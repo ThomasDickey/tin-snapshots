@@ -48,7 +48,7 @@ LIBS	= @LIBS@ $(INN_NNTPLIB)
 # Where do you want the binary & manual page installed?
 INS_BINARY_DIR	= @bindir@
 INS_DAEMON_DIR	= $(LIBDIR)
-INS_MANUAL_DIR	= $(prefix)/man/man
+INS_MANUAL_DIR	= @mandir@/man
 INS_MANUAL_EXT	= 1
 
 # Use INN clientlibs config functions (define USE_INN_NNTPLIB in autoconf.h)

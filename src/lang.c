@@ -522,6 +522,7 @@ constext txt_resp_x_of_n[] = "RespNo %3d of %3d\r\n";
 constext txt_s_at_s[] = "%s at %s";
 constext txt_save_filename[] = "Save filename [%s]> ";
 constext txt_saved[] = "-- %d Article(s) saved --";
+constext txt_saved_nothing[] = "-- No unread articles: nothing saved! --";
 constext txt_saved_pattern_to[] = "-- Saved pattern to %s - %s --";
 constext txt_saved_to_mailbox[] = "-- Saved to mailbox %s --";
 constext txt_saving[] = "Saving...";

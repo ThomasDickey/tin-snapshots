@@ -667,6 +667,7 @@ extern constext txt_s_at_s[];
 extern constext txt_save_filename[];
 extern constext txt_save_pattern[];
 extern constext txt_saved[];
+extern constext txt_saved_nothing[];
 extern constext txt_saved_pattern_to[];
 extern constext txt_saved_to_mailbox[];
 extern constext txt_saving[];

@@ -16,8 +16,8 @@
 
 #undef  OFF
 
-#define INITIAL 1
-#define MIDDLE	2
+#define INITIAL		1
+#define MIDDLE		2
 #define OFF		3
 #define END		4
 
@@ -94,7 +94,7 @@ check_start_save_any_news (check_start_save)
 	int log_opened = TRUE;
 	int print_first = TRUE;
 	int saved_arts = 0;
-	int saved_groups = 0;
+/*	int saved_groups = 0; */
 	int unread_news = FALSE;	
 	time_t epoch;
 	struct t_group *group;
@@ -161,7 +161,7 @@ check_start_save_any_news (check_start_save)
 								wait_message (buf);
 							}
 							print_group = FALSE;
-							saved_groups++;
+							/* saved_groups++; */
 							if (check_start_save == SAVE_ANY_NEWS) {
 #ifdef VMS
 				sprintf (buf, "[.%s]dummy", group_path);
@@ -405,7 +405,7 @@ save_thread_to_file (is_mailbox, group_path)
 	int i;
 
 	if (num_save == 0) {
-		info_message("No unread articles: nothing saved!");
+		info_message(txt_saved_nothing);
 		sleep(2);
 		return FALSE;
 	}
@@ -590,14 +590,12 @@ create_path (path)
 		}
 	}
 #else
-    if (my_mkdir (buf, 0755) == -1)
-     {
-      if (errno != EEXIST)
-       {
-	perror_message ("Cannot create %s", buf);
-	return FALSE;
-       }
-     }
+	if (my_mkdir (buf, 0755) == -1) {
+		if (errno != EEXIST) {
+			perror_message ("Cannot create %s", buf);
+			return FALSE;
+		}
+	}
 #endif
 
 	if (mbox_format) {
@@ -1548,5 +1546,3 @@ print_art_seperator_line (fp, mailbox)
 		my_fputc ('\n', fp);
 	}
 }
-
-

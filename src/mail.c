@@ -483,17 +483,17 @@ vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
 
 
 void
-vGrpDelMailArt (psGrp, psArt)
-	struct t_group *psGrp;
+vGrpDelMailArt (/*psGrp,*/ psArt)
+/*	struct t_group *psGrp;*/
 	struct t_article *psArt;
 {
 #if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 
 	if (psArt->delete) {
-		art_mark_undeleted (psGrp, psArt);
+		art_mark_undeleted (/*psGrp,*/ psArt);
 		info_message ("Article undeleted");
 	} else {
-		art_mark_deleted (psGrp, psArt);
+		art_mark_deleted (/*psGrp, */psArt);
 		info_message ("Article deleted");
 	}
 

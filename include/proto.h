@@ -154,7 +154,7 @@ extern void show_group_page P_((void));
 extern void update_group_page P_((void));
 extern void draw_subject_arrow P_((void));
 extern void erase_subject_arrow P_((void));
-extern int prompt_subject_num P_((int ch, char *group));
+extern int prompt_subject_num P_((int ch/*, char *group*/));
 extern void clear_note_area P_((void));
 extern int find_new_pos P_((int old_top, long old_artnum, int cur_pos));
 extern void mark_screen P_((int level, int screen_row, int screen_col, char *value));
@@ -203,7 +203,7 @@ extern void vPrintGrpLine P_((FILE *hFp, char *pcGrpName, long lArtMax, long lAr
 extern long lAtol P_((char *pcStr, int iNum));
 extern void vMakeGrpPath P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
 extern void vMakeGrpName P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
-extern void vGrpDelMailArt P_((struct t_group *psGrp, struct t_article *psArt));
+extern void vGrpDelMailArt P_((/*struct t_group *psGrp,*/ struct t_article *psArt));
 extern void vGrpDelMailArts P_((struct t_group *psGrp));
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 /* ./main.c */
@@ -309,8 +309,8 @@ extern void expand_bitmap P_((struct t_group *group, long min));
 extern void art_mark_read P_((struct t_group *group, struct t_article *art));
 extern void art_mark_unread P_((struct t_group *group, struct t_article *art));
 extern void art_mark_will_return P_((struct t_group *group, struct t_article *art));
-extern void art_mark_deleted P_((struct t_group *group, struct t_article *art));
-extern void art_mark_undeleted P_((struct t_group *group, struct t_article *art));
+extern void art_mark_deleted P_((/*struct t_group *group,*/ struct t_article *art));
+extern void art_mark_undeleted P_((/*struct t_group *group,*/ struct t_article *art));
 extern void vSetDefaultBitmap P_((struct t_group *group));
 extern char *getaline P_((FILE *fp));
 /* ./nntplib.c */

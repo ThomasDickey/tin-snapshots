@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960610 (Sun Jun  9 23:38:50 MET DST 1996)
 ----------------------------------------------------
-  17970 ./CHANGES
+  18374 ./CHANGES
    9218 ./TODO
    5012 ./Makefile
   17174 ./INSTALL
@@ -17,16 +17,16 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
    9210 ./include/config.h
-  31348 ./include/extern.h
+  31385 ./include/extern.h
     565 ./include/gst.h
   10025 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
    1562 ./include/patchlev.h
-  28562 ./include/proto.h
+  28578 ./include/proto.h
    1272 ./include/stpwatch.h
-  40242 ./include/tin.h
+  40333 ./include/tin.h
    4101 ./include/win32.h
     791 ./include/win32tcp.h
   19291 ./src/active.c
@@ -44,19 +44,19 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
   18348 ./src/feed.c
   35387 ./src/filter.c
   11250 ./src/getline.c
-  41720 ./src/group.c
+  41732 ./src/group.c
    2671 ./src/hashstr.c
    9691 ./src/help.c
-  11827 ./src/inews.c
+  11883 ./src/inews.c
   28052 ./src/init.c
-  41508 ./src/lang.c
+  41583 ./src/lang.c
    2771 ./src/list.c
-  12009 ./src/mail.c
+  12025 ./src/mail.c
   16832 ./src/main.c
   11022 ./src/memory.c
   42942 ./src/misc.c
    7234 ./src/msmail.c
-  33022 ./src/newsrc.c
+  33040 ./src/newsrc.c
   26051 ./src/nntplib.c
   31433 ./src/nntpw32.c
   26395 ./src/open.c
@@ -64,13 +64,13 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
   34756 ./src/page.c
   24128 ./src/parsdate.y
    7201 ./src/pgp.c
-  63983 ./src/post.c
+  63987 ./src/post.c
    4342 ./src/prompt.c
      53 ./src/proto.sed
   10088 ./src/refs.c
    5411 ./src/rfc1521.c
   12651 ./src/rfc1522.c
-  34250 ./src/save.c
+  34218 ./src/save.c
    4116 ./src/screen.c
    9895 ./src/search.c
   34879 ./src/select.c
@@ -84,5 +84,5 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
    7143 ./src/xref.c
    5549 ./src/vms.c
    5557 ./include/autoconf.hin
-  10116 ./src/Makefile.in
-1360005 total
+  10111 ./src/Makefile.in
+1360701 total
