@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : save.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 31.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *	             You may  freely  copy or  redistribute this  software,
@@ -1324,7 +1324,7 @@ post_process_sh (
 						 *  Write to temp file
 						 */
 						if (found_header)
-							my_fputs (buf, fp_out);
+							fputs (buf, fp_out);
 					}
 				}
 				fclose (fp_in);

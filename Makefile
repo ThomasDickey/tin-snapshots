@@ -1,15 +1,15 @@
 # Top level Makefile for tin
 # - for configuration options read the doc/INSTALL file.
 #
-# Updated   : 31.12.1997
+# Updated: 1998-02-15
 #
 
-PROJECT		= tin
-EXE		= tin
-MANEXT		= 1
-LVER		= 1.4
-PVER		= 980202
-VER		= pre-$(LVER)-$(PVER)
+PROJECT	= tin
+EXE	= tin
+MANEXT	= 1
+LVER	= 1.4
+PVER	= 980226
+VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
 TOPDIR	= .
@@ -187,7 +187,7 @@ PCRE	= \
 	$(PCREDIR)/testoutput \
 	$(PCREDIR)/testoutput2
 
-OLD    = \
+OLD	= \
 	$(OLDDIR)/msmail.c \
 	$(OLDDIR)/nntpvms.c \
 	$(OLDDIR)/nntpw32.c \
@@ -315,9 +315,9 @@ bzip2:
 # I know it's ugly, but it works
 #
 name:
-	@DATE=`date +%y%m%d`;  if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
+	@DATE=`date +%y%m%d`; if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
 	$(MV) ../`basename \`pwd\`` ../tin-$$DATE ; \
-	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./Makefile > ./Makefile.tmp \
+	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER	= $$DATE," ./Makefile > ./Makefile.tmp \
 	&& $(MV) ./Makefile.tmp ./Makefile ; \
 	$(SED) "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp \
 	&& $(MV) $(INCDIR)/version.h.tmp $(INCDIR)/version.h ; \

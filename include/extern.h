@@ -456,6 +456,7 @@ extern constext txt_enter_message_id[];
 extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
 extern constext txt_error_header_and_body_not_separate[];
+extern constext txt_error_header_line_bad_charset[];
 extern constext txt_error_header_line_blank[];
 extern constext txt_error_header_line_colon[];
 extern constext txt_error_header_line_comma[];
@@ -1216,6 +1217,7 @@ extern t_bool confirm_action;
 extern t_bool confirm_to_quit;
 extern t_bool count_articles;
 extern t_bool created_rcdir;
+extern t_bool dangerous_signal_exit; /* TRUE if SIGHUP, SIGTERM, SIGUSR1 */
 extern t_bool default_auto_save;
 extern t_bool default_batch_save;
 extern t_bool default_filter_kill_case;

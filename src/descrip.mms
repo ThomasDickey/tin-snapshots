@@ -129,10 +129,10 @@ MODULES = active, art, attrib, -
           charset, config, curses, debug, -
 	  envarg, feed, filter, getline, group, hashstr, -
           help, inews, init, lang, list, mail, main, -
-          memory, misc, msmail, newsrc, nntplib, nntpw32, -
-          open, os_2, page, pgp, post, prompt, -
+          memory, misc, newsrc, nntplib, -
+          open, page, pgp, post, prompt, -
           save, screen, search, select, sigfile, signal, -
-          strftime, thread, wildmat, win32, win32tcp, -
+          strftime, thread, wildmat, -
           xref, -
           rfc1522, rfc1521, string, header, -
           nrctbl, read, refs, regex, auth

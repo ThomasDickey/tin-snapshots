@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : envarg.c
- *  Author    : B.Davidson
- *  Created   : 10-13-91
- *  Updated   : 03-10-93
+ *  Author    : B. Davidson
+ *  Created   : 1991-10-13
+ *  Updated   : 1993-03-10
  *  Notes     : Adds default options from environment to command line
- *  Copyright : (c) Copyright 1991-94 by Bill Davidsen
+ *  Copyright : (c) Copyright 1991-98 by Bill Davidsen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

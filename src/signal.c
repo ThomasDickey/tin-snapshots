@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : signal.c
  *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 21-12-94
+ *  Created   : 1991-04-01
+ *  Updated   : 1994-12-21
  *  Notes     : signal handlers for different modes and window resizing
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -118,6 +118,9 @@ static const struct {
 #endif
 #ifdef SIGTSTP
 	{ SIGTSTP,	"SIGTSTP" },	/* terminal-stop */
+#endif
+#ifdef SIGHUP
+	{ SIGHUP,	"SIGHUP" },	/* hang up signal */
 #endif
 #ifdef SIGUSR1
 	{ SIGUSR1,	"SIGUSR1" },	/* User-defined signal 1 */
@@ -319,13 +322,26 @@ void _CDECL signal_handler (int sig)
 	Raw (FALSE);
 	EndWin ();
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
+#if defined(SIGHUP)
+	if (sig == SIGHUP)
+	{
+		dangerous_signal_exit = TRUE;
+		tin_done (- SIGHUP);
+	}
+#endif
 #if defined(SIGUSR1)
 	if (sig == SIGUSR1)
+	{
+		dangerous_signal_exit = TRUE;
 		tin_done (- SIGUSR1);
+	}
 #endif
 #if defined(SIGTERM)
 	if (sig == SIGTERM)
+	{
+		dangerous_signal_exit = TRUE;
 		tin_done (- SIGTERM);
+	}
 #endif
 #if defined(SIGBUS) || defined(SIGSEGV)
 	if (

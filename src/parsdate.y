@@ -2,9 +2,9 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : parsedate.y
- *  Author    : S.Bellovin & R.$alz & J.Berets & P.Eggert
- *  Created   : 01-08-90
- *  Updated   : 23-09-94
+ *  Author    : S. Bellovin, R. $alz, J. Berets, P. Eggert
+ *  Created   : 1990-08-01
+ *  Updated   : 1994-09-23
  *  Notes     : This grammar has 6 shift/reduce conflicts.
  *              Originally written by Steven M. Bellovin <smb@research.att.com>
  *              while at the University of North Carolina at Chapel Hill.

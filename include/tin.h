@@ -185,6 +185,30 @@
 
 #ifdef HAVE_SYS_IOCTL_H
 #	include <sys/ioctl.h>
+/* We don't need/use these, and they cause redefinition errors with SunOS 4.x
+ * when we include termio.h or termios.h
+ */
+#	if defined(sun) && !defined(__svr4)
+#		undef NL0
+#		undef NL1
+#		undef CR0
+#		undef CR1
+#		undef CR2
+#		undef CR3
+#		undef TAB0
+#		undef TAB1
+#		undef TAB2
+#		undef XTABS
+#		undef BS0
+#		undef BS1
+#		undef FF0
+#		undef FF1
+#		undef ECHO
+#		undef NOFLSH
+#		undef TOSTOP
+#		undef FLUSHO
+#		undef PENDIN
+#	endif
 #endif
 
 #ifdef HAVE_PROTOTYPES_H
@@ -410,32 +434,21 @@
 #		define	strrchr(str, ch)	rindex(str, ch)
 #	endif
 #	define	DEFAULT_SHELL	"/bin/csh"
-#	if defined(__386BSD__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__FreeBSD__)
+#	if defined(__386BSD__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #		define	DEFAULT_PRINTER	"/usr/bin/lpr"
-#		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
-#		define	DEFAULT_MAILBOX	"/var/mail"
 #		define	DEFAULT_SUM	"/usr/bin/cksum -o 1 <" /* use tailing <, otherwise get filename output too */
 #	else
-#		ifndef DEFAULT_EDITOR
-#			define	DEFAULT_EDITOR	"/usr/ucb/vi"
-#		endif
 #		define	DEFAULT_PRINTER	"/usr/ucb/lpr"
 #		define	DEFAULT_SUM	"sum"
 #	endif
 #	ifdef DGUX
-#		define	DEFAULT_MAILBOX	"/usr/mail"
 #		define	USE_INVERSE_HACK
 #	endif
 #	ifdef pyr
 #		define	DEFAULT_MAILER	"/usr/.ucbucb/mail"
 #	endif
 #else /* !BSD */
-#	if defined(NCR) || defined(atthcx) || defined(PTX) || defined(sinix)
-#		define	DEFAULT_MAILER	"/usr/bin/mailx"
-#	endif
 #	ifdef linux
-#		define	DEFAULT_MAILBOX	"/var/spool/mail"
-#		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_PRINTER	"/usr/bin/lpr"
 #	endif
 #	ifdef M_AMIGA
@@ -485,12 +498,6 @@
 #		define	DEFAULT_UUDECODE	"uudecode %s"
 #		define	DEFAULT_UNSHAR	"unshar %s"
 #	endif
-#	ifdef M_XENIX
-#		ifndef DEFAULT_EDITOR
-#			define	DEFAULT_EDITOR	"/bin/vi"
-#		endif
-#		define	DEFAULT_MAILER	"/usr/bin/mail"
-#	endif
 #	ifdef QNX42
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR	"/bin/vedit"
@@ -513,23 +520,15 @@
 #		define	DEFAULT_MAILER	"/bin/rmail"
 #	endif
 
-/*
- * TODO - check for new hp-ux (>=10) and correct the path
- * (new systems should have trasitions links to the old location, but...)
- *
- * DEFAULT_MAILER "/usr/sbin/sendmail"
- * DEFAULT_SHELL "/usr/bin/sh"
- * DEFAULT_MAILBOX "/var/mail/"
- */
+/* HP-UX >= 10 defines __STDC_EXT__ (ANSI) || __CLASSIC_C__ (K&R) */
+#	if defined (__hpux)
+#		if defined (__STDC_EXT__) || defined (__CLASSIC_C__)
+#			define DEFAULT_SHELL "/usr/bin/sh"
+#		endif
+#	endif
 
 #	ifndef DEFAULT_SHELL
 #		define	DEFAULT_SHELL	"/bin/sh"
-#	endif
-#	ifndef DEFAULT_MAILBOX
-#		define	DEFAULT_MAILBOX	"/usr/mail"
-#	endif
-#	ifndef DEFAULT_MAILER
-#		define	DEFAULT_MAILER	"/usr/lib/sendmail"
 #	endif
 #	ifndef DEFAULT_PRINTER
 #		define	DEFAULT_PRINTER	"/usr/bin/lp"

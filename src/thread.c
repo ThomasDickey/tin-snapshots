@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : thread.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 26.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-26
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -74,12 +74,10 @@ bld_tline (
 	struct t_msgid *ptr;
 
 	/*
-	 * Start with space for ->
+	 * Start with 2 spaces for ->
 	 * then index number of the message and whitespace (2+4+1 chars)
 	 */
-	strcpy(buff, "  ");
-	strcat(buff, tin_itoa(l, 4));
-	strcat(buff, " ");
+	sprintf (buff, "  %s ", tin_itoa(l, 4));
 
 	/*
 	 * Add the article flags, tag number, or whatever (3 chars)
@@ -88,7 +86,6 @@ bld_tline (
 		strcat (buff, tin_itoa(art->tagged, 3));
 	else {
 		strcat(buff, "   ");
-
 		if (art->inrange) {
 			mark = art_marked_inrange;
 		} else if (art->status == ART_UNREAD) {
@@ -96,8 +93,10 @@ bld_tline (
 		} else if (art->status == ART_WILL_RETURN) {
 			mark = art_marked_return;
 
-/* TODO - add kill_level		} else if (art->killed) {
- *			mark = 'K';
+/*
+ * TODO - add kill_level
+ * } else if (art->killed) {
+ *		mark = 'K';
  */
 
 		} else
@@ -541,7 +540,7 @@ thread_page_up:
 				erase_thread_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
 
-				thread_index_point = (((n = thread_index_point % scroll_lines) > 0)? (thread_index_point - n) : (((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines));
+				thread_index_point = (((n = thread_index_point % scroll_lines) > 0) ? (thread_index_point - n) : (((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines));
 
 				if (thread_index_point < 0)
 					thread_index_point = 0;

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : active.c
  *  Author    : I. Lea
- *  Created   : 16.02.1992
- *  Updated   : 05.01.1998
+ *  Created   : 1992-02-16
+ *  Updated   : 1998-01-05
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : mail.c
- *  Author    : I.Lea
- *  Created   : 02-10-92
- *  Updated   : 11-08-94
+ *  Author    : I. Lea
+ *  Created   : 1992-10-02
+ *  Updated   : 1994-08-11
  *  Notes     : Mail handling routines for creating pseudo newsgroups
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : string.c
  *  Author    : Urs Janssen <urs@tin.org>
- *  Created   : 20.01.1997
- *  Updated   : 31.12.1997
+ *  Created   : 1997-01-20
+ *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1997-98 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
@@ -453,6 +453,15 @@ str_trim(
  * Returns the number of characters written (not counting null), or -1 if there
  * is not enough room in the 'dst' buffer.
  */
+
+#define SH_FORMAT(c)	if (++result >= (int) len) \
+				break; \
+			*dst++ = c
+
+#define SH_SINGLE "\\\'"
+#define SH_DOUBLE "\\\'\"`$"
+#define SH_META   "\\\'\"`$*%?()[]{}|<>^&;#~"
+
 int
 sh_format (char *dst,
 	size_t len,
@@ -463,17 +472,22 @@ sh_format (char *dst,
 	char *src;
 	char temp[20];
 	va_list ap;
+	int quote = 0;
 
 	va_start(ap,fmt);
 
 	while (*fmt != 0) {
 		int ch = *fmt++;
 
-		if (ch == '%') {
-			if (*fmt == 0) {
-				if (++result >= (int) len)
-					break;
-				*dst++ = '%';
+		if (ch == '\\') {
+			SH_FORMAT(ch);
+			if (*fmt != '\0') {
+				SH_FORMAT(*fmt++);
+			}
+			continue;
+		} else if (ch == '%') {
+			if (*fmt == '\0') {
+				SH_FORMAT('%');
 				break;
 			}
 
@@ -494,8 +508,8 @@ sh_format (char *dst,
 			}
 
 			while (*src != '\0') {
-				if (++result >= (int) len)
-					break;
+				t_bool fix;
+
 				/*
 				 * This logic works for Unix.  Non-Unix systems
 				 * may require a different set of problem
@@ -503,17 +517,27 @@ sh_format (char *dst,
 				 * string rather than escaping individual
 				 * chars.
 				 */
-				if (strchr("*%?$()[]{}|<>^&;#\\\"`'~", *src)) {
-					if (++result >= (int) len)
-						break;
-					*dst++ = '\\';
+				if (quote == '"') {
+					fix = (strchr(SH_DOUBLE, *src) != 0);
+				} else if (quote == '\'') {
+					fix = (strchr(SH_SINGLE, *src) != 0);
+				} else {
+					fix = (strchr(SH_META, *src) != 0);
 				}
-				*dst++ = *src++;
+				if (fix) {
+					SH_FORMAT('\\');
+				}
+				SH_FORMAT(*src++);
 			}
 		} else {
-			if (++result >= (int) len)
-				break;
-			*dst++ = ch;
+			if (quote) {
+				if (ch == quote)
+					quote = 0;
+			} else {
+				if (ch == '"' || ch == '\'')
+					quote = ch;
+			}
+			SH_FORMAT(ch);
 		}
 	}
 	va_end(ap);
@@ -525,3 +549,31 @@ sh_format (char *dst,
 
 	return (result);
 }
+
+#ifndef HAVE_STRERROR
+#	ifdef HAVE_SYS_ERRLIST
+#		ifdef M_AMIGA
+#			ifndef sys_errlist
+				extern char *__sys_errlist[];
+#				define sys_errlist	__sys_errlist
+#			endif
+#		else
+#			ifdef DECL_SYS_ERRLIST
+				extern char *sys_errlist[];
+#			endif
+#		endif
+		extern int sys_nerr;
+#	endif
+
+char *
+my_strerror(int n)
+{
+	static char temp[20];
+#ifdef HAVE_SYS_ERRLIST
+	if (n >= 0 && n < sys_nerr)
+		return sys_errlist[n];
+#endif
+	sprintf(temp, "Errno: %i", n);
+	return temp;
+}
+#endif /* !HAVE_STRERROR */

@@ -2,8 +2,8 @@
  * Project   : tin - a Usenet reader
  * Module    : header.c
  * Author    : Urs Janssen <urs@tin.org>
- * Created   : 10.03.1997
- * Updated   : 19.03.1997
+ * Created   : 1997-03-10
+ * Updated   : 1997-03-19
  * Copyright : (c) Copyright 1997-98 by Urs Janssen
  *             You may  freely  copy or  redistribute  this software,
  *             so  long as there is no profit made from its use, sale
@@ -321,14 +321,14 @@ build_sender (void)
 
 	sender[0] = '\0';
 
-	if ((ptr = get_full_name())) {
-		strcpy(sender, ptr);
-		strcat(sender, " ");
-	}
+	if ((ptr = get_full_name()))
+		sprintf(sender, "%s ", ptr);
+
 	if ((ptr = get_user_name())) {
 		strcat(sender, "<");
 		strcat(sender, ptr);
 		strcat(sender, "@");
+
 #ifdef HAVE_GETHOSTBYNAME
 		if ((ptr = get_fqdn(get_host_name())))
 #else

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 24.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-24
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
@@ -253,7 +253,8 @@ get_respcode (
 	respcode = (int) strtol(ptr, &end, 10);
 DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 
-	if ((respcode == ERR_FAULT)  /* || (respcode == ERR_GOODBYE) ??? */) {
+	if ((respcode == ERR_FAULT /* || respcode == ERR_GOODBYE ??? */) &&
+	    last_put[0] != '\0') {
 		/*
 		 * Maybe server timed out.
 		 * If so, retrying will force a reconnect.
@@ -325,6 +326,7 @@ DEBUG_IO((stderr, "nntp_command (%s)\n", command));
 #endif
 	put_server (command);
 
+	if (dangerous_signal_exit != TRUE)
 	if ((/* respcode = */ get_respcode (message)) != success) {
 #ifdef DEBUG
 		debug_nntp (command, "NOT_OK");
@@ -464,7 +466,7 @@ open_newsgroups_fp (void)
 # endif /* DEBUG */
 				return result;
 			}
-			read_local_newsgroups_file = FALSE ;
+			read_local_newsgroups_file = FALSE;
 		}
 		return (nntp_command ("LIST NEWSGROUPS", OK_GROUPS, NULL));
 	} else
@@ -794,7 +796,7 @@ setup_hard_base (
 		 * nntpcache and leafnode. Usually this should not be needed.
 		 */
 		sprintf (buf, "GROUP %s", group->name);
-		if (nntp_command(buf, OK_GROUP, line) == NULL)
+		if (nntp_command(buf, OK_GROUP, NULL) == NULL)
 			return(-1);
 #endif /* 0*/
 

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : joinpath.c
  *  Author    : Thomas Dickey <dickey@clark.net>
- *  Created   : 10.01.1997
- *  Updated   : 10.01.1997
+ *  Created   : 1997-01-10
+ *  Updated   : 1997-01-10
  *  Notes     :
  *  Copyright : (c) Copyright 1997-98 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,

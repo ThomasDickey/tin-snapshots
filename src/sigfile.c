@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : sigfile.c
  *  Author    : M. Gleason & I. Lea
- *  Created   : 17.10.1992
- *  Updated   : 20.12.1997
+ *  Created   : 1992-10-17
+ *  Updated   : 1998-02-22
  *  Notes     : Generate random signature for posting/mailing etc.
  *  Copyright : (c) Copyright 1989-98 by Mike Gleason & Iain Lea
  *	             You may  freely  copy or  redistribute  this software,
@@ -54,12 +54,19 @@ msg_write_signature (
 	if (thisgroup->attribute->sigfile[0] == '!') {
 		char cmd[PATH_LEN];
 		FILE *pipe_fp;
+		char *sigcmd;
 		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-		if ((pipe_fp = popen (thisgroup->attribute->sigfile+1, "r")) != (FILE *) 0) {
-			while (fgets (cmd, PATH_LEN, pipe_fp))
-				fputs (cmd, fp);
-			pclose (pipe_fp);
-		}
+		if ((sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4)) != NULL) {
+			sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
+			if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
+				while (fgets (cmd, PATH_LEN, pipe_fp))
+					fputs (cmd, fp);
+				pclose (pipe_fp);
+			}
+			free(sigcmd);
+		} else
+			wait_message (2, txt_out_of_memory2);
+
 		return;
 	}
 	get_cwd (cwd);

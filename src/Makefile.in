@@ -1,7 +1,7 @@
-# Source Makefile for tin 
+# Source Makefile for tin
 # - for configuration options read the ../doc/INSTALL file.
 #
-# Updated   : 31.01.1998
+# Updated: 1998-01-31
 #
 
 SHELL		= /bin/sh

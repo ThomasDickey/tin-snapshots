@@ -1,5 +1,5 @@
 #
-# $VER: tin_makefile 2.2a (14.12.97)
+# $VER: tin_makefile 2.2b (19.02.97)
 #
 # This is especially for use with the SAS/C developing system
 # version 6.55 and above
@@ -105,16 +105,12 @@ HEADERS = \
         $(INCDIR)/config.h \
         $(INCDIR)/extern.h \
         $(INCDIR)/menukeys.h \
-        $(INCDIR)/msmail.h \
         $(INCDIR)/nntplib.h \
-        $(INCDIR)/os_2.h \
         $(REDIR)/pcre.h \
         $(INCDIR)/proto.h \
         $(INCDIR)/stpwatch.h \
         $(INCDIR)/tin.h \
         $(INCDIR)/version.h \
-        $(INCDIR)/win32.h \
-        $(INCDIR)/win32tcp.h
 #/*vb*/  $(INCDIR)/conf.h \
 
 #
@@ -152,13 +148,10 @@ OBJECTS = \
         $(OBJDIR)/main.o \
         $(OBJDIR)/memory.o \
         $(OBJDIR)/misc.o \
-        $(OBJDIR)/msmail.o \
         $(OBJDIR)/newsrc.o\
         $(OBJDIR)/nntplib.o \
-        $(OBJDIR)/nntpw32.o \
         $(OBJDIR)/nrctbl.o \
         $(OBJDIR)/open.o \
-        $(OBJDIR)/os_2.o \
         $(OBJDIR)/page.o \
         $(OBJDIR)/parsdate.o \
         $(OBJDIR)/pcre.o \
@@ -168,8 +161,8 @@ OBJECTS = \
         $(OBJDIR)/read.o \
         $(OBJDIR)/refs.o \
         $(OBJDIR)/regex.o \
-        $(OBJDIR)/rfc1521.o\
-        $(OBJDIR)/rfc1522.o\
+        $(OBJDIR)/rfc1521.o \
+        $(OBJDIR)/rfc1522.o \
         $(OBJDIR)/save.o \
         $(OBJDIR)/screen.o \
         $(OBJDIR)/search.o \
@@ -180,10 +173,7 @@ OBJECTS = \
         $(OBJDIR)/string.o \
         $(OBJDIR)/study.o \
         $(OBJDIR)/thread.o \
-        $(OBJDIR)/vms.o \
         $(OBJDIR)/wildmat.o \
-        $(OBJDIR)/win32.o \
-        $(OBJDIR)/win32tcp.o \
         $(OBJDIR)/xref.o \
 # (obw)  $(OBJDIR)/_tzset.o \
 #        $(OBJDIR)/parsdate.c \
@@ -277,13 +267,10 @@ $(OBJDIR)/makecfg.o:            $(SRCDIR)/makecfg.c $(GSTFILE)
 $(OBJDIR)/maketables.o:         $(REDIR)/maketables.c $(GSTFILE)
 $(OBJDIR)/memory.o:             $(SRCDIR)/memory.c $(GSTFILE)
 $(OBJDIR)/misc.o:               $(SRCDIR)/misc.c $(GSTFILE)
-$(OBJDIR)/msmail.o:             $(SRCDIR)/msmail.c $(GSTFILE)
 $(OBJDIR)/newsrc.o:             $(SRCDIR)/newsrc.c $(GSTFILE)
 $(OBJDIR)/nntplib.o:            $(SRCDIR)/nntplib.c $(GSTFILE)
-$(OBJDIR)/nntpw32.o:            $(SRCDIR)/nntpw32.c $(GSTFILE)
 $(OBJDIR)/nrctbl.o:             $(SRCDIR)/nrctbl.c $(GSTFILE)
 $(OBJDIR)/open.o:               $(SRCDIR)/open.c $(GSTFILE)
-$(OBJDIR)/os_2.o:               $(SRCDIR)/os_2.c $(GSTFILE)
 $(OBJDIR)/page.o:               $(SRCDIR)/page.c $(GSTFILE)
 #$(OBJDIR)/parsdate.o:           $(AMIDIR)/parsdate.c $(GSTFILE)
 $(OBJDIR)/parsdate.o:           $(SRCDIR)/parsdate.c $(GSTFILE)
@@ -307,8 +294,5 @@ $(OBJDIR)/strftime.o:           $(SRCDIR)/strftime.c $(GSTFILE)
 $(OBJDIR)/string.o:             $(SRCDIR)/string.c $(GSTFILE)
 $(OBJDIR)/study.o:              $(REDIR)/study.c $(GSTFILE)
 $(OBJDIR)/thread.o:             $(SRCDIR)/thread.c $(GSTFILE)
-$(OBJDIR)/vms.o:                $(SRCDIR)/vms.c $(GSTFILE)
 $(OBJDIR)/wildmat.o:            $(SRCDIR)/wildmat.c $(GSTFILE)
-$(OBJDIR)/win32.o:              $(SRCDIR)/win32.c $(GSTFILE)
-$(OBJDIR)/win32tcp.o:           $(SRCDIR)/win32tcp.c $(GSTFILE)
 $(OBJDIR)/xref.o:               $(SRCDIR)/xref.c $(GSTFILE)

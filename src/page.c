@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : page.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 26-07-95
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 1991-04-01
+ *  Updated   : 1995-07-26
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -359,7 +359,7 @@ page_down:
 				respnum = n;
 				goto restart;
 
-			case iKeyPageNextUnread: 	/* goto next unread article */
+			case iKeyPageNextUnread:	/* goto next unread article */
 page_goto_next_unread:
 				skip_include = '\0';
 				if (note_page != ART_UNAVAILABLE) {

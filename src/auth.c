@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
- *  Created   : 05.04.1997
- *  Updated   : 19.12.1997
+ *  Created   : 1997-04-05
+ *  Updated   : 1997-12-19
  *  Notes     : Routines to authenticate to a news server via NNTP
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,
@@ -93,7 +93,7 @@ authinfo_generic (void)
 
 #ifdef HAVE_PUTENV
 	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
-	new_env = my_malloc (strlen (tmpbuf) + 1);
+	new_env = (char *) my_malloc (strlen (tmpbuf) + 1);
 	strcpy (new_env, tmpbuf);
 	putenv (new_env);
 	FreeIfNeeded (old_env);
@@ -237,10 +237,7 @@ do_authinfo_original (
 	debug_nntp ("authorization", line);
 #endif
 	put_server (line);
-	if ((ret = get_respcode(line)) == OK_AUTH)
-		wait_message(2, txt_authorization_ok, authuser);
-	else
-		wait_message(2, txt_authorization_fail, authuser);
+	wait_message(2, (((ret = get_respcode(line)) == OK_AUTH) ? txt_authorization_ok : txt_authorization_fail), authuser);
 	return ret;
 }
 

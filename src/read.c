@@ -2,9 +2,9 @@
  *  Project   : tin - a Usenet reader
  *  Module    : read.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
- *  Created   : 10-04-97
- *  Updated   : 15-05-97
- *  Copyright : (c) 1997 by Jason Faultless
+ *  Created   : 1997-04-10
+ *  Updated   : 1997-04-15
+ *  Copyright : (c) 1997-98 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -34,7 +34,7 @@ static char * tin_read (char *buffer, size_t len, FILE *fp);
 #ifdef NNTP_ABLE
 /*
  * Used by the I/O read routine to look for keyboard input
- * Returns TRUE if user aborted with 'q'
+ * Returns TRUE if user aborted with 'q' or 'z' (lynx-style)
  *         FALSE otherwise
  * Exits via tin_done() on irrecoverable errors
  */
@@ -45,7 +45,7 @@ wait_for_input (
 #ifdef VMS
 	int ch = ReadChNowait ();
 
-	if (ch == 'q' || ch == ESC) {
+	if (ch == 'q' || ch == 'z' || ch == ESC) {
 		if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
 			return (TRUE);
 	}
@@ -98,7 +98,7 @@ wait_for_input (
 DEBUG_IO((stderr, "keybd ready\n"));
 				ch = ReadCh();
 
-				if (ch == 'q' || ch == ESC) {
+				if (ch == 'q' || ch == 'z' || ch == ESC) {
 					if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
 /* TODO if(cmd_line) this is all cacked when not in curses mode */
 						return (TRUE);
@@ -299,12 +299,12 @@ DEBUG_IO((stderr, "Drain %s\n", buf));
 }
 
 /* It works the same way as fgets except that it converts
-   new line character into ' ' if the first character following it
-   is white space(' ' or '\t'). It's used by rfc1521.c
-   to concatenate multiple line header field into a single line.
-   It also removes leading white spaces in continuation header lines
-   J. Shin */
-
+ * new line character into ' ' if the first character following it
+ * is white space(' ' or '\t'). It's used by rfc1521.c
+ * to concatenate multiple line header field into a single line.
+ * It also removes leading white spaces in continuation header lines
+ * J. Shin
+ */
 char *
 fgets_hdr (
 	char *s,
@@ -319,7 +319,7 @@ fgets_hdr (
 	*s1 = (int) c;
 
 	while ((size_t) (s1-s) < size-2 && c != EOF) {
-		if (*s1  == '\n' || *s1 == '\r') {
+		if (*s1 == '\n' || *s1 == '\r') {
 			if (!is_leading_wsp) {
 				is_leading_wsp = 1;
 				c = fgetc(f);

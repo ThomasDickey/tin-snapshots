@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : refs.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
- *  Created   : 09.05.96
- *  Updated   : 04.01.98
+ *  Created   : 1996-05-09
+ *  Updated   : 1998-01-04
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
  *              hash_msgid, free_msgid

@@ -6,8 +6,8 @@ tested have a look at doc/INSTALL).
 Quick Install:
 
 configure to your local setup (have a look at):
-	configure --help
-	conf-tin
+	./configure --help
+	./conf-tin
 
 check your local setup in:
 	include/autoconf.h
@@ -28,7 +28,7 @@ tins mail_bugreport function (shift-R) and write in english.
 
 The latest release is available at:
 <ftp://ftp.tin.org/pub/news/clients/tin/current/>
-or it's mirrors.
+or its mirrors.
 
 If you have additional questions or like to be informed about the
 latest new features/version you may subscribe to the (developers)

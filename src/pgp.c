@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : pgp.c
  *  Author    : Steven J. Madsen
- *  Created   : 12.05.1995
- *  Updated   : 31.12.1997
+ *  Created   : 1995-05-12
+ *  Updated   : 1997-12-31
  *  Notes     : PGP support for article posting and mailing
  *  Copyright : (c) 1995-98 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : init.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 28.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-28
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -219,6 +219,8 @@ t_bool confirm_action;
 t_bool confirm_to_quit;
 t_bool count_articles;			/* count articles on spooldir or via GROUP cmd */
 t_bool created_rcdir;			/* checks if first time tin is started */
+t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command
+					when dangerous signal exit */
 t_bool default_auto_save;		/* save thread with name from Archive-name: field */
 t_bool default_batch_save;		/* save arts if -M/-S command line switch specified */
 t_bool default_filter_kill_case;
@@ -539,6 +541,7 @@ void init_selfinfo (void)
 	inverse_okay = TRUE;
 	draw_arrow_mark = FALSE;
 #endif
+	dangerous_signal_exit = FALSE;
 	default_auto_save = FALSE;
 	default_auto_save_msg = FALSE;
 	default_batch_save = FALSE;
@@ -706,7 +709,7 @@ void init_selfinfo (void)
 	 */
 
 #ifdef INEWSDIR
-	strcpy(inewsdir, INEWSDIR);
+	strcpy (inewsdir, INEWSDIR);
 #else /* INEWSDIR */
 	inewsdir[0] = '\0';
 #endif /* INEWSDIR */
@@ -723,9 +726,8 @@ void init_selfinfo (void)
 		my_strncpy (default_organization, ptr, sizeof (default_organization));
 #endif /* USE_INN_NNTPLIB */
 
-	/* getval sucks - it doesn't check buffer overflows! */
-	strcpy(libdir, get_val("TIN_LIBDIR", NEWSLIBDIR));
 #ifndef NNTP_ONLY
+	strcpy (libdir, get_val("TIN_LIBDIR", NEWSLIBDIR)); /* moved inside ifdef */
 	strcpy (novrootdir, get_val ("TIN_NOVROOTDIR", NOVROOTDIR));
 	strcpy (novfilename, get_val ("TIN_NOVFILENAME", OVERVIEW_FILE));
 	strcpy (spooldir, get_val ("TIN_SPOOLDIR", SPOOLDIR));
@@ -1058,7 +1060,7 @@ static int read_site_config (void)
 {
 	FILE *fp;
 	char buf[LEN];
-	const char *tin_defaults[] = { TIN_DEFAULTS };
+	static const char *tin_defaults[] = { TIN_DEFAULTS };
 	int i = 0;
 	struct stat sb;
 

@@ -2,11 +2,11 @@
  *  Project   : tin - a Usenet reader
  *  Module    : regex.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
- *  Created   : 21-02-97
- *  Updated   : 25-02-97
+ *  Created   : 1997-02-21
+ *  Updated   : 1997-02-25
  *  Notes     : Regular expression subroutines
  *  Credits   :
- *  Copyright : (c) 1997 by Jason Faultless
+ *  Copyright : (c) 1997-98 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 04.12.97
+dnl Updated   : 20.02.98
 dnl Notes     :
 dnl
-dnl Copyright 1996,1997 by Thomas Dickey
+dnl Copyright 1996,1997,1998 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -242,6 +242,34 @@ else
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check if curses supports color.  (Note that while SVr3 curses supports
+dnl color, it does this differently from SVr4 curses; more work would be needed
+dnl to accommodate SVr3).
+dnl 
+AC_DEFUN([CF_COLOR_CURSES],
+[
+AC_MSG_CHECKING(if curses supports color attributes)
+AC_CACHE_VAL(cf_cv_color_curses,[
+	AC_TRY_LINK([
+#include <$cf_cv_ncurses_header>
+],
+	[chtype x = COLOR_BLUE;
+	 has_colors();
+	 start_color();
+#ifndef NCURSES_BROKEN
+	 wbkgd(curscr, getbkgd(stdscr)); /* X/Open XPG4 aka SVr4 Curses */
+#endif
+	],
+	[cf_cv_color_curses=yes],
+	[cf_cv_color_curses=no])
+	])
+AC_MSG_RESULT($cf_cv_color_curses)
+if test $cf_cv_color_curses = yes ; then
+	AC_DEFINE(COLOR_CURSES)
+	test ".$cf_cv_ncurses_broken" != .yes && AC_DEFINE(HAVE_GETBKGD)
+fi
+])
+dnl ---------------------------------------------------------------------------
 dnl Check if the application can dump core (for debugging).
 AC_DEFUN([CF_COREFILE],
 [
@@ -335,39 +363,172 @@ freebsd*) #(vi
 		# HP's header uses __HP_CURSES, but user claims _HP_CURSES.
 		LIBS="-lHcurses $LIBS"
 		CFLAGS="-D__HP_CURSES -D_HP_CURSES $CFLAGS"
+		ac_cv_func_initscr=yes
 		],[
 	AC_CHECK_LIB(cur_color,initscr,[
 		LIBS="-lcur_color $LIBS"
 		CFLAGS="-I/usr/include/curses_colr $CFLAGS"
+		ac_cv_func_initscr=yes
 		])])
 	;;
 esac
+
+if test ".$With5lib" != ".no" ; then
 if test -d /usr/5lib ; then
 	# SunOS 3.x or 4.x
 	CPPFLAGS="$CPPFLAGS -I/usr/5include"
 	LIBS="$LIBS -L/usr/5lib"
-# FIXME: check if we need/use -R option
-# elif test -d /usr/ccs/lib ; then
-# 	# Solaris 5.x
-# 	LIBS="$LIBS -L/usr/ccs/lib -R/usr/ccs/lib"
+fi
 fi
 
-cf_save_LIBS="$LIBS"
-AC_CHECK_FUNC(tgoto,[
-	AC_CHECK_LIB(curses,initscr,,[
-		AC_ERROR(cannot link curses)])
-],[
-AC_CHECK_LIB(termcap, tgoto,[
-	LIBS="-ltermcap $cf_save_LIBS"
-	AC_CHECK_LIB(curses,initscr,,[
-		AC_CHECK_LIB(cursesX,initscr,,[
-			AC_CHECK_LIB(jcurses,initscr,,[
-				AC_ERROR(cannot link curses)])])])
-	],[
-	AC_CHECK_LIB(curses,initscr,,[
-		AC_ERROR(cannot link curses)])])
-])
+if test ".$ac_cv_func_initscr" != .yes ; then
+	cf_save_LIBS="$LIBS"
+	cf_term_lib=""
+	cf_curs_lib=""
+
+	# Check for library containing tgoto.  Do this before curses library
+	# because it may be needed to link the test-case for initscr.
+	AC_CHECK_FUNC(tgoto,[cf_term_lib=predefined],[
+		for cf_term_lib in termcap termlib unknown
+		do
+			AC_CHECK_LIB($cf_term_lib,tgoto,[break])
+		done
+	])
+
+	# Check for library containing initscr
+	test "$cf_term_lib" != predefined && test "$cf_term_lib" != unknown && LIBS="-l$cf_term_lib $cf_save_LIBS"
+	for cf_curs_lib in curses ncurses xcurses cursesX jcurses unknown
+	do
+		AC_CHECK_LIB($cf_curs_lib,initscr,[break])
+	done
+	test $cf_curs_lib = unknown && AC_ERROR(no curses library found)
+
+	LIBS="-l$cf_curs_lib $cf_save_LIBS"
+	if test "$cf_term_lib" = unknown ; then
+		AC_MSG_CHECKING(if we can link with $cf_curs_lib library)
+		AC_TRY_LINK([#include <${cf_cv_ncurses_header-curses.h}>],
+			[initscr()],
+			[cf_result=yes],
+			[cf_result=no])
+		AC_MSG_RESULT($cf_result)
+		test $cf_result = no && AC_ERROR(Cannot link curses library)
+	elif test "$cf_term_lib" != predefined ; then
+		AC_MSG_CHECKING(if we need both $cf_curs_lib and $cf_term_lib libraries)
+		AC_TRY_LINK([#include <${cf_cv_ncurses_header-curses.h}>],
+			[initscr(); tgoto((char *)0, 0, 0);],
+			[cf_result=no],
+			[
+			LIBS="-l$cf_curs_lib -l$cf_term_lib $cf_save_LIBS"
+			AC_TRY_LINK([#include <${cf_cv_ncurses_header-curses.h}>],
+				[initscr()],
+				[cf_result=yes],
+				[cf_result=error])
+			])
+		AC_MSG_RESULT($cf_result)
+	fi
+fi
+
 ])])
+dnl ---------------------------------------------------------------------------
+dnl Check if we should include <curses.h> to pick up prototypes for termcap
+dnl functions.  On terminfo systems, these are normally declared in <curses.h>,
+dnl but may be in <term.h>.  We check for termcap.h as an alternate, but it
+dnl isn't standard (usually associated with GNU termcap).
+dnl
+dnl The 'tgoto()' function is declared in both terminfo and termcap.
+dnl
+dnl See CF_TYPE_OUTCHAR for more details.
+AC_DEFUN([CF_CURSES_TERMCAP],
+[
+AC_REQUIRE([CF_CURSES_TERM_H])
+AC_MSG_CHECKING(if we should include curses.h or termcap.h)
+AC_CACHE_VAL(cf_cv_need_curses_h,[
+cf_save_CFLAGS="$CFLAGS"
+cf_cv_need_curses_h=no
+
+for cf_t_opts in "" "NEED_TERMCAP_H"
+do
+for cf_c_opts in "" "NEED_CURSES_H"
+do
+
+    CFLAGS="$cf_save_CFLAGS $CHECK_DECL_FLAG"
+    test -n "$cf_c_opts" && CFLAGS="$CFLAGS -D$cf_c_opts"
+    test -n "$cf_t_opts" && CFLAGS="$CFLAGS -D$cf_t_opts"
+
+    AC_TRY_LINK([/* $cf_c_opts $cf_t_opts */
+$CHECK_DECL_HDRS],
+	[char *x = (char *)tgoto("")],
+	[test "$cf_cv_need_curses_h" = no && {
+	     cf_cv_need_curses_h=maybe
+	     cf_ok_c_opts=$cf_c_opts
+	     cf_ok_t_opts=$cf_t_opts
+	}],
+	[echo "Recompiling with corrected call (C:$cf_c_opts, T:$cf_t_opts)" >&AC_FD_CC
+	AC_TRY_LINK([
+$CHECK_DECL_HDRS],
+	[char *x = (char *)tgoto("",0,0)],
+	[cf_cv_need_curses_h=yes
+	 cf_ok_c_opts=$cf_c_opts
+	 cf_ok_t_opts=$cf_t_opts])])
+
+	CFLAGS="$cf_save_CFLAGS"
+	test "$cf_cv_need_curses_h" = yes && break
+done
+	test "$cf_cv_need_curses_h" = yes && break
+done
+
+if test "$cf_cv_need_curses_h" != no ; then
+	echo "Curses/termcap test = $cf_cv_need_curses_h (C:$cf_ok_c_opts, T:$cf_ok_t_opts)" >&AC_FD_CC
+	if test -n "$cf_ok_c_opts" ; then
+		if test -n "$cf_ok_t_opts" ; then
+			cf_cv_need_curses_h=both
+		else
+			cf_cv_need_curses_h=curses.h
+		fi
+	elif test -n "$cf_ok_t_opts" ; then
+		cf_cv_need_curses_h=termcap.h
+	elif test "$cf_cv_have_term_h" = yes ; then
+		cf_cv_need_curses_h=term.h
+	else 
+		cf_cv_need_curses_h=no
+	fi
+fi
+])
+AC_MSG_RESULT($cf_cv_need_curses_h)
+
+case $cf_cv_need_curses_h in
+both) #(vi
+	AC_DEFINE_UNQUOTED(NEED_CURSES_H)
+	AC_DEFINE_UNQUOTED(NEED_TERMCAP_H)
+	;;
+curses.h) #(vi
+	AC_DEFINE_UNQUOTED(NEED_CURSES_H)
+	;;
+termcap.h) #(vi
+	AC_DEFINE_UNQUOTED(NEED_TERMCAP_H)
+	;;
+esac
+
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl SVr4 curses should have term.h as well (where it puts the definitions of
+dnl the low-level interface).  This may not be true in old/broken implementations,
+dnl as well as in misconfigured systems (e.g., gcc configured for Solaris 2.4
+dnl running with Solaris 2.5.1).
+AC_DEFUN([CF_CURSES_TERM_H],
+[
+AC_MSG_CHECKING([for term.h])
+AC_CACHE_VAL(cf_cv_have_term_h,[
+	AC_TRY_COMPILE([
+#include <curses.h>
+#include <term.h>],
+	[WINDOW *x],
+	[cf_cv_have_term_h=yes],
+	[cf_cv_have_term_h=no])
+	])
+AC_MSG_RESULT($cf_cv_have_term_h)
+test $cf_cv_have_term_h = yes && AC_DEFINE(HAVE_TERM_H)
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if 'errno' is declared in <errno.h>
 AC_DEFUN([CF_ERRNO],
@@ -415,6 +576,11 @@ AC_DEFUN([CF_FIND_LIBRARY],
 if test $cf_cv_have_lib_$1 = no ; then
 	AC_ERROR(Cannot link $1 library)
 fi
+case $host_os in #(vi
+linux*) # Suse Linux does not follow /usr/lib convention
+	$1="[$]$1 /lib"
+	;;
+esac
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
@@ -737,7 +903,7 @@ esac
 
 LIBS="$cf_ncurses_LIBS $LIBS"
 CF_FIND_LIBRARY(ncurses,
-	[#include <$cf_cv_ncurses_header>],
+	[#include <${cf_cv_ncurses_header-curses.h}>],
 	[initscr()],
 	initscr)
 
@@ -750,7 +916,7 @@ if test -n "$cf_ncurses_LIBS" ; then
 			LIBS="$q"
 		fi
 	done
-	AC_TRY_LINK([#include <$cf_cv_ncurses_header>],
+	AC_TRY_LINK([#include <${cf_cv_ncurses_header-curses.h}>],
 		[initscr(); mousemask(0,0); tgoto((char *)0, 0, 0);],
 		[AC_MSG_RESULT(yes)],
 		[AC_MSG_RESULT(no)
@@ -765,7 +931,7 @@ AC_CACHE_VAL(cf_cv_ncurses_version,[
 	cf_cv_ncurses_version=no
 	cf_tempfile=out$$
 	AC_TRY_RUN([
-#include <$cf_cv_ncurses_header>
+#include <${cf_cv_ncurses_header-curses.h}>
 int main()
 {
 	FILE *fp = fopen("$cf_tempfile", "w");
@@ -790,7 +956,7 @@ int main()
 	# This will not work if the preprocessor splits the line after the
 	# Autoconf token.  The 'unproto' program does that.
 	cat > conftest.$ac_ext <<EOF
-#include <$cf_cv_ncurses_header>
+#include <${cf_cv_ncurses_header-curses.h}>
 #undef Autoconf
 #ifdef NCURSES_VERSION
 Autoconf NCURSES_VERSION
@@ -852,6 +1018,80 @@ AC_CHECK_FUNCS(strcasecmp,,[
 ])
 LIBS="$LIBS $cf_cv_netlibs"
 test $cf_test_netlibs = no && echo "$cf_cv_netlibs" >&AC_FD_MSG
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Look for the default editor (vi)
+AC_DEFUN([CF_PATH_EDITOR],
+[
+AC_MSG_CHECKING(for default editor)
+AC_ARG_WITH(editor,
+    [  --with-editor=PROG      specify editor (default: vi)],
+    [DEFAULT_EDITOR=$withval],[
+if test -z "$DEFAULT_EDITOR" ; then
+    if test -n "$EDITOR" ; then
+    	DEFAULT_EDITOR="$EDITOR"
+    elif test -n "$VISUAL" ; then
+    	DEFAULT_EDITOR="$VISUAL"
+    else
+	AC_PATH_PROG(DEFAULT_EDITOR,vi,vi,$PATH:/usr/bin:/usr/ucb)
+    fi
+fi
+])
+AC_MSG_RESULT($DEFAULT_EDITOR)
+AC_DEFINE_UNQUOTED(DEFAULT_EDITOR,"$DEFAULT_EDITOR")
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Look for the directory that contains incoming mail.  I would check for an
+dnl actual mail-file, to verify this, but that is not always easy to arrange.
+AC_DEFUN([CF_PATH_MAILBOX],
+[
+AC_MSG_CHECKING(for incoming-mail directory)
+AC_ARG_WITH(mailbox,
+    [  --with-mailbox=DIR      directory for incoming mailboxes],
+    [DEFAULT_MAILBOX=$withval],[
+if test -z "$DEFAULT_MAILBOX" ; then
+for cf_dir in \
+	/var/spool/mail \
+	/usr/spool/mail \
+	/var/mail \
+	/usr/mail \
+	/mail
+    do
+    	if test -d $cf_dir ; then
+	    DEFAULT_MAILBOX=$cf_dir
+	    break
+	fi
+    done
+fi
+])
+if test -n "$DEFAULT_MAILBOX" ; then
+	AC_DEFINE_UNQUOTED(DEFAULT_MAILBOX,"$DEFAULT_MAILBOX")
+else
+	DEFAULT_MAILBOX=none
+fi
+AC_MSG_RESULT($DEFAULT_MAILBOX)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Look for the program that sends outgoing mail.
+AC_DEFUN([CF_PATH_MAILER],
+[
+AC_PATH_PROG(DEFAULT_MAILER,sendmail,,$PATH:/usr/sbin:/usr/lib)
+AC_ARG_WITH(mailer,
+     [  --with-mailer=PROG      specify default mailer-program],
+     [DEFAULT_MAILER=$withval],[
+if test -z "$DEFAULT_MAILER" ; then
+AC_PATH_PROG(DEFAULT_MAILER,mailx,,$PATH:/usr/bin)
+fi
+if test -z "$DEFAULT_MAILER" ; then
+AC_PATH_PROG(DEFAULT_MAILER,mail,,$PATH:/usr/bin)
+fi
+if test -n "$DEFAULT_MAILER" ; then
+	AC_DEFINE_UNQUOTED(DEFAULT_MAILER,"$DEFAULT_MAILER")
+else
+	DEFAULT_MAILER=none
+fi
+AC_MSG_RESULT($DEFAULT_MAILER)
+])
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl See if sum can take -r
@@ -952,44 +1192,6 @@ AC_CHECK_LIB($2,$1,[
 	$4],
 	[[$]$3])
 ])dnl
-dnl ---------------------------------------------------------------------------
-dnl Check if there is a conflict between <sys/select.h> and <sys/time.h>.
-dnl This is known to be a problem with SCO.
-AC_DEFUN([CF_SYS_SELECT_TIMEVAL],
-[
-AC_MSG_CHECKING(if sys/time.h conflicts with sys/select.h)
-AC_CACHE_VAL(cf_cv_sys_select_timeval,[
-for cf_opts in no yes
-do
-AC_TRY_COMPILE([
-#define yes 1
-#define no 0
-#if $cf_opts
-#define timeval fake_timeval
-#endif
-#ifdef TIME_WITH_SYS_TIME
-#	include <sys/time.h>
-#	include <time.h>
-#else
-#	ifdef HAVE_SYS_TIME_H
-#		include <sys/time.h>
-#	else
-#		include <time.h>
-#	endif
-#endif
-#undef timeval
-#ifdef HAVE_SYS_SELECT_H
-#	include <sys/select.h>
-#endif
-],[struct timeval foo],
-	[cf_cv_sys_select_timeval=$cf_opts
-	 break],
-	[cf_cv_sys_select_timeval=no])
-done
-])
-AC_MSG_RESULT($cf_cv_sys_select_timeval)
-test $cf_cv_sys_select_timeval = yes && AC_DEFINE(NEED_TIMEVAL_FIX)
-])
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
 dnl follow the AC_CHECK_FUNCS call.
@@ -1183,6 +1385,45 @@ if test ".$SYS_NAME" != ".$cf_cv_system_name" ; then
 	AC_ERROR("Please remove config.cache and try again.")
 fi])
 dnl ---------------------------------------------------------------------------
+dnl Check if there is a conflict between <sys/select.h> and <sys/time.h>.
+dnl This is known to be a problem with SCO.
+AC_DEFUN([CF_SYS_SELECT_TIMEVAL],
+[
+AC_MSG_CHECKING(if sys/time.h conflicts with sys/select.h)
+AC_CACHE_VAL(cf_cv_sys_select_timeval,[
+for cf_opts in no yes
+do
+AC_TRY_COMPILE([
+#define yes 1
+#define no 0
+#if $cf_opts
+#define timeval fake_timeval
+#endif
+#include <sys/types.h>
+#ifdef TIME_WITH_SYS_TIME
+#	include <sys/time.h>
+#	include <time.h>
+#else
+#	ifdef HAVE_SYS_TIME_H
+#		include <sys/time.h>
+#	else
+#		include <time.h>
+#	endif
+#endif
+#undef timeval
+#ifdef HAVE_SYS_SELECT_H
+#	include <sys/select.h>
+#endif
+],[struct timeval foo],
+	[cf_cv_sys_select_timeval=$cf_opts
+	 break],
+	[cf_cv_sys_select_timeval=no])
+done
+])
+AC_MSG_RESULT($cf_cv_sys_select_timeval)
+test $cf_cv_sys_select_timeval = yes && AC_DEFINE(NEED_TIMEVAL_FIX)
+])
+dnl ---------------------------------------------------------------------------
 dnl See if we can link with the termios functions tcsetattr/tcgetattr
 AC_DEFUN([CF_TERMIOS],
 [
@@ -1288,29 +1529,42 @@ test $cf_cv_tm_gmtoff = no && AC_DEFINE(DONT_HAVE_TM_GMTOFF)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for return and param type of 3rd -- OutChar() -- param of tputs().
+dnl
+dnl For this check, and for CF_CURSES_TERMCAP, the $CHECK_DECL_HDRS variable
+dnl must point to a header file containing this (or equivalent):
+dnl
+dnl	#ifdef NEED_CURSES_H
+dnl	# if HAVE_NCURSES_H
+dnl	#  include <ncurses.h>
+dnl	# else
+dnl	#  include <curses.h>
+dnl	# endif
+dnl	#endif
+dnl	#if HAVE_TERM_H
+dnl	# include <term.h>
+dnl	#endif
+dnl	#if NEED_TERMCAP_H
+dnl	# include <termcap.h>
+dnl	#endif
+dnl
 AC_DEFUN([CF_TYPE_OUTCHAR],
-[AC_MSG_CHECKING([declaration of tputs 3rd param])
+[
+AC_REQUIRE([CF_CURSES_TERMCAP])
+
+AC_MSG_CHECKING([declaration of tputs 3rd param])
 AC_CACHE_VAL(cf_cv_type_outchar,[
+
 cf_cv_type_outchar="int OutChar(int)"
 cf_cv_found=no
+cf_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $CHECK_DECL_FLAG"
+
 for P in int void; do
 for Q in int void; do
 for R in int char; do
 for S in "" const; do
-	AC_TRY_COMPILE([
-#ifdef USE_TERMINFO
-#include <curses.h>
-#if HAVE_TERM_H
-#include <term.h>
-#endif
-#else
-#ifdef NEED_CURSES_H	/* FIXME: need a test */
-#include <curses.h>
-#endif
-#if HAVE_TERMCAP_H
-#include <termcap.h>
-#endif
-#endif ],
+
+	AC_TRY_COMPILE([$CHECK_DECL_HDRS],
 	[extern $Q OutChar($R);
 	extern $P tputs ($S char *string, int nlines, $Q (*_f)($R));
 	tputs("", 1, OutChar)],
@@ -1336,6 +1590,8 @@ case $cf_cv_type_outchar in
 	AC_DEFINE(OUTC_ARGS,char c)
 	;;
 esac
+
+CFLAGS="$cf_save_CFLAGS"
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl

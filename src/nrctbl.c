@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : nrctbl.c
  *  Author    : Sven Paulus <sven@tin.org>
- *  Created   : 06.10.1996
- *  Updated   : 26.12.1997
+ *  Created   : 1996-10-06
+ *  Updated   : 1997-12-26
  *  Notes     : This module does the NNTP server name lookup in
  *              ~/.tin/newsrctable and returns the real hostname
  *              and the name of the newsrc file for a given

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : memory.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 05-06-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 1991-04-01
+ *  Updated   : 1994-06-05
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -102,8 +102,7 @@ expand_active (void)
 		active = (struct t_group *) my_malloc (sizeof (*active) * max_active);
 		my_group = (int *) my_malloc (sizeof (int) * max_active);
 	} else {
-		active = (struct t_group *) my_realloc((char *) active,
-				 sizeof (*active) * max_active);
+		active = (struct t_group *) my_realloc((char *) active, sizeof (*active) * max_active);
 		my_group = (int *) my_realloc((char *) my_group, sizeof (int) * max_active);
 	}
 }

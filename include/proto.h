@@ -546,6 +546,10 @@ extern void strcpynl (char *to, const char *from);
 #ifndef HAVE_STRTOL
 	extern long strtol (const char *str, char **ptr, int use_base);
 #endif /* HAVE STRTOL */
+#ifndef HAVE_STRERROR
+	extern char * my_strerror(int n);
+#	define strerror(n) my_strerror(n)
+#endif
 
 /* thread.c */
 extern int find_response (int i, int n);

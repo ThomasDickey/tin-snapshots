@@ -6,11 +6,11 @@
  *              Giuseppe De Marco <gdm@rebel.net> (light-colors)
  *              Julien Oster <fuzzy@cu8.cum.de> (word highlighting)
  *              T.Dickey <dickey@clark.net> (curses support)
- *  Created   : 02-06-95
- *  Updated   : 06-03-95, 30-03-96, 22-04-96, 15-12-96
+ *  Created   : 1995-06-02
+ *  Updated   : 1996-12-15
  *  Notes     : This are the basic function for ansi-color
  *              and word highlighting
- *  Copyright : (c) 1995 by Olaf Kalzuga and Roland Rosenfeld
+ *  Copyright : (c) 1995-98 by Olaf Kalzuga and Roland Rosenfeld
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -91,7 +91,7 @@ set_colors (
 			if (found)
 				pair = p->pair;
 			else if (++nextpair < COLOR_PAIRS) {
-				p = (struct LIST *)malloc(sizeof(struct LIST));
+				p = (struct LIST *) my_malloc(sizeof(struct LIST));
 				p->fg = fcolor;
 				p->bg = bcolor;
 				p->pair = pair = nextpair;

@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : getline.c
  *  Author    : Chris Thewalt & Iain Lea
- *  Created   : 09-11-91
- *  Updated   : 27-07-94
+ *  Created   : 1991-11-09
+ *  Updated   : 1994-07-27
  *  Notes     : emacs style line editing input package.
- *  Copyright : (c) Copyright 1991-94 by Chris Thewalt & Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Chris Thewalt & Iain Lea
  *              Permission to use, copy, modify, and distribute this
  *              software for any purpose and without fee is hereby
  *              granted, provided that the above copyright notices

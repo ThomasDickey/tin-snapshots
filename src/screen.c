@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : screen.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 31.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -126,21 +126,6 @@ error_message (const char *fmt, ...)
 void
 perror_message (const char *fmt, ...)
 {
-#ifndef HAVE_STRERROR
-#	ifdef HAVE_SYS_ERRLIST
-#		ifdef M_AMIGA
-#			ifndef sys_errlist
-				extern char *__sys_errlist[];
-#				define sys_errlist	__sys_errlist
-#			endif
-#		else
-#			ifdef DECL_SYS_ERRLIST
-				extern char *sys_errlist[];
-#			endif
-#		endif
-#	endif
-#endif
-
 	int err;
 	va_list ap;
 
@@ -151,15 +136,7 @@ perror_message (const char *fmt, ...)
 
 	vsprintf (msg, fmt, ap);
 
-#ifdef HAVE_STRERROR
 	my_fprintf (stderr, "%s: Error: %s", msg, strerror(err));
-#else
-#	ifdef HAVE_SYS_ERRLIST
-		my_fprintf (stderr, "%s: %s", msg, sys_errlist[err]);
-#	else
-		my_fprintf (stderr, "%s: Errno: %i", msg, err);
-#	endif
-#endif
 	errno = 0;
 
 	if (cmd_line) {
@@ -356,108 +333,3 @@ show_progress (
 		my_printf ("%s%4d/%-4d", txt, count, total);
 	my_flush();
 }
-
-#if 0
-These are the original fixed argument versions
-void
-info_message (
-	const char *str)
-{
-	clear_message ();			/* Clear any old messages hanging around */
-#ifdef HAVE_COLOR
-	fcol(col_message);
-#endif
-	center_line (cLINES, FALSE, str);	/* center the message at screen bottom */
-#ifdef HAVE_COLOR
-	fcol(col_normal);
-#endif
-	stow_cursor();
-}
-
-
-void
-wait_message (
-	const char *str)
-{
-	clear_message ();	  /* Clear any old messages hanging around */
-#ifdef HAVE_COLOR
-	fcol(col_message);
-#endif
-	my_fputs (str, stdout);
-#ifdef HAVE_COLOR
-	fcol(col_normal);
-#endif
-	cursoron ();
-	my_flush();
-}
-
-
-void
-error_message (
-	const char *template,
-	const char *str)
-{
-	errno = 0;
-
-	clear_message ();	  /* Clear any old messages hanging around */
-
-	my_fprintf (stderr, template, str);
-	my_fflush (stderr);
-
-	if (cmd_line) {
-		my_fputc ('\n', stderr);
-		fflush (stderr);
-	} else {
-		stow_cursor();
-		sleep (3);
-	}
-}
-
-
-void
-perror_message (
-	const char *template,
-	const char *str)
-{
-#ifndef HAVE_STRERROR
-#	ifdef HAVE_SYS_ERRLIST
-#		ifdef M_AMIGA
-#			ifndef sys_errlist
-				extern char *__sys_errlist[];
-#				define sys_errlist	__sys_errlist
-#			endif
-#		else
-#			ifdef DECL_SYS_ERRLIST
-				extern char *sys_errlist[];
-#			endif
-#		endif
-#	endif
-#endif
-
-	char str2[512];
-	int err;
-
-	clear_message ();	  /* Clear any old messages hanging around */
-
-	sprintf (str2, template, str);
-	err = errno;
-#ifdef HAVE_STRERROR
-	my_fprintf (stderr, "%s: Error: %s", str2, strerror(err));
-#else
-#  ifdef HAVE_SYS_ERRLIST
-	my_fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
-#  else
-	my_fprintf (stderr, "%s: Error: %i", str2, err);
-#  endif
-#endif
-	errno = 0;
-
-	if (cmd_line) {
-		my_fputc ('\n', stderr);
-		fflush (stderr);
-	} else {
-		stow_cursor();
-		sleep (3);
-	}
-}
-#endif

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : xref.c
- *  Author    : I.Lea & H.Brugge
- *  Created   : 01-07-93
- *  Updated   : 02-12-94
+ *  Author    : I. Lea & H. Brugge
+ *  Created   : 1993-07-01
+ *  Updated   : 1998-20-24
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Herman ten Brugge
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Herman ten Brugge
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -22,6 +22,8 @@
 #	define BIT_OR(n,b,mask)	n[NOFFSET(b)] |= mask
 #	define BIT_AND(n,b,mask)	n[NOFFSET(b)] &= mask
 #endif /* USE_DBMALLOC */
+
+static void read_xref_header (struct t_article *art);
 
 /*
  *  Read NEWSLIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
@@ -58,6 +60,54 @@ overview_xref_support (void)
 }
 
 /*
+ * read xref reference for current article
+ * This enables crosspost marking even if the xref records are not
+ * part of the xover record.
+ */
+static void
+read_xref_header (struct t_article *art)
+{
+#ifdef NNTP_ABLE
+	/* xref_supported means already supported in xover record */
+	if (!xref_supported && read_news_via_nntp && art && !art->xref) {
+		char buf[HEADER_LEN];
+		char *ptr, *q;
+		long artnum = 0;
+
+		sprintf(buf, "xhdr xref %ld", art->artnum);
+		put_server (buf);
+		if (get_respcode (NULL) != OK_HEAD)
+			return;
+		while (tin_fgets (buf, sizeof (buf)-1, (FILE*)nntp_rd_fp)) {
+			ptr = buf;
+			while (*ptr && isspace(*ptr))
+				ptr++;
+			if (*ptr == '.')
+				break;
+			/*
+			 * read the article number
+			 */
+			artnum = atol (ptr);
+			if ((artnum == art->artnum) && !art->xref && !strstr (ptr, "(none)")) {
+				q = strchr (ptr, ' ');	/* skip artikel number */
+				if (q == NULL)
+					continue;
+				ptr = q;
+				while (*ptr && isspace(*ptr))
+					ptr++;
+				q = strchr (ptr, '\n');
+				if (q)
+					*q = '\0';
+				art->xref = my_strdup (ptr);
+			}
+		}
+
+	}
+#endif
+	return;
+}
+
+/*
  *  mark all other Xref: crossposted articles as read when one article read
  *  Xref: sitename newsgroup:artnum newsgroup:artnum [newsgroup:artnum ...]
  */
@@ -73,9 +123,10 @@ art_mark_xref_read (
 	long artnum;
 	struct t_group *psGrp;
 
+	read_xref_header (art);
+
 	if (art->xref == '\0')
 		return;
-
 	xref_ptr = art->xref;
 
 	/*

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : lang.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 26.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-26
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -115,6 +115,7 @@ constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
 constext txt_error_sender_in_header_not_allowed[] = "Error on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
 constext txt_error_header_and_body_not_separate[] = "Error: No blank line found after header.\n\n";
+constext txt_error_header_line_bad_charset[] = "Error: Bad charset for non-7bit encoding (must not be us-ascii)\n\n";
 constext txt_error_header_line_blank[] = "Error: Article starts with blank line instead of header\n\n";
 constext txt_error_header_line_colon[] = "Error: Header on line %d does not have a colon after the header name:\n%s\n\n";
 constext txt_superseding_art[] = "Superseding article...";
@@ -651,7 +652,7 @@ constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
 constext txt_opt_sigfile[] = "Create signature from path/command : ";
 constext txt_opt_sort_art_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
-constext txt_opt_pgdn_goto_next[] = "PgDn goes to next artice at EOF    : ";
+constext txt_opt_pgdn_goto_next[] = "PgDn goes to next article at EOF   : ";
 constext txt_opt_start_editor_offset[] = "Start editor with line offset      : ";
 constext txt_opt_strip_blanks[] = "Strip blanks of end of lines       : ";
 constext txt_opt_strip_bogus[] = "Remove bogus groups from newsrc    : ";
@@ -1194,7 +1195,7 @@ constext txt_warn_multiple_sigs[] ="\n\
   Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";
 constext txt_warn_wrong_sig_format[] = "\n\
   Warning: Signatures should start with '-- \\n' not with '--\\n'.\n\n";
-constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\nTin will be unable to mark crossposts read.\n";
+constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\nTin will try to use XHDR XREF instead (slows down things a bit).\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";

@@ -3,7 +3,7 @@
  *  Module    : autoconf.hin
  *  Author    : Thomas Dickey <dickey@clark.net>
  *  Created   : 24.08.1995
- *  Updated   : 04.12.1997
+ *  Updated   : 10.02.1998
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1996-98 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
@@ -55,9 +55,9 @@
 #undef	NO_ETIQUETTE
 #undef	NO_LOCALE
 #undef	OVERVIEW_FILE
-#undef	USE_SOCKS5
 #undef	SPOOLDIR
 #undef	USE_INN_NNTPLIB
+#undef	USE_SOCKS5
 
 /*
  * These are defined if the corresponding program is found during configuration
@@ -305,6 +305,9 @@
 /*
  * Program-paths (i.e., the invocation-path)
  */
+#undef	DEFAULT_EDITOR
+#undef	DEFAULT_MAILBOX
+#undef	DEFAULT_MAILER
 #undef	PATH_ISPELL
 #undef	PATH_METAMAIL
 #undef	PATH_SUM
@@ -419,6 +422,6 @@
  * can be left empty, tin searches for some standard places
  * XXXXX please define surrounded with double quotes! XXXXX
  */
-#undef TIN_DEFAULTS_PATH
+#undef TIN_DEFAULTS_DIR
 
 #undef HAVE_COFFEE

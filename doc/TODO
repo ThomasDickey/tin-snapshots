@@ -84,8 +84,6 @@ o  In cases where a tinrc variable is stored in group->attributes
    to fix the problem properly in config.c by flashing changes to all
    groups using default attributes.
 
-o  ispell checks all headers
-
 o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
    ???
 

@@ -1,9 +1,9 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : strftime.c
- *  Author    : A.Robbins & I.Lea
- *  Created   : 01-02-91
- *  Updated   : 15-08-93
+ *  Author    : A. Robbins & I. Lea
+ *  Created   : 1991-02-01
+ *  Updated   : 1993-08-15
  *  Notes     : Relatively quick-and-dirty implemenation of ANSI library
  *              routine for System V Unix systems.
  *              If target system already has strftime() call the #define
@@ -11,7 +11,7 @@
  *  Example   : time (&secs);
  *              tm = localtime (&secs);
  *              num = strftime (buf, sizeof (buf), "%a %d-%m-%y %H:%M:%S", tm);
- *  Copyright : (c) Copyright 1991-94 by Arnold Robbins & Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Arnold Robbins & Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

@@ -1,13 +1,13 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : curses.c
- *  Author    : D.Taylor & I.Lea
- *  Created   : 01-01-86
- *  Updated   : 17-05-94
+ *  Author    : D. Taylor & I. Lea
+ *  Created   : 1986-01-01
+ *  Updated   : 1994-05-17
  *  Notes     : This is a screen management library borrowed with permission
  *              from the Elm mail system. This library was hacked to provide
  *              what tin needs.
- *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
+ *  Copyright : Copyright (c) 1986-98 Dave Taylor & Iain Lea
  *              The Elm Mail System  -  @Revision: 2.1 $   $State: Exp @
  */
 
@@ -550,12 +550,12 @@ void
 set_keypad_on (void)
 {
 #ifndef INDEX_DAEMON
-#    ifdef HAVE_KEYPAD
+#	ifdef HAVE_KEYPAD
 	if (use_keypad && _keypadxmit) {
 		tputs (_keypadxmit, 1, outchar);
 		my_flush();
 	}
-#    endif
+#	endif
 #endif /* INDEX_DAEMON */
 }
 
@@ -564,12 +564,12 @@ void
 set_keypad_off (void)
 {
 #ifndef INDEX_DAEMON
-#    ifdef HAVE_KEYPAD
+#	ifdef HAVE_KEYPAD
 	if (use_keypad && _keypadlocal) {
 		tputs (_keypadlocal, 1, outchar);
 		my_flush();
 	}
-#    endif
+#	endif
 #endif /* INDEX_DAEMON */
 }
 
