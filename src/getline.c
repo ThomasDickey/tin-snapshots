@@ -66,12 +66,13 @@ int (*gl_out_hook) P_((char *)) = 0;
 int (*gl_tab_hook) P_((char *, int, int *)) = gl_tab;
 
 char *
-getline (prompt, number_only, str)
+getline (prompt, number_only, str, max_chars)
 	char *prompt;
 	int number_only;
 	char *str;
+	int max_chars;
 {
-	int c, i, loc, tmp;
+	int c, i, loc, tmp, gl_max;
 
 	set_xclick_off ();
 	if (!gl_init_done) {
@@ -86,6 +87,16 @@ getline (prompt, number_only, str)
 	gl_width = cCOLS - strlen (prompt);
 	gl_prompt = prompt;
 	gl_pos = gl_cnt = 0;
+
+	if (max_chars == 0) {
+		if (number_only) {
+			gl_max = 6;
+		} else {
+			gl_max = BUF_SIZE;
+		}
+	} else {
+		gl_max = max_chars;
+	}
 
 	my_fputs (prompt, stdout);
 	cursoron ();
@@ -102,9 +113,9 @@ getline (prompt, number_only, str)
 	}
 	while ((c = ReadCh ()) != EOF) {
 		c &= 0xff;
-		if (isprint (c) || (c >= 0xa0 && c <= 0xff)) {
+		if ((gl_cnt < gl_max) && (isprint (c) || ( c>=0xa0 && c<=0xff ))) {
 			if (number_only) {
-				if (isdigit (c) && gl_cnt < 6) {	/* num < 100000 */
+				if (isdigit (c)) {
 					gl_addchar (c);
 				} else {
 					ring_bell ();
@@ -190,6 +201,7 @@ gl_addchar (c)
 		error_message ("getline: input buffer overflow", "");
 		exit (1);
 	}
+
 	for (i = gl_cnt; i >= gl_pos; i--) {
 		gl_buf[i + 1] = gl_buf[i];
 	}

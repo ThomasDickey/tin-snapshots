@@ -3,7 +3,7 @@
  *  Module    : config.c
  *  Author    : I.Lea
  *  Created   : 01-04-91
- *  Updated   : 21-12-94
+ *  Updated   : 21-12-94, 15-08-96
  *  Notes     : Configuration file routines
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -12,14 +12,16 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include        "patchlev.h"
+#include	"patchlev.h"
 #include	"tin.h"
-
-static int COL1;
-static int COL2;
-static int COL3;
+#include	"conf.h"
+#include	"menukeys.h"
 
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
+static void highlight_option P_((int option));
+static void print_option P_((int act_option));
+static void refresh_config_page P_((int act_option));
+static void unhighlight_option P_((int option));
 
 /*
  *  read local & global configuration defaults
@@ -305,11 +307,21 @@ read_config_file (file, global_file)
 			if (match_string (buf, "mail_mime_encoding=", mail_mime_encoding, sizeof (mail_mime_encoding))) {
 				if (strcasecmp(mail_mime_encoding, "8bit") &&
 					strcasecmp(mail_mime_encoding, "base64") &&
+					strcasecmp(mail_mime_encoding, "7bit") &&  /* Jungshik Shin for EUC-KR/JP/CN */
 					strcasecmp(mail_mime_encoding, "quoted-printable")) {
 					strcpy(mail_mime_encoding,"8bit");
 				}
 				break;
 			}
+/* Jungshik Shin for allowing 8bit header in news posting */
+			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
+                                if ( strcasecmp(mail_mime_encoding,"8bit") )
+                                   mail_8bit_header=FALSE;
+				break;
+			}
+			if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset))) {
+				break;
+			} /* J. Shin */
 			if (match_string (buf, "motd_file_info=", motd_file_info, sizeof (motd_file_info))) {
 				break;
 			}
@@ -341,9 +353,16 @@ read_config_file (file, global_file)
 			if (match_string (buf, "post_mime_encoding=", post_mime_encoding, sizeof (post_mime_encoding))) {
 				if (strcasecmp(post_mime_encoding, "8bit") &&
 					strcasecmp(post_mime_encoding, "base64") &&
+					strcasecmp(post_mime_encoding, "7bit") && /* Jungshik Shin for EUC-JP/CN */
 					strcasecmp(post_mime_encoding, "quoted-printable")) {
 					strcpy(post_mime_encoding,"8bit");
 				}
+				break;
+			}
+/* Jungshik Shin for allowing 8bit header in news posting */
+			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
+                                if ( strcasecmp(post_mime_encoding,"8bit") )
+                                   post_8bit_header=FALSE;
 				break;
 			}
 			if (match_boolean (buf, "print_header=", &print_header)) {
@@ -564,7 +583,7 @@ write_config_file (file)
 	fprintf (fp, "draw_arrow=%s\n\n", print_boolean (draw_arrow_mark));
 #ifdef HAVE_COLOR
 	fprintf (fp, "# if ON using ansi-color\n");
-	fprintf (fp, "use_color=%s\n\n", (use_color_tinrc ? "ON" : "OFF"));
+	fprintf (fp, "use_color=%s\n\n", print_boolean (use_color_tinrc));
 	fprintf (fp, "# For coloradjust use the following numbers\n");
 	fprintf (fp, "#  0-black       1-red         2-green        3-brown\n");
 	fprintf (fp, "#  4-blue        5-pink        6-cyan         7-white\n");
@@ -614,9 +633,37 @@ write_config_file (file)
  	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
 	fprintf (fp, "# MIME encoding of the body for mails and posts, if necessary.\n");
-	fprintf (fp, "# (8bit, base64, quoted-printable), but you don't want to choose base64.\n");
+	fprintf (fp, "# (8bit, base64, quoted-printable,7bit), QP is efficient\n");
+        fprintf (fp, "# for most European character sets(ISO-8859-X) with small\n");
+        fprintf (fp, "# fraction of non-US-ASCII chars. while Base64 is more efficient\n");
+        fprintf (fp, "# for most 8bit East Asian char. sets\n");
+        fprintf (fp, "# For EUC-KR/JP/CN, 7bit encoding specifies that EUC charsets be\n");
+        fprintf (fp, "# converted to corresponding ISO-2022-KR/JP/CN\n"); 
+        fprintf (fp, "# Korean users should set post_mime_encoding to 8bit\n");
+        fprintf (fp, "# and mail_mime_encoding to 7bit. With mm_charset to EUC-KR, post_mime_encoding\n");
+        fprintf (fp, "# set to 7bit does NOT lead to encoding of EUC-KR into ISO-2022-KR in news\n"); 
+        fprintf (fp, "# posting since it's never meant to be used for Usenet news.\n");  
+        fprintf (fp, "# It's not the case for EUC-JP and EUC-CN and post_mime_encoding 7bit does have\n");
+        fprintf (fp, "# on news posting althought NOT yet implemented in this
+release.\n");
 	fprintf (fp, "post_mime_encoding=%s\n", post_mime_encoding);
 	fprintf (fp, "mail_mime_encoding=%s\n\n", mail_mime_encoding);
+        fprintf (fp, "# charset used for MIME header and Content-Type header\n");
+        fprintf (fp, "# can be overriden by MM_CHARSET environment variable\n");
+	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
+        fprintf (fp, "# if ON, 8bit characters in news posting is NOT encoded.\n");
+        fprintf (fp, "# default is OFF. Thus 8bit character is encoded by default.\n");
+        fprintf (fp, "# 8bit chars in header is encoded regardless of the value of this parameter\n");
+        fprintf (fp, "# unless post_mime_encoding is 8bit as well. \n");
+	fprintf (fp, "post_8bit_header=%s\n\n", print_boolean(post_8bit_header));
+        fprintf (fp, "# if ON, 8bit characters in mail message is NOT encoded.\n");
+        fprintf (fp, "# default is OFF. Thus 8bit character is encoded by default.\n");
+        fprintf (fp, "# 8bit chars in header is encoded regardless of the value of this parameter\n");
+        fprintf (fp, "# unless mail_mime_encoding is 8bit as well. Note that RFC 1552/1651/1652\n");
+        fprintf (fp, "# prohibit 8bit characters in mail header so that you're advised NOT to\n");
+        fprintf (fp, "# turn it ON unless you have some compelling reason as is the case of\n");
+        fprintf (fp, "# Korean users with localized sendmail.\n");
+	fprintf (fp, "mail_8bit_header=%s\n\n", print_boolean(mail_8bit_header));
 	fprintf (fp, "# if ON ask user if read groups should all be marked read\n");
 	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
 	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");
@@ -795,10 +842,88 @@ write_config_file (file)
 	}
 }
 
+int first_option_on_screen;
+/*
+ * FIXME put in tin.h (or find a better solution). See also: prompt.c
+ */
+#define option_lines_per_page (cLINES - INDEX_TOP - 3)
+
+int actual_option_page = 0;
+
+/*
+ * Display option in a line containing option number, explaining text,
+ * and option value. Note that "act_option" needs to be the option number
+ * in the option_table array, which is different from the option number
+ * displayed to the user (the latter one is one greater since counting
+ * starts with one instead of zero).
+ * FIXME make consistent with other functions using the option number
+ *       shown on the screen.
+ */
+
+static void
+print_option (act_option)
+	int act_option;
+{
+	printf("%3d. %s ", act_option + 1, option_table[act_option].option_text);
+	switch (option_table[act_option].var_type) {
+		case OPT_ON_OFF:
+			printf("%s ", print_boolean(*((int *)option_table[act_option].variable)));
+			break;
+		case OPT_LIST:
+			printf("%s", option_table[act_option].opt_list[*((int *)option_table[act_option].variable)]);
+			break;
+		case OPT_STRING:
+			printf("%-.*s", cCOLS - (int) strlen((char *) option_table[act_option].option_text) - OPT_ARG_COLUMN - 3, (char *) option_table[act_option].variable);
+			break;
+		case OPT_NUM:
+			printf("%d", *((int *) option_table[act_option].variable));
+			break;
+		case OPT_CHAR:
+			/* grrr... who the heck defined art_marked_* as int? */
+			printf("%c", *((int *) option_table[act_option].variable));
+		break;
+	}
+}
+
+static void 
+highlight_option (option)
+	int option;
+{
+	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	my_fputs ("->", stdout);
+	fflush (stdout);
+	MoveCursor (cLINES, 0);
+}
+
+static void 
+unhighlight_option (option)
+	int option;
+{
+	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	my_fputs ("  ", stdout);
+	fflush (stdout);
+}
+
+static void
+refresh_config_page (act_option)
+	int act_option;
+{
+	int desired_page;
+	
+	/* determine on which page act_option would be */
+	desired_page = (int) (act_option - 1) / option_lines_per_page;
+	
+	if (desired_page != actual_option_page)
+	{
+		show_config_page (desired_page);
+		actual_option_page = desired_page;
+	}
+}
+
 /*
  *  options menu so that the user can dynamically change parameters
  */
- 
+
 int 
 change_config_file (group, filter_at_once)
 	struct t_group *group;
@@ -806,10 +931,11 @@ change_config_file (group, filter_at_once)
 {
 	int ch, i;
 	int filter_changed = FALSE;
-	int orig_show_only_unread;
-	int orig_thread_arts;
-	int option;
+	int change_option = FALSE;
+	int original_on_off_value, original_list_value;
+	int option, old_option;
 	int ret_code = NO_FILTERING;
+	int mime_type = 0;
 	
 #ifdef SIGTSTP
 	RETSIGTYPE (*susp)(SIG_ARGS);
@@ -821,12 +947,9 @@ change_config_file (group, filter_at_once)
 	}
 #endif
 
-	COL1 = 0;
-	COL2 = ((cCOLS / 3) * 1) + 1;
-	COL3 = ((cCOLS / 3) * 2) + 2;
-
-	show_config_menu ();
-
+	actual_option_page = -1;
+	option = 1;
+	
 	set_xclick_off ();
 	forever {
 
@@ -835,28 +958,59 @@ change_config_file (group, filter_at_once)
 			sigdisp (SIGTSTP, config_suspend);
 		}
 #endif
+	 	refresh_config_page (option);
+	 	highlight_option (option);
+	
 		MoveCursor (cLINES, 0);
 		ch = ReadCh ();
-		if (ch >= '1' && ch <= '9') {
-			option = prompt_num (ch, "Enter option number> ");
-		} else {
-			if (ch == 'q' || ch == ESC) {
-				option = -1;
-			} else {
-				option = 0;
-			}
-		}
-#ifdef SIGTSTP
-		if (do_sigtstp) {
-			sigdisp (SIGTSTP, SIG_IGN);
-		}
+
+		/*
+		 * convert arrow key codes to "normal" codes
+		 */
+		switch (ch) {
+
+#ifndef WIN32
+			case ESC:	/* common arrow keys */
+#	ifdef HAVE_KEY_PREFIX
+			case KEY_PREFIX:
+#	endif
+				switch (get_arrow_key ()) {
 #endif
-		switch (option) {
-			case 0:
+					case KEYMAP_UP:
+						ch = iKeyConfigUp;
+						break;
+
+					case KEYMAP_DOWN:
+						ch = iKeyConfigDown;
+						break;
+
+					case KEYMAP_HOME:
+						ch = iKeyConfigHome;
+						break;
+
+					case KEYMAP_END:
+						ch = iKeyConfigEnd;
+						break;
+
+					case KEYMAP_PAGE_UP:
+						ch = iKeyConfigPageUp;
+						break;
+
+					case KEYMAP_PAGE_DOWN:
+						ch = iKeyConfigPageDown;
+						break;
+#ifndef WIN32
+				} /* switch (get_arrow_key ()) */
+				break;
+#endif
+		}	/* switch (ch) */
+
+		switch (ch) {
+			case iKeyQuit:
 				write_config_file (local_config_file);
 				/* FALLTHRU */
-			case -1:
-				if (filter_changed) {
+			case iKeyConfigNoSave:
+				if (filter_changed) {	/* FIXME who did this? what for? filter_changed is not changed ever */
 					if (filter_at_once) {
 						global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 						local_filtered_articles = read_filter_file (local_filter_file, FALSE);
@@ -882,231 +1036,324 @@ change_config_file (group, filter_at_once)
 				}
 #endif
 				return ret_code;
-			
-			case 1:		/* auto save */
-				prompt_on_off (INDEX_TOP, COL1, &default_auto_save, 
-					txt_help_autosave, txt_opt_autosave);
+
+			case iKeyConfigUp:
+				unhighlight_option (option);
+				option--;
+				if (option < 1)
+					option = LAST_OPT;
+				refresh_config_page (option);
+				highlight_option (option);
 				break;
 
-			case 2:		/* start editor with line offset */
-				prompt_on_off (INDEX_TOP, COL2, &start_editor_offset, 
-					txt_help_start_editor_offset, txt_opt_start_editor_offset);
-				break;
-			
-			case 3:		/* mark saved articles read */
-				prompt_on_off (INDEX_TOP, COL3, &mark_saved_read, 
-					txt_help_mark_saved_read, txt_opt_mark_saved_read);
-				break;
-
-			case 4:		/* confirm action */
-				prompt_on_off (INDEX_TOP+2, COL1, &confirm_action, 
-					txt_help_confirm_action, txt_opt_confirm_action);
+			case iKeyConfigDown:
+				unhighlight_option (option);
+				option++;
+				if (option > LAST_OPT)
+					option = 1;
+				refresh_config_page (option);
+				highlight_option (option);
 				break;
 
-			case 5:		/* draw -> / highlighted bar */
-				prompt_on_off (INDEX_TOP+2, COL2, &draw_arrow_mark, 
-					txt_help_draw_arrow, txt_opt_draw_arrow);
-				if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
-					inverse_okay = TRUE;
+			case iKeyConfigHome:
+				unhighlight_option (option);
+				option = 1;
+				refresh_config_page (option);
+				highlight_option (option);
+				break;
+
+			case iKeyConfigEnd:
+				unhighlight_option (option);
+				option = LAST_OPT;
+				refresh_config_page (option);
+				highlight_option (option);
+				break;
+
+			case iKeyConfigPageUp:
+				unhighlight_option (option);
+				option -= option_lines_per_page;
+				if (option < 1)
+					option = LAST_OPT;
+				refresh_config_page (option);
+				highlight_option (option);
+				break;
+
+			case iKeyConfigPageDown:
+				unhighlight_option (option);
+				option += option_lines_per_page;
+				if (option > LAST_OPT)
+					option = 1;
+				refresh_config_page (option);
+				highlight_option (option);
+				break;
+
+			case '1': case '2': case '3': case '4': case '5':
+			case '6': case '7': case '8': case '9':
+				unhighlight_option (option);
+				old_option = option; 
+				option = prompt_num (ch, "Enter option number> ");
+				if (option < 1 || option > LAST_OPT) {
+					option = old_option;
+					break;
 				}
+				refresh_config_page (option);
+				/* FALLTHROUGH */
+
+			case iKeyConfigSelect:
+			case iKeyConfigSelect2:
+				change_option = TRUE;
 				break;
+		} /* switch (ch) */
 
-			case 6:		/* print header */
-				prompt_on_off (INDEX_TOP+2, COL3, &print_header, 
-					txt_help_print_header, txt_opt_print_header);
-				break;
-			
-			case 7:		/* position cursor at first / last unread art */
-				prompt_on_off (INDEX_TOP+4, COL1, &pos_first_unread, 
-					txt_help_pos_first_unread, txt_opt_pos_first_unread);
-				break;
-
-			case 8:		/* scroll half/full page of groups/articles */
-				prompt_on_off (INDEX_TOP+4, COL2, &full_page_scroll, 
-					txt_help_page_scroll, txt_opt_page_scroll);
-				break;
-
-			case 9:		/* catchup read groups when quitting */
-				prompt_on_off (INDEX_TOP+4, COL3, &catchup_read_groups, 
-					txt_help_catchup_groups, txt_opt_catchup_groups);
-				break;
-
-			case 10:	/* threading strategy for groups except those in ~/.tin/unthreaded */
-				orig_thread_arts = default_thread_arts;	
-
-				default_thread_arts = prompt_list (INDEX_TOP+6, COL1,
-							default_thread_arts,
-							txt_help_thread_arts,
-							txt_opt_thread_arts,
-							txt_thread,
-							THREAD_MAX + 1
-							);
-
-				/*
-				 * If the threading strategy has changed, fix things
-				 * so that rethreading will occur
-				 */
-				if (default_thread_arts != orig_thread_arts && 
-				    							group != (struct t_group *) 0) {
-					group->attribute->thread_arts = default_thread_arts;
-					make_threads (group, TRUE);
-					find_base (group);
-				}
-				clear_message ();
-				break;
-
-			case 11:	/* show all arts or just new/unread arts */
-				orig_show_only_unread = default_show_only_unread;	
-				prompt_on_off (INDEX_TOP+6, COL2, &default_show_only_unread, 
-					txt_help_show_only_unread, txt_opt_show_only_unread);
-				if (default_show_only_unread != orig_show_only_unread &&
-				    group != (struct t_group *) 0) {
-					make_threads (group, TRUE);
-					find_base (group);
-					if (space_mode) {
-						for (i = 0; i < top_base; i++) {
-							if (new_responses (i)) {
-								break;
+		if (change_option) {
+			switch (option_table[option - 1].var_type) {
+				case OPT_ON_OFF:
+					original_on_off_value = *((int *) option_table[option - 1].variable);
+					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page, 
+						OPT_ARG_COLUMN, option_table[option - 1].variable,
+						option_table[option - 1].help_text,
+						option_table[option - 1].option_text
+						);
+					/*
+					 * some options need further action to take effect
+					 */
+	    				switch (option) {
+	    					/* show mini help menu */
+		    				case OPT_BEGINNER_LEVEL:
+		    					if (beginner_level != original_on_off_value)
+								(void) set_win_size (&cLINES, &cCOLS);
+							break;
+							
+						/* show all arts or just new/unread arts */
+						case OPT_DEFAULT_SHOW_ONLY_UNREAD:
+							if (default_show_only_unread != original_on_off_value && group != (struct t_group *) 0) {
+								make_threads (group, TRUE);
+								find_base (group);
+								if (space_mode) {
+									for (i = 0; i < top_base; i++) {
+										if (new_responses (i)) {
+											break;
+										}
+									}
+									if (i < top_base) {
+										index_point = i;
+									} else {
+										index_point = top_base - 1;
+									}
+								} else {
+									index_point = top_base - 1;
+								}
 							}
-						}
-						if (i < top_base) {
-							index_point = i;
-						} else {
-							index_point = top_base - 1;
-						}
-					} else {
-						index_point = top_base - 1;
-					}
-				}
-				break;
+							break;
 
-			case 12:	/* show newsgroup description text next to newsgroups */
-				prompt_on_off (INDEX_TOP+6, COL3, &show_description, 
-					txt_help_show_description, txt_opt_show_description);
-				if (show_description) {	/* force reread of newgroups file */
-					read_newsgroups_file ();
-					clear_message ();
-				} else {
-					set_groupname_len (FALSE);
-				}
-				break;
+						/* draw -> / highlighted bar */
+						case OPT_DRAW_ARROW_MARK:
+							unhighlight_option (option);
+							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
+								inverse_okay = TRUE;
+								if (OPT_INVERSE_OKAY > first_option_on_screen && OPT_INVERSE_OKAY < first_option_on_screen + option_lines_per_page) {
+									MoveCursor (INDEX_TOP + (OPT_INVERSE_OKAY - 1) % option_lines_per_page, 3);
+									print_option (OPT_INVERSE_OKAY - 1);
+								}
+							}
+							break;
 
-			case 13:		/* show subject & author / subject only */
-				default_show_author = prompt_list (INDEX_TOP+8, COL1,
-							default_show_author,
-							txt_help_show_author,
-							txt_opt_show_author,
-							txt_show_from,
-							SHOW_FROM_BOTH + 1
-							);
-				break;
+						/* draw inversed screen header lines */
+						/* draw inversed group/article/option line if draw_arrow_mark is OFF */
+ 	   					case OPT_INVERSE_OKAY:
+							unhighlight_option (option);
+							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
+								draw_arrow_mark = TRUE;	/* we don't want to navigate blindly */
+								if (OPT_DRAW_ARROW_MARK > first_option_on_screen && OPT_DRAW_ARROW_MARK < first_option_on_screen + option_lines_per_page) {
+									MoveCursor (INDEX_TOP + (OPT_DRAW_ARROW_MARK - 1) % option_lines_per_page, 3);
+									print_option (OPT_DRAW_ARROW_MARK - 1);
+								}
+							}
+							break;
 
-			case 14:
-				default_post_proc_type = prompt_list (INDEX_TOP+8, COL2,
-							default_post_proc_type,
-							txt_help_post_proc_type,
-							txt_opt_process_type,
-							txt_post_process,
-							POST_PROC_UUD_EXT_ZIP + 1
-							);
-				proc_ch_default = get_post_proc_type (default_post_proc_type);
-				break;
-
-			case 15:
-				default_sort_art_type = prompt_list (INDEX_TOP+10, COL1,
-							default_sort_art_type,
-							txt_help_sort_type,
-							txt_opt_sort_type,
-							txt_sort_type,
-							SORT_BY_DATE_ASCEND + 1
-							);
-				break;
-
-			case 16:
-#ifdef M_AMIGA
-				if (tin_bbs_mode) break;
+						/* show newsgroup description text next to newsgroups */
+						case OPT_SHOW_DESCRIPTION:
+							if (show_description) {	/* force reread of newgroups file */
+								read_newsgroups_file ();
+								clear_message ();
+							} else {
+								set_groupname_len (FALSE);
+							}
+							break;
+							
+						/* use ANSI color */
+						case OPT_USE_COLOR:
+							use_color = use_color_tinrc;
+							break;
+							
+						/*
+						 * the following do not need further action (if I'm right)
+						 *
+						 * case OPT_AUTO_BCC:			case OPT_AUTO_CC:
+						 * case OPT_AUTO_LIST_THREAD:		case OPT_CATCHUP_READ_GROUPS:
+						 * case OPT_CONFIRM_ACTION:		case OPT_CONFIRM_TO_QUIT:
+						 * case OPT_DEFAULT_AUTO_SAVE:		case OPT_DEFAULT_BATCH_SAVE:
+						 * case OPT_FORCE_SCREEN_REDRAW:	case OPT_FULL_PAGE_SCROLL:
+						 * case OPT_GROUP_CATCHUP_ON_EXIT:	case OPT_HIGHLIGHT_XCOMMENTTO:
+						 * case OPT_KEEP_POSTED_ARTICLES:	case OPT_MARK_SAVED_READ:
+						 * case OPT_NO_ADVERTISING:		case OPT_POS_FIRST_UNREAD:
+						 * case OPT_PRINT_HEADER:		case OPT_PROCESS_ONLY_UNREAD:
+						 * case OPT_SAVE_TO_MMDF_MAILBOX:	case OPT_SHOW_LINES:
+						 * case OPT_SHOW_LAST_LINE_PREV_PAGE:	case OPT_SHOW_ONLY_UNREAD_GROUPS:
+						 * case OPT_SHOW_XCOMMENTTO:		case OPT_SIGDASHES:
+						 * case OPT_SPACE_GOTO_NEXT_UNREAD:	case OPT_START_EDITOR_OFFSET:
+						 * case OPT_STRIP_BLANKS:		case OPT_TAB_AFTER_X_SELECTION:
+						 * case OPT_TAB_GOTO_NEXT_UNREAD:	case OPT_THREAD_CATCHUP_ON_EXIT:
+						 * case OPT_UNLINK_ARTICLE:		case OPT_USE_BUILTIN_INEWS:
+						 * case OPT_USE_MAILREADER_I:		case OPT_USE_MOUSE:
+#ifdef HAVE_KEYPAD
+						 * case OPT_USE_KEYPAD:
 #endif
-				show_menu_help (txt_help_savedir);
-				prompt_menu_string (INDEX_TOP+12, COL1 + (int) strlen (txt_opt_savedir), default_savedir);
-				expand_rel_abs_pathname (INDEX_TOP+12, COL1 + (int) strlen (txt_opt_savedir), default_savedir);
-				break;
-
-			case 17:
-#ifdef M_AMIGA
-				if (tin_bbs_mode) break;
+#ifdef HAVE_METAMAIL
+						 * case OPT_ASK_FOR_METAMAIL:	case OPT_USE_METAMAIL:
 #endif
-				show_menu_help (txt_help_maildir);
-				prompt_menu_string (INDEX_TOP+14, COL1 + (int) strlen (txt_opt_maildir), default_maildir);
-				expand_rel_abs_pathname (INDEX_TOP+14, COL1 + (int) strlen (txt_opt_maildir), default_maildir);
-				break;
-
-			case 18:
-#ifdef M_AMIGA
-				if (tin_bbs_mode) break;
+#ifdef M_UNIX
+						 * case OPT_KEEP_DEAD_ARTICLES:
 #endif
-				show_menu_help (txt_help_printer);
-				prompt_menu_string (INDEX_TOP+16, COL1 + (int) strlen (txt_opt_printer), default_printer);
-				expand_rel_abs_pathname (INDEX_TOP+16, COL1 + (int) strlen (txt_opt_printer), default_printer);
-				break;
-		}
-		show_menu_help (txt_select_config_file_option);
-	}
-}
+						 * 	break;
+						 */
+					} /* switch (option) */
+					break;
 
+				case OPT_LIST:
+					original_list_value = *((int *) option_table[option - 1].variable);
+					*((int *) option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page, 
+								OPT_ARG_COLUMN,
+								*((int *) option_table[option - 1].variable), /*default_post_proc_type,*/
+								option_table[option - 1].help_text,
+								option_table[option - 1].option_text,
+								option_table[option - 1].opt_list,
+								option_table[option - 1].opt_count
+								);
+					
+					/*
+					 * some options need further action to take effect
+					 */
+					switch (option) {
+						/* threading strategy for groups except those in ~/.tin/unthreaded */
+						case OPT_DEFAULT_THREAD_ARTS:
+							/*
+							 * If the threading strategy has changed, fix things
+							 * so that rethreading will occur
+							 */
+							if (default_thread_arts != original_list_value && group != (struct t_group *) 0) {
+								group->attribute->thread_arts = default_thread_arts;
+								make_threads (group, TRUE);
+								find_base (group);
+							}
+							clear_message ();
+							break;
 
-void 
-show_config_menu ()
-{
-	ClearScreen ();
+						case OPT_DEFAULT_POST_PROC_TYPE:
+							proc_ch_default = get_post_proc_type (default_post_proc_type);
+							break;
 
-	center_line (0, TRUE, txt_options_menu);
-	
-	MoveCursor (INDEX_TOP, 0);
-	printf ("%s%s\r\n\r\n", txt_opt_autosave, print_boolean (default_auto_save));
-	printf ("%s%s\r\n\r\n", txt_opt_confirm_action, print_boolean (confirm_action));
-	printf ("%s%s\r\n\r\n", txt_opt_pos_first_unread, print_boolean (pos_first_unread));
-	printf ("%s%s", txt_opt_thread_arts, txt_thread[default_thread_arts]);
-
-	MoveCursor(INDEX_TOP, COL2);
-	printf ("%s%s", txt_opt_start_editor_offset, print_boolean (start_editor_offset));
-	MoveCursor(INDEX_TOP+2, COL2);
-	printf ("%s%s", txt_opt_draw_arrow, print_boolean (draw_arrow_mark));
-	MoveCursor(INDEX_TOP+4, COL2);
-	printf ("%s%s", txt_opt_page_scroll, print_boolean (full_page_scroll));
-	MoveCursor(INDEX_TOP+6, COL2);
-	printf ("%s%s", txt_opt_show_only_unread, print_boolean (default_show_only_unread));
-
-	MoveCursor(INDEX_TOP, COL3);
-	printf ("%s%s", txt_opt_mark_saved_read, print_boolean (mark_saved_read));
-	MoveCursor(INDEX_TOP+2, COL3);
-	printf ("%s%s", txt_opt_print_header, print_boolean (print_header));
-	MoveCursor(INDEX_TOP+4, COL3);
-	printf ("%s%s", txt_opt_catchup_groups, print_boolean (catchup_read_groups));
-	MoveCursor(INDEX_TOP+6, COL3);
-	printf ("%s%s", txt_opt_show_description, print_boolean (show_description));
-
-	MoveCursor(INDEX_TOP+8, COL1);
-	printf ("%s%s", txt_opt_show_author, txt_show_from[default_show_author]);
-	MoveCursor(INDEX_TOP+8, COL2);
-	printf ("%s%s\r\n\r\n", txt_opt_process_type, txt_post_process[default_post_proc_type]);
-	
-	MoveCursor(INDEX_TOP+10, COL1);
-	printf ("%s%s\r\n\r\n", txt_opt_sort_type, txt_sort_type[default_sort_art_type]);
-
-#ifdef M_AMIGA
-	if (!tin_bbs_mode) {
+			    			/*
+	    					 * the following don't need any further action (if i'm right)
+	    					 *
+#ifdef HAVE_COLOR
+						 * case OPT_COL_BACK:		case OPT_COL_FROM:
+						 * case OPT_COL_HEAD:		case OPT_COL_HELP:
+						 * case OPT_COL_INVERS:		case OPT_COL_MESSAGE:
+						 * case OPT_COL_MINIHELP:	case OPT_COL_NORMAL:
+						 * case OPT_COL_QUOTE:		case OPT_COL_RESPONSE:
+						 * case OPT_COL_SIGNATURE:	case OPT_COL_SUBJECT:
+						 * case OPT_COL_TEXT:		case OPT_COL_TITLE:
 #endif
-	printf ("%s%s\r\n\r\n", txt_opt_savedir, default_savedir);
-	printf ("%s%s\r\n\r\n", txt_opt_maildir, default_maildir);
-	printf ("%s%s\r\n\r\n", txt_opt_printer, default_printer);
-#ifdef M_AMIGA
-	}
-#endif
-	fflush(stdout);
+						 * case OPT_DEFAULT_SHOW_AUTHOR:	case OPT_DEFAULT_SORT_ART_TYPE:
+						 *	break;
+						 */	
 
-	show_menu_help (txt_select_config_file_option);
-	MoveCursor (cLINES, 0);
-}
+					} /* switch (option) */
+					break;
+
+				case OPT_STRING:
+					switch (option) {
+						case OPT_DEFAULT_EDITOR_FORMAT:
+						case OPT_DEFAULT_MAILER_FORMAT:
+						case OPT_MAIL_QUOTE_FORMAT:
+						case OPT_NEWS_QUOTE_FORMAT:
+						case OPT_QUOTE_CHARS:
+						case OPT_XPOST_QUOTE_FORMAT:
+#ifdef FORGERY
+						case OPT_MAIL_ADDRESS:
+#endif
+							prompt_option_string (option);
+							break;
+
+						case OPT_DEFAULT_MAILDIR:
+						case OPT_DEFAULT_PRINTER:
+						case OPT_DEFAULT_SAVEDIR:
+						case OPT_DEFAULT_SIGFILE:
+#ifdef M_AMIGA
+							if (tin_bbs_mode) break;
+#endif
+							prompt_option_string (option);
+							expand_rel_abs_pathname (INDEX_TOP + (option - 1) % option_lines_per_page, 
+								OPT_ARG_COLUMN + (int) strlen (option_table[option - 1].option_text), 
+								option_table[option - 1].variable
+								);
+							break;
+
+						/*
+						 * special case: mime encoding options. The encoding
+						 * is stored as a string, but we want to select it
+						 * from a predefined list.
+						 */
+						case OPT_MAIL_MIME_ENCODING:
+						case OPT_POST_MIME_ENCODING:
+							for (i=0; i<3; i++) {
+								if (!strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
+									mime_type = i;
+								}
+							}
+							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page, 
+										OPT_ARG_COLUMN,
+										mime_type,
+										option_table[option - 1].help_text,
+										option_table[option - 1].option_text,
+										option_table[option - 1].opt_list,
+										option_table[option - 1].opt_count
+										);
+							strcpy (option_table[option - 1].variable, txt_mime_types[mime_type]);
+							break;
+
+					} /* switch (option) */
+					break;
+
+				case OPT_NUM:
+					switch (option) {
+						case OPT_REREAD_ACTIVE_FILE_SECS:
+						case OPT_GROUPNAME_MAX_LENGTH:
+						case OPT_DEFAULT_FILTER_DAYS:
+							prompt_option_num (option);
+							break;
+					} /* switch (option) */
+					break;
+
+				case OPT_CHAR:
+					switch (option) {
+						case OPT_ART_MARKED_DELETED:
+						case OPT_ART_MARKED_INRANGE:
+						case OPT_ART_MARKED_RETURN:
+						case OPT_ART_MARKED_SELECTED:
+						case OPT_ART_MARKED_UNREAD:
+							prompt_option_char (option);
+							break;
+					} /* switch (option) */
+					break;
+					
+			} /* switch (option_table[option - 1].var_type) */
+			change_option = FALSE;
+			show_menu_help (txt_select_config_file_option);
+		} /* if (change_option) */
+	} /* forever */
+} /* change_config_file */
 
 /*
  *  expand ~/News to /usr/username/News and print to screen
@@ -1278,4 +1525,36 @@ quote_space_to_dash (str)
 	*dst = '\0';
 
 	return buf;
+}
+
+/*
+ * display current configuration page
+ * page numbering starts with zero; argument page_no is expected to be valid
+ */
+ 
+void
+show_config_page (page_no)
+	int page_no;
+{
+	int i, lines_to_print = option_lines_per_page;
+
+	ClearScreen ();
+	center_line (0, TRUE, txt_options_menu);
+	
+	first_option_on_screen = page_no * option_lines_per_page;
+	/*
+	 * on last page, there need not be option_lines_per_page options
+	 */
+	if (first_option_on_screen + option_lines_per_page > LAST_OPT)
+		lines_to_print = LAST_OPT - first_option_on_screen;
+	 
+	for (i = 0;i < lines_to_print;i++)
+	{
+		MoveCursor (INDEX_TOP + i, 3);
+		print_option (first_option_on_screen + i);
+	}
+	fflush (stdout);
+	
+	show_menu_help (txt_select_config_file_option);
+	MoveCursor (cLINES, 0);
 }

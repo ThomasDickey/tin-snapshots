@@ -89,6 +89,7 @@ INSTALL	= @INSTALL@
 
 HFILES	= \
 	$(INCDIR)/autoconf.h \
+	$(INCDIR)/conf.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -327,6 +328,8 @@ $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
 $(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(TIN_DEP)
 $(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_DEP)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP) \
+				$(INCDIR)/conf.h \
+				$(INCDIR)/menukeys.h \
 				$(INCDIR)/patchlev.h
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(TIN_DEP)
 $(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(TIN_DEP)

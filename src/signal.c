@@ -246,7 +246,8 @@ void _CDECL signal_handler (sig)
 }
 
 
-int set_win_size (num_lines, num_cols)
+int 
+set_win_size (num_lines, num_cols)
 	int *num_lines;
 	int *num_cols;
 {
@@ -572,7 +573,7 @@ void config_suspend (sig)
 	Raw (TRUE);
 	set_keypad_on ();
 	set_xclick_on ();
-	show_config_menu ();	
+	show_config_page (actual_option_page);
 }
 
 #endif /* SIGTSTP */	

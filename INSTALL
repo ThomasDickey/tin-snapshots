@@ -405,6 +405,7 @@ Compiled & installed on the following machines:
 	AlphaStation ??? & OSF/1 v3.2 with gcc 2.7.1
 
 6)	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
+        ?? & SunOS 5.5 with cc
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
 
@@ -414,6 +415,7 @@ Compiled & installed on the following machines:
 9)	i486 & NetBSD 1.1 with gcc 2.4.5
 
 10)	IBM PowerPC RS6000/40p & AIX 4.1.4.0 with gcc 2.7.2
+        ?? & AIX 3.2 with gcc 2.3.3
 
 11)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
 	with SCO OpenServer Development System (ver 5.0.0a)

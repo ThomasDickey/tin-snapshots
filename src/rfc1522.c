@@ -3,7 +3,7 @@
  *  Module    : rfc1522.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 08-06-96
+ *  Updated   : 08-15-96
  *  Notes     : MIME header encoding/decoding stuff
  *  Copyright : (c) Copyright 1995-96 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
@@ -56,7 +56,9 @@
 
 #define NOT_RANKED 255
 
-char mm_charset[128] = "";
+/* char mm_charset[128] = ""; */
+/* make it configurable in tinrc. move it to init.c 
+   Jungshik Shin */ 
 const char base64_alphabet[64] =
 {
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -551,9 +553,10 @@ rfc1522_encode (s)
 }
 
 void
-rfc15211522_encode (filename, mime_encoding)
+rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	char *filename;
 	char *mime_encoding;
+        int  allow_8bit_header;
 {
 	FILE *f;
 	FILE *g;
@@ -563,6 +566,7 @@ rfc15211522_encode (filename, mime_encoding)
 	int umlauts = 0;
 	int body_encoding_needed = 0;
 	char encoding;
+        void (*body_encode) ();
 
 	g = tmpfile ();
 	if (!g)
@@ -578,7 +582,10 @@ rfc15211522_encode (filename, mime_encoding)
 	while (fgets (buffer, 2048, f)) {
 		if (header[0]
 		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
-			fputs (rfc1522_encode (header), g);
+                        if ( allow_8bit_header )     /* J. Shin */
+                           fputs(header,g);
+                        else 
+			   fputs (rfc1522_encode (header), g);
 			fputc ('\n', g);
 			header[0] = '\0';
 			d = header;
@@ -621,7 +628,16 @@ rfc15211522_encode (filename, mime_encoding)
 #endif
 		fputs ("MIME-Version: 1.0\n", f);
 		if (body_encoding_needed) {
-			fprintf (f, "Content-Type: text/plain; charset=%s\n", mm_charset);
+
+/* added for EUC-KR/JP/CN by Jungshik Shin  */
+
+                        if ( !strncasecmp(mm_charset,"euc-",4) && 
+                             !strcasecmp(mime_encoding,"7bit") ) 
+                            
+			   fprintf (f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &mm_charset[4]);
+                        else 
+                               
+			   fprintf (f, "Content-Type: text/plain; charset=%s\n", mm_charset);
 			fprintf (f, "Content-Transfer-Encoding: %s\n", mime_encoding);
 		} else {
 			fputs ("Content-Type: text/plain; charset=US-ASCII\n", f);
@@ -634,17 +650,35 @@ rfc15211522_encode (filename, mime_encoding)
 		encoding = 'b';
 	else if (!strcasecmp (mime_encoding, "quoted-printable"))
 		encoding = 'q';
-	else
+	else 
 		encoding = '8';
 
 	if (!body_encoding_needed)
 		encoding = '8';
 
+/* added for EUC-KR/JP/CN by Jungshik Shin  */
+
+	if (!strcasecmp (mime_encoding, "7bit")) {
+          encoding = '7';
+          if ( !strcasecmp(mm_charset,"euc-kr") )
+             body_encode = (void (*)() ) rfc1557_encode;
+          else if ( !strcasecmp(mm_charset,"euc-jp") )
+             body_encode = (void (*)() ) rfc1468_encode;
+          else if ( !strcasecmp(mm_charset,"euc-cn") )
+             body_encode = (void (*)() ) rfc1922_encode;
+          else {
+             body_encode = (void (*)() ) rfc1521_encode;
+             encoding='8';
+          }
+        }
+        else
+             body_encode = (void (*)() ) rfc1521_encode;
+              
 	while (fgets (buffer, 2048, g)) {
-		rfc1521_encode (buffer, f, encoding);
+		body_encode (buffer, f, encoding);
 	}
-	if (encoding == 'b' || encoding == 'q')
-		rfc1521_encode (NULL, f, encoding);	/* flush */
+	if (encoding == 'b' || encoding == 'q' || encoding == '7' )
+		body_encode (NULL, f, encoding);	/* flush */
 
 	fclose (g);
 	fclose (f);

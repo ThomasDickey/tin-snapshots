@@ -1175,6 +1175,25 @@ If ON use inverse video for page headers at different levels. Default is ON.
 If ON keep all failed postings in \fI$HOME/dead.articles\fP besides keeping the
 last failed posting in \fI$HOME/dead.article\fP. Default is ON.
 .TP 4
+\fBmail_8bit_header\fP
+Allows 8bit characters unencoded in the header of mail message.
+Default is OFF. Turning it ON is effective only if mail_mime_encoding is 
+also set to 8bit.  Leaving it OFF is safe for most users except for Korean 
+users with localized sendmail.
+.TP 4
+\fBmail_mime_encoding\fP
+MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable,7bit)
+Default is 8bit. If set to 7bit, EUC-KR/JP/CN is encoded into ISO-2022-KR/JP/CN.
+Currently, only ISO-2022-KR is implemented.
+.TP 4
+\fBmm_char\fP
+charset used for MIME header in news posting and mail message.
+If MIME_STRICT is defined at compile time,
+charset other than the value of this parameter is considered 
+not displayable and replaced as '?'. Otherwise, all character
+sets are regarded as compatible with the display. The environment
+variable MM_CHARSET overrides the setting.
+.TP 4
 \fBkeep_posted_articles\fP
 If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
 .TP 4
@@ -1184,9 +1203,6 @@ Default is "In article %M you wrote:"
 \fBmark_saved_read\fP
 If ON mark articles that are saved as read. Default is ON.
 .TP 4
-\fBmime_encoding\fP
-MIME encoding of the body, if necessary (8bit, base64, quoted-printable).
-Default is 8bit.
 .TP 4
 \fBnews_quote_format\fP
 Format of quote line when posting/following up an article (%A=Address, %D=Date,
@@ -1199,6 +1215,14 @@ Turn off advertising in header (X-Newsreader/X-Mailer). Default is OFF.
 \fBpos_first_unread\fP
 If ON put cursor at first unread article in group otherwise at last article.
 Default is ON.
+.TP 4
+\fBpost_8bit_header\fP
+Allows 8bit characters unencoded in the header of news article.
+Default is OFF. Only enacted if post_mime_encoding is also set to 8bit.
+.TP 4
+\fBpost_mime_encoding\fP
+MIME encoding of the body in news posting, if necessary (8bit, base64, quoted-printable)
+Default is 8bit.
 .TP 4
 \fBpost_process_type\fP
 Type of post processing to perform after saving articles.

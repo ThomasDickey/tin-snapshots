@@ -1915,7 +1915,7 @@ mail_bug_report ()
 					 && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						sprintf (msg, txt_mailing_to, mail_to);
 						wait_message (msg);
-						rfc15211522_encode(nam, mail_mime_encoding);
+						rfc15211522_encode(nam, mail_mime_encoding,mail_8bit_header);
 						strfmailer (mailer, subject, mail_to, nam,
 							buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
@@ -2085,7 +2085,7 @@ mail_to_author (group, respnum, copy_text)
 				sprintf (msg, txt_mailing_to, mail_to);
 				wait_message (msg);
 				checknadd_headers (nam, lines);
-				rfc15211522_encode(nam, mail_mime_encoding);
+				rfc15211522_encode(nam, mail_mime_encoding,mail_8bit_header);
 				strfmailer (mailer, subject, mail_to, nam,
 					buf, sizeof (buf), default_mailer_format);
 				if (invoke_cmd (buf)) {
@@ -3121,7 +3121,7 @@ submit_mail_file (file)
 			sprintf (buf, txt_mailing_to, mail_to);
 			wait_message (buf);
 
-			rfc15211522_encode(file, mail_mime_encoding);
+			rfc15211522_encode(file, mail_mime_encoding,mail_8bit_header);
 
 			strfmailer (mailer, subject, mail_to, file,
 				buf, sizeof (buf), default_mailer_format);
