@@ -7,13 +7,13 @@ srcdir		= @srcdir@
 
 # From: address in posted articles (don't use both - read the INSTALL file)
 # Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
-INEWS_MAIL_GATEWAY	=@INEWS_MAIL_GATEWAY@
-INEWS_MAIL_DOMAIN	=@INEWS_MAIL_DOMAIN@
+INEWS_MAIL_GATEWAY	= @INEWS_MAIL_GATEWAY@
+INEWS_MAIL_DOMAIN	= @INEWS_MAIL_DOMAIN@
 #.scn.de
 #.subdomain.domain
 
 # Default nntp server (can be overridden by NNTPSERVER environment variable)
-NNTP_DEFAULT_SERVER	=@NNTP_DEFAULT_SERVER@
+NNTP_DEFAULT_SERVER	= @NNTP_DEFAULT_SERVER@
 #news.scn.de
 #news-server.subdomain.domain
 
@@ -21,6 +21,7 @@ NNTP_DEFAULT_SERVER	=@NNTP_DEFAULT_SERVER@
 LIBDIR		= @LIBDIR@
 SPOOLDIR	= @SPOOLDIR@
 NOVROOTDIR	= @NOVROOTDIR@
+INEWSDIR	= @INEWSDIR@
 
 # Compiler, linker & parser commands
 CC	= @CC@
@@ -33,7 +34,8 @@ CFLAGS	= @CFLAGS@ $(CPPOPTS) -c \
 	-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
 	-DLIBDIR=\"$(LIBDIR)\" \
 	-DSPOOLDIR=\"$(SPOOLDIR)\" \
-	-DNOVROOTDIR=\"$(NOVROOTDIR)\"
+	-DNOVROOTDIR=\"$(NOVROOTDIR)\" \
+	-DINEWSDIR=\"$(INEWSDIR)\"
 
 CPROTO_OPTS = \
 	-e -m  $(CPPOPTS) \
@@ -71,7 +73,7 @@ OBJDIR	= .
 SRCDIR	= $(srcdir)
 
 # standard commands
-CHGRP	= chown
+CHGRP	= chgrp
 CHMOD	= chmod
 CHOWN	= chown
 CFLOW	= cflow

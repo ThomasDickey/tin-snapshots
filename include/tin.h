@@ -17,9 +17,9 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
+#	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
 #else
-#include	"config.h"
+#	include	"config.h"
 #endif
 
 /*
@@ -27,46 +27,48 @@
  * etc).
  */
 #if defined(__amiga__) || defined(__amiga)
-#  undef  M_UNIX
-#  define M_AMIGA
-#  define SMALL_MEMORY_MACHINE
-#  define DONT_REREAD_ACTIVE_FILE
-#  ifndef __GNUC__
-#    define  SIG_ARGS /*nothing, since compiler doesn't handle it*/
-#    undef   DECL_SIG_CONST
-#  endif
+#	undef  M_UNIX
+#	define M_AMIGA
+#	define SMALL_MEMORY_MACHINE
+#	define DONT_REREAD_ACTIVE_FILE
+#	ifndef __GNUC__
+#		define  SIG_ARGS /*nothing, since compiler doesn't handle it*/
+#		undef   DECL_SIG_CONST
+#	endif
 #endif
 
 #ifdef __DECC
-#include	<unixio.h>
+#	include	<unixio.h>
 #else
-#include	<stdio.h>
+#	include	<stdio.h>
 #endif
 #include	<signal.h>
 #include	<errno.h>
 
 #ifdef VMS
-#define NNTP_ONLY
-#define NNTP_INEWS
-#define DONT_LOG_USER
-#define NO_PIPING
-#define DONT_HAVE_PIPING
-#define NO_SHELL_ESCAPE
-#define USE_CLEARSCREEN
+#	define NNTP_ONLY
+#	define NNTP_INEWS
+#	ifdef	LOG_USER
+#		undef	LOG_USER
+#	endif /* LOG_USER */
+#	define NO_PIPING
+#	define DONT_HAVE_PIPING
+#	define NO_SHELL_ESCAPE
+#	define USE_CLEARSCREEN
 extern char *get_uaf_fullname();
 
-#ifdef MULTINET
-#include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TYPES.H"
-#include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TIME.H"
-#else
-#include "select.h"
-#ifdef VAXC
-#include "vmstimval.h"
-#endif
-#include <types.h>
-#endif /* !MULTINET */
-#include <stat.h>
-#endif
+#	ifdef MULTINET
+#		include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TYPES.H"
+#		include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TIME.H"
+#	else
+#		include "select.h"
+#		ifdef VAXC
+#			include "vmstimval.h"
+#		endif /* VAXC */
+#		include <types.h>
+#	endif /* !MULTINET */
+#	include <stat.h>
+#endif /* VMS */
 
 #ifdef HAVE_STDDEF_H
 #	include <stddef.h>
@@ -1213,15 +1215,9 @@ struct t_filter
 	char lines_cmp; 			/* Lines compare <> */
 	int  lines_num; 			/* Lines: line	    */
 	time_t time;				/* expire time in seconds */
-#if defined(_AIX) && !defined(__GNUC__)
-	unsigned int inscope:4; /* if group matches scope ie. 'comp.os.*' */
-	unsigned int type:2;		/* kill/auto select */
-	unsigned int icase:2;		/* Case sensitive filtering */
-#else
-	unsigned char inscope:4;	/* if group matches scope ie. 'comp.os.*' */
-	unsigned char type:2;		/* kill/auto select */
-	unsigned char icase:2;		/* Case sensitive filtering */
-#endif
+	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
+	unsigned int type:2;			/* kill/auto select */
+	unsigned int icase:2;			/* Case sensitive filtering */
 };
 
 /*

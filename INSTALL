@@ -6,19 +6,19 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following Makefile & ./include/tin.h defines are documented in detail:
 ---------------------------------------------------------------------------
-  DEBUG                      HAVE_REF_THREADING         NNTP_DEFAULT_SERVER
-  DEFAULT_ISO2ASC            HAVE_SELECT                NNTP_INEWS
-  DONT_LOG_USER              HAVE_SETREUID              NNTP_ONLY
-  DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_SERVER_FILE
-  HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NOVROOTDIR
-  HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NO_PIPING
-  HAVE_ISPELL                INDEX_DAEMON               NO_POSTING
-  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_REGEX
-  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_SHELL_ESCAPE
-  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SMALL_MEMORY_MACHINE
-  HAVE_MMDF_MAILER           LIBDIR                     SPOOLDIR
-  HAVE_POLL                  NETLIBS                    USE_INN_NNTPLIB
-  HAVE_POSIX_JC              NNTP_ABLE                  USE_INVERSE_HACK
+  DEBUG                      HAVE_SELECT                NNTP_DEFAULT_SERVER
+  DEFAULT_ISO2ASC            HAVE_SETREUID              NNTP_INEWS
+  DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_ONLY
+  HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NNTP_SERVER_FILE
+  HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NOVROOTDIR
+  HAVE_ISEPLL                INDEX_DAEMON               NO_PIPING
+  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_POSTING
+  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_REGEX
+  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         NO_SHELL_ESCAPE
+  HAVE_MMDF_MAILER           LIBDIR                     SMALL_MEMORY_MACHINE
+  HAVE_POLL                  LOG_USER                   SPOOLDIR
+  HAVE_POSIX_JC              NETLIBS                    USE_INN_NNTPLIB
+  HAVE_REF_THREADING         NNTP_ABLE                  USE_INVERSE_HACK
 
 News machine names
 ------------------
@@ -257,7 +257,7 @@ logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
 BASE and NNTP.
 
 
-DONT_LOG_USER
+LOG_USER
 Log user-name & info to /tmp/.tin_log for usage statistics. If reading via
 NNTP the NNTP XUSER extended command will log user info to NNTP server.
 If -DNNTP_XUSER is defined it will define LOG_USER automatically.

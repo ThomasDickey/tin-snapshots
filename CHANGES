@@ -1,3 +1,21 @@
+--unoff BETA release 960623 --
+
+094) Chris Blum <chris@phil.uni-sb.de>
+     ADD. mail_address to tinrc if defined FORGERY to build a vaild From:
+          via slip/ppp connections
+     FIX. extern.h, config.c, inews.c, init.c
+
+093) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Lars Dannenberg <lars@vendetta.han.de>
+     BUG. used wrong colors under certain cricumstances
+     FIX. extern.h, config.c, help.c, init.c
+
+092) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. renamed DONT_LOG_USER to LOG_USER, set default to off
+     ADD. little code 'cleanup'
+     BUG. INEWSDIR is not set in src/Makefile
+     FIX. several patches
+
 --unoff BETA release 960622 --
 
 091) Jason Faultless <jason@radar.demon.co.uk>

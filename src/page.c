@@ -99,7 +99,6 @@ restart:
 	art_mark_read (group, &arts[respnum]);
 	
 	if ((note_page = art_open (art, group_path)) == ART_UNAVAILABLE) {
-/*		arts[respnum].thread = ART_EXPIRED; */ /* 21.11.92 FIXME */
 		sprintf (msg, txt_art_unavailable, art);
 		if (debug) {
 
@@ -162,15 +161,12 @@ restart:
 									goto page_down;
 								}
 								goto page_goto_next_unread;
-								/* break; */
 							case MOUSE_BUTTON_2:
 								if (xrow < 3 || xrow >= cLINES-1) {
 									goto page_up;
 								}
 								goto return_to_index;
-								/* break; */
 							case MOUSE_BUTTON_3:
-								/* if (xcut_and_paste || mouse_click_on) { */
 								if (mouse_click_on) {
 									set_xclick_off ();
 									mouse_click_on = FALSE;
@@ -826,12 +822,12 @@ print_a_line:
 		
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
-			ConvertTeX2Iso (buf3, buf2);
+			ConvertTeX2Iso ((unsigned char *)buf3, (unsigned char *)buf2);
 		}
 
 		if (iso2asc_supported >= 0) {
 			strcpy (buf3, buf2);
-			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
+			ConvertIso2Asc ((unsigned char *)buf3, (unsigned char*)buf2, iso2asc_supported);
 		}
 		
 		first_char = buf2[0] ? buf2[0] : first_char;
@@ -1214,7 +1210,7 @@ art_open (art, group_path)
 	art_close ();	/* just in case */
 
 	if (tex2iso_supported) {
-		tex2iso_article = iIsArtTexEncoded (art, group_path);
+		tex2iso_article = iIsArtTexEncoded (art, (unsigned char *)group_path);
 		if (tex2iso_article) {
 			wait_message ("TeX2Iso encoded article");
 		}

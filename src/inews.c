@@ -390,6 +390,13 @@ get_from_name (user_name, host_name, full_name, from_name)
 	char domain[PATH_LEN];
 	char nntp_inews_domain[PATH_LEN];
 	char *ptr;
+
+#ifdef FORGERY
+	if (*mail_address) {
+		strcpy(from_name, mail_address);
+		return;
+	}
+#endif
 	
 	domain[0] = '\0';
 	nntp_inews_domain[0] = '\0';

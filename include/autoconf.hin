@@ -33,6 +33,7 @@
 #undef	MIME_STRICT_CHARSET
 #undef	MM_CHARSET
 #undef	FORGERY
+#undef	LOG_USER
 #undef	USE_INN_NNTPLIB
 
 /*
