@@ -24,8 +24,20 @@
 static int current_fcol = 7;
 static int current_bcol = 0;
 
+/*
+ * local prototypes
+ */
+static t_bool check_valid_mark (const char *s, int c);
+static t_bool isalp (int c);
+static void color_fputs (const char *s, FILE *stream, int color);
 #if USE_CURSES
-static void set_colors(int fcolor, int bcolor)
+	static void set_colors (int fcolor, int bcolor);
+#endif /* USE_CURSES */
+
+#if USE_CURSES
+static void set_colors (
+	int fcolor,
+	int bcolor)
 {
 	static bool FIXME[64];
 

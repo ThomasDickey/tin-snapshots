@@ -39,6 +39,8 @@ static int read_group (struct t_group *group, char *group_path, int *pcount);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
 static void print_expired_arts (int num_expired);
+static void thread_by_subject (void);
+
 
 /*
  *  Construct the pointers to the base article in each thread.

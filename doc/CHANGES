@@ -1,4 +1,48 @@
---unoff BETA release 970819 --
+--unoff BETA release 970826 --
+
+427) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. 'i' in group menu always shows subject of the base article
+     BUG. newsrc entry was ignored when resubscribing to an unsubscribed group
+     BUG. newgroups are now skipped correctly when 'm'oving newsgroups
+     BUG. 'd' behaved funny in first newsgroup (introduced in 313)
+     ADD. when subscribing to a new group, the group counts are checked and
+          num_unread is calculated and shown without having to enter the group
+     ADD. minor code clean-up
+
+426) Thomas E. Dickey <dickey@clark.net>
+     BUG. correct & extend the configuration script macros for finding the
+          network and ncurses libraries
+     ADD. modify makecfg to generate table-definitions that work on SCO
+     ADD. modify the help-screen to allow it to scroll by one line at a
+          time [(n)curses]
+     ADD. minor fixes to makefiles
+     FIX. Makefile, makefile[.in], Makefile[.in], aclocal.m4, configure[.in]
+          autoconf.h[in], config.h, proto.h, tin.h, auth.c, help.c
+          makecfg.c, signal.c, tcurses.c
+
+425) Darrell Tangman <darrelltman@mindspring.com>
+     ADD. possibillity to shutdown tin cleanly via SIGUSR1
+     BUG. calculated wrong size of signal_list
+     FIX. misc.c, signal.c
+
+424) Urs Janssen <urs@karlsruhe.org>   
+     Sven Paulus <sven@karlsruhe.org>
+     BUG. tin skipped second page when paging up with
+          show_headers_to_display != ""
+          [page.c really should be rewritten!]
+     PRF. got rid of useless fseek()s to determine article's size
+     FIX. page.c
+
+423) Urs Janssen <urs@akk.uni-karlsruhe.de>   
+     BUG. Makefile[.in] dosn't work with /bin/csh anymore
+          [introduced in 420]
+     BUG. empty X-Comment-To: is inserted if posting contains no realname
+     BUG. prompting for username didn't allow to change the default
+     ADD. minor code cleanup (added missing prototypes, removed gotos,
+          moved strings to lang.c)
+     FIX. Makefile[.in], proto.h, *.c
+
+--unoff BETA release 970820 --
 
 422) Phil Edge <phil@edge.demon.co.uk>
      BUG. On followup, cancel and repost an empty Distribution
@@ -19,11 +63,11 @@
      BUG. minor tweaks to makefiles to work with configure --srcdir option,
 	  and to autoconfigure for lint program.
      FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
-          Makefile[.in], config.c, getline.c, group.c, help.c, misc.c
+          Makefile[.in], config.c, getline.c, group.c, help.c, misc.c
           page.c, prompt.c, select.c, thread.c
 
 420) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. minor code-cleanup (removed unused variables, fixed a few
+     ADD. minor code cleanup (removed unused variables, fixed a few
           type-mismatches, etc.)
      FIX. extern,h, proto.h, autoconf.h[in], configure[.in]
           Makefile[.in], *.c
@@ -32,17 +76,17 @@
 
 419) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. missplaced #ifdefs moved
-     ADD. minor code-cleanup
+     ADD. minor code cleanup
      FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c,
           search.c, thread.c, proto.h, Makefile.in
 
 418) Oliver B. Warzecha <obw@amarok.ping.de>
      BUG. get_arrow_keys()/AmigaOS doesn't work
-     ADD. minor code-cleanup (AmigaOS)
+     ADD. minor code cleanup (AmigaOS)
      FIX. several supplied patches
 
 417) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
-     ADD. minor code clean-up (mainly debug-message related)
+     ADD. minor code cleanup (mainly debug-message related)
      FIX. several supplied patches
 
 --unoff BETA release 970731 --
@@ -79,7 +123,7 @@
      FIX. main.c, post.c
 
 411) Oliver B. Warzecha <obw@amarok.ping.de>
-     ADD. amiga code clean-up
+     ADD. amiga code cleanup
      BUG. impossible to killfile articles with lines=0
      BUG. wildcards were not quoted when the subject was used for filtering.
      ADD. function quote_wild() is called for subject.
@@ -128,7 +172,7 @@
 
 403) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. check for control-characters in Subject:
-     ADD. minor code clean-up
+     ADD. minor code cleanup
      FIX. several patches
 
 402) Sven Paulus <sven@oops.sub.de>
@@ -145,7 +189,7 @@
 401) Oliver B. Warzecha <obw@amarok.ping.de>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. strip "(was:" from Subject:
-     ADD. amiga code clean-up
+     ADD. amiga code cleanup
      FIX. misc.c
 
 400) Sven Paulus <sven@oops.sub.de>
@@ -158,11 +202,11 @@
      ADD. '/' subject search to thread menu
      ADD. Improvements to search by subject - now enters thread
           if needed
-     ADD. still more code clean-up
+     ADD. still more code cleanup
      FIX. several supplied patches
 
 398) Oliver B. Warzecha <obw@amarok.ping.de>
-     ADD. amiga code clean-up
+     ADD. amiga code cleanup
      FIX. amiga.c, amiga.h
 
 397) Mike Muise <c-muise@mail.dec.com>
@@ -187,7 +231,7 @@
 
 393) Thomas E. Dickey <dickey@clark.net>
      ADD. install-prefix and autoconf support for regular expression
-     ADD. code clean-up
+     ADD. code cleanup
      FIX. several supplied patches
 
 392) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -202,7 +246,7 @@
      BUG. ranges were broken on group menu
      ADD. 'K', 'z' & 'Z' on group menu now understand ranges
      ADD. improvements to regex error reporting
-     ADD. code clean-up
+     ADD. code cleanup
      FIX. several supplied patches
 
 390) Dmitri A. Martynoff <dmart@wowa.net.kiae.su>
@@ -210,13 +254,13 @@
      FIX. misc.c
 
 389) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. code clean-up
+     ADD. code cleanup
      FIX. several supplied patches
 
 --unoff BETA release 970612 --
 
 388) Oliver B. Warzecha <obw@amarok.ping.de>
-     ADD. minor code clean-up, mainly amiga stuff
+     ADD. minor code cleanup, mainly amiga stuff
      FIX. several supplied patches
 
 387) Jason Faultless <jason@radar.demon.co.uk>
@@ -1784,7 +1828,7 @@
 
 120) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. moved some newsgroup specific defaults from feed.c to attrib.c
-     ADD. minor code clean up
+     ADD. minor code cleanup
      FIX. feed.c, attrib.c, menukeys.h
 
 --unoff BETA release 960718 --
@@ -1807,7 +1851,7 @@
      FIX. open.c
 
 116) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. minor code clean up
+     ADD. minor code cleanup
      FIX. extern.h, lang.c
 
 115) Jason Faultless <jason@radar.demon.co.uk>

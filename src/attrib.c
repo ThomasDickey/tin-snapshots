@@ -55,10 +55,11 @@
 ** Local prototypes
 */
 #ifndef INDEX_DAEMON
-static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
-static void set_attrib_num (int type, char *scope, int num);
-static void set_attrib_str (int type, char *scope, char *str);
-#endif	/* INDEX_DAEMON */
+	static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
+	static void set_attrib_num (int type, char *scope, int num);
+	static void set_attrib_str (int type, char *scope, char *str);
+	static void set_default_attributes (struct t_attribute *psAttrib);
+#endif /* !INDEX_DAEMON */
 
 /*
  * global attributes

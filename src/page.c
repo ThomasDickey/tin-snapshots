@@ -36,7 +36,6 @@ char note_h_ftnto[HEADER_LEN];		/* Old X-Comment-To: (Used by FIDO) */
 char *glob_page_group;
 
 FILE *note_fp;				/* the body of the current article */
-FILE *tmp_fp;				/* TODO: hack var for broken overview */
 
 int glob_respnum;
 int last_resp;				/* current & previous article for - command */
@@ -61,14 +60,15 @@ static int tex2iso_article;
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
-#ifdef HAVE_METAMAIL
-static void show_mime_article (FILE *fp, struct t_article *art);
-#endif
 static void show_first_header (int respnum, char *group);
 static void show_cont_header (int respnum);
 static int prompt_response (int ch, int respnum);
 static int show_last_page (void);
-#endif /* INDEX_DAEMON */
+static t_bool expand_ctrl_chars (char *tobuf, char *frombuf, int length, int do_rotation);
+#	ifdef HAVE_METAMAIL
+	static void show_mime_article (FILE *fp, struct t_article *art);
+#	endif /* HAVE_METAMAIL */
+#endif /* !INDEX_DAEMON */
 
 #ifndef INDEX_DAEMON
 int
@@ -88,6 +88,7 @@ show_page (
 	int ret_code;
 	long old_artnum;
 	long art;
+	struct stat note_stat_blubb;
 
 	local_filtered_articles = FALSE;	/* used in thread level */
 
@@ -118,8 +119,11 @@ restart:
 		if (num_headers_to_display || num_headers_to_not_display) {
 			note_page = 0;
 			note_end = FALSE;
-			fseek(note_fp, 0L, 0);
+			fseek(note_fp, 0L, SEEK_SET);
 		}
+	   /* Get article size */
+	   fstat(fileno(note_fp), &note_stat_blubb);
+	   note_size = note_stat_blubb.st_size;
 		show_note_page (group->name, respnum);
 	}
 
@@ -269,16 +273,6 @@ end_of_article:
 					break;
 				}
 
-				/* TODO: fix this hack properly */
-				/* See if parent really exists in case overview is broken */
-				if ((tmp_fp = open_art_fp (group_path,
-						arts[arts[respnum].refptr->parent->article].artnum)) == (FILE *) 0) {
-					info_message(txt_art_parent_unavail);
-					break;
-				}
-				fclose (tmp_fp);
-				/* TODO: end of hack */
-
 				art_close ();
 				respnum = arts[respnum].refptr->parent->article;
 				goto restart;
@@ -398,7 +392,7 @@ page_goto_next_unread:
 				} else {
 					note_page = 0;
 					note_end = FALSE;
-					fseek(note_fp, 0L, 0);
+					fseek(note_fp, 0L, SEEK_SET);
 					show_all_headers = 1;
 					show_note_page (group->name, respnum);
 					show_all_headers = 0;
@@ -479,9 +473,9 @@ begin_of_article:
 					note_end = FALSE;
 					/* so we get any headers -- swp */
 					if (num_headers_to_display || num_headers_to_not_display) {
-						fseek (note_fp, 0L, 0);
+						fseek (note_fp, 0L, SEEK_SET);
 					} else {
-						fseek (note_fp, note_mark[0], 0);
+						fseek (note_fp, note_mark[0], SEEK_SET);
 					}
 					show_note_page (group->name, respnum);
 				}
@@ -522,11 +516,11 @@ page_up:
 					} else {
 						note_page -= 2;
 						note_end = FALSE;
-						/* to get any headers -- swp */
-						if (note_page <= 1 && (num_headers_to_display || num_headers_to_not_display)) {
-							fseek (note_fp, 0L, 0);
+						/* to get any headers -- swp -- Lin Wutang */
+						if (!note_page && (num_headers_to_display || num_headers_to_not_display)) {
+							fseek (note_fp, 0L, SEEK_SET);
 						} else {
-							fseek (note_fp, note_mark[note_page], 0);
+							fseek (note_fp, note_mark[note_page], SEEK_SET);
 						}
 						show_note_page (group->name, respnum);
 					}
@@ -811,16 +805,16 @@ redraw_page (
 		note_page--;
 		/* to get any headers -- swp */
 		if (note_page <= 1 && (num_headers_to_display || num_headers_to_not_display)) {
-			fseek (note_fp, 0L, 0);
+			fseek (note_fp, 0L, SEEK_SET);
 		} else {
-			fseek (note_fp, note_mark[note_page], 0);
+			fseek (note_fp, note_mark[note_page], SEEK_SET);
 		}
 		show_note_page (group, respnum);
 	}
 }
 
 #ifndef INDEX_DAEMON
-static int
+static t_bool
 expand_ctrl_chars(
 	char *tobuf,
 	char *frombuf,
@@ -828,8 +822,8 @@ expand_ctrl_chars(
 	int do_rotation)
 {
 	char *p, *q;
-	int ctrl_L = FALSE;
 	int i, j;
+	t_bool ctrl_L = FALSE;
 
 	for (p = frombuf, q = tobuf; *p && *p != '\n' && q < &tobuf[length]; p++) {
 		if (*p == '\b' && q > tobuf) {
@@ -868,18 +862,16 @@ show_note_page (
 {
 #ifndef INDEX_DAEMON
 
-	int below_sig;			/* are we in the signature? */
-
 	char buf3[2*HEADER_LEN+200];
-	int ctrl_L = FALSE;		/* form feed character detected */
-	int first  = TRUE;
-	int lines;
-	long tmp_pos;
-	static char buf[HEADER_LEN];
 	int do_display_header, dont_display_header;
+	int lines;
+	int display_header, i;
+	static char buf[HEADER_LEN];
+	t_bool below_sig;			/* are we in the signature? */
+	t_bool ctrl_L = FALSE;		/* form feed character detected */
+	t_bool first  = TRUE;
 	t_bool wild_do_display_headers = FALSE;
 	t_bool wild_dont_display_headers = FALSE;
-	int display_header, i;
 
 	if (beginner_level) {
 		lines = cLINES - (MINI_HELP_LINES - 1);
@@ -890,13 +882,6 @@ show_note_page (
 	ClearScreen ();
 
 	note_line = 1;
-
-	if (note_size == 0L) {
-		tmp_pos = ftell (note_fp);
-		fseek (note_fp, 0L, 2);			/* goto end of article */
-		note_size = ftell (note_fp);
-		fseek (note_fp, tmp_pos, 0);	/* goto old position */
-	}
 
 	if (note_page == 0) {
 		buf2[0] = '\0';
@@ -945,8 +930,8 @@ show_note_page (
 	}
 
 	while (note_line < lines) {
-		note_mark[note_page+1] = ftell (note_fp);
 		if (show_last_line_prev_page) {
+		   note_mark[note_page+1] = ftell (note_fp);
 			if (doing_pgdn && first && buf2[0]) {
 				goto print_a_line;
 			}
@@ -1084,7 +1069,7 @@ print_a_line:
 			break;
 		}
 	}
-
+	
 	if (!show_last_line_prev_page) {
 		note_mark[++note_page] = ftell (note_fp);
 	} else {
@@ -1150,7 +1135,7 @@ show_mime_article (
 	pclose (mime_fp);
 	note_end = TRUE;
 	Raw(TRUE);
-	fseek (fp, offset, 0);	/* goto old position */
+	fseek (fp, offset, SEEK_SET);	/* goto old position */
 	MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 	StartInverse ();
 	if (art->thread != -1) {
@@ -1345,7 +1330,7 @@ show_first_header (
 
 	note_line += 4;
 
-/* with the new news_headers_to_display this is 'obsolete' */
+/* FIXME with the new news_headers_to_display this is 'obsolete' */
 /*
 	if (note_h_keywords[0]) {
 		my_printf ("Keywords: %s" cCRLF, note_h_keywords);
@@ -1642,18 +1627,10 @@ show_last_page (void)
 {
 	char buf[LEN];
 	char buf3[LEN+50];
-	int ctrl_L;		/* form feed character detected */
-	long tmp_pos;
+	t_bool ctrl_L;		/* form feed character detected */
 
 	if (note_end) {
 		return FALSE;
-	}
-
-	if (note_size == 0L) {
-		tmp_pos = ftell (note_fp);
-		fseek (note_fp, 0L, 2);			/* goto end of article */
-		note_size = ftell (note_fp);
-		fseek (note_fp, tmp_pos, 0);	/* goto old position */
 	}
 
 	while (!note_end) {
@@ -1687,7 +1664,7 @@ show_last_page (void)
 			note_mark[++note_page] = ftell(note_fp);
 		}
 	}
-	fseek (note_fp, note_mark[note_page], 0);
+	fseek (note_fp, note_mark[note_page], SEEK_SET);
 	return TRUE;
 }
 #endif /* INDEX_DAEMON */

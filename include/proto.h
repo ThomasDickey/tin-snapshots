@@ -128,9 +128,11 @@ extern int filter_menu (int type, struct t_group *group, struct t_article *art);
 extern int quick_filter_kill (struct t_group *group, struct t_article *art);
 extern int quick_filter_select (struct t_group *group, struct t_article *art);
 extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
-extern int read_filter_file (char *file, int global_file);
 extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
 extern void free_all_filter_arrays (void);
+#ifndef INDEX_DAEMON
+	extern int read_filter_file (char *file, t_bool global_file);
+#endif /* INDEX_DAEMON */
 
 /* getline.c */
 extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
@@ -153,7 +155,7 @@ extern void hash_init (void);
 extern void hash_reclaim (void);
 
 /* help.c */
-extern void display_info_page (void);
+extern void display_info_page (t_bool first);
 extern void show_info_page (int type, const char *help[], const char *title);
 extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
@@ -240,18 +242,16 @@ extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
 extern int input_pending (int delay);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
-extern int invoke_ispell (char *nam);
 extern int mail_check (void);
 extern int my_chdir (char *path);
 extern int my_isprint (int c);
-extern int my_mkdir (char *path, int mode);
+extern int my_mkdir (char *path, mode_t mode);
 extern int peek_char (FILE *fp);
 extern int stat_file (char *file);
 extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format);
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
 extern int untag_all_articles (void);
-extern void append_file (char *old_filename, char *new_filename);
 extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
@@ -267,13 +267,11 @@ extern void read_input_history_file (void);
 extern void rename_file (char *old_filename, char *new_filename);
 extern void set_real_uid_gid (void);
 extern void set_tin_uid_gid (void);
-extern void shell_escape (void);
 extern void show_inverse_video_status (void);
 extern void strip_double_ngs (char *ngs_list);
 extern void tin_done (int ret);
 extern void toggle_inverse_video (void);
 extern void vPrintBugAddress (void);
-extern void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
 	extern void buffer_to_local (char *b);
 	extern void buffer_to_network (char *b);
@@ -282,9 +280,17 @@ extern void write_input_history_file (void);
 	extern void toggle_color (void);
 	extern void show_color_status (void);
 #endif /* HAVE_COLOR */
-#if !defined(M_UNIX)
+#ifdef HAVE_ISPELL
+	extern int invoke_ispell (char *nam);
+#endif /* HAVE_ISPELL */
+#ifdef M_UNIX
+	extern void append_file (char *old_filename, char *new_filename);
+#else
 	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
-#endif /* !M_UNIX */
+#endif /* M_UNIX */
+#ifndef	NO_SHELL_ESCAPE
+	extern void shell_escape (void);
+#endif /* NO_SHELL_ESCAPE */
 
 /* newsrc.c */
 extern int pos_group_in_newsrc (struct t_group *group, int pos);
@@ -342,6 +348,7 @@ extern int get_respcode (void);
 extern int nntp_open (void);
 extern int setup_hard_base (struct t_group *group, char *group_path);
 extern int stat_article (long art, char *group_path);
+extern void vGet1GrpArtInfo(struct t_group *grp);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
 extern void nntp_close (void);
 extern void vGrpGetSubArtInfo (void);
@@ -353,11 +360,13 @@ extern void vGrpGetSubArtInfo (void);
 /* page.c */
 extern int art_open (long art, char *group_path);
 extern int match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
-extern int show_page (struct t_group *group, char *group_path, int respnum, int *threadnum);
 extern void art_close (void);
 extern void redraw_page (char *group, int respnum);
 extern void show_note_page (char *group, int respnum);
 extern void yank_to_addr (char *orig, char *addr);
+#ifndef INDEX_DAEMON
+	extern int show_page (struct t_group *group, char *group_path, int respnum, int *threadnum);
+#endif /* INDEX_DAEMON */
 
 /* parsdate.y */
 extern int GetTimeInfo (TIMEINFO *Now);

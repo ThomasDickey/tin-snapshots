@@ -643,7 +643,7 @@ void init_selfinfo (void)
 #endif
 	{
 		created_rcdir = TRUE;
-		my_mkdir (rcdir, 0755);
+		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 
 	strcpy (bug_addr, BUG_REPORT_ADDRESS);
@@ -693,7 +693,7 @@ void init_selfinfo (void)
 #endif
 	}
 	if (stat (index_newsdir, &sb) == -1) {
-		my_mkdir (index_newsdir, 0777);
+		my_mkdir (index_newsdir, S_IRWXUGO);
 	}
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
@@ -701,11 +701,11 @@ void init_selfinfo (void)
 	joinpath (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
 #endif
 	if (stat (index_maildir, &sb) == -1) {
-		my_mkdir (index_maildir, 0777);
+		my_mkdir (index_maildir, S_IRWXUGO);
 	}
 	joinpath (index_savedir, get_val ("TIN_INDEX_SAVEDIR", rcdir), INDEX_SAVEDIR);
 	if (stat (index_savedir, &sb) == -1) {
-		my_mkdir (index_savedir, 0777);
+		my_mkdir (index_savedir, S_IRWXUGO);
 	}
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
 	joinpath (local_config_file, rcdir, CONFIG_FILE);
@@ -747,7 +747,7 @@ void init_selfinfo (void)
 	joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", novrootdir), INDEX_NEWSDIR);
 
 	if (stat (index_newsdir, &sb) == -1) {
-		my_mkdir (index_newsdir, 0755);
+		my_mkdir (index_newsdir, (S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 #else
 #	ifdef HAVE_LONG_FILE_NAMES
@@ -763,17 +763,17 @@ void init_selfinfo (void)
 #endif
 	{
 		created_rcdir = TRUE;
-		my_mkdir (rcdir, 0755);
+		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 	if (tin_uid != real_uid) {
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", spooldir), INDEX_NEWSDIR);
 		set_tin_uid_gid ();
 		if (stat (index_newsdir, &sb) == -1) {
-			my_mkdir (index_newsdir, 0777);
+			my_mkdir (index_newsdir, S_IRWXUGO);
 		}
 		set_real_uid_gid ();
 	} else if (stat (index_newsdir, &sb) == -1) {
-		my_mkdir (index_newsdir, 0777);
+		my_mkdir (index_newsdir, S_IRWXUGO);
 	}
 	if (stat (posted_info_file, &sb) == -1) {
 		if ((fp = fopen (posted_info_file, "w")) != (FILE *) 0) {
@@ -915,7 +915,7 @@ int create_mail_save_dirs (void)
 		joinpath (path, homedir, DEFAULT_MAILDIR);
 	}
 	if (stat (path, &sb) == -1) {
-		my_mkdir (path, 0755);
+		my_mkdir (path, (S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;
 	}
 
@@ -924,7 +924,7 @@ int create_mail_save_dirs (void)
 		joinpath (path, homedir, DEFAULT_SAVEDIR);
 	}
 	if (stat (path, &sb) == -1) {
-		my_mkdir (path, 0755);
+		my_mkdir (path, (S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;
 	}
 

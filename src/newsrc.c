@@ -17,7 +17,7 @@
 
 #define BITS_TO_BYTES(n)	(size_t)((n+NBITS-1)/NBITS)
 
-static int newsrc_mode = 0;
+static mode_t newsrc_mode = 0;
 
 /*
 ** Local prototypes
@@ -64,7 +64,7 @@ read_newsrc (
 	}
 
 	if (stat (newsrc_file, &buf) == 0) {
-		newsrc_mode = buf.st_mode;
+		newsrc_mode = (mode_t) buf.st_mode;
 	}
 
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
@@ -319,6 +319,11 @@ subscribe (
 				if (STRCMPEQ(grp, group->name)) {
  					fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
 					group->subscribed = SUB_BOOL(sub_state);
+
+					/* If previously subscribed to in .newsrc, load up any existing information */
+					if (sub_state == SUBSCRIBED)
+						parse_bitmap_seq (group, seq);
+
 					found = TRUE;
 				} else {
 					fprintf (newfp, "%s%c %s\n", grp, sub, seq);
@@ -332,6 +337,16 @@ subscribe (
 		if (!found) {
 			fprintf (newfp, "%s%c\n", group->name, sub_state);
 			group->subscribed = SUB_BOOL(sub_state);
+
+			/* A new group - get min/max/unread counts etc. for it */
+			wait_message (txt_subscribing);
+
+			if (sub_state == SUBSCRIBED) {
+				char null_seq[2] = "";
+
+				vGet1GrpArtInfo(group);
+				parse_bitmap_seq(group, null_seq);
+			}
 		}
 	}
 
@@ -457,7 +472,6 @@ grp_mark_unread (
 	debug_print_comment ("Z command");
 #endif
 
-/* TODO - this is bogus - test return code */
 	vGrpGetArtInfo (
 		group->spooldir,
 		group->name,

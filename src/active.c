@@ -24,9 +24,10 @@ time_t new_newnews_time;			/* FIXME: never set */
  * Local prototypes
  */
 static int find_newnews_index (char *cur_newnews_host);
+static int parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
-static void active_add( struct t_group *ptr, long count, long max, long min, const char *moderated);
+static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
 #if 0 /* never used */
 /*
  *  Compare two pointers to "group_t" structures - used in qsort.

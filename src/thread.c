@@ -87,6 +87,9 @@ bld_tline (
 			mark = (art->selected ? art_marked_selected : art_marked_unread);
 		} else if (art->status == ART_WILL_RETURN) {
 			mark =  art_marked_return;
+/* TODO - add kill_level		} else if (art->killed) {
+ *			mark = 'K';
+ */
 		} else {
 			mark = ART_MARK_READ;
 		}

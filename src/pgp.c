@@ -283,7 +283,7 @@ pgp_check_article(void)
 		info_message(buf);
 		return (0);
 	}
-	fseek(note_fp, note_mark[0], 0);
+	fseek(note_fp, note_mark[0], SEEK_SET);
 	fgets(buf, LEN, note_fp);
 	while (!feof(note_fp)) {
 		if (!strcmp(buf, PGP_SIG_TAG))

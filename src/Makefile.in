@@ -217,22 +217,14 @@ all: $(BINDIR)/$(EXE)
 $(OBJDIR)/parsdate.o: $(SRCDIR)/parsdate.y
 	@$(ECHO) "expect 6 shift/reduce conflicts..."
 	$(YACC) $(SRCDIR)/parsdate.y
-	@-if test -e 'parsdate.tab.c' ; then \
-		$(MV) parsdate.tab.c $(OBJDIR)/parsdate.c ;\
-	else \
-		$(MV) y.tab.c $(OBJDIR)/parsdate.c ;\
-	fi
+	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 @SHOW_CC@
 	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(OBJDIR)/parsdate.c
 
 $(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
 	@$(ECHO) "expect 6 shift/reduce conflicts..."
 	$(YACC) $(SRCDIR)/parsdate.y
-	@-if test -e 'parsdate.tab.c' ; then \
-		$(MV) parsdate.tab.c $(OBJDIR)/parsdate.c ;\
-	else \
-		$(MV) y.tab.c $(OBJDIR)/parsdate.c ;\
-	fi
+	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 
 actived:	$(OBJDIR)/lang.o \
 		$(OBJDIR)/joinpath.o \

@@ -20,6 +20,13 @@
  */
 
 #if !defined(INDEX_DAEMON) && defined(NNTP_ABLE)
+/*
+ * local prototypes
+ */
+static int do_authinfo_original (char *server, char *authuser, char *authpass);
+static t_bool authinfo_generic (void);
+static t_bool read_newsauth_file (char *server, char *authuser, char *authpass);
+static t_bool authinfo_original (char *server, char *authuser, t_bool startup);
 
 /*
  * Process AUTHINFO GENERIC method.
@@ -115,7 +122,10 @@ authinfo_generic (void)
  */
 
 static t_bool
-read_newsauth_file (char *server, char *authuser, char *authpass)
+read_newsauth_file (
+	char *server,
+	char *authuser,
+	char *authpass)
 {
 	char line[PATH_LEN];
 	char *_authpass;
@@ -268,6 +278,7 @@ authinfo_original (
 	debug_nntp ("authorization", "original authinfo");
 #endif
 
+  	authpassword[0]='\0';
 	authuser = strncpy (authusername, authuser, PATH_LEN);
 	authpass = authpassword;
 
@@ -313,14 +324,13 @@ authinfo_original (
 	 * that the server doesn't want a password; so only ask for it if needed.
 	 */
 	if (!startup) {
-		clear_message ();
-		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN, HIST_OTHER)) == (char *) 0) {
+/* FIXME: add default value to prompt */
+		if (! prompt_string(txt_auth_user_needed, authusername, HIST_OTHER)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
-#endif
+#endif /* DEBUG */
 			return FALSE;
 		}
-		authuser = strncpy (authusername, ptr, PATH_LEN);
 
 		clear_message ();
 		ptr = getpass (txt_auth_pass_needed);

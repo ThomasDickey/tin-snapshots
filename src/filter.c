@@ -47,13 +47,16 @@ struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 ** Local prototypes
 */
 static char *pcChkRegexStr (char *pcStr);
+static int get_choice (int x, const char *help, const char *prompt, const char *opt1, const char *opt2, const char *opt3, const char *opt4, const char *opt5);
 static int iAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
 static int unfilter_articles (void);
 static int set_filter_scope (struct t_group *group);
-static void vWriteFilterFile (char *pcFile);
-
+static void free_filter_array (struct t_filters *ptr);
+static void free_filter_item (struct t_filter *ptr);
 #ifndef INDEX_DAEMON
-static void vWriteFilterArray (FILE *fp, int global, struct t_filters *ptr, long theTime);
+	static void vSetFilter (struct t_filter *psFilter);
+	static void vWriteFilterArray (FILE *fp, int global, struct t_filters *ptr, long theTime);
+	static void vWriteFilterFile (char *pcFile);
 #endif
 
 
@@ -159,12 +162,12 @@ free_all_filter_arrays (void)
  *  read ~/.tin/filter file contents into filter array
  */
 
+#ifndef INDEX_DAEMON
 int
 read_filter_file (
 	char	*file,
-	int	global_file)
+	t_bool global_file)
 {
-#ifndef INDEX_DAEMON
 	FILE *fp;
 	char buf[HEADER_LEN];
 	char group[HEADER_LEN];
@@ -421,8 +424,6 @@ if (debug) {
 		printf ("\r\n");
 	}
 
-#endif	/* INDEX_DAEMON */
-
 	return TRUE;
 }
 
@@ -434,7 +435,6 @@ static void
 vWriteFilterFile (
 	char *pcFile)
 {
-#ifndef	INDEX_DAEMON
 	FILE *hFp;
 	int i;
 	time_t lCurTime;
@@ -449,6 +449,7 @@ vWriteFilterFile (
 	 */
 	time (&lCurTime);
 
+	/* FIXME: move to lang.c ! */
 	fprintf (hFp, "# Global & local filter file for the TIN newsreader\n#\n");
 	fprintf (hFp, "# Global format:\n");
 	fprintf (hFp, "#   scope=STRING      Newsgroups (e.g. comp.*)    [mandatory]\n");
@@ -465,8 +466,8 @@ vWriteFilterFile (
 	fprintf (hFp, "#   or:\n");
 	fprintf (hFp, "#   xref=PATTERN      Kill pattern (e.g. alt.flame*)\n");
 	fprintf (hFp, "#   \n");
-
 	fprintf (hFp, "#   time=NUM          Filter period in days (default %d)\n#\n", default_filter_days);
+
 	fprintf (hFp, "# Local format:\n");
 	fprintf (hFp, "#   group=STRING      Newsgroup (e.g. alt.flame)  [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
@@ -504,8 +505,9 @@ my_flush ();
 
 	fclose (hFp);
 	chmod (pcFile, (S_IRUSR|S_IWUSR));
-#endif	/* INDEX_DAEMON */
 }
+
+#endif/* !INDEX_DAEMON */
 
 /* do NOT sort the filterfile, cause sorting should be left to the user,
    so he could do a kill and then a mark hot (usefull in binaries groups
@@ -938,23 +940,29 @@ filter_menu (
 			start_line_offset = 22;
 			invoke_editor (local_filter_file, start_line_offset);
 			unfilter_articles ();
+#ifndef INDEX_DAEMON
 			(void) read_filter_file (local_filter_file, FALSE);
+#endif /* INDEX_DAEMON */
 			filtered = TRUE;
-			goto filter_done;
+			return (filtered);
+			/* keep lint quiet: */
+			/* FALLTHROUGH */
 
 		case iKeyQuit:
 		case iKeyAbort:
 			filtered = FALSE;
-			goto filter_done;
+			return (filtered);
+			/* keep lint quiet: */
+			/* FALLTHROUGH */
 
 		case iKeyFilterSave:
 			/*
 			 * Add the filter rule and save it to the filter file
 			 */
 			filtered = iAddFilterRule (group, art, &rule);
-
-filter_done:
 			return (filtered);
+			/* keep lint quiet: */
+			/* FALLTHROUGH */
 
 		default:
 			break;
@@ -1277,7 +1285,9 @@ iAddFilterRule (
 			wait_message (msg);
 			sleep (2);
 		}
+#ifndef INDEX_DAEMON
 		vWriteFilterFile (local_filter_file);
+#endif /* !INDEX_DAEMON */
 	}
 
 	return iFiltered;
@@ -1368,6 +1378,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 	 * loop thru all arts applying global & local filtering rules
 	 */
 	for (i=0 ; i < top ; i++) {
+/* TODO - this seems to be the crux of the kill_level stuff */
 		if (IS_READ(i) || IS_SELECTED(i)) {
 			continue;
 		}
@@ -1457,10 +1468,13 @@ wait_message (msg); sleep (1);
 				/*
 				 * Filter on Xref: lines
 				 */
-				if(arts[i].xref && *arts[i].xref!='\0' &&
-				   strlen(group->name)>4 &&
-				   strcmp(group->name+strlen(group->name)-5, ".test")!=0) {
+				if(arts[i].xref && *arts[i].xref!='\0'
+#if 0 /* WHY?! */
 				  /* don't do anything in *.test groups */
+				   && strlen(group->name)>4 &&
+				   strcmp(group->name+strlen(group->name)-5, ".test")!=0
+#endif
+				   ) {
 
 				  if (ptr[j].xref_max > 0 || ptr[j].xref != (char*)0) {
 				    char *s,*e;

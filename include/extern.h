@@ -908,6 +908,7 @@ extern constext txt_select_thread[];
 extern constext txt_select_time[];
 extern constext txt_server_name_in_file_env_var[];
 extern constext txt_shell_escape[];
+extern constext txt_skipping_newgroups[];
 extern constext txt_stuff_nntp_cannot_open[];
 extern constext txt_subj_line_only[];
 extern constext txt_subj_line_only_case[];
@@ -1273,192 +1274,196 @@ extern constext txt_opt_mail_address[];
 #endif
 
 #ifndef DONT_HAVE_PIPING
-extern constext txt_pipe_to_command[];
-extern constext txt_piping[];
+	extern constext txt_pipe_to_command[];
+	extern constext txt_piping[];
 #else
-extern constext txt_piping_not_enabled[];
+	extern constext txt_piping_not_enabled[];
 #endif /* DONT_HAVE_PIPING */
 
 #ifdef FORGERY
-extern constext txt_warn_cancel_forgery[];
+	extern constext txt_warn_cancel_forgery[];
 #endif /* FORGERY */
 
 #ifdef HAVE_COLOR
-extern constext txt_help__[];
-extern constext txt_help_col_back[];
-extern constext txt_help_col_from[];
-extern constext txt_help_col_head[];
-extern constext txt_help_col_help[];
-extern constext txt_help_col_invers_bg[];
-extern constext txt_help_col_invers_fg[];
-extern constext txt_help_col_markdash[];
-extern constext txt_help_col_markstar[];
-extern constext txt_help_col_message[];
-extern constext txt_help_col_minihelp[];
-extern constext txt_help_col_normal[];
-extern constext txt_help_col_quote[];
-extern constext txt_help_col_response[];
-extern constext txt_help_col_signature[];
-extern constext txt_help_col_subject[];
-extern constext txt_help_col_text[];
-extern constext txt_help_col_title[];
-extern constext txt_help_color[];
-extern constext txt_help_word_h_display_marks[];
-extern constext txt_help_word_highlight_tinrc[];
-extern constext txt_opt_col_back[];
-extern constext txt_opt_col_from[];
-extern constext txt_opt_col_head[];
-extern constext txt_opt_col_help[];
-extern constext txt_opt_col_invers_bg[];
-extern constext txt_opt_col_invers_fg[];
-extern constext txt_opt_col_markdash[];
-extern constext txt_opt_col_markstar[];
-extern constext txt_opt_col_message[];
-extern constext txt_opt_col_minihelp[];
-extern constext txt_opt_col_normal[];
-extern constext txt_opt_col_quote[];
-extern constext txt_opt_col_response[];
-extern constext txt_opt_col_signature[];
-extern constext txt_opt_col_subject[];
-extern constext txt_opt_col_text[];
-extern constext txt_opt_col_title[];
-extern constext txt_opt_word_h_display_marks[];
-extern constext txt_opt_word_highlight_tinrc[];
-extern constext txt_tinrc_col_back[];
-extern constext txt_tinrc_col_from[];
-extern constext txt_tinrc_col_head[];
-extern constext txt_tinrc_col_newsheaders[];
-extern constext txt_tinrc_col_help[];
-extern constext txt_tinrc_col_invers_bg[];
-extern constext txt_tinrc_col_invers_fg[];
-extern constext txt_tinrc_col_markstar[];
-extern constext txt_tinrc_col_message[];
-extern constext txt_tinrc_col_minihelp[];
-extern constext txt_tinrc_col_normal[];
-extern constext txt_tinrc_col_response[];
-extern constext txt_tinrc_col_quote[];
-extern constext txt_tinrc_col_signature[];
-extern constext txt_tinrc_col_subject[];
-extern constext txt_tinrc_col_text[];
-extern constext txt_tinrc_col_title[];
-extern constext txt_tinrc_colors[];
-extern constext txt_tinrc_use_color[];
-extern constext txt_tinrc_word_h_display_marks[];
-extern constext txt_tinrc_word_highlight[];
-extern constext txt_toggled_high_off[];
-extern constext txt_toggled_high_on[];
-extern int col_back;
-extern int col_from;
-extern int col_head;
-extern int col_newsheaders;
-extern int col_help;
-extern int col_invers_bg;
-extern int col_invers_fg;
-extern int col_markdash;
-extern int col_markstar;
-extern int col_message;
-extern int col_minihelp;
-extern int col_normal;
-extern int col_quote;
-extern int col_response;
-extern int col_signature;
-extern int col_subject;
-extern int col_text;
-extern int col_title;
-extern int use_color;
-extern int word_h_display_marks;
-extern int word_highlight;
-extern t_bool use_color_tinrc;
-extern t_bool word_highlight_tinrc;
+	extern constext txt_help__[];
+	extern constext txt_help_col_back[];
+	extern constext txt_help_col_from[];
+	extern constext txt_help_col_head[];
+	extern constext txt_help_col_help[];
+	extern constext txt_help_col_invers_bg[];
+	extern constext txt_help_col_invers_fg[];
+	extern constext txt_help_col_markdash[];
+	extern constext txt_help_col_markstar[];
+	extern constext txt_help_col_message[];
+	extern constext txt_help_col_minihelp[];
+	extern constext txt_help_col_normal[];
+	extern constext txt_help_col_quote[];
+	extern constext txt_help_col_response[];
+	extern constext txt_help_col_signature[];
+	extern constext txt_help_col_subject[];
+	extern constext txt_help_col_text[];
+	extern constext txt_help_col_title[];
+	extern constext txt_help_color[];
+	extern constext txt_help_word_h_display_marks[];
+	extern constext txt_help_word_highlight_tinrc[];
+	extern constext txt_opt_col_back[];
+	extern constext txt_opt_col_from[];
+	extern constext txt_opt_col_head[];
+	extern constext txt_opt_col_help[];
+	extern constext txt_opt_col_invers_bg[];
+	extern constext txt_opt_col_invers_fg[];
+	extern constext txt_opt_col_markdash[];
+	extern constext txt_opt_col_markstar[];
+	extern constext txt_opt_col_message[];
+	extern constext txt_opt_col_minihelp[];
+	extern constext txt_opt_col_normal[];
+	extern constext txt_opt_col_quote[];
+	extern constext txt_opt_col_response[];
+	extern constext txt_opt_col_signature[];
+	extern constext txt_opt_col_subject[];
+	extern constext txt_opt_col_text[];
+	extern constext txt_opt_col_title[];
+	extern constext txt_opt_word_h_display_marks[];
+	extern constext txt_opt_word_highlight_tinrc[];
+	extern constext txt_tinrc_col_back[];
+	extern constext txt_tinrc_col_from[];
+	extern constext txt_tinrc_col_head[];
+	extern constext txt_tinrc_col_newsheaders[];
+	extern constext txt_tinrc_col_help[];
+	extern constext txt_tinrc_col_invers_bg[];
+	extern constext txt_tinrc_col_invers_fg[];
+	extern constext txt_tinrc_col_markstar[];
+	extern constext txt_tinrc_col_message[];
+	extern constext txt_tinrc_col_minihelp[];
+	extern constext txt_tinrc_col_normal[];
+	extern constext txt_tinrc_col_response[];
+	extern constext txt_tinrc_col_quote[];
+	extern constext txt_tinrc_col_signature[];
+	extern constext txt_tinrc_col_subject[];
+	extern constext txt_tinrc_col_text[];
+	extern constext txt_tinrc_col_title[];
+	extern constext txt_tinrc_colors[];
+	extern constext txt_tinrc_use_color[];
+	extern constext txt_tinrc_word_h_display_marks[];
+	extern constext txt_tinrc_word_highlight[];
+	extern constext txt_toggled_high_off[];
+	extern constext txt_toggled_high_on[];
+	extern int col_back;
+	extern int col_from;
+	extern int col_head;
+	extern int col_newsheaders;
+	extern int col_help;
+	extern int col_invers_bg;
+	extern int col_invers_fg;
+	extern int col_markdash;
+	extern int col_markstar;
+	extern int col_message;
+	extern int col_minihelp;
+	extern int col_normal;
+	extern int col_quote;
+	extern int col_response;
+	extern int col_signature;
+	extern int col_subject;
+	extern int col_text;
+	extern int col_title;
+	extern int use_color;
+	extern int word_h_display_marks;
+	extern int word_highlight;
+	extern t_bool use_color_tinrc;
+	extern t_bool word_highlight_tinrc;
 #	if 0 /* unused */
-extern constext txt_help_col_newsheaders[];
-extern constext txt_tinrc_col_markdash[];
+	extern constext txt_help_col_newsheaders[];
+	extern constext txt_tinrc_col_markdash[];
 #	endif /* 0 */
 #endif /* HAVE_COLOR */
 
 #ifdef HAVE_FASCIST_NEWSADMIN
-extern constext txt_error_followup_to_several_groups[];
-extern constext txt_error_missing_followup_to[];
-extern constext txt_error_not_valid_newsgroup[];
+	extern constext txt_error_followup_to_several_groups[];
+	extern constext txt_error_missing_followup_to[];
+	extern constext txt_error_not_valid_newsgroup[];
 #endif /* HAVE_FASCIST_NEWSADMIN */
 
 #ifdef HAVE_KEYPAD
-extern constext txt_help_use_keypad[];
-extern constext txt_opt_use_keypad[];
-extern constext txt_tinrc_use_keypad[];
+	extern constext txt_help_use_keypad[];
+	extern constext txt_opt_use_keypad[];
+	extern constext txt_tinrc_use_keypad[];
 #endif /* HAVE_KEYPAD */
 
 #ifdef HAVE_METAMAIL
-extern constext txt_help_ask_for_metamail[];
-extern constext txt_help_use_metamail[];
-extern constext txt_opt_ask_for_metamail[];
-extern constext txt_opt_use_metamail[];
-extern constext txt_tinrc_ask_for_metamail[];
-extern constext txt_tinrc_use_metamail[];
-extern constext txt_use_mime[];
-extern t_bool ask_for_metamail;
-extern t_bool use_metamail;
+	extern constext txt_help_ask_for_metamail[];
+	extern constext txt_help_use_metamail[];
+	extern constext txt_opt_ask_for_metamail[];
+	extern constext txt_opt_use_metamail[];
+	extern constext txt_tinrc_ask_for_metamail[];
+	extern constext txt_tinrc_use_metamail[];
+	extern constext txt_use_mime[];
+	extern t_bool ask_for_metamail;
+	extern t_bool use_metamail;
 #endif /* HAVE_METAMAIL */
 
 #ifdef HAVE_PGP
-extern char pgp_data[PATH_LEN];
-extern const char *pgpopts;
-extern constext txt_help_ctrl_g[];
-extern constext txt_pgp_mail[];
-extern constext txt_pgp_news[];
-extern constext txt_pgp_not_avail[];
-extern constext txt_pgp_nothing[];
+	extern char pgp_data[PATH_LEN];
+	extern const char *pgpopts;
+	extern constext txt_help_ctrl_g[];
+	extern constext txt_pgp_mail[];
+	extern constext txt_pgp_news[];
+	extern constext txt_pgp_not_avail[];
+	extern constext txt_pgp_nothing[];
 #endif /* HAVE_PGP */
 
 #ifdef HAVE_SYS_UTSNAME_H
-extern struct utsname system_info;
+	extern struct utsname system_info;
 #endif /* HAVE_SYS_UTSNAME_H */
 
 #ifdef HAVE_TIN_NNTP_EXTS
-extern t_bool xuser_supported;
+	extern t_bool xuser_supported;
 #endif /* HAVE_TIN_NNTP_EXTS */
 
 #ifdef INDEX_DAEMON
-extern char group_times_file[PATH_LEN];
-extern constext txt_cannot_stat_group[];
-extern constext txt_cannot_stat_index_file[];
+	extern char group_times_file[PATH_LEN];
+	extern constext txt_cannot_stat_group[];
+	extern constext txt_cannot_stat_index_file[];
 #endif /* INDEX_DAEMON */
 
+#if !defined(INDEX_DAEMON) && !defined(ACTIVE_DAEMON)
+	extern constext txt_intro_page[];
+#endif /* !INDEX_DAEMON && !ACTIVE_DAEMON */
+
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-extern constext txt_reading_mail_active_file[];
-extern constext txt_reading_mailgroups_file[];
+	extern constext txt_reading_mail_active_file[];
+	extern constext txt_reading_mailgroups_file[];
 #endif /* !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING) */
 
 #ifdef LOCAL_CHARSET
-extern constext txt_tinrc_local_charset[];
-extern int use_local_charset;
+	extern constext txt_tinrc_local_charset[];
+	extern int use_local_charset;
 #endif /* LOCAL_CHARSET */
 
 #ifdef M_AMIGA
-extern constext txt_env_var_not_found[];
-extern int tin_bbs_mode;
+	extern constext txt_env_var_not_found[];
+	extern int tin_bbs_mode;
 #endif /* M_AMIGA */
 
 #ifdef M_OS2
-extern char TMPDIR[PATH_LEN];
+	extern char TMPDIR[PATH_LEN];
 #endif /* M_OS2 */
 
 #ifdef M_UNIX
-extern constext txt_help_keep_dead_articles[];
-extern constext txt_opt_keep_dead_articles[];
-extern constext txt_tinrc_keep_dead_articles[];
+	extern constext txt_help_keep_dead_articles[];
+	extern constext txt_opt_keep_dead_articles[];
+	extern constext txt_tinrc_keep_dead_articles[];
 #endif /* M_UNIX */
 
 #ifdef NNTP_ABLE
-extern int get_server_nolf; /* from open.c */
+	extern int get_server_nolf; /* from open.c */
 #endif /* NNTP_ABLE */
 
 #ifndef NO_SHELL_ESCAPE
-extern constext txt_help_shell[];
+	extern constext txt_help_shell[];
 #endif /* NO_SHELL_ESCAPE */
 
 #if !defined(USE_CURSES)
-extern struct t_screen *screen;
+	extern struct t_screen *screen;
 #endif /* !USE_CURSES */
 
 #if 0 /* unused */
@@ -1474,7 +1479,6 @@ extern constext txt_tinrc_mail_mime_encoding[];
 extern constext txt_tinrc_mail_quote_format[];
 extern constext txt_tinrc_thread_catchup_on_exit[];
 extern constext txt_tinrc_xpost_quote_format[];
-extern constext txt_skipping_newsgroups[];
 extern constext txt_subscribe_to_new_group[];
 extern constext txt_subscribing_to[];
 #endif /* 0 */

@@ -437,7 +437,7 @@ search_article (
 			*q = '\0';
 
 			if (REGEX_MATCH (buf2, pattern, TRUE)) {
-				fseek (note_fp, note_mark[note_page], 0);
+				fseek (note_fp, note_mark[note_page], SEEK_SET);
 				return TRUE;
 			}
 
@@ -454,7 +454,7 @@ search_article (
 
 	note_end = orig_note_end;
 	note_page = orig_note_page;
-	fseek (note_fp, note_mark[note_page], 0);
+	fseek (note_fp, note_mark[note_page], SEEK_SET);
 	info_message ((msg[0] == '\0') ? txt_no_match : msg);
 	return FALSE;
 }

@@ -14,6 +14,8 @@
 
 #include "tin.h"
 
+static int count_args (char *s);
+
 static int
 count_args (
 	char *s)

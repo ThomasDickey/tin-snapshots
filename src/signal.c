@@ -107,6 +107,9 @@ static const struct {
 #ifdef SIGTSTP
 	{ SIGTSTP,	"SIGTSTP" },	/* terminal-stop */
 #endif
+#ifdef SIGUSR1
+	{ SIGUSR1,	"SIGUSR1" },	/* User-defined signal 1 */
+#endif
 #ifdef SIGWINCH
 	{ SIGWINCH,	"SIGWINCH" },	/* window-size change */
 #endif
@@ -155,7 +158,7 @@ signal_name(int code)
 {
 	size_t n;
 	const char *name = "unknown";
-	for (n = 0; n < SIZEOF(signal_list)/sizeof(signal_list[0]); n++) {
+	for (n = 0; n < SIZEOF(signal_list); n++) {
 		if (signal_list[n].code == code) {
 			name = signal_list[n].name;
 			break;
@@ -195,7 +198,7 @@ handle_resize (int repaint)
 			refresh_config_page (0, TRUE);
 			break;
 		case cHelp:
-			display_info_page ();
+			display_info_page (TRUE);
 			break;
 		case cGroup:
 			ClearScreen ();
@@ -305,6 +308,10 @@ void _CDECL signal_handler (int sig)
 	EndWin ();
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n",
 		progname, signal_name(sig), sig);
+#if defined(SIGUSR1)
+	if (sig == SIGUSR1)
+		tin_done (- SIGUSR1) ;
+#endif
 #if defined(SIGBUS) || defined(SIGSEGV)
 	if (
 #	ifdef SIGBUS

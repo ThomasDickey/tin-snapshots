@@ -1309,7 +1309,12 @@ undo_auto_select_arts:
 				if (index_point < 0) {
 					info_message (txt_no_arts);
 				} else {
-					info_message(arts[(int)base[index_point]].subject);
+					struct t_art_stat statbuf;
+					int j;
+
+					stat_thread(index_point, &statbuf);
+					j = (statbuf.unread) ? next_unread(base[index_point]) : base[index_point];
+					info_message(arts[j].subject);
 				}
 				break;
 
@@ -1581,7 +1586,7 @@ set_subj_from_size (
 {
 	int size, show_author;
 
-	if (cur_groupnum == 0)
+	if (group_top == 0)
 		show_author = default_show_author;
 	else
 		show_author = CURR_GROUP.attribute->show_author;

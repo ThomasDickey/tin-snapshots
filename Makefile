@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970820
+PVER		= 970826
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -177,18 +177,16 @@ all:
 	@$(ECHO) "    make dist            [ Create a gziped distribution tar file ]"
 
 install:
-	@$(CD) $(SRCDIR); $(MAKE) install
+	@$(CD) $(SRCDIR) && $(MAKE) install
 
 install_setuid:
-	@$(CD) $(SRCDIR); $(MAKE) install_setuid
+	@$(CD) $(SRCDIR) && $(MAKE) install_setuid
 
 install_daemon:
-	@$(CD) $(SRCDIR); $(MAKE) install_daemon
+	@$(CD) $(SRCDIR) && $(MAKE) install_daemon
 
 clean:
-	@-if test -e $(SRCDIR)/Makefile; then \
-		$(CD) $(SRCDIR); $(MAKE) clean ;\
-	fi
+	@-test -e $(SRCDIR)/Makefile && $(CD) $(SRCDIR) && $(MAKE) clean
 	@-$(RM) -f *~
 	@-$(RM) -f $(DOCDIR)/*~
 	@-$(RM) -f $(INCDIR)/*~

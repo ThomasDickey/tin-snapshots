@@ -60,23 +60,46 @@ struct msg_header {
 /*
 ** Local prototypes
 */
+static char * backup_article_name (char *the_article);
+static char prompt_rejected (void);
+static char prompt_to_continue (void);
+static char prompt_to_edit (void);
+static char prompt_to_send (const char *subject);
+static int fetch_postponed_article(char tmp_file[], char subject[], char newsgroups[]);
 static int msg_add_x_body (FILE *fp_out, char *body);
+static int msg_write_headers (FILE *fp);
 static int pcCopyArtHeader (int iHeader, char *pcArt, char *result);
 static int submit_mail_file (char *file);
-static void postpone_article ( char *the_article);
+static size_t skip_id (const char *id);
+static t_bool check_article_to_be_posted (char *the_article, int art_type, int *lines);
+static t_bool check_for_spamtrap (char *addr);
+static t_bool damaged_id (const char *id);
+static t_bool is_crosspost (char *xref);
+static t_bool must_include (char *id);
+static t_bool repair_article (char *result);
+static void append_postponed_file (char *file, char *addr);
+static void appendid (char **where, const char **what);
+static void backup_article (char *the_article);
 static void find_reply_to_addr (int respnum, char *from_addr, t_bool parse);
+static void join_references (char *buffer, char *oldrefs, const char *newref);
+static void modify_headers (char *line);
+static void msg_add_header (const char *name, const char *text);
 static void msg_add_x_headers (char *headers);
+static void msg_free_headers (void);
+static void msg_init_headers (void);
+static void post_existing_article (int ask, char* subject);
+static void postpone_article (char *the_article);
 static void setup_check_article_screen (int *init);
 static void update_active_after_posting (char *newsgroups);
-static t_bool check_for_spamtrap (char *addr);
-static char prompt_rejected(void);
-static char prompt_to_continue(void);
-static char prompt_to_send(const char *subject);
-static char prompt_to_edit(void);
-
+static void update_posted_info_file (char *group, int action, char *subj);
+static void update_posted_msgs_file (char *file, char *addr);
 #ifdef FORGERY
-static void make_path_header (char *line, char *from_name);
+	static void make_path_header (char *line, char *from_name);
 #endif /* FORGERY */
+#ifndef M_AMIGA
+	static t_bool insert_from_header (char *infile);
+#endif /* !M_AMIGA */
+
 
 static char
 prompt_to_edit(void)
@@ -1930,8 +1953,10 @@ ignore_followup_to_poster:
 
 	if (psGrp && psGrp->attribute->x_comment_to && *note_h_from) {
 		parse_from(note_h_from, bigbuf, buf);
-		sprintf(bigbuf, "%s", buf);
-		msg_add_header ("X-Comment-To", bigbuf);
+		if (*buf) {
+			sprintf(bigbuf, "(%s)", buf);
+			msg_add_header ("X-Comment-To", bigbuf);
+		}
 	}
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h_followup);
@@ -2018,9 +2043,9 @@ ignore_followup_to_poster:
 		}
 
 		if (with_headers)
-			fseek (note_fp, 0L, 0);
+			fseek (note_fp, 0L, SEEK_SET);
 		else
-			fseek (note_fp, note_mark[0], 0);
+			fseek (note_fp, note_mark[0], SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
 			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
@@ -2229,11 +2254,11 @@ mail_to_someone (
 				}
 			}
 		}
-		fseek (note_fp, note_mark[0], 0);
+		fseek (note_fp, note_mark[0], SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
-		fseek (note_fp, 0L, 0);
+		fseek (note_fp, 0L, SEEK_SET);
 		fprintf (fp, "-- forwarded message --\n");
 		copy_fp (note_fp, fp, "");
 		fprintf (fp, "-- end of forwarded message --\n");
@@ -2595,9 +2620,9 @@ mail_to_author (
 			}
 		}
 		if (with_headers)
-			fseek (note_fp, 0L, 0);
+			fseek (note_fp, 0L, SEEK_SET);
 		else
-			fseek (note_fp, note_mark[0], 0);
+			fseek (note_fp, note_mark[0], SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
@@ -2976,7 +3001,7 @@ cancel_article (
 #ifdef FORGERY
 	if (!author) {
 		fputc ('\n', fp);
-		fseek (note_fp, 0L, 0);
+		fseek (note_fp, 0L, SEEK_SET);
 		copy_fp (note_fp, fp, "");
 	}
 	fclose (fp);
@@ -3224,7 +3249,7 @@ repost_article (
 		}
 		fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
 	}
-	fseek (note_fp, note_mark[0], 0);
+	fseek (note_fp, note_mark[0], SEEK_SET);
 	copy_fp (note_fp, fp, "");
 
 /* only append signature when NOT superseeding own articles */
@@ -3536,8 +3561,6 @@ static t_bool
 insert_from_header (
 	char *infile)
 {
-	t_bool from_found = FALSE;
-	t_bool in_header = TRUE;
 	char *ptr;
 	char from_name[HEADER_LEN];
 	char full_name[128];
@@ -3545,13 +3568,15 @@ insert_from_header (
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
 	FILE *fp_in, *fp_out;
+	t_bool from_found = FALSE;
+	t_bool in_header = TRUE;
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
 #ifdef VMS
 		sprintf (outfile, "%s-%d", infile, process_id);
 #else
 		sprintf (outfile, "%s.%d", infile, process_id);
-#endif
+#endif /* VMS */
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			get_user_info (user_name, full_name);
 			get_from_name (from_name);
@@ -3578,7 +3603,7 @@ insert_from_header (
 			if (!from_found)
 				fprintf (fp_out, "From: %s\n", from_name);
 
-			fseek(fp_in, SEEK_SET, 0l);
+			fseek(fp_in, 0L, SEEK_SET);
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				fputs (line, fp_out);
 			}
@@ -3591,7 +3616,7 @@ insert_from_header (
 	}
 	return FALSE;
 }
-#endif
+#endif /* !M_AMIGA */
 
 static void
 find_reply_to_addr (
@@ -3612,7 +3637,7 @@ find_reply_to_addr (
 	long orig_offset;
 
 	orig_offset = ftell (note_fp);
-	fseek (note_fp, 0L, 0);
+	fseek (note_fp, 0L, SEEK_SET);
 
 	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 &&
 	       found == FALSE && buf[0] != '\n') {
@@ -3644,7 +3669,7 @@ find_reply_to_addr (
 				 arts[respnum].from, add_addr);
 		}
 	}
-	fseek (note_fp, orig_offset, 0);
+	fseek (note_fp, orig_offset, SEEK_SET);
 #else
 	char *ptr, buf[HEADER_LEN];
 	char replyto[HEADER_LEN];
@@ -3656,7 +3681,7 @@ find_reply_to_addr (
 	long orig_offset;
 
 	orig_offset = ftell (note_fp);
-	fseek (note_fp, 0L, 0);
+	fseek (note_fp, 0L, SEEK_SET);
 
 	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 && buf[0] != '\n') {
 		/* not quite correct, since we don't process continuation
@@ -3695,7 +3720,7 @@ find_reply_to_addr (
 		parse_from (temp, from_addr, fullname);
 	}
 
-	fseek (note_fp, orig_offset, 0);
+	fseek (note_fp, orig_offset, SEEK_SET);
 #endif
 }
 

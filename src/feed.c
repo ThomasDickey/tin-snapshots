@@ -378,7 +378,7 @@ feed_articles (
 					redraw_screen = mail_to_someone (respnum, address, FALSE, TRUE, &processed_ok);
 					break;
 				case FEED_PIPE:
-					fseek (note_fp, 0L, 0);
+					fseek (note_fp, 0L, SEEK_SET);
 					if (got_sig_pipe) goto got_sig_pipe_while_piping;
 					copy_fp (note_fp, fp, "");
 					break;
@@ -438,7 +438,7 @@ feed_articles (
 					case FEED_PIPE:
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
-						fseek (note_fp, 0L, 0);
+						fseek (note_fp, 0L, SEEK_SET);
 						copy_fp (note_fp, fp, "");
 						break;
 					case FEED_PRINT:
@@ -492,7 +492,7 @@ feed_articles (
 								break;
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
-								fseek (note_fp, 0L, 0);
+								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp, "");
 								break;
 							case FEED_PRINT:
@@ -561,7 +561,7 @@ feed_articles (
 								break;
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
-								fseek (note_fp, 0L, 0);
+								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp, "");
 								break;
 							case FEED_PRINT:
@@ -653,7 +653,7 @@ got_sig_pipe_while_piping:
 		}
 		note_end = orig_note_end;
 		note_page = orig_note_page;
-		fseek (note_fp, note_mark[note_page], 0);
+		fseek (note_fp, note_mark[note_page], SEEK_SET);
 		if (redraw_screen) {
 			if (note_page == 0) {
 				show_note_page (group->name, respnum);
@@ -730,7 +730,7 @@ print_file (
 	}
 
 	if (print_header) {
-		fseek(note_fp, 0L, 0);
+		fseek(note_fp, 0L, SEEK_SET);
 	} else {
 		fprintf (fp, "Newsgroups: %s\n", note_h_newsgroups);
 		if (arts[respnum].from == arts[respnum].name ||
@@ -742,7 +742,7 @@ print_file (
 		}
 		fprintf (fp, "Subject: %s\n", note_h_subj);
 		fprintf (fp, "Date: %s\n\n", note_h_date);
-		fseek (note_fp, note_mark[0], 0);
+		fseek (note_fp, note_mark[0], SEEK_SET);
 	}
 	copy_fp (note_fp, fp, "");
 

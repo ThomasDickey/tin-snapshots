@@ -293,14 +293,63 @@ static int info_type;
 static int max_page;
 static int pos_help;
 
+static int ReadHelpCh(void)
+{
+	int ch = ReadCh ();
+
+	switch (ch) {
+		case ESC:	/* common arrow keys */
+#ifdef HAVE_KEY_PREFIX
+		case KEY_PREFIX:
+#endif
+			switch (get_arrow_key (ch)) {
+				case KEYMAP_LEFT:
+					break;
+
+				case KEYMAP_UP:
+#if USE_CURSES
+					ch = iKeyUp;
+					break;
+#endif
+				case KEYMAP_PAGE_UP:
+					ch = iKeyPageUp;
+					break;
+
+				case KEYMAP_DOWN:
+#if USE_CURSES
+					ch = iKeyDown;
+					break;
+#endif
+				case KEYMAP_RIGHT:
+				case KEYMAP_PAGE_DOWN:
+					ch = iKeyPageDown;
+					break;
+
+				case KEYMAP_HOME:
+					ch = iKeyFirstPage;
+					break;
+
+				case KEYMAP_END:
+					ch = iKeyLastPage;
+					break;
+
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+	return ch;
+}
+
 void
 show_info_page (
 	int type,
 	const char *help[],
 	const char *title)
 {
-	int ch;
-	int i, len;
+	int max_line, len;
 	int help_lines;
 	int old_page = 0;
 
@@ -328,65 +377,55 @@ show_info_page (
 	 *  find how many elements in array
 	 */
 	if (type == HELP_INFO) {
-		for (i=0 ; help[i] ; i++) {
+		for (max_line=0 ; help[max_line] ; max_line++) {
 			continue;
 		}
 	} else {
-		for (i=0 ; posted[i].date[0] ; i++) {
-			len = strlen (posted[i].group);
+		for (max_line=0 ; posted[max_line].date[0] ; max_line++) {
+			len = strlen (posted[max_line].group);
 			if (len > group_len) {
  				group_len = len;
 			}
  		}
 	}
 
-	max_page = i / help_lines;
-	if (i % help_lines) {
+	max_page = max_line / help_lines;
+	if (max_line % help_lines) {
 		max_page++;
 	}
 
 	set_xclick_off ();
+#if USE_CURSES
+	ClearScreen();
+#endif
 	forever {
 		if (cur_page != old_page) {
-			display_info_page ();
+			display_info_page (FALSE);
 		}
 
 		old_page = cur_page;
 
-		ch = ReadCh ();
-		switch (ch) {
+		switch (ReadHelpCh()) {
 			case ESC:	/* common arrow keys */
-#ifdef HAVE_KEY_PREFIX
-			case KEY_PREFIX:
-#endif
-				switch (get_arrow_key (ch)) {
-					case KEYMAP_LEFT:
-						goto help_done;
-
-					case KEYMAP_UP:
-					case KEYMAP_PAGE_UP:
-						goto help_page_up;
-
-					case KEYMAP_RIGHT:
-					case KEYMAP_DOWN:
-					case KEYMAP_PAGE_DOWN:
-						goto help_page_down;
-
-					case KEYMAP_HOME:
-						goto help_home;
-
-					case KEYMAP_END:
-						goto help_end;
-
-					default:
-						break;
-				}
 				break;
 
+#if USE_CURSES
+			case iKeyUp:				/* line up */
+				if (--pos_help < 0)
+					pos_help = (max_page-1) * help_lines;
+				old_page = -1;
+				cur_page = pos_help / help_lines + 1;
+				break;
+			case iKeyDown:				/* line down */
+				if (++pos_help >= max_line)
+					pos_help = 0;
+				old_page = -1;
+				cur_page = pos_help / help_lines + 1;
+				break;
+#endif
 			case iKeyPageDown:			/* page down */
 			case iKeyPageDown2:
 			case iKeyPageDown3:
-help_page_down:
 				if (cur_page < max_page) {
 					pos_help = cur_page * help_lines;
 					cur_page++;
@@ -399,19 +438,13 @@ help_page_down:
 			case iKeyPageUp:			/* page up */
 			case iKeyPageUp2:
 			case iKeyPageUp3:
-help_page_up:
-				if (cur_page > 1) {
-					cur_page--;
-					pos_help = (cur_page-1) * help_lines;
-				} else {
-					pos_help = (max_page-1) * help_lines;
+				if (--cur_page <= 0)
 					cur_page = max_page;
-				}
+				pos_help = (cur_page-1) * help_lines;
 				break;
 
 			case iKeyFirstPage:			/* Home */
 			case iKeyHelpFirstPage:
-help_home:
 				if (cur_page != 1) {
 					cur_page = 1;
 					pos_help = 0;
@@ -420,15 +453,12 @@ help_home:
 
 			case iKeyLastPage:			/* End */
 			case iKeyHelpLastPage:
-help_end:
-				if (cur_page != max_page) {
+				if (cur_page != max_page)
 					cur_page = max_page;
-					pos_help = (max_page-1) * help_lines;
-				}
+				pos_help = (max_page-1) * help_lines;
 				break;
 
 			default:
-help_done:
 				ClearScreen ();
 				return;
 		}
@@ -437,7 +467,7 @@ help_done:
 
 
 void
-display_info_page (void)
+display_info_page (t_bool first)
 {
 	char buf[LEN];
 	int i, help_lines;
@@ -445,7 +475,10 @@ display_info_page (void)
 #ifdef HAVE_COLOR
 	fcol(col_help);
 #endif
-	ClearScreen ();
+#if USE_CURSES
+	if (first)
+#endif
+		ClearScreen ();
 	sprintf (buf, info_title, cur_page, max_page);
 	center_line (0, TRUE, buf);
 	MoveCursor (INDEX_TOP, 0);
@@ -469,6 +502,7 @@ display_info_page (void)
 			my_printf ("%s" cCRLF, buf);
 		}
 	}
+	CleartoEOS ();
 
 	center_line (cLINES, FALSE, txt_hit_space_for_more);
 #ifdef HAVE_COLOR

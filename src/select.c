@@ -548,8 +548,8 @@ select_done:
 					break;
 				}
 				if (!CURR_GROUP.subscribed && !CURR_GROUP.bogus) {
-					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, " ");
 					subscribe (&CURR_GROUP, SUBSCRIBED);
+					show_selection_page();
 					sprintf (buf, txt_subscribed_to, CURR_GROUP.name);
 					info_message (buf);
 				}
@@ -1089,7 +1089,7 @@ reposition_group (
 {
 	char buf[LEN];
 	char pos[LEN];
-	int pos_num;
+	int pos_num, newgroups;
 
 	sprintf (buf, txt_newsgroup_position, group->name,
 		(default_move_group ? default_move_group : default_num+1));
@@ -1118,13 +1118,30 @@ reposition_group (
 		pos_num = 1;
 	}
 
+	newgroups = skip_newgroups();
+
+	/*
+	 * Can't move into newgroups, they aren't in .newsrc
+	 */
+	if (pos_num <= newgroups) {
+		error_message(txt_skipping_newgroups, "");
+		return(default_num);
+	}
+
 	sprintf (buf, txt_moving, group->name);
 	wait_message (buf);
 
-	/* seems to have the side effect of rearranging
-	   my_groups, so show_only_unread_groups has to be updated */
+	/*
+	 * seems to have the side effect of rearranging
+	 * my_groups, so show_only_unread_groups has to be updated
+	 */
 	show_only_unread_groups = FALSE;
-	if (pos_group_in_newsrc (group, pos_num)) {
+
+	/*
+	 * New newgroups aren't in .newsrc so we need to offset to
+	 * get the right position
+	 */
+	if (pos_group_in_newsrc (group, pos_num - newgroups)) {
 		read_newsrc (newsrc, 1);
 		default_move_group = pos_num;
 		return (pos_num-1);
