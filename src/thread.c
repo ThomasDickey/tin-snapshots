@@ -213,7 +213,7 @@ show_thread (group, group_path, respnum)
 
 	show_thread_page ();
 
-	while (TRUE) {
+	forever {
 		set_xclick_on ();
 		ch = ReadCh ();
 
@@ -298,7 +298,7 @@ show_thread (group, group_path, respnum)
 								} else {
 									goto thread_done;
 								}
-								break;
+								/* break; */
 						}
 						break;
 				}
@@ -511,7 +511,6 @@ thread_page_up:
 				break;
 
 			case iKeyThreadCatchupConditional:	/* catchup thread but ask for confirmation */
-			case iKeyThreadCatchup:	/* mark thread as read immediately */
 thread_catchup:
 				if (ch == iKeyThreadCatchupConditional) {
 					if (confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1) {
@@ -521,6 +520,15 @@ thread_catchup:
 				thd_mark_read (group, base[thread_basenote]);
 				goto thread_done;
 
+			case iKeyThreadCatchup:	/* mark thread as read immediately */
+				n = choose_response (thread_basenote, thread_index_point);
+				arts[n].selected = 0;
+				arts[n].status = ART_READ;
+				art_mark_xref_read (&arts[n]);
+				bld_tline (thread_index_point, &arts[n]);
+				draw_tline (thread_index_point, FALSE);
+				break;
+				
 			case iKeyThreadToggleSubjDisplay:	/* toggle display of subject & subj/author */
 				if (! threaded_on_subject) {
 					toggle_subject_from ();
@@ -633,6 +641,10 @@ thread_catchup:
 				update_thread_page ();
 				break;
 
+			case iKeyPageDisplaySubject:
+				info_message(arts[respnum].subject);
+				break;
+				
 			default:
 			    info_message (txt_bad_command);
 		}
@@ -695,18 +707,8 @@ show_thread_page ()
 		last_thread_on_screen = 0;
 	}
 
-/*sprintf (msg, "first=[%d] last=[%d] basenote=[%d] thread_respnum=[%d] index=[%d]",
-	first_thread_on_screen, last_thread_on_screen, thread_basenote, thread_respnum, index);
-error_message (msg, "");
-sleep(2);
-*/
 	index = choose_response (thread_basenote, first_thread_on_screen);
 
-/*sprintf (msg, "first=[%d] last=[%d] basenote=[%d] thread_respnum=[%d] index=[%d]",
-	first_thread_on_screen, last_thread_on_screen, thread_basenote, thread_respnum, index);
-error_message (msg, "");
-sleep(2);
-*/
 	assert(first_thread_on_screen != 0 || index == thread_respnum);
 
 	if (threaded_on_subject) {

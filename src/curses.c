@@ -8,7 +8,7 @@
  *              from the Elm mail system. This library was hacked to provide 
  *              what tin needs.
  *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
- *              The Elm Mail System  -  $Revision: 2.1 $   $State: Exp $
+ *              The Elm Mail System  -  $Revision: 2.1.1.1 $   $State: Exp $
  */
 
 #include "tin.h"
@@ -631,8 +631,17 @@ StartInverse ()
 #ifndef INDEX_DAEMON
 
 	in_inverse = 1;
-	if (_setinverse && inverse_okay)
+	if (_setinverse && inverse_okay) {
+#ifdef HAVE_COLOR
+		if (use_color) {
+			bcol(col_invers);
+		} else {
+			tputs (_setinverse, 1, outchar);
+		}
+#else
 		tputs (_setinverse, 1, outchar);
+#endif
+	}
 	fflush (stdout);
 
 #endif /* INDEX_DAEMON */
@@ -648,8 +657,17 @@ EndInverse ()
 #ifndef INDEX_DAEMON
 
 	in_inverse = 0;
-	if (_clearinverse && inverse_okay)
+	if (_clearinverse && inverse_okay) {
+#ifdef HAVE_COLOR
+		if (use_color) {
+			bcol(col_back);
+		} else {
+			tputs (_clearinverse, 1, outchar);
+		}
+#else
 		tputs (_clearinverse, 1, outchar);
+#endif
+	}
 	fflush (stdout);
 
 #endif /* INDEX_DAEMON */
@@ -999,7 +1017,7 @@ xclick (state)
 void
 set_xclick_on ()
 {
-	xclick (TRUE);
+	if (use_mouse) xclick (TRUE);
 }
 
 /*
@@ -1009,7 +1027,7 @@ set_xclick_on ()
 void
 set_xclick_off ()
 {
-	xclick (FALSE);
+	if (use_mouse) xclick (FALSE);
 }
 
 void

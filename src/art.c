@@ -14,6 +14,7 @@
 
 #include	"tin.h"
 #include	"stpwatch.h"
+#include        "rfc1522.h"
 
 #define SortBy(func) qsort ((char *) arts, (size_t)top, sizeof (struct t_article), func);
 #define CorruptIndex(n)  error = n; goto corrupt_index;
@@ -244,6 +245,8 @@ sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 		    my_fputc ('\n', stdout);
 		    fflush (stdout);
 		}
+
+		rfc1522_decode_all_headers();
 
 BegStopWatch("make_thread");
 		make_threads (group, FALSE);
@@ -542,10 +545,11 @@ parse_headers (buf, h)
   	
 	ptr = buf;
 
-	while (1) {
-		for (ptrline = ptr; *ptr && *ptr != '\n'; ptr++) {
+	forever {
+		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace(*(ptr+1)) && *(ptr+1)!= '\n')); ptr++) {
 			if (((*ptr) & 0xFF) < ' ') {
-				*ptr = ' ';
+				if (*ptr=='\n'&&isspace(*(ptr+1))&&*(ptr+1)!='\n') *ptr=1;
+				else *ptr = ' ';
 			}
 		}
 		flag = *ptr;
@@ -574,7 +578,7 @@ parse_headers (buf, h)
 						while (*s && *s == ' ') {
 							s++;
 						}
-						h->refs = str_dup (s);
+						h->refs = parse_references (s);
 						got_refs = TRUE;
 					}
 				}
@@ -1158,7 +1162,7 @@ pcFindNovFile (psGrp, iMode)
 	if (iHashFileName) {
 		lHash = hash_groupname (psGrp->name);
 
-		for (iNum = 1; TRUE ; iNum++) {
+		for (iNum = 1;;iNum++) {
 			sprintf (acNovFile, "%s/%lu.%d", pcDir, lHash, iNum);
 		
 			if ((hFp = fopen (acNovFile, "r")) == (FILE *) 0) {
@@ -1482,7 +1486,7 @@ input_pending ()
 	switch (fds[0].revents) {
 		case POLLIN:
 			return TRUE;
-			break;
+			/* break; */
 		/* 
 		 * Other conditions on the stream 
 		 */
@@ -1490,7 +1494,7 @@ input_pending ()
 		case POLLERR:
 		default:
 			return FALSE;
-			break;
+			/* break; */
 	}
 #endif	/* HAVE_POLL */
 
@@ -1512,7 +1516,7 @@ valid_artnum (art)
 	range = cur / 2;
 	cur--;
 	
-	while (1) {
+	forever {
 		if (arts[cur].artnum == art) {
 			return cur;
 		}

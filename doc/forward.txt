@@ -1,3 +1,0 @@
-# Example of $HOME/.forward mail forwarder file that feeds procmail mail filter.
-# Username is list - Copy forward.txt to $HOME/.forward and adjust to suit.
-"|IFS=' ';exec /usr/bin/procmail #list"

@@ -18,20 +18,20 @@
  * Defines used in setting attributes switch
  */
  
-#define	ATTRIB_MAILDIR				0
-#define	ATTRIB_SAVEDIR				1
-#define	ATTRIB_SAVEFILE				2
-#define	ATTRIB_ORGANIZATION			3
-#define	ATTRIB_SIGFILE				4
-#define	ATTRIB_FOLLOWUP_TO			5
-#define	ATTRIB_PRINTER				6
-#define	ATTRIB_AUTO_SELECT			7
-#define	ATTRIB_AUTO_SAVE			8
-#define	ATTRIB_BATCH_SAVE			9
+#define	ATTRIB_MAILDIR			0
+#define	ATTRIB_SAVEDIR			1
+#define	ATTRIB_SAVEFILE			2
+#define	ATTRIB_ORGANIZATION		3
+#define	ATTRIB_SIGFILE			4
+#define	ATTRIB_FOLLOWUP_TO		5
+#define	ATTRIB_PRINTER			6
+#define	ATTRIB_AUTO_SELECT		7
+#define	ATTRIB_AUTO_SAVE		8
+#define	ATTRIB_BATCH_SAVE		9
 #define	ATTRIB_DELETE_TMP_FILES		10
 #define	ATTRIB_SHOW_ONLY_UNREAD		11
-#define	ATTRIB_THREAD_ARTS			12
-#define	ATTRIB_SHOW_AUTHOR			13
+#define	ATTRIB_THREAD_ARTS		12
+#define	ATTRIB_SHOW_AUTHOR		13
 #define	ATTRIB_SORT_ART_TYPE		14
 #define	ATTRIB_POST_PROC_TYPE		15
 #define	ATTRIB_QUICK_KILL_HEADER	16
@@ -42,11 +42,12 @@
 #define	ATTRIB_QUICK_SELECT_SCOPE	21
 #define	ATTRIB_QUICK_SELECT_EXPIRE	22
 #define	ATTRIB_QUICK_SELECT_CASE  	23
-#define	ATTRIB_MAILING_LIST		  	24
-#define	ATTRIB_X_HEADERS		  	25
-#define	ATTRIB_X_BODY			  	26
+#define	ATTRIB_MAILING_LIST		24
+#define	ATTRIB_X_HEADERS		25
+#define	ATTRIB_X_BODY			26
 #define	ATTRIB_AUTO_SAVE_MSG		27
-#define ATTRIB_X_COMMENT_TO         28
+#define ATTRIB_X_COMMENT_TO		28
+#define ATTRIB_NEWS_QUOTE		29
 
 /*
  * global attributes	
@@ -93,8 +94,9 @@ set_default_attributes (psAttrib)
 	psAttrib->auto_select = FALSE;
 	psAttrib->batch_save = default_batch_save;
 	psAttrib->delete_tmp_files = FALSE;
-	psAttrib->post_proc_type = default_post_proc_type; 
-    psAttrib->x_comment_to = FALSE;
+	psAttrib->post_proc_type = default_post_proc_type;
+	psAttrib->x_comment_to = FALSE;
+	psAttrib->news_quote_format = news_quote_format;
 
 #endif	/* INDEX_DAEMON */
 }
@@ -144,6 +146,7 @@ set_default_attributes (psAttrib)
  *  attribute.mailing_list = STRING
  *  attribute.x_headers = STRING
  *  attribute.x_comment_to = ON/OFF
+ *  attribute.news_quote_format = STRING
  */
 
 void
@@ -225,6 +228,11 @@ read_attributes_file (file, global_file)
 					break;
 				}
 				break;
+			case 'n':
+				if (match_string (line, "news_quote_format=", buf, sizeof (buf))) {
+					set_attrib_str (ATTRIB_NEWS_QUOTE, scope, buf);
+					break;
+				}
 			case 'o':
 				if (match_string (line, "organization=", buf, sizeof (buf))) {
 					set_attrib_str (ATTRIB_ORGANIZATION, scope, buf);
@@ -321,7 +329,7 @@ read_attributes_file (file, global_file)
 				}
 				if (match_boolean (line, "x_comment_to=", &num)) {
 					set_attrib_num (ATTRIB_X_COMMENT_TO, scope, num);
-					continue;
+					break;
 				}
 				break;
 			}
@@ -533,6 +541,9 @@ set_attrib (psGrp, type, str, num)
 		case ATTRIB_X_COMMENT_TO:
 			psGrp->attribute->x_comment_to = num;
 			break;
+		case ATTRIB_NEWS_QUOTE:
+			psGrp->attribute->news_quote_format = str_dup (str);
+			break;
 		default:
 			break;
 	}
@@ -616,7 +627,8 @@ write_attributes_file (file)
 	fprintf (fp, "#    0=subj (case sensitive) 1=subj (ignore case)\n");
 	fprintf (fp, "#    2=from (case sensitive) 3=from (ignore case)\n");
 	fprintf (fp, "#    4=msgid 5=lines\n#\n");
-	fprintf (fp, "#  x_comment_to=ON/OFF\n#\n");
+	fprintf (fp, "#  x_comment_to=ON/OFF\n");
+	fprintf (fp, "#  news_quote_format=STRING\n#\n");
 	fprintf (fp, "# Note that it is best to put general (global scoping)\n");
 	fprintf (fp, "# entries first followed by group specific entries.\n\n");
 
@@ -666,6 +678,7 @@ write_attributes_file (file)
 		fprintf (fp, "x_body=%s\n", psGrp->attribute->x_body);
 		fprintf (fp, "x_comment_to=%s\n", 
 			print_boolean (psGrp->attribute->x_comment_to));
+		fprintf (fp, "news_quote_format=%s\n", psGrp->attribute->news_quote_format);
 	}
 
 	fclose (fp);

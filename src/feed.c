@@ -356,7 +356,7 @@ feed_articles (function, level, group, respnum)
 					}
 					break;
 				case FEED_REPOST:
-					redraw_screen = repost_article (group_name, &arts[respnum]);
+					redraw_screen = repost_article (group_name, &arts[respnum], respnum);
 					break;
 			}
 			if (processed_ok) {
@@ -390,7 +390,11 @@ feed_articles (function, level, group, respnum)
 					case FEED_MAIL:
 						processed_ok = TRUE;	
 						mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-						confirm = FALSE;
+						if (processed_ok) {
+							confirm = FALSE;
+						} else {
+							confirm = TRUE;
+						}
 						break;
 					case FEED_PIPE:
 						fseek (note_fp, 0L, 0);
@@ -403,7 +407,7 @@ feed_articles (function, level, group, respnum)
 						add_to_save_list (i, &arts[i], is_mailbox, TRUE, filename);
 						break;
 					case FEED_REPOST:
-						redraw_screen = repost_article (group_name, &arts[i]);
+						redraw_screen = repost_article (group_name, &arts[i], i);
 						break;
 				}
 				if (processed_ok) {
@@ -411,7 +415,7 @@ feed_articles (function, level, group, respnum)
 				}
 				if (mark_saved_read) {
 					if (processed_ok) {
-						art_mark_read (group, &arts[respnum]);
+						art_mark_read (group, &arts[i]);
 					}	
 				}
 				art_close ();
@@ -437,7 +441,11 @@ feed_articles (function, level, group, respnum)
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								confirm = FALSE;
+								if (processed_ok) {
+									confirm = FALSE;
+								} else {
+									confirm = TRUE;
+								}
 								break;
 							case FEED_PIPE:
 								fseek (note_fp, 0L, 0);
@@ -452,7 +460,7 @@ feed_articles (function, level, group, respnum)
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j]);
+								redraw_screen = repost_article (group_name, &arts[j], j);
 								break;
 						}
 						if (processed_ok) {
@@ -500,7 +508,11 @@ feed_articles (function, level, group, respnum)
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								/* confirm = FALSE; */
+								if (processed_ok) {
+									confirm = FALSE;
+								} else {
+									confirm = TRUE;
+								}
 								break;
 							case FEED_PIPE:
 								fseek (note_fp, 0L, 0);
@@ -513,7 +525,7 @@ feed_articles (function, level, group, respnum)
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j]);
+								redraw_screen = repost_article (group_name, &arts[j], j);
 								break;
 						}
 						if (processed_ok) {

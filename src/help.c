@@ -20,6 +20,9 @@ char *help_select[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
 	txt_help_b,
+#ifdef HAVE_COLOR
+	txt_help_color,
+#endif
 	txt_help_j,
 txt_help_empty_line,
 	txt_help_g_4,
@@ -70,6 +73,8 @@ txt_help_empty_line,
 #else
 	txt_help_I,
 #endif
+txt_help_empty_line,
+	txt_help_s_i,
 txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -174,6 +179,8 @@ txt_help_empty_line,
 	txt_help_I,
 #endif
 txt_help_empty_line,
+	txt_help_g_t_p_i,
+txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
 	(char *) 0
@@ -206,6 +213,8 @@ txt_help_empty_line,
 #else
 	txt_help_I,
 #endif
+txt_help_empty_line,
+	txt_help_g_t_p_i,
 txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -303,6 +312,10 @@ txt_help_empty_line,
 	txt_help_tex,
 txt_help_empty_line,
 	txt_help_v,
+txt_help_empty_line,
+	txt_help_colon,
+txt_help_empty_line,
+	txt_help_g_t_p_i,
 	(char *) 0
 };
 
@@ -367,7 +380,7 @@ show_info_page (type, help, title)
 	}
 
 	set_xclick_off ();
-	while (1) {
+	forever {
 		if (cur_page != old_page) {
 			display_info_page ();
 		}

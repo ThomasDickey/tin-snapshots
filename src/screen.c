@@ -188,11 +188,17 @@ show_title (title)
 	col = (cCOLS - (int) strlen (txt_type_h_for_help))+1;
 	if (col) {
 		MoveCursor (0, col);
+#ifdef HAVE_COLOR
+		fcol(col_title);
+#endif
 		if (mail_check ()) {		/* you have mail message in */
 			my_fputs (txt_you_have_mail, stdout);
 		} else {
 			my_fputs (txt_type_h_for_help, stdout);
 		}
+#ifdef HAVE_COLOR
+		fcol(col_normal);
+#endif
 	}
 	center_line (0, TRUE, title);
 }

@@ -1,26 +1,21 @@
 # Top level Makefile for tin - for configuration options read the ./INSTALL file.
 # 
-PROJECT	= tin
+PROJECT		= tin
 EXE		= tin
-MANEXT	= 1
-BASE_VER= 950823
-VER		= 1.3beta-950824
-MAIL_ADDR = "iain@scn.de"
+MANEXT		= 1
+BASE_VER	= 950824
+LVER		= 1.3_$(BASE_VER)
+PPREFIX		= MC
+PVER		= 960405
+VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
+MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
 # directory structure
 TOPDIR	= .
-AMGDIR	= ./amiga
 DOCDIR	= ./doc
-DOCDEDIR = ./doc/german
 INCDIR	= ./include
-MISCDIR = ./misc
-NNTPDIR = ./nntp
 OBJDIR	= ./src
-OS2DIR	= ./os2
 SRCDIR	= ./src
-VMSDIR  = ./vms
-VMSSIODIR  = ./sio
-WIN32DIR= ./win32
 
 HFILES	= \
 	$(INCDIR)/amiga.h \
@@ -34,6 +29,8 @@ HFILES	= \
 	$(INCDIR)/os_2.h \
 	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
+	$(INCDIR)/rfc1521.h \
+	$(INCDIR)/rfc1522.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/win32.h \
@@ -47,6 +44,7 @@ CFILES	= \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/charset.c \
+	$(SRCDIR)/color.c \
 	$(SRCDIR)/config.c \
 	$(SRCDIR)/curses.c \
 	$(SRCDIR)/debug.c\
@@ -76,6 +74,8 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/rfc1521.c \
+	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
 	$(SRCDIR)/screen.c \
 	$(SRCDIR)/search.c \
@@ -91,141 +91,36 @@ CFILES	= \
 	$(SRCDIR)/vms.c
 
 DOC	= \
-	$(DOCDIR)/HACKERS \
-	$(DOCDIR)/HOWTOGET \
-	$(DOCDIR)/README.PGP \
-	$(DOCDIR)/attrib.txt \
-	$(DOCDIR)/cmdref1.txt \
-	$(DOCDIR)/cmdref2.txt \
-	$(DOCDIR)/cmdref3.txt \
-	$(DOCDIR)/cmdref4.txt \
-	$(DOCDIR)/faq.html \
-	$(DOCDIR)/faq.txt \
-	$(DOCDIR)/filter.txt \
-	$(DOCDIR)/forward.txt \
-	$(DOCDIR)/intro.txt \
-	$(DOCDIR)/iso2asc.txt \
-	$(DOCDIR)/procmail.txt \
-	$(DOCDIR)/rfc977.txt \
-	$(DOCDIR)/rfc1036.txt \
-	$(DOCDIR)/son1036.txt \
 	$(DOCDIR)/$(EXE).$(MANEXT) \
-	$(DOCDIR)/$(EXE).nrf \
-	$(DOCDIR)/$(EXE).lsm \
-	$(DOCDIR)/strftime.3 \
-	$(DOCDIR)/wildmat.3
-
-DOCDE = \
-	$(DOCDEDIR)/README \
-	$(DOCDEDIR)/tin.1
 
 TOP	= \
-	$(TOPDIR)/Makefile \
 	$(TOPDIR)/CHANGES \
+	$(TOPDIR)/TODO \
+	$(TOPDIR)/Makefile \
 	$(TOPDIR)/INSTALL \
 	$(TOPDIR)/MANIFEST \
-	$(TOPDIR)/README \
-	$(TOPDIR)/TODO 
+	$(TOPDIR)/README
 
-MISC	= \
-	$(SRCDIR)/Makefile \
-	$(SRCDIR)/proto.sed \
-	$(SRCDIR)/descrip.mms \
-  	$(MISCDIR)/scroll.dif
+ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) $(SRCDIR)/Makefile
 
-AMIGA	= \
-	$(AMGDIR)/README \
-	$(AMGDIR)/smakefile \
-	$(AMGDIR)/actived.c \
-	$(AMGDIR)/parsdate.c
-
-NNTP	= \
-	$(NNTPDIR)/README \
-	$(NNTPDIR)/INSTALL \
-	$(NNTPDIR)/patch.srv
-
-OS2	= \
-	$(OS2DIR)/README \
-	$(OS2DIR)/Makefile.bcc \
-	$(OS2DIR)/Makefile.icc
-
-WIN32	= \
-	$(WIN32DIR)/README \
-	$(WIN32DIR)/parsdate.c \
-	$(WIN32DIR)/tin.mak
-
-VMS	= \
-	$(VMSDIR)/cc-multinet.opt \
-	$(VMSDIR)/decc-multinet.opt \
-	$(VMSDIR)/decc-ucx.opt \
-	$(VMSDIR)/descrip.mms \
-	$(VMSDIR)/dir.h \
-	$(VMSDIR)/filetypes.h \
-	$(VMSDIR)/gcc-multinet.opt \
-	$(VMSDIR)/gcc-ucx.opt \
-	$(VMSDIR)/getopt.c \
-	$(VMSDIR)/getopt.h \
-	$(VMSDIR)/getopt1.c \
-	$(VMSDIR)/isxterm.c \
-	$(VMSDIR)/make.com \
-	$(VMSDIR)/makefile. \
-	$(VMSDIR)/makevmslib.com \
-	$(VMSDIR)/ndir.h \
-	$(VMSDIR)/parse.c \
-	$(VMSDIR)/parse.h \
-	$(VMSDIR)/pwd.h \
-	$(VMSDIR)/qsort.c \
-	$(VMSDIR)/select.h \
-	$(VMSDIR)/strings.h \
-	$(VMSDIR)/uaf.h \
-	$(VMSDIR)/vms-multinet.opt \
-	$(VMSDIR)/vmsdir.c \
-	$(VMSDIR)/vmsfile.c \
-	$(VMSDIR)/vmspwd.c \
-	$(VMSDIR)/vmstimval.h
-
-VMSSIO	= \
-	$(VMSSIODIR)/COPYRIGHT \
-	$(VMSSIODIR)/Makefile \
-	$(VMSSIODIR)/README \
-	$(VMSSIODIR)/Sprint.3 \
-	$(VMSSIODIR)/descrip.mms \
-	$(VMSSIODIR)/events.h \
-	$(VMSSIODIR)/impl.h \
-	$(VMSSIODIR)/sio.3 \
-	$(VMSSIODIR)/sio.c \
-	$(VMSSIODIR)/sio.h \
-	$(VMSSIODIR)/sioconf.h \
-	$(VMSSIODIR)/siosup.c \
-	$(VMSSIODIR)/sprint.c
-
-ALL_FILES = $(TOP) $(DOC) $(DOCDE) $(HFILES) $(CFILES) $(AMIGA) $(MISC) $(NNTP) $(OS2) $(WIN32) $(VMS) $(VMSSIO)
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
 
 # standard commands
 CD		= cd
-CHMOD	= chmod
-COMPRESS= compress
+CHMOD		= chmod
 CP		= cp -p
-CSCOPE	= cscope
-DIFF	= diff
-ECHO	= echo
+ECHO		= echo
 LS		= ls -l
-LP		= lpr -h
-MAKE	= make
-MKDIR	= mkdir
+MAKE		= make
 MV		= mv
-NROFF	= nroff
-#NROFF	= groff -Tascii
+NROFF		= groff -Tascii
 RM		= rm
-SHAR	= shar
-SHELL	= /bin/sh
-TAR		= tar
-#TROFF	= troff
-TROFF	= groff
-UUENCODE= uuencode
+SHELL		= /bin/sh
+TAR		= gtar
+TROFF		= groff
 WC		= wc
-ZIP		= zip
-GZIP	= gzip -9
+SED		= sed
+TR		= tr
 
 all: 
 	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
@@ -236,21 +131,12 @@ all:
 	@$(ECHO) "This Makefile offers the following general purpose options:"
 	@$(ECHO) " "
 	@$(ECHO) "    make clean           [ Delete all object files & backup files ]"
-	@$(ECHO) "    make clobber         [ Delete all object files, backup files & binaries ]"
-	@$(ECHO) "    make diff            [ Generate context diffs against old version ]"
-	@$(ECHO) "    make ftptar          [ Create compressed tar archive for ftp sites ]"
 	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
-	@$(ECHO) "    make manpage         [ Generate & print troff version of manual page ]"
-	@$(ECHO) "    make nrfpage         [ Generate nroff version of manual page ]"
-	@$(ECHO) "    make patch           [ Generate multi-part patch kit against old version ]"
-	@$(ECHO) "    make print           [ Print all source code to printer ]"
-	@$(ECHO) "    make shar            [ Create multi-part shell archive distribution ]"
-	@$(ECHO) "    make tar             [ Create gzipped tar archive of the distribution ]"
-	@$(ECHO) "    make uuencode        [ Create uuencoded compressed tar distribution ]"
-	@$(ECHO) "    make zip             [ Create zip archive of the distribution ]"
-	@$(ECHO) "    make ztar            [ Create compressed tar archive of the distribution ]"
+	@$(ECHO) "    make manpage         [ Generate nroff version of manual page ]"
+	@$(ECHO) "    make manifest        [ Generate MANIFEST ]"
+	@$(ECHO) "    make gtar            [ Generate gziped tar archive ]"
 
 install:
 	@$(CD) $(SRCDIR); $(MAKE) install
@@ -264,33 +150,15 @@ install_daemon:
 clean:
 	@$(CD) $(SRCDIR); $(MAKE) clean
 	@$(RM) -f *~
-	@$(RM) -f $(AMGDIR)/*~
 	@$(RM) -f $(DOCDIR)/*~
 	@$(RM) -f $(INCDIR)/*~
-	@$(RM) -f $(MISCDIR)/*~
-	@$(RM) -f $(NNTPDIR)/*~
-	@$(RM) -f $(OBJDIR)/*~
-	@$(RM) -f $(OS2DIR)/*~
 	@$(RM) -f $(SRCDIR)/*~
 
-clobber:
-	@$(CD) $(SRCDIR); $(MAKE) clobber
-	@$(RM) -f *~
-	@$(RM) -f $(AMGDIR)/*~
-	@$(RM) -f $(DOCDIR)/*~
-	@$(RM) -f $(INCDIR)/*~
-	@$(RM) -f $(MISCDIR)/*~
-	@$(RM) -f $(NNTPDIR)/*~
-	@$(RM) -f $(OBJDIR)/*~
-	@$(RM) -f $(OS2DIR)/*~
-	@$(RM) -f $(SRCDIR)/*~
+man:
+	@$(MAKE) manpage
 
 manpage:
-	@$(ECHO) "Printing $(TROFF) man page for $(EXE)..."
-	@$(TROFF) -man $(DOCDIR)/$(EXE).$(MANEXT) | $(LP)
-
-nrfpage:
-	@$(ECHO) "Creating $(NROFF) man page for $(EXE)..."
+	@$(ECHO) "Creating $(NROFF) man page for $(EXE)$(VER)..."
 	@$(NROFF) -man $(DOCDIR)/$(EXE).1 > $(DOCDIR)/$(EXE).nrf
 
 manifest:
@@ -300,121 +168,22 @@ manifest:
 	@$(WC) -c $(ALL_FILES) >> MANIFEST
 
 chmod:
-	@$(CHMOD) 755 $(AMGDIR) $(DOCDIR) $(INCDIR) $(NNTPDIR) $(OBJDIR) $(SRCDIR)
+	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
-
-shar:
-	@$(ECHO) "Generating multi-part shell archive..."
-	@$(MAKE) nrfpage
-	@$(MAKE) manifest
-	@$(MAKE) chmod
-	@$(SHAR) -a -F -L60 -n $(PROJECT)-$(VER) -s $(MAIL_ADDR) \
-		-o ../$(PROJECT)-$(VER) $(ALL_FILES)
-
-uuencode:
+	@$(CHMOD) 755 $(ALL_DIRS)
+gtar:
 	@$(MAKE) tar
-	@$(ECHO) "Uuencoding $(PROJECT).t.gz..."
-	@$(UUENCODE) $(PROJECT).t.gz $(PROJECT).t.gz > $(PROJECT).t.gz.uu
-	@$(LS) $(PROJECT).t.gz.uu
-
-diff:
-	@$(ECHO) "Generating diffs against $(PROJECT)-$(BASE_VER)..."
-	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
-	@$(MAKE) nrfpage
-	@$(MAKE) manifest
-	@$(MAKE) chmod
-	@-$(MV) -f $(PROJECT)-$(VER).diff $(PROJECT)-$(VER).diff-
-	@-$(DIFF) -rusNP ../$(BASE_VER) . > ../$(PROJECT)-$(VER).diff
-	@$(LS) ../$(PROJECT)-$(VER).diff
-
-patch:
-	@$(MAKE) diff
-	@$(ECHO) "Generating patch against $(PROJECT)-$(BASE_VER)..."
-	@-$(MV) $(PROJECT)-$(VER).diff $(PROJECT)-$(VER).patch
-	@$(SHAR) -a -n $(PROJECT)-$(VER) -s $(MAIL_ADDR) -L60 \
-		-o ../patch-$(VER) $(PROJECT)-$(VER).patch
-	@$(LS) ../patch-$(VER).*
-
-ftptar:
-	@$(ECHO) "Creating FTP tar file with a directory of $(PROJECT)-$(VER)..."
-	@$(MAKE) nrfpage
-	@$(MAKE) manifest
-	@$(MAKE) chmod
-	@-$(MKDIR) $(PROJECT)-$(VER)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(AMGDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(DOCDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(DOCDEDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(INCDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(MISCDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(NNTPDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(OS2DIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(SRCDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(WIN32DIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(VMSDIR)
-	@-$(MKDIR) $(PROJECT)-$(VER)/$(VMSSIODIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(AMGDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(DOCDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(DOCDEDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(INCDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(MISCDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(NNTPDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(OS2DIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(SRCDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(WIN32DIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(VMSDIR)
-	@$(CHMOD) 755 $(PROJECT)-$(VER)/$(VMSSIODIR)
-	@$(CP) $(TOP) $(PROJECT)-$(VER)
-	@$(CP) $(AMIGA) $(PROJECT)-$(VER)/$(AMGDIR)
-	@$(CP) $(DOC) $(PROJECT)-$(VER)/$(DOCDIR)
-	@$(CP) $(DOCDE) $(PROJECT)-$(VER)/$(DOCDEDIR)
-	@$(CP) $(HFILES) $(PROJECT)-$(VER)/$(INCDIR)
-	@$(CP) $(NNTP) $(PROJECT)-$(VER)/$(NNTPDIR)
-	@$(CP) $(OS2) $(PROJECT)-$(VER)/$(OS2DIR)
-	@$(CP) $(CFILES) $(PROJECT)-$(VER)/$(SRCDIR)
-	@$(CP) $(WIN32) $(PROJECT)-$(VER)/$(WIN32DIR)
-	@$(CP) $(VMS) $(PROJECT)-$(VER)/$(VMSDIR)
-	@$(CP) $(VMSSIO) $(PROJECT)-$(VER)/$(VMSSIODIR)
-	@$(CP) $(SRCDIR)/Makefile $(PROJECT)-$(VER)/$(SRCDIR)
-	@$(CP) $(SRCDIR)/proto.sed $(PROJECT)-$(VER)/$(SRCDIR)
-	@$(CP) $(SRCDIR)/descrip.mms $(PROJECT)-$(VER)/$(SRCDIR)
-	@$(CP) $(MISCDIR)/scroll.dif $(PROJECT)-$(VER)/$(MISCDIR)
-	@$(TAR) cvf $(PROJECT)-$(VER).tar $(PROJECT)-$(VER)
-	@$(ECHO) "Compressing $(PROJECT)-$(VER).tar..."
-	@$(GZIP) $(PROJECT)-$(VER).tar
-	@$(LS) $(PROJECT)-$(VER).tar.gz
-	@-$(RM) -rf $(PROJECT)-$(VER)
 
 tar:
+	@$(MAKE) clean
+	@$(MAKE) chmod
+	@$(MAKE) manifest
 	@$(ECHO) "Generating gzipped tar file..."
-	@-$(RM) $(PROJECT).t $(PROJECT).t.gz > /dev/null 2>&1
-	@$(MAKE) chmod
-	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)  
-	@$(ECHO) "Gzipping $(PROJECT).t..."
-	@$(GZIP) $(PROJECT).t
-	@$(LS) $(PROJECT).t.gz
-
-ztar:
-	@$(ECHO) "Generating compressed tar file..."
-	@-$(RM) $(PROJECT).t $(PROJECT).t.Z > /dev/null 2>&1
-	@$(MAKE) chmod
-	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)  
-	@$(ECHO) "Compressing $(PROJECT).t..."
-	@$(COMPRESS) $(PROJECT).t 
-	@$(LS) $(PROJECT).t.Z
-
-zip:
-	@$(ECHO) "Generating zip archive file..."
-	@-$(RM) $(PROJECT).zip > /dev/null 2>&1
-	@$(ZIP) $(PROJECT).zip  $(ALL_FILES)
-	@$(LS) $(PROJECT).zip
-
-cscope:
-	@$(ECHO) "Creating cscope database $(PROJECT)..."
-	@$(CSCOPE) $(ALL_FILES)
-
-print:
-	for FILE in $(HFILES) $(CFILES) $(MISC); do \
-	$(ECHO) "Printing $$FILE..."; \
-	a2ps $$FILE | $(LP); \
-	done
+	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1  
+	@$(TAR) cvzf $(PROJECT)$(VER).tgz -C ../ \
+	`$(ECHO) $(ALL_FILES) \
+	| $(TR) -s '[[:space:]]' "[\012*]" \
+	| $(SED) 's/^/$(PVER)\//' \
+ 	| $(TR) "[\012]" " "`
+	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
+	@$(LS) $(PROJECT)$(VER).tgz

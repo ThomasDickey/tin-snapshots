@@ -33,7 +33,7 @@ the specified file.
 If the first letter of the string is a '$' the gateway name will be read from 
 the specified environment variable. The env. variable contents may be a path.
 If the first letter of the string is a '%' the gateway name will be directly
-appended to the username.  
+appended to the user-name.  
 The '%' hack will *only* be used if INEWS_MAIL_DOMAIN is not defined.
 Note: don't define if INEWS_MAIL_DOMAIN is defined.
 
@@ -83,7 +83,7 @@ Tin can be compiled to read news in any of the following ways:
 
   o  remotely from another machine via NNTP and also retrieving tin index
      files from remote machine via NNTP (-DNNTP_ONLY). This
-     option requires that my nntp patch be applied to your NNTP 1.5.11t5 
+     option requires that my NNTP patch be applied to your NNTP 1.5.11t5 
      server nntpd. On the NNTP server the index daemon of tin
      'tind' needs to be run from cron to update the index files at regular 
      intervals (not required if INN/Cnews generate NOV index files).
@@ -124,7 +124,7 @@ Note1: If you want to retrieve tin index files from your NNTP server,
       above 4 points.
   2)  Run "make clean" to delete the *.o files from the normal version.
   3)  The tind index daemon needs to be installed on your NNTP server,
-      or on your standalone news server if you're not using NNTP.
+      or on your stand-alone news server if you're not using NNTP.
       More info. concerning my NNTP patches & the tin daemon can be
       found in the INSTALL.NNTP file.  If you don't use NNTP, just
       install tind on the machine that has the news spool directory.
@@ -136,10 +136,10 @@ Note1: If you want to retrieve tin index files from your NNTP server,
       be linked with curses and it will save a good 30-50K on the size of
       tind.
   6)  Type 'make <system type>' to compile tind daemon for your NNTP server
-      or standalone news server.  This creates tind as the file "tin".
+      or stand-alone news server.  This creates tind as the file "tin".
   7)  Rename the file "tin" to "tind" (i.e. mv tin tind).
   8)  Type 'make install_daemon' to install tind daemon on your NNTP server
-      or standalone news server.
+      or stand-alone news server.
   9)  Add the following line to your system cron to run tind every 30 mins:
         00,30 * * * * su news -c '/usr/lib/news/tind'
 
@@ -211,7 +211,7 @@ NNTP_ONLY
 Define if you [want to | can] ONLY read news remotely via an NNTP server.
 
 NNTP_INEWS
-Define if you want to use my builtin NNTP POST routine so that you no
+Define if you want to use my built-in NNTP POST routine so that you no
 longer have to rely on the mini-inews from NNTP to be installed on each
 client machine. Also check that INEWS_MAIL_GATEWAY & INEWS_MAIL_DOMAIN 
 are correctly set to produce a correct From: headers for your site.
@@ -220,10 +220,10 @@ be set to OFF rather than ON. The tinrc file is created automatically for
 each user the first time they use tin.
 
 NNTP_SERVER_FILE
-Only define if your nntpserver file is other than /etc/nntpserver.
+Only define if your NNTP-server file is other than /etc/nntpserver.
 
 NNTP_DEFAULT_SERVER
-Defines the name of the default nntp server that tin should connect to.
+Defines the name of the default NNTP server that tin should connect to.
 Overrides the value of NNTP_SERVER_FILE. Can be overridden by setting the
 environment variable NNTPSERVER.
 
@@ -263,7 +263,7 @@ DONT_HAVE_GETCWD
 Define if you don't have the getcwd() system call. getwd() will be used.
 
 DONT_LOG_USER
-Log username & info to /tmp/.tin_log for usage statistics. If reading via
+Log user-name & info to /tmp/.tin_log for usage statistics. If reading via
 NNTP the NNTP XUSER extended command will log user info to NNTP server.
 If -DNNTP_XUSER is defined it will define LOG_USER automatically.
 
@@ -280,11 +280,11 @@ article checking routine therefore causing the user to remove the group
 from his/her posting or to abort the posting of the article.
 
 HAVE_ISPELL
-Define if you have ispell (interactive spellchecker) installed and want the
+Define if you have ispell (interactive spell-checker) installed and want the
 option of checking your articles, mails before posting/mailing them.
 
 HAVE_LONG_FILENAMES
-Define if your machines filesystem supports filenames longer than 14
+Define if your machines file-system supports filenames longer than 14
 chars (default for BSD type systems).
 
 HAVE_MAIL_HANDLING
@@ -346,7 +346,7 @@ Define if you want inverse video and highlighted bar disabled. Can be
 toggled in tin by the 'I' command and highlight bar by 'M' command.
 
 DEFAULT_ISO2ASC
-Define if you want tin todo ISO-8859-1 Charset to Ascii conversations
+Define if you want tin to do ISO-8859-1 Charset to ASCII conversations
 by default for all groups. You must specify a value of "0-6" to get tin
 to use one of the 7 conversion tables for different languages.
 i.e., Adding -DUSE_ISO2ASC=\"2\" to the COPTS line in the Makefile would 

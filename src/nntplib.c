@@ -634,18 +634,18 @@ handle_server_response (response, nntpserver)
 
 		case OK_CANPOST:
 			return (0);
-			break;
+			/* break; */
 
 		case ERR_ACCESS:
 			printf ("This machine does not have permission to use the %s news server.\n", nntpserver);
 			return (-1);
-			break;
+			/* break; */
 
 		default:
 			printf ("Unexpected response code from %s news server: %d\n",
 				nntpserver, response);
 			return (-1);
-			break;
+			/* break; */
     }
 	/*NOTREACHED*/
 #else
@@ -790,6 +790,7 @@ static int reconnecting = 0;
 			if (reconnecting) return -1;
 			if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				return -2;
+	/* there was no check for -2 in open.c !!!*/			
 			}
 			reconnecting = 1;
 			clear_message ();
@@ -925,15 +926,12 @@ nntp_respcode (respcode)
 	int respcode;
 {
 #ifdef NNTP_ABLE
+	extern char error_response[NNTP_STRLEN];
 	static char *text;
 
-	/*
-	 * If the last response line matches and has a description, return it
-	 */
-	if (atoi (nntp_line) == respcode && strlen (nntp_line) > 4) {
-		return nntp_line;
-	}
-
+	if (strlen (error_response) > 4) {
+		return (error_response);
+	} else {
 	switch (respcode) {
 		case 0:
 			text = "";
@@ -1114,6 +1112,7 @@ nntp_respcode (respcode)
 			break;
 	}
 	return (text);
+	}	
 #else
 	return ("");
 #endif

@@ -12,6 +12,8 @@
  *		right notice, and it must be included in any copy made
  */
 
+#define forever for(;;)
+
 /*
  * OS specific doda's
  */
@@ -350,8 +352,8 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_MAILER	"/usr/lib/sendmail"
 #	endif
 #	ifdef linux
-#		define	DEFAULT_MAILBOX "/usr/spool/mail"
-#		define	DEFAULT_MAILER	"/usr/bin/smail"
+#		define	DEFAULT_MAILBOX "/var/spool/mail"
+#		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_PRINTER "/usr/bin/lpr"
 #	endif
 #	ifdef M_AMIGA
@@ -543,6 +545,7 @@ extern char *get_uaf_fullname();
 
 #define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define STRNCMPEQ(s1, s2, n)	(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
+#define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
 #ifdef VMS
 #	define	LEN		512
@@ -751,9 +754,9 @@ extern char *get_uaf_fullname();
 
 #if !defined(M_OS2) && !defined(WIN32)
 #	ifdef HAVE_ANSI_ASSERT
-#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else
+#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
 #	else
-#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else
+#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else (void)0;
 #	endif
 #endif
 
@@ -939,27 +942,27 @@ typedef unsigned char	t_bitmap;
 
 struct t_article
 {
-	long artnum;		/* Article number in spool directory for group */
-	char *subject;		/* Subject: line from mail header */
+	long artnum;			/* Article number in spool directory for group */
+	char *subject;			/* Subject: line from mail header */
 	char *from;			/* From: line from mail header (address) */
 	char *name;			/* From: line from mail header (full name) */
 	time_t date;			/* Date: line from header in seconds */
 	char *xref;			/* Xref: cross posted article reference line */
-	char *msgid;		/* Message-ID: unique message identifier */
+	char *msgid;			/* Message-ID: unique message identifier */
 	char *refs;			/* References: article reference id's */
 	int lines;			/* Lines: number of lines in article */
-	char *archive;		/* Archive-name: line from mail header */
+	char *archive;			/* Archive-name: line from mail header */
 	char *part;			/* part  no. of archive */
-	char *patch;		/* patch no. of archive */
+	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
-	unsigned int inthread:1;/* 0 = thread head, 1 = thread follower */
-	unsigned int status:2;	/* 0 = read, 1 = unread, 2 = will return */
-	unsigned int killed:1;	/* 0 = not killed, 1 = killed */
+	unsigned int inthread:1;	/* 0 = thread head, 1 = thread follower */
+	unsigned int status:2;		/* 0 = read, 1 = unread, 2 = will return */
+	unsigned int killed:1;		/* 0 = not killed, 1 = killed */
 	unsigned int selected:1;	/* 0 = not selected, 1 = selected */
-	unsigned int zombie:1;	/* 1 = was alive (unread) before 'X' command */
-	unsigned int delete:1;	/* 1 = delete art when leaving group [mail group] */
-	unsigned int inrange:1; /* 1 = article selected via # range command */
+	unsigned int zombie:1;		/* 1 = was alive (unread) before 'X' command */
+	unsigned int delete:1;		/* 1 = delete art when leaving group [mail group] */
+	unsigned int inrange:1; 	/* 1 = article selected via # range command */
 };
 
 /*
@@ -968,19 +971,19 @@ struct t_article
 
 struct t_attribute
 {
-	char *maildir;						/* mail dir if other than ~/Mail */
-	char *savedir;						/* save dir if other than ~/News */
-	char *savefile; 					/* save articles to specified file */
-	char *sigfile;						/* sig file if other than ~/.Sig */
-	char *organization;					/* organization name */
-	char *followup_to;					/* where posts should be redirected */
-	char *printer;						/* printer command & parameters */
-	char *quick_kill_scope; 			/* quick filter kill scope */
-	char *quick_select_scope;			/* quick filter select scope */
-	char *mailing_list;					/* mail list email address */
-	char *x_headers;					/* extra headers for message header */
-	char *x_body;						/* bolierplate text for message body */
-	unsigned int global:1;				/* global/group specific */
+	char *maildir;				/* mail dir if other than ~/Mail */
+	char *savedir;				/* save dir if other than ~/News */
+	char *savefile; 			/* save articles to specified file */
+	char *sigfile;				/* sig file if other than ~/.Sig */
+	char *organization;			/* organization name */
+	char *followup_to;			/* where posts should be redirected */
+	char *printer;				/* printer command & parameters */
+	char *quick_kill_scope; 		/* quick filter kill scope */
+	char *quick_select_scope;		/* quick filter select scope */
+	char *mailing_list;			/* mail list email address */
+	char *x_headers;			/* extra headers for message header */
+	char *x_body;				/* bolierplate text for message body */
+	unsigned int global:1;			/* global/group specific */
 	unsigned int quick_kill_header:3;	/* quick filter kill header */
 	unsigned int quick_kill_expire:1;	/* quick filter kill limited/unlimited time */
 	unsigned int quick_kill_case:1; 	/* quick filter kill case sensitive? */
@@ -988,19 +991,20 @@ struct t_attribute
 	unsigned int quick_select_expire:1;	/* quick filter select limited/unlimited time */
 	unsigned int quick_select_case:1;	/* quick filter select case sensitive? */
 	unsigned int auto_save_msg:1;		/* 0=none, 1=save copy of posted article */
-	unsigned int auto_select:1;			/* 0=show all unread, 1='X' just hot arts */
-	unsigned int auto_save:1;			/* 0=none, 1=save */
-	unsigned int batch_save:1;			/* 0=none, 1=save -S/mail -M  */
+	unsigned int auto_select:1;		/* 0=show all unread, 1='X' just hot arts */
+	unsigned int auto_save:1;		/* 0=none, 1=save */
+	unsigned int batch_save:1;		/* 0=none, 1=save -S/mail -M  */
 	unsigned int delete_tmp_files:1;	/* 0=leave, 1=delete */
 	unsigned int show_only_unread:1;	/* 0=all, 1=only unread */
-	unsigned int thread_arts:1;			/* 0=unthread, 1=thread */
-	unsigned int show_author:4;			/* 0=none, 1=name, 2=addr, 3=both */
+	unsigned int thread_arts:1;		/* 0=unthread, 1=thread */
+	unsigned int show_author:4;		/* 0=none, 1=name, 2=addr, 3=both */
 	unsigned int sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
-										   3=from descend, 4=from ascend,
-										   5=date descend, 6=date ascend */
+						   3=from descend, 4=from ascend,
+						   5=date descend, 6=date ascend */
 	unsigned int post_proc_type:4;		/* 0=none, 1=shar, 2=uudecode,
-										   3=uud & list zoo, 4=uud & ext zoo*/
-    unsigned int x_comment_to:1;        /* insert X-Comment-To: in Followup */
+						   3=uud & list zoo, 4=uud & ext zoo*/
+	unsigned int x_comment_to:1;		/* insert X-Comment-To: in Followup */
+	char *news_quote_format;		/* another way to begin a posting format */
 };
 
 /*

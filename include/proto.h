@@ -243,6 +243,7 @@ extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
 extern unsigned long hash_groupname P_((char *group));
 extern void rename_file P_((char *old_filename, char *new_filename));
+extern void append_file P_((char *old_filename, char *new_filename));
 extern char *str_dup P_((char *str));
 extern int invoke_cmd P_((char *nam));
 extern void draw_percent_mark P_((long cur_num, long max_num));
@@ -251,6 +252,7 @@ extern void set_tin_uid_gid P_((void));
 extern void base_name P_((char *dirname, char *program));
 extern int mail_check P_((void));
 extern void parse_from P_((char *from_line, char *eaddr, char *fname));
+extern char *parse_references P_((char *r));
 extern long my_atol P_((char *s, int n));
 extern int my_stricmp P_((char *p, char *q));
 extern int my_strnicmp P_((char *p, char *q, size_t n));
@@ -380,7 +382,7 @@ extern int mail_bug_report P_((void));
 extern int mail_to_author P_((char *group, int respnum, int copy_text));
 extern int pcCopyArtHeader P_((int iHeader, char *pcArt, char *result));
 extern int delete_article P_((struct t_group *group, struct t_article *art));
-extern int repost_article P_((char *group, struct t_article *art));
+extern int repost_article P_((char *group, struct t_article *art, int respnum));
 extern void msg_add_x_headers P_((char *headers));
 extern int msg_add_x_body P_((FILE *fp_out, char *body));
 extern void insert_x_headers P_((char *infile, int lines));
@@ -389,6 +391,9 @@ extern void find_reply_to_addr P_((int respnum, char *from_addr));
 extern int reread_active_after_posting P_((void));
 extern void update_active_after_posting P_((char *newsgroups));
 extern int submit_mail_file P_((char *file));
+#ifdef FORGERY
+extern void make_path_header P_((char *line, char *from_name));
+#endif
 /* ./prompt.c */
 extern int prompt_num P_((int ch, char *prompt));
 extern int prompt_string P_((char *prompt, char *buf));

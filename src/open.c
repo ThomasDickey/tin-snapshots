@@ -14,9 +14,13 @@
  */
 
 #include	"tin.h"
+#include        "rfc1521.h"
 
 int nntp_codeno = 0;
 long head_next;
+
+/* error message vom server */
+char error_response[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
 int compiled_with_nntp = TRUE;		/* used in mail_bug_report() info */
@@ -79,6 +83,8 @@ nntp_open ()
 
 		case OK_NOPOST:
 			can_post = FALSE;
+			wait_message(txt_cannot_post);
+			fputc ('\n', stdout);
 			break;	
 
 		case -1:
@@ -479,9 +485,12 @@ open_art_header (art)
 			 *  HEAD failed, try to find NEXT
 			 */
 			put_server ("next");
-			if (get_server (buf, NNTP_STRLEN) == -1) {
+			switch (get_server (buf, NNTP_STRLEN)) {
+			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
+			case -2:
+				tin_done (0);
 			}
 			if (atoi (buf) == OK_NOTEXT) {
 				ptr = buf;
@@ -501,15 +510,18 @@ open_art_header (art)
 		safe_nntp_strlen = NNTP_STRLEN - 2;
 		len = safe_nntp_strlen;
 		ptr = mem;
-		while (1) {
+		forever {
 			if (full || len < 32) {
 				full = TRUE;
 				ptr = buf;
 				len = safe_nntp_strlen;
 			}
-			if (get_server (ptr, len) == -1) {
+			switch (get_server (ptr, len)) {
+			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
+			case -2:
+				tin_done (0);
 			}
 			if (STRCMPEQ(ptr, ".")) {	/* end of text */
 				break;
@@ -600,7 +612,7 @@ open_art_fp (group_path, art)
 		} else {
 			note_size = sb.st_size;
 		}
-		return fopen (buf, "r");
+		return rfc1521_decode(fopen (buf, "r"));
 	}
 }
 
@@ -708,9 +720,12 @@ setup_hard_base (group, group_path)
 		
 		put_server (buf);
 
-		if (get_server (line, NNTP_STRLEN) == -1) {
+			switch (get_server (line, NNTP_STRLEN)) {
+			case -1:
 			error_message (txt_connection_to_server_broken, "");
 			tin_done (EXIT_NNTP_ERROR);
+			case -2:
+				tin_done (0);
 		}
 
 		if (atoi (line) != OK_GROUP) {
@@ -727,16 +742,22 @@ setup_hard_base (group, group_path)
 		sprintf (buf, "listgroup %s", group->name);
 		debug_nntp ("setup_base", buf);
 		put_server (buf);
-		if (get_server (line, NNTP_STRLEN) == -1) {
+			switch (get_server (line, NNTP_STRLEN)) {
+			case -1:
 			error_message (txt_connection_to_server_broken, "");
 			tin_done (EXIT_NNTP_ERROR);
+			case -2:
+				tin_done (0);
 		}
 		if (atoi (line) == OK_GROUP) {
 			debug_nntp ("setup_base", line);
-			while (TRUE) {
-				if (get_server (line, NNTP_STRLEN) == -1) {
+			forever {
+					switch (get_server (line, NNTP_STRLEN)) {
+					case -1:
 					error_message (txt_connection_to_server_broken, "");
 					tin_done (EXIT_NNTP_ERROR);
+					case -2:
+						tin_done (0);
 				}
 				if (STRCMPEQ(line, ".")) {
 					debug_nntp ("setup_base", line);
@@ -885,13 +906,19 @@ get_respcode ()
 	char line[NNTP_STRLEN];
 	int respcode;
 	
-	if (get_server (line, NNTP_STRLEN) == -1) {
+	switch (get_server (line, NNTP_STRLEN)) {
+	case -1:
 		error_message (txt_connection_to_server_broken, "");
 		tin_done (EXIT_NNTP_ERROR);
+	case -2:
+		tin_done (0);
 	}
 
 	debug_nntp ("get_respcode", line);
 
+	/* error message vom server retten*/
+	strcpy(error_response, line);
+	
 	respcode = atoi (line);
 
 #ifdef USE_GENAUTH
@@ -937,11 +964,15 @@ stuff_nntp (fnam)
 		return FALSE;
 	}
 
-	while (1) {
-		if (get_server (line, sizeof (line)-1) == -1) {
+	forever {
+		switch (get_server (line, sizeof (line)-1)) {
+		case -1:
 			error_message (txt_connection_to_server_broken, "");
 			tin_done (EXIT_NNTP_ERROR);
+		case -2:
+			tin_done (0);
 		}
+
 
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
@@ -985,7 +1016,7 @@ nntp_to_fp ()
 		return (FILE *) 0;
 	}
 
-	if ((fp = fopen (fnam, "r")) == (FILE *) 0) {
+	if ((fp = rfc1521_decode(fopen (fnam, "r"))) == (FILE *) 0) {
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}
@@ -1014,10 +1045,10 @@ void
 log_user ()
 {
 	char dummy[PATH_LEN];
-	char log_file[PATH_LEN];
 	char buf[32], *ptr;
 	char line[NNTP_STRLEN];
 #ifndef DONT_LOG_USER
+	char log_file[PATH_LEN];
 	FILE *fp;
 	long epoch;
 #endif
@@ -1237,9 +1268,12 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 		
 		put_server (acBuf);
 
-		if (get_server (acLine, NNTP_STRLEN) == -1) {
+		switch (get_server (acLine, NNTP_STRLEN)) {
+		case -1:
 			error_message (txt_connection_to_server_broken, "");
 			tin_done (EXIT_NNTP_ERROR);
+		case -2:
+			tin_done (0);
 		}
 
 		if (atoi (acLine) != OK_GROUP) {

@@ -461,12 +461,22 @@ fflush (stdout);
 #endif	/* INDEX_DAEMON */
 }
 
-/*
- * Write out rules for global/group with select rules before kill rules
- * so that when filtering any subjects that are selected can not be killed
- * by a later kill rule.
- */
- 
+/* do NOT sort the filterfile, cause sorting should be left to the user,
+   so he could do a kill and then a mark hot (usefull in binaries groups
+   to eleminate all postings smaler than f.e. 10-lines)
+
+scope=*binar*
+type=0
+case=1
+lines=<10
+scope=*binar*
+type=1
+case=1
+subj=*xv*
+
+should work - but didn't with changing order of filterfile
+*/
+
 void 
 vWriteFilterArray (fp, global, ptr, time)
 	FILE *fp;
@@ -474,14 +484,11 @@ vWriteFilterArray (fp, global, ptr, time)
 	struct t_filters *ptr;
 	long time;
 {
-	int write_filter_type = FILTER_SELECT;
 	register int i;
 	 
 	if (ptr == (struct t_filters *) 0) {
 		return;
 	}	 
-
-goto_done_select:	/* called at the end of the following for() loop */
 
 	for (i = 0 ; i < ptr->num ; i++) {
 
@@ -493,8 +500,7 @@ goto_done_select:	/* called at the end of the following for() loop */
 			}
 		}
 
-		if (ptr->filter[i].type == write_filter_type) {
-			if (global) {
+		if (global) {
 /*
 printf ("Scope=[%s]\r\n",
 (ptr->filter[i].scope != (char * ) 0 ? ptr->filter[i].scope : "*"));
@@ -534,12 +540,7 @@ fflush (stdout);
 			}
 			if (ptr->filter[i].time) {
 				fprintf (fp, "time=%ld\n", ptr->filter[i].time);
-			}
 		}
-	}
-	if (write_filter_type == FILTER_SELECT) {
-		write_filter_type = FILTER_KILL;
-		goto goto_done_select;
 	}
 
 /* continue_prompt (); */
@@ -862,7 +863,7 @@ filter_menu (type, group, art)
 		return FALSE;
 	}
 
-	while (1) {
+	forever {
 		do {
 			sprintf (msg, "%s%c", ptr_filter_quit_edit_save, ch_default);
 			wait_message (msg);

@@ -1,50 +1,65 @@
 # Source Makefile for tin - for configuration options read the ../INSTALL file.
 # 
 # Compiler, linker & parser commands
-CC		= cc
-#CC		= gcc
-#CC		= checkergcc
-DEBUG	= # -DDEBUG -DDEBUG_NEWSRC -DPROFILE
-DEBUG	= #-g -DDEBUG
-# -Wstrict-prototypes -Wnested-externs -Wmissing-prototypes -Wredundant-decls
-COPTS	= -c  -DHAVE_PGP -DHAVE_COREDUMP -g -I$(INCDIR) $(DEBUG) -DNNTP_ONLY # -DHAVE_MAIL_HANDLING
-#COPTS	= -I$(INCDIR) $(DEBUG) -c -Wall -Wconversion -Wstrict-prototypes -Wmissing-prototypes  -DHAVE_MAIL_HANDLING
-LD		= $(CC)
-#LD		= cc
+
+CC	= gcc
+
+COPTS	= -c \
+	-O2 \
+	-m486 \
+	-I$(INCDIR) \
+	-DNNTP_ONLY \
+	-DNNTP_INEWS \
+	-DDONT_LOG_USER \
+	-DHAVE_ISPELL \
+	-DUSE_ISO2ASC=\"2\" \
+	-DNO_ETIQUETTE
+
+#	-DHAVE_COLOR
+#	-DHAVE_PGP
+#	-DMIME_BREAK_LONG_LINES
+#	-DFORGERY
+
+LD	= $(CC)
 YACC	= bison -y
-#YACC    = yacc
 
 # From: address in posted articles (don't use both - read the INSTALL file)
 # Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
-INEWS_MAIL_GATEWAY=/etc/inews_mail_gateway
-INEWS_MAIL_DOMAIN=
-#.scn.de
+INEWS_MAIL_GATEWAY=
+#/etc/inews_mail_gateway
+INEWS_MAIL_DOMAIN=akk.uni-karlsruhe.de
 #.subdomain.domain
 
 # Default nntp server (can be overridden by NNTPSERVER environment variable)
-NNTP_DEFAULT_SERVER=
-#news.scn.de
+NNTP_DEFAULT_SERVER=news.akk.uni-karlsruhe.de
 #news-server.subdomain.domain
 
 # Where are your news libdir & spooldir?
-LIBDIR	= /usr/lib/news
-SPOOLDIR= /usr/spool/news
-NOVROOTDIR= $(SPOOLDIR)
+LIBDIR		=
+#/var/lib/news
+SPOOLDIR	=
+#/var/spool/news
+NOVROOTDIR 	=
+# $(SPOOLDIR)
+
+INEWSDIR	=
+#/usr/bin/inews
 
 # Where do you want the binary & manual page installed?
-INS_BINARY_DIR	= /usr/local/bin
-INS_DAEMON_DIR	= $(LIBDIR)
-INS_MANUAL_DIR	= /usr/local/man/man
-INS_MANUAL_EXT	= 1
+INS_BINARY_DIR	=/usr/local/bin
+INS_DAEMON_DIR	=$(LIBDIR)
+INS_MANUAL_DIR	=/usr/local/man/man
+INS_MANUAL_EXT	=1
 
 # Use INN clientlibs config functions (add -DUSE_INN_NNTPLIB to COPTS line)
-INN_NNTPLIB=
+INN_NNTPLIB	=
+#
 
 # Project
 PROJECT	= tin
-EXE		= tin
+EXE	= tin
 EXED	= tind
-VER		= 1.30
+VER	= 1.30
 MANEXT	= 1
 
 # directory structure
@@ -55,52 +70,53 @@ OBJDIR	= .
 SRCDIR	= .
 
 # standard commands
-CD		= cd
+CD	= cd
 CHGRP	= chown
 CHMOD	= chmod
 CHOWN	= chown
 CFLOW	= cflow
-CP		= cp
+CP	= cp
 CPROTO	= cproto
 CSCOPE	= cscope
 ECHO	= echo
 LINT	= lint
-LN		= ln
-LS		= ls -l
+LN	= ln
+LS	= ls -l
 MAKE	= make
-MV		= mv
-RM		= rm
+MV	= mv
+RM	= rm
 SHELL	= /bin/sh
 STRIP	= strip
 STRIP2	= mcs -d
-SU		= su
+SU	= su
 TAGS	= ctags
 
 HFILES	= \
-	$(INCDIR)/amiga.h \
-	$(INCDIR)/amigatcp.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
-	$(INCDIR)/gst.h \
 	$(INCDIR)/menukeys.h \
-	$(INCDIR)/msmail.h \
 	$(INCDIR)/nntplib.h \
-	$(INCDIR)/os_2.h \
 	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
+	$(INCDIR)/rfc1521.h \
+	$(INCDIR)/rfc1522.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
-	$(INCDIR)/win32.h \
-	$(INCDIR)/win32tcp.h
+#	$(INCDIR)/amiga.h
+#	$(INCDIR)/amigatcp.h
+#	$(INCDIR)/gst.h
+#	$(INCDIR)/msmail.h
+#	$(INCDIR)/win32.h
+#	$(INCDIR)/win32tcp.h
+#	$(INCDIR)/os_2.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
 	$(SRCDIR)/actived.c \
-	$(SRCDIR)/amiga.c \
-	$(SRCDIR)/amigatcp.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/charset.c \
+	$(SRCDIR)/color.c \
 	$(SRCDIR)/config.c \
 	$(SRCDIR)/curses.c \
 	$(SRCDIR)/debug.c\
@@ -119,17 +135,16 @@ CFILES	= \
 	$(SRCDIR)/main.c \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
-	$(SRCDIR)/msmail.c \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
-	$(SRCDIR)/nntpw32.c \
 	$(SRCDIR)/open.c \
-	$(SRCDIR)/os_2.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/rfc1521.c \
+	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
 	$(SRCDIR)/screen.c \
 	$(SRCDIR)/search.c \
@@ -139,18 +154,23 @@ CFILES	= \
 	$(SRCDIR)/strftime.c \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
-	$(SRCDIR)/win32.c \
-	$(SRCDIR)/win32tcp.c \
-	$(SRCDIR)/xref.c \
-	$(SRCDIR)/vms.c
+	$(SRCDIR)/xref.c
+#	$(SRCDIR)/amiga.c
+#	$(SRCDIR)/amigatcp.c
+#	$(SRCDIR)/msmail.c
+#	$(SRCDIR)/nntpw32.c
+#	$(SRCDIR)/win32.c
+#	$(SRCDIR)/win32tcp.c
+#	$(SRCDIR)/os_2.c
+#	$(SRCDIR)/vms.c
 
 OFILES	= \
 	$(OBJDIR)/active.o \
 	$(OBJDIR)/actived.o \
-	$(OBJDIR)/amiga.o \
 	$(OBJDIR)/art.o \
 	$(OBJDIR)/attrib.o \
 	$(OBJDIR)/charset.o \
+	$(OBJDIR)/color.o \
 	$(OBJDIR)/config.o \
 	$(OBJDIR)/curses.o \
 	$(OBJDIR)/debug.o\
@@ -171,14 +191,14 @@ OFILES	= \
 	$(OBJDIR)/misc.o \
 	$(OBJDIR)/newsrc.o\
 	$(OBJDIR)/nntplib.o \
-	$(OBJDIR)/nntpw32.o \
 	$(OBJDIR)/open.o \
-	$(OBJDIR)/os_2.o \
 	$(OBJDIR)/page.o \
 	$(OBJDIR)/parsdate.o \
 	$(OBJDIR)/pgp.o \
 	$(OBJDIR)/post.o \
 	$(OBJDIR)/prompt.o\
+	$(OBJDIR)/rfc1521.o \
+	$(OBJDIR)/rfc1522.o \
 	$(OBJDIR)/save.o \
 	$(OBJDIR)/screen.o \
 	$(OBJDIR)/search.o \
@@ -188,16 +208,21 @@ OFILES	= \
 	$(OBJDIR)/strftime.o \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/wildmat.o \
-	$(OBJDIR)/win32.o \
-	$(OBJDIR)/xref.o \
-	$(OBJDIR)/vms.o
+	$(OBJDIR)/xref.o
+#	$(OBJDIR)/amiga.o
+#	$(OBJDIR)/win32.o
+#	$(OBJDIR)/vms.o
+#	$(OBJDIR)/os_2.o
+#	$(OBJDIR)/nntpw32.o
 
 
-ALL_FILES = $(HFILES) $(CFILES) $(NNTP)
+ALL_FILES	= $(HFILES) $(CFILES) $(NNTP)
 
-LINTFLAGS=-a -c -h -n -x 
+LINTFLAGS	=-a -c -h -n -x 
 
-all: 
+all: linux
+
+help:
 	@$(ECHO) "Makefile for the TIN v$(VER) Usenet newsreader. Configuration:"
 	@$(ECHO) " "
 	@$(ECHO) "  Compiler=[$(CC)]  Copts=[$(COPTS)]  INN Lib=[$(INN_NNTPLIB)]"
@@ -208,14 +233,15 @@ all:
 	@$(ECHO) "If the above options are OK make one of the following targets:"
 	@$(ECHO) " "
 	@$(ECHO) "  make bsd    [ BSD[I] / DGUX / NeXT / OSF1 / Pyramid / SunOS / Ultrix (nntp) ]"
-	@$(ECHO) "  make sysv   [ SysV / HPUX 7&8 ]    make sysvr4  [ SysVR4 / HPUX 9 ]"
-	@$(ECHO) "  make aix    [ IBM AIX (nntp) ]     make apollo  [ Apollo DomainOS ]"
-	@$(ECHO) "  make coh    [ Coherent 4.0 ]       make dynix   [ Sequent DYNIX (nntp) ]"
-	@$(ECHO) "  make irix   [ SGI Irix ]           make linux   [ Linux (nntp) ]"
-	@$(ECHO) "  make minix  [ Minix 386 ]          make mips    [ Mips / CDC EPIX ]"
-	@$(ECHO) "  make ptx    [ Sequent PTX ]        make qnx     [ QNX 4.2 ]"
-	@$(ECHO) "  make sco    [ SCO Unix ]           make sinix   [ SNI Sinix ]"
-	@$(ECHO) "  make tower  [ NCR Tower]           make xenix   [ SCO Xenix 386 ]"
+	@$(ECHO) "  make sysv   [ SysV ]		make sysvr4  [ SysVR4 ]"
+	@$(ECHO) "  make hpux7  [ HP-UX 7/8 ]		make hpux9   [ HP-UX 9/10 ]"
+	@$(ECHO) "  make aix    [ IBM AIX (nntp) ]	make apollo  [ Apollo DomainOS ]"
+	@$(ECHO) "  make coh    [ Coherent 4.0 ]	make dynix   [ Sequent DYNIX (nntp) ]"
+	@$(ECHO) "  make irix   [ SGI Irix ]		make linux   [ Linux (nntp) ]"
+	@$(ECHO) "  make minix  [ Minix 386 ]		make mips    [ Mips / CDC EPIX ]"
+	@$(ECHO) "  make ptx    [ Sequent PTX ]		make qnx     [ QNX 4.2 ]"
+	@$(ECHO) "  make sco    [ SCO Unix ]		make sinix   [ SNI Sinix ]"
+	@$(ECHO) "  make tower  [ NCR Tower]		make xenix   [ SCO Xenix 386 ]"
 	@$(ECHO) "  make sol    [ Solaris 2.X ]"
 	@$(ECHO) " "
 	@$(ECHO) "Note that targets marked with '(nntp)' have -DNNTP_ABLE defined automatically."
@@ -407,11 +433,53 @@ sinix:
 			EXE=tin linkit
 
 # For System V
-#			 NETLIBS="-lnet -lnsl_s" \
+#			 NETLIBS="-lnsl -lnsl_s" \
 #
 sysv:
 	@$(ECHO) "Compiling $(EXE) v$(VER) for System V..."
 	@$(MAKE) CC=$(CC) CFLAGS='$(COPTS) -DSYSV \
+			-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
+			-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
+			-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
+			-DLIBDIR=\"$(LIBDIR)\" \
+			-DSPOOLDIR=\"$(SPOOLDIR)\" \
+			-DNOVROOTDIR=\"$(NOVROOTDIR)\"' \
+			LIBS="-lcurses -ltermcap $(INN_NNTPLIB)" \
+			EXE=tin linkit
+
+# For System V Release 4
+#			 NETLIBS="-lnsl -lsocket" \
+#
+sysvr4:
+	@$(ECHO) "Compiling $(EXE) v$(VER) for System V Release 4..."
+	@$(MAKE) CC=$(CC) CFLAGS='$(COPTS) -DSVR4 \
+			-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
+			-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
+			-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
+			-DLIBDIR=\"$(LIBDIR)\" \
+			-DSPOOLDIR=\"$(SPOOLDIR)\" \
+			-DNOVROOTDIR=\"$(NOVROOTDIR)\"' \
+			LIBS="-lcurses -ltermcap $(INN_NNTPLIB)" \
+			EXE=tin linkit
+
+# For HP-UX 7/8 and cc, if using gcc use "make sysv"
+hpux7:
+	@$(ECHO) "Compiling $(EXE) v$(VER) for HP-UX 7&8..."
+	@$(MAKE) CC=$(CC) CFLAGS='-Aa -s $(COPTS) -DSYSV \
+			-D_HPUX_SOURCE \
+			-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
+			-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
+			-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
+			-DLIBDIR=\"$(LIBDIR)\" \
+			-DSPOOLDIR=\"$(SPOOLDIR)\" \
+			-DNOVROOTDIR=\"$(NOVROOTDIR)\"' \
+			LIBS="-lcurses -ltermcap $(INN_NNTPLIB)" \
+			EXE=tin linkit
+
+# For HP-UX 9/10 and cc, if using gcc use "make sysvr4"
+hpux9:
+	@$(ECHO) "Compiling $(EXE) v$(VER) for HP-UX 9&10..."
+	@$(MAKE) CC=$(CC) CFLAGS='-Ae -s $(COPTS) -DSVR4 \
 			-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
 			-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
 			-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
@@ -434,21 +502,6 @@ sol:
 			-DNOVROOTDIR=\"$(NOVROOTDIR)\"' \
 			LIBS="-lcurses -ltermcap $(INN_NNTPLIB)" \
 			NETLIBS="-lnsl -lsocket" \
-			EXE=tin linkit
-
-# For System V Release 4
-#			 NETLIBS="-lnsl -lsocket" \
-#
-sysvr4:
-	@$(ECHO) "Compiling $(EXE) v$(VER) for System V Release 4..."
-	@$(MAKE) CC=$(CC) CFLAGS='$(COPTS) -DSVR4 \
-			-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
-			-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
-			-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
-			-DLIBDIR=\"$(LIBDIR)\" \
-			-DSPOOLDIR=\"$(SPOOLDIR)\" \
-			-DNOVROOTDIR=\"$(NOVROOTDIR)\"' \
-			LIBS="-lcurses -ltermcap $(INN_NNTPLIB)" \
 			EXE=tin linkit
 
 # For NCR Tower
@@ -605,20 +658,20 @@ cscope:
 	@$(CSCOPE) $(ALL_FILES)
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(HFILES)
-$(OBJDIR)/actived.o:	$(SRCDIR)/actived.c $(HFILES)
+$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(HFILES)
 $(OBJDIR)/amiga.o:		$(SRCDIR)/amiga.c $(HFILES)
 $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(HFILES)
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(HFILES)
-$(OBJDIR)/charset.o:	$(SRCDIR)/charset.c $(HFILES)
+$(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(HFILES)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(HFILES)
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(HFILES)
 $(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(HFILES)
 $(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(HFILES)
 $(OBJDIR)/feed.o:		$(SRCDIR)/feed.c $(HFILES)
 $(OBJDIR)/filter.o:		$(SRCDIR)/filter.c $(HFILES)
-$(OBJDIR)/getline.o:	$(SRCDIR)/getline.c $(HFILES)
+$(OBJDIR)/getline.o:		$(SRCDIR)/getline.c $(HFILES)
 $(OBJDIR)/group.o:		$(SRCDIR)/group.c $(HFILES)
-$(OBJDIR)/hashstr.o:	$(SRCDIR)/hashstr.c $(HFILES)
+$(OBJDIR)/hashstr.o:		$(SRCDIR)/hashstr.c $(HFILES)
 $(OBJDIR)/help.o:		$(SRCDIR)/help.c $(HFILES)
 $(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(HFILES)
 $(OBJDIR)/init.o:		$(SRCDIR)/init.c $(HFILES)
@@ -630,24 +683,26 @@ $(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(HFILES)
 $(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(HFILES)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(HFILES)
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(HFILES)
-$(OBJDIR)/nntplib.o:	$(SRCDIR)/nntplib.c $(HFILES)
-$(OBJDIR)/nntpw32.o:	$(SRCDIR)/nntpw32.c $(HFILES)
+$(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(HFILES)
+$(OBJDIR)/nntpw32.o:		$(SRCDIR)/nntpw32.c $(HFILES)
 $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(HFILES)
 $(OBJDIR)/os_2.o:		$(SRCDIR)/os_2.c $(HFILES)
 $(OBJDIR)/page.o:		$(SRCDIR)/page.c $(HFILES)
-$(OBJDIR)/parsdate.o:	$(SRCDIR)/parsdate.y $(HFILES)
+$(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(HFILES)
 $(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(HFILES)
 $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(HFILES)
 $(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(HFILES)
+$(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(HFILES)
+$(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(HFILES)
 $(OBJDIR)/save.o:		$(SRCDIR)/save.c $(HFILES)
 $(OBJDIR)/screen.o:		$(SRCDIR)/screen.c $(HFILES)
 $(OBJDIR)/search.o:		$(SRCDIR)/search.c $(HFILES)
 $(OBJDIR)/select.o:		$(SRCDIR)/select.c $(HFILES)
-$(OBJDIR)/sigfile.o:	$(SRCDIR)/sigfile.c $(HFILES)
+$(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(HFILES)
 $(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(HFILES)
-$(OBJDIR)/strftime.o:	$(SRCDIR)/strftime.c $(HFILES)
+$(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(HFILES)
 $(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(HFILES)
-$(OBJDIR)/wildmat.o:	$(SRCDIR)/wildmat.c $(HFILES)
+$(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(HFILES)
 $(OBJDIR)/win32.o:		$(SRCDIR)/win32.c
 $(OBJDIR)/xref.o:		$(SRCDIR)/xref.c $(HFILES)
 $(OBJDIR)/vms.o:		$(SRCDIR)/vms.c $(HFILES)

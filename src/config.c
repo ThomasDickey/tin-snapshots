@@ -104,6 +104,50 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "confirm_to_quit=", &confirm_to_quit)) {
 				break;
 			}
+#ifdef HAVE_COLOR
+			if (match_integer (buf, "col_back=", &col_back)) {
+				break;
+			}
+			if (match_integer (buf, "col_invers=", &col_invers)) {
+				break;
+			}
+			if (match_integer (buf, "col_text=", &col_text)) {
+				break;
+			}
+			if (match_integer (buf, "col_foot=", &col_foot)) {
+				break;
+			}
+			if (match_integer (buf, "col_quote=", &col_quote)) {
+				break;
+			}
+			if (match_integer (buf, "col_head=", &col_head)) {
+				break;
+			}
+			if (match_integer (buf, "col_subject=", &col_subject)) {
+				break;
+			}
+			if (match_integer (buf, "col_response=", &col_response)) {
+				break;
+			}
+			if (match_integer (buf, "col_from=", &col_from)) {
+				break;
+			}
+			if (match_integer (buf, "col_normal=", &col_normal)) {
+				break;
+			}
+			if (match_integer (buf, "col_title=", &col_title)) {
+				break;
+			}
+			if (match_integer (buf, "col_highlight1=", &col_highlight1)) {
+				break;
+			}
+			if (match_integer (buf, "col_highlight2=", &col_highlight2)) {
+				break;
+			}
+			if (match_integer (buf, "col_highlight3=", &col_highlight3)) {
+				break;
+			}
+#endif
 			break;
 		case 'd':
 			if (match_string (buf, "default_editor_format=", default_editor_format, sizeof (default_editor_format))) {
@@ -233,12 +277,33 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+		case 'h':
+			if (match_boolean (buf, "highlight_xcommentto=", &highlight_xcommentto)) {
+				break;
+			}
+			break;
 		case 'i':
 			if (match_boolean (buf, "inverse_okay=", &inverse_okay)) {
 				break;
 			}
 			break;
+		case 'k':
+			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles)) {
+				break;
+			}
+			if (match_boolean (buf, "keep_posted_articles=", &keep_posted_articles)) {
+				break;
+			}
+			break;				
 		case 'm':
+			if (match_string (buf, "mime_encoding=", mime_encoding, sizeof (mime_encoding))) {
+				if (strcasecmp(mime_encoding, "8bit") &&
+					strcasecmp(mime_encoding, "base64") &&
+					strcasecmp(mime_encoding, "quoted-printable")) {
+					strcpy(mime_encoding,"8bit");
+				}
+				break;
+			}
 			if (match_string (buf, "motd_file_info=", motd_file_info, sizeof (motd_file_info))) {
 				break;
 			}
@@ -255,6 +320,9 @@ read_config_file (file, global_file)
 				break;
 			}
 			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format))) {
+				break;
+			}
+			if (match_boolean (buf, "no_advertizing=", &no_advertizing)) {
 				break;
 			}
 			break;
@@ -315,6 +383,9 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "strip_blanks=", &strip_blanks)) {
 				break;
 			}
+			if (match_boolean (buf, "show_xcommentto=", &show_xcommentto)) {
+				 break;
+			}
 			break;
 		case 't':
 			if (match_boolean (buf, "thread_articles=", &default_thread_arts)) {
@@ -349,17 +420,27 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "use_metamail=", &use_metamail)) {
 				break;
 			}
-			break;
 #endif
+#ifdef HAVE_COLOR
+			if (match_boolean (buf, "use_color=", &use_color_tinrc)) {
+				use_color=use_color_tinrc;
+				break;
+			}
+#endif
+			break;
 		case 'x':
-			if (match_boolean (buf, "xcut_and_paste=", &xcut_and_paste)) {
+			if (match_string (buf, "xpost_quote_format=", xpost_quote_format, sizeof (xpost_quote_format))) {
+
 				break;
 			}
 			break;
 		}
 	}
 	fclose (fp);
-
+	/* nobody likes to navigate blind */
+	if (! draw_arrow_mark && !inverse_okay) {
+		draw_arrow_mark = TRUE;
+	}
 	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
 		wait_message ("\n");
 	}
@@ -413,6 +494,41 @@ write_config_file (file)
 	fprintf (fp, "inverse_okay=%s\n\n", print_boolean (inverse_okay));
 	fprintf (fp, "# if ON use -> otherwise highlighted bar for selection\n");
 	fprintf (fp, "draw_arrow=%s\n\n", print_boolean (draw_arrow_mark));
+#ifdef HAVE_COLOR
+	fprintf (fp, "# if ON using ansi-color\n");
+	fprintf (fp, "use_color=%s\n\n", (use_color_tinrc ? "ON" : "OFF"));
+	fprintf (fp, "# For coloradjust use the following numbers\n");
+	fprintf (fp, "# 0-black   1-red     2-green      3-brown\n");
+	fprintf (fp, "# 4-blue    5-pink    6-turquoise  7-white\n\n");
+	fprintf (fp, "#Standard-Background-Color\n");
+	fprintf (fp, "col_back=%d\n\n", col_back);
+	fprintf (fp, "#Color for inverse text\n");
+	fprintf (fp, "col_invers=%d\n\n", col_invers);
+	fprintf (fp, "#Color of textlines\n");
+	fprintf (fp, "col_text=%d\n\n", col_text);
+	fprintf (fp, "#Color of footlines (Help,...)\n");
+	fprintf (fp, "col_foot=%d\n\n", col_foot);
+	fprintf (fp, "#Color of quotelines\n");
+	fprintf (fp, "col_quote=%d\n\n", col_quote);
+	fprintf (fp, "#Color of headerlines\n");
+	fprintf (fp, "col_head=%d\n\n", col_head);
+	fprintf (fp, "#Color of article subject\n");
+	fprintf (fp, "col_subject=%d\n\n", col_subject);
+	fprintf (fp, "#Color of response counter\n");
+	fprintf (fp, "col_response=%d\n\n", col_response);
+	fprintf (fp, "#Color of sender (From:)\n");
+	fprintf (fp, "col_from=%d\n\n", col_from);
+	fprintf (fp, "#Standard foreground color\n");
+	fprintf (fp, "col_normal=%d\n\n", col_normal);
+	fprintf (fp, "#Color of Help/Mail-Sign\n");
+	fprintf (fp, "col_title=%d\n\n", col_title);
+	fprintf (fp, "#First kind of word-high-lightning\n");
+	fprintf (fp, "col_highlight1=%d\n\n", col_highlight1);
+	fprintf (fp, "#Second kind of word-high-lightning\n");
+	fprintf (fp, "col_highlight2=%d\n\n", col_highlight2);
+	fprintf (fp, "#Third kind of word-high-lightning\n");
+	fprintf (fp, "col_highlight3=%d\n\n", col_highlight3);
+#endif
 	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
 	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));
 	fprintf (fp, "# if ON put cursor at first unread art in group otherwise last art\n");
@@ -426,6 +542,8 @@ write_config_file (file)
  	fprintf (fp, "# this only occurs, if use_metamail is also switched ON\n");
  	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
+	fprintf (fp, "# MIME encoding of the body, if necessary. (8bit, base64, quoted-printable)\n");
+	fprintf (fp, "mime_encoding=%s\n\n", mime_encoding);
 	fprintf (fp, "# if ON ask user if read groups should all be marked read\n");
 	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
 	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");
@@ -450,6 +568,10 @@ write_config_file (file)
 	fprintf (fp, "thread_articles=%s\n\n", print_boolean (default_thread_arts));
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
+	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
+	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
+	fprintf (fp, "# if ON keep all failed postings in ~/Mail/posted\n");
+	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
 	fprintf (fp, "# if ON show only subscribed to groups that contain unread articles.\n");
 	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (show_only_unread_groups));
 	fprintf (fp, "# if ON show only new/unread articles otherwise show all.\n");
@@ -467,6 +589,8 @@ write_config_file (file)
 	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
 	fprintf (fp, "# if ON prepend the signature with dashes '\\n-- \\n'\n");
 	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));
+	fprintf (fp, "# turn off advertizing in header (X-Newsreader/X-Mailer)\n");
+	fprintf (fp, "no_advertizing=%s\n\n", print_boolean (no_advertizing));
 	fprintf (fp, "# time interval in seconds between rereading the active file\n");
 	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
 	fprintf (fp, "# characters used in quoting to followups and replys. '_' replaced by ' '\n");
@@ -493,11 +617,11 @@ write_config_file (file)
 	fprintf (fp, "save_to_mmdf_mailbox=%s\n\n", print_boolean (save_to_mmdf_mailbox));
 	fprintf (fp, "# if ON use the builtin mini inews otherwise use an external inews program\n");
 	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
-
 	fprintf (fp, "# Format of quote line when mailing/posting/followingup an article\n");
 	fprintf (fp, "# %%A Address  %%D Date  %%F Addr+Name  %%G Groupname  %%M MessageId  %%N Name\n");
 	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
-	fprintf (fp, "mail_quote_format=%s\n\n", mail_quote_format);
+	fprintf (fp, "mail_quote_format=%s\n", mail_quote_format);
+	fprintf (fp, "xpost_quote_format=%s\n\n", xpost_quote_format);
 	fprintf (fp, "# if ON automatically put your name in the Cc: field when mailing an article\n");
 	fprintf (fp, "auto_cc=%s\n\n", print_boolean (auto_cc));
 	fprintf (fp, "# if ON catchup group/thread when leaving with the left arrow key.\n");
@@ -511,8 +635,6 @@ write_config_file (file)
 	fprintf (fp, "# If ON enable scroll keys on terminals that support it\n");
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
 #endif
-	fprintf (fp, "# If ON allows the mouse in an xterm todo cut and paste actions\n");
-	fprintf (fp, "xcut_and_paste=%s\n\n", print_boolean (xcut_and_paste));
 	fprintf (fp, "# If ON strip blanks from end of lines to speedup display on slow terminals\n");
 	fprintf (fp, "strip_blanks=%s\n\n", print_boolean (strip_blanks));
 	fprintf (fp, "# Maximum length of the names of newsgroups displayed\n");
@@ -521,9 +643,13 @@ write_config_file (file)
 	fprintf (fp, "beginner_level=%s\n\n", print_boolean (beginner_level));
 	fprintf (fp, "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n");
 	fprintf (fp, "process_only_unread=%s\n\n", print_boolean (process_only_unread));
+	fprintf (fp, "# If ON, the realname in the X-Comment-To header is displayed\n");
+	fprintf (fp, "show_xcommentto=%s\n\n", print_boolean(show_xcommentto));
+	fprintf (fp, "# If ON X-Commento-To name is displayed in the upper-right corner,\n");
+	fprintf (fp, "# if OFF below the Summary-Header\n");
+	fprintf (fp, "highlight_xcommentto=%s\n\n", print_boolean(highlight_xcommentto));
 	fprintf (fp, "# Num of days a short term filter will be active\n");
 	fprintf (fp, "default_filter_days=%d\n\n", default_filter_days);
-
 	fprintf (fp, "# Defaults for quick (1 key) kill & auto-selection filters\n");
 	fprintf (fp, "# header=NUM  0=Subject: 1=From: 2=Message-Id:\n");
 	fprintf (fp, "# global=ON/OFF  ON=apply to all groups OFF=apply to current group\n");
@@ -537,7 +663,6 @@ write_config_file (file)
 	fprintf (fp, "default_filter_select_global=%s\n", print_boolean (default_filter_select_global));
 	fprintf (fp, "default_filter_select_case=%s\n", print_boolean (default_filter_select_case));
 	fprintf (fp, "default_filter_select_expire=%s\n\n", print_boolean (default_filter_select_expire));
-
 	fprintf (fp, "# default action/prompt strings\n");
 	fprintf (fp, "default_save_mode=%c\n", default_save_mode);
 	fprintf (fp, "default_author_search=%s\n", default_author_search);
@@ -558,10 +683,8 @@ write_config_file (file)
 	fprintf (fp, "default_save_file=%s\n", default_save_file);
 	fprintf (fp, "default_select_pattern=%s\n", default_select_pattern);
 	fprintf (fp, "default_shell_command=%s\n\n", default_shell_command);
-
 	fprintf (fp, "# news motd file dates from server used for detecting new motd info\n");
 	fprintf (fp, "motd_file_info=%s\n\n", motd_file_info);
-
 	fprintf (fp, "# host&time info used for detecting new groups (don't touch)\n");
 	if (! num_newnews) {
 		fprintf (fp, "newnews=%s %ld\n", new_newnews_host, new_newnews_time);
@@ -570,7 +693,6 @@ write_config_file (file)
 			fprintf (fp, "newnews=%s %ld\n", newnews[i].host, newnews[i].time);
 		}
 	}
-
 	fclose (fp);
 	chmod (file, 0600);
 }
@@ -610,7 +732,7 @@ change_config_file (group, filter_at_once)
 	show_config_menu ();
 
 	set_xclick_off ();
-	while (1) {
+	forever {
 
 #ifdef SIGTSTP
 		if (do_sigtstp) {
@@ -1171,9 +1293,9 @@ match_boolean (line, pat, dst)
 	int *dst;
 {
 	size_t	patlen = strlen (pat);
-
-	if (STRNCMPEQ(line, pat, patlen)) {
-		*dst = (STRNCMPEQ(&line[patlen], "ON", 2) ? TRUE : FALSE);
+	
+	if (STRNCASECMPEQ(line, pat, patlen)) {
+		*dst = (STRNCASECMPEQ(&line[patlen], "ON", 2) ? TRUE : FALSE);
 		return TRUE;
 	}
 	return FALSE;
