@@ -16,6 +16,7 @@
 
 #include "nntplib.h"
 #include "tin.h"
+#include "tcurses.h"
 
 
 /*
@@ -323,19 +324,23 @@ authinfo_original (
 	 * that the server doesn't want a password; so only ask for it if needed.
 	 */
 	if (!startup) {
-		int state;
+/*		int state; */
 		wait_message (0, txt_auth_needed);
+#if 0
 		state = RawState();
 		Raw(TRUE);
+#endif
 		if (! prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
 #endif /* DEBUG */
 			return FALSE;
 		}
+#if 0
 		clear_message ();
 		Raw(state);
 		printf ("\n");
+#endif
 		ptr = getpass (txt_auth_pass);
 		authpass = strncpy (authpassword, ptr, PATH_LEN);
 		ret = do_authinfo_original (server, authuser, authpass);

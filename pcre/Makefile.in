@@ -31,6 +31,10 @@ OBJ	= \
 	study.o \
 	pcre.o
 
+PCR_DEP	= \
+	internal.h \
+	pcre.h
+
 all:	$(PRELIB)pcre.a $(PRELIB)pcreposix.a pcretest$x pgrep$x
 
 .SUFFIXES: .i
@@ -59,15 +63,17 @@ $(PRELIB)pcreposix.a: pcreposix.o
 		$(AR) $(PRELIB)pcreposix.a pcreposix.o
 		$(RANLIB) $(PRELIB)pcreposix.a
 
-pcre.o:		chartables.c pcre.c pcre.h internal.h
+pcre.o:		chartables.c pcre.c $(PCR_DEP)
 
-pcreposix.o:	pcreposix.c pcreposix.h pcre.h internal.h
+pcreposix.o:	pcreposix.c pcreposix.h $(PCR_DEP)
 
-maketables.o:	maketables.c pcre.h internal.h
+maketables.o:	maketables.c $(PCR_DEP)
 @SHOW_CC@
 	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(srcdir)/maketables.c
 
-study.o:	study.c pcre.h internal.h
+get.o:		get.c $(PCR_DEP)
+
+study.o:	study.c $(PCR_DEP)
 
 pcretest.o:	pcretest.c pcre.h
 
@@ -78,7 +84,7 @@ pgrep.o:	pgrep.c pcre.h
 chartables.c:	dftables$x
 		./dftables$x >$@
 
-dftables$x:	dftables.c maketables.c pcre.h internal.h
+dftables$x:	dftables.c maketables.c $(PCR_DEP)
 @SHOW_CC@
 		@ECHO_CC@$(CC) -o $@ $(CFLAGS) $(srcdir)/dftables.c
 

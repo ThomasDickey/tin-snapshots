@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 19990413
+PVER	= 19990517
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -170,10 +170,11 @@ TOP	= \
 
 PCRE	= \
 	$(PCREDIR)/ChangeLog \
+	$(PCREDIR)/LICENCE \
 	$(PCREDIR)/Makefile.in \
 	$(PCREDIR)/Makefile.orig \
-	$(PCREDIR)/RunTest \
 	$(PCREDIR)/README \
+	$(PCREDIR)/RunTest \
 	$(PCREDIR)/Tech.Notes \
 	$(PCREDIR)/pgrep.1 \
 	$(PCREDIR)/pcre.3 \
@@ -190,11 +191,11 @@ PCRE	= \
 	$(PCREDIR)/pcreposix.h \
 	$(PCREDIR)/pcretest.c \
 	$(PCREDIR)/perltest \
-	$(PCREDIR)/testinput \
+	$(PCREDIR)/testinput1 \
 	$(PCREDIR)/testinput2 \
 	$(PCREDIR)/testinput3 \
 	$(PCREDIR)/testinput4 \
-	$(PCREDIR)/testoutput \
+	$(PCREDIR)/testoutput1 \
 	$(PCREDIR)/testoutput2 \
 	$(PCREDIR)/testoutput3 \
 	$(PCREDIR)/testoutput4

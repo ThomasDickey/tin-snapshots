@@ -368,7 +368,7 @@ save_art_to_file (
 		char from[HEADER_LEN];
 		time_t epoch;
 
-		strip_address (note_h.from, from);
+		strip_name (note_h.from, from);
 		(void) time (&epoch);
 		fprintf (fp, "From %s %s", from, ctime (&epoch));
 	}
@@ -1032,7 +1032,7 @@ post_process_files (
 #ifndef INDEX_DAEMON
 static void
 post_process_uud (
-#  ifndef HAVE_LIBUU
+#	ifndef HAVE_LIBUU
 	int pp,
 #	endif /* !HAVE_LIBUU */
 	t_bool auto_delete)

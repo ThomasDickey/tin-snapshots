@@ -181,7 +181,7 @@ selection_page (
 						goto end_of_list;
 #ifndef WIN32
 					case KEYMAP_MOUSE:
-						INDEX_BOTTOM = INDEX_TOP+last_group_on_screen-first_group_on_screen;
+						INDEX_BOTTOM = INDEX_TOP + last_group_on_screen - first_group_on_screen;
 						switch (xmouse)
 						{
 							case MOUSE_BUTTON_1:
@@ -190,7 +190,7 @@ selection_page (
 									goto select_page_down;
 
 								erase_group_arrow ();
-								cur_groupnum = xrow-INDEX_TOP+first_group_on_screen;
+								cur_groupnum = xrow - INDEX_TOP + first_group_on_screen;
 								draw_group_arrow ();
 								if (xmouse == MOUSE_BUTTON_1)
 									goto select_read_group;
@@ -350,7 +350,7 @@ select_page_up:
 					cur_groupnum = n;
 					set_groupname_len (FALSE);
 					if (cur_groupnum < first_group_on_screen ||
-						cur_groupnum >= last_group_on_screen ||
+						cur_groupnum  >= last_group_on_screen ||
 						cur_groupnum != n) {
 						show_selection_page ();
 					} else {
@@ -503,8 +503,7 @@ select_quit:
 				}
 
 				if (CURR_GROUP.subscribed && !no_write) {
-					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
-											2, CURR_GROUP.newgroup ? "N" : "u");
+					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, CURR_GROUP.newgroup ? "N" : "u");
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
 					info_message(txt_unsubscribed_to, CURR_GROUP.name);
 					move_to_group (cur_groupnum + 1);
@@ -790,7 +789,8 @@ static void
 erase_group_arrow (
 	void)
 {
-	erase_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
+	if (group_top)
+		erase_arrow (INDEX_TOP + cur_groupnum - first_group_on_screen);
 }
 
 
@@ -798,11 +798,13 @@ void
 draw_group_arrow (
 	void)
 {
-	draw_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
 	if (!group_top)
 		info_message (txt_no_groups);
-	else if (tinrc.info_in_last_line)
-		info_message ("%s", CURR_GROUP.description ? CURR_GROUP.description : txt_no_description);
+	else {
+		draw_arrow (INDEX_TOP + cur_groupnum - first_group_on_screen);
+		if (tinrc.info_in_last_line)
+			info_message ("%s", CURR_GROUP.description ? CURR_GROUP.description : txt_no_description);
+	}
 }
 
 
@@ -850,8 +852,7 @@ choose_new_group (
 
 	clear_message ();
 
-	idx = my_group_add (p);
-	if (idx == -1)
+	if ((idx = my_group_add (p)) == -1)
 		info_message (txt_not_in_active_file, p);
 
 	return idx;
@@ -865,7 +866,7 @@ int
 skip_newgroups (
 	void)
 {
-	int i=0;
+	int i = 0;
 
 	if (group_top) {
 		while (i < group_top && active[my_group[i]].newgroup)
@@ -915,10 +916,10 @@ reposition_group (
 	int pos_num, newgroups;
 
 	if (no_write)
-		return (tinrc.default_move_group ? tinrc.default_move_group : default_num+1);
+		return (tinrc.default_move_group ? tinrc.default_move_group : default_num + 1);
 
 	sprintf (buf, txt_newsgroup_position, group->name,
-		(tinrc.default_move_group ? tinrc.default_move_group : default_num+1));
+		(tinrc.default_move_group ? tinrc.default_move_group : default_num + 1));
 
 	if (!prompt_string (buf, pos, HIST_MOVE_GROUP))
 		return default_num;
@@ -1069,6 +1070,9 @@ read_groups (
 			case GRP_NEXTUNREAD:
 				if (!pos_next_unread_group (FALSE))
 					done = TRUE;
+				break;
+
+			case GRP_ENTER:			/* group_page() has set cur_groupnum, no need to change it */
 				break;
 
 			case GRP_RETURN:

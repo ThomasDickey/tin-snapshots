@@ -21,6 +21,9 @@
  */
 #define ACTIVE_SEP		" \n"
 
+/* convert anything to a string */
+#define _mkstr(a) #a
+#define mkstr(a) _mkstr(a)
 
 t_bool force_reread_active_file = FALSE;
 
@@ -333,7 +336,8 @@ read_newsrc_active_file (
 				switch (respcode) {
 
 					case OK_GROUP:
-						if (sscanf (acLine, "%ld %ld %ld %s", &count, &min, &max, ngname) != 4)
+	/* field width is to shut checker up */
+						if (sscanf (acLine, "%ld %ld %ld %" mkstr(NNTP_STRLEN) "s", &count, &min, &max, ngname) != 4)
 							error_message("Invalid response to GROUP command, %s", acLine);
 						if (strcmp(ngname, ngnames[index_o]) != 0)
 							error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]);
@@ -410,8 +414,8 @@ read_newsrc_active_file (
 		tin_done (EXIT_FAILURE);
 	}
 
-	if (INTERACTIVE2)
-		wait_message (0, "\n");
+	if (INTERACTIVE)
+		my_fputs("\n", stdout);
 }
 
 
@@ -490,8 +494,8 @@ read_active_file (
 		tin_done (EXIT_FAILURE);
 	}
 
-	if (INTERACTIVE2)
-		wait_message (0, "\n");
+	if (INTERACTIVE)
+		my_fputs("\n", stdout);
 }
 
 

@@ -18,7 +18,7 @@ This following configure options and defines are documented in detail:
   --enable-mmdf-mailer       --with-ispell         NNTP_INEWS
   --enable-nntp		     --with-libdir         NNTP_SERVER_FILE
   --enable-nntp-only	     --with-local-charset  (SMALL_MEMORY_MACHINE)
-  --enable-broken-listgorup-fix
+  --enable-broken-listgroup-fix                    KILL_READ
 
 Not yet documented configure options and defines:
 -------------------------------------------------
@@ -40,6 +40,7 @@ TIN related:
   DEBUG_REFS (see doc/DEBUG_REFS)  PROFILE
   ENFORCE_RFC1034                  REQUIRE_BRACKET_IN_DOMAIN_LITERAL
   JUST_TESTING                     TINC_DNS
+  KILL_READ
 
   
 System related:
@@ -244,7 +245,7 @@ Enable if you [want to | can] ONLY read news remotely via an NNTP server.
 Defines the name of the default NNTP server that tin should connect to.
 Can be overridden by setting the environment variable NNTPSERVER.
 
---enable-broken-listgorup-fix (default: off)
+--enable-broken-listgroup-fix (default: off)
 Bypass a bug in some broken NNTPservers which need an extra
 GROUP command before accepting a LISTGROUP command.
 
@@ -432,7 +433,8 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i586 & Linux 2.2.5-ac7 with egcs-egcs-2.91.60
+	i586 & Linux 2.2.9 with gcc 2.7.2.3
+	i586 & Linux 2.3.3 with egcs-egcs-2.91.66
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1

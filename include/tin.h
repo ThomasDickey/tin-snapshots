@@ -803,6 +803,7 @@ enum resizer { cNo, cYes, cRedraw };
  * the background or some other non-curses mode
  */
 #define INTERACTIVE	(!batch_mode || update_fork)
+/* Obselete now, I think */
 #define INTERACTIVE2	((cmd_line && !(batch_mode || verbose)) || (batch_mode && update_fork))
 
 /*
@@ -979,6 +980,7 @@ enum resizer { cNo, cYes, cRedraw };
 #define GRP_ARTFAIL		-5	/* show_page() only. Failed to get into the article */
 #define GRP_KILLED		-6	/* Thread was killed at pager level */
 #define GRP_GOTOTHREAD	-7	/* show_page() only. Enter thread menu */
+#define GRP_ENTER		-8	/* New group is set, spin in read_groups() */
 
 #ifndef EXIT_SUCCESS
 #	define EXIT_SUCCESS	0	/* Successful exit status */

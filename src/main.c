@@ -102,30 +102,22 @@ main (
 	init_selfinfo ();
 	init_group_hash ();
 
-	if (update_fork || (batch_mode && verbose) || !batch_mode)
-		error_message (cvers);		/* TODO Why to stderr ?? */
-
 	/*
-	 *  Read user local & global config files
+	 * Init curses emulation
 	 */
-	read_config_file (global_config_file, TRUE);
-	read_config_file (local_config_file, FALSE);
+	if (!InitScreen ()) {
+		error_message (txt_screen_init_failed, progname);
+		exit (EXIT_FAILURE);
+	}
 
-	/*
-	 *  Process envargs & command line options
-	 */
-	read_cmd_line_options (argc, argv);
+	EndInverse ();
 
-	tmp_no_write = no_write; /* keep no_write */
-	no_write = TRUE; /* don't allow any writing back during startup */
-
-#ifndef INDEX_DAEMON
-	set_up_private_index_cache ();
-#endif /* !INDEX_DAEMON */
+	if (INTERACTIVE || (batch_mode && verbose))
+		wait_message (0, "%s\n", cvers);
 
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
 #	ifndef USE_CURSES
-	if (INTERACTIVE2) {
+	if (INTERACTIVE) {
 		if (!SetupScreen ()) {
 			error_message (txt_screen_init_failed, progname);
 			exit (EXIT_FAILURE);
@@ -134,6 +126,29 @@ main (
 	}
 #	endif /* !USE_CURSES */
 #endif /* M_UNIX && !INDEX_DAEMON */
+
+	/*
+	 *  Read user local & global config files
+	 */
+	read_config_file (global_config_file, TRUE);
+	read_config_file (local_config_file, FALSE);
+
+	/*
+	 * This depends on various things in tinrc
+	 */
+	setup_screen ();
+
+	/*
+	 *  Process envargs & command line options
+	 */
+	read_cmd_line_options (argc, argv);
+
+	tmp_no_write = no_write; /* keep no_write */
+	no_write = TRUE;		 /* don't allow any writing back during startup */
+
+#ifndef INDEX_DAEMON
+	set_up_private_index_cache ();
+#endif /* !INDEX_DAEMON */
 
 	/*
 	 *  Connect to nntp server?
@@ -160,16 +175,6 @@ main (
 	if (!batch_mode)
 		read_input_history_file ();
 #endif /* !INDEX_DAEMON */
-
-#ifdef WIN32
-	/*
-	 * Init curses emulation
-	 */
-	if (!InitScreen ()) {
-		error_message (txt_screen_init_failed, progname);
-		exit (EXIT_FAILURE);
-	}
-#endif /* WIN32 */
 
 	/*
 	 *  Load the mail & news active files into active[]
@@ -225,11 +230,6 @@ main (
 	 */
 #ifndef INDEX_DAEMON
 	if (post_article_and_exit || post_postponed_and_exit) {
-		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
-		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-#	ifdef DEBUG
-		debug_print_filters ();
-#	endif /* DEBUG */
 		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_SUCCESS);
 	}
@@ -300,22 +300,6 @@ main (
 	 *  Update index files
 	 */
 	update_index_files ();
-
-#ifndef WIN32
-	/*
-	 * Init curses emulation
-	 */
-	if (!InitScreen ()) {
-		error_message (txt_screen_init_failed, progname);
-		exit (EXIT_FAILURE);
-	}
-#endif /* !WIN32 */
-
-	/*
-	 *  Set up screen and switch to raw mode, set default attributes
-	 */
-	setup_screen ();
-	EndInverse ();
 
 	/*
 	 *  If first time print welcome screen and auto-subscribe
@@ -735,7 +719,7 @@ usage (
 
 	error_message ("  -q       don't check for new newsgroups");
 
-#  ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 	error_message ("  -Q       quick start. Same as -nqd");
 #	else
 	error_message ("  -Q       quick start. Same as -qd");

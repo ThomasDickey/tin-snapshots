@@ -309,7 +309,7 @@ dirty:
 distclean \
 clobber: clean
 	@$(ECHO) "Clobbering..."
-	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) tags TAGS LINT cflow.$(PROJECT
+	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) tags TAGS LINT cflow.$(PROJECT)
 
 cflow:
 	@$(ECHO) "Creating cflow for $(PROJECT)..."

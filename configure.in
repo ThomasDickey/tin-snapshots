@@ -453,8 +453,8 @@ AC_MSG_RESULT($enableval)
 
 ### bypass a bug in old versions of leafnode & NNTPcache
 AC_MSG_CHECKING(whether to send a GROUP command before a LISTGROUP)
-CF_ARG_ENABLE(broken-listgorup-fix,
-	[  --enable-broken-listgorup-fix
+CF_ARG_ENABLE(broken-listgroup-fix,
+	[  --enable-broken-listgroup-fix
                           send extra GROUP command before LISTGROUP
                          ],
 	[AC_DEFINE(BROKEN_LISTGROUP)])

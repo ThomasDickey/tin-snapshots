@@ -39,7 +39,6 @@ t_bool show_subject;
 #ifndef INDEX_DAEMON
 	static t_bool find_unexpired (struct t_msgid *ptr);
 	static t_bool has_sibling (struct t_msgid *ptr);
-	static void fixup_thread (int basenote, int respnum);
 	static void prompt_thread_num (int ch);
 	static void bld_tline (int l, struct t_article *art);
 	static void draw_tline (int i, t_bool full);
@@ -540,7 +539,7 @@ enter_pager:
 							ret_code = GRP_KILLED; /* ?? */
 							goto thread_done;
 						}
-						fixup_thread (n, this_resp);
+						fixup_thread (this_resp, FALSE);
 						show_thread_page();
 				}
 				break;
@@ -633,8 +632,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 
 			case iKeySearchBody:			/* search article body */
 				if ((n = search_body (find_response (thread_basenote, thread_index_point))) != -1) {
-					fixup_thread (which_thread (n), n);
-					move_to_response (thread_index_point);
+					fixup_thread (n, TRUE);
 /*					goto enter_pager;*/
 				}
 				break;
@@ -643,8 +641,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 			case iKeySearchSubjB:
 				if ((n = search (SEARCH_SUBJ, find_response (thread_basenote, thread_index_point),
 										(ch == iKeySearchSubjF))) != -1) {
-					fixup_thread (which_thread (n), n);
-					move_to_response (thread_index_point);
+					fixup_thread (n, TRUE);
 				}
 				break;
 
@@ -652,8 +649,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 			case iKeySearchAuthB:
 				if ((n = search (SEARCH_AUTH, find_response (thread_basenote, thread_index_point),
 										(ch == iKeySearchAuthF))) != -1) {
-					fixup_thread (which_thread (n), n);
-					move_to_response (thread_index_point);
+					fixup_thread (n, TRUE);
 				}
 				break;
 
@@ -909,21 +905,24 @@ erase_thread_arrow (
  * Fix all the internal pointers if the current thread/response has
  * changed.
  */
-static void
+void
 fixup_thread (
-	int basenote,
-	int respnum)
+	int respnum,
+	t_bool redraw)
 {
-	if (basenote != thread_basenote
-	 && basenote >= 0) {
+	int basenote = which_thread(respnum);
+
+	if (basenote != thread_basenote && basenote >= 0) {
 		thread_basenote = basenote;
 		top_thread = num_of_responses (thread_basenote) + 1;
 		thread_respnum = base[thread_basenote];
 		index_point = basenote;
-		show_thread_page();
+		if (redraw)
+			show_thread_page();
 	}
 
-	move_to_response (which_response(respnum));		/* Redraw screen etc.. */
+	if (redraw)
+		move_to_response (which_response(respnum));		/* Redraw screen etc.. */
 }
 
 static void

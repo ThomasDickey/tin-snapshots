@@ -38,7 +38,9 @@ static int gnksa_check_domain_literal (char *domain);
 static int gnksa_check_localpart (char *localpart);
 static int gnksa_dequote_plainphrase (char *realname, char *decoded, int addrtype);
 static int gnksa_split_from (char *from, char *address, char *realname, int *addrtype);
+#ifndef USE_CURSES
 static int input_pending (int delay);
+#endif
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
@@ -727,9 +729,7 @@ invoke_cmd (
 	if (!save_cmd_line) {
 		Raw (TRUE);
 		InitWin ();
-#if defined(SIGWINCH)
-		handle_resize (FALSE);
-#endif /* SIGWINCH */
+		need_resize = cYes;		/* Flag a redraw */
 	}
 
 #ifdef VMS
@@ -1316,11 +1316,12 @@ show_color_status (
  * by delay in msec. The original behaviour of input_pending()
  * (in art.c's threading code) is delay=0
  */
+#ifndef USE_CURSES
 static int
 input_pending (
 	int delay)
 {
-#ifdef USE_CURSES
+#if 0
 	int ch;
 	nodelay(stdscr, TRUE);
 	if ((ch = getch()) != ERR)
@@ -1337,7 +1338,7 @@ input_pending (
 	return (WaitForChar(Input(), 1000 * delay) == DOSTRUE) ? TRUE : FALSE;
 #	endif /* M_AMIGA */
 
-#ifdef HAVE_SELECT
+#	ifdef HAVE_SELECT
 	int fd = STDIN_FILENO;
 	fd_set fdread;
 	struct timeval tvptr;
@@ -1349,18 +1350,18 @@ input_pending (
 
 	FD_SET(fd, &fdread);
 
-#ifdef HAVE_SELECT_INTP
+#		ifdef HAVE_SELECT_INTP
 	if (select (1, (int *)&fdread, NULL, NULL, &tvptr))
-#else
+#		else
 	if (select (1, &fdread, NULL, NULL, &tvptr))
-#endif /* HAVE_SELECT_INTP */
+#		endif /* HAVE_SELECT_INTP */
 	{
 		if (FD_ISSET(fd, &fdread))
 			return TRUE;
 	}
-#endif /* HAVE_SELECT */
+#	endif /* HAVE_SELECT */
 
-#if defined(HAVE_POLL) && !defined(HAVE_SELECT)
+#	if defined(HAVE_POLL) && !defined(HAVE_SELECT)
 	static int Timeout;
 	static long nfds = 1;
 	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
@@ -1380,12 +1381,13 @@ input_pending (
 		default:
 			return FALSE;
 	}
-#endif /* HAVE_POLL && !HAVE_SELECT */
+#	endif /* HAVE_POLL && !HAVE_SELECT */
 
-#endif /* USE_CURSES */
+#endif /* 0 */
 
 	return FALSE;
 }
+#endif /* !USE_CURSES */
 
 
 int
@@ -2589,7 +2591,7 @@ write_input_history_file (
 	char *chr;
 	int his_w, his_e;
 
-	if (!no_write)
+	if (no_write)
 		return;
 
 	if ((fp = fopen(local_input_history_file, "w")) == NULL)
@@ -2675,11 +2677,48 @@ quote_wild_whitespace (
 }
 
 
+
 /*
- * strip_address () removes the realname part from a given e-mail address
+ * strip_address () removes the address part from a given e-mail address
  */
 void
 strip_address (
+	char *the_address,
+	char *stripped_address)
+{
+	char *end_pos;
+	char *start_pos;
+
+	if (strchr(the_address, '@') != (char *) 0) {
+		if ((end_pos = strchr(the_address,'<')) == (char *) 0) {
+			if ((start_pos = strchr(the_address, ' ')) == (char *) 0)
+				strcpy (stripped_address, the_address);
+			else {
+				strcpy (stripped_address, start_pos + 2);
+				if (stripped_address[strlen(stripped_address) - 1] == ')')
+					stripped_address[strlen(stripped_address) - 1] = '\0';
+			}
+		} else
+			if (end_pos > the_address)
+				strncpy (stripped_address, the_address, end_pos - the_address - 1);
+			else
+				strcpy (stripped_address, the_address);
+	} else {
+		if (the_address[0] == '(')
+			strcpy (stripped_address, the_address + 1);
+		else
+			strcpy (stripped_address, the_address);
+		if (stripped_address[strlen(stripped_address) - 1] == ')')
+			stripped_address[strlen(stripped_address) - 1] = '\0';
+	}
+}
+
+
+/*
+ * strip_name () removes the realname part from a given e-mail address
+ */
+void
+strip_name (
 	char *the_address,
 	char *stripped_address)
 {
@@ -3545,8 +3584,13 @@ gnksa_split_from (
 
 	/* skip trailing whitespace */
 	addr_end = work + strlen(work) - 1;
-	while ((' ' == *addr_end) || ('\t' == *addr_end))
+	while (addr_end >= work && (' ' == *addr_end || '\t' == *addr_end))
 		addr_end--;
+
+	if (addr_end < work) {
+		*addrtype = GNKSA_ADDRTYPE_OLDSTYLE;
+		return GNKSA_LPAREN_MISSING;
+	}
 
 	*(addr_end + 1) = '\0';
 	*(addr_end + 2) = '\0';
@@ -3572,7 +3616,7 @@ gnksa_split_from (
 		addr_begin = work;
 
 		/* strip surrounding whitespace */
-		while ((' ' == *addr_end) || ('\t' == *addr_end))
+		while (addr_end >= work && (' ' == *addr_end || '\t' == *addr_end))
 			addr_end--;
 
 		while ((' ' == *addr_begin) || ('\t' == *addr_begin))
@@ -3700,10 +3744,10 @@ gnksa_do_check_from (
 #endif /* DEBUG */
 
 	/* check realname */
-	if (GNKSA_OK != (result = gnksa_dequote_plainphrase(realname, decoded, addrtype))
-	    && (GNKSA_OK == code)) /* error detected */
-		code = result;
-	else	/* copy dequoted realname to result variable */
+	if (GNKSA_OK != (result = gnksa_dequote_plainphrase(realname, decoded, addrtype))) {
+		if (GNKSA_OK == code) /* error detected */
+			code = result;
+	} else	/* copy dequoted realname to result variable */
 		strcpy(realname, decoded);
 
 #ifdef DEBUG

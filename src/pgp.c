@@ -162,7 +162,7 @@ do_pgp (
 		strcat(options, "s");
 
 	if (*tinrc.mail_address) {
-		strip_address (tinrc.mail_address, address);
+		strip_name (tinrc.mail_address, address);
 		sh_format (cmd, sizeof(cmd), "%s %s %s %s %s -u %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "", address);
 	} else
 		sh_format (cmd, sizeof(cmd), "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
@@ -193,7 +193,7 @@ pgp_append_public_key (
 	char keyfile[PATH_LEN], cmd[LEN], buf[LEN];
 
 	if (*tinrc.mail_address)
-		strip_address (tinrc.mail_address, buf);
+		strip_name (tinrc.mail_address, buf);
 	else
 		sprintf(buf, "%s@%s", userid, host_name);
 

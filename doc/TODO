@@ -1,5 +1,12 @@
 Bugs
 ----
+o  --with-ncurses --enable-curses has several display problems:
+    - if use_color is set:
+      - '^G' (pgp-check article output is grabbled)
+      - warning/error messges upon posting are not displayed
+    - line which are exactly cCOLS wide cause a LF in the pager (ugly)
+      and the LF is not counted note.lines
+
 o  searching in the pager is broken; it doesn't actually search the first
    page.
 
@@ -383,9 +390,6 @@ o  tin.defaults is not mentioned in manpage/INSTALL
 
 Not yet classified
 ------------------
-o  confirm_to_quit=ON & hitting 'Q' in thread or page-level and answering
-   the following question with 'n' will put you back in the selection level.
-
 o  'B'ody search doesn't jump to the match in the article
    (IMHO this is confusing inside the pager (at least if the hit
     is in the current article), but ok at any other level).
@@ -481,12 +485,6 @@ o  sometimes tin truncates newsgroup-names after turning off newsgroup
 
 o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
    compile at all... - use -O2 for debug.c!!
-
-o  --enable-curses has several bugs
-   (screen redraw is broken, tty-settings get messed up, color might not
-    work, ...)
-   [seems to work properly with ncurses and SVr4 curses - need specifics
-    dickey@clark.net]
 
 o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
    ???

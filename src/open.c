@@ -332,7 +332,8 @@ get_respcode (
 
 		} else {
 			error_message (txt_auth_failed, ERR_ACCESS);
-			return -1;
+/*			return -1;*/
+			tin_done (EXIT_FAILURE);
 		}
 	}
 

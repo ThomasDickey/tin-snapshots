@@ -21,10 +21,9 @@ struct t_header note_h;
 FILE *note_fp;					/* the body of the current article */
 
 int glob_respnum;
-int last_resp;					/* current & previous article for - command */
+int last_resp, this_resp;		/* previous & current article # in arts[] for '-' command */
 int note_line;
 int note_page;					/* what page we're on */
-int this_resp;
 
 long note_mark[MAX_PAGES];	/* holds ftell() on beginning of each page */
 long mark_body;				/* holds ftell() on beginning of message body */
@@ -87,9 +86,7 @@ show_page (
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
 	int old_sort_art_type = tinrc.sort_article_type;
-	int old_top;
 	int posted_flag;
-	long old_artnum;
 	long art;
 	struct stat note_stat;
 	t_bool mouse_click_on = TRUE;
@@ -551,8 +548,7 @@ page_up:
 return_to_index:
 				art_close ();
 
-				if (filter_state == NO_FILTERING &&
-					tinrc.sort_article_type != old_sort_art_type) {
+				if (filter_state == NO_FILTERING && tinrc.sort_article_type != old_sort_art_type) {
 					make_threads (group, TRUE);
 				}
 
@@ -561,8 +557,8 @@ return_to_index:
 					*threadnum = which_response (respnum);
 
 				if (filter_state == FILTERING || local_filtered_articles) {
-					old_top = top;
-					old_artnum = arts[respnum].artnum;
+					int old_top = top;
+					long old_artnum = arts[respnum].artnum;
 					filter_articles (group);
 					make_threads (group, FALSE);
 					i = find_new_pos (old_top, old_artnum, i);
@@ -607,6 +603,8 @@ return_to_index:
 				/* NOTREACHED */
 
 			case iKeyPageListThd:	/* -> thread page that this article is in */
+				art_close ();
+				fixup_thread (respnum, FALSE);
 				return GRP_GOTOTHREAD;
 
 			case iKeyPageMail:	/* mail article/thread/tagged articles to somebody */
@@ -1157,11 +1155,8 @@ show_first_header (
 	/* Displaying the value of X-Comment-To header in the upper right corner */
 	if (note_h.ftnto[0] && tinrc.show_xcommentto) {
 		char ftbuf[HEADER_LEN]; /* FTN-To aka X-Comment-To */
-
 		my_fputs (buf, stdout);
-		parse_from(note_h.ftnto, buf, ftbuf);
-		if (*ftbuf == '\0')
-			strncpy (ftbuf, buf, 19);
+		strip_address(note_h.ftnto, ftbuf);
 		ftbuf[19] = '\0';
 		Convert2Printable (ftbuf);
 		StartInverse ();
@@ -1295,7 +1290,10 @@ show_cont_header (
 
 	assert (whichbase < top_base);
 
-	buf = (char *) my_malloc (strlen((arts[respnum].name ? arts[respnum].name : arts[respnum].from)) + strlen(note_h.subj) + cCOLS);
+	/* the last term in the length of the buffer is mainly to shut
+	   checker up although we still depend on txt_thread_resp_page
+	   not being too long */
+	buf = (char *) my_malloc (strlen((arts[respnum].name ? arts[respnum].name : arts[respnum].from)) + strlen(note_h.subj) + cCOLS + 5*3*sizeof(int));
 
 	if (whichresp) {
 		sprintf(buf, txt_thread_resp_page,
@@ -1588,7 +1586,7 @@ match_header (
 	 * Does ': ' follow the header text?
 	 * or are we searching for a prefix?
 	 */
-	if (buf[plen] != ':' || buf[plen+1] != ' ')
+	if (strlen(buf) < plen + 2 || buf[plen] != ':' || buf[plen+1] != ' ')
 		/* if (pat[plen-1] != '-') */
 		if (!(body && nodec_body))
 			return FALSE;

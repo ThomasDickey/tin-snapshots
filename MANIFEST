@@ -1,10 +1,10 @@
-MANIFEST for tin-pre-1.4-19990413 (Tue Apr 13 14:58:19 CEST 1999)
+MANIFEST for tin-pre-1.4-19990517 (Mon May 17 18:04:22 CEST 1999)
 ----------------------------------------------------
-   9248 ./Makefile
-   4459 ./MANIFEST
+   9272 ./Makefile
+   4484 ./MANIFEST
    1278 ./README
    2209 ./README.VMS
-   1168 ./README.WIN
+   1515 ./README.WIN
   57956 ./aclocal.m4
     727 ./conf-tin
   27466 ./config.guess
@@ -14,10 +14,10 @@ MANIFEST for tin-pre-1.4-19990413 (Tue Apr 13 14:58:19 CEST 1999)
    4765 ./install.sh
   11883 ./makefile.in
     661 ./mkdirs.sh
- 141461 ./doc/CHANGES
+ 143161 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
-  21301 ./doc/INSTALL
-  19248 ./doc/TODO
+  21375 ./doc/INSTALL
+  19195 ./doc/TODO
    2876 ./doc/WHATSNEW
   12688 ./doc/auth.txt
    8375 ./doc/filtering
@@ -35,69 +35,69 @@ MANIFEST for tin-pre-1.4-19990413 (Tue Apr 13 14:58:19 CEST 1999)
     535 ./include/bool.h
    1213 ./include/bugrep.h
    8261 ./include/config.h
-  52543 ./include/extern.h
+  52545 ./include/extern.h
   13261 ./include/menukeys.h
    5053 ./include/nntplib.h
-   3085 ./include/policy.h
-  24651 ./include/proto.h
+   3083 ./include/policy.h
+  24775 ./include/proto.h
    2212 ./include/stpwatch.h
    2721 ./include/tcurses.h
-  54319 ./include/tin.h
+  54415 ./include/tin.h
    8386 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1104 ./include/version.h
-  25310 ./src/active.c
+   1103 ./include/version.h
+  25454 ./src/active.c
   38792 ./src/art.c
-  22945 ./src/attrib.c
-  10326 ./src/auth.c
+  22956 ./src/attrib.c
+  10378 ./src/auth.c
    8939 ./src/charset.c
    6220 ./src/color.c
-  59440 ./src/config.c
+  59562 ./src/config.c
   22205 ./src/curses.c
   11867 ./src/debug.c
    2300 ./src/envarg.c
-  19132 ./src/feed.c
-  45948 ./src/filter.c
+  19136 ./src/feed.c
+  46013 ./src/filter.c
   12168 ./src/getline.c
-  41406 ./src/group.c
+  41487 ./src/group.c
    3077 ./src/hashstr.c
    7928 ./src/header.c
   11402 ./src/help.c
    9577 ./src/inews.c
-  30945 ./src/init.c
+  30990 ./src/init.c
    1412 ./src/joinpath.c
-  91842 ./src/lang.c
+  91856 ./src/lang.c
    2976 ./src/list.c
-  10506 ./src/mail.c
-  23853 ./src/main.c
+  10470 ./src/mail.c
+  23388 ./src/main.c
    8741 ./src/makecfg.c
    8524 ./src/memory.c
-  79608 ./src/misc.c
-  37444 ./src/newsrc.c
+  80774 ./src/misc.c
+  37397 ./src/newsrc.c
   23625 ./src/nntplib.c
    5770 ./src/nrctbl.c
-  23676 ./src/open.c
-  41696 ./src/page.c
+  23708 ./src/open.c
+  41872 ./src/page.c
   24159 ./src/parsdate.y
-   8397 ./src/pgp.c
-  98102 ./src/post.c
-  12369 ./src/prompt.c
-   8854 ./src/read.c
-  23478 ./src/refs.c
+   8391 ./src/pgp.c
+  97513 ./src/post.c
+  12370 ./src/prompt.c
+   8806 ./src/read.c
+  23672 ./src/refs.c
    1796 ./src/regex.c
-  11486 ./src/rfc1521.c
+  11511 ./src/rfc1521.c
   22688 ./src/rfc1522.c
-  35679 ./src/save.c
+  35675 ./src/save.c
    5434 ./src/screen.c
   10297 ./src/search.c
-  35286 ./src/select.c
+  35407 ./src/select.c
    6607 ./src/sigfile.c
-  10753 ./src/signal.c
+  10866 ./src/signal.c
    5765 ./src/strftime.c
   10355 ./src/string.c
-   6605 ./src/tcurses.c
-  32045 ./src/thread.c
+   6667 ./src/tcurses.c
+  31887 ./src/thread.c
    1044 ./src/trace.c
    4345 ./src/wildmat.c
    6328 ./src/xref.c
@@ -131,37 +131,38 @@ MANIFEST for tin-pre-1.4-19990413 (Tue Apr 13 14:58:19 CEST 1999)
    1705 ./vms/vmsfile.c
    5652 ./vms/vmspwd.c
     389 ./vms/vmstimval.h
-  15336 ./pcre/ChangeLog
-   2267 ./pcre/Makefile.in
+  15924 ./pcre/ChangeLog
+   1143 ./pcre/LICENCE
+   2293 ./pcre/Makefile.in
    2274 ./pcre/Makefile.orig
-   1960 ./pcre/RunTest
-  15741 ./pcre/README
+  15739 ./pcre/README
+   1962 ./pcre/RunTest
    9493 ./pcre/Tech.Notes
    2384 ./pcre/pgrep.1
-  62604 ./pcre/pcre.3
+  64530 ./pcre/pcre.3
    5068 ./pcre/pcreposix.3
    4486 ./pcre/dftables.c
    6466 ./pcre/get.c
    3338 ./pcre/maketables.c
- 125923 ./pcre/pcre.c
+ 126310 ./pcre/pcre.c
    8048 ./pcre/pcreposix.c
    4764 ./pcre/pgrep.c
   10942 ./pcre/study.c
-  13536 ./pcre/internal.h
+  13542 ./pcre/internal.h
    2100 ./pcre/pcre.h
    2159 ./pcre/pcreposix.h
   23879 ./pcre/pcretest.c
    2989 ./pcre/perltest
-  50648 ./pcre/testinput
-   4716 ./pcre/testinput2
+  51543 ./pcre/testinput1
+   4797 ./pcre/testinput2
   16130 ./pcre/testinput3
     547 ./pcre/testinput4
-  61174 ./pcre/testoutput
-  17688 ./pcre/testoutput2
+  62640 ./pcre/testoutput1
+  19709 ./pcre/testoutput2
   26078 ./pcre/testoutput3
    1452 ./pcre/testoutput4
   10202 ./include/autoconf.hin
-  12120 ./src/Makefile.in
+  12121 ./src/Makefile.in
    2124 ./src/ibm437_l1.tab
    2124 ./src/ibm850_l1.tab
    2124 ./src/l1_ibm437.tab
@@ -181,4 +182,4 @@ MANIFEST for tin-pre-1.4-19990413 (Tue Apr 13 14:58:19 CEST 1999)
    2225 ./old/os_2.h
    3753 ./old/win32.h
     786 ./old/win32tcp.h
-2912159 total
+2924110 total
