@@ -771,6 +771,7 @@ group_selection_page ()
 	char buf[LEN];
 	char new[10];
 	char subs;
+	char *smal_buffer="?????";
 	int i, j, n;
 	int blank_len;
 	char active_name[255];
@@ -861,15 +862,21 @@ group_selection_page ()
 		strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
 		group_descript[blank_len+1] = '\0';
 
+		if (i>=9999) {
+			strcpy (smal_buffer, "   ?");
+		} else {
+			sprintf (smal_buffer, "%4d", i+1);
+		}
+
 		if (show_description) {
 			if (active[n].description) {
-				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s  %-*.*s\r\n",
-				         subs, i+1, new,
+				sprintf (screen[j].col, "  %c %4.4s %-5.5s  %-*.*s  %-*.*s\r\n",
+				         subs, smal_buffer, new,
 				         groupname_len, groupname_len, active_name,
 				         blank_len, blank_len, group_descript);
 			} else {
-				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s  \r\n",
-				         subs, i+1, new,
+				sprintf (screen[j].col, "  %c %4.4s %-5.5s  %-*.*s  \r\n",
+				         subs, smal_buffer, new,
 				         (groupname_len+blank_len),
 				         (groupname_len+blank_len), active[n].name);
 			}
