@@ -226,15 +226,14 @@
 
 #undef	DONT_HAVE_TM_GMTOFF
 
-#if defined(apollo) || defined(AUX) || defined(BSD) || defined(linux) || \
-    defined(__hpux) || defined(__osf__) || defined(PTX) || defined(QNX42) || \
-    defined(RS6000) || defined(sinix) || defined(SVR4) || defined(UMAXV) || \
+#if defined(AUX) || defined(BSD) || \
+    defined(PTX) || defined(QNX42) || \
+    defined(RS6000) || defined(sinix) || defined(UMAXV) || \
     defined(WIN32)
-#	define	HAVE_LONG_FILENAMES
+#	define	HAVE_LONG_FILE_NAMES
 #endif
 
-#if defined(apollo) || defined(BSD) || defined(__hpux) || defined(linux) || \
-    defined(__osf__) || defined(M_OS2) || defined(RS6000) || defined(sinix) || \
+#if defined(M_OS2) || defined(RS6000) || defined(sinix) || \
     defined(UMAXV) || defined(VMS)
 #	define	HAVE_GETHOSTBYNAME
 #endif

@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960610
+PVER		= 960611
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -65,6 +65,7 @@ CFILES	= \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
 	$(SRCDIR)/nntpw32.c \
+	$(SRCDIR)/nrctbl.c \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/os_2.c \
 	$(SRCDIR)/page.c \

@@ -267,9 +267,9 @@ main (argc, argv)
 #		define OPTIONS "BcCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
 #	else
 #               ifdef HAVE_COLOR
-#		        define OPTIONS "acCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#		        define OPTIONS "acCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
 #               else
-#		        define OPTIONS "cCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#		        define OPTIONS "cCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
 #               endif
 #	endif
 #endif
@@ -280,7 +280,8 @@ read_cmd_line_options (argc, argv)
 	char *argv[];
 {
 	int ch;
-
+	int newsrc_set = 0;
+	
 	envargs (&argc, &argv, "TINRC");
 	
 	while ((ch = getopt (argc, argv, OPTIONS)) != EOF) {
@@ -324,6 +325,17 @@ read_cmd_line_options (argc, argv)
 				my_strncpy (news_active_file, optarg, sizeof (news_active_file));
 #else
 				my_strncpy (newsrc, optarg, sizeof (newsrc));
+				newsrc_set = 1;
+#endif
+				break;
+
+			case 'g':	/* select alternative NNTP-server, implies -r */
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+				my_strncpy(cmdline_nntpserver, optarg, sizeof(cmdline_nntpserver));
+				read_news_via_nntp = TRUE;
+#else
+				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
+				exit (1);
 #endif
 				break;
 
@@ -438,6 +450,9 @@ read_cmd_line_options (argc, argv)
 	cmdargs = argv;
 	num_cmdargs = optind;
 	max_cmdargs = argc;
+	if (!newsrc_set)
+		get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
+
 }
 
 /*
@@ -455,45 +470,48 @@ usage (progname)
 #endif
 	error_message ("Usage: %s [options] [newsgroups]", progname);
 #ifndef INDEX_DAEMON
-#ifdef HAVE_COLOR
-	error_message ("  -a       toggle color flag","");
-#endif
+#	ifdef HAVE_COLOR
+		error_message ("  -a       toggle color flag","");
+#	endif /* HAVE_COLOR */
 #	ifdef M_AMIGA
-	error_message ("  -B       BBS mode. File operations limited to home directories.","");
-#	endif
+		error_message ("  -B       BBS mode. File operations limited to home directories.","");
+#	endif /* M_AMIGA */
 	error_message ("  -c       mark all news as read in subscribed newsgroups (batch mode)", "");
 	error_message ("  -C       count unread articles", "");
 	error_message ("  -f file  subscribed to newsgroups file [default=%s]", newsrc);
 #else
 	error_message ("  -d       delete index file before indexing articles", "");
 	error_message ("  -f file  active newsgroups file [default=%s]", newsrc);
-#endif
+#endif /* INDEX_DAEMON */
+#ifdef NNTP_ABLE
+	error_message ("  -g serv  read news from NNTP server serv", "");
+#endif /* NNTP_ABLE */
 	error_message ("  -h       this help message", "");
 #ifndef INDEX_DAEMON
 	error_message ("  -H       help information about %s", progname);
-#endif
+#endif /* INDEX_DAEMON */
 	error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
 #ifndef INDEX_DAEMON
 	error_message ("  -m dir   mailbox directory [default=%s]", default_maildir);
 	error_message ("  -M user  mail new news to specified user (batch mode)", "");
-#ifdef NNTP_ABLE
-	error_message ("  -n       only read subscribed .newsrc groups from NNTP server", "");
-#endif
+#	ifdef NNTP_ABLE
+		error_message ("  -n       only read subscribed .newsrc groups from NNTP server", "");
+#	endif /* NNTP_ABLE */
 	error_message ("  -P       purge any expired articles from index files", "");
 	error_message ("  -q       quick start by not checking for new newsgroups", "");
-#  if defined(NNTP_ABLE) && !defined(NNTP_ONLY)
-	if (! read_news_via_nntp) {
-		error_message ("  -r       read news remotely from default NNTP server", "");
-	}
-#  endif /* NNTP_ABLE */	
+#	if defined(NNTP_ABLE) && !defined(NNTP_ONLY)
+		if (! read_news_via_nntp) {
+			error_message ("  -r       read news remotely from default NNTP server", "");
+		}
+#	endif /* NNTP_ABLE */	
 	error_message ("  -R       read news saved by -S option", "");
 	error_message ("  -s dir   save news directory [default=%s]", default_savedir);
 	error_message ("  -S       save new news for later reading (batch mode)", "");
-#  if !defined(NNTP_ONLY)
-	error_message ("  -u       update index files (batch mode)", "");
-	error_message ("  -U       update index files in the background while reading news", "");
-#  endif /* NNTP_ONLY */
-#else
+#	if !defined(NNTP_ONLY)
+		error_message ("  -u       update index files (batch mode)", "");
+		error_message ("  -U       update index files in the background while reading news", "");
+#	endif /* NNTP_ONLY */
+#	else
 	error_message ("  -P       purge any expired articles from index files", "");
 #endif /* INDEX_DAEMON */
 	error_message ("  -v       verbose output for batch mode options", "");
@@ -502,7 +520,7 @@ usage (progname)
 	error_message ("  -w       post an article and exit", "");
 	error_message ("  -z       start if any unread news", "");
 	error_message ("  -Z       return status indicating if any unread news (batch mode)", "");
-#endif
+#endif /* INDEX_DAEMON */
 	error_message ("\nMail bug reports/comments to %s", BUG_REPORT_ADDRESS);
 }
 

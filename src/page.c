@@ -193,7 +193,7 @@ restart:
 #endif
 
 			case iKeyPageLastPage:	/* goto end of article */
-			case iKeyPageLastPage2:	/* 'less' compatible */
+			case iKeyPageLastPage2:
 end_of_article:			
 				if (show_last_page ()) {
 					show_note_page (group->name, respnum);
@@ -253,7 +253,7 @@ end_of_article:
 
 			case iKeyPagePageDown:		/* page down or next response */
 			case iKeyPagePageDown2:
-			case iKeyPagePageDown3:		/* vi style */
+			case iKeyPagePageDown3:
 page_down:
 				if (! space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
@@ -385,9 +385,9 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPageRestartArt:		/* redraw beginning of article */
-			case iKeyPageRestartArt2:			/* 'less' compatible */
-			case iKeyPageRestartArt3:
+			case iKeyPageFirstPage:		/* goto beginning of article */
+			case iKeyPageFirstPage2:
+			case iKeyPageFirstPage3:
 begin_of_article:			
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
@@ -421,7 +421,7 @@ begin_of_article:
 
 			case iKeyPagePageUp:		/* page up */
 			case iKeyPagePageUp2:
-			case iKeyPagePageUp3:		/* vi style */
+			case iKeyPagePageUp3:
 page_up:
 				if (note_page == ART_UNAVAILABLE) {
 					art_close ();
@@ -868,10 +868,6 @@ print_a_line:
 			note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 		}
 
-#ifdef HAVE_COLOR
-		fcol(col_foot);
-#endif
-
 		if (first) {
 			EndInverse ();
 		}	
@@ -893,6 +889,9 @@ print_a_line:
 		note_end = TRUE;
 	}
 
+#ifdef HAVE_COLOR
+	fcol(col_text);
+#endif
 	if (note_end) {
 		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 		StartInverse ();	

@@ -25,7 +25,13 @@ info_message (str)
 	char *str;
 {
 	clear_message ();				/* Clear any old messages hanging around */
+#ifdef HAVE_COLOR
+	fcol(col_message);
+#endif
 	center_line (cLINES, FALSE, str);	/* center the message at screen bottom */
+#ifdef HAVE_COLOR
+	fcol(col_text);
+#endif
 	if (! cmd_line) {
 		MoveCursor (cLINES, 0);
 	}
@@ -37,7 +43,13 @@ wait_message (str)
 	char *str;
 {
 	clear_message ();	  /* Clear any old messages hanging around */
+#ifdef HAVE_COLOR
+	fcol(col_message);
+#endif
 	my_fputs (str, stdout);
+#ifdef HAVE_COLOR
+	fcol(col_text);
+#endif
 	cursoron ();
 	fflush (stdout);
 }

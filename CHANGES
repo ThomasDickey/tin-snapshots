@@ -1,3 +1,30 @@
+--950824BETA  PLMC.960611 --
+
+078) Sven Paulus <sven@oops.sub.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. tin -n fails if NNTP_ONLY and newsrc could not be read
+     FIX. active.c
+
+077) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code clean-up
+     FIX. refs.c, nrctbl.c, menukeys.h, proto.h, Makefile.in, autoconf.hin
+
+076) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more autoconf stuff
+     FIX. several supplied patches
+
+075) Branden Robinson <branden@purdue.edu>
+     ADD. code clean-up
+     FIX. several supplied patches
+
+074) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. even more color-support (mini-help, etc.)
+     FIX. several supplied patches
+
+073) Sven Paulus <sven@oops.sub.de>
+     ADD. multiple news-server support (tin -g)
+     FIX. several supplied patches
+
 --950824BETA  PLMC.960610 --
 
 072) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -39,9 +66,9 @@
      FIX. several supplied patches
 
 064) Chris Blum <chris@phil.uni-sb.de>
-     ADD. better alogorithm for mime-encoding =sequences or not
+     ADD. better algorithm for mime-encoding =sequences or not
      ADD. forged-cancel warning
-     FIX. several suppiled patches
+     FIX. several supplied patches
 
 063) Sven Paulus <sven@oops.sub.de>
      BUG. FIDO-style quoting via mail does not work
@@ -60,7 +87,7 @@
      FIX. page.c
 
 060) Chris Blum <chris@phil.uni-sb.de>
-     BUG. useless mime-headers without mimeencoding in the body
+     BUG. useless mime-headers without mime-encoding in the body
      FIX. rfc1522.c
 
 059) Thomas E. Dickey <dickey@clark.net>
@@ -69,7 +96,7 @@
 
 058) Roland Rosenfeld <roland@spinnaker.rhein.de>
      BUG. color was wrong when pressing 'K' mark_article_unread
-     BUG. 'x' repost_article only came up with the fullname (without
+     BUG. 'x' repost_article only came up with the full-name (without
           address)
      FIX. thread.c, post.c
 
@@ -101,7 +128,7 @@
      FIX. rfc1522.c, rfc1521.c
 
 052) Thomas E. Dickey <dickey@clark.net>
-     ADD. better alogorithm for creating MANIFEST
+     ADD. better algorithm for creating MANIFEST
      FIX. Makefile, makefile.in
 
 --950824BETA  PLMC.960527 --
@@ -175,7 +202,7 @@
      BUG. extraneous newline after "Checking for new newsgroups..."
      BUG. prompting with "Read article" where it should be "Read thread"
      ADD. 'Q' never asks before quitting tin
-     ADD. ANSI color enabled/disable footline at top level
+     ADD. ANSI color enabled/disable foot-line at top level
      ADD. shell escape to thread level.
      ADD. Add "^" command to top, group, thread, and article level
           (and help screen).
@@ -305,7 +332,7 @@
      ADD. iKeyPageDisplaySubject 'i' to show subject at page_level
      ADD. iKeyThreadDisplaySubject 'i' to show subject at thread_level
      BUG. compiling without -DHAVE_COLOR compiles color.c 
-     FIX. menuekeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c,
+     FIX. menukeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c,
           lang.c
 
 --950824BETA  PLMC.960401 --

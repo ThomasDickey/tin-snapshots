@@ -44,7 +44,6 @@ o  add
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
-   rem. INEWS_MAIL_DOMAIN default or set it to 'hostname -d'
 
 o  move architecture depending files in subdirectorys, clean up architecture
    independend files, rename several defines, remove useless doubled defines
@@ -129,8 +128,6 @@ o  toggle behavior of 't'ag is not mentioned in the man-page
 o  show a warning at startup if news-server is read-only
    print a message at startup if server doesn't grok XOVER
 
-o  -r not documented in command line help
-
 o  error message when tin -uv and using xover is misleading
 
 Not yet classified
@@ -147,10 +144,6 @@ o  marking hot-articles read with 'K' and then post-process the newsgroup
    also processes the read articles
 
 o  killing articles with Lines: 0 does not work
-
-o  if -DNNTP_ONLY and ~/.newsrc could not be read because you are not the
-   owner (don't ask how i found that bug), tin -n tries to read a local
-   active file - argh!
 
 o  canceling via Supersedes:/Also-Control:/Control:-header is possible if it
    is supplied by hand (buildin_inews)
@@ -238,7 +231,7 @@ o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
    (Velveeta-kill)
 
 o  fix kill/hot mechanism so that it is possible do kill articles with
-   "X-*" headers
+   "X-*" headers (X-Mailer: Bazilla 47.11 etc.)
 
 o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
    cnews-server

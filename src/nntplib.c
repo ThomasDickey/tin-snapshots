@@ -149,9 +149,14 @@ getserverbyfile (file)
 	register char	*cp;
 	static char	buf[256];
 
+	if (cmdline_nntpserver[0] != '\0') {
+		(void) get_nntpserver (buf, cmdline_nntpserver);
+		return (buf);
+	}
+
 	cp = (char *) getenv ("NNTPSERVER");
 	if (cp != (char *) 0) {
-		(void) strcpy (buf, cp);
+		(void) get_nntpserver (buf, cp);
 		return (buf);
 	}
 

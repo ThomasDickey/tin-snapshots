@@ -31,7 +31,9 @@
 #undef	NO_ETIQUETTE
 #undef	MIME_BREAK_LONG_LINES
 #undef	MIME_STRICT_CHARSET
+#undef	MM_CHARSET
 #undef	FORGERY
+#undef	USE_INN_NNTPLIB
 
 /*
  * These are defined if the corresponding program is found during configuration
@@ -198,7 +200,7 @@
 /*
  * Define this if the host system has long (>14 character) filenames
  */
-#undef	HAVE_LONG_FILENAMES
+#undef	HAVE_LONG_FILE_NAMES
 
 /*
  * Define this if the compiler performs ANSI-style token substitution (used in

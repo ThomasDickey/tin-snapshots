@@ -15,7 +15,7 @@
 #include	"tin.h"
 #include	"stpwatch.h"
 
-#define SortBy(func) qsort ((char *) arts, (size_t)top, sizeof (struct t_article), func);
+#define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
 #define CorruptIndex(n)  error = n; goto corrupt_index;
 
 char *glob_art_group;
