@@ -1,3 +1,14 @@
+--unoff BETA release 960720 --
+
+121) Daniel Naber <dnaber@pluto.teuto.de>
+     ADD. interactive call of user defined mailer
+     FIX. several suppiled patches
+
+120) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. moved some newsgroup specific defaults from feed.c to attrib.c
+     ADD. minor code clean up
+     FIX. feed.c, attrib.c, menukeys.h
+
 --unoff BETA release 960718 --
 
 119) Jason Faultless <jason@radar.demon.co.uk>

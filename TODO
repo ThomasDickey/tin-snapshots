@@ -1,5 +1,10 @@
 Bugs
 ----
+o  mail_bugreport does not care about use_mailreader_i=ON
+
+o  using other mailers than sendmail without use_mailreader_i=ON may leed to
+   multiple signatures
+
 o  tins killfile editor does not quote brackets, stars and questionmarks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
@@ -8,9 +13,6 @@ o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())
 
 o  fix article superseding that it enters the editor emediately
-
-o  strip hard-coded values (binaries/sources) from feed.c
-   add default to attributes... 
 
 o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
    true...
@@ -49,7 +51,7 @@ o  'D' deleted article flag (thread selection level) is not showing up.
    (is it still needed?!)
 
 o  marking latest article with 'K' does not jump to top of newsgroup if
-   there are still articles to read
+   there are still articles to read (group.c:740)
 
 o  screen.c:center_line() no range check for cCOLS. Excessively long
    messages cause a scroll and no redraw
