@@ -8,7 +8,7 @@
  *              from the Elm mail system. This library was hacked to provide 
  *              what tin needs.
  *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
- *              The Elm Mail System  -  $Revision: 2.1.1.3 $   $State: Exp $
+ *              The Elm Mail System  -  @Revision: 2.1 $   $State: Exp @
  */
 
 #include "tin.h"
@@ -16,6 +16,7 @@
 #ifndef ns32000
 #	undef	sinix
 #endif
+
 #ifdef VMS
 #include <descrip.h>
 #include <iodef.h>
@@ -26,7 +27,6 @@
 #include <lib$routines.h>
 #endif
 #endif
-
 
 #ifdef HAVE_ERRNO_H
 #	include <errno.h>
@@ -46,45 +46,78 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 
 #ifndef INDEX_DAEMON
 
-#define		BACKSPACE	'\b'
-#define		VERY_LONG_STRING	2500
+#define BACKSPACE        '\b'
+#define VERY_LONG_STRING 2500
+#define TTYIN            0
+
+#ifdef HAVE_CONFIG_H
+
+#if HAVE_TERMIOS_H
+#	ifdef HAVE_IOCTL_H
+#		include <ioctl.h>
+#	else
+#		ifdef HAVE_SYS_IOCTL_H
+#			include <sys/ioctl.h>
+#		endif
+#	endif
+#	if !defined(sun) || !defined(NL0)
+#		include <termios.h>
+#	endif
+#	define USE_POSIX_TERMIOS 1
+#	define TTY struct termios
+#else
+#	if HAVE_TERMIO_H
+#		include <termio.h>
+#		define USE_TERMIO 1
+#		define TTY struct termio
+#	else
+#		if HAVE_SGTTY_H
+#			include <sgtty.h>
+#			define USE_SGTTY 1
+#			define TTY struct sgttyb
+#		else
+			please-fix-me(thanks)
+#		endif
+#	endif
+#endif
+static	TTY _raw_tty, _original_tty;
+
+#else	/* FIXME: prune the non-autoconf'd stuff */
 
 #if (defined(M_AMIGA) && !defined(__SASC)) || defined(COHERENT) || defined(BSD)
-#	ifndef BSD4_1
-#		include <sgtty.h>
-#	else
+#	ifdef BSD4_1
 #		include <termio.h>
+#		define USE_TERMIO 1
+#	else
+#		include <sgtty.h>
+#		define USE_SGTTY 1
 #	endif
 #else
 #	ifndef SYSV
-#		ifndef MINIX
+#		ifdef MINIX
+#			include <sgtty.h>
+#			define USE_SGTTY 1
+#		else
 #			ifndef QNX42
 #				ifdef sinix
 #					include <termios.h>
+#					define USE_POSIX_TERMIOS 1
 #				else
 #					ifdef VMS
 #						include <curses.h>
 #					else
 #						include <termio.h>
+#						define USE_TERMIO 1
 #					endif
 #				endif
 #			endif
-#		else
-#			include <sgtty.h>
 #		endif
 #	else
 #		if defined(__hpux) || (defined(sun) && defined(SVR4))
 #			include <termio.h>
+#			define USE_TERMIO 1
 #		endif
 #	endif
-#endif
-
-#define TTYIN	0
-
-#ifdef SHORTNAMES
-# define _clearinverse	_clrinv
-# define _cleartoeoln	_clrtoeoln
-# define _cleartoeos	_clr2eos
 #endif
 
 #ifndef VMS
@@ -97,28 +130,40 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 #		undef TCSETAW
 #	endif
 #	define TCSETAW	TIOCSETP
-struct sgttyb _raw_tty,
-	      _original_tty;
+#	define USE_SGTTY 1
+struct sgttyb _raw_tty, _original_tty;
 #else
-#	if !defined(M_AMIGA)
+#	if !defined(M_AMIGA) && !defined(M_OS2)
 #		if defined(HAVE_TERMIOS_H) || defined(sinix)
 #			ifndef TCGETA
 #				define TCGETA	STCGETA
 #			endif
-#			ifndef TCSETA
+#			ifndef TCSETAW
 #				define TCSETAW	STCSETAW
 #			endif
-struct termios _raw_tty,
-	      _original_tty;
+#			define USE_POSIX_TERMIOS 1
+struct termios _raw_tty, _original_tty;
 #		else
-#			ifndef M_OS2
-struct termio _raw_tty,
-	      _original_tty;
-#			endif
+#			define USE_TERMIO 1
+struct termio _raw_tty, _original_tty;
 #		endif
 #	endif
 #endif
 #endif /* VMS */
+
+#endif /* HAVE_CONFIG_H */
+
+#ifndef USE_SGTTY
+#define USE_SGTTY 0
+#endif
+
+#ifndef USE_TERMIO
+#define USE_TERMIO 0
+#endif
+
+#ifndef USE_POSIX_TERMIOS
+#define USE_POSIX_TERMIOS 0
+#endif
 
 static char *_clearscreen, *_moveto, *_cleartoeoln, *_cleartoeos,
 			*_setinverse, *_clearinverse, *_setunderline, *_clearunderline,
@@ -132,6 +177,15 @@ static char *_getwinsize;
 static int _columns, _line, _lines;
 
 #ifdef M_UNIX
+
+#ifndef HAVE_TCSETATTR
+#define tcsetattr(fd,cmd,arg) ioctl(fd, cmd, arg)
+#endif
+
+#ifndef HAVE_TCGETATTR
+#define tcgetattr(fd, arg)    ioctl(fd, TCGETA, arg)
+#endif
+
 static char _terminal[1024];		/* Storage for terminal entry */
 static char _capabilities[1024];	/* String for cursor motion */
 
@@ -732,15 +786,10 @@ Raw (state)
 #endif
 		_inraw = 0;
 	} else if (state == TRUE && ! _inraw) {
-#ifdef HAVE_TCGETATTR
 		(void) tcgetattr (TTYIN, &_original_tty);
 		(void) tcgetattr (TTYIN, &_raw_tty);
-#else
-		(void) ioctl (TTYIN, TCGETA, &_original_tty);	/* current setting */
-		(void) ioctl (TTYIN, TCGETA, &_raw_tty);	/* again! */
-#endif
 
-#if defined(BSD) || defined(M_AMIGA) || defined(MINIX)
+#if USE_SGTTY || defined(M_AMIGA) || defined(MINIX)
 		_raw_tty.sg_flags &= ~(ECHO | CRMOD);	/* echo off */
 		_raw_tty.sg_flags |= CBREAK;		/* raw on */
 #ifdef M_AMIGA	

@@ -117,7 +117,10 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "col_text=", &col_text, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_foot=", &col_foot, MAX_COLOR)) {
+			if (match_integer (buf, "col_minihelp=", &col_minihelp, MAX_COLOR)) {
+				break;
+			}
+			if (match_integer (buf, "col_message=", &col_message, MAX_COLOR)) {
 				break;
 			}
 			if (match_integer (buf, "col_quote=", &col_quote, MAX_COLOR)) {
@@ -530,8 +533,10 @@ write_config_file (file)
 	fprintf (fp, "col_invers=%d\n\n", col_invers);
 	fprintf (fp, "#Color of textlines\n");
 	fprintf (fp, "col_text=%d\n\n", col_text);
-	fprintf (fp, "#Color of footlines (Help,...)\n");
-	fprintf (fp, "col_foot=%d\n\n", col_foot);
+	fprintf (fp, "#Color of mini help menu\n");
+	fprintf (fp, "col_minihelp=%d\n\n", col_minihelp);
+	fprintf (fp, "#Color of messages in last line\n");
+	fprintf (fp, "col_message=%d\n\n", col_message);
 	fprintf (fp, "#Color of quotelines\n");
 	fprintf (fp, "col_quote=%d\n\n", col_quote);
 	fprintf (fp, "#Color of headerlines\n");

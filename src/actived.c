@@ -112,7 +112,7 @@ vInitVariables ()
 		psPwd = getpwuid (getuid ());
 	}
 	if (psPwd != (struct passwd *) 0) {	
-		memcpy ((char *) &sPwd, (char *) psPwd, sizeof (struct passwd));
+		memcpy (&sPwd, psPwd, sizeof (struct passwd));
 		psPwd = &sPwd;
 	}
 #endif

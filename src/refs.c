@@ -93,7 +93,6 @@ static int collapse_thread P_((int i, int level));
  */
 
 
-FILE *dumpfd;
 
 /*-------------------------------------------------------------------------
  * THIS IS ABYSMALLY INEFFICIENT
@@ -227,19 +226,19 @@ collapse_thread(i, level)
 
 		arts[arts[i].sibling].inthread = TRUE;		/* Sibling is in a thread */
 
-/* The next two lines are mutually Xclusive and should be optimised ? */
+	/* The next two lines are mutually Xclusive and should be optimised ? */
 
-		/*
-	     * If we have a propogated ptr from the bottom of this thread,
-		 * point it at our sibling, to preserve the flow of the thread
-   	  	 */
+	/*
+	 * If we have a propogated ptr from the bottom of this thread,
+	 * point it at our sibling, to preserve the flow of the thread
+	 */
 	    if (bottom != -1)
 	        arts[bottom].thread = arts[i].sibling;
 
-		/*
-		 * If we haven't already got a ptr down to a child we
-		 * move on to our sibling
-	 	 */
+	/*
+	 * If we haven't already got a ptr down to a child we
+	 * move on to our sibling
+	 */
 		if (arts[i].thread == NO_THREAD)
 			arts[i].thread = arts[i].sibling;		/* We -> to sibling */
 
@@ -270,6 +269,8 @@ thread_by_reference (group)
 	char *refer;
 
 #if 0
+	FILE *dumpfd;
+	
 	fprintf (stderr, "\nthread_arts=[%d]  attr_thread_arts=[%d]\n", 	
 		default_thread_arts, group->attribute->thread_arts);
 #endif

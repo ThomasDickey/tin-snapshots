@@ -1973,7 +1973,7 @@ strfpath (format, str, maxsize, homedir, maildir, savedir, group)
 					if (strfpath (savedir, buf, sizeof (buf), homedir,
 					    (char *) 0, (char *) 0, (char *) 0)) {
 
-#ifdef HAVE_LONG_FILENAMES
+#ifdef HAVE_LONG_FILE_NAMES
 						my_strncpy (tmp, group, sizeof (tmp));
 #else
 						my_strncpy (tmp, group, 14);

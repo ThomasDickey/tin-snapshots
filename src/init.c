@@ -21,6 +21,7 @@ char add_addr[LEN];			/* address to add to rR reply to author with mail */
 char article[PATH_LEN];			/* ~/.article file */
 char bug_addr[LEN];			/* address to add send bug reports to */
 char cmd_line_printer[PATH_LEN];	/* printer program specified on cmd line */
+char cmdline_nntpserver[PATH_LEN];
 char cvers[LEN];
 char dead_article[PATH_LEN];		/* ~/dead.article file */
 char dead_articles[PATH_LEN];		/* ~/dead.articles file */
@@ -51,6 +52,7 @@ char lock_file[PATH_LEN];		/* contains name of index lock file */
 char local_config_file[PATH_LEN];
 char local_filter_file[PATH_LEN];
 char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
+char local_newsrctable_file[PATH_LEN];
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mail_active_file[PATH_LEN];
@@ -158,7 +160,8 @@ int use_color_tinrc;			/* like use_color but stored in tinrc */
 int col_back;				/* standard bacground color */
 int col_invers;				/* color of inverse text */
 int col_text;				/* color of textlines*/
-int col_foot;				/* color of footlines (Help,...) */
+int col_minihelp;			/* color of mini help */
+int col_message;			/* color of message lines at bottom */
 int col_quote;				/* color of quotelines */
 int col_head;				/* color of headerlines */
 int col_subject;			/* color of article subject */
@@ -279,7 +282,7 @@ void init_selfinfo ()
 		myentry = getpwuid (getuid ());
 	}
 	if (myentry != (struct passwd *) 0) {	
-		memcpy ((char *) &pwdentry, (char *) myentry, sizeof (struct passwd));
+		memcpy (&pwdentry, myentry, sizeof (struct passwd));
 		myentry = &pwdentry;
 	}
 #if defined(M_OS2) || defined(WIN32)
@@ -337,6 +340,7 @@ void init_selfinfo ()
 	auto_list_thread = TRUE;
 	beginner_level = TRUE;
 	catchup_read_groups = FALSE;
+	cmdline_nntpserver[0] = '\0';
 	confirm_action = TRUE;
 	confirm_to_quit = TRUE;
 	count_articles = FALSE;
@@ -436,7 +440,8 @@ void init_selfinfo ()
 	col_back = 0;
 	col_invers = 4;
 	col_text = 7;
-	col_foot = 7;
+	col_minihelp = 3;
+	col_message = 6;
 	col_quote = 2;
 	col_head = 2;
 	col_subject = 6;
@@ -572,6 +577,7 @@ void init_selfinfo ()
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
 	joinpath (local_config_file, rcdir, CONFIG_FILE);
 	joinpath (local_filter_file, rcdir, FILTER_FILE);
+	joinpath (local_newsrctable_file, rcdir, NEWSRCTABLE_FILE);
 	joinpath (local_newsgroups_file, rcdir, NEWSGROUPS_FILE);
 	joinpath (mail_active_file, rcdir, ACTIVE_MAIL_FILE);
 #ifdef VMS
@@ -607,7 +613,7 @@ void init_selfinfo ()
 		my_mkdir (index_newsdir, 0755);
 	}
 #else
-#	ifdef HAVE_LONG_FILENAMES
+#	ifdef HAVE_LONG_FILE_NAMES
 		sprintf (lock_file, "%stin.%s.LCK", TMPDIR, userid);
 #	else
 		sprintf (lock_file, "%s%s.LCK", TMPDIR, userid);

@@ -1625,7 +1625,7 @@ mail_bug_report ()
 		fprintf (fp, "Please enter the following information:\n");
 		fprintf (fp, "BOX1: Machine+OS:\n");
 	}
-#ifdef HAVE_LONG_FILENAMES
+#ifdef HAVE_LONG_FILE_NAMES
 	is_longfiles = TRUE;
 #else
 	is_longfiles = FALSE;

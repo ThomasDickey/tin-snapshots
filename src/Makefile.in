@@ -3,6 +3,7 @@
 SHELL	= /bin/sh
 prefix	= @prefix@
 exec_prefix = @exec_prefix@
+srcdir	= @srcdir@
 
 # From: address in posted articles (don't use both - read the INSTALL file)
 # Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
@@ -19,7 +20,7 @@ NNTP_DEFAULT_SERVER=@NNTP_DEFAULT_SERVER@
 # Where are your news libdir & spooldir?
 LIBDIR	= @LIBDIR@
 SPOOLDIR= @SPOOLDIR@
-NOVROOTDIR= $(SPOOLDIR)
+NOVROOTDIR= @NOVROOTDIR@
 
 # Compiler, linker & parser commands
 CC	= @CC@
@@ -63,10 +64,10 @@ MANEXT	= 1
 
 # directory structure
 DOCDIR	= ../doc
-INCDIR	= ../include
+INCDIR	= $(srcdir)/../include
 BINDIR	= .
 OBJDIR	= .
-SRCDIR	= .
+SRCDIR	= $(srcdir)
 
 # standard commands
 CHGRP	= chown
@@ -87,12 +88,9 @@ STRIP	= strip
 STRIP2	= mcs -d
 SU	= su
 TAGS	= ctags
-TOUCH	= touch
 
 HFILES	= \
 	$(INCDIR)/autoconf.h \
-	$(INCDIR)/amiga.h \
-	$(INCDIR)/amigatcp.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -100,6 +98,8 @@ HFILES	= \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h
+#	$(INCDIR)/amiga.h
+#	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/config.h
 #	$(INCDIR)/gst.h
 #	$(INCDIR)/msmail.h
@@ -110,22 +110,20 @@ HFILES	= \
 CFILES	= \
 	$(SRCDIR)/active.c \
 	$(SRCDIR)/actived.c \
-	$(SRCDIR)/amiga.c \
-	$(SRCDIR)/amigatcp.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/charset.c \
 	$(SRCDIR)/color.c \
 	$(SRCDIR)/config.c \
 	$(SRCDIR)/curses.c \
-	$(SRCDIR)/debug.c\
+	$(SRCDIR)/debug.c \
 	$(SRCDIR)/envarg.c \
 	$(SRCDIR)/feed.c \
 	$(SRCDIR)/filter.c \
 	$(SRCDIR)/getline.c \
 	$(SRCDIR)/group.c \
 	$(SRCDIR)/hashstr.c \
-	$(SRCDIR)/help.c\
+	$(SRCDIR)/help.c \
 	$(SRCDIR)/inews.c \
 	$(SRCDIR)/init.c \
 	$(SRCDIR)/lang.c \
@@ -134,14 +132,15 @@ CFILES	= \
 	$(SRCDIR)/main.c \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
-	$(SRCDIR)/newsrc.c\
+	$(SRCDIR)/newsrc.c \
 	$(SRCDIR)/nntplib.c \
+	$(SRCDIR)/nrctbl.c \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
-	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/prompt.c \
 	$(SRCDIR)/refs.c \
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
@@ -155,6 +154,8 @@ CFILES	= \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/xref.c
+#	$(SRCDIR)/amiga.c
+#	$(SRCDIR)/amigatcp.c
 #	$(SRCDIR)/msmail.c
 #	$(SRCDIR)/nntpw32.c
 #	$(SRCDIR)/win32.c
@@ -162,25 +163,23 @@ CFILES	= \
 #	$(SRCDIR)/os_2.c
 #	$(SRCDIR)/vms.c
 
-OFILES	= \
+OFILES	= @ALLOCA@ \
 	$(OBJDIR)/active.o \
 	$(OBJDIR)/actived.o \
-	$(OBJDIR)/amiga.o \
-	$(OBJDIR)/amigatcp.o \
 	$(OBJDIR)/art.o \
 	$(OBJDIR)/attrib.o \
 	$(OBJDIR)/charset.o \
 	$(OBJDIR)/color.o \
 	$(OBJDIR)/config.o \
 	$(OBJDIR)/curses.o \
-	$(OBJDIR)/debug.o\
+	$(OBJDIR)/debug.o \
 	$(OBJDIR)/envarg.o \
 	$(OBJDIR)/feed.o \
 	$(OBJDIR)/filter.o \
 	$(OBJDIR)/getline.o \
 	$(OBJDIR)/group.o \
 	$(OBJDIR)/hashstr.o \
-	$(OBJDIR)/help.o\
+	$(OBJDIR)/help.o \
 	$(OBJDIR)/inews.o \
 	$(OBJDIR)/init.o \
 	$(OBJDIR)/lang.o \
@@ -189,15 +188,16 @@ OFILES	= \
 	$(OBJDIR)/main.o \
 	$(OBJDIR)/memory.o \
 	$(OBJDIR)/misc.o \
-	$(OBJDIR)/newsrc.o\
+	$(OBJDIR)/newsrc.o \
 	$(OBJDIR)/nntplib.o \
+	$(OBJDIR)/nrctbl.o \
 	$(OBJDIR)/open.o \
 	$(OBJDIR)/page.o \
 	$(OBJDIR)/parsdate.o \
 	$(OBJDIR)/pgp.o \
 	$(OBJDIR)/post.o \
-	$(OBJDIR)/prompt.o\
-	$(OBJDIR)/refs.o\
+	$(OBJDIR)/prompt.o \
+	$(OBJDIR)/refs.o \
 	$(OBJDIR)/rfc1521.o \
 	$(OBJDIR)/rfc1522.o \
 	$(OBJDIR)/save.o \
@@ -210,6 +210,8 @@ OFILES	= \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/wildmat.o \
 	$(OBJDIR)/xref.o
+#	$(OBJDIR)/amiga.o
+#	$(OBJDIR)/amigatcp.o
 #	$(OBJDIR)/win32.o
 #	$(OBJDIR)/vms.o
 #	$(OBJDIR)/os_2.o
@@ -300,7 +302,7 @@ tags:
 
 lint:	$(CFILES) $(SRCDIR)/parsdate.c
 	@$(ECHO) "Linting source (results in ./LINT)..."
-	@$(LINT) $(LINTFLAGS) -DNNTP_ABLE `/bin/ls -1 $(CFILES)|sed -e 's/\.y$$/.c/'` > LINT
+	@$(LINT) $(LINTFLAGS) -DNNTP_ABLE `/bin/ls $(CFILES)|sed -e 's/\.y/.c/'` $(LIBS) > LINT
 
 clean:
 	@$(ECHO) "Cleaning..."
@@ -337,6 +339,7 @@ $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_H) \
 				$(INCDIR)/stpwatch.h
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_H)
 $(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(TIN_H)
+$(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_H)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_H)
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(TIN_H)
 $(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(TIN_H)
@@ -358,12 +361,14 @@ $(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(TIN_H)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_H)
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(TIN_H)
 $(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(TIN_H)
+$(OBJDIR)/nrctbl.o:		$(SRCDIR)/nrctbl.c $(TIN_H)
 $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(TIN_H)
 $(OBJDIR)/page.o:		$(SRCDIR)/page.c $(TIN_H)
 $(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(TIN_H)
 $(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(TIN_H)
 $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_H)
 $(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(TIN_H)
+$(OBJDIR)/refs.o:		$(SRCDIR)/refs.c $(TIN_H)
 $(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(TIN_H)
 $(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(TIN_H)
 $(OBJDIR)/save.o:		$(SRCDIR)/save.c $(TIN_H)

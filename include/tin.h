@@ -517,7 +517,7 @@ extern char *get_uaf_fullname();
 #	define		DEFAULT_SUM		"sum -r"
 #endif
 
-#ifdef HAVE_LONG_FILENAMES
+#ifdef HAVE_LONG_FILE_NAMES
 #	define		LONG_PATH_PART	"part"
 #	define		LONG_PATH_PATCH "patch"
 #else
@@ -587,6 +587,7 @@ extern char *get_uaf_fullname();
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
+#define		NEWSRCTABLE_FILE	"newsrctable"
 #define 	NEWNEWSRC_FILE		".newnewsrc"
 #define 	OLDNEWSRC_FILE		".oldnewsrc"
 #define 	OVERVIEW_FILE		".overview"

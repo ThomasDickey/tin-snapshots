@@ -413,7 +413,7 @@ group_tab_pressed:
 	
 			case iKeyGroupPageDown:		/* page down */
 			case iKeyGroupPageDown2:
-			case iKeyGroupPageDown3:	/* vi style */
+			case iKeyGroupPageDown3:
 group_page_down:
 				if (! top_base) {
 					break;
@@ -532,8 +532,8 @@ group_page_down:
 				show_group_page ();
 				break;
 				
-			case iKeyGroupDown:
-			case iKeyGroupDown2:		/* line down */
+			case iKeyGroupDown:		/* line down */
+			case iKeyGroupDown2:
 group_down:
 				if (! top_base) {
 					break;
@@ -563,8 +563,8 @@ group_down:
 				}
 				break;
 
-			case iKeyGroupUp:
-			case iKeyGroupUp2:		/* line up */
+			case iKeyGroupUp:		/* line up */
+			case iKeyGroupUp2:
 group_up:
 				if (! top_base) {
 					break;
@@ -598,7 +598,7 @@ group_up:
 
 			case iKeyGroupPageUp:		/* page up */
 			case iKeyGroupPageUp2:
-			case iKeyGroupPageUp3:		/* vi style */
+			case iKeyGroupPageUp3:
 group_page_up:
 				if (! top_base) {
 					break;
@@ -730,7 +730,7 @@ group_catchup:
 				break;
 #endif
 
-			case iKeyGroupKillThd:	/* mark rest of thread as read */
+			case iKeyGroupMarkThdRead:	/* mark rest of thread as read */
 				if (index_point < 0) {
 					info_message (txt_no_next_unread_art);
 					break;

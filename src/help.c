@@ -418,7 +418,7 @@ show_info_page (type, help, title)
 				break;
 
 			case iKeyHelpPageDown:			/* page down */
-			case iKeyHelpPageDown2:			/* vi style */
+			case iKeyHelpPageDown2:
 			case iKeyHelpPageDown3:
 			case iKeyHelpPageDown4:
 help_page_down:
@@ -432,7 +432,7 @@ help_page_down:
 				break;
 			
 			case iKeyHelpPageUp:			/* page up */
-			case iKeyHelpPageUp2:			/* vi style */
+			case iKeyHelpPageUp2:
 			case iKeyHelpPageUp3:
 			case iKeyHelpPageUp4:
 help_page_up:
@@ -520,6 +520,10 @@ show_mini_help (level)
 
 	line = NOTESLINES + (MINI_HELP_LINES - 2);
 
+#ifdef HAVE_COLOR
+	fcol(col_minihelp);
+#endif
+
 	switch (level) {
 		case SELECT_LEVEL:
 			center_line (line,   FALSE, txt_mini_select_1);
@@ -547,6 +551,9 @@ show_mini_help (level)
 			error_message ("Unknown display level", "");
 			break;
 	}
+#ifdef HAVE_COLOR
+	fcol(col_text);
+#endif
 }
 
 

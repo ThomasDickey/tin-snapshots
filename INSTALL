@@ -6,21 +6,19 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following Makefile & ./include/tin.h defines are documented in detail:
 ---------------------------------------------------------------------------
-  DEBUG                    DEFAULT_ISO2ASC          DONT_HAVE_GETCWD
-  DONT_HAVE_MKDIR          HAVE_TIN_NNTP_EXTS       DONT_HAVE_STRTOL
-  DONT_LOG_USER            DONT_REREAD_ACTIVE_FILE  HAVE_FASCIST_NEWSADMIN
-  HAVE_ISPELL              HAVE_LONG_FILENAMES      HAVE_MH_MAIL_HANDLING
-  HAVE_MMDF_MAILER         HAVE_POLL                HAVE_POSIX_JC
-  HAVE_SELECT              HAVE_SETREUID            HAVE_STRFTIME
-  HAVE_TIN_NNTP_EXTS       INDEX_DAEMON             INEWS_MAIL_DOMAIN
-  INEWS_MAIL_GATEWAY       INEWSDIR                 LIBDIR
-  NETLIBS                  NNTP_ABLE                NNTP_DEFAULT_SERVER
-  NNTP_INEWS               NNTP_ONLY                NNTP_SERVER_FILE
-  NOVROOTDIR               NO_PIPING                NO_POSTING
-  NO_REGEX                 NO_SHELL_ESCAPE          SMALL_MEMORY_MACHINE
-  SPOOLDIR                 USE_INN_NNTPLIB          USE_INVERSE_HACK
-  HAVE_REF_THREADING
-
+  DEBUG                      HAVE_REF_THREADING         NNTP_DEFAULT_SERVER
+  DEFAULT_ISO2ASC            HAVE_SELECT                NNTP_INEWS
+  DONT_LOG_USER              HAVE_SETREUID              NNTP_ONLY
+  DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_SERVER_FILE
+  HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NOVROOTDIR
+  HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NO_PIPING
+  HAVE_ISPELL                INDEX_DAEMON               NO_POSTING
+  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_REGEX
+  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_SHELL_ESCAPE
+  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SMALL_MEMORY_MACHINE
+  HAVE_MMDF_MAILER           LIBDIR                     SPOOLDIR
+  HAVE_POLL                  NETLIBS                    USE_INN_NNTPLIB
+  HAVE_POSIX_JC              NNTP_ABLE                  USE_INVERSE_HACK
 
 News machine names
 ------------------
@@ -258,14 +256,6 @@ by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for
 logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
 BASE and NNTP.
 
-DONT_HAVE_MKDIR
-Define if your machine does not have the mkdir() system call.
-
-DONT_HAVE_STRTOL
-Define if your machine does not have the strtol() system call.
-
-DONT_HAVE_GETCWD
-Define if you don't have the getcwd() system call. getwd() will be used.
 
 DONT_LOG_USER
 Log user-name & info to /tmp/.tin_log for usage statistics. If reading via
@@ -297,13 +287,19 @@ posting to was not found in the sites active file to an error in the
 article checking routine therefore causing the user to remove the group
 from his/her posting or to abort the posting of the article.
 
+HAVE_GETCWD
+Defined if you have the getcwd() system call, otherwise getwd() will be used.
+
 HAVE_ISPELL
 Define if you have ispell (interactive spell-checker) installed and want the
 option of checking your articles, mails before posting/mailing them.
 
-HAVE_LONG_FILENAMES
+HAVE_LONG_FILE_NAMES
 Define if your machines file-system supports filenames longer than 14
 chars (default for BSD type systems).
+
+HAVE_MKDIR
+Defined if your machine has the mkdir() system call.
 
 HAVE_MH_MAIL_HANDLING
 Define if you want to use the MH style mail handling & reading code in mail.c
@@ -342,6 +338,9 @@ your system supports the setreuid() system call.
 HAVE_STRFTIME
 Define if date shown at article viewer level is incorrect (i.e. 1970...).
 Only define if your system supports the strftime() system call.
+
+HAVE_STRTOL
+Defined if your machine has the strtol() system call.
 
 NO_PIPING
 Do not allow piping of articles to shell commands.

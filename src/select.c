@@ -221,7 +221,7 @@ select_read_group:
 
 			case iKeySelectPageDown:		/* page down */
 			case iKeySelectPageDown2:
-			case iKeySelectPageDown3:		/* vi style */
+			case iKeySelectPageDown3:
 select_page_down:
 				if (! group_top) {
 					break;
@@ -333,7 +333,7 @@ select_up:
 
 			case iKeySelectPageUp:		/* page up */
 			case iKeySelectPageUp2:
-			case iKeySelectPageUp3:		/* vi style */
+			case iKeySelectPageUp3:
 select_page_up:
 				if (! group_top) {
 					break;

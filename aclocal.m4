@@ -206,8 +206,7 @@ AC_CACHE_VAL(cf_cv_comptype,[
 #endif],
 	[extern int compare(const void *, const void *);
 	 char *foo = "string";
-	 qsort(foo, sizeof(foo)/sizeof(*foo), sizeof(*foo), compare);
-	],
+	 qsort(foo, sizeof(foo)/sizeof(*foo), sizeof(*foo), compare)],
 	[cf_cv_comptype=yes],
 	[cf_cv_comptype=no])
 ])
@@ -258,12 +257,10 @@ int main()
 	}
 	exit(1);
 #endif
-}
-	],
+}],
 	[cf_cv_corefile=yes],
 	[cf_cv_corefile=no],
-	[cf_cv_corefile=unknown])
-	])
+	[cf_cv_corefile=unknown])])
 AC_MSG_RESULT($cf_cv_corefile)
 test $cf_cv_corefile = yes && AC_DEFINE(HAVE_COREFILE)
 ])dnl
@@ -277,30 +274,28 @@ AC_CACHE_VAL(cf_cv_extern_errno,[
 #include <errno.h>],
 		[int x = errno],
 		[cf_cv_extern_errno=yes],
-		[cf_cv_extern_errno=no])
-	])
+		[cf_cv_extern_errno=no])])
 AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = yes && AC_DEFINE(HAVE_EXTERN_ERRNO)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check if the system supports long (>14 character) filenames
-AC_DEFUN([CF_LONG_FILENAMES],
-[
-AC_MSG_CHECKING([for long filenames])
-AC_CACHE_VAL(cf_cv_longnames,[
-rm -f testlong*         2>/dev/null
-touch testlongfilename  2>/dev/null
-touch testlongfilename2 2>/dev/null
-rm -f testlongfilename  2>/dev/null
-if test -f testlongfilename2; then
-	cf_cv_longnames=yes
-else
-	cf_cv_longnames=no
-fi
-rm -f testlong*         2>/dev/null
-])
-AC_MSG_RESULT($cf_cv_longnames)
-test $cf_cv_longnames = yes && AC_DEFINE(HAVE_LONG_FILENAMES)
+dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
+dnl machines) have a non-working 'fork()' entrypoint.
+AC_DEFUN([CF_FUNC_FORK],
+[AC_MSG_CHECKING([for fork])
+AC_CACHE_VAL(cf_cv_func_fork,[
+AC_TRY_RUN([
+int main()
+{
+	if (fork() < 0)
+		exit(1);
+	exit(0);
+}],	[cf_cv_func_fork=yes],
+	[cf_cv_func_fork=no],
+	[cf_cv_func_fork=unknown])
+])dnl
+AC_MSG_RESULT($cf_cv_func_fork)
+test $cf_cv_func_fork = yes && AC_DEFINE(HAVE_FORK)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
@@ -313,19 +308,18 @@ AC_CACHE_VAL(cf_cv_makeflags,[
 	cf_cv_makeflags=''
 	for cf_option in '$(MFLAGS)' '-$(MAKEFLAGS)'
 	do
-		cat >ncurses.tmp <<CF_EOF
+		cat >cf_makeflags.tmp <<CF_EOF
 all :
 	echo '.$cf_option'
 CF_EOF
-		set cf_result=`${MAKE-make} -f ncurses.tmp 2>/dev/null`
+		set cf_result=`${MAKE-make} -f cf_makeflags.tmp 2>/dev/null`
 		if test "$cf_result" != "."
 		then
 			cf_cv_makeflags=$cf_option
 			break
 		fi
 	done
-	rm -f ncurses.tmp
-	])
+	rm -f cf_makeflags.tmp])
 AC_MSG_RESULT($cf_cv_makeflags)
 AC_SUBST(cf_cv_makeflags)
 ])dnl
@@ -404,8 +398,7 @@ int main()
 	 	exit(1);
 	signal(SIGINT, SIG_DFL);
 	exit(0);
-}
-	],
+}],
 	[cf_cv_sig_const=yes],
 	[cf_cv_sig_const=no],
 	[cf_cv_sig_const=unknown])
@@ -415,7 +408,7 @@ AC_MSG_RESULT($cf_cv_sig_const)
 test "$cf_cv_sig_const" = yes && AC_DEFINE(DECL_SIG_CONST)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl	Check for declarion of sys_errlist in one of stdio.h and errno.h.  
+dnl	Check for declaration of sys_errlist in one of stdio.h and errno.h.  
 dnl	Declaration of sys_errlist on BSD4.4 interferes with our declaration.
 dnl	Reported by Keith Bostic.
 AC_DEFUN([CF_SYS_ERRLIST],
@@ -426,10 +419,9 @@ AC_CACHE_VAL(cf_cv_dcl_sys_errlist,[
 #include <stdio.h>
 #include <sys/types.h>
 #include <errno.h> ],
-	[ char *c = (char *) *sys_errlist; ],
+	[char *c = (char *) *sys_errlist],
 	[cf_cv_dcl_sys_errlist=yes],
-	[cf_cv_dcl_sys_errlist=no])
-	])
+	[cf_cv_dcl_sys_errlist=no])])
 AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
 test $cf_cv_dcl_sys_errlist = yes && AC_DEFINE(HAVE_EXTERN_SYS_ERRLIST)
 ])dnl
@@ -459,8 +451,7 @@ AC_CACHE_VAL(cf_cv_use_termios_h,[
 ],[
 	struct termios save_tty;
 	(void) tcsetattr (0, TCSANOW, &save_tty);
-	(void) tcgetattr (0, &save_tty);
-	],
+	(void) tcgetattr (0, &save_tty)],
 	[cf_cv_use_termios_h=yes],
 	[cf_cv_use_termios_h=no])
 ])
@@ -500,13 +491,11 @@ int main()
 		 && size.ws_col > 0)
 			exit(0);
 	}
-	exit(1);
-}
-		],
+	exit(0);	/* we cannot guarantee this is run interactively */
+}],
 		[cf_cv_use_tiocgwinsz=yes],
 		[cf_cv_use_tiocgwinsz=no],
-		[cf_cv_use_tiocgwinsz=unknown])
-	])
+		[cf_cv_use_tiocgwinsz=unknown])])
 AC_MSG_RESULT($cf_cv_use_tiocgwinsz)
 test $cf_cv_use_tiocgwinsz != yes && AC_DEFINE(BROKEN_TIOCGETWINSZ)
 ])dnl
@@ -532,8 +521,7 @@ AC_CACHE_VAL(cf_cv_tm_gmtoff,[
 	struct tm foo;
 	long bar = foo.tm_gmtoff],
 	[cf_cv_tm_gmtoff=yes],
-	[cf_cv_tm_gmtoff=no])
-	])
+	[cf_cv_tm_gmtoff=no])])
 AC_MSG_RESULT($cf_cv_tm_gmtoff)
 test $cf_cv_tm_gmtoff = no && AC_DEFINE(DONT_HAVE_TM_GMTOFF)
 ])dnl
@@ -547,10 +535,49 @@ AC_CACHE_VAL(cf_cv_type_sigaction,[
 #include <signal.h>],
 		[sigaction_t x],
 		[cf_cv_type_sigaction=yes],
-		[cf_cv_type_sigaction=no])
-	])
+		[cf_cv_type_sigaction=no])])
 AC_MSG_RESULT($cf_cv_type_sigaction)
 test $cf_cv_type_sigaction = yes && AC_DEFINE(HAVE_TYPE_SIGACTION)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl $1=uppercase($2)
+AC_DEFUN([CF_UPPER],
+[
+changequote(,)dnl
+$1=`echo $2 | tr '[a-z]' '[A-Z]'`
+changequote([,])dnl
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Wrapper for AC_ARG_WITH to inherit/override an environment variable's
+dnl "#define" in the compile.
+AC_DEFUN([CF_WITH_DFTENV],
+[AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
+ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
+case "$withval" in #(vi
+yes|no)
+  echo 'configure: error: expected a value for $3' 1>&2
+  exit 1
+  ;;
+esac
+$3="$withval"
+AC_DEFINE_UNQUOTED($3,"[$]$3")dnl
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Wrapper for AC_ARG_WITH to ensure that user supplies a pathname, not just
+dnl defaulting to yes/no.
+AC_DEFUN([CF_WITH_PATH],
+[AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
+ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
+case "$withval" in #(vi
+/*)
+  ;; #(vi
+*)
+  echo 'configure: error: expected a pathname for $3' 1>&2
+  exit 1
+  ;;
+esac
+$3="$withval"
+AC_SUBST($3)dnl
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Wrapper for AC_PATH_PROG, with command-line option.
@@ -589,10 +616,19 @@ AC_ARG_WITH($1,[$2],ifelse($3,,
 ])dnl
 undefine([cf_path_name])undefine([cf_have_name])])dnl
 dnl ---------------------------------------------------------------------------
-dnl $1=uppercase($2)
-AC_DEFUN([CF_UPPER],
-[
-changequote(,)dnl
-$1=`echo $2 | tr '[a-z]' '[A-Z]'`
-changequote([,])dnl
+dnl Wrapper for AC_ARG_WITH to ensure that if the user supplies a value, it is
+dnl not simply defaulting to yes/no.  Empty strings are ok if the macro is
+dnl invoked without a default value
+AC_DEFUN([CF_WITH_VALUE],
+[AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
+ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
+ifelse($4,,[test -n "$withval" && \
+],[test -z "$withval" && withval=no])dnl
+case "$withval" in #(vi
+yes|no)	echo 'configure: error: expected a value for $3' 1>&2
+  exit 1
+  ;;
+esac
+$3="$withval"
+AC_SUBST($3)dnl
 ])dnl

@@ -101,9 +101,9 @@ extern int seteuid P_((uid_t));
 #endif
 #ifdef DECL_SETPGRP
 #if SETPGRP_VOID
-extern void setpgrp P_((void));
+extern pid_t setpgrp P_((void));
 #else
-extern void setpgrp P_((int, int));
+extern int setpgrp P_((int, int));
 #endif
 #endif /* DECL_SETPGRP */
 #ifdef DECL_SOCKET
@@ -158,6 +158,7 @@ extern char article[PATH_LEN];
 extern char bug_addr[LEN];
 extern char ch_post_process[];
 extern char cmd_line_printer[PATH_LEN];
+extern char cmdline_nntpserver[PATH_LEN];
 extern char cvers[LEN];
 extern char dead_article[PATH_LEN];
 extern char dead_articles[PATH_LEN];
@@ -199,6 +200,7 @@ extern char local_attributes_file[PATH_LEN];
 extern char local_config_file[PATH_LEN];
 extern char local_filter_file[PATH_LEN];
 extern char local_newsgroups_file[PATH_LEN];
+extern char local_newsrctable_file[PATH_LEN];
 extern char mail_active_file[PATH_LEN];
 extern char mail_quote_format[PATH_LEN];
 extern char news_active_file[PATH_LEN];
@@ -915,7 +917,8 @@ extern int use_color_tinrc;
 extern int col_back;
 extern int col_invers;
 extern int col_text;
-extern int col_foot;
+extern int col_minihelp;
+extern int col_message;
 extern int col_quote;
 extern int col_head;
 extern int col_subject;

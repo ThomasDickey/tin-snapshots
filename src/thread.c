@@ -389,7 +389,7 @@ thread_tab_pressed:
 	
 			case iKeyThreadPageDown:		/* page down */
 			case iKeyThreadPageDown2:
-			case iKeyThreadPageDown3:		/* vi style */
+			case iKeyThreadPageDown3:
 thread_page_down:
 				if (thread_index_point + 1 == top_thread) {
 					if (0 < first_thread_on_screen) {
@@ -489,7 +489,7 @@ thread_up:
 
 			case iKeyThreadPageUp:		/* page up */
 			case iKeyThreadPageUp2:
-			case iKeyThreadPageUp3:		/* vi style */
+			case iKeyThreadPageUp3:
 thread_page_up:
 				if (thread_index_point == 0) {
 					if (_hp_glitch) {
@@ -534,6 +534,10 @@ thread_catchup:
 				goto thread_done;
 
 			case iKeyThreadCatchup:	/* mark thread as read immediately */
+				thd_mark_read (group, base[thread_basenote]);
+				goto thread_done;
+
+			case iKeyThreadMarkArtRead: /* mark article as read */
 				n = choose_response (thread_basenote, thread_index_point);
 				arts[n].selected = 0;
 				arts[n].status = ART_READ;

@@ -324,6 +324,10 @@ extern int get_server P_((char *string, int size));
 extern void close_server P_((void));
 extern char *nntp_respcode P_((int respcode));
 extern int nntp_message P_((int respcode));
+/* ./nrctbl.c */
+extern void get_nntpserver P_((char *nntpserver_name, char *nick_name));
+extern int get_newsrcname P_((char *newsrc_name, char *nntpserver_name));
+extern void write_newsrctable_file P_((void));
 /* ./open.c */
 extern int nntp_open P_((void));
 extern void nntp_close P_((void));

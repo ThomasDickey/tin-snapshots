@@ -85,42 +85,55 @@ then
 fi
 
 ## options for directories
-AC_ARG_WITH(libdir,
-	[  --with-libdir=PATH      news-library (default: /usr/lib/news)],
-	[LIBDIR=$withval],
-	[LIBDIR=/usr/lib/news])
-AC_SUBST(LIBDIR)
+AC_MSG_CHECKING(for news-library path)
+CF_WITH_PATH(libdir,
+	[  --with-libdir=PATH      news-library],
+	LIBDIR,/usr/lib/news)
+AC_MSG_RESULT($LIBDIR)
 
-AC_ARG_WITH(spooldir,
-	[  --with-spooldir=PATH    spool directory (default: /usr/spool/news)],
-	[SPOOLDIR=$withval],
-	[SPOOLDIR=/usr/spool/news])
-AC_SUBST(SPOOLDIR)
+AC_MSG_CHECKING(for news spool-directory path)
+CF_WITH_PATH(spooldir,
+	[  --with-spooldir=PATH    news spool-directory],
+	SPOOLDIR,/usr/spool/news)
+AC_MSG_RESULT($SPOOLDIR)
 
-## options for libraries (FIXME: this should be automatic)
-AC_ARG_WITH(inn-nntplib,
+AC_MSG_CHECKING(for news overview-directory path)
+CF_WITH_PATH(overviewdir,
+	[  --with-nov-dir=PATH     news overview-directory],
+	NOVROOTDIR,$SPOOLDIR)
+AC_MSG_RESULT($NOVROOTDIR)
+
+## options for libraries
+AC_MSG_CHECKING(for optional INN-NNTP library)
+CF_WITH_VALUE(inn-nntplib,
 	[  --with-inn-nntplib=PATH specify INN-NNTP library],
-	[AC_DEFINE(USE_INN_NNTPLIB)
-	 INN_NNTPLIB=$withval
-	 AC_SUBST(INN_NNTPLIB)])
+	INN_NNTPLIB)
+AC_MSG_RESULT($INN_NNTPLIB)
+test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
 
 ## options for miscellaneous definitions
-AC_ARG_WITH(mail-gateway,
-	[  --with-mail-gateway     (default: empty)],
-	[INEWS_MAIL_GATEWAY=$withval])
-AC_SUBST(INEWS_MAIL_GATEWAY)
+AC_MSG_CHECKING(for mail-gateway)
+CF_WITH_VALUE(mail-gateway,
+	[  --with-mail-gateway     override \$INEWS_MAIL_DOMAIN],
+	INEWS_MAIL_GATEWAY)
+AC_MSG_RESULT($INEWS_MAIL_GATEWAY)
 
-AC_ARG_WITH(mail-domain,
-	[  --with-mail-domain      (default: akk.uni-karlsruhe.de)
-	                  (sets INEWS_MAIL_DOMAIN)],
-	[INEWS_MAIL_DOMAIN=$withval],
-	[test -z "$INEWS_MAIL_DOMAIN" && INEWS_MAIL_DOMAIN="akk.uni-karlsruhe.de"])
-AC_SUBST(INEWS_MAIL_DOMAIN)
+AC_MSG_CHECKING(for mail-domain)
+CF_WITH_VALUE(mail-domain,
+	[  --with-mail-domain      sets \$INEWS_MAIL_DOMAIN],
+	INEWS_MAIL_DOMAIN,unspecified)
+AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
 
+if test "$INEWS_MAIL_DOMAIN" = unspecified ; then
+	echo "configure: error: You must specify the mail-domain" 1>&2
+	exit 1
+fi
+
+AC_MSG_CHECKING(for NNTP default-server)
 AC_ARG_WITH(nntp-default-server,
 	[  --with-nntp-default-server
                           (default: news\$INEWS_MAIL_DOMAIN)
-                          (sets NNTP_DEFAULT_SERVER)],
+                          (sets \$NNTP_DEFAULT_SERVER)],
 	[NNTP_DEFAULT_SERVER=$withval],
 	[test -z "$NNTP_DEFAULT_SERVER" && case "$INEWS_MAIL_DOMAIN" in #(((
 	 /*)	NNTP_DEFAULT_SERVER="news`cat $INEWS_MAIL_DOMAIN`" ;;
@@ -128,6 +141,7 @@ AC_ARG_WITH(nntp-default-server,
 	 *)	NNTP_DEFAULT_SERVER="news.$INEWS_MAIL_DOMAIN"      ;;
 	 esac])
 AC_SUBST(NNTP_DEFAULT_SERVER)
+AC_MSG_RESULT($NNTP_DEFAULT_SERVER)
 
 ## optional features
 AC_MSG_CHECKING(whether to use MH style mail handling)
@@ -175,6 +189,13 @@ CF_ARG_DISABLE(mime-strict-charset,
 	[AC_DEFINE(MIME_STRICT_CHARSET)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(for MIME character-set)
+CF_WITH_DFTENV(mime-default-charset,
+	[  --with-mime-default-charset
+                          fallback for \$MM_CHARSET],
+	MM_CHARSET,US-ASCII)
+AC_MSG_RESULT($MM_CHARSET)
+
 AC_MSG_CHECKING(whether to enable forged cancels)
 CF_ARG_ENABLE(forgery,
 	[  --enable-forgery        forged cancel support],
@@ -188,8 +209,16 @@ AC_C_CONST
 AC_C_INLINE
 CF_ANSI_ASSERT
 
-### check for alloca
-AC_FUNC_ALLOCA
+### check for alloca (only required for bison)
+case "$YACC" in
+bison*)
+  AC_FUNC_ALLOCA
+  ;;
+*)
+  ALLOCA=""
+  AC_SUBST(ALLOCA)
+  ;;
+esac
 
 ###	Checks for header files.
 AC_STDC_HEADERS
@@ -207,6 +236,7 @@ netlib.h \
 poll.h \
 prototypes.h \
 pwd.h \
+sgtty.h \
 stddef.h \
 stdlib.h \
 string.h \
@@ -265,7 +295,6 @@ AC_CHECK_FUNCS(\
 bcopy \
 bfill \
 bzero \
-fork \
 getcwd \
 gethostbyname \
 is_xterm \
@@ -292,6 +321,8 @@ strtol \
 tzset \
 unlink \
 )
+
+CF_FUNC_FORK
 
 CF_CHECK_DECL(\
 getenv \
@@ -389,10 +420,10 @@ CF_TIOCGWINSZ
 CF_TERMIOS
 CF_TM_GMTOFF
 
-CF_LONG_FILENAMES
+AC_SYS_LONG_FILE_NAMES
 CF_SIG_ARGS
 if test -n "$GCC"; then
-	CF_SIG_CONST
+  CF_SIG_CONST
 fi
 CF_COMPTYPE
 CF_COREFILE
