@@ -13,7 +13,7 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"961005"
+#define RELEASEDATE	"961006"
 
 /*
  * This is NO official release, but a patched version.

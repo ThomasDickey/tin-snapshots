@@ -1,3 +1,10 @@
+--unoff BETA release 961006 --
+
+183) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. if (show_description && !CURR_GROUP.descrition) don't truncate
+          active_name (select.c)
+     FIX. select.c
+
 --unoff BETA release 961005 --
 
 182) Urs Janssen <urs@akk.uni-karlsruhe.de>

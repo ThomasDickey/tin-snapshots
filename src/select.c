@@ -860,9 +860,17 @@ group_selection_page ()
 		group_descript[blank_len+1] = '\0';
 
 		if (show_description) {
+			if (active[n].description) {
 				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s  %-*.*s\r\n",
-				         subs, i+1, new, groupname_len, groupname_len,
-				         active_name, blank_len, blank_len, group_descript);
+				         subs, i+1, new,
+				         groupname_len, groupname_len, active_name,
+				         blank_len, blank_len, group_descript);
+			} else {
+				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s  \r\n",
+				         subs, i+1, new,
+				         (groupname_len+blank_len),
+				         (groupname_len+blank_len), active[n].name);
+			}
 		} else {
 			if (draw_arrow_mark) {
  				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s\r\n",
