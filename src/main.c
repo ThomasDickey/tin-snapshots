@@ -605,8 +605,8 @@ usage (theProgname)
 
 int
 check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
-	int CheckAnyUnread;
-	int StartAnyUnread;
+	t_bool CheckAnyUnread;
+	t_bool StartAnyUnread;
 {
 	int i = 0;
 

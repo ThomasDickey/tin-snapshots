@@ -229,25 +229,31 @@ color_fputs (s, stream, color)
 }
 
 void
-print_color (str)
+print_color (str, signature)
 	char *str;
+	t_bool signature;
 {
 	int color = col_text;
 
 	if (use_color) {
-		if (str[0] == '>'
-		    || str[0] == '|'
-		    || str[0] == ']'
-/*		    || str[0] == '»' */
-		    || (str[0] == ':' && str[1] != '-')
-		    || (str[1] == '>' && str[0] != '-')
-		    || (str[2] == '>' && str[1] != '-')
-		    || (str[3] == '>' && str[2] != '-')
-		    || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
-			fcol (col_quote);
-			color = col_quote;
+		if (signature) {
+			fcol (col_signature);
+			color = col_signature;
 		} else {
-			fcol (col_text);
+			if (str[0] == '>'
+				 || str[0] == '|'
+				 || str[0] == ']'
+/*		    	 || str[0] == '»' */
+				 || (str[0] == ':' && str[1] != '-')
+				 || (str[1] == '>' && str[0] != '-')
+				 || (str[2] == '>' && str[1] != '-')
+				 || (str[3] == '>' && str[2] != '-')
+				 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
+				fcol (col_quote);
+				color = col_quote;
+			} else {
+				fcol (col_text);
+			}
 		}
 	}
 

@@ -288,21 +288,21 @@ extern char news_active_file[PATH_LEN];
 extern char news_quote_format[PATH_LEN];
 extern char newsgroups_file[PATH_LEN];
 extern char newsrc[PATH_LEN];
-extern char note_h_contentenc[HEADER_LEN];		/* Content-Transfer-Encoding: */
-extern char note_h_contenttype[HEADER_LEN];		/* Content-Type: */
+extern char note_h_contentenc[HEADER_LEN];	/* Content-Transfer-Encoding: */
+extern char note_h_contenttype[HEADER_LEN];	/* Content-Type: */
 extern char note_h_date[HEADER_LEN];			/* Date:	*/
-extern char note_h_distrib[HEADER_LEN];			/* Distribution: */
+extern char note_h_distrib[HEADER_LEN];		/* Distribution: */
 extern char note_h_followup[HEADER_LEN];		/* Followup-To: */
 extern char note_h_from[HEADER_LEN];			/* From: */
 extern char note_h_keywords[HEADER_LEN];		/* Keywords: */
 extern char note_h_messageid[HEADER_LEN];		/* Message-ID:	*/
-extern char note_h_mimeversion[HEADER_LEN];		/* Mime-Version: */
-extern char note_h_newsgroups[HEADER_LEN];		/* Newsgroups:	*/
-extern char note_h_org[HEADER_LEN];			/* Organization: */
+extern char note_h_mimeversion[HEADER_LEN];	/* Mime-Version: */
+extern char note_h_newsgroups[HEADER_LEN];	/* Newsgroups:	*/
+extern char note_h_org[HEADER_LEN];				/* Organization: */
 extern char note_h_path[HEADER_LEN];			/* Path:	*/
-extern char note_h_references[HEADER_LEN];		/* References:	*/
+extern char note_h_references[HEADER_LEN];	/* References:	*/
 extern char note_h_subj[HEADER_LEN];			/* Subject:	*/
-extern char note_h_summary[HEADER_LEN];			/* Summary: */
+extern char note_h_summary[HEADER_LEN];		/* Summary: */
 extern char novrootdir[PATH_LEN];
 extern char page_header[LEN];
 extern char pgp_data[PATH_LEN];
@@ -944,7 +944,6 @@ extern int actual_option_page;
 extern int cCOLS;
 extern int cLINES;
 extern int can_post;
-extern int check_any_unread;
 extern int cmd_line;
 extern int compiled_with_nntp;
 extern int cur_groupnum;
@@ -959,7 +958,6 @@ extern int default_save_mode;
 extern int default_show_author;
 extern int default_sort_art_type;
 extern int default_thread_arts;
-extern int delete_index_file;
 extern int first_group_on_screen;
 extern int first_subj_on_screen;
 extern int glob_respnum;
@@ -984,9 +982,8 @@ extern int max_newnews;
 extern int max_save;
 extern int max_spooldir;
 extern int max_subj;
-extern int newsrc_active;
 extern int nntp_codeno;
-extern int note_end;				/* end of article ? */
+extern int note_end;					/* end of article ? */
 extern int note_line;
 extern int note_page;				/* what page we're on */
 extern int num_active;
@@ -997,24 +994,17 @@ extern int num_of_selected_arts;
 extern int num_of_tagged_arts;
 extern int num_save;
 extern int num_spooldir;
-extern int post_article_and_exit;
 extern int post_mime_encoding;
 extern int process_id;
-extern int purge_index_files;
-extern int read_local_newsgroups_file;
-extern int read_news_via_nntp;
-extern int read_saved_news;
 extern int real_gid;
 extern int real_uid;
 extern int real_umask;
 extern int reread_active_file;
 extern int reread_active_file_secs;
 extern int reread_active_for_posted_arts;
-extern int save_news;
 extern int show_author;
 extern int show_subject;
 extern int space_mode;
-extern int start_any_unread;
 extern int start_line_offset;
 extern int system_status;
 extern int tex2iso_supported;
@@ -1024,17 +1014,10 @@ extern int tin_gid;
 extern int tin_uid;
 extern int top;
 extern int top_base;
-extern int update;
-extern int update_fork;
-extern int use_keypad;
 extern int use_local_charset;
-extern int verbose;
 extern int xcol;
 extern int xmouse;
-extern int xover_supported;
-extern int xref_supported;
 extern int xrow;
-extern int xuser_supported;
 
 extern long *base;
 extern long head_next;
@@ -1060,6 +1043,7 @@ extern t_bool auto_list_thread;
 extern t_bool beginner_level;
 extern t_bool catchup;
 extern t_bool catchup_read_groups;
+extern t_bool check_any_unread;
 extern t_bool check_for_new_newsgroups;
 extern t_bool confirm_action;
 extern t_bool confirm_to_quit;
@@ -1074,6 +1058,7 @@ extern t_bool default_filter_select_case;
 extern t_bool default_filter_select_expire;
 extern t_bool default_filter_select_global;
 extern t_bool default_show_only_unread;
+extern t_bool delete_index_file;
 extern t_bool draw_arrow_mark;
 extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;
@@ -1081,17 +1066,24 @@ extern t_bool got_sig_pipe;
 extern t_bool group_catchup_on_exit;
 extern t_bool highlight_xcommentto;
 extern t_bool inverse_okay;
-extern t_bool keep_dead_articles; /* keep all dead articles in dead.articles */
-extern t_bool keep_posted_articles; /* keep all posted articles in ~/Mail/posted */
+extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
+extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
 extern t_bool mail_8bit_header;
 extern t_bool mail_news;
 extern t_bool mail_news_to_posted;
 extern t_bool mark_saved_read;
+extern t_bool newsrc_active;
 extern t_bool no_advertising;
 extern t_bool pos_first_unread;
 extern t_bool post_8bit_header;
+extern t_bool post_article_and_exit;
 extern t_bool print_header;
 extern t_bool process_only_unread;
+extern t_bool purge_index_files;
+extern t_bool read_local_newsgroups_file;
+extern t_bool read_news_via_nntp;
+extern t_bool read_saved_news;
+extern t_bool save_news;
 extern t_bool save_to_mmdf_mailbox;
 extern t_bool show_description;
 extern t_bool show_last_line_prev_page;
@@ -1100,15 +1092,23 @@ extern t_bool show_only_unread_groups;
 extern t_bool show_xcommentto;
 extern t_bool sigdashes;
 extern t_bool space_goto_next_unread;
+extern t_bool start_any_unread;
 extern t_bool start_editor_offset;
 extern t_bool strip_blanks;
 extern t_bool tab_after_X_selection;
 extern t_bool tab_goto_next_unread;
 extern t_bool thread_catchup_on_exit;
 extern t_bool unlink_article;
+extern t_bool update;
+extern t_bool update_fork;
 extern t_bool use_builtin_inews;
+extern t_bool use_keypad;
 extern t_bool use_mailreader_i;
 extern t_bool use_mouse;
+extern t_bool verbose;
+extern t_bool xover_supported;
+extern t_bool xref_supported;
+extern t_bool xuser_supported;
 
 extern time_t new_newnews_time;
 

@@ -1,10 +1,11 @@
 Bugs
 ----
 o  'K' is still a bit inconsistent
-   in the group menu (group.c) it jumps to the next unread article
-   in the thread menu (thread.c) it jumps to the next article
-   in the article pager (page.c) it marks the whole thread as unread
-   and jumps to the next thread containing unread articles
+   - in the group menu (group.c) it jumps to the next thread containing unread
+     articles.
+   - in the thread menu (thread.c) it jumps to the next article
+   - in the article pager (page.c) it marks the whole thread as unread
+     and jumps to the next thread containing unread articles
 
 o  art_mark_deleted in 'M'enu (50.) shows up as 'i' but it is 'D'
 
@@ -343,6 +344,8 @@ o  with show_only_unread_groups=ON and (y)ank in all groups, (y)ank out all
 o  fix reposition of cursor after reading active file... annoying! 
 
 o  think about group numbering in "only unread" display mode
+   (using different numbers in show all/show only unrerad leads to some
+    problems, f.e. group moving)
 
 o  fix kill/hot mechanism that you could kill/mark hot everything which
    contains abc OR def... like "tin *|* tin|* tin *" -even better would be
