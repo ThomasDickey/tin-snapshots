@@ -3,7 +3,7 @@
  *  Module    : prompt.c
  *  Author    : I.Lea
  *  Created   : 01-04-91
- *  Updated   : 24-10-94
+ *  Updated   : 24-10-94, 12-08-96
  *  Notes     :
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -13,7 +13,13 @@
  */
 
 #include	"tin.h"
+#include	"extern.h"
 #include	"menukeys.h"
+
+/*
+ * FIXME put in tin.h (or find a better solution). See also: config.c
+ */
+#define option_lines_per_page (cLINES - INDEX_TOP - 3)
 
 /*
  *  prompt_num
@@ -35,7 +41,7 @@ prompt_num (ch, prompt)
 
 	sprintf (msg, "%c", ch);
 
-	if ((p = getline (prompt, TRUE, msg)) != (char *) 0) {
+	if ((p = getline (prompt, TRUE, msg, 0)) != (char *) 0) {
 		strcpy (msg, p);
 		num = atoi (msg);
 	} else {
@@ -66,7 +72,7 @@ prompt_string (prompt, buf)
 	
 	clear_message ();
 
-	if ((p = getline (prompt, FALSE, (char *) 0)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, (char *) 0, 0)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
 		set_alarm_clock_on ();
@@ -98,7 +104,7 @@ prompt_menu_string (line, col, var)
 
 	MoveCursor (line, col);
 
-	if ((p = getline ("", FALSE, var)) == (char *) 0) {
+	if ((p = getline ("", FALSE, var, 0)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -109,7 +115,14 @@ prompt_menu_string (line, col, var)
 	return TRUE;
 }
 
-
+/*
+ * prompt_yn
+ * prompt user for 'y'es or 'n'o decision. "prompt" will be displayed in line
+ * "line" giving the default answer "default_answer".
+ * The function returns 1 if the user decided "yes", -1 if the user wanted 
+ * to escape, or 0 for any other key or decision.
+ */
+ 
 int 
 prompt_yn (line, prompt, default_answer)
 	int line;
@@ -117,47 +130,51 @@ prompt_yn (line, prompt, default_answer)
 	int default_answer;
 {
 	char ch, prompt_ch;
+	int yn_loop = TRUE;
 
 	set_alarm_clock_off ();
 
-prompt_yn_loop:
-	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
+	while (yn_loop) {
+		prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
 
-	MoveCursor (line, 0);
-	CleartoEOLN ();
-	printf ("%s%c", prompt, prompt_ch);
-	cursoron ();
-	fflush (stdout);
-	MoveCursor (line, (int) strlen (prompt));
+		MoveCursor (line, 0);
+		CleartoEOLN ();
+		printf ("%s%c", prompt, prompt_ch);
+		cursoron ();
+		fflush (stdout);
+		MoveCursor (line, (int) strlen (prompt));
 
-	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
-		ch = prompt_ch;
-	}	
+		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
+			ch = prompt_ch;
+		}	
+		yn_loop = FALSE; /* normal case: leave loop */
 
-	switch (ch) {
+		switch (ch) {
 #ifndef WIN32
-		case ESC:	/* (ESC) common arrow keys */
+			case ESC:	/* (ESC) common arrow keys */
 #	ifdef HAVE_KEY_PREFIX
-		case KEY_PREFIX:
+			case KEY_PREFIX:
 #	endif
-			switch (get_arrow_key ()) {
+				switch (get_arrow_key ()) {
 #endif /* WIN32 */
-				case KEYMAP_UP:
-				case KEYMAP_DOWN:
-					default_answer = 1 - default_answer;
-					goto prompt_yn_loop;
+					case KEYMAP_UP:
+					case KEYMAP_DOWN:
+						default_answer = 1 - default_answer;
+						yn_loop = TRUE; /* don't leave loop */
+						break;
 				
-				case KEYMAP_LEFT:
-					ch = ESC;
-					break;
+					case KEYMAP_LEFT:
+						ch = ESC;
+						break;
 					
-				case KEYMAP_RIGHT:
-					ch = prompt_ch;
-					break;
+					case KEYMAP_RIGHT:
+						ch = prompt_ch;
+						break;
 #ifndef WIN32
-			}
-			break;
+				}
+				break;
 #endif
+		}
 	}
 
 	if (line == cLINES) {
@@ -257,6 +274,124 @@ prompt_on_off (row, col, var, help_text, prompt_text)
 
 	ret = prompt_list (row, col, *var, help_text, prompt_text, txt_onoff, 2);
 	*var = ret;
+}
+
+/*
+ * Displays option text and actual option value for string based options in 
+ * one line, help text for that option near the bottom of the screen. Allows 
+ * change of the old value by normal editing; history function of getline() 
+ * will be used properly so that editing won't leave the actual line. Note 
+ * that "option" is the number the user will see, which is not the same as 
+ * the array position for this option in option_table (since the latter 
+ * starts counting with zero instead of one).
+ * The function returns TRUE, if the value was changed, FALSE otherwise.
+ */
+ 
+int 
+prompt_option_string (option)
+	int option;
+{
+	char prompt[LEN];
+	char *p;
+
+	set_alarm_clock_off ();
+
+	show_menu_help (option_table[option - 1].help_text);
+	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
+
+	if ((p = getline (prompt, FALSE, option_table[option - 1].variable, 0)) == (char *) 0) {
+		set_alarm_clock_on ();
+		return FALSE;
+	}
+	strcpy (option_table[option - 1].variable, p);
+	
+	show_config_page (actual_option_page);	/* quick fix to hide too long lines */
+	set_alarm_clock_on ();
+	
+	return TRUE;
+}
+
+/*
+ * Displays option text and actual option value for number based options in 
+ * one line, help text for that option near the bottom of the screen. Allows 
+ * change of the old value by normal editing; history function of getline() 
+ * will be used properly so that editing won't leave the actual line. Note 
+ * that "option" is the number the user will see, which is not the same as
+ * the array position for this option in option_table (since the latter 
+ * starts counting with zero instead of one).
+ * The function returns TRUE if the value was changed, FALSE otherwise.
+ */
+ 
+int 
+prompt_option_num (option)
+	int option;
+{
+	char prompt[LEN];
+	char number[LEN];
+	char *p;
+	int num;
+
+	set_alarm_clock_off ();
+
+	show_menu_help (option_table[option - 1].help_text);
+	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
+	sprintf (&number[0], "%d", *((int *) option_table[option - 1].variable));
+
+	if ((p = getline (prompt, TRUE, number, 0)) == (char *) 0) {
+		return FALSE;
+	}
+	strcpy (number, p);
+	num = atoi (number);
+	*((int *) option_table[option - 1].variable) = num;
+
+	clear_message ();
+	set_alarm_clock_on ();
+
+	return TRUE;
+}
+
+/*
+ * Displays option text and actual option value for character based options 
+ * in one line, help text for that option near the bottom of the screen. 
+ * Allows change of the old value by normal editing. Note that "option" is 
+ * the number the user will see, which is not the same as the array position 
+ * for this option in option_table (since the latter starts counting with 
+ * zero instead of one).
+ * The function returns TRUE if the value was changed, FALSE otherwise.
+ */
+
+int
+prompt_option_char (option)
+	int option;
+{
+	char prompt[LEN];
+	char input[2];
+	char *p = &input[0];
+
+	/* grrr... who the heck defined art_marked_* as int? */
+	input[0] = (char) *(int *) option_table[option - 1].variable;
+	input[1] = '\0';
+	
+	set_alarm_clock_off ();
+
+	show_menu_help (option_table[option - 1].help_text);
+	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
+
+	if ((p = getline (prompt, FALSE, p, 1)) == (char *) 0) {
+		set_alarm_clock_on ();
+		return FALSE;
+	}
+	
+	/* grrr... who the heck defined art_marked_* as int? */
+	*(int *)option_table[option - 1].variable = p[0];
+	
+	clear_message ();
+	set_alarm_clock_on ();
+	
+	return TRUE;
 }
 
 /*

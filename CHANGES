@@ -1,3 +1,15 @@
+--unoff BETA release 960815 --
+
+152) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. rfc1557 support
+     FIX. several supplied patches
+
+151) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. rewrote options 'M'enu, add several configurable options
+     ADD. getline() now allows to set maximum number of characters to type
+          in.
+     FIX. several supplied patches
+
 --unoff BETA release 960814 --
 
 150) Torsten Neumann <torsten@imke.infodrom.north.de>

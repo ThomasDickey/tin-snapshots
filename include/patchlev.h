@@ -13,7 +13,7 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"960814"
+#define RELEASEDATE	"960815"
 
 /* This is NO official release, but a patched version.
  * Including patches from:
@@ -34,11 +34,13 @@
  *	Alexander Lehmann	<alex@hal.rhein-main.de>
  *	Daniel Naber		<dnaber@pluto.teuto.de>
  *	Torsten Neumann		<torsten@imke.infodrom.north.de>
+ *	Dirk Nimmich		<nimmich@uni-muenster.de>
  *	Seven Paulus		<sven@oops.sub.de>
  *	Branden Robinson	<branden@purdue.edu>
  *	Roland Rosenfeld	<roland@spinnaker.rhein.de>
  *	Volker Schmidt		<volker@illuminatus.mz.rhein-main.de>
  * 	Stefan Scholl		<stesch@sks.inka.de>
+ *	Jungshik Shin		<jshin@pantheon.yale.edu>
  *	Dieter Stueken		<stueken@uni-muenster.de>
  *	Dean Takemori		<dean@uhheph.phys.hawaii.edu>
  *

@@ -70,7 +70,7 @@ extern void print_color P_((char *str));
 extern int read_config_file P_((char *file, int global_file));
 extern void write_config_file P_((char *file));
 extern int change_config_file P_((struct t_group *group, int filter_at_once));
-extern void show_config_menu P_((void));
+extern void show_config_page P_((int page_no));
 extern void show_menu_help P_((char *help_message));
 extern int match_boolean P_((char *line, char *pat, int *dst));
 extern int match_integer P_((char *line, char *pat, int *dst, int maxlen));
@@ -155,7 +155,7 @@ extern int set_filter_scope P_((struct t_group *group));
 extern char *pcChkRegexStr P_((char *pcStr));
 
 /* getline.c */
-extern char *getline P_((char *prompt, int number_only, char *str));
+extern char *getline P_((char *prompt, int number_only, char *str, int max_chars));
 
 /* group.c */
 extern void decr_tagged P_((int tag));
@@ -426,6 +426,9 @@ extern int prompt_menu_string P_((int line, int col, char *var));
 extern int prompt_yn P_((int line, char *prompt, int default_answer));
 extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char *list[], int size));
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
+extern int prompt_option_string P_((int option));
+extern int prompt_option_num P_((int option));
+extern int prompt_option_char P_((int option));
 extern void continue_prompt P_((void));
 
 /* refs.c */
@@ -444,13 +447,17 @@ extern unsigned char bin2hex P_((unsigned int x));
 extern char *strcasestr P_((char *haystack, char *needle));
 extern FILE *rfc1521_decode P_((FILE *file));
 extern void rfc1521_encode P_((char *line, FILE *f, int e));
+/* added for EUC-KR/JP/CN support by Jungshik Shin */
+extern void rfc1557_encode P_((char *line, FILE *f, int e)); 
+extern void rfc1468_encode P_((char *line, FILE *f, int e));
+extern void rfc1922_encode P_((char *line, FILE *f, int e));
 
 /* rfc1522.c */
 extern int mmdecode P_((char *what, int encoding, int delimiter, char *where, char *charset));
 extern void get_mm_charset P_((void));
 extern char *rfc1522_decode P_((char *s));
 extern char *rfc1522_encode P_((char *s));
-extern void rfc15211522_encode P_((char *filename, char *mime_encoding));
+extern void rfc15211522_encode P_((char *filename, char *mime_encoding,int allow_8bit_header));
 
 /* save.c */
 extern int check_start_save_any_news P_((int check_start_save));

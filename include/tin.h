@@ -734,6 +734,7 @@ extern char *get_uaf_fullname();
  * Maximum permissible colour number
  */
 #define		MAX_COLOR			15
+#define		MAX_BACKCOLOR			7
 
 #define 	SCREEN_READ_UNREAD		6		/* position for "  +" / "   " */
 #define 	INDEX_TOP			2
@@ -1362,6 +1363,19 @@ struct t_newnews
 {
 	char *host;
 	time_t time;
+};
+
+/*
+ * Used for building option menu
+ */
+ 
+struct t_option {
+	void *variable;		/* ptr to variable to change */
+	int var_type;		/* type of variable (see conf.h) */
+	char **opt_list;	/* ptr to list entries if OPT_LIST */
+	int opt_count;		/* no. of list entries if OPT_LIST */
+	char *option_text;	/* text to print as information on option */
+	char *help_text;	/* text to print as help text when option selected */
 };
 
 /*

@@ -12,12 +12,28 @@
  *              right notice, and it must be included in any copy made
  */
 
+/* general keys */
+
+#define iKeyQuit 'q'
+
 /* active.c */
 
 #define iKeyActiveNone 'N'
 #define iKeyActiveAll 'Y'
 #define iKeyActiveNo 'n'
 #define iKeyActiveYes 'y'
+
+/* config.c */
+
+#define iKeyConfigUp 'k'
+#define iKeyConfigDown 'j'
+#define iKeyConfigHome 'g'
+#define iKeyConfigEnd 'G'
+#define iKeyConfigNoSave 'Q'
+#define iKeyConfigPageDown ' '
+#define iKeyConfigPageUp 'b'
+#define iKeyConfigSelect '\n'
+#define iKeyConfigSelect2 '\r'
 
 /* feed.c */
 

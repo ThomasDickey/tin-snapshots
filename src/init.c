@@ -60,6 +60,8 @@ char mail_active_file[PATH_LEN];
 char mail_address[LEN];			/* user's mail address */
 #endif
 char mail_mime_encoding[LEN]="8bit";
+int mail_8bit_header=FALSE;               /* allow 8bit chars. in header of mail message */
+char mm_charset[LEN]="";                /* MIME charset:moved here by J. Shin */
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mailbox[PATH_LEN];			/* system mailbox for each user */
@@ -194,6 +196,7 @@ int process_id;
 int pos_first_unread;			/* position cursor at first/last unread article */
 int default_post_proc_type;		/* type of post processing to be performed */
 int post_article_and_exit;		/* quick post of an article then exit (elm like) */
+int post_8bit_header=FALSE;                   /* allow 8bit chars. in header when posting to newsgroup */
 int print_header;			/* print all of mail header or just Subject: & From lines */
 int purge_index_files;			/* stat all articles to see if they still exist */
 int default_filter_kill_header;
@@ -389,6 +392,7 @@ void init_selfinfo ()
 	num_of_tagged_arts = 0;
 	pos_first_unread = TRUE;
 	post_article_and_exit = FALSE;
+        post_8bit_header = FALSE;
 	print_header = FALSE;
 	process_only_unread = TRUE;
 	purge_index_files = FALSE;
