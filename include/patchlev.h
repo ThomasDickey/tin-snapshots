@@ -43,7 +43,7 @@
  *		FIDO support
  *
  * 	Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
- * 	Urs Janﬂen <urs@akk.uni-karlsruhe.de>
+ * 	Urs Janssen <urs@akk.uni-karlsruhe.de>
  *		bugfixes & customasations
  *
  *	Branden Robinson <branden@purdue.edu>
@@ -58,7 +58,7 @@
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960528"
+#define PATCHLEVEL	"MC.960529"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

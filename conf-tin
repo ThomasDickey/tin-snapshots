@@ -1,5 +1,8 @@
 #!/bin/sh
 # rm -f config.cache config.status config.log
+
+rm makefile src/Makefile include/autoconf.h
+
 if test ! -f configure
 then
         autoconf
@@ -52,6 +55,5 @@ CC="$CC" \
         --enable-warnings \
 	--with-libdir="" \
 	--with-spooldir="" \
-	--enable-nntp-only \
-	--enable-color
+	--enable-nntp-only
         $OPTS $* 2>&1 |tee -a $OUT

@@ -1,10 +1,16 @@
 Bugs
 ----
-o  The "M" moderation flag (group selection level) is not showing up
+o  if marking read article with 'z' as will return and than reread it, the
+   '-' article_will_return flag is not removed.
+   when leaving that group, the unread_articles counter still contains that
+   article, but when reentering it is recogniced as read and disapers (as it
+   should have before)
+
+o  The 'M' moderation flag (group selection level) is not showing up
    (help!!! in gdb it is showing up, without gdb it is not)
 
-o  "D" deleted article flag (thread selection level) is not showing up.
-   is it still needed?!
+o  'D' deleted article flag (thread selection level) is not showing up.
+   (is it still needed?!)
 
 o  can't 'x' (repost) to more than one group - comma is not parsed as
    separator
@@ -22,19 +28,21 @@ o  Colours are not reset when tin is suspended with ^Z (signal.c)
 
 o  full_page_scroll=OFF seems not to work
 
-New features
-------------
 o  fix nntplib.c line 387++ (no prototyping #if !defined(linux))
 
+New features
+------------
 o  add
        --enable-mime-base64           (default off)
        --enable-log-user              (default off)
-       --disabale-piping                (default on)
-       --enable-iso-to-ascii
+       --disabale-piping              (default on)
+       --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
+   add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
+   rem INEWS_MAIL_DOMAIN default or set it to 'hostname -d'
 
-o  move architecture depending files in subdirectory, clean up architecture
+o  move architecture depending files in subdirectorys, clean up architecture
    independend files, rename several defines, remove useless doubled defines
    like NO_PIPING and DONT_HAVE_PIPING
 

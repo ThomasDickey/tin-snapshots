@@ -1,18 +1,18 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960528 (Mon May 27 21:26:02 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960529 (Wed May 29 20:51:53 MET DST 1996)
 ----------------------------------------------------
-  15613 ./CHANGES
-   8725 ./TODO
-   4913 ./Makefile
+  15936 ./CHANGES
+   9154 ./TODO
+   5012 ./Makefile
   17174 ./INSTALL
    2092 ./MANIFEST
-   1398 ./README
+   1266 ./README
     913 ./tinpp
   13185 ./aclocal.m4
-  87239 ./configure
-   9030 ./configure.in
+  87297 ./configure
+   9245 ./configure.in
    4771 ./install.sh
   11438 ./makefile.in
-    952 ./conf-tin
+    980 ./conf-tin
   69402 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
@@ -37,7 +37,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960528 (Mon May 27 21:26:02 MET DST 1996)
   22033 ./src/attrib.c
    8262 ./src/charset.c
    1463 ./src/color.c
-  41391 ./src/config.c
+  41438 ./src/config.c
   19933 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
@@ -54,7 +54,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960528 (Mon May 27 21:26:02 MET DST 1996)
   12009 ./src/mail.c
   16806 ./src/main.c
   11022 ./src/memory.c
-  41582 ./src/misc.c
+  41965 ./src/misc.c
    7234 ./src/msmail.c
   33022 ./src/newsrc.c
   26002 ./src/nntplib.c
@@ -77,7 +77,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960528 (Mon May 27 21:26:02 MET DST 1996)
    5270 ./src/sigfile.c
   11022 ./src/signal.c
    5882 ./src/strftime.c
-  25284 ./src/thread.c
+  25285 ./src/thread.c
    5014 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
@@ -85,4 +85,4 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960528 (Mon May 27 21:26:02 MET DST 1996)
    5549 ./src/vms.c
    5614 ./include/autoconf.hin
   10463 ./src/Makefile.in
-1334562 total
+1336013 total

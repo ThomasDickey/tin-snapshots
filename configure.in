@@ -1,3 +1,13 @@
+#
+# Project   : tin - a Usenet reader
+# Module    : configure.in
+# Author    : Thomas E. Dickey <dickey@clark.net>
+# Created   : 
+# Updated   : 29.05.96
+# Notes     : 
+# Copyright : 
+#
+
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.0)
 AC_INIT(include/tin.h)
@@ -135,7 +145,7 @@ AC_ARG_ENABLE(mh-mail-handling,
 		AC_MSG_RESULT(no)
 		;;
 	esac ],
-	[ AC_MSG_RESULT(no)]
+	[ AC_MSG_RESULT(no) ]
 )
 
 AC_MSG_CHECKING(whether to be NNTP_ONLY)
@@ -159,17 +169,19 @@ AC_ARG_ENABLE(nntp-only,
 AC_MSG_CHECKING(whether to enable ANSI-color)
 AC_ARG_ENABLE(color,
 	[  --enable-color
-                          (ANSI-color support (default: off))],
+                          (ANSI-color support (default: on))],
 	[ case "$enableval" in
-	yes)
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_COLOR)
-		;;
-	*)
+	no)
 		AC_MSG_RESULT(no)
 		;;
+	*)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_COLOR)
+
+		;;
 	esac ],
-	[ AC_MSG_RESULT(no)]
+	[ AC_MSG_RESULT(yes)
+	  AC_DEFINE(HAVE_COLOR) ]
 )
 
 AC_MSG_CHECKING(whether to enable reference-based threading)
@@ -218,7 +230,7 @@ AC_ARG_ENABLE(break-long-lines,
 		AC_MSG_RESULT(no)
 		;;
 	esac ],
-	[ AC_MSG_RESULT(no)]
+	[ AC_MSG_RESULT(no) ]
 )
 
 AC_MSG_CHECKING(whether to force MM_CHARSET obeyance when decoding mime)
@@ -251,7 +263,7 @@ AC_ARG_ENABLE(forgery,
 		AC_MSG_RESULT(no)
 		;;
 	esac ],
-	[ AC_MSG_RESULT(no)]
+	[ AC_MSG_RESULT(no) ]
 )
 
 ###	checks for compiler characteristics

@@ -1534,6 +1534,7 @@ create_index_lock_file (lock_file)
  *   %G  Groupname of Article
  *   %M  Articles MessageId
  *   %N  Articles Name of author
+ *   %C  First Name of author
  */
 
 int
@@ -1625,6 +1626,18 @@ strfquote (group, respnum, s, maxsize, format)
 						strcpy (tbuf, arts[respnum].name);
 					} else {
 						strcpy (tbuf, arts[respnum].from);
+					}
+					break;
+				case 'C':   /* First Name of author */
+					if (strrchr (arts[respnum].name, ' ')) {
+						strcpy (tbuf, arts[respnum].name);
+						*(strrchr (tbuf, ' ')) = '\0';
+					} else {
+						if (arts[respnum].name != (char *) 0) {
+							strcpy (tbuf, arts[respnum].name);
+						} else {
+							strcpy (tbuf, arts[respnum].from);
+						}
 					}
 					break;
 				default:

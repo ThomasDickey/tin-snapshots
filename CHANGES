@@ -1,3 +1,14 @@
+--950824BETA  PLMC.960529 --
+
+055) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. %C First Name of author to news_quote_format
+     FIX. misc.c config.c
+
+054) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed --enable-color default to on
+     BUG. no range limit for Lines:
+     FIX. configure.in, thread.c
+
 --950824BETA  PLMC.960528 --
 
 053) Chris Blum <chris@phil.uni-sb.de>
