@@ -6,6 +6,9 @@ CC	= gcc
 
 COPTS	= -c \
 	-O2 -Wall -m486 \
+	$(CPP_OPTS)
+
+CPP_OPTS = \
 	-I$(INCDIR) \
 	-DNNTP_ONLY \
 	-DNNTP_INEWS \
@@ -16,9 +19,10 @@ COPTS	= -c \
 	-DHAVE_COLOR \
 	-DREF_THREADING
 
-#	-DHAVE_PGP
-#	-DMIME_BREAK_LONG_LINES
-#	-DFORGERY
+OTHER_OPTS = \
+	-DHAVE_PGP \
+	-DMIME_BREAK_LONG_LINES \
+	-DFORGERY
 
 LD	= $(CC)
 YACC	= bison -y
@@ -98,8 +102,6 @@ HFILES	= \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
-	$(INCDIR)/rfc1521.h \
-	$(INCDIR)/rfc1522.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h
 #	$(INCDIR)/amiga.h
@@ -140,10 +142,10 @@ CFILES	= \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
-	$(SRCDIR)/post.c \
 	$(SRCDIR)/pgp.c \
+	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c\
-	$(SRCDIR)/refs.c\
+	$(SRCDIR)/refs.c \
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
@@ -195,8 +197,8 @@ OFILES	= \
 	$(OBJDIR)/open.o \
 	$(OBJDIR)/page.o \
 	$(OBJDIR)/parsdate.o \
-	$(OBJDIR)/post.o \
 	$(OBJDIR)/pgp.o \
+	$(OBJDIR)/post.o \
 	$(OBJDIR)/prompt.o\
 	$(OBJDIR)/refs.o\
 	$(OBJDIR)/rfc1521.o \
@@ -628,7 +630,7 @@ proto:
 	@$(ECHO) "Generating function prototypes to $(INCDIR)/proto.h..."
 	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
 	@-$(CP) $(INCDIR)/proto.h $(INCDIR)/protoold.h
-	@$(CPROTO) -e -m -I$(INCDIR) -I/linux/include $(CFILES) | sed -f proto.sed > $(INCDIR)/protonew.h
+	@$(CPROTO) -e -m $(CPP_OPTS) $(OTHER_OPTS) $(CFILES) | sed -f proto.sed > $(INCDIR)/protonew.h
 	@-$(CHMOD) 0644 $(INCDIR)/proto.h
 	@-$(MV) $(INCDIR)/protonew.h $(INCDIR)/proto.h
 	@$(LS) $(INCDIR)/proto.h

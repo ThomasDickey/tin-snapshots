@@ -1,0 +1,132 @@
+
+#!/bin/sh
+# $Id: cfg-tin,v 1.6 1996/05/23 14:36:04 dickey Exp $
+#
+rm -f config.cache config.status config.log
+#
+OUT=td-conf.out
+cat >>$OUT <<EOF/
+** `date`
+** node: `uname -a`
+** from: `pwd`
+** user: `id`
+** conf: $*
+EOF/
+OPTS="$*"
+###############################################################################
+#
+if test ! -f configure
+then
+        autoconf
+fi
+###############################################################################
+#
+TOP=/usr/local
+for p in \
+        /local/local/sun4 \
+        /home/knews/news
+do
+        if test -d $p ; then
+                NewsTree=$p
+                break
+        fi
+done
+###############################################################################
+#
+case $NewsTree in
+/local/local/sun4)
+        NEWS_LIBDIR=$NewsTree/lib/news
+        NEWS_SPOOLDIR=$NewsTree/spool/news
+        ;;
+/home/knews/news)
+        NEWS_LIBDIR=$NewsTree/lib
+        NEWS_SPOOLDIR=$NewsTree/spool
+        ;;
+esac
+###############################################################################
+#
+INSTALL="td-install"
+CFLAGS="-O"
+CC="${CC-cc}"
+###############################################################################
+#
+case `hostname` in
+*clarknet*|explorer)
+        MAIL_DOMAIN="clark.net"
+        NEWS_LIBDIR=/opt/local/news
+        NEWS_SPOOLDIR=/news
+        ;;
+*dickey*)
+        ;;
+*akk*)
+	NNTP_DEFAULT_SERVER=news.akk.uni-karlsruhe.de
+	CFLAGS="$CFLAGS -DNNTP_ONLY -DNNTP_INEWS -DDONT_LOG_USER"
+	CFLAGS="$CFLAGS -DNO_ETIQUETTE"
+	MAIL_DOMAIN="akk.uni-karlsruhe.de"
+	;;
+*rzstud*)
+	NNTP_DEFAULT_SERVER=news.rz.uni-karlsruhe.de
+	CFLAGS="$CFLAGS -DNNTP_ONLY -DNNTP_INEWS -DDONT_LOG_USER"
+	;;
+*)
+        NNTP_DEFAULT_SERVER=nntpserver
+        MAIL_DOMAIN=".epd.prc.com"
+        ;;
+esac
+###############################################################################
+#
+NETLIBS=""
+case `uname -s` in
+api20|opera15)
+        NETLIBS="-lsocket"
+        ;;
+AIX)
+        ;;
+CLIX)
+        NETLIBS="-lbsd"
+        ;;
+Linux)
+        INSTALL=install
+#	OPTS="$OPTS -with-nntp-default-server=localhost"
+        ;;
+HP-UX)
+        if test "$CC" = "cc" ; then
+                YACC=yacc; export YACC
+                CFLAGS=""
+        fi
+        ;;
+SunOS)
+        case `uname -r` in
+        5.*)
+                NETLIBS="-lsocket -lnsl"
+                ;;
+        esac
+        ;;
+UNIX_SV)
+        NETLIBS="-lresolv -lsocket -lnsl"
+        ;;
+esac
+
+if test -n "$NETLIBS" ; then
+        LIBS="$LIBS $NETLIBS"
+        export LIBS
+fi
+###############################################################################
+#
+NNTP_DEFAULT_SERVER="$NNTP_DEFAULT_SERVER" \
+INSTALL="$INSTALL" \
+CFLAGS="$CFLAGS" \
+CC="$CC" \
+./configure --verbose \
+        --prefix=$TOP \
+        --exec-prefix=$TOP \
+        --disable-echo \
+        --enable-debug \
+        --enable-prototypes \
+        --enable-warnings \
+        --with-color \
+        --with-mail-handling \
+        --with-mail-domain=$MAIL_DOMAIN \
+        --with-libdir=$NEWS_LIBDIR \
+        --with-spooldir=$NEWS_SPOOLDIR \
+        $OPTS $* 2>&1 |tee -a $OUT

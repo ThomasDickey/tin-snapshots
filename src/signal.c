@@ -29,12 +29,12 @@ int do_sigtstp = 0;
 #ifdef HAVE_POSIX_JC
 
 /*
- * for POSIX systems we know SIGTYPE is void 
+ * for POSIX systems we know RETSIGTYPE is void 
  */
  
-void (*sigdisp(sig, func))(SIG_ARGS)
+RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	int sig;
-	void (*func)(SIG_ARGS);
+	RETSIGTYPE (*func)(SIG_ARGS);
 {
 	struct sigaction sa, osa;
 
@@ -45,11 +45,7 @@ void (*sigdisp(sig, func))(SIG_ARGS)
 	sa.sa_flags |= SA_RESTART;
 #endif
 	if (sigaction (sig, &sa, &osa) < 0) {
-#ifdef DONT_PROTOTYPE_PTR_TO_FUNC
-		return ((void (*) ()) (-1));
-#else
-		return ((void (*) (int)) (-1));
-#endif		
+		return SIG_ERR;
 	}
 	return (osa.sa_handler);
 }

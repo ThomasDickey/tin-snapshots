@@ -1,0 +1,367 @@
+# Source Makefile for tin - for configuration options read the ../INSTALL file.
+#
+SHELL	= /bin/sh
+prefix	= @prefix@
+exec_prefix = @exec_prefix@
+
+# From: address in posted articles (don't use both - read the INSTALL file)
+# Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
+INEWS_MAIL_GATEWAY=@INEWS_MAIL_GATEWAY@
+INEWS_MAIL_DOMAIN=@INEWS_MAIL_DOMAIN@
+#.scn.de
+#.subdomain.domain
+
+# Default nntp server (can be overridden by NNTPSERVER environment variable)
+NNTP_DEFAULT_SERVER=@NNTP_DEFAULT_SERVER@
+#news.scn.de
+#news-server.subdomain.domain
+
+# Where are your news libdir & spooldir?
+LIBDIR	= @LIBDIR@
+SPOOLDIR= @SPOOLDIR@
+NOVROOTDIR= $(SPOOLDIR)
+
+# Compiler, linker & parser commands
+CC	= @CC@
+
+DEBUG	= # -DDEBUG -DDEBUG_NEWSRC -DPROFILE
+CPPOPTS	= @DEFS@ -I$(INCDIR) $(DEBUG)
+CFLAGS	= @CFLAGS@ $(CPPOPTS) -c \
+	-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
+	-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
+	-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
+	-DLIBDIR=\"$(LIBDIR)\" \
+	-DSPOOLDIR=\"$(SPOOLDIR)\" \
+	-DNOVROOTDIR=\"$(NOVROOTDIR)\"
+
+CPROTO_OPTS = \
+	-e -m  $(CPPOPTS) \
+	-DFORGERY \
+	-DHAVE_COLOR \
+	-DREF_THREADING
+
+LD	= $(CC)
+YACC	= @YACC@
+
+LIBS	= @LIBS@ $(INN_NNTPLIB)
+
+# Where do you want the binary & manual page installed?
+INS_BINARY_DIR	= @bindir@
+INS_DAEMON_DIR	= $(LIBDIR)
+INS_MANUAL_DIR	= $(prefix)/man/man
+INS_MANUAL_EXT	= 1
+
+# Use INN clientlibs config functions (define USE_INN_NNTPLIB in autoconf.h)
+INN_NNTPLIB= @INN_NNTPLIB@
+
+# Project
+PROJECT	= tin
+EXE	= tin
+EXED	= tind
+VER	= 1.30
+MANEXT	= 1
+
+# directory structure
+DOCDIR	= ../doc
+INCDIR	= ../include
+BINDIR	= .
+OBJDIR	= .
+SRCDIR	= .
+
+# standard commands
+CHGRP	= chown
+CHMOD	= chmod
+CHOWN	= chown
+CFLOW	= cflow
+CP	= cp
+CPROTO	= cproto
+CSCOPE	= cscope
+ECHO	= echo
+LINT	= lint
+LN	= ln
+LS	= ls -l
+MAKE	= make
+MV	= mv
+RM	= rm
+STRIP	= strip
+STRIP2	= mcs -d
+SU	= su
+TAGS	= ctags
+
+HFILES	= \
+	$(INCDIR)/config.h \
+	$(INCDIR)/extern.h \
+	$(INCDIR)/menukeys.h \
+	$(INCDIR)/nntplib.h \
+	$(INCDIR)/patchlev.h \
+	$(INCDIR)/proto.h \
+	$(INCDIR)/stpwatch.h \
+	$(INCDIR)/tin.h
+#	$(INCDIR)/amiga.h
+#	$(INCDIR)/amigatcp.h
+#	$(INCDIR)/gst.h
+#	$(INCDIR)/msmail.h
+#	$(INCDIR)/win32.h
+#	$(INCDIR)/win32tcp.h
+#	$(INCDIR)/os_2.h
+
+CFILES	= \
+	$(SRCDIR)/active.c \
+	$(SRCDIR)/actived.c \
+	$(SRCDIR)/art.c \
+	$(SRCDIR)/attrib.c \
+	$(SRCDIR)/charset.c \
+	$(SRCDIR)/color.c \
+	$(SRCDIR)/config.c \
+	$(SRCDIR)/curses.c \
+	$(SRCDIR)/debug.c\
+	$(SRCDIR)/envarg.c \
+	$(SRCDIR)/feed.c \
+	$(SRCDIR)/filter.c \
+	$(SRCDIR)/getline.c \
+	$(SRCDIR)/group.c \
+	$(SRCDIR)/hashstr.c \
+	$(SRCDIR)/help.c\
+	$(SRCDIR)/inews.c \
+	$(SRCDIR)/init.c \
+	$(SRCDIR)/lang.c \
+	$(SRCDIR)/list.c \
+	$(SRCDIR)/mail.c \
+	$(SRCDIR)/main.c \
+	$(SRCDIR)/memory.c \
+	$(SRCDIR)/misc.c \
+	$(SRCDIR)/newsrc.c\
+	$(SRCDIR)/nntplib.c \
+	$(SRCDIR)/open.c \
+	$(SRCDIR)/page.c \
+	$(SRCDIR)/parsdate.y \
+	$(SRCDIR)/pgp.c \
+	$(SRCDIR)/post.c \
+	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/refs.c \
+	$(SRCDIR)/rfc1521.c \
+	$(SRCDIR)/rfc1522.c \
+	$(SRCDIR)/save.c \
+	$(SRCDIR)/screen.c \
+	$(SRCDIR)/search.c \
+	$(SRCDIR)/select.c \
+	$(SRCDIR)/sigfile.c \
+	$(SRCDIR)/signal.c \
+	$(SRCDIR)/strftime.c \
+	$(SRCDIR)/thread.c \
+	$(SRCDIR)/wildmat.c \
+	$(SRCDIR)/xref.c
+#	$(SRCDIR)/amiga.c
+#	$(SRCDIR)/amigatcp.c
+#	$(SRCDIR)/msmail.c
+#	$(SRCDIR)/nntpw32.c
+#	$(SRCDIR)/win32.c
+#	$(SRCDIR)/win32tcp.c
+#	$(SRCDIR)/os_2.c
+#	$(SRCDIR)/vms.c
+
+OFILES	= \
+	$(OBJDIR)/active.o \
+	$(OBJDIR)/actived.o \
+	$(OBJDIR)/art.o \
+	$(OBJDIR)/attrib.o \
+	$(OBJDIR)/charset.o \
+	$(OBJDIR)/color.o \
+	$(OBJDIR)/config.o \
+	$(OBJDIR)/curses.o \
+	$(OBJDIR)/debug.o\
+	$(OBJDIR)/envarg.o \
+	$(OBJDIR)/feed.o \
+	$(OBJDIR)/filter.o \
+	$(OBJDIR)/getline.o \
+	$(OBJDIR)/group.o \
+	$(OBJDIR)/hashstr.o \
+	$(OBJDIR)/help.o\
+	$(OBJDIR)/inews.o \
+	$(OBJDIR)/init.o \
+	$(OBJDIR)/lang.o \
+	$(OBJDIR)/list.o \
+	$(OBJDIR)/mail.o \
+	$(OBJDIR)/main.o \
+	$(OBJDIR)/memory.o \
+	$(OBJDIR)/misc.o \
+	$(OBJDIR)/newsrc.o\
+	$(OBJDIR)/nntplib.o \
+	$(OBJDIR)/open.o \
+	$(OBJDIR)/page.o \
+	$(OBJDIR)/parsdate.o \
+	$(OBJDIR)/pgp.o \
+	$(OBJDIR)/post.o \
+	$(OBJDIR)/prompt.o\
+	$(OBJDIR)/refs.o\
+	$(OBJDIR)/rfc1521.o \
+	$(OBJDIR)/rfc1522.o \
+	$(OBJDIR)/save.o \
+	$(OBJDIR)/screen.o \
+	$(OBJDIR)/search.o \
+	$(OBJDIR)/select.o \
+	$(OBJDIR)/sigfile.o \
+	$(OBJDIR)/signal.o \
+	$(OBJDIR)/strftime.o \
+	$(OBJDIR)/thread.o \
+	$(OBJDIR)/wildmat.o \
+	$(OBJDIR)/xref.o
+#	$(OBJDIR)/amiga.o
+#	$(OBJDIR)/win32.o
+#	$(OBJDIR)/vms.o
+#	$(OBJDIR)/os_2.o
+#	$(OBJDIR)/nntpw32.o
+
+
+ALL_FILES = $(HFILES) $(CFILES) $(NNTP)
+
+LINTFLAGS=-a -c -h -n -x $(CPPOPTS) \
+	-DDONT_LOG_USER \
+	-DUSE_ISO2ASC=\"2\" \
+	-DHAVE_ISPELL \
+	-DHAVE_COLOR
+
+all: $(BINDIR)/$(EXE) 
+
+.c.o:
+@SHOW_CC@
+	@ECHO_CC@$(CC) $(CFLAGS) $*.c
+
+# explicit rule to allow running lint
+$(SRCDIR)/parsdate.c: $(SRCDIR)/parsdate.y
+	@ echo expect 6 shift/reduce conflicts...
+	$(YACC) $(SRCDIR)/parsdate.y
+	$(MV) y.tab.c $(SRCDIR)/parsdate.c
+
+actived: actived.c mail.c
+	@$(ECHO) "Compiling actived..."
+	$(CC) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON actived.c mail.c
+	$(CC) actived.o mail.o -o actived $(LIBS)
+	@$(LS) actived
+
+$(BINDIR)/$(EXE): $(OFILES)
+	@$(ECHO) "Linking $(EXE) v$(VER)..."
+	$(LD) $(LFLAGS) -o $(BINDIR)/$(EXE) $(OFILES) $(NNTPLIB) $(NETLIBS) $(LIBS) $(DEBUG)
+	@$(LS) $(BINDIR)/$(EXE)
+
+install_manpage:
+	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
+	@$(CP) $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
+
+install:
+	@$(ECHO) "Installing $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
+	@$(STRIP) $(BINDIR)/$(EXE)
+	@-$(STRIP2) $(BINDIR)/$(EXE) > /dev/null 2>&1
+	@-$(MV) $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
+	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
+	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
+	@$(CHMOD) 755 $(INS_BINARY_DIR)/$(EXE)
+	@$(LS) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
+	@$(MAKE) install_manpage
+
+install_setuid:
+	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
+	@$(STRIP) $(BINDIR)/$(EXE)
+	@-$(STRIP2) $(BINDIR)/$(EXE) > /dev/null 2>&1 
+	@-$(MV) $(BINDIR)/$(EXE) $(BINDIR)/$(EXE)
+	@$(CHOWN) news $(BINDIR)/$(EXE) 
+	@$(CHGRP) news $(BINDIR)/$(EXE) 
+	@-$(RM) $(BINDIR)/r$(EXE)
+	@$(LN) $(BINDIR)/$(EXE) $(BINDIR)/r$(EXE)
+	@$(SU) news -c "chmod 6755 $(BINDIR)/$(EXE)"
+	@$(LS) $(BINDIR)/$(EXE) $(BINDIR)/r$(EXE)
+	@$(MAKE) install_manpage
+
+install_daemon:
+	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INS_DAEMON_DIR)..."
+	@$(STRIP) $(EXED)
+	@-$(STRIP2) $(EXED) > /dev/null 2>&1
+	@-$(MV) $(EXED) $(INS_DAEMON_DIR)/$(EXED)
+	@$(CHOWN) news $(INS_DAEMON_DIR)/$(EXED) 
+	@$(CHMOD) 0750 $(INS_DAEMON_DIR)/$(EXED)
+	@$(LS) $(INS_DAEMON_DIR)/$(EXED)
+
+proto:
+	@$(ECHO) "Generating function prototypes to $(INCDIR)/proto.h..."
+	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
+	@-$(CP) $(INCDIR)/proto.h $(INCDIR)/protoold.h
+	@$(CPROTO) $(CPROTO_OPTS) $(CFILES) | sed -f proto.sed > $(INCDIR)/protonew.h
+	@-$(CHMOD) 0644 $(INCDIR)/proto.h
+	@-$(MV) $(INCDIR)/protonew.h $(INCDIR)/proto.h
+	@$(LS) $(INCDIR)/proto.h
+
+tags:
+	@$(ECHO) "Generating tags (results in ./tags)..."
+	@-$(RM) -f tags
+	@$(TAGS) $(HFILES) $(CFILES) 
+
+lint:	$(CFILES) $(SRCDIR)/parsdate.c
+	@$(ECHO) "Linting source (results in ./LINT)..."
+	@$(LINT) $(LINTFLAGS) -DNNTP_ABLE `/bin/ls -1 $(CFILES)|sed -e 's/\.y$$/.c/'` > LINT
+
+clean:
+	@$(ECHO) "Cleaning..."
+	@-$(RM) -f $(OFILES)
+	@-$(RM) -f $(SRCDIR)/parsdate.c
+	@-$(RM) -f LINT *.ln
+	@-$(RM) -f *~
+
+distclean \
+clobber: clean
+	@$(ECHO) "Clobbering..."
+	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) tags 
+
+cflow:
+	@$(ECHO) "Creating cflow for $(PROJECT)..."
+	@$(CFLOW) $(CFILES) > cflow.$(PROJECT) &
+
+cscope:
+	@$(ECHO) "Creating cscope database $(PROJECT)..."
+	@$(CSCOPE) $(ALL_FILES)
+
+$(OBJDIR)/active.o:		$(SRCDIR)/active.c $(HFILES)
+$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(HFILES)
+$(OBJDIR)/art.o:		$(SRCDIR)/art.c $(HFILES)
+$(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(HFILES)
+$(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(HFILES)
+$(OBJDIR)/config.o:		$(SRCDIR)/config.c $(HFILES)
+$(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(HFILES)
+$(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(HFILES)
+$(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(HFILES)
+$(OBJDIR)/feed.o:		$(SRCDIR)/feed.c $(HFILES)
+$(OBJDIR)/filter.o:		$(SRCDIR)/filter.c $(HFILES)
+$(OBJDIR)/getline.o:		$(SRCDIR)/getline.c $(HFILES)
+$(OBJDIR)/group.o:		$(SRCDIR)/group.c $(HFILES)
+$(OBJDIR)/hashstr.o:		$(SRCDIR)/hashstr.c $(HFILES)
+$(OBJDIR)/help.o:		$(SRCDIR)/help.c $(HFILES)
+$(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(HFILES)
+$(OBJDIR)/init.o:		$(SRCDIR)/init.c $(HFILES)
+$(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(HFILES)
+$(OBJDIR)/list.o:		$(SRCDIR)/list.c $(HFILES)
+$(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(HFILES)
+$(OBJDIR)/main.o:		$(SRCDIR)/main.c $(HFILES)
+$(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(HFILES)
+$(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(HFILES)
+$(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(HFILES)
+$(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(HFILES)
+$(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(HFILES)
+$(OBJDIR)/open.o:		$(SRCDIR)/open.c $(HFILES)
+$(OBJDIR)/page.o:		$(SRCDIR)/page.c $(HFILES)
+$(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(HFILES)
+$(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(HFILES)
+$(OBJDIR)/post.o:		$(SRCDIR)/post.c $(HFILES)
+$(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(HFILES)
+$(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(HFILES)
+$(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(HFILES)
+$(OBJDIR)/save.o:		$(SRCDIR)/save.c $(HFILES)
+$(OBJDIR)/screen.o:		$(SRCDIR)/screen.c $(HFILES)
+$(OBJDIR)/search.o:		$(SRCDIR)/search.c $(HFILES)
+$(OBJDIR)/select.o:		$(SRCDIR)/select.c $(HFILES)
+$(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(HFILES)
+$(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(HFILES)
+$(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(HFILES)
+$(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(HFILES)
+$(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(HFILES)
+$(OBJDIR)/win32.o:		$(SRCDIR)/win32.c $(HFILES)
+$(OBJDIR)/xref.o:		$(SRCDIR)/xref.c $(HFILES)
+$(OBJDIR)/vms.o:		$(SRCDIR)/vms.c $(HFILES)

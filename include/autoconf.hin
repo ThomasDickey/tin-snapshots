@@ -1,0 +1,269 @@
+/*
+ * @SYS_NAME@
+ */
+
+/*
+ * If we're able to run the 'configure' script, it's close enough to UNIX for
+ * our purposes.  (It's predefined on SCO).
+ */
+#ifndef M_UNIX
+#define M_UNIX
+#endif
+
+/*
+ * SCO requires special handling
+ */
+#undef SYSTEM_LOOKS_LIKE_SCO
+
+/*
+ * These are set as configure options, and must be guarded by ifdefs because
+ * they're also used in makefile rules (e.g., lint, proto).
+ */
+#ifndef	HAVE_COLOR
+#undef	HAVE_COLOR
+#endif
+
+/*
+ * These are defined if the corresponding program is found during configuration
+ */
+#undef	HAVE_ISPELL
+#undef	HAVE_METAMAIL
+#undef	HAVE_UNAME
+#undef	HAVE_PGP
+
+/*
+ * Compiler characteristics
+ */
+#undef	inline
+#undef	const
+
+/*
+ * Data types
+ */
+#undef	size_t
+
+/*
+ * The following xxx_H definitions are set by the 'configure' script to
+ * defined or commented-out, according to whether the corresponding header
+ * file was detected during configuration.
+ */
+#undef	HAVE_CURSES_H
+#undef	HAVE_DIRENT_H
+#undef	HAVE_ERRNO_H
+#undef	HAVE_FCNTL_H
+#undef	HAVE_LOCALE_H
+#undef	HAVE_NETDB_H
+#undef	HAVE_NETLIB_H
+#undef	HAVE_POLL_H
+#undef	HAVE_PROTOTYPES_H
+#undef	HAVE_PWD_H
+#undef	HAVE_STDDEF_H
+#undef	HAVE_STDLIB_H
+#undef	HAVE_STRINGS_H
+#undef	HAVE_STRING_H
+#undef	HAVE_STROPTS_H
+#undef	HAVE_SYS_BSDTYPES_H
+#undef	HAVE_SYS_DIR_H
+#undef	HAVE_SYS_IOCTL_H
+#undef	HAVE_SYS_NDIR_H
+#undef	HAVE_SYS_PARAM_H
+#undef	HAVE_SYS_PTEM_H
+#undef	HAVE_SYS_PTY_H
+#undef	HAVE_SYS_SELECT_H
+#undef	HAVE_SYS_STREAM_H
+#undef	HAVE_SYS_TIMES_H
+#undef	HAVE_SYS_TIME_H
+#undef	HAVE_SYS_UTSNAME_H
+#undef	HAVE_SYS_WAIT_H
+#undef	HAVE_TERMIOS_H
+#undef	HAVE_TERMIO_H
+#undef	HAVE_TIME_H
+#undef	HAVE_UNISTD_H
+#undef	STDC_HEADERS
+#undef	TIME_WITH_SYS_TIME
+
+/*
+ * The following are defined by the configure script if the corresponding
+ * function is found in a library.
+ */
+#undef	HAVE_BCOPY
+#undef	HAVE_BFILL
+#undef	HAVE_BZERO
+#undef	HAVE_FORK
+#undef	HAVE_GETCWD
+#undef	HAVE_GETHOSTBYNAME
+#undef	HAVE_IS_XTERM
+#undef	HAVE_MEMCMP
+#undef	HAVE_MEMCPY
+#undef	HAVE_MEMSET
+#undef	HAVE_MKDIR
+#undef	HAVE_POLL
+#undef	HAVE_REWINDDIR
+#undef	HAVE_SELECT
+#undef	HAVE_SETEGID
+#undef	HAVE_SETEUID
+#undef	HAVE_SETGID
+#undef	HAVE_SETLOCALE
+#undef	HAVE_SETREGID
+#undef	HAVE_SETREUID
+#undef	HAVE_SETUID
+#undef	HAVE_SIGACTION
+#undef	HAVE_STRCHR
+#undef	HAVE_STRERROR
+#undef	HAVE_STRFTIME
+#undef	HAVE_STRTOL
+#undef	HAVE_TCGETATTR
+#undef	HAVE_TCSETATTR
+#undef	HAVE_TZSET
+#undef	HAVE_UNLINK
+
+/*
+ * The following are functions that we'll have to declare if they're not
+ * declared in the system include files, since they return values other than
+ * int.
+ */
+#undef	DECL_GETENV
+#undef	DECL_TGETSTR
+
+/*
+ * The following are functions that we'll optionally prototype (to stifle
+ * warnings, etc., for development/testing).
+ */
+#undef	DECL_BCOPY
+#undef	DECL_BZERO
+#undef	DECL_FCLOSE
+#undef	DECL_FFLUSH
+#undef	DECL_FPRINTF
+#undef	DECL_FPUTC
+#undef	DECL_FPUTS
+#undef	DECL_FREAD
+#undef	DECL_FSEEK
+#undef	DECL_FWRITE
+#undef	DECL_GETHOSTNAME
+#undef	DECL_GETOPT
+#undef	DECL_IOCTL
+#undef	DECL_MEMSET
+#undef	DECL_MKTEMP
+#undef	DECL_PCLOSE
+#undef	DECL_PERROR
+#undef	DECL_PRINTF
+#undef	DECL_REWIND
+#undef	DECL_SELECT
+#undef	DECL_SETEGID
+#undef	DECL_SETEUID
+#undef	DECL_SETPGRP
+#undef	DECL_SOCKET
+#undef	DECL_SSCANF
+#undef	DECL_STRFTIME
+#undef	DECL_STRTOL
+#undef	DECL_SYSTEM
+#undef	DECL_TIME
+#undef	DECL_TOLOWER
+#undef	DECL_TOUPPER
+#undef	DECL_TPUTS
+#undef	DECL__FLSBUF
+
+/*
+ * Define a symbol for the prototype arguments of a signal handler
+ */
+#undef	SIG_ARGS
+
+/*
+ * Define this if it's safe to redefine the signal constants with prototypes.
+ */
+#undef	DECL_SIG_CONST
+
+#if 0 /* FIXME */
+#if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
+    defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
+#	if !defined(M_OS2)
+#		define	HAVE_POSIX_JC
+#	endif
+#endif
+#endif
+
+/*
+ * Define this if the host system has long (>14 character) filenames
+ */
+#undef	HAVE_LONG_FILENAMES
+
+/*
+ * Define this if the compiler performs ANSI-style token substitution (used in
+ * our 'assert' macro).
+ */
+#undef	HAVE_ANSI_ASSERT
+
+/*
+ * One of the following two is defined, according to whether qsort's compare
+ * function is ANSI (declared with 'void *' parameters) or not.
+ */
+#undef	HAVE_COMPTYPE_VOID
+#undef	HAVE_COMPTYPE_CHAR
+
+/*
+ * Define this if an application can dump core.  Some systems (e.g., apollo)
+ * don't at all.  Others may not, depending on how they're configured.
+ */
+#undef	HAVE_COREFILE
+
+/*
+ * Define if the system has any of the pairs setuid/setgid, seteuid/setegid or
+ * setreuid/setregid.
+ */
+#undef	HAVE_SET_GID_UID
+
+/*
+ * Define if the system doesn't define SIGWINCH, or the associated structs
+ * to determine the window's size.
+ * FIXME: test-not-impl
+ */
+#undef DONT_HAVE_SIGWINCH
+
+/*
+ * Used in parsedate.y
+ */
+#undef	DONT_HAVE_TM_GMTOFF
+
+#if 0 /* FIXME: test-not-impl */
+#if defined(M_AMIGA)
+#	define	SMALL_MEMORY_MACHINE
+#endif
+
+#if defined(M_AMIGA)
+#	define	DONT_REREAD_ACTIVE_FILE
+#endif
+
+#if defined(COHERENT)
+#	define	HAVE_SETTZ
+#endif
+
+#if !defined(M_OS2)
+#	define	HAVE_SYSERRLIST
+#endif
+
+#if defined(__hpux)
+#	define	HAVE_KEYPAD
+#endif
+
+#if defined(RS6000)
+#	define	READ_CHAR_HACK
+#endif
+
+#if defined(supermax)
+#	define	HAVE_BROKEN_TGETSTR
+#endif
+
+/*
+ * Lets try and be a wise ass and make a nntp able binary
+ * for machines where the netlibs are in the libc library
+ */
+
+#if defined(BSD) || defined(linux) || defined(RS6000)
+#	if !defined(NNTP_ABLE)
+#		define	NNTP_ABLE
+#	endif
+#endif
+#endif /* FIXME */
+
+#undef NNTP_ABLE
+#undef NNTP_ONLY

@@ -126,7 +126,107 @@ extern unsigned int sleep  P_((unsigned int seconds));
 
 #endif
 
-#if !__STDC__ || defined(pre_CC_6_8)
+#ifdef DECL_BCOPY
+extern int	bcopy P_((char *, char *, int));
+#endif
+#ifdef DECL_BZERO
+extern void bzero P_((char *, int));
+#endif
+#ifdef DECL_FCLOSE
+extern int fclose P_((FILE *));
+#endif
+#ifdef DECL_FFLUSH
+extern int fflush P_((FILE *));
+#endif
+#ifdef DECL_FPRINTF
+extern int fprintf P_((FILE *, const char *, ...));
+#endif
+#ifdef DECL_FPUTC
+extern int fputc  P_((int c, FILE *fp));
+#endif
+#ifdef DECL_FPUTS
+extern int fputs  P_((const char *s, FILE *fp));
+#endif
+#ifdef DECL_FREAD
+extern size_t fread  P_((void *p, size_t size, size_t n, FILE *s));
+#endif
+#ifdef DECL_FSEEK
+extern int fseek  P_((FILE *p, long off, int n));
+#endif
+#ifdef DECL_FWRITE
+extern size_t fwrite  P_((void *p, size_t size, size_t n, FILE *s));
+#endif
+#ifdef DECL_GETHOSTNAME
+extern int gethostname  P_((char *, int));
+#endif
+#ifdef DECL_GETOPT
+extern int getopt  P_((int argc, char **argv, char *optstring));
+#endif
+#ifdef DECL_IOCTL
+extern int ioctl  P_((int, unsigned long, void *));
+#endif
+#ifdef DECL_MEMSET
+extern void * memset  P_((void *p, int c, size_t n));
+#endif
+#ifdef DECL_MKTEMP
+extern char * mktemp P_((char *));
+#endif
+#ifdef DECL_PCLOSE
+extern int pclose P_((FILE *));
+#endif
+#ifdef DECL_PERROR
+extern void perror P_((const char *s));
+#endif
+#ifdef DECL_PRINTF
+extern int printf P_((const char *fmt, ...));
+#endif
+#ifdef DECL_REWIND
+extern void rewind  P_((FILE *s));
+#endif
+#ifdef DECL_SELECT
+extern int select  P_((int width, fd_set *r, fd_set *w, fd_set *e, struct timeval *t));
+#endif
+#ifdef DECL_SETEGID
+extern int setegid  P_((uid_t gid));
+#endif
+#ifdef DECL_SETEUID
+extern int seteuid  P_((uid_t uid));
+#endif
+#ifdef DECL_SETPGRP
+/* FIXME: setpgrp */
+#endif
+#ifdef DECL_SOCKET
+extern int socket  P_((int domain, int type, int protocol));
+#endif
+#ifdef DECL_SSCANF
+extern int sscanf  P_((const char *s, const char *fmt, ...));
+#endif
+#ifdef DECL_STRFTIME
+extern int strftime P_((char *, int, char *, struct tm *));
+#endif
+#ifdef DECL_STRTOL
+extern long strtol P_((const char *s, char **d, int base));
+#endif
+#ifdef DECL_SYSTEM
+extern int system  P_((char *s));
+#endif
+#ifdef DECL_TIME
+extern time_t time  P_((time_t *p));
+#endif
+#ifdef DECL_TOLOWER
+extern int tolower  P_((int c));
+#endif
+#ifdef DECL_TOUPPER
+extern int toupper  P_((int c));
+#endif
+#ifdef DECL_TPUTS
+extern int tputs  P_((char *, int count, int (*outc)(int)));
+#endif
+#ifdef DECL__FLSBUF
+extern int _flsbuf P_((int, FILE *));
+#endif
+
+#if !__STDC__ || defined(DECL_GETENV)
 extern char *getenv  P_((char *));
 #endif
 
@@ -229,6 +329,9 @@ extern char userid[PATH_LEN];
 #ifdef M_OS2
 extern char TMPDIR[PATH_LEN];
 #endif
+
+extern const char base64_alphabet[64];
+
 
 extern constext txt_1_resp[];
 extern constext txt_abort_indexing[];

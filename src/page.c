@@ -13,7 +13,6 @@
  */
 
 #include	"tin.h"
-#include        "rfc1522.h"
 
 char note_h_path[LEN];			/* Path:         */
 char note_h_date[PATH_LEN];		/* Date:         */
@@ -533,7 +532,16 @@ return_to_index:
 			case iKeyPageToggleInverseVideo:	/* toggle inverse video */
 				toggle_inverse_video ();
 				redraw_page (group->name, respnum);
+				show_inverse_video_status ();
 				break;
+
+#ifdef HAVE_COLOR
+			case iKeyPageToggleColor:		/* toggle color */
+				toggle_color ();
+				redraw_page (group->name, respnum);
+				show_color_status ();
+				break;
+#endif
 
 			case iKeyPageKillArt:
 				if (note_page == ART_UNAVAILABLE) {

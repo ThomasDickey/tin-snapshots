@@ -425,10 +425,18 @@ select_page_up:
 				break;
 
 			case iKeySelectToggleInverseVideo:	/* toggle inverse video */
-				erase_group_arrow ();
 				toggle_inverse_video ();
 				group_selection_page ();
+				show_inverse_video_status ();
 				break;
+
+#ifdef HAVE_COLOR
+			case iKeySelectToggleColor:		/* toggle color */
+				toggle_color ();
+				group_selection_page ();
+				show_color_status ();
+				break;
+#endif
 
 			case iKeySelectDisplayGroupInfo:	/* display group description */
 				if (group_top == 0) {
@@ -718,19 +726,6 @@ select_done:
 				}
 				mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, msg);
 				break;
-
-#ifdef HAVE_COLOR
-			case iKeySelectColor:  /* toggle color */
-				use_color = !use_color;
-				use_color_tinrc = use_color;
-				group_selection_page();  /* redraw page */
-				if (use_color) {
-					info_message(txt_color_on);
-				} else {
-					info_message(txt_color_off);
-				}
-				break;
-#endif
 
 			default:
 			    info_message(txt_bad_command);

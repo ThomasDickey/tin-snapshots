@@ -14,7 +14,6 @@
 
 #include	"tin.h"
 #include	"stpwatch.h"
-#include	"rfc1522.h"
 
 #define SortBy(func) qsort ((char *) arts, (size_t)top, sizeof (struct t_article), func);
 #define CorruptIndex(n)  error = n; goto corrupt_index;
@@ -490,6 +489,7 @@ make_threads (group, rethread)
 #endif
 		case THREAD_SUBJ:
 			/* Fall through */
+			break;
 	}
 
 

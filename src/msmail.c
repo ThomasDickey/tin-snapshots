@@ -114,7 +114,7 @@ static int FAR PASCAL InitMAPI()
   if ((lpfnMAPISendMail= GetProcAddress(hLibrary,SZ_MAPISENDMAIL)) == NULL)
     return(ERR_LOAD_FUNC);
 
-#ifdef FULLMAPI // not needed here
+#ifdef FULLMAPI /* not needed here */
   if ((lpfnMAPISendDocuments= GetProcAddress(hLibrary,SZ_MAPISENDDOC)) == NULL)
     return(ERR_LOAD_FUNC);
 

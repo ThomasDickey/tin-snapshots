@@ -1,3 +1,17 @@
+--950824BETA  PLMC.960524 --
+
+047) Branden Robinson <branden@purdue.edu>
+     ADD. '&' toggle_color in all levels, rewrote show_inverse_video_status
+     FIX. several supplied patches
+
+046) Chris Blum <chris@phil.uni-sb.de>
+     BUG. mail_to_someone uses note_h_followup instead of note_h_newsgroups
+     FIX. post.c
+
+045) T.E. Dickey <dickey@clark.net>
+     ADD. autoconf
+     FIX. several supplied patches
+
 --950824BETA  PLMC.960522 --
 
 044) Sven Paulus <sven@oops.sub.de>

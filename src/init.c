@@ -211,7 +211,6 @@ int use_builtin_inews;
 int xref_supported = TRUE;
 int xover_supported = FALSE;
 int xuser_supported = FALSE;
-int keep_dead_articles;
 int no_advertising = FALSE;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
 int reread_active_file_secs;		/* reread active file interval in seconds */

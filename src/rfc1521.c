@@ -1,5 +1,4 @@
-#include "rfc1521.h"
-#include "rfc1522.h"
+#include "tin.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -55,14 +54,18 @@ rfc1521_decode(file)
 	FILE *f;
 	char buf[2048];
 	char buf2[2048];
-	char content_type[128]="";
-	char content_transfer_encoding[128]="";
+	char content_type[128];
+	char content_transfer_encoding[128];
 	char *charset;
 	char encoding='\0';
 
 	if (!file) return file;
 	f=tmpfile();
 	if (!f) return file;
+
+	content_type[0] = '\0';
+	content_transfer_encoding[0] = '\0';
+
 	/* pass article header unchanged */
 	while (fgets(buf,2048,file)) {
 		fputs(buf,f);
@@ -194,7 +197,7 @@ rfc1521_encode(line, f, e)
 		xpos=0;
 		while (*line) {
 			if (isspace(*line) && *line!='\n') {
-				char *l=line+1;
+				unsigned char *l=line+1;
 				while (*l) {
 					if (!isspace(*l)) { /* it's not trailing whitespace, no encoding needed */
 						*b++=*line++;

@@ -13,7 +13,6 @@
  */
 
 #include	"tin.h"
-#include        "rfc1522.h"
 
 #ifdef VMS
 #   include <ctype.h>

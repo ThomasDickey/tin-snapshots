@@ -1108,23 +1108,23 @@ match_boolean (line, pat, dst)
 
 /*
  * If pat matches the start of line, convert rest of line to an integer, dst
- * If max is set, constrain value to 0 <= dst <= max and return TRUE.
+ * If maxlen is set, constrain value to 0 <= dst <= maxlen and return TRUE.
  * If no match is made, return FALSE.
  */
 int 
-match_integer (line, pat, dst, max)
+match_integer (line, pat, dst, maxlen)
 	char *line;
 	char *pat;
-	int *dst, max;
+	int *dst, maxlen;
 {
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		*dst = atoi (&line[patlen]);
 
-		if (max)  {
-			if ((*dst < 0) || (*dst > max)) {
-				fprintf(stderr, "\n%s%d out of range 0 - %d. Reset to 0", pat, *dst, max);
+		if (maxlen)  {
+			if ((*dst < 0) || (*dst > maxlen)) {
+				fprintf(stderr, "\n%s%d out of range 0 - %d. Reset to 0", pat, *dst, maxlen);
 				*dst = 0;
 			}
 		}

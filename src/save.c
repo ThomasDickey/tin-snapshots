@@ -14,6 +14,8 @@
 
 #include	"tin.h"
 
+#undef  OFF
+
 #define INITIAL 1
 #define MIDDLE	2
 #define OFF		3

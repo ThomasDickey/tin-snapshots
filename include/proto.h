@@ -33,8 +33,6 @@ extern void vUpdateActiveFile P_((char *pcActiveFile, char *pcDir));
 extern void vPrintUsage P_((char *pcProgName));
 extern void vMakeGrpList P_((char *pcActiveFile, char *pcBaseDir, char *pcGrpPath));
 extern void vAppendGrpLine P_((char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir));
-/* ./amiga.c */
-/* ./amigatcp.c */
 /* ./art.c */
 extern void find_base P_((struct t_group *group));
 extern int index_group P_((struct t_group *group));
@@ -72,7 +70,7 @@ extern void show_config_menu P_((void));
 extern void expand_rel_abs_pathname P_((int line, int col, char *str));
 extern void show_menu_help P_((char *help_message));
 extern int match_boolean P_((char *line, char *pat, int *dst));
-extern int match_integer P_((char *line, char *pat, int *dst, int));
+extern int match_integer P_((char *line, char *pat, int *dst, int maxlen));
 extern int match_long P_((char *line, char *pat, long *dst));
 extern int match_string P_((char *line, char *pat, char *dst, size_t dstlen));
 extern char *print_boolean P_((int value));
@@ -209,7 +207,7 @@ extern void vGrpDelMailArt P_((struct t_group *psGrp, struct t_article *psArt));
 extern void vGrpDelMailArts P_((struct t_group *psGrp));
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 /* ./main.c */
-/*extern void main P_((int argc, char *argv[]));*/
+extern void main P_((int argc, char *argv[]));
 extern void read_cmd_line_options P_((int argc, char *argv[]));
 extern void usage P_((char *progname));
 extern int check_for_any_new_news P_((int check_any_unread, int start_any_unread));
@@ -235,6 +233,7 @@ extern void free_newnews_array P_((void));
 extern char *my_malloc1 P_((char *file, int line, size_t size));
 extern char *my_realloc1 P_((char *file, int line, char *p, size_t size));
 /* ./misc.c */
+extern void append_file P_((char *old_filename, char *new_filename));
 extern void asfail P_((char *file, int line, char *cond));
 extern void copy_fp P_((FILE *fp_ip, FILE *fp_op, char *prefix));
 extern void copy_body P_((FILE *fp_ip, FILE *fp_op, char *prefix, char *initl));
@@ -248,7 +247,6 @@ extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
 extern unsigned long hash_groupname P_((char *group));
 extern void rename_file P_((char *old_filename, char *new_filename));
-extern void append_file P_((char *old_filename, char *new_filename));
 extern char *str_dup P_((char *str));
 extern int invoke_cmd P_((char *nam));
 extern void draw_percent_mark P_((long cur_num, long max_num));
@@ -262,12 +260,16 @@ extern long my_atol P_((char *s, int n));
 extern int my_stricmp P_((char *p, char *q));
 extern int my_strnicmp P_((char *p, char *q, size_t n));
 extern char *eat_re P_((char *s));
-extern long hash_s P_((char *s));
 extern void my_strncpy P_((char *p, char *q, int n));
 extern int untag_all_articles P_((void));
 extern char *str_str P_((char *text, char *pattern, size_t patlen));
 extern void get_author P_((int thread, struct t_article *art, char *str));
 extern void toggle_inverse_video P_((void));
+extern void show_inverse_video_status P_((void));
+#ifdef HAVE_COLOR
+extern void toggle_color P_((void));
+extern void show_color_status P_((void));
+#endif
 extern int get_arrow_key P_((void));
 extern void create_index_lock_file P_((char *lock_file));
 extern int strfquote P_((char *group, int respnum, char *s, int maxsize, char *format));
@@ -282,7 +284,6 @@ extern void make_post_process_cmd P_((char *cmd, char *dir, char *file));
 extern int stat_file P_((char *file));
 extern void vPrintBugAddress P_((void));
 extern int iCopyFile P_((char *pcSrcFile, char *pcDstFile));
-/* ./msmail.c */
 /* ./newsrc.c */
 extern void read_newsrc P_((char *newsrc_file, int allgroups));
 extern void vWriteNewsrc P_((void));
@@ -323,7 +324,6 @@ extern int get_server P_((char *string, int size));
 extern void close_server P_((void));
 extern char *nntp_respcode P_((int respcode));
 extern int nntp_message P_((int respcode));
-/* ./nntpw32.c */
 /* ./open.c */
 extern int nntp_open P_((void));
 extern void nntp_close P_((void));
@@ -349,7 +349,6 @@ extern void log_user P_((void));
 extern void authorization P_((char *server, char *authuser));
 extern void vGrpGetSubArtInfo P_((void));
 extern void vGrpGetArtInfo P_((char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin));
-/* ./os_2.c */
 /* ./page.c */
 extern int show_page P_((struct t_group *group, char *group_path, int respnum, int *threadnum));
 extern void redraw_page P_((char *group, int respnum));
@@ -362,6 +361,7 @@ extern void art_close P_((void));
 extern int prompt_response P_((int ch, int respnum));
 extern void yank_to_addr P_((char *orig, char *addr));
 extern int show_last_page P_((void));
+extern void modifiedstrncpy P_((char *target, char *source, int size));
 extern int match_header P_((char *buf, char *pat, char *body, size_t len));
 /* ./parsdate.y */
 extern int GetTimeInfo P_((TIMEINFO *Now));
@@ -382,6 +382,7 @@ extern int check_article_to_be_posted P_((char *article, int art_type, int *line
 extern void setup_check_article_screen P_((int *init));
 extern void quick_post_article P_((void));
 extern int post_article P_((char *group, int *posted));
+extern void join_references P_((char *buffer, char *oldrefs, char *newref));
 extern int post_response P_((char *group, int respnum, int copy_text));
 extern int mail_to_someone P_((int respnum, char *address, int mail_to_poster, int confirm_to_mail, int *mailed_ok));
 extern int mail_bug_report P_((void));
@@ -405,11 +406,32 @@ extern int prompt_num P_((int ch, char *prompt));
 extern int prompt_string P_((char *prompt, char *buf));
 extern int prompt_menu_string P_((int line, int col, char *var));
 extern int prompt_yn P_((int line, char *prompt, int default_answer));
+extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char *list[], int size));
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
-extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char **list, int));
 extern void continue_prompt P_((void));
 /* ./refs.c */
+extern int search_older_refs P_((char *refs, char *end));
+extern void dump_thread P_((FILE *fp, int i, int level));
 extern void thread_by_reference P_((struct t_group *group));
+/* ./rfc1521.c */
+extern void strcpynl P_((char *to, char *from));
+extern unsigned char bin2hex P_((unsigned int x));
+extern char *strcasestr P_((char *haystack, char *needle));
+extern FILE *rfc1521_decode P_((FILE *file));
+extern void rfc1521_encode P_((unsigned char *line, FILE *f, int e));
+/* ./rfc1522.c */
+extern void build_base64_rank_table P_((void));
+extern unsigned char hex2bin P_((int x));
+extern int mmdecode P_((char *what, int encoding, int delimiter, char *where, char *charset));
+extern void get_mm_charset P_((void));
+extern char *rfc1522_decode P_((char *s));
+extern int contains_nonprintables P_((unsigned char *w));
+extern int sizeofnextword P_((unsigned char *w));
+extern int mystrcat P_((char **t, char *s));
+extern int rfc1522_do_encode P_((unsigned char *what, unsigned char **where));
+extern char *rfc1522_encode P_((char *s));
+extern void rfc1522_decode_all_headers P_((void));
+extern void rfc15211522_encode P_((char *filename));
 /* ./save.c */
 extern int check_start_save_any_news P_((int check_start_save));
 extern int save_art_to_file P_((int respnum, int indexnum, int mailbox, char *filename));
@@ -475,12 +497,7 @@ extern void msg_write_signature P_((FILE *fp, int flag));
 extern FILE *open_random_sig P_((char *sigdir));
 extern int thrashdir P_((char *sigdir));
 /* ./signal.c */
-#ifdef M_AMIGA
-/* This is to work around a compiler bug in SAS-C 6.51 */
-extern RETSIGTYPE (*sigdisp P_((int /* sig */, RETSIGTYPE (*func)(SIG_ARGS)))) P_((SIG_ARGS));
-#else
 extern RETSIGTYPE (*sigdisp P_((int sig, RETSIGTYPE (*func)(SIG_ARGS)))) P_((SIG_ARGS));
-#endif
 extern void set_signal_handlers P_((void));
 extern void set_alarm_signal P_((void));
 extern void set_alarm_clock_on P_((void));
@@ -530,8 +547,6 @@ extern int next_unread P_((int n));
 extern int prev_unread P_((int n));
 /* ./wildmat.c */
 extern int wildmat P_((char *text, char *p));
-/* ./win32.c */
-/* ./win32tcp.c */
 /* ./xref.c */
 extern int overview_xref_support P_((void));
 extern void art_mark_xref_read P_((struct t_article *art));

@@ -13,11 +13,12 @@
  */
 
 #include	"tin.h"
-#include        "rfc1522.h"
 
 #define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); fflush (stdout); Raw (TRUE);}
 
 #define MAX_MSG_HEADERS	20
+
+#undef nl	/* SunOS 4.x K&R compiler */
 
 extern char note_h_distrib[PATH_LEN];			/* Distribution: */
 extern char note_h_followup[LEN];			/* Followup-To: */
@@ -1447,11 +1448,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		msg_add_header ("Bcc", userid);
 	}
 	
-	if (*note_h_followup) {
-		msg_add_header ("Newsgroups", note_h_followup);
-	} else {
-		msg_add_header ("Newsgroups", note_h_newsgroups);
-	}
+	msg_add_header ("Newsgroups", note_h_newsgroups);
+	
 	if (*default_organization) {
 		msg_add_header ("Organization", default_organization);
 	}

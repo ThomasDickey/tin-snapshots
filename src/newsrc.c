@@ -748,7 +748,7 @@ parse_unread_arts (group)
 	bitmin = group->newsrc.xmin;
 	bitmax = group->newsrc.xmax;
 	if (group->xmax >= bitmin) {
-		newbitmap = my_malloc(BITS_TO_BYTES(group->xmax-bitmin+1));
+		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(group->xmax-bitmin+1));
 		NSETRNG0(newbitmap, 0, group->xmax - bitmin);
 	}
 	for (i = 0; i < top; i++) {
