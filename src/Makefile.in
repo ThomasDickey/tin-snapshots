@@ -18,7 +18,7 @@ NNTP_DEFAULT_SERVER	= @NNTP_DEFAULT_SERVER@
 #news-server.subdomain.domain
 
 # Where are your news libdir & spooldir?
-LIBDIR		= @LIBDIR@
+LIBDIR		= @NEWSLIBDIR@
 SPOOLDIR	= @SPOOLDIR@
 NOVROOTDIR	= @NOVROOTDIR@
 INEWSDIR	= @INEWSDIR@
@@ -88,10 +88,8 @@ LS	= ls -l
 MAKE	= make
 MV	= mv
 RM	= rm
-STRIP	= strip
-STRIP2	= mcs -d
-SU	= su
 TAGS	= ctags
+INSTALL	= @INSTALL@
 
 HFILES	= \
 	$(INCDIR)/autoconf.h \
@@ -254,40 +252,25 @@ $(BINDIR)/$(EXE): $(OFILES)
 
 install_manpage:
 	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
-	@$(CP) $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
+	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
 
 install:
 	@$(ECHO) "Installing $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
-	@$(STRIP) $(BINDIR)/$(EXE)
-	@-$(STRIP2) $(BINDIR)/$(EXE) > /dev/null 2>&1
-	@-$(MV) $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
+	@$(INSTALL) -s $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
 	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
 	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
-	@$(CHMOD) 755 $(INS_BINARY_DIR)/$(EXE)
-	@$(LS) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
 install_setuid:
 	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
-	@$(STRIP) $(BINDIR)/$(EXE)
-	@-$(STRIP2) $(BINDIR)/$(EXE) > /dev/null 2>&1 
-	@-$(MV) $(BINDIR)/$(EXE) $(BINDIR)/$(EXE)
-	@$(CHOWN) news $(BINDIR)/$(EXE) 
-	@$(CHGRP) news $(BINDIR)/$(EXE) 
-	@-$(RM) $(BINDIR)/r$(EXE)
-	@$(LN) $(BINDIR)/$(EXE) $(BINDIR)/r$(EXE)
-	@$(SU) news -c "chmod 6755 $(BINDIR)/$(EXE)"
-	@$(LS) $(BINDIR)/$(EXE) $(BINDIR)/r$(EXE)
+	@$(INSTALL) -s -o news -g news -m 6755 $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
+	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
+	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
 install_daemon:
 	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INS_DAEMON_DIR)..."
-	@$(STRIP) $(EXED)
-	@-$(STRIP2) $(EXED) > /dev/null 2>&1
-	@-$(MV) $(EXED) $(INS_DAEMON_DIR)/$(EXED)
-	@$(CHOWN) news $(INS_DAEMON_DIR)/$(EXED) 
-	@$(CHMOD) 0750 $(INS_DAEMON_DIR)/$(EXED)
-	@$(LS) $(INS_DAEMON_DIR)/$(EXED)
+	@$(INSTALL) -s -o news -m 0750 $(EXED) $(INS_DAEMON_DIR)/$(EXED)
 
 proto:
 	@$(ECHO) "Generating function prototypes to $(INCDIR)/proto.h..."
@@ -344,7 +327,8 @@ $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_DEP) \
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
 $(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(TIN_DEP)
 $(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_DEP)
-$(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP)
+$(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP) \
+				$(INCDIR)/patchlev.h
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(TIN_DEP)
 $(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(TIN_DEP)
 $(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(TIN_DEP)

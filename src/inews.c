@@ -50,7 +50,7 @@ submit_inews (name)
 {
 	int	ret_code = FALSE;
 
-#if !defined(INDEX_DAEMON) && !defined(XSPOOLDIR)
+#if !defined(INDEX_DAEMON) /* && !defined(XSPOOLDIR) */
 
 #ifdef NNTP_INEWS
 #if !defined(FORGERY) && defined INEWS_MAIL_DOMAIN
@@ -282,7 +282,7 @@ get_host_name (host_name)
 					gethostname (host, sizeof (host)); 
 					host_entry = gethostbyname (host);
 					if (host_entry != NULL)
-						my_strncpy (host, (char *) host_entry->h_name, sizeof (host)); 
+						my_strncpy (host, (char *) host_entry->h_name, sizeof (host));
 				}	
 #				else	
 #					if defined(M_AMIGA) || defined(M_OS2)

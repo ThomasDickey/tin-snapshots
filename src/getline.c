@@ -46,33 +46,30 @@ static int gl_init_done = 0;	/* -1 is terminal, 1 is batch  */
 static int gl_width = 0;	/* net size available for input */
 static int gl_pos, gl_cnt = 0;	/* position and size of input */
 
-static int gl_tab P_ ((char *, int, int *));
-static void gl_redraw P_ ((void));
-static void gl_addchar P_ ((int));
-static void gl_newline P_ ((void));
-static void gl_fixup P_ ((int, int));
-static void gl_del P_ ((int));
-static void gl_kill P_ ((void));
-static void hist_add P_ ((void));
-static void hist_init P_ ((void));
-static void hist_next P_ ((void));
-static void hist_prev P_ ((void));
+/*
+ * local prototypes
+ */
+static void gl_addchar P_((int c));
+static void gl_del P_((int loc));
+static void gl_fixup P_((int change, int cursor));
+static int gl_tab P_((char *buf, int offset, int *loc));
+static void gl_redraw P_((void));
+static void gl_newline P_((void));
+static void gl_kill P_((void));
+static void hist_add P_((void));
+static void hist_init P_((void));
+static void hist_next P_((void));
+static void hist_prev P_((void));
 
-int (*gl_in_hook) P_ ((char *)) = 0;
-int (*gl_out_hook) P_ ((char *)) = 0;
-int (*gl_tab_hook) P_ ((char *, int, int *)) = gl_tab;
+int (*gl_in_hook) P_((char *)) = 0;
+int (*gl_out_hook) P_((char *)) = 0;
+int (*gl_tab_hook) P_((char *, int, int *)) = gl_tab;
 
-#if __STDC__
-char *
-getline (char *prompt, int number_only, char *str)
-#else
 char *
 getline (prompt, number_only, str)
 	char *prompt;
 	int number_only;
 	char *str;
-
-#endif
 {
 	int c, i, loc, tmp;
 
@@ -183,15 +180,9 @@ getline (prompt, number_only, str)
  * the character is in the allowed template of characters
  */
 
-#if __STDC__
-static void
-gl_addchar (int c)
-#else
 static void
 gl_addchar (c)
 	int c;
-
-#endif
 {
 	int i;
 
@@ -239,15 +230,9 @@ gl_newline ()
  *     0 : delete character under cursor
  */
 
-#if __STDC__
-static void
-gl_del (int loc)
-#else
 static void
 gl_del (loc)
 	int loc;
-
-#endif
 {
 	int i;
 
@@ -300,16 +285,10 @@ gl_redraw ()
  *            should move just past the end of the input line.
  */
 
-#if __STDC__
-static void
-gl_fixup (int change, int cursor)
-#else
 static void
 gl_fixup (change, cursor)
 	int change;
 	int cursor;
-
-#endif
 {
 	static int gl_shift;	/* index of first on screen character */
 	static int off_right;	/* true if more text right of screen */
@@ -403,17 +382,11 @@ gl_fixup (change, cursor)
  * default tab handler, acts like tabstops every TABSIZE cols
  */
 
-#if __STDC__
-static int
-gl_tab (char *buf, int offset, int *loc)
-#else
 static int
 gl_tab (buf, offset, loc)
 	char *buf;
 	int offset;
 	int *loc;
-
-#endif
 {
 	int i, count, len;
 

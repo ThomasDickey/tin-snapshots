@@ -16,8 +16,9 @@
 
 #define BITS_TO_BYTES(n)	(size_t)((n+NBITS-1)/NBITS)
 
-/*static mode_t newsrc_mode = 0; */
 static int newsrc_mode = 0;
+
+static void vWriteNewsrcLine P_((FILE *fp, char *line));
 
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
@@ -80,8 +81,6 @@ fflush(stdout);
 	}
 }
 
-static void
-vWriteNewsrcLine P_ ((FILE *fp, char *line));
 
 static void
 vWriteNewsrcLine (fp,line)
@@ -530,7 +529,7 @@ parse_bitmap_seq (group, seq)
 #ifdef DEBUG_NEWSRC
 {
 char buf[NEWSRC_LINE];
-sprintf (buf, "Parsing [%s%c %s]", group->name, group->subscribed, ptr);
+sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
 debug_print_comment(buf);
 debug_print_bitmap(group,NULL);
 }
@@ -1068,7 +1067,7 @@ pcParseNewsrcLine (line, grp, sub)
 {
 	char *grpptr = grp;
 	static char *ptr;
-	
+
 	ptr = line;
 
 	while (*ptr && *ptr != ' ' && *ptr != ':' && *ptr != '!') {
@@ -1080,7 +1079,7 @@ pcParseNewsrcLine (line, grp, sub)
 
 	*sub = *ptr;
 	if (*ptr) ptr++;
-	
+
 	while (*ptr && (*ptr == ' ' || *ptr == '\t')) {
 			ptr++;
 	}
@@ -1269,7 +1268,7 @@ art_mark_will_return (group, art)
 	}
 }
 
-#ifdef HAVE_MH_MAIL_HANDLING
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 art_mark_deleted (art)
 	struct t_article *art;
@@ -1290,7 +1289,7 @@ art_mark_undeleted (art)
 wait_message("FIXME  article marked for undeletion");
 	}
 }
-#endif /* HAVE_MH_MAIL_HANDLING */
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 void
 vSetDefaultBitmap (group)

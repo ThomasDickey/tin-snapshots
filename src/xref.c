@@ -87,7 +87,7 @@ art_mark_xref_read (art)
 	/*
 	 *  tokenize each pair and update that newsgroup if it is in my_group[].
 	 */
-	for (;;) {
+	forever {
 		while (*xref_ptr == ' ') {
 			xref_ptr++;
 		}

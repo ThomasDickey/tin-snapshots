@@ -35,14 +35,6 @@ if test -z "$CFLAGS" ; then
 	esac
 fi
 
-# (config.guess should be included sometimes)
-NETLIBS=""
-
-if test -n "$NETLIBS" ; then
-	LIBS="$LIBS $NETLIBS"
-	export LIBS
-fi
-
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \

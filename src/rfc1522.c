@@ -68,14 +68,14 @@ static unsigned char base64_rank[256];
 static int base64_rank_table_built;
 static int quoteflag;
 
-static int contains_nonprintables P_ ((char *w));
-static int mystrcat P_ ((char **t, char *s));
-static int rfc1522_do_encode P_ ((char *what, char **where));
-static unsigned hex2bin P_ ((int x));
-static void build_base64_rank_table P_ ((void));
+static int contains_nonprintables P_((char *w));
+static int mystrcat P_((char **t, char *s));
+static int rfc1522_do_encode P_((char *what, char **where));
+static unsigned hex2bin P_((int x));
+static void build_base64_rank_table P_((void));
 
 #ifdef MIME_BREAK_LONG_LINES
-static int sizeofnextword P_ ((char *w));
+static int sizeofnextword P_((char *w));
 
 #endif
 
@@ -155,7 +155,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 			x = (hi << 4) + lo;
 			if (x >= 128 && !decode_gt128)
 				x = '?';
-			*EIGHT_BIT (t)++ = x;
+			*EIGHT_BIT(t)++ = x;
 		}
 		return t - where;
 	} else if (encoding == 'b') {	/* base64 */
@@ -291,8 +291,8 @@ contains_nonprintables (w)
 		w++;
 
 	/* then check the next word */
-	while (*w && !isbetween (*w)) {
-		if (is_EIGHT_BIT (w))
+	while (*w && !isbetween(*w)) {
+		if (is_EIGHT_BIT(w))
 			nonprint++;
 		if (!nonprint && *w == '=' && *(w + 1) == '?')
 			nonprint = TRUE;
@@ -408,12 +408,12 @@ rfc1522_do_encode (what, where)
 				quoting = TRUE;
 				any_quoting_done = TRUE;
 			}
-			while (*what && !isbetween (*what)) {
-				if (is_EIGHT_BIT (what)
+			while (*what && !isbetween(*what)) {
+				if (is_EIGHT_BIT(what)
 				    || *what == '='
 				    || *what == '?'
 				    || *what == '_') {
-					sprintf (buf2, "=%2.2X", *EIGHT_BIT (what));
+					sprintf (buf2, "=%2.2X", *EIGHT_BIT(what));
 					*t++ = buf2[0];
 					*t++ = buf2[1];
 					*t++ = buf2[2];
@@ -469,7 +469,7 @@ rfc1522_do_encode (what, where)
 						*t++ = '_';
 						ewsize++;
 					} else {
-						sprintf (buf2, "=%2.2X", *EIGHT_BIT (what));
+						sprintf (buf2, "=%2.2X", *EIGHT_BIT(what));
 						*t++ = buf2[0];
 						*t++ = buf2[1];
 						*t++ = buf2[2];
@@ -479,9 +479,9 @@ rfc1522_do_encode (what, where)
 				}
 			}
 		} else {
-			while (*what && !isbetween (*what))
+			while (*what && !isbetween(*what))
 				*t++ = *what++;		/* output word unencoded */
-			while (*what && isbetween (*what))
+			while (*what && isbetween(*what))
 				*t++ = *what++;		/* output trailing whitespace unencoded */
 		}
 	}
@@ -577,16 +577,16 @@ rfc15211522_encode (filename, mime_encoding)
 	quoteflag = 0;
 	while (fgets (buffer, 2048, f)) {
 		if (header[0]
-		    && (!isspace (buffer[0]) || isreturn (buffer[0]))) {
+		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
 			fputs (rfc1522_encode (header), g);
 			fputc ('\n', g);
 			header[0] = '\0';
 			d = header;
 		}
-		if (isreturn (buffer[0]))
+		if (isreturn(buffer[0]))
 			break;
 		c = buffer;
-		while (*c && !isreturn (*c))
+		while (*c && !isreturn(*c))
 			*d++ = *c++;
 		*d = 0;
 	}
@@ -594,8 +594,8 @@ rfc15211522_encode (filename, mime_encoding)
 	while (fgets (buffer, 2048, f)) {
 		fputs (buffer, g);
 		/* see if there are any umlauts in the body... */
-		for (c = buffer; *c && !isreturn (*c); c++)
-			if (is_EIGHT_BIT (c)) {
+		for (c = buffer; *c && !isreturn(*c); c++)
+			if (is_EIGHT_BIT(c)) {
 				umlauts = TRUE;
 				body_encoding_needed = TRUE;
 				break;
@@ -609,7 +609,7 @@ rfc15211522_encode (filename, mime_encoding)
 		return;
 	}
 	while (fgets (buffer, 2048, g)
-	       && !isreturn (buffer[0]))
+	       && !isreturn(buffer[0]))
 		fputs (buffer, f);
 
 	/* now add MIME headers as necessary */

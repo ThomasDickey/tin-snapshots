@@ -87,7 +87,7 @@ feed_articles (function, level, group, respnum)
 	 */
 	if (num_of_tagged_arts) {
 		ch_default = iKeyFeedTag;
-	} else if (num_of_selected_arts && default_auto_save == FALSE) {
+	} else if (num_of_selected_arts /* && default_auto_save == FALSE */) {
 		ch_default = iKeyFeedHot;
 	} else if (num_of_responses (b)) {
 		ch_default = iKeyFeedThd;

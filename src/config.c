@@ -19,6 +19,8 @@ static int COL1;
 static int COL2;
 static int COL3;
 
+static void expand_rel_abs_pathname P_((int line, int col, char *str));
+
 /*
  *  read local & global configuration defaults
  */
@@ -997,12 +999,6 @@ change_config_file (group, filter_at_once)
 							txt_show_from,
 							SHOW_FROM_BOTH + 1
 							);
-#if 0
-				/* If not changed ... */
-				 else {
-					set_subj_from_size (cCOLS);
-				}
-#endif				
 				break;
 
 			case 14:
@@ -1116,7 +1112,7 @@ show_config_menu ()
  *  expand ~/News to /usr/username/News and print to screen
  */
  
-void 
+static void
 expand_rel_abs_pathname (line, col, str)
 	int line;
 	int col;
@@ -1283,4 +1279,3 @@ quote_space_to_dash (str)
 
 	return buf;
 }
-

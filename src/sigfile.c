@@ -28,6 +28,8 @@
 
 static char sigfile[PATH_LEN];
 
+static FILE *open_random_sig P_((char *sigdir));
+static int thrashdir P_((char *sigdir));
 
 void 
 msg_write_signature (fp, flag)
@@ -53,11 +55,13 @@ msg_write_signature (fp, flag)
 	}
 	if (active[i].attribute->sigfile[0] == '!') {
 		char cmd[PATH_LEN];
+		FILE *pipe_fp;
 		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
-		/* FIXME - use popen() rather than system() */
-		sprintf (cmd, "%s 1>&%d", active[i].attribute->sigfile+1, fileno (fp));
-		fflush (fp);
-		system (cmd);
+		if ((pipe_fp = popen (active[i].attribute->sigfile+1, "r")) != NULL) {
+			while (fgets (cmd, PATH_LEN, pipe_fp))
+				fputs (cmd, fp);
+			fclose (pipe_fp);
+		}
 		return;
 	}
 	get_cwd (cwd);
@@ -112,7 +116,7 @@ msg_write_signature (fp, flag)
 }
 
 
-FILE *
+static FILE *
 open_random_sig (sigdir)
 	char *sigdir;
 {
@@ -143,7 +147,7 @@ open_random_sig (sigdir)
 }
 
 
-int 
+static int 
 thrashdir (sigdir)
 	char *sigdir;
 {
