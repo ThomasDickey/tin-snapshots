@@ -1226,7 +1226,11 @@ undo_auto_select_arts:
 				break;
 
 			case iKeyGroupDisplaySubject:
-				info_message(arts[(int)base[index_point]].subject);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
+				} else {
+					info_message(arts[(int)base[index_point]].subject);
+				}
 				break;
 
 			default:

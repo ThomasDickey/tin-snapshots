@@ -1129,6 +1129,7 @@ post_response (group, respnum, copy_text)
 	int lines;
 	int ret_code = POSTED_NONE;
 	struct t_group *psGrp;
+	char	initials[64];
 #ifdef FORGERY
 	char	from_name[PATH_LEN];
 	char	line[NNTP_STRLEN];
@@ -1279,7 +1280,8 @@ ignore_followup_to_poster:
 		}
 	
 		fseek (note_fp, note_mark[0], 0);
-		copy_fp (note_fp, fp, quote_chars);
+		get_initials(respnum, initials, sizeof (initials));
+		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}

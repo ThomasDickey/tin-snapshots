@@ -592,13 +592,11 @@ parse_headers (buf, h)
 	int got_subject = FALSE;
 	int got_xref = FALSE;
 
-	n = strlen (buf);
-	
-	if (n == 0) {
+	if ((n = strlen (buf))== 0) {
 		return FALSE;
 	}
 
-	buf[n-1] = '\0';
+	buf[--n] = '\0';
   	
 	ptr = buf;
 

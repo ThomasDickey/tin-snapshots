@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960522 (Thu May 23 00:37:28 MET DST 1996)
 ----------------------------------------------------
-  13768 ./CHANGES
+  14143 ./CHANGES
    8093 ./TODO
    4439 ./Makefile
   17158 ./INSTALL
@@ -18,7 +18,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
    1777 ./include/patchlev.h
-  27365 ./include/proto.h
+  27511 ./include/proto.h
      89 ./include/rfc1521.h
     292 ./include/rfc1522.h
    1272 ./include/stpwatch.h
@@ -29,18 +29,18 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
    8203 ./src/actived.c
   13012 ./src/amiga.c
    4427 ./src/amigatcp.c
-  36350 ./src/art.c
+  36345 ./src/art.c
   22033 ./src/attrib.c
    8262 ./src/charset.c
    1463 ./src/color.c
-  40941 ./src/config.c
+  41001 ./src/config.c
   19972 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
   18348 ./src/feed.c
   35387 ./src/filter.c
   11250 ./src/getline.c
-  41463 ./src/group.c
+  41543 ./src/group.c
    2671 ./src/hashstr.c
    9650 ./src/help.c
   11855 ./src/inews.c
@@ -50,7 +50,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
   12119 ./src/mail.c
   16806 ./src/main.c
   11022 ./src/memory.c
-  39115 ./src/misc.c
+  41295 ./src/misc.c
    7231 ./src/msmail.c
   33010 ./src/newsrc.c
   26006 ./src/nntplib.c
@@ -60,7 +60,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
   34474 ./src/page.c
   24108 ./src/parsdate.y
    7195 ./src/pgp.c
-  63041 ./src/post.c
+  63127 ./src/post.c
    4342 ./src/prompt.c
    9953 ./src/refs.c
    4813 ./src/rfc1521.c
@@ -68,15 +68,15 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
   34129 ./src/save.c
    4116 ./src/screen.c
    9895 ./src/search.c
-  34920 ./src/select.c
+  35004 ./src/select.c
    5270 ./src/sigfile.c
   11103 ./src/signal.c
    5882 ./src/strftime.c
-  25092 ./src/thread.c
+  25085 ./src/thread.c
    5014 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
   21908 ./src/Makefile
-1200278 total
+1203277 total

@@ -127,6 +127,71 @@ copy_fp (fp_ip, fp_op, prefix)
 	}
 }
 
+void
+copy_body (fp_ip, fp_op, prefix, initl)
+	FILE *fp_ip;
+	FILE *fp_op;
+	char *prefix;
+	char *initl;
+{
+#ifndef VMS
+	extern int errno;
+#endif
+	char buf[8192];
+	int retcode;
+	char prefixbuf[256];
+	int statusspace;
+	int statuschar;
+	int i;
+
+	if (!prefix || !prefix[0]) {
+		int n;
+		while ((n = fread(buf,1,sizeof(buf),fp_ip)) > 0) {
+			if (n != fwrite(buf,1,n,fp_op)) {
+				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+				perror_message (msg, "");
+				return;
+			}
+		}
+		return;
+	}
+
+	if (strstr(prefix, "%s")) sprintf(prefixbuf, prefix, initl);
+
+	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
+		if (buf[0] != '\n') {
+			if (strstr(prefix, "%s")) { /* initials wanted */
+				if (strchr(buf, '>')) {
+					statusspace = 0;
+					statuschar = 1;
+					for(i=0; buf[i] && (buf[i] != '>'); i++) {
+						if (buf[i] != ' ') statusspace = 1;
+						if ((statusspace) &&
+						  !((buf[i] >= 'A' && buf[i] <= 'Z') ||
+						    (buf[i] >= 'a' && buf[i] <= 'z') ||
+						    (buf[i] == '>'))) statuschar = 0;
+					}
+					if (statuschar) {  /* already quoted, do not quote again */
+						retcode = fprintf (fp_op, "%s", buf);
+					} else {
+						retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
+					}
+				} else {   /* line was not already quoted (no >) */
+					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
+				}
+			} else {    /* no initials in quote_string, just copy */
+				retcode = fprintf (fp_op, "%s%s", prefix, buf);
+			}
+		} else {
+			retcode = fprintf (fp_op, "%s", buf);
+		}
+		if (retcode == EOF) {
+			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+			perror_message (msg, "");
+			return;
+		}
+	}
+}
 
 char *
 get_val (env, def)
@@ -1563,6 +1628,10 @@ out:
 		return 0;
 }
 
+
+
+
+
 /*
  * strfeditor() - produce formatted editor string
  *   %E  Editor
@@ -2000,6 +2069,46 @@ out:
 	} else
 		return 0;
 }
+
+/* 
+ * get_initials() - get initial letters of a posters name
+ *
+ */ 
+
+int
+get_initials (respnum, s, maxsize)
+	int respnum;
+	char *s;
+	int maxsize;
+{
+	char tbuf[PATH_LEN];
+	int i, j;
+	int iflag;
+
+	if (s == (char *) 0 || maxsize == 0) {
+		return 0;
+	}
+
+	if (arts[respnum].name != (char *) 0) {
+		strcpy (tbuf, arts[respnum].name);
+	} else {
+		strcpy (tbuf, arts[respnum].from);
+	}
+	iflag = 1;
+	j = 0;
+	for (i=0; tbuf[i]; i++) {
+		if (iflag) {
+			s[j++] = tbuf[i];
+			iflag = 0;
+		}
+		if (tbuf[i] == ' ') iflag = 1;
+	}	
+	s[j] = '\0';  
+	
+	return 0;
+}
+
+
 
 void get_cwd (buf)
 	char *buf;
