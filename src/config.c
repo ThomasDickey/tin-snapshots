@@ -454,6 +454,9 @@ read_config_file (
 				quote_dash_to_space (quote_chars);
 				break;
 			}
+			if (match_boolean (buf, "quote_empty_lines=", &quote_empty_lines)) {
+				break;
+			}
 			break;
 
 		case 'r':
@@ -464,6 +467,9 @@ read_config_file (
 
 		case 's':
 			if (match_boolean (buf, "sigdashes=", &sigdashes)) {
+				break;
+			}
+			if (match_boolean (buf, "signature_repost=", &signature_repost)) {
 				break;
 			}
 			if (match_boolean (buf, "start_editor_offset=", &start_editor_offset)) {
@@ -791,6 +797,9 @@ write_config_file (
 	fprintf (fp, txt_tinrc_sigdashes);
 	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));
 
+	fprintf (fp, txt_tinrc_signature_repost);
+	fprintf (fp, "signature_repost=%s\n\n", print_boolean (signature_repost));
+
 	fprintf (fp, txt_tinrc_no_advertising);
 	fprintf (fp, "no_advertising=%s\n\n", print_boolean (no_advertising));
 
@@ -799,6 +808,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_quote_chars);
 	fprintf (fp, "quote_chars=%s\n\n", quote_space_to_dash (quote_chars));
+
+	fprintf (fp, txt_tinrc_quote_empty_lines);
+	fprintf (fp, "quote_empty_lines=%s\n\n", print_boolean(quote_empty_lines));
 
 	fprintf (fp, txt_tinrc_news_quote_format);
 	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
@@ -1292,6 +1304,13 @@ change_config_file (
 			case iKeyConfigSelect2:
 				change_option = TRUE;
 				break;
+
+			case iKeyConfigRedrawScr:	/* redraw screen */
+				my_retouch ();
+				set_xclick_off ();
+				refresh_config_page (option, FALSE);
+				break;
+
 			default:
 				break;
 		} /* switch (ch) */

@@ -280,8 +280,9 @@ void
 my_retouch(void)
 {
 	TRACE(("my_retouch"))
-	if (!cmd_line)
-		touchwin(stdscr);
+	if (!cmd_line) {
+		wrefresh(curscr);
+	}
 }
 
 char *

@@ -222,7 +222,7 @@ end_of_article:
 
 			case iKeyLookupMessage:			/* Goto article by Message-ID */
 
-				if (prompt_string(txt_enter_message_id, buf+1) && buf[1]) {
+				if (prompt_string(txt_enter_message_id, buf+1, HIST_MESSAGE_ID) && buf[1]) {
 					char *ptr = buf+1;
 					struct t_msgid *msgid;
 

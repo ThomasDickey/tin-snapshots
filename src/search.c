@@ -35,7 +35,8 @@ get_search_pattern(
 	int forward,
 	const char *fwd_msg,
 	const char *bwd_msg,
-	char *def)
+	char *def,
+	int which_hist)
 {
 	char pattern[LEN];
 
@@ -46,7 +47,7 @@ get_search_pattern(
 	else
 		sprintf (tmpbuf, bwd_msg, def);
 
-	if (!prompt_string (tmpbuf, pattern))
+	if (!prompt_string (tmpbuf, pattern, which_hist))
 		return NULL;
 
 	if (pattern[0] != '\0') {
@@ -92,7 +93,8 @@ search_author (
 				forward,
 				txt_author_search_forwards,
 				txt_author_search_backwards,
-				default_author_search
+				default_author_search,
+				HIST_AUTHOR_SEARCH
 	))) return -1;
 
 	if (!read_news_via_nntp || active[the_index].type != GROUP_TYPE_NEWS)
@@ -159,7 +161,8 @@ search_group (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_group_search
+				default_group_search,
+				HIST_GROUP_SEARCH
 	))) return;
 
 	i = cur_groupnum;
@@ -251,7 +254,8 @@ search_subject_thread(
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_subject_search
+				default_subject_search,
+				HIST_GROUP_SEARCH
 	))) return;
 
 	/*
@@ -292,7 +296,8 @@ search_subject_group (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_subject_search
+				default_subject_search,
+				HIST_SUBJECT_SEARCH
 	))) return 0;
 
 	i = index_point;						/* Search from current position */
@@ -374,7 +379,8 @@ search_article (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_art_search
+				default_art_search,
+				HIST_ART_SEARCH
 	))) return FALSE;
 	
 	/*
@@ -507,7 +513,8 @@ search_body (
 				1,
 				txt_search_body,
 				txt_search_body,
-				default_art_search
+				default_art_search,
+				HIST_ART_SEARCH
 	))) return -1;
 
 	make_group_path (group->name, group_path);

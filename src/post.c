@@ -40,6 +40,7 @@
 #	endif
 #endif
 #define EDIT_KEYS	"\033eoq"
+#define CONT_KEYS	"\033ac"
 
 char found_newsgroups[HEADER_LEN];
 
@@ -67,39 +68,13 @@ static void find_reply_to_addr (int respnum, char *from_addr, t_bool parse);
 static void msg_add_x_headers (char *headers);
 static void setup_check_article_screen (int *init);
 static void update_active_after_posting (char *newsgroups);
+static t_bool check_for_spamtrap (char *addr);
 
 #ifdef FORGERY
 static void make_path_header (char *line, char *from_name);
 #endif /* FORGERY */
 
 
-static void do_prompt1 (
-	const char *format,
-	int ch_default)
-{
-	sprintf (msg, "%s%c", format, ch_default);
-	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (format));
-}
-
-static void
-do_prompt2(
-	const char *format,
-	const char *subject,
-	int ch_default)
-{
-	int have = cCOLS - strlen (format) + 4;
-	int want = strlen(subject);
-
-	if (want > 0 && subject[want-1] == '\n')
-		want--;
-	if (have > want)
-		have = want;
-	sprintf (msg, format, have, subject, ch_default);
-
-	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (msg) - 1);
-}
 
 static int
 prompt_to_edit(void)
@@ -108,7 +83,7 @@ prompt_to_edit(void)
 	char ch_default = iKeyPostPost;
 
 	do {
-		do_prompt1 (txt_quit_edit_post, ch_default);
+		prompt_1 (txt_quit_edit_post, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (!strchr (POST_KEYS, ch));
@@ -123,10 +98,24 @@ prompt_to_send(
 	char ch_default = iKeyPostSend;
 
 	do {
-		do_prompt2 (txt_quit_edit_send, subject, ch_default);
+		prompt_2 (txt_quit_edit_send, subject, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (!strchr (SEND_KEYS, ch));
+	return ch;
+}
+
+static int
+prompt_to_continue(void)
+{
+	int ch;
+	char ch_default = iKeyPostContinue;
+
+	do {
+		prompt_1 (txt_warn_suspicious_mail, ch_default);
+		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
+			ch = ch_default;
+	} while (!strchr(CONT_KEYS, ch));
 	return ch;
 }
 
@@ -143,7 +132,7 @@ prompt_rejected(void)
 	Raw (TRUE);
 
 	do {
-		do_prompt1 (txt_quit_edit_postpone, ch_default);
+		prompt_1 (txt_quit_edit_postpone, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (!strchr (EDIT_KEYS, ch));
@@ -157,7 +146,7 @@ repair_article(
 	int ch;
 
 	do {
-		do_prompt1 (txt_bad_article, iKeyPostEdit);
+		prompt_1 (txt_bad_article, iKeyPostEdit);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = iKeyPostEdit;
 	} while (!strchr (EDIT_KEYS, ch));
@@ -812,7 +801,7 @@ quick_post_article (
 	 */
 	sprintf (buf, txt_post_newsgroups, default_post_newsgroups);
 
-	if (!prompt_string (buf, group)) {
+	if (!prompt_string (buf, group, HIST_POST_NEWSGROUPS)) {
 		my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 		return;
 	}
@@ -868,9 +857,16 @@ quick_post_article (
 	}
 
 	PRINT_LF();
-	sprintf (buf, txt_post_subject, default_post_subject);
 
-	if (!prompt_string (buf, subj)) {
+	/* Only display leading characters of subject */
+	if (strlen(default_post_subject) > DISPLAY_SUBJECT_LEN) {
+		strncpy(tmp, default_post_subject, DISPLAY_SUBJECT_LEN);
+		tmp[DISPLAY_SUBJECT_LEN] = '\0';
+		strcat(tmp, " ...");
+	} else
+		strncpy(tmp, default_post_subject, sizeof(tmp));
+	sprintf (buf, txt_post_subject, tmp);
+	if (!prompt_string (buf, subj, HIST_POST_SUBJECT)) {
 		Raw (FALSE);
 		my_fprintf (stderr, "%s\n", txt_no_quick_subject);
 		return;
@@ -944,7 +940,7 @@ quick_post_article (
 	if (psGrp) {
 		start_line_offset += msg_add_x_body (fp, psGrp->attribute->x_body);
 	}
-	msg_write_signature (fp, FALSE);
+	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -1359,7 +1355,7 @@ pickup_postponed_articles(
 		if (!all) {
 			def = iKeyPostponeYes;
 			do {
-				do_prompt2 (txt_postpone_repost, subject, def);
+				prompt_2 (txt_postpone_repost, subject, def);
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = def;
 			} while (!strchr ("\033qyYnA", ch));
@@ -1411,7 +1407,7 @@ post_article (
 	FILE *fp;
 	char ch;
 	char subj[HEADER_LEN];
-	char buf[HEADER_LEN];
+	char buf[HEADER_LEN], tmp[HEADER_LEN];
 	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
@@ -1445,9 +1441,16 @@ post_article (
 			return redraw_screen;
 		}
 	}
-	sprintf (msg, txt_post_subject, default_post_subject);
+	/* Only display leading characters of subject */
+	if (strlen(default_post_subject) > DISPLAY_SUBJECT_LEN) {
+		strncpy(tmp, default_post_subject, DISPLAY_SUBJECT_LEN);
+		tmp[DISPLAY_SUBJECT_LEN] = '\0';
+		strcat(tmp, " ...");
+	} else
+		strncpy(tmp, default_post_subject, sizeof(tmp));
+	sprintf (msg, txt_post_subject, tmp);
 
-	if (!prompt_string (msg, subj)) {
+	if (!prompt_string (msg, subj, HIST_POST_SUBJECT)) {
 		clear_message ();
 		return redraw_screen;
 	}
@@ -1510,7 +1513,7 @@ post_article (
 	msg_free_headers ();
 	lines = msg_add_x_body (fp, psGrp->attribute->x_body);
 	start_line_offset += lines;
-	msg_write_signature (fp, FALSE);
+	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -1850,7 +1853,7 @@ post_response (
 	}
 	if (*note_h_followup && STRCMPEQ(note_h_followup, "poster")) {
 		clear_message ();
-		do_prompt1 (txt_resp_to_poster, iKeyPageMail);
+		prompt_1 (txt_resp_to_poster, iKeyPageMail);
 		do {
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = iKeyPageMail;
@@ -2022,7 +2025,7 @@ ignore_followup_to_poster:
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 	}
 
-	msg_write_signature (fp, FALSE);
+	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -2232,7 +2235,7 @@ mail_to_someone (
 	}
 
 	if (!use_mailreader_i) {
-		msg_write_signature (fp, TRUE);
+		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
 	}
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2412,7 +2415,7 @@ mail_bug_report (void)
 	start_line_offset += 5;
 
 	if (!use_mailreader_i) {
-		msg_write_signature (fp, TRUE);
+		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
 	}
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2510,6 +2513,7 @@ mail_to_author (
 	FILE *fp;
 	int lines = 0;
 	int redraw_screen = FALSE;
+	t_bool spamtrap_found = FALSE;
 
 	msg_init_headers ();
 
@@ -2535,6 +2539,7 @@ mail_to_author (
 		find_reply_to_addr (respnum, from_addr, FALSE);
 
 		msg_add_header ("To", from_addr);
+		spamtrap_found = check_for_spamtrap(from_addr);
 		msg_add_header ("Subject", subject);
 
 		if (auto_cc) {
@@ -2596,12 +2601,29 @@ mail_to_author (
 	}
 
 	if (!use_mailreader_i) {
-		msg_write_signature (fp, TRUE);
+		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
 	}
 #ifdef WIN32
 	putc ('\0', fp);
 #endif
 	fclose (fp);
+
+	if (spamtrap_found) {
+		ch = prompt_to_continue();
+		switch (ch) {
+			case iKeyPostAbort:
+			case iKeyAbort:
+				unlink(nam);
+				clear_message();
+				return redraw_screen;
+
+			case iKeyPostContinue:
+				break;
+			/* the user wants to continue anyway, so we do nothing special here */
+			default:
+				break;
+		}
+	}
 
 	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
@@ -2675,6 +2697,31 @@ mail_to_author_done:
 	unlink (nam);
 
 	return redraw_screen;
+}
+
+/*
+ * compare the given e-mail address with a list of components in $SPAMTRAP
+ */
+
+static t_bool
+check_for_spamtrap(char *addr)
+{
+	char *env;
+	char *ptr;
+
+	if ((env = getenv("SPAMTRAP")) != (char *) 0) {
+		while (strlen(env)) {
+			ptr = strchr(env, ',');
+			if (ptr != NULL)
+				*ptr = '\0';
+			if (strcasestr(addr, env) != NULL)
+				return TRUE;
+			env += strlen(env);
+			if (ptr != NULL) 
+				env++;
+		}
+	}
+	return FALSE;
 }
 
 /*
@@ -2845,7 +2892,7 @@ cancel_article (
 #endif
 	} else {
 		do {
-			do_prompt2 (txt_cancel_article, art->subject, option_default);
+			prompt_2 (txt_cancel_article, art->subject, option_default);
 			if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 				option = option_default;
 		} while (!strchr ("\033dqs", option));
@@ -3172,13 +3219,9 @@ repost_article (
 	copy_fp (note_fp, fp, "");
 
 /* only append signature when NOT superseeding own articles */
-#ifndef FORGERY
-	if (!supersede) {
-		msg_write_signature (fp, FALSE);
+	if (NotSuperseding && signature_repost) {
+		msg_write_signature (fp, FALSE, psGrp);
 	}
-#else
-	msg_write_signature (fp, FALSE);
-#endif
 	fclose (fp);
 
 	/* on supersede change default-key */
@@ -3190,7 +3233,7 @@ repost_article (
 repost_article_loop:
 		if (!force_command)
 			do {
-				do_prompt2 (txt_quit_edit_xpost, note_h_subj, ch_default);
+				prompt_2 (txt_quit_edit_xpost, note_h_subj, ch_default);
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
 			} while (!strchr (POST_KEYS, ch));

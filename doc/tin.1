@@ -1825,6 +1825,12 @@ from without further query.  For example, setting
 will automatically unsubscribe the user from all new alt.flame groups 
 and all groups starting with u (university groups) other than UK groups (which
 will be queried for as usual.)
+.TP
+\fBSPAMTRAP\fP
+Set this variable to a list of commaseparated strings to be warned if you
+are replying to an article by mail where the e-mail address contains one of
+these strings. The matching is caseinsensitive. Example:
+\fISPAMTRAP=spam,delete,remove\fP
 .SH "TIPS AND TRICKS"
 .PP
 Tin can be pretty much be navigated by using the four cursor keys. The left

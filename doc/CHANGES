@@ -1,3 +1,38 @@
+--unoff BETA release 970709 --
+
+409) Thomas E. Dickey <dickey@clark.net>
+     BUG. correct the curses handling of CTL/L for repainting the screen
+     ADD. CTL/L command to the config-screen.
+     FIX. menukeys.h, config.c, tcurses.c
+
+408) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. check for possible spamtrap in e-mail address when
+          replying to an article by mail
+     FIX. extern.h, menukeys.h, lang.c, post.c, tin.1
+
+407) Ralf Doeblitz <r.doeblitz@tu-bs.de>
+     BUG. tin ignores "global=on/off" for Quick-Filter/Select
+     FIX. attrib.c, lang.c
+
+406) Michael Lupp <mike@nemesis.saar.de>
+     Andrey A. Chernov <ache@null.net>
+     ADD. minor Makefile tuning
+     FIX. Makefile[.in]
+
+405) Sven Paulus <sven@oops.sub.de>
+     BUG. prompt for subject was incorrectly displayed when 
+	  subject was too long -> now truncating to 20 chars
+     ADD. implement a permanent history for each type of input
+     ADD. enable cursor keys on input line
+     FIX. several supplied patches
+
+404) Sven Paulus <sven@oops.sub.de>
+     BUG. when reposting articles, the wrong signature was used
+     ADD. new configuration option "signature_repost"
+     BUG. cursor was on wrong position when asking "Repost or supersede"
+     ADD. new configuration option "quote_empty_lines"
+     FIX. several supplied patches
+
 --unoff BETA release 970705 --
 
 403) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -10,7 +45,7 @@
           postponed articles
      ADD. changed message "Repost" to "Post postponed articles"
      BUG. tin got slower as .tin/posted grew, increasing speed by
-          reverting order
+          reversing order
      BUG. tin garbled .tin/posted when posting postponed articles
      FIX. lang.c, post.c
 

@@ -142,6 +142,11 @@ main (
 	 */
 	read_motd_file ();
 
+	/*
+	 *  Read input history 
+	 */
+	read_input_history_file ();
+
 #ifdef WIN32
 	/*
 	 * Init curses emulation
@@ -309,9 +314,9 @@ main (
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCD:f:g:hHI:m:M:nN:oqrRs:SuUvVwzZ"
+#		define OPTIONS "acCD:f:g:hHI:m:M:nNoqrRs:SuUvVwzZ"
 #	else /* M_AMIGA */ /* may need some work */
-#		define OPTIONS "BcCD:f:hHI:m:M:nN:oqrRs:SuUvVwzZ"
+#		define OPTIONS "BcCD:f:hHI:m:M:nNoqrRs:SuUvVwzZ"
 #	endif
 #else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"

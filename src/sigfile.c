@@ -32,13 +32,13 @@ static int thrashdir (char *sigdir);
 void
 msg_write_signature (
 	FILE *fp,
-	int flag)
+	int flag,
+	struct t_group *thisgroup)
 {
 	char path[PATH_LEN];
 	char cwd[PATH_LEN];
 	FILE *fixfp;
 	FILE *sigfp;
-	int i;
 
 #ifdef NNTP_INEWS
 	if (read_news_via_nntp && use_builtin_inews) {
@@ -46,16 +46,14 @@ msg_write_signature (
 	}
 #endif
 
-	i = my_group[cur_groupnum];
-
-	if (!strcmp(active[i].attribute->sigfile, "--none")) {
+	if (!strcmp(thisgroup->attribute->sigfile, "--none")) {
 		return;
 	}
-	if (active[i].attribute->sigfile[0] == '!') {
+	if (thisgroup->attribute->sigfile[0] == '!') {
 		char cmd[PATH_LEN];
 		FILE *pipe_fp;
 		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-		if ((pipe_fp = popen (active[i].attribute->sigfile+1, "r")) != (FILE *) 0) {
+		if ((pipe_fp = popen (thisgroup->attribute->sigfile+1, "r")) != (FILE *) 0) {
 			while (fgets (cmd, PATH_LEN, pipe_fp))
 				fputs (cmd, fp);
 			fclose (pipe_fp);
@@ -64,10 +62,10 @@ msg_write_signature (
 	}
 	get_cwd (cwd);
 
-	if (!strfpath (active[i].attribute->sigfile, path, sizeof (path),
-	    homedir, (char *) 0, (char *) 0, active[i].name)) {
+	if (!strfpath (thisgroup->attribute->sigfile, path, sizeof (path),
+	    homedir, (char *) 0, (char *) 0, thisgroup->name)) {
 		if (!strfpath (default_sigfile, path, sizeof (path),
-		    homedir, (char *) 0, (char *) 0, active[i].name)) {
+		    homedir, (char *) 0, (char *) 0, thisgroup->name)) {
 			joinpath (path, homedir, ".Sig");
 		}
 	}

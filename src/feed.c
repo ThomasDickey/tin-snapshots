@@ -154,7 +154,7 @@ feed_articles (
 
 		case iKeyFeedPat:
 			sprintf (msg, txt_feed_pattern, default_regex_pattern);
-			if (!prompt_string (msg, pattern)) {
+			if (!prompt_string (msg, pattern, HIST_REGEX_PATTERN)) {
 				clear_message ();
 				return;
 			}
@@ -180,7 +180,7 @@ feed_articles (
 		case FEED_MAIL:
 			sprintf (msg, txt_mail_art_to,
 				cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
-			if (!prompt_string (msg, address)) {
+			if (!prompt_string (msg, address, HIST_MAIL_ADDRESS)) {
 				clear_message ();
 				return;
 			}
@@ -198,7 +198,7 @@ feed_articles (
 		case FEED_PIPE:
 			sprintf (msg, txt_pipe_to_command,
 				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
-			if (!prompt_string (msg, command)) {
+			if (!prompt_string (msg, command, HIST_PIPE_COMMAND)) {
 				clear_message ();
 				return;
 			}
@@ -244,7 +244,7 @@ feed_articles (
 				if (function != FEED_SAVE_TAGGED) {
 					sprintf (msg, txt_save_filename, save_file);
 
-					if (!prompt_string (msg, filename)) {
+					if (!prompt_string (msg, filename, HIST_SAVE_FILE)) {
 						clear_message ();
 						return;
 					}
@@ -319,9 +319,7 @@ feed_articles (
 #endif
 				/* repost or supersede ? */
 				do {
-					sprintf (msg,txt_supersede_article, arts[respnum].subject, option_default);
-					wait_message (msg);
-					MoveCursor (cLINES-1, (int) (strlen (msg)-1));
+					prompt_2 (txt_supersede_article, arts[respnum].subject, option_default);
 					if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 						option = option_default;
 				} while (!strchr ("qrs\033", option));
@@ -346,7 +344,7 @@ feed_articles (
 			}
 #endif
 
-			if (!prompt_string (msg, group_name)) {
+			if (!prompt_string (msg, group_name, HIST_REPOST_GROUP)) {
 				clear_message ();
 				return;
 			}

@@ -342,6 +342,7 @@ constext txt_help_process_only_unread[] = "<SPACE> toggles, <CR> sets, <ESC> can
 constext txt_help_prompt_followupto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_q[] = "Q\t  quit" cCRLF;
 constext txt_help_quote_chars[] = "Enter quotation marks, %s or %S for author's initials.";
+constext txt_help_quote_empty_lines[] = "Quote empty lines. <SPACE> toggles & <CR> sets.";
 constext txt_help_r[] = "r\t  toggle display of all/unread articles" cCRLF;
 constext txt_help_reread_active_file_secs[] = "Enter number of seconds until active file will be reread. <CR> sets.";
 constext txt_help_s[] = "s u\t  subscribe (u = unsubscribe) to chosen group" cCRLF;
@@ -357,6 +358,7 @@ constext txt_help_show_only_unread[] = "Show all articles or only unread article
 constext txt_help_show_only_unread_groups[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_show_xcommentto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_sigdashes[] = "Prepend signature with \"-- \" on own line. <SPACE> toggles & <CR> sets.";
+constext txt_help_signature_repost[] = "Add signature when reposting articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_sigfile[] = "Enter path/! command/--none to create your default signature. <CR> sets.";
 constext txt_help_sort_art_type[] = "Sort articles by Subject, From or Date fields. <SPACE> toggles & <CR> sets.";
 constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -551,6 +553,7 @@ constext txt_opt_printer[] = "Printer program with options       : ";
 constext txt_opt_process_only_unread[] = "Process only unread articles       : ";
 constext txt_opt_prompt_followupto[] = "Show empty Followup-To in editor   : ";
 constext txt_opt_quote_chars[] = "Characters used as quote-marks     : ";
+constext txt_opt_quote_empty_lines[] = "Quote empty lines                  : ";
 constext txt_opt_reread_active_file_secs[] = "Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = "Save mail in MMDF style            : ";
 constext txt_opt_savedir[] = "Directory to save arts/threads in  : ";
@@ -562,6 +565,7 @@ constext txt_opt_show_only_unread[] = "Show only unread articles          : ";
 constext txt_opt_show_only_unread_groups[] = "Show only groups with unread arts  : ";
 constext txt_opt_show_xcommentto[] = "Display X-Comment-To: header       : ";
 constext txt_opt_sigdashes[] = "Prepend signature with \"-- \"       : ";
+constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
 constext txt_opt_sigfile[] = "Create signature from path/command : ";
 constext txt_opt_sort_art_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
@@ -671,7 +675,7 @@ constext txt_tinrc_display_mime_header_asis[] = "# if ON, RFC 1522 (now RFC 2047
 # will be decoded back to 8bit when displayed.\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
-# header=NUM  0=Subject: 1=From: 2=Message-Id:\n\
+# header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: 5=Lines:\n\
 # global=ON/OFF  ON=apply to all groups OFF=apply to current group\n\
 # case=ON/OFF    ON=filter case sensitive OFF=ignore case\n\
 # expire=ON/OFF  ON=limit to default_filter_days OFF=don't ever expire\n";
@@ -752,6 +756,7 @@ constext txt_tinrc_process_only_unread[] = "# If ON only save/print/pipe/mail un
 constext txt_tinrc_prompt_followupto[] = "# If ON show empty Followup-To header when editing an article\n";
 constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups and replys.\n\
 # '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
+constext txt_tinrc_quote_empty_lines[] = "# If ON quote empty lines, too\n";
 constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
 constext txt_tinrc_news_headers_to_display[] = "# Which news headers you wish to see. If you want to see _all_ the headers,\n\
@@ -774,7 +779,8 @@ constext txt_tinrc_show_lines[] = "# show number of lines of first unread articl
 constext txt_tinrc_show_only_unread[] = "# if ON show only new/unread articles otherwise show all.\n";
 constext txt_tinrc_show_only_unread_groups[] = "# if ON show only subscribed to groups that contain unread articles.\n";
 constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed\n";
-constext txt_tinrc_sigdashes[] = "# if ON prepend the signature with dashes '\\n-- \\n'\n";
+constext txt_tinrc_sigdashes[] = "# if ON prepend the signature with dashes\n";
+constext txt_tinrc_signature_repost[] = "# if ON add signature to reposted articles'\\n-- \\n'\n";
 constext txt_tinrc_sort_article_type[] = "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n\
 # 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n";
 constext txt_tinrc_space_goto_next_unread[] = "# if ON the SPACE command will goto next unread article at article viewer\n\
@@ -959,6 +965,7 @@ constext txt_reading_filter_file[] = "Reading filter file...";
 constext txt_reading_global_attributes_file[] = "Reading global attributes file...";
 constext txt_reading_global_config_file[] = "Reading global config file...";
 constext txt_reading_global_filter_file[] = "Reading global filter file...";
+constext txt_reading_input_history_file[] = "Reading input history file...";
 constext txt_reading_mail_active_file[] = "Reading mail active file... ";
 constext txt_reading_mailgroups_file[] = "Reading mailgroups file... ";
 constext txt_reading_new_arts[] = "Reading unread articles...";
@@ -1005,7 +1012,7 @@ constext txt_subscribed_num_groups[] = "subscribed to %d groups";
 constext txt_subscribed_to[] = "Subscribed to %s";
 constext txt_subscribing[] = "Subscribing... ";
 constext txt_subscribing_to[] = "Subscribing to %s";
-constext txt_supersede_article[] = "Repost or supersede article(s) [%s]? (r/s/q): %c";
+constext txt_supersede_article[] = "Repost or supersede article(s) [%.*s]? (r/s/q): %c";
 constext txt_supersede_group[] = "Supersede article(s) to group(s) [%s]> ";
 constext txt_suspended_message[] = "\nStopped. Type 'fg' to restart TIN\n";
 constext txt_tagged_art[] = "Tagged article";
@@ -1044,6 +1051,7 @@ constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to mo
 constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";
 constext txt_warn_not_in_newsrc[] = "Warning: \"%s\" is not in your newsrc, it may be invalid at this site!\n";
 constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n";
+constext txt_warn_suspicious_mail[] = "Warning: this mail address may contain a spamtrap. Continue or Abort? (c/a) ";
 constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
   to just the  key points to which you are  responding, or  people will think\n\

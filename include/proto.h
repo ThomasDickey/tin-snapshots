@@ -127,7 +127,7 @@ extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
 extern void free_all_filter_arrays (void);
 
 /* getline.c */
-extern char *getline (const char *prompt, int number_only, char *str, int max_chars);
+extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
 
 /* group.c */
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
@@ -250,6 +250,7 @@ extern void get_cwd (char *buf);
 extern void make_group_path (char *name, char *path);
 extern void make_post_process_cmd (char *cmd, char *dir, char *file);
 extern void parse_from (char *from_line, char *eaddr, char *fname);
+extern void read_input_history_file (void);
 extern void rename_file (char *old_filename, char *new_filename);
 extern void set_real_uid_gid (void);
 extern void set_tin_uid_gid (void);
@@ -259,6 +260,7 @@ extern void strip_double_ngs (char *ngs_list);
 extern void tin_done (int ret);
 extern void toggle_inverse_video (void);
 extern void vPrintBugAddress (void);
+extern void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
 	extern void buffer_to_local (char *b);
 	extern void buffer_to_network (char *b);
@@ -362,10 +364,12 @@ extern int prompt_num (int ch, const char *prompt);
 extern int prompt_option_char (int option);
 extern int prompt_option_num (int option);
 extern int prompt_option_string (int option);
-extern int prompt_string (const char *prompt, char *buf);
+extern int prompt_string (const char *prompt, char *buf, int which_hist);
 extern int prompt_yn (int line, const char *prompt, t_bool default_answer);
 extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
+extern void prompt_1 (const char *format, int ch_default);
+extern void prompt_2 (const char *format, const char *subject, int ch_default);
 
 /* refs.c */
 extern char *get_references (struct t_msgid *refptr);
@@ -377,7 +381,7 @@ extern void free_msgids (void);
 extern void thread_by_reference (void);
 
 /* regex.c */
-extern t_bool match_regex(const char *string, char *pattern, t_bool icase);
+extern t_bool match_regex (const char *string, char *pattern, t_bool icase);
 
 /* rfc1521.c */
 extern FILE *rfc1521_decode (FILE *file);
@@ -445,7 +449,7 @@ extern void strip_line (char *line);
 extern void toggle_my_groups (t_bool only_unread_groups, const char *group);
 
 /* sigfile.c */
-extern void msg_write_signature (FILE *fp, int flag);
+extern void msg_write_signature (FILE *fp, int flag, struct t_group *thisgroup);
 
 /* signal.c */
 extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);

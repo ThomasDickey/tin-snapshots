@@ -82,14 +82,16 @@ set_default_attributes (
 	psAttrib->savefile = (char *) 0;
 	psAttrib->sigfile = default_sigfile;
 	psAttrib->organization =
-		(default_organization[0] ? default_organization : (char *) 0);
+		(default_organization ? default_organization : (char *) 0);
 	psAttrib->followup_to = (char *) 0;
 	psAttrib->printer = default_printer;
-	psAttrib->quick_kill_scope = (char *) 0;
+	psAttrib->quick_kill_scope =
+		(default_filter_kill_global ? strdup("*") : (char *) 0);
 	psAttrib->quick_kill_header = default_filter_kill_header;
 	psAttrib->quick_kill_case = default_filter_kill_case;
 	psAttrib->quick_kill_expire = default_filter_kill_expire;
-	psAttrib->quick_select_scope = (char *) 0;
+	psAttrib->quick_select_scope =
+		(default_filter_select_global ? strdup("*") : (char *) 0);
 	psAttrib->quick_select_header = default_filter_select_header;
 	psAttrib->quick_select_case = default_filter_select_case;
 	psAttrib->quick_select_expire = default_filter_select_expire;
