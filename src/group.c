@@ -1212,7 +1212,7 @@ group_list_thread:
 
  			case iKeyGroupSelPattern:	/* select matching patterns */
  				sprintf (msg, txt_select_pattern, default_select_pattern);
- 				if (!prompt_string (msg, buf)) {
+ 				if (!prompt_string (msg, buf, HIST_SELECT_PATTERN)) {
  					break;
  				}
  				if (buf[0] == '\0') {

@@ -179,8 +179,8 @@ copy_body (
 	if (strstr(zprefix, "%s")) sprintf(prefixbuf, zprefix, initl);
 
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
-		if (buf[0] != '\n') {
-			if (strstr(zprefix, "%s")) { /* initials wanted */
+		if (strstr(zprefix, "%s")) { /* initials wanted */
+			if (buf[0] != '\n') {
 				if (strchr(buf, '>')) {
 					status_space = 0;
 					status_char = 1;
@@ -204,11 +204,15 @@ copy_body (
 				} else {   /* line was not already quoted (no >) */
 					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
 				}
-			} else {    /* no initials in quote_string, just copy */
-				retcode = fprintf (fp_op, "%s%s", prefix, buf);
+			} else {
+				retcode = fprintf (fp_op, "%s", buf);
 			}
-		} else {
-			retcode = fprintf (fp_op, "%s", buf);
+		} else {    /* no initials in quote_string, just copy */
+			if ((buf[0] != '\n') || quote_empty_lines) {
+				retcode = fprintf (fp_op, "%s%s", prefix, buf);
+			} else {
+				retcode = fprintf (fp_op, "%s", buf);
+			}
 		}
 		if (retcode == EOF) {
 			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
@@ -320,7 +324,7 @@ shell_escape (void)
 
 	sprintf (msg, txt_shell_escape, default_shell_command);
 
-	if (!prompt_string (msg, shell))
+	if (!prompt_string (msg, shell, HIST_SHELL_COMMAND))
 		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
 
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
@@ -388,6 +392,9 @@ tin_done (
 	}
 
 	vWriteNewsrc ();
+	
+	write_input_history_file ();
+	
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	write_mail_active_file ();
 #endif
@@ -1237,7 +1244,10 @@ get_arrow_key (void)
 			code = '\b';
 			break;
 		case KEY_DC:
-			code = '\177';
+			code = KEYMAP_DEL;
+			break;
+		case KEY_IC:
+			code = KEYMAP_INS;
 			break;
 		case KEY_UP:
 			code = KEYMAP_UP;
@@ -1285,7 +1295,7 @@ get_arrow_key (void)
 #endif
 	}
 	return code;
-#else
+#else	/* USE_CURSES */
 	int ch;
 	int ch1;
 
@@ -1356,6 +1366,14 @@ get_arrow_key (void)
 		case 0xA8:
 #endif
 			return KEYMAP_END;
+
+		case '2':		/* vt200 Ins */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_INS;
+
+		case '3':		/* vt200 Del */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_DEL;
 
 		case '5':		/* vt200 PgUp */
 			(void) ReadCh ();	/* eat the ~ (interesting use of words :) */
@@ -2374,21 +2392,127 @@ char
 
 	if (*in_org != '/')
 		return in_org;
-		
+
 	if ((orgfp = fopen(in_org, "r")) == NULL)
 		return selorg;
 
 	/* count lines */
 	while (fgets(selorg, sizeof(selorg), orgfp))
 		nool++;
-	
+
 	fseek(orgfp, 0, SEEK_SET);
 	sol = rand () % nool + 1;
 	nool = 0;
 	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))
 		nool++;
-		
+
 	fclose(orgfp);
-	
+
 	return selorg;
 }	
+
+
+void
+dump_input_history(void) {
+	int his_w, his_e;
+	
+	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
+		fprintf(stderr, "Abschnitt %d: last=%d\n", his_w, hist_last[his_w]);
+		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
+			fprintf(stderr, "  %2d = '%s'\n", his_e,
+				input_history[his_w][his_e]);
+		}
+	}
+
+}	
+
+void
+read_input_history_file (void) {
+	FILE *fp;
+	char buf[HEADER_LEN];
+	int his_w = 0, his_e = 0;
+	char *chr, *chr1;
+	int his_free = 0;
+
+	/* this is usually .tin/.inputhistory */	
+	if ((fp = fopen(local_input_history_file, "r")) == NULL)
+		return;
+	
+        if (SHOW_UPDATE)
+		wait_message (txt_reading_input_history_file);
+
+	/* to be safe ;-) */
+	memset((void *) &input_history, 0, sizeof(input_history));
+	memset((void *) &hist_last, 0, sizeof(hist_last));
+	memset((void *) &hist_pos, 0, sizeof(hist_pos));
+
+
+	while (fgets(buf, sizeof(buf), fp)) {
+		
+		if ((chr = malloc(strlen(buf)+1)) != NULL) {
+			strcpy(chr, buf);
+			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
+				*chr1 = '\0';
+			if (*chr) 
+				input_history[his_w][his_e] = chr;
+			else {
+				/* empty lines in getline's history buf
+				   are stored as NULL pointers */
+				input_history[his_w][his_e] = NULL;
+				/* get the empty slot in the circular buf */
+				if (!his_free)
+					his_free = his_e;
+			}
+		}
+
+		his_e++;
+		/* check if next type is reached */
+		if (his_e >= HIST_SIZE) {
+			hist_last[his_w] = his_free;
+		        hist_pos[his_w] = hist_last[his_w];
+			his_free = 0;
+			his_e = 0;
+			his_w++;
+		}
+		/* check if end is reached */
+		if (his_w > HIST_MAXNUM)
+			break;
+	}
+
+	fclose(fp);
+
+/*	dump_input_history(); */
+
+        if (cmd_line) {
+		printf ("\r\n");
+	}
+
+	
+}
+
+void
+write_input_history_file(void) {
+	FILE *fp;
+	int his_w, his_e;
+	char *chr;
+
+/*	dump_input_history(); */
+	
+	if ((fp = fopen(local_input_history_file, "w")) == NULL)
+		return;
+	
+	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
+		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
+			/* write an empty line for empty slots */
+			if (input_history[his_w][his_e] == NULL)
+				fprintf(fp, "\n");
+			else {
+				if ((chr = strpbrk(input_history[his_w][his_e], "\n\r")) != NULL)
+					*chr = '\0';
+				fprintf(fp, "%s\n", input_history[his_w][his_e]);
+			}
+		}
+	}
+	
+	fclose(fp);
+}

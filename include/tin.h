@@ -608,6 +608,7 @@ extern char *get_uaf_fullname();
 #define 	POSTPONED_FILE		"postponed.articles"
 #define 	DEFAULT_MAILDIR 	"Mail"
 #define 	DEFAULT_SAVEDIR 	"News"
+#define	INPUT_HISTORY_FILE	".inputhistory"
 #define 	MAILGROUPS_FILE 	"mailgroups"
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
@@ -676,6 +677,9 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define 	MODULO_COUNT_NUM	10
 #define 	TABLE_SIZE		1409
 #define 	MAX_PAGES		1000
+/* when prompting for subject, display no more than 20 characters */
+#define 	DISPLAY_SUBJECT_LEN	20
+
 #define 	ctrl(c) 		((c) & 0x1F)
 
 #ifndef DEFAULT_ISO2ASC
@@ -783,9 +787,11 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	KEYMAP_LEFT		0xA5
 #define	KEYMAP_RIGHT		0xA7
 #define	KEYMAP_PAGE_UP		0xA1
-#define	KEYMAP_PAGE_DOWN		0xA2
+#define	KEYMAP_PAGE_DOWN	0xA2
 #define	KEYMAP_HOME		0xA4
 #define	KEYMAP_END		0xA3
+#define	KEYMAP_DEL		0
+#define	KEYMAP_INS		0
 #define	KEYMAP_MOUSE		0
 #else
 #define	KEYMAP_UNKNOWN		0
@@ -794,10 +800,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	KEYMAP_LEFT		3
 #define	KEYMAP_RIGHT		4
 #define	KEYMAP_PAGE_UP		5
-#define	KEYMAP_PAGE_DOWN		6
+#define	KEYMAP_PAGE_DOWN	6
 #define	KEYMAP_HOME		7
 #define	KEYMAP_END		8
-#define	KEYMAP_MOUSE		9
+#define	KEYMAP_DEL		9
+#define	KEYMAP_INS		10
+#define	KEYMAP_MOUSE		11
 #endif
 
 /*

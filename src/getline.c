@@ -21,9 +21,6 @@
 #define BUF_SIZE	1024
 #define SCROLL		30
 #define TABSIZE		4
-#ifndef HIST_SIZE
-#define HIST_SIZE	100
-#endif
 
 #define CTRL_A	'\001'
 #define CTRL_B	'\002'
@@ -39,11 +36,9 @@
 #define TAB	'\t'
 #define DEL	'\177'
 
-char *hist_buf[HIST_SIZE];
-int hist_pos, hist_last;
 static char gl_buf[BUF_SIZE];	/* input buffer */
+static int gl_init_done = 0;  /* -1 is terminal, 1 is batch  */
 static const char *gl_prompt;	/* to save the prompt string */
-static int gl_init_done = 0;	/* -1 is terminal, 1 is batch  */
 static int gl_width = 0;	/* net size available for input */
 static int gl_pos, gl_cnt = 0;	/* position and size of input */
 
@@ -55,12 +50,11 @@ static void gl_del (int loc);
 static void gl_fixup (int change, int cursor);
 static int gl_tab (char *buf, int offset, int *loc);
 static void gl_redraw (void);
-static void gl_newline (void);
+static void gl_newline (int w);
 static void gl_kill (void);
-static void hist_add (void);
-static void hist_init (void);
-static void hist_next (void);
-static void hist_prev (void);
+static void hist_add (int w);
+static void hist_next (int w);
+static void hist_prev (int w);
 
 int (*gl_in_hook) (char *) = 0;
 int (*gl_out_hook) (char *) = 0;
@@ -71,15 +65,12 @@ getline (
 	const char *prompt,
 	int number_only,
 	char *str,
-	int max_chars)
+	int max_chars,
+	int which_hist)
 {
 	int c, i, loc, tmp, gl_max;
 
 	set_xclick_off ();
-	if (!gl_init_done) {
-		gl_init_done = 1;
-		hist_init ();
-	}
 	if (prompt == (char *) 0) {
 		prompt = "";
 	}
@@ -127,10 +118,43 @@ getline (
 		} else {
 			switch (c) {
 				case ESC:	/* abort */
-					return (char *) 0;
+#ifdef HAVE_KEY_PREFIX
+				case KEY_PREFIX:
+#endif
+					switch (get_arrow_key ()) {
+						case KEYMAP_UP:
+						case KEYMAP_PAGE_UP:
+							hist_prev (which_hist);
+							break;
+						case KEYMAP_PAGE_DOWN:
+						case KEYMAP_DOWN:
+							hist_next (which_hist);
+							break;
+						case KEYMAP_RIGHT:
+							gl_fixup (-1, gl_pos + 1);
+							break;
+						case KEYMAP_LEFT:
+							gl_fixup (-1, gl_pos - 1);
+							break;
+						case KEYMAP_HOME:
+							gl_fixup (-1, 0);
+							break;
+						case KEYMAP_END:
+							gl_fixup (-1, gl_cnt);
+							break;
+						case KEYMAP_DEL:
+							gl_del (0);
+							break;
+						case KEYMAP_INS:
+							gl_addchar (' ');
+							break;
+						default: 
+							return (char *) 0;
+					}
+					break;
 				case '\n':	/* newline */
 				case '\r':
-					gl_newline ();
+					gl_newline (which_hist);
 					return gl_buf;
 				case CTRL_A:
 					gl_fixup (-1, 0);
@@ -173,10 +197,10 @@ getline (
 					gl_redraw ();
 					break;
 				case CTRL_N:
-					hist_next ();
+					hist_next (which_hist);
 					break;
 				case CTRL_P:
-					hist_prev ();
+					hist_prev (which_hist);
 					break;
 				default:
 					ring_bell ();
@@ -216,7 +240,7 @@ gl_addchar (
  */
 
 static void
-gl_newline (void)
+gl_newline (int w)
 {
 	int change = gl_cnt;
 	int len = gl_cnt;
@@ -226,7 +250,7 @@ gl_newline (void)
 		error_message ("getline: input buffer overflow", "");
 		exit (1);
 	}
-	hist_add ();		/* only adds if nonblank */
+	hist_add (w);		/* only adds if nonblank */
 	if (gl_out_hook) {
 		change = gl_out_hook (gl_buf);
 		len = strlen (gl_buf);
@@ -414,35 +438,22 @@ gl_tab (
 	return i;
 }
 
-/*
- * History functions
- */
-
 static void
-hist_init (void)
-{
-	int i;
-
-	for (i = 0; i < HIST_SIZE; i++)
-		hist_buf[i] = (char *) 0;
-}
-
-static void
-hist_add (void)
+hist_add (int w)
 {
 	char *p = gl_buf;
 
 	while (*p == ' ' || *p == '\t')		/* only save nonblank line */
 		p++;
 	if (*p) {
-		hist_buf[hist_last] = my_strdup (gl_buf);
-		hist_last = (hist_last + 1) % HIST_SIZE;
-		if (hist_buf[hist_last]) {	/* erase next location */
-			free (hist_buf[hist_last]);
-			hist_buf[hist_last] = (char *) 0;
+		input_history[w][hist_last[w]] = my_strdup (gl_buf);
+		hist_last[w] = (hist_last[w] + 1) % HIST_SIZE;
+		if (input_history[w][hist_last[w]]) {	/* erase next location */
+			free (input_history[w][hist_last[w]]);
+			input_history[w][hist_last[w]] = (char *) 0;
 		}
 	}
-	hist_pos = hist_last;
+	hist_pos[w] = hist_last[w];
 }
 
 /*
@@ -450,15 +461,15 @@ hist_add (void)
  */
 
 static void
-hist_prev (void)
+hist_prev (int w)
 {
 	int next;
 
-	next = (hist_pos - 1 + HIST_SIZE) % HIST_SIZE;
-	if (next != hist_last) {
-		if (hist_buf[next]) {
-			hist_pos = next;
-			strcpy (gl_buf, hist_buf[hist_pos]);
+	next = (hist_pos[w] - 1 + HIST_SIZE) % HIST_SIZE;
+	if (next != hist_last[w]) {
+		if (input_history[w][next]) {
+			hist_pos[w] = next;
+			strcpy (gl_buf, input_history[w][hist_pos[w]]);
 		} else {
 			ring_bell ();
 		}
@@ -475,12 +486,12 @@ hist_prev (void)
  */
 
 static void
-hist_next (void)
+hist_next (int w)
 {
-	if (hist_pos != hist_last) {
-		hist_pos = (hist_pos + 1) % HIST_SIZE;
-		if (hist_buf[hist_pos]) {
-			strcpy (gl_buf, hist_buf[hist_pos]);
+	if (hist_pos[w] != hist_last[w]) {
+		hist_pos[w] = (hist_pos[w] + 1) % HIST_SIZE;
+		if (input_history[w][hist_pos[w]]) {
+			strcpy (gl_buf, input_history[w][hist_pos[w]]);
 		} else {
 			gl_buf[0] = 0;
 		}

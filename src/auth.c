@@ -304,7 +304,7 @@ authinfo_original (
 	 */
 	if (!startup) {
 		clear_message ();
-		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN)) == (char *) 0) {
+		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN, HIST_OTHER)) == (char *) 0) {
 			debug_nntp ("authorization", "failed: no username");
 			return FALSE;
 		}

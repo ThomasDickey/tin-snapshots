@@ -58,6 +58,7 @@ char libdir[PATH_LEN];			/* directory where news config files are (ie. active) *
 char local_attributes_file[PATH_LEN];
 char local_config_file[PATH_LEN];
 char local_filter_file[PATH_LEN];
+char local_input_history_file[PATH_LEN];
 char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
 char local_newsrctable_file[PATH_LEN];
 char lock_file[PATH_LEN];		/* contains name of index lock file */
@@ -127,6 +128,8 @@ int global_filtered_articles;		/* globally killed / auto-selected articles */
 int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
+int hist_last[HIST_MAXNUM+1];
+int hist_pos[HIST_MAXNUM+1];
 int in_headers;			/* color in headers */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
@@ -230,6 +233,7 @@ t_bool print_header;				/* print all of mail header or just Subject: & From line
 t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
 t_bool prompt_followupto;    /* display empty Followup-To header in editor */
 t_bool purge_index_files;		/* stat all articles to see if they still exist */
+t_bool quote_empty_lines;	/* quote empty lines, too */
 t_bool read_local_newsgroups_file;	/* read newsgroups file locally or via NNTP */
 t_bool read_news_via_nntp = FALSE;	/* read news locally or via NNTP */
 t_bool read_saved_news = FALSE;	/* tin -R read saved news from tin -S */
@@ -241,6 +245,7 @@ t_bool show_lines;
 t_bool show_only_unread_groups;	/* set TRUE to see only subscribed groups with new news */
 t_bool show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
 t_bool sigdashes;					/* set TRUE to prepend every signature with dashes */
+t_bool signature_repost;		/* set TRUE to add signature when reposting articles */
 t_bool space_goto_next_unread;
 t_bool start_any_unread = FALSE;
 t_bool start_editor_offset;
@@ -260,6 +265,9 @@ t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
 t_bool xuser_supported = FALSE;
+
+/* History entries */
+char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 
 #ifdef HAVE_METAMAIL
 t_bool use_metamail;				/* enables/disables metamail on MIME messages */
@@ -485,6 +493,7 @@ void init_selfinfo (void)
 	process_only_unread = TRUE;
 	prompt_followupto = FALSE;
 	purge_index_files = FALSE;
+	quote_empty_lines = FALSE;
 	read_local_newsgroups_file = FALSE;
 	reread_active_file = TRUE;
 	reread_active_file_secs = REREAD_ACTIVE_FILE_SECS;
@@ -501,6 +510,7 @@ void init_selfinfo (void)
 	show_xcommentto = FALSE;
 	highlight_xcommentto = FALSE;
 	sigdashes = TRUE;
+	signature_repost = TRUE;
 	strip_blanks = TRUE;
 #ifdef M_UNIX
 	start_editor_offset = TRUE;
@@ -693,6 +703,7 @@ void init_selfinfo (void)
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
 	joinpath (local_config_file, rcdir, CONFIG_FILE);
 	joinpath (local_filter_file, rcdir, FILTER_FILE);
+	joinpath (local_input_history_file, rcdir, INPUT_HISTORY_FILE);
 	joinpath (local_newsrctable_file, rcdir, NEWSRCTABLE_FILE);
 	joinpath (local_newsgroups_file, rcdir, NEWSGROUPS_FILE);
 	joinpath (mail_active_file, rcdir, ACTIVE_MAIL_FILE);

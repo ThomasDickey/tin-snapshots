@@ -1,5 +1,8 @@
 Bugs
 ----
+o  -N comandline swith seems to be broken
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.
    [Jason C Lin <jlin@hawaii.edu>]
@@ -60,8 +63,6 @@ o  supersedes does not work if one of the Newsgroups is not present in the
 
 o  commas in real-name might cause problems in mail-replys
    -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
-
-o  tin ignores some file-permissions (.newsrc will be set to 644) ?????
 
 o  src/Makefile ignores cf_cv_makeflags
 

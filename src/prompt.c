@@ -42,7 +42,7 @@ prompt_num (
 
 	sprintf (msg, "%c", ch);
 
-	if ((p = getline (prompt, TRUE, msg, 0)) != (char *) 0) {
+	if ((p = getline (prompt, TRUE, msg, 0, HIST_OTHER)) != (char *) 0) {
 		strcpy (msg, p);
 		num = atoi (msg);
 	} else {
@@ -65,7 +65,8 @@ prompt_num (
 int
 prompt_string (
 	const char *prompt,
-	char *buf)
+	char *buf,
+	int which_hist)
 {
 	char *p;
 
@@ -73,7 +74,7 @@ prompt_string (
 
 	clear_message ();
 
-	if ((p = getline (prompt, FALSE, (char *) 0, 0)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, (char *) 0, 0, which_hist)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
 		set_alarm_clock_on ();
@@ -105,7 +106,7 @@ prompt_menu_string (
 
 	MoveCursor (line, col);
 
-	if ((p = getline ("", FALSE, var, 0)) == (char *) 0) {
+	if ((p = getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -313,7 +314,7 @@ prompt_option_string (
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 
-	if ((p = getline (prompt, FALSE, variable, 0)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -351,7 +352,7 @@ prompt_option_num (
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 	sprintf (&number[0], "%d", *(option_table[option - 1].variable));
 
-	if ((p = getline (prompt, TRUE, number, 0)) == (char *) 0) {
+	if ((p = getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0) {
 		return FALSE;
 	}
 	strcpy (number, p);
@@ -392,7 +393,7 @@ prompt_option_char (
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 
-	if ((p = getline (prompt, FALSE, p, 1)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -403,6 +404,37 @@ prompt_option_char (
 	set_alarm_clock_on ();
 
 	return TRUE;
+}
+
+
+void
+prompt_1 (
+	const char *format,
+	int ch_default)
+{
+	sprintf (msg, "%s%c", format, ch_default);
+	wait_message (msg);
+	MoveCursor (cLINES, (int) strlen (format));
+}
+
+
+void
+prompt_2(
+	const char *format,
+	const char *subject,
+	int ch_default)
+{
+	int have = cCOLS - strlen (format) + 4;
+	int want = strlen(subject);
+
+	if (want > 0 && subject[want-1] == '\n')
+		want--;
+	if (have > want)
+		have = want;
+	sprintf (msg, format, have, subject, ch_default);
+
+	wait_message (msg);
+	MoveCursor (cLINES, (int) strlen (msg) - 1);
 }
 
 /*
@@ -425,3 +457,4 @@ continue_prompt (void)
 
 	set_alarm_clock_on ();
 }
+

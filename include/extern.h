@@ -294,6 +294,7 @@ extern char libdir[PATH_LEN];
 extern char local_attributes_file[PATH_LEN];
 extern char local_config_file[PATH_LEN];
 extern char local_filter_file[PATH_LEN];
+extern char local_input_history_file[PATH_LEN];
 extern char local_newsgroups_file[PATH_LEN];
 extern char local_newsrctable_file[PATH_LEN];
 extern char lock_file[PATH_LEN];
@@ -629,6 +630,7 @@ extern constext txt_help_q[];
 extern constext txt_help_quick_kill[];
 extern constext txt_help_quick_select[];
 extern constext txt_help_quote_chars[];
+extern constext txt_help_quote_empty_lines[];
 extern constext txt_help_r[];
 extern constext txt_help_reread_active_file_secs[];
 extern constext txt_help_s[];
@@ -646,6 +648,7 @@ extern constext txt_help_show_only_unread[];
 extern constext txt_help_show_only_unread_groups[];
 extern constext txt_help_show_xcommentto[];
 extern constext txt_help_sigdashes[];
+extern constext txt_help_signature_repost[];
 extern constext txt_help_sigfile[];
 extern constext txt_help_sort_art_type[];
 extern constext txt_help_space_goto_next_unread[];
@@ -806,6 +809,7 @@ extern constext txt_opt_printer[];
 extern constext txt_opt_process_only_unread[];
 extern constext txt_opt_prompt_followupto[];
 extern constext txt_opt_quote_chars[];
+extern constext txt_opt_quote_empty_lines[];
 extern constext txt_opt_reread_active_file_secs[];
 extern constext txt_opt_save_to_mmdf_mailbox[];
 extern constext txt_opt_savedir[];
@@ -817,6 +821,7 @@ extern constext txt_opt_show_only_unread[];
 extern constext txt_opt_show_only_unread_groups[];
 extern constext txt_opt_show_xcommentto[];
 extern constext txt_opt_sigdashes[];
+extern constext txt_opt_signature_repost[];
 extern constext txt_opt_sigfile[];
 extern constext txt_opt_sort_art_type[];
 extern constext txt_opt_space_goto_next_unread[];
@@ -885,6 +890,7 @@ extern constext txt_reading_filter_file[];
 extern constext txt_reading_global_attributes_file[];
 extern constext txt_reading_global_config_file[];
 extern constext txt_reading_global_filter_file[];
+extern constext txt_reading_input_history_file[];
 extern constext txt_reading_mail_active_file[];
 extern constext txt_reading_mailgroups_file[];
 extern constext txt_reading_new_arts[];
@@ -1044,6 +1050,7 @@ extern constext txt_tinrc_print_header[];
 extern constext txt_tinrc_process_only_unread[];
 extern constext txt_tinrc_prompt_followupto[];
 extern constext txt_tinrc_quote_chars[];
+extern constext txt_tinrc_quote_empty_lines[];
 extern constext txt_tinrc_reread_active_file_secs[];
 extern constext txt_tinrc_save_to_mmdf_mailbox[];
 extern constext txt_tinrc_news_headers_to_display[];
@@ -1056,6 +1063,7 @@ extern constext txt_tinrc_show_only_unread[];
 extern constext txt_tinrc_show_only_unread_groups[];
 extern constext txt_tinrc_show_xcommentto[];
 extern constext txt_tinrc_sigdashes[];
+extern constext txt_tinrc_signature_repost[];
 extern constext txt_tinrc_sort_article_type[];
 extern constext txt_tinrc_space_goto_next_unread[];
 extern constext txt_tinrc_start_editor_offset[];
@@ -1112,6 +1120,7 @@ extern constext txt_warn_followup_to_several_groups[];
 extern constext txt_warn_missing_followup_to[];
 extern constext txt_warn_not_in_newsrc[];
 extern constext txt_warn_not_valid_newsgroup[];
+extern constext txt_warn_suspicious_mail[];
 extern constext txt_warn_posting_etiquette[];
 extern constext txt_warn_sig_too_long[];
 extern constext txt_warn_multiple_sigs[];
@@ -1278,6 +1287,7 @@ extern t_bool print_header;
 extern t_bool process_only_unread;
 extern t_bool prompt_followupto;
 extern t_bool purge_index_files;
+extern t_bool quote_empty_lines;
 extern t_bool read_local_newsgroups_file;
 extern t_bool read_news_via_nntp;
 extern t_bool read_saved_news;
@@ -1289,6 +1299,7 @@ extern t_bool show_lines;
 extern t_bool show_only_unread_groups;
 extern t_bool show_xcommentto;
 extern t_bool sigdashes;
+extern t_bool signature_repost;
 extern t_bool space_goto_next_unread;
 extern t_bool start_any_unread;
 extern t_bool start_editor_offset;
@@ -1331,6 +1342,30 @@ extern struct utsname system_info;
 #define txt_help_p_S txt_help_p_BIGS
 #define txt_help_t_K txt_help_t_BIGK
 #endif
+
+#define HIST_SIZE		15
+#define HIST_OTHER		 0
+#define HIST_ART_SEARCH		 1
+#define HIST_AUTHOR_SEARCH	 2
+#define HIST_GOTO_GROUP		 3
+#define HIST_GROUP_SEARCH	 4
+#define HIST_MAIL_ADDRESS	 5
+#define HIST_MESSAGE_ID		 6
+#define HIST_MOVE_GROUP		 7
+#define HIST_PIPE_COMMAND	 8
+#define HIST_POST_NEWSGROUPS	 9
+#define HIST_POST_SUBJECT	10
+#define HIST_REGEX_PATTERN	11
+#define HIST_REPOST_GROUP	12
+#define HIST_SAVE_FILE	 	13
+#define HIST_SELECT_PATTERN	14
+#define HIST_SHELL_COMMAND	15
+#define HIST_SUBJECT_SEARCH	16
+#define HIST_MAXNUM		17	/* must always be the same as the highest HIST_ value! */
+
+extern int hist_last[HIST_MAXNUM+1];
+extern int hist_pos[HIST_MAXNUM+1];
+extern char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 
 extern char mail_address[LEN];
 extern constext txt_help_mail_address[];

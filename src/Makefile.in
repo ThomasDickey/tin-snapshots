@@ -42,9 +42,10 @@ OBJDIR	= .
 SRCDIR	= $(srcdir)
 
 # standard commands
+CD	= cd
 CFLOW	= cflow
-CP	= cp
 CHMOD	= chmod
+CP	= cp
 CSCOPE	= cscope
 ECHO	= echo
 LINT	= lint
@@ -211,14 +212,14 @@ all: $(BINDIR)/$(EXE)
 
 # explicit rules to allow running lint, and to accommodate older 'make' programs
 $(OBJDIR)/parsdate.o: $(SRCDIR)/parsdate.y
-	@ echo expect 6 shift/reduce conflicts...
+	@$(ECHO) "expect 6 shift/reduce conflicts..."
 	$(YACC) $(SRCDIR)/parsdate.y
 	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 @SHOW_CC@
 	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(OBJDIR)/parsdate.c
 
 $(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
-	@ echo expect 6 shift/reduce conflicts...
+	@$(ECHO) "expect 6 shift/reduce conflicts..."
 	$(YACC) $(SRCDIR)/parsdate.y
 	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 
@@ -256,27 +257,27 @@ $(INSTALL_PREFIX)$(INS_DAEMON_DIR) :
 	$(srcdir)/../mkdirs.sh $@
 
 install_manpage: $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)
-	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
+	@$(ECHO) "Installing $(EXE) manual page to $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
 	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
 
 install: $(INSTALL_PREFIX)$(INS_BINARY_DIR)
 	@$(MAKE) all
-	@$(ECHO) "Installing $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
+	@$(ECHO) "Installing $(EXE) v$(VER) to $(INSTALL_PREFIX)$(INS_BINARY_DIR)..."
 	@$(INSTALL) -s $(BINDIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE)
-	@cd $(INSTALL_PREFIX)$(INS_BINARY_DIR) && $(RM) r$(EXE)
-	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
+	@$(CD) $(INSTALL_PREFIX)$(INS_BINARY_DIR) && $(RM) -f r$(EXE)
+	@$(LN) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
 install_setuid:
 	@$(MAKE) all
-	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
+	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INSTALL_PREFIX)$(INS_BINARY_DIR)..."
 	@$(INSTALL) -s -o news -g news -m 6755 $(BINDIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE)
-	@cd $(INSTALL_PREFIX)$(INS_BINARY_DIR) && @-$(RM) r$(EXE)
-	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
+	@$(CD) $(INSTALL_PREFIX)$(INS_BINARY_DIR) && $(RM) -f r$(EXE)
+	@$(LN) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
 install_daemon: $(INSTALL_PREFIX)$(INS_DAEMON_DIR)
-	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INS_DAEMON_DIR)..."
+	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INSTALL_PREFIX)$(INS_DAEMON_DIR)..."
 	@$(INSTALL) -s -o news -m 0750 $(EXED) $(INSTALL_PREFIX)$(INS_DAEMON_DIR)/$(EXED)
 
 tags:

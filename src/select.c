@@ -562,7 +562,7 @@ select_done:
 				if (num_active == 0) {
 					break;
 				}
-				if (prompt_string (txt_subscribe_pattern, buf) && buf[0]) {
+				if (prompt_string (txt_subscribe_pattern, buf, HIST_OTHER) && buf[0]) {
 					wait_message (txt_subscribing);
 					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
 /* TODO use match_group_list() here ? */
@@ -627,7 +627,7 @@ select_done:
 				if (num_active == 0) {
 					break;
 				}
-				if (prompt_string (txt_unsubscribe_pattern, buf) && buf[0]) {
+				if (prompt_string (txt_unsubscribe_pattern, buf, HIST_OTHER) && buf[0]) {
 					wait_message (txt_unsubscribing);
 					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
 						if (GROUP_MATCH (active[my_group[i]].name, buf, TRUE)) {
@@ -670,7 +670,7 @@ select_done:
 			case iKeySelectPost:	/* post a basenote */
 				if (can_post) {
 					if (group_top == 0) {
-						if (!prompt_string (txt_post_newsgroup, buf))
+						if (!prompt_string (txt_post_newsgroup, buf, HIST_POST_NEWSGROUPS))
 							break;
 						if (buf[0] == '\0')
 							break;
@@ -1002,7 +1002,7 @@ choose_new_group (void)
 
 	sprintf (msg, txt_newsgroup, default_goto_group);
 
-	if (!prompt_string (msg, buf)) {
+	if (!prompt_string (msg, buf, HIST_GOTO_GROUP)) {
 		return -1;
 	}
 
@@ -1093,7 +1093,7 @@ reposition_group (
 	sprintf (buf, txt_newsgroup_position, group->name,
 		(default_move_group ? default_move_group : default_num+1));
 
-	if (!prompt_string (buf, pos)) {
+	if (!prompt_string (buf, pos, HIST_MOVE_GROUP)) {
 		return default_num;
 	}
 
@@ -1424,7 +1424,7 @@ iSetRange (
 */
 	sprintf (msg, txt_enter_range, pcPtr);
 
-	if (!prompt_string (msg, acRng)) {
+	if (!prompt_string (msg, acRng, HIST_OTHER)) {
 		return iRetCode;
 	}
 

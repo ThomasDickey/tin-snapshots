@@ -139,6 +139,7 @@
 #define iKeyConfigLastPage 'G'
 #define iKeyConfigNoSave 'Q'
 #define iKeyConfigFirstPage 'g'
+#define iKeyConfigRedrawScr ctrl('L')
 
 /* feed.c */
 
@@ -296,6 +297,8 @@
 #ifdef HAVE_ISPELL
 #	define iKeyPostIspell 'i'
 #endif
+#define iKeyPostContinue 'c'
+#define iKeyPostAbort 'a'
 #define iKeyPostPost 'p'
 #define iKeyPostSend 's'
 #define iKeyPostSupersede 's'
