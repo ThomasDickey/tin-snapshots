@@ -635,8 +635,8 @@ create_sub_dir (i)
  */
 
 void 
-add_to_save_list (index, the_article, is_mailbox, archive_save, path)
-	int index;
+add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
+	int the_index;
 	struct t_article *the_article;
 	int is_mailbox;
 	int archive_save;
@@ -655,7 +655,7 @@ add_to_save_list (index, the_article, is_mailbox, archive_save, path)
 		expand_save ();
 	}
 
-	save[num_save].index   = index;
+	save[num_save].index   = the_index;
 	save[num_save].saved   = FALSE;
 	save[num_save].is_mailbox = is_mailbox;
 	save[num_save].dir     = (char *) 0;

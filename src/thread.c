@@ -564,7 +564,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 {
 	char tmp[3];
 	struct t_msgid *ptr;
-	int i=0;
+	int ii=0;
 
 	if (group->attribute->thread_arts < THREAD_REFS)
 		break;
@@ -575,13 +575,13 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 	 * Make sure we don't run haywire if the ptrs are broken
 	 */
 	for (ptr = arts[thread_respnum].refptr; ptr->parent != NULL; ptr = ptr->parent) {
-		if (++i > 100) {
+		if (++ii > 100) {
 			fprintf(stderr, "\nCan't find thread root - Infinite loop!\n");
 			break;
 		}
 	}
 
-	if (i <= 100) {
+	if (ii <= 100) {
 		fprintf(stderr, "\n");
 		dump_thread(stderr, ptr, 1);
 	}
@@ -733,7 +733,7 @@ show_thread_page ()
 #ifndef INDEX_DAEMON
 
 	int i, j;
-	static int index = 0;
+	static int the_index = 0;
 
 	set_signals_thread ();
 	
@@ -773,9 +773,9 @@ show_thread_page ()
 		last_thread_on_screen = 0;
 	}
 
-	index = choose_response (thread_basenote, first_thread_on_screen);
+	the_index = choose_response (thread_basenote, first_thread_on_screen);
 
-	assert(first_thread_on_screen != 0 || index == thread_respnum);
+	assert(first_thread_on_screen != 0 || the_index == thread_respnum);
 
 	if (show_subject)
 		sprintf (msg, "List Thread (%d of %d)", index_point+1, top_base);
@@ -787,9 +787,9 @@ show_thread_page ()
 	MoveCursor (INDEX_TOP, 0);
 
 	for (j=0, i = first_thread_on_screen; j < NOTESLINES && i < last_thread_on_screen; i++, j++) {
-		bld_tline (i, &arts[index]);
+		bld_tline (i, &arts[the_index]);
 		draw_tline (i, TRUE);
-		if ((index = next_response (index)) == -1) {
+		if ((the_index = next_response (the_index)) == -1) {
 			break;
 		}	
 	}
@@ -811,15 +811,15 @@ void
 update_thread_page ()
 {
 #ifndef INDEX_DAEMON
-	register int i, j, index;
+	register int i, j, the_index;
 
-	index = choose_response (thread_basenote, first_thread_on_screen);
-	assert(first_thread_on_screen != 0 || index == thread_respnum);
+	the_index = choose_response (thread_basenote, first_thread_on_screen);
+	assert(first_thread_on_screen != 0 || the_index == thread_respnum);
 
 	for (j=0, i = first_thread_on_screen; j < NOTESLINES && i < last_thread_on_screen; ++i, ++j) {
-		bld_tline (i, &arts[index]);
+		bld_tline (i, &arts[the_index]);
 		draw_tline (i, FALSE);
-		if ((index = next_response (index)) == -1) {
+		if ((the_index = next_response (the_index)) == -1) {
 			break;
 		}	
 	}

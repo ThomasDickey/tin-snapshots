@@ -29,8 +29,8 @@ char default_art_search[LEN];
  */
  
 int 
-search_author (index, current_art, forward)
-	int index;
+search_author (the_index, current_art, forward)
+	int the_index;
 	int current_art;
 	int forward;
 {
@@ -65,7 +65,7 @@ search_author (index, current_art, forward)
 
 	wait_message (txt_searching);
 
-	make_group_path (active[index].name, group_path);
+	make_group_path (active[the_index].name, group_path);
 	
 	str_lwr (default_author_search, buf);
 
@@ -85,7 +85,7 @@ search_author (index, current_art, forward)
 					num_of_responses (top_base - 1);
 		}
 
-		if (active[index].attribute->show_only_unread && 
+		if (active[the_index].attribute->show_only_unread && 
 		    arts[i].status != ART_UNREAD) {
 			continue;
 		}
