@@ -20,20 +20,27 @@ o  if save marked_hot_article fails with cannot create file the
 
 o  Colours are not reset when tin is suspended with ^Z (signal.c)
 
+o  full_page_scroll=OFF seems not to work
+
 New features
 ------------
+o  fix nntplib.c line 387++ (no prototyping #if !defined(linux))
+
 o  add
-       --with[out]-mime-strict-charset   (default on)
-       --with[out]-mime-break-long-lines (default off)
-       --with[out]-mime-base64           (default off)
-       --with[out]-log-user              (default off)
-       --with[out]-piping                (default on)
+       --enable-mime-base64           (default off)
+       --enable-log-user              (default off)
+       --disabale-piping                (default on)
+       --enable-iso-to-ascii
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 
 o  move architecture depending files in subdirectory, clean up architecture
    independend files, rename several defines, remove useless doubled defines
    like NO_PIPING and DONT_HAVE_PIPING
+
+o  splitt tin.h for better dependencies in make
+
+o  join Makefile and makefile
 
 o  add 'U'untag all command to thread level.
 
@@ -43,8 +50,6 @@ o  rewrite NGLIMIT handling (post.c)
 
 o  uniq newsgroups before posting
    (Newsgroups: alt.test,alt.test -> Newsgroups: alt.test)
-
-o  full_page_scroll=OFF seems not to work
 
 o  make look in group.c/thread.c for show-lines patch (group.c/thread.c)
    configurable via switch in tinrc

@@ -9,7 +9,7 @@ This following Makefile & ./include/tin.h defines are documented in detail:
   DEBUG                    DEFAULT_ISO2ASC          DONT_HAVE_GETCWD
   DONT_HAVE_MKDIR          HAVE_TIN_NNTP_EXTS       DONT_HAVE_STRTOL
   DONT_LOG_USER            DONT_REREAD_ACTIVE_FILE  HAVE_FASCIST_NEWSADMIN
-  HAVE_ISPELL              HAVE_LONG_FILENAMES      HAVE_MAIL_HANDLING
+  HAVE_ISPELL              HAVE_LONG_FILENAMES      HAVE_MH_MAIL_HANDLING
   HAVE_MMDF_MAILER         HAVE_POLL                HAVE_POSIX_JC
   HAVE_SELECT              HAVE_SETREUID            HAVE_STRFTIME
   HAVE_TIN_NNTP_EXTS       INDEX_DAEMON             INEWS_MAIL_DOMAIN
@@ -305,7 +305,7 @@ HAVE_LONG_FILENAMES
 Define if your machines file-system supports filenames longer than 14
 chars (default for BSD type systems).
 
-HAVE_MAIL_HANDLING
+HAVE_MH_MAIL_HANDLING
 Define if you want to use the MH style mail handling & reading code in mail.c
 It should be noted that mail handling is not well tested and not yet fully
 implemented. You can expect errors if you use this define so let me know the

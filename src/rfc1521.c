@@ -1,3 +1,18 @@
+/*
+ *  Project   : tin - a Usenet reader
+ *  Module    : rfc1521.c
+ *  Author    : Chris Blum <chris@phil.uni-sb.de>
+ *  Created   : September '95
+ *  Updated   : 27-05-96
+ *  Notes     : MIME text/plain support
+ *  Copyright : (c) Copyright 1995-96 by Chris Blum
+ *              You may  freely  copy or  redistribute  this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change this copy-
+ *              right notice, and it must be included in any copy made.
+ */
+
+
 #include "tin.h"
 
 #include <string.h>
@@ -95,7 +110,7 @@ rfc1521_decode(file)
 	/* see if charset matches (we do not attempt to convert charsets at
 	   this point of time - maybe in the future) */
 	charset=strcasestr(content_type,"charset=");
-	if (!charset) charset="US_ASCII";
+	if (!charset) charset="US-ASCII";
 	else charset+=8;
 	get_mm_charset();
 	/* see if content transfer encoding requires decoding anyway */
@@ -121,7 +136,7 @@ rfc1521_decode(file)
 
 
 /* A MIME replacement for fputs.  e can be 'b' for base64, 'q' for
-   quoted-printable, or 8 (default) for 8bit.  Long lines are broken in
+   quoted-printable, or 8 (default) for 8bit.  Long lines get broken in
    encoding modes. If line is the null pointer, flush internal buffers. */
 void
 rfc1521_encode(line, f, e)

@@ -383,6 +383,9 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "show_xcommentto=", &show_xcommentto)) {
 				 break;
 			}
+			if (match_boolean (buf, "space_goto_next_unread=", &space_goto_next_unread)) {
+				break;
+			}
 			break;
 		case 't':
 			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_REFS)) {
@@ -626,6 +629,9 @@ write_config_file (file)
 	fprintf (fp, "tab_after_X_selection=%s\n\n", print_boolean (tab_after_X_selection));
 	fprintf (fp, "# if ON the TAB command will goto next unread article at article viewer level\n");
 	fprintf (fp, "tab_goto_next_unread=%s\n\n", print_boolean (tab_goto_next_unread));
+	fprintf (fp, "# if ON the SPACE command will goto next unread article at article viewer\n");
+	fprintf (fp, "# level when the end of the article is reached (rn-style pager)\n");
+	fprintf (fp, "space_goto_next_unread=%s\n\n", print_boolean (space_goto_next_unread));
 	fprintf (fp, "# if ON a screen redraw will always be done after certain external commands\n");
 	fprintf (fp, "force_screen_redraw=%s\n\n", print_boolean (force_screen_redraw));
 	fprintf (fp, "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n");

@@ -29,6 +29,8 @@
 #undef	HAVE_REF_THREADING
 #endif
 #undef	NO_ETIQUETTE
+#undef	MIME_BREAK_LONG_LINES
+#undef	MIME_STRICT_CHARSET
 #undef	FORGERY
 
 /*

@@ -254,15 +254,16 @@ end_of_article:
 			case iKeyPagePageDown2:
 			case iKeyPagePageDown3:		/* vi style */
 page_down:
-				if (note_page == ART_UNAVAILABLE) {
-					n = next_response (respnum);
-					if (n == -1) {
-						return (which_thread (respnum));
+				if (! space_goto_next_unread) {
+					if (note_page != ART_UNAVAILABLE) {
+						if (note_end) {
+							art_close();
+						} else {
+							doing_pgdn = TRUE;
+							show_note_page (group->name, respnum);
+							break;
+						}
 					}
-					respnum = n;
-					goto restart;
-				} else if (note_end) {
-					art_close ();
 					n = next_response (respnum);
 					if (n == -1) {
 						return (which_thread (respnum));
@@ -270,6 +271,9 @@ page_down:
 					respnum = n;
 					goto restart;
 				} else {
+					if ((note_page == ART_UNAVAILABLE) || note_end)
+						goto page_goto_next_unread;
+
 					doing_pgdn = TRUE;
 					show_note_page (group->name, respnum);
 				}
@@ -287,37 +291,18 @@ page_down:
 			case iKeyPageNextUnread: 	/* goto next unread article */
 page_goto_next_unread:
 				skip_include = '\0';
-				if (! tab_goto_next_unread) {
-					if (note_page == ART_UNAVAILABLE) {
-						n = next_unread (next_response (respnum));
-						if (n == -1) {
-							return (which_thread (respnum));
-						}
-						respnum = n;
-						goto restart;
-					} else if (note_end) {
-						art_close ();
-						n = next_unread (next_response (respnum));
-						if (n == -1) {
-							return (which_thread (respnum));
-						}
-						respnum = n;
-						goto restart;
-					} else {
+				if (note_page != ART_UNAVAILABLE) {
+					if (!(tab_goto_next_unread || note_end)) {
 						show_note_page (group->name, respnum);
-					}	
-				} else {
-					if (note_page != ART_UNAVAILABLE) {
-						art_close();
+						break;
 					}
-					n = next_unread (next_response (respnum));
-					if (n == -1) {
-						return (which_thread (respnum));
-					}
-					respnum = n;
-					goto restart;
+					art_close();
 				}
-				break;
+				n = next_unread (next_response (respnum));
+				if (n == -1) 
+					return (which_thread (respnum));
+				respnum = n;
+				goto restart;
 
 #ifdef HAVE_PGP
 		        case iKeyPagePGPCheckArticle:

@@ -1,3 +1,25 @@
+--950824BETA  PLMC.960528 --
+
+053) Chris Blum <chris@phil.uni-sb.de>
+     ADD. headers to rfc152*.c files
+     BUG. typo in rfc1521.c "US_ASCII" instead of "US-ASCII"
+     FIX. rfc1522.c, rfc1521.c
+
+052) Thomas E. Dickey <dickey@clark.net>
+     ADD. better alogorithm for creating MANIFEST
+     FIX. Makefile, makefile.in
+
+--950824BETA  PLMC.960527 --
+
+051) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. space_goto_next_unread; code cleanup
+     FIX. several supplied patches
+
+050) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. --enable-break-long-lines --disable-mime-strict-charset
+          --enable-forgery; code cleanup
+     FIX. several supplied patches
+
 --950824BETA  PLMC.960526 --
 
 049) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -21,7 +43,7 @@
      BUG. mail_to_someone uses note_h_followup instead of note_h_newsgroups
      FIX. post.c
 
-045) T.E. Dickey <dickey@clark.net>
+045) Thomas E. Dickey <dickey@clark.net>
      ADD. autoconf
      FIX. several supplied patches
 

@@ -1,22 +1,43 @@
-#undef MIME_BREAK_LONG_LINES  /* define this to make TIN strictly observe RFC1522
-                                 and break lots of other software :-) */
-#define MIME_STRICT_CHARSET   /* define this to force MM_CHARSET obeyance when
-                                 decoding.  If you don't, everything is thought
-                                 to match your machine's charset */
-#undef MIME_BASE64_ALLOWED    /* allow base64 encoding in headers if the result
-                                 is shorter than quoted printable encoding. THIS
-                                 IS NOT YET IMPLEMENTED, so leave this off */
+/*
+ *  Project   : tin - a Usenet reader
+ *  Module    : rfc1522.c
+ *  Author    : Chris Blum <chris@phil.uni-sb.de>
+ *  Created   : September '95
+ *  Updated   : 27-05-96
+ *  Notes     : MIME header encoding/decoding stuff
+ *  Copyright : (c) Copyright 1995-96 by Chris Blum
+ *              You may  freely  copy or  redistribute  this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change this copy-
+ *              right notice, and it must be included in any copy made.
+ */
+
+#undef MIME_BASE64_ALLOWED	/*
+				 * allow base64 encoding in headers if the
+				 * result is shorter than quoted printable
+				 * encoding. THIS IS NOT YET IMPLEMENTED,
+				 * so leave this off
+				 */
 
 #ifndef RFCDEBUG
 #include "tin.h"
+#else
 #include "extern.h"
-#endif
-
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
+#undef MIME_BREAK_LONG_LINES	/*
+				 * define this to make TIN strictly observe
+				 * RFC1522 and break lots of other software
+				 */
+#define MIME_STRICT_CHARSET	/*
+				 * define this to force MM_CHARSET obeyance
+				 * when decoding.  If you don't, everything
+				 * is thought to match your machine's charset
+				 */
+#endif /* RFCDEBUG */
 
 /* NOTE: these routines expect that MM_CHARSET is set to the charset
    your system is using.  If it is not defined, US-ASCII is used. */
@@ -314,7 +335,7 @@ rfc1522_do_encode(what, where)
 		if ((encoding=contains_nonprintables(what))) {
 			if (!quoting) {
 				sprintf(buf2,"=?%s?%c?",mm_charset,encoding);
-				ewsize=mystrcat(&t,buf2);
+				ewsize=mystrcat((char **)&t,buf2);
 				quoting=1;
 				any_quoting_done=1;
 			}
@@ -395,7 +416,7 @@ rfc1522_encode(s)
 	char *s;
 {
 	static char buf[2048];
-	char *b;
+	unsigned char *b;
 	int x;
 
 	get_mm_charset();
@@ -405,7 +426,7 @@ rfc1522_encode(s)
 	return buf;
 }
 
-
+#if 0 /* no longer needed - it was a bfi approach anyway */
 #ifndef RFCDEBUG
 void
 rfc1522_decode_all_headers()
@@ -421,8 +442,8 @@ rfc1522_decode_all_headers()
 		hdr(name);
 	}
 }
-#endif
-
+#endif /* !RFCDEBUG */
+#endif /* 0 */
 
 void
 rfc15211522_encode(filename)
@@ -523,4 +544,4 @@ main()
   printf("%s\n",c=rfc1522_encode(TESTHEADER));
   printf("%s\n",rfc1522_decode(c));
 }
-#endif
+#endif /* RFCDEBUG */
