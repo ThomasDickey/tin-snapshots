@@ -1,3 +1,24 @@
+--unoff BETA release 961201 --
+
+227) Florian Lohoff <flo@mini.gt.owl.de>
+     BUG. articles without Lines header are not showing up
+     FIX. art.c
+
+226) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. quoted 8-bit from-adresses aren't MIME-encoded corect 
+     FIX. art.c, rfc1522.c
+
+225) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. The 'a' reference tree hack debug key now produces readable
+          output similar to the thread menu.
+     ADD. A few commentry changes.
+     FIX. several supplied patches
+
+224) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed (unread)article counter to act as a reply counter
+     ADD. little code cleanup
+     FIX. several supplied patches
+
 --unoff BETA release 961126 --
 
 223) Rainer Scholz <jrs@startrek.franken.de>

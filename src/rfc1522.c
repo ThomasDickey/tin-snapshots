@@ -49,7 +49,7 @@
 #endif /* DEBUG_MIME */
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
-#define isbetween(c) (isspace((unsigned char)c) || (c) == '(' || (c) == ')')
+#define isbetween(c) (isspace((unsigned char)c) || (c) == '(' || (c) == ')' || (c) == '"')
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.

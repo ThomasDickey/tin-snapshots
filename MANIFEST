@@ -1,9 +1,9 @@
-MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
 ----------------------------------------------------
-  49192 ./CHANGES
-  12494 ./TODO
+  49889 ./CHANGES
+  12753 ./TODO
    5341 ./Makefile
-  17527 ./INSTALL
+  17459 ./INSTALL
    2256 ./MANIFEST
    1659 ./README
     896 ./tinpp
@@ -13,14 +13,14 @@ MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
    4771 ./install.sh
   11609 ./makefile.in
    1014 ./conf-tin
-   1330 ./doc/DEBUG_REFS
+   1456 ./doc/DEBUG_REFS
   12018 ./doc/auth.txt
    1727 ./doc/hashing.doc
   71521 ./doc/tin.1
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
    8482 ./include/config.h
-  40967 ./include/extern.h
+  40973 ./include/extern.h
   14068 ./include/menukeys.h
     718 ./include/msmail.h
    4764 ./include/nntplib.h
@@ -31,11 +31,11 @@ MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  19349 ./src/active.c
+  19491 ./src/active.c
    8119 ./src/actived.c
   13003 ./src/amiga.c
    4429 ./src/amigatcp.c
-  38097 ./src/art.c
+  37834 ./src/art.c
   23852 ./src/attrib.c
    8460 ./src/charset.c
    1548 ./src/color.c
@@ -46,11 +46,11 @@ MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
   19301 ./src/feed.c
   39895 ./src/filter.c
   10935 ./src/getline.c
-  41319 ./src/group.c
+  41325 ./src/group.c
    3202 ./src/hashstr.c
    9486 ./src/help.c
   12147 ./src/inews.c
-  29388 ./src/init.c
+  29394 ./src/init.c
   55384 ./src/lang.c
    1739 ./src/list.c
   11984 ./src/mail.c
@@ -71,9 +71,9 @@ MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
   75707 ./src/post.c
    9044 ./src/prompt.c
     160 ./src/proto.sed
-  22400 ./src/refs.c
+  22467 ./src/refs.c
    8731 ./src/rfc1521.c
-  17478 ./src/rfc1522.c
+  17492 ./src/rfc1522.c
   33655 ./src/save.c
    4573 ./src/screen.c
   10148 ./src/search.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961126 (Mon Nov 25 23:26:51 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1577690 total
+1578682 total

@@ -547,9 +547,8 @@ clear_art_ptrs()
 }
 
 /*
- * Function to messily dump an ASCII tree map of a thread.
- * msgid is a ptr to the root article, level is the current depth
- * of the tree.
+ * Function to dump an ASCII tree map of a thread rooted at msgid.
+ * Output goes to fp, level is the current depth of the tree.
  */
 void
 dump_thread(fp, msgid, level)
@@ -557,26 +556,34 @@ dump_thread(fp, msgid, level)
 	struct t_msgid *msgid;
 	int level;
 {
-	char buff[120];		/* This will probably break - test only */
+	char buff[120];		/* This is _probably_ enough */
+	char *ptr = buff;
+	int i, len;
 
 	/*
 	 * Dump the current article
 	 */
-	sprintf(buff, "%3d %*s %-.18s", msgid->article, 2*level, "  ",
-	        (msgid->article >= 0) ? ((arts[msgid->article].name) ?
-	        arts[msgid->article].name : arts[msgid->article].from) :
-	        "[- Unavailable -]");
+	sprintf(ptr, "%3d %*s", msgid->article, 2*level, "  ");
 
-	fprintf(fp, "%-*s  %-.45s\n", 30, buff, (msgid->article >= 0) ?
-	        arts[msgid->article].subject : "");
+	len = strlen(ptr);
+	i = cCOLS - len - 20;
 
-	if (msgid->child != NULL) {
+	if (msgid->article >= 0) {
+		sprintf(ptr+len, "%-*.*s   %-17.17s", i, i,
+				arts[msgid->article].subject,
+				(arts[msgid->article].name) ?
+					arts[msgid->article].name :
+					arts[msgid->article].from);
+	} else
+		sprintf(ptr+len, "%-*.*s", i, i, "[- Unavailable -]");
+
+	fprintf(fp, "%s\n", ptr);
+
+	if (msgid->child != NULL)
 		dump_thread(fp, msgid->child, level + 1);
-	}
 
-	if (msgid->sibling != NULL) {
+	if (msgid->sibling != NULL)
 		dump_thread(fp, msgid->sibling, level);
-	}
 
 	return;
 }
@@ -687,6 +694,7 @@ find_next(ptr)
 		if (ptr->child == NULL && ptr->sibling == NULL) {
 
 			while(ptr != NULL && ptr->sibling == NULL) {
+
 				if (ptr ==  ptr->parent) {
 				/* Jehova */
 					return (NULL);

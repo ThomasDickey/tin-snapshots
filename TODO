@@ -1,5 +1,8 @@
 Bugs
 ----
+o  dupilcated parent msg-ids(*) could cause infinite loops
+   (* onyl happens if the news spool is corrupt)
+
 o  ispell checks all headers
 
 o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
@@ -11,11 +14,6 @@ o  with --enable-forgery reposting of an thread reposts only the first
 
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
-
-o  if reading news from a local spool with xover support tin assumes that he
-   could update the overview files - that's not always true (reading via
-   NFS) - if this fails, tin creates own overview-files in ~/.tin/.news/
-   DULL!!!
 
 o  tins kill-file editor does not quote brackets, stars and question marks
    in the subject - this leads to unexpected results cause they are
@@ -59,6 +57,7 @@ o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    expired...), it is untouched, and remains marked as unread.
 
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
+   Other tty characteristics (eg echo) are not reset after a fatal signal
 
 o  According to 026) in CHANGES, some of the config files can be
    trashed on a bad write (except .newsrc/tinrc/attributes)
@@ -73,6 +72,15 @@ o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
 
 o  looks like Keywords & Summary in attributes/x_headers are ignored :(
 
+o  kill-file may get messed up if using multiple news servers with feeds
+   that are not identical (moving some groups entries under new groups and
+   losing all references to the moved groups)
+
+o  sometimes (when using tins kill-menu) kill-file entries are
+   duplicated/get lost or messed up
+
+o  killing articles with Lines: 0 does not work
+
 New features
 ------------
 o  add command: mark all articles older than <date> as read
@@ -85,30 +93,6 @@ o  add rfc1468/1922 support
 o  add a weed-out list like in elm so the user could specify which headers
    he'd like to see and which not (attrib.c)
 
-o  compile-time option: generate own MSGIDs on host with a proper FQDN
-   (to add a _-_ to the local part of the MSGID on a subject-change; keep
-    MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
-    own postings)
-
-o  add
-       --with-overview-names
-         (tin assumes that overview-files are named ".overview" 
-          that's not always true)
-
-       --disable-piping               (default off)
-       check for str[n]casecmp() and if necesarry define it to
-       my_str[n]icmp()
-
-   to autoconf; determine which network libraries are needed; eradicate
-   platform/compiler ifdefs
-
-o  move architecture dependent files to subdirectories, clean up architecture
-   independent files, rename several defines, remove useless doubled defines
-
-o  split tin.h/proto.h for better dependencies in make
-
-o  join Makefile and makefile (not entirely possible)
-
 o  unique newsgroups after editing article
 
 o  add feature save selected/tagged files sequentially to the same file
@@ -120,9 +104,6 @@ o  use several functions from libcurses/<curses.h> if it's present in
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
-
-o  fix built-in inews to truncate signature > 4 lines
-   (compile-time option?)
 
 o  add feature Cc:
 
@@ -157,10 +138,19 @@ o  Add '/' (search subject) to the thread menu
 o  add 'U'untag all command to thread level.
 
 o  Add 'l' (goto thread menu) to the article pager
+   Add 'u' (up - goto parent) to the article pager
+
+o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
+   store the differences from this.
+   A key code to reset to the system defaults
+   Maybe a file which could be used to force settings (eg inews & mailer)
 
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the
    newsgroups-line (N/y)
+
+o  fix built-in inews to truncate signature > 4 lines
+   (compile-time option?)
 
 o  bring up a warning on a long newsgroup/followup line (>=5 groups) and
    force the user to confirm every single group he wants to post in.
@@ -174,13 +164,58 @@ o  posting to a binaries group should warn if no followup is set to another
    group/poster (you have not set a target for a possible discussion on your
    post, would you like to go on anyway? N/y) 
 
-o  when posting to a group which name has a uppercase-letter: bring up a
+o  when posting to a group containing uppercase-letters: bring up a
    warning: "Newsgroup-names should be all lowercase, correct it? (Y/n)"
+
+   (g)oto group (and (S)ubscribe pattern) is case sensitive
+   also newsgroup names in the command-line are case sensitive
+   better would be: check if they exist and if not ask if you would like to
+   convert newsgroup name to lowercase
+	[son_of_1036]
+	NOTE: Possibly newsgroup names  should  have  been
+	case-insensitive, but all existing software treats
+	them as case-sensitive.   (RFC  977  [rrr]  claims
+	that they are case-insensitive in NNTP, but exist-
+	ing implementations are believed to ignore  this.)
+	The simplest solution is just to ban use of upper-
+	case letters, since no widespread  newsgroup  name
+	uses  them  anyway; this avoids any possibility of
+	confusion.
 
 o  when server responses with:
    "441 The newsgroup "foo.bar" has been renamed to "bar.foo"."
    ask the user if he want's to post to "bar.foo" instead of "foo.bar"
    (Y/n)
+
+Internal Changes
+----------------
+o  compile-time option: generate own MSGIDs on host with a proper FQDN
+   (to add a _-_ to the local part of the MSGID on a subject-change; keep
+    MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
+    own postings)
+
+o  add
+       --with-overview-names
+         (tin assumes that overview-files are named ".overview" 
+          that's not always true)
+
+       --disable-piping               (default off)
+       check for str[n]casecmp() and if necesarry define it to
+       my_str[n]icmp()
+
+   to autoconf; determine which network libraries are needed; eradicate
+   platform/compiler ifdefs
+
+o  move architecture dependent files to subdirectories, clean up architecture
+   independent files, rename several defines, remove useless doubled defines
+
+o  split tin.h/proto.h for better dependencies in make
+
+o  check all switch()s for missing defaults (this can be done by some compilers)
+
+o  join Makefile and makefile (not entirely possible)
+
+o  move all strings to lang.c
 
 Docs/online help
 ----------------
@@ -197,8 +232,6 @@ Not yet classified
 o  on some AIX mail (f.e. /usr/bin/mail) prints out an error (but the mail
    is sent)
    (add -DRS6000 in the Makefile to fix this)
-
-o  move all strings to lang.c
 
 o  looks like, that while being connected to a server, new newsgroups are
    not recognized and that tin writes a timestamp of the last time it read
@@ -217,19 +250,8 @@ o  what is with HAVE_GENERIC_AUTHINFO in open.c?
 o  what is with setup_soft_base - anyone remembering where it was used and
    the the code was not stripped after it was considered as no longer needed?
 
-o  check all switch()s for missing defaults (this can be done by some compilers)
-
 o  repost ('x') ignores ~/.tin/headers & ~/.tin/attributes - bug or
    feature?!
-
-o  kill-file may get messed up if using multiple news servers with feeds
-   that are not identical (moving some groups entries under new groups and
-   losing all references to the moved groups)
-
-o  sometimes (when using tins kill-menu) kill-file entries are
-   duplicated/get lost or messed up
-
-o  killing articles with Lines: 0 does not work
 
 o  forged cancelling via Supersedes:/Also-Control:/Control:-header is possible
    if it is supplied by hand (buildin_inews)
@@ -283,21 +305,6 @@ o  (Y)ank in after resync-time ends up in a double re-read of the active file
 
 o  with show_only_unread_groups=ON and (y)ank in all groups, (y)ank out all
    groups show_only_unread_groups-status get lost :(
-
-o  (g)oto group (and (S)ubscribe pattern) is case sensitive
-   also newsgroup names in the command-line are case sensitive
-   better would be: check if they exist and if not ask if you would like to
-   convert newsgroup name to lowercase
-	[son_of_1036]
-	NOTE: Possibly newsgroup names  should  have  been
-	case-insensitive, but all existing software treats
-	them as case-sensitive.   (RFC  977  [rrr]  claims
-	that they are case-insensitive in NNTP, but exist-
-	ing implementations are believed to ignore  this.)
-	The simplest solution is just to ban use of upper-
-	case letters, since no widespread  newsgroup  name
-	uses  them  anyway; this avoids any possibility of
-	confusion.
 
 o  fix reposition of cursor after reading active file... annoying! 
 

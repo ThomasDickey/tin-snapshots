@@ -59,7 +59,7 @@ char mail_active_file[PATH_LEN];
 #ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
 #endif
-int mail_mime_encoding;
+size_t mail_mime_encoding;
 int mail_8bit_header=FALSE;               /* allow 8bit chars. in header of mail message */
 char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char mail_news_user[LEN];		/* mail new news to this user address */
@@ -78,7 +78,7 @@ char newnewsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
-int post_mime_encoding;
+size_t post_mime_encoding;
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char progname[PATH_LEN];		/* program name */

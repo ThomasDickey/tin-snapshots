@@ -36,6 +36,8 @@ You should now have two files, Refs.info and whatever file you directed
 error output into.
 
 Submit these two files with information on what you think the problem is
-(if it isn't already obvious)
+(if it isn't already obvious), such as:
+a) The Subject line of the thread causing the problem
+b) Whether the problem occurs only in certain threading modes
 
-J. Faultless (08/10/96)
+J. Faultless (14/11/96)
