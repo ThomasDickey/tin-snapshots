@@ -1,3 +1,15 @@
+--unoff BETA release 960730 --
+
+130) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. tin did not thread more than 128 articles (introduced in 960725)
+     ADD. added 'Re :' to eat_re
+     FIX. art.c, misc.c, refs.c
+
+129) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     BUG. configure --disable-warings did not work; fixed a few typos
+     FIX. configure.in, art.c
+
 --unoff BETA release 960729 --
 
 128) Alexander Lehmann <alex@hal.rhein-main.de>

@@ -387,7 +387,7 @@ thread_by_subject()
 {
 	register int i;		/* gcc, at least, will ignore 'register' as */
 	register int j;		/* it can do a better job itself */
-	char *aptr;
+	int *aptr;
 
 	for (i = 0; i < top; i++) {
 
@@ -397,7 +397,7 @@ thread_by_subject()
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = arts[i].subject;
+		aptr = (int *)arts[i].subject;
 		aptr -=2;
 
 		j = *aptr;
@@ -1507,7 +1507,8 @@ input_pending ()
 	tvptr.tv_usec = 0;
 
 	FD_SET(fd, &fdread);
-#ifdef __hpux
+
+#if defined(__hpux) && !defined(__GNUC__)
 	if (select (1, (int *)&fdread, NULL, NULL, &tvptr)) {
 #else
 	if (select (1, &fdread, NULL, NULL, &tvptr)) {

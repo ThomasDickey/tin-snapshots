@@ -141,8 +141,7 @@ ConvertIso2Asc (iso, asc, t)
 	int first;   /* flag for first SPACE/TAB after other characters */
 	int i, a;    /* column counters in iso and asc */
 
-	if (iso == 0 ||
-	    asc == 0) {
+	if (iso == 0 || asc == 0) {
 		return;
 	}
 

@@ -61,9 +61,6 @@ o  The 'M' moderation flag (group selection level) is not showing up
 o  'D' deleted article flag (thread selection level) is not showing up.
    (is it still needed?!)
 
-o  marking latest article with 'K' does not jump to top of newsgroup if
-   there are still articles to read (group.c:740)
-
 o  screen.c:center_line() no range check for cCOLS. Excessively long
    messages cause a scroll and no redraw
 
@@ -309,3 +306,6 @@ o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
 
 o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
    ignores start_line_offset
+
+o  marking latest article with 'K' does not jump to top of newsgroup if
+   there are still articles to read (group.c:740)

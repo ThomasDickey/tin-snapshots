@@ -112,7 +112,7 @@ CF_ARG_ENABLE(warnings,
 	# -Wshadow
 	# -pedantic
 	#
-	if test -n "$with_warnings"
+	if test "$enableval" = "yes"
 	then
 		EXTRA_CFLAGS="-Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
 	fi
@@ -273,9 +273,10 @@ CF_ARG_DISABLE(etiquette,
 	[AC_DEFINE(NO_ETIQUETTE)])
 AC_MSG_RESULT($enableval)
 
-AC_MSG_CHECKING(whether to allow base64 coding in headers)
+AC_MSG_CHECKING(whether to allow base64 encoding in headers)
 CF_ARG_ENABLE(mime-base64,
-	[--enable-mime-base64      allow base64 encoding in headers if shorter],
+	[  --enable-mime-base64    allow base64 encoding in headers if shorter
+                         ],
 	[AC_DEFINE(MIME_BASE64_ALLOWED)])
 AC_MSG_RESULT($enableval)
 
@@ -302,7 +303,7 @@ AC_MSG_RESULT($MM_CHARSET)
 
 AC_MSG_CHECKING(for default ISO/ASCII table)
 CF_WITH_DFTENV(iso-to-ascii,
-	[  --iso-to-ascii          ISO -> ASCII conversion],
+	[  --with-iso-to-ascii     ISO -> ASCII conversion],
 	DEFAULT_ISO2ASC,-1)
 AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
