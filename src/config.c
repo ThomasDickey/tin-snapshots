@@ -639,7 +639,8 @@ write_config_file (file)
 	fprintf (fp, "# if ON use the builtin mini inews otherwise use an external inews program\n");
 	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
 	fprintf (fp, "# Format of quote line when mailing/posting/followingup an article\n");
-	fprintf (fp, "# %%A Address  %%D Date  %%F Addr+Name  %%G Groupname  %%M MessageId  %%N Name\n");
+	fprintf (fp, "# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n");
+	fprintf (fp, "# %%N Full Name  %%C First Name\n");
 	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
 	fprintf (fp, "mail_quote_format=%s\n", mail_quote_format);
 	fprintf (fp, "xpost_quote_format=%s\n\n", xpost_quote_format);
