@@ -12,6 +12,7 @@
  *              right notice, and it must be included in any copy made
  */
 
+#include        "patchlev.h"
 #include	"tin.h"
 
 static int COL1;
@@ -508,8 +509,7 @@ write_config_file (file)
 	if (! default_editor_format[0]) {
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
 	}
-	
-	fprintf (fp, "# tin 1.3 unoff configuration file\n#\n");
+        fprintf (fp, "# %s %s %s configuration file\n#\n", progname, VERSION, RELEASEDATE);
 	fprintf (fp, "# This file was automatically saved by tin\n#\n");
 	fprintf (fp, "# Do not edit while tin is running, since all your changes to this file\n");
 	fprintf (fp, "# would be overwritten when you leave tin.\n#\n");
@@ -619,8 +619,6 @@ write_config_file (file)
 	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
 	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
 	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
-	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n");
-	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
 #ifdef M_UNIX
@@ -633,6 +631,8 @@ write_config_file (file)
 	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (show_only_unread_groups));
 	fprintf (fp, "# if ON show only new/unread articles otherwise show all.\n");
 	fprintf (fp, "show_only_unread=%s\n\n", print_boolean (default_show_only_unread));
+	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n");
+	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
 	fprintf (fp, "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n");
 	fprintf (fp, "# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n");
 	fprintf (fp, "sort_article_type=%d\n\n", default_sort_art_type);

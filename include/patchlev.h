@@ -13,7 +13,7 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"960716"
+#define RELEASEDATE	"960717"
 
 /* This is NO official release, but a patched version.
  * Including patches from:
@@ -35,6 +35,8 @@
  *	Branden Robinson	<branden@purdue.edu>
  *	Roland Rosenfeld	<roland@spinnaker.rhein.de>
  * 	Stefan Scholl		<stesch@sks.inka.de>
+ *	Dieter Stueken		<stueken@uni-muenster.de>
+ *	Dean Takemori		<dean@uhheph.phys.hawaii.edu>
  *
  */
 

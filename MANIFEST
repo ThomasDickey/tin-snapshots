@@ -1,11 +1,11 @@
-MANIFEST for tin-1.3-unoff-BETA-960716 (Wed Jul 17 01:16:04 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960717 (Thu Jul 18 02:59:51 MET DST 1996)
 ----------------------------------------------------
-  27271 ./CHANGES
-  10550 ./TODO
-   5170 ./Makefile
+  27348 ./CHANGES
+  10555 ./TODO
+   5181 ./Makefile
   17237 ./INSTALL
    2112 ./MANIFEST
-   1784 ./README
+   1902 ./README
     896 ./tinpp
   19318 ./aclocal.m4
  120966 ./configure
@@ -23,7 +23,7 @@ MANIFEST for tin-1.3-unoff-BETA-960716 (Wed Jul 17 01:16:04 MET DST 1996)
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
-   1556 ./include/patchlev.h
+   1649 ./include/patchlev.h
   29135 ./include/proto.h
    1376 ./include/stpwatch.h
   41639 ./include/tin.h
@@ -37,7 +37,7 @@ MANIFEST for tin-1.3-unoff-BETA-960716 (Wed Jul 17 01:16:04 MET DST 1996)
   22649 ./src/attrib.c
    8270 ./src/charset.c
    1480 ./src/color.c
-  42911 ./src/config.c
+  42972 ./src/config.c
   19743 ./src/curses.c
   12294 ./src/debug.c
    2826 ./src/envarg.c
@@ -59,8 +59,8 @@ MANIFEST for tin-1.3-unoff-BETA-960716 (Wed Jul 17 01:16:04 MET DST 1996)
   33010 ./src/newsrc.c
   26134 ./src/nntplib.c
   31349 ./src/nntpw32.c
-   3815 ./src/nrctbl.c
-  27341 ./src/open.c
+   3814 ./src/nrctbl.c
+  27363 ./src/open.c
    6300 ./src/os_2.c
   35005 ./src/page.c
   24098 ./src/parsdate.y
@@ -86,4 +86,4 @@ MANIFEST for tin-1.3-unoff-BETA-960716 (Wed Jul 17 01:16:04 MET DST 1996)
    5522 ./src/vms.c
    6764 ./include/autoconf.hin
   11054 ./src/Makefile.in
-1430767 total
+1431153 total

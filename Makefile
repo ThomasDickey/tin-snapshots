@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960716
+PVER		= 960717
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -210,7 +210,8 @@ distclean:
 	@$(RM) -f config.*
 	@$(RM) -f $(INCDIR)/autoconf.h
 	@$(RM) -f $(SRCDIR)/Makefile
-	@$(RM) -f td-conf.out makefile
+	@$(RM) -f td-conf.out
+	@$(RM) -f makefile
 	@$(MAKE) configure
 	
 configure: configure.in aclocal.m4

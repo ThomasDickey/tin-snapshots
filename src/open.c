@@ -915,7 +915,7 @@ get_respcode ()
 
 	debug_nntp ("get_respcode", line);
 
-	/* error message vom server retten*/
+	/* save error message from server */
 	strcpy(error_response, line);
 
 	respcode = atoi (line);
@@ -1100,6 +1100,7 @@ authorization (server, authuser)
 {
 	static char already_failed = 0;
 	char line[PATH_LEN];
+	char line2[PATH_LEN];
 	char *authpass;
 	char *ptr;
 	FILE *fp;
@@ -1139,7 +1140,7 @@ authorization (server, authuser)
 	 * will return authpass != NULL if any match
 	 */
 	authpass = (char *) 0;
-	while (fgets (line, sizeof (line), fp) != (char *) 0) {
+	while (fgets (line, PATH_LEN, fp) != (char *) 0) {
 
 		/*
 		 * strip trailing newline character
@@ -1204,8 +1205,8 @@ authorization (server, authuser)
 		return;
 	}
 
-	sprintf (line, "authinfo user %s", authuser);
-	put_server (line);
+	sprintf (line2, "authinfo user %s", authuser);
+	put_server (line2);
 	ret = get_respcode ();
 	if (ret != NEED_AUTHDATA) {
 		nntp_message (ret);
@@ -1213,8 +1214,8 @@ authorization (server, authuser)
 		return;
 	}
 
-	sprintf (line, "authinfo pass %s", authpass);
-	put_server (line);
+	sprintf (line2, "authinfo pass %s", authpass);
+	put_server (line2);
 	ret = get_respcode ();
 	if (ret != OK_AUTH) {
 		nntp_message (ret);
