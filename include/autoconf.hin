@@ -240,6 +240,13 @@
 #undef HAVE_TYPE_UNIONWAIT
 
 /*
+ * Define symbols to prototype the function 'outchar()'
+ */
+#undef	USE_TERMINFO
+#undef	OUTC_RETURN
+#undef	OUTC_ARGS
+
+/*
  * Define a symbol for the prototype arguments of a signal handler
  */
 #undef	SIG_ARGS
@@ -307,6 +314,11 @@
  */
 #undef	DONT_HAVE_TM_GMTOFF
 
+/*
+ * The AIX compiler doesn't seem to have any predefined symbols.  This is ours.
+ */
+#undef RS6000
+
 #if 0 /* FIXME: test-not-impl */
 
 #if defined(COHERENT)
@@ -321,23 +333,8 @@
 #	define	HAVE_KEYPAD
 #endif
 
-#if defined(RS6000)
-#	define	READ_CHAR_HACK
-#endif
-
 #if defined(supermax)
 #	define	HAVE_BROKEN_TGETSTR
-#endif
-
-/*
- * Lets try and be a wise ass and make a nntp able binary
- * for machines where the netlibs are in the libc library
- */
-
-#if defined(BSD) || defined(linux) || defined(RS6000)
-#	if !defined(NNTP_ABLE)
-#		define	NNTP_ABLE
-#	endif
 #endif
 #endif /* FIXME */
 

@@ -183,7 +183,7 @@ extern int tolower P_((int));
 extern int toupper P_((int));
 #endif
 #ifdef DECL_TPUTS
-extern int tputs P_((char *, int, int (*)(int)));
+extern int tputs P_((char *, int, OutcPtr));
 #endif
 #ifdef DECL__FLSBUF
 extern int _flsbuf P_((int, FILE *));

@@ -1382,12 +1382,12 @@ yank_to_addr (orig, addr)
 		addr++;
 
 	while (*orig) {
-		while (*orig && (*orig == ' ' || *orig == '"' || *orig == ','))
+		while (*orig && (*orig == ' ' /* || *orig == '"' */ || *orig == ','))
 			orig++;
 		*addr++ = ' ';
-		while (*orig && (*orig != ' ' && *orig != ',' && *orig != '"'))
+		while (*orig && (*orig != ' ' && *orig != ',' /* && *orig != '"' */ ))
 			*addr++ = *orig++;
-		while (*orig && (*orig == ' ' || *orig == '"' || *orig == ','))
+		while (*orig && (*orig == ' ' /* || *orig == '"' */ || *orig == ','))
 			orig++;
 		if (*orig == '(') {
 			orig++;

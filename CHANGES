@@ -1,3 +1,16 @@
+--unoff BETA release 961203 --
+
+231) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. changed dafault_mailer_format to "%M -t < %F"
+     BUG. parsing of " in mailadress does not work
+     FIX. tin.h, misc.c, page.c
+
+230) Thomas E. Dickey <dickey@clark.net>
+     BUG. tputs is called with wrong parameters on some systems (f.e. HP-UX)
+     ADD. -DRS6000 on AIX to force the correct use of 'system()' return-code
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
 --unoff BETA release 961202 --
 
 229) Urs Janssen <urs@akk.uni-karlsruhe.de>

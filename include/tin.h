@@ -183,28 +183,6 @@ extern char *get_uaf_fullname();
 #	include <poll.h>
 #endif
 
-#ifdef HAVE_CURSES_H
-#	if defined(M_XENIX)
-#		ifdef	HZ
-#			undef	HZ /* looks like a bug in M_XENIX includefiles */
-#		endif
-#	endif
-/* it doesn't do any harm, and <curses.h> may have conflicting defs */
-#	undef TRUE
-#	undef FALSE
-#	include <curses.h>
-#endif
-
-#if 0	/* FIXME: this has prototypes, but opens up new problems! */
-#ifdef HAVE_TERM_H
-#	include <term.h>
-#endif
-#endif /* 0 */
-
-#ifdef HAVE_TERMCAP_H
-#	include <termcap.h>
-#endif
-
 /*
  * Directory handling code
  */
@@ -495,6 +473,7 @@ extern char *get_uaf_fullname();
 #	endif
 #	ifdef RS6000
 #		define	DEFAULT_PRINTER "/bin/lp"
+#		define	READ_CHAR_HACK
 #	endif
 #	ifdef SCO_UNIX
 #		define	HAVE_MMDF_MAILER
@@ -1523,7 +1502,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	ENV_VAR_MAILER		"MAILER"
 #	define	ENV_VAR_SHELL		"SHELL"
 #	define	EDITOR_FORMAT_ON		"%E +%N %F"
-#	define	MAILER_FORMAT		"%M \"%T\" < %F"
+#	define	MAILER_FORMAT		"%M -t < %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR		"/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
@@ -1618,6 +1597,25 @@ extern void joinpath (char *result, char *dir, char *file);
 	typedef /* FIXME: const */ char constext;
 #endif
 
+/*
+ * tputs() function-param
+ */
+#ifdef OUTC_RETURN
+#define OUTC_RETTYPE int
+#else
+#define OUTC_RETTYPE void
+#endif
+
+#ifndef OUTC_ARGS
+#define OUTC_ARGS int
+#endif
+
+#if __STDC__ || defined(__cplusplus)
+#define OUTC_FUNCTION(func) OUTC_RETTYPE func (OUTC_ARGS c)
+#else
+#define OUTC_FUNCTION(func) OUTC_RETTYPE func (c) int c;
+#endif
+
 #include	"extern.h"
 #include	"nntplib.h"
 #ifndef __CPROTO__
@@ -1638,6 +1636,8 @@ extern void joinpath (char *result, char *dir, char *file);
  * rfc1521/rfc1522 interface
  */
 typedef void (*BodyPtr) P_((char *, FILE *, int));
+
+typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
 
 #ifdef DBMALLOC
 #	undef strchr
