@@ -472,7 +472,7 @@ my_realloc1 (file, line, p, size)
 #ifdef DEBUG
 	vDbgPrintMalloc (FALSE, file, line, size);
 #endif
-	if (! p) {
+	if (!p) {
 		p = (char *) calloc (1, size);
 	} else {
 		p = (char *) realloc (p, size);

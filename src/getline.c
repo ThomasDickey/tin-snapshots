@@ -78,7 +78,7 @@ getline (prompt, number_only, str, max_chars, passwd)
 
 	set_xclick_off ();
 	is_passwd = passwd;
-	if (! gl_init_done) {
+	if (!gl_init_done) {
 		gl_init_done = 1;
 		hist_init ();
 	}
@@ -116,7 +116,7 @@ getline (prompt, number_only, str, max_chars, passwd)
 	}
 	while ((c = ReadCh ()) != EOF) {
 		c &= 0xff;
-		if ((gl_cnt < gl_max) && (isprint (c) || ( c>=0xa0 && c<=0xff ))) {
+		if ((gl_cnt < gl_max) && (isprint (c) || (c>=0xa0 && c<=0xff))) {
 			if (number_only) {
 				if (isdigit (c)) {
 					gl_addchar (c);

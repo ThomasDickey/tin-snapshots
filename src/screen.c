@@ -30,7 +30,7 @@ info_message (str)
 #ifdef HAVE_COLOR
 	fcol(col_normal);
 #endif
-	if (! cmd_line) {
+	if (!cmd_line) {
 		MoveCursor (cLINES, 0);
 	}
 }
@@ -126,7 +126,7 @@ perror_message (template, str)
 void
 clear_message ()
 {
-	if (! cmd_line) {
+	if (!cmd_line) {
 		MoveCursor (cLINES, 0);
 		CleartoEOLN ();
 		cursoroff ();
@@ -143,7 +143,7 @@ center_line (line, inverse, str)
 {
 	int pos;
 
-	if (! cmd_line) {
+	if (!cmd_line) {
 		if (cCOLS >= (int) strlen (str)) {
 			pos = (cCOLS - (int) strlen (str)) / 2;
 		} else {
@@ -164,7 +164,7 @@ center_line (line, inverse, str)
 	
 	fflush (stdout);
 
-	if (! cmd_line) {
+	if (!cmd_line) {
 		if (inverse) {
 			EndInverse ();
 		}

@@ -416,7 +416,7 @@ extern int mail_to_someone P_((int respnum, char *address, int mail_to_poster, i
 extern int mail_bug_report P_((void));
 extern int mail_to_author P_((char *group, int respnum, int copy_text));
 extern int pcCopyArtHeader P_((int iHeader, char *pcArt, char *result));
-extern int delete_article P_((struct t_group *group, struct t_article *art, int respnum));
+extern int cancel_article P_((struct t_group *group, struct t_article *art, int respnum));
 extern int repost_article P_((char *group, struct t_article *art, int respnum, int supersede));
 extern void msg_add_x_headers P_((char *headers));
 extern int msg_add_x_body P_((FILE *fp_out, char *body));

@@ -234,7 +234,7 @@ get_host_name (host_name)
 				}
 				fclose (fp);
 			}
-			if (! host_name[0]) {
+			if (!host_name[0]) {
 				strcpy (host_name, "PROBLEM_WITH_YOUR_MAIL_GATEWAY_FILE");
 			}
 		} else {
@@ -408,7 +408,7 @@ get_from_name (user_name, host_name, full_name, from_name)
 	}
 #endif
 
-	if (! nntp_inews_domain[0]) {
+	if (!nntp_inews_domain[0]) {
 		ptr = GetConfigValue (_CONF_FROMHOST);
 		if (ptr != (char *) 0) {
 			strncpy (nntp_inews_domain, ptr, sizeof (nntp_inews_domain));
@@ -484,7 +484,7 @@ get_domain_name (inews_domain, domain)
 			}
 			fclose (fp);
 		}
-		if (! domain[0]) {
+		if (!domain[0]) {
 			strcpy (domain, "PROBLEM_WITH_YOUR_MAIL_DOMAIN_FILE");
 		}
 	} else {
@@ -505,7 +505,7 @@ submit_news_file (name, lines)
 	checknadd_headers (name, lines);
 
     /* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
-        if (! strcasecmp(mm_charset, "euc-kr") && ! strcasecmp(post_mime_encoding, txt_7bit) )
+        if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(post_mime_encoding, txt_7bit)))
              post_mime_encoding[0] = '8';
 
 	rfc15211522_encode(name, post_mime_encoding,post_8bit_header);

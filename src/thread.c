@@ -51,7 +51,7 @@ bld_tline (l, art)
 	int off_subj = 0;
 	int off_both = 0;
 
-	if (! draw_arrow_mark) {
+	if (!draw_arrow_mark) {
 		off_subj = 2;
 		off_both = 5;
 	}
@@ -92,7 +92,7 @@ bld_tline (l, art)
 	}
 
 	from[0] = '\0';
-	if (! show_subject || show_author != SHOW_FROM_NONE) {
+	if (!show_subject || show_author != SHOW_FROM_NONE) {
 		get_author (TRUE, art, from);
 	}
 
@@ -302,7 +302,7 @@ show_thread (group, group_path, respnum)
 						break;
 				}
 				break;
-#endif /* ! WIN32 */
+#endif /* !WIN32 */
 
 #ifndef NO_SHELL_ESCAPE
 			case iKeyShellEscape:

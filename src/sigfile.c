@@ -50,7 +50,7 @@ msg_write_signature (fp, flag)
 
 	i = my_group[cur_groupnum];
 
-	if (! strcmp(active[i].attribute->sigfile, "---none")) {
+	if (!strcmp(active[i].attribute->sigfile, "---none")) {
 		return;
 	}
 	if (active[i].attribute->sigfile[0] == '!') {
@@ -66,9 +66,9 @@ msg_write_signature (fp, flag)
 	}
 	get_cwd (cwd);
 
-	if (! strfpath (active[i].attribute->sigfile, path, sizeof (path),
+	if (!strfpath (active[i].attribute->sigfile, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, active[i].name)) {
-		if (! strfpath (default_sigfile, path, sizeof (path),
+		if (!strfpath (default_sigfile, path, sizeof (path),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
 			joinpath (path, homedir, ".Sig");
 		}
@@ -129,7 +129,7 @@ open_random_sig (sigdir)
 			srand ((unsigned int) epoch);
 			my_chdir (sigdir);
 
-			if (thrashdir (sigdir) || ! sigfile[0]) {
+			if (thrashdir (sigdir) || !sigfile[0]) {
 				if (debug == 2) {
 					error_message ("NO sigfile=[%s]", sigfile);
 				}
@@ -209,8 +209,8 @@ if (debug == 2) {
 			}
 		}
 		if (dp != NULL) {	/* if we could open the dir entry */
-			if (! strcmp (dp->d_name, CURRENTDIR) ||
-			    ! strcmp (dp->d_name, "..")) {
+			if (!strcmp (dp->d_name, CURRENTDIR) ||
+			    !strcmp (dp->d_name, "..")) {
 				dp = NULL;
 			} else {	/* if we have a non-dot entry */
 				if (stat (dp->d_name, &st) == -1) {

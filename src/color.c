@@ -23,7 +23,7 @@ void
 fcol (color)
 	int color;
 {
-	if (! use_color)
+	if (!use_color)
 		return;
 	printf ("\033[%d;%dm", (color >> 3), ((color & 7) + 30));
 }
@@ -33,7 +33,7 @@ void
 bcol (color)
 	int color;
 {
-	if (! use_color)
+	if (!use_color)
 		return;
 	printf ("\033[%dm", (color + 40));
 }

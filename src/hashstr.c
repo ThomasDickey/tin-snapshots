@@ -120,7 +120,7 @@ hash_init ()
 	int i;
 
 #ifdef M_AMIGA
-	if (! table) {
+	if (!table) {
 		table = (struct t_hashnode **) my_malloc (HASHNODE_TABLE_SIZE * sizeof (void *));
 	}
 #endif
@@ -138,7 +138,7 @@ hash_reclaim ()
 	struct t_hashnode *p, *next;
 
 #ifdef M_AMIGA
-	if (! table) {
+	if (!table) {
 		return;
 	}
 #endif

@@ -1605,6 +1605,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
 
 #define FreeIfNeeded(p) if (p != 0) free((char *)p)
+#define FreeAndNull(p)  if (p != 0) { free((char *)p); p = 0; }
 
 /*
  * Cast for the (few!) places where we need to examine 8-bit characters w/o

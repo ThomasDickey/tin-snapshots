@@ -284,7 +284,7 @@ printf ("opendir(%s)\n", pcGrpPath);
 /*
 printf ("STAT=[%s]\n", acPath);
 */
-			if (! (acFile[0] == '.' && acFile[1] == '\0') &&
+			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
 				if (stat (acPath, &sStatInfo) != -1) {
 					if (S_ISDIR(sStatInfo.st_mode)) {
@@ -324,7 +324,7 @@ vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
 	char	acGrpName[PATH_LEN];
 	FILE	*hFp;
 
-	if (! iAllGrps && (lArtMax == 0 && lArtMin == 1)) {
+	if (!iAllGrps && (lArtMax == 0 && lArtMin == 1)) {
 		return;
 	}
 

@@ -180,7 +180,7 @@ read_filter_file (file, global_file)
 		return FALSE;
 	}
 
-	if ((update && update_fork) || ! update) {
+	if ((update && update_fork) || !update) {
 		if (global_file) {
 			wait_message (txt_reading_global_filter_file);
 		} else {
@@ -207,7 +207,7 @@ read_filter_file (file, global_file)
 		switch(tolower(buf[0])) {
 		case 'c':
 			if (match_integer (buf, "case=", &icase, 1)) {
-				if (arr_ptr && ! expired_time) {
+				if (arr_ptr && !expired_time) {
 					arr_ptr[i].icase = icase;
 				}
 				break;
@@ -215,7 +215,7 @@ read_filter_file (file, global_file)
 			break;
 		case 'f':
 			if (match_string (buf, "from=", from, sizeof (from))) {
-				if (arr_ptr && ! expired_time) {
+				if (arr_ptr && !expired_time) {
 					if (arr_ptr[i].icase) {
 						str_lwr (from, from);
 					}
@@ -255,7 +255,7 @@ if (debug) {
 			break;
 		case 'l':
 			if (match_string (buf, "lines=", lines, sizeof (lines))) {
-				if (arr_ptr && ! expired_time) {
+				if (arr_ptr && !expired_time) {
 					if (lines[0] == '<') {
 						arr_ptr[i].lines_cmp = FILTER_LINES_LT;
 						arr_ptr[i].lines_num = atoi (&lines[1]);
@@ -307,7 +307,7 @@ if (debug) {
 				break;
 			}
 			if (match_string (buf, "subj=", subj, sizeof (subj))) {
-				if (arr_ptr && ! expired_time) {
+				if (arr_ptr && !expired_time) {
 					if (arr_ptr[i].icase) {
 						str_lwr (subj, subj);
 					}
@@ -331,7 +331,7 @@ if (debug) {
 	printf ("type=[%d][%s]\n", type, (type == 0 ? "KILL" : "SELECT"));
 	fflush (stdout);
 }
-				if (psGrp && ! global) {
+				if (psGrp && !global) {
 					arr_num = &psGrp->grps_filter->num;
 					arr_max = &psGrp->grps_filter->max;
 					if (*arr_num >= (*arr_max - 1)) {
@@ -359,7 +359,7 @@ if (debug) {
 				break;
 			}
 	 		if (match_long (buf, "time=", &secs)) {
-				if (arr_ptr && ! expired_time) {
+				if (arr_ptr && !expired_time) {
 					arr_ptr[i].time = secs;
 					if (secs && current_secs > secs) {
 if (debug) {
@@ -503,11 +503,11 @@ vWriteFilterArray (fp, global, ptr, theTime)
 		if (global) {
 /*
 printf ("Scope=[%s]\r\n",
-(ptr->filter[i].scope != (char * ) 0 ? ptr->filter[i].scope : "*"));
+(ptr->filter[i].scope != (char *) 0 ? ptr->filter[i].scope : "*"));
 fflush (stdout);
 */
 				fprintf (fp, "scope=%s\n",
-					(ptr->filter[i].scope != (char * ) 0 ? ptr->filter[i].scope : "*"));
+					(ptr->filter[i].scope != (char *) 0 ? ptr->filter[i].scope : "*"));
 			}
 /*
 printf ("PtrType=[%d] FilType=[%d]\r\n", ptr->filter[i].type, write_filter_type);
@@ -712,7 +712,7 @@ filter_menu (type, group, art)
 
 	show_menu_help (txt_help_filter_text);
 
-	if (! prompt_menu_string (INDEX_TOP, (int) strlen (ptr_filter_text), rule.text)) {
+	if (!prompt_menu_string (INDEX_TOP, (int) strlen (ptr_filter_text), rule.text)) {
 		return FALSE;
 	}
 
@@ -730,7 +730,7 @@ filter_menu (type, group, art)
 		rule.counter = i;
 	}
 
-	if (! rule.text[0]) {
+	if (!rule.text[0]) {
 		/*
 		 * Subject:
 		 */
@@ -792,7 +792,7 @@ filter_menu (type, group, art)
 	show_menu_help (txt_help_filter_lines);
 
 	buf[0] = '\0';
-	if (! prompt_menu_string (INDEX_TOP+12, (int) strlen (ptr_filter_lines), buf)) {
+	if (!prompt_menu_string (INDEX_TOP+12, (int) strlen (ptr_filter_lines), buf)) {
 		return FALSE;
 	}
 
@@ -881,7 +881,7 @@ filter_menu (type, group, art)
 			MoveCursor (cLINES, (int) strlen (ptr_filter_quit_edit_save));
 			if ((ch = ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("eqs\033", ch));
+		} while (!strchr ("eqs\033", ch));
 		switch (ch) {
 		case iKeyFilterEdit:
 			start_line_offset = 22;
@@ -1293,7 +1293,7 @@ filter_articles (group)
 		 * ie. group=comp.os.linux.help  scope=comp.os.linux.*
 		 */
 		inscope = set_filter_scope (group);
-		if (! cmd_line) {
+		if (!cmd_line) {
 			sprintf (buf, txt_filter_global_rules, inscope, group->glob_filter->num);
 			wait_message (buf);
 		}
@@ -1301,7 +1301,7 @@ filter_articles (group)
 		ptr = group->glob_filter->filter;
 		global_filter = TRUE;
 	} else {
-		if (! cmd_line) {
+		if (!cmd_line) {
 			sprintf (buf, txt_filter_local_rules, group->grps_filter->num);
 			wait_message (buf);
 		}
@@ -1419,7 +1419,7 @@ sleep (1);
 					}
 				}
 
-				if (IS_KILLED(i) || ! filtered) {
+				if (IS_KILLED(i) || !filtered) {
 					filtered = TRUE;
 				}
 			}
@@ -1438,7 +1438,7 @@ sleep (1);
 		num = group->grps_filter->num;
 		ptr = group->grps_filter->filter;
 		global_filter = FALSE;
-		if (! cmd_line) {
+		if (!cmd_line) {
 			sprintf (buf, txt_filter_local_rules, group->grps_filter->num);
 			wait_message (buf);
 		}
@@ -1484,7 +1484,7 @@ set_filter_scope (group)
 	for (i = 0; i < num; i++) {
 		ptr[i].inscope = TRUE;
 		if (ptr[i].scope != (char *) 0) {
-			if (! wildmat (group->name, ptr[i].scope)) {
+			if (!wildmat (group->name, ptr[i].scope)) {
 				ptr[i].inscope = FALSE;
 				inscope--;
 			}

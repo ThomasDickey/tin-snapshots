@@ -176,7 +176,7 @@ read_attributes_file (file, global_file)
 	}
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
-		if ((update && update_fork) || ! update) {
+		if ((update && update_fork) || !update) {
 			if (global_file) {
 				wait_message (txt_reading_global_attributes_file);
 			} else {
@@ -341,6 +341,8 @@ read_attributes_file (file, global_file)
 					break;
 				}
 				break;
+			default:
+				break;
 			}
 		}
 		fclose (fp);
@@ -349,7 +351,7 @@ read_attributes_file (file, global_file)
 	/*
 	 * Now setup the rest of the groups to use the default attributes
 	 */
-	if (! global_file) {
+	if (!global_file) {
 		for (i = 0; i < num_active ; i++) {
 			if (active[i].attribute == (struct t_attribute *) 0) {
 				active[i].attribute = &glob_attributes;
@@ -358,7 +360,7 @@ read_attributes_file (file, global_file)
 	}
 /* debug_print_filter_attributes(); */
 
-	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
+	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
 
@@ -368,9 +370,9 @@ read_attributes_file (file, global_file)
 
 void
 set_attrib_str (type, scope, str)
-	int		type;
-	char	*scope;
-	char	*str;
+	int type;
+	char *scope;
+	char *str;
 {
 #ifndef INDEX_DAEMON
 	register int i;
@@ -380,7 +382,7 @@ set_attrib_str (type, scope, str)
 		/*
 		 * Does scope refer to 1 or more groups (ie. regex) ?
 		 */
-		if (! strchr (scope, '*')) {
+		if (!strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 if (debug) {
@@ -406,9 +408,9 @@ if (debug) {
 
 void
 set_attrib_num (type, scope, num)
-	int		type;
-	char	*scope;
-	int		num;
+	int type;
+	char *scope;
+	int num;
 {
 #ifndef INDEX_DAEMON
 	register int i;
@@ -418,7 +420,7 @@ set_attrib_num (type, scope, num)
 		/*
 		 * Does scope refer to 1 or more groups (ie. regex) ?
 		 */
-		if (! strchr (scope, '*')) {
+		if (!strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 if (debug) {
@@ -590,14 +592,14 @@ write_attributes_file (file)
 #else
 	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
 #endif
-		error_message (txt_filesystem_full_backup, "attributes");
+		error_message (txt_filesystem_full_backup, ATTRIBUTES_FILE);
 		/* free memory for tmp-filename */
 		free (file_tmp);
 		return;
 	}
 
-	if (! cmd_line) {
-		if ((update && update_fork) || ! update) {
+	if (!cmd_line) {
+		if ((update && update_fork) || !update) {
 			wait_message (txt_writing_attributes_file);
 		}
 	}
@@ -727,7 +729,7 @@ write_attributes_file (file)
 	}
 
 	if (ferror (fp) | fclose (fp)){
-		error_message (txt_filesystem_full, "attributes");
+		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
 		/* free memory for tmp-filename */
 		free (file_tmp);
 		return;

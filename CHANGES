@@ -1,3 +1,26 @@
+--unoff BETA release 961101 --
+
+210) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. unknown symbol in open.c
+     FIX. open.c
+
+209) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. Cnews+overview-files Lines: count
+     FIX. art.c
+
+208) Andy Gabor <ajgabor@ucdavis.edu>
+     BUG. 'W' somtimes crashes
+     FIX. post.c
+
+207) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (mainly reformating source)
+     FIX. several supplied patches
+
+206) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup (mainly reformating source)
+     BUG. checking declaration of signal arguments fails on some machines
+     FIX. tin.h, post.c, configure[.in]
+
 --unoff BETA release 961025 --
 
 205) Thomas E. Dickey <dickey@clark.net>

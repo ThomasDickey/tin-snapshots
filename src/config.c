@@ -40,7 +40,7 @@ read_config_file (file, global_file)
 		return FALSE;
 	}
 
-	if ((update && update_fork) || ! update) {
+	if ((update && update_fork) || !update) {
 		if (global_file) {
 			wait_message (txt_reading_global_config_file);
 		} else {
@@ -497,16 +497,16 @@ read_config_file (file, global_file)
 	fclose (fp);
 
 	/* nobody likes to navigate blind */
-	if (! draw_arrow_mark && !inverse_okay) {
+	if (!(draw_arrow_mark || inverse_okay)) {
 		draw_arrow_mark = TRUE;
 	}
 
 	/* sort out conflicting settings */
-	if (! draw_arrow_mark && strip_blanks) {
+	if (!draw_arrow_mark && strip_blanks) {
 		strip_blanks = FALSE;
 	}
 
-	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
+	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
 
@@ -542,11 +542,11 @@ write_config_file (file)
 		return;
 	}
 
-	if (! cmd_line) {
+	if (!cmd_line) {
 		wait_message (txt_saving);
 	}
 
-	if (! default_editor_format[0]) {
+	if (!default_editor_format[0]) {
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
 	}
 	fprintf (fp, "# %s %s %s configuration file\n#\n", progname, VERSION, RELEASEDATE);
@@ -697,7 +697,7 @@ write_config_file (file)
 
 	fprintf (fp, "# Signature path (random sigs)/file to be used when posting/replying\n");
 	fprintf (fp, "# default_sigfile=file       appends file as signature\n");
-	fprintf (fp, "# default_sigfile=! command  executes external command to generate a signature\n");
+	fprintf (fp, "# default_sigfile=!command  executes external command to generate a signature\n");
 	fprintf (fp, "# default_sigfile=--none     don't append a signature\n");
 	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
 
@@ -927,7 +927,7 @@ write_config_file (file)
 	fprintf (fp, "motd_file_info=%s\n\n", motd_file_info);
 
 	fprintf (fp, "# host & time info used for detecting new groups (don't touch)\n");
-	if (! num_newnews) {
+	if (!num_newnews) {
 		fprintf (fp, "newnews=%s %ld\n", new_newnews_host, new_newnews_time);
 	} else {
 		for (i = 0 ; i < num_newnews ; i++) {
@@ -1438,7 +1438,7 @@ change_config_file (group, filter_at_once)
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
 							for (i=0; i<4; i++) {
-								if (! strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
+								if (!strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
 									mime_type = i;
 								}
 							}
@@ -1645,7 +1645,7 @@ quote_dash_to_space (str)
 {
 	char *ptr;
 
-	for (ptr = str; *ptr; ptr++ ) {
+	for (ptr = str; *ptr; ptr++) {
 		if (*ptr == '_') {
 			*ptr = ' ';
 		}
