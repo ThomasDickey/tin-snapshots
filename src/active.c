@@ -108,6 +108,7 @@ resync_active_file ()
 		free_active_arrays ();
 		max_active = get_active_num ();
 		expand_active ();
+
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mail_active_file ();
 #endif

@@ -383,7 +383,7 @@ Compiled & installed on the following machines:
 
 1)	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.0  with gcc 2.7.2p
-	i486 & Linux 2.0.8  with gcc 2.7.2
+	i486 & Linux 2.0.12  with gcc 2.7.2
 
 2)	HP 9000/825 & HP-UX 8.00 with cc
 	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2

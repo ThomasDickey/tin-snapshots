@@ -1,17 +1,17 @@
-MANIFEST for tin-1.3-unoff-BETA-960807 (Wed Aug  7 14:47:22 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960814 (Thu Aug 15 19:55:35 MET DST 1996)
 ----------------------------------------------------
-  33255 ./CHANGES
-  12296 ./TODO
-   5209 ./Makefile
-  17181 ./INSTALL
-   2138 ./MANIFEST
+  34012 ./CHANGES
+  12949 ./TODO
+   5174 ./Makefile
+  17182 ./INSTALL
+   2088 ./MANIFEST
    1272 ./README
     896 ./tinpp
   19318 ./aclocal.m4
  130893 ./configure
   14907 ./configure.in
    4771 ./install.sh
-  11527 ./makefile.in
+  11394 ./makefile.in
     818 ./conf-tin
   69407 ./doc/tin.1
   23650 ./doc/iso2asc.txt
@@ -30,17 +30,17 @@ MANIFEST for tin-1.3-unoff-BETA-960807 (Wed Aug  7 14:47:22 MET DST 1996)
   42092 ./include/tin.h
    4101 ./include/win32.h
     791 ./include/win32tcp.h
-  19407 ./src/active.c
+  19408 ./src/active.c
    8158 ./src/actived.c
   13034 ./src/amiga.c
-   4426 ./src/amigatcp.c
+   4425 ./src/amigatcp.c
   36156 ./src/art.c
   23226 ./src/attrib.c
    8217 ./src/charset.c
    1558 ./src/color.c
   44234 ./src/config.c
   19759 ./src/curses.c
-  12322 ./src/debug.c
+  12323 ./src/debug.c
    2826 ./src/envarg.c
   18975 ./src/feed.c
   35697 ./src/filter.c
@@ -55,16 +55,16 @@ MANIFEST for tin-1.3-unoff-BETA-960807 (Wed Aug  7 14:47:22 MET DST 1996)
   12078 ./src/mail.c
   17740 ./src/main.c
   10966 ./src/memory.c
-  45859 ./src/misc.c
+  45916 ./src/misc.c
    7234 ./src/msmail.c
   33157 ./src/newsrc.c
   26389 ./src/nntplib.c
   31348 ./src/nntpw32.c
-   6206 ./src/nrctbl.c
+   6190 ./src/nrctbl.c
   27815 ./src/open.c
    6300 ./src/os_2.c
   34645 ./src/page.c
-  24098 ./src/parsdate.y
+  24090 ./src/parsdate.y
    6414 ./src/pgp.c
   74644 ./src/post.c
    4873 ./src/prompt.c
@@ -80,11 +80,11 @@ MANIFEST for tin-1.3-unoff-BETA-960807 (Wed Aug  7 14:47:22 MET DST 1996)
   10912 ./src/signal.c
    5777 ./src/strftime.c
   26074 ./src/thread.c
-   4853 ./src/wildmat.c
+   4804 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
    6294 ./src/xref.c
    5522 ./src/vms.c
    6837 ./include/autoconf.hin
   10775 ./src/Makefile.in
-1485156 total
+1464307 total

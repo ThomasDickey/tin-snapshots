@@ -1,3 +1,14 @@
+--unoff BETA release 960814 --
+
+150) Torsten Neumann <torsten@imke.infodrom.north.de>
+     ADD. default entry to newsrctable (* .newsrc-${NNTPSERVER-localhost})
+     BUG. ${VAR-fix} expansion in strfpath() did not work correctly
+     FIX. misc.c nrctbl.c
+
+149) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. makefile.in, Makefile.in, amigatcp.c, misc.c, parsdate.y, wildmat.c
+
 --unoff BETA release 960808 --
 
 148) Alexander Lehmann <alex@hal.rhein-main.de>
