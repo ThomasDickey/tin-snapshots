@@ -1,3 +1,10 @@
+--unoff BETA release 960826 --
+
+161) Andrey Blochintsev <bag@wood.cs.kiev.ua>
+     BUG. reading only the first HEADER_LEN bytes could truncate headers.
+          -> check for NULL-poniters
+     FIX. art.c
+
 --unoff BETA release 960825 --
 
 160) Thomas E. Dickey <dickey@clark.net>

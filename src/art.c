@@ -603,8 +603,9 @@ parse_headers (buf, h)
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
 				if (! got_from) {
-					if (match_header (ptrline, "From", buf2, HEADER_LEN) ||
-					    match_header (ptrline, "To", buf2, HEADER_LEN)) {
+					if ((match_header (ptrline, "From", buf2, HEADER_LEN) ||
+					    match_header (ptrline, "To", buf2, HEADER_LEN)) &&
+					    *buf2 != '\0' ) {
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (art_full_name[0]) {
@@ -616,7 +617,7 @@ parse_headers (buf, h)
 				break;
 			case 'R':	/* References: optional */
 				if (! got_refs) {
-					if (match_header (ptrline, "References", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "References", buf2, HEADER_LEN) && *buf2 != '\0') {
 						h->refs = str_dup (buf2);
 						got_refs = TRUE;
 					}
@@ -624,7 +625,7 @@ parse_headers (buf, h)
 
 				/* Received:  If found its probably a mail article */
 				if (! got_received) {
-					if (match_header (ptrline, "Received", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Received", buf2, HEADER_LEN) && *buf2 != '\0') {
 						max_lineno = 50;
 						got_received = TRUE;
 					}
@@ -632,7 +633,7 @@ parse_headers (buf, h)
 				break;
 			case 'S':	/* Subject:  mandatory */
 				if (! got_subject) {
-					if (match_header (ptrline, "Subject", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Subject", buf2, HEADER_LEN) && *buf2 != '\0') {
 						s = eat_re (buf2);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
@@ -641,7 +642,7 @@ parse_headers (buf, h)
 				break;
 			case 'D':	/* Date:  mandatory */
 				if (! got_date) {
-					if (match_header (ptrline, "Date", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Date", buf2, HEADER_LEN) && *buf2 != '\0') {
 						h->date = parsedate (buf2, (struct _TIMEINFO *) 0);
 						got_date = TRUE;
 					}
@@ -649,7 +650,7 @@ parse_headers (buf, h)
 				break;
 			case 'X':	/* Xref:  optional */
 				if (! got_xref) {
-					if (match_header (ptrline, "Xref", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Xref", buf2, HEADER_LEN) && *buf2 != '\0') {
 						h->xref = str_dup (buf2);
 						got_xref = TRUE;
 					}
@@ -657,7 +658,7 @@ parse_headers (buf, h)
 				break;
 			case 'M':	/* Message-ID:  mandatory */
 				if (! got_msgid) {
-					if (match_header (ptrline, "Message-ID", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Message-ID", buf2, HEADER_LEN) && *buf2 != '\0') {
 						h->msgid = str_dup (buf2);
 						got_msgid = TRUE;
 					}
@@ -665,14 +666,14 @@ parse_headers (buf, h)
 				break;
 			case 'L':	/* Lines:  optional */
 				if (! got_lines) {
-					if (match_header (ptrline, "Lines", buf2, HEADER_LEN)) {
+					if (match_header (ptrline, "Lines", buf2, HEADER_LEN) && *buf2 != '\0') {
 						h->lines = atoi (buf2);
 						got_lines = TRUE;
 					}
 				}
 				break;
 			case 'A':	/* Archive-name:  optional */
-				if (match_header (ptrline, "Archive-name", buf2, HEADER_LEN)) {
+				if (match_header (ptrline, "Archive-name", buf2, HEADER_LEN) && *buf2 != '\0') {
 					if ((s = strchr (buf2, '/')) != (char *) 0) {
 						if (STRNCMPEQ(s+1, "part", 4) ||
 						    STRNCMPEQ(s+1, "Part", 4)) {
@@ -868,7 +869,7 @@ sleep(1);
 		 * READ article message id
 		 */
 		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if (q == (char *) 0 || p == q ) {	/* Empty msgid's */
 #ifdef DEBUG
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
