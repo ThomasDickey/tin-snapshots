@@ -579,6 +579,10 @@ constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
 constext txt_uudecoding[] = "Uudecoding %s...";
 constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n\n";
+constext txt_warn_missing_followup_to[] = "Warning: crossposting to %d newsgroups and no Followup-To line!\n\n";
+constext txt_error_missing_followup_to[] = "Error: crossposting to %d newsgroups and no Followup-To line!\n\n";
+constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";
+constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to more than one newsgroup!\n\n";
 constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
   to just the  key points to which you are  responding, or  people will think\n\

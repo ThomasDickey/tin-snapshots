@@ -352,6 +352,8 @@ check_article_to_be_posted (article, art_type, lines)
 	int errors = 0;
 	int found_newsgroups_line = FALSE;
 	int found_subject_line = FALSE;
+	int found_followup_to = FALSE;
+	int found_followup_to_several_groups = FALSE;
 	int got_long_line = FALSE;
 	int init = TRUE;
 	int ngcnt = 0;
@@ -407,17 +409,17 @@ check_article_to_be_posted (article, art_type, lines)
 			fflush (stderr);
 			errors++;
 		}
-		if (cp - line == 7 && ! strncmp (line, "Subject", 7)) {
+		if (cp - line == 7 && ! strncasecmp (line, "Subject", 7)) {
 			found_subject_line = TRUE;
 		}
 #ifndef FORGERY
-		if (cp - line == 4 && ! strncmp (line, "From", 4)) {
+		if (cp - line == 4 && ! strncasecmp (line, "From", 4)) {
 			fprintf (stderr, txt_error_from_in_header_not_allowed, cnt);
 			fflush (stderr);
 			errors++;
 		}
 #endif
-		if (cp - line == 10 && ! strncmp (line, "Newsgroups", 10)) {
+		if (cp - line == 10 && ! strncasecmp (line, "Newsgroups", 10)) {
 			found_newsgroups_line = TRUE;
 			for (cp = line + 11; *cp == ' '; cp++) {
 				;
@@ -459,6 +461,10 @@ check_article_to_be_posted (article, art_type, lines)
 				errors++;
 				continue;
 			}
+		}
+		if (cp - line == 11 && ! strncasecmp (line, "Followup-To", 11)) {
+			found_followup_to=1;
+			if (strchr(cp,',')) found_followup_to_several_groups=1;
 		}
 	}
 
@@ -531,6 +537,22 @@ check_article_to_be_posted (article, art_type, lines)
 #endif
 			}
 			free (ngptrs[i]);
+		}
+		if (!found_followup_to && ngcnt>1 && !errors) {
+#ifdef HAVE_FASCIST_NEWSADMIN
+			fprintf(stderr, txt_error_missing_followup_to,ngcnt);
+			errors++;
+#else
+			fprintf(stderr, txt_warn_missing_followup_to,ngcnt);
+#endif
+		}
+		if (found_followup_to_several_groups && !errors) {
+#ifdef HAVE_FASCIST_NEWSADMIN
+			fprintf(stderr, txt_error_followup_to_several_groups);
+			errors++;
+#else
+			fprintf(stderr, txt_warn_followup_to_several_groups);
+#endif
 		}
 #ifndef NO_ETIQUETTE
 		fprintf (stderr, txt_warn_posting_etiquette);

@@ -437,10 +437,17 @@ read_config_file (file, global_file)
 		}
 	}
 	fclose (fp);
+	
 	/* nobody likes to navigate blind */
 	if (! draw_arrow_mark && !inverse_okay) {
 		draw_arrow_mark = TRUE;
 	}
+
+	/* sort out conflicting settings */
+	if (! draw_arrow_mark && strip_blanks) {
+		strip_blanks = FALSE;
+	}
+
 	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
 		wait_message ("\n");
 	}
