@@ -104,7 +104,7 @@ constext txt_end_of_thread[] = "*** End of Thread ***";
 constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
 constext txt_env_var_not_found[] = "Environment variable %s not found. Set and retry...";
-constext txt_error_from_in_header_not_allowed[] = "Error on line %d: \"From:\" header not allowed (it will be added for you)\n";
+constext txt_error_sender_in_header_not_allowed[] = "Error on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
 constext txt_error_header_and_body_not_separate[] = "Error: No blank line found after header.\n\n";
 constext txt_error_header_line_blank[] = "Error: Article starts with blank line instead of header\n\n";
 constext txt_error_header_line_colon[] = "Error: Header on line %d does not have a colon after the header name:\n%s\n\n";
@@ -293,9 +293,7 @@ constext txt_help_l[] = "l\t  list articles within current thread (bring up Thre
 constext txt_help_m[] = "m\t  move chosen group within list" cCRLF;
 constext txt_help_mail_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_mail_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#ifdef FORGERY
 constext txt_help_mail_address[] = "Enter default mail address. <CR> sets.";
-#endif
 constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-Id %N Name %C First Name";
 constext txt_help_maildir[] = "The directory where articles/threads are to be saved in mailbox format.";
 constext txt_help_mailer_format[] = "Enter %M for mailer, %S for subject, %T for to, %F for filename, <CR> to set.";
@@ -534,9 +532,7 @@ constext txt_opt_keep_dead_articles[] = "Keep failed arts in ~/dead.articles: ";
 #endif
 constext txt_opt_keep_posted_articles[] = "Keep posted arts in ~/Mail/posted  : ";
 constext txt_opt_mail_8bit_header[] = "Use 8bit characters in mail headers: ";
-#ifdef FORGERY
-constext txt_opt_mail_address[] = "Forged mail address                : ";
-#endif
+constext txt_opt_mail_address[] = "Mail address                       : ";
 constext txt_opt_full_page_scroll[] = "Scroll full page (OFF=half page)   : ";
 constext txt_opt_mail_mime_encoding[] = "MIME encoding in mail messages     : ";
 constext txt_opt_mail_quote_format[] = "Quote line when mailing            : ";
@@ -705,9 +701,7 @@ constext txt_tinrc_mail_8bit_header[] = "# if ON, 8bit characters in mail messag
 # prohibit 8bit characters in mail header so that you are advised NOT to\n\
 # turn it ON unless you have some compelling reason as is the case of\n\
 # Korean users with localized sendmail.\n";
-#ifdef FORGERY
 constext txt_tinrc_mail_address[] = "# user's mail address, if not username@host\n";
-#endif /* FORGERY */
 constext txt_tinrc_mail_mime_encoding[] = "";
 constext txt_tinrc_mail_quote_format[] = "";
 constext txt_tinrc_mark_saved_read[] = "# if ON mark articles that are saved as read\n";

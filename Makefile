@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970321
+PVER		= 970324
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -28,6 +28,7 @@ HFILES	= \
 	$(INCDIR)/tcurses.h \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/tnntp.h \
+	$(INCDIR)/trace.h \
 	$(INCDIR)/version.h \
 	$(INCDIR)/win32.h \
 	$(INCDIR)/win32tcp.h
@@ -85,6 +86,7 @@ CFILES	= \
 	$(SRCDIR)/string.c \
 	$(SRCDIR)/tcurses.c \
 	$(SRCDIR)/thread.c \
+	$(SRCDIR)/trace.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/win32.c \
 	$(SRCDIR)/win32tcp.c \

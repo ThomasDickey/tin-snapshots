@@ -14,8 +14,11 @@
 #include "tin.h"
 #include "tnntp.h"
 
+static const char * get_user_name(void);
+static const char * get_full_name(void);
+
 /* find hostname */
-char *
+const char *
 get_host_name (
 void)
 {
@@ -62,7 +65,7 @@ void)
 
 #ifdef DOMAIN_NAME
 /* find domainname - check DOMAIN_NAME */
-char *
+const char *
 get_domain_name (
 	void)
 {
@@ -115,17 +118,26 @@ static const char *domain_name_hack = DOMAIN_NAME;
 
 #ifdef HAVE_GETHOSTBYNAME
 /* find FQDN - gethostbyaddr() */
-const char *get_fqdn(host)
-const char	*host;
+const char *
+get_fqdn(
+	const char *host)
 {
 	char	name[MAXHOSTNAMELEN+2];
+	char	line[MAXLINELEN+1];
+	char	*cp,*domain;
+	static char	fqdn[1024];
 	struct hostent	*hp;
 	struct in_addr	in;
+	FILE	*inf;
+  
+	*fqdn=0;
+	domain=NULL; 
 
 	name[MAXHOSTNAMELEN]='\0';
-	if (host)
+	if (host) {
+                if (strchr(host,'.')) return host;
 		(void)strncpy(name,host,MAXHOSTNAMELEN);
-	else
+	} else
 		if (gethostname(name,MAXHOSTNAMELEN))
 			return(NULL);
 
@@ -138,18 +150,42 @@ const char	*host;
 	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
 		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
 			in.s_addr=(*hp->h_addr);
-	return(hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
-}
-#endif
+	sprintf(fqdn,"%s",hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
 
-/*
- * FIXME: split get_user_info to get_full_name() and get_user_name()
- */
+        if (!*fqdn || (fqdn[strlen(fqdn)-1]<='9')) {
+	  *fqdn=0;
+	  inf=fopen("/etc/resolv.conf","r");
+	  if (inf) {
+	    while(fgets(line,MAXLINELEN,inf)) {
+	      line[MAXLINELEN]=0;
+	      str_trim(line);
+	      if (strncmp(line,"domain ",7)==0) {
+		domain=line+7;
+		break;
+	      } 
+	      if (strncmp(line,"search ",7)==0) {
+		domain=line+7;
+	        cp=strchr(domain,' ');
+		if (cp) *cp=0;
+		break;
+	      }
+	    }
+	    if (domain) sprintf(fqdn,"%s.%s",name,domain);
+	  }
+	  fclose(inf);
+	}
+  
+	return(fqdn);
+}
+
+#endif
 
 
 /*
  * Find username & fullname
  */
+#if 0
+/* old get_user_info() */
 void
 get_user_info (
 	char *user_name,
@@ -209,6 +245,91 @@ get_user_info (
 #endif /* INDEX_DAEMON */
 }
 
+#else
+/* new get_user_info which uses get_full_name()/get_user_name() */
+
+void
+get_user_info (
+	char *user_name,
+	char *full_name)
+{
+#ifndef INDEX_DAEMON
+	const char *ptr;
+
+	user_name[0]='\0';
+	full_name[0]='\0';
+	
+	if ((ptr=get_full_name())) {
+		strcpy(full_name,ptr);
+	}
+	if ((ptr=get_user_name())) {
+		strcpy(user_name,ptr);
+	}
+#endif /* INDEX_DAEMON */
+}
+
+static const char *
+get_user_name(
+	void)
+{
+#ifdef M_AMIGA
+	char *p;
+#endif
+	static char username[128];
+	struct passwd *pw;
+	
+	username[0]='\0';
+#ifndef M_AMIGA
+	pw = getpwuid (getuid ());
+	strcpy (username, pw->pw_name);
+#else
+	if ((p = getenv ("USER"))) {
+		strncpy (username, p, 128);
+	}
+#endif
+	return(username);
+}
+
+static const char *
+get_full_name(
+	void)
+{
+	char *p;
+	static char fullname[128];
+	char buf[128];
+	char tmp[128];
+	struct passwd *pw;
+
+	fullname[0]='\0';
+
+	if ((p = getenv ("NAME")) != (char *) 0) {
+		strncpy (fullname, p, sizeof (fullname));
+		return (fullname);
+	}
+	if ((p =  getenv ("REALNAME")) != (char *) 0) {
+		strncpy (fullname, p, sizeof (fullname));
+		return (fullname);
+	}
+
+	pw = getpwuid (getuid ());
+	strncpy (buf, pw->pw_gecos, sizeof (fullname));
+	if ((p = strchr (buf, ','))) {
+		*p = '\0';
+	}
+	if ((p = strchr (buf, '&'))) {
+		*p++ = '\0';
+		strcpy (tmp, pw->pw_name);
+		/* strcpy(tmp, get_user_name()); */
+		if (*tmp && *tmp >= 'a' && *tmp <= 'z') {
+			*tmp = *tmp - 32;
+		}
+		sprintf (fullname, "%s%s%s", buf, tmp, p);
+	} else {
+		strcpy (fullname, buf);
+	}
+return (fullname);
+}
+#endif /* 0 */
 
 /*
  * FIXME to:
@@ -219,26 +340,57 @@ get_user_info (
  */
 void
 get_from_name (
-	char *user_name,
-	char *full_name,
 	char *from_name)
 {
 #ifndef INDEX_DAEMON
 
-#ifdef FORGERY
 	if (*mail_address) {
 		strcpy(from_name, mail_address);
 		return;
 	}
-#endif
 
-	sprintf (from_name, "%s <%s@%s>", full_name, user_name, domain_name);
+	sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), domain_name);
 
 	if (debug == 2) {
 		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
-			from_name, user_name, domain_name, full_name);
+			from_name, get_user_name(), domain_name, get_full_name());
 		error_message (msg, "");
 	}
 
 #endif /* INDEX_DAEMON */
 }
+
+/*
+** build_sender()
+** return (*(user@fq.domainna.me))
+*/
+#ifndef FORGERY
+const char *
+build_sender (
+	void)
+{
+	const char *ptr;
+	static char sender[8192];
+	
+	sender[0]='\0';
+
+	if ((ptr = get_full_name())) {
+		strcpy(sender, ptr);
+		strcat(sender, " ");
+	}
+	if ((ptr = get_user_name())) {
+		strcat(sender, "<");
+		strcat(sender, ptr);
+		strcat(sender, "@");
+		if ((ptr = get_fqdn(get_host_name()))) {
+			strcat(sender, ptr);
+			strcat(sender, ">");
+		} else { 
+			return ((char *)NULL);
+		}
+	} else {
+		return ((char *)NULL);
+	}
+	return (sender);
+}
+#endif

@@ -645,7 +645,7 @@ get_server (
 
 	static int reconnecting = 0;
 
-int retry=2; /* uj 970124 - reconnect workaround */
+	int retry=2; /* uj 970124 - reconnect workaround */
 
 	errno = 0;
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
@@ -662,25 +662,31 @@ int retry=2; /* uj 970124 - reconnect workaround */
 */
 			if (reconnecting) return -1;
 			if (prompt_yn2 (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
-				return -2;
+				tin_done(EXIT_NNTP_ERROR);
+				/*return -2;*/
 			}
 			reconnecting = 1;
 			clear_message ();
 			strcpy (buf, last_put);
 
-while (retry) { /* uj 970124 - reconnect workaround */
-			if (nntp_open () == 0) {
-				if (glob_group != (char *) 0) {
-					sprintf (last_put, "group %s", glob_group);
-					put_server (last_put);
-					s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
+			while (retry) { /* uj 970124 - reconnect workaround */
+				if (nntp_open () == 0) {
+					if (glob_group != (char *) 0) {
+						sprintf (last_put, "group %s", glob_group);
+						put_server (last_put);
+						s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
+					}
+					put_server (buf);
+					reconnecting = 0;
+					break; /* uj 970124 - reconnect workaround */
 				}
-				put_server (buf);
-break; /* uj 970124 - reconnect workaround */
+				retry--; /* uj 970124 - reconnect workaround */
+			} /* uj 970124 - reconnect workaround */
+
+			/* If we get here with reconnecting == 1 then bug out */
+			if (reconnecting) {
+				tin_done(EXIT_NNTP_ERROR);
 			}
-retry--; /* uj 970124 - reconnect workaround */
-} /* uj 970124 - reconnect workaround */
-			reconnecting = 0;
 		}
 	}
 
@@ -725,7 +731,7 @@ int get_server (char *string, int size)
 			netclose(sockt_rd);
 			ring_bell ();
 			if (!prompt_yn2 (cLINES, txt_reconnect_to_news_server, 'y')) {
-				return -1;
+				tin_done(EXIT_NNTP_ERROR);
 			}
 			clear_message ();
 			strcpy (buf, last_put);
@@ -740,6 +746,8 @@ int get_server (char *string, int size)
 					strncpy(last_put, p, NNTP_STRLEN);
 #endif
 				}
+			} else {
+				tin_done(EXIT_NNTP_ERROR);
 			}
 			put_server (buf);
 		}

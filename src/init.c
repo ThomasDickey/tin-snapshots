@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include "tnntp.h"
 #include	"menukeys.h"
 #include	"version.h"
 
@@ -97,12 +98,10 @@ char txt_help_bug_report[LEN];	/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
 
-char domain_name[MAXHOSTNAMELEN]="";
-char host_name[MAXHOSTNAMELEN]="";
+char domain_name[MAXHOSTNAMELEN];
+char host_name[MAXHOSTNAMELEN];
 
-#ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
-#endif
 
 #ifdef VMS
 char rcdir_asfile[PATH_LEN];	/* rcdir expressed as dev:[dir]tin.dir, for stat() */
@@ -284,6 +283,7 @@ void init_selfinfo (void)
 {
 	char nam[LEN];
 	char *ptr;
+	const char *cptr;
 	FILE *fp;
 	struct stat sb;
 
@@ -300,25 +300,25 @@ void init_selfinfo (void)
 #	endif /* HAVE_SYS_UTSNAME_H */
 #endif /* M_AMIGA */
 
-	if ((ptr = get_host_name()) != (char *) 0) {
-		strcpy (host_name, ptr);
+	if ((cptr = get_host_name()) != (char *) 0) {
+		strcpy (host_name, cptr);
 	}
 
 #ifdef DOMAIN_NAME
-	if ((ptr = get_domain_name()) != (char *) 0) {
-		strcpy (domain_name, ptr);
+	if ((cptr = get_domain_name()) != (char *) 0) {
+		strcpy (domain_name, cptr);
 	}
 #endif /* DOMAIN_NAME */
 
 #ifdef HAVE_GETHOSTBYNAME
 	if (domain_name[0]=='\0') {
 		if (host_name[0]=='\0') {
-			ptr = get_fqdn((char *)NULL);
+			cptr = get_fqdn((char *)NULL);
 		} else {
-			ptr = get_fqdn(host_name);
+			cptr = get_fqdn(host_name);
 		}
-		if (ptr != (char *)NULL) {
-			strcpy (domain_name, ptr);
+		if (cptr != (char *)NULL) {
+			strcpy (domain_name, cptr);
 		}
 	}
 #endif /* HAVE_GETHOSTBYNAME */

@@ -530,7 +530,7 @@ group_page_down:
 				break;
 
 			case iKeyGroupRedrawScr:	/* redraw screen */
-				ClearScreen ();
+				my_retouch ();
 				set_xclick_off ();
 				show_group_page ();
 				break;

@@ -17,9 +17,11 @@
 #include "tin.h"
 #include "tcurses.h"
 
-#if USE_CURSES
+#ifdef USE_CURSES
 
 #include <stdarg.h>
+
+#include "trace.h"
 
 #ifndef attr_get
 #define	attr_get() getattrs(stdscr)
@@ -31,7 +33,8 @@ t_bool inverse_okay = TRUE;
 
 /*
  */
-void setup_screen (void) {
+void setup_screen (void)
+{
 	/* FIXME */
 	cmd_line = FALSE;
 	bcol(col_back);
@@ -41,14 +44,16 @@ void setup_screen (void) {
  */
 int InitScreen (void)
 {
-#if 0
-	/*trace(TRACE_CALLS|TRACE_MOVE|TRACE_UPDATE);*/
-	trace(TRACE_MAXIMUM);
+#ifdef NCURSES_VERSION
+#ifdef USE_TRACE
+	trace(TRACE_CALLS);
 #endif
+#endif
+	TRACE(("InitScreen"))
 	initscr();
-	set_win_size(&cLINES, &cCOLS);
 	cCOLS = COLS;
 	cLINES = LINES - 1;
+	set_win_size(&cLINES, &cCOLS);
 	raw(); noecho(); cbreak();
 
 	keypad(stdscr, TRUE);
@@ -68,14 +73,20 @@ int InitScreen (void)
  */
 void InitWin(void)
 {
-	/* FIXME */
+	TRACE(("InitWin"))
+	Raw(TRUE);		/* FIXME */
 }
 
 /*
  */
 void EndWin(void)
 {
-	endwin();
+	TRACE(("EndWin (%d)", cmd_line))
+	if (!cmd_line) {
+		Raw(FALSE);		/* FIXME */
+		endwin();
+		cmd_line = TRUE;
+	}
 }
 
 static int _inraw;
@@ -85,9 +96,11 @@ static int _inraw;
 void Raw(int state)
 {
 	if (state && !_inraw) {
+		TRACE(("reset_prog_mode"))
 		reset_prog_mode();
 		_inraw = TRUE;
 	} else if (!state && _inraw) {
+		TRACE(("reset_shell_mode"))
 		reset_shell_mode();
 		_inraw = FALSE;
 	}
@@ -166,8 +179,9 @@ void set_xclick_off (void) { /* FIXME */ }
 void
 MoveCursor(int row, int col)
 {
-	/* _tracef("MoveCursor(%d,%d)", row, col);*/
-	move(row,col);
+	TRACE(("MoveCursor %d,%d", row,col))
+	if (!cmd_line)
+		move(row,col);
 }
 
 
@@ -185,6 +199,7 @@ ReadCh(void)
 			ch = ESC;
 		}
 	}
+	TRACE(("ReadCh(%s)", _tracechar(ch)))
 	return ch;
 }
 
@@ -205,6 +220,7 @@ my_fprintf(FILE *stream, const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
+	TRACE(("my_fprintf(%s)", fmt))
 	if (cmd_line)
 		vfprintf(stream, fmt, ap);
 	else
@@ -215,6 +231,7 @@ my_fprintf(FILE *stream, const char *fmt, ...)
 void
 my_fputc(int ch, FILE *fp)
 {
+	TRACE(("my_fputc(%s)", _tracechar(ch)))
 	if (cmd_line)
 		fputc (ch, fp);
 	else
@@ -224,6 +241,7 @@ my_fputc(int ch, FILE *fp)
 void
 my_fputs(const char *str, FILE *fp)
 {
+	TRACE(("my_fputs(%s)", _nc_visbuf(str)))
 	if (cmd_line)
 		fputs (str, fp);
 	else
@@ -232,6 +250,8 @@ my_fputs(const char *str, FILE *fp)
 
 void my_erase()
 {
+	TRACE(("my_erase"))
+
 	erase();
 
 	/* FIXME:  curses doesn't actually do an erase() until refresh() is
@@ -250,8 +270,18 @@ my_fflush(FILE *stream)
 {
 	if (cmd_line)
 		fflush(stream);
-	else
+	else {
+		TRACE(("my_fflush"))
 		refresh();
+	}
+}
+
+void
+my_retouch(void)
+{
+	TRACE(("my_retouch"))
+	if (!cmd_line)
+		touchwin(stdscr);
 }
 
 char *
@@ -261,12 +291,12 @@ screen_contents(int row, int col, char *buffer)
 	int len = COLS - col;
 	getyx(stdscr, y, x);
 	move(row, col);
-	/* _tracef("screen_contents(%d,%d)", row, col);*/
+	TRACE(("screen_contents(%d,%d)", row, col))
 	if (innstr(buffer, len) == ERR)
 		len = 0;
 	buffer[len] = '\0';
 	/* FIXME move(y, x); */
-	/* _tracef("...screen_contents(%d,%d) %s", y, x, _nc_visbuf(buffer));*/
+	TRACE(("...screen_contents(%d,%d) %s", y, x, _nc_visbuf(buffer)))
 	return buffer;
 }
 

@@ -97,9 +97,7 @@
 	col_markstar			txt_colors	MAX_COLOR+1
 	col_markdash			txt_colors	MAX_COLOR+1
 #endif
-#ifdef	FORGERY
 	mail_address			OPT_STRING
-#endif
 	mm_charset			OPT_STRING
 	post_mime_encoding		txt_mime_types	NUM_MIME_TYPES
 	post_8bit_header		OPT_ON_OFF

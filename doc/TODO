@@ -31,14 +31,11 @@ o  fix nntp_open/get_server (as reconnect often fails on the first try
    so we can try to reconnect more then once - see open.c/nntplib.[ch])
 
 o  sender-patch
-   If user ads From:-line, accept it but build a Sender:-line
-   [If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
+   If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
    Sender:-line nobody@akk.uni-karlsruhe.de (RFC 1413 reverse-lookup not
-   verified)]
+   verified)
    If user ads Sender:-line rename it to X-Unverifiable-Sender and
    ad a Sender:-line
-   (for cancelling articles never look at the Sender:-line, always look at
-   the From:-line)
 
 o  'K' is still a bit inconsistent
    - in the group menu (group.c) it jumps to the next thread containing unread
@@ -127,8 +124,28 @@ o  kill-file editor does not quote brackets, stars and question marks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
 
+o  remove build in path of external commands (metamail, pgp, ...)
+
+o  When enabling the 'cc/bcc on every message that is sent', and
+   then mailing a message to myself, tin will print the message
+   "Mailing to ... gary gary".  A nice touch would be if tin
+   checks the mail_to line, and doesn't add the user's name
+   twice.  Yes, sendmail removes the duplicate ... but it'd
+   be better if tin caught this case first.
+
 New features
 ------------
+o  Rather than cc/bcc, I'd like to see tin simply append the
+   message to a mail folder, whose name is given by a setting
+   in the (M)enu command, possibly overidden by the current
+   setting of "record" environment variable.  The folder would
+   have to be locked using a convention that will hold off
+   the various Unix mailer programs.
+
+o  have the default answer to "do you really want to send this
+   bug report?" be: (y)es. check for a null body, and just ignore it ...
+   [I hate all those empty bugreports ,-)]
+
 o  add support for ispell language change
 
 o  add RFC1468/1922 support
@@ -164,6 +181,13 @@ o  Additions to the thread menu :
 	keys to goto previous/next thread
 
 o  Add 'l' (goto thread menu) to the article pager
+
+o  Add to the 'M'enu:
+        news_headers_to_display
+        news_headers_not_to_display
+        DEFAULT_MAILER
+
+o  Add a comandline swith that prints out all values of cpp-symbols etc.
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
@@ -245,9 +269,7 @@ o  join Makefile and makefile (not entirely possible)
 
 o  move all strings to lang.c
 
-o  use several functions from libcurses/<curses.h> if it's present in
-   curses.c (terminfo rather than termcap can provide correct color
-   capabilities, curses itself could simplify some logic).
+o  cleanup (=rewrite) post.c/inews.c/header.c
 
 o  rework the message routines (wait_message, error_message) to use variable
    length argument lists

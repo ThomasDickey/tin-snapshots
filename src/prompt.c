@@ -213,9 +213,12 @@ prompt_yn2 (
 	int default_answer)
 {
 	char ch, prompt_ch;
+	char valid[10];
 
 	set_alarm_clock_off ();
 	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
+
+	sprintf(valid, "%c%c%c", tolower(iKeyPromptYes), tolower(iKeyPromptNo), ESC);
 
 	MoveCursor (line, 0);
 	CleartoEOLN ();
@@ -224,9 +227,12 @@ prompt_yn2 (
 	my_flush ();
 	MoveCursor (line, (int) strlen (prompt));
 
-	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
-		ch = prompt_ch;
-	}	
+	do {
+		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
+			ch = prompt_ch;
+		}	
+		ch = tolower(ch);
+	} while (!strchr(valid, ch));
 
 	if (line == cLINES) {
 		clear_message ();
@@ -243,7 +249,7 @@ prompt_yn2 (
 
 	set_alarm_clock_on ();
 
-	return (tolower (ch) == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
+	return (ch == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
 
 /*
@@ -456,6 +462,9 @@ continue_prompt (void)
 
 	info_message (txt_return_key);
 	(void) ReadCh ();
+#if USE_CURSES
+	my_retouch();
+#endif
 
 	set_alarm_clock_on ();
 }

@@ -150,13 +150,16 @@ extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
 
 /* header.c */
-extern char *get_domain_name (void);
-extern char *get_host_name (void);
+extern const char *get_domain_name (void);
+extern const char *get_host_name (void);
 extern const char *get_fqdn (const char *host);
+#ifndef FORGERY
+extern const char *build_sender (void);
+#endif /* !FORGERY */
 
 /* inews.c */
 extern void get_user_info (char *user_name, char *full_name);
-extern void get_from_name (char *user_name, char *full_name, char *from_name);
+extern void get_from_name (char *from_name);
 extern int submit_news_file (char *name, int lines);
 
 /* init.c */
@@ -481,6 +484,7 @@ extern void my_strncpy (char *p, const char *q, int n);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
 extern void strcpynl (char *to, const char *from);
 extern void str_lwr (const char *src, char *dst);
+extern char * str_trim (char *string);
 
 #ifndef HAVE_STRCASECMP
 extern int strcasecmp (const char *p, const char *q);

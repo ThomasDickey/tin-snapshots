@@ -43,6 +43,7 @@ CC="$CC" \
 ./configure --verbose \
 	--disable-echo \
 	--enable-nntp-only \
+	--enable-forgery \
 	--disable-mime-strict-charset \
 	--with-domain-name="/etc/NNTP_INEWS_DOMAIN" \
         $OPTS $* 2>&1 |tee -a $OUT

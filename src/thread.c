@@ -527,7 +527,7 @@ thread_page_down:
 				break;
 
 			case iKeyThreadRedrawScr:		/* redraw screen */
-				ClearScreen ();
+				my_retouch ();
 				set_xclick_off ();
 				show_thread_page ();
 				break;

@@ -106,4 +106,8 @@
 
 #endif /* NNTP_ABLE */
 
+#ifndef MAXHOSTNAMELEN
+#	define MAXHOSTNAMELEN 255
+#endif
+
 #endif /* TNNTP_H */

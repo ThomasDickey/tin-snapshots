@@ -141,7 +141,9 @@ clear_message (void)
 		MoveCursor (cLINES, 0);
 		CleartoEOLN ();
 		cursoroff ();
+#if !USE_CURSES
 		my_flush();
+#endif
 	}
 }
 
@@ -174,9 +176,9 @@ center_line (
 		my_fputs (str, stdout);
 	}
 	
-	my_flush();
-
-	if (!cmd_line) {
+	if (cmd_line) {
+		my_flush();
+	} else {
 		if (inverse) {
 			EndInverse ();
 		}

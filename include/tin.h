@@ -665,9 +665,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #endif
 #define		NEWSRC_LINE		8192
 
-#ifndef MAXHOSTNAMELEN
-#	define MAXHOSTNAMELEN 255
-#endif
+#define MAXLINELEN 1024
 
 #ifdef HAVE_MAIL_HANDLER	/* what is that? */
 #	define	HEADER_LEN		2048

@@ -65,7 +65,7 @@ submit_inews (
 	}
 
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, full_name, from_name);
+	get_from_name (from_name);
 
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line
@@ -112,8 +112,12 @@ submit_inews (
 	sprintf (line, "Path: %s", PATHMASTER);
 	put_server (line);
 
-	sprintf (line, "From: %s", rfc1522_encode(from_name, ismail));
-	put_server (line);
+	if ((ptr = build_sender())) {
+		if(strcasecmp(from_name, ptr)) {
+			sprintf (line, "Sender: %s", rfc1522_encode(ptr,ismail));
+			put_server (line);
+		}
+	}
 #endif /* !FORGERY */
 
 	/*

@@ -313,7 +313,7 @@ feed_articles (
 		case FEED_REPOST:	/* repost article */
 #ifndef FORGERY
 			get_user_info (user_name, full_name);
-			get_from_name (user_name, full_name, from_name);
+			get_from_name (from_name);
 
 			if (strstr (from_name, arts[respnum].from)) {
 #endif
