@@ -220,6 +220,8 @@ constext *help_page[] = {
 	txt_help_p_r,
 	txt_help_x,
 	txt_help_e,
+	txt_help_p_ctrl_w,
+	txt_help_p_ctrl_e,
 		txt_help_empty_line,
 	txt_help_p_m,
 	txt_help_p_s,

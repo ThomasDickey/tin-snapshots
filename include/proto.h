@@ -329,10 +329,10 @@ extern int pgp_check_article (void);
 /* post.c */
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
 extern int mail_bug_report (void);
-extern int mail_to_author (char *group, int respnum, int copy_text);
+extern int mail_to_author (char *group, int respnum, int copy_text, int with_headers);
 extern int mail_to_someone (int respnum, char *address, int mail_to_poster, int confirm_to_mail, int *mailed_ok);
 extern int post_article (char *group, int *posted_flag);
-extern int post_response (char *group, int respnum, int copy_text);
+extern int post_response (char *group, int respnum, int copy_text, int with_headers);
 extern int repost_article (char *group, struct t_article *art, int respnum, int supersede);
 extern int reread_active_after_posting (void);
 extern t_bool user_posted_messages (void);

@@ -302,6 +302,8 @@ constext txt_help_no_advertising[] = "If ON, do not include X-Newsreader: header
 constext txt_help_o[] = "o\t  output article/thread/hot/pattern/tagged articles to printer\r\n";
 constext txt_help_p_caret_dollar[] = "^ $\t  display first ($ = last) page of article\r\n";
 constext txt_help_p_coma[] = "@\t  reverse article selections\r\n";
+constext txt_help_p_ctrl_e[] = "^E\t  reply through mail to author quoting complete headers\r\n";
+constext txt_help_p_ctrl_w[] = "^W\t  post followup to current article quoting complete headers\r\n";
 constext txt_help_p_cr[] = "<CR>\t  display first article in next thread\r\n";
 constext txt_help_p_d[] = "d\t  decode article; toggle rotate-13 for current article\r\n";
 constext txt_help_p_dot[] = ".\t  toggle article selection\r\n";
@@ -334,6 +336,7 @@ constext txt_help_post_proc_type[] = "Post process (ie. unshar) saved article/th
 constext txt_help_print_header[] = "By printing print all/part of header. <SPACE> toggles & <CR> sets.";
 constext txt_help_printer[] = "The printer program with options that is to be used to print articles/threads.";
 constext txt_help_process_only_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_prompt_followupto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_q[] = "Q\t  quit\r\n";
 constext txt_help_quote_chars[] = "Enter quotation marks, %s or %S for author's initials.";
 constext txt_help_r[] = "r\t  toggle display of all/unread articles\r\n";
@@ -542,6 +545,7 @@ constext txt_opt_post_proc_type[] = "Post process saved art/thread with : ";
 constext txt_opt_print_header[] = "Print all header when printing     : ";
 constext txt_opt_printer[] = "Printer program with options       : ";
 constext txt_opt_process_only_unread[] = "Process only unread articles       : ";
+constext txt_opt_prompt_followupto[] = "Show empty Followup-To in editor   : ";
 constext txt_opt_quote_chars[] = "Characters used as quote-marks     : ";
 constext txt_opt_reread_active_file_secs[] = "Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = "Save mail in MMDF style            : ";
@@ -734,6 +738,7 @@ constext txt_tinrc_post_process_type[] = "# type of post processing to perform a
 #endif /* M_AMIGA */
 constext txt_tinrc_print_header[] = "# if ON print all of mail header otherwise Subject: & From: lines\n";
 constext txt_tinrc_process_only_unread[] = "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n";
+constext txt_tinrc_prompt_followupto[] = "# If ON show empty Followup-To header when editing an article\n";
 constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups and replys.\n\
 # '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
 constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";

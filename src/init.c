@@ -216,6 +216,7 @@ t_bool post_8bit_header=FALSE;	/* allow 8bit chars. in header when posting to ne
 t_bool post_article_and_exit;	/* quick post of an article then exit (elm like) */
 t_bool print_header;				/* print all of mail header or just Subject: & From lines */
 t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
+t_bool prompt_followupto;    /* display empty Followup-To header in editor */
 t_bool purge_index_files;		/* stat all articles to see if they still exist */
 t_bool read_local_newsgroups_file;	/* read newsgroups file locally or via NNTP */
 t_bool read_news_via_nntp = FALSE;	/* read news locally or via NNTP */
@@ -414,6 +415,7 @@ void init_selfinfo (void)
 	post_8bit_header = FALSE;
 	print_header = FALSE;
 	process_only_unread = TRUE;
+	prompt_followupto = FALSE;
 	purge_index_files = FALSE;
 	read_local_newsgroups_file = FALSE;
 	reread_active_file = TRUE;

@@ -888,6 +888,8 @@ quick_post_article (void)
 #endif
 	msg_add_header ("Subject", subj);
 	msg_add_header ("Newsgroups", group);
+	if (prompt_followupto)
+		msg_add_header("Followup-To:", "");
 	if (psGrp && psGrp->attribute->organization != (char *) 0) {
 		msg_add_header ("Organization", psGrp->attribute->organization);
 	}
@@ -1409,14 +1411,17 @@ post_article (
 	} else {
 		msg_add_header ("Newsgroups", group);
 	}
-	if (psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
+	if (psGrp->attribute->followup_to != (char *) 0 && art_type == GROUP_TYPE_NEWS) {
+		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
+	} else {
+		if (prompt_followupto)
+			msg_add_header("Followup-To:", "");
 	}
 	if (*reply_to) {
 		msg_add_header ("Reply-To", reply_to);
 	}
-	if (psGrp->attribute->followup_to != (char *) 0 && art_type == GROUP_TYPE_NEWS) {
-		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
+	if (psGrp->attribute->organization != (char *) 0) {
+		msg_add_header ("Organization", psGrp->attribute->organization);
 	}
 	if (*my_distribution && art_type == GROUP_TYPE_NEWS) {
 		msg_add_header ("Distribution", my_distribution);
@@ -1736,7 +1741,8 @@ int /* return code is currently ignored! */
 post_response (
 	char *group,
 	int respnum,
-	int copy_text)
+	int copy_text,
+	int with_headers)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -1842,12 +1848,20 @@ post_response (
 	}
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h_followup);
+		if (prompt_followupto)
+			msg_add_header("Followup-To:",
+  			  (strchr(note_h_followup, ',') != (char *) 0) ?
+			    note_h_followup : "");
 	} else {
 		if (psGrp && psGrp->attribute->mailing_list) {
 			msg_add_header ("To", psGrp->attribute->mailing_list);
 			art_type = GROUP_TYPE_MAIL;
 		} else {
 			msg_add_header ("Newsgroups", note_h_newsgroups);
+			if (prompt_followupto)
+				msg_add_header("Followup-To:",
+	  			  (strchr(note_h_newsgroups, ',') != (char *) 0) ?
+				    note_h_newsgroups : "");
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
 				msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 			} else {
@@ -1916,7 +1930,10 @@ post_response (
 			}
 		}
 
-		fseek (note_fp, note_mark[0], 0);
+		if (with_headers)
+			fseek (note_fp, 0, 0);
+		else
+			fseek (note_fp, note_mark[0], 0);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
 			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
@@ -2410,7 +2427,8 @@ int
 mail_to_author (
 	char *group,
 	int respnum,
-	int copy_text)
+	int copy_text,
+	int with_headers)
 {
 	char buf[LEN];
 	char from_addr[HEADER_LEN];
@@ -2495,7 +2513,10 @@ mail_to_author (
 				}
 			}
 		}
-		fseek (note_fp, note_mark[0], 0);
+		if (with_headers)
+			fseek (note_fp, 0, 0);
+		else
+			fseek (note_fp, note_mark[0], 0);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
@@ -2808,6 +2829,8 @@ cancel_article (
 	strip_double_ngs (note_h_newsgroups);
 
 	msg_add_header ("Newsgroups", note_h_newsgroups);
+	if (prompt_followupto)
+		msg_add_header("Followup-To", "");	
 	sprintf (buf, "cancel %s", note_h_messageid);
 	msg_add_header ("Control", buf);
 	if (group->moderated == 'm') {

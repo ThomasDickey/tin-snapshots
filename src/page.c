@@ -75,7 +75,6 @@ show_page (
 #ifndef INDEX_DAEMON
 
 	int ch, i, n = 0;
-	int copy_text;
 	int filter_state = NO_FILTERING;
 	int mouse_click_on = TRUE;
 	int old_sort_art_type = default_sort_art_type;
@@ -411,8 +410,7 @@ begin_of_article:
 				break;
 
 			case iKeyPageToggleRot:
-			case iKeyPageToggleRot2:
-			case iKeyPageToggleRot3:	/* toggle rot-13 mode */
+			case iKeyPageToggleRot2:	/* toggle rot-13 mode */
 				rotate = (rotate ? 0 : 13);
 				redraw_page (group->name, respnum);
 				info_message (txt_toggled_rot13);
@@ -480,13 +478,15 @@ page_up:
 				break;
 
 			case iKeyPageFollowupQuote:	/* post a followup to this article */
+			case iKeyPageFollowupQuoteHeaders:
 			case iKeyPageFollowup:
 				if (!can_post) {
 					info_message (txt_cannot_post);
 					break;
 				}
-				copy_text = (ch == iKeyPageFollowupQuote ? TRUE : FALSE);
-				(void) post_response (group->name, respnum, copy_text);
+				(void) post_response (group->name, respnum, 
+				  (ch == iKeyPageFollowupQuote || ch == iKeyPageFollowupQuoteHeaders) ? TRUE : FALSE,
+				  ch == iKeyPageFollowupQuoteHeaders ? TRUE : FALSE);
 				redraw_page (group->name, respnum);
 				break;
 
@@ -623,9 +623,11 @@ return_to_index:
 				return GRP_QUIT;
 
 			case iKeyPageReplyQuote:	/* reply to author through mail */
+			case iKeyPageReplyQuoteHeaders:
 			case iKeyPageReply:
-				copy_text = (ch == iKeyPageReplyQuote ? TRUE : FALSE);
-				mail_to_author (group->name, respnum, copy_text);
+				mail_to_author (group->name, respnum,
+				  (ch == iKeyPageReplyQuote || ch == iKeyPageReplyQuoteHeaders) ? TRUE : FALSE,
+				  ch == iKeyPageReplyQuoteHeaders ? TRUE : FALSE);
 				redraw_page (group->name, respnum);
 				break;
 

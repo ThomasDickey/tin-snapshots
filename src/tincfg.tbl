@@ -15,6 +15,7 @@
 	mark_saved_read			OPT_ON_OFF
 	default_post_proc_type		txt_post_process POST_PROC_UUD_EXT_ZIP+1
 	process_only_unread		OPT_ON_OFF
+	prompt_followupto		OPT_ON_OFF
 	confirm_action			OPT_ON_OFF
 	confirm_to_quit			OPT_ON_OFF
 	draw_arrow_mark			OPT_ON_OFF

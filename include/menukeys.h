@@ -129,13 +129,6 @@
 #define iKeyUp ctrl('P')
 #define iKeyPageUp2 ctrl('U')
 
-/* active.c */
-
-#define iKeyActiveNone 'N'
-#define iKeyActiveAll 'Y'
-#define iKeyActiveNo 'n'
-#define iKeyActiveYes 'y'
-
 /* config.c */
 
 #define iKeyConfigSelect '\n'
@@ -231,6 +224,7 @@
 /* page.c */
 
 #define iKeyPageAutoSel ctrl('A')
+#define iKeyPageReplyQuoteHeaders ctrl('E')
 #ifdef HAVE_PGP
 #	define iKeyPagePGPCheckArticle ctrl('G')
 #endif
@@ -243,9 +237,9 @@
 #define iKeyPageNextThd2 '\r'
 #define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
-#define iKeyPageToggleRot ctrl('X')
+#define iKeyPageFollowupQuoteHeaders ctrl('W')
 #define iKeyPageToggleTex2iso '\"'
-#define iKeyPageToggleRot2 '%'
+#define iKeyPageToggleRot '%'
 #ifdef HAVE_COLOR
 #  define iKeyPageToggleColor '&'
 #  define iKeyPageToggleHighlight '_'
@@ -271,7 +265,7 @@
 #define iKeyPagePostHist 'W'
 #define iKeyPageFsearchAuth 'a'
 #define iKeyPageCatchup 'c'
-#define iKeyPageToggleRot3 'd'
+#define iKeyPageToggleRot2 'd'
 #define iKeyPageEdit 'e'
 #define iKeyPageFollowupQuote 'f'
 #define iKeyPageFirstPage2 'g'
