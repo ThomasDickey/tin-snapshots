@@ -428,7 +428,7 @@ backup_active (create)
 /*
  * Check for any newly created newsgroups.
  *
- * If reading news locally check the LIBDIR/active.times file. Format:
+ * If reading news locally check the NEWSLIBDIR/active.times file. Format:
  *   Groupname Seconds Creator
  *
  * If reading news via NNTP issue a NEWGROUPS command.

@@ -199,7 +199,7 @@ open_news_active_fp ()
 }
 
 /*
- * Open the LIBDIR/overview.fmt file locally or send the LIST OVERVIEW.FMT
+ * Open the NEWSLIBDIR/overview.fmt file locally or send the LIST OVERVIEW.FMT
  * command via NNTP
  */
 

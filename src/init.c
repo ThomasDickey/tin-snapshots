@@ -510,7 +510,7 @@ void init_selfinfo ()
 	 */
 
 #ifndef NNTP_ONLY
-	strcpy (libdir, get_val ("TIN_LIBDIR", LIBDIR));
+	strcpy (libdir, get_val ("TIN_LIBDIR", NEWSLIBDIR));
 	strcpy (novrootdir, get_val ("TIN_NOVROOTDIR", NOVROOTDIR));
 	strcpy (spooldir, get_val ("TIN_SPOOLDIR", SPOOLDIR));
 #endif
@@ -684,8 +684,8 @@ void init_selfinfo ()
 		goto got_active;
 
 	/*
-	 *  I hate forgetting to define LIBDIR correctly.  Guess a couple
-	 *  of the likely places if it's not where LIBDIR says it is.
+	 *  I hate forgetting to define NEWSLIBDIR correctly.  Guess a couple
+	 *  of the likely places if it's not where NEWSLIBDIR says it is.
 	 */
 	strcpy (news_active_file, "/usr/lib/news/active");
 	if (stat (news_active_file, &sb) >= 0)
@@ -700,7 +700,7 @@ void init_selfinfo ()
 		goto got_active;
 
 	/*
-	 *  Oh well. Revert to what LIBDIR says it is to produce a useful
+	 *  Oh well. Revert to what NEWSLIBDIR says it is to produce a useful
 	 *  error message when read_news_active_file () fails later.
 	 */
 	joinpath (news_active_file, libdir, ACTIVE_FILE);
@@ -869,7 +869,7 @@ GetConfigValue (name)
 		}
 
 		/*
-		 *  check LIBDIR/organization for system wide organization
+		 *  check NEWSLIBDIR/organization for system wide organization
 		 */
 		joinpath (path, libdir, "organization");
 		fp = fopen (path, "r");

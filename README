@@ -9,8 +9,11 @@ configure to your local setup (have a look at):
 	configure --help
 	conf-tin
 
+check your local setup in:
+	include/autoconf.h
+
 compile with:
-	cd src; make
+	make build (or cd src; make)
 
 install with:
 	make install

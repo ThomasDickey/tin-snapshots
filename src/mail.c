@@ -172,7 +172,7 @@ read_mailgroups_file ()
 #endif	/* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
 
 /*
- *  Load the text description from LIBDIR/newsgroups for each group into the
+ *  Load the text description from NEWSLIBDIR/newsgroups for each group into the
  *  active[] array. Save a copy locally if reading via NNTP to save bandwidth.
  */
 

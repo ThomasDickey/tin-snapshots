@@ -23,7 +23,7 @@
 #endif
 
 /*
- *  Read LIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
+ *  Read NEWSLIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
  *  Note: if the file cannot be found set the default Xref supported to TRUE
  */
 

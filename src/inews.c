@@ -196,7 +196,7 @@ get_host_name (host_name)
 
 	char *ptr, host[PATH_LEN];
 	char nntp_inews_gateway[PATH_LEN];
-#ifdef LIBDIR
+#ifdef NEWSLIBDIR
 	char sitename[PATH_LEN];
 #endif
 	FILE *fp, *sfp;
@@ -245,8 +245,8 @@ get_host_name (host_name)
 		 * Get the FQDN that the article will have from
 		 * 1 of 5 locations:
 		 *   /etc/HOSTNAME (linux)
-		 *   LIBDIR/sitename
-		 *   LIBDIR/mailname
+		 *   NEWSLIBDIR/sitename
+		 *   NEWSLIBDIR/mailname
 		 *   gethostbyname()
 		 *   uname()
 		 */
@@ -255,16 +255,16 @@ get_host_name (host_name)
 		if (sfp == (FILE *) 0)
 #endif
 		{
-#ifdef LIBDIR
-			joinpath (sitename, LIBDIR, "sitename");
+#ifdef NEWSLIBDIR
+			joinpath (sitename, NEWSLIBDIR, "sitename");
 			sfp = fopen (sitename, "r");
 #ifndef M_AMIGA
 			if (sfp == (FILE *) 0) {
-				sprintf (sitename, "%s/mailname", LIBDIR);
+				sprintf (sitename, "%s/mailname", NEWSLIBDIR);
 				sfp = fopen (sitename, "r");
 			}
 #endif /* !M_AMIGA */
-#endif /* LIBDIR */
+#endif /* NEWSLIBDIR */
 		}
 		if (sfp != (FILE *) 0) {
 			fgets (host, sizeof (host), sfp);

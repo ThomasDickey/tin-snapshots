@@ -5,59 +5,26 @@ prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 srcdir		= @srcdir@
 
-# From: address in posted articles (don't use both - read the INSTALL file)
-# Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
-INEWS_MAIL_GATEWAY	= @INEWS_MAIL_GATEWAY@
-INEWS_MAIL_DOMAIN	= @INEWS_MAIL_DOMAIN@
-#.scn.de
-#.subdomain.domain
-
-# Default nntp server (can be overridden by NNTPSERVER environment variable)
-NNTP_DEFAULT_SERVER	= @NNTP_DEFAULT_SERVER@
-#news.scn.de
-#news-server.subdomain.domain
-
-# Where are your news libdir & spooldir?
-LIBDIR		= @NEWSLIBDIR@
-SPOOLDIR	= @SPOOLDIR@
-NOVROOTDIR	= @NOVROOTDIR@
-INEWSDIR	= @INEWSDIR@
-
 # Compiler, linker & parser commands
 CC	= @CC@
 
-DEBUG	= @ENABLE_DEBUG@ -DDEBUG -DDEBUG_NEWSRC -DPROFILE
-# DEBUG_MIME DEBUG_REFS
+DEBUG	= @ENABLE_DEBUG@ -DDEBUG -DDEBUG_NEWSRC -DPROFILE -DDEBUG_MIME -DDEBUG_REFS
 CPPOPTS	= @DEFS@ -I$(INCDIR) $(DEBUG) @CPPFLAGS@
-CFLAGS	= @CFLAGS@ $(CPPOPTS) -c \
-	-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
-	-DINEWS_MAIL_DOMAIN=\"$(INEWS_MAIL_DOMAIN)\" \
-	-DNNTP_DEFAULT_SERVER=\"$(NNTP_DEFAULT_SERVER)\" \
-	-DLIBDIR=\"$(LIBDIR)\" \
-	-DSPOOLDIR=\"$(SPOOLDIR)\" \
-	-DNOVROOTDIR=\"$(NOVROOTDIR)\" \
-	-DINEWSDIR=\"$(INEWSDIR)\"
+CFLAGS	= @CFLAGS@
 
-CPROTO_OPTS = \
-	-e -m  $(CPPOPTS) \
-	-DFORGERY \
-	-DHAVE_COLOR \
-	-DHAVE_REF_THREADING
+CPROTO_OPTS = -e -m  $(CPPOPTS) -DFORGERY -DHAVE_COLOR -DHAVE_REF_THREADING
 
 LD	= $(CC)
 LDFLAGS	= @LDFLAGS@
 YACC	= @YACC@
 
-LIBS	= @LIBS@ $(INN_NNTPLIB)
+LIBS	= @LIBS@ @INN_NNTPLIB@
 
 # Where do you want the binary & manual page installed?
 INS_BINARY_DIR	= @bindir@
-INS_DAEMON_DIR	= $(LIBDIR)
+INS_DAEMON_DIR	= @NEWSLIBDIR@
 INS_MANUAL_DIR	= @mandir@/man
 INS_MANUAL_EXT	= 1
-
-# Use INN clientlibs config functions (define USE_INN_NNTPLIB in autoconf.h)
-INN_NNTPLIB= @INN_NNTPLIB@
 
 # Project
 PROJECT	= tin
@@ -230,7 +197,7 @@ all: $(BINDIR)/$(EXE)
 
 .c.o:
 @SHOW_CC@
-	@ECHO_CC@$(CC) $(CFLAGS) $*.c
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $*.c
 
 # explicit rule to allow running lint
 $(SRCDIR)/parsdate.c: $(SRCDIR)/parsdate.y

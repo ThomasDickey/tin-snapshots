@@ -1,4 +1,14 @@
---unoff BETA release 960823 --
+--unoff BETA release 960825 --
+
+160) Thomas E. Dickey <dickey@clark.net>
+     ADD. moves the remaining cpp defines out of src/Makefile.in into
+          include/autoconf.hin
+     ADD. renames LIBDIR to NEWSLIBDIR (it had been partly, breaking some
+          instances).
+     ADD. sorts include/extern.h (it's easier to manage...)
+     FIX. several supplied patches
+
+--unoff BETA release 960824 --
 
 159) Andreas Ley <ley@rz.uni-karlsruhe.de>
      Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
@@ -12,8 +22,7 @@
 --unoff BETA release 960822 --
 
 157) Jarkko Jormanainen <jarkko@utu.fi>
-     Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
-     BUG. a curly-brace was missing and one parenthesis was to much
+     BUG. a curly-brace was missing
      FIX. open.c
 
 --unoff BETA release 960821 --

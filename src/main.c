@@ -182,7 +182,7 @@ main (argc, argv)
 
 	/*
 	 *  Read text descriptions for mail & news groups from
-	 *  ~/.tin/mailgroups & LIBDIR/newsgroups respectively
+	 *  ~/.tin/mailgroups & NEWSLIBDIR/newsgroups respectively
 	 */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
