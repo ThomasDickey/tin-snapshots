@@ -1,3 +1,11 @@
+--unoff BETA release 961218 --
+
+250) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. invers videobar in article selection level is too long
+          art_mark_hot is not colored
+          (both introduced in 248 :-()
+     FIX. group.c
+
 --unoff BETA release 961216 --
 
 249) Alexander Lehmann <alex@hal.rhein-main.de>
