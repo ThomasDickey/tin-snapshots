@@ -43,7 +43,7 @@ struct archiver_t {
 	{ "lha",	"lha",		"t",		"l",		"x" },
 #else
 	{ "zoo",	"zoo",		"-test",	"-list",	"-extract" },
-#endif	
+#endif
 	{ "unzip",	"zip",		"-t",		"-l",		"-o"	},
 	{ (char *) 0,	(char *) 0,	(char *) 0,	(char *) 0,	(char *) 0 }
 };
@@ -82,10 +82,10 @@ check_start_save_any_news (check_start_save)
 	int print_first = TRUE;
 	int saved_arts = 0;
 /*	int saved_groups = 0; */
-	int unread_news = FALSE;	
+	int unread_news = FALSE;
 	time_t epoch;
 	struct t_group *group;
-	
+
 	switch (check_start_save) {
 		case CHECK_ANY_NEWS:
 		case START_ANY_NEWS:
@@ -116,7 +116,7 @@ check_start_save_any_news (check_start_save)
 			fprintf (fp_log, "%s\n\n", subject);
 			break;
 	}
-	
+
 	for (i = 0; i < group_top; i++) {
 		group = &active[my_group[i]];
 		make_group_path (group->name, group_path);
@@ -141,7 +141,7 @@ check_start_save_any_news (check_start_save)
 						/* NOTREACHED */
 					case MAIL_ANY_NEWS:
 					case SAVE_ANY_NEWS:
-						if (print_group) {	
+						if (print_group) {
 							sprintf (buf, "Saved %s...\n", group->name);
 							fprintf (fp_log, "%s", buf);
 							if (verbose) {
@@ -221,14 +221,14 @@ check_start_save_any_news (check_start_save)
 				}
 			}
 		}
-		
+
 		if (check_arts) {
 			if (verbose) {
 				sprintf (buf, "%4d unread articles in %s\n",
 					check_arts, group->name);
-				wait_message (buf); 	
+				wait_message (buf);
 			}
-			unread_news = TRUE;	
+			unread_news = TRUE;
 		}
 	}
 
@@ -298,7 +298,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 	int i = 0, ret_code = FALSE;
 	time_t epoch;
 	struct stat st;
-	
+
 	if (strlen (filename)) {
 		is_mailbox = the_mailbox;
 		i = indexnum;
@@ -306,7 +306,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 
 	file = save_filename (i);
 	strcpy (mode, "a+");
-	
+
 	if (! save[i].is_mailbox) {
 		if (stat (file, &st) != -1) {
 			ch_default = default_save_mode;
@@ -410,10 +410,10 @@ save_thread_to_file (is_mailbox, group_path)
 		note_page = art_open (arts[save[i].index].artnum, group_path);
 		if (note_page != ART_UNAVAILABLE) {
 			(void) save_art_to_file (save[i].index, i, is_mailbox, file);
-			art_close ();			
+			art_close ();
 		}
 	}
-	
+
 	first_savefile = get_first_savefile ();
 
 	if (first_savefile == (char *) 0) {
@@ -450,8 +450,8 @@ save_regex_arts (is_mailbox, group_path)
 #ifndef INDEX_DAEMON
 
 	char buf[PATH_LEN];
-	int i, ret_code = FALSE; 	
-	
+	int i, ret_code = FALSE;
+
 	for (i=0 ; i < num_save ; i++) {
 		sprintf(msg, "%s%d", txt_saving, i+1);
 		wait_message (msg);
@@ -465,11 +465,11 @@ save_regex_arts (is_mailbox, group_path)
 		note_page = art_open (arts[save[i].index].artnum, group_path);
 		if (note_page != ART_UNAVAILABLE) {
 			ret_code = save_art_to_file (save[i].index, i, is_mailbox, buf);
-			art_close ();			
+			art_close ();
 		}
 	}
 
-	if (! num_save) {	
+	if (! num_save) {
 		info_message (txt_no_match);
 	} else {
 		if (is_mailbox) {
@@ -486,7 +486,7 @@ save_regex_arts (is_mailbox, group_path)
 #else
 
 	return FALSE;
-	
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -502,7 +502,7 @@ create_path (path)
 	char buf[PATH_LEN];
 	int i, j, len;
 	struct stat st;
-	
+
 	i = my_group[cur_groupnum];
 
 	/*
@@ -610,7 +610,7 @@ create_sub_dir (i)
 			my_mkdir (dir, 0755);
 			return TRUE;
 		}
-#ifdef M_AMIGA		
+#ifdef M_AMIGA
 		if (st.st_attr & ST_DIRECT) {
 #else
 #	ifdef M_OS2
@@ -626,7 +626,7 @@ create_sub_dir (i)
 	}
 
 #endif /* INDEX_DAEMON */
-	
+
 	return FALSE;
 }
 
@@ -647,7 +647,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 	char dir[PATH_LEN];
 	char file[PATH_LEN];
 	int i;
-	
+
 	dir[0] = '\0';
 	file[0] = '\0';
 
@@ -822,7 +822,7 @@ save_comp (p1, p2)
 				}
 			} else {
 				return 0;
-			}	
+			}
 		} else if (s1->patch != (char *) 0) {
 			if (s2->patch != (char *) 0) {
 				if (strcmp (s1->patch, s2->patch) < 0) {
@@ -833,8 +833,8 @@ save_comp (p1, p2)
 				}
 			} else {
 				return 0;
-			}	
-		}	
+			}
+		}
 	} else {
 		if (strcmp (s1->subject, s2->subject) < 0) {
 			return -1;
@@ -843,7 +843,7 @@ save_comp (p1, p2)
 			return 1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -965,7 +965,7 @@ get_last_savefile ()
 {
 	char *file;
 	int i;
-	
+
 	for (i=num_save-1 ; i >= 0 ; i--) {
 		if (save[i].saved) {
 			file = (char *) my_malloc (PATH_LEN);
@@ -1097,7 +1097,7 @@ post_process_uud (pp, auto_delete)
 #endif
 	state = INITIAL;
 	open_out_file = TRUE;
-	
+
 	for (i=0 ; i < num_save ; i++) {
 		if (! save[i].saved) {
 			continue;
@@ -1212,13 +1212,13 @@ uudecode_file (pp, file_out_dir, file_out)
 	int	i, file_size = 0;
 	struct	stat st;
 
-	sprintf (buf, txt_uudecoding, file_out);			
+	sprintf (buf, txt_uudecoding, file_out);
 	wait_message (buf);
 
 #if !defined(M_UNIX)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #else
-	sleep (1);	
+	sleep (1);
 	sprintf (buf, "cd %s; uudecode %s", file_out_dir, file_out); 
 	if (invoke_cmd (buf)) {
 		/*
@@ -1296,7 +1296,7 @@ uudecode_file (pp, file_out_dir, file_out)
 					}
 					sleep (3);
 				}
-	
+
 				if (file != (char *) 0) {
 					free (file);
 				}
@@ -1387,7 +1387,7 @@ post_process_sh (auto_delete)
 								found_header = TRUE;
 							}
 						}
-					
+
 						/*
 						 *  Write to temp file
 						 */
@@ -1402,7 +1402,7 @@ post_process_sh (auto_delete)
 
 #if !defined(M_UNIX)
 			make_post_process_cmd (DEFAULT_UNSHAR, file_out_dir, file_out);
-#else	
+#else
 			sprintf (buf, "cd %s; sh %s", file_out_dir, file_out); 
 			my_fputs ("\r\n", stdout);
 			fflush (stdout);
@@ -1484,7 +1484,7 @@ delete_processed_files (auto_delete)
 		} else if (prompt_yn (cLINES, txt_delete_processed_files, TRUE) == 1) {
 			delete = TRUE;
 		}
-	
+
 		if (delete) {
 			wait_message ("\r\n");
 			wait_message (txt_deleting);
@@ -1494,7 +1494,7 @@ delete_processed_files (auto_delete)
 			}
 		}
 	}
-		
+
 #endif	/* INDEX_DAEMON */
 }
 
@@ -1502,14 +1502,14 @@ static int
 any_saved_files ()
 {
 	int i, saved = FALSE;
-	
+
 	for (i=0 ; i < num_save ; i++) {
 		if (save[i].saved) {
 			saved = TRUE;
 			break;
 		}
 	}
-	
+
 	return saved;
 }
 
@@ -1520,11 +1520,11 @@ print_art_seperator_line (fp, the_mailbox)
 {
 	int sep = 0x01;	/* Ctrl-A */
 
-	if (debug == 2) {	
+	if (debug == 2) {
 		sprintf (msg, "Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);
 		error_message (msg, "");
 	}
-	
+
 	if (the_mailbox && save_to_mmdf_mailbox) {
 		fprintf (fp, "%c%c%c%c\n", sep, sep, sep, sep);
 	} else {

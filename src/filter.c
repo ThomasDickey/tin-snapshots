@@ -886,8 +886,8 @@ filter_menu (type, group, art)
 			filtered = TRUE;
 			goto filter_done;
 
-		case iKeyFilterQuit:
-		case iKeyFilterQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			filtered = FALSE;
 			goto filter_done;
 

@@ -1183,16 +1183,24 @@ users with localized sendmail.
 .TP 4
 \fBmail_mime_encoding\fP
 MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable,7bit)
-Default is 8bit. If set to 7bit, EUC-KR/JP/CN is encoded into ISO-2022-KR/JP/CN.
-Currently, only ISO-2022-KR is implemented.
+Default is 8bit. If set to 7bit, CJK text is encoded into ISO-2022-KR/JP/CN.
+Currently, only ISO-2022-KR is implemented. No encoding(or charset conversion)
+is done(i.e. local charset is used as it is) if set to 8bit.
 .TP 4
-\fBmm_char\fP
-charset used for MIME header in news posting and mail message.
-If MIME_STRICT is defined at compile time,
+\fBmm_charset\fP
+charset supported locally, which is also used for MIME header(charset 
+parameter and charset name in header encoding)
+in mail and news posting unless local charset needs to be encoded into
+other charset as in case of ISO-2022-KR encoding of EUC-KR in mail message.
+Possible values include ISO-8859-X(where X is 1 to 10), EUC-JP,EUC-CN,
+EUC-KR,and perhaps names for various Chinese and Japanese charsets(GB,Big5,
+SJIS,Shift JIS,and so forth).
+If MIME_STRICT_CHARSET is defined at the compile time, text in
 charset other than the value of this parameter is considered 
-not displayable and replaced as '?'. Otherwise, all character
-sets are regarded as compatible with the display. The environment
-variable MM_CHARSET overrides the setting.
+not displayable and represented as '?'. Otherwise, all character
+sets are regarded as compatible with the display. If it's not set,
+the value of the environment variable MM_CHARSET is used. US-ASCII
+or compile-time default is used in case neither of them is defined.
 .TP 4
 \fBkeep_posted_articles\fP
 If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
@@ -1221,8 +1229,11 @@ Allows 8bit characters unencoded in the header of news article.
 Default is OFF. Only enacted if post_mime_encoding is also set to 8bit.
 .TP 4
 \fBpost_mime_encoding\fP
-MIME encoding of the body in news posting, if necessary (8bit, base64, quoted-printable)
-Default is 8bit.
+MIME encoding of the body in news message, if necessary. (8bit, base64, quoted-printable,7bit)
+Default is 8bit, which leads to no encoding(or charset conversion. i.e.
+local charset is posted as it is). If set to 7bit, Chinese and Japanese 
+text is encoded into ISO-2022-CN/JP(not yet implemented). 7bit is 
+equivalent to 8bit for Korean news messages. 
 .TP 4
 \fBpost_process_type\fP
 Type of post processing to perform after saving articles.

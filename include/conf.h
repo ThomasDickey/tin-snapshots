@@ -104,8 +104,11 @@ enum option_enum {
 #ifdef FORGERY
 	OPT_MAIL_ADDRESS,
 #endif
+	OPT_MM_CHARSET, 
 	OPT_POST_MIME_ENCODING,
+	OPT_POST_8BIT_HEADER,
 	OPT_MAIL_MIME_ENCODING,
+	OPT_MAIL_8BIT_HEADER,
 #ifdef HAVE_METAMAIL
 	OPT_USE_METAMAIL,
 	OPT_ASK_FOR_METAMAIL,
@@ -212,8 +215,11 @@ struct t_option option_table[]=
 #ifdef FORGERY
  ,{mail_address, OPT_STRING, NULL, 0, txt_opt_mail_address, txt_help_mail_address }
 #endif
- ,{post_mime_encoding, OPT_STRING, txt_mime_types, 3, txt_opt_post_mime_encoding, txt_help_post_mime_encoding },
-  {mail_mime_encoding, OPT_STRING, txt_mime_types, 3, txt_opt_mail_mime_encoding, txt_help_mail_mime_encoding }
+ ,{mm_charset, OPT_STRING, NULL, 0, txt_opt_mm_charset, txt_help_mm_charset },
+  {post_mime_encoding, OPT_STRING, txt_mime_types, 4, txt_opt_post_mime_encoding, txt_help_post_mime_encoding },
+  {&post_8bit_header, OPT_ON_OFF, NULL, 0, txt_opt_post_8bit_header, txt_help_post_8bit_header },
+  {mail_mime_encoding, OPT_STRING, txt_mime_types, 4, txt_opt_mail_mime_encoding, txt_help_mail_mime_encoding },
+  {&mail_8bit_header, OPT_ON_OFF, NULL, 0, txt_opt_mail_8bit_header, txt_help_mail_8bit_header }
 #ifdef HAVE_METAMAIL
  ,{&use_metamail, OPT_ON_OFF, NULL, 0, txt_opt_use_metamail, txt_help_use_metamail },
   {&ask_for_metamail, OPT_ON_OFF, NULL, 0, txt_opt_ask_for_metamail, txt_help_ask_for_metamail }

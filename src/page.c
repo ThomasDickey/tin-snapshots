@@ -487,7 +487,7 @@ page_up:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPageQuit:	/* return to index page */
+			case iKeyQuit:	/* return to index page */
 return_to_index:
 				art_close ();
 

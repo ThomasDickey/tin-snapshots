@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960815
+PVER		= 960817
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -71,6 +71,7 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c \
+	$(SRCDIR)/proto.sed \
 	$(SRCDIR)/refs.c \
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
@@ -198,6 +199,7 @@ tar:
 	@$(LS) $(PROJECT)$(VER).tgz
 
 dist:
+	@$(MAKE) configure
 	@$(MAKE) manifest
 	@$(MAKE) chmod
 	@$(MAKE) tar
@@ -212,7 +214,6 @@ distclean:
 	@$(RM) -f $(SRCDIR)/Makefile
 	@$(RM) -f td-conf.out
 	@$(RM) -f makefile
-	@$(MAKE) configure
 	
 configure: configure.in aclocal.m4
 	autoconf

@@ -89,6 +89,12 @@ o  rereading the active file is buggy, it causes crashes on some machines and
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
+o  when changing the window size while in options menu, the article/group/
+   thread overview will be displayed (depends from where you entered the
+   options menu), but you are still in the options menu. Probably, the
+   routine for the signal for window resizing must be changed at the
+   beginning of change_config_file() and be reset at the end of it.
+
 New features
 ------------
 o  add a weed-out list like in elm so the user could specify which headers

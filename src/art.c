@@ -65,7 +65,7 @@ find_base (group)
 		for (i = 0; i < top; i++) {
 			if (IGNORE_ART(i) || arts[i].inthread != FALSE) {
 				continue;
-			}	
+			}
 			if (top_base >= max_art) {
 				expand_art ();
 			}
@@ -84,7 +84,7 @@ find_base (group)
 		for (i = 0; i < top; i++) {
 			if (IGNORE_ART(i) || arts[i].inthread != FALSE) {
 				continue;
-			}	
+			}
 			if (top_base >= max_art) {
 				expand_art ();
 			}
@@ -230,7 +230,7 @@ debug_print_bitmap (group, NULL);
 #endif	/* PROFILE */
 
 		find_base (group);
-	
+
 		if ((modified || filtered) && ! update) {
 			clear_message ();
 		}
@@ -277,7 +277,7 @@ read_group (group, group_path, pcount)
 	buf[0] = '\0';
 	 
 	sprintf (progress, txt_group, group->name);
-	
+
 	/*
 	 *  Count num of arts to index so the user has an idea of index time
 	 */
@@ -305,7 +305,7 @@ read_group (group, group_path, pcount)
 		if ((respnum = valid_artnum (art)) >= 0 || art <= last_read_article) {
 			if (respnum >= 0) {
 				arts[respnum].thread = ART_NORMAL;
-			}	
+			}
 			continue;
 		}
 
@@ -465,7 +465,7 @@ make_threads (group, rethread)
 
 #if 0
 	if (debug == 2) {
-		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]", 	
+		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]", 
 				rethread, default_thread_arts, group->attribute->thread_arts);
 		error_message (msg, "");
 	}
@@ -478,7 +478,7 @@ make_threads (group, rethread)
 	 * will be date sorted.
 	 */
 	sort_arts (group->attribute->sort_art_type);
-	
+
 	/*
 	 * Reset all the ptrs to articles following the above sort
 	 */
@@ -582,7 +582,7 @@ parse_headers (buf, h)
 	}
 
 	buf[--n] = '\0';
-  	
+
 	ptr = buf;
 
 	forever {
@@ -629,7 +629,7 @@ parse_headers (buf, h)
 					}
 				}
 				break;
-			case 'S':	/* Subject:  mandatory */	
+			case 'S':	/* Subject:  mandatory */
 				if (! got_subject) {
 					if (match_header (ptrline, "Subject", buf2, HEADER_LEN)) {
 						s = eat_re (buf2);
@@ -692,7 +692,7 @@ parse_headers (buf, h)
 							s = buf2;
 							while (*s && *s != '/')
 								s++;
-							*s = '\0';	
+							*s = '\0';
 							s = buf2;
 							h->archive = hash_str (s);
 							got_archive = TRUE;
@@ -876,7 +876,7 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		if (*p)	
+		if (*p)
 			arts[top].msgid = str_dup (p);
 		else
 			arts[top].msgid = '\0';
@@ -996,7 +996,7 @@ sleep(1);
 						s = buf2;
 						while (*s && *s != '/')
 							s++;
-						*s = '\0';	
+						*s = '\0';
 						s = buf2;
 						arts[top].archive = hash_str (s);
 					}
@@ -1042,7 +1042,7 @@ vWriteNovFile (psGrp)
 	FILE	*hFp;
 	int		iNum;
 	struct	t_article *psArt;
-	
+
 	set_tin_uid_gid ();
 
 	/* 
@@ -1167,7 +1167,7 @@ pcFindNovFile (psGrp, iMode)
 
 	iHashFileName = FALSE;
 	pcDir = "";
-	
+
 	switch (psGrp->type) {
 		case GROUP_TYPE_MAIL:
 			pcDir = index_maildir;
@@ -1183,7 +1183,7 @@ pcFindNovFile (psGrp, iMode)
 			} else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);
 				sprintf (acNovFile, "%s/%s", acBuf, OVERVIEW_FILE);
-				if (iMode == R_OK) {					
+				if (iMode == R_OK) {
 					if (access (acNovFile, iMode) == 0) {
 						overview_index_filename = TRUE;
 					}
@@ -1199,14 +1199,14 @@ pcFindNovFile (psGrp, iMode)
 			}
 			break;
 	}
-	
+
 	if (iHashFileName) {
 		lHash = hash_groupname (psGrp->name);
 
 		for (iNum = 1;;iNum++) {
 
 			sprintf (acNovFile, "%s/%lu.%d", pcDir, lHash, iNum);
-		
+
 			if ((hFp = fopen (acNovFile, "r")) == (FILE *) 0) {
 				return acNovFile;
 			}
@@ -1229,7 +1229,7 @@ pcFindNovFile (psGrp, iMode)
 
 			if (STRCMPEQ(acBuf, psGrp->name)) {
 				return acNovFile;
-			}	
+			}
 		}
 	}
 
@@ -1254,7 +1254,7 @@ do_update ()
 	time_t group_time, index_time;
 	struct stat stinfo;
 #endif
-	
+
 	if (verbose) {
 		time (&beg_epoch);
 	}
@@ -1263,7 +1263,7 @@ do_update ()
 	 * load last updated times for each group (tind daemon only)
 	 */
 	read_group_times_file ();
-	
+
 	/*
 	 * loop through groups and update any required index files
 	 */
@@ -1310,7 +1310,7 @@ do_update ()
 				pcNovFile, index_time,
 				psGrp->last_updated_time, group_time);
 		}
-		
+
 		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 || 
 		    (psGrp->last_updated_time > index_time) ||
 		    (group_time > psGrp->last_updated_time) ||
@@ -1319,7 +1319,7 @@ do_update ()
 		} else {
 			continue;
 		}
-#endif		
+#endif
 
 		if (verbose) {
 			printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
@@ -1339,7 +1339,7 @@ do_update ()
 	 * save last updated times for each group (tind daemon only)
 	 */
 	write_group_times_file ();
-	
+
 	if (verbose) {
 		time (&end_epoch);
 		sprintf (msg, txt_catchup_update_info,
@@ -1459,7 +1459,7 @@ date_comp (p1, p2)
 			return 1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -1467,7 +1467,7 @@ date_comp (p1, p2)
 void
 set_article (art)
 	struct t_article *art;
-{	
+{
 	art->subject	= (char *) 0;
 	art->from	= (char *) 0;
 	art->name	= (char *) 0;
@@ -1530,14 +1530,14 @@ input_pending ()
 	static int Timeout = 0;
 	static long nfds = 1;
 	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
-	
+
 	if (poll (fds, nfds, Timeout) < 0) {
 		/* 
 		 * Error on poll 
 		 */
 		return FALSE;
 	}
-	
+
 	switch (fds[0].revents) {
 		case POLLIN:
 			return TRUE;
@@ -1570,7 +1570,7 @@ valid_artnum (art)
 	}
 	range = cur / 2;
 	cur--;
-	
+
 	forever {
 		if (arts[cur].artnum == art) {
 			return cur;
@@ -1620,8 +1620,8 @@ pcPrintDate (lSecs)
 
 	psTm = localtime (&lSecs);
 	(void) my_strftime (acDate, sizeof (acDate), "%d %b %Y %X", psTm);
-	
-	return acDate;	
+
+	return acDate;
 }
 
 static char *
@@ -1631,14 +1631,14 @@ pcPrintFrom (psArt)
 	static	char acFrom[PATH_LEN];
 
 	*acFrom = '\0';
-	
+
 	if (psArt->name != (char *) 0) {
 		sprintf (acFrom, "%s (%s)", psArt->from, psArt->name);
 	} else {
 		strcpy (acFrom, psArt->from);
 	}
-	
-	return acFrom;	
+
+	return acFrom;
 }
 #endif /* !NNTP_ONLY */
 

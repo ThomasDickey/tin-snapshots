@@ -264,6 +264,7 @@ install_manpage:
 	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
 
 install:
+	@$(MAKE) all
 	@$(ECHO) "Installing $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
 	@$(INSTALL) -s $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
 	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
@@ -271,6 +272,7 @@ install:
 	@$(MAKE) install_manpage
 
 install_setuid:
+	@$(MAKE) all
 	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
 	@$(INSTALL) -s -o news -g news -m 6755 $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
 	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)

@@ -66,7 +66,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 		}
 		set_xclick_on ();
 		ch = ReadCh ();
-		if (ch != iKeySelectQuit && ch != iKeySelectQuit2) {
+		if (ch != iKeyQuit && ch != iKeySelectQuit2) {
 			(void) resync_active_file ();
 		}
 
@@ -505,7 +505,7 @@ select_page_up:
 				}
 				break;
 
-			case iKeySelectQuit:	/* quit */
+			case iKeyQuit:	/* quit */
 select_done:
 				if (! confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
 					write_config_file (local_config_file);

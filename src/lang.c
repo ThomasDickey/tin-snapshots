@@ -271,6 +271,7 @@ constext txt_help_keep_dead_articles[] = "Keep all failed articles in ~/dead.art
 constext txt_help_keep_posted_articles[] = "Keep all posted articles in ~/Mail/posted. <SPACE> toggles & <CR> sets.";
 constext txt_help_l[] = "l\t  list articles within current thread (bring up Thread submenu)\r\n";
 constext txt_help_m[] = "m\t  move chosen group within group choices list\r\n";
+constext txt_help_mail_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_mail_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #ifdef FORGERY
 constext txt_help_mail_address[] = "Enter default mail address. <CR> sets.";
@@ -279,6 +280,7 @@ constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupna
 constext txt_help_maildir[] = "The directory where articles/threads are to be saved in mailbox format.";
 constext txt_help_mailer_format[] = "Enter %M for mailer, %S for subject, %T for to, %F for filename, <CR> to set.";
 constext txt_help_mark_saved_read[] = "Mark saved articles/threads as read. <SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_mm_charset[] = "Enter charset name for MIME (e.g. US-ASCII, ISO-8859-1, EUC-KR), <CR> to set.";
 constext txt_help_n[] = "N\t  choose next group with unread news\r\n";
 constext txt_help_news_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M MessageId %N Name %C First Name";
 constext txt_help_no_advertising[] = "If ON, do not include X-Newsreader: header. <SPACE> toggles & <CR> sets.";
@@ -312,6 +314,7 @@ constext txt_help_page_scroll[] = "Scroll half/full page of groups/articles. <SP
 constext txt_help_pipe[] = "|\t  pipe article/thread/hot/pattern/tagged articles into command\r\n";
 constext txt_help_plus[] = "+\t  select group (make \"hot\")\r\n";
 constext txt_help_pos_first_unread[] = "Put cursor at first/last unread art in groups. <SPACE> toggles & <CR> sets.";
+constext txt_help_post_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_post_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_post_proc_type[] = "Post process (ie. unshar) saved article/thread. <SPACE> toggles & <CR> sets.";
 constext txt_help_print_header[] = "By printing print all/part of header. <SPACE> toggles & <CR> sets.";
@@ -494,6 +497,7 @@ constext txt_opt_inverse_okay[] = 		"Use inverse video for page headers : ";
 constext txt_opt_keep_dead_articles[] = 	"Keep failed arts in ~/dead.articles: ";
 #endif
 constext txt_opt_keep_posted_articles[] = 	"Keep posted arts in ~/Mail/posted  : ";
+constext txt_opt_mail_8bit_header[] = 		"Use 8bit characters in mail headers: ";
 #ifdef FORGERY
 constext txt_opt_mail_address[] =		"Forged mail address                : ";
 #endif
@@ -502,10 +506,12 @@ constext txt_opt_mail_quote_format[] = 		"Quote line when mailing            : "
 constext txt_opt_maildir[] = 			"Mail directory                     : ";
 constext txt_opt_mailer_format[] = 		"Invokation of your mail command    : ";
 constext txt_opt_mark_saved_read[] = 		"Mark saved articles/threads as read: ";
+constext txt_opt_mm_charset[] = 		"MM_CHARSET                         : ";
 constext txt_opt_news_quote_format[] = 		"Quote line when following up       : ";
 constext txt_opt_no_advertising[] = 		"Insert no advertising X-Newsreader : ";
 constext txt_opt_page_scroll[] = 		"Scroll full page (OFF=half page)   : ";
 constext txt_opt_pos_first_unread[] = 		"Goto first unread article in group : ";
+constext txt_opt_post_8bit_header[] = 		"Use 8bit characters in news headers: ";
 constext txt_opt_post_mime_encoding[] = 	"MIME encoding in news messages     : ";
 constext txt_opt_print_header[] = 		"Print all header when printing     : ";
 constext txt_opt_printer[] = 			"Printer program with options       : ";
@@ -587,7 +593,7 @@ constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
 /*
  * MIME-Content-Types.
  */
-constext *txt_mime_types[] = { "8bit", "base64", "Quoted-Printable" };
+constext *txt_mime_types[] = { "8bit", "base64", "Quoted-Printable", "7bit" };
 
 /*
  * Array of possible post processing descriptions and shortkeys

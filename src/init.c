@@ -61,7 +61,7 @@ char mail_address[LEN];			/* user's mail address */
 #endif
 char mail_mime_encoding[LEN]="8bit";
 int mail_8bit_header=FALSE;               /* allow 8bit chars. in header of mail message */
-char mm_charset[LEN]="";                /* MIME charset:moved here by J. Shin */
+char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mailbox[PATH_LEN];			/* system mailbox for each user */

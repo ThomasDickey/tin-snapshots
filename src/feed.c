@@ -135,8 +135,8 @@ feed_articles (function, level, group, respnum)
 	}
 
 	switch (ch) {
-		case iKeyFeedQuit:
-		case iKeyFeedQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			clear_message ();
 			return;
 			
@@ -284,7 +284,7 @@ feed_articles (function, level, group, respnum)
 							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (! strchr ("eElLnqsu\033", proc_ch));
-						if (proc_ch == iKeyFeedQuit || proc_ch == iKeyFeedQuit2) { /* exit */
+						if (proc_ch == iKeyQuit || proc_ch == iKeyQuit2) { /* exit */
 							clear_message ();
 							return;
 						}
