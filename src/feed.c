@@ -132,48 +132,32 @@ feed_articles (function, level, group, respnum)
 	} else {
 		filename[0] = '\0';
 		ch = ch_default;
-		if (proc_ch != 'n') {
-			/* 
-			 *  Set up default for *source* / *binaries* group
-			 */
-			if (str_str (group->name, "sources", 7)) {
-				proc_ch = 's';		
-			} else if (str_str (group->name, "binaries", 8) ||
-					   function == FEED_SAVE_TAGGED) {
-				proc_ch = get_post_proc_type (group->attribute->post_proc_type);
-				if (proc_ch < POST_PROC_UUDECODE) {
-					proc_ch = 'u';
-				}
-			} else {
-				proc_ch = 's';
-			}
-		}	
-/* error_message ("S: default proc type=[%c]", proc_ch); */
 	}
 
-	if (ch == 'q' || ch == ESC) {	/* exit */
-		clear_message ();
-		return;
-	}
-	
-	if (ch == iKeyFeedPat) {
-		sprintf (msg, txt_feed_pattern, default_regex_pattern);
-		if (! prompt_string (msg, pattern)) {
+	switch (ch) {
+		case iKeyFeedQuit:
+		case iKeyFeedQuit2:
 			clear_message ();
 			return;
-		}	
-		if (strlen (pattern)) {
-			my_strncpy (default_regex_pattern, pattern, 
-				sizeof (default_regex_pattern));
-		} else {
-			if (default_regex_pattern[0]) {
-				my_strncpy (pattern, default_regex_pattern, 
+			
+		case iKeyFeedPat:
+			sprintf (msg, txt_feed_pattern, default_regex_pattern);
+			if (! prompt_string (msg, pattern)) {
+				clear_message ();
+				return;
+			}	
+			if (strlen (pattern)) {
+				my_strncpy (default_regex_pattern, pattern, 
 					sizeof (default_regex_pattern));
 			} else {
-				info_message (txt_no_match);
-				return;
+				if (default_regex_pattern[0]) {
+					my_strncpy (pattern, default_regex_pattern, 
+						sizeof (default_regex_pattern));
+				} else {
+					info_message (txt_no_match);
+					return;
+				}
 			}
-		}
 	}
 
 	switch (function) {
@@ -300,7 +284,7 @@ feed_articles (function, level, group, respnum)
 							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (! strchr ("eElLnqsu\033", proc_ch));
-						if (proc_ch == 'q' || proc_ch == ESC) {	/* exit */
+						if (proc_ch == iKeyFeedQuit || proc_ch == iKeyFeedQuit2) { /* exit */
 							clear_message ();
 							return;
 						}
@@ -497,7 +481,6 @@ feed_articles (function, level, group, respnum)
 								break;
 							case FEED_SAVE:
 							case FEED_SAVE_TAGGED:
-/* error_message ("S: default filename=[%s]", filename); */
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 							case FEED_REPOST:
@@ -596,7 +579,8 @@ feed_articles (function, level, group, respnum)
 		fflush (stdout);
 	}
 
-	redraw_screen = mail_check ();	/* in case of sending to oneself */
+	if( ! use_mailreader_i )
+		redraw_screen = mail_check ();	/* in case of sending to oneself */
 
 	if (debug == 2) {
 		printf ("REDRAW=[%d]", redraw_screen);
@@ -619,7 +603,6 @@ feed_articles (function, level, group, respnum)
 		case FEED_SAVE:
 		case FEED_SAVE_TAGGED:
 			if (proc_ch != 'n' && is_mailbox == FALSE) {
-/* error_message ("S: default post processing=[%c]", proc_ch); */
 				ret2 = post_process_files (
 					proc_ch, (function == FEED_SAVE ? FALSE : TRUE));
 			}
@@ -659,9 +642,15 @@ feed_articles (function, level, group, respnum)
 			show_group_page ();
 		}
 	}
+
 	if (function == FEED_MAIL) {	
-		sprintf (msg, txt_mailed, processed);
-		info_message (msg);
+		if( use_mailreader_i ) {
+			strcpy (msg, txt_external_mail_done);
+			info_message (msg);
+		} else {
+			sprintf (msg, txt_mailed, processed);
+			info_message (msg);
+		}
 	} else if (function == FEED_PRINT) {	
 		sprintf (msg, txt_printed, processed);
 		info_message (msg);

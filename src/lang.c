@@ -107,6 +107,7 @@ constext txt_error_header_line_missing_subject[] = "Error: the \"Subject:\" line
 constext txt_error_header_line_missing_target[] = "Error: the \"To:\" line is missing from the articles header.\n\n";
 constext txt_error_header_line_space[] = "Error: Header on line %d does not have a space after the colon:\n%s\n\n";
 constext txt_error_not_valid_newsgroup[] = "Error: \"%s\" is not a valid newsgroup!\n\n";
+constext txt_external_mail_done[] = "leaving external mailreader";
 constext txt_extracting_archive[] = "\r\n\r\nExtracting %s archive...\r\n";
 constext txt_extracting_shar[] ="\r\nExtracting %s...\r\n";
 constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %s. Exiting...";

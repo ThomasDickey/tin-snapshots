@@ -177,6 +177,7 @@ int col_normal;				/* standard foreground color */
 int col_title;				/* color of Help/Mail-Sign */
 int col_signature;			/* color of signature */
 #endif
+int use_mailreader_i;			/* invoke user's mailreader earlier to use more of its features (i = interactive) */
 int use_mouse;				/* enables/disables mouse support under xterm */
 int auto_cc;				/* add your name to cc automatically */
 int auto_bcc;				/* add your name to bcc automatically */
@@ -426,6 +427,7 @@ void init_selfinfo ()
 #endif
 	use_builtin_inews = TRUE;
 	use_keypad = FALSE;
+	use_mailreader_i = FALSE;
 	use_mouse = FALSE; /* default changed to FALSE (eb) */
 #ifdef HAVE_METAMAIL
 #	ifdef M_AMIGA

@@ -21,10 +21,12 @@
 
 /* feed.c */
 
+#define iKeyFeedQuit ESC
 #define iKeyFeedTag 'T'
 #define iKeyFeedArt 'a'
 #define iKeyFeedHot 'h'
 #define iKeyFeedPat 'p'
+#define iKeyFeedQuit2 'q'
 #define iKeyFeedRepost 'r'
 #define iKeyFeedSupersede 's'
 #define iKeyFeedThd 't'

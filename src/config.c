@@ -426,6 +426,9 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "use_builtin_inews=", &use_builtin_inews)) {
 				break;
 			}
+			if (match_boolean (buf, "use_mailreader_i=", &use_mailreader_i)) {
+				break;
+			}
 			if (match_boolean (buf, "use_mouse=", &use_mouse)) {
 				break;
 			}
@@ -529,7 +532,12 @@ write_config_file (file)
 	fprintf (fp, "# Format of mailer line including parameters\n");
 	fprintf (fp, "# %%M Mailer  %%S Subject  %%T To  %%F Filename  %%U User (AmigaDOS)\n");
 	fprintf (fp, "# ie. to use elm as your mailer:    elm -s \"%%S\" \"%%T\" < %%F\n");
+	fprintf (fp, "# ie. elm interactive          :    elm -s \"%%S\" \"%%T\" -i %%F\n");
 	fprintf (fp, "default_mailer_format=%s\n\n", default_mailer_format);
+	fprintf (fp, "# interactive mailreader: if ON mailreader will be invoked earlier for\n");
+	fprintf (fp, "# reply so you can use more of its features (eg. MIME, pgp, ...)\n");
+	fprintf (fp, "# this option has to suit default_mailer_format\n");
+	fprintf (fp, "use_mailreader_i=%s\n\n", print_boolean (use_mailreader_i));
 #ifdef FORGERY
 	if (*mail_address) {
 		fprintf (fp, "# user's mail address, if not username@host\n");

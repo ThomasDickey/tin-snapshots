@@ -644,8 +644,24 @@ write_attributes_file (file)
 	fprintf (fp, "#  news_quote_format=STRING\n#\n");
 	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n#\n");
 	fprintf (fp, "# Note that it is best to put general (global scoping)\n");
-	fprintf (fp, "# entries first followed by group specific entries.\n\n");
+	fprintf (fp, "# entries first followed by group specific entries.\n#\n");
+	fprintf (fp, "############################################################################\n\n");
 
+/*
+ * some usefull defaults 
+ */
+	fprintf (fp, "# in *sources* set post process type to shar\n");
+	fprintf (fp, "scope=*sources*\n");
+	fprintf (fp, "post_proc_type=1\n\n");
+	
+	fprintf (fp, "# in *binaries* set post process type to uudecode, remove tmp files\n");
+	fprintf (fp, "# and Followup-To: poster\n");        
+	fprintf (fp, "scope=*binaries*\n");
+	fprintf (fp, "post_proc_type=2\n");
+	fprintf (fp, "delete_tmp_files=ON\n");
+	fprintf (fp, "followup_to=poster\n\n");
+		
+	
 	for (i = 0 ; i < num_active ; i++) {
 		psGrp = &active[i];
 		fprintf (fp, "scope=%s\n", psGrp->name);

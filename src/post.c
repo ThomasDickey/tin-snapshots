@@ -1557,6 +1557,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 {
 	char nam[HEADER_LEN];
 	char subject[HEADER_LEN];
+	char mailreader_subject[PATH_LEN];      /* for calling external mailreader */
 	char ch = iKeyPostSend;
 	char ch_default = iKeyPostSend;
 	char buf[HEADER_LEN];
@@ -1581,37 +1582,41 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	}
 	chmod (nam, 0600);
 
-	msg_add_header ("To", mail_to);
+	sprintf (subject, "(fwd) %s\n", note_h_subj);
 
-	if (mail_to_poster) {
-		sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
-		msg_add_header ("Subject", subject);
-	} else {
-		sprintf (subject, "(fwd) %s\n", note_h_subj);
-		msg_add_header ("Subject", subject);
-	}
+	if( ! use_mailreader_i ) {	/* tin should start editor */
 
-	if (auto_cc) {
-		msg_add_header ("Cc", userid);
-	}
-	if (auto_bcc) {
-		msg_add_header ("Bcc", userid);
-	}
+		msg_add_header ("To", mail_to);
 
-	/*
-	 * remove duplicates from Newsgroups header
-	 */
-	strip_double_ngs(note_h_newsgroups);
+		if (mail_to_poster) {
+			sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
+			msg_add_header ("Subject", subject);
+		} else {
+			msg_add_header ("Subject", subject);
+		}
 
-	msg_add_header ("Newsgroups", note_h_newsgroups);
+		if (auto_cc) {
+			msg_add_header ("Cc", userid);
+		}
+		if (auto_bcc) {
+			msg_add_header ("Bcc", userid);
+		}
 
-	if (*default_organization) {
-		msg_add_header ("Organization", default_organization);
+		/*
+		 * remove duplicates from Newsgroups header
+		 */
+		strip_double_ngs(note_h_newsgroups);
+
+		msg_add_header ("Newsgroups", note_h_newsgroups);
+
+		if (*default_organization) {
+			msg_add_header ("Organization", default_organization);
+		}
+		if (*reply_to) {
+			msg_add_header ("Reply-To", reply_to);
+		}
+		msg_add_x_headers (msg_headers_file);
 	}
-	if (*reply_to) {
-		msg_add_header ("Reply-To", reply_to);
-	}
-	msg_add_x_headers (msg_headers_file);
 
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
@@ -1620,7 +1625,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	if (mail_to_poster) {
 		ch = iKeyPostEdit;
 		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
-														mail_quote_format)) {
+							mail_quote_format)) {
 			fprintf (fp, "%s\n", buf);
 			start_line_offset++;
 			{ char *s;
@@ -1639,14 +1644,27 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		fprintf(fp, "<------- end-of-forwarded-message --------\n");
 	}
 
+	if( ! use_mailreader_i ) {
 	msg_write_signature (fp, TRUE);
+	}
+
 #ifdef WIN32
 	putc('\0', fp);
 #endif
 	fclose (fp);
 
+	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
+		ch = iKeyPostQuit;
+		redraw_screen = TRUE;
+		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
+		my_strncpy (mail_to, address, sizeof (mail_to));
+		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		if (! invoke_cmd (buf))
+			error_message (txt_command_failed_s, buf);
+	} 
+
 	forever {
-		if (confirm_to_mail) {
+		if (confirm_to_mail && (! use_mailreader_i) ) {
 			do {
 				sprintf (msg, "%s [%.*s]: %c", txt_quit_edit_send,
 					cCOLS-36, note_h_subj, ch_default);
@@ -1896,7 +1914,7 @@ mail_bug_report ()
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-			} while (! strchr (SEND_KEYS, ch));
+		} while (! strchr (SEND_KEYS, ch));
 	}
 
 mail_bug_report_done:
@@ -1917,6 +1935,7 @@ mail_to_author (group, respnum, copy_text)
 	char nam[100];
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
+	char mailreader_subject[PATH_LEN];      /* for calling external mailreader */
 	char initials[64];
 	char ch, ch_default = iKeyPostSend;
 	FILE *fp;
@@ -1938,30 +1957,33 @@ mail_to_author (group, respnum, copy_text)
 	}
 	chmod (nam, 0600);
 
-	find_reply_to_addr (respnum, from_addr);
-
-	msg_add_header ("To", from_addr);
 	sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
-	msg_add_header ("Subject", subject);
 
-	if (auto_cc) {
-		msg_add_header ("Cc", userid);
-	}
-	if (auto_bcc) {
-		msg_add_header ("Bcc", userid);
-	}
+	if( ! use_mailreader_i ) {	/* tin should start editor */
+		find_reply_to_addr (respnum, from_addr);
 
-	/*
-	 * remove duplicates from Newsgroups header
-	 */
-	strip_double_ngs(note_h_newsgroups);
+		msg_add_header ("To", from_addr);
+		msg_add_header ("Subject", subject);
 
-	msg_add_header ("Newsgroups", note_h_newsgroups);
-	if (*default_organization) {
-		msg_add_header ("Organization", default_organization);
-	}
-	if (*reply_to) {
-		msg_add_header ("Reply-To", reply_to);
+		if (auto_cc) {
+			msg_add_header ("Cc", userid);
+		}
+		if (auto_bcc) {
+			msg_add_header ("Bcc", userid);
+		}
+
+		/*
+		 * remove duplicates from Newsgroups header
+		 */
+		strip_double_ngs(note_h_newsgroups);
+
+		msg_add_header ("Newsgroups", note_h_newsgroups);
+		if (*default_organization) {
+			msg_add_header ("Organization", default_organization);
+		}
+		if (*reply_to) {
+			msg_add_header ("Reply-To", reply_to);
+		}
 	}
 
 	start_line_offset = msg_write_headers (fp);
@@ -1985,13 +2007,26 @@ mail_to_author (group, respnum, copy_text)
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
 
+	if( ! use_mailreader_i )  {
 	msg_write_signature (fp, TRUE);
+	}
+
 #ifdef WIN32
 	putc('\0', fp);
 #endif
 	fclose (fp);
 
-	ch = iKeyPostEdit;
+	if( use_mailreader_i ) {	/* user wants to use his own mailreader for reply */
+		ch = iKeyPostQuit;
+		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
+		my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
+		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		if (! invoke_cmd (buf))
+			error_message (txt_command_failed_s, buf);
+	} else {
+		ch = iKeyPostEdit;
+	}
+
 	forever {
 		switch (ch) {
 		case iKeyPostEdit:
@@ -2047,7 +2082,7 @@ mail_to_author (group, respnum, copy_text)
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-			} while (! strchr (SEND_KEYS, ch));
+		} while (! strchr (SEND_KEYS, ch));
 	}
 
 mail_to_author_done:
@@ -2688,7 +2723,7 @@ msg_add_x_body (fp_out, body)
 	char	file[PATH_LEN];
 	char	line[HEADER_LEN];
 	FILE	*fp;
-	int		wrote = 0;
+	int	wrote = 0;
 
 	if (body) {
 		if (body[0] != '/' && body[0] != '~') {
