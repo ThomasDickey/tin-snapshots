@@ -1,0 +1,406 @@
+<html>
+<head>
+<title>Frequently Asked Questions about the TIN newsreader</title>
+</head>
+<body>
+<h2>FAQ about the TIN newsreader</h2>
+<hr>
+<h2>Contents</h2>
+<ul>
+<li><a href="faq.html#ToC01">1 General</a>
+<ul>
+<li><a href="faq.html#ToC02">What is tin and what can it do for me?</a>
+<li><a href="faq.html#ToC03">Where can I get it from?</a>
+<li><a href="faq.html#ToC04">Where should I report a bug, problem or suggestion?</a>
+<li><a href="faq.html#ToC05">What is the copyright on tin?</a>
+<li><a href="faq.html#ToC06">Can I resell tin?</a>
+<li><a href="faq.html#ToC07">Can I make changes to the source code?</a>
+</ul>
+<li><a href="faq.html#ToC08">2 Compilation</a>
+<ul>
+<li><a href="faq.html#ToC09">Tin will not compile?</a>
+<li><a href="faq.html#ToC10">Tin will not link?</a>
+</ul>
+<li><a href="faq.html#ToC11">3 Configuration</a>
+<ul>
+<li><a href="faq.html#ToC12">My articles Email address is wrong?</a>
+<li><a href="faq.html#ToC13">I want to use an editor other than vi?</a>
+<li><a href="faq.html#ToC14">I want to use my mail aliases from elm / pine?</a>
+<li><a href="faq.html#ToC15">When I use the pico editor the posted article is empty?</a>
+<li><a href="faq.html#ToC16">What is the filename +6 I edit when composing an article?</a>
+<li><a href="faq.html#ToC17">I cannot print any articles?</a>
+<li><a href="faq.html#ToC18">New newsgroups are not being detected?</a>
+<li><a href="faq.html#ToC19">There are no articles in any newsgroups?</a>
+<li><a href="faq.html#ToC20">I keep seeing the message 'article XXXX unavailable'?</a>
+<li><a href="faq.html#ToC21">I no longer see the message 'Indexing XXXX/XXXX...' entering a group?</a>
+<li><a href="faq.html#ToC22">How can I kill/auto-select articles?</a>
+<li><a href="faq.html#ToC23">How do I add a Distribution, Followup-To: etc. header to an article?</a>
+<li><a href="faq.html#ToC24">How can I post an article to multiple newsgroups?</a>
+<li><a href="faq.html#ToC25">Can I use the SPACE key to read all my news like in rn?</a>
+<li><a href="faq.html#ToC26">What are the unrecognized nntp commands in my syslog file?</a>
+<li><a href="faq.html#ToC27">When connecting via nntp I get the message 'nntp/tcp: Unknown service'?</a>
+<li><a href="faq.html#ToC28">How can I turn off the 3 line help mini-menu?</a>
+<li><a href="faq.html#ToC29">Can the confirmation prompts be turned off?</a>
+<li><a href="faq.html#ToC30">Can I save news for later reading while I'm on vacation?</a>
+<li><a href="faq.html#ToC31">What do the T A H K R letters mean at the top of the group index screen?</a>
+<li><a href="faq.html#ToC32">Is there any documentation available apart from the manual page?</a>
+<li><a href="faq.html#ToC33">Can I change the organization header for posting articles?</a>
+<li><a href="faq.html#ToC34">How can I see more of the newsgroups description text?</a>
+<li><a href="faq.html#ToC35">Why do some people claim tin doesn't thread?</a>
+</ul>
+<li><a href="faq.html#ToC36">4 Known Bugs</a>
+<ul>
+<li><a href="faq.html#ToC37">I have to press the Enter key after every command?</a>
+<li><a href="faq.html#ToC38">thread.c (677): first_thread_on_screen != 0</a>
+</ul>
+<li><a href="faq.html#ToC39">5 Acknowledgements</a>
+<ul>
+</ul>
+</ul>
+<hr>
+<h2><a name="ToC01">1 General</a></h2>
+
+<b><a name="ToC02">What is tin and what can it do for me?</a></b>
+<p>
+Tin is a netnews (also referred to as Usenet or just the news) newsreader
+that provides a full screen  easy to use text based interface with online 
+help at all levels for the Unix, AmigaDOS, OS/2 and Win32 operating systems.
+<p>
+It can read news locally from your systems news spool directory as well as
+from a remote news server via NNTP (Network News Transport Protocol). News
+overview (NOV) index files are used if available to speedup newsreading. 
+<p>
+Easy to remember commands to mail, pipe, print and save as well as auto-
+unpacking of multi-part shell archives and uuencoded articles.
+<p>
+A full screen interface to kill uninteresting and auto-select interesting
+articles allows easy tailoring to your specific interests. The concept of 
+group attributes is supported for even finer control of ones newsreading. 
+<p>
+Batch mode mailing and saving of new articles is supported (i.e., vacation).
+<p>
+A builtin NNTP inews client allows a single binary (i.e., no Pnews) to be
+installed in a distributed environment.
+<p>
+<b><a name="ToC03">Where can I get it from?</a></b>
+<p>
+<li>Unix Reference sites:<br>
+<ul>
+<pre>
+<a href="ftp://ftp.scn.de/pub/news/tin">ftp://ftp.scn.de/pub/news/tin</a>
+ftp://ftp.Germany.EU.net/pub/news/newsreader/unix/tin
+ftp://src.doc.ic.ac.uk/computing/usenet/software/readers/tin
+ftp://ftp.uwp.edu/pub/tin
+ftp://yoyo.cc.monash.edu.au/pub/tin
+</pre>
+</ul>
+<li>AmigaDOS Reference sites:  
+<ul>
+<pre>
+ftp://litaamiga.epfl.ch/pub/amiga/aminet/local/uucp
+</pre>
+</ul>
+<li>OS/2 Reference sites:
+<ul>
+<pre>
+ftp://ftp-os2.nmsu.edu/os2/2_x/network
+ftp://ftp-os2.cdrom.com/os2/2_x/network
+</pre>
+</ul>
+<li>Win32 Reference sites:
+<ul>
+<pre>
+ftp://ftp.wa.com/pub/local/ntnews/tin
+</pre>
+</ul>
+<p>
+<b><a name="ToC04">Where should I report a bug, problem or suggestion?</a></b>
+<p>
+<pre>
+Email: <a href="mailto:iain@scn.de">iain@scn.de</a>
+Snail: Iain Lea, Bruecken Str. 12, 90419 Nuernburg, Germany
+</pre>
+<p>
+Please provide as much infomation as possible when sending me a report.
+Of use would be the machine type and operating system, what options tin 
+was compiled with and a detailed description of what you were doing 
+leading upto the problem. A stacktrace from a debugger would be best.
+<p>
+A detailed report has got a lot better chance of being fixed than a 
+message that says 'Tin crashed and told me to send you a message' (sic).
+<p>
+<b><a name="ToC05">What is the copyright on tin?</a></b>
+<p>
+Copyright (c) 1991-9? by Iain Lea
+<p>
+You may  freely  copy or  redistribute  this software, so  long as there 
+is no profit made from its use, sale trade or  reproduction. You may not 
+change this copyright notice, and it must be included in any copy made.
+<p>
+<b><a name="ToC06">Can I resell tin?</a></b>
+<p>
+No (well maybe). A commercial licence will be granted if the author is
+in agreement with the intended use of the commercial venture. 
+Please send email or snail mail to above address to workout any details.
+<p>
+<b><a name="ToC07">Can I make changes to the source code?</a></b>
+<p>
+Yes. All changes must be submitted to the author for inclusion in the base
+distribution.  The author reserves the right to include submitted changes. 
+Also read the file ./doc/HACKERS that describes tin's internal structures.
+
+<h2><a name="ToC08">2  Compilation</a></h2>
+
+<b><a name="ToC09">Tin will not compile?</a></b>
+<p>
+Most problems that arise seem to center around the file ./src/curses.c
+or the include files that it tries to use. Check the ./include/config.h
+file for certain HAVE_XXX defines that control which include files to
+include for a certain operating system. Also read the file ./INSTALL.
+<p>
+<b><a name="ToC10">Tin will not link?</a></b>
+<p>
+Most problems center around operating systems that do not have the 
+network socket routines in the system library libc.a. If you look at
+the ./src/Makefile you will see for some targets a commented out line
+(i.e., a # at the start of the line) that will contain the text NETLIBS. 
+Add this line to the make rule below the LIBS line and remove the # at 
+the beginning of the moved line. Try compiling again and cross your
+fingers.
+
+<h2><a name="ToC11">3 Configuration</a></h2>
+
+<b><a name="ToC12">My articles Email address is wrong?</a></b>
+<p>
+The articles email address is something like  joe@luser  instead of the
+correct address  joe@luser.confusion.com  or maybe  joe@confusion.com
+<p>
+You should read the ./INSTALL document which documents the following two 
+./src/Makefile variables INEWS_MAIL_GATEWAY and INEWS_MAIL_DOMAIN. Both
+are documented in an abbreviated form below.  Note that only one of the 
+two variables should be defined.
+<p>
+INEWS_MAIL_GATEWAY  defines the name of your news gateway machine. Useful if 
+you don't want your internal network visible to the outside world, or if your
+inews script or NNTP server rewrites your address for you. 
+For the above example you would set  INEWS_MAIL_GATEWAY=\"confusion.com\" 
+to get the address  joe@confusion.com
+<p>
+INEWS_MAIL_DOMAIN  defines the name of your network domain (i.e, the bit to
+tag onto the end of the host and machine name). 
+For the above example you would set  INEWS_MAIL_DOMAIN=\"confusion.com\" 
+to get the address  joe@luser.confusion.com
+<p>
+If your email address ends with the string ".subdomain.domain" then your
+mail/news system has not been setup correctly. Speak to your system 
+administrator.
+<p>
+<b><a name="ToC13">I want to use an editor other than vi?</a></b>
+<p>
+<li>Edit the ./include/tin.h file to reflect the editor you want to use.
+<li>Set the shell variable VISUAL to the editor you wish to use i.e.,:
+$ setenv VISUAL emacs
+or if you are not a C-shell (csh) fan and use the bourne shell (sh)
+# VISUAL=emacs
+<p>     
+<b><a name="ToC14">I want to use my mail aliases from elm / pine?</a></b>
+<p>
+Edit the ~/.tin/tinrc file default mailer variable 'default_mailer_format=' 
+to make use of elm/pine. To use elm (as I do) you would set the line to:
+default_mailer_format=elm -s "%S" "%T" < "%F"
+which would be transformed in my case to 'elm -s "subject" "iain" < .article' 
+<p>
+<b><a name="ToC15">When I use the pico editor the posted article is empty?</a></b>
+<p>
+When setting the VISUAL shell variable (see above) make sure to use  pico -t
+<p>
+<b><a name="ToC16">What is the filename +6 I edit when composing an article?</a></b>
+<p>
+<li>Set option 2 in the options menu (M command) to OFF.
+<li>Edit the ~/.tin/tinrc file default editor variable 'default_editor_format=' 
+to make use of your own editor. To use pico you would set the line to:
+<pre>
+default_editor_format=pico -t %F
+</pre>
+which would be transformed to 'pico -t .article'
+<p>
+<b><a name="ToC17">I cannot print any articles?</a></b>
+<p>
+<li>Check what option 18 in the options menu (M command) thinks will print
+an article (usually 'lpr'). Set to the required command (I use the following 
+'a2ps -nn | lpr -h').
+<li>Make sure the printer that you specify is online and ready to print.
+<li>Speak to your onsite printer guru.
+<p>
+<b><a name="ToC18">New newsgroups are not being detected?</a></b>
+<p>
+Make sure that the file LIBDIR/active.times exists if reading news locally.
+LIBDIR will be set to the value that you specified in the ./src/Makefile
+(default is /usr/lib/news). If you still have no luck or read news via 
+nntp (i.e., remotely) consult your onsite news guru.
+<p>
+<b><a name="ToC19">There are no articles in any newsgroups?</a></b>
+<p>
+<li>Are you trying to read news on a local machine when the news is actually
+on a remote news server. Try using 'tin -r' or compiling with -DNNTP_ONLY.
+<li>Recheck your news setup (ie., Are LIBDIR and SPOOLDIR actually where you
+specified them to be in the Makefile) and speak to your news guru again. 
+<p>
+<b><a name="ToC20">I keep seeing the message 'article XXXX unavailable'?</a></b>
+<p>
+<li>If running Cnews check that the upact shell script is run daily from cron.
+<li>Run tin with the -P (purge index files) to update the expired articles
+from all the index files in the directory ~/.tin/.news
+<p>
+<b><a name="ToC21">I no longer see the message 'Indexing XXXX/XXXX...' entering a group?</a></b>
+<p>
+Your news server is creating NOV style overview files that tin can read so
+there is no need for tin to index the new articles.
+<p>
+<b><a name="ToC22">How can I kill/auto-select articles?</a></b>
+<p>
+Tin supports killing articles as well as auto-selecting articles that are
+of interest to you.  To kill articles via a menu use the Ctrl-K command.
+A single command quick-kill is possible using the ']' command.  Note that
+the quick-kill is not as configurable as the menu based kill. Its default
+kill behaviour can be set via the group attributes file (~/.tin/attributes).
+To auto-select articles of interest to you via a menu use the Ctrl-A command
+and to quick-select articles use the '[' command.
+<p>
+<b><a name="ToC23">How do I add a Distribution:, Followup-To: etc. header to an article?</a></b>
+<p>
+Extra headers can be added when editing your article to post. Simply add
+the header (ie. Followup-To:) to the beginning of the article. Don't forget
+that the keyword must be at the beginning of the line and a space must come
+after the colon ':'. For example to add the Followup-To: line to an article:
+<pre>
+Newsgroups: comp.os.linux.misc,comp.os.research
+Subject: Buffer cache idea...
+Followup-To: comp.os.research
+
+text of article
+</pre>
+<p>
+<b><a name="ToC24">How can I post an article to multiple newsgroups?</a></b>
+<p>
+The 'Newsgroups' header allows an article to be posted to multiple groups.
+Don't forget that the a space ' ' must come after the 'Newsgroups:' text
+and that each newgroup name must be separated by a comma ',' and no space.
+<pre>
+Newsgroups: comp.os.linux.misc,comp.unix.misc,comp.os.mach,alt.folklore
+Subject: Posting to multiple newsgroups
+
+text of article
+</pre>
+<p>
+<b><a name="ToC25">Can I use the SPACE key to read all my news like in rn?</a></b>
+<p>
+Use the TAB key to read all unread articles in all subscribed to newsgroups.
+<p>
+<b><a name="ToC26">What are the unrecognized nntp commands in my syslog file?</a></b>
+<p>
+The messages are printed in the syslog file because your nntp server does
+not support some of tin's nntp extensions.  If it really bugs you and you 
+don't want the extensions you can add -DDONT_HAVE_NNTP_EXTS to the COPTS 
+line in the Makefile and recompile.
+<p>
+<b><a name="ToC27">When connecting via nntp I get the message 'nntp/tcp: Unknown service'?</a></b>
+<p>
+Make sure you have the following line in your /etc/services file (or the
+'services' map if using NIS):
+<pre>
+nntp  119/tcp  usenet    # Network News Transfer                                   
+</pre>
+<p>
+<b><a name="ToC28">How can I turn off the 3 line help mini-menu?</a></b>
+<p>
+The 'H' command at any level will toggle the mini-menu on and off.
+<p>
+<b><a name="ToC29">Can the confirmation prompts be turned off?</a></b>
+<p>
+Enter the options menu (M command) and select option 4 (press 4). Using
+the space key toggle the ON to OFF.
+<p>
+<b><a name="ToC30">Can I save news for later reading while I'm on vacation?</a></b>
+<p>
+You can save news in batch mode from cron using a script as follows:
+<pre>
+#!/bin/sh
+tin -c -S -f newsrc-savegroups
+</pre>
+The -c command forces tin to mark saved articles as read in the newsrc.
+The -S command forces tin to go thru all the groups in the newsrc and
+save any unread articles to ~/News/group.name/number.
+The -f command (optional) forces user groups to be read from specified
+file instead of the default ~/.newsrc file. You should only save news
+that you really do want to read later as a couple of hundred newsgroups
+that you occasionaly browse will quickly fill up your disk/user quota.
+Therefore create another newsrc file that contains just the groups that
+you really want to save for later.
+<p>
+You can also mail unread news to someone by using the following command:
+<p>
+<pre>
+tin -c -M user@somewhere -f newsrc-mailgroups
+</pre>
+<p>
+<b><a name="ToC31">What do the T A H K R letters mean at the top of the group index screen?</a></b>
+<p>
+T is the number of threads in the group.<br>
+A is the number of articles in the group.<br>
+H is the number of hot (auto-selected) articles in the group ('*' marked).<br>
+K is the number of killed in the group.<br>
+R means that only unread articles will be displayed.<br>
+<p>
+<b><a name="ToC32">Is there any documentation available apart from the manual page?</a></b>
+<p>
+There is an 'Introduction to tin' document written by Paul Kramer that is
+included with v1.3 PL0 onwards.
+<p>
+<b><a name="ToC33">Can I change the organization header for posting articles?</a></b>
+<p>
+To set the organization field use the shell environment variable ORGANIZATION 
+(i.e., setenv ORGANIZATION text).  By using the group attributes file 
+($HOME/.tin/attributes) you can setup an organziation on a per group basis.
+<p>
+<b><a name="ToC34">How can I see more of the newsgroups description text?</a></b>
+<p>
+You need to set the maximum length of the newsgroup to be displayed. This
+can be accomplished by setting the groupname_max_length variable in tin's
+config file $HOME/.tin/tinrc to a smaller value (i.e., 25).
+<p>
+<b><a name="ToC35">Why do some people claim tin doesn't thread?</a></b>
+<p>
+Because not everyone defines threading in the same way. Those who  assert tin 
+doesn't thread consider threading to be building up a tree data structure out
+of  references lines and message-ids, allowing one to deal with  followups by
+subthread in logical response order and irrespective of subject changes. What
+tin calls threading is actually what some other newsreaders call subject/date 
+sorting. A future release of tin will support reference threading.
+<p>
+<h2><a name="ToC36">4 Known Bugs</a></h2>
+
+<b><a name="ToC37">I have to press the Enter key after every command?</a></b>
+<p>
+You probably compiled tin on Unixware or Solaris 2.X (am I right?).
+Both OS's seem to have pretty screwy terminal drivers that not setting
+the terminal to raw mode. Read the INSTALL file and look at the termio
+or termios code in the files ./include/config.h and ./src/curses.c
+<p>
+<b><a name="ToC38">thread.c (677): first_thread_on_screen != 0 </a></b>
+<p>
+You tried to kill or auto-select an article at the article viewer level.
+It is one of the best known bugs that I have been meaning to fix for a 
+long time. To fix it will require rewriting a large part of the lower
+levels of tin so don't expect it anytime soon.
+<p>
+Note: Fixed in v1.3 PL0
+<p>
+<h2><a name="ToC39">5 Acknowledgements</a></h2>
+
+I would like to thank the following people for contributing to this FAQ:
+<p>
+<hr>
+Last updated <em>950426 13:35</em>
+</body>
+</html>

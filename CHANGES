@@ -1,0 +1,1257 @@
+--950824BETA released--
+
+256) Tom Parry (parry@yoyo.cc.monash.edu.au)
+    BUG. PGP module always redirects stdout & stderr to /dev/null
+    FIX. tin.h pgp.c - applied supplied patch.
+
+255) Urs Janssen (ugdf@rz.uni-karlsruhe.de)
+    BUG. 'make sol' entry duplicates target label from sysvr4
+    FIX. Makefile - applied supplied patch.
+
+254) Roland Rosenfeld (roland@spinnaker.rhein.de)
+    BUG. X-Comment-To: does'nt work correctly with FIDO network.
+    FIX. various - applied supplied patch.
+
+--950822BETA released--
+
+253) Andrew Greer (Andrew.Greer@vuw.ac.nz)
+    ADD. Added still more VAX/VMS support.
+
+252) Mark Tomlinson (mark@garden.southern.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         + Removed some old defines from amiga smakefile
+         + Added DONT_HAVE_PIPING flag (different to NO_PIPING!)
+         * Temporary print file deleted after printing. 
+    FIX. various - applied supplied patch.
+
+251) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Bug in the body search routine when there are expired overview
+         records present, and even an access to invalid memory when
+         show_only_unread is in effect.
+    FIX. search.c - applied supplied patch.
+
+250) Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. popen() bug in previous patch.
+    FIX. various - applied supplied patch.
+
+249) Mark Tomlinson (mark@garden.equinox.gen.nz) MLT
+     Reinhard Luebke (luebke@erls02.siemens.de)  REL
+    BUG. (+ = amiga specific, * = general).
+         + Minor changes to Smakefile (REL)
+         + Use localtime over gmtime for speed (MLT)
+         + Change default printer on Amiga (REL/MLT)
+         + Obsolete amiga: target removed from Makefile (MLT)
+         + time() written to replace slow library routine (MLT)
+         + pipes improved to used named pipes (REL)
+         + curses.c patched for amiga profiler (MLT)
+         * New "sigdashes" tinrc variable (REL)
+         * New metamail tinrc variables (REL)
+         * art.c made header parsing case insensitive (MLT)
+         * art.c don't call str_dup with a blank string (MLT)
+         * attrib.c speed up reading attribute file (MLT)
+         * config.c speed up reading tinrc file (MLT)
+         * filter.c speed up reading filter file (MLT)
+         * hashstr.c speed up hash function and reduce mallocs (MLT)
+         * memory.c change calloc() to malloc() for speed (MLT)
+         * misc.c change copy_fp() to be quicker copying files (MLT)
+         * stricmp() and str_lwr() speed improved (MLT)
+         * newsrc.c small bug fixed (showed up after changing malloc call!) (MLT)
+         * page.c asking for metamail now configurable (REL)
+         * match_header speed improved (MLT)
+         * pgp.c one too many "void"s removed. (MLT)
+         * sigfile.c changed to configure sigdashes (REL)
+    FIX. various - applied supplied patch.
+
+248) Urs Janssen (ugdf@rz.uni-karlsruhe.de)
+    BUG. x_headers attribute does not work for $HOME/filename format
+    FIX. post.c - applied supplied patch.
+
+247) Urs Janssen (ugdf@rz.uni-karlsruhe.de)
+    BUG. Cannot cancel article if it has a Followup-To: line.
+    FIX. post.c - applied supplied patch.
+
+246) Olivier Lacroix (Lacroix@ciril.fr)
+    BUG. sum program after saving does not work on files such as 'abc&123'
+    FIX. save.c - applied supplied patch.
+
+245) Iain Lea (iain@scn.de)
+    ADD. Added solaris entry to src/Makefile to link in corect libs.
+
+244) Peter Van Rossem (pvrossem@vub.ac.be)
+    BUG. Problem with reading domainname when builtin inews reads from file. 
+    FIX. inews.c - apllied supplied patch.
+
+243) Bruce Momjian (root@candle.pha.pa.us)
+    BUG. Memory exhaustion on rereading active file. 
+    FIX. active.c - apllied supplied patch.
+
+--950726BETA released--
+
+242) Martin Buck (martin.buck@student.uni-ulm.de)
+    BUG. Failed to compile cleanly on HPUX 9.
+    FIX. curses.c - applied supplied patch.
+
+241) David O'Brien (obrien@Sea.Legent.com)
+    BUG. Failed to compile on FreeBSD.
+    FIX. tin.h screen.c - applied supplied patch.
+
+240) Andrew Greer (Andrew.Greer@vuw.ac.nz)
+    ADD. Added ever more VAX/VMS support.
+
+239) Steven J. Madsen (steve@erinet.com)
+    BUG. Minor PGP nitpicks.
+    FIX. README.PGP - applied supplied patch.
+
+238) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         + Change Amiga makefile for PGP
+         + Added stub for Amiga umask()
+         * Made PGP code look like "tin standard source".
+         * Removed some unix dependencies (eg /tmp) from pgp.c.
+    FIX. various - applied supplied patch.
+
+237) Jack Bryans (jbryans@csulb.edu)
+    BUG. Non-existant DONT_HAVE_NNTP_EXTS define is mentioned in INSTALL
+    FIX. INSTALL - fixed typo.
+
+236) Jeff Hurwitt (jhurwit@netcom.com)
+    BUG. An earlier patch to cancel code stopped it working on INN 1.4.
+    FIX. post.c - applied supplied patch.
+
+235) Tom Dickey (dickey@clark.net)
+    BUG. K&R cc on sunos fails to compile due to ansi c usage
+    FIX. pgp.c - changed void parameters for 2 functions.
+
+234) Steve Beaty (beaty@fc.hp.com)
+    BUG. Reading nntp from another port than 119 does not work
+    FIX. nntplib.c - applied supplied patch.
+
+--950621BETA released--
+
+233) Steven J. Madsen (smadsen@cs.muohio.edu)
+    BUG. PGP support only allows pgp to be in /usr/local/bin/pgp
+    FIX. pgp.c - applied supplied patch.
+
+232) Andrew Greer (Andrew.Greer@vuw.ac.nz)
+    ADD. Added more VAX/VMS support.
+
+231) Marty Leisner (leisner@sdsp.mc.xerox.com)
+    BUG. Tar file of source always unpacks into same dir.
+    FIX. Makefile - changed to unpack into  tin-1.X[beta-YYMMDD]
+
+--950619BETA released--
+
+230) Andrew Greer (Andrew.Greer@vuw.ac.nz)
+    ADD. Beginnings of VAX/VMS support.
+
+229) Martin Buck (martin.buck@student.uni-ulm.de)
+    BUG. Filesystem full error could be handled better using ferror()
+    FIX. various - applied supplied patch.
+
+228) Martin Kraemer (Martin.Kraemer@mch.sni.de)
+    BUG. SVR4 should use its own strftime() implementation from libc
+    FIX. various - applied supplied patch.
+
+227) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         * Added "use_metamail" flag to tinrc.
+         + Changed max length of overview record to 2048
+         + Changed Amiga metamail command to something that might work
+    FIX. various - applied supplied patch.
+
+226) Steven J. Madsen (smadsen@cs.muohio.edu)
+    ADD. PGP support for news and mail messages.
+
+225) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         * Fix command line groups to not corrupt newsrc
+         * Fix tin -w to not corrupt newsrc
+         * Fix find_group_index to not use strncmp
+         + Get around a SAS/C compiler bug in inews.c
+         * Fix screen handling for tin -w
+         * Avoid calling malloc(0) in newsrc.c
+         * Fix tabwidth calculation
+         * Fix tin -w to multiple groups
+         * Remove code bloat from add_my_group
+         * Fix tab key when reading at thread list level
+         + Update Amiga parsdate.c to match parsdate.y
+    FIX. various - applied supplied patch.
+
+224) Bruce Momjian (root@candle.pha.pa.us)
+    BUG. Cnews uses 'xref' instead of 'Xref' so crossposting inactive
+    FIX. art.c - apllied supplied patch.
+
+223) Dan Zerkle (zerkle@cs.ucdavis.edu)
+    BUG. Cancel subject header slightly wrong
+    FIX. post.c - applied fix.
+
+--950520BETA released--
+
+222) Tom Dickey (dickey@clark.net)
+    BUG. add ^T to toggle tab stops
+	     check for error conditions in post.c (cannot simply do strcpy...)
+	     check for null pattern in wildmat.c
+    FIX. various - applied supplied patch.
+
+221) Phil Edwards (pedwards@valhalla.cs.wright.edu)
+    BUG. '.' command incorrectly formatted in manual page.
+    FIX. tin.1 - added delimiter character to get formatting working.
+
+220) Bernd Ernesti (bernd@arresum.inka.de)
+    BUG. Configuration for editor wrong for NetBSD.
+    FIX. config.h tin.h - applied supplied patch.
+
+219) Iain Lea (iain@scn.de)
+    BUG. NeXT does not have strdup() routine as used in active.c line 345
+    FIX. active.c - changed to use included str_dup() routine
+
+--950515BETA released--
+
+218) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         + Fix possible one byte memory corruption in Amiga NNTP code.
+         * Change prompt_yn to return 1 (yes), 0 (no), -1 (esc).
+         * int instead of time_t in one place.
+         * Catchup now does correct thing on ESC.
+         * Fix moving a group. Could munge .newsrc in some circumstances.
+         + Put const back into typedef for constext. Works with SAS/C 6.55.
+    FIX. various - applied supplied patch.
+
+--950427BETA released--
+
+217) Nigel Ellis (nigele@microsoft.com)
+    BUG. Win32 still has a ways togo before its fully integrated.
+    FIX. various - applied supplied patch.
+
+216) Larry Schwimmer (rosebud@cyclone.Stanford.EDU)
+    BUG. HP UX complains about curses.h double definition
+    FIX. curses.c - applied supplied patch.
+
+215) Larry Schwimmer (rosebud@cyclone.Stanford.EDU)
+    BUG. OSF1 & gcc complain about prototypes and long instead of time_t
+    FIX. various - applied supplied patch.
+
+214) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. When moving a group, TIN would unread all the articles you had 
+         read in that session.
+    FIX. newsrc.c - applied supplied patch.
+
+213) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. (+ = amiga specific, * = general).
+         + Fix amiga console handling for putting Axsh into raw mode.
+         + Fix date handling on Amiga.
+         + Don't insert from headers on Amiga - it confuses postnews.
+         + Fix time handling in actived.
+         + Amiga readch() had rarely seen bug (if ever).
+         * Remove prototype for non-existent function.
+         * Don't assume \r is end of line from nntp server.
+         * Fix handling of bitmaps for unusual conditions.
+         * Don't skip an unread group when using 'C' from an article!
+    FIX. various - applied supplied patch.
+
+212) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. More Minor warts in the AmigaDOS.
+    FIX. various - applied supplied patch.
+
+--950211BETA released--
+
+211) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Using AMIGADATE again, Fixed compiling with NNTP without optimization,
+         changed some routines in art.c to static, fixed time zone handling,
+         removed purge_needed() and num_of_arts() (not used),
+         completely changed purging of overview files. Now -P only does 
+         anything useful in tind.
+         improved parse_unread_arts() so count & bitmap is always correct
+         when entering a group, regardless of what's expired, or indexed,
+         changed a chdir() to my_chdir(), don't thread expired articles!,
+         changed definition of constext to reduce linker warnings,
+         stop actived from crashing when a new group is added to the end
+         of the newsgroups file,
+         made a few items const in parsdate.c to remove more linker warnings,
+         minor change to smakefile.
+         Fix error on pressing KEYMAP_RIGHT in a group with no articles in it.
+    FIX. various - applied supplied patch.
+
+210) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Minor warts in the AmigaDOS.
+    FIX. various - applied supplied patch.
+
+209) Iain Lea (iain@scn.de)
+    BUG. When posting (via email) to a mailing list the From: line is
+         only the username ie. From: iain 
+    FIX. post.c - added insert_from_header() to submit_mail_file()
+
+208) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Groupnames longer than 128 cause SIGSEGV.
+    FIX. tin.h - applied supplied patch.
+
+207) Iain Lea (iain@scn.de)
+    BUG. Lots of dead code lying around (ie. CDROM defines)
+    FIX. various - deleted dead code for readability.
+
+206) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. If a filter rule is entered by hand in the filter file in uppercase
+         and the rule is an ignore-case type the filter will fail.
+    FIX. filter.c - added str_lwr() to lowercase string as its read in.
+
+205) Iain Lea (iain@scn.de)
+    ADD. Reading of global attributes, filter and tinrc site files before
+         reading in user copies in ~/.tin directory.
+
+--941220BETA released--
+
+------------------------------------------------------------------------------
+From this point onwards the entries are from OLDEST to NEWEST !!!
+
+CHANGES tin v1.2 PL2 -> tin 1.3 PL0
+-----------------------------------
+
+1)  Colin Perkins (csp@ohm.york.ac.uk)
+    BUG. Compile fails on Next due to use of uname()
+    FIX. config.h - applied supplied patch.
+
+2)  Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Would not compile on AmigaDOS.
+    FIX. applied supplied patch.
+
+3)  Bryan Dongray (btd@uk.cray.com)
+    BUG. nntp NEXT art routine broken from supplied 12x patch.
+    FIX. open.c - applied supplied patch.
+
+4)  bill@msi.com (Bill Potrais)
+    BUG. The FTP filename is not to intuitive and covers more that ftp.
+    FIX. renamed FTP file to HOWTOGET.
+
+5)  Andreas Borchert (borchert@mathematik.uni-ulm.de)
+    BUG. typos in the manual page.
+    FIX. tin.1 - applied supplied patch.
+
+6)  Jack Applin (neutron@fc.hp.com)
+    BUG. 'd' command at group index & thread level causes buf len to 
+         be invalid when it is used later in the routine.
+    FIX. group.c thread.c - applied supplied patch.
+
+7)  Iain Lea (iain@scn.de)
+    ADD. On linux machines automatically define HAVE_ISPELL for ispell.
+
+8)  Michael O'Reilly (oreillym@tartarus.uwa.edu.au)
+    BUG. The problem is if two groups like 'abc.def' and 'abc.def.ghi' hash 
+         to the same thing, and abc.def.ghi is earlier in the chain, then 
+           strncmp("abc.def.ghi", "abc.def", strlen("abc.def"))
+         will suceed, which you don't want as its found the wrong group.
+    FIX. active.c - applied supplied patch.
+
+9)  Tom Dickey (dickey@software.org)
+    BUG. Many variables are given values but they are never used later.
+    FIX. applied supplied patch.
+
+10) Richard Perlman ()
+    BUG. If groups are specified on the cmdline and only 1 matches then
+         it should automatically enter the group and show subjects.
+    FIX. main.c - added code to enter group if only one group matched.
+
+11) Andreas Wrede (andreas@scilink.org)
+    BUG. Would not compile on OS/2 machines.
+    FIX. applied supllied patch.
+
+12) Keith Howell (kch@edgtech.demon.co.uk)
+    BUG. qsort() causes a compiler warning on Linux machines.
+    FIX. config.h - applied supplied patch.
+
+13) Gerry Pratt (cca13@cc.keele.ac.uk)
+    BUG. mouse does not work correctly when tin is suspended in xterm.
+    FIX. signal.c - added set_xmouse_off() to all relavant points.
+         Thanx to Bryan Dongray for the patch.
+ 
+14) Iain Lea (iain@scn.de)
+    ADD. page.c - added support to display Keywords: & Summary: header lines.
+
+15) Doug Sewell (doug@cc.ysu.edu)
+    BUG. When reading news from the local spool, the Xref: support to nuke 
+         cross-postings didn't seem to be working.
+    FIX. main.c - applied supplied patch.
+
+16) Bryan Dongray (btd@uk.cray.com)
+    BUG. eat_re() function does not strip whitespace from end of subjects.
+    FIX. misc.c - applied supplied patch.
+
+17) Iain Lea (iain@scn.de)
+    BUG. Delete & Undelete group are pretty useless considering Sub & Unsub.
+    FIX. select.c - removed commands.
+
+18) Iain Lea (iain@scn.de)
+    BUG. The auto subscribe to groups the first time tin is started does
+         not save state of users initial Sub & Unsubscribe selections.
+    FIX. newsrc.c - rewrote auto_subscribe_groups().
+
+19) Iain Lea (iain@scn.de)
+    BUG. 't'ag article in unthreaded mode always does a full screen refresh.
+    FIX. group.c - rewrote tag command when in unthreaded mode.
+
+20) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. for() loop was not being correctly completed in getopt() function.
+    FIX. amiga.c os_2.c - applied supplied patch.
+
+21) Tom Parry (parry@yoyo.cc.monash.edu.au)
+    BUG. -w command line options will fail if 1st group in active is moderated.
+    FIX. post.c select.c - applied supplied patch.
+
+22) Iain Lea (iain@scn.de)
+    BUG. newsrc.c is so muddled with the sequencer & bitmap code its hard to
+         read and understand.
+    FIX. newsrc.c - started rewriting functions for simplicity.
+
+23) Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. Would not compile nntplib.c on DomainOS SR 10.4
+    FIX. Makefile - applied supplied patch.
+
+24) Geoffrey Keating (geoffk@cairo.anu.edu.au)
+    BUG. valid_artnum() variable dtop is a macro in param.h on a Pyramid.
+    FIX. art.c - applied supplied patch.
+
+25) John Schmitz <schmitz@scd.hp.com>
+    BUG. the NSETBLK macro should be NRESETBLK in the mark_group_read().
+    FIX. newsrc.c - applied supplied patch.
+
+26) Marty Leisner (leisner@sdsp.mc.xerox.com)
+    BUG. I can't seem to send a bug report in tin anymore.
+    FIX. Correctly documented man page to reflect use of 'R' for bug reports.
+
+27) Boleslaw Ciesielski (bolek@viewlogic.com)
+    BUG. -P option doesn't work at all, i.e. the expired articles are being 
+         found but they are not deleted from the index.
+    FIX. art.c - applied supplied patch.
+
+28) Toomas Tamm (toomas@chem.ut.ee)
+    BUG. Mangled Reply-To: addresses are not parsed properly.
+    FIX. post.c - process found Reply-To: address with parse_from() call.
+
+29) Jim Robinson (robinson@mdd.comm.mot.com)
+    BUG. Prototype incorrect on SunOS when compiling with -DDEBUG.
+    FIX. extern.h - applied supplied patch.
+
+30) Mike Holmes (fofp@festival.edinburgh.ac.uk)
+    BUG. '=' command does something different than help text says.
+    FIX. lang.c - updated text for '=' command.
+
+31) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. compare functions used in checking for new groups are incorrect.
+    FIX. active.c - applied supplied patch.
+
+32) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. AmigaDOS version does not check if LF on end of environment variable.
+    FIX. amiga.c - applied supplied patch.
+
+33) Iain Lea (iain@scn.de)
+    BUG. USE_CLEARSCREEN is redundant code.
+    FIX. Removed all code relating to use of USE_CLEARSCREEN.
+
+34) Iain Lea (iain@scn.de)
+    ADD. Added full support for reading and writing nov style index files.
+         Removed support for XINDEX and tin native style index files.
+
+35) Iain Lea (iain@scn.de)
+    BUG. nntpd server patch is out of date & in some cases incorrect.
+    FIX. nntpd.patch - created new patch against nntpt5.tar.gz from uu.net
+
+36) Iain Lea (iain@scn.de)
+    ADD. page.c - added 'e' command to edit an article (mailgroups only).
+
+37) Steve Alvey (steve@galadriel.bt.co.uk)
+    BUG. Problem with tin growing to ~5Mb when checking for new groups.
+    FIX. tin.h active.c - applied supplied patch.
+
+38) Iain Lea (iain@scn.de)
+    ADD. filter.c - added new article filtering routines that allow more
+         control on whats filtered. New features are filtering (kill/select)
+         on Lines:, Message-ID: as well as From: & Subject: lines.
+         Also added a expire flag that allows certain filters to be deleted
+         after a certain number of days (default 28 thats configurable in
+         ~/.tin/tinrc config file).  Filtering lists have been split into
+         global and group specific to speed up filtering.  Filters have
+         also been added that can be applied to a wildcard specified groups
+         (scope=comp.os.linux.*) in global filters list (default=*).
+         Kill command is now Ctrl-K and auto-select command is Ctrl-A.
+
+39) Mark Walker (mwalker@eece.unm.edu)
+    BUG. Tabs in newsgroup descriptions cause garbled screen.
+    FIX. mail.c - stripped tabs from newsgroups description as read.
+
+40) Juergen Schroeder (schroeii@papin.HRZ.Uni-Marburg.DE)
+    BUG. Date formats to  1 Jan 1970 under AIX.
+    FIX. config.h - added AIX to machines that HAVE_STRFTIME.
+
+41) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Updated AmigaDOS directory routines.
+    FIX. amiga.c - applied supplied patch.
+
+42) Hal Jespersen (hlj@posix.com)
+    BUG. Would not compile on AUX 3.0 machine.
+    FIX. config.h - applied supplied patch.
+
+43) Iain Lea (iain@scn.de)
+    ADD. open.c - added NNTPPORT env variable to allow tcp port other than 119.
+
+44) Ulli Horlacher (framstag@rus.uni-stuttgart.de)
+    BUG. help screen text for X command is not very clear.
+    FIX. lang.c - applied supplied patch.
+
+45) Iain Lea (iain@scn.de)
+    ADD. Added a better directory structure (doc, src, include etc.)
+
+--270194APLHA released--
+
+46) Alain Lasserre (alwin@proqnx.in-berlin.de)
+    BUG. Would not compile on QNX4.2 machine.
+    FIX. applied supplied patch.
+
+47) Iain Lea (iain@scn.de)
+    ADD. Added catchup group when leaving group with left arrow key.
+         Really allows driving tin with 4 arrow keys. Configurable
+         by tinrc option. Default is ON.
+
+48) Tom Dickey (dickey@software.org)
+    BUG. Deref'ing a NULL pointer possible in filter_articles() if filter
+         file ~/.tin/filter does not exist.
+    FIX. filter.c - applied supplied patch.
+
+49) Mark Tomlinson (mark@garden.equinox.gen.nz) & Tom Dickey (dickey@software.org)
+    BUG. newsrc routines can cause SIGSEGV 
+    FIX. applied supplied patch.
+
+50) Earle F. Ake (akee@wpdis11.wpafb.af.mil)
+    BUG. You cannot cancel your own post in a moderated group.
+    FIX. post.c - applied supplied patch.
+
+--070294APLHA released--
+
+51) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. page viewer display code was duplicated in a couple of routines.
+    FIX. applied supplied patch.
+
+52) Iain Lea (iain@scn.de)
+    BUG. The code that sets the index file is outdated and badly done.
+    FIX. art.c - rewrote pcFindNovFile() routine.
+
+53) Iain Lea (iain@scn.de)
+    ADD. New env. variables TIN_INDEX_NEWSDIR, TIN_INDEX_MAILDIR,
+         TIN_INDEX_SAVEDIR and documented them in the manual page.
+
+--150294APLHA released--
+
+54) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. new page viewer display code had a buglet in rot13 part.
+    FIX. page.c - applied supplied patch.
+
+55) Tom Dickey (dickey@software.org)
+    BUG. 'u'nthread command does not work at group level.
+    FIX. art.c - applied supplied patch.
+
+56) Iain Lea (iain@scn.de)
+    BUG. Filter expiration had a bug that causeed empty rules in filter file.
+    FIX. filter.c - added checks to the filter reading & writing routines.
+
+57) Iain Lea (iain@scn.de)
+    BUG. Does not support Y/N when subscribing to new groups that allows Y 
+         to subscribe to the rest of the groups and N to unsubscribe to the
+         rest of the new groups. yn still work the same (ie. on single groups)
+    FIX. active.c - changed prompt_subscribe_group() to handle 'YyNnq' input.
+
+--220294APLHA released--
+
+58) Ronald Orr (orr@hqrim.sedd.trw.com)
+    BUG. Explanation of builtin inews not as clear as it could be. 
+    FIX. INSTALL - applied supplied patch.
+
+59) Tom Dickey (dickey@software.org)
+    BUG. Signal hander definition code was not complete.
+    FIX. signal.c - applied supplied patch.
+
+60) Iain Lea (iain@scn.de)
+    BUG. If nntp read access is not allowed tin starts but cannot
+         read any articles.
+    FIX. open.c - added test to see if reading from server allowed.
+
+61) Tilman Burmester (tilli@aspic.han.de)
+    BUG. MIME header detection does not use "Context-Transfer-Encoding".
+    FIX. page.c - applied supplied patch.
+
+62) Tom Dickey (dickey@software.org)
+    BUG. Tagging articles does refresh screen efficently.
+    FIX. group.c - applied supplied patch.
+
+63) Sean Casey (caseys@smdis01.mcclellan.af.mil)
+    BUG. Would not compile on Pyramid machine.
+    FIX. tin.h - applied supplied patch.
+
+64) Iain Lea (iain@scn.de)
+    BUG. Articles marked by z/Z should not be reshown going to next art.
+    FIX. thread.c - ignore articles marked WILL_RETURN in next_unread()
+
+65) Tilman Burmester (tilli@aspic.han.de)
+    BUG. Updated latin-1 character set support routines.
+    FIX. charset.c page.c - applied supplied patch.
+
+66) Alain Lasserre (alwin@proqnx.in-berlin.de)
+    BUG. lAtol() was wrong on QNX4.2 machines.
+    FIX. mail.c open.c - applied supplied patch.
+
+--020394BETA released--
+
+67) Iain Lea (iain@scn.de)
+    BUG. Mail groups index files are always rebuilt when in nntp mode.
+    FIX. open.c - added check to open_xover_fp() if group type is mail.
+
+68) Iain Lea (iain@scn.de)
+    BUG. Article viewer does not update changes in article after editing.
+    FIX. mail.c - added screen redraw after editing article in mailgroups.
+
+69) Paul Kramer (pkramer@unlinfo.unl.edu)
+    ADD. doc/intro.txt - gentle introduction document to tin.
+
+70) Iain Lea (iain@scn.de)
+    BUG. Many people have problems reading the INSTALL file (or so they say).
+    FIX. INSTALL - Moved the mail address variables section to the top of file.
+
+71) Iain Lea (iain@scn.de)
+    BUG. iCopyFile() function would not compile on K&R compiler.
+    FIX. misc.c - Modified function declaration.
+
+72) Markus Kuhn (??)
+    ADD. doc/iso2asc.txt - document explaining iso2ascii encoding scheme.
+
+73) Iain Lea (iain@scn.de)
+    ADD. misc.c post.c - strfmailer() function to allow using an external
+         mailer with options specified in tinrc (ie. "elm -s %S %T < %F").
+
+74) Dan Greenspan (greenspa@elvis.rowan.edu)
+    BUG. CFLAGS is used instead of COPTS in text throughout INSTALL doc.
+    FIX. INSTALL - applied supplied patch.
+
+75) Iain Lea (iain@scn.de)
+    ADD. doc/rfc977.txt doc/rfc1036.txt news reference documents.
+
+76) Iain Lea (iain@scn.de)
+    BUG. builtin inews not producing correct Path: entry when posting.
+    FIX. inews.c - Added extra check to add domain name to hostname in Path:.
+
+77) Iain Lea (iain@scn.de)
+    BUG. Decoding uuencode articles does not always work.
+    FIX. save.c - Added better test for 'begin' line.
+
+--310394BETA released--
+
+78) Roland Rosenfeld (Roland_Rosenfeld@p13.flokiste.fido.de)
+    BUG. MET DST type dates are not parsed correctly.
+    FIX. parsdate.y - applied supplied patch.
+
+79) Jason Wessel (jwessel@uiuc.edu)
+    BUG. Would not compile on Sequent OS due to missing strtol()
+    FIX. misc.c - applied supplied patch.
+
+80) Reinhard Luebke (luebke@erls02.siemens.de)
+    ADD. ./amiga/smakefile for AmigaDOS SAS C compiler > v6.50
+
+81) Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. Buffer overrun in match_header() in page.c
+    FIX. page.c - applied supplied patch.
+
+82) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. NNTP support missing in AmigaDOS version.
+    FIX. applied supplied patch.
+
+83) Tom Parry (parry@yoyo.cc.monash.edu.au)
+    BUG. Lines: header is not added to posted articles.
+    FIX. applied supplied patch.
+
+84) Iain Lea (iain@scn.de)
+    BUG. Linux uses the file /etc/HOSTNAME for domain name info.
+    FIX. inews.c - Added test for /etc/HOSTNAME
+
+--150594BETA released--
+
+85) Iain Lea (iain@scn.de)
+    BUG. Default save filename on a per group basis not supported.
+    FIX. feed.c - Added savefile global/group attribute test for filename.
+
+86) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Misc odds & bobs.
+    FIX. applied supplied patch.
+
+87) Iain Lea (iain@scn.de)
+    ADD. ./doc/FAQ to answer frequently asked questions.
+
+88) Iain Lea (iain@scn.de)
+    BUG. Mouse support cannot be switched OFF if running in a xterm.
+    FIX. Added 'use_mouse=' tinrc variable to switch mouse support ON/OFF.
+
+89) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. NNTP support for AmigaDOS will not compile.
+    FIX. applied supplied patch.
+
+90) James Morris (jmorris@aurora.apana.org.au)
+    BUG. HOME shell variable could overwrite buffer length.
+    FIX. init.c - applied supplied patch.
+
+91) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. DEFAULT_MAILER define for AmigaDOS incorrect.
+    FIX. tin.h - applied supplied patch.
+
+92) Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. Using random sigs causes pwd to be changed when leaving tin.
+    FIX. sigfile.c - applied supplied patch.
+
+93) Iain Lea (iain@scn.de)
+    BUG. Group attributes only work on a per group basis. Would be
+         good to have them scope over groups that cover the same
+         theme ie. *sources* or comp.os.linux.*
+    FIX. attrib.c - changed to support attribute scoping over more
+         than 1 group. Changed group= keyword to scope= 
+
+94) Iain Lea (iain@scn.de)
+    ADD. attrib.c filter.c - added quick_{kill|select}_scope attributes
+         to allow finer control over kill & auto-select scoping using 
+         the quick kill ('[') and auto-select (']') commands.
+
+--940606BETA released--
+
+95) Andreas Wrede (andreas@planix.com)
+    BUG. Compiling with -DDEBUG caused errors in debug.c
+    FIX. debug.c - changed filter_ to quick_ in attributes.
+
+96) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Options in Amiga smakefile needed changing.
+    FIX. smakefile - applied supplied patch.
+
+97) Iain Lea (iain@scn.de)
+    BUG. ISO2ASC charset conversion was always on.
+    FIX. tin.h init.c - Added DEFAULT_ISO2ASC define that allows setting
+         default decoding table to use. Can be overridden by the ISO2ASC
+         shell variable.
+
+98) Iain Lea (iain@scn.de)
+    ADD. attrib.c groups.c - Added auto_select= group attribute that when
+         set to ON only hot articles will be shown when entering a group.
+         Non-hot unread articles can be viewed by using the 'X' command.
+
+99) Richard Lloyd (rk@csc.liv.ac.uk)
+    BUG. HP 800 series machines do not have the poll() system call.
+    FIX. config.h - applied supplied patch.
+
+100) Troy Cauble (troy@neural.neural.att.com)
+    BUG. SIGSEGV when printing an article that has From name butno Username.
+    FIX. feed.c - applied aupplied patch.
+
+101) Steve Beaty (beaty@craycos.com)
+    BUG. New mail indeicator could sometimes be wrong.
+    FIX. misc.c - applied supplied patch.
+
+102) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Newsrc parsing still suspect.
+    FIX. amiga.c newsrc.c - applied supplied patch.
+
+103) Ralf W. Stephan (ralf@ark.btbg.sub.de)
+    BUG. 'm' mail thread and then q)uit still mails the thread.
+    FIX. feed.c - applied supplied patch.
+
+104) Tom Dickey (dickey@clark.net)
+    BUG. Various portability issues.
+    FIX. applied supplied patch.
+
+--940628BETA released--
+
+105) Oleg Ohotnikov (oleg@izhmark.udmurtia.su)
+    BUG. FIDO gated messages need to support X-Comment-To: headers
+    FIX. page.c post.c - applied supplied patch.
+
+106) Ralf W. Stephan (ralf@ark.btbg.sub.de)
+    BUG. Manual page incorrectly documented article tagging.
+    FIX. tin.1 - applied supplied patch.
+
+107) Iain Lea (iain@scn.de)
+    BUG. Articles can be posted with an incomplete From: line.
+    FIX. inews.c - Check to see if a '.' exists after the '@' in From: line.
+
+108) Alan Silverstein (ajs@hpfcajs.fc.hp.com)
+    BUG. Posting of badly formatted articles should be warned against.
+    FIX. post.c - applied supplied patch.
+
+109) Iain Lea (iain@scn.de)
+    BUG. 'S' command only applies regex to yanked in groups after a 'y'
+         when the user may not know about the required yank in step.
+    FIX. select.c - Checked all of active file after .newsrc groups.
+
+110) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Indexing indicator 10/23 overwrites ... in prompt string
+    FIX. screen.c - set temp variable in show_progess() to NULL.
+
+111) Iain Lea (iain@scn.de)
+    ADD. added spin cursor routine to give user progress report.
+
+112) Iain Lea (iain@scn.de)
+    ADD. config.c group.c - added auto_list_thread= tinrc variable to
+         automatically list thread when entering it using right arrow
+         key.
+
+--940713BETA released--
+
+113) Iain Lea (iain@scn.de)
+    BUG. Kill command within page level when called from thread level 
+         caused assert() 
+    FIX. page.c thread.c - If kill worked then return to group index level.
+
+114) Bruce Hague (bruceh@cv.hp.com)
+    BUG. When 'n' pressed at catchup group prompt it should return to 
+         group selection level leaving group unread.
+    FIX. group.c - moved return code outside catchup if ().
+
+--940718BETA released--
+
+115) Iain Lea (iain@scn.de)
+    BUG. When S command is used the groupnames length are not updated.
+    FIX. select.c - added a set_groupname_len() call to 'S' command.
+
+116) Tom Dickey (dickey@clark.net)
+    BUG. Various portability issues.
+    FIX. applied supplied patch.
+
+117) Ralf Stephan (ralf@ark.franken.de)
+    BUG. Man page wrongly documents 'o' and 't' commands.
+    FIX. tin.1 - applied supplied patch.
+
+118) Iain Lea (iain@scn.de)
+    ADD. Removed -p and added -C cmd line option.
+
+119) Iain Lea (iain@scn.de)
+    BUG. When telnet fails tin goes into 90% Cpu state.
+    FIX. signal.c - commented out SIGHUP redirection.
+
+--940725BETA released--
+
+120) Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. 'x' repost article command does not work.
+    FIX. feed.c post.c - applied supplied patch.
+
+121) Paul Kramer (pkramer@unlinfo.unl.edu)
+    ADD. doc/cmdref[1234].txt - command reference guide.
+
+122) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Case sensitive filtering does not always work.
+    FIX. filter.c - applied supplied patch.
+
+123) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. AmigaDOS has 64K text segments that are overrun due to lang.c
+    FIX. extern.h lang.c - applied supplied patch.
+
+--940801BETA released--
+
+124) Iain Lea (iain@scn.de)
+    BUG. 'C' catches up ok but goes to next group instead of next unread.
+    FIX. group.c page.c - added code to TAB into next unread group.
+
+125) Iain Lea (iain@scn.de)
+    ADD. page.c - added quick_{kill|select} '[' & ']' filter commands.
+         to article viewer level.
+
+126) Iain Lea (iain@scn.de)
+    BUG. Article kill & auto-select on Lines: header (useful in *source*)
+         groups does not work.
+    FIX. filter.c - rewrote Lines: filtering code to work with == < >num
+         ie. <10 selects/kills articles with less than 10 lines while
+         >300 selects/kills articles with more than 300 lines. Entering
+         just 22 selects/kills articles with exactly 22 lines.
+
+127) Iain Lea (iain@scn.de)
+    BUG. Articles marked as  auto-selected are still being tested against.
+    FIX. filter.c - Added test to not filter on already selected articles.
+
+--940808BETA released--
+
+128) Andreas Wrede (andreas@planix.com)
+    BUG. Compiling with -DDEBUG caused errors in debug.c
+    FIX. debug.c - applied supplied patch.
+
+129) Iain Lea (iain@scn.de)
+    BUG. Answering 'n' to reconnect to server does not exit immediately.
+    FIX. misc.c - Added test to check if tin_done() retcode was nntp error.
+
+130) Mark Tomlinson (mark@garden.equinox.gen.nz)
+     Reinhard Luebke (luebke@erls02.siemens.de)
+    BUG. Added extra unix type functionality to AmigaDOS port.
+    FIX. applied supplied patch.
+
+131) Tom Parry (parry@yoyo.cc.monash.edu.au)
+    BUG. If nov files are stored under a directory with a '.' in its name
+         it will never be found due to vMakeGrpPath() replacing with '/'.
+    FIX. mail.c - applied supplied patch.
+
+132) Iain Lea (iain@scn.de)
+    BUG. A '\n' in a nov header line causes the parsing to return an error.
+    FIX. art.c - Change all '\n' in the headers to a ' '.
+
+133) Ralf Stephan (ralf@ark.franken.de)
+    BUG. Man page typos.
+    FIX. tin.1 - applied supplied patch.
+
+134) Ralf Stephan (ralf@ark.franken.de)
+    ADD. German language manual page.
+
+--940815BETA released--
+
+135) Steve Robbins (steve@cim.mcgill.ca)
+    ADD. menukeys.h *.c - the beginning of multi-language support.
+
+136) Iain Lea (iain@scn.de)
+    CHANGE. Mouse under xterm is now more consistant at all levels:
+              Button1 - enter next level if on a article otherwise page down.
+              Button2 - return to upper level if on a article otherwise page up.
+              Button3 - position on article line under mouse cursor.
+            Also added support for mouse clicking at article page level:
+              Button1 - enter next level if on a article otherwise page down.
+              Button2 - return to upper level if on a article otherwise page up.
+              Button3 - position on article line under mouse cursor.
+
+137) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. newsrc is reread to often on AmigaDOS.
+    FIX. signal.c - applied supplied patch.
+
+138) Iain Lea (iain@scn.de)
+    BUG. When mail/save/print/repost/pipe commands are used read articles
+         are processed as well as unread. Not good if trying to save just
+         the new articles in a thread etc.
+    FIX. feed.c - added check to only process unread articles.
+
+139) Steve Beaty (beaty@craycos.com)
+    BUG. Newsrc files permissions are changed to 644 by tin (not good for
+         prying eyes)
+    FIX. newsrc.c - applied supplied patch.
+
+140) Harald Milz (hm@seneca.ix.de)
+    BUG. make install_manpage target does not work.
+    FIX. src/Makefile - fixed to use new variables INS_MANUAL_*.
+
+141) Nigel Ellis (nigele@microsoft.com) & Piers Haken (piersh@microsoft.com)
+    ADD. Win32 support.
+
+--940826BETA released--
+
+142) Iain Lea (iain@scn.de)
+    BUG. From: lines containing  "subdomain.domain" are allowed.
+    FIX. inews.c - added check for "subdomain.domain" in From: line.
+
+143) Tim Rice (timr@crl.com)
+    BUG. timeout variable in art.c cause a compile error on Altos machines.
+    FIX. art.c - applied supplied patch
+
+144) Iain Lea (iain@scn.de)
+    BUG. Pressing a Q can sometimes be due to CAPSLOCK and on a slow line
+         one will have to wait while it loads.
+    FIX. select.c - added y/n prompt to quit tin.
+
+145) Tom Parry (parry@yoyo.cc.monash.edu.au)
+    BUG. New mail check returns true even if mailbox is size 0.
+    FIX. misc.c - applied supplied patch.
+
+146) Iain Lea (iain@scn.de)
+    BUG. Writing newsrc causes 0 length file if filesystem full. 
+    FIX. newsrc.c - added check to see if newnewsrc size is 0 and if so
+         don't rename it newsrc therefore keeping old state.
+
+147) Prentiss Riddle (riddle@is.rice.edu)
+    ADD. group.c - added 'M' flag to group title if moderated group.
+
+148) Dave Hill (davidh@harston.cv.com)
+    BUG. hash_groupname() returns wrong groupname in *rare* cases.
+    FIX. active.c - applied supplied patch.
+
+149) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Purify found an unitialized memory read in strip_line().
+    FIX. select.c - applied supplied patch.
+
+150) Iain Lea (iain@scn.de)
+    ADD. config.c - added tinrc variable 'process_only_unread=' to control
+         if all/just unread articles are to be piped/saved/mailed etc.
+
+--941010BETA released--
+
+151) Iain Lea (iain@scn.de)
+    BUG. Tagging multiple articles for uudecod'ing only does the first one.
+    FIX. save.c - added more intelligent processing of each file.
+
+152) Iain Lea (iain@scn.de)
+    BUG. If kill rule is before select rule on same text in filter array
+         the kill will succeed even though select should have priority.
+    FIX. filter.c - changed write filter file to do 2 passes over filter
+         rules so that select rules are written before kill rules.
+
+153) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. More fixes for the AmigaDOS support
+    FIX. amiga/* - applied supplied patch.
+
+154) Steve Robbins (steve@cim.mcgill.ca)
+    FIX. hardcoded language strings in prompt_yn() routine.
+    ADD. menukeys.h *.c - applied supplied patch.
+
+155) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Purify found a memory leak in quick_filter_select_posted_art().
+    FIX. filter.c - applied supplied patch.
+
+156) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Yes/no prompt when quitting cannot be turned off.
+    FIX. config.c select.c - added a confirm_quit tinrc variable.
+
+--941027BETA released--
+
+157) Andreas Siegert (afx@ibm.de)
+    BUG. IBM AIX xlc compiler barfs on char bitfield in tin.h
+    FIX. tin.h - applied supplied patch.
+
+158) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Mark thread unread is not documented in help screen.
+    FIX. lang.c - applied supplied patch.
+
+159) Tom Dickey (dickey@clark.net)
+    BUG. ART_ADJUST macro for art count in thread is wrong.
+    FIX. group.c - applied supplied patch.
+
+160) Nigel Ellis (nigele@microsoft.com)
+    BUG. Win32 support still not fully implemented.
+    FIX. various - applied supplied patch.
+
+--941028BETA released--
+
+161) Larry Schwimmer (scwimm@cyclone.stanford.edu)
+    BUG. Posting an article on SunOS causes SIGSEGV.
+    FIX. post.c - check if pcFindArtHeader() returns valid value.
+
+162) Iain Lea (iain@scn.de)
+    ADD. post.c - added post & response to mailing lists that have 
+         been gatewayed into news groups. 'w' post & 'f' follow-up
+         article mail message to mailing list address specified in
+         attributes file mailing_list=list@somewhere.org
+         Useful to me for particapating in the Linux mailing lists.
+         I have the following entries in ~/.tin/attributes file:
+           #  mailing_list=STRING (ie. majordomo@list.org)
+           #  x_headers=STRING (ie. ~/.tin/extra-headers)
+           scope=list.linux.*
+           mailing_list=linux-activists@niksula.hut.fi
+
+           scope=list.linux.kernel
+           x_headers=X-Mn-Key: KERNEL
+
+           scope=list.linux.net
+           x_headers=X-Mn-Key: NET
+    NOTE: Look at the doc/attrib.txt file for examples!
+
+163) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Win32 net code could be seperated into win32tcp.[ch] files.
+    FIX. amiga/* nntplib.c - applied supplied patch.
+
+164) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Reconnect to nntp server not fully implemented.
+    FIX. nntplib.c - applied supplied patch.
+
+165) Tom Dickey (dickey@clark.net)
+    BUG. Proto target wrong in Makefile and minor nitpickings.
+    FIX. Makefile various - applied supplied patch.
+
+166) Helmut Geyer (??)
+    BUG. Tagged articles should be processed irrespective of whether
+         they are read or unread.
+    FIX. feed.c - removed unread check for tagged articles.
+
+167) Iain Lea (iain@scn.de)
+    BUG. Writing of message header lines should be consistant.
+    FIX. post.c - added msg_[init|add|write|free]_header(s) routines.
+
+--941107BETA released--
+
+168) Dave Schweisguth (dcs@proton.chem.yale.edu)
+    BUG. wintcp.h is #included but file does not exist.
+    FIX. nntplib.c win32tcp.c - changed wintcp.h to win32tcp.h
+
+169) Iain Lea (iain@scn.de)
+    BUG. Adding user defined headers to messages is pretty awkward.
+    FIX. init.c post.c - reads contents of ~/.tin/headers file that
+         contains header lines to add to created mail/news messages.
+         ie.  Organization: Bits & Bobs Inc.
+
+170) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Purify found a memory leak in check_article_to_be_posted().
+    FIX. post.c - applied supplied patch.
+
+171) Bruce Hague (bruceh@cv.hp.com)
+    BUG. Posting and mailing seem to have been broken since last beta.
+    FIX. post.c - fixed minor problems in msg_write_headers().
+
+172) Tom Dickey (dickey@clark.net)
+    BUG. Minor nitpickings ie. int -> size_t.
+    FIX. various - applied supplied patch.
+
+--941109BETA released--
+
+173) Tom Dickey (dickey@clark.net)
+    BUG. Mouse actions in xterm are not 100% (+ minor nitpicks).
+    FIX. various doc/tin.1 - applied supplied patch.
+
+175) Iain Lea (iain@scn.de)
+    BUG. delete_article() does not use msg_*_header() routines.
+    FIX. post.c - added msg_*_header(s) routines to delete_article().
+
+176) Iain Lea (iain@scn.de)
+    ADD. post.c - added automatic saving of posted & followup-to messages
+         to ~/Mail/posted mailbox file. Can be turned off by default by 
+         adding following 2 lines to ~/.tin/attributes file:
+           scope=*
+           auto_save_msg=OFF
+
+177) Iain Lea (iain@scn.de)
+    ADD. post.c - added attribute variable  x_body=  to add bolierplate 
+         text to message body when posting or following upto a message.
+           scope=comp.*
+           x_body=/usr/lib/news/company-disclaimer
+    NOTE: Look at the doc/attrib.txt file for examples!
+
+178) Iain Lea (iain@scn.de)
+    ADD. doc/forward.txt doc/procmail.txt - added example files that I use
+         to gateway the linux mailing lists into local newsgroups.
+
+179) Iain Lea (iain@scn.de)
+    BUG. setup_base() does not issue nntp LISTGROUP command if not talking
+         to an INN server. That was correct but the newer nntp t6 reference
+         implementation and maybe others also support this.
+    FIX. open.c - removed inn_nntp_server check.
+
+180) Nigel Ellis (nigele@microsoft.com)
+    ADD. various - Further support for Win32.
+
+181) Iain Lea (iain@scn.de)
+    BUG. Append to and overwrite a file when saving a message not supported.
+    FIX. open.c - added append/overwrite logic to save_art_to_file().
+
+--941114BETA released--
+
+182) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Amiga stack checking, added BBS mode (-B) for secure file
+         operations, fixed some prototypes to allo -DDEBUG to work,
+         added help messages for some options, fixed reading of arts 
+         beyond max number in active file, fixed/simplified file name
+         handling in save.c, minor change to makefile and make sure 
+         all temporary NNTP files are deleted on exit.
+    FIX. various - applied supplied patch.
+
+183) Iain Lea (iain@scn.de)
+    ADD. doc/son1036.txt - Son of RFC 1036 document for Usenet standards.
+
+184) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Increased timeout in amiga TCP code, changed cursor rendition so
+         that it is now usable by other OS's. Fixed window size/cursor 
+         rendition for non-console Amiga terminals. Since amiga's parsdate
+         is separate, added a few __far's on constant data to cut down on
+         copied data section. (Saves 2K of memory for the first user, and 
+         4K for each subsequent user!).
+    FIX. various - applied supplied patch.
+
+185) Larry Schwimmer (rosebud@cyclone.stanford.edu)
+    BUG. DEFAULT_EDITOR should also be settable via Makefile.
+    FIX. tin.h Makefile - applied supplied patch.
+
+--941121BETA released--
+
+186) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. MoveCursor caused an illegal memory hit if curses wasn't initialised
+         under AmigaDOS/OS2/Win. Fixed searching for HOSTNAME for AmigaDOS.
+         Inews put incorrect path when NNTP_INEWS_DOMAIN didn't begin with '.'.
+    FIX. various - applied supplied patch.
+
+187) David Tiller (dtiller@rmc.edu)
+    BUG. If you answer no to append to existing file question you get SIGSEGV.
+    FIX. save.c - applied supplied patch.
+
+188) Iain Lea (iain@scn.de)
+    BUG. Post processing and deleting tmp files still called if nothing saved.
+    FIX. save.c - added any_saved_files() routine to check for any saved files.
+
+189) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Used constext type in charset.c. Updated config.h for M_AMIGA.
+         Changed add headers so home:.tin/headers was recognised as a 
+         file name, and not a header! (Now checks for space or tab after 
+         ':' character.
+    FIX. various - applied supplied patch.
+
+--941128BETA released--
+
+190) Iain Lea (iain@scn.de)
+    BUG. SunOS 4.1.3 cc would not compile save.c
+    FIX. save.c - changed parameter index to indexnum.
+
+191) Shih-Kun Huang (skhuang@csie.nctu.edu.tw)
+    BUG. make_thread() uses a O(n^2) algorithm to thread the articles.
+    FIX. art.c hashstr.c - Changed O(n^2) to O(n) at the expense of one
+         extra int for each "hash node". Speedup will really be noticed 
+         when there are 000's of articles in a group. 
+         [ Iain: I got a x8-x30 speedup on groups with 3000-5900 articles!!! ]
+
+192) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Made amigatcp compile with latest AmiTCP headers.
+         Rewrote actived program for AmigaDOS.
+    FIX. amigatcp.h amiga/actived.c - applied supplied patch.
+
+193) Iain Lea (iain@scn.de)
+    BUG. Certain newsrc sequences are parsed incorrectly.
+    FIX. newsrc.c - corrected one off error in parameter to NSETRNG0().
+
+194) Iain Lea (iain@scn.de)
+    BUG. NSETRNG0/1() macro marks bitmap wrong if constructing byte bitmask.
+    FIX. xref.c - Used for() loop calling NSET0/1() macro instead of bitmask.
+
+195) Iain Lea (iain@scn.de)
+    BUG. g goto group command does not always subscribe the group it finds.
+    FIX. newsrc.c - set group to SUBSCRIBED where group was not in newsrc.
+
+196) Iain Lea (iain@scn.de)
+    BUG. S *pattern* causes subscribe to grow and grow memory and crash.
+    FIX. select.c - changed active[my_group[i]] to active[i] in 2nd loop.
+
+--941205BETA released--
+
+197) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. backup_newsrc() routine does not write linefeeds for each line.
+    FIX. newsrc.c - added linefeed to each line as its written.
+
+198) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. Removed some redundant assignments & variables. 
+         Removed pcFindGrpPath() since it is no longer called.
+         Fixed calls to NSETRNGx since the calling interface changed.
+         Fixed amiga/actived to not use CST timezone.
+    FIX. various - applied supplied patch.
+
+199) Iain Lea (iain@scn.de)
+    BUG. g command that doubles bitmap size after adding group and entering 
+         it also does not show num unread arts.
+    FIX. newsrc.c - added code to initialize bitmap if no newsrc seq.
+
+--941213BETA released--
+
+200) Jeff M. Garzik (jgarzik@cc.gatech.edu)
+    BUG. Don't display NNTP port when connecting unless its not 119
+    FIX. open.c - added check to see what nntp port number is used.
+
+201) Bill Frolik (bill@cv.hp.com)
+    BUG. A prompt should be displayed when articles have been tagged
+         before quiting or catching up in a group.
+    FIX. group.c - applied supplied patch.
+
+202) Chris Lewis (clewis@bnr.ca)
+    BUG. Does not support new AUTHINFO GENERIC code for nntp 1.5.12/INN 1.5
+    FIX. open.c - applied supplied patch.
+
+203) Mark Tomlinson (mark@garden.equinox.gen.nz)
+    BUG. vWriteNovFile() contains dead code.
+    FIX. art.c - applied supplied patch.
+
+204) Iain Lea (iain@scn.de)
+    BUG. NNTP_INEWS_GATEWAY and NNTP_INEWS_DOMAIN are incorrectly named as
+         they are also used when not compiled for NNTP.
+    FIX. inews.c post.c - changed all NNTP_INEWS_* to INEWS_MAIL_*.
+

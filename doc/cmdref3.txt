@@ -1,0 +1,68 @@
+Helpsheet:    Back Page (Left two columns)
+
+'Group level': tagging an article         'Group level': miscellaneous
+     Tagging two or more articles              The following table shows the
+     allows you to apply the mail,             keystrokes and the commands not
+     print, save, crosspost, and               covered previously.  You may use
+     piping operations against them.           them at this level only:
+                                          
+ 1.  Move the selection bar to the            ^K    Kill / Auto select (hot)
+     desired article.                               current article
+ 2.  Press the <t> key.                     <TAB>   Goto next unread article or
+                                                    group
+'Group level': mailing article(s)             a     Author forward search
+                                              B     Article body search
+ 1.  Move the selection bar to the            c     Mark all articles as read
+     desired article.                               and go to group selection
+ 1.  Press the <m> key.                             menu
+ 2.  Look for a prompt.                       d     Toggle display of subject
+ 3.  Press the <a> key or make a                    or subject & author
+     capital T.                               H     Toggle off/on the mini help
+     Note:  The 'a' means the                       menu
+            current article and 'T'           l     List articles within
+            means the tagged                        current thread
+            articles .                        M     Menu of configurable
+ 4.  Look for a prompt.                             options
+ 5.  Enter the e-mail address.                n     Go to next group
+ 6.  Look for a prompt.                       p     Go to previous group
+ 7.  Press the <s> key.                       N     Go to next unread article
+                                              P     Go to previous unread
+'Group level': printing articles                    article
+     You may print the article that           q     Return to previous level
+     you are currently reading.               Q     Quit
+                                              r     Toggle display to show all
+ 1.  Press the <o> key.                             / only unread articles
+ 2.  Look for a prompt.                       t     Tag current article for
+ 3.  Press the <a> key or make a                    crossposting/mailing/piping
+     capital T.                                     /printing/saving
+     Note:  Where the article is              u     Toggle display of
+            printed depends on what                 unthreaded & threaded
+            printer is set under                    articles
+            O)ptions.                         U     Untag all tagged articles
+                                              x     Crosspost current article
+'Group level': reading                              to another group
+     Once you have decided on an              z     Mark article as unread
+     article to read, you must select         Z     Mark thread as unread
+     it.                                      -     Show last message
+                                              |     Pipe
+ Proc. 1 (Use the <RETURN> key):                    article/thread/hot/pattern/
+ 1.  Move the selection bar to the                  tagged articles into
+     desired article.                               command
+ 2.  Press the <RETURN> key.                  *     Select thread
+ 3.  Look for the 'Article level'             .     Toggle selection of thread
+     screen.                                  @     Reverse all selections (all
+                                                    articles)
+ Proc. 2 (Use the right .  key):              ~     Undo all selections (all
+ 1.  Move the selection bar to the                  articles)
+     desired article.                         X     Mark all unread articles
+ 2.  Press the . key.                               that have not been selected
+ 3.  Look for the 'Article level'                   as read
+     screen.                                  +     Perform auto-selection on
+                                                    group
+ Proc. 3 (Enter the numeric                   =     Mark threads selected if at
+     identifier):                                   least one unread art is
+ 1.  Type the article's numeric                     selected
+     identifier.                              ;     Mark threads selected if at
+ 2.  Press the <RETURN> key.                        least one unread art is
+ 3.  Look for the 'Article level'                   selected
+     screen.                              

@@ -1,0 +1,6 @@
+gnu_cc:[000000]gcclib.olb/libr
+multinet:multinet_socket_library/share
+sys$library:decw$dwtlibshr/share
+sys$library:decw$xlibshr/share
+sys$library:vaxccurse/libr
+sys$share:vaxcrtl/share
