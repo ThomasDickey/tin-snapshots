@@ -39,7 +39,7 @@ static	char nntp_line[NNTP_STRLEN];
 #	define	s_flush		fflush
 #	define	s_fclose	fclose
 #	define	s_gets		fgets
-#   define s_close		close
+#	define  s_close		close
 #	define	s_puts		my_fputs
 #	define	s_dup		dup
 #	define	s_init()	(1)
@@ -163,12 +163,6 @@ getserverbyfile (file)
 		return (buf);
 	}
 
-	cp = GetConfigValue (_CONF_SERVER);
-	if (cp != (char *) 0) {
-		(void) strcpy (buf, cp);
-		return (buf);
-	}
-
 	if (file == (char *) 0) {
 		return (char *) 0;
 	}
@@ -190,6 +184,23 @@ getserverbyfile (file)
 	}
 
 	(void) fclose (fp);
+
+	if (cp != (char *) 0) {
+		get_nntpserver (buf, cp);
+		return (buf);
+	}
+
+	cp = GetConfigValue (_CONF_SERVER);
+
+	if (file == (char *) 0) {
+		return (char *) 0;
+	}
+
+	if (cp != (char *) 0) {
+		(void) strcpy (buf, cp);
+		return (buf);
+	}
+
 #endif /* NNTP_ABLE */
 	return (char *) 0;	/* No entry */
 }
@@ -220,8 +231,10 @@ server_init (machine, service, port)
 	int	sockt_rd, sockt_wr;
 #endif
 
+#if defined (M_AMIGA) || defined(WIN32) && defined(NNTP_ABLE)
 	if (s_init() == 0)                /* some initialisation ... */
 		return -1;
+#endif
 
 #ifdef DECNET
 	char	*cp;
@@ -329,7 +342,7 @@ get_tcp_socket (machine, service, port)
 		t_close (s);
 		return (-1);
 	}
-	bzero((char *) &sock_in, sizeof (sock_in));	
+	memset((char *) &sock_in, '\0', sizeof (sock_in));	
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
 	if (!isdigit(*machine) ||
@@ -339,7 +352,7 @@ get_tcp_socket (machine, service, port)
 			t_close (s);
 			return (-1);
 		}
-		bcopy(hp->h_addr, (char *) &sock_in.sin_addr, hp->h_length);
+		memcopy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
 	}
 	
 	/*
@@ -429,12 +442,12 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 
-	bzero((char *) &sock_in, sizeof (sock_in));
+	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = hp->h_addrtype;
 	sock_in.sin_port = htons (port);
 /* 	sock_in.sin_port = sp->s_port; */
 #else /* EXCELAN */
-	bzero((char *) &sock_in, sizeof (sock_in));
+	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 #endif /* EXCELAN */
 
@@ -459,7 +472,7 @@ get_tcp_socket (machine, service, port)
 			perror ("socket");
 			return (-1);
 		}
-		bcopy(*cp, (char *) &sock_in.sin_addr, hp->h_length);
+		memcpy((char *) &sock_in.sin_addr, *cp, hp->h_length);
 		
 		if (x < 0) {
 			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
@@ -498,7 +511,7 @@ get_tcp_socket (machine, service, port)
 		perror ("socket");
 		return (-1);
 	}
-	bzero((char *) &sock_in, sizeof (sock_in));
+	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (IPPORT_NNTP);
 	/* set up addr for the connect */
@@ -522,7 +535,7 @@ get_tcp_socket (machine, service, port)
 
 	/* And then connect */
 
-	bcopy (hp->h_addr, (char *) &sock_in.sin_addr, hp->h_length);
+	memcpy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
 	if (connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0) {
 		perror ("connect");
 		(void) s_close (s);
@@ -563,7 +576,7 @@ get_dnet_socket (machine, service)
 	struct	sockaddr_dn sdn;
 	struct	nodeent *getnodebyname(), *np;
 
-	bzero((char *) &sdn, sizeof (sdn));
+	memset((char *) &sdn, '\0', sizeof (sdn));
 
 	switch (s = sscanf (machine, "%d%*[.]%d", &area, &node)) {
 		case 1: 
@@ -581,7 +594,7 @@ get_dnet_socket (machine, service)
 				fprintf (stderr, "%s: Unknown host.\n", machine);
 				return (-1);
 			} else {
-				bcopy(np->n_addr, (char *) sdn.sdn_add.a_addr, np->n_length);
+				memcpy((char *) sdn.sdn_add.a_addr, np->n_addr, np->n_length);
 				sdn.sdn_add.a_len = np->n_length;
 				sdn.sdn_family = np->n_addrtype;
 			}
@@ -590,7 +603,7 @@ get_dnet_socket (machine, service)
 	sdn.sdn_objnum = 0;
 	sdn.sdn_flags = 0;
 	sdn.sdn_objnamel = strlen ("NNTP");
-	bcopy("NNTP", &sdn.sdn_objname[0], sdn.sdn_objnamel);
+	memcpy(&sdn.sdn_objname[0], "NNTP", sdn.sdn_objnamel);
 
 	if ((s = socket (AF_DECnet, SOCK_STREAM, 0)) < 0) {
 		nerror ("socket");

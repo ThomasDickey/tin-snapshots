@@ -106,7 +106,7 @@ index_group (group)
 	struct t_group *group;
 {
 	char group_path[PATH_LEN];
-	int artcount;
+/*	int artcount; */
 	int count;
 	int expired;
 	int filtered;
@@ -141,7 +141,7 @@ index_group (group)
 		BegStopWatch("setup_base");
 #endif	/* PROFILE */
 
-		artcount = setup_hard_base (group, group_path);
+		/* artcount = */ (void) setup_hard_base (group, group_path);
 
 #ifdef	PROFILE
 		EndStopWatch();
@@ -156,7 +156,7 @@ debug_print_bitmap (group, NULL);
 		/*
 		 * Read in the existing index via XOVER or the index file
 		 */
-		artcount = iReadNovFile (group, min, max, &expired);
+		/* artcount = */ (void) iReadNovFile (group, min, max, &expired);
 
 		if (expired) {
 			print_expired_arts (expired);
@@ -1097,11 +1097,11 @@ vWriteNovFile (psGrp)
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
 		        sort_arts (psGrp->attribute->sort_art_type);
 		}
-#endif
+#endif /* 0 */
 	}
 	set_real_uid_gid ();
 }
-#endif
+#endif /* !NNTP_ONLY */
 
 
 
@@ -1640,7 +1640,7 @@ pcPrintFrom (psArt)
 	
 	return acFrom;	
 }
-#endif
+#endif /* !NNTP_ONLY */
 
 #ifdef INDEX_DAEMON
 static void

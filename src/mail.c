@@ -530,10 +530,10 @@ vGrpDelMailArts (psGrp)
 		if ((! read_news_via_nntp) && iUpdateIndexFile) {
 			vWriteNovFile (psGrp);
 		}
-#endif
+#endif /* !NNTP_ONLY */
 	}
 }
-#endif	/* INDEX_DAEMON */
+#endif	/* !INDEX_DAEMON */
 
 
 int 

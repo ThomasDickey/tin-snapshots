@@ -57,7 +57,7 @@ feed_articles (function, level, group, respnum)
 	int redraw_screen = FALSE;
 	int ret1 = FALSE;
 	int ret2 = FALSE;
-	int retcode;
+/*	int retcode; */
 	int supersede = FALSE;
 #ifndef FORGERY
 	char from_name[PATH_LEN];
@@ -592,9 +592,9 @@ feed_articles (function, level, group, respnum)
 		case FEED_PIPE:
 #if defined(SIGCHLD) && !defined(RS6000)
 			pclose (fp);
-			retcode = system_status;
+			/* retcode = */ (void) system_status;
 #else
-			retcode = pclose (fp);
+			/* retcode = */ (void) pclose (fp);
 #endif
 			Raw (TRUE);
 			continue_prompt ();

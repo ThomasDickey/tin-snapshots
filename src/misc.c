@@ -518,9 +518,9 @@ strip_double_ngs (ngs_list)
 
 long
 my_strtol (str, ptr, use_base)
-	char	*str;
-	char	**ptr;
-	int	use_base;
+	/* const */ char *str;
+	char **ptr;
+	int use_base;
 {
 #ifndef HAVE_STRTOL
 #define DIGIT(x) (isdigit(x)? ((x)-'0'): (10+tolower(x)-'a'))
@@ -1188,8 +1188,8 @@ my_atol (s, n)
 
 int
 my_stricmp (p, q)
-	char *p;
-	char *q;
+	/* const */ char *p;
+	/* const */ char *q;
 {
 	int r;
 	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
@@ -1203,8 +1203,8 @@ my_stricmp (p, q)
 
 int
 my_strnicmp(p, q, n)
-	char *p;
-	char *q;
+	/* const */ char *p;
+	/* const */ char *q;
 	size_t n;
 {
 	int r=0;
@@ -1285,7 +1285,7 @@ hash_s (s)
 void
 my_strncpy (p, q, n)
 	char *p;
-	char *q;
+	/* const */ char *q;
 	int n;
 {
 	while (n--) {

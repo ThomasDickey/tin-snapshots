@@ -196,7 +196,9 @@ get_host_name (host_name)
 
 	char *ptr, host[PATH_LEN];
 	char nntp_inews_gateway[PATH_LEN];
+#ifdef LIBDIR
 	char sitename[PATH_LEN];
+#endif
 	FILE *fp, *sfp;
 
 	host_name[0] = '\0';
@@ -252,14 +254,17 @@ get_host_name (host_name)
 		sfp = fopen ("/etc/HOSTNAME", "r");
 		if (sfp == (FILE *) 0)
 #endif
-		{	joinpath (sitename, LIBDIR, "sitename");
+		{
+#ifdef LIBDIR
+			joinpath (sitename, LIBDIR, "sitename");
 			sfp = fopen (sitename, "r");
 #ifndef M_AMIGA
 			if (sfp == (FILE *) 0) {
 				sprintf (sitename, "%s/mailname", LIBDIR);
 				sfp = fopen (sitename, "r");
 			}
-#endif
+#endif /* !M_AMIGA */
+#endif /* LIBDIR */
 		}
 		if (sfp != (FILE *) 0) {
 			fgets (host, sizeof (host), sfp);
@@ -282,7 +287,7 @@ get_host_name (host_name)
 					gethostname (host, sizeof (host)); 
 					host_entry = gethostbyname (host);
 					if (host_entry != NULL)
-						my_strncpy (host, (char *) host_entry->h_name, sizeof (host));
+						my_strncpy (host, host_entry->h_name, sizeof (host));
 				}	
 #				else	
 #					if defined(M_AMIGA) || defined(M_OS2)

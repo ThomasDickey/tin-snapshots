@@ -30,7 +30,7 @@ static int max_cmdargs;
  *  OK lets start the ball rolling...
  */
  
-void 
+int
 main (argc, argv)
 	int argc;	
 	char *argv[];
@@ -259,6 +259,7 @@ main (argc, argv)
 	 *  Work loop
 	 */
 	selection_index (start_groupnum, num_cmd_line_groups);
+	return(0); /* not reached */
 }
 
 /*
@@ -317,11 +318,11 @@ read_cmd_line_options (argc, argv)
 #ifdef DEBUG			
 				debug = atoi (optarg);
 				debug_delete_files ();
+				break;
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
 				exit (1);
 #endif
-				break;
 
 			case 'f':	/* active (tind) / newsrc (tin) file */
 #ifdef INDEX_DAEMON
@@ -345,7 +346,6 @@ read_cmd_line_options (argc, argv)
 			case 'H':
 				show_intro_page ();
 				exit (1);
-				break;
 
 #if !defined(NNTP_ONLY)
 			case 'I':
@@ -427,7 +427,6 @@ read_cmd_line_options (argc, argv)
 #endif					
 				error_message (msg, "");
 				exit (1);
-				break;
 
 			case 'w':	/* post article & exit */
 				post_article_and_exit = TRUE;

@@ -1793,8 +1793,8 @@ mail_bug_report ()
 	start_line_offset++;
 	msg_free_headers ();
 
-#if HAVE_UNAME || HAVE_HOSTNAME
-#if HAVE_UNAME
+#if defined(HAVE_UNAME) || defined(HAVE_HOSTNAME)
+#if defined(HAVE_UNAME)
 	(void) sprintf(buf, "%s -a", PATH_UNAME);
 #else
 	(void) strcpy(buf, PATH_HOSTNAME);

@@ -424,9 +424,11 @@ stat_article (art, group_path)
 	long art;
 	char *group_path;
 {
+/*
 #ifdef NNTP_ABLE
 	int respcode;
 #endif
+*/
 	char buf[NNTP_STRLEN];
 	int i;
 	int art_exists = TRUE;
@@ -439,7 +441,7 @@ stat_article (art, group_path)
 		sprintf (buf, "stat %ld", art);
 		debug_nntp ("stat_article", buf);
 		put_server (buf);
-		if ((respcode = get_respcode ()) != OK_NOTEXT) {
+		if (/*(respcode = */ get_respcode ()/*)*/ != OK_NOTEXT) {
 			art_exists = FALSE;
 		}
 #endif
