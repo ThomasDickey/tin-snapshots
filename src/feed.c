@@ -378,7 +378,7 @@ feed_articles (
 				case FEED_REPOST:
 					if (can_post)
 						redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
-					else 
+					else
 						info_message(txt_cannot_post);
 					break;
 

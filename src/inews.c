@@ -19,9 +19,9 @@
  * local prototypes
  */
 static int submit_inews (char *name);
-#ifndef FORGERY
+#if defined (NNTP_INEWS) && !defined(FORGERY)
 	static int sender_needed (char * from, char * sender);
-#endif
+#endif /* NNTP_INEWS && !FORGERY */
 
 #if 0
 #ifdef VMS
@@ -59,14 +59,14 @@ submit_inews (
 
 #if !defined(INDEX_DAEMON)
 
-#ifdef NNTP_INEWS
+#	ifdef NNTP_INEWS
 	char	from_name[PATH_LEN];
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
-#ifndef FORGERY
+#		ifndef FORGERY
 	int	ismail=FALSE;
-#endif
+#		endif /* FORGERY */
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, name);
@@ -122,7 +122,7 @@ submit_inews (
 	/*
 	 * Send Path: and From: article headers
 	 */
-#ifndef FORGERY
+#		ifndef FORGERY
 	sprintf (line, "Path: %s", PATHMASTER);
 	put_server (line);
 
@@ -132,7 +132,7 @@ submit_inews (
 			put_server (line);
 		}
 	}
-#endif /* !FORGERY */
+#		endif /* !FORGERY */
 
 	/*
 	 * Send article 1 line at a time ending with "."
@@ -167,7 +167,7 @@ submit_inews (
 
 	ret_code = TRUE;
 
-#endif /* NNTP_INEWS */
+#	endif /* NNTP_INEWS */
 
 #endif /* INDEX_DAEMON */
 
@@ -226,13 +226,13 @@ submit_news_file (
 
 /*
  * FIXME: do _real_ RFC822-parsing - currently this is a quick hack
- *        to cover the most usual cases... 
+ *        to cover the most usual cases...
  *
  * returnvalues:  FALSE = no Sender needed
  *                TRUE  = Sender needed
  *                -1    = error (no '.' and/or '@' in from and/or sender)
  */
-#ifndef FORGERY
+#if defined (NNTP_INEWS) && !defined(FORGERY)
 static int sender_needed (
 	char * from,
 	char * sender)
@@ -285,4 +285,4 @@ static int sender_needed (
 
 	return FALSE;
 }
-#endif
+#endif /* NNTP_INEWS && !FORGERY */

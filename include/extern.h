@@ -226,14 +226,14 @@ extern int _flsbuf (int, FILE *);
 extern char *getenv (const char *);
 #endif
 
-#ifdef DECL_FGETC 
-extern int fgetc (FILE * stream);
+#ifdef DECL_FGETC
+extern int fgetc (FILE *);
 #endif
 #ifdef DECL_RENAME
-extern int rename (const char *oldpath, const char *newpath);
+extern int rename (const char *, const char *);
 #endif
 #ifdef DECL_UNGETC
-extern int ungetc (int c, FILE *stream);
+extern int ungetc (int, FILE *);
 #endif
 
 #ifdef DECL_ERRNO
@@ -325,8 +325,6 @@ extern char mailbox[PATH_LEN];
 extern char mailer[PATH_LEN];
 extern char mailgroups_file[PATH_LEN];
 extern char mm_charset[LEN];
-extern char motd_file[PATH_LEN];
-extern char motd_file_info[PATH_LEN];
 extern char msg[LEN];
 extern char msg_headers_file[PATH_LEN];
 extern char my_distribution[LEN];
@@ -1011,7 +1009,6 @@ extern constext txt_tinrc_mail_8bit_header[];
 extern constext txt_tinrc_mail_address[];
 extern constext txt_tinrc_mark_saved_read[];
 extern constext txt_tinrc_mm_charset[];
-extern constext txt_tinrc_motd_file_info[];
 extern constext txt_tinrc_newnews[];
 extern constext txt_tinrc_news_headers_to_display[];
 extern constext txt_tinrc_news_headers_to_not_display[];
@@ -1461,10 +1458,6 @@ extern constext txt_opt_mail_address[];
 #ifdef HAVE_SYS_UTSNAME_H
 	extern struct utsname system_info;
 #endif /* HAVE_SYS_UTSNAME_H */
-
-#ifdef HAVE_TIN_NNTP_EXTS
-	extern t_bool xuser_supported;
-#endif /* HAVE_TIN_NNTP_EXTS */
 
 #ifdef INDEX_DAEMON
 	extern char group_times_file[PATH_LEN];

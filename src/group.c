@@ -33,6 +33,8 @@ static const char *spaces = "XXXX";
  * Local prototypes
  */
 static int draw_sline (int i, int full);
+static void draw_subject_arrow (void);
+static void erase_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
 	static int bld_sline (int i);
@@ -592,7 +594,7 @@ group_catchup:								/* came here on group exit via left arrow */
 								goto group_done;
 							}
 							break;
-	
+
 						case iKeyGroupCatchupGotoNext:
 							if (yn == 1)
 								goto group_tab_pressed;
@@ -1347,7 +1349,7 @@ update_group_page (void)
 #endif /* INDEX_DAEMON */
 
 
-void
+static void
 draw_subject_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
@@ -1363,7 +1365,7 @@ draw_subject_arrow (void)
 	stow_cursor();
 }
 
-void
+static void
 erase_subject_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
@@ -1445,7 +1447,7 @@ find_new_pos (
 		}
 	}
 
-	if (cur_pos < top_base) 
+	if (cur_pos < top_base)
 		return cur_pos;
 	else
 		return (top_base - 1);

@@ -148,11 +148,6 @@ main (
 #endif
 
 	/*
-	 *  Read message of the day file from newsadmin
-	 */
-	read_motd_file ();
-
-	/*
 	 *  Read input history
 	 */
 #ifndef INDEX_DAEMON
@@ -666,7 +661,7 @@ usage (
 	error_message ("  -d       don't show newsgroup descriptions");
 
 #	ifdef DEBUG
-	error_message ("  -D       debug mode 1=NNTP 2=ALL");
+		error_message ("  -D       debug mode 1=NNTP 2=ALL");
 #	endif
 
 	error_message ("  -f file  subscribed to newsgroups file [default=%s]", newsrc);
@@ -681,7 +676,7 @@ usage (
 	error_message ("  -H       help information about %s", theProgname);
 
 #	ifndef NNTP_ONLY
-	error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
+		error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
 #	endif /* NNTP_ONLY */
 
 	error_message ("  -m dir   mailbox directory [default=%s]", default_maildir);
@@ -694,7 +689,7 @@ usage (
 	error_message ("  -N       mail new news to your posts");
 	error_message ("  -o       post all postponed articles and exit");
 #	ifdef NNTP_ABLE
-	error_message ("  -p       use special NNTP port (instead of %d)", nntp_tcp_port);
+		error_message ("  -p port  use port (instead of %d) as NNTP port", nntp_tcp_port);
 #	endif /* NNTP_ABLE */
 	error_message ("  -q       don't check for new newsgroups");
 	error_message ("  -Q       quick start. Same as -nqd");

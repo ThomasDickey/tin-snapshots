@@ -22,6 +22,7 @@
  * Local prototypes
  */
 static char * escape_shell_meta (char *source, int quote_area);
+static int input_pending (int delay);
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
@@ -101,7 +102,7 @@ copy_fp (
 
 	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
 		if (n != fwrite (buf, 1, n, fp_op)) {
-			if (!got_sig_pipe) 
+			if (!got_sig_pipe)
 				perror_message ("copy_fp() failed");
 
 			return;
@@ -1195,7 +1196,7 @@ toggle_color (void)
 		info_message (txt_no_colorterm);
 		return FALSE;
 	} else
-#endif 
+#endif /* USE_CURSES */
 		use_color = !use_color;
 
 	return TRUE;
@@ -1227,7 +1228,7 @@ int kbhit(void);
  * (in art.c's threading code) is delay=0
  *
  */
-int
+static int
 input_pending (int delay)
 {
 #if USE_CURSES

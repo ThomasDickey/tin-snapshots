@@ -77,7 +77,7 @@ int InitScreen (void)
 	} else {
 		use_color = 0;
 	}
-		
+
 	postinit_colors();
 	set_xclick_on();
 	return (TRUE);

@@ -39,6 +39,7 @@ static void subscribe_pattern (const char *prompt, const char *message, const ch
 
 static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
 static void vDelRange (int iLevel, int iNumMax);
+static void erase_group_arrow (void);
 
 
 void
@@ -813,7 +814,7 @@ prompt_group_num (
 #endif /* INDEX_DAEMON */
 
 
-void
+static void
 erase_group_arrow (void)
 {
 	erase_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
@@ -1334,7 +1335,7 @@ iSetRange (
 	else {
 		if (*pcPtr)
 			strcpy (acRng, pcPtr);
-		else 
+		else
 			return iRetCode;
 	}
 
@@ -1489,7 +1490,7 @@ move_to_group(
 	int n)
 {
 	char lbuf[128];
-	
+
 	if (cur_groupnum == n)
 		return;
 
@@ -1502,7 +1503,7 @@ move_to_group(
 		draw_group_arrow ();
 	else
 		show_selection_page ();
-	
+
 	if (CURR_GROUP.aliasedto) {
 		sprintf(lbuf, "please use %.100s instead", CURR_GROUP.aliasedto);
 		center_line (cLINES, FALSE, lbuf);

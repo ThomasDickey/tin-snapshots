@@ -856,7 +856,7 @@ show_note_page (
 		show_cont_header (respnum);
 
 #ifdef HAVE_METAMAIL
-	if (note_page == 0 && *note_h.mimeversion && *note_h.contenttype 
+	if (note_page == 0 && *note_h.mimeversion && *note_h.contenttype
 		 && (!STRNCMPEQ("text/plain", note_h.contenttype, 10))
 		 && use_metamail) {
 		if (!ask_for_metamail || prompt_yn (cLINES, txt_use_mime, TRUE) == 1) {
@@ -887,7 +887,7 @@ show_note_page (
 		}
 
 		in_headers = (ftell (note_fp) < mark_body); /* still in header? */
-		
+
 		if (in_headers && !show_all_headers) {
 			if (*buf == ' ' || *buf == '\t')	{	/* continuation line */
 				if (!show_prev_header)	/* last line was not displayed */
@@ -895,7 +895,7 @@ show_note_page (
 			} else {
 				/* no continuation line */
 				do_display_header = 0; /* default: don't display header */
-				if (num_headers_to_display 
+				if (num_headers_to_display
 					 && (news_headers_to_display_array[0][0] == '*')) {
 					do_display_header = 1; /* wild do */
 				} else {
@@ -919,7 +919,7 @@ show_note_page (
 						}
 					}
 				}
-				
+
 				/* do_display_header is set iff line should be displayed */
 				show_prev_header = do_display_header;	/* remember for cont. */
 				if (!do_display_header)
@@ -945,8 +945,8 @@ print_a_line:
 		 * distrupt other parts.
 		 */
 
-		if (in_headers 
-			 && ( (!display_mime_header_asis && !show_all_headers) 
+		if (in_headers
+			 && ( (!display_mime_header_asis && !show_all_headers)
 					|| (!display_mime_allheader_asis && show_all_headers) ) )  {
 			/* check if it's a continuation header line */
 			if ( buf2[0] != ' ' && buf2[0] != '\t' ) {
@@ -1048,7 +1048,7 @@ print_a_line:
 	show_mini_help (PAGE_LEVEL);
 
 	stow_cursor();
-	
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -1109,7 +1109,7 @@ show_first_header (
 
 	ClearScreen ();
 
-	if (!my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S", 
+	if (!my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S",
 							localtime (&arts[respnum].date)))
 		strcpy (buf, note_h.date);
 
@@ -1149,7 +1149,7 @@ show_first_header (
 	fcol(col_head);
 #endif
 
-	/* Displaying the value of X-Comment-To header in the upper right corner */ 
+	/* Displaying the value of X-Comment-To header in the upper right corner */
 	if (note_h.ftnto[0] && show_xcommentto) {
 		char ftbuf[HEADER_LEN]; /* FTN-To aka X-Comment-To */
 
@@ -1241,10 +1241,10 @@ show_first_header (
 
 	if (arts[respnum].name)
 		sprintf (buf, "%s <%s>", arts[respnum].name, arts[respnum].from);
-	else 
+	else
 		strncpy (buf, arts[respnum].from, cCOLS-1);
 	buf[cCOLS-1] = '\0';
-	
+
 	if (*note_h.org) {
 		sprintf (tmp, txt_at_s, note_h.org);
 		tmp[sizeof(tmp)-1] = '\0';
@@ -1467,7 +1467,7 @@ art_open (
 	}
 
 	/* This is used as some warped success indicator in art_close() */
-	note_page = 0;	
+	note_page = 0;
 
 	return (0);
 }

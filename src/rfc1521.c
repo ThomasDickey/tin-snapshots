@@ -107,12 +107,14 @@ rfc1521_decode(
 		 * with whitespace to the preceding one, but I guess we can
 		 * live with that here.
 		 */
-                /* Note: Actually, this is not the case. Especially,
-                   MS Outlook Express produces multiple line header
-                   for C-T header field. We have to take care of it
-                   to detect multipart/alternative in this case. Hence,
-                   a new function fgets_hdr is defined in string.c and 
-                   invoked in while loop above J. Shin */
+
+		/* Note: Actually, this is not the case. Especially,
+		 * MS Outlook Express produces multiple line header
+		 * for C-T header field. We have to take care of it
+		 * to detect multipart/alternative in this case. Hence,
+		 * a new function fgets_hdr is defined in string.c and
+		 * invoked in while loop above (J. Shin)
+		 */
 		if (!strncasecmp(buf, "Content-Type: ", 14)) {
 			strcpynl(content_type, buf + 14);
 		} else if (!strncasecmp(buf, "Content-Transfer-Encoding: ", 27)) {

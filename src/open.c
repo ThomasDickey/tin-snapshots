@@ -131,7 +131,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		case OK_CANPOST:
 			sec = TRUE;
 			break;
-			
+
 		case OK_NOPOST:
 			can_post = FALSE;
 			sec = TRUE;
@@ -144,7 +144,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		case ERR_COMMAND:
 		default:
 			break;
- 
+
 	}
 
    if (!is_reconnect) {
@@ -189,15 +189,6 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	}
 
 #endif	/* NNTP_ABLE */
-
-	/*
-	 * Check if NNTP supports my XINDEX & XUSER commands
-	 * ie, we _don't_ get an ERR_COMMAND
-	 */
-#ifdef HAVE_TIN_NNTP_EXTS
-	if (!nntp_command("XUSER", ERR_COMMAND, NULL))
-		xuser_supported = TRUE;
-#endif	/* HAVE_TIN_NNTP_EXTS */
 
 DEBUG_IO((stderr, "nntp_open okay\n"));
 	return 0;
@@ -384,31 +375,6 @@ open_newgroups_fp (
 }
 
 /*
- * If we have the tin NNTP extensions, open the news motd file
- *
- * XMOTD 311299 235959 [GMT]
- */
-/* TODO testme */
-#ifdef HAVE_TIN_NNTP_EXTS
-FILE *
-open_motd_fp (
-	char *motd_file_date)
-{
-#if defined(NNTP_ABLE)
-	if (read_news_via_nntp) {
-
-		char line[NNTP_STRLEN];
-
-		sprintf (line, "XMOTD %s", motd_file_date);
-		return (nntp_command (line, OK_XMOTD));
-	} else
-#endif
-		return (fopen (motd_file, "r"));
-}
-#endif
-
-
-/*
  * Get a list of default groups to subscribe to
  */
 /* TODO fixme/checkme */
@@ -519,17 +485,16 @@ stat_article (
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 		sprintf (buf, "STAT %ld", art);
 		return(nntp_command (buf, OK_NOTEXT, NULL) != NULL);
-	} else {
+	} else
 #endif /* NNTP_ABLE */
+	{
 		struct stat sb;
 
 		joinpath (buf, active[i].spooldir, group_path);
 		sprintf (&buf[strlen (buf)], "/%ld", art);
 
 		return (stat (buf, &sb) != -1);
-#ifdef NNTP_ABLE
 	}
-#endif /* NNTP_ABLE */
 }
 
 FILE *
@@ -537,9 +502,9 @@ open_art_header (
 	long art)
 {
 	char buf[NNTP_STRLEN];
+#ifdef NNTP_ABLE
 	FILE *fp;
 
-#ifdef NNTP_ABLE
 	if (read_news_via_nntp && CURR_GROUP.type == GROUP_TYPE_NEWS) {
 		/*
 		 *  Don't bother requesting if we have not got there yet.
@@ -896,7 +861,8 @@ setup_hard_base (
 
 
 void
-vGet1GrpArtInfo(struct t_group *grp)
+vGet1GrpArtInfo (
+	struct t_group *grp)
 {
 	long	lMinOld = grp->xmin;
 	long	lMaxOld = grp->xmax;

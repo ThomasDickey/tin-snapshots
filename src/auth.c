@@ -353,5 +353,6 @@ authenticate (
 	return (authinfo_generic () || authinfo_original (server, user, startup));
 }
 #else
+static void no_authenticate (void);
 static void no_authenticate (void) { }
 #endif

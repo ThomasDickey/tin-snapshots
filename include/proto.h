@@ -9,7 +9,6 @@ extern int parse_active_line (char *line, long *max, long *min, char *moderated)
 extern int process_bogus(char *name);
 extern int resync_active_file (void);
 extern void load_newnews_info (char *info);
-extern void read_motd_file (void);
 extern void read_news_active_file (void);
 #ifdef INDEX_DAEMON
 	extern void read_group_times_file (void);
@@ -40,8 +39,6 @@ extern void write_attributes_file (char *file);
 /* auth.c */
 #if !defined (INDEX_DAEMON) && defined (NNTP_ABLE)
 	extern t_bool authenticate (char *server, char *user, t_bool startup);
-#else
-	extern void no_authenticate (void);
 #endif /* !INDEX_DAEMON && NNTP_ABLE */
 
 /* charset.c */
@@ -71,9 +68,6 @@ extern void refresh_config_page (int act_option);
 extern void show_menu_help (const char *help_message);
 extern char **ulBuildArgv(char *cmd, int *new_argc);
 extern void write_config_file (char *file);
-#ifdef HAVE_COLOR
-	extern int match_color (char *line, const char *pat, int *dst, int maxlen);
-#endif
 
 /* curses.c */
 extern OUTC_RETTYPE outchar (OUTC_ARGS);
@@ -145,8 +139,6 @@ extern char *getline (const char *prompt, int number_only, char *str, int max_ch
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
 extern void clear_note_area (void);
 extern void decr_tagged (int tag);
-extern void draw_subject_arrow (void);
-extern void erase_subject_arrow (void);
 extern void group_page (struct t_group *group);
 extern void mark_screen (int level, int screen_row, int screen_col, const char *value);
 extern void set_subj_from_size (int num_cols);
@@ -209,7 +201,6 @@ extern char *random_organization(char *in_org);
 
 /* mail.c */
 extern int iArtEdit (struct t_group *psGrp, struct t_article *psArt);
-extern void read_groups_descriptions (FILE *fp, FILE *fp_save);
 extern void read_newsgroups_file (void);
 extern void vFindArtMaxMin (char *pcGrpPath, long *plArtMax, long *plArtMin);
 extern void vMakeGrpName (char *pcBaseDir, char *pcGrpName, char *pcGrpPath);
@@ -235,7 +226,6 @@ extern void expand_newnews (void);
 extern void expand_save (void);
 extern void init_alloc (void);
 extern void init_screen_array (int allocate);
-extern void free_active_arrays (void);
 extern void free_all_arrays (void);
 extern void free_art_array (void);
 extern void free_attributes_array (void);
@@ -250,7 +240,6 @@ extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
 extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
-extern int input_pending (int delay);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
 extern int mail_check (void);
@@ -350,9 +339,6 @@ extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 /* open.c */
 extern FILE *nntp_command(const char *, int, char *);
 extern FILE *open_art_fp (char *group_path, long art, int lines);
-#ifdef HAVE_TIN_NNTP_EXTS
-	extern FILE *open_motd_fp (char *motd_file_date);
-#endif
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
 extern FILE *open_newsgroups_fp (void);
@@ -501,7 +487,6 @@ extern int choose_new_group (void);
 extern int iSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern int skip_newgroups (void);
 extern void draw_group_arrow (void);
-extern void erase_group_arrow (void);
 extern void selection_index (int start_groupnum, int num_cmd_line_groups);
 extern void set_groupname_len (int all_groups);
 extern void show_selection_page (void);

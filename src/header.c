@@ -150,27 +150,27 @@ get_fqdn(
 			in.s_addr=(*hp->h_addr);
 
 	sprintf(fqdn,"%s",hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
-	if (!*fqdn || (fqdn[strlen(fqdn)-1]<='9')) {
-		*fqdn=0;
-		inf=fopen("/etc/resolv.conf","r");
+	if (!*fqdn || (fqdn[strlen(fqdn)-1] <= '9')) {
+		*fqdn = 0;
+		inf = fopen("/etc/resolv.conf", "r");
 		if (inf) {
-			while(fgets(line,MAXLINELEN,inf)) {
-				line[MAXLINELEN]=0;
+			while(fgets(line, MAXLINELEN, inf)) {
+				line[MAXLINELEN] = 0;
 				str_trim(line);
-				if (strncmp(line,"domain ",7)==0) {
-					domain=line+7;
+				if (strncmp(line,"domain ", 7) == 0) {
+					domain = line + 7;
 					break;
 				}
-				if (strncmp(line,"search ",7)==0) {
-					domain=line+7;
-					cp=strchr(domain,' ');
+				if (strncmp(line,"search ", 7) == 0) {
+					domain = line + 7;
+					cp = strchr(domain, ' ');
 					if (cp)
 						*cp=0;
 					break;
 				}
 			}
 			if (domain)
-				sprintf(fqdn,"%s.%s",name,domain);
+				sprintf(fqdn, "%s.%s", name, domain);
 		}
 		fclose(inf);
 	}
@@ -191,13 +191,13 @@ get_user_info (
 #ifndef INDEX_DAEMON
 	const char *ptr;
 
-	user_name[0]='\0';
-	full_name[0]='\0';
+	user_name[0] = '\0';
+	full_name[0] = '\0';
 
-	if ((ptr=get_full_name()))
-		strcpy(full_name,ptr);
-	if ((ptr=get_user_name()))
-		strcpy(user_name,ptr);
+	if ((ptr = get_full_name()))
+		strcpy(full_name, ptr);
+	if ((ptr = get_user_name()))
+		strcpy(user_name, ptr);
 #endif /* INDEX_DAEMON */
 }
 
@@ -211,7 +211,7 @@ get_user_name(
 	static char username[128];
 	struct passwd *pw;
 
-	username[0]='\0';
+	username[0] = '\0';
 #ifndef M_AMIGA
 	pw = getpwuid (getuid ());
 	strcpy (username, pw->pw_name);
@@ -232,7 +232,7 @@ get_full_name(
 	char tmp[128];
 	struct passwd *pw;
 
-	fullname[0]='\0';
+	fullname[0] = '\0';
 
 	if ((p = getenv ("NAME")) != (char *) 0) {
 		strncpy (fullname, p, sizeof (fullname));
@@ -310,7 +310,7 @@ build_sender (void)
 	const char *ptr;
 	static char sender[8192];
 
-	sender[0]='\0';
+	sender[0] = '\0';
 
 	if ((ptr = get_full_name())) {
 		strcpy(sender, ptr);

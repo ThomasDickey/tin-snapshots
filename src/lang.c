@@ -61,9 +61,7 @@ constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
 constext txt_cannot_get_term_entry[] = "%s: Can't get entry for TERM\n";
 constext txt_cannot_open[] = "Can't open %s";
-#ifdef NNTP_ABLE
-	constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
-#endif /* NNTP_ABLE */
+constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
 constext txt_cannot_post[] = "*** Posting not allowed ***";
 constext txt_cannot_post_group[] = "Posting is not allowed to %s";
 constext txt_cannot_write_index[] = "Can't write index %s";
@@ -761,7 +759,6 @@ constext txt_tinrc_mm_charset[] = "# charset supported locally which is also use
 # Set to US-ASCII or compile time default if neither of them is defined.\n\
 # If MIME_STRICT_CHARSET is defined at compile-time, charset other than\n\
 # mm_charset is considered not displayable and represented as '?'.\n";
-constext txt_tinrc_motd_file_info[] = "# news motd file dates from server used for detecting new motd info\n";
 constext txt_tinrc_newnews[] = "# host & time info used for detecting new groups (don't touch)\n";
 constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/following-up an article\n\
 # %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M Message-Id\n\

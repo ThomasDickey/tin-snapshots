@@ -55,12 +55,27 @@ getserverbyfile (
 	const char *file)
 {
 #ifdef NNTP_ABLE
-	FILE	*fp;
-	char	*cp;
-	static char	buf[256];
+	FILE *fp;
+	char *cp;
+	static char buf[256];
+#	ifdef HAVE_PUTENV
+	char tmpbuf[256];
+	char *new_env;
+	static char *old_env = 0;
+#	endif /* HAVE_PUTENV */
 
 	if (cmdline_nntpserver[0] != '\0') {
 		get_nntpserver (buf, cmdline_nntpserver);
+#	ifdef HAVE_PUTENV
+		sprintf (tmpbuf, "NNTPSERVER=%s", buf);
+		new_env = my_malloc (strlen (tmpbuf) + 1);
+		strcpy (new_env, tmpbuf);
+		putenv (new_env);
+		FreeIfNeeded (old_env);
+		old_env = new_env;
+#	else
+		setenv ("NNTPSERVER", buf, 1);
+#	endif /* HAVE_PUTENV */
 		return (buf);
 	}
 

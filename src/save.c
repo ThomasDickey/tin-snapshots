@@ -392,7 +392,7 @@ save_thread_to_file (
 		/* the tailing spaces are needed for SHOW_PROGRESS */
 		wait_message (0, "%s%d  ", txt_saving, ++count);
 
-		if (is_mailbox) 
+		if (is_mailbox)
 			file[0] = 0;
 		else
 			sprintf (file, "%s.%03d", save[i].file, i+1);

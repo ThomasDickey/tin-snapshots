@@ -15,6 +15,8 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
+static void read_groups_descriptions (FILE *fp, FILE *fp_save);
+
 /*
  *  Load the mail active file into active[]
  */
@@ -191,7 +193,7 @@ read_newsgroups_file (void)
  *  descriptions.
  */
 
-void
+static void
 read_groups_descriptions (
 	FILE *fp,
 	FILE *fp_save)

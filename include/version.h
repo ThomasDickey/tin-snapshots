@@ -17,7 +17,7 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"971127"
+#	define RELEASEDATE	"971204"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

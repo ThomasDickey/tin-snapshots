@@ -22,6 +22,10 @@ static int match_list ( char *line, constext *pat, constext *const *table, size_
 static void expand_rel_abs_pathname (int line, int col, char *str);
 static void show_config_page (void);
 
+#ifdef HAVE_COLOR
+	static int match_color (char *line, const char *pat, int *dst, int maxlen);
+#endif
+
 enum state { IGNORE, CHECK, UPGRADE };
 
 /*
@@ -380,8 +384,6 @@ read_config_file (
 			if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset)))
 				break;
 
-			if (match_string (buf, "motd_file_info=", motd_file_info, sizeof (motd_file_info)))
-				break;
 			if (match_boolean (buf, "mark_saved_read=", &mark_saved_read))
 				break;
 
@@ -399,10 +401,10 @@ read_config_file (
 				break;
 			}
 			/* pick which news headers to display */
-			if (match_string(buf, "news_headers_to_display=", 
-								  news_headers_to_display, 
+			if (match_string(buf, "news_headers_to_display=",
+								  news_headers_to_display,
 								  sizeof (news_headers_to_display))) {
-				news_headers_to_display_array 
+				news_headers_to_display_array
 					= ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 				break;
 			}
@@ -410,7 +412,7 @@ read_config_file (
 			if (match_string(buf, "news_headers_to_not_display=",
 								  news_headers_to_not_display,
 								  sizeof (news_headers_to_not_display))) {
-				news_headers_to_not_display_array 
+				news_headers_to_not_display_array
 					= ulBuildArgv(news_headers_to_not_display,
 									  &num_headers_to_not_display);
 				break;
@@ -1040,9 +1042,6 @@ write_config_file (
 	fprintf (fp, "default_select_pattern=%s\n", default_select_pattern);
 	fprintf (fp, "default_shell_command=%s\n\n", default_shell_command);
 
-	fprintf (fp, txt_tinrc_motd_file_info);
-	fprintf (fp, "motd_file_info=%s\n\n", motd_file_info);
-
 	fprintf (fp, txt_tinrc_newnews);
 	if (!num_newnews) {
 		fprintf (fp, "newnews=%s %ld\n", new_newnews_host, new_newnews_time);
@@ -1111,7 +1110,8 @@ print_option (
 }
 
 static t_bool
-OptionOnPage(int option)
+OptionOnPage (
+	int option)
 {
 	if ((option >= first_option_on_screen) && (option <  first_option_on_screen + option_lines_per_page))
 		return TRUE;
@@ -1125,13 +1125,15 @@ OptionOnPage(int option)
 #define OptionIndex(option)  (OptionInPage(option) % option_lines_per_page)
 
 int
-option_row(int option)
+option_row (
+	int option)
 {
 	return (INDEX_TOP + OptionIndex(option));
 }
 
 static void
-RepaintOption(int option)
+RepaintOption (
+	int option)
 {
 	if (OptionOnPage(option)) {
 		MoveCursor (option_row(option), 3);
@@ -1140,7 +1142,8 @@ RepaintOption(int option)
 }
 
 #if USE_CURSES
-static void DoScroll(int jump)
+static void DoScroll (
+	int jump)
 {
 	int y, x;
 	getyx(stdscr, y, x);
@@ -1381,7 +1384,7 @@ change_config_file (
 				if (option != old_option) {
 					unhighlight_option (old_option);
 					highlight_option (option);
-				} 	
+				}
 				break;
 
 			case iKeyConfigSelect:
@@ -1646,8 +1649,8 @@ change_config_file (
 							prompt_option_string (option);
 							free (*news_headers_to_display_array);
 							free (news_headers_to_display_array);
-							news_headers_to_display_array 
-								= ulBuildArgv(news_headers_to_display, 
+							news_headers_to_display_array
+								= ulBuildArgv(news_headers_to_display,
 												  &num_headers_to_display);
 							break;
 
@@ -1656,7 +1659,7 @@ change_config_file (
 							prompt_option_string (option);
 							free (*news_headers_to_not_display_array);
 							free (news_headers_to_not_display_array);
-							news_headers_to_not_display_array 
+							news_headers_to_not_display_array
 								= ulBuildArgv(news_headers_to_not_display,
 												  &num_headers_to_not_display);
 							break;
@@ -1799,7 +1802,7 @@ match_boolean (
 }
 
 #ifdef HAVE_COLOR
-int
+static int
 match_color (
 	char *line,
 	const char *pat,
