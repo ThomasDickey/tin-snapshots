@@ -182,9 +182,6 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
-o  if (show_description && !CURR_GROUP.descrition) don't truncate
-   active_name (select.c)
-
 o  move all strings to lang.c
 
 o  looks like, that while being connected to a server, new newsgroups are
