@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include "tcurses.h"
 
 #ifdef HAVE_PGP
 
@@ -200,7 +201,7 @@ invoke_pgp_mail (
 	do {
 		sprintf(msg, "%s%c", txt_pgp_mail, ch_default);
 		wait_message(msg);
-		MoveCursor(cLINES, (int) strlen(txt_pgp_mail));
+		MoveCursor(cLINES-1, (int) strlen(txt_pgp_mail));
 		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (!strchr("beqs\033", ch));
@@ -239,7 +240,7 @@ invoke_pgp_news(
 	do {
 		sprintf(msg, "%s%c", txt_pgp_news, ch_default);
 		wait_message(msg);
-		MoveCursor(cLINES, (int) strlen(txt_pgp_news));
+		MoveCursor(cLINES-1, (int) strlen(txt_pgp_news));
 		if ((ch = (char) ReadCh()) == '\n' || ch == '\r')
 			ch = ch_default;
 	} while (!strchr("iqs\033", ch));
@@ -300,7 +301,7 @@ pgp_check_article(void)
 		Raw(FALSE);
 		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 		system(cmd);
-		printf("\n");
+		my_printf("\n");
 		Raw(TRUE);
 	}
 	if (pgp_key) {
@@ -309,7 +310,7 @@ pgp_check_article(void)
 			Raw (FALSE);
 			sprintf (cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
 			system (cmd);
-			printf ("\n");
+			my_printf ("\n");
 			Raw (TRUE);
 		}
 	}

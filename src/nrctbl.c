@@ -15,9 +15,10 @@
  *              right notice, and it must be included in any copy made
  */
 
+#include	"tin.h"
+#include	"tcurses.h"
 #include	"version.h"
 #include	"menukeys.h"
-#include	"tin.h"
 
 /* write_newsrctable_file()
  * create newsrctable file in local rc directory

@@ -13,10 +13,11 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 #include	"version.h"
 
-#define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); fflush (stdout); Raw (TRUE);}
+#define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); my_flush (); Raw (TRUE);}
 
 #define	MAX_MSG_HEADERS	20
 
@@ -78,7 +79,7 @@ static void do_prompt1 (
 {
 	sprintf (msg, "%s%c", format, ch_default);
 	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (format));
+	MoveCursor (cLINES-1, (int) strlen (format));
 }
 
 static void
@@ -97,7 +98,7 @@ do_prompt2(
 	sprintf (msg, format, have, subject, ch_default);
 
 	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (msg) - 1);
+	MoveCursor (cLINES-1, (int) strlen (msg) - 1);
 }
 
 static int
@@ -1855,11 +1856,11 @@ post_response (
 			if (*ptr != ',') {
 				my_fputc (*ptr, stdout);
 			} else {
-				my_fputs ("\r\n    ", stdout);
+				my_fputs (cCRLF "    ", stdout);
 			}
 			ptr++;
 		}
-		fflush (stdout);
+		my_flush ();
 
 		if (prompt_yn (cLINES, txt_continue, TRUE) != 1) {
 			return ret_code;
@@ -2928,7 +2929,7 @@ cancel_article (
 			sprintf (msg, "%s [%.*s]: %c", txt_quit_cancel,
 				 cCOLS - ((int) strlen(txt_quit_cancel)+7), note_h_subj, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg) - 1);
+			MoveCursor (cLINES-1, (int) strlen (msg) - 1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (!strchr ("\033deq", ch));
@@ -3626,17 +3627,17 @@ reread_active_after_posting (void)
 
 					if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
-						printf ("\r\nUnread WRONG grp=[%s] unread=[%ld] count=[%ld]",
+						my_printf (cCRLF "Unread WRONG grp=[%s] unread=[%ld] count=[%ld]",
 							psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-						fflush (stdout);
+						my_flush ();
 #endif
 						psGrp->newsrc.num_unread = psGrp->count;
 					}
 					if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
 #ifdef DEBUG
-						printf ("\r\nMin/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
+						my_printf (cCRLF "Min/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
 							psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-						fflush (stdout);
+						my_flush ();
 #endif
 
 /*

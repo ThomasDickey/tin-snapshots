@@ -91,7 +91,9 @@ init_alloc (void)
 
 	spooldirs = (struct t_spooldir *) my_malloc (sizeof(*spooldirs) * max_spooldir);
 
+#if !USE_CURSES
 	screen = (struct t_screen *) 0;
+#endif
 }
 
 
@@ -155,6 +157,7 @@ void
 init_screen_array (
 	int allocate)
 {
+#if !USE_CURSES
 	int i;
 
 	if (allocate) {
@@ -174,6 +177,7 @@ init_screen_array (
 			screen = (struct t_screen *) 0;
 		}
 	}
+#endif
 }
 
 

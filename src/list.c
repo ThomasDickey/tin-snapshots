@@ -56,7 +56,7 @@ hash_groupname (
 	}
 	val = hash % prime;
 /*
-printf ("hash=[%s] [%ld]\n", group, val);
+my_printf ("hash=[%s] [%ld]\n", group, val);
 */
 	return val;
 #else

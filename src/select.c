@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 char default_goto_group[LEN];
@@ -27,12 +28,15 @@ int yank_in_active_file = TRUE;
 /*
 ** Local prototypes
 */
+#ifndef INDEX_DAEMON
+static int next_unread_group (int enter_group);
 static int prompt_group_num (int ch);
-static void yank_active_file (void);
 static int reposition_group (struct t_group *group, int default_num);
 static void catchup_group (struct t_group *group, int goto_next_unread_group);
-static int next_unread_group (int enter_group);
 static void goto_next_group_on_screen (void);
+static void yank_active_file (void);
+#endif
+
 static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
 static void vDelRange (int iLevel, int iNumMax);
 
@@ -338,9 +342,7 @@ select_up:
 					break;
 				}
 				if (cur_groupnum == 0) {
-					if (_hp_glitch) {
-						erase_group_arrow ();
-					}
+					HpGlitch(erase_group_arrow ());
 					if (group_top > last_group_on_screen) {
 						cur_groupnum = group_top - 1;
 						show_selection_page ();
@@ -351,9 +353,7 @@ select_up:
 					}
 					break;
 				}
-				if (_hp_glitch) {
-					erase_group_arrow ();
-				}
+				HpGlitch(erase_group_arrow ());
 				if (cur_groupnum <= first_group_on_screen) {
 					cur_groupnum--;
 					show_selection_page ();
@@ -381,9 +381,7 @@ select_page_up:
 					break;
 				}
 				if (cur_groupnum == 0) {
-					if (_hp_glitch) {
-						erase_group_arrow ();
-					}
+					HpGlitch(erase_group_arrow ());
 					if (group_top > last_group_on_screen) {
 						cur_groupnum = group_top - 1;
 						show_selection_page ();
@@ -483,9 +481,7 @@ select_page_up:
 				if (CURR_GROUP.subscribed) {
 					n = cur_groupnum;
 					cur_groupnum = reposition_group (&active[my_group[n]], n);
-					if (_hp_glitch) {
-						erase_group_arrow ();
-					}
+					HpGlitch(erase_group_arrow ());
 					if (cur_groupnum < first_group_on_screen ||
 						cur_groupnum >= last_group_on_screen ||
 						cur_groupnum != n) {
@@ -757,9 +753,7 @@ select_done:
 					vWriteNewsrc ();
 /* TODO - remove if working okay without this		read_newsrc (newsrc, 1);*/
 					toggle_my_groups(show_only_unread_groups, "");
-					if (_hp_glitch) {
-						erase_group_arrow ();
-					}
+					HpGlitch(erase_group_arrow ());
 					cur_groupnum = group_top - 1;
 					set_groupname_len (yank_in_active_file);
 					show_selection_page ();
@@ -869,6 +863,11 @@ show_selection_page (void)
  	}
 
 	for (j=0, i=first_group_on_screen; i < last_group_on_screen; i++, j++) {
+#if USE_CURSES
+		char sptr[BUFSIZ];
+#else
+		char *sptr = screen[j].col;
+#endif
 		if (active[my_group[i]].inrange) {
 			strcpy (new, "    #");
 		} else if (active[my_group[i]].newsrc.num_unread) {
@@ -898,32 +897,32 @@ show_selection_page (void)
 
 		if (show_description) {
 			if (active[n].description) {
-				sprintf (screen[j].col, "  %c %s %s  %-*.*s  %-*.*s\r\n",
+				sprintf (sptr, "  %c %s %s  %-*.*s  %-*.*s" cCRLF,
 				         subs, tin_itoa(i+1, 4), new,
 				         groupname_len, groupname_len, active_name,
 				         blank_len, blank_len, group_descript);
 			} else {
-				sprintf (screen[j].col, "  %c %s %s  %-*.*s  \r\n",
+				sprintf (sptr, "  %c %s %s  %-*.*s  " cCRLF,
 				         subs, tin_itoa(i+1, 4), new,
 				         (groupname_len+blank_len),
 				         (groupname_len+blank_len), active[n].name);
 			}
 		} else {
 			if (draw_arrow_mark) {
- 				sprintf (screen[j].col, "  %c %s %s  %-*.*s\r\n",
+ 				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF,
 				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name);
 			} else {
- 				sprintf (screen[j].col, "  %c %s %s  %-*.*s%*s\r\n",
+ 				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF,
 				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name,
  					 blank_len, " ");
 			}
  		}
  		if (strip_blanks) {
-			strip_line (screen[j].col);
-			strcat (screen[j].col, "\r\n");
+			strip_line (sptr);
+			strcat (sptr, cCRLF);
 		}
  		CleartoEOLN ();
- 		my_fputs (screen[j].col, stdout);
+ 		my_fputs (sptr, stdout);
 	}
 
 	CleartoEOS ();
@@ -942,6 +941,7 @@ show_selection_page (void)
 }
 
 
+#ifndef INDEX_DAEMON
 static int
 prompt_group_num (
 	int ch)
@@ -976,6 +976,7 @@ prompt_group_num (
 
 	return TRUE;
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -992,12 +993,14 @@ draw_group_arrow (void)
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 yank_active_file (void)
 {
 	reread_active_file = TRUE;
 	resync_active_file ();
 }
+#endif /* INDEX_DAEMON */
 
 
 int
@@ -1087,6 +1090,7 @@ add_my_group (
 	return -1;
 }
 
+#ifndef INDEX_DAEMON
 static int
 reposition_group (
 	struct t_group *group,
@@ -1138,8 +1142,10 @@ reposition_group (
 		return (default_num);
 	}
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static void
 catchup_group (
 	struct t_group *group,
@@ -1160,8 +1166,10 @@ catchup_group (
 		}
 	}
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static int
 next_unread_group (
 	int enter_group)
@@ -1216,6 +1224,7 @@ next_unread_group (
 
 	return GRP_CONTINUE;
 }
+#endif /* INDEX_DAEMON */
 
 /*
  *  Calculate max length of groupname field for group selection level.
@@ -1343,12 +1352,11 @@ toggle_my_groups (
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 goto_next_group_on_screen (void)
 {
-	if (_hp_glitch) {
-		erase_group_arrow ();
-	}
+	HpGlitch(erase_group_arrow ());
 
 	if (cur_groupnum+1 < last_group_on_screen) {
 		erase_group_arrow ();
@@ -1359,6 +1367,7 @@ goto_next_group_on_screen (void)
 		show_selection_page ();
 	}
 }
+#endif	/* INDEX_DAEMON */
 
 /*
  * Strip trailing blanks, \r and \n

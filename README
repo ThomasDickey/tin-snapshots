@@ -1,9 +1,9 @@
 WARNING, this is NOT an official release, but a patched version with
 many new features and bug-fixes over the last 'official' beta release from
-August 1995. (for more information have a look at the WHATSNEW file).
+August 1995. (for more information have a look at the doc/WHATSNEW file).
 It is still a work in progress and might not compile on all machines (for a
 list of platforms on which tin-unoff has been installed and tested have a
-look at INSTALL).
+look at doc/INSTALL).
 
 Quick Install - 
 

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 #define INDEX2TNUM(i)	((i) % NOTESLINES)
@@ -25,39 +26,44 @@
 int thread_basenote = 0;
 int show_subject;
 
-static int top_thread = 0;
+#ifndef INDEX_DAEMON
 static int thread_index_point = 0;
+static int top_thread = 0;
 static int thread_respnum = 0;
 static int first_thread_on_screen = 0;
 static int last_thread_on_screen = 0;
+#endif
 
 /*
  * Local prototypes
  */
+#ifndef INDEX_DAEMON
 static int prompt_thread_num (int ch);
+static void update_thread_page (void);
 static void draw_thread_arrow (void);
 static void erase_thread_arrow (void);
-static void update_thread_page (void);
+#endif
 
 
 /*
  * Build one line of the thread page display. Looks long winded, but
  * there are a lot of variables in the format for the output
  */
+#ifndef INDEX_DAEMON
 static void
 bld_tline (
 	int l,
 	struct t_article *art)
 {
-#ifndef INDEX_DAEMON
-	int i, j;
+	int i;
 	int len_from;
 	char mark;
-	char *buff;
 	struct t_msgid *ptr;
-
-	j = INDEX2TNUM(l);			/* j is position on screen of this line */
-	buff = screen[j].col;
+#if USE_CURSES
+	char buff[BUFSIZ];
+#else
+	char *buff = screen[INDEX2TNUM(l)].col;
+#endif
 
 	/*
 	 * Start with space for ->
@@ -167,38 +173,44 @@ bld_tline (
 		get_author (TRUE, art, buff+strlen(buff), cCOLS-strlen(buff));
 	}
 
-	if (strip_blanks)					/* No fancy padding needed */
-		return;
+	if (!strip_blanks) {
+		/*
+		 * Pad to end of line so that inverse bar looks 'good'
+		 */
+		for (i=strlen(buff); i<cCOLS; i++)
+			*(buff + i) = ' ';
 
-	/*
-	 * Pad to end of line so that inverse bar looks 'good'
-	 */
-	for (i=strlen(buff); i<cCOLS; i++)
-		*(buff + i) = ' ';
+		*(buff + i) = '\0';
+	}
 
-	*(buff + i) = '\0';
-
-	return;
+#if USE_CURSES
+	/* FIXME: draw_tline usually does this too */
+	/* FIXME: there's an unintercepted return above */
+	mvaddstr(INDEX2LNUM(l), 0, buff);
+	clrtoeol();
 #endif
+	return;
 }
+#endif
 
 
+#ifndef INDEX_DAEMON
 static void
 draw_tline (
 	int i,
 	int full)
 {
-#ifndef INDEX_DAEMON
-	size_t tlen;
-	int j, x;
+	int tlen;
+	int x = full ? 0 : (MARK_OFFSET-2);
 	int k = MARK_OFFSET;
-	char *s;
-
-	j = INDEX2TNUM(i);
+#if USE_CURSES
+	char buffer[BUFSIZ];
+	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
+#else
+	char *s = &(screen[INDEX2TNUM(i)].col[x]);
+#endif
 
 	if (full) {
-		s = screen[j].col;
-		x = 0;
 		if (strip_blanks) {
 			strip_line (s);
 			CleartoEOLN ();
@@ -206,27 +218,26 @@ draw_tline (
 		tlen = strlen (s);	/* note new line length */
 	} else {
 		tlen = 3; /* tagged/mark is 3 chars wide */
-		s = &screen[j].col[MARK_OFFSET-2];
-		x = MARK_OFFSET-2;
 	}
 
 	MoveCursor(INDEX2LNUM(i), x);
-	fwrite (s, 1, tlen, stdout);
+	if (tlen)
+		my_printf("%.*s", tlen, s);
 
 	/* it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if (screen[j].col[k] == art_marked_selected) {
+	if (s[k-x] == art_marked_selected) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
-		my_fputc (screen[j].col[k], stdout);
+		my_fputc (s[k-x], stdout);
 		ToggleInverse ();
 	}
 
 	MoveCursor(INDEX2LNUM(i)+1, 0);
-#endif
 	return;
 }
+#endif
 
 /*
  * show current thread. If threaded on Subject: show
@@ -525,9 +536,7 @@ thread_page_down:
 			case iKeyDown2:
 thread_down:
 				if (thread_index_point + 1 >= top_thread) {
-					if (_hp_glitch) {
-						erase_thread_arrow ();
-					}
+					HpGlitch(erase_thread_arrow ());
 					if (0 < first_thread_on_screen) {
 						thread_index_point = 0;
 						show_thread_page ();
@@ -553,9 +562,7 @@ thread_down:
 			case iKeyUp2:		/* line up */
 thread_up:
 				if (thread_index_point == 0) {
-					if (_hp_glitch) {
-						erase_thread_arrow ();
-					}
+					HpGlitch(erase_thread_arrow ());
 					if (top_thread > last_thread_on_screen) {
 						thread_index_point = top_thread - 1;
 						show_thread_page ();
@@ -566,9 +573,7 @@ thread_up:
 					}
 					break;
 				}
-				if (_hp_glitch) {
-					erase_thread_arrow ();
-				}
+				HpGlitch(erase_thread_arrow ());
 				if (thread_index_point <= first_thread_on_screen) {
 					thread_index_point--;
 					show_thread_page ();
@@ -584,9 +589,7 @@ thread_up:
 			case iKeyPageUp3:
 thread_page_up:
 				if (thread_index_point == 0) {
-					if (_hp_glitch) {
-						erase_thread_arrow ();
-					}
+					HpGlitch(erase_thread_arrow ());
 					if (top_thread > last_thread_on_screen) {
 						thread_index_point = top_thread - 1;
 						show_thread_page ();
@@ -869,10 +872,10 @@ show_thread_page (void)
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 update_thread_page (void)
 {
-#ifndef INDEX_DAEMON
 	register int i, j, the_index;
 
 	the_index = choose_response (thread_basenote, first_thread_on_screen);
@@ -887,10 +890,11 @@ update_thread_page (void)
 	}
 
 	draw_thread_arrow();
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static void
 draw_thread_arrow (void)
 {
@@ -898,13 +902,13 @@ draw_thread_arrow (void)
 
 	if (draw_arrow_mark) {
 		my_fputs ("->", stdout);
-		fflush (stdout);
+		my_flush ();
 	} else {
 		StartInverse ();
 		draw_tline (thread_index_point, TRUE);
 		EndInverse ();
 	}
-	MoveCursor (cLINES, 0);
+	stow_cursor();
 
 /*
 ** show current subject in the last line - this is done a bit to often
@@ -912,8 +916,10 @@ draw_thread_arrow (void)
 */
 	info_message (arts[(choose_response (thread_basenote, thread_index_point))].subject);
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static void
 erase_thread_arrow (void)
 {
@@ -922,15 +928,15 @@ erase_thread_arrow (void)
 	if (draw_arrow_mark) {
 		my_fputs ("  ", stdout);
 	} else {
-		if (_hp_glitch) {
-			EndInverse ();
-		}
+		HpGlitch(EndInverse ());
 		draw_tline (thread_index_point, TRUE);
 	}
-	fflush (stdout);
+	my_flush ();
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static int
 prompt_thread_num (
 	int ch)
@@ -959,6 +965,8 @@ prompt_thread_num (
 	}
 	return TRUE;
 }
+#endif /* INDEX_DAEMON */
+
 
 /*
  *  Return the number of unread articles there are within a thread

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 char note_h_from[HEADER_LEN];		/* From:         */
@@ -58,6 +59,7 @@ static int tex2iso_article;
 /*
  * Local prototypes
  */
+#ifndef INDEX_DAEMON
 #ifdef HAVE_METAMAIL
 static void show_mime_article (FILE *fp, struct t_article *art);
 #endif
@@ -65,7 +67,9 @@ static void show_first_header (int respnum, char *group);
 static void show_cont_header (int respnum);
 static int prompt_response (int ch, int respnum);
 static int show_last_page (void);
+#endif /* INDEX_DAEMON */
 
+#ifndef INDEX_DAEMON
 int
 show_page (
 	struct t_group *group,
@@ -73,7 +77,6 @@ show_page (
 	int respnum,		/* index into arts[] */
 	int *threadnum)		/* to allow movement in thread mode */
 {
-#ifndef INDEX_DAEMON
 
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
@@ -427,8 +430,8 @@ page_goto_next_unread:
 begin_of_article:
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
-					printf (txt_art_unavailable, arts[respnum].artnum);
-					fflush (stdout);
+					my_printf (txt_art_unavailable, arts[respnum].artnum);
+					my_flush ();
 				} else {
 					note_page = 0;
 					note_end = FALSE;
@@ -739,8 +742,8 @@ return_to_index:
 			    info_message(txt_bad_command);
 		}
 	}
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -750,8 +753,8 @@ redraw_page (
 {
 	if (note_page == ART_UNAVAILABLE) {
 		ClearScreen ();
-		printf (txt_art_unavailable, arts[respnum].artnum);
-		fflush (stdout);
+		my_printf (txt_art_unavailable, arts[respnum].artnum);
+		my_flush ();
 	} else if (note_page > 0) {
 		note_page--;
 		fseek (note_fp, note_mark[note_page], 0);
@@ -759,6 +762,7 @@ redraw_page (
 	}
 }
 
+#ifndef INDEX_DAEMON
 static int
 expand_ctrl_chars(
 	char *tobuf,
@@ -798,6 +802,7 @@ expand_ctrl_chars(
 
 	return ctrl_L;
 }
+#endif /* INDEX_DAEMON */
 
 void
 show_note_page (
@@ -904,7 +909,7 @@ print_a_line:
 #ifdef HAVE_COLOR
 				print_color (buf2, below_sig);
 #else
-				printf ("%s\r\n", buf2);
+				my_printf ("%s" cCRLF, buf2);
 #endif
 				note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 				note_page++;
@@ -913,7 +918,7 @@ print_a_line:
 #ifdef HAVE_COLOR
 			print_color (buf2, below_sig);
 #else
-			printf ("%s\r\n", buf2);
+			my_printf ("%s" cCRLF, buf2);
 #endif
 			note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 		}
@@ -943,36 +948,36 @@ print_a_line:
 	fcol(col_text);
 #endif
 	if (note_end) {
-		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
+		MoveCursor (cLINES-1, MORE_POS-(5+BLANK_PAGE_COLS));
 		StartInverse ();
 		if (arts[respnum].thread != -1) {
 			my_fputs (txt_next_resp, stdout);
 		} else {
 			my_fputs (txt_last_resp, stdout);
 		}
-		fflush (stdout);
+		my_flush ();
 		EndInverse ();
 	} else {
 		if (note_size > 0) {
 			draw_percent_mark (note_mark[note_page], note_size);
 		} else {
-			MoveCursor (cLINES, MORE_POS-BLANK_PAGE_COLS);
+			MoveCursor (cLINES-1, MORE_POS-BLANK_PAGE_COLS);
 			StartInverse ();
 			my_fputs (txt_more, stdout);
-			fflush (stdout);
+			my_flush ();
 			EndInverse ();
 		}
 	}
 
 	show_mini_help (PAGE_LEVEL);
 
-	MoveCursor (cLINES, 0);
+	stow_cursor();
 
 #endif /* INDEX_DAEMON */
 }
 
 
-#ifdef HAVE_METAMAIL
+#if defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON)
 static void
 show_mime_article (
 	FILE	*fp,
@@ -985,7 +990,7 @@ show_mime_article (
 	Raw(FALSE);
 	offset = ftell (fp);
 	rewind (fp);
-	printf ("mime article\n");
+	my_printf ("mime article\n");
 	sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 	mime_fp = popen (buf, "w");
 	while (fgets (buf, sizeof (buf), fp) != 0) {
@@ -996,19 +1001,20 @@ show_mime_article (
 	note_end = TRUE;
 	Raw(TRUE);
 	fseek (fp, offset, 0);	/* goto old position */
-	MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
+	MoveCursor (cLINES-1, MORE_POS-(5+BLANK_PAGE_COLS));
 	StartInverse ();
 	if (art->thread != -1) {
 		my_fputs (txt_next_resp, stdout);
 	} else {
 		my_fputs (txt_last_resp, stdout);
 	}
-	fflush (stdout);
+	my_flush ();
 	EndInverse ();
 }
-#endif
+#endif /* defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON) */
 
 
+#ifndef INDEX_DAEMON
 static void
 show_first_header (
 	int respnum,
@@ -1081,7 +1087,7 @@ show_first_header (
 		StartInverse ();
 		my_fputs (ftbuf, stdout);
 		EndInverse ();
-		my_fputs ("\r\n", stdout);
+		my_fputs (cCRLF, stdout);
 	}
 	else {
 		char x[5];
@@ -1139,14 +1145,14 @@ show_first_header (
 
 	MoveCursor (1, RIGHT_POS);
 	if (whichresp)
-		printf (txt_resp_x_of_n, whichresp, x_resp);
+		my_printf (txt_resp_x_of_n, whichresp, x_resp);
 	else {
 		if (x_resp == 0)
 			my_fputs (txt_no_resp, stdout);
 		else if (x_resp == 1)
 			my_fputs (txt_1_resp, stdout);
 		else
-			printf (txt_x_resp, x_resp);
+			my_printf (txt_x_resp, x_resp);
 	}
 
 #ifdef HAVE_COLOR
@@ -1185,7 +1191,7 @@ show_first_header (
 	fcol(col_from);
 #endif
 
-	printf ("%s\r\n\r\n", buf);
+	my_printf ("%s" cCRLF cCRLF, buf);
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
@@ -1194,14 +1200,14 @@ show_first_header (
 	note_line += 4;
 
 	if (note_h_keywords[0]) {
-		printf ("Keywords: %s\r\n", note_h_keywords);
+		my_printf ("Keywords: %s" cCRLF, note_h_keywords);
 		note_line++;
 	}
 
 	if (note_h_summary[0]) {
 		char *cp, *cp1;
 
-		printf ("Summary: ");
+		my_printf ("Summary: ");
 		for (cp = note_h_summary; cp;)
 		{	if ((cp1 = strchr (cp, '\n')) != 0) {
 				strncpy (tmp, cp, (size_t)(cp1-cp));
@@ -1212,23 +1218,25 @@ show_first_header (
 				my_fputs (cp, stdout);
 				cp = (char *) 0;
 			}
-			my_fputs ("\r\n", stdout);
+			my_fputs (cCRLF, stdout);
 			note_line++;
 		}
 	}
 
 	if (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto) {
-		printf ("X-Comment-To: %s\r\n", note_h_ftnto);
+		my_printf ("X-Comment-To: %s" cCRLF, note_h_ftnto);
 		note_line++;
 	}
 
 	if (note_h_keywords[0] || note_h_summary[0] || (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto)) {
-		printf ("\r\n");
+		my_printf (cCRLF);
 		note_line++;
 	}
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static void
 show_cont_header (
 	int respnum)
@@ -1268,7 +1276,7 @@ show_cont_header (
 	fcol(col_head);
 #endif
 
-	printf("%s\r\n\r\n", buf);
+	my_printf("%s" cCRLF cCRLF, buf);
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
@@ -1276,6 +1284,7 @@ show_cont_header (
 
 	note_line += 2;
 }
+#endif /* INDEX_DAEMON */
 
 
 int
@@ -1415,6 +1424,7 @@ art_close (void)
 }
 
 
+#ifndef INDEX_DAEMON
 static int
 prompt_response (
 	int ch,
@@ -1431,6 +1441,7 @@ prompt_response (
 
 	return choose_response (which_thread (respnum), num);
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -1474,6 +1485,7 @@ yank_to_addr (
 }
 
 
+#ifndef INDEX_DAEMON
 static int
 show_last_page (void)
 {
@@ -1527,6 +1539,7 @@ show_last_page (void)
 	fseek (note_fp, note_mark[note_page], 0);
 	return TRUE;
 }
+#endif /* INDEX_DAEMON */
 
 
 /*

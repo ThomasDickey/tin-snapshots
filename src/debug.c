@@ -521,12 +521,12 @@ debug_print_active_hash (void)
 
 	for (i = 0; i < TABLE_SIZE; i++) {
 /*
-		printf ("HASH[%4d]  ", i);
+		my_printf ("HASH[%4d]  ", i);
 */
 
 		if (group_hash[i] == -1) {
 /*
-			printf ("EMPTY\n");
+			my_printf ("EMPTY\n");
 */
 			empty++;
 		} else {
@@ -535,23 +535,23 @@ debug_print_active_hash (void)
 				number++;
 			}
 			if (number > 31) {
-				printf ("MEGA HASH COLLISION > 31 HASH[%d]=[%d]!!!\n", i, number);
+				my_printf ("MEGA HASH COLLISION > 31 HASH[%d]=[%d]!!!\n", i, number);
 			} else {
 				collisions[number]++;
 			}
 		}
 	}
 
-	printf ("HashTable Active=[%d] Size=[%d] Filled=[%d] Empty=[%d]\n",
+	my_printf ("HashTable Active=[%d] Size=[%d] Filled=[%d] Empty=[%d]\n",
 		num_active, TABLE_SIZE, TABLE_SIZE-empty, empty);
-	printf ("01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32\n");
-	printf ("-----------------------------------------------------------------------------------------------\n");
+	my_printf ("01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32\n");
+	my_printf ("-----------------------------------------------------------------------------------------------\n");
 	for (i = 0; i < 32; i++) {
 		if (i) {
-			printf ("%2d ", collisions[i]);
+			my_printf ("%2d ", collisions[i]);
 		}
 	}
-	printf ("\n");
+	my_printf ("\n");
 }
 #endif
 
@@ -562,7 +562,7 @@ debug_print_group_hash (void)
 	int i;
 
 	for (i = 0; i < TABLE_SIZE; i++) {
-		printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
+		my_printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
 	}
 }
 #endif

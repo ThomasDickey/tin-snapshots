@@ -14,6 +14,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"version.h"
 
 #ifdef NNTP_ABLE
@@ -612,8 +613,8 @@ open_art_header (
 			fclose (fp);
 		}
 /*
-printf ("Artnum=[%ld] Items=[%d]\n", art, items);
-fflush (stdout);
+my_printf ("Artnum=[%ld] Items=[%d]\n", art, items);
+my_flush ();
 sleep (1);
 */
 		if (items == 0) {
@@ -921,6 +922,7 @@ setup_hard_base (
  * 1 means failed
  */
 
+#ifndef INDEX_DAEMON
 static int
 authenticate (void)
 {
@@ -997,6 +999,7 @@ authenticate (void)
 	return 1;	/* authentication "failed" */
 #endif	/* NNTP_ABLE; former: HAVE_GENERIC_AUTHINFO */
 }
+#endif /* INDEX_DAEMON */
 
 /*
  *  Get a response code from the server and return it to the caller
@@ -1323,18 +1326,18 @@ vGrpGetSubArtInfo (void)
 				&psGrp->xmin);
 			if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
-				printf ("\r\nUnread WRONG [%d]=%s unread=[%ld] count=[%ld]",
+				my_printf (cCRLF "Unread WRONG [%d]=%s unread=[%ld] count=[%ld]",
 					iNum, psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-				fflush(stdout);
+				my_flush ();
 #endif
 				psGrp->newsrc.num_unread = psGrp->count;
 			}
 			if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
 				expand_bitmap(psGrp, psGrp->xmin);
 #ifdef DEBUG
-	printf ("\r\nMin/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]",
+	my_printf (cCRLF "Min/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]",
 		iNum, psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-	fflush(stdout);
+	my_flush ();
 #endif
 			}
 			if (iNum % 5 == 0) {
@@ -1406,7 +1409,7 @@ vGrpGetArtInfo (
 				return(-ERR_NOGROUP);
 
 			case ERR_ACCESS:
-				error_message ("\r\n%s", acLine);
+				error_message (cCRLF "%s", acLine);
 				tin_done (EXIT_NNTP_ERROR);
 
 			default:

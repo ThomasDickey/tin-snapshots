@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 #undef OFF
@@ -52,13 +53,15 @@ struct archiver_t {
 ** Local prototypes
 */
 static int any_saved_files (void);
+static void post_process_uud (int pp, t_bool auto_delete);
+static void post_process_sh (t_bool auto_delete);
+
+#ifndef INDEX_DAEMON
 static const char *get_first_savefile (void);
 static const char *get_last_savefile (void);
-static void post_process_uud (int pp, t_bool auto_delete);
 static void uudecode_file (int pp, char *file_out_dir, char *file_out);
-static void post_process_sh (t_bool auto_delete);
 static char *get_archive_file (char *dir);
-
+#endif /* INDEX_DAEMON */
 
 /*
  *  Check for articles and say how many new/unread in each group.
@@ -336,7 +339,7 @@ save_art_to_file (
 				sprintf (buf, txt_append_overwrite_quit, file);
 				sprintf (msg, "%s%c", buf, ch_default);
 				wait_message (msg);
-				MoveCursor (cLINES, (int) strlen (buf));
+				MoveCursor (cLINES-1, (int) strlen (buf));
 				if ((ch = (char) ReadCh ()) == '\n' || ch == '\r')
 					ch = ch_default;
 			} while (!strchr ("aoq\033", ch));
@@ -922,6 +925,7 @@ save_filename (
 }
 
 
+#ifndef INDEX_DAEMON
 static const char *
 get_first_savefile (void)
 {
@@ -982,8 +986,10 @@ get_first_savefile (void)
 	}
 	return "";
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static const char *
 get_last_savefile (void)
 {
@@ -1044,6 +1050,7 @@ get_last_savefile (void)
 	}
 	return "";
 }
+#endif /* INDEX_DAEMON */
 
 
 int
@@ -1226,6 +1233,7 @@ post_process_uud (
  *  uudecode a single file
  */
 
+#ifndef INDEX_DAEMON
 static void
 uudecode_file (
 	int	pp,
@@ -1252,11 +1260,11 @@ uudecode_file (
 		 */
 		if ((file = get_archive_file (file_out_dir)) != (char *) 0) {
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
-			printf (txt_checksum_of_file, file);
-			fflush (stdout);
+			my_printf (txt_checksum_of_file, file);
+			my_flush ();
 			if ((fp_in = popen (buf, "r")) == (FILE *) 0) {
-				printf ("Cannot execute %s\r\n", buf);
-				fflush (stdout);
+				my_printf ("Cannot execute %s" cCRLF, buf);
+				my_flush ();
 			} else {
 				if (stat (file, &st) != -1) {
 					file_size = (int) st.st_size;
@@ -1268,8 +1276,8 @@ uudecode_file (
 					}
 				}
 				pclose (fp_in);
-				printf ("%s  %8d bytes\r\n\r\n", buf, file_size);
-				fflush (stdout);
+				my_printf ("%s  %8d bytes" cCRLF cCRLF, buf, file_size);
+				my_flush ();
 			}
 
 			/* If defined, invoke post processor command */
@@ -1288,8 +1296,8 @@ uudecode_file (
 					i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].test, file);
-					printf (txt_testing_archive, file);
-					fflush (stdout);
+					my_printf (txt_testing_archive, file);
+					my_flush ();
 					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
@@ -1301,8 +1309,8 @@ uudecode_file (
 					i = (pp == POST_PROC_UUD_LST_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].list, file);
-					printf (txt_listing_archive, file);
-					fflush (stdout);
+					my_printf (txt_listing_archive, file);
+					my_flush ();
 					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
@@ -1315,8 +1323,8 @@ uudecode_file (
 					i = (pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].extract, file);
-					printf (txt_extracting_archive, file);
-					fflush (stdout);
+					my_printf (txt_extracting_archive, file);
+					my_flush ();
 					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
@@ -1329,6 +1337,7 @@ uudecode_file (
 	}
 #endif	/* M_UNIX */
 }
+#endif /* INDEX_DAEMON */
 
 /*
  *  Unpack /bin/sh archives
@@ -1381,8 +1390,8 @@ post_process_sh (
 		}
 		my_strncpy (file_in, save_filename (j), sizeof (file_in));
 
-		printf (txt_extracting_shar, file_in);
-		fflush (stdout);
+		my_printf (txt_extracting_shar, file_in);
+		my_flush ();
 
 		found_header = FALSE;
 
@@ -1425,8 +1434,8 @@ post_process_sh (
 			make_post_process_cmd (DEFAULT_UNSHAR, file_out_dir, file_out);
 #else
 			sprintf (buf, "cd %s; sh %s", file_out_dir, file_out);
-			my_fputs ("\r\n", stdout);
-			fflush (stdout);
+			my_fputs (cCRLF, stdout);
+			my_flush ();
 			Raw (FALSE);
 			invoke_cmd (buf);
 			Raw (TRUE);
@@ -1443,6 +1452,7 @@ post_process_sh (
  * Returns the most recently modified file in the specified drectory
  */
 
+#ifndef INDEX_DAEMON
 static char *
 get_archive_file (
 	char *dir)
@@ -1487,6 +1497,7 @@ get_archive_file (
 
 	return file;
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -1507,7 +1518,7 @@ delete_processed_files (
 		}
 
 		if (delete) {
-			wait_message ("\r\n");
+			wait_message (cCRLF);
 			wait_message (txt_deleting);
 
 			for (i=0 ; i < num_save ; i++) {

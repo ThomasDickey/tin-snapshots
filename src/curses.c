@@ -12,6 +12,13 @@
  */
 
 #include "tin.h"
+#include "tcurses.h"
+
+#if USE_CURSES
+
+void my_dummy(void) { }	/* ANSI C requires non-empty file */
+
+#else	/* !USE_CURSES */
 
 #ifdef M_AMIGA
 #	undef BSD
@@ -516,7 +523,7 @@ InitWin (void)
 
 	if (_terminalinit) {
 		tputs (_terminalinit, 1, outchar);
-		fflush (stdout);
+		my_flush();
 	}
 	set_keypad_on ();
 	set_xclick_on ();
@@ -532,7 +539,7 @@ EndWin (void)
 
 	if (_terminalend) {
 		tputs (_terminalend, 1, outchar);
-		fflush (stdout);
+		my_flush();
 	}
 	set_keypad_off ();
 	set_xclick_off ();
@@ -549,7 +556,7 @@ set_keypad_on (void)
 #    ifdef HAVE_KEYPAD
 	if (use_keypad && _keypadxmit) {
 		tputs (_keypadxmit, 1, outchar);
-		fflush (stdout);
+		my_flush();
 	}
 #    endif
 #endif /* INDEX_DAEMON */
@@ -563,14 +570,14 @@ set_keypad_off (void)
 #    ifdef HAVE_KEYPAD
 	if (use_keypad && _keypadlocal) {
 		tputs (_keypadlocal, 1, outchar);
-		fflush (stdout);
+		my_flush();
 	}
 #    endif
 #endif /* INDEX_DAEMON */
 }
 
 /*
- *  clear the screen: returns -1 if not capable
+ *  clear the screen
  */
 
 void
@@ -579,7 +586,7 @@ ClearScreen (void)
 #ifndef INDEX_DAEMON
 
 	tputs (_clearscreen, 1, outchar);
-	fflush (stdout);      /* clear the output buffer */
+	my_flush ();      /* clear the output buffer */
 	_line = 1;
 
 #endif /* INDEX_DAEMON */
@@ -601,7 +608,7 @@ MoveCursor (int row, int col)
 
 	stuff = tgoto (_moveto, col, row);
 	tputs (stuff, 1, outchar);
-	fflush (stdout);
+	my_flush ();
 	_line = row + 1;
 
 #endif /* INDEX_DAEMON */
@@ -619,7 +626,7 @@ MoveCursor (int row, int col)
 	if (_moveto) {
 		sprintf (stuff, _moveto, row+1, col+1);
 		tputs (stuff, 1, outchar);
-		fflush (stdout);
+		my_flush ();
 		_line = row + 1;
 	}
 
@@ -631,14 +638,13 @@ MoveCursor (int row, int col)
 /*
  *  clear to end of line
  */
-
 void
 CleartoEOLN (void)
 {
 #ifndef INDEX_DAEMON
 
 	tputs (_cleartoeoln, 1, outchar);
-	fflush (stdout);  /* clear the output buffer */
+	my_flush ();  /* clear the output buffer */
 
 #endif /* INDEX_DAEMON */
 }
@@ -646,7 +652,6 @@ CleartoEOLN (void)
 /*
  *  clear to end of screen
  */
-
 void
 CleartoEOS (void)
 {
@@ -662,7 +667,7 @@ CleartoEOS (void)
 			CleartoEOLN ();
 		}
 	}
-	fflush (stdout);  /* clear the output buffer */
+	my_flush ();  /* clear the output buffer */
 
 #endif /* INDEX_DAEMON */
 }
@@ -689,7 +694,7 @@ StartInverse (void)
 		tputs (_setinverse, 1, outchar);
 #endif
 	}
-	fflush (stdout);
+	my_flush ();
 
 #endif /* INDEX_DAEMON */
 }
@@ -716,7 +721,7 @@ EndInverse (void)
 		tputs (_clearinverse, 1, outchar);
 #endif
 	}
-	fflush (stdout);
+	my_flush ();
 
 #endif /* INDEX_DAEMON */
 }
@@ -970,7 +975,7 @@ AmiGetWinSize(int *lines, int *columns)
 #ifndef INDEX_DAEMON
 	if (_getwinsize) {
 		tputs (_getwinsize,1,outchar);	/* identify yourself */
-		fflush (stdout);
+		my_flush ();
 		AmiReadCh(1);		/* Look for the identification */
 		*lines = new_lines;
 		*columns = new_columns;
@@ -1056,7 +1061,7 @@ xclick (
 		} else {
 			tputs (_xclickend, 1, outchar);
 		}
-		fflush (stdout);
+		my_flush ();
 		prev_state = state;
 	}
 #endif	/* INDEX_DAEMON */
@@ -1099,3 +1104,5 @@ cursoroff (void)
 		tputs (_cursoroff, 1, outchar);
 #endif
 }
+
+#endif /* !USE_CURSES */

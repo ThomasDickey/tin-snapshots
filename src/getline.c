@@ -16,6 +16,7 @@
  */
 
 #include "tin.h"
+#include "tcurses.h"
 
 #define BUF_SIZE	1024
 #define SCROLL		30
@@ -103,7 +104,7 @@ getline (
 
 	my_fputs (prompt, stdout);
 	cursoron ();
-	fflush (stdout);
+	my_flush ();
 
 	if (gl_in_hook) {
 		loc = gl_in_hook (gl_buf);
@@ -390,7 +391,7 @@ gl_fixup (
 			for (i = gl_pos; i < cursor; i++)
 				my_fputc (gl_buf[i], stdout);
 		}
-		fflush (stdout);
+		my_flush ();
 	}
 	gl_pos = cursor;
 }

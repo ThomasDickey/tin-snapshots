@@ -22,9 +22,10 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
-static constext txt_help_empty_line[] = "\r\n";
+static constext txt_help_empty_line[] = cCRLF;
 
 constext *help_select[] = {
 	txt_help_ctrl_d,
@@ -466,11 +467,11 @@ display_info_page (void)
 				posted[i].date, posted[i].action,
 				group_len, posted[i].group, posted[i].subj);
 				buf[cCOLS-2] = '\0';
-			printf ("%s\r\n", buf);
+			my_printf ("%s" cCRLF, buf);
 		}
 	}
 
-	center_line (cLINES, FALSE, txt_hit_space_for_more);
+	center_line (cLINES-1, FALSE, txt_hit_space_for_more);
 #ifdef HAVE_COLOR
 	fcol(col_normal);
 #endif

@@ -15,6 +15,7 @@
 #include	"version.h"
 #include	"tin.h"
 #include	"tincfg.h"
+#include 	"tcurses.h"
 #include	"menukeys.h"
 
 #define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)
@@ -998,22 +999,22 @@ static void
 print_any_option (
 	int act_option)
 {
-	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
+	my_printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
-			printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option - 1].var_index]));
+			my_printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option - 1].var_index]));
 			break;
 		case OPT_LIST:
-			printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
+			my_printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
 			break;
 		case OPT_STRING:
-			printf("%-.*s", cCOLS - (int) strlen(option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option - 1].var_index]);
+			my_printf("%-.*s", cCOLS - (int) strlen(option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option - 1].var_index]);
 			break;
 		case OPT_NUM:
-			printf("%d", *(option_table[act_option - 1].variable));
+			my_printf("%d", *(option_table[act_option - 1].variable));
 			break;
 		case OPT_CHAR:
-			printf("%c", *OPT_CHAR_list[option_table[act_option - 1].var_index]);
+			my_printf("%c", *OPT_CHAR_list[option_table[act_option - 1].var_index]);
 			break;
 		default:
 			break;
@@ -1026,8 +1027,8 @@ highlight_option (
 {
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	my_fputs ("->", stdout);
-	fflush (stdout);
-	MoveCursor (cLINES, 0);
+	my_flush();
+	stow_cursor();
 }
 
 static void
@@ -1036,7 +1037,7 @@ unhighlight_option (
 {
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	my_fputs ("  ", stdout);
-	fflush (stdout);
+	my_flush();
 }
 
 /*
@@ -1107,7 +1108,7 @@ change_config_file (
 	 	refresh_config_page (option, FALSE);
 	 	highlight_option (option);
 
-		MoveCursor (cLINES, 0);
+		stow_cursor();
 		ch = ReadCh ();
 
 		/*
@@ -1578,7 +1579,7 @@ expand_rel_abs_pathname (
 	MoveCursor (line, col);
 	CleartoEOLN ();
 	my_fputs (&buf[0], stdout);
-	fflush (stdout);
+	my_flush();
 }
 
 /*
@@ -1782,6 +1783,6 @@ show_config_page (
 	}
 
 	show_menu_help (txt_select_config_file_option);
-	fflush (stdout);
-	MoveCursor (cLINES, 0);
+	my_flush();
+	stow_cursor();
 }

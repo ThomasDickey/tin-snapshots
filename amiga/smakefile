@@ -93,8 +93,8 @@ YACC = bison --yacc
 #
 # /*vb*/
 HEADERS = \
-        $(INCDIR)/amiga.h \
-        $(INCDIR)/amigatcp.h \
+        $(AMIDIR)/amiga.h \
+        $(AMIDIR)/amigatcp.h \
         $(INCDIR)/config.h \
         $(INCDIR)/extern.h \
         $(INCDIR)/menukeys.h \
@@ -197,7 +197,7 @@ $(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)
 
 $(GSTFILE): $(HEADERS)
         -gst $(GSTFILE) unload
-        $(CC) $(CFLAGS) noobjname makegst=$@ $(SRCDIR)/amiga.c
+        $(CC) $(CFLAGS) noobjname makegst=$@ $(AMIDIR)/amiga.c
 
 $(OBJDIR):
         -@makedir $(OBJDIR)
@@ -221,8 +221,8 @@ clean:
 $(OBJDIR)/activeda.o:           $(AMIDIR)/actived.c $(GSTFILE)
 $(OBJDIR)/active.o:             $(SRCDIR)/active.c $(GSTFILE)
 $(OBJDIR)/actived.o:            $(SRCDIR)/actived.c $(GSTFILE)
-$(OBJDIR)/amiga.o:              $(SRCDIR)/amiga.c $(GSTFILE)
-$(OBJDIR)/amigatcp.o:           $(SRCDIR)/amigatcp.c $(GSTFILE)
+$(OBJDIR)/amiga.o:              $(AMIDIR)/amiga.c $(GSTFILE)
+$(OBJDIR)/amigatcp.o:           $(AMIDIR)/amigatcp.c $(GSTFILE)
 $(OBJDIR)/art.o:                $(SRCDIR)/art.c $(GSTFILE)
 $(OBJDIR)/attrib.o:             $(SRCDIR)/attrib.c $(GSTFILE)
 $(OBJDIR)/charset.o:            $(SRCDIR)/charset.c $(GSTFILE)

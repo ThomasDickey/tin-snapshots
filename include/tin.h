@@ -1485,19 +1485,9 @@ typedef struct t_notify *notify_p;
 
 #define	EDITOR_FORMAT_OFF		"%E %F"
 
-#ifdef WIN32
-#	define	my_fputc(ch, stream)		cmd_line ? fputc (ch, stream) : addch (ch)
-#	define	my_fputs(str, stream)		cmd_line ? fputs (str, stream) : addstr(str)
-#	define	my_fprintf (stream, str)	cmd_line ? fprintf (stream, str) : addstr(str)
-#else
-#	define	my_fputc(ch, stream)		fputc (ch, stream)
-#	define	my_fputs(str, stream)		fputs (str, stream)
-#	define	my_fprintf (stream, str)	fprintf (stream, str)
-#endif
-
 #ifdef M_AMIGA
 #	define	NEWSGROUPS_FILE 	"newsdescrip"
-#	define	BUG_REPORT_ADDRESS	"mark@garden.southern.gen.nz"
+#	define	BUG_REPORT_ADDRESS	"volker@vb.franken.de"
 #	define	REDIRECT_OUTPUT 	"> NIL:"
 #	define	REDIRECT_PGP_OUTPUT	"> NIL:"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"

@@ -26,6 +26,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 char	acHomeDir[PATH_LEN];
 char	acMailActiveFile[PATH_LEN];
@@ -96,7 +97,7 @@ create_save_active_file (void)
 {
 	char	acGrpPath[PATH_LEN];
 
-	printf (txt_creating_active);
+	my_printf (txt_creating_active);
 
 	vInitVariables ();
 
@@ -276,7 +277,7 @@ vMakeGrpList (
 	struct	stat sStatInfo;
 
 if (iVerbose) {
-printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
+my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 }
 	if (access (pcGrpPath, R_OK) != 0) {
 		return;
@@ -284,7 +285,7 @@ printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 
 	tDirFile = opendir (pcGrpPath);
 /*
-printf ("opendir(%s)\n", pcGrpPath);
+my_printf ("opendir(%s)\n", pcGrpPath);
 */
 	if (tDirFile != (DIR *) 0) {
 		iIsDir = FALSE;
@@ -293,7 +294,7 @@ printf ("opendir(%s)\n", pcGrpPath);
 			acFile[D_NAMLEN(tFile)] = '\0';
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
 /*
-printf ("STAT=[%s]\n", acPath);
+my_printf ("STAT=[%s]\n", acPath);
 */
 			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
@@ -307,7 +308,7 @@ printf ("STAT=[%s]\n", acPath);
 				iIsDir = FALSE;
 				strcpy (pcGrpPath, acPath);
 				if (iVerbose) {
-					printf ("Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
+					my_printf ("Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 				}
 
 				vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath);
@@ -341,7 +342,7 @@ vAppendGrpLine (
 
 	if ((hFp = fopen (pcActiveFile, "a+")) != (FILE *) 0) {
 		vMakeGrpName (pcBaseDir, acGrpName, pcGrpPath);
-		printf ("Appending=[%s %ld %ld %s]\n", acGrpName, lArtMax, lArtMin, pcBaseDir);
+		my_printf ("Appending=[%s %ld %ld %s]\n", acGrpName, lArtMax, lArtMin, pcBaseDir);
 		vPrintGrpLine (hFp, acGrpName, lArtMax, lArtMin, pcBaseDir);
 		fclose (hFp);
 	}
@@ -356,7 +357,7 @@ vCreatePath (
 
 	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
 	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
-	printf ("CREATE Path=[%s]\n", acCmd);
+	my_printf ("CREATE Path=[%s]\n", acCmd);
 	system (acCmd);
 }
 #endif

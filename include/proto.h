@@ -396,6 +396,7 @@ extern void delete_processed_files (t_bool auto_delete);
 extern void print_art_seperator_line (FILE *fp, int the_mailbox);
 
 /* screen.c */
+extern void stow_cursor (void);
 extern void info_message (const char *str);
 extern void wait_message (const char *str);
 extern void error_message (const char *template, const char *str);

@@ -111,6 +111,8 @@ o  kill-file editor does not quote brackets, stars and question marks
 
 New features
 ------------
+o  if INEWS_MAIL_* is empty try to 'guess' the domainname
+
 o  add abillity to strip bogus newsgroups from newsrc
 
 o  add support for ispell language change

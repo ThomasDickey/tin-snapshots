@@ -15,6 +15,7 @@
  */
 
 #include "tin.h"
+#include "tcurses.h"
 
 #ifdef VMS
 #	include "sio.h"

@@ -188,6 +188,10 @@
 #	define	HAVE_ERRNO_H
 #endif
 
+#ifdef WIN32
+#define USE_CURSES 1
+#endif
+
 #ifndef VMS
 #define DECL_ERRNO
 #endif

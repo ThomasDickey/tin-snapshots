@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 #ifdef	PROFILE
 #	include	"stpwatch.h"
@@ -213,7 +214,7 @@ index_group (
 
 	if ((expired || count) && cmd_line && verbose) {
 		my_fputc ('\n', stdout);
-		fflush (stdout);
+		my_flush ();
 	}
 
 #ifdef	PROFILE
@@ -349,7 +350,7 @@ read_group (
 		}
 		if (update && verbose) {
 			my_fputc ('.', stdout);
-			fflush (stdout);
+			my_flush();
 		}
 
 	}
@@ -809,8 +810,8 @@ iReadNovFile (
 		 * Check to make sure article in nov file has not expired in group
 		 */
 #if 0
-printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
-fflush(stdout);
+my_printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
+my_flush();
 sleep(1);
 #endif
 		if (artnum < group->xmin) {
@@ -1306,7 +1307,7 @@ do_update (void)
 		joinpath (buf, psGrp->spooldir, group_path);
 		joinpath (novpath, novrootdir, group_path);
 
-		if (verbose) printf ("NOV path=[%s]\n", novpath);
+		if (verbose) my_printf ("NOV path=[%s]\n", novpath);
 		vCreatePath (novpath);
 		if (stat (buf, &stinfo) == -1) {
 			if (verbose) {
@@ -1328,7 +1329,7 @@ do_update (void)
 
 		if (stat (pcNovFile, &stinfo) == -1) {
 			if (verbose) {
-				printf (txt_cannot_stat_index_file, psGrp->name, pcNovFile);
+				my_printf (txt_cannot_stat_index_file, psGrp->name, pcNovFile);
 			}
 		} else {
 			if (delete_index_file) {
@@ -1338,7 +1339,7 @@ do_update (void)
 		}
 
 		if (debug == 2) {
-			printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n",
+			my_printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n",
 				pcNovFile, index_time,
 				psGrp->last_updated_time, group_time);
 		}
@@ -1354,8 +1355,8 @@ do_update (void)
 #endif
 
 		if (verbose) {
-			printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
-			fflush (stdout);
+			my_printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
+			my_flush();
 		}
 		if (!index_group (psGrp)) {
 			continue;
@@ -1676,13 +1677,13 @@ print_expired_arts (
 
 	if (cmd_line && verbose) {
 		if (debug) {
-			printf ("Expired Index Arts=[%d]", num_expired);
+			my_printf ("Expired Index Arts=[%d]", num_expired);
 		}
 		for (i = 0; i < num_expired; i++) {
 			my_fputc ('P', stdout);
 		}
 		if (num_expired) {
-			fflush (stdout);
+			my_flush();
 		}
 	}
 }

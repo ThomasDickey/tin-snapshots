@@ -106,26 +106,26 @@ char TMPDIR[PATH_LEN];
 #endif
 
 /*  check for the bools -> change to t_bool */
-int MORE_POS;						/* set in set_win_size () */
-int NOTESLINES;					/* set in set_win_size () */
-int RIGHT_POS;						/* set in set_win_size () */
-int cmd_line;						/* batch / interactive mode */
+int MORE_POS;				/* set in set_win_size () */
+int NOTESLINES;				/* set in set_win_size () */
+int RIGHT_POS;				/* set in set_win_size () */
+int cmd_line;				/* batch / interactive mode */
 int default_auto_save_msg;		/* save posted message to ~/Mail/posted */
 int default_filter_days;		/* num of days an article  filter can be active */
 int default_filter_kill_header;
 int default_filter_select_header;
-int default_post_proc_type;	/* type of post processing to be performed */
+int default_post_proc_type;		/* type of post processing to be performed */
 int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
 int default_sort_art_type;		/* sort arts[] array by subject,from or date field */
 int default_thread_arts;		/* threading system for viewing articles */
-int global_filtered_articles;	/* globally killed / auto-selected articles */
-int group_top;						/* Total # of groups in my_group[] */
+int global_filtered_articles;		/* globally killed / auto-selected articles */
+int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
-int local_filtered_articles;	/* locally killed / auto-selected articles */
-int local_index;					/* do private indexing? */
+int local_filtered_articles;		/* locally killed / auto-selected articles */
+int local_index;			/* do private indexing? */
 int mail_mime_encoding;
 int max_from = 0;
 int max_subj = 0;
@@ -137,7 +137,7 @@ int process_id;
 int real_gid;
 int real_uid;
 int real_umask;
-int reread_active_file_secs;	/* reread active file interval in seconds */
+int reread_active_file_secs;		/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */

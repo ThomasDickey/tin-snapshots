@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"version.h"
 
 #if defined(M_AMIGA) && defined(__SASC_650)
@@ -784,27 +785,27 @@ show_intro_page (void)
 		Raw (FALSE);
 	}
 
-	printf ("\n\nWelcome to tin, a full screen threaded Netnews reader. It can read news locally\n");
-	printf ("(ie. <spool>/news) or remotely (-r option) from a NNTP  (Network News Transport\n");
-	printf ("Protocol) server. tin -h lists the available command line options.\n\n");
+	my_printf ("\n\nWelcome to tin, a full screen threaded Netnews reader. It can read news locally\n");
+	my_printf ("(ie. <spool>/news) or remotely (-r option) from a NNTP  (Network News Transport\n");
+	my_printf ("Protocol) server. tin -h lists the available command line options.\n\n");
 
-	printf ("Tin has five  newsreading levels,  the newsgroup  selection page,  the spooldir\n");
-	printf ("selection page,  the group index page,  the thread listing page and the article\n");
-	printf ("viewer. Help is available at each level by pressing the 'h' command.\n\n");
+	my_printf ("Tin has five  newsreading levels,  the newsgroup  selection page,  the spooldir\n");
+	my_printf ("selection page,  the group index page,  the thread listing page and the article\n");
+	my_printf ("viewer. Help is available at each level by pressing the 'h' command.\n\n");
 
-	printf ("Move up/down by using the terminal arrow keys or 'j' and 'k'.  Use PgUp/PgDn or\n");
-	printf ("Ctrl-U and Ctrl-D to page up/down. Enter a newsgroup by pressing RETURN/TAB.\n\n");
+	my_printf ("Move up/down by using the terminal arrow keys or 'j' and 'k'.  Use PgUp/PgDn or\n");
+	my_printf ("Ctrl-U and Ctrl-D to page up/down. Enter a newsgroup by pressing RETURN/TAB.\n\n");
 
-	printf ("Articles, threads, tagged articles or articles matching a pattern can be mailed\n");
-	printf ("('m' command), printed ('o' command), saved ('s' command), piped ('|' command).\n");
-	printf ("Use the 'w' command  to post  a news  article,  the 'f'/'F' commands to  post a\n");
-	printf ("follow-up  to  an existing  news article and the 'r'/'R' commands to  reply via\n");
-	printf ("mail to an existing news articles author.  The 'M' command allows the operation\n");
-	printf ("of tin to be configured via a menu.\n\n");
+	my_printf ("Articles, threads, tagged articles or articles matching a pattern can be mailed\n");
+	my_printf ("('m' command), printed ('o' command), saved ('s' command), piped ('|' command).\n");
+	my_printf ("Use the 'w' command  to post  a news  article,  the 'f'/'F' commands to  post a\n");
+	my_printf ("follow-up  to  an existing  news article and the 'r'/'R' commands to  reply via\n");
+	my_printf ("mail to an existing news articles author.  The 'M' command allows the operation\n");
+	my_printf ("of tin to be configured via a menu.\n\n");
 
-	printf ("For more information read the manual page, README, INSTALL, TODO and FTP files.\n");
-	printf ("Please send bug reports/comments to the programs author with the 'R' command.\n");
-	fflush (stdout);
+	my_printf ("For more information read the manual page, README, INSTALL, TODO and FTP files.\n");
+	my_printf ("Please send bug reports/comments to the programs author with the 'R' command.\n");
+	my_flush();
 
 	if (!cmd_line) {
 		Raw (TRUE);

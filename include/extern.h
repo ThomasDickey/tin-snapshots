@@ -48,7 +48,7 @@ extern FILE *fdopen (int, const char *);
 #ifdef DECL_FFLUSH
 extern int fflush (FILE *);
 #endif
-#ifdef DECL_FILENO
+#if defined(DECL_FILENO) && !defined(fileno)
 extern int fileno (FILE *);
 #endif
 #ifdef DECL_FPRINTF
@@ -1193,7 +1193,9 @@ extern struct t_newnews *newnews;
 extern struct t_option option_table[];
 extern struct t_posted *posted;
 extern struct t_save *save;
+#if !USE_CURSES
 extern struct t_screen *screen;
+#endif
 extern struct t_spooldir *spooldirs;
 
 extern t_bool alternative_handling;

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
@@ -31,13 +32,17 @@ static const char *spaces = "XXXX";
 /*
 ** Local prototypes
 */
-static int bld_sline (int i);
 static int draw_sline (int i, int full);
+
+#ifndef INDEX_DAEMON
+static int bld_sline (int i);
 static int prompt_subject_num (int ch);
 static void update_group_page (void);
 static void show_group_title (int clear_title);
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static int
 line_is_tagged (
 	int n)
@@ -54,7 +59,10 @@ line_is_tagged (
 	}
 	return code;
 }
+#endif /* INDEX_DAEMON */
 
+
+#ifndef INDEX_DAEMON
 static void
 show_tagged_lines (void)
 {
@@ -66,6 +74,7 @@ show_tagged_lines (void)
 		}
 	}
 }
+#endif /* INDEX_DAEMON */
 
 /*
  * Remove the current tag from the tag 'chain'
@@ -359,7 +368,7 @@ group_read_basenote:
 				} else if (index_point < 0) {
 					space_mode = (index_point == GRP_CONTINUE);
 /*
-printf ("point=[%d] filtered_art=[%d]", index_point, filtered_articles);
+my_printf ("point=[%d] filtered_art=[%d]", index_point, filtered_articles);
 sleep(3);
 */
 					if (index_point == GRP_CONTINUE) {
@@ -533,9 +542,7 @@ group_down:
 					break;
 				}
 				if (index_point + 1 >= top_base) {
-					if (_hp_glitch) {
-						erase_subject_arrow ();
-					}
+					HpGlitch(erase_subject_arrow());
 					if (0 < first_subj_on_screen) {
 						index_point = 0;
 						show_group_page ();
@@ -564,9 +571,7 @@ group_up:
 					break;
 				}
 				if (index_point == 0) {
-					if (_hp_glitch) {
-						erase_subject_arrow ();
-					}
+					HpGlitch(erase_subject_arrow ());
 					if (top_base > last_subj_on_screen) {
 						index_point = top_base - 1;
 						show_group_page ();
@@ -577,9 +582,7 @@ group_up:
 					}
 					break;
 				}
-				if (_hp_glitch) {
-					erase_subject_arrow ();
-				}
+				HpGlitch(erase_subject_arrow ());
 				if (index_point <= first_subj_on_screen) {
 					index_point--;
 					show_group_page ();
@@ -598,9 +601,7 @@ group_page_up:
 					break;
 				}
 				if (index_point == 0) {
-					if (_hp_glitch) {
-						erase_subject_arrow ();
-					}
+					HpGlitch(erase_subject_arrow ());
 					if (top_base > last_subj_on_screen) {
 						index_point = top_base - 1;
 						show_group_page ();
@@ -749,8 +750,7 @@ group_catchup:
 					break;
 				}
 				if (n < first_subj_on_screen || n >= last_subj_on_screen) {
-					if (_hp_glitch)
-						erase_subject_arrow ();
+					HpGlitch(erase_subject_arrow ());
 					index_point = n;
 					show_group_page ();
 				} else {
@@ -1332,10 +1332,10 @@ show_group_page (void)
 #endif /* INDEX_DAEMON */
 }
 
+#ifndef INDEX_DAEMON
 static void
 update_group_page (void)
 {
-#ifndef INDEX_DAEMON
 	register int i;
 
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
@@ -1347,8 +1347,8 @@ update_group_page (void)
 		return;
 
 	draw_subject_arrow ();
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -1358,13 +1358,13 @@ draw_subject_arrow (void)
 
 	if (draw_arrow_mark) {
 		my_fputs ("->", stdout);
-		fflush (stdout);
+		my_flush ();
 	} else {
 		StartInverse();
 		draw_sline(index_point, TRUE);
 		EndInverse();
 	}
-	MoveCursor (cLINES, 0);
+	stow_cursor();
 }
 
 void
@@ -1375,15 +1375,14 @@ erase_subject_arrow (void)
 	if (draw_arrow_mark) {
 		my_fputs ("  ", stdout);
 	} else {
-		if (_hp_glitch) {
-			EndInverse ();
-		}
+		HpGlitch(EndInverse ());
 		draw_sline(index_point, TRUE);
 	}
-	fflush (stdout);
+	my_flush ();
 }
 
 
+#ifndef INDEX_DAEMON
 static int
 prompt_subject_num (
 	int ch)
@@ -1422,6 +1421,7 @@ prompt_subject_num (
 
 	return TRUE;
 }
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -1474,19 +1474,23 @@ mark_screen (
 	int screen_col,
 	const char *value)
 {
-	int i, len;
-
-	len = strlen (value);
-
 	if (draw_arrow_mark) {
 		MoveCursor(INDEX_TOP + screen_row, screen_col);
 		my_fputs (value, stdout);
-		MoveCursor (cLINES, 0);
-		fflush (stdout);
+		stow_cursor();
+		my_flush ();
 	} else {
-		for (i=0 ; i < len ; i++) {
+#if USE_CURSES
+		int y, x;
+		getyx(stdscr, y, x);
+		mvaddstr(INDEX_TOP + screen_row, screen_col, value);
+		move(y, x);
+#else
+		int i;
+		for (i=0 ; value[i] != '\0'; i++) {
 			screen[screen_row].col[screen_col+i] = value[i];
 		}
+#endif
 		if (level == SELECT_LEVEL) {
 			draw_group_arrow();
 		} else {
@@ -1557,18 +1561,22 @@ toggle_subject_from (void)
  * Yes, this is somewhat kludgy.
  */
 
+#ifndef INDEX_DAEMON
 static int
 bld_sline (
 	int i)
 {
-#ifndef INDEX_DAEMON
+#if USE_CURSES
+	char buffer[BUFSIZ];	/* FIXME: allocate? */
+#else
+	char *buffer;
+#endif
 	int respnum;
 	int n, j;
 	char from[HEADER_LEN];
 	char new_resps[8];
 	char art_cnt[9];
 	struct t_art_stat sbuf;
-	register char *buffer;
 	char arts_sub[255];
 
 	from[0] = '\0';
@@ -1631,7 +1639,10 @@ bld_sline (
 	j = INDEX2SNUM(i);
 	arts_sub[len_subj-5+1] = '\0';
 
-	sprintf (buffer = screen[j].col, "  %s %s %s%-*.*s%s%-*.*s",
+#if !USE_CURSES
+	buffer = screen[j].col;
+#endif
+	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, from);
 	
@@ -1641,10 +1652,15 @@ bld_sline (
 			buffer[n] = '?';
 		}
 	}
+#if USE_CURSES
+	/* FIXME: draw_sline usually does this too */
+	mvaddstr(INDEX2LNUM(i), 0, buffer);
+	clrtoeol();
+#endif
 
-#endif /* INDEX_DAEMON */
 	return(0);
 }
+#endif /* INDEX_DAEMON */
 
 /*
  * Draw subject line given an index into base[].
@@ -1662,19 +1678,20 @@ bld_sline (
 static int
 draw_sline (
 	int i,
-	int full)	/* unused at moment */
+	int full)
 {
 #ifndef INDEX_DAEMON
-	size_t tlen;
-	int j, x;
+	int tlen;
+	int x = full ? 0 : 6;
 	int k = MARK_OFFSET;
-	char *s;
-
-	j = INDEX2SNUM(i);
+#if USE_CURSES
+	char buffer[BUFSIZ];
+	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
+#else
+	char *s = &(screen[INDEX2SNUM(i)].col[x]);
+#endif
 
 	if (full) {
-		s = screen[j].col;
-		x = 0;
 		if (strip_blanks) {
 			strip_line (s);
 			CleartoEOLN ();
@@ -1682,24 +1699,19 @@ draw_sline (
 		tlen = strlen (s);	/* notes new line length */
 	} else {
 		tlen = 12; /* ??? */
-		s = &screen[j].col[6];
-		x = 6;
 	}
 	MoveCursor (INDEX2LNUM(i), x);
-#ifdef VMS
-	sys_fwrite (s, 1, tlen, stdout);
-#else
-	fwrite (s, 1, tlen, stdout);
-#endif
+	if (tlen)
+		my_printf("%.*s", tlen, s);
 
 	/*
 	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if (screen[j].col[k] == art_marked_selected) {
+	if (s[k-x] == art_marked_selected) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
-		my_fputc (screen[j].col[k], stdout);
+		my_fputc (s[k-x], stdout);
 		ToggleInverse ();
 	}
 
@@ -1710,11 +1722,11 @@ draw_sline (
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 show_group_title (
 	int clear_title)
 {
-#ifndef INDEX_DAEMON
 
 	char buf[PATH_LEN];
 	int num;
@@ -1756,5 +1768,5 @@ show_group_title (
 
 	show_title (buf);
 
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */

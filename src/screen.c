@@ -13,26 +13,37 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 char msg[LEN];
-struct t_screen *screen;
 
+#if !USE_CURSES
+struct t_screen *screen;
+#endif
+
+/*
+ * Move the cursor to the lower-left of the screen, where it won't be annoying
+ */
+void
+stow_cursor(void)
+{
+	if (!cmd_line)
+		MoveCursor (cLINES-1, 0);
+}
 
 void
 info_message (
 	const char *str)
 {
-	clear_message ();				/* Clear any old messages hanging around */
+	clear_message ();			/* Clear any old messages hanging around */
 #ifdef HAVE_COLOR
 	fcol(col_message);
 #endif
-	center_line (cLINES, FALSE, str);	/* center the message at screen bottom */
+	center_line (cLINES-1, FALSE, str);	/* center the message at screen bottom */
 #ifdef HAVE_COLOR
 	fcol(col_normal);
 #endif
-	if (!cmd_line) {
-		MoveCursor (cLINES, 0);
-	}
+	stow_cursor();
 }
 
 
@@ -49,7 +60,7 @@ wait_message (
 	fcol(col_normal);
 #endif
 	cursoron ();
-	fflush (stdout);
+	my_flush();
 }
 
 
@@ -69,7 +80,7 @@ error_message (
 		my_fputc ('\n', stderr);
 		fflush (stderr);
 	} else {
-		MoveCursor (cLINES, 0);
+		stow_cursor();
 		sleep (3);
 	}
 }
@@ -117,7 +128,7 @@ perror_message (
 		my_fputc ('\n', stderr);
 		fflush (stderr);
 	} else {
-		MoveCursor (cLINES, 0);
+		stow_cursor();
 		sleep (3);
 	}
 }
@@ -127,10 +138,10 @@ void
 clear_message (void)
 {
 	if (!cmd_line) {
-		MoveCursor (cLINES, 0);
+		MoveCursor (cLINES-1, 0);
 		CleartoEOLN ();
 		cursoroff ();
-		fflush(stdout);
+		my_flush();
 	}
 }
 
@@ -162,8 +173,6 @@ center_line (
 		my_fputs (str, stdout);
 	}
 	
-	fflush (stdout);
-
 	if (!cmd_line) {
 		if (inverse) {
 			EndInverse ();
@@ -180,14 +189,18 @@ draw_arrow (
 
 	if (draw_arrow_mark) {
 		my_fputs ("->", stdout);
-		fflush (stdout);
 	} else {
+#if USE_CURSES
+		char buffer[BUFSIZ];
+		char *s = screen_contents(line, 0, buffer);
+#else
+		char *s = screen[line-INDEX_TOP].col;
+#endif
 		StartInverse ();
-		my_fputs (screen[line-INDEX_TOP].col, stdout);
-		fflush (stdout);
+		my_fputs (s, stdout);
 		EndInverse ();
 	}
-	MoveCursor (cLINES, 0);
+	stow_cursor();
 }
 
 
@@ -200,10 +213,15 @@ erase_arrow (
 	if (draw_arrow_mark) {
 		my_fputs ("  ", stdout);
 	} else {
+#if USE_CURSES
+		char buffer[BUFSIZ];
+		char *s = screen_contents(line, 0, buffer);
+#else
+		char *s = screen[line-INDEX_TOP].col;
+#endif
 		EndInverse ();
-		my_fputs (screen[line-INDEX_TOP].col, stdout);
+		my_fputs (s, stdout);
 	}
-	fflush (stdout);
 }
 
 
@@ -235,8 +253,12 @@ show_title (
 void
 ring_bell (void)
 {
+#if USE_CURSES
+	beep();
+#else
 	my_fputc ('\007', stdout);
-	fflush (stdout);
+	my_flush();
+#endif
 }
 
 
@@ -249,8 +271,8 @@ spin_cursor (void)
 	if (i > 7) {
 		i = 0;
 	}
-	printf ("\b%c", buf[i++]);
-	fflush (stdout);
+	my_printf ("\b%c", buf[i++]);
+	my_flush();
 }
 
 
@@ -280,5 +302,5 @@ show_progress (
 		s = dst;
 	}
 	my_fputs (s, stdout);
-	fflush (stdout);
+	my_flush();
 }

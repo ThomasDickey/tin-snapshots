@@ -17,10 +17,48 @@
  */
 
 #include "tin.h"
+#include "tcurses.h"
+
 #ifdef HAVE_COLOR
 
 static int current_fcol = 7;
 static int current_bcol = 0;
+
+#if USE_CURSES
+static void set_colors(int fcolor, int bcolor)
+{
+	static bool FIXME[64];
+
+	if (!cmd_line) {
+		chtype attribute = A_NORMAL;
+		int pair;
+
+		if (fcolor > 7) {
+			fcolor &= 7;
+			attribute |= A_BOLD;
+		}
+		bcolor &= 7;
+		pair = (fcolor * 8) + bcolor;	/* FIXME: assumes 64-colors */
+#if 0		/* FIXME: curses assumes white/black */
+		if (fcolor == COLOR_WHITE
+		 && bcolor == COLOR_BLACK)
+			pair = 0;
+#endif
+		if ((pair != 0)
+		 && FIXME[pair] == FALSE) {
+			init_pair(pair, fcolor, bcolor);
+			FIXME[pair] = TRUE;
+		}
+
+		bkgdset(attribute | COLOR_PAIR(pair));
+	}
+}
+
+void refresh_color(void)
+{
+	set_colors(current_fcol, current_bcol);
+}
+#endif
 
 /* setting foregroundcolor */
 void
@@ -29,13 +67,20 @@ fcol (
 {
 	if (use_color) {
 		if (color >= 0 && color <= 15) {
+#if USE_CURSES
+			set_colors(color, current_bcol);
+#else
 			int bold = (color >> 3);
-			printf("\033[%d;%dm", bold, ((color & 7) + 30));
+			my_printf("\033[%d;%dm", bold, ((color & 7) + 30));
 			if (!bold)
 				bcol(current_bcol);
+#endif
 			current_fcol = color;
 		}
 	}
+#if USE_CURSES
+	else set_colors(7, 0);
+#endif
 }
 
 /* setting backgroundcolor */
@@ -45,10 +90,17 @@ bcol (
 {
 	if (use_color) {
 		if (color >= 0 && color <= 7) {
-			printf("\033[%dm", (color + 40));
+#if USE_CURSES
+			set_colors(current_fcol, color);
+#else
+			my_printf("\033[%dm", (color + 40));
+#endif
 			current_bcol = color;
 		}
 	}
+#if USE_CURSES
+	else set_colors(7, 0);
+#endif
 }
 
 static t_bool
@@ -253,6 +305,6 @@ print_color (
 	} else {
 		my_fputs(str, stdout);
 	}
-	my_fputs("\r\n", stdout);
+	my_fputs(cCRLF, stdout);
 }
 #endif

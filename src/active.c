@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 char new_newnews_host[PATH_LEN];
@@ -646,7 +647,7 @@ read_group_times_file (void)
 		}
 
 if (debug == 2) {
-	printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
+	my_printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
 }
 	}
 	fclose (fp);
@@ -663,8 +664,6 @@ write_group_times_file (void)
 {
 #ifdef INDEX_DAEMON
 
-	char buf[HEADER_LEN];
-	char group[HEADER_LEN];
 	FILE *fp;
 	register int i;
 
@@ -799,7 +798,7 @@ read_motd_file (void)
 			if (buf[0] == '.') {
 				break;
 			}
-			printf ("%s", buf);
+			my_printf ("%s", buf);
 			lineno++;
 		}
 		fclose (fp);

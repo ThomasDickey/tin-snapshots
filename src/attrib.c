@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 /*
  * Defines used in setting attributes switch
@@ -53,9 +54,11 @@
 /*
 ** Local prototypes
 */
+#ifndef INDEX_DAEMON
 static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
 static void set_attrib_num (int type, char *scope, int num);
 static void set_attrib_str (int type, char *scope, char *str);
+#endif	/* INDEX_DAEMON */
 
 /*
  * global attributes
@@ -67,11 +70,11 @@ struct t_attribute glob_attributes;
  * Per group attributes
  */
 
+#ifndef INDEX_DAEMON
 static void
 set_default_attributes (
 	struct t_attribute *psAttrib)
 {
-#ifndef INDEX_DAEMON
 
 	psAttrib->global = FALSE;	/* global/group specific */
 	psAttrib->maildir = default_maildir;
@@ -107,8 +110,8 @@ set_default_attributes (
 	psAttrib->news_quote_format = news_quote_format;
 	psAttrib->quote_chars = quote_chars;
 
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 /*
  *  Load global & local attributes into active[].attribute
@@ -369,13 +372,13 @@ read_attributes_file (
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 set_attrib_str (
 	int type,
 	char *scope,
 	char *str)
 {
-#ifndef INDEX_DAEMON
 	register int i;
 	struct t_group *psGrp;
 
@@ -387,7 +390,7 @@ set_attrib_str (
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 if (debug) {
-	printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
+	my_printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
 }
 				set_attrib (psGrp, type, str, -1);
 			}
@@ -396,24 +399,24 @@ if (debug) {
 				psGrp = &active[i];
 				if (wildmat (psGrp->name, scope)) {
 if (debug) {
-	printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
+	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
 }
 					set_attrib (psGrp, type, str, -1);
 				}
 			}
 		}
 	}
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static void
 set_attrib_num (
 	int type,
 	char *scope,
 	int num)
 {
-#ifndef INDEX_DAEMON
 	register int i;
 	struct t_group *psGrp;
 
@@ -425,7 +428,7 @@ set_attrib_num (
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 if (debug) {
-	printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
+	my_printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
 }
 				set_attrib (psGrp, type, "", num);
 			}
@@ -434,16 +437,17 @@ if (debug) {
 				psGrp = &active[i];
 				if (wildmat (psGrp->name, scope)) {
 if (debug) {
-	printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
+	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
 }
 					set_attrib (psGrp, type, "", num);
 				}
 			}
 		}
 	}
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
+#ifndef INDEX_DAEMON
 static void
 set_attrib (
 	struct	t_group	*psGrp,
@@ -451,7 +455,6 @@ set_attrib (
 	const char *str,
 	int	num)
 {
-#ifndef INDEX_DAEMON
 
 	/*
 	 * Setup attributes for this group
@@ -562,8 +565,8 @@ set_attrib (
 			break;
 	}
 
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 /*
  *  Save the group attributes from active[].attribute to ~/.tin/attributes
@@ -749,17 +752,17 @@ debug_print_filter_attributes (void)
 	register int i;
 	struct t_group *psGrp;
 
-	printf("\nBEG ***\n");
+	my_printf("\nBEG ***\n");
 
 	for (i = 0; i < num_active ; i++) {
 		psGrp = &active[i];
-		printf ("Grp=[%s] KILL   header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
+		my_printf ("Grp=[%s] KILL   header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
 			psGrp->name, psGrp->attribute->quick_kill_header,
 			(psGrp->attribute->quick_kill_scope ?
 				psGrp->attribute->quick_kill_scope : ""),
 			(psGrp->attribute->quick_kill_case ? "ON" : "OFF"),
 			(psGrp->attribute->quick_kill_expire ? "ON" : "OFF"));
-		printf ("Grp=[%s] SELECT header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
+		my_printf ("Grp=[%s] SELECT header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
 			psGrp->name, psGrp->attribute->quick_select_header,
 			(psGrp->attribute->quick_select_scope ?
 				psGrp->attribute->quick_select_scope: ""),
@@ -767,7 +770,7 @@ debug_print_filter_attributes (void)
 			(psGrp->attribute->quick_select_expire ? "ON" : "OFF"));
 	}
 
-	printf("END ***\n");
+	my_printf("END ***\n");
 #endif	/* INDEX_DAEMON */
 }
 #endif /* 0 */
