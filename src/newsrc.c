@@ -500,7 +500,7 @@ thd_mark_unread (group, thread)
 #endif
 
 	for (i = (int) thread; i >= 0; i = arts[i].thread) {
-		art_mark_unread (group, &arts[i]);
+		art_mark_will_return (group, &arts[i]); /* art_mark_unread (group, &arts[i]); */
 	}
 }
 
@@ -1240,6 +1240,10 @@ art_mark_unread (group, art)
 	}
 }
 
+/* make a funktion art_mark(group, art, FLAG)
+ * could be uses for art_mark_will_return(),
+ * art_mark_unread(),...
+ */
 
 void
 art_mark_will_return (group, art)

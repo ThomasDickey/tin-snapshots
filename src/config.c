@@ -316,7 +316,7 @@ read_config_file (file, global_file)
 			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format))) {
 				break;
 			}
-			if (match_boolean (buf, "no_advertizing=", &no_advertizing)) {
+			if (match_boolean (buf, "no_advertising=", &no_advertising)) {
 				break;
 			}
 			break;
@@ -606,8 +606,8 @@ write_config_file (file)
 	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
 	fprintf (fp, "# if ON prepend the signature with dashes '\\n-- \\n'\n");
 	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));
-	fprintf (fp, "# turn off advertizing in header (X-Newsreader/X-Mailer)\n");
-	fprintf (fp, "no_advertizing=%s\n\n", print_boolean (no_advertizing));
+	fprintf (fp, "# turn off advertising in header (X-Newsreader/X-Mailer)\n");
+	fprintf (fp, "no_advertising=%s\n\n", print_boolean (no_advertising));
 	fprintf (fp, "# time interval in seconds between rereading the active file\n");
 	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
 	fprintf (fp, "# characters used in quoting to followups and replys. '_' replaced by ' '\n");

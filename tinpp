@@ -1,4 +1,4 @@
-# Tin Newsreader postprocessor
+# Tin Newsreader post-processor
 # $1 is the filename that has been uudecoded
 # This is just a sample script - It is very Linux oriented.
 # TODO:

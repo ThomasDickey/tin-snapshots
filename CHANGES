@@ -1,3 +1,22 @@
+--950824BETA  PLMC.960519 --
+
+038) Branden Robinson <branden@ecn.purdue.edu>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. little code clean-up
+     FIX. extern.h, proto.h, config.c, init.c, page.c, post.c, rfc1522.c,
+          save.c
+
+--950824BETA  PLMC.960518 --
+
+037) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (it was a useless feature) if show_author!=0 'd' toggles only
+          between setting at startup and 0, but there are 4 different
+          possibilities to cycle through.
+     BUG. tagging counter for tagged articles was not decremented on untag
+     BUG. anywhere but the pager on 'z'/'Z' art_marked_unread instead of
+          art_marked_return is called
+     FIX. group.c, thread.c, newsrc.c
+
 --950824BETA  PLMC.960517 --
 
 036) Juergen Bernau <pas@freitag.muc.de>
@@ -7,9 +26,9 @@
 --950824BETA  PLMC.960516 --
 
 035) Chris Blum <chris@phil.uni-sb.de>
-     ADD. print waring is crossposting contains no Followup-To: line
+     ADD. print waring if cross-posting contains no Followup-To: line
      ADD. print waring if Followup-To: line contains more than 1 newsgroup
-     BUG. case-sensitive headerchecking removed
+     BUG. case-sensitive header-checking removed
      FIX. several supplied patches
    
 --950824BETA  PLMC.960515 --
@@ -40,13 +59,13 @@
 --950824BETA  PLMC.960510 --
 
 031) Chris Blum <chris@phil.uni-sb.de>
-     BUG. threading problem with mimedecoded subjects
+     BUG. threading problem with mime-decoded subjects
      FIX. art.c
 
 --950824BETA  PLMC.960507 --
 
 030) Chris Blum <chris@phil.uni-sb.de>
-     BUG. threading problem with mimedecoded subjects
+     BUG. threading problem with mime-decoded subjects
      FIX. art.c
 
 --950824BETA  PLMC.960506 --
@@ -68,12 +87,12 @@
 --950824BETA  PLMC.960427 --
 
 027) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     BUG. Did not recognize multipart mime articles
+     BUG. Did not recognize multi-part mime articles
      FIX. page.c
 
 --950824BETA  PLMC.960421 --
 026) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. on a full filesystem tinrc was trashed
+     BUG. on a full file-system tinrc was trashed
      FIX. config.c, lang.c, extern.h
           This should also be done for
                write_attributes_file(), write_mail_active_file()
@@ -100,7 +119,7 @@
 --950824BETA  PLMC.960401 --
 
 C01) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     ADD. -DHAVE_COLOR for color cupport
+     ADD. -DHAVE_COLOR for color support
 
 --950824BETA  PLM.960401 --
 
@@ -170,7 +189,7 @@ L09) Sven Paulus <sven@oops.sub.de>
      FIX. tin.1
 
 L08) Chris Blum <chris@phil.uni-sb.de>
-     ADD. no_advertizing switch in tinrc
+     ADD. no_advertising switch in tinrc
      ADD. Parses references according to son-of-1036, stripping multiple
           whitespace
      FIX. several supplied patches

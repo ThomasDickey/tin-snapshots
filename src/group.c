@@ -1057,7 +1057,8 @@ group_list_thread:
  					info_message (txt_no_arts);
 					break;
 				}
-				art_mark_unread (&active[my_group[cur_groupnum]], &arts[base[index_point]]);
+				art_mark_will_return (&active[my_group[cur_groupnum]], &arts[base[index_point]]);
+				/* art_mark_unread (&active[my_group[cur_groupnum]], &arts[base[index_point]]); */
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
@@ -1518,6 +1519,7 @@ set_subj_from_size (num_cols)
 void 
 toggle_subject_from ()
 {
+/*
 	int i;
 	
 	i = my_group[cur_groupnum];
@@ -1529,12 +1531,16 @@ toggle_subject_from ()
 			show_author = active[i].attribute->show_author;
 		}
 	} else {
-		if (show_author + 1 > SHOW_FROM_BOTH) {
+*/
+		if (++show_author > SHOW_FROM_BOTH) {
 			show_author = SHOW_FROM_NONE;
-		} else {
+		}
+/*		
+		 else {
 			show_author++;
 		}
 	}
+*/
 
 	set_subj_from_size (cCOLS);
 }

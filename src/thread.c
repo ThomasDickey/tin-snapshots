@@ -566,6 +566,7 @@ thread_catchup:
  
  				if (arts[n].tagged) {
  					arts[n].tagged = 0;
+ 					--num_of_tagged_arts;
  					info_message (txt_untagged_art);
  				} else {
  					arts[n].tagged = ++num_of_tagged_arts;
@@ -590,7 +591,7 @@ thread_catchup:
 
 			case iKeyThreadMarkArtUnread:	/* mark article as unread */
 				n = choose_response (thread_basenote, thread_index_point);
-				art_mark_unread (group, &arts[n]);
+				art_mark_will_return (group, &arts[n]); /*art_mark_unread (group, &arts[n]);*/
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
 				info_message (txt_art_marked_as_unread);

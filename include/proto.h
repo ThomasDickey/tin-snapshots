@@ -423,7 +423,7 @@ extern int post_process_files P_((int proc_type_ch, int auto_delete));
 extern void post_process_uud P_((int pp, int auto_delete));
 extern void uudecode_file P_((int pp, char *file_out_dir, char *file_out));
 extern void post_process_sh P_((int auto_delete));
-extern char *get_archive_file P_((char *dir, char *ext));
+extern char *get_archive_file P_((char *dir));
 extern void delete_processed_files P_((int auto_delete));
 extern void print_art_seperator_line P_((FILE *fp, int mailbox));
 /* ./screen.c */

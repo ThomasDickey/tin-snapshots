@@ -671,7 +671,7 @@ return_to_index:
 			case iKeyPageSkipIncludedText:	/* skip included text */
 				skip_include = first_char;
 				goto page_down;
-				break;
+				/* break; */
 
 			case iKeyPageDisplaySubject:
 				info_message(arts[respnum].subject);

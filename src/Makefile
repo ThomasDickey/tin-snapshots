@@ -234,16 +234,16 @@ help:
 	@$(ECHO) "If the above options are OK make one of the following targets:"
 	@$(ECHO) " "
 	@$(ECHO) "  make bsd    [ BSD[I] / DGUX / NeXT / OSF1 / Pyramid / SunOS / Ultrix (nntp) ]"
-	@$(ECHO) "  make sysv   [ SysV ]		make sysvr4  [ SysVR4 ]"
-	@$(ECHO) "  make hpux7  [ HP-UX 7/8 ]		make hpux9   [ HP-UX 9/10 ]"
 	@$(ECHO) "  make aix    [ IBM AIX (nntp) ]	make apollo  [ Apollo DomainOS ]"
 	@$(ECHO) "  make coh    [ Coherent 4.0 ]	make dynix   [ Sequent DYNIX (nntp) ]"
+	@$(ECHO) "  make hpux7  [ HP-UX 7/8 ]		make hpux9   [ HP-UX 9/10 ]"
 	@$(ECHO) "  make irix   [ SGI Irix ]		make linux   [ Linux (nntp) ]"
 	@$(ECHO) "  make minix  [ Minix 386 ]		make mips    [ Mips / CDC EPIX ]"
 	@$(ECHO) "  make ptx    [ Sequent PTX ]		make qnx     [ QNX 4.2 ]"
 	@$(ECHO) "  make sco    [ SCO Unix ]		make sinix   [ SNI Sinix ]"
-	@$(ECHO) "  make tower  [ NCR Tower]		make xenix   [ SCO Xenix 386 ]"
-	@$(ECHO) "  make sol    [ Solaris 2.X ]"
+	@$(ECHO) "  make sysv   [ SysV ]		make sysvr4  [ SysVR4 ]"
+	@$(ECHO) "  make sol    [ Solaris 2.X ]		make tower   [ NCR Tower]"
+	@$(ECHO) "  make xenix  [ SCO Xenix 386 ]"
 	@$(ECHO) " "
 	@$(ECHO) "Note that targets marked with '(nntp)' have -DNNTP_ABLE defined automatically."
 	@$(ECHO) " "
@@ -639,7 +639,15 @@ tags:
 
 lint:
 	@$(ECHO) "Linting source (results in ./LINT)..."
-	@$(LINT) $(LINTFLAGS) -DNNTP_ABLE $(CFILES) > LINT
+	@$(LINT) $(LINTFLAGS) \
+	-I$(INCDIR) \
+	-DNNTP_ONLY \
+	-DNNTP_INEWS \
+	-DDONT_LOG_USER \
+	-DUSE_ISO2ASC=\"2\" \
+	-DHAVE_ISPELL \
+	-DHAVE_COLOR \
+	$(CFILES) > ../LINT
 
 clean:
 	@$(ECHO) "Cleaning..."

@@ -1233,7 +1233,7 @@ uudecode_file (pp, file_out_dir, file_out)
 		/*
 		 *  Sum file
 		 */
-		if ((file = get_archive_file (file_out_dir, "*")) != (char *) 0) { 
+		if ((file = get_archive_file (file_out_dir)) != (char *) 0) { 
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file); 
 			printf (txt_checksum_of_file, file); 
 			fflush (stdout);
@@ -1432,9 +1432,8 @@ post_process_sh (auto_delete)
  */
 
 char *
-get_archive_file (dir, ext)
+get_archive_file (dir)
 	char *dir;
-	char *ext;
 {
 	char buf[LEN];
 	char *file;
