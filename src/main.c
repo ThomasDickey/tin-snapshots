@@ -100,6 +100,25 @@ main (
 		error_message (cvers, "");		/* Why to stderr ?? */
 	}
 
+#ifndef INDEX_DAEMON
+	/*
+	 * check curses emulation before reading any configfiles
+	 *
+	 * FIXME: don't do this if running in batchmode
+	 */
+	if (!InitScreen ()) {
+		error_message (txt_screen_init_failed, progname);
+		exit (EXIT_ERROR);
+	} else {
+#ifdef HAVE_COLOR
+		use_color=FALSE;
+		EndInverse();
+#endif
+		EndWin ();
+		Raw (FALSE);
+}
+#endif
+
 	/*
 	 *  Read user local & global config files
 	 */

@@ -25,7 +25,7 @@
 #define UNISTD_H
 /* And also get rid of prototypes for the netlib we're not using */
 #define CLIB_NETLIB_PROTOS_H
-/* #include <proto/usergroup.h> */
+#include <proto/usergroup.h>
 #include <bsdsocket.h>
 /* But we still need prototypes for select() and inet_ntoa() */
 /* if we're not using optimisation... */

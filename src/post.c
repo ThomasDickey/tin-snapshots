@@ -440,9 +440,9 @@ update_posted_msgs_file (
  * 6.  List of newsgroups is presented to user with description
  * 7.  Lines in body that are to long causes a warning to be printed
  * 8.  Group(s) must be listed in the active file
- * 9.  No From: header allowed (limit accidental forging) and
- *     rejection by inn servers
- * 10  Display an 'are you sure' message before posting article
+ * 9.  No Sender: header allowed (limit forging) and rejection by
+ *     inn servers
+ * 10. Display an 'are you sure' message before posting article
  */
 
 static t_bool
@@ -3062,20 +3062,22 @@ repost_article (
 	int respnum,
 	int supersede)
 {
+	FILE *fp;
+	char *ptr;
 	char buf[HEADER_LEN];
 	char tmp[HEADER_LEN];
-	int done = FALSE;
-	char ch;
-	char ch_default = iKeyPostPost;
-	FILE *fp;
-	int ret_code = POSTED_NONE;
-	struct t_group *psGrp;
-	char *ptr;
-	char line[HEADER_LEN];
 	char from_name[HEADER_LEN];
 	char user_name[128];
 	char full_name[128];
+	char ch;
+	char ch_default = iKeyPostPost;
+	int done = FALSE;
 	int force_command = FALSE;
+	int ret_code = POSTED_NONE;
+	struct t_group *psGrp;
+#ifdef FORGERY
+	char line[HEADER_LEN];
+#endif
 
 	msg_init_headers ();
 
@@ -3139,9 +3141,10 @@ repost_article (
 #ifndef FORGERY
 		get_user_info (user_name, full_name);
 		get_from_name (from_name);
-
 		if (FromSameUser) {
 			msg_add_header ("From", from_name);
+			if (*reply_to)
+				msg_add_header ("Reply-To", reply_to);
 #else
 		{
 			make_path_header (line, from_name);
@@ -3152,6 +3155,8 @@ repost_article (
 				sprintf (line, "<%s>", arts[respnum].from);
 			}
 			msg_add_header ("From", line);
+			find_reply_to_addr (respnum, line, FALSE);
+			msg_add_header ("Reply-To", line);
 			msg_add_header ("X-Superseded-By", from_name);
 			if (note_h_org[0])
 				msg_add_header ("Organization", note_h_org);
@@ -3161,8 +3166,6 @@ repost_article (
 			msg_add_header ("Supersedes", note_h_messageid);
 			if (note_h_followup[0])
 				msg_add_header ("Followup-To", note_h_followup);
-			find_reply_to_addr (respnum, line, FALSE);
-			msg_add_header ("Reply-To", line);
 			if (note_h_keywords[0])
 				msg_add_header ("Keywords", note_h_keywords);
 			if (note_h_summary[0])
@@ -3174,6 +3177,8 @@ repost_article (
 		get_user_info (user_name, full_name);
 		get_from_name (from_name);
 		msg_add_header ("From", from_name);
+		if (*reply_to)
+			msg_add_header ("Reply-To", reply_to);
 	}
 	msg_add_header ("Subject", note_h_subj);
 	msg_add_header ("Newsgroups", group);
@@ -3537,6 +3542,8 @@ static t_bool
 insert_from_header (
 	char *infile)
 {
+	t_bool from_found = FALSE;
+	t_bool in_header = TRUE;
 	char *ptr;
 	char from_name[HEADER_LEN];
 	char full_name[128];
@@ -3566,6 +3573,8 @@ insert_from_header (
 					return FALSE;
 				}
 			}
+
+#if 0  /* WTFIT?  And who did that anyway? */
 			/*
 			 * Check that domain is not of type  host.subdomain.domain
 			 */
@@ -3574,8 +3583,19 @@ insert_from_header (
 				error_message (txt_invalid_from2, from_name);
 				return FALSE;
 			}
-			fprintf (fp_out, "From: %s\n", from_name);
+#endif			
 
+			while ((fgets (line, sizeof (line), fp_in) != (char *) 0) && in_header) {
+				if (!strncasecmp(line, "From:", 5))
+					from_found = TRUE;
+				if (*line == '\n')
+				   in_header = FALSE;
+			}
+
+			if (!from_found)
+				fprintf (fp_out, "From: %s\n", from_name);
+
+			fseek(fp_in, SEEK_SET, 0l);
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				fputs (line, fp_out);
 			}

@@ -551,7 +551,7 @@ search_body (
 		}
 
 		if (count % MODULO_COUNT_NUM == 0) {
-			if (input_pending ()) {
+			if (input_pending (0)) {
 				if (read (STDIN_FILENO, buf2, sizeof (buf2)-1)) {
 					if (buf2[0] == ESC || buf2[0] == 'q' || buf2[0] == 'Q') {
 						if (prompt_yn (cLINES, txt_abort_searching, TRUE) == 1) {

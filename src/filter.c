@@ -93,7 +93,7 @@ vSetFilter (
 		psFilter->subj = (char *) 0;
 		psFilter->from = (char *) 0;
 		psFilter->msgid = (char *) 0;
-		psFilter->lines_cmp = FILTER_LINES_EQ;
+		psFilter->lines_cmp = FILTER_LINES_NO;
 		psFilter->lines_num = 0;
 		psFilter->xref = (char *) 0;
 		psFilter->xref_max=0;
@@ -457,7 +457,7 @@ vWriteFilterFile (
 	fprintf (hFp, "#   subj=STRING       Subject: line (e.g. How to be a wizard)\n");
 	fprintf (hFp, "#   from=STRING       From: line (e.g. *Craig Shergold*)\n");
 	fprintf (hFp, "#   msgid=STRING      Message-ID: line (e.g. <123@ether.net>)\n");
-	fprintf (hFp, "#   lines=NUM         Lines: line (default 0)\n");
+	fprintf (hFp, "#   lines=NUM         Lines: line\n");
 	fprintf (hFp, "#   either:\n");
 	fprintf (hFp, "#   xref_max=NUM      Maximum score (e.g. 5)\n");
 	fprintf (hFp, "#   xref_score=NUM,PATTERN score for pattern (e.g 0,*.answers)\n");
@@ -573,7 +573,7 @@ my_flush ();
 			if (ptr->filter[i].msgid != (char *) 0) {
 				fprintf (fp, "msgid=%s\n", ptr->filter[i].msgid);
 			}
-			if (ptr->filter[i].lines_num > 0) {
+			if (ptr->filter[i].lines_cmp != FILTER_LINES_NO) {
 				switch (ptr->filter[i].lines_cmp) {
 					case FILTER_LINES_EQ:
 						fprintf (fp, "lines=%d\n", ptr->filter[i].lines_num);
@@ -693,7 +693,7 @@ filter_menu (
 	rule.scope[0] = '\0';
 	rule.counter = 0;
 	rule.global = FALSE;
-	rule.lines_cmp = FILTER_LINES_EQ;
+	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
 	rule.from_ok = FALSE;
 	rule.lines_ok = FALSE;
@@ -857,9 +857,12 @@ filter_menu (
 	} else if (ptr && *ptr == '<') {
 		rule.lines_cmp = FILTER_LINES_LT;
 		ptr++;
+	} else if (ptr && *ptr == '=') {
+		rule.lines_cmp = FILTER_LINES_EQ;
+		ptr++;
 	}
 	rule.lines_num = atoi (ptr);
-	if (rule.lines_num > 0) {
+	if (rule.lines_cmp != FILTER_LINES_NO && rule.lines_num >= 0) {
 		rule.lines_ok = TRUE;
 	}
 
@@ -994,7 +997,7 @@ quick_filter_kill (
 		strcpy (rule.scope, group->attribute->quick_kill_scope);
 	}
 	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE);
-	rule.lines_cmp = FILTER_LINES_EQ;
+	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES ? TRUE : FALSE);
 	rule.msgid_ok = (header == FILTER_MSGID ? TRUE : FALSE);
@@ -1055,7 +1058,7 @@ quick_filter_select (
 		strcpy (rule.scope, group->attribute->quick_select_scope);
 	}
 	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE);
-	rule.lines_cmp = FILTER_LINES_EQ;
+	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES ? TRUE : FALSE);
 	rule.msgid_ok = (header == FILTER_MSGID ? TRUE : FALSE);
@@ -1109,7 +1112,7 @@ quick_filter_select_posted_art (
 		 */
 		rule.counter = 0;
 		rule.global = FALSE;
-		rule.lines_cmp = FILTER_LINES_EQ;
+		rule.lines_cmp = FILTER_LINES_NO;
 		rule.lines_num = 0;
 		rule.from_ok = FALSE;
 		rule.lines_ok = FALSE;
@@ -1234,7 +1237,7 @@ iAddFilterRule (
 		(*plNum)++;
 	} else {
 		if (psRule->subj_ok) {
-			sprintf (acBuf, "*%s*", psArt->subject);
+			sprintf (acBuf, "*%s*", quote_wild(psArt->subject));
 			if (psRule->check_string) {
 				strcpy (acBuf, pcChkRegexStr (acBuf));
 			}
@@ -1417,7 +1420,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				/*
 				 * Filter on Lines: line
 				 */
-				if (ptr[j].lines_num > 0 && arts[i].lines>=0) {
+				if (ptr[j].lines_cmp != FILTER_LINES_NO && arts[i].lines>=0) {
 					switch (ptr[j].lines_cmp) {
 						case FILTER_LINES_EQ:
 							if (arts[i].lines == ptr[j].lines_num) {

@@ -530,6 +530,7 @@ AC_CHECK_FUNCS(\
 	tzset \
 	uname \
 	unlink \
+	usleep \
 )
 
 CF_FUNC_FORK

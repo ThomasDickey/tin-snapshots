@@ -1,3 +1,26 @@
+--unoff BETA release 970724 --
+
+413) Thomas Quinot <thomas@cuivre.fdn.fr>
+     ADD. if using INN nntplib use _CONF_FROMHOST value, if present,
+          instead of domain_name.
+      FIX. header.c
+
+412) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. test for curses before reading any config-files
+     BUG. upon Supersedes Reply-To: was inserted even if $REPLYTO was't set
+     FIX. main.c, post.c
+
+411) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. amiga code clean-up
+     BUG. impossible to killfile articles with lines=0
+     BUG. wildcards were not quoted when the subject was used for filtering.
+     ADD. function quote_wild() is called for subject.
+     FIX. several supplied patches
+
+410) Sven Paulus <sven@oops.sub.de>
+     BUG. duplicated From: line in mailing_list-groups.
+     BUG. hitting ESC once didn't exit getline() (introduced in 405)
+
 --unoff BETA release 970709 --
 
 409) Thomas E. Dickey <dickey@clark.net>
