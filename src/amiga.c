@@ -85,7 +85,7 @@ void __interrupt _STD_restore_req(void)
 #ifdef __SASC
 void __interrupt __chkabort (void)
 {
-	if(SetSignal(0, SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D) & SIGBREAKF_CTRL_C)
+	if (SetSignal(0, SIGBREAKF_CTRL_C|SIGBREAKF_CTRL_D) & SIGBREAKF_CTRL_C)
 	{
 		raise(SIGINT);
 	}
@@ -153,12 +153,12 @@ LONG action,			/* packet type (desired action)	*/
 	LONG	count, *pargs, res1;
 
 	replyport = (struct MsgPort *)CreatePort(NULL,0);
-	if (!replyport) return NULL;
+	if (! replyport) return NULL;
 
 	packet = (struct StandardPacket *)
 			AllocMem((long)sizeof(struct StandardPacket),
 					MEMF_PUBLIC|MEMF_CLEAR);
-	if (!packet)
+	if (! packet)
 	{	DeletePort(replyport);
 		return NULL;
 	}
@@ -656,7 +656,7 @@ void * __interrupt malloc(size_t size)
 
 	if (size == 0) return 0;
 	p = (struct memhead *)AllocMem(size + sizeof(struct memhead), 0L);
-	if (!p) return (void *) 0;
+	if (! p) return (void *) 0;
 	p->next = alloc_list;
 	p->size = size;
 	alloc_list = p;

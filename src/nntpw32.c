@@ -410,7 +410,7 @@ server_init (machine, service, port)
 	int	sockt_rd;
 	WSADATA wsaData;
 
-	if( WSAStartup( MAKEWORD(1,1), &wsaData) != 0) {
+	if ( WSAStartup( MAKEWORD(1,1), &wsaData) != 0) {
 		return -1;
 	}
 
@@ -470,7 +470,7 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 	/* If not a raw ip address, try nameserver */
-	if (!isdigit(*machine) ||
+	if (! isdigit(*machine) ||
 	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
@@ -638,7 +638,7 @@ static int read_from_server (LPSTR nntp_line, DWORD length)
 	DWORD cbRead = 0, cb;
 	char *pEol;
 
-	if( imemBlock == iendBlock )
+	if ( imemBlock == iendBlock )
 	{
 		pEol = 0;
 	}
@@ -649,10 +649,10 @@ static int read_from_server (LPSTR nntp_line, DWORD length)
 			pEol = 0;								/* then we didn't really find one      */
 	}
 
-	if( !pEol)
+	if ( !pEol)
 	{
 		iendBlock -= imemBlock;
-		if( iendBlock)
+		if ( iendBlock)
 			memcpy( memBlock, memBlock+imemBlock, iendBlock );
 		imemBlock = 0;
 		do {
@@ -703,7 +703,7 @@ get_server (string, size)
 	int cbRead;
 
 	cbRead = read_from_server(string, size);
-	if( cbRead == -1)
+	if ( cbRead == -1)
 	{
 		closesocket(nntp_wr_fp);
 		if (nntp_open () != -1)
@@ -808,7 +808,7 @@ int server_init (LPCSTR machine, LPCSTR service, USHORT port)
 
 		/* All pipe instances are busy, so wait for 20 seconds. */
 
-		if (!WaitNamedPipe (lpszPipename, 20000))
+		if (! WaitNamedPipe (lpszPipename, 20000))
 			return (-1);
 
 	}
@@ -819,7 +819,7 @@ int server_init (LPCSTR machine, LPCSTR service, USHORT port)
 										   NULL,	/* don't set max. bytes */
 										   NULL);	/* don't set max. time  */
 
-	if (!fSuccess)
+	if (! fSuccess)
 		return (-1);
 	/*
 	 * now get the servers signon message
@@ -843,10 +843,10 @@ static void real_put_server (LPCSTR plpvMessage, int fCRLF)
 	DWORD cbWritten;
 
 	fSuccess = WriteFile (hPipe, plpvMessage, strlen (plpvMessage), &cbWritten, NULL);
-	if( fSuccess && fCRLF)
+	if ( fSuccess && fCRLF)
 		fSuccess = WriteFile (hPipe, "\r\n", 2, &cbWritten, NULL);
 
-	if (!fSuccess)
+	if (! fSuccess)
 	{
 		char buf[NNTP_STRLEN];
 
@@ -924,7 +924,7 @@ int get_server (LPSTR nntp_line, DWORD length)
 
 	}
 
-	if (!pEol)
+	if (! pEol)
 	{
 		iendBlock -= imemBlock;
 		if (iendBlock)
@@ -1008,7 +1008,7 @@ int server_init (LPCSTR machine, LPCSTR service, USHORT port)
 	 */
 	strcpy(nntp_line, machine);
 
-	if((LSN = get_connection(&LANA, nntp_line)) < 0)
+	if ((LSN = get_connection(&LANA, nntp_line)) < 0)
 		return -1;
 
 	printf("connected...");
@@ -1027,7 +1027,7 @@ void real_put_server (LPCSTR plpvMessage, int fCRLF)
 	length = (unsigned) strlen(plpvMessage);
 	packet = 0;
 
-	if(length - packet)
+	if (length - packet)
 		{
 		cbWritten = netsend(LANA, LSN, (char *) plpvMessage + packet, length - packet);
 		assert(cbWritten!=-1);
@@ -1078,7 +1078,7 @@ void put_server(LPCSTR plpvMessage)
 
 void close_server ()
 	{
-	if(LSN == 0)
+	if (LSN == 0)
 		return;
 
 	put_server ("QUIT");
@@ -1108,7 +1108,7 @@ int get_server (LPSTR nntp_line, DWORD length)
 			pEol = 0;		/* then we didn't really find one */
 		}
 
-	if (!pEol)
+	if (! pEol)
 		{
 		iendBlock -= imemBlock;
 		if (iendBlock)
@@ -1146,7 +1146,7 @@ int	netaddname(unsigned lana, char *lname)
 	{
 	struct _NCB ncb={0};
 
-	if(lname == NULL || *lname == '\0')
+	if (lname == NULL || *lname == '\0')
 		return -1;
 
 	ncb.ncb_command = NCBADDNAME;
@@ -1154,7 +1154,7 @@ int	netaddname(unsigned lana, char *lname)
 	memcpy(ncb.ncb_name, (char *)lname, NCBNAMSZ);
 
 	rc = passncb(&ncb);
-	if(rc < 0)
+	if (rc < 0)
 		rc = -1;
 	else
 		rc = ncb.ncb_num;
@@ -1175,13 +1175,13 @@ int	get_connection(unsigned *lana, char *machine)
 	{
 	int s;
 
-	if((s = checknet()) < 0)
+	if ((s = checknet()) < 0)
 		{
 		netperror("Net not found");
 		}
 	else
 		{
-		if((s = netconnect(lana, machine, "nntp")) < 0)
+		if ((s = netconnect(lana, machine, "nntp")) < 0)
 			{
 			netperror("Trouble connecting");
 			}
@@ -1204,10 +1204,10 @@ unsigned char netcall(unsigned lana, char *lname, char *rname)
 	{
 	struct _NCB ncb={0};
 
-	if(lname == NULL)
+	if (lname == NULL)
 		{
 	    /* use permanent node name */
-		if(netpname(lana, ncb.ncb_name) < 0)
+		if (netpname(lana, ncb.ncb_name) < 0)
 			{
 			return 0;
 			}
@@ -1229,7 +1229,7 @@ unsigned char netcall(unsigned lana, char *lname, char *rname)
 
 	rc = passncb(&ncb);
 
-	if(rc < 0)
+	if (rc < 0)
 		rc = 0;
 	else
 		rc = ncb.ncb_lsn;
@@ -1276,11 +1276,11 @@ int	netconnect(unsigned *lana, char *rname, char *service)
 		}
 
 	/* tell the server daemon what service we want */
-	if(netsend(*lana, lsn, service, strlen(service) + 1) != -1)
+	if (netsend(*lana, lsn, service, strlen(service) + 1) != -1)
 		{
-		if(netreceive(*lana, lsn, callname, 1) != -1)
+		if (netreceive(*lana, lsn, callname, 1) != -1)
 			{
-			if(*callname == ACK_CHAR)
+			if (*callname == ACK_CHAR)
 				{
 				return lsn;
 				}
@@ -1307,7 +1307,7 @@ int netpname(unsigned lana, char *pname)
 
 	memset(stats.adapter_address, 0, 6);
 
-	if(passncb(&ncb) < 0)
+	if (passncb(&ncb) < 0)
 		rc = -1;
 	else
 		{
@@ -1339,7 +1339,7 @@ int	netreceive(unsigned lana, int lsn, char *data, unsigned nbytes)
 
 	rc = passncb(&ncb);
 
-	if(rc < 0)
+	if (rc < 0)
 		rc = -1;
 	else
 		{
@@ -1363,7 +1363,7 @@ int	netsend(unsigned lana, int lsn, char *data, unsigned nbytes)
 	struct _NCB ncb={0};
 	char buffer[PACKET_SIZE + 1];
 
-	if(nbytes == 0)
+	if (nbytes == 0)
 		{
 		neterrno = NRC_BUFLEN;
 		return -1;
@@ -1382,7 +1382,7 @@ int	netsend(unsigned lana, int lsn, char *data, unsigned nbytes)
 
 	rc = passncb(&ncb);
 
-	if(rc < 0)
+	if (rc < 0)
 		rc = -1;
 	else
 		rc = ncb.ncb_length;
@@ -1400,7 +1400,7 @@ int	checknet(void)
 	passncb(&ncb);
 
 	rc = neterrno;
-	if(rc == NRC_ILLCMD)
+	if (rc == NRC_ILLCMD)
 		rc = neterrno = 0;
 
 	return rc;
@@ -1423,7 +1423,7 @@ int	resetnet(unsigned lana)
 	rc = passncb(&ncb);
 
 	rc = neterrno;
-	if(rc != NRC_GOODRET)
+	if (rc != NRC_GOODRET)
 		rc = neterrno = -1;
 
 	return rc;
@@ -1437,7 +1437,7 @@ int	netlana(LANA_ENUM *plenum)
 	ncb.ncb_command = NCBENUM;
 	ncb.ncb_length = sizeof(LANA_ENUM);
 	ncb.ncb_buffer = (unsigned char *)plenum;
-	if(ncb.ncb_buffer == (unsigned char *) NULL)
+	if (ncb.ncb_buffer == (unsigned char *) NULL)
 		{
 		rc = neterrno = -1;
 		return rc;
@@ -1446,7 +1446,7 @@ int	netlana(LANA_ENUM *plenum)
 	passncb(&ncb);
 
 	rc = plenum->length;
-	if(ncb.ncb_retcode != NRC_GOODRET)
+	if (ncb.ncb_retcode != NRC_GOODRET)
 		rc = neterrno = -1;
 
 	return rc;
@@ -1476,7 +1476,7 @@ int passncb(PNCB ncb)
 		neterrno = Netbios(ncb);
 		}
 
-	if(neterrno && neterrno != NRC_INCOMP)
+	if (neterrno && neterrno != NRC_INCOMP)
 		return -1;
 	else
 		return 0;

@@ -540,7 +540,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 			}
 			free (ngptrs[i]);
 		}
-		if (!found_followup_to && ngcnt > 1 && !errors) {
+		if (! found_followup_to && ngcnt > 1 && !errors) {
 #ifdef HAVE_FASCIST_NEWSADMIN
 			fprintf(stderr, txt_error_missing_followup_to, ngcnt);
 			errors++;
@@ -1191,7 +1191,7 @@ join_references (buffer, oldrefs, newref)
 			}
 			continue;
 		}
-		if (!space) *c+=' ';
+		if (! space) *c+=' ';
 		else space=0;
 		appendid(&c,&d);
 	}
@@ -1584,7 +1584,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 
 	sprintf (subject, "(fwd) %s\n", note_h_subj);
 
-	if( ! use_mailreader_i ) {	/* tin should start editor */
+	if (! use_mailreader_i) {	/* tin should start editor */
 
 		msg_add_header ("To", mail_to);
 
@@ -1644,7 +1644,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		fprintf(fp, "<------- end-of-forwarded-message --------\n");
 	}
 
-	if(! use_mailreader_i) {
+	if (! use_mailreader_i) {
 	msg_write_signature (fp, TRUE);
 	}
 
@@ -1653,11 +1653,11 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 #endif
 	fclose (fp);
 
-	if(use_mailreader_i) {	/* user wants to use his own mailreader */
+	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
-		my_strncpy (mail_to, address, sizeof (mail_to));
+/*		my_strncpy (mail_to, address, sizeof (mail_to));*/
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (! invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -1760,7 +1760,7 @@ mail_bug_report ()
 	}
 	chmod(nam, 0600);
 
-	if(! use_mailreader_i) {	/* tin should start editor */
+	if (! use_mailreader_i) {	/* tin should start editor */
 		sprintf (buf, "%s%s", bug_addr, add_addr);
 		msg_add_header ("To", buf);
 
@@ -1859,7 +1859,7 @@ mail_bug_report ()
 
 	start_line_offset +=5;
 
-	if(! use_mailreader_i) {
+	if (! use_mailreader_i) {
 		msg_write_signature (fp, TRUE);
 	}
 #ifdef WIN32
@@ -1867,7 +1867,7 @@ mail_bug_report ()
 #endif
 	fclose (fp);
 
-	if(use_mailreader_i) {	/* user wants to use his own mailreader */
+	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		sprintf (subject, "BUG REPORT %s", page_header);
 		sprintf (mail_to, "%s%s", bug_addr, add_addr);
@@ -1976,7 +1976,7 @@ mail_to_author (group, respnum, copy_text)
 
 	sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
 
-	if( ! use_mailreader_i ) {	/* tin should start editor */
+	if (! use_mailreader_i ) {	/* tin should start editor */
 		find_reply_to_addr (respnum, from_addr);
 
 		msg_add_header ("To", from_addr);
@@ -2024,7 +2024,7 @@ mail_to_author (group, respnum, copy_text)
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
 
-	if(! use_mailreader_i)  {
+	if (! use_mailreader_i)  {
 	msg_write_signature (fp, TRUE);
 	}
 
@@ -2033,7 +2033,7 @@ mail_to_author (group, respnum, copy_text)
 #endif
 	fclose (fp);
 
-	if(use_mailreader_i) {	/* user wants to use his own mailreader for reply */
+	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
 		find_reply_to_addr (respnum, mail_to);
@@ -2151,7 +2151,7 @@ pcCopyArtHeader (iHeader, pcArt, result)
 
 		/* check for continued header */
 		while((c=peek_char(fp)) !=EOF && isspace(c) && c!='\n' && strlen(buf) < sizeof (buf)-1) {
-			if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+			if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
 				buf[strlen(buf)-1]='\0';
 			}
 			fgets(buf+strlen(buf), sizeof buf-strlen(buf), fp);
@@ -2371,7 +2371,7 @@ delete_article (group, art, respnum)
 	setup_check_article_screen(&init);
 
 #ifdef FORGERY
-	if (!author) {
+	if (! author) {
 		fprintf(stderr, txt_warn_cancel_forgery);
 		fprintf(stderr, "From: %s\n", note_h_from);
 	} else {
@@ -2865,7 +2865,7 @@ checknadd_headers (infile, lines)
 					}
 					gotit = TRUE;
 				} else {
-					if (!gotit) {
+					if (! gotit) {
 						modify_headers(line);
 					}
 					fputs (line, fp_out);

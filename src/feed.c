@@ -584,7 +584,7 @@ feed_articles (function, level, group, respnum)
 		fflush (stdout);
 	}
 
-	if( ! use_mailreader_i )
+	if (! use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
 
 	if (debug == 2) {
@@ -651,7 +651,7 @@ got_sig_pipe_while_piping:
 	}
 
 	if (function == FEED_MAIL) {
-		if( use_mailreader_i ) {
+		if (use_mailreader_i) {
 			strcpy (msg, txt_external_mail_done);
 			info_message (msg);
 		} else {

@@ -29,7 +29,7 @@
 #undef ERR
 #endif
 
-#define ERR(s, c)	if(opterr) {\
+#define ERR(s, c)	if (opterr) {\
 	    fprintf(stderr, "%s%s%c\n", argv[0], s, c);}
 
 int currentfile ();
@@ -117,11 +117,11 @@ struct direct *readdir (DIR * dirp)
 	{
 		rc = FindNextFile (xdirp->dirHandle, &xdirp->dirData);
 	}
-	if (!strcmp (xdirp->dirData.cFileName, "."))
+	if (! strcmp (xdirp->dirData.cFileName, "."))
 	{
 		rc = FindNextFile (xdirp->dirHandle, &xdirp->dirData);
 	}
-	if (!strcmp (xdirp->dirData.cFileName, ".."))
+	if (! strcmp (xdirp->dirData.cFileName, ".."))
 	{
 		rc = FindNextFile (xdirp->dirHandle, &xdirp->dirData);
 	}
@@ -227,9 +227,9 @@ void joinpath ( char *str, char *dir, char *file)
 	if (file[0] == '.')
 		file++;
 
-	if(dir[0] == '~')
+	if (dir[0] == '~')
 	{
-		if(no_pw.pw_dir == NULL)
+		if (no_pw.pw_dir == NULL)
 			pw = getpwnam(getlogin());
 		else
 			pw = &no_pw;
@@ -292,7 +292,7 @@ struct passwd * getpwnam ( const char *name)
 {
 	char *env;
 
-	if( !(env=getenv("USERNAME")) )
+	if ( !(env=getenv("USERNAME")) )
 	{
 		fprintf(stderr, "\nYou must set the environment variable USERNAME");
 		exit(1);
@@ -300,14 +300,14 @@ struct passwd * getpwnam ( const char *name)
 
 	no_pw.pw_name = no_pw.pw_gecos = env;
 
-	if( !(env=getenv("HOMEDRIVE")) )
+	if ( !(env=getenv("HOMEDRIVE")) )
 	{
 		fprintf(stderr, "\nYou must set the environment variable HOMEDRIVE");
 		exit(1);
 	}
 	strcpy(szHomeDir, env);
 
-	if( !(env=getenv("HOMEPATH")) )
+	if ( !(env=getenv("HOMEPATH")) )
 	{
 		fprintf(stderr, "\nYou must set the environment variable HOMEPATH");
 		exit(1);
@@ -418,7 +418,7 @@ void addch(UCHAR c)
 			break;
 
 		case '\b':
-			if(curX>0)
+			if (curX>0)
 				MoveCursor(curY, curX-1);
 			break;
 
@@ -427,7 +427,7 @@ void addch(UCHAR c)
 				DWORD cchWritten;
 
 				WriteConsole(hConOut, &c, 1, &cchWritten, NULL);
-				if(curX++ >= cCOLS)
+				if (curX++ >= cCOLS)
 				{
 					curX = 0;
 					curY++;
@@ -584,7 +584,7 @@ int ReadCh (void)
 	{
 		dwModeSave = dwMode;
 		dwMode &= ~ENABLE_LINE_INPUT;
-		if(raw)
+		if (raw)
 			dwMode &= ~ENABLE_ECHO_INPUT;
 		SetConsoleMode (hConIn, dwMode);
 	}
@@ -602,7 +602,7 @@ int ReadCh (void)
 	if (dwModeSave)
 		SetConsoleMode (hConIn, dwModeSave);
 
-	if(irBuffer.Event.KeyEvent.uChar.AsciiChar)
+	if (irBuffer.Event.KeyEvent.uChar.AsciiChar)
 	{
 		return (char) irBuffer.Event.KeyEvent.uChar.AsciiChar;
 	}

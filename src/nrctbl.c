@@ -70,7 +70,7 @@ get_nntpserver (nntpserver_name, nick_name)
 		while ((fgets(line, sizeof(line), fp) != NULL) && (!found)) {
 			line_entry_counter = 0;
 
-			if (!strchr("# ;", line[0])) {
+			if (! strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
 					line_entry_counter++;
 
@@ -114,7 +114,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		while ((fgets(line, sizeof(line), fp) != NULL) && (found != 1)) {
 			line_entry_counter = 0;
 
-			if (!strchr("# ;", line[0])) {
+			if (! strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL :line, " \t\n")) != NULL) {
 					line_entry_counter++;
 

@@ -75,7 +75,7 @@ getline (prompt, number_only, str, max_chars)
 	int c, i, loc, tmp, gl_max;
 
 	set_xclick_off ();
-	if (!gl_init_done) {
+	if (! gl_init_done) {
 		gl_init_done = 1;
 		hist_init ();
 	}

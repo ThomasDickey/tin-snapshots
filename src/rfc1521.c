@@ -51,7 +51,7 @@ strcasestr (haystack, needle)
 		if (tolower (*h) == tolower (*n)) {
 			h++;
 			n++;
-			if (!*n)
+			if (! *n)
 				return haystack;
 		} else {
 			h = ++haystack;
@@ -76,10 +76,10 @@ rfc1521_decode (file)
 	char *charset;
 	char encoding = '\0';
 
-	if (!file)
+	if (! file)
 		return file;
 	f = tmpfile ();
-	if (!f)
+	if (! f)
 		return file;
 
 	content_type[0] = '\0';
@@ -92,16 +92,16 @@ rfc1521_decode (file)
 		 * with whitespace to the preceding one, but I guess we can
 		 * live with that here.
 		 */
-		if (!strncasecmp (buf, "Content-Type: ", 14)) {
+		if (! strncasecmp (buf, "Content-Type: ", 14)) {
 			strcpynl (content_type, buf + 14);
-		} else if (!strncasecmp (buf, "Content-Transfer-Encoding: ", 27)) {
+		} else if (! strncasecmp (buf, "Content-Transfer-Encoding: ", 27)) {
 			strcpynl (content_transfer_encoding, buf + 27);
 		}
 		if (*buf == '\r' || *buf == '\n')
 			break;
 	}
 	/* no MIME headers, no decoding */
-	if (!*content_type || !*content_transfer_encoding) {
+	if (! *content_type || !*content_transfer_encoding) {
 		fclose (f);
 		rewind (file);
 		return file;
@@ -117,16 +117,16 @@ rfc1521_decode (file)
 	 * this point of time - maybe in the future)
 	 */
 	charset = strcasestr (content_type, "charset=");
-	if (!charset)
+	if (! charset)
 		charset = "US-ASCII";
 	else
 		charset += 8;
 	get_mm_charset ();
 
 	/* see if content transfer encoding requires decoding anyway */
-	if (!strcasecmp (content_transfer_encoding, "base64"))
+	if (! strcasecmp (content_transfer_encoding, "base64"))
 		encoding = 'b';
-	else if (!strcasecmp (content_transfer_encoding, "quoted-printable"))
+	else if (! strcasecmp (content_transfer_encoding, "quoted-printable"))
 		encoding = 'q';
 
 	if (encoding) {
@@ -172,11 +172,11 @@ rfc1521_encode (line, f, e)
 	int i;
 
 	if (e == 'b') {
-		if (!b) {
+		if (! b) {
 			b = buffer;
 			*buffer = '\0';
 		}
-		if (!line) {	/* flush */
+		if (! line) {	/* flush */
 			if (bits) {
 				if (xpos >= 73) {
 					*b++ = '\n';
@@ -226,7 +226,7 @@ rfc1521_encode (line, f, e)
 			}
 		}
 	} else if (e == 'q') {
-		if (!line) {
+		if (! line) {
 			/*
 			 * we don't really flush anything in qp mode, just set
 			 * xpos to 0 in case the last line wasn't terminated by
@@ -241,14 +241,14 @@ rfc1521_encode (line, f, e)
 				char *l = line + 1;
 
 				while (*l) {
-					if (!isspace (*l)) {	/* it's not trailing whitespace, no encoding needed */
+					if (! isspace (*l)) {	/* it's not trailing whitespace, no encoding needed */
 						*b++ = *line++;
 						xpos++;
 						break;
 					}
 					l++;
 				}
-				if (!*l) {	/* trailing whitespace must be encoded */
+				if (! *l) {	/* trailing whitespace must be encoded */
 					*b++ = '=';
 					*b++ = bin2hex (HI4BITS(line));
 					*b++ = bin2hex (LO4BITS(line));

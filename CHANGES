@@ -1,3 +1,16 @@
+--unoff BETA release 961004 --
+
+179) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. wrong argument order for interactive external mailer elm
+     BUG. mar'K' article as read in 'l'ist_thread does not work
+     ADD. rage check to center_line()
+     ADD. <tab> no longer skips over ART_WILL_RETURN articles
+     FIX. several patches
+
+178) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. SIGSEGVs on several machines
+     FIX. active.c, select.c
+
 --unoff BETA release 960930 --
 
 177) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>

@@ -509,7 +509,7 @@ select_page_up:
 select_done:
 				if (! confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
 					write_config_file (local_config_file);
-					tin_done (EXIT_OK);
+					tin_done (EXIT_OK);	/* Tin END */
 				}
 				group_selection_page ();
 				break;
@@ -771,6 +771,8 @@ group_selection_page ()
 	char subs;
 	int i, j, n;
 	int blank_len;
+	char active_name[255];
+	char group_descript[255];
 
 	set_signals_select ();
 
@@ -826,55 +828,58 @@ group_selection_page ()
 		first_group_on_screen = 0;
 		last_group_on_screen = 0;
 	}
-
+	
 	if (show_description) {
 		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 2;
-	} else {
+ 	} else {
 		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 4;
-	}
+ 	}
 
 	for (j=0, i=first_group_on_screen; i < last_group_on_screen; i++, j++) {
 		if (active[my_group[i]].inrange) {
-				strcpy (new, "    #");
+			strcpy (new, "    #");
 		} else if (active[my_group[i]].newsrc.num_unread) {
-				sprintf (new, "%5ld", active[my_group[i]].newsrc.num_unread);
-		} else {
-				strcpy (new, "     ");
-		}
+			sprintf (new, "%5ld", active[my_group[i]].newsrc.num_unread);
+ 		} else {
+ 			strcpy (new, "     ");
+ 		}
 
 		n = my_group[i];
 		if (active[n].subscribed == SUBSCRIBED) {
 			subs = ' ';
 		} else {
-			subs = 'u';	/* u next to unsubscribed groups */
+ 			subs = 'u';	/* u next to unsubscribed groups */
+ 		}
+		strncpy(active_name, active[n].name, groupname_len);
+		active_name[groupname_len+1] = '\0';
+		if (blank_len > 254) {
+			blank_len = 254;
 		}
-		
-			/*
-			 * copy of active[n].description fix some malloc bugs
-			 */
-		if (show_description) {
-			char group_descript[256];
-			if (blank_len >= 255) { /* better be carefull here */
-				blank_len = 255;
-			}
-			strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
-			group_descript[blank_len+1] = '\0';
+		/* copy of active[n].description fix some malloc bugs kg */
+		strncpy(group_descript,active[n].description ? active[n].description : " ", blank_len);
+		group_descript[blank_len+1] = '\0';
 
-			sprintf (screen[j].col, "  %c %4d %s  %-*.*s  %-*.*s\r\n",
-			         subs, i+1, new, groupname_len, groupname_len,
-			         active[n].name, blank_len, blank_len, group_descript);
+		if (show_description) {
+			if (draw_arrow_mark) {
+				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
+				         subs, i+1, new, groupname_len,
+				         active[n].name, blank_len, blank_len, group_descript);
+			} else {
+				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
+				         subs, i+1, new,groupname_len,
+				         active[n].name, blank_len, blank_len, group_descript);
+			}
 		} else {
 			if (draw_arrow_mark) {
-				sprintf (screen[j].col, "  %c %4d %s  %-*.*s\r\n",
-				         subs, i+1, new, groupname_len, groupname_len,
-				         active[n].name);
+ 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s\r\n",
+				         subs, i+1, new, groupname_len, groupname_len, active_name);
 			} else {
-				sprintf (screen[j].col, "  %c %4d %s  %-*.*s%*s\r\n",
-				         subs, i+1, new, groupname_len, groupname_len,
-				         active[n].name, blank_len, " ");
+ 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s%*s\r\n",
+				         subs, i+1, new, groupname_len, groupname_len, active_name,
+ 					 blank_len, " ");
 			}
-		}
-		if (strip_blanks) {
+ 		}
+ 		if (strip_blanks) {
 			strip_line (screen[j].col, strlen (screen[j].col));
 			strcat (screen[j].col, "\r\n");
 		}

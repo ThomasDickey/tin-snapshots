@@ -120,7 +120,7 @@ resync_active_file ()
 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
-		if (!command_line) {
+		if (! command_line) {
 			toggle_my_groups (show_only_unread_groups, old_group);
 		}
 		set_groupname_len (FALSE);
@@ -269,7 +269,7 @@ read_news_active_file ()
 						txt_reading_news_active_file);
 	}
 
-	if (!newsrc_active) {
+	if (! newsrc_active) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
 			if (compiled_with_nntp) {
 				if (cmd_line) {
@@ -349,6 +349,7 @@ read_news_active_file ()
 				active[num_active].spooldir = spooldir;
 			}
 			active[num_active].name = str_dup (buf);
+			active[num_active].name[strlen(buf)+1]= '\0';
 			active[num_active].description = (char *) 0;
 			active[num_active].count = count;
 			active[num_active].xmax = max;

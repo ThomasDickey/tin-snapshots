@@ -253,22 +253,22 @@ InitScreen ()
 
 	InitWin ();
 
-	if (!_clearscreen) {
+	if (! _clearscreen) {
 		fprintf (stderr,
 			"%s: Terminal must have clearscreen (cl) capability\n",progname);
 		return (FALSE);
 	}
-	if (!_moveto) {
+	if (! _moveto) {
 		fprintf (stderr,
 			"%s: Terminal must have cursor motion (cm)\n", progname);
 		return (FALSE);
 	}
-	if (!_cleartoeoln) {
+	if (! _cleartoeoln) {
 		fprintf (stderr,
 			"%s: Terminal must have clear to end-of-line (ce)\n", progname);
 		return (FALSE);
 	}
-	if (!_cleartoeos) {
+	if (! _cleartoeos) {
 		fprintf (stderr,
 			"%s: Terminal must have clear to end-of-screen (cd)\n", progname);
 		return (FALSE);
