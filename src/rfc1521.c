@@ -324,7 +324,9 @@ rfc1557_encode (line, f, e)
 			}
 			i++;
 		}
-		/* KS C 5601 doesn't appear, yet -  no conversion */
+	}
+
+	if (! iskorean) { /* KS C 5601 doesn't appear, yet -  no conversion */
 		fputs(line, f);
 		return;
 	}

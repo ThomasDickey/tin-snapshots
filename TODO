@@ -107,6 +107,8 @@ o  compile-time option: generate own MSGIDs on host with a proper FQDN
 
 o  add
        --disable-piping               (default off)
+       check for str[n]casecmp() and if necesarry define it to
+       my_str[n]icmp()
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 

@@ -1,3 +1,13 @@
+--unoff BETA release 960901 --
+
+164) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. fixed minor bug in korean encoding (introduced in 154)
+     FIX. rfc1521.c
+
+163) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Reply-To: is ignored if use_mailreader_i=ON
+     FIX. post.c
+
 --unoff BETA release 960827 --
 
 162) Andrey Blochintsev <bag@wood.cs.kiev.ua>
