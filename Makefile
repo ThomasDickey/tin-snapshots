@@ -1,10 +1,10 @@
 # Top level Makefile for tin - for configuration options read the ./INSTALL file.
-# 
+#
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970901
+PVER		= 970911
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -162,7 +162,7 @@ WC		= wc
 SED		= sed
 TR		= tr
 
-all: 
+all:
 	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
 	@$(ECHO) " "
 	@$(ECHO) "To compile the source code change to the source directory by"
@@ -221,7 +221,7 @@ chmod:
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
-	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1  
+	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1
 	@$(TAR) cvzf $(PROJECT)$(VER).tgz -C ../ \
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \

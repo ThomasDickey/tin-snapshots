@@ -3,7 +3,7 @@
  *  Module    : tcurses.c
  *  Author    : Thomas Dickey
  *  Created   : 02.03.97
- *  Updated   : 02.03.97
+ *  Updated   : 02.09.97
  *  Notes     : This is a set of wrapper functions adapting the termcap
  *		interface of tin to use SVr4 curses (e.g., ncurses).
  *
@@ -59,12 +59,20 @@ int InitScreen (void)
 	cLINES = LINES - 1;
 	set_win_size(&cLINES, &cCOLS);
 	raw(); noecho(); cbreak();
+	cmd_line = FALSE;	/* ...so fcol/bcol will succeed */
 
 	keypad(stdscr, TRUE);
 	if (has_colors()) {
 		start_color();
+#ifdef HAVE_USE_DEFAULT_COLORS
+		if (use_default_colors() != ERR) {
+			fcol(default_fcol = -1);
+			bcol(default_bcol = -1);
+		}
+#endif
 	}
-#ifdef NCURSES_VERSION
+	postinit_colors();
+#ifdef NCURSES_MOUSE_VERSION
 	(void) mousemask(
 		(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
 		(mmask_t *)0);
@@ -79,6 +87,7 @@ void InitWin(void)
 {
 	TRACE(("InitWin"))
 	Raw(TRUE);		/* FIXME */
+	cmd_line = FALSE;
 }
 
 /*
@@ -132,11 +141,23 @@ void StartInverse(void)
 	}
 }
 
+static int isInverse(void)
+{
+	if (use_color) {
+		short pair = PAIR_NUMBER(attr_get());
+		short fg, bg;
+		pair_content(pair, &fg, &bg);
+		return (fg == col_invers_fg) && (bg == col_invers_bg);
+	}
+
+	return (attr_get() & A_REVERSE);
+}
+
 /*
  */
 void ToggleInverse(void)
 {
-	if (attr_get() & A_REVERSE)
+	if (isInverse())
 		EndInverse();
 	else
 		StartInverse();
@@ -198,7 +219,9 @@ ReadCh(void)
 		ch = cmdReadCh();
 	else {
 		ch = getch();
-		if (ch == ESC || ch >= KEY_MIN) {
+		if (ch == KEY_BACKSPACE)
+			ch = '\010';    /* fix for Ctrl-H - show headers */
+		else if (ch == ESC || ch >= KEY_MIN) {
 			ungetch(ch);
 			ch = ESC;
 		}
@@ -239,7 +262,7 @@ my_fputc(int ch, FILE *fp)
 	if (cmd_line)
 		fputc (ch, fp);
 	else
-		addch (ch);
+		addch ((unsigned char) ch);
 }
 
 void

@@ -99,6 +99,7 @@
 #undef	HAVE_LIBC_H
 #undef	HAVE_LOCALE_H
 #undef	HAVE_MALLOC_H
+#undef	HAVE_NCURSES_H		/* obsolete versions of ncurses */
 #undef	HAVE_NETDB_H
 #undef	HAVE_NETINET_IN_H
 #undef	HAVE_NETLIB_H
@@ -154,6 +155,7 @@
 #undef	HAVE_MKDIR
 #undef	HAVE_POLL
 #undef	HAVE_PUTENV
+#undef	HAVE_RESIZETERM
 #undef	HAVE_REWINDDIR
 #undef	HAVE_SELECT
 #undef	HAVE_SETEGID
@@ -177,6 +179,7 @@
 #undef	HAVE_TZSET
 #undef	HAVE_UNAME
 #undef	HAVE_UNLINK
+#undef	HAVE_USE_DEFAULT_COLORS
 #undef	HAVE_USLEEP
 
 /*

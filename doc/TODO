@@ -1,15 +1,12 @@
 Bugs
 ----
-o  -c commandline switch only works propperly together with -S, but it
-   might be usefull without any other switch to catchup all groups.
+o  -c commandline switch only works properly together with -S, but it
+   might be useful without any other switch to catchup all groups.
    it seems to trash some newsrc entrys when used without -S and/or
    not to catchup anything.
    [Michael Faurot <mfaurot@clark.net>]
 
-o  tin needs a terminal in batch mode - thus it can't run out of cron!
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
-o  -N and -M comandline switches are broken
+o  -N and -M commandline switches are broken
    -N does not enter batch mode and does not mail out any articles
    -M always mails to your address
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
@@ -19,7 +16,7 @@ o  a problem concerning .tin/posted: when I post a postponed followup,
    "References:" header, the article should be regarded as a followup.
    [Vincent Lefevre <vlefevre@ens-lyon.fr>]
 
-o  the cursor postion gets 'lost' after 'y'ank in 'y'ank out - it'll
+o  the cursor position gets 'lost' after 'y'ank in 'y'ank out - it'll
    be placed to the first(last?) group in your list, not to the one it
    pointed to before the yanks.
 
@@ -28,7 +25,7 @@ o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    [Jason C Lin <jlin@hawaii.edu>]
    [I can't reproduce this - jason@radar.demon.co.uk]
 
-o  When an article is piped and the message "Press <RETURN> to continue..." 
+o  When an article is piped and the message "Press <RETURN> to continue..."
    appears, if an arrow key is pressed, arbitrary commands are executed.
    [Jason C Lin <jlin@hawaii.edu>]
 
@@ -142,16 +139,16 @@ o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
    useless!
 
-o  Followup-To: line is not examined weather the mentioned group(s) are valid
+o  Followup-To: line is not examined whether the mentioned group(s) are valid
    on this server.
 
 o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
-   is examined wether it contains several groups...
+   is examined whether it contains several groups...
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
 o  tin does not warn you if you try to save into a directory and not into
-   a file. 
+   a file.
 
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
@@ -208,7 +205,7 @@ o  allow changing From: in mail-replys
 
 o  '/', '?' searching in 'M'enu and 'h'elp-screen
 
-o  iftem_by_item_etiquette_warnings [compiletime?]
+o  item_by_item_etiquette_warnings [compiletime?]
    (i.e. enable x-posts without f'up waring, disable long-sig waring)
 
 o  auto_reconnect=ON/OFF ['M'enu]
@@ -271,7 +268,7 @@ o  Add to the 'M'enu:
         news_headers_not_to_display
         DEFAULT_MAILER
 
-o  Add a comandline switch that prints out all values of cpp-symbols etc.
+o  Add a commandline switch that prints out all values of cpp-symbols etc.
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
@@ -300,7 +297,7 @@ o  bring up a warning when trying to f'up into a binaries group
 
 o  posting to a binaries group should warn if no followup is set to another
    group/poster (you have not set a target for a possible discussion on your
-   post, would you like to go on anyway? N/y) 
+   post, would you like to go on anyway? N/y)
 
 o  when posting to a group containing uppercase-letters: bring up a
    warning: "Newsgroup-names should be all lowercase, correct it? (Y/n)"
@@ -364,7 +361,7 @@ o  join Makefile and makefile (not entirely possible)
 
 o  move all strings to lang.c
 
-o  cleanup (=rewrite) post.c/inews.c/header.c
+o  cleanup (=rewrite) post.c/inews.c/header.c/page.c/filter.c
 
 o  rework the message routines (wait_message, error_message) to use variable
    length argument lists
@@ -452,7 +449,7 @@ o  if answering (c)atchup with (n) you are leaving the group... not useful
 o  numbering of Hot articles is wrong after (post)processing them
    (6T 0A 0K -5H R)
 
-o  fix reposition of cursor after reading active file... annoying! 
+o  fix reposition of cursor after reading active file... annoying!
 
 o  think about group numbering in "only unread" display mode
    (using different numbers in show all/show only unread leads to some

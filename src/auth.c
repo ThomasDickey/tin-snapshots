@@ -245,8 +245,10 @@ do_authinfo_original (
 	ret = atoi (line);
 	if (ret == OK_AUTH) {
 		sprintf (line, txt_authorization_ok, authuser);
-		wait_message (line);
+	}else{
+		sprintf (line, txt_authorization_fail, authuser);
 	}
+	wait_message (line);
 	return ret;
 }
 

@@ -5,7 +5,7 @@ It is still a work in progress and might not compile on all machines (for a
 list of platforms on which tin-unoff has been installed and tested have a
 look at doc/INSTALL).
 
-Quick Install - 
+Quick Install:
 
 configure to your local setup (have a look at):
 	configure --help

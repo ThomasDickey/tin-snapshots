@@ -457,6 +457,7 @@ int getopt (int argc, char **argv, char *options)
  * ST_DIRECT though
  */
 
+#ifndef __SASC
 int stat (char *name, struct stat *buf)
 {
         BPTR dirlock;
@@ -480,6 +481,7 @@ int stat (char *name, struct stat *buf)
         free (inf);
         return 0;
 }
+#endif
 
 /*
  * This getenv and setenv will use the WB2.0 calls if you have the new

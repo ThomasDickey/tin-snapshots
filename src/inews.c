@@ -104,18 +104,6 @@ submit_inews (
 		}
 	}
 
-#if 0 /* WTFIT haeh! */
-	/*
-	 * Check that domain is not of type host.subdomain.domain
-	 */
-	ptr = strstr (from_name, "subdomain.domain");
-	if (ptr != (char *) 0) {
-		error_message ("Invalid  From: %s line. Reconfigure your domainname.", from_name);
-		fclose (fp);
-		return ret_code;
-	}
-#endif
-
 	/*
 	 * Send POST command to NNTP server
 	 */

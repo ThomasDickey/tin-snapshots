@@ -1,3 +1,38 @@
+--unoff BETA release 970911 --
+
+436) Thomas E. Dickey <dickey@clark.net>
+     BUG. on articles with an '*' in color on the last line, color isn't
+          reset after that point
+     FIX. color.c, tcurses.c
+
+435) Patrick St. Jean <stjeanp@pdq.net>
+     ADD. failure message for when a news server rejects authentication 
+          information
+     FIX. extern.h, auth.c, lang.c 
+
+434) Sven Paulus <sven@karlsruhe.org>
+     ADD. quote signatures/display signatures switch
+     FIX. extern.h, proto.h, config.c, init.c, lang.c, misc.c, page.c
+          post.c, tincfg.tbl
+
+433) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. Amiga-port had problems with stat()/fstat()
+     ADD. minor code cleanup
+     FIX. amiga.h, tin.h, smakefile, amiga.c, save.c
+
+432) Thomas E. Dickey <dickey@clark.net>
+     Andrey A. Chernov <ache@null.net>
+     BUG. backspace key didn't work with curses
+     BUG. ncurses.h wasn't included (needed by old ncurses versions)
+     ADD. use ncurses 4.1 extension use_default_colors()
+     ADD. configure script check to (try to) set compiler options for
+          ANSI mode
+     BUG. core-dump in curses-configuration due to printing the whole
+          intro page as one chunk
+     FIX. aclocal.m4, configure[.in], autoconf[.hin], extern.h, proto.h
+          tcurses.h, color.c, config.c, curses.c, init.c, lang.c, main.c
+          misc.c, prompt.c, signal.c, tcurses.c
+
 --unoff BETA release 970901 --
 
 431) Sven Paulus <sven@karlsruhe.org>

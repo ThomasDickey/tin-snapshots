@@ -1,39 +1,39 @@
-MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
+MANIFEST for tin-1.3-unoff-BETA-970911 (Thu Sep 11 00:23:09 CEST 1997)
 ----------------------------------------------------
-   6670 ./Makefile
+   6666 ./Makefile
    2809 ./MANIFEST
-   1427 ./README
-  35917 ./aclocal.m4
+   1425 ./README
+  37124 ./aclocal.m4
   20446 ./config.guess
   19236 ./config.sub
- 176237 ./configure
-  16133 ./configure.in
+ 177752 ./configure
+  16180 ./configure.in
    4772 ./install.sh
     651 ./mkdirs.sh
   11707 ./makefile.in
     964 ./conf-tin
-  90787 ./doc/CHANGES
-   1470 ./doc/DEBUG_REFS
+  92281 ./doc/CHANGES
+   1469 ./doc/DEBUG_REFS
   19310 ./doc/Good-Netkeeping-Seal
-  16554 ./doc/INSTALL
-  18266 ./doc/TODO
+  16437 ./doc/INSTALL
+  18163 ./doc/TODO
    1627 ./doc/WHATSNEW
   12686 ./doc/auth.txt
-   2323 ./doc/internals.txt
+   2322 ./doc/internals.txt
   74038 ./doc/tin.1
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
    1060 ./include/bugrep.h
    8473 ./include/config.h
-  51558 ./include/extern.h
+  52013 ./include/extern.h
   13269 ./include/menukeys.h
     718 ./include/msmail.h
    4828 ./include/nntplib.h
    2233 ./include/os_2.h
-  23528 ./include/proto.h
+  23709 ./include/proto.h
    2389 ./include/stpwatch.h
-   1877 ./include/tcurses.h
-  47835 ./include/tin.h
+   1933 ./include/tcurses.h
+  47706 ./include/tin.h
    2734 ./include/tnntp.h
     873 ./include/trace.h
     903 ./include/version.h
@@ -43,11 +43,11 @@ MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
    9883 ./src/actived.c
   36981 ./src/art.c
   23005 ./src/attrib.c
-   9693 ./src/auth.c
+   9752 ./src/auth.c
    8441 ./src/charset.c
-   6756 ./src/color.c
-  55168 ./src/config.c
-  20923 ./src/curses.c
+   7594 ./src/color.c
+  56332 ./src/config.c
+  20968 ./src/curses.c
   12471 ./src/debug.c
    2300 ./src/envarg.c
   19708 ./src/feed.c
@@ -57,16 +57,16 @@ MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
    3007 ./src/hashstr.c
    7208 ./src/header.c
   10433 ./src/help.c
-   5054 ./src/inews.c
-  33366 ./src/init.c
+   4759 ./src/inews.c
+  34363 ./src/init.c
     962 ./src/joinpath.c
-  78777 ./src/lang.c
+  79633 ./src/lang.c
    3805 ./src/list.c
    9532 ./src/mail.c
-  21132 ./src/main.c
+  21139 ./src/main.c
    8683 ./src/makecfg.c
    9675 ./src/memory.c
-  52133 ./src/misc.c
+  52218 ./src/misc.c
    7228 ./src/msmail.c
   33544 ./src/newsrc.c
   23905 ./src/nntplib.c
@@ -74,17 +74,17 @@ MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
    6314 ./src/nrctbl.c
   28045 ./src/open.c
    6272 ./src/os_2.c
-  41810 ./src/page.c
+  41886 ./src/page.c
   24119 ./src/parsdate.y
    6720 ./src/pgp.c
-  92682 ./src/post.c
-   9867 ./src/prompt.c
+  92786 ./src/post.c
+  10006 ./src/prompt.c
     160 ./src/proto.sed
   22674 ./src/refs.c
    3044 ./src/regex.c
   11244 ./src/rfc1521.c
   22445 ./src/rfc1522.c
-  34057 ./src/save.c
+  33923 ./src/save.c
    5184 ./src/screen.c
   11418 ./src/search.c
   36894 ./src/select.c
@@ -92,8 +92,8 @@ MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
    9512 ./src/signal.c
    5681 ./src/strftime.c
    7453 ./src/string.c
-   4651 ./src/tcurses.c
-  29395 ./src/thread.c
+   5210 ./src/tcurses.c
+  29392 ./src/thread.c
     971 ./src/trace.c
    4336 ./src/wildmat.c
   12575 ./src/win32.c
@@ -101,16 +101,16 @@ MANIFEST for tin-1.3-unoff-BETA-970901 (Mon Sep  1 17:29:28 CEST 1997)
    4741 ./src/xref.c
    5597 ./src/vms.c
    4987 ./amiga/README
-   4222 ./amiga/tin-unoff.readme
-   9659 ./amiga/smakefile
+   4931 ./amiga/tin-unoff.readme
+   9698 ./amiga/smakefile
    4987 ./amiga/actived.c
-  17201 ./amiga/amiga.c
+  17223 ./amiga/amiga.c
    6373 ./amiga/amigatcp.c
-   2773 ./amiga/amiga.h
+   2336 ./amiga/amiga.h
    2167 ./amiga/amigatcp.h
-   8548 ./include/autoconf.hin
-  11968 ./src/Makefile.in
+   8660 ./include/autoconf.hin
+  11963 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   3976 ./src/tincfg.tbl
-1904136 total
+   4036 ./src/tincfg.tbl
+1913731 total

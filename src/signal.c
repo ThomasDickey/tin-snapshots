@@ -191,7 +191,7 @@ handle_resize (int repaint)
 
 	if (repaint) {
 #if USE_CURSES
-#ifdef NCURSES_VERSION
+#ifdef HAVE_RESIZETERM
 		resizeterm(cLINES+1, cCOLS+1);
 #else
 		my_retouch();

@@ -5,6 +5,7 @@
  *  Author    : Roland Rosenfeld <roland@spinnaker.rhein.de>
  *              Giuseppe De Marco <gdm@rebel.net> (light-colors)
  *              Julien Oster <fuzzy@cu8.cum.de> (word highlighting)
+ *		T.Dickey <dickey@clark.net> (curses support)
  *  Created   : 02-06-95
  *  Updated   : 06-03-95, 30-03-96, 22-04-96, 15-12-96
  *  Notes     : This are the basic function for ansi-color
@@ -18,8 +19,18 @@
 
 #include "tin.h"
 #include "tcurses.h"
+#include "trace.h"
 
 #ifdef HAVE_COLOR
+
+#ifdef HAVE_USE_DEFAULT_COLORS
+#define MIN_COLOR -1
+#else
+#define MIN_COLOR 0
+#endif
+
+int default_fcol = 7;
+int default_bcol = 0;
 
 static int current_fcol = 7;
 static int current_bcol = 0;
@@ -30,9 +41,6 @@ static int current_bcol = 0;
 static t_bool check_valid_mark (const char *s, int c);
 static t_bool isalp (int c);
 static void color_fputs (const char *s, FILE *stream, int color);
-#if USE_CURSES
-	static void set_colors (int fcolor, int bcolor);
-#endif /* USE_CURSES */
 
 #if USE_CURSES
 static void
@@ -40,27 +48,59 @@ set_colors (
 	int fcolor,
 	int bcolor)
 {
-	static bool FIXME[64];
-
-	if (!cmd_line) {
-		chtype attribute = A_NORMAL;
+	static struct LIST {
+		struct LIST *link;
 		int pair;
+		int fg;
+		int bg;
+	} *list;
+	static int nextpair;
 
-		if (fcolor > 7) {
-			fcolor &= 7;
+	if (cmd_line || !use_color) {
+		current_fcol = default_fcol;
+		current_bcol = default_bcol;
+	} else {
+		chtype attribute = A_NORMAL;
+		int pair = 0;
+
+		TRACE(("set_colors (%d,%d)", fcolor, bcolor))
+
+		/* fcolor/bcolor may be negative, if we're using ncurses
+		 * function use_default_colors().
+		 */
+		if (fcolor > (COLORS-1)) {
 			attribute |= A_BOLD;
+			fcolor %= (COLORS-1);
 		}
-		bcolor &= 7;
-		pair = (fcolor * 8) + bcolor;	/* FIXME: assumes 64-colors */
-#if 0		/* FIXME: curses assumes white/black */
-		if (fcolor == COLOR_WHITE
-		 && bcolor == COLOR_BLACK)
-			pair = 0;
-#endif
-		if ((pair != 0)
-		 && FIXME[pair] == FALSE) {
-			init_pair(pair, fcolor, bcolor);
-			FIXME[pair] = TRUE;
+		if (bcolor >= 0)
+			bcolor %= (COLORS-1);
+
+		/* curses assumes white/black */
+		if (fcolor != COLOR_WHITE
+		 || bcolor != COLOR_BLACK) {
+			int found = FALSE;
+			struct LIST *p;
+
+			for (p = list; p != 0; p = p->link) {
+				if (p->fg == fcolor
+				 && p->bg == bcolor) {
+					found = TRUE;
+					break;
+				}
+			}
+			if (found) {
+				pair = p->pair;
+			} else if (++nextpair < COLOR_PAIRS) {
+				p = (struct LIST *)malloc(sizeof(struct LIST));
+				p->fg = fcolor;
+				p->bg = bcolor;
+				p->pair = pair = nextpair;
+				p->link = list;
+				list = p;
+				init_pair(pair, fcolor, bcolor);
+			} else {
+				pair = 0;
+			}
 		}
 
 		bkgdset(attribute | COLOR_PAIR(pair) | ' ');
@@ -79,7 +119,7 @@ fcol (
 	int color)
 {
 	if (use_color) {
-		if (color >= 0 && color <= 15) {
+		if (color >= MIN_COLOR && color <= MAX_COLOR) {
 #if USE_CURSES
 			set_colors(color, current_bcol);
 #else
@@ -92,7 +132,7 @@ fcol (
 		}
 	}
 #if USE_CURSES
-	else set_colors(7, 0);
+	else set_colors(default_fcol, default_bcol);
 #endif /* USE_CURSES */
 }
 
@@ -102,7 +142,7 @@ bcol (
 	int color)
 {
 	if (use_color) {
-		if (color >= 0 && color <= 7) {
+		if (color >= MIN_COLOR && color <= MAX_BACKCOLOR) {
 #if USE_CURSES
 			set_colors(current_fcol, color);
 #else
@@ -112,7 +152,7 @@ bcol (
 		}
 	}
 #if USE_CURSES
-	else set_colors(7, 0);
+	else set_colors(default_fcol, default_bcol);
 #endif
 }
 

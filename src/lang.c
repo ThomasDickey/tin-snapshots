@@ -47,6 +47,7 @@ constext txt_auth_user_needed[] = "Server expects authentication. Please enter u
 constext txt_author_search_backwards[] = "Author search backwards [%s]> ";
 constext txt_author_search_forwards[] = "Author search forwards [%s]> ";
 constext txt_authorization_ok[] = "Authorized for user: %s\n";
+constext txt_authorization_fail[] = "Authorization failed for user: %s\n";
 constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
 constext txt_autoselecting_articles[] = "Autoselecting articles (use 'X' to see all unread) ...";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
@@ -335,6 +336,7 @@ constext txt_help_prompt_followupto[] = "<SPACE> toggles, <CR> sets, <ESC> cance
 constext txt_help_q[] = "Q\t  quit" cCRLF;
 constext txt_help_quote_chars[] = "Enter quotation marks, %s or %S for author's initials.";
 constext txt_help_quote_empty_lines[] = "Quote empty lines. <SPACE> toggles & <CR> sets.";
+constext txt_help_quote_signatures[] = "Quote signatures. <SPACE> toggles & <CR> sets.";
 constext txt_help_r[] = "r\t  toggle display of all/unread articles" cCRLF;
 constext txt_help_reread_active_file_secs[] = "Enter number of seconds until active file will be reread. <CR> sets.";
 constext txt_help_s[] = "s u\t  subscribe (u = unsubscribe) to chosen group" cCRLF;
@@ -348,6 +350,7 @@ constext txt_help_show_last_line_prev_page[] = "<SPACE> toggles, <CR> sets, <ESC
 constext txt_help_show_lines[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_show_only_unread[] = "Show all articles or only unread articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_show_only_unread_groups[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_show_signatures[] = "Display signatures. <SPACE> toggles & <CR> sets.";
 constext txt_help_show_xcommentto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_sigdashes[] = "Prepend signature with \"-- \" on own line. <SPACE> toggles & <CR> sets.";
 constext txt_help_signature_repost[] = "Add signature when reposting articles. <SPACE> toggles & <CR> sets.";
@@ -555,6 +558,7 @@ constext txt_opt_process_only_unread[] = "Process only unread articles       : "
 constext txt_opt_prompt_followupto[] = "Show empty Followup-To in editor   : ";
 constext txt_opt_quote_chars[] = "Characters used as quote-marks     : ";
 constext txt_opt_quote_empty_lines[] = "Quote empty lines                  : ";
+constext txt_opt_quote_signatures[] = "Quote signatures                   : ";
 constext txt_opt_reread_active_file_secs[] = "Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = "Save mail in MMDF style            : ";
 constext txt_opt_savedir[] = "Directory to save arts/threads in  : ";
@@ -564,6 +568,7 @@ constext txt_opt_show_last_line_prev_page[] = "Show last line of previous page  
 constext txt_opt_show_lines[] = "Show no. of lines in thread listing: ";
 constext txt_opt_show_only_unread[] = "Show only unread articles          : ";
 constext txt_opt_show_only_unread_groups[] = "Show only groups with unread arts  : ";
+constext txt_opt_show_signatures[] = "Display signatures                 : ";
 constext txt_opt_show_xcommentto[] = "Display X-Comment-To: header       : ";
 constext txt_opt_sigdashes[] = "Prepend signature with \"-- \"       : ";
 constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
@@ -653,7 +658,9 @@ constext txt_tinrc_colors[] = "# For color-adjust use the following numbers\n\
 #  4-blue        5-pink        6-cyan         7-white\n\
 # These are *only* for foreground:\n\
 #  8-gray        9-lightred   10-lightgreen  11-yellow\n\
-# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n";
+# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\
+# A '-1' is interpreted as default (foreground normally is white, and\n\
+# background black)\n\n";
 #endif /* HAVE_COLOR */
 constext txt_tinrc_confirm_action[] = "# if ON confirm certain commands with y/n before executing\n";
 constext txt_tinrc_confirm_to_quit[] = "# if ON confirm with y/n before quitting ('Q' never asks)\n";
@@ -723,7 +730,7 @@ constext txt_tinrc_mm_charset[] = "# charset supported locally which is also use
 constext txt_tinrc_motd_file_info[] = "# news motd file dates from server used for detecting new motd info\n";
 constext txt_tinrc_newnews[] = "# host & time info used for detecting new groups (don't touch)\n";
 constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/following-up an article\n\
-# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n\
+# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M Message-ID\n\
 # %%N Full Name  %%C First Name\n";
 constext txt_tinrc_no_advertising[] = "# turn off advertising in header (X-Newsreader/X-Mailer)\n";
 constext txt_tinrc_pos_first_unread[] = "# if ON put cursor at first unread art in group otherwise last art\n";
@@ -760,6 +767,7 @@ constext txt_tinrc_prompt_followupto[] = "# If ON show empty Followup-To header 
 constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups and replys.\n\
 # '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
 constext txt_tinrc_quote_empty_lines[] = "# If ON quote empty lines, too\n";
+constext txt_tinrc_quote_signatures[] = "# If ON quote signatures, too\n";
 constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
 constext txt_tinrc_news_headers_to_display[] = "# Which news headers you wish to see. If you want to see _all_ the headers,\n\
@@ -781,6 +789,7 @@ constext txt_tinrc_show_last_line_prev_page[] = "# if ON show the last line of t
 constext txt_tinrc_show_lines[] = "# show number of lines of first unread article in thread listing (ON/OFF)\n";
 constext txt_tinrc_show_only_unread[] = "# if ON show only new/unread articles otherwise show all.\n";
 constext txt_tinrc_show_only_unread_groups[] = "# if ON show only subscribed to groups that contain unread articles.\n";
+constext txt_tinrc_show_signatures[] = "# If OFF don't show signatures when displaying articles\n";
 constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed\n";
 constext txt_tinrc_sigdashes[] = "# if ON prepend the signature with dashes\n";
 constext txt_tinrc_signature_repost[] = "# if ON add signature to reposted articles'\\n-- \\n'\n";
@@ -820,6 +829,11 @@ constext txt_tinrc_word_highlight[] = "# Enable word highlighting?\n";
 #endif /* HAVE_COLOR */
 
 /*
+ * Special value used to override option-list behavior
+ */
+constext txt_default[] = "Default";
+
+/*
  * OFF ~ FALSE, ON ~ TRUE
  */
 constext *txt_onoff[] = { "OFF", "ON" };
@@ -844,10 +858,14 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 /*
  * Which colors can be used.
  */
-constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
-									"Cyan", "White", "Gray", "Light Red",
-									"Light Green", "Yellow", "Light Blue",
-									"Light Pink", "Light Cyan", "Light White" };
+constext *txt_colors[] = {
+#ifdef HAVE_USE_DEFAULT_COLORS
+	txt_default,
+#endif
+	"Black",      "Red",        "Green",       "Brown",
+	"Blue",       "Pink",       "Cyan",        "White",
+	"Gray",       "Light Red",  "Light Green", "Yellow",
+	"Light Blue", "Light Pink", "Light Cyan",  "Light White" };
 
 /*
  * Which mark types can be used.

@@ -59,6 +59,8 @@
 	reread_active_file_secs		OPT_NUM
 	quote_chars			OPT_STRING
 	quote_empty_lines		OPT_ON_OFF
+	quote_signatures		OPT_ON_OFF
+	show_signatures			OPT_ON_OFF
 	news_quote_format		OPT_STRING
 	xpost_quote_format		OPT_STRING
 	mail_quote_format		OPT_STRING

@@ -32,7 +32,7 @@ All the Message-ID and Reference headers are broken down and stored here.
 They are linked together by parent, sibling and child pointers
 
 table[]
-Hash of the key headers from the articles, to save space and speed up 
+Hash of the key headers from the articles, to save space and speed up
 searches and compares.
 
 

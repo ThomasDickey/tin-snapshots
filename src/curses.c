@@ -320,6 +320,9 @@ SetupScreen (void)
 		if (_setinverse == 0)
 			draw_arrow_mark = 1;
 	}
+#ifdef HAVE_COLOR
+	postinit_colors();
+#endif
 	return (TRUE);
 }
 #endif

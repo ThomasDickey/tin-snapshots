@@ -18,7 +18,11 @@
 
 #if USE_CURSES
 
+#ifdef HAVE_NCURSES_H
+#include <ncurses.h>
+#else
 #include <curses.h>
+#endif
 
 #if USE_TRACE
 #if HAVE_NOMACROS_H

@@ -15,7 +15,7 @@ in the order of .5Mb of output. It is much more useful if problems
 can be reproduced in groups with as few articles as possible.
 
 1) Recompile Tin with DEBUG_REFS enabled.
-   If you have a build tree already, simply editing refs.c to make 
+   If you have a build tree already, simply editing refs.c to make
 
    #undef DEBUG_REFS
 	read

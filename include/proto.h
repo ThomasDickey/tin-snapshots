@@ -68,6 +68,9 @@ extern void quote_dash_to_space (char *str);
 extern void refresh_config_page (int act_option, int force_redraw);
 extern void show_menu_help (const char *help_message);
 extern void write_config_file (char *file);
+#ifdef HAVE_COLOR
+	extern int match_color (char *line, const char *pat, int *dst, int maxlen);
+#endif
 
 /* curses.c */
 extern OUTC_RETTYPE outchar (OUTC_ARGS);
@@ -178,6 +181,9 @@ extern char *GetConfigValue (const char *name);
 extern int create_mail_save_dirs (void);
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 extern void init_selfinfo (void);
+#ifdef HAVE_COLOR
+	extern void postinit_colors (void);
+#endif
 
 /* joinpath.c */
 extern void joinpath (char *result, const char *dir, const char *file);
@@ -255,7 +261,7 @@ extern int untag_all_articles (void);
 extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
-extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl);
+extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl, t_bool with_sig);
 extern void copy_fp (FILE *fp_ip, FILE *fp_op, const char *prefix);
 extern void create_index_lock_file (char *the_lock_file);
 extern void draw_percent_mark (long cur_num, long max_num);

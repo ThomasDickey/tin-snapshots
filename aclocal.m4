@@ -40,6 +40,49 @@ do
 done
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl This is adapted from the macros 'fp_PROG_CC_STDC' and 'fp_C_PROTOTYPES'
+dnl in the sharutils 4.2 distribution.
+AC_DEFUN([CF_ANSI_CC],
+[
+AC_MSG_CHECKING(for ${CC-cc} option to accept ANSI C)
+AC_CACHE_VAL(cf_cv_ansi_cc,[
+cf_cv_ansi_cc=no
+cf_save_CFLAGS="$CFLAGS"
+# Don't try gcc -ansi; that turns off useful extensions and
+# breaks some systems' header files.
+# AIX			-qlanglvl=ansi
+# Ultrix and OSF/1	-std1
+# HP-UX			-Aa -D_HPUX_SOURCE
+# SVR4			-Xc
+# UnixWare 1.2		(cannot use -Xc, since ANSI/POSIX clashes)
+for cf_arg in "-DCC_HAS_PROTOS" "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" -Xc
+do
+	CFLAGS="$cf_save_CFLAGS $cf_arg"
+	AC_TRY_COMPILE(
+[
+#ifndef CC_HAS_PROTOS
+#if !defined(__STDC__) || __STDC__ != 1
+choke me
+#endif
+#endif
+],[
+	int test (int i, double x);
+	struct s1 {int (*f) (int a);};
+	struct s2 {int (*f) (double a);};],
+	[cf_cv_ansi_cc="$cf_arg"; break])
+done
+CFLAGS="$cf_save_CFLAGS"
+])
+AC_MSG_RESULT($cf_cv_ansi_cc)
+if test "$cf_cv_ansi_cc" != "no"; then
+if test ".$cf_cv_ansi_cc" != ".-DCC_HAS_PROTOS"; then
+	CFLAGS="$CFLAGS $cf_cv_ansi_cc"
+fi
+else
+	AC_ERROR(This program requires an ANSI compiler)
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Allow user to disable a normally-on option.
 AC_DEFUN([CF_ARG_DISABLE],
 [CF_ARG_OPTION($1,[$2 (default: on)],[$3],[$4],yes)])dnl
@@ -616,7 +659,7 @@ changequote([,])dnl
 
 case $cf_cv_ncurses_header in # (vi
 */ncurses.h)
-	AC_DEFINE(NCURSESHEADER)
+	AC_DEFINE(HAVE_NCURSES_H)
 	;;
 esac
 
