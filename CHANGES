@@ -1,3 +1,9 @@
+--unoff BETA release 960923 --
+
+172) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. SIGSEGV on several machines
+     FIX. select.c
+
 --unoff BETA release 960917 --
 
 171) Urs Janssen <urs@akk.uni-karlsruhe.de>
