@@ -1,5 +1,5 @@
 #
-# $VER: tin_makefile 2.2b (19.02.97)
+# $VER: tin_makefile 2.3 (13.06.99)
 #
 # This is especially for use with the SAS/C developing system
 # version 6.55 and above
@@ -47,8 +47,8 @@ SCOPTIONS = strmer nover ignore=85,93,104,105 \
 
 # comment the next two lines, for the final release
 
-#DEBUG     = debug=line stkchk def MEM_DEBUG def DEBUG
-#LDEBUG    = debug=sym
+# DEBUG     = debug=line stkchk def MEM_DEBUG def DEBUG
+# LDEBUG    = debug=sym
 
 # optimization should always be disabled while debugging
 # uncomment the following only for the final version
@@ -119,7 +119,6 @@ HEADERS = \
 # /*vb*/
 OBJECTS = \
         $(OBJDIR)/active.o \
-        $(OBJDIR)/actived.o \
         $(OBJDIR)/amiga.o \
         $(OBJDIR)/amigatcp.o \
         $(OBJDIR)/art.o \
@@ -210,11 +209,11 @@ $(GSTFILE): $(HEADERS)
 $(OBJDIR):
         -@makedir $(OBJDIR)
 
-$(REDIR)/chartables.c: maketables
-        maketables >$(REDIR)/chartables.c
+$(REDIR)/chartables.c: dftables
+        dftables >$(REDIR)/chartables.c
 
-maketables: $(OBJDIR)/maketables.o $(GSTFILE)
-        $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/maketables.o
+dftables: $(OBJDIR)/maketables.o $(OBJDIR)/dftables.o $(GSTFILE)
+        $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/dftables.o
 
 #/*vb*/
 makecfg: $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o $(GSTFILE)
@@ -225,10 +224,13 @@ $(INCDIR)/tincfg.h: $(SRCDIR)/tincfg.tbl makecfg
 
 clean:
         -gst $(GSTFILE) unload
-        -delete $(OBJDIR)/\#?.o #?.lnk
+        -delete $(OBJDIR)/\#?.o \#?.lnk
         -delete $(GSTFILE)(%|.info) $(ACTIVED)(%|.info) $(PROJECT)(%|.info)
+	-delete $(INCDIR)/tincfg.h
         -delete $(SRCDIR)/parsdate.c
-        -delete maketables
+
+dist-clean: clean
+	-delete $(REDIR)/chartables.c
 
 #
 # dependencies
@@ -236,7 +238,6 @@ clean:
 
 $(OBJDIR)/activeda.o:           $(AMIDIR)/actived.c $(GSTFILE)
 $(OBJDIR)/active.o:             $(SRCDIR)/active.c $(GSTFILE)
-$(OBJDIR)/actived.o:            $(SRCDIR)/actived.c $(GSTFILE)
 $(OBJDIR)/amiga.o:              $(AMIDIR)/amiga.c $(GSTFILE)
 $(OBJDIR)/amigatcp.o:           $(AMIDIR)/amigatcp.c $(GSTFILE)
 $(OBJDIR)/art.o:                $(SRCDIR)/art.c $(GSTFILE)
@@ -247,6 +248,7 @@ $(OBJDIR)/chartables.o:         $(REDIR)/chartables.c $(GSTFILE)
 $(OBJDIR)/color.o:              $(SRCDIR)/color.c $(GSTFILE)
 $(OBJDIR)/config.o:             $(SRCDIR)/config.c $(GSTFILE) $(INCDIR)/tincfg.h
 $(OBJDIR)/curses.o:             $(SRCDIR)/curses.c $(GSTFILE)
+$(OBJDIR)/dftables.o:           $(REDIR)/dftables.c $(GSTFILE)
 $(OBJDIR)/debug.o:              $(SRCDIR)/debug.c $(GSTFILE)
 $(OBJDIR)/envarg.o:             $(SRCDIR)/envarg.c $(GSTFILE)
 $(OBJDIR)/feed.o:               $(SRCDIR)/feed.c $(GSTFILE)

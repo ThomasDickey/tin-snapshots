@@ -510,11 +510,11 @@ select_quit:
 				} else if (CURR_GROUP.bogus && tinrc.strip_bogus == BOGUS_ASK) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
-					vWriteNewsrc();									/* save current newsrc */
-					delete_group(CURR_GROUP.name);					/* remove bogus group */
-					read_newsrc(newsrc, TRUE);						/* reload newsrc */
-					toggle_my_groups (tinrc.show_only_unread_groups, ""); /* keep current display-state */
-					show_selection_page();							/* reddraw screen */
+					vWriteNewsrc ();		/* save current newsrc */
+					delete_group(CURR_GROUP.name);		/* remove bogus group */
+					read_newsrc(newsrc, TRUE);		/* reload newsrc */
+					toggle_my_groups (tinrc.show_only_unread_groups, "");		/* keep current display-state */
+					show_selection_page();		/* reddraw screen */
 					info_message (buf);
 				}
 				break;

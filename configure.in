@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1998-04-20
+dnl Updated   : 1999-06-23
 dnl Notes     :
 dnl
-dnl Copyright 1996,1997,1998 by Thomas Dickey
+dnl Copyright 1996,1997,1998,1999 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,7 @@ dnl             right notice, and it must be included in any copy made
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.12)
+AC_PREREQ(2.13.19990117)
 AC_INIT(include/tin.h)
 AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
 AC_PREFIX_DEFAULT(/usr/local)
@@ -127,16 +127,7 @@ AC_MSG_RESULT($enableval)
 AC_SUBST(ENABLE_DEBUG)
 
 ###	use option --disable-echo to suppress full display compiling commands
-AC_MSG_CHECKING(if you want to see long compiling messages)
-CF_ARG_DISABLE(echo,
-	[  --disable-echo          display \"compiling\" commands],
-	[SHOW_CC='	@echo compiling $@'
-	ECHO_CC='@'],
-	[SHOW_CC='# compiling'
-	ECHO_CC=''])
-AC_MSG_RESULT($enableval)
-AC_SUBST(SHOW_CC)
-AC_SUBST(ECHO_CC)
+CF_DISABLE_ECHO
 
 ### use option --enable-prototypes to turn on optional prototypes
 AC_MSG_CHECKING(if you want to compile with fallback prototypes)
@@ -200,7 +191,7 @@ fi
 
 AC_MSG_CHECKING(for directory containing \"inews\")
 CF_WITH_PATH(inews-dir,
-	[  --with-inews-dir=PATH   directory containing \"inews\"],
+	[  --with-inews-dir=PATH   directory containing "inews"],
 	INEWSDIR,$INEWSPATH)
 AC_MSG_RESULT($INEWSDIR)
 
@@ -236,6 +227,7 @@ AC_ARG_WITH(socks5,
 if test "x$cf_cv_use_libsocks" != xno ; then
 	CF_SOCKS($cf_cv_use_libsocks)
 elif test "x$cf_cv_use_libsocks5" != xno ; then
+	CF_NETLIBS
 	CF_SOCKS5($cf_cv_use_libsocks5)
 else
 	CF_NETLIBS
@@ -389,7 +381,7 @@ CF_WITH_DFTENV(iso-to-ascii,
 	DEFAULT_ISO2ASC,-1)
 AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
-AC_MSG_CHECKING(whether to use character set conversation)
+AC_MSG_CHECKING(whether to use character set conversion)
 CF_ARG_WITH(local-charset,
 	[  --with-local-charset=CHARSET
                           set local charset to convert from/to],
@@ -437,6 +429,12 @@ AC_MSG_CHECKING(whether to enable piping support)
 CF_ARG_DISABLE(piping,
 	[  --disable-piping        disable piping support],
 	[AC_DEFINE(DONT_HAVE_PIPING)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to enable printer support)
+CF_ARG_DISABLE(printing,
+	[  --disable-printing      disable printer support],
+	[AC_DEFINE(DISABLE_PRINTING)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to unique tmp-files by appending .pid)

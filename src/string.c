@@ -6,7 +6,7 @@
  *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1997-99 by Urs Janssen
- *              You may  freely  copy or  redistribute	this software,
+ *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
@@ -290,6 +290,11 @@ atol (
 	const char *s)
 {
 	long ret = 0;
+
+	/* skip leading whitespace(s) */
+	while (*s && isspace((unsigned char) *s))
+		s++;
+
 	while (*s) {
 		if (isdigit(*s))
 			ret = ret * 10 + (*s - '0');

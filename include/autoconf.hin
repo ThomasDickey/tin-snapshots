@@ -401,6 +401,12 @@
 #undef	DONT_HAVE_PIPING
 
 /*
+ * Define if the system doesn't support printing, or if it is not a
+ * desired feature.
+ */
+#undef	DISABLE_PRINTING
+
+/*
  * Used in parsedate.y
  */
 #undef	DONT_HAVE_TM_GMTOFF

@@ -128,9 +128,9 @@ get_fqdn (
 	char *cp, *domain;
 	char line[MAXLINELEN+1];
 	char name[MAXHOSTNAMELEN+2];
-	static char	fqdn[1024];
-	struct hostent	*hp;
-	struct in_addr	in;
+	static char fqdn[1024];
+	struct hostent *hp;
+	struct in_addr in;
 
 	*fqdn = '\0';
 	domain = NULL;

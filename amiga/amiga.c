@@ -317,6 +317,11 @@ int pclose (FILE *pipe)
  * Directory stuff
  */
 
+/*
+ * if we have SAS/C 6.50+ we use the SAS lib instead, those versions work ok
+ */
+
+#ifndef __SASC_650
 DIR *opendir (char *name)
 {
         DIR *di;
@@ -357,6 +362,7 @@ DIR *opendir (char *name)
 }
 
 
+
 struct dirent *readdir (DIR *di)
 {
         static struct dirent de;
@@ -386,19 +392,21 @@ struct dirent *readdir (DIR *di)
 }
 
 
+
 void closedir (DIR *di)
 {
         if (DOSBase->dl_lib.lib_Version >= 37) {
                 if (di->more)
                         while (ExAll(di->Lock, di->buffer, BUFSIZE, ED_NAME, di->eac))
                                 /* do nothing */ ;
-                free(di->buffer);
+		free(di->buffer);
                 FreeDosObject(DOS_EXALLCONTROL,di->eac);
         }
 
         UnLock (di->Lock);
         free (di);
 }
+#endif /* !__SASC_650 */
 
 int getopt (int argc, char **argv, char *options)
 {

@@ -3,7 +3,7 @@
 *************************************************/
 
 
-#define PCRE_VERSION       "2.05 21-Apr-1999"
+#define PCRE_VERSION       "2.06 21-Jun-1999"
 
 
 /* This is a library of functions to support regular expressions whose syntax
@@ -92,7 +92,7 @@ time, run time or study time, respectively. */
 
 /* Magic number to provide a small check against being handed junk. */
 
-#define MAGIC_NUMBER  0x50435245UL   /* 'PCRE' */
+#define MAGIC_NUMBER  0x50435245L   /* 'PCRE' */
 
 /* Miscellaneous definitions */
 

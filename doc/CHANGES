@@ -1,3 +1,54 @@
+-- pre-1.4 release 19990624 "Dawnrazor" --
+
+661) Thomas E. Dickey <dickey@clark.net>
+     ADD. configure scrip updates/improvements
+     FIX. aclocal.m4, config.guess, config.sub, configure.in, internal.h
+          active.c
+
+660) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. some minor AmigaOS fixes
+     FIX. config.h, tin.h, version.h, smakefile, amiga.c, init.c
+          read.c, tin.readme
+
+659) Urs Janssen <urs@tin.org>
+     ADD. prompt before abort unmodified postings/followups/bugreports
+     ADD. warning if less lines are written to newsrc as read on start
+     ADD. moved some strings to lang.c
+     ADD. ispell opts to attirbutes
+     ADD. updated pcre (2.05 -> 2.06)
+     BUG. whole Reference:-tree was added to In-Reply-To:
+     BUG. compiling with --disable-color failed with --enable-curses
+     BUG. removed a few typos
+     BUG. fixed some eval-order dependencie bugs
+     FIX. configure[.in], extern.h, proto.h, tin.h, active.c, attrib.c
+          config.c, inews.c, lang.c, main.c, misc.c, newsrc.c, post.c
+          save.c, select.c, tcurses.c, pcre/*
+
+658) John R. Myers <jmyers@netcom.com>
+     Urs Janssen <urs@tin.org>
+     BUG. tins atol() didn't ignore leading whitespace(s)
+     FIX. string.c
+
+657) Fabrice Bellet <Fabrice.Bellet@imag.fr>
+     BUG. screen init was done before reading cmd-line options
+     FIX. main.c
+
+656) Albert Chin-A-Young <china@thewrittenword.com>
+     BUG. CF_NETLIBS was missing if compiling with --with-socks5 on Solaris
+     FIX. configure[.in]
+
+655) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. read articles were filtered even with unset KILL_READ
+     FIX. filter.c
+
+654) Ruediger Geys <aage@fen.baynet.de>
+     Urs Janssen <urs@tin.org>
+     ADD. --disable-printing
+     BUG. removed unused cmd_line_printer var
+     FIX. configure[.in], autoconf.h[in], extern.h, menukeys.h, tinrc.h
+          attrib.c, config.c, feed.c, group.c, help.c, init.c, lang.c
+          memory.c, page.c, tincfg.tbl
+
 -- pre-1.4 release 19990517 "Psychonaut" --
 
 653) Wolfgang Becker <uafr@gmx.de>

@@ -91,9 +91,9 @@ NOV (News OVerview) style index files if available locally or via the NNTP
 XOVER command.
 .PP
 .B tin
-has four separate levels of operation: Group selection level, Group
-level, Thread level and Article level. Use the `h' (help) command to view a
-list of the commands available at a particular level.
+has four separate levels of operation: Group selection level, Group level,
+Thread level and Article level. Use the `h' (help) command to view a list of
+the commands available at a particular level.
 .PP
 On startup \fBtin\fR will show a list of the newsgroups found in
 \fI$HOME/.newsrc\fP. An arrow '->' or highlighted bar will point to the
@@ -474,12 +474,12 @@ group selection list looking for unread groups.
 Toggle use of ANSI color.
 .TP
 .B c
-Make current group as all read [after confirmation] and move to the next group
-in the group selection list.
+Make current group as all read [after confirmation] and move to the next
+group in the group selection list.
 .TP
 .B C
-Mark current group as all read [after confirmation] and enter the next unread
-group in the group selection list.
+Mark current group as all read [after confirmation] and enter the next
+unread group in the group selection list.
 .TP
 .B d
 Toggle display to show just the group name or the group name and the groups
@@ -619,8 +619,8 @@ Kill article(s) via a menu. Read the section FILTERING ARTICLES for
 more information.
 .TP
 .B ]
-Kill article(s) with a single key [after confirmation]. The defaults used for
-killing are set via the following four tinrc config variables:
+Kill article(s) with a single key [after confirmation]. The defaults used
+for killing are set via the following four tinrc config variables:
 .in +.3i
 default_filter_kill_header
 .in +.3i
@@ -690,7 +690,8 @@ Help screen of group index commands.
 Toggle the display of help mini menu at the bottom of the screen.
 .TP
 .B i
-Display the subject of the first article in the current thread in the last line.
+Display the subject of the first article in the current thread in the last
+line.
 .TP
 .B I
 Toggle inverse video.
@@ -1237,14 +1238,15 @@ exists, the global configuration file, \fI/usr/lib/news/tinrc\fP is read.
 After that, the users own configuration file is read from
 \fI$HOME/.tin/tinrc\fP. The global file is useful for distributing
 system-wide defaults to new users who have no private tinrc yet.
-.TP
-The following variables are user configurable by editing \fI$HOME/.tin/tinrc\fP
-directly. Most of them can be set in the GLOBAL OPTIONS MENU which is could
-be accessed by pressing `M' at all levels. It allows the user to customize the
-behavior of \fBtin\fR. The options are saved to the file \fI$HOME/.tin/tinrc\fP.
-Use <SPACE> to toggle the required option and <CR> to set. Use `/', `?' to search
-for a specific option. The name in braces is the name of the corresponding setting
-in \fI$HOME/.tin/tinrc\fP.
+.PP
+The following variables are user configurable by editing
+\fI$HOME/.tin/tinrc\fP directly. Most of them can be set in the
+GLOBAL OPTIONS MENU which is could be accessed by pressing `M' at all
+levels. It allows the user to customize the behaviour of \fBtin\fR. The
+options are saved to the file \fI$HOME/.tin/tinrc\fP. Use <SPACE> to toggle
+the required option and <CR> to set. Use `/', `?' to search for a specific
+option. The name in braces is the name of the corresponding setting in
+\fI$HOME/.tin/tinrc\fP.
 .TP 4
 .B Add posted articles to filter (add_posted_to_filter)
 If ON add posted articles to filter for highlighting follow-ups.
@@ -1461,8 +1463,8 @@ or 'sendmail -oem -t < %F' (i.e. sendmail -oem -t < .article).
 .B default_post_subject
 .TP
 .B Printer program with options (default_printer)
-The printer program with options that is to be used to print
-articles. Default is lpr for BSD machines and lp for SysV machines.
+The printer program with options that is to be used to print articles.
+Default is \fBlpr\fR(1) for BSD machines and \fBlp\fR(1) for SysV machines.
 .TP
 .B default_range_group
 .TP
@@ -1526,8 +1528,8 @@ means no limit.
 If ON catchup group when leaving with the left arrow key. Default is ON.
 .TP
 .B Max. length of group names shown (groupname_max_length)
-Maximum length of the names of newsgroups to be displayed so that more of the
-newgroup description can be displayed. Default is 32.
+Maximum length of the names of newsgroups to be displayed so that more of
+the newgroup description can be displayed. Default is 32.
 .TP
 .B info_in_last_line
 If ON, show current group description or articles subject in the last line
@@ -1537,8 +1539,8 @@ If ON, show current group description or articles subject in the last line
 If ON use inverse video for page headers at different levels. Default is ON.
 .TP
 .B Keep failed arts in ~/dead.articles (keep_dead_articles)
-If ON keep all failed postings in \fI$HOME/dead.articles\fP besides keeping the
-last failed posting in \fI$HOME/dead.article\fP. Default is ON.
+If ON keep all failed postings in \fI$HOME/dead.articles\fP besides keeping
+the last failed posting in \fI$HOME/dead.article\fP. Default is ON.
 .TP
 .B Keep posted arts in ~/Mail/posted (keep_posted_articles)
 If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
@@ -1550,7 +1552,7 @@ to 8bit. Leaving it OFF is safe for most users and compliant to Internet
 Mail Standard (STD 11/RFC 822 and RFC 2047).
 .TP
 .B Mail address (mail_address)
-User's mail address, if not username@host.
+User's mail address (and fullname), if not username@host.
 .TP
 .B MIME encoding in mail messages (mail_mime_encoding)
 MIME encoding of the body in mail message, if necessary (8bit, base64,
@@ -1742,7 +1744,7 @@ Default is OFF unless reading news on SCO Unix which uses MMDF by default.
 If set 'None' (0) only the ``Subject:'' line will be displayed.
 If set 'Addr' (1) ``Subject:'' line & the address part of the ``From:'' line are displayed.
 If set 'Name' (2) ``Subject:'' line & the authors full name part of the ``From:'' line are displayed.
-If set 'Both' (3) ``Subject:'' line & all of the ``From:'' lin are displayed.
+If set 'Both' (3) ``Subject:'' line & all of the ``From:'' line are displayed.
 Default is 2, authors full.
 .TP
 .B Show description of each newsgroup (show_description)
@@ -1807,13 +1809,13 @@ If ON the SPACE command will goto next unread article at article viewer
 level when the end of the article is reached (rn-style pager)
 .TP
 .B Start editor with line offset (start_editor_offset)
-Set ON if the editor used for posting, follow-ups and bug reports has
-the capability of starting and positioning the cursor at a specified line
-within a file. Default is ON.
+Set ON if the editor used for posting, follow-ups and bug reports has the
+capability of starting and positioning the cursor at a specified line within
+a file. Default is ON.
 .TP
 .B Strip blanks of end of lines (strip_blanks)
-Strips the blanks from the end of each line therefore speeding up the display
-when reading on a slow terminal or via modem. Default is ON.
+Strips the blanks from the end of each line therefore speeding up the
+display when reading on a slow terminal or via modem. Default is ON.
 .TP
 .B Remove bogus groups from newsrc (strip_bogus)
 Bogus groups are groups that are present in your \fI.newsrc\fP file that
@@ -1824,8 +1826,8 @@ Selection Menu, prefixed with a 'D'. This allows you to unsubscribe
 from them as and when you wish. Default is 0 (Always Keep).
 .TP
 .B No unsubscribed groups in newsrc (strip_newsrc)
-If ON, then unsubscribed groups will be permanently removed from
-your \fI.newsrc\fP file. Default is OFF.
+If ON, then unsubscribed groups will be permanently removed from your
+\fI.newsrc\fP file. Default is OFF.
 .TP
 .B Do tab after X automatically (tab_after_X_selection)
 If enabled will automatically goto the first unread article after having
@@ -1974,6 +1976,8 @@ equivalents. The following group attributes are available:
 .B news_quote_format
 .TP
 .B quote_chars
+.TP
+.B ispell
 .PP
 Examples:
 .RS
@@ -2090,16 +2094,16 @@ i.e.,
 .ft CW
 mail_quote_format=On %D in %G you wrote:
 news_quote_format=In %M, %F wrote:
-.ft P
+.ft R
 .fi
 .RE
-would expand when used to:
+would expand to:
 .RS
 .nf
 .ft CW
 On 21 Jul 1992 09:45:51 -0400 in alt.sources you wrote:
 In <abcINN123@ecrc.de>, Iain Lea (iain@ecrc.de) wrote:
-.ft P
+.ft R
 .fi
 .RE
 The quoted text section of an article is marked by a preceding quote string
@@ -2447,6 +2451,10 @@ by the variable.
 This is useful if the machine is not registered in the UUCP mail maps
 or if you wish to receive replies at a different machine.
 .TP
+.B NAME
+Overrides the fullname given in the gecos-files in \fI/etc/passwd\fP, see
+also \fBmail_address\fR.
+.TP
 .B MAILER
 This variable has precedence over the default mailer that is used in all
 mailing operations within \fBtin\fR.
@@ -2496,6 +2504,10 @@ these strings. The matching is case-insensitive. Example:
 .B METAMAIL
 Set this variable to point to \fBmetamail\fR(1) or a replacement
 (i.e. metamutt).
+.TP
+.B ISPELL
+Set this variable to point to \fBispell\fR(1) or a replacement and it's
+cmd-line options.
 .\"
 .\"
 .SH FILES
@@ -2571,8 +2583,11 @@ Short description of all newsgroups.
 .TP
 \fI/usr/lib/news/subscriptions\fP
 List of newsgroups to subscribe first time user to.
-.TP 2i
+.TP
 \fI/usr/lib/news/tinrc\fP
+Global configuration file.
+.TP 2i
+\fI/etc/tin/tin.defaults\fP
 Global configuration file.
 .\"
 .\"
@@ -2671,54 +2686,56 @@ Dieter Becker, Fabrice Bellet, Greg Berigan, Enrik Berkhan, Juergen Bernau,
 Dan Berry, David Binderman, Andrey Blochintsev, Chris Blum, Fokke de Boer,
 Andreas Borchert, Mark Boucher, Bill Brolik, Herman ten Brugge, Martin Buck,
 Leila Burrell-Davis, Sean Casey, Peter Castro, Troy Cauble, Andrey A.
-Chernov, Tan Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven
-Cogswell, Don Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris
-Davies, John Davis, Borislav Deianov, Thomas E. Dickey, Theo Van Dinter,
-Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig Durland, Bernd
-Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle,
-Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason
-Faultless, Michael Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor,
-Torsten Gesang, Callum Gibson, Mike Glendinning, Philippe Goujard, Dan
-Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck,
-Christian Haul, Per Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero,
-Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy
-Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter
-Immelman, Jarkko Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin,
-Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten
-Keil, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven
-Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas
-Kroener, Florian Kuehnert, Kris Kugel, Manoj Kumar, Yuri Kuzmenko, Olivier
-Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu
-Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner,
-Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
-David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
-Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
-De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Philipp
-Mergenthaler, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
-Klaus Mueller, Mike Muise, Udo Munk, Daniel Naber, Torsten Neumann, Dirk
-Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov,
-Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson,
-Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins, Eric
-Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
-Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards, Steve Robbins,
-Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman, Roland
-Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders,
-Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif, Volker
-Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz,
-Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug
-Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark
-Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
-Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
-Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
-Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
-Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
-Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
-Nickolai Zeldovich, Zbigniew Zych
+Chernov, Albert Chin-A-Young, Tan Kwee Chuan, Boleslaw Ciesielski, Robert
+Claeson, Steven Cogswell, Don Costello, Bryan Curnutt, Ned Danieley, Lars
+Dannenberg, Chris Davies, John Davis, Borislav Deianov, Thomas E. Dickey,
+Theo Van Dinter, Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig
+Durland, Bernd Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf,
+Rob Engle, Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland
+Espinosa, Jason Faultless, Michael Faurot, Werner Fleck, John M.
+Flinchbaugh, Andy Gabor, Torsten Gesang, Ruediger Geys, Callum Gibson, Mike
+Glendinning, Philippe Goujard, Dan Greenspan, Karlo Gross, Carl Hage, Paul
+Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per Headland, Arnold
+Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom Hite, Torsten
+Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun Huang, Steve
+Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter Immelman, Jarkko Isokungas,
+Patrick St. Jean, Hal Jespersen, Park Sang Jin, Robbin Johnson, Jarkko
+Jormanainen, Nelson Kading, Geoffrey Keating, Karsten Keil, Fritz Kleeman,
+Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas
+Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Florian
+Kuehnert, Kris Kugel, Manoj Kumar, Yuri Kuzmenko, Olivier Lacroix, Geoff
+Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila, Vincent
+Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan Lennestal,
+Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley, David-Michael
+Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard Luebke, Clifford
+Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri
+A. Martynoff, Kazushi Marukawa, Owen Medd, Philipp Mergenthaler, Soren
+Moller, Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike
+Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich,
+James Nugen, David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr,
+Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven
+Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim
+Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger, GianPiero
+Puccioni, Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards, Steve
+Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Meelis Roos,
+Stephen Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich
+Salz, Gary Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger
+Schif, Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl,
+Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav
+Serrander, Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda,
+Andreas Siegert, Mark Smith, Steve Spearman, Helmut Springer, Cliff
+Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Michael Stenns,
+Helmrich Streitmatter, Hans Werner Strube, Dieter Stueken, Ed Sznyter, Dean
+Takemori, Darrell Tangman, Derek Terveer, Carsten Theis, Julian Thompson,
+David Tiller, Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
+Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist, Greg
+Woods, Lloyd Wright, Jens Wuepper, Billy Y., Nickolai Zeldovich, Zbigniew
+Zych
 .\"
 .\"
 .SH AUTHOR
 .TP 1i
-Iain Lea <iain@ecrc.de>
+Iain Lea <iain@bricbrac.de>
 .\"
 .\"
 .SH MAINTAINER

@@ -344,7 +344,7 @@ pgp_check_article (
 	joinpath(the_article, homedir, ".article");
 
 #	ifdef APPEND_PID
-	sprintf (the_article+strlen(the_article), ".%d", process_id);
+	sprintf (the_article+strlen(the_article), ".%d", (int) process_id);
 #	endif /* APPEND_PID */
 
 	if ((art = fopen(article, "w")) == (FILE *) 0) {

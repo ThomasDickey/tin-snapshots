@@ -329,7 +329,7 @@ authinfo_original (
 #if 0
 		state = RawState();
 		Raw(TRUE);
-#endif
+#endif /* 0 */
 		if (! prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
@@ -340,7 +340,7 @@ authinfo_original (
 		clear_message ();
 		Raw(state);
 		printf ("\n");
-#endif
+#endif /* 0 */
 		ptr = getpass (txt_auth_pass);
 		authpass = strncpy (authpassword, ptr, PATH_LEN);
 		ret = do_authinfo_original (server, authuser, authpass);

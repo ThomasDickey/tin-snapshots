@@ -1,7 +1,5 @@
-From: Jeroen Scheerder <js@xs4all.nl>
-Newsgroups: news.software.readers,comp.os.msdos.mail-news,comp.os.os2.mail-news
-,comp.sys.mac.comm,comp.os.ms-windows.apps.comm,comp.os.ms-windows.apps.winsock
-.news,alt.usenet.offline-reader,alt.answers,comp.answers,news.answers
+From: Jeroen Scheerder <js@cwi.nl>
+Newsgroups: news.software.readers,comp.os.msdos.mail-news,comp.os.os2.mail-news,comp.sys.mac.comm,comp.os.ms-windows.apps.comm,comp.os.ms-windows.apps.winsock.news,alt.usenet.offline-reader,alt.answers,comp.answers,news.answers
 Subject: Good Net-Keeping Seal of Approval 2.0 (GNKSA 2.0) for Usenet Software
 Approved: news-answers-request@MIT.EDU
 Followup-To: news.software.readers
@@ -12,10 +10,10 @@ X-Note: This is an updated and revised descendant of Ron Newman's GNKSA 1.2
 
 Archive-name: usenet/software/good-netkeeping-seal
 Posting-Frequency: monthly (first Sunday)
-Last-modified: 1998/06/01
-Version: 2.04
+Last-modified: 1998/09/07
+Version: 2.05
 URL: <http://www.xs4all.nl/%7Ejs/gnksa/>
-Maintainer: Jeroen Scheerder <js@xs4all.nl>
+Maintainer: Jeroen Scheerder <js@cwi.nl>
 
 -----BEGIN PGP SIGNED MESSAGE-----
 
@@ -94,7 +92,7 @@ deserve the "Good Net-Keeping Seal":
   12) Provide a valid "From: " header
   13) Allow users to both cancel and supersede their own articles (and
       _no_ others!)
-  14) Try to respect the 80-character line-length convention
+  14) Try to respect the 80-character line-length conventions
   15) Separate signatures correctly, and don't use excessive ones
   16) Try to prevent obvious user errors
   17) Post human-readable articles unless ordered otherwise
@@ -226,9 +224,9 @@ as an editable field in a form will meet the requirement.
 Rationale: Topics drift as a discussion progresses, and users need the
 ability to change the Subject header to reflect the drift. Similarly, a
 user may determine that the discussion no longer belongs in some of the
-places that it started, or that its continuation needs to go elsewhere.
+places that it started, or that its continuation needs to go elsewhere. 
 The software must not impede the user's ability to make these
-judgments, possibly during the composition of her followup article.
+judgments, possibly during the composition of her followup article.  
 It's not acceptable to have users who respond to "Please direct
 followups appropriately" with "I can't; the software won't let me."
 
@@ -257,7 +255,7 @@ software by replacing non-standard prefixes (such as "Re^2: ", "Re(2):
 prefix "Re: ".
 
 Rationale: These things should be obvious, but many authors of news
-software don't seem to understand the relevant sections of RFC 1036.
+software don't seem to understand the relevant sections of RFC 1036. 
 Truncated "Subject: " headers, especially when gratuitous non-ASCII
 characters are also thrown in, are a major annoyance for users and can
 make threading difficult or impossible.
@@ -474,7 +472,7 @@ such as "delete".  Similarly, in English software, the text of the
 supersede command SHOULD include the word "supersede".
 
 Rationale: People make mistakes and need the ability to revoke or
-correct them; both `cancel' and `supersede' exist for good reasons.
+correct them; both `cancel' and `supersede' exist for good reasons. 
 However, software should not encourage users to abuse the net, either
 intentionally or accidentally, by sending unauthorized (`rogue') cancels
 or supersedes.  The supersede option is essential: due (a.o.) to
@@ -483,7 +481,7 @@ behave very different from a "supersede".  News servers might also have
 different acceptance policies for both.
 
 
-14) Try to respect the 80-character line-length convention
+14) Try to respect the 80-character line-length conventions
 
 Any line breaks shown to the user while she is editing her article
 SHOULD still be present when the article is actually posted to the Net.
@@ -697,8 +695,7 @@ careful attention to the following documents:
 
   "Read This Before You Write a Newsreader, News Transport
   System, etc.", by Tom Limoncelli.
-        <http://http.bsd.uchicago.edu/%7Etwpierce/news/newsreader-manifesto.htm
-l>
+        <http://http.bsd.uchicago.edu/%7Etwpierce/news/newsreader-manifesto.html>
 
   "The "Good Net-Keeping Seal of Approval", revision 1.2, by Ron
   Newman; the previous version of this document, published in
@@ -754,13 +751,12 @@ John E. Davis <davis@space.mit.edu>, Karl-Johan Johnsson
 good net keeping in the form of well-designed usenet reading programs.
 
 -----BEGIN PGP SIGNATURE-----
-Version: 2.6.3i
+Version: PGPfreeware 5.0i for non-commercial use
 Charset: noconv
 
-iQCVAwUBNXKejChIY6bIQPMpAQGOcwP+JtSmGhld/4wkVxucYgHLE24bdw5liclp
-vaOmUvkLHMjYaAXrkbfMELx9CWlJLSh1VhhdjuTx9ghUTAvx3FMrSRy4frdq8DaG
-te0zHdgUMuUSgwuB8IPinlDreG66WhNctZNUUbXE1i9+S5x8/xZLyF2nh3fwXVTG
-QZCoNsMLJ+Y=
-=w4CF
+iQCVAwUBNfOXxyhIY6bIQPMpAQFy4AP/TliDJFCtvHDt24sYUcUlFflNU8jEWhD/
+6mL2sOn3mlw/ge3ggXeO5j3pwK1R9QpjiQ5/Mk9M9cF36C09K20kkzc8AAoiQYMu
+4/t6GFc1AM0L1CyYT8qA/8gDWks5IrCnnOxcL8/N6FpaFwU+umlzZtcMZcFmyJOX
+ddOjZuGZTGs=
+=2O3y
 -----END PGP SIGNATURE-----
-

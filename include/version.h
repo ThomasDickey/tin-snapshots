@@ -17,13 +17,13 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990517"
-#	define RELEASENAME	"Psychonaut"
+#	define RELEASEDATE	"19990624"
+#	define RELEASENAME	"Dawnrazor"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA
 #		define OS	"AMIGA"
-#		define AMIVER	"1.3B"
+#		define AMIVER	VERSION
 #	endif /* M_AMIGA */
 
 #	ifdef M_OS2

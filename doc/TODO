@@ -1,5 +1,9 @@
 Bugs
 ----
+o  % in filenames crashes tin -> we need a quote_percent(string)
+   function and should check all wait_message() etc.pp. calls
+   with user defined strings...
+
 o  --with-ncurses --enable-curses has several display problems:
     - if use_color is set:
       - '^G' (pgp-check article output is grabbled)
@@ -124,8 +128,8 @@ o  According to 026) in CHANGES, some of the config files can be
    trashed on a bad write (except .newsrc/tinrc/attributes)
 
 o  remove built in path of external commands (metamail, ispell, ...)
-   [for metamail $METAMAIL could be used to override systempath and
-    progname]
+   [for metamail/ispell $METAMAIL/$ISPELL could be used to override
+    systempath and progname]
 
 o  when enabling the 'cc/bcc on every message that is sent', and
    then mailing a message to myself, tin will print the message
@@ -210,8 +214,6 @@ o  Rather than cc/bcc, I'd like to see tin simply append the
    have to be locked using a convention that will hold off
    the various Unix mailer programs.
 
-o  add support for ispell language change
-
 o  add check for gpg
 
 o  MIME-pgp support according to RFC2015
@@ -276,6 +278,12 @@ o  - remove global filter file (TIN_LIBDIR/filter) as you don't know which
    - think about removing global attributes files (TIN_LIBDIR/attributes)
    - move global files (TIN_LIBDIR/tinrc, TIN_LIBDIR/attributes) to
      TIN_DEFAULTS_DIR
+
+o  bring up a warning if Subject: starts with 'Re:' but article has no
+   References:
+
+o  bring up a warning if References: are present but Subject: doesn't start
+   with 'Re:' or doesn't contain '(was: '.
 
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the

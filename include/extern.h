@@ -261,7 +261,6 @@ extern char bug_addr[LEN];
 extern char bug_nntpserver1[PATH_LEN];
 extern char bug_nntpserver2[PATH_LEN];
 extern char ch_post_process[];
-extern char cmd_line_printer[PATH_LEN];
 extern char cmdline_nntpserver[PATH_LEN];
 extern char cvers[LEN];
 extern char dead_article[PATH_LEN];
@@ -385,9 +384,11 @@ extern constext txt_cannot_get_nntp_server_name[];
 extern constext txt_cannot_get_term[];
 extern constext txt_cannot_get_term_entry[];
 extern constext txt_cannot_open[];
+
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	extern constext txt_cannot_open_active_file[];
 #endif
+
 extern constext txt_cannot_post[];
 extern constext txt_cannot_post_group[];
 extern constext txt_cannot_write_index[];
@@ -424,6 +425,9 @@ extern constext txt_error_bad_approved[];
 extern constext txt_error_bad_from[];
 extern constext txt_error_bad_replyto[];
 extern constext txt_error_bad_msgidfqdn[];
+extern constext txt_error_copy_fp[];
+extern constext txt_error_corrupted_file[];
+extern constext txt_error_exiting[];
 extern constext txt_error_gnksa_internal[];
 extern constext txt_error_gnksa_langle[];
 extern constext txt_error_gnksa_lparen[];
@@ -601,7 +605,11 @@ extern constext txt_help_n[];
 extern constext txt_help_news_headers_to_display[];
 extern constext txt_help_news_headers_to_not_display[];
 extern constext txt_help_news_quote_format[];
-extern constext txt_help_o[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_help_o[];
+#endif /* !DISABLE_PRINTING */
+
 extern constext txt_help_p_S[];
 extern constext txt_help_p_caret_dollar[];
 extern constext txt_help_p_coma[];
@@ -626,14 +634,22 @@ extern constext txt_help_p_tilda[];
 extern constext txt_help_p_u[];
 extern constext txt_help_p_z[];
 extern constext txt_help_pgdn_goto_next[];
-extern constext txt_help_pipe[];
+
+#ifndef DONT_HAVE_PIPING
+	extern constext txt_help_pipe[];
+#endif /* !DONT_HAVE_PIPING */
+
 extern constext txt_help_plus[];
 extern constext txt_help_pos_first_unread[];
 extern constext txt_help_post_8bit_header[];
 extern constext txt_help_post_mime_encoding[];
 extern constext txt_help_post_process_type[];
-extern constext txt_help_print_header[];
-extern constext txt_help_printer[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_help_print_header[];
+	extern constext txt_help_printer[];
+#endif /* !DISABLE_PRINTING */
+
 extern constext txt_help_process_only_unread[];
 extern constext txt_help_prompt_followupto[];
 extern constext txt_help_q[];
@@ -706,6 +722,7 @@ extern constext txt_info_not_subscribed[];
 extern constext txt_info_no_write[];
 extern constext txt_info_postponed[];
 extern constext txt_invalid_from[];
+extern constext txt_invalid_sender[];
 extern constext txt_inverse_off[];
 extern constext txt_inverse_on[];
 extern constext txt_is_tex_ecoded[];
@@ -719,6 +736,18 @@ extern constext txt_kill_text[];
 extern constext txt_kill_time[];
 extern constext txt_last[];
 extern constext txt_last_resp[];
+
+#ifdef HAVE_LIBUU
+	extern constext txt_libuu_saved[];
+	extern constext txt_libuu_success[];
+	extern constext txt_libuu_error_decode[];
+	extern constext txt_libuu_error_missing[];
+	extern constext txt_libuu_error_no_begin[];
+	extern constext txt_libuu_error_no_end[];
+	extern constext txt_libuu_error_no_data[];
+	extern constext txt_libuu_error_unknown[];
+#endif /* HAVE_LIBUU */
+
 extern constext txt_lines[];
 extern constext txt_listing_archive[];
 extern constext txt_mail[];
@@ -757,7 +786,11 @@ extern constext txt_nntp_authorization_failed[];
 extern constext txt_no[];
 extern constext txt_no_arts[];
 extern constext txt_no_arts_posted[];
-extern constext txt_no_command[];
+
+#ifndef DONT_HAVE_PIPING
+	extern constext txt_no_command[];
+#endif /* !DONT_HAVE_PIPING */
+
 extern constext txt_no_description[];
 extern constext txt_no_filename[];
 extern constext txt_no_group[];
@@ -837,8 +870,12 @@ extern constext txt_opt_pos_first_unread[];
 extern constext txt_opt_post_8bit_header[];
 extern constext txt_opt_post_mime_encoding[];
 extern constext txt_opt_post_process_type[];
-extern constext txt_opt_print_header[];
-extern constext txt_opt_printer[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_opt_print_header[];
+	extern constext txt_opt_printer[];
+#endif /* !DISABLE_PRINTING */
+
 extern constext txt_opt_process_only_unread[];
 extern constext txt_opt_prompt_followupto[];
 extern constext txt_opt_quote_chars[];
@@ -899,9 +936,16 @@ extern constext txt_post_subject[];
 extern constext txt_posted_info_file[];
 extern constext txt_posting[];
 extern constext txt_postpone_repost[];
-extern constext txt_print[];
-extern constext txt_printed[];
-extern constext txt_printing[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_print[];
+	extern constext txt_printed[];
+	extern constext txt_printing[];
+#endif /* !DISABLE_PRINTING */
+
+extern constext txt_prompt_unchanged_art[];
+extern constext txt_prompt_unchanged_bug[];
+extern constext txt_prompt_see_postponed[];
 extern constext txt_quick_filter_kill[];
 extern constext txt_quick_filter_select[];
 extern constext txt_quit[];
@@ -971,7 +1015,12 @@ extern constext txt_select_text[];
 extern constext txt_select_thread[];
 extern constext txt_select_time[];
 extern constext txt_server_name_in_file_env_var[];
-extern constext txt_shell_escape[];
+extern constext txt_servers_active[];
+
+#ifndef NO_SHELL_ESCAPE
+	extern constext txt_shell_escape[];
+#endif /* !NO_SHELL_ESCAPE */
+
 extern constext txt_skipping_newgroups[];
 extern constext txt_subj_line_only[];
 extern constext txt_subj_line_only_case[];
@@ -1020,7 +1069,11 @@ extern constext txt_tinrc_default_editor_format[];
 extern constext txt_tinrc_default_filter_days[];
 extern constext txt_tinrc_maildir[];
 extern constext txt_tinrc_default_mailer_format[];
-extern constext txt_tinrc_default_printer[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_tinrc_default_printer[];
+#endif /* !DISABLE_PRINTING */
+
 extern constext txt_tinrc_savedir[];
 extern constext txt_tinrc_default_sigfile[];
 extern constext txt_tinrc_defaults[];
@@ -1053,7 +1106,11 @@ extern constext txt_tinrc_post_8bit_header[];
 extern constext txt_tinrc_post_mime_encoding[];
 extern constext txt_tinrc_post_process_command[];
 extern constext txt_tinrc_post_process_type[];
-extern constext txt_tinrc_print_header[];
+
+#ifndef DISABLE_PRINTING
+	extern constext txt_tinrc_print_header[];
+#endif /* !DISABLE_PRINTING */
+
 extern constext txt_tinrc_process_only_unread[];
 extern constext txt_tinrc_prompt_followupto[];
 extern constext txt_tinrc_quote_chars[];
@@ -1103,11 +1160,16 @@ extern constext txt_value_out_of_range[];
 extern constext txt_warn_art_line_too_long[];
 extern constext txt_warn_blank_subject[];
 extern constext txt_warn_cancel[];
-extern constext txt_warn_followup_to_several_groups[];
-extern constext txt_warn_missing_followup_to[];
+
+#ifndef HAVE_FASCIST_NEWSADMIN
+	extern constext txt_warn_followup_to_several_groups[];
+	extern constext txt_warn_missing_followup_to[];
+	extern constext txt_warn_not_in_newsrc[];
+	extern constext txt_warn_not_valid_newsgroup[];
+#endif /* !HAVE_FASCIST_NEWSADMIN */
+
+extern constext txt_warn_newsrc[];
 extern constext txt_warn_multiple_sigs[];
-extern constext txt_warn_not_in_newsrc[];
-extern constext txt_warn_not_valid_newsgroup[];
 extern constext txt_warn_sig_too_long[];
 extern constext txt_warn_suspicious_mail[];
 extern constext txt_warn_update[];
@@ -1170,6 +1232,9 @@ extern long head_next;
 extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
 extern long mark_body;					/* ftell on beginning of body */
 extern long note_size;
+
+extern signed long int read_newsrc_lines;
+extern signed long int wrote_newsrc_lines;
 
 extern gid_t real_gid;
 extern gid_t tin_gid;

@@ -306,7 +306,7 @@ extern int parse_from (char *from, char *address, char *realname);
 	extern void show_color_status (void);
 #endif /* HAVE_COLOR */
 #ifdef HAVE_ISPELL
-	extern int invoke_ispell (char *nam);
+	extern int invoke_ispell (char *nam, struct t_group *psGrp );
 #endif /* HAVE_ISPELL */
 #ifndef M_UNIX
 	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
@@ -317,6 +317,8 @@ extern int parse_from (char *from, char *address, char *realname);
 
 /* newsrc.c */
 extern int pos_group_in_newsrc (struct t_group *group, int pos);
+extern signed long int read_newsrc (char *newsrc_file, t_bool allgroups);
+extern signed long int vWriteNewsrc (void);
 extern void art_mark_read (struct t_group *group, struct t_article *art);
 extern void art_mark_unread (struct t_group *group, struct t_article *art);
 extern void art_mark_will_return (struct t_group *group, struct t_article *art);
@@ -327,13 +329,11 @@ extern void expand_bitmap (struct t_group *group, long min);
 extern void grp_mark_read (struct t_group *group, struct t_article *psArt);
 extern void grp_mark_unread (struct t_group *group);
 extern void parse_unread_arts (struct t_group *group);
-extern void read_newsrc (char *newsrc_file, t_bool allgroups);
 extern void reset_newsrc (void);
 extern void subscribe (struct t_group *group, int sub_state);
 extern void thd_mark_read (struct t_group *group, long thread);
 extern void thd_mark_unread (struct t_group *group, long thread);
 extern void vSetDefaultBitmap (struct t_group *group);
-extern t_bool vWriteNewsrc (void);
 #ifndef INDEX_DAEMON
 	extern void art_mark_deleted (struct t_article *art);
 	extern void art_mark_undeleted (struct t_article *art);

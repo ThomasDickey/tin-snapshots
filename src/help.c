@@ -124,7 +124,9 @@ constext *help_group[] = {
 #ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
 #endif /* !DONT_HAVE_PIPING */
+#ifndef DISABLE_PRINTING
 	txt_help_o,
+#endif /* !DISABLE_PRINTING */
 	txt_help_t,
 		txt_help_empty_line,
 	txt_help_p_z,
@@ -258,7 +260,9 @@ constext *help_page[] = {
 #ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
 #endif /* !DONT_HAVE_PIPING */
+#ifndef DISABLE_PRINTING
 	txt_help_o,
+#endif /* !DISABLE_PRINTING */
 	txt_help_t,
 		txt_help_empty_line,
 	txt_help_ctrl_a,

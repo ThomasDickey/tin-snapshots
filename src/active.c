@@ -21,14 +21,14 @@
  */
 #define ACTIVE_SEP		" \n"
 
-/* convert anything to a string */
-#define _mkstr(a) #a
-#define mkstr(a) _mkstr(a)
-
 t_bool force_reread_active_file = FALSE;
 
 static char acSaveActiveFile[PATH_LEN];
 static time_t active_timestamp;	/* time active file read (local) */
+
+#ifdef NNTP_ABLE
+#  define NUM_SIMULTANEOUS_GROUP_COMMAND 50
+#endif /* NNTP_ABLE */
 
 
 /*
@@ -259,7 +259,6 @@ read_newsrc_active_file (
 	static char ngname[NNTP_STRLEN];
 	struct t_group *grpptr;
 #ifdef NNTP_ABLE
-#	define NUM_SIMULTANEOUS_GROUP_COMMAND 50
 	char *ngnames[NUM_SIMULTANEOUS_GROUP_COMMAND];
 	int index_i = 0;
 	int index_o = 0;
@@ -336,16 +335,21 @@ read_newsrc_active_file (
 				switch (respcode) {
 
 					case OK_GROUP:
-	/* field width is to shut checker up */
-						if (sscanf (acLine, "%ld %ld %ld %" mkstr(NNTP_STRLEN) "s", &count, &min, &max, ngname) != 4)
-							error_message("Invalid response to GROUP command, %s", acLine);
-						if (strcmp(ngname, ngnames[index_o]) != 0)
-							error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]);
-						ptr = ngname;
-						free(ngnames[index_o]);
-						index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
-						window--;
-						break;
+						{
+							char fmt[20];
+
+							sprintf(fmt, "%%ld %%ld %%ld %%%ds", NNTP_STRLEN);
+
+							if (sscanf (acLine, fmt, &count, &min, &max, ngname) != 4)
+								error_message("Invalid response to GROUP command, %s", acLine);
+							if (strcmp(ngname, ngnames[index_o]) != 0)
+								error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]);
+							ptr = ngname;
+							free(ngnames[index_o]);
+							index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+							window--;
+							break;
+						}
 
 					case ERR_NOGROUP:
 						free(ngnames[index_o]);
@@ -409,8 +413,8 @@ read_newsrc_active_file (
 	/*
 	 *  Exit if active file wasn't read correctly or is empty
 	 */
-	if (tin_errno || !num_active) { /* FIXME: move string to lang.c */
-		error_message (txt_active_file_is_empty, (read_news_via_nntp ? "servers active-file" : news_active_file));
+	if (tin_errno || !num_active) {
+		error_message (txt_active_file_is_empty, (read_news_via_nntp ? txt_servers_active : news_active_file));
 		tin_done (EXIT_FAILURE);
 	}
 
@@ -489,8 +493,8 @@ read_active_file (
 	/*
 	 *  Exit if active file wasn't read correctly or is empty
 	 */
-	if (tin_errno || !num_active) { /* FIXME: move string to lang.c */
-		error_message (txt_active_file_is_empty, (read_news_via_nntp ? "servers active-file" : news_active_file));
+	if (tin_errno || !num_active) {
+		error_message (txt_active_file_is_empty, (read_news_via_nntp ? txt_servers_active : news_active_file));
 		tin_done (EXIT_FAILURE);
 	}
 
@@ -919,9 +923,9 @@ vInitVariables (
 
 static void
 vMakeGrpList (
-	char	*pcActiveFile,
-	char	*pcBaseDir,
-	char	*pcGrpPath)
+	char *pcActiveFile,
+	char *pcBaseDir,
+	char *pcGrpPath)
 {
 	DIR *tDirFile;
 	DIR_BUF *tFile;
@@ -971,11 +975,11 @@ vMakeGrpList (
 
 static void
 vAppendGrpLine (
-	char	*pcActiveFile,
-	char	*pcGrpPath,
-	long	lArtMax,
-	long	lArtMin,
-	char	*pcBaseDir)
+	char *pcActiveFile,
+	char *pcGrpPath,
+	long lArtMax,
+	long lArtMin,
+	char *pcBaseDir)
 {
 	FILE *hFp;
 	char acGrpName[PATH_LEN];

@@ -201,7 +201,9 @@
 #define iKeyGroupListThd 'l'
 #define iKeyGroupMail 'm'
 #define iKeyGroupNextGroup 'n'
-#define iKeyGroupPrint 'o'
+#ifndef DISABLE_PRINTING
+#	define iKeyGroupPrint 'o'
+#endif /* !DISABLE_PRINTING */
 #define iKeyGroupPrevGroup 'p'
 #define iKeyGroupToggleReadUnread 'r'
 #define iKeyGroupSave 's'
@@ -275,7 +277,9 @@
 #define iKeyPageListThd 'l'
 #define iKeyPageMail 'm'
 #define iKeyPageNextArt 'n'
-#define iKeyPagePrint 'o'
+#ifndef DISABLE_PRINTING
+#	define iKeyPagePrint 'o'
+#endif /* !DISABLE_PRINTING */
 #define iKeyPagePrevArt 'p'
 #define iKeyPageReplyQuote 'r'
 #define iKeyPageSave 's'

@@ -371,7 +371,7 @@ enum resizer { cNo, cYes, cRedraw };
 #				define NEWSLIBDIR	"NEWSLIB:[000000]"
 #			else
 #				ifdef M_AMIGA
-#					define NEWSLIBDIR	"uulib:"
+#					define NEWSLIBDIR	"uulib:news"
 #				else
 #					define NEWSLIBDIR	"/usr/lib/news"
 #				endif /* M_AMIGA */
@@ -445,9 +445,9 @@ enum resizer { cNo, cYes, cRedraw };
 #		define DEFAULT_MAILBOX	"uumail:"
 #		define DEFAULT_MAILER	"uucp:c/sendmail"
 #		define DEFAULT_POSTER	"uucp:c/postnews %s"
-#		define DEFAULT_PRINTER	"c:copy to PRT:"
-#		define DEFAULT_BBS_PRINTER	"c:copy to NIL:"
-#		define DEFAULT_SHELL	"c:newshell"	/* Not Yet Implemented */
+#		define DEFAULT_PRINTER	"copy to PRT:"
+#		define DEFAULT_BBS_PRINTER	"copy to NIL:"
+#		define DEFAULT_SHELL	"newshell"	/* Not Yet Implemented */
 #		define DEFAULT_UUDECODE	"uudecode %s"
 #		define DEFAULT_UNSHAR	"unshar %s"
 #	endif /* M_AMIGA */
@@ -1258,7 +1258,9 @@ struct t_attribute
 	char *sigfile;				/* sig file if other than ~/.Sig */
 	char *organization;			/* organization name */
 	char *followup_to;			/* where posts should be redirected */
+#ifndef DISABLE_PRINTING
 	char *printer;				/* printer command & parameters */
+#endif /* !DISABLE_PRINTING */
 	char *quick_kill_scope; 		/* quick filter kill scope */
 	char *quick_select_scope;		/* quick filter select scope */
 	char *mailing_list;			/* mail list email address */
@@ -1288,6 +1290,9 @@ struct t_attribute
 	unsigned int x_comment_to:1;		/* insert X-Comment-To: in Followup */
 	char *news_quote_format;		/* another way to begin a posting format */
 	char *quote_chars;			/* string to precede quoted text on each line */
+#ifdef HAVE_ISPELL
+	char *ispell;			/* path to ispell and options */
+#endif /* HAVE_ISPELL */
 };
 
 /*
@@ -1582,7 +1587,7 @@ typedef struct t_notify *notify_p;
 #define TIN_EDITOR_FMT_OFF		"%E %F"
 
 #ifdef M_AMIGA
-#	define NEWSGROUPS_FILE	"newsdescrip"
+#	define NEWSGROUPS_FILE	"newsgroups"
 #	define REDIRECT_OUTPUT	"> NIL:"
 #	define REDIRECT_PGP_OUTPUT	"> NIL:"
 #	define ENV_VAR_GROUPS		"TIN_GROUPS"
@@ -1907,7 +1912,16 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #endif /* HAVE_TEMPNAM */
 
 /* define some standard places to look for a tin.defaults file */
+/*
+ * on Amiga only those two locations make sense and maybe PROGDIR:tin.defaults,
+ * also possible are AmiTCP:db/tin.defaults or UULIB:tin.defaults, but these are
+ * no system assigns.
+ */
+#ifdef M_AMIGA
+#define TIN_DEFAULTS_BUILTIN "S:tin.defaults","ENV:tin.defaults",NULL
+#else
 #define TIN_DEFAULTS_BUILTIN "/etc/opt/tin","/etc/tin","/etc","/usr/local/lib/tin","/usr/local/lib","/usr/local/etc/tin","/usr/local/etc","/usr/lib/tin","/usr/lib",NULL
+#endif /* M_AMIGA */
 #ifdef TIN_DEFAULTS_DIR
 #	define TIN_DEFAULTS TIN_DEFAULTS_DIR,TIN_DEFAULTS_BUILTIN
 #else

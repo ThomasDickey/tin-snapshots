@@ -803,12 +803,12 @@ iReadNovFile (
 	long max,
 	int *expired)
 {
-	char	*p, *q;
-	char	*buf;
-	char	art_full_name[HEADER_LEN];
-	char	art_from_addr[HEADER_LEN];
-	FILE	*fp;
-	long	artnum;
+	FILE *fp;
+	char *p, *q;
+	char *buf;
+	char art_full_name[HEADER_LEN];
+	char art_from_addr[HEADER_LEN];
+	long artnum;
 
 	top = 0;
 	last_read_article = 0L;

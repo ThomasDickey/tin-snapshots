@@ -28,6 +28,8 @@
 #	endif /* VMS */
 #endif /* M_AMIGA && __SASC_650 */
 
+signed long int read_newsrc_lines = -1;
+
 static char **cmdargs;
 static int num_cmdargs;
 static int max_cmdargs;
@@ -43,6 +45,7 @@ static void usage (char *theProgname);
 #ifndef INDEX_DAEMON
 	static void show_intro_page (void);
 #endif /* !INDEX_DAEMON */
+
 
 /*
  *  OK lets start the ball rolling...
@@ -103,6 +106,20 @@ main (
 	init_group_hash ();
 
 	/*
+	 *  Read user local & global config files
+	 */
+	read_config_file (global_config_file, TRUE);
+	read_config_file (local_config_file, FALSE);
+
+	/*
+	 *  Process envargs & command line options
+	 */
+	read_cmd_line_options (argc, argv);
+
+	tmp_no_write = no_write; /* keep no_write */
+	no_write = TRUE;		 /* don't allow any writing back during startup */
+
+	/*
 	 * Init curses emulation
 	 */
 	if (!InitScreen ()) {
@@ -127,24 +144,11 @@ main (
 #	endif /* !USE_CURSES */
 #endif /* M_UNIX && !INDEX_DAEMON */
 
-	/*
-	 *  Read user local & global config files
-	 */
-	read_config_file (global_config_file, TRUE);
-	read_config_file (local_config_file, FALSE);
 
 	/*
 	 * This depends on various things in tinrc
 	 */
 	setup_screen ();
-
-	/*
-	 *  Process envargs & command line options
-	 */
-	read_cmd_line_options (argc, argv);
-
-	tmp_no_write = no_write; /* keep no_write */
-	no_write = TRUE;		 /* don't allow any writing back during startup */
 
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
@@ -178,10 +182,10 @@ main (
 
 	/*
 	 *  Load the mail & news active files into active[]
+	 *
+	 * create_save_active_file cannot write to active.save
+	 * if no_write == TRUE, so restore original value temporarily
 	 */
-
-	/* create_save_active_file cannot write to active.save
-	   if no_write == TRUE, so restore original value temporarily */
 	no_write = tmp_no_write;
 	if (read_saved_news)
 		create_save_active_file ();
@@ -266,7 +270,7 @@ main (
 	 * Load my_groups[] from the .newsrc file. We append these groups to any
 	 * new newsgroups and command line newsgroups already loaded
 	 */
-	read_newsrc (newsrc, FALSE);
+	read_newsrc_lines = read_newsrc (newsrc, FALSE);
 
 	no_write = tmp_no_write; /* restore old value */
 
@@ -654,8 +658,11 @@ read_cmd_line_options (
 	}
 }
 
+
 /*
  * usage
+ *
+ * FIXME: move strings to lang.c
  */
 static void
 usage (
@@ -767,10 +774,10 @@ usage (
 	error_message ("\nMail bug reports/comments to %s", BUG_REPORT_ADDRESS);
 }
 
+
 /*
  *  check/start if any new/unread articles
  */
-
 static int
 check_for_any_new_news (
 	t_bool CheckAnyUnread,

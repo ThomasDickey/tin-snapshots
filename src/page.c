@@ -636,9 +636,11 @@ return_to_index:
 				}
 				break;
 
+#ifndef DISABLE_PRINTING
 			case iKeyPagePrint:	/* output art/thread/tagged arts to printer */
 				feed_articles (FEED_PRINT, PAGE_LEVEL, group, respnum);
 				break;
+#endif /* !DISABLE_PRINTING */
 
 			case iKeyPagePrevArt:	/* previous article */
 				art_close ();
@@ -1073,11 +1075,13 @@ show_mime_article (
 	} else
 		info_message (txt_error_metamail_failed, strerror(errno));
 
-	/* if we don't set note_end the undecoded article is displayed
-	   after metamail quits */
+	/*
+	 * if we don't set note_end the undecoded article is displayed
+	 *  after metamail quits
+	 */
 #if 0
 	note_end = TRUE;
-#endif
+#endif /* 0*/
 	Raw(TRUE);
 	InitWin ();
 	continue_prompt ();

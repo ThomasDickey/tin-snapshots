@@ -55,11 +55,12 @@ match_regex (
 	 *
 	 * pcre_exec(precompile pattern, hints pointer, string to match,
 	 *           length of string (string may contain '\0', but not in
-	 *           out case), options, vector of offsets to be filled,
+	 *           out case), startoffset, options,
+	 *           vector of offsets to be filled,
 	 *           number of elements in offsets);
 	 *
 	 */
-	error = pcre_exec(re, NULL, string, strlen(string), 0, NULL, 0);
+	error = pcre_exec(re, NULL, string, strlen(string), 0, 0, NULL, 0);
 	if (error >= 0)
 		ret = TRUE;
 	else if (error == -1)

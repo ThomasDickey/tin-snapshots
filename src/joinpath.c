@@ -21,7 +21,7 @@
 #ifndef M_AMIGA
 void
 joinpath (
-	char	*result,
+	char *result,
 	const char *dir,
 	const char *file)
 {

@@ -1,6 +1,10 @@
 /*
  * These are the tin defaults read from the tinrc file
  * If you change this, ensure you change the initial values in init.c
+ *
+ * FIXME: most default_* could/should be stored in the .inputhistory
+ *        and could be nuked if tin comes with a prefilled .inputhistory
+ *        which is installed automatically if no .inputhistory is found.
  */
 struct t_config {
 	/*
@@ -20,7 +24,9 @@ struct t_config {
 #endif /* DONT_HAVE_PIPING */
 	char default_post_newsgroups[PATH_LEN];	/* default newsgroups to post to */
 	char default_post_subject[PATH_LEN];	/* default subject when posting */
+#ifndef DISABLE_PRINTING
 	char default_printer[LEN];			/* printer program specified from tinrc */
+#endif /* !DISABLE_PRINTING */
 	char default_range_group[PATH_LEN];
 	char default_range_select[PATH_LEN];
 	char default_range_thread[PATH_LEN];
@@ -115,7 +121,9 @@ struct t_config {
 	t_bool pgdn_goto_next;
 	t_bool pos_first_unread;			/* position cursor at first/last unread article */
 	t_bool post_8bit_header;			/* allow 8bit chars. in header when posting to newsgroup */
+#ifndef DISABLE_PRINTING
 	t_bool print_header;				/* print all of mail header or just Subject: & From lines */
+#endif /* !DISABLE_PRINTING */
 	t_bool process_only_unread;			/* save/print//mail/pipe unread/all articles */
 	t_bool prompt_followupto;			/* display empty Followup-To header in editor */
 	t_bool quote_empty_lines;			/* quote empty lines, too */

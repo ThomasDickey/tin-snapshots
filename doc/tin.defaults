@@ -48,7 +48,7 @@
 #
 #inewsdir=/usr/lib/news
 
-# mm_charset - the default charset to be used in MIME«s
+# mm_charset - the default charset to be used in MIME's
 #              Content-Type header
 #
 # luser may change this setting in their tinrcs but it's a good
