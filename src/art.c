@@ -1515,7 +1515,7 @@ input_pending ()
 
 	FD_SET(fd, &fdread);
 
-#if defined(__hpux) && !defined(__GNUC__)
+#ifdef HAVE_SELECT_INTP
 	if (select (1, (int *)&fdread, NULL, NULL, &tvptr)) {
 #else
 	if (select (1, &fdread, NULL, NULL, &tvptr)) {
