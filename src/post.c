@@ -1558,7 +1558,7 @@ post_article_loop:
 						info_message (txt_art_rejected, dead_article);
 						ReadCh ();
 					}
-				 	return redraw_screen;
+					return redraw_screen;
 				}
 			case iKeyPostPostpone:
 				postpone_article(article);
@@ -1908,8 +1908,7 @@ ignore_followup_to_poster:
 			msg_add_header ("Newsgroups", note_h.newsgroups);
 			if (prompt_followupto)
 				msg_add_header("Followup-To",
-	  			  (strchr(note_h.newsgroups, ',') != (char *) 0) ?
-				    note_h.newsgroups : "");
+				(strchr(note_h.newsgroups, ',') != (char *) 0) ? note_h.newsgroups : "");
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
 				msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 			} else {

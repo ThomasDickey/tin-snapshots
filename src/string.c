@@ -15,8 +15,8 @@
 #include	"tin.h"
 
 /*
-** this file needs some work
-*/
+ * this file needs some work
+ */
 
 /*
  * special itoa()

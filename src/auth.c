@@ -159,7 +159,7 @@ read_newsauth_file (
 			if (ptr == (char *) 0)		/* no passwd, no auth, skip */
 				continue;
 
-			*ptr++ = '\0'; 			/* cut off server part */
+			*ptr++ = '\0';		/* cut off server part */
 
 			if ((strcasecmp (line, server)))
 				continue;		/* wrong server, keep on */

@@ -264,6 +264,7 @@ extern void rename_file (char *old_filename, char *new_filename);
 extern void set_real_uid_gid (void);
 extern void set_tin_uid_gid (void);
 extern void show_inverse_video_status (void);
+extern void strip_address (char *the_address, char *stripped_address);
 extern void strip_double_ngs (char *ngs_list);
 extern void tin_done (int ret);
 extern void toggle_inverse_video (void);
@@ -306,7 +307,7 @@ extern void subscribe (struct t_group *group, int sub_state);
 extern void thd_mark_read (struct t_group *group, long thread);
 extern void thd_mark_unread (struct t_group *group, long thread);
 extern void vSetDefaultBitmap (struct t_group *group);
-extern void vWriteNewsrc (void);
+extern t_bool vWriteNewsrc (void);
 #ifdef DEBUG_NEWSRC
 	extern void vNewsrcTestHarness (void);
 #endif /* DEBUG_NEWSRC */
@@ -314,7 +315,6 @@ extern void vWriteNewsrc (void);
 	extern void art_mark_deleted (struct t_article *art);
 	extern void art_mark_undeleted (struct t_article *art);
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
-
 
 /* nntplib.c */
 extern char *getserverbyfile (const char *file);

@@ -725,8 +725,10 @@ return_to_index:
 				break;
 
 			case iKeyPagePostHist:	/* display messages posted by user */
-				if (user_posted_messages ())
+				if (user_posted_messages ()) {
+					set_signals_page ();
 					redraw_page (group->name, respnum);
+				}
 				break;
 
 			case iKeyPageRepost:	/* repost current article */
@@ -742,7 +744,7 @@ return_to_index:
 				skip_include = first_char;
 				goto page_down;
 
-			case iKeyPageDisplaySubject:
+			case iKeyToggleInfoLastLine: /* this is _not_ correct, we do not toggle status here */
 				clear_message();
 				center_line (cLINES, FALSE, arts[respnum].subject);
 				break;
@@ -1602,7 +1604,7 @@ show_last_page (void)
  * Returns:
  *	FALSE	Header was not matched.
  *	TRUE	Header was matched. body contains NULL terminated content
- * 			portion of buf (ie with pat: and leading space removed)
+ *       portion of buf (ie with pat: and leading space removed)
  */
 int
 match_header (

@@ -156,9 +156,8 @@ static const char *
 typename_of(
 	MYDATA *p)
 {
-	if (!strcmp(p->type, "OPT_STRING")
-	 || !strcmp(p->type, "OPT_CHAR"))
-	 	return "char *";
+	if (!strcmp(p->type, "OPT_STRING") || !strcmp(p->type, "OPT_CHAR"))
+		return "char *";
 	if (!strcmp(p->type, "OPT_ON_OFF"))
 		return "t_bool *";
 	return "int *";

@@ -399,7 +399,7 @@ feed_articles (
 
 			break;
 
-		case iKeyFeedThd: 		/* thread */
+		case iKeyFeedThd:		/* thread */
 			confirm = TRUE;
 			for (i = (int) base[b]; i >= 0; i = arts[i].thread) {
 				if (level == PAGE_LEVEL)
@@ -457,7 +457,7 @@ feed_articles (
 			}
 			break;
 
-		case iKeyFeedTag: 		/* tagged articles */
+		case iKeyFeedTag:		/* tagged articles */
 			confirm = TRUE;
 			for (i=1 ; i <= num_of_tagged_arts ; i++) {
 				for (j=0 ; j < top ; j++) {
@@ -517,8 +517,8 @@ feed_articles (
 			untag_all_articles ();
 			break;
 
-		case iKeyFeedHot: 		/* hot (auto-selected) articles */
-		case iKeyFeedPat: 		/* regex pattern matched articles */
+		case iKeyFeedHot:		/* hot (auto-selected) articles */
+		case iKeyFeedPat:		/* regex pattern matched articles */
 			confirm = TRUE;
 			for (i = 0 ; i < top_base ; i++) {
 				for (j = (int) base[i]; j >= 0; j = arts[j].thread) {

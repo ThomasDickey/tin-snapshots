@@ -3,7 +3,7 @@
  *  Module    : version.h
  *  Author    : I. Lea
  *  Created   : 01.04.1991
- *  Updated   : 24.12.1998
+ *  Updated   : 24.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -17,7 +17,7 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"980105"
+#	define RELEASEDATE	"980117"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA
@@ -33,7 +33,7 @@
 #		if !defined( __amiga )
 #			define  OS	"UNIX"
 #		else
-#			define  OS      "AMIGA"
+#			define  OS	"AMIGA"
 #		endif
 #	endif
 

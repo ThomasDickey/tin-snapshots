@@ -14,7 +14,7 @@ This following configure options and defines are documented in detail:
   --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
   --enable-locale	     --with-nntp-default-server NO_POSTING
   --enable-mh-mail-handling  --with-nov-dir		NO_SHELL_ESCAPE
-  --enable-nntp		     --with-pgp			NO_WILDMAT
+  --enable-nntp		     --with-pgp
   --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
   --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
   --with-inews-dir	     DONT_REREAD_ACTIVE_FILE
@@ -60,7 +60,6 @@ overview data on the fly using the NNTP XOVER extension.
 Otherwise tin will create its own NOV style index files on the local machine
 for each user in $HOME/.tin/.index
 
-
 Many machines require the name of the news gateway machine or the news
 domain to be set via the --with-mail-gateway or the --with-mail-domain
 configure options.  This is true of both NNTP and local news systems.
@@ -80,7 +79,8 @@ Building the Normal version:
 Building the Index daemon version:
 ----------------------------------
 
-(only if your server doesn't support NOV overview files)
+(This feature is deprecated. Use it only if your server doesn't support
+NOV overview files)
 
 Note1: If you want to retrieve tin index files from your NNTP server,
        or if you don't run NNTP but want to install tin setuid and have
@@ -323,9 +323,6 @@ Define if you use pgp-5 instead of pgp-2.
 
 NO_POSTING
 Do not allow posting/followup of articles.
-
-NO_WILDMAT
-Define if you do not want to use wildcard pattern matching.
 
 NO_SHELL_ESCAPE
 Do not allow shell escapes.

@@ -863,7 +863,7 @@ build_references(
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.dump", "w");
 	setvbuf (dbgfd, NULL, 0, _IONBF);
-	fprintf(dbgfd, "MSGID phase\n");
+	fprintf (dbgfd, "MSGID phase\n");
 #endif
 
 	/*

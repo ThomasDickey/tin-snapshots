@@ -45,7 +45,7 @@ static void thread_by_subject (void);
 #ifdef INDEX_DAEMON
 	static void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
-   
+
 
 /*
  *  Construct the pointers to the base article in each thread.
@@ -331,7 +331,7 @@ read_group (
 
 		/*
 		 * Try and open the article
-	 	 */
+		 */
 		if ((fp = open_art_header (art)) == (FILE *) 0)
 			continue;
 
@@ -1126,24 +1126,24 @@ vWriteNovFile (
 			psArt = &arts[iNum];
 
 			if (psArt->thread != ART_EXPIRED && psArt->artnum >= psGrp->xmin) {
-			 	fprintf (hFp, "%ld\t%s\t%s\t%s\t%s\t%s\t%d\t%d",
-			 		psArt->artnum,
-			 		psArt->subject,
-			 		pcPrintFrom (psArt),
-			 		pcPrintDate (psArt->date),
-			 		(psArt->msgid ? psArt->msgid : ""),
-			 		(psArt->refs ? psArt->refs : ""),
-			 		0,	/* bytes */
-			 		psArt->lines);
+				fprintf (hFp, "%ld\t%s\t%s\t%s\t%s\t%s\t%d\t%d",
+					psArt->artnum,
+					psArt->subject,
+					pcPrintFrom (psArt),
+					pcPrintDate (psArt->date),
+					(psArt->msgid ? psArt->msgid : ""),
+					(psArt->refs ? psArt->refs : ""),
+					0,	/* bytes */
+					psArt->lines);
 
-			 	if (psArt->xref)
-				 	fprintf (hFp, "\tXref: %s", psArt->xref);
+				if (psArt->xref)
+					fprintf (hFp, "\tXref: %s", psArt->xref);
 
-			 	if (psArt->archive)
-				 	fprintf (hFp, "\tArchive-name: %s/%s%s",
-				 		psArt->archive,
-				 		(psArt->part ? "part" : "patch"),
-				 		(psArt->part ? psArt->part : psArt->patch));
+				if (psArt->archive)
+					fprintf (hFp, "\tArchive-name: %s/%s%s",
+						psArt->archive,
+						(psArt->part ? "part" : "patch"),
+						(psArt->part ? psArt->part : psArt->patch));
 
 				fprintf (hFp, "\n");
 			}
@@ -1667,4 +1667,3 @@ vCreatePath (
 	system (acCmd);
 	}
 #endif /* INDEX_DAEMON */
-                  

@@ -349,6 +349,9 @@ read_config_file (
 			break;
 
 		case 'i':
+			if (match_boolean (buf, "info_in_last_line=", &info_in_last_line))
+				break;
+
 			if (match_boolean (buf, "inverse_okay=", &inverse_okay))
 				break;
 
@@ -747,17 +750,18 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_news_headers_to_display);
 	fprintf (fp, "news_headers_to_display=");
-	for (i=0; i<num_headers_to_display; i++) {
+	for (i=0; i<num_headers_to_display; i++)
 		fprintf (fp, "%s ",news_headers_to_display_array[i]);
-	}
 	fprintf (fp, "\n\n");
 
 	fprintf (fp, txt_tinrc_news_headers_to_not_display);
 	fprintf (fp, "news_headers_to_not_display=");
-	for (i=0; i<num_headers_to_not_display; i++) {
+	for (i=0; i<num_headers_to_not_display; i++)
 		fprintf (fp, "%s ",news_headers_to_not_display_array[i]);
-	}
 	fprintf (fp, "\n\n");
+
+	fprintf (fp, txt_tinrc_info_in_last_line);
+	fprintf (fp, "info_in_last_line=%s\n\n", print_boolean(info_in_last_line));
 
 	fprintf (fp, txt_tinrc_sort_article_type);
 	fprintf (fp, "sort_article_type=%d\n\n", default_sort_art_type);
@@ -1041,24 +1045,17 @@ write_config_file (
 	fprintf (fp, "default_shell_command=%s\n\n", default_shell_command);
 
 	fprintf (fp, txt_tinrc_newnews);
-	if (!num_newnews) {
-		fprintf (fp, "newnews=%s %ld\n", new_newnews_host, new_newnews_time);
-	} else {
-		for (i = 0 ; i < num_newnews ; i++) {
-			fprintf (fp, "newnews=%s %ld\n", newnews[i].host, newnews[i].time);
-		}
-	}
-	if (ferror (fp) | fclose (fp)){
+	for (i = 0 ; i < num_newnews ; i++)
+		fprintf (fp, "newnews=%s %ld\n", newnews[i].host, newnews[i].time);
+
+	if (ferror (fp) | fclose (fp))
 		error_message (txt_filesystem_full, CONFIG_FILE);
-		/* free memory for tmp-filename */
-		free (file_tmp);
-		return;
-	} else {
+	else {
 		rename_file (file_tmp, file);
 		chmod (file, (S_IRUSR|S_IWUSR));
-		/* free memory for tmp-filename */
-		free (file_tmp);
 	}
+	/* free memory for tmp-filename */
+	free (file_tmp);
 }
 
 #define option_lines_per_page (cLINES - INDEX_TOP - 3)

@@ -28,11 +28,11 @@ static char *pcParseNewsrcLine (char *line, int *sub);
 #endif /* 0 */
 static char *pcParseSubSeq (struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum);
 static char *pcParseGetSeq (char *pcSeq, long *plLow, long *plHigh);
+static int iWriteNewsrcLine (FILE *fp, char *line);
 static void auto_subscribe_groups (char *newsrc_file);
 static void create_newsrc (char *newsrc_file);
 static void parse_bitmap_seq (struct t_group *group, char *seq);
 static void print_bitmap_seq (FILE *fp, struct t_group *group);
-static void vWriteNewsrcLine (FILE *fp, char *line);
 
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
@@ -96,8 +96,12 @@ read_newsrc (
 }
 
 
-static void
-vWriteNewsrcLine (
+/*
+ * Parse a line from the newsrc file and write it back out with updated
+ * sequence information. Return number of lines written (ie, 0 or 1)
+ */
+static int
+iWriteNewsrcLine (
 	FILE *fp,
 	char *line)
 {
@@ -108,7 +112,7 @@ vWriteNewsrcLine (
 	seq = pcParseNewsrcLine (line, &sub);
 
 	if (line[0] == 0 || sub == 0)		/* Insurance against blank line */
-		return;
+		return 0;
 
 	/*
 	 * Find the group in active. If we cannot, then junk it if bogus groups
@@ -120,7 +124,7 @@ vWriteNewsrcLine (
 	if (strip_bogus == BOGUS_REMOVE) {
 		if (psGrp == NULL || psGrp->bogus) {
 			wait_message(1, txt_remove_bogus, line);
-			return;
+			return 0;
 		}
 	}
 
@@ -131,13 +135,16 @@ vWriteNewsrcLine (
 		if (sub == SUBSCRIBED || !strip_newsrc)
 			fprintf (fp, "%s%c %s\n", line, sub, seq);
 	}
+
+	return 1;
 }
 
 /*
- * Read in the users newsrc file and update the line with sessions changes
+ * Read in the users newsrc file and write a new file with all the changes
+ * changes from the current session. If this works, replace the original
+ * newsrc file.
  */
-
-void
+t_bool
 vWriteNewsrc (void)
 {
 #ifndef INDEX_DAEMON
@@ -145,34 +152,40 @@ vWriteNewsrc (void)
 	FILE *fp_op;
 	char *line;
 	char buf[HEADER_LEN];
-	int rename_ok = FALSE;
+	int tot = 0;
+	t_bool write_ok = FALSE;
 
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
-		return;
+		return write_ok;
 
 	if ((fp_op = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
 		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
 
 		while ((line = tin_fgets (buf, sizeof(buf), fp_ip)) != (char *) 0)
-			vWriteNewsrcLine(fp_op,line);
+			tot += iWriteNewsrcLine(fp_op,line);
 
 		/*
 		 * Don't rename if either fclose() fails or ferror() is set
 		 */
 		if (ferror (fp_op) | fclose (fp_op)) {
-/* TODO return here and give user chance to try again */
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
 		} else
-			rename_ok = TRUE;
+			write_ok = TRUE;
 	}
 
 	fclose (fp_ip);
 
-	if (rename_ok)
+	if (tot == 0) {
+		error_message (txt_newsrc_nogroups);
+		return TRUE;		/* So we don't get prompted to try again */
+	}
+
+	if (write_ok)
 		rename_file (newnewsrc, newsrc);
 
+	return write_ok;
 #endif	/* INDEX_DAEMON */
 }
 
@@ -930,9 +943,9 @@ pos_group_in_newsrc (
 			found = TRUE;
 			continue;
 		} else if (strchr (line, SUBSCRIBED) != (char *) 0) {
-			vWriteNewsrcLine(fp_sub,line);
+			iWriteNewsrcLine(fp_sub,line);
 		} else if (strchr (line, UNSUBSCRIBED) != (char *) 0) {
-			vWriteNewsrcLine(fp_unsub,line);
+			iWriteNewsrcLine(fp_unsub,line);
 		} else {								/* options line at beginning of .newsrc */
 			fprintf (fp_sub, "%s\n", line);
 			option_line = TRUE;
@@ -971,7 +984,7 @@ pos_group_in_newsrc (
 		}
 
 		if (pos == subscribed_pos) {
-			vWriteNewsrcLine(fp_out, newsgroup);
+			iWriteNewsrcLine(fp_out, newsgroup);
 			repositioned = TRUE;
 		}
 
@@ -981,7 +994,7 @@ pos_group_in_newsrc (
 	}
 
 	if (!repositioned) {
-		vWriteNewsrcLine(fp_out, newsgroup);
+		iWriteNewsrcLine(fp_out, newsgroup);
 		repositioned = TRUE;
 	}
 

@@ -228,6 +228,7 @@ t_bool force_screen_redraw;	/* force screen redraw after external (shell) comman
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool got_sig_pipe = FALSE;
 t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
+t_bool info_in_last_line;
 t_bool keep_dead_articles;
 t_bool keep_posted_articles;
 t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
@@ -554,6 +555,7 @@ void init_selfinfo (void)
 	groupname_max_length = 32;
 	global_filtered_articles = FALSE;
 	local_filtered_articles = FALSE;
+	info_in_last_line = FALSE;
 	iso2asc_supported = atoi (get_val ("ISO2ASC", DEFAULT_ISO2ASC));
 	if (iso2asc_supported > NUM_ISO_TABLES)
 		iso2asc_supported = 0;

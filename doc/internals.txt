@@ -1,4 +1,4 @@
-I/O in tin (updated 14/04/97)
+I/O in tin (updated 05/01/98)
 ----------
 
 All critical I/O, be it NNTP data or not, should be done with
@@ -8,10 +8,12 @@ and deals with timeouts, reconnections and user aborts.
 It supports the use of 'q' to abort the operation and 'Q' to exit tin
 without error recovery.
 
-tin_errno will be set to !0 to flag errors.
+tin_errno will be set to !0 to flag errors. Currently the only
+supported error is 'user aborted with q'.
 
 Closing NNTP data files should be done with TIN_FCLOSE(fp) as the NNTP
 socket should be kept open, whereas local spool fd's must be closed.
+TIN_FCLOSE() takes care of this.
 
 If you wish to quit reading an NNTP stream, then call drain_buffer(fp) to
 clear out any pending data on NNTP socket.
@@ -35,7 +37,7 @@ if (nntp_command ("GROUP comp.thing", OK_GROUP, NULL) != NULL) {
 
 
 
-Hashing in tin (updated 10/02/97)
+Hashing in tin (updated 05/01/98)
 --------------
 
 All the main arrays in tin are dynamically managed by functions in memory.c
@@ -47,7 +49,13 @@ The main structures are:
 active[]
 An array of all the groups in the active file
 
-TODO - base[] ??
+arts[]
+This is an array of the article headers for the current group. Only headers
+present in the overview (NOV) database are stored.
+
+base[]
+An array of integers that represent the index in arts[] of the current
+root article for each displayed thread.
 
 group_hash[]
 active[] is hashed for faster access. An entry of -1 denotes no group at
@@ -59,20 +67,17 @@ my_group[]
 List of integer pointers into active[]
 These are the groups that actually appear on the selection screen
 
-arts[]
-This is an array of the article headers for the current group. Only headers
-present in the overview (NOV) database are stored.
-
 msgids[]
 Hashed array of all the individual message-ids in arts[]
 All the Message-ID and Reference headers are broken down and stored here.
 They are linked together by parent, sibling and child pointers
 
 table[]
-Hash of the key headers from the articles, to save space and speed up
+Hash of the key text headers from the articles, to save space and speed up
 searches and compares.
 
 
+The functions that manipulate the above include:
 
 active.c:
 	read_news_active_file() populates active[] using psGrpAdd()
@@ -80,7 +85,7 @@ active.c:
 
 art.c:
 	Many of the overview headers are stored with hash_str()
-
+    base[] is populated by find_base()
 
 hashstr.c:
 	hash_str() Hashes text strings
@@ -115,7 +120,7 @@ memory.c:
 refs.c:
 	Handling for msgids[]
 	When threading, each msgid in the hash has a pointer back to
-	its article header in arts[] or ART_NORMAL if the article is not
+	its article header in arts[] or ART_UNAVAILABLE if the article is not
 	available
 
 

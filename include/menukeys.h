@@ -103,7 +103,7 @@
  * ' ','!','$','/','?',
  * 'M',
  * '^',
- * 'b','j','k','q','v'
+ * 'b','i','j','k','q','v'
  * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
  */
 
@@ -121,6 +121,7 @@
 #define iKeyQuitTin 'Q'
 #define iKeyFirstPage '^'
 #define iKeyPageUp3 'b'
+#define iKeyToggleInfoLastLine 'i'
 #define iKeyDown2 'j'
 #define iKeyUp2 'k'
 #define iKeyQuit 'q'
@@ -195,7 +196,6 @@
 #define iKeyGroupToggleSubjDisplay 'd'
 #define iKeyGroupGoto 'g'
 #define iKeyGroupHelp 'h'
-#define iKeyGroupDisplaySubject 'i'
 #define iKeyGroupListThd 'l'
 #define iKeyGroupMail 'm'
 #define iKeyGroupNextGroup 'n'
@@ -272,7 +272,6 @@
 #define iKeyPageFollowupQuote 'f'
 #define iKeyPageFirstPage2 'g'
 #define iKeyPageHelp 'h'
-#define iKeyPageDisplaySubject 'i'
 #define iKeyPageKillArt 'k' /* overrides iKeyUp3 */
 #define iKeyPageMail 'm'
 #define iKeyPageNextArt 'n'
@@ -352,7 +351,6 @@
 #define iKeySelectToggleSubjDisplay 'd'
 #define iKeySelectGoto 'g'
 #define iKeySelectHelp 'h'
-#define iKeySelectDisplayGroupInfo 'i'
 #define iKeySelectMoveGrp 'm'
 #define iKeySelectEnterNextUnreadGrp2 'n'
 #define iKeySelectToggleReadDisplay 'r'
