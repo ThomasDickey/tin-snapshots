@@ -55,14 +55,14 @@ join_files (file)
 	char buf[LEN];
 	FILE *art, *header, *text;
 
-	if ((header = fopen(hdr, "r")) == NULL) {
+	if ((header = fopen(hdr, "r")) == (FILE *) 0) {
 		return;
 	}
-	if ((text = fopen(ct, "r")) == NULL) {
+	if ((text = fopen(ct, "r")) == (FILE *) 0) {
 		fclose(header);
 		return;
 	}
-	if ((art = fopen(file, "w")) == NULL) {
+	if ((art = fopen(file, "w")) == (FILE *) 0) {
 		fclose(art);
 		fclose(text);
 		return;
@@ -95,14 +95,14 @@ split_file (file)
 	sprintf(pt, PLAINTEXT, TMPDIR, pid);
 	sprintf(ct, CIPHERTEXT, TMPDIR, pid);
 	mask = umask(077);
-	if ((art = fopen(file, "r")) == NULL) {
+	if ((art = fopen(file, "r")) == (FILE *) 0) {
 		return;
 	}
-	if ((header = fopen(hdr, "w")) == NULL) {
+	if ((header = fopen(hdr, "w")) == (FILE *) 0) {
 		fclose(art);
 		return;
 	}
-	if ((text = fopen(pt, "w")) == NULL) {
+	if ((text = fopen(pt, "w")) == (FILE *) 0) {
 		fclose(art);
 		fclose(header);
 		return;
@@ -159,9 +159,9 @@ pgp_append_public_key (file)
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
 	sprintf(cmd, "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
 	if (invoke_cmd(cmd)) {
-		if ((f = fopen(file, "a")) == NULL)
+		if ((f = fopen(file, "a")) == (FILE *) 0)
 			return;
-		if ((key = fopen(keyfile, "r")) == NULL) {
+		if ((key = fopen(keyfile, "r")) == (FILE *) 0) {
 			fclose(f);
 			return;
 		}
@@ -184,7 +184,7 @@ pgp_available ()
 	char keyring[PATH_LEN];
 
 	joinpath(keyring, pgp_data, "pubring.pgp");
-	if ((f = fopen(keyring, "r")) == NULL) {
+	if ((f = fopen(keyring, "r")) == (FILE *) 0) {
 		return (0);
 	} else {
 		fclose(f);
@@ -274,7 +274,7 @@ pgp_check_article()
 		return (0);
 	}
 	joinpath(the_article, homedir, ".article");
-	if ((art = fopen(article, "w")) == NULL) {
+	if ((art = fopen(article, "w")) == (FILE *) 0) {
 		sprintf(buf, txt_cannot_open, the_article);
 		info_message(buf);
 		return (0);

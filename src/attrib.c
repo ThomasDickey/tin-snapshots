@@ -156,7 +156,7 @@ set_default_attributes (psAttrib)
 void
 read_attributes_file (file, global_file)
 	char	*file;
-	int		global_file;
+	int	global_file;
 {
 #ifndef INDEX_DAEMON
 
@@ -446,9 +446,9 @@ if (debug) {
 void
 set_attrib (psGrp, type, str, num)
 	struct	t_group	*psGrp;
-	int		type;
+	int	type;
 	char	*str;
-	int		num;
+	int	num;
 {
 #ifndef INDEX_DAEMON
 

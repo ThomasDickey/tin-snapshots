@@ -210,6 +210,7 @@ int default_filter_select_case;
 int default_filter_select_expire;
 int process_only_unread;		/* save/print//mail/pipe unread/all articles */
 int read_local_newsgroups_file;		/* read newsgroups file locally or via NNTP */
+int mail_news_to_posted;		/* mail all arts to specified user */
 int mail_news;				/* mail all arts to specified user */
 int save_news;				/* save all arts to savedir structure */
 int save_to_mmdf_mailbox;		/* save mail to MMDF/mbox format mailbox */

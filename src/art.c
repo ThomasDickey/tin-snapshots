@@ -210,10 +210,6 @@ debug_print_bitmap (group, NULL);
 		    fflush (stdout);
 		}
 
-		/* rfc1522_decode_all_headers(); */
-		/* nothing to be done here, because all possibly encoded
-		   headers in the arts structure have already been decoded. */
-
 #ifdef	PROFILE
 		BegStopWatch("make_thread");
 #endif	/* PROFILE */
@@ -1046,9 +1042,9 @@ vWriteNovFile (psGrp)
 {
 	char	*pcNovFile;
 	FILE	*hFp;
-	int		iNum;
+	int	iNum;
 	struct	t_article *psArt;
-	char 	tmp[PATH_LEN];
+	char	tmp[PATH_LEN];
 
 	if (xover_supported)		/* Don't write local index if we have XOVER */
 		return;
@@ -1450,10 +1446,10 @@ from_comp (p1, p2)
 /*
  * Works like strcmp() for comparing time_t type values
  * Return codes:
- * 	-1:		If p1 is before p2
- *	 0:		If they are the same time
+ *  -1:		If p1 is before p2
+ *   0:		If they are the same time
  *   1:		If p1 is after p2
- * If the sort order is _not_  DATE_ASCEND then the sense of the above
+ * If the sort order is _not_ DATE_ASCEND then the sense of the above
  * is reversed.
  */
 static int
@@ -1463,7 +1459,6 @@ date_comp (p1, p2)
 {
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
-
 
 	if (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) {
 		/*
@@ -1632,18 +1627,18 @@ valid_artnum (art)
  */
 
 char *
-safe_fgets (f)
-	FILE *f;
+safe_fgets (fp)
+	FILE *fp;
 {
-	char *buf   = NULL;
-	char *temp  = NULL;
-	int	next  = 0;
-	int	chunk = 256;
+	char *buf	= NULL;
+	char *temp	= NULL;
+	int	next	= 0;
+	int	chunk	= 256;
 
 	buf = (char *) malloc (chunk * sizeof(char));
 
 	forever {
-		if (fgets (buf + next, chunk, f) == NULL) {
+		if (fgets (buf + next, chunk, fp) == NULL) {
 			if (next) {
 				return buf;
 			}
@@ -1734,7 +1729,7 @@ vCreatePath (pcPath)
 
 	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
 	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
-printf ("CREATE Path=[%s]\n", acCmd);
+	printf ("CREATE Path=[%s]\n", acCmd);
 	system (acCmd);
 }
 #endif

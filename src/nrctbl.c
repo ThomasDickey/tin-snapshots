@@ -15,7 +15,7 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include 	"version.h"
+#include	"version.h"
 #include	"menukeys.h"
 #include	"tin.h"
 
@@ -27,8 +27,7 @@
 void
 write_newsrctable_file()
 {
-
-	FILE *fp;
+	FILE	*fp;
 
 	if ((fp = fopen(local_newsrctable_file, "w")) == (FILE *) 0)
 		return;
@@ -59,12 +58,12 @@ get_nntpserver (nntpserver_name, nick_name)
 	char *nntpserver_name;
 	char *nick_name;
 {
-	FILE 	*fp;
+	FILE	*fp;
 	char	line[LEN];
 	char	*line_entry;
 	int	line_entry_counter;
 	char	name_found[PATH_LEN];
-	int 	found = 0;
+	int	found = 0;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
 		while ((fgets(line, sizeof(line), fp) != NULL) && (!found)) {
@@ -74,19 +73,23 @@ get_nntpserver (nntpserver_name, nick_name)
 				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
 					line_entry_counter++;
 
-					if (line_entry_counter == 1)
+					if (line_entry_counter == 1) {
 						strcpy(name_found, line_entry);
+					}
 
-					if ((line_entry_counter > 2) && (!strcasecmp(line_entry, nick_name)))
+					if ((line_entry_counter > 2) && (!strcasecmp(line_entry, nick_name))) {
 						found = 1;
+					}
 				}
 			}
 		}
 		fclose(fp);
-		if (found) strcpy(nntpserver_name, name_found);
-		else strcpy(nntpserver_name, nick_name);
-	}
-	else {
+		if (found) {
+			strcpy(nntpserver_name, name_found);
+		} else {
+			strcpy(nntpserver_name, nick_name);
+		}
+	} else {
 		write_newsrctable_file();
 		strcpy(nntpserver_name, nick_name);
 	}
@@ -102,12 +105,12 @@ get_newsrcname (newsrc_name, nntpserver_name)
 	char *newsrc_name;
 	char *nntpserver_name;
 {
-	FILE 	*fp;
+	FILE	*fp;
 	char	line[LEN];
 	char	*line_entry;
 	int	line_entry_counter;
 	char	name_found[PATH_LEN];
-	int 	found = 0;
+	int	found = 0;
 	int	do_cpy = 0;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
@@ -138,19 +141,20 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		if (found) {
 			int	error=0;
 			char	dir[PATH_LEN];
-			char    tmp_newsrc[PATH_LEN];
+			char	tmp_newsrc[PATH_LEN];
 
 			if (!strfpath (name_found, tmp_newsrc, sizeof (tmp_newsrc),
 				homedir, (char *) 0, (char *) 0, (char *) 0)) {
 					fprintf (stderr, "couldn't expand %s\n", name_found);
 					error=1;
 			} else {
-				if (tmp_newsrc[0] == '/')
+				if (tmp_newsrc[0] == '/') {
 					(void) strcpy (newsrc_name, tmp_newsrc);
-				else
+				} else {
 					joinpath (newsrc_name, homedir, tmp_newsrc);
+				}
 			}
-			strcpy (dir, newsrc_name);
+			(void) strcpy (dir, newsrc_name);
 			*strrchr (dir, '/') = (char) 0;
 
 			if (!error) {
@@ -217,8 +221,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			}
 			return TRUE;
 		}
-	}
-	else {
+	} else {
 		(void) write_newsrctable_file();
 	}
 	return FALSE;

@@ -1576,7 +1576,12 @@ bld_sline (i)
 		n = sbuf.unread + sbuf.seen;
 	else
 		n = sbuf.total;
-
+	/*
+	 * if you like to see the number of responses excluding the fist
+	 *	art in thread - add the following:
+	 *	n--;
+	 */
+	 
 	if ((j = line_is_tagged(respnum)) != 0) {
 		strcpy (new_resps, tin_itoa(j, 3));
 	} else {

@@ -37,7 +37,10 @@ error output into.
 
 Submit these two files with information on what you think the problem is
 (if it isn't already obvious), such as:
+
 a) The Subject line of the thread causing the problem
 b) Whether the problem occurs only in certain threading modes
 
-J. Faultless (14/11/96)
+The .overview file from the offending newsgroup would be of great help too.
+
+J. Faultless (03/12/96)

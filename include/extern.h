@@ -988,6 +988,7 @@ extern int last_subj_on_screen;
 extern int local_filtered_articles;
 extern int local_index;
 extern int mail_8bit_header;
+extern int mail_news_to_posted;
 extern int mail_news;
 extern int mark_saved_read;
 extern int max_active;

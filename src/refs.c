@@ -3,7 +3,7 @@
  *  Module    : refs.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
  *  Created   : 09-05-96
- *  Updated   : 16-07-96
+ *  Updated   : 04-12-96
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
  *		hash_msgid, free_msgid
@@ -22,6 +22,12 @@
 /* Produce disgusting amounts of output to help me tame this thing */
 #undef DEBUG_REFS
 
+#ifdef DEBUG_REFS
+#	define DEBUG_PRINT(x)	fprintf x
+#else
+#	define DEBUG_PRINT(x)
+#endif
+
 /*
  * The msgids are all hashed into a big array, with overspill
  */
@@ -33,6 +39,7 @@ struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
 static unsigned int hash_msgid P_((char *key));
 static void add_to_parent P_((struct t_msgid *ptr));
 static struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *newparent));
+static struct t_msgid *parse_references P_((char *r));
 static char *_get_references P_((struct t_msgid *refptr, int depth));
 #ifdef HAVE_REF_THREADING
 #ifdef DEBUG_REFS
@@ -157,8 +164,9 @@ add_to_parent(ptr)
  *        If (key == REF_REF) ignore the error - probably the refs
  *        headers are broken or have been truncated.
  *
- *        Otherwise we have a genuine paradox, two articles in one group
- *        with identical Message-IDs and different parents.
+ *        Otherwise we have a genuine problem, two articles in one group
+ *        with identical Message-IDs. This is indicative of a broken
+ *        overview database.
  */
 static struct t_msgid *
 add_msgid(key, msgid, newparent)
@@ -177,104 +185,86 @@ add_msgid(key, msgid, newparent)
   
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
-#ifdef DEBUG_REFS
-	fprintf(stderr, "---------------- Add %s %s\n", (key==MSGID_REF)?"MSG":"REF", msgid);
-#endif
+	DEBUG_PRINT((stderr, "---------------- Add %s %s with parent %s\n", (key==MSGID_REF)?"MSG":"REF", msgid, (newparent == NULL)?"unchanged":newparent->txt));
 
 	/*
-	 * Look for this message id in the cache. Broken software will sometimes
-	 * not preserve the original case of a message-id.
+	 * Look for this message id in the cache.
+	 * Broken software will sometimes damage the case of a message-id.
 	 */
 	for (i = msgids[h]; i != NULL; i = i->next) {
 
-		if (strcasecmp(i->txt, msgid) == 0) {
+		if (strcasecmp(i->txt, msgid) != 0)				/* No match yet */
+			continue;
 
-			/*
-			 * CASE 1
-			 * No parent given or parent not changed - no update required
-			 */
-			if ((newparent == NULL) || (newparent == i->parent)) {
-#ifdef DEBUG_REFS
-				if (newparent == i->parent)
-					fprintf(stderr, "dup: %s -> no change\n", msgid);
-				else
-					fprintf(stderr, "nop: No parent specified\n");
-#endif
-				return(i);
-			}
-
-			/*
-			 * CASE2
-			 * A parent has been given where there was none before.
-			 * Need to change parent from null -> not-null & update ptrs
-			 */
-			if (i->parent == NULL) {
-				/*
-				 * Check for circular reference paths by looking for the
-				 * new parents' presence in this thread
-				 * I'm assuming here that if we do find the parent, then this
-				 * can only happen in a broken ref thread and so the rest of
-				 * this block is pointless as it only applies when we're a
-				 * MSGID_REF
-				 */
-				for (ptr = newparent; ptr != NULL; ptr = ptr->parent) {
-					if (strcasecmp(ptr->txt, msgid) == 0) {
-#ifdef DEBUG_REFS
-						fprintf(stderr, "Avoiding circular reference!(key=%s)\n", (key==MSGID_REF)?"MSG":"REF");
-#endif
-						return(i);
-					}
-				}
-
-				i->parent = newparent;
-
-				add_to_parent(i);
-#ifdef DEBUG_REFS
-				fprintf(stderr, "set: %s -> %s\n", msgid,
-										(newparent)?newparent->txt:"None");
-#endif
-				return(i);
-			}
-
-			/*
-			 * CASE 3
-			 * A new parent has been given that conflicts with the current
-			 * one. This is bad - caused by incorrectly trimmed or
-			 * otherwise corrupt references.
-			 * If the information is from a message-ID header, then
-			 * we have a genuine conflict here. All we can do is flag the
-			 * fact.
-			 */
-			if (i->parent != newparent) {
-#ifdef DEBUG_REFS
-				fprintf(stderr, "Warning: (%s) %s -> %s (already %s)\n",
-					(key==MSGID_REF)?"MSG":"REF", msgid,
-					(newparent)?newparent->txt:"None", i->parent->txt);
-#endif
-				if (key == MSGID_REF)
-					fprintf(stderr, "Warning: Duplicate parent for Message-ID %s -> %s (already %s)\n",
-								msgid, (newparent)?newparent->txt:"None", i->parent->txt);
-
-				return(i);
-			}
-
-			error_message("Impossible: combination of conditions !\n", "");
+		/*
+		 * CASE 1a - No parent specified, do nothing
+		 */
+		if (newparent == NULL) {
+			DEBUG_PRINT((stderr, "nop: %s No parent specified\n", i->txt));
 			return(i);
 		}
+
+		/*
+		 * CASE 1b - Parent not changed, do nothing
+		 */
+		if (newparent == i->parent) {
+			DEBUG_PRINT((stderr, "dup: %s -> %s (no change)\n", i->txt, (i->parent)?i->parent->txt:"NULL"));
+			return(i);
+		}
+
+		/*
+		 * CASE2 - A parent has been given where there was none before.
+		 *         Change parent from null -> not-null & update ptrs
+		 */
+		if (i->parent == NULL) {
+
+			/*
+			 * Detect & ignore circular reference paths by looking for the
+			 * new parent in this thread
+			 */
+			for (ptr = newparent; ptr != NULL; ptr = ptr->parent) {
+				if (ptr == i) {
+					DEBUG_PRINT((stderr, "Avoiding circular reference! (%s)\n", (key==MSGID_REF)?"MSG":"REF"));
+					return(i);
+				}
+			}
+
+			i->parent = newparent;
+			add_to_parent(i);
+
+			DEBUG_PRINT((stderr, "set: %s -> %s\n", i->txt, (newparent)?newparent->txt:"None"));
+			return(i);
+		}
+
+		/*
+		 * CASE 3 - A new parent has been given that conflicts with the
+		 *			current one. This is caused by
+		 * 1) A duplicate Message-ID in the spool (very bad !)
+		 * 2) corrupt References header
+		 * All we can do is ignore the error
+		 */
+		if (i->parent != newparent) {
+			DEBUG_PRINT((stderr, "Warning: (%s) Ignoring %s -> %s (already %s)\n",
+				(key==MSGID_REF)?"MSG":"REF", i->txt,
+				(newparent)?newparent->txt:"None", i->parent->txt));
+
+			return(i);
+		}
+
+		error_message("Error: Impossible combination of conditions !\n", "");
+		return(i);
 	}
 
-#ifdef DEBUG_REFS
-	fprintf(stderr, "new: %s -> %s\n", msgid, (newparent)?newparent->txt:"None");
-#endif
+	DEBUG_PRINT((stderr, "new: %s -> %s\n", msgid, (newparent)?newparent->txt:"None"));
 
 	/*
 	 * This is a new node, so build a structure for it
-	 * Insert at start of list for speed.
 	 */
 	ptr = (struct t_msgid *)my_malloc(sizeof(struct t_msgid));
 
 	ptr->txt = my_strdup(msgid);
 	ptr->parent = newparent;
+
 #ifdef HAVE_REF_THREADING
 	ptr->child = ptr->sibling = NULL;
 	ptr->article = (key == MSGID_REF ? top : ART_NORMAL);
@@ -282,7 +272,7 @@ add_msgid(key, msgid, newparent)
 #endif
 
 	/*
-	 * Makes no difference to insert at the head of the hash buckets
+	 * Insert at head of list for speed.
 	 */
 	ptr->next = msgids[h];
 	msgids[h] = ptr;
@@ -309,9 +299,7 @@ parse_references(r)
 	if (!r)
 		return(NULL);
 
-#ifdef DEBUG_REFS
-	fprintf(stderr, "Refs: %s\n", r);
-#endif
+	DEBUG_PRINT((stderr, "parse_references: %s\n", r));
 
 	/*
 	 * Break the refs down, using a space as delimiters
@@ -349,10 +337,12 @@ _get_references(refptr, depth)
 
 	if (refptr->parent == NULL || depth > MAX_REFS) {
 
+#ifdef DEBUG_REFS
 		if (depth > MAX_REFS) {
 			fprintf(stderr, "Warning: Too many refs near to %s. Truncated\n", refptr->txt);
 			sleep(2);
 		}
+#endif
 
 		refs = (char *) my_malloc(HEADER_LEN);
 		len  = 0;
@@ -399,8 +389,6 @@ get_references(refptr)
  * Clear the entire msgid cache, freeing up all chains. This is
  * normally only needed when entering a new group
  */
-/* TODO  */
-#ifndef OLD_FREE_CODE
 void
 free_msgids()
 {
@@ -423,41 +411,6 @@ free_msgids()
 		}
 	}
 }
-
-#else
-/*
- * Clear the entire msgid cache, freeing up all chains. This is
- * normally only needed when entering a new group
- */
-
-static void _free_list P_((struct t_msgid *ptr));
-
-static void
-_free_list(ptr)
-	struct t_msgid *ptr;
-{
-	if (ptr->next != NULL)
-		_free_list(ptr->next);
-
-	free(ptr->txt);
-	free(ptr);
-	return;
-}
-
-void
-free_msgids()
-{
-	int i;
-
-	for (i=0; i<MSGID_HASH_SIZE; i++) {
-
-		if (msgids[i] != NULL) {
-			_free_list(msgids[i]);
-			msgids[i] = NULL;
-		}
-	}
-}
-#endif
 
 #if 0
 static void
@@ -616,9 +569,13 @@ dump_msgid_threads()
 	int i;
 	struct t_msgid *ptr;
 
+	fprintf(stderr, "Dump started.\n\n");
+
 	for (i=0; i<MSGID_HASH_SIZE; i++) {
 		if (msgids[i] != NULL) {
-			for (ptr = msgids[i]; ptr!=NULL; ptr = ptr->next) {
+
+			for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next) {
+
 				if (ptr->parent == NULL) {
 					dump_msgid_thread(ptr, 1);
 					fprintf(stderr, "\n");
@@ -638,9 +595,9 @@ dump_msgid_threads()
  * If there are no more down pointers, backtrack to find a sibling
  * to continue the thread, we note this with the 'bottom' flag.
  *
- * A messagid will not be included in a thread if
+ * A Message-ID will not be included in a thread if
  *  It doesn't point to an article OR
- *     (it's already threaded OR it has been autokilled)
+ *     (it's already threaded/expired OR it has been autokilled)
  */
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || \
@@ -693,15 +650,20 @@ find_next(ptr)
 		 */
 		if (ptr->child == NULL && ptr->sibling == NULL) {
 
-			while(ptr != NULL && ptr->sibling == NULL) {
+			while(ptr != NULL && ptr->sibling == NULL)
+				ptr = ptr->parent;
 
+#if 0	/* TODO The fix for self-referencing reference loops obseletes this */
+				/*
+				 * Skip self referencing arts
+				 */
 				if (ptr ==  ptr->parent) {
-				/* Jehova */
+					DEBUG_PRINT((stderr, "Self Referencing article avoided\n"));
 					return (NULL);
-				} else {
+				} else
 					ptr = ptr->parent;
-				}
 			}
+#endif
 
 			/*
 			 * We've backtracked up to the parent with a suitable sibling
@@ -840,7 +802,7 @@ collate_subjects()
 			if (((arts[i].subject == arts[j].subject) ||
 						   ((arts[i].part || arts[i].patch) &&
 							 arts[i].archive == arts[j].archive))) {
-/*fprintf(stderr, "RES: %d is now inthread, at end of %d\n", i, j);*/
+/*DEBUG_PRINT((stderr, "RES: %d is now inthread, at end of %d\n", i, j));*/
 
 				for (art = j; arts[art].thread >= 0; art = arts[art].thread);
 
@@ -862,14 +824,18 @@ collate_subjects()
 #endif /* HAVE_REF_THREADING */
 
 /*
- * Builds the reference tree
+ * Builds the reference tree:
+ *
  * 1) Sort the article base. This will ensure that articles and their
  *    siblings are inserted in the correct order.
- * 2) Add the Message-ID headers to the cache.
- * 3) Add the Reference header to the cache. This information is less
- *    reliable than the Message-ID info and will only be used to add
- *    to the cache and not to supercede
- * 4) Frees up the msgid and refs headers once cached
+ * 2) Add each Message-ID header and its direct reference ('reliable info')
+ *    to the cache. Son of RFC1036 mandates that if References headers must
+ *    be trimmed, then at least the (1st three and) last reference should be
+ *    maintained.
+ * 3) Add rest of References header to the cache. This information is less
+ *    reliable than the info added in 2) and is only used to fill in any
+ *    gaps in the reference tree - no information is superceded.
+ * 4) Free() up the msgid and refs headers once cached
  */
 void
 build_references(group)
@@ -884,11 +850,14 @@ build_references(group)
 		sort_arts (group->attribute->sort_art_type);
 
 	/*
-	 * Add the Message-ID headers to the cache, the last ref being the parent.
+	 * Add the Message-ID headers to the cache, using the last Reference
+	 * as the parent
 	 */
+	DEBUG_PRINT((stderr, "MSGID phase\n"));
 	for (i = 0; i < top; i++) {
 		art = &arts[i];
 
+#ifndef INFERIOR_REF_HANDLING
 		if (art->refs) {
 
 			/*
@@ -904,19 +873,31 @@ build_references(group)
 
 			art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, s, NULL));
 		} else
+#endif
 			art->refptr = add_msgid(MSGID_REF, art->msgid, NULL);
 
 		free(art->msgid);					/* Now cached - discard this */
 	}
 
+	DEBUG_PRINT((stderr, "REFS phase\n"));
 	/*
-	 * Add all the References data to the cache
+	 * Add the References data to the cache
 	 */
 	for (i = 0; i < top; i++) {
-		if (arts[i].refs) {
-			arts[i].refptr->parent = parse_references(arts[i].refs);
-			free(arts[i].refs);
-		}
+
+		if (!arts[i].refs)						/* No refs - skip */
+			continue;
+
+		art = &arts[i];
+
+		/*
+		 * Use add_msgid() to add the references, this will neatly sort out
+		 * all the special cases, circular refs, child/sibling ptrs etc..
+		 */
+/* TODO there is a lot of redundancy here still */
+		add_msgid(MSGID_REF, art->refptr->txt, parse_references(art->refs));
+
+		free(art->refs);
 	}
 }
 
