@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971106
+PVER		= 971123
 VER		= pre-$(LVER)-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 

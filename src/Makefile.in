@@ -13,14 +13,14 @@ CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 DAEMON	= # -DINDEX_DAEMON # -DACTIVE_DAEMON
-CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
+CPPOPTS	= @DEFS@ -I. -I../include -I../pcre -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
 LD	= $(CC)
 LDFLAGS	= @LDFLAGS@
 YACC	= @YACC@
 
-LIBS	= @LIBS@ @INN_NNTPLIB@
+LIBS	= -L../pcre -lpcre @LIBS@ @INN_NNTPLIB@
 
 # Where do you want the binary & manual page installed?
 INSTALL_PREFIX	= @INSTALL_PREFIX@
@@ -138,6 +138,8 @@ CFILES	= \
 
 EXTRAOBJS = @EXTRAOBJS@
 
+EXTRALIBS = ../pcre/libpcre.a
+
 OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/active.o \
 	$(OBJDIR)/actived.o \
@@ -242,7 +244,7 @@ actived:	$(OBJDIR)/lang.o \
 	@-$(RM) actived.o mail.o
 	@$(LS) actived
 
-$(BINDIR)/$(EXE): $(OFILES)
+$(BINDIR)/$(EXE): $(OFILES) $(EXTRALIBS)
 	@$(ECHO) "Linking $(EXE) v$(VER)..."
 	$(LD) $(LDFLAGS) -o $(BINDIR)/$(EXE) $(OFILES) $(NNTPLIB) $(NETLIBS) $(LIBS) $(DEBUG)
 	@$(LS) $(BINDIR)/$(EXE)
@@ -310,6 +312,8 @@ clean:
 	@-$(RM) -f makecfg makecfg.o tincfg.h
 	@-$(RM) -f core *~
 	@-$(RM) -f $(EXE) $(EXED)
+	@$(ECHO) "Cleaning Philip Hazel's Perl regular expressions library..."
+	@$(CD) ../pcre ; $(MAKE) clean ; $(CD) ../src
 
 distclean \
 clobber: clean
@@ -332,12 +336,16 @@ TIN_DEP	= \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/proto.h
 
+../pcre/libpcre.a:
+	@$(ECHO) "Building Philip Hazel's Perl regular expressions library..."
+	@$(CD) ../pcre ; $(MAKE) libpcre.a; $(CD) ../src
+
 tincfg.h:			$(SRCDIR)/tincfg.tbl \
 				makecfg
 	./makecfg $(SRCDIR)/tincfg.tbl tincfg.h
 
 makecfg:			$(OBJDIR)/makecfg.o
-	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg $(LIBS)
+	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h

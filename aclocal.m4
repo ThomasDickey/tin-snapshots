@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 22.10.97
+dnl Updated   : 08.11.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -16,7 +16,8 @@ dnl
 dnl ---------------------------------------------------------------------------
 dnl ---------------------------------------------------------------------------
 dnl Add an include-directory to $CPPFLAGS.  Don't add /usr/include, since it's
-dnl redundant.  Also, don't add /usr/local/include if we're using gcc.
+dnl redundant.  We don't normally need to add -I/usr/local/include for gcc,
+dnl but old versions (and some misinstalled ones) need that.
 AC_DEFUN([CF_ADD_INCDIR],
 [
 for cf_add_incdir in $1
@@ -25,9 +26,6 @@ do
 	do
 		case $cf_add_incdir in
 		/usr/include) # (vi
-			;;
-		/usr/local/include) # (vi
-			test -z "$GCC" && CPPFLAGS="$CPPFLAGS -I$cf_add_incdir"
 			;;
 		*) # (vi
 			CPPFLAGS="$CPPFLAGS -I$cf_add_incdir"
@@ -1270,11 +1268,13 @@ AC_REQUIRE([CF_WAIT_HEADERS])
 AC_MSG_CHECKING([for union wait])
 AC_CACHE_VAL(cf_cv_type_unionwait,[
 	AC_TRY_COMPILE($cf_wait_headers,
-	[union wait x;
+	[int x;
 	 int y = WEXITSTATUS(x);
 	 int z = WTERMSIG(x);
 	],
-	[cf_cv_type_unionwait=no],[
+	[cf_cv_type_unionwait=no
+	 echo compiles ok w/o union wait 1>&AC_FD_CC
+	],[
 	AC_TRY_COMPILE($cf_wait_headers,
 	[union wait x;
 #ifdef WEXITSTATUS
@@ -1284,7 +1284,9 @@ AC_CACHE_VAL(cf_cv_type_unionwait,[
 	 int z = WTERMSIG(x);
 #endif
 	],
-	[cf_cv_type_unionwait=yes],
+	[cf_cv_type_unionwait=yes
+	 echo compiles ok with union wait and possibly macros too 1>&AC_FD_CC
+	],
 	[cf_cv_type_unionwait=no])])])
 AC_MSG_RESULT($cf_cv_type_unionwait)
 test $cf_cv_type_unionwait = yes && AC_DEFINE(HAVE_TYPE_UNIONWAIT)

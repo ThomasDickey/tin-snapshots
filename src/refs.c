@@ -354,7 +354,7 @@ parse_references(
  * Reconstruct the References: field from the parent pointers
  * NB: The original Refs: can be no longer than HEADER_LEN (see open.c)
  *     Broken headers sometimes have malformed or circular reference
- *	   lists, which we strive to work around.
+ *	    lists, which we strive to work around.
  */
 static char *
 _get_references(
@@ -619,14 +619,14 @@ dump_msgid_threads(void)
  *     (it's already threaded/expired OR it has been autokilled)
  */
 
-#if 0
+#if 0 /* this one dumps core if parent is killed and you do 'u' */
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || \
 		(arts[ptr->article].thread != ART_UNAVAILABLE || arts[ptr->article].killed)))
-#endif /* 0 */
-
+#else
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || arts[ptr->article].thread != ART_UNAVAILABLE))
+#endif
 
 static struct t_msgid *
 find_next(
@@ -884,8 +884,16 @@ build_references(
 			/*
 			 * Add the last ref, and then trim it to save wasting time adding
 			 * it again later
+			 * Check for circular references to current article
 			 */
-			if ((s = strrchr(art->refs, ' ')) != NULL) {
+			while (((s = strrchr(art->refs, ' ')) != NULL) && (!strcmp(art->msgid, s+1))) {
+				/*
+				 * Remove circular reference to current article
+				 */
+				DEBUG_PRINT((dbgfd, "removing circular reference to%s\n", s));
+				*s = '\0';
+			}
+			if (s != NULL) {
 				art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, s+1, NULL));
 				*s = '\0';
 			} else {

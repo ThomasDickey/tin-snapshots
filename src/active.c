@@ -275,14 +275,20 @@ read_news_active_file (void)
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	char *ptr;
+	struct stat newsrc_stat;
 	struct t_group *grpptr;
 	long count = -1L, min = 1, max = 0;
 
 	/*
-	 * Ignore -n if no .newsrc can be found
+	 * Ignore -n if no .newsrc can be found or .newsrc is empty
 	 */
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
+	if (newsrc_active) {
+		fstat (fileno(fp), &newsrc_stat);
+		if (!newsrc_stat.st_size)
+			newsrc_active = FALSE;
+	}
 
 	if (INTERACTIVE)
 		wait_message (0, newsrc_active ? txt_reading_news_newsrc_file : txt_reading_news_active_file);
@@ -293,11 +299,10 @@ read_news_active_file (void)
 			if (cmd_line)
 				my_fputc ('\n', stderr);
 
-#ifdef NNTP_ABLE
-				error_message (txt_cannot_open_active_file, news_active_file, progname);
-#else
+			if (read_news_via_nntp)
 				error_message (txt_cannot_open, news_active_file);
-#endif
+			else
+				error_message (txt_cannot_open_active_file, news_active_file, progname);
 
 			tin_done (EXIT_ERROR);
 		}

@@ -1012,16 +1012,16 @@ pos_group_in_newsrc (
 
 rewrite_group_done:
 	if (fp_in != (FILE *) 0)
-	  fclose (fp_in);
+		fclose (fp_in);
 
 	if (fp_out != (FILE *) 0)
-	  fclose (fp_out);
+		fclose (fp_out);
 
 	if (fp_sub != (FILE *) 0)
-	  fclose (fp_sub);
+		fclose (fp_sub);
 
 	if (fp_unsub != (FILE *) 0)
-	  fclose (fp_unsub);
+		fclose (fp_unsub);
 
 	if (newnewsrc_created)
 		unlink (newnewsrc);

@@ -262,6 +262,10 @@
 #undef	DECL_USLEEP
 #undef	DECL__FLSBUF
 
+#undef	DECL_FGETC
+#undef	DECL_RENAME
+#undef	DECL_UNGETC
+
 #undef HAVE_SELECT_INTP
 #undef HAVE_TYPE_SIGACTION
 #undef HAVE_TYPE_UNIONWAIT
@@ -315,7 +319,7 @@
 
 #if 0 /* FIXME */
 #if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
-    defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
+	defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
 #	if !defined(M_OS2)
 #		define	HAVE_POSIX_JC
 #	endif

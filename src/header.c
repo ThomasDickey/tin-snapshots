@@ -288,9 +288,9 @@ get_from_name (
 	}
 
 	if (strchr(get_full_name(), '.'))
-	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);
+		sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);
 	else
-	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
+		sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());

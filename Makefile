@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971106
+PVER		= 971123
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -15,6 +15,7 @@ OBJDIR	= ./src
 SRCDIR	= ./src
 AMGDIR	= ./amiga
 TOLDIR	= ./tools
+PCREDIR	= ./pcre
 
 HFILES	= \
 	$(INCDIR)/bugrep.h \
@@ -139,14 +140,38 @@ TOP	= \
 	$(TOPDIR)/makefile.in \
 	$(TOPDIR)/conf-tin
 
-ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) \
+PCRE	= \
+	$(PCREDIR)/ChangeLog \
+	$(PCREDIR)/Makefile \
+	$(PCREDIR)/Performance \
+	$(PCREDIR)/README \
+	$(PCREDIR)/Tech.Notes \
+	$(PCREDIR)/pgrep.1 \
+	$(PCREDIR)/pcre.3 \
+	$(PCREDIR)/pcreposix.3 \
+	$(PCREDIR)/maketables.c \
+	$(PCREDIR)/pcre.c \
+	$(PCREDIR)/pcreposix.c \
+	$(PCREDIR)/pgrep.c \
+	$(PCREDIR)/study.c \
+	$(PCREDIR)/internal.h \
+	$(PCREDIR)/pcre.h \
+	$(PCREDIR)/pcreposix.h \
+	$(PCREDIR)/pcretest.c \
+	$(PCREDIR)/perltest \
+	$(PCREDIR)/testinput \
+	$(PCREDIR)/testinput2 \
+	$(PCREDIR)/testoutput \
+	$(PCREDIR)/testoutput2
+
+ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(PCRE) \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
 	$(SRCDIR)/l1_next.tab \
 	$(SRCDIR)/next_l1.tab \
 	$(SRCDIR)/tincfg.tbl
 
-ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR)
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(PCREDIR)
 
 # standard commands
 CD		= cd
@@ -190,11 +215,12 @@ install_daemon:
 	@$(CD) $(SRCDIR) && $(MAKE) install_daemon
 
 clean:
-	@-test -e $(SRCDIR)/Makefile && $(CD) $(SRCDIR) && $(MAKE) clean
 	@-$(RM) -f *~
 	@-$(RM) -f $(DOCDIR)/*~
 	@-$(RM) -f $(INCDIR)/*~
 	@-$(RM) -f $(SRCDIR)/*~
+	@-$(RM) -f $(PCREDIR)/*~
+	@-test -e $(SRCDIR)/Makefile && $(CD) $(SRCDIR) && $(MAKE) clean
 
 man:
 	@$(MAKE) manpage
@@ -219,7 +245,8 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh tools/tinpp
+	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh
+	@$(CHMOD) 755 $(TOLDIR)/tinpp $(PCREDIR)/perltest
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
@@ -260,6 +287,7 @@ distclean:
 	@-$(MAKE) clean
 	@-$(RM) -f config.cache config.log config.status
 	@-$(RM) -f $(INCDIR)/autoconf.h
+	@-$(RM) -f $(PCREDIR)/maketables $(PCREDIR)/chartables.c
 	@-$(RM) -f $(SRCDIR)/Makefile
 	@-$(RM) -f td-conf.out
 	@-$(RM) -f makefile

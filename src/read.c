@@ -211,7 +211,8 @@ tin_fgets (
 	tin_errno = 0;			/* Clear errors */
 
 	temp = tin_read(buffer, len, fp);
-DEBUG_IO((stderr, "tin_fgets (%s)\n", temp));
+
+DEBUG_IO((stderr, "tin_fgets (%s)\n", (temp) ? temp : "NULL"));
 
 	if (tin_errno != 0) {
 DEBUG_IO((stderr, "Aborted read\n"));
@@ -266,11 +267,69 @@ drain_buffer(
 DEBUG_IO((stderr, "Draining\n"));
 	while (tin_read(buf, sizeof(buf), fp) != (char *) 0) {
 DEBUG_IO((stderr, "Drain %s\n", buf));
-	    if (++i % MODULO_COUNT_NUM == 0)
+		if (++i % MODULO_COUNT_NUM == 0)
 			spin_cursor();
 	}
 
 #endif
+}
+
+/* It works the same way as fgets except that it converts
+   new line character into ' ' if the first character following it 
+   is white space(' ' or '\t'). It's used by rfc1521.c
+   to concatenate multiple line header field into a single line.
+   It also removes leading white spaces in continuation header lines
+   J. Shin */
+
+char *
+fgets_hdr (
+	char *s,
+	int size,
+	FILE *f)
+{
+	char *s1 = s;
+	int is_leading_wsp = 0;
+
+	*s1 = fgetc(f);
+
+	while (s1-s < size-2 &&  *s1 != EOF) {
+		if (*s1  == '\n' || *s1 == '\r') {
+			if (!is_leading_wsp) {
+				is_leading_wsp = 1;
+				*(++s1) = fgetc(f);
+			} else {
+				ungetc(*s1,f);
+				s1--;
+				break;
+			}
+		}
+		else if (is_leading_wsp) {
+			if (*s1 == ' ' || *s1 == '\t') {
+				*(s1-1) = ' '; /* convert newline to space */
+				/* remove leading wsp in continuation header lines */
+				do {
+					*s1 = fgetc(f);
+				} while (*s1 != EOF && (*s1 == '\t' || *s1== ' '));
+				is_leading_wsp = 0;
+				continue;
+			} else {
+				ungetc(*s1,f);
+				s1--;
+				break;
+			}
+		} else
+			*(++s1) = fgetc(f);
+	}
+
+	if (*s1 == EOF)
+		s1--;
+
+	*(++s1) = '\0';
+
+	if (s1 == s)
+		return NULL;
+	else 
+		return s;
 }
 
 /* end of read.c */

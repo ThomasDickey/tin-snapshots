@@ -44,11 +44,6 @@
 
 char found_newsgroups[HEADER_LEN];
 
-t_bool reread_active_for_posted_arts = TRUE;
-t_bool unlink_article = TRUE;
-t_bool keep_dead_articles = TRUE;
-t_bool keep_posted_articles = TRUE;
-
 struct t_posted *posted;
 
 struct msg_header {
@@ -995,11 +990,8 @@ post_article_done:
 		update_active_after_posting (group);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-
-#if 0 /* this sucks! (urs) */
-			quick_filter_select_posted_art (psGrp, subj);
-#endif
-
+			if (add_posted_to_filter)
+				quick_filter_select_posted_art (psGrp, subj);
 			update_posted_info_file (group, 'w', subj);
 		} else
 			subj[0] = '\0';
@@ -1091,11 +1083,6 @@ post_existing_article_loop:
 
 				backup_article(article);
 
-				if(!strchr(group, ','))
-					psGrp=psGrpFind(group);
-				else
-					psGrp=NULL;
-
 				if (submit_news_file (article)) {
 					unlink(backup_article_name(article));
 					Raw(FALSE);
@@ -1142,11 +1129,9 @@ post_article_done:
 		    * crossposted postponed articles, since we don't
 		    * know in which group the article was actually in
 		    */
-#if 0 /* this sucks! (urs) */
-			if (!strchr(group, ',') && (psGrp=psGrpFind(group)))
+			if (add_posted_to_filter && !strchr(group, ',') && 
+			  (psGrp=psGrpFind(group)))
 				quick_filter_select_posted_art (psGrp, subj);
-#endif
-
 			update_posted_info_file (group, strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
 		} else
 			subj[0] = '\0';
@@ -1329,6 +1314,7 @@ pickup_postponed_articles(
 		return FALSE;
 	}
 
+	/* FIXME - move to lang.c */
 	sprintf(question, "do you want to see postponed articles (%d)? ", count);
 
 	if (ask && prompt_yn(cLINES, question, TRUE) != 1)
@@ -1561,15 +1547,15 @@ post_article_loop:
 						rename(backup_article_name(article), article);
 						ch = iKeyPostEdit;
 						goto post_article_loop;
-				  	} else {
-					    unlink(backup_article_name(article));
-					    rename_file (article, dead_article);
+					} else {
+						unlink(backup_article_name(article));
+						rename_file (article, dead_article);
 #ifdef M_UNIX
-					    if (keep_dead_articles)
-					      append_file (dead_articles, dead_article);
+						if (keep_dead_articles)
+							append_file (dead_articles, dead_article);
 #endif
-	 				    info_message (txt_art_rejected, dead_article);
-					    ReadCh ();
+						info_message (txt_art_rejected, dead_article);
+						ReadCh ();
 					}
 				 	return redraw_screen;
 				}
@@ -1590,9 +1576,8 @@ post_article_done:
 		}
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
 
-#if 0 /* this sucks! (urs) */
-			quick_filter_select_posted_art (psGrp, subj);
-#endif
+			if (add_posted_to_filter) 
+				quick_filter_select_posted_art (psGrp, subj);
 
 			update_posted_info_file (group, 'w', subj);
 		}
@@ -3241,9 +3226,9 @@ repost_article_loop:
 			case iKeyPostPost:
 			case iKeyPostPost2:
 				if (Superseding)
-					wait_message (2, txt_superseding_art);
+					wait_message (0, txt_superseding_art);
 				else
-					wait_message (2, txt_repost_an_article);
+					wait_message (0, txt_repost_an_article);
 
 				backup_article(article);
 
@@ -3544,8 +3529,7 @@ find_reply_to_addr (
 	orig_offset = ftell (note_fp);
 	fseek (note_fp, 0L, SEEK_SET);
 
-	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 &&
-	       !found && buf[0] != '\n') {
+	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 && !found && buf[0] != '\n') {
 		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (from_both, &buf[10]);
 			ptr = strchr (from_both, '\n');

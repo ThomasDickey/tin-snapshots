@@ -179,6 +179,7 @@ constext txt_group_selection[] = "Group Selection";
 	constext txt_help_X[] = "X\t  toggle display of all/selected articles" cCRLF;
 #endif
 constext txt_help_a[] = "a A\t  display article by author string forward (A = backward) search" cCRLF;
+constext txt_help_add_posted_to_filter[] = "Add subject of posted articles to filter. <SPACE> toggles & <CR> sets.";
 constext txt_help_alternative_handling[] = "Do you want to enable automatic handling of multipart/alternative articles?";
 constext txt_help_art_marked_deleted[] = "Enter character to indicate deleted articles. <CR> sets, <ESC> cancels.";
 constext txt_help_art_marked_inrange[] = "Enter character to indicate articles in range. <CR> sets, <ESC> cancels.";
@@ -363,6 +364,7 @@ constext txt_help_signature_repost[] = "Add signature when reposting articles. <
 constext txt_help_sigfile[] = "Enter path/! command/--none to create your default signature. <CR> sets.";
 constext txt_help_sort_art_type[] = "Sort articles by Subject, From, Date or Score. <SPACE> toggles & <CR> sets.";
 constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_pgdn_goto_next[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_start_editor_offset[] = "Start editor with line offset. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_blanks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_bogus[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -504,6 +506,7 @@ constext txt_not_exist[] = "Newsgroup does not exist on this server";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_nrctbl_create[] = "c)reate it, use a)lternative name, use d)efault .newsrc, q)uit tin: ";
 constext txt_nrctbl_default[] = "use a)lternative name, use d)efault .newsrc, q)uit tin: ";
+constext txt_opt_add_posted_to_filter[] = "Add posted articles to filter      : ";
 constext txt_opt_alternative_handling[] = "Skip multipart/alternative parts   : ";
 constext txt_opt_art_marked_deleted[] = "Character to show deleted articles : ";
 constext txt_opt_art_marked_inrange[] = "Character to show inrange articles : ";
@@ -598,6 +601,7 @@ constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
 constext txt_opt_sigfile[] = "Create signature from path/command : ";
 constext txt_opt_sort_art_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
+constext txt_opt_pgdn_goto_next[] = "PgDn goes to next artice at EOF    : ";
 constext txt_opt_start_editor_offset[] = "Start editor with line offset      : ";
 constext txt_opt_strip_blanks[] = "Strip blanks of end of lines       : ";
 constext txt_opt_strip_bogus[] = "Remove bogus groups from newsrc    : ";
@@ -642,6 +646,7 @@ constext txt_out_of_memory[] = "%s: memory exhausted trying to allocate %d bytes
 constext txt_plural[] = "s";
 constext txt_screen_too_small[] = "%s: screen is too small\n";
 constext txt_screen_too_small_exiting[] = "screen is too small, tin is exiting\n";
+constext txt_tinrc_add_posted_to_filter[] = "# If ON add posted articles to filter for highlighting follow-ups\n";
 constext txt_tinrc_alternative_handling[] = "# If ON strip multipart/alternative messages automatically\n";
 constext txt_tinrc_art_marked_deleted[] = "# character used to show that an art was deleted (default 'D')\n";
 constext txt_tinrc_art_marked_inrange[] = "# character used to show that an art is in a range (default '#')\n";
@@ -827,6 +832,8 @@ constext txt_tinrc_sort_article_type[] = "# sort articles by 0=(nothing) 1=(Subj
 # 7=(Score descend) 8=(Score ascend).\n";
 constext txt_tinrc_space_goto_next_unread[] = "# if ON the SPACE command will goto next unread article at article viewer\n\
 # level when the end of the article is reached (rn-style pager)\n";
+constext txt_tinrc_pgdn_goto_next[] = "# if ON the PGDN or DOWN command will goto next article when pressed\n\
+# at end of message\n";
 constext txt_tinrc_start_editor_offset[] = "# if ON editor will be started with cursor offset into the file\n\
 # otherwise the cursor will be positioned at the first line\n";
 constext txt_tinrc_strip_blanks[] = "# If ON strip blanks from end of lines to speedup display on slow terminals\n";
@@ -888,8 +895,8 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 
 #ifdef HAVE_COLOR
 	/*
- 	* Which colors can be used.
- 	*/
+	 * Which colors can be used.
+	 */
 	constext *txt_colors[] = {
 	txt_default,
 	"Black",      "Red",        "Green",       "Brown",
@@ -898,8 +905,8 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 	"Light Blue", "Light Pink", "Light Cyan",  "Light White" };
 
 	/*
- 	* Which mark types can be used.
- 	*/
+	 * Which mark types can be used.
+	 */
 	constext *txt_marks[] = { "Nothing", "Mark", "Space" };
 #endif
 
@@ -1000,7 +1007,6 @@ constext txt_quit_no_write[] = "Do you really want to quit without saving your c
 #	endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */
 constext txt_quit_edit_postpone[] = "q)uit, e)dit, p(o)stpone: ";
-
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
 constext txt_quoted_printable[] = "quoted-printable";
@@ -1131,7 +1137,6 @@ constext txt_warn_cancel[] = "Read carefully!\n\n\
   You are about to cancel an article seemingly written by you.  This will\n\
   wipe the article from most news servers throughout the world, but there is\n\
   no guarantee that it will work.\n\nThis is the article you are about to cancel:\n\n";
-
 constext txt_all_groups[] = "All groups";
 constext txt_filter_text_type[] = "Apply pattern to    : ";
 constext txt_from_line_only[] = "From: line (ignore case)        ";

@@ -583,7 +583,7 @@ feed_articles (
 								num_of_selected_arts--;
 							}
 						}
-	 					art_close ();
+						art_close ();
 					}
 				}
 			}

@@ -53,6 +53,9 @@
 
 #include	<signal.h>
 
+/* Philip Hazel's Perl regular expressions library */
+#include 	<pcre.h>
+
 #ifdef VMS
 #	ifdef __DECC
 #		include	<unixio.h>
@@ -679,8 +682,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #endif
 
 /* safe strcpy into fixed-legth buffer */
-#define STRCPY(dst, src) \
-       (dst[sizeof(dst) - 1] = 0, strncpy(dst, src, sizeof(dst) -1))
+#define STRCPY(dst, src)	(dst[sizeof(dst) - 1] = 0, strncpy(dst, src, sizeof(dst) -1))
 
 #define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
@@ -792,12 +794,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	GROUP_MATCH(s1, pat, case)		(wildmat (s1, pat, case))
 
-#if defined(HAVE_REGEX_H_FUNCS) || defined(HAVE_REGEXP_H_FUNCS) || defined(HAVE_REGEXPR_H_FUNCS)
-#	define	HAVE_REGEX_FUNCS
-#	define	REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
-#else
-#	define	REGEX_MATCH(s1, pat, case)	(wildmat (s1, pat, case))
-#endif
+#define	REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
 
 #define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
@@ -1533,9 +1530,9 @@ struct t_option {
 
 typedef struct _TIMEINFO
 {
-    time_t	time;
-    long	usec;
-    long	tzone;
+	time_t	time;
+	long	usec;
+	long	tzone;
 } TIMEINFO;
 
 #if 0		/* Does anyone know what this was going to do ? */

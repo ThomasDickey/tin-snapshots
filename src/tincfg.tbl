@@ -25,6 +25,7 @@
 	show_only_unread_groups		OPT_ON_OFF
 	tab_goto_next_unread		OPT_ON_OFF
 	space_goto_next_unread		OPT_ON_OFF
+	pgdn_goto_next			OPT_ON_OFF
 	tab_after_X_selection		OPT_ON_OFF
 	full_page_scroll		OPT_ON_OFF
 	show_last_line_prev_page	OPT_ON_OFF
@@ -50,6 +51,7 @@
 	show_lines			OPT_ON_OFF
 	unlink_article			OPT_ON_OFF
 	keep_posted_articles		OPT_ON_OFF
+	add_posted_to_filter		OPT_ON_OFF
 #ifdef	M_UNIX
 	keep_dead_articles		OPT_ON_OFF
 #endif
@@ -123,7 +125,5 @@
 	alternative_handling		OPT_ON_OFF
 	strip_newsrc			OPT_ON_OFF
 	strip_bogus			txt_strip_bogus BOGUS_ASK+1
-#ifdef	HAVE_REGEX_FUNCS
 	wildcard			txt_wildcard	2
-#endif
 	cache_overview_files		OPT_ON_OFF
