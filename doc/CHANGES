@@ -1,3 +1,17 @@
+--unoff BETA release 970409 --
+
+373) Jason Faultless <jason@radar.demon.co.uk>
+     FIX. screenredraw, cursor position after removing bogus newsgroups
+     FIX. tin.1, newsrc.c, select.c
+
+372) Billy Y. <billy@mix.com>
+     ADD. use gettimeofday with -DPROFILE if available
+     FIX. stpwatch.h
+
+371) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor logic change of signature parsing.
+     FIX. post.c, lang.c, tin.1
+
 --unoff BETA release 970406 --
 
 370) Dirk Nimmich <nimmich@uni-muenster.de>

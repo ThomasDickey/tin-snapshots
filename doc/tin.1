@@ -73,6 +73,9 @@ only).
 use the specified file of subscribed to newsgroups in place of
 \fI$HOME/.newsrc\fP.
 .TP
+.BI -g " server"
+use the in \fI$HOME/.tin/newsrctable\fP specified server and newsrc.
+.TP
 .B -h
 help listing all command line options.
 .TP
@@ -93,16 +96,12 @@ information read section Automatic Mailing and Saving New News.
 .BI -n
 Only load groups from the active file that are subscribed to in the
 user's \fI.newsrc\fP.  This allows a noticeable speedup when connecting
-via a slow line.
+via a slow line, but \fItin\fP cannot tell which groups are moderated.
 .TP
 .BI -q
 quick start without checking for new newsgroups.
 .sp
-Combine \fB-n\fR and \fB-q\fR for best speedup when only reading (not posting).
-In this case,
-\fItin\fP will use the contents of \fI$HOME/.newsrc\fP to obtain the list of
-newsgroups rather than asking the server.
-This is fast, but \fItin\fP cannot tell which groups are moderated.
+Combine \fB-n\fR and \fB-q\fR for best speedup.
 .TP
 .BI -P
 purge group index files of articles that no longer exist.
@@ -117,7 +116,7 @@ environment variable NNTPSERVER or contained in the file
 \fI/etc/nntpserver\fP.
 .TP
 .B -R
-read news saved by the -S option (not yet implemented).
+read news saved by the -S option.
 .TP
 .BI -s " dir"
 save articles to directory.  Default is \fI$HOME/News\fP.
@@ -185,9 +184,9 @@ can be matched.
 If your news server supports NOV index files (most modern installations will),
 then this section can be ignored.
 .PP
-If your news server doesn't support NOV index files, \fItin\fP tin will
-maintain an index for each newsgroup. There are a number of methods in which
-index files can be created and updated.
+If your news server doesn't support NOV index files, \fItin\fP will maintain
+an index for each newsgroup. There are a number of methods in which index
+files can be created and updated.
 .PP
 The simplest method is that each user creates/updates his/her own index files
 that are stored in \fI$HOME/.tin/.news\fP. This has the advantage that any 
@@ -242,30 +241,29 @@ readings of a group will cause incremental updating of the index file.
 If reading news remotely and updating index files locally, operation will be
 somewhat slower because the articles must be retrieved from the NNTP server.
 .SH "NEWS ADMINISTRATION"
-Maintaining Netnews on large networks of machines can be a pretty time 
-consuming job as I discovered when I was given the job of maintaining our 
+Maintaining Netnews on large networks of machines can be a pretty time
+consuming job as I discovered when I was given the job of maintaining our
 news system and news users.
 .PP
 \fITin\fP is a News User Agent and so most of the users were always asking
 questions or doing things that could be frowned upon by their departments.
 To relieve news admins (and especially me) some features have been added.
 .PP
-When a user starts \fItin\fP it is possible to inform them of any important 
-changes/information concerning the news system by displaying a message of the 
-day (motd) file. The motd file should be created in your news lib directory 
-(i.e., \fI/usr/lib/news/motd\fP) and should have file permissions set to 0644. 
+When a user starts \fItin\fP it is possible to inform them of any important
+changes/information concerning the news system by displaying a message of the
+day (motd) file. The motd file should be created in your news lib directory
+(i.e., \fI/usr/lib/news/motd\fP) and should have file permissions set to 0644.
 The motd file will only be displayed if its contents is newer than the last
 time the user started \fItin\fP. If reading news via NNTP my XMOTD patch will
 have to have been applied to your NNTP server.
 .PP
-A user starting \fItin\fP for the first time can be automatically subscribed 
-to a list of newsgroups that are deemed appropriate by the news administrator.  
-At our site the subscriptions file has 125 groups (our active file contains
-over 400 groups with many only being marginally interesting to most people).
+A user starting \fItin\fP for the first time can be automatically subscribed
+to a list of newsgroups that are deemed appropriate by the news administrator.
 The subscriptions file should be created in your news lib directory (i.e.,
-\fI/usr/lib/news/subscriptions\fP) and should have file permissions set to 
-0644. If reading news via NNTP my LIST SUBSCRIPTIONS patch will have to 
-have been applied to your NNTP server.
+\fI$NEWSLIBDIR/subscriptions\fP) and should have file permissions
+set to 0644. If you read news via NNTP, then your news server must support
+the LIST SUBSCRIPTIONS command. It is part of the Common NNTP Extensions and
+all modern servers should understand it.
 .PP
 .SH "SCREEN FORMAT"
 \fITin\fP has four separate levels of operation: Group selection level, 
@@ -273,8 +271,8 @@ Group level, Thread level and Article level.
 .PP
 At the Group Selection level the title displays (the name of the newsserver
 and) the number of subscribed groups (containing new unread articles).  The
-newsgroups are displayed in the middle of the screen with the
-number of unread articles displayed on the same line in front.
+newsgroups are displayed in the middle of the screen with the number of
+unread articles displayed on the same line in front.
 .PP
 .TS
 expand tab (#);
@@ -305,14 +303,19 @@ unsubscribe from it in the normal way. This flag will only appear if
 you have set strip_bogus=Ask in the Options Menu.
 .PP
 At the Group level the title contains the name of the group, the number
-of conversation threads and total number of articles i.e., alt.sources (7 23).
-If the group has been setup not to thread articles (i.e., alt.sources
-is in \fI$(HOME)/.tin/unthread\fP) the title will be alt.sources (U 23).
+of conversation threads, the threading-method, the total number of articles,
+the number of killed articles and the number of hot articles. i.e.,
+alt.sources (5T(B) 23A 0K 0H).
+If the group has been setup not to thread articles the title will be
+alt.sources (23U 0K 0H).
+It might also contain an R if your are in 'show_only_unread' mode and an M
+if the group is moderated. (The later does not work with the \fB-n\fR
+command-line switch!).
 .PP
 .TS
 expand tab (#);
 rB lB l lB l lB l lB .
-1#  + 2# #18#  #Bnews sources?#  #iain@scn.de
+1#  + 2# #18#  #Bnews sources?#  #iain@ecrc.de
 2#  + 17##1275##Plese Help! I Have A Problem!##dau@lus.er
 .TE
 .PP
@@ -436,6 +439,9 @@ Help screen of newsgroup selection commands.
 \fBH\fP
 Toggle the display of help mini menu at the bottom of the screen.
 .TP
+\fBi\fP
+Show description of the current newsgroup at the last line.
+.TP
 \fBI\fP
 Toggle inverse video.
 .TP
@@ -455,10 +461,10 @@ entering '$' the group will be the last group displayed.
 User configurable options menu (for more information see section Options Menu).
 .TP
 \fBq\fP
-Quit \fItin\fP.
+Quit \fItin\fP - ask the user to confirm if confirm_to_quit=ON.
 .TP
 \fBQ\fP
-Quit \fItin\fP.
+Quit \fItin\fP - don't ask the user to confirm.
 .TP
 \fBr\fP
 Toggle display of all subscribed to groups and just the subscribed to groups 
@@ -490,6 +496,9 @@ Post an article to current group.
 \fBW\fP
 List articles posted by user.  The date posted, the newsgroup and the
 subject are listed.
+.TP
+\fBX\fP
+Quit \fItin\fP without saving (changed) configuration.
 .TP
 \fBy\fP
 The first time this command is called it will yank in all groups from
@@ -573,6 +582,9 @@ Help screen of group index commands.
 .TP
 \fBH\fP
 Toggle the display of help mini menu at the bottom of the screen.
+.TP
+\fBi\fP
+Display the subject of the first article in the current thread in the last line.
 .TP
 \fBI\fP
 Toggle inverse video.
@@ -849,6 +861,9 @@ Help screen of article page commands.
 \fBH\fP
 Toggle the display of help mini menu at the bottom of the screen.
 .TP
+\fBi\fP
+Display the subject of the current article in the last line.
+.TP
 \fBI\fP
 Toggle inverse video.
 .TP
@@ -1079,8 +1094,8 @@ The printer program with options that is to be used to print
 articles.  Default is lpr for BSD machines and lp for SysV machines.
 .SH "TINRC CONFIGURABLE VARIABLES"
 The following variables are user configurable by editing \fI$HOME/.tin/tinrc\fP
-directly. It is hoped to eventually provide a menu to allow the setting of the
-most common variables. 
+directly. Most of them could be set in the GLOBAL OPTIONS MENU (the listing
+above is very incomplete).
 .TP 4
 \fBart_marked_deleted\fP
 The character used to show that an article was deleted. Default is D.
@@ -1510,6 +1525,9 @@ lines of an article.  The kill description can be limited to the current
 newsgroup or it can apply to all newsgroups. Once entered the user can 
 abort the command and not save the kill description, edit the kill file 
 or save the kill description.
+WARNING: the online killfile-menu is somewhat buggy and might trash your
+killfile, it is highly recomended not to use it! The killfile synatx is esay
+to understand so you could edit it with your desired editor outside of tin. 
 .PP
 On starting \fItin\fP the user's killfile \fI$HOME/.tin/filter\fP is read
 and on entering a newsgroup any kill or select descriptions are applied.  
@@ -1579,7 +1597,7 @@ would expand when used to:
 .nf
 .ft CW
 On 21 Jul 1992 09:45:51 -0400 in alt.sources you wrote:
-In <abcINN123@scn.de>, Iain Lea (iain@scn.de) wrote:
+In <abcINN123@ecrc.de>, Iain Lea (iain@ecrc.de) wrote:
 .ft P
 .fi
 .RE
@@ -1908,7 +1926,7 @@ and paste of xterm, but after one click of any button.
 subscribed to newsgroups.
 .TP 2i
 \fI$HOME/.newsauth\fP
-``nntpserver password'' pairs for NNTP servers that require authorization.
+``nntpserver password [user]'' pairs for NNTP servers that require authorization.
 .TP 2i
 \fI$HOME/.tin/tinrc\fP
 options.
@@ -1950,6 +1968,10 @@ extra header lines to be added to each article to be posted.
 \fI$HOME/.tin/posted\fP
 history of articles posted by user.
 .TP 2i
+\fI$HOME/.tin/newsrctable\fP
+``nntpserver newsrc shortname'' pairs to use with \fB-g\fR command-line
+switch.
+.TP 2i
 \fI$HOME/.signature\fP
 signature.
 .TP 2i
@@ -1988,10 +2010,10 @@ v1.2 PL1 (patch) was posted in 8 parts to alt.sources on 14 Jul 1993.
 .br
 v1.2 PL2 (patch) was posted in 5 parts to alt.sources on 25 Sep 1993.
 .br
-v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin since April 1995.
+v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin/ since April 1995.
 .br
-v1.3-unoff-beta has been available from ftp.akk.uni-karlsruhe.de:/pub/tin/
-since March 1996.
+v1.3-unoff-beta has been available from
+ftp.akk.uni-karlsruhe.de:/pub/news/clients/tin-unoff/ since March 1996.
 
 .SH CREDITS
 .TP 1.5i
@@ -2106,4 +2128,4 @@ Thomas Ziegler
 .SH AUTHOR
 .TP 1i
 Iain Lea
-(iain@scn.de)
+(iain@ecrc.de)

@@ -1048,11 +1048,12 @@ constext txt_warn_posting_etiquette[] = "\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
 constext txt_warn_sig_too_long[] ="\n\
-  Warning: Your signature is longer then %d lines. Since signatures usualy do\n\
-  not transport any useful  information they  should be as short as  possible.\n\n";
-constext txt_warn_multiple_sigs[] ="\n  Warning: found %d '-- \\n' lines, this may confuse some people.\n";
+  Warning: Your signature is longer then %d lines.  Since signatures usualy do\n\
+  not transport any useful information  they should be as  short as possible.\n\n";
+constext txt_warn_multiple_sigs[] ="\n\
+  Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";
 constext txt_warn_wrong_sig_format[] = "\n\
-  Warning: signatures should start with '-- \\n' not with '--\\n'.\n";
+  Warning: Signatures should start with '-- \\n' not with '--\\n'.\n\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";

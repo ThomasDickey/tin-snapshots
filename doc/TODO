@@ -208,9 +208,6 @@ o  if Newsgroups:-line has groups in it which are not present in the users
    newsgroups-line (N/y)
    do the same for Followup-to:
 
-o  fix built-in inews to truncate signature > 4 lines
-   (compile-time option?)
-
 o  bring up a warning on a long newsgroup (>=5) line and
    force the user to confirm every single group he wants to post (or
    redirect followups to) in. (N/y)
@@ -297,10 +294,10 @@ o  print a message at startup if server doesn't grok XOVER
 
 o  error message when tin -uv and using xover is misleading
 
-o  man-page claims that -R does not work but it does
-
 Not yet classified
 ------------------
+o  what is with $ADD_ADDRESS?!
+
 o  what is tin -C (count articles)? - if running in batch-mode (-Z)
    -v gives a summary...
 
