@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"version.h"
 
 /*
@@ -493,7 +494,7 @@ strip_double_ngs (
 				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
 			}
 
-/*			printf("1[%d]: %s\n", ncnt1, ngroup1); */ /* debug */
+/*			my_printf("1[%d]: %s\n", ncnt1, ngroup1); */ /* debug */
 
 			over2 = FALSE;
 			ncnt2 = 0;
@@ -507,7 +508,7 @@ strip_double_ngs (
 	    		while (!over2) {
 	    			ncnt2++;
 	    			strcpy(ngroup2, cmplist);
-/*				printf("2[%d]: %s\n", ncnt2, ngroup2); */
+/*				my_printf("2[%d]: %s\n", ncnt2, ngroup2); */
 	    			ptr2 = strchr(ngroup2, ',');
 	    			if (ptr2 != (char *) 0) {
 	    				strcpy(cmplist, ptr2+1);
@@ -709,10 +710,10 @@ draw_percent_mark (
 
 	percent = cur_num * 100 / max_num;
 	sprintf (buf, "%s(%d%%) [%ld/%ld]", txt_more, percent, cur_num, max_num);
-	MoveCursor (cLINES, (cCOLS - (int) strlen (buf))-(1+BLANK_PAGE_COLS));
+	MoveCursor (cLINES-1, (cCOLS - (int) strlen (buf))-(1+BLANK_PAGE_COLS));
 	StartInverse ();
 	my_fputs (buf, stdout);
-	fflush (stdout);
+	my_flush ();
 	EndInverse ();
 }
 
@@ -1884,8 +1885,8 @@ strfpath (
 		*str = '\0';
 /*
 clear_message ();
-printf ("!!!format=[%s]  path=[%s]", startp, start);
-fflush (stdout);
+my_printf ("!!!format=[%s]  path=[%s]", startp, start);
+my_flush ();
 sleep (2);
 */
 		return (str - start);

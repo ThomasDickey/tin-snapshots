@@ -11,7 +11,7 @@ CC	= @CC@
 CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
-CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) @CPPFLAGS@
+CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) @CPPFLAGS@ # -DINDEX_DAEMON
 CFLAGS	= @CFLAGS@
 
 LD	= $(CC)
@@ -64,8 +64,6 @@ HFILES	= \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/version.h
-#	$(INCDIR)/amiga.h
-#	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/config.h
 #	$(INCDIR)/msmail.h
 #	$(INCDIR)/os_2.h
@@ -120,8 +118,6 @@ CFILES	= \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/xref.c
-#	$(SRCDIR)/amiga.c
-#	$(SRCDIR)/amigatcp.c
 #	$(SRCDIR)/msmail.c
 #	$(SRCDIR)/nntpw32.c
 #	$(SRCDIR)/win32.c
@@ -175,11 +171,10 @@ OFILES	= @ALLOCA@ \
 	$(OBJDIR)/signal.o \
 	$(OBJDIR)/strftime.o \
 	$(OBJDIR)/string.o \
+	$(OBJDIR)/tcurses.o \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/wildmat.o \
 	$(OBJDIR)/xref.o
-#	$(OBJDIR)/amiga.o
-#	$(OBJDIR)/amigatcp.o
 #	$(OBJDIR)/win32.o
 #	$(OBJDIR)/vms.o
 #	$(OBJDIR)/os_2.o
@@ -384,6 +379,7 @@ $(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(TIN_DEP)
 $(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(TIN_DEP)
 $(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(TIN_DEP)
 $(OBJDIR)/string.o:		$(SRCDIR)/string.c $(TIN_DEP)
+$(OBJDIR)/tcurses.o:		$(SRCDIR)/tcurses.c $(TIN_DEP)
 $(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(TIN_DEP)

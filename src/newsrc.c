@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 #define BITS_TO_BYTES(n)	(size_t)((n+NBITS-1)/NBITS)
 
@@ -88,7 +89,7 @@ read_newsrc (
 		fclose (fp);
 		if (cmd_line) {
 			my_fputc ('\n', stdout);
-			fflush (stdout);
+			my_flush ();
 		}
 	}
 }
@@ -671,7 +672,7 @@ pcParseSubSeq (
 
 /*
 #ifdef DEBUG_NEWSRC
-	printf ("Seq=[%s]\n", pcSeq);
+	my_printf ("Seq=[%s]\n", pcSeq);
 #endif
 */
 
@@ -745,7 +746,7 @@ pcParseGetSeq(
 	}
 /*
 #ifdef DEBUG_NEWSRC
-	printf ("Min=[%ld] Max=[%ld] Seq=[%s]\n", *plLow, *plHigh, pcSeq);
+	my_printf ("Min=[%ld] Max=[%ld] Seq=[%s]\n", *plLow, *plHigh, pcSeq);
 #endif
 */
 	return pcSeq;
@@ -1395,7 +1396,7 @@ vNewsrcTestHarness (void)
 
 	strcpy (seq, get_val ("TIN_SEQ", ""));
 
-	printf ("\nENV Min=[%ld] Max=[%ld] Rng=[%ld-%ld] Count=[%ld] Seq=[%s]\n",
+	my_printf ("\nENV Min=[%ld] Max=[%ld] Rng=[%ld-%ld] Count=[%ld] Seq=[%s]\n",
 		group.xmin, group.xmax, rng_min, rng_max, group.count, seq);
 
 	for (i=0; i < 3 ; i++) {
@@ -1408,13 +1409,13 @@ vNewsrcTestHarness (void)
 			group.newsrc.xmax = 0;
 		}
 		fp = fopen ("/tmp/NEWSRC", "w");
-		printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
+		my_printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
 
 		parse_bitmap_seq (&group, seq);
 debug_print_newsrc (&group.newsrc, stdout);
 		print_bitmap_seq (fp, &group);
 
-		printf("   PRINT Seq=[");
+		my_printf("   PRINT Seq=[");
 		print_bitmap_seq (stdout, &group);
 
 		fclose (fp);
@@ -1440,7 +1441,7 @@ debug_print_newsrc (&group.newsrc, stdout);
 	NSETBLK1(group.newsrc.xbitmap, group.newsrc.xbitlen);
 	debug_print_newsrc (&group.newsrc, stdout);
 #endif
-	printf ("\n");
+	my_printf ("\n");
 }
 
 
@@ -1457,7 +1458,7 @@ set_bitmap_range_read (
 		offset = beg - newsrc->xmin;
 		length = end - newsrc->xmin;
 
-printf ("\nRNG Min-Max=[%ld-%ld] Beg-End=[%ld-%ld] OFF=[%ld] LEN=[%ld]\n",
+my_printf ("\nRNG Min-Max=[%ld-%ld] Beg-End=[%ld-%ld] OFF=[%ld] LEN=[%ld]\n",
 newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 
 		if (beg == end) {
@@ -1481,7 +1482,7 @@ set_bitmap_range_unread (
 		offset = beg - newsrc->xmin;
 		length = end - newsrc->xmin;
 
-printf ("\nRNG Min-Max=[%ld-%ld] Beg-End=[%ld-%ld] OFF=[%ld] LEN=[%ld]\n",
+my_printf ("\nRNG Min-Max=[%ld-%ld] Beg-End=[%ld-%ld] OFF=[%ld] LEN=[%ld]\n",
 newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 
 		if (beg == end) {

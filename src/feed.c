@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 char default_mail_address[LEN];
@@ -26,8 +27,10 @@ char proc_ch_default;			/* set in change_config_file () */
 /*
 ** Local prototypes
 */
+#ifndef INDEX_DAEMON
 static int does_article_exist (int function, long artnum, char *path);
 static int print_file (char *command, int respnum, int count);
+#endif
 
 
 void
@@ -134,7 +137,7 @@ feed_articles (
 		do {
 			sprintf (msg, "%s%s%c", prompt, txt_art_thread_regex_tag, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg)-1);
+			MoveCursor (cLINES-1, (int) strlen (msg)-1);
 			if ((ch = ReadCh ()) == '\r' || ch == '\n') {
 				ch = ch_default;
 			}
@@ -295,7 +298,7 @@ feed_articles (
 						do {
 							sprintf (msg, "%s%c", txt_post_process_type, proc_ch_default);
 							wait_message (msg);
-							MoveCursor (cLINES, (int) strlen (msg)-1);
+							MoveCursor (cLINES-1, (int) strlen (msg)-1);
 							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (!strchr ("eElLnqsu\033", proc_ch));
@@ -320,7 +323,7 @@ feed_articles (
 				do {
 					sprintf (msg,txt_supersede_article, arts[respnum].subject, option_default);
 					wait_message (msg);
-					MoveCursor (cLINES, (int) (strlen (msg)-1));
+					MoveCursor (cLINES-1, (int) (strlen (msg)-1));
 					if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 						option = option_default;
 				} while (!strchr ("qrs\033", option));
@@ -604,16 +607,16 @@ feed_articles (
 	 * Now work out what (if anything) needs to be redrawn
 	 */
 	if (debug == 2) {
-		printf ("REDRAW=[%d]  ", redraw_screen);
-		fflush (stdout);
+		my_printf ("REDRAW=[%d]  ", redraw_screen);
+		my_flush ();
 	}
 
 	if (!use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
 
 	if (debug == 2) {
-		printf ("REDRAW=[%d]", redraw_screen);
-		fflush (stdout);
+		my_printf ("REDRAW=[%d]", redraw_screen);
+		my_flush ();
 		sleep (2);
 	}
 
@@ -702,6 +705,7 @@ got_sig_pipe_while_piping:
 }
 
 
+#ifndef INDEX_DAEMON
 static int
 print_file (
 	char *command,
@@ -710,19 +714,20 @@ print_file (
 {
 	FILE *fp;
 #ifdef DONT_HAVE_PIPING
-    char cmd[255],  file[255];
-    strcpy(cmd, command);
+	char cmd[255],  file[255];
+	strcpy(cmd, command);
 #endif
 
 	sprintf (msg, "%s%d", txt_printing, count);
 	wait_message (msg);
 
 #ifdef DONT_HAVE_PIPING
-    sprintf(file, TIN_PRINTFILE, respnum);
-	if ((fp = fopen(file,"w")) == (FILE *) 0) {
+	sprintf(file, TIN_PRINTFILE, respnum);
+	if ((fp = fopen(file,"w")) == (FILE *) 0)
 #else
-	if ((fp = popen (command, "w")) == (FILE *) 0) {
+	if ((fp = popen (command, "w")) == (FILE *) 0)
 #endif
+	{
 		perror_message (txt_command_failed_s, command);
 		return FALSE;
 	}
@@ -745,10 +750,10 @@ print_file (
 	copy_fp (note_fp, fp, "");
 
 #ifdef DONT_HAVE_PIPING
-    fclose(fp);
-    strcat(cmd, " ");
-    strcat(cmd, file);
-    system(cmd);
+	fclose(fp);
+	strcat(cmd, " ");
+	strcat(cmd, file);
+	system(cmd);
 	unlink(file);
 #else
 	pclose (fp);
@@ -756,6 +761,7 @@ print_file (
 
 	return (TRUE);	/* a hack that will check if file was really checked later */
 }
+#endif /* INDEX_DAEMON */
 
 /*
  * Return the single char hotkey corresponding to the post process type
@@ -778,6 +784,7 @@ get_post_proc_type (
  * gets us the elusive free lunch!
  */
 
+#ifndef INDEX_DAEMON
 static int
 does_article_exist (
 	int function,
@@ -799,3 +806,4 @@ does_article_exist (
 
 	return retcode;
 }
+#endif	/* INDEX_DAEMON */

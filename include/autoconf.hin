@@ -253,6 +253,12 @@
 #undef HAVE_TYPE_UNIONWAIT
 
 /*
+ * Define a symbol to control whether we use curses, or the termcap/terminfo
+ * interface
+ */
+#undef	USE_CURSES
+
+/*
  * Define symbols to prototype the function 'outchar()'
  */
 #undef	USE_TERMINFO
@@ -277,6 +283,7 @@
 #undef	PATH_HOSTNAME
 #undef	PATH_UNAME
 #undef	PATH_SUM
+
 /*
  * Configure also checks whether sum takes -r
  * And defines PATH_SUM_R appropriately

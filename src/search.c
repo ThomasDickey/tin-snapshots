@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 /*
  * last search patterns
@@ -180,9 +181,7 @@ search_group (
 		str_lwr (buf2, buf2);
 
 		if (strstr (buf2, buf) != 0) {
-			if (_hp_glitch) {
-				erase_group_arrow ();
-			}
+			HpGlitch(erase_group_arrow ());
 			if (i >= first_group_on_screen
 			&&  i < last_group_on_screen) {
 				clear_message ();
@@ -283,8 +282,7 @@ search_subject (
 
 found_something:
 	if (found) {
-		if (_hp_glitch)
-			erase_subject_arrow ();
+		HpGlitch(erase_subject_arrow());
 
 		if (i >= first_subj_on_screen && i < last_subj_on_screen) {
 			clear_message ();

@@ -49,8 +49,8 @@ read_mail_active_file (void)
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 /*
-printf ("Line=[%s", buf);
-fflush(stdout);
+my_printf ("Line=[%s", buf);
+my_flush();
 */
 		if (!parse_active_line (buf, &max, &min, spooldir) || *buf == '\0') {
 			continue;

@@ -219,11 +219,19 @@ found-ncurses
 				;;
 			esac
 		esac
+		AC_CHECK_LIB(gpm, Gpm_Open)
 		AC_CHECK_LIB(ncurses, trace,
 			[found_ncurses=yes],
 			[LIBS="$save_LIBS"])
 	fi
 	],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING(if you want curses, rather than termcap, interface)
+CF_ARG_ENABLE(curses,
+	[  --enable-curses         use curses interface],
+	[AC_DEFINE(USE_CURSES)])
+AC_MSG_RESULT($enableval)
+use_curses=$enableval
 
 ## debugging libraries (do this after other libraries)
 debug_malloc=none

@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970225
+PVER		= 970303
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -17,8 +17,6 @@ SRCDIR	= ./src
 AMGDIR	= ./amiga
 
 HFILES	= \
-	$(INCDIR)/amiga.h \
-	$(INCDIR)/amigatcp.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
@@ -27,6 +25,7 @@ HFILES	= \
 	$(INCDIR)/os_2.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
+	$(INCDIR)/tcurses.h \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/version.h \
 	$(INCDIR)/win32.h \
@@ -35,8 +34,6 @@ HFILES	= \
 CFILES	= \
 	$(SRCDIR)/active.c \
 	$(SRCDIR)/actived.c \
-	$(SRCDIR)/amiga.c \
-	$(SRCDIR)/amigatcp.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/charset.c \
@@ -85,6 +82,7 @@ CFILES	= \
 	$(SRCDIR)/signal.c \
 	$(SRCDIR)/strftime.c \
 	$(SRCDIR)/string.c \
+	$(SRCDIR)/tcurses.c \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/win32.c \
@@ -96,21 +94,25 @@ AMIGA	=\
 	$(AMGDIR)/README \
 	$(AMGDIR)/smakefile \
 	$(AMGDIR)/actived.c \
+	$(AMGDIR)/amiga.c \
+	$(AMGDIR)/amigatcp.c \
+	$(AMGDIR)/amiga.h \
+	$(AMGDIR)/amigatcp.h
 
 DOC	= \
+	$(DOCDIR)/CHANGES \
 	$(DOCDIR)/DEBUG_REFS \
+	$(DOCDIR)/INSTALL \
+	$(DOCDIR)/TODO \
+	$(DOCDIR)/WHATSNEW \
 	$(DOCDIR)/auth.txt \
 	$(DOCDIR)/hashing.doc \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
 TOP	= \
-	$(TOPDIR)/CHANGES \
-	$(TOPDIR)/TODO \
 	$(TOPDIR)/Makefile \
-	$(TOPDIR)/INSTALL \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
-	$(TOPDIR)/WHATSNEW \
 	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
 	$(TOPDIR)/configure \
@@ -212,7 +214,22 @@ tar:
 	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
 	@$(LS) $(PROJECT)$(VER).tgz
 
+#
+# I know it's ugly, but it works
+#
+name:
+	@DATE=`date +%y%m%d`;  if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
+	mv ../`basename \`pwd\`` ../tin-$$DATE ; \
+	sed "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./Makefile > ./Makefile.tmp \
+	&& mv ./Makefile.tmp ./Makefile ; \
+	sed "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp \
+	&& mv $(INCDIR)/version.h.tmp $(INCDIR)/version.h ; \
+	sed "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./makefile.in > ./makefile.in.tmp \
+	&& mv ./makefile.in.tmp ./makefile.in ; \
+	fi
+
 dist:
+	@$(MAKE) name
 	@$(MAKE) configure
 	@$(MAKE) manifest
 	@$(MAKE) chmod

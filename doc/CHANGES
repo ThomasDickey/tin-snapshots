@@ -1,3 +1,24 @@
+--unoff BETA release 970303 --
+
+329) T.E.Dickey <dickey@clark.net>
+     ADD. support configuration with termcap/terminfo vs curses
+          implements color support from the curses library.
+     ADD. minor code cleanup (INDEX_DAEMON ifdef's, a nit for SunOS's fileno)
+     FIX. several supplied patches
+
+328) Andy Gabor <ajgabor@ucdavis.edu>
+     BUG. typo in manpage
+     FIX. tin.1
+
+327) Volker Barthelmann <volker@vb.franken.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. minor code cleanup
+     FIX. several patches
+
+326) Tan Kwee Chuan <tankweec@iscs.nus.sg>
+     BUG. typo
+     FIX. lang.c
+
 --unoff BETA release 970225 --
 
 325) Urs Janssen <urs@akk.uni-karlsruhe.de>

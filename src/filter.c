@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 #define IS_READ(i)		(arts[i].status == ART_READ)
@@ -50,7 +51,10 @@ static int iAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struc
 static int unfilter_articles (void);
 static int set_filter_scope (struct t_group *group);
 static void vWriteFilterFile (char *pcFile);
+
+#ifndef INDEX_DAEMON
 static void vWriteFilterArray (FILE *fp, int global, struct t_filters *ptr, long theTime);
+#endif
 
 
 struct t_filter *
@@ -75,6 +79,7 @@ psExpandFilterArray (
 }
 
 
+#ifndef INDEX_DAEMON
 static void
 vSetFilter (
 	struct t_filter *psFilter)
@@ -96,6 +101,7 @@ vSetFilter (
 		psFilter->time = 0L;
 	}
 }
+#endif /* INDEX_DAEMON */
 
 
 static void
@@ -233,16 +239,16 @@ read_filter_file (
 		case 'g':
 			if (match_string (buf, "group=", group, sizeof (group))) {
 if (debug) {
-	printf ("group=[%s]\n", group);
-	fflush (stdout);
+	my_printf ("group=[%s]\n", group);
+	my_flush ();
 }
 				psGrp = psGrpFind (group);
 				if (psGrp != (struct t_group *) 0) {	/* switch to group filter */
 					global = FALSE;
 					if (psGrp->grps_filter == (struct t_filters *) 0) {
 if (debug) {
-	printf ("Allocating grp_filter for group=[%s]\n", psGrp->name);
-	fflush (stdout);
+	my_printf ("Allocating grp_filter for group=[%s]\n", psGrp->name);
+	my_flush ();
 }
 						psGrp->grps_filter =
 							(struct t_filters *) my_malloc (sizeof (struct t_filters));
@@ -287,8 +293,8 @@ if (debug) {
 		case 's':
 			if (match_string (buf, "scope=", scope, sizeof (scope))) {
 if (debug) {
-	printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
-	fflush (stdout);
+	my_printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
+	my_flush ();
 }
 				global = TRUE;
 				arr_num = &glob_filter.num;
@@ -322,11 +328,11 @@ if (debug) {
 				}
 if (debug) {
 	if (global) {
-		printf ("6. buf=[%s]  Gsubj=[%s]\n", arr_ptr[i].subj, glob_filter.filter[i].subj);
-		fflush (stdout);
+		my_printf ("6. buf=[%s]  Gsubj=[%s]\n", arr_ptr[i].subj, glob_filter.filter[i].subj);
+		my_flush ();
 	} else {
-		printf ("6. buf=[%s]  Lsubj=[%s]\n", arr_ptr[i].subj, psGrp->grps_filter->filter[i].subj);
-		fflush (stdout);
+		my_printf ("6. buf=[%s]  Lsubj=[%s]\n", arr_ptr[i].subj, psGrp->grps_filter->filter[i].subj);
+		my_flush ();
 	}
 }
 				break;
@@ -335,8 +341,8 @@ if (debug) {
 		case 't':
 			if (match_integer (buf, "type=", &type, 1)) {
 if (debug) {
-	printf ("type=[%d][%s]\n", type, (type == 0 ? "KILL" : "SELECT"));
-	fflush (stdout);
+	my_printf ("type=[%d][%s]\n", type, (type == 0 ? "KILL" : "SELECT"));
+	my_flush ();
 }
 				if (psGrp && !global) {
 					arr_num = &psGrp->grps_filter->num;
@@ -351,8 +357,8 @@ if (debug) {
 					vSetFilter (&arr_ptr[i]);
 					expired_time = FALSE;
 if (debug) {
-	printf ("grp_filter num=[%d] max=[%d]\n", *arr_num, *arr_max);
-	fflush (stdout);
+	my_printf ("grp_filter num=[%d] max=[%d]\n", *arr_num, *arr_max);
+	my_flush ();
 }
 					subj[0] = '\0';
 					from[0] = '\0';
@@ -370,8 +376,8 @@ if (debug) {
 					arr_ptr[i].time = secs;
 					if (secs && current_secs > secs) {
 if (debug) {
-	printf ("EXPIRED  secs=[%ld]  current_secs=[%ld]\n", secs, current_secs);
-	fflush (stdout);
+	my_printf ("EXPIRED  secs=[%ld]  current_secs=[%ld]\n", secs, current_secs);
+	my_flush ();
 }
 						(*arr_num)--;
 						expired_time = TRUE;
@@ -501,8 +507,8 @@ vWriteFilterFile (
 		psFilter = active[i].grps_filter;
 		if (psFilter != (struct t_filters *) 0 && psFilter->num) {
 /*
-printf ("Group=[%s]\r\n", active[i].name);
-fflush (stdout);
+my_printf ("Group=[%s]" cCRLF, active[i].name);
+my_flush ();
 */
 			fprintf (hFp, "\ngroup=%s\n", active[i].name);
 			vWriteFilterArray (hFp, FALSE, psFilter, lCurTime);
@@ -530,6 +536,7 @@ subj=*xv*
 should work - but didn't with changing order of filterfile
 */
 
+#ifndef INDEX_DAEMON
 static void
 vWriteFilterArray (
 	FILE *fp,
@@ -546,7 +553,7 @@ vWriteFilterArray (
 
 	for (i = 0 ; i < ptr->num ; i++) {
 
-/* printf ("WRITE i=[%d] subj=[%s] from=[%s]\n", i, (ptr->filter[i].subj ? ptr->filter[i].subj : ""), (ptr->filter[i].from ? ptr->filter[i].from : "")); */
+/* my_printf ("WRITE i=[%d] subj=[%s] from=[%s]\n", i, (ptr->filter[i].subj ? ptr->filter[i].subj : ""), (ptr->filter[i].from ? ptr->filter[i].from : "")); */
 
 		if (theTime && ptr->filter[i].time) {
 			if (theTime > ptr->filter[i].time) {
@@ -556,16 +563,16 @@ vWriteFilterArray (
 
 		if (global) {
 /*
-printf ("Scope=[%s]\r\n",
+my_printf ("Scope=[%s]" cCRLF,
 (ptr->filter[i].scope != (char *) 0 ? ptr->filter[i].scope : "*"));
-fflush (stdout);
+my_flush ();
 */
 				fprintf (fp, "scope=%s\n",
 					(ptr->filter[i].scope != (char *) 0 ? ptr->filter[i].scope : "*"));
 			}
 /*
-printf ("PtrType=[%d] FilType=[%d]\r\n", ptr->filter[i].type, write_filter_type);
-fflush (stdout);
+my_printf ("PtrType=[%d] FilType=[%d]" cCRLF, ptr->filter[i].type, write_filter_type);
+my_flush ();
 */
 			fprintf (fp, "type=%d\n", ptr->filter[i].type);
 			fprintf (fp, "case=%d\n", ptr->filter[i].icase);
@@ -611,6 +618,7 @@ fflush (stdout);
 
 	fflush (fp);
 }
+#endif /* INDEX_DAEMON */
 
 
 static int
@@ -646,7 +654,7 @@ get_choice (
 	do {
 		MoveCursor(x, (int) strlen (prompt));
 		my_fputs (argv[i], stdout);
-		fflush (stdout);
+		my_flush ();
 		CleartoEOLN ();
 		if ((ch = ReadCh ()) != ' ')
 			continue;
@@ -764,15 +772,15 @@ filter_menu (
 	center_line (0, TRUE, ptr_filter_menu);
 
 	MoveCursor (INDEX_TOP, 0);
-	printf ("%s\r\n\r\n", ptr_filter_text);
-	printf ("%s\r\n\r\n\r\n", txt_filter_text_type);
-	printf ("%s\r\n\r\n", text_subj);
-	printf ("%s\r\n\r\n", text_from);
-	printf ("%s\r\n\r\n\r\n", text_msgid);
-	printf ("%s\r\n\r\n", ptr_filter_lines);
-	printf ("%s\r\n\r\n\r\n", ptr_filter_time);
-	printf ("%s%s", ptr_filter_scope, group->name);
-	fflush (stdout);
+	my_printf ("%s" cCRLF cCRLF, ptr_filter_text);
+	my_printf ("%s" cCRLF cCRLF cCRLF, txt_filter_text_type);
+	my_printf ("%s" cCRLF cCRLF, text_subj);
+	my_printf ("%s" cCRLF cCRLF, text_from);
+	my_printf ("%s" cCRLF cCRLF cCRLF, text_msgid);
+	my_printf ("%s" cCRLF cCRLF, ptr_filter_lines);
+	my_printf ("%s" cCRLF cCRLF cCRLF, ptr_filter_time);
+	my_printf ("%s%s", ptr_filter_scope, group->name);
+	my_flush ();
 
 	show_menu_help (txt_help_filter_text);
 
@@ -942,7 +950,7 @@ filter_menu (
 		do {
 			sprintf (msg, "%s%c", ptr_filter_quit_edit_save, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (ptr_filter_quit_edit_save));
+			MoveCursor (cLINES-1, (int) strlen (ptr_filter_quit_edit_save));
 			if ((ch = ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (!strchr ("eqs\033", ch));
@@ -1400,7 +1408,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-/*printf ("1. subj=[%s] filter=[%s]\n", arts[i].subject, ptr[j].subj);
+/*my_printf ("1. subj=[%s] filter=[%s]\n", arts[i].subject, ptr[j].subj);
 */
 					if (ptr[j].icase) {
 						str_lwr (arts[i].subject, acStr);
@@ -1408,7 +1416,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					} else {
 						pcPtr = arts[i].subject;
 					}
-/*printf ("2. case=[%d] subj=[%s] filter=[%s]\n", ptr[j].icase, pcPtr, ptr[j].subj);
+/*my_printf ("2. case=[%d] subj=[%s] filter=[%s]\n", ptr[j].icase, pcPtr, ptr[j].subj);
 */
 					if (STR_MATCH (pcPtr, ptr[j].subj)) {
 						SET_FILTER(group, i, j);
@@ -1423,7 +1431,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					} else {
 						strcpy (buf, arts[i].from);
 					}
-/* 	printf ("from=[%s] filter=[%s]\n", buf, ptr[j].from);
+/* 	my_printf ("from=[%s] filter=[%s]\n", buf, ptr[j].from);
 */
 					if (ptr[j].icase) {
 						str_lwr (buf, acStr);
@@ -1445,7 +1453,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					struct t_article *art = &arts[i];
 					char *refs;
 
-/*printf ("msgid=[%s] filter=[%s]\n", MSGID(art), ptr[j].msgid); */
+/*my_printf ("msgid=[%s] filter=[%s]\n", MSGID(art), ptr[j].msgid); */
 
 					if (STR_MATCH (REFS(art, refs), ptr[j].msgid) ||
 					    STR_MATCH (MSGID(art), ptr[j].msgid)) {

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 #include	"extern.h"
 #include	"menukeys.h"
 
@@ -139,9 +140,9 @@ prompt_yn (
 
 		MoveCursor (line, 0);
 		CleartoEOLN ();
-		printf ("%s%c", prompt, prompt_ch);
+		my_printf ("%s%c", prompt, prompt_ch);
 		cursoron ();
-		fflush (stdout);
+		my_flush ();
 		MoveCursor (line, (int) strlen (prompt));
 
 		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
@@ -192,7 +193,7 @@ prompt_yn (
 		}
 	}
 	cursoroff ();
-	fflush (stdout);
+	my_flush ();
 
 	set_alarm_clock_on ();
 
@@ -218,9 +219,9 @@ prompt_yn2 (
 
 	MoveCursor (line, 0);
 	CleartoEOLN ();
-	printf ("%s%c", prompt, prompt_ch);
+	my_printf ("%s%c", prompt, prompt_ch);
 	cursoron ();
-	fflush (stdout);
+	my_flush ();
 	MoveCursor (line, (int) strlen (prompt));
 
 	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
@@ -238,7 +239,7 @@ prompt_yn2 (
 		}
 	}
 	cursoroff ();
-	fflush (stdout);
+	my_flush ();
 
 	set_alarm_clock_on ();
 
@@ -289,16 +290,16 @@ prompt_list (
 			 */
 			var = ++var % size;
 
-			printf("%-*s", (int)width, list[var]);
-			fflush (stdout);
+			my_printf("%-*s", (int)width, list[var]);
+			my_flush ();
 		}
 	} while (ch != '\r' && ch != '\n' && ch != ESC);
 
 	if (ch == ESC) {
 		var = var_orig;
 
-		printf("%-*s", (int)width, list[var]);
-		fflush (stdout);
+		my_printf("%-*s", (int)width, list[var]);
+		my_flush ();
 	}
 
 	cursoroff ();
