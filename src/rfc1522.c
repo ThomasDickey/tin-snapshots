@@ -277,6 +277,11 @@ rfc1522_decode (s)
 			*t++ = *d++;
 	}
 	*t = '\0';
+
+#ifdef LOCAL_CHARSET
+	buffer_to_local(buffer);
+#endif
+
 	return buffer;
 }
 
@@ -583,6 +588,9 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	d = header;
 	quoteflag = 0;
 	while (fgets (buffer, 2048, f)) {
+#ifdef LOCAL_CHARSET
+		buffer_to_network(buffer);
+#endif
 		if (header[0]
 		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
                         if ( allow_8bit_header )
@@ -602,6 +610,9 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	}
 	fputc ('\n', g);
 	while (fgets (buffer, 2048, f)) {
+#ifdef LOCAL_CHARSET
+		buffer_to_network(buffer);
+#endif
 		fputs (buffer, g);
 		/* see if there are any umlauts in the body... */
 		for (c = buffer; *c && !isreturn(*c); c++)

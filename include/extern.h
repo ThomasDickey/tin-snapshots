@@ -495,6 +495,7 @@ extern constext txt_help_g_r[];
 extern constext txt_help_g_search[];
 extern constext txt_help_g_t_p_i[];
 extern constext txt_help_g_tab[];
+extern constext txt_help_g_x[];
 extern constext txt_help_g_y[];
 extern constext txt_help_g_z[];
 extern constext txt_help_group_catchup_on_exit[];

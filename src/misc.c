@@ -13,7 +13,7 @@
  */
 
 #include	"tin.h"
-#include "patchlev.h"
+#include "version.h"
 
 #ifdef M_UNIX
 /*
@@ -1338,23 +1338,24 @@ untag_all_articles ()
 }
 
 
+#ifndef HAVE_STRSTR
 /*
  * ANSI C strstr () - Uses Boyer-Moore algorithm.
  */
-
 char *
-str_str (text, pattern, patlen)
+my_strstr (text, pattern)
 	char *text;
 	char *pattern;
-	size_t patlen;
 {
 	register unsigned char *p, *t;
 	register int i, j, *delta;
 	register size_t p1;
 	int deltaspace[256];
 	size_t textlen;
+	size_t patlen;
 
 	textlen = strlen (text);
+	patlen = strlen (pattern);
 
 	/* algorithm fails if pattern is empty */
 	if ((p1 = patlen) == 0)
@@ -1393,6 +1394,7 @@ str_str (text, pattern, patlen)
 	}
 	return (NULL);
 }
+#endif
 
 
 void
@@ -2428,3 +2430,93 @@ peek_char (fp)
 		ungetc(c, fp);
 	return c;
 }
+
+#ifdef LOCAL_CHARSET
+
+/*
+ * convert between local and network charset (e.g. NeXT and latin1)
+ */
+
+
+#define CHARNUM 256
+#define BAD (-1)
+
+#include "l1_next.tab"
+#include "next_l1.tab"
+
+static int to_local(c)
+	int c;
+{
+	c=c_l1_next[(unsigned char)c];
+	if(c==BAD) return '?';
+	else return c;
+}
+
+void buffer_to_local(b)
+	char *b;
+{
+	for( ;*b;b++)
+		*b=to_local(*b);
+}
+
+static int to_network(c)
+	int c;
+{
+	c=c_next_l1[(unsigned char)c];
+	if(c==BAD) return '?';
+	else return c;
+}
+
+void buffer_to_network(b)
+	char *b;
+{
+	for( ;*b;b++)
+		*b=to_network(*b);
+}
+
+#endif
+
+#ifdef LOCAL_CHARSET
+
+/*
+ * convert between local and network charset (e.g. NeXT and latin1)
+ */
+
+
+#define CHARNUM 256
+#define BAD (-1)
+
+#include "l1_next.tab"
+#include "next_l1.tab"
+
+static int to_local(c)
+	int c;
+{
+	c=c_l1_next[(unsigned char)c];
+	if(c==BAD) return '?';
+	else return c;
+}
+
+void buffer_to_local(b)
+	char *b;
+{
+	for( ;*b;b++)
+		*b=to_local(*b);
+}
+
+static int to_network(c)
+	int c;
+{
+	c=c_next_l1[(unsigned char)c];
+	if(c==BAD) return '?';
+	else return c;
+}
+
+void buffer_to_network(b)
+	char *b;
+{
+	for( ;*b;b++)
+		*b=to_network(*b);
+}
+
+#endif

@@ -240,13 +240,13 @@ debug_print_bitmap (group, NULL);
 #endif /* WIN32 */
 
 #ifndef NO_SHELL_ESCAPE
-			case iKeyGroupShell:
+			case iKeyShellEscape:
 				shell_escape ();
 				show_group_page ();
 				break;
 #endif
 
-			case iKeyGroupFirstPage: /*show first page of threads */
+			case iKeyFirstPage: /*show first page of threads */
 top_of_list:
 				if (! top_base) {
 					break;
@@ -314,9 +314,9 @@ end_of_list:
 				}
 				break;
 
-			case iKeyGroupFSearchSubj:	/* forward/backward search */
-			case iKeyGroupBSearchSubj:
-				search_subject ((ch == iKeyGroupFSearchSubj));
+			case iKeySearchSubjF:	/* forward/backward search */
+			case iKeySearchSubjB:
+				search_subject ((ch == iKeySearchSubjF));
 				break;
 
 			case iKeyGroupFSearchBody:	/* search article body */

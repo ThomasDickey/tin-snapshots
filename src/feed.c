@@ -118,6 +118,9 @@ feed_articles (function, level, group, respnum)
 	make_group_path (group->name, group_path);
 	filename[0] = '\0';
 
+	/*
+	 * If not automatic, ask what the user wants to save
+	 */
 	if (((default_auto_save == FALSE || arts[respnum].archive == (char *) 0) ||
 		(default_auto_save == TRUE && function != FEED_SAVE) ||
 		ch_default == iKeyFeedTag) && function != FEED_SAVE_TAGGED) {
@@ -213,7 +216,7 @@ feed_articles (function, level, group, respnum)
 				sprintf (command, "%s %s", group->attribute->printer, REDIRECT_OUTPUT);
 			}
 			break;
-		case FEED_SAVE:		/* ask user for filename */
+		case FEED_SAVE:		/* ask user for filename to save to */
 		case FEED_SAVE_TAGGED:
 			free_save_array ();
 			if ((default_auto_save == FALSE ||
@@ -300,7 +303,7 @@ feed_articles (function, level, group, respnum)
 			get_user_info (user_name, full_name);
 			get_from_name (user_name, host_name, full_name, from_name);
 
-			if (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))) {
+			if (strstr (from_name, arts[respnum].from)) {
 #endif
 				/* repost or supersede ? */
 				do {
@@ -354,7 +357,7 @@ feed_articles (function, level, group, respnum)
 				}
 			}
 			break;
-	}
+	} /* switch (function) */
 
 	switch (ch) {
 		case iKeyFeedArt:		/* article */
@@ -577,8 +580,11 @@ feed_articles (function, level, group, respnum)
 				(void) save_regex_arts (is_mailbox, group_path);
 			}
 			break;
-	}
+	} /* switch (ch) */
 
+	/*
+	 * Now work out what (if anything) needs to be redrawn
+	 */
 	if (debug == 2) {
 		printf ("REDRAW=[%d]  ", redraw_screen);
 		fflush (stdout);
@@ -617,12 +623,11 @@ got_sig_pipe_while_piping:
 			break;
 	}
 
-	if (level == GROUP_LEVEL) {
+	if (level == GROUP_LEVEL || level == THREAD_LEVEL)
 		ret1 = (mark_saved_read ? TRUE : FALSE);
-	}
-	if ((ret1 || ret2) && is_mailbox == FALSE) {
+
+	if ((ret1 || ret2) && is_mailbox == FALSE)
 		redraw_screen = TRUE;
-	}
 
 	if (level == PAGE_LEVEL) {
 		if (ch != iKeyFeedArt) {
@@ -646,7 +651,14 @@ got_sig_pipe_while_piping:
 		}
 	} else {
 		if (redraw_screen) {
-			show_group_page ();
+			switch (level) {
+				case GROUP_LEVEL:
+					show_group_page ();
+					break;
+				case THREAD_LEVEL:
+					show_thread_page ();
+					break;
+			}
 		}
 	}
 

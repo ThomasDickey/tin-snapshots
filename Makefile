@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 961012
+PVER		= 961015
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -25,10 +25,10 @@ HFILES	= \
 	$(INCDIR)/msmail.h \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/os_2.h \
-	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
+	$(INCDIR)/version.h \
 	$(INCDIR)/win32.h \
 	$(INCDIR)/win32tcp.h
 
@@ -111,7 +111,9 @@ TOP	= \
 
 ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) \
 	$(INCDIR)/autoconf.hin \
-	$(SRCDIR)/Makefile.in
+	$(SRCDIR)/Makefile.in \
+	$(SRCDIR)/l1_next.tab \
+	$(SRCDIR)/next_l1.tab
 
 ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
 

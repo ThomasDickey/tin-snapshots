@@ -1,6 +1,6 @@
 /*
  *  Project   : tin - a Usenet reader
- *  Module    : patchlev.h
+ *  Module    : version.h
  *  Author    : I.Lea
  *  Created   : 01-04-91
  *  Updated   : 12-06-96
@@ -12,12 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"961012"
-
 /*
  * This is NO official release, but a patched version.
  */
+
+#define VERSION		"1.3 unoff BETA"
+#define RELEASEDATE	"961015"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

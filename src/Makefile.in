@@ -62,10 +62,10 @@ HFILES	= \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
-	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
-	$(INCDIR)/tin.h
+	$(INCDIR)/tin.h \
+	$(INCDIR)/version.h
 #	$(INCDIR)/amiga.h
 #	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/config.h
@@ -310,7 +310,7 @@ $(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_DEP)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP) \
 				$(INCDIR)/conf.h \
 				$(INCDIR)/menukeys.h \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(TIN_DEP)
 $(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(TIN_DEP)
 $(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(TIN_DEP)
@@ -327,29 +327,29 @@ $(OBJDIR)/help.o:		$(SRCDIR)/help.c $(TIN_DEP) \
 $(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(TIN_DEP)
 $(OBJDIR)/init.o:		$(SRCDIR)/init.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(TIN_DEP)
 $(OBJDIR)/list.o:		$(SRCDIR)/list.c $(TIN_DEP)
 $(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(TIN_DEP)
 $(OBJDIR)/main.o:		$(SRCDIR)/main.c $(TIN_DEP) \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(TIN_DEP)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_DEP) \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(TIN_DEP)
 $(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(TIN_DEP)
 $(OBJDIR)/nrctbl.o:		$(SRCDIR)/nrctbl.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(TIN_DEP) \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/page.o:		$(SRCDIR)/page.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(TIN_DEP)
 $(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(TIN_DEP)
 $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
-				$(INCDIR)/patchlev.h
+				$(INCDIR)/version.h
 $(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/refs.o:		$(SRCDIR)/refs.c $(TIN_DEP)

@@ -92,6 +92,7 @@
 #undef	HAVE_ERRNO_H
 #undef	HAVE_FCNTL_H
 #undef	HAVE_IOCTL_H
+#undef	HAVE_LIBC_H
 #undef	HAVE_LOCALE_H
 #undef	HAVE_MALLOC_H
 #undef	HAVE_NETDB_H

@@ -305,13 +305,13 @@ show_thread (group, group_path, respnum)
 #endif /* ! WIN32 */
 
 #ifndef NO_SHELL_ESCAPE
-			case iKeyThreadShell:
+			case iKeyShellEscape:
 				shell_escape ();
 				show_thread_page ();
 				break;
 #endif
 
-			case iKeyThreadFirstPage:	/* show first page of articles */
+			case iKeyFirstPage:	/* show first page of articles */
 top_of_thread:
 				if (thread_index_point != 0) {
 					if (0 < first_thread_on_screen) {
@@ -344,6 +344,13 @@ end_of_thread:
 			case iKeyThreadSetRange:	/* set range */
 				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point)) {
 					show_thread_page ();
+				}
+				break;
+
+			case iKeyThreadSave: /* save articles with prompting */
+				if (index_point >= 0) {
+					feed_articles (FEED_SAVE, THREAD_LEVEL,
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 

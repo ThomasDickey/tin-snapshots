@@ -12,7 +12,7 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"patchlev.h"
+#include	"version.h"
 #include	"tin.h"
 #include	"conf.h"
 #include	"menukeys.h"

@@ -14,7 +14,7 @@
  */
 
 #include	"tin.h"
-#include	"patchlev.h"
+#include	"version.h"
 
 int nntp_codeno = 0;
 long head_next;

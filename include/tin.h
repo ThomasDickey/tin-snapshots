@@ -99,6 +99,10 @@ extern char *get_uaf_fullname();
 #	include <sys/times.h>
 #endif
 
+#ifdef HAVE_LIBC_H
+#include <libc.h>
+#endif
+
 #ifdef HAVE_UNISTD_H
 #	include <unistd.h>
 #endif
@@ -220,6 +224,11 @@ extern char *get_uaf_fullname();
 #		ifdef	HZ
 #			undef	HZ /* looks like a bug in M_XENIX includefiles */
 #		endif
+#	endif
+#	if defined(NeXT)
+/* on NeXT curses.h and something included from libc.h both define TRUE/FALSE */
+#		undef TRUE
+#		undef FALSE
 #	endif
 #	include <curses.h>
 #endif
@@ -735,7 +744,7 @@ extern char *get_uaf_fullname();
 #define 	INDEX_TOP	2
 
 #ifdef NO_REGEX
-#	define	STR_MATCH(s1,s2)	(str_str (s1, s2, strlen (s2)) != 0)
+#	define	STR_MATCH(s1,s2)	(strstr (s1, s2) != 0)
 #else
 #	define	STR_MATCH(s1,pat)	(wildmat (s1, pat))
 #endif
@@ -804,6 +813,8 @@ extern char *get_uaf_fullname();
 
 /*
  * Threading strategies available
+ * NB: The ordering is important in that threading forms that don't use
+ *     references should be < THREAD_REFS
  */
 #define	THREAD_NONE		0
 #define	THREAD_SUBJ		1

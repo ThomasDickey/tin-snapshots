@@ -134,13 +134,13 @@ selection_index (start_groupnum, num_cmd_line_groups)
 #endif /* ! WIN32 */
 
 #ifndef NO_SHELL_ESCAPE
-			case iKeySelectShell:
+			case iKeyShellEscape:
 				shell_escape ();
 				group_selection_page ();
 				break;
 #endif
 
-			case iKeySelectFirstPage:	/* show first page of groups */
+			case iKeyFirstPage:	/* show first page of groups */
 top_of_list:
 				if (cur_groupnum != 0) {
 					if (0 < first_group_on_screen) {
@@ -176,9 +176,9 @@ end_of_list:
 				}
 				break;
 
-			case iKeySelectFSearchSubj:	/* search forward */
-			case iKeySelectBSearchSubj:	/* search backward */
-				i = (ch == iKeySelectFSearchSubj);
+			case iKeySearchSubjF:	/* search forward */
+			case iKeySearchSubjB:	/* search backward */
+				i = (ch == iKeySearchSubjF);
 				search_group (i);
 				break;
 

@@ -13,7 +13,7 @@
  */
 
 #include	"tin.h"
-#include	"patchlev.h"
+#include	"version.h"
 
 #if defined(M_AMIGA) && defined(__SASC_650)
 extern int	_WBArg;

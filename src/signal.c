@@ -52,9 +52,16 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 }
 
 #else
+#ifdef NeXT
+/* NeXT's parser seems to somehow have problems with this syntax */
+RETSIGTYPE (*sigdisp(sig, func))()
+	int sig;
+	RETSIGTYPE (*func)();
+#else
 RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	int sig;
 	RETSIGTYPE (_CDECL *func)(SIG_ARGS);
+#endif
 {
 	return (signal (sig, func));
 }
