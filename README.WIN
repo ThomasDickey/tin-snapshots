@@ -16,7 +16,9 @@
 
      - configure
        - export CC=gcc
-       - export CFLAGS="-DLOCAL_CHARSET=850"  (or 437 depends on "mode con")
+       - export CFLAGS="-DLOCAL_CHARSET=850 -DSTATIC"
+                                        ^^^
+                            (or 437 depends on "mode con")
        - ./configure --with-ncurses --libdir=/usr/local/lib --disable-locale
 
      - make
@@ -38,8 +40,9 @@
               set HOME=c:\home
               set USER=username
        - tested with
-	   tin pre-1.4 release 981225 ("Volcane")
-	   tin pre-1.4 release 19990517 ("Psychonaut")
+           tin pre-1.4 release 981225 ("Volcane")
+           tin pre-1.4 release 19990517 ("Psychonaut")
+           tin pre-1.4 release 19991104 ("Nine While Nine")
 
      - lates version of this file
        - on http://www.uni-karlsruhe.de/~uafr/windows/
@@ -47,4 +50,4 @@
 
      - contributed by
        - uafr@gmx.de (Wolfgang Becker)
-         16.5.1999
+         6.11.1999

@@ -13,10 +13,15 @@
  *              right notice, and it must be included in any copy made
  */
 
-
-#include "nntplib.h"
-#include "tin.h"
-#include "tcurses.h"
+#ifndef NNTPLIB_H
+#	include "nntplib.h"
+#endif /* !NNTPLIB_H */
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 
 /*
@@ -43,7 +48,6 @@ static t_bool
 authinfo_generic (
 	void)
 {
-	FILE *fp;
 	char *authcmd;
 	char authval[NNTP_STRLEN];
 	char tmpbuf[NNTP_STRLEN];
@@ -69,21 +73,14 @@ authinfo_generic (
 		char tempfile[BUFSIZ];
 
 		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);
-		if (!mktemp (tempfile)) {
+		if ((cookiefd = (my_mktemp (tempfile))) == -1) {
 			error_message (txt_cannot_create_uniq_name);
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("authorization", txt_cannot_create_uniq_name);
-#endif /* DEBUG */
+#	endif /* DEBUG */
 			return FALSE;
 		} else {
-			if ((fp = fopen (tempfile, "w+")) != (FILE *) 0) {
-				cookiefd = fileno (fp);
-				(void) unlink (tempfile);
-			} else {
-				error_message (txt_cannot_open, tempfile);
-				(void) unlink (tempfile);
-				return FALSE;
-			}
+			(void) unlink (tempfile);
 		}
 	}
 

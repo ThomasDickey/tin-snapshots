@@ -20,17 +20,29 @@
 #define TIN_H 1
 
 #ifdef HAVE_CONFIG_H
-#	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
+#	ifndef TIN_AUTOCONF_H
+#		include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
+#	endif /* !TIN_AUTOCONF_H */
 #else
 #	ifndef HAVE_CONFDEFS_H
 #		include	"config.h"
 #	endif /* !HAVE_CONFDEFS_H */
 #endif /* HAVE_CONFIG_H */
 
+
+/* FIXME */
+#if 0
+/*
+ * this causes trouble on Linux (forces nameserver lookups even for local
+ * connections - this is an (unwanted) feature of getaddrinfo) see also
+ * nntplib.c
+ */
 /* IPv6 support */
 #if defined(HAVE_GETADDRINFO) && defined(HAVE_GAI_STRERROR)
 #	define INET6
 #endif /* HAVE_GETADDRINFO && HAVE_GAI_STRERROR */
+#endif /* 0 */
+
 
 /*
  * Non-autoconf'able definitions for Amiga Developer Environment (gcc 2.7.2,
@@ -85,7 +97,8 @@ enum resizer { cNo, cYes, cRedraw };
 #	ifndef MM_CHARSET
 #		define MM_CHARSET "ISO-8859-1"
 #	endif /* !MM_CHARSET */
-	/* Apparently this means fileops=create if not already there - no idea
+	/*
+	 * Apparently this means fileops=create if not already there - no idea
 	 * why this should be needed. Standard fopen() implies this in arg 2
 	 */
 	extern char *get_uaf_fullname();
@@ -653,7 +666,9 @@ enum resizer { cNo, cYes, cRedraw };
 #define _CONF_ORGANIZATION	"organization"
 #define _CONF_SERVER	"server"
 
-#include <bool.h>
+#ifndef BOOL_H
+#	include "bool.h"
+#endif /* BOOL_H */
 
 /* Philip Hazel's Perl regular expressions library */
 #include	<pcre.h>
@@ -661,6 +676,9 @@ enum resizer { cNo, cYes, cRedraw };
 #ifndef MAX
 #	define MAX(a,b)	((a > b) ? a : b)
 #endif /* !MAX */
+#ifndef MIN
+#	define MIN(a,b)	((a > b) ? b : a)
+#endif /* !MIN */
 
 #ifndef forever
 /*@notfunction@*/
@@ -728,11 +746,9 @@ enum resizer { cNo, cYes, cRedraw };
 #ifndef ART_MARK_READ
 #	define ART_MARK_READ	' '	/* used to show that an art was not read or seen */
 #endif /* !ART_MARK_READ */
-#ifdef KILL_READ
-#	ifndef ART_MARK_READ_SELECTED
-#		define ART_MARK_READ_SELECTED ':'	/* used to show that an read art is hot */
-#	endif /* !ART_MARK_READ_SELECTED */
-#endif /* KILL_READ */
+#ifndef ART_MARK_READ_SELECTED
+#	define ART_MARK_READ_SELECTED ':'	/* used to show that an read art is hot */
+#endif /* !ART_MARK_READ_SELECTED */
 #ifndef ART_MARK_DELETED
 #	define ART_MARK_DELETED	'D'	/* art has been marked for deletion (mailgroup) */
 #endif /* !ART_MARK_DELETED */
@@ -794,7 +810,7 @@ enum resizer { cNo, cYes, cRedraw };
 #define REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
 #define REGEX_FMT (tinrc.wildcard ? "%s" : "*%s*")
 
-#define IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
+#define IGNORE_ART(i)	((tinrc.kill_level != KILL_THREAD && arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
 /* TRUE if basenote has responses */
 #define HAS_FOLLOWUPS(i)	(arts[base[i]].thread != -1)
@@ -955,6 +971,13 @@ enum resizer { cNo, cYes, cRedraw };
 #define BOGUS_KEEP		0
 #define BOGUS_REMOVE		1
 #define BOGUS_ASK		2
+
+/*
+ * Different extents to which we can hide killed articles
+ */
+#define KILL_READ		0		/* Kill only read articles */
+#define KILL_THREAD		1		/* Kill all articles and show as K */
+#define KILL_NOTHREAD	2		/* Kill all articles, never show them */
 
 /*
  * used in help.c
@@ -1872,12 +1895,20 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 	typedef	FILE	TCP;
 #endif /* M_AMIGA */
 
-#include	"extern.h"
-#include	"tinrc.h"
-#include	"nntplib.h"
+#ifndef EXTERN_H
+#	include	"extern.h"
+#endif /* !EXTERN_H */
+#ifndef TINRC_H
+#	include	"tinrc.h"
+#endif /* !TINRC_H */
+#ifndef NNTPLIB_H
+#	include	"nntplib.h"
+#endif /* !NNTPLIB_H */
 
 #ifndef __CPROTO__
-#	include	"proto.h"
+#	ifndef PROTO_H
+#		include	"proto.h"
+#	endif /* !PROTO_H */
 #endif /* !__CPROTO__ */
 
 #if defined(WIN32)
@@ -1944,7 +1975,7 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 
 #define IS_PLURAL(x)	(x != 1 ? txt_plural : "")
 
-/* FIXME - check also for mktemp/mkstemp/tmpfile */
+/* FIXME - check also for tmpfile() and provide fallback functions */
 #ifdef HAVE_TEMPNAM
 #	define my_tempnam(a,b)	tempnam(a,b)
 #else
@@ -1952,6 +1983,13 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #		define my_tempnam(a,b)	tmpnam((char *)0)
 #	endif /* HAVE_TMPNAM */
 #endif /* HAVE_TEMPNAM */
+#ifdef HAVE_MKSTEMP
+#	define my_mktemp(a)	mkstemp(a)
+#else
+#	ifdef HAVE_MKTEMP
+#		define my_mktemp(a) open(mktemp(a), O_RDWR, (mode_t)(S_IRUSR|S_IWUSR))
+#	endif /* HAVE_MKTEMP */
+#endif /* HAVE_MKSTEMP */
 
 /* define some standard places to look for a tin.defaults file */
 /*

@@ -11,8 +11,12 @@
  *              The Elm Mail System  -  @Revision: 2.1 $   $State: Exp @
  */
 
-#include "tin.h"
-#include "tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #ifdef USE_CURSES
 

@@ -1,21 +1,20 @@
-filtering in tin
+Filtering in tin
 
 0. Status
 
 This is an overview of the new filtering capabilities of tin. This
-document should be absorbed in the main documentation at some time, when
-the rewrite is finished.
+document will be absorbed in the main documentation at some point.
 
 
 1. Introduction
 
-Tin's filter mechanism has changed. Originally there were only two
-possibilities:
+Tin's filtering mechanism has changed significantly since version 1.3beta.
+Originally there were only two possibilities:
 
 1) kill an article matching a rule.
-2) mark an article matching a rule.
+2) hot-select an article matching a rule.
 
-This led (me) to constant confusion, as it seemed important which rule
+This led to constant confusion, as it seemed important which rule
 came first in the filter file, but it wasn't. Then if an article was
 selected for whatever reason it couldn't be killed even if it was Craig
 Shergold telling you how to make money fast in a crosspost to alt.test.
@@ -25,25 +24,24 @@ mechanism was necessary: scoring.
 When using tin's new scoring mechanism you assign a "score" to each
 filter rule. The scores of rules matching the current article are added
 and the final score of the article decides if it is regular, marked hot
-or killed. All in all very simple, one wonders why this hasn't already
-been done.
+or killed.
 
 The standard "kill" and standard "select" already in your filter-file have
-the score SCORE_KILL and SCORE_SELECT (-> 4) respectively.
+the score SCORE_KILL and SCORE_SELECT respectively (See section 4). 
 
 
 2. Changes to the filter-file format
 
 Tin understands the additional "score" command in the filter-file now.
 
-Old:
+Old style rule:
 
 scope=*
 type=0
 case=0
 subj=*$$$*
 
-New:
+New style rule:
 
 group=*
 type=0
@@ -53,7 +51,7 @@ subj=*$$$*
 #####
 
 So you can give the individual rule a weight, based on your opinion
-about the rule. E.g. if you want to be sure to never read a certain
+about the rule. e.g. if you want to be sure to never read a certain
 individual again, you may give the rule a score of (-)9000. The sign is
 not important by now, the direction (+ or -) is still determined by the
 "type" of a rule. So the following
@@ -86,16 +84,16 @@ may be somewhat easier to remember.
 
 You might have noticed by the examples above that tin inserts a line of
 hashes between two rules now. This is *not* required, it just improves
-human readability of the filter file.
+readability.
 
 
 3. Changes in the filter menu
 
-The filter menu got more compact, it fits easily on small terminals like
-a small xterm or a 640x200 CON: window now. Additionally you can enter a
-score for the rule you are adding. It should be in the range from 1 to
-SCORE_MAX. (-> 4.) otherwise it will be defaulted to SCORE_DEFAULT.
-(-> 4.)
+The on screen filter menu is now more compact and fits easily on small
+terminals such as a small xterm or a 640x200 CON: window now. It has been
+enhanced to allow you to enter a score for the rule you are adding. It should
+be in the range from 1 to SCORE_MAX (See section 4) otherwise it will default
+to SCORE_DEFAULT (See section 4).
 
 
 4. Internal defaults
@@ -103,8 +101,8 @@ SCORE_MAX. (-> 4.) otherwise it will be defaulted to SCORE_DEFAULT.
 There are some constants defined in tin.h, search for SCORE in your
 favorite editor.
 
-SCORE_MAX is the maximum the scoring of an article can reach. Any value
-in excess is cut to SCORE_MAX, equally with negative sign.
+SCORE_MAX is the maximum score an article can reach. Any value
+above this is cut to SCORE_MAX, the same goes for negative scores.
 recommended: 10000
 
 SCORE_DEFAULT is the default score, also used for quick kills and
@@ -128,12 +126,13 @@ recommended when used with values given above: -50/+50.
 
 5. Overview of "filter"-commands
 
-Everything here is also described in the file ~/.tin/filter, but
-some things are more concise there.
+Everything here is also described in the file ~/.tin/filter, albeit more
+concisely.
 
+All lines are of the form:
 command=value
 
-possible "command"s sorted by field of use:
+Valid "command"s are:
 
 scope selection:
 
@@ -149,8 +148,8 @@ group=newsgroup_pattern_list
 newsgroup_pattern_list is a comma-separated list of newsgroup_patterns
 
 newsgroup_patterns can be a pattern (wildmat-style) or !pattern,
-negating the match of pattern. Yes, this is the same format as for the
-AUTO(UN)SUBSCRIBE environment variable
+negating the match of pattern. This is the same format used for the
+AUTO(UN)SUBSCRIBE environment variable.
 
 Tin doesn't rework your filter file, the new pattern matching is only
 used when you enter new entries by hand.

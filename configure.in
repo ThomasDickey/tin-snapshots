@@ -588,20 +588,35 @@ else
 			# This is only necessary if you are linking against an
 			# obsolete version of ncurses (but it should do no
 			# harm, since it's static).
-			AC_CHECK_LIB(mytinfo,tgoto,[LIBS="-lmytinfo $LIBS" found_tcap=yes])
+			AC_CHECK_LIB(mytinfo,tgoto,[
+				LIBS="-lmytinfo $LIBS"
+				found_tcap=yes
+			])
 			;;
 		esac
 	fi
-	if test $found_tcap != yes ; then
-		AC_CHECK_LIB(termlib, tgoto, [LIBS="$LIBS -ltermlib" found_tcap=yes])
+	if test "$found_tcap" != yes ; then
+		AC_CHECK_LIB(termlib, tgoto, [
+			LIBS="$LIBS -ltermlib"
+			found_tcap=yes
+		])
 	fi
 	if test "$found_tcap" != yes; then
 		# allow curses library for broken AIX system.
-		AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" found_tcap=yes])
-		AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
+		AC_CHECK_LIB(curses, initscr, [
+			LIBS="$LIBS -lcurses"
+			found_tcap=yes
+		])
+		AC_CHECK_LIB(termcap, tgoto, [
+			LIBS="$LIBS -ltermcap"
+			found_tcap=yes
+		])
 	fi
 	if test "$found_tcap" != yes; then
-		AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
+		AC_CHECK_LIB(termcap, tgoto, [
+			LIBS="$LIBS -ltermcap"
+			found_tcap=yes
+		])
 	fi
 	if test "$found_tcap" != yes; then
 		AC_WARN([Can't find -ltermlib, -lcurses, or -ltermcap])
@@ -632,6 +647,8 @@ AC_CHECK_FUNCS(\
 	atol \
 	bcopy \
 	ftime \
+	fdopen \
+	ftime \
 	getcwd \
 	inet_aton \
 	is_xterm \
@@ -642,6 +659,8 @@ AC_CHECK_FUNCS(\
 	memmove \
 	memset \
 	mkdir \
+	mktemp \
+	mkstemp \
 	poll \
 	putenv \
 	rewinddir \
@@ -803,6 +822,7 @@ CF_CHECK_DECL(\
 	isascii \
 	malloc \
 	memset \
+	mkstemp \
 	mktemp \
 	pclose \
 	perror \
@@ -875,6 +895,19 @@ test ".$ac_cv_func_memmove" != ".yes" && \
 test ".$cf_cv_good_bcopy" = ".yes" && \
 	PCRE_DEFINES="$PCRE_DEFINES -DUSE_BCOPY"
 AC_SUBST(PCRE_DEFINES)
+
+### sum up warnings
+if test "$found_tcap" != yes ; then
+	if test "$found_ncurses" != yes; then
+        	echo "Warning: no term-lib found, you might run into trouble later."
+	fi
+fi
+if test "$YACC" = "" ; then
+	echo "Warning: no yacc-parser found, you might run into trouble later."
+fi
+if test "$RANLIB" = "" ; then
+        echo "Warning: no librarie archive builder found, you might run into trouble later."
+fi
 
 ### Finally, build autoconf.h and the makefiles
 CFLAGS="$CFLAGS $EXTRA_CFLAGS"

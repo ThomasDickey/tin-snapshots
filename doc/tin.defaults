@@ -42,7 +42,7 @@
 # inewsdir - defines the directory containing of the inews executable
 #
 # Usually tin uses its own builtin inews routines. you might want
-# to use an external inews, so you can define the directoy where tin
+# to use an external inews, so you can define the directory where tin
 # expects the executable. The program's name is set to inews, don't
 # include it
 #
@@ -56,6 +56,25 @@
 # in most western countries ISO-8859-1 might be the best value
 #
 #mm_charset=iso-8859-1
+
+# post_mime_encoding
+# 
+#                                 
+# luser may change this setting in their tinrcs but it's a good
+# idea to set post_mime_encoding here for providing a default
+# in most western countries 8bit might be the best value
+#
+#post_mime_encoding=8bit
+
+# mail_mime_encoding
+# 
+#
+# luser may change this setting in their tinrcs but it's a good
+# idea to set mail_mime_encoding here for providing a default
+# as mail isn't guaranteed to be 8bit clean quoted-printable is
+# a good choice
+#
+#mail_mime_encoding=quoted-printable
 
 # disable_gnksa_domain_check - allow unregistered top level domains
 #
@@ -87,7 +106,7 @@
 # overviewdir - the base of your NOV database
 #
 # the overview files are either included within your spooldir or
-# in a separate direcory tree
+# in a separate directory tree
 # common values are /var/spool/overview, /usr/spool/overview, /news/overview
 #
 #overviewdir=/var/spool/overview

@@ -12,15 +12,20 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 #define INDEX2TNUM(i)	((i) % NOTESLINES)
 #define TNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(TNUM2LNUM(INDEX2TNUM(i)))
-#define EXPIRED(a) ((a)->article == ART_UNAVAILABLE || \
-		    arts[(a)->article].thread == ART_EXPIRED)
+#define EXPIRED(a) ((a)->article == ART_UNAVAILABLE || arts[(a)->article].thread == ART_EXPIRED)
 
 int thread_basenote = 0;						/* Index in base[] of basenote */
 t_bool show_subject;
@@ -91,22 +96,13 @@ bld_tline (
 			mark = (art->selected ? tinrc.art_marked_selected : tinrc.art_marked_unread);
 		} else if (art->status == ART_WILL_RETURN) {
 			mark = tinrc.art_marked_return;
-
-/*
- * TODO - add kill_level
- */
-#if 1
 		} else if (art->killed) {
 			mark = 'K';
-#endif /* 1 */
-
 		} else {
-#ifdef KILL_READ
-			if (art->score >= SCORE_SELECT)
+			if (tinrc.kill_level == KILL_THREAD && art->score >= SCORE_SELECT)
 				mark = ART_MARK_READ_SELECTED ; /* read hot chil^H^H^H^H article */
 			else
-#endif /* KILL_READ */
-			mark = ART_MARK_READ;
+				mark = ART_MARK_READ;
 		}
 
 		buff[MARK_OFFSET] = mark;			/* insert mark */
@@ -122,7 +118,7 @@ bld_tline (
 	if (tinrc.show_lines || tinrc.show_score) { /* add [ */
 		strcat (buff, "[");
 		rest_of_line--;
-   }
+	}
 
 	if (tinrc.show_lines) { /* add lines */
 		strcat (buff, ((art->lines != -1) ? tin_ltoa(art->lines, 4): "   ?"));
@@ -267,11 +263,7 @@ draw_tline (
 	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if ((s[k-x] == tinrc.art_marked_selected
-#ifdef KILL_READ
-		 || s[k-x] == ART_MARK_READ_SELECTED
-#endif /* KILL_READ */
-	 )) {
+	if (s[k-x] == tinrc.art_marked_selected || (tinrc.kill_level == KILL_THREAD && s[k-x] == ART_MARK_READ_SELECTED)) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
 		my_fputc (s[k-x], stdout);
@@ -565,7 +557,7 @@ thread_page_down:
 					show_thread_page();
 				break;
 
-			case iKeyThreadRedrawScr:		/* redraw screen */
+			case iKeyRedrawScr:		/* redraw screen */
 				my_retouch ();
 				set_xclick_off ();
 				show_thread_page ();
@@ -637,7 +629,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 				show_thread_page ();
 				break;
 
-			 case iKeyLookupMessage:
+			case iKeyLookupMessage:
 				if ((n = prompt_msgid ()) != ART_UNAVAILABLE) {
 					i = n;
 					goto enter_pager;
@@ -679,7 +671,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 				break;
 
 #	ifdef HAVE_COLOR
-			case iKeyThreadToggleColor:		/* toggle color */
+			case iKeyToggleColor:		/* toggle color */
 				if (toggle_color ()) {
 					show_thread_page ();
 					show_color_status ();
@@ -779,6 +771,11 @@ thread_catchup:										/* come here when exiting thread via <- */
 						show_thread_page();
 				} else
 					info_message(txt_cannot_post);
+				break;
+
+			case iKeyDisplayPostHist:	/* display messages posted by user */
+				if (user_posted_messages ())
+					show_thread_page ();
 				break;
 
 			case iKeyToggleInfoLastLine:		/* display subject in last line */

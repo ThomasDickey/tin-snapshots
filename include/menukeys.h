@@ -21,32 +21,32 @@
  *        Oct   Dec   Hex   Char           Oct   Dec   Hex   Char
  *        ------------------------------------------------------------
  *        000   0     00    NUL '\0'       100   64    40    @
- *        001   1     01    SOH            101   65    41    A
- *        002   2     02    STX            102   66    42    B
- *        003   3     03    ETX            103   67    43    C
- *        004   4     04    EOT            104   68    44    D
- *        005   5     05    ENQ            105   69    45    E
- *        006   6     06    ACK            106   70    46    F
- *        007   7     07    BEL '\a'       107   71    47    G
- *        010   8     08    BS  '\b'       110   72    48    H
- *        011   9     09    HT  '\t'       111   73    49    I
- *        012   10    0A    LF  '\n'       112   74    4A    J
- *        013   11    0B    VT  '\v'       113   75    4B    K
- *        014   12    0C    FF  '\f'       114   76    4C    L
- *        015   13    0D    CR  '\r'       115   77    4D    M
- *        016   14    0E    SO             116   78    4E    N
- *        017   15    0F    SI             117   79    4F    O
- *        020   16    10    DLE            120   80    50    P
- *        021   17    11    DC1            121   81    51    Q
- *        022   18    12    DC2            122   82    52    R
- *        023   19    13    DC3            123   83    53    S
- *        024   20    14    DC4            124   84    54    T
- *        025   21    15    NAK            125   85    55    U
- *        026   22    16    SYN            126   86    56    V
- *        027   23    17    ETB            127   87    57    W
- *        030   24    18    CAN            130   88    58    X
- *        031   25    19    EM             131   89    59    Y
- *        032   26    1A    SUB            132   90    5A    Z
+ *        001   1     01    SOH      ^A    101   65    41    A
+ *        002   2     02    STX      ^B    102   66    42    B
+ *        003   3     03    ETX      ^C    103   67    43    C
+ *        004   4     04    EOT      ^D    104   68    44    D
+ *        005   5     05    ENQ      ^E    105   69    45    E
+ *        006   6     06    ACK      ^F    106   70    46    F
+ *        007   7     07    BEL '\a' ^G    107   71    47    G
+ *        010   8     08    BS  '\b' ^H    110   72    48    H
+ *        011   9     09    HT  '\t' ^I    111   73    49    I
+ *        012   10    0A    LF  '\n' ^J    112   74    4A    J
+ *        013   11    0B    VT  '\v' ^K    113   75    4B    K
+ *        014   12    0C    FF  '\f' ^L    114   76    4C    L
+ *        015   13    0D    CR  '\r' ^M    115   77    4D    M
+ *        016   14    0E    SO       ^N    116   78    4E    N
+ *        017   15    0F    SI       ^O    117   79    4F    O
+ *        020   16    10    DLE      ^P    120   80    50    P
+ *        021   17    11    DC1      ^Q    121   81    51    Q
+ *        022   18    12    DC2      ^R    122   82    52    R
+ *        023   19    13    DC3      ^S    123   83    53    S
+ *        024   20    14    DC4      ^T    124   84    54    T
+ *        025   21    15    NAK      ^U    125   85    55    U
+ *        026   22    16    SYN      ^V    126   86    56    V
+ *        027   23    17    ETB      ^W    127   87    57    W
+ *        030   24    18    CAN      ^X    130   88    58    X
+ *        031   25    19    EM       ^Y    131   89    59    Y
+ *        032   26    1A    SUB      ^Z    132   90    5A    Z
  *        033   27    1B    ESC            133   91    5B    [
  *        034   28    1C    FS             134   92    5C    \   '\\'
  *        035   29    1D    GS             135   93    5D    ]
@@ -98,13 +98,8 @@
  * [make emacs happy: "]
  */
 
-/* general keys
- * ESC
- * ' ','!','$','/','?'
- * 'A','B','L','M','O','Q','W'
- * '^'
- * 'a','b','i','j','k','q','v'
- * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
+/*
+ * Global keys
  */
 
 #define iKeyAbort ESC
@@ -114,10 +109,11 @@
 #endif /* !NO_SHELL_ESCAPE */
 #define iKeySetRange '#'
 #define iKeyLastPage '$'
-#define iKeySearchBody 'B'
+#define iKeyToggleColor '&'
 #define iKeySearchSubjF '/'
 #define iKeySearchSubjB '?'
 #define iKeySearchAuthB 'A'
+#define iKeySearchBody 'B'
 #define iKeyLookupMessage 'L'
 #define iKeyOptionMenu 'M'
 #define iKeyPostponed2 'O'
@@ -134,6 +130,7 @@
 #define iKeyPageUp ctrl('B')
 #define iKeyPageDown ctrl('D')
 #define iKeyPageDown2 ctrl('F')
+#define iKeyRedrawScr ctrl('L')
 #define iKeyDown ctrl('N')
 #define iKeyPostponed ctrl('O')
 #define iKeyUp ctrl('P')
@@ -146,7 +143,6 @@
 #define iKeyConfigLastPage 'G'
 #define iKeyConfigNoSave 'Q'
 #define iKeyConfigFirstPage 'g'
-#define iKeyConfigRedrawScr ctrl('L')
 
 /* feed.c */
 
@@ -169,9 +165,7 @@
 #define iKeyGroupNextUnreadArtOrGrp '\t'
 #define iKeyGroupReadBasenote '\n'
 #define iKeyGroupKill ctrl('K')
-#define iKeyGroupRedrawScr ctrl('L')
 #define iKeyGroupReadBasenote2 '\r'
-#define iKeyGroupToggleColor '&'
 #define iKeyGroupSelThd '*'
 #define iKeyGroupDoAutoSel '+'
 #define iKeyGroupLastViewed '-'
@@ -194,6 +188,7 @@
 #define iKeyGroupMarkThdUnread 'Z'
 #define iKeyGroupQuickAutosel '['
 #define iKeyGroupQuickKill ']'
+#define iKeyGroupTagParts 'T'
 #define iKeyGroupCatchup 'c'
 #define iKeyGroupToggleSubjDisplay 'd'
 #define iKeyGroupGoto 'g'
@@ -239,15 +234,12 @@
 #define iKeyPageNextUnread '\t'
 #define iKeyPageNextThd '\n'
 #define iKeyPageAutoKill ctrl('K')
-#define iKeyPageRedrawScr ctrl('L')
 #define iKeyPageNextThd2 '\r'
-#define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
 #define iKeyPageFollowupQuoteHeaders ctrl('W')
 #define iKeyPageToggleTex2iso '\"'
 #define iKeyPageToggleRot '%'
 #ifdef HAVE_COLOR
-#	define iKeyPageToggleColor '&'
 #	define iKeyPageToggleHighlight '_'
 #endif /* HAVE_COLOR */
 #define iKeyPageLastViewed '-'
@@ -274,7 +266,7 @@
 #define iKeyPageFollowupQuote 'f'
 #define iKeyPageFirstPage2 'g'
 #define iKeyPageHelp 'h'
-#define iKeyPageKillArt 'k' /* overrides iKeyUp3 */
+#define iKeyPageKillArt 'k' /* overrides iKeyUp3, which has no effect at pager level */
 #define iKeyPageListThd 'l'
 #define iKeyPageMail 'm'
 #define iKeyPageNextArt 'n'
@@ -338,10 +330,8 @@
 
 #define iKeySelectEnterNextUnreadGrp '\t'
 #define iKeySelectReadGrp '\n'
-#define iKeySelectRedrawScr ctrl('L')
 #define iKeySelectReadGrp2 '\r'
 #define iKeySelectResetNewsrc ctrl('R')
-#define iKeySelectToggleColor '&'
 #define iKeySelectCatchupNextUnread 'C'
 #define iKeySelectToggleHelpDisplay 'H'
 #define iKeySelectToggleInverseVideo 'I'
@@ -369,9 +359,7 @@
 
 #define iKeyThreadReadNextArtOrThread '\t'
 #define iKeyThreadReadArt '\n'
-#define iKeyThreadRedrawScr ctrl('L')
 #define iKeyThreadReadArt2 '\r'
-#define iKeyThreadToggleColor '&'
 #define iKeyThreadMarkArtSel '*'
 #define iKeyThreadLastViewed '-'
 #define iKeyThreadToggleArtSel '.'

@@ -41,7 +41,8 @@ TIN related:
   DEBUG_REFS (see doc/DEBUG_REFS)  PROFILE
   ENFORCE_RFC1034                  REQUIRE_BRACKET_IN_DOMAIN_LITERAL
   JUST_TESTING                     TINC_DNS
-  KILL_READ
+  EVIL_INSIDE                      USE_CANLOCK
+  REREAD_ACTIVE_FILE_SECS
 
 
 System related:
@@ -409,11 +410,7 @@ They are just not able to use the '!' key to do so.
 
 --enable-inverse-video (default: on)
 Disable if you want inverse video and highlighted bar disabled. Can be
-toggled in tin by the 'I' command and highlight bar by 'M' command.
-
-[FIXME: Is this still true? 'M' command is for entering the config menu
- ... Is the support for disabling of this feature complete?
-							-dn, 1998-12-27]
+toggled in tin by the 'I' command.
 
 --enable-xhdr-xref (default: on)
 If disabled, don't allow using XHDR XREF if XOVER doesn't work to mark
@@ -434,95 +431,59 @@ reclaimed.
 
 Compiled & installed on the following machines:
 -----------------------------------------------
+i486-pc-linux-gnu        (libc 5.4.33) gcc 2.7.2.1  (pre-1.4 release 19990927)        <urs@tin.org>
+i686-pc-linux-gnu        (glibc 2.0.7) egcs 2.91.66 (pre-1.4 release 19990927)        <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.0.7) fcc 1.0      (pre-1.4 release 19990927)        <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.0.7) tcc 4.1.2    (pre-1.4 release 19990927) [3][4] <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.1.1) gcc 2.95.2   (pre-1.4 release 19990927)        <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.1.1) lcc 4.27     (pre-1.4 release 19990927) [4][5] <urs@tin.org>
+mipsel-unknown-linux-gnu (glibc 2.0.7) gcc 2.7.2    (pre-1.4 release 19990927)        <urs@tin.org>
 
-1)	i486 & Linux 0.99.14w with gcc 2.5.7
-	i486 & Linux 1.2.13 with gcc 2.7.0
-	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i586 & Linux 2.2.12 with fcc 1.0
-	i586 & Linux 2.2.12 with gcc 2.95.1
-	i586 & Linux 2.3.9 with egcs-2.91.66
-	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
-	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
-	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
-	Cobalt Microserver 27 (MIPS Nevada V10.0) & Linux 2.0.34 with gcc 2.7.2
-	DEC Station 5000/xx (MIPS R3000A V3.0) & Linux 2.2.1 with egcs 2.90.27
+m68k-cbm-netbsd1.4                     egcs 2.91.60 (pre-1.4 release 19990927)        <rhoenie@many.de>
+vax-unknown-netbsd1.4M                 egcs 2.91.60 (pre-1.4 release 19990927)        <laura@tin.org>
+i386-unknown-netbsd1.4.1               egcs 2.91.60 (pre-1.4 release 19990927)        <urs@tin.org>
 
-2)	HP 9000/835 & HP-UX 8.00 with cc
-	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2
-	HP 9000/735 & HP-UX 9.02 with gcc 2.6.3
-	HP 9000/720 & HP-UX 9.05 with cc
-	HP 9000/720 & HP-UX 9.05 with gcc 2.7.2
-	HP 9000/715 & HP-UX 9.07 with cc
-	HP 9000/715 & HP-UX 9.07 with gcc 2.7.2
-	HP 9000/375 & HP-UX 9.10 with gcc 2.7.2.3
-	HP 9000/819 & HP-UX 10.10 with cc
-	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
-	HP 9000/829 & HP-UX 10.20 with cc
-	HP 9000/829 & HP-UX 10.20 with gcc 2.8.1
+i386-unknown-freebsd2.2                gcc 2.7.2.1  (pre-1.4 release 19990927)        <urs@tin.org>
+i386-unknown-freebsd3.1                gcc 2.7.2.1  (pre-1.4 release 19990927)        <goose@muffin.org>
+i386-unknown-freebsd3.2                egcs 2.91.60 (pre-1.4 release 19990927)        <goose@muffin.org>
 
-3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
-	VAX 8350 & Ultrix 4.0 with gcc 2.7.2
-	DEC Station ??? & Ultrix 4.3 with gcc 2.6.3
+sparc-sun-sunos4.1.3                   gcc 2.6.0    (pre-1.4 release 19990927)        <andy@tin.org>
+sparc-sun-solaris2.5                   gcc 2.7.2    (pre-1.4 release 19990927)        <urs@tin.org>
+sparc-sun-solaris2.5.1                 gcc 2.8.1    (pre-1.4 release 19990927)        <urs@tin.org>
+sparc-sun-solaris2.6                   gcc 2.8.1    (pre-1.4 release 19990927)        <dk@ssw.krakow.pl>
 
-4)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
-	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
-	AlphaStation 3000/M800 & Digital UNIX V4.0B OSF/1 with cc
+mips-sgi-irix6.2                       cc 7.000     (pre-1.4 release 19990927)        <andy@tin.org>
+mips-sgi-irix6.2                       gcc 2.7.2.2  (pre-1.4 release 19990927)        <turin@incubus.de>
+mips-sgi-irix6.4 (IRIX64)              cc 7.10      (pre-1.4 release 19990927)        <laura@tin.org>
 
-5)	AlphaStation ??? & OSF/1 v3.2 with cc
-	AlphaStation ??? & OSF/1 v3.2 with gcc 2.7.2
+mips-dec-ultrix4.4                     cc           (pre-1.4 release 19990927) [1]    <urs@tin.org>
 
-6)	Sun SPARCstation 10 & SunOS 5.5 with cc 3.0.1
-	Sun UltraSPARC Enterprise 2 & SunOS 5.5.1 with gcc 2.7.2
-	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0
-	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
-	sparc-sun-solaris2.5.1 with Sun Sparcworks compiler (v 4.2)
-	Sun 3/60 & SunOS 4.1.1_U1 with gcc 2.7.2.2
-	Sun SPARCsystem 600 & SunOS 5.5.1 with WorkShop Compilers 5.0
-	Sun SPARCsystem 600 & SunOS 5.5.1 with gcc 2.8.1
-	i686 & SunOS 5.6 with gcc 2.8.1
-	i586 & SunOS 5.7 with gcc 2.8.1
-	i586 & SunOS 5.7 with WorkShop Compilers 5.0
+alpha-dec-osf4.0b                      cc 5.2-033   (pre-1.4 release 19990927)        <roland@tin.org>
 
-7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
+rs6000-ibm-aix3.2.5                    xlc 1.3      (pre-1.4 release 19990927)        <andy@tin.org>
+rs6000-ibm-aix4.1.5.0                  xlc 3.1      (pre-1.4 release 19990927)        <andy@tin.org>
+rs6000-ibm-aix4.1.5.0                  gcc 2.8.1    (pre-1.4 release 19990927)        <andy@tin.org>
+powerpc-ibm-aix4.3.1.0                 egcs 2.91.60 (pre-1.4 release 19990927)        <rhoenie@mayn.de>
 
-8)	i486 & BSDI 2.0 with gcc 1.42
-	i486 & BSDI 2.0 with gcc 2.6.3
+hppa1.1-hp-hpux9.05                    cc 9.84      (pre-1.4 release 19990927) [2]    <urs@tin.org>
+hppa1.1-hp-hpux9.07                    cc 9.77      (pre-1.4 release 19990927) [2]    <urs@tin.org>
+hppa1.1-hp-hpux9.07                    gcc 2.7.2.3  (pre-1.4 release 19990927) [2]    <urs@tin.org>
+hppa1.1-hp-hpux10.20                   cc 10.32.20  (pre-1.4 release 19990927) [2]    <andy@tin.org>
+hppa1.1-hp-hpux10.20                   gcc 2.8.1    (pre-1.4 release 19990927) [2]    <andy@tin.org>
+hppa2.0-hp-hpux10.20                   cc 10.32.05  (pre-1.4 release 19990927) [2]    <urs@tin.org>
+hppa2.0-hp-hpux10.20                   gcc 2.7.2.3  (pre-1.4 release 19990927) [2]    <urs@tin.org>
 
-9)	i486 & NetBSD 1.1 with gcc 2.4.5
-	i486 & NetBSD 1.2 with gcc 2.7.2
-	Amiga 4000 & NetBSD 1.2 with gcc 2.7.2
-	Sun 3/60 & NetBSD 1.2G with gcc 2.7.2.2
+i386-sni-sysv4                         cc 3.5F      (pre-1.4 release 19990927)        <laura@tin.org>
 
-10)	i386 & FreeBSD 2.1.0 with gcc 2.7.2
-	i586 & FreeBSD 2.2.7 with tcc 4.0 (TenDRA-4.1.2)
-	i486 & FreeBSD 2.2.7 with gcc 2.7.2.1
-	i586 & FreeBSD 3.0-SNAP-971208 with gcc 2.7.2.1
+f300-fujitsu-uxpv4.1_ES                cc 1.04      (pre-1.4 release 19990927)        <andy@tin.org>
 
-11)	IBM PowerPC RS6000/40p & AIX 4.1.5.0 with gcc 2.8.1
-	IBM RS6000/990 & AIX 4.1.5 with xlc
-	IBM 7012/320H & AIX 3.2 with gcc 2.3.3
-
-12)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
-	with SCO OpenServer Development System (ver 5.0.0a)
-	i486 & SCO System V Rel 3.2v4.2 with cc
-
-13)	i386 & XENIX 2.3.3 with gcc 1.37.1
-
-14)	NeXT Computer & NeXTSTEP 3.3 with gcc 2.5.8
-
-15)	SGI SC900 Power Challenge & IRIX 6.2 with gcc 2.7.2
-	SGI SC900 Power Challenge & IRIX 6.2 with cc -32
-	SGI Indigo2 & IRIX 5.3 with gcc 2.7.2
-	SGI 4D/35 & IRIX 5.2 with IDO 5.2
-	SGI 4D/35 & IRIX 5.2 with gcc 2.8.1
-
-16)	m88k mc88110 & UNIX_System_V 4.0 R40V4.4
-	with Motorola Configurable C Compilation System (CCCS) 1.0
-
-17)	Amiga 4000 & AmigaOS 3.0 with SAS/C 6.57
-
-18)	OpenVMS/Alpha 6.2, DEC C V5.0-003,                  SOCKETSHR_TCP
-	OpenVMS/Vax   5.3, GCC 2.7.2 (Pat Ranking edition), SOCKETSHR_TCP
-
-19)	i586 & Windows95 with CYGWIN_95-4.0/20.1
-	i686 & WindowsNT with CYGWIN_NT-4.0/20.1
+[1] add extra space at the end of buf[] in src/screen.c:spin_cursor()
+    (fixed in the next release)
+[2] rename USE_KEYPAD to HAVE_KEYPAD in include/extern.h and src/lang.c
+    (fixed in the next release)
+[3] missing cast for 5th arg of mail_to_someone() in src/post.c:1982
+    (fixed in the next release)
+[4] parsdate.c can't be compiled with lcc (use gcc), tcc -Xp or -Xs
+    (use tcc -Xc) - needs to be fixed.
+[5] alloca detection fails, remove alloca.o from src/Makefile before
+    compiling

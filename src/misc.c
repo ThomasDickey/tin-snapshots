@@ -12,13 +12,24 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"version.h"
-#include	"bugrep.h"
-#include	"trace.h"
-#include	"policy.h"
-
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
+#ifndef BUGREP_H
+#	include  "bugrep.h"
+#endif /* !BUGREP_H */
+#ifndef included_trace_h
+#	include "trace.h"
+#endif /* !included_trace_h */
+#ifndef TIN_POLICY_H
+#	include	"policy.h"
+#endif /* !TIN_POLICY_H */
 
 /*
  * defines to control GNKSA-checks behaviour:
@@ -257,7 +268,7 @@ invoke_editor (
 		first = FALSE;
 	}
 
-	strcpy (editor_format, (tinrc.start_editor_offset ? (*tinrc.editor_format ? tinrc.editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
+	strcpy (editor_format, (*tinrc.editor_format ? tinrc.editor_format : (tinrc.start_editor_offset ? TIN_EDITOR_FMT_ON : TIN_EDITOR_FMT_OFF)));
 
 	if (!strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format))
 		sh_format (buf, sizeof(buf), "%s %s", editor, filename);
@@ -1098,7 +1109,7 @@ parse_from (
 						break;
 					case '(' :
 						plevel++;
-					/* FALLTHROUGH */
+						nobreak; /* FALLTHROUGH */
 					default :
 						*(cmtp++) = *ap;
 					break;
@@ -1149,61 +1160,25 @@ eat_re (
 	char *s,
 	t_bool eat_was)
 {
-#if 0
-	char *e;
-
-	while (*s == 'r' || *s == 'R') {
-		if ((*(s+1) == 'e' || *(s+1) == 'E')) {
-			if (*(s+2) == ':')
-				s += 3;
-			else if (*(s+2) == ' ' && *(s+3) == ':')
-				s += 4;
-			else if (*(s+2) == '^' && isdigit((unsigned char)*(s+3)) && *(s+4) == ':')
-				s += 5;	/* hurray nn */
-			else
-				break;
-		} else
-			break;
-
-		while (*s == ' ')		/* And skip leading whitespace */
-			s++;
-
-	}
-	if (eat_was) { /* kill "(was: ...)" ? */
-		if ((e = strstr(s, "(was:"))) /* should we take more spaces into consideration? */
-			*e = '\0';
-	}
-
-	for (e = s; *e; e++)	/* NULL out trailing whitespace */
-		;		/* moved here from the loop */
-
-	while (e-- > s && isspace((unsigned char)*e))
-		*e = '\0';
-
-	return s;
-#else
 	int data, slen;
 	int offsets[6];
 	int size_offsets = sizeof(offsets)/sizeof(int);
 
 	do {
 		slen = strlen(s);
-		data = pcre_exec(strip_re_regex.re, strip_re_regex.extra,
-			       	s, slen, 0, 0, offsets, size_offsets);
+		data = pcre_exec(strip_re_regex.re, strip_re_regex.extra, s, slen, 0, 0, offsets, size_offsets);
 		if (offsets[0] == 0)
 			s += offsets[1];
 	} while (data > 0);
 
 	if (eat_was) do {
 		slen = strlen(s);
-		data = pcre_exec(strip_was_regex.re, strip_was_regex.extra,
-				s, slen, 0, 0, offsets, size_offsets);
+		data = pcre_exec(strip_was_regex.re, strip_was_regex.extra, s, slen, 0, 0, offsets, size_offsets);
 		if (offsets[0] > 0)
 			s[offsets[0]] = '\0';
 	} while (data > 0);
 
 	return s;
-#endif
 }
 
 
@@ -1410,7 +1385,7 @@ strfquote (
 {
 	char *endp = s + maxsize;
 	char *start = s;
-	char tbuf[PATH_LEN];
+	char tbuf[LEN];
 	int i, j;
 	t_bool iflag;
 
@@ -1638,12 +1613,12 @@ out:
 
 /*
  * strfpath - produce formatted pathname expansion. Handles following forms:
- *   ~/News    -> /usr/iain/News
+ *   ~/News    -> $HOME/News
  *   ~abc/News -> /usr/abc/News
  *   $var/News -> /env/var/News
- *   =file     -> /usr/iain/Mail/file
- *   +file     -> /usr/iain/News/group.name/file
- *   ~/News/%G -> /usr/iain/News/group.name		currently not implemented
+ *   =file     -> $HOME/Mail/file
+ *   +file     -> tinrc.default_savedir/group.name/file
+ *   ~/News/%G -> $HOME/News/group.name
  *
  * Inputs:
  *   format		The string to be converted
@@ -1690,9 +1665,9 @@ strfpath (
 		 * If just a normal part of the pathname copy it
 		 */
 #ifdef VMS
-		if (!strchr ("~=+", *format))
+		if (!strchr ("~=+%", *format))
 #else
-		if (!strchr ("~$=+", *format))
+		if (!strchr ("~$=+%", *format))
 #endif /* VMS */
 		{
 			*str++ = *format;
@@ -1848,11 +1823,23 @@ strfpath (
 				} else
 					*str++ = *format;
 				break;
-#if 0 /* %G is not implemented at the moment */
 			case '%':	/* Different forms of parsing cmds */
-				*str++ = *format;
-				break;
-#endif /* 0 */
+				format++;
+				if (*format && *format == 'G') {
+					memset(tbuf, 0, sizeof(tbuf));
+					STRCPY(tbuf, group);
+					i = strlen(tbuf);
+					if (((str + i) < (endp - 1)) && (i > 0)) {
+						strcpy(str, tbuf);
+						str += i;
+						break;
+					} else {
+						str[0] = '\0';
+						return 0;
+					}
+				} else
+					*str++ = *format;
+				nobreak; /* FALLTHROUGH */
 			default:
 				break;
 		}
@@ -3172,7 +3159,7 @@ gnksa_check_domain (
 
 	/* check for domain literal */
 	if ('[' == *domain) /* check value of domain literal */
-		 return gnksa_check_domain_literal(domain);
+		return gnksa_check_domain_literal(domain);
 
 	/* check for leading or trailing dot */
 	if (('.' == *domain) || ('.' == *(domain+strlen(domain)-1)))
@@ -3201,7 +3188,7 @@ gnksa_check_domain (
 			/* no numeric components allowed */
 			if (('0' <= *aux) && ('9' >= *aux)
 			    && ('0' <= *(aux + 1)) && ('9' >= *(aux + 1)))
-			    return gnksa_check_domain_literal(domain);
+				return gnksa_check_domain_literal(domain);
 
 			if (('a' <= *aux) && ('z' >= *aux)
 			    && ('a' <= *(aux + 1)) && ('z' >= *(aux + 1))) {
@@ -3217,8 +3204,8 @@ gnksa_check_domain (
 			if (('0' <= *aux) && ('9' >= *aux)
 			    && ('0' <= *(aux + 1)) && ('9' >= *(aux + 1))
 			    && ('0' <= *(aux + 2)) && ('9' >= *(aux + 2)))
-			    return gnksa_check_domain_literal(domain);
-		/* FALLTHROUGH */
+				return gnksa_check_domain_literal(domain);
+			nobreak; /* FALLTHROUGH */
 		default:
 			/* check for valid domains */
 			result = GNKSA_INVALID_DOMAIN;

@@ -14,9 +14,15 @@
  *              update for scoring (c) 1997 by Oliver B. Warzecha
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 #define IS_READ(i)	(arts[i].status == ART_READ)
 #define IS_KILLED(i)	(arts[i].killed)
@@ -1086,12 +1092,13 @@ filter_menu (
 		}
 	}
 	/* NOTREACHED */
+	return FALSE;
 }
+
 
 /*
  * Quick command to add an auto-select / kill filter to specified groups filter
  */
-
 t_bool
 quick_filter (
 	int type,
@@ -1254,7 +1261,7 @@ bAddFilterRule (
 	switch(psRule->expire_time)
 	{
 		case 1:
-			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 86400);		/*  86400 = 60 * 60 * 24 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 86400);	/*  86400 = 60 * 60 * 24 */
 			break;
 		case 2:
 			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 172800);	/* 172800 = 60 * 60 * 24 * 2 */
@@ -1447,10 +1454,9 @@ filter_articles (
 	 */
 	for (i = 0; i < top; i++) {
 		arts[i].score = 0;
-#ifndef KILL_READ
-		if (IS_READ(i)) /* skip only when the article is read */
+
+		if (tinrc.kill_level == KILL_READ && IS_READ(i)) /* skip only when the article is read */
 			continue;
-#endif /* !KILL_READ */
 
 		mesg[0] = '\0';				/* Clear system message field */
 

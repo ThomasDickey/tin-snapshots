@@ -13,7 +13,9 @@
  */
 
 #define __BUILD__
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #define L_CURL '{'
 #define R_CURL '}'

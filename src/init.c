@@ -12,14 +12,24 @@
  *              right notice, and it must be included in any copy made
  */
 
-
-#include	"tin.h"
-#include	"tnntp.h"
-#include	"trace.h"
-#include	"menukeys.h"
-#include	"version.h"
-#include	"bugrep.h"
-
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TNNTP_H
+#	include "tnntp.h"
+#endif /* !TNNTP_H */
+#ifndef included_trace_h
+#	include "trace.h"
+#endif /* !included_trace_h */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
+#ifndef BUGREP_H
+#	include	"bugrep.h"
+#endif /* !BUGREP_H */
 
 /*
  * local prototypes
@@ -223,7 +233,6 @@ struct t_config tinrc = {
 	"",		/* default_search_subject */
 	"",		/* default_select_pattern */
 	"",		/* default_shell_command */
-	"",		/* sigfile */
 	"In article %M you wrote:",		/* mail_quote_format */
 	"",		/* maildir */
 	"",		/* mail_address */
@@ -238,6 +247,7 @@ struct t_config tinrc = {
 	"",		/* quote_regex 2nd level*/
 	"",		/* quote_regex >= 3rd level */
 #endif /* HAVE_COLOR */
+	"",		/* sigfile */
 	"",		/* strip_re_regex */
 	"",		/* strip_was_regex */
 	"",		/* savedir */
@@ -250,6 +260,7 @@ struct t_config tinrc = {
 	iKeySaveAppendFile,		/* default_save_mode */
 	0,		/* getart_limit */
 	32,		/* groupname_max_length */
+	KILL_READ,		/* kill_level */
 	MIME_ENCODING_7BIT,		/* mail_mime_encoding */
 	MIME_ENCODING_7BIT,		/* post_mime_encoding */
 	POST_PROC_NONE,			/* post_process */
@@ -1066,6 +1077,10 @@ read_site_config (
 			continue;
 		if (match_string (buf, "mm_charset=", tinrc.mm_charset, sizeof (tinrc.mm_charset)))
 			continue;
+		if (match_list (buf, "post_mime_encoding=", txt_mime_encodings, NUM_MIME_ENCODINGS, &tinrc.post_mime_encoding))
+			continue;
+		if (match_list (buf, "mail_mime_encoding=", txt_mime_encodings, NUM_MIME_ENCODINGS, &tinrc.mail_mime_encoding))
+			continue;
 		if (match_boolean (buf, "disable_gnksa_domain_check=", &disable_gnksa_domain_check))
 			continue;
 		if (match_boolean (buf, "disable_sender=", &disable_sender))
@@ -1075,4 +1090,31 @@ read_site_config (
 	fclose(fp);
 
 	return 0;
+}
+
+
+/*
+ * set defaults if needed to avoid empty regexp
+ */
+void
+postinit_regexp (
+	void)
+{
+	if (!strlen(tinrc.strip_re_regex))
+		STRCPY(tinrc.strip_re_regex, DEFAULT_STRIP_RE_REGEX);
+	compile_regex (tinrc.strip_re_regex, &strip_re_regex, PCRE_ANCHORED);
+	if (!strlen(tinrc.strip_was_regex))
+		STRCPY(tinrc.strip_was_regex, DEFAULT_STRIP_WAS_REGEX);
+	compile_regex (tinrc.strip_was_regex, &strip_was_regex, 0);
+#ifdef HAVE_COLOR
+	if (!strlen(tinrc.quote_regex))
+		STRCPY(tinrc.quote_regex, DEFAULT_QUOTE_REGEX);
+	compile_regex (tinrc.quote_regex, &quote_regex, PCRE_CASELESS);
+	if (!strlen(tinrc.quote_regex2))
+		STRCPY(tinrc.quote_regex2, DEFAULT_QUOTE_REGEX2);
+	compile_regex (tinrc.quote_regex2, &quote_regex2, PCRE_CASELESS);
+	if (!strlen(tinrc.quote_regex3))
+		STRCPY(tinrc.quote_regex3, DEFAULT_QUOTE_REGEX3);
+	compile_regex (tinrc.quote_regex3, &quote_regex3, PCRE_CASELESS);
+#endif /* HAVE_COLOR */
 }

@@ -12,12 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-#	include	"tcurses.h"
-#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #ifndef INDEX_DAEMON
 	static void read_groups_descriptions (FILE *fp, FILE *fp_save);

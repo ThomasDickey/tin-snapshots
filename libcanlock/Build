@@ -3,8 +3,8 @@
 if [ me$1ow = mecleanow ] ; then
 	rm *.o *.a endian endian.h canlocktest hmactest *~ core
 else
-	CC="cc"
-	
+#	CC="cc"
+	CC="${CC-cc}"
 	echo 'Determining endianness...'
 	${CC} -o endian endian.c
 	./endian > endian.h

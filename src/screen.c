@@ -12,8 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 char mesg[LEN];
 
@@ -310,7 +314,7 @@ void
 spin_cursor (
 	void)
 {
-	static const char buf[] = "|/-\\|/-\\";
+	static const char buf[] = "|/-\\|/-\\ "; /* don't remove the taling sapce! */
 	static unsigned short int i = 0;
 
 	if (batch_mode)

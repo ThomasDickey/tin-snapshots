@@ -14,8 +14,12 @@
  */
 
 
-#include	"tin.h"
-#include	"tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 
 /*
@@ -655,7 +659,7 @@ open_xover_fp (
 #ifdef DEBUG
 		if (debug)
 			error_message ("READ file=[%s]", pcNovFile);
-#endif /* DEBUG  */
+#endif /* DEBUG */
 		if (pcNovFile != (char *) 0)
 			return fopen (pcNovFile, pcMode);
 
@@ -748,12 +752,22 @@ get_article (
 	char *ptr;
 	char tempfile[PATH_LEN];
 	int count = 0;
+#	if defined(HAVE_FDOPEN) && defined(HAVE_MKSTEMP)
+	int fd = -1;
+#	endif /* HAVE_FDOPEN && HAVE_MKSTEMP */
 	struct stat sb;
 
 	sprintf (tempfile, "%stin_nntpXXXXXX", TMPDIR);
+#	if defined(HAVE_FDOPEN) && defined(HAVE_MKSTEMP)
+	if ((fd = my_mktemp (tempfile)) == -1) {
+		perror_message (txt_cannot_create_uniq_name);
+		return (FILE *) 0;
+	}
+	if ((fp = fdopen (fd, "w")) == (FILE *) 0) {
+#	else
 	mktemp (tempfile);
-
 	if ((fp = fopen (tempfile, "w")) == (FILE *) 0) {
+#	endif /* HAVE_FDOPEN && HAVE_MKSTEMP */
 		perror_message (txt_article_cannot_open, tempfile);
 		return (FILE *) 0;
 	}

@@ -8,8 +8,10 @@
  */
 #include <stdio.h>
 #include <sys/types.h>
-//#include "sha1.h"
-//#include "md5.h"
+#if 0
+// #include "sha1.h"
+// #include "md5.h"
+#endif /* 0 */
 #include "canlock.h"
 
 #define BUFFSIZE 512

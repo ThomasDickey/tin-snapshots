@@ -16,10 +16,10 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990927"
-#	define RELEASENAME	"Nine While Nine"
-#	define TINRC_VERSION	"1.1"
+#	define VERSION		"1.4"
+#	define RELEASEDATE	"19991113"
+#	define RELEASENAME	"No Labels"
+#	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA
 #		define OS	"AMIGA"
@@ -31,7 +31,7 @@
 #	endif /* M_OS2 */
 
 #	ifdef M_UNIX
-#		if !defined( __amiga )
+#		if !defined(__amiga)
 #			define OS	"UNIX"
 #		else
 #			define OS	"AMIGA"

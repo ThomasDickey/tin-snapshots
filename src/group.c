@@ -12,9 +12,15 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))
@@ -37,16 +43,28 @@ static int len_subj;
 	static int first_subj_on_screen;
 	static int last_subj_on_screen;
 	static int thread_depth;			/* Stating depth in threads we enter */
+	typedef struct
+	{
+		char *subject;
+		int subject_compare_len;
+		int part_number;
+		int total;
+		int base_index;
+	} MultiPartInfo;
 #endif /* !INDEX_DAEMON */
 
 /*
  * Local prototypes
  */
-
+static int choose_new_group (void);
 static void draw_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
+	static int get_multipart_info (int base_index, MultiPartInfo *setme);
+	static int get_multiparts (int base_index, MultiPartInfo **malloc_and_setme_info);
+	static int look_for_multipart_info (int base_index, MultiPartInfo* setme, char start, char stop);
 	static int line_is_tagged (int n);
+	static int tag_multipart (int base_index);
 	static void bld_sline (int i);
 	static void draw_sline (int i, t_bool full);
 	static void erase_subject_arrow (void);
@@ -56,6 +74,201 @@ static void draw_subject_arrow (void);
 	static void show_group_title (t_bool clear_title);
 	static void show_tagged_lines (void);
 	static void toggle_read_unread (t_bool force);
+#endif /* !INDEX_DAEMON */
+
+#ifndef INDEX_DAEMON
+/*
+ * Parses a subject header of the type "multipart message subject (01/42)"
+ * into a MultiPartInfo struct, or fails if the message subject isn't in the
+ * right form.
+ *
+ * @return nonzero on success
+ */
+static int
+get_multipart_info (
+	int base_index,
+	MultiPartInfo *setme)
+{
+	int i = look_for_multipart_info(base_index, setme, '[', ']');
+	if (i)
+		return i;
+	return look_for_multipart_info(base_index, setme, '(', ')');
+}
+
+
+static int
+look_for_multipart_info (
+	int base_index,
+	MultiPartInfo* setme,
+	char start,
+	char stop)
+{
+	MultiPartInfo tmp;
+	char *subj = (char *) 0;
+	char *pch = (char *) 0;
+
+	/* entry assertions */
+	assert (0 <= base_index && base_index < top_base && "invalid base_index");
+	assert (setme != NULL && "setme must not be NULL");
+
+	/* parse the message */
+	subj = arts[base[base_index]].subject;
+	pch = strrchr (subj, start);
+	if (!pch)
+		return 0;
+	if (!isdigit((int)pch[1]))
+		return 0;
+	tmp.base_index = base_index;
+	tmp.subject_compare_len = pch - subj;
+	tmp.part_number = (int) strtol(pch+1, &pch, 10);
+	if (*pch != '/' && *pch!='|')
+		return 0;
+	if (!isdigit((int)pch[1]))
+		return 0;
+	tmp.total = (int) strtol (pch+1, &pch, 10);
+	if (*pch != stop)
+		return 0;
+	tmp.subject = subj;
+	*setme = tmp;
+	return 1;
+}
+
+
+/*
+ * Tries to find all the parts to the multipart message pointed to by
+ * base_index.
+ *
+ * Weakness(?): only walks through the base messages.
+ *
+ * @return on success, the number of parts found.  On failure, zero if not a
+ * multipart or the negative value of the first missing part.
+ * @param base_index index pointing to one of the messages in a multipart
+ * message.
+ * @param malloc_and_setme_info on success, set to a malloced array the
+ * parts found.  Untouched on failure.
+ */
+static int
+get_multiparts (
+	int base_index,
+	MultiPartInfo **malloc_and_setme_info)
+{
+	MultiPartInfo tmp, tmp2;
+	MultiPartInfo *info = 0;
+	int i = 0;
+
+	/* entry assertions */
+	assert (0<=base_index && base_index<top_base && "Invalid base index");
+	assert (malloc_and_setme_info!=NULL && "malloc_and_setme_info must not be NULL");
+
+	/* make sure this is a multipart message... */
+	if (!get_multipart_info(base_index, &tmp) || tmp.total < 1)
+		return 0;
+
+	/* make a temporary buffer to hold the multipart info... */
+	info = my_malloc (sizeof(MultiPartInfo) * tmp.total);
+
+	/* zero out part-number for the repost check below */
+	for (i = 0; i < tmp.total; ++i)
+		info[i].part_number = -1;
+
+	/* try to find all the multiparts... */
+	for (i = 0; i < top_base; ++i) {
+		int part_index = 0;
+
+		if (strncmp (arts[base[i]].subject, tmp.subject, tmp.subject_compare_len))
+			continue;
+		if (!get_multipart_info (i, &tmp2))
+			continue;
+
+		part_index = tmp2.part_number - 1;
+
+		/* skip the "blah (00/102)" info messages... */
+		if (part_index < 0)
+			continue;
+
+		/* skip insane "blah (103/102) subjects... */
+		if (part_index >= tmp.total)
+			continue;
+
+		/* repost check: do we already have this part? */
+		if (info[part_index].part_number != -1) {
+			assert (info[part_index].part_number == tmp2.part_number && "bookkeeping error");
+			continue;
+		}
+
+		/* we have a match, hooray! */
+		info[part_index] = tmp2;
+	}
+
+	/* see if we got them all. */
+	for (i = 0; i < tmp.total; ++i) {
+		if (info[i].part_number != i+1) {
+			free (info);
+			return -(i+1); /* missing part #(i+1) */
+		}
+	}
+
+	/* looks like a success .. */
+	*malloc_and_setme_info = info;
+	return tmp.total;
+}
+
+
+/*
+ * Tags all parts of a multipart index if base_index points
+ * to a multipart message and all its parts can be found.
+ *
+ * @param base_index points to one message in a multipart message.
+ * @return number of messages tagged, or zero on failure
+ */
+static int
+tag_multipart (
+	int base_index)
+{
+	MultiPartInfo *info = 0;
+	int i = 0;
+	const int qty = get_multiparts(base_index, &info);
+
+	/* check for failure... */
+	if (qty == 0) {
+		info_message ("Not a multi-part message"); /* FIXME: -> lang.c */
+		return 0;
+	}
+	if (qty < 0) {
+		char tmp[48];
+		sprintf (tmp, "Missing part #%d", -qty);
+		info_message(tmp); /* FIXME: -> lang.c? */
+		return 0;
+	}
+
+	/*
+	 * if any are already tagged, untag 'em first
+	 * so num_of_tagged_arts doesn't get corrupted
+	 */
+	for ( i=0; i<qty; ++i ) {
+		int *tagged = &arts[base[info[i].base_index]].tagged;
+		if (*tagged) {
+			decr_tagged (*tagged);
+			*tagged = 0;
+			--num_of_tagged_arts;
+		}
+	}
+
+	/*
+	 * get_multiparts sorts info by part number,
+	 * so a sinmple for loop tags in the right order
+	 */
+	for (i = 0; i < qty; ++i) {
+		const int my_base_index = info[i].base_index;
+		arts[base[my_base_index]].tagged = ++num_of_tagged_arts;
+	}
+
+	free (info);
+
+	info_message ("All parts tagged"); /* FIXME -> lang.c */
+	update_group_page();
+	return qty;
+}
 #endif /* !INDEX_DAEMON */
 
 
@@ -460,7 +673,7 @@ group_page_down:
 				}
 				break;
 
-			case iKeyGroupRedrawScr:	/* redraw screen */
+			case iKeyRedrawScr:	/* redraw screen */
 				my_retouch ();
 				set_xclick_off ();
 				show_group_page ();
@@ -520,7 +733,7 @@ group_catchup:									/* came here on group exit via left arrow */
 									break;
 								case 1:						/* We caught up - advance group */
 									index_point = GRP_NEXT;
-									/* FALLTHROUGH */
+									nobreak;	/* FALLTHROUGH */
 								default:					/* Just leave the group */
 									goto group_done;
 							}
@@ -566,7 +779,7 @@ group_catchup:									/* came here on group exit via left arrow */
 				break;
 
 #	ifdef HAVE_COLOR
-			case iKeyGroupToggleColor:
+			case iKeyToggleColor:
 				if (toggle_color ()) {
 					show_group_page ();
 					show_color_status ();
@@ -836,6 +1049,27 @@ enter_pager:
 				mail_bug_report ();
 				ClearScreen ();
 				show_group_page ();
+				break;
+
+			case iKeyGroupTagParts: /* tag all in order */
+				if (0 <= index_point) {
+					int new_tag_qty = tag_multipart (index_point);
+					/*
+					 * on success, move the pointer to the next
+					 * untagged article just for ease of use's sake
+					 */
+					if (new_tag_qty != 0) {
+						int k = index_point;
+						do {
+							k++;
+							k %= top_base;
+							if (!arts[base[k]].tagged ) {
+								move_to_thread (k);
+								break;
+							}
+						} while (k != index_point);
+					}
+				}
 				break;
 
 			case iKeyGroupTag:	/* tag/untag threads for mailing/piping/printing/saving */
@@ -1347,6 +1581,36 @@ toggle_read_unread (
 		index_point = top_base - 1;
 }
 #endif /* !INDEX_DAEMON */
+
+
+static int
+choose_new_group (
+	void)
+{
+	char *p;
+	int idx;
+
+	sprintf (mesg, txt_newsgroup, tinrc.default_goto_group);
+
+	if (!(prompt_string_default (mesg, tinrc.default_goto_group, "", HIST_GOTO_GROUP)))
+		return -1;
+
+	/*
+	 * Skip leading whitespace, ignore blank strings
+	 */
+	for (p = tinrc.default_goto_group; *p && (*p == ' ' || *p == '\t'); p++)
+		continue;
+
+	if (*p == '\0')
+		return -1;
+
+	clear_message ();
+
+	if ((idx = my_group_add (p)) == -1)
+		info_message (txt_not_in_active_file, p);
+
+	return idx;
+}
 
 
 /*

@@ -16,50 +16,50 @@ struct t_config {
 	char art_marked_selected;
 	char art_marked_unread;
 	char editor_format[PATH_LEN];		/* editor + parameters  %E +%N %F */
-	char default_goto_group[LEN];		/* default for the 'g' command */
-	char default_mail_address[LEN];
+	char default_goto_group[HEADER_LEN];		/* default for the 'g' command */
+	char default_mail_address[HEADER_LEN];
 	char mailer_format[PATH_LEN];		/* mailer + parameters  %M %S %T %F */
 #ifndef DONT_HAVE_PIPING
 	char default_pipe_command[LEN];
 #endif /* DONT_HAVE_PIPING */
-	char default_post_newsgroups[PATH_LEN];	/* default newsgroups to post to */
-	char default_post_subject[PATH_LEN];	/* default subject when posting */
+	char default_post_newsgroups[HEADER_LEN];	/* default newsgroups to post to */
+	char default_post_subject[LEN];	/* default subject when posting */
 #ifndef DISABLE_PRINTING
 	char printer[LEN];					/* printer program specified from tinrc */
 #endif /* !DISABLE_PRINTING */
-	char default_range_group[PATH_LEN];
-	char default_range_select[PATH_LEN];
-	char default_range_thread[PATH_LEN];
+	char default_range_group[LEN];
+	char default_range_select[LEN];
+	char default_range_thread[LEN];
 	char default_regex_pattern[LEN];
 	char default_repost_group[LEN];		/* default group to repost to */
 	char default_save_file[PATH_LEN];
 	char default_search_art[LEN];		/* default when searching in article */
-	char default_search_author[LEN];	/* default when searching for author */
+	char default_search_author[HEADER_LEN];	/* default when searching for author */
 	char default_search_config[LEN];	/* default when searching config menu */
-	char default_search_group[LEN];		/* default when searching select screen */
+	char default_search_group[HEADER_LEN];		/* default when searching select screen */
 	char default_search_subject[LEN];	/* default when searching by subject */
 	char default_select_pattern[LEN];
 	char default_shell_command[LEN];
-	char sigfile[PATH_LEN];
-	char mail_quote_format[PATH_LEN];
+	char mail_quote_format[LEN];
 	char maildir[PATH_LEN];				/* mailbox dir where = saves are stored */
-	char mail_address[LEN];				/* user's mail address */
+	char mail_address[HEADER_LEN];				/* user's mail address */
 	char mm_charset[LEN];				/* MIME charset: moved from rfc1522.c */
 	char news_headers_to_display[LEN];	/* which headers to display */
 	char news_headers_to_not_display[LEN];	/* which headers to not display */
-	char news_quote_format[PATH_LEN];
+	char news_quote_format[LEN];
 	char post_process_command[PATH_LEN];		/* Post processing command */
-	char quote_chars[PATH_LEN];			/* quote chars for posting/mails ": " */
+	char quote_chars[LEN];			/* quote chars for posting/mails ": " (size matches prefixbuf in copy_body() */
 #ifdef HAVE_COLOR
 	char quote_regex[LEN];				/* regex used to determine quoted lines */
 	char quote_regex2[LEN];				/* regex used to determine twice quoted lines */
 	char quote_regex3[LEN];				/* regex used to determine >=3 times quoted lines */
 #endif /* HAVE_COLOR */
+	char sigfile[PATH_LEN];
 	char strip_re_regex[LEN];			/* regex used to find and remove 'Re:'-like strings */
 	char strip_was_regex[LEN];			/* regex used to find and remove '(was:.*'-like strings */
 	char savedir[PATH_LEN];				/* directory to save articles to */
 	char spamtrap_warning_addresses[LEN];
-	char xpost_quote_format[PATH_LEN];
+	char xpost_quote_format[LEN];
 	int filter_days;					/* num of days an article filter can be active */
 	int default_filter_kill_header;
 	int default_filter_select_header;
@@ -67,6 +67,7 @@ struct t_config {
 	int default_save_mode;				/* Append/Overwrite existing file when saving */
 	int getart_limit;					/* number of article to get */
 	int groupname_max_length;			/* max len of group names to display on screen */
+	int kill_level;						/* Define how killed articles are shown */
 	int mail_mime_encoding;
 	int post_mime_encoding;
 	int post_process;					/* type of post processing to be performed */

@@ -27,17 +27,6 @@
 #		define BUG_REPORT_ADDRESS	"stenns@vw.tci.uni-hannover.de"
 #	endif /* VMS */
 
-/* OS2 and WIN32 are currently not supported */
-#if 0
-#	ifdef M_OS2
-#		define BUG_REPORT_ADDRESS	"andreas@scilink.org"
-#	endif /* M_OS2 */
-
-#	ifdef WIN32
-#		define BUG_REPORT_ADDRESS	"nigele@microsoft.com"
-#	endif /* WIN32 */
-#endif /* 0*/
-
 /* fallback */
 #	ifndef BUG_REPORT_ADDRESS
 #		define BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
