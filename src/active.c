@@ -141,7 +141,7 @@ active_add(
 	long count,
 	long max,
 	long min,
-	char *moderated)
+	const char *moderated)
 {
 	ptr->name = my_strdup(name);
 	ptr->description = (char *) 0;
@@ -167,10 +167,11 @@ active_add(
 #endif
 
 #ifdef WIN32				/* Paths are in form - x:\a\b\c */
-	if (strchr(moderated, '\\')) {
+	if (strchr(moderated, '\\'))
 #else
-	if (moderated[0] == '/') {
+	if (moderated[0] == '/')
 #endif
+	{
 		ptr->type = GROUP_TYPE_SAVE;
 		ptr->spooldir = my_strdup(moderated);
 	} else {

@@ -452,7 +452,7 @@ continue_prompt (void)
 {
 	set_alarm_clock_off ();
 
-	info_message (txt_hit_any_key);
+	info_message (txt_cmdline_hit_any_key);
 	(void) ReadCh ();
 
 	set_alarm_clock_on ();

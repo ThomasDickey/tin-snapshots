@@ -1,0 +1,78 @@
+This document summarises new and significantly changed features
+in tin-1.3 unoff as of the 970212 release.
+
+[ Changes are relative to the last original tin beta, 950824 ]
+
+Full details of all the tinrc flags can be found on the man page. (eventually)
+
+Major additions
+---------------
+
+. Full MIME support
+	New foreign charset support
+	Many new associated tinrc variables
+
+. Colour support
+	& to toggle while online, many variables in tinrc
+	Word highlighting
+
+. References based threading
+	u to toggle online, settable in tinrc and in attributes
+    Various thread menu additions & enhancements
+
+. Now autoconfigures and builds out of the box
+	Much improved configurability
+
+. Configuration menu completely rewritten ('M')
+
+. Article Superceding
+
+. Full PGP support
+
+. Support for multiple news servers
+
+. Newsserver authorisation fully supported
+
+Plus of course, countless bug fixes and doubtless some new ones.
+
+Other enhancements
+------------------
+
+: skips quoted text in articles
+
+i shows group description in main menu or article subject in group menu
+
+^ goes to top of current display
+
+article length shown in group menu, can be turned off
+
+new_quote_format in attributes
+
+mark forwarded text ??? 0713
+
+locale support
+
+filtering on number of Xposts
+
+article postponement
+
+New newsgroup handling completely rewritten
+
+-N flag
+
+New flags in tinrc
+------------------
+keep_dead_articles
+keep_posted_articles
+no-advertising
+show_xcommentto
+hightlight_xcommentto
+xpost_quote_format
+auto_bcc
+post_process_command
+space_goto_next_unread
+news_quote_format enhancements (%C)
+show_lines
+lots for colour/highlighting
+
+loads more...

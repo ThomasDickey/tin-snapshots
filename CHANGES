@@ -1,3 +1,24 @@
+--unoff BETA release 970214 --
+
+316 ) T.E.Dicky  <dickey@clark.net>
+     ADD. several 'const'
+     BUG. tabs before preprocessor symbols (introduced in 312)
+     FIX. several supplied patches
+
+315) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. Tagged article counter sometimes badly broken
+     BUG. 'q' quit didn't work properly while entering a group
+     ADD. 'u' goto parent article in pager
+     ADD. 'S' autosave tagged and 'U' untag all to thread menu
+     ADD. Better handling of upgrade from earlier versions of Tin
+     ADD. Some documentation and help
+     ADD. minor code cleanup
+     FIX. art.c, config.c, page.c, thread.c
+
+314) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. first name (%C) in strfquote crashes when no name is given
+     FIX. misc.c
+
 --unoff BETA release 970212 --
 
 313) Jason Faultless <jason@radar.demon.co.uk>
@@ -50,11 +71,11 @@
      FIX. several supplied patches
 
 305) Dirk Nimmich <nimmich@uni-muenster.de>
-     ADD. code cleaup (moved stings to lang.c)
-     FIX. severap supplied patches
+     ADD. code cleanup (moved strings to lang.c)
+     FIX. several supplied patches
 
 304) Sven Paulus <sven@oops.sub.de>
-     BUG. Summery/Keywords are overwritten on a superseede
+     BUG. Summary/Keywords are overwritten on a supersede
      FIX. post.c
 
 --unoff BETA release 970127 --

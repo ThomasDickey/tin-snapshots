@@ -177,7 +177,7 @@ backup_article_name(
 {
   static char name[PATH_LEN];
 
-  strcpy(name, article);
+  strcpy(name, the_article);
   strcat(name, ".bak");
 
   return name;
@@ -190,10 +190,10 @@ backup_article(
   char line[LEN];
   FILE *in, *out;
 
-  if((in=fopen(article, "r"))==NULL)
+  if((in=fopen(the_article, "r"))==NULL)
     return;
 
-  if((out=fopen(backup_article_name(article), "w"))==NULL) {
+  if((out=fopen(backup_article_name(the_article), "w"))==NULL) {
     fclose(in);
     return;
   }
@@ -1325,7 +1325,7 @@ postpone_article(
 	char *the_article)
 {
   wait_message("storing article for later posting");
-  append_postponed_file(article, userid);
+  append_postponed_file(the_article, userid);
 }
 
 /*
@@ -3357,23 +3357,23 @@ checknadd_headers (
 					}
 					if (!no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
-				#ifdef HAVE_SYS_UTSNAME_H
+#ifdef HAVE_SYS_UTSNAME_H
 							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s %s]\n\n",
 								 OS, VERSION, RELEASEDATE, 
 								 system_info.machine, system_info.sysname, system_info.release);
-				#else
+#else
 							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
-				#endif
+#endif
 						} else {
-				#ifdef HAVE_SYS_UTSNAME_H
+#ifdef HAVE_SYS_UTSNAME_H
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s %s]\n\n",
 								 OS, VERSION, RELEASEDATE, 
 								 system_info.machine, system_info.sysname, system_info.release);
-				#else
+#else
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
-				#endif
+#endif
 						}
 					} else {
 						fprintf (fp_out, "\n");

@@ -34,6 +34,8 @@ constext txt_art_rejected[] = "Article rejected (saved to %s)";
 constext txt_art_saved_to[] = "Article saved to %s";
 constext txt_art_thread_regex_tag[] = " a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: ";
 constext txt_art_unavailable[] = "Article %ld unavailable";
+constext txt_art_parent_none[] = "Article has no parent";
+constext txt_art_parent_unavail[] = "Parent article is unavailable";
 constext txt_article_cancelled[] = "Article cancelled from within tin [v%s release %s]\n";
 constext txt_article_reposted1[] = "\n[ Article reposted from %s ]";
 constext txt_article_reposted2a[] = "\n[ Author was %s <%s> ]";
@@ -325,6 +327,7 @@ constext txt_help_full_page_scroll[] = "Scroll half/full page of groups/articles
 constext txt_help_p_search[] = "/\t  search forward within this article\r\n";
 constext txt_help_p_star[] = "*\t  select article\r\n";
 constext txt_help_p_tab[] = "<TAB>\t  display next unread article\r\n";
+constext txt_help_p_u[] = "u\t  goto the article that this one followed up\r\n";
 constext txt_help_p_tilda[] = "~\t  undo all selections in thread\r\n";
 constext txt_help_p_z[] = "z Z\t  mark article (Z = thread) as unread\r\n";
 constext txt_help_pipe[] = "|\t  pipe article/thread/hot/pattern/tagged articles into command\r\n";
@@ -401,7 +404,6 @@ constext txt_help_y[] = "Y\t  yank in active file to see any new news\r\n";
 #ifdef HAVE_COLOR
 constext txt_help__[] = "_\t  toggle word highlighting on/off\r\n";
 #endif
-constext txt_hit_any_key[] = "-- Press any key to continue --";
 constext txt_hit_space_for_more[] = "PgDn,End,<SPACE>,^D - page down. PgUp,Home,b,^U - page up. <CR>,q - quit";
 constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
 constext txt_invalid_from1[] = "Invalid  From: %s  line. Read the INSTALL file again.";

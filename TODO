@@ -25,8 +25,6 @@ o  'K' is still a bit inconsistent
    - in the article pager (page.c) it marks the whole thread as unread
      and jumps to the next thread containing unread articles
 
-o  art_mark_deleted in 'M'enu (50.) shows up as 'i' but it is 'D'
-
 o  tin crashes if started with too small a screen size
 
 o  In cases where a tinrc variable is stored in group->attributes
@@ -35,10 +33,6 @@ o  In cases where a tinrc variable is stored in group->attributes
    doesn't reread the attributes, whereas select.c does. It might be better
    to fix the problem properly in config.c by flashing changes to all
    groups using default attributes.
-
-o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
-   szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag
-             number 2 - *bingo!*
 
 o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
@@ -85,7 +79,7 @@ o  if save marked_hot_article fails with cannot create file the
 
 o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
-   expired...), it is untouched, and remains marked as unread.
+   expired! (cnews only?)), it is untouched, and remains marked as unread.
 
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
    Other tty characteristics (eg echo) are not reset after a fatal signal
@@ -101,7 +95,7 @@ o  (Y)ank in after resync-time ends up in a double re-read of the active file
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
-o  looks like Keywords & Summary in attributes/x_headers are ignored :(
+o  in options 'M'enu art_mark_deleted shows up as 'i' instead of 'D'
 
 o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and
@@ -119,9 +113,6 @@ o  kill-file editor does not quote brackets, stars and question marks
 New features
 ------------
 o  add abillity to strip bogus newsgroups from newsrc
-
-o  add command: mark all articles older than <date> as read
-   (usefull when subscribing to a new group with high-traffic...)
 
 o  add support for ispell language change
 
@@ -153,8 +144,6 @@ o  add feature goto using the 'G' key
 
 o  Additions to the thread menu :
 	'/' (search subject)
-	'S' (autosave tagged)
-	'U' (untag all)
 	'M' (option menu)	- not easy if the threading changes!
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
@@ -163,7 +152,6 @@ o  Additions to the thread menu :
 	keys to goto previous/next thread
 
 o  Add 'l' (goto thread menu) to the article pager
-   Add 'u' (up - goto parent) to the article pager
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
@@ -220,6 +208,9 @@ o  when server responses with:
    ask the user if he want's to post to "bar.foo" instead of "foo.bar"
    (Y/n)
 
+o  when From: only contains "First-name Last-name" tin strips the space
+   misc.c:parse_from() ??
+
 Internal Changes
 ----------------
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
@@ -253,6 +244,10 @@ o  is art->inthread really needed, surely art->thread contains enough
    information
 
 o  is there really a spurious int in t_hashnode ?
+   bring the hidden data fields into t_hashnode (see hashstr.c) and
+   remove annoying casts to int *
+
+o  check where tin_done() should be called instead of using exit()
 
 Docs/online help
 ----------------
@@ -287,8 +282,6 @@ o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 
 o  what is with NEW_HASH_METHOD in misc.c?
 
-o  what is with HAVE_GENERIC_AUTHINFO in open.c?
-
 o  what is with setup_soft_base - anyone remembering where it was used and
    why the code was not stripped after it was considered as no longer needed?
 
@@ -301,9 +294,6 @@ o  forged cancelling via Supersedes:/Also-Control:/Control:-header is possible
 o  f'uping with 'F' to a article which has Followup-To: poster set an then
    use 'm' quotes the text, but it should not! (mail_to_someone has no
    copy_text switch)
-
-o  when From: only contains "First-name Last-name" tin strips the space
-   misc.c:parse_from() ??
 
 o  if exiting tin with
    catchup_read_groups=ON
@@ -349,6 +339,23 @@ o  think about group numbering in "only unread" display mode
    (using different numbers in show all/show only unrerad leads to some
     problems, f.e. group moving)
 
+o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
+   cnews-server
+
+o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
+   to 'duplicated'-headers and multiple signatures
+
+o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
+   ignores start_line_offset
+
+o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
+   when the user is actually in an editor spawned by tin.
+
+Filtering enhancements
+----------------------
+o  add command: mark all articles older than <date> as read
+   (usefull when subscribing to a new group with high-traffic...)
+
 o  fix kill/hot mechanism that you could kill/mark hot everything which
    contains abc OR def... like "tin *|* tin|* tin *" -even better would be
    a routine which recognizes word-delimiters so that "tin:" or "'tin'"
@@ -363,17 +370,3 @@ o  add kill mechanism on Newsgroups:-line (f.e.: in junk I only want to see
    group=junk
    type=0
    newsgroups=junk
-
-o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
-   cnews-server
-
-o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
-   to 'duplicated'-headers and multiple signatures
-
-o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
-   ignores start_line_offset
-
-o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
-   when the user is actually in an editor spawned by tin.
-
-o  check where tin_done() should be called instead of using exit()

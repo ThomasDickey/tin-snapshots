@@ -676,7 +676,7 @@ select_done:
 				}
 			    break;
 
-			case iKeySelectVersion:	/* show tin version */
+			case iKeyVersion:	/* show tin version */
 				info_message (cvers);
 				break;
 

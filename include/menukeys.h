@@ -103,7 +103,7 @@
  * ' ','!','$','/','?',
  * 'M',
  * '^',
- * 'b','j','k','q',
+ * 'b','j','k','q','v'
  * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('P'),ctrl('U')
  */
 
@@ -122,6 +122,7 @@
 #define iKeyDown2 'j'
 #define iKeyUp2 'k'
 #define iKeyQuit 'q'
+#define iKeyVersion 'v'
 #define iKeyPageUp ctrl('B')
 #define iKeyPageDown ctrl('D')
 #define iKeyPageDown2 ctrl('F')
@@ -202,7 +203,6 @@
 #define iKeyGroupSave 's'
 #define iKeyGroupTag 't'
 #define iKeyGroupToggleThreading 'u'
-#define iKeyGroupVersion 'v'
 #define iKeyGroupPost 'w'
 #define iKeyGroupRepost 'x'
 #define iKeyGroupMarkArtUnread 'z'
@@ -279,7 +279,7 @@
 #define iKeyPageReplyQuote 'r'
 #define iKeyPageSave 's'
 #define iKeyPageTag 't'
-#define iKeyPageVersion 'v'
+#define iKeyPageGotoParent 'u'
 #define iKeyPagePost 'w'
 #define iKeyPageRepost 'x'
 #define iKeyPageMarkArtUnread 'z'
@@ -349,7 +349,6 @@
 #define iKeySelectToggleReadDisplay 'r'
 #define iKeySelectSubscribe 's'
 #define iKeySelectUnsubscribe 'u'
-#define iKeySelectVersion 'v'
 #define iKeySelectPost 'w'
 #define iKeySelectYankActive 'y'
 #define iKeySelectMarkGrpUnread 'z'
@@ -371,16 +370,16 @@
 #define iKeyThreadToggleInverseVideo 'I'
 #define iKeyThreadMarkArtRead 'K'
 #define iKeyThreadBugReport 'R'
+#define iKeyThreadSaveTagged 'S'
+#define iKeyThreadUntag 'U'
 #define iKeyThreadMarkThdUnread 'Z'
+#define iKeyThreadQuickAutosel '['		/* Merge with same keys in Group ? */
+#define iKeyThreadQuickKill ']'
 #define iKeyThreadCatchupConditional 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'
-/*
-#define iKeyThreadDisplaySubject 'i'
-*/
 #define iKeyThreadSave 's'
 #define iKeyThreadTag 't'
-#define iKeyThreadVersion 'v'
 #define iKeyThreadMarkArtUnread 'z'
 #define iKeyThreadUndoSel '~'
 

@@ -1089,6 +1089,7 @@ stuff_nntp (
 		note_size = sb.st_size;
 	}
 #endif
+
 	return TRUE;
 }
 

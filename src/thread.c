@@ -426,6 +426,17 @@ end_of_thread:
 				}
 				break;
 
+			case iKeyThreadSaveTagged:   /* save tagged articles without prompting */
+				if (index_point >= 0) {
+					if (num_of_tagged_arts) {
+						feed_articles (FEED_SAVE_TAGGED, THREAD_LEVEL,
+							&CURR_GROUP, (int) base[index_point]);
+					} else {
+						info_message (txt_no_tagged_arts_to_save);
+					}
+				}
+				break;
+
 			case iKeyThreadReadArt:
 			case iKeyThreadReadArt2:	/* read current article within thread */
 thread_read_article:
@@ -668,23 +679,28 @@ thread_catchup:
 				goto thread_done;
 
  			case iKeyThreadTag:			/* tag/untag art for mailing/piping/printing/saving */
-				n = choose_response (thread_basenote, thread_index_point);
 
- 				if (n < 0)
- 					break;
+				/* Find index of current article */
+				if ((n = choose_response (thread_basenote, thread_index_point)) < 0)
+					break;
 
  				if (arts[n].tagged) {
+					decr_tagged(arts[n].tagged);
  					arts[n].tagged = 0;
  					--num_of_tagged_arts;
  					info_message (txt_untagged_art);
+					update_thread_page();						/* Must update whole page */
  				} else {
  					arts[n].tagged = ++num_of_tagged_arts;
 					info_message (txt_tagged_art);
+					bld_tline (thread_index_point, &arts[n]);	/* Update just this line */
+					draw_tline (thread_index_point, FALSE);
  				}
-				bld_tline (thread_index_point, &arts[n]);
-				draw_tline (thread_index_point, FALSE);
+
+				/* Automatically advance to next art if not at end of thread */
 				if (thread_index_point + 1 < top_thread)
 					goto thread_down;
+
 				draw_thread_arrow ();
 				break;
 
@@ -694,7 +710,14 @@ thread_catchup:
 				show_thread_page ();
 				break;
 
-			case iKeyThreadVersion:			/* version */
+			case iKeyThreadUntag:  			 /* untag all articles */
+				if (index_point >= 0) {
+					if (untag_all_articles())
+						update_thread_page();
+				}
+				break;
+
+			case iKeyVersion:			/* version */
 				info_message (cvers);
 				break;
 

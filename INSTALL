@@ -66,22 +66,25 @@ General Notes on Building Tin
 -----------------------------
 
 Tin has been compiled on a wide range of Un*x machines with cc and gcc.
+It has even been ported to other systems like the Amiga.
 A list of these machines can be found at the end of this file.
 
 This file is long (so was the yellow brick road) but please read it all
 as it could save you problems later and we don't want an unhappy ending
-do we? :-)  
+do we ? :-)  
 
 Tin can be compiled to read news in any of the following ways:
 
   o  locally from your machines news spool dir (default /usr/spool/news).
 
-  o  locally and remotely (rtin or tin -r option) (--enable-nntp).
+  o  locally and remotely via NNTP (rtin or tin -r option) (--enable-nntp).
 
+TODO - is this dead yet ?
   o  remotely from another machine via NNTP but creating tin index files
      on local machine for each user in $HOME/.tin/.index 
      (--enable-nntp-only).
 
+TODO - is this still supported ?
   o  remotely from another machine via NNTP and also retrieving tin index
      files from remote machine via NNTP (--enable-nntp-only). This
      option requires that my NNTP patch be applied to your NNTP 1.5.11t5 
@@ -89,6 +92,7 @@ Tin can be compiled to read news in any of the following ways:
      'tind' needs to be run from cron to update the index files at regular 
      intervals (not required if INN/Cnews generate NOV index files).
 
+TODO this is automatic if NOV is found
   o  remotely from another machine via NNTP and retrieving NOV style index
      files from remote machine via the NNTP XOVER extension 
      (--enable-nntp-only). 
@@ -101,23 +105,24 @@ configure options.  This is true of both NNTP and local news systems.
 Building Tin (Normal & Daemon versions) 
 ---------------------------------------
 
-Normal version
+Normal version:
 
 1)  Type './configure --help' to see which options are needed for your
     local setup.
-2)  Change conf-tin for you needs or run ./configure with all needed
+2)  Change conf-tin for your needs or run ./configure with all needed
     options.
-3)  Goto src subdirectory and type 'make' to compile for your system.
+3)  type 'make build' to build tin in the src/ directory.
+    Alternatively goto the src subdirectory and type 'make'
 4)  Type 'make install' to install.
 
-Index daemon version
+Index daemon version: (only if your server doesn't support NOV overview files)
 
 Note1: If you want to retrieve tin index files from your NNTP server,
-      or if you don't run NNTP but want to install tin setuid and have
-      a central index rather than each user keeping his/her own index
-      and want tind to automatically keep the index up-to-date, then
-      you will need the tind index file daemon; create it using the
-      following steps:
+       or if you don't run NNTP but want to install tin setuid and have
+       a central index rather than each user keeping his/her own index
+       and want tind to automatically keep the index up-to-date, then
+       you will need the tind index file daemon; create it using the
+       following steps:
 
   1)  Build and install the 'Normal version' of tin as specified by the
       above 4 points.
@@ -142,9 +147,9 @@ Note1: If you want to retrieve tin index files from your NNTP server,
   9)  Add the following line to your system cron to run tind every 30 mins:
         00,30 * * * * su news -c '/usr/lib/news/tind'
 
-  Note2: tind must be run as user 'news' and the normal tin must have
-         the correct permissions to read the central index files!
-  Note3: tind can also be used to update a copy of all index files
+Note2: tind must be run as user 'news' and the normal tin must have
+       the correct permissions to read the central index files!
+Note3: tind can also be used to update a copy of all index files
 
 Testing Tin
 -----------
@@ -182,9 +187,10 @@ Things to test:
 Further testing is desirable, but left to your individual conscience and
 ingenuity.
 
-configure options (beginning with '--') 
-and compiler flags (-D<name> define directives) 
------------------------------------------------
+
+
+Detailed list of configure options (beginning with '--') and compiler flags
+(-D<name> directives) 
 
 News directory structure
 ------------------------
@@ -363,7 +369,7 @@ Compiled & installed on the following machines:
 -----------------------------------------------
 
 1)	i486 & Linux 1.2.13 with gcc 2.7.0
-	i486 & Linux 2.0.26 with gcc 2.7.2.1
+	i486 & Linux 2.0.29 with gcc 2.7.2.1
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 

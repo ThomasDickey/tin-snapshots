@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970212
+PVER		= 970214
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -110,6 +110,7 @@ TOP	= \
 	$(TOPDIR)/INSTALL \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
+	$(TOPDIR)/WHATSNEW \
 	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
 	$(TOPDIR)/configure \
