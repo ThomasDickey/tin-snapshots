@@ -191,7 +191,11 @@ str_lwr (
 	char *dst)
 {
 	while (*src) {
-		*dst++ = (char)tolower((int)*src);
+		if (*src && *src & 0x80) {
+			*dst++ = *src++;
+			*dst++ = *src;
+		} else
+			*dst++ = (char)tolower((int)*src);
 		src++;
 	}
 	*dst = '\0';

@@ -12,14 +12,14 @@
  *              right notice, and it must be included in any copy made
  */
 
+#include "tin.h"
+
 /*
  * we don't need authentication stuff at all if we are building an index
  * daemon or don't have NNTP support
  */
 
-#if !defined(INDEX_DAEMON) || defined(NNTP_ABLE)
-
-#include "tin.h"
+#if !defined(INDEX_DAEMON) && defined(NNTP_ABLE)
 
 /*
  * Process AUTHINFO GENERIC method.
@@ -334,4 +334,6 @@ authenticate (
 {
 	return (authinfo_generic () || authinfo_original (server, user, startup));
 }
+#else
+void no_authenticate (void) { }
 #endif

@@ -802,6 +802,17 @@ setup_hard_base (
 	 */
 	if (read_news_via_nntp && group->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
+
+#if 0
+/*
+ * leafnode seems to need the extra group command (reported by reorx@irc.pl)
+ * usually this should not be needed
+ */
+		sprintf (buf, "group %s", group->name);
+		debug_nntp ("setup_base", buf);
+		put_server (buf);
+#endif /* 0*/
+
 		sprintf (buf, "listgroup %s", group->name);
 		debug_nntp ("setup_base", buf);
 		put_server (buf);

@@ -1,3 +1,16 @@
+--unoff BETA release 970417 --
+
+375) Thomas E. Dickey <dickey@clark.net>
+     BUG. tind didn't compile due to missplaced ifdefs
+     BUG. test for USE_SYSTEM_STATUS still didn't work on some systems
+     FIX. aclocal.m4, tnntp.h, auth.c
+
+374) Orbby S. Arka <aqlott@db.csie.ncu.edu.tw>
+     REM. some useless checks for 8bit chars
+     ADD. don't lower 2nd char in searchstring if first char is > 0x7f
+          (BIG5 users will be happy about that)
+     FIX. art.c, string.c, misc.c
+
 --unoff BETA release 970409 --
 
 373) Jason Faultless <jason@radar.demon.co.uk>

@@ -585,10 +585,10 @@ parse_headers (
 	ptr = buf;
 
 	forever {
-		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace((unsigned char)*(ptr+1)) && *(ptr+1) != '\n')); ptr++) {
+		for (ptrline = ptr; *ptr && *ptr != '\n'; ptr++) {
 			if (((*ptr) & 0xFF) < ' ') {
-				if (*ptr == '\n' && isspace((unsigned char)*(ptr+1)) && *(ptr+1) !='\n')
-					*ptr=1;
+				if (*ptr == '\n' && *(ptr+1) != '\n')
+					*ptr = 1;
 				else
 					*ptr = ' ';
 			}

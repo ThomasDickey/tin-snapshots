@@ -628,7 +628,7 @@ constext txt_tinrc_col_help[] = "# Color of help pages\n";
 constext txt_tinrc_col_invers_bg[] = "# Color of background for inverse text\n";
 constext txt_tinrc_col_invers_fg[] = "# Color of foreground for inverse text\n";
 constext txt_tinrc_col_markdash[] = "";
-constext txt_tinrc_col_markstar[] = "# Color of word highlighting. There are two posibilities for\n\
+constext txt_tinrc_col_markstar[] = "# Color of word highlighting. There are two possibilities for\n\
 # in Articles: *stars* and _underdashes_\n";
 constext txt_tinrc_col_message[] = "# Color of messages in last line\n";
 constext txt_tinrc_col_minihelp[] = "# Color of mini help menu\n";
@@ -639,7 +639,7 @@ constext txt_tinrc_col_signature[] = "# Color of signature\n";
 constext txt_tinrc_col_subject[] = "# Color of article subject\n";
 constext txt_tinrc_col_text[] = "# Color of textlines\n";
 constext txt_tinrc_col_title[] = "# Color of Help/Mail-Sign\n";
-constext txt_tinrc_colors[] = "# For coloradjust use the following numbers\n\
+constext txt_tinrc_colors[] = "# For color-adjust use the following numbers\n\
 #  0-black       1-red         2-green        3-brown\n\
 #  4-blue        5-pink        6-cyan         7-white\n\
 # These are *only* for foreground:\n\
@@ -683,7 +683,7 @@ constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file w
 # Do not edit while tin is running, since all your changes to this file\n\
 # would be overwritten when you leave tin.\n#\n\
 ############################################################################\n\n";
-constext txt_tinrc_highlight_xcommentto[] = "# If ON X-Commento-To name is displayed in the upper-right corner,\n\
+constext txt_tinrc_highlight_xcommentto[] = "# If ON X-Comment-To name is displayed in the upper-right corner,\n\
 # if OFF below the Summary-Header\n";
 constext txt_tinrc_inverse_okay[] = "# if ON use inverse video for page headers at different levels\n";
 #ifdef M_UNIX
@@ -756,7 +756,7 @@ constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds betwe
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
 constext txt_tinrc_news_headers_to_display[] = "# Which news headers you wish to see. If you want to see _all_ the headers,\n\
 # place an '*' as this value. This is the only way a wildcard can be used.\n\
-# If you enter 'X-' as the value, you will see all headers begining with\n\
+# If you enter 'X-' as the value, you will see all headers beginning with\n\
 # 'X-' (like X-Alan or X-Pape). You can list more than one by delimiting with\n\
 # spaces. Not defining anything turns off this option.\n";
 constext txt_tinrc_news_headers_to_not_display[] = "# Same as 'news_headers_to_display' except it denotes the opposite.\n\
@@ -1048,7 +1048,7 @@ constext txt_warn_posting_etiquette[] = "\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
 constext txt_warn_sig_too_long[] ="\n\
-  Warning: Your signature is longer then %d lines.  Since signatures usualy do\n\
+  Warning: Your signature is longer then %d lines.  Since signatures usually do\n\
   not transport any useful information  they should be as  short as possible.\n\n";
 constext txt_warn_multiple_sigs[] ="\n\
   Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";

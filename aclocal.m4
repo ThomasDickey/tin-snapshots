@@ -376,7 +376,7 @@ RETSIGTYPE signal_handler (int sig)
 	int system_status;
 	wait (&wait_status);
 	system_status = WEXITSTATUS(wait_status); /* should be nonzero */
-	exit(system_status == 0);
+	exit(system_status != 23);
 }
 
 int main()
