@@ -319,6 +319,7 @@ extern char userid[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
 extern const char base64_alphabet[64];
 extern constext *txt_colors[];
+extern constext *txt_marks[];
 extern constext *txt_mime_types[NUM_MIME_TYPES];
 extern constext *txt_onoff[];
 extern constext *txt_post_process[];

@@ -89,7 +89,7 @@ char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin
 #ifdef WIN32
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
 #endif
-constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%s]? (d/s/q): %c";
+constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): %c";
 constext txt_cancelling_art[] = "Canceling article...";
 constext txt_creating_active[] = "Creating active file for saved groups...\n";
 constext txt_creating_newsrc[] = "Creating newsrc file...\n";
@@ -495,7 +495,7 @@ constext txt_opt_col_subject[] = 		"Color of article subject lines     : ";
 constext txt_opt_col_text[] = 			"Color of text lines                : ";
 constext txt_opt_col_title[] = 			"Color of help/mail sign            : ";
 constext txt_opt_word_highlight_tinrc[] =	"Word highlighting in message body  : ";
-constext txt_opt_word_h_display_marks[] =	"Display _ or * when highlighting   : ";
+constext txt_opt_word_h_display_marks[] =	"What to display instead of mark    : ";
 constext txt_opt_col_markstar[] =		"Color of highlighting with *stars* : ";
 constext txt_opt_col_markdash[] =		"Color of highlighting with _dash_  : ";
 #endif
@@ -605,6 +605,11 @@ constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
                            "Cyan", "White", "Gray", "Light Red",
                            "Light Green", "Yellow", "Light Blue",
                            "Light Pink", "Light Cyan", "Light White" };
+
+/*
+ * Which mark types can be used.
+ */
+constext *txt_marks[] = { "Nothing", "Mark", "Space" };
 #endif
 
 /*

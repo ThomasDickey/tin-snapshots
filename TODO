@@ -1,5 +1,14 @@
 Bugs
 ----
+o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
+   szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag
+             number 2 - *bingo!*
+
+o  if the connections times out while you are in a newsgoup and you answer
+   the recconect question (accedently by using crsr-keys) with no - the
+   newsrc entry of this group is reset to the low-mark in the active file
+   -> all articles are marked as unread
+
 o  subscribe to newgroups does not work if tin is started with the -n flag
    (introduced in 961125)
 
@@ -68,7 +77,8 @@ o  Colors are not reset when tin is suspended with ^Z (signal.c)
 o  According to 026) in CHANGES, some of the config files can be
    trashed on a bad write (except .newsrc/tinrc/attributes)
 
-o  full_page_scroll=OFF seems not to work
+o  full_page_scroll=OFF is not implemented in page.c (article viewer)
+   and config.c (option 'M'enu)
 
 o  rereading the active file is buggy, it causes crashes on some machines and
    sometimes it takes 50 times longer than the first read at startup...
@@ -85,7 +95,7 @@ o  kill-file may get messed up if using multiple news servers with feeds
 o  sometimes (when using tins kill-menu) kill-file entries are
    duplicated/get lost or messed up
 
-o  killing articles with Lines: 0 does not work
+o  killing articles with Lines: 0 on lines=0 does not work
 
 New features
 ------------
@@ -156,6 +166,7 @@ o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the
    newsgroups-line (N/y)
+   do the same for Followup-to:
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
@@ -164,7 +175,9 @@ o  bring up a warning on a long newsgroup (>=5) line and
    force the user to confirm every single group he wants to post (or
    redirect followups to) in. (N/y)
    rewrite NGLIMIT handling (post.c)
-   (not just truncate Newsgroups:-line after the NGLIMITth newsgroup)
+   (not just truncate Newsgroups:-line after the NGLIMITth newsgroup -
+    or if we do so - give an extra warning to the user and give the the
+    chance to edit the Newsgroups:-line)
 
 o  bring up a warning when trying to f'up into a binaries group
    (Warning, sending a followup to a binaries group is undesired, post it
@@ -245,6 +258,9 @@ o  manpage claims that -R does not work but it does
 
 Not yet classified
 ------------------
+o  what is tin -C (count articles)? - if running in batch-mode (-Z)
+   -v gives a summary...
+
 o  tin -n -q does not show descriptions - but tin -q or tin -n does -
    wouldn't it be better to add a new flaq to prevent tin form loading
    newsgroups file?
