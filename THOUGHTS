@@ -1,0 +1,154 @@
+Nomenclature:
+
+spool level = group selection level
+group level = thread selection level
+thread level = article selection level
+article level = article viewer level
+
+COMMENTS ON EXECUTABLE:
+
+There is an extraneous newline after the "Checking for new groups..."
+message at startup
+
+The "D" deleted article flag (group and thread level) is not
+showing up
+  With PLMC I can't get the articles to show up at all; with
+  tin-1.3beta-950824 it would sometimes list them but not let you enter
+  article viewer -- if this new behavior is reliable we don't need the "D"
+  flag
+
+** PLMC -- I'm not sure I like this new "feature" of number of lines in
+article showing up at group level...can this be made tinrc configurable?
+
+Problem with invoking editor with blank articles -- "Not that many lines
+in buffer" ... if you have an automatic .sig file you don't see this problem
+REM: that seems to be a problem with tin/vi - no probelms with tin/joe
+
+After an article, thread, or group is marked unread, shouldn't we rerun the
+filter on it?
+
+** PLMC -- The new header on page 2+ at article level sure is ugly -- maybe
+we need a two line header, perhaps one that looks like this?
+
+alt.some.newsgroup                     Thread 47 of 167, Resp 1/4 (page 2 of 13)
+Joe Q. Public                    Re: So, what really is the longest thread ever?
+
+  It would be nice if we had some code to calculate the number of screens
+  an article would take up.
+
+Shouldn't the prompt (when numbers are typed) at group level say "Select
+thread>"?
+
+How about a "^" command at spool, group, and thread level analogous to "$"?
+
+Shell escape should spawn $SHELL, not "sh"
+
+Shell escape should permit "^U" line kill
+
+Get that keywords and summary crap out of the article body display 
+Make this tinrc configurable.
+
+The "X" command at group doesn't actually show only selected articles,
+  it does what "r" does.
+
+How about a "Z" command at spool level that marks ALL groups as
+unread (basically the opposite of ^R)?
+REM: plain "Z" is too dangerous, "^Z" is used by the shell...
+
+How about an "a" (add group) command at group selection level with "g"'s
+current functionality, and let g simply go to the new group without adding
+it to the .newsrc.  This would make the "g" command more like the "g"
+command at group level.
+  PLMC seems to have done the "g" half of this, but "a" toggles ANSI color
+  on and off.  Since this would be a new feature, we could make it "^A" and
+  let "a" be "add group"...
+REM:^a/^A is used by the shell... 
+
+Let the articles saved to the "posted" mailbox format file be configurable
+(whether it is done at all, and what dir it goes to)
+
+Someone on news.software.readers made a good suggestion -- a quick article
+save command that just takes all the defaults.  "S" maybe?  This might,
+however, conflict with the behavior of "S" at group level (fast save of
+tagged articles).
+
+Speaking of "S" at group level, it doesn't seem to work!  I tagged an
+article at group level, hit "S", and the article went to the bit bucket!
+Perhaps "S" should be rewritten to fast save current thread (at group
+level only) if no articles are tagged.  Use default_save_file from tinrc,
+and make up a filename if that is undefined.
+
+We need a way to bring up the newsgroup description string at any level.
+Currently, to see it at any time other than posting confirmation, you have
+to hack the maxlength of the newsgroups name down, which necessitates
+editing the tinrc.  This is too clumsy.  How about a command invokable from
+any level that would bring it up on the bottom one or two lines?
+
+Finally, some big suggestions for the look and feel of tin.  These would
+probably be a real pain to code.
+  1) If any of the fields at the top of the screen at article level are too
+     large to fit on the screen (this only happens with newsgroup names
+     and subject lines), we need something to check the length and perhaps
+     put a "..." in the middle of the string so that the beginning and end
+     can be seen.
+  2) When tin is doing prompting and message display at the bottom of the
+     screen at any level, it needs to "intelligently" scroll so that the
+     top of the screen does not scroll, but instead overwrites lines
+     upwards toward midscreen.  This would look a lot cleaner.  (ELM does
+     something much like what I'm talking about.)
+
+COMMENTS ON MANUAL PAGE:
+
+"t" at group level works as a toggle.  Manpage doesn't mention this.
+
+Manpage claims "-c" and "-u" options do the same thing.
+
+"q" at group level should say "return to group selection level", since it
+does not actually return you to the previous level you were at (for
+instance, if you had been at thread level).
+
+"#" command at spool level undocumented in manpage.
+
+Manpage probably needs to be heavily rewritten.
+
+MISCELLANEOUS REMARKS:
+
+The language in the INSTALL file ("DONT_LOG_USER") is misleading
+
+The whole INSTALL file really needs to be rewritten for greater clarity
+
+
+018) Urs Janssen <urs@akk.uni-karlsruhe.de> 
+     ADD. made keep_posted_articles configurable in tinrc
+     FIX. extern.h, config.c, post.c
+     later i recognized that such an option exists in ~/.tin/attributes
+     so this patch will probably removed in a future version
+
+This should probably be moved to the tinrc anyway.
+
+--950824BETA  PLM.960224 eb/uj/sts/gb/cb --
+
+016) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. inverse_okay & draw_arrow both could be off
+     FIX. config.c
+
+This seems to still be the case if someone uses the undocumented "a"
+command at spool level...
+
+--950824BETA  PL0.951125 eb/uj/gb--
+
+007) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. goto implies auto-subscribe, reposition does not update "show
+          unread" state.
+     FIX. select.c - kicked auto-subscribe, corrected reposition_group
+
+This is good, but now we need a command to add a group to the newsrc.
+
+L02) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. skip quoted text while reading (press ':')
+     FIX. various - applied supplied patch.
+
+This seems to do exactly the same thing as the spacebar.
+REM: it does not, but if we would use regex for finding quotelines for
+coloring and skipping them....

@@ -1,12 +1,13 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960517 (Fri May 17 01:02:51 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960519 (Sun May 19 01:40:14 MET DST 1996)
 ----------------------------------------------------
-  11482 ./CHANGES
-   6926 ./TODO
-   4420 ./Makefile
+  12215 ./CHANGES
+   7293 ./TODO
+   4442 ./Makefile
   16972 ./INSTALL
     132 ./MANIFEST
-   1272 ./README
-    899 ./tinpp
+   1356 ./README
+   6179 ./THOUGHTS
+    900 ./tinpp
   69115 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
@@ -18,7 +19,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960517 (Fri May 17 01:02:51 MET DST 1996)
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
    1690 ./include/patchlev.h
-  27291 ./include/proto.h
+  27280 ./include/proto.h
      89 ./include/rfc1521.h
     292 ./include/rfc1522.h
    1272 ./include/stpwatch.h
@@ -40,7 +41,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960517 (Fri May 17 01:02:51 MET DST 1996)
   18348 ./src/feed.c
   35381 ./src/filter.c
   11250 ./src/getline.c
-  41751 ./src/group.c
+  41858 ./src/group.c
    2671 ./src/hashstr.c
    9628 ./src/help.c
   11855 ./src/inews.c
@@ -52,30 +53,30 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960517 (Fri May 17 01:02:51 MET DST 1996)
   11022 ./src/memory.c
   39126 ./src/misc.c
    7231 ./src/msmail.c
-  32844 ./src/newsrc.c
+  33010 ./src/newsrc.c
   25982 ./src/nntplib.c
   31433 ./src/nntpw32.c
   26640 ./src/open.c
    6305 ./src/os_2.c
-  34437 ./src/page.c
+  34443 ./src/page.c
   24108 ./src/parsdate.y
    7195 ./src/pgp.c
   62752 ./src/post.c
    4342 ./src/prompt.c
    4813 ./src/rfc1521.c
-  11669 ./src/rfc1522.c
-  34153 ./src/save.c
+  11740 ./src/rfc1522.c
+  34131 ./src/save.c
    4103 ./src/screen.c
    9895 ./src/search.c
   34611 ./src/select.c
    5270 ./src/sigfile.c
   11103 ./src/signal.c
    5882 ./src/strftime.c
-  24419 ./src/thread.c
+  24491 ./src/thread.c
    5014 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
-  21739 ./src/Makefile
-1181715 total
+  21854 ./src/Makefile
+1189605 total

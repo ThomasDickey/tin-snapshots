@@ -1,13 +1,32 @@
+o  The "M" moderation flag (group selection level) is not showing up
+   (help!!! in gdb it is showing up, without gdb it is not)
+
+o  add 'U'untag all command to thread level.
+
+o  toggle behavior of 't'ag is not mentioned in the man-page
+
+o  add feature save selected/tagged files sequentially to the same file
+
+o  "D" deleted article flag (thread selection level) is not showing up.
+   is it still needed?!
+
+o  show up 'waring' at startup if news-server is read-only
+
+o  kill-file may get messed up if  using multiple news servers with feeds
+   that are not identical (moving some groups entries under new groups and
+   losing all references to the moved groups)
+
+o  sometimes kill-file entries are duplicated
+
 o  can't 'x' (repost) to more than one group - comma is not parsed as
    separator
 
 o  add s)upersede option at the 'D' article delete mini-menu
 
-o  at toplevel 'Q' ask you if you really want to quit, not usefull
+o  add s)upersede option at the 'x' article repost mini-menu
+   for own articles
 
-o  bug or feature?:
-   inverse_okay=ON & draw_arrow=OFF & strip_blanks=OFF
-   -> highlighted bar does not use full screen width
+o  at top-level 'Q' ask you if you really want to quit, useful?
 
 o  rewrite NGLIMIT handling (post.c)
 
@@ -21,7 +40,7 @@ o  full_page_scroll=OFF seems not to work
 o  marking latest article with 'K' does not jump to top of newsgroup if
    there are still articles to read
 
-o  marking hot-articles read with 'K' and then postprocess the newsgroup
+o  marking hot-articles read with 'K' and then post-process the newsgroup
    also processes the read articles
 
 o  killing articles with Lines: 0 does not work
@@ -41,13 +60,6 @@ o  tin sometimes crashes (thread.c) 710/892
 
 o  when From: only contains "First-name Last-name" tin strips the space
 
-o  when tagging and then untagging articles in an group and then leaving,
-   warning comes up "You have tagged articles in this group - quit anyway?"
-   but there are no tagged articles ,-)
-
-o  sometimes (when calling kill-file editor?) kill-file entries are duplicated
-   (bug introduced in patch 010, see CHANGES)
-
 o  if exiting tin with
    catchup_read_groups=ON
    thread_articles=ON
@@ -61,7 +73,7 @@ o  make look in group.c/thread.c for show-lines patch (group.c/thread.c)
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
 
-o  fix builtin inews to truncate signature > 4 lines
+o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
 
 o  when last articles in a newsgroup were canceled, it shows that there are
@@ -173,4 +185,5 @@ o  sender-patch
    (for canceling articles never look at the Sender:-line, always look at
    the From:-line)
 
-o  Add add-mail-header tinrc to stop headers in message sent from elm
+o  mailers other than sendmail (f.e. elm) may have 'problems' with
+   'duplicated'-headers

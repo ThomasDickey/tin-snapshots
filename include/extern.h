@@ -834,7 +834,7 @@ extern int max_save;
 extern int max_spooldir;
 extern int newsrc_active;
 extern int nntp_codeno;
-extern int no_advertizing;
+extern int no_advertising;
 extern int num_active;
 extern int num_newnews;
 extern int num_kill;

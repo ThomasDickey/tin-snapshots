@@ -214,9 +214,11 @@ int
 contains_nonprintables(w)
 	unsigned char *w;
 {
+#ifdef MIME_BASE64_ALLOWED	
 	int chars=0;
-	int nonprint=0;
 	int equalsigns=0;
+#endif
+	int nonprint=0;
 
 	/* first skip all leading whitespaces */
   	while (*w&&isspace(*w)) w++;
@@ -224,8 +226,10 @@ contains_nonprintables(w)
 	/* then check the next word */
 	while (*w&&!isspace(*w)&&*w!='('&&*w!=')') {
 		if (*w<32||*w>127) nonprint=1;
+#ifdef MIME_BASE64_ALLOWED
 		if (*w=='=') equalsigns++;
 		chars++;
+#endif		
 		w++;
   	}
 	if (nonprint) {

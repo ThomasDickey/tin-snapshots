@@ -2399,7 +2399,7 @@ insert_x_headers (infile, lines)
 					if (lines) {
 						fprintf (fp_out, "Lines: %d\n", lines);
 					}
-					if (!no_advertizing) {
+					if (!no_advertising) {
 						if (active[my_group[cur_groupnum]].type == GROUP_TYPE_MAIL) {
 							fprintf (fp_out, "X-Mailer: TIN [%s %s PL%s]\n\n",
 								OS, VERSION, PATCHLEVEL);
