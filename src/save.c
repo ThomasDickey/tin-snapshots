@@ -489,7 +489,7 @@ save_regex_arts (is_mailbox, group_path)
 		if (is_mailbox) {
 			sprintf (buf, txt_saved_to_mailbox, get_first_savefile ());
 		} else {
-			sprintf (buf,txt_saved_pattern_to,
+			sprintf (buf, txt_saved_pattern_to,
 				get_first_savefile (), get_last_savefile ());
 		}
 		info_message (buf);

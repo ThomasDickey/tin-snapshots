@@ -815,7 +815,7 @@ static int reconnecting = 0;
 	}
 
 	/* save the server response */
-	my_strncpy(error_response, string, size);
+	my_strncpy(error_response, string, NNTP_STRLEN);
 
 	/*
 	 * some broken newsposters/newsservers have \r's in the middle

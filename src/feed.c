@@ -677,15 +677,15 @@ got_sig_pipe_while_piping:
 			strcpy (msg, txt_external_mail_done);
 			info_message (msg);
 		} else {
-			sprintf (msg, txt_mailed, processed);
+			sprintf (msg, txt_mailed, processed, IS_PLURAL(processed));
 			info_message (msg);
 		}
 	} else if (function == FEED_PRINT) {
-		sprintf (msg, txt_printed, processed);
+		sprintf (msg, txt_printed, processed, IS_PLURAL(processed));
 		info_message (msg);
 	} else if (function == FEED_SAVE || function == FEED_SAVE_TAGGED) {
 		if (ch == iKeyFeedArt) {
-			sprintf (msg, txt_saved, processed);
+			sprintf (msg, txt_saved, processed, IS_PLURAL(processed));
 			info_message (msg);
 		}
 	}
