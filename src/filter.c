@@ -94,26 +94,11 @@ void
 free_filter_item (ptr)
 	struct t_filter *ptr;
 {
-	if (ptr->scope != (char *) 0) {
-		free ((char *) ptr->scope);
-		ptr->scope = (char *) 0;
-	}
-	if (ptr->subj != (char *) 0) {
-		free ((char *) ptr->subj);
-		ptr->subj = (char *) 0;
-	}
-	if (ptr->from != (char *) 0) {
-		free ((char *) ptr->from);
-		ptr->from = (char *) 0;
-	}
-	if (ptr->msgid != (char *) 0) {
-		free ((char *) ptr->msgid);
-		ptr->msgid = (char *) 0;
-	}
-	if (ptr->xref != (char *) 0) {
-		free ((char *) ptr->xref);
-		ptr->xref = (char *) 0;
-	}
+	FreeAndNull(ptr->scope);
+	FreeAndNull(ptr->subj);
+	FreeAndNull(ptr->from);
+	FreeAndNull(ptr->msgid);
+	FreeAndNull(ptr->xref);
 }
 
 void
@@ -1154,9 +1139,9 @@ quick_filter_select_posted_art (group, subj)
 		rule.check_string = TRUE;
 
 		filtered = iAddFilterRule (group, &art, &rule);
-		if (art.subject) {
-			free (art.subject);
-		}
+
+		FreeIfNeeded(art.subject);
+
 	}
 
 	return filtered;
@@ -1460,9 +1445,9 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					    STR_MATCH (MSGID(art), ptr[j].msgid)) {
 						SET_FILTER(group, i, j);
 					}
+					
+					FreeIfNeeded(refs);
 
-					if (refs)
-						free(refs);
 				}
 				/*
 				 * Filter on Lines: line

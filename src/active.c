@@ -826,7 +826,12 @@ load_newnews_info (info)
 		}
 	}
 
-	my_strncpy (buf, info, sizeof (buf));
+	if (strlen(info)>=NNTP_STRLEN) { /* shouldn't happen */
+		my_strncpy (buf, info, sizeof (buf));
+		buf[NNTP_STRLEN]='\0';
+	} else {
+		my_strncpy (buf, info, sizeof (info));
+	}
 
 	ptr = strchr (buf, ' ');
 	if (ptr != (char *) 0) {

@@ -418,7 +418,7 @@ grp_mark_read (group, psArt)
 			art_mark_read (group, &psArt[i]);
 		}
 	}
-	if (group->newsrc.xbitmap) {
+	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 		free ((char *) group->newsrc.xbitmap);
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 	}
@@ -453,7 +453,7 @@ grp_mark_unread (group)
 	if (bitlength > 0) {
 		newbitmap = (t_bitmap *) my_malloc (BITS_TO_BYTES(bitlength));
 	}
-	if (group->newsrc.xbitmap) {
+	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 		free ((char *) group->newsrc.xbitmap);
 	}
 	group->newsrc.xbitmap = newbitmap;
@@ -558,7 +558,7 @@ debug_print_bitmap(group,NULL);
 
 		max = group->xmax;
 
-		if (group->newsrc.xbitmap) {
+		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 			free ((char *) group->newsrc.xbitmap);
 			group->newsrc.xbitmap = (t_bitmap *) 0;
 		}
@@ -588,7 +588,7 @@ debug_print_bitmap(group,NULL);
 			ptr = pcParseSubSeq (group, ptr, &low, &high, &sum);
 		}
 	} else {
-		if (group->newsrc.xbitmap) {
+		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 			free ((char *) group->newsrc.xbitmap);
 			group->newsrc.xbitmap = (t_bitmap *) 0;
 		}
@@ -766,7 +766,9 @@ parse_unread_arts (group)
 	group->newsrc.xmin = bitmin;
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xbitlen = group->xmax - bitmin + 1;
-	if (group->newsrc.xbitmap) free(group->newsrc.xbitmap);
+	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
+		free(group->newsrc.xbitmap);
+	}
 	group->newsrc.xbitmap = newbitmap;
 	group->newsrc.num_unread = unread;
 }
@@ -1024,9 +1026,9 @@ rewrite_group_done:
 	if (unsub_created) {
 		unlink (unsub);
 	}
-	if (newsgroup != (char *) 0) {
-		free (newsgroup);
-	}
+
+	FreeIfNeeded(newsgroup);
+
 	return ret_code;
 }
 
@@ -1159,7 +1161,7 @@ error_message (msg, "");
 */
 		}
 
-		free((char *)(group->newsrc.xbitmap));
+		free((char *) (group->newsrc.xbitmap));
 		group->newsrc.xbitmap = newbitmap;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen != (group->max-group->min)+1");
@@ -1299,7 +1301,7 @@ vSetDefaultBitmap (group)
 		group->newsrc.num_unread = 0;
 		group->newsrc.present = FALSE;
 		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
-			free ((char *)(group->newsrc.xbitmap));
+			free ((char *) (group->newsrc.xbitmap));
 		}
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 		group->newsrc.xbitlen = 0;

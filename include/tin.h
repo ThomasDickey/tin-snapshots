@@ -390,7 +390,7 @@ extern char *get_uaf_fullname();
 #	ifdef pyr
 #		define	DEFAULT_MAILER	"/usr/.ucbucb/mail"
 #	endif
-#else
+#else /* !BSD */
 #	if defined(NCR) || defined(atthcx) || defined(PTX) || defined(sinix)
 #		define	DEFAULT_MAILER	"/usr/bin/mailx"
 #	endif
@@ -412,16 +412,16 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_UUDECODE	"uudecode %s"
 #		define	DEFAULT_UNSHAR		"unshar %s"
 #	endif
-#ifdef VMS
-#	define	DEFAULT_EDITOR		"EDIT/TPU"
-#	define	DEFAULT_MAILBOX 	"SYS$LOGIN:"
-#	define	DEFAULT_MAILER		"MAIL"
-#	define	MAILER_FORMAT		"MAIL /SUBJECT=\"%S\" %F \"IN%%\"\"%T\"\""
-#	define	DEFAULT_POSTER		"inews %s"
-#	define	DEFAULT_PRINTER 	"PRINT/DELETE"
-#	define	DEFAULT_UUDECODE	"uudecode %s"
-#	define	DEFAULT_UNSHAR		"unshar %s"
-#endif
+#	ifdef VMS
+#		define	DEFAULT_EDITOR		"EDIT/TPU"
+#		define	DEFAULT_MAILBOX 	"SYS$LOGIN:"
+#		define	DEFAULT_MAILER		"MAIL"
+#		define	MAILER_FORMAT		"MAIL /SUBJECT=\"%S\" %F \"IN%%\"\"%T\"\""
+#		define	DEFAULT_POSTER		"inews %s"
+#		define	DEFAULT_PRINTER 	"PRINT/DELETE"
+#		define	DEFAULT_UUDECODE	"uudecode %s"
+#		define	DEFAULT_UNSHAR		"unshar %s"
+#	endif
 #	ifdef M_OS2
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR		"epm /m"
@@ -473,6 +473,19 @@ extern char *get_uaf_fullname();
 #	ifdef UNIXPC
 #		define	DEFAULT_MAILER	"/bin/rmail"
 #	endif
+
+/*
+ * TODO - check for new hp-ux (>=10) and correct the path
+ * (new systems should have trasitions links to the old location, but...)
+ *
+ * DEFAULT_MAILER "/usr/sbin/sendmail"
+ * DEFAULT_SHELL "/usr/bin/sh"
+ * DEFAULT_MAILBOX "/var/mail/"
+ */
+#	ifdef __hpux
+#		define DEFAULT_MAILER	"/usr/lib/sendmail"
+#	endif
+
 #	ifndef DEFAULT_SHELL
 #		define	DEFAULT_SHELL	"/bin/sh"
 #	endif
@@ -486,7 +499,7 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_PRINTER "/usr/bin/lp"
 #	endif
 #	define		DEFAULT_SUM		"sum -r"
-#endif
+#endif /* BSD */
 
 #ifndef HAVE_STRCASECMP
 #	define strcasecmp my_stricmp
@@ -503,7 +516,7 @@ extern char *get_uaf_fullname();
 #	define	DEFAULT_EDITOR		"/usr/bin/vi"
 #endif
 #ifndef DEFAULT_MAILER
-#	define  DEFAULT_MAILER		"/usr/bin/sendmail"
+#	define  DEFAULT_MAILER		"/usr/lib/sendmail" 
 #endif
 #ifndef DEFAULT_MAILBOX
 #	define  DEFAULT_MAILBOX		"/usr/spool/mail"
@@ -1581,8 +1594,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #define my_malloc(size) my_malloc1(__FILE__, __LINE__, (size))
 #define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
 
-#define FreeIfNeeded(p) if (p != 0) free((char *)p)
-#define FreeAndNull(p)  if (p != 0) { free((char *)p); p = 0; }
+#define FreeIfNeeded(p) if (p != (char *)0) free((char *)p)
+#define FreeAndNull(p)  if (p != (char *)0) { free((char *)p); p = (char *)0; }
 
 /*
  * Cast for the (few!) places where we need to examine 8-bit characters w/o

@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961222 (Mon Dec 23 01:30:55 MET 1996)
 ----------------------------------------------------
-  54140 ./CHANGES
-  13375 ./TODO
+  54770 ./CHANGES
+  13451 ./TODO
    5341 ./Makefile
   17216 ./INSTALL
    2260 ./MANIFEST
@@ -27,11 +27,11 @@ MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
    2233 ./include/os_2.h
   29528 ./include/proto.h
    1376 ./include/stpwatch.h
-  43719 ./include/tin.h
+  44089 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  19520 ./src/active.c
+  19657 ./src/active.c
    8119 ./src/actived.c
   13003 ./src/amiga.c
    4429 ./src/amigatcp.c
@@ -44,7 +44,7 @@ MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
   12401 ./src/debug.c
    2278 ./src/envarg.c
   19436 ./src/feed.c
-  40043 ./src/filter.c
+  39695 ./src/filter.c
   10935 ./src/getline.c
   41577 ./src/group.c
    3202 ./src/hashstr.c
@@ -56,25 +56,25 @@ MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
   11984 ./src/mail.c
   19013 ./src/main.c
    5124 ./src/makecfg.c
-  10990 ./src/memory.c
+   9471 ./src/memory.c
   48344 ./src/misc.c
    7228 ./src/msmail.c
-  33533 ./src/newsrc.c
+  33605 ./src/newsrc.c
   26312 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6176 ./src/nrctbl.c
-  28897 ./src/open.c
+  28884 ./src/open.c
    6242 ./src/os_2.c
   35821 ./src/page.c
   24090 ./src/parsdate.y
    6631 ./src/pgp.c
-  76983 ./src/post.c
+  77063 ./src/post.c
    9094 ./src/prompt.c
     160 ./src/proto.sed
-  22462 ./src/refs.c
+  22480 ./src/refs.c
    8741 ./src/rfc1521.c
   17528 ./src/rfc1522.c
-  33915 ./src/save.c
+  33849 ./src/save.c
    4573 ./src/screen.c
   10148 ./src/search.c
   35515 ./src/select.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3653 ./src/tincfg.tbl
-1608530 insgesamt
+1607967 insgesamt

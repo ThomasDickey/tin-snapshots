@@ -1,3 +1,26 @@
+--unoff BETA release 961222 --
+
+255) David-Michael Lincke <david-miachel.linke@iwi.unisg.ch>
+     ADD. missing DEFAULT_MAILER for hp-ux
+     FIX. tin.h
+
+254) Helmrich Streitmatter <helmrich@helix.franken.de>
+     BUG. newnew_info could return 2 large (not null terminated)
+          string
+     FIX. active.c
+
+253) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+252) Thomas E. Dickey <dickey@clark.net>
+     BUG. redefinition of prase_reference()
+     FIX. refs.c
+
+251) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. art_mark_hot is not colored
+     FIX. thread.c
+
 --unoff BETA release 961218 --
 
 250) Urs Janssen <urs@akk.uni-karlsruhe.de>

@@ -17,7 +17,7 @@
 #include "tin.h"
 
 #define MAX_REFS	100			/* Limit recursion depth */
-#define REF_SEP		" "			/* Separator chars in ref headers */
+#define REF_SEP	" "			/* Separator chars in ref headers */
 
 /* Produce disgusting amounts of output to help me tame this thing */
 #undef DEBUG_REFS
@@ -289,7 +289,7 @@ add_msgid(key, msgid, newparent)
  * the previous ref as the parent.
  * The space saving vs. storing the refs as a single string is significant.
  */
-struct t_msgid *
+static struct t_msgid *
 parse_references(r)
 	char *r;
 {
@@ -788,7 +788,7 @@ collate_subjects()
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = (int *)arts[i].subject - 2;
+		aptr = (int *)arts[i].subject - 2; /* arghh */
 
 		j = *aptr;
 

@@ -226,7 +226,11 @@ user_posted_messages ()
 		fclose (fp);
 
 		show_info_page (POST_INFO, (char **) 0, txt_post_history_menu);
-		FreeAndNull (posted);
+
+		if (posted != (struct t_posted *)0) {
+			free((char *)posted);
+			posted = (struct t_posted *)0;
+		}
 		return TRUE;
 	}
 }

@@ -161,10 +161,7 @@ init_screen_array (allocate)
 	} else {
 		if (screen != (struct t_screen *) 0) {
 			for (i=0 ; i < cLINES ; i++) {
-				if (screen[i].col != (char *) 0) {
-					free ((char *) screen[i].col);
-					screen[i].col = (char *) 0;
-				}
+				FreeAndNull(screen[i].col);
 			}
 
 			free ((char *) screen);
@@ -238,18 +235,10 @@ free_art_array ()
 		arts[i].tagged = FALSE;
 		arts[i].selected = FALSE;
 		arts[i].date = 0L;
-		if (arts[i].part != (char *) 0) {
-			free ((char *) arts[i].part);
-			arts[i].part = (char *) 0;
-		}
-		if (arts[i].patch != (char *) 0) {
-			free ((char *) arts[i].patch);
-			arts[i].patch = (char *) 0;
-		}
-		if (arts[i].xref != (char *) 0) {
-			free ((char *) arts[i].xref);
-			arts[i].xref = NULL;
-		}
+		
+		FreeAndNull(arts[i].part);
+		FreeAndNull(arts[i].patch);
+		FreeAndNull(arts[i].xref);
 
 		/* .refs & .msgid are cleared in build_references() */
 		arts[i].refs = '\0';
@@ -292,18 +281,11 @@ free_attributes_array ()
 				free ((char *) psGrp->attribute->printer);
 				psGrp->attribute->printer = (char *) 0;
 			}
-			if (psGrp->attribute->followup_to != (char *) 0) {
-				free ((char *) psGrp->attribute->followup_to);
-				psGrp->attribute->followup_to = (char *) 0;
-			}
-			if (psGrp->attribute->quick_kill_scope != (char *) 0) {
-				free ((char *) psGrp->attribute->quick_kill_scope);
-				psGrp->attribute->quick_kill_scope = (char *) 0;
-			}
-			if (psGrp->attribute->quick_select_scope != (char *) 0) {
-				free ((char *) psGrp->attribute->quick_select_scope);
-				psGrp->attribute->quick_select_scope = (char *) 0;
-			}
+
+			FreeAndNull(psGrp->attribute->followup_to);			
+			FreeAndNull(psGrp->attribute->quick_kill_scope);
+			FreeAndNull(psGrp->attribute->quick_select_scope);
+
 			free ((char *) psGrp->attribute);
 		}
 		psGrp->attribute = (struct t_attribute *) 0;
@@ -323,14 +305,10 @@ free_active_arrays ()
 
 	if (active != (struct t_group *) 0) {		/* active[] */
 		for (i=0 ; i < num_active ; i++) {
-			if (active[i].name != (char *) 0) {
-				free ((char *) active[i].name);
-				active[i].name = (char *) 0;
-			}
-			if (active[i].description != (char *) 0) {
-				free ((char *) active[i].description);
-				active[i].description = (char *) 0;
-			}
+
+			FreeAndNull(active[i].name);			
+			FreeAndNull(active[i].description);
+			
 			if (active[i].type == GROUP_TYPE_MAIL &&
 			    active[i].spooldir != (char *) 0) {
 				free ((char *) active[i].spooldir);
@@ -363,30 +341,14 @@ free_save_array ()
 	int i;
 
 	for (i=0 ; i < num_save ; i++) {
-		if (save[i].subject != (char *) 0) {
-			free ((char *) save[i].subject);
-			save[i].subject = (char *) 0;
-		}
-		if (save[i].archive != (char *) 0) {
-			free ((char *) save[i].archive);
-			save[i].archive = (char *) 0;
-		}
-		if (save[i].dir != (char *) 0) {
-			free ((char *) save[i].dir);
-			save[i].dir = (char *) 0;
-		}
-		if (save[i].file != (char *) 0) {
-			free ((char *) save[i].file);
-			save[i].file = (char *) 0;
-		}
-		if (save[i].part != (char *) 0) {
-			free ((char *) save[i].part);
-			save[i].part = (char *) 0;
-		}
-		if (save[i].patch != (char *) 0) {
-			free ((char *) save[i].patch);
-			save[i].patch = (char *) 0;
-		}
+	
+		FreeAndNull(save[i].subject);
+		FreeAndNull(save[i].archive);
+		FreeAndNull(save[i].dir);
+		FreeAndNull(save[i].file);
+		FreeAndNull(save[i].part);
+		FreeAndNull(save[i].patch);
+		
 		save[i].index   = -1;
 		save[i].saved   = FALSE;
 		save[i].is_mailbox = FALSE;
@@ -402,14 +364,10 @@ free_spooldirs_array ()
 	int i;
 
 	for (i=0 ; i < num_spooldir ; i++) {
-		if (spooldirs[i].name != (char *) 0) {
-			free ((char *) spooldirs[i].name);
-			spooldirs[i].name = (char *) 0;
-		}
-		if (spooldirs[i].comment != (char *) 0) {
-			free ((char *) spooldirs[i].comment);
-			spooldirs[i].comment = (char *) 0;
-		}
+
+		FreeAndNull(spooldirs[i].name);
+		FreeAndNull(spooldirs[i].comment);
+
 		spooldirs[i].state = 0;
 	}
 
@@ -422,11 +380,8 @@ free_newnews_array ()
 {
 	int i;
 
-	for (i=0 ; i < num_newnews ; i++) {
-		if (newnews[i].host != (char *) 0) {
-			free ((char *) newnews[i].host);
-			newnews[i].host = (char *) 0;
-		}
+	for (i=0 ; i < num_newnews ; i++) {	
+		FreeAndNull(newnews[i].host);
 	}
 
 	num_newnews = 0;
