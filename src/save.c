@@ -1211,14 +1211,14 @@ post_process_uud (pp, auto_delete)
 
 void
 uudecode_file (pp, file_out_dir, file_out)
-	int		pp;
+	int	pp;
 	char	*file_out_dir;
 	char	*file_out;
 {
 	char	buf[LEN];
 	char	*file, *ptr;
 	FILE	*fp_in;
-	int		i, file_size = 0;
+	int	i, file_size = 0;
 	struct	stat st;
 
 	sprintf (buf, txt_uudecoding, file_out);			

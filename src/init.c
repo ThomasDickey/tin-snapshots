@@ -139,7 +139,7 @@ int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
 int default_show_only_unread;		/* show only new/unread arts or all arts */
 int default_sort_art_type;		/* sort arts[] array by subject,from or date field */
-int default_thread_arts;		/* thread/unthread articles for viewing */
+int default_thread_arts;		/* threading system for viewing articles */
 int delete_index_file;			/* delete index file before indexing (tind only) */
 int draw_arrow_mark;			/* draw -> or highlighted bar */
 int force_screen_redraw;		/* force screen redraw after external (shell) commands */

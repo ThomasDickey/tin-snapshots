@@ -192,6 +192,9 @@ debug_print_bitmap (group, NULL);
 
 sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 */
+		/*
+		 * Read in the existing index via XOVER or the index file
+		 */
 		artcount = iReadNovFile (group, min, max, &expired);
 /*
 		if (artcount) {
@@ -207,6 +210,7 @@ sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 		/*
 		 *  add any articles to arts[] that are new or were killed
 		 */
+
 		modified = read_group (group, group_path, &count);
 		if (modified == -1) {  
 			/*
@@ -399,11 +403,24 @@ read_group (group, group_path, pcount)
 }
 
 /*
- *  Go through the articles in arts[] and use .thread to snake threads
- *  through them.  Use the subject line to construct threads.  The
+ *  Go through the articles in arts[] and create threads. There are
+ *  3 strategies currently defined :
+ *
+ *	THREAD_NONE		No threading
+ *	THREAD_SUBJ		Threads are created using like Subject lines
+ *	THREAD_REFS		The References line is used to create a thread tree
+ *
+ *  In the second two cases, .thread and .inthread are used, the
  *  first article in a thread should have .inthread set to FALSE, the
  *  rest TRUE.  Only do unexprired articles we haven't visited yet
  *  (arts[].thread == -1 ART_NORMAL).
+ *
+ *  The rethread parameter is a misnomer. Its only effect (if set) is
+ *  to delete all threading information, not to rethread
+ *
+ *  This function used to rely on default_threads_arts - surely
+ *  changing a global default should alter all groups using global default
+ *  attributes ?
  */
 
 void
@@ -411,48 +428,79 @@ make_threads (group, rethread)
 	struct t_group *group;
 	int rethread;
 {
-	register int i;
-	register int j;
+	register int i;		/* gcc, at least, will ignore 'register' as */
+	register int j;		/* it can do a better job itself */
 
 	if (! cmd_line) {
-		if (group->attribute->thread_arts) {
-			wait_message (txt_threading_arts);
-		} else {
+		if (group->attribute->thread_arts == THREAD_NONE)
 			wait_message (txt_unthreading_arts);
-		}
+		else
+			wait_message (txt_threading_arts);
 	}
-/*
-if (debug == 2) {
-	sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]", 	
-		rethread, default_thread_arts, group->attribute->thread_arts);
-	error_message (msg, "");
-}
-*/
+
+#if 0
+	if (debug == 2) {
+		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]", 	
+				rethread, default_thread_arts, group->attribute->thread_arts);
+		error_message (msg, "");
+	}
+#endif
+
 	/*
-	 *  arts[].thread & arts[].inthread need to be reset if re-threading
+	 * Do we really have to do this every time we come here, even if
+	 * we're not rethreading ?
+	 */
+	sort_arts (group->attribute->sort_art_type);
+	
+	/*
+	 *  The threading pointers need to be reset if re-threading
+	 *	If used, parent pointers get set explicitly later on
 	 */
 	if (rethread || group->attribute->thread_arts) {
-/*
-if (debug == 2) {
-	error_message("Resetting .thread & .inthread", "");
-}
-*/
+
 		for (i=0 ; i < top ; i++) {
-			if (arts[i].thread != ART_EXPIRED) arts[i].thread = ART_NORMAL;
+
+#ifdef REF_THREADING
+			arts[i].sibling = arts[i].child = NO_THREAD;
+#endif
+
+			if (arts[i].thread != ART_EXPIRED)
+				arts[i].thread = ART_NORMAL;
+
 			arts[i].inthread = FALSE;
 		}
 	}
 
-	sort_arts (group->attribute->sort_art_type);
-	
-/*
-if (debug == 2) {
-	error_message("Threading", "");
-}
-*/
-	if (group->attribute->thread_arts == 0 || default_thread_arts == 0) {
-		return;
+#if 0
+	if (debug == 2)
+		error_message("Threading", "");
+#endif
+
+	/*
+	 * Do the right thing according to the threading strategy
+	 */
+	switch (group->attribute->thread_arts) {
+		case THREAD_NONE:
+			return;
+
+#ifdef REF_THREADING
+		case THREAD_REFS:
+			thread_by_reference(group);
+			return;
+#endif
+		case THREAD_SUBJ:
+			/* Fall through */
 	}
+
+
+	/* Mark i as being in j's thread list iff
+	 * . The article is _not_ being ignored
+	 * . The article is not already threaded
+	 * . One of the following is true:
+	 *    1) The subject lines are the same
+	 *    2) Both are part of the same archive (name's match and arch bit set)
+	 */
+
 	for (i = 0; i < top; i++) {
 #ifndef OLD_THREADING
 		int *aptr; 
@@ -460,19 +508,26 @@ if (debug == 2) {
 		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i)) {
 			continue;
 		}	
+
 #ifndef OLD_THREADING
 		aptr = (int*)arts[i].subject;
 		aptr -=2;
-	        j = *aptr;	
+		j = *aptr;	
+
 		if (j != -1 && j < i) {
-		  if (! IGNORE_ART(i) && arts[i].inthread == FALSE &&
-			   ((arts[i].subject == arts[j].subject) ||
-			   ((arts[i].part || arts[i].patch) &&
-			   arts[i].archive == arts[j].archive))) {
-		       arts[j].thread = i;
-		       arts[i].inthread = TRUE;
-                   }
+
+			/*
+			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
+			 */
+			if (! IGNORE_ART(i) && arts[i].inthread == FALSE &&
+						   ((arts[i].subject == arts[j].subject) ||
+						   ((arts[i].part || arts[i].patch) &&
+							 arts[i].archive == arts[j].archive))) {
+				arts[j].thread = i;
+				arts[i].inthread = TRUE;
+			}
 		} 
+
 		*aptr = i; 
 #else
 		for (j = i+1; j < top; j++) {
@@ -724,7 +779,7 @@ iReadNovFile (group, min, max, expired)
 	*expired = 0;
  
 	/* 
-	 * setup the overview file (whether it be local or via nntp)
+	 * open the overview file (whether it be local or via nntp)
 	 */
 	fp = open_xover_fp (group, "r", min, max);
 	if (fp == (FILE *) 0) {
@@ -1188,7 +1243,6 @@ pcFindNovFile (psGrp, iMode)
 			}	
 		}
 	}
-	
 	return acNovFile;
 }
 

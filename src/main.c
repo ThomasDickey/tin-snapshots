@@ -606,7 +606,7 @@ update_index_files ()
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */			
 					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */			
 					nntp_open ();				/* connect server if we are using nntp */
-					default_thread_arts = FALSE;	/* stop threading to run faster */
+					default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
 					do_update ();
 					tin_done (EXIT_OK);
 					break;
@@ -618,7 +618,7 @@ update_index_files ()
 #endif	/* HAVE_FORK */
 		{
 			create_index_lock_file (lock_file);
-			default_thread_arts = FALSE;	/* stop threading to run faster */
+			default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
 			do_update ();
 			tin_done (EXIT_OK);
 		}

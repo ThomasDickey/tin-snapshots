@@ -48,4 +48,4 @@ echo "Press <RETURN> to keep $(basename $1) or anything else to remove it."
 read ans
 [ -n "$ans" ] && echo "Removing $1" && rm -f $1
 
-#
+# end of tinpp

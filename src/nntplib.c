@@ -78,7 +78,8 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		define netread	socket_read
 #		define netwrite socket_write
 #		define netclose socket_close
-#	    elif UCX
+#	    else
+#	    ifdef UCX
 #		include <errno.h>
 #		include <iodef.h>
 #		include <netdb.h>
@@ -89,6 +90,7 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		define netwrite write
 #		define netclose close
 #			define	IPPORT_NNTP	((unsigned short) 119)
+#	    endif
 #	    endif
 #	else /* !VMS */
 #		include <sys/socket.h>

@@ -444,6 +444,7 @@ help_page_up:
 
 			case iKeyHelpHome:			/* Home */
 			case iKeyHelpHome2:
+			case iKeyHelpHome3:
 help_home:
 				if (cur_page != 1) {
 					cur_page = 1;
@@ -451,7 +452,7 @@ help_home:
 				}
 				break;
 
-			case iKeyHelpEnd:				/* End */
+			case iKeyHelpEnd:			/* End */
 			case iKeyHelpEnd2:
 help_end:
 				if (cur_page != max_page) {

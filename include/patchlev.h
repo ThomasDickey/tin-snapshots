@@ -32,6 +32,7 @@
  *		bugfixes
  *
  *	Jason Faultless <jason@radar.demon.co.uk>
+ *		reference-based-threading
  *		post_process_command
  *		bugfixes
  *
@@ -42,6 +43,9 @@
  * 	Urs Janﬂen <urs@akk.uni-karlsruhe.de>
  *		bugfixes & customasations
  *
+ *	Branden Robinson <branden@purdue.edu>
+ *		bugfixes
+ *
  *	Juergen Bernau <pas@freitag.muc.de>
  *		minor bugfix
  *
@@ -51,7 +55,7 @@
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960519"
+#define PATCHLEVEL	"MC.960521"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

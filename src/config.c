@@ -108,37 +108,37 @@ read_config_file (file, global_file)
 				break;
 			}
 #ifdef HAVE_COLOR
-			if (match_integer (buf, "col_back=", &col_back)) {
+			if (match_integer (buf, "col_back=", &col_back, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_invers=", &col_invers)) {
+			if (match_integer (buf, "col_invers=", &col_invers, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_text=", &col_text)) {
+			if (match_integer (buf, "col_text=", &col_text, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_foot=", &col_foot)) {
+			if (match_integer (buf, "col_foot=", &col_foot, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_quote=", &col_quote)) {
+			if (match_integer (buf, "col_quote=", &col_quote, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_head=", &col_head)) {
+			if (match_integer (buf, "col_head=", &col_head, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_subject=", &col_subject)) {
+			if (match_integer (buf, "col_subject=", &col_subject, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_response=", &col_response)) {
+			if (match_integer (buf, "col_response=", &col_response, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_from=", &col_from)) {
+			if (match_integer (buf, "col_from=", &col_from, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_normal=", &col_normal)) {
+			if (match_integer (buf, "col_normal=", &col_normal, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_title=", &col_title)) {
+			if (match_integer (buf, "col_title=", &col_title, MAX_COLOR)) {
 				break;
 			}
 #endif
@@ -166,10 +166,10 @@ read_config_file (file, global_file)
 			if (match_string (buf, "default_sigfile=", default_sigfile, sizeof (default_sigfile))) {
 				break;
 			}
-			if (match_integer (buf, "default_filter_days=", &default_filter_days)) {
+			if (match_integer (buf, "default_filter_days=", &default_filter_days, 0)) {
 				break;
 			}
-			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header)) {
+			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header, 0)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global)) {
@@ -181,7 +181,7 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire)) {
 				break;
 			}
-			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header)) {
+			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header, 0)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global)) {
@@ -218,7 +218,7 @@ read_config_file (file, global_file)
 			if (match_string (buf, "default_mail_address=", default_mail_address, sizeof (default_mail_address))) {
 				break;
 			}
-			if (match_integer (buf, "default_move_group=", &default_move_group)) {
+			if (match_integer (buf, "default_move_group=", &default_move_group, 0)) {
 				break;
 			}
 			if (match_string (buf, "default_pipe_command=", default_pipe_command, sizeof (default_pipe_command))) {
@@ -264,7 +264,7 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 'g':
-			if (match_integer (buf, "groupname_max_length=", &groupname_max_length)) {
+			if (match_integer (buf, "groupname_max_length=", &groupname_max_length, 132)) {
 				break;
 			}
 			if (match_boolean (buf, "group_catchup_on_exit=", &group_catchup_on_exit)) {
@@ -327,10 +327,7 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "pos_first_unread=", &pos_first_unread)) {
 				break;
 			}	
-			if (match_integer (buf, "post_process_type=", &default_post_proc_type)) {
-				if (default_post_proc_type < POST_PROC_NONE || default_post_proc_type > POST_PROC_UUD_EXT_ZIP)
-					default_post_proc_type = 0;
-
+			if (match_integer (buf, "post_process_type=", &default_post_proc_type, POST_PROC_UUD_EXT_ZIP)) {
 				proc_ch_default = get_post_proc_type (default_post_proc_type);
 				break;
 			}
@@ -348,7 +345,7 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 'r':
-			if (match_integer (buf, "reread_active_file_secs=", &reread_active_file_secs)) {
+			if (match_integer (buf, "reread_active_file_secs=", &reread_active_file_secs, 10000)) {
 				break;
 			}
 			break;
@@ -368,10 +365,10 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "show_description=", &show_description)) {
 				break;
 			}
-			if (match_integer (buf, "show_author=", &default_show_author)) {
+			if (match_integer (buf, "show_author=", &default_show_author, SHOW_FROM_BOTH)) {
 				break;
 			}	
-			if (match_integer (buf, "sort_article_type=", &default_sort_art_type)) {
+			if (match_integer (buf, "sort_article_type=", &default_sort_art_type, SORT_BY_DATE_ASCEND)) {
 				break;
 			}	
 			if (match_boolean (buf, "show_last_line_prev_page=", &show_last_line_prev_page)) {
@@ -388,7 +385,7 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 't':
-			if (match_boolean (buf, "thread_articles=", &default_thread_arts)) {
+			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_REFS)) {
 				break;
 			}	
 			if (match_boolean (buf, "tab_after_X_selection=", &tab_after_X_selection)) {
@@ -563,7 +560,7 @@ write_config_file (file)
 	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
 	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");
 	fprintf (fp, "confirm_action=%s\n\n", print_boolean (confirm_action));
-	fprintf (fp, "# if ON confirm with y/n before quitting\n");
+	fprintf (fp, "# if ON confirm with y/n before quitting ('Q' never asks)\n");
 	fprintf (fp, "confirm_to_quit=%s\n\n", print_boolean (confirm_to_quit));
 	fprintf (fp, "# if ON show group description text after newsgroup name at\n");
 	fprintf (fp, "# group selection level\n");
@@ -581,8 +578,8 @@ write_config_file (file)
 	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
 	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
 	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
-	fprintf (fp, "# if ON all group will be threaded as default.\n");
-	fprintf (fp, "thread_articles=%s\n\n", print_boolean (default_thread_arts));
+	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References).\n");
+	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
 	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
@@ -872,8 +869,13 @@ change_config_file (group, filter_at_once)
 #endif
 							);
 
+				/*
+				 * If the threading strategy has changed, fix things
+				 * so that rethreading will occur
+				 */
 				if (default_thread_arts != orig_thread_arts && 
-				    group != (struct t_group *) 0) {
+				    							group != (struct t_group *) 0) {
+					group->attribute->thread_arts = default_thread_arts;
 					make_threads (group, TRUE);
 					find_base (group);
 				}
@@ -1103,16 +1105,29 @@ match_boolean (line, pat, dst)
 }
 
 
+/*
+ * If pat matches the start of line, convert rest of line to an integer, dst
+ * If max is set, constrain value to 0 <= dst <= max and return TRUE.
+ * If no match is made, return FALSE.
+ */
 int 
-match_integer (line, pat, dst)
+match_integer (line, pat, dst, max)
 	char *line;
 	char *pat;
-	int *dst;
+	int *dst, max;
 {
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		*dst = atoi (&line[patlen]);
+
+		if (max)  {
+			if ((*dst < 0) || (*dst > max)) {
+				fprintf(stderr, "\n%s%d out of range 0 - %d. Reset to 0", pat, *dst, max);
+				*dst = 0;
+			}
+		}
+
 		return TRUE;
 	}
 	return FALSE;

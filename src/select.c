@@ -103,22 +103,10 @@ selection_index (start_groupnum, num_cmd_line_groups)
 						goto select_page_down;
 
 					case KEYMAP_HOME:
-						if (cur_groupnum != 0) {
-							if (0 < first_group_on_screen) {
-								erase_group_arrow ();
-								cur_groupnum = 0;
-								group_selection_page ();
-							} else {
-								erase_group_arrow ();
-								cur_groupnum = 0;
-								draw_group_arrow ();
-							}
-						}
-						break;
-					
+						goto top_of_list;
+
 					case KEYMAP_END:
 						goto end_of_list;
-
 #ifndef WIN32
 					case KEYMAP_MOUSE:
 						INDEX_BOTTOM = INDEX_TOP+last_group_on_screen-first_group_on_screen;
@@ -154,6 +142,21 @@ selection_index (start_groupnum, num_cmd_line_groups)
 				break;
 #endif
 
+			case iKeySelectFirstPage:	/* show first page of groups */
+top_of_list:
+				if (cur_groupnum != 0) {
+					if (0 < first_group_on_screen) {
+						erase_group_arrow ();
+						cur_groupnum = 0;
+						group_selection_page ();
+					} else {
+						erase_group_arrow ();
+						cur_groupnum = 0;
+						draw_group_arrow ();
+					}
+				}
+				break;
+					
 			case iKeySelectLastPage:	/* show last page of groups */
 end_of_list:
 				if (cur_groupnum != group_top - 1) {
@@ -473,7 +476,6 @@ select_page_up:
 				break;
 
 			case iKeySelectQuit:	/* quit */
-			case iKeySelectQuit2:
 select_done:
 				if (! confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
 					write_config_file (local_config_file);
@@ -481,6 +483,11 @@ select_done:
 				}
 				group_selection_page ();
 				break;
+
+			case iKeySelectQuit2:   /* quit, no ask */
+				write_config_file (local_config_file);
+				tin_done (EXIT_OK);
+                                break;
 
 			case iKeySelectToggleReadDisplay:
 	 			/* 
@@ -713,6 +720,11 @@ select_done:
 				use_color = !use_color;
 				use_color_tinrc = use_color;
 				group_selection_page();  /* redraw page */
+				if (use_color) {
+					info_message(txt_color_on);
+				} else {
+					info_message(txt_color_off);
+				}
 				break;
 #endif
 

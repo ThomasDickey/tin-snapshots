@@ -1,6 +1,42 @@
+--950824BETA  PLMC.960521 --
+
+042) Jason Faultless (jason@radar.demon.co.uk)
+     ADD. Initial implementation of references based threading.
+          See refs.c for more information, TODO etc..
+          o Can be set on Options Menu
+          o 'u' in group mode cycles through none, subj, refs
+          When in a group, threading type appears at top as (S) or (R)
+          o Thread menu shows subject lines, 'd' toggles From:
+          o Hidden debug key 'a' in thread menu shows thread structure
+     BUG. No range checking on integer values in tinrc.
+          Out of range values could have unpredictable results.
+     ADD. Added range checking to match_integer(). Modified all calls
+          to pass in sensible upper limit where possible.
+          Various other fixes
+     FIX. several supplied patches
+
+041) Branden Robinson <branden@purdue.edu>
+     BUG. extraneous newline after "Checking for new newsgroups..."
+     BUG. prompting with "Read article" where it should be "Read thread"
+     ADD. 'Q' never asks before quitting tin
+     ADD. ANSI color enabled/disable footline at top level
+     ADD. shell escape to thread level.
+     ADD. Add "^" command to top, group, thread, and article level
+          (and help screen).
+     BUG. vi sometimes stumbled "Not that many lines in buffer"
+     FIX. several supplied patches
+
+040) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. even more noticed quote-strings
+     FIX. color.c
+
+039) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code clean-up
+     FIX. nntplib.c screen.c
+
 --950824BETA  PLMC.960519 --
 
-038) Branden Robinson <branden@ecn.purdue.edu>
+038) Branden Robinson <branden@purdue.edu>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. little code clean-up
      FIX. extern.h, proto.h, config.c, init.c, page.c, post.c, rfc1522.c,
@@ -26,8 +62,8 @@
 --950824BETA  PLMC.960516 --
 
 035) Chris Blum <chris@phil.uni-sb.de>
-     ADD. print waring if cross-posting contains no Followup-To: line
-     ADD. print waring if Followup-To: line contains more than 1 newsgroup
+     ADD. print warning if cross-posting contains no Followup-To: line
+     ADD. print warning if Followup-To: line contains more than 1 newsgroup
      BUG. case-sensitive header-checking removed
      FIX. several supplied patches
    

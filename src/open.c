@@ -401,6 +401,7 @@ open_xover_fp (psGrp, pcMode, lMin, lMax)
 #endif
 	} else {
 		pcNovFile = pcFindNovFile (psGrp, (*pcMode == 'r' ? R_OK : W_OK));
+
 		if (debug) { 
 			error_message ("READ file=[%s]", pcNovFile);
 		}

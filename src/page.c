@@ -402,6 +402,7 @@ page_goto_next_unread:
 
 			case iKeyPageRestartArt:		/* redraw beginning of article */
 			case iKeyPageRestartArt2:			/* 'less' compatible */
+			case iKeyPageRestartArt3:
 begin_of_article:			
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
@@ -508,13 +509,16 @@ page_up:
 			case iKeyPageQuit:	/* return to index page */
 return_to_index:
 				art_close ();
+
 				if (filter_state == NO_FILTERING &&
 					default_sort_art_type != old_sort_art_type) {
 					make_threads (group, TRUE);
 					find_base (group);
 				}
+
 				i = which_thread (respnum);
 				*threadnum = which_response (respnum);
+
 				if (filter_state == FILTERING || local_filtered_articles) {
 					old_top = top;
 					old_artnum = arts[respnum].artnum;
@@ -523,6 +527,7 @@ return_to_index:
 					find_base (group);
 					i = find_new_pos (old_top, old_artnum, i);
 				}
+
 				return i;
 
 			case iKeyPageToggleInverseVideo:	/* toggle inverse video */
@@ -610,7 +615,7 @@ return_to_index:
 				}
 				break;
 
-			case iKeyPageQuickQuit:	/* quit */
+			case iKeyPageQuitTin:	/* quit */
 				return GRP_QUIT;
 	
 			case iKeyPageReplyQuote:	/* reply to author through mail */
