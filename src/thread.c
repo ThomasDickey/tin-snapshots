@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : thread.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 27-09-94
+ *  Author    : I. Lea
+ *  Created   : 01.04.91
+ *  Updated   : 24.12.97
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -44,6 +44,7 @@ static int prompt_thread_num (int ch);
 static void update_thread_page (void);
 static void draw_thread_arrow (void);
 static void erase_thread_arrow (void);
+static void make_prefix (struct t_msgid *art, char *prefix);
 #endif
 
 
@@ -60,11 +61,13 @@ bld_tline (
 	int i;
 	int len_from;
 	char mark;
-	struct t_msgid *ptr;
 #if USE_CURSES
 	char buff[BUFSIZ];
 #else
 	char *buff = screen[INDEX2TNUM(l)].col;
+#endif
+#if 0 /* not needed with mutt-like threading tree */
+	struct t_msgid *ptr;
 #endif
 
 	/*
@@ -88,13 +91,14 @@ bld_tline (
 		} else if (art->status == ART_UNREAD) {
 			mark = (art->selected ? art_marked_selected : art_marked_unread);
 		} else if (art->status == ART_WILL_RETURN) {
-			mark =  art_marked_return;
+			mark = art_marked_return;
+
 /* TODO - add kill_level		} else if (art->killed) {
  *			mark = 'K';
  */
-		} else {
+
+		} else
 			mark = ART_MARK_READ;
-		}
 
 		*(buff+MARK_OFFSET) = mark;			/* insert mark */
 	}
@@ -133,27 +137,51 @@ bld_tline (
 		else
 			len_from = 0;
 
+#if 0 /* old insertion code, obsolete with mutt like threading tree */
 		/*
 		 * Indent the subject according to the current depth of threading
 		 */
 		for (ptr = art->refptr; ptr->parent != NULL; ptr = ptr->parent) {
 			strcat(buff, THREAD_SPACER);
 
-			if ((int)strlen(buff) >= cCOLS)		/* If extremely nested */
+			if ((int)strlen(buff) >= cCOLS)	/* If extremely nested */
 				return;
+#endif /* 0 */
+
+		/*
+		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
+		 * Insert tree-structure strings "`->", "+->", ...
+		 */
+
+		make_prefix(art->refptr, buff+strlen(buff));
+
+		if ((int)strlen(buff) >= cCOLS)	/* If extremely nested */
+		    return;
+
+#if 0 /* see #if 0 above */
 		}
+#endif /* 0 */
 
 		/*
 		 * Copy in the subject up to where the author (if any) starts
 		 */
 		i = cCOLS - strlen(buff) - len_from;
 
-		if (len_from)						/* Leave gap before author */
+		if (len_from)	/* Leave gap before author */
 			i=i-2;
+		/*
+		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
+		 * Hide subject if same as parent's.
+		 */
 
 		if (i > 0) {
-			strncat(buff, art->subject, i);
-			*(buff + strlen(buff)) = '\0';		/* Just in case */
+			if (!(art->refptr->parent &&
+			  art->refptr->parent->article != ART_NORMAL &&
+			  arts[art->refptr->parent->article].subject ==
+			  art->subject))
+				strncat(buff, art->subject, i);
+
+			*(buff + strlen(buff)) = '\0';	/* Just in case */
 		}
 
 		/*
@@ -1195,7 +1223,7 @@ prev_unread (
  */
 #ifndef INDEX_DAEMON
 void
-move_to_response(
+move_to_response (
 	int n)
 {
 	HpGlitch(erase_thread_arrow ());
@@ -1208,3 +1236,44 @@ move_to_response(
 		show_thread_page ();
 }
 #endif /* INDEX_DAEMON */
+
+
+/*
+ * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
+ */  
+static void
+make_prefix (
+	struct t_msgid *art,
+	char *prefix)
+{
+	struct t_msgid *ptr;
+	int prefix_ptr;
+	int depth = 0;
+
+	for (ptr = art->parent; ptr; ptr = ptr->parent)
+		depth++;
+
+	if (depth == 0) {
+		prefix[0] = '\0';
+		return;
+	}
+
+	prefix_ptr = depth * 2 - 1;
+	strcpy (&prefix[prefix_ptr], "->");
+	prefix_ptr--;
+	if (art->sibling)
+		prefix[prefix_ptr] = '+';
+	else
+		prefix[prefix_ptr] = '`';
+
+	for (ptr = art->parent; ptr->parent; ptr = ptr->parent) {
+		prefix_ptr--;
+		prefix[prefix_ptr] = ' ';
+		prefix_ptr--;
+		if (ptr->sibling)
+			prefix[prefix_ptr] = '|';
+		else
+			prefix[prefix_ptr] = ' ';
+	}
+	return;
+}

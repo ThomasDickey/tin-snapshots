@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : init.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 21-12-94
+ *  Author    : I. Lea
+ *  Created   : 01.04.91
+ *  Updated   : 21.12.98
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -801,7 +801,7 @@ void init_selfinfo (void)
 	joinpath (subscriptions_file, libdir, SUBSCRIPTIONS_FILE);
 
 #ifdef INDEX_DAEMON
-	joinpath  (lock_file, TMPDIR, LOCK_FILE);
+	joinpath (lock_file, TMPDIR, LOCK_FILE);
 	strcpy (newsrc, news_active_file);	/* default so all groups are indexed */
 	joinpath (group_times_file, rcdir, GROUP_TIMES_FILE);
 	joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", novrootdir), INDEX_NEWSDIR);

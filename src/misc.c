@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : misc.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 22-12-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.91
+ *  Updated   : 22.12.97
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute	this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -2544,9 +2544,9 @@ read_input_history_file (void) {
 			if (*chr)
 				input_history[his_w][his_e] = chr;
 			else {
-				/* empty lines in getline's history buf
-				   are stored as NULL pointers */
+				/* empty lines in getline's history buf are stored as NULL pointers */
 				input_history[his_w][his_e] = NULL;
+
 				/* get the empty slot in the circular buf */
 				if (!his_free)
 					his_free = his_e;
@@ -2557,7 +2557,7 @@ read_input_history_file (void) {
 		/* check if next type is reached */
 		if (his_e >= HIST_SIZE) {
 			hist_last[his_w] = his_free;
-		        hist_pos[his_w] = hist_last[his_w];
+			hist_pos[his_w] = hist_last[his_w];
 			his_free = 0;
 			his_e = 0;
 			his_w++;
@@ -2622,14 +2622,12 @@ quote_wild(
 			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
 			    || *str == ' ' || *str == '\t' ) {
 				*target++ = '\\';
-				if (*str == ' ' || *str == '\t') {
+				if (*str == ' ' || *str == '\t')
 					*target++ = 's';
-				} else {
+				else
 					*target++ = *str;
-				}
-			} else {
+			} else
 				*target++ = *str;
-			}
 		} else {	/* wildmat */
 			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
 				*target++ = '\\';

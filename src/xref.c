@@ -127,7 +127,7 @@ art_mark_xref_read (
 
 		if (psGrp && psGrp->newsrc.xbitmap) {
 			if (artnum >= psGrp->newsrc.xmin && artnum <= psGrp->xmax) {
-			    artread = ((NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ) ? TRUE : FALSE);
+				artread = ((NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ) ? TRUE : FALSE);
 				if (!artread) {
 					NSET0(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin);
 					if (psGrp->newsrc.num_unread > 0)

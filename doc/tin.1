@@ -105,7 +105,7 @@ line, but \fItin\fP cannot tell which groups are moderated.
 purge group index files of articles that no longer exist. Care should be
 taken when using this command as it checks each and every article in each
 group that is accessed. On a low speed connection this can have an
-undesirable effect and it also knocks the hell out of your filesystem.
+undesirable effect and it also knocks the hell out of your file-system.
 .TP
 .BI -q
 Don't check for new newsgroups.
@@ -164,13 +164,13 @@ The index daemon version, \fItind\fP, supports the -f, -h, -I and -v
 options.
 .PP
 A list of groups can be specified after the other command line options. This
-can be useful if you wish to yank in or subscribe to a handpicked subset of
+can be useful if you wish to yank in or subscribe to a hand-picked subset of
 the active newsgroups. The list may include the usual newsgroup wildcard
 characters. It can be comma or space separated, eg:
 .PP
 alt.config news.*,!news.test
 .PP
-If you specify a single groupname, or a wildcard that matches a single
+If you specify a single group-name, or a wildcard that matches a single
 group, then you will automatically enter that group. Otherwise the normal
 group selection screen will appear, but with all the matching groups present
 too, as though you had yanked just those groups in.
@@ -299,7 +299,7 @@ unsubscribe from it in the normal way. This flag will only appear if
 you have set strip_bogus=Ask in the Options Menu.
 .TP
 \fBX\fP
-You may no longer make posts to this group. Often a group will be superceded
+You may no longer make posts to this group. Often a group will be superseded
 by a more appropriately named one.
 .TP
 \fB=\fP
@@ -321,7 +321,7 @@ command-line switch!).
 expand tab (#);
 rB lB l lB l lB l lB .
 1#  + 2# #18#  #Bnews sources?#  #iain@ecrc.de
-2#  + 17##1275##Plese Help! I Have A Problem!##dau@lus.er
+2#  + 17##1275##Please Help! I Have A Problem!##dau@lus.er
 .TE
 .PP
 At the Article level the page header has the following format:
@@ -374,7 +374,7 @@ The following commands are available when editing a string:
 move to beginning or end of line, respectively.
 .TP
 \fB^F, ^B\fP
-nondestructive move forward or back one location, respectively.
+non-destructive move forward or back one location, respectively.
 .TP
 \fB^D\fP
 delete the character currently under the cursor, or send EOF if no
@@ -393,7 +393,7 @@ move through history, previous and next, respectively.
 redraw the current line.
 .TP
 \fB<CR>\fP
-places line on history list if nonblank, appends newline and returns
+places line on history list if non-blank, appends newline and returns
 to the caller.
 .TP
 \fB<ESC>\fP
@@ -530,7 +530,7 @@ for more information.
 \fB[\fP
 Auto select article(s) with a single key. The defaults used for selection
 are set via the following three tinrc config variables: 
-default_filter_select_header (0=Subject:, 1=From:, 2=MessageiId:), 
+default_filter_select_header (0=Subject:, 1=From:, 2=Message-ID:), 
 default_filter_select_global (ON=apply to all groups, OFF=apply to current
 group) and default_filter_select_expire (ON=expire after specified time,
 OFF=always apply the filter).
@@ -543,7 +543,7 @@ more information.
 \fB]\fP
 Kill article(s) with a single key. The defaults used for killing
 are set via the following three tinrc config variables: 
-default_filter_kill_header (0=Subject:, 1=From:, 2=MessageiId:), 
+default_filter_kill_header (0=Subject:, 1=From:, 2=Message-ID:), 
 default_filter_kill_global (ON=apply to all groups, OFF=apply to current
 group) and default_filter_kill_expire (ON=expire after specified time,
 OFF=always apply the filter).
@@ -793,7 +793,7 @@ for more information.
 \fB[\fP
 Auto select article(s) with a single key. The defaults used for selection
 are set via the following three tinrc config variables: 
-default_filter_select_header (0=Subject:, 1=From:, 2=MessageiId:), 
+default_filter_select_header (0=Subject:, 1=From:, 2=Message-ID:), 
 default_filter_select_global (ON=apply to all groups, OFF=apply to current
 group) and default_filter_select_expire (ON=expire after specified time,
 OFF=always apply the filter).
@@ -809,7 +809,7 @@ more information.
 \fB]\fP
 Kill article(s) with a single key. The defaults used for killing
 are set via the following three tinrc config variables: 
-default_filter_kill_header (0=Subject:, 1=From:, 2=MessageiId:), 
+default_filter_kill_header (0=Subject:, 1=From:, 2=Message-ID:), 
 default_filter_kill_global (ON=apply to all groups, OFF=apply to current
 group) and default_filter_kill_expire (ON=expire after specified time,
 OFF=always apply the filter).
@@ -1058,10 +1058,10 @@ whose contents is listed.
 whose contents is extracted.
 .ti -\w'\(em'u
 \(emunpacking of multi-part uuencoded files, which produce a *.lha archive
-whose contents is listed (AmigaDOS version only).
+whose contents is listed (AmigaOS version only).
 .ti -\w'\(em'u
 \(emunpacking of multi-part uuencoded files, which produce a *.lha archive
-whose contents is extracted (AmigaDOS version only).
+whose contents is extracted (AmigaOS version only).
 .in -.5i
 .TP
 \fBSort articles by\fP
@@ -1106,7 +1106,7 @@ The character used to show that an article is in a range. Default is #.
 The character used to show that an article will return. Default is '-'.
 .TP 4
 \fBart_marked_selected\fP
-The character used to show that an article/thread is autoselected (hot).
+The character used to show that an article/thread is auto-selected (hot).
 Default is *.
 .TP 4
 \fBart_marked_unread\fP
@@ -1271,11 +1271,11 @@ If ON mark articles that are saved as read. Default is ON.
 .TP 4
 \fBnews_quote_format\fP
 Format of quote line when posting/following up an article (%A=Address, %D=Date,
-%F=Addr+Name, %G=Groupname, %M=MessageId, %N=Name).
+%F=Addr+Name, %G=Groupname, %M=Message-Id, %N=Name).
 Default is "%F wrote:"
 .TP 4
 \fBno_advertising\fP
-Turn off advertising in header (X-Newsreader/X-Mailer). Default is OFF.
+Turn off advertising in header (User-Agent:). Default is OFF.
 .TP 4
 \fBpos_first_unread\fP
 If ON put cursor at first unread article in group otherwise at last article.
@@ -1438,7 +1438,7 @@ If ON remove ~/.article after posting. Default is ON.
 .TP 4
 \fBuse_builtin_inews\fP
 Allows the builtin NNTP inews to be enabled/disabled. This has no effect
-when reading/posting direct to local spool where external inews will alsways
+when reading/posting direct to local spool where external inews will always
 be used. Default is ON (enabled).
 .TP 4
 \fBuse_metamail\fP
@@ -1484,7 +1484,7 @@ thread_arts=1
 show_author=1
 sort_art_type=5
 post_proc_type=1
-news_quote_format=IM %M %F wrote:
+news_quote_format=In %M %F wrote:
 
 scope=fido.*
 x_comment_to=ON
@@ -1513,7 +1513,7 @@ range: 0=none, 1=subject descending, 2=subject ascending, 3=from descending,
 The post_proc_type attribute is specified by a number from the following 
 range: 0=none, 1=unshar, 2=uudecode, 3=uudecode & list zoo archive, 
 4=uudecode & extract zoo archive, 5=uudecode & list zip archive, 
-6=uudecode & extract zip archive. (note: if running on AmigaDOS the zoo
+6=uudecode & extract zip archive. (note: if running on AmigaOS the zoo
 options are replaced by there corresponding lha archiver options).
 .SH "FILTERING ARTICLES"
 When there is a subject or an author which you are either very
@@ -1531,7 +1531,7 @@ newsgroup or it can apply to all newsgroups. Once entered the user can
 abort the command and not save the kill description, edit the kill file 
 or save the kill description.
 WARNING: the online killfile-menu is somewhat buggy and might trash your
-killfile, it is highly recomended not to use it! The killfile synatx is esay
+killfile, it is highly recommended not to use it! The killfile syntax is easy
 to understand so you could edit it with your desired editor outside of tin. 
 .PP
 On starting \fItin\fP the user's killfile \fI$HOME/.tin/filter\fP is read
@@ -1655,11 +1655,11 @@ Saved news can be read later by \fItin -R\fP.
 .PP
 .TP 2i
 \fItin -M iain -c -f newsrc.mail\fP 
-(mail any unread articles in newgroups specified in file newsrc.mail)
+(mail any unread articles in newsgroups specified in file newsrc.mail)
 .PP
 .TP 2i
 \fItin -S -c -f newsrc.save\fP 
-(save any unread articles in newgroups specified in file newsrc.save)
+(save any unread articles in newsgroups specified in file newsrc.save)
 .PP
 .TP 2i
 \fItin -R\fP 
@@ -1678,9 +1678,8 @@ The following is an example of a \fI$HOME/.Sig\fP file:
 .RS
 .nf
 .ft CW
-NAMES  Iain Lea    iain.lea@scn.de
+NAMES  Iain Lea    iain@ecrc.de
 SNAIL  Bruecken Str 12, 90419 Nuernberg 90, Germany
-PHONE  +49-911-978-3120 (work)
 .ft P
 .fi
 .RE
@@ -1825,9 +1824,9 @@ and all groups starting with u (university groups) other than UK groups (which
 will be queried for as usual.)
 .TP
 \fBSPAMTRAP\fP
-Set this variable to a list of commaseparated strings to be warned if you
+Set this variable to a list of comma-separated strings to be warned if you
 are replying to an article by mail where the e-mail address contains one of
-these strings. The matching is caseinsensitive. Example:
+these strings. The matching is case-insensitive. Example:
 \fISPAMTRAP=spam,delete,remove\fP
 .SH "TIPS AND TRICKS"
 .PP
@@ -2026,6 +2025,9 @@ v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin/ since April 1995
 .br
 v1.3-unoff-beta has been available from
 ftp.akk.uni-karlsruhe.de:/pub/news/clients/tin-unoff/ since March 1996.
+.br
+v1.4 has been available from
+ftp.tin.org:/pub/news/clients/tin/ since ??????
 
 .SH CREDITS
 .TP 1.5i
@@ -2063,7 +2065,7 @@ Chris Thewalt
 author of getline.c emacs style editing routine.
 .TP 1.5i
 Mark Tomlinson
-for porting \fItin\fP to the AmigaDOS operating system.
+for porting \fItin\fP to the AmigaOS operating system.
 .TP 1.5i
 Andreas Wrede
 for porting \fItin\fP to the OS/2 operating system.
@@ -2103,34 +2105,35 @@ Philippe Goujard, Dan Greenspan, Karlos Gross, Carl Hage, Paul Halsema, Ed
 Hanway, Scott Hauck, Per Headland, Arnold Hendriks, Daniel Hermans, Jose
 Herrero, Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell,
 Tommy Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Pieter Immelman,
-Jarkko Isokungas, Urs Janssen, Patrick St. Jean, Hal Jespersen, Robbin
-Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten Keil,
-Fritz Kleeman, Andreas Kies, Tomasz Kloczko, Dwarven Knight, Thomas Koenig,
-Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Kris Kugel, Yuri
-Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Hannu
-Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner,
-Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
-David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
-Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
-De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Soren Moller,
-Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise,
-Udo Munk, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E.
-O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb
-Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven Paulus, Walter
-Pelissero, Colin Perkins, Eric Peterson, Tim Pierce, Bill Poitras, Scott W.
-Powers, Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Ted Richards, Steve
-Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman,
-Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary
-Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif,
-Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer
-Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander,
-Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert,
-Mark Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner,
-Ralf Stephan, Helmrich Streitmatter, Dieter Stueken, Ed Sznyter, Dean
-Takemori, Darrell Tangman, Derek Terveer, Carsten Theis, Julian Thompson,
-David Tiller, Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
-Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist, Greg
-Woods, Lloyd Wright, Billy Y., Nickolai Zeldovich
+Jarkko Isokungas, Urs Janssen, Patrick St. Jean, Hal Jespersen, Park Sang
+Jin, Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating,
+Karsten Keil, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz Kloczko,
+Dwarven Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin Kraemer,
+Thomas Kroener, Kris Kugel, Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex
+Lange, Alain Lasserre, Hannu Laurila, Vincent Lefevre, Alexander Lehmann,
+Marty Leisner, Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua Choon
+Leong, Chris Lewis, Andreas Ley, David-Michael Lincke, Otto Lind, Richard
+Lloyd, Florian Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp, David
+MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi
+Marukawa, Owen Medd, Soren Moller, Bruce Momjian, Sergio Morales, Michael
+Morrell, Klaus Mueller, Mike Muise, Udo Munk, Daniel Naber, Torsten Neumann,
+Dirk Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg
+Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim
+Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins,
+Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
+Thomas Quinot, Stefan Rapp, Ted Richards, Steve Robbins, Ollivier Robert,
+Branden Robinson, Jim Robinson, Stephen Roseman, Roland Rosenfeld, Peter Van
+Rossem, Clifton Royston, Rich Salz, Gary Sanders, Nickolay Saukh, John
+Sauter, Christopher Sawtell, Holger Schif, Volker Schmidt, John Schmitz,
+Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder, Larry
+Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer,
+Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman,
+Cliff Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Helmrich
+Streitmatter, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman,
+Derek Terveer, Carsten Theis, Julian Thompson, David Tiller, Andry Timonin,
+Mark Tomlin, Michael Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha,
+Jason Wessel, Cary Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Billy Y.,
+Nickolai Zeldovich
 .PP
 .SH AUTHOR
 .TP 1i

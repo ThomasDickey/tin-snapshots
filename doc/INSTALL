@@ -99,7 +99,7 @@ Note1: If you want to retrieve tin index files from your NNTP server,
        install tind on the machine that has the news spool directory.
    4)  Apply my NNTP patches to your nntpd server or this will not work
        with NNTP!!!. (If you want tind locally read Note3).
-   5)  Edit the Makefile and add -DINDEX_DAEMON to your COPTS entry and
+   5)  Edit the Makefile and add -DINDEX_DAEMON to your CPPOPTS entry and
        remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap, and
        any other screen-handling libraries used, as tind does not need to
        be linked with curses and it will save a good 30-50K on the size of
@@ -275,7 +275,7 @@ the correct path to INN library.
 Define if you want tin to do ISO-8859-1 Charset to ASCII conversations
 by default for all groups. You must specify a value of "0-6" to get tin
 to use one of the 7 conversion tables for different languages.
-i.e., Adding -DUSE_ISO2ASC=\"2\" to the COPTS line in the Makefile would
+i.e., Adding -DUSE_ISO2ASC=\"2\" to the CPPOPTS line in the Makefile would
 be useful in the german language newsgroups. For more detailed info
 read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
@@ -345,7 +345,7 @@ Compiled & installed on the following machines:
 -----------------------------------------------
 
 1)	i486 & Linux 1.2.13 with gcc 2.7.0
-	i486 & Linux 2.0.32 with gcc 2.7.2.2
+	i486 & Linux 2.0.33 with gcc 2.7.2.2
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2

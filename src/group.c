@@ -367,7 +367,7 @@ sleep(3);
 group_tab_pressed:
 				space_mode = TRUE;
 				if (index_point < 0)
-					n =  -1;
+					n = -1;
 				else
 					n = next_unread ((int) base[index_point]);
 				if (index_point < 0 || n < 0) {
@@ -606,7 +606,7 @@ group_catchup:								/* came here on group exit via left arrow */
 									break;
 								case 1:						/* We caught up - advance group */
 									if (cur_groupnum + 1 < group_top)
-  										cur_groupnum++;
+										cur_groupnum++;
 								default:					/* Just leave the group */
 									goto group_done;
 							}

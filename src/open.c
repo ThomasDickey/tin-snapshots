@@ -1,12 +1,12 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : open.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 21-12-94, 05-04-97
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.91
+ *  Updated   : 24.12.97
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -249,7 +249,7 @@ DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
 
 		if (tin_errno != 0)
-		        return(-1);
+			return(-1);
 
 		respcode = (int) strtol(ptr, &end, 10);
 DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));

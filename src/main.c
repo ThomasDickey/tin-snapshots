@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : main.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 22-12-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.91
+ *  Updated   : 22.12.94
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -572,7 +572,6 @@ read_cmd_line_options (
 
 			case 'z':
 				start_any_unread = TRUE;
-				batch_mode = TRUE;	/* This is demoted later if nothing found */
 				break;
 
 			case 'Z':
@@ -624,13 +623,6 @@ read_cmd_line_options (
 		wait_message(0, "Assuming -r in order to use -n\n");
 		read_news_via_nntp = TRUE;	/* We won't get here without NNTP support */
 	}
-
-	/*
-	 *  If we're reading from an NNTP server and we've been asked not to look
-	 *  for new newsgroups, trust our cached copy of the newsgroups file.
-	 */
-	if (read_news_via_nntp)
-		read_local_newsgroups_file = ! check_for_new_newsgroups;
 #endif
 }
 
@@ -753,10 +745,9 @@ check_for_any_new_news (
 	}
 
 	if (StartAnyUnread) {
-		i = check_start_save_any_news (START_ANY_NEWS);
-		if (i == -1) {		/* no new/unread news so exit */
-			exit (EXIT_OK);
-		}
+		batch_mode = TRUE;			/* Suppress some unwanted on-screen garbage */
+		if ((i = check_start_save_any_news (START_ANY_NEWS)) == -1)
+			exit (EXIT_OK);			/* No new/unread news so exit */
 		batch_mode = FALSE;
 	}
 
@@ -779,11 +770,10 @@ save_or_mail_new_news (void)
 		catchup = FALSE;
 		do_update ();
 		catchup = i;			/* set catchup to previous value */
-		if (mail_news) {
+		if (mail_news)
 			check_start_save_any_news (MAIL_ANY_NEWS);
-		} else {
+		else
 			check_start_save_any_news (SAVE_ANY_NEWS);
-		}
 		tin_done (EXIT_OK);
 	}
 }

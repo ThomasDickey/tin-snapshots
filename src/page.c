@@ -875,7 +875,7 @@ show_note_page (
 	while (note_line < lines) { /* loop show_note_page */
 
 		if (show_last_line_prev_page) {
-		   note_mark[note_page+1] = ftell (note_fp);
+			note_mark[note_page+1] = ftell (note_fp);
 			if (doing_pgdn && first && buf2[0])
 				goto print_a_line;
 		}

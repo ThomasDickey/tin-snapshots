@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : pgp.c
  *  Author    : Steven J. Madsen
- *  Created   : 12-05-95
- *  Updated   : 09-12-97
+ *  Created   : 12.05.95
+ *  Updated   : 09.12.97
  *  Notes     : PGP support for article posting and mailing
- *  Copyright : (c) 1995 by Steven J. Madsen
+ *  Copyright : (c) 1995-98 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -147,31 +147,25 @@ do_pgp (
 
 	split_file(file);
 	strcpy(options, "-at");
+
 #	ifdef HAVE_PGP_2
 	if (what & ENCRYPT)
 		strcat(options, "e");
 	if (what & SIGN)
 		strcat(options, "s");
-	sprintf(cmd, "%s %s %s %s %s", PGPNAME, pgpopts, options, pt,
-		mail_to ? mail_to : "");
+	sprintf(cmd, "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
 #	else
 #		ifdef HAVE_PGP_5
-        if (what & ENCRYPT && what & SIGN)
-          {
-	    strcat (options, "s");
-	    sprintf (cmd, "%se %s %s %s %s", PGPNAME, pgpopts, options, pt,
-		     mail_to ? mail_to : "");
-	  }
-        else
-          {
-	    sprintf (cmd, "%s%s %s %s %s %s", PGPNAME,
-		     (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt,
-		     mail_to ? mail_to : "");
 
-	  }
+	if (what & ENCRYPT && what & SIGN) {
+		strcat (options, "s");
+		sprintf (cmd, "%se %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
+	} else
+		sprintf (cmd, "%s%s %s %s %s %s", PGPNAME, (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt, mail_to ? mail_to : "");
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
-        invoke_cmd(cmd);
+
+	invoke_cmd(cmd);
 	join_files(file);
 	unlink(pt);
 	unlink(hdr);
@@ -187,6 +181,7 @@ pgp_append_public_key (
 
 	sprintf(user, "%s@%s", userid, host_name);
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
+
 #	ifdef HAVE_PGP_2
 	sprintf(cmd, "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
 #	else
@@ -194,7 +189,8 @@ pgp_append_public_key (
 	sprintf(cmd, "%sk %s -xa %s %s", PGPNAME, pgpopts, user, keyfile);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
-	if (invoke_cmd(cmd)) {
+
+	if (invoke_cmd (cmd)) {
 		if ((f = fopen(file, "a")) == (FILE *) 0)
 			return;
 		if ((key = fopen(keyfile, "r")) == (FILE *) 0) {
@@ -304,9 +300,11 @@ pgp_check_article(void)
 		return (0);
 	}
 	joinpath(the_article, homedir, ".article");
+
 #	ifdef APPEND_PID
 	sprintf (the_article+strlen(the_article), ".%d", process_id);
 #	endif /* APPEND_PID */
+
 	if ((art = fopen(article, "w")) == (FILE *) 0) {
 		info_message(txt_cannot_open, the_article);
 		return (0);
@@ -330,13 +328,15 @@ pgp_check_article(void)
 	ClearScreen();
 	if (pgp_signed) {
 		Raw(FALSE);
+
 #	ifdef HAVE_PGP_2
 		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 #	else
 #		ifdef  HAVE_PGP_5
-	        sprintf(cmd, "%sv <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
+		sprintf(cmd, "%sv <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
+
 		system(cmd);
 		my_printf("\n");
 		Raw(TRUE);
@@ -345,13 +345,15 @@ pgp_check_article(void)
 		strcpy (buf, "Add key(s) to public keyring? ");
 		if (prompt_yn (cLINES, buf, FALSE) == 1) {
 			Raw (FALSE);
+
 #	ifdef HAVE_PGP_2
 			sprintf (cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
 #	else
 #		ifdef HAVE_PGP_5
-		        sprintf (cmd, "%sk %s -a %s", PGPNAME, pgpopts, the_article);
+			sprintf (cmd, "%sk %s -a %s", PGPNAME, pgpopts, the_article);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
+
 			system (cmd);
 			my_printf ("\n");
 			Raw (TRUE);

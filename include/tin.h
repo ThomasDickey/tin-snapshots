@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : tin.h
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01.04.91
- *  Updated   : 30.07.97
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 22.12.1997
  *  Notes     : #include files, #defines & struct's
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *		You may  freely  copy or  redistribute	this software,
  *		so  long as there is no profit made from its use, sale
  *		trade or  reproduction.  You may not change this copy-
@@ -54,9 +54,6 @@
 #endif
 
 #include	<signal.h>
-
-/* Philip Hazel's Perl regular expressions library */
-#include 	<pcre.h>
 
 #ifdef VMS
 #	ifdef __DECC
@@ -147,14 +144,6 @@ extern char *get_uaf_fullname();
 
 #ifdef HAVE_STDLIB_H
 #	include <stdlib.h>
-#endif
-
-#if __STDC__
-#	define ANSI_VARARGS 1
-#	include <stdarg.h>
-#else
-#	define ANSI_VARARGS 0
-#	include <varargs.h>
 #endif
 
 #include <stdarg.h>
@@ -1075,7 +1064,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FILTER_FROM_CASE_IGNORE		3
 #define	FILTER_MSGID		4
 #define	FILTER_MSGID_LAST	5
-#define	FILTER_LINES		6
+#define	FILTER_MSGID_ONLY	6
+#define	FILTER_LINES		7
 
 #define	FILTER_LINES_NO		0
 #define	FILTER_LINES_EQ		1
@@ -1405,7 +1395,7 @@ struct t_filter
 	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;			/* kill/auto select */
 	unsigned int icase:2;			/* Case sensitive filtering */
-	unsigned int fullref:2;			/* use full references or last entry only */
+	unsigned int fullref:4;			/* use full references or last entry only */
 };
 
 /*
@@ -1842,6 +1832,9 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 #if defined(WIN32)
 #	include	"msmail.h"
 #endif
+
+/* Philip Hazel's Perl regular expressions library */
+#include 	<pcre.h>
 
 /*
  * rfc1521/rfc1522 interface

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : extern.h
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 26-04-95
+ *  Author    : I. Lea
+ *  Created   : 01.04.1991
+ *  Updated   : 22.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -774,6 +774,7 @@ extern constext txt_not_exist[];
 extern constext txt_not_in_active_file[];
 extern constext txt_nrctbl_create[];
 extern constext txt_nrctbl_default[];
+extern constext txt_only[];
 extern constext txt_opt_add_posted_to_filter[];
 extern constext txt_opt_advertising[];
 extern constext txt_opt_alternative_handling[];

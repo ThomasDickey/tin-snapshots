@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : attrib.c
- *  Author    : I.Lea
- *  Created   : 01-12-93
- *  Updated   : 21-11-94
+ *  Author    : I. Lea
+ *  Created   : 01.12.93
+ *  Updated   : 20.12.97
  *  Notes     : Group attribute routines
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -100,7 +100,7 @@ set_default_attributes (
 	psAttrib->show_only_unread = default_show_only_unread;
 	psAttrib->thread_arts = default_thread_arts;
 	psAttrib->sort_art_type = default_sort_art_type;
-	psAttrib->show_author  = default_show_author;
+	psAttrib->show_author = default_show_author;
 	psAttrib->auto_save_msg = default_auto_save_msg;
 	psAttrib->auto_save = default_auto_save;
 	psAttrib->auto_select = FALSE;
