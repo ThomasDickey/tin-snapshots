@@ -1,80 +1,72 @@
-#include "tin.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <sys/utsname.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
-#ifndef MAXHOSTNAMELEN
-#	define MAXHOSTNAMELEN 255
-#endif
-
 /*
-** find hostname
+** Project   : tin - a Usenet reader
+** Module    : header.c
+** Author    : Urs Janssen <urs@akk.uni-karlsruhe.de>
+** Created   : 10.03.97
+** Updated   : 19.03.97
+** Copyright : (c) Copyright 1997 by Urs Janssen
+**             You may  freely  copy or  redistribute  this software,
+**             so  long as there is no profit made from its use, sale
+**             trade or  reproduction.  You may not change this copy-
+**             right notice, and it must be included in any copy made.
 */
-void
+
+#include "tin.h"
+#include "tnntp.h"
+
+/* find hostname */
+char *
 get_host_name (
-	char *hostname)
+void)
 {
 	char *ptr;
+	static char hostname[MAXHOSTNAMELEN+2];
 
 #ifdef HAVE_GETHOSTBYNAME
-	char shortname[MAXHOSTNAMELEN+2]="";
-
-	if	(gethostname(shortname, sizeof(shortname))){
-		strcpy(host_name, shortname);
-	}
+	gethostname(hostname, sizeof(hostname));
 #else
 #	if defined(M_AMIGA) || defined(M_OS2)
-
+	
 	if ((ptr = getenv("NodeName")) != (char *) 0) {
-		strcpy(host_name, ptr);
+		strcpy(hostname, ptr);
 	}
 #	else
 #		if defined(WIN32)
 	if ((ptr = getenv("COMPUTERNAME")) != (char *) 0) {
-		strcpy(host_name, ptr);
+		strcpy(hostname, ptr);
 	}
 #		endif /* WIN32 */
 #	endif /* M_AMIGA || M_OS2 */
 #endif /* HAVE_GETHOSTBYNAME */
-
-	else {
-		struct utsname uts_name;
-			
-		if (!uname (&uts_name)) {
-			strcpy (host_name, uts_name.nodename);
+#ifdef HAVE_SYS_UTSNAME_H
+	if (! *hostname){
+		strcpy(hostname, system_info.nodename);
+	} 	else
+#endif /* HAVE_SYS_UTSNAME_H */
+	{
+		if ((ptr = getenv("HOST")) != (char *) 0) {
+			strcpy (hostname, ptr);
 		} else {
-			if ((ptr = getenv("HOST")) != (char *) 0) {
-				strcpy(host_name, ptr);
-			} else {
-				if ((ptr = getenv("HOSTNAME")) != (char *) 0) {
-					strcpy(host_name, ptr);
-				}
+			if ((ptr = getenv("HOSTNAME")) != (char *) 0) {
+				strcpy (hostname, ptr);
 			}
 		}
 	}
+	return (hostname);
 }
 
-/*
-** find domainname - check DOMAIN_NAME, /etc/resolv.conf
-*/
-void
-get_domain_name (
-	char *domainname)
-{
-	char *ptr;
-	char domain[MAXHOSTNAMELEN+2]="";
-	char buff[MAXHOSTNAMELEN+2]="";
-	FILE *fp;
 
 #ifdef DOMAIN_NAME
+/* find domainname - check DOMAIN_NAME */
+char *
+get_domain_name (
+	void)
+{
+	char *ptr;
+	static char domain[MAXHOSTNAMELEN+2];
+	char buff[MAXHOSTNAMELEN+2];
+	FILE *fp;
+
 #	if defined(M_AMIGA)
 /* Damn compiler bugs...
  * Without this hack, SASC 6.55 produces a TST.B d16(pc),
@@ -98,82 +90,26 @@ static const char *domain_name_hack = DOMAIN_NAME;
 				}
 				if((ptr = strrchr (buff, '\n'))) {
 					*ptr = '\0';
-				strcpy (domain_name, buff);
+				strcpy (domain, buff);
 				}
 			}
 			fclose (fp);
+		} else {
+			domain[0]='\0';
 		}
-		domain[0] = '\0';
 	}
-	if (*domain_name=='\0') { /* domain_name is still in domain */
-		strcpy(domain_name, domain);
-	}
+	return (domain);
+}
 #endif /* DOMAIN_NAME */
 
-	/*
-	** DOMAIN_NAME did not carrie any usefull information or an error
-	** occured while reading -> check domain-line in /etc/resolv.conf
-	*/
-
-	if (*domain_name=='\0') {
-		/* read /etc/resolv.conf and parse domain-line */
-		if ((fp = fopen ("/etc/resolv.conf", "r")) != (FILE *) 0) {
-			while (fgets (buff, sizeof (buff), fp) != (char *) 0) {
-			switch(buff[0]) {
-				case 'd':
-					if(! strncmp(buff,"domain",6)) {
-						if ((ptr = strrchr(buff,' '))) {
-							strcpy (domain, ptr+1);
-						} else {
-							strcpy (domain, buff+6);
-						}
-						if ((ptr = strrchr(domain, '\t'))) {
-							strcpy (domain_name, ptr+1);
-						} else {
-							strcpy (domain_name, domain);
-						}
-						if ((ptr = strrchr (domain_name, '\n'))) {
-							*ptr = '\0';
-						}
-					}
-					break;
-				default:
-					break;
-				}
-			}
-			fclose (fp);
-		}
-		/*
-		** if we got domain-name from /etc/resolv.conf
-		** switch domain-name && FQDN to lowercase
-		** and check is domain-name is a substring of FQDN
-		*/
-		strcpy (domain, get_fqdn(host_name));
-		ptr = domain;
-		while (*ptr != '\0') {
-			*ptr = tolower(*ptr++);
-		}
-		ptr = domain_name;
-		while (*ptr != '\0') {
-			*ptr = tolower(*ptr++);
-		}
-		if (! strstr (get_fqdn (host_name), domain_name)) {
-			*domain_name = '\0';
-		}
-	}
-}
-
 #ifdef HAVE_GETHOSTBYNAME
-
-/*
-** find FQDN - gethostbyaddr()
-*/
-char *
+/* find FQDN - gethostbyaddr() */
+const char *
 get_fqdn (
-	char *host)
+	const char *host)
 {
 	char	name[MAXHOSTNAMELEN+2];
-	struct hostent	*hp;
+	const struct hostent	*hp;
 	struct in_addr	in;
 
 	name[MAXHOSTNAMELEN]='\0';
@@ -190,11 +126,112 @@ get_fqdn (
 		in.s_addr = inet_addr(name);
 		if ((hp = gethostbyaddr((char *) &in.s_addr, 4, AF_INET)))
 			in.s_addr = (*hp->h_addr);
-		return(hp && strchr(hp->h_name, '.') ? hp->h_name : inet_ntoa(in));
+		return((hp && strchr(hp->h_name, '.')) ? hp->h_name : inet_ntoa(in));
 	}
 	if ((hp = gethostbyname(name)) && !strchr (hp->h_name, '.'))
 		if ((hp = gethostbyaddr(hp->h_addr, hp->h_length, hp->h_addrtype)))
 			in.s_addr = (*hp->h_addr);
-	return(hp ? strchr(hp->h_name, '.') ? hp->h_name : inet_ntoa(in) : NULL);
+	return(hp ? ((strchr(hp->h_name, '.')) ? hp->h_name : inet_ntoa(in)) : 0);
 }
 #endif
+
+/*
+ * FIXME: split get_user_info to get_full_name() and get_user_name()
+ */
+
+
+/*
+ * Find username & fullname
+ */
+void
+get_user_info (
+	char *user_name,
+	char *full_name)
+{
+#ifndef INDEX_DAEMON
+	char buf[128];
+	char tmp[128];
+	const char *ptr;
+	char *p;
+
+#if defined(M_AMIGA)
+	ptr = get_val ("REALNAME", "Unknown");
+	my_strncpy (full_name, ptr, 128);
+	strcpy (user_name, userid);
+#else
+#ifndef VMS
+		my_strncpy (buf, myentry->pw_gecos, 128);
+		p = strchr (buf, ',');
+		if (p != 0) {
+			*p = '\0';
+		}
+		/*
+		 * check if SYSV (& lastname) hack is in gecos field
+		 */
+		p = strchr (buf, '&');
+		if (p != 0) {
+			*p++ = '\0';
+			strcpy (tmp, userid);
+			if (*tmp && *tmp >= 'a' && *tmp <= 'z') {
+				*tmp = *tmp - 32;
+			}
+			sprintf (full_name, "%s%s%s", buf, tmp, p);
+		} else {
+			strcpy (full_name, buf);
+		}
+#else
+		strcpy(full_name, fix_fullname(get_uaf_fullname()));
+#endif
+
+	if ((ptr = getenv ("NAME")) != 0) {
+		my_strncpy (full_name, ptr, 128);
+	}
+
+	/*
+	 * haha, supplying a from: line is not allowed, but this!
+	 */
+
+	if (userid == 0) {
+		ptr = get_val ("USER", "please-set-USER-variable");
+	} else {
+		ptr = userid;
+	}
+	my_strncpy (user_name, ptr, 128);
+#endif
+
+#endif /* INDEX_DAEMON */
+}
+
+
+/*
+ * FIXME to:
+ * char * build_from(full_name, user_name, domain_name)
+ */
+/*
+ * build From: in 'name <user@host.doma.in>' format
+ */
+void
+get_from_name (
+	char *user_name,
+	char *full_name,
+	char *from_name)
+{
+#ifndef INDEX_DAEMON
+
+#ifdef FORGERY
+	if (*mail_address) {
+		strcpy(from_name, mail_address);
+		return;
+	}
+#endif
+
+	sprintf (from_name, "%s <%s@%s>", full_name, user_name, domain_name);
+
+	if (debug == 2) {
+		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
+			from_name, user_name, domain_name, full_name);
+		error_message (msg, "");
+	}
+
+#endif /* INDEX_DAEMON */
+}

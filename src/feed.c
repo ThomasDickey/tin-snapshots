@@ -312,7 +312,6 @@ feed_articles (
 			break;
 		case FEED_REPOST:	/* repost article */
 #ifndef FORGERY
-			get_host_name (host_name);
 			get_user_info (user_name, full_name);
 			get_from_name (user_name, full_name, from_name);
 

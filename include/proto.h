@@ -4,6 +4,7 @@
 /* active.c */
 extern int get_active_num (void);
 extern int resync_active_file (void);
+extern int process_bogus(char *name);
 extern int parse_active_line (char *line, long *max, long *min, char *moderated);
 extern void read_news_active_file (void);
 extern int match_group_list (char *group, char *group_list);
@@ -149,9 +150,9 @@ extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
 
 /* header.c */
-extern void get_domain_name (char *domain);
-extern void get_host_name (char *host);
-extern char *  get_fqdn (char *host);
+extern char *get_domain_name (void);
+extern char *get_host_name (void);
+extern const char *get_fqdn (const char *host);
 
 /* inews.c */
 extern void get_user_info (char *user_name, char *full_name);
@@ -262,6 +263,7 @@ extern void vWriteNewsrc (void);
 extern void backup_newsrc (void);
 extern void subscribe (struct t_group *group, int sub_state);
 extern void reset_newsrc (void);
+extern void delete_group (char *group);
 extern void grp_mark_read (struct t_group *group, struct t_article *psArt);
 extern void grp_mark_unread (struct t_group *group);
 extern void thd_mark_read (struct t_group *group, long thread);

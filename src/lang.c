@@ -69,7 +69,7 @@ constext txt_check_article[] = "Check Prepared Article";
 constext txt_checking_new_groups[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
 constext txt_checksum_of_file[] = cCRLF "Checksum of %s" cCRLF;
-constext txt_cmdline_hit_any_key[] = "Press any key to continue...";
+constext txt_return_key[] = "Press <RETURN> to continue...";
 constext txt_color_off[] = "ANSI color disabled";
 constext txt_color_on[] = "ANSI color enabled";
 constext txt_command_failed_s[] = "Command failed: %s\n";
@@ -240,7 +240,7 @@ constext txt_help_ctrl_k[] = "^K\t  kill an article via a menu" cCRLF;
 constext txt_help_ctrl_l[] = "^L\t  redraw page" cCRLF;
 constext txt_help_d[] = "d\t  toggle display of subject or subject plus author" cCRLF;
 constext txt_help_dash[] = "-\t  display last article viewed" cCRLF;
-constext txt_help_display_rfc1522_header_undecoded[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_display_mime_header_asis[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_draw_arrow_mark[] = "Draw -> or highlighted bar for selection. <SPACE> toggles & <CR> sets.";
 constext txt_help_e[] =  "e\t  edit article (mail-groups only)" cCRLF;
 constext txt_help_editor_format[] = "Enter %E for editor, %F for filename, %N for line-number, <CR> to set.";
@@ -366,6 +366,7 @@ constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> 
 constext txt_help_space_toggles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_start_editor_offset[] = "Start editor with line offset. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_blanks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_strip_bogus[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_newsrc[] = "Do you want to strip unsubscribed groups from .newsrc";
 constext txt_help_t[] = "t\t  tag current article for reposting/mailing/piping/printing/saving" cCRLF;
 constext txt_help_tab_after_X_selection[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -381,7 +382,7 @@ constext txt_help_t_cr[] = "<CR>\t  read chosen article" cCRLF;
 constext txt_help_t_num[] = "<0> - <9> choose article by number" cCRLF;
 constext txt_help_t_tab[] = "<TAB>\t  read next unread article" cCRLF;
 constext txt_help_thread[] = "< >\t  display first (> = last) article in current thread" cCRLF;
-constext txt_help_thread_arts[] = "Enable/disable threading of articles in all groups. <SPACE> toggles, <CR> sets.";
+constext txt_help_thread_arts[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_thread_catchup_on_exit[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_u[] = "u\t  cycle through threading options available" cCRLF;
 constext txt_help_unlink_article[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -519,7 +520,7 @@ constext txt_opt_col_markdash[] = "Color of highlighting with _dash_  : ";
 #endif
 constext txt_opt_confirm_action[] = "Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = "Confirm before quitting            : ";
-constext txt_opt_display_rfc1522_header_undecoded[] = "Display RFC 1522 header undecoded  : ";
+constext txt_opt_display_mime_header_asis[] = "Display RFC 1522 header undecoded  : ";
 constext txt_opt_draw_arrow_mark[] = "Draw -> instead of highlighted bar : ";
 constext txt_opt_editor_format[] = "Invocation of your editor          : ";
 constext txt_opt_filter_days[] = "No. of days a filter entry is valid: ";
@@ -570,6 +571,7 @@ constext txt_opt_sort_art_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
 constext txt_opt_start_editor_offset[] = "Start editor with line offset      : ";
 constext txt_opt_strip_blanks[] = "Strip blanks of end of lines       : ";
+constext txt_opt_strip_bogus[] = "Remove bogus groups from newsrc    : ";
 constext txt_opt_strip_newsrc[] = "No unsubscribed groups in newsrc   : ";
 constext txt_opt_tab_after_X_selection[] = "Do tab after X automatically       : ";
 constext txt_opt_tab_goto_next_unread[] = "Tab goes to next unread article    : ";
@@ -664,9 +666,12 @@ constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to b
 # default_sigfile=!command  executes external command to generate a signature\n\
 # default_sigfile=--none     don't append a signature\n";
 constext txt_tinrc_defaults[] = "# default action/prompt strings\n";
-constext txt_tinrc_display_rfc1522_header_undecoded[] = "# if ON, RFC 1522(now RFC 2047)-style header is displayed without decoding.\n\
-# default is OFF so that RFC 1522(RFC 2047) style header will be decoded back\n\
-# to 8bit when displayed.\n";
+constext txt_tinrc_display_mime_header_asis[] = "# if ON, RFC 1522(now RFC 2047)-style header fields are  displayed\n\
+# without decoding.NO effect on header displayed at the top of\n\
+# each page in article mode and summary mode(they are always decoded).\n\
+# default is OFF so that RFC 1522(RFC 2047) style header(designated in\n\
+# news_header_to_display or displayed with CTRL-h(full header option)\n\
+# will be decoded back to 8bit when displayed.\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
 # header=NUM  0=Subject: 1=From: 2=Message-Id:\n\
@@ -782,6 +787,7 @@ constext txt_tinrc_space_goto_next_unread[] = "# if ON the SPACE command will go
 constext txt_tinrc_start_editor_offset[] = "# if ON editor will be started with cursor offset into the file\n\
 # otherwise the cursor will be positioned at the first line\n";
 constext txt_tinrc_strip_blanks[] = "# If ON strip blanks from end of lines to speedup display on slow terminals\n";
+constext txt_tinrc_strip_bogus[] = "# What to do with bogus groups in newsrc file\n# 0=(Keep) 1=(Remove) 2=(Highlight with D on selection screen).\n";
 constext txt_tinrc_strip_newsrc[] = "# If ON strip unsubscribed groups from newsrc\n";
 constext txt_tinrc_tab_after_X_selection[] = "# if ON a TAB command will be automatically done after the X command\n";
 constext txt_tinrc_tab_goto_next_unread[] = "# if ON the TAB command will goto next unread article at article viewer level\n";
@@ -878,6 +884,13 @@ constext *txt_sort_type[] = {
 		"Date: field (ascending)"
 };
 
+/* Ways of handling bogus groups */
+constext *txt_strip_bogus[] = {
+		"Always Keep",
+		"Always Remove",
+		"Mark with D on selection screen"
+};
+
 #ifdef M_AMIGA
 constext txt_post_process_type[] = "Process n)one, s)har, u)ud, q)uit: ";
 #else
@@ -954,6 +967,7 @@ constext txt_reading_news_newsrc_file[] = "Reading groups from newsrc file only.
 constext txt_reading_newsgroups_file[] = "Reading newsgroups file... ";
 constext txt_reading_newsrc[] = "Reading newsrc file...";
 constext txt_reconnect_to_news_server[] = "Connection to news server has timed out. Reconnect? (y/n): ";
+constext txt_remove_bogus[] = "Bogus group %s removed.";
 constext txt_rename_error[] = "Error: rename %s to %s";
 constext txt_reply_to_author[] = "Reply to author...";
 constext txt_repost_an_article[] = "Reposting article...";

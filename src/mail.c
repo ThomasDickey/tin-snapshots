@@ -66,7 +66,6 @@ my_flush();
 		 * Load group info. TODO - integrate with active_add()
 		 */
 		ptr->type = GROUP_TYPE_MAIL;
-		ptr->name = my_strdup (buf);
 		ptr->spooldir = my_strdup (spooldir);
 		ptr->description = (char *) 0;
 		ptr->count = count;

@@ -48,8 +48,7 @@ static int base64_rank_table_built;
 static int quoteflag;
 
 static void
-build_base64_rank_table (
-	void)
+build_base64_rank_table (void)
 {
 	int i;
 
@@ -159,8 +158,7 @@ mmdecode (
 }
 
 void
-get_mm_charset (
-	void)
+get_mm_charset (void)
 {
 	char *c;
 
@@ -256,8 +254,7 @@ rfc1522_decode (
 
 static void 
 str2b64(
-  char *from,
-  char *to) 
+  char *from, char *to) 
 {
 
   unsigned long tmp;
@@ -290,10 +287,7 @@ str2b64(
   
 static int
 do_b_encode(
- char *w,
- char *b,
- int max_ewsize,
- t_bool isstruct_head)
+ char *w,char *b,int max_ewsize,t_bool isstruct_head)
 {
 
   char tmp[60];   /* strings to be B encoded */
@@ -378,7 +372,8 @@ which_encoding(
 static int
 contains_nonprintables (
 	char *w,
-        t_bool isstruct_head)
+        t_bool isstruct_head
+)
 {
 	int nonprint = 0;
 
@@ -474,16 +469,26 @@ rfc1522_do_encode (
 	char buf2[80];		/* buffer for this and that */
 	char *c;
 	char *t;
-        t_bool isstruct_head=TRUE; /* are we dealing with structured header? */
+        t_bool isstruct_head=FALSE; /* are we dealing with structured header? */
         int ew_taken_len;
+
+/* the list of structured header fields where '(' and ')' are
+   treated specially in rfc 1522 encoding */
+        static char *struct_header[] = {"Approved: ","From: ","Originator: ",
+           "Reply-To: ","Sender: ","X-Cancelled-By: ","X-Comment-To: ",
+           "X-Submissions-To: ","To: ","Cc: ","Bcc: ","X-Originator: ",NULL};
+        char **strptr=struct_header;
         
 
+
+        do {
+              if ( !strncasecmp(what,*strptr,strlen(*strptr)) ) {
+                   isstruct_head=TRUE;
+                   break;
+              }
+        } while ( *(++strptr) != NULL );
+
 	t = buf;
-
-        if ( !strncasecmp(what,"Subject: ",9) || !strncasecmp(what,"Summary: ",9) || !strncasecmp(what,"Keywords: ",10) ) {
-             isstruct_head=FALSE;
-        }
-
         encoding = which_encoding(what);
         ew_taken_len = strlen(mm_charset) + 7; /* the minimum encoded word length without any encoded text */
 

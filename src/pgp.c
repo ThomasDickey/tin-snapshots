@@ -147,10 +147,9 @@ pgp_append_public_key (
 	char *file)
 {
 	FILE *f, *key;
-	char keyfile[PATH_LEN], cmd[LEN], user[50], host[50], buf[LEN];
+	char keyfile[PATH_LEN], cmd[LEN], user[50], buf[LEN];
 
-	get_host_name(host);
-	sprintf(user, "%s@%s", userid, host);
+	sprintf(user, "%s@%s", userid, host_name);
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
 	sprintf(cmd, "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
 	if (invoke_cmd(cmd)) {

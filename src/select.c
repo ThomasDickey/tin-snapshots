@@ -213,6 +213,12 @@ select_read_group:
 					info_message (txt_no_groups);
 					break;
 				}
+
+				if (CURR_GROUP.bogus) {
+					info_message (txt_not_exist);
+					break;
+				}
+
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 				/*
 				 * If via NNTP, check that group exists. 
@@ -562,7 +568,7 @@ select_done:
 				if (group_top == 0) {
 					break;
 				}
-				if (!CURR_GROUP.subscribed) {
+				if (!CURR_GROUP.subscribed && !CURR_GROUP.bogus) {
 					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, " ");
 					subscribe (&CURR_GROUP, SUBSCRIBED);
 					sprintf (buf, txt_subscribed_to, CURR_GROUP.name);
@@ -616,15 +622,23 @@ select_done:
 			    break;
 
 			case iKeySelectUnsubscribe:	/* unsubscribe to current group */
-				if (group_top == 0) {
+				if (group_top == 0)
 					break;
-				}
+
 				if (CURR_GROUP.subscribed) {
 					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, "u");
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
 					sprintf(buf, txt_unsubscribed_to, CURR_GROUP.name);
 					info_message(buf);
+				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK) {
+					/* Bogus groups aren't subscribed to avoid confusion */
+					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
+					delete_group(CURR_GROUP.name);
+					read_newsrc(newsrc, 1);
+					show_selection_page();
+					info_message (buf);
 				}
+
 				goto_next_group_on_screen ();
 				break;
 
@@ -872,14 +886,14 @@ show_selection_page (void)
  		}
 
 		n = my_group[i];
-		if (active[n].subscribed)
+		if (active[n].bogus)		/* Group is not in active list */
+			subs = 'D';
+		else if (active[n].newgroup)
+			subs = 'N';		/* New (but unsubscribed) group */
+		else if (active[n].subscribed)
 			subs = ' ';
-		else {
-			if (active[n].newgroup)
-				subs = 'N';		/* New (but unsubscribed) group */
-			else
-	 			subs = 'u';		/* unsubscribed group */
-		}
+		else
+	 		subs = 'u';		/* unsubscribed group */
 
 		strncpy(active_name, active[n].name, groupname_len);
 		active_name[groupname_len+1] = '\0';
@@ -1041,7 +1055,7 @@ choose_new_group (void)
 
 /*
  * Return new value for group_top, skipping any new newsgroups that have been
- * found and tagged
+ * found
  */
 int
 skip_newgroups(void)

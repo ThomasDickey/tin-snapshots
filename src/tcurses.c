@@ -258,7 +258,7 @@ char *
 screen_contents(int row, int col, char *buffer)
 {
 	int y, x;
-	int len = BUFSIZ-1;
+	int len = COLS - col;
 	getyx(stdscr, y, x);
 	move(row, col);
 	/* _tracef("screen_contents(%d,%d)", row, col);*/

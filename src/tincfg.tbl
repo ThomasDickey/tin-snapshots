@@ -105,6 +105,7 @@
 	post_8bit_header		OPT_ON_OFF
 	mail_mime_encoding		txt_mime_types	NUM_MIME_TYPES
 	mail_8bit_header		OPT_ON_OFF
+        display_mime_header_asis	OPT_ON_OFF
 #ifdef	HAVE_METAMAIL
 	use_metamail			OPT_ON_OFF
 	ask_for_metamail		OPT_ON_OFF
@@ -115,4 +116,4 @@
 
 	alternative_handling		OPT_ON_OFF
 	strip_newsrc		OPT_ON_OFF
-
+	strip_bogus		txt_strip_bogus BOGUS_ASK+1

@@ -444,7 +444,8 @@ prompt_option_char (
 }
 
 /*
- * Wait until a key is pressed. Pedants will point out that:
+ * Wait until a key is pressed. We specify the <RETURN> key otherwise
+ * pedants will point out that:
  * i)  There is no 'any' key on a keyboard
  * ii) CTRL, SHIFT etc don't work
  */
@@ -453,7 +454,7 @@ continue_prompt (void)
 {
 	set_alarm_clock_off ();
 
-	info_message (txt_cmdline_hit_any_key);
+	info_message (txt_return_key);
 	(void) ReadCh ();
 
 	set_alarm_clock_on ();

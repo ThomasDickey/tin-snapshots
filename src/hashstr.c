@@ -45,9 +45,8 @@ hash_str (
 	long h;				/* result of hash:  index into hash table */
 	struct t_hashnode **p;	/* used to descend the spillover structs */
 
-	if (s == (char *) 0) {
+	if (s == (char *) 0)
 		return ((char *) 0);
-	}
 
 	{
 		const unsigned char *t = (const unsigned char *) s;
@@ -65,14 +64,14 @@ hash_str (
 	p = &table[h];
 
 	while (*p) {
-		if (STRCMPEQ(s, (*p)->s)) {
-			return (*p)->s;
+		if (STRCMPEQ(s, (*p)->txt)) {
+			return (*p)->txt;
 		}
 		p = &(*p)->next;
 	}
 
 	*p = add_string (s);
-	return (*p)->s;			/* Return ptr to text, _not_ the struct */
+	return (*p)->txt;			/* Return ptr to text, _not_ the struct */
 }
 
 
@@ -80,35 +79,26 @@ hash_str (
  * Add a string to the hash table
  * Each entry will have the following structure:
  *
- * char *s		-+			Pointer to the text
- * char *next	 |			Pointer to the next hashnode in chain
- * int			 |			'magic' ptr used to speed subj threading
- * int			 |			Unknown ptr ?
- * T		 <---+			The text itself. The ptr that hash_str()
- * E					    returns points here - the earlier fields
- * X						are 'hidden'.
+ * char *next			Pointer to the next hashnode in chain
+ * int aptr				'magic' ptr used to speed subj threading
+ * T					The text itself. The ptr that hash_str()
+ * E					returns points here - the earlier fields
+ * X					are 'hidden'.
  * T
- * \0						String terminator
+ * \0					String terminator
  */
 static struct t_hashnode *
 add_string (
 	const char *s)
 {
-	int *iptr;
 	struct t_hashnode *p;
 
-	p = (struct t_hashnode *) my_malloc (sizeof (struct t_hashnode)
-		+ sizeof (int) * 2 + strlen(s) + 1);
+	p = (struct t_hashnode *) my_malloc (sizeof (struct t_hashnode) + strlen(s));
 
 	p->next = (struct t_hashnode *) 0;
+	p->aptr = -1;					/* -1 is the default value */
 
-	iptr = (int *) &p[1];
-
-	*iptr++ = -1;			/* Initialise 'magic' ptr to -1 */
-	*iptr++ = -1;			/* TODO: Is this ever used ? */
-
-	p->s = (char *) iptr;	/* Bolt the text onto the end */
-	strcpy (p->s, s);
+	strcpy (p->txt, s);				/* Copy in the text */
 
 	return p;
 }
@@ -138,9 +128,8 @@ hash_reclaim (void)
 	struct t_hashnode *p, *next;
 
 #ifdef M_AMIGA
-	if (!table) {
+	if (!table)
 		return;
-	}
 #endif
 
 	for (i = 0; i < HASHNODE_TABLE_SIZE; i++)
