@@ -87,23 +87,23 @@ constext txt_continue[] = "Continue? (y/n): ";
 
 #ifdef M_AMIGA
 	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Mark Tomlinson.";
-#endif
+#endif /* M_AMIGA */
 
 #ifdef M_OS2
 	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Andreas Wrede.";
-#endif
+#endif /* M_OS2 */
 
 #ifdef M_UNIX
 	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea.";
-#endif
+#endif /* M_UNIX */
 
 #ifdef VMS
 	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Tod McQuillin & other.";
-#endif
+#endif /* VMS */
 
 #ifdef WIN32
 	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Nigel Ellis.";
-#endif
+#endif /* WIN32 */
 
 constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): ";
 constext txt_cancelling_art[] = "Cancelling article...";
@@ -119,6 +119,7 @@ constext txt_enter_next_thread[] = " and enter next unread thread";
 constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
 constext txt_error_approved[] = "\nWarning: Approved: header used.\n";
+constext txt_error_asfail[] = "%s: assertion failure: %s (%d): %s\n";
 constext txt_error_bad_approved[] = "\nError: Bad address in Approved: header.\n";
 constext txt_error_bad_from[] = "\nError: Bad address in From: header.\n";
 constext txt_error_bad_replyto[] = "\nError: Bad address in Reply-To: header.\n";
@@ -204,7 +205,7 @@ constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
 	constext txt_group[] = "Group %.*s ('q' to quit)... ";
 #else
 	constext txt_group[] = "Group %*s... ";
-#endif
+#endif /* HAVE_POLL || HAVE_SELECT */
 
 constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
 constext txt_group_select_com[] = "Top Level Commands (page %d of %d)";
@@ -212,7 +213,7 @@ constext txt_group_selection[] = "Group Selection";
 
 #ifndef NO_SHELL_ESCAPE
 	constext txt_help_shell[] = "!\t  shell escape" cCRLF;
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 
 #ifdef CASE_PROBLEM
 	constext txt_help_BIGB[] = "B\t  search all articles for a given string (this may take some time)" cCRLF "\t  (searches are case-insensitive and wrap around to all articles)" cCRLF;
@@ -238,7 +239,7 @@ constext txt_group_selection[] = "Group Selection";
 	constext txt_help_U[] = "U\t  untag all tagged threads" cCRLF;
 	constext txt_help_W[] = "W\t  list articles posted by you (from posted file)" cCRLF;
 	constext txt_help_X[] = "X\t  toggle display of all/selected articles" cCRLF;
-#endif
+#endif /* CASE_PROBLEM */
 
 constext txt_help_a[] = "a A\t  search for articles by author (a = forward, A = backward)" cCRLF;
 constext txt_help_add_posted_to_filter[] = "Add subject of posted articles to filter. <SPACE> toggles & <CR> sets.";
@@ -251,7 +252,7 @@ constext txt_help_art_marked_unread[] = "Enter character to indicate unread arti
 
 #ifdef HAVE_METAMAIL
 	constext txt_help_ask_for_metamail[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* HAVE_METAMAIL */
 
 constext txt_help_auto_bcc[] = "Send you a blind carbon copy automatically. <SPACE> toggles & <CR> sets.";
 constext txt_help_auto_cc[] = "Send you a carbon copy automatically. <SPACE> toggles & <CR> sets.";
@@ -296,7 +297,7 @@ constext txt_help_use_getart_limit[] = "<SPACE> toggles, <CR> sets, <ESC> cancel
 	constext txt_help_col_markdash[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 	constext txt_help_word_highlight_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 	constext txt_help_word_h_display_marks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* HAVE_COLOR */
 
 constext txt_help_colon[] = ":\t  skip next block of included text" cCRLF;
 constext txt_help_confirm_action[] = "Ask for command confirmation. <SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -307,7 +308,7 @@ constext txt_help_ctrl_f[] = "^F ^B\t  down (^B = up) one page" cCRLF;
 
 #ifdef HAVE_PGP
 	constext txt_help_ctrl_g[] = "^G\t  perform PGP operations on article" cCRLF;
-#endif
+#endif /* HAVE_PGP */
 
 constext txt_help_ctrl_h[] = "^H\t  show article headers" cCRLF;
 constext txt_help_ctrl_k[] = "^K\t  kill an article via a menu" cCRLF;
@@ -397,7 +398,7 @@ constext txt_help_p_s[] = "s\t  save article/thread/hot/pattern/tagged articles 
 	constext txt_help_p_BIGS[] = "S\t  save tagged articles automatically without user prompts" cCRLF;
 #else
 	constext txt_help_p_S[] = "S\t  save tagged articles automatically without user prompts" cCRLF;
-#endif
+#endif /* CASE_PROBLEM */
 
 constext txt_help_full_page_scroll[] = "Scroll half/full page of groups/articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_p_search[] = "/\t  search forward within this article" cCRLF;
@@ -461,21 +462,21 @@ constext txt_help_unlink_article[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.
 
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	constext txt_help_use_builtin_inews[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 
 #ifdef HAVE_COLOR
 	constext txt_help_use_color_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* HAVE_COLOR */
 
 #ifdef HAVE_KEYPAD
 	constext txt_help_use_keypad[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* HAVE_KEYPAD */
 
 constext txt_help_use_mailreader_i[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 
 #ifdef HAVE_METAMAIL
 	constext txt_help_use_metamail[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-#endif
+#endif /* HAVE_METAMAIL */
 
 constext txt_help_g_t_p_i[] = "i\t  toggle info message in last line (subject/description)" cCRLF;
 constext txt_help_s_i[] = "i\t  show description of chosen newsgroup" cCRLF;
@@ -489,7 +490,7 @@ constext txt_help_y[] = "Y\t  yank in active file to see any new news" cCRLF;
 
 #ifdef HAVE_COLOR
 	constext txt_help__[] = "_\t  toggle word highlighting on/off" cCRLF;
-#endif
+#endif /* HAVE_COLOR */
 
 constext txt_hit_space_for_more[] = "PgDn,End,<SPACE>,^D - page down. PgUp,Home,b,^U - page up. <CR>,q - quit";
 constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
@@ -617,7 +618,7 @@ constext txt_opt_art_marked_unread[] = "Character to show unread articles  : ";
 
 #ifdef HAVE_METAMAIL
 	constext txt_opt_ask_for_metamail[] = "Ask before using metamail          : ";
-#endif
+#endif /* HAVE_METAMAIL */
 
 constext txt_opt_auto_bcc[] = "Send you a blind cc automatically  : ";
 constext txt_opt_auto_cc[] = "Send you a cc automatically        : ";
@@ -652,7 +653,7 @@ constext txt_opt_getart_limit[] = "Number of articles to get          : ";
 	constext txt_opt_word_h_display_marks[] = "What to display instead of mark    : ";
 	constext txt_opt_col_markstar[] = "Color of highlighting with *stars* : ";
 	constext txt_opt_col_markdash[] = "Color of highlighting with _dash_  : ";
-#endif
+#endif /* HAVE_COLOR */
 
 constext txt_opt_confirm_action[] = "Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = "Confirm before quitting            : ";
@@ -722,21 +723,21 @@ constext txt_opt_unlink_article[] = "Remove ~/.article after posting    : ";
 
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	constext txt_opt_use_builtin_inews[] = "Use builtin inews                  : ";
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 
 #ifdef HAVE_COLOR
 	constext txt_opt_use_color_tinrc[] = "Use ANSI color                     : ";
-#endif
+#endif /* HAVE_COLOR */
 
 #ifdef HAVE_KEYPAD
 	constext txt_opt_use_keypad[] = "Use scroll keys on keypad          : ";
-#endif
+#endif /* HAVE_KEYPAD */
 
 constext txt_opt_use_mailreader_i[] = "Use interactive mail reader        : ";
 
 #ifdef HAVE_METAMAIL
 	constext txt_opt_use_metamail[] = "Use metamail upon MIME articles    : ";
-#endif
+#endif /* HAVE_METAMAIL */
 
 constext txt_opt_use_mouse[] =	"Use mouse in xterm                 : ";
 constext txt_opt_wildcard[] =	"Wildcard matching                  : ";
@@ -766,7 +767,7 @@ constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s
 		constext txt_piping[] = "";
 #	endif /* VMS */
 	constext txt_piping_not_enabled[] = "Piping not enabled.";
-#endif /* DONT_HAVE_PIPING */
+#endif /* !DONT_HAVE_PIPING */
 
 constext txt_plural[] = "s";
 constext txt_posted_info_file[] = "# Summary of mailed/posted messages viewable by 'W' command from within tin.\n";
@@ -988,7 +989,7 @@ constext txt_tinrc_thread_articles[] = "# Thread articles on 0=(nothing) 1=(Subj
 constext txt_tinrc_unlink_article[] = "# If ON remove ~/.article after posting.\n";
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	constext txt_tinrc_use_builtin_inews[] = "# If ON use the builtin mini inews for posting via NNTP\n# otherwise use an external inews program\n";
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 #ifdef HAVE_COLOR
 	constext txt_tinrc_use_color[] = "# If ON using ANSI-color\n";
 #endif /* HAVE_COLOR */
@@ -1051,7 +1052,7 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 	 * Which mark types can be used.
 	 */
 	constext *txt_marks[] = { "Nothing", "Mark", "Space" };
-#endif
+#endif /* HAVE_COLOR */
 
 /*
  * MIME-Content-Transfer-Encodings.
@@ -1072,7 +1073,7 @@ constext *txt_post_process[] = {
 #else
 		"Uudecode & list zoo archive",
 		"Uudecode & extract zoo archive",
-#endif
+#endif /* M_AMIGA */
 		"Uudecode & list zip archive",
 		"Uudecode & extract zip archive"
 };
@@ -1102,7 +1103,7 @@ constext *txt_strip_bogus[] = {
 	constext txt_post_process_type[] = "Process n)one, s)har, u)ud, q)uit: ";
 #else
 	constext txt_post_process_type[] = "Process n)one, s)har, u)ud, l)ist zoo, e)xt zoo, L)ist zip, E)xt zip, q)uit: ";
-#endif
+#endif /* M_AMIGA */
 
 constext txt_post_a_followup[] = "Post a followup...";
 constext txt_post_an_article[] = "Post an article...";
@@ -1224,7 +1225,7 @@ constext txt_thread_x_of_n[] = "%sThread %4s of %4s" cCRLF;
 constext txt_threading_arts[] = "Threading articles...";
 #ifdef HAVE_COLOR
 	constext txt_toggled_high[] = "Toggled word highlighting %s";
-#endif
+#endif /* HAVE_COLOR */
 constext txt_toggled_rot13[] = "Toggled rot13 encoding";
 constext txt_toggled_tex2iso[] = "Toggled german TeX encoding %s";
 constext txt_type_h_for_help[] = "           h=help\n";

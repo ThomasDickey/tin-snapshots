@@ -54,8 +54,10 @@
 #undef	NO_ETIQUETTE
 #undef	NO_LOCALE
 #undef	OVERVIEW_FILE
+#undef	SOCKS
 #undef	SPOOLDIR
 #undef	USE_INN_NNTPLIB
+#undef	USE_SOCKS4_PREFIX
 #undef	USE_SOCKS5
 
 /*
@@ -173,7 +175,6 @@
 #undef	HAVE_SETREUID
 #undef	HAVE_SETTZ
 #undef	HAVE_SETUID
-#undef	HAVE_SIGACTION
 #undef	HAVE_STRCASECMP
 #undef	HAVE_STRCHR
 #undef	HAVE_STRERROR
@@ -277,6 +278,8 @@
 #undef	DECL_VSPRINTF
 #undef	DECL__FLSBUF
 
+#undef SVR4_ACTION		/* FIXME: do we need this? */
+#undef HAVE_POSIX_JC
 #undef HAVE_SELECT_INTP
 #undef HAVE_TYPE_SIGACTION
 #undef HAVE_TYPE_UNIONWAIT
@@ -329,15 +332,6 @@
  */
 #undef	SUM_TAKES_DASH_R
 #undef	PATH_SUM_R
-
-#if 0 /* FIXME */
-#	if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
-		defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
-#		if !defined(M_OS2)
-#			define	HAVE_POSIX_JC
-#		endif
-#	endif
-#endif /* 0 */
 
 /*
  * Define this if the host system has long (>14 character) filenames
@@ -406,7 +400,7 @@
 #undef	DONT_HAVE_TM_GMTOFF
 
 #if defined(__hpux)
-#	define	HAVE_KEYPAD
+#	define HAVE_KEYPAD
 #endif /* __hpux */
 
 /*
@@ -416,7 +410,7 @@
 
 #if 0 /* FIXME: test-not-impl */
 #	if defined(supermax)
-#		define	HAVE_BROKEN_TGETSTR
+#		define HAVE_BROKEN_TGETSTR
 #	endif /* supermax */
 #endif /* 0 */
 
@@ -444,5 +438,19 @@
 /*
  * libuu - used in save.c
  */
-#undef HAVE_UUDEVIEW_H
-#undef HAVE_LIBUU
+#undef	HAVE_UUDEVIEW_H
+#undef	HAVE_LIBUU
+
+/*
+ * Some older socks libraries, especially AIX need special definitions
+ */
+#if defined(_AIX) && !defined(USE_SOCKS5)
+#	undef	accept
+#	undef	bind
+#	undef	connect
+#	undef	getpeername
+#	undef	getsockname
+#	undef	listen
+#	undef	recvfrom
+#	undef	select
+#endif /* _AIX && !USE_SOCKS5 */

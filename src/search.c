@@ -72,6 +72,7 @@ get_search_pattern(
 	/*
 	 * A gross hack to simulate substrings with wildmat()
 	 */
+/* TODO somehow use REGEX_FMT here ? */
 	sprintf(tmpbuf, "*%s*", def);
 	return(tmpbuf);
 }
@@ -129,7 +130,7 @@ search_active (
 {
 	char *buf;
 	char buf2[LEN];
- 	char *ptr = buf2;
+	char *ptr = buf2;
 	int i;
 
 	if (!group_top) {
@@ -137,7 +138,7 @@ search_active (
 		return -1;
 	}
 
-	if (!(buf = get_search_pattern( forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
+	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
 		return -1;
 
 	i = cur_groupnum;
@@ -182,10 +183,10 @@ search_help (
 	int current,
 	int last)
 {
-	int n;
+	char *buf;
 	int incr = forward ? 1 : -1;
 	int result = current;
-	char *buf;
+	int n;
 
 	if (!(buf = get_search_pattern(
 				forward,
@@ -226,11 +227,11 @@ body_search (
 	int i,
 	char *searchbuf)
 {
-	char group_path[PATH_LEN];
+	FILE *fp;
 	char *line;
+	char group_path[PATH_LEN];
 	int  code;
 	struct t_article *art = &arts[i];
-	FILE *fp;
 
 	if (!read_news_via_nntp || CURR_GROUP.type != GROUP_TYPE_NEWS)
 		make_group_path (CURR_GROUP.name, group_path);
@@ -244,7 +245,7 @@ body_search (
 	if ((fp = open_art_fp (group_path, art->artnum, -art->lines, TRUE)) == (FILE *) 0)
 #else
 	if ((fp = open_art_fp (group_path, art->artnum, art->lines, TRUE)) == (FILE *) 0)
-#endif
+#endif /* 1 */
 		return ((tin_errno != 0) ? -1 : 0);
 
 	/*
@@ -375,7 +376,7 @@ search (
 	int current_art,
 	int forward)
 {
-	char *buf = '\0';
+	char *buf = NULL;
 	int (*search_func) (int i, char *searchbuff) = author_search;
 
 	switch (key) {
@@ -415,17 +416,17 @@ search (
  * page.c (search current article body)
  *	TODO - highlight located text ?
  */
-int
+t_bool
 search_article (
 	int forward)
 {
-	char buf[LEN];
-	char buf2[LEN];
 	char *pattern;
 	char *p, *q;
-	int ctrl_L;
+	char buf[LEN];
+	char buf2[LEN];
 	int i, j;
 	int local_note_page = note_page; /* copy current position in article */
+	t_bool ctrl_L;
 	t_bool local_note_end = note_end;
 
 	if (!(pattern = get_search_pattern(

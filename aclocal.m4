@@ -667,11 +667,10 @@ dnl Check for memmove, or a bcopy that can handle overlapping copy.  If neither
 dnl is found, add our own version of memmove to the list of objects.
 AC_DEFUN([CF_FUNC_MEMMOVE],
 [
-if test ".$ac_cv_func_memmove" != .yes ; then
-	if test ".$ac_cv_func_bcopy" = ".yes" ; then
-		AC_MSG_CHECKING(if bcopy does overlapping moves)
-		AC_CACHE_VAL(cf_cv_good_bcopy,[
-			AC_TRY_RUN([
+AC_CHECK_FUNC(memmove,,[
+AC_CHECK_FUNC(bcopy,[
+	AC_CACHE_CHECK(if bcopy does overlapping moves,cf_cv_good_bcopy,[
+		AC_TRY_RUN([
 int main() {
 	static char data[] = "abcdefghijklmnopqrstuwwxyz";
 	char temp[40];
@@ -685,17 +684,13 @@ int main() {
 		[cf_cv_good_bcopy=no],
 		[cf_cv_good_bcopy=unknown])
 		])
-		AC_MSG_RESULT($cf_cv_good_bcopy)
-	else
-		cf_cv_good_bcopy=no
-	fi
+	],[cf_cv_good_bcopy=no])
 	if test $cf_cv_good_bcopy = yes ; then
 		AC_DEFINE(USE_OK_BCOPY)
 	else
 		AC_DEFINE(USE_MY_MEMMOVE)
 	fi
-fi
-])dnl
+])])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the 'system()' function returns a usable status, or if not, try
 dnl to use the status returned by a SIGCHLD.
@@ -1190,6 +1185,70 @@ fi
 AC_MSG_RESULT($DEFAULT_MAILER)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check the argument to see that it looks like a pathname.  Rewrite it if it
+dnl begins with one of the prefix/exec_prefix variables, and then again if the
+dnl result begins with 'NONE'.  This is necessary to workaround autoconf's
+dnl delayed evaluation of those symbols.
+AC_DEFUN([CF_PATH_SYNTAX],[
+case ".[$]$1" in #(vi
+./*) #(vi
+  ;;
+.\[$]{*prefix}*) #(vi
+  eval $1="[$]$1"
+  case ".[$]$1" in #(vi
+  .NONE/*)
+    $1=`echo [$]$1 | sed -e s@NONE@$ac_default_prefix@`
+    ;;
+  esac
+  ;; #(vi
+.NONE/*)
+  $1=`echo [$]$1 | sed -e s@NONE@$ac_default_prefix@`
+  ;;
+*)
+  AC_ERROR(expected a pathname)
+  ;;
+esac
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check if we have POSIX-style job control (i.e., sigaction), or if we must
+dnl use the signal functions.  Use AC_CHECK_FUNCS(sigaction) first.
+AC_DEFUN([CF_POSIX_JC],[
+
+AC_REQUIRE([AC_TYPE_SIGNAL])
+AC_REQUIRE([CF_SIG_ARGS])
+
+if test "$ac_cv_func_sigaction" = yes; then
+
+AC_CACHE_CHECK(whether sigaction needs _POSIX_SOURCE,cf_cv_sigact_bad,[
+AC_TRY_COMPILE([
+#include <sys/types.h>
+#include <signal.h>],[struct sigaction act],
+  [cf_cv_sigact_bad=no],[cf_cv_sigact_bad=yes AC_DEFINE(SVR4_ACTION)])
+])
+
+test "$cf_cv_sigact_bad" = yes && AC_DEFINE(SVR4_ACTION)
+
+AC_CACHE_CHECK(if we have sigaction/related functions,cf_cv_sigaction_funcs,[
+AC_TRY_LINK([
+#ifdef SVR4_ACTION
+#define _POSIX_SOURCE
+#endif
+#include <sys/types.h>
+#include <signal.h>],[
+    RETSIGTYPE (*func)(SIG_ARGS) = SIG_IGN;
+    struct sigaction sa, osa;
+    sa.sa_handler = func;
+    sa.sa_flags = 0;
+    sigemptyset (&sa.sa_mask);
+    sigaction (SIGBUS,&sa,&osa);],
+    [cf_cv_sigaction_funcs=yes],
+    [cf_cv_sigaction_funcs=no])])
+
+test "$cf_cv_sigaction_funcs" = yes && AC_DEFINE(HAVE_POSIX_JC)
+
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Compute $PROG_EXT, used for non-Unix ports, such as OS/2 EMX.
 AC_DEFUN([CF_PROG_EXT],
 [
@@ -1447,28 +1506,72 @@ AC_MSG_RESULT($cf_cv_sizechange)
 test $cf_cv_sizechange != no && AC_DEFINE(HAVE_SIZECHANGE)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check for socks5 configuration
-AC_DEFUN([CF_SOCKS5],[
-AC_MSG_CHECKING(if we can link against socks5 library)
-AC_CACHE_VAL(cf_cv_lib_socks5,[
-LIBS="$LIBS -lsocks5"
+dnl Check for socks library
+dnl $1 = the [optional] directory in which the library may be found
+dnl $2 = the [optional] name of the library
+AC_DEFUN([CF_SOCKS],[
+case "$1" in #(vi
+no|yes) #(vi
+  ;;
+*)
+  LIBS="$LIBS -L$1"
+  ;;
+esac
+LIBS="$LIBS -lsocks"
+AC_DEFINE(SOCKS)
+AC_DEFINE(accept,Raccept)
+AC_DEFINE(bind,Rbind)
+AC_DEFINE(connect,Rconnect)
+AC_DEFINE(getpeername,Rgetpeername)
+AC_DEFINE(getsockname,Rgetsockname)
+AC_DEFINE(listen,Rlisten)
+AC_DEFINE(recvfrom,Rrecvfrom)
+AC_DEFINE(select,Rselect)
 AC_TRY_LINK([
-#define SOCKS
+#include <stdio.h>],[
+	accept((char *)0)],,
+	[AC_ERROR(Cannot link with socks library)])
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check for socks5 configuration
+dnl $1 = the [optional] directory in which the library may be found
+AC_DEFUN([CF_SOCKS5],[
+case "$1" in #(vi
+no|yes) #(vi
+  ;;
+*)
+  LIBS="$LIBS -L$1"
+  CFLAGS="$CFLAGS -I$1/../include"
+  ;;
+esac
+LIBS="$LIBS -lsocks5"
+AC_DEFINE(USE_SOCKS5)
+AC_DEFINE(SOCKS)
+AC_MSG_CHECKING(if the socks library uses socks4 prefix)
+AC_TRY_LINK([
 #include <socks.h>],[
-#ifdef USE_SOCKS4_PREFIX
-	Rinit((char *)0);
-#else
-	SOCKSinit((char *)0);
-#endif
-	getpeername(0, (struct sockaddr *)0, (int *)0);],
-	[cf_cv_lib_socks5=yes],
-	[cf_cv_lib_socks5=no])
-])
-AC_MSG_RESULT($cf_cv_lib_socks5)
-if test $cf_cv_lib_socks5 = yes ; then
-	AC_DEFINE(USE_SOCKS5)
+	Rinit((char *)0)],
+	[AC_DEFINE(USE_SOCKS4_PREFIX)
+	 cf_use_socks4=yes],
+	[AC_TRY_LINK([#include <socks.h>],
+		[SOCKSinit((char *)0)],
+		[cf_use_socks4=no],
+		[AC_ERROR(Cannot link with socks5 library)])])
+AC_MSG_RESULT($cf_use_socks4)
+if test "$cf_use_socks4" = "yes" ; then
+	AC_DEFINE(accept,Raccept)
+	AC_DEFINE(bind,Rbind)
+	AC_DEFINE(connect,Rconnect)
+	AC_DEFINE(getpeername,Rgetpeername)
+	AC_DEFINE(getsockname,Rgetsockname)
+	AC_DEFINE(listen,Rlisten)
+	AC_DEFINE(recvfrom,Rrecvfrom)
+	AC_DEFINE(select,Rselect)
 else
-	AC_ERROR(Sorry.  Cannot link against socks5 library)
+	AC_DEFINE(accept,SOCKSaccept)
+	AC_DEFINE(getpeername,SOCKSgetpeername)
+	AC_DEFINE(getsockname,SOCKSgetsockname)
+	AC_DEFINE(recvfrom,SOCKSrecvfrom)
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
@@ -1818,24 +1921,7 @@ dnl
 AC_DEFUN([CF_WITH_PATH],
 [AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
 ifelse($4,,[withval="${$3}"],[withval="${$3-ifelse($5,,$4,$5)}"]))dnl
-case ".$withval" in #(vi
-./*) #(vi
-  ;;
-.\[$]{*prefix}*) #(vi
-  eval withval="$withval"
-  case ".$withval" in #(vi
-  .NONE/*)
-    withval=`echo $withval | sed -e s@NONE@$ac_default_prefix@`
-    ;;
-  esac
-  ;; #(vi
-.NONE/*)
-  withval=`echo $withval | sed -e s@NONE@$ac_default_prefix@`
-  ;;
-*)
-  AC_ERROR(expected a pathname for $1)
-  ;;
-esac
+CF_PATH_SYNTAX(withval)
 eval $3="$withval"
 AC_SUBST($3)dnl
 ])dnl

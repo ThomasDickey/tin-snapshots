@@ -108,7 +108,7 @@ rfc1521_decode(
 	while ((line = tin_fgets (file, TRUE)) != (char *) 0) {
 #ifdef LOCAL_CHARSET
 		buffer_to_local(line);
-#endif
+#endif /* LOCAL_CHARSET */
 		fputs(line, f);
 		fputs("\n", f);
 
@@ -217,7 +217,7 @@ rfc1521_decode(
 		rewind(file);
 		return file;
 	}
-#endif
+#endif /* !LOCAL_CHARSET */
 
 	/*
 	 * see if charset matches (we do not attempt to convert charsets at
@@ -255,7 +255,7 @@ rfc1521_decode(
 				strcpy(buf2, buf);
 #ifdef LOCAL_CHARSET
 			buffer_to_local(buf2);
-#endif
+#endif /* LOCAL_CHARSET */
 			fputs(buf2, f);
 		}
 		fclose(file);
@@ -280,7 +280,7 @@ rfc1521_decode(
 	fclose(f);
 	rewind(file);
 	return file;
-#endif
+#endif /* LOCAL_CHARSET */
 }
 
 #define HI4BITS(c) (unsigned char)(*EIGHT_BIT(c) >> 4)

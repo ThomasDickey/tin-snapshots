@@ -27,7 +27,7 @@
 FILE *dbgfd;
 #else
 #	define DEBUG_PRINT(x)
-#endif
+#endif /* DEBUG_REFS */
 
 /*
  * local prototypes
@@ -369,7 +369,7 @@ _get_references(
 #ifdef DEBUG_REFS
 		if (depth > MAX_REFS)
 			error_message("Warning: Too many refs near to %s. Truncated\n", refptr->txt);
-#endif
+#endif /* DEBUG_REFS */
 		refs = (char *) my_malloc(HEADER_LEN);
 		len = 0;
 	} else
@@ -460,7 +460,7 @@ dump_msgids(void)
 		}
 	}
 }
-#endif
+#endif /* 0 */
 
 /*
  * The rest of this code deals with reference threading
@@ -724,7 +724,7 @@ thread_by_reference(void)
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.info", "w");
 	dump_msgid_threads();
-#endif
+#endif /* DEBUG_REFS */
 
 	/*
 	 * Build threads starting from root msgids (ie without parent)
@@ -751,7 +751,7 @@ thread_by_reference(void)
 	}
 
 	fclose(dbgfd);
-#endif
+#endif /* DEBUG_REFS */
 
 	return;
 
@@ -862,7 +862,7 @@ build_references(
 	dbgfd = fopen("Refs.dump", "w");
 	setvbuf (dbgfd, NULL, 0, _IONBF);
 	fprintf (dbgfd, "MSGID phase\n");
-#endif
+#endif /* DEBUG_REFS */
 
 	/*
 	 * Add the Message-ID headers to the cache, using the last Reference
@@ -929,7 +929,7 @@ build_references(
 
 #ifdef DEBUG_REFS
 	fclose(dbgfd);
-#endif
+#endif /* DEBUG_REFS */
 
 }
 

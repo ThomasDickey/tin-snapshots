@@ -46,7 +46,7 @@
 #endif
 
 #if !defined(M_AMIGA) && !defined(M_OS2) && !defined(M_UNIX) && !defined(WIN32) && !defined(VMS)
-#	define	M_UNIX
+#	define M_UNIX
 #endif
 
 #ifndef VMS
@@ -58,67 +58,67 @@
 #endif
 
 #if defined(M_XENIX)
-#	define	HAVE_PROTOTYPES_H
+#	define HAVE_PROTOTYPES_H
 #endif
 
 #if defined(AUX) || defined(EPIX) || defined (__hpux) || defined(PTX)
-#	define	HAVE_TERMIO_H
+#	define HAVE_TERMIO_H
 #endif
 
 #if defined(QNX42) || defined(UMAXV)
-#	define	HAVE_TERMIOS_H
+#	define HAVE_TERMIOS_H
 #endif
 
 #if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
     defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
 #	if !defined(M_OS2)
-#		define	HAVE_POSIX_JC
+#		define HAVE_POSIX_JC
 #	endif
 #endif
 
 #if defined(M_OS2) || defined(SVR4) || defined(M_AMIGA)
-#	define	HAVE_LOCALE_H
+#	define HAVE_LOCALE_H
 #endif
 
 #if defined(SVR4) || defined(M_AMIGA)
-#	define	HAVE_SETLOCALE
+#	define HAVE_SETLOCALE
 #	undef	sinix		/* SNI Sinix (nsc32000) */
 #endif
 
 #if defined(SIGCHLD) || defined(__hpux)
-#	define	HAVE_SYS_WAIT_H
+#	define HAVE_SYS_WAIT_H
 #endif
 
 #if !defined(M_OS2) && !defined(WIN32)
-#	define	HAVE_PWD_H
+#	define HAVE_PWD_H
 #endif
 
 #if !defined(M_OS2) && !defined(WIN32) && !defined(VMS)
-#	define	HAVE_SYS_PARAM_H
+#	define HAVE_SYS_PARAM_H
 #endif
 
 #if !defined(gould) && !defined(MACH) && \
 	!defined(mips) && !defined(__NeXT__) && !defined(M_OS2) && \
 	!defined(WIN32) && !defined(M_AMIGA)
-#	define	HAVE_UNISTD_H
+#	define HAVE_UNISTD_H
 #endif
 
 #if !defined(COHERENT) && !defined(MINIX) && \
     !defined(M_OS2) && !defined(WIN32) && !defined(VMS)
-#	define	HAVE_SYS_IOCTL_H
+#	define HAVE_SYS_IOCTL_H
 #endif
 
 #if !defined(BSD) && \
 	!defined(M_OS2) && !defined(sinix) && \
 	!defined(WIN32) && !defined(VMS) && \
 	!defined(M_AMIGA)
-#	define	HAVE_SYS_UTSNAME_H
+#	define HAVE_SYS_UTSNAME_H
 #endif
 
 #if !defined(EPIX) && !defined(pyr) && \
     !defined(sequent) && !defined(UTS) && \
     !defined(u3b2)
-#	define	HAVE_STDLIB_H
+#	define HAVE_STDLIB_H
 #endif
 
 /*
@@ -126,66 +126,66 @@
  */
 #if defined(BSD) && !defined(__STDC__)
 #	undef	HAVE_STRCHR
-#	define	HAVE_STRINGS_H
+#	define HAVE_STRINGS_H
 #else
-#	define	HAVE_STRING_H
+#	define HAVE_STRING_H
 #endif
 
 #if defined(BSD) || defined(EPIX) || \
     defined(M_OS2) || defined(__osf__) || defined(UMAXV) || defined(WIN32)
-#	define	HAVE_FCNTL_H
+#	define HAVE_FCNTL_H
 #endif
 
 #if !defined(__hpux)
-#	define	HAVE_SYS_STREAM_H
+#	define HAVE_SYS_STREAM_H
 #endif
 
 #if !defined(COHERENT) && !defined(__hpux) && \
     !defined(M_OS2) && !defined(QNX42) && !defined(sinix) && \
     !defined(UMAXV) && !defined(WIN32)
-#	define	HAVE_SYS_PTEM_H
+#	define HAVE_SYS_PTEM_H
 #endif
 
 #if !defined(COHERENT) && !defined(M_OS2) && \
     !defined(QNX42) && !defined(SCO_UNIX) && !defined(sinix) && \
     !defined(SVR4) && !defined(WIN32)
-#	define	HAVE_SYS_PTY_H
-#	define	XWIN	/* stops ISC bitching */
+#	define HAVE_SYS_PTY_H
+#	define XWIN	/* stops ISC bitching */
 #endif
 
 #if defined(__386BSD__) || defined(BSD) || \
     defined(__hpux) || defined(M_OS2) || \
     defined(__osf__) || defined(sinix) || \
     defined(UMAXV) || defined(M_AMIGA)
-#	define	HAVE_NETDB_H
+#	define HAVE_NETDB_H
 #endif
 
 #if defined(M_OS2) || defined(WIN32)
-#	define	HAVE_NETLIB_H
+#	define HAVE_NETLIB_H
 #endif
 
 #if !defined(pyr)
-#	define	HAVE_TIME_H
+#	define HAVE_TIME_H
 #endif
 
 #if !defined(M_OS2) && !defined(SCO_UNIX) && !defined(u3b2) && \
     !defined(WIN32) && !defined(VMS)
-#	define	HAVE_SYS_TIME_H
+#	define HAVE_SYS_TIME_H
 #endif
 
 #if defined(SCO_UNIX) || defined(u3b2)
-#	define	HAVE_SYS_TIMES_H
+#	define HAVE_SYS_TIMES_H
 #endif
 
 #define TIME_WITH_SYS_TIME
 
 #if defined(PTX) || defined(QNX42) || defined(SCO_UNIX)
-#	define	HAVE_SYS_SELECT_H
+#	define HAVE_SYS_SELECT_H
 #endif
 
 #if defined(COHERENT) || defined(M_OS2) || \
 	defined(QNX42) || defined(WIN32) || defined(VMS)
-#	define	HAVE_ERRNO_H
+#	define HAVE_ERRNO_H
 #endif
 
 #ifdef WIN32
@@ -197,19 +197,19 @@
 #endif
 
 #if defined(__GNUC__) || defined(HAVE_POSIX_JC)
-#	define	RETSIGTYPE void
+#	define RETSIGTYPE void
 #else
 #	if defined(sony)
-#		define	RETSIGTYPE int
+#		define RETSIGTYPE int
 #	else
 #		if __STDC__ || defined(atthcx) || defined(__hpux) || \
 		   defined(__osf__) || defined(M_OS2) || defined(PTX) || \
 		   defined(sinix) || \
 		   defined(SVR4) || \
 		   defined(u3b2) || defined(ultrix)	|| defined(WIN32)
-#			define	RETSIGTYPE void
+#			define RETSIGTYPE void
 #		else
-#			define	RETSIGTYPE int
+#			define RETSIGTYPE int
 #		endif
 #	endif
 #endif
@@ -217,11 +217,11 @@
 #if defined(M_OS2) || defined(SVR4) || \
 	defined(WIN32)
 #	if !defined(HAVE_COMPTYPE_CHAR)
-#		define	HAVE_COMPTYPE_VOID
+#		define HAVE_COMPTYPE_VOID
 #	endif
 #else
 #	if !defined(HAVE_COMPTYPE_VOID)
-#		define	HAVE_COMPTYPE_CHAR
+#		define HAVE_COMPTYPE_CHAR
 #	endif
 #endif
 
@@ -235,12 +235,12 @@
     defined(PTX) || defined(QNX42) || \
     defined(sinix) || defined(UMAXV) || \
     defined(WIN32)
-#	define	HAVE_LONG_FILE_NAMES
+#	define HAVE_LONG_FILE_NAMES
 #endif
 
 #if defined(M_OS2) || defined(sinix) || \
     defined(UMAXV) || defined(VMS)
-#	define	HAVE_GETHOSTBYNAME
+#	define HAVE_GETHOSTBYNAME
 #endif
 
 /*
@@ -248,20 +248,20 @@
  */
 
 #if defined(M_UNIX)
-#	define	HAVE_COREFILE
+#	define HAVE_COREFILE
 #endif
 
 #if defined(M_UNIX)
-#	define	HAVE_SET_GID_UID
+#	define HAVE_SET_GID_UID
 #endif
 
 #if defined(M_UNIX) && !defined(__386BSD__) && !defined(__NeXT__)
-#	define	HAVE_UNAME
+#	define HAVE_UNAME
 #endif
 
 #if defined(MACH) || defined(__NeXT__) || \
 	defined(M_OS2) || defined(M_AMIGA)
-#	define	DONT_HAVE_SIGWINCH
+#	define DONT_HAVE_SIGWINCH
 #endif
 
 #if defined(BSD) || defined(EPIX) && !defined(__386BSD__) && \
@@ -295,7 +295,7 @@
 
 #if defined(__arm) || defined(__convex__) || \
     defined(DGUX) || defined(pyr) || defined(sequent) || !defined(BSD)
-#	define	DONT_HAVE_TM_GMTOFF
+#	define DONT_HAVE_TM_GMTOFF
 #endif
 
 /*
@@ -305,38 +305,38 @@
 #if defined(SVR4) || defined(__hp9000s700) || defined(__hp9000s900) || \
 	defined(HAVE_POLL)
 #	if !defined(__hpux)
-#		define	HAVE_STROPTS_H
+#		define HAVE_STROPTS_H
 #	endif
-#	define	HAVE_POLL_H
+#	define HAVE_POLL_H
 #	if !defined(HAVE_POLL)
-#		define	HAVE_POLL
+#		define HAVE_POLL
 #	endif
 #	undef HAVE_SELECT
 #endif
 
 #if !defined(COHERENT) && !defined(M_OS2) && !defined(supermax) && !defined(u3b2) && \
     !defined(HAVE_POLL) && !defined(WIN32) && !defined(M_AMIGA)
-#	define	HAVE_SELECT
+#	define HAVE_SELECT
 #endif
 
 #if defined(COHERENT)
-#	define	HAVE_SETTZ
+#	define HAVE_SETTZ
 #endif
 
 #if defined(M_UNIX)
-#	define	HAVE_FORK
+#	define HAVE_FORK
 #endif
 
 #if defined(M_OS2) || defined(SVR4)
-#	define	HAVE_STRFTIME
+#	define HAVE_STRFTIME
 #endif
 
 #if !defined(M_OS2) && !defined(VMS)
-#	define	HAVE_SYS_ERRLIST
+#	define HAVE_SYS_ERRLIST
 #endif
 
 #if defined(__hpux)
-#	define	HAVE_KEYPAD
+#	define HAVE_KEYPAD
 #endif
 
 #if defined(sinix)
@@ -345,12 +345,12 @@
 #endif
 
 #if defined(supermax)
-#	define	HAVE_BROKEN_TGETSTR
+#	define HAVE_BROKEN_TGETSTR
 #endif
 
 #if defined(QNX42)
-#	define	HAVE_TCGETATTR
-#	define	HAVE_TCSETATTR
+#	define HAVE_TCGETATTR
+#	define HAVE_TCSETATTR
 #endif
 
 #if defined(QNX42) || defined(VMS) || defined(M_AMIGA)
@@ -362,7 +362,7 @@
 #endif
 
 #if defined(BSD) || defined(__osf__) || defined(_POSIX_SOURCE)
-#	define	HAVE_REWINDDIR
+#	define HAVE_REWINDDIR
 #endif
 
 /*
@@ -370,7 +370,7 @@
  */
 
 #if defined(u3b2)
-#	define	size_t	unsigned long int
+#	define size_t	unsigned long int
 #endif
 
 /*
@@ -380,7 +380,7 @@
 
 #if defined(BSD)
 #	if !defined(NNTP_ABLE)
-#		define	NNTP_ABLE
+#		define NNTP_ABLE
 #	endif
 #endif
 

@@ -299,13 +299,12 @@ int
 thread_page (
 	struct t_group *group,
 	int respnum,				/* base[] article of thread to view */
-	int thread_depth)			/* initial depth in thread */
+	int the_thread_depth)			/* initial depth in thread */
 {
 	char buf[LEN];
 	int ret_code = 0;
 	int ch;
 	int i, n;
-	int flag;
 	t_bool ignore_unavail = FALSE;	/* Set if we keep going after an 'article unavailable' */
 
 	thread_respnum = respnum;		/* Bodge to make this variable global */
@@ -324,12 +323,12 @@ thread_page (
 
 	/*
 	 * Set the cursor to the last response unless space_mode is active
-	 * or an explicit thread_depth has been specified
+	 * or an explicit the_thread_depth has been specified
 	 */
 	thread_index_point = top_thread;
 
-	if (thread_depth)
-		thread_index_point = thread_depth;
+	if (the_thread_depth)
+		thread_index_point = the_thread_depth;
 	else {
 		if (space_mode) {
 			if ((i = new_responses (thread_basenote))) {
@@ -586,11 +585,8 @@ thread_page_up:
 thread_catchup:										/* come here when exiting thread via <- */
 				sprintf(buf, txt_mark_thread_read, (ch == iKeyThreadCatchupNextUnread) ? txt_enter_next_thread : "");
 
-				if (confirm_action && prompt_yn (cLINES, buf, TRUE) != 1)
-					break;
-
-				thd_mark_read (group, base[thread_basenote]);
-
+				if (confirm_action && prompt_yn (cLINES, buf, TRUE) == 1)
+					thd_mark_read (group, base[thread_basenote]);
 				ret_code = (ch == iKeyThreadCatchupNextUnread ? GRP_NEXTUNREAD : GRP_NEXT);
 				goto thread_done;
 
@@ -615,6 +611,14 @@ thread_catchup:										/* come here when exiting thread via <- */
 			case iKeyThreadHelp:			/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();
+				break;
+
+			case iKeySearchBody:			/* search article body */
+				if ((n = search_body (find_response (thread_basenote, thread_index_point))) != -1) {
+					fixup_thread (which_thread (n), n);
+					move_to_response (thread_index_point);
+/*					goto enter_pager;*/
+				}
 				break;
 
 			case iKeySearchSubjF:			/* subject search */
@@ -719,8 +723,7 @@ thread_catchup:										/* come here when exiting thread via <- */
 				n = find_response (thread_basenote, thread_index_point);
 				if (n < 0)
 					break;
-				flag = (!(ch == iKeyThreadToggleArtSel && arts[n].selected == 1));
-				arts[n].selected = flag;
+				arts[n].selected = (!(ch == iKeyThreadToggleArtSel && arts[n].selected == 1));
 /*				update_thread_page (); */
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
@@ -883,7 +886,7 @@ erase_thread_arrow (void)
  * Fix all the internal pointers if the current thread/response has
  * changed.
  */
-void
+static void
 fixup_thread (
 	int basenote,
 	int respnum)
@@ -979,7 +982,7 @@ which_thread (
 			}
 #else
 				return i;
-#endif
+#endif /* JUST_TESTING */
 		}
 	}
 

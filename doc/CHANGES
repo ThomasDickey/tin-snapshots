@@ -1,3 +1,42 @@
+-- pre-1.4 release 981225 "Volcane" --
+
+626) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     BUG. FromSameUser() was case sensitive
+     BUG. thread_catchup_on_exit && confirm_action && 'n' did not leave
+          the thread
+     FIX. Makefile, metamutt, active.c, art.c, post.c, select.c, thread.c
+
+625) Thomas E. Dickey <dickey@clark.net>
+     BUG. group_num could get negative
+     ADD. configure test to set HAVE_POSIX_JC
+     ADD. j/k to up/down arrows in help.c
+     ADD. new option --with-socks, --with-socks5 now can take a pathname
+     ADD. minor fixes/updates to some of the configure macros
+     FIX. aclocal.m4, config.guess, config.sub, configure[.in],
+          autoconf.h[in], tin.h, tnntp.h, help.c, select.c, signal.c
+
+624) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. '-' at group level dumped core if previous article no longer
+          threaded
+     BUG. various selection menu options would coredump with no active
+          group set
+     BUG. 'S''*' on select menu coredumped when no ~/.tin and ~/.newsrc
+     ADD. 'B' search all articles to thread menu
+     ADD. saved filenames have trailing whitespace removed
+     ADD. minor code cleanup
+     FIX. menukeys.h, proto.h, feed.c, group.c, open.c, page.c, post.c
+          save.c, search.c, select.c, thread.c
+
+623) Jeremy Buhler <jbuhler@cs.washington.edu>
+     BUG. will not build if the 'configure' command is issued in a
+          directory other than the source
+     FIX. pcre/Makefile[.in]
+
+622) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. cur_groupnum could get negative
+     FIX. newsrc.c, select.c
+
 -- pre-1.4 release 981114 "The Watchman" --
 
 621) Michael Stenns <stenns@hal.tci.uni-hannover.de>

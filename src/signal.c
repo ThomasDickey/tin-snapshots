@@ -133,16 +133,15 @@ static const struct {
 #endif /* SIGWINCH */
 };
 
-#ifdef HAVE_POSIX_JC
-
-/*
- * for POSIX systems we know RETSIGTYPE is void
- */
-
-RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
-	int sig,
-	RETSIGTYPE (*func)(SIG_ARGS))
+#	ifdef HAVE_NESTED_PARAMS
+RETSIGTYPE (*sigdisp(int signum, RETSIGTYPE (_CDECL *func)(SIG_ARGS)))(SIG_ARGS)
+#	else
+RETSIGTYPE (*sigdisp(signum, func))(SIG_ARGS)
+	int signum;
+	RETSIGTYPE (_CDECL *func)(SIG_ARGS);
+#	endif /* HAVE_NESTED_PARAMS */
 {
+#ifdef HAVE_POSIX_JC
 	struct sigaction sa, osa;
 
 	sa.sa_handler = func;
@@ -151,26 +150,14 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 #	ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #	endif /* SA_RESTART */
-	if (sigaction (sig, &sa, &osa) < 0)
+	if (sigaction (signum, &sa, &osa) < 0)
 		return SIG_ERR;
 
 	return (osa.sa_handler);
-}
-
 #else
-#	ifdef HAVE_NESTED_PARAMS
-RETSIGTYPE (*sigdisp(int sig, RETSIGTYPE (_CDECL *func)(SIG_ARGS)))(SIG_ARGS)
-#	else
-RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
-	int sig;
-	RETSIGTYPE (_CDECL *func)(SIG_ARGS);
-#	endif /* HAVE_NESTED_PARAMS */
-{
-	return (signal (sig, func));
-}
-
+	return (signal (signum, func));
 #endif /* HAVE_POSIX_JC */
-
+}
 
 static const char *
 signal_name(
@@ -400,7 +387,9 @@ void set_signal_handlers (void)
 {
 	size_t n;
 	int code;
+#ifdef SIGTSTP
 	RETSIGTYPE (*ptr)(SIG_ARGS);
+#endif /* SIGTSTP */
 
 	for (n = 0; n < SIZEOF(signal_list); n++) {
 		switch ((code = signal_list[n].code)) {

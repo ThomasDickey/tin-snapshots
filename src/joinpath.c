@@ -25,26 +25,26 @@ joinpath(
 	const char *dir,
 	const char *file)
 {
-#ifdef __amigaos
+#	ifdef __amigaos
 	int i=0, tmp=0, tmp2=1;
-#endif /* __amigaos */
-#ifdef M_UNIX
+#	endif /* __amigaos */
+#	ifdef M_UNIX
 	(void) strcpy(result, dir);
 	if (result[0] == '\0' || result[strlen(result)-1] != '/')
 		(void) strcat(result, "/");
 	(void) strcat(result, file != 0 ? file : "");
-#endif  /* M_UNIX */
+#	endif  /* M_UNIX */
 /*
  * JK - horrible hack to convert "/foo/baz/bar" to "foo:baz/bar" (editors bug with *NIX-paths)
  * "foo:baz/bar" -styled paths should always work on Amiga
  */
-#ifdef __amigaos
+#	ifdef __amigaos
 	if (result[0] == '/')
 		while (result[tmp++] = result[tmp2++])
 			;
 	while (result[i] != '/' && result[i] != ':')
 		i++;
 	result[i]=':';
-#endif /* __amigaos */
+#	endif /* __amigaos */
 }
-#endif
+#endif /* !M_AMIGA */

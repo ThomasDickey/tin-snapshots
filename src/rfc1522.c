@@ -32,7 +32,7 @@
  */
 #ifndef MM_CHARSET
 #	define MM_CHARSET "US-ASCII"
-#endif
+#endif /* !MM_CHARSET */
 
 #define NOT_RANKED 255
 
@@ -108,7 +108,7 @@ mmdecode(
 
 #ifdef MIME_STRICT_CHARSET
 	if (charset && !strcasecmp(charset, mm_charset))
-#endif
+#endif /* MIME_STRICT_CHARSET */
 		decode_gt128 = TRUE;
 	t = where;
 	encoding = tolower((unsigned char)encoding);
@@ -264,7 +264,7 @@ rfc1522_decode(
 
 #ifdef LOCAL_CHARSET
 	buffer_to_local(buffer);
-#endif
+#endif /* LOCAL_CHARSET */
 
 	return buffer;
 }
@@ -362,7 +362,7 @@ which_encoding(
 		if (is_EIGHT_BIT(w))
 			nonprint++;
 		if (!nonprint && *w == '=' && *(w + 1) == '?')
-			nonprint = TRUE;
+			nonprint = 1;
 		if (*w == '=' || *w == '?' || *w == '_')
 			schars++;
 		chars++;
@@ -458,11 +458,11 @@ rfc1522_do_encode(
 	 * words by '_', break long lines, etc.
 	 */
 
-	t_bool quoting = FALSE;		  /* currently inside quote block? */
-	t_bool rightafter_ew = FALSE;
-	t_bool isbroken_within = FALSE;	/* is word broken due to length restriction on encoded of word? */
 	int encoding;					  /* which encoding to use ('B' or 'Q') */
-	int any_quoting_done = 0;
+	t_bool quoting = FALSE;		  /* currently inside quote block? */
+	t_bool any_quoting_done = FALSE;
+	t_bool isbroken_within = FALSE;	/* is word broken due to length restriction on encoded of word? */
+	t_bool rightafter_ew = FALSE;
 
 /*
  * Uncommented this and other conditional compilation statement
@@ -709,11 +709,9 @@ rfc1522_encode(
  */
 #ifdef MIME_BREAK_LONG_LINES
 	t_bool break_long_line = TRUE;
-
 #else
 	t_bool break_long_line = FALSE;
-
-#endif
+#endif /* MIME_BREAK_LONG_LINES */
 
 /*
  * Even if MIME_BREAK_LONG_LINES is NOT defined,
@@ -723,7 +721,7 @@ rfc1522_encode(
 #ifndef MIME_BREAK_LONG_LINES
 	if (ismail)
 		break_long_line = TRUE;
-#endif
+#endif /* !MIME_BREAK_LONG_LINES */
 
 	get_mm_charset();
 	b = buf;
@@ -742,12 +740,12 @@ rfc15211522_encode(
 {
 	FILE *f;
 	FILE *g;
-	char header[4096];
-	char buffer[2048];
 	char *c, *d;
-	int umlauts = 0;
-	int body_encoding_needed = 0;
 	char encoding;
+	char buffer[2048];
+	char header[4096];
+	t_bool body_encoding_needed = FALSE;
+	t_bool umlauts = FALSE;
 	BodyPtr body_encode;
 
 	g = tmpfile();
@@ -764,7 +762,7 @@ rfc15211522_encode(
 	while (fgets(buffer, 2048, f)) {
 #ifdef LOCAL_CHARSET
 		buffer_to_network(buffer);
-#endif
+#endif /* LOCAL_CHARSET */
 		if (header[0]
 			 && (!isspace((unsigned char) buffer[0]) || isreturn(buffer[0]))) {
 			if (allow_8bit_header)
@@ -786,7 +784,7 @@ rfc15211522_encode(
 	while (fgets(buffer, 2048, f)) {
 #ifdef LOCAL_CHARSET
 		buffer_to_network(buffer);
-#endif
+#endif /* LOCAL_CHARSET */
 		fputs(buffer, g);
 		/* see if there are any umlauts in the body... */
 		for (c = buffer; *c && !isreturn(*c); c++)

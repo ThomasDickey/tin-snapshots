@@ -161,7 +161,7 @@ restart:
 			case ESC:
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#endif
+#endif /* HAVE_KEY_PREFIX */
 				switch (get_arrow_key (ch)) {
 					case KEYMAP_LEFT:
 						goto return_to_index;
@@ -217,7 +217,7 @@ restart:
 				shell_escape ();
 				redraw_page (group->name, respnum);
 				break;
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 
 			case iKeyLastPage:	/* goto end of article */
 			case iKeyPageLastPage2:
@@ -315,9 +315,8 @@ end_of_article:
 					show_note_page (group->name, respnum);
 				break;
 
-			case iKeyPageBSearchBody:	/* article body search */
-				n = search_body (respnum);
-				if (n != -1) {
+			case iKeySearchBody:	/* article body search */
+				if ((n = search_body (respnum)) != -1) {
 					respnum = n;
 					art_close ();
 					goto restart;
@@ -409,7 +408,7 @@ page_goto_next_unread:
 				if (pgp_check_article())
 					redraw_page(group->name, respnum);
 				break;
-#endif
+#endif /* HAVE_PGP */
 
 			case iKeyPageToggleHeaders:	/* toggle display of article headers */
 				if (note_page == ART_UNAVAILABLE) {
@@ -603,7 +602,7 @@ return_to_index:
 					show_color_status ();
 				}
 				break;
-#endif
+#endif /* HAVE_COLOR */
 
 			/* TODO: consider combine this with iKeyPageNextUnreadArt */
 			case iKeyPageKillArt:
@@ -773,7 +772,7 @@ return_to_index:
 					info_message(txt_toggled_high, (word_highlight) ? "on" : "off");
 				}
 				break;
-#endif
+#endif /* HAVE_COLOR */
 
 			default:
 				info_message(txt_bad_command);
@@ -872,7 +871,7 @@ show_note_page (
 	} else
 		show_cont_header (respnum);
 
-#ifdef HAVE_METAMAIL
+#	ifdef HAVE_METAMAIL
 	if (!note_page && *note_h.mimeversion && *note_h.contenttype
 		 && (!STRNCMPEQ("text/plain", note_h.contenttype, 10))
 		 && use_metamail) {
@@ -882,7 +881,7 @@ show_note_page (
 		}
 		show_first_header (respnum, group);
 	}
-#endif
+#	endif /* HAVE_METAMAIL */
 
 	if (skip_include)
 		note_page--;
@@ -1008,20 +1007,20 @@ print_a_line:
 			if (skip_include) {
 				if (first_char != skip_include) {
 					skip_include = '\0';
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 					print_color (buf2, below_sig);
-#else
+#	else
 					my_printf ("%s" cCRLF, buf2);
-#endif
+#	endif /* HAVE_COLOR */
 					note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 					note_page++;
 				}
 			} else {
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 				print_color (buf2, below_sig);
-#else
+#	else
 				my_printf ("%s" cCRLF, buf2);
-#endif
+#	endif /* HAVE_COLOR */
 				note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 			}
 		}
@@ -1045,9 +1044,9 @@ print_a_line:
 	if (ftell (note_fp) == note_size)
 		note_end = TRUE;
 
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 	fcol(col_text);
-#endif
+#	endif /* HAVE_COLOR */
 	if (note_end) {
 		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 		StartInverse ();

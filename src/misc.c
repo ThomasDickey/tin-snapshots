@@ -73,7 +73,7 @@ asfail (
 	int line,
 	const char *cond)
 {
-	my_fprintf (stderr, "%s: assertion failure: %s (%d): %s\n", progname, file, line, cond);
+	my_fprintf (stderr, txt_error_asfail, progname, file, line, cond);
 	my_fflush (stderr);
 
 /*
@@ -112,7 +112,7 @@ copy_fp (
 	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
 		if (n != fwrite (buf, 1, n, fp_op)) {
 			if (!got_sig_pipe)
-				perror_message ("copy_fp() failed");
+				perror_message ("copy_fp() failed"); /* FIXME: -> lang.c */
 
 			return;
 		}
@@ -149,18 +149,19 @@ copy_body (
 		return;
 	}
 
+	if (strlen(prefix) > 240) /* truncate and terminate */
+		prefix[240] = '\0';
+
 	/* convert %S to %s, for compability reasons only */
 	if (strstr(prefix, "%S")) {
 		status_char = FALSE;
-		for (i=0; prefix[i]; i++) {
+		for (i = 0; prefix[i]; i++) {
 			if ((status_char) && (prefix[i] == 'S'))
 				prefix[i] = 's';
 			status_char = (prefix[i] == '%');
 		}
 	}
 
-	if (strlen(prefix) > 240) /* truncate and terminate */
-		prefix[240] = '\0';
 	if (strstr(prefix, "%s"))
 		sprintf(prefixbuf, prefix, initl);
 	else {
@@ -255,7 +256,7 @@ invoke_editor (
 	strcpy (fnameb, filename);
 	strcat (fnameb, BACKUP_FILE_EXT);
 	unlink (fnameb);
-#endif
+#endif /* BACKUP_FILE_EXT */
 	return retcode;
 }
 
@@ -272,13 +273,13 @@ invoke_ispell (
 	static t_bool first = TRUE;
 
 	if (first) {
-#ifdef VMS
+#	ifdef VMS
 		*my_ispell = '\0';
 		strcpy (ispell, "ispell");
-#else
+#	else
 		my_ispell = getenv ("ISPELL");
 		strcpy (ispell, my_ispell != NULL ? my_ispell : PATH_ISPELL);
-#endif
+#	endif /* VMS */
 		first = FALSE;
 	}
 
@@ -335,7 +336,7 @@ invoke_ispell (
 
 	return retcode;
 }
-#endif
+#endif /* HAVE_ISPELL */
 
 
 #ifndef NO_SHELL_ESCAPE
@@ -361,7 +362,7 @@ shell_escape (void)
 	}
 
 	ClearScreen ();
-	sprintf (mesg, "Shell Command (%s)", p);
+	sprintf (mesg, "Shell Command (%s)", p); /* FIXME: -> lang.c */
 	center_line (0, TRUE, mesg);
 	MoveCursor (INDEX_TOP, 0);
 
@@ -730,7 +731,7 @@ draw_percent_mark (
 	long cur_num,
 	long max_num)
 {
-	char buf[32];
+	char buf[32]; /* FIXME: ensure it's always big enought */
 	int percent;
 
 	if (NOTESLINES <= 0)
@@ -927,25 +928,25 @@ mail_check (void)
  * Rewritten from scratch by Th. Quinot, 1997-01-03
  */
 
-#ifdef lint
+#	ifdef lint
 static int once;
-#	define ONCE while(once)
-#else
-#	define ONCE while(0)
-#endif /* lint */
+#		define ONCE while(once)
+#	else
+#		define ONCE while(0)
+#	endif /* lint */
 
-#define APPEND_TO(dest, src) do { \
+#	define APPEND_TO(dest, src) do { \
 	(void) sprintf ((dest), "%s", (src)); \
 	(dest) = strchr((dest), '\0'); \
 	} ONCE
-#define RTRIM(whatbuf, whatp) do { (whatp)--; \
+#	define RTRIM(whatbuf, whatp) do { (whatp)--; \
 	while ((whatp) >= (whatbuf) && \
 	(*(whatp) == ' ')) \
 	*((whatp)--) = '\0'; } ONCE
-#define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
+#	define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
 	(whatp) && (*(whatp) == ' '); \
 	(whatp)++)
-#define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
+#	define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
 	LTRIM ((whatbuf), (whatp)); \
 	} ONCE
 
@@ -1093,12 +1094,12 @@ FATAL:
 	strcpy(addrspec, "error@hell");
 	*comment = '\0';
 }
-#undef APPEND_TO
-#undef RTRIM
-#undef LTRIM
-#undef TRIM
+#	undef APPEND_TO
+#	undef RTRIM
+#	undef LTRIM
+#	undef TRIM
 
-#endif
+#endif /* 0 */
 
 /*
  *  Return a pointer into s eliminating any leading Re:'s.  Example:
@@ -1200,7 +1201,7 @@ my_isprint (
  */
 void
 get_author (
-	int thread,
+	t_bool thread,
 	struct t_article *art,
 	char *str, size_t len)
 {
@@ -1242,7 +1243,7 @@ toggle_inverse_video (void)
 	if (inverse_okay) {
 #ifndef USE_INVERSE_HACK
 		draw_arrow_mark = FALSE;
-#endif
+#endif /* !USE_INVERSE_HACK */
 	} else {
 		draw_arrow_mark = TRUE;
 	}
@@ -1285,7 +1286,7 @@ show_color_status (void)
 #ifdef WIN32
 	/* Don't want the overhead of windows.h */
 	int kbhit(void);
-#endif
+#endif /* WIN32 */
 
 
 /*
@@ -1489,25 +1490,25 @@ get_arrow_key (
 		case 'i':
 #	ifdef QNX42
 		case 0xA1:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_UP;
 
 		case 'B':
 #	ifdef QNX42
 		case 0xA9:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_DOWN;
 
 		case 'D':
 #	ifdef QNX42
 		case 0xA4:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_LEFT;
 
 		case 'C':
 #	ifdef QNX42
 		case 0xA6:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_RIGHT;
 
 		case 'I':		/* ansi  PgUp */
@@ -1516,36 +1517,36 @@ get_arrow_key (
 		case 'v':		/* emacs style */
 #	ifdef QNX42
 		case 0xA2:
-#	endif
+#	endif /* QNX42 */
 #	ifdef M_AMIGA
 			return KEYMAP_PAGE_DOWN;
 #	else
 			return KEYMAP_PAGE_UP;
-#	endif
+#	endif /* M_AMIGA */
 
 		case 'G':		/* ansi  PgDn */
 		case 'U':		/* at386 PgDn */
 		case 'T':		/* 97801 PgDn */
 #	ifdef QNX42
 		case 0xAA:
-#	endif
+#	endif /* QNX42 */
 #	ifdef M_AMIGA
 			return KEYMAP_PAGE_UP;
 #	else
 			return KEYMAP_PAGE_DOWN;
-#	endif
+#	endif /* M_AMIGA */
 
 		case 'H':		/* at386 Home */
 #	ifdef QNX42
 		case 0xA0:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_HOME;
 
 		case 'F':		/* ansi  End */
 		case 'Y':		/* at386 End */
 #	ifdef QNX42
 		case 0xA8:
-#	endif
+#	endif /* QNX42 */
 			return KEYMAP_END;
 
 		case '2':		/* vt200 Ins */
@@ -1616,7 +1617,7 @@ create_index_lock_file (
 #else
 			error_message ("\n%s: Already started pid=[%d] on %s",
 				progname, atoi(buf), buf+8);
-#endif
+#endif /* INDEX_DAEMON */
 			exit (EXIT_FAILURE);
 		}
 	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
@@ -1817,7 +1818,7 @@ strfeditor (
 				case '\"':
 					strcpy (tbuf, "\\\"");
 					break;
-#endif
+#endif /* WIN32 */
 				default:
 					tbuf[0] = '%';
 					tbuf[1] = *format;
@@ -1914,7 +1915,7 @@ strfpath (
 	int i;
 #ifndef M_AMIGA
 	struct passwd *pwd;
-#endif
+#endif /* !M_AMIGA */
 
 	if (str == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
@@ -1932,7 +1933,7 @@ strfpath (
 		if (!strchr ("~=+", *format))
 #else
 		if (!strchr ("~$=+", *format))
-#endif
+#endif /* VMS */
 		{
 			*str++ = *format;
 			continue;
@@ -1962,7 +1963,7 @@ strfpath (
 #else
 						/* Amiga has no other users */
 						return 0;
-#endif
+#endif /* !M_AMIGA */
 						break;
 				}
 				i = strlen (tbuf);
@@ -2101,7 +2102,7 @@ strfpath (
 		*str = '\0';
 #if 0
 	wait_message (2, "!!!format=[%s]  path=[%s]", startp, start);
-#endif
+#endif /* 0 */
 		return (str - start);
 	} else {
 		str[0] = '\0';
@@ -2323,7 +2324,7 @@ void get_cwd (
 	getcwd (buf, PATH_LEN);
 #else
 	getwd (buf);
-#endif
+#endif /* HAVE_GETCWD */
 }
 
 
@@ -2345,7 +2346,7 @@ make_group_path (
 		path++;
 	}
 	*path = '\0';
-#endif
+#endif /* VMS */
 }
 
 
@@ -2381,9 +2382,9 @@ make_post_process_cmd (
 
 	get_cwd (currentdir);
 	my_chdir (dir);
-#ifdef M_OS2
+#	ifdef M_OS2
 	backslash (file);
-#endif
+#	endif /* M_OS2 */
 	sh_format (buf, sizeof(buf), cmd, file);
 	invoke_cmd (buf);
 	my_chdir (currentdir);
@@ -3137,6 +3138,7 @@ gnksa_dequote_plainphrase(
 					case '[':
 					case ']':
 						return GNKSA_ILLEGAL_UNQUOTED_CHAR;
+						/* NOTREACHED */
 						break;
 
 					case '=':
@@ -3169,6 +3171,7 @@ gnksa_dequote_plainphrase(
 					case '>':
 					case '\\':
 						return GNKSA_ILLEGAL_QUOTED_CHAR;
+						/* NOTREACHED */
 						break;
 
 					default:
@@ -3202,6 +3205,7 @@ gnksa_dequote_plainphrase(
 					case '/':
 					case '=':
 						return GNKSA_ILLEGAL_ENCODED_CHAR;
+						/* NOTREACHED */
 						break;
 
 					default:
@@ -3235,6 +3239,7 @@ gnksa_dequote_plainphrase(
 					case '/':
 					case '=':
 						return GNKSA_ILLEGAL_ENCODED_CHAR;
+						/* NOTREACHED */
 						break;
 
 					default:
@@ -3358,6 +3363,7 @@ gnksa_check_domain (
 
 			/* single letter TLDs do not exist */
 			return GNKSA_ILLEGAL_DOMAIN;
+			/* NOTREACHED */
 			break;
 
 		case 2:
@@ -3576,8 +3582,10 @@ gnksa_do_check_from(
 {
 	char *addr_begin;
 	char *aux;
-	char decoded[HEADER_LEN] = "";
+	char decoded[HEADER_LEN];
 	int result;
+
+	decoded[0] = '\0';
 
 	/* split from */
 	if (GNKSA_OK != (result = gnksa_split_from(from, address, realname))) /* error detected */
@@ -3622,8 +3630,8 @@ int
 gnksa_check_from(
 	char *from)
 {
-	char address[HEADER_LEN] = "";
-	char realname[HEADER_LEN] = "";
+	char address[HEADER_LEN];	/* will be initialised in gnksa_split_from () */
+	char realname[HEADER_LEN];	/* which is called by gnksa_do_check_from() */
 
 	return gnksa_do_check_from(from, address, realname);
 }

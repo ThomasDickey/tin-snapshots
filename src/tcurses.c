@@ -18,15 +18,15 @@
 
 #ifdef USE_CURSES
 
-#ifndef KEY_MIN
-#	define KEY_MIN KEY_BREAK	/* SVr3 curses */
-#endif
+#	ifndef KEY_MIN
+#		define KEY_MIN KEY_BREAK	/* SVr3 curses */
+#	endif /* !KEY_MIN */
 
-#include "trace.h"
+#	include "trace.h"
 
-#ifndef attr_get
-#define	attr_get() getattrs(stdscr)
-#endif
+#	ifndef attr_get
+#		define attr_get()	getattrs(stdscr)
+#	endif /* !attr_get */
 
 int cLINES;
 int cCOLS;
@@ -45,15 +45,15 @@ void setup_screen (void)
  */
 int InitScreen (void)
 {
-#ifdef NCURSES_VERSION
-#ifdef USE_TRACE
-#ifdef TRACE_CCALLS
+#	ifdef NCURSES_VERSION
+#		ifdef USE_TRACE
+#			ifdef TRACE_CCALLS
 	trace(TRACE_CALLS|TRACE_CCALLS);
-#else
+#			else
 	trace(TRACE_CALLS);
-#endif
-#endif
-#endif
+#			endif /* TRACE_CCALLS */
+#		endif /* USE_TRACE */
+#	endif /* NCURSES_VERSION */
 	TRACE(("InitScreen"))
 	initscr();
 	cCOLS = COLS;
@@ -65,12 +65,12 @@ int InitScreen (void)
 	set_keypad_on();
 	if (has_colors()) {
 		start_color();
-#ifdef HAVE_USE_DEFAULT_COLORS
+#	ifdef HAVE_USE_DEFAULT_COLORS
 		if (use_default_colors() != ERR) {
 			fcol(default_fcol = -1);
 			bcol(default_bcol = -1);
 		}
-#endif
+#	endif /* HAVE_USE_DEFAULT_COLORS */
 	} else {
 		use_color = FALSE;
 	}
@@ -201,21 +201,21 @@ void set_keypad_off (void) { if (!cmd_line) keypad(stdscr, FALSE); }
  */
 void set_xclick_on (void)
 {
-#ifdef NCURSES_MOUSE_VERSION
+#	ifdef NCURSES_MOUSE_VERSION
 	if (use_mouse)
 		mousemask(
 			(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
 			(mmask_t *)0);
-#endif
+#	endif /* NCURSES_MOUSE_VERSION */
 }
 
 /*
  */
 void set_xclick_off (void)
 {
-#ifdef NCURSES_MOUSE_VERSION
+#	ifdef NCURSES_MOUSE_VERSION
 	(void) mousemask(0, (mmask_t *)0);
-#endif
+#	endif /* NCURSES_MOUSE_VERSION */
 }
 
 void
@@ -397,4 +397,4 @@ write_line(
 
 void my_tcurses(void); /* proto-type */
 void my_tcurses(void) { }	/* ANSI C requires non-empty file */
-#endif
+#endif /* USE_CURSES */

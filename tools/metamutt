@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.13 1998/10/26 15:36:59 roland Exp $
+# $Id: metamutt,v 1.14 1998/12/25 11:54:11 tom Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
@@ -79,7 +79,10 @@ if [ -f ~/.mutt/muttrc ]
 then
     echo 'source ~/.mutt/muttrc' > $tmpdir/muttrc
 else
-    echo 'source ~/.muttrc' > $tmpdir/muttrc
+    if [ -f ~/.muttrc ]
+    then
+        echo 'source ~/.muttrc' > $tmpdir/muttrc
+    fi
 fi
 
 cat >> $tmpdir/muttrc <<EOF

@@ -460,6 +460,7 @@ extern constext txt_enter_next_thread[];
 extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
 extern constext txt_error_approved[];
+extern constext txt_error_asfail[];
 extern constext txt_error_bad_approved[];
 extern constext txt_error_bad_from[];
 extern constext txt_error_bad_replyto[];
@@ -665,6 +666,7 @@ extern constext txt_help_p_tab[];
 extern constext txt_help_p_tilda[];
 extern constext txt_help_p_u[];
 extern constext txt_help_p_z[];
+extern constext txt_help_pg_k[];
 extern constext txt_help_pgdn_goto_next[];
 extern constext txt_help_pipe[];
 extern constext txt_help_plus[];
@@ -1220,6 +1222,7 @@ extern int system_status;
 extern int tex2iso_supported;
 extern int this_resp;
 extern int thread_basenote;
+extern int thread_depth;
 extern int tin_errno;
 extern int top;
 extern int top_base;
@@ -1370,7 +1373,7 @@ extern t_bool xref_supported;
 #define HIST_POST_SUBJECT	10
 #define HIST_REGEX_PATTERN	11
 #define HIST_REPOST_GROUP	12
-#define HIST_SAVE_FILE	 	13
+#define HIST_SAVE_FILE		13
 #define HIST_SELECT_PATTERN	14
 #define HIST_SHELL_COMMAND	15
 #define HIST_SUBJECT_SEARCH	16

@@ -101,7 +101,7 @@
 /* general keys
  * ESC
  * ' ','!','$','/','?'
- * 'A','L','M','O','Q','W'
+ * 'A','B','L','M','O','Q','W'
  * '^'
  * 'a','b','i','j','k','q','v'
  * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
@@ -114,6 +114,7 @@
 #endif
 #define iKeySetRange '#'
 #define iKeyLastPage '$'
+#define iKeySearchBody 'B'
 #define iKeySearchSubjF '/'
 #define iKeySearchSubjB '?'
 #define iKeySearchAuthB 'A'
@@ -179,7 +180,6 @@
 #define iKeyGroupSelThdIfUnreadSelected ';'
 #define iKeyGroupSelPattern '='
 #define iKeyGroupReverseSel '@'
-#define iKeyGroupFSearchBody 'B'
 #define iKeyGroupCatchupNextUnread 'C'
 #define iKeyGroupToggleGetartLimit 'G'
 #define iKeyGroupToggleHelpDisplay 'H'
@@ -253,7 +253,6 @@
 #define iKeyPageSkipIncludedText ':'
 #define iKeyPageTopThd '<'
 #define iKeyPageBotThd '>'
-#define iKeyPageBSearchBody 'B'
 #define iKeyPageCatchupNextUnread 'C'
 #define iKeyPageCancel 'D'
 #define iKeyPageFollowup 'F'

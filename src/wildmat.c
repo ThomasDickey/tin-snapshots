@@ -55,7 +55,7 @@
 static int DoMatch(register const char *text, register char *p);
 
 /*
- *  Match text and p, return TRUE, FALSE, or ABORT.
+ *  Match text and p, return 1 (TRUE), 0 (FALSE), or -1 (ABORT).
  */
 
 static int
@@ -78,7 +78,7 @@ DoMatch(
 				/* FALLTHROUGH */
 			default:
 				if (*text != *p)
-					return FALSE;
+					return 0;
 				continue;
 			case '?':
 				/* Match anything. */
@@ -89,9 +89,9 @@ DoMatch(
 					continue;
 				if (*p == '\0')
 					/* Trailing star matches everything. */
-					return TRUE;
+					return 1;
 				while (*text)
-					if ((matched = DoMatch(text++, p)) != FALSE)
+					if ((matched = DoMatch(text++, p)) != 0)
 						return matched;
 				return ABORT;
 			case '[':
@@ -108,13 +108,13 @@ DoMatch(
 					if (*p == '-' && p[1] != ']' ? *text <= *++p && *text >= last : *text == *p)
 						matched = TRUE;
 				if (matched == reverse)
-					return FALSE;
+					return 0;
 				continue;
 			}
 		}
 #	ifdef MATCH_TAR_PATTERN
 		if (*text == '/')
-			return TRUE;
+			return 1;
 #	endif /* MATCH_TAR_ATTERN */
 #endif /* !INDEX_DAEMON */
 	return *text == '\0';

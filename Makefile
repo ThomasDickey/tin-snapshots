@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 981114
+PVER	= 981225
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -229,7 +229,7 @@ MV	= mv
 NROFF	= groff -Tascii
 RM	= rm
 SHELL	= /bin/sh
-TAR	= gtar
+TAR	= tar
 BZIP2	= bzip2
 WC	= wc
 SED	= sed
@@ -238,18 +238,24 @@ TR	= tr
 all:
 	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
 	@$(ECHO) " "
-	@$(ECHO) "To compile the source code change to the source directory by"
-	@$(ECHO) "typing 'cd src' and then type 'make' for more instructions."
+	@$(ECHO) "To compile the source code type 'make build' or change to the"
+	@$(ECHO) "source directory by typing 'cd src' and then type 'make'."
 	@$(ECHO) " "
 	@$(ECHO) "This Makefile offers the following general purpose options:"
 	@$(ECHO) " "
+	@$(ECHO) "    make build           [ Compile tin ]"
 	@$(ECHO) "    make clean           [ Delete all object files & backup files ]"
 	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
+	@$(ECHO) "    make install_sysdefs [ Install the system-wide-defaults file ]"
 	@$(ECHO) "    make manpage         [ Create nroff version of manual page ]"
 	@$(ECHO) "    make manifest        [ Create MANIFEST ]"
 	@$(ECHO) "    make dist            [ Create a gziped distribution tar file ]"
+	@$(ECHO) " "
+
+build:
+	@$(CD) $(SRCDIR) && $(MAKE)
 
 install:
 	@$(CD) $(SRCDIR) && $(MAKE) install
@@ -259,6 +265,9 @@ install_setuid:
 
 install_daemon:
 	@$(CD) $(SRCDIR) && $(MAKE) install_daemon
+
+install_sysdefs:
+	@$(CD) $(SRCDIR) && $(MAKE) install_sysdefs
 
 clean:
 	@-$(RM) -f *~

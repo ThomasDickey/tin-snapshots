@@ -24,7 +24,7 @@ static void show_config_page (void);
 
 #ifdef HAVE_COLOR
 	static t_bool match_color (char *line, const char *pat, int *dst, int maxlen);
-#endif
+#endif /* HAVE_COLOR */
 
 enum state { IGNORE, CHECK, UPGRADE };
 
@@ -114,7 +114,7 @@ read_config_file (
 #ifdef HAVE_METAMAIL
 			if (match_boolean (buf, "ask_for_metamail=", &ask_for_metamail))
 				break;
-#endif
+#endif /* HAVE_METAMAIL */
 
 			if (match_boolean (buf, "auto_cc=", &auto_cc))
 				break;
@@ -209,7 +209,7 @@ read_config_file (
 
 			if (match_color (buf, "col_markdash=", &col_markdash, MAX_COLOR))
 				break;
-#endif
+#endif /* HAVE_COLOR */
 
 			break;
 
@@ -388,7 +388,7 @@ read_config_file (
 #ifdef LOCAL_CHARSET
 			if (match_boolean (buf, "local_charset=", &use_local_charset))
 				break;
-#endif
+#endif /* LOCAL_CHARSET */
 
 			break;
 
@@ -582,7 +582,7 @@ read_config_file (
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 			if (match_boolean (buf, "use_builtin_inews=", &use_builtin_inews))
 				break;
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 
 			if (match_boolean (buf, "use_getart_limit=", &use_getart_limit))
 				break;
@@ -596,19 +596,19 @@ read_config_file (
 #ifdef HAVE_KEYPAD
 			if (match_boolean (buf, "use_keypad=", &use_keypad))
 				break;
-#endif
+#endif /* HAVE_KEYPAD */
 
 #ifdef HAVE_METAMAIL
 			if (match_boolean (buf, "use_metamail=", &use_metamail))
 				break;
-#endif
+#endif /* HAVE_METAMAIL */
 
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "use_color=", &use_color_tinrc)) {
 				use_color = use_color_tinrc;
 				break;
 			}
-#endif
+#endif /* HAVE_COLOR */
 
 			break;
 
@@ -626,7 +626,7 @@ read_config_file (
 
 			if (match_integer (buf, "word_h_display_marks=", &word_h_display_marks, MAX_MARK))
 				break;
-#endif
+#endif /* HAVE_COLOR */
 
 			break;
 
@@ -900,7 +900,7 @@ write_config_file (
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	fprintf (fp, txt_tinrc_use_builtin_inews);
 	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 
 	fprintf (fp, txt_tinrc_auto_list_thread);
 	fprintf (fp, "auto_list_thread=%s\n\n", print_boolean (auto_list_thread));
@@ -992,7 +992,7 @@ write_config_file (
 	fprintf (fp, txt_tinrc_col_markstar);
 	fprintf (fp, "col_markstar=%d\n", col_markstar);
 	fprintf (fp, "col_markdash=%d\n\n", col_markdash);
-#endif
+#endif /* HAVE_COLOR */
 
 	fprintf (fp, txt_tinrc_mail_address);
 	fprintf (fp, "mail_address=%s\n\n", mail_address);
@@ -1003,7 +1003,7 @@ write_config_file (
 #ifdef LOCAL_CHARSET
 	fprintf (fp, txt_tinrc_local_charset);
 	fprintf (fp, "local_charset=%s\n\n", print_boolean(use_local_charset));
-#endif
+#endif /* LOCAL_CHARSET */
 
 	fprintf (fp, txt_tinrc_post_mime_encoding);
 	fprintf (fp, "post_mime_encoding=%s\n", txt_mime_encodings[post_mime_encoding]);
@@ -1027,12 +1027,12 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_ask_for_metamail);
 	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
-#endif
+#endif /* HAVE_METAMAIL */
 
 #ifdef HAVE_KEYPAD
 	fprintf (fp, txt_tinrc_use_keypad);
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
-#endif
+#endif /* HAVE_KEYPAD */
 
 	fprintf (fp, txt_tinrc_alternative_handling);
 	fprintf (fp, "alternative_handling=%s\n\n", print_boolean (alternative_handling));
@@ -1129,7 +1129,7 @@ print_any_option (
 	}
 #ifdef USE_CURSES
 	clrtoeol();
-#endif
+#endif /* USE_CURSES */
 }
 
 
@@ -1187,7 +1187,7 @@ static void DoScroll (
 	scrl(jump);
 	setscrreg(0, LINES-1);
 }
-#endif
+#endif /* USE_CURSES */
 
 
 static void
@@ -1203,7 +1203,7 @@ highlight_option (
 			DoScroll(-1);
 			first_option_on_screen--;
 		} else
-#endif
+#endif /* USE_CURSES */
 		{
 			first_option_on_screen = TopOfPage(option);
 			ClearScreen();
@@ -1702,7 +1702,7 @@ change_config_file (
 #ifdef M_AMIGA
 							if (tin_bbs_mode)
 								break;
-#endif
+#endif /* M_AMIGA */
 							prompt_option_string (option);
 							expand_rel_abs_pathname (option_row(option),
 								OPT_ARG_COLUMN + (int) strlen (option_table[option].option_text),

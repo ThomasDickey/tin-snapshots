@@ -74,7 +74,7 @@ constext *help_select[] = {
 	txt_help_g_x,
 #ifndef NO_SHELL_ESCAPE
 	txt_help_shell,
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 	txt_help_esc,
 	txt_help_ctrl_l,
 		txt_help_empty_line,
@@ -86,7 +86,7 @@ constext *help_select[] = {
 	txt_help_I,
 #ifdef HAVE_COLOR
 	txt_help_color,
-#endif
+#endif /* HAVE_COLOR */
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -122,7 +122,7 @@ constext *help_group[] = {
 	txt_help_p_S,
 #ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
-#endif
+#endif /* !DONT_HAVE_PIPING */
 	txt_help_o,
 	txt_help_t,
 		txt_help_empty_line,
@@ -154,7 +154,7 @@ constext *help_group[] = {
 	txt_help_ctrl_l,
 #ifndef NO_SHELL_ESCAPE
 	txt_help_shell,
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 		txt_help_empty_line,
 	txt_help_ctrl_a,
 	txt_help_ctrl_k,
@@ -166,13 +166,13 @@ constext *help_group[] = {
 	txt_help_I,
 #ifdef HAVE_COLOR
 	txt_help__,
-#endif
+#endif /* HAVE_COLOR */
 		txt_help_empty_line,
 	txt_help_g_t_p_i,
 	txt_help_g_G,
 #ifdef HAVE_COLOR
 	txt_help_color,
-#endif
+#endif /* HAVE_COLOR */
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -215,7 +215,7 @@ constext *help_thread[] = {
 	txt_help_I,
 #ifdef HAVE_COLOR
 	txt_help_color,
-#endif
+#endif /* HAVE_COLOR */
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -255,7 +255,7 @@ constext *help_page[] = {
 	txt_help_p_s,
 #ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
-#endif
+#endif /* !DONT_HAVE_PIPING */
 	txt_help_o,
 	txt_help_t,
 		txt_help_empty_line,
@@ -274,7 +274,7 @@ constext *help_page[] = {
 	txt_help_p_d,
 #ifdef HAVE_PGP
 	txt_help_ctrl_g,
-#endif
+#endif /* HAVE_PGP */
 		txt_help_empty_line,
 	txt_help_W,
 		txt_help_empty_line,
@@ -287,14 +287,14 @@ constext *help_page[] = {
 	txt_help_ctrl_l,
 #ifndef NO_SHELL_ESCAPE
 	txt_help_shell,
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 		txt_help_empty_line,
 	txt_help_M,
 	txt_help_I,
 #ifdef HAVE_COLOR
 	txt_help_color,
 	txt_help__,
-#endif
+#endif /* HAVE_COLOR */
 		txt_help_empty_line,
 	txt_help_p_star,
 	txt_help_p_dot,
@@ -320,7 +320,7 @@ ReadHelpCh (void)
 		case ESC:	/* common arrow keys */
 #ifdef HAVE_KEY_PREFIX
 		case KEY_PREFIX:
-#endif
+#endif /* HAVE_KEY_PREFIX */
 			switch (get_arrow_key (ch)) {
 				case KEYMAP_LEFT:
 					break;
@@ -329,7 +329,7 @@ ReadHelpCh (void)
 #ifdef USE_CURSES
 					ch = iKeyUp;
 					break;
-#endif
+#endif /* USE_CURSES */
 
 				case KEYMAP_PAGE_UP:
 					ch = iKeyPageUp;
@@ -339,7 +339,7 @@ ReadHelpCh (void)
 #ifdef USE_CURSES
 					ch = iKeyDown;
 					break;
-#endif
+#endif /* USE_CURSES */
 
 				case KEYMAP_RIGHT:
 				case KEYMAP_PAGE_DOWN:
@@ -411,7 +411,7 @@ show_info_page (
 	set_xclick_off ();
 #ifdef USE_CURSES
 	ClearScreen();
-#endif
+#endif /* USE_CURSES */
 	forever {
 		if (cur_page != old_page)
 #ifdef USE_CURSES
@@ -428,18 +428,20 @@ show_info_page (
 
 #ifdef USE_CURSES
 			case iKeyUp:				/* line up */
+			case iKeyUp2:
 				if (--pos_help < 0)
 					pos_help = (max_page-1) * help_lines;
 				old_page = -1;
 				cur_page = pos_help / help_lines + 1;
 				break;
 			case iKeyDown:				/* line down */
+			case iKeyDown2:
 				if (++pos_help >= max_line)
 					pos_help = 0;
 				old_page = -1;
 				cur_page = pos_help / help_lines + 1;
 				break;
-#endif
+#endif /* USE_CURSES */
 			case iKeyPageDown:			/* page down */
 			case iKeyPageDown2:
 			case iKeyPageDown3:
@@ -509,10 +511,10 @@ display_info_page (
 
 #ifdef HAVE_COLOR
 	fcol(col_help);
-#endif
+#endif /* HAVE_COLOR */
 #ifdef USE_CURSES
 	if (first)
-#endif
+#endif /* USE_CURSES */
 		ClearScreen ();
 	sprintf (buf, info_title, cur_page, max_page);
 	center_line (0, TRUE, buf);
@@ -537,7 +539,7 @@ display_info_page (
 	center_line (cLINES, FALSE, txt_hit_space_for_more);
 #ifdef HAVE_COLOR
 	fcol(col_normal);
-#endif
+#endif /* HAVE_COLOR */
 }
 
 
@@ -554,7 +556,7 @@ show_mini_help (
 
 #ifdef HAVE_COLOR
 	fcol(col_minihelp);
-#endif
+#endif /* HAVE_COLOR */
 
 	switch (level) {
 		case SELECT_LEVEL:
@@ -582,7 +584,7 @@ show_mini_help (
 	}
 #ifdef HAVE_COLOR
 	fcol(col_normal);
-#endif
+#endif /* HAVE_COLOR */
 }
 
 

@@ -16,9 +16,9 @@
 
 #ifndef	NNTP_SERVER_FILE
 #	ifdef M_AMIGA
-#		define	NNTP_SERVER_FILE	"uulib:nntpserver"
+#		define NNTP_SERVER_FILE	"uulib:nntpserver"
 #	else
-#		define	NNTP_SERVER_FILE	"/etc/nntpserver"
+#		define NNTP_SERVER_FILE	"/etc/nntpserver"
 #	endif	/* M_AMIGA */
 #endif /* !NNTP_SERVER_FILE */
 

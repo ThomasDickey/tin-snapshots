@@ -19,7 +19,7 @@ char mesg[LEN];
 
 #ifndef USE_CURSES
 	struct t_screen *screen;
-#endif
+#endif /* !USE_CURSES */
 
 /*
  * Move the cursor to the lower-left of the screen, where it won't be annoying
@@ -46,7 +46,7 @@ info_message (
 	clear_message ();
 #ifdef HAVE_COLOR
 	fcol(col_message);
-#endif
+#endif /* HAVE_COLOR */
 
 	vsprintf (mesg, fmt, ap);
 
@@ -54,7 +54,7 @@ info_message (
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
-#endif
+#endif /* HAVE_COLOR */
 	stow_cursor();
 
 	va_end(ap);
@@ -77,14 +77,14 @@ wait_message (
 	clear_message ();
 #ifdef HAVE_COLOR
 	fcol(col_message);
-#endif
+#endif /* HAVE_COLOR */
 
 	vsprintf (mesg, fmt, ap);
 	my_fputs (mesg, stdout);
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
-#endif
+#endif /* HAVE_COLOR */
 	cursoron ();
 	my_flush();
 
@@ -171,7 +171,7 @@ clear_message (void)
 		cursoroff ();
 #ifndef USE_CURSES
 		my_flush();
-#endif
+#endif /* !USE_CURSES */
 	}
 }
 
@@ -179,7 +179,7 @@ clear_message (void)
 void
 center_line (
 	int line,
-	int inverse,
+	t_bool inverse,
 	const char *str)
 {
 	int pos;
@@ -274,13 +274,13 @@ show_title (
 		MoveCursor (0, col);
 #ifdef HAVE_COLOR
 		fcol(col_title);
-#endif
+#endif /* HAVE_COLOR */
 		/* you have mail message in */
 		my_fputs ((mail_check () ? txt_you_have_mail : txt_type_h_for_help), stdout);
 
 #ifdef HAVE_COLOR
 		fcol(col_normal);
-#endif
+#endif /* HAVE_COLOR */
 	}
 	center_line (0, TRUE, title);
 }
@@ -293,12 +293,12 @@ ring_bell (void)
 	if (!cmd_line)
 		beep();
 	else {
-#endif
+#endif /* USE_CURSES */
 	my_fputc ('\007', stdout);
 	my_flush();
 #ifdef USE_CURSES
 	}
-#endif
+#endif /* USE_CURSES */
 }
 
 
@@ -339,7 +339,7 @@ show_progress (
 	if (total < 0)
 		my_printf ("%s", txt);
 	else
-#endif
+#endif /* 1 */
 		my_printf ("%s%6d/%-6d", txt, count, total);
 	my_flush();
 }

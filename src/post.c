@@ -61,18 +61,18 @@ static char prompt_rejected (void);
 static char prompt_to_continue (void);
 static char prompt_to_edit (void);
 static char prompt_to_send (const char *subject);
-static int fetch_postponed_article(char tmp_file[], char subject[], char newsgroups[]);
 static int msg_add_x_body (FILE *fp_out, char *body);
 static int msg_write_headers (FILE *fp);
-static int submit_mail_file (char *file);
 static size_t skip_id (const char *id);
 static t_bool check_article_to_be_posted (char *the_article, int art_type, int *lines);
 static t_bool check_for_spamtrap (char *addr);
 static t_bool damaged_id (const char *id);
+static t_bool fetch_postponed_article(char tmp_file[], char subject[], char newsgroups[]);
 static t_bool is_crosspost (char *xref);
 static t_bool must_include (char *id);
 static t_bool pcCopyArtHeader (int iHeader, char *pcArt, char *result);
 static t_bool repair_article (char *result);
+static t_bool submit_mail_file (char *file);
 static void append_postponed_file (char *file, char *addr);
 static void appendid (char **where, const char **what);
 static void backup_article (char *the_article);
@@ -223,8 +223,8 @@ msg_add_header (
 	char *ptr;
 	char *new_name = (char *) 0;
 	char *new_text = (char *) 0;
-	int done = FALSE;
 	int i;
+	t_bool done = FALSE;
 
 	if (name) {
 		/*
@@ -327,7 +327,7 @@ user_posted_messages (void)
 				posted[i].date[j] = buf[j];	/* posted date */
 
 			if (buf[j] == '\n') {
-				error_message ("Corrupted file %s", posted_info_file);
+				error_message ("Corrupted file %s", posted_info_file); /* FIXME: -> lang.c */
 				(void) sleep (1);
 				fclose (fp);
 				clear_message ();
@@ -451,7 +451,7 @@ check_article_to_be_posted (
 	int cnt = 0;
 	int col, len, i = 0;
 	int errors = 0;
-	int init = TRUE;
+	int init = 1;
 	int ngcnt = 0;
 	int oldraw;		/* save previous raw state */
 	int c;
@@ -873,7 +873,7 @@ setup_check_article_screen (
 		center_line (0, TRUE, txt_check_article);
 		MoveCursor (INDEX_TOP, 0);
 		Raw (FALSE);
-		*init = FALSE;
+		*init = 0;
 	}
 }
 
@@ -1360,7 +1360,7 @@ int count_postponed_articles(void)
 
 /* Copy the first postponed article and remove it from the postponed file */
 
-static int
+static t_bool
 fetch_postponed_article(
 	char tmp_file[],
 	char subject[],
@@ -1521,7 +1521,7 @@ postpone_article(
 /*
  * Post an original article (not a followup)
  */
-int
+t_bool
 post_article (
 	char *group,
 	int *posted_flag)
@@ -1533,8 +1533,8 @@ post_article (
 	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
-	int redraw_screen = FALSE;
 	struct t_group *psGrp;
+	t_bool redraw_screen = FALSE;
 #ifdef FORGERY
 	char line[HEADER_LEN];
 #endif /* FORGERY */
@@ -2248,7 +2248,7 @@ post_response_postponed:
 	return ret_code;
 }
 
-int
+t_bool
 mail_to_someone (
 	int respnum,
 	char *address,
@@ -2256,15 +2256,15 @@ mail_to_someone (
 	t_bool confirm_to_mail,
 	int *mailed_ok)
 {
+	FILE *fp;
+	char ch = iKeyPostSend;
 	char nam[HEADER_LEN];
 	char subject[HEADER_LEN];
 	char mailreader_subject[PATH_LEN];	/* for calling external mailreader */
-	char ch = iKeyPostSend;
 	char buf[HEADER_LEN];
 	char mail_to[HEADER_LEN];
 	char initials[64];
-	FILE *fp;
-	int redraw_screen = FALSE;
+	t_bool redraw_screen = FALSE;
 
 	msg_init_headers ();
 
@@ -2412,15 +2412,15 @@ mail_to_someone_done:
 	return redraw_screen;
 }
 
-int
-mail_bug_report (void) /* return value is always ignored */
+t_bool
+mail_bug_report (void) /* FIXME: return value is always ignored */
 {
-	char buf[LEN], nam[100];
+	FILE *fp;
 	const char *domain;
 	char ch;
+	char buf[LEN], nam[100];
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
-	FILE *fp;
 	t_bool is_longfiles, is_nntp = FALSE, is_nntp_only, is_debug;
 
 	msg_init_headers ();
@@ -2527,7 +2527,7 @@ mail_bug_report (void) /* return value is always ignored */
 	start_line_offset += 6;
 
 	if (!use_mailreader_i)
-		msg_write_signature (fp, TRUE, &CURR_GROUP);
+		msg_write_signature (fp, TRUE, (cur_groupnum == -1) ? NULL : &CURR_GROUP);
 
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2601,13 +2601,15 @@ mail_bug_report_done:
 }
 
 
-int
+t_bool
 mail_to_author (
 	char *group,
 	int respnum,
 	int copy_text,
 	t_bool with_headers) /* return value is always ignored */
 {
+	FILE *fp;
+	char ch;
 	char buf[LEN];
 	char from_addr[HEADER_LEN];
 	char nam[100];
@@ -2616,9 +2618,7 @@ mail_to_author (
 	char bigbuf[HEADER_LEN];
 	char mailreader_subject[PATH_LEN];	/* for calling external mailreader */
 	char initials[64];
-	char ch;
-	FILE *fp;
-	int redraw_screen = FALSE;
+	t_bool redraw_screen = FALSE;
 	t_bool spamtrap_found = FALSE;
 
 	msg_init_headers ();
@@ -2962,7 +2962,7 @@ cancel_article (
 	char user_name[128];
 	char full_name[128];
 #endif /* FORGERY */
-	int init = TRUE;
+	int init = 1;
 	int oldraw;
 	t_bool redraw_screen = TRUE;
 
@@ -2988,7 +2988,7 @@ cancel_article (
 	if (debug == 2)
 		error_message ("From=[%s]  Cancel=[%s]", art->from, from_name);
 #endif /* DEBUG */
-	if (!strstr (from_name, art->from)) {
+	if (!strcasestr (from_name, art->from)) {
 #ifdef FORGERY
 		author = FALSE;
 #else
@@ -3135,6 +3135,8 @@ cancel_article (
 				break;
 		}
 	}
+	/* NOTREACHED */
+	return redraw_screen;
 }
 #endif /* !INDEX_DAEMON */
 
@@ -3143,7 +3145,7 @@ cancel_article (
  * Repost an already existing article to another group (ie. local group)
  */
 
-#define FromSameUser (strstr (from_name, arts[respnum].from))
+#define FromSameUser (strcasestr (from_name, arts[respnum].from))
 
 #ifndef FORGERY
 #	define NotSuperseding	(!supersede || (supersede && (!FromSameUser)))
@@ -3157,7 +3159,7 @@ int
 repost_article (
 	const char *group,
 	int respnum,
-	int supersede)
+	t_bool supersede)
 {
 	FILE *fp;
 	char *ptr;
@@ -3666,7 +3668,7 @@ find_reply_to_addr (
 	char *ptr, buf[HEADER_LEN];
 	char from_both[HEADER_LEN];
 	char from_name[HEADER_LEN];
-	int found = FALSE;
+	t_bool found = FALSE;
 	long orig_offset;
 
 	orig_offset = ftell (note_fp);
@@ -3698,8 +3700,8 @@ find_reply_to_addr (
 	char replyto[HEADER_LEN];
 	char from[HEADER_LEN];
 	char fullname[HEADER_LEN];
-	int found_replyto = FALSE;
 	long orig_offset;
+	t_bool found_replyto = FALSE;
 
 	orig_offset = ftell (note_fp);
 	fseek (note_fp, 0L, SEEK_SET);
@@ -3840,14 +3842,14 @@ update_active_after_posting (
 }
 
 
-static int
+static t_bool
 submit_mail_file (
 	char *file)
 {
 	char buf[HEADER_LEN];
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
-	int mailed = FALSE;
+	t_bool mailed = FALSE;
 
 #ifndef M_AMIGA
 	if (insert_from_header (file))
