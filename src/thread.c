@@ -75,6 +75,8 @@ bld_tline (
 	if (art->tagged) {
 		strcat (buff, tin_itoa(art->tagged, 3));
 	} else {
+		strcat(buff, "   ");
+
 		if (art->inrange) {
 			mark = art_marked_inrange;
 		} else if (art->status == ART_UNREAD) {
@@ -85,7 +87,6 @@ bld_tline (
 			mark = ART_MARK_READ;
 		}
 
-		strcat(buff, "   ");
 		*(buff+MARK_OFFSET) = mark;			/* insert mark */
 	}
 
@@ -139,24 +140,26 @@ bld_tline (
 		 * Copy in the subject up to where the author (if any) starts
 		 */
 		i = cCOLS - strlen(buff) - len_from;
+
+		if (len_from)						/* Leave gap before author */
+			i=i-2;
+
 		if (i > 0) {
 			strncat(buff, art->subject, i);
 			*(buff + strlen(buff)) = '\0';		/* Just in case */
 		}
+/* TODO */
+		Convert2Printable((unsigned char *)buff);
 
 		/*
 		 * If we need to show the author, pad out to the start of the author field,
 		 */
 		if (len_from) {
-/* TODO tidy up this mess fix i--, above ?? */
 			for (i=strlen(buff); i < (cCOLS - len_from); i++)
 				*(buff + i) = ' ';
 
-		 	/* leaving at least one mandatory space after the subject */
-			*(buff + cCOLS - len_from - 1) = ' ';
-
 			/*
-			 * Now add the author info at the end. This will NULL terminate
+			 * Now add the author info at the end. This will be 0 terminated
 			 */
 			get_author (TRUE, art, buff + cCOLS - len_from, len_from);
 		}

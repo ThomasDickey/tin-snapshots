@@ -757,6 +757,13 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	CURR_GROUP	(active[my_group[cur_groupnum]])
 
 /*
+ * Reset my_group[], skipping any newgroups that have been assigned
+ */
+#define SKIP_NEWGROUPS \
+	group_top = -1; \
+	while (active[my_group[++group_top]].newgroup)
+
+/*
  * Some informational message are only shown if this is true
  * otherwise suppressed when we're backgrounded or in batch mode
  */
@@ -972,7 +979,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /* Converts .newsrc subscription char to boolean */
 #define SUB_BOOL(x)	(x == SUBSCRIBED)
 /* Only write newsrc line if subscribed and not stripping */
-#define WRITE_NEWSRC(x)	(!(x != SUBSCRIBED && strip_newsrc))
+/*TODO#define WRITE_NEWSRC(x)	(!(x != SUBSCRIBED && strip_newsrc))*/
+#define WRITE_NEWSRC(x)		(x == SUBSCRIBED || !strip_newsrc)
 
 /*
  * filter_type used in struct t_filter
@@ -1100,8 +1108,9 @@ typedef unsigned char	t_bitmap;
 #define MSGID_HASH_SIZE		2609
 
 /*
+ * These will probably go away when filtering is rewritten
  * Easier access to hashed msgids. Note that in REFS(), y must be free()d
- * msgid is mandatory and cannot be NULL in an article.
+ * msgid is mandatory in an article and cannot be NULL
  */
 #define MSGID(x)			(x->refptr->txt)
 #define REFS(x,y)			((y = get_references(x->refptr->parent)) ? y : "")
@@ -1424,6 +1433,7 @@ typedef struct _TIMEINFO
     long	tzone;
 } TIMEINFO;
 
+#if 0		/* Does anyone know what this was going to do ? */
 /*
  * Used for detecting new groups when reading news locally.  It's easy to be
  * confused by arrays of pointers to pointers, so typedef's are used for the
@@ -1438,6 +1448,7 @@ struct t_notify
 
 typedef struct t_group *group_p;
 typedef struct t_notify *notify_p;
+#endif
 
 /*
  * Determine signal return type
@@ -1651,6 +1662,9 @@ extern void joinpath (char *result, char *dir, char *file);
 
 #define FreeIfNeeded(p) if (p != (char *)0) free((char *)p)
 #define FreeAndNull(p)  if (p != (char *)0) { free((char *)p); p = (char *)0; }
+
+#define my_group_find(x)	add_my_group(x, 0)
+#define my_group_add(x)		add_my_group(x, 1)
 
 /*
  * Cast for the (few!) places where we need to examine 8-bit characters w/o

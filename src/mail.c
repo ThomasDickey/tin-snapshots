@@ -24,6 +24,7 @@ read_mail_active_file (void)
 {
 	char	buf[LEN];
 	char	spooldir[PATH_LEN];
+	struct	t_group *ptr;
 	FILE	*fp;
 	long	count = -1L;
 	long	min, max;
@@ -58,35 +59,31 @@ fflush(stdout);
 		/*
 		 * Load mailgroup into group hash table
 		 */
-		if (psGrpAdd (buf) != 0)
-			goto read_mail_active_continue;
+		if ((ptr = psGrpAdd (buf)) == NULL)
+			continue;
 
 		/*
-		 * Load group info.
+		 * Load group info. TODO - integrate with active_add()
 		 */
-		active[num_active].type = GROUP_TYPE_MAIL;
-		active[num_active].name = my_strdup (buf);
-		active[num_active].spooldir = my_strdup (spooldir);
-		active[num_active].description = (char *) 0;
-		active[num_active].count = count;
-		active[num_active].xmax = max;
-		active[num_active].xmin = min;
-		active[num_active].moderated = 'y';
-		active[num_active].next = -1;			/* hash chaining */
-		active[num_active].inrange = FALSE;
-		active[num_active].read_during_session = FALSE;
-		active[num_active].art_was_posted = FALSE;
-		active[num_active].subscribed = FALSE;		/* not in my_group[] yet */
-		active[num_active].newgroup = FALSE;		/* not in my_group[] yet */
-		active[num_active].newsrc.xbitmap = (t_bitmap *) 0;
-		active[num_active].attribute = (struct t_attribute *) 0;
-		active[num_active].glob_filter = &glob_filter;
-		active[num_active].grps_filter = (struct t_filters *) 0;
-		vSetDefaultBitmap (&active[num_active]);
-		num_active++;
-
-read_mail_active_continue:;
-
+		ptr->type = GROUP_TYPE_MAIL;
+		ptr->name = my_strdup (buf);
+		ptr->spooldir = my_strdup (spooldir);
+		ptr->description = (char *) 0;
+		ptr->count = count;
+		ptr->xmax = max;
+		ptr->xmin = min;
+		ptr->moderated = 'y';
+		ptr->next = -1;			/* hash chaining */
+		ptr->inrange = FALSE;
+		ptr->read_during_session = FALSE;
+		ptr->art_was_posted = FALSE;
+		ptr->subscribed = FALSE;		/* not in my_group[] yet */
+		ptr->newgroup = FALSE;
+		ptr->newsrc.xbitmap = (t_bitmap *) 0;
+		ptr->attribute = (struct t_attribute *) 0;
+		ptr->glob_filter = &glob_filter;
+		ptr->grps_filter = (struct t_filters *) 0;
+		vSetDefaultBitmap (ptr);
 	}
 	fclose (fp);
 

@@ -21,6 +21,7 @@ int debug;
 */
 #ifdef DEBUG
 static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
+static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
 #endif
 
 /*
@@ -369,12 +370,12 @@ debug_print_bitmap (
 }
 
 
+#ifdef DEBUG_NEWSRC
 void
 debug_print_newsrc (
 	struct t_newsrc *NewSrc,
 	FILE *fp)
 {
-#ifdef DEBUG_NEWSRC
 	register int i, j;
 
 	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
@@ -394,10 +395,11 @@ debug_print_newsrc (
 	}
 	fprintf (fp, "]\n");
 	fflush (fp);
-#endif
 }
+#endif
 
 
+#ifdef DEBUG
 void
 vDbgPrintMalloc (
 	int	iIsMalloc,
@@ -405,7 +407,6 @@ vDbgPrintMalloc (
 	int	iLine,
 	size_t	iSize)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	static int iTotal = 0;
@@ -426,17 +427,17 @@ vDbgPrintMalloc (
 			chmod (file, (S_IRUGO|S_IWUGO));
 		}
 	}
-#endif
 }
+#endif
 
 
+#ifdef DEBUG
 void
 debug_print_filter (
 	FILE *fp,
 	int num,
 	struct t_filter *the_filter)
 {
-#ifdef DEBUG
 	fprintf (fp, "[%3d]  scope=[%s] inscope=[%s] type=[%d][%s] case=[%d][%s] lines=[%d %d]\n",
 		num, (the_filter->scope ? the_filter->scope : ""),
 		(the_filter->inscope ? "TRUE" : "FILTER"),
@@ -453,8 +454,8 @@ debug_print_filter (
 			the_filter->time,
 			(the_filter->time ? ctime (&the_filter->time) : "]\n"));
 	}
-#endif
 }
+#endif
 
 
 void

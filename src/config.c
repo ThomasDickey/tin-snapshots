@@ -1372,9 +1372,7 @@ change_config_file (
 					 * some options need further action to take effect
 					 */
 					switch (option) {
-						/* threading strategy for groups except those in ~/.tin/unthreaded */
-/* TODO - surely the above comment is obselete ? this has long been handled
- * by the attributes file -  no reference to this file in the source exists */
+
 						case OPT_DEFAULT_THREAD_ARTS:
 							/*
 							 * If the threading strategy has changed, fix things

@@ -158,6 +158,10 @@ main (
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mail_active_file ();
 #endif
+
+	/*
+	 * Initialise active[] and add new newsgroups to start of my_group[]
+	 */
 	read_news_active_file ();
 	debug_print_active();
 
@@ -198,38 +202,46 @@ main (
 	}
 
 	/*
-	 *  Read text descriptions for mail & news groups from
-	 *  ~/.tin/mailgroups & NEWSLIBDIR/newsgroups respectively
+	 *  Read text descriptions for mail and/or news groups
 	 */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
 #endif
 	read_newsgroups_file ();
 
-	if (create_mail_save_dirs ()) {
+	if (create_mail_save_dirs ())
 		write_config_file (local_config_file);
-	}
 
+	/*
+	 * Preloads active[] with command line groups. They will follow any
+	 * new newsgroups
+	 */
 	num_cmd_line_groups = read_cmd_line_groups ();
-
+/* TODO - do we want cmd line groups b4 or after newsrc group ? */
 #ifdef INDEX_DAEMON
 	vMakeActiveMyGroup ();
 #else
 	backup_newsrc ();
-/*	read_newsrc (newsrc, num_cmd_line_groups ? 0 : 1);*/
-	/* As a one-off, we append groups here so that New newsgroup are kept */
+
+	/*
+	 * Load my_groups[] from the .newsrc file. We append these groups to any
+	 * new newsgroups and command line newsgroups already loaded
+	 */
 	read_newsrc (newsrc, 0);
+
 	if (!num_cmd_line_groups)
 		toggle_my_groups (show_only_unread_groups, "");
 #endif
 
-	if (count_articles && !newsrc_active) {
 	/*
-	** what is count_articles good for?
-	** if running in batch-mode (-Z) -v gives a summary!
-	*/
+	 * This updates the min/max/unread counters for all subscribed groups using
+	 * 'correct' data from spool or NNTP GROUP rather than less reliable data
+	 * from the active file. Normally this only happens when entering a
+	 * group, as it takes longer.
+	 * if running in batch-mode (-Z) -v gives a summary!
+	 */
+	if (count_articles && !newsrc_active)
 		vGrpGetSubArtInfo ();
-	}
 
 	/*
 	 *  Check/start if any new/unread articles
@@ -795,6 +807,10 @@ show_intro_page (void)
 	}
 }
 
+/*
+ * Wildcard match any newsgroups on the command line and autosubscribe to them
+ * They are _not_ subscribed in the .newsrc file, only online
+ */
 
 int
 read_cmd_line_groups (void)
@@ -805,7 +821,7 @@ read_cmd_line_groups (void)
 	register int i;
 
 	if (num_cmdargs < max_cmdargs) {
-		group_top = 0;
+		SKIP_NEWGROUPS;			/* Position group_top after any newgroups */
 
 		for (num = num_cmdargs ; num < max_cmdargs ; num++) {
 			sprintf (buf, txt_matching_cmd_line_groups, cmdargs[num]);
@@ -813,7 +829,7 @@ read_cmd_line_groups (void)
 
 			for (i = 0 ; i < num_active ; i++) {
 				if (wildmat (active[i].name, cmdargs[num])) {
-					if (add_my_group (active[i].name, 1) != -1) {
+					if (my_group_add (active[i].name) != -1) {
 						active[i].subscribed = TRUE;
 						matched++;
 					}

@@ -34,7 +34,7 @@ static void auto_subscribe_groups (char *newsrc_file);
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
  *  active[] entries.
  *  If allgroups is set, then my_group[] is completely overwritten,
- *  otherwise, groups are appended to the current my_group[]
+ *  otherwise, groups are appended
  */
 void
 read_newsrc (
@@ -53,7 +53,7 @@ read_newsrc (
 		group_top = 0;
 
 	/*
-	 * make a .newsrc if one does'nt exist & auto subscribe to set groups
+	 * make a .newsrc if one doesn't exist & auto subscribe to set groups
 	 */
 	if (!stat_file (newsrc_file)) {
 		create_newsrc (newsrc_file);
@@ -72,18 +72,15 @@ read_newsrc (
 			seq = pcParseNewsrcLine (line, grp, &sub);
 
 			if (sub == SUBSCRIBED) {
-/* TODO !!! - ponder carefully ramifications of changing 'allgroups' to '1' in
- * the following line !!!
- * shouldn't make any difference - only had effect if cmd line groups
- * supplied, these are added by read_cmd_line_groups, so duplicate won't
- * make any difference ??
+/* TODO used to be my_group_find() if command line groups supplied.
+ *      Since cmd line groups are completely broken, so what !
  */
-				if ((i = add_my_group (grp, 1)) >= 0) {
+				if ((i = my_group_add (grp)) >= 0) {
 					active[my_group[i]].subscribed = SUB_BOOL(sub);
 					parse_bitmap_seq (&active[my_group[i]], seq);
 				} else {
-/*TODO - fake an entry - mark as deletion material ? */
-					fprintf(stderr, "Bogus %s in .newsrc, not in active\n", grp);
+/* TODO - create dummy group and mark as Deleteable ? */
+					fprintf(stderr, "\nBogus %s in .newsrc, not in active", grp);
 				}
 			}
 			free (line);
@@ -113,7 +110,6 @@ vWriteNewsrcLine (
 	}
 	psGrp = psGrpFind (grp);
 
-/* 	if ((psGrp && psGrp->newsrc.present) && !(!psGrp->subscribed && strip_newsrc)) {*/
  	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
@@ -1074,7 +1070,6 @@ catchup_newsrc_file (
 			}
 			for (i = 0 ; i < group_top ; i++) {
 
-/* 				if (!(!active[my_group[i]].subscribed && strip_newsrc)) {*/
  				if (active[my_group[i]].subscribed || !strip_newsrc) {
  					fprintf (fp, "%s%c 1-%ld\n",
  						active[my_group[i]].name,

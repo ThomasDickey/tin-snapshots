@@ -1,3 +1,22 @@
+--unoff BETA release 970212 --
+
+313) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. New newsgroups were broken with -n
+     BUG. unYank didn't honour show_only_unread_groups
+     BUG. $ didn't always skip to last article correctly
+     ADD. cleanup/fixes from 309)
+     ADD. code-cleanup
+     FIX. cut down some compiler noise
+     FIX. several supplied patches
+
+312) Sven Paulus <sven@oops.sub.de>
+     ADD. systemtype to X-Newsreader
+     FIX. extern.h, init.c, post.c
+
+311) Volker Barthelmann <volker@vb.franken.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
 --unoff BETA release 970206 --
 
 310) Sven Paulus <sven@oops.sub.de>

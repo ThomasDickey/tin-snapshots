@@ -170,13 +170,14 @@ nntp_close (void)
 /*
  * Open the mail active file locally
  */
-
+#ifdef HAVE_MAIL_MH_HANDLING
 FILE *
 open_mail_active_fp (
 	char *mode)
 {
 	return fopen (mail_active_file, mode);
 }
+#endif
 
 /*
  * Open the news active file locally or send the LIST command via NNTP
@@ -341,12 +342,13 @@ open_subscription_fp (void)
 /*
  *  Open mail groups description file.
  */
-
+#ifdef HAVE_MAIL_MH_HANDLING
 FILE *
 open_mailgroups_fp (void)
 {
 	return fopen (mailgroups_file, "r");
 }
+#endif
 
 /*
  * If reading via NNTP, allow the special case where the user's telling us to

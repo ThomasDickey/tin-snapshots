@@ -3357,11 +3357,23 @@ checknadd_headers (
 					}
 					if (!no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
+				#ifdef HAVE_SYS_UTSNAME_H
+							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s %s]\n\n",
+								 OS, VERSION, RELEASEDATE, 
+								 system_info.machine, system_info.sysname, system_info.release);
+				#else
 							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
+				#endif
 						} else {
+				#ifdef HAVE_SYS_UTSNAME_H
+							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s %s]\n\n",
+								 OS, VERSION, RELEASEDATE, 
+								 system_info.machine, system_info.sysname, system_info.release);
+				#else
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
+				#endif
 						}
 					} else {
 						fprintf (fp_out, "\n");

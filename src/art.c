@@ -395,6 +395,8 @@ thread_by_subject(void)
 		/* 
 		 * Yehova: casting char * to int *
 		 * FIXME!! 
+		 * I think this can be fixed by declaring t_hashnode to properly
+		 * include these 'hidden' fields. See hashstr.c
 		 */
 		aptr = (int *)arts[i].subject;
 		aptr -=2;
@@ -1207,7 +1209,7 @@ pcFindNovFile (
 			} else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);
 				sprintf (acNovFile, "%s/%s", acBuf, OVERVIEW_FILE);
-				if (iMode == R_OK) {
+				if (iMode == R_OK || iMode == W_OK /*vb*/) {
 					if (access (acNovFile, iMode) == 0) {
 						overview_index_filename = TRUE;
 					}

@@ -276,7 +276,7 @@ end_of_list:
 					break;
 				}
 				if (index_point != top_base - 1) {
-					if (top_base - 1 > last_subj_on_screen) {
+					if (top_base - 1 >= last_subj_on_screen) {
 						erase_subject_arrow ();
 						index_point = top_base - 1;
 						show_group_page ();
