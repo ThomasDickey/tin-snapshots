@@ -19,6 +19,10 @@
 				 * so leave this off
 				 */
 
+#define MIME_ALWAYS_ENCODE_EQUAL /* make sure such funny subjects like
+				  * =?ISO-8859-1?Q?T=E4st?= work.
+				  */
+
 #ifndef RFCDEBUG
 #include "tin.h"
 #else
@@ -42,7 +46,12 @@
 #endif /* RFCDEBUG */
 
 /* NOTE: these routines expect that MM_CHARSET is set to the charset
-   your system is using.  If it is not defined, US-ASCII is used. */
+   your system is using.  If it is not defined, US-ASCII is used.
+   Can be overridden by setting MM_CHARSET as environment variable. */
+
+#ifndef MM_CHARSET
+#define MM_CHARSET "US-ASCII"
+#endif
 
 char mm_charset[128] = "";
 const char base64_alphabet[64] = {
@@ -159,7 +168,7 @@ get_mm_charset()
 
 	if (!mm_charset[0]) {
 		c=getenv("MM_CHARSET");
-		if (!c) strcpy(mm_charset,"US-ASCII");
+		if (!c) strcpy(mm_charset,MM_CHARSET);
 		else {
 			strncpy(mm_charset,c,128);
 			mm_charset[127]='\0';
@@ -247,6 +256,9 @@ contains_nonprintables(w)
 	/* then check the next word */
 	while (*w&&!isspace(*w)&&*w!='('&&*w!=')') {
 		if (*w<32||*w>127) nonprint=1;
+#ifdef MIME_ALWAYS_ENCODE_EQUAL
+		if (*w=='=') nonprint=1;
+#endif
 #ifdef MIME_BASE64_ALLOWED
 		if (*w=='=') equalsigns++;
 		chars++;
