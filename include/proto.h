@@ -336,6 +336,8 @@ extern int reread_active_after_posting P_((void));
 extern t_bool user_posted_messages P_((void));
 extern void checknadd_headers P_((char *infile, int lines));
 extern void quick_post_article P_((void));
+extern int count_postponed_articles P_((void));
+extern int pickup_postponed_articles P_((int ask));
 
 /* prompt.c */
 extern int prompt_num P_((int ch, char *prompt));
@@ -476,7 +478,7 @@ extern int strcasecmp P_((/* const */ char *p, /* const */ char *q));
 extern int strncasecmp P_((/* const */ char *p, /* const */ char *q, size_t n));
 #endif
 #ifndef HAVE_ATOL
-extern long atol P_((char *s));
+extern long atol P_((/* const */ char *s));
 #endif
 #ifndef HAVE_STRPBRK
 extern char *strpbrk P_((char *str1, char *str2));

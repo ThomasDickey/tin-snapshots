@@ -111,7 +111,7 @@ static	TTY _raw_tty, _original_tty;
 #		define USE_SGTTY 1
 #	endif
 #else
-#	ifndef SYSV
+#	if !defined(SYSV) && !defined(M_AMIGA)
 #		ifdef MINIX
 #			include <sgtty.h>
 #			define USE_SGTTY 1

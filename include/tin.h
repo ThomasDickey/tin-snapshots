@@ -326,8 +326,9 @@ extern char *get_uaf_fullname();
 #		else
 #			ifdef M_AMIGA
 #				define	NEWSLIBDIR	"uulib:"
-#			endif
-#			define	NEWSLIBDIR	"/usr/lib/news"
+#			else
+#				define	NEWSLIBDIR	"/usr/lib/news"
+#			endif /* M_AMIGA */
 #		endif /* VMS */
 #	endif /* !NEWSLIBDIR */
 #	ifndef NOVROOTDIR
@@ -601,6 +602,7 @@ extern char *get_uaf_fullname();
 #define 	FILTER_FILE		"filter"
 #define 	GROUP_TIMES_FILE	"group.times"
 #define 	POSTED_FILE		"posted"
+#define 	POSTPONED_FILE		"postponed.articles"
 #define 	DEFAULT_MAILDIR 	"Mail"
 #define 	DEFAULT_SAVEDIR 	"News"
 #define 	MAILGROUPS_FILE 	"mailgroups"
@@ -1692,6 +1694,12 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 
 typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
+
+#ifdef M_AMIGA
+	typedef	struct __tcpbuf TCP;
+#else
+	typedef	FILE	TCP;
+#endif /* M_AMIGA */
 
 #include	"extern.h"
 #include	"nntplib.h"

@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-970123 (Thu Jan 23 22:06:52 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970124 (Sat Jan 25 00:51:10 MET 1997)
 ----------------------------------------------------
-  62305 ./CHANGES
+  62749 ./CHANGES
   14368 ./TODO
    5499 ./Makefile
   17319 ./INSTALL
@@ -17,72 +17,72 @@ MANIFEST for tin-1.3-unoff-BETA-970123 (Thu Jan 23 22:06:52 MET 1997)
   12018 ./doc/auth.txt
    1727 ./doc/hashing.doc
   71521 ./doc/tin.1
-   2545 ./include/amiga.h
-   2131 ./include/amigatcp.h
-   8379 ./include/config.h
-  42382 ./include/extern.h
-  12952 ./include/menukeys.h
+   2551 ./include/amiga.h
+   2101 ./include/amigatcp.h
+   8543 ./include/config.h
+  42566 ./include/extern.h
+  13092 ./include/menukeys.h
     718 ./include/msmail.h
    4828 ./include/nntplib.h
    2233 ./include/os_2.h
-  23334 ./include/proto.h
+  23446 ./include/proto.h
    1443 ./include/stpwatch.h
-  45071 ./include/tin.h
+  45233 ./include/tin.h
     889 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
   18946 ./src/active.c
    8883 ./src/actived.c
-  13024 ./src/amiga.c
+  13041 ./src/amiga.c
    4429 ./src/amigatcp.c
   37236 ./src/art.c
   22774 ./src/attrib.c
    8460 ./src/charset.c
    5410 ./src/color.c
   59014 ./src/config.c
-  20493 ./src/curses.c
+  20520 ./src/curses.c
   12686 ./src/debug.c
    2349 ./src/envarg.c
   19699 ./src/feed.c
   40310 ./src/filter.c
   10935 ./src/getline.c
-  41370 ./src/group.c
+  41513 ./src/group.c
    3202 ./src/hashstr.c
    9529 ./src/help.c
   12222 ./src/inews.c
-  30339 ./src/init.c
+  30476 ./src/init.c
     968 ./src/joinpath.c
-  56870 ./src/lang.c
+  57469 ./src/lang.c
    3629 ./src/list.c
   11291 ./src/mail.c
-  19860 ./src/main.c
+  20123 ./src/main.c
    8323 ./src/makecfg.c
    9643 ./src/memory.c
   45241 ./src/misc.c
    7228 ./src/msmail.c
   33659 ./src/newsrc.c
-  25325 ./src/nntplib.c
+  25306 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6257 ./src/nrctbl.c
   29550 ./src/open.c
    6242 ./src/os_2.c
-  35572 ./src/page.c
+  35732 ./src/page.c
   24102 ./src/parsdate.y
    6631 ./src/pgp.c
-  77380 ./src/post.c
+  87916 ./src/post.c
    9937 ./src/prompt.c
     160 ./src/proto.sed
   22562 ./src/refs.c
   11236 ./src/rfc1521.c
   16428 ./src/rfc1522.c
   34304 ./src/save.c
-   4573 ./src/screen.c
+   4576 ./src/screen.c
   10133 ./src/search.c
-  35730 ./src/select.c
+  35944 ./src/select.c
    5667 ./src/sigfile.c
   12463 ./src/signal.c
    5772 ./src/strftime.c
-   6680 ./src/string.c
+   6685 ./src/string.c
   27400 ./src/thread.c
    4131 ./src/wildmat.c
   12575 ./src/win32.c
@@ -90,11 +90,11 @@ MANIFEST for tin-1.3-unoff-BETA-970123 (Thu Jan 23 22:06:52 MET 1997)
    4723 ./src/xref.c
    5552 ./src/vms.c
    4987 ./amiga/README
-   9218 ./amiga/smakefile
+   9257 ./amiga/smakefile
    4987 ./amiga/actived.c
    7539 ./include/autoconf.hin
   11511 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3768 ./src/tincfg.tbl
-1652386 insgesamt
+1665692 insgesamt

@@ -33,9 +33,9 @@ GSTFILE  = $(AMIDIR)/tin.gst
 #
 
 /*vb*/
-#SCOPTIONS = strmer data=near parms=register nover errrexx ignore=93,104,105 \
+#SCOPTIONS = strmer data=near parms=register nover errrexx ignore=85,93,104,105 \
 #                    idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) cpu=$(CPU)
-SCOPTIONS = strmer nover ignore=93,104,105 \
+SCOPTIONS = strmer nover ignore=85,93,104,105 \
  idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) data=far
 
 # comment the next two lines, for the final release
@@ -54,8 +54,9 @@ GSTDEFS    = def __USE_SYSBASE
 
 # read the docs (/INSTALL & /doc/HACKERS) for compiler defines
 
-DEFINES   = def M_AMIGA def SYSV def NO_SHELL_ESCAPE def NO_PIPING \
+DEFINES   = def M_AMIGA def NO_SHELL_ESCAPE def NO_PIPING \
  def LIBDIR="uulib:" def DONT_LOG_USER def SPOOLDIR="uunews:" \
+ def HAVE_COLOR def HAVE_REF_THREEADING \
  def DONT_REREAD_ACTIVE_FILE $(GSTDEFS) $(NNTPDEF) $(TINDDEF)
 
 # build the final compile and link flags

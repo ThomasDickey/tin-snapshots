@@ -29,7 +29,6 @@ char	last_put[NNTP_STRLEN];
 #ifdef M_AMIGA
 #	include "amigatcp.h"
 #else
-	typedef	FILE	TCP;
 #	define	s_printf	fprintf
 #	define	s_fdopen	fdopen
 #	define	s_flush	fflush

@@ -1,3 +1,18 @@
+--unoff BETA release 970124 --
+
+298) Volker Berthelmann <volker@vb.franken.de>
+     ADD. even more AMIGA port
+     FIX. several supplied patches
+
+297) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. nntp_wr/rd had wrong type
+     FIX. tin.h, extern.h, nntplib.c
+
+296) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. abillity to postpone articles
+     ADD. detection of whitespaces in Followup-To:-line
+     FIX. several supplied patches
+
 --unoff BETA release 970123 --
 
 295) Volker Berthelmann <volker@vb.franken.de>

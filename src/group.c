@@ -1051,6 +1051,12 @@ group_list_thread:
 				}
 				break;
 
+			case iKeyGroupPostponed:	/* post postponed article */
+				if(pickup_postponed_articles(FALSE)) {
+					show_group_page ();
+				}
+				break;
+
 			case iKeyGroupDisplayPostHist:	/* display messages posted by user */
 				if (user_posted_messages ()) {
 					show_group_page ();

@@ -71,9 +71,9 @@ extern FILE *popen (char *command, char *mode);
 extern int pclose (FILE *pipe);
 
 extern unsigned int sleep(unsigned int secs);
-extern int tputs (char *cp, int count, int (*outc)(int));
+extern int tputs (char *cp, int count, void (*outc)(int));
 extern int getpid(void);
-extern int setenv(char *, char *);
+extern int setenv(char *, char *, int);
 extern char *mktemp(char *);
 extern unsigned short umask(unsigned short);
 

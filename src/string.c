@@ -287,13 +287,13 @@ strstr (text, pattern)
 /*
 ** handrolled atol
 */
-long
+long int
 atol (s)
-	char *s;
+	/* const */ char *s;
 {
 	long ret = 0;
 	while (*s) {
-		if (*s >= '0' && *s <= '9')
+		if (isdigit(*s))
 			ret = ret * 10 + (*s - '0');
 		else
 			return -1;

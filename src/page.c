@@ -661,6 +661,12 @@ return_to_index:
 				}
 				break;
 
+			case iKeyPagePostponed:	/* post postponed article */
+				if (pickup_postponed_articles (FALSE)) {
+					redraw_page (group->name, respnum);
+				}
+				break;
+
 			case iKeyPagePostHist:	/* display messages posted by user */
 				if (user_posted_messages ()) {
 					redraw_page (group->name, respnum);

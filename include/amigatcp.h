@@ -50,8 +50,6 @@ struct __tcpbuf
 #define TIO_WRITE	1
 #define	TIO_READ	2
 
-typedef struct __tcpbuf TCP;
-
 extern int	s_printf(TCP *, const char *, ...);
 extern TCP	*s_fdopen(int, const char *);
 extern int	s_flush(TCP *);

@@ -81,6 +81,7 @@ char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
+char postponed_articles_file[PATH_LEN];	/* ~/.tin/postponed.articles file */
 char progname[PATH_LEN];		/* program name */
 char quote_chars[PATH_LEN];	/* quote chars for posting/mails ": " */
 char rcdir[PATH_LEN];
@@ -644,6 +645,7 @@ void init_selfinfo ()
 #endif
 	joinpath (posted_info_file, rcdir, POSTED_FILE);
 	joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
+	joinpath (postponed_articles_file, rcdir, POSTPONED_FILE);
 	joinpath (save_active_file, rcdir, ACTIVE_SAVE_FILE);
 	joinpath (subscriptions_file, libdir, SUBSCRIPTIONS_FILE);
 

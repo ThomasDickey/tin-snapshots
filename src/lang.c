@@ -106,10 +106,14 @@ constext txt_error_header_and_body_not_separate[] = "Error: No blank line found 
 constext txt_error_header_line_blank[] = "Error: Article starts with blank line instead of header\n\n";
 constext txt_error_header_line_colon[] = "Error: Header on line %d does not have a colon after the header name:\n%s\n\n";
 constext txt_superseding_art[] = "Superseding article...";
-constext txt_error_header_line_comma[] = "Error: the \"Newsgroups:\" line has spaces in it that MUST be removed. The\n\
+constext txt_error_header_line_comma[] = "Error: the \"%s:\" line has spaces in it that MUST be removed. The\n\
 only allowable space is the one separating the colon (:) from the contents.\n\
 Use a comma (,) to separate multiple newsgroup names.\n\n";
 constext txt_error_header_line_empty_newsgroups[] = "Error: the \"Newsgroups:\" line lists no newsgroups.\n\n";
+constext txt_error_header_line_groups_contd[] =
+"Error: The \"%s:\" line is continued in the next line. Since the line\n\
+may not contain whitespace, this is not allowed. Please write all groups\n\
+into a single line.\n\n";
 constext txt_error_header_line_missing_newsgroups[] = "Error: the \"Newsgroups:\" line is missing from the articles header.\n\n";
 constext txt_error_header_line_missing_subject[] = "Error: the \"Subject:\" line is missing from the articles header.\n\n";
 constext txt_error_header_line_missing_target[] = "Error: the \"To:\" line is missing from the articles header.\n\n";
@@ -663,6 +667,10 @@ constext txt_post_process_type[] = "Process n)one, s)har, u)ud, l)ist zoo, e)xt 
 
 constext txt_post_a_followup[] = "Post a followup...";
 constext txt_post_an_article[] = "Post an article...";
+constext txt_post_error_ask_postpone[]=
+"An error has occurred while posting the article. If you think that this\n\
+error is temporary or otherwise correctable, you can postpone the article\n\
+and pick it up again with ^O later.\n";
 constext txt_post_history_menu[] = "Posted articles history (page %d of %d)";
 constext txt_post_newsgroup[] = "Post newsgroup> ";
 constext txt_post_newsgroups[] = "Post to newsgroup(s) [%s]> ";
@@ -681,25 +689,26 @@ constext txt_quit_no_write[] = "Do you really want to quit without saving your c
 
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
-constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, g) pgp, p)ost: ";
+constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, g) pgp, p)ost, p(o)stpone: ";
 constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost [%.*s]: %c";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost, p(o)stpone [%.*s]: %c";
 #else
-constext txt_quit_edit_post[] = "q)uit, e)dit, g) pgp, p)ost: ";
+constext txt_quit_edit_post[] = "q)uit, e)dit, g) pgp, p)ost, p(o)stpone: ";
 constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost [%.*s]: %c";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost, p(o)stpone [%.*s]: %c";
 #endif /* HAVE_ISPELL */
 #else
 #ifdef HAVE_ISPELL
-constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, p)ost: ";
+constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, p)ost, p(o)stpone: ";
 constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost [%.*s]: %c";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost, p(o)stpone [%.*s]: %c";
 #else
-constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost: ";
+constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost, p(o)stpone: ";
 constext txt_quit_edit_send[] = "q)uit, e)dit, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost, p(o)stpone [%.*s]: %c";
 #endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */
+constext txt_quit_postpone[] = "q)uit, p(o)stpone: ";
 
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to more than one newsgroup!\n\n";
