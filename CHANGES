@@ -1,3 +1,19 @@
+--unoff BETA release 960930 --
+
+177) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
+     ADD. free_all_arrys() call to reduce 'meomry'-leaks
+     FIX. main.c
+
+176) Thomas E. Dickey <dickey@clark.net>
+     ADD. systemtype check before using cached configure values to prevent
+          using them on the wrong plattform
+     FIX. aclocale.m4, configure.in, init.c
+
+175) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. when NNTP_ONLY default $INEWSDIR contained a trailing slash
+     ADD. minor code cleanup
+     FIX. configure.in, debug.c
+
 --unoff BETA release 960927 --
 
 174) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
