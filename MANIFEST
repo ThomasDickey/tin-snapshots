@@ -1,20 +1,20 @@
-MANIFEST for tin-1.4.5 (Mon Dec 18 16:35:49 CET 2000)
+MANIFEST for tin-1.4.5 (Mon Apr  9 18:08:21 CEST 2001)
 ----------------------------------------------------
   10365 ./Makefile
-   5413 ./MANIFEST
+   5414 ./MANIFEST
    1690 ./README
    2209 ./README.VMS
    1543 ./README.WIN
   65711 ./aclocal.m4
     801 ./conf-tin
-  36344 ./config.guess
-  26726 ./config.sub
+  39238 ./config.guess
+  27590 ./config.sub
  253090 ./configure
   20916 ./configure.in
    4765 ./install.sh
   11873 ./makefile.in
     777 ./mkdirs.sh
-   6703 ./doc/CHANGES
+   6721 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
   30564 ./doc/INSTALL
@@ -36,7 +36,7 @@ MANIFEST for tin-1.4.5 (Mon Dec 18 16:35:49 CET 2000)
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
     564 ./include/bool.h
-    966 ./include/bugrep.h
+    968 ./include/bugrep.h
    8556 ./include/config.h
   46686 ./include/extern.h
   13172 ./include/menukeys.h
@@ -70,7 +70,7 @@ MANIFEST for tin-1.4.5 (Mon Dec 18 16:35:49 CET 2000)
   10143 ./src/inews.c
   34710 ./src/init.c
    1447 ./src/joinpath.c
-  90839 ./src/lang.c
+  90840 ./src/lang.c
    3011 ./src/list.c
   10764 ./src/mail.c
   23773 ./src/main.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.5 (Mon Dec 18 16:35:49 CET 2000)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3274679 total
+3278459 total
