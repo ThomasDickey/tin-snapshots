@@ -453,7 +453,7 @@ page_up:
 				break;
 
 			case iKeyPageDelete:	/* delete an article */
-				if (delete_article (group, &arts[respnum])) {
+				if (delete_article (group, &arts[respnum], respnum)) {
 					redraw_page (group->name, respnum);
 				}
 				break;

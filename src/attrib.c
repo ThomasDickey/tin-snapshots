@@ -702,7 +702,7 @@ write_attributes_file (file)
 #endif	/* INDEX_DAEMON */
 }
 
-#ifdef 0
+#if 0
 void
 debug_print_filter_attributes ()
 {
