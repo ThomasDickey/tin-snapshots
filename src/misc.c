@@ -1411,7 +1411,7 @@ get_author (thread, art, str)
 			break;
 		case SHOW_FROM_BOTH:
 			if (art->name) {
-				sprintf (str, "%s (%s)", art->name, art->from);
+				sprintf (str, "%s <%s>", art->name, art->from);
 			} else {
 				strcpy (str, art->from);
 			}

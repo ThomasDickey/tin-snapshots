@@ -47,9 +47,6 @@
 #ifdef VMS
 #	define NNTP_ONLY
 #	define NNTP_INEWS
-#	ifdef	LOG_USER
-#		undef	LOG_USER
-#	endif /* LOG_USER */
 #	define DONT_HAVE_PIPING
 #	define NO_SHELL_ESCAPE
 #	define USE_CLEARSCREEN
@@ -579,14 +576,6 @@ extern char *get_uaf_fullname();
 #endif
 
 /*
- * Useful for logging user usage
- */
-
-#ifdef LOG_USER
-#	define 	LOG_USER_FILE	".tin_log"
-#endif /* LOG_USER */
-
-/*
  * Should active file be reread for new news & if so how often
  */
 
@@ -640,7 +629,7 @@ extern char *get_uaf_fullname();
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
-#define		NEWSRCTABLE_FILE	"newsrctable"
+#define	NEWSRCTABLE_FILE	"newsrctable"
 /* NEWNEWSRC_FILE will actually be .newnewsrc<pid> if SINGLETASKING is not
    defined */
 #define 	NEWNEWSRC_FILE		".newnewsrc"
@@ -689,12 +678,13 @@ extern char *get_uaf_fullname();
 #	define	LEN			1024
 #endif
 #define		NEWSRC_LINE		8192
-#define		OVERVIEW_LINE		4096
-#ifdef HAVE_MAIL_HANDLER
+
+#ifdef HAVE_MAIL_HANDLER	/* what is that? */
 #	define	HEADER_LEN		2048
 #else
 #	define	HEADER_LEN		1024
 #endif
+
 #define 	MODULO_COUNT_NUM	10
 #define 	TABLE_SIZE		1409
 #define 	MAX_PAGES		1000
@@ -900,10 +890,6 @@ extern char *get_uaf_fullname();
 #define 	GRP_CONTINUE		-4		/* set in show_page() */
 #define 	GRP_NOREDRAW		-5		/* Unclear meaning ? */
 #define 	GRP_KILLED		-6		/* thread was killed at art level */
-
-/*
- *
- */
 
 #define 	EXIT_OK 		0
 #define 	EXIT_ERROR		1

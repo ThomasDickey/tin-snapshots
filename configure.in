@@ -334,12 +334,6 @@ CF_ARG_ENABLE(forgery,
 	[AC_DEFINE(FORGERY)])
 AC_MSG_RESULT($enableval)
 
-AC_MSG_CHECKING(whether to enable user-statistic logfile)
-CF_ARG_ENABLE(log-user,
-	[  --enable-log-user       log statistic],
-	[AC_DEFINE(LOG_USER)])
-AC_MSG_RESULT($enableval)
-
 ###	checks for operator characteristics (should be the last option)
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,

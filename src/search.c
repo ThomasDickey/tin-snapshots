@@ -93,7 +93,7 @@ search_author (the_index, current_art, forward)
 		if (arts[i].name == (char *) 0) {
 			str_lwr (arts[i].from, buf2);
 		} else {
-			sprintf (msg, "%s (%s)", arts[i].from, arts[i].name);
+			sprintf (msg, "%s <%s>", arts[i].name, arts[i].from);
 			str_lwr (msg, buf2);
 		}
 

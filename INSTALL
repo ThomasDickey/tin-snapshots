@@ -6,19 +6,19 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following Makefile & ./include/tin.h defines are documented in detail:
 ---------------------------------------------------------------------------
-  DEBUG                      HAVE_REF_THREADING         NNTP_ABLE
-  DEFAULT_ISO2ASC            HAVE_SELECT                NNTP_DEFAULT_SERVER
-  DONT_HAVE_PIPING           HAVE_SETREUID              NNTP_INEWS
-  DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_ONLY
-  HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NNTP_SERVER_FILE
-  HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NOVROOTDIR
-  HAVE_ISPELL                INDEX_DAEMON               NO_POSTING
-  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_REGEX
-  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_SHELL_ESCAPE
-  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SMALL_MEMORY_MACHINE
-  HAVE_MMDF_MAILER           LOG_USER                   SPOOLDIR
-  HAVE_POLL                  NETLIBS                    USE_INN_NNTPLIB
-  HAVE_POSIX_JC              NEWSLIBDIR                 USE_INVERSE_HACK
+  DEBUG                      HAVE_REF_THREADING         NNTP_DEFAULT_SERVER
+  DEFAULT_ISO2ASC            HAVE_SELECT                NNTP_INEWS
+  DONT_HAVE_PIPING           HAVE_SETREUID              NNTP_ONLY
+  DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_SERVER_FILE
+  HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NOVROOTDIR
+  HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NO_POSTING
+  HAVE_ISPELL                INDEX_DAEMON               NO_REGEX
+  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_SHELL_ESCAPE
+  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          SMALL_MEMORY_MACHINE
+  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SPOOLDIR
+  HAVE_MMDF_MAILER           NETLIBS                    USE_INN_NNTPLIB
+  HAVE_POLL                  NEWSLIBDIR                 USE_INVERSE_HACK
+  HAVE_POSIX_JC              NNTP_ABLE
 
 News machine names
 ------------------
@@ -256,12 +256,6 @@ by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for
 logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
 BASE and NNTP.
 
-
-LOG_USER
-Log user-name & info to /tmp/.tin_log for usage statistics. If reading via
-NNTP the NNTP XUSER extended command will log user info to NNTP server.
-If -DNNTP_XUSER is defined it will define LOG_USER automatically.
-
 DONT_HAVE_PIPING
 Define if your system does not support piping of articles to shell commands.
 
@@ -422,6 +416,8 @@ Compiled & installed on the following machines:
 	with SCO OpenServer Development System (ver 5.0.0a)
 
 12)     i386 & XENIX 2.3.3 with gcc 1.37.1
+
+13)	NeXT Computer & NeXTSTEP 3.3 with gcc 2.5.8
 
 *1)     (If anyone knows about a FreeBSD for the VAX, please contact
          urs@akk.uni-karlsruhe.de - Ultrix 4.0 is horrible)

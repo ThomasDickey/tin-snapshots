@@ -47,6 +47,7 @@ extern void do_update P_((void));
 extern void set_article P_((struct t_article *art));
 extern int input_pending P_((void));
 extern int valid_artnum P_((long art));
+extern char *regrettably_named_safe_fgets P_((FILE *f));
 
 /* attrib.c */
 extern void set_default_attributes P_((struct t_attribute *psAttrib));
@@ -363,7 +364,6 @@ extern int setup_hard_base P_((struct t_group *group, char *group_path));
 extern int get_respcode P_((void));
 extern int stuff_nntp P_((char *fnam));
 extern FILE *nntp_to_fp P_((void));
-extern void log_user P_((void));
 extern void authorization P_((char *server, char *authuser));
 extern void vGrpGetSubArtInfo P_((void));
 extern void vGrpGetArtInfo P_((char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin));

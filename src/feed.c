@@ -705,8 +705,8 @@ print_file (command, respnum, count)
 			arts[respnum].name == (char *) 0) {
 			fprintf (fp, "From: %s\n", arts[respnum].from);
 		} else {
-			fprintf (fp, "From: %s (%s)\n",
-				arts[respnum].from, arts[respnum].name);
+			fprintf (fp, "From: %s <%s>\n",
+				arts[respnum].name, arts[respnum].from);
 		}
 		fprintf (fp, "Subject: %s\n", note_h_subj);
 		fprintf (fp, "Date: %s\n\n", note_h_date);

@@ -123,11 +123,6 @@ main (argc, argv)
 #endif
 
 	/*
-	 *  Log username info to local/central logfile (NNTP XUSER)
-	 */
-	log_user ();
-
-	/*
 	 *  Read message of the day file from newsadmin
 	 */
 	read_motd_file ();
@@ -272,11 +267,11 @@ main (argc, argv)
 #	ifdef M_AMIGA
 #		define OPTIONS "BcCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
 #	else
-#               ifdef HAVE_COLOR
-#		        define OPTIONS "acCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
-#               else
-#		        define OPTIONS "cCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
-#               endif
+#		ifdef HAVE_COLOR
+#			define OPTIONS "acCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
+#		else
+#			define OPTIONS "cCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
+#		endif
 #	endif
 #endif
 
@@ -456,10 +451,15 @@ read_cmd_line_options (argc, argv)
 		if (read_news_via_nntp)
 			get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
 		else {
+#if defined(NeXT)
+			char nodenamebuf[32];
+			(int) gethostname(&nodenamebuf, 32);
+			get_newsrcname(newsrc,nodenamebuf);
+#else
 			struct utsname uts;
-
-			(int) uname(&uts);
+			(int) uname(&uts);			
 			get_newsrcname(newsrc,uts.nodename);
+#endif
 		}
 	}
 
