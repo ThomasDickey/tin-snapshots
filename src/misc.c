@@ -1359,7 +1359,7 @@ str_str (text, pattern, patlen)
 	p = (unsigned char *) pattern + p1;
 	t = (unsigned char *) text + p1;
 	i = textlen - patlen;
-	for (;;) {
+	forever {
 		if (*p == *t && memcmp ((p - p1), (t - p1), p1) == 0)
 			return ((char *)t - p1);
 		j = delta[*t];
@@ -1992,8 +1992,8 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 				 * OK lookup the variable in the shells environment
 				 */
 				envptr = getenv (tbuf);
-				if (envptr == (char *) 0) {
-					strncpy(tbuf, defbuf, sizeof(tbuf)-1);
+				if (envptr == (char *) 0 || (*envptr == '\0')) {
+					strncpy(tbuf, defbuf, sizeof (tbuf)-1);
 				} else {
 					strncpy (tbuf, envptr, sizeof (tbuf)-1);
 				}

@@ -217,7 +217,7 @@ char *s_gets(char *str, int size, TCP *tp)
 	cp = str;
 	if (size == 0) return (char *)0;
 
-	for (;;) {
+	forever {
 		while(tp->cnt && size > 1) {
 			--tp->cnt;
 			--size;

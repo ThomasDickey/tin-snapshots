@@ -514,7 +514,8 @@ debug_print_active_hash ()
 	}
 	
 	for (i = 0; i < TABLE_SIZE; i++) {
-/*		printf ("HASH[%4d]  ", i);
+/*
+		printf ("HASH[%4d]  ", i);
 */
 
 		if (group_hash[i] == -1) {

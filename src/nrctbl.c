@@ -108,20 +108,29 @@ get_newsrcname (newsrc_name, nntpserver_name)
 	int	line_entry_counter;
 	char	name_found[PATH_LEN];
 	int 	found = 0;
+	int	do_cpy = 0;
 	
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
-		while ((fgets(line, sizeof(line), fp) != NULL) && (!found)) {
+		while ((fgets(line, sizeof(line), fp) != NULL) && (found != 1)) {
 			line_entry_counter = 0;
 
 			if (!strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL :line, " \t\n")) != NULL) {
 					line_entry_counter++;
 					
-					if ((line_entry_counter == 1) && (!strcasecmp(line_entry, nntpserver_name)))
+					if ((line_entry_counter == 1) && (! strcasecmp(line_entry, nntpserver_name))) {
 						found = 1;
+						do_cpy = 1;
+					}
 
-					if (line_entry_counter == 2)
+					if ((line_entry_counter ==1 ) && ((! strcasecmp(line_entry, "default")) || (! strcmp(line_entry,"*")))) {
+						found = 2;
+						do_cpy =1;
+					}
+					if (do_cpy && (line_entry_counter == 2)) {
 						strcpy(name_found, line_entry);
+						do_cpy = 0;
+					}
 				}
 			}			
 		}
