@@ -269,7 +269,7 @@ authinfo_original (
 	char *authuser,
 	t_bool startup)
 {
-	char *authpass, *ptr;
+	char *authpass;
 	char authusername[PATH_LEN];
 	char authpassword[PATH_LEN];
 	int ret = ERR_AUTHBAD, changed;
@@ -324,26 +324,42 @@ authinfo_original (
 	 * that the server doesn't want a password; so only ask for it if needed.
 	 */
 	if (!startup) {
-/*		int state; */
+#ifdef USE_CURSES
+		int state = RawState();
+#endif /* USE_CURSES */
+
 		wait_message (0, txt_auth_needed);
-#if 0
-		state = RawState();
+#ifdef USE_CURSES
 		Raw(TRUE);
-#endif /* 0 */
-		if (! prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
+#endif /* USE_CURSES */
+
+		if (!prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
 #endif /* DEBUG */
 			return FALSE;
 		}
-#if 0
-		clear_message ();
+
+#ifdef USE_CURSES
 		Raw(state);
-		printf ("\n");
-#endif /* 0 */
-		ptr = getpass (txt_auth_pass);
-		authpass = strncpy (authpassword, ptr, PATH_LEN);
+		my_printf ("%s", txt_auth_pass);
+		getnstr (authpassword, sizeof(authpassword));
+		Raw(TRUE);
+#else
+#	if 0
+		/*
+		 * on some systems (i.e. Solaris) getpass(3) is limited to 8 chars ->
+		 * we use tin_getline() till we have a config check
+		 * for getpass() or our won getpass()
+		 */
+		authpass = strncpy (authpassword, getpass (txt_auth_pass), PATH_LEN);
+#	else
+		authpass = strncpy (authpassword, tin_getline (txt_auth_pass, FALSE, (char *) 0, PATH_LEN, TRUE, HIST_OTHER), PATH_LEN);
+#	endif /* 0 */
+#endif /* USE_CURSES */
+
 		ret = do_authinfo_original (server, authuser, authpass);
+		my_retouch();			/* Get rid of the chaff */
 	}
 
 #ifdef DEBUG

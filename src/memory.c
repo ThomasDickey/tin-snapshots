@@ -171,7 +171,6 @@ free_all_arrays (
 #endif /* !USE_CURSES */
 
 	free_art_array ();
-
 	free_msgids ();
 
 	if (arts != (struct t_article *) 0) {
@@ -181,6 +180,11 @@ free_all_arrays (
 
 	free_all_filter_arrays();
 	free_active_arrays ();
+
+#ifdef HAVE_COLOR
+	FreeIfNeeded(quote_regex.re);
+	FreeIfNeeded(quote_regex.extra);
+#endif /* HAVE_COLOR */
 
 	if (base != (long *) 0) {
 		free ((char *) base);
@@ -378,7 +382,7 @@ my_malloc1 (
 #endif /* DEBUG */
 
 	if ((p = (char *) malloc (size)) == (char *) 0) {
-		error_message (txt_out_of_memory, progname, size, file, line);
+		error_message (txt_out_of_memory, tin_progname, size, file, line);
 		exit (EXIT_FAILURE);
 	}
 	return (void *) p;
@@ -400,7 +404,7 @@ my_realloc1 (
 	p = (char *) ((!p) ? (calloc (1, size)) : realloc (p, size));
 
 	if (p == (char *) 0) {
-		error_message (txt_out_of_memory, progname, size, file, line);
+		error_message (txt_out_of_memory, tin_progname, size, file, line);
 		exit (EXIT_FAILURE);
 	}
 	return (void *) p;

@@ -352,7 +352,7 @@ signal_handler (
 		default:
 			break;
 	}
-	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
+	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", tin_progname, signal_name(sig), sig);
 #if defined(SIGHUP)
 	if (sig == SIGHUP) {
 		dangerous_signal_exit = TRUE;

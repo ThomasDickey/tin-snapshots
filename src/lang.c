@@ -59,6 +59,7 @@ constext txt_batch_update_failed[] = "Failed to start background indexing proces
 constext txt_begin_of_art[] = "*** Beginning of article ***";
 constext txt_caching_disabled[] = "Overview caching not supported; Tin is setuid";
 constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
+constext txt_cannot_create[] = "Cannot create %s";
 constext txt_cannot_find_base_art[] = "Can't find base article %d";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
@@ -433,6 +434,11 @@ constext txt_help_prompt_followupto[] = "<SPACE> toggles, <CR> sets, <ESC> cance
 constext txt_help_q[] = "Q\t  quit" cCRLF;
 constext txt_help_quote_chars[] = "Enter quotation marks, %s or %S for author's initials.";
 constext txt_help_quote_empty_lines[] = "Quote empty lines. <SPACE> toggles & <CR> sets.";
+
+#ifdef HAVE_COLOR
+	constext txt_help_quote_regex[] = "A regex used to decide which lines to show in col_quote.";
+#endif /* HAVE_COLOR */
+
 constext txt_help_quote_signatures[] = "Quote signatures. <SPACE> toggles & <CR> sets.";
 constext txt_help_r[] = "r\t  toggle display of all/unread articles" cCRLF;
 constext txt_help_reread_active_file_secs[] = "Enter number of seconds until active file will be reread. <CR> sets.";
@@ -729,6 +735,11 @@ constext txt_opt_process_only_unread[] = "Process only unread articles       : "
 constext txt_opt_prompt_followupto[] = "Show empty Followup-To in editor   : ";
 constext txt_opt_quote_chars[] = "Characters used as quote-marks     : ";
 constext txt_opt_quote_empty_lines[] = "Quote empty lines                  : ";
+
+#ifdef HAVE_COLOR
+	constext txt_opt_quote_regex[] = "Regex used to show quoted lines    : ";
+#endif /* HAVE_COLOR */
+
 constext txt_opt_quote_signatures[] = "Quote signatures                   : ";
 constext txt_opt_reread_active_file_secs[] = "Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = "Save mail in MMDF style            : ";
@@ -789,6 +800,7 @@ constext txt_pcre_error_num[] = "Error in regex: pcre internal error %d";
 constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s";
 
 #ifdef HAVE_PGP
+	constext txt_pgp_add[] = "Add key(s) to public keyring? ";
 	constext txt_pgp_mail[] = "e)ncrypt, s)ign, b)oth, q)uit: ";
 	constext txt_pgp_news[] = "s)ign, i) sign & include public key, q)uit: ";
 	constext txt_pgp_not_avail[] = "PGP has not been set up for this account.";
@@ -810,10 +822,9 @@ constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s
 constext txt_plural[] = "s";
 constext txt_posted_info_file[] = "# Summary of mailed/posted messages viewable by 'W' command from within tin.\n";
 constext txt_prompt_unchanged_art[] = "Article unchanged, abort posting? (Y/n) ";
-constext txt_prompt_unchanged_bug[] = "Bugreport unchanged, abort sendig? (Y/n) ";
+constext txt_prompt_unchanged_bug[] = "Bugreport unchanged, abort sending? (Y/n) ";
 constext txt_prompt_see_postponed[] = "Do you want to see postponed articles (%d)? ";
 constext txt_repost[] = "Repost";
-constext txt_save[] = "Save";
 
 #ifdef HAVE_LIBUU
 	constext txt_libuu_saved[] = "%d files successfully written from %d articles. %d error%s occured." cCRLF;
@@ -1005,6 +1016,12 @@ constext txt_tinrc_prompt_followupto[] = "# If ON show empty Followup-To header 
 constext txt_tinrc_quote_chars[] = "# Characters used in quoting to followups and replys.\n\
 # '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
 constext txt_tinrc_quote_empty_lines[] = "# If ON quote empty lines, too\n";
+
+#ifdef HAVE_COLOR
+	constext txt_tinrc_quote_regex[] = "# A regular expression that tin will use to decide which lines are quoted when viewing articles\n\
+# Quoted lines are shown in col_quote. If you leave this blank, tin will use a builtin default.\n";
+#endif /* HAVE_COLOR */
+
 constext txt_tinrc_quote_signatures[] = "# If ON quote signatures, too\n";
 constext txt_tinrc_reread_active_file_secs[] = "# Time interval in seconds between rereading the active file\n";
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# If ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
@@ -1230,6 +1247,7 @@ constext txt_quit_edit_postpone[] = "q)uit, e)dit, p(o)stpone: ";
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
 constext txt_quoted_printable[] = "quoted-printable";
+constext txt_range_invalid[] = "Invalid range - valid are '0-9.$' eg. 1-$";
 constext txt_read_abort[] = "Do you want to abort this operation? (y/n): ";
 constext txt_read_exit[] = "Do you want to exit tin immediately ? (y/n): ";
 constext txt_read_resp[] = "Read response> ";
@@ -1261,9 +1279,11 @@ constext txt_resp_redirect[] = "Responses have been directed to the following ne
 constext txt_resp_to_poster[] = "Responses have been directed to poster. Mail/Post/Quit (m/p/q): ";
 constext txt_resp_x_of_n[] = "RespNo %3d of %3d" cCRLF;
 constext txt_at_s[] = " at %s";
+constext txt_save[] = "Save";
+constext txt_saved[] = "Saved %s...\n";
 constext txt_save_config[] = "Save configuration before continuing? (y/n): ";
 constext txt_save_filename[] = "Save filename [%s]> ";
-constext txt_saved[] = "-- %d Article%s saved --";
+constext txt_saved_arts[] = "-- %d Article%s saved --";
 constext txt_saved_nothing[] = "-- No unread articles: nothing saved! --";
 constext txt_saved_pattern_to[] = "-- Saved pattern to %s - %s --";
 constext txt_saved_to_mailbox[] = "-- Saved to mailbox %s --";
@@ -1336,7 +1356,7 @@ Some values in your configuration file have changed\nRead WHATSNEW, etc...\n";
 
 constext txt_warn_newsrc[] = "Warning: tin wrote less groups to your %s\n\
 than it read at startup. If you didn't unsubscribe from %ld group%s during\n\
-this session this indicates an error and you sould backup your %s\n\
+this session this indicates an error and you should backup your %s\n\
 before you start tin once again!\n";
 
 #ifdef FORGERY

@@ -66,7 +66,7 @@ extern void my_fputs(const char *str, FILE *stream);
 extern void my_fprintf(FILE *stream, const char *fmt, ...)
 #ifdef __GNUC__
 	__attribute__((format(printf,2,3)))
-#endif
+#endif /* __GNUC__ */
 	;
 extern void my_printf(const char *fmt, ...)
 #ifdef __GNUC__

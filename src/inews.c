@@ -279,7 +279,7 @@ submit_news_file (
 	char buf[LEN];
 	char *cp = buf;
 	int ret_code;
-	t_bool ismail=FALSE;
+	t_bool ismail = FALSE;
 
 	checknadd_headers (name);
 

@@ -17,10 +17,13 @@
 #include	"menukeys.h"
 
 int cur_groupnum = 0;				/* always >= 0 */
+int group_top;				/* Total # of groups in my_group[] */
+
 static int first_group_on_screen;
 #ifndef INDEX_DAEMON
 	static int last_group_on_screen;
 #endif /* !INDEX_DAEMON */
+
 /*
  * Oddly named variable - seems to dictate whether to position on first
  * unread item or not. Used internally unlike 'tinrc.pos_first_unread', which
@@ -1091,9 +1094,9 @@ read_groups (
 
 
 /*
- *  Calculate max length of groupname field for group selection level.
- *  If all_groups is TRUE check all groups in active file otherwise
- *  just subscribed to groups.
+ * Calculate max length of groupname field for group selection level.
+ * If all_groups is TRUE check all groups in active file otherwise
+ * just subscribed to groups.
  */
 void
 set_groupname_len (
@@ -1146,7 +1149,7 @@ toggle_my_groups (
 	char buf[NEWSRC_LINE];
 	char old_curr_group[PATH_LEN];
 	char *ptr;
-	int active_idx = 0;
+	int old_curr_group_idx = 0;
 	int group_num = (cur_groupnum == -1) ? 0 : cur_groupnum;
 	register int i;
 
@@ -1159,26 +1162,23 @@ toggle_my_groups (
 	old_curr_group[0] = '\0';
 
 	if (group_top) {
-		if (!only_unread_groups || reread_active_file ()) {
-
-			if (group[0] != '\0') {
-				if ((i = find_group_index (group)) >= 0)
-					active_idx = i;
-			} else if (group_num >= 0) {
-				active_idx = my_group[group_num];
-			} else {
-				active_idx = 0;
-			}
-
-			my_strncpy (old_curr_group, active[active_idx].name, sizeof (old_curr_group));
+		if (group[0] != '\0') {
+			if ((i = my_group_find (group)) >= 0)
+				old_curr_group_idx = i;
+		} else if (group_num >= 0) {
+			old_curr_group_idx = group_num;
 		} else {
-			for (i = group_num; i < group_top; i++) {
-				if (active[my_group[i]].newsrc.num_unread) {
+			old_curr_group_idx = 0;
+		}
+		if (only_unread_groups) {
+			for (i = old_curr_group_idx; i < group_top; i++) {
+				if (active[my_group[i]].newsrc.num_unread || active[my_group[i]].newgroup) {
 					my_strncpy (old_curr_group, active[my_group[i]].name, sizeof (old_curr_group));
 					break;
 				}
 			}
-		}
+		} else
+			my_strncpy (old_curr_group, active[my_group[old_curr_group_idx]].name, sizeof (old_curr_group));
 	}
 
 	group_top = skip_newgroups();			/* Reposition after any newgroups */
@@ -1351,8 +1351,7 @@ bSetRange (
 	 * Parse range string
 	 */
 	if (!bParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
-		/* FIXME -> lang.c */
-		info_message ("Invalid range - valid are '0-9.$' eg. 1-$");
+		info_message (txt_range_invalid);
 	else {
 /*
 		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]", pcPtr, acRng, iRngMin, iRngMax);

@@ -201,6 +201,26 @@ static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 #endif /* !INDEX_DAEMON */
 
 
+/*
+ *  returns the number of lines and columns on the display.
+ */
+#ifndef INDEX_DAEMON
+static void
+ScreenSize (
+	int *num_lines,
+	int *num_columns)
+{
+	if (!_lines)
+		_lines = DEFAULT_LINES_ON_TERMINAL;
+	if (!_columns)
+		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
+
+	*num_lines = _lines - 1;		/* assume index from zero*/
+	*num_columns = _columns;		/* assume index from one */
+}
+#endif /* !INDEX_DAEMON */
+
+
 void
 setup_screen (void)
 {
@@ -221,20 +241,20 @@ setup_screen (void)
 
 #ifndef INDEX_DAEMON
 int
-SetupScreen (void)
+get_termcaps (void)
 {
 	char the_termname[40], *p;
 
 	if ((p = getenv ("TERM")) == (char *) 0) {
-		my_fprintf (stderr, txt_no_term_set, progname);
+		my_fprintf (stderr, txt_no_term_set, tin_progname);
 		return (FALSE);
 	}
 	if (strcpy (the_termname, p) == NULL) {
-		my_fprintf (stderr, txt_cannot_get_term, progname);
+		my_fprintf (stderr, txt_cannot_get_term, tin_progname);
 		return (FALSE);
 	}
 	if (tgetent (_terminal, the_termname) != 1) {
-		my_fprintf (stderr, txt_cannot_get_term_entry, progname);
+		my_fprintf (stderr, txt_cannot_get_term_entry, tin_progname);
 		return (FALSE);
 	}
 
@@ -273,19 +293,19 @@ SetupScreen (void)
 	}
 
 	if (!_clearscreen) {
-		my_fprintf (stderr, txt_no_term_clearscreen, progname);
+		my_fprintf (stderr, txt_no_term_clearscreen, tin_progname);
 		return (FALSE);
 	}
 	if (!_moveto) {
-		my_fprintf (stderr, txt_no_term_cursor_motion, progname);
+		my_fprintf (stderr, txt_no_term_cursor_motion, tin_progname);
 		return (FALSE);
 	}
 	if (!_cleartoeoln) {
-		my_fprintf (stderr, txt_no_term_clear_eol, progname);
+		my_fprintf (stderr, txt_no_term_clear_eol, tin_progname);
 		return (FALSE);
 	}
 	if (!_cleartoeos) {
-		my_fprintf (stderr, txt_no_term_clear_eos, progname);
+		my_fprintf (stderr, txt_no_term_clear_eos, tin_progname);
 		return (FALSE);
 	}
 	if (_lines == -1)
@@ -294,7 +314,7 @@ SetupScreen (void)
 		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
 
 	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
-		my_fprintf(stderr, txt_screen_too_small, progname);
+		my_fprintf(stderr, txt_screen_too_small, tin_progname);
 		return (FALSE);
 	}
 	/*
@@ -306,9 +326,6 @@ SetupScreen (void)
 		if (!_setinverse)
 			tinrc.draw_arrow_mark = 1;
 	}
-#ifdef HAVE_COLOR
-	postinit_colors();
-#endif /* HAVE_COLOR */
 	return (TRUE);
 }
 #endif /* !INDEX_DAEMON */
@@ -318,6 +335,9 @@ InitScreen (void)
 {
 #ifndef INDEX_DAEMON
 	InitWin ();
+#ifdef HAVE_COLOR
+	postinit_colors();
+#endif /* HAVE_COLOR */
 	return (TRUE);
 #else
 	return (FALSE);
@@ -476,7 +496,7 @@ InitScreen (void)
 #endif /* VMS */
 
 	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
-		my_fprintf(stderr, txt_screen_too_small, progname);
+		my_fprintf(stderr, txt_screen_too_small, tin_progname);
 		return (FALSE);
 	}
 
@@ -492,26 +512,6 @@ InitScreen (void)
 }
 
 #endif /* M_UNIX */
-
-
-/*
- *  returns the number of lines and columns on the display.
- */
-#ifndef INDEX_DAEMON
-static void
-ScreenSize (
-	int *num_lines,
-	int *num_columns)
-{
-	if (!_lines)
-		_lines = DEFAULT_LINES_ON_TERMINAL;
-	if (!_columns)
-		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
-
-	*num_lines = _lines - 1;		/* assume index from zero*/
-	*num_columns = _columns;		/* assume index from one */
-}
-#endif /* !INDEX_DAEMON */
 
 
 void

@@ -1,9 +1,5 @@
 Bugs
 ----
-o  % in filenames crashes tin -> we need a quote_percent(string)
-   function and should check all wait_message() etc.pp. calls
-   with user defined strings...
-
 o  --with-ncurses --enable-curses has several display problems:
     - if use_color is set:
       - '^G' (pgp-check article output is grabbled)
@@ -160,6 +156,8 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 New features
 ------------
+o  add shortcut(s) to repeat last command (i.e. search again)
+
 o  add unicode/UTF-8 support
 
 o  add Message-ID param to quick_filter_select_posted_art() and
@@ -398,6 +396,9 @@ o  tin.defaults is not mentioned in manpage/INSTALL
 
 Not yet classified
 ------------------
+o  we might need a quote_percent(string) function and should check all
+   wait_message() etc.pp. calls with user defined strings...
+
 o  'B'ody search doesn't jump to the match in the article
    (IMHO this is confusing inside the pager (at least if the hit
     is in the current article), but ok at any other level).
@@ -444,8 +445,6 @@ o  shows up cross-postings multiple times even if read once before getting
 o  numbering of Hot articles is wrong after (post)processing them
    (6T 0A 0K -5H R)
 
-o  fix reposition of cursor after reading active file... annoying!
-
 o  think about group numbering in "only unread" display mode
    (using different numbers in show all/show only unread leads to some
     problems, f.e. group moving)
@@ -475,11 +474,6 @@ o  allow expiring filter entrys n-days after the last time they matched
 
 Fixed already?:
 ----------------
-o  The subject lines for the 1st newsgroup in .newsrc is truncated when
-   the author field is toggled off using the 'd' command.
-   [Jason C Lin <jlin@hawaii.edu>]
-   [I can't reproduce this - <jason@radar.tele2.co.uk>]
-
 o  tin (sometimes?) overwrites the newsgroup-number and number of unread
    articles with spaces when turning on newsgroup descriptions with
    strip_blanks=OFF - the bugs seems to be related to the screen-width and

@@ -12,7 +12,7 @@
 
      - preliminaries
        - install ncurses first
-         - get tin source (e.g. from ftp://ftp.tin.org/tin)
+         - get tin source (e.g. from ftp://ftp.tin.org/tin/)
 
      - configure
        - export CC=gcc

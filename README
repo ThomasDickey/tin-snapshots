@@ -24,7 +24,7 @@ Send them to tin-bugs@tin.org. Before mailing a bug-report please check
 if you are using the latest release, and if not, please upgrade first!
 Have a look a the TODO file for known bugs. If you still think you've
 found a bug, please use the mail_bugreport function (shift-R) and write
-in English. Please do NOT enclose a corefile in your bugreport until we
+in English. Please do NOT enclose a core-file in your bugreport until we
 request it.
 
 The latest release is available at:

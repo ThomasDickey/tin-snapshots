@@ -43,6 +43,10 @@
 	display_mime_header_asis	OPT_ON_OFF
 	display_mime_allheader_asis	OPT_ON_OFF
 	alternative_handling		OPT_ON_OFF
+#ifdef HAVE_COLOR
+	quote_regex			OPT_STRING
+#endif
+
 #ifdef	HAVE_METAMAIL
 	use_metamail			OPT_ON_OFF
 	ask_for_metamail		OPT_ON_OFF

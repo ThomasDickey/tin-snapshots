@@ -69,6 +69,8 @@
 # use this only if you cannot generate a valid Sender:, eg. if you do not
 # have a registered FQDN for your system
 #
+# disable_sender has no effect if use_builtin_inews is OFF
+#
 #disable_sender=OFF
 
 ############# reading from a local spool #########################

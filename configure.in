@@ -75,7 +75,7 @@ CF_PATH_MAILER
 CF_PATH_MAILBOX
 
 ## PGP Support
-AC_MSG_CHECKING(if you want PGP-Support )
+AC_MSG_CHECKING(if you want PGP-Support)
 CF_ARG_DISABLE(pgp,
 	[  --disable-pgp           disable PGP Support],
 	[USE_PGP=no],

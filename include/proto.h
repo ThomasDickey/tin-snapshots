@@ -73,7 +73,7 @@ extern OUTC_RETTYPE outchar (OUTC_ARGS);
 extern int InitScreen (void);
 extern int RawState (void);
 extern int ReadCh (void);
-extern int SetupScreen (void);
+extern int get_termcaps (void);
 extern void ClearScreen (void);
 extern void CleartoEOLN (void);
 extern void CleartoEOS (void);
@@ -131,7 +131,7 @@ extern void free_all_filter_arrays (void);
 #endif /* !INDEX_DAEMON */
 
 /* getline.c */
-extern char *tin_getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
+extern char *tin_getline (const char *prompt, int number_only, char *str, int max_chars, t_bool passwd, int which_hist);
 
 /* group.c */
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
@@ -235,7 +235,7 @@ extern void expand_save (void);
 extern void init_alloc (void);
 #ifndef USE_CURSES
 	extern void init_screen_array (t_bool allocate);
-#endif
+#endif /* !USE_CURSES */
 extern void free_all_arrays (void);
 extern void free_art_array (void);
 extern void free_attributes_array (void);
@@ -278,8 +278,8 @@ extern void get_author (t_bool thread, struct t_article *art, char *str, size_t 
 extern void get_cwd (char *buf);
 extern void make_group_path (char *name, char *path);
 #if 0
-extern void parse_from (char *from_line, char *eaddr, char *fname);
-#endif
+	extern void parse_from (char *from_line, char *eaddr, char *fname);
+#endif /* 0 */
 extern void read_input_history_file (void);
 extern void rename_file (char *old_filename, char *new_filename);
 extern void set_first_screen_item (int cur, int max, int *first, int *last);
@@ -299,8 +299,8 @@ extern void vPrintBugAddress (void);
 extern const char *gnksa_strerror (int errcode);
 extern int gnksa_check_from (char *from);
 #if 1
-extern int parse_from (char *from, char *address, char *realname);
-#endif
+	extern int parse_from (char *from, char *address, char *realname);
+#endif /* 1 */
 #ifdef HAVE_COLOR
 	extern t_bool toggle_color (void);
 	extern void show_color_status (void);
@@ -362,7 +362,7 @@ extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 /* open.c */
 #ifdef NNTP_ABLE
 	extern FILE *nntp_command (const char *, int, char *);
-#endif
+#endif /* NNTP_ABLE */
 extern FILE *open_art_fp (char *group_path, long art, int lines, t_bool rfc1521decode);
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
@@ -454,6 +454,7 @@ extern void free_msgids (void);
 extern void thread_by_reference (void);
 
 /* regex.c */
+extern t_bool compile_regex (char *regex, struct regex_cache *cache);
 extern t_bool match_regex (const char *string, char *pattern, t_bool icase);
 
 /* rfc1521.c */

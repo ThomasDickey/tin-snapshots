@@ -637,6 +637,9 @@ enum resizer { cNo, cYes, cRedraw };
 
 #include <bool.h>
 
+/* Philip Hazel's Perl regular expressions library */
+#include	<pcre.h>
+
 #ifndef MAX
 #	define MAX(a,b)	((a > b) ? a : b)
 #endif /* !MAX */
@@ -714,6 +717,11 @@ enum resizer { cNo, cYes, cRedraw };
 #ifndef ART_MARK_READ
 #	define ART_MARK_READ	' '	/* used to show that an art was not read or seen */
 #endif /* !ART_MARK_READ */
+#ifdef KILL_READ
+#	ifndef ART_MARK_READ_SELECTED
+#		define ART_MARK_READ_SELECTED ':'	/* used to show that an read art is hot */
+#	endif /* !ART_MARK_READ_SELECTED */
+#endif /* KILL_READ */
 #ifndef ART_MARK_DELETED
 #	define ART_MARK_DELETED	'D'	/* art has been marked for deletion (mailgroup) */
 #endif /* !ART_MARK_DELETED */
@@ -1421,6 +1429,15 @@ struct t_filter_rule
 	int expire_time;
 };
 
+/*
+ * Filter cache structure using Philip Hazel's Perl regular expression
+ * library (see pcre/pcre.[ch] for details)
+ */
+struct regex_cache {
+	pcre *re;
+	pcre_extra *extra;
+};
+
 struct t_header_list
 {
 	char header[HEADER_LEN];
@@ -1724,6 +1741,14 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define S_IXOTH	0000001	/* execute permission (other) */
 #endif /* !S_IRWXU */
 
+/* the next two are needed for fcc 1.0 on linux */
+#ifndef S_IFMT
+#	define S_IFMT	0xF000	/* type of file */
+#endif /* S_IFMT */
+#ifndef S_IFREG
+#	define S_IFREG	0x8000	/* regular */
+#endif /* S_IFREG */
+
 #ifndef S_IRWXUGO
 #	define S_IRWXUGO	(S_IRWXU|S_IRWXG|S_IRWXO)	/* read, write, execute permission (all) */
 #	define S_IRUGO	(S_IRUSR|S_IRGRP|S_IROTH)	/* read permission (all) */
@@ -1838,9 +1863,6 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 #if defined(WIN32)
 #	include	"msmail.h"
 #endif /* WIN32 */
-
-/* Philip Hazel's Perl regular expressions library */
-#include	<pcre.h>
 
 /*
  * rfc1521/rfc1522 interface

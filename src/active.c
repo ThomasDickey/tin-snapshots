@@ -281,12 +281,17 @@ read_newsrc_active_file (
 
 	while ((ptr = tin_fgets (fp, FALSE)) != (char *)0 || window != 0) {
 		if (ptr) {
-			char *p;
-			p = strpbrk (ptr, ":!");
+			char *p = strpbrk (ptr, ":!");
+
 			if (!p || *p != SUBSCRIBED)	/* Invalid line or unsubscribed */
 				continue;
-			*p = '\0';			/* Now buf is the group name */
-			STRCPY(ngname, ptr);
+			*p = '\0';			/* Now ptr is the group name */
+
+			/*
+			 * 128 should be enough for a groupname, >256 and we overflow buffers
+			 * later on
+			 */
+			strncpy(ngname, ptr, 128);
 			ptr = ngname;
 		}
 
@@ -451,7 +456,7 @@ read_active_file (
 			error_message (txt_cannot_open, news_active_file);
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 		else
-			error_message (txt_cannot_open_active_file, news_active_file, progname);
+			error_message (txt_cannot_open_active_file, news_active_file, tin_progname);
 #endif /* NNTP_ABLE || NNTP_ONLY */
 
 		tin_done (EXIT_FAILURE);

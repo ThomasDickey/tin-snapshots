@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 19990624
+PVER	= 19990805
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -141,6 +141,8 @@ DOC	= \
 	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/good-netkeeping-seal \
+	$(DOCDIR)/pgp.txt \
+	$(DOCDIR)/rcvars.txt \
 	$(DOCDIR)/reading-mail.txt \
 	$(DOCDIR)/umlaute.txt \
 	$(DOCDIR)/umlauts.txt \
@@ -177,8 +179,14 @@ PCRE	= \
 	$(PCREDIR)/RunTest \
 	$(PCREDIR)/Tech.Notes \
 	$(PCREDIR)/pgrep.1 \
+	$(PCREDIR)/pgrep.1.html \
+	$(PCREDIR)/pgrep.1.txt \
 	$(PCREDIR)/pcre.3 \
+	$(PCREDIR)/pcre.3.html \
+	$(PCREDIR)/pcre.3.txt \
 	$(PCREDIR)/pcreposix.3 \
+	$(PCREDIR)/pcreposix.3.html \
+	$(PCREDIR)/pcreposix.3.txt \
 	$(PCREDIR)/dftables.c \
 	$(PCREDIR)/get.c \
 	$(PCREDIR)/maketables.c \

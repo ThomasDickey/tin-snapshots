@@ -29,8 +29,6 @@
  *   require domain literals to be enclosed in square brackets
  */
 
-signed long int wrote_newsrc_lines = -1;
-
 /*
  * Local prototypes
  */
@@ -83,7 +81,7 @@ asfail (
 	int line,
 	const char *cond)
 {
-	my_fprintf (stderr, txt_error_asfail, progname, file, line, cond);
+	my_fprintf (stderr, txt_error_asfail, tin_progname, file, line, cond);
 	my_fflush (stderr);
 
 /*
@@ -406,6 +404,7 @@ tin_done (
 	register int i;
 	t_bool ask = TRUE;
 	struct t_group *group;
+	signed long int wrote_newsrc_lines = -1;
 
 	signal_context = cMain;
 
@@ -435,14 +434,14 @@ tin_done (
 	 */
 	if (!no_write) {
 		forever {
-			if (((wrote_newsrc_lines = vWriteNewsrc ()) > 0) && (wrote_newsrc_lines >= read_newsrc_lines)) {
+			if (((wrote_newsrc_lines = vWriteNewsrc ()) >= 0L) && (wrote_newsrc_lines >= read_newsrc_lines)) {
 				my_fputs(txt_newsrc_saved, stdout);
 				break;
 			}
 
 			if (wrote_newsrc_lines < read_newsrc_lines) {
 				/* FIXME: prompt for retry? (i.e. remove break) */
-				wait_message(3, txt_warn_newsrc, newsrc, (read_newsrc_lines - wrote_newsrc_lines), (read_newsrc_lines - wrote_newsrc_lines) == 1 ? "" : txt_plural, OLDNEWSRC_FILE);
+				wait_message(5, txt_warn_newsrc, newsrc, (read_newsrc_lines - wrote_newsrc_lines), (read_newsrc_lines - wrote_newsrc_lines) == 1 ? "" : txt_plural, OLDNEWSRC_FILE);
 				break;
 			}
 
@@ -759,7 +758,7 @@ draw_percent_mark (
 	long cur_num,
 	long max_num)
 {
-	char buf[32]; /* FIXME: ensure it's always big enought */
+	char buf[32]; /* FIXME: ensure it's always big enough */
 	int percent;
 
 	if (NOTESLINES <= 0)
@@ -860,7 +859,7 @@ set_tin_uid_gid (
 void
 base_name (
 	char *dirname,		/* argv[0] */
-	char *program)		/* progname is returned */
+	char *program)		/* tin_progname is returned */
 {
 	int i;
 #ifdef VMS
@@ -1651,10 +1650,10 @@ create_index_lock_file (
 			fclose (fp);
 #ifdef INDEX_DAEMON
 			error_message ("%s: Already started pid=[%d] on %s",
-				progname, atoi(buf), buf+8);
+				tin_progname, atoi(buf), buf+8);
 #else
 			error_message ("\n%s: Already started pid=[%d] on %s",
-				progname, atoi(buf), buf+8);
+				tin_progname, atoi(buf), buf+8);
 #endif /* INDEX_DAEMON */
 			exit (EXIT_FAILURE);
 		}
@@ -2452,7 +2451,7 @@ vPrintBugAddress (
 	void)
 {
 	my_fprintf (stderr, "%s %s %s (\"%s\") [%s]: send a DETAILED bug report to %s\n",
-		progname, VERSION, RELEASEDATE, RELEASENAME, OS, BUG_REPORT_ADDRESS);
+		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OS, BUG_REPORT_ADDRESS);
 	my_fflush (stderr);
 }
 

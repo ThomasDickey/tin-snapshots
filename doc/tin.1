@@ -1729,6 +1729,11 @@ If ON quote empty lines, too. Default is OFF due to backward compatibility,
 but it is highly recommended to turn it on as it makes quotes much more
 readable.
 .TP
+.B Expression for highlighting quoted text (quote_regex)
+A regular expression that will be applied when reading articles. All matching
+lines are shown in col_quote. If quote_regex is blank, then tin uses a builtin
+default for this.
+.TP
 .B Quote signatures (quote_signatures)
 If ON quote signatures, too.
 .TP
@@ -2689,48 +2694,48 @@ Leila Burrell-Davis, Sean Casey, Peter Castro, Troy Cauble, Andrey A.
 Chernov, Albert Chin-A-Young, Tan Kwee Chuan, Boleslaw Ciesielski, Robert
 Claeson, Steven Cogswell, Don Costello, Bryan Curnutt, Ned Danieley, Lars
 Dannenberg, Chris Davies, John Davis, Borislav Deianov, Thomas E. Dickey,
-Theo Van Dinter, Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig
-Durland, Bernd Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf,
-Rob Engle, Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland
-Espinosa, Jason Faultless, Michael Faurot, Werner Fleck, John M.
-Flinchbaugh, Andy Gabor, Torsten Gesang, Ruediger Geys, Callum Gibson, Mike
-Glendinning, Philippe Goujard, Dan Greenspan, Karlo Gross, Carl Hage, Paul
-Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per Headland, Arnold
-Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom Hite, Torsten
-Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun Huang, Steve
-Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter Immelman, Jarkko Isokungas,
-Patrick St. Jean, Hal Jespersen, Park Sang Jin, Robbin Johnson, Jarkko
-Jormanainen, Nelson Kading, Geoffrey Keating, Karsten Keil, Fritz Kleeman,
-Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas
-Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Florian
-Kuehnert, Kris Kugel, Manoj Kumar, Yuri Kuzmenko, Olivier Lacroix, Geoff
-Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila, Vincent
-Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan Lennestal,
-Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley, David-Michael
-Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard Luebke, Clifford
-Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri
-A. Martynoff, Kazushi Marukawa, Owen Medd, Philipp Mergenthaler, Soren
-Moller, Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike
-Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich,
-James Nugen, David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr,
-Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven
-Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim
-Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger, GianPiero
-Puccioni, Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards, Steve
-Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Meelis Roos,
-Stephen Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich
-Salz, Gary Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger
-Schif, Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl,
-Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav
-Serrander, Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda,
-Andreas Siegert, Mark Smith, Steve Spearman, Helmut Springer, Cliff
-Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Michael Stenns,
-Helmrich Streitmatter, Hans Werner Strube, Dieter Stueken, Ed Sznyter, Dean
-Takemori, Darrell Tangman, Derek Terveer, Carsten Theis, Julian Thompson,
-David Tiller, Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
-Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist, Greg
-Woods, Lloyd Wright, Jens Wuepper, Billy Y., Nickolai Zeldovich, Zbigniew
-Zych
+Olaf Dietrich, Theo Van Dinter, Ralf Doeblitz, Bryan Dongray, Michael
+Douglass, Craig Durland, Bernd Eckenfels, Phil Edge, Kirk Edson, Nick
+Efthymiou, Stefan Elf, Rob Engle, Olle Eriksson, Brent Ermlick, Bernd
+Ernesti, Ragnar Hojland Espinosa, Jason Faultless, Michael Faurot, Werner
+Fleck, John M. Flinchbaugh, Andy Gabor, Torsten Gesang, Ruediger Geys,
+Callum Gibson, Mike Glendinning, Philippe Goujard, Dan Greenspan, Karlo
+Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per
+Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom
+Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun
+Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter Immelman, Jarkko
+Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin, Robbin Johnson,
+Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten Keil, Fritz
+Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight,
+Thomas Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener,
+Florian Kuehnert, Kris Kugel, Manoj Kumar, Yuri Kuzmenko, Olivier Lacroix,
+Geoff Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila,
+Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan
+Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
+David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
+Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
+De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Philipp
+Mergenthaler, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
+Klaus Mueller, Mike Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten
+Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg
+Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim
+Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins,
+Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
+GianPiero Puccioni, Thomas Quinot, Stefan Rapp, Martin Reising, Kyle Rhorer,
+Ted Richards, Steve Robbins, Ollivier Robert, Branden Robinson, Jim
+Robinson, Erik van Roode, Meelis Roos, Stephen Roseman, Roland Rosenfeld,
+Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders, Nickolay Saukh,
+John Sauter, Christopher Sawtell, Holger Schif, Volker Schmidt, John
+Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder,
+Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip
+Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve
+Spearman, Helmut Springer, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
+Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
+Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
+Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
+Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
+Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
+Nickolai Zeldovich, Zbigniew Zych
 .\"
 .\"
 .SH AUTHOR

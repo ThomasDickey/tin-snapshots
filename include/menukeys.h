@@ -111,7 +111,7 @@
 #define iKeyPageDown3 ' '
 #ifndef NO_SHELL_ESCAPE
 #	define iKeyShellEscape '!'
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 #define iKeySetRange '#'
 #define iKeyLastPage '$'
 #define iKeySearchBody 'B'
@@ -234,7 +234,7 @@
 #define iKeyPageReplyQuoteHeaders ctrl('E')
 #ifdef HAVE_PGP
 #	define iKeyPagePGPCheckArticle ctrl('G')
-#endif
+#endif /* HAVE_PGP */
 #define iKeyPageToggleHeaders ctrl('H')
 #define iKeyPageNextUnread '\t'
 #define iKeyPageNextThd '\n'
@@ -249,7 +249,7 @@
 #ifdef HAVE_COLOR
 #	define iKeyPageToggleColor '&'
 #	define iKeyPageToggleHighlight '_'
-#endif
+#endif /* HAVE_COLOR */
 #define iKeyPageLastViewed '-'
 /* digits 0-9 in use */
 #define iKeyPageSkipIncludedText ':'
@@ -267,6 +267,7 @@
 #define iKeyPageReply 'R'
 #define iKeyPageAutoSaveTagged 'S'
 #define iKeyPageGroupSel 'T'
+#define iKeyPageMarkThdUnread 'Z'
 #define iKeyPageCatchup 'c'
 #define iKeyPageToggleRot2 'd'
 #define iKeyPageEdit 'e'
@@ -296,10 +297,10 @@
 #define iKeyPostEdit 'e'
 #ifdef HAVE_PGP
 #	define iKeyPostPGP 'g'
-#endif
+#endif /* HAVE_PGP */
 #ifdef HAVE_ISPELL
 #	define iKeyPostIspell 'i'
-#endif
+#endif /* HAVE_ISPELL */
 #define iKeyPostContinue 'c'
 #define iKeyPostAbort 'a'
 #define iKeyPostPost 'p'

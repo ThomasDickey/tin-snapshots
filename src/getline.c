@@ -43,6 +43,7 @@ static int gl_init_done = 0;	/* -1 is terminal, 1 is batch */
 static const char *gl_prompt;	/* to save the prompt string */
 static int gl_width = 0;	/* net size available for input */
 static int gl_pos, gl_cnt = 0;	/* position and size of input */
+t_bool is_passwd;
 
 /*
  * local prototypes
@@ -69,9 +70,12 @@ tin_getline (
 	int number_only,
 	char *str,
 	int max_chars,
+	t_bool passwd,
 	int which_hist)
 {
 	int c, i, loc, tmp, gl_max;
+
+	is_passwd = passwd;
 
 	set_xclick_off ();
 	if (prompt == (char *) 0) {
@@ -399,61 +403,63 @@ gl_fixup (
 		ring_bell ();
 		cursor = 0;
 	}
-	if (off_right || (off_left && (cursor < gl_shift + gl_width - SCROLL / 2)))
-		extra = 2;	/* shift the scrolling boundary */
-	else
-		extra = 0;
-	new_shift = cursor + extra + SCROLL - gl_width;
-	if (new_shift > 0) {
-		new_shift /= SCROLL;
-		new_shift *= SCROLL;
-	} else
-		new_shift = 0;
-	if (new_shift != gl_shift) {	/* scroll occurs */
-		gl_shift = new_shift;
-		off_left = (gl_shift) ? 1 : 0;
-		off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
-		left = gl_shift;
-		right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
-	} else if (change >= 0) {	/* no scroll, but text changed */
-		if (change < gl_shift + off_left) {
+	if (!is_passwd) {
+		if (off_right || (off_left && (cursor < gl_shift + gl_width - SCROLL / 2)))
+			extra = 2;	/* shift the scrolling boundary */
+		else
+			extra = 0;
+		new_shift = cursor + extra + SCROLL - gl_width;
+		if (new_shift > 0) {
+			new_shift /= SCROLL;
+			new_shift *= SCROLL;
+		} else
+			new_shift = 0;
+		if (new_shift != gl_shift) {	/* scroll occurs */
+			gl_shift = new_shift;
+			off_left = (gl_shift) ? 1 : 0;
+			off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
 			left = gl_shift;
+			right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
+		} else if (change >= 0) {	/* no scroll, but text changed */
+			if (change < gl_shift + off_left)
+				left = gl_shift;
+			else {
+				left = change;
+				backup = gl_pos - change;
+			}
+			off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
+			right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
+		}
+		pad -= (off_right) ? gl_width - 1 : gl_cnt - gl_shift;
+		pad = (pad < 0) ? 0 : pad;
+		if (left <= right) {	/* clean up screen */
+			for (i = 0; i < backup; i++)
+				my_fputc ('\b', stdout);
+			if (left == gl_shift && off_left) {
+				my_fputc ('$', stdout);
+				left++;
+			}
+			for (i = left; i < right; i++)
+				my_fputc (gl_buf[i], stdout);
+			if (off_right) {
+				my_fputc ('$', stdout);
+				gl_pos = right + 1;
+			} else {
+				for (i = 0; i < pad; i++)	/* erase remains of prev line */
+					my_fputc (' ', stdout);
+				gl_pos = right + pad;
+			}
+		}
+		i = gl_pos - cursor;	/* move to final cursor location */
+		if (i > 0) {
+			while (i--)
+				my_fputc ('\b', stdout);
 		} else {
-			left = change;
-			backup = gl_pos - change;
+			for (i = gl_pos; i < cursor; i++)
+				my_fputc (gl_buf[i], stdout);
 		}
-		off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
-		right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
+		my_flush ();
 	}
-	pad -= (off_right) ? gl_width - 1 : gl_cnt - gl_shift;
-	pad = (pad < 0) ? 0 : pad;
-	if (left <= right) {	/* clean up screen */
-		for (i = 0; i < backup; i++)
-			my_fputc ('\b', stdout);
-		if (left == gl_shift && off_left) {
-			my_fputc ('$', stdout);
-			left++;
-		}
-		for (i = left; i < right; i++)
-			my_fputc (gl_buf[i], stdout);
-		if (off_right) {
-			my_fputc ('$', stdout);
-			gl_pos = right + 1;
-		} else {
-			for (i = 0; i < pad; i++)	/* erase remains of prev line */
-				my_fputc (' ', stdout);
-			gl_pos = right + pad;
-		}
-	}
-	i = gl_pos - cursor;	/* move to final cursor location */
-	if (i > 0) {
-		while (i--)
-			my_fputc ('\b', stdout);
-	} else {
-		for (i = gl_pos; i < cursor; i++)
-			my_fputc (gl_buf[i], stdout);
-	}
-	my_flush ();
 	gl_pos = cursor;
 }
 

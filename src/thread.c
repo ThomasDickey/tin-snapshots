@@ -97,8 +97,14 @@ bld_tline (
 			mark = 'K';
 #endif /* 1 */
 
-		} else
+		} else {
+#ifdef KILL_READ
+			if (art->score >= SCORE_SELECT)
+				mark = ART_MARK_READ_SELECTED ; /* read hot chil^H^H^H^H article */
+			else
+#endif /* KILL_READ */
 			mark = ART_MARK_READ;
+		}
 
 		*(buff+MARK_OFFSET) = mark;			/* insert mark */
 	}
@@ -267,7 +273,11 @@ draw_tline (
 	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if (s[k-x] == tinrc.art_marked_selected) {
+	if ((s[k-x] == tinrc.art_marked_selected
+#ifdef KILL_READ
+		 || s[k-x] == ART_MARK_READ_SELECTED
+#endif /* KILL_READ */
+	 )) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
 		my_fputc (s[k-x], stdout);

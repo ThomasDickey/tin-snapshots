@@ -1,7 +1,43 @@
+-- pre-1.4 release 19990805 "Preacher Man" --
+
+666) Olaf Dietrich <olaf.dietrich@urz.uni-heidelberg.de>
+     BUG. cursor position gets lost after rereading the active file
+     FIX. select.c
+
+665) Martin Reising <mreising@irrlicht.Ruhr.DE>
+     ADD. ART_MARK_READ_HOT for -DKILL_READ
+     FIX. thread.c
+
+664) Urs Janssen <urs@tin.org>
+     ADD. S_IFMT and S_IFREG fallback for fcc
+     ADD. 'Z' to pager
+     ADD. updated pcre (2.06 -> 2.07)
+     BUG. don't prompt user for rewrite newsrc if it is empty
+     BUG. use tin_getline() instead of getpass() for passwd prompt again
+          as getpass() might truncate passwds
+     FIX. menukeys.h, proto.h, tin.h, auth.c, getline.c, lang.c, misc.c
+          page.c, prompt.c, pcre/*
+
+663) Erik van Roode <erik@cthulhu.demon.nl>
+     BUG. articles with missing realname in From:-line crashed debug-level 2
+     FIX. debug.c
+
+662) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. quote_regex option for highlighting quoted text
+     ADD. minor code cleanup
+     BUG. long groupnames in .newsrc could crash tin
+     BUG. interactive authorisation was broken
+     BUG. filename 'guessing' for uudecoded used mtime which sometimes
+          lead to wrong results
+     BUG. formatstrings in txt_saved_pattern_to weren't quoted
+     FIX. extern.h, proto.h, tin.h, tinrc.h, active.c, auth.c, color.c
+          config.c, curses.c, filter.c, init.c, lang.c, main.c, memory.c
+          regex.c, save.c, tcurses.c, tincfg.tbl, tin.1, rcvars.txt
+
 -- pre-1.4 release 19990624 "Dawnrazor" --
 
 661) Thomas E. Dickey <dickey@clark.net>
-     ADD. configure scrip updates/improvements
+     ADD. configure script updates/improvements
      FIX. aclocal.m4, config.guess, config.sub, configure.in, internal.h
           active.c
 
@@ -14,12 +50,12 @@
      ADD. prompt before abort unmodified postings/followups/bugreports
      ADD. warning if less lines are written to newsrc as read on start
      ADD. moved some strings to lang.c
-     ADD. ispell opts to attirbutes
+     ADD. ispell opts to attributes
      ADD. updated pcre (2.05 -> 2.06)
      BUG. whole Reference:-tree was added to In-Reply-To:
      BUG. compiling with --disable-color failed with --enable-curses
      BUG. removed a few typos
-     BUG. fixed some eval-order dependencie bugs
+     BUG. fixed some eval-order dependencies bugs
      FIX. configure[.in], extern.h, proto.h, tin.h, active.c, attrib.c
           config.c, inews.c, lang.c, main.c, misc.c, newsrc.c, post.c
           save.c, select.c, tcurses.c, pcre/*
@@ -139,7 +175,7 @@
      BUG. resizeterm() was called during malloc()/realloc() calls
      BUG. fixup_thread() was called after show_thread_page()
      BUG. confirm_to_quit=yes 'disabled' 'Q'
-     ADD. fixed '-' to work without toggeling show_only_unread
+     ADD. fixed '-' to work without toggling show_only_unread
      FIX. extern.h, menukeys.h, proto.h, tin.h, art.c, config.c, curses.c,
           group.c, help.c, misc.c, page.c, select.c, signal.c, thread.c
 
@@ -156,7 +192,7 @@
      ADD. updated pcre (2.03 -> 2.04)
      ADD. automatically abort unmodified ('empty')
           postings/followups/bugreports
-     ADD. check if realname in Sender: contais '.' and add "" if needed
+     ADD. check if realname in Sender: contains '.' and add "" if needed
      BUG. posted_msgs_file wasn't updated if default_maildir was changed
           via 'M'enu
      FIX. config.c, header.c, post.c, pcre/*
@@ -281,7 +317,7 @@
 
 616) Urs Janssen <urs@tin.org>
      ADD. removed --enable-forgery configure option
-     ADD. support for serverside generated Message-IDs in POST response
+     ADD. support for server-side generated Message-IDs in POST response
      ADD. minor code cleanup
      ADD. updated pcre (2.00 -> 2.01)
      BUG. possible bufferoverflow in show_cont_header() and bAddFilterRule()
