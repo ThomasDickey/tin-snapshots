@@ -295,6 +295,13 @@ extern char *get_uaf_fullname();
 #define NNTP_IDLE_RETRY_SECS	300
 
 /*
+ *  Max time between the first character of a VT terminal escape sequence
+ *  for special keys and the following characters to arrive (msec)
+ *
+ */
+#define SECOND_CHARACTER_DELAY   200
+
+/*
  * Index file daemon version of tin. Will create/update index files from cron
  * on NNTP server machine so clients can retreive index file with NNTP XINDEX
  * command from server. Also can be used on machines that just want one copy
@@ -999,9 +1006,10 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FILTER_MSGID		4
 #define	FILTER_LINES		5
 
-#define	FILTER_LINES_EQ		0
-#define	FILTER_LINES_LT		1
-#define	FILTER_LINES_GT		2
+#define	FILTER_LINES_NO		0
+#define	FILTER_LINES_EQ		1
+#define	FILTER_LINES_LT		2
+#define	FILTER_LINES_GT		3
 
 /*
  * used in checking article header before posting
@@ -1500,7 +1508,7 @@ typedef struct t_notify *notify_p;
 
 #ifdef M_AMIGA
 #	define	NEWSGROUPS_FILE 	"newsdescrip"
-#	define	BUG_REPORT_ADDRESS	"volker@vb.franken.de"
+#	define	BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
 #	define	REDIRECT_OUTPUT 	"> NIL:"
 #	define	REDIRECT_PGP_OUTPUT	"> NIL:"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"

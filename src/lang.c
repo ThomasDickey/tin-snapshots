@@ -1091,7 +1091,7 @@ constext txt_filter_text_type[] = "Apply pattern to    : ";
 constext txt_from_line_only[] = "From: line (ignore case)        ";
 constext txt_from_line_only_case[] = "From: line (case sensitive)     ";
 constext txt_help_filter_from[] = "From: line to add to filter file. <SPACE> toggles & <CR> sets.";
-constext txt_help_filter_lines[] = "Number of lines that should be filtered (-num means less than num of lines).";
+constext txt_help_filter_lines[] = "Linecount of articles to be filtered. < for less, > for more, = for equal.";
 constext txt_help_filter_msgid[] = "Message-Id: line to add to filter file. <SPACE> toggles & <CR> sets.";
 constext txt_help_filter_subj[] = "Subject: line to add to filter file. <SPACE> toggles & <CR> sets.";
 constext txt_help_filter_text[] = "Enter text pattern to filter if Subject: & From: lines are not what you want.";

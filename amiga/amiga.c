@@ -481,26 +481,6 @@ int stat (char *name, struct stat *buf)
         return 0;
 }
 
-#if defined(__SASC) && !defined(AS225)
-/* If we are using AmiTCP, we are also using SAS/C (bold, I know), so
- * we can use SAS/C's autoinit-feature for handling usergroup.library
- * should really be in amitcp.c, this needs a fix badly!
- */
-
-int _STI_205_initlib(void)
-{
-    if (UserGroupBase = OpenLibrary(USERGROUPNAME, 0L))
-        return 0;
-    else
-        return 1;
-}
-
-void _STD_205_closelib(void)
-{
-    CloseLibrary(UserGroupBase);
-}
-#endif
-
 /*
  * This getenv and setenv will use the WB2.0 calls if you have the new
  * rom. If not, it resorts to looking in the ENV: directory.

@@ -26,7 +26,6 @@ extern void create_save_active_file (void);
 extern char *pcFindNovFile (struct t_group *psGrp, int iMode);
 extern char *safe_fgets (FILE *fp);
 extern int index_group (struct t_group *group);
-extern int input_pending (void);
 extern void do_update (void);
 extern void find_base (struct t_group *group);
 extern void make_threads (struct t_group *group, int rethread);
@@ -220,10 +219,12 @@ extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 
 /* misc.c */
 extern char *eat_re (char *s, t_bool eat_was);
+extern char *quote_wild(char *str);
 extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (void);
 extern int get_initials (int respnum, char *s, int maxsize);
 extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
+extern int input_pending (int delay);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
 extern int invoke_ispell (char *nam);

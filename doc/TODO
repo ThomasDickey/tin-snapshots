@@ -1,5 +1,10 @@
 Bugs
 ----
+o  after resubscribing to a newgroup which is still in the .newsrc, tin
+   ignores the old related .newsrc entry and marks all articles as
+   unread.
+   [Sven Manias <sven.manias@stud.uni-karlsruhe.de>]
+
 o  -N comandline swith seems to be broken
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
@@ -179,12 +184,6 @@ o  kill-file may get messed up if using multiple news servers with feeds
 o  sometimes (when using tins kill-menu) kill-file entries are
    duplicated/get lost or messed up
 
-o  killing articles with Lines: 0 on lines=0 does not work
-
-o  kill-file editor does not quote brackets, stars and question marks
-   in the subject - this leads to unexpected results cause they are
-   treated as wildcards
-
 o  remove build in path of external commands (metamail, pgp, ...)
 
 o  When enabling the 'cc/bcc on every message that is sent', and
@@ -196,6 +195,10 @@ o  When enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
+o  Word highlighting shouldn't be enabled in signatures, as '*'
+   and '_' characters may be used for ASCII art (e.g. '___').
+   [Vincent Lefevre <vlefevre@ens-lyon.fr>]
+
 o  allow changing From: in mail-replys
 
 o  '/', '?' searching in 'M'enu and 'h'elp-screen
@@ -254,6 +257,7 @@ o  Additions to the thread menu :
 	''  r ought to be toggle show all/show only unread
 	'f' (post a followup)
 	keys to goto previous/next thread
+        '^O' post postponed article
 
 o  Add 'l' (goto thread menu) to the article pager
 

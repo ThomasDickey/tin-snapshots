@@ -281,6 +281,10 @@ get_from_name (
 	char *from_name)
 {
 #ifndef INDEX_DAEMON
+	char *fromhost = GetConfigValue (_CONF_FROMHOST);
+
+	if (!(fromhost && *fromhost))
+          fromhost = domain_name;
 
 	if (*mail_address) {
 		strcpy(from_name, mail_address);
@@ -288,9 +292,9 @@ get_from_name (
 	}
 
 	if (strchr(get_full_name(), '.'))
-	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), domain_name);		
+	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);		
 	else
-	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), domain_name);
+	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
 
 	if (debug == 2) {
 		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",

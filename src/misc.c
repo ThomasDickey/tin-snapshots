@@ -8,7 +8,7 @@
  *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute	this software,
  *              so  long as there is no profit made from its use, sale
- *              trade or  reproduction.  You may not change th/////is copy-
+ *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
  */
 
@@ -21,6 +21,10 @@
 ** Local prototypes
 */
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
+
+#if 0
+static void dump_input_history(void);
+#endif
 
 #ifdef M_UNIX
 /*
@@ -1229,6 +1233,83 @@ show_color_status (void)
 }
 #endif /* HAVE_COLOR */
 
+
+/*
+ * moved from art.c
+ *
+ */
+#ifdef WIN32
+/* Don't want the overhead of windows.h */
+int kbhit(void);
+#endif
+
+/*
+ * input_pending() waits for input during time given
+ * by delay in msec. The original behaviour of input_pending()
+ * (in art.c's threading code) is delay=0
+ *
+ */
+int
+input_pending (int delay)
+{
+#ifdef WIN32
+	return kbhit() ? TRUE : FALSE;
+#endif
+
+#ifdef HAVE_SELECT
+	int fd = STDIN_FILENO;
+	fd_set fdread;
+	struct timeval tvptr;
+
+	FD_ZERO(&fdread);
+
+	tvptr.tv_sec = 0;
+	tvptr.tv_usec = delay * 100;
+
+	FD_SET(fd, &fdread);
+
+#ifdef HAVE_SELECT_INTP
+	if (select (1, (int *)&fdread, NULL, NULL, &tvptr)) {
+#else
+	if (select (1, &fdread, NULL, NULL, &tvptr)) {
+#endif
+		if (FD_ISSET(fd, &fdread)) {
+			return TRUE;
+		}
+	}
+#endif	/* HAVE_SELECT */
+
+#if defined(HAVE_POLL) && !defined(HAVE_SELECT)
+	static int Timeout = delay;
+	static long nfds = 1;
+	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
+
+	if (poll (fds, nfds, Timeout) < 0) {
+		/*
+		 * Error on poll
+		 */
+		return FALSE;
+	}
+
+	switch (fds[0].revents) {
+		case POLLIN:
+			return TRUE;
+		/*
+		 * Other conditions on the stream
+		 */
+		case POLLHUP:
+		case POLLERR:
+		default:
+			return FALSE;
+	}
+#endif	/* HAVE_POLL */
+
+	return FALSE;
+}
+
+
+
+
 int
 get_arrow_key (void)
 {
@@ -1236,9 +1317,16 @@ get_arrow_key (void)
 #if NCURSES_MOUSE_VERSION
 	MEVENT my_event;
 #endif
-	int ch = getch();
+	int ch;
 	int code = KEYMAP_UNKNOWN;
 
+	if (!input_pending(0)) {
+		sleep(1);
+		if (!input_pending(0))
+			return ESC;
+	}
+
+	ch = getch();
 	switch (ch) {
 		case KEY_BACKSPACE:
 			code = '\b';
@@ -1295,9 +1383,36 @@ get_arrow_key (void)
 #endif
 	}
 	return code;
-#else	/* USE_CURSES */
+#else	/* not USE_CURSES */
 	int ch;
 	int ch1;
+
+	if (!input_pending(0)) {
+#ifdef HAVE_USLEEP
+		int i=0;
+		
+		while (!input_pending(0) && i < 10) {
+			usleep(SECOND_CHARACTER_DELAY * 100);
+			i++;
+		}
+#else	/* !HAVE_USLEEP */
+#ifdef HAVE_SELECT
+		struct timeval tvptr;
+		int i=0;
+		
+		while (!input_pending(0) && i < 10) {
+			tvptr.tv_sec = 0;
+			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 100;
+			select (0, NULL, NULL, NULL, &tvptr);
+			i++;
+		}
+#else  /* !HAVE_SELECT */
+		sleep(1);
+#endif	/* HAVE_SELECT */
+#endif	/* HAVE_USLEEP */
+		if (!input_pending(0))
+			return ESC;
+	}
 
 	ch = ReadCh ();
 	if (ch == '[' || ch == 'O')  {
@@ -2380,8 +2495,8 @@ buffer_to_network (
 #endif /* LOCAL_CHARSET */
 
 
-char 
-*random_organization(
+char *
+random_organization(
 	char *in_org)
 {
 	static char selorg[512];
@@ -2411,7 +2526,7 @@ char
 	return selorg;
 }	
 
-
+#if 0
 void
 dump_input_history(void) {
 	int his_w, his_e;
@@ -2425,6 +2540,7 @@ dump_input_history(void) {
 	}
 
 }	
+#endif
 
 void
 read_input_history_file (void) {
@@ -2515,4 +2631,23 @@ write_input_history_file(void) {
 	}
 	
 	fclose(fp);
+}
+
+/* 
+ * quotes wildcards * ? \ [ ] with \
+ */
+
+char *
+quote_wild(
+	char *str)
+{
+	static char buff[2*LEN];	/* on the safe side */
+	char *target;
+
+	for (target = buff; *str != '\0'; str++) {
+		if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
+			*target++ = '\\';
+		*target++ = *str;
+	}
+	return (buff);
 }

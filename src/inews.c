@@ -102,6 +102,7 @@ submit_inews (
 		}
 	}
 
+#if 0 /* WTFIT haeh! */
 	/*
 	 * Check that domain is not of type host.subdomain.domain
 	 */
@@ -111,6 +112,7 @@ submit_inews (
 		fclose (fp);
 		return ret_code;
 	}
+#endif
 
 	/*
 	 * Send POST command to NNTP server

@@ -173,6 +173,7 @@
 #undef	HAVE_TZSET
 #undef	HAVE_UNAME
 #undef	HAVE_UNLINK
+#undef	HAVE_USLEEP
 
 /*
  * The following are functions/data that we'll have to declare if they're not

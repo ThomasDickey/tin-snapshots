@@ -336,7 +336,7 @@ read_group (
 		top++;
 
 		if (++count % MODULO_COUNT_NUM == 0 && !update) {
-			if (input_pending ()) {
+			if (input_pending (0)) {
 				buf[0] = ReadCh();
 				if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
 					if (prompt_yn (cLINES, txt_abort_indexing, TRUE) == 1) {
@@ -772,7 +772,7 @@ iReadNovFile (
 
 	while ((buf = safe_fgets (fp)) != (char *) 0) {
 
-		if (input_pending ()) {
+		if (input_pending (0)) {
 			buf[0] = ReadCh();
 			if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
 				if (prompt_yn (cLINES, txt_abort_indexing, TRUE) == 1)
@@ -1517,69 +1517,6 @@ set_article (
 	art->zombie	= FALSE;
 	art->delete	= FALSE;
 	art->inrange	= FALSE;
-}
-
-#ifdef WIN32
-/* Don't want the overhead of windows.h */
-int kbhit(void);
-#endif
-
-int
-input_pending (void)
-{
-#ifdef WIN32
-	return kbhit() ? TRUE : FALSE;
-#endif
-
-#ifdef HAVE_SELECT
-	int fd = STDIN_FILENO;
-	fd_set fdread;
-	struct timeval tvptr;
-
-	FD_ZERO(&fdread);
-
-	tvptr.tv_sec = 0;
-	tvptr.tv_usec = 0;
-
-	FD_SET(fd, &fdread);
-
-#ifdef HAVE_SELECT_INTP
-	if (select (1, (int *)&fdread, NULL, NULL, &tvptr)) {
-#else
-	if (select (1, &fdread, NULL, NULL, &tvptr)) {
-#endif
-		if (FD_ISSET(fd, &fdread)) {
-			return TRUE;
-		}
-	}
-#endif	/* HAVE_SELECT */
-
-#if defined(HAVE_POLL) && !defined(HAVE_SELECT)
-	static int Timeout = 0;
-	static long nfds = 1;
-	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
-
-	if (poll (fds, nfds, Timeout) < 0) {
-		/*
-		 * Error on poll
-		 */
-		return FALSE;
-	}
-
-	switch (fds[0].revents) {
-		case POLLIN:
-			return TRUE;
-		/*
-		 * Other conditions on the stream
-		 */
-		case POLLHUP:
-		case POLLERR:
-		default:
-			return FALSE;
-	}
-#endif	/* HAVE_POLL */
-
-	return FALSE;
 }
 
 

@@ -1,4 +1,4 @@
-MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
+MANIFEST for tin-1.3-unoff-BETA-970724 (Thu Jul 24 04:24:47 CEST 1997)
 ----------------------------------------------------
    6550 ./Makefile
    2749 ./MANIFEST
@@ -6,17 +6,17 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
   25192 ./aclocal.m4
   20446 ./config.guess
   19236 ./config.sub
- 154833 ./configure
-  16990 ./configure.in
+ 154843 ./configure
+  17000 ./configure.in
    4771 ./install.sh
     651 ./mkdirs.sh
   11743 ./makefile.in
     934 ./conf-tin
-  84231 ./doc/CHANGES
+  85093 ./doc/CHANGES
    1470 ./doc/DEBUG_REFS
   19310 ./doc/Good-Netkeeping-Seal
   15584 ./doc/INSTALL
-  17654 ./doc/TODO
+  17842 ./doc/TODO
    1627 ./doc/WHATSNEW
   12686 ./doc/auth.txt
    2323 ./doc/internals.txt
@@ -29,10 +29,10 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
     718 ./include/msmail.h
    4828 ./include/nntplib.h
    2233 ./include/os_2.h
-  22939 ./include/proto.h
+  22980 ./include/proto.h
    2389 ./include/stpwatch.h
    1877 ./include/tcurses.h
-  46044 ./include/tin.h
+  46258 ./include/tin.h
    2734 ./include/tnntp.h
     873 ./include/trace.h
   45445 ./include/tin.h
@@ -42,7 +42,7 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
     789 ./include/win32tcp.h
   18837 ./src/active.c
    8765 ./src/actived.c
-  37650 ./src/art.c
+  36650 ./src/art.c
   22917 ./src/attrib.c
    9289 ./src/auth.c
    8441 ./src/charset.c
@@ -52,22 +52,22 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
   12610 ./src/debug.c
    2266 ./src/envarg.c
   19651 ./src/feed.c
-  39219 ./src/filter.c
+  39366 ./src/filter.c
   11281 ./src/getline.c
   43436 ./src/group.c
    3007 ./src/hashstr.c
-   7097 ./src/header.c
+   7208 ./src/header.c
    9755 ./src/help.c
-   4965 ./src/inews.c
+   4996 ./src/inews.c
   33153 ./src/init.c
     962 ./src/joinpath.c
-  77074 ./src/lang.c
+  77072 ./src/lang.c
    3805 ./src/list.c
   10513 ./src/mail.c
-  21131 ./src/main.c
+  21476 ./src/main.c
    7772 ./src/makecfg.c
    9641 ./src/memory.c
-  48676 ./src/misc.c
+  50909 ./src/misc.c
    7228 ./src/msmail.c
   33100 ./src/newsrc.c
   23916 ./src/nntplib.c
@@ -78,7 +78,7 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
   42265 ./src/page.c
   24119 ./src/parsdate.y
    6472 ./src/pgp.c
-  91062 ./src/post.c
+  91554 ./src/post.c
    9755 ./src/prompt.c
     160 ./src/proto.sed
   21891 ./src/refs.c
@@ -87,12 +87,12 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
   21935 ./src/rfc1522.c
   33917 ./src/save.c
    5184 ./src/screen.c
-  11099 ./src/search.c
+  11100 ./src/search.c
   36599 ./src/select.c
    5669 ./src/sigfile.c
    9173 ./src/signal.c
    5750 ./src/strftime.c
-   7416 ./src/string.c
+   7417 ./src/string.c
    4502 ./src/tcurses.c
   29100 ./src/thread.c
     971 ./src/trace.c
@@ -104,13 +104,13 @@ MANIFEST for tin-1.3-unoff-BETA-970709 (Wed Jul  9 07:00:48 CEST 1997)
    4987 ./amiga/README
    9411 ./amiga/smakefile
    4987 ./amiga/actived.c
-  17649 ./amiga/amiga.c
-   4656 ./amiga/amigatcp.c
+  17201 ./amiga/amiga.c
+   6373 ./amiga/amigatcp.c
    2752 ./amiga/amiga.h
-   2173 ./amiga/amigatcp.h
-   8179 ./include/autoconf.hin
+   2167 ./amiga/amigatcp.h
+   8198 ./include/autoconf.hin
   11773 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3976 ./src/tincfg.tbl
-1836834 total
+1841800 total

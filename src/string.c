@@ -448,3 +448,4 @@ str_trim(
 
 	return(string);
 }
+
