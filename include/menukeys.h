@@ -221,7 +221,8 @@
 
 #define iKeyNrctblCreate 'c'
 #define iKeyNrctblDefault 'd'
-#define iKeyNrctblIgnore 'i'
+#define iKeyNrctblAlternative 'a'
+#define iKeyNrctblQuit 'q'
 
 /* page.c */
 
@@ -299,7 +300,9 @@
 #define iKeyPostContinue 'c'
 #define iKeyPostAbort 'a'
 #define iKeyPostPost 'p'
+#define iKeyPostPost2 'y'
 #define iKeyPostSend 's'
+#define iKeyPostSend2 'y'
 #define iKeyPostSupersede 's'
 #define iKeyPostPostpone 'o'
 

@@ -1,5 +1,12 @@
 Bugs
 ----
+o  external inews, ~/.signature and base64 encoding MUST 'fail'
+   (article will be encoded, signature will be not!)
+   [Sven Paulus <sven@karlsruhe.org>]
+
+o  print a 'usage error' and quit tin when it is started with '-v' only.
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
 o  wait_message() is 'broken': it does not wait
    (check where wait_message should wait or where info_message should be
     used instead... or add a 2nd argument (seconds) to wait_message...)
@@ -14,6 +21,7 @@ o  a problem concerning .tin/posted: when I post a postponed followup,
    a 'w' is written to the file instead of a 'f'. If there's a
    "References:" header, the article should be regarded as a followup.
    [Vincent Lefevre <vlefevre@ens-lyon.fr>]
+   (970919 - partial solution by checking for "Re: " in subject -sp)
 
 o  the cursor position gets 'lost' after 'y'ank in 'y'ank out - it'll
    be placed to the first(last?) group in your list, not to the one it
@@ -23,10 +31,6 @@ o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.
    [Jason C Lin <jlin@hawaii.edu>]
    [I can't reproduce this - jason@radar.demon.co.uk]
-
-o  When an article is piped and the message "Press <RETURN> to continue..."
-   appears, if an arrow key is pressed, arbitrary commands are executed.
-   [Jason C Lin <jlin@hawaii.edu>]
 
 o  word_h_display_marks, word_highlighting and wildcard are sometimes
    reseted to their default value.
@@ -43,21 +47,19 @@ o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
    [Stan Brooks <stabro@almatel.net>]
 
 o  tin does not care about resizing the xterm it's running in.
-   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de>]
+   [I can't reproduce this, what OS? - sven@karlsruhe.org]
 
 o  tin (sometimes?) overwrites the newsgroup-number and number of unread
    articles with spaces when turning on newsgroup descriptions with
    strip_blanks=OFF - the bugs seems to be related to the screen-width and
    does not show up on small screens, but in large xterms...
    (sounds like a calculation error with float -> int values [urs])
-   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de>]
 
 o  sometimes tin truncates newsgroup-names after turning off newsgroup
    descriptions.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
-o  supersedes does not work if one of the Newsgroups is not present in the
-   active file.
 
 o  commas in real-name might cause problems in mail-replys
    -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
@@ -101,8 +103,6 @@ o  'K' is still a bit inconsistent
    - in the thread menu (thread.c) it jumps to the next article
    - in the article pager (page.c) it marks the whole thread as unread
      and jumps to the next thread containing unread articles
-
-o  tin crashes if started with too small a screen size ???
 
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always

@@ -173,7 +173,7 @@ extern const char *get_host_name (void);
 
 /* inews.c */
 extern int submit_news_file (char *name);
-extern void get_from_name (char *from_name);
+extern void get_from_name (char *from_name, struct t_group *thisgrp);
 extern void get_user_info (char *user_name, char *full_name);
 
 /* init.c */
@@ -262,7 +262,7 @@ extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
 extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl, t_bool with_sig);
-extern void copy_fp (FILE *fp_ip, FILE *fp_op, const char *prefix);
+extern void copy_fp (FILE *fp_ip, FILE *fp_op);
 extern void create_index_lock_file (char *the_lock_file);
 extern void draw_percent_mark (long cur_num, long max_num);
 extern void get_author (int thread, struct t_article *art, char *str, int len);

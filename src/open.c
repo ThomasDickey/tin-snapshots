@@ -1301,9 +1301,9 @@ vGrpGetArtInfo (
 		long	lDummy;
 
 		sprintf (acBuf, "group %s", pcGrpName);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("vGrpGetArtInfo", acBuf);
-#endif
+#	endif
 		put_server (acBuf);
 
 		switch (get_server (acLine, NNTP_STRLEN)) {
@@ -1320,9 +1320,9 @@ vGrpGetArtInfo (
 				break;
 		}
 
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("vGrpGetArtInfo", acLine);
-#endif
+#	endif
 
 		switch (atoi(acLine)) {
 

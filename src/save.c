@@ -218,7 +218,7 @@ check_start_save_any_news (
 							wait_message (buf);
 						}
 						fseek (note_fp, 0L, SEEK_SET);
-						copy_fp (note_fp, fp, "");
+						copy_fp (note_fp, fp);
 						art_close ();
 						fclose (fp);
 						saved_arts++;
@@ -330,6 +330,12 @@ save_art_to_file (
 
 	if (!save[i].is_mailbox) {
 		if (stat (file, &st) != -1) {
+			if (S_ISDIR(st.st_mode)) {
+				sprintf (buf, txt_cannot_write_to_directory, file);
+				info_message (buf);
+				sleep(2);
+				return FALSE;
+			}
 			ch_default = default_save_mode;
 			do {
 				sprintf (buf, txt_append_overwrite_quit, file);
@@ -377,7 +383,7 @@ save_art_to_file (
 	if (fseek (note_fp, 0L, SEEK_SET) == -1) {
 		perror_message ("fseek() error on [%s]", arts[respnum].subject);
 	}
-	copy_fp (note_fp, fp, "");
+	copy_fp (note_fp, fp);
 
 	print_art_seperator_line (fp, the_mailbox);
 
