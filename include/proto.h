@@ -548,6 +548,7 @@ extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);
 extern t_bool set_win_size (int *num_lines, int *num_cols);
 extern void allow_resize(t_bool allow);
 extern void handle_resize (t_bool repaint);
+extern void set_noteslines (int num_lines);
 extern void set_signal_catcher (int flag);
 extern void set_signal_handlers (void);
 extern void set_signals_art (void);

@@ -1,4 +1,10 @@
--- 1.4.5 release 20001104 "" --
+-- 1.4.5 release 20001218 "" --
+
+031) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. empty news_headers_to_[not_]display_array could cause a SIGSEGV
+     BUG. changing beginner_level or show_description from the options menu
+          messed up the screen
+     FIX. proto.h, config.c, signal.c
 
 030) Thomas E. Dickey <dickey@herndon4.his.com>
      ADD. VMS port
