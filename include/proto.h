@@ -1,7 +1,7 @@
 #if __STDC__ || defined(__cplusplus)
 #	define P_(s) s
 #else
-#	define P_(s) ()
+#	define P_(s) ()  
 #endif
 
 /* ./active.c */
@@ -54,7 +54,7 @@ extern void set_attrib_str P_((int type, char *scope, char *str));
 extern void set_attrib_num P_((int type, char *scope, int num));
 extern void set_attrib P_((struct t_group *psGrp, int type, char *str, int num));
 extern void write_attributes_file P_((char *file));
-extern void debug_print_filter_attributes P_((void));
+/* extern void debug_print_filter_attributes P_((void)); */
 /* ./charset.c */
 extern void ConvertIso2Asc P_((unsigned char *iso, unsigned char *asc, int t));
 extern void ConvertTeX2Iso P_((unsigned char *from, unsigned char *to));
@@ -190,11 +190,13 @@ extern struct t_group *psGrpFirst P_((void));
 extern struct t_group *psGrpLast P_((void));
 extern struct t_group *psGrpNext P_((void));
 extern struct t_group *psGrpPrev P_((void));
-extern void vGrpTest P_((void));
+/* extern void vGrpTest P_((void)); */
 /* ./mail.c */
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 extern void read_mail_active_file P_((void));
 extern void write_mail_active_file P_((void));
 extern void read_mailgroups_file P_((void));
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 extern void read_newsgroups_file P_((void));
 extern void read_groups_descriptions P_((FILE *fp, FILE *fp_save));
 extern void vPrintActiveHead P_((char *pcActiveFile));
@@ -204,8 +206,10 @@ extern void vPrintGrpLine P_((FILE *hFp, char *pcGrpName, long lArtMax, long lAr
 extern long lAtol P_((char *pcStr, int iNum));
 extern void vMakeGrpPath P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
 extern void vMakeGrpName P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 extern void vGrpDelMailArt P_((struct t_article *psArt));
 extern void vGrpDelMailArts P_((struct t_group *psGrp));
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 /* ./main.c */
 extern void main P_((int argc, char *argv[]));

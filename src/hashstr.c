@@ -88,12 +88,8 @@ add_string (s)
 
 	p->next = (struct t_hashnode *) 0;
 	iptr = (int *) &p[1];
-#ifndef OLD_THREADING
 	*iptr++ = -1;
 	*iptr++ = -1;
-#else
-	*iptr++ = -1;
-#endif
 	p->s = (char *) iptr;
 	strcpy (p->s, s);
 

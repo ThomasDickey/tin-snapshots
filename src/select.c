@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 extern int index_point;
 extern int thread_basenote;

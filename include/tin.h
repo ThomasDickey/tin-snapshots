@@ -673,12 +673,11 @@ extern char *get_uaf_fullname();
 #	define	MARK_INRANGE		'#'	/* group/art within a range (# command) */
 #endif
 
+#define			SELECT_MISC_COLS	21
 #ifdef USE_INVERSE_HACK
-#	define		SELECT_MISC_COLS	21
 #	define		BLANK_GROUP_COLS	2
 #	define		BLANK_PAGE_COLS 	2
 #else
-#	define		SELECT_MISC_COLS	21
 #	define		BLANK_GROUP_COLS	0
 #	define		BLANK_PAGE_COLS 	0
 #endif
@@ -1379,7 +1378,7 @@ typedef char t_comptype;
 #define		MOUSE_BUTTON_3	2
 
 #define	EDITOR_FORMAT_OFF	"%E %F"
-#define	ISPELL_CMD			"ispell"
+#define	ISPELL_CMD		"ispell"
 
 #ifdef WIN32
 #	define	my_fputc(ch, stream)		cmd_line ? fputc (ch, stream) : addch (ch)
@@ -1453,9 +1452,6 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef M_UNIX
 #	define	NEWSGROUPS_FILE 	"newsgroups"
-/*
-#	define	BUG_REPORT_ADDRESS	"iain@scn.de"
-*/
 #	define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
 #	define	REDIRECT_OUTPUT 	"> /dev/null 2>&1"
 #	define	REDIRECT_PGP_OUTPUT "> /dev/null"
@@ -1553,11 +1549,9 @@ typedef const char __far constext;
 typedef char constext;
 #endif
 
-#include	"patchlev.h"
 #include	"extern.h"
 #include	"nntplib.h"
 #include	"proto.h"
-#include	"menukeys.h"
 
 #if defined(WIN32)
 #include	"msmail.h"
@@ -1568,7 +1562,6 @@ typedef char constext;
 #else
 #	define P_(s) ()
 #endif
-
 
 #ifdef DBMALLOC
 #	undef strchr

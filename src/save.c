@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 #undef  OFF
 

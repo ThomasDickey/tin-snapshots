@@ -16,7 +16,7 @@
 
 #ifdef	PROFILE
 #	include	"stpwatch.h"
-#endif	/* PROFILE */
+#endif
 
 #define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
 

@@ -14,6 +14,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 char new_newnews_host[PATH_LEN];
 int group_hash[TABLE_SIZE];			/* group name --> active[] */
@@ -108,10 +109,14 @@ resync_active_file ()
 		free_active_arrays ();
 		max_active = get_active_num ();
 		expand_active ();
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mail_active_file ();
+#endif
 		read_news_active_file ();
 		read_attributes_file ();
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mailgroups_file ();
+#endif
 		read_newsgroups_file ();
 */
 		command_line = read_cmd_line_groups ();

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"patchlev.h"
 
 #if defined(M_AMIGA)
 

@@ -301,7 +301,6 @@ constext txt_invalid_from1[] = "Invalid  From: %s  line. Read the INSTALL file a
 constext txt_invalid_from2[] = "Invalid  From: %s line. Reconfigure your domainname.";
 constext txt_inverse_off[] = "Inverse video disabled";
 constext txt_inverse_on[] = "Inverse video enabled";
-constext txt_ispell_define_not_compiled[] = "Interactive spellchecker not enabled. Recompile with -DHAVE_ISPELL.";
 constext txt_filtering_arts[] = "Selecting articles...";
 constext txt_last_resp[] = "-- Last response --";
 constext txt_lines[] = "Lines %s  ";

@@ -1271,8 +1271,7 @@ art_mark_will_return (group, art)
 
 
 void
-art_mark_deleted (/*group, */art)
-/*	struct t_group *group; */
+art_mark_deleted (art)
 	struct t_article *art;
 {
 	if (art != (struct t_article *) 0) {
@@ -1283,8 +1282,7 @@ wait_message("FIXME  article marked for deletion");
 
 
 void
-art_mark_undeleted (/*group,*/ art)
-/*	struct t_group *group; */
+art_mark_undeleted (art)
 	struct t_article *art;
 {
 	if (art != (struct t_article *) 0) {

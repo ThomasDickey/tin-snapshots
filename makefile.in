@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960626
+PVER		= 960630
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -28,7 +28,6 @@ HFILES	= \
 	$(INCDIR)/amigatcp.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
-	$(INCDIR)/gst.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/msmail.h \
 	$(INCDIR)/nntplib.h \

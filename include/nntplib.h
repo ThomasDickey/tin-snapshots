@@ -30,7 +30,6 @@
 #define	SMTP_TCP_PORT	"25"
 
 /*
-
  *
  * @(#)Header: nntp.h,v 1.81 92/03/12 02:08:31 sob Exp $
  *
@@ -79,7 +78,7 @@
 #define	OK_NOTEXT		223	/* No text sent -- stat, next, last */
 #define	OK_XOVER		224	/* .overview data follows */
 #define	OK_NEWNEWS		230	/* New articles by message-id follow */
-#define	OK_NEWGROUPS	231	/* New newsgroups follow */
+#define	OK_NEWGROUPS		231	/* New newsgroups follow */
 #define	OK_XFERED		235	/* Article transferred successfully */
 #define	OK_POSTED		240	/* Article posted successfully */
 #define	OK_AUTHSYS		280	/* Authorization system ok */

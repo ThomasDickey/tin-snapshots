@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 #define MARK_OFFSET	8
 #define CURR_GROUP	(active[my_group[cur_groupnum]])
@@ -1244,10 +1245,10 @@ group_done:
 		tin_done (EXIT_OK);
 	}	
 	clear_note_area ();
-
+#ifdef	HAVE_MH_MAIL_HANDLING
 	vGrpDelMailArts (&CURR_GROUP);
-
-#endif /* INDEX_DAEMON */
+#endif	/* HAVE_MH_MAIL_HANDLING */
+#endif	/* INDEX_DAEMON */
 }
 
 

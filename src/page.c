@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 char note_h_from[LEN];			/* From:         */
 char note_h_path[LEN];			/* Path:         */

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include 	"patchlev.h"
 
 #ifdef M_UNIX
 /*
@@ -267,12 +268,11 @@ invoke_editor (filename, lineno)
 	return invoke_cmd (buf);
 }
 
-
+#ifdef HAVE_ISPELL
 int 
 invoke_ispell (nam)
 	char *nam;
 {
-#ifdef HAVE_ISPELL
 	char buf[PATH_LEN];
 	char *my_ispell;
 	static char ispell[PATH_LEN];
@@ -296,11 +296,8 @@ invoke_ispell (nam)
 	wait_message (buf);
 
 	return invoke_cmd (buf);
-#else
-	error_message (txt_ispell_define_not_compiled, "");
-	return FALSE;
-#endif
 }
+#endif
 
 
 #ifndef NO_SHELL_ESCAPE
@@ -405,7 +402,9 @@ tin_done (ret)
 	}
 
 	vWriteNewsrc ();
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	write_mail_active_file ();
+#endif
 	if (ret != EXIT_NNTP_ERROR) {
 		nntp_close ();			/* disconnect from NNTP server */
 	}

@@ -98,4 +98,3 @@ extern int tmp_close(FILE *fp);
 #endif	/* AMIGA_H */
 
 #endif	/* M_AMIGA */
-

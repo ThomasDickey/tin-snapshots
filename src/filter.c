@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 #define IS_READ(i)		(arts[i].status == ART_READ)
 #define IS_KILLED(i)	(arts[i].killed == 1)

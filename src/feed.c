@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 extern char note_h_date[PATH_LEN];	/* Date:	*/
 extern char note_h_newsgroups[LEN];	/* Newsgroups:	*/
