@@ -61,7 +61,7 @@ get_search_pattern(
 	}
 
 	wait_message (txt_searching);
-	MoveCursor(cLINES, 0);
+	stow_cursor();
 
 	if (wildcard)			/* ie, not wildmat() */
 		return(def);

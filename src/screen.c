@@ -154,7 +154,10 @@ center_line (
 	int inverse,
 	const char *str)
 {
-	int pos;
+	int pos, n;
+	char buffer[256];
+
+	strcpy(buffer, str);
 
 	if (!cmd_line) {
 		if (cCOLS >= (int) strlen (str)) {
@@ -168,12 +171,21 @@ center_line (
 			my_flush();
 		}
 	}
-	if ((int) strlen (str) >= cCOLS) {
+
+	/* protect terminal... */
+	strcpy(buffer, str);
+	for (n = 0; buffer[n] != '\0'; n++) {
+		if (!(isprint(buffer[n]) || ((unsigned char) buffer[n] >= 0xa0))) {
+			buffer[n] = '?';
+		}
+	}
+
+	if ((int) strlen (buffer) >= cCOLS) {
 		char buf[256];
-		sprintf(buf, "%-.*s%s", cCOLS-6, str, " ...");
+		sprintf(buf, "%-.*s%s", cCOLS-6, buffer, " ...");
 		my_fputs (buf, stdout);
 	} else {
-		my_fputs (str, stdout);
+		my_fputs (buffer, stdout);
 	}
 	
 	if (cmd_line) {

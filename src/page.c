@@ -1228,8 +1228,7 @@ show_first_header (
 
 		my_fputs (buf, stdout);
 		parse_from(note_h_ftnto, buf, ftbuf);
-		if (strlen(ftbuf) > 19)
-			ftbuf[19] = '\0';
+		ftbuf[19] = '\0';
 		StartInverse ();
 		my_fputs (ftbuf, stdout);
 		EndInverse ();
@@ -1282,6 +1281,7 @@ show_first_header (
 	}
 
 	StartInverse ();
+	/* ?? protect display from non-displayable characters ?? */
 	my_fputs (buf, stdout);
 	EndInverse ();
 

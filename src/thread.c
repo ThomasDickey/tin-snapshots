@@ -173,6 +173,13 @@ bld_tline (
 		get_author (TRUE, art, buff+strlen(buff), cCOLS-strlen(buff));
 	}
 
+/* protect display from non-displayable characters (e.g., form-feed) */
+	for (i = 0; buff[i] != '\0'; i++) {
+		if (!(isprint(buff[i]) || ((unsigned char) buff[i] >= 0xa0))) {
+			buff[i] = '?';
+		}
+	}
+
 	if (!strip_blanks) {
 		/*
 		 * Pad to end of line so that inverse bar looks 'good'
