@@ -923,8 +923,6 @@ quick_post_article (
 		return;
 	}
 
-	setup_screen ();
-	InitScreen ();
 	ClearScreen ();
 
 	/*
@@ -943,21 +941,11 @@ quick_post_article (
 	 * If multiple newsgroups test all to see if any are moderated.
 	 */
 	sprintf (buf, txt_post_newsgroups, tinrc.default_post_newsgroups);
-
-	if (!prompt_string (buf, group, HIST_POST_NEWSGROUPS)) {
-		my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
+	if (!(prompt_string_default (buf, tinrc.default_post_newsgroups,
+									txt_no_quick_newsgroups, HIST_POST_NEWSGROUPS)))
 		return;
-	}
-	if (strlen (group))
-		my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
-	else {
-		if (*tinrc.default_post_newsgroups)
-			my_strncpy (group, tinrc.default_post_newsgroups, sizeof (group));
-		else {
-			my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
-			return;
-		}
-	}
+
+	strncpy (group, tinrc.default_post_newsgroups, sizeof(group));
 
 	/*
 	 * Strip double newsgroups
@@ -970,8 +958,7 @@ quick_post_article (
 	strcpy (tmp, group);
 	while (!done) {
 		strcpy (buf, tmp);
-		ptr = strchr (buf, ',');
-		if (ptr != (char *) 0) {
+		if ((ptr = strchr (buf, ',')) != (char *) 0) {
 			strcpy (tmp, ptr + 1);
 			*ptr = '\0';
 		} else
@@ -983,9 +970,7 @@ quick_post_article (
 			wait_message (1, "Group=[%s]", buf);
 #endif /* DEBUG */
 		if (!psGrp) {
-			Raw (FALSE);
-			/* FIXME: -> lang.c */
-			my_fprintf (stderr, "\nGroup %s not found in active file. Exiting...\n", buf);
+			error_message (txt_not_in_active_file, buf);
 			return;
 		}
 		if (psGrp->moderated == 'x' || psGrp->moderated == 'n') {
@@ -1015,23 +1000,11 @@ quick_post_article (
 		strncpy(tmp, tinrc.default_post_subject, sizeof(tmp));
 
 	sprintf (buf, txt_post_subject, tmp);
-
-	if (!prompt_string (buf, subj, HIST_POST_SUBJECT)) {
-		Raw (FALSE);
-		my_fprintf (stderr, "%s\n", txt_no_quick_subject);
+	if (!(prompt_string_default (buf, tinrc.default_post_subject,
+									txt_no_quick_subject, HIST_POST_SUBJECT)))
 		return;
-	}
-	if (strlen (subj))
-		my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
-	else {
-		if (*tinrc.default_post_subject)
-			my_strncpy (subj, tinrc.default_post_subject, sizeof (subj));
-		else {
-			Raw (FALSE);
-			my_fprintf (stderr, "%s\n", txt_no_quick_subject);
-			return;
-		}
-	}
+
+	strncpy (subj, tinrc.default_post_subject, sizeof(subj));
 
 	PRINT_LF();
 
@@ -1045,9 +1018,7 @@ quick_post_article (
 /* FIXME so that group only contains 1 group when finding an index number */
 /* Does this count? */
 	strcpy (buf, group);
-	ptr = strchr (buf, ',');
-
-	if (ptr)
+	if ((ptr = strchr (buf, ',')) != NULL)
 		*ptr = '\0';
 
 	psGrp = psGrpFind (group);
@@ -2043,7 +2014,7 @@ post_response (
 				strcpy (save_followup, note_h.followup);
 				*note_h.followup = '\0';
 				find_reply_to_addr (/*respnum,*/ buf, FALSE);
-				mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);
+				mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);	/* FIXME: arg5 is t_bool */
 				strcpy (note_h.followup, save_followup);
 				return ret_code;
 			}

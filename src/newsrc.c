@@ -1342,9 +1342,6 @@ art_mark_read (
 			if (group != (struct t_group *) 0 && group->newsrc.num_unread)
 				group->newsrc.num_unread--;
 
-			if (art->killed)
-				num_of_killed_arts++;
-
 			if (art->selected && num_of_selected_arts)
 				num_of_selected_arts--;
 

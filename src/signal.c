@@ -168,15 +168,21 @@ void
 allow_resize (
 	t_bool allow)
 {
+#	ifdef HAVE_POSIX_JC
 	struct sigaction sa, osa;
 
 	sa.sa_handler = signal_handler;
 	sigemptyset (&sa.sa_mask);
 	sa.sa_flags = 0;
+#	ifdef SA_RESTART
 	if (!allow)
 		sa.sa_flags |= SA_RESTART;
+#	endif /* SA_RESTART */
+#	ifdef SIGWINCH
 	sigaction(SIGWINCH, &sa, &osa);
+#	endif /* SIGWINCH */
 	sigaction(SIGTSTP, &sa, &osa);
+#endif /* HAVE_POSIX_JC */
 }
 
 static const char *
@@ -197,6 +203,7 @@ signal_name (
 /*
  * Rescale the display buffer and redraw the contents according to
  * the current context
+ * This should NOT be called from an interrupt context
  */
 #if defined(SIGWINCH) || defined(SIGTSTP)
 void
@@ -205,7 +212,6 @@ handle_resize (
 {
 #	ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
-	RESTORE_HANDLER (SIGWINCH, signal_handler);
 #	endif /* SIGWINCH */
 
 	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
@@ -340,15 +346,12 @@ signal_handler (
 #ifdef SIGWINCH
 		case SIGWINCH:
 			need_resize = cYes;
+			RESTORE_HANDLER (SIGWINCH, signal_handler);
 			return;
 #endif /* SIGWINCH */
 		default:
 			break;
 	}
-#if 0
-	Raw (FALSE);	/* This is in tin_done() */
-	EndWin ();
-#endif /* 0 */
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
 #if defined(SIGHUP)
 	if (sig == SIGHUP) {
@@ -454,9 +457,9 @@ set_win_size (
 #ifdef TIOCGSIZE
 	struct ttysize win;
 #else
-#  ifdef TIOCGWINSZ
+#	ifdef TIOCGWINSZ
 	struct winsize win;
-#  endif /* TIOCGWINSZ */
+#	endif /* TIOCGWINSZ */
 #endif /* TIOCGSIZE */
 
 	old_lines = *num_lines;

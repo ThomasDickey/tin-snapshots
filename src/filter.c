@@ -1415,8 +1415,10 @@ filter_articles (
 	 */
 	for (i = 0; i < top; i++) {
 		arts[i].score = 0;
+#ifdef KILL_READ
 		if (IS_READ(i)) /* skip only when the article is read */
 			continue;
+#endif /* KILL_READ */
 
 		for (j = 0; j < num; j++) {
 			if (ptr[j].inscope) {
@@ -1753,6 +1755,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	for (i = 0; i < top; i++) {
 		if (arts[i].score <= SCORE_LIM_KILL) {
 			arts[i].killed = TRUE;
+			num_of_killed_arts++;
 			filtered = TRUE;
 			art_mark_read (group, &arts[i]);
 		} else if (arts[i].score >= SCORE_LIM_SEL) {

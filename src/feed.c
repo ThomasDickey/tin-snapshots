@@ -28,8 +28,8 @@ t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
 /*
  * Local prototypes
  */
-static int print_file (char *command, int respnum, int count);
 static t_bool does_article_exist (int function, struct t_article *art, char *path);
+static t_bool print_file (char *command, int respnum, int count);
 
 void
 feed_articles (
@@ -51,12 +51,12 @@ feed_articles (
 	int b, i, j;
 	int orig_note_page = 0;
 	int processed = 0;
-	t_bool is_mailbox = FALSE;
-	t_bool processed_ok = TRUE;
-	t_bool redraw_screen = FALSE;
 	t_bool confirm;
+	t_bool is_mailbox = FALSE;
 	t_bool orig_note_end = FALSE;
 	t_bool proceed;
+	t_bool processed_ok = TRUE;
+	t_bool redraw_screen = FALSE;
 	t_bool ret1 = FALSE;
 	t_bool ret2 = FALSE;
 	t_bool supersede = FALSE;
@@ -647,7 +647,7 @@ got_sig_pipe_while_piping:
 }
 
 
-static int
+static t_bool
 print_file (
 	char *command,
 	int respnum,
@@ -697,7 +697,7 @@ print_file (
 	pclose (fp);
 #	endif /* DONT_HAVE_PIPING */
 
-	return (TRUE);	/* a hack that will check if file was really checked later */
+	return TRUE;	/* a hack that will check if file was really checked later */
 }
 
 

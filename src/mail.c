@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"tcurses.h"
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 #	include	"tcurses.h"
@@ -57,10 +58,6 @@ read_mail_active_file (
 	}
 
 	while (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
-/*
-my_printf ("Line=[%s", buf);
-my_flush();
-*/
 		if (!parse_active_line (buf, &max, &min, my_spooldir) || *buf == '\0')
 			continue;
 
@@ -95,8 +92,8 @@ my_flush();
 	}
 	fclose (fp);
 
-	if (INTERACTIVE2)
-		wait_message (0, "\n");
+	if (INTERACTIVE)
+		my_fputs("\n", stdout);
 }
 
 
@@ -146,14 +143,15 @@ read_mailgroups_file (
 		return;
 
 	if ((fp = open_mailgroups_fp ()) != (FILE *) 0) {
-		wait_message (0, txt_reading_mailgroups_file);
+		if (INTERACTIVE)
+			wait_message (0, txt_reading_mailgroups_file);
 
 		read_groups_descriptions (fp, (FILE *) 0);
 
 		fclose (fp);
 
-/*PLOK2*/	if (cmd_line && !verbose)
-			wait_message (0, "\n");
+		if (INTERACTIVE)
+			my_fputs("\n", stdout);
 	}
 }
 #endif /* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
@@ -174,9 +172,10 @@ read_newsgroups_file (
 	if (!show_description || save_news || catchup)
 		return;
 
-	wait_message (0, txt_reading_newsgroups_file);
-
 	if ((fp = open_newsgroups_fp ()) != (FILE *) 0) {
+		if (INTERACTIVE)
+			wait_message (0, txt_reading_newsgroups_file);
+
 
 		if (read_news_via_nntp && !read_local_newsgroups_file && !no_write)
 			fp_save = fopen (local_newsgroups_file, "w" FOPEN_OPTS);
@@ -189,11 +188,10 @@ read_newsgroups_file (
 		}
 
 		TIN_FCLOSE (fp);
+
+		if (INTERACTIVE)
+			my_fputs("\n", stdout);
 	}
-
-/*PLOK2*/	if (cmd_line && !(batch_mode || verbose))
-		wait_message (0, "\n");
-
 #endif /* !INDEX_DAEMON */
 }
 

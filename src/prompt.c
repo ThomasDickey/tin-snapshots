@@ -415,7 +415,7 @@ prompt_string_default (
 		my_strncpy (def, pattern, LEN);
 	else {
 		if (def[0] == '\0')	{		/* no default - give up */
-			info_message (failtext);
+			error_message (failtext);
 			return NULL;
 		}
 	}

@@ -152,6 +152,7 @@ rfc1521_decode (
 			 */
 			strcpynl(boundary, strcasestr(content_type, "boundary=") + 9);
 
+			/* FIXME -> lang.c */
 			fputs("X-Conversion-Note: multipart/alternative contents have been removed.\n", f);
 			fputs("\tTo get the whole article, turn tinrc.alternative_handling OFF\n", f);
 

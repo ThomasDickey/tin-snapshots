@@ -69,7 +69,7 @@ static const char *gnksa_domain_list[] = {
 	"arpa",
 	"uucp",
 	"bitnet",
-#  if 0
+#	if 0
 	/* the new domain names, not yet valid */
 	"nom",
 	"rec",
@@ -78,7 +78,7 @@ static const char *gnksa_domain_list[] = {
 	"firm",
 	"info",
 	"shop",
-#  endif /* 0 */
+#	endif /* 0 */
 #	ifdef TINC_DNS
 	"bofh",
 #	endif /* TINC_DNS */

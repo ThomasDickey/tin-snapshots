@@ -38,6 +38,8 @@ void setup_screen (void)
 {
 	cmd_line = FALSE;
 	bcol(tinrc.col_back);
+	scrollok(stdscr, TRUE);
+	set_win_size (&cLINES, &cCOLS);
 }
 
 /*
@@ -57,7 +59,7 @@ int InitScreen (void)
 	initscr();
 	cCOLS = COLS;
 	cLINES = LINES - 1;
-	set_win_size(&cLINES, &cCOLS);
+/*	set_win_size(&cLINES, &cCOLS);*/
 	raw(); noecho(); cbreak();
 	cmd_line = FALSE;	/* ...so fcol/bcol will succeed */
 
@@ -198,7 +200,8 @@ void set_keypad_off (void) { if (!cmd_line) keypad(stdscr, FALSE); }
  * Ncurses mouse support is turned on/off when the keypad code is on/off,
  * as well as when we enable/disable the mousemask.
  */
-void set_xclick_on (void)
+void
+set_xclick_on (void)
 {
 #	ifdef NCURSES_MOUSE_VERSION
 	if (tinrc.use_mouse)
@@ -210,7 +213,8 @@ void set_xclick_on (void)
 
 /*
  */
-void set_xclick_off (void)
+void
+set_xclick_off (void)
 {
 #	ifdef NCURSES_MOUSE_VERSION
 	(void) mousemask(0, (mmask_t *)0);

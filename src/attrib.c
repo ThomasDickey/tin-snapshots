@@ -359,9 +359,10 @@ read_attributes_file (
 	}
 /* debug_print_filter_attributes(); */
 
-	if (INTERACTIVE2)
+#if 0
+	if (INTERACTIVE)
 		wait_message (0, "\n");
-
+#endif
 }
 
 

@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990413"
-#	define RELEASENAME	"Endemoniada"
+#	define RELEASEDATE	"19990517"
+#	define RELEASENAME	"Psychonaut"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

@@ -618,9 +618,15 @@ dump_msgid_threads (
  *     (it's already threaded/expired OR it has been autokilled)
  */
 
-#define SKIP_ART(ptr)	\
+#ifdef KILL_READ
+#	define SKIP_ART(ptr)	\
+	(ptr && (ptr->article == ART_UNAVAILABLE || \
+		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+#else
+#	define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || \
 		(arts[ptr->article].thread != ART_NORMAL /*|| arts[ptr->article].killed*/)))
+#endif /* KILL_READ */
 
 static struct t_msgid *
 find_next (

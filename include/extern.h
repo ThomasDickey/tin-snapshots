@@ -1153,6 +1153,7 @@ extern int num_of_killed_arts;
 extern int num_of_selected_arts;
 extern int num_of_tagged_arts;
 extern int num_save;
+extern int signal_context;
 extern int start_line_offset;
 extern int system_status;
 extern int this_resp;
@@ -1197,9 +1198,6 @@ extern t_bool delete_index_file;
 extern t_bool disable_gnksa_domain_check;
 extern t_bool disable_sender;
 extern t_bool do_rfc1521_decoding;
-#ifdef NNTP_ABLE
-extern t_bool force_auth_on_conn_open;
-#endif
 extern t_bool force_reread_active_file;
 extern t_bool global_filtered_articles;
 extern t_bool got_sig_pipe;
@@ -1339,7 +1337,7 @@ extern constext txt_opt_mail_address[];
 #	ifdef VMS /* M.St. 15.01.98 */
 		extern constext txt_pipe_to_command[];
 		extern constext txt_piping[];
-#	endif
+#	endif /* VMS */
 	extern constext txt_piping_not_enabled[];
 #endif /* !DONT_HAVE_PIPING */
 
@@ -1414,7 +1412,6 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_toggled_high[];
 	extern int default_bcol;
 	extern int default_fcol;
-	extern int signal_context;
 	extern t_bool use_color;
 	extern t_bool word_highlight;
 #	ifdef USE_CURSES
@@ -1507,6 +1504,7 @@ extern constext txt_opt_mail_address[];
 
 #ifdef NNTP_ABLE
 	extern unsigned short nntp_tcp_port;
-#endif
+	extern t_bool force_auth_on_conn_open;
+#endif /* NNTP_ABLE */
 
 #endif /* !EXTERN_H */

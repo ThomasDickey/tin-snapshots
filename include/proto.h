@@ -288,6 +288,7 @@ extern void set_tin_uid_gid (void);
 extern void show_inverse_video_status (void);
 extern void strip_address (char *the_address, char *stripped_address);
 extern void strip_double_ngs (char *ngs_list);
+extern void strip_name (char *the_address, char *stripped_address);
 extern void tin_done (int ret);
 extern void toggle_inverse_video (void);
 extern void vPrintBugAddress (void);
@@ -593,6 +594,7 @@ extern int which_thread (int n);
 extern void show_thread_page (void);
 #ifndef INDEX_DAEMON
 	extern int thread_page (struct t_group *group, int respnum, int thread_depth);
+	extern void fixup_thread (int respnum, t_bool redraw);
 #endif /* !INDEX_DAEMON */
 
 /* wildmat.c */

@@ -121,6 +121,7 @@ decr_tagged (
  * GRP_QUIT			User has done a 'Q'
  * GRP_NEXT			User wants to move onto next group
  * GRP_NEXTUNREAD	User did a 'C'atchup
+ * GRP_ENTER		'g' command has been used to set group to enter
  */
 int
 group_page (
@@ -511,7 +512,7 @@ group_catchup:									/* came here on group exit via left arrow */
 					if (old_group_top != group_top)
 						set_groupname_len(FALSE);
 					cur_groupnum = n;
-					index_point = GRP_NEXTUNREAD;
+					index_point = GRP_ENTER;
 					goto group_done;
 				}
 				break;
@@ -741,7 +742,7 @@ enter_pager:
 						break;
 
 					case GRP_GOTOTHREAD:		/* Enter thread menu, at the top */
-						thread_depth = 0;
+						thread_depth = which_response(this_resp);
 						goto next_thread;
 
 					case GRP_NEXT:				/* Thread was 'c'aught up */

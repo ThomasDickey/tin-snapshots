@@ -103,7 +103,6 @@ wait_for_input (void /*FILE *fd*/)
 
 				if (ch == 'q' || ch == 'z' || ch == ESC) {
 					if (prompt_yn (cLINES, txt_read_abort, FALSE) == 1)
-/* TODO if (cmd_line) this is all cacked when not in curses mode */
 						return TRUE;
 				}
 
@@ -206,9 +205,9 @@ tin_read (
 	 * 'offset' is the # of chars which we read now
 	 */
 	i = strlen(buffer);
-	if (buffer[i - 1] == '\n') {
+	if (i >= 1 && buffer[i - 1] == '\n') {
 
-		if (buffer[i - 2] == '\r') {
+		if (i >= 2 && buffer[i - 2] == '\r') {
 			buffer[i - 2] = '\0';
 			offset = i -= 2;
 		} else {

@@ -25,7 +25,11 @@
  * local prototypes
  */
 static int read_site_config(void);
-static void preinit_colors(void);
+
+#ifdef HAVE_COLOR
+	static void preinit_colors(void);
+#endif /* HAVE_COLOR */
+
 
 char active_times_file[PATH_LEN];
 char article[PATH_LEN];			/* ~/.article file */

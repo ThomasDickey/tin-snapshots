@@ -1,8 +1,56 @@
+-- pre-1.4 release 19990517 "Psychonaut" --
+
+653) Wolfgang Becker <uafr@gmx.de>
+     ADD. updated README.WIN
+     FIX. README.WIN
+
+652) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. various buffer over/underruns and reads from uninitialized
+          memory
+     FIX. active.c, misc.c, page.c, read.c, select.c
+
+651) Urs Janssen <urs@tin.org>
+     ADD. strip_address() for removing mailaddress
+     ADD. updated pcre (2.04 -> 2.05)
+     BUG. --disable-pipe-command was broken
+     FIX. config.c, misc.c, pcre/*
+
+650) Thomas E. Dickey <dickey@clark.net>
+     BUG. typo in Makefile
+     BUG. didn't compile on !HAVE_POSIX_JC systems
+     FIX. Makefile[.in], signal.c
+
+649) GianPiero Puccioni <gip@fox.ino.it>
+     BUG. trying to set SA_RESTART on systems which don't know
+          BSD-like signals
+     FIX. signal.c
+
+648) Helmut Springer <delta@rus.uni-stuttgart.de>
+     BUG. compiling with --disable-color failed
+     FIX. extern.h
+
+647) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. input_history wasn't saved
+     BUG. 'g'oto group didn't enter a group with all articles read
+           if show_only_unread_groups was set
+     BUG. 'l', <TAB> till you reach one article of the next thread, 'l'
+          shows the threading-tree of the 'old' thread not the current one
+     BUG. tin -w didn't work with use_color
+     BUG. during interactive auth requests curses stuff was called
+          before enabling it.
+     FIX. proto.h, tin.h, active.c, attrib.c, config.c, group.c, lang.c
+          mail.c, main.c, misc.c, open.c, page.c, post.c, prompt.c
+          open.c, select.c, signal.c, thread.c
+
+646) Meelis Roos <mroos@cs.ut.ee>
+     BUG. typo in the configure script
+     FIX. configure[.in]
+
 -- pre-1.4 release 19990413 "Endemoniada" --
 
 645) Urs Janssen <urs@tin.org>
      BUG. use_keypad was missing in t_config
-     ADD. --enable-broken-listgorup-fix
+     ADD. --enable-broken-listgroup-fix
      FIX. configure.[in], autoconf.h[in], extern.h, tinrc.h, config.c,
           curses.c, init.c, open.c
 
@@ -90,7 +138,7 @@
      FIX. Makefile.in, tin.defaults, extern.h, policy.h, proto.h, inews.c
           init.c, lang.c, misc.c, post.c
 
-632) Wolfgang Becker <uafr@rz.uni-karlsruhe.de>
+632) Wolfgang Becker <uafr@gmx.de>
      ADD. README.WIN
      FIX. README.WIN
 

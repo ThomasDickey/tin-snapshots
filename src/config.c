@@ -304,8 +304,10 @@ read_config_file (
 			if (match_integer (buf, "default_move_group=", &tinrc.default_move_group, 0))
 				break;
 
+#ifndef DONT_HAVE_PIPING
 			if (match_string (buf, "default_pipe_command=", tinrc.default_pipe_command, sizeof (tinrc.default_pipe_command)))
 				break;
+#endif /* DONT_HAVE_PIPING */
 
 			if (match_string (buf, "default_post_newsgroups=", tinrc.default_post_newsgroups, sizeof (tinrc.default_post_newsgroups)))
 				break;
@@ -656,8 +658,10 @@ read_config_file (
 	if (tinrc.use_getart_limit && (tinrc.getart_limit < 0))
 		tinrc.use_getart_limit = FALSE;
 
-	if (INTERACTIVE2)
+#if 0
+	if (INTERACTIVE)
 		wait_message (0, "\n");
+#endif
 
 	return TRUE;
 }
@@ -1074,7 +1078,9 @@ write_config_file (
 	fprintf (fp, "default_repost_group=%s\n", tinrc.default_repost_group);
 	fprintf (fp, "default_mail_address=%s\n", tinrc.default_mail_address);
 	fprintf (fp, "default_move_group=%d\n", tinrc.default_move_group);
+#ifndef DONT_HAVE_PIPING
 	fprintf (fp, "default_pipe_command=%s\n", tinrc.default_pipe_command);
+#endif /* DONT_HAVE_PIPING */
 	fprintf (fp, "default_post_newsgroups=%s\n", tinrc.default_post_newsgroups);
 	fprintf (fp, "default_post_subject=%s\n", tinrc.default_post_subject);
 	fprintf (fp, "default_range_group=%s\n", tinrc.default_range_group);
