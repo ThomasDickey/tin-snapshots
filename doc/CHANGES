@@ -1,3 +1,16 @@
+--unoff BETA release 970304 --
+
+331) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. getfqdn()
+     FIX. configire[.in], autoconf.h[in], inews.c
+
+330) Kevin Lentin <kevinl@cs.monash.edu.au>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. --{en,dis}able-append-pid to generate unique tmp-filenames
+         (i.e. .article)
+     FIX. configure[.in], autoconf.h[in], init.c, post.c
+
 --unoff BETA release 970303 --
 
 329) T.E.Dickey <dickey@clark.net>

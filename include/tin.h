@@ -620,8 +620,7 @@ extern char *get_uaf_fullname();
 #define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
 #define 	NEWSRCTABLE_FILE	"newsrctable"
-/* NEWNEWSRC_FILE will actually be .newnewsrc<pid> if SINGLETASKING is not
-   defined */
+/* ifdef APPEND_PID (default) NEWNEWSRC_FILE will be .newnewsrc<pid> */
 #define 	NEWNEWSRC_FILE		".newnewsrc"
 #define 	OLDNEWSRC_FILE		".oldnewsrc"
 #ifndef 	OVERVIEW_FILE

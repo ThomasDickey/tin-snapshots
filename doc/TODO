@@ -1,5 +1,9 @@
 Bugs
 ----
+o  --enable-curses has several bugs
+   (screen redraw is brocken, tyy-settings get messed up, color might not
+    work, ...)
+
 o  mark group as read warps into the next line if the groupname is very long
 
 o  on some systems (my Linux 2.0.26/gcc 2.7.2.1) - tin claims that the
@@ -111,8 +115,6 @@ o  kill-file editor does not quote brackets, stars and question marks
 
 New features
 ------------
-o  if INEWS_MAIL_* is empty try to 'guess' the domainname
-
 o  add abillity to strip bogus newsgroups from newsrc
 
 o  add support for ispell language change

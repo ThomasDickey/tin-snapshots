@@ -99,6 +99,7 @@
 #undef	HAVE_MALLOC_H
 #undef	HAVE_NETDB_H
 #undef	HAVE_NETLIB_H
+#undef	HAVE_NETINET_IN_H
 #undef	HAVE_POLL_H
 #undef	HAVE_PROTOTYPES_H
 #undef	HAVE_PWD_H
@@ -117,6 +118,7 @@
 #undef	HAVE_SYS_PTY_H
 #undef	HAVE_SYS_SELECT_H
 #undef	HAVE_SYS_STREAM_H
+#undef	HAVE_SYS_SOCKET_H
 #undef	HAVE_SYS_TIMEB_H
 #undef	HAVE_SYS_TIMES_H
 #undef	HAVE_SYS_TIME_H
@@ -379,4 +381,8 @@
 #endif
 #endif /* FIXME */
 
+/*
+ * Use this if you want pid attached to the end of .article filename
+ */
+#undef APPEND_PID
 #undef HAVE_COFFEE

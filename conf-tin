@@ -43,8 +43,6 @@ CC="$CC" \
 ./configure --verbose \
 	--disable-echo \
 	--enable-nntp-only \
-	--enable-curses \
-	--with-ncurses \
 	--disable-mime-strict-charset \
 	--with-mail-gateway=/etc/NNTP_INEWS_DOMAIN \
 	--with-nntp-default-server=news.rz.uni-karlsruhe.de \

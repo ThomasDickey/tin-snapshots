@@ -2114,7 +2114,10 @@ mail_to_someone (
 	joinpath (nam, homedir, "letter.");
 #else
 	joinpath (nam, homedir, ".letter");
-#endif
+#	ifdef APPEND_PID
+		sprintf (nam+strlen(nam), ".%d", process_id);
+#	endif /* APPEND_PID */
+#endif /* VMS */
 	if ((fp = fopen (nam, "w")) == NULL) {
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
@@ -2282,6 +2285,10 @@ mail_bug_report (void)
 	wait_message (txt_mail_bug_report);
 
 	joinpath (nam, homedir, ".bugreport");
+#ifdef APPEND_PID
+	sprintf (nam+strlen(nam), ".%d", process_id);
+#endif /* APPEND_PID */
+
 	if ((fp = fopen (nam, "w")) == NULL) {
 		perror_message (txt_cannot_open, nam);
 		return FALSE;
@@ -2491,7 +2498,10 @@ mail_to_author (
 	joinpath (nam, homedir, "letter.");
 #else
 	joinpath (nam, homedir, ".letter");
-#endif
+#	ifdef APPEND_PID
+		sprintf (nam+strlen(nam), ".%d", process_id);
+#	endif /* APPEND_PID */
+#endif /* VMS */
 	if ((fp = fopen (nam, "w")) == NULL) {
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
@@ -2837,6 +2847,10 @@ cancel_article (
 	clear_message ();
 
 	joinpath (cancel, homedir, ".cancel");
+#ifdef APPEND_PID
+	sprintf (cancel+strlen(cancel), ".%d", process_id);
+#endif /* APPEND_PID */
+
 	if ((fp = fopen (cancel, "w")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, cancel);
 		return redraw_screen;

@@ -28,6 +28,13 @@
 #	endif
 #endif
 
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+
 #define	PATHMASTER	"not-for-mail"
 
 #if defined(M_AMIGA) && (defined (INEWS_MAIL_GATEWAY) || defined (INEWS_MAIL_DOMAIN))
@@ -43,6 +50,35 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 #define INEWS_MAIL_GATEWAY inews_mail_gateway
 #define INEWS_MAIL_DOMAIN inews_mail_domain
 #endif
+
+static char *getfqdn (char *host);
+
+static char *getfqdn(host)
+char	*host;
+{
+	char	name[MAXHOSTNAMELEN+2];
+	struct hostent	*hp;
+	struct in_addr	in;
+
+	name[MAXHOSTNAMELEN]='\0';
+	if (host)
+		(void)strncpy(name,host,MAXHOSTNAMELEN);
+	else
+		if (gethostname(name,MAXHOSTNAMELEN))
+			return(NULL);
+
+	if ('0'<=*name&&*name<='9') {
+		in.s_addr=inet_addr(name);
+		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
+			in.s_addr=(*hp->h_addr);
+		return(hp&&strchr(hp->h_name,'.')?hp->h_name:(char *)inet_ntoa(in));
+	}
+	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
+		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
+			in.s_addr=(*hp->h_addr);
+	return(hp?strchr(hp->h_name,'.')?hp->h_name:(char *)inet_ntoa(in):NULL);
+}
+
 
 static int
 submit_inews (
@@ -244,17 +280,13 @@ get_host_name (
 		/*
 		 * Get the FQDN that the article will have from
 		 * 1 of 5 locations:
-		 *   /etc/HOSTNAME (linux)
-		 *   NEWSLIBDIR/sitename
+** is the order ok? **
+		 *   NEWSLIBDIR/sitename 
 		 *   NEWSLIBDIR/mailname
-		 *   gethostbyname()
+		 *   getfqdn()
+		 *   /etc/HOSTNAME (linux)
 		 *   uname()
 		 */
-#ifndef M_AMIGA
-		sfp = fopen ("/etc/HOSTNAME", "r");
-		if (sfp == (FILE *) 0)
-#endif
-		{
 #ifdef NEWSLIBDIR
 			joinpath (sitename, NEWSLIBDIR, "sitename");
 			sfp = fopen (sitename, "r");
@@ -265,7 +297,6 @@ get_host_name (
 			}
 #endif /* !M_AMIGA */
 #endif /* NEWSLIBDIR */
-		}
 		if (sfp != (FILE *) 0) {
 			fgets (host, sizeof (host), sfp);
 			if (strlen (host) != 0) {
@@ -276,35 +307,28 @@ get_host_name (
 			}
 			fclose (sfp);
 		} else {
-			ptr = GetFQDN ();
+			ptr = getfqdn ((char *) 0);
 			if (ptr != (char *) 0) {
 				my_strncpy (host, ptr, sizeof (host));
 			} else {
-#				ifdef HAVE_GETHOSTBYNAME
-				{
-					struct hostent *host_entry;
-
-					gethostname (host, sizeof (host));
-					host_entry = gethostbyname (host);
-					if (host_entry != NULL)
-						my_strncpy (host, host_entry->h_name, sizeof (host));
-				}
-#				else
 #					if defined(M_AMIGA) || defined(M_OS2)
 						my_strncpy (host, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (host));
 #					else
-#					if defined(WIN32)
-						my_strncpy (host, get_val ("COMPUTERNAME", "PROBLEM_WITH_COMPUTERNAME"), sizeof (host));
-#					else
+#						if defined(WIN32)
+							my_strncpy (host, get_val ("COMPUTERNAME", "PROBLEM_WITH_COMPUTERNAME"), sizeof (host));
+#						else
+#						ifndef M_AMIGA
+							sfp = fopen ("/etc/HOSTNAME", "r");
+							if (sfp == (FILE *) 0)
+#						endif
 					{
 						struct utsname uts_name;
 
 						uname (&uts_name);
 						my_strncpy (host, uts_name.nodename, sizeof (host));
 					}
+#						endif
 #					endif
-#					endif
-#				endif
 			}
 		}
 		strcpy (host_name, host);
