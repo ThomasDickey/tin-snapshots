@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970826
+PVER		= 970901
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -52,6 +52,7 @@ CFILES	= \
 	$(SRCDIR)/getline.c \
 	$(SRCDIR)/group.c \
 	$(SRCDIR)/hashstr.c \
+	$(SRCDIR)/header.c \
 	$(SRCDIR)/help.c\
 	$(SRCDIR)/inews.c \
 	$(SRCDIR)/init.c \
@@ -99,6 +100,7 @@ CFILES	= \
 
 AMIGA	=\
 	$(AMGDIR)/README \
+	$(AMGDIR)/tin-unoff.readme \
 	$(AMGDIR)/smakefile \
 	$(AMGDIR)/actived.c \
 	$(AMGDIR)/amiga.c \

@@ -35,7 +35,8 @@ static void color_fputs (const char *s, FILE *stream, int color);
 #endif /* USE_CURSES */
 
 #if USE_CURSES
-static void set_colors (
+static void
+set_colors (
 	int fcolor,
 	int bcolor)
 {

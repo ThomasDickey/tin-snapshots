@@ -781,7 +781,7 @@ setup_check_article_screen (
 
 void
 quick_post_article (
-	int postponed_only)
+	t_bool postponed_only)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -1350,10 +1350,10 @@ fetch_postponed_article(
 
 /* pick up any postponed article and ask if the user want to use it */
 
-int
+t_bool
 pickup_postponed_articles(
-	int ask,
-	int all)
+	t_bool ask,
+	t_bool all)
 {
   char newsgroups[HEADER_LEN];
   char subject[HEADER_LEN];

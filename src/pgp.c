@@ -40,6 +40,15 @@
 #define SIGN 0x01
 #define ENCRYPT 0x02
 
+/*
+ * local prototypes
+ */
+static int pgp_available (void);
+static void do_pgp (int what, char *file, char *mail_to);
+static void join_files (char *file);
+static void pgp_append_public_key (char *file);
+static void split_file (char *file);
+
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
 const char *pgpopts = 0;
 char pgp_data[PATH_LEN];

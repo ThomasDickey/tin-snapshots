@@ -53,6 +53,7 @@ struct archiver_t {
 ** Local prototypes
 */
 static int any_saved_files (void);
+static int create_sub_dir (int i);
 static void post_process_uud (int pp, t_bool auto_delete);
 static void post_process_sh (t_bool auto_delete);
 
@@ -481,7 +482,7 @@ save_regex_arts (
 
 		if (is_mailbox) {
 			buf[0] = 0;
-		}else {
+		} else {
 			sprintf (buf, "%s.%03d", save[i].file, i+1);
 		}
 

@@ -126,7 +126,12 @@ extern char *get_uaf_fullname();
 #	include <stddef.h>
 #endif
 #include <sys/types.h>
+
+#ifdef M_AMIGA
+#include "include:stat.h"      /* FIXME: Problem with AmiTCP-includes, AmiTCP's fstat() needs */
+#else                          /* a running TCP-Stack. OTOH fstat() ist used with local spool */
 #include <sys/stat.h>
+#endif
 
 #ifdef TIME_WITH_SYS_TIME
 #	include <sys/time.h>
@@ -1788,7 +1793,7 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 
 #ifdef M_AMIGA
 	typedef	struct __tcpbuf TCP;
-        #include "amigatcp.h"
+#	include "amigatcp.h"
 #else
 	typedef	FILE	TCP;
 #endif /* M_AMIGA */

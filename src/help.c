@@ -27,6 +27,9 @@
 
 static constext txt_help_empty_line[] = cCRLF;
 
+static int ReadHelpCh (void);
+
+
 constext *help_select[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
@@ -293,7 +296,8 @@ static int info_type;
 static int max_page;
 static int pos_help;
 
-static int ReadHelpCh(void)
+static int
+	ReadHelpCh (void)
 {
 	int ch = ReadCh ();
 

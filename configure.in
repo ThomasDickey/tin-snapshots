@@ -186,7 +186,7 @@ AC_ARG_WITH(socks5,
 	[cf_cv_use_libsocks5=yes],
 	[cf_cv_use_libsocks5=no])
 ])
-AC_MSG_RESULT($cf_use_libsocks5)
+AC_MSG_RESULT($cf_cv_use_libsocks5)
 
 if test $cf_cv_use_libsocks5 = yes ; then
 	CF_SOCKS5
@@ -573,6 +573,7 @@ CF_CHECK_DECL(\
 	getcwd \
 	gethostname \
 	getopt \
+	getpass \
 	ioctl \
 	malloc \
 	memset \
@@ -604,6 +605,7 @@ CF_CHECK_DECL(\
 	tolower \
 	toupper \
 	tputs \
+	usleep \
 )
 fi
 

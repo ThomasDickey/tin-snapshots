@@ -218,6 +218,7 @@
 #undef	DECL_GETCWD
 #undef	DECL_GETHOSTNAME
 #undef	DECL_GETOPT
+#undef	DECL_GETPASS
 #undef	DECL_INET_ADDR
 #undef	DECL_INET_NTOA
 #undef	DECL_IOCTL
@@ -252,6 +253,7 @@
 #undef	DECL_TOLOWER
 #undef	DECL_TOUPPER
 #undef	DECL_TPUTS
+#undef	DECL_USLEEP
 #undef	DECL__FLSBUF
 
 #undef HAVE_SELECT_INTP

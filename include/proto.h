@@ -384,15 +384,15 @@ extern int count_postponed_articles (void);
 extern int mail_bug_report (void);
 extern int mail_to_author (char *group, int respnum, int copy_text, int with_headers);
 extern int mail_to_someone (int respnum, char *address, int mail_to_poster, int confirm_to_mail, int *mailed_ok);
-extern int pickup_postponed_articles (int ask, int all);
 extern int post_article (char *group, int *posted_flag);
 extern int post_response (char *group, int respnum, int copy_text, int with_headers);
 extern int repost_article (char *group, struct t_article *art, int respnum, int supersede);
 extern int reread_active_after_posting (void);
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
+extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
 extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile);
-extern void quick_post_article (int postponed_only);
+extern void quick_post_article (t_bool postponed_only);
 
 /* prompt.c */
 extern int prompt_list (int row, int col, int var, constext *help_text, constext *prompt_text, constext *list[], int size);
@@ -422,7 +422,6 @@ extern t_bool match_regex (const char *string, char *pattern, t_bool icase);
 
 /* rfc1521.c */
 extern FILE *rfc1521_decode (FILE *file);
-extern unsigned char bin2hex (unsigned int x);
 extern void rfc1468_encode (char *line, FILE *f, int e);
 extern void rfc1521_encode (char *line, FILE *f, int e);
 extern void rfc1557_encode (char *line, FILE *f, int e);

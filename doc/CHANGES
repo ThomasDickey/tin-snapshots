@@ -1,3 +1,29 @@
+--unoff BETA release 970901 --
+
+431) Sven Paulus <sven@karlsruhe.org>
+     BUG. random Organization didn't work
+     FIX. misc.c
+
+430) Urs Janssen <urs@karlsruhe.org>
+     ADD. minor code cleanup (added missing prototypes)
+     FIX. configure[.in], autoconf.h[in], extern.h, proto.h, *.c
+
+429) Thomas E. Dickey <dickey@clark.net>
+     Andrey A. Chernov <ache@null.net>
+     ADD. some whitespace in aclocal.m4
+     BUG. quoting bug in CF_RECHECK_FUNC configure macro
+     ADD. workaround for limitation in FreeBSD linker for ncurses tests.
+     ADD. autoconf recommends that shell scripts begin "#! /bin/sh" rather
+          than "!/bin/sh".
+     ADD. guard against some curses functions invoked as a result of errors
+          found during initialization.
+     FIX. aclocal.m4, conf-tin, configure[.in], install.sh, main.c
+          misc.c, newsrc.c, tcurses.c
+
+428) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor code cleanup (AmigaOS)
+     FIX. amiga.h, tin.h, lang.c
+
 --unoff BETA release 970826 --
 
 427) Jason Faultless <jason@radar.demon.co.uk>
@@ -25,7 +51,7 @@
      BUG. calculated wrong size of signal_list
      FIX. misc.c, signal.c
 
-424) Urs Janssen <urs@karlsruhe.org>   
+424) Urs Janssen <urs@karlsruhe.org>
      Sven Paulus <sven@karlsruhe.org>
      BUG. tin skipped second page when paging up with
           show_headers_to_display != ""
@@ -33,7 +59,7 @@
      PRF. got rid of useless fseek()s to determine article's size
      FIX. page.c
 
-423) Urs Janssen <urs@akk.uni-karlsruhe.de>   
+423) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. Makefile[.in] dosn't work with /bin/csh anymore
           [introduced in 420]
      BUG. empty X-Comment-To: is inserted if posting contains no realname
@@ -54,14 +80,14 @@
 421) Thomas E. Dickey <dickey@clark.net>
      ADD. improves the configure script that configures ncurses
      ADD. configure script option --enable-8bit-keys to turn on code
-	  that allows 8-bit controls for arrow and function keys.
+          that allows 8-bit controls for arrow and function keys.
      ADD. adds includes for ctype.h and sys/socket.h to the test program used
-	  for checking prototypes.
+          for checking prototypes.
      ADD. library-check for -lmytinto to build on FreeBSD.
      BUG. corrects some logic that prevented 8-bit controls from working.
      BUG. corrects some ifdef's that broke ncurses/curses configuration.
      BUG. minor tweaks to makefiles to work with configure --srcdir option,
-	  and to autoconfigure for lint program.
+          and to autoconfigure for lint program.
      FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
           Makefile[.in], config.c, getline.c, group.c, help.c, misc.c
           page.c, prompt.c, select.c, thread.c
@@ -96,7 +122,7 @@
      BUG. corrects timeout values in get_arrow_key()
      BUG. corrected logic of input_pending() when configured with curses.
      ADD. moves the termcap lookup out of InitScreen() to a new function
-	  SetupScreen()
+          SetupScreen()
      ADD. moves the network-library checks to aclocal.m4
      ADD. configure option "--with-socks5"
      FIX. several supplied patches
@@ -155,8 +181,8 @@
      FIX. Makefile[.in]
 
 405) Sven Paulus <sven@oops.sub.de>
-     BUG. prompt for subject was incorrectly displayed when 
-	  subject was too long -> now truncating to 20 chars
+     BUG. prompt for subject was incorrectly displayed when
+          subject was too long -> now truncating to 20 chars
      ADD. implement a permanent history for each type of input
      ADD. enable cursor keys on input line
      FIX. several supplied patches
@@ -300,7 +326,7 @@
 
 380) Thomas E. Dickey <dickey@clark.net>
      ADD. restores 'cmd_line' setting after running a shell command, so tin
-	  re-enters screen mode
+          re-enters screen mode
      ADD. merges the two copies of code that run shell commands
      ADD. more debug-traces for the curses configuration
      ADD. test for CLIX machines
@@ -377,7 +403,7 @@
      BUG. incorrect display of Newgroup flag (from 351)
      ADD. general code cleanup
      FIX. several supplied patches
-     
+
 367) Urs Janssen <urs@akk.uni-karlsruhe.de>
      Thomas E. Dickey <dickey@clark.net>
      BUG. reamed valid in prompt.c as Suns K&R compiler didn't like it.
@@ -496,7 +522,7 @@
 347) Thomas E. Dickey <dickey@clark.net>
      ADD. even more curses support:
           + ifdef'd to use the termcap version of ReadCh when curses isn't
-	    active.
+            active.
           + fix a couple of background color bugs that appear with SVr4
             curses (but not ncurses).
           + add missing include, ifdefs to debug.c
@@ -1056,7 +1082,7 @@
 249) Alexander Lehmann <alex@hal.rhein-main.de>
      BUG. (introduced in 240)
           - when writing out the .newsrc, apparently no longer existing
-            groups and unsubscribed groups get an empty line afterwards 
+            groups and unsubscribed groups get an empty line afterwards
           - when subscribing some groups from the yanked-in list and then
             yanking out the unsubscribed groups again, leaves only the 1st
             subscribed group in the .newsrc or doesn't add the group at all.
@@ -1267,31 +1293,31 @@
 
 211) Thomas E. Dickey <dickey@clark.net>
      ADD. replace include/conf.h with an automatically-generated table.
-	  (This fixes one of the two problems with the config.c rewrite: now
-	  the enum and table will track together -- the other, making it
-	  type-clean will be in a later patch -- when I have time).
+          (This fixes one of the two problems with the config.c rewrite: now
+          the enum and table will track together -- the other, making it
+          type-clean will be in a later patch -- when I have time).
      BUG. fix a place in the configure script that I missed before (allowed
-	  some stray "-g" options to get into the makefile for non-debug
-	  build -- I was just arguing with autoconf's author tonight, who
-	  insists that everyone ought to use -g as he intends).
+          some stray "-g" options to get into the makefile for non-debug
+          build -- I was just arguing with autoconf's author tonight, who
+          insists that everyone ought to use -g as he intends).
      BUG. fix a place in tin.h where "#" line by itself broke SunOS K&R compile
      BUG. disentangle some use of _DECC (someone on an OSF/1 box reports
-	  problems with this, which was, I believe, targeted for VMS).
+          problems with this, which was, I believe, targeted for VMS).
      ADD. move the <termios.h> includes out of tin.h (now only in curses.c
-	  and signal.c) -- on Apollo, termios.h redefines some symbols from
-	  sys/ioctl.h, producing _lots_ of compiler warnings.  (I did builds
-	  on several machines to ensure that there's no impact due to this).
+          and signal.c) -- on Apollo, termios.h redefines some symbols from
+          sys/ioctl.h, producing _lots_ of compiler warnings.  (I did builds
+          on several machines to ensure that there's no impact due to this).
      ADD. some fixes aimed at supporting the configure --srcdir option (not
-	  complete yet -- I'll do more later).
+          complete yet -- I'll do more later).
      BUG. make parsdate.o rule more explicit (IRIX's make couldn't cope:  I
-	  don't remember problems from the last time I did a bunch of
-	  regression builds, and figure that it got simplified by someone).
+          don't remember problems from the last time I did a bunch of
+          regression builds, and figure that it got simplified by someone).
      BUG. correct an error from cleanup in art.c that broke my local config
-	  (i.e., '-' is legal in that context).
+          (i.e., '-' is legal in that context).
      BUG. remove bogus code in feed.c (noticed while resolving similarly
-	  ifdef'd code in misc.c)
+          ifdef'd code in misc.c)
      BUG. modified ifdef in misc.c to fix Kevin Maguire's problem (on OSF/1)
-	  with pipes/return-codes.
+          with pipes/return-codes.
      FIX. several supplied patches
 
 --unoff BETA release 961101 --
@@ -1386,7 +1412,7 @@
 193) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. variable/label name conflict
      FIX. search.c
-     
+
 --unoff BETA release 961015 --
 
 192) Alexander Lehmann <alex@hal.rhein-main.de>
@@ -1753,7 +1779,7 @@
 
 133) Alexander Lehmann <alex@hal.rhein-main.de>
      ADD. smarter MIME-code
-     FIX. several supplied patches     
+     FIX. several supplied patches
 
 132) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. don't check for LIB/SPOOL/NOVROOTDIR when NNTP_ONLY
@@ -1818,7 +1844,7 @@
 
 122) Daniel Naber <dnaber@pluto.teuto.de>
      BUG. mail_bugreport() does not care about use_mailreader_i=ON
-     FIX. post.c 
+     FIX. post.c
 
 --unoff BETA release 960720 --
 
@@ -1835,7 +1861,7 @@
 
 119) Jason Faultless <jason@radar.demon.co.uk>
      BUG. tin crashed on filtering on a msg-id
-     FIX. art.c 
+     FIX. art.c
 
 --unoff BETA release 960717 --
 
@@ -2076,9 +2102,9 @@
 079) Sven Paulus <sven@oops.sub.de>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. HAVE_CR_AS_CHAR was never defined but used, prevented BSD-systems
-          to recognize CR 
+          to recognize CR
      ADD. 'X' in select.c to quit without saving configuration
-     CHG. changed to unoff version :) 
+     CHG. changed to unoff version :)
      FIX. several patches
 
 --950824BETA  PLMC.960611 --
@@ -2120,7 +2146,7 @@
 
 070) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minimum code cleanup
-     FIX. group.c, inews.c, mail.c, newsrc.c, post.c, save.c, proto.h, tin.h 
+     FIX. group.c, inews.c, mail.c, newsrc.c, post.c, save.c, proto.h, tin.h
 
 --950824BETA  PLMC.960609 --
 
@@ -2231,7 +2257,7 @@
      ADD. --enable-mail-handling --enable-etiquette --enable-forgery
      BUG. --enable-ref-threading did not work
      FIX. several patches
-     
+
 --950824BETA  PLMC.960525 --
 
 048) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -2331,7 +2357,7 @@
      ADD. print warning if Followup-To: line contains more than 1 newsgroup
      BUG. case-sensitive header-checking removed
      FIX. several supplied patches
-   
+
 --950824BETA  PLMC.960515 --
 
 034) Chris Blum <chris@phil.uni-sb.de>
@@ -2349,7 +2375,7 @@
 --950824BETA  PLMC.960511 --
 
 032) Jason Faultless <jason@radar.demon.co.uk>
-     BUG. When changing Process type in Options Menu, <ESC> resets 
+     BUG. When changing Process type in Options Menu, <ESC> resets
           the single character prompt to bogus values.
           Rewrote option toggle interface to use a generic, more
           extensible system.
@@ -2413,7 +2439,7 @@
           (iKeyGroupQuit2 removed)
      ADD. iKeyPageDisplaySubject 'i' to show subject at page_level
      ADD. iKeyThreadDisplaySubject 'i' to show subject at thread_level
-     BUG. compiling without -DHAVE_COLOR compiles color.c 
+     BUG. compiling without -DHAVE_COLOR compiles color.c
      FIX. menukeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c,
           lang.c
 
@@ -2466,7 +2492,7 @@ L10) Greg Berigan <gberigan@cse.unl.edu>
      BUG. when show_xcommentto=ON, it was not mime-decoded;
           when show_xcommentto and highlight_xcommentto were both off
           X-Comment-To: was displayed
-     FIX. page.c                           
+     FIX. page.c
 
 --950824BETA  PLM.960318 cb/eb/gb/uj/sp/sts --
 
@@ -2477,7 +2503,7 @@ L10) Greg Berigan <gberigan@cse.unl.edu>
      FIX. post.c, check for '\n's in *_quote_format
 
 L09) Sven Paulus <sven@oops.sub.de>
-     ADD. show_xcommentto, highlight_show_xcommentto in ~/.tin/tinrc 
+     ADD. show_xcommentto, highlight_show_xcommentto in ~/.tin/tinrc
           news_quote_format in ~/.tin/attributes
      FIX. several supplied patches
 
@@ -2497,7 +2523,7 @@ L08) Chris Blum <chris@phil.uni-sb.de>
 
 --950824BETA  PLM.960302 eb/uj/sts/gb/cb --
 
-018) Urs Janssen <urs@akk.uni-karlsruhe.de> 
+018) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. made keep_posted_articles configurable in tinrc
      FIX. extern.h, config.c, post.c
      later i recognized that such an option exists in ~/.tin/attributes
@@ -2534,7 +2560,7 @@ L07) Chris Blum <chris@phil.uni-sb.de>
 014) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. ugly help-text
      FIX. lang.c - reformat help-text
-     
+
 L06) Chris Blum <chris@phil.uni-sb.de>
      BUG. minor bug in misc.c, USER-ID was not mime decoded
      FIX. misc.c
@@ -2554,7 +2580,7 @@ L06) Chris Blum <chris@phil.uni-sb.de>
      ADD. keep_dead_articles configurable in tinrc
      FIX. misc.c, init.c, config.c extern.h, post.c
           append_file (dead_article, article); changed to
-	  rename_file (dead_article, article);
+          rename_file (dead_article, article);
           if (keep_dead_articles) append_file (dead_articles, dead_article);
 
 L05) Chris Blum <chris@phil.uni-sb.de>
@@ -2635,7 +2661,7 @@ L03) Greg Berigan <gberigan@cse.unl.edu>
      BUG. tin -w destroys ~/.tin/filter
      FIX. main.c read attributes/filter in right order
 
-NOP) FIX. local version number in version.h to patchdate 
+NOP) FIX. local version number in version.h to patchdate
 
 003) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      BUG. use_mouse switch was ignored
@@ -2651,13 +2677,13 @@ L02) Greg Berigan <gberigan@cse.unl.edu>
 --950824BETA eb/uj 02 PL0--
 
 002) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
-     BUG. 'm' mail thread only marks first article in thread as read 
+     BUG. 'm' mail thread only marks first article in thread as read
      FIX. feed.c - article pointer corrected
      BUG. 'm' mail thread asks for every article for confirmation
           (introduced in 001)
      FIX. feed.c - missing else statements inserted
 
---950824BETA eb/uj 01 PL0-- 
+--950824BETA eb/uj 01 PL0--
 
 L01) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. can't mail under Linux
@@ -2667,6 +2693,6 @@ NOP) ADD. Added local version number in version.h
 
 001) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      BUG. 'm' mail thread and then q)uit still mailed the thread.
-     FIX. feed.c - (simple workaround) 
+     FIX. feed.c - (simple workaround)
 
 --950824BETA released--

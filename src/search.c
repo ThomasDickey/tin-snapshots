@@ -18,6 +18,14 @@
 static char tmpbuf[LEN];
 
 /*
+ * local prototypes
+ */
+static char * get_search_pattern (int forward, const char *fwd_msg, const char *bwd_msg, char *def, int which_hist);
+static int search_art_body (char *group_path, struct t_article *art, char *pat);
+static int search_thread (int i, char *pattern);
+
+
+/*
  * last search patterns (from tinrc file)
  */
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 # Remove the files created by this script before running it.
 #rm -f config.cache config.status config.log
 rm -f makefile src/Makefile include/autoconf.h

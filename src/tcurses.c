@@ -146,7 +146,7 @@ void ToggleInverse(void)
  */
 void EndInverse(void)
 {
-	if (inverse_okay) {
+	if (inverse_okay && !cmd_line) {
 		fcol(col_normal);
 		bcol(col_back);
 		attroff(A_REVERSE);
@@ -156,11 +156,11 @@ void EndInverse(void)
 
 /*
  */
-void cursoron (void) { /* FIXME */ }
+void cursoron (void) { if (!cmd_line) curs_set(1); }
 
 /*
  */
-void cursoroff (void) { /* FIXME */ }
+void cursoroff (void) { if (!cmd_line) curs_set(0); }
 
 
 /*
@@ -256,17 +256,20 @@ void my_erase()
 {
 	TRACE(("my_erase"))
 
-	erase();
+	if (!cmd_line) {
+		erase();
 
-	/* FIXME:  curses doesn't actually do an erase() until refresh() is
-	 * called.  Ncurses 4.0 (and lower) reset the background color when
-	 * doing an erase().  So the only way to ensure we'll get the same
-	 * background colors is to reset them here.
-	 *
-	 * (Need to verify if SVr4 does the same thing).
-	 */
-	refresh();
-	refresh_color();
+		/* FIXME:  curses doesn't actually do an erase() until
+		 * refresh() is called.  Ncurses 4.0 (and lower) reset the
+		 * background color when doing an erase().  So the only way to
+		 * ensure we'll get the same background colors is to reset them
+		 * here.
+		 *
+		 * (Need to verify if SVr4 does the same thing).
+		 */
+		refresh();
+		refresh_color();
+	}
 }
 
 void

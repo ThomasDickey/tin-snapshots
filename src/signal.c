@@ -52,21 +52,30 @@
 #endif
 
 #ifdef MINIX
-#undef SIGTSTP
-#endif
+#	undef SIGTSTP
+#endif /* !MINIX */
 
 static unsigned int time_remaining;
 
+/*
+ * local prototypes
+ */
+static const char * signal_name(int code);
+#ifdef SIGTSTP
+	static void handle_suspend (void);
+#endif /* SIGTSTP */
+
+
 #ifndef WEXITSTATUS
-# define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
-#endif
+#	define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif /* !WEXITSTATUS */
 #ifndef WIFEXITED
-# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
-#endif
+#	define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif /* !WIFEXITED */
 
 #ifdef SIGTSTP
-static t_bool do_sigtstp = FALSE;
-#endif
+	static t_bool do_sigtstp = FALSE;
+#endif /* SIGTSTP */
 
 enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
 enum context my_context;

@@ -6,7 +6,7 @@
  *  Updated   : 04-12-96
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
- *		hash_msgid, free_msgid
+ *              hash_msgid, free_msgid
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -28,6 +28,25 @@ FILE *dbgfd;
 #else
 #	define DEBUG_PRINT(x)
 #endif
+
+/*
+ * local prototypes
+ */
+static char * _get_references (struct t_msgid *refptr, int depth);
+static struct t_msgid * add_msgid (int key, char *msgid, struct t_msgid *newparent);
+static struct t_msgid * find_next (struct t_msgid *ptr);
+static struct t_msgid * parse_references (char *r);
+static unsigned int hash_msgid (char *key);
+static void add_to_parent (struct t_msgid *ptr);
+static void build_thread (struct t_msgid *ptr);
+static void dump_thread (FILE *fp, struct t_msgid *msgid, int level);
+#ifdef DEBUG_REFS
+	static void dump_msgid_thread(struct t_msgid *ptr, int level);
+	static void dump_msgid_threads(void);
+#endif /* DEBUG_REFS */
+#if 0
+	static void dump_msgids(void);
+#endif /* 0 */
 
 /*
  * The msgids are all hashed into a big array, with overspill

@@ -75,6 +75,9 @@ extern size_t fwrite (void *, size_t, size_t, FILE *);
 #ifdef DECL_GETCWD
 extern char *getcwd (char *, size_t);
 #endif
+#ifdef DECL_GETHOSTBYNAME
+extern struct hostent *gethostbyname (const char *);
+#endif
 #ifdef DECL_GETHOSTNAME
 extern int gethostname (char *, int);
 #endif
@@ -84,8 +87,8 @@ extern char *getlogin (void);
 #ifdef DECL_GETOPT
 extern int getopt (int, char * const*, const char *);
 #endif
-#ifdef DECL_GETHOSTBYNAME
-extern struct hostent *gethostbyname (const char *);
+#ifdef DECL_GETPASS
+char *getpass(const char *);
 #endif
 #ifdef DECL_GETPWNAM
 extern struct passwd *getpwnam (const char *);
@@ -208,6 +211,9 @@ extern int toupper (int);
 #endif
 #ifdef DECL_TPUTS
 extern int tputs (char *, int, OutcPtr);
+#endif
+#ifdef DECL_USLEEP
+void usleep(unsigned long);
 #endif
 #ifdef DECL__FLSBUF
 extern int _flsbuf (int, FILE *);
@@ -1455,7 +1461,7 @@ extern constext txt_opt_mail_address[];
 #endif /* M_UNIX */
 
 #ifdef NNTP_ABLE
-	extern int get_server_nolf; /* from open.c */
+	extern int get_server_nolf;
 #endif /* NNTP_ABLE */
 
 #ifndef NO_SHELL_ESCAPE

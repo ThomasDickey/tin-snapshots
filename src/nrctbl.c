@@ -24,8 +24,10 @@
  * create newsrctable file in local rc directory
  */
 
+static void write_newsrctable_file (void);
+
 static void
-write_newsrctable_file(void)
+write_newsrctable_file (void)
 {
 	FILE	*fp;
 

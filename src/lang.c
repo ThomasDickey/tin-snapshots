@@ -1042,7 +1042,7 @@ constext txt_unsubscribing[] = "Unsubscribing... ";
 constext txt_untagged_art[] = "Untagged article";
 constext txt_untagged_thread[] = "Untagged thread";
 constext txt_unthreading_arts[] = "Unthreading articles...";
-#if HAVE_METAMAIL
+#ifdef HAVE_METAMAIL
 constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
 #endif /* HAVE_METAMAIL */
 constext txt_uudecoding[] = "Uudecoding %s";

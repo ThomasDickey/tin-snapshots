@@ -1,0 +1,124 @@
+This is the Amiga directory of tin-unoff.
+
+It contains:
+README          original readme for Amiga-tin 1.2 by
+                Mark Tomlinson and Geoff McCaughan
+amiga.c    \
+amigatcp.c  \__ Amiga-specific source needed for a
+amiga.h     /   compile with SAS/C
+amigatcp.h /
+actived.c       Amiga-specific actived-source.
+
+0. Additional Info
+
+tin needs 2.04 Minimum now. (V37)
+
+_Always_ check the other docs, especially if you are using gcc, also
+check the docs in the main directory. It may be, that this file is not
+really up-to-date. Query the document version string for the last
+change:
+
+$VER: tin-unoff.readme 0.1 (28.08.97)
+
+1. Building tin-unoff.
+
+tin-unoff is tested to build on the following compilers:
+SAS/C 6.57
+gcc 2.7.2.1 (ADE/Geek Gadgets)
+
+If you have SAS/C <6.55 then you have to put some work in it, but then
+you may consider to use the gcc instead if you can't update because your
+one is too old. 6.58 is going to be tested in the next time but should
+pose no problems. If you are using 6.50 or 6.51: UPDATE! There are lots
+of nasty bugs fixed in the later versions, and you also get the source
+for the tzset()-function. ;) And don't forget to thank the guys at SAS
+for putting their valuable free time in the enhancement of this great
+compiler.
+
+If you use an older gcc: UPDATE! The old 2.7.0 from Aminet is buggy and
+also out of date. Fetch your update at ftp.ninemoons.com or one of its
+mirrors. Do not be embarassed by the size of the files to download, it's
+more than just a compiler you get. /* TODO: which archives are needed to
+buld tin? */
+
+a) SAS/C
+You need an additional package, sorry, but I have to make an
+archaeological excursion for the source I need to replace these
+functions. The dateparser needs an installed yacc/bison to compile. If
+you are using yacc, edit the smakefile accordingly (search for "YACC").
+
+If you are building a NNTP-version, the correct SDK's must be installed.
+AmiTCP SDK is available from Aminet, the AS/Inet 225 SDK is available
+from the Developer CD 1.1.
+
+First edit the smakefile to suit your needs. Especially take care of
+DEBUG, LDEBUG, SCOPTIONS, OPTIMIZE and DEFINES. You might want piping
+disabled if you want to run tin on a BBS.
+
+Then run smake. Ignore any warnings (if you don't, send suggestions how
+to clean up the code) and see tin getting built. If you get an error,
+sometimes calling smake a second time will be enough to clear the smoke.
+(Don't wonder, remember: This is BETAware and the source is under
+constant change.)
+
+You should now have the following files:
+tin.exe
+actived
+
+For more see under 2.
+
+b) ADE-gcc
+You may have guessed it if you compiled some packages before:
+This is going to be a piece of cake. :)
+
+Have a look at the available options with
+
+    sh Configure --help
+
+Don't forget --with-libdir and --with-spooldir if you are reading
+locally. Select those you want additionally and start off with
+
+    sh Configure <insert your options here>
+
+Have a nice cup of hot Earl Grey (On my 040/40 the script takes quite
+some 10 minutes) or two (--with-coffee is also recommended). Then check
+the Makefile if you want to be sure everything went ok.
+
+Start "make". It should work with no problems.
+
+
+2. Installing
+
+If you have utilities running that capture the TAB-key, (KingCON, CFN
+etc.) don't forget that tin uses the key for "next unread" and you might
+be getting confused if you get a whole stream of characters inserted
+instead.
+
+a) SAS/C
+Drop tin.exe anywhere in your path. If you use wCNews, you *DON'T* need
+the actived, because it already has an "active" file. I didn't test what
+happens to the wCNews "active" if you use the actived, but on the other
+hand I am not too keen on making a samba dance with my running hard disk
+in hand either.
+
+You might need a wrapper script like the one described in the README. 
+
+b) ADE-gcc
+Put tin where appropriate. Don't forget to set the NNTPSERVER variable
+if you didn't set a default server at compile-time, this might cause
+problems (see doc/TODO)
+
+3. Credits
+
+Thanks go to all those people who put their time into the port of this
+great program before. Among them:
+
+Mark Tomlinson
+Geoff McCaughan
+Reinhard Luebke
+Volker Barthelmann
+
+I hope no name is missing here.
+
+Oliver B. Warzecha
+
