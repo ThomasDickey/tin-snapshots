@@ -1,3 +1,20 @@
+-- 1.4.5 release 20001104 "" --
+
+030) Thomas E. Dickey <dickey@herndon4.his.com>
+     ADD. VMS port
+     FIX. Makefile, aclocal.m4, config.guess, config.sub, configure[.in],
+          mkdirs.sh, bugrep.h, config.h, extern.h, proto.h, tin.h, config.c
+          lang.c, main.c, misc.c, save.c, signal.c, descrip.mms, pcre.mms
+          vms/libvms.mms, vms/parsdate.c, vms/vmsdir.c, vms/vmsfile.c,
+          vms/vmspwd.c, vms/select.h
+
+029) Urs Janssen <urs@tin.org>
+     BUG. possible bufferoverrun in read_groups_descriptions() on very long
+          groupnames/descriptions
+     ADD. allow superseding of articles even if one of the groups isn't
+          in the active file.
+     FIX. mail.c, post.c
+
 -- 1.4.4 release 20000803 "Vet for the Insane" --
 
 028) Urs Janssen <urs@tin.org>

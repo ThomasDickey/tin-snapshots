@@ -18,9 +18,9 @@
 #ifndef TIN_H
 #	include "tin.h"
 #endif /* !TIN_H */
-#ifndef TINTBL_H
-#	include	"tincfg.h"
-#endif /* !TINTBL_H */
+
+#include "tincfg.h"
+
 #ifndef TCURSES_H
 #	include "tcurses.h"
 #endif /* !TCURSES_H */

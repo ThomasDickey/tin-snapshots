@@ -209,10 +209,10 @@ read_groups_descriptions (
 	FILE *fp,
 	FILE *fp_save)
 {
-	char *ptr;
-	char *p, *q;
-	char group[PATH_LEN];
+	char *p, *q, *ptr;
+	char *group = (char *) 0;
 	int count = 0;
+	size_t space = 0;
 	struct t_group *psGrp;
 
 	while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
@@ -228,6 +228,16 @@ read_groups_descriptions (
  */
 		if ((fp_save != (FILE *) 0) && read_news_via_nntp && !read_local_newsgroups_file)
 			fprintf (fp_save, "%s\n", ptr);
+
+		if (!space) { /* initial malloc */
+			space = strlen(ptr) + 1;
+			group = my_malloc(space);
+		} else {
+			while (strlen(ptr) > space) { /* realloc needed? */
+				space *= 2;
+				group = (char *) my_realloc((void *) group, space);
+			}
+		}
 
 		for (p = ptr, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
 			*q = *p;
@@ -256,8 +266,8 @@ read_groups_descriptions (
 
 		if (++count % 100 == 0)
 			spin_cursor ();
-
 	}
+	free(group);
 }
 #endif /* !INDEX_DAEMON */
 

@@ -3,7 +3,7 @@
  *  Module    : bugrep.h
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 1997-07-30
- *  Updated   : 1998-02-01
+ *  Updated   : 2000-11-09
  *  Notes     :
  *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute this  software,
@@ -24,7 +24,7 @@
 #	endif /* M_AMIGA */
 
 #	ifdef VMS
-#		define BUG_REPORT_ADDRESS	"stenns@vw.tci.uni-hannover.de"
+#		define BUG_REPORT_ADDRESS	"dickey@herndon4.his.com"
 #	endif /* VMS */
 
 /* fallback */

@@ -1,23 +1,23 @@
-MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
+MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
 ----------------------------------------------------
   10365 ./Makefile
-   5414 ./MANIFEST
+   5413 ./MANIFEST
    1690 ./README
    2209 ./README.VMS
    1543 ./README.WIN
-  62001 ./aclocal.m4
+  65711 ./aclocal.m4
     801 ./conf-tin
-  35433 ./config.guess
-  26214 ./config.sub
- 246075 ./configure
-  20895 ./configure.in
+  36344 ./config.guess
+  26726 ./config.sub
+ 253090 ./configure
+  20916 ./configure.in
    4765 ./install.sh
   11873 ./makefile.in
-    661 ./mkdirs.sh
-   5737 ./doc/CHANGES
+    777 ./mkdirs.sh
+   6296 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
-  30337 ./doc/INSTALL
+  30564 ./doc/INSTALL
   19434 ./doc/TODO
    5197 ./doc/WHATSNEW
    3882 ./doc/auth.txt
@@ -36,16 +36,16 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
     564 ./include/bool.h
-    972 ./include/bugrep.h
-   8374 ./include/config.h
-  47173 ./include/extern.h
+    966 ./include/bugrep.h
+   8556 ./include/config.h
+  46686 ./include/extern.h
   13172 ./include/menukeys.h
    5170 ./include/nntplib.h
    3083 ./include/policy.h
-  25462 ./include/proto.h
+  25585 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
-  57743 ./include/tin.h
+  57871 ./include/tin.h
    9336 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
@@ -56,7 +56,7 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
   11074 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
-  63207 ./src/config.c
+  63168 ./src/config.c
   26938 ./src/curses.c
   11967 ./src/debug.c
    2335 ./src/envarg.c
@@ -70,13 +70,13 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
   10143 ./src/inews.c
   34710 ./src/init.c
    1447 ./src/joinpath.c
-  90614 ./src/lang.c
+  90839 ./src/lang.c
    3011 ./src/list.c
-  10492 ./src/mail.c
-  23871 ./src/main.c
+  10764 ./src/mail.c
+  23773 ./src/main.c
    8911 ./src/makecfg.c
    9347 ./src/memory.c
-  76886 ./src/misc.c
+  77206 ./src/misc.c
   37785 ./src/newsrc.c
   27202 ./src/nntplib.c
    5942 ./src/nrctbl.c
@@ -84,19 +84,19 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
   42378 ./src/page.c
   24159 ./src/parsdate.y
    8496 ./src/pgp.c
-  97452 ./src/post.c
+  97609 ./src/post.c
   12519 ./src/prompt.c
    8874 ./src/read.c
   23620 ./src/refs.c
    2431 ./src/regex.c
   13486 ./src/rfc1521.c
   22744 ./src/rfc1522.c
-  36133 ./src/save.c
+  36257 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
   35125 ./src/select.c
    6655 ./src/sigfile.c
-  11003 ./src/signal.c
+  11041 ./src/signal.c
    5800 ./src/strftime.c
   10478 ./src/string.c
    8278 ./src/tcurses.c
@@ -119,20 +119,20 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
    4252 ./vms/getopt1.c
    2374 ./vms/getpass.c
     496 ./vms/isxterm.c
-   4553 ./vms/libvms.mms
+   4556 ./vms/libvms.mms
    1262 ./vms/ndir.h
-  47966 ./vms/parsdate.c
+  38295 ./vms/parsdate.c
    2716 ./vms/parse.c
     165 ./vms/parse.h
    1138 ./vms/pwd.h
    5596 ./vms/qsort.c
-   1019 ./vms/select.h
+   1064 ./vms/select.h
    1172 ./vms/strings.h
    9012 ./vms/uaf.h
    6134 ./vms/vms.c
-   3971 ./vms/vmsdir.c
-   1705 ./vms/vmsfile.c
-   5652 ./vms/vmspwd.c
+   4004 ./vms/vmsdir.c
+   1298 ./vms/vmsfile.c
+   5686 ./vms/vmspwd.c
     389 ./vms/vmstimval.h
   19464 ./pcre/ChangeLog
    1143 ./pcre/LICENCE
@@ -181,8 +181,8 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
    4284 ./src/l1_next.tab
    4284 ./src/next_l1.tab
    4789 ./src/tincfg.tbl
-   8747 ./src/descrip.mms
-   5779 ./pcre/pcre.mms
+   9705 ./src/descrip.mms
+   5803 ./pcre/pcre.mms
     954 ./libcanlock/Build
     882 ./libcanlock/CHANGES
     789 ./libcanlock/MANIFEST
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3268870 total
+3273898 total

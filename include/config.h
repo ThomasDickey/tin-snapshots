@@ -19,6 +19,7 @@
 #define HAVE_MEMCMP
 #define HAVE_MEMCPY
 #define HAVE_MEMSET
+#define HAVE_MKTEMP
 #define HAVE_STRCHR
 #define HAVE_STRTOL
 #define HAVE_STRPBRK
@@ -41,8 +42,14 @@
 #   if defined(VAXC) || defined(__DECC)
 #	define CASE_PROBLEM
 #	define VAR_LENGTH_PROBLEM
+#	define CLOSEDIR_VOID
 #	undef  const
 #   endif
+#   if defined(__DECC) && __CRTL_VER >= 70000000
+#	define HAVE_STRCASECMP 1
+#	define HAVE_STRNCASECMP 1
+#   endif
+#   define NNTP_ABLE 1
 #endif
 
 #if !defined(M_AMIGA) && !defined(M_OS2) && !defined(M_UNIX) && !defined(WIN32) && !defined(VMS)
@@ -131,8 +138,7 @@
 #	define HAVE_STRING_H
 #endif
 
-#if defined(BSD) || defined(EPIX) || \
-    defined(M_OS2) || defined(__osf__) || defined(UMAXV) || defined(WIN32)
+#if defined(EPIX) || defined(M_OS2) || defined(UMAXV) || defined(WIN32) || defined(__DECC)
 #	define HAVE_FCNTL_H
 #endif
 
@@ -177,7 +183,9 @@
 #	define HAVE_SYS_TIMES_H
 #endif
 
+#if !defined(VMS)
 #define TIME_WITH_SYS_TIME
+#endif
 
 #if defined(PTX) || defined(QNX42) || defined(SCO_UNIX)
 #	define HAVE_SYS_SELECT_H

@@ -548,6 +548,9 @@ create_path (
 	char buf[PATH_LEN];
 	int i, j, len;
 	struct stat st;
+#ifdef VMS
+	char *leaf;
+#endif
 
 	i = my_group[cur_groupnum];
 
@@ -619,6 +622,9 @@ create_path (
 		}
 	}
 #	else
+	if ((leaf = strrchr(buf, ']')) != 0
+	 || (leaf = strrchr(buf, ':')) != 0)
+		*++leaf = '\0';
 	if (my_mkdir (buf, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 		if (errno != EEXIST) {
 			perror_message (txt_cannot_create, buf);

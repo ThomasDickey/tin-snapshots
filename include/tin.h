@@ -82,6 +82,10 @@ enum resizer { cNo, cYes, cRedraw };
 #		ifndef SOCKETSHR_HAVE_FERROR
 #			define ferror(a) (0)
 #		endif /* !SOCKETSHR_HAVE_FERROR */
+#		if defined(__DECC) && __CRTL_VER < 70000000
+			extern int my_sleep(unsigned);
+#			define sleep(n) my_sleep(n) /* conflicts with socketshr */
+#		endif
 #	endif /* SOCKETSHR_TCP */
 #	include <curses.h>
 #	include <stat.h>
@@ -93,7 +97,6 @@ enum resizer { cNo, cYes, cRedraw };
 #	define NNTP_INEWS
 #	define DONT_HAVE_PIPING
 #	define NO_SHELL_ESCAPE
-#	define USE_CLEARSCREEN
 #	ifndef MM_CHARSET
 #		define MM_CHARSET "ISO-8859-1"
 #	endif /* !MM_CHARSET */

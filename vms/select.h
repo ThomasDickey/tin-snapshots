@@ -1,3 +1,6 @@
+#ifdef __DECC
+#include <time.h>
+#else
 #define NBBY	8		/* number of bits in a byte */
 /*
  * Select uses bit masks of file descriptors in longs.
@@ -24,3 +27,4 @@ typedef struct fd_set {
 #define FD_CLR(n, p)	((p)->fds_bits[(n)/CHANNELSIZE/NFDBITS] &= ~(1 << (((n)/CHANNELSIZE) % NFDBITS)))
 #define FD_ISSET(n, p)	((!((n) % CHANNELSIZE)) && ((p)->fds_bits[(n)/CHANNELSIZE/NFDBITS] & (1 << (((n)/CHANNELSIZE) % NFDBITS))))
 #define FD_ZERO(p)	memset((char *)(p),'\0',sizeof(*(p)))
+#endif

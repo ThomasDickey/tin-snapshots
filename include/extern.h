@@ -265,6 +265,26 @@ extern char *optarg;
 /*
  * Local variables
  */
+
+/* This fixes ambiguities on platforms that don't distinguish extern case */
+#ifdef CASE_PROBLEM
+#	define txt_help_B	txt_help_BIGB
+#	define txt_help_D	txt_help_BIGD
+#	define txt_help_I	txt_help_BIGI
+#	define txt_help_K	txt_help_BIGK
+#	define txt_help_L	txt_help_BIGL
+#	define txt_help_M	txt_help_BIGM
+#	define txt_help_Q	txt_help_BIGQ
+#	define txt_help_S	txt_help_BIGS
+#	define txt_help_T	txt_help_BIGT
+#	define txt_help_U	txt_help_BIGU
+#	define txt_help_W	txt_help_BIGW
+#	define txt_help_X	txt_help_BIGX
+#	define txt_help_p_S	txt_help_p_BIGS
+#	define txt_help_t_K	txt_help_t_BIGK
+#	define txt_help_thd_C	txt_help_thd_BIGC
+#endif /* CASE_PROBLEM */
+
 extern FILE *note_fp;				/* body of current article */
 extern char **news_headers_to_display_array;
 extern char **news_headers_to_not_display_array;
@@ -1134,41 +1154,6 @@ extern char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 /* address types */
 #define GNKSA_ADDRTYPE_ROUTE	0
 #define GNKSA_ADDRTYPE_OLDSTYLE	1
-
-/* This fixes ambiguities on platforms that don't distinguish extern case */
-#ifdef CASE_PROBLEM
-#	define txt_help_B	txt_help_BIGB
-#	define txt_help_D	txt_help_BIGD
-#	define txt_help_I	txt_help_BIGI
-#	define txt_help_K	txt_help_BIGK
-#	define txt_help_L	txt_help_BIGL
-#	define txt_help_M	txt_help_BIGM
-#	define txt_help_Q	txt_help_BIGQ
-#	define txt_help_S	txt_help_BIGS
-#	define txt_help_T	txt_help_BIGT
-#	define txt_help_U	txt_help_BIGU
-#	define txt_help_W	txt_help_BIGW
-#	define txt_help_X	txt_help_BIGX
-#	define txt_help_p_S	txt_help_p_BIGS
-#	define txt_help_t_K	txt_help_t_BIGK
-#endif /* CASE_PROBLEM */
-
-#ifdef VMS /* M.St. 15.01.98 */
-	extern constext txt_help_BIGB[];
-	extern constext txt_help_BIGD[];
-	extern constext txt_help_BIGI[];
-	extern constext txt_help_BIGK[];
-	extern constext txt_help_BIGL[];
-	extern constext txt_help_BIGM[];
-	extern constext txt_help_BIGQ[];
-	extern constext txt_help_BIGS[];
-	extern constext txt_help_BIGT[];
-	extern constext txt_help_BIGU[];
-	extern constext txt_help_BIGW[];
-	extern constext txt_help_BIGX[];
-	extern constext txt_help_p_BIGS[];
-	extern constext txt_help_t_BIGK[];
-#endif /* VMS */
 
 #ifndef DONT_HAVE_PIPING
 	extern constext txt_pipe[];

@@ -130,6 +130,7 @@ int sys_read (int fildes, char *buf, unsigned int nbyte)
   return (rtnval);
 }
 
+#if  __CRTL_VER < 70000000
 FILE *
 popen (
 	char *command,
@@ -182,4 +183,4 @@ int setenv (char *name, char *value, int notused)
   }
   return status;
 }
-
+#endif

@@ -1,6 +1,11 @@
 #ifndef PROTO_H
 #	define PROTO_H 1
 
+#ifdef CASE_PROBLEM
+#	define Raw	tin_Raw
+#	define EndWin	tin_EndWin
+#endif
+
 /* active.c */
 extern int get_active_num (void);
 extern char group_flag (int ch);
@@ -193,6 +198,9 @@ extern void postinit_regexp (void);
 
 /* joinpath.c */
 extern void joinpath (char *result, const char *dir, const char *file);
+
+/* lang.c */
+extern char *tin_version (void);
 
 /* list.c */
 extern int find_group_index (const char *group);
