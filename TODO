@@ -1,8 +1,5 @@
 Bugs
 ----
-o  range check for artl-counter/num-lines etc. is missing -> output may look
-   ugly (f.e. if there are more than 9999 threads/arts in a group group.c)
-
 o  dupilcated parent msg-ids(*) could cause infinite loops
    (* onyl happens if the news spool is corrupt)
 

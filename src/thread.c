@@ -96,14 +96,14 @@ bld_tline (l, art)
 		get_author (TRUE, art, from);
 	}
 
-	if (art->lines != -1) {
-		sprintf (lines, "%-4d", art->lines);
+	if (art->lines != -1 && art->lines <=9999) {
+		sprintf (lines, "%4d", art->lines);
 	} else {
 		strcpy (lines, "   ?");
 	}
 
 	if (show_lines) {
-		sprintf (screen[j].col, "  %4d%3s  [%-4s]  %-*.*s%s%-*.*s",
+		sprintf (screen[j].col, "  %4d%3s  [%4.4s]  %-*.*s%s%-*.*s",
 			 l, new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {

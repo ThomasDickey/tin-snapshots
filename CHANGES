@@ -1,3 +1,9 @@
+--unoff BETA release 961204 --
+
+232) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. several range checks
+     FIX. group.c, select.c, thread.c
+
 --unoff BETA release 961203 --
 
 231) Roland Rosenfeld <roland@spinnaker.rhein.de>
