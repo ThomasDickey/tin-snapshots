@@ -114,8 +114,6 @@ o  (Y)ank in after resync-time ends up in a double re-read of the active file
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
-o  in options 'M'enu art_mark_deleted shows up as 'i' instead of 'D'
-
 o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and
    losing all references to the moved groups)

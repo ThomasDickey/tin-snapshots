@@ -137,20 +137,20 @@ debug_print_header (
 			(s->msgid ? s->msgid : ""),
 			(s->refs ? s->refs : ""));
 
- 		if (s->archive) {
- 		    fprintf (fp, "arch=[%-38s]  ", s->archive);
+		if (s->archive) {
+ 			fprintf (fp, "arch=[%-38s]  ", s->archive);
  		} else {
- 		    fprintf (fp, "arch=[]  ");
+ 			fprintf (fp, "arch=[]  ");
  		}
  		if (s->part) {
- 		    fprintf (fp, "part=[%s]  ", s->part);
+ 			fprintf (fp, "part=[%s]  ", s->part);
  		} else {
- 		    fprintf (fp, "part=[]  ");
+ 			fprintf (fp, "part=[]  ");
  		}
  		if (s->patch) {
- 		    fprintf (fp, "patch=[%s]\n", s->patch);
-		} else {
- 		    fprintf (fp, "patch=[]\n");
+ 			fprintf (fp, "patch=[%s]\n", s->patch);
+ 		} else {
+ 			fprintf (fp, "patch=[]\n");
  		}
 		fprintf (fp,"thread=[%d]  inthread=[%d]  status=[%d]\n\n",
 			s->thread, s->inthread, s->status);
@@ -185,21 +185,21 @@ debug_save_comp (void)
 
 			fprintf (fp,"subj=[%-38s]\n", save[i].subject);
 			fprintf (fp,"dir=[%s]  file=[%s]\n", save[i].dir, save[i].file);
- 			if (save[i].archive) {
- 			    fprintf (fp, "arch=[%-38s]  ", save[i].archive);
- 			} else {
- 			    fprintf (fp, "arch=[]  ");
- 			}
- 			if (save[i].part) {
- 			    fprintf (fp, "part=[%s]  ", save[i].part);
- 			} else {
- 			    fprintf (fp, "part=[]  ");
- 			}
- 			if (save[i].patch) {
- 			    fprintf (fp, "patch=[%s]\n", save[i].patch);
+			if (save[i].archive) {
+				fprintf (fp, "arch=[%-38s]  ", save[i].archive);
 			} else {
- 			    fprintf (fp, "patch=[]\n");
- 			}
+				fprintf (fp, "arch=[]  ");
+			}
+			if (save[i].part) {
+				fprintf (fp, "part=[%s]  ", save[i].part);
+			} else {
+				fprintf (fp, "part=[]  ");
+			}
+			if (save[i].patch) {
+				fprintf (fp, "patch=[%s]\n", save[i].patch);
+			} else {
+				fprintf (fp, "patch=[]\n");
+			}
 			fprintf (fp,"index=[%d]  saved=[%d]  mailbox=[%d]\n\n",
 				save[i].index, save[i].saved, save[i].is_mailbox);
 		}

@@ -29,7 +29,7 @@
 #	define	s_fclose	fclose
 #	define	s_gets	fgets
 #	define	s_close	close
-#	define	s_puts	my_fputs
+#	define	s_puts	fputs
 #	define	s_dup		dup
 #	define	s_init()	(1)
 #	define	s_end()
@@ -105,9 +105,5 @@
 #	endif
 
 #endif /* NNTP_ABLE */
-
-#ifndef MAXHOSTNAMELEN
-#	define MAXHOSTNAMELEN 255
-#endif
 
 #endif /* TNNTP_H */

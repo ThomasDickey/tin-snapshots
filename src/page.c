@@ -350,9 +350,9 @@ page_goto_next_unread:
 				goto restart;
 
 #ifdef HAVE_PGP
-		        case iKeyPagePGPCheckArticle:
-			        if (pgp_check_article())
-				        redraw_page(group->name, respnum);
+			case iKeyPagePGPCheckArticle:
+				if (pgp_check_article())
+					redraw_page(group->name, respnum);
 				break;
 #endif
 
@@ -661,7 +661,7 @@ return_to_index:
 			case iKeyPagePrevUnreadArt:	/* previous unread article */
 				n = prev_unread (prev_response (respnum));
 				if (n == -1)
-				    info_message (txt_no_prev_unread_art);
+					info_message (txt_no_prev_unread_art);
 				else {
 					art_close ();
 					respnum = n;
@@ -758,7 +758,7 @@ return_to_index:
 #endif				
 
 			default:
-			    info_message(txt_bad_command);
+				info_message(txt_bad_command);
 		}
 	}
 }
@@ -942,11 +942,11 @@ show_note_page (
 				if (!wild_dont_display_headers) {
 					for (i = 0; i < num_headers_to_not_display; i++) {
 						if (!strncasecmp(buf, news_headers_to_not_display_array[i], strlen(news_headers_to_not_display_array[i]))) {
-			    			dont_display_header = 1;
-			    			break;
-			    		}
-			    	}
-			    }
+							dont_display_header = 1;
+							break;
+						}
+					}
+				}
 				if (wild_dont_display_headers) {
 					display_header = (do_display_header);
 				} else if (wild_do_display_headers) {
@@ -971,6 +971,10 @@ print_a_line:
 			StartInverse ();
 		}
 
+		if (!strcmp (buf2, "-- "))
+			below_sig = TRUE;			/* begin of signature */
+		strip_line (buf2);
+
 /* decode RFC 1522(RFC 2047) style headers back to 8bit before
    further processiing. It doesn't work if header part is longer
    than a pageful. A quick patch would be remove check for
@@ -978,23 +982,30 @@ print_a_line:
    as well as make it impossible to have header-like lines
    in article body. Somehow, in_headers is set to FALSE
    even if we're still in header part of article when
-   header part is longer than a pageful. need to FIX */
+   header part is longer than a pageful. need to FIX
+   There's another problem to be addressed, namely
+   RFC 2047 headers spanning two or more lines should
+   be concatenated, but it's not done, yet for feat that
+   it may distrupt other parts.
+*/
 
-                if (in_headers && ! display_mime_header_asis) { 
-                    char header_name[80];
-                    size_t header_name_len;
-                    header_name_len = strstr(buf2,": ")-buf2;
-                    strncpy(header_name,buf2,header_name_len);
-                    header_name[header_name_len]='\0';
-                    match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
-                    strcpy(buf2+header_name_len+2,buf3);
-                }
-
-		if (!strcmp (buf2, "-- "))
-			below_sig = TRUE;			/* begin of signature */
-
-		strip_line (buf2);
-
+		if (in_headers && ! display_mime_header_asis) {
+			/* check if it's  a continuation header line */
+			if ( buf2[0] != ' ' && buf2[0] != '\t' ) {
+				char header_name[80];
+				size_t header_name_len;
+				/* maybe not necessary, but just in case,
+				   checking the range would not be bad */
+				if ( (header_name_len = strstr(buf2,": ")-buf2) > 0) {
+					strncpy(header_name,buf2,header_name_len);
+					header_name[header_name_len]='\0';
+					match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
+					strcpy(buf2+header_name_len+2,buf3);
+				}
+			} else {
+				strcpy(buf2,rfc1522_decode(buf2));
+				}
+		}
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
 			ConvertTeX2Iso (buf3, buf2);
@@ -1200,8 +1211,8 @@ show_first_header (
 		/* Can't eval tin_itoa() more than once in a statement due to statics */
 		strcpy(x, tin_itoa(which_thread(respnum) + 1, 4));
 
-   		sprintf (tmp, txt_thread_x_of_n, buf, x, tin_itoa(top_base, 4));
-   		my_fputs (tmp, stdout);
+		sprintf (tmp, txt_thread_x_of_n, buf, x, tin_itoa(top_base, 4));
+		my_fputs (tmp, stdout);
 	}
 
 	if (arts[respnum].lines < 0) {

@@ -69,7 +69,7 @@ main (
 
 	base_name (argv[0], progname);
 #ifdef VMS
-    argv[0] = progname;
+	argv[0] = progname;
 #endif
 
 #ifdef NNTP_ONLY
@@ -195,13 +195,12 @@ main (
 	}
 
 	if((count=count_postponed_articles())) {
-	  if(count==1) {
-	    printf("there is one postponed article, use '^O' to reuse it\n");
-	  } else {
-	    printf("there are %d postponed articles, use '^O' to reuse them\n",
-		   count);
-	  }
-	  sleep(2);
+		if(count==1) {
+			printf("there is one postponed article, use '^O' to reuse it\n");
+		} else {
+			printf("there are %d postponed articles, use '^O' to reuse them\n", count);
+		}
+		sleep(2);
 	}
 
 	/*

@@ -1,3 +1,20 @@
+--unoff BETA release 970321 --
+
+357) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. continued headerlines caused crashes upon a rfc1522decode
+     FIX. page.c
+
+356) Kevin Lentin <kevinl@cs.monash.edu.au>
+     T.E.Dickey <dickey@clark.net>
+     BUG. can not post in curses-mode
+     FIX. tnntp.h
+
+355) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. check for return null-pointers in get_host/domain/fqdn
+     BUG. typo in configure.in
+     ADD. minor code-clenup
+     FIX. several patches
+
 --unoff BETA release 970320 --
 
 354) Urs Janssen <urs@akk.uni-karlsruhe.de>

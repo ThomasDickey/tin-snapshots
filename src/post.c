@@ -189,22 +189,22 @@ static void
 backup_article(
 	char *the_article)
 {
-  char line[LEN];
-  FILE *in, *out;
+	char line[LEN];
+	FILE *in, *out;
 
-  if((in=fopen(the_article, "r"))==NULL)
-    return;
+	if ((in = fopen(the_article, "r")) == NULL)
+		return;
 
-  if((out=fopen(backup_article_name(the_article), "w"))==NULL) {
-    fclose(in);
-    return;
-  }
+	if ((out = fopen(backup_article_name(the_article), "w")) == NULL) {
+		fclose(in);
+		return;
+	}
 
-  while(fgets(line, sizeof(line), in)!=NULL) {
-    fputs(line, out);
-  }
-  fclose(in);
-  fclose(out);
+	while( fgets(line, sizeof(line), in) != NULL) {
+		fputs(line, out);
+	}
+	fclose(in);
+	fclose(out);
 }
 
 static void
@@ -1058,9 +1058,8 @@ post_existing_article (
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, 0);
-				while (!check_article_to_be_posted (article, art_type, &lines)
-				   && repair_article(&ch))
-				   	;
+				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+					;
 				if (ch == iKeyPostEdit) {
 					break;
 				}
@@ -1100,24 +1099,24 @@ post_existing_article (
 					info_message (txt_art_posted);
 					goto post_article_done;
 				} else {
-				  if(prompt_rejected()==iKeyPostPostpone) {
-				    postpone_article(backup_article_name(article));
-				  } else {
-				    unlink(backup_article_name(article));
-				    rename_file (article, dead_article);
+					if (prompt_rejected() == iKeyPostPostpone) {
+						postpone_article(backup_article_name(article));
+					} else {
+						unlink(backup_article_name(article));
+						rename_file (article, dead_article);
 #ifdef M_UNIX
-				    if (keep_dead_articles)
-				      append_file (dead_articles, dead_article);
+						if (keep_dead_articles)
+						append_file (dead_articles, dead_article);
 #endif
-				    Raw (FALSE);
-				    error_message (txt_art_rejected, dead_article);
-				    ReadCh ();
- 				  }
-				  return;
+						Raw (FALSE);
+						error_message (txt_art_rejected, dead_article);
+						ReadCh ();
+					}
+					return;
 				}
 			case iKeyPostPostpone:
-			  postpone_article(article);
-			  goto post_article_postponed;
+				postpone_article(article);
+				goto post_article_postponed;
 
 			default:
 				break;
@@ -1125,19 +1124,20 @@ post_existing_article (
 		ch = prompt_to_edit();
 	}
 
-      post_article_done:
+post_article_done:
 	if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
 		update_active_after_posting (group);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-		  /* we currently do not add autoselect for
-                   * crossposted postponed articles, since we don't
-                   * know in which group the article was actually in
-                   * */
-		  if(!strchr(group, ',') && (psGrp=psGrpFind(group))) {
-			quick_filter_select_posted_art (psGrp, subj);
-		  }
-		  update_posted_info_file (group, 'w', subj);
+			/* we currently do not add autoselect for
+		    * crossposted postponed articles, since we don't
+		    * know in which group the article was actually in
+		    */
+		    
+			if(!strchr(group, ',') && (psGrp=psGrpFind(group))) {
+				quick_filter_select_posted_art (psGrp, subj);
+			}
+			update_posted_info_file (group, 'w', subj);
 		} else {
 			subj[0] = '\0';
 		}

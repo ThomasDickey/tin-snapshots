@@ -661,7 +661,7 @@ group_catchup:
 					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, 'y') != 1) {
 						break;
 					}
-				    if (!CURR_GROUP.newsrc.num_unread ||
+					if (!CURR_GROUP.newsrc.num_unread ||
 					    !confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1) {
 						grp_mark_read (&CURR_GROUP, arts);
 					}
@@ -678,7 +678,7 @@ group_catchup:
 						}
 					}
 				}
-			    break;
+				break;
 
 			case iKeyGroupToggleSubjDisplay:	/* toggle display of subject & subj/author */
 				toggle_subject_from ();
@@ -805,7 +805,7 @@ group_list_thread:
 				set_subj_from_size (cCOLS);
 				index_point = find_new_pos (old_top, old_artnum, index_point);
 				show_group_page ();
-			    break;
+				break;
 
 			case iKeyGroupNextGroup:	/* goto next group */
 				clear_message ();
@@ -862,13 +862,13 @@ group_list_thread:
 
 			case iKeyGroupPrevUnreadArt:	/* go to previous unread article */
 				if (index_point < 0) {
-				    info_message(txt_no_prev_unread_art);
-				    break;
+					info_message(txt_no_prev_unread_art);
+					break;
 				}
 				n = prev_response ((int) base[index_point]);
 				n = prev_unread (n);
 				if (n == -1) {
-				    info_message(txt_no_prev_unread_art);
+					info_message(txt_no_prev_unread_art);
 				} else {
 					index_point = show_page (group, group_path, n, &dummy);
 					if (index_point != GRP_NOREDRAW) {
@@ -1239,7 +1239,7 @@ undo_auto_select_arts:
 				break;
 
 			default:
-			    info_message (txt_bad_command);
+				info_message (txt_bad_command);
 		}
 	}
 

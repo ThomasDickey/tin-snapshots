@@ -192,7 +192,7 @@ end_of_list:
 					else
 						draw_group_arrow();
 				}
-			    break;
+				break;
 
 			case iKeySelectSetRange:	/* set range */
 				if (iSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1)) {
@@ -226,7 +226,7 @@ select_read_group:
 				 * get the min/max/count info in parse_newsrc_active_line()
 				 */
 				if (read_news_via_nntp && !newsrc_active) {
-					char    acBuf[NNTP_STRLEN];
+					char	acBuf[NNTP_STRLEN];
 					char	acLine[NNTP_STRLEN];
 
 					sprintf (acBuf, "group %s", CURR_GROUP.name);
@@ -371,13 +371,13 @@ select_up:
 				break;
 
 			case iKeySelectResetNewsrc:	/* reset .newsrc */
-			    if (prompt_yn (cLINES, txt_reset_newsrc, FALSE) == 1) {
+				if (prompt_yn (cLINES, txt_reset_newsrc, FALSE) == 1) {
 					reset_newsrc ();
 					yank_active_file ();
 					cur_groupnum = 0;
 					show_selection_page ();
-			    }
-			    break;
+				}
+				break;
 
 			case iKeyPageUp:		/* page up */
 			case iKeyPageUp2:
@@ -421,7 +421,7 @@ select_page_up:
 					break;
 				}
 				catchup_group (&CURR_GROUP, (ch == iKeySelectCatchupGotoNext));
-			    break;
+				break;
 
 			case iKeySelectToggleSubjDisplay:	/* toggle newsgroup descriptions */
 				show_description = !show_description;
@@ -532,7 +532,7 @@ select_done:
 			case iKeySelectQuit2:	/* quit, no ask */
 				write_config_file (local_config_file);
 				tin_done (EXIT_OK);
-                                break;
+				break;
 
 			case iKeySelectQuitNoWrite:	/* quit, but don't save configuration */
 				if (prompt_yn (cLINES, txt_quit_no_write, TRUE)==1) {
@@ -574,7 +574,7 @@ select_done:
 					sprintf (buf, txt_subscribed_to, CURR_GROUP.name);
 					info_message (buf);
 				}
-			    break;
+				break;
 
 			case iKeySelectSubscribePat:	/* subscribe to groups matching pattern */
 				/* If no groups in active[] then break otherwise loop thru looking
@@ -619,7 +619,7 @@ select_done:
 				} else {
 					clear_message ();
 				}
-			    break;
+				break;
 
 			case iKeySelectUnsubscribe:	/* unsubscribe to current group */
 				if (group_top == 0)
@@ -680,7 +680,7 @@ select_done:
 				} else {
 					clear_message ();
 				}
-			    break;
+				break;
 
 			case iKeyVersion:	/* show tin version */
 				info_message (cvers);
@@ -755,7 +755,7 @@ select_done:
 						show_selection_page ();
 						info_message (buf);
 					} else {
-					    info_message (txt_no_groups_to_yank_in);
+						info_message (txt_no_groups_to_yank_in);
 					}
 					yank_in_active_file = FALSE;
 				} else {
@@ -789,7 +789,7 @@ select_done:
 				break;
 
 			default:
-			    info_message(txt_bad_command);
+				info_message(txt_bad_command);
 		}
 	}
 
@@ -1521,11 +1521,11 @@ iParseRange (
 	while (*pcPtr && !iDone) {
 		if (*pcPtr >= '0' && *pcPtr <= '9') {
 			if (iSetMax) {
-	    			*piRngMax = atoi (pcPtr);
+				*piRngMax = atoi (pcPtr);
 				iDone = TRUE;
-	    		} else {
-	    			*piRngMin = atoi (pcPtr);
-	    		}
+			} else {
+				*piRngMin = atoi (pcPtr);
+			}
 			while (*pcPtr >= '0' && *pcPtr <= '9') {
 				pcPtr++;
 			}
@@ -1534,19 +1534,19 @@ iParseRange (
 				case '-':
 					iSetMax = TRUE;
 					break;
-			    	case '.':
+				case '.':
 					if (iSetMax) {
-			    			*piRngMax = iNumCur;
+						*piRngMax = iNumCur;
 						iDone = TRUE;
-			    		} else {
-			    			*piRngMin = iNumCur;
-			    		}
+					} else {
+						*piRngMin = iNumCur;
+					}
 					break;
-			    	case '$':
+				case '$':
 					if (iSetMax) {
-			    			*piRngMax = iNumMax;
+						*piRngMax = iNumMax;
 						iDone = TRUE;
-			    		}
+					}
 					break;
 				default:
 					break;

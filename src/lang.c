@@ -666,11 +666,11 @@ constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to b
 # default_sigfile=!command  executes external command to generate a signature\n\
 # default_sigfile=--none     don't append a signature\n";
 constext txt_tinrc_defaults[] = "# default action/prompt strings\n";
-constext txt_tinrc_display_mime_header_asis[] = "# if ON, RFC 1522(now RFC 2047)-style header fields are  displayed\n\
-# without decoding.NO effect on header displayed at the top of\n\
-# each page in article mode and summary mode(they are always decoded).\n\
-# default is OFF so that RFC 1522(RFC 2047) style header(designated in\n\
-# news_header_to_display or displayed with CTRL-h(full header option)\n\
+constext txt_tinrc_display_mime_header_asis[] = "# if ON, RFC 1522 (now RFC 2047)-style header fields are displayed\n\
+# without decoding. No effect on header displayed at the top of\n\
+# each page in article mode and summary mode (they are always decoded).\n\
+# default is OFF so that RFC 1522 (RFC 2047)-style headers (designated in\n\
+# news_header_to_display or displayed with CTRL-h (full header option))\n\
 # will be decoded back to 8bit when displayed.\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\

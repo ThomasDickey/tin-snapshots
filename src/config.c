@@ -1302,10 +1302,10 @@ change_config_file (
 					/*
 					 * some options need further action to take effect
 					 */
-	    				switch (option) {
-	    					/* show mini help menu */
-		    				case OPT_BEGINNER_LEVEL:
-		    					if (beginner_level != original_on_off_value)
+					switch (option) {
+						/* show mini help menu */
+						case OPT_BEGINNER_LEVEL:
+							if (beginner_level != original_on_off_value)
 								(void) set_win_size (&cLINES, &cCOLS);
 							break;
 
@@ -1373,7 +1373,6 @@ change_config_file (
 								print_option (OPT_POST_8BIT_HEADER);
 							}
 							break;
-                                                   
 
 						/* show newsgroup description text next to newsgroups */
 						case OPT_SHOW_DESCRIPTION:

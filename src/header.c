@@ -20,20 +20,21 @@ get_host_name (
 void)
 {
 	char *ptr;
-	static char hostname[MAXHOSTNAMELEN+2];
+	static char hostname[MAXHOSTNAMELEN];
 
+	hostname[0]='\0';
+	
 #ifdef HAVE_GETHOSTBYNAME
 	gethostname(hostname, sizeof(hostname));
 #else
-#	if defined(M_AMIGA) || defined(M_OS2)
-	
+#	if defined(M_AMIGA) || defined(M_OS2)	
 	if ((ptr = getenv("NodeName")) != (char *) 0) {
-		strcpy(hostname, ptr);
+		strncpy(hostname, ptr, MAXHOSTNAMELEN);
 	}
 #	else
 #		if defined(WIN32)
 	if ((ptr = getenv("COMPUTERNAME")) != (char *) 0) {
-		strcpy(hostname, ptr);
+		strncpy(hostname, ptr, MAXHOSTNAMELEN);
 	}
 #		endif /* WIN32 */
 #	endif /* M_AMIGA || M_OS2 */
@@ -41,17 +42,20 @@ void)
 #ifdef HAVE_SYS_UTSNAME_H
 	if (! *hostname){
 		strcpy(hostname, system_info.nodename);
-	} 	else
+	}
 #endif /* HAVE_SYS_UTSNAME_H */
-	{
+	if (! *hostname) {
 		if ((ptr = getenv("HOST")) != (char *) 0) {
-			strcpy (hostname, ptr);
+			strncpy (hostname, ptr, MAXHOSTNAMELEN);
 		} else {
 			if ((ptr = getenv("HOSTNAME")) != (char *) 0) {
-				strcpy (hostname, ptr);
+				strncpy (hostname, ptr, MAXHOSTNAMELEN);
+			} else {
+				hostname[0]='\0';
 			}
 		}
 	}
+	hostname[MAXHOSTNAMELEN]='\0';
 	return (hostname);
 }
 
@@ -63,9 +67,11 @@ get_domain_name (
 	void)
 {
 	char *ptr;
-	static char domain[MAXHOSTNAMELEN+2];
-	char buff[MAXHOSTNAMELEN+2];
+	static char domain[8192];
+	char buff[MAXHOSTNAMELEN];
 	FILE *fp;
+
+	domain[0]='\0';
 
 #	if defined(M_AMIGA)
 /* Damn compiler bugs...
@@ -93,45 +99,46 @@ static const char *domain_name_hack = DOMAIN_NAME;
 				strcpy (domain, buff);
 				}
 			}
+			if (domain[0] == '/') {
+				/* file was empty */
+				domain[0]='\0';
+			} 
 			fclose (fp);
 		} else {
 			domain[0]='\0';
 		}
 	}
+	domain[MAXHOSTNAMELEN]='\0';
 	return (domain);
 }
 #endif /* DOMAIN_NAME */
 
 #ifdef HAVE_GETHOSTBYNAME
 /* find FQDN - gethostbyaddr() */
-const char *
-get_fqdn (
-	const char *host)
+const char *get_fqdn(host)
+const char	*host;
 {
 	char	name[MAXHOSTNAMELEN+2];
-	const struct hostent	*hp;
+	struct hostent	*hp;
 	struct in_addr	in;
 
 	name[MAXHOSTNAMELEN]='\0';
-	if (host) {
-		(void) strncpy (name, host, MAXHOSTNAMELEN);
-	} else {
-		if (gethostname (name, MAXHOSTNAMELEN)) {
-			/* oh oh */
+	if (host)
+		(void)strncpy(name,host,MAXHOSTNAMELEN);
+	else
+		if (gethostname(name,MAXHOSTNAMELEN))
 			return(NULL);
-		}
-	}
 
-	if (isdigit(*name)) {
-		in.s_addr = inet_addr(name);
-		if ((hp = gethostbyaddr((char *) &in.s_addr, 4, AF_INET)))
-			in.s_addr = (*hp->h_addr);
-		return((hp && strchr(hp->h_name, '.')) ? hp->h_name : inet_ntoa(in));
+	if ('0'<=*name&&*name<='9') {
+		in.s_addr=inet_addr(name);
+		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
+			in.s_addr=(*hp->h_addr);
+		return(hp&&strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in));
 	}
-	if ((hp = gethostbyname(name)) && !strchr (hp->h_name, '.'))
-		if ((hp = gethostbyaddr(hp->h_addr, hp->h_length, hp->h_addrtype)))
-			in.s_addr = (*hp->h_addr);
-	return(hp ? ((strchr(hp->h_name, '.')) ? hp->h_name : inet_ntoa(in)) : 0);
+	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
+		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
+			in.s_addr=(*hp->h_addr);
+	return(hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
 }
 #endif
 

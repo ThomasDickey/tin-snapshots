@@ -438,7 +438,8 @@ feed_articles (
 						}
 						break;
 					case FEED_PIPE:
-   					if (got_sig_pipe) goto got_sig_pipe_while_piping;
+						if (got_sig_pipe)
+							goto got_sig_pipe_while_piping;
 						fseek (note_fp, 0L, 0);
 						copy_fp (note_fp, fp, "");
 						break;
@@ -492,7 +493,7 @@ feed_articles (
 								}
 								break;
 							case FEED_PIPE:
-         					if (got_sig_pipe) goto got_sig_pipe_while_piping;
+								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, 0);
 								copy_fp (note_fp, fp, "");
 								break;
@@ -561,7 +562,7 @@ feed_articles (
 								}
 								break;
 							case FEED_PIPE:
-         					if (got_sig_pipe) goto got_sig_pipe_while_piping;
+								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, 0);
 								copy_fp (note_fp, fp, "");
 								break;

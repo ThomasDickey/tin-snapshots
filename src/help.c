@@ -496,24 +496,24 @@ show_mini_help (
 
 	switch (level) {
 		case SELECT_LEVEL:
-			center_line (line,   FALSE, txt_mini_select_1);
+			center_line (line, FALSE, txt_mini_select_1);
 			center_line (line+1, FALSE, txt_mini_select_2);
 			center_line (line+2, FALSE, txt_mini_select_3);
 			break;
 		case SPOOLDIR_LEVEL:
-			center_line (line,   FALSE, txt_mini_spooldir_1);
+			center_line (line, FALSE, txt_mini_spooldir_1);
 			break;
 		case GROUP_LEVEL:
-			center_line (line,   FALSE, txt_mini_group_1);
+			center_line (line, FALSE, txt_mini_group_1);
 			center_line (line+1, FALSE, txt_mini_group_2);
 			center_line (line+2, FALSE, txt_mini_group_3);
 			break;
 		case THREAD_LEVEL:
-			center_line (line,   FALSE, txt_mini_thread_1);
+			center_line (line, FALSE, txt_mini_thread_1);
 			center_line (line+1, FALSE, txt_mini_thread_2);
 			break;
 		case PAGE_LEVEL:
-			center_line (line,   FALSE, txt_mini_page_1);
+			center_line (line, FALSE, txt_mini_page_1);
 			center_line (line+1, FALSE, txt_mini_page_2);
 			center_line (line+2, FALSE, txt_mini_page_3);
 			break;

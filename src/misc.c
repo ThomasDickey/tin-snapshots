@@ -438,8 +438,7 @@ tin_done (
 #endif
 
 #ifdef VMS
-    if (ret == 0)
-      ret = 1;
+	if (ret == 0) ret = 1;
 #endif
 
 	exit (ret);
@@ -498,34 +497,33 @@ strip_double_ngs (
 
 			over2 = FALSE;
 			ncnt2 = 0;
-
-	    		/* now compare with each inner newsgroup on the list,
-	    	         * which is behind the momentary outer newsgroup
-	    	         * if it is different from the outer newsgroup, append
-	    	         * to list, strip double-commas
-	    	         */
-
-	    		while (!over2) {
-	    			ncnt2++;
-	    			strcpy(ngroup2, cmplist);
+			
+			/* now compare with each inner newsgroup on the list,
+			 * which is behind the momentary outer newsgroup
+			 * if it is different from the outer newsgroup, append
+			 * to list, strip double-commas
+			 */
+			
+			while (!over2) {
+				ncnt2++;
+				strcpy(ngroup2, cmplist);
 /*				my_printf("2[%d]: %s\n", ncnt2, ngroup2); */
-	    			ptr2 = strchr(ngroup2, ',');
-	    			if (ptr2 != (char *) 0) {
-	    				strcpy(cmplist, ptr2+1);
-	    				*ptr2 = '\0';
-	    			} else {
-	    				over2 = TRUE;
-	    			}
-
-	    			if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
-    					&& (strlen(ngroup2) != 0)) {
-	    					strcat(newlist, ",");
-    						strcat(newlist, ngroup2);
-    				}
-    			}
-    		}
-
- 	   	strcpy(ngs_list, newlist);	/* move string to its real location */
+				ptr2 = strchr(ngroup2, ',');
+				if (ptr2 != (char *) 0) {
+					strcpy(cmplist, ptr2+1);
+					*ptr2 = '\0';
+				} else {
+					over2 = TRUE;
+				}
+				
+				if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
+					&& (strlen(ngroup2) != 0)) {
+					strcat(newlist, ",");
+					strcat(newlist, ngroup2);
+				}
+			}
+		}
+		strcpy(ngs_list, newlist);	/* move string to its real location */
 	}
 }
 
@@ -640,11 +638,11 @@ invoke_cmd (
 	int ret;
 
 #if defined(__hpux)
-#if defined(__STDC__)
-       RETSIGTYPE (*suspchld)(int sig);
-#else
-       RETSIGTYPE (*suspchld)();
-#endif
+#	if defined(__STDC__)
+		RETSIGTYPE (*suspchld)(int sig);
+#	else
+		RETSIGTYPE (*suspchld)();
+#	endif
 #endif
 
 #ifdef SIGTSTP
@@ -823,8 +821,7 @@ base_name (
 	str_lwr (program, program);
 #endif
 #ifdef VMS
-    if (cp = strrchr(program, '.'))
-      *cp = '\0';
+	if (cp = strrchr(program, '.')) *cp = '\0';
 #endif
 }
 
@@ -900,19 +897,19 @@ mail_check (void)
  */
 
 # define APPEND_TO(dest, src) do { \
-                                     (void) sprintf ((dest), "%s", (src)); \
-                                     (dest)=strchr((dest), '\0'); \
-			         } while (0)
+	(void) sprintf ((dest), "%s", (src)); \
+	(dest)=strchr((dest), '\0'); \
+	} while (0)
 # define RTRIM(whatbuf, whatp) do { (whatp)--; \
-                          while ((whatp) >= (whatbuf) && \
-                                 isspace (*(whatp))) \
-			    *((whatp)--) = '\0'; } while (0)
+	while ((whatp) >= (whatbuf) && \
+	isspace (*(whatp))) \
+	*((whatp)--) = '\0'; } while (0)
 # define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf) ; \
-                          (whatp) && isspace (*(whatp)) ; \
-                          (whatp)++)
+	(whatp) && isspace (*(whatp)) ; \
+	(whatp)++)
 # define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
-                                   LTRIM ((whatbuf), (whatp)); \
-                              } while (0)
+	LTRIM ((whatbuf), (whatp)); \
+	} while (0)
 
 void
 parse_from (
@@ -2081,7 +2078,7 @@ strfmailer (
 			}
 		}
 		if (*format == '%') {
-                        t_bool ismail=TRUE;
+			t_bool ismail=TRUE;
 			switch (*++format) {
 				case '\0':
 					*s++ = '%';
@@ -2188,7 +2185,7 @@ make_group_path (
 	char *ptr;
 
 #ifdef VMS
-    sprintf(path, "[%s]", name);
+	sprintf(path, "[%s]", name);
 #else
 	strcpy (path, name);
 

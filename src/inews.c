@@ -18,10 +18,10 @@
 #if 0
 #ifdef VMS
 #   ifdef MULTINET
-#		define netwrite    socket_write
+#		define netwrite	socket_write
 #		include "multinet_root:[multinet.include]netdb.h"
 #   else
-#		define netwrite    write
+#		define netwrite	write
 #		include <netdb.h>
 #   endif
 #else
@@ -171,9 +171,8 @@ submit_news_file (
 	checknadd_headers (name, lines);
 
     /* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
-        if (!(strcasecmp(mm_charset, "euc-kr")
-	 || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))
-             post_mime_encoding = 0;	/* FIXME: txt_8bit */
+    if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))
+    	post_mime_encoding = 0;	/* FIXME: txt_8bit */
 
 	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header, ismail);
 

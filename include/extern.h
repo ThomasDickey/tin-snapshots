@@ -350,8 +350,8 @@ extern char txt_help_bug_report[LEN];
 extern char userid[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
 
-extern char domain_name[256];
-extern char host_name[256];
+extern char domain_name[MAXHOSTNAMELEN];
+extern char host_name[MAXHOSTNAMELEN];
 
 extern const char base64_alphabet[64];
 extern constext *help_group[];
