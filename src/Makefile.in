@@ -89,7 +89,6 @@ SU	= su
 TAGS	= ctags
 
 HFILES	= \
-	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -97,6 +96,8 @@ HFILES	= \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h
+#	$(INCDIR)/autoconf.h
+#	$(INCDIR)/config.h
 #	$(INCDIR)/amiga.h
 #	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/gst.h

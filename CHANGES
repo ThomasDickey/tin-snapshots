@@ -1,3 +1,10 @@
+--950824BETA  PLMC.960526 --
+
+049) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. --enable-mail-handling --enable-etiquette --enable-forgery
+     BUG. --enable-ref-threading did not work
+     FIX. several supplied patches
+     
 --950824BETA  PLMC.960525 --
 
 048) Urs Janssen <urs@akk.uni-karlsruhe.de>

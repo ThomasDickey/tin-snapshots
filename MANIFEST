@@ -1,17 +1,18 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960525 (Sat May 25 19:25:34 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960526 (Sun May 26 18:03:35 MET DST 1996)
 ----------------------------------------------------
-  14714 ./CHANGES
-   8823 ./TODO
-   4613 ./Makefile
+  14944 ./CHANGES
+   8666 ./TODO
+   4631 ./Makefile
   17168 ./INSTALL
     132 ./MANIFEST
    1380 ./README
     913 ./tinpp
   13185 ./aclocal.m4
-   6736 ./configure.in
+  86006 ./configure
+   8294 ./configure.in
    4771 ./install.sh
   11427 ./makefile.in
-   1520 ./conf-tin
+   1241 ./conf-tin
   69402 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
@@ -53,7 +54,6 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960525 (Sat May 25 19:25:34 MET DST 1996)
    2771 ./src/list.c
   12009 ./src/mail.c
   16806 ./src/main.c
-   9903 ./src/makefile.in
   11022 ./src/memory.c
   41582 ./src/misc.c
    7234 ./src/msmail.c
@@ -68,7 +68,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960525 (Sat May 25 19:25:34 MET DST 1996)
   63052 ./src/post.c
    4342 ./src/prompt.c
      53 ./src/proto.sed
-  10055 ./src/refs.c
+  10088 ./src/refs.c
    4856 ./src/rfc1521.c
   11710 ./src/rfc1522.c
   34142 ./src/save.c
@@ -84,4 +84,6 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960525 (Sat May 25 19:25:34 MET DST 1996)
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
-1240475 total
+   5558 ./include/autoconf.hin
+   9925 ./src/Makefile.in
+1327968 total

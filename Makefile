@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960525
+PVER		= 960526
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -20,7 +20,6 @@ SRCDIR	= ./src
 HFILES	= \
 	$(INCDIR)/amiga.h \
 	$(INCDIR)/amigatcp.h \
-	$(INCDIR)/autoconf.hin \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/gst.h \
@@ -60,7 +59,6 @@ CFILES	= \
 	$(SRCDIR)/list.c \
 	$(SRCDIR)/mail.c \
 	$(SRCDIR)/main.c \
-	$(SRCDIR)/makefile.in \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
 	$(SRCDIR)/msmail.c \
@@ -104,12 +102,15 @@ TOP	= \
 	$(TOPDIR)/README \
 	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
+	$(TOPDIR)/configure \
 	$(TOPDIR)/configure.in \
 	$(TOPDIR)/install.sh \
 	$(TOPDIR)/makefile.in \
 	$(TOPDIR)/conf-tin
 
-ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES)
+ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) \
+	$(INCDIR)/autoconf.hin \
+	$(SRCDIR)/Makefile.in
 
 ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
 
@@ -179,7 +180,7 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./tinpp
+	@$(CHMOD) 755 ./conf-tin ./tinpp ./configure
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
@@ -193,7 +194,6 @@ tar:
 	@$(LS) $(PROJECT)$(VER).tgz
 
 dist:
-#	@$(MAKE) clean
 	@$(MAKE) chmod
 	@$(MAKE) manifest
 	@$(MAKE) tar

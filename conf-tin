@@ -1,17 +1,5 @@
 #!/bin/sh
-
-#rm -f config.cache config.status config.log
-
-OUT=td-conf.out
-cat >>$OUT <<EOF/
-** `date`
-** node: `uname -a`
-** from: `pwd`
-** user: `id`
-** conf: $*
-EOF/
-OPTS="$*"
-
+# rm -f config.cache config.status config.log
 if test ! -f configure
 then
         autoconf
@@ -20,6 +8,7 @@ fi
 INSTALL="td-install"
 CFLAGS="-O"
 CC="${CC-cc}"
+TOP="/usr/local/"
 
 NETLIBS=""
 case `uname -s` in
@@ -53,37 +42,25 @@ if test -n "$NETLIBS" ; then
         export LIBS
 fi
 
-case `hostname` in
-akk*)
-	OPTS="$OPTS \
-	--with-libdir="" \
-	--with-spooldir="" \
-	--with-mail-gateway="" \
-        --with-mail-domain=akk.uni-karlsruhe.de \
-	--with-nntp-default-server=news.akk.uni-karlsruhe.de \
-        --with-mail-handling \
-	--with-nntp-only \
-	--with-color \
-	--with-ref-threading "
-#	--with-advertising
-#	--without-etiquette 
-#	--without-forgery 
-#	--with-mime-strict-charset 
-#	--without-mime-break-long-lines 
-#	--without-mime-base64
-#	--without-log-user
-	;;
-
-esac
-
 INSTALL="$INSTALL" \
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
         --prefix=$TOP \
         --exec-prefix=$TOP \
-        --disable-echo \
+        --enable-echo \
         --disable-debug \
         --enable-prototypes \
         --enable-warnings \
+	--with-libdir="" \
+	--with-spooldir="" \
+	--with-mail-gateway="" \
+        --with-mail-domain=akk.uni-karlsruhe.de \
+	--with-nntp-default-server=news.akk.uni-karlsruhe.de \
+        --disable-mail-handling \
+	--enable-nntp-only \
+	--enable-color \
+	--enable-ref-threading \
+	--disable-etiquette \
+	--disable-forgery 
         $OPTS $* 2>&1 |tee -a $OUT

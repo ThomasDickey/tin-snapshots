@@ -24,7 +24,6 @@ test -n "$PATH_METAMAIL" && AC_DEFINE(HAVE_METAMAIL)
 AC_PATH_PROG(PATH_PGP,pgp)
 test -n "$PATH_PGP" && AC_DEFINE(HAVE_PGP)
 
-CF_MAKEFLAGS
 
 ###	use option --enable-debug to compile-in test/development code
 AC_ARG_ENABLE(debug,
@@ -97,24 +96,6 @@ AC_ARG_WITH(inn-nntplib,
 	 INN_NNTPLIB=$withval
 	 AC_SUBST(INN_NNTPLIB)])
 
-## optional features
-AC_ARG_WITH(color,
-	[  --with-color            ANSI color support],
-	[AC_DEFINE(HAVE_COLOR)])
-
-AC_ARG_WITH(ref-threading,
-	[  --with-ref-threading    reference-based threading],
-	[AC_DEFINE(HAVE_REF_THREADING)])
-
-AC_ARG_WITH(mail-handling,
-	[  --with-mail-handling],
-	[AC_DEFINE(HAVE_MAIL_HANDLING)])
-
-AC_ARG_WITH(nntp-only,
-	[  --with-nntp-only        alternatives: NNTP_ONLY, NNTP_ABLE],
-	[AC_DEFINE(NNTP_ONLY)],
-	[AC_DEFINE(NNTP_ABLE)])
-
 ## options for miscellaneous definitions
 AC_ARG_WITH(mail-gateway,
 	[  --with-mail-gateway     (default: empty)],
@@ -140,7 +121,108 @@ AC_ARG_WITH(nntp-default-server,
 	 esac])
 AC_SUBST(NNTP_DEFAULT_SERVER)
 
+## optional features
+AC_MSG_CHECKING(whether to use MH style mail handling)
+AC_ARG_ENABLE(mail-handling,
+	[  --enable-mail-handling            MH style mail handling (default: off).
+	  --disable-mail-handling],
+	[ case "$enableval" in
+	yes)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_MAIL_HANDLING)
+		;;
+	*)
+		AC_MSG_RESULT(no)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(no)]
+)
+
+AC_MSG_CHECKING(whether to be NNTP_ONLY)
+AC_ARG_ENABLE(nntp-only,
+	[  --enable-nntp-only                reading via NNTP only (default: off).
+	  --disable-nntp-only],
+	[ case "$enableval" in
+	yes)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(NNTP_ONLY)
+		;;
+	*)
+		AC_MSG_RESULT(no)
+		AC_DEFINE(NNTP_ABLE)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(no)
+	  AC_DEFINE(NNTP_ABLE)]
+)
+
+AC_MSG_CHECKING(whether to enable ANSI-color)
+AC_ARG_ENABLE(color,
+	[  --enable-color            ANSI-color support (default: off).
+	  --disable-color],
+	[ case "$enableval" in
+	yes)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_COLOR)
+		;;
+	*)
+		AC_MSG_RESULT(no)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(no)]
+)
+
+AC_MSG_CHECKING(whether to enable reference-based threading)
+AC_ARG_ENABLE(ref-threading,
+	[  --enable-ref-threading    reference-based threading (default: on).
+	  --disable-ref-threading ],
+	[ case "$enableval" in
+	no)
+		AC_MSG_RESULT(no)
+		;;
+	*)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_REF_THREADING)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(yes)
+	  AC_DEFINE(HAVE_REF_THREADING) ]
+)
+
+AC_MSG_CHECKING(whether to enable posting-etiquette)
+AC_ARG_ENABLE(etiquette,
+	[  --enable-etiquette            print posting-etiquette (default: on).
+	  --disable-etiquette],
+	[ case "$enableval" in
+	no)
+		AC_MSG_RESULT(no)
+		AC_DEFINE(NO_ETIQUETTE)
+		;;
+	*)
+		AC_MSG_RESULT(yes)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(yes) ]
+)
+
+AC_MSG_CHECKING(whether to enable forged cancels)
+AC_ARG_ENABLE(forgery,
+	[  --enable-forgery              forged cancel support (default: off).
+	  --disable-forgery],
+	[ case "$enableval" in
+	yes)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(FORGERY)
+		;;
+	*)
+		AC_MSG_RESULT(no)
+		;;
+	esac ],
+	[ AC_MSG_RESULT(no)]
+)
+
 ###	checks for compiler characteristics
+CF_MAKEFLAGS
 AC_LANG_C
 AC_C_CONST
 AC_C_INLINE
@@ -311,4 +393,4 @@ fi
 CF_COMPTYPE
 CF_COREFILE
 
-AC_OUTPUT(makefile src/makefile)
+AC_OUTPUT(makefile src/Makefile)
