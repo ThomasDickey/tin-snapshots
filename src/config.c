@@ -53,10 +53,10 @@ check_upgrade (
 	char foo[60];
 	char bar[120]; /* should be enought; snprintf() would be handy */
 
-	my_strncpy(foo, txt_tinrc_header, strlen(foo)-1);
-	sprintf(bar, foo, PRODUCT, TINRC_VERSION);
+	my_strncpy(foo, txt_tinrc_header, sizeof(foo) - 1);
+	snprintf(bar, sizeof(bar)-1, foo, PRODUCT, TINRC_VERSION);
 
-	if (strncmp(buf, bar, MIN(strlen(bar),strlen(buf))) == 0)
+	if (strncmp(buf, bar, MIN(strlen(bar), strlen(buf))) == 0)
 		return(IGNORE);
 	else {
 		error_message (txt_warn_update, VERSION);
@@ -66,10 +66,10 @@ check_upgrade (
 	}
 }
 
+
 /*
  *  read local & global configuration defaults
  */
-
 t_bool
 read_config_file (
 	char *file,

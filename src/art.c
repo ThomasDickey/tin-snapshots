@@ -678,7 +678,8 @@ parse_headers (
 	char buf[HEADER_LEN];
 	char art_from_addr[HEADER_LEN];
 	char art_full_name[HEADER_LEN];
-	char *ptr, *s;
+	char *ptr;
+	char *s;
 	int lineno = 0;
 	int max_lineno = 25;
 	t_bool got_archive, got_date, got_from, got_lines;
@@ -726,18 +727,15 @@ parse_headers (
 				break;
 			case 'D':	/* Date:  mandatory */
 				if (!got_date) {
-					if (match_header (ptr+1, "ate", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+					if (match_header (ptr + 1, "ate", (char *) 0, buf, HEADER_LEN) && *buf != '\0') {
 						h->date = parsedate (buf, (struct _TIMEINFO *) 0);
 						got_date = TRUE;
 					}
 				}
 				break;
 			case 'F':	/* From:  mandatory */
-			case 'T':	/* To:    mandatory (mailbox) */
 				if (!got_from) {
-					if ((match_header (ptr+1, "rom", (char*)0, buf, HEADER_LEN) ||
-					    match_header (ptr+1, "o", (char*)0, buf, HEADER_LEN)) &&
-					    *buf != '\0') {
+					if (match_header (ptr + 1, "rom", (char *) 0, buf, HEADER_LEN) && *buf != '\0') {
 						h->gnksa_code = parse_from (buf, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (*art_full_name)
@@ -772,7 +770,7 @@ parse_headers (
 
 				/* Received:  If found its probably a mail article */
 				if (!got_received) {
-					if (match_header (ptr+1, "eceived", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+					if (match_header (ptr + 1, "eceived", (char *) 0, buf, HEADER_LEN) && *buf != '\0') {
 						max_lineno = 50;
 						got_received = TRUE;
 					}
@@ -780,9 +778,9 @@ parse_headers (
 				break;
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
-					if (match_header (ptr+1, "ubject", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
-						s = eat_re (eat_tab(rfc1522_decode(buf)), FALSE);
-						h->subject = hash_str (s);
+					if (match_header (ptr + 1, "ubject", (char *) 0, buf, HEADER_LEN) && *buf != '\0') {
+						s = eat_re(eat_tab(rfc1522_decode(buf)), FALSE);
+						h->subject = hash_str(s);
 						got_subject = TRUE;
 					}
 				}

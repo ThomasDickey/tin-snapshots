@@ -1,3 +1,47 @@
+-- 1.4.6 release 20020816 "Aerials" --
+
+040) Urs Janssen <urs@tin.org>
+     ADD. config.guess, config.sub update
+     ADD. fixed a few warnings
+     FIX. config.guess, config.sub, extern.h, misc.c
+
+039) Russ Allbery <rra@stanford.edu>
+     BUG. strlen instead of sizeof used
+     FIX. config.c
+
+038) Urs Janssen <urs@tin.org>
+     ADD. new TLDs .coop and .aero
+     REM. obsolete TLD .zr, .fx, and .uucp
+     BUG. typo fixed
+     BUG. missing Subject caused crashes when followupping
+     FIX. autoconf.h[in], policy.h, misc.c
+
+037) Urs Janssen <urs@tin.org>
+     ADD. allow new GTLDs: .biz, .info, .name, .museum
+     FIX. policy.h
+
+036) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. base64 encoding was broken
+     FIX. rfc1521.c
+
+035) Stephan Kulow <coolo@caldera.de>
+     BUG. format-strings passed to prompt_slk_response() weren't "quoted".
+     FIX. feed.c, filter.c, pgp.c, post.c, prompt.c, save.c
+
+034) Andreas Metzler <tin-dev@downhill.at.eu.org>
+     BUG. gnksa_split_from() didn't treat missing @ as error
+     FIX. misc.c
+
+033) Dieter Baron <dillo@danbala.ifoer.tuwien.ac.at>
+     BUG. 'Y' didn't check for new messages in mailgroups
+     BUG. parse_headers() might use To: header as originator
+     FIX. active.c, art.c, mail.c
+
+032) Herbert Martin Dietze <herbert@spamcop.net>
+     Urs Janssen <urs@tin.org>
+     BUG. empty random organization file coulkd crash tin
+     FIX. misc.c
+
 -- 1.4.5 release 20010409 "One More Nightmare" --
 
 031) Dirk Nimmich <nimmich@uni-muenster.de>

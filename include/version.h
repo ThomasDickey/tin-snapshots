@@ -3,9 +3,9 @@
  *  Module    : version.h
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1999-11-13
+ *  Updated   : 2002-08-16
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2002 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -16,9 +16,9 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION 	"1.4.5"
-#	define RELEASEDATE	"20010409"
-#	define RELEASENAME	"One More Nightmare"
+#	define VERSION 	"1.4.6"
+#	define RELEASEDATE	"20020816"
+#	define RELEASENAME	"Aerials"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA

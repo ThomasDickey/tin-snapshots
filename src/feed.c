@@ -240,7 +240,7 @@ feed_articles (
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
-						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_choose_post_process_type);
+						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", "%s", txt_choose_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
@@ -266,7 +266,7 @@ feed_articles (
 				if (strstr (from_name, arts[respnum].from)) {
 #	endif /* !FORGERY */
 					/* repost or supersede ? */
-					option = (char) prompt_slk_response (option_default, "\033qrs", sized_message(txt_supersede_article, arts[respnum].subject));
+					option = (char) prompt_slk_response (option_default, "\033qrs", "%s", sized_message(txt_supersede_article, arts[respnum].subject));
 
 					switch (option) {
 						case iKeyFeedSupersede:

@@ -7,9 +7,9 @@
 PROJECT	= tin
 LVER	= 1
 PVER	= 4
-SVER	= 5
+SVER	= 6
 VER	= $(LVER).$(PVER).$(SVER)
-DVER	= 20010409
+DVER	= 20020816
 EXE	= tin
 MANEXT	= 1
 
@@ -392,7 +392,7 @@ name:
 	$(SED) "s,^DVER[[:space:]]*=[[:print:]]*,DVER	= $$DATE," ./Makefile > ./Makefile.tmp && \
 	$(MV) ./Makefile.tmp ./Makefile ;\
 	$(SED) "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp && \
-	$(SED) "s, VERSION[[:space:]]*\"[[:print:]]*\", VERSION 	\"$(VER)\"," $(INCDIR)/version.h.tmp > $(INCDIR)/version.h ;\
+	$(SED) "s, VERSION[[:space:]]*\"[[:print:]]*\", VERSION 	\"$(VER)\"," $(INCDIR)/version.h.tmp > $(INCDIR)/version.h && $(RM) -f $(INCDIR)/version.h.tmp ;\
 	$(SED) "s,^DVER[[:space:]]*=[[:print:]]*,DVER		= $$DATE," ./makefile.in > ./makefile.in.tmp && \
 	$(MV) ./makefile.in.tmp ./makefile.in
 

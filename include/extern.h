@@ -42,9 +42,11 @@
 		extern int bcopy (char *, char *, int);
 #	endif /* DECL_BCOPY */
 #endif /* !HAVE_MEMCPY */
+#if 0 /* trouble on Linux/gcc 3.1 */
 #ifdef DECL_BZERO /* FD_ZERO() might use this */
 	extern void bzero (char *, int);
 #endif /* DECL_BZERO */
+#endif /* 0 */
 #ifdef DECL_CALLOC
 	extern void *calloc (size_t, size_t);
 #endif /* DECL_CALLOC */

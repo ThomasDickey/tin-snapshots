@@ -1059,7 +1059,7 @@ filter_menu (
 		return FALSE;
 
 	forever {
-		ch = prompt_slk_response(ch_default, "eqs\033", ptr_filter_quit_edit_save);
+		ch = prompt_slk_response(ch_default, "eqs\033", "%s", ptr_filter_quit_edit_save);
 		switch (ch) {
 
 		case iKeyFilterEdit:
