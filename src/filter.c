@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : filter.c
- *  Author    : I.Lea
- *  Created   : 28-12-92
- *  Updated   : 07-10-97
+ *  Author    : I. Lea
+ *  Created   : 28.12.1992
+ *  Updated   : 22.12.1997
  *  Notes     : Filter articles. Kill & auto selection are supported.
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -48,7 +48,15 @@
  */
 
 #define iAFR_FORMAT1 ((wildcard) ? "%s" : "*%s*")
-#define iAFR_FORMAT2 ((wildcard) ? "%s (%s)" : "*%s (%s)*")
+#if 0
+/* 
+ * format for From: in filter
+ * should be "%s1 (%s2)" or "%s2 <%s1>" depending on the format
+ * used in the header.
+ * disabled because of problems with From:-Lines in name <address> format
+ */
+#define iAFR_FORMAT2 ((wildcard) ? "%s\\s\\(%s\\)" : "*%s (%s)*")
+#endif
 
 /*
  * global filter array
@@ -118,7 +126,7 @@ vSetFilter (
 		psFilter->scope = (char *) 0;
 		psFilter->inscope = TRUE;
 		psFilter->icase = FALSE;
-		psFilter->fullref = TRUE;
+		psFilter->fullref = FILTER_MSGID;
 		psFilter->subj = (char *) 0;
 		psFilter->from = (char *) 0;
 		psFilter->msgid = (char *) 0;
@@ -310,14 +318,21 @@ if (debug) {
 			if (match_string (buf+1, "sgid=", msgid, sizeof (msgid))) {
 				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
-					arr_ptr[i].fullref = TRUE;
+					arr_ptr[i].fullref = FILTER_MSGID;
 				}
 				break;
 			}
 			if (match_string (buf+1, "sgid_last=", msgid, sizeof (msgid))) {
 				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
-					arr_ptr[i].fullref = FALSE;
+					arr_ptr[i].fullref = FILTER_MSGID_LAST;
+				}
+				break;
+			}
+			if (match_string (buf+1, "sgid_only=", msgid, sizeof (msgid))) {
+				if (arr_ptr) {
+					arr_ptr[i].msgid = my_strdup (msgid);
+					arr_ptr[i].fullref = FILTER_MSGID_ONLY;
 				}
 				break;
 			}
@@ -561,10 +576,19 @@ my_flush ();
 			fprintf (fp, "from=%s\n", ptr->filter[i].from);
 
 		if (ptr->filter[i].msgid != (char *) 0) {
-			if (ptr->filter[i].fullref)
-				fprintf (fp, "msgid=%s\n", ptr->filter[i].msgid);
-			else
-				fprintf (fp, "msgid_last=%s\n", ptr->filter[i].msgid);
+			switch (ptr->filter[i].fullref) {
+				case FILTER_MSGID:
+					fprintf (fp, "msgid=%s\n", ptr->filter[i].msgid);
+					break;
+				case FILTER_MSGID_LAST:
+					fprintf (fp, "msgid_last=%s\n", ptr->filter[i].msgid);
+					break;
+				case FILTER_MSGID_ONLY:
+					fprintf (fp, "msgid_only=%s\n", ptr->filter[i].msgid);
+					break;
+				default:
+					break;
+			}
 		}
 
 		if (ptr->filter[i].lines_cmp != FILTER_LINES_NO) {
@@ -692,7 +716,7 @@ filter_menu (
 	rule.from_ok = FALSE;
 	rule.lines_ok = FALSE;
 	rule.msgid_ok = FALSE;
-	rule.fullref = TRUE;
+	rule.fullref = FILTER_MSGID;
 	rule.subj_ok = FALSE;
 	rule.type = type;
 	rule.score = 0;
@@ -734,13 +758,21 @@ filter_menu (
 	sprintf (text_time, txt_time_default_days, default_filter_days);
 	sprintf (text_subj, ptr_filter_subj, len, len, art->subject);
 
+#if 0
+	/*
+	 * There are two possible formats: from (name) and name <from>
+	 * This segment of code should be disabled as it converts all
+	 * addresses to the first format, even when they are in the second
+	 * format in the header.
+	 */
 	if (art->name != (char *) 0)
 		sprintf (buf, "%s (%s)", art->from, art->name);
 	else
+#endif
 		strcpy (buf, art->from);
 
 	sprintf (text_from, ptr_filter_from, len, len, buf);
-	sprintf (text_msgid, ptr_filter_msgid, len-2, len-2, MSGID(art));
+	sprintf (text_msgid, ptr_filter_msgid, len-4, len-4, MSGID(art));
 
 	ClearScreen ();
 
@@ -806,29 +838,38 @@ filter_menu (
 		 * Message-Id:
 		 */
 		if (rule.subj_ok || rule.from_ok)
-			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_no, txt_full, txt_last, (char *)0, (char *)0);
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_no, txt_full, txt_last, txt_only, (char *)0);
 		else
-			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_full, txt_last, txt_no, (char *)0, (char *)0);
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_full, txt_last, txt_only, txt_no, (char *)0);
 
 		if (i == -1)
 			return FALSE;
 		else {
 			switch ((rule.subj_ok || rule.from_ok) ? i : i+1) {
-			case 0:
-			case 3:
-				rule.msgid_ok = FALSE;
-				rule.fullref  = FALSE;
-				break;
+				case 0:
+				case 4:
+					rule.msgid_ok = FALSE;
+					rule.fullref  = FILTER_MSGID;
+					break;
 
-			case 1:
-				rule.msgid_ok = TRUE;
-				rule.fullref  = TRUE;
-				break;
+				case 1:
+					rule.msgid_ok = TRUE;
+					rule.fullref  = FILTER_MSGID;
+					break;
 
-			case 2:
-				rule.msgid_ok = TRUE;
-				rule.fullref  = FALSE;
-				break;
+				case 2:
+					rule.msgid_ok = TRUE;
+					rule.fullref  = FILTER_MSGID_LAST;
+					break;
+
+				case 3:
+					rule.msgid_ok = TRUE;
+					rule.fullref  = FILTER_MSGID_ONLY;
+					break;
+
+				default: /* should not happen */
+					assert(0 != 0);
+					break;
 			}
 		}
 
@@ -1020,7 +1061,7 @@ quick_filter_kill (
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES);
 	rule.msgid_ok = (header == FILTER_MSGID) || (header == FILTER_MSGID_LAST);
-	rule.fullref = (header == FILTER_MSGID);
+	rule.fullref = header; /* value is directly used to select correct filter type */
 
 	if (header == FILTER_FROM_CASE_SENSITIVE || header == FILTER_FROM_CASE_IGNORE)
 		rule.from_ok = TRUE;
@@ -1081,7 +1122,7 @@ quick_filter_select (
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES);
 	rule.msgid_ok = (header == FILTER_MSGID) || (header == FILTER_MSGID_LAST);
-	rule.fullref = (header == FILTER_MSGID);
+	rule.fullref = header; /* value is directly used to select correct filter type */
 
 	if (header == FILTER_FROM_CASE_SENSITIVE || header == FILTER_FROM_CASE_IGNORE)
 		rule.from_ok = TRUE;
@@ -1135,7 +1176,7 @@ quick_filter_select_posted_art (
 		rule.from_ok = FALSE;
 		rule.lines_ok = FALSE;
 		rule.msgid_ok = FALSE;
-		rule.fullref = TRUE;
+		rule.fullref = FILTER_MSGID;
 		rule.subj_ok = TRUE;
 		rule.text[0] = '\0';
 		if (strlen(group->name) > sizeof(rule.scope)-1)
@@ -1183,7 +1224,7 @@ iAddFilterRule (
 	psPtr[*plNum].type = psRule->type;
 	psPtr[*plNum].icase = FALSE;
 	psPtr[*plNum].inscope = TRUE;
-	psPtr[*plNum].fullref = TRUE;
+	psPtr[*plNum].fullref = FILTER_MSGID;
 	psPtr[*plNum].scope = (char *) 0;
 	psPtr[*plNum].subj = (char *) 0;
 	psPtr[*plNum].from = (char *) 0;
@@ -1216,13 +1257,13 @@ iAddFilterRule (
 	}
 
 	if (psRule->text[0]) {
+#if 0
 		/*
 		 * quoting metacharacters and/or wildcards should not be necessary for
 		 * manually entered strings
 		 * we should assume that the users does know what he is doing and allow
 		 * him to enter regular expressions or wilmat patterns
 		 */
-#if 0
 		if (psRule->check_string)
 			sprintf (acBuf, iAFR_FORMAT1, quote_wild(psRule->text));
 		else
@@ -1245,14 +1286,13 @@ iAddFilterRule (
 
 				break;
 			case FILTER_MSGID:
-				psPtr[*plNum].msgid = my_strdup (acBuf);
-				psPtr[*plNum].fullref = TRUE;
-				break;
 			case FILTER_MSGID_LAST:
+			case FILTER_MSGID_ONLY:
 				psPtr[*plNum].msgid = my_strdup (acBuf);
-				psPtr[*plNum].fullref = FALSE;
+				psPtr[*plNum].fullref = psRule->counter;
 				break;
-			default:
+			default: /* should not happen */
+				assert(0 != 0);
 				break;
 		}
 		iFiltered = TRUE;
@@ -1267,10 +1307,18 @@ iAddFilterRule (
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
 		if (psRule->from_ok) {
+#if 0
+			/*
+			 * There are two possible formats: from (name) and name <from>
+			 * This segment of code should be disabled as it converts all
+			 * addresses to the first format, even when they are in the second
+			 * format in the header.
+			 */
 			if (psArt->name != (char *) 0)
 				sprintf (acBuf, iAFR_FORMAT2, psArt->from, psArt->name);
 			else
-				sprintf (acBuf, iAFR_FORMAT1, psArt->from);
+#endif
+				sprintf (acBuf, iAFR_FORMAT1, quote_wild (psArt->from));
 
 			psPtr[*plNum].from = my_strdup (acBuf);
 		}
@@ -1292,16 +1340,15 @@ iAddFilterRule (
 	if (iFiltered) {
 #ifdef DEBUG
 		if (debug)
-			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%s] line=[%d %d] time=[%ld]",
+			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%d] line=[%d %d] time=[%ld]",
 				(psPtr[*plNum-1].inscope ? "TRUE" : "FALSE"),
 				(psRule->scope ? psRule->scope : ""),
 				psPtr[*plNum-1].type, psPtr[*plNum-1].icase,
 				(psPtr[*plNum-1].subj ? psPtr[*plNum-1].subj : ""),
 				(psPtr[*plNum-1].from ? psPtr[*plNum-1].from : ""),
 				(psPtr[*plNum-1].msgid ? psPtr[*plNum-1].msgid : ""),
-				(psPtr[*plNum-1].fullref ? "TRUE" : "FALSE"),
-				psPtr[*plNum-1].lines_cmp, psPtr[*plNum-1].lines_num,
-				psPtr[*plNum-1].time);
+				psPtr[*plNum-1].fullref, psPtr[*plNum-1].lines_cmp,
+				psPtr[*plNum-1].lines_num, psPtr[*plNum-1].time);
 #endif
 
 #ifndef INDEX_DAEMON
@@ -1506,18 +1553,28 @@ filter_articles (
 
 					struct t_article *art = &arts[i];
 					char *refs = NULL;
-					const char *myrefs;
+					const char *myrefs = NULL;
+
 /* TODO nice idea del'd; better apply one rule on all fitting
  * TODO articles, so we can switch to an appropriate algorithm
  * TODO for each kind of rule, including the deleted one.
  */
-
 					/* myrefs does not need to be freed */
+
 					/* use full references header or just the last entry ? */
-					if (ptr[j].fullref) {
-						myrefs = REFS(art, refs);
-					} else {
-						myrefs = (art->refptr->parent) ? art->refptr->parent->txt : "";
+					switch (ptr[j].fullref) {
+						case FILTER_MSGID:
+							myrefs = REFS(art, refs);
+							break;
+						case FILTER_MSGID_LAST:
+							myrefs = (art->refptr->parent) ? art->refptr->parent->txt : "";
+							break;
+						case FILTER_MSGID_ONLY:
+							myrefs = "";
+							break;
+						default: /* should not happen */
+							assert(0 != 0);
+							break;
 					}
 
 					if (!wildcard) {

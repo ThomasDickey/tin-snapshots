@@ -759,7 +759,8 @@ esac
 test ".$ac_cv_func_strerror" != ".yes" && \
 test ".$cf_cv_have_sys_errlist" = ".yes" && \
 	PCRE_DEFINES="$PCRE_DEFINES -DSTRERROR_FROM_ERRLIST"
-test ".$cf_cv_good_bcopy = ".yes &&
+test ".$ac_cv_func_memmove" != ".yes" && \
+test ".$cf_cv_good_bcopy" = ".yes" && \
 	PCRE_DEFINES="$PCRE_DEFINES -DUSE_BCOPY"
 AC_SUBST(PCRE_DEFINES)
 

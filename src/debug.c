@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : debug.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 09-12-94
+ *  Author    : I. Lea
+ *  Created   : 01.04.91
+ *  Updated   : 24.12.94
  *  Notes     : debug routines
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -449,7 +449,7 @@ debug_print_bitmap (
 	sprintf (file, "%sBITMAP", TMPDIR);
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		fprintf (fp, "\nActive; Group=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
+		fprintf (fp, "\nActive: Group=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
 			group->name, SUB_CHAR(group->subscribed),
 			group->xmin, group->xmax, group->count,
 			group->newsrc.num_unread);

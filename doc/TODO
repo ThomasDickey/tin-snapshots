@@ -1,4 +1,4 @@
-Bugs
++Bugs
 ----
 o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
 
@@ -210,6 +210,8 @@ o  add feature goto using the 'G' key
    Quoted text
    uuencode header lines
    etc...
+o  Additions to the group menu :
+        'L' (lookup message-id)
 
 o  Additions to the thread menu :
 	'/','?' (search subject)
@@ -220,6 +222,7 @@ o  Additions to the thread menu :
 	''  r ought to be toggle show all/show only unread
 	'f' (post a followup)
 	'-' (goto last article)
+	'L' (lookup message-id)
 	keys to goto previous/next thread
 
 o  Additions to the pager:

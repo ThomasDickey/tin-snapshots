@@ -977,8 +977,8 @@ quick_post_article_loop:
 				return;
 				}
 			case iKeyPostPostpone:
-			  postpone_article(article);
-			  goto post_article_postponed;
+				postpone_article(article);
+				goto post_article_postponed;
 
 			default:
 				break;
@@ -1175,7 +1175,7 @@ append_postponed_file (
 			fprintf (fp_out, "From %s %s", addr, ctime (&epoch));
 			while (fgets (buf, sizeof buf, fp_in) != (char *) 0) {
 				if(strncmp(buf, "From ", 5)==0)
-				  fputc('>', fp_out);
+					fputc('>', fp_out);
 				fputs (buf, fp_out);
 			}
 			print_art_seperator_line (fp_out, FALSE);
@@ -1561,8 +1561,8 @@ post_article_loop:
 				 	return redraw_screen;
 				}
 			case iKeyPostPostpone:
-			  postpone_article(article);
-			  goto post_article_postponed;
+				postpone_article(article);
+				goto post_article_postponed;
 			default:
 				break;
 		}
@@ -2042,20 +2042,20 @@ post_response_loop:
 						ch = iKeyPostEdit;
 						goto post_response_loop;
 					} else {
-					    unlink(backup_article_name(article));
-					    rename_file (article, dead_article);
+						unlink(backup_article_name(article));
+						rename_file (article, dead_article);
 #ifdef M_UNIX
-					    if (keep_dead_articles)
-					      append_file (dead_articles, dead_article);
+						if (keep_dead_articles)
+							append_file (dead_articles, dead_article);
 #endif
-					    info_message (txt_art_rejected, dead_article);
-					    ReadCh ();
+						info_message (txt_art_rejected, dead_article);
+						ReadCh ();
 					}
 					return ret_code;
 				}
 			case iKeyPostPostpone:
-			  postpone_article(article);
-			  goto post_response_postponed;
+				postpone_article(article);
+				goto post_response_postponed;
 
 			default:
 				break;
@@ -2074,8 +2074,7 @@ post_response_done:
 				update_posted_info_file (note_h.followup, 'f', buf);
 		} else if (pcCopyArtHeader (HEADER_SUBJECT, article, buf)) {
 			update_posted_info_file (note_h.newsgroups, 'f', buf);
-			my_strncpy (default_post_newsgroups, note_h.newsgroups,
-				    sizeof (default_post_newsgroups));
+			my_strncpy (default_post_newsgroups, note_h.newsgroups, sizeof (default_post_newsgroups));
 		}
 		if (keep_posted_articles)
 			update_posted_msgs_file (article, userid);
@@ -2551,8 +2550,7 @@ mail_to_author (
 		else
 			fseek (note_fp, mark_body, SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials,
-		    with_headers ? TRUE : quote_signatures);
+		copy_body (note_fp, fp, quote_chars, initials, with_headers ? TRUE : quote_signatures);
 	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 
@@ -3488,7 +3486,7 @@ insert_from_header (
 				if (!strncasecmp(line, "From:", 5))
 					from_found = TRUE;
 				if (*line == '\n')
-				   in_header = FALSE;
+					in_header = FALSE;
 			}
 
 			if (!from_found)

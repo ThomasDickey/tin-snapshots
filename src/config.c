@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : config.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 21-12-94, 15-08-96
+ *  Author    : I. Lea
+ *  Created   : 01.04.91
+ *  Updated   : 15.12.97
  *  Notes     : Configuration file routines
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -404,26 +404,18 @@ read_config_file (
 				break;
 			}
 			/* pick which news headers to display */
-			if (match_string(buf, "news_headers_to_display=",
-								  news_headers_to_display,
-								  sizeof (news_headers_to_display))) {
-				news_headers_to_display_array
-					= ulBuildArgv(news_headers_to_display, &num_headers_to_display);
+			if (match_string(buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
+				news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 				break;
 			}
 			/* pick which news headers to NOT display */
-			if (match_string(buf, "news_headers_to_not_display=",
-								  news_headers_to_not_display,
-								  sizeof (news_headers_to_not_display))) {
-				news_headers_to_not_display_array
-					= ulBuildArgv(news_headers_to_not_display,
-									  &num_headers_to_not_display);
+			if (match_string(buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
+				news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
 				break;
 			}
 
 			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format)))
 				break;
-
 
 			break;
 
@@ -1656,9 +1648,7 @@ change_config_file (
 							prompt_option_string (option);
 							free (*news_headers_to_display_array);
 							free (news_headers_to_display_array);
-							news_headers_to_display_array
-								= ulBuildArgv(news_headers_to_display,
-												  &num_headers_to_display);
+							news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 							break;
 
 
@@ -1666,9 +1656,7 @@ change_config_file (
 							prompt_option_string (option);
 							free (*news_headers_to_not_display_array);
 							free (news_headers_to_not_display_array);
-							news_headers_to_not_display_array
-								= ulBuildArgv(news_headers_to_not_display,
-												  &num_headers_to_not_display);
+							news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
 							break;
 
 						case OPT_DEFAULT_MAILDIR:

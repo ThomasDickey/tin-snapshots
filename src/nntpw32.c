@@ -395,7 +395,7 @@ int
 server_init (machine, service, port)
 	char	*machine;
 	char	*service;
-	int		port;
+	int	port;
 {
 #ifdef NNTP_ABLE
 	int	sockt_rd;

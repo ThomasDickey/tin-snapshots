@@ -1,3 +1,38 @@
+-- pre-1.4 release 971224 --
+
+522) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (1.02 -> 1.05)
+          (see also 518)
+     FIX. pcre/*
+
+521) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. -z was broken
+     FIX. main.c
+
+520) Park Sang Jin <sjpark@gura.kaist.ac.kr>
+     ADD. mutt like threading tree
+     FIX. thread.c
+
+519) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. conversion of From: lines to "%s (%s)" in filter entries
+     ADD. new filter type for message-id only (msgid_only)
+     FIX. extern.h, tin.h, filter.c lang.c
+
+518) Thomas E. Dickey <dickey@clark.net>
+     BUG. typo in configure script that set the USE_BCOPY macro
+     ADD. move include for pcre.h down past system headers
+     ADD. undef for memmove, in case the configure test doesn't
+          find that the system defines a macro for it.
+     ADD. reduce the ifdef's in pcre.c using macro DPRINTF
+     ADD. include for <sys/types.h> before <stdlib.h>
+     ADD. fallback definition for offsetof
+     FIX. configure[.in], tin.h, internal.h, pcre.c, pcre.h, pcretest.c
+          nntplib.c, nntpw32.c
+
+517) Cameron Perkins <erasmus@cc.gatech.edu>
+     BUG. used fclose() to close a pipe
+     FIX. sigfile.c
+
 -- pre-1.4 release 971215 --
 
 516) Janne Kiviluoto <jajoki@utu.fi>

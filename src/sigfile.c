@@ -1,15 +1,15 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : sigfile.c
- *  Author    : M.Gleason & I.Lea
- *  Created   : 17-10-92
- *  Updated   : 08-11-94
+ *  Author    : M. Gleason & I. Lea
+ *  Created   : 17.10.92
+ *  Updated   : 20.12.97
  *  Notes     : Generate random signature for posting/mailing etc.
- *  Copyright : (c) Copyright 1989-94 by Mike Gleason & Iain Lea
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *  Copyright : (c) Copyright 1989-97 by Mike Gleason & Iain Lea
+ *	             You may  freely  copy or  redistribute	this software,
+ *	             so  long as there is no profit made from its use, sale
+ *	             trade or  reproduction.  You may not change this copy-
+ *	             right notice, and it must be included in any copy made
  */
 
 #include	"tin.h"
@@ -58,7 +58,7 @@ msg_write_signature (
 		if ((pipe_fp = popen (thisgroup->attribute->sigfile+1, "r")) != (FILE *) 0) {
 			while (fgets (cmd, PATH_LEN, pipe_fp))
 				fputs (cmd, fp);
-			fclose (pipe_fp);
+			pclose (pipe_fp);
 		}
 		return;
 	}

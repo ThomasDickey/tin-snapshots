@@ -263,4 +263,24 @@
 
 /((?>a*?))*/X
 
+/)/
+
+/a[]b/
+
+/[^a]/
+    \Iaaaabcd
+    \IaaAabcd 
+
+/[^az]/
+    \Iaaaabcd
+    \IaaAabcd 
+
+/[^az]/
+    \Izazabcd
+    \IAaZabcd 
+    
+/[^aeiou ]{3,}/
+    co-processors, and for 
+    \Ico-processors, and for 
+
 / End of test input /

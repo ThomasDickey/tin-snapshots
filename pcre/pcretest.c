@@ -38,7 +38,7 @@ static const char *OP_names[] = {
   "*", "*?", "+", "+?", "?", "??", "{", "{", "{",
   "*", "*?", "+", "+?", "?", "??", "{", "{", "{",
   "*", "*?", "+", "+?", "?", "??", "{", "{",
-  "class", "Ref",
+  "class", "negclass", "Ref",
   "Alt", "Ket", "KetRmax", "KetRmin", "Assert", "Assert not", "Once",
   "Brazero", "Braminzero", "Bra"
 };
@@ -122,7 +122,7 @@ for(;;)
     case OP_TYPEUPTO:
     case OP_TYPEMINUPTO:
     printf("    %s{", OP_names[code[3]]);
-    if (*code != OP_TYPEEXACT) printf(",");
+    if (*code != OP_TYPEEXACT) printf("0,");
     printf("%d}", (code[1] << 8) + code[2]);
     if (*code == OP_TYPEMINUPTO) printf("?");
     code += 3;
@@ -157,14 +157,15 @@ for(;;)
 
     case OP_REF:
     printf("    \\%d", *(++code));
-    break;
+    code++;
+    goto CLASS_REF_REPEAT;
 
     case OP_CLASS:
+    case OP_NEGCLASS:
       {
       int i, min, max;
-
-      code++;
-      printf("    [");
+      if (*code++ == OP_CLASS) printf("    [");
+        else printf("   ^[");
 
       for (i = 0; i < 256; i++)
         {
@@ -186,6 +187,8 @@ for(;;)
         }
       printf("]");
       code += 32;
+
+      CLASS_REF_REPEAT:
 
       switch(*code)
         {
@@ -265,6 +268,7 @@ int timeit = 0;
 int showinfo = 0;
 int posix = 0;
 int debug = 0;
+int done = 0;
 unsigned char buffer[30000];
 unsigned char dbuffer[1024];
 
@@ -323,7 +327,7 @@ fprintf(outfile, "PCRE version %s\n\n", pcre_version());
 
 /* Main loop */
 
-for (;;)
+while (!done)
   {
   pcre *re = NULL;
   pcre_extra *extra = NULL;
@@ -372,7 +376,8 @@ for (;;)
     if (fgets((char *)pp, len, infile) == NULL)
       {
       fprintf(outfile, "** Unexpected EOF\n");
-      goto END_OFF;
+      done = 1;
+      goto CONTINUE;
       }
     if (infile != stdin) fprintf(outfile, (char *)pp);
     }
@@ -407,7 +412,7 @@ for (;;)
       }
     }
 
-  /* Handle compiing via the POSIX interface, which doesn't support the
+  /* Handle compiling via the POSIX interface, which doesn't support the
   timing, showing, or debugging options. */
 
   if (posix || do_posix)
@@ -462,7 +467,10 @@ for (;;)
         for (;;)
           {
           if (fgets((char *)buffer, sizeof(buffer), infile) == NULL)
-            goto END_OFF;
+            {
+            done = 1;
+            goto CONTINUE;
+            }
           len = (int)strlen((char *)buffer);
           while (len > 0 && isspace(buffer[len-1])) len--;
           if (len == 0) break;
@@ -581,7 +589,7 @@ for (;;)
 
   for (;;)
     {
-    unsigned char *pp;
+    unsigned char *q;
     int count, c;
     int offsets[30];
     int size_offsets = sizeof(offsets)/sizeof(int);
@@ -589,7 +597,11 @@ for (;;)
     options = 0;
 
     if (infile == stdin) printf("  data> ");
-    if (fgets((char *)buffer, sizeof(buffer), infile) == NULL) goto END_OFF;
+    if (fgets((char *)buffer, sizeof(buffer), infile) == NULL)
+      {
+      done = 1;
+      goto CONTINUE;
+      }
     if (infile != stdin) fprintf(outfile, (char *)buffer);
 
     len = (int)strlen((char *)buffer);
@@ -600,7 +612,7 @@ for (;;)
     p = buffer;
     while (isspace(*p)) p++;
 
-    pp = dbuffer;
+    q = dbuffer;
     while ((c = *p++) != 0)
       {
       int i = 0;
@@ -662,17 +674,17 @@ for (;;)
 
         case 'O':
         while(isdigit(*p)) n = n * 10 + *p++ - '0';
-        if (n <= (int)sizeof(offsets)/sizeof(int)) size_offsets = n;
+        if (n <= (int)(sizeof(offsets)/sizeof(int))) size_offsets = n;
         continue;
 
         case 'Z':
         options |= PCRE_NOTEOL;
         continue;
         }
-      *pp++ = c;
+      *q++ = c;
       }
-    *pp = 0;
-    len = pp - dbuffer;
+    *q = 0;
+    len = q - dbuffer;
 
     /* Handle matching via the POSIX interface, which does not
     support timing. */
@@ -759,12 +771,12 @@ for (;;)
       }
     }
 
+  CONTINUE:
   if (posix || do_posix) regfree(&preg);
   if (re != NULL) free(re);
   if (extra != NULL) free(extra);
   }
 
-END_OFF:
 fprintf(outfile, "\n");
 return 0;
 }

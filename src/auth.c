@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
- *  Created   : 05-04-97
- *  Updated   : no
+ *  Created   : 05.04.97
+ *  Updated   : 19.12.97
  *  Notes     : Routines to authenticate to a news server via NNTP
- *  Copyright : (c) Copyright 1991-97 by Iain Lea & Dirk Nimmich
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -57,7 +57,7 @@ authinfo_generic (void)
 	 * exists, pull out the cookiefd. Just in case we've nested.
 	 */
 	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS")))
-	    sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
+		sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
 
 	if (cookiefd == -1) {
 		char tempfile[BUFSIZ];

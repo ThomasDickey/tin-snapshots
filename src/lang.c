@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : lang.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 21-12-94, 05-08-96
+ *  Author    : I. Lea
+ *  Created   : 01.04.1991
+ *  Updated   : 22.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -80,19 +80,19 @@ constext txt_connecting[] = "Connecting to %s...";
 constext txt_connecting_port[] = "Connecting to %s:%d...";
 constext txt_continue[] = "Continue? (y/n): ";
 #ifdef M_AMIGA
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-97 Iain Lea & Mark Tomlinson.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Mark Tomlinson.";
 #endif
 #ifdef M_OS2
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Andreas Wrede.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Andreas Wrede.";
 #endif
 #ifdef M_UNIX
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-97 Iain Lea.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea.";
 #endif
 #ifdef VMS
-	char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin.";
+	char txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Tod McQuillin.";
 #endif
 #ifdef WIN32
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Nigel Ellis.";
 #endif
 constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): ";
 constext txt_cancelling_art[] = "Cancelling article...";
@@ -723,8 +723,9 @@ constext txt_tinrc_display_mime_allheader_asis[] = "# similar to display_mime_he
 # instead of news_headers_to_display\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
-# header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: & References:\n\
-#             5=Message-Id: & last References: entry only 6=Lines:\n\
+# header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: & full References: line\n\
+#             5=Message-Id: & last References: entry only\n\
+#             6=Message-Id: entry only 7=Lines:\n\
 # global=ON/OFF  ON=apply to all groups OFF=apply to current group\n\
 # case=ON/OFF    ON=filter case sensitive OFF=ignore case\n\
 # expire=ON/OFF  ON=limit to default_filter_days OFF=don't ever expire\n";
@@ -1155,7 +1156,7 @@ constext txt_help_select_scope[] = "Apply select to current group or all groups.
 constext txt_kill_from[] = "Kill From:     [%-*.*s] (y/n): ";
 constext txt_kill_lines[] = "Kill Lines: (</>num): ";
 constext txt_kill_menu[] = "Kill Article Menu";
-constext txt_kill_msgid[] = "Kill Msg-Id:   [%-*.*s] (f/l/n): ";
+constext txt_kill_msgid[] = "Kill Msg-Id:   [%-*.*s] (f/l/o/n): ";
 constext txt_kill_scope[] = "Kill pattern scope  : ";
 constext txt_kill_subj[] = "Kill Subject:  [%-*.*s] (y/n): ";
 constext txt_kill_text[] = "Kill text pattern   : ";
@@ -1166,7 +1167,7 @@ constext txt_quit_edit_save_select[] = "q)uit e)dit s)ave select description: ";
 constext txt_select_from[] = "Select From    [%-*.*s] (y/n): ";
 constext txt_select_lines[] = "Select Lines: (</>num): ";
 constext txt_select_menu[] = "Auto-select Article Menu";
-constext txt_select_msgid[] = "Select Msg-Id  [%-*.*s] (f/l/n): ";
+constext txt_select_msgid[] = "Select Msg-Id  [%-*.*s] (f/l/o/n): ";
 constext txt_select_scope[] = "Select pattern scope: ";
 constext txt_select_subj[] = "Select Subject [%-*.*s] (y/n): ";
 constext txt_select_text[] = "Select text pattern : ";
@@ -1177,6 +1178,7 @@ constext txt_time_default_days[] = "%d days";
 constext txt_unlimited_time[] = "Unlimited";
 constext txt_full[] = "Full";
 constext txt_last[] = "Last";
+constext txt_only[] = "Only";
 constext txt_filter_file[] = "# Global & local filter file for the TIN newsreader\n#\n\
 # Global format:\n\
 #   group=STRING      Newsgroups list (e.g. comp.*,!*sources*)    [mandatory]\n\
@@ -1187,6 +1189,7 @@ constext txt_filter_file[] = "# Global & local filter file for the TIN newsreade
 #   from=STRING       From: line (e.g. *Craig Shergold*)\n\
 #   msgid=STRING      Message-ID: line (e.g. <123@ether.net>) with full references\n\
 #   msgid_last=STRING Message-ID: line (e.g. <123@ether.net>) with last reference only\n\
+#   msgid_only=STRING Message-ID: line (e.g. <123@ether.net>) without references\n\
 #   lines=NUM         Lines: line\n\
 #   either:\n\
 #   xref_max=NUM      Maximum score (e.g. 5)\n\

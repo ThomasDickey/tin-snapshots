@@ -515,7 +515,7 @@ create_path (
 		if (!strfpath (active[i].attribute->maildir, buf, sizeof (buf),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
 #ifdef VMS
-			joindir  (buf, homedir, DEFAULT_MAILDIR);
+			joindir (buf, homedir, DEFAULT_MAILDIR);
 #else
 			joinpath (buf, homedir, DEFAULT_MAILDIR);
 #endif
