@@ -44,7 +44,6 @@ constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";
 constext txt_bad_command[] = "Bad command.  Type 'h' for help.";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
-constext txt_cannot_change_spooldir[] = "Cannot change to valid spooldir. Exiting..."; 
 constext txt_cannot_find_base_art[] = "Can't find base article %s";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_open[] = "Can't open %s";
@@ -56,7 +55,6 @@ constext txt_cannot_stat_index_file[] = "Can't stat %s index %s\n";
 constext txt_cannot_write_index[] = "Can't write index %s";
 constext txt_catchup_update_info[] = "%s %d group(s) in %ld seconds\n";
 constext txt_catchup_all_read_groups[] = "Catchup all groups entered during this session? (y/n): ";
-constext txt_changing_spooldir_to[] = "Changing spooldir to";
 constext txt_check_article[] = "Check Prepared Article";
 constext txt_checking_active_file[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
@@ -75,25 +73,22 @@ constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Mark Toml
 #ifdef M_OS2
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Andreas Wrede.";
 #endif
-#ifdef WIN32
-constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
-#endif
 #ifdef M_UNIX
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea.";
 #endif
 #ifdef VMS
 char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin.";
 #endif
+#ifdef WIN32
+constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
+#endif
 constext txt_creating_newsrc[] = "Creating newsrc file...\n";
-constext txt_del_group_in_newsrc[] = "Delete %s from .newsrc? (y/n): ";
 constext txt_delete_article[] = "Delete or supersede article [%s]? (d/s/q): %c";
-constext txt_delete_bogus_group[] = "Remove bogus group %s (y/n/q) [%c]: ";
 constext txt_delete_processed_files[] = "Delete saved files that have been post processed? (y/n): ";
 constext txt_deleting[] = "Deleting...";
 constext txt_deleting_art[] = "Deleting article...";
 constext txt_superseding[] = "Superseding...";
 constext txt_superseding_art[] = "Superseding article...";
-constext txt_deleting_from_newsrc[] = "Group %s not in active file. Deleting.";
 constext txt_end_of_arts[] = "*** End of Articles ***";
 constext txt_end_of_groups[] = "*** End of Groups ***";
 constext txt_end_of_thread[] = "*** End of Thread ***";
@@ -137,11 +132,9 @@ constext txt_group[] = "Group %s ('q' to quit)...";
 #else
 constext txt_group[] = "Group %s...";
 #endif
-constext txt_group_deleted[] = "Group %s deleted";
 constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
 constext txt_group_select_com[] = "Group Selection Commands (page %d of %d)";
 constext txt_group_selection[] = "Group Selection";
-constext txt_group_undeleted[] = "Group undeleted";
 #ifndef NO_SHELL_ESCAPE
 constext txt_help_shell[] = "!\t  shell escape\r\n";
 #endif
@@ -337,7 +330,6 @@ constext txt_newsgroup[] = "Goto newsgroup [%s]> ";
 constext txt_newsgroup_position[] = "Position %s in group list (1,2,..,$) [%d]> ";
 constext txt_next_resp[] = "-- Next response --";
 constext txt_nntp_authorization_failed[] = "NNTP authorization password not found for %s";
-constext txt_nntp_to_fd_cannot_reopen[] = "nntp_to_fd: can't reopen %s: ";
 constext txt_nntp_to_fp_cannot_reopen[] = "nntp_to_fp: can't reopen %s: ";
 constext txt_no[] = "No ";
 constext txt_no_tagged_arts_to_save[] = "No articles tagged for saving";
@@ -347,7 +339,6 @@ constext txt_no_command[] = "No command";
 constext txt_no_filename[] = "No filename";
 constext txt_no_group[] = "No group";
 constext txt_no_groups[] = "*** No Groups ***";
-constext txt_no_groups_to_delete[] = "No groups to delete";
 constext txt_no_groups_to_read[] = "No more groups to read";
 constext txt_no_groups_to_yank_in[] = "No more groups to yank in";
 constext txt_no_index_file[] = "No index file specified";
@@ -367,7 +358,6 @@ constext txt_no_resps_in_thread[] = "No responses to list in current thread";
 constext txt_no_search_string[] = "No search string";
 constext txt_no_spooldirs[] = "No spooldirs"; 
 constext txt_no_subject[] = "No subject";
-constext txt_not_active_newsfeed[] = "Command only allowed on active news";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_opt_autosave[] = "1. Auto save       : ";
 constext txt_opt_catchup_groups[] = "9. Catchup on quit : ";
@@ -408,7 +398,7 @@ constext *txt_onoff[] = { "OFF", "ON" };
  * NB: All the following arrays must match corresponding ordering in tin.h
  * Threading types
  */
-constext *txt_thread[] = { "None", "Subj", "Refs" };
+constext *txt_thread[] = { "None", "Subj", "Refs", "Both" };
 
 /*
  * How the From: line is displayed.
@@ -464,10 +454,6 @@ constext txt_post_subject[] = "Post subject [%s]> ";
 constext txt_posting[] = "Posting article...";
 constext txt_printed[] = "%d Article(s) printed";
 constext txt_printing[] = "Printing...";
-#if 0
-constext txt_processing_xrefs[] = "Processing Xref's...";
-#endif
-constext txt_purge[] = "Purging %s...";
 constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";
 constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
 constext txt_quit[] = "Do you really want to quit? (y/n): ";
@@ -518,7 +504,6 @@ constext txt_reading_news_newsrc_file[] = "Reading groups from newsrc file only.
 constext txt_reading_newsgroups_file[] = "Reading newsgroups file... ";
 constext txt_reading_newsrc[] = "Reading newsrc file...";
 constext txt_reconnect_to_news_server[] = "Connection to news server has timed out. Reconnect? (y/n): ";
-constext txt_rejected_by_nntpserver[] = "Rejected by server, nntp error %d";
 constext txt_rename_error[] = "Error: rename %s to %s";
 constext txt_reply_to_author[] = "Reply to author...";
 constext txt_supersede_article[] = "Repost or supersede article(s) [%s]? (r/s/q): %c";
@@ -527,7 +512,6 @@ constext txt_repost_group[] = "Repost article(s) to group(s) [%s]> ";
 constext txt_supersede_group[] = "Supersede article(s) to group(s) [%s]> ";
 constext txt_rereading_active_file[] = "Rereading active file... ";
 constext txt_reset_newsrc[] = "Reset newsrc? (y/n): ";
-constext txt_resizing_window[] = "resizing window";
 constext txt_resp_redirect[] = "Responses have been directed to the following newsgroups";
 constext txt_resp_to_poster[] = "Responses have been directed to poster. Mail/Post/Quit (m/p/q): ";
 constext txt_resp_x_of_n[] = "RespNo %3d of %3d\r\n";
@@ -552,11 +536,6 @@ constext txt_select_spooldir[] = "Select spooldir> ";
 constext txt_select_thread[] = "Select thread > ";
 constext txt_server_name_in_file_env_var[] = "Put the server name in the file %s,\nor set the environment variable NNTPSERVER";
 constext txt_shell_escape[] = "Enter shell command [%s]> ";
-constext txt_spooldir_com[] = "Spooldir Selection Commands (page %d of %d)";
-constext txt_spooldir_selection[] = "Spooldir Selection (%d)";
-constext txt_spooldir_server_error_1[] = "Server does not appear to support the spooldir command\n"; 
-constext txt_spooldir_server_error_2[] = "Reconfigure the news reader or the server & try again.\n"; 
-constext txt_spooldirs_not_supported[] = "Multiple spooldirs are not supported";
 constext txt_stuff_nntp_cannot_open[] = "stuff_nntp: can't open %s: ";
 constext txt_subscribe_to_new_group[] = "Subscribe to new group %s (Yy/Nn) [%c]: ";
 constext txt_subscribed_num_groups[] = "subscribed to %d groups";
@@ -583,7 +562,6 @@ constext txt_toggled_rot13[] = "Toggled rot13 encoding";
 constext txt_toggled_tex2iso_on[] = "Toggled german TeX encoding on";
 constext txt_toggled_tex2iso_off[] = "Toggled german TeX encoding off";
 constext txt_type_h_for_help[] = "           h=help\n";
-constext txt_unfiltering_arts[] = "Unselecting articles...";
 constext txt_unsubscribed_num_groups[] = "unsubscribed from %d groups";
 constext txt_unsubscribed_to[] = "Unsubscribed from %s";
 constext txt_unsubscribing[] = "Unsubscribing... ";
@@ -664,4 +642,3 @@ constext txt_subj_line_only_case[] = "Subject: line (case sensitive)  ";
 constext txt_from_line_only[] = "From: line (ignore case)        ";
 constext txt_from_line_only_case[] = "From: line (case sensitive)     ";
 constext txt_msgid_line_only[] = "Message-Id: line";
-

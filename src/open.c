@@ -1087,28 +1087,35 @@ log_user ()
 
 /*
  * NNTP user authorization. Password read from ~/.newsauth
- * The ~/.newsauth authorization file has the format:
- *   nntpserver1 password
- *   nntpserver2 password
+ * The ~/.newsauth authorization file has the format:  
+ *   nntpserver1 password [user]
+ *   nntpserver2 password [user]
  *   etc.
  */
 
-void
+void 
 authorization (server, authuser)
 	char *server;
 	char *authuser;
 {
-	char authfile[PATH_LEN];
-	char authpass[PATH_LEN];
-	char line[NNTP_STRLEN];
-	char buf[PATH_LEN], *ptr;
-	int found = FALSE;
+	static char already_failed = 0;
+	char line[PATH_LEN];
+	char *authpass;
+	char *ptr;
 	FILE *fp;
+	int ret;
 
 	/*
 	 * Check if running via NNTP
 	 */
 	if (! read_news_via_nntp) {
+		return;
+	}
+
+	/*
+	 * don't try again if failed before
+	 */
+	if(already_failed) {
 		return;
 	}
 
@@ -1121,53 +1128,103 @@ authorization (server, authuser)
 		return;
 	}
 
-	joinpath (authfile, homedir, ".newsauth");
+	joinpath (line, homedir, ".newsauth");
 
-	if ((fp = fopen (authfile,"r")) != (FILE *) 0) {
+	if ((fp = fopen (line,"r")) == (FILE *) 0)
+		return;
+
+	/*
+	 * Search through authorization file for correct NNTP server
+	 * File has format:  'nntp-server' 'password'
+	 * will return authpass != NULL if any match
+	 */
+	authpass = (char *) 0;
+	while (fgets (line, sizeof (line), fp) != (char *) 0) {
+
 		/*
-		 * Search through authorization file for correct NNTP server
-		 * File has format:  'nntp-server' 'password'
+		 * strip trailing newline character
 		 */
-		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-			/*
-			 * Get server from 1st part of the line
-			 */
-			strcpy (line, buf);
-			ptr = (char *) strchr (line, ' ');
-			if (ptr != (char *) 0) {
-				*ptr = '\0';
-			}
 
-			if (STRNCMPEQ(line, server, sizeof (server))) {
-				/*
-				 * Get passwdord from 2nd part of the line
-				 */
-				ptr = (char *) strrchr (buf, ' ');
-				if (ptr != (char *) 0 && ++ptr != (char *) 0) {
-					strcpy (authpass, ptr);
-					ptr = (char *) strchr (authpass, '\n');
-					if (ptr != (char *) 0) {
-						*ptr = '\0';
-					}
-					found = TRUE;
-				}
-				break;
-			}
+		ptr = (char *) strchr (line, '\n');
+		if(ptr != (char *) 0)
+			*ptr = '\0';
+
+		/*
+		 * Get server from 1st part of the line
+		 */
+
+		ptr = (char *) strchr (line, ' ');
+
+		if(ptr == (char *) 0)		/* no passwd, no auth, skip */
+			continue;
+
+		*ptr++ = '\0'; 			/* cut of server part */
+
+		if ((strcasecmp(line, server)))
+			continue;		/* wrong server, keep on */
+
+		/*
+		 * Get password from 2nd part of the line
+		 */
+
+		authpass = ptr;
+		while(*authpass == ' ')
+			authpass++;		/* skip any blanks */
+
+		/*
+		 * Get user from 3rd part of the line
+		 */
+
+		ptr = authpass;			/* continue searching here */
+
+		if(*authpass == '"') {		/* skip "embedded" password string */
+			ptr = strrchr(authpass,'"');
+			if((ptr != (char *) 0) && (ptr > authpass)) {
+				authpass++;
+				*ptr++ = '\0';	/* cut off trailing " */
+			} else			/* no matching ", proceede as normal */
+				ptr = authpass;
 		}
-		fclose (fp);
 
-		if (! found) {
-			error_message (txt_nntp_authorization_failed, authuser);
-		} else {
-			sprintf (line, "authinfo user %s", authuser);
-			put_server (line);
-			get_respcode ();
+		ptr = strchr(ptr,' ');		/* find next separating blank */
 
-			sprintf (line, "authinfo pass %s", authpass);
-			put_server (line);
-			get_respcode ();
+		if(ptr != (char *) 0) {		/* a 3rd argument follows */
+			while(*ptr == ' ')	/* skip any blanks */
+				*ptr++ = '\0';
+			if(*ptr != '\0')	/* if its not just empty */
+				authuser = ptr;	/* so will replace default user */
 		}
+
+		break;	/* if we end up here, everything seems OK */
 	}
+	fclose (fp); 
+
+	if (authpass == (char *) 0) {
+		error_message (txt_nntp_authorization_failed, server);
+		return;
+	}
+
+	sprintf (line, "authinfo user %s", authuser);
+	put_server (line);
+	ret = get_respcode ();
+	if (ret != NEED_AUTHDATA) {
+		nntp_message (ret);
+		already_failed = 1;
+		return;
+	}
+
+	sprintf (line, "authinfo pass %s", authpass);
+	put_server (line);
+	ret = get_respcode ();
+	if (ret != OK_AUTH) {
+		nntp_message (ret);
+		already_failed = 1;
+		return;
+	}
+
+	/* this is indeed no error ... */
+	error_message ("Authorized for user: %s\n", authuser);
+	return;
 }
 
 void

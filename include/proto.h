@@ -43,7 +43,6 @@ extern int iReadNovFile P_((struct t_group *group, long min, long max, int *expi
 extern void vWriteNovFile P_((struct t_group *psGrp));
 extern char *pcFindNovFile P_((struct t_group *psGrp, int iMode));
 extern void do_update P_((void));
-extern int date_comp P_((t_comptype *p1, t_comptype *p2));
 extern void set_article P_((struct t_article *art));
 extern int input_pending P_((void));
 extern int valid_artnum P_((long art));
@@ -418,13 +417,14 @@ extern int prompt_list P_((int row, int col, int var, char *help_text, char *pro
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
 extern void continue_prompt P_((void));
 /* ./refs.c */
-extern struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *newparent));
 extern struct t_msgid *parse_references P_((char *r));
 extern char *get_references P_((struct t_msgid *refptr));
 extern void free_msgids P_((void));
 extern void clear_art_ptrs P_((void));
 extern void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
 extern void thread_by_reference P_((void));
+extern void collate_subjects P_((void));
+extern void build_references P_((struct t_group *group));
 /* ./rfc1521.c */
 extern void strcpynl P_((char *to, char *from));
 extern unsigned char bin2hex P_((unsigned int x));

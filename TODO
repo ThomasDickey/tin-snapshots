@@ -121,14 +121,15 @@ o  sender-patch
 
 o  add feature show_new_newsgroups_since
 
-o  add feature goto_msg-id, URL 'G'
-
-o  general purpose routine for locating regex's in articles
-   (Current code in wildmat.c may help)
-   Use this to better detect :
-   quoted text
+o  add feature goto using the 'G' key
+   use a general purpose routine for locating regex's in articles
+   Use this to goto:
    URL's
-   message-id's
+   Message-ID's
+
+   Could also be used to better detect (or act upon) :
+   Quoted text
+   uuencode header lines
    etc...
 
 o  if Newsgroups:-line has groups in it which are not present in the users
@@ -170,6 +171,8 @@ Not yet classified
 o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 
 o  what is with NEW_HASH_METHOD in misc.c?
+
+o  what is with HAVE_GENERIC_AUTHINFO in open.c?
 
 o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and

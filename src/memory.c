@@ -251,10 +251,9 @@ free_art_array ()
 			arts[i].xref = NULL;
 		}
 
-		/* .refs & .msgid are cleared in free_msgids() */
-
-		arts[i].refs = NULL;
-		arts[i].msgid = NULL;
+		/* .refs & .msgid are cleared in build_references() */
+		arts[i].refs = '\0';
+		arts[i].msgid = '\0';
 	}
 }
 

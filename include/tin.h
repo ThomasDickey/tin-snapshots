@@ -802,7 +802,7 @@ extern char *get_uaf_fullname();
 #define		THREAD_BOTH			3
 
 #ifdef HAVE_REF_THREADING
-#define		THREAD_MAX			THREAD_REFS
+#define		THREAD_MAX			THREAD_BOTH
 #else
 #define		THREAD_MAX			THREAD_SUBJ
 #endif
@@ -1067,9 +1067,10 @@ typedef unsigned char	t_bitmap;
 
 /*
  * Easier access to hashed msgids. Note that in REFS(), y must be free()d
+ * msgid is mandatory and cannot be NULL in an article.
  */
-#define MSGID(x)			(x->msgid ? x->msgid->txt : "")
-#define REFS(x,y)			((y = get_references(x->refs)) ? y : "")
+#define MSGID(x)			(x->refptr->txt)
+#define REFS(x,y)			((y = get_references(x->refptr->parent)) ? y : "")
 
 /*
  *	struct t_msgid - message id
@@ -1090,9 +1091,9 @@ struct t_msgid
  *  struct t_article - article header
  *
  *  article.thread:
- *	-1 initial default (ART_NORMAL)
- *	-2 means article has expired (wasn't found in file search) (ART_EXPIRED)
- *	of spool directory for the group)
+ *	-1 (ART_NORMAL)  initial default
+ *	-2 (ART_EXPIRED) article has expired (wasn't found in search of spool
+ *	   directory for the group)
  *	>=0 points to another arts[] (struct t_article)
  *
  *  article.inthread:
@@ -1108,9 +1109,10 @@ struct t_article
 	char *name;			/* From: line from mail header (full name) */
 	time_t date;			/* Date: line from header in seconds */
 	char *xref;			/* Xref: cross posted article reference line */
-	struct t_msgid *msgid;		/* Message-ID: unique message identifier */
-/* An interesting note. refs = msgid->parent and could be removed */
-	struct t_msgid *refs;		/* References: article reference id's */
+	/* NB: The msgid and refs are only retained until the reference tree is built */
+	char *msgid;			/* Message-ID: unique message identifier */
+	char *refs;			/* References: article reference id's */
+	struct t_msgid *refptr;		/* Pointer to us in the reference tree */
 	int lines;			/* Lines: number of lines in article */
 	char *archive;			/* Archive-name: line from mail header */
 	char *part;			/* part  no. of archive */
