@@ -136,8 +136,9 @@ active_add(
 	/* spool - see below */
 	ptr->moderated = moderated[0];
 	if (moderated[0] == '=')
-		wait_message(3, "\nNote: Any posts to %s should be sent to %s\n", ptr->name, moderated+1);
-
+		ptr->aliasedto = my_strdup(moderated+1);
+	else
+		ptr->aliasedto = (char *) 0;
 	ptr->count = count;
 	ptr->xmax = max;
 	ptr->xmin = min;

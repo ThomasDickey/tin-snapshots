@@ -2376,12 +2376,21 @@ mail_bug_report (void) /* return value is always ignored */
 	fprintf (fp, "CFG3: debug=%d domain=[%s]\n",
 		 is_debug,
 		 (domain ? domain : ""));
-	fprintf (fp, "CFG4: threading=%d", default_thread_arts);
+	fprintf (fp, "CFG4: threading=%d\n", default_thread_arts);
 	start_line_offset++;
+
+	if (*bug_nntpserver1) {
+		fprintf(fp, "NNTP1: %s\n", bug_nntpserver1);
+		start_line_offset++;
+	}
+	if (*bug_nntpserver2) {
+		fprintf(fp, "NNTP2: %s\n", bug_nntpserver2);
+		start_line_offset++;
+	}
 
 	fprintf (fp, "\nPlease enter bug report/gripe/comment:\n");
 
-	start_line_offset += 5;
+	start_line_offset += 6;
 
 	if (!use_mailreader_i)
 		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);

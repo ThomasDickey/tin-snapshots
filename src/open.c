@@ -44,6 +44,7 @@ nntp_open (void)
 {
 #ifdef NNTP_ABLE
 	int ret;
+	t_bool sec = FALSE;
 	static unsigned short nntp_tcp_port;
 	char line[NNTP_STRLEN];
 
@@ -110,6 +111,8 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 			error_message (line);
 			return ret;
 	}
+	strncpy(bug_nntpserver1, line, sizeof(bug_nntpserver1)-1);
+	bug_nntpserver1[sizeof(bug_nntpserver1)-1] = '\0';
 
 	/*
 	 * Switch INN into NNRP mode with 'mode reader'
@@ -122,7 +125,13 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	put_server ("MODE READER");
 	switch (get_respcode(line)) {
 		case OK_CANPOST:
+			sec = TRUE;
+			break;
+			
 		case OK_NOPOST:
+			can_post = FALSE;
+			sec = TRUE;
+			wait_message(0, "%s\n", txt_cannot_post);
 			break;
 
 		case ERR_ACCESS:
@@ -130,6 +139,13 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			error_message (line);
 			return ret;
 	}
+	strncpy(bug_nntpserver2, line, sizeof(bug_nntpserver2)-1);
+	bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
+
+	if (sec)
+	    	wait_message(0, "%s\n", bug_nntpserver2);
+	else
+		wait_message(0, "%s\n", bug_nntpserver1);
 
 	/*
 	 * Check if NNTP supports XOVER command

@@ -70,7 +70,10 @@ int InitScreen (void)
 			bcol(default_bcol = -1);
 		}
 #endif
+	} else {
+		use_color = 0;
 	}
+		
 	postinit_colors();
 	set_xclick_on();
 	return (TRUE);

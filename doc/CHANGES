@@ -1,3 +1,41 @@
+-- pre-1.4 release 971105 --
+
+482) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. removed linecounter in body-search
+     FIX. screen.c, search.c
+
+481) Sven Paulus <sven@tin.org>
+     ADD. server infos to bugreprot
+     ADD. moved some strings to lang.c
+     ADD. moved aliased group 'warning' to select.c
+     BUG. didn't notice no post if nnrpd was invoked via mode reader
+     FIX. extern.h, tin.h, init.c, lang.c, misc.c, open.c, post.c,
+          prompt.c, select.c, active.c
+
+480) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. search in 'M'enu ends in a endless loop if no match was found
+     BUG. off by one error when jumping direct to a 'M'enu option
+     ADD. runtime check if color is supported
+     FIX. search.c, extern.h, proto.h, color.c, config.c, group.c, lang.c
+          misc.c, page.c, select.c, tcurses.c, thread.c
+
+479) Andrey A. Chernov <ache@null.net>
+     BUG. calling beep() when initscr() not called
+     BUG. division by zero (COLORS value if !has_colors())
+     FIX. color.c screen.c
+
+478) Thomas E. Dickey <dickey@clark.net>
+     ADD. bypasses the color code if there are no colors active
+     FIX. color.c
+
+477) Urs Janssen <urs@tin.org>
+     BUG. pointer into article_arry could get negative
+     FIX. thread.c
+
+476) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. wait_message() call with two few arguments
+     FIX. xref.c
+
 -- pre-1.4 release 971102 --
 
 475) Urs Janssen <urs@tin.org>

@@ -140,7 +140,7 @@ art_mark_xref_read (
 						debug_print_comment (msg);
 						debug_print_bitmap (psGrp, NULL);
 #endif
-						wait_message (msg);
+						wait_message (2, msg);
 					}
 #endif /* DEBUG */
 				}

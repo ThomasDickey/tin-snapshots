@@ -159,7 +159,8 @@ search_config(int forward, int current, int last)
 				HIST_CONFIG_SEARCH
 	))) return result;
 
-	n = current + incr;
+	current += incr;
+	n = current;
 	do {
 		if (n < 0)
 			n = last;
@@ -472,7 +473,11 @@ search_art_body (
 	char *line;
 	FILE *fp;
 
+#if 1 /* see also screen.c show_progress ()*/
+	if ((fp = open_art_fp (group_path, art->artnum, -art->lines)) == (FILE *) 0) {
+#else
 	if ((fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0) {
+#endif
 		if (tin_errno != 0)
 			return -1;
 		else

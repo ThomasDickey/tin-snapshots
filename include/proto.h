@@ -290,7 +290,7 @@ extern void vPrintBugAddress (void);
 	extern void buffer_to_network (char *b);
 #endif /* LOCAL_CHARSET */
 #ifdef HAVE_COLOR
-	extern void toggle_color (void);
+	extern t_bool toggle_color (void);
 	extern void show_color_status (void);
 #endif /* HAVE_COLOR */
 #ifdef HAVE_ISPELL

@@ -1330,6 +1330,7 @@ struct t_newsrc
 struct t_group
 {
 	char *name;				/* newsgroup / mailbox name */
+	char *aliasedto;			/* =new.group in active file, NULL if not */
 	char *description;			/* text from NEWSLIBDIR/newsgroups file */
 	char *spooldir; 			/* groups spool directory */
 	char moderated; 			/* state of group moderation */

@@ -317,9 +317,13 @@ end_of_article:
 page_down:
 				if (!space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
-						if (note_end)
+						if (note_end) {
 							art_close();
-						else {
+#if 0	/* set to 1 if you like pgdn to stop going to next article */
+							doing_pgdn = FALSE;
+							break;
+#endif
+						} else {
 							doing_pgdn = TRUE;
 							show_note_page (group->name, respnum);
 							break;
@@ -580,9 +584,10 @@ return_to_index:
 
 #ifdef HAVE_COLOR
 			case iKeyPageToggleColor:		/* toggle color */
-				toggle_color ();
-				redraw_page (group->name, respnum);
-				show_color_status ();
+				if (toggle_color ()) {
+					redraw_page (group->name, respnum);
+					show_color_status ();
+				}
 				break;
 #endif
 

@@ -376,7 +376,7 @@ tin_done (
 	vWriteNewsrc ();
 
 /* TODO - can we do anything if saving the newsrc failed ? */
-	wait_message(1, "newsrc file saved successfully.\n");
+	info_message(txt_newsrc_saved);
 
 	write_input_history_file ();
 #if 0 /* FIXME */
@@ -1173,10 +1173,19 @@ show_inverse_video_status (void)
 }
 
 #ifdef HAVE_COLOR
-void
+t_bool
 toggle_color (void)
 {
-	use_color = !use_color;
+#if USE_CURSES
+	if (!has_colors()) {
+		use_color = 0;
+		info_message (txt_no_colorterm);
+		return FALSE;
+	} else
+#endif 
+		use_color = !use_color;
+
+	return TRUE;
 }
 
 void
