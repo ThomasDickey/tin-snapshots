@@ -100,7 +100,6 @@ set_default_attributes (
 	psAttrib->thread_arts = default_thread_arts;
 	psAttrib->sort_art_type = default_sort_art_type;
 	psAttrib->show_author = default_show_author;
-	psAttrib->auto_save_msg = default_auto_save_msg;
 	psAttrib->auto_save = default_auto_save;
 	psAttrib->auto_select = FALSE;
 	psAttrib->batch_save = default_batch_save;
@@ -215,9 +214,6 @@ read_attributes_file (
 				MATCH_BOOLEAN (
 					"auto_save=",
 					ATTRIB_AUTO_SAVE);
-				MATCH_BOOLEAN (
-					"auto_save_msg=",
-					ATTRIB_AUTO_SAVE_MSG);
 				MATCH_BOOLEAN (
 					"auto_select=",
 					ATTRIB_AUTO_SELECT);
@@ -494,9 +490,6 @@ set_attrib (
 		case ATTRIB_AUTO_SAVE:
 			psGrp->attribute->auto_save = num;
 			break;
-		case ATTRIB_AUTO_SAVE_MSG:
-			psGrp->attribute->auto_save_msg = num;
-			break;
 		case ATTRIB_BATCH_SAVE:
 			psGrp->attribute->batch_save = num;
 			break;
@@ -582,10 +575,8 @@ write_attributes_file (
 #	endif /* 0 */
 
 	/* alloc memory for tmp-filename */
-	if ((file_tmp = (char *) my_malloc (strlen (file)+5)) == NULL) {
-		wait_message (2, txt_out_of_memory2);
-		return;
-	}
+	file_tmp = (char *) my_malloc (strlen (file)+5);
+
 	/* generate tmp-filename */
 	sprintf (file_tmp, "%s.tmp", file);
 
@@ -611,7 +602,6 @@ write_attributes_file (
 	fprintf (fp, "#  printer=STRING\n");
 	fprintf (fp, "#  auto_select=ON/OFF\n");
 	fprintf (fp, "#  auto_save=ON/OFF\n");
-	fprintf (fp, "#  auto_save_msg=ON/OFF\n");
 	fprintf (fp, "#  batch_save=ON/OFF\n");
 	fprintf (fp, "#  delete_tmp_files=ON/OFF\n");
 	fprintf (fp, "#  show_only_unread=ON/OFF\n#\n");
@@ -692,8 +682,6 @@ write_attributes_file (
 			print_boolean (psGrp->attribute->auto_select));
 		fprintf (fp, "auto_save=%s\n",
 			print_boolean (psGrp->attribute->auto_save));
-		fprintf (fp, "auto_save_msg=%s\n",
-			print_boolean (psGrp->attribute->auto_save_msg));
 		fprintf (fp, "batch_save=%s\n",
 			print_boolean (psGrp->attribute->batch_save));
 		fprintf (fp, "delete_tmp_files=%s\n",

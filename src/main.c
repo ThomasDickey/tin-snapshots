@@ -230,7 +230,7 @@ main (
 	}
 #endif /* !INDEX_DAEMON */
 
-	if((count = count_postponed_articles()))
+	if ((count = count_postponed_articles()))
 		wait_message(3, txt_info_postponed, count, IS_PLURAL(count));
 
 	/*
@@ -323,8 +323,8 @@ main (
 	/*
 	 *  Work loop
 	 */
-	selection_index (start_groupnum, num_cmd_line_groups);
-	return(0); /* not reached */
+	selection_page (start_groupnum, num_cmd_line_groups);
+	return 0; /* not reached */
 }
 
 
@@ -333,12 +333,12 @@ main (
  */
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "aAcdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "aAcdD:f:G:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	else
-#		define OPTIONS "BcdD:f:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "BcdD:f:G:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	endif /* M_AMIGA */
 #else
-#	define OPTIONS "dD:f:hI:PvV"
+#	define OPTIONS "dD:f:G:hI:PvV"
 #endif /* !INDEX_DAEMON */
 
 static void
@@ -414,6 +414,14 @@ read_cmd_line_options (
 				my_strncpy (newsrc, optarg, sizeof (newsrc));
 				newsrc_set = TRUE;
 #endif /* INDEX_DAEMON */
+				break;
+
+			case 'G':
+				getart_limit = atoi(optarg);
+				if (getart_limit > 0)
+					use_getart_limit = TRUE;
+				else
+					use_getart_limit = FALSE;
 				break;
 
 #ifndef INDEX_DAEMON
@@ -684,6 +692,7 @@ usage (
 #	endif
 
 	error_message ("  -f file  subscribed to newsgroups file [default=%s]", newsrc);
+	error_message ("  -G flag  turn on|off that limit the number of article to get (flag=on|off)");
 
 #	ifndef M_AMIGA
 #		ifdef NNTP_ABLE
@@ -726,9 +735,8 @@ usage (
 #	endif /* NNTP_ABLE */
 
 #	ifdef NNTP_ABLE
-		if (!read_news_via_nntp) {
+		if (!read_news_via_nntp)
 			error_message ("  -r       read news remotely from default NNTP server");
-		}
 #	endif /* NNTP_ABLE */
 
 	error_message ("  -R       read news saved by -S option");

@@ -39,7 +39,7 @@ match_regex(
 	/*
 	 * Compile the expression internally.
 	 */
-	if ((re = pcre_compile(pattern, flags, &errmsg, &error)) == NULL) {
+	if ((re = pcre_compile(pattern, flags, &errmsg, &error, NULL)) == NULL) {
 		sprintf(mesg, txt_pcre_error_at, errmsg, error);
 		return(FALSE);
 	}

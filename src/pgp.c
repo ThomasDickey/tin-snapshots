@@ -328,7 +328,7 @@ pgp_check_article(void)
 
 	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
-		return (0);
+		return 0;
 	}
 	joinpath(the_article, homedir, ".article");
 
@@ -338,7 +338,7 @@ pgp_check_article(void)
 
 	if ((art = fopen(article, "w")) == (FILE *) 0) {
 		info_message(txt_cannot_open, the_article);
-		return (0);
+		return 0;
 	}
 	fseek(note_fp, mark_body, SEEK_SET);
 	fgets(buf, LEN, note_fp);
@@ -353,7 +353,7 @@ pgp_check_article(void)
 	fclose(art);
 	if (!(pgp_signed || pgp_key)) {
 		info_message(txt_pgp_nothing);
-		return (0);
+		return 0;
 	}
 	ClearScreen();
 	if (pgp_signed) {
@@ -362,7 +362,7 @@ pgp_check_article(void)
 #	ifdef HAVE_PGP_2
 		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 #	else
-#		ifdef  HAVE_PGP_5
+#		ifdef	HAVE_PGP_5
 		sprintf(cmd, "%sv <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */

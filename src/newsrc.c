@@ -448,6 +448,12 @@ delete_group (
 }
 
 
+/*
+ * Mark a group as read
+ * If psArt != NULL then we explicitly process each article thus
+ * catching crossposts as well, otherwise we simply scrub the
+ * bitmap and adjust the highwater mark.
+ */
 void
 grp_mark_read (
 	struct t_group *group,
@@ -958,17 +964,17 @@ pos_group_in_newsrc (
 
 #ifdef VMS
 	joinpath (buf, TMPDIR, "subrc");
-	sprintf (sub, "%s.%d", buf, process_id);
+	sprintf (sub, "%s.%d", buf, (int) process_id);
 
 	joinpath (buf, TMPDIR, "unsubrc");
-	sprintf (unsub, "%s.%d", buf, process_id);
+	sprintf (unsub, "%s.%d", buf, (int) process_id);
 
 #else /* !VMS */
 	joinpath (buf, TMPDIR, ".subrc");
-	sprintf (sub, "%s.%d", buf, process_id);
+	sprintf (sub, "%s.%d", buf, (int) process_id);
 
 	joinpath (buf, TMPDIR, ".unsubrc");
-	sprintf (unsub, "%s.%d", buf, process_id);
+	sprintf (unsub, "%s.%d", buf, (int) process_id);
 
 #endif /* !VMS */
 
@@ -1305,9 +1311,8 @@ expand_bitmap (
 #endif
 	}
 	group->newsrc.xmin = first;
-	if (group->newsrc.xmax < max) {
+	if (group->newsrc.xmax < max)
 		group->newsrc.num_unread += max - group->newsrc.xmax;
-	}
 	group->newsrc.xmax = max;
 	group->newsrc.xbitlen = bitlen;
 	group->newsrc.present = TRUE;
@@ -1411,9 +1416,8 @@ void
 art_mark_deleted (
 	struct t_article *art)
 {
-	if (art != (struct t_article *) 0) {
+	if (art != (struct t_article *) 0)
 		art->delete_it = TRUE;
-	}
 }
 
 
@@ -1421,9 +1425,8 @@ void
 art_mark_undeleted (
 	struct t_article *art)
 {
-	if (art != (struct t_article *) 0) {
+	if (art != (struct t_article *) 0)
 		art->delete_it = FALSE;
-	}
 }
 #endif /* !INDEX_DAEMON */
 

@@ -3,7 +3,7 @@
  *  Module    : version.h
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1998-08-10
+ *  Updated   : 1998-11-14
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -17,33 +17,33 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"981002"
-#	define RELEASENAME	"Phobia"
+#	define RELEASEDATE	"981114"
+#	define RELEASENAME	"The Watchman"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA
-#		define	OS	"AMIGA"
-#		define	AMIVER	"1.3B"
-#	endif
+#		define OS	"AMIGA"
+#		define AMIVER	"1.3B"
+#	endif /* M_AMIGA */
 
 #	ifdef M_OS2
-#		define	OS	"OS/2"
-#	endif
+#		define OS	"OS/2"
+#	endif /* M_OS2 */
 
 #	ifdef M_UNIX
 #		if !defined( __amiga )
-#			define	OS	"UNIX"
+#			define OS	"UNIX"
 #		else
-#			define	OS	"AMIGA"
-#		endif
-#	endif
+#			define OS	"AMIGA"
+#		endif /* !__amiga */
+#	endif /* M_UNIX */
 
 #	ifdef WIN32
-#		define	OS	"Windows/NT"
-#	endif
+#		define OS	"Windows/NT"
+#	endif /* WIN32 */
 
 #	ifndef OS
-#		define	OS "Unknown"
-#	endif
+#		define OS	"Unknown"
+#	endif /* !OS */
 
 #endif /* !VERSION_H */

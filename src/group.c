@@ -21,9 +21,15 @@
 #define INDEX2LNUM(i)	(SNUM2LNUM(INDEX2SNUM(i)))
 
 char *glob_group;
+
+/*
+ * Essentially, an index into base[]
+ * Equates to the cursor location (thread number) on group page
+ */
 int index_point;
 int first_subj_on_screen;
 int last_subj_on_screen;
+int thread_depth;					/* Stating depth in threads we enter */
 
 static int len_from;
 static int len_subj;
@@ -40,6 +46,7 @@ static void draw_subject_arrow (void);
 	static void bld_sline (int i);
 	static void draw_sline (int i, t_bool full);
 	static void erase_subject_arrow (void);
+	static void move_to_thread (int n);
 	static void prompt_subject_num (int ch);
 	static void update_group_page (void);
 	static void show_group_title (t_bool clear_title);
@@ -103,26 +110,31 @@ decr_tagged (
 
 
 #ifndef INDEX_DAEMON
-void
+/*
+ * index_point is overloaded internally as a return code
+ * >= 0				'Normal'
+ * GRP_RETURN		We are en route from pager to the selection screen
+ * GRP_QUIT			User has done a 'Q'
+ * GRP_NEXT			User wants to move onto next group
+ * GRP_NEXTUNREAD	User did a 'C'atchup
+ */
+int
 group_page (
 	struct t_group *group)
 {
-	char group_path[LEN];
 	char buf[128];
 	char pat[128];
 	int ch;
-	int dummy = 0;
 	int i, n;
 	int filter_state;
 	int old_selected_arts;
 	int old_top = 0;
 	int posted_flag;
-	int scroll_lines;
 	int old_group_top;
-	int thread_depth;					/* Depth into thread we start at */
 	unsigned int flag;
 	long old_artnum = 0L;
 	struct t_art_stat sbuf;
+	t_bool ignore_unavail = FALSE;		/* Set if we keep going after an 'article unavailable' */
 	t_bool range_active = FALSE;		/* Set if a range is defined */
 	t_bool xflag = FALSE;
 
@@ -136,8 +148,6 @@ group_page (
 	glob_group = group->name;
 	num_of_tagged_arts = 0;
 
-	make_group_path (group->name, group_path);
-
 	last_resp = -1;
 	this_resp = -1;
 
@@ -145,16 +155,12 @@ group_page (
 	 * update index file. quit group level if user aborts indexing
 	 */
 	if (!index_group (group))
-		return;
+		return GRP_RETURN;
 
-	if (space_mode) {
-		for (i = 0; i < top_base; i++) {
-			if (new_responses (i))
-				break;
-		}
-		index_point = ((i < top_base) ? i : (top_base - 1));
-	} else
-		index_point = top_base - 1;
+	/*
+	 * Position 'index_point' accordingly
+	 */
+	pos_first_unread_thread();
 
 	set_subj_from_size (cCOLS);
 	clear_note_area ();
@@ -201,8 +207,7 @@ group_page (
 						goto group_done;
 
 				case KEYMAP_RIGHT:
-					if (auto_list_thread && index_point >= 0 && num_of_responses (index_point)) {
-/* TODO the above line is a waste, why not 'arts[base[index_point]].thread != -1 or a HAS_FOLLOWUP() macro */
+					if (auto_list_thread && index_point >= 0 && HAS_FOLLOWUPS (index_point)) {
 						thread_depth = 0;
 						goto group_list_thread;
 					} else
@@ -231,8 +236,7 @@ group_page (
 							index_point = xrow-INDEX2LNUM(first_subj_on_screen)+first_subj_on_screen;
 							draw_subject_arrow ();
 							if (xmouse == MOUSE_BUTTON_1) {
-								if (auto_list_thread && num_of_responses (index_point)) {
-/* TODO see above re: waste */
+								if (auto_list_thread && HAS_FOLLOWUPS (index_point)) {
 									thread_depth = 0;
 									goto group_list_thread;
 								} else
@@ -282,19 +286,8 @@ end_of_list:
 					info_message (txt_no_last_message);
 					break;
 				}
-				index_point = show_page (group, group_path, this_resp, &dummy);
-				if (index_point == GRP_NOREDRAW) {
-					index_point = which_thread (this_resp);
-					clear_message ();
-				} else {
-					if (index_point < 0) {
-						space_mode = (index_point == GRP_CONTINUE);
-						goto group_done;
-					}
-					clear_note_area ();
-					show_group_page ();
-				}
-				break;
+				n = this_resp;
+				goto enter_pager;
 
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
 				if (index_point >= 0)
@@ -308,14 +301,35 @@ end_of_list:
 				}
 				break;
 
-			case iKeySearchSubjF:	/* forward/backward search */
+			case iKeySearchAuthF:	/* author search forward / backward */
+			case iKeySearchAuthB:
+				i = (ch == iKeySearchAuthF) ? 1 : 0;
+				n = SEARCH_AUTH;
+				goto do_search;
+
+			case iKeySearchSubjF:	/* subject forward/backward search */
 			case iKeySearchSubjB:
-				/*
-				 * If the search found something deeper in a thread (not the base art)
-				 * (ie search_subject_group () != -1) then enter the thread
-				 */
-				if ((thread_depth = search_subject_group (ch == iKeySearchSubjF)) != -1)
-					goto group_list_thread;
+				i = (ch == iKeySearchSubjF) ? 1 : 0;
+				n = SEARCH_SUBJ;
+
+do_search:		/* Search for type 'n' in direction 'i' */
+				{
+					/* Not intuitive to search current thread in fwd search */
+					int start = (i && index_point < top_base-1) ? prev_response((int)base[index_point+1]) : (int)base[index_point];
+
+					if ((n = search (n, start, i)) != -1) {
+						index_point = which_thread(n);
+
+						/*
+						 * If the search found something deeper in a thread (not the base art)
+						 * then enter the thread
+						 */
+						if ((thread_depth = which_response(n)) != 0)
+							goto group_list_thread;
+
+						show_group_page ();
+					}
+				}
 				break;
 
 			case iKeyGroupFSearchBody:	/* search article body */
@@ -324,16 +338,10 @@ end_of_list:
 					break;
 				}
 
-				n = search_body (group, (int) base[index_point]);
-				if (n != -1) {
-					index_point = show_page (group, group_path, n, &dummy);
-					if (index_point < 0) {
-						space_mode = FALSE;
-						goto group_done;
-					}
-					show_group_page ();
-				}
-				break;
+				if ((n = search_body ((int) base[index_point])) == -1)
+					break;
+
+				goto enter_pager;
 
 			case iKeyGroupReadBasenote:
 			case iKeyGroupReadBasenote2:	/* read current basenote */
@@ -342,94 +350,34 @@ group_read_basenote:
 					info_message(txt_no_arts);
 					break;
 				}
-				i = (int) base[index_point];
-				index_point = show_page (group, group_path, i, &dummy);
-				if (index_point == GRP_NOREDRAW)
-					index_point = which_thread (i);
-				else if (index_point < 0) {
-					space_mode = (index_point == GRP_CONTINUE);
-/*
-my_printf ("point=[%d] filtered_art=[%d]", index_point, filtered_articles);
-(void) sleep(3);
-*/
-					if (index_point == GRP_CONTINUE)
-						goto group_tab_pressed;
-					else
-						goto group_done;
-				}
-				clear_note_area ();
-				show_group_page ();
-				break;
+
+				n = (int) base[index_point];
+				ignore_unavail = TRUE;
+				goto enter_pager;
 
 			case iKeyGroupNextUnreadArtOrGrp:	/* goto next unread article/group */
 group_tab_pressed:
 				space_mode = TRUE;
+
 				n = ((index_point < 0) ? -1 : next_unread ((int) base[index_point]));
-				if (index_point < 0 || n < 0) {
-					for (i = cur_groupnum+1; i < group_top; i++) {
-						if (active[my_group[i]].newsrc.num_unread > 0)
-							break;
-					}
-					if (i >= group_top)
-						goto group_done;
-					cur_groupnum = i;
-					index_point = GRP_GOTONEXT;
+				if (n < 0) {
+					index_point = GRP_NEXTUNREAD;	/* => Enter next unread group */
 					goto group_done;
 				}
-				index_point = show_page (group, group_path, n, &dummy);
-				if (index_point == GRP_NOREDRAW || index_point == GRP_CONTINUE) {
-					index_point = which_thread (n);
-					goto group_tab_pressed;	/* repeat TAB */
-				} else {
-					if (index_point < 0)
-						goto group_done;
-					clear_note_area ();
-					show_group_page ();
-				}
-				break;
+
+				/* We still have unread arts in the current group ... */
+				ignore_unavail = TRUE;
+				goto enter_pager;
 
 			case iKeyPageDown:		/* page down */
 			case iKeyPageDown2:
 			case iKeyPageDown3:
 group_page_down:
-				if (!top_base)
-					break;
-				if (index_point + 1 == top_base) {
-					move_to_thread (0);
-					break;
-				}
-				erase_subject_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				index_point = ((index_point + scroll_lines) / scroll_lines) * scroll_lines;
-				if (index_point >= top_base) {
-					index_point = (top_base / scroll_lines) * scroll_lines;
-					if (index_point < top_base - 1)
-						index_point = top_base - 1;
-				}
-				if (index_point < first_subj_on_screen || index_point >= last_subj_on_screen)
-					show_group_page ();
-				else
-					draw_subject_arrow ();
+				if (top_base)
+					move_to_thread (page_down (index_point, top_base));
 				break;
 
 			case iKeyGroupAutosel:		/* auto-select article menu */
-				if (index_point < 0) {
-					info_message (txt_no_arts);
-					break;
-				}
-				old_top = top;
-				n = (int) base[index_point];
-				old_artnum = arts[n].artnum;
-				if (filter_menu (FILTER_SELECT, group, &arts[n])) {
-					if (filter_articles (group)) {
-						make_threads (group, FALSE);
-						find_base (group);
-						index_point = find_new_pos (old_top, old_artnum, index_point);
-					}
-				}
-				show_group_page ();
-				break;
-
 			case iKeyGroupKill:		/* kill article menu */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
@@ -438,10 +386,9 @@ group_page_down:
 				old_top = top;
 				n = (int) base[index_point];
 				old_artnum = arts[n].artnum;
-				if (filter_menu (FILTER_KILL, group, &arts[n])) {
+				if (filter_menu ((ch == iKeyGroupKill) ? FILTER_KILL : FILTER_SELECT, group, &arts[n])) {
 					if (filter_articles (group)) {
 						make_threads (group, FALSE);
-						find_base (group);
 						index_point = find_new_pos (old_top, old_artnum, index_point);
 					}
 				}
@@ -449,40 +396,19 @@ group_page_down:
 				break;
 
 			case iKeyGroupQuickAutosel:		/* quickly auto-select article */
-				if (index_point < 0) {
-					info_message (txt_no_arts);
-					break;
-				}
-				if (!confirm_action || prompt_yn (cLINES, txt_quick_filter_select, TRUE) == 1) {
-					old_top = top;
-					n = (int) base[index_point];
-					old_artnum = arts[n].artnum;
-					if (quick_filter_select (group, &arts[n])) {
-						info_message (txt_info_add_select);
-						if (filter_articles (group)) {
-							make_threads (group, FALSE);
-							find_base (group);
-							index_point = find_new_pos (old_top, old_artnum, index_point);
-						}
-					}
-					show_group_page ();
-				}
-				break;
-
 			case iKeyGroupQuickKill:		/* quickly kill article */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
 					break;
 				}
-				if (!confirm_action || prompt_yn (cLINES, txt_quick_filter_kill, TRUE) == 1) {
+				if (!confirm_action || prompt_yn (cLINES, (ch == iKeyGroupQuickKill) ? txt_quick_filter_kill : txt_quick_filter_select, TRUE) == 1) {
 					old_top = top;
 					n = (int) base[index_point];
 					old_artnum = arts[n].artnum;
-					if (quick_filter_kill (group, &arts[n])) {
-						info_message (txt_info_add_kill);
+					if (quick_filter ((ch == iKeyGroupQuickKill) ? FILTER_KILL : FILTER_SELECT, group, &arts[n])) {
+						info_message ((ch == iKeyGroupQuickKill) ? txt_info_add_kill : txt_info_add_select);
 						if (filter_articles (group)) {
 							make_threads (group, FALSE);
-							find_base (group);
 							index_point = find_new_pos (old_top, old_artnum, index_point);
 						}
 					}
@@ -499,90 +425,47 @@ group_page_down:
 			case iKeyDown:		/* line down */
 			case iKeyDown2:
 group_down:
-				if (!top_base)
-					break;
-				move_to_thread ((index_point + 1 >= top_base) ? 0 : (index_point + 1));
+				if (top_base)
+					move_to_thread ((index_point + 1 >= top_base) ? 0 : (index_point + 1));
 				break;
 
 			case iKeyUp:		/* line up */
 			case iKeyUp2:
 group_up:
-				if (!top_base)
-					break;
-				move_to_thread ((index_point == 0) ? (top_base - 1) : (index_point - 1));
+				if (top_base)
+					move_to_thread ((index_point == 0) ? (top_base - 1) : (index_point - 1));
 				break;
 
 			case iKeyPageUp:		/* page up */
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 group_page_up:
-				if (!top_base)
-					break;
-				if (index_point == 0) {
-					move_to_thread (top_base - 1);
-					break;
-				}
-				clear_message ();
-				erase_subject_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = index_point % scroll_lines) > 0)
-					index_point = index_point - n;
-				else
-					index_point = ((index_point - scroll_lines) / scroll_lines) * scroll_lines;
-				if (index_point < 0)
-					index_point = 0;
-				if (index_point < first_subj_on_screen || index_point >= last_subj_on_screen)
-					show_group_page ();
-				else
-					draw_subject_arrow ();
+				if (top_base)
+					move_to_thread (page_up (index_point, top_base));
 				break;
 
-			case iKeyGroupFSearchAuth:	/* author search forward */
-			case iKeyGroupBSearchAuth:	/* author search backward */
-				if (index_point < 0) {
-					info_message (txt_no_arts);
-					break;
-				}
-
-				i = (ch == iKeyGroupFSearchAuth);
-
-				n = search_author (my_group[cur_groupnum], (int) base[index_point], i);
-				if (n < 0)
-					break;
-
-				index_point = show_page (group, group_path, n, &dummy);
-				if (index_point != GRP_NOREDRAW) {
-					if (index_point < 0) {
-						space_mode = FALSE;
-						goto group_done;
-					}
-					clear_note_area ();
-					show_group_page ();
-				}
-				break;
-
-			case iKeyGroupCatchup:			/* catchup & return to group menu */
-			case iKeyGroupCatchupGotoNext:	/* catchup & go to next group with unread */
-group_catchup:								/* came here on group exit via left arrow */
-				{	int yn = 1;
+			case iKeyGroupCatchup:				/* & return to group menu */
+			case iKeyGroupCatchupNextUnread:	/* catchup & go to next group with unread */
+group_catchup:									/* came here on group exit via left arrow */
+				{
+					int yn = 1;
 
 					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, TRUE) != 1)
 						break;
 
-					if (!CURR_GROUP.newsrc.num_unread || !confirm_action ||
-									(yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1)
+					sprintf(buf, txt_mark_arts_read, (ch == iKeyGroupCatchupNextUnread) ? " and enter next unread group" : "");
+					if (!CURR_GROUP.newsrc.num_unread || !confirm_action || (yn = prompt_yn (cLINES, buf, TRUE)) == 1)
 						grp_mark_read (&CURR_GROUP, arts);
 
 					switch (ch) {
 						case iKeyGroupCatchup:				/* Return to menu */
 							if (yn == 1) {
-								if (cur_groupnum + 1 < group_top)
-									cur_groupnum++;
+								index_point = GRP_NEXT;
 								goto group_done;
 							}
 							break;
 
-						case iKeyGroupCatchupGotoNext:
+						case iKeyGroupCatchupNextUnread:
 							if (yn == 1)
 								goto group_tab_pressed;
 							break;
@@ -592,8 +475,7 @@ group_catchup:								/* came here on group exit via left arrow */
 								case -1:					/* ESCAPE - do nothing */
 									break;
 								case 1:						/* We caught up - advance group */
-									if (cur_groupnum + 1 < group_top)
-										cur_groupnum++;
+									index_point = GRP_NEXT;
 									/* FALLTHROUGH */
 								default:					/* Just leave the group */
 									goto group_done;
@@ -618,7 +500,7 @@ group_catchup:								/* came here on group exit via left arrow */
 					if (old_group_top != group_top)
 						set_groupname_len(FALSE);
 					cur_groupnum = n;
-					index_point = GRP_GOTONEXT;
+					index_point = GRP_NEXTUNREAD;
 					goto group_done;
 				}
 				break;
@@ -676,17 +558,16 @@ group_catchup:								/* came here on group exit via left arrow */
 				/*
 				 * If # of 'hot' articles changed, update the header
 				 */
-				if (num_of_selected_arts != old_selected_arts) {
+				if (num_of_selected_arts != old_selected_arts)
 					show_group_title (TRUE);
-				}
+
 				bld_sline (index_point);
 				draw_sline (index_point, FALSE);
 
 				/*
 				 * Move cursor to next unread
 				 */
-				n = next_unread (next_response ((int) base[index_point]));
-				if (n < 0) {
+				if ((n = next_unread (next_response ((int) base[index_point]))) < 0) {
 					draw_subject_arrow ();
 					info_message (txt_no_next_unread_art);
 					break;
@@ -707,25 +588,48 @@ group_catchup:								/* came here on group exit via left arrow */
 				move_to_thread (n);
 				break;
 
-			case iKeyGroupListThd:	/* list articles within current thread */
+			case iKeyGroupListThd:			/* list articles within current thread */
 				thread_depth = 0;			/* Enter thread at the top */
-group_list_thread:
+group_list_thread:							/* Possibly enter thread lower down here */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
 					break;
 				}
-				space_mode = TRUE;
-				n = show_thread (group, group_path, (int) base[index_point], thread_depth);
-				if (n == GRP_QUIT) {
-					index_point = n;
-					space_mode = FALSE;
-					goto group_done;
-				} else if (n == GRP_KILLED) {
-					index_point = 0;
-				} else if (index_point < 0) {
-					space_mode = FALSE;
-					goto group_done;
+				space_mode = TRUE;		/* Pos on first unread */
+next_thread:
+				switch (thread_page (group, (int) base[index_point], thread_depth)) {
+
+					case GRP_QUIT:
+						index_point = GRP_QUIT;
+						goto group_done;
+
+					case GRP_RETURN:
+						index_point = GRP_RETURN;
+						goto group_done;
+
+					case GRP_NEXT:
+						show_group_page ();
+						goto group_down;
+
+					case GRP_NEXTUNREAD:
+						if ((n = next_unread ((int) base[index_point])) >= 0) {
+							if ((n = which_thread (n)) >= 0) {
+								index_point = n;
+								thread_depth = 0;
+								goto next_thread;
+							}
+						}
+						/* No more unread thread in this group */
+						/* FALLTHROUGH ?? */
+
+					case GRP_KILLED:
+						index_point = 0;
+						/* FALLTHROUGH ?? */
+
+					default:		/* ie, >= 0 */
+						break;
 				}
+
 				clear_note_area ();
 				show_group_page ();
 				break;
@@ -746,10 +650,8 @@ group_list_thread:
 				n = default_sort_art_type;
 				filter_state = change_config_file (group);
 				set_signals_group ();	/* Just to be sure */
-				if (filter_state == NO_FILTERING && n != default_sort_art_type) {
+				if (filter_state == NO_FILTERING && n != default_sort_art_type)
 					make_threads (&CURR_GROUP, TRUE);
-					find_base (&CURR_GROUP);
-				}
 				set_subj_from_size (cCOLS);
 				index_point = find_new_pos (old_top, old_artnum, index_point);
 				show_group_page ();
@@ -761,7 +663,7 @@ group_list_thread:
 					info_message (txt_no_more_groups);
 				else {
 					cur_groupnum++;
-					index_point = GRP_GOTONEXT;
+					index_point = GRP_NEXTUNREAD;
 					space_mode = pos_first_unread;
 					goto group_done;
 				}
@@ -773,20 +675,69 @@ group_list_thread:
 					break;
 				}
 
-				n = next_unread ((int) base[index_point]);
-				if (n == -1) {
+				if ((n = next_unread ((int) base[index_point])) == -1) {
 					info_message (txt_no_next_unread_art);
-				} else {
-					index_point = show_page (group, group_path, n, &dummy);
-					if (index_point != GRP_NOREDRAW) {
-						if (index_point < 0) {
-							space_mode = pos_first_unread;
-							goto group_done;
-						}
-						clear_note_area ();
-						show_group_page ();
-					}
+					break;
 				}
+
+				goto enter_pager;
+
+			case iKeyGroupPrevUnreadArt:	/* go to previous unread article */
+				if (index_point < 0) {
+					info_message(txt_no_prev_unread_art);
+					break;
+				}
+
+				n = prev_response ((int) base[index_point]);
+
+				if ((n = prev_unread (n)) == -1) {
+					info_message(txt_no_prev_unread_art);
+					break;
+				}
+
+				/*
+				 * This is the main way to page articles, at this point
+				 * 'n' should be the arts[n] we wish to read
+				 */
+enter_pager:
+				if ((i = show_page (group, n, 0)) >= 0) {
+					index_point = i;
+					clear_note_area ();
+					show_group_page ();
+					break;
+				}
+
+				space_mode = pos_first_unread; /* TODO space_mode sucks, kill it ? */
+
+				/*
+				 * In some cases, we have to keep going after an ARTFAIL
+				 */
+				if (ignore_unavail) {
+					ignore_unavail = FALSE;
+					if (i == GRP_ARTFAIL)
+						i = GRP_NEXTUNREAD;
+				}
+
+				switch (i) {
+					case GRP_ARTFAIL:			 /* Failed to open art - get a valid index_point and continue */
+						clear_message ();
+						break;
+
+					case GRP_GOTOTHREAD:		/* Enter thread menu, at the top */
+						thread_depth = 0;
+						goto next_thread;
+
+					case GRP_NEXT:				/* Thread was 'c'aught up */
+						show_group_page ();
+						goto group_down;
+
+					case GRP_NEXTUNREAD:		/* Thread was 'C'aught up - enter next unread thread */
+						goto group_tab_pressed;
+
+					default:					/* GRP_QUIT / GRP_RETURN */
+						goto group_done;		/* All other cases -> group_done -> select:read_groups() */
+				}
+
 				break;
 
 			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
@@ -798,48 +749,30 @@ group_list_thread:
 
 			case iKeyGroupPrevGroup:	/* previous group */
 				clear_message();
-				if (cur_groupnum <= 0)
+
+				for (i=cur_groupnum-1; i>=0; i--) {
+					if (UNREAD_GROUP (i))
+						break;
+				}
+
+				if (i < 0)
 					info_message(txt_no_prev_group);
 				else {
-					cur_groupnum--;
-					index_point = GRP_GOTONEXT;
+					cur_groupnum = i;
+					index_point = GRP_NEXTUNREAD;
 					space_mode = pos_first_unread;
 					goto group_done;
 				}
 				break;
 
-			case iKeyGroupPrevUnreadArt:	/* go to previous unread article */
-				if (index_point < 0) {
-					info_message(txt_no_prev_unread_art);
-					break;
-				}
-				n = prev_response ((int) base[index_point]);
-				n = prev_unread (n);
-				if (n == -1) {
-					info_message(txt_no_prev_unread_art);
-				} else {
-					index_point = show_page (group, group_path, n, &dummy);
-					if (index_point != GRP_NOREDRAW) {
-						if (index_point < 0) {
-							space_mode = pos_first_unread;
-							goto group_done;
-						}
-						clear_note_area ();
-						show_group_page ();
-					}
-				}
-				break;
-
 			case iKeyQuit:	/* return to group selection page */
-				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1) {
+				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1)
 					break;
-				}
 				goto group_done;
 
 			case iKeyQuitTin:		/* quit */
-				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1) {
+				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1)
 					break;
-				}
 				index_point = GRP_QUIT;
 				space_mode = FALSE;
 				goto group_done;
@@ -849,6 +782,14 @@ group_list_thread:
 				show_group_page ();
 				break;
 
+			case iKeyGroupToggleGetartLimit:
+				clear_message ();
+				use_getart_limit = !use_getart_limit;
+				index_point = GRP_NEXTUNREAD;
+				space_mode = pos_first_unread;
+				goto group_done;
+				break;
+
 			case iKeyGroupBugReport:	/* bug/gripe/comment mailed to author */
 				mail_bug_report ();
 				ClearScreen ();
@@ -856,20 +797,16 @@ group_list_thread:
 				break;
 
 			case iKeyGroupSave:	/* save articles with prompting */
-				if (index_point >= 0) {
-					feed_articles (FEED_SAVE, GROUP_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
+				if (index_point >= 0)
+					feed_articles (FEED_SAVE, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
 				break;
 
 			case iKeyGroupAutoSaveTagged:	/* Auto-save tagged articles without prompting */
 				if (index_point >= 0) {
-					if (num_of_tagged_arts) {
-						feed_articles (FEED_AUTOSAVE_TAGGED, GROUP_LEVEL,
-							&CURR_GROUP, (int) base[index_point]);
-					} else {
+					if (num_of_tagged_arts)
+						feed_articles (FEED_AUTOSAVE_TAGGED, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+					else
 						info_message (txt_no_tagged_arts_to_save);
-					}
 				}
 				break;
 
@@ -928,13 +865,14 @@ group_list_thread:
 				break;
 
 			case iKeyGroupToggleThreading:	/* Cycle through the threading types */
-
 				CURR_GROUP.attribute->thread_arts = (CURR_GROUP.attribute->thread_arts + 1) % (THREAD_MAX + 1);
 				if (index_point >= 0) {
+					i = base[index_point];								/* Save a copy of current thread */
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);
+					if ((index_point = which_thread(i)) < 0)			/* Restore current position in group */
+						index_point = 0;
 				}
-
 				show_group_page ();
 				break;
 
@@ -989,9 +927,8 @@ group_list_thread:
 						if (arts[base[ii]].inrange) {
 							arts[base[ii]].inrange = FALSE;
 							art_mark_will_return (&CURR_GROUP, &arts[base[ii]]);
-							for (i = arts[base[ii]].thread; i != -1; i = arts[i].thread) {
+							for (i = arts[base[ii]].thread; i != -1; i = arts[i].thread)
 								arts[i].inrange = FALSE;
-							}
 						}
 					}
 					range_active = FALSE;
@@ -1075,9 +1012,8 @@ group_list_thread:
 				break;
 
 			case iKeyGroupReverseSel:	/* reverse selections */
-				for (i=0; i < top; i++) {
+				for (i=0; i < top; i++)
 					arts[i].selected = !arts[i].selected;
-				}
 				update_group_page ();
 				break;
 
@@ -1092,9 +1028,9 @@ group_list_thread:
 
 			case iKeyGroupSelPattern:	/* select matching patterns */
 				sprintf (mesg, txt_select_pattern, default_select_pattern);
-				if (!prompt_string (mesg, buf, HIST_SELECT_PATTERN)) {
+				if (!prompt_string (mesg, buf, HIST_SELECT_PATTERN))
 					break;
-				}
+
 				if (buf[0] == '\0') {
 					if (default_select_pattern[0] == '\0') {
 						info_message ("No previous expression"); /* FIXME: -> lang.c */
@@ -1111,29 +1047,29 @@ group_list_thread:
 
 				flag = 0;
 				for (n=0; n < top_base; n++) {
-					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE)) {
+					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE))
 						continue;
-					}
-					for (i = (int) base[n]; i != -1; i = arts[i].thread) {
+
+					for (i = (int) base[n]; i != -1; i = arts[i].thread)
 						arts[i].selected = TRUE;
-					}
+
 					bld_sline(n);
 					flag++;
 				}
-				if (flag) {
+				if (flag)
 					update_group_page ();
-				}
+
 				break;
 
 			case iKeyGroupSelThdIfUnreadSelected:	/* select all unread arts in thread hot if 1 is hot */
 				for (n=0; n < top_base; n++) {
 					stat_thread(n, &sbuf);
-					if (!sbuf.selected_unread || sbuf.selected_unread == sbuf.unread) {
+					if (!sbuf.selected_unread || sbuf.selected_unread == sbuf.unread)
 						continue;
-					}
-					for (i = (int) base[n]; i != -1; i = arts[i].thread) {
+
+					for (i = (int) base[n]; i != -1; i = arts[i].thread)
 						arts[i].selected = 1;
-					}
+
 				}
 				/* no screen update needed */
 				break;
@@ -1152,9 +1088,9 @@ do_auto_select_arts:
 						arts[i].zombie = TRUE;
 					}
 				}
-				if (CURR_GROUP.attribute->show_only_unread) {
+				if (CURR_GROUP.attribute->show_only_unread)
 					find_base (&CURR_GROUP);
-				}
+
 				xflag = TRUE;
 				index_point = 0;
 				show_group_page ();
@@ -1173,9 +1109,9 @@ undo_auto_select_arts:
 						arts[i].zombie = FALSE;
 					}
 				}
-				if (CURR_GROUP.attribute->show_only_unread) {
+				if (CURR_GROUP.attribute->show_only_unread)
 					find_base (&CURR_GROUP);
-				}
+
 				xflag = FALSE;
 				index_point = 0;	/* do we want this ? */
 				show_group_page ();
@@ -1188,18 +1124,17 @@ undo_auto_select_arts:
 
 			default:
 				info_message (txt_bad_command);
-		}
-	}
+		} /* switch(ch) */
+	} /* forever */
 
 group_done:
+
 	set_xclick_off ();
-	if (index_point == GRP_QUIT) {
-		if (!no_write)
-			write_config_file (local_config_file);
-		tin_done (EXIT_SUCCESS);
-	}
+
 	clear_note_area ();
 	vGrpDelMailArts (&CURR_GROUP);
+
+	return (index_point);
 }
 #endif /* !INDEX_DAEMON */
 
@@ -1224,37 +1159,10 @@ show_group_page (void)
 	if (index_point >= top_base)
 		index_point = top_base - 1;
 
-	if (NOTESLINES <= 0)
-		first_subj_on_screen = 0;
-	else {
-		first_subj_on_screen = (index_point / NOTESLINES) * NOTESLINES;
-		if (first_subj_on_screen < 0)
-			first_subj_on_screen = 0;
-	}
+	set_first_screen_item (index_point, top_base, &first_subj_on_screen, &last_subj_on_screen);
 
-	last_subj_on_screen = first_subj_on_screen + NOTESLINES;
-
-	if (last_subj_on_screen >= top_base) {
-		last_subj_on_screen = top_base;
-		first_subj_on_screen = (top_base / NOTESLINES) * NOTESLINES;
-
-		if (first_subj_on_screen == last_subj_on_screen ||
-			first_subj_on_screen < 0) {
-			if (first_subj_on_screen < 0)
-				first_subj_on_screen = 0;
-			else
-				first_subj_on_screen = last_subj_on_screen - NOTESLINES;
-		}
-	}
-
-	if (!top_base) {
-		first_subj_on_screen = 0;
-		last_subj_on_screen = 0;
-	}
-
-	if (draw_arrow_mark) {
+	if (draw_arrow_mark)
 		CleartoEOS ();
-	}
 
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
 		bld_sline(i);
@@ -1294,6 +1202,7 @@ update_group_page (void)
 }
 #endif /* !INDEX_DAEMON */
 
+
 static void
 draw_subject_arrow (void)
 {
@@ -1328,9 +1237,9 @@ erase_subject_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
-	if (draw_arrow_mark) {
+	if (draw_arrow_mark)
 		my_fputs ("  ", stdout);
-	} else {
+	else {
 		HpGlitch(EndInverse ());
 		draw_sline (index_point, TRUE);
 	}
@@ -1437,7 +1346,27 @@ find_new_pos (
 		}
 	}
 
-	return ((cur_pos < top_base)? cur_pos : (top_base - 1));
+	return ((cur_pos < top_base) ? cur_pos : (top_base - 1));
+}
+
+
+/*
+ * Set index_point to the first unread or the last thread depending on
+ * the internal variable 'space_mode'
+ */
+void
+pos_first_unread_thread (void)
+{
+	int i;
+
+	if (space_mode) {
+		for (i = 0; i < top_base; i++) {
+			if (new_responses (i))
+				break;
+		}
+		index_point = ((i < top_base) ? i : (top_base - 1));
+	} else
+		index_point = top_base - 1;
 }
 
 
@@ -1500,10 +1429,15 @@ set_subj_from_size (
 		spaces = "  ";
 	} else {
 		len_from = 0;
-		len_subj = (max_subj+max_from+2) - BLANK_GROUP_COLS;
+		len_subj = (max_subj + max_from + 2) - BLANK_GROUP_COLS;
 		spaces = "";
 	}
-		len_subj += 5 * (1 - show_lines);
+
+	if (!show_lines)
+		len_subj += 5;
+
+	if (!show_score)
+		len_subj += 7;
 }
 
 
@@ -1572,6 +1506,7 @@ bld_sline (
 	 */
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
+
 	if (show_lines) {
 		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
 			if (arts[j].lines != -1) {
@@ -1596,16 +1531,23 @@ bld_sline (
 	if (CURR_GROUP.attribute->show_author != SHOW_FROM_NONE)
 		get_author (FALSE, &arts[j], from, len_from);
 
-	strncpy(arts_sub, arts[j].subject, len_subj+5);
+	strncpy(arts_sub, arts[j].subject, len_subj+12);
 	j = INDEX2SNUM(i);
-	arts_sub[len_subj-5+1] = '\0';
+	arts_sub[len_subj-12+1] = '\0';
 
 #ifndef USE_CURSES
 	buffer = screen[j].col;
 #endif /* !USE_CURSES */
-	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
-		 tin_ltoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
-		 arts_sub, spaces, len_from, len_from, from);
+	if (show_score)
+		sprintf (buffer, "  %s %s %s%6d %-*.*s%s%-*.*s",
+			 tin_ltoa(i+1, 4), new_resps, art_cnt, sbuf.score,
+			 len_subj-12, len_subj-12, arts_sub,
+			 spaces, len_from, len_from, from);
+	else
+		sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
+			 tin_ltoa(i+1, 4), new_resps, art_cnt,
+			 len_subj-12, len_subj-12, arts_sub,
+			 spaces, len_from, len_from, from);
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	Convert2Printable (buffer);
@@ -1689,28 +1631,21 @@ show_group_title (
 		}
 	}
 
-
-#	if 0
-/*
- * turn on the warning about missing articles
- * patch 596 should finally have fixed the problem
- */
-	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c) %ldU %s",
+if (use_getart_limit)
+	sprintf (buf, "%s (%dT(%c) %dA %dK %dH [%dL]%s%c)",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
+		getart_limit,
 		(active[num].attribute->show_only_unread ? " R" : ""),
-		group_flag(active[num].moderated),
-		active[num].newsrc.num_unread,
-		(art_cnt == active[num].newsrc.num_unread) ? "okay" : "articles missing!");
-#	else
+		group_flag(active[num].moderated));
+else
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated));
-#	endif /* 0 */
 
 	if (clear_title) {
 		MoveCursor (0, 0);
@@ -1724,7 +1659,7 @@ show_group_title (
 /*
  * Move the on-screen pointer & internal variable to the given thread number
  */
-void
+static void
 move_to_thread(
 	int n)
 {

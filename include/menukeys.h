@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : menukeys.h
  *  Author    : S.Robbins
- *  Created   : 15-08-94
- *  Updated   : 21-12-94
+ *  Created   : 1994-08-15
+ *  Updated   : 1995-12-21
  *  Notes     :
  *  Copyright : (c) Copyright 1991-94 by Steve Robbins & Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -101,9 +101,9 @@
 /* general keys
  * ESC
  * ' ','!','$','/','?'
- * 'L','M','O','Q','W'
+ * 'A','L','M','O','Q','W'
  * '^'
- * 'b','i','j','k','q','v'
+ * 'a','b','i','j','k','q','v'
  * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
  */
 
@@ -116,12 +116,14 @@
 #define iKeyLastPage '$'
 #define iKeySearchSubjF '/'
 #define iKeySearchSubjB '?'
+#define iKeySearchAuthB 'A'
 #define iKeyLookupMessage 'L'
 #define iKeyOptionMenu 'M'
 #define iKeyPostponed2 'O'
 #define iKeyQuitTin 'Q'
 #define iKeyDisplayPostHist 'W'
 #define iKeyFirstPage '^'
+#define iKeySearchAuthF 'a'
 #define iKeyPageUp3 'b'
 #define iKeyToggleInfoLastLine 'i'
 #define iKeyDown2 'j'
@@ -177,9 +179,9 @@
 #define iKeyGroupSelThdIfUnreadSelected ';'
 #define iKeyGroupSelPattern '='
 #define iKeyGroupReverseSel '@'
-#define iKeyGroupBSearchAuth 'A'
 #define iKeyGroupFSearchBody 'B'
-#define iKeyGroupCatchupGotoNext 'C'
+#define iKeyGroupCatchupNextUnread 'C'
+#define iKeyGroupToggleGetartLimit 'G'
 #define iKeyGroupToggleHelpDisplay 'H'
 #define iKeyGroupToggleInverseVideo 'I'
 #define iKeyGroupMarkThdRead 'K'
@@ -192,7 +194,6 @@
 #define iKeyGroupMarkThdUnread 'Z'
 #define iKeyGroupQuickAutosel '['
 #define iKeyGroupQuickKill ']'
-#define iKeyGroupFSearchAuth 'a'
 #define iKeyGroupCatchup 'c'
 #define iKeyGroupToggleSubjDisplay 'd'
 #define iKeyGroupGoto 'g'
@@ -252,9 +253,8 @@
 #define iKeyPageSkipIncludedText ':'
 #define iKeyPageTopThd '<'
 #define iKeyPageBotThd '>'
-#define iKeyPageBsearchAuth 'A'
 #define iKeyPageBSearchBody 'B'
-#define iKeyPageCatchupGotoNext 'C'
+#define iKeyPageCatchupNextUnread 'C'
 #define iKeyPageCancel 'D'
 #define iKeyPageFollowup 'F'
 #define iKeyPageLastPage2 'G'
@@ -266,7 +266,6 @@
 #define iKeyPageReply 'R'
 #define iKeyPageAutoSaveTagged 'S'
 #define iKeyPageGroupSel 'T'
-#define iKeyPageFsearchAuth 'a'
 #define iKeyPageCatchup 'c'
 #define iKeyPageToggleRot2 'd'
 #define iKeyPageEdit 'e'
@@ -274,6 +273,7 @@
 #define iKeyPageFirstPage2 'g'
 #define iKeyPageHelp 'h'
 #define iKeyPageKillArt 'k' /* overrides iKeyUp3 */
+#define iKeyPageListThd 'l'
 #define iKeyPageMail 'm'
 #define iKeyPageNextArt 'n'
 #define iKeyPagePrint 'o'
@@ -337,7 +337,7 @@
 #define iKeySelectReadGrp2 '\r'
 #define iKeySelectResetNewsrc ctrl('R')
 #define iKeySelectToggleColor '&'
-#define iKeySelectCatchupGotoNext 'C'
+#define iKeySelectCatchupNextUnread 'C'
 #define iKeySelectToggleHelpDisplay 'H'
 #define iKeySelectToggleInverseVideo 'I'
 #define iKeySelectNextUnreadGrp 'N'
@@ -369,10 +369,11 @@
 #define iKeyThreadReadArt2 '\r'
 #define iKeyThreadToggleColor '&'
 #define iKeyThreadMarkArtSel '*'
+#define iKeyThreadLastViewed '-'
 #define iKeyThreadToggleArtSel '.'
 /* digits 0-9 in use */
 #define iKeyThreadReverseSel '@'
-#define iKeyThreadCatchup 'C'
+#define iKeyThreadCatchupNextUnread 'C'
 #define iKeyThreadToggleHelpDisplay 'H'
 #define iKeyThreadToggleInverseVideo 'I'
 #define iKeyThreadMarkArtRead 'K'
@@ -382,7 +383,7 @@
 #define iKeyThreadMarkThdUnread 'Z'
 #define iKeyThreadQuickAutosel '['		/* Merge with same keys in Group ? */
 #define iKeyThreadQuickKill ']'
-#define iKeyThreadCatchupConditional 'c'
+#define iKeyThreadCatchup 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'
 #define iKeyThreadSave 's'

@@ -37,7 +37,6 @@ long head_next;
 
 char *nntp_server = (char *)0;
 
-
 /*
  * Open a connection to the NNTP server
  * Returns: 0	success
@@ -116,7 +115,7 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 	}
 	if (!is_reconnect) {
 		linep = line;
-		while (isspace(*linep))
+		while (isspace((int)*linep))
 			linep++;
 
 		STRCPY(bug_nntpserver1, linep);
@@ -156,7 +155,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			wait_message(0, "%s\n", txt_cannot_post);
 
 		linep = line;
-		while (isspace(*linep))
+		while (isspace((int)*linep))
 			linep++;
 
 		STRCPY(bug_nntpserver2, linep);
@@ -203,6 +202,14 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 #	endif /* DEBUG */
 		authenticate (nntp_server, userid, TRUE);
 	}
+
+#if 0 /* TODO */
+	/* if we're using -n, check for XGTITLE */
+	if (newsrc_active && !list_active) { /* -n */
+		if (!nntp_command("XGTITLE", ERR_COMMAND, NULL))
+			xgtitle_supported = TRUE;
+	}
+#endif /* 0 */
 
 #endif	/* NNTP_ABLE */
 
@@ -501,6 +508,15 @@ open_newsgroups_fp (void)
 			}
 			read_local_newsgroups_file = FALSE;
 		}
+#if 0 /* TODO */
+		if (xgtitle_supported && newsrc_active
+		    && !list_active
+		    && num_active < some_usefull_limit) {
+			for (i = 0; i < num_active; i++) {
+				sprintf(buff, "XGTITLE %s", active[i].name);
+				nntp_command(buff, OK_LIST, NULL));
+		} else
+#endif /* 0 */
 		return (nntp_command ("LIST NEWSGROUPS", OK_GROUPS, NULL));
 	} else
 #endif /* NNTP_ABLE */
@@ -542,10 +558,10 @@ open_xover_fp (
 #endif /* NNTP_ABLE */
 }
 
+
 /*
  * Stat a mail/news article to see if it still exists
  */
-
 int
 stat_article (
 	long art,
@@ -632,7 +648,7 @@ get_article (
 
 	if ((fp = fopen (tempfile, "w")) == (FILE *) 0) {
 		perror_message (txt_article_cannot_open, tempfile);
-		return ((FILE *) 0);
+		return (FILE *) 0;
 	}
 
 	while ((ptr = tin_fgets(art_fp, FALSE)) != NULL) {
@@ -726,8 +742,8 @@ open_art_fp (
 #endif /* NNTP_ABLE */
 		joinpath (buf, active[i].spooldir, group_path);
 		sprintf (&buf[strlen (buf)], "/%ld", art);
-
-		/* Get the correct file size. This is done in get_article() for
+		/*
+		 * Get the correct file size. This is done in get_article() for
 		 * the NNTP case. TODO - fix this
 		 */
 		note_size = ((stat (buf, &sb) == -1) ? 0 : sb.st_size);
@@ -1001,7 +1017,7 @@ vGrpGetArtInfo (
 		}
 #else
 		my_fprintf(stderr, "Unreachable ?\n");
-		return(0);
+		return 0;
 #endif /* NNTP_ABLE */
 	} else {
 #ifdef M_AMIGA
@@ -1031,20 +1047,18 @@ vGrpGetArtInfo (
 						*plArtMax = lArtNum;
 						if (*plArtMin == 0)
 							*plArtMin = lArtNum;
-					} else if (lArtNum < *plArtMin) {
+					} else if (lArtNum < *plArtMin)
 						*plArtMin = lArtNum;
-					}
 					(*plArtCount)++;
 				}
 			}
 			closedir (tDirFile);
-		} else {
+		} else
 			return(-1);
-		}
 #endif /* M_AMIGA */
 	}
 
-	return(0);
+	return 0;
 }
 
 

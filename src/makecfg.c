@@ -89,9 +89,9 @@ parse_tbl (
 	char *t = s + strlen (s);
 
 	/* strip leading/trailing blanks */
-	while ((t-- != s) && isspace (*t))
+	while ((t-- != s) && isspace ((int)*t))
 		*t = '\0';
-	while (isspace (*s))
+	while (isspace ((int)*s))
 		s++;
 	buffer = s;
 
@@ -100,17 +100,18 @@ parse_tbl (
 		if (*buffer == '#') {
 			store_data (buffer, "", "");
 		} else {
-			/* otherwise the data consists of up to 3 blank
+			/*
+			 * otherwise the data consists of up to 3 blank
 			 * separated columns (name, type, size).
 			 */
-			while (*s && !isspace (*s))
+			while (*s && !isspace ((int)*s))
 				s++;
-			while (isspace (*s))
+			while (isspace ((int)*s))
 				*s++ = '\0';
 			t = s;
-			while (*t && !isspace (*t))
+			while (*t && !isspace ((int)*t))
 				t++;
-			while (isspace (*t))
+			while (isspace ((int)*t))
 				*t++ = '\0';
 			store_data (buffer, s, t);
 		}

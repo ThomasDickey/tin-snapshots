@@ -366,7 +366,7 @@ strcasecmp (
 	int r;
 	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
 		if (*p == '\0')
-			return (0);
+			return 0;
 	}
 
 	return r;
@@ -409,7 +409,7 @@ str_trim(
 	t_bool ws = TRUE;		/* white space flag */
 
 	for (wp = rp = string; *rp; rp++) {		/* loop over string */
-		if (isspace(*rp)) {		/* is it a white space? */
+		if (isspace((int)*rp)) {		/* is it a white space? */
 			if (!ws) {		/* was the last character not a white space? */
 				*wp++ = ' ';		/* store a blank */
 				ws = TRUE;
@@ -532,9 +532,8 @@ sh_format (char *dst,
 					fix = (strchr(SH_DOUBLE, *src) != 0);
 				} else if (quote == '\'') {
 					fix = (strchr(SH_SINGLE, *src) != 0);
-				} else {
+				} else
 					fix = (strchr(SH_META, *src) != 0);
-				}
 				if (fix) {
 					SH_FORMAT('\\');
 				}

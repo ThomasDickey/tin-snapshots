@@ -2,14 +2,14 @@
  *  Project   : tin - a Usenet reader
  *  Module    : tin.h
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 31.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-31
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *              You may  freely  copy or  redistribute  this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change this copy-
+ *              right notice, and it must be included in any copy made
  */
 
 /*
@@ -61,7 +61,7 @@
 #		ifndef __VMS_VER  /* assume old types.h */
 			typedef unsigned short mode_t;
 #			undef HAVE_STRFTIME
-#		endif /* __VMS_VER */
+#		endif /* !__VMS_VER */
 #		include <stdio.h>
 #	endif /* __DECC */
 #	ifdef SOCKETSHR_TCP
@@ -69,14 +69,15 @@
 #		include <unistd.h>
 #		ifndef SOCKETSHR_HAVE_DUP
 #			define dup
-#		endif /* SOCKETSHR_HAVE_DUP */
+#		endif /* !SOCKETSHR_HAVE_DUP */
 #		ifndef SOCKETSHR_HAVE_FERROR
 #			define ferror(a) (0)
-#		endif /* SOCKETSHR_HAVE_FERROR */
+#		endif /* !SOCKETSHR_HAVE_FERROR */
 #	endif /* SOCKETSHR_TCP */
 #	include <curses.h>
 #	include <stat.h>
-#	undef	HAVE_SELECT
+#	undef HAVE_SELECT
+#	define XHDR_XREF	/* enable crosspost support */
 #	define CASE_PROBLEM
 #	define HAVE_ERRNO_H
 #	define NNTP_ONLY
@@ -86,7 +87,7 @@
 #	define USE_CLEARSCREEN
 #	ifndef MM_CHARSET
 #		define MM_CHARSET "ISO-8859-1"
-#	endif /* MM_CHARSET */
+#	endif /* !MM_CHARSET */
 	/* Apparently this means fileops=create if not already there - no idea
 	 * why this should be needed. Standard fopen() implies this in arg 2
 	 */
@@ -785,6 +786,9 @@
 
 #define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
+/* TRUE if basenote has responses */
+#define HAS_FOLLOWUPS(i)	(arts[base[i]].thread != -1)
+
 /*
  * Only close off our stream when reading on local spool
  */
@@ -799,6 +803,10 @@
  */
 #define	CURR_GROUP	(active[my_group[cur_groupnum]])
 
+/*
+ * Defines an unread group
+ */
+#define UNREAD_GROUP(i)		(!active[my_group[i]].bogus && active[my_group[i]].newsrc.num_unread > 0)
 /*
  * Some informational message are only shown if we're running in
  * the background or some other non-curses mode
@@ -877,6 +885,7 @@
 #	define DEBUG_IO(x)	/* nothing */
 #endif
 
+
 /*
  * Threading strategies available
  * NB: The ordering is important in that threading methods that don't use
@@ -923,6 +932,11 @@
 #define	SORT_BY_SCORE_DESCEND	7
 #define	SORT_BY_SCORE_ASCEND	8
 
+/*
+ * Search keys
+ */
+#define SEARCH_SUBJ		1
+#define SEARCH_AUTH		2
 
 /*
  * Different values of strip_bogus - the ways to handle bogus groups
@@ -960,14 +974,20 @@
 
 
 /*
- * index_point variable values used throughout many modules
+ * index_point variable values used throughout tin
  */
-#define	GRP_UNINDEXED		-1		/* Stop reading group */
-#define	GRP_QUIT		-2		/* Set by 'Q' */
-#define	GRP_GOTONEXT		-3		/* Goto another group */
-#define	GRP_CONTINUE		-4		/* set in show_page() */
-#define	GRP_NOREDRAW		-5		/* Unclear meaning ? */
-#define	GRP_KILLED		-6		/* thread was killed at art level */
+
+/*
+ * -1 is kind of overloaded as an error from which_thread() and other functions
+ * where we wish to return to the next level up
+ */
+#define	GRP_RETURN		-1	/* Stop reading group ('T' command) -> return to selection screen */
+#define	GRP_QUIT		-2	/* Set by 'Q' when coming all the way out */
+#define	GRP_NEXTUNREAD		-3	/* goto next unread group */
+#define	GRP_NEXT		-4	/* (catchup) & goto next group */
+#define	GRP_ARTFAIL		-5	/* show_page() only. Failed to get into the article */
+#define	GRP_KILLED		-6	/* Thread was killed at pager level */
+#define GRP_GOTOTHREAD	-7	/* show_page() only. Enter thread menu */
 
 #ifndef EXIT_SUCCESS
 #	define EXIT_SUCCESS	0	/* Successful exit status */
@@ -1210,6 +1230,7 @@ struct t_article
 /* t_article.subject is casted to (int *) in art.c :-( */
 	char *from;			/* From: line from mail header (address) */
 	char *name;			/* From: line from mail header (full name) */
+	int gnksa_code;			/* From: line from mail header (GNKSA error code) */
 	time_t date;			/* Date: line from header in seconds */
 	char *xref;			/* Xref: cross posted article reference line */
 	/* NB: The msgid and refs are only retained until the reference tree is built */
@@ -1257,7 +1278,6 @@ struct t_attribute
 	unsigned quick_select_header:3;		/* quick filter select header */
 	unsigned quick_select_expire:1;		/* quick filter select limited/unlimited time */
 	unsigned quick_select_case:1;		/* quick filter select case sensitive? */
-	unsigned auto_save_msg:1;		/* 0=none, 1=save copy of posted article */
 	unsigned auto_select:1;			/* 0=show all unread, 1='X' just hot arts */
 	unsigned auto_save:1;			/* 0=none, 1=save */
 	unsigned batch_save:1;			/* 0=none, 1=save -S/mail -M */
@@ -1281,12 +1301,12 @@ struct t_attribute
  */
 struct t_newsrc
 {
-	t_bool	present;			/* update newsrc ? */
-	long	num_unread;			/* unread articles in group */
-	long	xmax;				/* newsrc max */
-	long	xmin;				/* newsrc min */
-	long	xbitlen;			/* bitmap length (max-min+1) */
-	t_bitmap *xbitmap;			/* bitmap read/unread (max-min+1+7)/8 */
+	t_bool present;		/* update newsrc ? */
+	long num_unread;		/* unread articles in group */
+	long xmax;				/* newsrc max */
+	long xmin;				/* newsrc min */
+	long xbitlen;			/* bitmap length (max-min+1) */
+	t_bitmap *xbitmap;	/* bitmap read/unread (max-min+1+7)/8 */
 };
 
 /*
@@ -1358,24 +1378,26 @@ struct t_filters
  */
 struct t_filter
 {
-	char *scope;		/* NULL='*' (all groups) or 'comp.os.*' */
+	char *scope;			/* NULL='*' (all groups) or 'comp.os.*' */
 	char *subj;			/* Subject: line */
 	char *from;			/* From: line */
-	char *msgid;		/* Message-ID: line */
-	char lines_cmp;	/* Lines compare <> */
-	int  lines_num;	/* Lines: line	*/
+	char *msgid;			/* Message-ID: line */
+	char lines_cmp;			/* Lines compare <> */
+	int  lines_num;			/* Lines: line */
+	char gnksa_cmp;			/* GNKSA compare <> */
+	int  gnksa_num;			/* GNKSA code */
 	int  score;			/* score to give if rule matches */
 	char *xref;			/* groups in xref line */
-	int xref_max;		/* maximal number of groups in newsgroups line */
+	int xref_max;			/* maximal number of groups in newsgroups line */
 	int xref_score_cnt;
 	int xref_scores[10];
 	char *xref_score_strings[10];
-	time_t time;				/* expire time in seconds */
-	struct t_filter *next;			/* next rule valid in group */
-	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
-	unsigned int type:2;			/* kill/auto select */
-	unsigned int icase:2;			/* Case sensitive filtering */
-	unsigned int fullref:4;			/* use full references or last entry only */
+	time_t time;			/* expire time in seconds */
+	struct t_filter *next;		/* next rule valid in group */
+	unsigned int inscope:4;		/* if group matches scope ie. 'comp.os.*' */
+	unsigned int type:2;		/* kill/auto select */
+	unsigned int icase:2;		/* Case sensitive filtering */
+	unsigned int fullref:4;		/* use full references or last entry only */
 };
 
 /*
@@ -1466,6 +1488,7 @@ struct t_art_stat
 	int selected_unread;	/* selected and unread */
 	int selected_seen;	/* selected and seen */
 	char art_mark;		/* mark to use for this thread - not used for groups */
+	int score;		/* maximum score */
 };
 
 
@@ -1591,7 +1614,7 @@ extern void joinpath (char *result, const char *dir, const char *file);
 #	define	TMPDIR "SYS$SCRATCH:"
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0x9b
-#	endif
+#	endif /* HAVE_KEY_PREFIX */
 extern void joinpath (char *result, const char *dir, const char *file);
 extern void joindir (char *result, const char *dir, const char *file);
 #endif /* VMS */
@@ -1754,7 +1777,7 @@ extern void joinpath (char *result, char *dir, char *file);
  * sign-extension, and a corresponding test-macro.
  */
 #define	EIGHT_BIT(ptr)	(unsigned char *)ptr
-#define	is_EIGHT_BIT(p)	((*EIGHT_BIT(p) < 32 && !isspace(*p)) || *EIGHT_BIT(p) > 127)
+#define	is_EIGHT_BIT(p)	((*EIGHT_BIT(p) < 32 && !isspace((int)*p)) || *EIGHT_BIT(p) > 127)
 
 /*
  * function prototypes & extern definitions

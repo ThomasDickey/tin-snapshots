@@ -344,11 +344,10 @@ get_tcp_socket (
 	 */
 	if (t_connect (s, callptr, (struct t_call *) 0) < 0) {
 		save_errno = t_errno;
-		if(save_errno == TLOOK){
+		if (save_errno == TLOOK)
 			fprintf(stderr, "Server unavailable\n");
-		} else {
+		else
 			t_error ("t_connect");
-		}
 		t_free((char *)callptr, T_CALL);
 		t_close (s);
 		return (-save_errno);
@@ -680,7 +679,7 @@ reconnect(
 	 * Tear down current connection
 	 */
 	NNTP_HARD_CLOSE;
-	if(!auto_reconnect)
+	if (!auto_reconnect)
 		ring_bell ();
 
 	DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
@@ -706,7 +705,7 @@ reconnect(
 		}
 		DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
 		put_server (buf);
-		return(0);
+		return 0;
 	}
 
 	if (--retry == 0)					/* No more tries ? */

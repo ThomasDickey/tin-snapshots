@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.11 1998/10/01 21:40:08 urs Exp $
+# $Id: metamutt,v 1.13 1998/10/26 15:36:59 roland Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
@@ -41,8 +41,11 @@
 #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 
-TMP=/tmp/metamutt.$$
-trap "rm -f $TMP*; exit" 0 1 2 15
+umask 077
+
+tmpdir=${TMPDIR-/tmp}/metamutt.$$
+mkdir $tmpdir || exit 1
+trap "rm -rf $tmpdir; exit" 0 1 2 3 15
 
 # formail options:
 fmopt=''
@@ -65,29 +68,29 @@ do
 done
 
 # create mbox message using formail (from procmail package):
-cat "$@" | formail $fmopt > $TMP-mbox
+cat "$@" | formail $fmopt > $tmpdir/mbox
 
 # If you don't have formail installed, try this:
-#echo "From PIPE `env LC_ALL=C date`" > $TMP-mbox
-#cat $* - | sed 's/^From />From /' >> $TMP-mbox
+#echo "From PIPE `env LC_ALL=C date`" > $tmpdir/mbox
+#cat $* - | sed 's/^From />From /' >> $tmpdir/mbox
 
 # create special muttrc for metamutt:
 if [ -f ~/.mutt/muttrc ]
 then
-    echo 'source ~/.mutt/muttrc' > $TMP-rc
+    echo 'source ~/.mutt/muttrc' > $tmpdir/muttrc
 else
-    echo 'source ~/.muttrc' > $TMP-rc
+    echo 'source ~/.muttrc' > $tmpdir/muttrc
 fi
 
-cat >> $TMP-rc <<EOF
-macro pager g ":set sendmail=$TMP-inews dsn_notify='' dsn_return=''<return>:my_hdr `formail -X Newsgroups < $TMP-mbox`<return>r"
+cat >> $tmpdir/muttrc <<EOF
+macro pager g ":set sendmail=$tmpdir/inews dsn_notify='' dsn_return=''<return>:my_hdr `formail -X Newsgroups < $tmpdir/mbox`<return>r"
 EOF
 
 # some additions, if we read exactly one article.
 if [ "$digest" = "no" ]
 then
 
-cat >> $TMP-rc <<EOF
+cat >> $tmpdir/muttrc <<EOF
 set pager_index_lines=0
 set quit=yes
 bind pager \t next-page
@@ -101,12 +104,12 @@ EOF
 fi
 
 # create special inews which removes mail only headers:
-cat > $TMP-inews<<EOF
+cat > $tmpdir/inews<<EOF
 #! /bin/sh
 formail -I To -I Cc -I Bcc -I Fcc -I From\  -I In-Reply-To \
     -R X-Mailer User-Agent | inews -h
 EOF
-chmod 700 $TMP-inews
+chmod 700 $tmpdir/inews
 
 # run mutt on mbox message with special muttrc:
-mutt -F $TMP-rc -R -f $TMP-mbox </dev/tty >/dev/tty
+mutt -F $tmpdir/muttrc -R -f $tmpdir/mbox </dev/tty >/dev/tty

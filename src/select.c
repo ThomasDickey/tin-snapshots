@@ -21,20 +21,26 @@ int default_move_group;
 int cur_groupnum = 0;
 int first_group_on_screen;
 int last_group_on_screen;
+/*
+ * Oddly named variable - seems to dictate whether to position on first
+ * unread item or not. Used internally unlike 'pos_first_unread', which
+ * is a tinrc variable.
+ */
 t_bool space_mode;
-
 
 /*
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
 	static int continual_key (int ch, int ch1);
-	static int next_unread_group (t_bool enter_group);
-	static void prompt_group_num (int ch);
 	static int reposition_group (struct t_group *group, int default_num);
+	static t_bool pos_next_unread_group (t_bool redraw);
+	static t_bool read_groups (void);
 	static void catchup_group (struct t_group *group, t_bool goto_next_unread_group);
-	static void yank_active_file (void);
+	static void move_to_group (int n);
+	static void prompt_group_num (int ch);
 	static void subscribe_pattern (const char *prompt, const char *message, const char *result, t_bool state);
+	static void yank_active_file (void);
 #endif /* !INDEX_DAEMON */
 
 static t_bool bParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
@@ -89,7 +95,7 @@ continual_key (
 }
 
 void
-selection_index (
+selection_page (
 	int start_groupnum,
 	int num_cmd_line_groups)
 {
@@ -100,7 +106,6 @@ selection_index (
 	int i, n, ch, ch1 = 0;
 	int INDEX_BOTTOM;
 	int posted_flag;
-	int scroll_lines;
 	t_bool yank_in_active_file = TRUE;
 
 	cur_groupnum = start_groupnum;
@@ -234,7 +239,11 @@ end_of_list:
 			case iKeySearchSubjF:	/* search forward */
 			case iKeySearchSubjB:	/* search backward */
 				i = (ch == iKeySearchSubjF);
-				search_group (i);
+
+				if ((i = search_active (i)) != -1) {
+					move_to_group (i);
+					clear_message ();
+				}
 				break;
 
 			case iKeySelectReadGrp:	/* go into group */
@@ -252,20 +261,8 @@ select_read_group:
 
 				n = my_group[cur_groupnum];
 				if (active[n].xmax > 0 && (active[n].xmin <= active[n].xmax)) {
-					space_mode = pos_first_unread;
-					clear_message ();
-					do {
-						index_point = GRP_UNINDEXED;
-						if (CURR_GROUP.bogus)
-							break;
-						group_page (&CURR_GROUP);
-					} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
-
-					if (index_point == GRP_QUIT)
+					if (!read_groups())
 						goto select_done;
-
-					if (!reread_active_file ())
-						show_selection_page ();
 				} else
 					info_message (txt_no_arts);
 				break;
@@ -276,32 +273,18 @@ select_read_group:
 				/* FALLTHROUGH */
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
-				if (next_unread_group (TRUE) == GRP_QUIT)
-					goto select_done;
-				break;
+				if (pos_next_unread_group (FALSE)) {
+					if (!read_groups ())
+						goto select_done;		/* User quit */
+				}
+
+				break;							/* Nothing more to do at the moment */
 
 			case iKeyPageDown:		/* page down */
 			case iKeyPageDown2:
 select_page_down:
-				if (!group_top)
-					break;
-				if (cur_groupnum == group_top - 1) {
-					move_to_group(0);
-					break;
-				}
-				erase_group_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				cur_groupnum = ((cur_groupnum + scroll_lines) / scroll_lines) * scroll_lines;
-				if (cur_groupnum >= group_top) {
-					cur_groupnum = (group_top / scroll_lines) * scroll_lines;
-					if (cur_groupnum < group_top - 1)
-						cur_groupnum = group_top - 1;
-				}
-
-				if (cur_groupnum <= first_group_on_screen || cur_groupnum >= last_group_on_screen)
-					show_selection_page ();
-				else
-					draw_group_arrow ();
+				if (group_top)
+					move_to_group (page_down (cur_groupnum, group_top));
 				break;
 
 			case iKeySelectRedrawScr:		/* redraw */
@@ -313,17 +296,15 @@ select_page_down:
 			case iKeyDown:		/* line down */
 			case iKeyDown2:
 select_down:
-				if (!group_top)
-					break;
-				move_to_group((cur_groupnum + 1 >= group_top) ? 0 : (cur_groupnum + 1));
+				if (group_top)
+					move_to_group((cur_groupnum + 1 >= group_top) ? 0 : (cur_groupnum + 1));
 				break;
 
 			case iKeyUp:		/* line up */
 			case iKeyUp2:
 select_up:
-				if (!group_top)
-					break;
-				move_to_group ((cur_groupnum == 0) ? (group_top - 1) : (cur_groupnum - 1));
+				if (group_top)
+					move_to_group ((cur_groupnum == 0) ? (group_top - 1) : (cur_groupnum - 1));
 				break;
 
 			case iKeySelectResetNewsrc:	/* reset .newsrc */
@@ -339,31 +320,15 @@ select_up:
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 select_page_up:
-				if (!group_top)
-					break;
-				if (cur_groupnum == 0) {
-					move_to_group (group_top - 1);
-					break;
-				}
-				erase_group_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = cur_groupnum % scroll_lines) > 0)
-					cur_groupnum = cur_groupnum - n;
-				else
-					cur_groupnum = ((cur_groupnum - scroll_lines) / scroll_lines) * scroll_lines;
-				if (cur_groupnum < 0)
-					cur_groupnum = 0;
-				if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen)
-					show_selection_page ();
-				else
-					draw_group_arrow ();
+				if (group_top)
+					move_to_group (page_up (cur_groupnum, group_top));
 				break;
 
 			case iKeySelectCatchup:	/* catchup - mark all articles as read */
-			case iKeySelectCatchupGotoNext:	/* and goto next unread group */
+			case iKeySelectCatchupNextUnread:	/* and goto next unread group */
 				if (!group_top)
 					break;
-				catchup_group (&CURR_GROUP, (ch == iKeySelectCatchupGotoNext));
+				catchup_group (&CURR_GROUP, (ch == iKeySelectCatchupNextUnread));
 				break;
 
 			case iKeySelectToggleSubjDisplay:	/* toggle newsgroup descriptions */
@@ -454,8 +419,7 @@ select_page_up:
 				break;
 
 			case iKeySelectNextUnreadGrp:	/* goto next unread group */
-				if (next_unread_group (FALSE) == GRP_QUIT)
-					goto select_done;
+				pos_next_unread_group (TRUE);
 				break;
 
 			case iKeyQuit:	/* quit */
@@ -531,11 +495,11 @@ select_done:
 				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK && !no_write) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
-					vWriteNewsrc();	/* save current newsrc */
-					delete_group(CURR_GROUP.name); /* remove bogus group */
-					read_newsrc(newsrc, TRUE);	/* reload newsrc*/
+					vWriteNewsrc();									/* save current newsrc */
+					delete_group(CURR_GROUP.name);					/* remove bogus group */
+					read_newsrc(newsrc, TRUE);						/* reload newsrc */
 					toggle_my_groups (show_only_unread_groups, ""); /* keep current display-state */
-					show_selection_page(); /* reddraw screen */
+					show_selection_page();							/* reddraw screen */
 					info_message (buf);
 				}
 				break;
@@ -594,11 +558,7 @@ select_done:
 					 */
 					group_top = 0;
 					for (i = 0; i < num_active; i++)
-#if 0
-						(void) my_group_add (active[i].name);
-#else
 						my_group[group_top++] = i;
-#endif
 
 					/*
 					 * If there are now more groups than before, we did yank something
@@ -606,18 +566,28 @@ select_done:
 					if (n < group_top) {
 						if (n)	/* Keep us positioned on the group we were before */
 							cur_groupnum = my_group_add (buf);
-						sprintf (buf, txt_added_groups, group_top - n, (group_top - n) == 1 ? "" : txt_plural);
 						set_groupname_len (yank_in_active_file);
 						show_selection_page ();
-						info_message (buf);
+						info_message (txt_added_groups, group_top - n, (group_top - n) == 1 ? "" : txt_plural);
 					} else
 						info_message (txt_no_groups_to_yank_in);
 					yank_in_active_file = FALSE;
 				} else {												/* Yank out */
 					wait_message (0, txt_yanking_sub_groups);
+
+					n = group_top;
+					if (group_top)
+						strcpy (buf, CURR_GROUP.name);
+
 					toggle_my_groups(show_only_unread_groups, "");
 					HpGlitch(erase_group_arrow ());
-					cur_groupnum = group_top - 1;
+
+					cur_groupnum = -1;
+					if (n)  /* Keep us positioned on the group we were before */
+						cur_groupnum = add_my_group (buf, FALSE);
+					if (cur_groupnum == -1)
+						cur_groupnum = group_top - 1;
+
 					set_groupname_len (yank_in_active_file);
 					show_selection_page ();
 					yank_in_active_file = TRUE;
@@ -677,37 +647,13 @@ show_selection_page (void)
 	CleartoEOLN ();
 	MoveCursor (INDEX_TOP, 0);
 
-	if (cur_groupnum >= group_top)
-		cur_groupnum = group_top - 1;
-
 	if (cur_groupnum < 0)
 		cur_groupnum = 0;
 
-	if (NOTESLINES <= 0)
-		first_group_on_screen = 0;
-	else {
-		first_group_on_screen = (cur_groupnum / NOTESLINES) * NOTESLINES;
-		if (first_group_on_screen < 0)
-			first_group_on_screen = 0;
-	}
+	if (cur_groupnum >= group_top)
+		cur_groupnum = group_top - 1;
 
-	last_group_on_screen = first_group_on_screen + NOTESLINES;
-
-	if (last_group_on_screen >= group_top) {
-		last_group_on_screen = group_top;
-		first_group_on_screen = (cur_groupnum / NOTESLINES) * NOTESLINES;
-
-		if (first_group_on_screen == last_group_on_screen ||
-			first_group_on_screen < 0) {
-			if (first_group_on_screen < 0)
-				first_group_on_screen = 0;
-			else
-				first_group_on_screen = last_group_on_screen - NOTESLINES;
-		}
-	}
-
-	if (!group_top)
-		first_group_on_screen = last_group_on_screen = 0;
+	set_first_screen_item (cur_groupnum, group_top, &first_group_on_screen, &last_group_on_screen);
 
 	blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + (show_description ? 2 : 4);
 
@@ -717,9 +663,9 @@ show_selection_page (void)
 #else
 		char *sptr = screen[j].col;
 #endif
-		if (active[my_group[i]].inrange) {
+		if (active[my_group[i]].inrange)
 			strcpy (tmp, "    #");
-		} else if (active[my_group[i]].newsrc.num_unread) {
+		else if (active[my_group[i]].newsrc.num_unread) {
 			strcpy (tmp, tin_ltoa(active[my_group[i]].newsrc.num_unread, 5));
 		} else
 			strcpy (tmp, "     ");
@@ -999,31 +945,39 @@ catchup_group (
 	if (!confirm_action || prompt_yn (cLINES, sized_message(txt_mark_group_read, group->name), TRUE) == 1) {
 		grp_mark_read (group, NULL);
 		mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, "     ");
-		move_to_group(cur_groupnum + 1);
+
+		move_to_group (cur_groupnum + 1);
+
 		if (goto_next_unread_group)
-			next_unread_group (FALSE);
+			pos_next_unread_group (TRUE);
 	}
 }
 
 
-static int
-next_unread_group (
-	t_bool enter_group)
+/*
+ * Set cur_groupnum to next group with unread arts
+ * If the current group has unread arts, it will be counted. This is important !
+ * If redraw is set, update the selection menu appropriately
+ * Return FALSE if no groups left to read
+ *        TRUE  at all other times
+ */
+static t_bool
+pos_next_unread_group (
+	t_bool redraw)
 {
 	int i;
 	t_bool all_groups_read = TRUE;
 
 	for (i = cur_groupnum; i < group_top; i++) {
-		if (active[my_group[i]].newsrc.num_unread != 0) {
+		if (UNREAD_GROUP (i)) {
 			all_groups_read = FALSE;
-			erase_group_arrow ();
 			break;
 		}
 	}
 
 	if (all_groups_read) {
 		for (i = 0; i < cur_groupnum; i++) {
-			if (active[my_group[i]].newsrc.num_unread != 0) {
+			if (UNREAD_GROUP (i)) {
 				all_groups_read = FALSE;
 				break;
 			}
@@ -1032,41 +986,72 @@ next_unread_group (
 
 	if (all_groups_read) {
 		info_message (txt_no_groups_to_read);
-		return GRP_UNINDEXED;
+		return FALSE;
 	}
 
-	if (i != cur_groupnum)
-		erase_group_arrow ();
-
-	cur_groupnum = i;
-
-	if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen)
-		show_selection_page ();
+	if (redraw)
+		move_to_group (i);
 	else
-		draw_group_arrow ();
+		cur_groupnum = i;
+
+	return TRUE;
+}
+
+
+/*
+ * This is the main loop that cycles through, reading groups.
+ * We keep going until we return to the selection screen
+ * (return TRUE) or quit (return FALSE)
+ */
+static t_bool
+read_groups()
+{
+	t_bool done = FALSE;
 
 	space_mode = pos_first_unread;
 
-	if (enter_group) {
-		clear_message ();
-		do {
-			index_point = GRP_UNINDEXED;
-			group_page (&CURR_GROUP);
-		} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
+	clear_message ();
 
-		if (index_point == GRP_QUIT)
-			return GRP_QUIT;
+	forever {
 
-		show_selection_page ();
+		if (done)
+			break;
+
+		switch (group_page (&CURR_GROUP)) {
+
+			case GRP_QUIT:
+				return FALSE;
+
+			case GRP_NEXT:
+				if (cur_groupnum + 1 < group_top)
+					cur_groupnum++;
+
+				done = TRUE;
+				break;
+
+			case GRP_NEXTUNREAD:
+				if (!pos_next_unread_group (FALSE))
+					done = TRUE;
+				break;
+
+			case GRP_RETURN:
+			default:
+				done = TRUE;
+				break;
+		}
 	}
 
-	return GRP_CONTINUE;
+	if (!reread_active_file ())
+		show_selection_page ();
+
+	return TRUE;
 }
 #endif /* !INDEX_DAEMON */
 
+
 /*
  *  Calculate max length of groupname field for group selection level.
- *  If all_group is TRUE check all groups in active file otherwise
+ *  If all_groups is TRUE check all groups in active file otherwise
  *  just subscribed to groups.
  */
 void
@@ -1104,6 +1089,7 @@ set_groupname_len (
 		groupname_len = groupname_max_length;
 }
 
+
 /*
  * Toggle my_group[] between all groups / only unread groups
  * We make a special case for Newgroups (always appear, at the top)
@@ -1115,10 +1101,10 @@ toggle_my_groups (
 	const char *group)
 {
 #ifndef INDEX_DAEMON
+	FILE *fp;
 	char buf[NEWSRC_LINE];
 	char old_curr_group[PATH_LEN];
 	char *ptr;
-	FILE *fp;
 	int active_idx = 0;
 	int group_num = cur_groupnum;
 	register int i;
@@ -1178,6 +1164,7 @@ toggle_my_groups (
 #endif	/* !INDEX_DAEMON */
 }
 
+
 #ifndef INDEX_DAEMON
 /*
  * Subscribe or unsubscribe from a list of groups. List can be full list as supported
@@ -1203,7 +1190,7 @@ subscribe_pattern (
 
 	wait_message (0, message);
 
-	/* TODO - so why precisely do we have these 2 separate passes ? */
+	/* TODO - so why precisely do we need these 2 separate passes ? */
 
 	for (subscribe_num = 0, i = 0; i < group_top; i++) {
 		if (match_group_list (active[my_group[i]].name, buf)) {
@@ -1442,9 +1429,8 @@ vDelRange (
 			for (iIndex = 0; iIndex < iNumMax-1; iIndex++)
 				arts[iIndex].inrange = FALSE;
 /*
-			for (iIndex = base[thread_basenote]; iIndex >= 0; iIndex = arts[iIndex].thread) {
+			for (iIndex = base[thread_basenote]; iIndex >= 0; iIndex = arts[iIndex].thread)
 				arts[iIndex].inrange = FALSE;
-				}
 */
 			break;
 		default:
@@ -1457,7 +1443,7 @@ vDelRange (
 /*
  * Move the on-screen pointer & internal variable to the given group
  */
-void
+static void
 move_to_group(
 	int n)
 {

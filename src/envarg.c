@@ -54,9 +54,8 @@ envargs (
 	 * see if anything in the environment
 	 */
 	envptr = getenv (envstr);
-	if (envptr == (char *) 0 || *envptr == 0) {
+	if (envptr == (char *) 0 || *envptr == 0)
 		return;
-	}
 
 	/*
 	 * count the args so we can allocate room for them

@@ -21,9 +21,9 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : parsedate.y
- *  Author    : S.Bellovin & R.$alz & J.Berets & P.Eggert
- *  Created   : 01-08-90
- *  Updated   : 23-09-94
+ *  Author    : S. Bellovin, R. $alz, J. Berets, P. Eggert
+ *  Created   : 1990-08-01
+ *  Updated   : 1994-09-23
  *  Notes     : This grammar has 6 shift/reduce conflicts.
  *              Originally written by Steven M. Bellovin <smb@research.att.com>
  *              while at the University of North Carolina at Chapel Hill.
@@ -300,9 +300,11 @@ static const short yycheck[] = {    23,
 
 
 #ifndef alloca
-#if defined  VMS && !defined __GNUC__ /* M.St. */
+#ifdef VMS
+#ifndef __GNUC__
 #include <builtins.h>
 #define alloca __alloca
+#endif
 #endif
 #ifdef __GNUC__
 #define alloca __builtin_alloca
@@ -877,9 +879,9 @@ case 17:
 	    int	i;
 
 	    /* Unix and GMT and numeric timezones -- a little confusing. */
-	    if (yyvsp[0].Number < 0) {
+	    if ((int)yyvsp[0].Number < 0) {
 		/* Don't work with negative modulus. */
-		yyvsp[0].Number = -yyvsp[0].Number;
+		yyvsp[0].Number = -(int)yyvsp[0].Number;
 	 	if (yyvsp[0].Number > 9999 || (i = yyvsp[0].Number % 100) >= 60) {
 	 		YYABORT;
 	 	}
@@ -1187,8 +1189,6 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-
-#line 307 "parsdate.y"
 
 
 /*

@@ -128,8 +128,8 @@ check_start_save_any_news (
 				verbose = FALSE;
 				log_opened = FALSE;
 			}
-			(void) time (&epoch);
 			fprintf (fp_log, "To: %s\n", userid);
+			(void) time (&epoch);
 			sprintf (subject, "Subject: NEWS LOG %s", ctime (&epoch));
 			/** Remove trailing \n introduced by ctime() **/
 			if ((ich = strrchr(subject, '\n')) != 0)
@@ -184,7 +184,7 @@ check_start_save_any_news (
 					}
 
 					if (check_start_save == MAIL_ANY_NEWS)
-						sprintf (savefile, "%stin.%d", TMPDIR, process_id);
+						sprintf (savefile, "%stin.%d", TMPDIR, (int) process_id);
 					else {
 						if (!strfpath (group->attribute->savedir, path, sizeof (path), homedir, (char *) 0, (char *) 0, group->name))
 							joinpath (path, homedir, DEFAULT_SAVEDIR);
@@ -215,7 +215,7 @@ check_start_save_any_news (
 						fprintf (fp, "To: %s\n", mail_news_user);
 
 					sprintf (buf, "[%5ld]  %s\n", arts[j].artnum, arts[j].subject);
-					fprintf (fp_log, buf);
+					fprintf (fp_log, "%s", buf); /* buf may contain % */
 					if (verbose)
 						wait_message (0, buf);
 
@@ -401,7 +401,7 @@ save_thread_to_file (
 	}
 
 	for (i = 0; i < num_save; i++) {
-		/* the tailing spaces are needed for the progress-meter */
+		/* the trailing spaces are needed for the progress-meter */
 		wait_message (0, "%s%d  ", txt_saving, ++count);
 
 		if (is_mailbox)
@@ -880,9 +880,8 @@ get_first_savefile (void)
 #else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PART, save[i].part);
 #endif
-						} else {
+						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
-						}
 					} else {
 						if (create_subdir) {
 #ifdef VMS
@@ -892,20 +891,18 @@ get_first_savefile (void)
 #else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PATCH, save[i].patch);
 #endif
-						} else {
+						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
-						}
 					}
 				} else {
-					if (num_save == 1) {
+					if (num_save == 1)
 						sprintf (file, "%s", save[i].file);
-					} else {
+					else
 #ifdef VMS
 						sprintf (file, "%s-%03d", save[i].file, i+1);
 #else
 						sprintf (file, "%s.%03d", save[i].file, i+1);
 #endif
-					}
 				}
 				return file;
 			}
@@ -944,9 +941,8 @@ get_last_savefile (void)
 #else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PART, save[i].part);
 #endif
-						} else {
+						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
-						}
 					} else {
 						if (create_subdir) {
 #ifdef VMS
@@ -956,20 +952,18 @@ get_last_savefile (void)
 #else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PATCH, save[i].patch);
 #endif
-						} else {
+						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
-						}
 					}
 				} else {
-					if (num_save == 1) {
+					if (num_save == 1)
 						sprintf (file, "%s", save[i].file);
-					} else {
+					else
 #ifdef VMS
 						sprintf (file, "%s-%03d", save[i].file, i+1);
 #else
 						sprintf (file, "%s.%03d", save[i].file, i+1);
 #endif
-					}
 				}
 				return file;
 			}
@@ -1105,9 +1099,8 @@ post_process_uud (
 				my_printf("No end." cCRLF);
 			} else if (item->state & UUFILE_NODATA) {
 				my_printf("No data." cCRLF);
-			} else {
+			} else
 				my_printf("Unknown error." cCRLF);
-			}
 		}
 		i++;
 		item = UUGetFileListItem(i);
@@ -1120,9 +1113,9 @@ post_process_uud (
 	return;
 #	else
 #		ifdef VMS
-	sprintf (file_out, "%suue.%05d", file_out_dir, process_id);
+	sprintf (file_out, "%suue.%05d", file_out_dir, (int) process_id);
 #		else
-	sprintf (file_out, "%s/uue%05d", file_out_dir, process_id);
+	sprintf (file_out, "%s/uue%05d", file_out_dir, (int) process_id);
 #		endif /* VMS */
 	state = INITIAL;
 	open_out_file = TRUE;
@@ -1360,9 +1353,9 @@ post_process_sh (
 	}
 
 #	ifdef VMS
-	sprintf (file_out, "%ssh.%05d", file_out_dir, process_id);
+	sprintf (file_out, "%ssh.%05d", file_out_dir, (int) process_id);
 #	else
-	sprintf (file_out, "%s/sh%05d", file_out_dir, process_id);
+	sprintf (file_out, "%s/sh%05d", file_out_dir, (int) process_id);
 #	endif /* VMS */
 
 	for (j = 0; j < num_save; j++) {
@@ -1432,7 +1425,7 @@ get_archive_file (
 	DIR *dirp;
 	DIR_BUF *dp;
 	struct stat sbuf;
-	time_t last = 0;
+	time_t last = (time_t) 0;
 
 	file = (char *) my_malloc(LEN);
 	if (file == 0)
@@ -1459,7 +1452,7 @@ get_archive_file (
 	}
 	closedir (dirp);
 
-	if (last == 0) {
+	if (last == (time_t) 0) {
 		free (file);
 		file = 0;
 	}

@@ -43,7 +43,6 @@
 
 #undef	DEFAULT_ISO2ASC
 #undef	DOMAIN_NAME
-#undef	FORGERY
 #undef	INEWSDIR
 #undef	INN_NNTPLIB
 #undef	MIME_BREAK_LONG_LINES

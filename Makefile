@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 981002
+PVER	= 981114
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -173,6 +173,7 @@ PCRE	= \
 	$(PCREDIR)/pgrep.1 \
 	$(PCREDIR)/pcre.3 \
 	$(PCREDIR)/pcreposix.3 \
+	$(PCREDIR)/deftables.c \
 	$(PCREDIR)/maketables.c \
 	$(PCREDIR)/pcre.c \
 	$(PCREDIR)/pcreposix.c \

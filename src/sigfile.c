@@ -56,16 +56,14 @@ msg_write_signature (
 			char *sigcmd;
 			char cmd[PATH_LEN];
 			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-			if ((sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4)) != NULL) {
-				sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
-				if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
-					while (fgets (cmd, PATH_LEN, pipe_fp))
-						fputs (cmd, fp);
-					pclose (pipe_fp);
-				}
-				free(sigcmd);
-			} else
-				wait_message (2, txt_out_of_memory2);
+			sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4);
+			sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
+			if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
+				while (fgets (cmd, PATH_LEN, pipe_fp))
+					fputs (cmd, fp);
+				pclose (pipe_fp);
+			}
+			free(sigcmd);
 
 			return;
 		}
@@ -140,12 +138,10 @@ open_random_sig (
 	char *sigdir)
 {
 	struct stat st;
-	time_t epoch;
 
 	if (stat (sigdir, &st) != -1) {
 		if (S_ISDIR(st.st_mode)) {
-			(void) time (&epoch);
-			srand ((unsigned int) epoch);
+			srand ((unsigned int) time(NULL));
 			my_chdir (sigdir);
 
 			if (thrashdir (sigdir) || !*sigfile) {
@@ -277,5 +273,5 @@ thrashdir (
 #endif /* DEBUG */
 	closedir (dirp);
 
-	return (0);
+	return 0;
 }

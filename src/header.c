@@ -71,7 +71,8 @@ get_domain_name (
 	static char domain[8192];
 
 #	if defined(M_AMIGA)
-/* Damn compiler bugs...
+/*
+ * Damn compiler bugs...
  * Without this hack, SASC 6.55 produces a TST.B d16(pc),
  * which is illegal on a 68000
  */
@@ -342,9 +343,10 @@ build_sender (void)
 			strcat(sender, ptr);
 			strcat(sender, ">");
 		} else
-			return 0;
+			return (char *) 0;
 	} else
-		return 0;
-	return (sender);
+		return (char *) 0;
+
+	return sender;
 }
 #endif /* !FORGERY */

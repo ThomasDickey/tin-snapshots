@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : bugrep.h
  *  Author    : Urs Janssen <urs@tin.org>
- *  Created   : 30.07.1997
- *  Updated   : 01.02.1998
+ *  Created   : 1997-07-30
+ *  Updated   : 1998-02-01
  *  Notes     :
  *  Copyright : (c) Copyright 1997-98 by Urs Janssen
  *              You may  freely  copy or  redistribute this  software,

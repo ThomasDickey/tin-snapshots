@@ -355,6 +355,9 @@ read_config_file (
 			break;
 
 		case 'g':
+			if (match_integer (buf, "getart_limit=", &getart_limit, 0))
+				break;
+
 			if (match_integer (buf, "groupname_max_length=", &groupname_max_length, 132))
 				break;
 
@@ -527,6 +530,9 @@ read_config_file (
 			if (match_boolean (buf, "show_lines=" , &show_lines))
 				break;
 
+			if (match_boolean (buf, "show_score=" , &show_score))
+				break;
+
 			if (match_boolean (buf, "show_signatures=", &show_signatures))
 				break;
 
@@ -577,6 +583,9 @@ read_config_file (
 			if (match_boolean (buf, "use_builtin_inews=", &use_builtin_inews))
 				break;
 #endif
+
+			if (match_boolean (buf, "use_getart_limit=", &use_getart_limit))
+				break;
 
 			if (match_boolean (buf, "use_mailreader_i=", &use_mailreader_i))
 				break;
@@ -641,6 +650,10 @@ read_config_file (
 	if (!(draw_arrow_mark || inverse_okay))
 		draw_arrow_mark = TRUE;
 
+	/* ignore negativ limits */
+	if (use_getart_limit && (getart_limit < 0))
+		use_getart_limit = FALSE;
+
 	if (INTERACTIVE2)
 		wait_message (0, "\n");
 
@@ -660,10 +673,8 @@ write_config_file (
 	int i;
 
 	/* alloc memory for tmp-filename */
-	if ((file_tmp = (char *) my_malloc (strlen (file)+5)) == NULL) {
-		wait_message (0, txt_out_of_memory2);
-		return;
-	}
+	file_tmp = (char *) my_malloc (strlen (file)+5);
+
 	/* generate tmp-filename */
 	sprintf (file_tmp, "%s.tmp", file);
 
@@ -812,6 +823,9 @@ write_config_file (
 	fprintf (fp, txt_tinrc_show_lines);
 	fprintf (fp, "show_lines=%s\n\n", print_boolean(show_lines));
 
+	fprintf (fp, txt_tinrc_show_score);
+	fprintf (fp, "show_score=%s\n\n", print_boolean(show_score));
+
 	fprintf (fp, txt_tinrc_unlink_article);
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
 
@@ -908,6 +922,12 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_cache_overview_files);
 	fprintf (fp, "cache_overview_files=%s\n\n", print_boolean (cache_overview_files));
+
+	fprintf (fp, txt_tinrc_use_getart_limit);
+	fprintf (fp, "use_getart_limit=%s\n\n", print_boolean (use_getart_limit));
+
+	fprintf (fp, txt_tinrc_getart_limit);
+	fprintf (fp, "getart_limit=%d\n\n", getart_limit);
 
 #ifdef HAVE_COLOR
 	fprintf (fp, txt_tinrc_use_color);
@@ -1248,7 +1268,7 @@ int
 change_config_file (
 	struct t_group *group)
 {
-	int ch, i;
+	int ch;
 	int original_list_value;
 	int option, old_option;
 	int ret_code = NO_FILTERING;
@@ -1452,15 +1472,7 @@ change_config_file (
 						case OPT_DEFAULT_SHOW_ONLY_UNREAD:
 							if (!bool_equal(default_show_only_unread, original_on_off_value) && group != (struct t_group *) 0) {
 								make_threads (group, TRUE);
-								find_base (group);
-								if (space_mode) {
-									for (i = 0; i < top_base; i++) {
-										if (new_responses (i))
-											break;
-									}
-									index_point = ((i < top_base) ? i: top_base - 1);
-								} else
-									index_point = top_base - 1;
+								pos_first_unread_thread();
 							}
 							break;
 
@@ -1504,9 +1516,9 @@ change_config_file (
 							if (show_description) {	/* force reread of newgroups file */
 								read_newsgroups_file ();
 								clear_message ();
-							} else {
+							} else
 								set_groupname_len (FALSE);
-							}
+
 							break;
 
 #ifdef HAVE_COLOR
@@ -1544,6 +1556,7 @@ change_config_file (
 						 * case OPT_PROCESS_ONLY_UNREAD:
 						 * case OPT_SAVE_TO_MMDF_MAILBOX:
 						 * case OPT_SHOW_LINES:
+						 * case OPT_SHOW_SCORE:
 						 * case OPT_SHOW_LAST_LINE_PREV_PAGE:
 						 * case OPT_SHOW_ONLY_UNREAD_GROUPS:
 						 * case OPT_SHOW_XCOMMENTTO:
@@ -1604,7 +1617,6 @@ change_config_file (
 							if (default_thread_arts != original_list_value && group != (struct t_group *) 0) {
 								group->attribute->thread_arts = default_thread_arts;
 								make_threads (group, TRUE);
-								find_base (group);
 							}
 							clear_message ();
 							break;
@@ -1731,6 +1743,7 @@ change_config_file (
 				case OPT_NUM:
 					switch (option) {
 						case OPT_REREAD_ACTIVE_FILE_SECS:
+						case OPT_GETART_LIMIT:
 						case OPT_GROUPNAME_MAX_LENGTH:
 						case OPT_DEFAULT_FILTER_DAYS:
 							prompt_option_num (option);
@@ -2039,13 +2052,13 @@ show_config_page (void)
  * Watch out for the frees! You must free(*argv) and then free(argv)! NOTHING
  *   ELSE!! Do _NOT_ free the individual args of argv.
  */
-extern char **
+char **
 ulBuildArgv(
 	char *cmd,
 	int *new_argc)
 {
 	char **new_argv = NULL;
-	char *buf = NULL, *tmp = NULL;
+	char *buf, *tmp;
 	int i = 0;
 
 	if (!cmd && !*cmd) {
@@ -2053,15 +2066,14 @@ ulBuildArgv(
 		return (NULL);
 	}
 
-	for (tmp = cmd; isspace (*tmp); tmp++)
+	for (tmp = cmd; isspace ((int)*tmp); tmp++)
 		;
+
 	buf = my_strdup(tmp);
 	if (!buf) {
 		*new_argc = 0;
 		return (NULL);
 	}
-
-	tmp = buf;
 
 	new_argv = (char **) calloc (1, sizeof (char *));
 	if (!new_argv) {
@@ -2070,21 +2082,23 @@ ulBuildArgv(
 		return (NULL);
 	}
 
+	tmp = buf;
 	new_argv[0] = NULL;
+
 	while (*tmp) {
-		if (!isspace(*tmp)) { /*found the begining of a word*/
+		if (!isspace((int)*tmp)) { /*found the begining of a word*/
 			new_argv[i] = tmp;
-				for (; *tmp && !isspace(*tmp); tmp++);
-				if (*tmp) {
-					*tmp = '\0';
-					tmp++;
-				}
+			for (; *tmp && !isspace((int)*tmp); tmp++)
+				;
+			if (*tmp) {
+				*tmp = '\0';
+				tmp++;
+			}
 			i++;
 			new_argv = (char **) realloc (new_argv, ((i+1) * sizeof (char *)));
 			new_argv[i] = NULL;
-		} else {
+		} else
 			tmp++;
-		}
 	}
 	*new_argc = i;
 	return (new_argv);

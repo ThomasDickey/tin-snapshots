@@ -47,7 +47,7 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 int cLINES = DEFAULT_LINES_ON_TERMINAL - 1;
 int cCOLS  = DEFAULT_COLUMNS_ON_TERMINAL;
 t_bool inverse_okay = TRUE;
-static int _inraw = FALSE;	/* are we IN rawmode?    */
+static int _inraw = FALSE;	/* are we IN rawmode? */
 int _hp_glitch = FALSE;		/* standout not erased by overwriting on HP terms */
 
 #ifndef INDEX_DAEMON
@@ -186,7 +186,7 @@ static int _columns, _line, _lines;
 
 static char _terminal[1024];		/* Storage for terminal entry */
 static char _capabilities[1024];	/* String for cursor motion */
-static char *ptr = _capabilities;	/* for buffering         */
+static char *ptr = _capabilities;	/* for buffering */
 
 #endif	/* M_UNIX */
 
@@ -325,7 +325,7 @@ InitScreen (void)
 #endif /* INDEX_DAEMON */
 }
 
-#else	/* !M_UNIX  */
+#else	/* !M_UNIX */
 
 int
 InitScreen (void)
@@ -463,7 +463,8 @@ InitScreen (void)
 			}
 #if 0
 			else {
-				/* These are the settings for a DECterm but the reply can't easily be parsed
+				/*
+				 * These are the settings for a DECterm but the reply can't easily be parsed
 				 * Reply is of the form - CSI Pe ; Pb ; Pr ; Pc & w
 				 * Where Pe is the event, Pb the button, Pr and Pc the row and column
 				 */
@@ -796,8 +797,8 @@ Raw (
 		cfmakeraw(&_raw_tty);
 		_raw_tty.c_lflag |= ISIG;       /* for ^Z */
 #else
-		_raw_tty.c_lflag &= ~(ICANON | ECHO);	/* noecho raw mode        */
-		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue    */
+		_raw_tty.c_lflag &= ~(ICANON | ECHO);	/* noecho raw mode */
+		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue */
 		_raw_tty.c_cc[VTIME] = '\0';	/* minimum time to wait for input */
 #endif
 #endif
@@ -1111,11 +1112,11 @@ ReadCh (void)
 	result = read (0, &ch, 1);
 #endif	/* EINTR */
 
-	return((result <= 0) ? EOF : ch & 0xFF);
+	return ((result <= 0) ? EOF : ch & 0xFF);
 
 #endif	/* READ_CHAR_HACK */
 #else
-	return (0);
+	return 0;
 #endif	/* INDEX_DAEMON */
 }
 

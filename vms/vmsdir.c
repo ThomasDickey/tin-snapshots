@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <unixio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "strings.h"
 #include <sys/stat.h>
 #include "ndir.h"
@@ -128,3 +129,57 @@ int sys_read (int fildes, char *buf, unsigned int nbyte)
 	 && (errno == EINTR));
   return (rtnval);
 }
+
+FILE *
+popen (
+	char *command,
+	char *mode)
+{
+	return ((FILE *) 0);
+}
+
+
+void
+pclose (FILE *pipe)
+{
+	return;
+}
+
+void tzset(void)
+{
+	return;
+}
+
+/* Get the name of current user */
+char *
+getlogin (void)
+{
+	char *p;
+
+	if ((p = getenv ("USER")) == NULL) {
+		return ( (char *) 0);
+	}
+
+	return (p);
+}
+
+/*
+ *  setenv (char *name, char *value, int notused)
+ */
+int setenv (char *name, char *value, int notused)
+{
+  int status = 0;
+  char command[1024];
+
+  if (name && value)
+  {
+    if (sprintf(command,"define/nolog/job %s \"%s\" ",name,value) > sizeof command)
+    {
+	fprintf (stderr, "FATAL buffer overflow in setenv");
+	tin_done (EXIT_FAILURE);
+    }
+    status = system(command);
+  }
+  return status;
+}
+

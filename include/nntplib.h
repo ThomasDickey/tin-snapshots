@@ -89,6 +89,7 @@
 #define	OK_AUTHSYS		280	/* Authorization system ok */
 #define	OK_AUTH			281	/* Authorization (user/pass) ok */
 #define	OK_BIN			282	/* binary data follows */
+#define	OK_LIST			282	/* list follows */
 #define	OK_SPLIST		283	/* spooldir list follows */
 #define	OK_SPSWITCH		284	/* Switching to a different spooldir */
 #define	OK_SPNOCHANGE		285	/* Still using same spooldir */

@@ -161,9 +161,8 @@ rfc1521_decode(
 
 				while (fgets(buf, (int) sizeof (buf), file)) {
 					if (boundary_cmp(buf, boundary)) {
-						if (boundary_cmp(buf, boundary) == 2) {
+						if (boundary_cmp(buf, boundary) == 2)
 							break;
-						}
 						fseek(f, hdr_pos, SEEK_SET);
 						while (fgets(buf, (int) sizeof (buf), file)) {
 							if (strncasecmp(buf, "Content-Type: ", 14) == 0 &&
@@ -479,12 +478,10 @@ rfc1557_encode(
 		i++;
 	}
 
-	if (mode == KSC) {
+	if (mode == KSC)
 		fputc(SI, f);
-	}
-	if (line[i] == '\n') {
+	if (line[i] == '\n')
 		fputc('\n', f);
-	}
 	return;
 }
 

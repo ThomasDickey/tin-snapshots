@@ -32,7 +32,7 @@ static int offset = 0;
  */
 static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
 #ifdef NNTP_ABLE
-	static t_bool wait_for_input (FILE *fd);
+	static t_bool wait_for_input (void/*FILE *fd*/);
 #endif /* NNTP_ABLE */
 
 
@@ -43,21 +43,18 @@ static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
  *         FALSE otherwise
  */
 static t_bool
-wait_for_input (
-	FILE *fd)
+wait_for_input (/*FILE *fd*/)
 {
 #	ifndef HAVE_SELECT
 #		ifdef VMS
 	int ch = ReadChNowait ();
 
 	if (ch == 'q' || ch == 'z' || ch == ESC) {
-		/* FIXME -> lang.c */
-		if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
+		if (prompt_yn (cLINES, txt_read_abort, FALSE) == 1)
 			return TRUE;
 	}
 	if (ch == 'Q') {
-		/* FIXME -> lang.c */
-		if (prompt_yn (cLINES, "Do you want to exit tin immediately ? (y/n): ", FALSE) == 1)
+		if (prompt_yn (cLINES, txt_read_exit, FALSE) == 1)
 			tin_done (EXIT_SUCCESS);
 	}
 #		endif /* VMS */
@@ -105,13 +102,13 @@ wait_for_input (
 					return FALSE;
 
 				if (ch == 'q' || ch == 'z' || ch == ESC) {
-					if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
+					if (prompt_yn (cLINES, txt_read_abort, FALSE) == 1)
 /* TODO if (cmd_line) this is all cacked when not in curses mode */
 						return TRUE;
 				}
 
 				if (ch == 'Q') {
-					if (prompt_yn (cLINES, "Do you want to exit tin immediately ? (y/n): ", FALSE) == 1)
+					if (prompt_yn (cLINES, txt_read_exit, FALSE) == 1)
 						tin_done (EXIT_SUCCESS);
 				}
 
@@ -121,9 +118,8 @@ wait_for_input (
 			/*
 			 * Our file has something for us to read
 			 */
-			if (FD_ISSET(fileno(NEED_NNTP_FD_HERE), &readfds)) {
+			if (FD_ISSET(fileno(NEED_NNTP_FD_HERE), &readfds))
 				return TRUE;
-			}
 #		endif /* 0 */
 		}
 
@@ -132,7 +128,10 @@ wait_for_input (
 #	ifdef M_AMIGA
 	return (WaitForChar(Input(), 0) == DOSTRUE) ? TRUE : FALSE;
 #	endif /* M_AMIGA */
-/* FIXME, insert !HAVE_SELECT code here */
+/*
+ * FIXME, insert !HAVE_SELECT code here - NB: we already have VMS specific code
+ *        at the top of this function
+ */
 	return FALSE;
 }
 #endif /* NNTP_ABLE */
@@ -168,8 +167,7 @@ tin_read (
 	partial_read = FALSE;
 
 #ifdef NNTP_ABLE
-/*	if (fp == FAKE_NNTP_FP)*/
-	if (wait_for_input(fp)) {			/* Check if okay to read */
+	if (wait_for_input(/*fp*/)) {			/* Check if okay to read */
 		info_message("Aborting read, please wait...");
 		drain_buffer(fp);
 		clear_message();
@@ -193,11 +191,13 @@ tin_read (
 	ptr = fgets (buffer, len, fp);
 #endif /* NNTP_ABLE */
 
-/* TODO develop this next line ?  */
+/* TODO develop this next line ? */
+#ifdef DEBUG
 	if (errno)
 		fprintf(stderr, "errno in tin_read %d\n", errno);
+#endif /* DEBUG */
 
-	if (ptr == 0)						/* End of data ? */
+	if (ptr == 0)	/* End of data ? */
 		return(NULL);
 
 	/*

@@ -55,11 +55,11 @@ static int quoteflag;
 /*
  * local prototypes
  */
-static int contains_nonprintables (char *w, t_bool isstruct_head);
 static int do_b_encode (char *w, char *b, int max_ewsize, t_bool isstruct_head);
 static int rfc1522_do_encode (char *what, char **where, t_bool break_long_line);
 static int sizeofnextword (char *w);
 static int which_encoding (char *w);
+static t_bool contains_nonprintables (char *w, t_bool isstruct_head);
 static unsigned hex2bin (int x);
 static void build_base64_rank_table (void);
 static void str2b64 (char *from, char *to);
@@ -313,7 +313,7 @@ do_b_encode(
 	int len8 = 0;				/* the number of trailing 8bit chars, which
 									   should be even(i.e. the first and second byte
 									   of wide_char should NOT be split into two
-									   encoded words) in order  to be compatible with
+									   encoded words) in order to be compatible with
 									   some CJK mail client */
 	char *t = tmp;
 
@@ -322,9 +322,8 @@ do_b_encode(
 
 	while (count-- > 0 && (!isbetween(*w, isstruct_head) || isleading_between) && *w) {
 		len8 += is_EIGHT_BIT(w) ? 1 : (-len8);
-		if (!isbetween(*w, isstruct_head)) {
+		if (!isbetween(*w, isstruct_head))
 			isleading_between = FALSE;
-		}
 		*(t++) = *(w++);
 	}
 
@@ -383,12 +382,12 @@ which_encoding(
 
 
 /* now only checks if there's any 8bit chars in a given "fragment" */
-static int
+static t_bool
 contains_nonprintables(
 	char *w,
 	t_bool isstruct_head)
 {
-	int nonprint = 0;
+	t_bool nonprint = FALSE;
 
 	/* first skip all leading whitespaces */
 	while (*w && isspace((unsigned char) *w))
@@ -397,15 +396,12 @@ contains_nonprintables(
 	/* then check the next word */
 	while (*w && !isbetween(*w, isstruct_head)) {
 		if (is_EIGHT_BIT(w))
-			nonprint++;
+			nonprint = TRUE;
 		if (!nonprint && *w == '=' && *(w + 1) == '?')
 			nonprint = TRUE;
 		w++;
 	}
-	if (nonprint) {
-		return 1;
-	}
-	return 0;
+	return nonprint;
 }
 
 
@@ -515,9 +511,8 @@ rfc1522_do_encode(
 	ew_taken_len = strlen(mm_charset) + 7;		/* the minimum encoded word length without any encoded text */
 
 	while (*what) {
-		if (break_long_line) {
+		if (break_long_line)
 			word_cnt++;
-		}
 /*
  * if a word with 8bit chars is broken in the middle, whatever follows
  * after the point where it's split should be encoded (i.e. even if
@@ -546,7 +541,7 @@ rfc1522_do_encode(
 #if 0
 					if (is_EIGHT_BIT(what) || (strchr (RFC2047_ESPECIALS, *what))) {
 #else
-					if (is_EIGHT_BIT(what) || !isalnum(*what)) {
+					if (is_EIGHT_BIT(what) || !isalnum((int)*what)) {
 #endif /* 0 */
 						sprintf(buf2, "=%2.2X", *EIGHT_BIT(what));
 						*t++ = buf2[0];
@@ -613,18 +608,16 @@ rfc1522_do_encode(
 					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
 					ewsize = mystrcat(&t, buf2);
 
-					if (word_cnt == 2) {
+					if (word_cnt == 2)
 						ewsize = t - buf;
-					}
 					what += do_b_encode(what, buf2, 75 - ew_taken_len, isstruct_head);
 					ewsize += mystrcat(&t, buf2);
 					*t++ = '?';
 					*t++ = '=';
 					*t++ = ' ';
 					ewsize += 3;
-					if (break_long_line) {
+					if (break_long_line)
 						word_cnt++;
-					}
 					rightafter_ew = FALSE;
 					any_quoting_done = TRUE;
 				}
@@ -646,7 +639,7 @@ rfc1522_do_encode(
 				*t++ = *what++;	  /* output trailing whitespace unencoded */
 			rightafter_ew = FALSE;
 		}
-	}									  /* end of pass 1 while  loop */
+	}									  /* end of pass 1 while loop */
 	*t = 0;
 	/* Pass 2: break long lines if there are MIME-sequences in the result */
 	c = buf;
@@ -676,9 +669,8 @@ rfc1522_do_encode(
 						*((*where)++) = '\n';
 						column = 0;
 					}
-					if (c > buf && !isspace((unsigned char) *(c - 1))) {
+					if (c > buf && !isspace((unsigned char) *(c - 1)))
 						word_cnt++;
-					}
 					*((*where)++) = *c++;
 					column++;
 				} else
@@ -854,7 +846,7 @@ rfc15211522_encode(
 	if (!strcasecmp(mime_encoding, txt_7bit)) {
 		encoding = '7';
 
-/* For EUC-KR, 7bit means conversion to ISO-2022-KR  specified in RFC 1557 */
+/* For EUC-KR, 7bit means conversion to ISO-2022-KR specified in RFC 1557 */
 
 		if (!strcasecmp(mm_charset, "euc-kr"))
 			body_encode = rfc1557_encode;
