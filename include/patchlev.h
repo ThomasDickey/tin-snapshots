@@ -42,13 +42,16 @@
  * 	Urs Janﬂen <urs@akk.uni-karlsruhe.de>
  *		bugfixes & customasations
  *
+ *	Juergen Bernau <pas@freitag.muc.de>
+ *		minor bugfix
+ *
  * 	Stefan Scholl <stesch@sks.inka.de>
  *		minor bugfix
  *
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960515"
+#define PATCHLEVEL	"MC.960517"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

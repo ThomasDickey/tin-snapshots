@@ -1,3 +1,19 @@
+o  can't 'x' (repost) to more than one group - comma is not parsed as
+   separator
+
+o  add s)upersede option at the 'D' article delete mini-menu
+
+o  at toplevel 'Q' ask you if you really want to quit, not usefull
+
+o  bug or feature?:
+   inverse_okay=ON & draw_arrow=OFF & strip_blanks=OFF
+   -> highlighted bar does not use full screen width
+
+o  rewrite NGLIMIT handling (post.c)
+
+o  uniq newsgroups before posting
+   (Newsgroups: alt.test,alt.test -> Newsgroups: alt.test)
+
 o  tin sometimes freezes while saving a thread
 
 o  full_page_scroll=OFF seems not to work
@@ -55,6 +71,8 @@ o  article save with Archive-name: doesn't not work correctly
 
 o  shows up cross-postings multiple times even if read once before getting
    a resync/reread active/newsrc-file
+
+o  add feature Cc:
 
 o  add feature goto_msg-id, URL 'G'
 

@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960517 (Fri May 17 01:02:51 MET DST 1996)
 ----------------------------------------------------
-  11020 ./CHANGES
-   6431 ./TODO
+  11482 ./CHANGES
+   6926 ./TODO
    4420 ./Makefile
   16972 ./INSTALL
     132 ./MANIFEST
@@ -11,13 +11,13 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
    9622 ./include/config.h
-  32032 ./include/extern.h
+  32240 ./include/extern.h
     565 ./include/gst.h
    9741 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
-   1631 ./include/patchlev.h
+   1690 ./include/patchlev.h
   27291 ./include/proto.h
      89 ./include/rfc1521.h
     292 ./include/rfc1522.h
@@ -33,7 +33,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
   21879 ./src/attrib.c
    8262 ./src/charset.c
    1448 ./src/color.c
-  40199 ./src/config.c
+  40309 ./src/config.c
   19972 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
@@ -45,7 +45,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
    9628 ./src/help.c
   11855 ./src/inews.c
   27948 ./src/init.c
-  40191 ./src/lang.c
+  40633 ./src/lang.c
    2771 ./src/list.c
   12119 ./src/mail.c
   16794 ./src/main.c
@@ -60,7 +60,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
   34437 ./src/page.c
   24108 ./src/parsdate.y
    7195 ./src/pgp.c
-  62055 ./src/post.c
+  62752 ./src/post.c
    4342 ./src/prompt.c
    4813 ./src/rfc1521.c
   11669 ./src/rfc1522.c
@@ -78,4 +78,4 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960515 (Wed May 15 02:09:52 MET DST 1996)
    7143 ./src/xref.c
    5549 ./src/vms.c
   21739 ./src/Makefile
-1179242 total
+1181715 total

@@ -1,3 +1,17 @@
+--950824BETA  PLMC.960517 --
+
+036) Juergen Bernau <pas@freitag.muc.de>
+     ADD. if (! draw_arrow_mark && strip_blanks) strip_blanks = FALSE;
+     FIX. config.c
+
+--950824BETA  PLMC.960516 --
+
+035) Chris Blum <chris@phil.uni-sb.de>
+     ADD. print waring is crossposting contains no Followup-To: line
+     ADD. print waring if Followup-To: line contains more than 1 newsgroup
+     BUG. case-sensitive headerchecking removed
+     FIX. several supplied patches
+   
 --950824BETA  PLMC.960515 --
 
 034) Chris Blum <chris@phil.uni-sb.de>
