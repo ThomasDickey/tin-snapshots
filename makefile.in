@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960618
+PVER		= 960619
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -423,5 +423,8 @@ print:
 # This isn't the final form; it's just used for developing the autoconf script
 distclean:
 	cd src && make clobber
-	rm -f config.* makefile */Makefile */makefile include/autoconf.h
-#	rm -f configure
+	rm -f config.* makefile */Makefile include/autoconf.h
+	make configure
+
+configure: configure.in aclocal.m4
+	autoconf

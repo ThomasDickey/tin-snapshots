@@ -1,22 +1,22 @@
 Bugs
 ----
-o  mailing an article with editig the subject in the editor shows you the
+o  mailing an article with editing the subject in the editor shows you the
    old subject after leaving the editor :-( , but uses the new one :)
 
-o  Followup-To: line is not examined wether the mentioned group(s) are valid
+o  Followup-To: line is not examined weather the mentioned group(s) are valid
    on this server (btw. with nntp_only & tin -n this feature is useless
    cause it may lead to wrong results (on the other hand, posting in a
-   newsgroup which one insn't subscribed to is not very usefull))
+   newsgroup which one isn't subscribed to is not very useful))
 
 o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
-   is examined wether it contains several groups...
+   is examined weather it contains several groups...
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
 o  if marking read article with 'z' as will return and than reread it, the
    '-' article_will_return flag is not removed.
    when leaving that group, the unread_articles counter still contains that
-   article, but when reentering it is recogniced as read and disapers (as it
+   article, but when reentering it is recognized as read and disapers (as it
    should have before)
 
 o  The 'M' moderation flag (group selection level) is not showing up
@@ -47,17 +47,17 @@ New features
 o  add
        --enable-mime-base64           (default off)
        --enable-log-user              (default off)
-       --disabale-piping              (default on)
+       --disable-piping              (default on)
        --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
 
 o  move architecture depending files in subdirectorys, clean up architecture
-   independend files, rename several defines, remove useless doubled defines
+   independent files, rename several defines, remove useless doubled defines
    like NO_PIPING and DONT_HAVE_PIPING
 
-o  splitt tin.h for better dependencies in make
+o  split tin.h for better dependencies in make
 
 o  join Makefile and makefile
 
@@ -105,8 +105,8 @@ o  if newsgroups lines has groups in it which are not present in the users
    active file then ask user if he wants to strip these groups from the
    newsgroups-line (N/y)
 
-o  Make the options menu multi-page, add more dynamically
-   configurable variables
+o  Make the options menu multi-page more dynamically add more
+   configurable variables (use color, ...)
 
 o  bring up a warning on a long newsgroup/followup line (>=5 groups) and
    force the user to confirm every single group he wants to post in.
@@ -139,7 +139,7 @@ Not yet classified
 ------------------
 o  what is with NEW_HASH_METHOD in misc.c?
 
-o  kill-file may get messed up if  using multiple news servers with feeds
+o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and
    losing all references to the moved groups)
 
