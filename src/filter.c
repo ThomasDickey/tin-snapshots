@@ -218,7 +218,7 @@ read_filter_file (
 		}
 		switch(tolower((unsigned char)buf[0])) {
 		case 'c':
-			if (match_integer (buf, "case=", &icase, 1)) {
+			if (match_integer (buf+1, "ase=", &icase, 1)) {
 				if (arr_ptr && !expired_time) {
 					arr_ptr[i].icase = icase;
 				}
@@ -226,22 +226,15 @@ read_filter_file (
 			}
 			break;
 		case 'f':
-			if (match_string (buf, "from=", from, sizeof (from))) {
+			if (match_string (buf+1, "rom=", from, sizeof (from))) {
 				if (arr_ptr && !expired_time) {
-					if (arr_ptr[i].icase) {
-						str_lwr (from, from);
-					}
 					arr_ptr[i].from = my_strdup (from);
 				}
 				break;
 			}
 			break;
 		case 'g':
-			if (match_string (buf, "group=", group, sizeof (group))) {
-if (debug) {
-	my_printf ("group=[%s]\n", group);
-	my_flush ();
-}
+			if (match_string (buf+1, "roup=", group, sizeof (group))) {
 				psGrp = psGrpFind (group);
 				if (psGrp != (struct t_group *) 0) {	/* switch to group filter */
 					global = FALSE;
@@ -266,7 +259,7 @@ if (debug) {
 			}
 			break;
 		case 'l':
-			if (match_string (buf, "lines=", lines, sizeof (lines))) {
+			if (match_string (buf+1, "ines=", lines, sizeof (lines))) {
 				if (arr_ptr && !expired_time) {
 					if (lines[0] == '<') {
 						arr_ptr[i].lines_cmp = FILTER_LINES_LT;
@@ -283,7 +276,7 @@ if (debug) {
 			}
 			break;
 		case 'm':
-			if (match_string (buf, "msgid=", msgid, sizeof (msgid))) {
+			if (match_string (buf+1, "sgid=", msgid, sizeof (msgid))) {
 				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
 				}
@@ -291,7 +284,7 @@ if (debug) {
 			}
 			break;
 		case 's':
-			if (match_string (buf, "scope=", scope, sizeof (scope))) {
+			if (match_string (buf+1, "cope=", scope, sizeof (scope))) {
 if (debug) {
 	my_printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
 	my_flush ();
@@ -319,11 +312,8 @@ if (debug) {
 				psGrp = (struct t_group *) 0;	/* fudge for out of order rules */
 				break;
 			}
-			if (match_string (buf, "subj=", subj, sizeof (subj))) {
+			if (match_string (buf+1, "ubj=", subj, sizeof (subj))) {
 				if (arr_ptr && !expired_time) {
-					if (arr_ptr[i].icase) {
-						str_lwr (subj, subj);
-					}
 					arr_ptr[i].subj = my_strdup (subj);
 				}
 if (debug) {
@@ -339,7 +329,7 @@ if (debug) {
 			}
 			break;
 		case 't':
-			if (match_integer (buf, "type=", &type, 1)) {
+			if (match_integer (buf+1, "ype=", &type, 1)) {
 if (debug) {
 	my_printf ("type=[%d][%s]\n", type, (type == 0 ? "KILL" : "SELECT"));
 	my_flush ();
@@ -371,7 +361,7 @@ if (debug) {
 				}
 				break;
 			}
-	 		if (match_long (buf, "time=", &secs)) {
+	 		if (match_long (buf+1, "ime=", &secs)) {
 				if (arr_ptr && !expired_time) {
 					arr_ptr[i].time = secs;
 					if (secs && current_secs > secs) {
@@ -388,22 +378,19 @@ if (debug) {
 			}
 			break;
 		case 'x':
-			if (match_string (buf, "xref=", xref, sizeof (xref))) {
+			if (match_string (buf+1, "ref=", xref, sizeof (xref))) {
 				if (arr_ptr && ! expired_time) {
-					if (arr_ptr[i].icase) {
-						str_lwr (xref, xref);
-					}
 					arr_ptr[i].xref = my_strdup (xref);
 				}
 				break;
 			}
-			if (match_integer (buf, "xref_max=", &xref_max, 1000)) {
+			if (match_integer (buf+1, "ref_max=", &xref_max, 1000)) {
 				if (arr_ptr && ! expired_time) {
 					arr_ptr[i].xref_max = xref_max;
 				}
 				break;
 			}
-			if (match_string (buf, "xref_score=", xref_score, sizeof(xref_score))) {
+			if (match_string (buf+1, "ref_score=", xref_score, sizeof(xref_score))) {
 				if (arr_ptr && !expired_time) {
 					if (xref_score_cnt < 10) {
 						if (isdigit(xref_score[0])) {
@@ -1218,7 +1205,7 @@ iAddFilterRule (
 	}
 
 	if (psRule->text[0]) {
-		sprintf (acBuf, "*%s*", psRule->text);
+		sprintf (acBuf, "*%s*", psRule->text);		/* TODO - why the '*'s ? */
 		if (psRule->check_string) {
 			strcpy (acBuf, pcChkRegexStr (acBuf));
 		}
@@ -1227,7 +1214,6 @@ iAddFilterRule (
 			case FILTER_SUBJ_CASE_SENSITIVE:
 				psPtr[*plNum].subj = my_strdup (acBuf);
 				if (psRule->counter == FILTER_SUBJ_CASE_IGNORE) {
-					str_lwr (psPtr[*plNum].subj, psPtr[*plNum].subj);
 					psPtr[*plNum].icase = TRUE;
 				}
 				break;
@@ -1235,7 +1221,6 @@ iAddFilterRule (
 			case FILTER_FROM_CASE_SENSITIVE:
 				psPtr[*plNum].from = my_strdup (acBuf);
 				if (psRule->counter == FILTER_FROM_CASE_IGNORE) {
-					str_lwr (psPtr[*plNum].from, psPtr[*plNum].from);
 					psPtr[*plNum].icase = TRUE;
 				}
 				break;
@@ -1331,7 +1316,6 @@ filter_articles (
 	struct t_group *group)
 {
 	char buf[LEN];
-	char acStr[LEN], *pcPtr;
 	int filtered = FALSE;
 	int num, inscope;
 	int global_filter;
@@ -1391,17 +1375,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-/*my_printf ("1. subj=[%s] filter=[%s]\n", arts[i].subject, ptr[j].subj);
-*/
-					if (ptr[j].icase) {
-						str_lwr (arts[i].subject, acStr);
-						pcPtr = acStr;
-					} else {
-						pcPtr = arts[i].subject;
-					}
-/*my_printf ("2. case=[%d] subj=[%s] filter=[%s]\n", ptr[j].icase, pcPtr, ptr[j].subj);
-*/
-					if (STR_MATCH (pcPtr, ptr[j].subj)) {
+					if (REGEX_MATCH (arts[i].subject, ptr[j].subj, ptr[j].icase)) {
 						SET_FILTER(group, i, j);
 					}
 				}
@@ -1414,15 +1388,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					} else {
 						strcpy (buf, arts[i].from);
 					}
-/* 	my_printf ("from=[%s] filter=[%s]\n", buf, ptr[j].from);
-*/
-					if (ptr[j].icase) {
-						str_lwr (buf, acStr);
-						pcPtr = acStr;
-					} else {
-						pcPtr = buf;
-					}
-					if (STR_MATCH (pcPtr, ptr[j].from)) {
+					if (REGEX_MATCH (buf, ptr[j].from, ptr[j].icase)) {
 						SET_FILTER(group, i, j);
 					}
 				}
@@ -1430,16 +1396,18 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				/*
 				 * Filter on Message-ID: line
 				 * Apply to Message-ID: & References: lines
+				 * Case is important here
 				 */
 				if (ptr[j].msgid != (char *) 0) {
 
 					struct t_article *art = &arts[i];
 					char *refs;
-
-/*my_printf ("msgid=[%s] filter=[%s]\n", MSGID(art), ptr[j].msgid); */
-
-					if (STR_MATCH (REFS(art, refs), ptr[j].msgid) ||
-					    STR_MATCH (MSGID(art), ptr[j].msgid)) {
+/* TODO This is now rubbish - we can rewrite filtering on MsgID & Refs
+ * TODO to traverse the references tree in *1* pass for the whole group
+ * TODO Simply find the root art and SET_FILTER(every child)
+ */
+					if (REGEX_MATCH (REFS(art, refs), ptr[j].msgid, FALSE) ||
+					    REGEX_MATCH (MSGID(art), ptr[j].msgid, FALSE)) {
 						SET_FILTER(group, i, j);
 					}
 					
@@ -1455,8 +1423,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 							if (arts[i].lines == ptr[j].lines_num) {
 /*
 sprintf (msg, "FILTERED Lines arts[%d] == [%d]", arts[i].lines, ptr[j].lines_num);
-wait_message (msg);
-sleep (1);
+wait_message (msg); sleep (1);
 */
 								SET_FILTER(group, i, j);
 							}
@@ -1465,8 +1432,7 @@ sleep (1);
 							if (arts[i].lines < ptr[j].lines_num) {
 /*
 sprintf (msg, "FILTERED Lines arts[%d] < [%d]", arts[i].lines, ptr[j].lines_num);
-wait_message (msg);
-sleep (1);
+wait_message (msg); sleep (1);
 */
 								SET_FILTER(group, i, j);
 							}
@@ -1475,8 +1441,7 @@ sleep (1);
 							if (arts[i].lines > ptr[j].lines_num) {
 /*
 sprintf (msg, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_num);
-wait_message (msg);
-sleep (1);
+wait_message (msg); sleep (1);
 */
 								SET_FILTER(group, i, j);
 							}
@@ -1513,7 +1478,7 @@ sleep (1);
 					strncpy(buf, s, e-s);
 					buf[e-s]='\0';
 					for(k=0;k<ptr[j].xref_score_cnt;k++) {
-					  if(STR_MATCH(buf, ptr[j].xref_score_strings[k])) {
+					  if(GROUP_MATCH(buf, ptr[j].xref_score_strings[k], TRUE)) {
 					    group_count+=ptr[j].xref_scores[k];
 					    break;
 					  }
@@ -1525,16 +1490,10 @@ sleep (1);
 				      if(ptr[j].xref != (char*)0) {
 					strncpy(buf, s, e-s);
 					buf[e-s]='\0';
-					/* don't kill when we are
-                                           actually in that group */
+					/* don't kill when we are actually in that group */
+					/* Group names shouldn't be case sensitive in any case. Whatever */
 					if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf)!=0) {
-					  if (ptr[j].icase) {
-					    str_lwr (buf, acStr);
-					    pcPtr = acStr;
-					  } else {
-					    pcPtr = buf;
-					  }
-					  if (STR_MATCH (pcPtr, ptr[j].xref)) {
+					  if (REGEX_MATCH (buf, ptr[j].xref, ptr[j].icase)) {
 					    group_count=-1;
 					    break;
 					  }
@@ -1603,6 +1562,7 @@ auto_select_articles (
 }
 
 
+/* TODO can we use match_group_list() for better defining the scope= rule ? */
 static int
 set_filter_scope (
 	struct t_group *group)
@@ -1617,7 +1577,7 @@ set_filter_scope (
 	for (i = 0; i < num; i++) {
 		ptr[i].inscope = TRUE;
 		if (ptr[i].scope != (char *) 0) {
-			if (!wildmat (group->name, ptr[i].scope)) {
+			if (!GROUP_MATCH (group->name, ptr[i].scope, TRUE)) {
 				ptr[i].inscope = FALSE;
 				inscope--;
 			}

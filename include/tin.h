@@ -742,10 +742,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define		INDEX_TOP	2
 
-#ifdef NO_WILDMAT
-#	define	STR_MATCH(s1,s2)	(strstr (s1, s2) != 0)
+#define	GROUP_MATCH(s1, pat, case)		(wildmat (s1, pat, case))
+
+#ifdef HAVE_POSIX_REGEX
+#	define	REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
 #else
-#	define	STR_MATCH(s1,pat)	(wildmat (s1, pat))
+#	define	REGEX_MATCH(s1, pat, case)	(wildmat (s1, pat, case))
 #endif
 
 #define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
@@ -1501,7 +1503,7 @@ typedef struct t_notify *notify_p;
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR			"T:"
 #	define	KEY_PREFIX		0x9b
-extern void joinpath (char *result, char *dir, char *file);
+extern void joinpath (char *result, const char *dir, const char *file);
 #endif
 #ifdef VMS
 #	define	NEWSGROUPS_FILE 	"newsgroups"

@@ -29,6 +29,8 @@
 
 #include <proto/exec.h>
 
+/* #include <clib/netlib_protos.h> */
+
 #ifndef EOF
 #define EOF (-1)
 #endif

@@ -147,6 +147,7 @@ int real_umask;
 int reread_active_file_secs;		/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int strip_bogus=BOGUS_KEEP;
+int wildcard = FALSE;			/* Use wildmat, not regex */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
 int tin_gid;
@@ -255,6 +256,7 @@ t_bool use_keypad;				/* enables/disables scroll keys on supported terminals */
 t_bool use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
 t_bool use_mouse;					/* enables/disables mouse support under xterm */
 t_bool verbose = FALSE;			/* update index files only mode */
+t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
 t_bool xuser_supported = FALSE;
@@ -521,6 +523,7 @@ void init_selfinfo (void)
 	use_keypad = FALSE;
 	use_mailreader_i = FALSE;
 	use_mouse = FALSE; /* default changed to FALSE (eb) */
+	wildcard_func = wildmat;
 #ifdef HAVE_METAMAIL
 #	ifdef M_AMIGA
 		/* for all those AmigaElm users ... ;-) */

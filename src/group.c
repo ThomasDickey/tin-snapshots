@@ -1149,20 +1149,17 @@ group_list_thread:
  						break;
  					}
 					sprintf (pat, "*%s*", default_select_pattern);
- 				} else if (STRCMPEQ(buf, "*")) { /* all */
+ 				} else if (STRCMPEQ(buf, "*")) {	/* all */
  					strcpy (pat, buf);
  					strcpy (default_select_pattern, pat);
  				} else {
- 					str_lwr (buf, buf);
  					strcpy (default_select_pattern, buf);
  					sprintf (pat, "*%s*", default_select_pattern);
  				}
 
  				flag = 0;
  				for (n=0; n < top_base; n++) {
- 					char sub[HEADER_LEN];
- 					str_lwr (arts[base[n]].subject, sub);
- 					if (!wildmat (sub, pat)) {
+ 					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE)) {
  						continue;
  					}
  					for (i = (int) base[n] ; i != -1 ; i = arts[i].thread) {

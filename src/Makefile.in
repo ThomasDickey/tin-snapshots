@@ -107,6 +107,7 @@ CFILES	= \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c \
 	$(SRCDIR)/refs.c \
+	$(SRCDIR)/regex.c \
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
@@ -167,6 +168,7 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/post.o \
 	$(OBJDIR)/prompt.o \
 	$(OBJDIR)/refs.o \
+	$(OBJDIR)/regex.o \
 	$(OBJDIR)/rfc1521.o \
 	$(OBJDIR)/rfc1522.o \
 	$(OBJDIR)/save.o \
@@ -375,6 +377,7 @@ $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_DEP) \
 $(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/refs.o:		$(SRCDIR)/refs.c $(TIN_DEP)
+$(OBJDIR)/regex.o:		$(SRCDIR)/regex.c $(TIN_DEP)
 $(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(TIN_DEP)
 $(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(TIN_DEP)
 $(OBJDIR)/save.o:		$(SRCDIR)/save.c $(TIN_DEP) \

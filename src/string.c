@@ -187,8 +187,8 @@ void modifiedstrncpy(
 
 void
 str_lwr (
-	const char *src,
-	char *dst)
+	char *dst,
+	const char *src)
 {
 	while (*src) {
 		*dst++ = (char)tolower((unsigned char)*src);

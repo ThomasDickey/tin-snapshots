@@ -555,6 +555,7 @@ select_done:
 				break;
 
 			case iKeySelectSubscribePat:	/* subscribe to groups matching pattern */
+/* TODO this should be combined with UnsubPat - they are almost identical */
 				/* If no groups in active[] then break otherwise loop thru looking
 				   for matches. If found and group is not subscribed add it to end
 				   of my_group[]. */
@@ -564,7 +565,8 @@ select_done:
 				if (prompt_string (txt_subscribe_pattern, buf) && buf[0]) {
 					wait_message (txt_subscribing);
 					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
-						if (wildmat (active[my_group[i]].name, buf)) {
+/* TODO use match_group_list() here ? */
+						if (GROUP_MATCH (active[my_group[i]].name, buf, TRUE)) {
 			   		 		if (!active[my_group[i]].subscribed) {
 								spin_cursor ();
 								subscribe (&active[my_group[i]], SUBSCRIBED);
@@ -574,7 +576,7 @@ select_done:
 					}
 					if (num_active > group_top) {
 						for (i=0 ; i < num_active ; i++) {
-							if (wildmat (active[i].name, buf)) {
+							if (GROUP_MATCH (active[i].name, buf, TRUE)) {
 				   		 		if (!active[i].subscribed) {
 									spin_cursor ();
 									subscribe (&active[i], SUBSCRIBED);
@@ -628,7 +630,7 @@ select_done:
 				if (prompt_string (txt_unsubscribe_pattern, buf) && buf[0]) {
 					wait_message (txt_unsubscribing);
 					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
-						if (wildmat (active[my_group[i]].name, buf)) {
+						if (GROUP_MATCH (active[my_group[i]].name, buf, TRUE)) {
 			   		 		if (active[my_group[i]].subscribed) {
 								spin_cursor ();
 								subscribe (&active[my_group[i]], UNSUBSCRIBED);
@@ -638,7 +640,7 @@ select_done:
 					}
 					if (num_active > group_top) {
 						for (i=0 ; i < num_active ; i++) {
-							if (wildmat (active[i].name, buf)) {
+							if (GROUP_MATCH (active[i].name, buf, TRUE)) {
 				   		 		if (active[i].subscribed) {
 									spin_cursor ();
 									subscribe (&active[i], UNSUBSCRIBED);

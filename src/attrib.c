@@ -397,7 +397,8 @@ if (debug) {
 		} else {
 			for (i = 0; i < num_active; i++) {
 				psGrp = &active[i];
-				if (wildmat (psGrp->name, scope)) {
+/* TODO can we use match_group_list() here for better effect ? */
+				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
 if (debug) {
 	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
 }
@@ -435,7 +436,8 @@ if (debug) {
 		} else {
 			for (i = 0; i < num_active; i++) {
 				psGrp = &active[i];
-				if (wildmat (psGrp->name, scope)) {
+/* TODO use match_group_list() here too ? */
+				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
 if (debug) {
 	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
 }

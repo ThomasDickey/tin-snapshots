@@ -16,7 +16,7 @@ OBJDIR   = /obj
 # To use AS225 rather than AmiTCP, also include "def AS225".
 
 # /*vb*/
-NNTPDEF  = def NNTP_ABLE def def DOMAIN_NAME="$$DOMAIN" \
+NNTPDEF  = def NNTP_ABLE def DOMAIN_NAME="UULIB:news/whoami" \
  def UNISTD_H def CLIB_NETLIB_PROTOS_H
 
 # Next line enables tind to be created
@@ -121,6 +121,7 @@ OBJECTS = \
         $(OBJDIR)/amigatcp.o \
         $(OBJDIR)/art.o \
         $(OBJDIR)/attrib.o \
+        $(OBJDIR)/auth.o \
         $(OBJDIR)/charset.o \
         $(OBJDIR)/color.o \
         $(OBJDIR)/config.o \
@@ -226,6 +227,7 @@ $(OBJDIR)/amiga.o:              $(AMIDIR)/amiga.c $(GSTFILE)
 $(OBJDIR)/amigatcp.o:           $(AMIDIR)/amigatcp.c $(GSTFILE)
 $(OBJDIR)/art.o:                $(SRCDIR)/art.c $(GSTFILE)
 $(OBJDIR)/attrib.o:             $(SRCDIR)/attrib.c $(GSTFILE)
+$(OBJDIR)/auth.o:               $(SRCDIR)/auth.c $(GSTFILE)
 $(OBJDIR)/charset.o:            $(SRCDIR)/charset.c $(GSTFILE)
 $(OBJDIR)/color.o:              $(SRCDIR)/color.c $(GSTFILE)
 $(OBJDIR)/config.o:             $(SRCDIR)/config.c $(GSTFILE) $(INCDIR)/tincfg.h

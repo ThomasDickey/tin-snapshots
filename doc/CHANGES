@@ -1,3 +1,15 @@
+--unoff BETA release 970612 --
+
+388) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor code clean-up, mainly amiga stuff
+     FIX. several supplied patches
+
+387) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. started support for regular expressions
+          [define HAVE_POSIX_REGEX and you might need libregex]
+     ADD. make str_lwr() syntax more ANSI-like. Other minor changes.
+     FIX. several supplied patches
+
 --unoff BETA release 970527 --
 
 386) Thomas E. Dickey <dickey@clark.net>

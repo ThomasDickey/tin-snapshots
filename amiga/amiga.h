@@ -18,6 +18,7 @@
 #define AMIGA_H
 
 #include <dos/dos.h>
+#include <proto/exec.h>
 
 /* SAS-C and Aztec don't take the mode for mkdir() */
 extern int mkdir(char *path);

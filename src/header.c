@@ -23,7 +23,7 @@ get_host_name (
 void)
 {
 	char *ptr;
-	static char hostname[MAXHOSTNAMELEN];
+	static char hostname[MAXHOSTNAMELEN+1]; /* need space for '\0' */
 
 	hostname[0]='\0';
 	
@@ -74,23 +74,27 @@ get_domain_name (
 	char buff[MAXHOSTNAMELEN];
 	FILE *fp;
 
-	domain[0]='\0';
-
 #	if defined(M_AMIGA)
 /* Damn compiler bugs...
  * Without this hack, SASC 6.55 produces a TST.B d16(pc),
  * which is illegal on a 68000
  */
 static const char *domain_name_hack = DOMAIN_NAME;
-#	undef	DOMAIN_NAME
-#	define DOMAIN_NAME domain_name_hack
+#		undef   DOMAIN_NAME
+#		define DOMAIN_NAME domain_name_hack
 #	endif /* M_AMIGA */
+
+	domain[0]='\0';
 
 	if (strlen(DOMAIN_NAME)) {
 		strcpy(domain, DOMAIN_NAME);
 	}
 
+#	if defined(M_AMIGA)
+	if (strchr(domain, ':')) { /* absolute AmigaOS paths contain one, RFC-hostnames don't */ 
+#else	
 	if (domain[0] == '/' && domain[1]) {
+#	endif /* M_AMIGA */
 		/* If 1st letter is '/' read domianname from specified file */
 		if ((fp = fopen (domain, "r")) != (FILE *) 0) {
 			while (fgets (buff, sizeof (buff), fp) != (char *) 0) {
@@ -283,7 +287,10 @@ get_from_name (
 		return;
 	}
 
-	sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), domain_name);
+	if (strchr(get_full_name(), '.'))
+	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), domain_name);		
+	else
+	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), domain_name);
 
 	if (debug == 2) {
 		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
@@ -316,7 +323,11 @@ build_sender (
 		strcat(sender, "<");
 		strcat(sender, ptr);
 		strcat(sender, "@");
+#ifdef HAVE_GETHOSTBYNAME
 		if ((ptr = get_fqdn(get_host_name()))) {
+#else
+		if (ptr = get_host_name()) { 
+#endif /* HAVE_GETHOSTBYNAME */
 			strcat(sender, ptr);
 			strcat(sender, ">");
 		} else { 
