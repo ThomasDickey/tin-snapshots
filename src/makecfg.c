@@ -5,7 +5,7 @@
  *  Created   : 1997-08-23
  *  Updated   :
  *  Notes     : #defines and structs for config.c
- *  Copyright : (c) Copyright 1997-98 by Thomas E. Dickey
+ *  Copyright : (c) Copyright 1997-99 by Thomas E. Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

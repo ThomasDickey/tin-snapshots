@@ -15,7 +15,7 @@
 #ifndef TNNTP_H
 #define TNNTP_H 1
 
-#if defined (VMS) && defined (SOCKETSHR_TCP)
+#if defined(VMS) && defined(SOCKETSHR_TCP)
 #	ifdef __GNUC__
 #		define __SOCKET_TYPEDEFS
 #	endif /* __GNUC__ */
@@ -118,16 +118,16 @@
 
 #ifndef MAXHOSTNAMELEN
 #	define MAXHOSTNAMELEN 255
-#endif
+#endif /* !MAXHOSTNAMELEN */
 
 #ifndef SOCKS
-#ifdef DECL_CONNECT
+#	ifdef DECL_CONNECT
 	extern int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
-#endif /* DECL_CONNECT */
-#endif
+#	endif /* DECL_CONNECT */
+#endif /* !SOCKS */
 
 #ifdef DECL_INET_NTOA
 	extern char *inet_ntoa (struct in_addr);
-#endif
+#endif /* DECL_INET_NTOA */
 
 #endif /* TNNTP_H */

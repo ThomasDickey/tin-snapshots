@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *	             You may  freely  copy or  redistribute this  software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-
@@ -59,6 +59,7 @@
 /*
  * Local prototypes
  */
+static int save_comp (t_comptype *p1, t_comptype *p2);
 static t_bool any_saved_files (void);
 static t_bool create_sub_dir (int i);
 #ifndef INDEX_DAEMON
@@ -67,7 +68,11 @@ static t_bool create_sub_dir (int i);
 	static const char *get_last_savefile (void);
 	static void delete_processed_files (t_bool auto_delete);
 	static void post_process_sh (t_bool auto_delete);
-	static void post_process_uud (int pp, t_bool auto_delete);
+	static void post_process_uud (
+#	ifndef HAVE_LIBUU
+		int pp,
+#	endif /* !HAVE_LIBUU */
+	t_bool auto_delete);
 #	ifndef HAVE_LIBUU
 		static char *get_archive_file (char *dir);
 		static void uudecode_file (int pp, char *file_out_dir, char *file_out);
@@ -293,11 +298,10 @@ save_art_to_file (
 	const char *filename)
 {
 #ifndef INDEX_DAEMON
-
+	FILE *fp;
 	char *file;
 	char mode[3];
 	char save_art_info[LEN];
-	FILE *fp;
 	int ch;
 	int is_mailbox = 0;
 	int i = 0;
@@ -350,7 +354,7 @@ save_art_to_file (
 
 	{
 		/*
-		 * place "^From from  date" line as mailbox-seperator
+		 * place "^From from date" line as mailbox-seperator
 		 * on top of each article
 		 */
 		char from[HEADER_LEN];
@@ -759,7 +763,8 @@ add_to_save_list (
  *  Print save array of files to be saved
  */
 void
-sort_save_list (void)
+sort_save_list (
+	void)
 {
 	qsort ((char *) save, (size_t)num_save, sizeof (struct t_save), save_comp);
 #ifdef DEBUG
@@ -772,7 +777,7 @@ sort_save_list (void)
  *  string comparison routine for the qsort()
  *  ie. qsort(array, 5, 32, save_comp);
  */
-int
+static int
 save_comp (
 	t_comptype *p1,
 	t_comptype *p2)
@@ -860,12 +865,13 @@ save_filename (
 
 	return filename;
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
 static char *
-get_first_savefile (void)
+get_first_savefile (
+	void)
 {
 	static char empty[] = "";
 	char *file;
@@ -927,7 +933,8 @@ get_first_savefile (void)
 
 #ifndef INDEX_DAEMON
 static const char *
-get_last_savefile (void)
+get_last_savefile (
+	void)
 {
 	char *file;
 	int i;
@@ -999,19 +1006,39 @@ post_process_files (
 				post_process_sh (auto_delete);
 				break;
 			case iKeyPProcUUDecode:
-				post_process_uud (POST_PROC_UUDECODE, auto_delete);
+				post_process_uud (
+#	ifndef HAVE_LIBUU
+				POST_PROC_UUDECODE,
+#	endif /* !HAVE_LIBUU */
+				auto_delete);
 				break;
 			case iKeyPProcListZoo:
-				post_process_uud (POST_PROC_UUD_LST_ZOO, auto_delete);
+				post_process_uud (
+#	ifndef HAVE_LIBUU
+				POST_PROC_UUD_LST_ZOO,
+#	endif /* !HAVE_LIBUU */
+				auto_delete);
 				break;
 			case iKeyPProcExtractZoo:
-				post_process_uud (POST_PROC_UUD_EXT_ZOO, auto_delete);
+				post_process_uud (
+#	ifndef HAVE_LIBUU
+				POST_PROC_UUD_EXT_ZOO,
+#	endif /* !HAVE_LIBUU */
+				auto_delete);
 				break;
 			case iKeyPProcListZip:
-				post_process_uud (POST_PROC_UUD_LST_ZIP, auto_delete);
+				post_process_uud (
+#	ifndef HAVE_LIBUU
+				POST_PROC_UUD_LST_ZIP,
+#	endif /* !HAVE_LIBUU */
+				auto_delete);
 				break;
 			case iKeyPProcExtractZip:
-				post_process_uud (POST_PROC_UUD_EXT_ZIP, auto_delete);
+				post_process_uud (
+#	ifndef HAVE_LIBUU
+				POST_PROC_UUD_EXT_ZIP,
+#	endif /* !HAVE_LIBUU */
+				auto_delete);
 				break;
 			default:
 				break;
@@ -1028,7 +1055,9 @@ post_process_files (
 #ifndef INDEX_DAEMON
 static void
 post_process_uud (
+#  ifndef HAVE_LIBUU
 	int pp,
+#	endif /* !HAVE_LIBUU */
 	t_bool auto_delete)
 {
 	FILE *fp_in;
@@ -1463,7 +1492,7 @@ get_archive_file (
 		}
 		dp = (DIR_BUF *) readdir (dirp);
 	}
-	closedir (dirp);
+	CLOSEDIR(dirp);
 
 	if (last == (time_t) 0) {
 		free (file);
@@ -1504,7 +1533,8 @@ delete_processed_files (
 
 
 static t_bool
-any_saved_files (void)
+any_saved_files (
+	void)
 {
 	int i;
 	t_bool saved = FALSE;

@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1998-11-14
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"981225"
-#	define RELEASENAME	"Volcane"
+#	define RELEASEDATE	"19990216"
+#	define RELEASENAME	"Styrofoam"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

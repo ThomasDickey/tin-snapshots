@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-25
  *  Notes     : mail/post/replyto/followup/repost & cancel articles
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -42,6 +42,13 @@
 #define TIN_EDIT_KEYS	"\033eoq"
 #define TIN_EDIT_KEYS_EXT	"\033eoqM"
 #define TIN_CONT_KEYS	"\033ac"
+
+/* tmpname for responses by mail */
+#ifdef VMS
+#	define TIN_LETTER	"letter."
+#else
+#	define TIN_LETTER	".letter"
+#endif /* VMS */
 
 struct t_posted *posted;
 
@@ -91,22 +98,23 @@ static void update_posted_info_file (char *group, int action, char *subj);
 static void update_posted_msgs_file (char *file, char *addr);
 static void yank_to_addr (char *orig, char *addr);
 #ifdef FORGERY
-	static void make_path_header (char *line, char *from_name);
+	static void make_path_header (char *line);
 #endif /* FORGERY */
-#ifndef M_AMIGA
+#if !defined(M_AMIGA) && !defined(INDEX_DAEMON)
 	static t_bool insert_from_header (char *infile);
-#endif /* !M_AMIGA */
+#endif /* !M_AMIGA && !INDEX_DAEMON */
 
 
 static char
-prompt_to_edit(void)
+prompt_to_edit (
+	void)
 {
 	return (prompt_slk_response(iKeyPostPost, TIN_POST_KEYS, txt_quit_edit_post));
 }
 
 
 static char
-prompt_to_send(
+prompt_to_send (
 	const char *subject)
 {
 	return (prompt_slk_response (iKeyPostSend, TIN_SEND_KEYS, sized_message(txt_quit_edit_send, subject)));
@@ -114,14 +122,16 @@ prompt_to_send(
 
 
 static char
-prompt_to_continue(void)
+prompt_to_continue (
+	void)
 {
 	return (prompt_slk_response (iKeyPostContinue, TIN_CONT_KEYS, txt_warn_suspicious_mail));
 }
 
 
 static char
-prompt_rejected(void)
+prompt_rejected (
+	void)
 {
 /* fix screen pos. ?? */
 	Raw (FALSE);
@@ -134,7 +144,7 @@ prompt_rejected(void)
 
 
 static t_bool
-repair_article(
+repair_article (
 	char *result)
 {
 	int ch;
@@ -157,7 +167,7 @@ repair_article(
  * submit_news_file adds headers, does q-p conversion etc
  */
 static char *
-backup_article_name(
+backup_article_name (
 	char *the_article)
 {
 	static char name[PATH_LEN];
@@ -168,7 +178,7 @@ backup_article_name(
 
 
 static void
-backup_article(
+backup_article (
 	char *the_article)
 {
 	char line[LEN];
@@ -191,7 +201,8 @@ backup_article(
 
 
 static void
-msg_init_headers (void)
+msg_init_headers (
+	void)
 {
 	int i;
 
@@ -203,7 +214,8 @@ msg_init_headers (void)
 
 
 static void
-msg_free_headers (void)
+msg_free_headers (
+	void)
 {
 	int i;
 
@@ -297,7 +309,8 @@ msg_write_headers (
 
 
 t_bool
-user_posted_messages (void)
+user_posted_messages (
+	void)
 {
 	char buf[LEN];
 	FILE *fp;
@@ -380,8 +393,8 @@ update_posted_info_file (
 	char *subj)
 {
 	FILE *fp;
-	time_t epoch;
 	struct tm *pitm;
+	time_t epoch;
 
 	if ((fp = fopen (posted_info_file, "a+")) != NULL) {
 		(void) time (&epoch);
@@ -397,8 +410,8 @@ update_posted_msgs_file (
 	char *file,
 	char *addr)
 {
-	char buf[LEN];
 	FILE *fp_in, *fp_out;
+	char buf[LEN];
 	time_t epoch;
 
 	fp_in = fopen (file, "r");
@@ -457,7 +470,6 @@ check_article_to_be_posted (
 	int c;
 	int saw_sig_dashes = 0;
 	int sig_lines = 0;
-	size_t nglens[NGLIMIT];
 	t_bool end_of_header = FALSE;
 	t_bool found_newsgroups_line = FALSE;
 	t_bool found_subject_line = FALSE;
@@ -468,6 +480,7 @@ check_article_to_be_posted (
 	t_bool mime_7bit = TRUE;
 	t_bool mime_usascii = TRUE;
 	t_bool contains_8bit = FALSE;
+	size_t nglens[NGLIMIT];
 	struct t_group *psGrp;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
@@ -551,7 +564,7 @@ check_article_to_be_posted (
 				errors++;
 #endif /* HAVE_FASCIST_NEWSADMIN */
 			}
-			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_approved, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -563,7 +576,7 @@ check_article_to_be_posted (
 			}
 		}
 		if (cp - line == 4 && !strncasecmp (line, "From", 4)) {
-			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_from, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -576,7 +589,7 @@ check_article_to_be_posted (
 		}
 
 		if (cp - line == 8 && !strncasecmp (line, "Reply-To", 8)) {
-			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_replyto, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -854,7 +867,7 @@ check_article_to_be_posted (
 #ifndef NO_ETIQUETTE
 		if (beginner_level)
 			my_fprintf (stderr, txt_warn_posting_etiquette);
-#endif /* NO_ETIQUETTE */
+#endif /* !NO_ETIQUETTE */
 		my_fflush (stderr);
 	}
 	fclose (fp);
@@ -877,10 +890,10 @@ setup_check_article_screen (
 	}
 }
 
+
 /*
  *  Quick post an article (not a followup)
  */
-
 void
 quick_post_article (
 	t_bool postponed_only)
@@ -893,8 +906,8 @@ quick_post_article (
 	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines = 0;
-	t_bool done = FALSE;
 	struct t_group *psGrp;
+	t_bool done = FALSE;
 
 #ifdef FORGERY
 	char line[HEADER_LEN];
@@ -1035,9 +1048,11 @@ quick_post_article (
 		*ptr = '\0';
 
 	psGrp = psGrpFind (group);
+#ifndef INDEX_DAEMON
 	get_from_name(from_name, psGrp);
+#endif /* !INDEX_DAEMON */
 #ifdef FORGERY
-	make_path_header (line, from_name);
+	make_path_header (line);
 	msg_add_header ("Path", line);
 #endif /* FORGERY */
 	msg_add_header ("From", from_name);
@@ -1314,8 +1329,8 @@ append_postponed_file (
 	char *file,
 	char *addr)
 {
-	char buf[LEN];
 	FILE *fp_in, *fp_out;
+	char buf[LEN];
 	time_t epoch;
 
 	fp_in = fopen (file, "r");
@@ -1341,11 +1356,13 @@ append_postponed_file (
  * count how many articles are in postponed.articles. Essentially,
  * we count '^From ' lines
  */
-int count_postponed_articles(void)
+int
+count_postponed_articles (
+	void)
 {
 	FILE *fp = fopen(postponed_articles_file,"r");
-	int count = 0;
 	char line[HEADER_LEN];
+	int count = 0;
 
 	if (!fp)
 		return 0;
@@ -1358,10 +1375,12 @@ int count_postponed_articles(void)
 	return count;
 }
 
-/* Copy the first postponed article and remove it from the postponed file */
 
+/*
+ * Copy the first postponed article and remove it from the postponed file
+ */
 static t_bool
-fetch_postponed_article(
+fetch_postponed_article (
 	char tmp_file[],
 	char subject[],
 	char newsgroups[])
@@ -1451,14 +1470,14 @@ fetch_postponed_article(
 
 /* pick up any postponed article and ask if the user want to use it */
 t_bool
-pickup_postponed_articles(
+pickup_postponed_articles (
 	t_bool ask,
 	t_bool all)
 {
+	char ch = 0;
 	char newsgroups[HEADER_LEN];
 	char subject[HEADER_LEN];
 	char question[HEADER_LEN];
-	char ch = 0;
 	int count = count_postponed_articles();
 	int i;
 
@@ -1510,7 +1529,7 @@ pickup_postponed_articles(
 
 
 static void
-postpone_article(
+postpone_article (
 	char *the_article)
 {
 	wait_message(3, txt_info_do_postpone);
@@ -1542,7 +1561,7 @@ post_article (
 	msg_init_headers ();
 
 	psGrp = psGrpFind (group);
-	if (!psGrp) {
+	if (!psGrp || !psGrp->attribute) {
 		error_message (txt_not_in_active_file, group);
 		return redraw_screen;
 	}
@@ -1601,9 +1620,11 @@ post_article (
 	}
 	chmod (article, (mode_t)(S_IRUSR|S_IWUSR));
 
+#ifndef INDEX_DAEMON
 	get_from_name(from_name, psGrp);
+#endif /* !INDEX_DAEMON */
 #ifdef FORGERY
-	make_path_header (line, from_name);
+	make_path_header (line);
 	msg_add_header ("Path", line);
 #endif /* FORGERY */
 	msg_add_header ("From", from_name);
@@ -1772,6 +1793,11 @@ appendid (
 	}
 }
 
+
+/*
+ * check given Message-ID for "_-_@" which (should) indicate(s)
+ * a Subject: change
+ */
 static t_bool
 must_include (
 	char *id)
@@ -1791,6 +1817,7 @@ must_include (
 	return FALSE;
 }
 
+
 static size_t
 skip_id (
 	const char *id)
@@ -1804,6 +1831,7 @@ skip_id (
 	}
 	return skipped;
 }
+
 
 static t_bool
 damaged_id (
@@ -1819,6 +1847,7 @@ damaged_id (
 		return TRUE;
 	return FALSE;
 }
+
 
 /*
  * A real crossposting test had to run on Newsgroups but we only have Xref in
@@ -1953,6 +1982,7 @@ join_references (
 	 */
 }
 
+
 int /* return code is currently ignored! */
 post_response (
 	char *group,
@@ -2042,9 +2072,11 @@ post_response (
 	chmod (article, (mode_t)(S_IRUSR|S_IWUSR));
 
 	psGrp = psGrpFind (group);
+#ifndef INDEX_DAEMON
 	get_from_name(from_name, psGrp);
+#endif /* !INDEX_DAEMON */
 #ifdef FORGERY
-	make_path_header (line, from_name);
+	make_path_header (line);
 	msg_add_header ("Path", line);
 #endif /* FORGERY */
 	msg_add_header ("From", from_name);
@@ -2248,6 +2280,7 @@ post_response_postponed:
 	return ret_code;
 }
 
+
 t_bool
 mail_to_someone (
 	int respnum,
@@ -2271,14 +2304,12 @@ mail_to_someone (
 	strcpy (mail_to, address);
 	clear_message ();
 
-#ifdef VMS
-	joinpath (nam, homedir, "letter.");
-#else
-	joinpath (nam, homedir, ".letter");
-#	ifdef APPEND_PID
-		sprintf (nam+strlen(nam), ".%d", (int) process_id);
-#	endif /* APPEND_PID */
-#endif /* VMS */
+	joinpath (nam, homedir, TIN_LETTER);
+
+#if defined(APPEND_PID) && !defined (VMS)
+	sprintf (nam+strlen(nam), ".%d", (int) process_id);
+#endif /* APPEND_PID && !VMS */
+
 	if ((fp = fopen (nam, "w")) == NULL) {
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
@@ -2315,8 +2346,7 @@ mail_to_someone (
 
 	if (mail_to_poster) {
 		ch = iKeyPostEdit;
-		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
-			       mail_quote_format)) {
+		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), mail_quote_format)) {
 			fprintf (fp, "%s\n", buf);
 			start_line_offset++;
 			{
@@ -2413,7 +2443,8 @@ mail_to_someone_done:
 }
 
 t_bool
-mail_bug_report (void) /* FIXME: return value is always ignored */
+mail_bug_report (
+	void) /* FIXME: return value is always ignored */
 {
 	FILE *fp;
 	const char *domain;
@@ -2625,14 +2656,12 @@ mail_to_author (
 
 	wait_message (0, txt_reply_to_author);
 
-#ifdef VMS
-	joinpath (nam, homedir, "letter.");
-#else
-	joinpath (nam, homedir, ".letter");
-#	ifdef APPEND_PID
-		sprintf (nam+strlen(nam), ".%d", (int) process_id);
-#	endif /* APPEND_PID */
-#endif /* VMS */
+	joinpath (nam, homedir, TIN_LETTER);
+
+#if defined(APPEND_PID) && !defined (VMS)
+	sprintf (nam+strlen(nam), ".%d", (int) process_id);
+#endif /* APPEND_PID && !VMS */
+
 	if ((fp = fopen (nam, "w")) == NULL) {
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
@@ -2798,10 +2827,10 @@ mail_to_author_done:
 	return redraw_screen;
 }
 
+
 /*
  * compare the given e-mail address with a list of components in $SPAMTRAP
  */
-
 static t_bool
 check_for_spamtrap (
 	char *addr)
@@ -2839,10 +2868,10 @@ check_for_spamtrap (
 	return FALSE;
 }
 
+
 /*
  *  Read a file grabbing the value of the specified mail header line
  */
-
 static t_bool
 pcCopyArtHeader (
 	int iHeader,
@@ -2957,7 +2986,7 @@ cancel_article (
 #ifdef FORGERY
 	char line[HEADER_LEN];
 	char line2[HEADER_LEN];
-	char author = TRUE;
+	t_bool author = TRUE;
 #else
 	char user_name[128];
 	char full_name[128];
@@ -2972,17 +3001,20 @@ cancel_article (
 	 * Check if news / mail / save group
 	 */
 	if (group->type == GROUP_TYPE_MAIL || group->type == GROUP_TYPE_SAVE) {
-#if !defined(INDEX_DAEMON)
+#ifndef INDEX_DAEMON
 		vGrpDelMailArt (art);
 #endif /* !INDEX_DAEMON */
 		return FALSE;
 	}
-
+#ifndef INDEX_DAEMON
 	get_from_name (from_name, group);
+#endif /* !INDEX_DAEMON */
 #ifdef FORGERY
-	make_path_header (line, from_name);
+	make_path_header (line);
 #else
+#	ifndef INDEX_DAEMON
 	get_user_info (user_name, full_name);
+#	endif /* !INDEX_DAEMON */
 #endif /* FORGERY */
 #ifdef DEBUG
 	if (debug == 2)
@@ -3155,6 +3187,7 @@ cancel_article (
 #	define Superseding	(supersede)
 #endif /* !FORGERY */
 
+#ifndef INDEX_DAEMON
 int
 repost_article (
 	const char *group,
@@ -3174,9 +3207,9 @@ repost_article (
 	struct t_group *psGrp, *tmpGrp = NULL;
 	t_bool done = FALSE;
 	t_bool force_command = FALSE;
-#ifdef FORGERY
+#	ifdef FORGERY
 	char line[HEADER_LEN];
-#endif /* FORGERY */
+#	endif /* FORGERY */
 
 	msg_init_headers ();
 
@@ -3202,10 +3235,10 @@ repost_article (
 
 		if (psGrp && !tmpGrp)
 			tmpGrp = psGrp;
-#ifdef DEBUG
+#	ifdef DEBUG
 		if (debug == 2)
 			wait_message (1, "Group=[%s]", buf);
-#endif /* DEBUG */
+#	endif /* DEBUG */
 		if (psGrp && psGrp->moderated == 'm') {
 			sprintf (mesg, txt_group_is_moderated, buf);
 			if (prompt_yn (cLINES, mesg, TRUE) != 1) {
@@ -3234,14 +3267,14 @@ repost_article (
 	if (supersede) {
 		get_user_info (user_name, full_name);
 		get_from_name (from_name, psGrp);
-#ifndef FORGERY
+#	ifndef FORGERY
 		if (FromSameUser) {
 			msg_add_header ("From", from_name);
 			if (*reply_to)
 				msg_add_header ("Reply-To", reply_to);
-#else
+#	else
 		{
-			make_path_header (line, from_name);
+			make_path_header (line);
 			msg_add_header ("Path", line);
 
 			msg_add_header ("From", (*note_h.from ? note_h.from : from_name));
@@ -3254,7 +3287,7 @@ repost_article (
 
 			sprintf (line, "<supersede.%s", note_h.messageid + 1);
 			msg_add_header ("Message-ID", line);
-#endif /* FORGERY */
+#	endif /* !FORGERY */
 			msg_add_header ("Supersedes", note_h.messageid);
 
 			if (*note_h.followup)
@@ -3351,17 +3384,17 @@ repost_article_loop:
 				}
 				break;
 
-#ifdef HAVE_ISPELL
+#	ifdef HAVE_ISPELL
 			case iKeyPostIspell:
 				invoke_ispell (article);
 				break;
-#endif /* HAVE_ISPELL */
+#	endif /* HAVE_ISPELL */
 
-#ifdef HAVE_PGP
+#	ifdef HAVE_PGP
 			case iKeyPostPGP:
 				invoke_pgp_news (article);
 				break;
-#endif /* HAVE_PGP */
+#	endif /* HAVE_PGP */
 
 			case iKeyQuit:
 			case iKeyAbort:
@@ -3418,15 +3451,17 @@ repost_postponed:
 
 	return ret_code;
 }
+#endif /* !INDEX_DAEMON */
+
 
 static void
 msg_add_x_headers (
 	char *headers)
 {
+	FILE *fp;
 	char *ptr;
 	char file[PATH_LEN];
 	char line[HEADER_LEN];
-	FILE *fp;
 
 	if (headers) {
 		if (headers[0] != '/' && headers[0] != '~') {
@@ -3465,15 +3500,16 @@ msg_add_x_headers (
 	}
 }
 
+
 static int
 msg_add_x_body (
 	FILE *fp_out,
 	char *body)
 {
+	FILE *fp;
 	char *ptr;
 	char file[PATH_LEN];
 	char line[HEADER_LEN];
-	FILE *fp;
 	int wrote = 0;
 
 	if (body) {
@@ -3505,13 +3541,14 @@ msg_add_x_body (
 	return wrote;
 }
 
+
 static void
 modify_headers (
 	char *line)
 {
-	char buf[HEADER_LEN];
 	char *chr;
 	char *chr2;
+	char buf[HEADER_LEN];
 
 	if (strncasecmp (line, "Newsgroups: ", 12) == 0) {
 		chr = strpbrk (line, "\t ");
@@ -3540,13 +3577,14 @@ modify_headers (
 	}
 }
 
+
 void
 checknadd_headers (
 	char *infile)
 {
+	FILE *fp_in, *fp_out;
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
-	FILE *fp_in, *fp_out;
 	t_bool gotit = FALSE;
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
@@ -3592,27 +3630,27 @@ checknadd_headers (
 	}
 }
 
-#ifndef M_AMIGA
+
+#if !defined(M_AMIGA) && !defined(INDEX_DAEMON)
 static t_bool
 insert_from_header (
 	char *infile)
 {
-	char *ptr;
+	FILE *fp_in, *fp_out;
 	char from_name[HEADER_LEN];
 	char full_name[128];
 	char user_name[128];
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
-	FILE *fp_in, *fp_out;
 	t_bool from_found = FALSE;
 	t_bool in_header = TRUE;
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
-#ifdef VMS
+#	ifdef VMS
 		sprintf (outfile, "%s-%d", infile, (int) process_id);
-#else
+#	else
 		sprintf (outfile, "%s.%d", infile, (int) process_id);
-#endif /* VMS */
+#	endif /* VMS */
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			get_user_info (user_name, full_name);
 			get_from_name (from_name, (struct t_group *) 0);
@@ -3620,12 +3658,15 @@ insert_from_header (
 			/*
 			 * Check that at least one '.' comes after the '@' in the From: line
 			 */
-			 /* why not gnksa_check_from()? */
-			if ((ptr = strchr (from_name, '@')) != (char *) 0) {
-				if ((ptr = strchr (ptr, '.')) == (char *) 0) { /* no '.' */
-					error_message (txt_invalid_from, from_name);
-					return FALSE;
-				}
+
+#ifdef DEBUG
+			if (debug == 2)
+				wait_message (2, "insert_from_header [%s]", from_name);
+#endif /* DEBUG */
+
+			if (GNKSA_OK != gnksa_check_from(rfc1522_encode(from_name, FALSE))) { /* error in address */
+				error_message (txt_invalid_from, from_name);
+				return FALSE;
 			}
 
 			while ((fgets (line, (int) sizeof(line), fp_in) != (char *) 0) && in_header) {
@@ -3651,7 +3692,8 @@ insert_from_header (
 	}
 	return FALSE;
 }
-#endif /* !M_AMIGA */
+#endif /* !M_AMIGA && !INDEX_DAEMON */
+
 
 static void
 find_reply_to_addr (
@@ -3741,14 +3783,15 @@ find_reply_to_addr (
 #endif /* 0 */
 }
 
+
 /*
  * If any arts have been posted by the user reread the active
  * file so that they are shown in the unread articles number
  * for each group at the group selection level.
  */
-
 t_bool
-reread_active_after_posting (void)
+reread_active_after_posting (
+	void)
 {
 	int i;
 	long lMinOld;
@@ -3802,11 +3845,11 @@ reread_active_after_posting (void)
 	return modified;
 }
 
+
 /*
  * If posting was successful parse the Newgroups; line and set a flag in each
  * posted to newsgroups for later processing to update num of unread articles
  */
-
 static void
 update_active_after_posting (
 	char *newsgroups)
@@ -3851,9 +3894,9 @@ submit_mail_file (
 	char subject[HEADER_LEN];
 	t_bool mailed = FALSE;
 
-#ifndef M_AMIGA
+#if !defined(M_AMIGA) && !defined(INDEX_DAEMON)
 	if (insert_from_header (file))
-#endif /* !M_AMIGA */
+#endif /* !M_AMIGA && !INDEX_DAEMON */
 	{
 		if (pcCopyArtHeader (HEADER_TO, file, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, file, subject)) {
 			t_bool ismail=TRUE;
@@ -3880,10 +3923,11 @@ submit_mail_file (
 	return mailed;
 }
 
+
 #ifdef FORGERY
 static void
 make_path_header (
-	char *line, char *from_name)
+	char *line)
 {
 	char full_name[128];
 	char user_name[128];

@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1994-12-01
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -42,7 +42,7 @@ char *
 hash_str (
 	const char *s)
 {
-	long h;				/* result of hash:  index into hash table */
+	long h;				/* result of hash: index into hash table */
 	struct t_hashnode **p;	/* used to descend the spillover structs */
 
 	if (s == (char *) 0)
@@ -79,13 +79,13 @@ hash_str (
  * Add a string to the hash table
  * Each entry will have the following structure:
  *
- * char *next			Pointer to the next hashnode in chain
- * int aptr				'magic' ptr used to speed subj threading
- * T					The text itself. The ptr that hash_str()
- * E					returns points here - the earlier fields
- * X					are 'hidden'.
+ * t_hashnode *next		Pointer to the next hashnode in chain
+ * int aptr					'magic' ptr used to speed subj threading
+ * T							The text itself. The ptr that hash_str()
+ * E							returns points here - the earlier fields
+ * X							are 'hidden'.
  * T
- * \0					String terminator
+ * \0							String terminator
  */
 static struct t_hashnode *
 add_string (
@@ -98,14 +98,15 @@ add_string (
 	p->next = (struct t_hashnode *) 0;
 	p->aptr = -1;					/* -1 is the default value */
 
-	strcpy (p->txt, s);				/* Copy in the text */
+	strcpy (p->txt, s);			/* Copy in the text */
 
 	return p;
 }
 
 
 void
-hash_init (void)
+hash_init (
+	void)
 {
 	int i;
 
@@ -120,7 +121,8 @@ hash_init (void)
 
 
 void
-hash_reclaim (void)
+hash_reclaim (
+	void)
 {
 	int i;
 	struct t_hashnode *p, *next;
@@ -130,7 +132,7 @@ hash_reclaim (void)
 		return;
 #endif /* M_AMIGA */
 
-	for (i = 0; i < HASHNODE_TABLE_SIZE; i++)
+	for (i = 0; i < HASHNODE_TABLE_SIZE; i++) {
 		if (table[i] != (struct t_hashnode *) 0) {
 			p = table[i];
 			while (p != (struct t_hashnode *) 0) {
@@ -140,4 +142,5 @@ hash_reclaim (void)
 			}
 			table[i] = (struct t_hashnode *) 0;
 		}
+	}
 }

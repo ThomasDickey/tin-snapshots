@@ -5,7 +5,7 @@
  *  Created   : 1995-08-24
  *  Updated   : 1998-04-21
  *  Notes     : #include files, #defines & struct's
- *  Copyright : (c) Copyright 1996-98 by Thomas Dickey
+ *  Copyright : (c) Copyright 1996-99 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -43,8 +43,11 @@
 
 #undef	DEFAULT_ISO2ASC
 #undef	DOMAIN_NAME
+#undef	HAVE_FASCIST_NEWSADMIN
+#undef	HAVE_MMDF_MAILER
 #undef	INEWSDIR
 #undef	INN_NNTPLIB
+#undef	LOCAL_CHARSET
 #undef	MIME_BREAK_LONG_LINES
 #undef	MIME_STRICT_CHARSET
 #undef	MM_CHARSET
@@ -53,10 +56,13 @@
 #undef	NOVROOTDIR
 #undef	NO_ETIQUETTE
 #undef	NO_LOCALE
+#undef	NO_POSTING
+#undef	NO_SHELL_ESCAPE
 #undef	OVERVIEW_FILE
 #undef	SOCKS
 #undef	SPOOLDIR
 #undef	USE_INN_NNTPLIB
+#undef	USE_INVERSE_HACK
 #undef	USE_SOCKS4_PREFIX
 #undef	USE_SOCKS5
 
@@ -432,6 +438,17 @@
  * XXXXX please define surrounded with double quotes! XXXXX
  */
 #undef	TIN_DEFAULTS_DIR
+
+/*
+ * define if second and thrid argument of setvbuf() are swaped
+ * (System V before Release 3)
+ */
+#undef	SETVBUF_REVERSED
+
+/*
+ * define if closedir() does not return a status
+ */
+#undef	CLOSEDIR_VIOD
 
 #undef	HAVE_COFFEE
 

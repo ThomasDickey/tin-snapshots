@@ -8,7 +8,7 @@
  *              ~/.tin/newsrctable and returns the real hostname
  *              and the name of the newsrc file for a given
  *              alias of the server.
- *  Copyright : (c) Copyright 1996-98 by Sven Paulus
+ *  Copyright : (c) Copyright 1996-99 by Sven Paulus
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -31,7 +31,8 @@ static void write_newsrctable_file (void);
  * create newsrctable file in local rc directory
  */
 static void
-write_newsrctable_file (void)
+write_newsrctable_file (
+	void)
 {
 	FILE	*fp;
 

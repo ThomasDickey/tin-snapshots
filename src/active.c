@@ -5,7 +5,7 @@
  *  Created   : 1992-02-16
  *  Updated   : 1998-05-02
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -14,7 +14,6 @@
 
 #include	"tin.h"
 #include	"tcurses.h"
-#include	"menukeys.h"
 
 /*
  * List of allowed seperator chars in active file
@@ -49,7 +48,8 @@ static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
  *  or just return the standard default.
  */
 int
-get_active_num (void)
+get_active_num (
+	void)
 {
 #ifdef ENV_VAR_GROUPS /* M_AMIGA && M_OS2 && WIN32 only */
 	char *ptr;
@@ -63,7 +63,8 @@ get_active_num (void)
 
 
 static void
-set_active_timestamp (void)
+set_active_timestamp (
+	void)
 {
 	(void) time (&active_timestamp);
 	force_reread_active_file = FALSE;
@@ -71,7 +72,8 @@ set_active_timestamp (void)
 
 
 t_bool
-reread_active_file (void)
+reread_active_file (
+	void)
 {
 	return (force_reread_active_file || (reread_active_file_secs != 0 &&
 		(int)(time(NULL) - active_timestamp) >= reread_active_file_secs));
@@ -83,7 +85,8 @@ reread_active_file (void)
  * force_reread_actve_file is set.
  */
 t_bool
-resync_active_file (void)
+resync_active_file (
+	void)
 {
 	char old_group[HEADER_LEN];
 	t_bool command_line = FALSE;
@@ -124,7 +127,7 @@ resync_active_file (void)
  * TODO: 2) Lump count/max/min/moderat into a t_active, big patch but much cleaner throughout tin
  */
 static void
-active_add(
+active_add (
 	struct t_group *ptr,
 	long count,
 	long max,
@@ -177,7 +180,7 @@ active_add(
  * Otherwise, bogus groups are dealt with when newsrc is written.
  */
 t_bool
-process_bogus(
+process_bogus (
 	char *name) /* return value is always ignored */
 {
 	struct t_group *ptr;
@@ -241,7 +244,8 @@ parse_active_line (
  * read_active_file()
  */
 static void
-read_newsrc_active_file (void)
+read_newsrc_active_file (
+	void)
 {
 	FILE *fp = (FILE *) 0;
 	char *ptr;
@@ -415,7 +419,8 @@ read_newsrc_active_file (void)
  * Load the active file into active[]
  */
 static void
-read_active_file (void)
+read_active_file (
+	void)
 {
 	FILE *fp = (FILE *) 0;
 	char *ptr;
@@ -495,7 +500,8 @@ read_active_file (void)
  * Check and preload any new newgroups into my_group[]
  */
 void
-read_news_active_file (void)
+read_news_active_file (
+	void)
 {
 	FILE *fp = 0;
 
@@ -539,7 +545,8 @@ read_news_active_file (void)
  * Format:   (as active file) Groupname Maxart Minart moderated
  */
 static void
-check_for_any_new_groups (void)
+check_for_any_new_groups (
+	void)
 {
 	FILE *fp;
 	char *autosubscribe, *autounsubscribe;
@@ -834,7 +841,8 @@ group_flag (
 
 /* ex actived.c functions */
 void
-create_save_active_file (void)
+create_save_active_file (
+	void)
 {
 	char acGrpPath[PATH_LEN];
 
@@ -849,7 +857,8 @@ create_save_active_file (void)
 
 
 static void
-vInitVariables (void)
+vInitVariables (
+	void)
 {
 	char *pcPtr;
 	char acTempActiveFile[PATH_LEN];
@@ -948,7 +957,7 @@ vMakeGrpList (
 					*pcPtr = '\0';
 			}
 		}
-		closedir (tDirFile);
+		CLOSEDIR(tDirFile);
 	}
 }
 
@@ -978,7 +987,8 @@ vAppendGrpLine (
 
 #ifdef INDEX_DAEMON
 void
-vMakeActiveMyGroup (void)
+vMakeActiveMyGroup (
+	void)
 {
 	register int iNum;
 
@@ -999,7 +1009,8 @@ vMakeActiveMyGroup (void)
  *  comp.archives 71234890
  */
 void
-read_group_times_file (void)
+read_group_times_file (
+	void)
 {
 	FILE *fp;
 	char *p, *q;
@@ -1047,7 +1058,8 @@ read_group_times_file (void)
  *  Save the last updated time for each group to ~/.tin/group.times
  */
 void
-write_group_times_file (void)
+write_group_times_file (
+	void)
 {
 	FILE *fp;
 	register int i;

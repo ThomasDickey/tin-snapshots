@@ -5,7 +5,7 @@
  *  Created   : 1993-07-01
  *  Updated   : 1998-20-24
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Herman ten Brugge
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Herman ten Brugge
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -36,7 +36,8 @@
  *  Read NEWSLIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
  */
 t_bool
-overview_xref_support (void)
+overview_xref_support (
+	void)
 {
 	FILE *fp;
 	char *ptr;
@@ -82,7 +83,7 @@ read_xref_header (
 		FILE *fp;
 		char *ptr, *q;
 		char buf[HEADER_LEN];
-		long artnum = 0;
+		long artnum = 0L;
 
 		sprintf(buf, "XHDR XREF %ld", art->artnum);
 		if ((fp = nntp_command (buf, OK_HEAD, NULL)) == NULL)

@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1995-04-19
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -363,12 +363,12 @@ read_group (
 
 		TIN_FCLOSE(fp);
 		if (tin_errno) {
-#ifdef INDEX_DAEMON
-			my_chdir (dir);
-#else
+
+#ifndef INDEX_DAEMON
 			if (!read_news_via_nntp || group->type != GROUP_TYPE_NEWS)
+#endif /* !INDEX_DAEMON */
 				my_chdir (dir);
-#endif /* INDEX_DAEMON */
+
 			return(-1);
 		}
 
@@ -401,12 +401,10 @@ read_group (
 	/*
 	 * if !nntp change to previous dir before indexing started
 	 */
-#ifdef INDEX_DAEMON
-	my_chdir (dir);
-#else
+#ifndef INDEX_DAEMON
 	if (!read_news_via_nntp || group->type != GROUP_TYPE_NEWS)
+#endif /* !INDEX_DAEMON */
 		my_chdir (dir);
-#endif /* INDEX_DAEMON */
 
 	return modified;
 }
@@ -424,7 +422,8 @@ read_group (
  *    2) Both are part of the same archive (name's match and arch bit set)
  */
 static void
-thread_by_subject(void)
+thread_by_subject (
+	void)
 {
 	int i, j;
 	struct t_hashnode *h;
@@ -826,10 +825,8 @@ iReadNovFile (
 	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0)
 		return top;
 
-#if 1
 	if (group->xmax > max)
 		group->xmax = max;
-#endif /* 1 */
 
 	while ((buf = tin_fgets (fp, FALSE)) != (char *) 0) {
 
@@ -855,10 +852,11 @@ iReadNovFile (
 		 * Check to make sure article in nov file has not expired in group
 		 */
 #if 0
-my_printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
-my_flush();
-(void) sleep(1);
+	my_printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
+	my_flush();
+	(void) sleep(1);
 #endif /* 0 */
+
 		if (artnum < group->xmin) {
 			(*expired)++;
 			continue;
@@ -1255,7 +1253,8 @@ pcFindNovFile (
  *  Run the index file updater only for the groups we've loaded.
  */
 void
-do_update (void)
+do_update (
+	void)
 {
 	char group_path[PATH_LEN];
 	register int i, j;

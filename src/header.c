@@ -4,7 +4,7 @@
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 1997-03-10
  *  Updated   : 1997-03-19
- *  Copyright : (c) Copyright 1997-98 by Urs Janssen
+ *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -14,8 +14,11 @@
 #include "tin.h"
 #include "tnntp.h"
 
-static const char * get_user_name(void);
-static const char * get_full_name(void);
+#ifndef INDEX_DAEMON
+	static const char * get_full_name (void);
+	static const char * get_user_name (void);
+#endif /* !INDEX_DAEMON */
+
 
 /* find hostname */
 const char *
@@ -114,19 +117,20 @@ static const char *domain_name_hack = DOMAIN_NAME;
 }
 #endif /* DOMAIN_NAME */
 
+
 #ifdef HAVE_GETHOSTBYNAME
 /* find FQDN - gethostbyaddr() */
 const char *
-get_fqdn(
+get_fqdn (
 	const char *host)
 {
-	char	name[MAXHOSTNAMELEN+2];
-	char	line[MAXLINELEN+1];
-	char	*cp, *domain;
+	FILE *inf;
+	char *cp, *domain;
+	char line[MAXLINELEN+1];
+	char name[MAXHOSTNAMELEN+2];
 	static char	fqdn[1024];
 	struct hostent	*hp;
 	struct in_addr	in;
-	FILE	*inf;
 
 	*fqdn = '\0';
 	domain = NULL;
@@ -188,12 +192,12 @@ get_fqdn(
 /*
  * Find username & fullname
  */
+#ifndef INDEX_DAEMON
 void
 get_user_info (
 	char *user_name,
 	char *full_name)
 {
-#ifndef INDEX_DAEMON
 	const char *ptr;
 
 	user_name[0] = '\0';
@@ -203,42 +207,47 @@ get_user_info (
 		strcpy(full_name, ptr);
 	if ((ptr = get_user_name()))
 		strcpy(user_name, ptr);
-#endif /* !INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
 
+
+#ifndef INDEX_DAEMON
 static const char *
-get_user_name(
+get_user_name (
 	void)
 {
-#if defined (M_AMIGA) || (defined VMS)
+#	if defined (M_AMIGA) || (defined VMS)
 	char *p;
-#endif /* M_AMIGA || VMS */
+#	endif /* M_AMIGA || VMS */
 	static char username[128];
 	struct passwd *pw;
 
 	username[0] = '\0';
-#if defined (M_AMIGA) || defined (VMS)
+#	if defined (M_AMIGA) || defined (VMS)
 	if ((p = getenv ("USER"))) {
 		STRCPY (username, p);
-#	ifdef VMS
+#		ifdef VMS
 		lower (username);
-#	endif /* VMS */
+#		endif /* VMS */
 	}
-#else
+#	else
 	pw = getpwuid (getuid ());
 	strcpy (username, pw->pw_name);
-#endif /* M_AMIGA || VMS */
+#	endif /* M_AMIGA || VMS */
 	return(username);
 }
+#endif /* !INDEX_DAEMON */
 
+
+#ifndef INDEX_DAEMON
 static const char *
-get_full_name(
+get_full_name (
 	void)
 {
 	char *p;
-	static char fullname[128];
 	char buf[128];
 	char tmp[128];
+	static char fullname[128];
 	struct passwd *pw;
 
 	fullname[0] = '\0';
@@ -252,9 +261,9 @@ get_full_name(
 		return (fullname);
 	}
 
-#ifdef VMS
+#	ifdef VMS
 	strncpy (fullname, fix_fullname(get_uaf_fullname()), sizeof (fullname));
-#else  /* !VMS */
+#	else
 	pw = getpwuid (getuid ());
 	strncpy (buf, pw->pw_gecos, sizeof (fullname));
 	if ((p = strchr (buf, ',')))
@@ -268,9 +277,11 @@ get_full_name(
 		sprintf (fullname, "%s%s%s", buf, tmp, p);
 	} else
 		strcpy (fullname, buf);
-#endif /* !VMS */
+#	endif /* VMS */
 	return (fullname);
 }
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * FIXME to:
@@ -279,12 +290,12 @@ get_full_name(
 /*
  * build From: in 'name <user@host.doma.in>' format
  */
+#ifndef INDEX_DAEMON
 void
 get_from_name (
 	char *from_name,
 	struct t_group *thisgrp)
 {
-#ifndef INDEX_DAEMON
 #	ifdef USE_INN_NNTPLIB
 	char *fromhost = GetConfigValue (_CONF_FROMHOST);
 #	else
@@ -310,16 +321,18 @@ get_from_name (
 		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());
 #	endif /* DEBUG */
 
-#endif /* !INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * build_sender()
  * returns *(Full_Name <user@fq.domainna.me>)
  */
-#ifndef FORGERY
+#if !defined(INDEX_DAEMON) && !defined(FORGERY)
 char *
-build_sender (void)
+build_sender (
+	void)
 {
 	const char *ptr;
 	static char sender[8192];
@@ -349,4 +362,4 @@ build_sender (void)
 
 	return sender;
 }
-#endif /* !FORGERY */
+#endif /* !INDEX_DAEMON && !FORGERY */

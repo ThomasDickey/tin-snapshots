@@ -19,7 +19,7 @@
 #		define NNTP_SERVER_FILE	"uulib:nntpserver"
 #	else
 #		define NNTP_SERVER_FILE	"/etc/nntpserver"
-#	endif	/* M_AMIGA */
+#	endif /* M_AMIGA */
 #endif /* !NNTP_SERVER_FILE */
 
 #define	NNTP_TCP_NAME	"nntp"

@@ -57,6 +57,20 @@
 #
 #mm_charset=iso-8859-1
 
+# disable_gnksa_domain_check - allow unregistered top level domains
+#
+# you should activate this only if you are using in an intranet environment
+# where articles do _not_ leak out into usenet
+#
+#disable_gnksa_domain_check=OFF
+
+# disable_sender - post without Sender: even if tin normally would add it
+#
+# use this only if you cannot generate a valid Sender:, eg. if you do not
+# have a registered FQDN for your system
+#
+#disable_sender=OFF
+
 ############# reading from a local spool #########################
 #
 # If you are using tin only via NNTP connections, this section

@@ -6,7 +6,7 @@
  *  Updated   : 1998-04-21
  *  Notes     : This is a set of wrapper functions adapting the termcap
  *	             interface of tin to use SVr4 curses (e.g., ncurses).
- * Copyright :  (c) Copyright 1997-98 by Thomas Dickey
+ * Copyright :  (c) Copyright 1997-99 by Thomas Dickey
  *	             You may  freely  copy or  redistribute  this software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-

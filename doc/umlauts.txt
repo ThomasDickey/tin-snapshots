@@ -1,0 +1,33 @@
+[This text is mostly based on the de.comp.os.linux FAQ that is regularly
+posted to some German speaking newsgroup.]
+
+Since the 1996-11-15 release of TIN it uses a function that checks if the
+characters contained in an article may be displayed properly on your
+system. To do this, TIN take advantage of a feature named "locales".
+Locales are configuration files with information about national or regional
+characteristics, among them language, format of numbers (e.g. if a dot or a
+comma is used as a decimal point), format of date and time, and displayable
+characters. If the locales are incomplete or not configured correctly, all
+characters outside of 7 bit ASCII (including all umlauts) are considered
+non-displayable and TIN outputs a question mark instead.
+
+Configuration of locales is done via environment variables. To have umlauts
+being displayed you have to set "export LC_CTYPE=de_DE" (if you are using
+bash) or "setenv LC_CTYPE de_DE" (if you are using (t)csh, respectively).
+Note: You should first try your own language and country codes; e.g. if you
+are in the US, the de_DE should be en_US. If that does not work, i.e. you
+still have question marks instead of umlauts, try en_US.ISO-8859-1 (or any
+other appropriate character set appended). As a last option, you may check
+the de_DE example.
+
+If this still is not successful then your locale files are likely
+incomplete or even not installed. If you cannot or do not want to install a
+recent set of locales (which is a good idea anyway, since more and more
+software takes advantage of them) you may fall back to a "brute force"
+method and recompile TIN with --disable-locale configured (or ask your
+local administration to do so if you use a pre-configured environment). In
+this case locales are ignored completely and every character is considered
+displayable. Note: This can screw up your terminal.
+
+Dirk Nimmich <dirk@roxel.ms.sub.org>
+1999-01-01

@@ -8,7 +8,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
 Written by: Philip Hazel <ph10@cam.ac.uk>
 
-           Copyright (c) 1998 University of Cambridge
+           Copyright (c) 1997-1999 University of Cambridge
 
 -----------------------------------------------------------------------------
 Permission is granted to anyone to use this software for any purpose on any
@@ -24,6 +24,10 @@ restrictions:
 
 3. Altered versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
+
+4. If PCRE is embedded in any software that is released under the GNU
+   General Purpose Licence (GPL), then the terms of that licence shall
+   supersede any condition above with which it is incompatible.
 -----------------------------------------------------------------------------
 
 See the file Tech.Notes for some information on the internals.
@@ -31,10 +35,10 @@ See the file Tech.Notes for some information on the internals.
 
 
 /* This file is compiled on its own as part of the PCRE library. However,
-it is also included in the compilation of deftables.c, in which case the macro
-DEFTABLES is defined. */
+it is also included in the compilation of dftables.c, in which case the macro
+DFTABLES is defined. */
 
-#ifndef DEFTABLES
+#ifndef DFTABLES
 #include "internal.h"
 #endif
 
@@ -48,7 +52,7 @@ DEFTABLES is defined. */
 a pointer to them. They are build using the ctype functions, and consequently
 their contents will depend upon the current locale setting. When compiled as
 part of the library, the store is obtained via pcre_malloc(), but when compiled
-inside deftables, use malloc().
+inside dftables, use malloc().
 
 Arguments:   none
 Returns:     pointer to the contiguous block of data
@@ -60,7 +64,7 @@ pcre_maketables(void)
 unsigned char *yield, *p;
 int i;
 
-#ifndef DEFTABLES
+#ifndef DFTABLES
 yield = (pcre_malloc)(tables_length);
 #else
 yield = malloc(tables_length);

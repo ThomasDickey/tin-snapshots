@@ -6,7 +6,7 @@
  *  Updated   : 1998-04-18
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -44,7 +44,8 @@ char *nntp_server = (char *)0;
  *        < 0	-errno from system call or similar error
  */
 int
-nntp_open (void)
+nntp_open (
+	void)
 {
 #ifdef NNTP_ABLE
 	char *linep;
@@ -203,15 +204,15 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		authenticate (nntp_server, userid, TRUE);
 	}
 
-#if 0 /* TODO */
+#	if 0 /* TODO */
 	/* if we're using -n, check for XGTITLE */
 	if (newsrc_active && !list_active) { /* -n */
 		if (!nntp_command("XGTITLE", ERR_COMMAND, NULL))
 			xgtitle_supported = TRUE;
 	}
-#endif /* 0 */
+#	endif /* 0 */
 
-#endif	/* NNTP_ABLE */
+#endif /* NNTP_ABLE */
 
 	DEBUG_IO((stderr, "nntp_open okay\n"));
 	return 0;
@@ -219,7 +220,8 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 
 
 void
-nntp_close (void)
+nntp_close (
+	void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp) {
@@ -381,7 +383,8 @@ DEBUG_IO((stderr, "nntp_command (%s)\n", command));
  */
 
 FILE *
-open_news_active_fp (void)
+open_news_active_fp (
+	void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp && !read_saved_news)
@@ -396,7 +399,8 @@ open_news_active_fp (void)
  */
 
 FILE *
-open_overview_fmt_fp (void)
+open_overview_fmt_fp (
+	void)
 {
 	char line[NNTP_STRLEN];
 
@@ -456,7 +460,8 @@ open_newgroups_fp (
  */
 /* TODO fixme/checkme */
 FILE *
-open_subscription_fp (void)
+open_subscription_fp (
+	void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp && !read_saved_news)
@@ -481,7 +486,8 @@ open_mail_active_fp (
  *  Open mail groups description file locally
  */
 FILE *
-open_mailgroups_fp (void)
+open_mailgroups_fp (
+	void)
 {
 	return fopen (mailgroups_file, "r");
 }
@@ -493,7 +499,8 @@ open_mailgroups_fp (void)
  * net bandwidth and the local copy of the newsgroups file can be accessed.
  */
 FILE *
-open_newsgroups_fp (void)
+open_newsgroups_fp (
+	void)
 {
 #ifdef NNTP_ABLE
 	FILE *result;
@@ -910,7 +917,7 @@ setup_hard_base (
 					base[top_base++] = art;
 				}
 			}
-			closedir (d);
+			CLOSEDIR(d);
 			qsort ((char *) base, (size_t)top_base, sizeof (long), base_comp);
 		}
 	}
@@ -1049,7 +1056,7 @@ vGrpGetArtInfo (
 					(*plArtCount)++;
 				}
 			}
-			closedir (tDirFile);
+			CLOSEDIR(tDirFile);
 		} else
 			return(-1);
 #endif /* M_AMIGA */

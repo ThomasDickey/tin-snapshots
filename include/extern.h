@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1998-07-13
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -357,7 +357,6 @@ extern char domain_name[];
 extern char host_name[];
 
 extern const char base64_alphabet[64];
-extern const char *info_title;
 extern const char **info_help;
 extern constext *help_group[];
 extern constext *help_page[];
@@ -489,6 +488,8 @@ extern constext txt_error_gnksa_rn_unq[];
 extern constext txt_error_gnksa_rn_qtd[];
 extern constext txt_error_gnksa_rn_enc[];
 extern constext txt_error_gnksa_rn_encsyn[];
+extern constext txt_error_gnksa_rn_paren[];
+extern constext txt_error_gnksa_rn_invalid[];
 extern constext txt_error_header_and_body_not_separate[];
 extern constext txt_error_header_line_bad_charset[];
 extern constext txt_error_header_line_bad_encoding[];
@@ -508,7 +509,6 @@ extern constext txt_error_no_from[];
 extern constext txt_error_no_read_permission[];
 extern constext txt_error_no_such_file[];
 extern constext txt_error_no_write_permission[];
-extern constext txt_error_metamail_failed[];
 extern constext txt_error_sender_in_header_not_allowed[];
 extern constext txt_external_mail_done[];
 extern constext txt_extracting_archive[];
@@ -562,7 +562,6 @@ extern constext txt_help_cC[];
 extern constext txt_help_c[];
 extern constext txt_help_cache_overview_files[];
 extern constext txt_help_catchup_read_groups[];
-extern constext txt_help_ck[];
 extern constext txt_help_colon[];
 extern constext txt_help_confirm_action[];
 extern constext txt_help_confirm_to_quit[];
@@ -666,7 +665,6 @@ extern constext txt_help_p_tab[];
 extern constext txt_help_p_tilda[];
 extern constext txt_help_p_u[];
 extern constext txt_help_p_z[];
-extern constext txt_help_pg_k[];
 extern constext txt_help_pgdn_goto_next[];
 extern constext txt_help_pipe[];
 extern constext txt_help_plus[];
@@ -979,7 +977,6 @@ extern constext txt_reply_to_author[];
 extern constext txt_repost[];
 extern constext txt_repost_an_article[];
 extern constext txt_repost_group[];
-extern constext txt_rereading_active_file[];
 extern constext txt_reset_newsrc[];
 extern constext txt_resp_redirect[];
 extern constext txt_resp_to_poster[];
@@ -1174,7 +1171,6 @@ extern int cCOLS;
 extern int cLINES;
 extern int cur_groupnum;
 extern int debug;
-extern int default_auto_save_msg;
 extern int default_filter_days;
 extern int default_filter_kill_header;
 extern int default_filter_select_header;
@@ -1184,8 +1180,6 @@ extern int default_save_mode;
 extern int default_show_author;
 extern int default_sort_art_type;
 extern int default_thread_arts;
-extern int first_group_on_screen;
-extern int first_subj_on_screen;
 extern int getart_limit;
 extern int glob_respnum;
 extern int group_hash[TABLE_SIZE];
@@ -1194,9 +1188,7 @@ extern int groupname_len;
 extern int groupname_max_length;
 extern int index_point;
 extern int iso2asc_supported;
-extern int last_group_on_screen;
 extern int last_resp;
-extern int last_subj_on_screen;
 extern int mail_mime_encoding;
 extern int max_active;
 extern int max_art;
@@ -1222,7 +1214,6 @@ extern int system_status;
 extern int tex2iso_supported;
 extern int this_resp;
 extern int thread_basenote;
-extern int thread_depth;
 extern int tin_errno;
 extern int top;
 extern int top_base;
@@ -1244,9 +1235,7 @@ extern pid_t process_id;
 extern uid_t real_uid;
 extern uid_t tin_uid;
 
-extern struct passwd *myentry;
 extern struct t_article *arts;
-extern struct t_attribute glob_attributes;
 extern struct t_filters glob_filter;
 extern struct t_group *active;
 extern struct t_header note_h;
@@ -1283,6 +1272,8 @@ extern t_bool default_filter_select_expire;
 extern t_bool default_filter_select_global;
 extern t_bool default_show_only_unread;
 extern t_bool delete_index_file;
+extern t_bool disable_gnksa_domain_check;
+extern t_bool disable_sender;
 extern t_bool display_mime_header_asis;
 extern t_bool display_mime_allheader_asis;
 extern t_bool do_rfc1521_decoding;
@@ -1420,7 +1411,12 @@ extern constext txt_opt_mail_address[];
 #define GNKSA_ILLEGAL_QUOTED_CHAR	401
 #define GNKSA_ILLEGAL_ENCODED_CHAR	402
 #define GNKSA_BAD_ENCODE_SYNTAX		403
+#define GNKSA_ILLEGAL_PAREN_CHAR		404
+#define GNKSA_INVALID_REALNAME		405
 
+/* address types */
+#define GNKSA_ADDRTYPE_ROUTE	0
+#define GNKSA_ADDRTYPE_OLDSTYLE	1
 
 /* This fixes ambiguities on platforms that don't distinguish extern case */
 #ifdef CASE_PROBLEM
@@ -1589,6 +1585,10 @@ extern constext txt_opt_mail_address[];
 	extern t_bool ask_for_metamail;
 	extern t_bool use_metamail;
 #endif /* HAVE_METAMAIL */
+
+#if defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON)
+	extern constext txt_error_metamail_failed[];
+#endif /* HAVE_METAMAIL && !INDEX_DAEMON */
 
 #ifdef HAVE_PGP
 	extern char pgp_data[PATH_LEN];

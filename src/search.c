@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-27
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,6 @@
  */
 
 #include	"tin.h"
-#include	"tcurses.h"
 
 static char tmpbuf[LEN];
 
@@ -49,7 +48,7 @@ char default_art_search[LEN];
  * Return NULL if no pattern could be found
  */
 static char *
-get_search_pattern(
+get_search_pattern (
 	int forward,
 	const char *fwd_msg,
 	const char *bwd_msg,

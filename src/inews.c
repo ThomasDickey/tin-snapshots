@@ -5,7 +5,7 @@
  *  Created   : 1992-03-17
  *  Updated   : 1997-12-31
  *  Notes     : NNTP builtin version of inews
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -24,7 +24,7 @@
 	static int submit_inews (char *name);
 #endif /* NNTP_INEWS */
 
-#if defined (NNTP_INEWS) && !defined(FORGERY)
+#if defined(NNTP_INEWS) && !defined(FORGERY)
 	static int sender_needed (char * from, char * sender);
 #endif /* NNTP_INEWS && !FORGERY */
 
@@ -68,12 +68,13 @@ submit_inews (
 	char line[NNTP_STRLEN];
 	int auth_error = 0;
 	int respcode;
+	int sender = 0;
 	t_bool leave_loop = FALSE;
 	t_bool id_in_article = FALSE;
 	t_bool ret_code = FALSE;
 #	ifndef FORGERY
 	t_bool ismail = FALSE;
-#	endif /* FORGERY */
+#	endif /* !FORGERY */
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, name);
@@ -108,21 +109,15 @@ submit_inews (
 		return ret_code;
 	}
 	/*
-	 * check for @ and that at least one '.' comes after the '@' in the From: line
+	 * check for valid From: line
+	 *
+	 * this will be done once again in sender_needed!?!
 	 */
-	/* see also post.c/insert_from_header() */
-	if ((ptr = strchr (from_name, '@')) != (char *) 0) {
-		if ((ptr = strchr (ptr, '.')) == (char *) 0) { /* no '.' */
-			error_message (txt_invalid_from, from_name);
-			fclose (fp);
-			return ret_code;
-		}
-	} else { /* no '@' */
+	if (GNKSA_OK != gnksa_check_from(rfc1522_encode(from_name, FALSE))) { /* error in address */
 		error_message (txt_invalid_from, from_name);
 		fclose (fp);
 		return ret_code;
 	}
-
 
 	/*
 	 * Send POST command to NNTP server
@@ -165,10 +160,31 @@ submit_inews (
 		sprintf (line, "Path: %s", PATHMASTER);
 		put_server (line);
 
-		if ((ptr = build_sender())) {
-			if (sender_needed(rfc1522_decode(from_name), ptr) == 1) {
-				sprintf (line, "Sender: %s", rfc1522_encode(ptr, ismail));
-				put_server (line);
+		if ((ptr = build_sender()) && (!disable_sender)) {
+			sender = sender_needed(rfc1522_decode(from_name), ptr);
+			switch (sender) {
+				case -2: /* can't build Sender: */
+					 error_message ("invalid Sender: %s", ptr); /* FIXME -> lang.c */
+					 fclose (fp);
+					 return ret_code;
+					 /* NOTREACHED */
+					 break;
+
+				case -1: /* illegal From: (can't happen as check is done above allready) */
+					error_message (txt_invalid_from, from_name);
+					fclose (fp);
+					return ret_code;
+					/* NOTREACHED */
+					break;
+
+				case 1:	/* insert Sender */
+					sprintf (line, "Sender: %s", rfc1522_encode(ptr, ismail));
+					put_server (line);
+					break;
+
+				case 0: /* no sender needed */
+				default:
+					break;
 			}
 		}
 #	endif /* !FORGERY */
@@ -315,56 +331,45 @@ submit_news_file (
  *               -1 = error (no '.' and/or '@' in From)
  *               -2 = error (no '.' and/or '@' in Sender)
  */
-#if defined (NNTP_INEWS) && !defined(FORGERY)
+#if defined(NNTP_INEWS) && !defined(FORGERY)
 static int sender_needed (
-	char * from,
-	char * sender)
+	char *from,
+	char *sender)
 {
-	char * from_at_pos;
-	char * from_login_pos;
-	char * from_end_pos;
-	char * sender_at_pos;
-	char * sender_dot_pos;
-	char * sender_login_pos;
+	char *from_at_pos;
+	char *sender_at_pos;
+	char *sender_dot_pos;
+	char from_addr[HEADER_LEN];
+	char from_name[HEADER_LEN];
+	char sender_addr[HEADER_LEN];
+	char sender_name[HEADER_LEN];
 
-	/* skip realname in from */
-	if ((from_login_pos = strchr (from, '<')) == (char *) 0) {
-		/* address in user@domain (realname) syntax or realname is missing */
-		from_login_pos = from;
-		if ((from_end_pos = strchr (from_login_pos, ' ')) == (char *) 0)
-			from_end_pos = from_login_pos+strlen(from_login_pos);
-	} else {
-		from_login_pos++; /* skip '<' */
-		from_end_pos = from_login_pos+strlen(from_login_pos)-1; /* skip '>' */
-	}
+#ifdef DEBUG
+	if (debug == 2)
+		wait_message (0, "sender_needed From:=[%s]", from);
+#endif /* DEBUG */
 
-	if ((from_at_pos = strchr (from_login_pos, '@')) == (char *) 0)
-		return -1; /* no '@' in from */
+	if (GNKSA_OK != gnksa_do_check_from(rfc1522_encode(from, FALSE), from_addr, from_name))
+		return -1;
 
-	/* skip realname in sender */
-	if ((sender_login_pos = strchr (sender, '<')) == (char *) 0)
-		/* address in user@domain (realname) syntax or realname missing */
-		sender_login_pos = sender;
-	else
-		sender_login_pos++; /* skip '<' */
+#ifdef DEBUG
+	if (debug == 2)
+		wait_message (0, "sender_needed Sender:=[%s]", sender);
+#endif /* DEBUG */
 
-	if ((sender_at_pos = strchr (sender_login_pos, '@')) == (char *) 0)
-		return -2; /* no '@' in sender */
+	if (GNKSA_OK != gnksa_do_check_from(rfc1522_encode(sender, FALSE), sender_addr, sender_name))
+		return -2;
 
-	if (strncasecmp (from_login_pos, sender_login_pos, (from_at_pos - from_login_pos)))
+	from_at_pos = strchr(from_addr, '@');
+	sender_at_pos = strchr(sender_addr, '@');
+	sender_dot_pos = strchr (sender_at_pos, '.');
+
+	if (strncasecmp(from_addr, sender_addr, (from_at_pos - from_addr)))
 		return 1; /* login differs */
 
-	if (strchr (from_at_pos, '.') == (char *) 0)
-		return -1; /* no '.' in from */
-
-	if ((sender_dot_pos = strchr (sender_at_pos, '.')) == (char *) 0)
-		return -2; /* no '.' in sender */
-
-	if (strncasecmp (from_at_pos, sender_at_pos, (from_end_pos - from_at_pos))) {
-		/* skip the 'hostname' in sender */
-		if (strncasecmp (from_at_pos+1, sender_dot_pos+1, (from_end_pos - from_at_pos - 1)))
-			return 1; /* domainname differs */
-	}
+	if (strcasecmp(from_at_pos, sender_at_pos)
+	    && (strcasecmp (from_at_pos+1, sender_dot_pos+1)))
+		return 1; /* domainname differs */
 
 	return 0;
 }

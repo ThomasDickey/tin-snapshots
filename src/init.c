@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-28
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -225,8 +225,10 @@ t_bool default_filter_select_expire;
 t_bool default_filter_select_global;
 t_bool default_show_only_unread; /* show only new/unread arts or all arts */
 t_bool delete_index_file;	/* delete index file before indexing (tind only) */
-t_bool display_mime_header_asis=FALSE;	/* rfc 1522/2047 news_headers_to_display will be decoded by default */
-t_bool display_mime_allheader_asis=TRUE;	/* rfc 1522/2047 all heades (^H) will not be decoded by default */
+t_bool disable_gnksa_domain_check;		/* disable checking TLD in From: etc. */
+t_bool disable_sender;		/* disable generation of Sender: header */
+t_bool display_mime_header_asis = FALSE;	/* rfc 1522/2047 news_headers_to_display will be decoded by default */
+t_bool display_mime_allheader_asis = TRUE;	/* rfc 1522/2047 all heades (^H) will not be decoded by default */
 t_bool draw_arrow_mark;		/* draw -> or highlighted bar */
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
@@ -311,7 +313,7 @@ char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 #endif /* HAVE_SYS_UTSNAME_H */
 
 #ifndef M_AMIGA
-	struct passwd *myentry;
+	static struct passwd *myentry;
 	static struct passwd pwdentry;
 #endif /* !M_AMIGA */
 
@@ -345,7 +347,9 @@ static const struct {
 	{ &col_title,       4 },
 };
 
-static void preinit_colors(void)
+static void
+preinit_colors (
+	void)
 {
 	size_t n;
 
@@ -353,7 +357,9 @@ static void preinit_colors(void)
 		*(our_colors[n].colorp) = DFT_INIT;
 }
 
-void postinit_colors(void)
+void
+postinit_colors (
+	void)
 {
 	size_t n;
 
@@ -384,7 +390,9 @@ void postinit_colors(void)
 /*
  * Get users home directory, userid, and a bunch of other stuff!
  */
-void init_selfinfo (void)
+void
+init_selfinfo (
+	void)
 {
 	char nam[LEN];
 	char *ptr;
@@ -403,7 +411,7 @@ void init_selfinfo (void)
 		*system_info.release = '\0';
 	}
 #	endif /* HAVE_SYS_UTSNAME_H */
-#endif /* M_AMIGA */
+#endif /* !M_AMIGA */
 
 	if ((cptr = get_host_name()) != (char *) 0)
 		strcpy (host_name, cptr);
@@ -501,7 +509,7 @@ void init_selfinfo (void)
 		strcpy (homedir, "/tmp");
 	} else
 		my_strncpy (homedir, myentry->pw_dir, sizeof (homedir));
-#endif	/* M_AMIGA */
+#endif /* M_AMIGA */
 
 	/*
 	 * we're setuid, so index in /usr/spool/news even if user root
@@ -559,6 +567,8 @@ void init_selfinfo (void)
 	default_sort_art_type = SORT_BY_DATE_ASCEND;
 	default_thread_arts = THREAD_MAX;
 	delete_index_file = FALSE;
+	disable_gnksa_domain_check = FALSE;
+	disable_sender = FALSE;
 	display_mime_header_asis=FALSE;
 	display_mime_allheader_asis=TRUE;
 	force_screen_redraw = FALSE;
@@ -731,7 +741,7 @@ void init_selfinfo (void)
 	strcpy (novrootdir, get_val ("TIN_NOVROOTDIR", NOVROOTDIR));
 	strcpy (novfilename, get_val ("TIN_NOVFILENAME", OVERVIEW_FILE));
 	strcpy (spooldir, get_val ("TIN_SPOOLDIR", SPOOLDIR));
-#endif /* NNTP_ONLY */
+#endif /* !NNTP_ONLY */
 	/* clear news_active_file, active_time_file, newsgroups_file */
 	news_active_file[0] = '\0';
 	active_times_file[0] = '\0';
@@ -999,7 +1009,8 @@ void init_selfinfo (void)
  */
 #ifndef INDEX_DAEMON
 void
-set_up_private_index_cache (void)
+set_up_private_index_cache (
+	void)
 {
 	char *to;
 	char *from;
@@ -1035,7 +1046,8 @@ set_up_private_index_cache (void)
  * Create default mail & save directories if they do not exist
  */
 t_bool
-create_mail_save_dirs (void)
+create_mail_save_dirs (
+	void)
 {
 	t_bool created = FALSE;
 #ifndef INDEX_DAEMON
@@ -1073,7 +1085,9 @@ create_mail_save_dirs (void)
  *
  * Sven Paulus <sven@tin.org>, 26-Jan-'98
  */
-static int read_site_config (void)
+static int
+read_site_config (
+	void)
 {
 	FILE *fp = (FILE *)0;
 	char buf[LEN];
@@ -1103,7 +1117,7 @@ static int read_site_config (void)
 			continue;
 		if (match_string (buf, "overviewfile=", novfilename, sizeof (novfilename)))
 			continue;
-#endif	/* NNTP_ONLY */
+#endif /* !NNTP_ONLY */
 		if (match_string (buf, "activefile=", news_active_file, sizeof (news_active_file)))
 			continue;
 		if (match_string (buf, "activetimesfile=", active_times_file, sizeof (active_times_file)))
@@ -1123,6 +1137,10 @@ static int read_site_config (void)
 		if (match_string (buf, "organization=", default_organization, sizeof (default_organization)))
 			continue;
 		if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset)))
+			continue;
+		if (match_boolean (buf, "disable_gnksa_domain_check=", &disable_gnksa_domain_check))
+			continue;
+		if (match_boolean (buf, "disable_sender=", &disable_sender))
 			continue;
 	}
 

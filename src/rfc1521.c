@@ -5,7 +5,7 @@
  *  Created   : September '95
  *  Updated   : 1998-01-03
  *  Notes     : MIME text/plain support
- *  Copyright : (c) Copyright 1995-98 by Chris Blum
+ *  Copyright : (c) Copyright 1995-99 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -21,7 +21,7 @@ static int boundary_cmp (char *line, char *boundary);
 static unsigned char bin2hex (unsigned int x);
 
 static unsigned char
-bin2hex(
+bin2hex (
 	unsigned int x)
 {
 	if (x < 10)
@@ -35,7 +35,7 @@ bin2hex(
  * returns 0 if false, 1 if normal boundary and 2 if closing boundary
  */
 static int
-boundary_cmp(
+boundary_cmp (
 	char *line,
 	char *boundary)
 {
@@ -77,7 +77,7 @@ boundary_cmp(
  * [ I have a plan to sort all this out - Jason ]
  */
 FILE *
-rfc1521_decode(
+rfc1521_decode (
 	FILE * file)
 {
 	FILE *f;
@@ -292,17 +292,17 @@ rfc1521_decode(
  * encoding modes. If line is the null pointer, flush internal buffers.
  */
 void
-rfc1521_encode(
+rfc1521_encode (
 	char *line,
 	FILE * f,
 	int e)
 {
-	static char buffer[80];		  /* they must be static for base64 */
-	static char *b = NULL;
+	int i;
+	static char *b = NULL;	/* they must be static for base64 */
+	static char buffer[80];
+	static int bits = 0;
 	static int xpos = 0;
 	static unsigned long pattern = 0;
-	static int bits = 0;
-	int i;
 
 	if (e == 'b') {
 		if (!b) {
@@ -433,7 +433,7 @@ rfc1521_encode(
 #define SO '\016'
 
 void
-rfc1557_encode(
+rfc1557_encode (
 	char *line,
 	FILE * f,
 	int e)
@@ -487,7 +487,7 @@ rfc1557_encode(
 
 /* Not yet implemented */
 void
-rfc1468_encode(
+rfc1468_encode (
 	char *line,
 	FILE * f,
 	int e)
@@ -498,7 +498,7 @@ rfc1468_encode(
 
 /* Not yet implemented */
 void
-rfc1922_encode(
+rfc1922_encode (
 	char *line,
 	FILE * f,
 	int e)

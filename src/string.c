@@ -5,7 +5,7 @@
  *  Created   : 1997-01-20
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1997-98 by Urs Janssen
+ *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -152,7 +152,9 @@ mystrcat (
 	return len;
 }
 
-void modifiedstrncpy(
+
+void
+modifiedstrncpy (
 	char *target,
 	const char *source,
 	size_t size,
@@ -297,7 +299,7 @@ atol (
 	}
 	return ret;
 }
-#endif /* HAVE_ATOL */
+#endif /* !HAVE_ATOL */
 
 #ifndef HAVE_STRTOL
 /* fix me - put me in tin.h */
@@ -351,7 +353,7 @@ OUT:
 }
 #undef DIGIT(x)
 #undef MBASE
-#endif /* HAVE_STRTOL */
+#endif /* !HAVE_STRTOL */
 
 
 /*
@@ -379,7 +381,7 @@ strcasecmp (
 
 #ifndef HAVE_STRNCASECMP
 int
-strncasecmp(
+strncasecmp (
 	const char *p,
 	const char *q,
 	size_t n)
@@ -405,7 +407,7 @@ strncasecmp(
  * RETURN: trimmed string
  */
 char *
-str_trim(
+str_trim (
 	char *string)
 {
 	char *rp;		/* reading string pointer */
@@ -580,7 +582,7 @@ sh_format (char *dst,
 #	endif /* HAVE_SYS_ERRLIST */
 
 char *
-my_strerror(
+my_strerror (
 	int n)
 {
 	static char temp[32];

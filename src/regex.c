@@ -1,12 +1,12 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : regex.c
- *  Author    : Jason Faultless <jason@radar.demon.co.uk>
+ *  Author    : Jason Faultless <jason@radar.tele2.co.uk>
  *  Created   : 1997-02-21
  *  Updated   : 1997-02-25
  *  Notes     : Regular expression subroutines
  *  Credits   :
- *  Copyright : (c) 1997-98 by Jason Faultless
+ *  Copyright : (c) 1997-99 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -20,7 +20,7 @@
  * if icase=TRUE then ignore case in the compare
  */
 t_bool
-match_regex(
+match_regex (
 	const char *string,
 	char *pattern,
 	t_bool icase)

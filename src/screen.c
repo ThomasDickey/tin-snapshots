@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -25,7 +25,8 @@ char mesg[LEN];
  * Move the cursor to the lower-left of the screen, where it won't be annoying
  */
 void
-stow_cursor(void)
+stow_cursor (
+	void)
 {
 	if (!cmd_line)
 		MoveCursor (cLINES, 0);
@@ -163,7 +164,8 @@ perror_message (
 
 
 void
-clear_message (void)
+clear_message (
+	void)
 {
 	if (!cmd_line) {
 		MoveCursor (cLINES, 0);
@@ -287,7 +289,8 @@ show_title (
 
 
 void
-ring_bell (void)
+ring_bell (
+	void)
 {
 #ifdef USE_CURSES
 	if (!cmd_line)
@@ -303,7 +306,8 @@ ring_bell (void)
 
 
 void
-spin_cursor (void)
+spin_cursor (
+	void)
 {
 	static const char buf[] = "|/-\\|/-\\";
 	static unsigned short int i = 0;

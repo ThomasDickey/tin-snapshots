@@ -193,6 +193,10 @@ none given, too simple, find out yourself ,-)
 
 6.2 REGEXP EXAMPLES
 
+Be sure to change Wildcard setting from WILDMAT (default) to REGEX to make
+the following examples to work properly. This can be done using the internal
+configuration menu or in file ~/.tin/tinrc
+
 ### this kills all articles about CNews, DNEWS or diablo
 ### in news.software.* but not in news.software.readers
 group=news.software.*,!news.software.readers

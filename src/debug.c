@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1994-12-24
  *  Notes     : debug routines
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,10 @@
  */
 
 #include "tin.h"
-#include "tcurses.h"
+
+#if defined(DEBUG) || defined(DEBUG_NEWSRC)
+#	include "tcurses.h"
+#endif /* DEBUG || DEBUG_NEWSRC */
 
 int debug;
 
@@ -33,7 +36,8 @@ static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
  */
 
 void
-debug_delete_files (void)
+debug_delete_files (
+	void)
 {
 	char file[PATH_LEN];
 
@@ -88,7 +92,8 @@ debug_nntp (
  */
 
 void
-debug_print_arts (void)
+debug_print_arts (
+	void)
 {
 	int i;
 
@@ -145,7 +150,8 @@ debug_print_header (
 
 
 void
-debug_save_comp (void)
+debug_save_comp (
+	void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
@@ -183,7 +189,8 @@ debug_save_comp (void)
 
 
 static void
-debug_print_base (void)
+debug_print_base (
+	void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
@@ -205,7 +212,8 @@ debug_print_base (void)
 
 
 void
-debug_print_active (void)
+debug_print_active (
+	void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
@@ -324,7 +332,8 @@ debug_print_filter (
 
 
 void
-debug_print_filters (void)
+debug_print_filters (
+	void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
@@ -361,7 +370,8 @@ debug_print_filters (void)
  */
 #if 0
 static void
-debug_print_active_hash (void)
+debug_print_active_hash (
+	void)
 {
 	int empty = 0, number;
 	int collisions[32];
@@ -404,14 +414,15 @@ debug_print_active_hash (void)
 #endif /* 0 */
 
 static void
-debug_print_group_hash (void)
+debug_print_group_hash (
+	void)
 {
 	int i;
 
 	for (i = 0; i < TABLE_SIZE; i++)
 		my_printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
 }
-#endif	/* DEBUG */
+#endif /* DEBUG */
 
 #ifdef DEBUG_NEWSRC
 void
@@ -494,4 +505,4 @@ debug_print_newsrc (
 	fprintf (fp, "]\n");
 	fflush (fp);
 }
-#endif	/* DEBUG_NEWSRC */
+#endif /* DEBUG_NEWSRC */

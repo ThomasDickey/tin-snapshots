@@ -5,7 +5,7 @@
  *  Created   : 1997-01-10
  *  Updated   : 1997-01-10
  *  Notes     :
- *  Copyright : (c) Copyright 1997-98 by Thomas Dickey
+ *  Copyright : (c) Copyright 1997-99 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -20,7 +20,7 @@
  */
 #ifndef M_AMIGA
 void
-joinpath(
+joinpath (
 	char	*result,
 	const char *dir,
 	const char *file)

@@ -5,7 +5,7 @@
  *  Created   : 1991-10-13
  *  Updated   : 1993-03-10
  *  Notes     : Adds default options from environment to command line
- *  Copyright : (c) Copyright 1991-98 by Bill Davidsen
+ *  Copyright : (c) Copyright 1991-99 by Bill Davidsen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

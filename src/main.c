@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-28
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -121,7 +121,7 @@ main (
 
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
 #	ifndef USE_CURSES
@@ -706,7 +706,7 @@ usage (
 
 #	ifndef NNTP_ONLY
 		error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
-#	endif /* NNTP_ONLY */
+#	endif /* !NNTP_ONLY */
 
 #	ifdef NNTP_ABLE
 		error_message ("  -l       use only LISTGROUP instead of GROUP (-n) command");
@@ -746,7 +746,7 @@ usage (
 #	ifndef NNTP_ONLY
 		error_message ("  -u       update index files (batch mode)");
 		error_message ("  -U       update index files in the background while reading news");
-#	endif /* NNTP_ONLY */
+#	endif /* !NNTP_ONLY */
 
 	error_message ("  -v       verbose output for batch mode options");
 	error_message ("  -V       print version & date information");
@@ -809,7 +809,8 @@ check_for_any_new_news (
  *  save any new articles to savedir structure for later reading
  */
 static void
-save_or_mail_new_news (void)
+save_or_mail_new_news (
+	void)
 {
 	if (mail_news || save_news) {
 		t_bool i = catchup;
@@ -826,7 +827,8 @@ save_or_mail_new_news (void)
  *  update index files
  */
 static void
-update_index_files (void)
+update_index_files (
+	void)
 {
 	if (batch_mode || update_fork) {
 		if (!catchup && (read_news_via_nntp && xover_supported)) {
@@ -890,7 +892,7 @@ update_index_files (void)
 			}
 			batch_mode = FALSE;
 		} else
-#endif	/* HAVE_FORK */
+#endif /* HAVE_FORK */
 		{
 			create_index_lock_file (lock_file);
 			default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
@@ -906,7 +908,8 @@ update_index_files (void)
  */
 #ifndef INDEX_DAEMON
 static void
-show_intro_page (void)
+show_intro_page (
+	void)
 {
 	char buf[4096]; /* should be enoght */
 
@@ -935,7 +938,8 @@ show_intro_page (void)
  * yank at startup. Return number of groups that were matched.
  */
 int
-read_cmd_line_groups (void)
+read_cmd_line_groups (
+	void)
 {
 	int matched = 0;
 	int num;

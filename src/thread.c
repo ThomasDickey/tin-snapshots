@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-26
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -299,16 +299,17 @@ int
 thread_page (
 	struct t_group *group,
 	int respnum,				/* base[] article of thread to view */
-	int the_thread_depth)			/* initial depth in thread */
+	int thread_depth)			/* initial depth in thread */
 {
 	char buf[LEN];
 	int ret_code = 0;
-	int ch;
+	int ch = 0;
 	int i, n;
 	t_bool ignore_unavail = FALSE;	/* Set if we keep going after an 'article unavailable' */
 
 	thread_respnum = respnum;		/* Bodge to make this variable global */
-	thread_basenote = which_thread (thread_respnum);
+	if ((n = which_thread (thread_respnum)) >= 0)
+		thread_basenote = n;
 	top_thread = num_of_responses (thread_basenote) + 1;
 
 	if (top_thread <= 0) {
@@ -323,12 +324,12 @@ thread_page (
 
 	/*
 	 * Set the cursor to the last response unless space_mode is active
-	 * or an explicit the_thread_depth has been specified
+	 * or an explicit thread_depth has been specified
 	 */
 	thread_index_point = top_thread;
 
-	if (the_thread_depth)
-		thread_index_point = the_thread_depth;
+	if (thread_depth)
+		thread_index_point = thread_depth;
 	else {
 		if (space_mode) {
 			if ((i = new_responses (thread_basenote))) {
@@ -527,6 +528,10 @@ enter_pager:
 						ret_code = n;
 						goto thread_done;
 
+					case GRP_QUIT:
+						ret_code = GRP_QUIT;
+						goto thread_done;
+
 					case GRP_NEXTUNREAD:
 						goto thread_tab_pressed;
 
@@ -583,10 +588,16 @@ thread_page_up:
 			case iKeyThreadCatchup:					/* catchup thread, move to next one */
 			case iKeyThreadCatchupNextUnread:	/* -> next with unread arts */
 thread_catchup:										/* come here when exiting thread via <- */
-				sprintf(buf, txt_mark_thread_read, (ch == iKeyThreadCatchupNextUnread) ? txt_enter_next_thread : "");
-
-				if (confirm_action && prompt_yn (cLINES, buf, TRUE) == 1)
-					thd_mark_read (group, base[thread_basenote]);
+				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, thread_index_point));
+				for (i = n; i != -1; i = arts[i].thread) {
+					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN))
+						break;
+				}
+				if (i != -1) {	/* still unread arts in the thread */
+					sprintf(buf, txt_mark_thread_read, (ch == iKeyThreadCatchupNextUnread) ? txt_enter_next_thread : "");
+					if (!confirm_action || (confirm_action && prompt_yn (cLINES, buf, TRUE) == 1))
+						thd_mark_read (group, base[thread_basenote]);
+				}
 				ret_code = (ch == iKeyThreadCatchupNextUnread ? GRP_NEXTUNREAD : GRP_NEXT);
 				goto thread_done;
 
@@ -773,7 +784,8 @@ thread_done:
 
 
 void
-show_thread_page (void)
+show_thread_page (
+	void)
 {
 #ifndef INDEX_DAEMON
 
@@ -809,10 +821,11 @@ show_thread_page (void)
 	MoveCursor (INDEX_TOP, 0);
 
 	for (j=0, i = first_thread_on_screen; j < NOTESLINES && i < last_thread_on_screen; i++, j++) {
+		if (the_index < 0 || the_index >= max_art)
+			break;
 		bld_tline (i, &arts[the_index]);
 		draw_tline (i, TRUE);
-		if ((the_index = next_response (the_index)) == -1)
-			break;
+		the_index = next_response (the_index);
 	}
 
 	CleartoEOS ();
@@ -829,7 +842,8 @@ show_thread_page (void)
 
 #ifndef INDEX_DAEMON
 static void
-update_thread_page (void)
+update_thread_page (
+	void)
 {
 	register int i, j, the_index;
 
@@ -848,7 +862,8 @@ update_thread_page (void)
 
 
 static void
-draw_thread_arrow (void)
+draw_thread_arrow (
+	void)
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
@@ -868,7 +883,8 @@ draw_thread_arrow (void)
 
 
 static void
-erase_thread_arrow (void)
+erase_thread_arrow (
+	void)
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
@@ -891,7 +907,8 @@ fixup_thread (
 	int basenote,
 	int respnum)
 {
-	if (basenote != thread_basenote) {
+	if (basenote != thread_basenote
+	 && basenote >= 0) {
 		thread_basenote = basenote;
 		top_thread = num_of_responses (thread_basenote) + 1;
 		thread_respnum = base[thread_basenote];
@@ -1029,6 +1046,9 @@ num_of_responses (
 	int sum = 0;
 
 	assert (n < top_base);
+
+	if (n < 0)
+		n = 0;
 
 	for (i = (int) base[n]; i != -1; i = arts[i].thread) {
 		assert (i != ART_EXPIRED);

@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -396,7 +396,7 @@ prompt_option_char (
  * Return the string or NULL if we can't get anything useful
  */
 char *
-prompt_string_default(
+prompt_string_default (
 	char *prompt,
 	char *def,
 	const char *failtext,
@@ -430,7 +430,7 @@ prompt_string_default(
  * TODO - maybe add a '...' to the string to show it was truncated. See center_line()
  */
 char *
-sized_message(
+sized_message (
 	const char *format,
 	const char *subject)
 {
@@ -452,7 +452,7 @@ sized_message(
  * eg, Press a)ppend, o)verwrite, q)uit :
  */
 int
-prompt_slk_response(
+prompt_slk_response (
 	int ch_default,
 	const char *responses,
 	const char *fmt, ...)
@@ -487,7 +487,8 @@ prompt_slk_response(
  * ii) CTRL, SHIFT etc don't work
  */
 void
-continue_prompt (void)
+continue_prompt (
+	void)
 {
 	int ch;
 

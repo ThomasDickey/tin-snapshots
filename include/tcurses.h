@@ -23,27 +23,27 @@
 #		undef TRUE
 #		undef FALSE
 #		include <curses.h>
-#		ifndef TRUE
-#			define TRUE	1
-#		endif
 #		ifndef FALSE
 #			define FALSE	0
-#		endif
-#	endif
-#endif
+#		endif /* !FALSE */
+#		ifndef TRUE
+#			define TRUE	(!FALSE)
+#		endif /* !TRUE */
+#	endif /* HAVE_NCURSES_H */
+#endif /* USE_CURSES || NEED_CURSES_H */
 
 #ifdef USE_CURSES
 
 #ifdef USE_TRACE
 #	ifdef HAVE_NOMACROS_H
 #		include <nomacros.h>
-#	endif
+#	endif /* HAVE_NOMACROS_H */
 #endif /* USE_TRACE */
 
 #if 0	/* FIXME: this has prototypes, but opens up new problems! */
 #ifdef HAVE_TERM_H
 #	include <term.h>
-#endif
+#endif /* HAVE_TERM_H */
 #endif /* 0 */
 
 #define cCRLF				"\n"
@@ -71,7 +71,7 @@ extern void my_fprintf(FILE *stream, const char *fmt, ...)
 extern void my_printf(const char *fmt, ...)
 #ifdef __GNUC__
 	__attribute__((format(printf,1,2)))
-#endif
+#endif /* __GNUC__ */
 	;
 extern void my_retouch(void);
 extern void refresh_color(void);
@@ -81,12 +81,12 @@ extern void write_line(int row, char *buffer);
 
 #ifdef HAVE_TERMCAP_H
 #	include <termcap.h>
-#endif
+#endif /* HAVE_TERMCAP_H */
 
 #define cCRLF				"\r\n"
 
-#define	my_fputc(ch, stream)		fputc (ch, stream)
-#define	my_fputs(str, stream)		fputs (str, stream)
+#define my_fputc(ch, stream)		fputc (ch, stream)
+#define my_fputs(str, stream)		fputs (str, stream)
 
 #define my_printf			printf
 #define my_fprintf			fprintf
@@ -97,7 +97,7 @@ extern void write_line(int row, char *buffer);
 
 #define HpGlitch(func)			if (_hp_glitch) func
 
-#endif	/* USE_CURSES/!USE_CURSES */
+#endif /* USE_CURSES/!USE_CURSES */
 
 extern void my_dummy(void);
 

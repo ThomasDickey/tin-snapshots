@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-28
  *  Notes     : ArtCount = (ArtMax - ArtMin) + 1  [could have holes]
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -147,7 +147,8 @@ iWriteNewsrcLine (
  * Return TRUE if this succeeds, FALSE otherwise.
  */
 t_bool
-vWriteNewsrc (void)
+vWriteNewsrc (
+	void)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp_ip;
@@ -198,7 +199,7 @@ vWriteNewsrc (void)
 	return write_ok;
 #else
 	return TRUE;
-#endif	/* !INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -273,7 +274,8 @@ auto_subscribe_groups (
  * make a backup of users .newsrc in case of the bogie man
  */
 void
-backup_newsrc (void)
+backup_newsrc (
+	void)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp_ip, *fp_op;
@@ -378,7 +380,8 @@ subscribe (
 
 
 void
-reset_newsrc (void)
+reset_newsrc (
+	void)
 {
 	FILE *fp;
 	FILE *newfp;
@@ -772,7 +775,7 @@ pcParseSubSeq (
 
 
 static char *
-pcParseGetSeq(
+pcParseGetSeq (
 	char *pcSeq,
 	long *plLow,
 	long *plHigh)
@@ -1098,7 +1101,8 @@ rewrite_group_done:
  *  catchup all groups in .newsrc
  */
 void
-catchup_newsrc_file (void)
+catchup_newsrc_file (
+	void)
 {
 	register int i;
 	struct t_group *group;
@@ -1450,7 +1454,8 @@ vSetDefaultBitmap (
 #	endif /* DEBUG_NEWSRC_FIXME */
 
 void
-vNewsrcTestHarness (void)
+vNewsrcTestHarness (
+	void)
 {
 	char seq[20000];
 	char *temp_file = NULL;

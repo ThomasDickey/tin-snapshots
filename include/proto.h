@@ -52,11 +52,11 @@ extern void fcol (int color);
 extern void print_color (char *str, t_bool signature);
 
 /* config.c */
-extern char **ulBuildArgv(char *cmd, int *new_argc);
+extern char **ulBuildArgv (char *cmd, int *new_argc);
 extern char *quote_space_to_dash (char *str);
 extern const char *print_boolean (t_bool value);
 extern int change_config_file (struct t_group *group);
-extern int option_row(int option);
+extern int option_row (int option);
 extern t_bool match_boolean (char *line, const char *pat, t_bool *dst);
 extern t_bool match_integer (char *line, const char *pat, int *dst, int maxlen);
 extern t_bool match_long (char *line, const char *pat, long *dst);
@@ -120,7 +120,6 @@ extern char get_post_proc_type (int proc_type);
 #endif /* !INDEX_DAEMON */
 
 /* filter.c */
-extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
 extern t_bool filter_articles (struct t_group *group);
 extern t_bool filter_menu (int type, struct t_group *group, struct t_article *art);
 extern t_bool quick_filter (int type, struct t_group *group, struct t_article *art);
@@ -144,7 +143,7 @@ extern void show_group_page (void);
 extern void toggle_subject_from (void);
 #ifndef INDEX_DAEMON
 	extern int group_page (struct t_group *group);
-	extern void toggle_read_unread(t_bool force);
+	extern void toggle_read_unread (t_bool force);
 #endif /* !INDEX_DAEMON */
 
 /* hashstr.c */
@@ -198,7 +197,7 @@ extern struct t_group *psGrpAdd (char *group);
 extern struct t_group *psGrpFind (char *pcGrpName);
 extern unsigned long hash_groupname (const char *group);
 extern void init_group_hash (void);
-extern char *random_organization(char *in_org);
+extern char *random_organization (char *in_org);
 #if 0
 	extern struct t_group *psGrpFirst (void);
 	extern struct t_group *psGrpLast (void);
@@ -246,11 +245,12 @@ extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 
 /* misc.c */
 extern char *eat_re (char *s, t_bool eat_was);
-extern char *quote_wild(char *str);
-extern char *quote_wild_whitespace(char *str);
+extern char *quote_wild (char *str);
+extern char *quote_wild_whitespace (char *str);
 extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
+extern int gnksa_do_check_from(char *from, char *address, char *realname);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
 extern int my_chdir (char *path);
@@ -295,16 +295,10 @@ extern void vPrintBugAddress (void);
 	extern void buffer_to_local (char *b);
 	extern void buffer_to_network (char *b);
 #endif /* LOCAL_CHARSET */
-extern const char *gnksa_strerror(int errcode);
-extern int gnksa_dequote_plainphrase(char *realname, char *decoded);
-extern int gnksa_check_domain_literal(char *domain);
-extern int gnksa_check_domain(char *domain);
-extern int gnksa_check_localpart(char *localpart);
-extern int gnksa_split_from(char *from, char *address, char *realname);
-extern int gnksa_do_check_from(char *from, char *address, char *realname);
-extern int gnksa_check_from(char *from);
+extern const char *gnksa_strerror (int errcode);
+extern int gnksa_check_from (char *from);
 #if 1
-extern int parse_from(char *from, char *address, char *realname);
+extern int parse_from (char *from, char *address, char *realname);
 #endif
 #ifdef HAVE_COLOR
 	extern t_bool toggle_color (void);
@@ -348,8 +342,8 @@ extern t_bool vWriteNewsrc (void);
 #endif /* DEBUG_NEWSRC */
 
 /* nntplib.c */
-extern FILE *get_nntp_fp(FILE *fp);
-extern FILE *get_nntp_wr_fp(FILE *fp);
+extern FILE *get_nntp_fp (FILE *fp);
+extern FILE *get_nntp_wr_fp (FILE *fp);
 extern char *getserverbyfile (const char *file);
 extern char *get_server (char *string, int size);
 extern int server_init (char *machine, const char *service, int port, char *text);
@@ -365,7 +359,7 @@ extern int get_newsrcname (char *newsrc_name, const char *nntpserver_name);
 extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 
 /* open.c */
-extern FILE *nntp_command(const char *, int, char *);
+extern FILE *nntp_command (const char *, int, char *);
 extern FILE *open_art_fp (char *group_path, long art, int lines, t_bool rfc1521decode);
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
@@ -381,7 +375,7 @@ extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long
 extern long setup_hard_base (struct t_group *group, char *group_path);
 extern t_bool stat_article (long art, char *group_path);
 extern void nntp_close (void);
-extern void vGet1GrpArtInfo(struct t_group *grp);
+extern void vGet1GrpArtInfo (struct t_group *grp);
 #ifdef HAVE_MH_MAIL_HANDLING
 	extern FILE *open_mail_active_fp (const char *mode);
 	extern FILE *open_mailgroups_fp (void);
@@ -410,7 +404,6 @@ extern time_t parsedate (char *p, TIMEINFO *now);
 /* post.c */
 extern int count_postponed_articles (void);
 extern int post_response (char *group, int respnum, int copy_text, t_bool with_headers);
-extern int repost_article (const char *group, int respnum, t_bool supersede);
 extern t_bool mail_bug_report (void);
 extern t_bool mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
 extern t_bool mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
@@ -421,6 +414,7 @@ extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile);
 extern void quick_post_article (t_bool postponed_only);
 #ifndef INDEX_DAEMON
+	extern int repost_article (const char *group, int respnum, t_bool supersede);
 	extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
 #endif /* !INDEX_DAEMON */
 
@@ -474,7 +468,6 @@ extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool 
 
 /* save.c */
 extern int check_start_save_any_news (int check_start_save);
-extern int save_comp (t_comptype *p1, t_comptype *p2);
 extern t_bool create_path (char *path);
 extern t_bool post_process_files (int proc_type_ch, t_bool auto_delete);
 extern t_bool save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
@@ -529,7 +522,6 @@ extern void msg_write_signature (FILE *fp, t_bool flag, struct t_group *thisgrou
 /* signal.c */
 extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);
 extern int set_win_size (int *num_lines, int *num_cols);
-extern void _CDECL signal_handler (SIG_ARGS);
 extern void handle_resize (int repaint);
 extern void set_signal_catcher (int flag);
 extern void set_signal_handlers (void);
@@ -550,7 +542,7 @@ extern char *my_strdup (const char *str);
 extern char *str_trim (char *string);
 extern char *strcasestr (char *haystack, const char *needle);
 extern char *tin_ltoa (long value, int digits);
-extern int sh_format(char *dst, size_t len, const char *fmt, ...);
+extern int sh_format (char *dst, size_t len, const char *fmt, ...);
 extern size_t mystrcat (char **t, const char *s);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
 extern void my_strncpy (char *p, const char *q, size_t n);
@@ -578,7 +570,7 @@ extern void strcpynl (char *to, const char *from);
 	extern long strtol (const char *str, char **ptr, int use_base);
 #endif /* !HAVE STRTOL */
 #ifndef HAVE_STRERROR
-	extern char *my_strerror(int n);
+	extern char *my_strerror (int n);
 #	define strerror(n) my_strerror(n)
 #endif /* !HAVE_STRERROR */
 
@@ -596,7 +588,7 @@ extern int which_response (int n);
 extern int which_thread (int n);
 extern void show_thread_page (void);
 #ifndef INDEX_DAEMON
-	extern int thread_page (struct t_group *group, int respnum, int the_thread_depth);
+	extern int thread_page (struct t_group *group, int respnum, int thread_depth);
 #endif /* !INDEX_DAEMON */
 
 /* wildmat.c */

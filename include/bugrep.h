@@ -5,7 +5,7 @@
  *  Created   : 1997-07-30
  *  Updated   : 1998-02-01
  *  Notes     :
- *  Copyright : (c) Copyright 1997-98 by Urs Janssen
+ *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute this  software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
