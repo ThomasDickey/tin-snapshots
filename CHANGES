@@ -1,3 +1,20 @@
+--unoff BETA release 960704 --
+
+105) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. repost_article() calls join_references so reposting an article
+          with two white_spaces between 2 msgids won't fail anymore
+          (join_references is not appending the original-msgid of the
+           article which is reposted to the new References:-line, should
+           it?)
+     FIX. post.c
+
+104) Chris Blum <chris@phil.uni-sb.de
+     BUG. TIN did not guarantee a syntactically correct References line if
+          preceding articles had a faulty one.
+     BUG. wrong array sizes for header information (mostly LEN instead of
+          HEADER_LEN), inane *LEN-declarations
+     FIX. several supplied patches
+
 --unoff BETA release 960703 --
 
 103) Greg Berigan <gberigan@cse.unl.edu>

@@ -544,8 +544,8 @@ parse_headers (buf, h)
 	struct t_article *h;
 {
 	char buf2[HEADER_LEN];
-	char art_from_addr[LEN];
-	char art_full_name[LEN];
+	char art_from_addr[HEADER_LEN];
+	char art_full_name[HEADER_LEN];
 	char *ptr, *ptrline, *s;
 	char *msgid = NULL;
 	int flag, n;
@@ -756,9 +756,9 @@ iReadNovFile (group, min, max, expired)
 {
  	char	*p, *q, *s;
 	char	buf[OVERVIEW_LINE];
-	char	buf2[LEN];
- 	char	art_full_name[LEN];
-	char	art_from_addr[LEN];
+	char	buf2[HEADER_LEN];
+ 	char	art_full_name[HEADER_LEN];
+	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
 	char	*msgid;
 	long	artnum;

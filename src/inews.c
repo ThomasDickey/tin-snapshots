@@ -54,8 +54,8 @@ submit_inews (name)
 
 #ifdef NNTP_INEWS
 #if !defined(FORGERY) && defined INEWS_MAIL_DOMAIN
-	char	buf[PATH_LEN];
-	char	domain_name[PATH_LEN];
+	char	buf[NNTP_STRLEN];
+	char	domain_name[NNTP_STRLEN];
 #endif /* !FORGERY && INEWS_MAIL_DOMAIN */
 	char	from_name[PATH_LEN];
 	char	host_name[PATH_LEN];

@@ -159,13 +159,13 @@ read_filter_file (file, global_file)
 	int		global_file;
 {
 #ifndef INDEX_DAEMON
-	char buf[LEN];
-	char group[PATH_LEN];
-	char scope[PATH_LEN];
-	char subj[PATH_LEN];
-	char from[PATH_LEN];
-	char msgid[PATH_LEN];
-	char lines[PATH_LEN];
+	char buf[HEADER_LEN];
+	char group[HEADER_LEN];
+	char scope[HEADER_LEN];
+	char subj[HEADER_LEN];
+	char from[HEADER_LEN];
+	char msgid[HEADER_LEN];
+	char lines[HEADER_LEN];
 	FILE *fp;
 	int expired = FALSE;
 	int expired_time = FALSE;

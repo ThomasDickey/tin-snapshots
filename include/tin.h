@@ -642,11 +642,11 @@ extern char *get_uaf_fullname();
 #	define	LEN			1024
 #endif
 #define		NEWSRC_LINE		8192
-#define		OVERVIEW_LINE		2048
+#define		OVERVIEW_LINE		4096
 #ifdef HAVE_MAIL_HANDLER
-#	define	HEADER_LEN		8192
-#else
 #	define	HEADER_LEN		2048
+#else
+#	define	HEADER_LEN		1024
 #endif
 #define 	MODULO_COUNT_NUM	10
 #define 	TABLE_SIZE		1409

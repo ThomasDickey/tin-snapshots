@@ -38,26 +38,26 @@
 
 
 
-extern char note_h_distrib[PATH_LEN];			/* Distribution: */
-extern char note_h_followup[LEN];			/* Followup-To: */
-extern char note_h_messageid[PATH_LEN];			/* Message-ID:	*/
-extern char note_h_references[LEN];			/* References:	*/
-extern char note_h_newsgroups[LEN];			/* Newsgroups:	*/
-extern char note_h_subj[LEN];				/* Subject:	*/
-extern char note_h_date[PATH_LEN];			/* Date:	*/
-extern char note_h_from[LEN];				/* From: */
+extern char note_h_distrib[HEADER_LEN];			/* Distribution: */
+extern char note_h_followup[HEADER_LEN];		/* Followup-To: */
+extern char note_h_messageid[HEADER_LEN];		/* Message-ID:	*/
+extern char note_h_references[HEADER_LEN];		/* References:	*/
+extern char note_h_newsgroups[HEADER_LEN];		/* Newsgroups:	*/
+extern char note_h_subj[HEADER_LEN];			/* Subject:	*/
+extern char note_h_date[HEADER_LEN];			/* Date:	*/
+extern char note_h_from[HEADER_LEN];			/* From: */
 
-extern char note_h_org[PATH_LEN];			/* Organization: */
-extern char note_h_keywords[LEN];			/* Keywords: */
-extern char note_h_summary[LEN];			/* Summary: */
-extern char note_h_mimeversion[PATH_LEN];		/* Mime-Version: */
-extern char note_h_contenttype[LEN];			/* Content-Type: */
-extern char note_h_contentenc[LEN];			/* Content-Transfer-Encoding: */
+extern char note_h_org[HEADER_LEN];			/* Organization: */
+extern char note_h_keywords[HEADER_LEN];		/* Keywords: */
+extern char note_h_summary[HEADER_LEN];			/* Summary: */
+extern char note_h_mimeversion[HEADER_LEN];		/* Mime-Version: */
+extern char note_h_contenttype[HEADER_LEN];		/* Content-Type: */
+extern char note_h_contentenc[HEADER_LEN];		/* Content-Transfer-Encoding: */
 
 extern FILE *note_fp;					/* the body of the current article */
 extern long note_mark[MAX_PAGES];			/* ftells on beginnings of pages */
 
-char found_newsgroups[LEN];
+char found_newsgroups[HEADER_LEN];
 
 int unlink_article = TRUE;
 int keep_dead_articles = TRUE;
@@ -363,7 +363,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 	int  *lines;
 {
 	char *ngptrs[NGLIMIT];
-	char line[LEN], *cp, *cp2;
+	char line[HEADER_LEN], *cp, *cp2;
 	FILE *fp;
 	int cnt = 0;
 	int col, len, i;
@@ -609,16 +609,16 @@ quick_post_article ()
 	FILE	*fp;
 	char	ch, *ptr;
 	char	ch_default = iKeyPostPost;
-	char	group[PATH_LEN];
-	char	subj[PATH_LEN];
-	char	buf[LEN], tmp[LEN];
+	char	group[HEADER_LEN];
+	char	subj[HEADER_LEN];
+	char	buf[HEADER_LEN], tmp[HEADER_LEN];
 	int	art_type = GROUP_TYPE_NEWS;
 	int	done = FALSE;
 	int	lines;
 	struct	t_group *psGrp;
 #ifdef FORGERY
-	char 	from_name[PATH_LEN];
-	char 	line[NNTP_STRLEN];
+	char 	from_name[HEADER_LEN];
+	char 	line[HEADER_LEN];
 #endif
 
 	msg_init_headers ();
@@ -889,15 +889,15 @@ post_article (group, posted_flag)
 	FILE	*fp;
 	char	ch;
 	char	ch_default = iKeyPostPost;
-	char	subj[LEN];
-	char	buf[LEN];
+	char	subj[HEADER_LEN];
+	char	buf[HEADER_LEN];
 	int	art_type = GROUP_TYPE_NEWS;
 	int	lines;
 	int	redraw_screen = FALSE;
 	struct	t_group *psGrp;
 #ifdef FORGERY
-	char	from_name[PATH_LEN];
-	char	line[NNTP_STRLEN];
+	char	from_name[HEADER_LEN];
+	char	line[HEADER_LEN];
 #endif
 
 	msg_init_headers ();
@@ -1099,63 +1099,169 @@ post_article_done:
 }
 
 
-#define MAXREFSIZE 512 /* see below */
+static void appendid(char **, char **);
+static int must_include(char *);
+static void skip_id(char **);
+static int damaged_id(char *);
+
+
+/* yeah, right, that's from the same Chris who is telling Jason he's
+   doing obfuscated C :-) */
+static void appendid(where,what)
+	char **where;
+	char **what;
+{
+	char *oldpos;
+	oldpos=*where;
+	while (**what && **what!='<') (*what)++;
+	if (**what) {
+		while (**what && **what!='>' && !isspace(**what)) *(*where)++=*(*what)++;
+		if (**what!='>') *where=oldpos;
+		else {
+			(*what)++;
+			*(*where)++='>';
+		}
+	}
+}
+
+
+static int must_include(id)
+	char *id;
+{
+	while (*id && *id!='<') id++;
+	while (*id && *id!='>') {
+		if (*++id!='_') continue;
+		if (*++id!='-') continue;
+		if (*++id!='_') continue;
+		if (*++id=='@') return 1;
+	}
+	return 0;
+}
+
+
+static void skip_id(id)
+	char **id;
+{
+	while (**id && isspace(**id)) (*id)++;
+	if (**id) {
+		while (**id && !isspace(**id)) (*id)++;
+	}
+}
+
+
+static int damaged_id(id)
+	char *id;
+{
+	while (*id && isspace(*id)) id++;
+	if (*id!='<') return 1;
+	while (*id && *id!='>') id++;
+	if (*id!='>') return 1;
+	return 0;
+}
+
+
+/* Widespread news software like INN's nnrpd restricts the size of several
+   headers, notably the references header, to 512 characters.  Oh well...
+   guess that's what son-of-1036 calls a "desparate last ressort" :-/
+   From TIN's point of view, this could be HEADER_LEN. */
+#define MAXREFSIZE 512
 
 /* TODO - if we have the art[x] that we are following up to, then
  *        get_references(art[x].msgid) will give us the new refs line
  *		  Also, parsing could be better effected with strtok()
+ * CHRIS - We can't use strtok without seriously damaging old triple-spaces
  */
+
 void
 join_references (buffer, oldrefs, newref)
 	char *buffer;
 	char *oldrefs;
 	char *newref;
 {
-        char *c;
-	int buflen, newlen, oldlen;
-	int stripflag = 0;
-
-	/* TODO
-	 * son-of-1036 says it's ok to remove message ids from the middle as
-	 * long as the first and last 3 are retained and 3 blanks are inserted
-	 * to denote the deletion. This should only be done as a last resort.
-	 * We don't currently comply with this very well.
-	 * Much wide-spread software, notably INN, comes with a default maximum
-	 * header size of 512 characters, so let's make sure we don't break
-	 * this limit else our article won't get far. [is this still the case?]
-	 */
-
-	/* Always keep the first reference */
-	c = buffer;
-	while (*oldrefs && !isspace(*oldrefs))
-		*c++ = *oldrefs++;
-	*c++ = ' '; while (isspace(*oldrefs)) oldrefs++;
-	*c = 0;
-	buflen = strlen(buffer);
-	newlen = strlen(newref);
-	oldlen = strlen(oldrefs);
-
-	/* now see if it will break the limit if we include the next reference;
-	 * 14 is just the size of the References header and required whitespace
-	 */
-	while (buflen+newlen+oldlen+14 >= MAXREFSIZE) {
-		/* won't do, so clip off the next reference */
-		while (*oldrefs && !isspace(*oldrefs)) { oldrefs++; oldlen--; }
-		while (*oldrefs && isspace(*oldrefs)) { oldrefs++; oldlen--; }
-		if (!stripflag) {
-			stripflag = 1;
-			*c++ = ' ';
+	/* First of all: shortening references is a VERY BAD IDEA.
+	   Nevertheless, current software usually has restrictions in
+	   header length (their programmers seem to misinterpret RFC821
+	   as valid for news, and the command length limit of RFC977
+	   as valid for headers) */
+	/* construct a new references line, then trim it if necessary */
+	/* do some sanity cleanups: remove damaged ids, make
+	   sure there is space between ids (tabs and commas are stripped) */
+	/* note that we're not doing strict son-of-1036 here: we don't
+	   take any precautions to keep the last three message ids, but
+	   it's not very likely that MAXREFSIZE chars can't hold at least
+	   4 refs */
+	char *b,*c,*d;
+	int space;
+	b=(char *)malloc(strlen(oldrefs)+strlen(newref)+64);
+	c=b;
+	d=oldrefs;
+	space=0;
+	while (*d) {
+		if (*d==' ') {
+			space++, *c++=' ', d++; /* keep existing spaces */
+			continue;
 		}
+		else if (*d!='<') { /* strip everything besides spaces and */
+			d++;	    /* message-ids */
+			continue;
+		}
+		if (damaged_id(d)) { /* remove damaged message ids and mark
+					the gap if that's not already done */
+			skip_id(&d);
+			while (space<3) {
+				space++, *c++=' ';
+			}
+			continue;
+		}
+		if (!space) *c+=' ';
+		else space=0;
+		appendid(&c,&d);
 	}
-	/* include what's left */
-	while (*oldrefs) {
-		while (*oldrefs && !isspace(*oldrefs)) *c++ = *oldrefs++;
-		*c++ = ' ';
-		while (*oldrefs && isspace(*oldrefs)) oldrefs++;
+	while (space) c--,space--; /* remove superfluous space at the end */
+	*c++=' ';
+	appendid(&c,&newref);
+	*c=0;
+
+	/* now see if we need to remove ids */
+	while (strlen(b)>MAXREFSIZE-14) { /* 14 = strlen("References: ")+2 */
+		c=b;
+		skip_id(&c); /* keep the first one */
+		while (*c && must_include(c)) skip_id(&c); /* skip those marked
+							      with _-_ */
+		d=c;
+		skip_id(&c); /* ditch one */
+		*d++=' '; *d++=' '; *d++=' '; /* and mark this appropriately */
+		while (*c==' ') c++;
+		strcpy(d,c);
 	}
-	/* and append the new reference */
-	while (*newref) *c++ = *newref++;
-	*c = 0;
+
+	strcpy(buffer,b);
+	free(b);
+	return;
+
+	/* son-of-1036 says:
+          Followup agents SHOULD not shorten References  headers.   If
+          it  is absolutely necessary to shorten the header, as a des-
+          perate last resort, a followup agent MAY do this by deleting
+          some  of  the  message IDs.  However, it MUST not delete the
+          first message ID, the last three message IDs (including that
+          of  the immediate precursor), or any message ID mentioned in
+          the body of the followup.  If it is possible  for  the  fol-
+          lowup agent to determine the Subject content of the articles
+          identified in the References header, it MUST not delete  the
+          message  ID of any article where the Subject content changed
+          (other than by prepending of a back  reference).   The  fol-
+          lowup  agent MUST not delete any message ID whose local part
+          ends with "_-_" (underscore (ASCII 95), hyphen  (ASCII  45),
+          underscore);  followup  agents are urged to use this form to
+          mark subject changes, and to avoid using it otherwise.
+	  [...]
+          When a References header is shortened, at least three blanks
+          SHOULD be left between adjacent message IDs  at  each  point
+          where  deletions  were  made.  Software preparing new Refer-
+          ences headers SHOULD preserve multiple blanks in older  Ref-
+          erences content.
+	*/
 }
 
 
@@ -1169,15 +1275,15 @@ post_response (group, respnum, copy_text)
 	char ch, *ptr;
 	char ch_default = iKeyPostPost;
 	char bigbuf[HEADER_LEN];
-	char buf[LEN];
+	char buf[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	int ret_code = POSTED_NONE;
 	struct t_group *psGrp;
 	char	initials[64];
 #ifdef FORGERY
-	char	from_name[PATH_LEN];
-	char	line[NNTP_STRLEN];
+	char	from_name[HEADER_LEN];
+	char	line[HEADER_LEN];
 #endif
 
 	msg_init_headers ();
@@ -1209,7 +1315,7 @@ post_response (group, respnum, copy_text)
 			return ret_code;
 		}
 		{
-			char save_followup[LEN];
+			char save_followup[HEADER_LEN];
 			strcpy(save_followup, note_h_followup);
 			*note_h_followup = '\0';
 			find_reply_to_addr (respnum, buf);
@@ -1467,12 +1573,12 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	int confirm_to_mail;
 	int *mailed_ok;
 {
-	char nam[PATH_LEN];
-	char subject[LEN];
+	char nam[HEADER_LEN];
+	char subject[HEADER_LEN];
 	char ch = iKeyPostSend;
 	char ch_default = iKeyPostSend;
-	char buf[LEN];
-	char mail_to[LEN];
+	char buf[HEADER_LEN];
+	char mail_to[HEADER_LEN];
 	char initials[64];
 	FILE *fp;
 	int redraw_screen = FALSE;
@@ -1629,8 +1735,8 @@ mail_bug_report ()
 	char *gateway;
 	char *domain;
 	char ch, ch_default = iKeyPostSend;
-	char mail_to[PATH_LEN];
-	char subject[PATH_LEN];
+	char mail_to[HEADER_LEN];
+	char subject[HEADER_LEN];
 	FILE *fp;
 #ifdef HAVE_UNAME
 	FILE *fp_uname;
@@ -1818,10 +1924,10 @@ mail_to_author (group, respnum, copy_text)
 	int copy_text;
 {
 	char buf[LEN];
-	char from_addr[LEN];
+	char from_addr[HEADER_LEN];
 	char nam[100];
-	char mail_to[LEN];
-	char subject[PATH_LEN];
+	char mail_to[HEADER_LEN];
+	char subject[HEADER_LEN];
 	char initials[64];
 	char ch, ch_default = iKeyPostSend;
 	FILE *fp;
@@ -1977,13 +2083,13 @@ pcCopyArtHeader (iHeader, pcArt, result)
 	char *pcArt;
 	char *result;
 {
-	char buf[LEN];
-	char buf2[LEN];
+	char buf[HEADER_LEN];
+	char buf2[HEADER_LEN];
 	char *p;
 	FILE *fp;
 	int found = FALSE;
 	int was_to = FALSE;
-	static char header[LEN];
+	static char header[HEADER_LEN];
 
 	*header = '\0';
 
@@ -2075,12 +2181,12 @@ delete_article (group, art, respnum)
 	int respnum;
 {
 	char ch, ch_default = iKeyPostDelete;
-	char buf[LEN];
-	char delete[PATH_LEN];
-	char from_name[PATH_LEN];
+	char buf[HEADER_LEN];
+	char delete[HEADER_LEN];
+	char from_name[HEADER_LEN];
 #ifdef FORGERY
-	char line[NNTP_STRLEN];
-	char line2[NNTP_STRLEN];
+	char line[HEADER_LEN];
+	char line2[HEADER_LEN];
 	char author = TRUE;
 #else
 	char host_name[PATH_LEN];
@@ -2272,13 +2378,6 @@ delete_article (group, art, respnum)
  * Repost an already existing article to another group (ie. local group)
  */
 
-/* FIXME!
- * if References: <con.tains@a.double>  <space@between.two.msg.ids>
- * it trashes them :(
- * "441 437 No colon-space in "z.uni-karlsruhe.de>" header"
- * and reposting/superseding fails
- */
-
 int
 repost_article (group, art, respnum, supersede)
 	char *group;
@@ -2286,8 +2385,8 @@ repost_article (group, art, respnum, supersede)
 	int respnum;
 	char supersede;
 {
-	char 	buf[LEN];
-	char 	tmp[LEN];
+	char 	buf[HEADER_LEN];
+	char 	tmp[HEADER_LEN];
 	int	done 		= FALSE;
 	char 	ch;
 	char 	ch_default 	= iKeyPostPost;
@@ -2295,8 +2394,8 @@ repost_article (group, art, respnum, supersede)
 	int 	ret_code 	= POSTED_NONE;
  	struct t_group 	*psGrp;
  	char 	*ptr;
-	char	line[NNTP_STRLEN];
-	char	from_name[PATH_LEN];
+	char	line[HEADER_LEN];
+	char	from_name[HEADER_LEN];
 #ifndef FORGERY
 	char host_name[PATH_LEN];
 	char user_name[128];
@@ -2404,7 +2503,18 @@ repost_article (group, art, respnum, supersede)
 	msg_add_header ("Newsgroups", group);
 
 	if (note_h_references[0])
+		/*
+		 * calling join_references prevents repost_article
+		 * to fail if REferences: contains a double space
+		 * between 2 msgids - what it does not do is
+		 * adding the msgid of the original article to the
+		 * References header - is this needed?
+		 */
+/*
 		msg_add_header ("References", note_h_references);
+*/
+		join_references (buf, note_h_references, "");
+		msg_add_header ("References", buf);
 
 #ifndef FORGERY
 	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
@@ -2540,7 +2650,7 @@ msg_add_x_headers (headers)
 {
 	char	*ptr;
 	char	file[PATH_LEN];
-	char	line[LEN];
+	char	line[HEADER_LEN];
 	FILE	*fp;
 
 	if (headers) {
@@ -2584,7 +2694,7 @@ msg_add_x_body (fp_out, body)
 {
 	char	*ptr;
 	char	file[PATH_LEN];
-	char	line[LEN];
+	char	line[HEADER_LEN];
 	FILE	*fp;
 	int		wrote = 0;
 
@@ -2624,7 +2734,7 @@ modify_headers (line)
 	char *line;
 {
 
-	char 	buf[LEN];
+	char 	buf[HEADER_LEN];
 	char	*chr;
 	char	*chr2;
 
@@ -2662,7 +2772,7 @@ checknadd_headers (infile, lines)
 	char *infile;
 	int   lines;
 {
-	char line[LEN];
+	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
 	FILE *fp_in, *fp_out;
 	int gotit = FALSE;
@@ -2713,11 +2823,11 @@ insert_from_header (infile)
   	char *infile;
 {
 	char	*ptr;
-	char	from_name[PATH_LEN];
+	char	from_name[HEADER_LEN];
 	char	host_name[PATH_LEN];
 	char	full_name[128];
 	char	user_name[128];
-	char	line[LEN];
+	char	line[HEADER_LEN];
 	char	outfile[PATH_LEN];
 	FILE	*fp_in, *fp_out;
 
@@ -2775,9 +2885,9 @@ find_reply_to_addr (respnum, from_addr)
 	int respnum;
 	char *from_addr;
 {
-	char *ptr, buf[LEN];
-	char from_both[LEN];
-	char from_name[PATH_LEN];
+	char *ptr, buf[HEADER_LEN];
+	char from_both[HEADER_LEN];
+	char from_name[HEADER_LEN];
 	int found = FALSE;
 	long orig_offset;
 
@@ -2895,7 +3005,7 @@ update_active_after_posting (newsgroups)
 	char *newsgroups;
 {
 	char *src, *dst;
-	char group[LEN];
+	char group[HEADER_LEN];
 	struct t_group *psGrp;
 
 	/*
@@ -2936,9 +3046,9 @@ int
 submit_mail_file (file)
 	char	*file;
 {
-	char buf[LEN];
-	char mail_to[LEN];
-	char subject[PATH_LEN];
+	char buf[HEADER_LEN];
+	char mail_to[HEADER_LEN];
+	char subject[HEADER_LEN];
 	int mailed = FALSE;
 
 #ifndef M_AMIGA

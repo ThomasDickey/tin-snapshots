@@ -3,9 +3,6 @@ Bugs
 o  only create_index_lock_file() if it is realy needed (tind/tin -U) and only
    try to remove the lock file if it is realy created (cleanup_tmp_files())
 
-o  fix repost_article that it does not thrash References: header if it
-   contains more than one space between 2 msgids
-
 o  fix article superseding that it enters the editor emediately
 
 o  strip hardcoded values (binaries/sources) from feed.c

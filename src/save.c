@@ -49,8 +49,8 @@ struct archiver_t {
 };
 
 extern char *glob_group;
-extern char note_h_path[LEN];		/* Path:	*/
-extern char note_h_date[PATH_LEN];	/* Date:	*/
+extern char note_h_path[HEADER_LEN];	/* Path:	*/
+extern char note_h_date[HEADER_LEN];	/* Date:	*/
 extern FILE	*note_fp;		/* the body of the current article */
 extern int index_point;
 extern int note_end;
@@ -80,7 +80,7 @@ check_start_save_any_news (check_start_save)
 	char buf[LEN], logfile[LEN];
 	char group_path[PATH_LEN];
 	char savefile[PATH_LEN];
-	char subject[PATH_LEN];
+	char subject[HEADER_LEN];
 	char path[PATH_LEN];
 	char *ich;
 	extern FILE *note_fp;

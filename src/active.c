@@ -90,7 +90,7 @@ int
 resync_active_file ()
 {
 	extern int reread_active_for_posted_arts;
-	char old_group[PATH_LEN];
+	char old_group[HEADER_LEN];
 	int reread = FALSE;
 	int command_line;
 	
@@ -227,7 +227,7 @@ parse_newsrc_active_line (fp, group, count, max, min, moderated)
 	long *min;
 	char *moderated;
 {
-	char	*ptr, buf[LEN];
+	char	*ptr, buf[HEADER_LEN];
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		ptr = my_strpbrk (buf, ":!");
@@ -256,7 +256,7 @@ void
 read_news_active_file ()
 {
 	FILE *fp = NULL;
-	char buf[LEN];
+	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	int i;
 	long count = -1L , h;
@@ -440,7 +440,7 @@ void
 check_for_any_new_groups ()
 {
 	char *autosubscribe, *autounsubscribe;
-	char *ptr, buf[LEN];
+	char *ptr, buf[NNTP_STRLEN];
 	char old_newnews_host[PATH_LEN];
 	FILE *fp = (FILE *) 0;
 	time_t the_newnews_time = (time_t)0;
@@ -668,7 +668,7 @@ match_group_list (group, group_list)
 	char *group_list;
 {
 	char *separator;
-	char pattern[LEN];
+	char pattern[HEADER_LEN];
 	int accept, negate, list_len;
 	size_t group_len;
 	
@@ -734,8 +734,8 @@ read_group_times_file ()
 #ifdef INDEX_DAEMON
 
 	char *p, *q;
-	char buf[LEN];
-	char group[PATH_LEN];
+	char buf[HEADER_LEN];
+	char group[HEADER_LEN];
 	FILE *fp;
 	time_t updated_time;
 	struct t_group *psGrp;
@@ -785,8 +785,8 @@ write_group_times_file ()
 {
 #ifdef INDEX_DAEMON
 
-	char buf[LEN];
-	char group[PATH_LEN];
+	char buf[HEADER_LEN];
+	char group[HEADER_LEN];
 	FILE *fp;
 	register int i;
 	
@@ -808,7 +808,7 @@ load_newnews_info (info)
 	char *info;
 {
 	char *ptr;
-	char buf[PATH_LEN];
+	char buf[NNTP_STRLEN];
 	int i;
 	time_t the_time;
 		
@@ -872,7 +872,7 @@ read_motd_file ()
 {
 #ifndef INDEX_DAEMON
 
-	char buf[LEN];
+	char buf[NNTP_STRLEN];
 	char motd_file_date[32];
 	FILE *fp;
 	int lineno = 0;
