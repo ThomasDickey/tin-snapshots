@@ -153,9 +153,11 @@ prompt_yn (
 			CleartoEOLN ();
 		}
 		my_printf ("%s%c", prompt, prompt_ch);
-		if (!cmd_line) cursoron ();
+		if (!cmd_line)
+			cursoron ();
 		my_flush ();
-		if (!cmd_line) MoveCursor (line, (int) strlen (prompt));
+		if (!cmd_line)
+			MoveCursor (line, (int) strlen (prompt));
 
 		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r'))
 			ch = prompt_ch;

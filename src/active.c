@@ -634,6 +634,10 @@ check_for_any_new_groups (
 				*ptr = '\0';
 			}
 
+			free_attributes_array ();
+			read_attributes_file (global_attributes_file, TRUE);
+			read_attributes_file (local_attributes_file, FALSE);
+
 			subscribe_new_group (line, autosubscribe, autounsubscribe);
 		}
 

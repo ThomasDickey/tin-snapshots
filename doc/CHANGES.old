@@ -1,0 +1,4336 @@
+This file contains an overview of the changes made between
+tin 1.3BETA 950824 and tin 1.4.0, for recent changes look at CHANGES
+
+-- 1.4.0 release 19991113 "No Labels" --
+
+684) Wolfgang Becker <uafr@gmx.de>
+     ADD. updated README.WIN
+     FIX. README.WIN
+
+683) Niklas Edmundsson <nikke@ing.umu.se>
+     BUG. in some cases returnval of getaddrinfo() was interpreted wrong
+     FIX. nntplib.c
+
+682) Serge N. Pokhodyaev <snp@ru.ru>
+     ADD. %G in savefile string in group attributes
+     FIX. misc.c
+
+681) Vincent Lefevre <vlefevre@ens-lyon.fr>
+     BUG. used C-style comparsion in shell script
+     FIX. configure[.in]
+
+680) Dawid Kuroczko <dk@ssw.krakow.pl>
+     BUG. with start_editor_offset=off userdefined default_editor_format
+          was ignored
+     FIX. misc.c
+
+679) Charles S. Kerr <charles@skywalker.ecn.ou.edu>
+     ADD. 'T'ag multipart-articles in group level
+     FIX. menukeys.h, group.c
+
+678) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. unread articles in killed threads not displayed in some cases
+     BUG. allocation/expansion of bitmaps for all groups
+     BUG. current bitmap not retained when subscribing to group
+     ADD. kill_level to control processing/display of killed articles
+     ADD. stop excessive reloading of articles when feeding articles
+     ADD. reduce some tinrc vars PATH_LEN -> LEN
+     ADD. reorganisation of help screens. All keys documented.
+     ADD. big manpage update. All keys documented.
+     ADD. 'W' to thread menu
+     ADD. code cleanup
+     FIX. tin.1, extern.h, menukeys.h, tin.h, tinrc.h, active.c, config.c
+          feed.c, filter.c, init.c, lang.c, misc.c, newsrc.c, page.c, post.c
+          refs.c, save.c, select.c, thread.c, tincfg.tbl
+
+677) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. base64 encoding didn't convert CRs <-> CRLFs when needed
+     FIX. extern.h, proto.h, lang.c, rfc1521.c
+
+676) Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. post_mime_encoding/mail_mime_encoding to tin.defaults
+     ADD. X-Headers on supersede
+     BUG. disabled IPv6 support as it didn't work on AIX and causes
+          unwanted nameserver lookups (/etc/hosts is ignored - bug or
+          feature?) on Linux
+     BUG. several regexp weren't initialized when there was no tinrc at
+          startup
+     BUG. passed wrong argument to update_posted_info_file()
+     BUG. wrong order of initial tinrc.* values
+     FIX. aclocal.m4, configure[.in], Makefile, autoconf.h[in], extern.h
+          proto.h, tin.h, version.h, active.c, auth.c, config.c, inews.c
+          init.c, lang.c, main.c, post.c, screen.c, select.c, rfc1521.c
+          rfc1522.c, Build, canlocktest.c, old/*
+
+-- pre-1.4 release 19990927 "Nine While Nine" --
+
+675) Thomas E. Dickey <dickey@clark.net>
+     BUG. on unexpected errors the terminal modes were not restored
+     ADD. check if tin fallback prototypes work with the system headers
+     ADD. update configure script macros to accommodate cygwin32
+     ADD. rearrange the configure script's check for network libraries
+     ADD. fix a couple of casts loosing const
+     FIX. aclocal.m4, configure[.in], proto.h, getline.c, init.c, main.c
+          memory.c, misc.c, nntplib.c, read.c, refs.c, select.c, signal.c
+
+674) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Huge cleanup of quick_post_article(), post_existing_article(),
+          post_article(), post_response(), repost_article()
+     ADD. cleanup of mail_to_someone(), mail_bug_report(), mail_to_author()
+     ADD. print an error when an external command could not be invoked
+     REM. various error messages now that reporting is centralised in
+          invoke_cmd()
+     ADD. Change process_only_unread default to OFF
+     ADD. 'w' post article, 'm' mail article to thread menu
+     ADD. big code cleanup
+     ADD. clear status line after error_message() is displayed
+     ADD. correct inital cursor position when mailing bug reports
+     ADD. cleanup tinrc/option menu variable naming
+     BUG. mail bug report coredumps on bogus groups in selection menu
+     FIX. extern.h, proto.h, tin.h, filter.c, group.c, inews.c, init.c
+          page.c, post.c, select.c, thread.c
+
+673) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. authentication was not first command after MODE READER if
+          invoked with -A
+     BUG. if server sent 201 after MODE READER posting was not possible
+          even after successful authentication
+     BUG. user was not notified when XOVER was not available
+     BUG. Followup-To: line was not examined whether the mentioned group(s)
+          were valid on the server
+     BUG. Fixed small memory leak in post.c
+     BUG. Fixed several potential bufferoverruns (make_prefix(),
+          show_selection_page())
+     ADD. also try OVER (if XOVER failed) at connection startup
+     ADD. use OVER if available (and not XOVER)
+     ADD. warn if using quoted-printable or base64 and external inews
+     FIX. extern.h, lang.c, open.c, post.c, thread.c, select.c
+
+672) Urs Janssen <urs@tin.org>
+     BUG. fixed uncritical memleak in free_attributes_array()
+     BUG. fixed possible call of free(NULL)
+     ADD. overview_xref_support() now handles Xref:full entrys in
+          overview.ftm with traling garbage on the line
+     ADD. check for duplicated Newsgroups, Subject and Followup-To
+          header before posting
+     ADD. key to ignore Followup-To in followups
+     ADD. -DEVIL_INSIDE and -DUSE_CANLOCK
+     ADD. updated pcre (2.07 -> 2.08)
+     FIX. Makefile, Makefile[.in], extern.h, lang.c, memory.c, newsrc.c
+          page.c, post.c, xref.c, pcre/*, libcanlock/*
+
+671) Wolfgang Behrens <wolfgang@snoopy.flensburg.de>
+     Urs Janssen <urs@tin.org>
+     ADD. regexp/color for 2nd and >=3rd level quotes
+     ADD. minimal code cleanup
+     FIX. tin.1, extern.h, tin.h, tinrc.h, color.c, config.c, header.c
+          init.c, lang.c, memory.c, tincfg.tbl
+
+670) Arkadiusz Miskiewicz <misiek@misiek.eu.org>
+     ADD. IPv6 connects
+     FIX. configure[.in], autoconf.h[in], tin.h, nntplib.c
+
+669) Dawid Kuroczko <dk@ssw.krakow.pl>
+     ADD. allow negative values in getart_limit to specify the number
+          of already read articles which should be fetched again.
+     ADD. signature level to word_h_display_marks
+     ADD. changed algorithm of syntax highlighting
+     ADD. userdefined regexp for Re: and was: subject stripping in
+          followups
+     FIX. extern.h, proto.h, tin.h, tinrc.h, art.c, color.c, config.c
+          getline.c, init.c, lang.c, memory.c, misc.c, prompt.c, regex.c
+          tincfg.tbl, tin.1
+
+668) William McBrine <wmcbrine@clark.net>
+     BUG. lines which were exactly cCOLS wide caused a LF in the pager
+          and the LF was not counted note.lines
+     FIX. color.c, page.c
+
+667) Stuffed Crust <pizza@shaftnet.org>
+     Urs Janssen <urs@tin.org>
+     BUG. normal text was colored as quoted-text if quote_regex was empty
+     FIX. tin.h, color.c, config.c, init.c, lang.c
+
+-- pre-1.4 release 19990805 "Preacher Man" --
+
+666) Olaf Dietrich <olaf.dietrich@urz.uni-heidelberg.de>
+     BUG. cursor position gets lost after rereading the active file
+     FIX. select.c
+
+665) Martin Reising <mreising@irrlicht.Ruhr.DE>
+     ADD. ART_MARK_READ_HOT for -DKILL_READ
+     FIX. thread.c
+
+664) Urs Janssen <urs@tin.org>
+     ADD. S_IFMT and S_IFREG fallback for fcc
+     ADD. 'Z' to pager
+     ADD. updated pcre (2.06 -> 2.07)
+     BUG. don't prompt user for rewrite newsrc if it is empty
+     BUG. use tin_getline() instead of getpass() for passwd prompt again
+          as getpass() might truncate passwords
+     FIX. menukeys.h, proto.h, tin.h, auth.c, getline.c, lang.c, misc.c
+          page.c, prompt.c, pcre/*
+
+663) Erik van Roode <erik@cthulhu.demon.nl>
+     BUG. articles with missing realname in From:-line crashed debug-level 2
+     FIX. debug.c
+
+662) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. quote_regex option for highlighting quoted text
+     ADD. minor code cleanup
+     BUG. long groupnames in .newsrc could crash tin
+     BUG. interactive authorisation was broken
+     BUG. filename 'guessing' for uudecoded used mtime which sometimes
+          lead to wrong results
+     BUG. formatstrings in txt_saved_pattern_to weren't quoted
+     FIX. extern.h, proto.h, tin.h, tinrc.h, active.c, auth.c, color.c
+          config.c, curses.c, filter.c, init.c, lang.c, main.c, memory.c
+          regex.c, save.c, tcurses.c, tincfg.tbl, tin.1, rcvars.txt
+
+-- pre-1.4 release 19990624 "Dawnrazor" --
+
+661) Thomas E. Dickey <dickey@clark.net>
+     ADD. configure script updates/improvements
+     FIX. aclocal.m4, config.guess, config.sub, configure.in, internal.h
+          active.c
+
+660) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. some minor AmigaOS fixes
+     FIX. config.h, tin.h, version.h, smakefile, amiga.c, init.c
+          read.c, tin.readme
+
+659) Urs Janssen <urs@tin.org>
+     ADD. prompt before abort unmodified postings/followups/bugreports
+     ADD. warning if less lines are written to newsrc as read on start
+     ADD. moved some strings to lang.c
+     ADD. ispell opts to attributes
+     ADD. updated pcre (2.05 -> 2.06)
+     BUG. whole Reference:-tree was added to In-Reply-To:
+     BUG. compiling with --disable-color failed with --enable-curses
+     BUG. removed a few typos
+     BUG. fixed some eval-order dependencies bugs
+     FIX. configure[.in], extern.h, proto.h, tin.h, active.c, attrib.c
+          config.c, inews.c, lang.c, main.c, misc.c, newsrc.c, post.c
+          save.c, select.c, tcurses.c, pcre/*
+
+658) John R. Myers <jmyers@netcom.com>
+     Urs Janssen <urs@tin.org>
+     BUG. tins atol() didn't ignore leading whitespace(s)
+     FIX. string.c
+
+657) Fabrice Bellet <Fabrice.Bellet@imag.fr>
+     BUG. screen init was done before reading cmd-line options
+     FIX. main.c
+
+656) Albert Chin-A-Young <china@thewrittenword.com>
+     BUG. CF_NETLIBS was missing if compiling with --with-socks5 on Solaris
+     FIX. configure[.in]
+
+655) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. read articles were filtered even with unset KILL_READ
+     FIX. filter.c
+
+654) Ruediger Geys <aage@fen.baynet.de>
+     Urs Janssen <urs@tin.org>
+     ADD. --disable-printing
+     BUG. removed unused cmd_line_printer var
+     FIX. configure[.in], autoconf.h[in], extern.h, menukeys.h, tinrc.h
+          attrib.c, config.c, feed.c, group.c, help.c, init.c, lang.c
+          memory.c, page.c, tincfg.tbl
+
+-- pre-1.4 release 19990517 "Psychonaut" --
+
+653) Wolfgang Becker <uafr@gmx.de>
+     ADD. updated README.WIN
+     FIX. README.WIN
+
+652) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. various buffer over/underruns and reads from uninitialized
+          memory
+     FIX. active.c, misc.c, page.c, read.c, select.c
+
+651) Urs Janssen <urs@tin.org>
+     ADD. strip_address() for removing mailaddress
+     ADD. updated pcre (2.04 -> 2.05)
+     BUG. --disable-pipe-command was broken
+     FIX. config.c, misc.c, pcre/*
+
+650) Thomas E. Dickey <dickey@clark.net>
+     BUG. typo in Makefile
+     BUG. didn't compile on !HAVE_POSIX_JC systems
+     FIX. Makefile[.in], signal.c
+
+649) GianPiero Puccioni <gip@fox.ino.it>
+     BUG. trying to set SA_RESTART on systems which don't know
+          BSD-like signals
+     FIX. signal.c
+
+648) Helmut Springer <delta@rus.uni-stuttgart.de>
+     BUG. compiling with --disable-color failed
+     FIX. extern.h
+
+647) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. input_history wasn't saved
+     BUG. 'g'oto group didn't enter a group with all articles read
+           if show_only_unread_groups was set
+     BUG. 'l', <TAB> till you reach one article of the next thread, 'l'
+          shows the threading-tree of the 'old' thread not the current one
+     BUG. tin -w didn't work with use_color
+     BUG. during interactive auth requests curses stuff was called
+          before enabling it.
+     FIX. proto.h, tin.h, active.c, attrib.c, config.c, group.c, lang.c
+          mail.c, main.c, misc.c, open.c, page.c, post.c, prompt.c
+          open.c, select.c, signal.c, thread.c
+
+646) Meelis Roos <mroos@cs.ut.ee>
+     BUG. typo in the configure script
+     FIX. configure[.in]
+
+-- pre-1.4 release 19990413 "Endemoniada" --
+
+645) Urs Janssen <urs@tin.org>
+     BUG. use_keypad was missing in t_config
+     ADD. --enable-broken-listgroup-fix
+     FIX. configure.[in], autoconf.h[in], extern.h, tinrc.h, config.c
+          curses.c, init.c, open.c
+
+644) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. 'L'ookup Message-ID to group and thread menus
+     ADD. minor code cleanup
+     FIX. group.c, page.c, help.c, tin.1
+
+643) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. split config variables into new structure
+     BUG. online show_description toggles affected tinrc copy
+     BUG. search config menu used wrong default
+     FIX. tinrc.h, *.c
+
+642) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. mark thread read didn't always work
+     FIX. thread.c
+
+641) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. refs_only filter
+     FIX. tin.h, filter.c, lang.c
+
+640) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. code cleanup
+     ADD. some man-page corrections
+     REM. create_subdir, because it was constant
+     FIX. feed.c, save.c, tin.1
+
+639) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. respect mail_address for mail-replys if not using interactive
+          mailer (!use_mailreader_i)
+     FIX. post.c
+
+638) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. resizeterm() was called during malloc()/realloc() calls
+     BUG. fixup_thread() was called after show_thread_page()
+     BUG. confirm_to_quit=yes 'disabled' 'Q'
+     ADD. fixed '-' to work without toggling show_only_unread
+     FIX. extern.h, menukeys.h, proto.h, tin.h, art.c, config.c, curses.c
+          group.c, help.c, misc.c, page.c, select.c, signal.c, thread.c
+
+637) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. rewrote -X (no-overwrite) mode
+     BUG. reposting ('x') to a 'D'eleted group dumped core
+     BUG. the pager asks for metamail every time it's scrolled to the top
+     BUG. after metamail quits we are left in the pager with a blank screen
+     FIX. extern.h, active.c, art.c, attrib.c, config.c, filter.c, lang.c
+          mail.c, main.c, misc.c, newsrc.c, page.c, post.c, save.c
+          select.c, tin.1
+
+636) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (2.03 -> 2.04)
+     ADD. automatically abort unmodified ('empty')
+          postings/followups/bugreports
+     ADD. check if realname in Sender: contains '.' and add "" if needed
+     BUG. posted_msgs_file wasn't updated if default_maildir was changed
+          via 'M'enu
+     FIX. config.c, header.c, post.c, pcre/*
+
+635) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. MH mail folder reading was broken
+     FIX. reading-mail.txt, active.c, mail.c
+
+-- pre-1.4 release 19990216 "Styrofoam" --
+
+634) Urs Janssen <urs@tin.org>
+     BUG. case for GRP_QUIT was missing
+     BUG. thread_catchup_on_exit && !confirm_action did not catchup
+          the thread
+     ADD. skip "mark thread read?" if confirm_action &&
+          thread_catchup_on_exit and the whole thread is read already
+     ADD. minor code cleanup (removed unused vars, made some
+          functions static, ...)
+     ADD. updated pcre (2.01 -> 2.03)
+     FIX. configure[.in], autoconf.h[in], Makefile, tin.defaults, proto.h
+          tin.h, feed.c, group.c, misc.c, post.c, rfc1522.c, thread.c
+          pcre/*
+
+633) Ralf Doeblitz <doeblitz@gmx.de>
+     FIX. the GNKSA-cheks now try to decode the given address as far as
+          possible
+     ADD. option to disable Sender: via tin.defaults
+     ADD. option to disable GNKSA check of top level domain and domain
+          literals via tin.defaults
+     FIX. Makefile.in, tin.defaults, extern.h, policy.h, proto.h, inews.c
+          init.c, lang.c, misc.c, post.c
+
+632) Wolfgang Becker <uafr@gmx.de>
+     ADD. README.WIN
+     FIX. README.WIN
+
+631) Bernhard Oemer <oemer@tph.tuwien.ac.at>
+     BUG. posting ('w') to a 'D'eleted group dumped core
+     FIX. post.c
+
+630) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt (1.13 -> 1.15)
+     FIX. metamutt
+
+629) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. documentation cleanup
+     ADD. missing configure flags
+     FIX. autoconf.h[in], configure[.in], INSTALL, umlauts.txt
+
+628) Thomas E. Dickey <dickey@clark.net>
+     BUG. several array index checks were missing
+     ADD. updated config.guess/config.sub
+     FIX. config.guess, config.sub, thread.c
+
+627) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. searching in a group with all articles read and
+          show_only_unread=TRUE caused a crash
+     ADD. improved signal handling with HAVE_POSIX_JC
+     ADD. debug assertion check around handle_resize()
+     FIX. group.c, select.c
+
+-- pre-1.4 release 981225 "Volcane" --
+
+626) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     BUG. FromSameUser() was case sensitive
+     BUG. thread_catchup_on_exit && confirm_action && 'n' did not leave
+          the thread
+     FIX. Makefile, metamutt, active.c, art.c, post.c, select.c, thread.c
+
+625) Thomas E. Dickey <dickey@clark.net>
+     BUG. group_num could get negative
+     ADD. configure test to set HAVE_POSIX_JC
+     ADD. j/k to up/down arrows in help.c
+     ADD. new option --with-socks, --with-socks5 now can take a pathname
+     ADD. minor fixes/updates to some of the configure macros
+     FIX. aclocal.m4, config.guess, config.sub, configure[.in]
+          autoconf.h[in], tin.h, tnntp.h, help.c, select.c, signal.c
+
+624) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. '-' at group level dumped core if previous article no longer
+          threaded
+     BUG. various selection menu options would coredump with no active
+          group set
+     BUG. 'S''*' on select menu coredumped when no ~/.tin and ~/.newsrc
+     ADD. 'B' search all articles to thread menu
+     ADD. saved filenames have trailing whitespace removed
+     ADD. minor code cleanup
+     FIX. menukeys.h, proto.h, feed.c, group.c, open.c, page.c, post.c
+          save.c, search.c, select.c, thread.c
+
+623) Jeremy Buhler <jbuhler@cs.washington.edu>
+     BUG. will not build if the 'configure' command is issued in a
+          directory other than the source
+     FIX. pcre/Makefile[.in]
+
+622) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. cur_groupnum could get negative
+     FIX. newsrc.c, select.c
+
+-- pre-1.4 release 981114 "The Watchman" --
+
+621) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. minor VMS-code cleanup
+     FIX. vms/*
+
+620) Fabrice Bellet <Fabrice.Bellet@imag.fr>
+     BUG. insecure usage of fprintf()
+     FIX. save.c
+
+619) Manoj Kumar <manoj@sasi.com>
+     ADD. speed up highlighting code
+     FIX. color.c
+
+618) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. the cursor position gets 'lost' after 'y'ank in 'y'ank out
+     FIX. select.c
+
+617) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt (1.11 -> 1.13)
+     FIX. metamutt
+
+616) Urs Janssen <urs@tin.org>
+     ADD. removed --enable-forgery configure option
+     ADD. support for server-side generated Message-IDs in POST response
+     ADD. minor code cleanup
+     ADD. updated pcre (2.00 -> 2.01)
+     BUG. possible bufferoverflow in show_cont_header() and bAddFilterRule()
+     FIX. active.c, config.c, filter.c, group.c, inews.c, main.c, misc.c
+          page.c, regexp.c, autoconf.h[in], configure[.in], pcre/*
+
+615) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. fix inconsistencies in [Cc]atchup and other menus
+     ADD. cleaned up navigation between menus and commented existing code
+     ADD. 'l'ist thread to pager
+     ADD. '-' enter previous article to thread menu
+     ADD. 'a', 'A', '?' searching to thread menu
+     ADD. article position lost when cycling threading mode
+     ADD. big code cleanup
+     BUG. wrong values returned from show_page()
+     BUG. core dump when using 'N' and 'P' on unavailable articles
+     BUG. author search in group menu entered the article unlike Subject
+          search
+     BUG. -> on thread menu and art unavailable, screen redraw was needed
+          to remove the +
+     BUG. more bad handling of art unavailable on group page
+     BUG. tiny memleak in read_input_history_file()
+     BUG. various inconsistencies / minor errors in searching
+     REM. unnecessary checks for error returns from my_malloc()
+     REM. #ifdef SHOW_PROGESS - it is on by default
+     REM. auto_save_msg, it was not used
+     FIX. tin.1, extern.h, menukeys.h, proto.h, tin.h, active.c, art.c
+          attrib.c, config.c, filter.c, group.c, help.c, init.c, lang.c
+          main.c, misc.c, newsrc.c, page.c, post.c, prompt.c, read.c
+          save.c, search.c, select.c, sigfile.c, thread.c
+
+614) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. show_score in thread/group-level
+     ADD. GNKSA-checks for valid From/Sender/Approved
+     FIX. extern.h, proto.h, tin.h, version.h, config.c, group.c, init.c
+          lang.c, misc.c, post.c, thread.c, tincfg.tbl
+
+613) Jeon Hyoung-Jo <hjjeon@cclab.kaist.ac.kr>
+     ADD. -G cmd-line switch/getart_limit,use_getart_limit
+          to limit the number of articles/group being fetched from
+          the server
+     FIX. extern.h, menukeys.h, art.c, config.c, group.c, help.c
+          init.c, lang.c, main.c, tincfg.tbl
+
+-- pre-1.4 release 981002 "Phobia" --
+
+612) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+611) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. -A cmd-line switch to force auth on connect
+     FIX. extern.h, init.c, main.c, open.c
+
+610) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. if the shell tin is running in is SIGHUP tin could fall into
+          a endless loop
+     FIX. read.c, signal.c
+
+609) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. conversion tables for ibm437/ibm850 <-> iso-8859-1
+     FIX. ibm437_l1.tab, ibm850_l1.tab, l1_ibm437.tab, l1_ibm850.tab
+          l1_next.tab, next_l1.tab, misc.c
+
+608) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. <ESC> now aborts shell_escape '!' request
+     ADD. updated pcre (1.09 -> 2.00)
+     FIX. misc.c, signal.c, pcre/*
+
+-- pre-1.4 release 980818 "Laura" --
+
+607) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+606) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. initialisation of h_addr_list was missing
+     FIX. nntplib.c
+
+605) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. configure check for libuu, inet_aton()
+     ADD. removed -C cmd-line flag (did the same as -l -n which is default)
+     BUG. default signal-handler was missing
+     FIX. configure[.in], autoconf.h[in], tin.h, init.c, mail.c, main.c
+          page.c, open.c, nntplib.c, read.c, save.c, signal.c, strftime.c
+
+604) Kazushi Marukawa <jam@pobox.com>
+     ADD. speedup reading low/high marks for each group via GROUP
+     FIX. extern.h, active.c, nntplib.c
+
+-- pre-1.4 release 980730 --
+
+603) Thomas E. Dickey <dickey@clark.net>
+     BUG. spurious escaping of '<' and '>' in mailer commands
+     FIX. misc.c
+
+602) Urs Janssen <urs@tin.org>
+     BUG. new my_strdup() didn't work on system which come with bcopy only
+     BUG. declaration of sys_errlist didn't work on systems which need it
+     BUG. in some cases newsrcs was written out even if '-X'-flag was
+          present.
+     ADD. minor code cleanup
+     ADD. 'Z' mark group unread in top-level (select.c)
+     FIX. bool.h, extern.h, menukeys.h, proto.h, tin.h, *.c
+
+601) Nick Efthymiou <NEFT@pacbell.net>
+     ADD. SCO-port
+     BUG. possible curses calls in 'command-line-mode'
+     BUG. memory leak in the TLI-code
+     BUG. typo in the TLI interface
+     BUG. fixed a few types (int -> pid_t/uid_t/...)
+     FIX. init.c, misc.c, nntplib.c, prompt.c
+
+600) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. support for persistent-headers
+     ADD. minor code cleanup
+     FIX. tin.h, page.c, post.c
+
+599) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. random-sigs now allow different sigfixed-parts via
+          random_sigdir/.sigfixed which has a higher precedence
+          as ~/.sigfixed
+     BUG. typo in vWriteFilterArray()
+     FIX. filter.c, sigfile.c
+
+598) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. speedup 'y'ank in
+     FIX. select.c
+
+597) Sven Paulus <sven@tin.org>
+     BUG. possible buffer overrun
+     FIX. init.c
+
+596) Kazushi Marukawa <jam@pobox.com>
+     BUG. tin now handles "LIST ACTIVE"/"GROUP" differences correct
+     BUG. tins mailgroup feature was broken
+     BUG. parse_headers() used MIME-decoded data which might be troublesome
+     ADD. '-l' cmd-line switch to turn on "LIST ACTIVE" only-mode
+     ADD. changed '-R' to read saved news (-S) off-line
+     ADD. -s option to -R to point -R to the saved spool
+     FIX. extern.h, active.c, art.c, group.c, inews.c, init.c, mail.c
+          main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c
+          read.c, refs.c
+
+595) Jason Faultless <jason@radar.tele2.co.uk>
+     Kazushi Marukawa <jam@pobox.com>
+     BUG: possible buffer overflow in rfc1521_decode()
+     ADD. Made I/O code fully dynamic. Fixed header joining in all cases.
+          Cured various related I/O & fd problems
+     ADD. 'S'ave tagged in pager
+     ADD. Various minor cleanups and fixes
+     FIX. extern.h, menukeys.h, proto.h, tin.h, active.c, art.c, auth.c
+          feed.c, group.c, lang.c, mail.c, main.c, misc.c, newsrc.c
+          nntplib.c, open.c, page.c, post.c, prompt.c, read.c, rfc1521.c
+          save.c, search.c, thread.c, xref.c
+
+594) Phil Edge <phil@edge.demon.co.uk>
+     ADD. minor code cleanup
+     FIX. post.c
+
+593) Dean Takemori <dean@uhheph.phys.hawaii.edu>
+     ADD. better libuu support
+     FIX. save.c
+
+-- pre-1.4 release 980618 --
+
+592) Urs Janssen <urs@tin.org>
+     BUG. defines for HAVE_SETPGRP and SETPGRP_VOID were missing
+     ADD. --disable-xhdr-xref switch to configure in case it slows down
+          your reading process too much.
+     ADD. check for empty domain_name is now done after site_config-file
+          is read (simplifies binarie dist.)
+     ADD. changed msg_add_x_headers() that "x_headers=foo" without
+          a ':' in it is no longer treated as filename in the current
+          dir, you could still use '/' or '~' to indicate that's a
+          filename
+     ADD. rewrote my_strdup() (little speedup)
+     ADD. minor code cleanup
+     FIX. configure[.in], autoconf.h[in], extern.h, init.c, lang.c, post.c
+          string.c
+
+591) Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. y2k compliance
+     FIX. post.c, open.c
+
+590) Cameron Perkins <erasmus@cc.gatech.edu>
+     BUG. when entering a group while the server is receiving a new article
+          this article could be marked as read without having a chance to
+          read it.
+     FIX. art.c
+
+589) Bernhard Oemer <oemer@tph.tuwien.ac.at>
+     ADD. on catchup_read_groups=ON mark the whole group as read
+          instead of each article
+     FIX. misc.c
+
+588) Kyle Rhorer <rhorer@clarc.org>
+     ADD. just stat article before piping it instead of reading
+          it to check if it still exists.
+     FIX. feed.c, screen.c
+
+587) Kazushi Marukawa <jam@pobox.com>
+     ADD. allow ^U and ^W in string-prompts
+     FIX. getline.c
+
+586) Thomas E. Dickey <dickey@clark.net>
+     BUG. use of null pointer in sprintf()
+     BUG. misplaced fclose
+     BUG. correct conflicting definitions of isascii
+     BUG. duplicate switch cases
+     ADD. case to the configure test for compiler options (HP-UX 10.*)
+     ADD. improve check for HP curses, check for cursesX before curses
+     ADD. code cleanup (fix misuses of const, removed NULL as a synonym for
+          (char*)0, ...)
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], extern.h, nntplib.h
+          tin.h, Makefile[.in], art.c, filter.c, header.c, init.c, mail.c
+          makecfg.c, misc.c, newsrc.c, nntplib.c, nrctbl.c, post.c, read.c
+          save.c, select.c, sigfile.c, tcurses.c, thread.c
+
+-- pre-1.4 release 980514 --
+
+585) Stanislav Latishko <sl@sl.spb.su>
+     BUG. possible NULL-pointer reference in tind
+     ADD. allow/expand "\t" into '\t' in strfquote()
+     FIX. misc.c, refs.c
+
+584) Simon Hosie <gumboot@clear.net.nz>
+     ADD. minor code cleanup
+     FIX. post.c
+
+583) Urs Janssen <urs@tin.org>
+     BUG. compile with -DDONT_HAVE_PIPING didn't work
+     BUG. broken newsrc-lines could cause a core-dump
+     BUG. if starting with on commandline group, tin doesn't display
+          any groupnames after leaving group-level
+     BUG. no check for empty but present Followup-To line if posting
+          to multiple newsgroups
+     ADD. disable etiquette warning if beginner_level is off
+     ADD. cleaned up repost_article() to meet alt.humor.best-of-usenet
+          criteria
+     ADD. strip doubled newsgroups from Followup-To: before checking
+          if it contains several groups
+     ADD. searching in posted_message-file disabled
+     ADD. allow <TAB> as fieldseperator in ~/.newsauth
+     ADD. check for empty / all whitespace Subject
+     ADD. updated pcre (1.07 -> 1.09)
+     ADD. -X cmd-line switch
+     ADD. minor code cleanup
+     FIX. extern.h, menukeys.h, proto.h, active.c, art.c, auth.c
+          feed.c, help.c, lang.c, main.c, misc.c, newsrc.c, post.c
+          read.c, save.c, select.c, xref.c, pcre/*
+
+581) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. depending on the auth-request authentication sometimes failed
+     BUG. article was not resent on authentication request after POST command
+     ADD. prompt default user name on authentication request
+     FIX. proto.h, auth.c, inews.c, open.c, prompt.c
+
+580) Kazushi Marukawa <jam@pobox.com>
+     BUG. writing out of final ".\r\n" could fail on some systems.
+     BUG. mail_address was extracted after MIME-decoding From:-line
+          but parse_from() can't handle multiple '@'/'('
+     BUG. @LIBS@ was missing in makecfg make-rule
+     BUG. From:-line was not MIME-encoded in NOV-file entries
+          created by tin
+     FIX. Makefile[.in], art.c, nntplib.c, post.c
+
+579) Dirk Nimmich <nimmich@uni-muenster.de>
+     Urs Janssen <urs@tin.org>
+     BUG. when saving/piping MIME-encoded articles they were automatically
+          decoded but that's only useful if any post-processing is done
+     FIX. extern.h, proto.h, charset.c, feed.c, lang.c, open.c, page.c
+          save.c, search.c
+
+578) Hans Werner Strube <strube@physik3.gwdg.de>
+     BUG. unset TIN_DEFAULTS_PATH instead of TIN_DEFAULTS_DIR used
+          to locate the system-wide tin.defaults file
+     FIX. tin.h
+
+577) Sven Paulus <sven@tin.org>
+     ADD. spamtrap_warning_addresses option to .tin/tinrc
+     ADD. mm_charset option tin.defaults
+     BUG. off by one error in option numbers for OPT_CHAR/OPT_NUM
+     BUG. MIME type and MIME encoding behaviour was a little confusing
+     FIX. extern.h, tin.h, config.c, inews.c, init.c, lang.c, post.c
+          prompt.c, rfc1522.c, tincfg.tbl
+
+576) Philipp Mergenthaler <s_mergen@ira.uka.de>
+     BUG. art_cnt[] was to small to hold terminating '\0'
+     FIX. group.c
+
+575) Dirk Nimmich <nimmich@uni-muenster.de>
+     Jens Wuepper <wuepper@math.uni-hamburg.de>
+     BUG. !alnum-chars were not always MIME encode where they should
+     FIX. rfc1522.c
+
+574) Helmut.Bohr@t-online.de (Helmut Bohr)
+     ADD. configure check for pgp-5
+     FIX. configure[.in], autoconf.h[in], pgp.c
+
+573) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+572) Thomas E. Dickey <dickey@clark.net>
+     BUG. if giving syntactically wrong args to some configure options
+          it didn't fallback to a useful value.
+     FIX. aclocal.m4,configure[.in]
+
+571) Jason Faultless <jason@radar.tele2.co.uk>
+     FIX. Crash on 'L' when message already read
+     ADD. Better fix for message bar crash from 468/9
+     ADD. minor cleanup
+
+570) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     BUG. negative numerical timezone information was misinterpreted
+          on systems with unsigned time_t (i.e. OpenVMS)
+     FIX. parsedate.y
+
+569) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. charset/encoding mismatch considered an error even when there
+          are no 8bit characters in the body
+     ADD. check for 7bit encoding when posting 8bit article
+     FIX. extern.h, lang.c, post.c
+
+568) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. removed D_NAMLEN() macro
+     FIX. tin.h, active.c, mail.c, open.c
+
+567) Thomas E. Dickey <dickey@clark.net>
+     BUG. check for color support was broken for old ncurses version
+     FIX. aclocal.m4, configure[.in]
+
+-- pre-1.4 release 980226 --
+
+566) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. fallback to "XHDR Xref" (if possible) if Xref is no present
+          in the overviewfile
+     FIX. lang.c, xref.c
+
+565) Kirk Bauer <kirk@kaybee.org>
+     Urs Janssen <urs@tin.org>
+     ADD. pass newsgroup name as first argument to external sigfile creator
+     FIX. sigfile.c
+
+564) Thomas E. Dickey <dickey@clark.net>
+     ADD. missing strerror() for SunOS 4.x
+     ADD. new/improved configure script checks for curses & termcap libraries
+          and headers.
+     ADD. configure options/checks for default editor, mailer and mailpath
+     ADD. configure check for curses-color support
+     ADD. ifdef in tin.h to reduce the noise when compiling on SunOS 4.x
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
+          screen.c, string.c
+
+563) Florian Kuehnert <sutok@gmx.de>
+     Urs Janssen <urs@tin.org>
+     ADD. skip article header when spell checking
+     BUG. append_file() was broken
+     FIX. misc.c
+
+562) Sven Paulus <sven@tin.org>
+     ADD. 'z' (lynx style) as abort-key
+     FIX. read.c
+
+561) Yuri Kuzmenko <yuri@killer.cracksoft.kiev.ua>
+     BUG. tin sometimes freezes if getting a SIGHUP
+     FIX. init.c, open.c, signal.c
+
+560) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. tin retrys to connect after getting a 503 response from the
+          server
+     FIX. nntplib.c, open.c
+
+559) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. screen not cleared when scrolling by page
+     BUG. screen not redrawn when forcing redraw with
+          iKeyConfigRedrawScr
+     ADD. check for US-ASCII when posting with non-7bit encoding
+     FIX. extern.h, config.c, lang.c, post.c
+
+558) Zbigniew Zych <zych@onet.pl>
+     Florian Kuehnert <sutok@gmx.de>
+     BUG. typos
+     FIX. lang.c, README
+
+557) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (1.05 -> 1.07)
+     FIX. pcre/*
+
+556) Thomas E. Dickey <dickey@clark.net>
+     BUG. sh_format() escaped already escaped chars
+     FIX. save.c, string.c
+
+555) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. rule.icase sometimes used uninitialized
+     FIX. filter.c
+
+554) Henryk Bochmann <bochmann@TUDURZ.urz.tu-dresden.de>
+     Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     Thomas E. Dickey <dickey@clark.net>
+     Urs Janssen <urs@tin.org>
+     BUG. preprocessor symbol for OpenBSD was missing
+     ADD. check for HP-UX >=10
+     BUG. #ifdef NO_SHELL_ESCAPE was missing
+     BUG. TIN_DEFAULTS_DIR didn't get defined due misspelling
+     BUG. removed missplaced brace
+     BUG. no automatic aggregate initialization
+     FIX. init.c, misc.c, select.c, tin.h, autoconf.h[in]
+
+-- pre-1.4 release 980202 --
+
+553) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. VMS port
+     FIX. several supplied patches
+
+552) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. default_filter_kill_case and default_filter_select_case
+          ignored, interpreted wrong (ON must be false)
+     BUG. empty scope written to filter file
+     FIX. config.c, filter.c
+
+551) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. fixed display-gaps caused by missing articles in the
+          threading tree
+     FIX. thread.c
+
+550) Urs Janssen <urs@tin.org>
+     ADD. Support for configure --with-defaults-dir, used for
+          tin.defaults, new Makefile options to install this file
+     BUG. cleanup of init.c
+     FIX. Makefile, configure.in, Makefile.in, init.c
+
+549) Sven Paulus <sven@tin.org>
+     ADD. new system-wide defaults file "tin.defaults" (primarily
+          aimed for making binary distributions of TIN)
+     BUG. GetConfigValue() was more than useless if compiled without
+          INN library
+     FIX. Makefile, tin.defaults, autoconf.hin, extern.h, proto.h
+          tin.h, makefile.in, art.c, header.c, inews.c, init.c
+          nntplib.c, nntpw32.c
+
+548) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. MIME related documentation updated
+     FIX. tin.1, lang.c, rfc1521.c, rfc1522.c
+
+547) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. rewrote active file reread-stuff
+     REM. file-pointer-fix from patch nr. 511
+     FIX. several supplied patches
+
+546) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     FIX. several patches
+
+545) Branden Robinson <branden@purdue.edu>
+     ADD. iKeyPostponed2 ('O')
+     FIX. menukeys.h
+
+544) Thomas E. Dickey <dickey@clark.net>
+     BUG. some display-problems with --enable-curses and metamail
+     FIX. feed.c, page.c
+
+543) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. metamutt - a shell script to call mutt as MIME-parser
+     FIX. metamutt
+
+542) Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. $METAMAIL to set external MIME-parser (i.e. metamutt vs. metamail)
+     FIX. page.c
+
+541) Sven Paulus <sven@tin.org>
+     BUG. deep threads could thrash display
+     FIX. thread.c
+
+-- pre-1.4 release 980117 --
+
+540) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. 'Try again (y/n)' loop if writing newsrc fails due to full disk
+     ADD. Abort save of newsrc file if 0 groups written
+     BUG. Couple of very obscure problems related to new newsgroup
+          handling
+     BUG. Groups mistakenly reported as new by the server could
+          appear more than once in selection list
+     FIX. tin.1, extern.h, proto.h, active.c, config.c, lang.c, misc.c
+          newsrc.c, select.c
+
+539) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. the rest of the keycodes of an arrow key which triggers
+          rereading of the active file at group selection level disappear
+          by the time get_arrow_key() is called
+     FIX. select.c
+
+538) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. local caching of newsgroups file didn't try to read newsgroups
+          via NNTP if no local copy exists and -q flag was used
+     FIX. main.c, open.c
+
+537) Sven Paulus <sven@tin.org>
+     ADD. cosmetic-patch for start-up message
+     ADD. rearranged order of options 'M'enu items
+     FIX. open.c, tincfg.tbl
+
+536) Christian Haul <haul@informatik.tu-darmstadt.de>
+     Urs Janssen <urs@tin.org>
+     ADD. use mail_address for pgp-key if set
+     FIX. pgp.c, misc.c, proto.h
+
+535) Urs Janssen <urs@tin.org>
+     BUG. 'u'nsubscribing from bogus groups ('D') resets the .newsrc
+     BUG. 'u'nsubscribing fails in show_only_unread=OFF mode
+     ADD. joined GLOBAL OPTIONS MENU and TINRC CONFIGURABLE VARIABLES
+          in the man page
+     ADD. info_in_last_line ('i')
+     FIX. extern.h, menukeys.h, config.c, group.c, init.c, select.c
+          thread.c, tin.1
+
+534) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. missing set_signals_page() call added
+     ADD. check against active-file if using AUTOSUBSCRIBE and reading from
+          local spool.
+     ADD. documentation updated
+     FIX. several supplied patches
+
+533) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. commandline flags overridden by tinrc values
+     BUG. screen not initialized to default attributes when using color
+     BUG. documentation for default_filter_kill_header and
+          default_filter_select_header outdated in man page
+     ADD. whitespace quoting and cleanup
+     FIX. filter.c, main.c, tin.1
+
+-- pre-1.4 release 980105 --
+
+532) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. A NULL read following a partial read would hang tin with
+          a malloc() failure
+     FIX. read.c
+
+531) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. charset mismatch when parameter value is a quoted string
+     FIX. rfc1521.c
+
+530) Urs Janssen <urs@tin.org>
+     BUG. Newsgroups:-line was present in mail-replys, renamed it to
+          X-Newsgroups (RFC 822 doesn't define a Newsgroups:-header)
+          for mail_to_author and removed it from mail_to_someone where
+          it's usually present in the body.
+     FIX. post.c
+
+529) Thomas E. Dickey <dickey@clark.net>
+     ADD. use new function sh_format(), to quote filenames that require it
+          for shell commands.
+     ADD. implement '?','/' in help screen.
+     BUG. remove spurious #include's for <stdarg.h> that may prevent compile
+          with unproto on SunOS.
+     ADD. use make-flags substitution in makefiles
+     FIX. several supplied patches
+
+528) Jason Faultless <jason@radar.tele2.co.uk>
+     Ralf Doeblitz <doeblitz@gmx.de>
+     Thomas E. Dickey <dickey@clark.net>
+     BUG. regex search pattern in '=' (select thread) were
+          embedded in *%s*
+     FIX. tin.h, filter.c, group.c
+
+527) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. 'A'uthor search backwards might produce a
+           invalid offset into arts[]
+     FIX. search.c
+
+526) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. -N command-line switch was broken
+     FIX. extern.h, init.c, main.c, save.c
+
+525) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. blank in search pattern not quoted when using regexp
+     BUG. tin hangs if ~.newsrc doesn't exist
+     FIX. proto.h, misc.c, newsrc.c, search.c
+
+524) Thomas E. Dickey <dickey@clark.net>
+     BUG. printed clrtoeol() also on lines which were exactly screen width
+          wide -> following line was cleared
+     FIX. tcurses.h, group.c, tcurses.c, thread.c
+
+523) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup:
+          - removed ADD_ADDRESS-code
+          - removed ACTIVE_DEMON-code
+          - read command-line-flags before reading any config-files
+          - adjusted mailbox-separator
+          - moved some strings
+          - updated manpage
+     FIX. several patches
+
+-- pre-1.4 release 971224 --
+
+522) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (1.02 -> 1.05)
+          (see also 518)
+     FIX. pcre/*
+
+521) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. -z was broken
+     FIX. main.c
+
+520) Park Sang Jin <sjpark@gura.kaist.ac.kr>
+     ADD. mutt like threading tree
+     FIX. thread.c
+
+519) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. conversion of From: lines to "%s (%s)" in filter entries
+     ADD. new filter type for message-id only (msgid_only)
+     FIX. extern.h, tin.h, filter.c lang.c
+
+518) Thomas E. Dickey <dickey@clark.net>
+     BUG. typo in configure script that set the USE_BCOPY macro
+     ADD. move include for pcre.h down past system headers
+     ADD. undef for memmove, in case the configure test doesn't
+          find that the system defines a macro for it.
+     ADD. reduce the ifdef's in pcre.c using macro DPRINTF
+     ADD. include for <sys/types.h> before <stdlib.h>
+     ADD. fall-back definition for offsetof
+     FIX. configure[.in], tin.h, internal.h, pcre.c, pcre.h, pcretest.c
+          nntplib.c, nntpw32.c
+
+517) Cameron Perkins <erasmus@cc.gatech.edu>
+     BUG. used fclose() to close a pipe
+     FIX. sigfile.c
+
+-- pre-1.4 release 971215 --
+
+516) Janne Kiviluoto <jajoki@utu.fi>
+     ADD. some code was missing for compilation on Amiga gcc.
+     FIX. tnntp.h, version.h, joinpath.c
+
+515) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. score for articles was only reset when article was unread.
+     ADD. some minor AmigaOS fixes
+     ADD. unnecessary calls to auto_select_articles() removed, function
+          itself was only a dummy - removed.
+     FIX. filter.c, misc.c, group.c, read.c, open.c, smakefile
+
+514) Thomas E. Dickey <dickey@clark.net>
+     ADD. better configure-script test for yacc vs bison.
+     ADD. moved the compiler-options out of conf-tin into configure.in
+     ADD. split up one of the CF_CHECK_DECL chunks in configure.in
+     BUG. modify pcre to get rid of the places where it removes 'const' from
+          variables.
+     BUG. fix the signed/unsigned warnings in pcre.
+     BUG. fix the uninitialized-variables warnings in pcre.
+     FIX. conf-tin, aclocal.m4, configure[.in], proto.h, tin.h, config.c
+          filter.c, nntplib.c, regex.c, pcre.c, pcre.h, pcreposix.c
+          pcretest.c, pgrep.c, study.c
+
+513) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. ESC didn't abort backward search
+     FIX. search.c
+
+512) Ragnar Hojland Espinosa <ragnar@redestb.es>
+     ADD. pgp-5 support
+     FIX. pgp.c
+
+511) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. tin failed to discard "503 Timeout.." and resend last command
+          again upon reconnection.
+     BUG. nntp_rd_fp is invalid after reconnection
+     ADD. auto_reconnect option in tinrc
+     FIX. extern.h, config.c, init.c, lang.c, nntplib.c, open.c
+          tincfg.tbl
+
+510) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote some configure checks
+     FIX. several supplied patches
+
+509) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. random filter type (msgid or msgid_last) was created when
+          creating new filter entries with message-id filtering.
+     FIX. filter.c
+
+-- pre-1.4 release 971204 --
+
+508) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. 's'ave article in thread-level always saved base article
+     FIX. thread.c
+
+507) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. group=hierarchie.* in filter-editor was always changed to
+          group=*
+     FIX. filter.c
+
+506) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup (removed obsolete XMOTD/XUSER-code,
+          man-page-updated, ...)
+     FIX. several patches
+
+505) Holger Schif <rastaman@eikon.e-technik.tu-muenchen.de>
+     BUG. doesn't compile if configured with --disable-nntp
+     FIX. open.c, read.c, tin.h
+
+504) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. $NNTPSERVER overrides -g if using external inews
+     FIX. nntplib.c
+
+503) Andreas Kies <andi@muenchen.roses.de>
+     BUG. generated corrupted index files
+     FIX. art.c
+
+-- pre-1.4 release 971127 --
+
+502) Sven Paulus <sven@tin.org>
+     ADD. -p cmd-line flag
+     FIX. Makefile, extern.h, Makefile[.in], init.c, main.c, nrctbl.c
+          open.c
+
+501) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. moved some strings to lang.c
+     ADD. filtering on Message-ID and last References: entry only
+     ADD. missing meta-chars to quote_wild()
+     FIX. extern.h, tin.h, filter.c, misc.c
+
+500) Thomas E. Dickey <dickey@clark.net>
+     BUG. wrong initialization of colors for the normal (non-ncurses4.1)
+          case.
+     BUG. missing initialization of posted[] array end-marker.
+     ADD. generate pcre/Makefile (needed for --srcdir option, as well as to
+          solve various portability problems).
+     ADD. configure test for bcopy/memmove
+     ADD. minor fix for ncurses vs gpm library configure-test
+     ADD. remove configure-macro for regular expressions
+     ADD. improved test for 'union wait' in configure-script
+     FIX. aclocal.m4, configure.[in], makefile[.in], pcre/internal.h
+          pcre/pcre.c, pcre/Makefile.in, color.c, misc.c, post.c, tcurses.c
+          Makefile[.in]
+
+499) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Autosubscribed groups are not postable
+     BUG. Killed articles incorrectly threaded
+     BUG. 'u' crashed on killed parents
+     ADD. Better behaviour on 'Y'
+     ADD. Some new DEBUG_NEWSRC code
+
+498) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. fixed typo in msgid filtering code
+     FIX. filter.c
+
+497) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. included pcre into amiga-version
+     BUG. moved misplaced label
+     FIX. amiga.h smakefile open.c
+
+496) Enrik Berkhan <enrik@tin.org>
+     Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. minor man-page update
+     BUG. fixed wrong type in fgets_hdr()
+     BUG. fixed 12pm bug in parsedate.y
+     ADD. check for $YACC on HP-UX/cc
+     FIX. prasedate.y, read.c, tin.1, conf-tin
+
+-- pre-1.4 release 971123 --
+
+495) Sven Paulus <sven@tin.org>
+     ADD. changed regex code to Philip Hazel's <ph10@cus.cam.ac.uk>
+          pcre library, which provides enhanced capabilities and
+          speed improvements. pcre is now included within TIN
+          distribution and should compile on all platforms
+     ADD. cache for compiled regexp patterns
+     FIX. filter.c, regex.c, new pcre-subdirectory
+
+494) Sven Paulus <sven@tin.org>
+     ADD. new config option "add_posted_to_filter"
+     BUG. quick_filter_select_posted_art() didn't add group name to scope
+     FIX. extern.h, proto.h, config.c, filter.c, init.c, lang.c, post.c
+          tincfg.tbl
+
+493) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. detection of multi-line Content-Type:-header
+     FIX. proto.h, rfc1521.c, read.c
+
+492) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. can't leave group via left arrow when answering catch-up-question
+          with no
+     BUG. crash when 'n' points to bogus group
+     FIX. group.c, select.c
+
+491) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. check for circular references
+     FIX. refs.c
+
+490) John M. Flinchbaugh <glynis@hjsoft.com>
+     BUG. calling invoke_cmd() with empty argument to start ispell
+     FIX. misc.c
+
+489) Thomas E. Dickey <dickey@clark.net>
+     BUG. remove special-case for -I/usr/local/include
+     BUG. minor fix to configure-test for union wait.
+     BUG. remove redundant aggregate initialization in auth.c
+     FIX. aclocal.m4, auth.c, group.c
+
+488) Urs Janssen <urs@tin.org>
+     ADD. check for initial or reconnection
+     ADD. check for empty .newsrc (needed for -n switch)
+     ADD. minor code cleanup
+     BUG. fixed return value in case of !SIGUSR1
+     FIX. autoconf.h[in], extern.h, open.c, misc.c, filter.c, post.c
+          active.c, configure[.in]
+
+487) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. read/post problems with ANU NEWS-servers
+     BUG. wrong message counter while searching
+     FIX. open.c, search.c
+
+486) Yuri Kuzmenko <yuri@cs.cracksoft.kiev.ua>
+     ADD. removed message_delay upon superseding/reposting
+     ADD. clean program termination when receiving a SIGTERM
+     ADD. config switch for PgDn behaviour at end of article
+     FIX. config.c, page.c, post.c, signal.c, tincfg.tbl
+
+485) Torsten Schneider <schneidt@mabi.de>
+     BUG. advertising switch was not respected
+     FIX. config.c
+
+-- pre-1.4 release 971106 --
+
+484) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. rules for emacs-tags
+     FIX. Makefile.in
+
+483) Ralf Doeblitz <doeblitz@gmx.de>
+     Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. missing check for NULL-pointer references
+     FIX. refs.c
+
+-- pre-1.4 release 971105 --
+
+482) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. removed line-counter in body-search
+     FIX. screen.c, search.c
+
+481) Sven Paulus <sven@tin.org>
+     ADD. server info to bug-report
+     ADD. moved some strings to lang.c
+     ADD. moved aliased group 'warning' to select.c
+     BUG. didn't notice no post if nnrpd was invoked via mode reader
+     FIX. extern.h, tin.h, init.c, lang.c, misc.c, open.c, post.c
+          prompt.c, select.c, active.c
+
+480) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. search in 'M'enu ends in a endless loop if no match was found
+     BUG. off by one error when jumping direct to a 'M'enu option
+     ADD. runtime check if color is supported
+     FIX. search.c, extern.h, proto.h, color.c, config.c, group.c, lang.c
+          misc.c, page.c, select.c, tcurses.c, thread.c
+
+479) Andrey A. Chernov <ache@null.net>
+     BUG. calling beep() when initscr() not called
+     BUG. division by zero (COLORS value if !has_colors())
+     FIX. color.c screen.c
+
+478) Thomas E. Dickey <dickey@clark.net>
+     ADD. bypasses the color code if there are no colors active
+     FIX. color.c
+
+477) Urs Janssen <urs@tin.org>
+     BUG. pointer into article_array could get negative
+     FIX. thread.c
+
+476) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. wait_message() call with two few arguments
+     FIX. xref.c
+
+-- pre-1.4 release 971102 --
+
+475) Urs Janssen <urs@tin.org>
+     ADD. better test if Sender is needed
+     FIX. inews.c
+
+474) Thomas E. Dickey <dickey@clark.net>
+     ADD. "-lgen" to $LIBS if needed for linking with the regexpr.h
+          style of regular expressions.
+     ADD. search commands to the config screen
+     BUG. corrects interpretation of the --without-ncurses configure option.
+     BUG. enables/disables ncurses mouse as indicated by the config setting
+          use_mouse.
+     FIX. aclocal.m4, configure[.in], extern.h, proto.h, config.c, search.c
+          tcurses.c
+
+473) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. news_headers_to_display support completely rewritten.
+     ADD. continuation lines support
+     ADD. ^H now toggles the display of headers (it doesn't display them only
+          once as before.
+     ADD. news_headers_to_[not_]display configurable using "M"enu
+     ADD. set a useful default value for news_headers_to_display
+     REM. highlight_xcommentto and show_xcommentto merged to show_xcommentto,
+          which displays X-Comment-To in the upper right corner.
+     FIX. page.c and some other files
+
+472) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Sort by score
+     ADD. minor cleanup
+     FIX. several supplied patches
+
+471) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. changed pager layout
+     ADD. col_newsheaders configurable using "M"enu
+     BUG. light-colors had wrong index
+     FIX. color.c, tincfg.tbl, lang.c, page.c extern.h
+
+470) Urs Janssen <urs@tin.org>
+     ADD. unlink_article also works for .letter
+     ADD. hide built_in_inews if running spool only
+     ADD. minor code cleanup
+     FIX. several patches
+
+469) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Support for 'x' and '=' active file flags.
+          More informative flags on the selection page and
+          group page
+     BUG. Suppress -v when not in batch_mode
+     BUG. Reconnection timeouts sometimes broken
+     BUG. formatting chars in message bar could cause a crash
+     ADD. Sub/Unsub pattern now accept full group lists
+     ADD. code cleanup
+
+468) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. cleanup newsrc parsing
+     ADD. 'K' in thread menu now skips to next unread
+     BUG. no check for full disk when getting article
+     BUG. bogus group removal msg not displayed properly
+     BUG. aborting during save of articles would produce
+          unpredictable effects
+     BUG. formatting chars in subject crashed message bar
+     BUG. possible crash at startup in some cases
+     BUG. 'c'atchup group returns to selection page even if you
+          answered 'n' to confirmation
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+467) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup; cosmetic patch
+     FIX. several supplied patches
+
+466) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. cleanup *_message()
+     ADD. joined single letter key prompts
+     ADD. renamed stuff_nntp() to get_article()
+     BUG. show_progress sometimes trashed screen-layout
+     FIX. several supplied patches
+
+465) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. varargs *_message() functions
+     BUG. 'm'ove group was broken
+     ADD. minor code cleanup; cosmetic patch
+     FIX. several supplied patches
+
+464) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. replaced X-Newsreader:/X-Mailer: by User-Agent:-header (RFC 1945)
+     FIX. version.h, post.c
+
+463) Urs Janssen <urs@karlsruhe.org>
+     BUG. no line-warp after "Xref: not supported" warning
+     FIX. xref.c, lang.c, extern.h
+
+462) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. rewrite all I/O and NNTP data handling
+     ADD. extensive internal changes
+     ADD. new -d and -Q options
+     ADD. code clean-up
+     REM. all references to obsolete 'cdtin'
+
+461) Thomas E. Dickey <dickey@clark.net>
+     ADD. modify ncurses/gpm link test to work with recent changes to ncurses
+     ADD. improve ifdef-test for union wait.
+     ADD. modify CF_WITH_PATH to work better when the prefix that's used in
+          the default value is not given.
+     ADD. identify ncurses version (for bug reports)
+     FIX. aclocal.m4
+
+460) Urs Janssen <urs@tin.org>
+     BUG. check for gethostbyname was missing
+     FIX. configure[.in]
+
+459) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. improved scoring
+     FIX. several supplied patches
+
+458) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     BUG. X-Superseded-By:-header is broken (introduced in 443)
+     FIX. post.c
+
+--unoff BETA release 971018 --
+
+457) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. changed reread_active routine to old 1.2
+     FIX. active.c
+
+456) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. scoring
+     FIX. tin.h, filter.c, misc.c
+
+455) Sven Paulus <sven@tin.org>
+     ADD. improved get_initials()
+     FIX. misc.c
+
+454) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote prototype for OUTC_ARGS
+     FIX. aclocal.m4, tin.h
+
+--unoff BETA release 970930 --
+
+453) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. cosmetic patch
+     FIX. art.c, init.c, main.c, misc.c, signal.c
+
+452) Urs Janssen <urs@tin.org>
+     ADD. replaced explicit 'TRUE' comparisons
+     BUG. adjusted prototype for OUTC_ARGS (needed for HP-UX)
+     FIX. aclocal.m4, curses.c, feed.c, filter.c, page.c, rfc1522.c
+
+451) Branden Robinson <branden@purdue.edu>
+     BUG. newline missing after txt_info_postponed
+     FIX. lang.c
+
+450) Sven Paulus <sven@tin.org>
+     BUG. forgery was broken (introduced in 440)
+     FIX. post.c
+
+449) Thomas E. Dickey <dickey@clark.net>
+     BUG. conflict in config file between termcap and curses
+          version's handling of default color values
+     BUG. 'M' config menu isn't scrollable in curses.
+     BUG. call on get_arrow_key() that requires an extra
+          <return> after a shell command.
+     ADD. call to reset keypad mode in curses after a shell command
+     ADD. modify tcurses.c version of my_printf, etc., to turn off raw mode
+          if they're called when the program is in command-line (or batch)
+          mode.
+     FIX. Makefile, aclocal.m4, configure[.in], extern.h, proto.h, tin.h
+          makefile[.in], charset.c, color.c, config.c, curses.c, init.c
+          lang.c, makecfg.c, page.c, prompt.c, signal.c, tcurses.c, thread.c
+
+448) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. minor code cleanup (check for non-printable chars)
+     FIX. group.c, page.c, screen.c, thread.c
+
+447) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor makefile-tuning
+     FIX. smakefile
+
+--unoff BETA release 970923 --
+
+446) Ralf Doeblitz <r.doeblitz@tu-bs.de>
+     Urs Janssen <urs@karlsruhe.org>
+     BUG. several buffer overflows possible [partial fix only]
+     FIX. screen.c, misc.c, nntplib.c, rfc1522.c
+
+445) Sergey Shkonda <serg@bcs.zp.ua>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. used isprint() instead of my_isprint()
+     FIX. proto.h, charset.c, getline.c, group.c, misc.c, page.c
+          screen.c, thread.c
+
+444) Darrell Tangman <darrelltman@mindspring.com>
+     ADD. local caching of overview-files if reading via NNTP
+     FIX. extern.h, art.c, auth.c, config.c, init.c, lang.c, mail.c
+          main.c, misc.c, open.c, select.c, tincfg.tbl
+
+443) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     ADD. removed useless call of get_from_name() in make_path_header()
+     FIX. post.c
+
+--unoff BETA release 970922 --
+
+442) Sven Paulus <sven@karlsruhe.org>
+     Urs Janssen <urs@karlsruhe.org>
+     BUG. quoting of quoted lines didn't strip tailing space from
+          quote_chars
+     BUG. minor code cleanup (moved misplaced label, commented out
+          buggy code)
+     FIX. attrib.c, misc.c, post.c
+
+441) Vincent Lefevre <vlefevre@ens-lyon.fr>
+     BUG. typo
+     FIX. lang.c
+
+440) Sven Paulus <sven@karlsruhe.org>
+     BUG. superseding/cancelling didn't work when one the groups
+          was not contained in active file
+     BUG. typo in lang.c
+     BUG. garbled display when asking if .newsrc should be created
+     BUG. removed where "~" was used instead of homedir
+     BUG. When an article was piped and the message "Press <RETURN>
+          to continue..."  appeared, if an arrow key was pressed,
+          arbitrary commands were executed.
+     BUG. tin did not warn you if you tried to save into a directory
+          and not into a file.
+     ADD. when window was or got too small, tin SIGSEGVd, now tin
+          exits properly
+     ADD. set From:-address on per-group basis in attributes file
+     ADD. 'y' as an alternative to 'p' for mutt-users :-)
+     ADD. checking on startup, if window is large enough to run tin
+     FIX. tin.h, proto.h, attributes.c, post.c, lang.c
+
+--unoff BETA release 970916 --
+
+439) Martin Buck <martin-2.buck@student.uni-ulm.de>
+     BUG. joining of continued header-lines didn't work
+     FIX. art.c
+
+438) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. closed possible security hole with -DEBUG_NEWSRC
+     ADD. minor code cleanup (moved some strings)
+     ADD. '^O' to thread-'l'evel
+     ADD. check if posting is allowed before calling several posting
+          routines
+     FIX. configure[.in], autoconf.h[in], extern.h, menukeys.h, tin.h
+          config.c, feed.c, lang.c, main.c, newsrc.c, page.c, post.c
+          select.c, thread.c
+
+437) Sven Paulus <sven@karlsruhe.org>
+     BUG. -c was broken
+     FIX. newsrc.c
+
+--unoff BETA release 970911 --
+
+436) Thomas E. Dickey <dickey@clark.net>
+     BUG. on articles with an '*' in color on the last line, color isn't
+          reset after that point
+     FIX. color.c, tcurses.c
+
+435) Patrick St. Jean <stjeanp@pdq.net>
+     ADD. failure message for when a news server rejects authentication
+          information
+     FIX. extern.h, auth.c, lang.c
+
+434) Sven Paulus <sven@karlsruhe.org>
+     ADD. quote signatures/display signatures switch
+     FIX. extern.h, proto.h, config.c, init.c, lang.c, misc.c, page.c
+          post.c, tincfg.tbl
+
+433) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. Amiga-port had problems with stat()/fstat()
+     ADD. minor code cleanup
+     FIX. amiga.h, tin.h, smakefile, amiga.c, save.c
+
+432) Thomas E. Dickey <dickey@clark.net>
+     Andrey A. Chernov <ache@null.net>
+     BUG. backspace key didn't work with curses
+     BUG. ncurses.h wasn't included (needed by old ncurses versions)
+     ADD. use ncurses 4.1 extension use_default_colors()
+     ADD. configure script check to (try to) set compiler options for
+          ANSI mode
+     BUG. core-dump in curses-configuration due to printing the whole
+          intro page as one chunk
+     FIX. aclocal.m4, configure[.in], autoconf[.hin], extern.h, proto.h
+          tcurses.h, color.c, config.c, curses.c, init.c, lang.c, main.c
+          misc.c, prompt.c, signal.c, tcurses.c
+
+--unoff BETA release 970901 --
+
+431) Sven Paulus <sven@karlsruhe.org>
+     BUG. random Organization didn't work
+     FIX. misc.c
+
+430) Urs Janssen <urs@karlsruhe.org>
+     ADD. minor code cleanup (added missing prototypes)
+     FIX. configure[.in], autoconf.h[in], extern.h, proto.h, *.c
+
+429) Thomas E. Dickey <dickey@clark.net>
+     Andrey A. Chernov <ache@null.net>
+     ADD. some whitespace in aclocal.m4
+     BUG. quoting bug in CF_RECHECK_FUNC configure macro
+     ADD. workaround for limitation in FreeBSD linker for ncurses tests.
+     ADD. autoconf recommends that shell scripts begin "#! /bin/sh" rather
+          than "!/bin/sh".
+     ADD. guard against some curses functions invoked as a result of errors
+          found during initialization.
+     FIX. aclocal.m4, conf-tin, configure[.in], install.sh, main.c
+          misc.c, newsrc.c, tcurses.c
+
+428) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor code cleanup (AmigaOS)
+     FIX. amiga.h, tin.h, lang.c
+
+--unoff BETA release 970826 --
+
+427) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. 'i' in group menu always shows subject of the base article
+     BUG. newsrc entry was ignored when resubscribing to an unsubscribed group
+     BUG. 'N'ewgroups are now skipped correctly when 'm'oving newsgroups
+     BUG. 'd' behaved funny in first newsgroup (introduced in 313)
+     ADD. when subscribing to a new group, the group counts are checked and
+          num_unread is calculated and shown without having to enter the group
+     ADD. minor code clean-up
+
+426) Thomas E. Dickey <dickey@clark.net>
+     BUG. correct & extend the configuration script macros for finding the
+          network and ncurses libraries
+     ADD. modify makecfg to generate table-definitions that work on SCO
+     ADD. modify the help-screen to allow it to scroll by one line at a
+          time [(n)curses]
+     ADD. minor fixes to makefiles
+     FIX. Makefile, makefile[.in], Makefile[.in], aclocal.m4, configure[.in]
+          autoconf.h[in], config.h, proto.h, tin.h, auth.c, help.c
+          makecfg.c, signal.c, tcurses.c
+
+425) Darrell Tangman <darrelltman@mindspring.com>
+     ADD. possibility to shutdown tin cleanly via SIGUSR1
+     BUG. calculated wrong size of signal_list
+     FIX. misc.c, signal.c
+
+424) Urs Janssen <urs@karlsruhe.org>
+     Sven Paulus <sven@karlsruhe.org>
+     BUG. tin skipped second page when paging up with
+          show_headers_to_display != ""
+          [page.c really should be rewritten!]
+     PRF. got rid of useless fseek()s to determine article's size
+     FIX. page.c
+
+423) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Makefile[.in] doesn't work with /bin/csh anymore
+          [introduced in 420]
+     BUG. empty X-Comment-To: is inserted if posting contains no realname
+     BUG. prompting for username didn't allow to change the default
+     ADD. minor code cleanup (added missing prototypes, removed gotos,
+          moved strings to lang.c)
+     FIX. Makefile[.in], proto.h, *.c
+
+--unoff BETA release 970820 --
+
+422) Phil Edge <phil@edge.demon.co.uk>
+     BUG. On followup, cancel and repost an empty Distribution
+          header was added if the original article doesn't have a
+          Distribution header and the DISTRIBUTION environment variable
+          isn't set.
+     FIX. post.c
+
+421) Thomas E. Dickey <dickey@clark.net>
+     ADD. improves the configure script that configures ncurses
+     ADD. configure script option --enable-8bit-keys to turn on code
+          that allows 8-bit controls for arrow and function keys.
+     ADD. adds includes for ctype.h and sys/socket.h to the test program used
+          for checking prototypes.
+     ADD. library-check for -lmytinto to build on FreeBSD.
+     BUG. corrects some logic that prevented 8-bit controls from working.
+     BUG. corrects some ifdef's that broke ncurses/curses configuration.
+     BUG. minor tweaks to makefiles to work with configure --srcdir option,
+          and to autoconfigure for lint program.
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
+          Makefile[.in], config.c, getline.c, group.c, help.c, misc.c
+          page.c, prompt.c, select.c, thread.c
+
+420) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed unused variables, fixed a few
+          type-mismatches, etc.)
+     FIX. extern,h, proto.h, autoconf.h[in], configure[.in]
+          Makefile[.in], *.c
+
+--unoff BETA release 970817 --
+
+419) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. misplaced #ifdefs moved
+     ADD. minor code cleanup
+     FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c
+          search.c, thread.c, proto.h, Makefile.in
+
+418) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. get_arrow_keys()/AmigaOS doesn't work
+     ADD. minor code cleanup (AmigaOS)
+     FIX. several supplied patches
+
+417) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. minor code cleanup (mainly debug-message related)
+     FIX. several supplied patches
+
+--unoff BETA release 970731 --
+
+416) Thomas E. Dickey <dickey@clark.net>
+     ADD. logic to use 'poll() in get_arrow_key()
+     BUG. corrects timeout values in get_arrow_key()
+     BUG. corrected logic of input_pending() when configured with curses.
+     ADD. moves the termcap lookup out of InitScreen() to a new function
+          SetupScreen()
+     ADD. moves the network-library checks to aclocal.m4
+     ADD. configure option "--with-socks5"
+     FIX. several supplied patches
+
+415) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. some fallback values
+     FIX. several supplied patches
+
+414) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     BUG. strdup() calls replaced by my_strdup()-calls, as strdup()
+          is not mandatory in ansi-c.
+     FIX. attrib.c
+
+--unoff BETA release 970724 --
+
+413) Thomas Quinot <thomas@cuivre.fdn.fr>
+     ADD. if using INN nntplib use _CONF_FROMHOST value, if present,
+          instead of domain_name.
+     FIX. header.c
+
+412) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. test for curses before reading any config-files
+     BUG. upon Supersedes Reply-To: was inserted even if $REPLYTO was't set
+     FIX. main.c, post.c
+
+411) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. amiga code cleanup
+     BUG. impossible to killfile articles with lines=0
+     BUG. wildcards were not quoted when the subject was used for filtering.
+     ADD. function quote_wild() is called for subject.
+     FIX. several supplied patches
+
+410) Sven Paulus <sven@oops.sub.de>
+     BUG. duplicated From: line in mailing_list-groups.
+     BUG. hitting ESC once didn't exit getline() (introduced in 405)
+
+--unoff BETA release 970709 --
+
+409) Thomas E. Dickey <dickey@clark.net>
+     BUG. correct the curses handling of CTL/L for repainting the screen
+     ADD. CTL/L command to the config-screen.
+     FIX. menukeys.h, config.c, tcurses.c
+
+408) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. check for possible spamtrap in e-mail address when
+          replying to an article by mail
+     FIX. extern.h, menukeys.h, lang.c, post.c, tin.1
+
+407) Ralf Doeblitz <r.doeblitz@tu-bs.de>
+     BUG. tin ignores "global=on/off" for Quick-Filter/Select
+     FIX. attrib.c, lang.c
+
+406) Michael Lupp <mike@nemesis.saar.de>
+     Andrey A. Chernov <ache@null.net>
+     ADD. minor Makefile tuning
+     FIX. Makefile[.in]
+
+405) Sven Paulus <sven@oops.sub.de>
+     BUG. prompt for subject was incorrectly displayed when
+          subject was too long -> now truncating to 20 chars
+     ADD. implement a permanent history for each type of input
+     ADD. enable cursor keys on input line
+     FIX. several supplied patches
+
+404) Sven Paulus <sven@oops.sub.de>
+     BUG. when reposting articles, the wrong signature was used
+     ADD. new configuration option "signature_repost"
+     BUG. cursor was on wrong position when asking "Repost or supersede"
+     ADD. new configuration option "quote_empty_lines"
+     FIX. several supplied patches
+
+--unoff BETA release 970705 --
+
+403) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. check for control-characters in Subject:
+     ADD. minor code cleanup
+     FIX. several patches
+
+402) Sven Paulus <sven@oops.sub.de>
+     BUG. keyboard didn't return to raw mode after posting
+          postponed articles
+     ADD. changed message "Repost" to "Post postponed articles"
+     BUG. tin got slower as .tin/posted grew, increasing speed by
+          reversing order
+     BUG. tin garbled .tin/posted when posting postponed articles
+     FIX. lang.c, post.c
+
+--unoff BETA release 970625 --
+
+401) Oliver B. Warzecha <obw@amarok.ping.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. strip "(was:" from Subject:
+     ADD. amiga code cleanup
+     FIX. misc.c
+
+400) Sven Paulus <sven@oops.sub.de>
+     ADD. remove mail-address from X-Comment-To:
+     FIX. page.c, post.c
+
+399) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. author and article body searching fixed
+     ADD. 'L'ookup Message-ID in article pager
+     ADD. '/' subject search to thread menu
+     ADD. Improvements to search by subject - now enters thread
+          if needed
+     ADD. still more code cleanup
+     FIX. several supplied patches
+
+398) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. amiga code cleanup
+     FIX. amiga.c, amiga.h
+
+397) Mike Muise <c-muise@mail.dec.com>
+     BUG. typo
+     FIX. lang.c
+
+396) Henrik Wist <goose@MuFFiN.Org>
+     BUG. tin didn't remove temp.-articles after pgp-signing them.
+     FIX. pgp.c
+
+--unoff BETA release 970622 --
+
+395) Sven Paulus <sven@oops.sub.de>
+     ADD. 'e'dit article possibility if posting failed
+     ADD. random Organization via attributes file
+     FIX. several supplied patches
+
+394) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. REG_NOERROR definition (needed for hp-ux 8.0)
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+393) Thomas E. Dickey <dickey@clark.net>
+     ADD. install-prefix and autoconf support for regular expression
+     ADD. code cleanup
+     FIX. several supplied patches
+
+392) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. clear keyboard-buffer in prompt_yn() to avoid unexpected
+          results.
+     FIX. prompt.c
+
+--unoff BETA release 970613 --
+
+391) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. wildmat searching broken in 387)
+     BUG. ranges were broken on group menu
+     ADD. 'K', 'z' & 'Z' on group menu now understand ranges
+     ADD. improvements to regex error reporting
+     ADD. code cleanup
+     FIX. several supplied patches
+
+390) Dmitri A. Martynoff <dmart@wowa.net.kiae.su>
+     ADD. unlink editor backup files
+     FIX. misc.c
+
+389) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 970612 --
+
+388) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor code cleanup, mainly amiga stuff
+     FIX. several supplied patches
+
+387) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. started support for regular expressions
+     ADD. make str_lwr() syntax more ANSI-like. Other minor changes.
+     FIX. several supplied patches
+
+--unoff BETA release 970527 --
+
+386) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote signal-handler
+     FIX. several supplied patches
+
+385) Andrey A. Chernov <ache@null.net>
+     ADD. Various CTYPE fixes, mostly for toupper/tolower
+     FIX. several supplied patches
+
+384) Bruce Momjian <root@candle.pha.pa.us>
+     ADD. check for correct number of articles in group
+     REM. conflict check for strip_blanks and invers_video_bar
+     FIX. active.c, config.c
+
+383) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. initial check for authentication - now only done upon
+          server-request
+     FIX. open.c
+
+--unoff BETA release 970516 --
+
+382) Karsten Keil <keil@temic-ech.spacenet.de>
+     ADD. some additional checks for NULL-pointers
+     FIX. art.c, refs.c
+
+381) Bruce Momjian <root@candle.pha.pa.us>
+     ADD. check for correct number of articles in group
+     FIX. active.c
+
+380) Thomas E. Dickey <dickey@clark.net>
+     ADD. restores 'cmd_line' setting after running a shell command, so tin
+          re-enters screen mode
+     ADD. merges the two copies of code that run shell commands
+     ADD. more debug-traces for the curses configuration
+     ADD. test for CLIX machines
+     FIX. several supplied patches
+
+379) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. insertion of Lines:-header (as it's not always correct
+          (pgp-signed articles)) and could/should be inserted by the
+          server
+     FIX. post.c
+
+--unoff BETA release 970424 --
+
+378) Thomas E. Dickey <dickey@clark.net>
+     REM. useless ifdefs for __hpux
+     FIX. misc.c
+
+377) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. when using an external mailer, parse From: line upon replies.
+     FIX. post.c
+
+376) (sorry, lost the mail-address of the person who reported it!)
+     REM. str_lwr patch from 374 as it opens up problems with iso-8859-*
+          charsets
+
+--unoff BETA release 970417 --
+
+375) Thomas E. Dickey <dickey@clark.net>
+     BUG. tind didn't compile due to misplaced ifdefs
+     BUG. test for USE_SYSTEM_STATUS still didn't work on some systems
+     FIX. aclocal.m4, tnntp.h, auth.c
+
+374) Orbby S. Arka <aqlott@db.csie.ncu.edu.tw>
+     REM. some useless checks for 8bit chars
+     ADD. don't lower 2nd char in searchstring if first char is > 0x7f
+          (BIG5 users will be happy about that)
+     FIX. art.c, string.c, misc.c
+
+--unoff BETA release 970409 --
+
+373) Jason Faultless <jason@radar.tele2.co.uk>
+     FIX. screenredraw, cursor position after removing bogus newsgroups
+     FIX. tin.1, newsrc.c, select.c
+
+372) Billy Y. <billy@mix.com>
+     ADD. use gettimeofday with -DPROFILE if available
+     FIX. stpwatch.h
+
+371) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor logic change of signature parsing.
+     FIX. post.c, lang.c, tin.1
+
+--unoff BETA release 970406 --
+
+370) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. Authentication routines moved from open.c to a separate file
+          (auth.c)
+     ADD. Authentication at connection startup (re-)added.
+     ADD. Prompting for the password is now done by getpass(2)
+          instead of getline().
+     ADD. doc/auth.txt revised.
+     FIX. several supplied patches
+
+369) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. issue a warning double signatures or malformed signature
+          delimiters
+     ADD. tool/expand_aliases.tgz (might need some work)
+     FIX. several supplied patches
+
+368) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. strip_bogus=ASK now shows groups even with show_only_unread=TRUE
+     ADD. folded Message-ID text into t_msgid
+     BUG. threading problem (from 309)
+     BUG. incorrect display of 'N'ewgroup flag (from 351)
+     ADD. general code cleanup
+     FIX. several supplied patches
+
+367) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Thomas E. Dickey <dickey@clark.net>
+     BUG. renamed valid in prompt.c as Suns K&R compiler didn't like it.
+     BUG. '\t' was treated as 8bit-char
+     FIX. prompt.c, tin.h
+
+--unoff BETA release 970402 --
+
+366) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. issue a warning on signatures longer then MAX_SIG_LINES
+     FIX. several supplied patches
+
+365) Thomas E. Dickey <dickey@clark.net>
+     BUG. test for USE_SYSTEM_STATUS didn't work on some systems (i.e. sun)
+     FIX. aclocal.m4
+
+364) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed uname call in mail_bugreport)
+     FIX. several supplied patches
+
+--unoff BETA release 970327 --
+
+363) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Sender was not added if From: line was changed in the editor
+     ADD. minor code cleanup
+     FIX. inews.c, init.c, configure[.in]
+
+--unoff BETA release 970324 --
+
+362) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. removing tailing whitespaces from header-lines caused crashes
+          if the line contains only whitespaces after the header-name.
+     FIX. page.c
+
+361) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more curses stuff
+          + added some traces
+          + fixed an out-of-order call on set_win_size
+          + added the touchwin calls to make ^L work
+     FIX. several supplied patches
+
+360) Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. parsing to of /etc/resolv.conf to get_fqdn()
+     FIX. tin.h, string.c, header.c
+
+359) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. misplaced definition of MAXHOSTNAMELEN
+     ADD. ifndef FORGERY: insertion of Sender: if it differs from From:
+     FIX. several supplied patches
+
+358) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. When reading mail groups tin tries to connect the server
+     ADD. prompt_yn2() now allows only 'y','n','ESC' as a answer
+     BUG. if you answer the reconnect to server question with no or the
+          connection is broken the newsrc is written out before tin exits.
+     FIX. several supplied patches
+
+--unoff BETA release 970321 --
+
+357) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. continued header-lines caused crashes upon a rfc1522decode
+     FIX. page.c
+
+356) Kevin Lentin <kevinl@cs.monash.edu.au>
+     Thomas E. Dickey <dickey@clark.net>
+     BUG. can not post in curses-mode
+     FIX. tnntp.h
+
+355) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. check for return null-pointers in get_host/domain/fqdn
+     BUG. typo in configure.in
+     ADD. minor code cleanup
+     FIX. several patches
+
+--unoff BETA release 970320 --
+
+354) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup; removed /etc/resolv.conf parsing
+     FIX. several patches
+
+353) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. 'M'enu entry for display_rfc1522_header_undecoded (now
+          display_mime_header_asis)
+     FIX. several supplied patches
+
+352) Thomas E. Dickey <dickey@clark.net>
+     ADD. make a functional test for the system_status logic, tidying up of
+          aclocal.m4
+     BUG. correct a length used in tcurses.c in the innstr() call
+     FIX. aclocal.m4, configure[.in], tcurses.c
+
+351) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. handling for bogus groups in .newsrc
+     ADD. better string hashing, memory savings
+     ADD. better default for -n
+     BUG. removed references to the 'any' key
+     FIX. several supplied patches
+
+--unoff BETA release 970317 --
+
+350) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. automatic use of B-encoding if it's shorter then Q-encoding
+     ADD. display_rfc1522_header_undecoded switch to tinrc
+     FIX. several supplied patches
+
+349) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. rewrote INEWS_MAIL_* stuff
+     FIX. several patches
+
+--unoff BETA release 970314 --
+
+348) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. split long header lines in mail message
+     FIX. several supplied patches
+
+347) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more curses support:
+          + ifdef'd to use the termcap version of ReadCh when curses isn't
+            active.
+          + fix a couple of background color bugs that appear with SVr4
+            curses (but not ncurses).
+          + add missing include, ifdefs to debug.c
+          + add decoding for curses backspace and delete keys.
+          + implement curses raw mode.
+     BUG. fixes for parsdate.y to workaround redefinition of const by bison
+
+346) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Thomas Koenig <Thomas.Koenig@ciw.uni-karlsruhe.de>
+     ADD. configure check for usage of system() ; system_status
+     BUG. removed getfqdn() call as it opens up some problems
+          with INEWS_MAIL_DOMAIN - inews.c should be rewritten!!
+     FIX. autoconf.h[in], configure[.in], misc.c, inews.c
+
+345) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. fix wrong byte-count in article-pager (introduced in 340)
+     FIX. open.c
+
+344) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. tab_goto_next_unread=OFF && news_headers_to_display!="" didn't
+          work
+     FIX. page.c
+
+343) Sven Paulus <sven@oops.sub.de>
+     ADD. hide licence number on AIX
+     FIX. post.c
+
+--unoff BETA release 970309 --
+
+342) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup; replaced RS6000 define by _AIX
+     FIX. lang.c, misc.c, save.c, tin.h, autoconf.h[in], configure[.in]
+
+341) Chua Choon Leong <chuacl@iscs.nus.sg>
+     ADD. test/define for OSF1
+     FIX. configure[.in], autoconf.h[in]
+
+340) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. restrict MIME decoding to just article data
+     BUG. fix and document command line groups
+     ADD. minor tidy up
+     FIX. several supplied patches
+
+339) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. forget to append pid on pgp-commands
+     FIX. pgp.c
+
+--unoff BETA release 970307 --
+
+338) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. typos, misplaced brace
+     FIX. inews.c, configure[.in], Makefile
+
+--unoff BETA release 970306 --
+
+337) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more curses support
+          + wrap functions that write to stderr (fprintf, fflush) so they'll
+            write to curses screen.
+          + implement decoding for arrow keys
+          + correct error from previous patch that changed cLINES to cLINES-1
+          + move call on EndWin() to ensure that program exits curses
+            correctly.
+     ADD. split-out tnntp.h to use in inews.c (fixes compiler warnings)
+     FIX. several supplied patches
+
+336) Scott W. Powers <spowers@shire.ncsa.uiuc.edu>
+     ADD. weed-in/out-list for headers_to_display
+     FIX. extern.h, color.c, config.c, init.c, lang.c, page.c
+
+335) Urs Janssen <urs@akk.uni-karlsruhe.de
+     BUG. used /bin/mail as default_mailer on SysV-systems
+     FIX. tin.h
+
+334) Andrey A. Chernov <ache@null.net>
+     BUG. ~/.tin/headers file not used for "Reply to author..."
+     BUG. joinpath for ~/.tin/headers is duplicated
+     FIX. init.c, post.c
+
+333) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. typo
+     FIX. configure[.in]
+
+332) Chua Choon Leong <chuacl@iscs.nus.sg>
+     BUG. invoke_cmd() returns wrong status on OSF1
+     FIX. misc.c
+
+--unoff BETA release 970304 --
+
+331) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. getfqdn()
+     FIX. configure[.in], autoconf.h[in], inews.c
+
+330) Kevin Lentin <kevinl@cs.monash.edu.au>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. --{en,dis}able-append-pid to generate unique tmp-filenames
+         (i.e. .article)
+     FIX. configure[.in], autoconf.h[in], init.c, post.c
+
+--unoff BETA release 970303 --
+
+329) Thomas E. Dickey <dickey@clark.net>
+     ADD. support configuration with termcap/terminfo vs curses
+          implements color support from the curses library.
+     ADD. minor code cleanup (INDEX_DAEMON ifdefs, a nit for SunOS's fileno)
+     FIX. several supplied patches
+
+328) Andy Gabor <ajgabor@ucdavis.edu>
+     BUG. typo in man-page
+     FIX. tin.1
+
+327) Volker Barthelmann <volker@vb.franken.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de
+     ADD. minor code cleanup
+     FIX. several patches
+
+326) Tan Kwee Chuan <tankweec@iscs.nus.sg>
+     BUG. typo
+     FIX. lang.c
+
+--unoff BETA release 970225 --
+
+325) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. changing OPT_DEFAULT_SHOW_AUTHOR in 'M'enu at top-level SIGSEGVs
+     BUG. no range-check for ISO2ASC
+     BUG. wrong prototype for hand-rolled atol
+     FIX. config.c, init.c, string.c
+
+--unoff BETA release 970222 --
+
+324) Thomas Leitner <tom@finwds01.tu-graz.ac.at>
+     BUG. POSTED_FILE ignores default_maildir
+     FIX. config.c
+
+323) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. description of ^G to online help
+     REM. --disable-ref-threading form configure
+     FIX. help.c, autoconf.hin configure.in
+
+322) Chris Blum <chris@phil.uni-sb.de>
+     BUG. typo in HAVE_MH_MAIL_HANDLING
+     FIX. open.c
+
+321) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. crash on some systems with no subscribed groups
+     BUG. $ not always working on group selection page
+     BUG. workaround for annoying problem with 'u' key
+     ADD. streamlined setup_hard_base() and -n code
+     ADD. tidied up header in article pager
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+320) Theo Van Dinter <felicity@kluge.net>
+     BUG. 'q'uit in the 'D'elte/supersede menu does not redraw the screen
+     ADD. minor code cleanup
+     FIX. init.c, post.c
+
+--unoff BETA release 970217 --
+
+319) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. check_upgrade fails on binaries whose name isn't "tin"
+     FIX. config.c, lang.c, version.h
+
+318) Tan Kwee Chuan <tankweec@iscs.nus.sg>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. If the real-name part of the From:-line is missing, tin crashes
+          on a forged-cancel.
+     FIX. post.c
+
+317) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. improved postpone_article (add -o, 'A','Y')
+     FIX. several supplied patches
+
+--unoff BETA release 970214 --
+
+316) Thomas E. Dickey <dickey@clark.net>
+     ADD. several 'const'
+     BUG. tabs before preprocessor symbols (introduced in 312)
+     FIX. several supplied patches
+
+315) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Tagged article counter sometimes badly broken
+     BUG. 'q' quit didn't work properly while entering a group
+     ADD. 'u' goto parent article in pager
+     ADD. 'S' auto-save tagged and 'U' untag all to thread menu
+     ADD. Better handling of upgrade from earlier versions of Tin
+     ADD. Some documentation and help
+     ADD. minor code cleanup
+     FIX. art.c, config.c, page.c, thread.c
+
+314) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. first name (%C) in strfquote crashes when no name is given
+     FIX. misc.c
+
+--unoff BETA release 970212 --
+
+313) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. New newsgroups were broken with -n
+     BUG. unYank didn't honour show_only_unread_groups
+     BUG. $ didn't always skip to last article correctly
+     ADD. cleanup/fixes from 309)
+     ADD. code cleanup
+     FIX. cut down some compiler noise
+     FIX. several supplied patches
+
+312) Sven Paulus <sven@oops.sub.de>
+     ADD. systemtype to X-Newsreader
+     FIX. extern.h, init.c, post.c
+
+311) Volker Barthelmann <volker@vb.franken.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 970206 --
+
+310) Sven Paulus <sven@oops.sub.de>
+     ADD. inclusion of empty Followup-To: line (option)
+     ADD. keys for sending followups/replies with all headers quoted (^W,^E)
+     FIX. several supplied patches
+
+--unoff BETA release 970202 --
+
+309) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. rewrite new newsgroup handling
+     ADD. make newsrc->subscribed a bitfield
+     ADD. better reference parsing
+     ADD. partial fix for show_author update problem
+     ADD. code cleanup / other minor changes
+     FIX. several supplied patches
+
+308) Theo van Dinter <felicity@kluge.net>
+     BUG. typo
+     FIX. sigfile.c
+
+307) Thomas E. Dickey <dickey@clark.net>
+     ADD. more fall-back prototypes (e.g., atoi), from warnings I got
+          running with gcc -traditional on Linux 2.0.0
+     ADD. makes the gcc warnings auto-configured
+     ADD. makes strings 'const' (tested with gcc -Write-strings).
+     FIX. several supplied patches
+
+306) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. autoconf support for sum
+     FIX. several supplied patches
+
+305) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. code cleanup (moved strings to lang.c)
+     FIX. several supplied patches
+
+304) Sven Paulus <sven@oops.sub.de>
+     BUG. Summary/Keywords are overwritten on a supersede
+     FIX. post.c
+
+--unoff BETA release 970127 --
+
+303) Volker Barthelmann <volker@vb.franken.de>
+     ADD. some type fixes (Amiga)
+     FIX. several supplied patches
+
+302) Thomas E. Dickey <dickey@clark.net>
+     ADD. even mode K&R -> ANSI
+     FIX. several supplied patches
+
+--unoff BETA release 970126 --
+
+301) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. authenticate crashed on some machines
+     FIX. open.c
+
+300) Volker Barthelmann <volker@vb.franken.de>
+     BUG. several typos
+     FIX. color.c, smakefile
+
+299) Thomas E. Dickey <dickey@clark.net>
+     ADD. start to get rid of K&R code
+     FIX. several supplied patches
+
+--unoff BETA release 970124 --
+
+298) Volker Barthelmann <volker@vb.franken.de>
+     ADD. even more AMIGA port
+     FIX. several supplied patches
+
+297) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. nntp_wr/rd had wrong type
+     FIX. tin.h, extern.h, nntplib.c
+
+296) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. ability to postpone articles
+     ADD. detection of whitespaces in Followup-To:-line
+     FIX. several supplied patches
+
+--unoff BETA release 970123 --
+
+295) Volker Barthelmann <volker@vb.franken.de>
+     ADD. start of AMIGA port
+     FIX. several supplied patches
+
+294) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. stripping of unsubscribed newsgroups
+     FIX. several supplied patches
+
+293) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. 292 as it opens up a lot of problems
+     FIX. several patches
+
+--unoff BETA release 970122 --
+
+292) Arnold Hendriks <arnold@poboxes.com>
+     ADD. tagline-support
+     ADD. different from for different newsgroups (attribute)
+          [I'm not happy with that WITHOUT insertion of Sender:]
+     FIX. several supplied patches
+
+291) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several patches
+
+290) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. tuned authorization stuff
+     FIX. open.c
+
+--unoff BETA release 970120 --
+
+289) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. code cleanup (int -> t_bool, extern -> static)
+     FIX. several patches
+
+--unoff BETA release 970118 --
+
+288) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. word-highlighting in signatures
+     FIX. proto.h, color.c, page.c
+
+287) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (mainly int -> t_bool)
+     FIX. extern.h, proto.h, init.c, main.c, rfc1521.c
+
+--unoff BETA release 970115 --
+
+286) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several patches
+
+285) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. ability to strip non txt/plain parts from multi-part MIME-postings
+     FIX. several supplied patches
+
+--unoff BETA release 970114 --
+
+284) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several patches
+
+283) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. tin does not remember tcp_port (introduced in 281)
+     FIX. open.c
+
+282) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup (mainly lint stuff)
+     FIX. several supplied patches
+
+--unoff BETA release 970112 --
+
+281) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. some small fixes (mainly for 279/280)
+     FIX. attrib.c, config.c, newsrc.c, open.c, thread.c
+
+280) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. default threading method is now to use the best available
+     ADD. warning if attempt to use -n on local spool
+     BUG. incorrect article count with -n on empty groups
+     ADD. ignore bogus groups in .newsrc when reading -n
+     ADD. references based indentation of thread menu
+     ADD. major internal code cleanup/rewrite for above
+          move all group_hash[] code to list.c
+     FIX. active.c, init.c, list.c, misc.c, open.c, thread.c
+
+279) Thomas E. Dickey <dickey@clark.net>
+     ADD. fixes for getopt & isascii (we shouldn't _use_ the latter).
+     ADD. another round of lint, introducing t_bool type.
+     FIX. several supplied patches
+
+--unoff BETA release 970109 --
+
+278) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. rewrote APPEND_TO() macro
+     ADD. range-check for group->xmax/group->newsrc.xmax
+     FIX. misc.c, newsrc.c
+
+277) Thomas Quinot <operator@cuivre.fdn.fr>
+     BUG. parse_from() returns login@host.doma.in in the wrong field
+     FIX. misc.c
+
+--unoff BETA release 970108 --
+
+276) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. options-menu: on the last-1 page <page-down> does not always work
+          the way it should
+     FIX. config.c
+
+275) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup (mainly lint and dbmalloc stuff)
+     FIX. several supplied patches
+
+274) Thomas Quinot <operator@cuivre.fdn.fr>
+     BUG. parse_from() can't handle "login"@host.doma.in (luser)
+     FIX. misc.c
+
+--unoff BETA release 970106 --
+
+273) Nickolay Saukh <nms@nns.ru>
+     ADD. dbmalloc support
+     FIX. tin.h
+
+272) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     ADD. rewrote parse_from() macros to K&R-C
+     FIX. misc.c
+
+271) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. new check for x-posts to handle inn1.5 Xref: headers
+     FIX. post.c
+
+--unoff BETA release 970104 --
+
+270) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. tin.h, art.c, feed.c, post.c, nntplib.c
+
+--unoff BETA release 970103 --
+
+269) Thomas Quinot <operator@cuivre.fdn.fr>
+     ADD. new parse_from()
+     FIX. misc.c
+
+268) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. get_server() removes everything before a '\n' in the
+          server-response -> sometimes it trashes error-messages
+     ADD. minor code cleanup
+     FIX. main.c, nntplib.c, open.c
+
+--unoff BETA release 970101 --
+
+267) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. detection of _highlighted_ *words* directly followed by a , or .
+     FIX. color.c
+
+266) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. quoting/escaping of arguments in strf_mailer()
+     FIX. misc.c
+
+265) Thomas Quinot <operator@cuivre.fdn.fr>
+     ADD. 'K'ill article now cycles through the list (group.c)
+     ADD. inverse_bg/fg-color
+     FIX. several supplied patches
+
+--unoff BETA release 961231 --
+
+264) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. newnews_times is broken (since 254)
+          -> new newsgroups are not recognized
+     ADD. prompt_yn2() without crsr-key support
+     FIX. proto.h, active.c, prompt.c, nntplib.c
+
+263) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. color.c doesn't display any _ or * (introduced in 262)
+     FIX. color.c
+
+--unoff BETA release 961229 --
+
+262) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. word_h_marks_display now is a tristate (Nothing, Mark, Space).
+     FIX. several patches
+
+261) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     BUG. txt_cancel_article has wrong number of format arguments
+     FIX. lang.c, main.c, post.c
+
+--unoff BETA release 961227 --
+
+260) Thomas E. Dickey <dickey@clark.net>
+     ADD. extends 'makecfg' to generate type-specific tables for string and
+          char pointers, getting rid of the void* casts in tincfg.h
+          modifies config.c and prompt.c accordingly.
+     ADD. fixes color.c to work in xterm (i.e., the XFree86 3.2 version, or
+          rxvt -- there's no point in fixing for color_xterm unless we
+          converted to using ncurses).
+     ADD. eliminates some of the clutter in post.c by using new utility
+          functions (I did that when seeing that the newline in a subject
+          wasn't stripped properly).
+     FIX. several supplied patches
+
+259) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961225 --
+
+258) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. with 258) word_h_marks_display could be off with color disabled
+     BUG. automatically turning off word_highlighting_tinrc if color is
+          disabled via 'M'enu is not intuitive
+     BUG. with no groups on screen <Home>/<End>-key draws arrow
+     ADD. changed several key-names (global keys)
+     FIX. several patches
+
+--unoff BETA release 961224 --
+
+257) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. in some circumstances reply-to could be MIME-encoded twice
+     FIX. post.c
+
+256) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. art_mark_will_return is not showing up in thread-level
+          if draw_arrow=on (introduced in 248)
+     BUG. word_highlighting is enabled with color turned off
+     FIX. thread.c, page.c, config.c
+
+--unoff BETA release 961222 --
+
+255) David-Michael Lincke <david-miachel.linke@iwi.unisg.ch>
+     ADD. missing DEFAULT_MAILER for hp-ux
+     FIX. tin.h
+
+254) Helmrich Streitmatter <helmrich@helix.franken.de>
+     BUG. newnews_info could return 2 large (not null terminated)
+          string
+     FIX. active.c
+
+253) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+252) Thomas E. Dickey <dickey@clark.net>
+     BUG. redefinition of parse_reference()
+     FIX. refs.c
+
+251) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. art_mark_hot is not colored
+     FIX. thread.c
+
+--unoff BETA release 961218 --
+
+250) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. inverse video-bar in article selection level is too long
+          art_mark_hot is not colored
+          (both introduced in 248 :-()
+     FIX. group.c
+
+--unoff BETA release 961216 --
+
+249) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. (introduced in 240)
+          - when writing out the .newsrc, apparently no longer existing
+            groups and unsubscribed groups get an empty line afterwards
+          - when subscribing some groups from the yanked-in list and then
+            yanking out the unsubscribed groups again, leaves only the 1st
+            subscribed group in the .newsrc or doesn't add the group at all.
+     FIX. newsrc.c
+
+248) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Julien Oster <fuzzy@cu8.cum.de>
+     ADD. minor code cleanup
+     BUG. strange display if num_tagged_articles_in_thread > 99
+     FIX. several supplied patches
+
+247) Thomas E. Dickey <dickey@clark.net>
+     ADD. extra rules for broken IRIX make
+     FIX. Makefile[.in]
+
+--unoff BETA release 961215 --
+
+246) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+245) Julien Oster <fuzzy@cu8.cum.de>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. _word_ *highlighting* if color enabled
+     FIX. several supplied patches
+
+--unoff BETA release 961214 --
+
+244) Michael Douglass <mikedoug@texas.net>
+     ADD. -N option
+     FIX. several supplied patched
+
+243) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. self referencing threads could still be generated in certain cases
+     BUG. incorrect thread creation with some broken headers
+     ADD. various other cleanups and tweaks
+     FIX. refs.c
+     REM. old code from page.c, obsoleted by 115)
+     BUG. post_proc_command didn't quote shell meta-characters
+     FIX. save.c
+
+242) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. find_reply_to_add() workaround - cause parse_from() is buggy
+          (and needs a rewrite)
+     ADD. changed References:-header in mails to In-Reply-To:
+     FIX. post.c
+
+241) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. check for return-type of tputs
+     FIX. aclocal.m4
+
+240) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     ADD. use safe_fgets() instead of getaline()
+     FIX. several supplied patches
+
+--unoff BETA release 961210 --
+
+239) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961208 --
+
+238) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. see 236)
+     FIX. misc.c
+
+--unoff BETA release 961207 --
+
+237) Thomas E. Dickey <dickey@clark.net>
+     BUG. typedefs for OutcPtr are out-of-order
+     ADD. configuration options/logic for the .overview name, piping
+          and the strcasecmp, strncasecmp functions.
+     FIX. several supplied patches
+
+236) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     see 235)
+
+--unoff BETA release 961206 --
+
+235) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. even more smarter tin_itoa()
+     FIX. misc.c, group.c, select.c, thread.c
+
+--unoff BETA release 961205 --
+
+234) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. smarter range check (still not complete)
+     FIX. proto.h, misc.c, group.c, select.c, thread.c
+
+--unoff BETA release 961204 --
+
+232) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. several range checks
+     FIX. group.c, select.c, thread.c
+
+--unoff BETA release 961203 --
+
+231) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. changed default_mailer_format to "%M -t < %F"
+     BUG. parsing of " in mail-address does not work
+     FIX. tin.h, misc.c, page.c
+
+230) Thomas E. Dickey <dickey@clark.net>
+     BUG. tputs is called with wrong parameters on some systems (f.e. HP-UX)
+     ADD. -DRS6000 on AIX to force the correct use of 'system()' return-code
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961202 --
+
+229) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     FIX. group.c (patch 224/222 removed)
+
+228) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. show subject/author of the first unread article in a thread
+     FIX. group.c
+
+--unoff BETA release 961201 --
+
+227) Florian Lohoff <flo@mini.gt.owl.de>
+     BUG. articles without Lines header are not showing up
+     FIX. art.c
+
+226) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. quoted 8-bit from-addresses aren't MIME-encoded correctly
+     FIX. art.c, rfc1522.c
+
+225) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. The 'a' reference tree hack debug key now produces readable
+          output similar to the thread menu.
+     ADD. A few commentary changes.
+     FIX. several supplied patches
+
+224) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed (unread)article counter to act as a reply counter
+     ADD. little code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961126 --
+
+223) Rainer Scholz <jrs@startrek.franken.de>
+     BUG. typo (wrong dependency)
+     FIX. Makefile[.in]
+
+--unoff BETA release 961125 --
+
+222) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (unread)article counter was 'wrong'
+     FIX. group.c
+
+221) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. little code cleanup (NetBSD)
+     FIX. main.c
+
+220) Thomas E. Dickey <dickey@clark.net>
+     ADD. extend the -n/-q options so that tin doesn't ask the nntp
+          server for the newsgroups file.
+          Some cleanup (and mods that let me build on Linux using the --srcdir
+          option).
+     FIX. tin.1, Makefile[.in], init.c, open.c
+
+219) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. still some assertion faults...
+     FIX. refs.c
+
+218) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. patch 215 wasn't complete
+     FIX. post.c
+
+--unoff BETA release 961115 --
+
+217) Thomas E. Dickey <dickey@clark.net>
+     BUG. some variables are missing
+     FIX. autoconf.h[in]
+
+216) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. filter support on Xref:-line
+     FIX. tin.h filter.c misc.c
+
+215) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. editor is not entered automatically on 's'upersede article
+     BUG. edited subject is not displayed correctly in status-line
+     FIX. lang.c post.c
+
+214) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. locale support
+     FIX. several supplied patches
+
+--unoff BETA release 961109 --
+
+213) Andrey A. Chernov <ache@null.net>
+     BUG. called ctype-family macros with 8bit characters, which is illegal
+          in POSIX/ANSI-C
+     FIX. several supplied patches
+
+212) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Expired articles sometimes incorrectly threaded when
+          threading both
+     FIX. refs.c
+     BUG. index files not written when reading via nntp and xover
+          not available (introduced in 138 & compounded later)
+     FIX. art.c, open.c
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+211) Thomas E. Dickey <dickey@clark.net>
+     ADD. replace include/conf.h with an automatically-generated table.
+          (This fixes one of the two problems with the config.c rewrite: now
+          the enum and table will track together -- the other, making it
+          type-clean will be in a later patch -- when I have time).
+     BUG. fix a place in the configure script that I missed before (allowed
+          some stray "-g" options to get into the makefile for non-debug
+          build -- I was just arguing with autoconf's author tonight, who
+          insists that everyone ought to use -g as he intends).
+     BUG. fix a place in tin.h where "#" line by itself broke SunOS K&R compile
+     BUG. disentangle some use of _DECC (someone on an OSF/1 box reports
+          problems with this, which was, I believe, targeted for VMS).
+     ADD. move the <termios.h> includes out of tin.h (now only in curses.c
+          and signal.c) -- on Apollo, termios.h redefines some symbols from
+          sys/ioctl.h, producing _lots_ of compiler warnings.  (I did builds
+          on several machines to ensure that there's no impact due to this).
+     ADD. some fixes aimed at supporting the configure --srcdir option (not
+          complete yet -- I'll do more later).
+     BUG. make parsdate.o rule more explicit (IRIX's make couldn't cope:  I
+          don't remember problems from the last time I did a bunch of
+          regression builds, and figure that it got simplified by someone).
+     BUG. correct an error from cleanup in art.c that broke my local config
+          (i.e., '-' is legal in that context).
+     BUG. remove bogus code in feed.c (noticed while resolving similarly
+          ifdef'd code in misc.c)
+     BUG. modified ifdef in misc.c to fix Kevin Maguire's problem (on OSF/1)
+          with pipes/return-codes.
+     FIX. several supplied patches
+
+--unoff BETA release 961101 --
+
+210) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. unknown symbol in open.c
+     FIX. open.c
+
+209) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. Cnews+overview-files Lines: count
+     FIX. art.c
+
+208) Andy Gabor <ajgabor@ucdavis.edu>
+     BUG. 'W' sometimes crashes
+     FIX. post.c
+
+207) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (mainly reformatting source)
+     FIX. several supplied patches
+
+206) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup (mainly reformatting source)
+     BUG. checking declaration of signal arguments fails on some machines
+     FIX. tin.h, post.c, configure[.in]
+
+--unoff BETA release 961025 --
+
+205) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961024 --
+
+204) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. No authentication upon request from server
+     BUG. attributes file trashed on a bad write (see 026)
+     ADD. Fall back on console input if no .newsauth is present
+     FIX. several supplied patches
+
+--unoff BETA release 961022 --
+
+203) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. References:-header (In-Reply-to:) to mail-reply
+     FIX. post.c
+
+202) Thomas E. Dickey <dickey@clark.net>
+     Nickolai Zeldovich <kolya@zepa.net>
+     ADD. apollo porting (still in progress)
+     ADD. core test for FreeBSD
+     FIX. several supplied patches
+
+201) Andrey A. Chernov <ache@null.net>
+     ADD. full path to cksum
+     FIX. tin.h
+
+200) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. with --enable-forgery reposting of an article fails
+          ('x' 'a' 'r' <group> 'p' -> 441 missing From:)
+     FIX. post.c
+
+--unoff BETA release 961020 --
+
+199) David E. O'Brien <obrien@cs.ucdavis.edu>
+     ADD. FreeBSD porting
+     FIX. tin.h
+
+198) Andrey A. Chernov <ache@null.net>
+     ADD. FreeBSD porting
+     FIX. curses.c, init.c, main.c
+
+197) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Supersede did not work correctly on cross-posts
+     ADD. minor code cleanup
+     FIX. lang.c, post.c
+
+196) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. 'g' goto group does not work with show_only_unread_groups=ON &
+          show_only_unread=ON but having no articles to read
+     FIX. select.c
+
+--unoff BETA release 961018 --
+
+195) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. cleaned up neXT charset stuff
+     FIX. several supplied patches
+
+194) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. Window resizing did not work correctly when in options menu
+     ADD. moved some more strings to lang.c
+     FIX. several supplied patches
+
+193) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. variable/label name conflict
+     FIX. search.c
+
+--unoff BETA release 961015 --
+
+192) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. NeXT porting (mainly chartset-stuff)
+     BUG. in some cases tin creates local index-files when nov-overview
+          files are available
+     FIX. several supplied patches
+
+191) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. in some cases tin creates local index-files when nov-overview
+          files are available
+     FIX. art.c
+
+190) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. on group menu, '/' (search for subject) now handles changes of
+          subject within threads, when using reference threading.
+     ADD. 's' (save) now works on thread menu
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+189) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. renamed patchlev.h to version.h
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 961012 --
+
+187) Branden Robinson <branden@purdue.edu>
+     ADD. minor code cleanup
+     ADD. online help updated
+     FIX. several supplied patches
+
+186) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. better debug ability for threading bugs
+     FIX. several supplied patches
+
+185) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. tin stripped tabs out of ALL headers, but that's not useful for
+          Summary:
+     FIX. page.c
+
+184) Thomas E. Dickey <dickey@clark.net>
+     Nickolai Zeldovich <kolya@zepa.net>
+     ADD. apollo porting (still in progress)
+     FIX. several supplied patches
+
+--unoff BETA release 961006 --
+
+183) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. if (show_description && !CURR_GROUP.description) don't truncate
+          active_name (select.c)
+     FIX. select.c
+
+--unoff BETA release 961005 --
+
+182) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. active_name is not truncated to groupname_len
+     BUG. number of unread articles is not truncated to 5 digits
+     FIX. select.c
+
+181) Jens Chr. Bachem <bachem@rrz.uni-koeln.de>
+     BUG. (introduced in 178)
+     FIX. active.c
+
+180) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     ADD. trailing '\0' to duplicated string in str_dup()
+     FIX. misc.c
+
+--unoff BETA release 961004 --
+
+179) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. wrong argument order for interactive external mailer elm
+     BUG. mar'K' article as read in 'l'ist_thread does not work
+     ADD. range check to center_line()
+     ADD. <tab> no longer skips over ART_WILL_RETURN articles
+     FIX. several patches
+
+178) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. SIGSEGVs on several machines
+     FIX. active.c, select.c
+
+--unoff BETA release 960930 --
+
+177) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     ADD. free_all_arrays() call to reduce 'memory'-leaks
+     FIX. main.c
+
+176) Thomas E. Dickey <dickey@clark.net>
+     ADD. systemtype check before using cached configure values to prevent
+          using them on the wrong platform
+     FIX. aclocale.m4, configure.in, init.c
+
+175) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. when NNTP_ONLY default $INEWSDIR contained a trailing slash
+     ADD. minor code cleanup
+     FIX. configure.in, debug.c
+
+--unoff BETA release 960927 --
+
+174) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. malloc-problems on several machines
+     FIX. group.c
+
+173) Stefan Rapp <s.rapp@hrz.uni-dortmund.de>
+     BUG. with highlighted bar and show description an, description was not
+          always truncated to the correct length
+     FIX. select.c
+
+--unoff BETA release 960923 --
+
+172) Karlo Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. SIGSEGV on several machines
+     FIX. select.c
+
+--unoff BETA release 960917 --
+
+171) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. a few type-corrections (long -> time_t where needed)
+     ADD. don't add signature when superseding own articles
+     FIX. filter.c, post.c, sigfile.c
+
+--unoff BETA release 960916 --
+
+170) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. removed some unused variables
+          [what is with the CASE_PROBLEM stuff (VMS only)?
+           someone removed it from help.c but left it lang.c/extern.h...]
+     FIX. lang.c, extern.h
+
+169) Hannu Laurila <Hannu.Laurila@japo.fi>
+     ADD. if no subscriptions could be found, don't subscribe to all
+          newsgroups - just add them to .newsrc
+     FIX. newsrc.c
+
+--unoff BETA release 960914 --
+
+168) Jarkko Isokungas <jti@iki.fi>
+     ADD. NeXTSTEP support
+     FIX. main.c, signal.c
+
+167) Thomas Kroener <kroener@jupiter.saar.de>
+     ADD. kill times in days 2/4 times default_filter_days
+     FIX. filter.c
+
+166) Tim Pierce <twpierce@midway.uchicago.edu>
+     ADD. safe_fgets() a function that allocates a sufficiently-large buffer
+          on demand.
+     FIX. art.c
+
+165) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed "user@do.mai.ne (Full Name)" to "Full Name <user@do.mai.ne>"
+          (expect those in filter.c and those in mailing routines)
+     ADD. removed LOG_USER
+     FIX. several patches
+
+--unoff BETA release 960901 --
+
+164) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. fixed minor bug in korean encoding (introduced in 154)
+     FIX. rfc1521.c
+
+163) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Reply-To: is ignored if use_mailreader_i=ON
+     FIX. post.c
+
+--unoff BETA release 960827 --
+
+162) Andrey Blochintsev <bag@wood.cs.kiev.ua>
+     BUG. M_XENIX complains about double definition of HZ
+     BUG. ifndef HAVE_LONG_FILE_NAMES pgp-module generates wrong filenames
+     FIX. tin.h, pgp.c
+
+--unoff BETA release 960826 --
+
+161) Andrey Blochintsev <bag@wood.cs.kiev.ua>
+     BUG. reading only the first HEADER_LEN bytes could truncate headers.
+          -> check for NULL-pointers
+     FIX. art.c
+
+--unoff BETA release 960825 --
+
+160) Thomas E. Dickey <dickey@clark.net>
+     ADD. moves the remaining cpp defines out of src/Makefile.in into
+          include/autoconf.hin
+     ADD. renames LIBDIR to NEWSLIBDIR (it had been partly, breaking some
+          instances).
+     ADD. sorts include/extern.h (it's easier to manage...)
+     FIX. several supplied patches
+
+--unoff BETA release 960824 --
+
+159) Andreas Ley <ley@rz.uni-karlsruhe.de>
+     Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. netdb.h was included multiple times (on VAX/Ultrix4.0)
+     FIX. nntplib.c
+
+158) David E. O'Brien <obrien@cs.ucdavis.edu>
+     ADD. make build to top-level makefile for FreeBSD compatibility
+     FIX. makefile.in
+
+--unoff BETA release 960822 --
+
+157) Jarkko Jormanainen <jarkko@utu.fi>
+     BUG. a curly-brace was missing
+     FIX. open.c
+
+--unoff BETA release 960821 --
+
+156) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. isbetween() called with signed char broke MIME-encoding
+     FIX. rfc1522.c
+
+155) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup
+     FIX. several patches
+
+154) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. SIGPIPE handling for feed_article
+     BUG. TeX2ISO did not work without rereading article
+     BUG. article with self-references caused endless loop
+     BUG. when threading Both, wrong flag was showing up
+     BUG. ~Mail/posted was not stored - brain-dead dependency removed
+     ADD. minor code cleanup (added a few casts, striped tailing blanks,
+          sorted tinrc according to options 'M'enu, ...)
+     FIX. several patches
+
+--unoff BETA release 960817 --
+
+153) Jungshik Shin <jshin@pantheon.yale.edu>
+     Dirk Nimmich <nimmich@uni-muenster.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Output of long lines in options menu did not stop at end of line
+          when using expand_rel_abs_pathname().
+     ADD. post/mail_8bit_header and mm_charset to options menu
+     ADD. iKeyQuit ('q') and iKeyQuit2 (ESC) now defined and used as
+          general quit keys.
+     ADD. make install* in top-level makefile no compiles source if needed
+     FIX. several patches
+
+--unoff BETA release 960815 --
+
+152) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. rfc1557 support:
+          7bit encoding for post_mime_encoding and mail_mime_encoding.
+          If mm_charset is one of CJK charset, 7bit means the body is to be
+          encoded in ISO-2022-JP/KR/CN (RFC1468/1557/1922).
+          ISO-2022-JP/CN/CN-ext is not yet supported.
+     ADD. mm_charset to tinrc to override $MM_CHARSET or compile-time default
+          post_8bit_header : on/off option
+          mail_8bit_header : on/off option
+     FIX. several supplied patches
+
+151) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. rewrote options 'M'enu, add several configurable options
+     ADD. getline() now allows to set maximum number of characters to type
+          in.
+     FIX. several supplied patches
+
+--unoff BETA release 960814 --
+
+150) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. default entry to newsrctable (* .newsrc-${NNTPSERVER-localhost})
+     BUG. ${VAR-fix} expansion in strfpath() did not work correctly
+     FIX. misc.c nrctbl.c
+
+149) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. makefile.in, Makefile.in, amigatcp.c, misc.c, parsdate.y, wildmat.c
+
+--unoff BETA release 960808 --
+
+148) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. check for HAVE_SELECT_INTP
+     BUG. get nntpserver name from file did not work
+     FIX. configure.in, autoconf.hin, art.c, nntplib.c
+
+--unoff BETA release 960807 --
+
+147) Tomasz Kloczko <kloczek@rudy.mif.pg.gda.pl>
+     BUG. get nntpserver name from file did not work
+     FIX. nntplib.c
+
+146) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several patches
+
+--unoff BETA release 960805 --
+
+145) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. brain-dead determination of default_save_option if auto_save=ON
+     FIX. feed.c
+
+144) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. use popen() rather than system()
+     BUG. if DEBUG_NEWSRC tin had problems with the length of .newsrc-lines
+     FIX. newsrc.c, sigfile.c
+
+143) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. expansion of ~user/, $HOME to newsrctable
+     ADD. ${VAR} expansion to strfpath()
+     FIX. misc.c nrctbl.c
+
+142) Volker Schmidt <volker@illuminatus.mz.rhein-main.de>
+     ADD. Makefile used @LIBDIR@ instead of @NEWSLIBDIR@ (introduced in 134)
+     FIX. Makefile.in
+
+141) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. use @INSTALL@
+     ADD. minor code cleanup
+     FIX. several patches
+
+--unoff BETA release 960804 --
+
+140) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup (removed useless casts, changed some functions
+          to static)
+     FIX. several supplied patches
+
+139) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. smarter file permission check for newsrc from newsrctable
+     ADD. minor code cleanup
+     FIX. nrctbl.c, pgp.c
+
+--unoff BETA release 960803 --
+
+138) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. removed useless (void) get_nntpserver casts
+     ADD. removed vWriteNovFile calls if running NNTP_ONLY
+     ADD. changed default quote char to "> "
+     BUG. tin -n crashed when trying to read articles from a not existing
+          newsgroup
+     FIX. extern.h, proto.h, tin.h, art.c, mail.c, lang.c, nntplib.c, select.c
+
+--unoff BETA release 960801 --
+
+137) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. detection of continuation lines is broken in cases where the
+          first line in the body starts with whitespace (introduced in 133)
+     BUG. article size isn't corrected if it gets shorter due to 1521/1522
+          decoding (resulting in wrong (m/n) displays in the pager.)
+     BUG. encoding very large lines (>2047 chars) with quoted-printable
+          leads to lines longer than 76 chars, due to the buffer overflow.
+     FIX. several supplied patches
+
+136) Torsten Neumann <torsten@londo.rhein-main.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. file permission check for newsrc from newsrctable
+     FIX. nrctbl.c
+
+135) Chris Blum <chris@phil.uni-sb.de>
+     BUG. compile problem for most Unices by accessing 'hidden' elements of
+          the _iobuf structure of stdio.
+     FIX. sigfile.c
+
+134) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. configure --help shows --with-inews-dir twice (introduced in 132)
+     ADD. minor code cleanup (added ifndef NNTP_ONLY around Iains fall-back
+          values for the local active file; added make version to makefile)
+     FIX. configure.in, makefile.in, init.c
+
+--unoff BETA release 960731 --
+
+133) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. smarter MIME-code
+     FIX. several supplied patches
+
+132) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. don't check for LIB/SPOOL/NOVROOTDIR when NNTP_ONLY
+     FIX. configure.in
+
+131) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. --none/! command to default_sigfile
+     FIX. config.c, sigfile.c
+
+--unoff BETA release 960730 --
+
+130) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. tin did not thread more than 128 articles (introduced in 124)
+     ADD. added 'Re :' to eat_re
+     FIX. art.c, misc.c, refs.c
+
+129) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     BUG. configure --disable-warnings did not work; fixed a few typos
+     FIX. configure.in, art.c
+
+--unoff BETA release 960729 --
+
+128) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. tin had problems with xover lines longer than 1024 chars
+     FIX. extern.h, nntplib.c, open.c
+
+127) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup
+     ADD. configure options: --enable-mime-base64, --with-iso-to-ascii
+     ADD. autoconf'd declaration of strchr/strrchr
+     FIX. several supplied patches
+
+126) Torsten Neumann <torsten@londo.rhein-main.de>
+     BUG. missing default condition in read_config_file caused tin to
+          crash on several systems
+     FIX. config.c
+
+--unoff BETA release 960725 --
+
+125) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. split mime_encoding to mail_mime_encoding/post_mime_encoding
+     ADD. pid to .newnewsrc name to avoid confusions when running multiple
+          tins
+     ADD. minor code cleanup
+     BUG. tin included identical Newsgroups:/Followup-To: lines
+     BUG. HAVE_GETHOSTBYNAME was not set if gethostbyname() is in libc
+     FIX. several supplied patches
+
+124) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed variable-shadowing)
+     FIX. several patches
+
+--unoff BETA release 960722 --
+
+123) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed variable-shadowing)
+     BUG. conf-tin overrides $CFLAGS
+     FIX. conf-tin, proto.h, open.c, save.c, search.c, thread.c
+
+--unoff BETA release 960721 --
+
+122) Daniel Naber <dnaber@pluto.teuto.de>
+     BUG. mail_bugreport() does not care about use_mailreader_i=ON
+     FIX. post.c
+
+--unoff BETA release 960720 --
+
+121) Daniel Naber <dnaber@pluto.teuto.de>
+     ADD. interactive call of user defined mailer
+     FIX. several supplied patches
+
+120) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. moved some newsgroup specific defaults from feed.c to attrib.c
+     ADD. minor code cleanup
+     FIX. feed.c, attrib.c, menukeys.h
+
+--unoff BETA release 960718 --
+
+119) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. tin crashed on filtering on a msg-id
+     FIX. art.c
+
+--unoff BETA release 960717 --
+
+118) Dean Takemori <dean@uhheph.phys.hawaii.edu>
+     BUG. user-name of .newsauth was truncated if full path of
+          .newsauth is shorter than the server password user-name line
+     FIX. open.c
+
+--unoff BETA release 960716 --
+
+117) Dieter Stueken <stueken@uni-muenster.de>
+     ADD. user argument to .newsauth
+     FIX. open.c
+
+116) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. extern.h, lang.c
+
+115) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Various improvements to reference thread creation
+          Siblings now sorted correctly
+          Threading on both references and subject
+     BUG. Original References header not preserved properly in xover records
+     FIX. Several supplied patches
+
+--unoff BETA release 960715 --
+
+114) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. tin returns an empty file (article) when you try to encrypt a pgp
+          signed message without knowing the public key.
+     FIX. pgp.c
+
+113) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. resign an article with pgp after (delete/)supersede did not work
+     BUG. supersede (via 'x'repost) on the first article of a thread did
+          not work.
+     FIX. post.c
+
+--unoff BETA release 960714 --
+
+112) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup; fixed a missing #if
+     FIX. wildmat.c, refs.c
+
+111) Sven Paulus <sven@oops.sub.de>
+     ADD. cursor selection ability for y/n-prompts
+     FIX. prompt.c
+
+--unoff BETA release 960713 --
+
+110) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup, ncurses support
+     FIX. several supplied patches
+
+109) Stefan Scholl <stesch@sks.inka.de>
+     ADD. mark forwarded text (mail to someone)
+     BUG. ctrl('R') did not work anymore in page-level, but still was
+          mentioned in the online help
+     FIX. post.c, page.c, menukeys.h
+
+108) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. inserted a few ifdefs to avoid useless definitions
+     FIX. menukeys.h
+
+--unoff BETA release 960705 --
+
+107) Chris Blum <chris@phil.uni-sb.de
+     BUG. When posting a new article after successfully posting a new
+          article with umlauts in the Subject header, Subject default
+          is RFC1522 encoded.
+     FIX. post.c, pcCopyArtHeader()
+
+106) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. "Bad overview"-error-messages guarded by #ifdef DEBUG so the
+          normal user won't see them; fixed a few prototypes; renamed
+          RFCDEBUG
+     FIX. art.c, post.c, rfc1522.c, Makefile.in
+
+--unoff BETA release 960704 --
+
+105) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. repost_article() calls join_references so reposting an article
+          with two white_spaces between 2 msgids won't fail anymore
+          (join_references is not appending the original-msgid of the
+           article which is reposted to the new References:-line, should
+           it?)
+     FIX. post.c
+
+104) Chris Blum <chris@phil.uni-sb.de
+     BUG. TIN did not guarantee a syntactically correct References line if
+          preceding articles had a faulty one.
+     BUG. wrong array sizes for header information (mostly LEN instead of
+          HEADER_LEN), inane *LEN-declarations
+     FIX. several supplied patches
+
+--unoff BETA release 960703 --
+
+103) Greg Berigan <gberigan@cse.unl.edu>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. supersede option on reposting/cancelling
+     FIX. several patches
+
+--unoff BETA release 960702 --
+
+102) Chris Blum <chris@phil.uni-sb.de
+     BUG. '_' not properly encoded inside non-MIME =?foo?bar?baz?=
+          words, which have to be encoded in order to prevent decoding
+     FIX. rfc1522.c
+
+101) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. reference-threading code cleanup
+     FIX. several supplied patches
+
+--unoff BETA release 960701 --
+
+100) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup & configure-tweaking
+     FIX. several supplied patches
+
+099) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (introduced in 026) allocated memory was not freed after usage
+     ADD. check for NULL pointer before giving memory free
+     FIX. configure[.in], config.c, page.c, pgp.c
+
+--unoff BETA release 960630 --
+
+098) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup
+     FIX. several patches
+
+--unoff BETA release 960626 --
+
+097) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Circular reference chains not handled correctly
+     FIX. several supplied patches
+
+096) Thomas E. Dickey <dickey@clark.net>
+     ADD. config.h cleanup, removed variable-shadowing
+     FIX. several supplied patches
+
+095) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup
+     FIX. several patches
+
+--unoff BETA release 960623 --
+
+094) Chris Blum <chris@phil.uni-sb.de>
+     ADD. mail_address to tinrc if defined FORGERY to build a valid From:
+          via slip/ppp connections
+     FIX. extern.h, config.c, inews.c, init.c
+
+093) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Lars Dannenberg <lars@vendetta.han.de>
+     BUG. used wrong colors under certain circumstances
+     FIX. extern.h, config.c, help.c, init.c
+
+092) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. renamed DONT_LOG_USER to LOG_USER, set default to off
+     ADD. little code 'cleanup'
+     BUG. INEWSDIR is not set in src/Makefile
+     FIX. several patches
+
+--unoff BETA release 960622 --
+
+091) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Hashing of Message-ID and References headers in msgid cache
+          o Saves memory
+          o Much faster reference threading
+          o Better reference threading
+     ADD. Rewrote reference threading to use msgid cache. The entire
+          reference tree is now used to collate and build threads,
+          even where respective articles no longer exist
+     BUG. Expired articles could still included in reference based threads
+     BUG. Thread Toggle key didn't work if no unread messages remained
+     FIX. several supplied patches
+
+--unoff BETA release 960619 --
+
+090) Chris Blum <chris@phil.uni-sb.de>
+     BUG. '"' in MIME-encoded-headers caused some trouble
+     FIX. rfc1521.c
+
+089) Thomas E. Dickey <dickey@clark.net>
+     ADD. top-level 'distclean' ignores errors
+     ADD. autoconf cleanup, name fixing, etc.
+     FIX. Makefile, aclocal.m4, configure.in, src/Makefile.in
+
+--unoff BETA release 960618 --
+
+088) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. distclean target to top-level Makefile
+     FIX. Makefile
+
+087) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. col_text was used when col_normal should be used
+     REM. '&' no longer toggles use_color in tinrc
+     FIX. several supplied patches
+
+086) Sven Paulus <sven@oops.sub.de>
+     BUG. tin generated identical Newsgroups: and Followup-To: lines
+     ADD. a little information on the top of ~/.tin/tinrc
+     FIX. post.c, inews.c, proto.h, config.c
+
+--unoff BETA release 960617 --
+
+085) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. no dot in news.`cat $INEWS_DOMAIN`)
+     FIX. configure[.in]
+
+084) Sven Paulus <sven@oops.sub.de>
+     BUG. reposting to multiple groups did not work;
+          some text definitions were in the code (-> lang.c)
+     ADD. strip duplicate newsgroups from Newsgroups: and Followup-To:
+     ADD. show_lines keyword in tinrc
+     FIX. several supplied patches
+
+--unoff BETA release 960616 --
+
+083) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. note_h_from overrides note_h_xcommentto
+     FIX. page.c, post.c
+
+--unoff BETA release 960613 --
+
+082) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more autoconf stuff; code cleanup
+     FIX. several supplied patches
+
+081) Branden Robinson <branden@purdue.edu>
+     REM. multiple screen redraw keys
+     FIX. several supplied patches
+
+080) Chris Blum <chris@phil.uni-sb.de>
+     ADD. cleaner compilation under !linux
+     FIX. rfc1521.c, rfc1522.c
+
+079) Sven Paulus <sven@oops.sub.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. HAVE_CR_AS_CHAR was never defined but used, prevented BSD-systems
+          to recognize CR
+     ADD. 'X' in select.c to quit without saving configuration
+     CHG. changed to unoff version :)
+     FIX. several patches
+
+--950824BETA  PLMC.960611 --
+
+078) Sven Paulus <sven@oops.sub.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. tin -n fails if NNTP_ONLY and newsrc could not be read
+     FIX. active.c
+
+077) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code cleanup
+     FIX. refs.c, nrctbl.c, menukeys.h, proto.h, Makefile.in, autoconf.hin
+
+076) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more autoconf stuff
+     FIX. several supplied patches
+
+075) Branden Robinson <branden@purdue.edu>
+     ADD. code cleanup
+     FIX. several supplied patches
+
+074) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. even more color-support (mini-help, etc.)
+     FIX. several supplied patches
+
+073) Sven Paulus <sven@oops.sub.de>
+     ADD. multiple news-server support (tin -g)
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960610 --
+
+072) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. configure --mandir did not work
+     FIX. Makefile.in
+
+071) Sven Paulus <sven@oops.sub.de>
+     ADD. minimum code cleanup
+     FIX. save.c, lang.c, extern.h
+
+070) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code cleanup
+     FIX. group.c, inews.c, mail.c, newsrc.c, post.c, save.c, proto.h, tin.h
+
+--950824BETA  PLMC.960609 --
+
+069) Sven Paulus <sven@oops.sub.de>
+     BUG. tin sometimes freezes while saving a thread
+     FIX. save.c
+
+068) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. AC_FUNC_ALLOCA (so it compiles under __hpux without byacc)
+     FIX. configure[.in], autoconf.hin
+
+067) Torsten Gesang <toge@stud.uni-sb.de>
+     BUG. txt_help_ctrl_g (pgp) was defined but not included in the
+          online-help
+     FIX. help.c
+
+--950824BETA  PLMC.960608 --
+
+066) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code cleanup (__hpux)
+     FIX. nntplib.c, pgp.c
+
+065) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. signature coloring
+     FIX. several supplied patches
+
+064) Chris Blum <chris@phil.uni-sb.de>
+     ADD. better algorithm for MIME-encoding =sequences or not
+     ADD. forged-cancel warning
+     FIX. several supplied patches
+
+063) Sven Paulus <sven@oops.sub.de>
+     BUG. FIDO-style quoting via mail does not work
+     FIX. post.c
+
+--950824BETA  PLMC.960607 --
+
+062) Chris Blum <chris@phil.uni-sb.de>
+     ADD. mm_charset default if env is not set
+     FIX. rfc1522.c
+
+--950824BETA  PLMC.960606 --
+
+061) Daniel Naber <dnaber@pluto.teuto.de>
+     ADD. no quote-coloring below sigdashes
+     FIX. page.c
+
+060) Chris Blum <chris@phil.uni-sb.de>
+     BUG. useless MIME-headers without MIME-encoding in the body
+     FIX. rfc1522.c
+
+059) Thomas E. Dickey <dickey@clark.net>
+     ADD. more autoconf-stuff
+     FIX. several supplied patches
+
+058) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. color was wrong when pressing 'K' mark_article_unread
+     BUG. 'x' repost_article only came up with the full-name (without
+          address)
+     FIX. thread.c, post.c
+
+057) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. no range limit for Lines:
+     FIX. page.c, thread.c
+
+056) Sven Paulus <sven@oops.sub.de>
+     ADD. even more FIDO-style quoting stuff
+          %S like %s but with keeping older quotings
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960529 --
+
+055) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. %C First Name of author to news_quote_format
+     FIX. misc.c config.c
+
+054) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed --enable-color default to on
+     BUG. no range limit for Lines:
+     FIX. configure.in, thread.c
+
+--950824BETA  PLMC.960528 --
+
+053) Chris Blum <chris@phil.uni-sb.de>
+     ADD. headers to rfc152*.c files
+     BUG. typo in rfc1521.c "US_ASCII" instead of "US-ASCII"
+     FIX. rfc1522.c, rfc1521.c
+
+052) Thomas E. Dickey <dickey@clark.net>
+     ADD. better algorithm for creating MANIFEST
+     FIX. Makefile, makefile.in
+
+--950824BETA  PLMC.960527 --
+
+051) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. space_goto_next_unread; code cleanup
+     FIX. several supplied patches
+
+050) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. --enable-break-long-lines --disable-mime-strict-charset
+          --enable-forgery; code cleanup
+     FIX. several patches
+
+--950824BETA  PLMC.960526 --
+
+049) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. --enable-mail-handling --enable-etiquette --enable-forgery
+     BUG. --enable-ref-threading did not work
+     FIX. several patches
+
+--950824BETA  PLMC.960525 --
+
+048) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup; --with-ref-threading
+     FIX. several patches
+
+--950824BETA  PLMC.960524 --
+
+047) Branden Robinson <branden@purdue.edu>
+     ADD. '&' toggle_color in all levels, rewrote show_inverse_video_status
+     FIX. several supplied patches
+
+046) Chris Blum <chris@phil.uni-sb.de>
+     BUG. mail_to_someone uses note_h_followup instead of note_h_newsgroups
+     FIX. post.c
+
+045) Thomas E. Dickey <dickey@clark.net>
+     ADD. autoconf
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960522 --
+
+044) Sven Paulus <sven@oops.sub.de>
+     ADD. FIDO-style quoting
+          %s in quote_chars will be replaced by your initials
+     FIX. several supplied patches
+
+043) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. got SIGSEGV on iKeyGroupDisplaySubject in an empty newsgroup
+     ADD. little code cleanup
+     FIX. art.c, group.c, thread.c
+
+--950824BETA  PLMC.960521 --
+
+042) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Initial implementation of references based threading.
+          o Can be set on Options Menu
+          o 'u' in group mode cycles through none, subj, refs
+          When in a group, threading type appears at top as (S) or (R)
+          o Thread menu shows subject lines, 'd' toggles From:
+          o Hidden debug key 'a' in thread menu shows thread structure
+     BUG. No range checking on integer values in tinrc.
+          Out of range values could have unpredictable results.
+     ADD. Added range checking to match_integer(). Modified all calls
+          to pass in sensible upper limit where possible.
+          Various other fixes
+     FIX. several supplied patches
+
+041) Branden Robinson <branden@purdue.edu>
+     BUG. extraneous newline after "Checking for new newsgroups..."
+     BUG. prompting with "Read article" where it should be "Read thread"
+     ADD. 'Q' never asks before quitting tin
+     ADD. ANSI color enabled/disable foot-line at top level
+     ADD. shell escape to thread level.
+     ADD. Add "^" command to top, group, thread, and article level
+          (and help screen).
+     BUG. vi sometimes stumbled "Not that many lines in buffer"
+     FIX. several supplied patches
+
+040) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. even more noticed quote-strings
+     FIX. color.c
+
+039) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup
+     FIX. nntplib.c screen.c
+
+--950824BETA  PLMC.960519 --
+
+038) Branden Robinson <branden@purdue.edu>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. little code cleanup
+     FIX. extern.h, proto.h, config.c, init.c, page.c, post.c, rfc1522.c
+          save.c
+
+--950824BETA  PLMC.960518 --
+
+037) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (it was a useless feature) if show_author!=0 'd' toggles only
+          between setting at startup and 0, but there are 4 different
+          possibilities to cycle through.
+     BUG. tagging counter for tagged articles was not decremented on untag
+     BUG. anywhere but the pager on 'z'/'Z' art_marked_unread instead of
+          art_marked_return is called
+     FIX. group.c, thread.c, newsrc.c
+
+--950824BETA  PLMC.960517 --
+
+036) Juergen Bernau <pas@freitag.muc.de>
+     ADD. if (! draw_arrow_mark && strip_blanks) strip_blanks = FALSE;
+     FIX. config.c
+
+--950824BETA  PLMC.960516 --
+
+035) Chris Blum <chris@phil.uni-sb.de>
+     ADD. print warning if cross-posting contains no Followup-To: line
+     ADD. print warning if Followup-To: line contains more than 1 newsgroup
+     BUG. case-sensitive header-checking removed
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960515 --
+
+034) Chris Blum <chris@phil.uni-sb.de>
+     BUG. non printable chars were displayed
+     FIX. group.c
+
+--950824BETA  PLMC.960512 --
+
+033) Chris Blum <chris@phil.uni-sb.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. typo in post.c
+     ADD. little code cleanup
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960511 --
+
+032) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. When changing Process type in Options Menu, <ESC> resets
+          the single character prompt to bogus values.
+          Rewrote option toggle interface to use a generic, more
+          extensible system.
+     ADD. post_process_command
+          If defined, command to be run after a successful article decode.
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960510 --
+
+031) Chris Blum <chris@phil.uni-sb.de>
+     BUG. threading problem with MIME-decoded subjects
+     FIX. art.c
+
+--950824BETA  PLMC.960507 --
+
+030) Chris Blum <chris@phil.uni-sb.de>
+     BUG. threading problem with MIME-decoded subjects
+     FIX. art.c
+
+--950824BETA  PLMC.960506 --
+
+029) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Giuseppe De Marco <gdemarco@freenet.hut.fi>
+     ADD. light-color support
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960428 --
+
+028) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. -DFORGERY without INEWS_MAIL_DOMAIN or DOMAIN_NAME
+          did not work
+     BUG. mail_to_someone did not use auto_cc
+     ADD. auto_bcc switch
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960427 --
+
+027) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. Did not recognize multi-part MIME articles
+     FIX. page.c
+
+--950824BETA  PLMC.960421 --
+026) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. on a full file-system tinrc was trashed
+     FIX. config.c, lang.c, extern.h
+          This should also be done for
+               write_attributes_file(), write_mail_active_file()
+               write_group_times_file(), ...
+
+--950824BETA  PLMC.960407 --
+
+025) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. #ifndef M_UNIX append_file() is not defined (misc.c) but
+          used in post.c
+     FIX. post.c
+
+--950824BETA  PLMC.960405 --
+
+024) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. iKeyGroupDisplaySubject 'i' to show subject at group_level
+          (iKeyGroupQuit2 removed)
+     ADD. iKeyPageDisplaySubject 'i' to show subject at page_level
+     ADD. iKeyThreadDisplaySubject 'i' to show subject at thread_level
+     BUG. compiling without -DHAVE_COLOR compiles color.c
+     FIX. menukeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c
+          lang.c
+
+--950824BETA  PLMC.960401 --
+
+C01) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. -DHAVE_COLOR for color support
+
+--950824BETA  PLM.960401 --
+
+L12) Chris Blum <chris@phil.uni-sb.de>
+     BUG. not all headers were mime_decoded
+     FIX. post.c, page.c
+
+--950824BETA  PLM.960330 cb/eb/gb/uj/sp/rr/sts --
+
+L11) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. auto_cc did not work.
+     BUG. TEX2ISO did not close all files
+     FIX. post.c, charset.c
+
+--950824BETA  PLM.960324 cb/eb/gb/uj/sp/sts --
+
+023) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup
+
+--950824BETA  PLM.960322 cb/eb/gb/uj/sp/sts --
+
+022) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. typo in post.c -> can't delete own articles
+     ADD. little code cleanup
+     FIX. post.c
+
+--950824BETA  PLM.960321 cb/eb/gb/uj/sp/sts --
+
+L10) Greg Berigan <gberigan@cse.unl.edu>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. -DNO_ETIQUETTE to stop printing posting-etiquette
+     ADD. -DFORGERY to allow superseding and cancelling
+          (newsadmins only!)
+     ADD. 'i' at group-selection-level to show group description
+     ADD. xpost_quote_format
+     ADD. little code cleanup; stripped unused variables, etc.
+     BUG. news_quote_format %F had wrong syntax
+     FIX. several supplied patches
+
+--950824BETA  PLM.960320 cb/eb/gb/uj/sp/sts --
+
+021) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. when show_xcommentto=ON, it was not MIME-decoded;
+          when show_xcommentto and highlight_xcommentto were both off
+          X-Comment-To: was displayed
+     FIX. page.c
+
+--950824BETA  PLM.960318 cb/eb/gb/uj/sp/sts --
+
+020) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Bernd Eckenfels <ecki@lina.inka.de>
+     BUG. start_editor_offset is incorrect when mail/news_quote_format is
+          >=1 line.
+     FIX. post.c, check for '\n's in *_quote_format
+
+L09) Sven Paulus <sven@oops.sub.de>
+     ADD. show_xcommentto, highlight_show_xcommentto in ~/.tin/tinrc
+          news_quote_format in ~/.tin/attributes
+     FIX. several supplied patches
+
+--950824BETA  PLM.960305 eb/uj/sts/gb/cb --
+
+019) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. documentation of the new features in man-page
+     BUG. man-page refers to $HOME/.tin/kill as kill-file, but this is now
+          $HOME/.tin/filter (line 1420)
+     FIX. tin.1
+
+L08) Chris Blum <chris@phil.uni-sb.de>
+     ADD. no_advertising switch in tinrc
+     ADD. Parses references according to son-of-1036, stripping multiple
+          whitespace
+     FIX. several supplied patches
+
+--950824BETA  PLM.960302 eb/uj/sts/gb/cb --
+
+018) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. made keep_posted_articles configurable in tinrc
+     FIX. extern.h, config.c, post.c
+     later i recognized that such an option exists in ~/.tin/attributes
+     so this patch will probably removed in a future version
+
+--950824BETA  PLM.960229 eb/uj/sts/gb/cb --
+
+017) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. No real error-messages on posting failed
+     FIX. nntplib.c, open.c
+
+--950824BETA  PLM.960224 eb/uj/sts/gb/cb --
+
+016) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. inverse_okay & draw_arrow both could be off
+     FIX. config.c
+
+--950824BETA  PLM.960221 eb/uj/sts/gb/cb --
+
+015) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. match_boolean was case-sensitive
+     FIX. tin.h, config.c
+
+--950824BETA  PLM.960220 eb/uj/sts/gb/cb --
+
+L07) Chris Blum <chris@phil.uni-sb.de>
+     ADD. encode($NAME || /etc/passwds-name-field)
+     FIX. inews.c
+
+--950824BETA  PLM.960219 eb/uj/sts/gb/cb --
+--950824BETA  PL0.960215 eb/uj/sts/gb/cb --
+
+014) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. ugly help-text
+     FIX. lang.c - reformat help-text
+
+L06) Chris Blum <chris@phil.uni-sb.de>
+     BUG. minor bug in misc.c, USER-ID was not MIME decoded
+     FIX. misc.c
+
+--950824BETA  PLM.960215 eb/uj/sts/gb/cb --
+--950824BETA  PL0.960215 eb/uj/sts/gb/cb --
+
+013) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. Followup-To: poster - responses are more comfortable
+     FIX. lang.c, post.c
+
+--950824BETA  PLM.960214 eb/uj/sts/gb/cb --
+--950824BETA  PL0.960214 eb/uj/sts/gb/cb --
+
+012) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. keep_dead_articles configurable in tinrc
+     FIX. misc.c, init.c, config.c extern.h, post.c
+          append_file (dead_article, article); changed to
+          rename_file (dead_article, article);
+          if (keep_dead_articles) append_file (dead_articles, dead_article);
+
+L05) Chris Blum <chris@phil.uni-sb.de>
+     ADD. e)dit cancel_msg
+     FIX. post.c - applied supplied patch
+
+NOP) ADD. local version number in version.h to MIME/no_MIME.patchdate
+
+--950824BETA  PL0.960211 eb/uj/sts/gb/cb --
+
+011) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. overwriting existing dead.article
+     FIX. misc.c, post.c
+          rename_file (article, dead_article) changed to
+          append_file (dead_article, article);
+
+--950824BETA  PL0.960209 eb/uj/sts/gb/cb --
+
+L04) Chris Blum <chris@phil.uni-sb.de>
+     ADD. MIME-en/decoding (Linux/gcc only)
+     BUG. loses references with multiple white-spaces in References-line
+     BUG. checks only for isprint() but still some chars may
+          destroy your terminal
+     ADD. if followup-to: is directed to poster, answering 'n' now post the
+          article in the newsgroups instead of doing nothing
+     FIX. various - applied supplied patch
+
+--950824BETA  PL0.960131 eb/uj/gb --
+
+010) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. automatically changed the order of the filter file, treating mark
+          hot as more important than kill - thus some kills won't work.
+     FIX. filter.c - code removed
+
+--950824BETA  PL0.960129 eb/uj/gb --
+
+009) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. useless code: xcut_and_paste
+     FIX. config.c/init.c/page.c/extern.h - code removed
+
+--950824BETA  PL0.960124 eb/uj/gb --
+
+008) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. builtin_inews prefers /etc/passwd user-id instead of $USER
+     FIX. inews.c - changed order
+
+--950824BETA  PL0.960121 eb/uj/gb --
+
+L03) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. show article-length in article-overview-level
+     FIX. group.c - applied supplied patch
+
+--950824BETA  PL0.951125 eb/uj/gb--
+
+007) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. goto implies auto-subscribe, reposition does not update "show
+          unread" state.
+     FIX. select.c - kicked auto-subscribe, corrected reposition_group
+
+--950824BETA  PL0.951027 eb/uj/gb--
+
+006) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. uses $VISUAL instead of $EDITOR to define the users editor
+     FIX. misc.c - changed getval() order
+
+--950824BETA PL0.950919 eb/uj/gb--
+
+005) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. reconnection to server could not be cancelled
+     FIX. open.c to recognize get_servers return value of -2
+
+--950824BETA PL0.950917 eb/uj/gb--
+
+004) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Stefan Scholl <stesch@sks.inka.de>
+     BUG. tin -w destroys ~/.tin/filter
+     FIX. main.c read attributes/filter in right order
+
+NOP) FIX. local version number in version.h to patchdate
+
+003) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. use_mouse switch was ignored
+     FIX. curses.c - recognize switch
+     FIX. init.c - use_mouse default to off
+
+--950824BETA eb/uj/gb 02 PL0--
+
+L02) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. skip quoted text while reading (press ':')
+     FIX. various - applied supplied patch.
+
+--950824BETA eb/uj 02 PL0--
+
+002) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. 'm' mail thread only marks first article in thread as read
+     FIX. feed.c - article pointer corrected
+     BUG. 'm' mail thread asks for every article for confirmation
+          (introduced in 001)
+     FIX. feed.c - missing else statements inserted
+
+--950824BETA eb/uj 01 PL0--
+
+L01) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. can't mail under Linux
+     FIX. changed tin.h to local setup
+
+NOP) ADD. Added local version number in version.h
+
+001) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. 'm' mail thread and then q)uit still mailed the thread.
+     FIX. feed.c - (simple workaround)
+
+--950824BETA released--

@@ -1,5 +1,12 @@
 Bugs
 ----
+o  --with-ncurses --enable-curses (ncurses 4.2-3.4 (Debian-Potato-Version),
+   debian 2.1, glibc2.0.7, 2.2.13ac3 kernel) colors all subjects of hot
+   articles in the same color as the hot-mark, after scrolling over them
+   with the invers video bar the subject geht's to right color.
+   [Stephan Seitz <rzsss@rzawb02.rz.uni-saarland.de> 19991115]
+   [initial screen setup somewhat broken? urs]
+
 o  --with-ncurses --enable-curses has several display problems:
     - if use_color is set:
       - '^G' (pgp-check article output is grabbled)
@@ -344,7 +351,7 @@ o  use XGTITLE (if available) if -n cmd-line flag is present
    (see open.c)
 
 o  check where snprintf() would be useful and if system has one
-   (mutt comes with one).
+   (tin 1.5.0 comes with a snprintf() fallback).
 
 o  clean-up INDEX_DAEMON code add configure option for it
    (or remove the tind-code (IMHO it's no longer needed))
@@ -374,6 +381,7 @@ o  add check for sizeof char, short, int, long, ...
    (i.e. char = 1 byte with 32 bit)
 
 o  join Makefile and makefile (not entirely possible)
+   update makefile[.in]
 
 o  move all strings to lang.c
 
@@ -469,6 +477,9 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 
 Filtering enhancements
 ----------------------
+o  add used filter-type to filter-file or filter-rule or use different
+   filter files for wildmat/regexp 
+
 o  add command: mark all articles older/newer than <date> as read
    (useful when subscribing to a new group with high-traffic...)
 

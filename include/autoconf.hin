@@ -255,7 +255,7 @@
 #undef	DECL_ISASCII
 #undef	DECL_MALLOC
 #undef	DECL_MEMSET
-#undef  DECL_MKSTEMP
+#undef	DECL_MKSTEMP
 #undef	DECL_MKTEMP
 #undef	DECL_PCLOSE
 #undef	DECL_PERROR
@@ -284,6 +284,7 @@
 #undef	DECL_TGETENT
 #undef	DECL_TGETFLAG
 #undef	DECL_TGETNUM
+#undef	DECL_TIGETNUM
 #undef	DECL_TIME
 #undef	DECL_TOLOWER
 #undef	DECL_TOUPPER
@@ -293,11 +294,10 @@
 #undef	DECL_VSPRINTF
 #undef	DECL__FLSBUF
 
-#undef SVR4_ACTION		/* FIXME: do we need this? */
-#undef HAVE_POSIX_JC
-#undef HAVE_SELECT_INTP
-#undef HAVE_TYPE_SIGACTION
-#undef HAVE_TYPE_UNIONWAIT
+#undef	HAVE_POSIX_JC
+#undef	HAVE_SELECT_INTP
+#undef	HAVE_TYPE_SIGACTION
+#undef	HAVE_TYPE_UNIONWAIT
 
 /*
  * Define a symbol to control whether we use curses, or the termcap/terminfo

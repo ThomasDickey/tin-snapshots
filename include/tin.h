@@ -2055,4 +2055,10 @@ extern struct tm *localtime(time_t *);
 #  include "../libcanlock/canlock.h"
 #endif /* USE_CANLOCK && !INDEX_DAEMON */
 
+#ifndef M_AMIGA  /* FXIME: use autoconf here to detect if system has st_mtime */
+# 	define file_changed(file)  file_mtime(file)
+#else
+# 	define file_changed(file)  file_size(file)
+#endif /* M_AMIGA */
+
 #endif /* !TIN_H */

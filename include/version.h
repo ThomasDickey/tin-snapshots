@@ -3,7 +3,7 @@
  *  Module    : version.h
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1998-11-14
+ *  Updated   : 1999-11-13
  *  Notes     :
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -16,34 +16,34 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION		"1.4"
-#	define RELEASEDATE	"19991113"
-#	define RELEASENAME	"No Labels"
+#	define VERSION 	"1.4.1"
+#	define RELEASEDATE	"19991201"
+#	define RELEASENAME	"Polish"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA
-#		define OS	"AMIGA"
+#		define OSNAME	"AMIGA"
 #		define AMIVER	VERSION
 #	endif /* M_AMIGA */
 
 #	ifdef M_OS2
-#		define OS	"OS/2"
+#		define OSNAME	"OS/2"
 #	endif /* M_OS2 */
 
 #	ifdef M_UNIX
 #		if !defined(__amiga)
-#			define OS	"UNIX"
+#			define OSNAME	"UNIX"
 #		else
-#			define OS	"AMIGA"
+#			define OSNAME	"AMIGA"
 #		endif /* !__amiga */
 #	endif /* M_UNIX */
 
 #	ifdef WIN32
-#		define OS	"Windows/NT"
+#		define OSNAME	"Windows/NT"
 #	endif /* WIN32 */
 
-#	ifndef OS
-#		define OS	"Unknown"
-#	endif /* !OS */
+#	ifndef OSNAME
+#		define OSNAME	"Unknown"
+#	endif /* !OSNAME */
 
 #endif /* !VERSION_H */

@@ -3,7 +3,7 @@
  *  Module    : nntplib.c
  *  Author    : S. Barber & I. Lea
  *  Created   : 1991-01-12
- *  Updated   : 1997-12-22
+ *  Updated   : 1999-11-29
  *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (1991-02-10)
  *  Copyright : (c) Copyright 1991-99 by Stan Barber & Iain Lea
  *              Permission is hereby granted to copy, reproduce, redistribute
@@ -943,6 +943,9 @@ nntp_respcode (
 		case OK_POSTED:
 			text = "240  Article posted successfully";
 			break;
+	        case OK_AUTHSIMPLE:
+	     	        text = "250  Authorization accepted";
+                        break;
 		case OK_AUTHSYS:
 			text = "280  Authorization system ok";
 			break;
@@ -975,6 +978,9 @@ nntp_respcode (
 			break;
 		case CONT_POST:
 			text = "340  Continue to post article";
+			break;
+	        case CONT_AUTHSIMPLE:
+		        text = "350  Continue with authorization sequence";
 			break;
 		case NEED_AUTHINFO:
 			text = "380  authorization is required";
@@ -1024,6 +1030,12 @@ nntp_respcode (
 		case ERR_POSTFAIL:
 			text = "441  Posting failed";
 			break;
+	        case ERR_NOAUTHSIMPLE:
+	                text = "450  Authorization required for this command";
+	                break;
+	        case ERR_AUTHREJSIMPLE:
+	                text = "452  Authorization rejected";
+	                break;
 		case ERR_NOAUTH:
 			text = "480  authorization required for command";
 			break;

@@ -125,14 +125,18 @@ copy_fp (
 	FILE *fp_op)
 {
 	char buf[8192];
-	size_t n;
+	size_t have, sent;
 
-	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
-		if (n != fwrite (buf, 1, n, fp_op)) {
-			if (!got_sig_pipe)						/* !SIGPIPE => more serious error */
+	while ((have = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
+		sent = fwrite (buf, 1, have, fp_op);
+		if (sent != have) {
+			TRACE(("copy_fp wrote %d of %d:{%.*s}",
+				sent, have, (int) sent, buf));
+			if (!got_sig_pipe) /* !SIGPIPE => more serious error */
 				perror_message (txt_error_copy_fp);
 			return FALSE;
 		}
+		TRACE(("copy_fp wrote %d:{%.*s}", sent, (int) sent, buf));
 	}
 	return TRUE;
 }
@@ -1184,6 +1188,7 @@ eat_re (
 
 /*
  * Clear tag status of all articles. If articles were untagged, return TRUE
+ * FIXME: Move to same place as other tagging code
  */
 t_bool
 untag_all_articles (
@@ -1194,7 +1199,7 @@ untag_all_articles (
 
 	for (i = 0; i < top; i++) {
 		if (arts[i].tagged) {
-			arts[i].tagged = FALSE;
+			arts[i].tagged = 0;
 			untagged = TRUE;
 		}
 	}
@@ -2150,7 +2155,20 @@ file_size (
 {
 	struct stat statbuf;
 
-	return (stat (file, &statbuf) == -1 ? -1L : (((statbuf.st_mode & S_IFMT) == S_IFREG) ? (long) statbuf.st_size : -1L));
+	return (stat (file, &statbuf) == -1 ? -1L : (S_ISREG(statbuf.st_mode)) ? (long) statbuf.st_size : -1L);
+}
+
+/*
+ * returns mtime
+ * -1 in case of an error (file not found, or !S_IFREG)
+ */
+long /* we use long here for file_changed() macro */
+file_mtime (
+	char *file)
+{
+	struct stat statbuf;
+
+	return (stat (file, &statbuf) == -1 ? -1L : (S_ISREG(statbuf.st_mode)) ? (long) statbuf.st_mtime : -1L);
 }
 
 
@@ -2159,13 +2177,14 @@ vPrintBugAddress (
 	void)
 {
 	my_fprintf (stderr, "%s %s %s (\"%s\") [%s]: send a DETAILED bug report to %s\n",
-		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OS, BUG_REPORT_ADDRESS);
+		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OSNAME, BUG_REPORT_ADDRESS);
 	my_fflush (stderr);
 }
 
 
 /*
  *  Copy file from pcSrcFile to pcDstFile
+ *  FIXME: Used only in mail.c, rework using copy_fp and junk this
  */
 t_bool
 copy_file (
@@ -2313,12 +2332,17 @@ write_input_history_file (
 	FILE *fp;
 	char *chr;
 	int his_w, his_e;
+	mode_t mask;
 
 	if (no_write)
 		return;
 
-	if ((fp = fopen(local_input_history_file, "w")) == NULL)
+	mask = umask((mode_t) (S_IRWXO|S_IRWXG));
+
+	if ((fp = fopen(local_input_history_file, "w")) == NULL) {
+		umask(mask);
 		return;
+	}
 
 	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
 		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
@@ -2334,6 +2358,9 @@ write_input_history_file (
 	}
 
 	fclose(fp);
+	umask(mask);
+	/* fix modes for all pre 1.4.1 local_input_history_file files */
+	chmod (local_input_history_file, (mode_t)(S_IRUSR|S_IWUSR));
 }
 
 

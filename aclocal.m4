@@ -823,7 +823,7 @@ then
 int main(int argc, char *argv[]) { return (argv[argc-1] == 0) ; }
 EOF
 	changequote([,])dnl
-	AC_CHECKING([for gcc warning options])
+	AC_CHECKING([for $CC warning options])
 	cf_save_CFLAGS="$CFLAGS"
 	EXTRA_CFLAGS="-W -Wall"
 	cf_warn_CONST=""
@@ -893,8 +893,8 @@ dnl $1 = variable to set
 AC_DEFUN([CF_LIB_PREFIX],
 [
 	case $cf_cv_system_name in
-		os2)	$1=''     ;;
-		*)	$1='lib'  ;;
+	os2)	$1=''     ;;
+	*)	$1='lib'  ;;
 	esac
 	LIB_PREFIX=[$]$1
 	AC_SUBST(LIB_PREFIX)
@@ -1706,6 +1706,60 @@ AC_MSG_RESULT($cf_cv_sys_select_timeval)
 test $cf_cv_sys_select_timeval = yes && AC_DEFINE(NEED_TIMEVAL_FIX)
 ])
 dnl ---------------------------------------------------------------------------
+dnl Look for termcap libraries, or the equivalent in terminfo.
+AC_DEFUN([CF_TERMCAP_LIBS],
+[
+AC_CACHE_VAL(cf_cv_termlib,[
+cf_cv_termlib=none
+AC_TRY_LINK([],[char *x=(char*)tgoto("",0,0)],
+[AC_TRY_LINK([],[int x=tigetstr("")],
+	[cf_cv_termlib=terminfo],
+	[cf_cv_termlib=termcap])
+	CF_VERBOSE(using functions in predefined $cf_cv_termlib LIBS)
+],[
+ifelse([$1],,,[
+if test "$1" = ncurses; then
+	CF_NCURSES_CPPFLAGS
+	CF_NCURSES_LIBS
+	cf_cv_termlib=terminfo
+fi
+])
+if test "$cf_cv_termlib" = none; then
+	# FreeBSD's linker gives bogus results for AC_CHECK_LIB, saying that
+	# tgetstr lives in -lcurses when it is only an unsatisfied extern.
+	cf_save_LIBS="$LIBS"
+	for cf_lib in curses ncurses termlib termcap
+	do
+	LIBS="-l$cf_lib $cf_save_LIBS"
+	for cf_func in tigetstr tgetstr
+	do
+		AC_MSG_CHECKING(for $cf_func in -l$cf_lib)
+		AC_TRY_LINK([],[int x=$cf_func("")],[cf_result=yes],[cf_result=no])
+		AC_MSG_RESULT($cf_result)
+		if test "$cf_result" = yes ; then
+			if test "$cf_func" = tigetstr ; then
+				cf_cv_termlib=terminfo
+			else
+				cf_cv_termlib=termcap
+			fi
+			break
+		fi
+	done
+		test "$cf_result" = yes && break
+	done
+	test "$cf_result" = no && LIBS="$cf_save_LIBS"
+fi
+if test "$cf_cv_termlib" = none; then
+	# allow curses library for broken AIX system.
+	AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" cf_cv_termlib=termcap])
+	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" cf_cv_termlib=termcap])
+fi
+])
+if test "$cf_cv_termlib" = none; then
+	AC_ERROR([Can't find -ltermlib, -lcurses, or -ltermcap])
+fi
+])])dnl
+dnl ---------------------------------------------------------------------------
 dnl See if we can link with the termios functions tcsetattr/tcgetattr
 AC_DEFUN([CF_TERMIOS],
 [
@@ -1941,6 +1995,11 @@ AC_DEFUN([CF_UPPER],
 changequote(,)dnl
 $1=`echo $2 | tr '[a-z]' '[A-Z]'`
 changequote([,])dnl
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Use AC_VERBOSE w/o the warnings
+AC_DEFUN([CF_VERBOSE],
+[test -n "$verbose" && echo "	$1" 1>&AC_FD_MSG
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Build up an expression $cf_wait_headers with the header files needed to

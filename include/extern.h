@@ -19,6 +19,10 @@
  * Library prototypes
  */
 
+#ifdef USE_TERMINFO
+#define tigetnum(s) tgetnum(s)
+#endif
+
 /*
  * The prototypes bracketed by DECL_xxxx ifdef's are used to get moderately
  * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
@@ -224,7 +228,7 @@
 #ifdef DECL_TGETFLAG
 	extern int tgetflag (char *);
 #endif /* DECL_TGETFLAG */
-#ifdef DECL_TGETNUM
+#if defined(DECL_TGETNUM) || defined(DECL_TIGETNUM)
 	extern int tgetnum (char *);
 #endif /* DECL_TGETNUM */
 #ifdef DECL_TGETSTR
@@ -1084,7 +1088,8 @@ extern t_bool xref_supported;
 #define HIST_SUBJECT_SEARCH	16
 #define HIST_CONFIG_SEARCH	17
 #define HIST_HELP_SEARCH	18
-#define HIST_MAXNUM		18	/* must always be the same as the highest HIST_ value! */
+#define HIST_MAXNUM		18	/* must always be the same as the highest HIST_ value except HIST_NONE */
+#define HIST_NONE		(HIST_MAXNUM+1)
 
 extern int hist_last[HIST_MAXNUM+1];
 extern int hist_pos[HIST_MAXNUM+1];

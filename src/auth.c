@@ -3,7 +3,7 @@
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
  *  Created   : 1997-04-05
- *  Updated   : 1998-04-18
+ *  Updated   : 1999-11-29
  *  Notes     : Routines to authenticate to a news server via NNTP.
  *              DON'T USE get_respcode() THROUGHOUT THIS CODE.
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Dirk Nimmich
@@ -133,13 +133,20 @@ read_newsauth_file (
 	char *ptr;
 	char line[PATH_LEN];
 	int found = 0;
+	struct stat statbuf;
 
 	joinpath (line, homedir, ".newsauth");
 
-	/*
-	 * TODO: check file permissions of .newsauth file and warn user if the
-	 * file could be read by others.
-	 */
+	if (stat (line, &statbuf) == -1) {
+		return FALSE;
+	} else {
+		if (S_ISREG(statbuf.st_mode) && (statbuf.st_mode|S_IRUSR|S_IWUSR) != (S_IRUSR|S_IWUSR|S_IFREG)) {
+			/* FIXME: -> lang.c */
+			error_message ("Insecure permissions of %s (%o)", line, statbuf.st_mode);
+			sleep(2);
+		}
+	}
+
 	if ((fp = fopen (line, "r"))) {
 
 		/*
@@ -330,7 +337,7 @@ authinfo_original (
 		Raw(TRUE);
 #endif /* USE_CURSES */
 
-		if (!prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
+		if (!prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_NONE)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
 #endif /* DEBUG */
@@ -351,7 +358,7 @@ authinfo_original (
 		 */
 		authpass = strncpy (authpassword, getpass (txt_auth_pass), PATH_LEN);
 #	else
-		authpass = strncpy (authpassword, tin_getline (txt_auth_pass, FALSE, (char *) 0, PATH_LEN, TRUE, HIST_OTHER), PATH_LEN);
+		authpass = strncpy (authpassword, tin_getline (txt_auth_pass, FALSE, (char *) 0, PATH_LEN, TRUE, HIST_NONE), PATH_LEN);
 #	endif /* 0 */
 #endif /* USE_CURSES */
 
@@ -371,16 +378,36 @@ authinfo_original (
  * Do authentication stuff. Return TRUE if authentication was successful,
  * FALSE otherwise.
  *
- * First try AUTHINFO GENERIC method, then, if that failed, ORIGINAL
- * AUTHINFO method. Other authentication methods can easily be added.
+ * Based on the authentication type requested by the server's respcode,
+ * decide which method to use.  Generic authentication should always
+ * fall back to original.  Simple authentication is not implemented
+ * and hence falls back to original.
  */
 t_bool
 authenticate (
 	char *server,
+	int respcode,
 	char *user,
 	t_bool startup)
 {
+  switch(respcode)
+    {
+    case ERR_NOAUTH:        /* original */
+      return authinfo_original(server, user, startup);
+      
+    case NEED_AUTHINFO:     /* generic */
 	return (authinfo_generic () || authinfo_original (server, user, startup));
+      
+    case ERR_NOAUTHSIMPLE:  /* simple */
+      error_message("Error: simple authentication not yet supported.");
+      return authinfo_original(server, user, startup);
+      
+    default:
+      error_message("Unknown authentication request type %d.", respcode);
+      break;
+    }
+  
+  return FALSE;
 }
 
 #else

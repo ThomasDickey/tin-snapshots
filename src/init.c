@@ -647,7 +647,7 @@ init_selfinfo (
 	newsrc[0] = '\0';
 
 	sprintf (page_header, "%s %s release %s (\"%s\") [%s%s%s]",
-		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OS,
+		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OSNAME,
 		(tex2iso_supported ? " TeX2ISO" : ""),
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
 	sprintf (cvers, txt_copyright_notice, page_header);
@@ -762,7 +762,7 @@ init_selfinfo (
 #endif /* VMS */
 	{
 		created_rcdir = TRUE;
-		my_mkdir (rcdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
+		my_mkdir (rcdir, (mode_t)(S_IRWXU/*|S_IRUGO|S_IXUGO*/));
 	}
 #if defined(M_UNIX) || defined (M_AMIGA) || defined(VMS)
 	strcpy (tinrc.mailer_format, MAILER_FORMAT);

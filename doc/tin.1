@@ -3,11 +3,11 @@
 .\" Module    : tin.1
 .\" Author    : I. Lea, U. Janssen
 .\" Created   : 1991-08-23
-.\" Updated   : 1999-11-10
+.\" Updated   : 1999-11-19
 .\" Notes     : still needs some work (but getting there ;)
 .\"
 .\"
-.TH tin 1 "November 10th, 1999" "1.4" "A Usenet newsreader"
+.TH tin 1 "November 19th, 1999" "1.4.1" "A Usenet newsreader"
 .\"
 .\"
 .SH NAME
@@ -520,8 +520,8 @@ Toggle display to show just the group name or the group name and the group
 descriptions.
 .TP
 .B g
-Search for a group by name (and description if displayed).
-This is the same as using '/'
+Choose a new group by name. This command can be used to access any group, even
+those not currently yanked in.
 .TP
 .B h
 Help screen of newsgroup selection commands. You can use \fB/\fR and
@@ -732,7 +732,8 @@ Cycle the display of the author through all the possible options
 for the tinrc variable 'show_author'.
 .TP
 .B g
-Choose a new group by name.
+Choose a new group by name. This command can be used to access any group, even
+those not currently yanked in.
 .TP
 .B G
 Toggle article/group limit.
@@ -880,6 +881,36 @@ Reverse article selections.
 .B ~
 Undo all selections on current thread.
 .TP
+.B [
+Auto select article(s) with a single key. The defaults used for selection
+are set based upon the following four tinrc config variables:
+.in +.3i
+.nf
+default_filter_select_case
+default_filter_select_expire
+default_filter_select_global
+default_filter_select_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
+.TP
+.B ]
+Kill article(s) with a single key. The defaults used for killing
+are based upon the following four tinrc config variables:
+.in +.3i
+.nf
+default_filter_kill_case
+default_filter_kill_expire
+default_filter_kill_global
+default_filter_kill_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
+.TP
 .B <CR>
 Read current article within thread.
 .TP
@@ -911,7 +942,7 @@ Cycle the display of the author through all the possible options
 for the tinrc variable 'show_author'.
 .TP
 .B h
-Help screen of thread listing commands.  You can use \fB/\fR and
+Help screen of thread listing commands. You can use \fB/\fR and
 \fB?\fR to search on this screen.
 .TP
 .B H
@@ -1034,36 +1065,6 @@ Goto the first article in the current thread.
 .B >
 Goto the last article in the current thread.
 .TP
-.B [
-Auto select article(s) with a single key. The defaults used for selection
-are set based upon the following four tinrc config variables:
-.in +.3i
-.nf
-default_filter_select_case
-default_filter_select_expire
-default_filter_select_global
-default_filter_select_header
-.fi
-.in -.3i
-Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
-a full explanation of these variables and FILTERING ARTICLES for more
-information on filtering.
-.TP
-.B ]
-Kill article(s) with a single key. The defaults used for killing
-are based upon the following four tinrc config variables:
-.in +.3i
-.nf
-default_filter_kill_case
-default_filter_kill_expire
-default_filter_kill_global
-default_filter_kill_header
-.fi
-.in -.3i
-Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
-a full explanation of these variables and FILTERING ARTICLES for more
-information on filtering.
-.TP
 .B _
 Toggle word highlighting on/off.
 .TP
@@ -1095,7 +1096,7 @@ the group index page.
 .TP
 .B C
 Mark the rest of the current thread as read [after confirmation] and enter the
-next thread with unread articles.  If no unread articles are left in this
+next thread with unread articles. If no unread articles are left in this
 group, enter the next group with unread news.
 .TP
 .B d
@@ -1379,7 +1380,7 @@ Color of title text on all the menu screens
 .TP
 .B Confirm commands before executing (confirm_action)
 Ask for confirmation before executing certain dangerous commands
-(e.g., `c'atchup).  Default is ON. Commands that this affects are
+(e.g., `c'atchup). Default is ON. Commands that this affects are
 marked in this manual with '[after confirmation]'.
 .TP
 .B Confirm before quitting (confirm_to_quit)
@@ -1528,9 +1529,9 @@ pager and in the GLOBAL OPTIONS MENU.
 .TP
 .B Number of articles per group to get (getart_limit)
 If \fBuse_getart_limit\fR is ON and getart_limit is > 0 not more than
-getart_limit articles/group are fetched from the server.  If \fBuse_getart_limit\fR
+getart_limit articles/group are fetched from the server. If \fBuse_getart_limit\fR
 is ON and getart_limit is < 0 tin will start fetching articles from
-your first unread minus absolute value of getart_limit.  Default is 0, which
+your first unread minus absolute value of getart_limit. Default is 0, which
 means no limit.
 .TP
 .B Catchup group using left key (group_catchup_on_exit)
@@ -2252,14 +2253,14 @@ mark them as read)
 .\"
 .SH RANGES
 A range is simply a group of items marked using the range ('#') key. Certain
-\fBtin\fR commands will operate on a range if one exists rather than
-just the current item. 
-A range is an expression of the form <min>-<max>, eg. 10-15 will highlight items
-10 through 15 on the current screen. Other than absolute numeric positions, '.'
-can be used in place of the current cursor position and '$' can be used to mean
-the highest number available.
-Currently the only commands that understand ranges are 'K', 'z' and 'Z' at the
-Group level.
+\fBtin\fR commands will operate on a range if one exists rather than just
+the current item.
+A range is an expression of the form <min>-<max>, eg. 10-15 will highlight
+items 10 through 15 on the current screen. Other than absolute numeric
+positions, '.' can be used in place of the current cursor position and '$'
+can be used to mean the highest number available.
+Currently the only commands that understand ranges are 'K', 'z' and 'Z' at
+the Group level.
 .PP
 .\"
 .SH SIGNATURES
@@ -2702,8 +2703,11 @@ v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin/ since April 1995
 v1.3-unoff-beta has been available from
 ftp.akk.uni-karlsruhe.de:/pub/news/clients/tin-unoff/ since March 1996.
 .br
-v1.4 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4 since
+v1.4.0 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
 November 13th 1999.
+.br
+v1.4.1 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
+December 1st 1999.
 .\"
 .\"
 .SH CREDITS
@@ -2770,53 +2774,54 @@ Chr. Bachem, George Baltz, Volker Barthelmann, Kirk Bauer, Paul Bauwens,
 Dieter Becker, Wolfgang Behrens, Fabrice Bellet, Greg Berigan, Enrik
 Berkhan, Juergen Bernau, Dan Berry, David Binderman, Andrey Blochintsev,
 Chris Blum, Fokke de Boer, Andreas Borchert, Mark Boucher, Bill Brolik,
-Herman ten Brugge, Martin Buck, Leila Burrell-Davis, Sean Casey, Peter
-Castro, Troy Cauble, Andrey A. Chernov, Albert Chin-A-Young, Tan Kwee Chuan,
-Boleslaw Ciesielski, Robert Claeson, Steven Cogswell, Don Costello, Bryan
-Curnutt, Ned Danieley, Lars Dannenberg, Chris Davies, John Davis, Borislav
-Deianov, Thomas E. Dickey, Olaf Dietrich, Theo Van Dinter, Ralf Doeblitz,
-Bryan Dongray, Michael Douglass, Craig Durland, Bernd Eckenfels, Phil Edge,
-Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle, Olle Eriksson, Brent
-Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason Faultless, Michael
-Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor, Torsten Gesang,
-Ruediger Geys, Callum Gibson, Mike Glendinning, Philippe Goujard, Dan
-Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck,
-Christian Haul, Per Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero,
-Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy
-Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter
-Immelman, Jarkko Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin,
-Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten
-Keil, Charles S. Kerr, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz
-Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin
-Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel, Manoj Kumar, Dawid
-Kuroczko, Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain
-Lasserre, Stanislav Latishko, Hannu Laurila, Vincent Lefevre, Alexander
-Lehmann, Marty Leisner, Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua
-Choon Leong, Chris Lewis, Andreas Ley, David-Michael Lincke, Otto Lind,
-Richard Lloyd, Florian Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp,
-David MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi
-Marukawa, William McBrine, Owen Medd, Philipp Mergenthaler, Arkadiusz
-Miskiewicz, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
-Klaus Mueller, Mike Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten
-Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg
-Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim
-Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins,
-Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
-GianPiero Puccioni, Thomas Quinot, Stefan Rapp, Martin Reising, Kyle Rhorer,
-Ted Richards, Steve Robbins, Ollivier Robert, Branden Robinson, Jim
-Robinson, Erik van Roode, Meelis Roos, Stephen Roseman, Roland Rosenfeld,
-Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders, Nickolay Saukh,
-John Sauter, Christopher Sawtell, Holger Schif, Volker Schmidt, John
-Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder,
-Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip
-Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve
-Spearman, Helmut Springer, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
-Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
-Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
-Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
-Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
-Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
-Nickolai Zeldovich, Zbigniew Zych
+Herman ten Brugge, Martin Buck, Jeremy Buhler, Leila Burrell-Davis, Sean
+Casey, Peter Castro, Troy Cauble, Andrey A. Chernov, Albert Chin-A-Young,
+Tan Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven Cogswell, Don
+Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris Davies, John
+Davis, Borislav Deianov, Thomas E. Dickey, Olaf Dietrich, Theo Van Dinter,
+Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig Durland, Bernd
+Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle,
+Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason
+Faultless, Michael Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor,
+Torsten Gesang, Ruediger Geys, Callum Gibson, Mike Glendinning, Philippe
+Goujard, Dan Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed Hanway,
+Scott Hauck, Christian Haul, Per Headland, Arnold Hendriks, Daniel Hermans,
+Jose Herrero, Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith
+Howell, Tommy Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon
+Hyoung-Jo, Pieter Immelman, Jarkko Isokungas, Patrick St. Jean, Hal
+Jespersen, Park Sang Jin, Robbin Johnson, Jarkko Jormanainen, Nelson Kading,
+Geoffrey Keating, Karsten Keil, Charles S. Kerr, Fritz Kleeman, Andreas
+Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig,
+Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Florian Kuehnert,
+Kris Kugel, Manoj Kumar, Dawid Kuroczko, Yuri Kuzmenko, Olivier Lacroix,
+Geoff Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila,
+Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan
+Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
+David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
+Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
+De Marco, Dmitri A. Martynoff, Kazushi Marukawa, William McBrine, Owen Medd,
+Philipp Mergenthaler, Arkadiusz Miskiewicz, Soren Moller, Bruce Momjian,
+Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise, Udo Munk, John
+R. Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E.
+O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb
+Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven Paulus, Walter
+Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim Pierce, Bill
+Poitras, Scott W. Powers, Wolfgang Prediger, GianPiero Puccioni, Thomas
+Quinot, Stefan Rapp, Martin Reising, Kyle Rhorer, Ted Richards, Steve
+Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Erik van Roode,
+Meelis Roos, Stephen Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton
+Royston, Rich Salz, Gary Sanders, Nickolay Saukh, John Sauter, Christopher
+Sawtell, Holger Schif, Volker Schmidt, John Schmitz, Torsten Schneider,
+Stefan Scholl, Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart
+Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer, Jungshik Shin,
+Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman, Helmut
+Springer, Cliff Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Michael
+Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter Stueken, Ed
+Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten Theis,
+Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael Traub,
+Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney,
+Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y., Nickolai
+Zeldovich, Zbigniew Zych
 .\"
 .\"
 .SH AUTHOR

@@ -114,16 +114,21 @@ split_file (
 	sprintf(pt, PLAINTEXT, TMPDIR, pid);
 	sprintf(ct, CIPHERTEXT, TMPDIR, pid);
 	mask = umask((mode_t) (S_IRWXO|S_IRWXG));
-	if ((art = fopen(file, "r")) == (FILE *) 0)
+
+	if ((art = fopen(file, "r")) == (FILE *) 0) {
+		umask(mask);
 		return;
+	}
 
 	if ((header = fopen(hdr, "w")) == (FILE *) 0) {
 		fclose(art);
+		umask(mask);
 		return;
 	}
 	if ((text = fopen(pt, "w")) == (FILE *) 0) {
 		fclose(art);
 		fclose(header);
+		umask(mask);
 		return;
 	}
 	fgets(buf, LEN, art);
@@ -260,7 +265,7 @@ invoke_pgp_mail (
 
 	ch = prompt_slk_response(ch_default, "beqs\033", txt_pgp_mail);
 	switch (ch) {
-		case '\033':
+		case ESC:
 		case 'q':
 			break;
 
@@ -301,7 +306,7 @@ invoke_pgp_news (
 
 	ch = prompt_slk_response(ch_default, "iqs\033", txt_pgp_news);
 	switch (ch) {
-		case '\033':
+		case ESC:
 		case 'q':
 			break;
 

@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1999-06-23
+dnl Updated   : 1999-11-22
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997,1998,1999 by Thomas Dickey
@@ -577,50 +577,9 @@ if test $use_curses = yes ; then
 	if test $found_ncurses != yes ; then
 		CF_CURSES_LIBS
 	fi
+	cf_cv_termlib=curses
 else
-	found_tcap=no
-	if test $found_ncurses = yes ; then
-		AC_CHECK_LIB(ncurses, tgoto, [found_tcap=yes])
-	fi
-	if test $found_tcap != yes ; then
-		case $host_os in #(vi
-		freebsd*)
-			# This is only necessary if you are linking against an
-			# obsolete version of ncurses (but it should do no
-			# harm, since it's static).
-			AC_CHECK_LIB(mytinfo,tgoto,[
-				LIBS="-lmytinfo $LIBS"
-				found_tcap=yes
-			])
-			;;
-		esac
-	fi
-	if test "$found_tcap" != yes ; then
-		AC_CHECK_LIB(termlib, tgoto, [
-			LIBS="$LIBS -ltermlib"
-			found_tcap=yes
-		])
-	fi
-	if test "$found_tcap" != yes; then
-		# allow curses library for broken AIX system.
-		AC_CHECK_LIB(curses, initscr, [
-			LIBS="$LIBS -lcurses"
-			found_tcap=yes
-		])
-		AC_CHECK_LIB(termcap, tgoto, [
-			LIBS="$LIBS -ltermcap"
-			found_tcap=yes
-		])
-	fi
-	if test "$found_tcap" != yes; then
-		AC_CHECK_LIB(termcap, tgoto, [
-			LIBS="$LIBS -ltermcap"
-			found_tcap=yes
-		])
-	fi
-	if test "$found_tcap" != yes; then
-		AC_WARN([Can't find -ltermlib, -lcurses, or -ltermcap])
-	fi
+	CF_TERMCAP_LIBS
 	# terminfo-based termcap interfaces may be prototyped in <curses.h>,
 	# which may/may not be compatible with <termcap.h>
 	AC_MSG_CHECKING(if we should include termcap.h)
@@ -628,7 +587,11 @@ else
 	CFLAGS="$CFLAGS -I$srcdir/include"
 	AC_TRY_COMPILE([
 #define HAVE_TERMCAP_H 1
-#include <tcurses.h>],[],
+#include <tcurses.h>],[
+#ifdef NCURSES_VERSION
+make an error
+#endif
+],
 		[cf_result=yes],
 		[cf_result=no])
 	AC_MSG_RESULT($cf_result)
@@ -636,6 +599,16 @@ else
 	test $cf_result = yes && AC_DEFINE(HAVE_TERMCAP_H)
 fi
 CF_TYPE_OUTCHAR
+
+cf_tc_externs="tgoto tgetstr tputs tgetent tgetflag"
+if test ".$cf_cv_termlib" = .terminfo ; then
+	AC_DEFINE(USE_TERMINFO)
+	cf_tc_externs="$cf_tc_externs tigetnum"
+elif test ".$cf_cv_termlib" = .termcap ; then
+	cf_tc_externs="$cf_tc_externs tgetnum"
+else
+	cf_tc_externs=""
+fi
 
 ###	Checks for external-data
 CF_ERRNO
@@ -857,12 +830,7 @@ CF_CHECK_DECL(\
 if test $use_curses = no ; then
 CHECK_DECL_HDRS="$TIN_DECL_HDRS
 #include <tcurses.h>"
-CF_CHECK_DECL(\
-	tgetent \
-	tgetflag \
-	tgetnum \
-	tputs \
-)
+CF_CHECK_DECL($cf_tc_externs)
 fi
 
 CHECK_DECL_HDRS="$TIN_DECL_HDRS
@@ -897,7 +865,7 @@ test ".$cf_cv_good_bcopy" = ".yes" && \
 AC_SUBST(PCRE_DEFINES)
 
 ### sum up warnings
-if test "$found_tcap" != yes ; then
+if test "$cf_cv_termlib" = none ; then
 	if test "$found_ncurses" != yes; then
         	echo "Warning: no term-lib found, you might run into trouble later."
 	fi

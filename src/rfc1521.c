@@ -115,6 +115,7 @@ rfc1521_decode (
 		fputs(line, outfile);
 		fputs("\n", outfile);
 
+/* FIXME: Surely art_open() already put these in note_h ? */
 		if (!strncasecmp(line, "Content-Type: ", 14)) {
 			STRCPY(content_type, line + 14);
 		} else if (!strncasecmp(line, "Content-Transfer-Encoding: ", 27)) {
@@ -125,7 +126,7 @@ rfc1521_decode (
 	}
 
 	/*
-	 * If we have an article of type multipart/alternative, we scan if for a
+	 * If we have an article of type multipart/alternative, we scan it for a
 	 * part that is text/plain and use only that. This should take care of the
 	 * text/html articles that seem to pop up more and more.
 	 */
