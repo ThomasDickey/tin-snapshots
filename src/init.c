@@ -201,6 +201,7 @@ t_bool alternative_handling;
 t_bool auto_bcc;		/* add your name to bcc automatically */
 t_bool auto_cc;			/* add your name to cc automatically */
 t_bool auto_list_thread;	/* list thread when entering it using right arrow */
+t_bool auto_reconnect;		/* automatically reconnect to news server */
 t_bool beginner_level;		/* beginner level (shows mini help a la elm) */
 t_bool cache_overview_files = FALSE;	/* create local index files for NNTP overview files */
 t_bool catchup = FALSE;		/* mark all arts read in all subscribed groups */
@@ -512,6 +513,7 @@ void init_selfinfo (void)
 	auto_cc = FALSE;
 	auto_bcc = FALSE;
 	auto_list_thread = TRUE;
+	auto_reconnect = FALSE;
 	beginner_level = TRUE;
 	catchup_read_groups = FALSE;
 	cmdline_nntpserver[0] = '\0';

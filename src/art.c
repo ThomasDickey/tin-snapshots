@@ -73,9 +73,9 @@ find_base (
 			if (top_base >= max_art)
 				expand_art ();
 
-			if (arts[i].status == ART_UNREAD) {
+			if (arts[i].status == ART_UNREAD)
 				base[top_base++] = i;
-			} else {
+			else {
 				for (j = i; j >= 0; j = arts[j].thread) {
 					if (arts[j].status == ART_UNREAD) {
 						base[top_base++] = i;
@@ -141,17 +141,17 @@ index_group (
 	 *  and then create base[] article numbers from loaded articles.
 	 *  If nov file does not exist then create base[] with setup_base().
 	 */
-#ifdef	PROFILE
+#ifdef PROFILE
 	BegStopWatch("setup_base");
-#endif	/* PROFILE */
+#endif /* PROFILE */
 
 	if (setup_hard_base (group, group_path) < 0)
 		return(FALSE);
 
-#ifdef	PROFILE
+#ifdef PROFILE
 	EndStopWatch();
 	PrintStopWatch();
-#endif	/* PROFILE */
+#endif /* PROFILE */
 
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Before iReadNovFile");
@@ -658,9 +658,8 @@ parse_headers (
 					    *buf2 != '\0') {
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
-						if (art_full_name[0]) {
+						if (art_full_name[0])
 							h->name = hash_str (art_full_name);
-						}
 						got_from = TRUE;
 					}
 				}
@@ -729,16 +728,13 @@ parse_headers (
 						    STRNCMPEQ(s+1, "Part", 4)) {
 							h->part = my_strdup (s+5);
 							s = strrchr (h->part, '\n');
-							if (s != (char *) 0) {
+							if (s != (char *) 0)
 								*s = '\0';
-							}
-						} else if (STRNCMPEQ(s+1,"patch",5) ||
-								   STRNCMPEQ(s+1,"Patch",5)) {
+						} else if (STRNCMPEQ(s+1,"patch",5) || STRNCMPEQ(s+1,"Patch",5)) {
 							h->patch = my_strdup (s+6);
 							s = strrchr (h->patch, '\n');
-							if (s != (char *) 0) {
+							if (s != (char *) 0)
 								*s = '\0';
-							}
 						}
 						if (h->part || h->patch) {
 							s = buf2;
@@ -814,9 +810,6 @@ iReadNovFile (
 	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
 	long	artnum;
-#if 0
-char *s; /* needed for Archive-Name: */
-#endif /* 0 */
 
 	top = 0;
 	last_read_article = 0L;
@@ -887,9 +880,8 @@ sleep(1);
 			debug_nntp ("iReadNovFile", "Bad overview record (Artnum)");
 #endif
 			continue;
-		} else {
+		} else
 			p = q + 1;
-		}
 
 		/*
 		 * READ subject
@@ -1031,50 +1023,6 @@ sleep(1);
 				arts[top].xref = my_strdup (q);
 			}
 		}
-
-#if 0 /* nobody stores Archive-name in overview-files! */
-		/*
-		 * READ article archive-name
-		 */
-		if (p != (char *) 0) {
-			q = strstr (p, "Archive-name: ");
-			if (q != (char *) 0) {
-				p = q + 14;
-				q = p;
-				while (*q && *q != '\t')
-					q++;
-
-				*q = '\0';
-				q = strrchr (p, '\n');
-				if (q != (char *) 0)
-					*q = '\0';
-
-				q = p;
-				while (*q && *q == ' ')
-					q++;
-
-/* TODO don't use CMPEQ then !! */
-				if ((s = strchr (q, '/')) != (char *) 0) {
-					if (STRNCMPEQ(s+1, "part", 4) ||
-					    STRNCMPEQ(s+1, "Part", 4)) {
-						arts[top].part = my_strdup (s+5);
-					} else if (STRNCMPEQ(s+1, "patch", 5) ||
-						   STRNCMPEQ(s+1, "Patch", 5)) {
-						arts[top].patch = my_strdup (s+6);
-					}
-					if (arts[top].part || arts[top].patch) {
-						strcpy (buf2, q);
-						s = buf2;
-						while (*s && *s != '/')
-							s++;
-						*s = '\0';
-						s = buf2;
-						arts[top].archive = hash_str (s);
-					}
-				}
-			}
-		}
-#endif /* 0 */
 
 		/*
 		 * end of overview line processing
@@ -1278,15 +1226,14 @@ pcFindNovFile (
 			iHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_NEWS:
-			if (read_news_via_nntp && xover_supported && ! cache_overview_files) {
+			if (read_news_via_nntp && xover_supported && ! cache_overview_files)
 				sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
-			} else {
+			else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);
 				sprintf (acNovFile, "%s/%s", acBuf, OVERVIEW_FILE);
 				if (iMode == R_OK || iMode == W_OK /*vb*/) {
-					if (access (acNovFile, iMode) == 0) {
+					if (access (acNovFile, iMode) == 0)
 						overview_index_filename = TRUE;
-					}
 				}
 				if (!overview_index_filename) {
 					pcDir = index_newsdir;

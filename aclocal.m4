@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 24.11.97
+dnl Updated   : 04.12.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -128,136 +128,17 @@ ifelse($3,,[    :]dnl
   ])])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for missing declarations in the system headers (adapted from vile).
+dnl
+dnl CHECK_DECL_FLAG and CHECK_DECL_HDRS must be set in configure.in
 AC_DEFUN([CF_CHECK_1_DECL],
 [
 AC_MSG_CHECKING([for missing "$1" extern])
 AC_CACHE_VAL([cf_cv_func_$1],[
 CF_MSG_LOG([for missing "$1" external])
+cf_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $CHECK_DECL_FLAG"
 AC_TRY_LINK([
-#include <stdio.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <ctype.h>
-#ifdef HAVE_ERRNO_H
-#	include <errno.h>
-#else
-#	include <sys/errno.h>
-#endif
-#ifdef HAVE_LIBC_H
-#	include <libc.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#	include <unistd.h>
-#endif
-#ifdef HAVE_STDARG_H
-#	include <stdarg.h>
-#else
-#	ifdef HAVE_VARARGS_H
-#		include <varargs.h>
-#	endif
-#endif
-#ifdef HAVE_UNISTD_H
-#	include <unistd.h>
-#endif
-#ifdef HAVE_STDLIB_H
-#	include <stdlib.h>
-#endif
-#ifdef HAVE_STDDEF_H
-#	include <stddef.h>
-#endif
-#ifdef HAVE_PWD_H
-#	include <pwd.h>
-#endif
-#ifdef HAVE_NETDB_H
-#	include <netdb.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-#	include <arpa/inet.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-#	include <sys/socket.h>
-#endif
-
-#if STDC_HEADERS || HAVE_STRING_H
-#	include <string.h>
-  /* An ANSI string.h and pre-ANSI memory.h might conflict.  */
-#	if !STDC_HEADERS && HAVE_MEMORY_H
-#		include <memory.h>
-#	endif /* not STDC_HEADERS and HAVE_MEMORY_H */
-#else /* not STDC_HEADERS and not HAVE_STRING_H */
-#	if HAVE_STRINGS_H
-#		include <strings.h>
-  /* memory.h and strings.h conflict on some systems */
-#	endif
-#endif /* not STDC_HEADERS and not HAVE_STRING_H */
-
-/* unistd.h defines _POSIX_VERSION on POSIX.1 systems.  */
-#if defined(HAVE_DIRENT_H) || defined(_POSIX_VERSION)
-#	include <dirent.h>
-#else /* not (HAVE_DIRENT_H or _POSIX_VERSION) */
-#	ifdef HAVE_SYS_NDIR_H
-#		include <sys/ndir.h>
-#	endif /* HAVE_SYS_NDIR_H */
-#	ifdef HAVE_SYS_DIR_H
-#		include <sys/dir.h>
-#	endif /* HAVE_SYS_DIR_H */
-#	ifdef HAVE_NDIR_H
-#		include <ndir.h>
-#	endif /* HAVE_NDIR_H */
-#endif /* not (HAVE_DIRENT_H or _POSIX_VERSION) */
-
-#ifdef HAVE_SYS_FILE_H
-#	include <sys/file.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#	include <sys/stat.h>
-#endif
-
-#ifdef TIME_WITH_SYS_TIME
-#	include <sys/time.h>
-#	include <time.h>
-#else
-#	ifdef HAVE_SYS_TIME_H
-#		include <sys/time.h>
-#	else
-#		include <time.h>
-#	endif
-#endif
-
-#ifdef HAVE_SYS_TIMES_H
-#	include <sys/times.h>
-#endif
-#ifdef HAVE_SYS_PARAM_H
-#	include <sys/param.h>
-#endif
-#ifdef HAVE_SYS_WAIT_H
-#	include <sys/wait.h>
-#endif
-#ifdef HAVE_SYS_SELECT_H
-#	include <sys/select.h>
-#endif
-
-#ifdef HAVE_CURSES_H
-#	include <curses.h>
-#endif
-
-#if 0	/* FIXME: this has prototypes, but creates new problems */
-#ifdef HAVE_TERM_H
-#	include <term.h>
-#endif
-#endif
-
-#ifdef HAVE_TERMCAP_H
-#	include <termcap.h>
-#endif
-
-#ifdef HAVE_IOCTL_H
-#	include <ioctl.h>
-#else
-#	ifdef HAVE_SYS_IOCTL_H
-#		include <sys/ioctl.h>
-#	endif
-#endif
+$CHECK_DECL_HDRS
 
 #undef $1
 struct zowie { int a; double b; struct zowie *c; char d; };
@@ -266,7 +147,9 @@ extern struct zowie *$1();
 [
 ],
 [eval 'cf_cv_func_'$1'=yes'],
-[eval 'cf_cv_func_'$1'=no'])])
+[eval 'cf_cv_func_'$1'=no'])
+CFLAGS="$cf_save_CFLAGS"
+])
 eval 'cf_result=$cf_cv_func_'$1
 AC_MSG_RESULT($cf_result)
 test $cf_result = yes && AC_DEFINE_UNQUOTED(DECL_$2)
@@ -278,6 +161,47 @@ do
 CF_UPPER(ac_tr_func,$ac_func)
 CF_CHECK_1_DECL(${ac_func}, ${ac_tr_func})dnl
 done
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check for data that is usually declared in <stdio.h> or <errno.h>
+dnl $1 = the name to check
+AC_DEFUN([CF_CHECK_ERRNO],
+[
+AC_MSG_CHECKING([declaration of $1])
+AC_CACHE_VAL(cf_cv_dcl_$1,[
+    AC_TRY_COMPILE([
+#include <stdio.h>
+#include <sys/types.h>
+#include <errno.h> ],
+    [long x = (long) $1],
+    [eval 'cf_cv_dcl_'$1'=yes'],
+    [eval 'cf_cv_dcl_'$1'=no]')])
+eval 'cf_result=$cf_cv_dcl_'$1
+AC_MSG_RESULT($cf_result)
+
+# It's possible (for near-UNIX clones) that the data doesn't exist
+AC_CACHE_VAL(cf_cv_have_$1,[
+if test $cf_result = no ; then
+    eval 'cf_result=DECL_'$1
+    CF_UPPER(cf_result,$cf_result)
+    AC_DEFINE_UNQUOTED($cf_result)
+    AC_MSG_CHECKING([existence of $1])
+        AC_TRY_LINK([
+#undef $1
+extern long $1;
+],
+            [$1 = 2],
+            [eval 'cf_cv_have_'$1'=yes'],
+            [eval 'cf_cv_have_'$1'=no'])
+        eval 'cf_result=$cf_cv_have_'$1
+        AC_MSG_RESULT($cf_result)
+else
+    eval 'cf_cv_have_'$1'=yes'
+fi
+])
+eval 'cf_result=HAVE_'$1
+CF_UPPER(cf_result,$cf_result)
+eval 'test $cf_cv_have_'$1' = yes && AC_DEFINE_UNQUOTED($cf_result)'
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the compiler allows nested parameter lists (some don't)
@@ -398,18 +322,57 @@ AC_MSG_RESULT($cf_cv_cpp_expands)
 test $cf_cv_cpp_expands = yes && AC_DEFINE(CPP_DOES_EXPAND)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Look for the curses libraries.  Older curses implementations may require
+dnl termcap/termlib to be linked as well.
+AC_DEFUN([CF_CURSES_LIBS],[
+AC_CHECK_FUNC(initscr,,[
+case $host_os in #(vi
+freebsd*) #(vi
+	AC_CHECK_LIB(mytinfo,tgoto,[LIBS="-lmytinfo $LIBS"])
+	;;
+*hp-hpux10.*)
+	AC_CHECK_LIB(Hcurses,initscr,[
+		# HP's header uses __HP_CURSES, but user claims _HP_CURSES.
+		LIBS="-lHcurses $LIBS"
+		CFLAGS="-D__HP_CURSES -D_HP_CURSES $CFLAGS"
+		],[
+	AC_CHECK_LIB(cur_color,initscr,[
+		LIBS="-lcur_color $LIBS"
+		CFLAGS="-I/usr/include/curses_colr $CFLAGS"
+		])])
+	;;
+esac
+if test -d /usr/5lib ; then
+	# SunOS 3.x or 4.x
+	CPPFLAGS="$CPPFLAGS -I/usr/5include"
+	LIBS="$LIBS -L/usr/5lib"
+# FIXME: check if we need/use -R option
+# elif test -d /usr/ccs/lib ; then
+# 	# Solaris 5.x
+# 	LIBS="$LIBS -L/usr/ccs/lib -R/usr/ccs/lib"
+fi
+
+cf_save_LIBS="$LIBS"
+AC_CHECK_FUNC(tgoto,[
+	AC_CHECK_LIB(curses,initscr,,[
+		AC_ERROR(cannot link curses)])
+],[
+AC_CHECK_LIB(termcap, tgoto,[
+	LIBS="-ltermcap $cf_save_LIBS"
+	AC_CHECK_LIB(curses,initscr,,[
+		AC_CHECK_LIB(cursesX,initscr,,[
+			AC_CHECK_LIB(jcurses,initscr,,[
+				AC_ERROR(cannot link curses)])])])
+	],[
+	AC_CHECK_LIB(curses,initscr,,[
+		AC_ERROR(cannot link curses)])])
+])
+])])
+dnl ---------------------------------------------------------------------------
 dnl Check if 'errno' is declared in <errno.h>
 AC_DEFUN([CF_ERRNO],
 [
-AC_MSG_CHECKING([for errno external decl])
-AC_CACHE_VAL(cf_cv_extern_errno,[
-    AC_TRY_COMPILE([
-#include <errno.h>],
-        [int x = errno],
-        [cf_cv_extern_errno=yes],
-        [cf_cv_extern_errno=no])])
-AC_MSG_RESULT($cf_cv_extern_errno)
-test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
+CF_CHECK_ERRNO(errno)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Look for a non-standard library, given parameters for AC_TRY_LINK.  We
@@ -915,6 +878,57 @@ AC_MSG_RESULT($ac_cv_prog_sum_r)
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl A better version of AC_PROC_YACC, verifies that we'll only choose bison if
+dnl we'll be able to compile with it.  Bison uses alloca, which isn't all that
+dnl portable.
+AC_DEFUN([CF_PROG_YACC],
+[
+AC_REQUIRE([AC_PROG_CC])
+AC_CACHE_VAL(cf_cv_prog_YACC,[
+if test -n "$YACC" ; then
+  cf_cv_prog_YACC="$YACC" # Let the user override the test.
+else
+cat >conftest.y <<EOF
+%{
+void yyerror(s) char *s; { }
+%}
+%token	NUMBER
+%%
+time	: NUMBER ':' NUMBER
+	;
+%%
+int yylex() { return NUMBER; }
+int main() { return yyparse(); }
+EOF
+  for cf_prog in 'bison -y' byacc yacc
+  do
+    rm -f y.tab.[ch]
+    AC_MSG_CHECKING(for $cf_prog)
+    cf_command="$cf_prog conftest.y"
+    cf_result=no
+    if AC_TRY_EVAL(cf_command) && test -s y.tab.c ; then
+      mv y.tab.c conftest.c
+      rm -f y.tab.h
+      if test "$cf_prog" = 'bison -y' ; then
+        if AC_TRY_EVAL(ac_link) && test -s conftest ; then
+          cf_result=yes
+        fi
+      else
+        cf_result=yes
+      fi
+    fi
+    AC_MSG_RESULT($cf_result)
+    if test $cf_result = yes ; then
+      cf_cv_prog_YACC="$cf_prog"
+      break
+    fi
+  done
+fi
+])
+YACC="$cf_cv_prog_YACC"
+AC_SUBST(YACC)dnl
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Re-check on a function to see if we can pick it up by adding a library.
 dnl	$1 = function to check
 dnl	$2 = library to check in
@@ -938,6 +952,44 @@ AC_CHECK_LIB($2,$1,[
 	$4],
 	[[$]$3])
 ])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check if there is a conflict between <sys/select.h> and <sys/time.h>.
+dnl This is known to be a problem with SCO.
+AC_DEFUN([CF_SYS_SELECT_TIMEVAL],
+[
+AC_MSG_CHECKING(if sys/time.h conflicts with sys/select.h)
+AC_CACHE_VAL(cf_cv_sys_select_timeval,[
+for cf_opts in no yes
+do
+AC_TRY_COMPILE([
+#define yes 1
+#define no 0
+#if $cf_opts
+#define timeval fake_timeval
+#endif
+#ifdef TIME_WITH_SYS_TIME
+#	include <sys/time.h>
+#	include <time.h>
+#else
+#	ifdef HAVE_SYS_TIME_H
+#		include <sys/time.h>
+#	else
+#		include <time.h>
+#	endif
+#endif
+#undef timeval
+#ifdef HAVE_SYS_SELECT_H
+#	include <sys/select.h>
+#endif
+],[struct timeval foo],
+	[cf_cv_sys_select_timeval=$cf_opts
+	 break],
+	[cf_cv_sys_select_timeval=no])
+done
+])
+AC_MSG_RESULT($cf_cv_sys_select_timeval)
+test $cf_cv_sys_select_timeval = yes && AC_DEFINE(NEED_TIMEVAL_FIX)
+])
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
 dnl follow the AC_CHECK_FUNCS call.
@@ -1019,6 +1071,68 @@ AC_MSG_RESULT($cf_cv_sig_const)
 test "$cf_cv_sig_const" = yes && AC_DEFINE(DECL_SIG_CONST)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check for definitions & structures needed for window size-changing
+dnl FIXME: check that this works with "snake" (HP-UX 10.x)
+AC_DEFUN([CF_SIZECHANGE],
+[
+AC_MSG_CHECKING([declaration of size-change])
+AC_CACHE_VAL(cf_cv_sizechange,[
+    cf_cv_sizechange=unknown
+    cf_save_CFLAGS="$CFLAGS"
+
+for cf_opts in "" "NEED_PTEM_H"
+do
+
+    CFLAGS="$cf_save_CFLAGS"
+    test -n "$cf_opts" && CFLAGS="$CFLAGS -D$cf_opts"
+    AC_TRY_COMPILE([#include <sys/types.h>
+#if HAVE_TERMIOS_H
+#include <termios.h>
+#else
+#if HAVE_TERMIO_H
+#include <termio.h>
+#endif
+#endif
+#if NEED_PTEM_H
+/* This is a workaround for SCO:  they neglected to define struct winsize in
+ * termios.h -- it's only in termio.h and ptem.h
+ */
+#include        <sys/stream.h>
+#include        <sys/ptem.h>
+#endif
+#if !defined(sun) || !defined(HAVE_TERMIOS_H)
+#include <sys/ioctl.h>
+#endif
+],[
+#ifdef TIOCGSIZE
+	struct ttysize win;	/* FIXME: what system is this? */
+	int y = win.ts_lines;
+	int x = win.ts_cols;
+#else
+#ifdef TIOCGWINSZ
+	struct winsize win;
+	int y = win.ws_row;
+	int x = win.ws_col;
+#else
+	no TIOCGSIZE or TIOCGWINSZ
+#endif /* TIOCGWINSZ */
+#endif /* TIOCGSIZE */
+	],
+	[cf_cv_sizechange=yes],
+	[cf_cv_sizechange=no])
+
+	CFLAGS="$cf_save_CFLAGS"
+	if test "$cf_cv_sizechange" = yes ; then
+		echo "size-change succeeded ($cf_opts)" >&AC_FD_CC
+		test -n "$cf_opts" && AC_DEFINE_UNQUOTED($cf_opts)
+		break
+	fi
+done
+	])
+AC_MSG_RESULT($cf_cv_sizechange)
+test $cf_cv_sizechange != no && AC_DEFINE(HAVE_SIZECHANGE)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check for socks5 configuration
 AC_DEFUN([CF_SOCKS5],[
 AC_MSG_CHECKING(if we can link against socks5 library)
@@ -1044,33 +1158,15 @@ else
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check for declaration of sys_errlist in one of stdio.h and errno.h.
-dnl Declaration of sys_errlist on BSD4.4 interferes with our declaration.
-dnl Reported by Keith Bostic.
+dnl Check for declaration of sys_nerr and sys_errlist in one of stdio.h and
+dnl errno.h.  Declaration of sys_errlist on BSD4.4 interferes with our
+dnl declaration.  Reported by Keith Bostic.
 AC_DEFUN([CF_SYS_ERRLIST],
 [
-AC_MSG_CHECKING([declaration of sys_errlist])
-AC_CACHE_VAL(cf_cv_dcl_sys_errlist,[
-    AC_TRY_COMPILE([
-#include <stdio.h>
-#include <sys/types.h>
-#include <errno.h> ],
-    [char *c = (char *) *sys_errlist],
-    [cf_cv_dcl_sys_errlist=yes],
-    [cf_cv_dcl_sys_errlist=no])])
-AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
-
-# It's possible (for near-UNIX clones) that sys_errlist doesn't exist
-if test $cf_cv_dcl_sys_errlist = no ; then
-    AC_DEFINE(DECL_SYS_ERRLIST)
-    AC_MSG_CHECKING([existence of sys_errlist])
-    AC_CACHE_VAL(cf_cv_have_sys_errlist,[
-        AC_TRY_LINK([#include <errno.h>],
-            [char *c = (char *) *sys_errlist],
-            [cf_cv_have_sys_errlist=yes],
-            [cf_cv_have_sys_errlist=no])])
-    AC_MSG_RESULT($cf_cv_have_sys_errlist)
-fi
+for cf_name in sys_nerr sys_errlist
+do
+    CF_CHECK_ERRNO($cf_name)
+done
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Derive the system name, as a check for reusing the autoconf cache
@@ -1126,19 +1222,16 @@ dnl
 dnl Attempt to determine if we're on such a system by running a test-program.
 dnl This won't work, of course, if the configure script is run in batch mode,
 dnl since we've got to have access to the terminal.
+dnl
+dnl CHECK_DECL_FLAG and CHECK_DECL_HDRS must be set in configure.in
 AC_DEFUN([CF_TIOCGWINSZ],
 [
 AC_MSG_CHECKING([for working TIOCGWINSZ])
 AC_CACHE_VAL(cf_cv_use_tiocgwinsz,[
-	cf_save="$CFLAGS"
-	CFLAGS="-I. -I$srcdir/include -DHAVE_CONFIG_H -D__CPROTO__ $CFLAGS"
-	rm -f autoconf.h
-	echo > autoconf.h
+	cf_save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -D__CPROTO__ $CHECK_DECL_FLAG"
 	AC_TRY_RUN([
-#ifndef M_UNIX
-#define M_UNIX
-#endif
-#include <tin.h>
+$CHECK_DECL_HDRS
 int main()
 {
 	int fd;
@@ -1163,7 +1256,7 @@ int main()
 		[cf_cv_use_tiocgwinsz=no],
 		[cf_cv_use_tiocgwinsz=unknown])
 		rm -f autoconf.h
-		CFLAGS="$cf_save"])
+		CFLAGS="$cf_save_CFLAGS"])
 AC_MSG_RESULT($cf_cv_use_tiocgwinsz)
 test $cf_cv_use_tiocgwinsz != yes && AC_DEFINE(DONT_HAVE_SIGWINCH)
 ])dnl
@@ -1211,8 +1304,8 @@ for S in "" const; do
 #include <term.h>
 #endif
 #else
-#if HAVE_CURSES_H
-#include <curses.h>	/* FIXME: this should be included only for terminfo */
+#ifdef NEED_CURSES_H	/* FIXME: need a test */
+#include <curses.h>
 #endif
 #if HAVE_TERMCAP_H
 #include <termcap.h>

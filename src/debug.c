@@ -352,15 +352,6 @@ debug_print_filters (void)
 		}
 		fprintf (fp, "*** END GLOBAL FILTER ***\n");
 
-/*		for (j=0 ; j < num_active ; j++) {
-			if (active[j].grps_filter) {
-				num = active[j].grps_filter->num;
-				the_filter = active[j].grps_filter->filter;
-				fprintf (fp, "\n*** group=[%3d] [%s]\n", num, active[j].name);
-				for (i=0 ; i < num ; i++)
-					debug_print_filter (fp, i, &the_filter[i]);
-			}
-		} */
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
@@ -458,7 +449,7 @@ debug_print_bitmap (
 	sprintf (file, "%sBITMAP", TMPDIR);
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
+		fprintf (fp, "\nActive; Group=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
 			group->name, SUB_CHAR(group->subscribed),
 			group->xmin, group->xmax, group->count,
 			group->newsrc.num_unread);
@@ -488,7 +479,7 @@ debug_print_newsrc (
 {
 	register int i, j;
 
-	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
+	fprintf (fp, "Newsrc: min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
 		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen,
 		NewSrc->num_unread, NewSrc->present);
 

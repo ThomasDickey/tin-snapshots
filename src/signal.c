@@ -22,9 +22,13 @@
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
+#else
+#	ifdef HAVE_TERMIO_H
+#		include <termio.h>
+#	endif
 #endif
 
-#if SYSTEM_LOOKS_LIKE_SCO
+#ifdef NEED_PTEM_H
 #	include <sys/stream.h>
 #	include <sys/ptem.h>
 #endif
@@ -34,19 +38,11 @@
 #		ifdef HAVE_SYS_STREAM_H
 #			include <sys/stream.h>
 #		endif
-#		ifdef HAVE_TERMIO_H
-#			include <termio.h>
-#		else
-#			ifdef HAVE_SYS_PTEM_H
-#				include <sys/ptem.h>
-#				include <sys/tty.h>
+#		ifdef HAVE_SYS_PTY_H
+#			if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
+#				include <sys/bsdtypes.h>
 #			endif
-#			ifdef HAVE_SYS_PTY_H
-#				if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
-#					include <sys/bsdtypes.h>
-#				endif
-#				include <sys/pty.h>
-#			endif
+#			include <sys/pty.h>
 #		endif
 #	endif
 #endif

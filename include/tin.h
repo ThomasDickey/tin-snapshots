@@ -22,7 +22,9 @@
 #ifdef HAVE_CONFIG_H
 #	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
 #else
-#	include	"config.h"
+#	ifndef HAVE_CONFDEFS_H
+#		include	"config.h"
+#	endif
 #endif
 
 /*
@@ -147,6 +149,16 @@ extern char *get_uaf_fullname();
 #	include <stdlib.h>
 #endif
 
+#if __STDC__
+#	define ANSI_VARARGS 1
+#	include <stdarg.h>
+#else
+#	define ANSI_VARARGS 0
+#	include <varargs.h>
+#endif
+
+#include <stdarg.h>
+
 #ifdef HAVE_GETOPT_H
 #	include <getopt.h>
 #endif
@@ -193,12 +205,12 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_SYS_SELECT_H
-#	if SYSTEM_LOOKS_LIKE_SCO
+#	if NEED_TIMEVAL_FIX
 #		define timeval fake_timeval
-#	endif
-#	include <sys/select.h>
-#	if SYSTEM_LOOKS_LIKE_SCO
+#		include <sys/select.h>
 #		undef timeval
+#	else
+#		include <sys/select.h>
 #	endif
 #endif
 
@@ -230,25 +242,8 @@ extern char *get_uaf_fullname();
 #	define	D_NAMLEN(p)	(p)->d_namlen
 #endif
 
-#else	/* FIXME: most of the rest of this isn't necessary with autoconf */
+#else
 
-#if defined(BSD) && !defined(__386BSD__) && \
-	!defined(M_OS2) && !defined(M_AMIGA)
-#	ifdef sinix
-#		include <dir.h>
-#	else
-#		if defined(__arm) || defined(__osf__)
-#			include <dirent.h>
-#			define	DIR_BUF struct dirent
-#		else
-#			include <sys/dir.h>
-#		endif
-#	endif
-#	ifndef DIR_BUF
-#		define	DIR_BUF 	struct direct
-#	endif
-#	define		D_NAMLEN(p)	(p)->d_namlen
-#endif
 #ifdef M_AMIGA
 #	include "amiga.h"
 #	define		DIR_BUF 	struct dirent
@@ -317,7 +312,7 @@ extern char *get_uaf_fullname();
  *  Max time between the first character of a VT terminal escape sequence
  *  for special keys and the following characters to arrive (msec)
  */
-#define SECOND_CHARACTER_DELAY   200
+#define SECOND_CHARACTER_DELAY	200
 
 /*
  * Maximum time (seconds) for a VT terminal escape sequence
@@ -550,10 +545,10 @@ extern char *get_uaf_fullname();
 #	define	DEFAULT_EDITOR		"/usr/bin/vi"
 #endif
 #ifndef DEFAULT_MAILER
-#	define  DEFAULT_MAILER		"/usr/lib/sendmail"
+#	define	DEFAULT_MAILER		"/usr/lib/sendmail"
 #endif
 #ifndef DEFAULT_MAILBOX
-#	define  DEFAULT_MAILBOX		"/usr/spool/mail"
+#	define	DEFAULT_MAILBOX		"/usr/spool/mail"
 #endif
 
 
@@ -738,7 +733,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #	define	ART_MARK_SELECTED	'*'	/* used to show that an art was auto selected */
 #endif
 #ifndef ART_MARK_READ
-#	define	ART_MARK_READ	' '	/* used to show that an art was not read or seen  */
+#	define	ART_MARK_READ	' '	/* used to show that an art was not read or seen */
 #endif
 #ifndef ART_MARK_DELETED
 #	define	ART_MARK_DELETED	'D'	/* art has been marked for deletion (mailgroup) */
@@ -776,7 +771,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * Number of charset-traslation tables (iso2asci)
  */
-#define NUM_ISO_TABLES  7
+#define NUM_ISO_TABLES	7
 
 /*
  * Maximum permissible colour number
@@ -819,7 +814,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define INTERACTIVE2	((cmd_line && !(batch_mode || verbose)) || (batch_mode && update_fork))
 
 /*
- *  News/Mail group types
+ * News/Mail group types
  */
 
 #define	GROUP_TYPE_MAIL	0
@@ -827,7 +822,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	GROUP_TYPE_SAVE	2		/* What on earth is this ? */
 
 /*
- *  used by get_arrow_key()
+ * used by get_arrow_key()
  */
 
 #ifdef WIN32
@@ -869,7 +864,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
- *  used by feed_articles() & show_mini_help()
+ * used by feed_articles() & show_mini_help()
  */
 
 #define	SELECT_LEVEL		1
@@ -887,9 +882,9 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FEED_REPOST		6
 
 #if 0
-#   define DEBUG_IO(x)   fprintf x
+#	define DEBUG_IO(x)   fprintf x
 #else
-#   define DEBUG_IO(x)
+#	define DEBUG_IO(x)
 #endif
 
 /*
@@ -949,7 +944,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define BOGUS_ASK		2
 
 /*
- *  used in help.c
+ * used in help.c
  */
 
 #define	HELP_INFO		0
@@ -957,7 +952,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
- *  used in save.c/main.c
+ * used in save.c/main.c
  */
 
 #define	CHECK_ANY_NEWS		0
@@ -967,7 +962,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
- *  used in post.c
+ * used in post.c
  */
 
 #define	HEADER_TO		0
@@ -996,7 +991,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
- *  Assertion verifier
+ * Assertion verifier
  */
 
 #if !defined(M_OS2) && !defined(WIN32)
@@ -1024,14 +1019,14 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
- *  art.thread (Can't ART_NORMAL be better named ?)
+ * art.thread (Can't ART_NORMAL be better named ?)
  */
 
 #define	ART_NORMAL		-1
 #define	ART_EXPIRED		-2
 
 /*
- *  art.status
+ * art.status
  */
 
 #define	ART_READ		0
@@ -1104,7 +1099,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  *
  * Each bitmap is handled as an array of bytes; the least-significant
  * bit of the 0th byte is the 0th bit; the most significant bit of
- * the 0th byte is the 7th bit.  Thus, the most-significant bit of the
+ * the 0th byte is the 7th bit. Thus, the most-significant bit of the
  * 128th byte is the 1023rd bit, and in general the mth bit of the nth
  * byte is considered to be bit (n*8)+m of the map as a whole.	Conversely,
  * the position of bit q in the map is the bit (q & 7) of byte (q >> 3).
@@ -1115,7 +1110,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  * changing the allocate/deallocate routines.
  *
  * In the newsrc context, a 0 bit represents an article which is read
- * or expired; a 1 represents an unread article.  The 0th bit corresponds
+ * or expired; a 1 represents an unread article. The 0th bit corresponds
  * to the minimum article number for this group, and (max-min+7)/8 bytes
  * are allocated to the bitmap.
  *
@@ -1141,8 +1136,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  *
  * NSETBLK0 and NSETBLK1 operate on whole numbers of bytes, and are
  * mainly useful for initializing complete bitmaps to one state or
- * another.  Both use the memset function, which is assumed to be
- * optimized for the target architecture.  NSETBLK is currently used to
+ * another. Both use the memset function, which is assumed to be
+ * optimized for the target architecture. NSETBLK is currently used to
  * initialize the group bitmap to 1s (unread).
  *
  * NSETRNG0 and NSETRNG1 operate on ranges of bits, from a low bit number
@@ -1217,15 +1212,15 @@ struct t_msgid
 };
 
 /*
- *  struct t_article - article header
+ * struct t_article - article header
  *
- *  article.thread:
+ * article.thread:
  *	-1 (ART_NORMAL)  initial default
  *	-2 (ART_EXPIRED) article has expired (wasn't found in search of spool
  *	   directory for the group)
  *	>=0 points to another arts[] (struct t_article)
  *
- *  article.inthread:
+ * article.inthread:
  *	FALSE for the first article in a thread, TRUE for all
  *	following articles in thread
  *
@@ -1247,7 +1242,7 @@ struct t_article
 	struct t_msgid *refptr;		/* Pointer to us in the reference tree */
 	int lines;			/* Lines: number of lines in article */
 	char *archive;			/* Archive-name: line from mail header */
-	char *part;			/* part  no. of archive */
+	char *part;			/* part no. of archive */
 	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
@@ -1262,7 +1257,7 @@ struct t_article
 };
 
 /*
- *  struct t_attribute - configurable attributes on a per group basis
+ * struct t_attribute - configurable attributes on a per group basis
  */
 
 struct t_attribute
@@ -1290,7 +1285,7 @@ struct t_attribute
 	unsigned auto_save_msg:1;		/* 0=none, 1=save copy of posted article */
 	unsigned auto_select:1;			/* 0=show all unread, 1='X' just hot arts */
 	unsigned auto_save:1;			/* 0=none, 1=save */
-	unsigned batch_save:1;			/* 0=none, 1=save -S/mail -M  */
+	unsigned batch_save:1;			/* 0=none, 1=save -S/mail -M */
 	unsigned delete_tmp_files:1;		/* 0=leave, 1=delete */
 	unsigned show_only_unread:1;		/* 0=all, 1=only unread */
 	unsigned thread_arts:2;			/* 0=unthread, 1=subject, 2=refs, 3=both */
@@ -1307,7 +1302,7 @@ struct t_attribute
 };
 
 /*
- *  struct t_newsrc - newsrc related info.
+ * struct t_newsrc - newsrc related info.
  */
 
 struct t_newsrc
@@ -1321,7 +1316,7 @@ struct t_newsrc
 };
 
 /*
- *  struct t_group - newsgroup info from active file
+ * struct t_group - newsgroup info from active file
  */
 
 struct t_group
@@ -1351,18 +1346,18 @@ struct t_group
 };
 
 /*
- *  used in hashstr.c
+ * used in hashstr.c
  */
 
 struct t_hashnode
 {
 	struct t_hashnode *next;		/* chain for spillover */
-	int  aptr;				/* used in subject threading */
+	int aptr;				/* used in subject threading */
 	char txt[1];			/* stub for the string data, \0 terminated */
 };
 
 /*
- *  used in filter.c
+ * used in filter.c
  *
  *  Create 2 filter arrays - global & local. Local will be part of group_t
  *  structure and will have priority over global filter. Should help to
@@ -1388,20 +1383,20 @@ struct t_filters
 };
 
 /*
- *  struct t_filter - local & global filtering (ie. kill & auto-selection)
+ * struct t_filter - local & global filtering (ie. kill & auto-selection)
  */
 
 struct t_filter
 {
-	char *scope;				/* NULL='*' (all groups) or 'comp.os.*'   */
-	char *subj;				/* Subject: line    */
-	char *from;				/* From: line	    */
-	char *msgid;				/* Message-ID: line */
-	char lines_cmp;				/* Lines compare <> */
-	int  lines_num; 			/* Lines: line	    */
-	int  score;				/* score to give if rule matches */
-	char *xref;				/* groups in xref line */
-	int xref_max;				/* maximal number of groups in newsgroups line */
+	char *scope;		/* NULL='*' (all groups) or 'comp.os.*' */
+	char *subj;			/* Subject: line */
+	char *from;			/* From: line */
+	char *msgid;		/* Message-ID: line */
+	char lines_cmp;	/* Lines compare <> */
+	int  lines_num;	/* Lines: line	*/
+	int  score;			/* score to give if rule matches */
+	char *xref;			/* groups in xref line */
+	int xref_max;		/* maximal number of groups in newsgroups line */
 	int xref_score_cnt;
 	int xref_scores[10];
 	char *xref_score_strings[10];
@@ -1414,26 +1409,26 @@ struct t_filter
 };
 
 /*
- *  struct t_filter_rule - provides parameters to build filter rule from
+ * struct t_filter_rule - provides parameters to build filter rule from
  */
 
 struct t_filter_rule
 {
 	char text[PATH_LEN];
 	char scope[PATH_LEN];
-	int  counter;
-	int  icase;
-	int  fullref;
-	int  lines_cmp;
-	int  lines_num;
+	int counter;
+	int icase;
+	int fullref;
+	int lines_cmp;
+	int lines_num;
 	t_bool from_ok:1;
 	t_bool lines_ok:1;
 	t_bool msgid_ok:1;
 	t_bool subj_ok:1;
 	t_bool check_string:1;
-	int  type;
-	int  score;
-	int  expire_time;
+	int type;
+	int score;
+	int expire_time;
 };
 
 struct t_header
@@ -1539,7 +1534,7 @@ typedef struct _TIMEINFO
 
 #if 0		/* Does anyone know what this was going to do ? */
 /*
- * Used for detecting new groups when reading news locally.  It's easy to be
+ * Used for detecting new groups when reading news locally. It's easy to be
  * confused by arrays of pointers to pointers, so typedef's are used for the
  * first level pointers to keep it clearer.
  */
@@ -1704,16 +1699,16 @@ extern void joinpath (char *result, char *dir, char *file);
 #		define S_ISDIR(m)	((m) & _S_IFDIR)
 #	else
 #		if defined(M_OS2)
-#			define S_ISDIR(m)   ((m) & S_IF_DIR)
+#			define S_ISDIR(m)	((m) & S_IF_DIR)
 #		endif
 #	endif
 #	if defined(M_UNIX) || defined(VMS) || defined(M_AMIGA)
-#		define S_ISDIR(m)   (((m) & S_IFMT) == S_IFDIR)
+#		define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
 #	endif
 #endif
 
 #if !defined(S_ISREG)
-#	define S_ISREG(m)   (((m) & S_IFMT) == S_IFREG)
+#	define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
 #endif
 
 #ifndef S_IRWXU /* should be defined in <sys/stat.h> */
@@ -1788,7 +1783,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #define is_EIGHT_BIT(p) ((*EIGHT_BIT(p) < 32 && !isspace(*p)) || *EIGHT_BIT(p) > 127)
 
 /*
- *  function prototypes & extern definitions
+ * function prototypes & extern definitions
  */
 
 /* #include	"filebug.h" */
@@ -1801,12 +1796,12 @@ extern void joinpath (char *result, char *dir, char *file);
 
 /* stifle complaints about not-a-prototype from gcc */
 #ifdef DECL_SIG_CONST
-# undef  SIG_DFL
-# define SIG_DFL	(void (*)(SIG_ARGS))0
-# undef  SIG_IGN
-# define SIG_IGN	(void (*)(SIG_ARGS))1
-# undef  SIG_ERR
-# define SIG_ERR	(void (*)(SIG_ARGS))-1
+#	undef	SIG_DFL
+#	define	SIG_DFL	(void (*)(SIG_ARGS))0
+#	undef	SIG_IGN
+#	define	SIG_IGN	(void (*)(SIG_ARGS))1
+#	undef	SIG_ERR
+#	define	SIG_ERR	(void (*)(SIG_ARGS))-1
 #endif	/* DECL_SIG_CONST */
 
 /*
@@ -1880,13 +1875,6 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #endif
 
 #ifdef DOALLOC
-#	if	__STDC__
-#  	define ANSI_VARARGS 1
-#  	include <stdarg.h>
-#	else
-#  	define ANSI_VARARGS 0
-#  	include <varargs.h>
-#	endif
 	extern char *doalloc (char *, size_t);
 	extern char *docalloc (size_t, size_t);
 	extern void	dofree (char *);
@@ -1917,10 +1905,10 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 
 /* FIXME - check also for mktemp/mkstemp/tmpfile */
 #ifdef HAVE_TEMPNAM
-#  define my_tempnam(a,b)	tempnam(a,b)
+#	define my_tempnam(a,b) tempnam(a,b)
 #else
-#  ifdef HAVE_TMPNAM
-#     define   my_tempnam(a,b)	tmpnam((char *)0)
+#	ifdef HAVE_TMPNAM
+#		define my_tempnam(a,b) tmpnam((char *)0)
 #  endif
 #endif
 

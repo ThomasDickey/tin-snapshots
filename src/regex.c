@@ -29,7 +29,7 @@ match_regex(
 	int flags = PCRE_EXTENDED;
 	int error;
 	pcre *re;
-	char *errmsg;
+	const char *errmsg;
 
 	msg[0] = '\0';
 

@@ -191,6 +191,7 @@ constext txt_help_art_marked_unread[] = "Enter character to indicate unread arti
 constext txt_help_auto_bcc[] = "Send you a blind carbon copy automatically. <SPACE> toggles & <CR> sets.";
 constext txt_help_auto_cc[] = "Send you a carbon copy automatically. <SPACE> toggles & <CR> sets.";
 constext txt_help_auto_list_thread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_auto_reconnect[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_auto_save[] = "Auto save article/thread by Archive-name: header. <SPACE> toggles & <CR> sets.";
 constext txt_help_b[] = "<SPACE> b down (b = up) one page" cCRLF;
 constext txt_help_batch_save[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -518,6 +519,7 @@ constext txt_opt_art_marked_unread[] = "Character to show unread articles  : ";
 constext txt_opt_auto_bcc[] = "Send you a blind cc automatically  : ";
 constext txt_opt_auto_cc[] = "Send you a cc automatically        : ";
 constext txt_opt_auto_list_thread[] = "List thread using right key        : ";
+constext txt_opt_auto_reconnect[] = "Reconnect to server automatically  : ";
 constext txt_opt_auto_save[] = "Use Archive-name: header for save  : ";
 constext txt_opt_batch_save[] = "Save articles in batch mode (-S)   : ";
 constext txt_opt_beginner_level[] = "Show mini menu at each level       : ";
@@ -659,6 +661,7 @@ constext txt_tinrc_art_marked_unread[] = "# character used to show that an art w
 constext txt_tinrc_auto_bcc[] = "# if ON automatically put your name in the Bcc: field when mailing an article\n";
 constext txt_tinrc_auto_cc[] = "# if ON automatically put your name in the Cc: field when mailing an article\n";
 constext txt_tinrc_auto_list_thread[] = "# if ON automatically list thread when entering it using right arrow key.\n";
+constext txt_tinrc_auto_reconnect[] = "# if ON automatically reconnect to NNTP server if the connection is broken\n";
 constext txt_tinrc_auto_save[] = "# if ON articles/threads with Archive-name: in mail header will\n\
 # be automatically saved with the Archive-name & part/patch no.\n";
 constext txt_tinrc_batch_save[] = "# if ON articles/threads will be saved in batch mode when save -S\n\

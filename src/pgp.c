@@ -3,7 +3,7 @@
  *  Module    : pgp.c
  *  Author    : Steven J. Madsen
  *  Created   : 12-05-95
- *  Updated   : 19-06-95
+ *  Updated   : 09-12-97
  *  Notes     : PGP support for article posting and mailing
  *  Copyright : (c) 1995 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,
@@ -17,28 +17,36 @@
 
 #ifdef HAVE_PGP
 
+#	ifndef HAVE_PGP_5
+#		define HAVE_PGP_2
+#		define PGP_PUBRING "pubring.pgp"
+#	else
+#		define PGP_PUBRING "pubring.pkr"
+#	endif /* !HAVE_PGP_5 */
+
+#	define PGP_SIG_TAG "-----BEGIN PGP SIGNED MESSAGE-----\n"
+#	define PGP_KEY_TAG "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
+
 /*
  * name of environment variable of options to pass to PGP
  */
-#define PGPNAME "pgp"
-#define PGPOPTS "PGPOPTS"
+#	define PGPNAME "pgp"
+#	define PGPOPTS "PGPOPTS"
 
-#define HEADERS	"%stin-%d.h"
-#ifdef HAVE_LONG_FILE_NAMES
-#	define PLAINTEXT	"%stin-%d.pt"
-#	define CIPHERTEXT	"%stin-%d.pt.asc"
-#	define KEYFILE	"%stin-%d.k.asc"
-#else
-#	define PLAINTEXT	"%stn-%d.p"
-#	define CIPHERTEXT	"%stn-%d.p.asc"
-#	define KEYFILE	"%stn-%d.k.asc"
-#endif /* HAVE_LONG_FILE_NAMES */
+#	define HEADERS	"%stin-%d.h"
+#	ifdef HAVE_LONG_FILE_NAMES
+#		define PLAINTEXT	"%stin-%d.pt"
+#		define CIPHERTEXT	"%stin-%d.pt.asc"
+#		define KEYFILE	"%stin-%d.k.asc"
+#	else
+#		define PLAINTEXT	"%stn-%d.p"
+#		define CIPHERTEXT	"%stn-%d.p.asc"
+#		define KEYFILE	"%stn-%d.k.asc"
+#	endif /* HAVE_LONG_FILE_NAMES */
 
-#define PGP_SIG_TAG "-----BEGIN PGP SIGNED MESSAGE-----\n"
-#define PGP_KEY_TAG "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
 
-#define SIGN 0x01
-#define ENCRYPT 0x02
+#	define SIGN 0x01
+#	define ENCRYPT 0x02
 
 /*
  * local prototypes
@@ -139,13 +147,31 @@ do_pgp (
 
 	split_file(file);
 	strcpy(options, "-at");
+#	ifdef HAVE_PGP_2
 	if (what & ENCRYPT)
 		strcat(options, "e");
 	if (what & SIGN)
 		strcat(options, "s");
 	sprintf(cmd, "%s %s %s %s %s", PGPNAME, pgpopts, options, pt,
 		mail_to ? mail_to : "");
-	invoke_cmd(cmd);
+#	else
+#		ifdef HAVE_PGP_5
+        if (what & ENCRYPT && what & SIGN)
+          {
+	    strcat (options, "s");
+	    sprintf (cmd, "%se %s %s %s %s", PGPNAME, pgpopts, options, pt,
+		     mail_to ? mail_to : "");
+	  }
+        else
+          {
+	    sprintf (cmd, "%s%s %s %s %s %s", PGPNAME,
+		     (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt,
+		     mail_to ? mail_to : "");
+
+	  }
+#		endif /* HAVE_PGP_5 */
+#	endif /* HAVE_PGP_2 */
+        invoke_cmd(cmd);
 	join_files(file);
 	unlink(pt);
 	unlink(hdr);
@@ -161,7 +187,13 @@ pgp_append_public_key (
 
 	sprintf(user, "%s@%s", userid, host_name);
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
+#	ifdef HAVE_PGP_2
 	sprintf(cmd, "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
+#	else
+#		ifdef HAVE_PGP_5
+	sprintf(cmd, "%sk %s -xa %s %s", PGPNAME, pgpopts, user, keyfile);
+#		endif /* HAVE_PGP_5 */
+#	endif /* HAVE_PGP_2 */
 	if (invoke_cmd(cmd)) {
 		if ((f = fopen(file, "a")) == (FILE *) 0)
 			return;
@@ -187,7 +219,7 @@ pgp_available (void)
 	FILE *f;
 	char keyring[PATH_LEN];
 
-	joinpath(keyring, pgp_data, "pubring.pgp");
+	joinpath(keyring, pgp_data, PGP_PUBRING);
 	if ((f = fopen(keyring, "r")) == (FILE *) 0) {
 		return (0);
 	} else {
@@ -272,9 +304,9 @@ pgp_check_article(void)
 		return (0);
 	}
 	joinpath(the_article, homedir, ".article");
-#ifdef APPEND_PID
+#	ifdef APPEND_PID
 	sprintf (the_article+strlen(the_article), ".%d", process_id);
-#endif /* APPEND_PID */
+#	endif /* APPEND_PID */
 	if ((art = fopen(article, "w")) == (FILE *) 0) {
 		info_message(txt_cannot_open, the_article);
 		return (0);
@@ -298,7 +330,13 @@ pgp_check_article(void)
 	ClearScreen();
 	if (pgp_signed) {
 		Raw(FALSE);
+#	ifdef HAVE_PGP_2
 		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
+#	else
+#		ifdef  HAVE_PGP_5
+	        sprintf(cmd, "%sv <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
+#		endif /* HAVE_PGP_5 */
+#	endif /* HAVE_PGP_2 */
 		system(cmd);
 		my_printf("\n");
 		Raw(TRUE);
@@ -307,7 +345,13 @@ pgp_check_article(void)
 		strcpy (buf, "Add key(s) to public keyring? ");
 		if (prompt_yn (cLINES, buf, FALSE) == 1) {
 			Raw (FALSE);
+#	ifdef HAVE_PGP_2
 			sprintf (cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
+#	else
+#		ifdef HAVE_PGP_5
+		        sprintf (cmd, "%sk %s -a %s", PGPNAME, pgpopts, the_article);
+#		endif /* HAVE_PGP_5 */
+#	endif /* HAVE_PGP_2 */
 			system (cmd);
 			my_printf ("\n");
 			Raw (TRUE);

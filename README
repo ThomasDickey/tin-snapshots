@@ -1,6 +1,6 @@
 WARNING, this is still a BETA release!
 It is still a work in progress and might not compile on all machines
-(for a list of platforms on which tin-unoff has been installed and
+(for a list of platforms on which tin has been installed and
 tested have a look at doc/INSTALL).
 
 Quick Install:
@@ -32,6 +32,5 @@ or it's mirrors.
 
 If you have additional questions or like to be informed about the
 latest new features/version you may subscribe to the (developers)
-tin-unoff mailing lists; to subscribe write to majordomo@tin.org,
-asking in the body to: subscribe <listname> and/or read
-news.software.readers.
+tin mailing lists; to subscribe write to majordomo@tin.org,asking
+in the body to: subscribe <listname> and/or read news.software.readers.

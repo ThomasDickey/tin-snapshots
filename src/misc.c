@@ -1369,8 +1369,11 @@ get_arrow_key (int prech)
 #define wait_a_while(i) \
 	while (!input_pending(0) \
 		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
+#ifdef M_AMIGA
+	if (WaitForChar(Input(),1000) == DOSTRUE)
+		return prech;
+#else	/* !M_AMIGA */
 
-#ifndef M_AMIGA
 	if (!input_pending(0)) {
 #ifdef HAVE_USLEEP
 		int i=0;
@@ -1399,8 +1402,10 @@ get_arrow_key (int prech)
 			poll(fds, 0, SECOND_CHARACTER_DELAY);
 			i++;
 		}
-#else
+#else /* !HAVE_POLL */
 		sleep(1);
+	}
+
 #endif	/* HAVE_POLL */
 #endif	/* HAVE_SELECT */
 #endif	/* HAVE_USLEEP */
@@ -1408,11 +1413,7 @@ get_arrow_key (int prech)
 		if (!input_pending(0))
 			return prech;
 	}
-#else	/* M_AMIGA */
-	if (input_pending(0))
-		return ESC;
-#endif	/* !M_AMIGA */
-
+#endif	/* M_AMIGA */
 	ch = ReadCh ();
 	if (ch == '[' || ch == 'O')
 		ch = ReadCh ();

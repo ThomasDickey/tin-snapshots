@@ -24,6 +24,9 @@
  * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
  * are enabled.  (Not all of the functions are ANSI or POSIX).
  */
+#ifdef DECL__FLSBUF
+extern int _flsbuf (int, FILE *);
+#endif
 #ifdef DECL_ATOI
 extern int atoi (char *);
 #endif
@@ -47,6 +50,9 @@ extern FILE *fdopen (int, const char *);
 #endif
 #ifdef DECL_FFLUSH
 extern int fflush (FILE *);
+#endif
+#ifdef DECL_FGETC 
+extern int fgetc (FILE * stream);
 #endif
 #if defined(DECL_FILENO) && !defined(fileno)
 extern int fileno (FILE *);
@@ -75,6 +81,9 @@ extern size_t fwrite (void *, size_t, size_t, FILE *);
 #ifdef DECL_GETCWD
 extern char *getcwd (char *, size_t);
 #endif
+#ifdef DECL_GETENV
+extern char *getenv (const char *);
+#endif
 #ifdef DECL_GETHOSTBYNAME
 extern struct hostent *gethostbyname (const char *);
 #endif
@@ -98,9 +107,6 @@ extern struct servent *getservbyname (const char *, const char *);
 #endif
 #ifdef DECL_INET_ADDR
 extern unsigned long inet_addr (const char *);
-#endif
-#ifdef DECL_INET_NTOA
-extern char *inet_ntoa (struct in_addr);
 #endif
 #ifdef DECL_IOCTL
 extern int ioctl (int, unsigned long, void *);
@@ -134,6 +140,9 @@ extern void qsort (void *, size_t, size_t, int (*)(t_comptype*, t_comptype*));
 #endif
 #ifdef DECL_REALLOC
 extern void * realloc (void *, size_t);
+#endif
+#ifdef DECL_RENAME
+extern int rename (const char *oldpath, const char *newpath);
 #endif
 #ifdef DECL_REWIND
 extern void rewind (FILE *);
@@ -215,25 +224,14 @@ extern int toupper (int);
 #ifdef DECL_TPUTS
 extern int tputs (char *, int, OutcPtr);
 #endif
+#ifdef DECL_UNGETC
+extern int ungetc (int c, FILE *stream);
+#endif
 #ifdef DECL_USLEEP
 void usleep(unsigned long);
 #endif
-#ifdef DECL__FLSBUF
-extern int _flsbuf (int, FILE *);
-#endif
-
-#ifdef DECL_GETENV
-extern char *getenv (const char *);
-#endif
-
-#ifdef DECL_FGETC
-extern int fgetc (FILE *);
-#endif
-#ifdef DECL_RENAME
-extern int rename (const char *, const char *);
-#endif
-#ifdef DECL_UNGETC
-extern int ungetc (int, FILE *);
+#ifdef DECL_VSPRINTF
+extern int vsprintf(char *str, char *format, va_list ap);
 #endif
 
 #ifdef DECL_ERRNO
@@ -404,6 +402,7 @@ extern constext txt_author_search_backwards[];
 extern constext txt_author_search_forwards[];
 extern constext txt_authorization_fail[];
 extern constext txt_authorization_ok[];
+extern constext txt_auto_reconnect[];
 extern constext txt_autoselecting_articles[];
 extern constext txt_autosubscribing_groups[];
 extern constext txt_bad_active_file[];
@@ -508,6 +507,7 @@ extern constext txt_help_art_marked_unread[];
 extern constext txt_help_auto_bcc[];
 extern constext txt_help_auto_cc[];
 extern constext txt_help_auto_list_thread[];
+extern constext txt_help_auto_reconnect[];
 extern constext txt_help_auto_save[];
 extern constext txt_help_b[];
 extern constext txt_help_batch_save[];
@@ -785,6 +785,7 @@ extern constext txt_opt_art_marked_unread[];
 extern constext txt_opt_auto_bcc[];
 extern constext txt_opt_auto_cc[];
 extern constext txt_opt_auto_list_thread[];
+extern constext txt_opt_auto_reconnect[];
 extern constext txt_opt_auto_save[];
 extern constext txt_opt_batch_save[];
 extern constext txt_opt_beginner_level[];
@@ -979,6 +980,7 @@ extern constext txt_tinrc_art_marked_unread[];
 extern constext txt_tinrc_auto_bcc[];
 extern constext txt_tinrc_auto_cc[];
 extern constext txt_tinrc_auto_list_thread[];
+extern constext txt_tinrc_auto_reconnect[];
 extern constext txt_tinrc_auto_save[];
 extern constext txt_tinrc_batch_save[];
 extern constext txt_tinrc_beginner_level[];
@@ -1187,6 +1189,7 @@ extern t_bool alternative_handling;
 extern t_bool auto_bcc;
 extern t_bool auto_cc;
 extern t_bool auto_list_thread;
+extern t_bool auto_reconnect;
 extern t_bool beginner_level;
 extern t_bool cache_overview_files;
 extern t_bool catchup;

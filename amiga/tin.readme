@@ -1,4 +1,4 @@
-This is the Amiga directory of tin-unoff.
+This is the Amiga directory of tin.
 
 It contains:
 README          original readme for Amiga-tin 1.2 by
@@ -18,11 +18,11 @@ check the docs in the main directory. It may be, that this file is not
 really up-to-date. Query the document version string for the last
 change:
 
-$VER: tin-unoff.readme 0.3 (08.10.97)
+$VER: tin.readme 0.3 (08.10.97)
 
-1. Building tin-unoff.
+1. Building tin.
 
-tin-unoff is tested to build on the following compilers:
+tin is tested to build on the following compilers:
 SAS/C 6.57
 gcc 2.7.2.1 (ADE/Geek Gadgets)
 
@@ -37,14 +37,14 @@ compiler.
 
 If you use an older gcc: UPDATE! The old 2.7.0 from Aminet is buggy and
 also out of date. Fetch your update at ftp.ninemoons.com or one of its
-mirrors. Do not be embarassed by the size of the files to download, it's
+mirrors. Do not be embarrassed by the size of the files to download, it's
 more than just a compiler you get. /* TODO: which archives are needed to
-buld tin? */
+build tin? */
 
 a) SAS/C
 You need an additional package, sorry, but I have to make an
 archaeological excursion for the source I need to replace these
-functions. The dateparser needs an installed yacc/bison to compile. If
+functions. The date-parser needs an installed yacc/bison to compile. If
 you are using yacc, edit the smakefile accordingly (search for "YACC").
 I am using the bison from ADE and it works fine, although the parser
 skeleton contains an alloca(). (Yikes!)

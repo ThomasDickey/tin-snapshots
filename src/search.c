@@ -316,7 +316,7 @@ search_subject_group (
 				txt_search_backwards,
 				default_subject_search,
 				HIST_SUBJECT_SEARCH
-	))) return 0;
+	))) return -1;
 
 	i = index_point;						/* Search from current position */
 

@@ -50,7 +50,6 @@
 #define iAFR_FORMAT1 ((wildcard) ? "%s" : "*%s*")
 #define iAFR_FORMAT2 ((wildcard) ? "%s (%s)" : "*%s (%s)*")
 
-
 /*
  * global filter array
  */
@@ -1184,6 +1183,7 @@ iAddFilterRule (
 	psPtr[*plNum].type = psRule->type;
 	psPtr[*plNum].icase = FALSE;
 	psPtr[*plNum].inscope = TRUE;
+	psPtr[*plNum].fullref = TRUE;
 	psPtr[*plNum].scope = (char *) 0;
 	psPtr[*plNum].subj = (char *) 0;
 	psPtr[*plNum].from = (char *) 0;
@@ -1280,6 +1280,7 @@ iAddFilterRule (
 		if (psRule->msgid_ok) {
 			sprintf (acBuf, iAFR_FORMAT1, quote_wild (MSGID(psArt)));
 			psPtr[*plNum].msgid = my_strdup (acBuf);
+			psPtr[*plNum].fullref = psRule->fullref;
 		}
 		if (psRule->subj_ok || psRule->from_ok ||
 		    psRule->msgid_ok || psRule->lines_ok) {
@@ -1356,7 +1357,7 @@ filter_articles (
 	struct regex_cache *regex_cache_from = NULL;
 	struct regex_cache *regex_cache_msgid = NULL;
 	struct regex_cache *regex_cache_xref = NULL;
-	char *regex_errmsg = NULL;
+	const char *regex_errmsg = 0;
 	int regex_errpos;
 /*	int score; */
 
@@ -1410,10 +1411,10 @@ filter_articles (
 	 * loop thru all arts applying global & local filtering rules
 	 */
 	for (i=0 ; i < top ; i++) {
+		arts[i].score = 0;
 		if (IS_READ(i)) /* skip only when the article is read */
 			continue;
 
-		arts[i].score = 0;
 		for (j=0 ; j < num ; j++) {
 			if (ptr[j].inscope) {
 				/*
@@ -1505,7 +1506,7 @@ filter_articles (
 
 					struct t_article *art = &arts[i];
 					char *refs = NULL;
-					char *myrefs;
+					const char *myrefs;
 /* TODO nice idea del'd; better apply one rule on all fitting
  * TODO articles, so we can switch to an appropriate algorithm
  * TODO for each kind of rule, including the deleted one.
@@ -1726,34 +1727,6 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	}
 	return filtered;
 }
-
-/*
- * Auto select articles.
- * WARNING - this routine is presently a kludge. It calls
- * filter_articles() which also kills articles. It also always returns
- * true in order to fake out the display code (cause it doesn't know
- * if any articles were actually selected)
- * The correct way to do this is to modify filter_articles() to take
- * another arg to specify whether killing, auto-selecting, or both is to be
- * done, rename it to something else, and then have a new filter_articles()
- * and auto_select_articles() call this new routine with the appropriate
- * arguments.
- */
-
-/*
- * If filter_articles() is really score_articles() now then this
- * function is unnecessary anyway
- * TODO: replace calls to this routine by calls to filter_articles()
- */
-
-int
-auto_select_articles (
-	struct t_group *group)
-{
-	filter_articles (group);
-	return (TRUE);
-}
-
 
 static int
 set_filter_scope (

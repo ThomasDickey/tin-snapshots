@@ -170,8 +170,6 @@ o  allow changing From: in mail-replys
 o  item_by_item_etiquette_warnings [compile-time?]
    (i.e. enable x-posts without f'up waring, disable long-sig waring)
 
-o  auto_reconnect=ON/OFF ['M'enu]
-
 o  Menu/tinrc/attributes entry for TeX2ISO_Conversion=ON/OFF
    [toggle via '"']
 

@@ -205,17 +205,13 @@
 #		if __STDC__ || defined(atthcx) || defined(__hpux) || \
 		   defined(__osf__) || defined(M_OS2) || defined(PTX) || \
 		   defined(sinix) || \
-		   defined(sun) || defined(SVR4) || \
+		   defined(SVR4) || \
 		   defined(u3b2) || defined(ultrix)	|| defined(WIN32)
 #			define	RETSIGTYPE void
 #		else
 #			define	RETSIGTYPE int
 #		endif
 #	endif
-#endif
-
-#if defined(__STDC__) && (defined(apollo) || defined(sun))
-#	define DECL_SIG_CONST
 #endif
 
 #if defined(M_OS2) || defined(SVR4) || \
@@ -336,7 +332,7 @@
 #endif
 
 #if !defined(M_OS2) && !defined(VMS)
-#	define	HAVE_SYSERRLIST
+#	define	HAVE_SYS_ERRLIST
 #endif
 
 #if defined(__hpux)
@@ -363,14 +359,6 @@
 
 #if defined(M_UNIX) || defined (M_AMIGA)
 #	define HAVE_METAMAIL
-#endif
-
-/*
- * Hack used to try and get a compile on Sun i386 & old SunOS 4.0.2
- */
-
-#if defined(sun) && defined(i386)
-#	undef	HAVE_STDLIB_H
 #endif
 
 #if defined(BSD) || defined(__osf__) || defined(_POSIX_SOURCE)

@@ -170,7 +170,7 @@ group_page (
 	show_group_page ();
 
 #ifdef DEBUG_NEWSRC
-	debug_print_comment ("group.c: before while(1) loop...");
+	debug_print_comment ("group.c: before forever loop...");
 	debug_print_bitmap (group, NULL);
 #endif
 
@@ -692,6 +692,9 @@ group_catchup:								/* came here on group exit via left arrow */
 					show_group_title (TRUE);
 				}
 				bld_sline (index_point);
+#if 0
+show_group_page();
+#endif
 				draw_sline (index_point, FALSE);
 
 				/*
@@ -877,7 +880,6 @@ group_list_thread:
 					}
 				}
 				CURR_GROUP.attribute->show_only_unread = !CURR_GROUP.attribute->show_only_unread;
-				auto_select_articles (&CURR_GROUP);
 				find_base (&CURR_GROUP);
 				if (i >= 0 && (n = which_thread (i)) >= 0)
 					index_point = n;
@@ -1200,9 +1202,7 @@ do_auto_select_arts:
 				break;
 
 			case iKeyGroupDoAutoSel:	/* perform auto-selection on group */
-				if (auto_select_articles (&CURR_GROUP)) {
-					update_group_page ();
-				}
+				/* selection already happened in filter_articles() */
 
 undo_auto_select_arts:
 				for (i=0; i<top; ++i) {

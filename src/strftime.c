@@ -75,10 +75,10 @@ my_strftime (
 
 #ifdef HAVE_TZSET
 	tzset ();
-#endif
-
+#else
 #ifdef HAVE_SETTZ
 	settz ();
+#endif
 #endif
 
 	for (; *format && s < endp - 1; format++) {

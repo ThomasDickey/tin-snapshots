@@ -119,6 +119,9 @@ read_config_file (
 			if (match_boolean (buf, "auto_list_thread=", &auto_list_thread))
 				break;
 
+			if (match_boolean (buf, "auto_reconnect=", &auto_reconnect))
+				break;
+
 			if (match_boolean (buf, "alternative_handling=", &alternative_handling))
 				break;
 
@@ -698,6 +701,9 @@ write_config_file (
 	fprintf (fp, txt_tinrc_confirm_to_quit);
 	fprintf (fp, "confirm_to_quit=%s\n\n", print_boolean (confirm_to_quit));
 
+	fprintf (fp, txt_tinrc_auto_reconnect);
+	fprintf (fp, "auto_reconnect=%s\n\n", print_boolean (auto_reconnect));
+
 	fprintf (fp, txt_tinrc_draw_arrow);
 	fprintf (fp, "draw_arrow=%s\n\n", print_boolean (draw_arrow_mark));
 
@@ -1137,7 +1143,7 @@ RepaintOption (
 {
 	if (OptionOnPage(option)) {
 		MoveCursor (option_row(option), 3);
-		print_option (option);
+		print_any_option (option);
 	}
 }
 
@@ -1504,6 +1510,7 @@ change_config_file (
 						 * case OPT_AUTO_BCC:
 						 * case OPT_AUTO_CC:
 						 * case OPT_AUTO_LIST_THREAD:
+						 * case OPT_AUTO_RECONNECT:
 						 * case OPT_CATCHUP_READ_GROUPS:
 						 * case OPT_CONFIRM_ACTION:
 						 * case OPT_CONFIRM_TO_QUIT:
@@ -2002,7 +2009,7 @@ show_config_page (void)
 	for (i = 0; i < lines_to_print;i++)
 	{
 		MoveCursor (INDEX_TOP + i, 3);
-		print_option (first_option_on_screen + i);
+		print_any_option (first_option_on_screen + i);
 	}
 	CleartoEOS ();
 

@@ -129,7 +129,7 @@ void
 perror_message (const char *fmt, ...)
 {
 #ifndef HAVE_STRERROR
-#	ifdef HAVE_SYSERRLIST
+#	ifdef HAVE_SYS_ERRLIST
 #		ifdef M_AMIGA
 #			ifndef sys_errlist
 				extern char *__sys_errlist[];
@@ -156,7 +156,7 @@ perror_message (const char *fmt, ...)
 #ifdef HAVE_STRERROR
 	my_fprintf (stderr, "%s: Error: %s", msg, strerror(err));
 #else
-#	ifdef HAVE_SYSERRLIST
+#	ifdef HAVE_SYS_ERRLIST
 		my_fprintf (stderr, "%s: %s", msg, sys_errlist[err]);
 #	else
 		my_fprintf (stderr, "%s: Errno: %i", msg, err);
@@ -424,7 +424,7 @@ perror_message (
 	const char *str)
 {
 #ifndef HAVE_STRERROR
-#	ifdef HAVE_SYSERRLIST
+#	ifdef HAVE_SYS_ERRLIST
 #		ifdef M_AMIGA
 #			ifndef sys_errlist
 				extern char *__sys_errlist[];
@@ -448,7 +448,7 @@ perror_message (
 #ifdef HAVE_STRERROR
 	my_fprintf (stderr, "%s: Error: %s", str2, strerror(err));
 #else
-#  ifdef HAVE_SYSERRLIST
+#  ifdef HAVE_SYS_ERRLIST
 	my_fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
 #  else
 	my_fprintf (stderr, "%s: Error: %i", str2, err);

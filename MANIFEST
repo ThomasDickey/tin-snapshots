@@ -1,99 +1,99 @@
-MANIFEST for tin-pre-1.4-971204 (Thu Dec  4 19:30:20 CET 1997)
+MANIFEST for tin-pre-1.4-971215 (Mon Dec 15 00:27:36 CET 1997)
 ----------------------------------------------------
-   7442 ./Makefile
-   3450 ./MANIFEST
-   1197 ./README
-  42185 ./aclocal.m4
+   7436 ./Makefile
+   3444 ./MANIFEST
+   1184 ./README
+  45106 ./aclocal.m4
   20446 ./config.guess
   19236 ./config.sub
- 188399 ./configure
-  16687 ./configure.in
+ 209391 ./configure
+  18022 ./configure.in
    4765 ./install.sh
-    650 ./mkdirs.sh
+    660 ./mkdirs.sh
   11685 ./makefile.in
-   1033 ./conf-tin
- 108471 ./doc/CHANGES
+    656 ./conf-tin
+ 110445 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
-  16370 ./doc/INSTALL
-  15519 ./doc/TODO
+  16474 ./doc/INSTALL
+  15484 ./doc/TODO
    1720 ./doc/WHATSNEW
   12686 ./doc/auth.txt
    6172 ./doc/filtering
    3369 ./doc/internals.txt
   23621 ./doc/iso2asc.txt
   34970 ./doc/minimal-netkeeping
-  73343 ./doc/tin.1
+  73348 ./doc/tin.1
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
    1043 ./include/bugrep.h
-   8454 ./include/config.h
-  52552 ./include/extern.h
+   8208 ./include/config.h
+  52793 ./include/extern.h
   13280 ./include/menukeys.h
     718 ./include/msmail.h
    5089 ./include/nntplib.h
    2233 ./include/os_2.h
-  23666 ./include/proto.h
+  23660 ./include/proto.h
    2388 ./include/stpwatch.h
-   1933 ./include/tcurses.h
-  49459 ./include/tin.h
-   2734 ./include/tnntp.h
+   2293 ./include/tcurses.h
+  48968 ./include/tin.h
+   2856 ./include/tnntp.h
     873 ./include/trace.h
-    920 ./include/version.h
+    993 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
   16526 ./src/active.c
    9812 ./src/actived.c
-  38783 ./src/art.c
+  37697 ./src/art.c
   23432 ./src/attrib.c
    9754 ./src/auth.c
    8946 ./src/charset.c
    7884 ./src/color.c
-  55754 ./src/config.c
-  21312 ./src/curses.c
-  12188 ./src/debug.c
+  55986 ./src/config.c
+  20850 ./src/curses.c
+  11889 ./src/debug.c
    2300 ./src/envarg.c
   19119 ./src/feed.c
-  45037 ./src/filter.c
+  44263 ./src/filter.c
   11249 ./src/getline.c
-  42556 ./src/group.c
+  42526 ./src/group.c
    2997 ./src/hashstr.c
    7236 ./src/header.c
   10226 ./src/help.c
    6798 ./src/inews.c
-  36248 ./src/init.c
-    960 ./src/joinpath.c
-  83194 ./src/lang.c
+  36342 ./src/init.c
+   1361 ./src/joinpath.c
+  83472 ./src/lang.c
    3778 ./src/list.c
-  10181 ./src/mail.c
+  10132 ./src/mail.c
   21931 ./src/main.c
    8656 ./src/makecfg.c
    8436 ./src/memory.c
-  51673 ./src/misc.c
+  51714 ./src/misc.c
    7228 ./src/msmail.c
-  34279 ./src/newsrc.c
-  22549 ./src/nntplib.c
+  34269 ./src/newsrc.c
+  22869 ./src/nntplib.c
   31268 ./src/nntpw32.c
    4405 ./src/nntpvms.c
    6335 ./src/nrctbl.c
-  21517 ./src/open.c
+  21991 ./src/open.c
    6272 ./src/os_2.c
   39323 ./src/page.c
   24108 ./src/parsdate.y
-   6353 ./src/pgp.c
+   7507 ./src/pgp.c
   90200 ./src/post.c
   10702 ./src/prompt.c
-   7675 ./src/read.c
+   7696 ./src/read.c
   23362 ./src/refs.c
-   1806 ./src/regex.c
+   1812 ./src/regex.c
   11698 ./src/rfc1521.c
   22306 ./src/rfc1522.c
   33153 ./src/save.c
-   7347 ./src/screen.c
-  11548 ./src/search.c
+   7351 ./src/screen.c
+  11549 ./src/search.c
   34895 ./src/select.c
    5680 ./src/sigfile.c
-   9745 ./src/signal.c
-   5681 ./src/strftime.c
+   9640 ./src/signal.c
+   5686 ./src/strftime.c
    7423 ./src/string.c
    5897 ./src/tcurses.c
   27503 ./src/thread.c
@@ -104,39 +104,39 @@ MANIFEST for tin-pre-1.4-971204 (Thu Dec  4 19:30:20 CET 1997)
    4914 ./src/xref.c
    5597 ./src/vms.c
    4987 ./amiga/README
-   5107 ./amiga/tin-unoff.readme
-  10603 ./amiga/smakefile
+   5086 ./amiga/tin.readme
+  10650 ./amiga/smakefile
    4987 ./amiga/actived.c
   17223 ./amiga/amiga.c
    6373 ./amiga/amigatcp.c
    2371 ./amiga/amiga.h
    2167 ./amiga/amigatcp.h
-   6872 ./pcre/ChangeLog
+   7245 ./pcre/ChangeLog
    2020 ./pcre/Makefile.in
-   2010 ./pcre/Makefile.orig
+   2237 ./pcre/Makefile.orig
    7165 ./pcre/Performance
-  10254 ./pcre/README
+  10388 ./pcre/README
    7401 ./pcre/Tech.Notes
    2379 ./pcre/pgrep.1
-  45318 ./pcre/pcre.3
+  45310 ./pcre/pcre.3
    5063 ./pcre/pcreposix.3
    4557 ./pcre/maketables.c
-  98909 ./pcre/pcre.c
-   7546 ./pcre/pcreposix.c
-   4750 ./pcre/pgrep.c
-   8949 ./pcre/study.c
-  10855 ./pcre/internal.h
-   1584 ./pcre/pcre.h
+  99406 ./pcre/pcre.c
+   7553 ./pcre/pcreposix.c
+   4756 ./pcre/pgrep.c
+   8979 ./pcre/study.c
+  10678 ./pcre/internal.h
+   1602 ./pcre/pcre.h
    2039 ./pcre/pcreposix.h
-  19266 ./pcre/pcretest.c
+  19288 ./pcre/pcretest.c
    2988 ./pcre/perltest
   46057 ./pcre/testinput
    3509 ./pcre/testinput2
   54238 ./pcre/testoutput
   11547 ./pcre/testoutput2
-   8772 ./include/autoconf.hin
+   8690 ./include/autoconf.hin
   12616 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   4276 ./src/tincfg.tbl
-2368738 total
+   4305 ./src/tincfg.tbl
+2397013 total
