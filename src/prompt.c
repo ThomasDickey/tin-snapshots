@@ -454,7 +454,7 @@ continue_prompt (void)
 #endif
 	info_message (txt_return_key);
 	ch = ReadCh ();
-	
+
 #ifndef WIN32
 	switch (ch) {
 		case ESC:
@@ -466,7 +466,7 @@ continue_prompt (void)
 			break;
 	}
 #endif /* WIN32 */
-                                                                                
+
 #if USE_CURSES
 	cmd_line = FALSE;
 	my_retouch();
@@ -474,4 +474,3 @@ continue_prompt (void)
 
 	set_alarm_clock_on ();
 }
-

@@ -1,3 +1,21 @@
+--unoff BETA release 971018 --
+
+457) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. changed reread_active routine to old 1.2
+     FIX. active.c
+
+456) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. scoring
+     FIX. tin.h, filter.c, misc.c
+
+455) Sven Paulus <sven@tin.org>
+     ADD. improved get_initials()
+     FIX. misc.c
+
+454) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote prototype for OUTC_ARGS
+     FIX. aclocal.m4, tin.h
+
 --unoff BETA release 970930 --
 
 453) Jason Faultless <jason@radar.demon.co.uk>
@@ -87,7 +105,7 @@
      BUG. tin did not warn you if you tried to save into a directory
           and not into a file.
      ADD. when window was or got too small, tin SIGSEGVd, now tin
-          exits properly 
+          exits properly
      ADD. set From:-address on per-group basis in attributes file
      ADD. 'y' as an alternative to 'p' for mutt-users :-)
      ADD. checking on startup, if window is large enough to run tin
@@ -121,9 +139,9 @@
      FIX. color.c, tcurses.c
 
 435) Patrick St. Jean <stjeanp@pdq.net>
-     ADD. failure message for when a news server rejects authentication 
+     ADD. failure message for when a news server rejects authentication
           information
-     FIX. extern.h, auth.c, lang.c 
+     FIX. extern.h, auth.c, lang.c
 
 434) Sven Paulus <sven@karlsruhe.org>
      ADD. quote signatures/display signatures switch

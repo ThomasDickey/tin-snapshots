@@ -95,7 +95,7 @@ frustrates the users of old hardware.
 Including the tables below in programs like mail user agents, news
 readers, gopher clients, file browsers, tty drivers etc. is often a
 trivial task. Users should be able to switch between the different
-tables and the 8-bit transparent normal mode. 
+tables and the 8-bit transparent normal mode.
 
 While I discussed these tables with people from many nations in USENET,
 it became obvious, that there are a lot of differences in the personal
@@ -111,7 +111,7 @@ tables listed below (or give at least a pointer in the source code of
 public domain software, where user-defined tables might be modified for
 local needs).
 
-Users should know if the text they read has been converted from the 
+Users should know if the text they read has been converted from the
 original Latin 1 text, i.e. the conversion should be clearly explained
 in the documentation and perhaps again noticed e.g. after the program
 starts. Otherwise, the conversion might cause confusion in some cases.
@@ -133,7 +133,7 @@ chosen. Other characters with more limited applications like the
 'small German letter sharp s' [ß] were replaced by the most often used
 replacements (e.g. 'ss') instead of graphically more similar characters
 like '3' or 'B'.
- 
+
 First of all, a table with the real characters in the range 160 - 255
 (0xa0 - 0xff):
 
@@ -247,7 +247,8 @@ For the convenience of C programmers, I included the code of these
 tables in this text. Just copy the following lines into your software:
 
 -----------------------------------------------------------------------
-/* Conversion tables for displaying the G1 set (0xa0-0xff) of
+/*
+   Conversion tables for displaying the G1 set (0xa0-0xff) of
    ISO Latin 1 (ISO 8859-1) with 7-bit ASCII characters.
 
    Version 1.1 -- error corrections are welcome
@@ -261,9 +262,10 @@ tables in this text. Just copy the following lines into your software:
      4     table with RFC 1345 codes in brackets
      5     table for printers that allow overstriking with backspace
 
-   Markus Kuhn <mskuhn@immd4.informatik.uni-erlangen.de>                 */
+   Markus Kuhn <mskuhn@immd4.informatik.uni-erlangen.de>
+*/
 
-#define SUB "?"        /* used if no reasonable ASCII string is possible */
+#define SUB "?"		/* used if no reasonable ASCII string is possible */
 #define ISO_TABLES 6
 
 static char *iso2asc[ISO_TABLES][96] = {{
@@ -467,14 +469,14 @@ of Latin 1 conversion support:
 
   - The simplest solution is to allow the user to switch between the
     real 8-bit representation and the above tables
-  - Highly recommended is a feature that allows the user to create his 
-    own table. If this is possible based on one or more of the described 
+  - Highly recommended is a feature that allows the user to create his
+    own table. If this is possible based on one or more of the described
     default tables, the effort needed for defining a private table will
-    be reduced drastically. The system administrator should be allowed 
+    be reduced drastically. The system administrator should be allowed
     to define a default table for his users.
   - More comfortable systems might also allow the user to change the
-    SUB string, to select the style (normal, highlighted, underlined, 
-    blinking, ...) in which the replacement strings are displayed, etc. 
+    SUB string, to select the style (normal, highlighted, underlined,
+    blinking, ...) in which the replacement strings are displayed, etc.
   - You might even think about possibilities for a user to enter
     Latin 1 characters with an old keyboard and editor, a problem
     that hasn't been addressed here.

@@ -201,7 +201,7 @@ get_newsrcname (
 				} while (!strchr ("\033acdq", ch));
 				printf("%c\n", ch);
 				Raw(FALSE);
-				
+
 				switch(ch) {
 					case iKeyNrctblCreate:
 						/* FIXME this doesn't check if we could create the file */

@@ -204,9 +204,9 @@ copy_body (
 				else
 					retcode = fprintf (fp_op, "%s%s", prefix, buf);
 
-			} else 
+			} else
 				retcode = fprintf (fp_op, "\n");
-			
+
 		}
 		if (retcode == EOF) {
 			sprintf (msg, "Failed copy_body(). errno=%d", errno);
@@ -2277,14 +2277,16 @@ get_initials (
 	} else {
 		strcpy (tbuf, arts[respnum].from);
 	}
-	iflag = 1;
+	iflag = 0;
 	j = 0;
-	for (i=0; tbuf[i]; i++) {
-		if (iflag) {
-			s[j++] = tbuf[i];
+	for (i=0; tbuf[i] && j < maxsize-1; i++) {
+		if (isalpha(tbuf[i])) {
+			if (!iflag) {
+				s[j++] = tbuf[i];
+				iflag = 1;
+			}
+		} else
 			iflag = 0;
-		}
-		if (strchr(" ._@", tbuf[i])) iflag = 1;
 	}
 	s[j] = '\0';
 
@@ -2651,5 +2653,6 @@ quote_wild(
 			*target++ = '\\';
 		*target++ = *str;
 	}
+	*target = '\0';
 	return (buff);
 }

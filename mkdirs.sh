@@ -8,7 +8,7 @@
 
 errstatus=0
 
-for file in ${1+"$@"} ; do 
+for file in ${1+"$@"} ; do
    set fnord `echo ":$file" | sed -ne 's/^:\//#/;s/^://;s/\// /g;s/^#/\//;p'`
    shift
 

@@ -97,25 +97,31 @@ resync_active_file (void)
 			old_group[0] = '\0';
 		}
 		vWriteNewsrc ();
+#if 0	/* 1.3beta behaviour, check the on-spool counts */
 		vGrpGetSubArtInfo ();
-#if 0
+#endif
+		/* original 1.2 behaviour, reload the active[] array and all its dependants */
 		free_active_arrays ();
 		max_active = get_active_num ();
 		expand_active ();
 
+		init_group_hash();
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mail_active_file ();
 #endif
+		group_top = 0;
 		read_news_active_file ();
-		read_attributes_file (....);
+
+		read_attributes_file (local_attributes_file, FALSE);
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mailgroups_file ();
 #endif
 		read_newsgroups_file ();
+		/* end of former 1.2 behaviour */
 
-#endif /* #if 0 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
+
 		if (command_line)		/* Can't show only unread groups with cmd line groups */
 			show_only_unread_groups = FALSE;
 		else

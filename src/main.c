@@ -192,6 +192,7 @@ main (
 	/*
 	 * Initialise active[] and add new newsgroups to start of my_group[]
 	 */
+	group_top = 0;
 	read_news_active_file ();
 #ifdef DEBUG
 	debug_print_active();
@@ -613,7 +614,7 @@ read_cmd_line_options (
  *  If we're reading from an NNTP server and we've been asked not to look
  *  for new newsgroups, trust our cached copy of the newsgroups file.
  */
-#ifdef NNTP_ABLE			
+#ifdef NNTP_ABLE
 	if (read_news_via_nntp)
 		read_local_newsgroups_file = ! check_for_new_newsgroups;
 #endif
@@ -869,7 +870,7 @@ show_intro_page (void)
 
 /*
  * Wildcard match any newsgroups on the command line. Sort of like a limited
- * yank at startup
+ * yank at startup. Return number of groups that were matched.
  */
 int
 read_cmd_line_groups (void)

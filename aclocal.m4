@@ -3,7 +3,7 @@ dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
 dnl Updated   : 23.08.97
-dnl Notes     : 
+dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
@@ -113,7 +113,7 @@ dnl values.
 dnl
 dnl Parameters:
 dnl $1 = option name
-dnl $2 = help-string 
+dnl $2 = help-string
 dnl $3 = action to perform if option is not default
 dnl $4 = action if perform if option is default
 dnl $5 = default option value (either 'yes' or 'no')
@@ -676,7 +676,7 @@ make an error
 			ncurses.h
 		do
 			if egrep "NCURSES" $cf_incdir/$cf_header 1>&5 2>&1; then
-				cf_cv_ncurses_header=$cf_incdir/$cf_header 
+				cf_cv_ncurses_header=$cf_incdir/$cf_header
 				test -n "$verbose" && echo $ac_n "	... found $ac_c" 1>&6
 				break
 			fi
@@ -1198,7 +1198,7 @@ int*)
 esac
 case $cf_cv_type_outchar in
 *char*)
-	AC_DEFINE(OUTC_ARGS,char)
+	AC_DEFINE(OUTC_ARGS,char c)
 	;;
 esac
 ])dnl

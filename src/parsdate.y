@@ -6,12 +6,12 @@
  *  Created   : 01-08-90
  *  Updated   : 23-09-94
  *  Notes     : This grammar has 6 shift/reduce conflicts.
- *              Originally written by Steven M. Bellovin <smb@research.att.com> 
- *              while at the University of North Carolina at Chapel Hill.  
- *              Later tweaked by a couple of people on Usenet.  Completely 
- *              overhauled by Rich $alz <rsalz@osf.org> and Jim Berets 
- *              <jberets@bbn.com> in August, 1990. 
- *              Further revised (removed obsolete constructs and cleaned up 
+ *              Originally written by Steven M. Bellovin <smb@research.att.com>
+ *              while at the University of North Carolina at Chapel Hill.
+ *              Later tweaked by a couple of people on Usenet.  Completely
+ *              overhauled by Rich $alz <rsalz@osf.org> and Jim Berets
+ *              <jberets@bbn.com> in August, 1990.
+ *              Further revised (removed obsolete constructs and cleaned up
  *              timezone names) in August, 1991, by Rich.
  *              Paul Eggert <eggert@twinsun.com> helped in September 1992.
  *              Roland Rosenfeld added MET DST code in April 1994.
@@ -222,7 +222,7 @@ zone	: tZONE {
 
 numzone	: tSNUMBER {
 	    int	i;
-	                
+
 	    /* Unix and GMT and numeric timezones -- a little confusing. */
 	    if ($1 < 0) {
 		/* Don't work with negative modulus. */
@@ -605,7 +605,7 @@ LookupWord(
 
     p = buff;
     c = p[0];
-    
+
     /* See if we have an abbreviation for a month. */
     if (length == 3 || (length == 4 && p[3] == '.'))
 	for (tp = MonthDayTable; tp < ENDOF(MonthDayTable); tp++) {
@@ -673,7 +673,7 @@ LookupWord(
 
     /* If we saw any periods, try the timezones again. */
     if (p - buff != length) {
-	c = buff[0];    
+	c = buff[0];
 	for (p = buff, tp = TimezoneTable; tp < ENDOF(TimezoneTable); tp++)
 	    if (c == tp->name[0] && p[1] == tp->name[1]
 	    && strcmp(p, tp->name) == 0) {
@@ -681,7 +681,7 @@ LookupWord(
 		return tp->type;
 	    }
     }
-    
+
     /* Unknown word -- assume GMT timezone. */
     yylval.Number = 0;
     return tZONE;
