@@ -499,8 +499,10 @@ check_article_to_be_posted (
 	t_bool found_followup_to_several_groups = FALSE;
 	t_bool got_long_line = FALSE;
 	struct t_group *psGrp;
-	t_bool saw_sig_dashes = FALSE;
+	int    saw_sig_dashes = 0;
 	int    sig_lines = 0;
+	t_bool wrong_sig_dashes = FALSE;
+	t_bool saw_wrong_sig_dashes = FALSE;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, the_article);
@@ -664,8 +666,11 @@ check_article_to_be_posted (
 		if ( saw_sig_dashes ) {
 			sig_lines++;
 		}
-		if ( !strcasecmp(line, "-- ") ) {
-			saw_sig_dashes = TRUE;	
+		wrong_sig_dashes = !strcmp(line, "--");
+		if ( !strcmp(line, "-- ") || wrong_sig_dashes ) {
+			saw_sig_dashes++;
+			saw_wrong_sig_dashes = saw_wrong_sig_dashes || wrong_sig_dashes;
+			sig_lines=0;
 		}
 		col = 0;
 		for (cp = line; *cp; cp++) {
@@ -681,6 +686,16 @@ check_article_to_be_posted (
 			my_fflush (stderr);
 			got_long_line = TRUE;
 		}
+	}
+	if ( saw_sig_dashes >= 2 ) {
+		setup_check_article_screen (&init);
+		my_fprintf (stderr, txt_warn_multiple_sigs, saw_sig_dashes );
+		my_fflush (stderr);
+	}
+	if ( saw_wrong_sig_dashes ) {
+		setup_check_article_screen (&init);
+		my_fprintf (stderr, txt_warn_wrong_sig_format );
+		my_fflush (stderr);
 	}
 	if ( sig_lines > MAX_SIG_LINES ) {
 		setup_check_article_screen (&init);
@@ -2288,10 +2303,7 @@ mail_bug_report (void)
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
 	FILE *fp;
-	int is_debug;
-	int is_longfiles;
-	int is_nntp;
-	int is_nntp_only;
+	t_bool is_longfiles, is_nntp, is_nntp_only, is_debug;
 
 	msg_init_headers ();
 

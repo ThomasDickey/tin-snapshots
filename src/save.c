@@ -110,11 +110,10 @@ check_start_save_any_news (
 		case SAVE_ANY_NEWS:
 #ifdef VMS
 			joinpath (logfile, rcdir, "log.");
-			if ((fp_log = fopen (logfile, "w", "fop=cif")) == NULL) {
 #else
 			sprintf (logfile, "%s/log", rcdir);
-			if ((fp_log = fopen (logfile, "w")) == NULL) {
 #endif
+			if ((fp_log = fopen (logfile, "w" FOPEN_OPTS)) == NULL) {
 				perror_message (txt_cannot_open, logfile);
 				fp_log = stdout;
 				verbose = FALSE;
@@ -200,11 +199,7 @@ check_start_save_any_news (
 							continue;
 						}
 
-#ifdef VMS
-						if ((fp = fopen (savefile, "w", "fop=cif")) == (FILE *) 0) {
-#else
-						if ((fp = fopen (savefile, "w")) == (FILE *) 0) {
-#endif
+						if ((fp = fopen (savefile, "w" FOPEN_OPTS)) == (FILE *) 0) {
 							fprintf (fp_log, txt_cannot_open, savefile);
 							if (verbose) {
 								perror_message (txt_cannot_open, savefile);
@@ -1396,11 +1391,7 @@ post_process_sh (
 
 		found_header = FALSE;
 
-#ifdef VMS
-		if ((fp_out = fopen (file_out, "w", "fop=cif")) != NULL) {
-#else
-		if ((fp_out = fopen (file_out, "w")) != NULL) {
-#endif
+		if ((fp_out = fopen (file_out, "w" FOPEN_OPTS)) != NULL) {
 			if ((fp_in = fopen (file_in, "r")) != NULL) {
 				ptr1 = sh_pattern_1;
 				ptr2 = sh_pattern_2;

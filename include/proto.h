@@ -38,6 +38,9 @@ extern char *safe_fgets (FILE *fp);
 extern void read_attributes_file (char *file, int global_file);
 extern void write_attributes_file (char *file);
 
+/* auth.c */
+extern t_bool authenticate (char *server, char *user, t_bool startup);
+
 /* charset.c */
 extern void ConvertIso2Asc (char *iso, char *asc, int t);
 extern void ConvertTeX2Iso (char *from, char *to);
@@ -124,7 +127,7 @@ extern int filter_articles (struct t_group *group);
 extern int auto_select_articles (struct t_group *group);
 
 /* getline.c */
-extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int passwd);
+extern char *getline (const char *prompt, int number_only, char *str, int max_chars);
 
 /* group.c */
 extern void decr_tagged (int tag);

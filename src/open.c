@@ -3,7 +3,7 @@
  *  Module    : open.c
  *  Author    : I.Lea & R.Skrenta
  *  Created   : 01-04-91
- *  Updated   : 21-12-94
+ *  Updated   : 21-12-94, 05-04-97
  *  Notes     : Routines to make reading news locally (ie. /usr/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
@@ -15,10 +15,8 @@
 
 #include	"tin.h"
 #include	"tcurses.h"
-#include	"version.h"
 
 #ifdef NNTP_ABLE
-static int authorization (char *server, char *authuser);
 static FILE *nntp_to_fp (void);
 static FILE *stuff_nntp (char *fnam);
 #endif
@@ -27,12 +25,6 @@ long head_next;
 
 /* error message from server */
 char error_response[NNTP_STRLEN];
-
-#ifdef NNTP_ABLE
-int compiled_with_nntp = TRUE;		/* used in mail_bug_report() info */
-#else
-int compiled_with_nntp = FALSE;
-#endif
 
 #ifdef NO_POSTING
 int can_post = FALSE;
@@ -64,8 +56,8 @@ nntp_open (void)
 	if (read_news_via_nntp) {
 		debug_nntp ("nntp_open", "BEGIN");
 
-		if (nntp_server == (char *) 0) {
 		/* do this only once at start-up */
+		if (nntp_server == (char *) 0) {
 			nntp_server = getserverbyfile (NNTP_SERVER_FILE);
 			nntp_tcp_port = atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 		}
@@ -152,6 +144,12 @@ nntp_open (void)
 		}
 #endif	/* HAVE_TIN_NNTP_EXTS */
 
+		/*
+		 * Try to authenticate
+		 */
+		debug_nntp ("nntp_open", "authenticate");
+		authenticate (nntp_server, userid, TRUE);
+
 	}
 #endif	/* NNTP_ABLE */
 
@@ -169,18 +167,6 @@ nntp_close (void)
 	}
 #endif
 }
-
-/*
- * Open the mail active file locally
- */
-#ifdef HAVE_MH_MAIL_HANDLING
-FILE *
-open_mail_active_fp (
-	char *mode)
-{
-	return fopen (mail_active_file, mode);
-}
-#endif
 
 /*
  * Open the news active file locally or send the LIST command via NNTP
@@ -342,10 +328,20 @@ open_subscription_fp (void)
 	}
 }
 
+#ifdef HAVE_MH_MAIL_HANDLING
+/*
+ * Open the mail active file locally
+ */
+FILE *
+open_mail_active_fp (
+	char *mode)
+{
+	return fopen (mail_active_file, mode);
+}
+
 /*
  *  Open mail groups description file.
  */
-#ifdef HAVE_MH_MAIL_HANDLING
 FILE *
 open_mailgroups_fp (void)
 {
@@ -774,15 +770,16 @@ setup_soft_base (group)
  *   Read the article numbers existing in the group into base[]
  *   If the LISTGROUP failed, issue a GROUP command. Use the results to
  *   create a less accurate version of base[]
+ *	 This data will already be sorted
  *   
  * on local spool:
- *   Read the spool dir to populate base[] as above.
+ *   Read the spool dir to populate base[] as above. Sort it.
  *
  * Grow the arts[] and bitmaps as needed.
  * NB: the output will be sorted on artnum
  *
  * top_base is one past top.
- * Returns total number of articles in group.
+ * Returns total number of articles in group, or -1 on error
  */
 
 int
@@ -795,8 +792,6 @@ setup_hard_base (
 	char line[NNTP_STRLEN];
 	long start, last, dummy, count;
 #endif
-	DIR *d;
-	DIR_BUF *e;
 	long art;
 	long total = 0;
 
@@ -836,9 +831,9 @@ setup_hard_base (
 					default:
 						break;
 				}
-				if (STRCMPEQ(line, ".")) {
+				if (STRCMPEQ(line, ".")) {				/* end of text */
 					debug_nntp ("setup_base", line);
-					break;	/* end of text */
+					break;
 				}
 				if (top_base >= max_art) {
 					expand_art ();
@@ -866,7 +861,7 @@ setup_hard_base (
 
 			if (atoi (line) != OK_GROUP) {
 				debug_nntp ("setup_base", "NOT_OK");
-				return total;
+				return (-1);
 			}
 
 			debug_nntp ("setup_base", line);
@@ -889,14 +884,17 @@ setup_hard_base (
 	 * Reading off local spool, read the directory files
 	 */
 	} else {
+		DIR *d;
+		DIR_BUF *e;
+
 		joinpath (buf, group->spooldir, group_path);
 
 		if (access (buf, R_OK) != 0) {
-			return total;
+			error_message(txt_not_exist, "");
+			return (-1);
 		}
 
-		d = opendir (buf);
-		if (d != NULL) {
+		if ((d = opendir (buf)) != NULL) {
 			while ((e = readdir (d)) != NULL) {
 				art = atol (e->d_name/*, D_NAMLEN(e)*/); /*e->d_name should be '\0' terminated... */
 				if (art >= 1) {
@@ -921,93 +919,8 @@ setup_hard_base (
 }
 
 /*
- * process authinfo generic.
- * 0 means succeeded.
- * 1 means failed
- */
-
-#ifndef INDEX_DAEMON
-static int
-authenticate (void)
-{
-#ifdef NNTP_ABLE /* former: HAVE_GENERIC_AUTHINFO */
-	char tmpbuf[NNTP_STRLEN];
-	char authval[NNTP_STRLEN];
-	char *authcmd;
-	FILE *fp;
-	t_bool builtinauth = FALSE;
-	static int cookiefd = -1;
-#ifdef HAVE_PUTENV
-	char *new_env;
-	static char *old_env = 0;
-#endif
-
-	/*
-	 * If we have authenticated before, NNTP_AUTH_FDS already
-	 * exists, pull out the cookiefd. Just in case we've nested.
-	 */
-	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS"))) {
-	    sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
-	}
-
-	if (cookiefd == -1) {
-		char tempfile[BUFSIZ];
-		
-		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);		
-		if (!mktemp(tempfile)) {
-			error_message ("Can't create unique tempfile-name","");
-			return 1;
-		} else {
-			fp = fopen (tempfile, "w+");
-			if (!fp) {
-				error_message ("Can't open %s", tempfile);
-				return 1;
-			}
-		}
-		(void) unlink (tempfile);
-		cookiefd = fileno (fp);
-	}
-
-	strcpy (tmpbuf, "authinfo generic ");
-	strcpy (authval, get_val("NNTPAUTH", ""));
-	if (strlen(authval)) {
-		strcat (tmpbuf, authval);
-	} else {
-		strcat (tmpbuf, "any ");
-		strcat (tmpbuf, userid);
-		builtinauth = TRUE;
-	}
-	put_server (tmpbuf);
-
-#ifdef HAVE_PUTENV
-	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d",
-		fileno(nntp_rd_fp), fileno(nntp_wr_fp), cookiefd);
-	new_env = my_malloc (strlen (tmpbuf)+1);
-	strcpy (new_env, tmpbuf);
- 	putenv (new_env);
-	FreeIfNeeded(old_env);
-	old_env = new_env;
-#else
-	sprintf (tmpbuf, "%d.%d.%d",
-		fileno(nntp_rd_fp), fileno(nntp_wr_fp), cookiefd);
-	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
-#endif
-
-	if (!builtinauth) {
-		return (system (authval));
-	} else {
-		get_server (tmpbuf, sizeof(tmpbuf));
-		return (atoi (tmpbuf) != OK_AUTH);	/* 0 = okay */
-	}
-#else
-	return 1;	/* authentication "failed" */
-#endif	/* NNTP_ABLE; former: HAVE_GENERIC_AUTHINFO */
-}
-#endif /* INDEX_DAEMON */
-
-/*
- *  Get a response code from the server and return it to the caller
- *  Also does AUTHINFO user/pass or GENERIC authorization
+ *  Get a response code from the server and return it to the caller.
+ *  Also does authentication if requested and repeats the last command.
  */
 
 int
@@ -1036,12 +949,9 @@ get_respcode (void)
 		/*
 		 * Server requires authentication.
 		 */
+		debug_nntp ("get_respcode", "authentication");
 		strcpy (savebuf, last_put);
-		/*
-		 * First, try generic authentication; if this fails, try
-		 * AUTHINFO USER/PASS.
-		 */
-		if (authenticate () && !authorization (nntp_server, userid)) {
+		if (!authenticate (nntp_server, userid, FALSE)) {
 			sprintf (line, txt_auth_failed, ERR_ACCESS);
 		} else {
 			strcpy (last_put, savebuf);
@@ -1069,7 +979,6 @@ stuff_nntp (
 	char line[HEADER_LEN];
 	FILE *fp;
 	struct stat sb;
-	int last_line_nolf=0;
 #ifdef SHOW_PROGRESS
 	int count = 0;
 #endif
@@ -1096,7 +1005,7 @@ stuff_nntp (
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
 #endif
-		if (!last_line_nolf && STRCMPEQ(line, "."))		/* end of text */
+		if (STRCMPEQ(line, "."))		/* end of text */
 			break;
 
 		if (!get_server_nolf) {
@@ -1158,149 +1067,6 @@ nntp_to_fp (void)
 	return fp;
 }
 #endif	/* NNTP_ABLE */
-
-#ifdef NNTP_ABLE
-/*
- * NNTP user authorization. Password read from ~/.newsauth
- * The ~/.newsauth authorization file has the format:
- *   nntpserver1 password [user]
- *   nntpserver2 password [user]
- *   etc.
- */
-
-static int
-authorization (
-	char *server,
-	char *authuser)
-{
-	char line[PATH_LEN];
-	char line2[PATH_LEN];
-	char authusername[PATH_LEN];
-	char authpassword[PATH_LEN];
-	char *authpass;
-	char *ptr;
-	FILE *fp;
-	int ret;
-
-	debug_nntp ("authorization", "authinfo");
-
-	joinpath (line, homedir, ".newsauth");
-	authpass = (char *) 0;
-	
-	if ((fp = fopen (line,"r")) == (FILE *) 0) {
-		/*
-		 * if no .newsauth-file given, fall back on console input
-		 */
-		clear_message ();
-		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN, FALSE)) == (char *) 0)
-			return FALSE;
-		strcpy (authusername, ptr);
-		authuser = &authusername[0];
-		clear_message ();
-/*
-** we should use getpass here
-*/
-		if ((ptr = getline (txt_auth_pass_needed, FALSE, (char *) 0, 0, TRUE)) == (char *) 0)
-			return FALSE;
-		strcpy (authpassword, ptr);
-		authpass = &authpassword[0];
-	} else {
-		/*
-		 * Search through authorization file for correct NNTP server
-		 * File has format:  'nntp-server' 'password'
-		 * will return authpass != NULL if any match
-		 */
-		while (fgets (line, PATH_LEN, fp) != (char *) 0) {
-
-			/*
-			 * strip trailing newline character
-			 */
-
-			ptr = strchr (line, '\n');
-			if (ptr != (char *) 0)
-				*ptr = '\0';
-
-			/*
-			 * Get server from 1st part of the line
-			 */
-
-			ptr = strchr (line, ' ');
-
-			if (ptr == (char *) 0)		/* no passwd, no auth, skip */
-				continue;
-
-			*ptr++ = '\0'; 			/* cut of server part */
-
-			if ((strcasecmp(line, server)))
-				continue;		/* wrong server, keep on */
-
-			/*
-			 * Get password from 2nd part of the line
-			 */
-
-			authpass = ptr;
-			while (*authpass == ' ')
-				authpass++;		/* skip any blanks */
-
-			/*
-			 * Get user from 3rd part of the line
-			 */
-
-			ptr = authpass;			/* continue searching here */
-
-			if (*authpass == '"') {		/* skip "embedded" password string */
-				ptr = strrchr (authpass,'"');
-				if ((ptr != (char *) 0) && (ptr > authpass)) {
-					authpass++;
-					*ptr++ = '\0';	/* cut off trailing " */
-				} else			/* no matching ", proceede as normal */
-					ptr = authpass;
-			}
-
-			ptr = strchr (ptr,' ');		/* find next separating blank */
-
-			if (ptr != (char *) 0) {		/* a 3rd argument follows */
-				while(*ptr == ' ')	/* skip any blanks */
-					*ptr++ = '\0';
-				if (*ptr != '\0')	/* if its not just empty */
-					authuser = ptr;	/* so will replace default user */
-			}
-
-			break;	/* if we end up here, everything seems OK */
-		}
-		fclose (fp);
-	}
-	
-	if (authpass == (char *) 0) {
-		error_message (txt_nntp_authorization_failed, server);
-		return FALSE;
-	}
-
-	sprintf (line2, "authinfo user %s", authuser);
-	put_server (line2);
-	get_server (line2, PATH_LEN);
-	ret = atoi (line2);
-	if (ret != NEED_AUTHDATA) {
-		if (ret == OK_AUTH) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	}
-
-	sprintf (line2, "authinfo pass %s", authpass);
-	put_server (line2);
-	get_server (line, PATH_LEN);
-	ret = atoi (line);
-	if (ret != OK_AUTH) {
-		return FALSE;
-	}
-
-	sprintf (line, txt_authorization_ok, authuser);
-	wait_message (line);
-	return TRUE;
-}
-#endif /* NNTP_ABLE */
 
 void
 vGrpGetSubArtInfo (void)
@@ -1445,7 +1211,7 @@ vGrpGetArtInfo (
 
 		if ((tDirFile = opendir (acBuf)) != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-				lArtNum = atol (tFile->d_name/*, (int) D_NAMLEN(tFile)*/); /* should be '\0' terminated... */
+				lArtNum = atol(tFile->d_name); /* should be '\0' terminated... */
 				if (lArtNum >= 1) {
 					if (lArtNum > *plArtMax) {
 						*plArtMax = lArtNum;

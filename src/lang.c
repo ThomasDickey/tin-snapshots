@@ -53,6 +53,7 @@ constext txt_bad_article[] = "Article to be posted has the errors/warnings noted
 constext txt_bad_command[] = "Bad command.  Type 'h' for help.";
 constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
+constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
 constext txt_cannot_find_base_art[] = "Can't find base article %s";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
@@ -1049,6 +1050,9 @@ constext txt_warn_posting_etiquette[] = "\n\
 constext txt_warn_sig_too_long[] ="\n\
   Warning: Your signature is longer then %d lines. Since signatures usualy do\n\
   not transport any useful  information they  should be as short as  possible.\n\n";
+constext txt_warn_multiple_sigs[] ="\n  Warning: found %d '-- \\n' lines, this may confuse some people.\n";
+constext txt_warn_wrong_sig_format[] = "\n\
+  Warning: signatures should start with '-- \\n' not with '--\\n'.\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";

@@ -1,6 +1,37 @@
+--unoff BETA release 970406 --
+
+370) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. Authentication routines moved from open.c to a separate file
+          (auth.c)
+     ADD. Authentication at connection startup (re-)added.
+     ADD. Prompting for the password is now done by getpass(2)
+          instead of getline().
+     ADD. doc/auth.txt revised.
+     FIX. several supplied patches
+
+369) Torsten Neumann <torsten@londo.rhein-main.de>
+     ADD. issue a warning double signatures or malformed signature
+          demiliters
+     ADD. tool/expand_aliases.tgz (might need some work)
+     FIX. several supplied patches
+
+368) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. strip_bogus=ASK now shows groups even with show_only_unread=TRUE
+     ADD. folded Message-ID text into t_msgid
+     BUG. threading problem (from 309)
+     BUG. incorrect display of Newgroup flag (from 351)
+     ADD. general code cleanup
+     FIX. several supplied patches
+     
+367) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Thomas E. Dickey <dickey@clark.net>
+     BUG. reamed valid in prompt.c as Suns K&R compiler didn't like it.
+     BUG. '\t' was treated as 8bit-char
+     FIX. prompt.c, tin.h
+
 --unoff BETA release 970402 --
 
-366) Torsten Neumann <torsten@imke.infodrom.north.de>
+366) Torsten Neumann <torsten@londo.rhein-main.de>
      ADD. issue a warning on signatures longer then MAX_SIG_LINES
      FIX. several supplied patches
 
@@ -1262,7 +1293,7 @@
 
 --unoff BETA release 960814 --
 
-150) Torsten Neumann <torsten@imke.infodrom.north.de>
+150) Torsten Neumann <torsten@londo.rhein-main.de>
      ADD. default entry to newsrctable (* .newsrc-${NNTPSERVER-localhost})
      BUG. ${VAR-fix} expansion in strfpath() did not work correctly
      FIX. misc.c nrctbl.c
@@ -1300,7 +1331,7 @@
      BUG. if DEBUG_NEWSRC tin had problems with the length of .newsrc-lines
      FIX. newsrc.c, sigfile.c
 
-143) Torsten Neumann <torsten@imke.infodrom.north.de>
+143) Torsten Neumann <torsten@londo.rhein-main.de>
      ADD. expansion of ~user/, $HOME to newsrctable
      ADD. ${VAR} expansion to strfpath()
      FIX. misc.c nrctbl.c
@@ -1347,7 +1378,7 @@
           leads to lines longer than 76 chars, due to the buffer overflow.
      FIX. several supplied patches
 
-136) Torsten Neumann <torsten@imke.infodrom.north.de>
+136) Torsten Neumann <torsten@londo.rhein-main.de>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. file permission check for newsrc from newsrctable
      FIX. nrctbl.c
@@ -1373,7 +1404,7 @@
      ADD. don't check for LIB/SPOOL/NOVROOTDIR when NNTP_ONLY
      FIX. configure.in
 
-131) Torsten Neumann <torsten@imke.infodrom.north.de>
+131) Torsten Neumann <torsten@londo.rhein-main.de>
      ADD. --none/! command to default_sigfile
      FIX. config.c, sigfile.c
 
@@ -1401,7 +1432,7 @@
      ADD. autoconf'd declaration of strchr/strrchr
      FIX. several supplied patches
 
-126) Torsten Neumann <torsten@imke.infodrom.north.de>
+126) Torsten Neumann <torsten@londo.rhein-main.de>
      BUG. missing default condition in read_config_file caused tin to
           crash on several systems
      FIX. config.c

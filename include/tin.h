@@ -53,6 +53,10 @@
 #	define DONT_HAVE_PIPING
 #	define NO_SHELL_ESCAPE
 #	define USE_CLEARSCREEN
+	/* Apparently this means fileops=create if not already there - no idea
+	 * why this should be needed. Standard fopen() implies this in arg 2
+	 */
+#	define FOPEN_OPTS	, "fop=cif"
 extern char *get_uaf_fullname();
 
 #	ifdef MULTINET
@@ -80,6 +84,7 @@ extern char *get_uaf_fullname();
 			extern int errno;
 #		endif
 #	endif
+#	define FOPEN_OPTS
 #endif
 
 #ifdef HAVE_STDDEF_H
@@ -968,8 +973,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define SUB_CHAR(x)	(x ? SUBSCRIBED : UNSUBSCRIBED)
 /* Converts .newsrc subscription char to boolean */
 #define SUB_BOOL(x)	(x == SUBSCRIBED)
-/* Only write newsrc line if subscribed and not stripping */
-#define WRITE_NEWSRC(x)		(x == SUBSCRIBED || !strip_newsrc)
 
 /*
  * filter_type used in struct t_filter
@@ -1111,11 +1114,11 @@ typedef unsigned char	t_bitmap;
 struct t_msgid
 {
 	struct t_msgid *next;		/* Next in hash chain */
-	char *txt;			/* The actual msgid */
 	struct t_msgid *parent;		/* Message-id followed up to */
 	struct t_msgid *sibling;	/* Next followup to parent */
 	struct t_msgid *child;		/* First followup to this article */
 	int article;			/* index in arts[] or ART_NORMAL */
+	char txt[1];			/* The actual msgid */
 };
 
 /*
@@ -1651,7 +1654,7 @@ extern void joinpath (char *result, char *dir, char *file);
  * sign-extension, and a corresponding test-macro.
  */
 #define EIGHT_BIT(ptr) (unsigned char *)ptr
-#define is_EIGHT_BIT(p) (*EIGHT_BIT(p) < 32 || *EIGHT_BIT(p) > 127)
+#define is_EIGHT_BIT(p) ((*EIGHT_BIT(p) < 32 && !isspace(*p)) || *EIGHT_BIT(p) > 127)
 
 /*
  *  function prototypes & extern definitions

@@ -58,11 +58,13 @@ use ansi color.
 .TP
 .B -c
 create/update index files for every group in \fI$HOME/.newsrc\fP or
-file specified by the -f option and mark all articles as read.
+file specified by the \fB-f\fR option and mark all articles as read.
+.TP
 .B -C
 count articles for each subscribed group at startup. With a large number of
 groups this will be slow. However the number of unread articles in each
 group will be accurate.
+.TP
 .B -d
 delete index files for each group before indexing article (tind index daemon
 only).
@@ -89,7 +91,7 @@ mail unread articles to specified user for later reading.  For more
 information read section Automatic Mailing and Saving New News. 
 .TP
 .BI -n
-Only load groups from the active file that are also subscribed to in the
+Only load groups from the active file that are subscribed to in the
 user's \fI.newsrc\fP.  This allows a noticeable speedup when connecting
 via a slow line.
 .TP
@@ -104,12 +106,10 @@ This is fast, but \fItin\fP cannot tell which groups are moderated.
 .TP
 .BI -P
 purge group index files of articles that no longer exist.
-Care should
-be taken when using this command as it checks each and every article
-in each group that is accessed.
-On a low speed connection this can
-have an undesirable effect and it also knocks the hell out of your 
-filesystem.
+Care should be taken when using this command as it checks each and
+every article in each group that is accessed.
+On a low speed connection this can have an undesirable effect and it also
+knocks the hell out of your filesystem.
 .TP
 .B -r
 read news remotely from the default NNTP server specified in the
@@ -123,12 +123,12 @@ read news saved by the -S option (not yet implemented).
 save articles to directory.  Default is \fI$HOME/News\fP.
 .TP
 .B -S
-save unread articles for later reading by the -R option.  For more information
-read section Automatic Mailing and Saving New News.
+save unread articles for later reading by the \fB-R\fR option.  For more
+information read section Automatic Mailing and Saving New News.
 .TP
 .B -u
 create/update index files for every group in \fI$HOME/.newsrc\fP or
-file specified by the -f option.  This option is disabled if \fItin\fP 
+file specified by the \fB-f\fR option.  This option is disabled if \fItin\fP 
 retrieves its index files via a NNTP server. 
 .TP
 .B -U
@@ -178,13 +178,16 @@ Once you use 'y' to yank in all active groups, or 'r' to toggle the
 read/unread status, then the command line groups will be gone. You
 can use 'Y' to reread the active file and get them back.
 .PP
-NB: With the -n flag, only unsubscribed groups in the .newsrc file
+NB: With the \fB-n\fR flag, only unsubscribed groups in the \fI.newsrc\fP file
 can be matched.
 .PP
 .SH "INDEX FILES"
-In order to keep track of threads, \fItin\fP maintains an index for each 
-newsgroup. There are a number of methods in which index files can be created 
-and updated.
+If your news server supports NOV index files (most modern installations will),
+then this section can be ignored.
+.PP
+If your news server doesn't support NOV index files, \fItin\fP tin will
+maintain an index for each newsgroup. There are a number of methods in which
+index files can be created and updated.
 .PP
 The simplest method is that each user creates/updates his/her own index files
 that are stored in \fI$HOME/.tin/.news\fP. This has the advantage that any 
@@ -272,23 +275,44 @@ At the Group Selection level the title displays (the name of the newsserver
 and) the number of subscribed groups (containing new unread articles).  The
 newsgroups are displayed in the middle of the screen with the
 number of unread articles displayed on the same line in front.
+.PP
 .TS
 expand tab (#);
 rB rB l lB l lB .
-      1#     2#  #news.admin.technical#      #Technical aspect
+1#2##news.admin.technical##Technical aspect
 2#157##news.software.readers##Discussion of so
 3#5##comp.sources.misc##Diskussionen ueb
 4#17##de.admin.news.net-abuse.misc##Diskussion ueber
 .TE
+
+There may also be a character prefixing the line. An explanation follows:
+.TP 10
+\fBu\fP
+This group is unsubscribed. To see only your subscribed groups use the 'r'
+or 'y' toggle keys.
+.TP
+\fBN\fP
+This is a new newsgroup which has been created since you last used \fItin\fP.
+New newsgroups are not subscribed to by default. Subscribe to it in the normal
+way if you wish the group to continue to appear in your Selection Menu. 
+Simply ignore new newsgroups and they will be gone the next time you start
+\fItin\fP. You will have to yank in all the groups to find them in a later
+session.
+.TP
+\fBD\fP
+This group no longer exists. If you no longer wish to see this group then
+unsubscribe from it in the normal way. This flag will only appear if
+you have set strip_bogus=Ask in the Options Menu.
 .PP
 At the Group level the title contains the name of the group, the number
 of conversation threads and total number of articles i.e., alt.sources (7 23).
 If the group has been setup not to thread articles (i.e., alt.sources
 is in \fI$(HOME)/.tin/unthread\fP) the title will be alt.sources (U 23).
+.PP
 .TS
 expand tab (#);
 rB lB l lB l lB l lB .
-      1#  + 2# #18#  #Bnews sources?#  #iain@scn.de
+1#  + 2# #18#  #Bnews sources?#  #iain@scn.de
 2#  + 17##1275##Plese Help! I Have A Problem!##dau@lus.er
 .TE
 .PP
@@ -978,11 +1002,6 @@ If set ON the user is asked when quitting if all groups read during the
 current session should be marked read.
 .TP
 \fBThread articles\fP
-If set to NONE, articles will be shown unthreaded.
-If set to SUBJ, articles will be threaded on the Subject line.
-If set to REFS, articles will be threaded using the References header.
-If set to BOTH(default), articles will be threaded using References and
-then by Subject.
 Threading type is possible on a per group basis by setting the group
 attribute variable 'thread_arts' to 0 - 3 in the file
 \fI$HOME/.tin/attributes\fP.
@@ -1373,6 +1392,18 @@ cursor will be positioned at the first line. Default is ON.
 Strips the blanks from the end of each line therefore speeding up the display
 when reading on a slow terminal or via modem. Default is ON.
 .TP 4
+\fBstrip_bogus\fP
+Bogus groups are groups that are present in your \fI.newsrc\fP file that
+no longer exist on the news server. There are 3 options. 0 means do
+nothing & always keep bogus groups. 1 means bogus groups will be
+permanently removed. 2 means that bogus groups will appear on the Group
+Selection Menu, prefixed with a 'D'. This allows you to unsubscribe
+from them as and when you wish. Default is 0 (Always Keep).
+.TP 4
+\fBstrip_newsrc\fP
+If ON, then unsubscribed groups will be permanently removed from
+your \fI.newsrc\fP file. Default is OFF.
+.TP 4
 \fBtab_after_X_selection\fP
 If enabled will automatically goto the first unread article after having
 selected all hot articles and threads with the 'X' command at group index
@@ -1629,6 +1660,7 @@ PHONE  +49-911-978-3120 (work)
 .ft P
 .fi
 .RE
+.PP
 \fITin\fP also has the capability to generate random signatures on a per
 newsgroup basis if so desired. The way to accomplish this is to specify
 the default signature or the group attribute sigfile as a directory.
@@ -1948,39 +1980,7 @@ Rob Kolstad in 1982.
 .PP
 v1.0 PL0 (full) was posted in 8 parts to alt.sources on 23 Aug 1991.
 .br
-v1.0 PL1 (full) was posted in 8 parts to alt.sources on 03 Sep 1991.
-.br
-v1.0 PL2 (full) was posted in 9 parts to alt.sources on 24 Sep 1991.
-.br
-v1.0 PL3 (patch) was posted in 4 parts to alt.sources on 30 Sep 1991.
-.br
-v1.0 PL4 (patch) was posted in 2 parts to alt.sources on 02 Oct 1991.
-.br
-v1.0 PL5 (patch) was posted in 4 parts to alt.sources on 17 Oct 1991.
-.br
-v1.0 PL6 (patch) was posted in 5 parts to alt.sources on 27 Nov 1991.
-.br
-v1.0 PL7 (patch) was posted in 2 parts to alt.sources on 27 Nov 1991.
-.br
 v1.1 PL0 (full) was posted in 11 parts to alt.sources on 13 Feb 1992.
-.br
-v1.1 PL1 (full) was posted in 12 parts to alt.sources on 24 Mar 1992.
-.br
-v1.1 PL2 (patch) was posted in 4 parts to alt.sources on 30 Mar 1992.
-.br
-v1.1 PL3 (full) was posted in 15 parts to alt.sources on 13 May 1992.
-.br
-v1.1 PL4 (full) was posted in 15 parts to alt.sources on 22 Jun 1992.
-.br
-v1.1 PL5 (patch) was posted in 7 parts to alt.sources on 11 Aug 1992.
-.br
-v1.1 PL6 (full) was posted in 15 parts to alt.sources on 14 Sep 1992.
-.br
-v1.1 PL7 (patch) was posted in 10 parts to alt.sources on 15 Nov 1992.
-.br
-v1.1 PL8 (patch) was posted in 6 parts to alt.sources on 06 Dec 1992.
-.br
-v1.1 PL9 (patch) was posted in 3 parts to alt.sources on 20 Mar 1993.
 .br
 v1.2 PL0 (full) was posted in 14 parts to alt.sources on 25 May 1993.
 .br
@@ -1988,10 +1988,11 @@ v1.2 PL1 (patch) was posted in 8 parts to alt.sources on 14 Jul 1993.
 .br
 v1.2 PL2 (patch) was posted in 5 parts to alt.sources on 25 Sep 1993.
 .br
-v1.3 PL0 beta is available from ftp.scn.de:/pub/news/tin since April 1995.
+v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin since April 1995.
 .br
-v1.3 PLM beta is available from ftp.akk.uni-karlsruhe.de:/pub/tin/
+v1.3-unoff-beta has been available from ftp.akk.uni-karlsruhe.de:/pub/tin/
 since March 1996.
+
 .SH CREDITS
 .TP 1.5i
 Rich Skrenta

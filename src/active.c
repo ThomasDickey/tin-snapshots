@@ -238,8 +238,6 @@ parse_active_line (
 	*min = atol (q);
 	strcpy(moderated, r);
 
-	/* TODO - if local, test if spooldir exists so we bounce bad groups ? */
-	/* Currently done in vGGAI() */
 	return(TRUE);
 }
 
@@ -303,12 +301,12 @@ read_news_active_file (void)
 			if (cmd_line)
 				my_fputc ('\n', stderr);
 
-			if (compiled_with_nntp) {
+#ifdef NNTP_ABLE
 				sprintf (msg, txt_cannot_open_active_file, news_active_file, progname);
 				error_message (msg, "");
-			} else {
+#else
 				error_message (txt_cannot_open, news_active_file);
-			}
+#endif
 
 			tin_done (EXIT_ERROR);
 		}
@@ -387,11 +385,7 @@ backup_active (
 		}
 	}
 
-#ifdef VMS
-	if ((fp = fopen (buf, "w", "fop=cif")) != (FILE *) 0) {
-#else
-	if ((fp = fopen (buf, "w")) != (FILE *) 0) {
-#endif
+	if ((fp = fopen (buf, "w" FOPEN_OPTS)) != (FILE *) 0) {
 		for (i = 0; i < num_active ; i++) {	/* for each group */
 			fprintf (fp, "%s\n", active[i].name);
 		}

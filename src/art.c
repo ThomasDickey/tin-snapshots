@@ -142,7 +142,8 @@ index_group (
 	BegStopWatch("setup_base");
 #endif	/* PROFILE */
 
-	(void) setup_hard_base (group, group_path);
+	if (setup_hard_base (group, group_path) < 0)
+		return(FALSE);
 
 #ifdef	PROFILE
 	EndStopWatch();

@@ -435,7 +435,7 @@ vDbgPrintMalloc (
 
 
 #ifdef DEBUG
-void
+static void
 debug_print_filter (
 	FILE *fp,
 	int num,

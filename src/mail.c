@@ -169,11 +169,7 @@ read_newsgroups_file (void)
 
 	if ((fp = open_newsgroups_fp ()) != (FILE *) 0) {
 		if (read_news_via_nntp && !read_local_newsgroups_file) {
-#ifdef VMS
-			fp_save = fopen (local_newsgroups_file, "w", "fop=cif");
-#else
-			fp_save = fopen (local_newsgroups_file, "w");
-#endif
+			fp_save = fopen (local_newsgroups_file, "w" FOPEN_OPTS);
 		}
 
 		read_groups_descriptions (fp, fp_save);
