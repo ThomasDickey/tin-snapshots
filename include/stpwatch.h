@@ -78,6 +78,6 @@ float d_time;
 #define BegStopWatch(msg)
 #define EndStopWatch()
 #define PrintStopWatch()
-	
+
 #endif	/* PROFILE */
 #endif	/* !STPWATCH_H */

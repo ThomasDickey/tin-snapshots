@@ -18,7 +18,7 @@ check the docs in the main directory. It may be, that this file is not
 really up-to-date. Query the document version string for the last
 change:
 
-$VER: tin-unoff.readme 0.2 (03.09.97)
+$VER: tin-unoff.readme 0.3 (08.10.97)
 
 1. Building tin-unoff.
 
@@ -50,8 +50,9 @@ I am using the bison from ADE and it works fine, although the parser
 skeleton contains an alloca(). (Yikes!)
 
 If you are building a NNTP-version, the correct SDK's must be installed.
-AmiTCP SDK is available from Aminet, the AS/Inet 225 SDK is available
-from the Developer CD 1.1.
+Read the readme's closely to see how they are installed. AmiTCP SDK is
+available from Aminet, the AS/Inet 225 SDK is available from the
+Developer CD 1.1.
 
 First edit the smakefile to suit your needs. Especially take care of
 DEBUG, LDEBUG, SCOPTIONS, OPTIMIZE and DEFINES. You might want piping
@@ -132,6 +133,9 @@ Reinhard Luebke
 Volker Barthelmann
 
 Also a big "Thank You" to Iain Lea for the original program.
+
+The scoring routines are dedicated to Tobias "Top" Walter, who
+celebrated birthday on the day I constructed the diff.
 
 I hope no name is missing here.
 

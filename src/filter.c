@@ -3,36 +3,44 @@
  *  Module    : filter.c
  *  Author    : I.Lea
  *  Created   : 28-12-92
- *  Updated   : 21-12-94
+ *  Updated   : 07-10-97
  *  Notes     : Filter articles. Kill & auto selection are supported.
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
+ *
+ *              update for scoring (c) 1997 by Oliver B. Warzecha
  */
 
 #include	"tin.h"
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-#define IS_READ(i)		(arts[i].status == ART_READ)
-#define IS_KILLED(i)		(arts[i].killed)
+#define IS_READ(i)	(arts[i].status == ART_READ)
+#define IS_KILLED(i)	(arts[i].killed)
 #define IS_SELECTED(i)	(arts[i].selected)
 
+/* SET_FILTER in group grp, current article arts[i], with rule ptr[j] */
+/* 
+ * filtering is now done this way:
+ * a. set score for all articles and rules
+ * b. check each article if the score is above or below the limit
+ */
+
 #define	SET_FILTER(grp,i,j)	\
-	if (ptr[j].type == FILTER_KILL) { \
-		if (!IS_KILLED(i) && !IS_SELECTED(i)) { \
-			arts[i].killed = TRUE; \
-			art_mark_read (grp, &arts[i]); \
-		} \
+	if (ptr[j].score > 0) { \
+		arts[i].score = (SCORE_MAX - ptr[j].score >= arts[i].score) ? \
+		(arts[i].score + ptr[j].score) : SCORE_MAX ; \
 	} else { \
-		if (!IS_SELECTED(i)) { \
-			arts[i].selected = TRUE; \
-			arts[i].killed = FALSE; \
-			num_of_selected_arts++; \
-		} \
-	}
+		arts[i].score = (-SCORE_MAX - ptr[j].score <= arts[i].score) ? \
+		(arts[i].score + ptr[j].score) : -SCORE_MAX ; }
+
+/*
+ * SET_FILTER is now somewhat shorter, as the real filtering is done
+ * at the end of filter_articles()
+ */
 
 /*
  * global filter array
@@ -46,7 +54,6 @@ struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 /*
 ** Local prototypes
 */
-static char *pcChkRegexStr (char *pcStr);
 static int get_choice (int x, const char *help, const char *prompt, const char *opt1, const char *opt2, const char *opt3, const char *opt4, const char *opt5);
 static int iAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
 static int unfilter_articles (void);
@@ -81,6 +88,10 @@ psExpandFilterArray (
 	return new;
 }
 
+/* 
+ * vSetFilter() initialises a struct t_filter with default values
+ */ 
+
 
 #ifndef INDEX_DAEMON
 static void
@@ -98,14 +109,18 @@ vSetFilter (
 		psFilter->msgid = (char *) 0;
 		psFilter->lines_cmp = FILTER_LINES_NO;
 		psFilter->lines_num = 0;
+		psFilter->score = 0;
 		psFilter->xref = (char *) 0;
-		psFilter->xref_max=0;
-		psFilter->xref_score_cnt=0;
+		psFilter->xref_max = 0;
+		psFilter->xref_score_cnt = 0;
 		psFilter->time = 0L;
 	}
 }
 #endif /* INDEX_DAEMON */
 
+/*
+ * free_filter_item() frees all filter data (char *)
+ */
 
 static void
 free_filter_item (
@@ -117,6 +132,10 @@ free_filter_item (
 	FreeAndNull(ptr->msgid);
 	FreeAndNull(ptr->xref);
 }
+
+/*
+ * free_filter_array() frees t_filter structs t_filters contains pointers to
+ */
 
 static void
 free_filter_array (
@@ -184,6 +203,7 @@ read_filter_file (
 	int global = TRUE;
 	int i = 0;
 	int icase = 0, type = -1;
+	int score = 0;
 	int xref_max = 0;
 	int xref_score_cnt = 0;
 	int xref_score_value = 0;
@@ -282,10 +302,9 @@ if (debug) {
 				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
 				}
-				break;
 			}
 			break;
-		case 's':
+		case 's': /* could it be the parsing is crude? one "scope" sets the scope for all following entries? */
 			if (match_string (buf+1, "cope=", scope, sizeof (scope))) {
 if (debug) {
 	my_printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
@@ -329,7 +348,28 @@ if (debug) {
 }
 				break;
 			}
+			/*
+			 *  read score for rule
+			 */
+
+			if (match_integer (buf+1, "core=", &score, 0)) {
+if (debug) {
+	my_printf ("score=[%d]\n", score);
+	my_flush();
+}
+				if (arr_ptr && !expired_time) {
+					if (score > SCORE_MAX)
+						score = SCORE_MAX;
+					else if (score < -SCORE_MAX)
+						score = -SCORE_MAX;
+					if ((arr_ptr[i].type == FILTER_KILL && score > 0) || (arr_ptr[i].type == FILTER_SELECT && score < 0))
+						score = -score;
+					arr_ptr[i].score = score;
+				}
+				break;
+			}
 			break;
+
 		case 't':
 			if (match_integer (buf+1, "ype=", &type, 1)) {
 if (debug) {
@@ -360,6 +400,7 @@ if (debug) {
 				}
 				if (arr_ptr) {
 					arr_ptr[i].type = type;
+					arr_ptr[i].score = type == 0 ? SCORE_KILL : SCORE_SELECT;
 				}
 				break;
 			}
@@ -454,6 +495,7 @@ vWriteFilterFile (
 	fprintf (hFp, "#   scope=STRING      Newsgroups (e.g. comp.*)    [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
 	fprintf (hFp, "#   case=NUM          Compare=0 / ignore=1 case when filtering\n");
+	fprintf (hFp, "#   score=NUM         Score to give (e.g. 70)\n");
 	fprintf (hFp, "#   subj=STRING       Subject: line (e.g. How to be a wizard)\n");
 	fprintf (hFp, "#   from=STRING       From: line (e.g. *Craig Shergold*)\n");
 	fprintf (hFp, "#   msgid=STRING      Message-ID: line (e.g. <123@ether.net>)\n");
@@ -471,6 +513,7 @@ vWriteFilterFile (
 	fprintf (hFp, "#   group=STRING      Newsgroup (e.g. alt.flame)  [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
 	fprintf (hFp, "#   case=NUM          Compare=0 / ignore=1 case when filtering\n");
+	fprintf (hFp, "#   score=NUM         Score to give\n");
 	fprintf (hFp, "#   subj=STRING       Subject: line\n");
 	fprintf (hFp, "#   from=STRING       From: line\n");
 	fprintf (hFp, "#   msgid=STRING      Message-ID: line\n");
@@ -522,6 +565,7 @@ case=1
 subj=*xv*
 
 should work - but didn't with changing order of filterfile
+Isn't that a non-issue with scoring anyway?
 */
 
 #ifndef INDEX_DAEMON
@@ -557,14 +601,16 @@ my_flush ();
 */
 				fprintf (fp, "scope=%s\n",
 					(ptr->filter[i].scope != (char *) 0 ? ptr->filter[i].scope : "*"));
-			}
+		}
 /*
 my_printf ("PtrType=[%d] FilType=[%d]" cCRLF, ptr->filter[i].type, write_filter_type);
 my_flush ();
 */
 			fprintf (fp, "type=%d\n", ptr->filter[i].type);
 			fprintf (fp, "case=%d\n", ptr->filter[i].icase);
-
+			if (ptr->filter[i].score != 0) {
+				fprintf (fp, "score=%d\n", ptr->filter[i].score);
+			}
 			if (ptr->filter[i].subj != (char *) 0) {
 				fprintf (fp, "subj=%s\n", ptr->filter[i].subj);
 			}
@@ -601,7 +647,8 @@ my_flush ();
 			}
 			if (ptr->filter[i].time) {
 				fprintf (fp, "time=%ld\n", ptr->filter[i].time);
-		}
+			}
+		fprintf (fp, "#####\n"); /* makes filter file more readable */
 	}
 
 	fflush (fp);
@@ -677,6 +724,7 @@ filter_menu (
 	const char *ptr_filter_time;
 	const char *ptr_filter_help_scope;
 	const char *ptr_filter_quit_edit_save;
+	const char *ptr_filter_score;
 	char argv[4][PATH_LEN];
 	char buf[LEN];
 	char text_from[PATH_LEN];
@@ -701,6 +749,7 @@ filter_menu (
 	rule.msgid_ok = FALSE;
 	rule.subj_ok = FALSE;
 	rule.type = type;
+	rule.score = 0;
 	rule.expire_time = FALSE;
 	rule.check_string = FALSE;
 
@@ -732,6 +781,12 @@ filter_menu (
 		ptr_filter_quit_edit_save = txt_quit_edit_save_select;
 	}
 
+	/*
+	 *  TODO: move all scoring text to lang.c
+	 */
+
+	ptr_filter_score = "Enter score for rule (default=100): ";
+
 	len = cCOLS - 30;
 
 	sprintf (text_time, txt_time_default_days, default_filter_days);
@@ -749,13 +804,14 @@ filter_menu (
 	center_line (0, TRUE, ptr_filter_menu);
 
 	MoveCursor (INDEX_TOP, 0);
-	my_printf ("%s" cCRLF cCRLF, ptr_filter_text);
-	my_printf ("%s" cCRLF cCRLF cCRLF, txt_filter_text_type);
-	my_printf ("%s" cCRLF cCRLF, text_subj);
-	my_printf ("%s" cCRLF cCRLF, text_from);
-	my_printf ("%s" cCRLF cCRLF cCRLF, text_msgid);
-	my_printf ("%s" cCRLF cCRLF, ptr_filter_lines);
-	my_printf ("%s" cCRLF cCRLF cCRLF, ptr_filter_time);
+	my_printf ("%s" cCRLF, ptr_filter_text);
+	my_printf ("%s" cCRLF cCRLF, txt_filter_text_type);
+	my_printf ("%s" cCRLF , text_subj);
+	my_printf ("%s" cCRLF , text_from);
+	my_printf ("%s" cCRLF cCRLF, text_msgid);
+	my_printf ("%s" cCRLF , ptr_filter_lines);
+	my_printf ("%s" cCRLF , ptr_filter_score);
+	my_printf ("%s" cCRLF cCRLF, ptr_filter_time);
 	my_printf ("%s%s", ptr_filter_scope, group->name);
 	my_flush ();
 
@@ -766,7 +822,7 @@ filter_menu (
 	}
 
 	if (rule.text[0]) {
-		i = get_choice (INDEX_TOP+2, txt_help_filter_text_type,
+		i = get_choice (INDEX_TOP+1, txt_help_filter_text_type,
 			       txt_filter_text_type,
 			       txt_subj_line_only_case,
 			       txt_subj_line_only,
@@ -783,7 +839,7 @@ filter_menu (
 		/*
 		 * Subject:
 		 */
-		i = get_choice (INDEX_TOP+5, txt_help_filter_subj,
+		i = get_choice (INDEX_TOP+3, txt_help_filter_subj,
 			        text_subj, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		if (i == -1) {
@@ -795,11 +851,11 @@ filter_menu (
 		 * From:
 		 */
 		if (rule.subj_ok) {
-			i = get_choice (INDEX_TOP+7, txt_help_filter_from,
+			i = get_choice (INDEX_TOP+4, txt_help_filter_from,
 			        text_from, txt_no, txt_yes,
 				(char *)0, (char *)0, (char *)0);
 		} else {
-			i = get_choice (INDEX_TOP+7, txt_help_filter_from,
+			i = get_choice (INDEX_TOP+4, txt_help_filter_from,
 			        text_from, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		}
@@ -816,11 +872,11 @@ filter_menu (
 		 * Message-Id:
 		 */
 		if (rule.subj_ok || rule.from_ok) {
-			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid,
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid,
 			        text_msgid, txt_no, txt_yes,
 				(char *)0, (char *)0, (char *)0);
 		} else {
-			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid,
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid,
 			        text_msgid, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		}
@@ -841,7 +897,7 @@ filter_menu (
 	show_menu_help (txt_help_filter_lines);
 
 	buf[0] = '\0';
-	if (!prompt_menu_string (INDEX_TOP+12, (int) strlen (ptr_filter_lines), buf)) {
+	if (!prompt_menu_string (INDEX_TOP+7, (int) strlen (ptr_filter_lines), buf)) {
 		return FALSE;
 	}
 
@@ -866,6 +922,27 @@ filter_menu (
 	if (rule.lines_cmp != FILTER_LINES_NO && rule.lines_num >= 0) {
 		rule.lines_ok = TRUE;
 	}
+	/*
+	 * Scoring value
+	 */
+	buf[0] = '\0';
+	show_menu_help("Enter the score weight (range 0 < score <= 10000)"); /* FIXME: a sprintf() is necessary here */
+	if (!prompt_menu_string(INDEX_TOP+8, (int)strlen(ptr_filter_score), buf)) {
+		return FALSE;
+	}
+	rule.score = atoi(buf);
+	/*
+	 *  assure we are in range
+	 */
+	if (rule.score <= 0) {
+		rule.score = SCORE_DEFAULT;
+	}
+	else if (rule.score > SCORE_MAX) {
+		rule.score = SCORE_MAX;
+	}
+	if (type == FILTER_KILL) {
+		rule.score = -rule.score;
+	}
 
 	/*
 	 * Expire time
@@ -874,7 +951,7 @@ filter_menu (
 	strcat(double_time, text_time);
 	strcpy(quat_time, "4x ");
 	strcat(quat_time, text_time);
-	i = get_choice (INDEX_TOP+14, txt_help_filter_time,
+	i = get_choice (INDEX_TOP+9, txt_help_filter_time,
 			ptr_filter_time, txt_unlimited_time, text_time,
 			double_time, quat_time, (char *)0);
 	if (i == -1) {
@@ -908,7 +985,7 @@ filter_menu (
 			argv[2][0] = '\0';
 		}
 
-		i = get_choice (INDEX_TOP+17, ptr_filter_help_scope,
+		i = get_choice (INDEX_TOP+11, ptr_filter_help_scope,
 			       ptr_filter_scope,
 			       (argv[0][0] ? argv[0] : (char *)0),
 			       (argv[1][0] ? argv[1] : (char *)0),
@@ -935,8 +1012,12 @@ filter_menu (
 				ch = ch_default;
 		} while (!strchr ("eqs\033", ch));
 		switch (ch) {
+/*
+ *  what is this? when you edit the filter_file the rule is not saved?
+ */
+
 		case iKeyFilterEdit:
-			start_line_offset = 22;
+			start_line_offset = 22; /* FIXME: check it out */
 			invoke_editor (local_filter_file, start_line_offset);
 			unfilter_articles ();
 #ifndef INDEX_DAEMON
@@ -1025,6 +1106,7 @@ quick_filter_kill (
 	rule.icase = group->attribute->quick_kill_case;
 	rule.expire_time = group->attribute->quick_kill_expire;
 	rule.check_string = TRUE;
+	rule.score = SCORE_KILL;
 
 	filtered = iAddFilterRule (group, art, &rule);
 
@@ -1086,6 +1168,7 @@ quick_filter_select (
 	rule.icase = group->attribute->quick_select_case;
 	rule.expire_time = group->attribute->quick_select_expire;
 	rule.check_string = TRUE;
+	rule.score = SCORE_SELECT;
 
 	filtered = iAddFilterRule (group, art, &rule);
 
@@ -1131,6 +1214,7 @@ quick_filter_select_posted_art (
 		rule.icase = FALSE;
 		rule.expire_time = TRUE;
 		rule.check_string = TRUE;
+		rule.score = SCORE_SELECT;
 
 		filtered = iAddFilterRule (group, &art, &rule);
 
@@ -1189,6 +1273,7 @@ iAddFilterRule (
 	psPtr[*plNum].msgid = (char *) 0;
 	psPtr[*plNum].lines_cmp = psRule->lines_cmp;
 	psPtr[*plNum].lines_num = psRule->lines_num;
+	psPtr[*plNum].score = psRule->score;
 	psPtr[*plNum].xref = (char *) 0;
 	psPtr[*plNum].xref_max = 0;
 	psPtr[*plNum].xref_score_cnt = 0;
@@ -1217,7 +1302,7 @@ iAddFilterRule (
 	if (psRule->text[0]) {
 		sprintf (acBuf, "*%s*", psRule->text);
 		if (psRule->check_string) {
-			strcpy (acBuf, pcChkRegexStr (acBuf));
+			strncpy (acBuf, quote_wild(acBuf),PATH_LEN);
 		}
 		switch (psRule->counter) {
 			case FILTER_SUBJ_CASE_IGNORE:
@@ -1246,7 +1331,7 @@ iAddFilterRule (
 		if (psRule->subj_ok) {
 			sprintf (acBuf, "*%s*", quote_wild(psArt->subject));
 			if (psRule->check_string) {
-				strcpy (acBuf, pcChkRegexStr (acBuf));
+				strncpy (acBuf, quote_wild (acBuf), PATH_LEN);
 			}
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
@@ -1308,6 +1393,7 @@ unfilter_articles (void) /* return value is always ignored */
 		if (arts[i].killed) {
 			arts[i].killed = FALSE;
 			arts[i].status = ART_UNREAD;
+			arts[i].score = 0;
 			unkilled++;
 		}
 	}
@@ -1346,7 +1432,7 @@ filter_articles (
 	}
 
 	/*
-	 * Apply global filter first if it has any entries
+	 * Apply global filter rules first if there are any entries
 	 */
 	if (group->glob_filter->num) {
 		/*
@@ -1377,11 +1463,10 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 	 * loop thru all arts applying global & local filtering rules
 	 */
 	for (i=0 ; i < top ; i++) {
-/* TODO - this seems to be the crux of the kill_level stuff */
-		if (IS_READ(i) || IS_SELECTED(i)) {
+		if (IS_READ(i)) { /* skip only when the article is read */
 			continue;
 		}
-
+		arts[i].score = 0;
 		for (j=0 ; j < num ; j++) {
 			if (ptr[j].inscope) {
 				/*
@@ -1415,9 +1500,9 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 
 					struct t_article *art = &arts[i];
 					char *refs;
-/* TODO This is now rubbish - we can rewrite filtering on MsgID & Refs
- * TODO to traverse the references tree in *1* pass for the whole group
- * TODO Simply find the root art and SET_FILTER(every child)
+/* TODO nice idea del'd; better apply one rule on all fitting
+ * TODO articles, so we can switch to an appropriate algorithm
+ * TODO for each kind of rule, including the deleted one.
  */
 					if (REGEX_MATCH (REFS(art, refs), ptr[j].msgid, FALSE) ||
 					    REGEX_MATCH (MSGID(art), ptr[j].msgid, FALSE)) {
@@ -1467,14 +1552,7 @@ wait_message (msg); sleep (1);
 				/*
 				 * Filter on Xref: lines
 				 */
-				if(arts[i].xref && *arts[i].xref!='\0'
-#if 0 /* WHY?! */
-				  /* don't do anything in *.test groups */
-				   && strlen(group->name)>4 &&
-				   strcmp(group->name+strlen(group->name)-5, ".test")!=0
-#endif
-				   ) {
-
+				if(arts[i].xref && *arts[i].xref!='\0') {
 				  if (ptr[j].xref_max > 0 || ptr[j].xref != (char*)0) {
 				    char *s,*e;
 				    int group_count;
@@ -1506,7 +1584,7 @@ wait_message (msg); sleep (1);
 				      if(ptr[j].xref != (char*)0) {
 					strncpy(buf, s, e-s);
 					buf[e-s]='\0';
-					/* don't kill when we are actually in that group */
+					/* don't filter when we are actually in that group */
 					/* Group names shouldn't be case sensitive in any case. Whatever */
 					if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf)!=0) {
 					  if (REGEX_MATCH (buf, ptr[j].xref, ptr[j].icase)) {
@@ -1525,10 +1603,6 @@ wait_message (msg); sleep (1);
 				      SET_FILTER(group, i, j);
 				    }
 				  }
-				}
-
-				if (IS_KILLED(i) || !filtered) {
-					filtered = TRUE;
 				}
 			}
 		}
@@ -1552,7 +1626,21 @@ wait_message (msg); sleep (1);
 		}
 		goto local_filter;	/* begin of for() */
 	}
+	/*
+	 * now entering the main filter loop:
+	 * all articles have scored, so do kill & select
+	 */
 
+	for ( i=0; i<top; i++) {
+		if (arts[i].score <= SCORE_LIM_KILL) {
+			arts[i].killed = TRUE;
+			filtered = TRUE;
+			art_mark_read (group, &arts[i]);
+		} else if (arts[i].score >= SCORE_LIM_SEL) {
+			arts[i].selected = TRUE;
+			num_of_selected_arts++;
+		}
+	}
 	return filtered;
 }
 
@@ -1567,6 +1655,12 @@ wait_message (msg); sleep (1);
  * done, rename it to something else, and then have a new filter_articles()
  * and auto_select_articles() call this new routine with the appropriate
  * arguments.
+ */
+
+/* 
+ * If filter_articles() is really score_articles() now then this
+ * function is unnecessary anyway
+ * TODO: replace calls to this routine by calls to filter_articles()
  */
 
 int
@@ -1601,29 +1695,4 @@ set_filter_scope (
 	}
 
 	return inscope;
-}
-
-static char *
-pcChkRegexStr (
-	char *pcStr)
-{
-	char *pcSrcPtr;
-	char *pcDstPtr;
-	static char acBuf[LEN];
-
-	pcSrcPtr = pcStr;
-	pcDstPtr = acBuf;
-
-	while (*pcSrcPtr) {
-		if (*pcSrcPtr == '[' || *pcSrcPtr == ']') {
-			*pcDstPtr = '\\';
-			pcDstPtr++;
-		}
-		*pcDstPtr = *pcSrcPtr;
-		pcDstPtr++;
-		pcSrcPtr++;
-	}
-	*pcDstPtr = '\0';
-
-	return acBuf;
 }

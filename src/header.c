@@ -336,7 +336,7 @@ build_sender (void)
 #ifdef HAVE_GETHOSTBYNAME
 		if ((ptr = get_fqdn(get_host_name())))
 #else
-		if (ptr = get_host_name())
+		if ((ptr = get_host_name()))
 #endif /* HAVE_GETHOSTBYNAME */
 		{
 			strcat(sender, ptr);

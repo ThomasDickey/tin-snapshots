@@ -527,7 +527,7 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_SHELL	"/bin/sh"
 #	endif
 #	ifndef DEFAULT_MAILBOX
-#		define	DEFAULT_MAILBOX "/usr/mail" 
+#		define	DEFAULT_MAILBOX "/usr/mail"
 #	endif
 #	ifndef DEFAULT_MAILER
 #		define	DEFAULT_MAILER	"/usr/lib/sendmail"
@@ -547,7 +547,7 @@ extern char *get_uaf_fullname();
 #	define	DEFAULT_EDITOR		"/usr/bin/vi"
 #endif
 #ifndef DEFAULT_MAILER
-#	define  DEFAULT_MAILER		"/usr/lib/sendmail" 
+#	define  DEFAULT_MAILER		"/usr/lib/sendmail"
 #endif
 #ifndef DEFAULT_MAILBOX
 #	define  DEFAULT_MAILBOX		"/usr/spool/mail"
@@ -856,7 +856,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  */
 #define MIN_LINES_ON_TERMINAL		 8
 #define MIN_COLUMNS_ON_TERMINAL		50
- 
+
 
 /*
  *  used by feed_articles() & show_mini_help()
@@ -1039,6 +1039,17 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FILTER_KILL		0
 #define	FILTER_SELECT		1
 
+#define SCORE_MAX		10000L
+
+#define SCORE_DEFAULT		100L
+#define SCORE_KILL		-(SCORE_DEFAULT)
+#define SCORE_SELECT		SCORE_DEFAULT
+
+/* TODO: the next two should be configurable at runtime */
+
+#define SCORE_LIM_KILL		-50L
+#define SCORE_LIM_SEL		50L
+
 #define	FILTER_SUBJ_CASE_SENSITIVE		0
 #define	FILTER_SUBJ_CASE_IGNORE		1
 #define	FILTER_FROM_CASE_SENSITIVE		2
@@ -1192,6 +1203,10 @@ struct t_msgid
  *  article.inthread:
  *	FALSE for the first article in a thread, TRUE for all
  *	following articles in thread
+ *
+ * TODO: when scoring works, add t_article.score and implement
+ * TODO: sorting by score in group.c, so we may see interesting
+ * TODO: articles first.
  */
 
 struct t_article
@@ -1214,6 +1229,7 @@ struct t_article
 	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
+	int score;			/* score article has reached after filtering */
 	unsigned int inthread:1;	/* 0 = thread head, 1 = thread follower */
 	unsigned int status:2;		/* 0 = read, 1 = unread, 2 = will return */
 	unsigned int killed:1;		/* 0 = not killed, 1 = killed */
@@ -1360,6 +1376,7 @@ struct t_filter
 	char *msgid;				/* Message-ID: line */
 	char lines_cmp;				/* Lines compare <> */
 	int  lines_num; 			/* Lines: line	    */
+	int  score;				/* score to give if rule matches */
 	char *xref;				/* groups in xref line */
 	int xref_max;				/* maximal number of groups in newsgroups line */
 	int xref_score_cnt;
@@ -1389,6 +1406,7 @@ struct t_filter_rule
 	int  msgid_ok;
 	int  subj_ok;
 	int  type;
+	int  score;
 	int  expire_time;
 	int  check_string;
 	int  ignore_case;
@@ -1768,11 +1786,11 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 
 #ifndef OUTC_ARGS
-#define OUTC_ARGS int
+#define OUTC_ARGS int c
 #endif
 
 #if __STDC__ || defined(__cplusplus)
-#define OUTC_FUNCTION(func) OUTC_RETTYPE func (OUTC_ARGS c)
+#define OUTC_FUNCTION(func) OUTC_RETTYPE func (OUTC_ARGS)
 #else
 #define OUTC_FUNCTION(func) OUTC_RETTYPE func (c) int c;
 #endif

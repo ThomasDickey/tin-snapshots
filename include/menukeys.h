@@ -17,7 +17,7 @@
 
 
 /* Revised 9 October 1996 by Branden Robinson in ASCII order
- * 
+ *
  *        Oct   Dec   Hex   Char           Oct   Dec   Hex   Char
  *        ------------------------------------------------------------
  *        000   0     00    NUL '\0'       100   64    40    @
@@ -84,9 +84,9 @@
  *        075   61    3D    =              175   125   7D    }
  *        076   62    3E    >              176   126   7E    ~
  *        077   63    3F    ?              177   127   7F    DEL
- * 
+ *
  * Above chart reprinted from Linux manual page.
- * 
+ *
  * When adding key functionality, be aware of key functions in the "big five"
  * levels of tin operation: top (group selection), group, thread, article
  * (pager), and help.  If possible, when adding a key to any of these levels,

@@ -1,0 +1,160 @@
+filtering in tin
+
+0. Status
+
+This is an overview of the new filtering capabilities of tin. This
+document should be absorbed in the main documentation at some time, when
+the rewrite is finished.
+
+
+1. Introduction
+
+Tin's filter mechanism has changed. Originally there were only two
+possibilities:
+
+1) kill an article matching a rule.
+2) mark an article matching a rule.
+
+This led (me) to constant confusion, as it seemed important which rule
+came first in the filter file, but it wasn't. Then if an article was
+selected for whatever reason it couldn't be killed even if it was Craig
+Shergold telling you how to make money fast in a crosspost to alt.test.
+This binary concept isn't modern anyway, so a much more up-to-date fuzzy
+mechanism was necessary: scoring.
+
+When using tin's new scoring mechanism you assign a "score" to each
+filter rule. The scores of rules matching the current article are added
+and the final score of the article decides if it is regular, marked hot
+or killed. All in all very simple, one wonders why this hasn't already
+been done.
+
+The standard "kill" and standard "select" have the score SCORE_KILL and
+SCORE_SELECT (-> 4) respectively.
+
+
+2. Changes to the killfile format
+
+Tin understands the additional "score" command in the filter-file now.
+
+Old:
+
+scope=*
+type=0
+case=0
+subj=**$$$**
+
+New:
+
+scope=*
+type=0
+case=0
+score=-100
+subj=**$$$**
+#####
+
+So you can give the individual rule a weight, based on your opinion
+about the rule. If you want to be sure to never read a certain
+individual again, give the rule a score of (-)9000. The sign is not
+important by now, the direction (+ or -) is still determined by the
+"type" of a rule. So the following
+
+scope=*
+type=0
+case=0
+score=100
+subj=**$$$**
+#####
+
+will be equivalent with the rule above for now. When tin writes it's
+filterfile the signs are rewritten to match the types. This is intended
+for backwards *and* future compatibility. A future version of tin will
+delete the "type"-line and write only the score.
+
+You might have noticed by the examples above that tin inserts a line of
+hashes between two rules now. This is *not* required, it just improves
+human readability of the filter file.
+
+
+3. Changes in the filter menu
+
+The filter menu got more compact, it fits easily on small terminals like
+a small xterm or a 640x200 CON: window now. Additionally you can enter a
+score for the rule you are adding. It should be in the range from 1 to
+SCORE_MAX. (-> 4.) otherwise it will be defaulted to SCORE_DEFAULT.
+(-> 4.)
+
+
+4. Internal defaults
+
+There are some constants defined in tin.h, search for SCORE in your
+favorite editor.
+
+SCORE_MAX is the maximum the scoring of an article can reach. Any value
+in excess is cut to SCORE_MAX, equally with negative sign.
+recommended: 10000
+
+SCORE_DEFAULT is the default score, also used for quick kills and
+selects.
+recommended: 100
+
+SCORE_KILL is the default score given for any kill rule, if no other
+is specified.
+recommended: -SCORE_DEFAULT
+
+SCORE_SELECT is the default score for any autoselection rule, if no
+other is specified.
+recommended: SCORE_DEFAULT
+
+SCORE_LIM_KILL and SCORE_LIM_SEL are the limits that must be crossed to
+mark an article as killed or selected.
+WARNING: These will only be used as default in future releases, the
+limits will be configurable at runtime.
+recommended when used with values given above: -50/+50.
+
+
+5. Overview of "filter"-commands
+
+Everything here is also described in the file ~/.tin/filter, but
+some things are more concise there.
+
+command=value
+
+possible "command"s sorted by field of use:
+
+scope selection:
+
+scope=pattern
+group=newsgroup
+
+additional info:
+
+type=num    num: 0=kill, 1=autoselect
+case=num    num: 0=casesensitive, 1=caseinsensitive
+score=num   num: score value of rule
+time=num    num: time_t value; when rule expires.
+
+matches:        matched to:
+
+subj=pattern    Subject:
+from=pattern    From:
+msgid=pattern   Message-Id: *AND* References:
+lines=num       Lines: ; <num matches less than, >num matches more than.
+xref=pattern    Xref: ; filter crossposts to groups matching pattern
+xref_max=num                } Xref: ; potentially obsolete, collects
+xref_score=num,pattern      } scores for crossposting in other
+                            } newsgroups
+
+patterns should be delimited with "*", verbatim wildcards in patterns
+must be escaped with "\".
+
+
+6. TODO
+
+- convert SCORE_LIM_* to global variables
+- rewrite filtering order to get optimal performance
+- sort articles by score/TAB reads article with next highest score
+- filtering on arbitrary header lines
+- convert .tin/filter, make "type" obsolete, maybe completely new file
+format
+- throw out "xref*" when it is obsolete for sure
+- maybe autoconf'able values?

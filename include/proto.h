@@ -198,7 +198,7 @@ extern struct t_group *psGrpAdd (char *group);
 extern struct t_group *psGrpFind (char *pcGrpName);
 extern unsigned long hash_groupname (const char *group);
 extern void init_group_hash (void);
-extern char *random_organization(char *in_org); 
+extern char *random_organization(char *in_org);
 #if 0
 	extern struct t_group *psGrpFirst (void);
 	extern struct t_group *psGrpLast (void);

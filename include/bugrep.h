@@ -3,7 +3,7 @@
  *  Module    : bugrep.h
  *  Author    : Urs Janssen <urs@akk.uni-karlsruhe.de>
  *  Created   : 30.07.1997
- *  Updated   : 
+ *  Updated   :
  *  Notes     :
  *  Copyright : (c) Copyright 1997 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
