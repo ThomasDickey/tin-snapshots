@@ -69,7 +69,9 @@
 
 #define	OK_CANPOST		200	/* Hello; you can post */
 #define	OK_NOPOST		201	/* Hello; you can't post */
+#define	OK_NOIHAVE		202	/* Hello; you can't IHAVE */
 #define	OK_SLAVE		202	/* Slave status noted */
+#define	OK_NOPOSTIHAVE	203	/* Hello; you can't POST or IHAVE */
 #define	OK_GOODBYE		205	/* Closing connection */
 #define	OK_GROUP		211	/* Group selected */
 #define	OK_GROUPS		215	/* Newsgroups follow */

@@ -16,9 +16,9 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION 	"1.4.3"
-#	define RELEASEDATE	"20000502"
-#	define RELEASENAME	"Marian"
+#	define VERSION 	"1.4.4"
+#	define RELEASEDATE	"20000803"
+#	define RELEASENAME	"Vet for the Insane"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA

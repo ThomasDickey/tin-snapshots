@@ -100,31 +100,39 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 #	endif /* DEBUG */
 
 	switch (ret) {
-
 		/*
 		 * ret < 0 : some error from system call
 		 * ret > 0 : NNTP response code
 		 *
-		 * Latest NNTP draft (Aug 1999) says only the following response codes
-		 * may be returned:
-		 *
-		 *   200 (OK_CANPOST) Hello, you can post
-		 *   201 (OK_NOPOST) Hello, you can't post
-		 *   502 (ERR_ACCESS) Service unavailable
-		 *   400 (ERR_GOODBYE) Service temporarily unavailable
+		 * According to the ietf-nntp mailinglist:
+		 *  200 you may (try to) do anything
+		 *  201 you may not POST
+		 *  202 you may not IHAVE
+		 *  203 you may not do EITHER
+		 *  All unrecognised 200 series codes should be assumed as success.
+		 *  All unrecognised 300 series codes should be assumed as notice to continue.
+		 *  All unrecognised 400 series codes should be assumed as temporary error.
+		 *  All unrecognised 500 series codes should be assumed as error.
 		 */
-
 		case OK_CANPOST:
+		case OK_NOIHAVE:
 #	ifndef NO_POSTING
 			can_post = TRUE;
 #	endif /* !NO_POSTING */
 			break;
 
 		case OK_NOPOST:
+		case OK_NOPOSTIHAVE:
 			can_post = FALSE;
 			break;
 
 		default:
+			if (ret >= 200 && ret <= 299) {
+#	ifndef NO_POSTING
+				 can_post = TRUE;
+#	endif /* !NO_POSTING */
+				break;
+			}
 			if (ret < 0) {
 				error_message (txt_failed_to_connect_to_server, nntp_server);
 			} else {
@@ -151,22 +159,10 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	put_server ("MODE READER");
 
-	/*
-	 * According to the latest NNTP draft (Aug 1999), MODE READER may only
-	 * return the following response codes:
-	 *
-	 *   200 (OK_CANPOST) Hello, you can post
-	 *   201 (OK_NOPOST) Hello, you can't post
-	 *   400 (ERR_GOODBYE) Service temporarily unavailable
-	 *   502 (ERR_ACCESS) Service unavailable
-	 *
-	 * However, there may be old servers out there that do not implement this
-	 * command and therefore return ERR_COMMAND (500).
-	 */
-
 	ret = get_respcode(line);
 	switch (ret) {
 		case OK_CANPOST:
+		case OK_NOIHAVE:
 #	ifndef NO_POSTING
 			can_post = TRUE;
 #	endif /* !NO_POSTING */
@@ -174,6 +170,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			break;
 
 		case OK_NOPOST:
+		case OK_NOPOSTIHAVE:
 			can_post = FALSE;
 			sec = TRUE;
 			break;
@@ -217,6 +214,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		ret = get_respcode (line);
 		switch (ret) {
 			case OK_CANPOST:
+			case OK_NOIHAVE:
 #	ifndef NO_POSTING
 				can_post = TRUE;
 #	endif /* !NO_POSTING */
@@ -224,6 +222,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 				break;
 
 			case OK_NOPOST:
+			case OK_NOPOSTIHAVE:
 				can_post = FALSE;
 				sec = TRUE;
 				break;

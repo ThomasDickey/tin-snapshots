@@ -1,4 +1,4 @@
-MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
+MANIFEST for tin-1.4.4 (Thu Aug  3 13:33:04 CEST 2000)
 ----------------------------------------------------
   10365 ./Makefile
    5414 ./MANIFEST
@@ -7,17 +7,17 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
    1543 ./README.WIN
   62001 ./aclocal.m4
     801 ./conf-tin
-  27469 ./config.guess
-  20192 ./config.sub
- 246084 ./configure
-  20904 ./configure.in
+  35433 ./config.guess
+  26214 ./config.sub
+ 246075 ./configure
+  20895 ./configure.in
    4765 ./install.sh
   11873 ./makefile.in
     661 ./mkdirs.sh
-   4754 ./doc/CHANGES
+   5737 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
-  29760 ./doc/INSTALL
+  30337 ./doc/INSTALL
   19434 ./doc/TODO
    5197 ./doc/WHATSNEW
    3882 ./doc/auth.txt
@@ -31,7 +31,7 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
    1615 ./doc/umlaute.txt
    1914 ./doc/umlauts.txt
    4643 ./doc/tin.defaults
-  97881 ./doc/tin.1
+  98384 ./doc/tin.1
    3703 ./tools/metamutt
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
@@ -40,7 +40,7 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
    8374 ./include/config.h
   47173 ./include/extern.h
   13172 ./include/menukeys.h
-   5053 ./include/nntplib.h
+   5170 ./include/nntplib.h
    3083 ./include/policy.h
   25462 ./include/proto.h
    2212 ./include/stpwatch.h
@@ -49,15 +49,15 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
    9336 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1128 ./include/version.h
+   1140 ./include/version.h
   25927 ./src/active.c
-  39543 ./src/art.c
+  39889 ./src/art.c
   23669 ./src/attrib.c
   11074 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
   63207 ./src/config.c
-  27000 ./src/curses.c
+  26938 ./src/curses.c
   11967 ./src/debug.c
    2335 ./src/envarg.c
   19955 ./src/feed.c
@@ -67,7 +67,7 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
    3112 ./src/hashstr.c
    8046 ./src/header.c
   12130 ./src/help.c
-   9955 ./src/inews.c
+  10143 ./src/inews.c
   34710 ./src/init.c
    1447 ./src/joinpath.c
   90614 ./src/lang.c
@@ -80,11 +80,11 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
   37785 ./src/newsrc.c
   27202 ./src/nntplib.c
    5942 ./src/nrctbl.c
-  27192 ./src/open.c
+  27171 ./src/open.c
   42378 ./src/page.c
   24159 ./src/parsdate.y
    8496 ./src/pgp.c
-  97284 ./src/post.c
+  97452 ./src/post.c
   12519 ./src/prompt.c
    8874 ./src/read.c
   23620 ./src/refs.c
@@ -94,7 +94,7 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
   36133 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
-  35126 ./src/select.c
+  35125 ./src/select.c
    6655 ./src/sigfile.c
   11003 ./src/signal.c
    5800 ./src/strftime.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3252092 total
+3268870 total

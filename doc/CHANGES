@@ -1,4 +1,36 @@
--- 1.4.3 release 20000428 "Marian" --
+-- 1.4.4 release 20000803 "Vet for the Insane" --
+
+028) Urs Janssen <urs@tin.org>
+     ADD. handling for new 202/203 return codes
+     BUG. nntp_open() treated unknown 2xx responses as an error
+     FIX. nntplib.h, open.c
+
+027) v9@fakehalo.org
+     Urs Janssen <urs@tin.org>
+     BUG. possible bufferoverflow
+     FIX. curses.c
+
+026) Dirk Nimmich <nimmich@uni-muenster.de>
+     Urs Janssen <urs@tin.org>
+     BUG. MIME-encoding of some headers broken
+     FIX. inews.c, post.c
+
+025) Bernd Kuemmerlen <bkuemmer@gmx.de>
+     Urs Janssen <urs@tin.org>
+     ADD. config.guess, config.sub update, removed dublicated configure
+          check for ftime()
+     FIX. config.guess, config.sub, configure[.in]
+
+024) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. possible core on empty groups with out of sync overviews
+     FIX. art.c
+
+023) Urs Janssen <urs@tin.org>
+     BUG. add Sender to FORGERY cancels
+     BUG. toplevel domains .kh and .zw not recognized
+     FIX. policy.h, post.c
+
+-- 1.4.3 release 20000502 "Marian" --
 
 022) Urs Janssen <urs@tin.org>
      BUG. patch 014 turned strings into lowercase
@@ -36,7 +68,7 @@
      FIX. filter.c
 
 015) Urs Janssen <urs@tin.org>
-     ADD. smater check wehen quotes around realnames are needed
+     ADD. smarter check wehen quotes around realnames are needed
      FIX. header.c
 
 014) Jason Faultless <jason@radar.tele2.co.uk>

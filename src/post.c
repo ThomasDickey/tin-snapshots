@@ -632,7 +632,7 @@ check_article_to_be_posted (
 				errors++;
 #endif /* HAVE_FASCIST_NEWSADMIN */
 			}
-			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode (line, FALSE) + (cp - line) + 1))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_approved, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -644,7 +644,7 @@ check_article_to_be_posted (
 			}
 		}
 		if (cp - line == 4 && !strncasecmp (line, "From", 4)) {
-			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode (line, FALSE) + (cp - line) + 1))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_from, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -657,7 +657,7 @@ check_article_to_be_posted (
 		}
 
 		if (cp - line == 8 && !strncasecmp (line, "Reply-To", 8)) {
-			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode(cp+1, FALSE)))) {
+			if (GNKSA_OK != (i = gnksa_check_from (rfc1522_encode (line, FALSE) + (cp - line) + 1))) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_bad_replyto, i);
 				my_fprintf (stderr, gnksa_strerror(i), i);
@@ -3462,8 +3462,10 @@ insert_from_header (
 {
 	FILE *fp_in, *fp_out;
 	char from_name[HEADER_LEN];
+#if 0 /* unused */
 	char full_name[128];
 	char user_name[128];
+#endif /* 0 */
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
 	t_bool from_found = FALSE;
@@ -3476,17 +3478,20 @@ insert_from_header (
 		sprintf (outfile, "%s.%d", infile, (int) process_id);
 #	endif /* VMS */
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
+#if 0 /* unused */
 			get_user_info (user_name, full_name);
-			get_from_name (from_name, (struct t_group *) 0);
+#endif /* 0 */
+			strcpy (from_name, "From: ");
+			get_from_name (from_name + 6, (struct t_group *) 0);
 
 #ifdef DEBUG
 			if (debug == 2)
-				wait_message (2, "insert_from_header [%s]", from_name);
+				wait_message (2, "insert_from_header [%s]", from_name + 6);
 #endif /* DEBUG */
 
 			/* Check the From: line */
-			if (GNKSA_OK != gnksa_check_from(rfc1522_encode(from_name, FALSE))) { /* error in address */
-				error_message (txt_invalid_from, from_name);
+			if (GNKSA_OK != gnksa_check_from(rfc1522_encode(from_name, FALSE) + 6)) { /* error in address */
+				error_message (txt_invalid_from, from_name + 6);
 				return FALSE;
 			}
 
@@ -3498,7 +3503,7 @@ insert_from_header (
 			}
 
 			if (!from_found)
-				fprintf (fp_out, "From: %s\n", from_name);
+				fprintf (fp_out, "%s\n", from_name);
 
 			rewind (fp_in);
 			while (fgets (line, (int) sizeof(line), fp_in) != (char *) 0)

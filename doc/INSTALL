@@ -1,4 +1,3 @@
-
 Compilation and installation notes for tin - 2000-01-22 (still incomplete!)
 -------------------------------------------------------
 
@@ -575,13 +574,14 @@ NNTP_* defines as the daemon has to be installed on the NNTP server.
 Compiled & installed on the following machines:
 -----------------------------------------------
 i486-pc-linux-gnulibc1   (libc 5.4.33) gcc 2.7.2.1  (1.4.0 release 19991113)          <urs@tin.org>
-i586-pc-linux-gnu        (glibc 2.0.7) egcs 2.91.60 (1.4.0 release 19991113)          <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.0.7) gcc 2.7.2.3  (1.4.3 release 20000502)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.0.7) fcc 1.0      (1.4.0 release 19991113)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.0.7) tcc 4.1.2    (1.4.0 release 19991113)   [3]    <urs@tin.org>
-i586-pc-linux-gnu        (glibc 2.1.1) gcc 2.95.2   (1.4.2 release 20000205)          <urs@tin.org>
+i686-pc-linux-gnu        (glibc 2.1.1) gcc 2.95.2   (1.4.3 release 20000502)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.1.1) lcc 4.27     (1.4.0 release 19991113)   [3][4] <urs@tin.org>
 mipsel-unknown-linux-gnu (glibc 2.0.7) gcc 2.7.2    (1.4.0 release 19991113)          <urs@tin.org>
 sparc-unknown-linux-gnu  (glibc 2.0.1) gcc 2.7.2.3  (1.4.0 release 19991113)          <urs@tin.org>
+ia64-unknown-linux-gnu   (glibc 2.1.3) gcc 2.9-ia64 (1.4.3 release 20000502)   [6]    <g-r@bigfoot.de>
 
 m68k-cbm-netbsd1.4                     egcs 2.91.60 (pre-1.4 release 19990927)        <rhoenie@many.de>
 vax-unknown-netbsd1.4M                 egcs 2.91.60 (pre-1.4 release 19990927)        <laura@tin.org>
@@ -596,10 +596,12 @@ sparc-sun-solaris2.5                   gcc 2.7.2    (pre-1.4 release 19990927)  
 sparc-sun-solaris2.5.1                 gcc 2.8.1    (1.4.0 release 19991113)          <urs@tin.org>
 sparc-sun-solaris2.6                   gcc 2.8.1    (pre-1.4 release 19990927)        <dk@ssw.krakow.pl>
 
-mips-sgi-irix5.2                       cc 3.18      (pre-1.4 release 19990927)        <sven@tin.org>
+mips-sgi-irix5.2                       cc 3.18      (1.4.4 release 20000502)          <sven@tin.org>
+mips-sgi-irix5.3                       cc 3.19      (1.4.3 release 20000502)          <sven@tin.org>
 mips-sgi-irix6.2                       cc 7.000     (1.4.0 release 19991113)          <andy@tin.org>
 mips-sgi-irix6.2                       gcc 2.7.2.2  (pre-1.4 release 19990927)        <turin@incubus.de>
 mips-sgi-irix6.4         (IRIX64)      cc 7.10      (pre-1.4 release 19990927)        <laura@tin.org>
+mips-sgi-irix6.5                       gcc 2.95.2   (1.4.3 release 20000502)          <sven@tin.org>
 
 mips-dec-ultrix4.4                     cc           (pre-1.4 release 19990927) [1]    <urs@tin.org>
 
@@ -624,6 +626,8 @@ f300-fujitsu-uxpv4.1_ES                cc 1.04      (pre-1.4 release 19990927)  
 
 i586-pc-cygwin           (Cygwin B20)  egcs 2.91.57 (pre-1.4 release 19990927) [2]    <uafr@gmx.de>
 
+powerpc-apple-rhapsody5.6              gcc 2.7.2.3  (1.4.3 release 20000502)   [5]       <bkuemmer@gmx.net>
+
 [1] add extra space at the end of buf[] in src/screen.c:spin_cursor()
     (fixed in the 1.4.0 release)
 [2] see README.WIN
@@ -631,3 +635,6 @@ i586-pc-cygwin           (Cygwin B20)  egcs 2.91.57 (pre-1.4 release 19990927) [
     (use tcc -Xc) - needs to be fixed.
 [4] alloca detection fails, remove alloca.o from src/Makefile before
     compiling
+[5] two small patches to config.guess and config.sub needed
+    (fixed in the 1.4.4 release)
+[6] actually IA-64 emulator running on i686-pc-linux-gnu (glibc 2.1.3)

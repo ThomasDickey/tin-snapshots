@@ -619,7 +619,6 @@ AC_CHECK_FUNCS(\
 	atoi \
 	atol \
 	bcopy \
-	ftime \
 	fdopen \
 	ftime \
 	getcwd \
