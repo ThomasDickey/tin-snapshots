@@ -208,7 +208,8 @@ rfc1522_decode(s)
 			if (*c=='?') {
 				c++;
 				encoding=tolower(*c);
-				if (encoding=='b') mmdecode(NULL,'b',0,NULL,NULL); /* flush */
+				if (encoding=='b')
+					mmdecode((char*)0,'b',0,(char*)0,(char*)0); /* flush */
 				c++;
 				if (*c=='?') {
 					c++;

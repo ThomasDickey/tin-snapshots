@@ -125,7 +125,7 @@ debug_print_header (s)
 			(s->selected ? "TRUE" : "FALSE"));
 		fprintf (fp,"subj=[%-38s]\n", s->subject);
 		fprintf (fp,"date=[%ld]  from=[%s]  name=[%s]\n", s->date, s->from, s->name);
-		fprintf (fp,"msgid=[%s]  refs=[%s]\n", MSGID(s), REFS(s, refs);
+		fprintf (fp,"msgid=[%s]  refs=[%s]\n", MSGID(s), REFS(s, refs));
 
 		if (refs)
 			free(refs);

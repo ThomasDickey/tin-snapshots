@@ -80,7 +80,11 @@ AC_TRY_LINK([
 #include <stdio.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <errno.h>
+#ifdef HAVE_ERRNO_H
+#	include <errno.h>
+#else
+#	include <sys/errno.h>
+#endif
 #ifdef HAVE_LIBC_H
 #	include <libc.h>
 #endif
@@ -102,6 +106,15 @@ AC_TRY_LINK([
 #endif
 #ifdef HAVE_STDDEF_H
 #	include <stddef.h>
+#endif
+#ifdef HAVE_PWD_H
+#	include <pwd.h>
+#endif
+#ifdef HAVE_NETDB_H
+#	include <netdb.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#	include <arpa/inet.h>
 #endif
 
 #if STDC_HEADERS || HAVE_STRING_H

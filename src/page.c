@@ -57,7 +57,7 @@ static int tex2iso_article;
 static int expand_ctrl_chars P_((char *tobuf, char *frombuf, int length, int do_rotate));
 
 
-int 
+int
 show_page (group, group_path, respnum, threadnum)
 	struct t_group *group;
 	char *group_path;
@@ -88,7 +88,7 @@ restart:
 	glob_page_group = group->name;
 
 	set_signals_page ();
-	
+
 	if (respnum != this_resp) {	   /* remember current & previous */
 		last_resp = this_resp;	   /* articles for - command */
 		this_resp = respnum;
@@ -98,7 +98,7 @@ restart:
 	art = arts[respnum].artnum;
 
 	art_mark_read (group, &arts[respnum]);
-	
+
 	if ((note_page = art_open (art, group_path)) == ART_UNAVAILABLE) {
 		sprintf (msg, txt_art_unavailable, art);
 		if (debug) {
@@ -177,7 +177,7 @@ restart:
 								}
 								break;
 						}
-						break;					
+						break;
 				}
 				break;
 
@@ -190,7 +190,7 @@ restart:
 
 			case iKeyPageLastPage:	/* goto end of article */
 			case iKeyPageLastPage2:
-end_of_article:			
+end_of_article:
 				if (show_last_page ()) {
 					show_note_page (group->name, respnum);
 				}
@@ -296,7 +296,7 @@ page_goto_next_unread:
 					art_close();
 				}
 				n = next_unread (next_response (respnum));
-				if (n == -1) 
+				if (n == -1)
 					return (which_thread (respnum));
 				respnum = n;
 				goto restart;
@@ -383,7 +383,7 @@ page_goto_next_unread:
 
 			case iKeyPageFirstPage:		/* goto beginning of article */
 			case iKeyPageFirstPage2:
-begin_of_article:			
+begin_of_article:
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
 					printf (txt_art_unavailable, arts[respnum].artnum);
@@ -457,14 +457,14 @@ page_up:
 					redraw_page (group->name, respnum);
 				}
 				break;
-	
+
 			case iKeyPageEdit:	/* edit an article (mailgroup only) */
 				if (iArtEdit (group, &arts[respnum])) {
 					goto restart;
 					/* redraw_page (group->name, respnum); */
 				}
 				break;
-	
+
 			case iKeyPageFollowupQuote:	/* post a followup to this article */
 			case iKeyPageFollowup:
 				if (! can_post) {
@@ -557,7 +557,7 @@ return_to_index:
 				if (change_config_file (group, FALSE) == FILTERING) {
 					filter_state = FILTERING;
 				}
-				set_subj_from_size (cCOLS); 
+				set_subj_from_size (cCOLS);
 				redraw_page (group->name, respnum);
 			    break;
 
@@ -569,7 +569,7 @@ return_to_index:
 				respnum = n;
 				goto restart;
 				/* NOTREACHED */
-				
+
 			case iKeyPageNextUnreadArt:	/* next unread article */
 				n = next_unread (next_response (respnum));
 				if (n == -1)
@@ -606,7 +606,7 @@ return_to_index:
 
 			case iKeyPageQuitTin:	/* quit */
 				return GRP_QUIT;
-	
+
 			case iKeyPageReplyQuote:	/* reply to author through mail */
 			case iKeyPageReply:
 				copy_text = (ch == iKeyPageReplyQuote ? TRUE : FALSE);
@@ -680,7 +680,7 @@ return_to_index:
 }
 
 
-void 
+void
 redraw_page (group, respnum)
 	char *group;
 	int respnum;
@@ -705,7 +705,7 @@ expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
 {
 	char *p, *q;
 	int ctrl_L = FALSE;
-	int i,j;
+	int i, j;
 
 	for (p = frombuf, q = tobuf; *p && *p != '\n' && q < &tobuf[length]; p++) {
 		if (*p == '\b' && q > tobuf) {
@@ -726,7 +726,7 @@ expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
 				*q++ = (*p - 'A' + do_rotation) % 26 + 'A';
 			else if (*p >= 'a' && *p <= 'z')
 				*q++ = (*p - 'a' + do_rotation) % 26 + 'a';
-			else 
+			else
 				*q++ = *p;
 		} else
 			*q++ = *p;
@@ -736,7 +736,7 @@ expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
 	return ctrl_L;
 }
 
-void 
+void
 show_note_page (group, respnum)
 	char *group;
 	int respnum;
@@ -744,7 +744,7 @@ show_note_page (group, respnum)
 #ifndef INDEX_DAEMON
 
 	int below_sig;			/* are we in the signature? */
-	
+
 	char buf3[2*LEN+200];
 	int ctrl_L = FALSE;		/* form feed character detected */
 	int first  = TRUE;
@@ -757,7 +757,7 @@ show_note_page (group, respnum)
 	} else {
 		lines = cLINES;
 	}
-	
+
 	ClearScreen ();
 
 	note_line = 1;
@@ -768,7 +768,7 @@ show_note_page (group, respnum)
 		note_size = ftell (note_fp);
 		fseek (note_fp, tmp_pos, 0);	/* goto old position */
 	}
-	
+
 	if (note_page == 0) {
 		buf2[0] = '\0';
 		doing_pgdn = FALSE;
@@ -776,7 +776,7 @@ show_note_page (group, respnum)
 	} else {
 		show_cont_header (respnum);
 	}
-	
+
 #ifdef HAVE_METAMAIL
 	if (note_page == 0 && *note_h_mimeversion && *note_h_contenttype &&
 		(!STRNCMPEQ("text/plain", note_h_contenttype, 10))) {
@@ -814,13 +814,13 @@ show_note_page (group, respnum)
 print_a_line:
 		if (first) {
 			StartInverse ();
-		}	
+		}
 
 		if ( ! strcmp (buf2, "-- ") )
-			below_sig = TRUE;			/* begin of signature */	
+			below_sig = TRUE;			/* begin of signature */
 
 		strip_line (buf2, strlen (buf2));
-		
+
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
 			ConvertTeX2Iso ((unsigned char *)buf3, (unsigned char *)buf2);
@@ -830,7 +830,7 @@ print_a_line:
 			strcpy (buf3, buf2);
 			ConvertIso2Asc ((unsigned char *)buf3, (unsigned char*)buf2, iso2asc_supported);
 		}
-		
+
 		first_char = buf2[0] ? buf2[0] : first_char;
 
 		if (skip_include) {
@@ -865,10 +865,10 @@ print_a_line:
 
 		if (first) {
 			EndInverse ();
-		}	
+		}
 		first = FALSE;
 		doing_pgdn = FALSE;
-		
+
 		if (ctrl_L) {
 			break;
 		}
@@ -879,7 +879,7 @@ print_a_line:
 	} else {
 		note_page++;
 	}
-	
+
 	if (ftell (note_fp) == note_size) {
 		note_end = TRUE;
 	}
@@ -889,7 +889,7 @@ print_a_line:
 #endif
 	if (note_end) {
 		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
-		StartInverse ();	
+		StartInverse ();
 		if (arts[respnum].thread != -1) {
 			my_fputs (txt_next_resp, stdout);
 		} else {
@@ -902,22 +902,22 @@ print_a_line:
 			draw_percent_mark (note_mark[note_page], note_size);
 		} else {
 			MoveCursor (cLINES, MORE_POS-BLANK_PAGE_COLS);
-			StartInverse ();	
+			StartInverse ();
 			my_fputs (txt_more, stdout);
 			fflush (stdout);
 			EndInverse ();
 		}
 	}
-	
+
 	show_mini_help (PAGE_LEVEL);
-	
+
 	MoveCursor (cLINES, 0);
 
 #endif /* INDEX_DAEMON */
 }
 
 
-void 
+void
 show_mime_article (fp, art)
 	FILE	*fp;
 	struct	t_article *art;
@@ -941,7 +941,7 @@ show_mime_article (fp, art)
 	Raw(TRUE);
 	fseek (fp, offset, 0);	/* goto old position */
 	MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
-	StartInverse ();	
+	StartInverse ();
 	if (art->thread != -1) {
 		my_fputs (txt_next_resp, stdout);
 	} else {
@@ -952,7 +952,7 @@ show_mime_article (fp, art)
 }
 
 
-void 
+void
 show_first_header (respnum, group)
 	int respnum;
 	char *group;
@@ -1008,7 +1008,7 @@ show_first_header (respnum, group)
 	else {
     		sprintf (tmp, txt_thread_x_of_n, buf, which_thread (respnum) + 1, top_base);
     		my_fputs (tmp, stdout);
-	}    		
+	}
 
 	if (arts[respnum].lines < 0) {
 		strcpy (tmp, "?");
@@ -1030,7 +1030,7 @@ show_first_header (respnum, group)
 		n += strlen (buf);
 		my_fputs (buf, stdout);
 	}
-	
+
 	if (note_h_subj[0]) {
 		strcpy (buf, note_h_subj);
 	} else {
@@ -1146,7 +1146,7 @@ show_first_header (respnum, group)
 }
 
 
-void 
+void
 show_cont_header (respnum)
 	int respnum;
 {
@@ -1197,7 +1197,7 @@ show_cont_header (respnum)
 }
 
 
-int 
+int
 art_open (art, group_path)
 	long art;
 	char *group_path;
@@ -1218,7 +1218,7 @@ art_open (art, group_path)
 	} else {
 		tex2iso_article = FALSE;
 	}
-	
+
 	if ((note_fp = open_art_fp (group_path, art)) == (FILE *) 0) {
 		return (ART_UNAVAILABLE);
 	}
@@ -1248,7 +1248,7 @@ art_open (art, group_path)
 				*ptr = ' ';
 		}
 		*ptr = '\0';
-		
+
 		if (*buf == '\0')
 			break;
 
@@ -1256,7 +1256,7 @@ art_open (art, group_path)
 		if (*buf == ' ') {
 			if (lasthead != (char *) 0) {
 				if (strlen(lasthead) + strlen(buf) + 1 < LEN) {
-					strcat(lasthead,"\n");
+					strcat(lasthead, "\n");
 					strcat(lasthead, buf);
 				}
 			}
@@ -1320,9 +1320,9 @@ art_open (art, group_path)
 	{
 		struct t_msgid *x;
 		char *y;
-		x=parse_references(note_h_references);
+		x = parse_references(note_h_references);
 		strcpy(note_h_references, (y = get_references(x)) ? y : "");
-		free(y);
+		if (y != NULL) free(y);
 	}
 
 	note_mark[0] = ftell (note_fp);
@@ -1337,12 +1337,12 @@ art_open (art, group_path)
 			*ptr = '.';
 		}
 	}
-	
+
 	return (0);
 }
 
 
-void 
+void
 art_close ()
 {
 	if (note_fp && note_page != ART_UNAVAILABLE) {
@@ -1352,7 +1352,7 @@ art_close ()
 }
 
 
-int 
+int
 prompt_response (ch, respnum)
 	int ch;
 	int respnum;
@@ -1370,14 +1370,14 @@ prompt_response (ch, respnum)
 }
 
 
-void 
+void
 yank_to_addr (orig, addr)
 	char *orig;
 	char *addr;
 {
 	char *p;
 	int open_parens;
-	
+
 	for (p = orig; *p; p++)
 		if (((*p) & 0xFF) < ' ')
 			*p = ' ';
@@ -1400,7 +1400,7 @@ yank_to_addr (orig, addr)
 				if (*orig == '(')
 					open_parens++;
 				if (*orig == ')')
-					open_parens--;	
+					open_parens--;
 				orig++;
 			}
 			if (*orig == ')')
@@ -1411,14 +1411,14 @@ yank_to_addr (orig, addr)
 }
 
 
-int 
+int
 show_last_page ()
 {
 	char buf[LEN];
 	char buf3[LEN+50];
 	int ctrl_L;		/* form feed character detected */
 	long tmp_pos;
-	
+
 	if (note_end) {
 		return FALSE;
 	}
@@ -1475,21 +1475,21 @@ int size;
 	int count;
 	char *c;
 
-	count=sizeof(buf)-1;
-	c=buf;
+	count = sizeof(buf)-1;
+	c = buf;
 	while (*source) {
-		if (*source!=1) {
-			*c++=*source++;
-			if (!--count) break;
+		if (*source!= 1) {
+			*c++ = *source++;
+			if (! --count) break;
 		}
 		else source++;
 	}
-	*c=0;
-	c=rfc1522_decode(buf);
+	*c = 0;
+	c = rfc1522_decode(buf);
 	while (--size) {
-	        *target++=*c++;
+	        *target++ = *c++;
 	}
-	*target=0;
+	*target = 0;
 }
 
 /*
@@ -1503,7 +1503,7 @@ int size;
  *	TRUE	Header was matched. body contains NULL terminated content
  * 			portion of buf (ie with pat: and leading space removed)
  */
-int 
+int
 match_header (buf, pat, body, len)
 	char *buf;
 	char *pat;

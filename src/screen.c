@@ -14,8 +14,6 @@
 
 #include	"tin.h"
 
-extern int errno;
-
 char msg[LEN];
 struct t_screen *screen;
 

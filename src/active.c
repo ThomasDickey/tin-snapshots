@@ -499,8 +499,8 @@ check_for_any_new_groups ()
 	 * Check if there are user-set groups to be 
 	 * automatically subscribed or unsubscribed.
 	 */
-	autosubscribe = (char *) getenv ("AUTOSUBSCRIBE");
-	autounsubscribe = (char *) getenv ("AUTOUNSUBSCRIBE");
+	autosubscribe = getenv ("AUTOSUBSCRIBE");
+	autounsubscribe = getenv ("AUTOUNSUBSCRIBE");
 
 	Raw (TRUE);
 

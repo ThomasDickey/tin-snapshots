@@ -238,12 +238,6 @@ struct passwd pwdentry;
 
 void init_selfinfo ()
 {
-#if !defined(linux)
-#if !defined(M_OS2)
-	extern struct passwd *getpwnam ();
-#endif
-	extern char *getlogin ();
-#endif
 	char nam[LEN];
 	char *ptr;
 	FILE *fp;
@@ -268,13 +262,13 @@ void init_selfinfo ()
 #endif
 		
 #ifdef M_AMIGA
-	if ((ptr = (char *) getenv ("USERNAME")) != (char *) 0) {
+	if ((ptr = getenv ("USERNAME")) != (char *) 0) {
 		my_strncpy (userid, ptr, sizeof (userid));
 	} else {
 		error_message (txt_env_var_not_found, "USERNAME");
 		tin_done (EXIT_ERROR);
 	}
-	if ((ptr = (char *) getenv ("HOME")) != (char *) 0) {
+	if ((ptr = getenv ("HOME")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
 	} else {
 		error_message (txt_env_var_not_found, "HOME");
@@ -313,9 +307,9 @@ void init_selfinfo ()
 #endif
 	strcpy (userid, myentry->pw_name);
 
-	if ((ptr = (char *) getenv ("TIN_HOMEDIR")) != (char *) 0) {
+	if ((ptr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
-	} else if ((ptr = (char *) getenv ("HOME")) != (char *) 0) {
+	} else if ((ptr = getenv ("HOME")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
 	} else if (! myentry) {
 		strcpy (homedir, "/tmp");
@@ -704,7 +698,7 @@ got_active:
 	 *  check enviroment for REPLYTO
 	 */
 	reply_to[0] = '\0';
-	if ((ptr = (char *) getenv ("REPLYTO")) != (char *) 0) {
+	if ((ptr = getenv ("REPLYTO")) != (char *) 0) {
 		my_strncpy (reply_to, ptr, sizeof (reply_to));
 	}
 
@@ -712,7 +706,7 @@ got_active:
 	 *  check enviroment for DISTRIBUTION
 	 */
 	my_distribution[0] = '\0';
-	if ((ptr = (char *) getenv ("DISTRIBUTION")) != (char *) 0) {
+	if ((ptr = getenv ("DISTRIBUTION")) != (char *) 0) {
 		my_strncpy (my_distribution, ptr, sizeof (my_distribution));
 	}
 
@@ -720,7 +714,7 @@ got_active:
 	 *  check enviroment for ADD_ADDRESS
  	 */
 	add_addr[0] = '\0';
-	if ((ptr = (char *) getenv ("ADD_ADDRESS")) != (char *) 0) {
+	if ((ptr = getenv ("ADD_ADDRESS")) != (char *) 0) {
 		my_strncpy (add_addr, ptr, sizeof (add_addr));
 		goto got_add_addr;
 	}
@@ -741,7 +735,7 @@ got_add_addr:;
 	/*
 	 *  check enviroment for BUG_ADDRESS
 	 */
-	if ((ptr = (char *) getenv ("BUG_ADDRESS")) != (char *) 0) {
+	if ((ptr = getenv ("BUG_ADDRESS")) != (char *) 0) {
 		my_strncpy (bug_addr, ptr, sizeof (bug_addr));
 		goto got_bug_addr;
 	}
@@ -843,9 +837,9 @@ GetConfigValue (name)
 		 *  check enviroment for ORGANIZATION / NEWSORG
 		 */
 #ifdef apollo
-		if ((ptr = (char *) getenv ("NEWSORG")) != (char *) 0) {
+		if ((ptr = getenv ("NEWSORG")) != (char *) 0) {
 #else	
-		if ((ptr = (char *) getenv ("ORGANIZATION")) != (char *) 0) {
+		if ((ptr = getenv ("ORGANIZATION")) != (char *) 0) {
 #endif
 			my_strncpy (conf_org, ptr, sizeof (conf_org));
 			goto got_org;

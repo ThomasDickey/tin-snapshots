@@ -117,7 +117,7 @@ txt_help_empty_line,
 #else
 	txt_help_p_S,
 #endif
-#ifndef NO_PIPING
+#ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
 #endif
 	txt_help_o,
@@ -257,7 +257,7 @@ txt_help_empty_line,
 txt_help_empty_line,
 	txt_help_p_m,
 	txt_help_p_s,
-#ifndef NO_PIPING
+#ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
 #endif
 	txt_help_o,

@@ -547,7 +547,7 @@ str_lwr (src, dst)
 	char *dst;
 {
 	while (*src) {
-		*dst++ = tolower(*src);
+		*dst++ = (char)tolower((int)*src);
 		src++;
 	}
 	*dst = '\0';

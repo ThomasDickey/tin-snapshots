@@ -143,7 +143,7 @@ for putting in login file.
 check if there is any new/unread news and exit with appropriate status.
 If -v option is specified the number of unread articles in each group
 is printed.  An exit code 0 indicates no news, 1 that an error occurred,
-2 that a nntp error ocurred and 3 that new/unread news exists.  Useful for 
+2 that a nntp error occurred and 3 that new/unread news exists.  Useful for 
 writing scripts.
 .PP
 \fITin\fP can also dynamically change its options by the 'M' menu command.
@@ -241,7 +241,7 @@ statistics.
 \fITin\fP has four separate levels of operation: Group selection level, 
 Group level, Thread level and Article level.
 .PP
-At the Group Selection level the title displays (tha name of the newsserver
+At the Group Selection level the title displays (the name of the newsserver
 and) the number of subscribed groups (containing new unread articles).  The
 newsgroups are displayed in the middle of the screen with the
 number of unread articles displayed on the same line in front.
@@ -473,7 +473,7 @@ Auto select article(s) with a single key. The defaults used for selection
 are set via the following three tinrc config variables: 
 default_filter_select_header (0=Subject:, 1=From:, 2=MessageiId:), 
 default_filter_select_global (ON=apply to all groups, OFF=apply to current
-group) and default_filter_select_expire (ON=expire after specifed time,
+group) and default_filter_select_expire (ON=expire after specified time,
 OFF=always apply the filter).
 Read the section \fIFiltering Articles\fP for more information.
 .TP
@@ -486,7 +486,7 @@ Kill article(s) with a single key. The defaults used for killing
 are set via the following three tinrc config variables: 
 default_filter_kill_header (0=Subject:, 1=From:, 2=MessageiId:), 
 default_filter_kill_global (ON=apply to all groups, OFF=apply to current
-group) and default_filter_kill_expire (ON=expire after specifed time,
+group) and default_filter_kill_expire (ON=expire after specified time,
 OFF=always apply the filter).
 Read the section \fIFiltering Articles\fP for more information.
 .TP
@@ -910,7 +910,7 @@ Undo all selections on current thread.
 Skip quoted text.
 .SH "GLOBAL OPTIONS MENU"
 This menu is accessed by pressing 'M' at all levels.  It allows the user
-to customize the behaviour of \fItin\fP. The options are saved to the file
+to customize the behavior of \fItin\fP. The options are saved to the file
 \fI$HOME/.tin/tinrc\fP.  Use <SPACE> to toggle the required option and
 <CR> to set.
 .TP 4
@@ -1142,7 +1142,7 @@ Default is /usr/bin/lpr.
 Directory where articles/threads are saved. Default is \fI$HOME/News\fP.
 .TP 4
 \fBdefault_sigfile\fP
-The path that specifies the signature file to use when posting, following upto
+The path that specifies the signature file to use when posting, following up to
 or replying to an article. If the path is a directory then the signature will
 be randomly generated from files that are in the specified directory.
 Default is \fI$HOME/.Sig\fP.
@@ -1189,7 +1189,7 @@ MIME encoding of the body, if necessary (8bit, base64, quoted-printable).
 Default is 8bit.
 .TP 4
 \fBnews_quote_format\fP
-Format of quote line when posting/followingup an article (%A=Address, %D=Date,
+Format of quote line when posting/following up an article (%A=Address, %D=Date,
 %F=Addr+Name, %G=Groupname, %M=MessageId, %N=Name).
 Default is "%F wrote:"
 .TP 4
@@ -1292,7 +1292,7 @@ If ON show only subscribed to groups that contain unread articles.
 Default is OFF.
 .TP 4
 \fBshow_xcommentto\fP
-If ON, the realname in the X-Comment-To header is displayed. Default is OFF.
+If ON, the real name in the X-Comment-To header is displayed. Default is OFF.
 .TP 4
 \fBsigdashes\fP
 If ON prepend the signature with dashes '\n-- \n'. Default is ON.

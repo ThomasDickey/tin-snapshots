@@ -170,7 +170,8 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 	int size;
 {
 	int ch, var_orig;
-	int i, width = 0;
+	int i;
+	size_t width = 0;
 
 	set_alarm_clock_off ();
 
@@ -194,7 +195,7 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 			 */
 			var = ++var % size;
 
-			printf("%-*s", width, list[var]);
+			printf("%-*s", (int)width, list[var]);
 			fflush (stdout);
 		}
 	} while (ch != '\r' && ch != '\n' && ch != ESC);
@@ -202,7 +203,7 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 	if (ch == ESC) {
 		var = var_orig;
 
-		printf("%-*s", width, list[var]);
+		printf("%-*s", (int)width, list[var]);
 		fflush (stdout);
 	}
 

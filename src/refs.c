@@ -5,7 +5,7 @@
  *  Created   : 09-05-96
  *  Notes     : Cacheing of message ids
  *				References based threading
- *	Credits   : Richard Hodson <richard@radar.demon.co.uk>
+ *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
  * 				Hashing function
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
@@ -94,7 +94,7 @@ hash_msgid(key)
  */
 #define DATE(x)		(arts[x->article].date)
 
-void
+static void
 add_to_parent(ptr)
 	struct t_msgid *ptr;
 {
@@ -362,8 +362,10 @@ _get_references(refptr, depth)
 	/*
 	 * Attempt at damage limitation in case of broken Refs fields
 	 */
-	if (len < HEADER_LEN-500)
-		len += sprintf(refs + len, "%s ", refptr->txt);
+	if (len < HEADER_LEN-500) {
+		sprintf(refs + len, "%s ", refptr->txt);
+		len = strlen(refs);
+	}
 
 	return (refs);
 }
@@ -524,7 +526,7 @@ dump_msgids()
  * TODO:
  * 
  * . Add threading on both references & subject.
- *  (reuse the current thread on subject code ??)
+ *  (reuse the current thread on subject code ?)
  * 
  * . When inserting sibling messages, we currently insert at the head of
  *   the list. This should be sorted by date.

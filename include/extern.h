@@ -25,7 +25,7 @@
 /*
  * The prototypes bracketed by DECL_xxxx ifdef's are used to get moderately
  * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
- * are enabled.
+ * are enabled.  (Not all of the functions are ANSI or POSIX).
  */
 #ifdef DECL_BCOPY
 extern int bcopy P_((char *, char *, int));
@@ -35,6 +35,9 @@ extern void bzero P_((char *, int));
 #endif
 #ifdef DECL_FCLOSE
 extern int fclose P_((FILE *));
+#endif
+#ifdef DECL_FDOPEN
+extern FILE *fdopen P_((int, const char *));
 #endif
 #ifdef DECL_FFLUSH
 extern int fflush P_((FILE *));
@@ -69,6 +72,21 @@ extern char *getlogin P_((void));
 #ifdef DECL_GETOPT
 extern int getopt P_((int, char **, char *));
 #endif
+#ifdef DECL_GETHOSTBYNAME
+extern struct hostent *gethostbyname P_((const char *));
+#endif
+#ifdef DECL_GETPWNAM
+extern struct passwd *getpwnam P_((const char *));
+#endif
+#ifdef DECL_GETSERVBYNAME
+extern struct servent *getservbyname P_((const char *, const char *));
+#endif
+#ifdef DECL_INET_ADDR
+extern unsigned long inet_addr P_((const char *));
+#endif
+#ifdef DECL_INET_NTOA
+extern char *inet_ntoa P_((struct in_addr));
+#endif
 #ifdef DECL_IOCTL
 extern int ioctl P_((int, unsigned long, void *));
 #endif
@@ -84,6 +102,9 @@ extern int pclose P_((FILE *));
 #ifdef DECL_PERROR
 extern void perror P_((const char *));
 #endif
+#ifdef DECL_POPEN
+extern FILE * popen P_((const char *, const char *));
+#endif
 #ifdef DECL_PRINTF
 extern int printf P_((const char *, ...));
 #endif
@@ -94,7 +115,7 @@ extern void rewind P_((FILE *));
 extern int select P_((int, fd_set *, fd_set *, fd_set *, struct timeval *));
 #endif
 #ifdef DECL_SETEGID
-extern int setegid P_((uid_t));
+extern int setegid P_((gid_t));
 #endif
 #ifdef DECL_SETEUID
 extern int seteuid P_((uid_t));
@@ -106,14 +127,26 @@ extern pid_t setpgrp P_((void));
 extern int setpgrp P_((int, int));
 #endif
 #endif /* DECL_SETPGRP */
+#ifdef DECL_SETREGID
+extern int setregid P_((gid_t, gid_t));
+#endif
+#ifdef DECL_SETREUID
+extern int setreuid P_((uid_t, uid_t));
+#endif
 #ifdef DECL_SOCKET
 extern int socket P_((int, int, int));
 #endif
 #ifdef DECL_SSCANF
 extern int sscanf P_((const char *, const char *, ...));
 #endif
+#ifdef DECL_STRCASECMP
+extern int strcasecmp P_((const char *, const char *));
+#endif
 #ifdef DECL_STRFTIME
 extern int strftime P_((char *, int, char *, struct tm *));
+#endif
+#ifdef DECL_STRNCASECMP
+extern int strncasecmp P_((const char *, const char *, size_t));
 #endif
 #ifdef DECL_STRTOL
 extern long strtol P_((const char *, char **, int));
@@ -141,13 +174,17 @@ extern int _flsbuf P_((int, FILE *));
 extern char *getenv P_((char *));
 #endif
 
+#ifdef DECL_ERRNO
+extern int errno;
+#endif
+
 extern int optind;
 extern char *optarg;
 
 /*
  * Local variables
  */
- 
+
 extern char *help_group[];
 extern char *help_page[];
 extern char *help_select[];
@@ -762,7 +799,7 @@ extern constext txt_kill_menu[];
 extern constext txt_kill_subj[];
 extern constext txt_kill_from[];
 extern constext txt_kill_msgid[];
-extern constext txt_kill_text[]; 
+extern constext txt_kill_text[];
 extern constext txt_kill_scope[];
 extern constext txt_kill_lines[];
 extern constext txt_kill_time[];

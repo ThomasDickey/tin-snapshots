@@ -52,12 +52,15 @@ TCP *nntp_rd_fp = NULL;
 TCP *nntp_wr_fp = NULL;
 #endif 
 
-extern	int errno;
 #else /* VMS */
 int	sockt_rd = -1, sockt_wr = -1;
 #endif
 
 #ifdef NNTP_ABLE
+#	ifdef HAVE_NETDB_H
+#		include <netdb.h>
+#	endif
+
 #	ifdef TLI
 #		include	<fcntl.h>
 #		include	<tiuser.h>
@@ -105,7 +108,7 @@ int	sockt_rd = -1, sockt_wr = -1;
 			extern int connect (int s, struct sockaddr *name, int namelen);
 			extern char *inet_ntoa (struct in_addr in);
 #		endif
-#		if defined(linux)
+#		ifdef HAVE_ARPA_INET_H
 #			include <arpa/inet.h>
 #		endif
 #	endif /* !VMS */
@@ -154,7 +157,7 @@ getserverbyfile (file)
 		return (buf);
 	}
 
-	cp = (char *) getenv ("NNTPSERVER");
+	cp = getenv ("NNTPSERVER");
 	if (cp != (char *) 0) {
 		(void) get_nntpserver (buf, cp);
 		return (buf);
@@ -310,7 +313,8 @@ get_tcp_socket (machine, service, port)
 */
 
 #ifdef TLI 
-	struct	hostent *gethostbyname (), *hp;
+	extern struct	hostent *gethostbyname ();
+	struct	hostent *hp;
 	struct	t_call	*callptr;
 
 	/*
@@ -393,13 +397,8 @@ get_tcp_socket (machine, service, port)
 	static struct hostent def;
 	static struct in_addr defaddr;
 	static char namebuf[256];
-#if !defined(linux)
-	struct servent *getservbyname ();
-	struct hostent *gethostbyname ();
-	unsigned long inet_addr();
-#endif
 
-#ifndef NO_GETSERVBYNAME
+#ifdef HAVE_GETSERVBYNAME
 	if ((sp = (struct servent *) getservbyname (service, "tcp")) ==  NULL) {
 		fprintf (stderr, "%s/tcp: Unknown service.\n", service);
 		return (-1);

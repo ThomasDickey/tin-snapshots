@@ -1,3 +1,14 @@
+--unoff BETA release 960701 --
+
+100) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup & configure-tweaking
+     FIX. several supplied patches
+
+099) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (introduced in 026) allocated memory was not freed after usage
+     ADD. check for NULL pointer before giving memory free
+     FIX. configure[.in], config.c, page.c, pgp.c
+
 --unoff BETA release 960630 --
 
 098) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -21,13 +32,13 @@
 --unoff BETA release 960623 --
 
 094) Chris Blum <chris@phil.uni-sb.de>
-     ADD. mail_address to tinrc if defined FORGERY to build a vaild From:
+     ADD. mail_address to tinrc if defined FORGERY to build a valid From:
           via slip/ppp connections
      FIX. extern.h, config.c, inews.c, init.c
 
 093) Roland Rosenfeld <roland@spinnaker.rhein.de>
      Lars Dannenberg <lars@vendetta.han.de>
-     BUG. used wrong colors under certain cricumstances
+     BUG. used wrong colors under certain circumstances
      FIX. extern.h, config.c, help.c, init.c
 
 092) Urs Janssen <urs@akk.uni-karlsruhe.de>

@@ -339,7 +339,7 @@ getserverbyfile (file)
 	register char	*cp;
 	static char	buf[256];
 
-	cp = (char *) getenv ("NNTPSERVER");
+	cp = getenv ("NNTPSERVER");
 	if (cp != (char *) 0) {
 		(void) strcpy (buf, cp);
 		return (buf);

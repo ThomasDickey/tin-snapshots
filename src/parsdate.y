@@ -824,7 +824,6 @@ parsedate(p, now)
     char		*p;
     TIMEINFO		*now;
 {
-    extern int		date_parse();
     struct tm		*tm;
     TIMEINFO		ti;
     time_t		Start;

@@ -6,11 +6,11 @@ o  strip hardcoded values (binaries/sources) from feed.c
 o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
    true...
 
-o  if external inews could not be found posting failes but no dead.article
+o  if external inews could not be found posting fails but no dead.article
    is saved :(
    fallback to build_in_inews would be good...
 
-o  if postings fails tin reareads the article numbers for the group you
+o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
    useless!
 
@@ -30,7 +30,7 @@ o  if a colored signature wraps over a page-break, the coloring gets lost
 o  if marking read article with 'z' as will return and than reread it, the
    '-' article_will_return flag is not removed.
    when leaving that group, the unread_articles counter still contains that
-   article, but when reentering it is recognized as read and disapers (as it
+   article, but when reentering it is recognized as read and disappears (as it
    should have before)
 
 o  The 'M' moderation flag (group selection level) is not showing up
@@ -55,19 +55,11 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  fix parsdate.y line 827   (no prototyping #if defined (__GNUC__)) *uhhh?*
-       nntplib.c  line 388++ (no prototyping #if !defined(linux)
-                                                 && defined (__GNUC__))
-       init.c     line 233++ (no prototyping #if !defined(linux)
-                                                 && defined (__GNUC__))
-       misc.c     line 666   (no prototyping #if !defined(linux)
-                                                 && defined (__GNUC__))
-
 o  tin sometimes crashes (thread.c) 710/892
 
 New features
 ------------
-o  add expandation of $HOME and/or ~ to newsrctable
+o  add expansion of $HOME and/or ~ to newsrctable
 
 o  add
        --enable-mime-base64           (default off)
@@ -75,11 +67,10 @@ o  add
        --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
-   add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
+   add ifdef NNTP_ONLY undef SPOOLDIR etc...
 
 o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
-   like NO_PIPING and DONT_HAVE_PIPING
 
 o  split tin.h/proto.h for better dependencies in make
 
@@ -93,8 +84,8 @@ o  add feature save selected/tagged files sequentially to the same file
 
 o  rewrite NGLIMIT handling (post.c)
 
-o  Reorganise tinrc into related sections for easier editing
-   eg: Display, Posting etc.
+o  Reorganize tinrc into related sections for easier editing
+   e.g., Display, Posting etc.
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
@@ -191,7 +182,7 @@ o  if exiting tin with
    catchup_read_groups=ON
    thread_articles=ON
    tin first threads the group and than catches
-   it up and than exits - but threading is not necesarry for a catch-up!
+   it up and than exits - but threading is not necessary for a catch-up!
    and it does a filter before exiting - stupid!
 
 o  when last articles in a newsgroup were canceled, it shows that there are
@@ -256,8 +247,8 @@ o  'g'oto group does not work when starting up tin with:
 
 o  fix kill/hot mechanism that you could kill/mark hot everything which
    contains abc OR def... like "tin *|* tin|* tin *" -even better would be a
-   routine which recognizes word-demiliters so that "tin:" or "'tin'" would be
-   also matched in an expression like ^tin^ and which would not match posTINg
+   routine which recognizes word-delimiters so that "tin:" or "'tin'" would be
+   also matched in an expression like ^tin^ and which would not match posting
 
 o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
    (Velveeta-kill)

@@ -65,7 +65,7 @@ feed_articles (function, level, group, respnum)
 	int ret2 = FALSE;
 	int retcode;
 	
-#ifdef NO_PIPING
+#ifdef DONT_HAVE_PIPING
 	if (function == FEED_PIPE) {
 		error_message (txt_piping_not_enabled, "");
 		clear_message ();

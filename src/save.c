@@ -22,10 +22,6 @@
 #define OFF		3
 #define END		4
 
-#ifndef VMS
-extern int errno;
-#endif
-
 int create_subdir = TRUE;
 
 

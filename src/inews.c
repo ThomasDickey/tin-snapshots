@@ -15,7 +15,6 @@
 #include	"tin.h"
 
 #ifdef VMS
-#   include <ctype.h>
 #   ifdef MULTINET
 #		define netwrite    socket_write
 #		include "multinet_root:[multinet.include]netdb.h"
@@ -214,7 +213,7 @@ get_host_name (host_name)
 		 * If 1st letter is '$' read gateway name from shell variable
 		 */
 		if (nntp_inews_gateway[0] == '$' && nntp_inews_gateway[1]) {
-			ptr = (char *) getenv (&nntp_inews_gateway[1]);
+			ptr = getenv (&nntp_inews_gateway[1]);
 			if (ptr != (char *) 0) {
 				strncpy (nntp_inews_gateway, ptr, sizeof (nntp_inews_gateway));
 			}
@@ -264,7 +263,7 @@ get_host_name (host_name)
 		}
 		if (sfp != (FILE *) 0) {
 			fgets (host, sizeof (host), sfp);
-			if (strlen (host) > 0) {
+			if (strlen (host) != 0) {
 				ptr = strrchr (host, '\n');
 				if (ptr != (char *) 0) {
 					*ptr = '\0';
@@ -352,7 +351,7 @@ get_user_info (user_name, full_name)
 		strcpy(full_name, fix_fullname(get_uaf_fullname()));
 #endif
 
-	if ((ptr = (char *) getenv ("NAME")) != (char *) 0) {
+	if ((ptr = getenv ("NAME")) != (char *) 0) {
 		my_strncpy (full_name, ptr, 128); }
 		
 	/* 
@@ -460,7 +459,7 @@ get_domain_name (inews_domain, domain)
 	 * If 1st letter is '$' read domain name from shell variable
 	 */
 	if (inews_domain[0] == '$' && inews_domain[1]) {
-		ptr = (char *) getenv (&inews_domain[1]);
+		ptr = getenv (&inews_domain[1]);
 		if (ptr != (char *) 0) {
 			strcpy (inews_domain, ptr);
 		}
