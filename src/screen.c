@@ -144,7 +144,7 @@ center_line (line, inverse, str)
 	int pos;
 
 	if (! cmd_line) {
-		if (cCOLS >= strlen (str)) {
+		if (cCOLS >= (int) strlen (str)) {
 			pos = (cCOLS - (int) strlen (str)) / 2;
 		} else {
 			pos = 1;
@@ -154,7 +154,7 @@ center_line (line, inverse, str)
 			StartInverse ();
 		}
 	}
-	if (strlen (str) >= cCOLS) {
+	if ((int) strlen (str) >= cCOLS) {
 		char buf[256];
 		sprintf(buf, "%-.*s%s", cCOLS-6, str, " ...");
 		my_fputs (buf, stdout);

@@ -184,7 +184,7 @@ user_posted_messages ()
 {
 	char buf[LEN];
 	FILE *fp;
-	int i = 0, j, k;
+	size_t i = 0, j, k;
 	int no_of_lines = 0;
 
 	if ((fp = fopen (posted_info_file, "r")) == (FILE *) 0) {
@@ -1639,9 +1639,9 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
 		fseek (note_fp, 0L, 0);
-		fprintf(fp, "-------- forwarded-message -------------->\n");
+		fprintf(fp, "-- forwarded message --\n");
 		copy_fp (note_fp, fp, "");
-		fprintf(fp, "<------- end-of-forwarded-message --------\n");
+		fprintf(fp, "-- end of forwarded message --\n");
 	}
 
 	if (! use_mailreader_i) {

@@ -65,7 +65,7 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  tin sometimes crashes (thread.c) 710/892/987
+o  tin sometimes crashes (thread.c) 987
 
 o  rereading the active file is buggy, it causes crashes on some machines and
    sometimes it takes 50 times longer than the first read at startup...

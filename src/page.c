@@ -1207,6 +1207,7 @@ art_open (art, group_path)
 	char buf[8192];
 	char *ptr;
 	int c;
+	int is_summary;
 
 	note_page = 0;
 
@@ -1248,17 +1249,26 @@ art_open (art, group_path)
 		if (*buf == '\n')
 			break;
 
+		/* do not remove \n in Summary lines */
+		is_summary = (my_strnicmp (buf, "Summary: ", 9) == 0);
+
 		/* check for continued header line */
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
 		      && strlen(buf)<sizeof(buf)-1) {
 		  if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
-		    buf[strlen(buf)-1]='\0';
+			  if (is_summary) {
+				  buf[strlen(buf)]='\0';
+			  } else {
+				  buf[strlen(buf)-1]='\0';
+			  }
 		  }
 		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
 		}
 
-		for (ptr = buf ; *ptr && *ptr != '\n' ; ptr++) {
-			if (((*ptr) & 0xFF) < ' ')
+		for (ptr = buf ; *ptr && ((*ptr!='\n') || (ptr[1]!='\0')); ptr++) {
+			if ((((*ptr) & 0xFF) < ' ') 
+				&& (*ptr!='\n') 
+				&& ((*ptr!='\t') || (!is_summary)))
 				*ptr = ' ';
 		}
 		*ptr = '\0';

@@ -16,6 +16,13 @@
 
 static unsigned int time_remaining;
 
+#ifndef WEXITSTATUS
+# define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
+#endif
+#ifndef WIFEXITED
+# define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
+#endif
+
 #ifdef SIGTSTP
 int do_sigtstp = 0;
 #endif
@@ -150,11 +157,11 @@ void _CDECL signal_handler (sig)
 {
 	char *sigtext;
 #ifdef SIGCHLD
+#if HAVE_TYPE_UNIONWAIT
+	union wait wait_status;
+#else
 	int wait_status = 1;
 #endif
-
-#if defined(SIGCHLD) && defined(NeXT)
-	union wait statusp;
 #endif
 
 	switch (sig) {
@@ -184,16 +191,9 @@ void _CDECL signal_handler (sig)
 
 #ifdef SIGCHLD
 		case SIGCHLD:
-#ifdef NeXT
-			wait (&statusp);
-			wait_status = statusp.w_status;
-#else
 			wait (&wait_status);
-#endif
 			signal (SIGCHLD, signal_handler);	/* death of a child */
-#	ifdef WEXITSTATUS
 			system_status = WEXITSTATUS(wait_status);
-#	endif
 			return;
 #endif
 

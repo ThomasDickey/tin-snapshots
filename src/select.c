@@ -345,6 +345,7 @@ select_up:
 			case iKeySelectResetNewsrc:	/* reset .newsrc */
 			    if (prompt_yn (cLINES, txt_reset_newsrc, FALSE) == 1) {
 					reset_newsrc ();
+					yank_active_file ();
 					cur_groupnum = 0;
 					group_selection_page ();
 			    }

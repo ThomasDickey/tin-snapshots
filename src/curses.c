@@ -54,7 +54,7 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 #			include <sys/ioctl.h>
 #		endif
 #	endif
-#	if !defined(sun) || !defined(NL0)
+#	if !(defined(sun) || defined(apollo)) || !defined(NL0)
 #		include <termios.h>
 #	endif
 #	define USE_POSIX_TERMIOS 1

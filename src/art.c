@@ -501,6 +501,14 @@ make_threads (group, rethread)
 			arts[i].inthread = FALSE;
 
 #ifdef HAVE_REF_THREADING
+			if (arts[i].refptr == NULL) {
+				fprintf(stderr, "\nError  : art->refptr is NULL\n");
+				fprintf(stderr, "Artnum : %ld\n", arts[i].artnum);
+				fprintf(stderr, "Subject: %s\n", arts[i].subject);
+				fprintf(stderr, "From   : %s\n", arts[i].from);
+			}
+			assert(arts[i].refptr != NULL);
+
 			arts[i].refptr->article = i;
 #endif
 		}

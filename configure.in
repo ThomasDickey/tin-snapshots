@@ -372,6 +372,7 @@ esac
 AC_STDC_HEADERS
 AC_HEADER_DIRENT
 AC_HEADER_TIME
+AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(\
 	arpa/inet.h \
 	curses.h \
@@ -402,12 +403,12 @@ AC_CHECK_HEADERS(\
 	sys/timeb.h \
 	sys/times.h \
 	sys/utsname.h \
-	sys/wait.h \
 	term.h \
 	termcap.h \
 	termio.h \
 	time.h \
 	unistd.h \
+	waitstatus.h \
 )
 
 # check for SCO.  this is a hack, and should be split into individual
@@ -475,6 +476,7 @@ AC_CHECK_FUNCS(\
 	strftime \
 	strtol \
 	tzset \
+	uname \
 	unlink \
 )
 

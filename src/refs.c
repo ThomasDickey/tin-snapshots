@@ -6,7 +6,7 @@
  *  Updated   : 16-07-96
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
- *	             hash_msgid, free_msgid
+ *		hash_msgid, free_msgid
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -17,6 +17,7 @@
 #include "tin.h"
 
 #define MAX_REFS	100			/* Limit recursion depth */
+#define REF_SEP		" "			/* Separator chars in ref headers */
 
 /* Produce disgusting amounts of output to help me tame this thing */
 #undef DEBUG_REFS
@@ -169,9 +170,11 @@ add_msgid(key, msgid, newparent)
 	struct t_msgid *i = NULL;
 	unsigned int h;
 
-	if (! msgid)
-		return(NULL);
-
+ 	if (! msgid) {
+ 		error_message("add_msgid: NULL msgid\n", "");
+ 		exit(1);
+ 	}
+  
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
 #ifdef DEBUG_REFS
@@ -311,10 +314,10 @@ parse_references(r)
 #endif
 
 	/*
-	 * Break the refs down, using ' ' as delimiters
-	 * A msgid can't contain a ' ', right ?
+	 * Break the refs down, using a space as delimiters
+	 * A msgid can't contain a space, right ?
 	 */
-	if ((ptr = strtok(r, " ")) == NULL)
+	if ((ptr = strtok(r, REF_SEP)) == NULL)
 		return(NULL);
 
 	/*
@@ -322,7 +325,7 @@ parse_references(r)
 	 */
 	parent = NULL;
 	current = add_msgid(REF_REF, ptr, parent);
-	while ((ptr = strtok(NULL, " ")) != NULL) {
+	while ((ptr = strtok(NULL, REF_SEP)) != NULL) {
 		parent = current;
 		current = add_msgid(REF_REF, ptr, parent);
 	}
@@ -339,6 +342,7 @@ parse_references(r)
 static char *
 _get_references(refptr, depth)
 	struct t_msgid *refptr;
+	int depth;
 {
 	char *refs;
 	static short len;							/* Accumulated size */
