@@ -1,4 +1,14 @@
---unoff BETA release 970125 --
+--unoff BETA release 970127 --
+
+303) Volker Barthelmann <volker@vb.franken.de>
+     ADD. some type fixes (amiga)
+     FIX. several supplied patches
+
+302) T.E.Dicky  <dickey@clark.net>
+     ADD. even mode K&R -> ANSI
+     FIX. several supplied patches
+
+--unoff BETA release 970126 --
 
 301) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. authenticate crashed on some machines
@@ -9,7 +19,7 @@
      FIX. color.c, smakefile
 
 299) T.E.Dicky  <dickey@clark.net>
-     ADD. start to get ridd og K&R code
+     ADD. start to get ridd of K&R code
      FIX. several supplied patches
 
 --unoff BETA release 970124 --

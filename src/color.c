@@ -22,14 +22,6 @@
 static int current_fcol = 7;
 static int current_bcol = 0;
 
-/*
- * Local prototypes
- */
-static t_bool isalp P_((int c));
-static t_bool check_valid_mark P_((const char *s, int c));
-static void color_fputs P_((const char *s, FILE *stream, int color));
-
-
 /* setting foregroundcolor */
 void
 fcol (

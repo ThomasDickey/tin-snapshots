@@ -39,7 +39,7 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exeptfds,
 
 struct __tcpbuf
 {
-	int		fd;		/* socket number */
+        int             _file;  /*vb*/          /* socket number */
 	char 	*buf;	/* current buffer pointer */
 	char	*base;	/* beginning of buffer */
 	int		size;	/* size of buffer */

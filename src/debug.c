@@ -20,10 +20,7 @@ int debug;
 ** Local prototypes
 */
 #ifdef DEBUG
-static void debug_print_active_hash P_((void));
-static void debug_print_attributes P_((struct t_attribute *attr, FILE *fp));
-static void debug_print_base P_((void));
-static void debug_print_group_hash P_((void));
+static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
 #endif
 
 /*

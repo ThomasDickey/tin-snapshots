@@ -34,24 +34,6 @@
 struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
 
 /*
- * Local prototypes
- */
-static unsigned int hash_msgid P_((char *key));
-static void add_to_parent P_((struct t_msgid *ptr));
-static struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *newparent));
-static struct t_msgid *parse_references P_((char *r));
-static char *_get_references P_((struct t_msgid *refptr, int depth));
-#ifdef HAVE_REF_THREADING
-#ifdef DEBUG_REFS
-static void dump_msgid_thread  P_((struct t_msgid *ptr, int level));
-static void dump_msgid_threads P_((void));
-#endif
-static struct t_msgid *find_next P_((struct t_msgid *ptr));
-static void build_thread P_((struct t_msgid *ptr));
-static void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
-#endif
-
-/*
  * This part of the code deals with the cacheing and retrieval
  * of Message-id and References headers
  *

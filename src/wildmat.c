@@ -38,8 +38,6 @@
 
 #include "tin.h"
 
-static int DoMatch P_((char *text, char *p));
-
 #define ABORT	-1
 
 /* What character marks an inverted character class? */

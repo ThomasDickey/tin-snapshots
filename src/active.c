@@ -23,18 +23,10 @@ time_t new_newnews_time;			/* FIXME: never set */
 /*
 ** Local prototypes
 */
-static int find_newnews_index P_((char *cur_newnews_host));
-static int match_group_list P_((char *group, char *group_list));
-static int parse_newsrc_active_line P_((char *group, long *count, long *max, long *min, char *moderated));
-static void check_for_any_new_groups P_((void));
-static void prompt_subscribe_group P_((char *group, char *autosubscribe, char *autounsubscribe));
-
-#if 0
-static int cmp_group_p P_((t_comptype *group1, t_comptype *group2));
-static int cmp_notify_p P_((t_comptype *notify1, t_comptype *notify2));
-static void backup_active P_((int create));
-#endif /* 0 */
-
+static int find_newnews_index (char *cur_newnews_host);
+static int match_group_list (char *group, char *group_list);
+static void check_for_any_new_groups (void);
+static void prompt_subscribe_group (char *group, char *autosubscribe, char *autounsubscribe);
 
 #if 0 /* never used */
 /*

@@ -19,12 +19,6 @@
 #include	"menukeys.h"
 #include	"tin.h"
 
-/*
-** Local prototyps
-*/
-static void write_newsrctable_file P_((void));
-
-
 /* write_newsrctable_file()
  * create newsrctable file in local rc directory
  */

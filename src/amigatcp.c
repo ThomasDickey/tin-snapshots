@@ -107,7 +107,7 @@ TCP *s_fdopen(int s, const char *mode)
 		return (TCP *)0;
 	}
 
-	tp->fd = s;
+        tp->_file = s;
 	tp->cnt = 0;
 	tp->buf = tp->base;
 	tp->flags = (mode[0] == 'w') ? TIO_WRITE : TIO_READ;
@@ -120,7 +120,7 @@ void s_fclose(TCP *tp)
 	if (tp->cnt)
 		s_flush(tp);
 	free(tp->base);
-	xs_close(tp->fd);
+        xs_close(tp->_file);
 	free(tp);
 }
 
@@ -151,7 +151,7 @@ int s_flush(TCP *tp)
 	int ret;
 
 	if (tp->cnt && tp->flags & TIO_WRITE) {
-		ret = send(tp->fd, tp->base, tp->cnt, 0);
+                ret = send(tp->_file, tp->base, tp->cnt, 0);
 		tp->cnt = 0;
 		tp->buf = tp->base;
 		return ret;
@@ -194,7 +194,7 @@ int s_puts(const char *str, TCP *tp)
 	}
 
 	while (tp->size - tp->cnt < length) {
-		ret = send(tp->fd, (char *)str, length, 0);
+                ret = send(tp->_file, (char *)str, length, 0);
 		if (ret < 0) return ret;
 		length -= ret;
 		if (length == 0) return 0;
@@ -235,7 +235,7 @@ char *s_gets(char *str, int size, TCP *tp)
 
 		tp->buf = tp->base;
 		do {
-			IoctlSocket(tp->fd, FIONREAD, (char *)&length);
+                        IoctlSocket(tp->_file, FIONREAD, (char *)&length);
 			if (length == 0) {
 				fd_set rfd, efd;
 				struct timeval timeout;
@@ -244,10 +244,10 @@ char *s_gets(char *str, int size, TCP *tp)
 				timeout.tv_micro = 0;
 
 				FD_ZERO(&rfd);
-				FD_SET(tp->fd, &rfd);
+                                FD_SET(tp->_file, &rfd);
 				efd = rfd;
-				select(tp->fd+1, &rfd, NULL, &efd, &timeout);
-				if (! FD_ISSET(tp->fd, &rfd)) {
+                                select(tp->_file+1, &rfd, NULL, &efd, &timeout);
+                                if (! FD_ISSET(tp->_file, &rfd)) {
 					*cp = 0;
 					return 0;
 				}
@@ -255,7 +255,7 @@ char *s_gets(char *str, int size, TCP *tp)
 		} while(length == 0);
 
 		if (length > tp->size) length = tp->size;
-		length = recv(tp->fd, tp->buf, length, 0L);
+                length = recv(tp->_file, tp->buf, length, 0L);
 		tp->cnt = length;
 	}
 }

@@ -49,15 +49,6 @@ static unsigned char base64_rank[256];
 static int base64_rank_table_built;
 static int quoteflag;
 
-static int contains_nonprintables P_((char *w));
-static int rfc1522_do_encode P_((char *what, char **where));
-static unsigned hex2bin P_((int x));
-static void build_base64_rank_table P_((void));
-
-#ifdef MIME_BREAK_LONG_LINES
-static int sizeofnextword P_((char *w));
-#endif
-
 static void
 build_base64_rank_table (void)
 {

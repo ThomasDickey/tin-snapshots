@@ -40,14 +40,14 @@ int	iVerbose;
 /*
 ** Local prototypes
 */
-static void vAppendGrpLine P_((char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir));
-static void vInitVariables P_((void));
-static void vMakeGrpList P_((char *pcActiveFile, char *pcBaseDir, char *pcGrpPath));
+static void vAppendGrpLine (char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir);
+static void vInitVariables (void);
+static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
 
 #ifdef ACTIVE_DAEMON
-static void vReadCmdLineOptions P_((int iNumArgs, char *pacArgs[]));
-static void vPrintUsage P_((char *pcProgName));
-static void vUpdateActiveFile P_((char *pcActiveFile, char *pcDir));
+static void vReadCmdLineOptions (int iNumArgs, char *pacArgs[]);
+static void vPrintUsage (char *pcProgName);
+static void vUpdateActiveFile (char *pcActiveFile, char *pcDir);
 #endif /* ACTIVE_DAEMON */
 
 #ifndef M_AMIGA
@@ -85,7 +85,7 @@ main (
 	 */
 	vUpdateActiveFile (acMailActiveFile, acMailDir);
 	vUpdateActiveFile (acSaveActiveFile, acSaveDir);
-	 return 0;
+	return 0;
 }
 
 #endif	/* ACTIVE_DAEMON */

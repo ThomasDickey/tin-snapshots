@@ -55,14 +55,13 @@ long note_size;				/* stat size in bytes of article */
 static int tex2iso_article;
 
 /*
-** Lolcal prototypes
+** Local prototypes
 */
-static int expand_ctrl_chars P_((char *tobuf, char *frombuf, int length, int do_rotate));
-static void show_mime_article P_((FILE *fp, struct t_article *art));
-static void show_first_header P_((int respnum, char *group));
-static void show_cont_header P_((int respnum));
-static int prompt_response P_((int ch, int respnum));
-static int show_last_page P_((void));
+static void show_mime_article (FILE *fp, struct t_article *art);
+static void show_first_header (int respnum, char *group);
+static void show_cont_header (int respnum);
+static int prompt_response (int ch, int respnum);
+static int show_last_page (void);
 
 int
 show_page (

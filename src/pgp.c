@@ -42,12 +42,6 @@
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
 char *pgpopts = (char *)NULL, pgp_data[PATH_LEN];
 
-static void join_files P_((char *file));
-static void split_file P_((char *file));
-static void do_pgp P_((int what, char *file, char *mail_to));
-static void pgp_append_public_key P_((char *file));
-static int pgp_available P_((void));
-
 static void
 join_files (
 	char *file)

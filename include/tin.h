@@ -1644,12 +1644,6 @@ extern void joinpath (char *result, char *dir, char *file);
  *  function prototypes & extern definitions
  */
 
-#if __STDC__ || defined(__cplusplus)
-#	define P_(s) s
-#else
-#	define P_(s) ()
-#endif
-
 /* #include	"filebug.h" */
 
 #ifndef SIG_ARGS
@@ -1693,10 +1687,11 @@ extern void joinpath (char *result, char *dir, char *file);
 #define OUTC_FUNCTION(func) OUTC_RETTYPE func (c) int c;
 #endif
 
-typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
+typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 
 #ifdef M_AMIGA
 	typedef	struct __tcpbuf TCP;
+        #include "amigatcp.h"
 #else
 	typedef	FILE	TCP;
 #endif /* M_AMIGA */
@@ -1714,7 +1709,7 @@ typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
 /*
  * rfc1521/rfc1522 interface
  */
-typedef void (*BodyPtr) P_((char *, FILE *, int));
+typedef void (*BodyPtr) (char *, FILE *, int);
 
 #ifdef USE_DBMALLOC
 #	undef strchr
@@ -1750,9 +1745,9 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #  	define ANSI_VARARGS 0
 #  	include <varargs.h>
 #	endif
-	extern char *doalloc P_((char *, size_t));
-	extern char *docalloc P_((size_t, size_t));
-	extern void	dofree P_((char *));
+	extern char *doalloc (char *, size_t);
+	extern char *docalloc (size_t, size_t);
+	extern void	dofree (char *);
 #	undef malloc
 #	undef realloc
 #	undef calloc
@@ -1761,12 +1756,12 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #	define	realloc		doalloc
 #	define	calloc		docalloc
 #	define	free		dofree
-	extern void	fail_alloc P_(( char *, char * ));
-	extern void	Trace P_(( char *, ... ));
-	extern void	Elapsed P_(( char * ));
-	extern void	WalkBack P_(( void ));
-	extern void	show_alloc P_(( void ));
-	extern void	no_leaks P_(( void ));
+	extern void	fail_alloc ( char *, char * );
+	extern void	Trace ( char *, ... );
+	extern void	Elapsed ( char * );
+	extern void	WalkBack ( void );
+	extern void	show_alloc ( void );
+	extern void	no_leaks ( void );
 #endif	/* DOALLOC */
 
 #ifdef __DECC		/* VMS */

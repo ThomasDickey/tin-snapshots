@@ -34,12 +34,10 @@ static int last_thread_on_screen = 0;
 /*
 ** Local prototypes
 */
-static int draw_tline P_((int i, int full));
-static int bld_tline P_((int l, struct t_article *art));
-static int prompt_thread_num P_((int ch));
-static void draw_thread_arrow P_((void));
-static void erase_thread_arrow P_((void));
-static void update_thread_page P_((void));
+static int prompt_thread_num (int ch);
+static void draw_thread_arrow (void);
+static void erase_thread_arrow (void);
+static void update_thread_page (void);
 
 
 /*

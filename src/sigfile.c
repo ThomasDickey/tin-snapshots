@@ -24,8 +24,8 @@
 
 static char sigfile[PATH_LEN];
 
-static FILE *open_random_sig P_((char *sigdir));
-static int thrashdir P_((char *sigdir));
+static FILE *open_random_sig (char *sigdir);
+static int thrashdir (char *sigdir);
 
 void
 msg_write_signature (

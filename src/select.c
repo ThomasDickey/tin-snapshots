@@ -27,14 +27,14 @@ int yank_in_active_file = TRUE;
 /*
 ** Local prototypes
 */
-static int prompt_group_num P_((int ch));
-static void yank_active_file P_((void));
-static int reposition_group P_((struct t_group *group, int default_num));
-static void catchup_group P_((struct t_group *group, int goto_next_unread_group));
-static int next_unread_group P_((int enter_group));
-static void goto_next_group_on_screen P_((void));
-static int iParseRange P_((char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax));
-static void vDelRange P_((int iLevel, int iNumMax));
+static int prompt_group_num (int ch);
+static void yank_active_file (void);
+static int reposition_group (struct t_group *group, int default_num);
+static void catchup_group (struct t_group *group, int goto_next_unread_group);
+static int next_unread_group (int enter_group);
+static void goto_next_group_on_screen (void);
+static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
+static void vDelRange (int iLevel, int iNumMax);
 
 
 void

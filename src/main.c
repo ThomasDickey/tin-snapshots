@@ -29,12 +29,12 @@ static int max_cmdargs;
 /*
 ** Local prototypes
 */
-static void read_cmd_line_options P_((int argc, char *argv[]));
-static void usage P_((char *theProgname));
-static int check_for_any_new_news P_((t_bool CheckAnyUnread, t_bool StartAnyUnread));
-static void save_or_mail_new_news P_((void));
-static void update_index_files P_((void));
-static void show_intro_page P_((void));
+static void read_cmd_line_options (int argc, char *argv[]);
+static void usage (char *theProgname);
+static int check_for_any_new_news (t_bool CheckAnyUnread, t_bool StartAnyUnread);
+static void save_or_mail_new_news (void);
+static void update_index_files (void);
+static void show_intro_page (void);
 
 
 /*

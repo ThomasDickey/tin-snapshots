@@ -45,16 +45,12 @@ struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 /*
 ** Local prototypes
 */
-static char *pcChkRegexStr P_((char *pcStr));
-static int get_choice P_((int x, char *help, char *prompt, char *opt1, char *opt2, char *opt3, char *opt4, char *opt5));
-static int iAddFilterRule P_((struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule));
-static int unfilter_articles P_((void));
-static int set_filter_scope P_((struct t_group *group));
-static void vSetFilter P_((struct t_filter *psFilter));
-static void free_filter_item P_((struct t_filter *ptr));
-static void free_filter_array P_((struct t_filters *ptr));
-static void vWriteFilterFile P_((char *pcFile));
-static void vWriteFilterArray P_((FILE *fp, int global, struct t_filters *ptr, long theTime));
+static char *pcChkRegexStr (char *pcStr);
+static int iAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
+static int unfilter_articles (void);
+static int set_filter_scope (struct t_group *group);
+static void vWriteFilterFile (char *pcFile);
+static void vWriteFilterArray (FILE *fp, int global, struct t_filters *ptr, long theTime);
 
 
 struct t_filter *

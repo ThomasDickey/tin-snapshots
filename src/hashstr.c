@@ -36,7 +36,7 @@ struct t_hashnode **table=0;
 struct t_hashnode *table[HASHNODE_TABLE_SIZE];
 #endif
 
-static struct t_hashnode *add_string P_((char *s));
+static struct t_hashnode *add_string (char *s);
 
 char *
 hash_str (
