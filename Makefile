@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971105
+PVER		= 971106
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure

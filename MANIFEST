@@ -1,4 +1,4 @@
-MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
+MANIFEST for tin-pre-1.4-971106 (Wed Nov  5 22:34:20 CET 1997)
 ----------------------------------------------------
    6686 ./Makefile
    2870 ./MANIFEST
@@ -12,7 +12,7 @@ MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
     650 ./mkdirs.sh
   11664 ./makefile.in
     964 ./conf-tin
- 103025 ./doc/CHANGES
+ 103300 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
   16483 ./doc/INSTALL
   15734 ./doc/TODO
@@ -47,7 +47,7 @@ MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
   23432 ./src/attrib.c
    9728 ./src/auth.c
    8946 ./src/charset.c
-   7778 ./src/color.c
+   7760 ./src/color.c
   55567 ./src/config.c
   21312 ./src/curses.c
   12178 ./src/debug.c
@@ -75,7 +75,7 @@ MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
   31268 ./src/nntpw32.c
    4405 ./src/nntpvms.c
    6326 ./src/nrctbl.c
-  22066 ./src/open.c
+  22151 ./src/open.c
    6272 ./src/os_2.c
   39258 ./src/page.c
   24083 ./src/parsdate.y
@@ -83,7 +83,7 @@ MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
   90404 ./src/post.c
   10702 ./src/prompt.c
    6119 ./src/read.c
-  23016 ./src/refs.c
+  23162 ./src/refs.c
    3013 ./src/regex.c
   11289 ./src/rfc1521.c
   22306 ./src/rfc1522.c
@@ -112,8 +112,8 @@ MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
    2336 ./amiga/amiga.h
    2167 ./amiga/amigatcp.h
    8718 ./include/autoconf.hin
-  12094 ./src/Makefile.in
+  12220 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    4244 ./src/tincfg.tbl
-1983745 total
+1984359 total

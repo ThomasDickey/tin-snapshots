@@ -59,12 +59,12 @@ set_colors (
 		chtype attribute = A_NORMAL;
 		int pair = 0;
 
-		TRACE(("set_colors (%d,%d)", fcolor, bcolor))
+		TRACE(("set_colors (%d, %d)", fcolor, bcolor))
 
 		/* fcolor/bcolor may be negative, if we're using ncurses
 		 * function use_default_colors().
 		 */
-		if ((COLORS != 0) && (fcolor > COLORS-1)) {
+		if (fcolor > COLORS-1) {
 			attribute |= A_BOLD;
 			fcolor %= COLORS;
 		}

@@ -341,6 +341,7 @@ parse_references(
 	 */
 	parent = NULL;
 	current = add_msgid(REF_REF, ptr, parent);
+
 	while ((ptr = strtok(NULL, REF_SEP)) != NULL) {
 		parent = current;
 		current = add_msgid(REF_REF, ptr, parent);
@@ -865,6 +866,7 @@ build_references(
 
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.dump", "w");
+	setvbuf (dbgfd, NULL, 0, _IONBF);
 	fprintf(dbgfd, "MSGID phase\n");
 #endif
 
@@ -903,6 +905,7 @@ build_references(
 	 * Add the References data to the cache
 	 */
 	for (i = 0; i < top; i++) {
+		struct t_msgid *refs;
 
 		if (!arts[i].refs)						/* No refs - skip */
 			continue;
@@ -911,9 +914,13 @@ build_references(
 
 		/*
 		 * Add the remaining references as parent to the last ref we added
-		 * earlier.
+		 * earlier. skip call to add_msgid when NULL pointer
 		 */
-		add_msgid(REF_REF, art->refptr->parent->txt, parse_references(art->refs));
+
+		refs = parse_references(art->refs);
+
+		if (art->refptr->parent)
+			add_msgid(REF_REF, art->refptr->parent->txt, refs);
 
 		free(art->refs);
 	}
