@@ -87,12 +87,12 @@ set_default_attributes (
 	psAttrib->maildir = tinrc.maildir;
 	psAttrib->savedir = tinrc.savedir;
 	psAttrib->savefile = (char *) 0;
-	psAttrib->sigfile = tinrc.default_sigfile;
+	psAttrib->sigfile = tinrc.sigfile;
 	psAttrib->organization = (default_organization ? default_organization : (char *) 0);
 	psAttrib->from = (char *) 0;
 	psAttrib->followup_to = (char *) 0;
 #ifndef DISABLE_PRINTING
-	psAttrib->printer = tinrc.default_printer;
+	psAttrib->printer = tinrc.printer;
 #endif /* !DISABLE_PRINTING */
 	psAttrib->quick_kill_scope = (tinrc.default_filter_kill_global ? my_strdup("*") : (char *) 0);
 	psAttrib->quick_kill_header = tinrc.default_filter_kill_header;
@@ -113,7 +113,7 @@ set_default_attributes (
 	psAttrib->auto_select = FALSE;
 	psAttrib->batch_save = tinrc.batch_save;
 	psAttrib->delete_tmp_files = FALSE;
-	psAttrib->post_proc_type = tinrc.post_process_type;
+	psAttrib->post_proc_type = tinrc.post_process;
 	psAttrib->x_comment_to = FALSE;
 	psAttrib->news_quote_format = tinrc.news_quote_format;
 	psAttrib->quote_chars = tinrc.quote_chars;

@@ -73,6 +73,7 @@ extern OUTC_RETTYPE outchar (OUTC_ARGS);
 extern int InitScreen (void);
 extern int RawState (void);
 extern int ReadCh (void);
+extern int get_arrow_key (int prech);
 extern int get_termcaps (void);
 extern void ClearScreen (void);
 extern void CleartoEOLN (void);
@@ -170,7 +171,7 @@ extern const char *get_host_name (void);
 #endif /* !FORGERY */
 
 /* inews.c */
-extern int submit_news_file (char *name);
+extern t_bool submit_news_file (char *name);
 extern void get_from_name (char *from_name, struct t_group *thisgrp);
 extern void get_user_info (char *user_name, char *full_name);
 
@@ -226,6 +227,7 @@ extern void vPrintGrpLine (FILE *hFp, char *pcGrpName, long lArtMax, long lArtMi
 /* main.c */
 extern int main (int argc, char *argv[]);
 extern int read_cmd_line_groups (void);
+extern void giveup(void);
 
 /* memory.c */
 extern void expand_active (void);
@@ -248,11 +250,8 @@ extern char *eat_re (char *s, t_bool eat_was);
 extern char *quote_wild (char *str);
 extern char *quote_wild_whitespace (char *str);
 extern const char *get_val (const char *env, const char *def);
-extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
 extern int gnksa_do_check_from(char *from, char *address, char *realname);
-extern int invoke_cmd (char *nam);
-extern int invoke_editor (char *filename, int lineno);
 extern int my_chdir (char *path);
 extern int my_isprint (int c);
 extern int my_mkdir (char *path, mode_t mode);
@@ -264,6 +263,9 @@ extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir,
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
 extern long file_size (char *file);
 extern t_bool copy_file (char *pcSrcFile, char *pcDstFile);
+extern t_bool copy_fp (FILE *fp_ip, FILE *fp_op);
+extern t_bool invoke_cmd (char *nam);
+extern t_bool invoke_editor (char *filename, int lineno);
 extern t_bool mail_check (void);
 extern t_bool untag_all_articles (void);
 extern void append_file (char *old_filename, char *new_filename);
@@ -271,7 +273,6 @@ extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
 extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl, t_bool with_sig);
-extern void copy_fp (FILE *fp_ip, FILE *fp_op);
 extern void create_index_lock_file (char *the_lock_file);
 extern void draw_percent_mark (long cur_num, long max_num);
 extern void get_author (t_bool thread, struct t_article *art, char *str, size_t len);
@@ -306,7 +307,7 @@ extern int gnksa_check_from (char *from);
 	extern void show_color_status (void);
 #endif /* HAVE_COLOR */
 #ifdef HAVE_ISPELL
-	extern int invoke_ispell (char *nam, struct t_group *psGrp );
+	extern t_bool invoke_ispell (char *nam, struct t_group *psGrp );
 #endif /* HAVE_ISPELL */
 #ifndef M_UNIX
 	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
@@ -409,17 +410,22 @@ extern int count_postponed_articles (void);
 extern int post_response (char *group, int respnum, int copy_text, t_bool with_headers);
 extern t_bool mail_bug_report (void);
 extern t_bool mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
-extern t_bool mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, t_bool *mailed_ok);
+extern t_bool mail_to_someone (int respnum, const char *address, t_bool mail_to_poster, t_bool confirm_to_mail, t_bool *mailed_ok);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
-extern t_bool post_article (char *group, int *posted_flag);
+extern t_bool post_article (const char *group);
 extern t_bool reread_active_after_posting (void);
 extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile);
-extern void quick_post_article (t_bool postponed_only);
 #ifndef INDEX_DAEMON
 	extern int repost_article (const char *group, int respnum, t_bool supersede);
 	extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
+	extern void quick_post_article (t_bool postponed_only);
 #endif /* !INDEX_DAEMON */
+#if defined(USE_CANLOCK) && !defined(INDEX_DAEMON)
+	extern char *build_cankey(const char *messageid, const char *secret);
+	extern char *build_canlock(const char *messageid, const char *secret);
+	extern char *get_secret(void);
+#endif /* USE_CANLOCK && !INDEX_DAEMON */
 
 /* prompt.c */
 extern char *prompt_string_default (const char *prompt, char *def, const char *failtext, int history);
@@ -454,7 +460,7 @@ extern void free_msgids (void);
 extern void thread_by_reference (void);
 
 /* regex.c */
-extern t_bool compile_regex (char *regex, struct regex_cache *cache);
+extern t_bool compile_regex (char *regex, struct regex_cache *cache, int options);
 extern t_bool match_regex (const char *string, char *pattern, t_bool icase);
 
 /* rfc1521.c */
@@ -473,12 +479,12 @@ extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool 
 
 /* save.c */
 extern int check_start_save_any_news (int check_start_save);
-extern t_bool create_path (char *path);
 extern t_bool post_process_files (int proc_type_ch, t_bool auto_delete);
-extern t_bool save_art_to_file (int indexnum, t_bool the_mailbox, const char *filename);
 extern void print_art_seperator_line (FILE *fp, t_bool is_mailbox);
 extern void sort_save_list (void);
 #ifndef INDEX_DAEMON
+	extern t_bool create_path (char *path);
+	extern t_bool save_art_to_file (int indexnum, t_bool the_mailbox, const char *filename);
 	extern t_bool save_regex_arts_to_file (t_bool is_mailbox, char *group_path);
 	extern t_bool save_thread_to_file (t_bool is_mailbox, char *group_path);
 	extern void add_to_save_list (int the_index, t_bool is_mailbox, int archive_save, char *path);
@@ -487,7 +493,7 @@ extern void sort_save_list (void);
 /* screen.c */
 extern void center_line (int line, t_bool inverse, const char *str);
 extern void clear_message (void);
-extern void draw_arrow (int line);
+extern void draw_arrow_mark (int line);
 extern void erase_arrow (int line);
 extern void error_message (const char *fmt, ...);
 extern void info_message (const char *fmt, ...);
@@ -510,7 +516,7 @@ extern t_bool search_article (int forward);
 #endif /* !INDEX_DAEMON */
 
 /* select.c */
-extern int add_my_group (char *group, t_bool add);
+extern int add_my_group (const char *group, t_bool add);
 extern int choose_new_group (void);
 extern int skip_newgroups (void);
 extern t_bool bSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);

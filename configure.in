@@ -58,7 +58,6 @@ AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
 CF_ANSI_CC_REQD
 CF_PROG_EXT
 CF_LIB_PREFIX(LIB_PREFIX)
-AC_SUBST(LIB_PREFIX)
 
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
@@ -226,11 +225,11 @@ AC_ARG_WITH(socks5,
 
 if test "x$cf_cv_use_libsocks" != xno ; then
 	CF_SOCKS($cf_cv_use_libsocks)
-elif test "x$cf_cv_use_libsocks5" != xno ; then
-	CF_NETLIBS
-	CF_SOCKS5($cf_cv_use_libsocks5)
 else
 	CF_NETLIBS
+	if test "x$cf_cv_use_libsocks5" != xno ; then
+	CF_SOCKS5($cf_cv_use_libsocks5)
+	fi
 fi
 
 ### Look for ncurses in the usual places, accommodating compilers that don't
@@ -686,6 +685,8 @@ AC_FUNC_SETVBUF_REVERSED
 
 ###	Checks for network library functions.
 AC_CHECK_FUNCS(\
+	gai_strerror \
+	getaddrinfo \
 	gethostbyname \
 	getservbyname \
 	inet_addr \

@@ -21,7 +21,7 @@
  * local prototypes
  */
 #ifdef NNTP_INEWS
-	static int submit_inews (char *name);
+	static t_bool submit_inews (char *name);
 #endif /* NNTP_INEWS */
 
 #if defined(NNTP_INEWS) && !defined(FORGERY)
@@ -57,7 +57,7 @@
  * Submit an article using the NNTP POST command
  */
 #ifdef NNTP_INEWS
-static int
+static t_bool
 submit_inews (
 	char *name)
 {
@@ -68,11 +68,11 @@ submit_inews (
 	char line[NNTP_STRLEN];
 	int auth_error = 0;
 	int respcode;
-	int sender = 0;
 	t_bool leave_loop = FALSE;
 	t_bool id_in_article = FALSE;
 	t_bool ret_code = FALSE;
 #	ifndef FORGERY
+	int sender = 0;
 	t_bool ismail = FALSE;
 #	endif /* !FORGERY */
 
@@ -192,9 +192,25 @@ submit_inews (
 		/*
 		 * check if Message-ID comes from the server
 		 */
-		if (*message_id && !id_in_article) {
+		if (*message_id) {
+			if (!id_in_article) {
 				sprintf (line, "Message-ID: %s", message_id);
 				put_server (line);
+			}
+#	ifdef USE_CANLOCK
+				/* create a Cancel-Lock: */
+			{
+				char lock[1024];
+				char *lptr = (char *) 0;
+
+				lock[0] = '\0';
+				if ((lptr = build_canlock(message_id, get_secret())) != (char *) 0) {
+					STRCPY(lock, lptr);
+					sprintf (line, "Cancel-Lock: %s", lock);
+					put_server (line);
+				}
+			}
+#	endif /* USE_CANLOCK */
 		}
 
 		/*
@@ -259,7 +275,7 @@ submit_inews (
 	 * response.)
 	 */
 	if (respcode != OK_POSTED) {
-		error_message ("Posting failed %s", line);
+		error_message ("Posting failed (%s)", line);
 		return ret_code;
 	}
 
@@ -272,13 +288,13 @@ submit_inews (
 /*
  * Call submit_inews() if using builtin inews, else invoke external inews prog
  */
-int
+t_bool
 submit_news_file (
 	char *name)
 {
 	char buf[LEN];
 	char *cp = buf;
-	int ret_code;
+	t_bool ret_code;
 	t_bool ismail = FALSE;
 
 	checknadd_headers (name);
@@ -291,19 +307,10 @@ submit_news_file (
 
 #ifdef NNTP_INEWS
 	if (read_news_via_nntp && !read_saved_news && tinrc.use_builtin_inews) {
-#	ifdef DEBUG
-		if (debug == 2)
-			error_message ("Using BUILTIN inews");
-#	endif /* DEBUG */
 		ret_code = submit_inews (name);
 	} else
 #endif /* NNTP_INEWS */
 		{
-#ifdef DEBUG
-		if (debug == 2)
-			error_message ("Using EXTERNAL inews");
-#endif /* DEBUG */
-
 #ifdef M_UNIX
 		if (*inewsdir) {
 			strcpy (buf, inewsdir);

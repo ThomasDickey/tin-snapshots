@@ -1,0 +1,43 @@
+#!/bin/sh
+
+if [ me$1ow = mecleanow ] ; then
+	rm *.o *.a endian endian.h canlocktest hmactest *~ core
+else
+	CC="cc"
+	
+	echo 'Determining endianness...'
+	${CC} -o endian endian.c
+	./endian > endian.h
+	
+	echo -n "Building: SHA-1 "
+	${CC} -c -o sha1.o sha1.c
+	echo -n "MD5 "
+	${CC} -c -o md5.o md5.c
+	echo -n "HMAC-SHA1 "
+	${CC} -c -o hmac_sha1.o hmac_sha1.c
+	echo -n "HMAC-MD5 "
+	${CC} -c -o hmac_md5.o hmac_md5.c
+	echo -n "Base64 "
+	${CC} -c -o base64.o base64.c
+	echo "canlock"
+	${CC} -c -o canlock_misc.o canlock_misc.c
+	${CC} -c -o canlock_sha1.o canlock_sha1.c
+	${CC} -c -o canlock_md5.o canlock_md5.c
+
+	echo "Archiving..."
+	ar -r libcanlock.a\
+		sha1.o hmac_sha1.o\
+		md5.o hmac_md5.o\
+		base64.o\
+		canlock_misc.o canlock_sha1.o canlock_md5.o
+
+	echo "Indexing..."
+	ranlib libcanlock.a
+
+	echo "Building test programs..."
+	${CC} -o hmactest  hmactest.c -L. -lcanlock
+	${CC} -o canlocktest canlocktest.c  -L. -lcanlock
+	
+	echo "Done."
+
+fi

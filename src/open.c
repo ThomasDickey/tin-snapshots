@@ -3,7 +3,7 @@
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1998-04-18
+ *  Updated   : 1999-07-17
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
@@ -36,9 +36,12 @@ long head_next;
 #endif /* NO_POSTING */
 
 char *nntp_server = (char *)0;
+static char txt_xover_string[] = "XOVER";
+char *txt_xover = txt_xover_string;
 
 /*
- * Open a connection to the NNTP server
+ * Open a connection to the NNTP server. Authenticate if necessary or
+ * desired, and test if the server supports XOVER.
  * Returns: 0	success
  *        > 0	NNTP error response code
  *        < 0	-errno from system call or similar error
@@ -92,8 +95,20 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 	debug_nntp ("nntp_open", line);
 #	endif /* DEBUG */
 
-	/* Latest NNTP draft says 205 Authentication required could be returned here */
 	switch (ret) {
+
+		/*
+		 * ret < 0 : some error from system call
+		 * ret > 0 : NNTP response code
+		 *
+		 * Latest NNTP draft (Aug 1999) says only the following response codes
+		 * may be returned:
+		 *
+		 *   200 (OK_CANPOST) Hello, you can post
+		 *   201 (OK_NOPOST) Hello, you can't post
+		 *   502 (ERR_ACCESS) Service unavailable
+		 *   400 (ERR_GOODBYE) Service temporarily unavailable
+		 */
 
 		case OK_CANPOST:
 #	ifndef NO_POSTING
@@ -108,13 +123,13 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 		default:
 			if (ret < 0) {
 				error_message (txt_failed_to_connect_to_server, nntp_server);
-				return -ret;
+			} else {
+				error_message (line);
 			}
-
-			error_message (line);
 			return ret;
 	}
 	if (!is_reconnect) {
+		/* remove leading whitespace and save server's initial response */
 		linep = line;
 		while (isspace((int)*linep))
 			linep++;
@@ -131,8 +146,26 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 #	endif /* DEBUG */
 DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	put_server ("MODE READER");
-	switch (get_respcode(line)) {
+
+	/*
+	 * According to the latest NNTP draft (Aug 1999), MODE READER may only
+	 * return the following response codes:
+	 *
+	 *   200 (OK_CANPOST) Hello, you can post
+	 *   201 (OK_NOPOST) Hello, you can't post
+	 *   400 (ERR_GOODBYE) Service temporarily unavailable
+	 *   502 (ERR_ACCESS) Service unavailable
+	 *
+	 * However, there may be old servers out there that do not implement this
+	 * command and therefore return ERR_COMMAND (500).
+	 */
+
+	ret = get_respcode(line);
+	switch (ret) {
 		case OK_CANPOST:
+#	ifndef NO_POSTING
+			can_post = TRUE;
+#	endif /* !NO_POSTING */
 			sec = TRUE;
 			break;
 
@@ -141,6 +174,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			sec = TRUE;
 			break;
 
+		case ERR_GOODBYE:
 		case ERR_ACCESS:
 			error_message (line);
 			return ret;
@@ -151,16 +185,76 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 
 	}
 
+	/*
+	 * NOTE: Latest NNTP draft (Aug 1998) states that LIST EXTENSIONS should
+	 *       (not SHOULD, however) be used to find out what commands are
+	 *       supported.
+	 *
+	 * TODO: Implement LIST EXTENSIONS here. Get this list before issuing
+	 *       authentication because the authentication method required may be
+	 *       mentioned in the list of extensions. (For details about
+	 *       authentication methods, see draft-newman-nntpext-auth-01.txt.)
+	 */
+
+	/*
+	 * If the user wants us to authenticate on connection startup, do it now.
+	 * Some news servers return "201 no posting" first, but after successful
+	 * authentication you get a "200 posting allowed". To find out if we are
+	 * allowed to post after authentication issue a "MODE READER" again and
+	 * interpret the response code.
+	 */
+
+	if (force_auth_on_conn_open) {
+#	ifdef DEBUG
+		debug_nntp ("nntp_open", "authenticate");
+#	endif /* DEBUG */
+		authenticate (nntp_server, userid, TRUE);
+		put_server ("MODE READER");
+		ret = get_respcode (line);
+		switch (ret) {
+			case OK_CANPOST:
+#	ifndef NO_POSTING
+				can_post = TRUE;
+#	endif /* !NO_POSTING */
+				sec = TRUE;
+				break;
+
+			case OK_NOPOST:
+				can_post = FALSE;
+				sec = TRUE;
+				break;
+
+			case ERR_GOODBYE:
+			case ERR_ACCESS:
+				error_message (line);
+				return ret;
+
+			case ERR_COMMAND:	/* Uh-oh ... now we don't know if posting */
+			default:				/* is allowed or not ... so use last 200 */
+				break;			/* or 201 response to decide. */
+
+		}
+	}
+
 	if (!is_reconnect) {
+		/* Inform user if he cannot post */
 		if (!can_post)
 			wait_message(0, "%s\n", txt_cannot_post);
 
+		/* Remove leading white space and save server's second response */
 		linep = line;
 		while (isspace((int)*linep))
 			linep++;
 
 		STRCPY(bug_nntpserver2, linep);
 
+		/*
+		 * Show user last server response line, do some nice formatting if
+		 * response is longer than a screen wide.
+		 *
+		 * TODO: This only breaks the line once, but the response could be
+		 * longer than two lines ...
+		 */
 		{
 			char *chr1, *chr2;
 			int j;
@@ -181,27 +275,30 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			wait_message (0, "%s\n", chr1);
 			free (chr1);
 		}
-
-		is_reconnect = TRUE;
 	}
 
 	/*
-	 * Check if NNTP supports XOVER command
+	 * Check if NNTP supports XOVER or OVER (successor of XOVER as of latest
+	 * NNTP Draft (Aug 1999)) command
 	 * ie, we _don't_ get an ERR_COMMAND
+	 *
+	 * TODO: Don't try (X)OVER if listed in LIST EXTENSIONS.
 	 */
-	if (!nntp_command("XOVER", ERR_COMMAND, NULL))
-		xover_supported = TRUE;
-		/* TODO issue warning if old index files found ? */
-	else {
-		if (!is_reconnect)
-			wait_message(2, "Your server does not support the NNTP XOVER command.\nTin will use local index files instead.\n");
-	}
 
-	if (force_auth_on_conn_open) {
-#	ifdef DEBUG
-		debug_nntp ("nntp_open", "authenticate");
-#	endif /* DEBUG */
-		authenticate (nntp_server, userid, TRUE);
+	if (!nntp_command(txt_xover_string, ERR_COMMAND, NULL)) {
+		xover_supported = TRUE;
+		txt_xover = txt_xover_string;
+		/* TODO issue warning if old index files found ? */
+	} else {
+		if (!nntp_command(&txt_xover_string[1], ERR_COMMAND, NULL)) {
+			xover_supported = TRUE;
+			txt_xover = &txt_xover_string[1];
+			/* TODO issue warning if old index files found ? */
+		} else {
+			if (!is_reconnect) {
+				wait_message(2, txt_no_xover_support);
+			}
+		}
 	}
 
 #	if 0 /* TODO */
@@ -211,6 +308,8 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			xgtitle_supported = TRUE;
 	}
 #	endif /* 0 */
+
+	is_reconnect = TRUE;
 
 #endif /* NNTP_ABLE */
 
@@ -546,7 +645,7 @@ open_xover_fp (
 	if (read_news_via_nntp && xover_supported && *pcMode == 'r' && psGrp->type == GROUP_TYPE_NEWS) {
 		char acLine[NNTP_STRLEN];
 
-		sprintf (acLine, "XOVER %ld-%ld", lMin, lMax);
+		sprintf (acLine, "%s %ld-%ld", txt_xover, lMin, lMax);
 		return(nntp_command (acLine, OK_XOVER, NULL));
 	} else {
 #endif /* NNTP_ABLE */

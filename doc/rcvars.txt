@@ -19,13 +19,11 @@ Adding new tinrc variables:
 	'M'enu.
 
 
-. Add the following definitions to extern.h
-	txt_help_NAME
-	txt_opt_NAME
-	txt_tinrc_NAME
+. Add the following definition to extern.h
+	struct opttxt txt_NAME
 
-. Fill the above out in lang.c
-	txt_help_NAME	- shown as help when asked for in Option 'M'enu
-	txt_opt_NAME	- the text shown on the left side in the Option 'M'enu
-	txt_tinrc_NAME	- the comment text that precedes the variable when
-	              	  written to the tinrc file
+. Fill the above structure out in lang.c
+	help text	- shown as help when asked for in Option 'M'enu
+	opt text	- the text shown on the left side in the Option 'M'enu
+	tinrc text	- the comment text that precedes the variable when
+	              written to the tinrc file. This is optional.

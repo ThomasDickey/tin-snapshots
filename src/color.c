@@ -31,15 +31,13 @@ int default_bcol = 0;
 static int current_fcol = 7;
 static int current_bcol = 0;
 
-#define isalp(c)	(isgraph ((unsigned char) (c)))
-
 
 /*
  * local prototypes
  */
 static t_bool check_valid_mark (const char *s);
-static void put_mark_char (int c, FILE *stream);
-static void color_fputs (const char *s, FILE *stream, int color);
+static void put_mark_char (int c, FILE *stream, t_bool signature);
+static void color_fputs (const char *s, FILE *stream, int color, t_bool signature);
 
 #ifdef USE_CURSES
 static void
@@ -179,17 +177,22 @@ check_valid_mark (
 	const char *p;
 	int c = *s;
 
-	if (s[1] == '\0' || s[1] == c || !isalp(s[1]))
+	if (s[1] == '\0' || s[1] == c || !isgraph ((unsigned char)s[1]))
 		return FALSE;
 	p = strpbrk(s+2, "*_");
-	return (p != NULL && *p == c && isalp(p[-1]) && !isalp(p[1]));
+
+	return (p != NULL && *p == c &&
+			((isalnum ((unsigned char)p[-1]) && !isalnum ((unsigned char)p[1])) ||
+			 (ispunct ((unsigned char)p[-1]) && !isgraph ((unsigned char)p[1])))
+			);
 }
 
 
 static void
 put_mark_char (
 	int c,
-	FILE *stream)
+	FILE *stream,
+	t_bool signature)
 {
 	switch (tinrc.word_h_display_marks) {
 		case 1: /* print mark */
@@ -197,6 +200,10 @@ put_mark_char (
 			break;
 		case 2: /* print space */
 			my_fputc(' ', stream);
+			break;
+		case 3: /* print space, but only in signatures */
+			if (signature)
+				my_fputc(' ', stream);
 			break;
 		default: /* print nothing */
 			break;
@@ -211,7 +218,8 @@ static void
 color_fputs (
 	const char *s,
 	FILE *stream,
-	int color)
+	int color,
+	t_bool signature)
 {
 	const char *p;
 	const char* eos = strchr(s, '\0');
@@ -220,15 +228,16 @@ color_fputs (
 	for (p=s; p < eos; p++) {
 		if (*p == '*' || *p == '_') {
 			if (! hilite) {
-				if ((p == s || !isalp(p[-1])) && check_valid_mark(p)) {
+				if ((p == s || !isgraph((unsigned char)p[-1]))
+						&& check_valid_mark(p)) {
 					hilite = TRUE;
 					fcol(*p == '*' ? tinrc.col_markstar : tinrc.col_markdash);
-					put_mark_char(*p, stream);
+					put_mark_char(*p, stream, signature);
 				} else /* print normal character */
 					my_fputc(*p, stream);
 			} else {
 				hilite = FALSE;
-				put_mark_char(*p, stream);
+				put_mark_char(*p, stream, signature);
 				fcol(color);
 			}
 		} else {
@@ -256,35 +265,32 @@ print_color (
 			color = tinrc.col_newsheaders;
 			fcol (tinrc.col_newsheaders);
 		} else {
-			if (quote_regex.re) {
-				if (pcre_exec (quote_regex.re, quote_regex.extra, str, strlen(str), 0, 0, NULL, 0) >= 0) {
-					fcol (tinrc.col_quote);
-					color = tinrc.col_quote;
-				} else
-					fcol (tinrc.col_text);
-			} else {
-				if (str[0] == '>'
-					 || str[0] == '|'
-					 || str[0] == ']'
-/*					 || str[0] == '»' */
-					 || (str[0] == ':' && str[1] != '-')
-					 || (str[1] == '>' && str[0] != '-')
-					 || (str[2] == '>' && str[1] != '-')
-					 || (str[3] == '>' && str[2] != '-')
-					 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
-					fcol (tinrc.col_quote);
-					color = tinrc.col_quote;
-				} else
-					fcol (tinrc.col_text);
+			if (quote_regex3.re) {
+				if (pcre_exec (quote_regex3.re, quote_regex3.extra, str, strlen(str), 0, 0, NULL, 0) >= 0) {
+					fcol (tinrc.col_quote3);
+					color = tinrc.col_quote3;
+				} else if (quote_regex2.re) {
+					if (pcre_exec (quote_regex2.re, quote_regex2.extra, str, strlen(str), 0, 0, NULL, 0) >= 0) {
+						fcol (tinrc.col_quote2);
+						color = tinrc.col_quote2;
+					} else if (quote_regex.re) {
+						if (pcre_exec (quote_regex.re, quote_regex.extra, str, strlen(str), 0, 0, NULL, 0) >= 0) {
+							fcol (tinrc.col_quote);
+							color = tinrc.col_quote;
+						} else
+							fcol (tinrc.col_text);
+					}
+				}
 			}
 		}
 	}
 
 	if (word_highlight && use_color)
-		color_fputs(str, stdout, color);
+		color_fputs(str, stdout, color, signature);
 	else
 		my_fputs(str, stdout);
-
+#	ifndef USE_CURSES
 	my_fputs(cCRLF, stdout);
+#	endif /* !USE_CURSES */
 }
 #endif /* HAVE_COLOR */

@@ -97,7 +97,7 @@ search_config (
 			n = last;
 		else if (n > last)
 			n = 0;
-		if (REGEX_MATCH (option_table[n].option_text, buf, TRUE)) {
+		if (REGEX_MATCH (option_table[n].txt->opt, buf, TRUE)) {
 			result = n;
 			break;
 		}

@@ -1234,7 +1234,7 @@ expand_bitmap (
 
 	if (bitlen <= 0) {
 		bitlen = 0;
-		free ((char *) group->newsrc.xbitmap);
+		FreeIfNeeded((char *)group->newsrc.xbitmap);
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen == 0");

@@ -1,0 +1,44 @@
+libcanlock - a library for creating and verifying cancel locks.
+
+Copyright stuff:
+
+	sha1.c was written by Steve Reid and placed in the public
+	domain.
+
+	md5.c was written by Colin Plumb and placed in the public
+	domain.
+
+	base64.c is copyrighted by the Internet Software Consortium. 
+	The copyright notice allows for unlimited distribution if
+	credit is given.  Read the file itself for details.
+
+	hmac*.c, canlock*.c, hmactest.c and canlocktest.c were written
+	by Fluffy, Ruler of All Usenet, and placed in the public
+	domain.
+
+
+How to compile it:
+
+	If you are lucky, it will be enough to run the build script. 
+	But you may not be that lucky.
+     
+	As shipped, this library assumes a little-endian 32-bit system
+	(i386 family, that is).  You may have to twiddle with
+	LITTLE_ENDIAN in sha1.h to make everything work right.  If
+	you're not running on a 32-bit system, I don't know what if
+	anything you may have to do to get all the little bits in
+	order.
+	
+	Once you've run the build script, check your work by running
+	hmactest.  If the expected and actual digests are different,
+	your endian-ness or something else is wrong.
+	
+
+	After hmactest is giving you the right results, run
+	canlocktest.
+
+
+The canlocktest source code should give you a pretty good idea of how
+the functions work.  See the doc directory for relevant RFCs and stuff.
+
+Meow.

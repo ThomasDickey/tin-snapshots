@@ -44,7 +44,7 @@ t_bool show_subject;
 	static void draw_tline (int i, t_bool full);
 	static void draw_thread_arrow (void);
 	static void erase_thread_arrow (void);
-	static void make_prefix (struct t_msgid *art, char *prefix);
+	static void make_prefix (struct t_msgid *art, char *prefix, int maxlen);
 	static void move_to_response (int n);
 	static void update_thread_page (void);
 #endif /* !INDEX_DAEMON */
@@ -65,8 +65,9 @@ bld_tline (
 #	else
 	char *buff = screen[INDEX2TNUM(l)].col;
 #	endif /* USE_CURSES */
-	int i;
-	int len_from;
+	int gap;
+	int rest_of_line = cCOLS;
+	int len_from, len_subj;
 	struct t_msgid *ptr;
 
 	/*
@@ -74,10 +75,12 @@ bld_tline (
 	 * then index number of the message and whitespace (2+4+1 chars)
 	 */
 	sprintf (buff, "  %s ", tin_ltoa(l, 4));
+	rest_of_line -= 7;
 
 	/*
 	 * Add the article flags, tag number, or whatever (3 chars)
 	 */
+	rest_of_line -= 3;
 	if (art->tagged)
 		strcat (buff, tin_ltoa(art->tagged, 3));
 	else {
@@ -106,34 +109,43 @@ bld_tline (
 			mark = ART_MARK_READ;
 		}
 
-		*(buff+MARK_OFFSET) = mark;			/* insert mark */
+		buff[MARK_OFFSET] = mark;			/* insert mark */
 	}
 
 	strcat(buff, "  ");					/* 2 more spaces */
-
+	rest_of_line -= 2;
 
 	/*
 	 * Add the number of lines and/or the score if enabled
 	 * (inside "[,]", 1+4[+1+6]+1+2 chars total)
 	 */
-	if (tinrc.show_lines || tinrc.show_score) /* add [ */
+	if (tinrc.show_lines || tinrc.show_score) { /* add [ */
 		strcat (buff, "[");
+		rest_of_line--;
+   }
 
-	if (tinrc.show_lines) /* add lines */
+	if (tinrc.show_lines) { /* add lines */
 		strcat (buff, ((art->lines != -1) ? tin_ltoa(art->lines, 4): "   ?"));
+		rest_of_line -= 4;
+	}
 
 	if (tinrc.show_score) {
 		char tmp_score[15];
 
-		if (tinrc.show_lines) /* insert a sperator if show lines and score */
+		if (tinrc.show_lines) { /* insert a sperator if show lines and score */
 			strcat (buff, ",");
+			rest_of_line--;
+		}
 
 		sprintf (tmp_score, "%6d", art->score);
 		strcat (buff, tmp_score); /* add score */
+		rest_of_line -= 6;
 	}
 
-	if (tinrc.show_lines||tinrc.show_score) /* add closing ] and two spaces */
+	if (tinrc.show_lines || tinrc.show_score) { /* add closing ] and two spaces */
 		strcat (buff, "]  ");
+		rest_of_line -= 3;
+	}
 
 	/*
 	 * There are two formats for the rest of the line:
@@ -144,27 +156,10 @@ bld_tline (
 	 */
 	if (show_subject) {
 
-#if 0 /* old code without show_score */
-		/* Work out in advance the length of the author field if needed */
-		/* OUCH! never use 'n * (1 - bool)' */
-		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - tinrc.show_lines) : 0);
-#else
 		if (CURR_GROUP.attribute->show_author == SHOW_FROM_NONE)
 				len_from = 0;
 		else {
-			/* compute max. screen width */
-			len_from = cCOLS - 7;	/* arrow_mark + index. num + space */
-			if (tinrc.show_lines || tinrc.show_score)
-				len_from -= 4;	/* [] + two taling spaces */
-
-			if (tinrc.show_lines) {
-				len_from -= 4;	/* lines */
-				if (tinrc.show_score)
-					len_from--;	/* seperator */
-			}
-
-			if (tinrc.show_score)
-				len_from -= 6;	/* score */
+			len_from = rest_of_line;
 
 			if (CURR_GROUP.attribute->show_author == SHOW_FROM_BOTH)
 				len_from /= 2; /* if SHOW_FROM_BOTH use 50% for author info */
@@ -173,46 +168,45 @@ bld_tline (
 
 			if (len_from < 0) /* security check - small screen ? */
 				len_from = 0;
-			}
-
-#endif /* 0 */
+		}
+		rest_of_line -= len_from;
+		len_subj = rest_of_line - (len_from? 2 : 0);
 
 		/*
 		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
 		 * Insert tree-structure strings "`->", "+->", ...
 		 */
 
-		make_prefix(art->refptr, buff+strlen(buff));
-
-		if ((int)strlen(buff) >= cCOLS) /* If extremely nested */
-			buff[cCOLS] = '\0';
+		make_prefix(art->refptr, buff+strlen(buff), len_subj);
 
 		/*
 		 * Copy in the subject up to where the author (if any) starts
 		 */
-		i = cCOLS - strlen(buff) - len_from;
+		gap = cCOLS - strlen(buff) - len_from; /* gap = gap (no. of chars) between tree and author/border of window */
 
 		if (len_from)	/* Leave gap before author */
-			i -= 2;
+			gap -= 2;
+
 		/*
 		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
 		 * Hide subject if same as parent's.
 		 */
-
-		if (i > 0) {
-			for (ptr = art->refptr->parent; ptr && EXPIRED (ptr); ptr = ptr->parent);
+		if (gap > 0) {
+			int len = strlen(buff);
+			for (ptr = art->refptr->parent; ptr && EXPIRED (ptr); ptr = ptr->parent)
+				;
 			if (!(ptr && arts[ptr->article].subject == art->subject))
-				strncat(buff, art->subject, i);
+				strncat(buff, art->subject, gap);
 
-			*(buff + strlen(buff)) = '\0';	/* Just in case */
+			buff[len+gap] = '\0';	/* Just in case */
 		}
 
 		/*
 		 * If we need to show the author, pad out to the start of the author field,
 		 */
 		if (len_from) {
-			for (i = strlen(buff); i < (cCOLS - len_from); i++)
-				*(buff + i) = ' ';
+			for (gap = strlen(buff); gap < (cCOLS - len_from); gap++)
+				buff[gap] = ' ';
 
 			/*
 			 * Now add the author info at the end. This will be 0 terminated
@@ -230,10 +224,10 @@ bld_tline (
 		/*
 		 * Pad to end of line so that inverse bar looks 'good'
 		 */
-		for (i = strlen(buff); i < cCOLS; i++)
-			*(buff + i) = ' ';
+		for (gap = strlen(buff); gap < cCOLS; gap++)
+			buff[gap] = ' ';
 
-		*(buff + i) = '\0';
+		buff[gap] = '\0';
 	}
 
 	WriteLine(INDEX2LNUM(l), buff);
@@ -473,7 +467,12 @@ end_of_thread:
 					show_thread_page ();
 				break;
 
-			case iKeyThreadSave: /* save articles with prompting */
+			case iKeyThreadMail:	/* mail article to somebody */
+				if (thread_basenote >= 0)
+					feed_articles (FEED_MAIL, THREAD_LEVEL, &CURR_GROUP, find_response (thread_basenote, thread_index_point));
+				break;
+
+			case iKeyThreadSave:	/* save articles with prompting */
 				if (thread_basenote >= 0)
 					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, find_response (thread_basenote, thread_index_point));
 				break;
@@ -559,6 +558,11 @@ enter_pager:
 			case iKeyPageDown3:
 thread_page_down:
 				move_to_response (page_down (thread_index_point, top_thread));
+				break;
+
+			case iKeyThreadPost:	/* post a basenote */
+				if (post_article (group->name))
+					show_thread_page();
 				break;
 
 			case iKeyThreadRedrawScr:		/* redraw screen */
@@ -880,7 +884,7 @@ draw_thread_arrow (
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
-	if (tinrc.draw_arrow_mark) {
+	if (tinrc.draw_arrow) {
 		my_fputs ("->", stdout);
 		my_flush ();
 	} else {
@@ -901,7 +905,7 @@ erase_thread_arrow (
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		my_fputs ("  ", stdout);
 	else {
 		HpGlitch(EndInverse ());
@@ -1313,12 +1317,18 @@ has_sibling (
 
 /*
  * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
+ * string in prefix will be overwritten up to length len
+ * prefix will always be terminated with \0
+ * make sure prefix is at least len+1 bytes long (to hold the terminating
+ * null byte)
  */
 static void
 make_prefix (
 	struct t_msgid *art,
-	char *prefix)
+	char *prefix,
+	int maxlen)
 {
+	char *buf;
 	int prefix_ptr;
 	int depth = 0;
 	struct t_msgid *ptr;
@@ -1326,21 +1336,28 @@ make_prefix (
 	for (ptr = art->parent; ptr; ptr = ptr->parent)
 		depth += (!EXPIRED (ptr) ? 1 : 0);
 
-	if (depth == 0) {
+	if ((depth == 0) || (maxlen < 1)) {
 		prefix[0] = '\0';
 		return;
 	}
 
 	prefix_ptr = depth * 2 - 1;
-	strcpy (&prefix[prefix_ptr], "->");
-	prefix[--prefix_ptr] = (has_sibling (art) ? '+' : '`');
+
+	if (!(buf = my_malloc (prefix_ptr + 3)))
+		return;	/* out of memory */
+
+	strcpy (&buf[prefix_ptr], "->");
+	buf[--prefix_ptr] = (has_sibling (art) ? '+' : '`');
 
 	for (ptr = art->parent; prefix_ptr != 0; ptr = ptr->parent) {
 		if (EXPIRED (ptr))
 			continue;
-		prefix[--prefix_ptr] = ' ';
-		prefix[--prefix_ptr] = (has_sibling (ptr) ? '|' : ' ');
+		buf[--prefix_ptr] = ' ';
+		buf[--prefix_ptr] = (has_sibling (ptr) ? '|' : ' ');
 	}
+	strncpy (prefix, buf, maxlen);
+	prefix[maxlen] = '\0'; /* just in case strlen(buf) > maxlen */
+	free (buf);
 	return;
 }
 #endif /* !INDEX_DAEMON */

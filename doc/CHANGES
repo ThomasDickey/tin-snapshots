@@ -1,3 +1,92 @@
+-- pre-1.4 release 19990927 "Nine While Nine" --
+
+675) Thomas E. Dickey <dickey@clark.net>
+     BUG. on unexpected errors the terminal modes were not restored
+     ADD. check if tin fallback prototypes work with the system headers
+     ADD. update configure script macros to accommodate cygwin32
+     ADD. rearrange the configure script's check for network libraries
+     ADD. fix a couple of casts loosing const
+     FIX. aclocal.m4, configure[.in], proto.h, getline.c, init.c, main.c
+          memory.c, misc.c, nntplib.c, read.c, refs.c, select.c, signal.c
+
+674) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. Huge cleanup of quick_post_article(), post_existing_article(),
+          post_article(), post_response(), repost_article()
+     ADD. cleanup of mail_to_someone(), mail_bug_report(), mail_to_author()
+     ADD. print an error when an external command could not be invoked
+     REM. various error messages now that reporting is centralised in
+          invoke_cmd()
+     ADD. Change process_only_unread default to OFF
+     ADD. 'w' post article, 'm' mail article to thread menu
+     ADD. big code cleanup
+     ADD. clear status line after error_message() is displayed
+     ADD. correct inital cursor position when mailing bug reports
+     ADD. cleanup tinrc/option menu variable naming
+     BUG. mail bug report coredumps on bogus groups in selection menu
+     FIX. extern.h, proto.h, tin.h, filter.c, group.c, inews.c, init.c,
+          page.c, post.c, select.c, thread.c
+
+673) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. authentication was not first command after MODE READER if
+          invoked with -A
+     BUG. if server sent 201 after MODE READER posting was not possible
+          even after successful authentication
+     BUG. user was not notified when XOVER was not available
+     BUG. Followup-To: line was not examined whether the mentioned group(s)
+          were valid on the server
+     BUG. Fixed small memory leak in post.c
+     BUG. Fixed several potential bufferoverruns (make_prefix(),
+          show_selection_page())
+     ADD. also try OVER (if XOVER failed) at connection startup
+     ADD. use OVER if available (and not XOVER)
+     ADD. Warn if using quoted-printable or base64 and external inews
+     FIX. extern.h, lang.c, open.c, post.c, thread.c, select.c
+
+672) Urs Janssen <urs@tin.org>
+     BUG. fixed uncritical memleak in free_attributes_array()
+     BUG. fixed possible call of free(NULL)
+     ADD. overview_xref_support() no handles Xref:full entrys in
+          overview.ftm with taling garbage on the line
+     ADD. check for duplicated Newsgroups, Subject and Followup-To
+          header before posting
+     ADD. key to ignore Followup-To in followups
+     ADD. -DEVIL_INSIDE and -DUSE_CANLOCK
+     ADD. updated pcre (2.07 -> 2.08)
+     FIX. Makefile, Makefile[.in], extern.h, lang.c, memory.c, newsrc.c
+          page.c, post.c, xref.c, pcre/*, libcanlock/*
+
+671) Wolfgang Behrens <wolfgang@snoopy.flensburg.de>
+     Urs Janssen <urs@tin.org>
+     ADD. regexp/color for 2nd and >=3rd level quotes
+     ADD. minimal code cleanup
+     FIX. tin.1, extern.h, tin.h, tinrc.h, color.c, config.c, header.c,
+          init.c, lang.c, memory.c, tincfg.tbl
+
+670) Arkadiusz Miskiewicz <misiek@misiek.eu.org>
+     ADD. IPv6 connects
+     FIX. configure[.in], autoconf.h[in], tin.h, nntplib.c
+
+669) Dawid Kuroczko <dk@ssw.krakow.pl>
+     ADD. allow negative values in getart_limit to specify the number
+          of already read articles which should be fetched again.
+     ADD. signature level to word_h_display_marks
+     ADD. changed algorithm of syntax highlighting
+     ADD. userdefined regexp for Re: and was: subject stripping in
+          followups
+     FIX. extern.h, proto.h, tin.h, tinrc.h, art.c, color.c, config.c,
+          getline.c, init.c, lang.c, memory.c, misc.c, prompt.c, regex.c
+          tincfg.tbl, tin.1
+
+668) William McBrine <wmcbrine@clark.net>
+     BUG. lines which were exactly cCOLS wide caused a LF in the pager
+          and the LF was not counted note.lines
+     FIX. color.c, page.c
+
+667) Stuffed Crust <pizza@shaftnet.org>
+     Urs Janssen <urs@tin.org>
+     BUG. normal text was colored as quoted-text if quote_regex was empty
+     FIX. tin.h, color.c, config.c, init.c, lang.c
+
 -- pre-1.4 release 19990805 "Preacher Man" --
 
 666) Olaf Dietrich <olaf.dietrich@urz.uni-heidelberg.de>

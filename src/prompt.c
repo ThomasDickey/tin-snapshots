@@ -305,9 +305,9 @@ prompt_option_string (
 	char *p;
 	char *variable = OPT_STRING_list[option_table[option].var_index];
 
-	show_menu_help (option_table[option].help_text);
+	show_menu_help (option_table[option].txt->help);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].txt->opt);
 
 	if ((p = tin_getline (prompt, FALSE, variable, 0, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
@@ -337,12 +337,12 @@ prompt_option_num (
 	char *p;
 	int num;
 
-	show_menu_help (option_table[option].help_text);
+	show_menu_help (option_table[option].txt->help);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].txt->opt);
 	sprintf (&number[0], "%d", *(option_table[option].variable));
 
-	if ((p = tin_getline (prompt, TRUE, number, 0, FALSE, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, 2, number, 0, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (number, p);
@@ -376,9 +376,9 @@ prompt_option_char (
 	input[0] = *variable;
 	input[1] = '\0';
 
-	show_menu_help (option_table[option].help_text);
+	show_menu_help (option_table[option].txt->help);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].txt->opt);
 
 	if ((p = tin_getline (prompt, FALSE, p, 1, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;

@@ -557,7 +557,7 @@ vWriteFilterFile (
 	if ((hFp = fopen (pcFile, "w")) == (FILE *) 0)
 		return;
 
-	fprintf (hFp, txt_filter_file, tinrc.default_filter_days);
+	fprintf (hFp, txt_filter_file, tinrc.filter_days);
 	fflush (hFp);
 
 	/*
@@ -820,7 +820,7 @@ filter_menu (
 
 	len = cCOLS - 30;
 
-	sprintf (text_time, txt_time_default_days, tinrc.default_filter_days);
+	sprintf (text_time, txt_time_default_days, tinrc.filter_days);
 	sprintf (text_subj, ptr_filter_subj, len, len, art->subject);
 
 	strcpy (buf, art->from);
@@ -1057,8 +1057,8 @@ filter_menu (
 
 		case iKeyFilterEdit:
 			bAddFilterRule (group, art, &rule); /* save the rule */
-			start_line_offset = 22; /* FIXME: check it out */
-			invoke_editor (local_filter_file, start_line_offset);
+			if (!invoke_editor (local_filter_file, 22)) /* FIXME: is 22 correct offset ? */
+				return FALSE;
 			unfilter_articles ();
 #ifndef INDEX_DAEMON
 			(void) read_filter_file (local_filter_file, FALSE);
@@ -1254,13 +1254,13 @@ bAddFilterRule (
 	switch(psRule->expire_time)
 	{
 		case 1:
-			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 86400);		/*  86400 = 60 * 60 * 24 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 86400);		/*  86400 = 60 * 60 * 24 */
 			break;
 		case 2:
-			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 172800);	/* 172800 = 60 * 60 * 24 * 2 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 172800);	/* 172800 = 60 * 60 * 24 * 2 */
 			break;
 		case 3:
-			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 345600);	/* 345600 = 60 * 60 * 24 * 4 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.filter_days * 345600);	/* 345600 = 60 * 60 * 24 * 4 */
 			break;
 		default:
 			psPtr[*plNum].time = (time_t) 0;

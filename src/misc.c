@@ -44,10 +44,6 @@ static void write_input_history_file (void);
 	static int to_local (int c);
 	static int to_network (int c);
 #endif /* LOCAL_CHARSET */
-#ifndef USE_CURSES
-	static int input_pending (int delay);
-#endif /* USE_CURSES */
-
 
 /*
  * append_file instead of rename_file
@@ -104,12 +100,15 @@ asfail (
 #	endif /* SIGABRT */
 #endif /* HAVE_COREFILE */
 
-	exit(EXIT_FAILURE);
+	giveup();
 }
 
 
-/* quick copying of files */
-void
+/*
+ * Quick copying of files
+ * Returns FALSE if copy failed. Caller may wish to check for SIGPIPE
+ */
+t_bool
 copy_fp (
 	FILE *fp_ip,
 	FILE *fp_op)
@@ -119,13 +118,12 @@ copy_fp (
 
 	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
 		if (n != fwrite (buf, 1, n, fp_op)) {
-			if (!got_sig_pipe)
+			if (!got_sig_pipe)						/* !SIGPIPE => more serious error */
 				perror_message (txt_error_copy_fp);
-
-			return;
+			return FALSE;
 		}
 	}
-	return;
+	return TRUE;
 }
 
 
@@ -240,7 +238,7 @@ get_val (
  */
 #define BACKUP_FILE_EXT ".b"
 
-int
+t_bool
 invoke_editor (
 	char *filename,
 	int lineno) /* return value is always ignored */
@@ -248,7 +246,7 @@ invoke_editor (
 	char *my_editor;
 	char buf[PATH_LEN], fnameb[PATH_LEN];
 	char editor_format[PATH_LEN];
-	int retcode;
+	t_bool retcode;
 	static char editor[PATH_LEN];
 	static t_bool first = TRUE;
 
@@ -259,14 +257,13 @@ invoke_editor (
 		first = FALSE;
 	}
 
-	strcpy (editor_format, (tinrc.start_editor_offset ? (*tinrc.default_editor_format ? tinrc.default_editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
+	strcpy (editor_format, (tinrc.start_editor_offset ? (*tinrc.editor_format ? tinrc.editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
 
-	retcode = strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format);
-
-	if (!retcode)
+	if (!strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format))
 		sh_format (buf, sizeof(buf), "%s %s", editor, filename);
 
 	retcode = invoke_cmd (buf);
+
 #ifdef BACKUP_FILE_EXT
 	strcpy (fnameb, filename);
 	strcat (fnameb, BACKUP_FILE_EXT);
@@ -277,14 +274,14 @@ invoke_editor (
 
 
 #ifdef HAVE_ISPELL
-int
+t_bool
 invoke_ispell (
 	char *nam,
 	struct t_group *psGrp) /* return value is always ignored */
 {
 	FILE *fp_all, *fp_body, *fp_head;
 	char buf[PATH_LEN], nam_body[100], nam_head[100];
-	int retcode;
+	t_bool retcode;
 	char ispell[PATH_LEN];
 
 /*
@@ -391,7 +388,7 @@ shell_escape (
 
 	continue_prompt ();
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		ClearScreen ();
 }
 #endif /* !NO_SHELL_ESCAPE */
@@ -401,10 +398,14 @@ void
 tin_done (
 	int ret)
 {
+	static int nested;
 	register int i;
 	t_bool ask = TRUE;
 	struct t_group *group;
 	signed long int wrote_newsrc_lines = -1;
+
+	if (nested++)
+		giveup();
 
 	signal_context = cMain;
 
@@ -716,7 +717,7 @@ rename_file (
 #endif /* M_AMIGA */
 
 
-int
+t_bool
 invoke_cmd (
 	char *nam)
 {
@@ -731,10 +732,10 @@ invoke_cmd (
 
 	TRACE(("called system(%s)", _nc_visbuf(nam)))
 #ifdef USE_SYSTEM_STATUS
-		system(nam);
-		ret = system_status;
+	system(nam);
+	ret = system_status;
 #else
-		ret = system (nam);
+	ret = system (nam);
 #endif /* USE_SYSTEM_STATUS */
 	TRACE(("return %d", ret))
 
@@ -744,6 +745,9 @@ invoke_cmd (
 		InitWin ();
 		need_resize = cYes;		/* Flag a redraw */
 	}
+
+	if (ret != 0)
+		error_message (txt_command_failed, nam);
 
 #ifdef VMS
 	return ret != 0;
@@ -1145,6 +1149,7 @@ eat_re (
 	char *s,
 	t_bool eat_was)
 {
+#if 0
 	char *e;
 
 	while (*s == 'r' || *s == 'R') {
@@ -1176,6 +1181,29 @@ eat_re (
 		*e = '\0';
 
 	return s;
+#else
+	int data, slen;
+	int offsets[6];
+	int size_offsets = sizeof(offsets)/sizeof(int);
+
+	do {
+		slen = strlen(s);
+		data = pcre_exec(strip_re_regex.re, strip_re_regex.extra,
+			       	s, slen, 0, 0, offsets, size_offsets);
+		if (offsets[0] == 0)
+			s += offsets[1];
+	} while (data > 0);
+
+	if (eat_was) do {
+		slen = strlen(s);
+		data = pcre_exec(strip_was_regex.re, strip_was_regex.extra,
+				s, slen, 0, 0, offsets, size_offsets);
+		if (offsets[0] > 0)
+			s[offsets[0]] = '\0';
+	} while (data > 0);
+
+	return s;
+#endif
 }
 
 
@@ -1274,10 +1302,10 @@ toggle_inverse_video (
 	tinrc.inverse_okay = !tinrc.inverse_okay;
 	if (tinrc.inverse_okay) {
 #ifndef USE_INVERSE_HACK
-		tinrc.draw_arrow_mark = FALSE;
+		tinrc.draw_arrow = FALSE;
 #endif /* !USE_INVERSE_HACK */
 	} else {
-		tinrc.draw_arrow_mark = TRUE;
+		tinrc.draw_arrow = TRUE;
 	}
 }
 
@@ -1325,313 +1353,6 @@ show_color_status (
 
 
 /*
- * input_pending() waits for input during time given
- * by delay in msec. The original behaviour of input_pending()
- * (in art.c's threading code) is delay=0
- */
-#ifndef USE_CURSES
-static int
-input_pending (
-	int delay)
-{
-#if 0
-	int ch;
-	nodelay(stdscr, TRUE);
-	if ((ch = getch()) != ERR)
-		ungetch(ch);
-	nodelay(stdscr, FALSE);
-	return (ch != ERR);
-
-#else	/* !USE_CURSES */
-
-#	ifdef WIN32
-	return kbhit() ? TRUE : FALSE;
-#	endif /* WIN32 */
-#	ifdef M_AMIGA
-	return (WaitForChar(Input(), 1000 * delay) == DOSTRUE) ? TRUE : FALSE;
-#	endif /* M_AMIGA */
-
-#	ifdef HAVE_SELECT
-	int fd = STDIN_FILENO;
-	fd_set fdread;
-	struct timeval tvptr;
-
-	FD_ZERO(&fdread);
-
-	tvptr.tv_sec = 0;
-	tvptr.tv_usec = delay * 100;
-
-	FD_SET(fd, &fdread);
-
-#		ifdef HAVE_SELECT_INTP
-	if (select (1, (int *)&fdread, NULL, NULL, &tvptr))
-#		else
-	if (select (1, &fdread, NULL, NULL, &tvptr))
-#		endif /* HAVE_SELECT_INTP */
-	{
-		if (FD_ISSET(fd, &fdread))
-			return TRUE;
-	}
-#	endif /* HAVE_SELECT */
-
-#	if defined(HAVE_POLL) && !defined(HAVE_SELECT)
-	static int Timeout;
-	static long nfds = 1;
-	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
-
-	Timeout = delay;
-	if (poll (fds, nfds, Timeout) < 0) /* Error on poll */
-		return FALSE;
-
-	switch (fds[0].revents) {
-		case POLLIN:
-			return TRUE;
-		/*
-		 * Other conditions on the stream
-		 */
-		case POLLHUP:
-		case POLLERR:
-		default:
-			return FALSE;
-	}
-#	endif /* HAVE_POLL && !HAVE_SELECT */
-
-#endif /* 0 */
-
-	return FALSE;
-}
-#endif /* !USE_CURSES */
-
-
-int
-get_arrow_key (
-	int prech)
-{
-#ifdef USE_CURSES
-#	ifdef NCURSES_MOUSE_VERSION
-	MEVENT my_event;
-#	endif /* NCURSES_MOUSE_VERSION */
-	int ch = getch();
-	int code = KEYMAP_UNKNOWN;
-
-	switch (ch) {
-		case KEY_DC:
-			code = KEYMAP_DEL;
-			break;
-		case KEY_IC:
-			code = KEYMAP_INS;
-			break;
-		case KEY_UP:
-			code = KEYMAP_UP;
-			break;
-		case KEY_DOWN:
-			code = KEYMAP_DOWN;
-			break;
-		case KEY_LEFT:
-			code = KEYMAP_LEFT;
-			break;
-		case KEY_RIGHT:
-			code = KEYMAP_RIGHT;
-			break;
-		case KEY_NPAGE:
-			code = KEYMAP_PAGE_DOWN;
-			break;
-		case KEY_PPAGE:
-			code = KEYMAP_PAGE_UP;
-			break;
-		case KEY_HOME:
-			code = KEYMAP_HOME;
-			break;
-		case KEY_END:
-			code = KEYMAP_END;
-			break;
-#	ifdef NCURSES_MOUSE_VERSION
-		case KEY_MOUSE:
-			if (getmouse(&my_event) != ERR) {
-				switch ((int) my_event.bstate) {
-					case BUTTON1_CLICKED:
-						xmouse = MOUSE_BUTTON_1;
-						break;
-					case BUTTON2_CLICKED:
-						xmouse = MOUSE_BUTTON_2;
-						break;
-					case BUTTON3_CLICKED:
-						xmouse = MOUSE_BUTTON_3;
-						break;
-				}
-				xcol = my_event.x;	/* column */
-				xrow = my_event.y;	/* row */
-				code = KEYMAP_MOUSE;
-			}
-			break;
-#	endif /* NCURSES_MOUSE_VERSION */
-	}
-	return code;
-#else	/* not USE_CURSES */
-	int ch;
-	int ch1;
-
-#define wait_a_while(i) \
-	while (!input_pending(0) \
-		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
-
-#	ifndef VMS
-#		ifdef M_AMIGA
-	if (WaitForChar(Input(), 1000) == DOSTRUE)
-		return prech;
-#		else	/* !M_AMIGA */
-	if (!input_pending(0)) {
-#			ifdef HAVE_USLEEP
-		int i=0;
-
-		wait_a_while(i) {
-			usleep((unsigned long) (SECOND_CHARACTER_DELAY * 1000));
-			i++;
-		}
-#			else	/* !HAVE_USLEEP */
-#				ifdef HAVE_SELECT
-		struct timeval tvptr;
-		int i=0;
-
-		wait_a_while(i) {
-			tvptr.tv_sec = 0;
-			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 1000;
-			select (0, NULL, NULL, NULL, &tvptr);
-			i++;
-		}
-#				else /* !HAVE_SELECT */
-#					ifdef HAVE_POLL
-		struct pollfd fds[1];
-		int i=0;
-
-		wait_a_while(i) {
-			poll(fds, 0, SECOND_CHARACTER_DELAY);
-			i++;
-		}
-#					else /* !HAVE_POLL */
-		(void) sleep(1);
-#					endif /* HAVE_POLL */
-#				endif /* HAVE_SELECT */
-#			endif /* HAVE_USLEEP */
-		if (!input_pending(0))
-			return prech;
-	}
-#		endif /* M_AMIGA */
-#	endif /* !VMS */
-	ch = ReadCh ();
-	if (ch == '[' || ch == 'O')
-		ch = ReadCh ();
-
-	switch (ch) {
-		case 'A':
-		case 'i':
-#	ifdef QNX42
-		case 0xA1:
-#	endif /* QNX42 */
-			return KEYMAP_UP;
-
-		case 'B':
-#	ifdef QNX42
-		case 0xA9:
-#	endif /* QNX42 */
-			return KEYMAP_DOWN;
-
-		case 'D':
-#	ifdef QNX42
-		case 0xA4:
-#	endif /* QNX42 */
-			return KEYMAP_LEFT;
-
-		case 'C':
-#	ifdef QNX42
-		case 0xA6:
-#	endif /* QNX42 */
-			return KEYMAP_RIGHT;
-
-		case 'I':		/* ansi  PgUp */
-		case 'V':		/* at386 PgUp */
-		case 'S':		/* 97801 PgUp */
-		case 'v':		/* emacs style */
-#	ifdef QNX42
-		case 0xA2:
-#	endif /* QNX42 */
-#	ifdef M_AMIGA
-			return KEYMAP_PAGE_DOWN;
-#	else
-			return KEYMAP_PAGE_UP;
-#	endif /* M_AMIGA */
-
-		case 'G':		/* ansi  PgDn */
-		case 'U':		/* at386 PgDn */
-		case 'T':		/* 97801 PgDn */
-#	ifdef QNX42
-		case 0xAA:
-#	endif /* QNX42 */
-#	ifdef M_AMIGA
-			return KEYMAP_PAGE_UP;
-#	else
-			return KEYMAP_PAGE_DOWN;
-#	endif /* M_AMIGA */
-
-		case 'H':		/* at386 Home */
-#	ifdef QNX42
-		case 0xA0:
-#	endif /* QNX42 */
-			return KEYMAP_HOME;
-
-		case 'F':		/* ansi  End */
-		case 'Y':		/* at386 End */
-#	ifdef QNX42
-		case 0xA8:
-#	endif /* QNX42 */
-			return KEYMAP_END;
-
-		case '2':		/* vt200 Ins */
-			(void) ReadCh ();	/* eat the ~ */
-			return KEYMAP_INS;
-
-		case '3':		/* vt200 Del */
-			(void) ReadCh ();	/* eat the ~ */
-			return KEYMAP_DEL;
-
-		case '5':		/* vt200 PgUp */
-			(void) ReadCh ();	/* eat the ~ (interesting use of words :) */
-			return KEYMAP_PAGE_UP;
-
-		case '6':		/* vt200 PgUp */
-			(void) ReadCh ();	/* eat the ~ */
-			return KEYMAP_PAGE_DOWN;
-
-		case '1':		/* vt200 PgUp */
-			ch = ReadCh (); /* eat the ~ */
-			if (ch == '5') {	/* RS/6000 PgUp is 150g, PgDn is 154g */
-				ch1 = ReadCh ();
-				(void) ReadCh ();
-				if (ch1 == '0')
-					return KEYMAP_PAGE_UP;
-				if (ch1 == '4')
-					return KEYMAP_PAGE_DOWN;
-			}
-			return KEYMAP_HOME;
-
-		case '4':		/* vt200 PgUp */
-			(void) ReadCh ();	/* eat the ~ */
-			return KEYMAP_END;
-
-		case 'M':		/* xterminal button press */
-			xmouse = ReadCh () - ' ';	/* button */
-			xcol = ReadCh () - '!';		/* column */
-			xrow = ReadCh () - '!';		/* row */
-			return KEYMAP_MOUSE;
-
-		default:
-			return KEYMAP_UNKNOWN;
-	}
-#endif /* USE_CURSES */
-}
-
-
-/*
  * Check for lock file to stop multiple copies of tind or tin -U running
  * and if it does not exist create it so this is the only copy running
  */
@@ -1655,7 +1376,7 @@ create_index_lock_file (
 			error_message ("\n%s: Already started pid=[%d] on %s",
 				tin_progname, atoi(buf), buf+8);
 #endif /* INDEX_DAEMON */
-			exit (EXIT_FAILURE);
+			giveup();
 		}
 	} else {
 		if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {

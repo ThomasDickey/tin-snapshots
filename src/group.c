@@ -136,7 +136,6 @@ group_page (
 	int filter_state;
 	int old_selected_arts;
 	int old_top = 0;
-	int posted_flag;
 	int old_group_top;
 	unsigned int flag;
 	long old_artnum = 0L;
@@ -302,6 +301,37 @@ end_of_list:
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
 				if (index_point >= 0)
 					feed_articles (FEED_PIPE, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				break;
+
+			case iKeyGroupMail:	/* mail article to somebody */
+				if (index_point >= 0)
+					feed_articles (FEED_MAIL, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				break;
+
+#ifndef DISABLE_PRINTING
+			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
+				if (index_point >= 0)
+					feed_articles (FEED_PRINT, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				break;
+#endif /* !DISABLE_PRINTING */
+
+			case iKeyGroupRepost:	/* repost current article */
+				if (index_point >= 0)
+					feed_articles (FEED_REPOST, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				break;
+
+			case iKeyGroupSave:	/* save articles with prompting */
+				if (index_point >= 0)
+					feed_articles (FEED_SAVE, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				break;
+
+			case iKeyGroupAutoSaveTagged:	/* Auto-save tagged articles without prompting */
+				if (index_point >= 0) {
+					if (num_of_tagged_arts)
+						feed_articles (FEED_AUTOSAVE_TAGGED, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
+					else
+						info_message (txt_no_tagged_arts_to_save);
+				}
 				break;
 
 			case iKeySetRange:	/* set range */
@@ -655,13 +685,6 @@ next_thread:
 				}
 				break;
 
-			case iKeyGroupMail:	/* mail article to somebody */
-				if (index_point >= 0) {
-					feed_articles (FEED_MAIL, GROUP_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
-				break;
-
 			case iKeyOptionMenu:	/* option menu */
 				if (top_base > 0) {
 					old_top = top;
@@ -755,8 +778,8 @@ enter_pager:
 						goto group_tab_pressed;
 
 					case GRP_QUIT:				/* 'Q' */
-					 	index_point = GRP_QUIT;
-					 	goto group_done;
+						index_point = GRP_QUIT;
+						goto group_done;
 
 					case GRP_RETURN:
 					default:
@@ -764,15 +787,6 @@ enter_pager:
 				}
 
 				break;
-
-#ifndef DISABLE_PRINTING
-			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
-				if (index_point >= 0) {
-					feed_articles (FEED_PRINT, GROUP_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
-				break;
-#endif /* !DISABLE_PRINTING */
 
 			case iKeyGroupPrevGroup:	/* previous group */
 				clear_message();
@@ -822,20 +836,6 @@ enter_pager:
 				mail_bug_report ();
 				ClearScreen ();
 				show_group_page ();
-				break;
-
-			case iKeyGroupSave:	/* save articles with prompting */
-				if (index_point >= 0)
-					feed_articles (FEED_SAVE, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
-				break;
-
-			case iKeyGroupAutoSaveTagged:	/* Auto-save tagged articles without prompting */
-				if (index_point >= 0) {
-					if (num_of_tagged_arts)
-						feed_articles (FEED_AUTOSAVE_TAGGED, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
-					else
-						info_message (txt_no_tagged_arts_to_save);
-				}
 				break;
 
 			case iKeyGroupTag:	/* tag/untag threads for mailing/piping/printing/saving */
@@ -916,7 +916,7 @@ enter_pager:
 				break;
 
 			case iKeyGroupPost:	/* post an article */
-				if (post_article (group->name, &posted_flag))
+				if (post_article (group->name))
 					show_group_page ();
 				break;
 
@@ -932,11 +932,6 @@ enter_pager:
 			case iKeyDisplayPostHist:	/* display messages posted by user */
 				if (user_posted_messages ())
 					show_group_page ();
-				break;
-
-			case iKeyGroupRepost:	/* repost current article */
-				if (index_point >= 0)
-					feed_articles (FEED_REPOST, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
 				break;
 
 			case iKeyGroupMarkArtUnread:	/* mark base article of thread unread */
@@ -1190,7 +1185,7 @@ show_group_page (
 
 	set_first_screen_item (index_point, top_base, &first_subj_on_screen, &last_subj_on_screen);
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		CleartoEOS ();
 
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
@@ -1240,7 +1235,7 @@ draw_subject_arrow (
 #ifndef INDEX_DAEMON
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
-	if (tinrc.draw_arrow_mark) {
+	if (tinrc.draw_arrow) {
 		my_fputs ("->", stdout);
 		my_flush ();
 	} else {
@@ -1269,7 +1264,7 @@ erase_subject_arrow (
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		my_fputs ("  ", stdout);
 	else {
 		HpGlitch(EndInverse ());
@@ -1411,7 +1406,7 @@ mark_screen (
 	int screen_col,
 	const char *value)
 {
-	if (tinrc.draw_arrow_mark) {
+	if (tinrc.draw_arrow) {
 		MoveCursor(INDEX_TOP + screen_row, screen_col);
 		my_fputs (value, stdout);
 		stow_cursor();

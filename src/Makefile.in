@@ -19,14 +19,16 @@ PRELIB	= @LIB_PREFIX@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 DAEMON	= # -DINDEX_DAEMON
-CPPOPTS	= @DEFS@ -I. -I../include -I$(top_srcdir)/pcre -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
+CANLOCK = # -DUSE_CANLOCK # -DEVIL_INSIDE
+CPPOPTS	= @DEFS@ -I. -I../include -I$(top_srcdir)/pcre -I$(INCDIR) $(DEBUG) $(DAEMON) $(CANLOCK) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
 LD	= $(CC)
 LDFLAGS	= @LDFLAGS@
 YACC	= @YACC@
 
-LIBS	= -L../pcre -lpcre @LIBS@ @INN_NNTPLIB@
+CANLIB	= # -L../libcanlock -lcanlock
+LIBS	= -L../pcre -lpcre $(CANLIB) @LIBS@ @INN_NNTPLIB@
 
 # Where do you want the binary & manual page installed?
 INSTALL_PREFIX	= @INSTALL_PREFIX@
@@ -319,6 +321,10 @@ cscope:
 	@$(ECHO) "Creating cscope database $(PROJECT)..."
 	@$(CSCOPE) $(ALL_FILES)
 
+canlock:
+	@$(ECHO) "Building libcanlock..."
+	@$(CD) ../libcanlock && ./Build
+
 TIN_DEP	= \
 	Makefile \
 	$(INCDIR)/tin.h \
@@ -327,6 +333,7 @@ TIN_DEP	= \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/proto.h
+
 
 ../pcre/$(PRELIB)pcre.a:
 	@$(ECHO) "Building Philip Hazel's Perl regular expressions library..."

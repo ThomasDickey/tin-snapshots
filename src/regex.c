@@ -79,12 +79,13 @@ match_regex (
 t_bool
 compile_regex(
 	char *regex,
-	struct regex_cache *cache)
+	struct regex_cache *cache,
+	int options)
 {
 	const char *regex_errmsg = 0;
 	int regex_errpos;
 
-	if ((cache->re = pcre_compile (regex, PCRE_EXTENDED | PCRE_CASELESS, &regex_errmsg, &regex_errpos, NULL)) == NULL)
+	if ((cache->re = pcre_compile (regex, PCRE_EXTENDED | options, &regex_errmsg, &regex_errpos, NULL)) == NULL)
 		error_message (txt_pcre_error_at, regex_errmsg, regex_errpos);
 	else {
 		cache->extra = pcre_study (cache->re, 0, &regex_errmsg);

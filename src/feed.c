@@ -172,7 +172,7 @@ feed_articles (
 
 			got_sig_pipe = FALSE;
 			if ((fp = popen (tinrc.default_pipe_command, "w")) == (FILE *) 0) {
-				perror_message (txt_command_failed_s, tinrc.default_pipe_command);
+				perror_message (txt_command_failed, tinrc.default_pipe_command);
 				return;
 			}
 			wait_message (0, txt_piping);
@@ -235,7 +235,7 @@ feed_articles (
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
-						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_post_process_type);
+						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_choose_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
@@ -255,11 +255,11 @@ feed_articles (
 			if (!can_post)
 				info_message(txt_cannot_post);
 			else {
-#	if !defined(FORGERY) && !defined (INDEX_DAEMON)
+#	ifndef FORGERY
 				get_user_info (user_name, full_name);
 				get_from_name (from_name, (struct t_group *) 0);
 				if (strstr (from_name, arts[respnum].from)) {
-#	endif /* !FORGERY && !INDEX_DAEMON */
+#	endif /* !FORGERY */
 					/* repost or supersede ? */
 					option = (char) prompt_slk_response (option_default, "\033qrs", sized_message(txt_supersede_article, arts[respnum].subject));
 
@@ -295,7 +295,7 @@ feed_articles (
 
 	switch (ch) {
 		case iKeyFeedArt:		/* article */
-			if (level == GROUP_LEVEL) {
+			if (level == GROUP_LEVEL || level == THREAD_LEVEL) {
 				if (!does_article_exist (function, &arts[respnum], group_path))
 					break;
 			}
@@ -347,7 +347,7 @@ feed_articles (
 			if (tinrc.mark_saved_read && processed_ok)
 				art_mark_read (group, &arts[respnum]);
 
-			if (level == GROUP_LEVEL)
+			if (level == GROUP_LEVEL || level == THREAD_LEVEL)
 				art_close ();
 
 			break;
@@ -690,7 +690,7 @@ print_file (
 	if ((fp = popen (command, "w")) == (FILE *) 0)
 #		endif /* DONT_HAVE_PIPING */
 	{
-		perror_message (txt_command_failed_s, command);
+		perror_message (txt_command_failed, command);
 		return FALSE;
 	}
 

@@ -7,7 +7,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 19990805
+PVER		= 19990927
 VER		= pre-$(LVER)-$(PVER)
 MAIL_ADDR	= "urs@tin.org"
 

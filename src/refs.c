@@ -185,7 +185,7 @@ add_msgid (
 
 	if (!msgid) {
 		error_message("add_msgid: NULL msgid\n");
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
@@ -378,7 +378,7 @@ _get_references (
 	/*
 	 * Attempt at damage limitation in case of broken Refs fields
 	 */
-	if (len < HEADER_LEN-500) {
+	if (len + strlen(refptr->txt) < (998 - strlen("References: "))) {
 		sprintf(refs + len, "%s ", refptr->txt);
 		len = strlen(refs);
 	}
