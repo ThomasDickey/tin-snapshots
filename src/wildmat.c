@@ -40,20 +40,21 @@
 
 static int DoMatch P_((char *text, char *p));
 
-#define ABORT			-1
+#define ABORT	-1
 
-
-    /* What character marks an inverted character class? */
+/* What character marks an inverted character class? */
 #define NEGATE_CLASS		'^'
-    /* Is "*" a common pattern? */
+
+/* Is "*" a common pattern? */
 #define OPTIMIZE_JUST_STAR
-    /* Do tar(1) matching rules, which ignore a trailing slash? */
+
+/* Do tar(1) matching rules, which ignore a trailing slash? */
 #undef MATCH_TAR_PATTERN
 
 
 /*
-**  Match text and p, return TRUE, FALSE, or ABORT.
-*/
+ *  Match text and p, return TRUE, FALSE, or ABORT.
+ */
 
 static int
 DoMatch(text, p)
@@ -124,16 +125,13 @@ DoMatch(text, p)
 
 
 /*
-**  User-level routine.  Returns TRUE or FALSE.
-*/
-#if __STDC__
-int wildmat(char *text, char *p)
-#else
+ *  User-level routine.  Returns TRUE or FALSE.
+ */
+
 int
 wildmat(text, p)
-    char	*text;
-    char	*p;
-#endif
+    char *text;
+    char *p;
 {
 	/*
 	 * Make sure the pattern is not NULL
@@ -141,10 +139,10 @@ wildmat(text, p)
 	if (p == (char *) 0 || text == (char *)0)
 		return FALSE;
 #ifdef	OPTIMIZE_JUST_STAR
-    if (p[0] == '*' && p[1] == '\0')
-	return TRUE;
+	if (p[0] == '*' && p[1] == '\0')
+		return TRUE;
 #endif	/* OPTIMIZE_JUST_STAR */
-    return DoMatch(text, p) == TRUE;
+	return DoMatch(text, p) == TRUE;
 }
 
 

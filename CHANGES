@@ -1,3 +1,29 @@
+--unoff BETA release 960805 --
+
+145) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. braindead determination of default_save_option if auto_save=ON
+     FIX. feed.c
+
+144) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. use popen() rather than system()
+     BUG. if DEBUG_NEWSRC tin had problems with the length of .newsrc-lines
+     FIX. newsrc.c, sigfile.c
+
+143) Torsten Neumann <torsten@imke.infodrom.north.de>
+     ADD. expansion of ~user/, $HOME to newsrctable
+     ADD. ${VAR} expansion to strfpath()
+     FIX. misc.c nrctbl.c
+
+142) Volker Schmidt <volker@illuminatus.mz.rhein-main.de>
+     ADD. Makefile used @LIBDIR@ instead of @NEWSLIBDIR@ (introduced in 134)
+     FIX. Makefile.in
+
+141) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. use @INSTALL@
+     ADD. minor code cleanup
+     FIX. several patches
+
 --unoff BETA release 960804 --
 
 140) Thomas E. Dickey <dickey@clark.net>
@@ -26,7 +52,7 @@
 137) Alexander Lehmann <alex@hal.rhein-main.de>
      BUG. detection of continuation lines is broken in cases where the
           first line in the body starts with whitespace (introduced in 133)
-     BUG. article size isn't corrected if it get's shorter due to 1521/1522
+     BUG. article size isn't corrected if it gets shorter due to 1521/1522
           decoding (resulting in wrong (m/n) displays in the pager.)
      BUG. encoding very large lines (>2047 chars) with quoted-printable
           leads to lines longer than 76 chars, due to the buffer overflow.
@@ -71,7 +97,7 @@
 
 129) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minor code cleanup
-     BUG. configure --disable-warings did not work; fixed a few typos
+     BUG. configure --disable-warnings did not work; fixed a few typos
      FIX. configure.in, art.c
 
 --unoff BETA release 960729 --

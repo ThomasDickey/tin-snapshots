@@ -23,8 +23,9 @@ void
 fcol (color)
 	int color;
 {
-	if (!use_color) return;
-	printf ("\033[%d;%dm", (color>>3), ((color&7)+30));
+	if (!use_color)
+		return;
+	printf ("\033[%d;%dm", (color >> 3), ((color & 7) + 30));
 }
 
 /* setting backgroundcolor */
@@ -32,28 +33,30 @@ void
 bcol (color)
 	int color;
 {
-	if (!use_color) return;
-	printf ("\033[%dm", (color+40));
+	if (!use_color)
+		return;
+	printf ("\033[%dm", (color + 40));
 }
-
 
 void
 print_color (str)
 	char *str;
 {
 	if (use_color) {
-		if ( str[0]=='>' || str[0]=='|' || str[0]==']' || str[0]=='»'
-			|| (str[0]==':' && str[1]!='-')
-			|| (str[1]=='>' && str[0]!='-') 
-			|| (str[2]=='>' && str[1]!='-')
-			|| (str[3]=='>' && str[2]!='-')
-			|| (str[0]==' ' && str[1]==':' && str[2]!='-'))
-		{
-			fcol(col_quote);
+		if (str[0] == '>'
+		    || str[0] == '|'
+		    || str[0] == ']'
+		    || str[0] == '»'
+		    || (str[0] == ':' && str[1] != '-')
+		    || (str[1] == '>' && str[0] != '-')
+		    || (str[2] == '>' && str[1] != '-')
+		    || (str[3] == '>' && str[2] != '-')
+		    || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
+			fcol (col_quote);
 		} else {
-			fcol(col_text);
+			fcol (col_text);
 		}
 	}
-	printf("%s\r\n", str);
+	printf ("%s\r\n", str);
 }
 #endif

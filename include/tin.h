@@ -349,29 +349,38 @@ extern char *get_uaf_fullname();
 #endif
 
 /*
- * Specify News spool & control directories
+ * Specify News spool & control directories if not running NNTP_ONLY
+ * (on machines who can run configure this is not needed)
  */
 
-#ifndef SPOOLDIR
-#ifdef VMS
-#   define	SPOOLDIR    "NEWSSPOOL:[000000]"
+#ifndef HAVE_CONFIG_H
+#ifndef NNTP_ONLY
+#	ifndef SPOOLDIR
+#		ifdef VMS
+#			define	SPOOLDIR	"NEWSSPOOL:[000000]"
+#		else
+#			define	SPOOLDIR	"/usr/spool/news"
+#		endif /* VMS */
+#	endif /* !SPOOLDIR */
+#	ifndef LIBDIR
+#		ifdef VMS
+#			define	LIBDIR		"NEWSLIB:[000000]"
+#		else
+#			define	LIBDIR		"/usr/lib/news"
+#		endif /* VMS */
+#	endif /* !LIBDIR */
+#	ifndef NOVROOTDIR
+#		define          NOVROOTDIR      SPOOLDIR
+#	endif /* !NOVROOTDIR */
+#	ifndef INEWSDIR
+#		define		INEWSDIR	LIBDIR
+#	endif /* INEWSDIR */
 #else
-#	define		SPOOLDIR	"/usr/spool/news"
-#endif /* !VMS */
-#endif
-#ifndef LIBDIR
-#ifdef VMS
-#define LIBDIR		"NEWSLIB:[000000]"
-#else
-#define LIBDIR		"/usr/lib/news"
-#endif
-#endif
-#ifndef NOVROOTDIR
-#	define		NOVROOTDIR	SPOOLDIR
-#endif
-#ifndef INEWSDIR
-#	define		INEWSDIR	LIBDIR
-#endif
+#	undef	SPOOLDIR
+#	undef	LIBDIR
+#	undef	NOVROOTDIR
+#endif /* !NNTP_ONLY */
+#endif /* !HAVE_CONFIG_H */
 
 /*
  * Determine machine configuration for external programs & directories
@@ -566,7 +575,9 @@ extern char *get_uaf_fullname();
  * Useful for logging user usage
  */
 
-#define 	LOG_USER_FILE	".tin_log"
+#ifdef LOG_USER
+#	define 	LOG_USER_FILE	".tin_log"
+#endif /* LOG_USER */
 
 /*
  * Should active file be reread for new news & if so how often

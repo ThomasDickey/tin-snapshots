@@ -129,45 +129,44 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		if (found) {
 			int	error=0;
 			char	dir[PATH_LEN];
+			char    tmp_newsrc[PATH_LEN];
 
-			switch (name_found[0]) {
-			case '/' :
-				strcpy (newsrc_name, name_found);
-				break;
-			case '~' :
-				if (name_found[1] == '/')
-                           		joinpath (newsrc_name, homedir, name_found+2);
-                                else
-					/* FIXME - who says that users home is in /home */
-					joinpath (newsrc_name, "/home/" , name_found+1);
-				break;
-			default :
-				joinpath (newsrc_name, homedir, name_found);
-				break;
+			if (! strfpath (name_found, tmp_newsrc, sizeof (tmp_newsrc),
+				homedir, (char *) 0, (char *) 0, (char *) 0)) {
+					fprintf (stderr, "couldn't expand %s\n", name_found);
+					error=1;
+			} else {
+				if (tmp_newsrc[0] == '/')
+					(void) strcpy (newsrc_name, tmp_newsrc);
+				else
+					joinpath (newsrc_name, homedir, tmp_newsrc);
 			}
 			strcpy (dir, newsrc_name);
 			*strrchr (dir, '/') = (char) 0;
+
+			if (! error) {
 			/* FIXME - write a global permssion check routine */
-			if (access (dir, X_OK)) {
-				/* FIXME - put me in lang.c */
-				fprintf (stderr, "No permissions to go into %s\n", dir);
-				error=1;
-			} else if (access (newsrc_name, F_OK)) {
-				/* FIXME - put me in lang.c */
-				fprintf (stderr, "File %s does not exists\n", newsrc_name);
-				error=2;
-			} else if (access (dir, R_OK)) {
-				fprintf (stderr, txt_error_no_read_permission, dir);
-				error=1;
-			} else if (access (newsrc_name, R_OK)) {
-				fprintf (stderr, txt_error_no_read_permission, newsrc_name);
-				error=1;
-			} else if (access (dir, W_OK)) {
-				fprintf (stderr, txt_error_no_write_permission, dir);
-				error=1;
-			} else if (access (newsrc_name, W_OK)) {
-				fprintf (stderr, txt_error_no_write_permission, newsrc_name);
-				error=1;
+				if (access (dir, X_OK)) {
+					/* FIXME - put me in lang.c */
+					fprintf (stderr, "No permissions to go into %s\n", dir);
+					error=1;
+				} else if (access (newsrc_name, F_OK)) {
+					/* FIXME - put me in lang.c */
+					fprintf (stderr, "File %s does not exists\n", newsrc_name);
+					error=2;
+				} else if (access (dir, R_OK)) {
+					fprintf (stderr, txt_error_no_read_permission, dir);
+					error=1;
+				} else if (access (newsrc_name, R_OK)) {
+					fprintf (stderr, txt_error_no_read_permission, newsrc_name);
+					error=1;
+				} else if (access (dir, W_OK)) {
+					fprintf (stderr, txt_error_no_write_permission, dir);
+					error=1;
+				} else if (access (newsrc_name, W_OK)) {
+					fprintf (stderr, txt_error_no_write_permission, newsrc_name);
+					error=1;
+				}
 			}
 			if (error) {
 				char ch;

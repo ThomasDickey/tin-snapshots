@@ -412,4 +412,7 @@ Compiled & installed on the following machines:
 
 9)	i486 & NetBSD 1.1 with gcc 2.4.5
 
-10)	IBM PowerPC RS6000/40p & AIX 4.1.4.0 with 2.7.2
+10)	IBM PowerPC RS6000/40p & AIX 4.1.4.0 with gcc 2.7.2
+
+11)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
+	with SCO OpenServer Development System (ver 5.0.0a)

@@ -1891,6 +1891,7 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 	char *startp = format;
 	char buf[PATH_LEN];
 	char tbuf[PATH_LEN];
+	char defbuf[PATH_LEN];
 	char tmp[PATH_LEN];
 	int i;
 #ifndef M_AMIGA
@@ -1965,18 +1966,34 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 			case '$':	/* Read the envvar and use its value */
 				i = 0;
 				format++;
-				while (*format && *format != '/') {
-					tbuf[i++] = *format++;
+				if ( *format && *format == '{' ) {
+					format++;
+					while ( *format && !(strchr("}-", *format)) ) {
+						tbuf[i++] = *format++;
+					}
+					tbuf[i] = '\0';
+					i = 0;
+					if ( *format && *format == '-' ) {
+						format++;
+						while ( *format && *format != '}' ) {
+							defbuf[i++] = *format++;
+						}
+					}
+					defbuf[i] = '\0'; 
+				} else {
+					while (*format && *format != '/') {
+						tbuf[i++] = *format++;
+					}
+					tbuf[i] = '\0';
+					format--;
+					defbuf[0] = '\0';
 				}
-				tbuf[i] = '\0';
-				format--;
 				/*
 				 * OK lookup the variable in the shells environment
 				 */
 				envptr = getenv (tbuf);
 				if (envptr == (char *) 0) {
-					str[0] = '\0';
-					return 0;
+					strncpy(tbuf, defbuf, sizeof(tbuf)-1);
 				} else {
 					strncpy (tbuf, envptr, sizeof (tbuf)-1);
 				}
@@ -1989,6 +2006,9 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 						str[0] = '\0';
 						return 0;
 					}
+				} else {
+					str[0] = '\0';
+					return 0;
 				}
 				break;
 #endif /* !VMS */

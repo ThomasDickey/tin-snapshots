@@ -18,7 +18,7 @@ o  tins killfile editor does not quote brackets, stars and question marks
 o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())
 
-o  fix article superseding that it enters the editor emediately
+o  fix article superseding that it enters the editor immediately
 
 o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
    true (Linux) ... search $LIBDIR, /usr/bin/,... in that case.
@@ -51,9 +51,6 @@ o  if marking read article with 'z' as will return and than reread it, the
    article, but when reentering it is recognized as read and disappears (as it
    should have before)
 
-o  The 'M' moderation flag (group selection level) is not showing up
-   (help!!! in gdb it is showing up, without gdb it is not)
-
 o  'D' deleted article flag (thread selection level) is not showing up.
    (is it still needed?!)
 
@@ -70,9 +67,6 @@ o  When tagging/autoselecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
    expired...), it is untouched, and remains marked as unread.
 
-o  marking hot-articles read with 'K' and then post-process the newsgroup
-   also processes the read articles
-
 o  mark_read with 'K' in 'l'ist_thread is not working, after you leave
    the group the articles are marked as unread again.
 
@@ -87,12 +81,13 @@ o  tin sometimes crashes (thread.c) 710/892/987
 
 New features
 ------------
+o  add a weed-out list like in elm so the user could specify which headers
+   he'd like to see and which not (attrib.c)
+
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
     own postings)
-
-o  add expansion of $HOME and ~userid/ to newsrctable
 
 o  add
        --disable-piping               (default off)
@@ -301,6 +296,12 @@ o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
 
 o  fix kill/hot mechanism so that it is possible do kill articles with
    "X-*" headers (X-Mailer: Bazilla 47.11 etc.)
+
+o  add kill mechanism on Newsgrops:-line (f.e.: in junk I only want to see
+   all those articles which are not! posted to junk)
+   group=junk
+   type=0
+   newsgroups=junk
 
 o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
    cnews-server

@@ -205,7 +205,7 @@ rfc1521_encode (line, f, e)
 		} else {
 			while (*line) {
 				pattern <<= 8;
-				pattern |= *EIGHT_BIT (line)++;
+				pattern |= *EIGHT_BIT(line)++;
 				bits += 8;
 				if (bits >= 24) {
 					if (xpos >= 73) {
@@ -248,12 +248,12 @@ rfc1521_encode (line, f, e)
 				}
 				if (!*l) {	/* trailing whitespace must be encoded */
 					*b++ = '=';
-					*b++ = bin2hex (HI4BITS (line));
-					*b++ = bin2hex (LO4BITS (line));
+					*b++ = bin2hex (HI4BITS(line));
+					*b++ = bin2hex (LO4BITS(line));
 					xpos += 3;
 					line++;
 				}
-			} else if ((!is_EIGHT_BIT (line) && *line != '=')
+			} else if ((!is_EIGHT_BIT(line) && *line != '=')
 				   || (*line == '\n')) {
 				*b++ = *line++;
 				xpos++;
@@ -261,8 +261,8 @@ rfc1521_encode (line, f, e)
 					break;
 			} else {
 				*b++ = '=';
-				*b++ = bin2hex (HI4BITS (line));
-				*b++ = bin2hex (LO4BITS (line));
+				*b++ = bin2hex (HI4BITS(line));
+				*b++ = bin2hex (LO4BITS(line));
 				xpos += 3;
 				line++;
 			}

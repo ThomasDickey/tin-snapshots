@@ -31,24 +31,16 @@ extern int daylight;
  * strftime --- produce formatted time 
  */
 
-#if __STDC__
-size_t
-my_strftime (char *s, size_t maxsize, char *format, struct tm *timeptr)
-#else
 size_t
 my_strftime (s, maxsize, format, timeptr)
-char *s;
-size_t maxsize;
-char *format;
-struct tm *timeptr;
-#endif
+	char *s;
+	size_t maxsize;
+	char *format;
+	struct tm *timeptr;
 {
 #ifdef HAVE_STRFTIME
-
 	return strftime (s, maxsize, format, timeptr);
-	
 #else
-
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[100];
