@@ -3,7 +3,7 @@
  *  Module    : post.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-19
+ *  Updated   : 2003-03-13
  *  Notes     : mail/post/replyto/followup/repost & cancel articles
  *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -1173,7 +1173,7 @@ post_article_done:
 			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
 				update_active_after_posting (group);
 				/* In POST_RESPONSE, this was copied from note_h.newsgroups if !followup to poster */
-				my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
+				my_strncpy(tinrc.default_post_newsgroups, group, sizeof(tinrc.default_post_newsgroups) - 1);
 			}
 		}
 
@@ -1219,7 +1219,7 @@ post_article_done:
 				/* Repost_article() uses psGrp->name rather than group here, but this is probably better anyway */
 				update_posted_info_file (group, tag, subj);
 
-			my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
+			my_strncpy(tinrc.default_post_subject, subj, sizeof(tinrc.default_post_subject) - 1);
 		}
 
 		if (tinrc.keep_posted_articles && type != POST_REPOST)
@@ -1339,7 +1339,7 @@ create_normal_article_headers(
 		tmp[DISPLAY_SUBJECT_LEN] = '\0';
 		strcat(tmp, " ...");
 	} else
-		strncpy(tmp, tinrc.default_post_subject, sizeof(tmp));
+		strncpy(tmp, tinrc.default_post_subject, sizeof(tmp) - 1);
 
 	sprintf (mesg, txt_post_subject, tmp);
 
@@ -2243,7 +2243,7 @@ mail_loop(
 
 #ifdef HAVE_PGP
 			case iKeyPostPGP:
-				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
+				my_strncpy(mail_to, arts[respnum].from, sizeof(mail_to) - 1);
 				if (pcCopyArtHeader (HEADER_TO, filename, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, filename, subject))
 					invoke_pgp_mail (filename, mail_to);
 				break;
@@ -2256,7 +2256,7 @@ mail_loop(
 
 			case iKeyPostSend:
 			case iKeyPostSend2:
-/*				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));*/
+/*				my_strncpy(mail_to, arts[respnum].from, sizeof(mail_to) - 1); */
 				checknadd_headers (filename);
 				if (submit_mail_file (filename)) {
 					info_message (txt_mailed, 1, IS_PLURAL(1));
@@ -2719,7 +2719,7 @@ mail_to_author (
 
 #ifdef HAVE_PGP
 			case iKeyPostPGP:
-				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
+				my_strncpy(mail_to, arts[respnum].from, sizeof(mail_to) - 1);
 				if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
 					invoke_pgp_mail (nam, mail_to);
 				break;
@@ -2732,7 +2732,7 @@ mail_to_author (
 
 			case iKeyPostSend:
 			case iKeyPostSend2:
-/*				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));*/
+/*				my_strncpy(mail_to, arts[respnum].from, sizeof(mail_to) - 1); */
 				checknadd_headers (nam);
 				if (submit_mail_file (nam)) {
 					redraw_screen = TRUE;
@@ -2821,19 +2821,18 @@ pcCopyArtHeader (
 	}
 
 	while ((ptr = tin_fgets (fp, TRUE)) != (char *) 0) {
-
 		if (*ptr == '\0')
 			break;
 
 		switch (iHeader) {
 			case HEADER_TO:
 				if (STRNCASECMPEQ(ptr, "To: ", 4) || STRNCASECMPEQ(ptr, "Cc: ", 4)) {
-					my_strncpy (buf2, &ptr[4], sizeof (buf2));
+					my_strncpy(buf2, &ptr[4], sizeof(buf2) - 1);
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
 					found = TRUE;
 				} else if (STRNCASECMPEQ(ptr, "Bcc: ", 5)) {
-					my_strncpy (buf2, &ptr[5], sizeof (buf2));
+					my_strncpy(buf2, &ptr[5], sizeof(buf2) - 1);
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
 					found = TRUE;
@@ -2853,7 +2852,7 @@ pcCopyArtHeader (
 
 			case HEADER_SUBJECT:
 				if (STRNCASECMPEQ(ptr, "Subject: ", 9)) {
-					my_strncpy (header, &ptr[9], sizeof (header));
+					my_strncpy(header, &ptr[9], sizeof(header) - 1);
 					found = TRUE;
 				}
 				break;
@@ -3348,7 +3347,7 @@ msg_add_x_body (
 		return 0;
 
 	if (body[0] != '/' && body[0] != '~') {
-		strncpy (line, body, sizeof(line));
+		strncpy(line, body, sizeof(line) - 1);
 		if ((ptr = strrchr (line, '\n')) != NULL)
 			*ptr = '\0';
 

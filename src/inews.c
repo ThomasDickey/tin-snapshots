@@ -202,7 +202,7 @@ submit_inews (
 			u_put_server (sender_hdr);
 			u_put_server("\r\n");
 		}
-			
+
 #	endif /* !FORGERY */
 
 		/*

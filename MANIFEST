@@ -1,4 +1,4 @@
-MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
+MANIFEST for tin-1.4.7 (Sat Mar 22 17:37:29 CET 2003)
 ----------------------------------------------------
   10401 ./Makefile
    5413 ./MANIFEST
@@ -14,7 +14,7 @@ MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
    4765 ./install.sh
   11873 ./makefile.in
     777 ./mkdirs.sh
-   9834 ./doc/CHANGES
+  10246 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
   30988 ./doc/INSTALL
@@ -49,34 +49,34 @@ MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
    9260 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1131 ./include/version.h
+   1135 ./include/version.h
   26068 ./src/active.c
-  40087 ./src/art.c
+  40116 ./src/art.c
   23637 ./src/attrib.c
   11074 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
-  63153 ./src/config.c
+  63156 ./src/config.c
   26878 ./src/curses.c
   11967 ./src/debug.c
    2335 ./src/envarg.c
-  19967 ./src/feed.c
+  19979 ./src/feed.c
   42861 ./src/filter.c
   12595 ./src/getline.c
   47290 ./src/group.c
    3112 ./src/hashstr.c
-   8170 ./src/header.c
+   8184 ./src/header.c
   12130 ./src/help.c
-  10298 ./src/inews.c
-  34789 ./src/init.c
+  10295 ./src/inews.c
+  34813 ./src/init.c
    1447 ./src/joinpath.c
   90623 ./src/lang.c
    3011 ./src/list.c
   11025 ./src/mail.c
-  23773 ./src/main.c
+  23795 ./src/main.c
    8911 ./src/makecfg.c
    9347 ./src/memory.c
-  77434 ./src/misc.c
+  77445 ./src/misc.c
   37785 ./src/newsrc.c
   27126 ./src/nntplib.c
    5942 ./src/nrctbl.c
@@ -84,17 +84,17 @@ MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
   42378 ./src/page.c
   24159 ./src/parsdate.y
    8481 ./src/pgp.c
-  97773 ./src/post.c
+  97799 ./src/post.c
   12519 ./src/prompt.c
    8871 ./src/read.c
   23845 ./src/refs.c
    2365 ./src/regex.c
   13500 ./src/rfc1521.c
   22744 ./src/rfc1522.c
-  36311 ./src/save.c
+  36319 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
-  35197 ./src/select.c
+  35203 ./src/select.c
    6655 ./src/sigfile.c
   11113 ./src/signal.c
    5850 ./src/strftime.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3296558 total
+3297126 total

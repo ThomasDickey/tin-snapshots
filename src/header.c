@@ -3,8 +3,8 @@
  *  Module    : header.c
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 1997-03-10
- *  Updated   : 2003-03-12
- *  Copyright : (c) Copyright 1997-99 by Urs Janssen
+ *  Updated   : 2003-03-13
+ *  Copyright : (c) Copyright 1997-2003 by Urs Janssen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -262,16 +262,16 @@ get_full_name (
 	fullname[0] = '\0';
 
 	if ((p = getenv ("NAME")) != (char *) 0) {
-		strncpy (fullname, p, sizeof (fullname));
+		my_strncpy(fullname, p, sizeof(fullname) - 1);
 		return (fullname);
 	}
 	if ((p =  getenv ("REALNAME")) != (char *) 0) {
-		strncpy (fullname, p, sizeof (fullname));
+		my_strncpy(fullname, p, sizeof(fullname) - 1);
 		return (fullname);
 	}
 
 #	ifdef VMS
-	strncpy (fullname, fix_fullname(get_uaf_fullname()), sizeof (fullname));
+	strncpy(fullname, fix_fullname(get_uaf_fullname()), sizeof(fullname) - 1);
 #	else
 	if ((pw = getpwuid(getuid())) != (struct passwd *) 0) {
 		strncpy (buf, pw->pw_gecos, sizeof (fullname));

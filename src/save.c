@@ -3,9 +3,9 @@
  *  Module    : save.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-31
+ *  Updated   : 2003-03-15
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *	             You may  freely  copy or  redistribute this  software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-
@@ -345,7 +345,7 @@ save_art_to_file (
 				return FALSE;
 			}
 
-			ch = prompt_slk_response(tinrc.default_save_mode, "aoq\033", "%s", txt_append_overwrite_quit, file);
+			ch = prompt_slk_response(tinrc.default_save_mode, "aoq\033", txt_append_overwrite_quit, file);
 			switch (ch) {
 				case iKeySaveAppendFile:
 					strcpy (mode, "a+");
@@ -706,7 +706,7 @@ add_to_save_list (
 	}
 
 	if (is_mailbox) {
-		my_strncpy (file, ((strlen (path) > 1) ? ((path[0] == '=') ? (path+1) : path) : glob_group), sizeof (file));
+		my_strncpy(file, ((strlen (path) > 1) ? ((path[0] == '=') ? (path+1) : path) : glob_group), sizeof(file) - 1);
 
 		i = my_group[cur_groupnum];
 		if (!strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
@@ -1099,7 +1099,7 @@ post_process_uud (
 	t[0] = '\0';
 	u[0] = '\0';
 
-	my_strncpy (file_out_dir, save_filename (0), sizeof (file_out_dir));
+	my_strncpy(file_out_dir, save_filename (0), sizeof(file_out_dir) - 1);
 	for (i = strlen(file_out_dir); i > 0; i--) {
 #	ifdef VMS
 		if (file_out_dir[i] == ']') {
@@ -1124,7 +1124,7 @@ post_process_uud (
 		if (!save[i].saved)
 			continue;
 
-		my_strncpy (buf, save_filename(i), sizeof (buf));
+		my_strncpy(buf, save_filename(i), sizeof(buf) - 1);
 		if ((fp_in = fopen (buf, "r")) != (FILE *)NULL) {
 			UULoadFile(buf, NULL, 0);
 			fclose(fp_in);
@@ -1195,7 +1195,7 @@ post_process_uud (
 			open_out_file = FALSE;
 		}
 
-		my_strncpy (buf, save_filename (i), sizeof (buf));
+		my_strncpy(buf, save_filename (i), sizeof(buf) - 1);
 		if ((fp_in = fopen (buf, "r")) != (FILE *) 0) {
 			if (fgets (s, (int) sizeof(s), fp_in) == 0) {
 				fclose (fp_in);
@@ -1406,7 +1406,7 @@ post_process_sh (
 	strcpy (sh_pattern_2, "#!/bin/sh");
 	strcpy (sh_pattern_3, "# This is a shell archive.");
 
-	my_strncpy (file_out_dir, save_filename (0), sizeof (file_out_dir));
+	my_strncpy(file_out_dir, save_filename (0), sizeof(file_out_dir) - 1);
 	for (i = strlen(file_out_dir); i > 0; i--) {
 #	ifdef VMS
 		if (file_out_dir[i] == ']') {
@@ -1428,7 +1428,7 @@ post_process_sh (
 	for (j = 0; j < num_save; j++) {
 		if (!save[j].saved)
 			continue;
-		my_strncpy (file_in, save_filename (j), sizeof (file_in));
+		my_strncpy(file_in, save_filename (j), sizeof(file_in) - 1);
 
 		my_printf (txt_extracting_shar, file_in);
 		my_flush ();

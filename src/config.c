@@ -3,7 +3,7 @@
  *  Module    : config.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-22
+ *  Updated   : 2003-03-13
  *  Notes     : Configuration file routines
  *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -247,7 +247,7 @@ read_config_file (
 			if (match_string (buf, "default_savedir=", tinrc.savedir, sizeof (tinrc.savedir))) {
 				if (tinrc.savedir[0] == '.' && strlen (tinrc.savedir) == 1) {
 					get_cwd (buf);
-					my_strncpy (tinrc.savedir, buf, sizeof (tinrc.savedir));
+					my_strncpy(tinrc.savedir, buf, sizeof (tinrc.savedir) - 1);
 				}
 				break;
 			}

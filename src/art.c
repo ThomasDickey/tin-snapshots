@@ -3,7 +3,7 @@
  *  Module    : art.c
  *  Author    : I.Lea & R.Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-21
+ *  Updated   : 2003-03-13
  *  Notes     :
  *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -1196,8 +1196,10 @@ vWriteNovFile (
 
 				fprintf (hFp, "\n");
 
-				if (q != ref)
+				if (q != ref) {
 					free(ref);
+					ref = q = NULL;
+				}
 			}
 		}
 
