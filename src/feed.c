@@ -660,7 +660,7 @@ got_sig_pipe_while_piping:
 		case FEED_SAVE:
 		case FEED_AUTOSAVE_TAGGED:
 			if (ch == iKeyFeedArt)
-				info_message (txt_saved, processed, IS_PLURAL(processed));
+				info_message (txt_saved_arts, processed, IS_PLURAL(processed));
 			break;
 		default:
 			break;

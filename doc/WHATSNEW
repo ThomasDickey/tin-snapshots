@@ -90,7 +90,7 @@ Other enhancements
    '?' Searching now works
 
 
-Article length in lines shown in group and thead menu, can be
+Article length in lines shown in group and thread menu, can be
 turned off
 
 new_quote_format in attributes
@@ -115,7 +115,7 @@ handling for bogus groups in newsrc
 
 user configurable header display in pager
 
-local overview cacheing for speed on slow links
+local overview caching for speed on slow links
 
 $SPAMTRAP
 

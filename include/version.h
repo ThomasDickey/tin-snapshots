@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990624"
-#	define RELEASENAME	"Dawnrazor"
+#	define RELEASEDATE	"19990805"
+#	define RELEASENAME	"Sumerland"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

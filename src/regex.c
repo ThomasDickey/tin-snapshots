@@ -71,3 +71,28 @@ match_regex (
 	free(re);
 	return(ret);
 }
+
+
+/*
+ * Compile and optimise 'regex'. Return TRUE if all went well
+ */
+t_bool
+compile_regex(
+	char *regex,
+	struct regex_cache *cache)
+{
+	const char *regex_errmsg = 0;
+	int regex_errpos;
+
+	if ((cache->re = pcre_compile (regex, PCRE_EXTENDED | PCRE_CASELESS, &regex_errmsg, &regex_errpos, NULL)) == NULL)
+		error_message (txt_pcre_error_at, regex_errmsg, regex_errpos);
+	else {
+		cache->extra = pcre_study (cache->re, 0, &regex_errmsg);
+		if (regex_errmsg != NULL)
+			error_message (txt_pcre_error_text, regex_errmsg);
+		else
+			return TRUE;
+	}
+	return FALSE;
+}
+

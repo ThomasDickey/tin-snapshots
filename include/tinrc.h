@@ -50,6 +50,9 @@ struct t_config {
 	char news_quote_format[PATH_LEN];
 	char post_process_command[PATH_LEN];/* Post processing command */
 	char quote_chars[PATH_LEN];			/* quote chars for posting/mails ": " */
+#ifdef HAVE_COLOR
+	char quote_regex[LEN];				/* regex used to determine quoted lines */
+#endif /* HAVE_COLOR */
 	char savedir[PATH_LEN];				/* directory to save articles to */
 	char spamtrap_warning_addresses[LEN];
 	char xpost_quote_format[PATH_LEN];

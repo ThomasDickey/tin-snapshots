@@ -252,23 +252,31 @@ print_color (
 		if (signature) {
 			fcol (tinrc.col_signature);
 			color = tinrc.col_signature;
+		} else if (in_headers) {
+			color = tinrc.col_newsheaders;
+			fcol (tinrc.col_newsheaders);
 		} else {
-			if (str[0] == '>'
-				 || str[0] == '|'
-				 || str[0] == ']'
-/*				 || str[0] == '»' */
-				 || (str[0] == ':' && str[1] != '-')
-				 || (str[1] == '>' && str[0] != '-')
-				 || (str[2] == '>' && str[1] != '-')
-				 || (str[3] == '>' && str[2] != '-')
-				 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
-				fcol (tinrc.col_quote);
-				color = tinrc.col_quote;
-			} else if (in_headers) {
-				color = tinrc.col_newsheaders;
-				fcol (tinrc.col_newsheaders);
-			} else
-				fcol (tinrc.col_text);
+			if (quote_regex.re) {
+				if (pcre_exec (quote_regex.re, quote_regex.extra, str, strlen(str), 0, 0, NULL, 0) >= 0) {
+					fcol (tinrc.col_quote);
+					color = tinrc.col_quote;
+				} else
+					fcol (tinrc.col_text);
+			} else {
+				if (str[0] == '>'
+					 || str[0] == '|'
+					 || str[0] == ']'
+/*					 || str[0] == '»' */
+					 || (str[0] == ':' && str[1] != '-')
+					 || (str[1] == '>' && str[0] != '-')
+					 || (str[2] == '>' && str[1] != '-')
+					 || (str[3] == '>' && str[2] != '-')
+					 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
+					fcol (tinrc.col_quote);
+					color = tinrc.col_quote;
+				} else
+					fcol (tinrc.col_text);
+			}
 		}
 	}
 

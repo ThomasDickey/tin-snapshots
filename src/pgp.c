@@ -235,12 +235,13 @@ pgp_available (
 	char keyring[PATH_LEN];
 
 	joinpath(keyring, pgp_data, PGP_PUBRING);
-	if ((f = fopen(keyring, "r")) == (FILE *) 0)
+	if ((f = fopen(keyring, "r")) == (FILE *) 0) {
+		info_message(txt_pgp_not_avail);
 		return FALSE;
-	else {
-		fclose(f);
-		return TRUE;
 	}
+
+	fclose(f);
+	return TRUE;
 }
 
 
@@ -251,10 +252,9 @@ invoke_pgp_mail (
 {
 	char ch, ch_default = 's';
 
-	if (!pgp_available()) {
-		info_message(txt_pgp_not_avail);
+	if (!pgp_available())
 		return;
-	}
+
 	ch = prompt_slk_response(ch_default, "beqs\033", txt_pgp_mail);
 	switch (ch) {
 		case '\033':
@@ -293,10 +293,9 @@ invoke_pgp_news (
 {
 	char ch, ch_default = 's';
 
-	if (!pgp_available()) {
-		info_message(txt_pgp_not_avail);
+	if (!pgp_available())
 		return;
-	}
+
 	ch = prompt_slk_response(ch_default, "iqs\033", txt_pgp_news);
 	switch (ch) {
 		case '\033':
@@ -337,10 +336,9 @@ pgp_check_article (
 	t_bool pgp_signed = FALSE;
 	t_bool pgp_key = FALSE;
 
-	if (!pgp_available()) {
-		info_message(txt_pgp_not_avail);
+	if (!pgp_available())
 		return 0;
-	}
+
 	joinpath(the_article, homedir, ".article");
 
 #	ifdef APPEND_PID
@@ -371,7 +369,11 @@ pgp_check_article (
 		Raw(FALSE);
 
 #	ifdef HAVE_PGP_2
+#if 0
 		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
+#else
+		sprintf(cmd, "%s -f %s < %s %s", PGPNAME, pgpopts, the_article, REDIRECT_PGP_OUTPUT);
+#endif /* 0 */
 #	else
 #		ifdef	HAVE_PGP_5
 		sprintf(cmd, "%sv <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
@@ -382,8 +384,8 @@ pgp_check_article (
 		my_printf("\n");
 		Raw(TRUE);
 	}
-	if (pgp_key) { /* FIXME: -> lang.c */
-		strcpy (buf, "Add key(s) to public keyring? ");
+	if (pgp_key) {
+		strcpy (buf, txt_pgp_add);
 		if (prompt_yn (cLINES, buf, FALSE) == 1) {
 			Raw (FALSE);
 

@@ -374,6 +374,9 @@ my_fflush(
 	}
 }
 
+/*
+ * Needed if non-curses output has corrupted curses understanding of the screen
+ */
 void
 my_retouch(void)
 {

@@ -123,7 +123,8 @@ debug_print_header (
 			bool_unparse(s->killed),
 			bool_unparse(s->selected));
 		fprintf (fp,"subj=[%-38s]\n", s->subject);
-		fprintf (fp,"date=[%ld]  from=[%s]  name=[%s]\n", s->date, s->from, s->name);
+		fprintf (fp,"date=[%ld]  from=[%s]  name=[%s]\n", s->date, s->from,
+			(s->name ? s->name : ""));
 		fprintf (fp,"msgid=[%s]  refs=[%s]\n",
 			(s->msgid ? s->msgid : ""),
 			(s->refs ? s->refs : ""));

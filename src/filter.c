@@ -70,14 +70,6 @@ static void free_filter_item (struct t_filter *ptr);
 	static void vWriteFilterFile (char *pcFile);
 #endif /* !INDEX_DAEMON */
 
-/*
- * Filter cache structure using Philip Hazel's Perl regular expression
- * library (see pcre/pcre.[ch] for details)
- */
-struct regex_cache {
-	pcre *re;
-	pcre_extra *extra;
-};
 
 static struct t_filter *
 psExpandFilterArray (
@@ -97,6 +89,48 @@ psExpandFilterArray (
 		result = (struct t_filter *) my_realloc ((char *) ptr, block);
 
 	return result;
+}
+
+
+/*
+ * Looks for a matching filter hit (wildmat or pcre regex) in the supplied string
+ * If the cache is not yet initialised, compile and optimise the regex
+ * Return TRUE if we hit the rule
+ */
+static t_bool
+test_regex(
+	const char *string,
+	char *regex,
+	t_bool nocase,
+	struct regex_cache *cache)
+{
+	const char *regex_errmsg = 0;
+	int regex_errpos;
+
+	if (!tinrc.wildcard) {
+		if (wildmat (string, regex, nocase))
+			return TRUE;
+	} else {
+		if (!cache->re) {
+			if ((cache->re = pcre_compile(regex, PCRE_EXTENDED | ((nocase) ? PCRE_CASELESS : 0),
+												&regex_errmsg, &regex_errpos, NULL)) == NULL)
+				sprintf (mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
+			else {
+				cache->extra = pcre_study(cache->re, 0, &regex_errmsg);
+				if (regex_errmsg != NULL)
+					sprintf (mesg, txt_pcre_error_text, regex_errmsg);
+			}
+		}
+		if (cache->re) {
+			regex_errpos = pcre_exec(cache->re, cache->extra, string, strlen(string), 0, 0, NULL, 0);
+			if (regex_errpos >= 0)
+				return TRUE;
+			else if (regex_errpos != PCRE_ERROR_NOMATCH)
+				sprintf (mesg, txt_pcre_error_num, regex_errpos);
+		}
+	}
+
+	return FALSE;
 }
 
 
@@ -1352,9 +1386,7 @@ filter_articles (
 	struct t_group *group)
 {
 	char buf[LEN];
-	const char *regex_errmsg = 0;
 	int num, inscope;
-	int regex_errpos;
 /*	int score; */
 	register int i, j, k;
 	struct t_filter *ptr; /*, *curr; */
@@ -1420,40 +1452,16 @@ filter_articles (
 			continue;
 #endif /* !KILL_READ */
 
+		mesg[0] = '\0';				/* Clear system message field */
+
 		for (j = 0; j < num; j++) {
 			if (ptr[j].inscope) {
 				/*
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-					if (!tinrc.wildcard) {
-						if (wildmat(arts[i].subject, ptr[j].subj, ptr[j].icase)) {
-							SET_FILTER(group, i, j);
-						}
-					} else {
-						if (!regex_cache_subj[j].re) {
-							if ((regex_cache_subj[j].re = pcre_compile(ptr[j].subj,
-							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
-								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
-							if (regex_cache_subj[j].re) {
-								regex_cache_subj[j].extra = pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL)
-									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
-							}
-						}
-						if (regex_cache_subj[j].re) {
-							regex_errpos =
-							  pcre_exec(regex_cache_subj[j].re,
-							    regex_cache_subj[j].extra,
-							    arts[i].subject,
-							    strlen(arts[i].subject),
-							    0, 0, NULL, 0);
-							if (regex_errpos >= 0) {
-								SET_FILTER(group, i, j);
-							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(mesg, txt_pcre_error_num, regex_errpos);
-						}
+					if (test_regex (arts[i].subject, ptr[j].subj, ptr[j].icase, &regex_cache_subj[j])) {
+						SET_FILTER(group, i, j);
 					}
 				}
 
@@ -1465,33 +1473,8 @@ filter_articles (
 						sprintf (buf, "%s (%s)", arts[i].from, arts[i].name);
 					else
 						strcpy (buf, arts[i].from);
-					if (!tinrc.wildcard) {
-						if (wildmat(buf, ptr[j].from, ptr[j].icase)) {
-							SET_FILTER(group, i, j);
-						}
-					} else {
-						if (!regex_cache_from[j].re) {
-							if ((regex_cache_from[j].re = pcre_compile(ptr[j].from,
-							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
-								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
-							if (regex_cache_from[j].re) {
-								regex_cache_from[j].extra = pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL)
-									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
-							}
-						}
-						if (regex_cache_from[j].re) {
-							regex_errpos = pcre_exec(regex_cache_from[j].re,
-							    regex_cache_from[j].extra,
-							    buf,
-							    strlen(buf),
-							    0, 0, NULL, 0);
-							if (regex_errpos >= 0) {
-								SET_FILTER(group, i, j);
-							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(mesg, txt_pcre_error_num, regex_errpos);
-						}
+					if (test_regex (buf, ptr[j].from, ptr[j].icase, &regex_cache_from[j])) {
+						SET_FILTER(group, i, j);
 					}
 				}
 
@@ -1539,46 +1522,10 @@ filter_articles (
 							break;
 					}
 
-					if (!tinrc.wildcard) {
-						if (wildmat(myrefs, ptr[j].msgid, FALSE) || wildmat(mymsgid, ptr[j].msgid, FALSE)) {
-							SET_FILTER(group, i, j);
-						}
-					} else {
-						if (!regex_cache_msgid[j].re) {
-							if ((regex_cache_msgid[j].re = pcre_compile(ptr[j].msgid,
-							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
-								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
-							if (regex_cache_msgid[j].re) {
-								regex_cache_msgid[j].extra = pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL)
-									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
-							}
-						}
-						if (regex_cache_msgid[j].re) {
-							regex_errpos =
-								pcre_exec(regex_cache_msgid[j].re,
-								regex_cache_msgid[j].extra,
-								myrefs,
-								strlen(myrefs),
-								0, 0, NULL, 0);
-							if (regex_errpos >= 0) {
-								SET_FILTER(group, i, j);
-							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(mesg, txt_pcre_error_num, regex_errpos);
-							else  { /* No match, try Message-ID */
-								regex_errpos =
-								  pcre_exec(regex_cache_msgid[j].re,
-								    regex_cache_msgid[j].extra,
-								    mymsgid,
-								    strlen(mymsgid),
-								    0, 0, NULL, 0);
-								if (regex_errpos >= 0) {
-									SET_FILTER(group, i, j);
-								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-									sprintf(mesg, txt_pcre_error_num, regex_errpos);
-							}
-						}
+					if (test_regex (myrefs, ptr[j].msgid, FALSE, &regex_cache_msgid[j])) {
+						SET_FILTER(group, i, j);
+					} else if (test_regex (mymsgid, ptr[j].msgid, FALSE, &regex_cache_msgid[j])) {
+						SET_FILTER(group, i, j);
 					}
 					FreeIfNeeded(refs);
 				}
@@ -1681,35 +1628,8 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 								/* don't filter when we are actually in that group */
 								/* Group names shouldn't be case sensitive in any case. Whatever */
 								if (ptr[j].type != FILTER_KILL || strcmp(group->name, buf) != 0) {
-									if (!tinrc.wildcard) {
-										if (wildmat(buf, ptr[j].xref, ptr[j].icase))
-											group_count = -1;
-									} else {
-										if (!regex_cache_xref[j].re) {
-											if ((regex_cache_xref[j].re = pcre_compile(ptr[j].xref,
-											  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-											  &regex_errmsg, &regex_errpos, NULL)) == NULL)
-												sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
-											if (regex_cache_xref[j].re) {
-												regex_cache_xref[j].extra =
-												  pcre_study(regex_cache_xref[j].re, 0, &regex_errmsg);
-												if (regex_errmsg != NULL)
-													sprintf(mesg, txt_pcre_error_text, regex_errmsg);
-											}
-										}
-										if (regex_cache_xref[j].re) {
-											regex_errpos =
-											  pcre_exec(regex_cache_xref[j].re,
-											    regex_cache_xref[j].extra,
-											    buf,
-											    strlen(buf),
-											    0, 0, NULL, 0);
-											if (regex_errpos >= 0)
-												group_count = -1;
-											else if (regex_errpos != PCRE_ERROR_NOMATCH)
-												sprintf(mesg, txt_pcre_error_num, regex_errpos);
-										}
-									}
+									if (test_regex (buf, ptr[j].xref, ptr[j].icase, &regex_cache_xref[j]))
+										group_count = -1;
 								}
 							}
 							s=e;
@@ -1726,6 +1646,9 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 			}
 		}
 	}
+
+	if (mesg[0] != '\0')
+		error_message (mesg);
 
 	/*
 	 * throw away the contents of all regex_caches

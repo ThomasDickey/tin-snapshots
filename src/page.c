@@ -20,6 +20,8 @@ struct t_header note_h;
 
 FILE *note_fp;					/* the body of the current article */
 
+int MORE_POS;				/* set in set_win_size () */
+int RIGHT_POS;				/* set in set_win_size () */
 int glob_respnum;
 int last_resp, this_resp;		/* previous & current article # in arts[] for '-' command */
 int note_line;
@@ -506,6 +508,12 @@ page_up:
 				}
 				break;
 
+			case iKeyPageMarkThdUnread:
+				thd_mark_unread (group, base[which_thread(respnum)]);
+				/* FIXME: replace 'Thread' by 'Article' if THREAD_NONE */
+				info_message(txt_marked_as_unread, "Thread");
+				break;
+
 			case iKeyPageCancel:			/* cancel an article */
 				if (can_post) {
 					if (cancel_article (group, &arts[respnum], respnum))
@@ -804,7 +812,8 @@ expand_ctrl_chars (
 		} else if (((*p) & 0xFF) < ' ') {
 			*q++ = '^';
 			*q++ = ((*p) & 0xFF) + '@';
-			if (*p == 12) ctrl_L = TRUE;
+			if (*p == 12)
+				ctrl_L = TRUE;
 		} else if (do_rotation) {
 			if (*p >= 'A' && *p <= 'Z')
 				*q++ = (*p - 'A' + do_rotation) % 26 + 'A';

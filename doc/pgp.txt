@@ -1,0 +1,24 @@
+Ensuring support is compiled in
+-------------------------------
+Tin will compile in support for PGP if it can find it.
+
+It looks for 'pgpk' on the path
+If this is found, then PGP5 support is assumed
+Otherwise it looks for 'pgp' on the path
+If this is found, then PGP2 support is assumed
+If neither is found, then no pgp support is compiled in
+If configure is called with --disable-pgp, then no pgp support is compiled in
+[ The actual program run is always 'pgp', pgpk appears to be simply a test
+  for PGP5 support ]
+
+When you try to use PGP
+-----------------------
+PGP2 support expects pubring.pgp
+PGP5    "      "     pubring.pkr
+
+It wants to find the above in:
+$HOME/.pgp/pubring.*
+
+Or you can override this with $PGPPATH/pubring.*
+
+If an environment var PGPOPTS is defined, then tin will use it.

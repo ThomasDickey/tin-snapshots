@@ -73,8 +73,7 @@ static t_bool create_sub_dir (int i);
 #	endif /* !HAVE_LIBUU */
 	t_bool auto_delete);
 #	ifndef HAVE_LIBUU
-		static char *get_archive_file (char *dir);
-		static void uudecode_file (int pp, char *file_out_dir, char *file_out);
+		static void uudecode_file (int pp, char *file_out_dir, char *file_out, char *uudname);
 #	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
@@ -170,7 +169,7 @@ check_start_save_any_news (
 				case MAIL_ANY_NEWS:
 				case SAVE_ANY_NEWS:
 					if (print_group) {
-						sprintf (buf, "Saved %s...\n", group->name); /* FIXME: -> lang.c */
+						sprintf (buf, txt_saved, group->name);
 						fprintf (fp_log, buf);
 						if (verbose)
 							wait_message (0, buf);
@@ -373,8 +372,8 @@ save_art_to_file (
 		fprintf (fp, "From %s %s", from, ctime (&epoch));
 	}
 
-	if (fseek (note_fp, 0L, SEEK_SET) == -1) /* FIXME: -> lang.c */
-		perror_message ("fseek() error on [%s]", save[i].subject);
+	if (fseek (note_fp, 0L, SEEK_SET) == -1)
+		perror_message ("fseek() error on [%s]", save[i].subject); /* FIXME: -> lang.c */
 
 	copy_fp (note_fp, fp);
 
@@ -516,8 +515,7 @@ save_regex_arts_to_file (
 			FreeIfNeeded(last_savefile);
 		}
 
-		/* FIXME: quote % in buf first */
-		wait_message (2, buf);
+		wait_message (2, "%s", buf);
 		FreeIfNeeded(first_savefile);
 	}
 	return ret_code;
@@ -603,7 +601,7 @@ create_path (
 			if (stat (buf, &st) == -1) {
 				if (my_mkdir (buf, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 					if (errno != EEXIST) {
-						perror_message ("Cannot create %s", buf); /* FIXME: -> lang.c */
+						perror_message (txt_cannot_create, buf);
 						return FALSE;
 					}
 				}
@@ -613,7 +611,7 @@ create_path (
 #else
 	if (my_mkdir (buf, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 		if (errno != EEXIST) {
-			perror_message ("Cannot create %s", buf);
+			perror_message (txt_cannot_create, buf);
 			return FALSE;
 		}
 	}
@@ -1171,6 +1169,8 @@ post_process_uud (
 	open_out_file = TRUE;
 
 	for (i = 0; i < num_save; i++) {
+		char realname[PATH_LEN];
+
 		if (!save[i].saved)
 			continue;
 		if (open_out_file) {
@@ -1192,6 +1192,8 @@ post_process_uud (
 				switch (state) {
 					case INITIAL:
 						if (!strncmp ("begin ", s, 6)) {
+							if (sscanf (s+6, "%*d %128s\n", realname) != 1)	/* Get the real filename */
+								realname[0] = '\0';
 							state = MIDDLE;
 							fprintf (fp_out, "%s", s);
 						}
@@ -1251,7 +1253,7 @@ post_process_uud (
 		}
 		if (state == END) {
 			fclose (fp_out);
-			uudecode_file (pp, file_out_dir, file_out);
+			uudecode_file (pp, file_out_dir, file_out, realname);
 			state = INITIAL;
 			open_out_file = TRUE;
 		}
@@ -1273,9 +1275,10 @@ static void
 uudecode_file (
 	int pp,
 	char *file_out_dir,
-	char *file_out)
+	char *file_out,
+	char *uudname)
 {
-	char *file;
+	FILE *fp_in;
 	char buf[LEN];
 
 	wait_message (0, txt_uudecoding, file_out);
@@ -1283,84 +1286,85 @@ uudecode_file (
 #		if !defined(M_UNIX)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #		else
-	chdir (file_out_dir); /* FIXME: remove useles cds below and in loopcalls */
+	chdir (file_out_dir);
+
 	sh_format (buf, sizeof(buf), "uudecode %s", file_out);
-	if (invoke_cmd (buf)) {
-		/*
-		 *  Sum file
-		 */
-		if ((file = get_archive_file (file_out_dir)) != 0) {
-			FILE *fp_in;
+	if (!invoke_cmd (buf)) {
+		error_message (txt_command_failed_s, buf);
+		return;
+	}
 
-			sh_format (buf, sizeof(buf), "%s %s", DEFAULT_SUM, file);
-			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
-				if (fgets (buf, (int) sizeof(buf), fp_in) != 0) {
-					char *ptr = strchr (buf, '\n');
-					if (ptr != 0)
-						*ptr = '\0';
-				}
-				pclose (fp_in);
-				my_printf (txt_checksum_of_file, file);
-				my_flush ();
-				my_printf ("%s  %10ld bytes" cCRLF cCRLF, buf, file_size (file));
-			} else
-				my_printf ("Cannot execute %s" cCRLF, buf); /* FIXME: -> lang.c */
+	if (uudname[0] == '\0')					/* Unable to determine the file that was uudecoded */
+		return;
 
-			my_flush ();
-
-			/* If defined, invoke post processor command */
-			if (*tinrc.post_process_command) {
-				sh_format (buf, sizeof(buf), "cd %s; %s '%s'", file_out_dir, tinrc.post_process_command, file);
-				if (!invoke_cmd (buf))
-					error_message (txt_command_failed_s, buf);
-				(void) sleep (3);
-			}
-
-			if (pp > POST_PROC_UUDECODE) {
-				int i;
-				/*
-				 *  Test archive integrity
-				 */
-				if (pp > POST_PROC_UUDECODE && archiver[pp].test != 0) {
-					i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
-					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
-						archiver[i].name, archiver[i].test, file);
-					my_printf (txt_testing_archive, file);
-					my_flush ();
-					if (!invoke_cmd (buf))
-						error_message (txt_post_processing_failed);
-					(void) sleep (3);
-				}
-				/*
-				 *  List archive
-				 */
-				if (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_LST_ZIP) {
-					i = (pp == POST_PROC_UUD_LST_ZOO ? 3 : 4);
-					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
-						archiver[i].name, archiver[i].list, file);
-					my_printf (txt_listing_archive, file);
-					my_flush ();
-					if (!invoke_cmd (buf))
-						error_message (txt_post_processing_failed);
-					(void) sleep (3);
-				}
-				/*
-				 *  Extract archive
-				 */
-				if (pp == POST_PROC_UUD_EXT_ZOO || pp == POST_PROC_UUD_EXT_ZIP) {
-					i = (pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
-					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
-						archiver[i].name, archiver[i].extract, file);
-					my_printf (txt_extracting_archive, file);
-					my_flush ();
-					if (!invoke_cmd (buf))
-						error_message (txt_post_processing_failed);
-					(void) sleep (3);
-				}
-			}
-			FreeIfNeeded(file);
+	/*
+	 *  Sum file
+	 */
+	sh_format (buf, sizeof(buf), "%s %s", DEFAULT_SUM, uudname);
+	if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
+		if (fgets (buf, (int) sizeof(buf), fp_in) != 0) {
+			char *ptr = strchr (buf, '\n');
+			if (ptr != 0)
+				*ptr = '\0';
 		}
-	}  /* (invoke_cmd (buf)) */
+		pclose (fp_in);
+		my_printf (txt_checksum_of_file, uudname);
+		my_flush ();
+		my_printf ("%s  %10ld bytes" cCRLF cCRLF, buf, file_size (uudname));
+	} else
+		my_printf ("Cannot execute %s" cCRLF, buf); /* FIXME: -> lang.c */
+
+	my_flush ();
+
+	/*
+	 * If defined, invoke post processor command
+	 */
+	if (*tinrc.post_process_command) {
+		sh_format (buf, sizeof(buf), "%s '%s'", tinrc.post_process_command, uudname);
+		if (!invoke_cmd (buf))
+			error_message (txt_command_failed_s, buf);
+		(void) sleep (1);
+	}
+
+	if (pp > POST_PROC_UUDECODE) {
+		int i;
+		/*
+		 *  Test archive integrity
+		 */
+		if (pp > POST_PROC_UUDECODE && archiver[pp].test != 0) {
+			i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
+			sh_format (buf, sizeof(buf), "%s %s %s", archiver[i].name, archiver[i].test, uudname);
+			my_printf (txt_testing_archive, uudname);
+			my_flush ();
+			if (!invoke_cmd (buf))
+				error_message (txt_post_processing_failed);
+			(void) sleep (3);
+		}
+		/*
+		 *  List archive
+		 */
+		if (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_LST_ZIP) {
+			i = (pp == POST_PROC_UUD_LST_ZOO ? 3 : 4);
+			sh_format (buf, sizeof(buf), "%s %s %s", archiver[i].name, archiver[i].list, uudname);
+			my_printf (txt_listing_archive, uudname);
+			my_flush ();
+			if (!invoke_cmd (buf))
+				error_message (txt_post_processing_failed);
+			(void) sleep (3);
+		}
+		/*
+		 *  Extract archive
+		 */
+		if (pp == POST_PROC_UUD_EXT_ZOO || pp == POST_PROC_UUD_EXT_ZIP) {
+			i = (pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
+			sh_format (buf, sizeof(buf), "%s %s %s", archiver[i].name, archiver[i].extract, uudname);
+			my_printf (txt_extracting_archive, uudname);
+			my_flush ();
+			if (!invoke_cmd (buf))
+				error_message (txt_post_processing_failed);
+			(void) sleep (3);
+		}
+	}
 #		endif /* M_UNIX */
 }
 #	endif /* !HAVE_LIBUU */
@@ -1460,54 +1464,6 @@ post_process_sh (
 	}
 	delete_processed_files (auto_delete);
 }
-#endif /* !INDEX_DAEMON */
-
-
-/*
- * Returns the most recently modified file in the specified drectory
- */
-#ifndef INDEX_DAEMON
-#	ifndef HAVE_LIBUU
-static char *
-get_archive_file (
-	char *dir)
-{
-	DIR *dirp;
-	DIR_BUF *dp;
-	char *file;
-	char buf[LEN];
-	struct stat sbuf;
-	time_t last = (time_t) 0;
-
-	if ((dirp = opendir (dir)) == (DIR *) 0)
-		return 0;
-
-	file = (char *) my_malloc(LEN);
-
-	dp = (DIR_BUF *) readdir (dirp);
-	while (dp != (DIR_BUF *) 0) {
-#		ifdef VMS
-		joinpath (buf, dir, dp->d_name);
-#		else
-		sprintf (buf, "%s/%s", dir, dp->d_name);
-#		endif /* VMS */
-		stat (buf, &sbuf);
-		if ((sbuf.st_mtime > last) && S_ISREG(sbuf.st_mode)) {
-			last = sbuf.st_mtime;
-			strcpy (file, buf);	/* FIXME: Why did we bother to malloc() file then ? */
-		}
-		dp = (DIR_BUF *) readdir (dirp);
-	}
-	CLOSEDIR(dirp);
-
-	if (last == (time_t) 0) {
-		free (file);
-		file = 0;
-	}
-
-	return file;
-}
-#	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
 

@@ -25,222 +25,228 @@
  * are enabled.  (Not all of the functions are ANSI or POSIX).
  */
 #ifdef DECL__FLSBUF
-extern int _flsbuf (int, FILE *);
-#endif
+	extern int _flsbuf (int, FILE *);
+#endif /* DECL__FLSBUF */
 #ifdef DECL_ATOI
-extern int atoi (char *);
-#endif
+	extern int atoi (char *);
+#endif /* DECL_ATOI */
 #ifdef DECL_ATOL
-extern long atol (char *);
-#endif
+	extern long atol (char *);
+#endif /* DECL_ATOL */
 #ifndef HAVE_MEMCPY
 #	ifdef DECL_BCOPY
-extern int bcopy (char *, char *, int);
+		extern int bcopy (char *, char *, int);
 #	endif /* DECL_BCOPY */
 #endif /* !HAVE_MEMCPY */
 #ifdef DECL_BZERO /* FD_ZERO() might use this */
-extern void bzero (char *, int);
-#endif
+	extern void bzero (char *, int);
+#endif /* DECL_BZERO */
 #ifdef DECL_CALLOC
-extern void *calloc (size_t, size_t);
-#endif
+	extern void *calloc (size_t, size_t);
+#endif /* DECL_CALLOC */
 #ifdef DECL_FCLOSE
-extern int fclose (FILE *);
-#endif
+	extern int fclose (FILE *);
+#endif /* DECL_FCLOSE */
 #ifdef DECL_FDOPEN
-extern FILE *fdopen (int, const char *);
-#endif
+	extern FILE *fdopen (int, const char *);
+#endif /* DECL_FDOPEN */
 #ifdef DECL_FFLUSH
-extern int fflush (FILE *);
-#endif
+	extern int fflush (FILE *);
+#endif /* DECL_FFLUSH */
 #ifdef DECL_FGETC
-extern int fgetc (FILE *);
-#endif
+	extern int fgetc (FILE *);
+#endif /* DECL_FGETC */
 #if defined(DECL_FILENO) && !defined(fileno)
-extern int fileno (FILE *);
-#endif
+	extern int fileno (FILE *);
+#endif /* DECL_FILENO && !fileno */
 #ifdef DECL_FPRINTF
-extern int fprintf (FILE *, const char *, ...);
-#endif
+	extern int fprintf (FILE *, const char *, ...);
+#endif /* DECL_FPRINTF */
 #ifdef DECL_FPUTC
-extern int fputc (int, FILE *);
-#endif
+	extern int fputc (int, FILE *);
+#endif /* DECL_FPUTC */
 #ifdef DECL_FPUTS
-extern int fputs (const char *, FILE *);
-#endif
+	extern int fputs (const char *, FILE *);
+#endif /* DECL_FPUTS */
 #ifdef DECL_FREAD
-extern size_t fread (void *, size_t, size_t, FILE *);
-#endif
+	extern size_t fread (void *, size_t, size_t, FILE *);
+#endif /* DECL_FREAD */
 #ifdef DECL_FREE
-extern void free (void *);
-#endif
+	extern void free (void *);
+#endif /* DECL_FREE */
 #ifdef DECL_FSEEK
-extern int fseek (FILE *, long, int);
-#endif
+	extern int fseek (FILE *, long, int);
+#endif /* DECL_FSEEK */
 #ifdef DECL_FWRITE
-extern size_t fwrite (void *, size_t, size_t, FILE *);
-#endif
+	extern size_t fwrite (void *, size_t, size_t, FILE *);
+#endif /* DECL_FWRITE */
 #ifdef DECL_GETCWD
-extern char *getcwd (char *, size_t);
-#endif
+	extern char *getcwd (char *, size_t);
+#endif /* DECL_GETCWD */
 #ifdef DECL_GETENV
-extern char *getenv (const char *);
-#endif
+	extern char *getenv (const char *);
+#endif /* DECL_GETENV */
 #ifdef DECL_GETHOSTBYNAME
-extern struct hostent *gethostbyname (const char *);
-#endif
+	extern struct hostent *gethostbyname (const char *);
+#endif /* DECL_GETHOSTBYNAME */
 #ifdef DECL_GETHOSTNAME
-extern int gethostname (char *, int);
-#endif
+	extern int gethostname (char *, int);
+#endif /* DECL_GETHOSTNAME */
 #ifdef DECL_GETLOGIN
-extern char *getlogin (void);
-#endif
+	extern char *getlogin (void);
+#endif /* DECL_GETLOGIN */
 #ifdef DECL_GETOPT
-extern int getopt (int, char * const*, const char *);
-#endif
+	extern int getopt (int, char * const*, const char *);
+#endif /* DECL_GETOPT */
 #ifdef DECL_GETPASS
-extern char *getpass(const char *);
-#endif
+	extern char *getpass(const char *);
+#endif /* DECL_GETPASS */
 #ifdef DECL_GETPWNAM
-extern struct passwd *getpwnam (const char *);
-#endif
+	extern struct passwd *getpwnam (const char *);
+#endif /* DECL_GETPWNAM */
 #ifdef DECL_GETSERVBYNAME
-extern struct servent *getservbyname (const char *, const char *);
-#endif
+	extern struct servent *getservbyname (const char *, const char *);
+#endif /* DECL_GETSERVBYNAME */
 #ifdef DECL_INET_ADDR
-extern unsigned long inet_addr (const char *);
-#endif
+	extern unsigned long inet_addr (const char *);
+#endif /* DECL_INET_ADDR */
 #ifdef DECL_IOCTL
-extern int ioctl (int, int, void *);
-#endif
+	extern int ioctl (int, int, void *);
+#endif /* DECL_IOCTL */
 #if defined(DECL_ISASCII) && !defined(isascii)
-extern int isascii (int);
-#endif
+	extern int isascii (int);
+#endif /* DECL_ISASCII && !isascii */
 #ifdef DECL_MALLOC
-extern void *malloc (size_t);
-#endif
+	extern void *malloc (size_t);
+#endif /* DECL_MALLOC */
 #ifdef DECL_MEMSET
-extern void *memset (void *, int, size_t);
-#endif
+	extern void *memset (void *, int, size_t);
+#endif /* DECL_MEMSET */
 #ifdef DECL_MKTEMP
-extern char *mktemp (char *);
-#endif
+	extern char *mktemp (char *);
+#endif /* DECL_MKTEMP */
 #ifdef DECL_PCLOSE
-extern int pclose (FILE *);
-#endif
+	extern int pclose (FILE *);
+#endif /* DECL_PCLOSE */
 #ifdef DECL_PERROR
-extern void perror (const char *);
-#endif
+	extern void perror (const char *);
+#endif /* DECL_PERROR */
 #ifdef DECL_POPEN
-extern FILE *popen (const char *, const char *);
-#endif
+	extern FILE *popen (const char *, const char *);
+#endif /* DECL_POPEN */
 #ifdef DECL_PRINTF
-extern int printf (const char *, ...);
-#endif
+	extern int printf (const char *, ...);
+#endif /* DECL_PRINTF */
 #ifdef DECL_PUTENV
-extern int putenv (const char *);
-#endif
+	extern int putenv (const char *);
+#endif /* DECL_PUTENV */
 #ifdef DECL_QSORT
-extern void qsort (void *, size_t, size_t, int (*)(t_comptype*, t_comptype*));
-#endif
+	extern void qsort (void *, size_t, size_t, int (*)(t_comptype*, t_comptype*));
+#endif /* DECL_QSORT */
 #ifdef DECL_REALLOC
-extern void *realloc (void *, size_t);
-#endif
+	extern void *realloc (void *, size_t);
+#endif /* DECL_REALLOC */
 #ifdef DECL_RENAME
-extern int rename (const char *, const char *);
-#endif
+	extern int rename (const char *, const char *);
+#endif /* DECL_RENAME */
 #ifdef DECL_REWIND
-extern void rewind (FILE *);
-#endif
+	extern void rewind (FILE *);
+#endif /* DECL_REWIND */
 #ifdef DECL_SELECT
-extern int select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
-#endif
+	extern int select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
+#endif /* DECL_SELECT */
 #ifdef DECL_SETEGID
-extern int setegid (gid_t);
-#endif
-#ifdef DECL_SETENV
-extern int setenv (const char *, const char *, int);
-#endif
+	extern int setegid (gid_t);
+#endif /* DECL_SETEGID */
+#ifndef HAVE_PUTENV
+#	ifdef DECL_SETENV
+		extern int setenv (const char *, const char *, int);
+#	endif /* DECL_SETENV */
+#endif /* !HAVE_PUTENV */
 #ifdef DECL_SETEUID
-extern int seteuid (uid_t);
-#endif
+	extern int seteuid (uid_t);
+#endif /* DECL_SETEUID */
 #ifdef DECL_SETPGRP
 #	ifdef SETPGRP_VOID
-extern pid_t setpgrp (void);
+		extern pid_t setpgrp (void);
 #	else
-extern int setpgrp (int, int);
+		extern int setpgrp (int, int);
 #	endif /* SETPGRP_VOID */
 #endif /* DECL_SETPGRP */
-#ifdef DECL_SETREGID
-extern int setregid (gid_t, gid_t);
-#endif
-#ifdef DECL_SETREUID
-extern int setreuid (uid_t, uid_t);
-#endif
+#ifndef HAVE_SETEGID
+#	ifdef DECL_SETREGID
+		extern int setregid (gid_t, gid_t);
+#	endif /* DECL_SETREGID */
+#endif /* !HAVE_SETEGID */
+#ifndef HAVE_SETEUID
+#	ifdef DECL_SETREUID
+		extern int setreuid (uid_t, uid_t);
+#	endif /* DECL_SETREUID */
+#endif /* !HAVE_SETEUID */
 #ifdef DECL_SOCKET
-extern int socket (int, int, int);
-#endif
+	extern int socket (int, int, int);
+#endif /* DECL_SOCKET */
 #ifdef DECL_SSCANF
-extern int sscanf (const char *, const char *, ...);
-#endif
+	extern int sscanf (const char *, const char *, ...);
+#endif /* DECL_SSCANF */
 #ifdef DECL_STRCASECMP
-extern int strcasecmp (const char *, const char *);
-#endif
+	extern int strcasecmp (const char *, const char *);
+#endif /* DECL_STRCASECMP */
 #ifdef DECL_STRCHR
-extern char *strchr (const char *, int);
-extern char *strrchr (const char *, int);
-#endif
+	extern char *strchr (const char *, int);
+	extern char *strrchr (const char *, int);
+#endif /* DECL_STRCHR */
 #ifdef DECL_STRFTIME
-extern int strftime (char *, int, char *, struct tm *);
-#endif
+	extern int strftime (char *, int, char *, struct tm *);
+#endif /* DECL_STRFTIME */
 #ifdef DECL_STRNCASECMP
-extern int strncasecmp (const char *, const char *, size_t);
-#endif
+	extern int strncasecmp (const char *, const char *, size_t);
+#endif /* DECL_STRNCASECMP */
 #ifdef DECL_STRTOL
-extern long strtol (const char *, char **, int);
-#endif
+	extern long strtol (const char *, char **, int);
+#endif /* DECL_STRTOL */
 #ifdef DECL_SYSTEM
-extern int system (char *);
-#endif
+	extern int system (char *);
+#endif /* DECL_SYSTEM */
 #ifdef DECL_TEMPNAM
-extern char *tempnam (const char *, const char *);
-#endif
+	extern char *tempnam (const char *, const char *);
+#endif /* DECL_TEMPNAM */
 #ifdef DECL_TGETENT
-extern int tgetent (char *, char *);
-#endif
+	extern int tgetent (char *, char *);
+#endif /* DECL_TGETENT */
 #ifdef DECL_TGETFLAG
-extern int tgetflag (char *);
-#endif
+	extern int tgetflag (char *);
+#endif /* DECL_TGETFLAG */
 #ifdef DECL_TGETNUM
-extern int tgetnum (char *);
-#endif
+	extern int tgetnum (char *);
+#endif /* DECL_TGETNUM */
 #ifdef DECL_TGETSTR
-extern char *tgetstr (char *, char **);
-#endif
+	extern char *tgetstr (char *, char **);
+#endif /* DECL_TGETSTR */
 #ifdef DECL_TGOTO
-extern char *tgoto (char *, int, int);
-#endif
+	extern char *tgoto (char *, int, int);
+#endif /* DECL_TGOTO */
 #ifdef DECL_TIME
-extern time_t time (time_t *);
-#endif
+	extern time_t time (time_t *);
+#endif /* DECL_TIME */
 #if defined(DECL_TOLOWER) && !defined(tolower)
-extern int tolower (int);
-#endif
+	extern int tolower (int);
+#endif /* DECL_TOLOWER && !tolower */
 #if defined(DECL_TOUPPER) && !defined(toupper)
-extern int toupper (int);
-#endif
+	extern int toupper (int);
+#endif /* DECL_TOUPPER && !toupper */
 #ifdef DECL_TPUTS
-extern int tputs (char *, int, OutcPtr);
-#endif
+	extern int tputs (char *, int, OutcPtr);
+#endif /* DECL_TPUTS */
 #ifdef DECL_UNGETC
-extern int ungetc (int, FILE *);
-#endif
+	extern int ungetc (int, FILE *);
+#endif /* DECL_UNGETC */
 #ifdef DECL_USLEEP
-extern void usleep(unsigned long);
-#endif
+	extern void usleep(unsigned long);
+#endif /* DECL_USLEEP */
 #ifdef DECL_VSPRINTF
-extern int vsprintf(char *, char *, va_list);
-#endif
+	extern int vsprintf(char *, char *, va_list);
+#endif /* DECL_VSPRINTF */
 
 extern int optind;
 extern char *optarg;
@@ -303,7 +309,7 @@ extern char posted_info_file[PATH_LEN];
 extern char posted_msgs_file[PATH_LEN];
 extern char postponed_articles_file[PATH_LEN];
 extern char proc_ch_default;
-extern char progname[PATH_LEN];
+extern char tin_progname[PATH_LEN];
 extern char rcdir[PATH_LEN];
 extern char reply_to[LEN];
 extern char save_active_file[PATH_LEN];
@@ -378,6 +384,7 @@ extern constext txt_begin_of_art[];
 extern constext txt_caching_disabled[];
 extern constext txt_cancel_article[];
 extern constext txt_cancelling_art[];
+extern constext txt_cannot_create[];
 extern constext txt_cannot_create_uniq_name[];
 extern constext txt_cannot_find_base_art[];
 extern constext txt_cannot_get_nntp_server_name[];
@@ -387,7 +394,7 @@ extern constext txt_cannot_open[];
 
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	extern constext txt_cannot_open_active_file[];
-#endif
+#endif /* NNTP_ABLE || NNTP_ONLY */
 
 extern constext txt_cannot_post[];
 extern constext txt_cannot_post_group[];
@@ -657,6 +664,11 @@ extern constext txt_help_quick_kill[];
 extern constext txt_help_quick_select[];
 extern constext txt_help_quote_chars[];
 extern constext txt_help_quote_empty_lines[];
+
+#ifdef HAVE_COLOR
+	extern constext txt_help_quote_regex[];
+#endif /* HAVE_COLOR */
+
 extern constext txt_help_quote_signatures[];
 extern constext txt_help_r[];
 extern constext txt_help_reread_active_file_secs[];
@@ -880,6 +892,11 @@ extern constext txt_opt_process_only_unread[];
 extern constext txt_opt_prompt_followupto[];
 extern constext txt_opt_quote_chars[];
 extern constext txt_opt_quote_empty_lines[];
+
+#ifdef HAVE_COLOR
+	extern constext txt_opt_quote_regex[];
+#endif /* HAVE_COLOR */
+
 extern constext txt_opt_quote_signatures[];
 extern constext txt_opt_reread_active_file_secs[];
 extern constext txt_opt_save_to_mmdf_mailbox[];
@@ -959,6 +976,7 @@ extern constext txt_quit_edit_send[];
 extern constext txt_quit_edit_xpost[];
 extern constext txt_quit_no_write[];
 extern constext txt_quoted_printable[];
+extern constext txt_range_invalid[];
 extern constext txt_read_abort[];
 extern constext txt_read_exit[];
 extern constext txt_read_resp[];
@@ -989,6 +1007,7 @@ extern constext txt_save[];
 extern constext txt_save_config[];
 extern constext txt_save_filename[];
 extern constext txt_saved[];
+extern constext txt_saved_arts[];
 extern constext txt_saved_nothing[];
 extern constext txt_saved_pattern_to[];
 extern constext txt_saved_to_mailbox[];
@@ -1115,6 +1134,11 @@ extern constext txt_tinrc_process_only_unread[];
 extern constext txt_tinrc_prompt_followupto[];
 extern constext txt_tinrc_quote_chars[];
 extern constext txt_tinrc_quote_empty_lines[];
+
+#ifdef HAVE_COLOR
+	extern constext txt_tinrc_quote_regex[];
+#endif /* HAVE_COLOR */
+
 extern constext txt_tinrc_quote_signatures[];
 extern constext txt_tinrc_reread_active_file_secs[];
 extern constext txt_tinrc_save_to_mmdf_mailbox[];
@@ -1234,7 +1258,6 @@ extern long mark_body;					/* ftell on beginning of body */
 extern long note_size;
 
 extern signed long int read_newsrc_lines;
-extern signed long int wrote_newsrc_lines;
 
 extern gid_t real_gid;
 extern gid_t tin_gid;
@@ -1242,6 +1265,10 @@ extern mode_t real_umask;
 extern pid_t process_id;
 extern uid_t real_uid;
 extern uid_t tin_uid;
+
+#ifdef HAVE_COLOR
+	extern struct regex_cache quote_regex;
+#endif /* HAVE_COLOR */
 
 extern struct t_article *arts;
 extern struct t_config tinrc;
@@ -1259,7 +1286,9 @@ extern t_bool check_for_new_newsgroups;
 extern t_bool cmd_line;
 extern t_bool created_rcdir;
 extern t_bool dangerous_signal_exit; /* TRUE if SIGHUP, SIGTERM, SIGUSR1 */
-extern t_bool delete_index_file;
+#ifdef INDEX_DAEMON
+	extern t_bool delete_index_file;
+#endif /* INDEX_DAEMON */
 extern t_bool disable_gnksa_domain_check;
 extern t_bool disable_sender;
 extern t_bool do_rfc1521_decoding;
@@ -1376,7 +1405,7 @@ extern constext txt_opt_mail_address[];
 #	define txt_help_X	txt_help_BIGX
 #	define txt_help_p_S	txt_help_p_BIGS
 #	define txt_help_t_K	txt_help_t_BIGK
-#endif
+#endif /* CASE_PROBLEM */
 
 #ifdef VMS /* M.St. 15.01.98 */
 	extern constext txt_help_BIGB[];
@@ -1392,7 +1421,7 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_help_BIGX[];
 	extern constext txt_help_p_BIGS[];
 	extern constext txt_help_t_BIGK[];
-#endif
+#endif /* VMS */
 
 #ifndef DONT_HAVE_PIPING
 	extern constext txt_pipe[];
@@ -1514,6 +1543,7 @@ extern constext txt_opt_mail_address[];
 	extern char pgp_data[PATH_LEN];
 	extern const char *pgpopts;
 	extern constext txt_help_ctrl_g[];
+	extern constext txt_pgp_add[];
 	extern constext txt_pgp_mail[];
 	extern constext txt_pgp_news[];
 	extern constext txt_pgp_not_avail[];

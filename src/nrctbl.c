@@ -39,7 +39,7 @@ write_newsrctable_file (
 	if ((fp = fopen(local_newsrctable_file, "w")) == (FILE *) 0)
 		return;
 
-	fprintf(fp, txt_nrctbl_info, progname, VERSION);
+	fprintf(fp, txt_nrctbl_info, tin_progname, VERSION);
 	fclose(fp);
 }
 

@@ -79,13 +79,13 @@ char page_header[LEN];			/* page header of pgm name and version */
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char postponed_articles_file[PATH_LEN];	/* ~/.tin/postponed.articles file */
-char progname[PATH_LEN];		/* program name */
+char tin_progname[PATH_LEN];		/* program name */
 char rcdir[PATH_LEN];
 char reply_to[LEN];			/* Reply-To: address */
 char save_active_file[PATH_LEN];
 char spooldir[PATH_LEN];		/* directory where news is */
 char subscriptions_file[PATH_LEN];
-char txt_help_bug_report[LEN];		/* address to add send bug reports to */
+char txt_help_bug_report[LEN];		/* address to send bug reports to */
 char userid[PATH_LEN];
 
 #ifdef INDEX_DAEMON
@@ -100,16 +100,11 @@ char userid[PATH_LEN];
 	char TMPDIR[PATH_LEN];
 #endif /* M_OS2 */
 
-int MORE_POS;				/* set in set_win_size () */
 int NOTESLINES;				/* set in set_win_size () */
-int RIGHT_POS;				/* set in set_win_size () */
-int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* 'runtime' copy of groupname_max_len */
 int hist_last[HIST_MAXNUM+1];
 int hist_pos[HIST_MAXNUM+1];
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
-int max_from = 0;
-int max_subj = 0;
 int num_headers_to_display;		/* num headers to display -- swp */
 int num_headers_to_not_display;		/* num headers to not display -- swp */
 int num_of_killed_arts;
@@ -118,7 +113,7 @@ int num_of_tagged_arts;
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int system_status;
 int top = 0;
-int top_base;
+int top_base;				/* Highest numbered thread */
 int xmouse, xrow, xcol;			/* xterm button pressing information */
 
 #ifdef HAVE_COLOR
@@ -140,7 +135,9 @@ t_bool check_for_new_newsgroups;	/* don't check for new newsgroups */
 t_bool cmd_line;			/* batch / interactive mode */
 t_bool created_rcdir;			/* checks if first time tin is started */
 t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command when dangerous signal exit */
+#ifdef INDEX_DAEMON
 t_bool delete_index_file;		/* delete index file before indexing (tind only) */
+#endif
 t_bool disable_gnksa_domain_check;	/* disable checking TLD in From: etc. */
 t_bool disable_sender;			/* disable generation of Sender: header */
 t_bool global_filtered_articles;	/* globally killed / auto-selected articles */
@@ -187,9 +184,16 @@ char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 	static struct passwd pwdentry;
 #endif /* !M_AMIGA */
 
+#ifdef HAVE_COLOR
+	struct regex_cache quote_regex = {
+		NULL,
+		NULL
+	};
+#endif /* HAVE_COLOR */
+
 struct t_config tinrc = {
 	ART_MARK_DELETED,		/* art_marked_deleted */
-	MARK_INRANGE,		/* art_marked_inrange */
+	MARK_INRANGE,			/* art_marked_inrange */
 	ART_MARK_RETURN,		/* art_marked_return */
 	ART_MARK_SELECTED,		/* art_marked_selected */
 	ART_MARK_UNREAD,		/* art_marked_unread */
@@ -205,9 +209,9 @@ struct t_config tinrc = {
 #ifndef DISABLE_PRINTING
 	"",		/* default_printer */
 #endif /* !DISABLE_PRINTING */
-	"1-.",		/* default_range_group */
-	"1-.",		/* default_range_select */
-	"0-.",		/* default_range_thread */
+	"1-.",	/* default_range_group */
+	"1-.",	/* default_range_select */
+	"0-.",	/* default_range_thread */
 	"",		/* default_regex_pattern */
 	"",		/* default_repost_group */
 	"savefile.tin",		/* default_save_file */
@@ -226,12 +230,15 @@ struct t_config tinrc = {
 	"Newsgroups Followup-To Summary Keywords",		/* news_headers_to_display */
 	"",		/* news_headers_to_not_display */
 	"%F wrote:",		/* news_quote_format */
-	"",		/* post_process_command */
-	DEFAULT_COMMENT,		/* quote_chars */
+	"",					/* post_process_command */
+	DEFAULT_COMMENT,	/* quote_chars */
+#ifdef HAVE_COLOR
+	"",		/* quote_regex */
+#endif /* HAVE_COLOR */
 	"",		/* savedir */
 	"",		/* spamtrap_warning_addresses */
-	"In %G %F wrote:",		/* xpost_quote_format */
-	DEFAULT_FILTER_DAYS,		/* default_filter_days */
+	"In %G %F wrote:",				/* xpost_quote_format */
+	DEFAULT_FILTER_DAYS,			/* default_filter_days */
 	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_kill_header */
 	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_select_header */
 	0,		/* default_move_group */
@@ -240,9 +247,9 @@ struct t_config tinrc = {
 	32,		/* groupname_max_length */
 	MIME_ENCODING_7BIT,		/* mail_mime_encoding */
 	MIME_ENCODING_7BIT,		/* post_mime_encoding */
-	POST_PROC_NONE,		/* post_process_type */
-	REREAD_ACTIVE_FILE_SECS,		/* reread_active_file_secs */
-	SHOW_FROM_NAME,		/* show_author */
+	POST_PROC_NONE,			/* post_process_type */
+	REREAD_ACTIVE_FILE_SECS,	/* reread_active_file_secs */
+	SHOW_FROM_NAME,				/* show_author */
 	SORT_BY_DATE_ASCEND,		/* sort_article_type */
 	BOGUS_ASK,		/* strip_bogus */
 	THREAD_MAX,		/* thread_articles */
@@ -409,15 +416,15 @@ postinit_colors (
 	for (n = 0; n < SIZEOF(our_colors); n++) {
 		if (*(our_colors[n].colorp) == DFT_INIT) {
 			switch (our_colors[n].color_dft) {
-			case DFT_FORE:
-				*(our_colors[n].colorp) = default_fcol;
-				break;
-			case DFT_BACK:
-				*(our_colors[n].colorp) = default_bcol;
-				break;
-			default:
-				*(our_colors[n].colorp) = our_colors[n].color_dft;
-				break;
+				case DFT_FORE:
+					*(our_colors[n].colorp) = default_fcol;
+					break;
+				case DFT_BACK:
+					*(our_colors[n].colorp) = default_bcol;
+					break;
+				default:
+					*(our_colors[n].colorp) = our_colors[n].color_dft;
+					break;
 			}
 		}
 		TRACE(("postinit_colors [%d] = %d", n, *(our_colors[n].colorp)))
@@ -569,7 +576,9 @@ init_selfinfo (
 	cmdline_nntpserver[0] = '\0';
 	created_rcdir = FALSE;
 	dangerous_signal_exit = FALSE;
+#ifdef INDEX_DAEMON
 	delete_index_file = FALSE;
+#endif
 	disable_gnksa_domain_check = FALSE;
 	disable_sender = FALSE;
 	global_filtered_articles = FALSE;
@@ -618,7 +627,7 @@ init_selfinfo (
 	newsrc[0] = '\0';
 
 	sprintf (page_header, "%s %s release %s (\"%s\") [%s%s%s]",
-		progname, VERSION, RELEASEDATE, RELEASENAME, OS,
+		tin_progname, VERSION, RELEASEDATE, RELEASENAME, OS,
 		(tex2iso_supported ? " TeX2ISO" : ""),
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
 	sprintf (cvers, txt_copyright_notice, page_header);

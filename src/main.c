@@ -48,7 +48,7 @@ static void usage (char *theProgname);
 
 
 /*
- *  OK lets start the ball rolling...
+ * OK lets start the ball rolling...
  */
 int
 main (
@@ -76,18 +76,18 @@ main (
 	}
 #endif /* M_AMIGA && __SASC */
 
-	base_name (argv[0], progname);
+	base_name (argv[0], tin_progname);
 #ifdef VMS
-	argv[0] = progname;
+	argv[0] = tin_progname;
 #endif /* VMS */
 
 #ifdef NNTP_ONLY
 	read_news_via_nntp = TRUE;
 #else
 	/*
-	 *  If called as rtin, read news remotely via NNTP
+	 * If called as rtin, read news remotely via NNTP
 	 */
-	if (progname[0] == 'r') {
+	if (tin_progname[0] == 'r') {
 #		ifdef NNTP_ABLE
 			read_news_via_nntp = TRUE;
 #		else
@@ -98,7 +98,7 @@ main (
 #endif /* NNTP_ONLY */
 
 	/*
-	 *  Set up initial array sizes, char *'s: homedir, newsrc, etc.
+	 * Set up initial array sizes, char *'s: homedir, newsrc, etc.
 	 */
 	init_alloc ();
 	hash_init ();
@@ -106,56 +106,57 @@ main (
 	init_group_hash ();
 
 	/*
-	 *  Read user local & global config files
+	 * Read user local & global config files
+	 * These override the compiled in defaults
 	 */
 	read_config_file (global_config_file, TRUE);
 	read_config_file (local_config_file, FALSE);
 
 	/*
-	 *  Process envargs & command line options
+	 * Process envargs & command line options
+	 * These override the configured in values
 	 */
 	read_cmd_line_options (argc, argv);
 
 	tmp_no_write = no_write; /* keep no_write */
 	no_write = TRUE;		 /* don't allow any writing back during startup */
 
-	/*
-	 * Init curses emulation
-	 */
-	if (!InitScreen ()) {
-		error_message (txt_screen_init_failed, progname);
-		exit (EXIT_FAILURE);
-	}
-
-	EndInverse ();
-
-	if (INTERACTIVE || (batch_mode && verbose))
-		wait_message (0, "%s\n", cvers);
-
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
 #	ifndef USE_CURSES
 	if (INTERACTIVE) {
-		if (!SetupScreen ()) {
-			error_message (txt_screen_init_failed, progname);
+		if (!get_termcaps ()) {
+			error_message (txt_screen_init_failed, tin_progname);
 			exit (EXIT_FAILURE);
 		}
-		EndInverse ();
+/*		EndInverse ();*/
 	}
 #	endif /* !USE_CURSES */
 #endif /* M_UNIX && !INDEX_DAEMON */
 
+	/*
+	 * Init curses emulation
+	 */
+	if (!InitScreen ()) {
+		error_message (txt_screen_init_failed, tin_progname);
+		exit (EXIT_FAILURE);
+	}
+
+	EndInverse ();
 
 	/*
 	 * This depends on various things in tinrc
 	 */
 	setup_screen ();
 
+	if (INTERACTIVE || (batch_mode && verbose))
+		wait_message (0, "%s\n", cvers);
+
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
 #endif /* !INDEX_DAEMON */
 
 	/*
-	 *  Connect to nntp server?
+	 * Connect to nntp server?
 	 */
 	if (read_news_via_nntp && !read_saved_news)
 		if (nntp_open () != 0)
@@ -173,7 +174,7 @@ main (
 #endif /* DEBUG_NEWSRC */
 
 	/*
-	 *  Read input history
+	 * Read input history
 	 */
 #ifndef INDEX_DAEMON
 	if (!batch_mode)
@@ -181,7 +182,7 @@ main (
 #endif /* !INDEX_DAEMON */
 
 	/*
-	 *  Load the mail & news active files into active[]
+	 * Load the mail & news active files into active[]
 	 *
 	 * create_save_active_file cannot write to active.save
 	 * if no_write == TRUE, so restore original value temporarily
@@ -284,31 +285,31 @@ main (
 #endif /* INDEX_DAEMON */
 
 	/*
-	 *  Check/start if any new/unread articles
+	 * Check/start if any new/unread articles
 	 */
 	start_groupnum = check_for_any_new_news (check_any_unread, start_any_unread);
 
 	/*
-	 *  Mail any new articles to specified user
-	 *  or
-	 *  Save any new articles to savedir structure for later reading
+	 * Mail any new articles to specified user
+	 * or
+	 * Save any new articles to savedir structure for later reading
 	 */
 	save_or_mail_new_news ();
 
 	/*
-	 *  Catchup newsrc file (-c option)
+	 * Catchup newsrc file (-c option)
 	 */
 	catchup_newsrc_file ();
 
 	/*
-	 *  Update index files
+	 * Update index files
 	 */
 	update_index_files ();
 
 	/*
-	 *  If first time print welcome screen and auto-subscribe
-	 *  to groups specified in /usr/lib/news/subscribe locally
-	 *  or via NNTP if reading news remotely (LIST SUBSCRIBE)
+	 * If first time print welcome screen and auto-subscribe
+	 * to groups specified in /usr/lib/news/subscribe locally
+	 * or via NNTP if reading news remotely (LIST SUBSCRIBE)
 	 */
 #ifndef INDEX_DAEMON
 	if (created_rcdir && !batch_mode)
@@ -316,7 +317,7 @@ main (
 
 #endif /* !INDEX_DAEMON */
 	/*
-	 *  Work loop
+	 * Work loop
 	 */
 	selection_page (start_groupnum, num_cmd_line_groups);
 	return 0; /* not reached */
@@ -600,7 +601,7 @@ read_cmd_line_options (
 			case 'h':
 			case '?':
 			default:
-				usage (progname);
+				usage (tin_progname);
 				exit (EXIT_SUCCESS);
 		}
 	}
@@ -642,15 +643,15 @@ read_cmd_line_options (
 	 */
 #ifdef NNTP_ABLE
 	/*
-	 *  If we're reading from an NNTP server and we've been asked not to look
-	 *  for new newsgroups, trust our cached copy of the newsgroups file.
+	 * If we're reading from an NNTP server and we've been asked not to look
+	 * for new newsgroups, trust our cached copy of the newsgroups file.
 	 */
 	if (read_news_via_nntp)
 		read_local_newsgroups_file = !check_for_new_newsgroups;
 #endif /* NNTP_ABLE */
 	/*
-	 *  If we use neither list_active nor newsrc_active,
-	 *  we use both of them.
+	 * If we use neither list_active nor newsrc_active,
+	 * we use both of them.
 	 */
 	if (!list_active && !newsrc_active) {
 		list_active = TRUE;
@@ -776,7 +777,7 @@ usage (
 
 
 /*
- *  check/start if any new/unread articles
+ * check/start if any new/unread articles
  */
 static int
 check_for_any_new_news (
@@ -802,9 +803,9 @@ check_for_any_new_news (
 
 
 /*
- *  mail any new articles to specified user
- *  or
- *  save any new articles to savedir structure for later reading
+ * mail any new articles to specified user
+ * or
+ * save any new articles to savedir structure for later reading
  */
 static void
 save_or_mail_new_news (
@@ -822,7 +823,7 @@ save_or_mail_new_news (
 
 
 /*
- *  update index files
+ * update index files
  */
 static void
 update_index_files (
@@ -830,7 +831,7 @@ update_index_files (
 {
 	if (batch_mode || update_fork) {
 		if (!catchup && (read_news_via_nntp && xover_supported)) {
-			error_message (txt_batch_update_unavail, progname);
+			error_message (txt_batch_update_unavail, tin_progname);
 			tin_done (EXIT_FAILURE);
 		}
 
@@ -902,7 +903,7 @@ update_index_files (
 
 
 /*
- *  display page of general info. for first time user.
+ * display page of general info. for first time user.
  */
 #ifndef INDEX_DAEMON
 static void

@@ -27,6 +27,8 @@ char *glob_group;
  * Equates to the cursor location (thread number) on group page
  */
 int index_point;
+int max_from = 0;
+int max_subj = 0;
 
 static const char *spaces = "XXXX";
 static int len_from;

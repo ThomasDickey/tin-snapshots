@@ -491,6 +491,13 @@ read_config_file (
 			if (match_boolean (buf, "quote_empty_lines=", &tinrc.quote_empty_lines))
 				break;
 
+#ifdef HAVE_COLOR
+			if (match_string (buf, "quote_regex=", tinrc.quote_regex, sizeof (tinrc.quote_regex))) {
+				compile_regex (tinrc.quote_regex, &quote_regex);
+				break;
+			}
+#endif /* HAVE_COLOR */
+
 			if (match_boolean (buf, "quote_signatures=", &tinrc.quote_signatures))
 				break;
 
@@ -704,7 +711,7 @@ write_config_file (
 	if (!*tinrc.default_editor_format)
 		strcpy (tinrc.default_editor_format, TIN_EDITOR_FMT_ON);
 
-	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE, RELEASENAME);
+	fprintf (fp, txt_tinrc_header, TINRC_VERSION, tin_progname, VERSION, RELEASEDATE, RELEASENAME);
 
 	fprintf (fp, txt_tinrc_savedir);
 	fprintf (fp, "default_savedir=%s\n\n", tinrc.savedir);
@@ -876,6 +883,11 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_quote_empty_lines);
 	fprintf (fp, "quote_empty_lines=%s\n\n", print_boolean(tinrc.quote_empty_lines));
+
+#ifdef HAVE_COLOR
+	fprintf (fp, txt_tinrc_quote_regex);
+	fprintf (fp, "quote_regex=%s\n\n", tinrc.quote_regex);
+#endif /* HAVE_COLOR */
 
 	fprintf (fp, txt_tinrc_quote_signatures);
 	fprintf (fp, "quote_signatures=%s\n\n", print_boolean(tinrc.quote_signatures));
@@ -1756,6 +1768,15 @@ change_config_file (
 								}
 							}
 							break;
+
+#ifdef HAVE_COLOR
+						case OPT_QUOTE_REGEX:
+							prompt_option_string (option);
+							FreeIfNeeded(quote_regex.re);
+							FreeIfNeeded(quote_regex.extra);
+							compile_regex (tinrc.quote_regex, &quote_regex);
+							break;
+#endif /* HAVE_COLOR */
 
 						default:
 							break;

@@ -648,8 +648,41 @@ parse_headers (
 
 		lineno++;		/* TODO Why is this needed ? */
 
-		/* FIXME: sort cases */
 		switch (toupper((unsigned char)*ptr)) {
+			case 'A':	/* Archive-name:  optional */
+				if (match_header (ptr+1, "rchive-name", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+					if ((s = strchr (buf, '/')) != (char *) 0) {
+						if (STRNCMPEQ(s+1, "part", 4) || STRNCMPEQ(s+1, "Part", 4)) {
+							h->part = my_strdup (s+5);
+							s = strrchr (h->part, '\n');
+							if (s != (char *) 0)
+								*s = '\0';
+						} else if (STRNCMPEQ(s+1, "patch", 5) || STRNCMPEQ(s+1, "Patch", 5)) {
+							h->patch = my_strdup (s+6);
+							s = strrchr (h->patch, '\n');
+							if (s != (char *) 0)
+								*s = '\0';
+						}
+						if (h->part || h->patch) {
+							s = buf;
+							while (*s && *s != '/')
+								s++;
+							*s = '\0';
+							s = buf;
+							h->archive = hash_str (s);
+							got_archive = TRUE;
+						}
+					}
+				}
+				break;
+			case 'D':	/* Date:  mandatory */
+				if (!got_date) {
+					if (match_header (ptr+1, "ate", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->date = parsedate (buf, (struct _TIMEINFO *) 0);
+						got_date = TRUE;
+					}
+				}
+				break;
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
 				if (!got_from) {
@@ -661,6 +694,22 @@ parse_headers (
 						if (*art_full_name)
 							h->name = hash_str (eat_tab(rfc1522_decode(art_full_name)));
 						got_from = TRUE;
+					}
+				}
+				break;
+			case 'L':	/* Lines:  optional */
+				if (!got_lines) {
+					if (match_header (ptr+1, "ines", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->lines = atoi (buf);
+						got_lines = TRUE;
+					}
+				}
+				break;
+			case 'M':	/* Message-ID:  mandatory */
+				if (!got_msgid) {
+					if (match_header (ptr+1, "essage-ID", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->msgid = my_strdup (buf);
+						got_msgid = TRUE;
 					}
 				}
 				break;
@@ -689,61 +738,11 @@ parse_headers (
 					}
 				}
 				break;
-			case 'D':	/* Date:  mandatory */
-				if (!got_date) {
-					if (match_header (ptr+1, "ate", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
-						h->date = parsedate (buf, (struct _TIMEINFO *) 0);
-						got_date = TRUE;
-					}
-				}
-				break;
 			case 'X':	/* Xref:  optional */
 				if (!got_xref) {
 					if (match_header (ptr+1, "ref", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
 						h->xref = my_strdup (buf);
 						got_xref = TRUE;
-					}
-				}
-				break;
-			case 'M':	/* Message-ID:  mandatory */
-				if (!got_msgid) {
-					if (match_header (ptr+1, "essage-ID", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
-						h->msgid = my_strdup (buf);
-						got_msgid = TRUE;
-					}
-				}
-				break;
-			case 'L':	/* Lines:  optional */
-				if (!got_lines) {
-					if (match_header (ptr+1, "ines", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
-						h->lines = atoi (buf);
-						got_lines = TRUE;
-					}
-				}
-				break;
-			case 'A':	/* Archive-name:  optional */
-				if (match_header (ptr+1, "rchive-name", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
-					if ((s = strchr (buf, '/')) != (char *) 0) {
-						if (STRNCMPEQ(s+1, "part", 4) || STRNCMPEQ(s+1, "Part", 4)) {
-							h->part = my_strdup (s+5);
-							s = strrchr (h->part, '\n');
-							if (s != (char *) 0)
-								*s = '\0';
-						} else if (STRNCMPEQ(s+1, "patch", 5) || STRNCMPEQ(s+1, "Patch", 5)) {
-							h->patch = my_strdup (s+6);
-							s = strrchr (h->patch, '\n');
-							if (s != (char *) 0)
-								*s = '\0';
-						}
-						if (h->part || h->patch) {
-							s = buf;
-							while (*s && *s != '/')
-								s++;
-							*s = '\0';
-							s = buf;
-							h->archive = hash_str (s);
-							got_archive = TRUE;
-						}
 					}
 				}
 				break;

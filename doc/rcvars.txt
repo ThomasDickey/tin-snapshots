@@ -1,0 +1,31 @@
+Adding new tinrc variables:
+
+. Think of a name for your variable, we'll call it NAME
+. Add it to tincfg.tbl, the ordering of this file decides the order of the
+  Option 'M'enu. Use an appropriate type.
+. Add an entry for it to the tin.1 manpage under the TINRC variables section
+. Add NAME with the correct type to the master declaration in tinrc.h
+. Add an initial value for NAME in the correct position in t_config tinrc={};
+. In config.c, add the following:
+
+	In read_config_file(), a match_*() function to read NAME into the
+	internal tinrc table, which may not necessarily be the same type.
+
+	In write_config_file(), code to write out NAME in some ASCII
+	friendly format.
+
+	In change_config_file(), you may need an OPT_NAME: switch to do any
+	special post-processing needed when NAME is changed on the Option
+	'M'enu.
+
+
+. Add the following definitions to extern.h
+	txt_help_NAME
+	txt_opt_NAME
+	txt_tinrc_NAME
+
+. Fill the above out in lang.c
+	txt_help_NAME	- shown as help when asked for in Option 'M'enu
+	txt_opt_NAME	- the text shown on the left side in the Option 'M'enu
+	txt_tinrc_NAME	- the comment text that precedes the variable when
+	              	  written to the tinrc file

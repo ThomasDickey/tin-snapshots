@@ -35,7 +35,7 @@ prompt_num (
 
 	sprintf (mesg, "%c", ch);
 
-	if ((p = tin_getline (prompt, TRUE, mesg, 0, HIST_OTHER)) != (char *) 0) {
+	if ((p = tin_getline (prompt, TRUE, mesg, 0, FALSE, HIST_OTHER)) != (char *) 0) {
 		strcpy (mesg, p);
 		num = atoi (mesg);
 	} else
@@ -79,7 +79,7 @@ prompt_default_string (
 
 	clear_message ();
 
-	if ((p = tin_getline (prompt, FALSE, default_prompt, buf_len, which_hist)) == (char *) 0) {
+	if ((p = tin_getline (prompt, FALSE, default_prompt, buf_len, FALSE, which_hist)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
 		return FALSE;
@@ -114,7 +114,7 @@ prompt_menu_string (
 
 	MoveCursor (line, col);
 
-	if ((p = tin_getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline ("", FALSE, var, 0, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (var, p);
@@ -309,7 +309,7 @@ prompt_option_string (
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
-	if ((p = tin_getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, FALSE, variable, 0, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (variable, p);
@@ -342,7 +342,7 @@ prompt_option_num (
 	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 	sprintf (&number[0], "%d", *(option_table[option].variable));
 
-	if ((p = tin_getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, TRUE, number, 0, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (number, p);
@@ -380,7 +380,7 @@ prompt_option_char (
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
-	if ((p = tin_getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, FALSE, p, 1, FALSE, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	*variable = p[0];

@@ -171,6 +171,7 @@ from=pattern        From:
 msgid=pattern       Message-Id: *AND* full References:
 msgid_last=pattern  Message-Id: and last last Reference:s entry only
 msgid_only=pattern  Message-Id:
+refs_only=pattern   References: line (e.g. <123@ether.net>) without Message-Id:
 lines=num           Lines: ; <num matches less than, >num matches more than.
 xref=pattern        Xref: ; filter crossposts to groups matching pattern
 xref_max=num                } Xref: ; potentially obsolete, collects

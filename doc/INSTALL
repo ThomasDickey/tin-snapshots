@@ -153,6 +153,8 @@ Note1: If you want to retrieve tin index files from your NNTP server,
        and any other screen-handling libraries used in the LIBS
        variable, as tind does not need to be linked with curses and it
        will save a good 30-50K on the size of tind.
+       [This doesn't work anymore - just don't remove the
+        screen-handling libraries and it builds fine]
 
    6)  Type 'make <system type>' to compile tind daemon for your NNTP server
        or stand-alone news server.  This creates tind as the file "tin".
@@ -436,8 +438,9 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i586 & Linux 2.2.10-ac2 with gcc 2.7.2.3
-	i586 & Linux 2.3.5 with egcs-egcs-2.91.66
+	i586 & Linux 2.2.6 with fcc 1.0
+	i586 & Linux 2.2.10-ac9 with gcc 2.7.2.3
+	i586 & Linux 2.3.9 with egcs-egcs-2.91.66
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
