@@ -166,6 +166,7 @@ index_group (group)
 
 		hash_reclaim ();
 		free_art_array ();
+		free_msgids ();
 
 		/*
 		 *  Load articles within min..max from xover index file if it exists
@@ -252,7 +253,7 @@ sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 		/* rfc1522_decode_all_headers(); */
 		/* nothing to be done here, because all possibly encoded
 		   headers in the arts structure have already been decoded. */
-		   
+
 BegStopWatch("make_thread");
 		make_threads (group, FALSE);
 EndStopWatch();
@@ -386,6 +387,7 @@ read_group (group, group_path, pcount)
 			my_fputc ('.', stdout);
 			fflush (stdout);
 		}
+
 	}
 
 	/*
@@ -446,34 +448,38 @@ make_threads (group, rethread)
 #endif
 
 	/*
-	 * Do we really have to do this every time we come here, even if
-	 * we're not rethreading ?
+	 * TODO: This may have some use with ref threading.
+	 * When find_base() is called, the bases are created ordered
+	 * on arts[]. children are threaded on references, and siblings
+	 * should be sorted on date.
 	 */
 	sort_arts (group->attribute->sort_art_type);
 	
 	/*
+	 * Reset all the ptrs to articles following the above sort
+	 */
+#ifdef HAVE_REF_THREADING
+	clear_art_ptrs();
+#endif
+
+	/*
 	 *  The threading pointers need to be reset if re-threading
-	 *	If used, parent pointers get set explicitly later on
+	 *	If using ref threading, revector the links back to the articles
 	 */
 	if (rethread || group->attribute->thread_arts) {
 
 		for (i=0 ; i < top ; i++) {
 
-#ifdef HAVE_REF_THREADING
-			arts[i].sibling = arts[i].child = NO_THREAD;
-#endif
-
 			if (arts[i].thread != ART_EXPIRED)
 				arts[i].thread = ART_NORMAL;
 
 			arts[i].inthread = FALSE;
+
+#ifdef HAVE_REF_THREADING
+			arts[i].msgid->article = i;
+#endif
 		}
 	}
-
-#if 0
-	if (debug == 2)
-		error_message("Threading", "");
-#endif
 
 	/*
 	 * Do the right thing according to the threading strategy
@@ -505,9 +511,8 @@ make_threads (group, rethread)
 #ifndef OLD_THREADING
 		int *aptr; 
 #endif
-		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i)) {
+		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i))
 			continue;
-		}	
 
 #ifndef OLD_THREADING
 		aptr = (int*)arts[i].subject;
@@ -579,6 +584,7 @@ parse_headers (buf, h)
 	char art_from_addr[LEN];
 	char art_full_name[LEN];
 	char *ptr, *ptrline, *s;
+	char *msgid = NULL;
 	int flag, n;
 	int lineno = 0;
 	int max_lineno = 25;
@@ -603,8 +609,10 @@ parse_headers (buf, h)
 	forever {
 		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace(*(ptr+1)) && *(ptr+1)!= '\n')); ptr++) {
 			if (((*ptr) & 0xFF) < ' ') {
-				if (*ptr=='\n'&&isspace(*(ptr+1))&&*(ptr+1)!='\n') *ptr=1;
-				else *ptr = ' ';
+				if (*ptr=='\n'&&isspace(*(ptr+1))&&*(ptr+1)!='\n')
+					*ptr=1;
+				else
+					*ptr = ' ';
 			}
 		}
 		flag = *ptr;
@@ -629,11 +637,13 @@ parse_headers (buf, h)
 			case 'R':	/* References: optional */
 				if (! got_refs) {
 					if (match_header (ptrline, "References", buf2, HEADER_LEN)) {
-						s = buf2;	/* Skip space - already done ?? */
-						while (*s && *s == ' ') {
-							s++;
-						}
-						h->refs = parse_references (s);
+/*
+	s = buf2;
+	while (*s && *s == ' ') {
+		s++;
+	}
+ */
+						h->refs = parse_references (buf2);
 						got_refs = TRUE;
 					}
 				}
@@ -665,23 +675,28 @@ parse_headers (buf, h)
 			case 'X':	/* Xref:  optional */
 				if (! got_xref) {
 					if (match_header (ptrline, "Xref", buf2, HEADER_LEN)) {
-						s = buf2;
-						while (*s && *s == ' ') {
-							s++;
-						}
-						h->xref = str_dup (s);
+/*
+	s = buf2;
+	while (*s && *s == ' ') {
+		s++;
+	}
+ */
+						h->xref = str_dup (buf2);
 						got_xref = TRUE;
 					}
 				}
 				break;
-			case 'M':	/* Message-ID: */
+			case 'M':	/* Message-ID:  mandatory */
 				if (! got_msgid) {
 					if (match_header (ptrline, "Message-ID", buf2, HEADER_LEN)) {
-						s = buf2;
-						while (*s && *s == ' ') {
-							s++;
-						}
-						h->msgid = str_dup (s);
+/*
+	s = buf2;
+	while (*s && *s == ' ') {
+		s++;
+	}
+ */
+					/* We add the Message-id later, when we have Refs: */
+						msgid = str_dup (buf2);
 						got_msgid = TRUE;
 					}
 				}
@@ -724,20 +739,30 @@ parse_headers (buf, h)
 					}
 				}
 				break;
-		}
+		} /* switch */
 
 		if (! flag || lineno > max_lineno || got_archive) {
 			if (got_from && got_date) {
-				if (! got_subject) {
+
+				if (! got_subject)
 					h->subject = hash_str ("<No subject>");
+
+				/*
+				 * If we have msgid, add it in, using refs as parent
+				 * TODO: RFC1036 says the Message-ID is Mandatory 
+				 */
+				if (got_msgid) {
+					h->msgid = add_msgid(msgid, h->refs);
+					free(msgid);
 				}
+
 				debug_print_header (h);
 				return TRUE;
 			} else {
 				return FALSE;
 			}	
 		}
-	}
+	} /* forever */
 	/* NOTREACHED */
 }
 
@@ -749,7 +774,7 @@ parse_headers (buf, h)
  *    2.  Subject: line  (ie. Which newsreader?)  [mandatory]
  *    3.  From: line     (ie. iain@scn.de)        [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
- *    5.  MessageID:     (Skipped - not used)     [mandatory]
+ *    5.  MessageID:     (ie. <123@ether.net>)     [mandatory]
  *    6.  References:    (ie. <message-id> ....)  [mandatory]
  *    7.  Byte count     (Skipped - not used)     [mandatory]
  *    8.  Lines: line    (ie. 23)                 [mandatory]
@@ -770,6 +795,7 @@ iReadNovFile (group, min, max, expired)
  	char	art_full_name[LEN];
 	char	art_from_addr[LEN];
 	FILE	*fp;
+	char	*msgid;
 	long	artnum;
 
 	top = 0;
@@ -874,7 +900,7 @@ sleep(1);
 		p = q + 1;
  
 		/* 
-		 * READ article messageid 
+		 * READ article message id 
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -884,13 +910,13 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		if (*p) {
-			arts[top].msgid = str_dup (p);
+		if (*p) {					/* Save a ptr until we have refs */
+			msgid = str_dup (p);
 		} else {
-			arts[top].msgid = (char *) 0;
+			msgid = NULL;
 		}
 		p = q + 1;
- 
+
 		/* 
 		 * READ article references 
 		 */
@@ -903,11 +929,17 @@ sleep(1);
 			*q = '\0';
 		}
 		if (*p) {
-			arts[top].refs = str_dup (p);
+			arts[top].refs = parse_references (p);
 		} else {
-			arts[top].refs = 0;
+			arts[top].refs = NULL;
 		}
 		p = q + 1;
+
+		/*
+		 * Now we have the references, add in the msgid
+		 */
+		arts[top].msgid = add_msgid(msgid, arts[top].refs);
+		free(msgid);
  
 		/* 
 		 * SKIP article bytes 
@@ -1028,7 +1060,7 @@ sleep(1);
  *    3.  From: line     (ie. iain@scn.de)        [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
  *    5.  MessageID:     (ie. <123@ether.net>)    [optional]
- *    6.  References:    (ie. msgid msgid msgid)  [optional]
+ *    6.  References:    (ie. <message-id> ....)  [mandatory]
  *    7.  Byte count     (Skipped - not used)     [mandatory]
  *    8.  Lines: line    (ie. 23)                 [mandatory]
  *    9.  Xref: line     (ie. alt.test:389)       [optional]
@@ -1043,6 +1075,7 @@ vWriteNovFile (psGrp)
 	FILE	*hFp;
 	int		iNum;
 	struct	t_article *psArt;
+	char	*refs;
 	
 	set_tin_uid_gid ();
 
@@ -1056,27 +1089,29 @@ vWriteNovFile (psGrp)
 
 	hFp = open_xover_fp (psGrp, "w", 0L, 0L);
 
-	if (hFp == (FILE *) 0) {
+	if (hFp == (FILE *) 0) 
 		error_message (txt_cannot_write_index, pcNovFile);
-	} else {
-		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
+	else {
+		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
 			SortBy(artnum_comp);
-		}
-		if (! overview_index_filename) {
+
+		if (! overview_index_filename)
 			fprintf (hFp, "%s\n", psGrp->name);
-		}
+
 		for (iNum = 0; iNum < top; iNum++) {
 			psArt = &arts[iNum];
+
 			if (psArt->thread != ART_EXPIRED && psArt->artnum >= psGrp->xmin) {
 			 	fprintf (hFp, "%ld\t%s\t%s\t%s\t%s\t%s\t%d\t%d",
 			 		psArt->artnum,
 			 		psArt->subject,
 			 		pcPrintFrom (psArt),
 			 		pcPrintDate (psArt->date),
-			 		(psArt->msgid ? psArt->msgid : ""),
-			 		(psArt->refs ? psArt->refs : ""),
+			 		MSGID(psArt),
+			 		REFS(psArt, refs),
 			 		0,	/* bytes */
 			 		psArt->lines);
+
 			 	if (psArt->xref) {
 				 	fprintf (hFp, "\tXref: %s", psArt->xref);
 				}
@@ -1087,8 +1122,12 @@ vWriteNovFile (psGrp)
 				 		(psArt->part ? psArt->part : psArt->patch));
 				}
 				fprintf (hFp, "\n");
+
+				if (refs)				/* Release any assigned refs */
+					free(refs);
 			}
 		}
+
 		fclose (hFp);
 		chmod (pcNovFile, 0644);
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
@@ -1219,15 +1258,21 @@ pcFindNovFile (psGrp, iMode)
 		lHash = hash_groupname (psGrp->name);
 
 		for (iNum = 1;;iNum++) {
+
 			sprintf (acNovFile, "%s/%lu.%d", pcDir, lHash, iNum);
 		
 			if ((hFp = fopen (acNovFile, "r")) == (FILE *) 0) {
 				return acNovFile;
 			}
 
+			/*
+			 * Don't follow, why should a zero length index file
+			 * cause the write to fail ?
+			 */
 			if (fgets (acBuf, sizeof (acBuf), hFp) == (char *) 0) {
 				fclose (hFp);
-				return (char *) 0;
+/*				return (char *) 0;*/
+				return acNovFile;
 			}
 			fclose (hFp);
 
@@ -1241,6 +1286,7 @@ pcFindNovFile (psGrp, iMode)
 			}	
 		}
 	}
+
 	return acNovFile;
 }
 
@@ -1474,26 +1520,26 @@ void
 set_article (art)
 	struct t_article *art;
 {	
-	art->subject = (char *) 0;
-	art->from = (char *) 0;
-	art->name = (char *) 0;
-	art->date = 0L;
-	art->xref = (char *) 0;
-	art->msgid = (char *) 0;
-	art->refs = (char *) 0;
-	art->lines = -1;
-	art->archive = (char *) 0;
-	art->part = (char *) 0;
-	art->patch = (char *) 0;
-	art->thread = ART_EXPIRED;
-	art->status = ART_UNREAD;
-	art->inthread = FALSE;
-	art->killed = FALSE;
-	art->tagged = FALSE;
-	art->selected = FALSE;
-	art->zombie = FALSE;
-	art->delete = FALSE;
-	art->inrange = FALSE;
+	art->subject	= (char *) 0;
+	art->from	= (char *) 0;
+	art->name	= (char *) 0;
+	art->date	= 0L;
+	art->xref	= (char *) 0;
+	art->msgid	= (struct t_msgid *) 0;
+	art->refs	= (struct t_msgid *) 0;
+	art->lines	= -1;
+	art->archive	= (char *) 0;
+	art->part	= (char *) 0;
+	art->patch	= (char *) 0;
+	art->thread	= ART_EXPIRED;
+	art->status	= ART_UNREAD;
+	art->inthread	= FALSE;
+	art->killed	= FALSE;
+	art->tagged	= FALSE;
+	art->selected	= FALSE;
+	art->zombie	= FALSE;
+	art->delete	= FALSE;
+	art->inrange	= FALSE;
 }
 
 #ifdef WIN32

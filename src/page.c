@@ -1217,7 +1217,6 @@ art_open (art, group_path)
 		tex2iso_article = iIsArtTexEncoded (art, group_path);
 		if (tex2iso_article) {
 			wait_message ("TeX2Iso encoded article");
-			/* sleep(2); */
 		}
 	} else {
 		tex2iso_article = FALSE;
@@ -1320,10 +1319,13 @@ art_open (art, group_path)
 		}
 	}
 
+	/* TODO - Would be better to retrieve the Refs: back from the msgid cache */
 	{
-	  char *x;
-	  x=parse_references(note_h_references);
-	  strcpy(note_h_references,x); free(x);
+		struct t_msgid *x;
+		char *y;
+		x=parse_references(note_h_references);
+		strcpy(note_h_references, (y = get_references(x)) ? y : "");
+		free(y);
 	}
 
 	note_mark[0] = ftell (note_fp);
@@ -1514,18 +1516,32 @@ match_header (buf, pat, body, len)
 	size_t	plen = strlen (pat);
 
 	/* A quick check on the length before calling strnicmp() etc. */
+
+	/*
+	 * Does ': ' follow the header text ?
+	 */
 	if (buf[plen] != ':' || buf[plen+1] != ' ') {
 		return FALSE;
 	}
 
+	/*
+	 * If the header matches, skip the ': ' and any leading whitespace
+	 */
 	if(my_strnicmp(buf, pat, plen) == 0) {
 		plen += 2;
+
 		while (buf[plen] == ' ') {
 			plen++;
 		}
+
+		/*
+		 * Copy the 'body' of the header into return string
+		 */
 		modifiedstrncpy (body, &buf[plen], len);
 		body[len - 1] = '\0';
+
 		return TRUE;
 	}
+
 	return FALSE;
 }

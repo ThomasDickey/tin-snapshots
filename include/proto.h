@@ -256,7 +256,6 @@ extern void set_tin_uid_gid P_((void));
 extern void base_name P_((char *dirname, char *program));
 extern int mail_check P_((void));
 extern void parse_from P_((char *from_line, char *eaddr, char *fname));
-extern char *parse_references P_((char *r));
 extern long my_atol P_((char *s, int n));
 extern int my_stricmp P_((char *p, char *q));
 extern int my_strnicmp P_((char *p, char *q, size_t n));
@@ -416,8 +415,12 @@ extern int prompt_list P_((int row, int col, int var, char *help_text, char *pro
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
 extern void continue_prompt P_((void));
 /* ./refs.c */
-extern int search_older_refs P_((char *refs, char *end));
-extern void dump_thread P_((FILE *fp, int i, int level));
+extern void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
+extern void clear_art_ptrs P_((void));
+extern void free_msgids P_((void));
+extern struct t_msgid *add_msgid P_((char *msgid, struct t_msgid *parent));
+extern struct t_msgid *parse_references P_((char *r));
+extern char *get_references P_((struct t_msgid *refptr));
 extern void thread_by_reference P_((struct t_group *group));
 /* ./rfc1521.c */
 extern void strcpynl P_((char *to, char *from));

@@ -397,7 +397,7 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 't':
-			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_REFS)) {
+			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_MAX)) {
 				break;
 			}	
 			if (match_boolean (buf, "tab_after_X_selection=", &tab_after_X_selection)) {
@@ -882,7 +882,7 @@ change_config_file (group, filter_at_once)
 					txt_help_catchup_groups, txt_opt_catchup_groups);
 				break;
 
-			case 10:	/* thread/unthread all groups except those in ~/.tin/unthreaded */
+			case 10:	/* threading strategy for groups except those in ~/.tin/unthreaded */
 				orig_thread_arts = default_thread_arts;	
 
 				default_thread_arts = prompt_list (INDEX_TOP+6, COL1,
@@ -890,11 +890,7 @@ change_config_file (group, filter_at_once)
 							txt_help_thread_arts,
 							txt_opt_thread_arts,
 							txt_thread,
-#ifdef HAVE_REF_THREADING
-							THREAD_REFS + 1
-#else
-							THREAD_REFS
-#endif
+							THREAD_MAX + 1
 							);
 
 				/*

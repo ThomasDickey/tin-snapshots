@@ -3,20 +3,395 @@
  *  Module    : refs.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
  *  Created   : 09-05-96
- *  Notes     : Implementation of References: based threading
+ *  Notes     : Cacheing of message ids
+ *				References based threading
+ *	Credits   : Richard Hodson <richard@radar.demon.co.uk>
+ * 				Hashing function
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
  */
-
 #include "tin.h"
+
+#define MAX_REFS	100			/* Limit recursion depth */
+
+/* Produce disgusting amounts of output to help me tame this thing */
+#undef DEBUG_REFS
+
+/*
+ * The msgids are all hashed into a big array, with overspill
+ */
+struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
+
+/*
+ * Local prototypes
+ */
+static void add_to_parent P_((struct t_msgid *ptr));
+static char *_get_references P_((struct t_msgid *refptr, int depth));
+static void _free_list P_((struct t_msgid *ptr));
+#ifdef DEBUG_REFS
+static void dump_msgid_threads P_((void));
+#endif
 #ifdef HAVE_REF_THREADING
+static struct t_msgid *find_next P_((struct t_msgid *ptr));
+static void build_thread P_((struct t_msgid *ptr));
+#endif
 
-static int find_by_msgid P_((char *msgid));
-static int collapse_thread P_((int i, int level));
+/*========================================================================
+ * This part of the code deals with the cacheing and retrieval
+ * of Message-id and References headers
+ * 
+ * Rationale:
+ *    Even though the Message-id is unique to an article, the References
+ *    field contains msgids from elsewhere in the group. As the expiry
+ *    period increases, so does the redundancy of data.
+ *    At the time of writing, comp.os.ms-windows.advocacy held ~850
+ *    articles. The references fields contained 192k of text, of which
+ *    169k was saved using the new cacheing.
+ *
+ *    When threading on Refs, a much better view of the original thead
+ *    can be built up using this data, and threading is much faster
+ *	  because all the article relationships are automatically available
+ *	  to us.
+ *
+ *	  NB: We don't cache msgids from the filter file.
+ */
 
+/*-------------------------------------------------------------------------
+ * Hash a message id. A msgid is of the form <unique@sitename>
+ * (But badly broken message id's do occur)
+ * We hash on the unique portion which should have good randomness in
+ * the lower 5 bits. Propagate the random bits up with a shift, and
+ * mix in the new bits with an exclusive or.
+ *
+ * This should generate about 5+strlen(string_start) bits of randomness.
+ * MSGID_HASH_SIZE is a prime of order 2^11
+ */
+static unsigned int
+hash_msgid(key)
+	char *key;
+{
+	unsigned int hash = 0;
+
+	while (*key && *key != '@') {
+		hash = (hash << 1 ) ^ *key;
+		++key;
+	}
+
+	hash %= MSGID_HASH_SIZE;
+
+	return(hash);
+}
+
+/*-------------------------------------------------------------------------
+ * Thread us into our parents' list of children.
+ */
+void
+add_to_parent(ptr)
+	struct t_msgid *ptr;
+{
+#ifdef HAVE_REF_THREADING
+	if (!ptr->parent)
+		return;
+
+	if (ptr->parent->child == NULL)	{		/* We are 1st child */
+		ptr->parent->child = ptr;
+	} else {
+		/* TODO: use date_comp() to insert siblings by date */
+		ptr->sibling = ptr->parent->child;
+		ptr->parent->child = ptr;
+	}
+#endif
+}
+
+/*-------------------------------------------------------------------------
+ * Adds or updates a message id in the cache.
+ * If the message id is new, add it.
+ * If parent is defined, update this information & add child / sibling ptrs
+ * Returns a ptr to the structure containing the msgid
+ * NB: By definition, a msgid can only have one parent and the 1st one
+ *     assigned stands.
+ * TODO - better handling on duplicate parent assignment ?
+ */
+struct t_msgid *
+add_msgid(msgid, newparent)
+	char *msgid;
+	struct t_msgid *newparent;
+{
+	struct t_msgid *ptr;
+	struct t_msgid *i = NULL;
+	unsigned int h;
+
+	if (!msgid)								/* Shouldn't happen */
+		return(NULL);
+
+	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
+
+	/*
+	 * Look for this message id in the cache. Broken software will sometimes
+	 * not preserve the original case of a message-id.
+	 */
+	for (i = msgids[h]; i != NULL; i = i->next) {
+
+		if (strcasecmp(i->txt, msgid) == 0) {
+
+			/*
+			 * Only update the parent if not already set. In theory, a
+			 * message-id can only follow up to one other message id. Due
+			 * to broken headers, this is not always the case.
+			 */
+
+			/* Parent update not required */
+			if ((newparent == NULL) || (newparent == i->parent)) {
+#ifdef DEBUG_REFS
+				if (newparent == i->parent)
+					fprintf(stderr, "dup: %s -> no change\n", msgid);
+#endif
+				return(i);
+			}
+				
+			/* Change from null -> not-null */
+			if (i->parent == NULL) {
+				i->parent = newparent;
+				add_to_parent(i);
+#ifdef DEBUG_REFS
+				fprintf(stderr, "set: %s -> %s\n", msgid,
+										(newparent)?newparent->txt:"None");
+#endif
+				return(i);
+			}
+
+			/* This is bad - caused by bad headers ? */
+/* TODO - add preference to msgids over refs to cut this down */
+			if (i->parent != newparent) {
+#ifdef DEBUG_REFS
+				fprintf(stderr, "Warning: %s -> %s (already %s)!\n",
+								msgid, (newparent)?newparent->txt:"None",
+								i->parent->txt);
+#endif
+			}
+
+			return(i);
+		}
+	}
+
+#ifdef DEBUG_REFS
+	fprintf(stderr, "new: %s -> %s\n", msgid, (newparent)?newparent->txt:"None");
+#endif
+
+	/*
+	 * This is a new node, so build a structure for it
+	 * Insert at start of list for speed.
+	 */
+	ptr = (struct t_msgid *)my_malloc(sizeof(struct t_msgid));
+
+	ptr->txt = str_dup(msgid);
+	ptr->parent = newparent;
+#ifdef HAVE_REF_THREADING
+	ptr->child = ptr->sibling = NULL;
+	add_to_parent(ptr);					/* Setup children / siblings */
+#endif
+
+	/*
+	 * Makes no difference where we insert into the hash buckets
+	 */
+	ptr->next = msgids[h];
+	msgids[h] = ptr;
+
+	return(ptr);
+}
+
+/*-------------------------------------------------------------------------
+ * Take a raw line of references data and return a ptr to a linked list of
+ * msgids, starting with the most recent entry. (Thus the list is reversed)
+ * Following the parent ptrs leads us back to the start of the thread.
+ *
+ * We iterate through the refs, adding each to the msgid cache, with
+ * the previous ref as the parent. 
+ * The space saving vs. storing the refs as a single string is large
+ */
+struct t_msgid *
+parse_references (r)
+	char *r;
+{
+	char *ptr;
+	struct t_msgid *parent, *current;
+
+	if (!r)
+		return(NULL);
+
+	/*
+	 * Break the refs down, using ' ' and <TAB> as delimiters
+	 * A msgid can't contain a ' ', right ?
+	 */
+	if ((ptr = strtok(r, " \t")) == NULL)
+		return(NULL);
+
+	parent = NULL;					/* By defn, top of thread has no parent */
+	current = add_msgid(ptr, parent);
+
+	while ((ptr = strtok(NULL, " \t")) != NULL) {
+		parent = current;
+		current = add_msgid(ptr, parent);
+	}
+
+	return(current);
+}
+
+/*-------------------------------------------------------------------------
+ * Reconstruct the References: field from the parent pointers
+ * NB: The original Refs: can be no longer than HEADER_LEN (see open.c)
+ *     Broken headers sometimes have malformed or circular reference
+ *	   lists, which we strive to work around.
+ */
+static char *
+_get_references(refptr, depth)
+	struct t_msgid *refptr;
+{
+	char *refs;
+	static short len;							/* Accumulated size */
+
+	if (refptr->parent == NULL || depth > MAX_REFS) {
+
+		if (depth > MAX_REFS) {
+			fprintf(stderr, "Warning: Too many refs (%d). Truncated\n", MAX_REFS);
+			sleep(2);
+		}
+
+		refs = my_malloc(HEADER_LEN);
+		len  = 0;
+	} else
+		refs = _get_references(refptr->parent, depth+1);
+
+	/*
+	 * Attempt at damage limitation in case of broken Refs fields
+	 */
+	if (len < HEADER_LEN-500)
+		len += sprintf(refs + len, "%s ", refptr->txt);
+
+	return (refs);
+}
+
+/*
+ * A wrapper to the above, null terminate the string and shrink it 
+ * to correct size
+ */
+char *
+get_references(refptr)
+	struct t_msgid *refptr;
+{
+	char *refs;
+	short len;
+
+	if (refptr == NULL)
+		return(NULL);
+
+	refs = _get_references(refptr, 1);
+
+	len = strlen(refs);
+
+	refs[len-1] = '\0';
+
+	refs = my_realloc(refs, len);
+
+	return(refs);
+}
+
+/*-------------------------------------------------------------------------
+ * Clear the entire msgid cache, freeing up all chains. This is
+ * normally only needed when entering a new group
+ */
+/* TODO - Fixup the new code */
+#if 0
+void
+free_msgids()
+{
+	int i;
+    struct t_msgid *ptr, *next, *msgptr;
+
+	msgptr = &msgids[0];		/* first list */
+
+	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {	/* count down is faster */
+		ptr = *msgptr;
+		*msgptr++ = NULL;		/* declare list empty */
+
+		while (ptr != NULL) {	/* for each node in the list */
+
+			next = ptr->next;	/* grab ptr before we free node */
+			free(ptr->txt);		/* release text */
+			free(ptr);			/* release node */
+
+			ptr = next;			/* hop down the chain */
+		}
+	}
+}
+#endif
+
+#if 1
+/*-------------------------------------------------------------------------
+ * Clear the entire msgid cache, freeing up all chains. This is
+ * normally only needed when entering a new group
+ */
+
+static void
+_free_list(ptr)
+	struct t_msgid *ptr;
+{
+	if (ptr->next != NULL)
+		_free_list(ptr->next);
+
+	free(ptr->txt);
+	free(ptr);
+	return;
+}
+
+void
+free_msgids()
+{
+	int i;
+
+	for (i=0; i<MSGID_HASH_SIZE; i++) {
+
+		if (msgids[i] != NULL) {
+			_free_list(msgids[i]);
+			msgids[i] = NULL;
+		}
+	}
+}
+#endif
+
+#if 0
+static void
+dump_msgids()
+{
+	int i;
+	struct t_msgid *ptr;
+
+	fprintf(stderr, "Dumping...\n");
+
+	for (i=0; i<MSGID_HASH_SIZE; i++) {
+
+		if (msgids[i] != NULL) {
+
+			fprintf(stderr, "node %d", i);
+
+			for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next) {
+				fprintf(stderr, " -> %s", ptr->txt);
+			}
+
+			fprintf(stderr, "\n");
+
+		}
+	}
+}
+#endif
+
+/*========================================================================
+ * The rest of this code deals with reference threading
+ */
+#ifdef HAVE_REF_THREADING
 /*
  * Legend:
  *
@@ -29,12 +404,12 @@ static int collapse_thread P_((int i, int level));
  *   message-id
  *
  * . The References: field should not be truncated, though in practice
- *   this will happen
+ *   this will happen, often in badly broken ways.
  *
  * This is simplistic, so check out RFC1036 & son of RFC1036 for full
  * details from the posting point of view.
  * 
- * We attempt to maintain 3 pointers in each article to handle threading
+ * We attempt to maintain 3 pointers in each message-id to handle threading
  * on References:
  *
  * 1) parent  - the article that the current one was in reply to
@@ -43,344 +418,289 @@ static int collapse_thread P_((int i, int level));
  * 
  * 2) sibling - the next reply in sequence to parent.
  *
- * 3) child   - the first reply to this current article.
+ * 3) child   - the first reply to the current article.
  *
+ * These pointers are automatically set up when we read in the
+ * headers for a group.
+ *
+ * It remains for us to:
+ * i)  Create pointers back from message-ids to the articles themselves
+ * ii) Run the thread pointer through the articles that form threads.
  * 
- * FINDING PARENT:
- *
- * If there is no (or NULL for some reason) references, we are a
- * root message.
- * Due to the out-of-order delivery nature of UseNet, if the parent is
- * not found, we backtrack through the References history to try
- * to find an 'upstream' match.
- *
- * If no parent article can be located, we are a root message.
- *
- * FINDING CHILDREN:
- *
- * We need to insert ourself into the parents list of children.
- * If we are the first child (parent->child == NULL), things are simple.
- *
- * If parent->child is not NULL, we insert outself at the head of
- * the parents list of children.
- *
  * TODO:
- *
- * . Hash all message id's. This includes both the Message-id and
- *   all id's in the References header. Quite a bit of memory can be
- *   saved by doing this - there is great duplication of msgids within
- *   a group.
- *
- * . Hashed message ids will greatly speed up location of parent.
- *   Current code is O(n^2), just like the subject threading was in
- *   tin-1.22
- *
- * . Hashing all references will allow us to combine threads by
- *   finding common expired ancestors.
- *
- * . Add threading on both references then subject.
  * 
- * All of the above should hopefully get tin up to date in the
- * threading arena.
+ * . Add threading on both references & subject.
+ *   (ought to be able to reuse the current thread on subject code ??)
  * 
- * . When inserting child messages, should we insert at the beginning,
- *   the end, or sort child threads on date ? Does this matter ?
- *   The whole group is presorted by date anyway.
- *	 What do other readers do?
+ * . When inserting sibling messages, we currently insert at the head of
+ *   the list. This should be sorted by date. This isn't easy, as the
+ *	 date isn't always available when the tree is built.
+ *   (Could this be done in find_next(), by choosing the 'next' based
+ *	  on date_comp() of all possible children, skipping those that
+ * 	  are already inthread==TRUE as an elimination policy ?)
  *
  * . We could differentiate between bona fide root messages
- *   and messages whose parent has expired.
+ *   and root messages whose parent has expired on the group menu
+ *	 (currently + is unread, - is marked unread and ' ' is read)
  */
-
-
 
 /*-------------------------------------------------------------------------
- * THIS IS ABYSMALLY INEFFICIENT
- * *** Currently does a linear search, needs hashing ***
- * Find an article by its message id, returning its index in arts[]
+ * Clear out all the article fields from the msgid hash prior to a 
+ * rethread.
  */
-static int
-find_by_msgid(msgid)
-	char *msgid;
+void
+clear_art_ptrs()
 {
 	int i;
+    struct t_msgid *ptr;
 
-	for (i=0 ; i < top ; i++) {
-/*		fprintf(stderr, "!%3d %3s (%s) (%s)\n", i, (strcmp(arts[i].msgid, msgid) == 0) ? "YES" : "NO ", arts[i].msgid, msgid);*/
-		if (strcmp(arts[i].msgid, msgid) == 0)
-			return(i);
+	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {
+		for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next)
+			ptr->article = ART_NORMAL;
 	}
-
-	return(NO_THREAD);
 }
 
 /*-------------------------------------------------------------------------
- * Reverse-search refs list looking for a matching article
- * I know rewriting strings is evil, but this routine gets called
- * a _lot_
- * It will all change once msgids are hashed anyway.
- */
-int
-search_older_refs(refs, end)
-	char *refs;
-	char *end;
-{
-	char *current;
-	int i;
-
-	/*
-	 * Quit if nothing more to search
-	 */
-	if (end == refs - 1)
-		return(NO_THREAD);
-
-	*end = '\0';								/* Terminate previous */
-
-	/*
-	 * If this is the only remaining Ref, fixup current
-	 */
-	if ((current = strrchr(refs, ' ')) == NULL)
-		current = refs - 1;
-		
-	/*
-	 * Search the next item,
-	 */
-	i = find_by_msgid(current + 1);
-/*fprintf(stderr, "Backref: !%s! %d\n", current+1, i);*/
-
-	*end = ' ';									/* Restore previous */
-
-	/*
-	 * Backtrack to the previous references
-	 */
-	if (i == NO_THREAD)
-		i = search_older_refs(refs, current);
-
-	return(i);
-}
-
-/*-------------------------------------------------------------------------
- * Function to dump an ASCII tree style map of a thread.
- * i is the index of the root article, level is the current depth
+ * Function to messily dump an ASCII tree map of a thread.
+ * msgid is a ptr to the root article, level is the current depth
  * of the tree.
  */
-/* static */
 void
-dump_thread(fp, i, level)
+dump_thread(fp, msgid, level)
 	FILE *fp;
-	int i;
+	struct t_msgid *msgid;
 	int level;
 {
 	char buff[120];		/* This will probably break - test only */
 
 	/*
-	 * The current article
+	 * Dump the current article
 	 */
-	sprintf(buff, "%3d %*s %-.16s", i, 2*level, "  ", arts[i].name);
-	fprintf(fp, "%-*s  %-.34s\n", 30, buff, arts[i].subject);
+	sprintf(buff, "%3d %*s %-.18s", msgid->article, 2*level, "  ",
+					(msgid->article >= 0) ? 
+						((arts[msgid->article].name) ?
+							arts[msgid->article].name :
+							arts[msgid->article].from) :
+						"[- Unavailable -]"
+	);
 
-	if (arts[i].child != NO_THREAD)
-		dump_thread(fp, arts[i].child, level + 1);
+	fprintf(fp, "%-*s  %-.45s\n", 30, buff,
+										(msgid->article >= 0) ?
+											arts[msgid->article].subject :
+											""
+	);
 
-	if (arts[i].sibling != NO_THREAD)
-		dump_thread(fp, arts[i].sibling, level);
+	if (msgid->child != NULL)
+		dump_thread(fp, msgid->child, level + 1);
+
+	if (msgid->sibling != NULL)
+		dump_thread(fp, msgid->sibling, level);
 
 	return;
 }
 
-/*-------------------------------------------------------------------------
- * Flatten a tree into a linear thread to mesh in with the current
- * threading code. This will do until I add a new screen to display
- * a thread tree
- *
- * This is straight recursion, except that the last most child at the
- * bottom of the tree needs a pointer to the next sibling somewhere furthur
- * up the tree
+#ifdef DEBUG_REFS
+/*--------------------------------------------------------------------------
+ * Dump out all the threads from the msgid point of view, show the
+ * related article index in arts[] where possible
+ * A thread is defined as a starting article with no parent
  */
-static int
-collapse_thread(i, level)
-	int i;
+static void
+dump_msgid_thread(ptr, level)
+	struct t_msgid *ptr;
 	int level;
 {
-	int bottom = -1;			/* If set, id of last most child in sub-tree */
+	fprintf(stderr, "%*s %s (%d)\n", level*3, "   ", ptr->txt, ptr->article);
+
+	if (ptr->child != NULL)
+		dump_msgid_thread(ptr->child, level+1);
+
+	if (ptr->sibling != NULL)
+		dump_msgid_thread(ptr->sibling, level);
+
+	return;
+}
+
+static void
+dump_msgid_threads()
+{
+	int i;
+	struct t_msgid *ptr;
+
+	for (i=0; i<MSGID_HASH_SIZE; i++) {
+		if (msgids[i] != NULL) {
+			for (ptr = msgids[i]; ptr!=NULL; ptr = ptr->next) {
+				if (ptr->parent == NULL) {
+					dump_msgid_thread(ptr, 1);
+					fprintf(stderr, "\n");
+				}
+			}
+		}
+	}
+
+	fprintf(stderr, "Dump complete.\n\n");
+}
+#endif
+
+/*
+ * An messagid will not be included in a thread if
+ *  It doesn't point to an article OR
+ *     (Its already threaded OR Its has been autokilled)
+ */
+/* WAS:		(ptr && ptr->article == ART_NORMAL) */
+
+#define SKIP_ART(ptr)	\
+	(ptr && (ptr->article == ART_NORMAL || \
+		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+
+/*-------------------------------------------------------------------------
+ * Find the next message in the thread.
+ * We descend children before siblings, and only return articles that
+ * exist in arts[] or NULL if we are truly at the end of a thread.
+ * If there are no more down pointers, backtrack to find a sibling
+ * to continue the thread, we note this with the bottom flag.
+ */
+static struct t_msgid *
+find_next(ptr)
+	struct t_msgid *ptr;
+{
+	static int bottom = FALSE;
 
 	/*
-	 * If child tree exists, descend it
+	 * Keep going while we haven't bottomed out and we haven't
+	 * got something in arts[]
 	 */
-	if (arts[i].child != NO_THREAD) {
+	while (ptr != NULL) {
 
 		/*
-		 * There is no way this can already be set, because
-		 * we only assign stray child ptrs to siblings
+		 * Children first, unless bottom is set
 		 */
-		arts[arts[i].child].inthread = TRUE;		/* Child is in a thread */
-		arts[i].thread = arts[i].child;				/* We -> to child */
+		if (!bottom && ptr->child != NULL) {
+			ptr = ptr->child;
 
-		bottom = collapse_thread(arts[i].child, level + 1);
+			/*
+			 * If article not present, keep going
+			 */
+			if (SKIP_ART(ptr))
+				continue;
+			else
+				break;
+		}
+
+		if (ptr->sibling != NULL) {
+			bottom = FALSE;
+
+			ptr = ptr->sibling;
+
+			/*
+			 * If article not present, keep going
+			 */
+			if (SKIP_ART(ptr))
+				continue;
+			else
+				break;
+		}
+
+		/*
+		 * No more child or sibling to follow, backtrack up to
+		 * a sibling if we can find one
+		 */
+		if (ptr->child == NULL && ptr->sibling == NULL) {
+
+			while(ptr != NULL && ptr->sibling == NULL)
+				ptr = ptr->parent;
+
+			/*
+			 * We've backtracked up to the parent with a suitable sibling
+			 * go round once again to move to this sibling
+			 */
+			if (ptr)
+				bottom = TRUE;
+			else
+				break;		/* Nothing found, exit with NULL */
+		}
 	}
 
-	/*
-	 * If a sibling exists
-	 */
-	if (arts[i].sibling != NO_THREAD) {
-
-		arts[arts[i].sibling].inthread = TRUE;		/* Sibling is in a thread */
-
-	/* The next two lines are mutually Xclusive and should be optimised ? */
-
-	/*
-	 * If we have a propogated ptr from the bottom of this thread,
-	 * point it at our sibling, to preserve the flow of the thread
-	 */
-	    if (bottom != -1)
-	        arts[bottom].thread = arts[i].sibling;
-
-	/*
-	 * If we haven't already got a ptr down to a child we
-	 * move on to our sibling
-	 */
-		if (arts[i].thread == NO_THREAD)
-			arts[i].thread = arts[i].sibling;		/* We -> to sibling */
-
-		bottom = collapse_thread(arts[i].sibling, level);
-	}
-
-	/*
-	 * This is a leaf node at the end of subtree. We must pass its
-	 * id back up to assign it to the next available sibling to
-	 * preserve the thread. If the resursion unwinds without finding
-	 * a sibling, then this will remain the last article in the thread.
-	 */
-	if (arts[i].child == NO_THREAD && arts[i].sibling == NO_THREAD)
-		bottom = i;
-
-	return(bottom);
+	return(ptr);
 }
 
 /*-------------------------------------------------------------------------
- * Traverse the articles in the current group, adding parent, sibling
- * & child ptrs as needed
+ * Run the .thread and .inthread pointers through the members of this
+ * thread.
+ */
+static void
+build_thread(ptr)
+	struct t_msgid *ptr;
+{
+	struct t_msgid *newptr;
+
+	/*
+	 * If the root article has gone, advance to the first valid one
+	 */
+	if (ptr->article == ART_NORMAL)
+		ptr = find_next(ptr);
+
+	/*
+	 * Keep working through the thread, updating the ptrs as we go
+	 */
+	while ((newptr = find_next(ptr)) != NULL) {
+
+		arts[newptr->article].inthread = TRUE;
+		arts[ptr->article].thread = newptr->article;
+
+		ptr = newptr;
+	}
+
+}
+
+/*-------------------------------------------------------------------------
+ * Run a new set of threads through the base articles, using the
+ * parent / child / sibling  / article pointers in the msgid hash.
  */
 void
 thread_by_reference (group)
 	struct t_group *group;
 {
 	int i;
-	char *refer;
+	struct t_msgid *ptr;
 
-#if 0
-	FILE *dumpfd;
-	
-	fprintf (stderr, "\nthread_arts=[%d]  attr_thread_arts=[%d]\n", 	
-		default_thread_arts, group->attribute->thread_arts);
+#ifdef DEBUG_REFS
+	freopen("Refs.info", "w", stderr);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
+	dump_msgid_threads();
 #endif
 
 	/*
-	 * Clear all the old threading pointers
-	 * The parent pointers get set explicitly later on
+	 * Build threads starting from root msgids (ie without parent)
 	 */
-	for (i=0 ; i < top ; i++) {
-
-		arts[i].sibling = arts[i].child = NO_THREAD;
-
-		if (arts[i].thread != ART_EXPIRED)
-			arts[i].thread = ART_NORMAL;
-
-		arts[i].inthread = FALSE;
-	}
-
-	/*
-	 * Here goes... :)
-	 */
-
-	for (i=0 ; i < top ; i++) {
-
-#if 0
-fprintf(stderr, "------- i=[%2d] %.60s\n", i, arts[i].subject);
-fprintf(stderr, "        msgid: %s\n", arts[i].msgid);
-#endif
-
-		/*
-		 * If there are refs, try to find the parent
-		 * Find the referred to article & look it up by msgid
-		 */
-		if (arts[i].refs) {
-
-			/*
-			 * Only a single reference
-			 */
-			if ((refer = strrchr(arts[i].refs, ' ')) == NULL)
-				arts[i].parent = find_by_msgid(arts[i].refs);
-
-			/*
-			 * Multiple references, try the first one (refer -> ' ')
-			 * If we do not find a parent, work back through the list
-			 * of references and keep trying.
-			 */
-			else {
-				if ((arts[i].parent = find_by_msgid(refer+1)) == NO_THREAD)
-					arts[i].parent = search_older_refs(arts[i].refs, refer);
-			}
-
-			/*
-			 * If we found a parent, thread us into its list of children
-			 */
-			if (arts[i].parent != NO_THREAD) {
-
-				if (arts[arts[i].parent].child == NO_THREAD)
-					arts[arts[i].parent].child = i;		/* 1st child */
-
-/* TODO: For now, stick us at head of the list */
-/* This code can be optimized, if we stick with it */
-				else {
-					arts[i].sibling = arts[arts[i].parent].child;
-					arts[arts[i].parent].child = i;
+	for (i=0; i<MSGID_HASH_SIZE; i++) {
+		if (msgids[i] != NULL) {
+			for (ptr = msgids[i]; ptr!=NULL; ptr = ptr->next) {
+				if (ptr->parent == NULL) {
+					build_thread(ptr);
 				}
 			}
-
-		} else {
-
-			/*
-			 * No Refs:, mark it as root message
-			 */
-			arts[i].parent = NO_THREAD;
 		}
+	}
 
-#if 0
-fprintf(stderr, "        paren: %d %.60s\n", arts[i].parent,
-										 arts[arts[i].parent].subject);
+#ifdef DEBUG_REFS
+	fprintf(stderr, "Full dump of threading info...\n");
+
+	for (i=0 ; i < top ; i++) {
+		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i, 
+			(arts[i].msgid->parent) ? arts[i].msgid->parent->article : -2,
+			(arts[i].msgid->sibling) ? arts[i].msgid->sibling->article : -2,
+			(arts[i].msgid->child) ? arts[i].msgid->child->article : -2,
+			arts[i].inthread, arts[i].thread, arts[i].msgid->txt, arts[i].subject);
+	}
+
+	freopen("/dev/tty", "w", stderr);
 #endif
-
-	}		/* end of main threading loop */
-
-
-	/*
-	 * For now, fold the reference tree into a linear thread to conform
-	 * with the current threading code
-	 */
-	for (i=0 ; i < top ; i++) {
-		if (arts[i].parent == NO_THREAD)
-			collapse_thread(i, 1);
-	}
-
-#if 0
-dumpfd = fopen ("1thread", "w");
-
-	for (i=0 ; i < top ; i++) {
-		if (arts[i].parent == NO_THREAD)
-			dump_thread(dumpfd, i, 1);
-	}
-
-	for (i=0 ; i < top ; i++) {
-		fprintf(dumpfd, "%3d %3d %3d %3d : %3d %3d : %.50s\n", i, 
-			arts[i].parent, arts[i].sibling, arts[i].child,
-			arts[i].inthread, arts[i].thread, arts[i].subject);
-	}
-
-fclose(dumpfd);
-#endif /* 0 */
 
 	return;
 
 }
 #endif /* HAVE_REF_THREADING */
+
+/* end of refs.c */

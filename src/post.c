@@ -1077,6 +1077,11 @@ post_article_done:
 
 
 #define MAXREFSIZE 512 /* see below */
+
+/* TODO - if we have the art[x] that we are following up to, then
+ *        get_references(art[x].msgid) will give us the new refs line
+ *		  Also, parsing could be better effected with strtok()
+ */
 void
 join_references (buffer, oldrefs, newref)
 	char *buffer;
@@ -1087,21 +1092,29 @@ join_references (buffer, oldrefs, newref)
 	int bl, nl, ol;
 	int stripflag = 0;
 
-	/* son-of-1036 says it's ok to leave away message ids in the middle as
-	   long as the first is retained, if the references line would get too
-	   long otherwise.  Many wide-spread software, notably INN, comes with
-	   a default maximum header size of 512 characters, so let's make
-	   sure we don't break this limit or our article won't get far. */
-	/* always keep the first reference */
+	/* TODO
+	 * son-of-1036 says it's ok to remove message ids from the middle as
+	 * long as the first and last 3 are retained and 3 blanks are inserted
+	 * to denote the deletion. This should only be done as a last resort.
+	 * We don't currently comply with this very well.
+	 * Much wide-spread software, notably INN, comes with a default maximum
+	 * header size of 512 characters, so let's make sure we don't break
+	 * this limit else our article won't get far. [is this still the case ?]
+	 */
+
+	/* Always keep the first reference */
 	c=buffer;
-	while (*oldrefs && !isspace(*oldrefs)) *c++=*oldrefs++;
+	while (*oldrefs && !isspace(*oldrefs))
+		*c++=*oldrefs++;
 	*c++=' '; while (isspace(*oldrefs)) oldrefs++;
 	*c=0;
 	bl=strlen(buffer);
 	nl=strlen(newref);
 	ol=strlen(oldrefs);
-	/* now see if it will break the limit if we include the next reference; 14 is
-	   just the size of the References header and required whitespace */
+
+	/* now see if it will break the limit if we include the next reference;
+	 * 14 is just the size of the References header and required whitespace
+	 */
 	while (bl+nl+ol+14>=MAXREFSIZE) {
 		/* won't do, so clip off the next reference */
 		while (*oldrefs && !isspace(*oldrefs)) { oldrefs++; ol--; }

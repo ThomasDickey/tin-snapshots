@@ -752,10 +752,23 @@ extern char *get_uaf_fullname();
 #define 	FEED_SAVE_TAGGED		5
 #define 	FEED_REPOST			6
 
+/*
+ * Threading strategies available
+ */
 #define		THREAD_NONE			0
 #define		THREAD_SUBJ			1
 #define		THREAD_REFS			2
+#define		THREAD_BOTH			3
 
+#ifdef HAVE_REF_THREADING
+#define		THREAD_MAX			THREAD_REFS
+#else
+#define		THREAD_MAX			THREAD_SUBJ
+#endif
+
+/*
+ * Values for show_author
+ */
 #define		SHOW_FROM_NONE			0
 #define		SHOW_FROM_ADDR			1
 #define		SHOW_FROM_NAME			2
@@ -863,16 +876,11 @@ extern char *get_uaf_fullname();
 #define 	DEFAULT_FILTER_DAYS	28
 
 /*
- *  art.thread
+ *  art.thread (Can't ART_NORMAL be better named ?)
  */
 
 #define 	ART_NORMAL		-1
 #define 	ART_EXPIRED		-2
-
-/*
- * art.parent, art.sibling, art.child
- */
-#define		NO_THREAD		-1
 
 /*
  *  art.status
@@ -1006,6 +1014,32 @@ extern char *get_uaf_fullname();
 typedef unsigned char	t_bitmap;
 
 /*
+ * Size of msgid hash table
+ */
+#define MSGID_HASH_SIZE		2609
+
+/*
+ * Easier access to hashed msgids. Note that in REFS(), y must be free()d
+ */
+#define MSGID(x)			(x->msgid ? x->msgid->txt : "")
+#define REFS(x,y)			((y = get_references(x->refs)) ? y : "")
+
+/*
+ *	struct t_msgid - message id
+ */
+struct t_msgid
+{
+	struct t_msgid *next;		/* Next in hash chain */
+	char *txt;			/* The actual msgid */
+	struct t_msgid *parent;		/* Message-id followed up to */
+#ifdef HAVE_REF_THREADING
+	struct t_msgid *sibling;	/* Next followup to parent */
+	struct t_msgid *child;		/* First followup to this article */
+	int article;				/* index in arts[] or ART_NORMAL */
+#endif
+};
+	
+/*
  *  struct t_article - article header
  *
  *  article.thread:
@@ -1027,19 +1061,15 @@ struct t_article
 	char *name;			/* From: line from mail header (full name) */
 	time_t date;			/* Date: line from header in seconds */
 	char *xref;			/* Xref: cross posted article reference line */
-	char *msgid;			/* Message-ID: unique message identifier */
-	char *refs;			/* References: article reference id's */
+	struct t_msgid *msgid;		/* Message-ID: unique message identifier */
+/* An interesting note. refs = msgid->parent and could be removed */
+	struct t_msgid *refs;		/* References: article reference id's */
 	int lines;			/* Lines: number of lines in article */
 	char *archive;			/* Archive-name: line from mail header */
 	char *part;			/* part  no. of archive */
 	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
-#ifdef HAVE_REF_THREADING
-	int parent;			/* Article followed up to */
-	int sibling;			/* Next followup to parent */
-	int child;			/* First followup to this article */
-#endif
 	unsigned int inthread:1;	/* 0 = thread head, 1 = thread follower */
 	unsigned int status:2;		/* 0 = read, 1 = unread, 2 = will return */
 	unsigned int killed:1;		/* 0 = not killed, 1 = killed */

@@ -322,7 +322,7 @@ read_attributes_file (file, global_file)
 				}
 				break;
 			case 't':
-				if (match_integer (line, "thread_arts=", &num, THREAD_REFS)) {
+				if (match_integer (line, "thread_arts=", &num, THREAD_MAX)) {
 					set_attrib_num (ATTRIB_THREAD_ARTS, scope, num);
 					break;
 				}

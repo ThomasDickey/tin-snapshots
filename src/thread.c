@@ -196,7 +196,7 @@ show_thread (group, group_path, respnum)
 	/*
 	 * If threading by Refs, it helps to see the subject line
 	 */
-	if ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts == THREAD_REFS))
+	if ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts >= THREAD_REFS))
 		show_subject = TRUE;
 	else
 		show_subject = FALSE;
@@ -562,19 +562,32 @@ thread_catchup:
 
 #ifdef HAVE_REF_THREADING				
 case 'a':	/* Very dirty temp. hack - Show threaded tree */
-	if (group->attribute->thread_arts == THREAD_REFS) {
-		char ch[10];
-		int siz=10;
+{
+	char tmp[3];
 
-		dump_thread(stderr, thread_respnum, 1);
+	if (group->attribute->thread_arts >= THREAD_REFS) {
+
+		struct t_msgid *ptr;
+
+		/*
+		 * The root article may not be the original root of the
+		 * thread (may have expired, for example) - find it.
+		 */
+		for (ptr = arts[thread_respnum].msgid;
+									ptr->parent != NULL; ptr = ptr->parent);
+
+		fprintf(stderr, "\n");
+		dump_thread(stderr, ptr, 1);
 		puts("Press <RETURN>");
-		fgets(ch, siz, stdin);
+
+		fgets(tmp, 2, stdin);
+
 		show_thread_page ();
 	}
 
 	break;
+}
 #endif
-
 			case iKeyThreadHelp:	/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();

@@ -1023,17 +1023,19 @@ group_list_thread:
 			 * types, otherwise act as a straight toggle
 			 */
 			case iKeyGroupToggleThreading:
- 				if (index_point >= 0) {
-					CURR_GROUP.attribute->thread_arts = 
+
+				CURR_GROUP.attribute->thread_arts = 
 #ifdef HAVE_REF_THREADING
-						++CURR_GROUP.attribute->thread_arts % (THREAD_REFS + 1);
+						++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
 #else
 						!CURR_GROUP.attribute->thread_arts;
 #endif
+ 				if (index_point >= 0) {
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);
-					show_group_page ();
 				}
+
+				show_group_page ();
 				break;
 
 			case iKeyGroupUntag:	/* untag all articles */
@@ -1750,7 +1752,7 @@ show_group_title (clear_title)
 	if (active[num].attribute->thread_arts) {
 		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%s)", 
 			active[num].name, top_base, 
-			(active[num].attribute->thread_arts == THREAD_SUBJ) ? 'S' : 'R',
+			*txt_thread[active[num].attribute->thread_arts],
 			art_cnt, num_of_killed_arts, num_of_selected_arts,
 			(active[num].attribute->show_only_unread ? " R" : ""),
 			(active[num].moderated == 'm' ? " M" : ""));

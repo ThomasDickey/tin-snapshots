@@ -36,24 +36,29 @@ o  if save marked_hot_article fails with cannot create file the
 
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
 
+o  According to 026) in CHANGES, some of the config files can be
+   trashed on a bad write
+
 o  full_page_scroll=OFF seems not to work
 
 o  fix nntplib.c line 388++ (no prototyping #if !defined(linux))
        init.c    line 233++ (no prototyping #if !defined(linux))
        misc.c    line 666   (no prototyping #if !defined(linux))
 
+o  tin sometimes crashes (thread.c) 710/892
+
 New features
 ------------
 o  add
        --enable-mime-base64           (default off)
        --enable-log-user              (default off)
-       --disable-piping              (default on)
+       --disable-piping               (default on)
        --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
 
-o  move architecture depending files in subdirectorys, clean up architecture
+o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
    like NO_PIPING and DONT_HAVE_PIPING
 
@@ -68,6 +73,9 @@ o  add 'U'untag all command to thread level.
 o  add feature save selected/tagged files sequentially to the same file
 
 o  rewrite NGLIMIT handling (post.c)
+
+o  Reorganise tinrc into related sections for easier editing
+   eg: Display, Posting etc.
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
@@ -144,8 +152,6 @@ o  kill-file may get messed up if using multiple news servers with feeds
    losing all references to the moved groups)
 
 o  sometimes kill-file entries are duplicated
-
-o  tin sometimes crashes (thread.c) 710/892/959
 
 o  marking hot-articles read with 'K' and then post-process the newsgroup
    also processes the read articles

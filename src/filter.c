@@ -691,7 +691,7 @@ filter_menu (type, group, art)
 		strcpy (buf, art->from);
 	}
 	sprintf (text_from, ptr_filter_from, len, len, buf);
-	sprintf (text_msgid, ptr_filter_msgid, len, len, art->msgid);
+	sprintf (text_msgid, ptr_filter_msgid, len, len, MSGID(art));
 
 	ClearScreen ();
 
@@ -1180,7 +1180,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 			psPtr[*plNum].from = str_dup (acBuf);
 		}
 		if (psRule->msgid_ok) {
-			sprintf (acBuf, "*%s*", psArt->msgid);
+			sprintf (acBuf, "*%s*", MSGID(psArt));
 			psPtr[*plNum].msgid = str_dup (acBuf);
 		}
 		if (psRule->subj_ok || psRule->from_ok || 
@@ -1342,17 +1342,25 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 						SET_FILTER(group, i, j);
 					}
 				}
+
 				/*
 				 * Filter on Message-ID: line
 				 * Apply to Message-ID: & References: lines
 				 */
 				if (ptr[j].msgid != (char *) 0) {
-/*printf ("msgid=[%s] filter=[%s]\n", arts[i].msgid, ptr[j].msgid); 
-*/
-					if (STR_MATCH (arts[i].refs, ptr[j].msgid) ||
-					    STR_MATCH (arts[i].msgid, ptr[j].msgid)) {
+
+					struct t_article *art = &arts[i];
+					char *refs;
+
+/*printf ("msgid=[%s] filter=[%s]\n", MSGID(art), ptr[j].msgid); */
+
+					if (STR_MATCH (REFS(art, refs), ptr[j].msgid) ||
+					    STR_MATCH (MSGID(art), ptr[j].msgid)) {
 						SET_FILTER(group, i, j);
 					}
+
+					if (refs)
+						free(refs);
 				}
 				/*
 				 * Filter on Lines: line
