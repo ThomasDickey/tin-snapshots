@@ -1096,6 +1096,7 @@ static void appendid P_((char **where, char **what));
 static int must_include P_((char *id));
 static void skip_id P_((char **id));
 static int damaged_id P_((char *id));
+static int is_crosspost P_((char *xref));
 
 /* yeah, right, that's from the same Chris who is telling Jason he's
    doing obfuscated C :-) */
@@ -1166,6 +1167,21 @@ damaged_id (id)
 	if (*id != '>')
 		return 1;
 	return 0;
+}
+
+/* 
+ * A real crossposting test had to run on Newsgroups but we only have Xref in
+ * t_article, so we use this.
+ */
+static int 
+is_crosspost (xref)
+	char *xref;
+{
+	int count=0;
+	for (;*xref;xref++) 
+		if (*xref==':')
+			count++;
+	return (count>=2) ? 1 : 0;
 }
 
 /* Widespread news software like INN's nnrpd restricts the size of several
@@ -1436,7 +1452,7 @@ post_response (group, respnum, copy_text)
 	start_line_offset += lines;
 
 	if (copy_text) {
-		if (arts[respnum].xref) {
+		if (arts[respnum].xref && is_crosspost(arts[respnum].xref)) {
 			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
 				       xpost_quote_format)) {
 				fprintf (fp, "%s\n", buf);
