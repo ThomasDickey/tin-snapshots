@@ -603,11 +603,9 @@ extern char *get_uaf_fullname();
 #ifdef SMALL_MEMORY_MACHINE
 #	define	DEFAULT_ARTICLE_NUM	600
 #	define	DEFAULT_SAVE_NUM	10
-#	define	DEFAULT_SPOOLDIR_NUM	5
 #else
 #	define	DEFAULT_ARTICLE_NUM	1200
 #	define	DEFAULT_SAVE_NUM	30
-#	define	DEFAULT_SPOOLDIR_NUM	10
 #endif
 #define	DEFAULT_ACTIVE_NUM	1800
 #define	DEFAULT_NEWNEWS_NUM	5
@@ -714,7 +712,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #	define	HEADER_LEN		1024
 #endif
 
-#define 	MODULO_COUNT_NUM	10
+#define 	MODULO_COUNT_NUM	50
 #define 	TABLE_SIZE		1409
 #define 	MAX_PAGES		2000	/* maximum article pages */
 /* when prompting for subject, display no more than 20 characters */
@@ -764,6 +762,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #endif
 
 /*
+ * Return values for tin_errno
+ */
+#define TIN_ABORT		1			/* User requested abort or timeout */
+#define TIN_TIMEOUT		2			/* Client side timeout */
+
+/*
  * Number of mime types
  */
 #define	NUM_MIME_TYPES	4
@@ -798,15 +802,25 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
 /*
+ * Only close off our stream when reading on local spool
+ */
+#ifdef NNTP_ABLE
+#	define TIN_FCLOSE(x)	if (!read_news_via_nntp) fclose(x)
+#else
+#	define TIN_FCLOSE		fclose(x)
+#endif /* NNTP_ABLE */
+
+/*
  * Often used macro to point to the group we are currenty in
  */
 #define	CURR_GROUP	(active[my_group[cur_groupnum]])
 
 /*
- * Some informational message are only shown if this is true
- * otherwise suppressed when we're backgrounded or in batch mode
+ * Some informational message are only shown if we're running in
+ * the background or some other non-curses mode
  */
-#define SHOW_UPDATE	(!update || update_fork)
+#define INTERACTIVE		(!batch_mode || update_fork)
+#define INTERACTIVE2	((cmd_line && !(batch_mode || verbose)) || (batch_mode && update_fork))
 
 /*
  *  News/Mail group types
@@ -814,7 +828,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	GROUP_TYPE_MAIL	0
 #define	GROUP_TYPE_NEWS	1
-#define	GROUP_TYPE_SAVE	2
+#define	GROUP_TYPE_SAVE	2		/* What on earth is this ? */
 
 /*
  *  used by get_arrow_key()
@@ -863,10 +877,9 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  */
 
 #define	SELECT_LEVEL		1
-#define	SPOOLDIR_LEVEL		2
-#define	GROUP_LEVEL		3
-#define	THREAD_LEVEL		4
-#define	PAGE_LEVEL		5
+#define	GROUP_LEVEL		2
+#define	THREAD_LEVEL		3
+#define	PAGE_LEVEL		4
 
 #define	MINI_HELP_LINES		5
 
@@ -876,6 +889,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FEED_SAVE		4
 #define	FEED_SAVE_TAGGED		5
 #define	FEED_REPOST		6
+
+#if 0
+#   define DEBUG_IO(x)   fprintf x
+#else
+#   define DEBUG_IO(x)
+#endif
 
 /*
  * Threading strategies available
@@ -903,11 +922,11 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	POST_PROC_NONE		0
 #define	POST_PROC_SHAR		1
-#define	POST_PROC_UUDECODE		2
-#define	POST_PROC_UUD_LST_ZOO		3
-#define	POST_PROC_UUD_EXT_ZOO		4
-#define	POST_PROC_UUD_LST_ZIP		5
-#define	POST_PROC_UUD_EXT_ZIP		6
+#define	POST_PROC_UUDECODE	2
+#define	POST_PROC_UUD_LST_ZOO	3
+#define	POST_PROC_UUD_EXT_ZOO	4
+#define	POST_PROC_UUD_LST_ZIP	5
+#define	POST_PROC_UUD_EXT_ZIP	6
 
 
 /*
@@ -916,20 +935,22 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  */
 
 #define	SORT_BY_NOTHING		0
-#define	SORT_BY_SUBJ_DESCEND		1
-#define	SORT_BY_SUBJ_ASCEND		2
-#define	SORT_BY_FROM_DESCEND		3
-#define	SORT_BY_FROM_ASCEND		4
-#define	SORT_BY_DATE_DESCEND		5
-#define	SORT_BY_DATE_ASCEND		6
+#define	SORT_BY_SUBJ_DESCEND	1
+#define	SORT_BY_SUBJ_ASCEND	2
+#define	SORT_BY_FROM_DESCEND	3
+#define	SORT_BY_FROM_ASCEND	4
+#define	SORT_BY_DATE_DESCEND	5
+#define	SORT_BY_DATE_ASCEND	6
+#define	SORT_BY_SCORE_DESCEND	7
+#define	SORT_BY_SCORE_ASCEND	8
 
 
 /*
  * Different values of strip_bogus - the ways to handle bogus groups
  */
-#define BOGUS_KEEP			0
+#define BOGUS_KEEP		0
 #define BOGUS_REMOVE		1
-#define BOGUS_ASK			2
+#define BOGUS_ASK		2
 
 /*
  *  used in help.c
@@ -955,7 +976,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	HEADER_TO		0
 #define	HEADER_SUBJECT		1
-#define	HEADER_NEWSGROUPS		2
+#define	HEADER_NEWSGROUPS	2
 
 #define	POSTED_NONE		0
 #define	POSTED_REDRAW		1
@@ -994,6 +1015,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	ESC		27
 
+/* Turn on nice progress indicators */
+#define SHOW_PROGRESS
 
 /*
  * return codes for change_config_file ()
@@ -1018,7 +1041,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	ART_READ		0
 #define	ART_UNREAD		1
 #define	ART_WILL_RETURN		2
-#define 	ART_UNAVAILABLE		-1
+#define	ART_UNAVAILABLE		-1 /* Also used by msgid.article */
+
+/*
+ * Additionally used for user aborts in art_open()
+ */
+#define ART_ABORT		-2
 
 /*
  * used by t_group & my_group[]
@@ -1204,9 +1232,6 @@ struct t_msgid
  *	FALSE for the first article in a thread, TRUE for all
  *	following articles in thread
  *
- * TODO: when scoring works, add t_article.score and implement
- * TODO: sorting by score in group.c, so we may see interesting
- * TODO: articles first.
  */
 
 struct t_article
@@ -1275,7 +1300,8 @@ struct t_attribute
 	unsigned show_author:4;			/* 0=none, 1=name, 2=addr, 3=both */
 	unsigned sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
 						   3=from descend, 4=from ascend,
-						   5=date descend, 6=date ascend */
+						   5=date descend, 6=date ascend,
+						   7=score descend, 8=score ascend */
 	unsigned int post_proc_type:4;		/* 0=none, 1=shar, 2=uudecode,
 						   3=uud & list zoo, 4=uud & ext zoo*/
 	unsigned int x_comment_to:1;		/* insert X-Comment-To: in Followup */
@@ -1315,13 +1341,12 @@ struct t_group
 	t_bool read_during_session:1;		/* TRUE if group entered during session */
 	t_bool art_was_posted:1;		/* TRUE if art was posted to group */
 	t_bool subscribed:1;			/* TRUE if subscribed to group */
-	t_bool newgroup:1;				/* TRUE is group was new this session */
+	t_bool newgroup:1;				/* TRUE if group was new this session */
 	t_bool bogus:1;					/* TRUE if group is not in active list */
 	int next;				/* next active entry in hash chain */
 	struct t_newsrc newsrc; 		/* newsrc bitmap specific info. */
 	struct t_attribute *attribute;		/* group specific attributes */
-	struct t_filters *glob_filter;		/* points to global filter array */
-	struct t_filters *grps_filter;		/* group specific filters */
+	struct t_filters *glob_filter;		/* points to filter array */
 #ifdef INDEX_DAEMON
 	time_t last_updated_time;		/* last time group dir was changed */
 #endif
@@ -1383,6 +1408,7 @@ struct t_filter
 	int xref_scores[10];
 	char *xref_score_strings[10];
 	time_t time;				/* expire time in seconds */
+	struct t_filter *next;			/* next rule valid in group */
 	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;			/* kill/auto select */
 	unsigned int icase:2;			/* Case sensitive filtering */
@@ -1397,21 +1423,38 @@ struct t_filter_rule
 	char text[PATH_LEN];
 	char scope[PATH_LEN];
 	int  counter;
-	int  global;
 	int  icase;
 	int  lines_cmp;
 	int  lines_num;
-	int  from_ok;
-	int  lines_ok;
-	int  msgid_ok;
-	int  subj_ok;
+	t_bool from_ok:1;
+	t_bool lines_ok:1;
+	t_bool msgid_ok:1;
+	t_bool subj_ok:1;
+	t_bool check_string:1;
 	int  type;
 	int  score;
 	int  expire_time;
-	int  check_string;
-	int  ignore_case;
 };
 
+struct t_header
+{
+	char from[HEADER_LEN];		/* From:         */
+	char path[HEADER_LEN];		/* Path:         */
+	char date[HEADER_LEN];		/* Date:         */
+	char subj[HEADER_LEN];		/* Subject:      */
+	char org[HEADER_LEN];		/* Organization: */
+	char newsgroups[HEADER_LEN];	/* Newsgroups:   */
+	char messageid[HEADER_LEN];	/* Message-ID:   */
+	char references[HEADER_LEN];	/* References:   */
+	char distrib[HEADER_LEN];	/* Distribution: */
+	char keywords[HEADER_LEN];	/* Keywords:     */
+	char summary[HEADER_LEN];	/* Summary:      */
+	char followup[HEADER_LEN];	/* Followup-To:  */
+	char mimeversion[HEADER_LEN];	/* Mime-Version: */
+	char contenttype[HEADER_LEN];	/* Content-Type: */
+	char contentenc[HEADER_LEN];	/* Content-Transfer-Encoding: */
+	char ftnto[HEADER_LEN];		/* Old X-Comment-To: (Used by FIDO) */
+};
 
 struct t_save
 {
@@ -1452,16 +1495,6 @@ struct t_art_stat
 	char art_mark;		/* mark to use for this thread - not used for groups */
 };
 
-/*
- * Used by spooldir command
- */
-
-struct t_spooldir
-{
-	int state;
-	char *name;
-	char *comment;
-};
 
 /*
  * Used for detecting changes in active file size on different news servers
@@ -1519,7 +1552,7 @@ struct t_notify
 
 typedef struct t_group *group_p;
 typedef struct t_notify *notify_p;
-#endif
+#endif /* 0 */
 
 /*
  * Determine signal return type
@@ -1880,15 +1913,15 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #	endif
 #endif
 
+#define IS_PLURAL(x) (x != 1 ? txt_plural : "")
+
 /* FIXME - check also for mktemp/mkstemp/tmpfile */
 #ifdef HAVE_TEMPNAM
-#	define my_tempnam(a,b) tempnam(a,b)
+#  define my_tempnam(a,b)	tempnam(a,b)
 #else
-#	ifdef HAVE_TMPNAM
-#		define my_tempnam(a,b) tmpnam((char *)0)
-#	endif /* HAVE_TMPNAM */
-#endif /* HAVE_TEMPNAM */
-
-#define IS_PLURAL(x) (x != 1 ? txt_plural : "")
+#  ifdef HAVE_TMPNAM
+#     define   my_tempnam(a,b)	tmpnam((char *)0)
+#  endif
+#endif
 
 #endif /* !TIN_H */

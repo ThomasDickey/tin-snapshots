@@ -25,9 +25,6 @@ int num_newnews = 0;
 int max_art = 0;
 int max_save = 0;
 int num_save = 0;
-int max_spooldir = 0;
-int num_spooldir = 0;
-
 /*
  * Dynamic arrays
  */
@@ -37,17 +34,11 @@ struct t_group *active;			/* active newsgroups */
 struct t_newnews *newnews;		/* active file sizes on differnet servers */
 struct t_article *arts;			/* articles headers in current group */
 struct t_save *save;			/* sorts articles before saving them */
-struct t_spooldir *spooldirs;		/* spooldirs on NNTP server (cdrom) */
-
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static void free_newnews_array (void);
-static void free_spooldirs_array (void);
-#if 0 /* unused */
-	static void expand_spooldirs (void);
-#endif /* 0 */
 
 /*
  *  Dynamic table management
@@ -84,13 +75,6 @@ init_alloc (void)
 	max_save = DEFAULT_SAVE_NUM;
 
 	save = (struct t_save *) my_malloc (sizeof(*save) * max_save);
-
-	/*
-	 * spooldirs array
-	 */
-	max_spooldir = DEFAULT_SPOOLDIR_NUM;
-
-	spooldirs = (struct t_spooldir *) my_malloc (sizeof(*spooldirs) * max_spooldir);
 
 #if !USE_CURSES
 	screen = (struct t_screen *) 0;
@@ -155,14 +139,13 @@ init_screen_array (
 		screen = (struct t_screen *) my_malloc (
 			sizeof (struct t_screen) * cLINES+1);
 
-		for (i=0 ; i < cLINES ; i++) {
+		for (i=0 ; i < cLINES ; i++)
 			screen[i].col = (char *) my_malloc (cCOLS+2);
-		}
+
 	} else {
 		if (screen != (struct t_screen *) 0) {
-			for (i=0 ; i < cLINES ; i++) {
+			for (i=0 ; i < cLINES ; i++)
 				FreeAndNull(screen[i].col);
-			}
 
 			free ((char *) screen);
 			screen = (struct t_screen *) 0;
@@ -201,14 +184,6 @@ free_all_arrays (void)
 		if (save != (struct t_save *) 0) {
 			free ((char *) save);
 			save = (struct t_save *) 0;
-		}
-	}
-
-	if (spooldirs != (struct t_spooldir *) 0) {
-		free_spooldirs_array ();
-		if (spooldirs != (struct t_spooldir *) 0) {
-			free ((char *) spooldirs);
-			spooldirs = (struct t_spooldir *) 0;
 		}
 	}
 
@@ -256,7 +231,7 @@ free_attributes_array (void)
 
 	for (i = 0 ; i < num_active ; i++) {
 		psGrp = &active[i];
-		if (psGrp->attribute && psGrp->attribute->global == FALSE) {
+		if (psGrp->attribute && !psGrp->attribute->global) {
 			if (psGrp->attribute->maildir != (char *) 0 &&
 				psGrp->attribute->maildir != default_maildir) {
 				free ((char *) psGrp->attribute->maildir);
@@ -319,10 +294,6 @@ free_active_arrays (void)
 				free ((char *) active[i].newsrc.xbitmap);
 				active[i].newsrc.xbitmap = 0;
 			}
-			if (active[i].grps_filter != 0) {
-				free ((char *) active[i].grps_filter);
-				active[i].grps_filter = 0;
-			}
 		}
 
 		free_attributes_array ();
@@ -358,32 +329,13 @@ free_save_array (void)
 	num_save = 0;
 }
 
-
-static void
-free_spooldirs_array (void)
-{
-	int i;
-
-	for (i=0 ; i < num_spooldir ; i++) {
-
-		FreeAndNull(spooldirs[i].name);
-		FreeAndNull(spooldirs[i].comment);
-
-		spooldirs[i].state = 0;
-	}
-
-	num_spooldir = 0;
-}
-
-
 static void
 free_newnews_array (void)
 {
 	int i;
 
-	for (i=0 ; i < num_newnews ; i++) {
+	for (i=0 ; i < num_newnews ; i++)
 		FreeAndNull(newnews[i].host);
-	}
 
 	num_newnews = 0;
 }
@@ -395,7 +347,6 @@ my_malloc1 (
 	int line,
 	size_t size)
 {
-	char	buf[128];
 	char	*p;
 
 #ifdef DEBUG
@@ -404,8 +355,7 @@ my_malloc1 (
 
 	if ((p = (char *) malloc (size)) == NULL) {
 
-		sprintf (buf, txt_out_of_memory, progname, size, file, line);
-		error_message (buf, "");
+		error_message (txt_out_of_memory, progname, size, file, line);
 
 /*		vPrintBugAddress (); */
 /*		tin_done (1); */
@@ -422,34 +372,20 @@ my_realloc1 (
 	char *p,
 	size_t size)
 {
-	char	buf[128];
 
 #ifdef DEBUG
 	vDbgPrintMalloc (FALSE, file, line, size);
 #endif
-	if (!p) {
+	if (!p)
 		p = (char *) calloc (1, size);
-	} else {
+	else
 		p = (char *) realloc (p, size);
-	}
 
 	if (p == (char *) 0) {
-		sprintf (buf, txt_out_of_memory, progname, size, file, line);
-		error_message (buf, "");
+		error_message (txt_out_of_memory, progname, size, file, line);
 /*		vPrintBugAddress (); */
 /*		tin_done (1); */
 		exit (1);
 	}
 	return (void *) p;
 }
-
-#if 0 /* unused */
-static void
-expand_spooldirs (void)
-{
-	max_spooldir += max_spooldir / 2;	/* increase by 50% */
-
-	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs,
-		sizeof (struct t_spooldir) * max_spooldir);
-}
-#endif /* 0 */

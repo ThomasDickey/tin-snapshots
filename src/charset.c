@@ -139,9 +139,8 @@ ConvertIso2Asc (
 	int first;   /* flag for first SPACE/TAB after other characters */
 	int i, a;    /* column counters in iso and asc */
 
-	if (iso == 0 || asc == 0) {
+	if (iso == 0 || asc == 0)
 		return;
-	}
 
 	tab = (iso2asc[t] - ISO_EXTRA);
 	first = 1;
@@ -265,7 +264,12 @@ iIsArtTexEncoded (
 	int body = FALSE;
 	int i, len;
 
-	fp = open_art_fp ((char *)group_path, art);
+	/*
+	 * TODO: This is a farce. Reread the whole art !!
+	 *       should be done as part of single pass when article is pulled down
+	 */
+	if ((fp = open_art_fp ((char *)group_path, art, 0)) == (FILE *) 0)
+		return FALSE;
 
 	while (fgets (line, sizeof line, fp) != (char *) 0) {
 		if (line[0] == '\n') {
@@ -307,9 +311,8 @@ Convert2Printable (
 {
 	unsigned char *c;
 	for (c= (unsigned char *)buf; *c; c++) {
-		if (!my_isprint(*c)) {
+		if (!my_isprint(*c))
 			*c = '?';
-		}
 	}
 }
 
@@ -322,10 +325,8 @@ ConvertBody2Printable (
 	char *buf)
 {
 	unsigned char *c;
-	for (c= (unsigned char *)buf; *c; c++) {
-		if ( !(my_isprint(*c) || *c==8 || *c==9 || *c==12)) {
+	for (c = (unsigned char *)buf; *c; c++) {
+		if (!(my_isprint(*c) || *c==8 || *c==9 || *c==12))
 			*c = '?';
-		}
 	}
 }
-

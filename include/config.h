@@ -303,7 +303,7 @@
 #endif
 
 /*
- * Use poll()/select() in input_pending()
+ * Use poll()/select()
  */
 
 #if defined(SVR4) || defined(__hp9000s700) || defined(__hp9000s900) || \

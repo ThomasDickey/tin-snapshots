@@ -39,23 +39,20 @@ append_file (
 	char *old_filename,
 	char *new_filename)
 {
-	char buf[1024];
 	FILE *fp_old, *fp_new;
 
 	if ((fp_new = fopen (new_filename, "r")) == (FILE *) 0) {
-		sprintf (buf, txt_cannot_open, new_filename);
-		perror_message (buf, "ONE");
+		perror_message (txt_cannot_open, new_filename);
 		return;
 	}
 	if ((fp_old = fopen (old_filename, "a+")) == (FILE *) 0) {
-		sprintf (buf, txt_cannot_open, old_filename);
-		perror_message (buf, "ONE");
+		perror_message (txt_cannot_open, old_filename);
 		fclose (fp_new);
 		return;
 	}
-   copy_fp(fp_old, fp_new);
+	copy_fp(fp_old, fp_new);
 	fclose (fp_old);
- 	fclose (fp_new);
+	fclose (fp_new);
 }
 #endif  /* M_UNIX */
 
@@ -104,10 +101,9 @@ copy_fp (
 
 	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
 		if (n != fwrite (buf, 1, n, fp_op)) {
-			if (!got_sig_pipe) {
-				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-				perror_message (msg, "");
-			}
+			if (!got_sig_pipe) 
+				perror_message ("copy_fp() failed");
+
 			return;
 		}
 	}
@@ -116,8 +112,9 @@ copy_fp (
 
 
 /* copy the body of articles with given file pointers,
-   prefix (= quote_chars), initials of the articles author
-   and a flag, if the signature should be quoted */
+ * prefix (= quote_chars), initials of the articles author
+ * and a flag, if the signature should be quoted
+ */
 
 void
 copy_body (
@@ -135,8 +132,7 @@ copy_body (
 	t_bool status_char;
 	int i;
 
-   /* This is a shortcut for speed reasons: if no prefix (= quote_chars)
-      is given just copy */
+	/* This is a shortcut for speed reasons: if no prefix (= quote_chars) is given just copy */
 	if (!prefix || !prefix[0]) {
 		copy_fp(fp_ip, fp_op);
 		return;
@@ -155,17 +151,17 @@ copy_body (
 		}
 	}
 
-	/* this is done to avoid snprintf() which some systems don't have */
 	if (strlen(prefix) > 240) /* truncate and terminate */
 		prefix[240] = '\0';
 	if (strstr(prefix, "%s"))
 		sprintf(prefixbuf, prefix, initl);
 	else {
-		strcpy(prefixbuf, prefix);
 		/* strip tailing space from quote-char for quoting quoted lines */
+		strcpy(prefixbuf,prefix);
 		if (prefixbuf[strlen(prefixbuf)-1] == ' ')
 			prefixbuf[strlen(prefixbuf)-1] = '\0';
 	}
+
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
 		if (!with_sig && !strcmp(buf, "-- \n"))
 			break;
@@ -209,8 +205,7 @@ copy_body (
 
 		}
 		if (retcode == EOF) {
-			sprintf (msg, "Failed copy_body(). errno=%d", errno);
-			perror_message (msg, "");
+			perror_message ("copy_body() failed");
 			return;
 		}
 	}
@@ -251,22 +246,19 @@ invoke_editor (
 	}
 
 	if (start_editor_offset) {
-		if (default_editor_format[0]) {
+		if (default_editor_format[0])
 			strcpy (editor_format, default_editor_format);
-		} else {
+		else
 			strcpy (editor_format, EDITOR_FORMAT_ON);
-		}
+
 	} else {
 		strcpy (editor_format, EDITOR_FORMAT_OFF);
 	}
 
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
 
-	if (!retcode) {
+	if (!retcode)
 		sprintf (buf, "%s %s", editor, filename);
-	}
-
-	wait_message (buf);
 
 	retcode = invoke_cmd (buf);
 #ifdef EDITOR_BACKUP_FILE_EXT
@@ -300,9 +292,7 @@ invoke_ispell (
 #endif
 	}
 
-	sprintf (buf, "%s %s", ispell, nam);
-
-	wait_message (buf);
+	wait_message (0, "%s %s", ispell, nam);
 
 	return invoke_cmd (buf);
 }
@@ -327,11 +317,11 @@ shell_escape (void)
 	if (*p) {
 		my_strncpy (default_shell_command, p, sizeof (default_shell_command));
 	} else {
-		if (default_shell_command[0]) {
+		if (default_shell_command[0])
 			my_strncpy (shell, default_shell_command, sizeof (shell));
-		} else {
+		else
 			my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
-		}
+
 		p = shell;
 	}
 
@@ -344,9 +334,8 @@ shell_escape (void)
 
 	continue_prompt ();
 
-	if (draw_arrow_mark) {
+	if (draw_arrow_mark)
 		ClearScreen ();
-	}
 }
 #endif /* !NO_SHELL_ESCAPE */
 
@@ -374,8 +363,7 @@ tin_done (
 						break;
 					}
 				}
-				sprintf (msg, "Catchup %s...", group->name);
-				wait_message (msg);
+				wait_message (0, "Catchup %s...", group->name);
 				if (index_group (group)) {
 					for (j = 0; j < top; j++) {
 						art_mark_read (group, &arts[j]);
@@ -387,18 +375,22 @@ tin_done (
 
 	vWriteNewsrc ();
 
-	write_input_history_file ();
+/* TODO - can we do anything if saving the newsrc failed ? */
+	wait_message(1, "newsrc file saved successfully.\n");
 
+	write_input_history_file ();
 #if 0 /* FIXME */
-   write_attributes_file (local_attributes_file);
+	write_attributes_file (local_attributes_file);
 #endif
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	write_mail_active_file ();
 #endif
-	if (ret != EXIT_NNTP_ERROR) {
+
+	/* Do this after we save the newsrc in case this hangs up for any reason */
+	if (ret != EXIT_NNTP_ERROR)
 		nntp_close ();			/* disconnect from NNTP server */
-	}
+
 	free_all_arrays ();
 #ifdef SIGUSR1
 	if (ret != - SIGUSR1) {
@@ -432,7 +424,8 @@ tin_done (
 #endif
 
 #ifdef VMS
-	if (ret == 0) ret = 1;
+	if (ret == 0)
+		ret = 1;
 #endif
 
 	exit (ret);
@@ -503,9 +496,8 @@ strip_double_ngs (
 				if (ptr2 != (char *) 0) {
 					strcpy(cmplist, ptr2+1);
 					*ptr2 = '\0';
-				} else {
+				} else
 					over2 = TRUE;
-				}
 
 				if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
 					&& (strlen(ngroup2) != 0)) {
@@ -565,7 +557,6 @@ rename_file (
 	char *old_filename,
 	char *new_filename)
 {
-	char buf[1024];
 	FILE *fp_old, *fp_new;
 
 	unlink (new_filename);
@@ -573,13 +564,11 @@ rename_file (
 	if (link (old_filename, new_filename) == -1) {
 		if (errno == EXDEV) {	/* create & copy file across filesystem */
 			if ((fp_old = fopen (old_filename, "r")) == (FILE *) 0) {
-				sprintf (buf, txt_cannot_open, old_filename);
-				perror_message (buf, "ONE");
+				perror_message (txt_cannot_open, old_filename);
 				return;
 			}
 			if ((fp_new = fopen (new_filename, "w")) == (FILE *) 0) {
-				sprintf (buf, txt_cannot_open, new_filename);
-				perror_message (buf, "ONE");
+				perror_message (txt_cannot_open, new_filename);
 				fclose (fp_old);
 				return;
 			}
@@ -588,14 +577,12 @@ rename_file (
 			fclose (fp_old);
 			errno = 0;
 		} else {
-			sprintf (buf, txt_rename_error, old_filename, new_filename);
-			perror_message (buf, "THREE");
+			perror_message (txt_rename_error, old_filename, new_filename);
 			return;
 		}
 	}
 	if (unlink (old_filename) == -1) {
-		sprintf (buf, txt_rename_error, old_filename, new_filename);
-		perror_message (buf, "TWO");
+		perror_message (txt_rename_error, old_filename, new_filename);
 		return;
 	}
 }
@@ -613,9 +600,8 @@ rename_file (
 
 	unlink (new_filename);
 	if (rename (old_filename, new_filename)==EOF)
-	{	sprintf (buf, txt_rename_error, old_filename, new_filename);
-		perror_message (buf, "THREE");
-	}
+		perror_message (txt_rename_error, old_filename, new_filename);
+
 	return;
 }
 #endif	/* M_UNIX */
@@ -668,13 +654,11 @@ draw_percent_mark (
 	char buf[32];
 	int percent;
 
-	if (NOTESLINES <= 0) {
+	if (NOTESLINES <= 0)
 		return;
-	}
 
-	if (cur_num <= 0 && max_num <= 0) {
+	if (cur_num <= 0 && max_num <= 0)
 		return;
-	}
 
 	percent = cur_num * 100 / max_num;
 	sprintf (buf, "%s(%d%%) [%ld/%ld]", txt_more, percent, cur_num, max_num);
@@ -700,27 +684,27 @@ set_real_uid_gid (void)
 	umask (real_umask);
 
 #	if HAVE_SETEUID && HAVE_SETEGID
-	if (seteuid (real_uid) == -1) {
-		perror_message ("Error seteuid(real) failed", "");
-	}
-	if (setegid (real_gid) == -1) {
-		perror_message ("Error setegid(real) failed", "");
-	}
+	if (seteuid (real_uid) == -1)
+		perror_message ("Error seteuid(real) failed");
+
+	if (setegid (real_gid) == -1)
+		perror_message ("Error setegid(real) failed");
+
 #	else
 #		if HAVE_SETREUID && HAVE_SETREGID
-	if (setreuid (-1, real_uid) == -1) {
-		perror_message ("Error setreuid(real) failed", "");
-	}
-	if (setregid (-1, real_gid) == -1) {
-		perror_message ("Error setregid(real) failed", "");
-	}
+	if (setreuid (-1, real_uid) == -1)
+		perror_message ("Error setreuid(real) failed");
+
+	if (setregid (-1, real_gid) == -1)
+		perror_message ("Error setregid(real) failed");
+
 #		else
-	if (setuid (real_uid) == -1) {
-		perror_message ("Error setuid(real) failed", "");
-	}
-	if (setgid (real_gid) == -1) {
-		perror_message ("Error setgid(real) failed", "");
-	}
+	if (setuid (real_uid) == -1)
+		perror_message ("Error setuid(real) failed");
+
+	if (setgid (real_gid) == -1)
+		perror_message ("Error setgid(real) failed");
+
 #		endif /* HAVE_SETREUID && HAVE_SETREGID */
 #	endif /* HAVE_SETEUID && HAVE_SETEGID */
 #endif	/* HAVE_SET_GID_UID */
@@ -736,27 +720,27 @@ set_tin_uid_gid (void)
 	umask (0);
 
 #	if HAVE_SETEUID && HAVE_SETEGID
-	if (seteuid (tin_uid) == -1) {
-		perror_message ("Error seteuid(real) failed", "");
-	}
-	if (setegid (tin_gid) == -1) {
-		perror_message ("Error setegid(real) failed", "");
-	}
+	if (seteuid (tin_uid) == -1)
+		perror_message ("Error seteuid(real) failed");
+
+	if (setegid (tin_gid) == -1)
+		perror_message ("Error setegid(real) failed");
+
 #	else
 #		if HAVE_SETREUID && HAVE_SETREGID
-	if (setreuid (-1, tin_uid) == -1) {
-		perror_message ("Error setreuid(tin) failed", "");
-	}
-	if (setregid (-1, tin_gid) == -1) {
-		perror_message ("Error setregid(tin) failed", "");
-	}
+	if (setreuid (-1, tin_uid) == -1)
+		perror_message ("Error setreuid(tin) failed");
+
+	if (setregid (-1, tin_gid) == -1)
+		perror_message ("Error setregid(tin) failed");
+
 #		else
-	if (setuid (tin_uid) == -1) {
-		perror_message ("Error setuid(tin) failed", "");
-	}
-	if (setgid (tin_gid) == -1) {
-		perror_message ("Error setgid(tin) failed", "");
-	}
+	if (setuid (tin_uid) == -1)
+		perror_message ("Error setuid(tin) failed");
+
+	if (setgid (tin_gid) == -1)
+		perror_message ("Error setgid(tin) failed");
+
 #		endif /* HAVE_SETREUID && HAVE_SETREGID */
 #	endif /* HAVE_SETEUID && HAVE_SETEGID */
 #endif	/* HAVE_SET_GID_UID */
@@ -770,7 +754,7 @@ base_name (
 {
 	int i;
 #ifdef VMS
-    char *cp;
+	char *cp;
 #endif
 
 	strcpy (program, dirname);
@@ -789,7 +773,8 @@ base_name (
 	str_lwr (program, program);
 #endif
 #ifdef VMS
-	if (cp = strrchr(program, '.')) *cp = '\0';
+	if (cp = strrchr(program, '.'))
+		*cp = '\0';
 #endif
 }
 
@@ -1065,7 +1050,7 @@ eat_re (
 			s++;
 
 	}
- 	if (eat_was) { /* kill "(was: ...)" ? */
+	if (eat_was) { /* kill "(was: ...)" ? */
 		if ((e = strstr(s, "(was:"))) /* should we take more spaces into consideration? */
 			*e = '\0';
 	}
@@ -1073,32 +1058,11 @@ eat_re (
 	for (e = s; *e; e++)	/* NULL out trailing whitespace */
 		;		/* moved here from the loop */
 
-	while (e-- > s && isspace((unsigned char)*e)) {
+	while (e-- > s && isspace((unsigned char)*e))
 		*e = '\0';
-	}
 
 	return s;
 }
-
-/*
- *  Hash the subjects (after eating the Re's off) for a quicker
- *  thread search later.  We store the hashes for subjects in the
- *  index file for speed.
- */
-#if 0
-long
-hash_s (
-	char *s)
-{
-	long h = 0;
-	unsigned char *t = (unsigned char *) s;
-
-	while (*t)
-		h = h * 64 + *t++;
-
-	return h;
-}
-#endif
 
 /*
  * Clear tag status of all articles. If articles were untagged, return TRUE
@@ -1148,7 +1112,7 @@ void
 get_author (
 	int thread,
 	struct t_article *art,
-	char *str, int len)
+	char *str, size_t len)
 {
 	int author;
 
@@ -1202,11 +1166,10 @@ toggle_inverse_video (void)
 void
 show_inverse_video_status (void)
 {
-	if (inverse_okay) {
+	if (inverse_okay)
 		info_message (txt_inverse_on);
-	} else {
+	else
 		info_message (txt_inverse_off);
-	}
 }
 
 #ifdef HAVE_COLOR
@@ -1219,11 +1182,10 @@ toggle_color (void)
 void
 show_color_status (void)
 {
-	if (use_color) {
+	if (use_color)
 		info_message (txt_color_on);
-	} else {
+	else
 		info_message (txt_color_off);
-	}
 }
 #endif /* HAVE_COLOR */
 
@@ -1281,9 +1243,8 @@ input_pending (int delay)
 	if (select (1, &fdread, NULL, NULL, &tvptr))
 #endif /* HAVE_SELECT_INTP */
 	{
-		if (FD_ISSET(fd, &fdread)) {
+		if (FD_ISSET(fd, &fdread))
 			return TRUE;
-		}
 	}
 #endif /* HAVE_SELECT */
 
@@ -1292,12 +1253,8 @@ input_pending (int delay)
 	static long nfds = 1;
 	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
 
-	if (poll (fds, nfds, Timeout) < 0) {
-		/*
-		 * Error on poll
-		 */
+	if (poll (fds, nfds, Timeout) < 0) /* Error on poll */
 		return FALSE;
-	}
 
 	switch (fds[0].revents) {
 		case POLLIN:
@@ -1434,9 +1391,9 @@ get_arrow_key (int prech)
 #endif	/* !M_AMIGA */
 
 	ch = ReadCh ();
-	if (ch == '[' || ch == 'O')  {
+	if (ch == '[' || ch == 'O')
 		ch = ReadCh ();
-	}
+
 	switch (ch) {
 		case 'A':
 		case 'i':
@@ -1564,13 +1521,12 @@ create_index_lock_file (
 			fgets (buf, sizeof (buf), fp);
 			fclose (fp);
 #ifdef INDEX_DAEMON
-			sprintf (msg, "%s: Already started pid=[%d] on %s",
+			error_message ("%s: Already started pid=[%d] on %s",
 				progname, atoi(buf), buf+8);
 #else
-			sprintf (msg, "\n%s: Already started pid=[%d] on %s",
+			error_message ("\n%s: Already started pid=[%d] on %s",
 				progname, atoi(buf), buf+8);
 #endif
-			error_message (msg, "");
 			exit (1);
 		}
 	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
@@ -1606,13 +1562,11 @@ strfquote (
 	char tbuf[PATH_LEN];
 	int i, j, iflag;
 
-	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0) {
+	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
-	}
 
-	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize) {
+	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize)
 		return 0;
-	}
 
 	for (; *format && s < endp - 1; format++) {
 		tbuf[0] = '\0';
@@ -1658,7 +1612,7 @@ strfquote (
 					strcpy (tbuf, arts[respnum].from);
 					break;
 				case 'D':	/* Articles Date */
-					strcpy(tbuf, note_h_date);
+					strcpy(tbuf, note_h.date);
 					break;
 				case 'F':	/* Articles Address+Name */
 					if (arts[respnum].name) {
@@ -1690,7 +1644,7 @@ strfquote (
 					tbuf[j] = '\0';
 					break;
 				case 'M':	/* Articles MessageId */
-					strcpy (tbuf, note_h_messageid);
+					strcpy (tbuf, note_h.messageid);
 					break;
 				case 'N':	/* Articles Name of author */
 					if (arts[respnum].name != (char *) 0) {
@@ -1756,13 +1710,11 @@ strfeditor (
 	char tbuf[PATH_LEN];
 	int i;
 
-	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0) {
+	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
-	}
 
-	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize) {
+	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize)
 		return 0;
-	}
 
 	for (; *format && s < endp - 1; format++) {
 		tbuf[0] = '\0';
@@ -1876,13 +1828,11 @@ strfpath (
 	struct passwd *pwd;
 #endif
 
-	if (str == (char *) 0 || format == (char *) 0 || maxsize == 0) {
+	if (str == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
-	}
 
-	if (strlen (format) + 1 >= maxsize) {
+	if (strlen (format) + 1 >= maxsize)
 		return 0;
-	}
 
 	for (; *format && str < endp - 1; format++) {
 		tbuf[0] = '\0';
@@ -2069,12 +2019,9 @@ strfpath (
 
 	if (str < endp && *format == '\0') {
 		*str = '\0';
-/*
-clear_message ();
-my_printf ("!!!format=[%s]  path=[%s]", startp, start);
-my_flush ();
-sleep (2);
-*/
+#if 0
+	wait_message (2, "!!!format=[%s]  path=[%s]", startp, start);
+#endif
 		return (str - start);
 	} else {
 		str[0] = '\0';
@@ -2160,13 +2107,11 @@ strfmailer (
 	char tbuf[PATH_LEN];
 	int i, quote_area = no_quote;
 
-	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0) {
+	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
-	}
 
-	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize) {
+	if (strchr (format, '%') == (char *) 0 && strlen (format) + 1 >= maxsize)
 		return 0;
-	}
 
 	for (; *format && s < endp - 1; format++) {
 		tbuf[0] = '\0';
@@ -2257,7 +2202,6 @@ out:
  * get_initials() - get initial letters of a posters name
  *
  */
-
 int
 get_initials (
 	int respnum,
@@ -2268,15 +2212,14 @@ get_initials (
 	int i, j;
 	int iflag;
 
-	if (s == (char *) 0 || maxsize == 0) {
+	if (s == (char *) 0 || maxsize == 0)
 		return 0;
-	}
 
-	if (arts[respnum].name != (char *) 0) {
+	if (arts[respnum].name != (char *) 0)
 		strcpy (tbuf, arts[respnum].name);
-	} else {
+	else
 		strcpy (tbuf, arts[respnum].from);
-	}
+
 	iflag = 0;
 	j = 0;
 	for (i=0; tbuf[i] && j < maxsize-1; i++) {
@@ -2289,10 +2232,8 @@ get_initials (
 			iflag = 0;
 	}
 	s[j] = '\0';
-
 	return 0;
 }
-
 
 
 void get_cwd (
@@ -2333,9 +2274,9 @@ make_group_path (
 	ptr = path;
 
 	while (*ptr) {
-		if (*ptr == '.') {
+		if (*ptr == '.')
 			*ptr = '/';
-		}
+
 		ptr++;
 	}
 #endif
@@ -2428,14 +2369,11 @@ iCopyFile (
 				iWriteSize = (size_t) (lCurFilePos - lSrcFilePos);
 				lSrcFilePos = lCurFilePos;
 				if ((iWriteOk = fwrite (acBuffer, iWriteSize, 1, hFpDst)) == -1)
-				{
 					break;
-				}
 			}
 			if (iReadOk != -1 && iWriteOk != -1)
-			{
 				iRetCode = TRUE;
-			}
+
 			fclose (hFpDst);
 		}
 		fclose (hFpSrc);
@@ -2564,8 +2502,8 @@ read_input_history_file (void) {
 	if ((fp = fopen(local_input_history_file, "r")) == NULL)
 		return;
 
-        if (SHOW_UPDATE)
-		wait_message (txt_reading_input_history_file);
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_input_history_file);
 
 	/* to be safe ;-) */
 	memset((void *) input_history, 0, sizeof(input_history));
@@ -2607,9 +2545,9 @@ read_input_history_file (void) {
 
 	fclose(fp);
 
-        if (cmd_line) {
+	if (cmd_line)
 		printf ("\r\n");
-	}
+
 }
 
 static void
@@ -2649,8 +2587,13 @@ quote_wild(
 	char *target;
 
 	for (target = buff; *str != '\0'; str++) {
-		if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
-			*target++ = '\\';
+		if (wildcard) { /* regex */
+			if (*str == '[' || *str == ']')		/* FIXME: is that really enough? */
+				 *target++ = '\\';
+		} else {	/* wildmat */
+			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
+				*target++ = '\\';
+		}
 		*target++ = *str;
 	}
 	*target = '\0';

@@ -262,6 +262,7 @@ extern char dead_article[PATH_LEN];
 extern char dead_articles[PATH_LEN];
 extern char default_art_search[LEN];
 extern char default_author_search[LEN];
+extern char default_config_search[LEN];
 extern char default_editor_format[PATH_LEN];
 extern char default_goto_group[LEN];
 extern char default_group_search[LEN];
@@ -289,7 +290,6 @@ extern char default_shell_command[LEN];
 extern char default_sigfile[PATH_LEN];
 extern char default_signature[PATH_LEN];
 extern char default_subject_search[LEN];
-extern char error_response[];
 extern char global_attributes_file[PATH_LEN];
 extern char global_config_file[PATH_LEN];
 extern char global_filter_file[PATH_LEN];
@@ -324,21 +324,6 @@ extern char news_active_file[PATH_LEN];
 extern char news_quote_format[PATH_LEN];
 extern char newsgroups_file[PATH_LEN];
 extern char newsrc[PATH_LEN];
-extern char note_h_contentenc[HEADER_LEN];	/* Content-Transfer-Encoding: */
-extern char note_h_contenttype[HEADER_LEN];	/* Content-Type: */
-extern char note_h_date[HEADER_LEN];			/* Date:	*/
-extern char note_h_distrib[HEADER_LEN];		/* Distribution: */
-extern char note_h_followup[HEADER_LEN];		/* Followup-To: */
-extern char note_h_from[HEADER_LEN];			/* From: */
-extern char note_h_keywords[HEADER_LEN];		/* Keywords: */
-extern char note_h_messageid[HEADER_LEN];		/* Message-ID:	*/
-extern char note_h_mimeversion[HEADER_LEN];	/* Mime-Version: */
-extern char note_h_newsgroups[HEADER_LEN];	/* Newsgroups:	*/
-extern char note_h_org[HEADER_LEN];				/* Organization: */
-extern char note_h_path[HEADER_LEN];			/* Path:	*/
-extern char note_h_references[HEADER_LEN];	/* References:	*/
-extern char note_h_subj[HEADER_LEN];			/* Subject:	*/
-extern char note_h_summary[HEADER_LEN];		/* Summary: */
 extern char novrootdir[PATH_LEN];
 extern char page_header[LEN];
 extern char post_proc_command[PATH_LEN];
@@ -378,15 +363,12 @@ extern constext *txt_wildcard[];
 extern constext txt_1_resp[];
 extern constext txt_7bit[];
 extern constext txt_8bit[];
-extern constext txt_abort_indexing[];
-extern constext txt_abort_searching[];
 extern constext txt_active_file_is_empty[];
 extern constext txt_added_groups[];
 extern constext txt_all_groups[];
 extern constext txt_append_overwrite_quit[];
 extern constext txt_art_cancel[];
 extern constext txt_art_cannot_cancel[];
-extern constext txt_art_marked_as_unread[];
 extern constext txt_art_newsgroups[];
 extern constext txt_art_not_posted[];
 extern constext txt_art_not_saved[];
@@ -399,6 +381,7 @@ extern constext txt_art_unavailable[];
 extern constext txt_art_parent_none[];
 extern constext txt_art_parent_unavail[];
 extern constext txt_article_cancelled[];
+extern constext txt_article_cannot_open[];
 extern constext txt_article_reposted1[];
 extern constext txt_article_reposted2a[];
 extern constext txt_article_reposted2b[];
@@ -427,6 +410,7 @@ extern constext txt_cannot_get_term_entry[];
 extern constext txt_cannot_open[];
 extern constext txt_cannot_open_active_file[];
 extern constext txt_cannot_post[];
+extern constext txt_cannot_post_group[];
 extern constext txt_cannot_write_index[];
 extern constext txt_cannot_write_to_directory[];
 extern constext txt_catchup_all_read_groups[];
@@ -442,7 +426,6 @@ extern constext txt_color_on[];
 extern constext txt_command_failed_s[];
 extern constext txt_connecting[];
 extern constext txt_connecting_port[];
-extern constext txt_connection_to_server_broken[];
 extern constext txt_continue[];
 extern constext txt_copyright_notice[];
 extern constext txt_creating_active[];
@@ -530,6 +513,7 @@ extern constext txt_help_ctrl_l[];
 extern constext txt_help_d[];
 extern constext txt_help_dash[];
 extern constext txt_help_display_mime_header_asis[];
+extern constext txt_help_display_mime_allheader_asis[];
 extern constext txt_help_draw_arrow_mark[];
 extern constext txt_help_e[];
 extern constext txt_help_editor_format[];
@@ -564,7 +548,6 @@ extern constext txt_help_group_catchup_on_exit[];
 extern constext txt_help_groupname_max_length[];
 extern constext txt_help_h[];
 extern constext txt_help_hash[];
-extern constext txt_help_highlight_xcommentto[];
 extern constext txt_help_i[];
 extern constext txt_help_i_caret_dollar[];
 extern constext txt_help_i_coma[];
@@ -591,8 +574,10 @@ extern constext txt_help_mailer_format[];
 extern constext txt_help_mark_saved_read[];
 extern constext txt_help_mm_charset[];
 extern constext txt_help_n[];
+extern constext txt_help_news_headers_to_display[];
+extern constext txt_help_news_headers_to_not_display[];
 extern constext txt_help_news_quote_format[];
-extern constext txt_help_no_advertising[];
+extern constext txt_help_advertising[];
 extern constext txt_help_o[];
 extern constext txt_help_p_S[];
 extern constext txt_help_p_caret_dollar[];
@@ -688,6 +673,7 @@ extern constext txt_info_add_select[];
 extern constext txt_info_do_postpone[];
 extern constext txt_info_postponed[];
 extern constext txt_info_nopostponed[];
+extern constext txt_info_not_subscribed[];
 extern constext txt_invalid_from[];
 extern constext txt_inverse_off[];
 extern constext txt_inverse_on[];
@@ -712,6 +698,7 @@ extern constext txt_mailing_to[];
 extern constext txt_mark_all_read[];
 extern constext txt_mark_group_read[];
 extern constext txt_mark_thread_read[];
+extern constext txt_marked_as_unread[];
 extern constext txt_matching_cmd_line_groups[];
 extern constext txt_mini_group_1[];
 extern constext txt_mini_group_2[];
@@ -737,6 +724,7 @@ extern constext txt_no[];
 extern constext txt_no_arts[];
 extern constext txt_no_arts_posted[];
 extern constext txt_no_command[];
+extern constext txt_no_description[];
 extern constext txt_no_filename[];
 extern constext txt_no_group[];
 extern constext txt_no_groups[];
@@ -783,6 +771,7 @@ extern constext txt_opt_catchup_read_groups[];
 extern constext txt_opt_confirm_action[];
 extern constext txt_opt_confirm_to_quit[];
 extern constext txt_opt_display_mime_header_asis[];
+extern constext txt_opt_display_mime_allheader_asis[];
 extern constext txt_opt_draw_arrow_mark[];
 extern constext txt_opt_editor_format[];
 extern constext txt_opt_filter_days[];
@@ -790,7 +779,6 @@ extern constext txt_opt_force_screen_redraw[];
 extern constext txt_opt_full_page_scroll[];
 extern constext txt_opt_group_catchup_on_exit[];
 extern constext txt_opt_groupname_max_length[];
-extern constext txt_opt_highlight_xcommentto[];
 extern constext txt_opt_inverse_okay[];
 extern constext txt_opt_keep_posted_articles[];
 extern constext txt_opt_mail_8bit_header[];
@@ -800,8 +788,10 @@ extern constext txt_opt_maildir[];
 extern constext txt_opt_mailer_format[];
 extern constext txt_opt_mark_saved_read[];
 extern constext txt_opt_mm_charset[];
+extern constext txt_opt_news_headers_to_display[];
+extern constext txt_opt_news_headers_to_not_display[];
 extern constext txt_opt_news_quote_format[];
-extern constext txt_opt_no_advertising[];
+extern constext txt_opt_advertising[];
 extern constext txt_opt_pos_first_unread[];
 extern constext txt_opt_post_8bit_header[];
 extern constext txt_opt_post_mime_encoding[];
@@ -878,18 +868,13 @@ extern constext txt_quit_edit_postpone[];
 extern constext txt_quit_no_write[];
 extern constext txt_quoted_printable[];
 extern constext txt_read_resp[];
-extern constext txt_reading_all_arts[];
-extern constext txt_reading_all_groups[];
 extern constext txt_reading_article[];
+extern constext txt_reading_arts[];
 extern constext txt_reading_attributes_file[];
 extern constext txt_reading_config_file[];
 extern constext txt_reading_filter_file[];
-extern constext txt_reading_global_attributes_file[];
-extern constext txt_reading_global_config_file[];
-extern constext txt_reading_global_filter_file[];
+extern constext txt_reading_groups[];
 extern constext txt_reading_input_history_file[];
-extern constext txt_reading_new_arts[];
-extern constext txt_reading_new_groups[];
 extern constext txt_reading_news_active_file[];
 extern constext txt_reading_news_newsrc_file[];
 extern constext txt_reading_newsgroups_file[];
@@ -905,7 +890,7 @@ extern constext txt_reset_newsrc[];
 extern constext txt_resp_redirect[];
 extern constext txt_resp_to_poster[];
 extern constext txt_resp_x_of_n[];
-extern constext txt_s_at_s[];
+extern constext txt_at_s[];
 extern constext txt_save_config[];
 extern constext txt_save_filename[];
 extern constext txt_saved[];
@@ -937,7 +922,6 @@ extern constext txt_select_time[];
 extern constext txt_server_name_in_file_env_var[];
 extern constext txt_shell_escape[];
 extern constext txt_skipping_newgroups[];
-extern constext txt_stuff_nntp_cannot_open[];
 extern constext txt_subj_line_only[];
 extern constext txt_subj_line_only_case[];
 extern constext txt_subscribe_pattern[];
@@ -955,7 +939,6 @@ extern constext txt_there_is_no_news[];
 extern constext txt_thread_com[];
 extern constext txt_thread_marked_as_deselected[];
 extern constext txt_thread_marked_as_selected[];
-extern constext txt_thread_marked_as_unread[];
 extern constext txt_thread_not_saved[];
 extern constext txt_thread_page[];
 extern constext txt_thread_resp_page[];
@@ -988,6 +971,7 @@ extern constext txt_tinrc_default_savedir[];
 extern constext txt_tinrc_default_sigfile[];
 extern constext txt_tinrc_defaults[];
 extern constext txt_tinrc_display_mime_header_asis[];
+extern constext txt_tinrc_display_mime_allheader_asis[];
 extern constext txt_tinrc_draw_arrow[];
 extern constext txt_tinrc_filter[];
 extern constext txt_tinrc_force_screen_redraw[];
@@ -995,7 +979,6 @@ extern constext txt_tinrc_full_page_scroll[];
 extern constext txt_tinrc_group_catchup_on_exit[];
 extern constext txt_tinrc_groupname_max_length[];
 extern constext txt_tinrc_header[];
-extern constext txt_tinrc_highlight_xcommentto[];
 extern constext txt_tinrc_inverse_okay[];
 extern constext txt_tinrc_keep_posted_articles[];
 extern constext txt_tinrc_mail_8bit_header[];
@@ -1005,7 +988,7 @@ extern constext txt_tinrc_mm_charset[];
 extern constext txt_tinrc_motd_file_info[];
 extern constext txt_tinrc_newnews[];
 extern constext txt_tinrc_news_quote_format[];
-extern constext txt_tinrc_no_advertising[];
+extern constext txt_tinrc_advertising[];
 extern constext txt_tinrc_pos_first_unread[];
 extern constext txt_tinrc_post_8bit_header[];
 extern constext txt_tinrc_post_mime_encoding[];
@@ -1046,8 +1029,7 @@ extern constext txt_tinrc_use_mailreader_i[];
 extern constext txt_tinrc_use_mouse[];
 extern constext txt_tinrc_wildcard[];
 extern constext txt_toggled_rot13[];
-extern constext txt_toggled_tex2iso_off[];
-extern constext txt_toggled_tex2iso_on[];
+extern constext txt_toggled_tex2iso[];
 extern constext txt_type_h_for_help[];
 extern constext txt_unlimited_time[];
 extern constext txt_unsubscribe_pattern[];
@@ -1072,6 +1054,7 @@ extern constext txt_warn_sig_too_long[];
 extern constext txt_warn_suspicious_mail[];
 extern constext txt_warn_update[];
 extern constext txt_warn_wrong_sig_format[];
+extern constext txt_warn_xref_not_supported[];
 extern constext txt_writing_attributes_file[];
 extern constext txt_x_resp[];
 extern constext txt_xpost_quote[];
@@ -1123,11 +1106,9 @@ extern int max_art;
 extern int max_from;
 extern int max_newnews;
 extern int max_save;
-extern int max_spooldir;
 extern int num_headers_to_display;
 extern int num_headers_to_not_display;
 extern int max_subj;
-extern int note_end;					/* end of article ? */
 extern int note_line;
 extern int note_page;				/* what page we're on */
 extern int num_active;
@@ -1136,7 +1117,6 @@ extern int num_of_killed_arts;
 extern int num_of_selected_arts;
 extern int num_of_tagged_arts;
 extern int num_save;
-extern int num_spooldir;
 extern int post_mime_encoding;
 extern int process_id;
 extern int real_gid;
@@ -1144,7 +1124,6 @@ extern int real_uid;
 extern int real_umask;
 extern int reread_active_file;
 extern int reread_active_file_secs;
-extern int reread_active_for_posted_arts;
 extern int show_subject;
 extern int space_mode;
 extern int start_line_offset;
@@ -1153,6 +1132,7 @@ extern int system_status;
 extern int tex2iso_supported;
 extern int this_resp;
 extern int thread_basenote;
+extern int tin_errno;
 extern int tin_gid;
 extern int tin_uid;
 extern int top;
@@ -1165,6 +1145,7 @@ extern int xrow;
 extern long *base;
 extern long head_next;
 extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
+extern long mark_body;					/* ftell on beginning of body */
 extern long note_size;
 
 extern struct passwd *myentry;
@@ -1172,12 +1153,12 @@ extern struct t_article *arts;
 extern struct t_attribute glob_attributes;
 extern struct t_filters glob_filter;
 extern struct t_group *active;
+extern struct t_header note_h;
 extern struct t_newnews *newnews;
 extern struct t_option option_table[];
 extern struct t_posted *posted;
 extern struct t_save *save;
-extern struct t_spooldir *spooldirs;
-
+extern t_bool advertising;
 extern t_bool alternative_handling;
 extern t_bool auto_bcc;
 extern t_bool auto_cc;
@@ -1203,12 +1184,12 @@ extern t_bool default_filter_select_global;
 extern t_bool default_show_only_unread;
 extern t_bool delete_index_file;
 extern t_bool display_mime_header_asis;
+extern t_bool display_mime_allheader_asis;
 extern t_bool draw_arrow_mark;
 extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;
 extern t_bool got_sig_pipe;
 extern t_bool group_catchup_on_exit;
-extern t_bool highlight_xcommentto;
 extern t_bool inverse_okay;
 extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
 extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
@@ -1217,7 +1198,7 @@ extern t_bool mail_news;
 extern t_bool mail_news_to_posted;
 extern t_bool mark_saved_read;
 extern t_bool newsrc_active;
-extern t_bool no_advertising;
+extern t_bool note_end;					/* end of article ? */
 extern t_bool pos_first_unread;
 extern t_bool post_8bit_header;
 extern t_bool post_article_and_exit;
@@ -1231,6 +1212,7 @@ extern t_bool quote_signatures;
 extern t_bool read_local_newsgroups_file;
 extern t_bool read_news_via_nntp;
 extern t_bool read_saved_news;
+extern t_bool reread_active_for_posted_arts;
 extern t_bool save_news;
 extern t_bool save_to_mmdf_mailbox;
 extern t_bool show_description;
@@ -1250,7 +1232,7 @@ extern t_bool tab_after_X_selection;
 extern t_bool tab_goto_next_unread;
 extern t_bool thread_catchup_on_exit;
 extern t_bool unlink_article;
-extern t_bool update;
+extern t_bool batch_mode;
 extern t_bool update_fork;
 extern t_bool use_builtin_inews;
 extern t_bool use_keypad;
@@ -1280,7 +1262,8 @@ extern time_t new_newnews_time;
 #define HIST_SELECT_PATTERN	14
 #define HIST_SHELL_COMMAND	15
 #define HIST_SUBJECT_SEARCH	16
-#define HIST_MAXNUM		17	/* must always be the same as the highest HIST_ value! */
+#define HIST_CONFIG_SEARCH	17
+#define HIST_MAXNUM		18	/* must always be the same as the highest HIST_ value! */
 
 extern int hist_last[HIST_MAXNUM+1];
 extern int hist_pos[HIST_MAXNUM+1];
@@ -1330,6 +1313,7 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_help_col_markstar[];
 	extern constext txt_help_col_message[];
 	extern constext txt_help_col_minihelp[];
+	extern constext txt_help_col_newsheaders[];
 	extern constext txt_help_col_normal[];
 	extern constext txt_help_col_quote[];
 	extern constext txt_help_col_response[];
@@ -1350,6 +1334,7 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_opt_col_markstar[];
 	extern constext txt_opt_col_message[];
 	extern constext txt_opt_col_minihelp[];
+	extern constext txt_opt_col_newsheaders[];
 	extern constext txt_opt_col_normal[];
 	extern constext txt_opt_col_quote[];
 	extern constext txt_opt_col_response[];
@@ -1380,8 +1365,7 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_tinrc_use_color[];
 	extern constext txt_tinrc_word_h_display_marks[];
 	extern constext txt_tinrc_word_highlight[];
-	extern constext txt_toggled_high_off[];
-	extern constext txt_toggled_high_on[];
+	extern constext txt_toggled_high[];
 	extern int col_back;
 	extern int col_from;
 	extern int col_head;
@@ -1408,7 +1392,6 @@ extern constext txt_opt_mail_address[];
 	extern t_bool use_color_tinrc;
 	extern t_bool word_highlight_tinrc;
 #	if 0 /* unused */
-	extern constext txt_help_col_newsheaders[];
 	extern constext txt_tinrc_col_markdash[];
 #	endif /* 0 */
 #endif /* HAVE_COLOR */
@@ -1490,10 +1473,6 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_tinrc_keep_dead_articles[];
 #endif /* M_UNIX */
 
-#ifdef NNTP_ABLE
-	extern int get_server_nolf;
-#endif /* NNTP_ABLE */
-
 #ifndef NO_SHELL_ESCAPE
 	extern constext txt_help_shell[];
 #endif /* NO_SHELL_ESCAPE */
@@ -1503,14 +1482,15 @@ extern constext txt_opt_mail_address[];
 #endif /* !USE_CURSES */
 
 #if 0 /* unused */
+extern constext txt_abort_indexing[];
+extern constext txt_abort_searching[];
+extern constext txt_connection_to_server_broken[];
 extern constext txt_help_cr[];
 extern constext txt_help_g_c[];
 extern constext txt_help_g_l[];
 extern constext txt_help_space_toggles[];
 extern constext txt_help_t_K[];
 extern constext txt_help_t_tab[];
-extern constext txt_mini_spooldir_1[];
-extern constext txt_opt_col_newsheaders[];
 extern constext txt_tinrc_mail_mime_encoding[];
 extern constext txt_tinrc_mail_quote_format[];
 extern constext txt_tinrc_thread_catchup_on_exit[];

@@ -207,28 +207,22 @@ invoke_pgp_mail (
 		info_message(txt_pgp_not_avail);
 		return;
 	}
-	do {
-		sprintf(msg, "%s%c", txt_pgp_mail, ch_default);
-		wait_message(msg);
-		MoveCursor(cLINES, (int) strlen(txt_pgp_mail));
-		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
-			ch = ch_default;
-	} while (!strchr("beqs\033", ch));
+	ch = prompt_slk_response(ch_default, "beqs\033", txt_pgp_mail);
 	switch (ch) {
-		case 'b':
-			do_pgp(SIGN | ENCRYPT, nam, mail_to);
-			break;
-
-		case 'e':
-			do_pgp(ENCRYPT, nam, mail_to);
-			break;
-
 		case '\033':
 		case 'q':
 			break;
 
 		case 's':
 			do_pgp(SIGN, nam, NULL);
+			break;
+
+		case 'b':
+			do_pgp(SIGN | ENCRYPT, nam, mail_to);
+			break;
+
+		case 'e':
+			do_pgp(ENCRYPT, nam, mail_to);
 			break;
 
 		default:
@@ -246,13 +240,7 @@ invoke_pgp_news(
 		info_message(txt_pgp_not_avail);
 		return;
 	}
-	do {
-		sprintf(msg, "%s%c", txt_pgp_news, ch_default);
-		wait_message(msg);
-		MoveCursor(cLINES, (int) strlen(txt_pgp_news));
-		if ((ch = (char) ReadCh()) == '\n' || ch == '\r')
-			ch = ch_default;
-	} while (!strchr("iqs\033", ch));
+	ch = prompt_slk_response(ch_default, "iqs\033", txt_pgp_news);
 	switch (ch) {
 		case '\033':
 		case 'q':
@@ -288,11 +276,10 @@ pgp_check_article(void)
 	sprintf (the_article+strlen(the_article), ".%d", process_id);
 #endif /* APPEND_PID */
 	if ((art = fopen(article, "w")) == (FILE *) 0) {
-		sprintf(buf, txt_cannot_open, the_article);
-		info_message(buf);
+		info_message(txt_cannot_open, the_article);
 		return (0);
 	}
-	fseek(note_fp, note_mark[0], SEEK_SET);
+	fseek(note_fp, mark_body, SEEK_SET);
 	fgets(buf, LEN, note_fp);
 	while (!feof(note_fp)) {
 		if (!strcmp(buf, PGP_SIG_TAG))

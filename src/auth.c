@@ -46,7 +46,7 @@ authinfo_generic (void)
 #ifdef HAVE_PUTENV
 	char *new_env;
 	static char *old_env = 0;
-#endif /* HAVE_PUTENV */
+#endif
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "authinfo generic");
@@ -56,16 +56,15 @@ authinfo_generic (void)
 	 * If we have authenticated before, NNTP_AUTH_FDS already
 	 * exists, pull out the cookiefd. Just in case we've nested.
 	 */
-	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS"))) {
+	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS")))
 	    sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
-	}
 
 	if (cookiefd == -1) {
 		char tempfile[BUFSIZ];
 
 		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);
 		if (!mktemp (tempfile)) {
-			error_message (txt_cannot_create_uniq_name, "");
+			error_message (txt_cannot_create_uniq_name);
 #ifdef DEBUG
 			debug_nntp ("authorization", txt_cannot_create_uniq_name);
 #endif
@@ -81,37 +80,33 @@ authinfo_generic (void)
 		cookiefd = fileno (fp);
 	}
 
-	strcpy (tmpbuf, "authinfo generic ");
+	strcpy (tmpbuf, "AUTHINFO GENERIC ");
 	strcpy (authval, get_val ("NNTPAUTH", ""));
-	if (strlen (authval)) {
+	if (strlen (authval))
 		strcat (tmpbuf, authval);
-	} else {
-		strcat (tmpbuf, "any ");
+	else {
+		strcat (tmpbuf, "ANY ");
 		strcat (tmpbuf, userid);
 		builtinauth = TRUE;
 	}
 	put_server (tmpbuf);
 
 #ifdef HAVE_PUTENV
-	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d",
-		fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
+	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
 	new_env = my_malloc (strlen (tmpbuf) + 1);
 	strcpy (new_env, tmpbuf);
- 	putenv (new_env);
+	putenv (new_env);
 	FreeIfNeeded (old_env);
 	old_env = new_env;
 #else
-	sprintf (tmpbuf, "%d.%d.%d",
-		fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
+	sprintf (tmpbuf, "%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
-#endif /* HAVE_PUTENV */
+#endif
 
-	if (!builtinauth) {
-		return (invoke_cmd (authval));
-	} else {
-		get_server (tmpbuf, sizeof(tmpbuf));
-		return (atoi (tmpbuf) == OK_AUTH);
-	}
+	if (!builtinauth)
+		return (invoke_cmd (authval));	/* TODO - is it possible that we should have drained server here ? */
+	else
+		return (get_respcode(NULL) == OK_AUTH);
 }
 
 /*
@@ -223,16 +218,13 @@ do_authinfo_original (
 	char line[PATH_LEN];
 	int ret;
 
-	sprintf (line, "authinfo user %s", authuser);
-	put_server (line);
-	get_server (line, PATH_LEN);
+	sprintf (line, "AUTHINFO USER %s", authuser);
 #ifdef DEBUG
 	debug_nntp ("authorization", line);
 #endif
-	ret = atoi (line);
-	if (ret != NEED_AUTHDATA) {
+	put_server (line);
+	if ((ret = get_respcode(NULL)) != NEED_AUTHDATA)
 		return ret;
-	}
 
 	if ((authpass == (char *) 0) || (*authpass == '\0')) {
 #ifdef DEBUG
@@ -242,19 +234,15 @@ do_authinfo_original (
 		return ERR_AUTHBAD;
 	}
 
-	sprintf (line, "authinfo pass %s", authpass);
-	put_server (line);
-	get_server (line, PATH_LEN);
+	sprintf (line, "AUTHINFO PASS %s", authpass);
 #ifdef DEBUG
 	debug_nntp ("authorization", line);
 #endif
-	ret = atoi (line);
-	if (ret == OK_AUTH) {
-		sprintf (line, txt_authorization_ok, authuser);
-	}else{
-		sprintf (line, txt_authorization_fail, authuser);
-	}
-	wait_message (line);
+	put_server (line);
+	if ((ret = get_respcode(line)) == OK_AUTH)
+		wait_message(2, txt_authorization_ok, authuser);
+	else
+		wait_message(2, txt_authorization_fail, authuser);
 	return ret;
 }
 
@@ -275,12 +263,12 @@ authinfo_original (
 	char *authuser,
 	t_bool startup)
 {
+	char *authpass, *ptr;
+	char authusername[PATH_LEN] = "";
+	char authpassword[PATH_LEN] = "";
+	int ret = ERR_AUTHBAD, changed;
 	static char last_server[PATH_LEN] = "";
 	static t_bool already_failed = FALSE;
-	char *authpass, *ptr;
-	int ret = ERR_AUTHBAD, changed;
-	char authusername[PATH_LEN];
-	char authpassword[PATH_LEN];
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "original authinfo");
@@ -303,9 +291,7 @@ authinfo_original (
 	 * and restart tin or change to another server and back in order to get
 	 * it read again.
 	 */
-	if ((changed = strcmp (server, last_server)) ||
-		((!changed) && (!already_failed)))
-	{
+	if ((changed = strcmp (server, last_server)) || ((!changed) && (!already_failed))) {
 		already_failed = FALSE;
 		if (read_newsauth_file (server, authuser, authpass)) {
 			ret = do_authinfo_original (server, authuser, authpass);
@@ -368,5 +354,4 @@ authenticate (
 }
 #else
 static void no_authenticate (void) { }
-
-#endif /* !INDEX_DAEMON || NNTP_ABLE */
+#endif

@@ -20,10 +20,12 @@
 static mode_t newsrc_mode = 0;
 
 /*
-** Local prototypes
-*/
-static char *getaline (FILE *fp);
-static char *pcParseNewsrcLine (char *line, char *grp, int *sub);
+ * Local prototypes
+ */
+static char *pcParseNewsrcLine (char *line, int *sub);
+#if 0
+	static char *pcParseNewsrcLine (char *line, char *grp, int *sub);
+#endif /* 0 */
 static char *pcParseSubSeq (struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum);
 static char *pcParseGetSeq (char *pcSeq, long *plLow, long *plHigh);
 static void auto_subscribe_groups (char *newsrc_file);
@@ -45,13 +47,12 @@ read_newsrc (
 	char *newsrc_file,
 	int allgroups)
 {
-	char *line;
-	char *seq;
-	char grp[HEADER_LEN];
 	FILE *fp;
+	char *grp, *seq;
+	char buf[HEADER_LEN];
 	int sub;
 	int i;
-	struct stat buf;
+	struct stat statbuf;
 
 	if (allgroups)
 		group_top = skip_newgroups();
@@ -64,16 +65,15 @@ read_newsrc (
 		auto_subscribe_groups (newsrc_file);
 	}
 
-	if (stat (newsrc_file, &buf) == 0) {
-		newsrc_mode = (mode_t) buf.st_mode;
-	}
+	if (stat (newsrc_file, &statbuf) == 0)
+		newsrc_mode = (mode_t) statbuf.st_mode;
 
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
-		if (SHOW_UPDATE)
-			wait_message (txt_reading_newsrc);
+		if (INTERACTIVE)
+			wait_message (0, txt_reading_newsrc);
 
-		while ((line = getaline (fp)) != (char *) 0) {
-			seq = pcParseNewsrcLine (line, grp, &sub);
+		while ((grp = tin_fgets (buf, sizeof(buf), fp)) != (char *) 0) {
+			seq = pcParseNewsrcLine (grp, &sub);
 
 			if (sub == SUBSCRIBED) {
 				if ((i = my_group_add (grp)) >= 0) {
@@ -81,13 +81,13 @@ read_newsrc (
 						active[my_group[i]].subscribed = SUB_BOOL(sub);
 						parse_bitmap_seq (&active[my_group[i]], seq);
 					}
-				} else {
+				} else
 					process_bogus(grp);
-				}
 			}
-			free (line);
 		}
 		fclose (fp);
+		/* If you aborted with 'q', then you get what you get. */
+
 		if (cmd_line) {
 			my_fputc ('\n', stdout);
 			my_flush ();
@@ -101,36 +101,35 @@ vWriteNewsrcLine (
 	FILE *fp,
 	char *line)
 {
-	char grp[HEADER_LEN];
 	char *seq;
 	int sub;
 	struct t_group *psGrp;
 
-	seq = pcParseNewsrcLine (line, grp, &sub);
-	if (grp[0] == 0 || sub == 0)		/* Insurance against blank line */
+	seq = pcParseNewsrcLine (line, &sub);
+
+	if (line[0] == 0 || sub == 0)		/* Insurance against blank line */
 		return;
 
 	/*
 	 * Find the group in active. If we cannot, then junk it if bogus groups
-     * are set to auto removal. Also check for bogus flag just in case
-     * strip_bogus was changed since tin started
+	 * are set to auto removal. Also check for bogus flag just in case
+	 * strip_bogus was changed since tin started
 	 */
-	psGrp = psGrpFind (grp);
+	psGrp = psGrpFind (line);
 
 	if (strip_bogus == BOGUS_REMOVE) {
 		if (psGrp == NULL || psGrp->bogus) {
-			my_printf(txt_remove_bogus, grp);		/* TODO this gets cleared */
-			my_printf("\n");
+			wait_message(1, txt_remove_bogus, line);
 			return;
 		}
 	}
 
- 	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
+	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
 	} else {
- 		if (sub == SUBSCRIBED || !strip_newsrc)
- 			fprintf (fp, "%s%c %s\n", grp, sub, seq);
+		if (sub == SUBSCRIBED || !strip_newsrc)
+			fprintf (fp, "%s%c %s\n", line, sub, seq);
 	}
 }
 
@@ -142,9 +141,10 @@ void
 vWriteNewsrc (void)
 {
 #ifndef INDEX_DAEMON
-	char *line;
 	FILE *fp_ip;
 	FILE *fp_op;
+	char *line;
+	char buf[HEADER_LEN];
 	int rename_ok = FALSE;
 
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
@@ -154,26 +154,25 @@ vWriteNewsrc (void)
 		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
 
-		while ((line = getaline (fp_ip)) != (char *) 0) {
+		while ((line = tin_fgets (buf, sizeof(buf), fp_ip)) != (char *) 0)
 			vWriteNewsrcLine(fp_op,line);
-			free (line);
-		}
 
 		/*
 		 * Don't rename if either fclose() fails or ferror() is set
 		 */
 		if (ferror (fp_op) | fclose (fp_op)) {
+/* TODO return here and give user chance to try again */
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
-		} else {
+		} else
 			rename_ok = TRUE;
-		}
 	}
 
 	fclose (fp_ip);
 
 	if (rename_ok)
 		rename_file (newnewsrc, newsrc);
+
 #endif	/* INDEX_DAEMON */
 }
 
@@ -189,62 +188,59 @@ create_newsrc (
 	register int i;
 
 	if ((fp = fopen (newsrc_file, "w")) != (FILE *) 0) {
-		wait_message (txt_creating_newsrc);
+		wait_message (0, txt_creating_newsrc);
 
-		for (i=0 ; i < num_active ; i++) {
+		for (i=0 ; i < num_active ; i++)
 			fprintf (fp, "%s!\n", active[i].name);
-		}
 
-		if (ferror (fp) | fclose (fp)) {
+		if (ferror (fp) | fclose (fp))
 			error_message (txt_filesystem_full, NEWSRC_FILE);
-		}
 	}
 }
 
 /*
  * Automatically subscribe user to newsgroups specified in
  * NEWSLIBDIR/subscribe (locally) or same file but from NNTP
- * server (LIST AUTOSUBSCRIBE) and create .newsrc
+ * server (LIST SUBSCRIPTIONS) and create .newsrc
  */
 
 static void
 auto_subscribe_groups (
 	char *newsrc_file)
 {
-	char *ptr, buf[HEADER_LEN];
 	FILE *fp_newsrc;
 	FILE *fp_subs;
-	struct t_group *psGrp;
+	char *ptr, buf[HEADER_LEN];
 
 	/*
 	 * If subscription file exists then first unsubscribe to all groups
 	 * and then subscribe to just the auto specified groups.
 	 */
-	if ((fp_subs = open_subscription_fp ()) != (FILE *) 0) {
-		wait_message (txt_autosubscribing_groups);
+	if ((fp_subs = open_subscription_fp ()) == (FILE *) 0)
+		return;
 
-		if ((fp_newsrc = fopen (newsrc_file, "w" FOPEN_OPTS)) != (FILE *) 0) {
-			if (newsrc_mode) {
-				chmod (newsrc_file, newsrc_mode);
-			}
-			while (fgets (buf, sizeof (buf), fp_subs) != (char *) 0) {
-				if (buf[0] != '#' && buf[0] != '\n') {
-					ptr = strrchr (buf, '\n');
-					if (ptr != (char *) 0) {
-						*ptr = '\0';
-					}
-					psGrp = psGrpFind (buf);
-					if (psGrp) {
-						fprintf (fp_newsrc, "%s:\n", buf);
-					}
-				}
-			}
-			if (ferror (fp_newsrc) | fclose (fp_newsrc)) {
-				error_message (txt_filesystem_full, NEWSRC_FILE);
-			}
+	wait_message (0, txt_autosubscribing_groups);
+
+	if ((fp_newsrc = fopen (newsrc_file, "w" FOPEN_OPTS)) == (FILE *) 0)
+		return;
+
+	if (newsrc_mode)
+		chmod (newsrc_file, newsrc_mode);
+
+/* TODO test me ! */
+	while (( ptr = tin_fgets (buf, sizeof (buf), fp_subs)) != (char *) 0) {
+		if (ptr[0] != '#') {
+			if (psGrpFind (ptr) != 0)
+				fprintf (fp_newsrc, "%s:\n", ptr);
 		}
-		fclose (fp_subs);
 	}
+
+	/* We ignore user 'q'uits here. They will get them next time in any case */
+
+	if (ferror (fp_newsrc) | fclose (fp_newsrc))
+		error_message (txt_filesystem_full, NEWSRC_FILE);
+
+	fclose (fp_subs);
 }
 
 /*
@@ -255,9 +251,9 @@ void
 backup_newsrc (void)
 {
 #ifndef INDEX_DAEMON
+	FILE *fp_ip, *fp_op;
 	char *line;
 	char buf[HEADER_LEN];
-	FILE *fp_ip, *fp_op;
 
 	if ((fp_ip = fopen (newsrc, "r")) != (FILE *) 0) {
 #if defined(WIN32)
@@ -271,13 +267,12 @@ backup_newsrc (void)
 			if (newsrc_mode)
 				chmod (buf, newsrc_mode);
 
-			while ((line = getaline (fp_ip)) != (char *) 0) {
+			while ((line = tin_fgets (buf, sizeof(buf), fp_ip)) != (char *) 0)
 				fprintf (fp_op, "%s\n", line);
-				free (line);
-			}
-			if (ferror (fp_op) | fclose (fp_op)) {
+
+			if (ferror (fp_op) | fclose (fp_op))
 				error_message (txt_filesystem_full_backup, NEWSRC_FILE);
-			}
+
 		}
 		fclose (fp_ip);
 	}
@@ -285,7 +280,7 @@ backup_newsrc (void)
 }
 
 /*
- *  Subscribe/unsubscribe to a group in .newsrc.
+ * Subscribe/unsubscribe to a group in .newsrc.
  *	This involves rewriting the .newsrc with the new info
  */
 
@@ -294,13 +289,13 @@ subscribe (
 	struct t_group *group,
 	int sub_state)
 {
-	char *line;
-	char *seq;
-	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
-	int found = FALSE;
+	char buf[HEADER_LEN];
+	char *line;
+	char *seq;
 	int sub;
+	t_bool found = FALSE;
 
 	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) == (FILE *) 0)
 		return;
@@ -310,15 +305,15 @@ subscribe (
 
 	if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
 
-		while ((line = getaline (fp)) != (char *) 0) {
+		while ((line = tin_fgets (buf, sizeof(buf), fp)) != (char *) 0) {
 
-			if (STRNCMPEQ("options ", line, 8)) {
+			if (STRNCMPEQ("options ", line, 8))
 				fprintf (newfp, "%s\n", line);
-			} else {
-				seq = pcParseNewsrcLine (line, grp, &sub);
+			else {
+				seq = pcParseNewsrcLine (line, &sub);
 
-				if (STRCMPEQ(grp, group->name)) {
- 					fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
+				if (STRCMPEQ(line, group->name)) {
+					fprintf (newfp, "%s%c %s\n", line, sub_state, seq);
 					group->subscribed = SUB_BOOL(sub_state);
 
 					/* If previously subscribed to in .newsrc, load up any existing information */
@@ -326,11 +321,9 @@ subscribe (
 						parse_bitmap_seq (group, seq);
 
 					found = TRUE;
-				} else {
-					fprintf (newfp, "%s%c %s\n", grp, sub, seq);
-				}
+				} else
+					fprintf (newfp, "%s%c %s\n", line, sub, seq);
 			}
-			free (line);
 		}
 
 		fclose (fp);
@@ -340,7 +333,7 @@ subscribe (
 			group->subscribed = SUB_BOOL(sub_state);
 
 			/* A new group - get min/max/unread counts etc. for it */
-			wait_message (txt_subscribing);
+			wait_message (0, txt_subscribing);
 
 			if (sub_state == SUBSCRIBED) {
 				char null_seq[2];
@@ -363,10 +356,10 @@ subscribe (
 void
 reset_newsrc (void)
 {
-	char *line;
-	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
+	char *line;
+	char buf[HEADER_LEN];
 	int sub;
 	long i;
 
@@ -376,24 +369,21 @@ reset_newsrc (void)
 			chmod (newnewsrc, newsrc_mode);
 
 		if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
-			while ((line = getaline (fp)) != (char *) 0) {
-				(void) pcParseNewsrcLine (line, grp, &sub);
-				fprintf (newfp, "%s%c\n", grp, sub);
-				free (line);
+			while ((line = tin_fgets (buf, sizeof(buf), fp)) != (char *) 0) {
+				(void) pcParseNewsrcLine (line, &sub);
+				fprintf (newfp, "%s%c\n", line, sub);
 			}
 			fclose (fp);
 		}
 		if (ferror (newfp) | fclose (newfp)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
-		} else {
+		} else
 			rename_file (newnewsrc, newsrc);
-		}
 	}
 
-	for (i = 0; i < group_top; i++) {
+	for (i = 0; i < group_top; i++)
 		vSetDefaultBitmap (&active[my_group[i]]);
-	}
 }
 
 /*
@@ -403,11 +393,11 @@ void
 delete_group (
 	char *group)
 {
-	char *line;
-	char *seq;
-	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
+	char *line;
+	char *seq;
+	char buf[HEADER_LEN];
 	int sub;
 
 	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
@@ -416,22 +406,21 @@ delete_group (
 			chmod (newnewsrc, newsrc_mode);
 
 		if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
-			while ((line = getaline (fp)) != (char *) 0) {
-				seq = pcParseNewsrcLine (line, grp, &sub);
+			while ((line = tin_fgets (buf, sizeof(buf), fp)) != (char *) 0) {
+				seq = pcParseNewsrcLine (line, &sub);
 
-				if (!STRCMPEQ(grp, group)) {
-					fprintf (newfp, "%s%c %s\n", grp, sub, seq);
-				}
-				free (line);
+				if (!STRCMPEQ(line, group))
+					fprintf (newfp, "%s%c %s\n", line, sub, seq);
+
 			}
 			fclose (fp);
 		}
+
 		if (ferror (newfp) | fclose (newfp)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
-		} else {
+		} else
 			rename_file (newnewsrc, newsrc);
-		}
 	}
 }
 
@@ -447,9 +436,8 @@ grp_mark_read (
 #endif
 
 	if (psArt != (struct t_article *) 0) {
-		for (i = 0; i < top; i++) {
+		for (i = 0; i < top; i++)
 			art_mark_read (group, &psArt[i]);
-		}
 	}
 	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 		free ((char *) group->newsrc.xbitmap);
@@ -483,20 +471,24 @@ grp_mark_unread (
 		&group->xmin);
 
 	bitlength = (group->xmax - group->xmin) + 1;
-	if (bitlength < 0) bitlength = 0;
-	if (bitlength > 0) {
+
+	if (bitlength < 0)
+		bitlength = 0;
+
+	if (bitlength > 0)
 		newbitmap = (t_bitmap *) my_malloc (BITS_TO_BYTES(bitlength));
-	}
-	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
+
+	if (group->newsrc.xbitmap != (t_bitmap *) 0)
 		free ((char *) group->newsrc.xbitmap);
-	}
+
 	group->newsrc.xbitmap = newbitmap;
 	group->newsrc.xbitlen = bitlength;
 	group->newsrc.num_unread = group->count;
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xmin = group->xmin;
 
-	if (bitlength) NSETRNG1(group->newsrc.xbitmap, 0L, bitlength - 1L);
+	if (bitlength)
+		NSETRNG1(group->newsrc.xbitmap, 0L, bitlength - 1L);
 
 #ifdef DEBUG_NEWSRC
 	debug_print_bitmap (group, NULL);
@@ -515,9 +507,8 @@ thd_mark_read (
 	debug_print_comment ("Mark thread read K command");
 #endif
 
-	for (i = (int) thread; i >= 0; i = arts[i].thread) {
+	for (i = (int) thread; i >= 0; i = arts[i].thread)
 		art_mark_read (group, &arts[i]);
-	}
 }
 
 
@@ -532,9 +523,8 @@ thd_mark_unread (
 	debug_print_comment ("Mark thread unread Z command");
 #endif
 
-	for (i = (int) thread; i >= 0; i = arts[i].thread) {
+	for (i = (int) thread; i >= 0; i = arts[i].thread)
 		art_mark_will_return (group, &arts[i]); /* art_mark_unread (group, &arts[i]); */
-	}
 }
 
 /*
@@ -557,38 +547,34 @@ parse_bitmap_seq (
 	 * Skip possible non-numeric prefix
 	 */
 	ptr = seq;
-	while (*ptr && (*ptr < '0' || *ptr > '9')) {
+	while (ptr && *ptr && (*ptr < '0' || *ptr > '9'))
 		ptr++;
-	}
+
 #ifdef DEBUG_NEWSRC
 	{
-	char buf[NEWSRC_LINE];
-	sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
-	debug_print_comment(buf);
-	debug_print_bitmap(group,NULL);
+		char buf[NEWSRC_LINE];
+		sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
+		debug_print_comment(buf);
+		debug_print_bitmap(group,NULL);
 	}
 #endif
-	if (*ptr) {
+	if (ptr) {
 		gotseq = TRUE;
 		ptr = pcParseGetSeq (ptr, &low, &high);
 
-		if (high < group->xmin - 1) {
+		if (high < group->xmin - 1)
 			high = group->xmin - 1;
-		}
 
-		if (high > group->xmax) {
+		if (high > group->xmax)
 			high = group->xmax;
-		}
 
-		if (low <= 1) {
+		if (low <= 1)
 			min = high + 1;
-		} else {
+		else
 			min = 1;
-		}
 
-		if (group->xmin > min) {
+		if (group->xmin > min)
 			min = group->xmin;
-		}
 
 		max = group->xmax;
 
@@ -601,26 +587,23 @@ parse_bitmap_seq (
 		group->newsrc.xmin = min;
 		group->newsrc.xbitlen = (max - min) + 1;
 		if (group->newsrc.xbitlen > 0) {
-			group->newsrc.xbitmap =
-				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
+			group->newsrc.xbitmap = (t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
 			NSETRNG1(group->newsrc.xbitmap, 0L, group->newsrc.xbitlen - 1L);
 		}
 
 		if (min <= high) {
-			if (low > min) {
+			if (low > min)
 				sum = low - min;
-			} else {
+			else
 				low = min;
-			}
 			NSETRNG0(group->newsrc.xbitmap, low - min, high - min);
 		}
 
 		/*
 		 * Pick up any additional articles/ranges after the first
 		 */
-		while (*ptr) {
+		while (*ptr)
 			ptr = pcParseSubSeq (group, ptr, &low, &high, &sum);
-		}
 	} else {
 		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 			free ((char *) group->newsrc.xbitmap);
@@ -631,29 +614,25 @@ parse_bitmap_seq (
 		group->newsrc.xmin = group->xmin;
 		group->newsrc.xbitlen = (group->xmax - group->xmin) + 1;
 		if (group->newsrc.xbitlen > 0) {
-			group->newsrc.xbitmap =
-				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
+			group->newsrc.xbitmap = (t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
 			NSETRNG1(group->newsrc.xbitmap, 0L, group->newsrc.xbitlen - 1L);
 		}
 /*
-sprintf (msg, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
+wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
 	group->name, group->xmin, group->xmax, group->newsrc.xbitlen);
-wait_message (msg);
 */
 	}
 
 	group->newsrc.present = TRUE;
 
 	if (gotseq) {
-		if (group->xmax > high) {
+		if (group->xmax > high)
 			sum += group->xmax - high;
-		}
 	} else {
-		if (group->count >= 0) {
+		if (group->count >= 0)
 			sum = (int) group->count;
-		} else {
+		else
 			sum = (int) (group->xmax - group->xmin) + 1;
-		}
 	}
 
 	group->newsrc.num_unread = sum;
@@ -700,27 +679,24 @@ pcParseSubSeq (
 	/*
 	 * check that seq is not out of order
 	 */
-	if (*plLow > lLastHigh) {
+	if (*plLow > lLastHigh)
 		*piSum += (*plLow - lLastHigh) - 1;
-	}
 
 	if (*plHigh == *plLow) {
-		if (lBitMin >= 0 && *plHigh <= psGrp->newsrc.xmax) {
+		if (lBitMin >= 0 && *plHigh <= psGrp->newsrc.xmax)
 			NSET0(psGrp->newsrc.xbitmap, lBitMin);
-		}
-	} else if ((*plLow < *plHigh) &&
-	           (*plLow <= psGrp->newsrc.xmax) &&
-	           (*plHigh >= psGrp->newsrc.xmin)) {
+	} else if ((*plLow < *plHigh) && (*plLow <= psGrp->newsrc.xmax) && (*plHigh >= psGrp->newsrc.xmin)) {
 		/*
 		 * Restrict the range to min..max
 		 */
-		if (lBitMin < 0) {
+		if (lBitMin < 0)
 			lBitMin = 0;
-		}
+
 		lBitMax = *plHigh;
-		if (lBitMax > psGrp->newsrc.xmax) {
+
+		if (lBitMax > psGrp->newsrc.xmax)
 			lBitMax = psGrp->newsrc.xmax;
-		}
+
 		lBitMax = lBitMax - psGrp->newsrc.xmin;
 
 		/*
@@ -741,22 +717,15 @@ pcParseGetSeq(
 {
 	*plLow = strtol (pcSeq, &pcSeq, 10);
 
-	if (*pcSeq == '-') {
-		/*
-		 * Range of articles
-		 */
+	if (*pcSeq == '-') {	/* Range of articles */
 		pcSeq++;
 		*plHigh = strtol (pcSeq, &pcSeq, 10);
-	} else {
-		/*
-		 * Single article
-		 */
+	} else	/* Single article */
 		*plHigh = *plLow;
-	}
 
-	while (*pcSeq && (*pcSeq < '0' || *pcSeq > '9')) {
+	while (*pcSeq && (*pcSeq < '0' || *pcSeq > '9'))
 		pcSeq++;
-	}
+
 /*
 #ifdef DEBUG_NEWSRC
 	my_printf ("Min=[%ld] Max=[%ld] Seq=[%s]\n", *plLow, *plHigh, pcSeq);
@@ -773,10 +742,10 @@ void
 parse_unread_arts (
 	struct t_group *group)
 {
+	long	unread = 0;
 	long	bitmin, bitmax;
 	register int i;
 	t_bitmap *newbitmap = (t_bitmap *)0;
-	long	unread = 0;
 
 	bitmin = group->newsrc.xmin;
 	bitmax = group->newsrc.xmax;
@@ -806,9 +775,9 @@ parse_unread_arts (
 	group->newsrc.xmin = bitmin;
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xbitlen = group->xmax - bitmin + 1;
-	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
+
+	if (group->newsrc.xbitmap != (t_bitmap *) 0)
 		free(group->newsrc.xbitmap);
-	}
 
 	group->newsrc.xbitmap = newbitmap;
 	group->newsrc.num_unread = unread;
@@ -830,9 +799,9 @@ print_bitmap_seq (
 
 	if (group->count == 0 || group->xmin > group->xmax) {
 /*		fprintf (fp, "1"); */
-		if (group->xmax > 1) {
+		if (group->xmax > 1)
 			fprintf (fp, "1-%ld", group->xmax);
-		}
+
 		fprintf (fp, "\n");
 		fflush (fp);
 #ifdef DEBUG_NEWSRC
@@ -842,45 +811,49 @@ print_bitmap_seq (
 	}
 
 	for (i = group->newsrc.xmin ; i <= group->newsrc.xmax ; i++) {
- 		if (NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ) {
-  			if (flag) {
+		if (NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ) {
+			if (flag) {
 				artnum = i;
-  				fprintf (fp, ",%ld", i);
+				fprintf (fp, ",%ld", i);
 			} else {
 				artnum = 1;
-  				flag = TRUE;
+				flag = TRUE;
 				fprintf (fp, "1");
 			}
 			i++;
-			while (i <= group->xmax && NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ) {
+
+			while (i <= group->xmax && NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ)
 				i++;
-			}
+
 			last = i - 1;
-			if (artnum != last) {
+
+			if (artnum != last)
 				fprintf (fp, "-%ld", last);
-			}
-		} else if (flag == FALSE && group->xmax) {
+
+		} else if (!flag && group->xmax) {
 			flag = TRUE;
 			if (group->newsrc.xmin > 1) {
 				fprintf (fp, "1");
-				if (group->newsrc.xmin > 2) {
+
+				if (group->newsrc.xmin > 2)
 					fprintf (fp, "-%ld", group->newsrc.xmin - 1);
-				}
+
 			}
 		}
 	}
-	if (flag == FALSE && group->newsrc.xmin) {
+	if (!flag && group->newsrc.xmin) {
 		fprintf (fp, "1");
-		if (group->newsrc.xmin > 2) {
+
+		if (group->newsrc.xmin > 2)
 			fprintf (fp, "-%ld", group->newsrc.xmin - 1);
-		}
+
 #ifdef DEBUG_NEWSRC
-		debug_print_comment ("print_bitmap_seq(): flag == FALSE && group->max > 0");
+		debug_print_comment ("print_bitmap_seq(): !flag && group->max > 0");
 #endif
 	}
 
 	fprintf (fp, "\n");
-  	fflush (fp);
+	fflush (fp);
 }
 
 
@@ -900,14 +873,15 @@ pos_group_in_newsrc (
 	char *line;
 	FILE *fp_in = NULL, *fp_out = NULL;
 	FILE *fp_sub = NULL, *fp_unsub = NULL;
-	int repositioned = FALSE;
 	int subscribed_pos = 1;
-	size_t group_len;
-	int option_line = FALSE;
 	int ret_code = FALSE;
-	int found = FALSE;
-	int newnewsrc_created = FALSE;
-	int sub_created = FALSE, unsub_created = FALSE;
+	size_t group_len;
+	t_bool found = FALSE;
+	t_bool newnewsrc_created = FALSE;
+	t_bool option_line = FALSE;
+	t_bool repositioned = FALSE;
+	t_bool sub_created = FALSE;
+	t_bool unsub_created = FALSE;
 
 	if ((fp_in = fopen (newsrc, "r")) == (FILE *) 0)
 		goto rewrite_group_done;
@@ -916,6 +890,7 @@ pos_group_in_newsrc (
 		goto rewrite_group_done;
 
 	newnewsrc_created = TRUE;
+
 	if (newsrc_mode)
 		chmod (newnewsrc, newsrc_mode);
 
@@ -926,14 +901,6 @@ pos_group_in_newsrc (
 	joinpath (buf, TMPDIR, "unsubrc");
 	sprintf (unsub, "%s.%d", buf, process_id);
 
-	if ((fp_sub = fopen (sub, "w" FOPEN_OPTS)) == (FILE *) 0) {
-		goto rewrite_group_done;
-	}
-	if ((fp_unsub = fopen (unsub, "w" FOPEN_OPTS)) == (FILE *) 0) {
-		fclose(fp_sub);
-		unlink(sub);
-		goto rewrite_group_done;
-	}
 #else /* !VMS */
 	joinpath (buf, TMPDIR, ".subrc");
 	sprintf (sub, "%s.%d", buf, process_id);
@@ -941,13 +908,16 @@ pos_group_in_newsrc (
 	joinpath (buf, TMPDIR, ".unsubrc");
 	sprintf (unsub, "%s.%d", buf, process_id);
 
-	if ((fp_sub = fopen (sub, "w")) == (FILE *) 0) {
+#endif /* !VMS */
+
+	if ((fp_sub = fopen (sub, "w" FOPEN_OPTS)) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
+
 	sub_created = TRUE;
-	if ((fp_unsub = fopen (unsub, "w")) == (FILE *) 0) {
+
+	if ((fp_unsub = fopen (unsub, "w" FOPEN_OPTS)) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
+
 	unsub_created = TRUE;
 
 	/*
@@ -955,85 +925,82 @@ pos_group_in_newsrc (
 	 */
 	group_len = strlen (group->name);
 
-	while ((line = getaline(fp_in)) != (char *) 0) {
+	while ((line = tin_fgets (buf, sizeof(buf), fp_in)) != (char *) 0) {
 		if (STRNCMPEQ(group->name, line, group_len) && line[group_len] == SUBSCRIBED) {
-			newsgroup = line;
+			newsgroup = my_strdup(line);		/* Take a copy of this line */
 			found = TRUE;
-			continue;	/* Don't free line */
+			continue;
 		} else if (strchr (line, SUBSCRIBED) != (char *) 0) {
 			vWriteNewsrcLine(fp_sub,line);
 		} else if (strchr (line, UNSUBSCRIBED) != (char *) 0) {
 			vWriteNewsrcLine(fp_unsub,line);
-		} else {	/* options line at beginning of .newsrc */
+		} else {								/* options line at beginning of .newsrc */
 			fprintf (fp_sub, "%s\n", line);
 			option_line = TRUE;
 		}
-		free(line);
 	}
 
-	if (ferror (fp_sub) | fclose (fp_sub)
-		| ferror (fp_unsub) | fclose (fp_unsub)) {
-
+	if (ferror (fp_sub) | fclose (fp_sub) | ferror (fp_unsub) | fclose (fp_unsub)) {
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 		fp_sub = fp_unsub = NULL;
 		goto rewrite_group_done;
 	}
+
 	fp_sub = fp_unsub = NULL;
 	fclose (fp_in);
 	fp_in = NULL;
 
-	if (!found) {
+	/*
+	 * The group to be moved cannot be found, so give up now
+	 */
+	if (!found)
 		goto rewrite_group_done;
-	}
-#endif /* !VMS */
 
 	/*
-	 *  write subscribed groups & position group to newnewsrc
+	 *  write subscribed groups & repositioned group to newnewsrc
 	 */
-	if ((fp_sub = fopen (sub, "r")) == (FILE *) 0) {
+	if ((fp_sub = fopen (sub, "r")) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
-	while ((line = getaline(fp_sub)) != (char *) 0) {
+
+	while ((line = tin_fgets(buf, sizeof(buf), fp_sub)) != (char *) 0) {
 		if (option_line) {
-			if (strchr (line, ':') == (char *) 0 &&
-			    strchr (line, '!') == (char *) 0) {
+			if (strchr (line, SUBSCRIBED) == (char *) 0 && strchr (line, UNSUBSCRIBED) == (char *) 0) {
 				fprintf (fp_out, "%s\n", line);
-				free (line);
 				continue;
-			} else {
+			} else
 				option_line = FALSE;
-			}
 		}
 
 		if (pos == subscribed_pos) {
-			vWriteNewsrcLine(fp_out,newsgroup);
+			vWriteNewsrcLine(fp_out, newsgroup);
 			repositioned = TRUE;
 		}
 
 		fprintf (fp_out, "%s\n", line);
-		free(line);
 
 		subscribed_pos++;
 	}
+
 	if (!repositioned) {
-		vWriteNewsrcLine(fp_out,newsgroup);
+		vWriteNewsrcLine(fp_out, newsgroup);
 		repositioned = TRUE;
 	}
 
 	/*
-	 *  write unsubscribed groups to newnewsrc
+	 *  append unsubscribed groups file to newnewsrc
 	 */
-	if ((fp_unsub = fopen (unsub, "r")) == (FILE *) 0) {
+	if ((fp_unsub = fopen (unsub, "r")) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
-	while ((line = getaline(fp_unsub)) != (char *) 0) {
-		fprintf (fp_out, "%s\n", line);
-		free (line);
-	}
 
-	if (ferror (fp_out) | fclose (fp_out)) {
+	while ((line = tin_fgets(buf, sizeof(buf), fp_unsub)) != (char *) 0)
+		fprintf (fp_out, "%s\n", line);
+
+	/*
+	 * Try and cleanly close out the newnewsrc file
+	 */
+	if (ferror (fp_out) | fclose (fp_out))
 		error_message (txt_filesystem_full, NEWSRC_FILE);
-	} else {
+	else {
 		if (repositioned) {
 			cur_groupnum = pos;
 			rename_file (newnewsrc, newsrc);
@@ -1044,30 +1011,31 @@ pos_group_in_newsrc (
 	newnewsrc_created = FALSE;
 
 rewrite_group_done:
-	if (fp_out != (FILE *) 0) {
+	if (fp_in != (FILE *) 0)
+	  fclose (fp_in);
+
+	if (fp_out != (FILE *) 0)
 	  fclose (fp_out);
-	}
-	if (fp_sub != (FILE *) 0) {
+
+	if (fp_sub != (FILE *) 0)
 	  fclose (fp_sub);
-	}
-	if (fp_unsub != (FILE *) 0) {
+
+	if (fp_unsub != (FILE *) 0)
 	  fclose (fp_unsub);
-	}
-	if (newnewsrc_created) {
+
+	if (newnewsrc_created)
 		unlink (newnewsrc);
-	}
-	if (sub_created) {
+
+	if (sub_created)
 		unlink (sub);
-	}
-	if (unsub_created) {
+
+	if (unsub_created)
 		unlink (unsub);
-	}
 
 	FreeIfNeeded(newsgroup);
 
 	return ret_code;
 }
-
 
 /*
  *  catchup all groups in .newsrc
@@ -1100,8 +1068,37 @@ catchup_newsrc_file (void)
 
 /*
  * Break down a line of .newsrc file
- * The sequence information [ eg; 1-3,10,12 ] is returned
+ * The sequence information [ eg; 1-3,10,12 ] is returned, line is truncated to
+ * just the group name and the subscription flag is copied to sub.
  */
+static char *
+pcParseNewsrcLine (
+	char *line,
+	int *sub)
+{
+	char *ptr, *tmp;
+
+	*sub = UNSUBSCRIBED;				/* Default to no entry */
+
+	if ((ptr = strpbrk(line, " !:")) == NULL)			/* space|SUBSCRIBED|UNSUBSCRIBED */
+		return(NULL);
+
+	*sub = *ptr;						/* Save the subscription status */
+	tmp=ptr;							/* Keep this blank for later */
+	*(ptr++) = '\0';					/* Terminate the group name */
+
+#if 0
+	if (ptr == NULL)					/* No seq info, so return a blank */
+		return(tmp);
+#endif
+
+	if ((ptr = strpbrk(ptr, " \t")) == NULL)
+		return(tmp);
+
+	return (ptr + 1);	/* Return pointer to sequence info. At worst this will be \0 */
+}
+
+#if 0
 static char *
 pcParseNewsrcLine (
 	char *line,
@@ -1121,14 +1118,15 @@ pcParseNewsrcLine (
 	*grpptr = '\0';
 
 	*sub = *ptr;
-	if (*ptr) ptr++;
+	if (*ptr)
+		ptr++;
 
-	while (*ptr && (*ptr == ' ' || *ptr == '\t')) {
-			ptr++;
-	}
+	while (*ptr && (*ptr == ' ' || *ptr == '\t'))
+		ptr++;
 
 	return ptr;
 }
+#endif
 
 void
 expand_bitmap (
@@ -1140,18 +1138,18 @@ expand_bitmap (
 	long new;
 
 /*
-** that shouldn' happen - looks like the newsservers database is broken
-*/
-if (group->newsrc.xmax > group->xmax) {
+ * that shouldn' happen - looks like the newsservers database is broken
+ */
+	if (group->newsrc.xmax > group->xmax) {
 #ifdef DEBUG
-	my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);
-	sleep(4);
+		my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);
+		sleep(4);
 #endif
-/*
-** (silently) fix it - we trust our newsrc
-*/
-	group->xmax = group->newsrc.xmax;
-}
+	/*
+	* (silently) fix it - we trust our newsrc
+	*/
+		group->xmax = group->newsrc.xmax;
+	}
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
 		group->newsrc.xmin = group->newsrc.xmax + 1;
 
@@ -1164,9 +1162,8 @@ if (group->newsrc.xmax > group->xmax) {
 
 	bitlen = group->xmax - first + 1;
 
-	if (bitlen <= 0) {
+	if (bitlen <= 0)
 		bitlen = 1;
-	}
 
 	if (group->newsrc.xbitmap == (t_bitmap *) 0) {
 		group->newsrc.xbitmap = (t_bitmap *)my_malloc (BITS_TO_BYTES(bitlen));
@@ -1185,9 +1182,7 @@ if (group->newsrc.xmax > group->xmax) {
 
 		assert((group->newsrc.xmin - first) / NBITS + BITS_TO_BYTES(group->newsrc.xbitlen) <= BITS_TO_BYTES(bitlen));
 
-		memcpy(newbitmap + (group->newsrc.xmin - first) / NBITS,
-			group->newsrc.xbitmap,
-			BITS_TO_BYTES(group->newsrc.xbitlen));
+		memcpy(newbitmap + (group->newsrc.xmin - first) / NBITS, group->newsrc.xbitmap, BITS_TO_BYTES(group->newsrc.xbitlen));
 
 		/* Mark earlier articles as read, updating num_unread */
 
@@ -1198,9 +1193,8 @@ if (group->newsrc.xmax > group->xmax) {
 			for (i = group->newsrc.xmin; i < min; i++) {
 				if (NTEST(newbitmap, i - first) != ART_READ) {
 					NSET0(newbitmap, i - first);
-					if (group->newsrc.num_unread) {
+					if (group->newsrc.num_unread)
 						group->newsrc.num_unread--;
-					}
 				}
 			}
 		}
@@ -1211,9 +1205,8 @@ if (group->newsrc.xmax > group->xmax) {
 			new = group->newsrc.xmin - first + group->newsrc.xbitlen;
 			NSETRNG1(newbitmap, new, bitlen - 1);
 /*
-sprintf (msg, "EXPAND BY=[%ld] grp->newsrc.xmin(%ld) - first(%ld) + grp->newsrc.xbitlen(%ld) < bitlen(%ld)",
+error_message("EXPAND BY=[%ld] grp->newsrc.xmin(%ld) - first(%ld) + + grp->newsrc.xbitlen(%ld) < bitlen(%ld)",
 	new, group->newsrc.xmin, first, group->newsrc.xbitlen, bitlen);
-error_message (msg, "");
 */
 		}
 
@@ -1227,9 +1220,8 @@ error_message (msg, "");
 	if (group->newsrc.xmax < group->xmax) {
 		group->newsrc.num_unread += group->xmax - group->newsrc.xmax;
 /*
-sprintf (msg, "EXPAND MAX BY=[%ld] to unread=[%ld]",
+error_message ("EXPAND MAX BY=[%ld] to unread=[%ld]",
 	group->xmax - group->newsrc.xmax, group->newsrc.num_unread);
-error_message (msg, "");
 */
 	}
 	group->newsrc.xmax = group->xmax;
@@ -1253,15 +1245,16 @@ art_mark_read (
 		}
 		if ((art->status  == ART_UNREAD) || (art->status == ART_WILL_RETURN)) {
 			art_mark_xref_read (art);
-			if (group != (struct t_group *) 0 && group->newsrc.num_unread) {
+
+			if (group != (struct t_group *) 0 && group->newsrc.num_unread)
 				group->newsrc.num_unread--;
-			}
-			if (art->killed) {
+
+			if (art->killed)
 				num_of_killed_arts++;
-			}
-			if (art->selected && num_of_selected_arts) {
+
+			if (art->selected && num_of_selected_arts)
 				num_of_selected_arts--;
-			}
+
 			art->status = ART_READ;
 		}
 	}
@@ -1274,19 +1267,19 @@ art_mark_unread (
 {
 	if (art != (struct t_article *) 0) {
 		if (art->status == ART_READ) {
-			if (group != (struct t_group *) 0) {
+
+			if (group != (struct t_group *) 0)
 				group->newsrc.num_unread++;
-			}
-			if (art->selected) {
+
+			if (art->selected)
 				num_of_selected_arts++;
-			}
+
 			art->status = ART_UNREAD;
 		}
 		if (group != (struct t_group *) 0) {
-			if (art->artnum < group->newsrc.xmin) {
+			if (art->artnum < group->newsrc.xmin)
 				expand_bitmap (group, art->artnum);
-
-			} else {
+			else {
 				NSET1(group->newsrc.xbitmap, art->artnum - group->newsrc.xmin);
 #ifdef DEBUG_NEWSRC
 				debug_print_bitmap (group, art);
@@ -1308,12 +1301,13 @@ art_mark_will_return (
 {
 	if (art != (struct t_article *) 0) {
 		if (art->status == ART_READ) {
-			if (group != (struct t_group *) 0) {
+
+			if (group != (struct t_group *) 0)
 				group->newsrc.num_unread++;
-			}
-			if (art->selected) {
+
+			if (art->selected)
 				num_of_selected_arts++;
-			}
+
 			art->status = ART_WILL_RETURN;
 		}
 		if (group != (struct t_group *) 0) {
@@ -1332,7 +1326,7 @@ art_mark_deleted (
 {
 	if (art != (struct t_article *) 0) {
 		art->delete = TRUE;
-wait_message("FIXME  article marked for deletion");
+wait_message(2, "FIXME  article marked for deletion");
 	}
 }
 
@@ -1343,7 +1337,7 @@ art_mark_undeleted (
 {
 	if (art != (struct t_article *) 0) {
 		art->delete = FALSE;
-wait_message("FIXME  article marked for undeletion");
+wait_message(2, "FIXME  article marked for undeletion");
 	}
 }
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
@@ -1355,9 +1349,10 @@ vSetDefaultBitmap (
 	if (group != (struct t_group *) 0) {
 		group->newsrc.num_unread = 0;
 		group->newsrc.present = FALSE;
-		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
+
+		if (group->newsrc.xbitmap != (t_bitmap *) 0)
 			free ((char *) (group->newsrc.xbitmap));
-		}
+
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 		group->newsrc.xbitlen = 0;
 		group->newsrc.xmin = group->xmin;
@@ -1365,24 +1360,13 @@ vSetDefaultBitmap (
 	}
 }
 
-static char *
-getaline(
-	FILE *fp)
-{
-	char *res=safe_fgets(fp);
-
-	if(res && strlen(res) && res[strlen(res)-1]=='\n')
-		res[strlen(res)-1]='\0';
-	return res;
-}
-
 /* TEST harness */
 #ifdef DEBUG_NEWSRC
 
-#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
-static void set_bitmap_range_read (struct t_newsrc *newsrc, long beg, long end);
-static void set_bitmap_range_unread (struct t_newsrc *newsrc, long beg, long end);
-#endif
+#	ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
+		static void set_bitmap_range_read (struct t_newsrc *newsrc, long beg, long end);
+		static void set_bitmap_range_unread (struct t_newsrc *newsrc, long beg, long end);
+#	endif /* DEBUG_NEWSRC_FIXME */
 
 void
 vNewsrcTestHarness (void)
@@ -1422,7 +1406,6 @@ vNewsrcTestHarness (void)
 			group.newsrc.xmin = 1;
 			group.newsrc.xmax = 0;
 		}
-
 		while (retry) {
 		/* FIXME - this is secure now, but doesn't write any debug output */
 		/* (it didn't before too) */
@@ -1436,24 +1419,21 @@ vNewsrcTestHarness (void)
 						my_printf("   PRINT Seq=[");
 						print_bitmap_seq (stdout, &group);
 						fclose(fp);
-					} else {
+					} else
 						retry--;
-					}
 					close(fd);
 					break;
-				} else {
+				} else
 					retry--;
-				}
-			} else {
+			} else
 				retry--;
-			}
 		}
 
 		debug_print_newsrc (&group.newsrc, stdout);
 
-		if (!retry) {
-			error_message (txt_cannot_create_uniq_name,"");
-		} else {
+		if (!retry)
+			error_message (txt_cannot_create_uniq_name);
+		else {
 			fp = fopen (temp_file, "r");
 			fgets (seq, sizeof(seq), fp);
 			seq[strlen(seq)-1] = '\0';
@@ -1527,4 +1507,4 @@ newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 }
 #endif /* DEBUG_NEWSRC_FIXME */
 
-#endif	/* DEBUG_NEWSRC */
+#endif /* DEBUG_NEWSRC */

@@ -3,9 +3,9 @@
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
-LVER		= 1.3
-PVER		= 971018
-VER		= $(LVER)-unoff-BETA-$(PVER)
+LVER		= 1.4
+PVER		= 971102
+VER		= pre-$(LVER)-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
 @SET_MAKE@
@@ -75,6 +75,7 @@ CFILES	= \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
 	$(SRCDIR)/nntpw32.c \
+	$(SRCDIR)/nntpvms.c \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/os_2.c \
 	$(SRCDIR)/page.c \
@@ -82,6 +83,7 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/read.c \
 	$(SRCDIR)/refs.c\
 	$(SRCDIR)/regex.c\
 	$(SRCDIR)/save.c \

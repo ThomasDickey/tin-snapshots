@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 23.08.97
+dnl Updated   : 22.10.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -479,6 +479,7 @@ dnl Check if the 'system()' function returns a usable status, or if not, try
 dnl to use the status returned by a SIGCHLD.
 AC_DEFUN([CF_FUNC_SYSTEM],
 [
+AC_REQUIRE([CF_UNION_WAIT])
 AC_MSG_CHECKING(if the system function returns usable child-status)
 AC_CACHE_VAL(cf_cv_system_status,[
 	AC_TRY_RUN([
@@ -660,7 +661,7 @@ AC_CACHE_VAL(cf_cv_ncurses_header,[
 printf("%s\n", NCURSES_VERSION);
 #else
 #ifdef __NCURSES_H
-printf("pre-1.8.7\n");
+printf("old\n");
 #else
 make an error
 #endif
@@ -675,12 +676,14 @@ make an error
 			curses.h \
 			ncurses.h
 		do
-			if egrep "NCURSES" $cf_incdir/$cf_header 1>&5 2>&1; then
+changequote(,)dnl
+			if egrep "NCURSES_[VH]" $cf_incdir/$cf_header 1>&AC_FD_CC 2>&1; then
+changequote([,])dnl
 				cf_cv_ncurses_header=$cf_incdir/$cf_header
-				test -n "$verbose" && echo $ac_n "	... found $ac_c" 1>&6
+				test -n "$verbose" && echo $ac_n "	... found $ac_c" 1>&AC_FD_MSG
 				break
 			fi
-			test -n "$verbose" && echo "	... tested $cf_incdir/$cf_header" 1>&6
+			test -n "$verbose" && echo "	... tested $cf_incdir/$cf_header" 1>&AC_FD_MSG
 		done
 		test -n "$cf_cv_ncurses_header" && break
 	done
@@ -707,6 +710,7 @@ predefined) # (vi
 	CF_ADD_INCDIR($cf_incdir)
 	;;
 esac
+CF_NCURSES_VERSION
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Look for the ncurses library.  This is a little complicated on Linux,
@@ -745,7 +749,7 @@ if test -n "$cf_ncurses_LIBS" ; then
 		fi
 	done
 	AC_TRY_LINK([#include <$cf_cv_ncurses_header>],
-		[initscr(); tgoto((char *)0, 0, 0);],
+		[initscr(); mousemask(0,0); tgoto((char *)0, 0, 0);],
 		[AC_MSG_RESULT(yes)],
 		[AC_MSG_RESULT(no)
 		 LIBS="$cf_ncurses_SAVE"])
@@ -757,25 +761,54 @@ AC_DEFUN([CF_NCURSES_VERSION],
 [AC_MSG_CHECKING(for ncurses version)
 AC_CACHE_VAL(cf_cv_ncurses_version,[
 	cf_cv_ncurses_version=no
+	cf_tempfile=out$$
+	AC_TRY_RUN([
+#include <$cf_cv_ncurses_header>
+int main()
+{
+	FILE *fp = fopen("$cf_tempfile", "w");
+#ifdef NCURSES_VERSION
+# ifdef NCURSES_VERSION_PATCH
+	fprintf(fp, "%s.%d\n", NCURSES_VERSION, NCURSES_VERSION_PATCH);
+# else
+	fprintf(fp, "%s\n", NCURSES_VERSION);
+# endif
+#else
+# ifdef __NCURSES_H
+	fprintf(fp, "old\n");
+# else
+	make an error
+# endif
+#endif
+	exit(0);
+}],[
+	cf_cv_ncurses_version=`cat $cf_tempfile`
+	rm -f $cf_tempfile],,[
+
+	# This will not work if the preprocessor splits the line after the
+	# Autoconf token.  The 'unproto' program does that.
 	cat > conftest.$ac_ext <<EOF
 #include <$cf_cv_ncurses_header>
+#undef Autoconf
 #ifdef NCURSES_VERSION
 Autoconf NCURSES_VERSION
 #else
 #ifdef __NCURSES_H
 Autoconf "old"
 #endif
+;
 #endif
 EOF
-	cf_try="$ac_cpp conftest.$ac_ext 2>&5 | grep '^Autoconf ' >conftest.out"
+	cf_try="$ac_cpp conftest.$ac_ext 2>&AC_FD_CC | grep '^Autoconf ' >conftest.out"
 	AC_TRY_EVAL(cf_try)
 	if test -f conftest.out ; then
 changequote(,)dnl
-		cf_out=`cat conftest.out | sed -e 's@^[^\"]*\"@@' -e 's@\".*@@'`
+		cf_out=`cat conftest.out | sed -e 's@^Autoconf @@' -e 's@^[^"]*"@@' -e 's@".*@@'`
 changequote([,])dnl
 		test -n "$cf_out" && cf_cv_ncurses_version="$cf_out"
+		rm -f conftest.out
 	fi
-])
+])])
 AC_MSG_RESULT($cf_cv_ncurses_version)
 ])
 dnl ---------------------------------------------------------------------------
@@ -884,10 +917,12 @@ AC_TRY_LINK([#include <sys/types.h>
 		char *p = compile("", "", "", 0);
 		int x = step("", "");
 	],[cf_cv_regex="regexp.h"],[
+		cf_save_LIBS="$LIBS"
+		LIBS="-lgen $LIBS"
 		AC_TRY_LINK([#include <regexpr.h>],[
 			char *p = compile("", "", "");
 			int x = step("", "");
-		],[cf_cv_regex="regexpr.h"])])])
+		],[cf_cv_regex="regexpr.h"],[LIBS="$cf_save_LIBS"])])])
 ])
 AC_MSG_RESULT($cf_cv_regex)
 case $cf_cv_regex in
@@ -1217,22 +1252,40 @@ AC_MSG_RESULT($cf_cv_type_sigaction)
 test $cf_cv_type_sigaction = yes && AC_DEFINE(HAVE_TYPE_SIGACTION)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check to see if the BSD-style union wait is declared.  Some platforms may
+dnl use this, though it is deprecated in favor of the 'int' type in Posix.
+dnl Some vendors provide a bogus implementation that declares union wait, but
+dnl uses the 'int' type instead; we try to spot these by checking for the
+dnl associated macros.
+dnl
+dnl Ahem.  Some implementers cast the status value to an int*, as an attempt to
+dnl use the macros for either union wait or int.  So we do a check compile to
+dnl see if the macros are defined and apply to an int.
+dnl
+dnl Sets: $cf_cv_type_unionwait
+dnl Defines: HAVE_TYPE_UNIONWAIT
 AC_DEFUN([CF_UNION_WAIT],
 [
+AC_REQUIRE([CF_WAIT_HEADERS])
 AC_MSG_CHECKING([for union wait])
 AC_CACHE_VAL(cf_cv_type_unionwait,[
-	AC_TRY_COMPILE([
-#include <sys/types.h>
-#if HAVE_SYS_WAIT_H
-#include <sys/wait.h>
+	AC_TRY_COMPILE($cf_wait_headers,
+	[union wait x;
+	 int y = WEXITSTATUS(x);
+	 int z = WTERMSIG(x);
+	],
+	[cf_cv_type_unionwait=no],[
+	AC_TRY_COMPILE($cf_wait_headers,
+	[union wait x;
+#ifdef WEXITSTATUS
+	 int y = WEXITSTATUS(x);
 #endif
-#if HAVE_WAITSTATUS_H
-#include <waitstatus.h>
+#ifdef WTERMSIG
+	 int z = WTERMSIG(x);
 #endif
-],
-	[union wait x],
+	],
 	[cf_cv_type_unionwait=yes],
-	[cf_cv_type_unionwait=no])])
+	[cf_cv_type_unionwait=no])])])
 AC_MSG_RESULT($cf_cv_type_unionwait)
 test $cf_cv_type_unionwait = yes && AC_DEFINE(HAVE_TYPE_UNIONWAIT)
 ])dnl
@@ -1244,6 +1297,35 @@ AC_DEFUN([CF_UPPER],
 changequote(,)dnl
 $1=`echo $2 | tr '[a-z]' '[A-Z]'`
 changequote([,])dnl
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Build up an expression $cf_wait_headers with the header files needed to
+dnl compile against the prototypes for 'wait()', 'waitpid()', etc.  Assume it's
+dnl Posix, which uses <sys/types.h> and <sys/wait.h>, but allow SVr4 variation
+dnl with <wait.h>.
+AC_DEFUN([CF_WAIT_HEADERS],
+[
+AC_HAVE_HEADERS(sys/wait.h)
+cf_wait_headers="#include <sys/types.h>
+"
+if test $ac_cv_header_sys_wait_h = yes; then
+cf_wait_headers="$cf_wait_headers
+#include <sys/wait.h>
+"
+else
+AC_HAVE_HEADERS(wait.h)
+AC_HAVE_HEADERS(waitstatus.h)
+if test $ac_cv_header_wait_h = yes; then
+cf_wait_headers="$cf_wait_headers
+#include <wait.h>
+"
+fi
+if test $ac_cv_header_waitstatus_h = yes; then
+cf_wait_headers="$cf_wait_headers
+#include <waitstatus.h>
+"
+fi
+fi
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Wrapper for AC_ARG_WITH to inherit/override an environment variable's
@@ -1276,7 +1358,7 @@ ifelse($4,,[withval="${$3}"],[withval="${$3-ifelse($5,,$4,$5)}"]))dnl
 case ".$withval" in #(vi
 ./*) #(vi
   ;;
-.\${*) #(vi
+.\[$]{*prefix}*) #(vi
   eval withval="$withval"
   case ".$withval" in #(vi
   .NONE/*)
@@ -1284,6 +1366,9 @@ case ".$withval" in #(vi
     ;;
   esac
   ;; #(vi
+.NONE/*)
+  withval=`echo $withval | sed -e s@NONE@$ac_default_prefix@`
+  ;;
 *)
   AC_ERROR(expected a pathname for $1)
   ;;

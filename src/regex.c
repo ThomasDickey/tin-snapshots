@@ -116,13 +116,12 @@ match_regex(
 	 * Only a single compare is needed to see if a match exists
 	 */
 	switch (error = regexec(&preg, string, 0, NULL, 0)) {
-		case REG_NOERROR:						/* Found */
+		case REG_NOERROR:		/* Found */
 			ret = TRUE;
-		/* FALLTHROUGH */
-		case REG_NOMATCH:						/* Not found */
 			break;
-
-		default:								/* Something wrong... */
+		case REG_NOMATCH:		/* Not found */
+			break;
+		default:					/* Something wrong */
 			regex_error(error, preg);
 	}
 

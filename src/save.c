@@ -50,18 +50,18 @@ struct archiver_t {
 };
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static int any_saved_files (void);
-static int create_sub_dir (int i);
+static t_bool create_sub_dir (int i);
 static void post_process_uud (int pp, t_bool auto_delete);
 static void post_process_sh (t_bool auto_delete);
 
 #ifndef INDEX_DAEMON
-static char *get_first_savefile (void);
-static const char *get_last_savefile (void);
-static void uudecode_file (int pp, char *file_out_dir, char *file_out);
-static char *get_archive_file (char *dir);
+	static char *get_first_savefile (void);
+	static char *get_archive_file (char *dir);
+	static const char *get_last_savefile (void);
+	static void uudecode_file (int pp, char *file_out_dir, char *file_out);
 #endif /* INDEX_DAEMON */
 
 /*
@@ -95,17 +95,15 @@ check_start_save_any_news (
 	int log_opened = TRUE;
 	int print_first = TRUE;
 	int saved_arts = 0;
-/*	int saved_groups = 0; */
 	int unread_news = FALSE;
-	time_t epoch;
 	struct t_group *group;
+	time_t epoch;
 
 	switch (check_start_save) {
 		case CHECK_ANY_NEWS:
 		case START_ANY_NEWS:
-			if (verbose) {
-				wait_message (txt_checking_for_news);
-			}
+			if (verbose)
+				wait_message (0, txt_checking_for_news);
 			break;
 		case MAIL_ANY_NEWS:
 		case SAVE_ANY_NEWS:
@@ -135,159 +133,141 @@ check_start_save_any_news (
 	for (i = 0; i < group_top; i++) {
 		group = &active[my_group[i]];
 		make_group_path (group->name, group_path);
-		if (!index_group (group)) {
+		if (!index_group (group))
 			continue;
-		}
 		print_group = TRUE;
 		check_arts = 0;
 
 		for (j = 0; j < top; j++) {
-			if (arts[j].status == ART_UNREAD) {
-				if (mail_news_to_posted && !arts[j].selected) {
-					if (catchup) {
-						art_mark_read (group, &arts[j]);
+			if (arts[j].status != ART_UNREAD)
+				continue;
+
+			if (mail_news_to_posted && !arts[j].selected) {
+				if (catchup)
+					art_mark_read (group, &arts[j]);
+				continue;
+			}
+			switch (check_start_save) {
+				case CHECK_ANY_NEWS:
+					if (print_first && verbose) {
+						my_fputc ('\n', stdout);
+						print_first = FALSE;
 					}
-					continue;
-				}
-				switch (check_start_save) {
-					case CHECK_ANY_NEWS:
-						if (print_first && verbose) {
-							my_fputc ('\n', stdout);
-							print_first = FALSE;
-						}
-						check_arts++;
-						break;
-					case START_ANY_NEWS:
-						return i;	/* return first group with unread news */
-						/* NOTREACHED */
-					case MAIL_ANY_NEWS:
-					case SAVE_ANY_NEWS:
-						if (print_group) {
-							sprintf (buf, "Saved %s...\n", group->name);
-							fprintf (fp_log, "%s", buf);
-							if (verbose) {
-								wait_message (buf);
-							}
-							print_group = FALSE;
-							/* saved_groups++; */
-							if (check_start_save == SAVE_ANY_NEWS) {
+					check_arts++;
+					break;
+				case START_ANY_NEWS:
+					return i;	/* return first group with unread news */
+					/* NOTREACHED */
+				case MAIL_ANY_NEWS:
+				case SAVE_ANY_NEWS:
+					if (print_group) {
+						sprintf (buf, "Saved %s...\n", group->name);
+						fprintf (fp_log, buf);
+						if (verbose)
+							wait_message (0, buf);
+
+						print_group = FALSE;
+						/* saved_groups++; */
+						if (check_start_save == SAVE_ANY_NEWS) {
 #ifdef VMS
-								sprintf (buf, "[.%s]dummy", group_path);
+							sprintf (buf, "[.%s]dummy", group_path);
 #else
-								sprintf (buf, "%s/dummy", group_path);
+							sprintf (buf, "%s/dummy", group_path);
 #endif
-								create_path (buf);
-							}
+							create_path (buf);
 						}
+					}
 
-						if (check_start_save == MAIL_ANY_NEWS) {
-							sprintf (savefile, "%stin.%d", TMPDIR, process_id);
-						} else {
-							if (!strfpath (group->attribute->savedir,
-							    path, sizeof (path), homedir, (char *) 0,
-							    (char *) 0, group->name)) {
-								joinpath (path, homedir, DEFAULT_SAVEDIR);
-							}
+					if (check_start_save == MAIL_ANY_NEWS)
+						sprintf (savefile, "%stin.%d", TMPDIR, process_id);
+					else {
+						if (!strfpath (group->attribute->savedir, path, sizeof (path), homedir, (char *) 0, (char *) 0, group->name))
+							joinpath (path, homedir, DEFAULT_SAVEDIR);
 #ifdef VMS
-							sprintf (savefile, "%s.%s]%ld", path, group_path, arts[j].artnum);
+						sprintf (savefile, "%s.%s]%ld", path, group_path, arts[j].artnum);
 #else
-							sprintf (savefile, "%s/%s/%ld", path, group_path, arts[j].artnum);
+						sprintf (savefile, "%s/%s/%ld", path, group_path, arts[j].artnum);
 #endif
-						}
+					}
 
-						note_page = art_open (arts[j].artnum, group_path);
-						if (note_page == ART_UNAVAILABLE) {
+					switch (art_open (&arts[j], group_path)) {
+						case ART_UNAVAILABLE:
 							continue;
-						}
+						case ART_ABORT:				/* User 'q'uit */
+							break;
+						default:					/* Normal case */
+							break;
+					}
 
-						if ((fp = fopen (savefile, "w" FOPEN_OPTS)) == (FILE *) 0) {
-							fprintf (fp_log, txt_cannot_open, savefile);
-							if (verbose) {
-								perror_message (txt_cannot_open, savefile);
-							}
-							continue;
-						}
+					if ((fp = fopen (savefile, "w" FOPEN_OPTS)) == (FILE *) 0) {
+						fprintf (fp_log, txt_cannot_open, savefile);
+						if (verbose)
+							perror_message (txt_cannot_open, savefile);
+						continue;
+					}
 
-						if (check_start_save == MAIL_ANY_NEWS) {
-							fprintf (fp, "To: %s\n", mail_news_user);
-						}
+					if (check_start_save == MAIL_ANY_NEWS)
+						fprintf (fp, "To: %s\n", mail_news_user);
 
-						sprintf (buf, "[%5ld]  %s\n", arts[j].artnum, arts[j].subject);
-						fprintf (fp_log, "%s", buf);
-						if (verbose) {
-							wait_message (buf);
-						}
-						fseek (note_fp, 0L, SEEK_SET);
-						copy_fp (note_fp, fp);
-						art_close ();
-						fclose (fp);
-						saved_arts++;
+					sprintf (buf, "[%5ld]  %s\n", arts[j].artnum, arts[j].subject);
+					fprintf (fp_log, buf);
+					if (verbose)
+						wait_message (0, buf);
 
-						if (check_start_save == MAIL_ANY_NEWS) {
-							strfmailer (mailer, arts[j].subject, mail_news_user,
-								savefile, buf, sizeof (buf), default_mailer_format);
-							if (!invoke_cmd (buf)) {
-								error_message (txt_command_failed_s, buf);
-							}
-							unlink (savefile);
-						}
-						if (catchup) {
-							art_mark_read (group, &arts[j]);
-						}
-						break;
-					default:
-						break;
-				}
+					fseek (note_fp, 0L, SEEK_SET);
+					copy_fp (note_fp, fp);
+					art_close ();
+					fclose (fp);
+					saved_arts++;
+
+					if (check_start_save == MAIL_ANY_NEWS) {
+						strfmailer (mailer, arts[j].subject, mail_news_user, savefile, buf, sizeof (buf), default_mailer_format);
+						if (!invoke_cmd (buf))
+							error_message (txt_command_failed_s, buf);
+						unlink (savefile);
+					}
+					if (catchup)
+						art_mark_read (group, &arts[j]);
+					break;
+				default:
+					break;
 			}
 		}
 
 		if (check_arts) {
-			if (verbose) {
-				sprintf (buf, "%4d unread articles in %s\n",
-					check_arts, group->name);
-				wait_message (buf);
-			}
+			if (verbose)
+				wait_message (0, "%4d unread articles in %s\n", check_arts, group->name);
 			unread_news = TRUE;
 		}
 	}
 
 	switch (check_start_save) {
 		case CHECK_ANY_NEWS:
-			if (unread_news) {
+			if (unread_news)
 				return 2;
-			} else {
-				if (verbose) {
-					wait_message (txt_there_is_no_news);
-				}
+			else {
+				if (verbose)
+					wait_message (1, txt_there_is_no_news);
 				return 0;
 			}
 			/* NOTREACHED */
 		case START_ANY_NEWS:
-			wait_message (txt_there_is_no_news);
+			wait_message (1, txt_there_is_no_news);
 			return -1;
 			/* NOTREACHED */
 		case MAIL_ANY_NEWS:
 		case SAVE_ANY_NEWS:
-			sprintf (buf, "\n%s %d article(s) from %d group(s)\n",
-				(check_start_save == MAIL_ANY_NEWS ? "Mailed" : "Saved"),
-				saved_arts, group_top); /*saved_groups); */
+			sprintf (buf, "\n%s %d article(s) from %d group(s)\n", (check_start_save == MAIL_ANY_NEWS ? "Mailed" : "Saved"), saved_arts, group_top); /*saved_groups); */
 			fprintf (fp_log, "%s", buf);
-			if (verbose) {
-				wait_message (buf);
-			}
+			if (verbose)
+				wait_message (0, buf);
 			if (log_opened) {
 				fclose (fp_log);
-				if (verbose) {
-					sprintf (buf, "Mailing log to %s\n",
-						(check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid));
-					wait_message (buf);
-				}
-				strfmailer (mailer, subject,
-					(check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid),
-					logfile, buf, sizeof (buf), default_mailer_format);
-				if (!invoke_cmd (buf)) {
+				if (verbose)
+					wait_message (0, "Mailing log to %s\n", (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid));
+				strfmailer (mailer, subject, (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid), logfile, buf, sizeof (buf), default_mailer_format);
+				if (!invoke_cmd (buf))
 					error_message (txt_command_failed_s, buf);
-				}
 			}
 			break;
 		default:
@@ -310,15 +290,14 @@ save_art_to_file (
 #ifndef INDEX_DAEMON
 
 	char *file;
-	char buf[LEN];
 	char mode[8];
 	char save_art_info[LEN];
 	FILE *fp;
-	int ch, ch_default;
+	int ch;
 	int is_mailbox = FALSE;
 	int i = 0, ret_code = FALSE;
-	time_t epoch;
 	struct stat st;
+	time_t epoch;
 
 	if (strlen (filename)) {
 		is_mailbox = the_mailbox;
@@ -331,20 +310,10 @@ save_art_to_file (
 	if (!save[i].is_mailbox) {
 		if (stat (file, &st) != -1) {
 			if (S_ISDIR(st.st_mode)) {
-				sprintf (buf, txt_cannot_write_to_directory, file);
-				info_message (buf);
-				sleep(2);
+				wait_message (2, txt_cannot_write_to_directory, file);
 				return FALSE;
 			}
-			ch_default = default_save_mode;
-			do {
-				sprintf (buf, txt_append_overwrite_quit, file);
-				sprintf (msg, "%s%c", buf, ch_default);
-				wait_message (msg);
-				MoveCursor (cLINES, (int) strlen (buf));
-				if ((ch = (char) ReadCh ()) == '\n' || ch == '\r')
-					ch = ch_default;
-			} while (!strchr ("aoq\033", ch));
+			ch = prompt_slk_response(default_save_mode, "aoq\033", txt_append_overwrite_quit, file);
 			switch (ch) {
 				case iKeySaveAppendFile:
 					strcpy (mode, "a+");
@@ -355,8 +324,7 @@ save_art_to_file (
 				case iKeyAbort:
 				case iKeySaveDontSaveFile2:
 					save[i].saved = FALSE;
-					info_message (txt_art_not_saved);
-					sleep (1);
+					wait_message (1, txt_art_not_saved);
 					return ret_code;
 				default:
 					break;
@@ -364,25 +332,21 @@ save_art_to_file (
 			default_save_mode = ch;
 		}
 	}
-
-	if (debug == 2) {
-		sprintf (msg, "Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]",
-			respnum, indexnum, the_mailbox, filename, file, mode);
-		error_message (msg, "");
-	}
-
+#ifdef DEBUG
+	if (debug == 2)
+		error_message("Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]", respnum, indexnum, the_mailbox, filename, file, mode);
+#endif
 	if ((fp = fopen (file, mode)) == (FILE *) 0) {
 		save[i].saved = FALSE;
 		info_message (txt_art_not_saved);
 		return ret_code;
 	}
 
- 	time (&epoch);
- 	fprintf (fp, "From %s %s", note_h_path, ctime (&epoch));
+	time (&epoch);
+	fprintf (fp, "From %s %s", note_h.path, ctime (&epoch));
 
-	if (fseek (note_fp, 0L, SEEK_SET) == -1) {
+	if (fseek (note_fp, 0L, SEEK_SET) == -1)
 		perror_message ("fseek() error on [%s]", arts[respnum].subject);
-	}
 	copy_fp (note_fp, fp);
 
 	print_art_seperator_line (fp, the_mailbox);
@@ -393,11 +357,10 @@ save_art_to_file (
 	save[i].saved = TRUE;
 
 	if (filename == 0) {
-		if (is_mailbox) {
+		if (is_mailbox)
 			sprintf (save_art_info, txt_saved_to_mailbox, get_first_savefile ());
-		} else {
+		else
 			sprintf (save_art_info, txt_art_saved_to, get_first_savefile ());
-		}
 		info_message (save_art_info);
 	}
 
@@ -421,104 +384,102 @@ save_thread_to_file (
 	int i;
 
 	if (num_save == 0) {
-		info_message(txt_saved_nothing);
-		sleep(2);
+		wait_message(2, txt_saved_nothing);
 		return FALSE;
 	}
 
 	for (i=0 ; i < num_save ; i++) {
 		/* the tailing spaces are needed for SHOW_PROGRESS */
-		sprintf (msg, "%s%d  ", txt_saving, ++count);
-		wait_message (msg);
+		wait_message (0, "%s%d  ", txt_saving, ++count);
 
-		if (is_mailbox) {
+		if (is_mailbox) 
 			file[0] = 0;
-		}else {
+		else
 			sprintf (file, "%s.%03d", save[i].file, i+1);
-		}
 
-		note_page = art_open (arts[save[i].index].artnum, group_path);
-		if (note_page != ART_UNAVAILABLE) {
-			(void) save_art_to_file (save[i].index, i, is_mailbox, file);
-			art_close ();
+		switch (art_open (&arts[save[i].index], group_path)) {
+
+			case ART_ABORT:					/* User 'q'uit */
+				return (FALSE);
+
+			case ART_UNAVAILABLE:			/* Ignore, just keep going */
+				continue;
+
+			default:
+				(void) save_art_to_file (save[i].index, i, is_mailbox, file);
+				art_close ();
 		}
 	}
 
 	first_savefile = get_first_savefile ();
 
-	if (strlen(first_savefile) == 0) {
+	if (strlen(first_savefile) == 0)
 		info_message (txt_thread_not_saved);
-	} else {
-		if (is_mailbox) {
+	else {
+		if (is_mailbox)
 			sprintf (save_thread_info, txt_saved_to_mailbox, first_savefile);
-		} else {
-			if (num_save == 1) {
+		else {
+			if (num_save == 1)
 				sprintf (save_thread_info, txt_art_saved_to, first_savefile);
-			} else {
-				sprintf (save_thread_info, txt_thread_saved_to_many,
-					first_savefile, get_last_savefile ());
-			}
+			else
+				sprintf (save_thread_info, txt_thread_saved_to_many, first_savefile, get_last_savefile ());
 
 			FreeIfNeeded(first_savefile);
 
 		}
-		info_message (save_thread_info);
-		sleep (2);
+		wait_message (2, save_thread_info);
 	}
-
-#endif /* INDEX_DAEMON */
 
 	return TRUE;
 }
+#endif /* INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 int
 save_regex_arts (
 	int is_mailbox,
 	char *group_path)
 {
-#ifndef INDEX_DAEMON
 
 	char buf[PATH_LEN];
 	int i, ret_code = FALSE;
 
 	for (i=0 ; i < num_save ; i++) {
-		sprintf (msg, "%s%d  ", txt_saving, i+1);
-		wait_message (msg);
+		wait_message (0, "%s%d  ", txt_saving, i+1);
 
-		if (is_mailbox) {
+		if (is_mailbox)
 			buf[0] = 0;
-		} else {
+		else
 			sprintf (buf, "%s.%03d", save[i].file, i+1);
-		}
 
-		note_page = art_open (arts[save[i].index].artnum, group_path);
-		if (note_page != ART_UNAVAILABLE) {
-			ret_code = save_art_to_file (save[i].index, i, is_mailbox, buf);
-			art_close ();
+		switch (art_open (&arts[save[i].index], group_path)) {
+
+			case ART_ABORT:					/* User 'q'uit */
+				return (ret_code);
+
+			case ART_UNAVAILABLE:
+				continue;					/* Ignore, just keep going */
+
+			default:
+				ret_code = save_art_to_file (save[i].index, i, is_mailbox, buf);
+				art_close ();
 		}
 	}
 
-	if (!num_save) {
+	if (!num_save)
 		info_message (txt_no_match);
-	} else {
-		if (is_mailbox) {
+	else {
+		if (is_mailbox)
 			sprintf (buf, txt_saved_to_mailbox, get_first_savefile ());
-		} else {
-			sprintf (buf, txt_saved_pattern_to,
-				get_first_savefile (), get_last_savefile ());
-		}
+		else
+			sprintf (buf, txt_saved_pattern_to, get_first_savefile (), get_last_savefile ());
 		info_message (buf);
 	}
 
 	return ret_code;
-
-#else
-
-	return FALSE;
-
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */
 
 int
 create_path (
@@ -540,10 +501,8 @@ create_path (
 	 * '+', '$' or '=' will be processed correctly later
 	 */
 	if (path[0] == '$') {
-		if (strfpath (path, buf, sizeof (buf), homedir,
-		    (char *) 0, (char *) 0, active[i].name)) {
+		if (strfpath (path, buf, sizeof (buf), homedir, (char *) 0, (char *) 0, active[i].name))
 			my_strncpy (path, buf, PATH_LEN);
-		}
 	}
 
 	/*
@@ -579,10 +538,8 @@ create_path (
 			joinpath (tmp, buf, path);
 			my_strncpy (path, tmp, PATH_LEN);
 		}
-		if (strfpath (path, buf, sizeof (buf), homedir,
-		    (char *) 0, active[i].attribute->savedir, active[i].name)) {
+		if (strfpath (path, buf, sizeof (buf), homedir, (char *) 0, active[i].attribute->savedir, active[i].name))
 			my_strncpy (path, buf, PATH_LEN);
-		}
 	}
 
 #ifndef VMS			/* no good answer to this yet XXX */
@@ -615,9 +572,8 @@ create_path (
 	}
 #endif
 
-	if (mbox_format) {
+	if (mbox_format)
 		strcpy (path, tmp);
-	}
 
 #endif /* INDEX_DAEMON */
 
@@ -625,7 +581,7 @@ create_path (
 }
 
 
-static int
+static t_bool
 create_sub_dir (
 	int i)
 {
@@ -640,11 +596,8 @@ create_sub_dir (
 			my_mkdir (dir, (S_IRWXU|S_IRUGO|S_IXUGO));
 			return TRUE;
 		}
-		if S_ISDIR(st.st_mode) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+
+		return ((S_ISDIR(st.st_mode)) ? TRUE : FALSE);
 	}
 
 #endif /* INDEX_DAEMON */
@@ -673,9 +626,8 @@ add_to_save_list (
 	dir[0] = '\0';
 	file[0] = '\0';
 
-	if (num_save == max_save-1) {
+	if (num_save == max_save-1)
 		expand_save ();
-	}
 
 	save[num_save].index = the_index;
 	save[num_save].saved = FALSE;
@@ -689,24 +641,20 @@ add_to_save_list (
 	save[num_save].subject = my_strdup (the_article->subject);
 	if (archive_save && the_article->archive) {
 		save[num_save].archive = my_strdup (the_article->archive);
-		if (the_article->part) {
+		if (the_article->part)
 			save[num_save].part = my_strdup (the_article->part);
-		}
-		if (the_article->patch) {
+		if (the_article->patch)
 			save[num_save].patch = my_strdup (the_article->patch);
-		}
 	}
 
 	if (is_mailbox) {
 		if ((int) strlen (path) > 1) {
-			if (path[0] == '=') {
+			if (path[0] == '=')
 				my_strncpy (file, path+1, sizeof (file));
-			} else {
+			else
 				my_strncpy (file, path, sizeof (file));
-			}
-		} else {
+		} else
 			my_strncpy (file, glob_group, sizeof (file));
-		}
 
 		i = my_group[cur_groupnum];
 		if (!strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
@@ -771,14 +719,13 @@ add_to_save_list (
 		}
 
 #ifdef M_AMIGA
-		if (tin_bbs_mode) {
+		if (tin_bbs_mode)
 			dir[0] = 0;
-		}
 #endif
 
-		if (dir[0]) {
+		if (dir[0])
 			save[num_save].dir = my_strdup (dir);
-		} else {
+		else {
 			i = my_group[cur_groupnum];
 			if (!strfpath (active[i].attribute->savedir, tmp, sizeof (tmp),
 			    homedir, (char *) 0, (char *) 0, active[i].name)) {
@@ -791,14 +738,13 @@ add_to_save_list (
 			save[num_save].dir = my_strdup (tmp);
 		}
 
-		if (file[0]) {
+		if (file[0])
 			save[num_save].file = my_strdup (file);
-		} else {
-			if (path[0]) {
+		else {
+			if (path[0])
 				save[num_save].file = my_strdup (path);
-			} else {
+			else
 				save[num_save].file = my_strdup (save[num_save].archive);
-			}
 		}
 	}
 	num_save++;
@@ -838,34 +784,26 @@ save_comp (
 	if (s1->archive != 0) {
 		if (s1->part != 0) {
 			if (s2->part != 0) {
-				if (strcmp (s1->part, s2->part) < 0) {
+				if (strcmp (s1->part, s2->part) < 0)
 					return -1;
-				}
-				if (strcmp (s1->part, s2->part) > 0) {
+				if (strcmp (s1->part, s2->part) > 0)
 					return 1;
-				}
-			} else {
+			} else
 				return 0;
-			}
 		} else if (s1->patch != 0) {
 			if (s2->patch != 0) {
-				if (strcmp (s1->patch, s2->patch) < 0) {
+				if (strcmp (s1->patch, s2->patch) < 0)
 					return -1;
-				}
-				if (strcmp (s1->patch, s2->patch) > 0) {
+				if (strcmp (s1->patch, s2->patch) > 0)
 					return 1;
-				}
-			} else {
+			} else
 				return 0;
-			}
 		}
 	} else {
-		if (strcmp (s1->subject, s2->subject) < 0) {
+		if (strcmp (s1->subject, s2->subject) < 0)
 			return -1;
-		}
-		if (strcmp (s1->subject, s2->subject) > 0) {
+		if (strcmp (s1->subject, s2->subject) > 0)
 			return 1;
-		}
 	}
 
 	return 0;
@@ -1057,7 +995,7 @@ post_process_files (
 	t_bool auto_delete)
 {
 	if (any_saved_files ()) {
-		wait_message (txt_post_processing);
+		wait_message (0, txt_post_processing);
 
 		switch (proc_type_ch) {
 			case iKeyPProcShar:
@@ -1130,9 +1068,8 @@ post_process_uud (
 	open_out_file = TRUE;
 
 	for (i=0 ; i < num_save ; i++) {
-		if (!save[i].saved) {
+		if (!save[i].saved)
 			continue;
-		}
 		if (open_out_file) {
 			if ((fp_out = fopen (file_out, "w")) == (FILE *) 0) {
 				perror_message (txt_cannot_open, file_out);
@@ -1164,12 +1101,10 @@ post_process_uud (
 							state = OFF;
 						} else { /* end */
 							state = END;
-							if (u[0] != 'M') {
+							if (u[0] != 'M')
 								fprintf (fp_out, "%s", u);
-							}
-							if (t[0] != 'M') {
+							if (t[0] != 'M')
 								fprintf (fp_out, "%s", t);
-							}
 							fprintf (fp_out, "%s\n", s);
 						}
 						break;
@@ -1182,12 +1117,10 @@ post_process_uud (
 							state = MIDDLE;
 						} else if (STRNCMPEQ("end", s, 3)) {
 							state = END;
-							if (u[0] != 'M') {
+							if (u[0] != 'M')
 								fprintf (fp_out, "%s", u);
-							}
-							if (t[0] != 'M') {
+							if (t[0] != 'M')
 								fprintf (fp_out, "%s", t);
-							}
 							fprintf (fp_out, "%s\n", s);
 						}
 						break;
@@ -1207,9 +1140,8 @@ post_process_uud (
 				/*
 				 *  read next line & if error goto next file in save array
 				 */
-				if (fgets (s, sizeof (s), fp_in) == 0) {
+				if (fgets (s, sizeof (s), fp_in) == 0)
 					break;
-				}
 			}
 			fclose (fp_in);
 		}
@@ -1244,13 +1176,12 @@ uudecode_file (
 	int	i, file_size = 0;
 	struct	stat st;
 
-	sprintf (buf, txt_uudecoding, file_out);
-	wait_message (buf);
+	wait_message (1, txt_uudecoding, file_out);
 
 #if !defined(M_UNIX)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #else
-	sleep (1);
+
 	sprintf (buf, "cd %s; uudecode %s", file_out_dir, file_out);
 	if (invoke_cmd (buf)) {
 		/*
@@ -1259,14 +1190,12 @@ uudecode_file (
 		if ((file = get_archive_file (file_out_dir)) != 0) {
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
 			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
-				if (stat (file, &st) != -1) {
+				if (stat (file, &st) != -1)
 					file_size = (int) st.st_size;
-				}
 				if (fgets (buf, sizeof (buf), fp_in) != 0) {
 					ptr = strchr (buf, '\n');
-					if (ptr != 0) {
+					if (ptr != 0)
 						*ptr = '\0';
-					}
 				}
 				pclose (fp_in);
 				my_printf (txt_checksum_of_file, file);
@@ -1296,9 +1225,8 @@ uudecode_file (
 						archiver[i].name, archiver[i].test, file);
 					my_printf (txt_testing_archive, file);
 					my_flush ();
-					if (!invoke_cmd (buf)) {
-						error_message (txt_post_processing_failed, "");
-					}
+					if (!invoke_cmd (buf))
+						error_message (txt_post_processing_failed);
 				}
 				/*
 				 *  List archive
@@ -1309,9 +1237,8 @@ uudecode_file (
 						archiver[i].name, archiver[i].list, file);
 					my_printf (txt_listing_archive, file);
 					my_flush ();
-					if (!invoke_cmd (buf)) {
-						error_message (txt_post_processing_failed, "");
-					}
+					if (!invoke_cmd (buf))
+						error_message (txt_post_processing_failed);
 					sleep (3);
 				}
 				/*
@@ -1323,9 +1250,8 @@ uudecode_file (
 						archiver[i].name, archiver[i].extract, file);
 					my_printf (txt_extracting_archive, file);
 					my_flush ();
-					if (!invoke_cmd (buf)) {
-						error_message (txt_post_processing_failed, "");
-					}
+					if (!invoke_cmd (buf))
+						error_message (txt_post_processing_failed);
 					sleep (3);
 				}
 
@@ -1383,9 +1309,8 @@ post_process_sh (
 #endif
 
 	for (j=0 ; j < num_save ; j++) {
-		if (!save[j].saved) {
+		if (!save[j].saved)
 			continue;
-		}
 		my_strncpy (file_in, save_filename (j), sizeof (file_in));
 
 		my_printf (txt_extracting_shar, file_in);
@@ -1405,19 +1330,15 @@ post_process_sh (
 						 *  find #!/bin/sh or #!/bin/sh pattern
 						 */
 						if (!found_header) {
-							if (strstr (buf, ptr1) != 0 ||
-								strstr (buf, ptr2) != 0 ||
-								strstr (buf, ptr3) != 0) {
+							if (strstr (buf, ptr1) != 0 || strstr (buf, ptr2) != 0 || strstr (buf, ptr3) != 0)
 								found_header = TRUE;
-							}
 						}
 
 						/*
 						 *  Write to temp file
 						 */
-						if (found_header) {
+						if (found_header)
 							my_fputs (buf, fp_out);
-						}
 					}
 				}
 				fclose (fp_in);
@@ -1459,9 +1380,8 @@ get_archive_file (
 	time_t last = 0;
 
 	file = my_malloc (LEN);
-	if (file == 0) {
+	if (file == 0)
 		return 0;
-	}
 
 	if ((dirp = opendir (dir)) == (DIR *) 0) {
 		free (file);
@@ -1504,20 +1424,17 @@ delete_processed_files (
 	int i;
 
 	if (any_saved_files ()) {
-		if (CURR_GROUP.attribute->delete_tmp_files ||
-			auto_delete) {
+		if (CURR_GROUP.attribute->delete_tmp_files || auto_delete)
 			delete = TRUE;
-		} else if (prompt_yn (cLINES, txt_delete_processed_files, TRUE) == 1) {
+		else if (prompt_yn (cLINES, txt_delete_processed_files, TRUE) == 1)
 			delete = TRUE;
-		}
 
 		if (delete) {
-			wait_message (cCRLF);
-			wait_message (txt_deleting);
+			wait_message (0, "%s%s", txt_deleting, cCRLF);
 
-			for (i=0 ; i < num_save ; i++) {
+			for (i=0 ; i < num_save ; i++)
 				unlink (save_filename (i));
-			}
+
 		}
 	}
 
@@ -1545,15 +1462,13 @@ print_art_seperator_line (
 	int the_mailbox)
 {
 	int sep = 0x01;	/* Ctrl-A */
+#ifdef DEBUG
+	if (debug == 2)
+		error_message ("Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);
+#endif
 
-	if (debug == 2) {
-		sprintf (msg, "Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);
-		error_message (msg, "");
-	}
-
-	if (the_mailbox && save_to_mmdf_mailbox) {
+	if (the_mailbox && save_to_mmdf_mailbox)
 		fprintf (fp, "%c%c%c%c\n", sep, sep, sep, sep);
-	} else {
+	else
 		my_fputc ('\n', fp);
-	}
 }

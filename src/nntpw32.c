@@ -101,10 +101,10 @@ handle_server_response (response, nntpserver)
 #endif /* NNTP_ABLE */
 }
 
+#ifdef DEBUG
 /*
  * NNTP strings for get_respcode()
  */
-
 char *
 nntp_respcode (respcode)
 	int respcode;
@@ -303,16 +303,7 @@ nntp_respcode (respcode)
 	return ("");
 #endif
 }
-
-
-int
-nntp_message (respcode)
-	int respcode;
-{
-	error_message ("%s", nntp_respcode (respcode));
-
-	return 0;
-}
+#endif /* DEBUG */
 
 /*
  * getserverbyfile	Get the name of a server from a named file.
@@ -706,7 +697,7 @@ get_server (string, size)
 	if ( cbRead == -1)
 	{
 		closesocket(nntp_wr_fp);
-		if (nntp_open () != -1)
+		if (nntp_open () == 0)
 		{
 			char buf[NNTP_STRLEN];
 
@@ -852,7 +843,7 @@ static void real_put_server (LPCSTR plpvMessage, int fCRLF)
 
 		CloseHandle (hPipe);
 		strcpy (buf, plpvMessage);
-		if (nntp_open () != -1)
+		if (nntp_open () == 0)
 		{
 			if (glob_group != (char *) 0)
 			{

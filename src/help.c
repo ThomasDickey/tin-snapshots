@@ -26,9 +26,15 @@
 #include	"menukeys.h"
 
 static constext txt_help_empty_line[] = cCRLF;
+static const char *info_title;
+static const char **info_help;
+static int cur_page;
+static int group_len = 0;
+static int info_type;
+static int max_page;
+static int pos_help;
 
 static int ReadHelpCh (void);
-
 
 constext *help_select[] = {
 	txt_help_ctrl_d,
@@ -288,13 +294,6 @@ constext *help_page[] = {
 	0
 };
 
-static const char *info_title;
-static const char **info_help;
-static int cur_page;
-static int group_len = 0;
-static int info_type;
-static int max_page;
-static int pos_help;
 
 static int
 	ReadHelpCh (void)
@@ -315,6 +314,7 @@ static int
 					ch = iKeyUp;
 					break;
 #endif
+
 				case KEYMAP_PAGE_UP:
 					ch = iKeyPageUp;
 					break;
@@ -324,6 +324,7 @@ static int
 					ch = iKeyDown;
 					break;
 #endif
+
 				case KEYMAP_RIGHT:
 				case KEYMAP_PAGE_DOWN:
 					ch = iKeyPageDown;
@@ -357,15 +358,13 @@ show_info_page (
 	int help_lines;
 	int old_page = 0;
 
-	if (NOTESLINES <= 0) {
+	if (NOTESLINES <= 0)
 		return;
-	}
 
-	if (beginner_level) {
+	if (beginner_level)
 		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
-	} else {
+	else
 		help_lines = NOTESLINES;
-	}
 
 	set_signals_help ();
 
@@ -381,31 +380,27 @@ show_info_page (
 	 *  find how many elements in array
 	 */
 	if (type == HELP_INFO) {
-		for (max_line=0 ; help[max_line] ; max_line++) {
+		for (max_line=0 ; help[max_line] ; max_line++)
 			continue;
-		}
 	} else {
 		for (max_line=0 ; posted[max_line].date[0] ; max_line++) {
 			len = strlen (posted[max_line].group);
-			if (len > group_len) {
- 				group_len = len;
-			}
- 		}
+			if (len > group_len)
+				group_len = len;
+		}
 	}
 
 	max_page = max_line / help_lines;
-	if (max_line % help_lines) {
+	if (max_line % help_lines)
 		max_page++;
-	}
 
 	set_xclick_off ();
 #if USE_CURSES
 	ClearScreen();
 #endif
 	forever {
-		if (cur_page != old_page) {
+		if (cur_page != old_page)
 			display_info_page (FALSE);
-		}
 
 		old_page = cur_page;
 
@@ -487,16 +482,14 @@ display_info_page (t_bool first)
 	center_line (0, TRUE, buf);
 	MoveCursor (INDEX_TOP, 0);
 
-	if (beginner_level) {
+	if (beginner_level)
 		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
-	} else {
+	else
 		help_lines = NOTESLINES;
-	}
 
 	if (info_type == HELP_INFO) {
-		for (i=pos_help ; i < (pos_help + help_lines) && info_help[i] ; i++) {
+		for (i=pos_help ; i < (pos_help + help_lines) && info_help[i] ; i++)
 			my_fputs (info_help[i], stdout);
-		}
 	} else {
 		for (i=pos_help ; i < (pos_help + help_lines) && posted[i].date[0] ; i++) {
 			sprintf (buf, "%8s  %c  %-*s  %s",
@@ -521,9 +514,8 @@ show_mini_help (
 {
 	int line;
 
-	if (!beginner_level) {
+	if (!beginner_level)
 		return;
-	}
 
 	line = NOTESLINES + (MINI_HELP_LINES - 2);
 
@@ -537,12 +529,6 @@ show_mini_help (
 			center_line (line+1, FALSE, txt_mini_select_2);
 			center_line (line+2, FALSE, txt_mini_select_3);
 			break;
-/* what the hell is the spooldir-level ???? */
-#if 0
-		case SPOOLDIR_LEVEL:
-			center_line (line, FALSE, txt_mini_spooldir_1);
-			break;
-#endif
 		case GROUP_LEVEL:
 			center_line (line, FALSE, txt_mini_group_1);
 			center_line (line+1, FALSE, txt_mini_group_2);
@@ -558,7 +544,7 @@ show_mini_help (
 			center_line (line+2, FALSE, txt_mini_page_3);
 			break;
 		default:
-			error_message ("Unknown display level", "");
+			error_message ("Unknown display level");
 			break;
 	}
 #ifdef HAVE_COLOR

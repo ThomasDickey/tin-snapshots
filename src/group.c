@@ -35,12 +35,12 @@ static const char *spaces = "XXXX";
 static int draw_sline (int i, int full);
 
 #ifndef INDEX_DAEMON
-static int bld_sline (int i);
-static int line_is_tagged (int n);
-static int prompt_subject_num (int ch);
-static void update_group_page (void);
-static void show_group_title (int clear_title);
-static void show_tagged_lines (void);
+	static int bld_sline (int i);
+	static int line_is_tagged (int n);
+	static int prompt_subject_num (int ch);
+	static void update_group_page (void);
+	static void show_group_title (int clear_title);
+	static void show_tagged_lines (void);
 #endif /* !INDEX_DAEMON */
 
 
@@ -49,16 +49,17 @@ static int
 line_is_tagged (
 	int n)
 {
-	int	code = 0;
+	int code = 0;
+
 	if (CURR_GROUP.attribute->thread_arts) {
 		register int i;
 		for (i = n; i >= 0; i = arts[i].thread) {
 			if (arts[i].tagged > code)
 				code = arts[i].tagged;
 		}
-	} else {
+	} else
 		code = arts[n].tagged;
-	}
+
 	return code;
 }
 #endif /* INDEX_DAEMON */
@@ -69,6 +70,7 @@ static void
 show_tagged_lines (void)
 {
 	register int i;
+
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
 		if ((i != index_point) && line_is_tagged(base[i])) {
 			bld_sline (i);
@@ -104,8 +106,8 @@ group_page (
 #ifndef INDEX_DAEMON
 
 	char group_path[LEN];
- 	char buf[128];
- 	char pat[128];
+	char buf[128];
+	char pat[128];
 	int ch;
 	int dummy = 0;
 	int flag, i;
@@ -119,7 +121,7 @@ group_page (
 	int old_group_top;
 	int thread_depth;					/* Depth into thread we start at */
 	long old_artnum = 0L;
- 	struct t_art_stat sbuf;
+	struct t_art_stat sbuf;
 	t_bool range_active = FALSE;		/* Set if a range is defined */
 
 	/*
@@ -127,7 +129,7 @@ group_page (
 	 */
 	group->read_during_session = TRUE;
 
- 	proc_ch_default = get_post_proc_type (group->attribute->post_proc_type);
+	proc_ch_default = get_post_proc_type (group->attribute->post_proc_type);
 
 	glob_group = group->name;
 	num_of_tagged_arts = 0;
@@ -140,38 +142,34 @@ group_page (
 	/*
 	 * update index file. quit group level if user aborts indexing
 	 */
-	if (!index_group (group)) {
+	if (!index_group (group))
 		return;
-	}
 
 	if (space_mode) {
 		for (i = 0; i < top_base; i++) {
-			if (new_responses (i)) {
+			if (new_responses (i))
 				break;
-			}
 		}
-		if (i < top_base) {
+		if (i < top_base)
 			index_point = i;
-		} else {
+		else
 			index_point = top_base - 1;
-		}
-	} else {
+	} else
 		index_point = top_base - 1;
-	}
 
 	set_subj_from_size (cCOLS);
 	clear_note_area ();
 
 	if (group->attribute->auto_select) {
-		error_message (txt_autoselecting_articles, "");
+		error_message (txt_autoselecting_articles);
 		goto do_auto_select_arts;	/* 'X' command */
 	}
 
 	show_group_page ();
 
 #ifdef DEBUG_NEWSRC
-debug_print_comment ("group.c: before while(1) loop...");
-debug_print_bitmap (group, NULL);
+	debug_print_comment ("group.c: before while(1) loop...");
+	debug_print_bitmap (group, NULL);
 #endif
 
 	forever {
@@ -197,21 +195,18 @@ debug_print_bitmap (group, NULL);
 					goto group_down;
 
 				case KEYMAP_LEFT:
-					if (group_catchup_on_exit) {
+					if (group_catchup_on_exit)
 						goto group_catchup;
-					} else {
+					else
 						goto group_done;
-					}
 
 				case KEYMAP_RIGHT:
-					if (auto_list_thread && index_point >= 0 &&
-					    num_of_responses (index_point)) {
+					if (auto_list_thread && index_point >= 0 && num_of_responses (index_point)) {
 /* TODO the above line is a waste, why not 'arts[base[index_point]].thread != -1 or a HAS_FOLLOWUP() macro */
 						thread_depth = 0;
 						goto group_list_thread;
-					} else {
+					} else
 						goto group_read_basenote;
-					}
 
 				case KEYMAP_PAGE_UP:
 					goto group_page_up;
@@ -229,10 +224,9 @@ debug_print_bitmap (group, NULL);
 					switch (xmouse) {
 						case MOUSE_BUTTON_1:
 						case MOUSE_BUTTON_3:
-							if (xrow < INDEX2LNUM(first_subj_on_screen) ||
-								xrow > INDEX2LNUM(last_subj_on_screen-1)) {
+							if (xrow < INDEX2LNUM(first_subj_on_screen) || xrow > INDEX2LNUM(last_subj_on_screen-1))
 								goto group_page_down;
-							}
+
 							erase_subject_arrow ();
 							index_point = xrow-INDEX2LNUM(first_subj_on_screen)+first_subj_on_screen;
 							draw_subject_arrow ();
@@ -241,21 +235,17 @@ debug_print_bitmap (group, NULL);
 /* TODO see above re: waste */
 									thread_depth = 0;
 									goto group_list_thread;
-								} else {
+								} else
 									goto group_tab_pressed;
-								}
 							}
 							break;
 						case MOUSE_BUTTON_2:
-							if (xrow < INDEX2LNUM(first_subj_on_screen) ||
-								xrow > INDEX2LNUM(last_subj_on_screen-1)) {
+							if (xrow < INDEX2LNUM(first_subj_on_screen) || xrow > INDEX2LNUM(last_subj_on_screen-1))
 								goto group_page_up;
-							}
-							if (group_catchup_on_exit) {
+							if (group_catchup_on_exit)
 								goto group_catchup;
-							} else {
+							else
 								goto group_done;
-							}
 
 						default:
 							break;
@@ -275,38 +265,16 @@ debug_print_bitmap (group, NULL);
 				break;
 #endif
 
-			case iKeyFirstPage: /*show first page of threads */
+			case iKeyFirstPage: /* show first page of threads */
 top_of_list:
-				if (!top_base) {
-					break;
-				}
-				if (index_point != 0) {
-					if (0 < first_subj_on_screen) {
-						erase_subject_arrow ();
-						index_point = 0;
-						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = 0;
-						draw_subject_arrow ();
-					}
-				}
+				if (top_base)
+					move_to_thread(0);
 				break;
 
 			case iKeyLastPage:	/* show last page of threads */
 end_of_list:
-				if (!top_base) {
-					break;
-				}
-				if (index_point != top_base - 1) {
-					erase_subject_arrow ();
-					index_point = top_base - 1;
-
-					if (top_base - 1 >= last_subj_on_screen)
-						show_group_page ();
-					else
-						draw_subject_arrow ();
-				}
+				if (top_base)
+					move_to_thread(top_base - 1);
 				break;
 
 			case iKeyGroupLastViewed:	/* go to last viewed article */
@@ -329,10 +297,8 @@ end_of_list:
 				break;
 
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
-				if (index_point >= 0) {
-					feed_articles (FEED_PIPE, GROUP_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
+				if (index_point >= 0)
+					feed_articles (FEED_PIPE, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
 				break;
 
 			case iKeySetRange:	/* set range */
@@ -378,19 +344,18 @@ group_read_basenote:
 				}
 				i = (int) base[index_point];
 				index_point = show_page (group, group_path, i, &dummy);
-				if (index_point == GRP_NOREDRAW) {
+				if (index_point == GRP_NOREDRAW)
 					index_point = which_thread (i);
-				} else if (index_point < 0) {
+				else if (index_point < 0) {
 					space_mode = (index_point == GRP_CONTINUE);
 /*
 my_printf ("point=[%d] filtered_art=[%d]", index_point, filtered_articles);
 sleep(3);
 */
-					if (index_point == GRP_CONTINUE) {
+					if (index_point == GRP_CONTINUE)
 						goto group_tab_pressed;
-					} else {
+					else
 						goto group_done;
-					}
 				}
 				clear_note_area ();
 				show_group_page ();
@@ -398,34 +363,29 @@ sleep(3);
 
 			case iKeyGroupNextUnreadArtOrGrp:	/* goto next unread article/group */
 group_tab_pressed:
- 				space_mode = TRUE;
-				if (index_point < 0) {
+				space_mode = TRUE;
+				if (index_point < 0)
 					n =  -1;
-				} else {
+				else
 					n = next_unread ((int) base[index_point]);
-				}
 				if (index_point < 0 || n < 0) {
 					for (i = cur_groupnum+1 ; i < group_top ; i++) {
-						if (active[my_group[i]].newsrc.num_unread > 0) {
+						if (active[my_group[i]].newsrc.num_unread > 0)
 							break;
-						}
 					}
-					if (i >= group_top) {
+					if (i >= group_top)
 						goto group_done;
-					}
 					cur_groupnum = i;
 					index_point = GRP_GOTONEXT;
 					goto group_done;
 				}
 				index_point = show_page (group, group_path, n, &dummy);
-				if (index_point == GRP_NOREDRAW ||
-					index_point == GRP_CONTINUE) {
+				if (index_point == GRP_NOREDRAW || index_point == GRP_CONTINUE) {
 					index_point = which_thread (n);
 					goto group_tab_pressed;	/* repeat TAB */
 				} else {
-					if (index_point < 0) {
+					if (index_point < 0)
 						goto group_done;
-					}
 					clear_note_area ();
 					show_group_page ();
 				}
@@ -435,19 +395,10 @@ group_tab_pressed:
 			case iKeyPageDown2:
 			case iKeyPageDown3:
 group_page_down:
-				if (!top_base) {
+				if (!top_base)
 					break;
-				}
-				if (index_point == top_base - 1) {
-					if (0 < first_subj_on_screen) {
-						erase_subject_arrow ();
-						index_point = 0;
-						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = 0;
-						draw_subject_arrow ();
-					}
+				if (index_point + 1 == top_base) {
+					move_to_thread (0);
 					break;
 				}
 				erase_subject_arrow ();
@@ -455,20 +406,18 @@ group_page_down:
 				index_point = ((index_point + scroll_lines) / scroll_lines) * scroll_lines;
 				if (index_point >= top_base) {
 					index_point = (top_base / scroll_lines) * scroll_lines;
-					if (index_point < top_base - 1) {
+					if (index_point < top_base - 1)
 						index_point = top_base - 1;
-					}
 				}
-				if (index_point < first_subj_on_screen
-				|| index_point >= last_subj_on_screen)
+				if (index_point < first_subj_on_screen || index_point >= last_subj_on_screen)
 					show_group_page ();
 				else
 					draw_subject_arrow ();
 				break;
 
 			case iKeyGroupAutosel:		/* auto-select article menu */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 				old_top = top;
@@ -485,8 +434,8 @@ group_page_down:
 				break;
 
 			case iKeyGroupKill:		/* kill article menu */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 				old_top = top;
@@ -503,8 +452,8 @@ group_page_down:
 				break;
 
 			case iKeyGroupQuickAutosel:		/* quickly auto-select article */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 				if (!confirm_action || prompt_yn (cLINES, txt_quick_filter_select, TRUE) == 1) {
@@ -524,8 +473,8 @@ group_page_down:
 				break;
 
 			case iKeyGroupQuickKill:		/* quickly kill article */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 				if (!confirm_action || prompt_yn (cLINES, txt_quick_filter_kill, TRUE) == 1) {
@@ -553,93 +502,47 @@ group_page_down:
 			case iKeyDown:		/* line down */
 			case iKeyDown2:
 group_down:
-				if (!top_base) {
+				if (!top_base)
 					break;
-				}
-				if (index_point + 1 >= top_base) {
-					HpGlitch(erase_subject_arrow());
-					if (0 < first_subj_on_screen) {
-						index_point = 0;
-						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = 0;
-						draw_subject_arrow ();
-					}
-					break;
-				}
-				if (index_point + 1 >= last_subj_on_screen) {
-					erase_subject_arrow();
-					index_point++;
-					show_group_page ();
-				} else {
-					erase_subject_arrow ();
-					index_point++;
-					draw_subject_arrow ();
-				}
+
+				if (index_point + 1 >= top_base)
+					move_to_thread (0);
+				else
+					move_to_thread (index_point + 1);
 				break;
 
 			case iKeyUp:		/* line up */
 			case iKeyUp2:
 group_up:
-				if (!top_base) {
+				if (!top_base)
 					break;
-				}
-				if (index_point == 0) {
-					HpGlitch(erase_subject_arrow ());
-					if (top_base > last_subj_on_screen) {
-						index_point = top_base - 1;
-						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = top_base - 1;
-						draw_subject_arrow ();
-					}
-					break;
-				}
-				HpGlitch(erase_subject_arrow ());
-				if (index_point <= first_subj_on_screen) {
-					index_point--;
-					show_group_page ();
-				} else {
-					erase_subject_arrow ();
-					index_point--;
-					draw_subject_arrow ();
-				}
+
+				if (index_point == 0)
+					move_to_thread (top_base - 1);
+				else
+					move_to_thread (index_point - 1);
 				break;
 
 			case iKeyPageUp:		/* page up */
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 group_page_up:
-				if (!top_base) {
+				if (!top_base)
 					break;
-				}
 				if (index_point == 0) {
-					HpGlitch(erase_subject_arrow ());
-					if (top_base > last_subj_on_screen) {
-						index_point = top_base - 1;
-						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = top_base - 1;
-						draw_subject_arrow ();
-					}
+					move_to_thread (top_base - 1);
 					break;
 				}
 				clear_message ();
 				erase_subject_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = index_point % scroll_lines) > 0) {
+				if ((n = index_point % scroll_lines) > 0)
 					index_point = index_point - n;
-				} else {
+				else
 					index_point = ((index_point - scroll_lines) / scroll_lines) * scroll_lines;
-				}
-				if (index_point < 0) {
+				if (index_point < 0)
 					index_point = 0;
-				}
-				if (index_point < first_subj_on_screen
-				|| index_point >= last_subj_on_screen)
+				if (index_point < first_subj_on_screen || index_point >= last_subj_on_screen)
 					show_group_page ();
 				else
 					draw_subject_arrow ();
@@ -669,26 +572,24 @@ group_page_up:
 				}
 				break;
 
- 			case iKeyGroupCatchup:	/* catchup - mark all articles as read */
- 			case iKeyGroupCatchupGotoNext:	/* catchup - and goto next unread group */
+			case iKeyGroupCatchup:			/* catchup & return to group menu */
+			case iKeyGroupCatchupGotoNext:	/* catchup & go to next group with unread */
 group_catchup:
 				{	int yn = 1;
-					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, TRUE) != 1) {
+
+					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, TRUE) != 1)
 						break;
-					}
-					if (!CURR_GROUP.newsrc.num_unread ||
-					    !confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1) {
+
+					if (!CURR_GROUP.newsrc.num_unread || !confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1)
 						grp_mark_read (&CURR_GROUP, arts);
-					}
+
 					if (ch == iKeyGroupCatchupGotoNext) {
-						if (yn == 1) {
+						if (yn == 1)
 							goto group_tab_pressed;
-						}
 					} else {
-						if (yn != -1) {
-							if (cur_groupnum + 1 < group_top) {
+						if (yn == 1) {
+							if (cur_groupnum + 1 < group_top)
 								cur_groupnum++;
-							}
 							goto group_done;
 						}
 					}
@@ -793,18 +694,10 @@ group_catchup:
 				}
 
 				if ((n = which_thread (n)) < 0) {
-					error_message ("Internal error: K which_thread < 0", "");
+					error_message ("Internal error: which_thread(%d) < 0", n);
 					break;
 				}
-				if (n < first_subj_on_screen || n >= last_subj_on_screen) {
-					HpGlitch(erase_subject_arrow ());
-					index_point = n;
-					show_group_page ();
-				} else {
-					erase_subject_arrow ();
-					index_point = n;
-					draw_subject_arrow ();
-				}
+				move_to_thread (n);
 				break;
 
 			case iKeyGroupListThd:	/* list articles within current thread */
@@ -814,7 +707,7 @@ group_list_thread:
 					info_message (txt_no_arts);
 					break;
 				}
- 				space_mode = TRUE;
+				space_mode = TRUE;
 				n = show_thread (group, group_path, (int) base[index_point], thread_depth);
 				if (n == GRP_QUIT) {
 					index_point = n;
@@ -951,32 +844,28 @@ group_list_thread:
 	 			 * exist after toggle. Otherwise we find the
 	 			 * next closest
 	 			 */
- 				if (CURR_GROUP.attribute->show_only_unread) {
-					wait_message (txt_reading_all_arts);
- 				} else {
-					wait_message (txt_reading_new_arts);
- 				}
- 				i = -1;
- 				if (index_point >= 0) {
- 					if (CURR_GROUP.attribute->show_only_unread ||
- 					    new_responses (index_point)) {
- 						i = base[index_point];
- 					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
- 						i = n;
- 					} else if ((n = next_unread ((int)base[index_point])) >= 0) {
- 						i = n;
- 					}
- 				}
- 				CURR_GROUP.attribute->show_only_unread =
- 					!CURR_GROUP.attribute->show_only_unread;
- 				auto_select_articles (&CURR_GROUP);
- 				find_base (&CURR_GROUP);
- 				if (i >= 0 && (n = which_thread (i)) >= 0)
- 					index_point = n;
- 				else if (top_base > 0)
- 					index_point = top_base - 1;
- 				show_group_page ();
- 				break;
+				wait_message (0, txt_reading_arts, (CURR_GROUP.attribute->show_only_unread) ? "all " : "unread ");
+
+				i = -1;
+				if (index_point >= 0) {
+					if (CURR_GROUP.attribute->show_only_unread ||
+					    new_responses (index_point)) {
+						i = base[index_point];
+					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
+						i = n;
+					} else if ((n = next_unread ((int)base[index_point])) >= 0) {
+						i = n;
+					}
+				}
+				CURR_GROUP.attribute->show_only_unread = !CURR_GROUP.attribute->show_only_unread;
+				auto_select_articles (&CURR_GROUP);
+				find_base (&CURR_GROUP);
+				if (i >= 0 && (n = which_thread (i)) >= 0)
+					index_point = n;
+				else if (top_base > 0)
+					index_point = top_base - 1;
+				show_group_page ();
+				break;
 
 			case iKeyGroupBugReport:	/* bug/gripe/comment mailed to author */
 				mail_bug_report ();
@@ -1060,7 +949,7 @@ group_list_thread:
 
 				CURR_GROUP.attribute->thread_arts =
 							++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
- 				if (index_point >= 0) {
+				if (index_point >= 0) {
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);
 				}
@@ -1069,7 +958,7 @@ group_list_thread:
 				break;
 
 			case iKeyGroupUntag:	/* untag all articles */
- 				if (index_point >= 0) {
+				if (index_point >= 0) {
 					if (untag_all_articles())
 						update_group_page();
 				}
@@ -1080,9 +969,8 @@ group_list_thread:
 				break;
 
 			case iKeyGroupPost:	/* post an article */
-				if (post_article (group->name, &posted_flag)) {
+				if (post_article (group->name, &posted_flag))
 					show_group_page ();
-				}
 				break;
 
 			case iKeyPostponed:	/* post postponed article */
@@ -1096,21 +984,18 @@ group_list_thread:
 				break;
 
 			case iKeyGroupDisplayPostHist:	/* display messages posted by user */
-				if (user_posted_messages ()) {
+				if (user_posted_messages ())
 					show_group_page ();
-				}
 				break;
 
 			case iKeyGroupRepost:	/* repost current article */
-				if (index_point >= 0) {
-					feed_articles (FEED_REPOST, GROUP_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
+				if (index_point >= 0)
+					feed_articles (FEED_REPOST, GROUP_LEVEL, &CURR_GROUP, (int) base[index_point]);
 				break;
 
 			case iKeyGroupMarkArtUnread:	/* mark base article of thread unread */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 				if (range_active) {
@@ -1131,19 +1016,22 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-				} else
+					strcpy(msg, "Base article range");
+				} else {
 	 				art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
+					strcpy(msg, "Base article");
+				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_art_marked_as_unread);
+				info_message (txt_marked_as_unread, msg);
 				break;
 
 			case iKeyGroupMarkThdUnread:	/* mark whole thread as unread */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 
@@ -1162,19 +1050,23 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-				} else
+					strcpy(msg, "Thread range");
+				} else {
 					thd_mark_unread (&CURR_GROUP, base[index_point]);
+					strcpy(msg, "Thread");
+				}
+
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_thread_marked_as_unread);
+				info_message (txt_marked_as_unread, msg);
 				break;
 
 			case iKeyGroupSelThd:	/* mark thread as selected */
 			case iKeyGroupToggleThdSel:	/* toggle thread */
- 				if (index_point < 0) {
- 					info_message (txt_no_arts);
+				if (index_point < 0) {
+					info_message (txt_no_arts);
 					break;
 				}
 
@@ -1209,49 +1101,49 @@ group_list_thread:
 				update_group_page ();
 				break;
 
-  			case iKeyGroupUndoSel:	/* undo selections */
- 				for (i=0; i < top; i++) {
-  					arts[i].selected = FALSE;
- 					arts[i].zombie = FALSE;
- 				}
- 				xflag = 0;
-  				update_group_page ();
-  				break;
+			case iKeyGroupUndoSel:	/* undo selections */
+				for (i=0; i < top; i++) {
+					arts[i].selected = FALSE;
+					arts[i].zombie = FALSE;
+				}
+				xflag = 0;
+				update_group_page ();
+				break;
 
- 			case iKeyGroupSelPattern:	/* select matching patterns */
- 				sprintf (msg, txt_select_pattern, default_select_pattern);
- 				if (!prompt_string (msg, buf, HIST_SELECT_PATTERN)) {
- 					break;
- 				}
- 				if (buf[0] == '\0') {
- 					if (default_select_pattern[0] == '\0') {
- 						info_message ("No previous expression");
- 						break;
- 					}
+			case iKeyGroupSelPattern:	/* select matching patterns */
+				sprintf (msg, txt_select_pattern, default_select_pattern);
+				if (!prompt_string (msg, buf, HIST_SELECT_PATTERN)) {
+					break;
+				}
+				if (buf[0] == '\0') {
+					if (default_select_pattern[0] == '\0') {
+						info_message ("No previous expression");
+						break;
+					}
 					sprintf (pat, "*%s*", default_select_pattern);
- 				} else if (STRCMPEQ(buf, "*")) {	/* all */
- 					strcpy (pat, buf);
- 					strcpy (default_select_pattern, pat);
- 				} else {
- 					strcpy (default_select_pattern, buf);
- 					sprintf (pat, "*%s*", default_select_pattern);
- 				}
+				} else if (STRCMPEQ(buf, "*")) {	/* all */
+					strcpy (pat, buf);
+					strcpy (default_select_pattern, pat);
+				} else {
+					strcpy (default_select_pattern, buf);
+					sprintf (pat, "*%s*", default_select_pattern);
+				}
 
- 				flag = 0;
- 				for (n=0; n < top_base; n++) {
- 					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE)) {
- 						continue;
- 					}
- 					for (i = (int) base[n] ; i != -1 ; i = arts[i].thread) {
- 						arts[i].selected = TRUE;
- 					}
- 					bld_sline(n);
- 					flag++;
- 				}
- 				if (flag) {
- 					update_group_page ();
- 				}
- 				break;
+				flag = 0;
+				for (n=0; n < top_base; n++) {
+					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE)) {
+						continue;
+					}
+					for (i = (int) base[n] ; i != -1 ; i = arts[i].thread) {
+						arts[i].selected = TRUE;
+					}
+					bld_sline(n);
+					flag++;
+				}
+				if (flag) {
+					update_group_page ();
+				}
+				break;
 
 			case iKeyGroupSelThdIfUnreadSelected:	/* select all unread arts in thread hot if 1 is hot */
 				for (n=0; n < top_base; n++) {
@@ -1285,7 +1177,7 @@ do_auto_select_arts:
 				}
 				xflag = TRUE;
 				index_point = 0;
- 				show_group_page ();
+				show_group_page ();
 				break;
 
 			case iKeyGroupDoAutoSel:	/* perform auto-selection on group */
@@ -1308,7 +1200,7 @@ undo_auto_select_arts:
 				}
 				xflag = FALSE;
 				index_point = 0;	/* do we want this ? */
- 				show_group_page ();
+				show_group_page ();
 				break;
 
 			case iKeyGroupDisplaySubject:
@@ -1320,7 +1212,8 @@ undo_auto_select_arts:
 
 					stat_thread(index_point, &statbuf);
 					j = (statbuf.unread) ? next_unread(base[index_point]) : base[index_point];
-					info_message(arts[j].subject);
+					clear_message();
+					center_line (cLINES, FALSE, arts[j].subject);
 				}
 				break;
 
@@ -1389,7 +1282,7 @@ show_group_page (void)
 		}
 	}
 
-	if (top_base == 0) {
+	if (!top_base) {
 		first_subj_on_screen = 0;
 		last_subj_on_screen = 0;
 	}
@@ -1475,9 +1368,8 @@ prompt_subject_num (
 {
 	int num;
 
-	if (!top_base) {
+	if (!top_base)
 		return FALSE;
-	}
 
 	clear_message ();
 
@@ -1485,25 +1377,16 @@ prompt_subject_num (
 		clear_message ();
 		return FALSE;
 	}
+
 	num--;		/* index from 0 (internal) vs. 1 (user) */
 
-	if (num < 0) {
+	if (num < 0)
 		num = 0;
-	}
-	if (num >= top_base) {
-		num = top_base - 1;
-	}
 
-	if (num >= first_subj_on_screen
-	&&  num < last_subj_on_screen) {
-		erase_subject_arrow ();
-		index_point = num;
-		draw_subject_arrow ();
-	} else {
-		erase_subject_arrow ();
-		index_point = num;
-		show_group_page ();
-	}
+	if (num >= top_base)
+		num = top_base - 1;
+
+	move_to_thread (num);
 
 	return TRUE;
 }
@@ -1532,24 +1415,23 @@ find_new_pos (
 {
 	int i, pos;
 
- 	if (top == old_top) {
- 		return cur_pos;
- 	}
+	if (top == old_top) {
+		return cur_pos;
+	}
 
 	for (i = 0 ; i < top ; i++) {
 		if (arts[i].artnum == old_artnum) {
- 			pos = which_thread (arts[i].artnum);
- 			if (pos >= 0) {
- 				return pos;
- 			}
- 		}
+			pos = which_thread (arts[i].artnum);
+			if (pos >= 0) {
+				return pos;
+			}
+		}
 	}
 
- 	if (cur_pos < top_base) {
- 		return cur_pos;
- 	} else {
- 		return (top_base - 1);
- 	}
+	if (cur_pos < top_base) 
+		return cur_pos;
+	else
+		return (top_base - 1);
 }
 
 
@@ -1592,16 +1474,20 @@ set_subj_from_size (
 {
 	int size, show_author;
 
-	if (group_top == 0)
-		show_author = default_show_author;
-	else
+	/*
+	 * This function is called early during startup when we only have
+	 * very limited information loaded.
+	 */
+	if (group_top && CURR_GROUP.attribute)
 		show_author = CURR_GROUP.attribute->show_author;
+	else
+		show_author = default_show_author;
 
-	if (show_author == SHOW_FROM_BOTH) {
+	if (show_author == SHOW_FROM_BOTH)
 		max_subj = (num_cols / 2) - 4;
-	} else {
+	else
 		max_subj = (num_cols / 2) + 3;
-	}
+
 	max_from = (num_cols - max_subj) - 17;
 
 	if (show_author != SHOW_FROM_BOTH) {
@@ -1683,7 +1569,7 @@ bld_sline (
 	 *	n--;
 	 */
 
-	if ((j = line_is_tagged(respnum)) != 0) {
+	if ((j = line_is_tagged(respnum))) {
 		strcpy (new_resps, tin_itoa(j, 3));
 	} else {
 		sprintf (new_resps, "  %c", sbuf.art_mark);
@@ -1829,20 +1715,12 @@ show_group_title (
 		}
 	}
 
-	if (active[num].attribute->thread_arts) {
-		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%s)",
-			active[num].name, top_base,
-			*txt_thread[active[num].attribute->thread_arts],
-			art_cnt, num_of_killed_arts, num_of_selected_arts,
-			(active[num].attribute->show_only_unread ? " R" : ""),
-			(active[num].moderated == 'm' ? " M" : ""));
-	} else {
-		sprintf (buf, "%s (%dU %dK %dH%s%s)",
-			active[num].name,
-			art_cnt, num_of_killed_arts, num_of_selected_arts,
-			(active[num].attribute->show_only_unread ? " R" : ""),
-			(active[num].moderated == 'm' ? " M" : ""));
-	}
+	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
+		active[num].name, top_base,
+		*txt_thread[active[num].attribute->thread_arts],
+		art_cnt, num_of_killed_arts, num_of_selected_arts,
+		(active[num].attribute->show_only_unread ? " R" : ""),
+		group_flag(active[num].moderated));
 
 	if (clear_title) {
 		MoveCursor (0, 0);
@@ -1852,4 +1730,25 @@ show_group_title (
 	show_title (buf);
 
 }
+
+/*
+ * Move the on-screen pointer & internal variable to the given thread number
+ */
+void
+move_to_thread(
+	int n)
+{
+	if (index_point == n)
+		return;
+
+	HpGlitch(erase_subject_arrow ());
+	erase_subject_arrow ();
+	index_point = n;
+
+	if (n >= first_subj_on_screen && n < last_subj_on_screen)
+		draw_subject_arrow ();
+	else
+		show_group_page ();
+}
+
 #endif /* INDEX_DAEMON */

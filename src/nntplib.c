@@ -18,20 +18,21 @@
 #include "tcurses.h"
 #include "tnntp.h"
 
+/* Copy of last NNTP command sent, so we can retry it if needed */
 char	last_put[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
-	static	char nntp_line[NNTP_STRLEN];
+	TCP *nntp_rd_fp = NULL;
+	TCP *nntp_wr_fp = NULL;
 #endif
 
-#ifndef VMS
-#	ifdef NNTP_ABLE
-		TCP *nntp_rd_fp = NULL;
-		TCP *nntp_wr_fp = NULL;
-#	endif /* NNTP_ABLE */
-#else /* VMS */
-	int	sockt_rd = -1, sockt_wr = -1;
-#endif /* !VMS */
+/* Close the NNTP connection with prejudice */
+#define NNTP_HARD_CLOSE					\
+	if (nntp_wr_fp)						\
+		s_fclose (nntp_wr_fp);			\
+	if (nntp_rd_fp)						\
+		s_fclose (nntp_rd_fp);			\
+	nntp_rd_fp = nntp_wr_fp = NULL;
 
 /*
  * getserverbyfile(file)
@@ -54,8 +55,8 @@ getserverbyfile (
 	const char *file)
 {
 #ifdef NNTP_ABLE
-	register FILE	*fp;
-	register char	*cp;
+	FILE	*fp;
+	char	*cp;
 	static char	buf[256];
 
 	if (cmdline_nntpserver[0] != '\0') {
@@ -63,26 +64,23 @@ getserverbyfile (
 		return (buf);
 	}
 
-	cp = getenv ("NNTPSERVER");
-	if (cp != (char *) 0) {
+	if ((cp = getenv ("NNTPSERVER")) != (char *) 0) {
 		get_nntpserver (buf, cp);
 		return (buf);
 	}
 
-	if (file == (char *) 0) {
+	if (file == (char *) 0)
 		return (char *) 0;
-	}
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
 
 		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-			if (*buf == '\n' || *buf == '#') {
+			if (*buf == '\n' || *buf == '#')
 				continue;
-			}
-			cp = strrchr (buf, '\n');
-			if (cp) {
+
+			if ((cp = strrchr (buf, '\n')) != NULL)
 				*cp = '\0';
-			}
+
 			(void) fclose (fp);
 			return (buf);
 		}
@@ -95,9 +93,7 @@ getserverbyfile (
 		}
 	}
 
-	cp = GetConfigValue (_CONF_SERVER);
-
-	if (cp != (char *) 0) {
+	if ((cp = GetConfigValue (_CONF_SERVER)) != (char *) 0) {
 		(void) strcpy (buf, cp);
 		return (buf);
 	}
@@ -113,26 +109,28 @@ getserverbyfile (
  *			"service" is the service to connect to on the machine.
  *			"port" is the servive port to connect to.
  *
- *	Returns:	-1 on error
- *			server's initial response code on success.
+ *	Returns:	server's initial response code
+ *			or -errno
  *
  *	Side effects:	Connects to server.
  *			"nntp_rd_fp" and "nntp_wr_fp" are fp's
  *			for reading and writing to server.
+ *			"text" is updated to contain the rest of response string from server
  */
 
+#ifdef NNTP_ABLE
 int
 server_init (
-	char	*machine,
+	char *machine,
 	const char *service,
-	int	port)
+	int port,
+	char *text)
 {
-#ifdef NNTP_ABLE
 #ifndef VMS
 	int	sockt_rd, sockt_wr;
 #endif
 
-#if defined (M_AMIGA) || defined(WIN32) && defined(NNTP_ABLE)
+#if defined (M_AMIGA) || defined(WIN32)
 	if (s_init() == 0)                /* some initialisation ... */
 		return -1;
 #endif
@@ -153,7 +151,7 @@ server_init (
 #endif
 
 	if (sockt_rd < 0)
-		return (-1);
+		return (sockt_rd);
 
 #ifndef VMS
 	/*
@@ -162,37 +160,39 @@ server_init (
 	 * open a fp for reading and writing -- we have to open
 	 * up two separate fp's, one for reading, one for writing.
 	 */
-
 	if ((nntp_rd_fp = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
 		perror ("server_init: fdopen #1");
-		return (-1);
+		return (-errno);
 	}
 
-	sockt_wr = s_dup (sockt_rd);
+	if ((sockt_wr = s_dup (sockt_rd)) < 0) {
+		perror ("server_init: dup");
+		return (-errno);
+	}
+
 #ifdef TLI
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
 		t_error ("server_init: t_sync");
 		nntp_rd_fp = NULL;		/* from above */
-		return (-1);
+		return (-EPROTO);
 	}
 #endif
+
 	if ((nntp_wr_fp = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
 		perror ("server_init: fdopen #2");
 		nntp_rd_fp = NULL;		/* from above */
-		return (-1);
+		return (-errno);
 	}
 #else /* VMS */
 	sockt_wr = sockt_rd;
 #endif
+
 	/*
 	 * Now get the server's signon message
 	 */
-	(void) get_server (nntp_line, sizeof (nntp_line));
-	return (atoi (nntp_line));
-#else
-	return (-1);
-#endif /* NNTP_ABLE */
+	return (get_respcode(text));
 }
+#endif /* NNTP_ABLE */
 
 /*
  * get_tcp_socket -- get us a socket connected to the specified server.
@@ -201,22 +201,25 @@ server_init (
  *			"service" is the service to connect to on the server.
  *			"port" is the port to connect to on the server.
  *
- *	Returns:	Socket connected to the server if
- *			all is ok, else -1 on error.
+ *	Returns:	Socket connected to the server if all if ok
+ *			EPROTO		for internal socket errors
+ *			EHOSTUNREACH	if specified NNTP port/server can't be located
+ *			errno		any valid errno value on connection
  *
  *	Side effects:	Connects to server.
  *
- *	Errors:		Printed via perror.
+ *	Errors:		Returned & printed via perror.
  */
 
+#ifdef NNTP_ABLE
 int
 get_tcp_socket (
 	const char *machine,	/* remote host */
 	const char *service,	/* nttp/smtp etc. */
 	unsigned port)		/* tcp port number */
 {
-#ifdef NNTP_ABLE
 	int	s = -1;
+	int save_errno = 0;
 	struct	sockaddr_in	sock_in;
 
 #ifdef TLI
@@ -229,22 +232,23 @@ get_tcp_socket (
 	 */
 	if ((s = t_open ("/dev/tcp", O_RDWR, (struct t_info*) 0)) < 0){
 		t_error ("t_open: can't t_open /dev/tcp");
-		return (-1);
+		return (-EPROTO);
 	}
 	if (t_bind (s, (struct t_bind *) 0, (struct t_bind *) 0) < 0) {
 	   	t_error ("t_bind");
 		t_close (s);
-		return (-1);
+		return (-EPROTO);
 	}
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
+
 	if (!isdigit((unsigned char)*machine) ||
 	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
 		if ((hp = gethostbyname (machine)) == NULL) {
 			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
-			return (-1);
+			return (-EHOSTUNREACH);
 		}
 		memcopy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
 	}
@@ -256,7 +260,7 @@ get_tcp_socket (
 	if ((callptr = (struct t_call *) t_alloc (s,T_CALL,T_ADDR)) == NULL){
 		t_error ("t_alloc");
 		t_close (s);
-		return (-1);
+		return (-EPROTO);
 	}
 
 	callptr->addr.maxlen = sizeof (sock_in);
@@ -269,9 +273,10 @@ get_tcp_socket (
 	 * Connect to the server.
 	 */
 	if (t_connect (s, callptr, (struct t_call *) 0) < 0) {
+		save_errno = t_errno;
 		t_error ("t_connect");
 		t_close (s);
-		return (-1);
+		return (-save_errno);
 	}
 
 	/*
@@ -283,13 +288,13 @@ get_tcp_socket (
 	if (ioctl (s,  I_POP,  (char *) 0) < 0) {
 		perror ("I_POP(timod)");
 		t_close (s);
-		return (-1);
+		return (-EPROTO);
 	}
 
 	if (ioctl (s,  I_PUSH, "tirdwr") < 0) {
 		perror ("I_PUSH(tirdwr)");
 		t_close (s);
-		return (-1);
+		return (-EPROTO);
 	}
 
 #else /* !TLI */
@@ -308,7 +313,7 @@ get_tcp_socket (
 #ifdef HAVE_GETSERVBYNAME
 	if ((sp = (struct servent *) getservbyname (service, "tcp")) ==  NULL) {
 		my_fprintf (stderr, "%s/tcp: Unknown service.\n", service);
-		return (-1);
+		return (-EHOSTUNREACH);
 	}
 #else
 	sp = (struct servent *) malloc (sizeof (struct servent));
@@ -331,15 +336,16 @@ get_tcp_socket (
 		def.h_aliases = 0;
 		hp = &def;
 	}
+
 	if (hp == NULL) {
 		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
-		return (-1);
+		return (-EHOSTUNREACH);
 	}
 
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = hp->h_addrtype;
 	sock_in.sin_port = htons (port);
-/* sock_in.sin_port = sp->s_port; */
+/*	sock_in.sin_port = sp->s_port; */
 #else /* EXCELAN */
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
@@ -356,21 +362,22 @@ get_tcp_socket (
 	 */
 
 #ifdef h_addr
-	/*
-	 * get a socket and initiate connection -- use multiple addresses
-	 */
 
+	/*
+	 * Get a socket and initiate connection -- use multiple addresses
+	 */
 	for (cp = hp->h_addr_list; cp && *cp; cp++) {
-		s = socket (hp->h_addrtype, SOCK_STREAM, 0);
-		if (s < 0) {
+
+		if ((s = socket (hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
 			perror ("socket");
-			return (-1);
+			return (-errno);
 		}
+
 		memcpy((char *) &sock_in.sin_addr, *cp, hp->h_length);
 
-		if (x < 0) {
+		if (x < 0)
 			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
-		}
+
 #if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
 #define	HPSOCKSIZE 0x8000
 		getsockopt(s, SOL_SOCKET, SO_SNDBUF, (caddr_t)&socksize, (caddr_t)&socksizelen);
@@ -386,64 +393,69 @@ get_tcp_socket (
 			setsockopt(s, SOL_SOCKET, SO_RCVBUF, (caddr_t)&socksize, sizeof(socksize));
 		}
 #endif
-		x = connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in));
-		if (x == 0) {
+
+		if ((x = connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in))) == 0)
 			break;
-		}
+
+		save_errno = errno;									/* Keep for later */
 		my_fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr));
 		perror ("");
 		(void) s_close (s);
 	}
+
 	if (x < 0) {
 		my_fprintf (stderr, "Giving up...\n");
-		return (-1);
+		return (-save_errno);					/* Return the last errno we got */
 	}
 #else	/* no name server */
+
 #ifdef EXCELAN
 	if ((s = socket (SOCK_STREAM,(struct sockproto *)NULL,&sock_in,SO_KEEPALIVE)) < 0) {
-		/* Get the socket */
 		perror ("socket");
-		return (-1);
+		return (-errno);
 	}
+
+	/* set up addr for the connect */
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (IPPORT_NNTP);
-	/* set up addr for the connect */
 
 	if ((sock_in.sin_addr.s_addr = rhost (&machine)) == -1) {
 		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
 		return (-1);
 	}
-	/* And then connect */
 
+	/* And connect */
 	if (connect (s, (struct sockaddr *)&sock_in) < 0) {
+		save_errno = errno;
 		perror ("connect");
 		(void) s_close (s);
-		return (-1);
+		return (-save_errno);
 	}
+
 #else /* not EXCELAN */
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror ("socket");
-		return (-1);
+		return (-errno);
 	}
 
 	/* And then connect */
 
 	memcpy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
+
 	if (connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0) {
+		save_errno = errno;
 		perror ("connect");
 		(void) s_close (s);
-		return (-1);
+		return (-save_errno);
 	}
 
 #endif /* !EXCELAN */
 #endif /* !h_addr */
 #endif /* !TLI */
 	return (s);
-#else
-	return (-1);
-#endif /* NNTP_ABLE */
 }
+#endif /* NNTP_ABLE */
 
 #ifdef DECNET
 /*
@@ -524,18 +536,15 @@ get_dnet_socket (
  * u_put_server -- send data to the server. Do not flush output.
  */
 
+#ifndef VMS
+#ifdef NNTP_ABLE
 void
 u_put_server (
 	const char *string)
 {
-#ifdef NNTP_ABLE
-#ifdef VMS
-	netwrite(sockt_wr, string, strlen(string));
-#else
 	s_puts(string, nntp_wr_fp);
-#endif
-#endif
 }
+#endif
 
 /*
  * put_server -- send a line of text to the server, terminating it
@@ -555,228 +564,157 @@ u_put_server (
  *			do the fprintf's yourself, and then a final
  *			fflush.
  */
-
+#ifndef VMS
+#ifdef NNTP_ABLE
 void
 put_server (
 	const char *string)
 {
-#ifdef NNTP_ABLE
-	int respno;
+#if 0
 	static time_t time_last;
 	time_t time_now;
+	int respcode;
+#endif /* 0 */
 
+	/*
+	 * We remember the last thing we wrote, in case we have to do a command retry in the future
+	 */
+DEBUG_IO((stderr, "put_server(%s)\n", string));
+	strcpy (last_put, string);
+
+#if 0
 	/*
 	 *  Check how idle we have been, if too idle send a STAT to check
 	 */
 	time (&time_now);
-#ifndef VMS
-	if (nntp_wr_fp == NULL || (time_last != 0 && time_last+NNTP_IDLE_RETRY_SECS < time_now)) {
-		respno = 0;
+
+
+	if (nntp_wr_fp == NULL || (time_last != 0 && time_last+NNTP_IDLE_RETRY_SECS-299 < time_now)) {
+
 		if (nntp_wr_fp) {
-			s_printf (nntp_wr_fp, "stat\r\n");
-			s_flush (nntp_wr_fp);
-			respno = get_respcode ();
-		}
-#else /* VMS */
-	if (sockt_wr == -1 || (time_last != 0 && time_last+NNTP_IDLE_RETRY_SECS < time_now)) {
-		respno = 0;
-		if (sockt_wr >= 0) {
-			netwrite(sockt_wr, "stat\r\n", 6);
-			respno = get_respcode ();
-		}
-#endif /* VMS */
-		if (respno != OK_NOTEXT && respno != ERR_NCING && respno != ERR_NOCRNT) {
 			/*
-			 *  STAT was not happy, close the connection
-			 *  it will reopen on next get_server
+			 * We don't care about the answer, just the fact that the connection still works
+			 * Don't use nntp_command() here - this is a lower level
 			 */
-#ifndef VMS
-			if (nntp_wr_fp) s_fclose (nntp_wr_fp);
-			if (nntp_rd_fp) s_fclose (nntp_rd_fp);
-			nntp_rd_fp = nntp_wr_fp = NULL;
-#else
-			if (sockt_wr >= 0) netclose(sockt_wr);
-			sockt_wr = sockt_rd = -1;
-#endif
-			strcpy (last_put, string);
-			time_last = 0;
-			return;
+fprintf(stderr, "Timeout - sending STAT\n");
+			s_printf (nntp_wr_fp, "STAT\r\n");
+			s_flush (nntp_wr_fp);
+			respcode = get_respcode (NULL);
+
+			if (respcode == -1) {
+				/*
+				 *  STAT was not happy, close the connection
+				 *  it will get reopened on next get_server
+				 */
+				NNTP_HARD_CLOSE;
+
+				time_last = 0;
+				return;
+			}
 		}
 	}
+
 	time_last = time_now;
 
-#ifndef VMS
+#endif /* 0 */
+
 	s_printf (nntp_wr_fp, "%s\r\n", string);
 	(void) s_flush (nntp_wr_fp);
-#else
-	{
-	  char line[8192]; /* FIXME */
-	  sprintf(line, "%s\r\n", string);
-	  netwrite(sockt_wr, line, strlen(line));
-	}
-#endif
 
-	strcpy (last_put, string);
+	return;
+}
 #endif /* NNTP_ABLE */
+#endif /* VMS */
+
+/*
+ * Reconnect to server after a timeout, reissue last command to
+ * get us back into the pre-timeout state
+ */
+#ifdef NNTP_ABLE
+static int
+reconnect(
+	int retry)
+{
+	char buf[NNTP_STRLEN];
+
+	/*
+	 * Tear down current connection
+	 */
+	NNTP_HARD_CLOSE;
+	ring_bell ();
+
+DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
+
+	if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
+		tin_done(0);		/* user said no to reconnect */
+
+	clear_message ();
+
+	strcpy (buf, last_put);			/* Keep copy here, it will be clobbered a lot otherwise */
+
+	if (nntp_open () == 0) {
+
+		/*
+		 * Re-establish our current group and resend last command
+		 */
+		if (glob_group != (char *) 0) {
+DEBUG_IO((stderr, "Rejoin current group\n"));
+			sprintf (last_put, "GROUP %s", glob_group);
+			put_server (last_put);
+			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
+DEBUG_IO((stderr, "Read (%s)\n", last_put));
+		}
+DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
+		put_server (buf);
+		return(0);
+	}
+
+	if (--retry == 0)					/* No more tries ? */
+		tin_done(EXIT_NNTP_ERROR);
+
+	return(retry);
 }
 
 /*
- * get_server -- get a line of text from the server.  Strips
- * CR's and LF's.
+ * Read a line of data from the NNTP socket. If something gives, do reconnect
  *
  *	Parameters:	"string" has the buffer space for the line received.
- *	             "size" is the size of the buffer.
+ *			"size" is maximum size of the buffer to read.
  *
- *	Returns:	-1 on error, 0 otherwise, -2 if user said no to reconnection.
+ *	Returns:	NULL on end of stream, or a line of data.
+ *				Basically, we try to act like fgets() on an NNTP stream.
  *
  *	Side effects:	Talks to server, changes contents of "string".
  *			Reopens connection when necessary and requested.
+ *			Exits via tin_done() if fatal error occurs.
  */
-
-#ifndef VMS
-int
+char *
 get_server (
-	char	*string,
+	char *string,
 	int	size)
 {
-#ifdef NNTP_ABLE
-	char buf[NNTP_STRLEN];
-	register char *cp;
-
-	static int reconnecting = 0;
-
-	int retry=2; /* uj 970124 - reconnect workaround */
+	int retry = NNTP_TRY_RECONNECT;
 
 	errno = 0;
-	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
-		if (errno != EINTR) {
-			if (nntp_wr_fp)
-				s_fclose (nntp_wr_fp);
-			if (nntp_rd_fp)
-				s_fclose (nntp_rd_fp);
-			nntp_wr_fp = nntp_rd_fp = NULL;
-			ring_bell ();
-
-/*
-** fixme - nntp_open does not make any difference why it failed
-** but a reconnect after a connection time out often fails on the first try
-** -> REconnection attempts should be done 2-3 times
-*/
-			if (reconnecting)
-				return -1;
-			if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
-				tin_done(EXIT_NNTP_ERROR);
-				/*return -2;*/
-			}
-			reconnecting = 1;
-			clear_message ();
-			strcpy (buf, last_put);
-
-			while (retry) { /* uj 970124 - reconnect workaround */
-				if (nntp_open () == 0) {
-					if (glob_group != (char *) 0) {
-						sprintf (last_put, "group %s", glob_group);
-						put_server (last_put);
-						s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
-					}
-					put_server (buf);
-					reconnecting = 0;
-					break; /* uj 970124 - reconnect workaround */
-				}
-				retry--; /* uj 970124 - reconnect workaround */
-			} /* uj 970124 - reconnect workaround */
-
-			/* If we get here with reconnecting == 1 then bug out */
-			if (reconnecting) {
-				tin_done(EXIT_NNTP_ERROR);
-			}
-		}
-	}
-
-	/* save the server response */
-	my_strncpy(error_response, string, NNTP_STRLEN);
 
 	/*
-	 * some broken newsposters/newsservers have \r's in the middle
-	 * of .overview records...
+	 * NULL socket reads indicates socket has closed. Try a few times more
 	 */
-	if ((cp = strchr (string, '\n')) != NULL) {
-		get_server_nolf=0;
-		*cp-- = '\0';
-		if (*cp == '\r')
-			*cp = '\0';
-	} else {
-		/* tell the calling function that the line is incomplete */
-		int len;
+	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 
-		get_server_nolf=1;
-		if (string[0] != '\0' && string[len=strlen(string)-1] == '\r')
-			string[len]='\0';
+		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
+			perror_message("get_server()");
+
+		retry = reconnect(retry);			/* Will abort when out of tries */
 	}
 
-	return 0;
-#else
-	return -1;
-#endif /* NNTP_ABLE */
+	return string;
 }
-#else /* VMS */
-
-int get_server (char *string, int size)
-{
-#ifdef NNTP_ABLE
-	char buf[NNTP_STRLEN];
-	register char *cp;
-
-#ifdef USE_SFGETS
-	while (Sfgets (string, size, sockt_rd) == NULL) {
-#else
-	char *p;
-	while ((p = Srdline(sockt_rd)) == NULL) {
-#endif
-		if (errno != EINTR) {
-			netclose(sockt_rd);
-			ring_bell ();
-			if (!prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE)) {
-				tin_done(EXIT_NNTP_ERROR);
-			}
-			clear_message ();
-			strcpy (buf, last_put);
-			if (nntp_open () == 0) {
-				if (glob_group != (char *) 0) {
-					sprintf (last_put, "group %s", glob_group);
-					put_server (last_put);
-#ifdef USE_SFGETS
-					Sfgets (last_put, NNTP_STRLEN, sockt_rd);
-#else
-					p = Srdline(sockt_rd);
-					strncpy(last_put, p, NNTP_STRLEN);
-#endif
-				}
-			} else {
-				tin_done(EXIT_NNTP_ERROR);
-			}
-			put_server (buf);
-		}
-	}
-#ifndef USE_SFGETS
-	memcpy(string, p, SIOLINELEN(sockt_rd) + 1);
-#endif
-	if ((cp = strchr (string, '\r')) != NULL) {
-		*cp = '\0';
-	} else if ((cp = strchr (string, '\n')) != NULL) {
-		*cp = '\0';
-	}
-
-	return (0);
-#else
-	return (-1);
 #endif /* NNTP_ABLE */
-}
-#endif /* VMS */
 
 /*
  * close_server -- close the connection to the server, after sending
- *		the "quit" command.
+ *		the "QUIT" command.
  *
  *	Parameters:	None.
  *
@@ -787,59 +725,34 @@ int get_server (char *string, int size)
  *			after this routine is called.
  */
 
+#ifdef NNTP_ABLE
 void
 close_server (void)
 {
-#ifdef NNTP_ABLE
-#ifndef VMS
 	if (nntp_wr_fp == NULL || nntp_rd_fp == NULL)
 		return;
 
-	put_server ("QUIT");
-	(void) get_server (nntp_line, sizeof (nntp_line));
+	info_message("Disconnecting from server...");
+	nntp_command("QUIT", OK_GOODBYE, NULL);
 
 	(void) s_fclose (nntp_wr_fp);
 	(void) s_fclose (nntp_rd_fp);
 	s_end();
 	nntp_wr_fp = nntp_rd_fp = NULL;
-#else
-	if (sockt_rd < 0 || sockt_wr < 0)
-		return;
-
-	put_server ("QUIT");
-	(void) get_server (nntp_line, sizeof (nntp_line));
-
-	netclose(sockt_rd);
-	s_end();
-	sockt_rd = sockt_wr = -1;
-#endif /* VMS */
-#endif /* NNTP_ABLE */
 }
+#endif /* NNTP_ABLE */
+#endif /* VMS */
 
+#ifdef DEBUG
 /*
  * NNTP strings for get_respcode()
  */
-
 const char *
 nntp_respcode (
 	int respcode)
 {
 #ifdef NNTP_ABLE
 	static const char *text;
-
-	if (strlen (error_response) > 4) {
-	/*
-	** the newsserver returns more than just an error number
-	** -> show it to the user
-	*/
-		return (error_response);
-	} else {
-	/*
-	** the newsserver returns just an error number
-	** -> translate it to something usefull
-	**
-	** (does this ever happen?)
-	*/
 
 	switch (respcode) {
 		case 0:
@@ -1021,15 +934,9 @@ nntp_respcode (
 			break;
 	}
 	return (text);
-	}
+
 #else
 	return ("");
 #endif
 }
-
-void
-nntp_message (
-	int respcode)
-{
-	error_message ("%s", nntp_respcode (respcode));
-}
+#endif /* DEBUG */

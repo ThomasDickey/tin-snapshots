@@ -32,6 +32,13 @@
 #define	SMTP_TCP_NAME	"smtp"
 #define	SMTP_TCP_PORT	"25"
 
+/* # seconds after which a read from the NNTP will timeout
+ * NB: This is different from the NNTP server timing us out due to inactivity
+ */
+#define NNTP_READ_TIMEOUT		30
+
+/* # times to try and reconnect to server after timeout */
+#define NNTP_TRY_RECONNECT		2
 /*
  *
  * @(#)Header: nntp.h,v 1.81 92/03/12 02:08:31 sob Exp $

@@ -5,7 +5,7 @@
  *  Author    : Roland Rosenfeld <roland@spinnaker.rhein.de>
  *              Giuseppe De Marco <gdm@rebel.net> (light-colors)
  *              Julien Oster <fuzzy@cu8.cum.de> (word highlighting)
- *		T.Dickey <dickey@clark.net> (curses support)
+ *              T.Dickey <dickey@clark.net> (curses support)
  *  Created   : 02-06-95
  *  Updated   : 06-03-95, 30-03-96, 22-04-96, 15-12-96
  *  Notes     : This are the basic function for ansi-color
@@ -66,27 +66,25 @@ set_colors (
 		 */
 		if (fcolor > (COLORS-1)) {
 			attribute |= A_BOLD;
-			fcolor %= (COLORS-1);
+			fcolor %= COLORS;
 		}
 		if (bcolor >= 0)
-			bcolor %= (COLORS-1);
+			bcolor %= COLORS;
 
 		/* curses assumes white/black */
-		if (fcolor != COLOR_WHITE
-		 || bcolor != COLOR_BLACK) {
+		if (fcolor != COLOR_WHITE || bcolor != COLOR_BLACK) {
 			int found = FALSE;
 			struct LIST *p;
 
 			for (p = list; p != 0; p = p->link) {
-				if (p->fg == fcolor
-				 && p->bg == bcolor) {
+				if (p->fg == fcolor && p->bg == bcolor) {
 					found = TRUE;
 					break;
 				}
 			}
-			if (found) {
+			if (found)
 				pair = p->pair;
-			} else if (++nextpair < COLOR_PAIRS) {
+			else if (++nextpair < COLOR_PAIRS) {
 				p = (struct LIST *)malloc(sizeof(struct LIST));
 				p->fg = fcolor;
 				p->bg = bcolor;
@@ -94,9 +92,8 @@ set_colors (
 				p->link = list;
 				list = p;
 				init_pair(pair, fcolor, bcolor);
-			} else {
+			} else
 				pair = 0;
-			}
 		}
 
 		bkgdset(attribute | COLOR_PAIR(pair) | ' ');
@@ -163,9 +160,9 @@ static t_bool
 isalp (
 	int c)
 {
-	if (isalnum(c)) {
+	if (isalnum(c))
 		return TRUE;
-	}
+
 	switch (c) {
 /*		case '.': */
 		case ':':
@@ -221,13 +218,11 @@ check_valid_mark (
 	const char *p;
 
 	for (p=s+2; p < (s+strlen(s)); p++) {
-		if (!isalp(*p) && *(p + 1) == c) {
+		if (!isalp(*p) && *(p + 1) == c)
 			return FALSE;
-		} else {
-			if (!isalp(*(p + 1)) && *p == c) {
+		else
+			if (!isalp(*(p + 1)) && *p == c)
 				return TRUE;
-			}
-		}
 	}
 	return FALSE;
 }
@@ -264,9 +259,8 @@ color_fputs (
 						default: /* print nothing */
 							break;
 						}
-					} else { /* print normal character */
+					} else /* print normal character */
 						my_fputc(*p, stream);
-					}
 				} else {
 					if (!isalp(*(p + 1)) && col1) {
 						switch (word_h_display_marks) {
@@ -280,9 +274,8 @@ color_fputs (
 							break;
 						}
 						fcol(color);
-					} else {
+					} else
 						my_fputc(*p, stream);
-					}
 				}
 				break;
 
@@ -304,9 +297,8 @@ color_fputs (
 						default: /* print nothing */
 							break;
 						}
-					} else { /* print normal character */
+					} else /* print normal character */
 						my_fputc(*p, stream);
-					}
 				} else {
 					if (!isalp(*( p + 1)) && col2) {
 						switch (word_h_display_marks) {
@@ -320,9 +312,8 @@ color_fputs (
 							break;
 						}
 						fcol(color);
-					} else {
+					} else
 						my_fputc(*p, stream);
-					}
 				}
 				break;
 
@@ -369,11 +360,11 @@ print_color (
 		}
 	}
 
-	if (word_highlight && use_color) {
+	if (word_highlight && use_color)
 		color_fputs(str, stdout, color);
-	} else {
+	else
 		my_fputs(str, stdout);
-	}
+
 	my_fputs(cCRLF, stdout);
 }
 #endif

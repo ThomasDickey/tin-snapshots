@@ -75,22 +75,19 @@ get_nntpserver (
 				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
 					line_entry_counter++;
 
-					if (line_entry_counter == 1) {
+					if (line_entry_counter == 1)
 						strcpy(name_found, line_entry);
-					}
 
-					if ((line_entry_counter > 2) && (!strcasecmp(line_entry, nick_name))) {
+					if ((line_entry_counter > 2) && (!strcasecmp(line_entry, nick_name)))
 						found = 1;
-					}
 				}
 			}
 		}
 		fclose(fp);
-		if (found) {
+		if (found)
 			strcpy(nntpserver_name, name_found);
-		} else {
+		else
 			strcpy(nntpserver_name, nick_name);
-		}
 	} else {
 		write_newsrctable_file();
 		strcpy(nntpserver_name, nick_name);
@@ -150,11 +147,10 @@ get_newsrcname (
 					my_fprintf (stderr, "couldn't expand %s\n", name_found);
 					error=1;
 			} else {
-				if (tmp_newsrc[0] == '/') {
+				if (tmp_newsrc[0] == '/')
 					(void) strcpy (newsrc_name, tmp_newsrc);
-				} else {
+				else
 					joinpath (newsrc_name, homedir, tmp_newsrc);
-				}
 			}
 			(void) strcpy (dir, newsrc_name);
 			*strrchr (dir, '/') = (char) 0;

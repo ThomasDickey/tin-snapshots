@@ -1,3 +1,40 @@
+I/O in tin (updated 14/04/97)
+----------
+
+All critical I/O, be it NNTP data or not, should be done with
+tin_fgets() This handles data formatting, removes any trailing \n and \r
+and deals with timeouts, reconnections and user aborts.
+
+It supports the use of 'q' to abort the operation and 'Q' to exit tin
+without error recovery.
+
+tin_errno will be set to !0 to flag errors.
+
+Closing NNTP data files should be done with TIN_FCLOSE(fp) as the NNTP
+socket should be kept open, whereas local spool fd's must be closed.
+
+If you wish to quit reading an NNTP stream, then call drain_buffer(fp) to
+clear out any pending data on NNTP socket.
+
+nntp_command(command, valid_response, rest_of_data) should be used for
+sending all generic NNTP command. It returns an fd to the open stream
+for reading the rest of the data.
+
+
+Example of a typical exchange:
+
+if (nntp_command ("GROUP comp.thing", OK_GROUP, NULL) != NULL) {
+
+	while ((ptr = tin_fgets(buff, sizeof(buff), nntp_rd_fd)) != NULL)
+		process_data(ptr);
+
+	if (tin_errno != 0)
+		return (read_error);
+
+}
+
+
+
 Hashing in tin (updated 10/02/97)
 --------------
 

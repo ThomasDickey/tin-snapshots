@@ -1,5 +1,5 @@
 This document summarises new and significantly changed features
-in tin-1.3 unoff as of the 970212 release.
+in tin-1.4
 
 [ Changes are relative to the last original tin beta, 950824 ]
 
@@ -33,6 +33,8 @@ Major additions
 
 . Newsserver authorisation fully supported
 
+. Scoring
+
 Plus of course, countless bug fixes and doubtless some new ones.
 
 Other enhancements
@@ -43,6 +45,8 @@ Other enhancements
 i shows group description in main menu or article subject in group menu
 
 ^ goes to top of current display
+
+L lookup article by message-id
 
 article length shown in group menu, can be turned off
 

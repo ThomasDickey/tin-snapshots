@@ -223,7 +223,7 @@ gl_addchar (
 	int i;
 
 	if (gl_cnt >= BUF_SIZE - 1) {
-		error_message ("getline: input buffer overflow", "");
+		error_message ("getline: input buffer overflow");
 		exit (1);
 	}
 
@@ -247,7 +247,7 @@ gl_newline (int w)
 	int loc = gl_width - 5;	/* shifts line back to start position */
 
 	if (gl_cnt >= BUF_SIZE - 1) {
-		error_message ("getline: input buffer overflow", "");
+		error_message ("getline: input buffer overflow");
 		exit (1);
 	}
 	hist_add (w);		/* only adds if nonblank */

@@ -44,8 +44,7 @@
 
 char found_newsgroups[HEADER_LEN];
 
-int reread_active_for_posted_arts = FALSE;
-
+t_bool reread_active_for_posted_arts = TRUE;
 t_bool unlink_article = TRUE;
 t_bool keep_dead_articles = TRUE;
 t_bool keep_posted_articles = TRUE;
@@ -58,9 +57,9 @@ struct msg_header {
 } msg_headers[MAX_MSG_HEADERS];
 
 /*
-** Local prototypes
-*/
-static char * backup_article_name (char *the_article);
+ * Local prototypes
+ */
+static char *backup_article_name (char *the_article);
 static char prompt_rejected (void);
 static char prompt_to_continue (void);
 static char prompt_to_edit (void);
@@ -104,64 +103,32 @@ static void update_posted_msgs_file (char *file, char *addr);
 static char
 prompt_to_edit(void)
 {
-	int ch;
-	char ch_default = iKeyPostPost;
-
-	do {
-		prompt_1 (txt_quit_edit_post, ch_default);
-		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-			ch = ch_default;
-	} while (!strchr (POST_KEYS, ch));
-	return ch;
+	return (prompt_slk_response(iKeyPostPost, POST_KEYS, txt_quit_edit_post));
 }
 
 static char
 prompt_to_send(
 	const char *subject)
 {
-	int ch;
-	char ch_default = iKeyPostSend;
-
-	do {
-		prompt_2 (txt_quit_edit_send, subject, ch_default);
-		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-			ch = ch_default;
-	} while (!strchr (SEND_KEYS, ch));
-	return ch;
+	return (prompt_slk_response (iKeyPostSend, SEND_KEYS, sized_message(txt_quit_edit_send, subject)));
 }
 
 static char
 prompt_to_continue(void)
 {
-	int ch;
-	char ch_default = iKeyPostContinue;
-
-	do {
-		prompt_1 (txt_warn_suspicious_mail, ch_default);
-		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
-			ch = ch_default;
-	} while (!strchr(CONT_KEYS, ch));
-	return ch;
+	return (prompt_slk_response (iKeyPostContinue, CONT_KEYS, txt_warn_suspicious_mail));
 }
 
 static char
 prompt_rejected(void)
 {
-	int ch;
-	char ch_default = iKeyPostEdit;
-
-/* fix screen pos. */
+/* fix screen pos. ?? */
 	Raw (FALSE);
 	my_fprintf(stderr, "\n\n%s\n\n", txt_post_error_ask_postpone);
 	my_fflush(stderr);
 	Raw (TRUE);
 
-	do {
-		prompt_1 (txt_quit_edit_postpone, ch_default);
-		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-			ch = ch_default;
-	} while (!strchr (EDIT_KEYS, ch));
-	return ch;
+	return (prompt_slk_response (iKeyPostEdit, EDIT_KEYS, txt_quit_edit_postpone));
 }
 
 static t_bool
@@ -170,11 +137,7 @@ repair_article(
 {
 	int ch;
 
-	do {
-		prompt_1 (txt_bad_article, iKeyPostEdit);
-		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-			ch = iKeyPostEdit;
-	} while (!strchr (EDIT_KEYS, ch));
+	ch = prompt_slk_response (iKeyPostEdit, EDIT_KEYS, txt_bad_article);
 
 	*result = ch;
 	if (ch == iKeyPostEdit) {
@@ -185,18 +148,18 @@ repair_article(
 }
 
 /* make a backup copy of ~/.article, this is necessary since
-   submit_news_file adds headers, does q-p conversion etc */
+ * submit_news_file adds headers, does q-p conversion etc 
+ */
 
 static char *
 backup_article_name(
 	char *the_article)
 {
-  static char name[PATH_LEN];
+	static char name[PATH_LEN];
 
-  strcpy(name, the_article);
-  strcat(name, ".bak");
-
-  return name;
+	strcpy(name, the_article);
+	strcat(name, ".bak");
+	return name;
 }
 
 static void
@@ -214,9 +177,9 @@ backup_article(
 		return;
 	}
 
-	while( fgets(line, sizeof(line), in) != NULL) {
+	while( fgets(line, sizeof(line), in) != NULL)
 		fputs(line, out);
-	}
+
 	fclose(in);
 	fclose(out);
 }
@@ -261,9 +224,9 @@ msg_add_header (
 		 */
 		new_name = my_strdup (name);
 		ptr = strchr (new_name, ':');
-		if (ptr) {
+		if (ptr)
 			*ptr = '\0';
-		}
+
 		/*
 		 * Check if header already exists and if update text
 		 */
@@ -276,9 +239,9 @@ msg_add_header (
 					}
 					new_text = my_strdup (p);
 					ptr = strchr (new_text, '\n');
-					if (ptr) {
+					if (ptr)
 						*ptr = '\0';
-					}
+
 					msg_headers[i].text = my_strdup (new_text);
 				}
 				done = TRUE;
@@ -296,9 +259,9 @@ msg_add_header (
 				}
 				new_text = my_strdup (p);
 				ptr = strchr (new_text, '\n');
-				if (ptr) {
+				if (ptr)
 					*ptr = '\0';
-				}
+
 				msg_headers[i].text = my_strdup (new_text);
 			}
 		}
@@ -316,9 +279,7 @@ msg_write_headers (
 
 	for (i = 0; i < MAX_MSG_HEADERS; i++) {
 		if (msg_headers[i].name) {
-			fprintf (fp, "%s: %s\n",
-				 msg_headers[i].name,
-			  (msg_headers[i].text ? msg_headers[i].text : ""));
+			fprintf (fp, "%s: %s\n", msg_headers[i].name, (msg_headers[i].text ? msg_headers[i].text : ""));
 			wrote++;
 		}
 	}
@@ -339,9 +300,9 @@ user_posted_messages (void)
 		clear_message ();
 		return FALSE;
 	} else {
-		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+		while (fgets (buf, sizeof (buf), fp) != (char *) 0)
 			no_of_lines++;
-		}
+
 		if (!no_of_lines) {
 			fclose (fp);
 			info_message (txt_no_arts_posted);
@@ -351,12 +312,12 @@ user_posted_messages (void)
 		posted = (struct t_posted *) my_malloc ((no_of_lines + 1) * sizeof (struct t_posted));
 
 		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-			if (buf[0] == '#' || buf[0] == '\n') {
+			if (buf[0] == '#' || buf[0] == '\n')
 				continue;
-			}
-			for (j = 0; buf[j] != '|' && buf[j] != '\n'; j++) {
+
+			for (j = 0; buf[j] != '|' && buf[j] != '\n'; j++)
 				posted[i].date[j] = buf[j];	/* posted date */
-			}
+
 			if (buf[j] == '\n') {
 				error_message ("Corrupted file %s", posted_info_file);
 				sleep (1);
@@ -369,14 +330,13 @@ user_posted_messages (void)
 			posted[i].action = buf[j];
 			j += 2;
 			for (k = j, j = 0; buf[k] != '|' && buf[k] != ','; k++, j++) {
-				if (j < sizeof (posted[i].group)) {
+				if (j < sizeof (posted[i].group))
 					posted[i].group[j] = buf[k];
-				}
 			}
 			if (buf[k] == ',') {
-				while (buf[k] != '|' && buf[k] != '\n') {
+				while (buf[k] != '|' && buf[k] != '\n')
 					k++;
-				}
+
 				posted[i].group[j++] = ',';
 				posted[i].group[j++] = '.';
 				posted[i].group[j++] = '.';
@@ -385,9 +345,8 @@ user_posted_messages (void)
 			posted[i].group[j] = '\0';
 			k++;
 			for (j = k, k = 0; buf[j] != '\n'; j++, k++) {
-				if (k < sizeof (posted[i].subj)) {
+				if (k < sizeof (posted[i].subj))
 					posted[i].subj[k] = buf[j];
-				}
 			}
 			posted[i].subj[k] = '\0';
 			i++;
@@ -417,9 +376,7 @@ update_posted_info_file (
 	if ((fp = fopen (posted_info_file, "a+")) != NULL) {
 		time (&epoch);
 		tm = localtime (&epoch);
-		fprintf (fp, "%02d-%02d-%02d|%c|%s|%s\n",
-			 tm->tm_mday, tm->tm_mon + 1, tm->tm_year,
-			 action, group, subj);
+		fprintf (fp, "%02d-%02d-%02d|%c|%s|%s\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year, action, group, subj);
 		fclose (fp);
 	}
 }
@@ -435,17 +392,16 @@ update_posted_msgs_file (
 
 	fp_in = fopen (file, "r");
 	if (fp_in != (FILE *) 0) {
-		if (!strfpath (posted_msgs_file, buf, sizeof (buf),
-			     homedir, (char *) 0, (char *) 0, (char *) 0)) {
+		if (!strfpath (posted_msgs_file, buf, sizeof (buf), homedir, (char *) 0, (char *) 0, (char *) 0))
 			strcpy (buf, posted_msgs_file);
-		}
+
 		fp_out = fopen (buf, "a+");
 		if (fp_out != (FILE *) 0) {
 			time (&epoch);
 			fprintf (fp_out, "From %s %s", addr, ctime (&epoch));
-			while (fgets (buf, sizeof buf, fp_in) != (char *) 0) {
+			while (fgets (buf, sizeof buf, fp_in) != (char *) 0)
 				fputs (buf, fp_out);
-			}
+
 			print_art_seperator_line (fp_out, FALSE);
 			fclose (fp_out);
 		}
@@ -508,9 +464,8 @@ check_article_to_be_posted (
 		cnt++;
 		len = strlen (line);
 		if (len > 0) {
-			if (line[len - 1] == '\n') {
+			if (line[len - 1] == '\n')
 				line[--len] = 0;
-			}
 		}
 		if ((cnt == 1) && (len == 0)) {
 			setup_check_article_screen (&init);
@@ -528,9 +483,9 @@ check_article_to_be_posted (
 		/*
 		 * ignore continuation lines - they start with white space
 		 */
-		if ((line[0] == ' ' || line[0] == '\t') && (cnt != 1)) {
+		if ((line[0] == ' ' || line[0] == '\t') && (cnt != 1))
 			continue;
-		}
+
 		cp = strchr (line, ':');
 		if (cp == (char *) 0) {
 			setup_check_article_screen (&init);
@@ -545,9 +500,9 @@ check_article_to_be_posted (
 			my_fflush (stderr);
 			errors++;
 		}
-		if (cp - line == 7 && !strncasecmp (line, "Subject", 7)) {
+		if (cp - line == 7 && !strncasecmp (line, "Subject", 7))
 			found_subject_line = TRUE;
-		}
+
 #ifndef FORGERY
 		if (cp - line == 6 && !strncasecmp (line, "Sender", 6)) {
 			my_fprintf (stderr, txt_error_sender_in_header_not_allowed, cnt);
@@ -569,18 +524,16 @@ check_article_to_be_posted (
 			}
 			strip_double_ngs (cp);
 			while (*cp) {
-				if (!(cp2 = strchr (cp, ','))) {
+				if (!(cp2 = strchr (cp, ',')))
 					cp2 = cp + strlen (cp);
-				} else {
+				else
 					*cp2++ = '\0';
-				}
 				if (ngcnt < NGLIMIT) {
 					nglens[ngcnt] = strlen (cp);
 					ngptrs[ngcnt] = (char *) my_malloc (nglens[ngcnt] + 1);
 					if (!ngptrs[ngcnt]) {
-						for (i = 0; i < ngcnt; i++) {
+						for (i = 0; i < ngcnt; i++)
 							FreeIfNeeded (ngptrs[i]);
-						}
 						Raw (oldraw);
 						return TRUE;
 					}
@@ -654,12 +607,12 @@ check_article_to_be_posted (
 		(*lines)++;
 		cnt++;
 		cp = strrchr (line, '\n');
-		if (cp != (char *) 0) {
+		if (cp != (char *) 0)
 			*cp = '\0';
-		}
-		if (saw_sig_dashes || saw_wrong_sig_dashes) {
+
+		if (saw_sig_dashes || saw_wrong_sig_dashes)
 			sig_lines++;
-		}
+
 		if (!strcmp(line, "-- ")) {
 			saw_wrong_sig_dashes=FALSE;
 			saw_sig_dashes++;
@@ -671,11 +624,10 @@ check_article_to_be_posted (
 		}
 		col = 0;
 		for (cp = line; *cp; cp++) {
-			if (*cp == '\t') {
+			if (*cp == '\t')
 				col += 8 - (col % 8);
-			} else {
+			else
 				col++;
-			}
 		}
 		if (col > MAX_COL && !got_long_line) {
 			setup_check_article_screen (&init);
@@ -718,18 +670,14 @@ check_article_to_be_posted (
 		for (i = 0; i < ngcnt; i++) {
 			psGrp = psGrpFind (ngptrs[i]);
 			if (psGrp) {
-				my_fprintf (stderr, "  %s\t%s\n", ngptrs[i],
-					 (psGrp->description ? psGrp->description : ""));
+				my_fprintf (stderr, "  %s\t%s\n", ngptrs[i], (psGrp->description ? psGrp->description : ""));
 				my_fflush (stderr);
 			} else {
 #ifdef HAVE_FASCIST_NEWSADMIN
 				my_fprintf (stderr, txt_error_not_valid_newsgroup, ngptrs[i]);
 				errors++;
 #else
-				my_fprintf (stderr,
-					(newsrc_active ? /* did we read the whole active file? */
-						txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup ),
-					ngptrs[i]);
+				my_fprintf (stderr, (newsrc_active ? /* did we read the whole active file? */ txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup ), ngptrs[i]);
 #endif
 			}
 			free (ngptrs[i]);
@@ -830,13 +778,12 @@ quick_post_article (
 		my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 		return;
 	}
-	if (strlen (group)) {
-		my_strncpy (default_post_newsgroups, group,
-			    sizeof (default_post_newsgroups));
-	} else {
-		if (default_post_newsgroups[0]) {
+	if (strlen (group))
+		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+	else {
+		if (default_post_newsgroups[0])
 			my_strncpy (group, default_post_newsgroups, sizeof (group));
-		} else {
+		else {
 			my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 			return;
 		}
@@ -857,25 +804,29 @@ quick_post_article (
 		if (ptr != (char *) 0) {
 			strcpy (tmp, ptr + 1);
 			*ptr = '\0';
-		} else {
+		} else
 			done = TRUE;
-		}
-		psGrp = psGrpFind (buf);
 
-		if (debug == 2) {
-			sprintf (msg, "Group=[%s]", buf);
-			wait_message (msg);
-		}
+		psGrp = psGrpFind (buf);
+#ifdef DEBUG
+		if (debug == 2)
+			wait_message (1, "Group=[%s]", buf);
+#endif
 		if (!psGrp) {
 			Raw (FALSE);
 			my_fprintf (stderr, "\nGroup %s not found in active file. Exiting...\n", buf);
 			return;
 		}
+		if (psGrp->moderated == 'x' || psGrp->moderated == 'n') {
+			error_message(txt_cannot_post_group, psGrp->name);
+			return;
+		}
+
 		if (psGrp->moderated == 'm') {
 			sprintf (msg, txt_group_is_moderated, buf);
 			if (prompt_yn (cLINES, msg, TRUE) != 1) {
 				Raw (FALSE);
-				my_fprintf (stderr, "\nExiting...\n");
+				error_message("Exiting...");
 				return;
 			}
 		}
@@ -890,19 +841,19 @@ quick_post_article (
 		strcat(tmp, " ...");
 	} else
 		strncpy(tmp, default_post_subject, sizeof(tmp));
+
 	sprintf (buf, txt_post_subject, tmp);
 	if (!prompt_string (buf, subj, HIST_POST_SUBJECT)) {
 		Raw (FALSE);
 		my_fprintf (stderr, "%s\n", txt_no_quick_subject);
 		return;
 	}
-	if (strlen (subj)) {
-		my_strncpy (default_post_subject, subj,
-			    sizeof (default_post_subject));
-	} else {
-		if (default_post_subject[0]) {
+	if (strlen (subj))
+		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+	else {
+		if (default_post_subject[0])
 			my_strncpy (subj, default_post_subject, sizeof (subj));
-		} else {
+		else {
 			Raw (FALSE);
 			my_fprintf (stderr, "%s\n", txt_no_quick_subject);
 			return;
@@ -922,9 +873,9 @@ quick_post_article (
 /* Does this count? */
 	strcpy (buf, group);
 	ptr = strchr (buf, ',');
-	if (ptr) {
+
+	if (ptr)
 		*ptr = '\0';
-	}
 
 	psGrp = psGrpFind (group);
 	get_from_name(from_name, psGrp);
@@ -935,36 +886,36 @@ quick_post_article (
 	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
 	msg_add_header ("Newsgroups", group);
-	if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
+	if (psGrp && psGrp->attribute->followup_to != (char *) 0)
 		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
-	} else {
-		if (prompt_followupto) {
+	else {
+		if (prompt_followupto)
 			msg_add_header("Followup-To", "");
-		}
 	}
-	if (*reply_to) {
+	if (*reply_to)
 		msg_add_header ("Reply-To", reply_to);
-	}
-	if (psGrp && psGrp->attribute->organization != (char *) 0) {
+
+	if (psGrp && psGrp->attribute->organization != (char *) 0)
 		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
-	}
-	if (*my_distribution) {
+
+	if (*my_distribution)
 		msg_add_header ("Distribution", my_distribution);
-	}
+
 	msg_add_header ("Summary", "");
 	msg_add_header ("Keywords", "");
 	msg_add_x_headers (msg_headers_file);
-	if (psGrp) {
+
+	if (psGrp)
 		msg_add_x_headers (psGrp->attribute->x_headers);
-	}
 
 	start_line_offset = msg_write_headers (fp);
 	fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 	start_line_offset += 2;
 	msg_free_headers ();
-	if (psGrp) {
+
+	if (psGrp)
 		start_line_offset += msg_add_x_body (fp, psGrp->attribute->x_body);
-	}
+
 	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
 	fclose (fp);
 
@@ -974,12 +925,11 @@ quick_post_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)
-				   && repair_article(&ch))
-				   	;
-				if (ch == iKeyPostEdit) {
+				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+					;
+				if (ch == iKeyPostEdit)
 					break;
-				}
+
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
@@ -1000,9 +950,9 @@ quick_post_article_loop:
 				break;
 #endif
 
-  			case iKeyPostPost:
-  			case iKeyPostPost2:
-  				wait_message (txt_posting);
+			case iKeyPostPost:
+			case iKeyPostPost2:
+				wait_message (0, txt_posting);
 				backup_article (article);
 				if (submit_news_file (article)) {
 					unlink(backup_article_name(article));
@@ -1011,9 +961,9 @@ quick_post_article_loop:
 					goto post_article_done;
 				} else {
 					ch = prompt_rejected();
-					if (ch==iKeyPostPostpone) {
+					if (ch==iKeyPostPostpone)
 						postpone_article(backup_article_name(article));
-					} else if (ch==iKeyPostEdit) {
+					else if (ch==iKeyPostEdit) {
 						rename(backup_article_name(article), article);
 						ch = iKeyPostEdit;
 						goto quick_post_article_loop;
@@ -1045,30 +995,32 @@ post_article_done:
 		update_active_after_posting (group);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
+
+#if 0 /* this sucks! (urs) */
 			quick_filter_select_posted_art (psGrp, subj);
+#endif
 
 			update_posted_info_file (group, 'w', subj);
-		} else {
+		} else
 			subj[0] = '\0';
-		}
-	} else {
+	} else
 		group[0] = '\0';
-	}
 
-	if (keep_posted_articles) {
+	if (keep_posted_articles)
 		update_posted_msgs_file (article, userid);
-	}
+
 	if (group[0] != '\0')
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+
 	if (subj[0] != '\0')
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 	write_config_file (local_config_file);
 
 post_article_postponed:
-	if (unlink_article) {
+	if (unlink_article)
 		unlink (article);
-	}
+
 	return;
 }
 
@@ -1105,9 +1057,10 @@ post_existing_article_loop:
 				invoke_editor (article, 0);
 				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
 					;
-				if (ch == iKeyPostEdit) {
+				if (ch == iKeyPostEdit)
 					break;
-				}
+
+			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
 				if (unlink_article)
@@ -1129,17 +1082,20 @@ post_existing_article_loop:
 
 			case iKeyPostPost:
 			case iKeyPostPost2:
+/* TODO - can't we use some generic routine for trimming with '... ? */
 				sprintf(prompt, "Posting: %s", subject);
-				if (strlen(prompt) > cCOLS-5)
+				if ((int)strlen(prompt) > cCOLS-5)
 					prompt[cCOLS-5] = 0;
 				strcat(prompt, " ...");
-				wait_message (prompt);
+				wait_message (0, prompt);
+
 				backup_article(article);
-				if(!strchr(group, ',')) {
-				  psGrp=psGrpFind(group);
-				} else {
-				  psGrp=NULL;
-				}
+
+				if(!strchr(group, ','))
+					psGrp=psGrpFind(group);
+				else
+					psGrp=NULL;
+
 				if (submit_news_file (article)) {
 					unlink(backup_article_name(article));
 					Raw(FALSE);
@@ -1147,9 +1103,9 @@ post_existing_article_loop:
 					goto post_article_done;
 				} else {
 					ch = prompt_rejected();
-					if (ch==iKeyPostPostpone) {
+					if (ch==iKeyPostPostpone)
 						postpone_article(backup_article_name(article));
-					} else if (ch==iKeyPostEdit) {
+					else if (ch==iKeyPostEdit) {
 						rename(backup_article_name(article), article);
 						ch = iKeyPostEdit;
 						goto post_existing_article_loop;
@@ -1158,7 +1114,7 @@ post_existing_article_loop:
 						rename_file (article, dead_article);
 #ifdef M_UNIX
 						if (keep_dead_articles)
-						append_file (dead_articles, dead_article);
+							append_file (dead_articles, dead_article);
 #endif
 						Raw (FALSE);
 						error_message (txt_art_rejected, dead_article);
@@ -1186,32 +1142,31 @@ post_article_done:
 		    * crossposted postponed articles, since we don't
 		    * know in which group the article was actually in
 		    */
-			if(!strchr(group, ',') && (psGrp=psGrpFind(group))) {
+#if 0 /* this sucks! (urs) */
+			if (!strchr(group, ',') && (psGrp=psGrpFind(group)))
 				quick_filter_select_posted_art (psGrp, subj);
-			}
-			update_posted_info_file (group,
-			   strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
-		} else {
-			subj[0] = '\0';
-		}
-	} else {
-		group[0] = '\0';
-	}
+#endif
 
-	if (keep_posted_articles) {
+			update_posted_info_file (group, strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
+		} else
+			subj[0] = '\0';
+	} else
+		group[0] = '\0';
+
+	if (keep_posted_articles)
 		update_posted_msgs_file (article, userid);
-	}
+
 	if (group[0] != '\0')
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+
 	if (subj[0] != '\0')
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 	write_config_file (local_config_file);
 
 post_article_postponed:
-	if (unlink_article) {
+	if (unlink_article)
 		unlink (article);
-	}
 
 	return;
 }
@@ -1249,24 +1204,22 @@ append_postponed_file (
 
 int count_postponed_articles(void)
 {
-  FILE *fp=fopen(postponed_articles_file,"r");
-  int count=0;
-  char line[HEADER_LEN];
+	FILE *fp=fopen(postponed_articles_file,"r");
+	int count=0;
+	char line[HEADER_LEN];
 
-  if(!fp)
-    return 0;
+	if (!fp)
+		return 0;
 
-  while(fgets(line, sizeof(line), fp)) {
-    if(strncmp(line, "From ", 5)==0)
-      count++;
-  }
-  fclose(fp);
-
-  return count;
+	while (fgets(line, sizeof(line), fp)) {
+		if (strncmp(line, "From ", 5)==0)
+			count++;
+	}
+	fclose(fp);
+	return count;
 }
 
-/* Copy the first postponed article and remove it from the postponed
-   file */
+/* Copy the first postponed article and remove it from the postponed file */
 
 static int
 fetch_postponed_article(
@@ -1274,81 +1227,85 @@ fetch_postponed_article(
 	char subject[],
 	char newsgroups[])
 {
-  char postponed_tmp[PATH_LEN];
-  FILE *in;
-  FILE *out;
-  FILE *tmp;
-  char line[HEADER_LEN];
-  int first_article;
-  int prev_line_nl;
-  int anything_left;
+	FILE *in;
+	FILE *out;
+	FILE *tmp;
+	char postponed_tmp[PATH_LEN];
+	char line[HEADER_LEN];
+	int first_article;
+	int prev_line_nl;
+	int anything_left;
 
-  strcpy(postponed_tmp, postponed_articles_file);
-  strcat(postponed_tmp, "_");
+	strcpy(postponed_tmp, postponed_articles_file);
+	strcat(postponed_tmp, "_");
+	in = fopen(postponed_articles_file, "r");
+	out = fopen(tmp_file, "w");
+	tmp = fopen(postponed_tmp, "w");
+	
+	if (in==NULL || out==NULL || tmp==NULL) {
+		if (in)
+			fclose(in);
+		if (out)
+			fclose(out);
+		if (tmp)
+			fclose(tmp);
+		return FALSE;
+	}
 
-  in=fopen(postponed_articles_file, "r");
-  out=fopen(tmp_file, "w");
-  tmp=fopen(postponed_tmp, "w");
-  if(in==NULL||out==NULL||tmp==NULL) {
-    if(in) fclose(in);
-    if(out) fclose(out);
-    if(tmp) fclose(tmp);
-    return FALSE;
-  }
+	fgets(line, sizeof(line), in);
 
-  fgets(line, sizeof(line), in);
+	if(strncmp(line, "From ", 5)!=0) {
+		fclose(in);
+		fclose(out);
+		fclose(tmp);
+		return FALSE;
+	}
 
-  if(strncmp(line, "From ", 5)!=0) {
-    fclose(in);
-    fclose(out);
-    fclose(tmp);
-    return FALSE;
-  }
+	first_article = TRUE;
+	prev_line_nl = FALSE;
+	anything_left = FALSE;
 
-  first_article=TRUE;
-  prev_line_nl=FALSE;
-  anything_left=FALSE;
+	/* we have one minor problem with copying the article, we have added
+	 * a newline at the end of the article and we have to remove that,
+	 * but we don't know we are on the last line until we read the next
+	 * line containing "From "
+	 */
+	
+	while(fgets(line, sizeof(line), in)!=NULL) {
+		if(strncmp(line, "From ", 5)==0)
+			first_article=FALSE;
+		if(first_article) {
+			match_string(line, "Newsgroups: ", newsgroups, HEADER_LEN);
+			match_string(line, "Subject: ", subject, HEADER_LEN);
+			
+			if(prev_line_nl)
+				fputc('\n', out);
 
-  /* we have one minor problem with copying the article, we have added
-   * a newline at the end of the article and we have to remove that,
-   * but we don't know we are on the last line until we read the next
-   * line containing "From " */
+			if(strlen(line) && line[strlen(line)-1]=='\n') {
+				prev_line_nl=TRUE;
+				line[strlen(line)-1]='\0';
+			} else
+				prev_line_nl=FALSE;
 
-  while(fgets(line, sizeof(line), in)!=NULL) {
-    if(strncmp(line, "From ", 5)==0)
-      first_article=FALSE;
-    if(first_article) {
-      match_string(line, "Newsgroups: ", newsgroups, HEADER_LEN);
-      match_string(line, "Subject: ", subject, HEADER_LEN);
-      if(prev_line_nl) {
-	fputc('\n', out);
-      }
+			fputs(line, out);
+		} else {
+			fputs(line, tmp);
+			anything_left=1;
+		}
+	}
 
-      if(strlen(line) && line[strlen(line)-1]=='\n') {
-	prev_line_nl=TRUE;
-	line[strlen(line)-1]='\0';
-      } else {
-	prev_line_nl=FALSE;
-      }
-      fputs(line, out);
-    }else {
-      fputs(line, tmp);
-      anything_left=1;
-    }
-  }
+	fclose(in);
+	fclose(out);
+	fclose(tmp);
 
-  fclose(in);
-  fclose(out);
-  fclose(tmp);
+	unlink(postponed_articles_file);
 
-  unlink(postponed_articles_file);
-  if(anything_left) {
-    rename(postponed_tmp, postponed_articles_file);
-  } else {
-    unlink(postponed_tmp);
-  }
+	if(anything_left)
+		rename(postponed_tmp, postponed_articles_file);
+	else
+		unlink(postponed_tmp);
 
-  return TRUE;
+	return TRUE;
 }
 
 
@@ -1363,8 +1320,7 @@ pickup_postponed_articles(
 	char subject[HEADER_LEN];
 	char question[HEADER_LEN];
 	char ch = 0;
-	char def = iKeyPostponeYes;
-	int count=count_postponed_articles();
+	int count = count_postponed_articles();
 	int i;
 
 	if (count==0) {
@@ -1373,7 +1329,7 @@ pickup_postponed_articles(
 		return FALSE;
 	}
 
-	sprintf (question, "do you want to see postponed articles (%d)? ", count);
+	sprintf(question, "do you want to see postponed articles (%d)? ", count);
 
 	if (ask && prompt_yn(cLINES, question, TRUE) != 1)
 		return FALSE;
@@ -1381,21 +1337,18 @@ pickup_postponed_articles(
 	for (i = 0; i < count; i++) {
 		if (!fetch_postponed_article(article, subject, newsgroups))
 			return TRUE;
+
 		if (!all) {
-			def = iKeyPostponeYes;
-			do {
-				prompt_2 (txt_postpone_repost, subject, def);
-				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-					ch = def;
-			} while (!strchr ("\033qyYnA", ch));
-			if (ch == iKeyPostponeYesAll) {
+			ch = prompt_slk_response (iKeyPostponeYes, "\033qyYnA", sized_message(txt_postpone_repost, subject));
+
+			if (ch == iKeyPostponeYesAll)
 				all = 1;
-			}
 		}
+
 		/* No else here since all changes in previous if */
-		if (all) {
+		if (all)
 			ch = iKeyPostponeYesOverride;
-		}
+
 		switch (ch)
 		{
 			case iKeyPostponeYes:
@@ -1420,11 +1373,8 @@ static void
 postpone_article(
 	char *the_article)
 {
-  wait_message(txt_info_do_postpone);
-  /* FIXME - message is overwritten immediately */
-  /* this is a bug in wait_message which dosn't wait anymore */
-  /* see also main.c: txt_info_postponed */
-  append_postponed_file(the_article, userid);
+	wait_message(3, txt_info_do_postpone);
+	append_postponed_file(the_article, userid);
 }
 
 /*
@@ -1445,7 +1395,6 @@ post_article (
 	int lines;
 	int redraw_screen = FALSE;
 	struct t_group *psGrp;
-
 #ifdef FORGERY
 	char line[HEADER_LEN];
 #endif
@@ -1457,14 +1406,19 @@ post_article (
 		error_message (txt_not_in_active_file, group);
 		return redraw_screen;
 	}
-	if (psGrp->attribute->mailing_list != (char *) 0) {
+	if (psGrp->attribute->mailing_list != (char *) 0)
 		art_type = GROUP_TYPE_MAIL;
-	}
+
 	if (!can_post && art_type == GROUP_TYPE_NEWS) {
 		info_message (txt_cannot_post);
 		return redraw_screen;
 	}
 	*posted_flag = FALSE;
+
+	if (psGrp->moderated == 'x' || psGrp->moderated == 'n') {
+		error_message(txt_cannot_post_group, psGrp->name);
+		return redraw_screen;
+	}
 
 	if (psGrp->moderated == 'm') {
 		sprintf (msg, txt_group_is_moderated, group);
@@ -1480,25 +1434,26 @@ post_article (
 		strcat(tmp, " ...");
 	} else
 		strncpy(tmp, default_post_subject, sizeof(tmp));
+
 	sprintf (msg, txt_post_subject, tmp);
 
 	if (!prompt_string (msg, subj, HIST_POST_SUBJECT)) {
 		clear_message ();
 		return redraw_screen;
 	}
-	if (strlen (subj)) {
-		my_strncpy (default_post_subject, subj,
-			    sizeof (default_post_subject));
-	} else {
-		if (default_post_subject[0]) {
+
+	if (strlen (subj))
+		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+	else {
+		if (default_post_subject[0])
 			my_strncpy (subj, default_post_subject, sizeof (subj));
-		} else {
+		else {
 			info_message (txt_no_subject);
 			return redraw_screen;
 		}
 	}
 
-	wait_message (txt_post_an_article);
+	wait_message (0, txt_post_an_article);
 
 	if ((fp = fopen (article, "w")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, article);
@@ -1513,26 +1468,28 @@ post_article (
 #endif
 	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
-	if (art_type == GROUP_TYPE_MAIL) {
+
+	if (art_type == GROUP_TYPE_MAIL)
 		msg_add_header ("To", psGrp->attribute->mailing_list);
-	} else {
+	else
 		msg_add_header ("Newsgroups", group);
-	}
-	if (psGrp->attribute->followup_to != (char *) 0 && art_type == GROUP_TYPE_NEWS) {
+
+	if (psGrp->attribute->followup_to != (char *) 0 && art_type == GROUP_TYPE_NEWS)
 		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
-	} else {
+	else {
 		if (prompt_followupto)
 			msg_add_header("Followup-To", "");
 	}
-	if (*reply_to) {
+
+	if (*reply_to)
 		msg_add_header ("Reply-To", reply_to);
-	}
-	if (psGrp->attribute->organization != (char *) 0) {
+
+	if (psGrp->attribute->organization != (char *) 0)
 		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
-	}
-	if (*my_distribution && art_type == GROUP_TYPE_NEWS) {
+
+	if (*my_distribution && art_type == GROUP_TYPE_NEWS)
 		msg_add_header ("Distribution", my_distribution);
-	}
+
 	msg_add_header ("Summary", "");
 	msg_add_header ("Keywords", "");
 
@@ -1554,13 +1511,12 @@ post_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)
-				 && repair_article(&ch))
-				 	;
+				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+					;
 				redraw_screen = TRUE;
-				if (ch == iKeyPostEdit) {
+				if (ch == iKeyPostEdit)
 					break;
-				}
+
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
@@ -1583,16 +1539,14 @@ post_article_loop:
 
 			case iKeyPostPost:
 			case iKeyPostPost2:
-				wait_message (txt_posting);
+				wait_message (0, txt_posting);
 				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article)) {
+					if (submit_news_file (article))
 						*posted_flag = TRUE;
-					}
 				} else {
-					if (submit_mail_file (article)) {
+					if (submit_mail_file (article))
 						*posted_flag = TRUE;
-					}
 				}
 				if (*posted_flag) {
 					unlink(backup_article_name(article));
@@ -1601,9 +1555,9 @@ post_article_loop:
 					goto post_article_done;
 				} else {
 					ch = prompt_rejected();
-					if (ch==iKeyPostPostpone) {
+					if (ch==iKeyPostPostpone)
 						postpone_article(backup_article_name(article));
-					} else if (ch==iKeyPostEdit) {
+					else if (ch==iKeyPostEdit) {
 						rename(backup_article_name(article), article);
 						ch = iKeyPostEdit;
 						goto post_article_loop;
@@ -1614,8 +1568,7 @@ post_article_loop:
 					    if (keep_dead_articles)
 					      append_file (dead_articles, dead_article);
 #endif
-					    sprintf (buf, txt_art_rejected, dead_article);
-	 				    info_message (buf);
+	 				    info_message (txt_art_rejected, dead_article);
 					    ReadCh ();
 					}
 				 	return redraw_screen;
@@ -1629,27 +1582,29 @@ post_article_loop:
 		ch = prompt_to_edit();
 	}
 
-      post_article_done:
+post_article_done:
 	if (*posted_flag) {
 		if (art_type == GROUP_TYPE_NEWS) {
 			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf))
 				update_active_after_posting (buf);
 		}
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
+
+#if 0 /* this sucks! (urs) */
 			quick_filter_select_posted_art (psGrp, subj);
+#endif
+
 			update_posted_info_file (group, 'w', subj);
 		}
-		if (keep_posted_articles) {
+		if (keep_posted_articles)
 			update_posted_msgs_file (article, userid);
-		}
 	}
 	my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
 	my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 post_article_postponed:
-	if (unlink_article) {
+	if (unlink_article)
 		unlink (article);
-	}
 
 	return redraw_screen;
 }
@@ -1668,8 +1623,7 @@ appendid (
 	while (**what && **what != '<')
 		(*what)++;
 	if (**what) {
-		while (**what && **what != '>'
-		       && !isspace ((unsigned char)**what))
+		while (**what && **what != '>' && !isspace ((unsigned char)**what))
 			*(*where)++ = *(*what)++;
 		if (**what != '>')
 			*where = oldpos;
@@ -1737,7 +1691,7 @@ is_crosspost (
 	char *xref)
 {
 	int count=0;
-	for (;*xref;xref++)
+	for ( ; *xref; xref++)
 		if (*xref==':')
 			count++;
 	return (count>=2) ? TRUE : FALSE;
@@ -1745,7 +1699,7 @@ is_crosspost (
 
 /* Widespread news software like INN's nnrpd restricts the size of several
    headers, notably the references header, to 512 characters.  Oh well...
-   guess that's what son-of-1036 calls a "desparate last ressort" :-/
+   guess that's what son-of-1036 calls a "desparate last resort" :-/
    From TIN's point of view, this could be HEADER_LEN. */
 #define MAXREFSIZE 512
 
@@ -1790,9 +1744,9 @@ join_references (
 		if (damaged_id (e)) {	/* remove damaged message ids and mark
 					   the gap if that's not already done */
 			e += skip_id (e);
-			while (space < 3) {
+			while (space < 3)
 				space++, *c++ = ' ';
-			}
+
 			continue;
 		}
 		if (!space)
@@ -1864,11 +1818,11 @@ post_response (
 	char bigbuf[HEADER_LEN];
 	char buf[HEADER_LEN];
 	char from_name[HEADER_LEN];
+	char initials[64];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	int ret_code = POSTED_NONE;
 	struct t_group *psGrp;
-	char initials[64];
 
 #ifdef FORGERY
 	char line[HEADER_LEN];
@@ -1876,22 +1830,18 @@ post_response (
 
 	msg_init_headers ();
 
-	wait_message (txt_post_a_followup);
+	wait_message (0, txt_post_a_followup);
 
 	/*
 	 *  Remove duplicates in Newsgroups and Followup-To line
 	 */
-	strip_double_ngs (note_h_newsgroups);
-	if (*note_h_followup) {
-		strip_double_ngs (note_h_followup);
-	}
-	if (*note_h_followup && STRCMPEQ(note_h_followup, "poster")) {
-		clear_message ();
-		prompt_1 (txt_resp_to_poster, iKeyPageMail);
-		do {
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = iKeyPageMail;
-		} while (!strchr ("\033mpyq", ch));
+	strip_double_ngs (note_h.newsgroups);
+	if (*note_h.followup)
+		strip_double_ngs (note_h.followup);
+
+	if (*note_h.followup && STRCMPEQ(note_h.followup, "poster")) {
+/*		clear_message ();*/
+		ch = prompt_slk_response(iKeyPageMail, "\033mpyq", txt_resp_to_poster);
 		switch (ch) {
 			case iKeyPostPost:
 			case iKeyPostPost2:
@@ -1905,15 +1855,15 @@ post_response (
 		{
 			char save_followup[HEADER_LEN];
 
-			strcpy (save_followup, note_h_followup);
-			*note_h_followup = '\0';
+			strcpy (save_followup, note_h.followup);
+			*note_h.followup = '\0';
 			find_reply_to_addr (respnum, buf, FALSE);
 			mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);
-			strcpy (note_h_followup, save_followup);
+			strcpy (note_h.followup, save_followup);
 			return ret_code;
 		}
-	} else if (*note_h_followup && strcmp (note_h_followup, group) != 0
-		   && strcmp (note_h_followup, note_h_newsgroups) != 0) {
+	} else if (*note_h.followup && strcmp (note_h.followup, group) != 0
+		   && strcmp (note_h.followup, note_h.newsgroups) != 0) {
 		/* note that comparing newsgroups and followup-to isn't
 		   really correct, since the order of the newsgroups may be
 		   different, but testing that also isn't really worth
@@ -1925,20 +1875,19 @@ post_response (
 		MoveCursor ((cLINES / 2) + 4, 0);
 
 		my_fputs ("    ", stdout);
-		ptr = note_h_followup;
+		ptr = note_h.followup;
 		while (*ptr) {
-			if (*ptr != ',') {
+			if (*ptr != ',')
 				my_fputc (*ptr, stdout);
-			} else {
+			else
 				my_fputs (cCRLF "    ", stdout);
-			}
+
 			ptr++;
 		}
 		my_flush ();
 
-		if (prompt_yn (cLINES, txt_continue, TRUE) != 1) {
+		if (prompt_yn (cLINES, txt_continue, TRUE) != 1)
 			return ret_code;
-		}
 	}
 ignore_followup_to_poster:
 	if ((fp = fopen (article, "w")) == NULL) {
@@ -1955,38 +1904,32 @@ ignore_followup_to_poster:
 #endif
 	msg_add_header ("From", from_name);
 
-	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj, TRUE));
+	sprintf (bigbuf, "Re: %s", eat_re (note_h.subj, TRUE));
 	msg_add_header ("Subject", bigbuf);
 
-	if (psGrp && psGrp->attribute->x_comment_to && *note_h_from) {
-		parse_from(note_h_from, bigbuf, buf);
-		if (*buf) {
-			sprintf(bigbuf, "(%s)", buf);
-			msg_add_header ("X-Comment-To", bigbuf);
-		}
+	if (psGrp && psGrp->attribute->x_comment_to && *note_h.from) {
+		msg_add_header ("X-Comment-To", note_h.from);
 	}
-	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
-		msg_add_header ("Newsgroups", note_h_followup);
+	if (*note_h.followup && strcmp (note_h.followup, "poster") != 0) {
+		msg_add_header ("Newsgroups", note_h.followup);
 		if (prompt_followupto)
-			msg_add_header("Followup-To",
-  			  (strchr(note_h_followup, ',') != (char *) 0) ?
-			    note_h_followup : "");
+			msg_add_header("Followup-To", (strchr(note_h.followup, ',') != (char *) 0) ? note_h.followup : "");
 	} else {
 		if (psGrp && psGrp->attribute->mailing_list) {
 			msg_add_header ("To", psGrp->attribute->mailing_list);
 			art_type = GROUP_TYPE_MAIL;
 		} else {
-			msg_add_header ("Newsgroups", note_h_newsgroups);
+			msg_add_header ("Newsgroups", note_h.newsgroups);
 			if (prompt_followupto)
 				msg_add_header("Followup-To",
-	  			  (strchr(note_h_newsgroups, ',') != (char *) 0) ?
-				    note_h_newsgroups : "");
+	  			  (strchr(note_h.newsgroups, ',') != (char *) 0) ?
+				    note_h.newsgroups : "");
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
 				msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 			} else {
-				ptr = strchr (note_h_newsgroups, ',');
+				ptr = strchr (note_h.newsgroups, ',');
 				if (ptr) {
-					msg_add_header ("Followup-To", note_h_newsgroups);
+					msg_add_header ("Followup-To", note_h.newsgroups);
 				}
 			}
 		}
@@ -1995,25 +1938,23 @@ ignore_followup_to_poster:
 	/*
 	 * Append to References: line if its already there
 	 */
-	if (note_h_references[0]) {
-		join_references (bigbuf, note_h_references, note_h_messageid);
+	if (note_h.references[0]) {
+		join_references (bigbuf, note_h.references, note_h.messageid);
 		msg_add_header ("References", bigbuf);
-	} else {
-		msg_add_header ("References", note_h_messageid);
-	}
+	} else
+		msg_add_header ("References", note_h.messageid);
 
-	if (psGrp && psGrp->attribute->organization != (char *) 0) {
+	if (psGrp && psGrp->attribute->organization != (char *) 0)
 		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
-	}
-	if (*reply_to) {
+
+	if (*reply_to)
 		msg_add_header ("Reply-To", reply_to);
-	}
+
 	if (art_type != GROUP_TYPE_MAIL) {
-		if (*note_h_distrib) {
-			msg_add_header ("Distribution", note_h_distrib);
-		} else if (*my_distribution) {
+		if (*note_h.distrib)
+			msg_add_header ("Distribution", note_h.distrib);
+		else if (*my_distribution)
 			msg_add_header ("Distribution", my_distribution);
-		}
 	}
 	msg_add_x_headers (msg_headers_file);
 	msg_add_x_headers (psGrp->attribute->x_headers);
@@ -2026,14 +1967,10 @@ ignore_followup_to_poster:
 
 	if (copy_text) {
 		if (arts[respnum].xref && is_crosspost(arts[respnum].xref)) {
-			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
-				       xpost_quote_format)) {
+			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), xpost_quote_format))
 				fprintf (fp, "%s\n", buf);
-			}
-		} else if (strfquote (group, respnum, buf, sizeof (buf),
-				      (psGrp && psGrp->attribute->news_quote_format != (char *) 0) ? psGrp->attribute->news_quote_format : news_quote_format)) {
+		} else if (strfquote (group, respnum, buf, sizeof (buf), (psGrp && psGrp->attribute->news_quote_format != (char *) 0) ? psGrp->attribute->news_quote_format : news_quote_format))
 			fprintf (fp, "%s\n", buf);
-		}
 		start_line_offset++;
 
 		/*
@@ -2052,14 +1989,13 @@ ignore_followup_to_poster:
 		if (with_headers)
 			fseek (note_fp, 0L, SEEK_SET);
 		else
-			fseek (note_fp, note_mark[0], SEEK_SET);
+			fseek (note_fp, mark_body, SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
 			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
 			   initials, with_headers ? TRUE : quote_signatures);
-	} else {
+	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
-	}
 
 	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
 	fclose (fp);
@@ -2070,13 +2006,11 @@ post_response_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)
-				 && repair_article(&ch))
-				 	;
+				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+					;
 				ret_code = POSTED_REDRAW;
-				if (ch == iKeyPostEdit) {
+				if (ch == iKeyPostEdit)
 					break;
-				}
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
@@ -2100,16 +2034,14 @@ post_response_loop:
 
 			case iKeyPostPost:
 			case iKeyPostPost2:
-				wait_message (txt_posting);
+				wait_message (0, txt_posting);
 				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article)) {
+					if (submit_news_file (article))
 						ret_code = POSTED_OK;
-					}
 				} else {
-					if (submit_mail_file (article)) {
+					if (submit_mail_file (article))
 						ret_code = POSTED_OK;
-					}
 				}
 				if (ret_code == POSTED_OK) {
 					info_message (txt_art_posted);
@@ -2130,8 +2062,7 @@ post_response_loop:
 					    if (keep_dead_articles)
 					      append_file (dead_articles, dead_article);
 #endif
-					    sprintf (buf, txt_art_rejected, dead_article);
-					    info_message (buf);
+					    info_message (txt_art_rejected, dead_article);
 					    ReadCh ();
 					}
 					return ret_code;
@@ -2146,30 +2077,29 @@ post_response_loop:
 		ch = prompt_to_edit();
 	}
 
-      post_response_done:
+post_response_done:
 	if (ret_code == POSTED_OK) {
 		if (art_type == GROUP_TYPE_NEWS) {
 			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf))
 				update_active_after_posting (buf);
 		}
-		if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
+		if (*note_h.followup && strcmp (note_h.followup, "poster") != 0) {
 			if (pcCopyArtHeader (HEADER_SUBJECT, article, buf))
-				update_posted_info_file (note_h_followup, 'f', buf);
+				update_posted_info_file (note_h.followup, 'f', buf);
 		} else if (pcCopyArtHeader (HEADER_SUBJECT, article, buf)) {
-			update_posted_info_file (note_h_newsgroups, 'f', buf);
-			my_strncpy (default_post_newsgroups, note_h_newsgroups,
+			update_posted_info_file (note_h.newsgroups, 'f', buf);
+			my_strncpy (default_post_newsgroups, note_h.newsgroups,
 				    sizeof (default_post_newsgroups));
 		}
-		if (keep_posted_articles) {
+		if (keep_posted_articles)
 			update_posted_msgs_file (article, userid);
-		}
 	}
 	my_strncpy (default_post_subject, buf, sizeof (default_post_subject));
 
 post_response_postponed:
-	if (unlink_article) {
+	if (unlink_article)
 		unlink (article);
-	}
+
 	return ret_code;
 }
 
@@ -2210,37 +2140,36 @@ mail_to_someone (
 	}
 	chmod (nam, (S_IRUSR|S_IWUSR));
 
-	sprintf (subject, "(fwd) %s\n", note_h_subj);
+	sprintf (subject, "(fwd) %s\n", note_h.subj);
 
 	if (!use_mailreader_i) {	/* tin should start editor */
 
 		msg_add_header ("To", mail_to);
 
 		if (mail_to_poster) {
-			sprintf (subject, "Re: %s\n", eat_re (note_h_subj, TRUE));
+			sprintf (subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
 			msg_add_header ("Subject", subject);
-		} else {
+		} else
 			msg_add_header ("Subject", subject);
-		}
-		if (auto_cc) {
+
+		if (auto_cc)
 			msg_add_header ("Cc", userid);
-		}
-		if (auto_bcc) {
+
+		if (auto_bcc)
 			msg_add_header ("Bcc", userid);
-		}
 		/*
 		 * remove duplicates from Newsgroups header
 		 */
-		strip_double_ngs (note_h_newsgroups);
+		strip_double_ngs (note_h.newsgroups);
 
-		msg_add_header ("Newsgroups", note_h_newsgroups);
+		msg_add_header ("Newsgroups", note_h.newsgroups);
 
-		if (*default_organization) {
+		if (*default_organization)
 			msg_add_header ("Organization", random_organization(default_organization));
-		}
-		if (*reply_to) {
+
+		if (*reply_to)
 			msg_add_header ("Reply-To", reply_to);
-		}
+
 		msg_add_x_headers (msg_headers_file);
 	}
 	start_line_offset = msg_write_headers (fp);
@@ -2262,7 +2191,7 @@ mail_to_someone (
 				}
 			}
 		}
-		fseek (note_fp, note_mark[0], SEEK_SET);
+		fseek (note_fp, mark_body, SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials, quote_signatures);
 	} else {
@@ -2272,9 +2201,9 @@ mail_to_someone (
 		fprintf (fp, "-- end of forwarded message --\n");
 	}
 
-	if (!use_mailreader_i) {
+	if (!use_mailreader_i)
 		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
-	}
+
 #ifdef WIN32
 	putc ('\0', fp);
 #endif
@@ -2283,15 +2212,15 @@ mail_to_someone (
 	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj, TRUE));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
 	}
 	forever {
-		if (confirm_to_mail && (!use_mailreader_i)) {
+		if (confirm_to_mail && (!use_mailreader_i))
 			ch = prompt_to_send(subject);
-		}
+
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (nam, start_line_offset);
@@ -2314,7 +2243,8 @@ mail_to_someone (
 
 			case iKeyQuit:
 			case iKeyAbort:
-				unlink (nam);
+				if (unlink_article)
+					unlink (nam);
 				clear_message ();
 				*mailed_ok = FALSE;
 				return redraw_screen;
@@ -2326,21 +2256,21 @@ mail_to_someone (
 				 *  case they changed it with the editor
 				 */
 				*mailed_ok = submit_mail_file (nam);
-				if (*mailed_ok) {
+				if (*mailed_ok)
 					goto mail_to_someone_done;
-				} else {
+				else
 					break;
-				}
+
 			default:
 				break;
 		}
-		if (mail_to_poster) {
+		if (mail_to_poster)
 			ch = prompt_to_send(subject);
-		}
 	}
 
 mail_to_someone_done:
-	unlink (nam);
+	if (unlink_article)
+		unlink (nam);
 
 	return redraw_screen;
 }
@@ -2358,7 +2288,7 @@ mail_bug_report (void) /* return value is always ignored */
 
 	msg_init_headers ();
 
-	wait_message (txt_mail_bug_report);
+	wait_message (2, txt_mail_bug_report);
 
 	joinpath (nam, homedir, ".bugreport");
 #ifdef APPEND_PID
@@ -2378,18 +2308,18 @@ mail_bug_report (void) /* return value is always ignored */
 		sprintf (subject, "BUG REPORT %s\n", page_header);
 		msg_add_header ("Subject", subject);
 
-		if (auto_cc) {
+		if (auto_cc)
 			msg_add_header ("Cc", userid);
-		}
-		if (auto_bcc) {
+
+		if (auto_bcc)
 			msg_add_header ("Bcc", userid);
-		}
-		if (*default_organization) {
+
+		if (*default_organization)
 			msg_add_header ("Organization", random_organization(default_organization));
-		}
-		if (*reply_to) {
+
+		if (*reply_to)
 			msg_add_header ("Reply-To", reply_to);
-		}
+
 		msg_add_x_headers (msg_headers_file);
 	}
 	start_line_offset = msg_write_headers (fp);
@@ -2453,9 +2383,9 @@ mail_bug_report (void) /* return value is always ignored */
 
 	start_line_offset += 5;
 
-	if (!use_mailreader_i) {
+	if (!use_mailreader_i)
 		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
-	}
+
 #ifdef WIN32
 	putc ('\0', fp);
 #endif
@@ -2468,9 +2398,8 @@ mail_bug_report (void) /* return value is always ignored */
 		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
-	} else {
+	} else
 		ch = iKeyPostEdit;
-	}
 
 	forever {
 		switch (ch) {
@@ -2502,26 +2431,20 @@ mail_bug_report (void) /* return value is always ignored */
 			case iKeyPostSend2:
 				sprintf (msg, txt_mail_bug_report_confirm, bug_addr, add_addr);
 				if (prompt_yn (cLINES, msg, FALSE) == 1) {
-					if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
-					    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
-                                                t_bool ismail=TRUE;
-						sprintf (msg, txt_mailing_to, mail_to);
-						wait_message (msg);
-						rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
-						strfmailer (mailer, subject, mail_to, nam,
-							    buf, sizeof (buf), default_mailer_format);
+					if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
+						wait_message (0, txt_mailing_to, mail_to);
+						rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header, TRUE);
+						strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
-							sprintf (msg, txt_mailed, 1, IS_PLURAL(1));
-							info_message (msg);
+							info_message (txt_mailed, 1, IS_PLURAL(1));
 							goto mail_bug_report_done;
-						} else {
+						} else
 							error_message (txt_command_failed_s, buf);
-						}
 					}
 					break;	/* an error occurred */
-				} else {
+				} else
 					goto mail_bug_report_done;
-				}
+
 			default:
 				break;
 		}
@@ -2556,7 +2479,7 @@ mail_to_author (
 
 	msg_init_headers ();
 
-	wait_message (txt_reply_to_author);
+	wait_message (0, txt_reply_to_author);
 
 #ifdef VMS
 	joinpath (nam, homedir, "letter.");
@@ -2572,7 +2495,7 @@ mail_to_author (
 	}
 	chmod (nam, (S_IRUSR|S_IWUSR));
 
-	sprintf (subject, "Re: %s\n", eat_re (note_h_subj, TRUE));
+	sprintf (subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
 		find_reply_to_addr (respnum, from_addr, FALSE);
@@ -2581,35 +2504,34 @@ mail_to_author (
 		spamtrap_found = check_for_spamtrap(from_addr);
 		msg_add_header ("Subject", subject);
 
-		if (auto_cc) {
+		if (auto_cc)
 			msg_add_header ("Cc", userid);
-		}
-		if (auto_bcc) {
+
+		if (auto_bcc)
 			msg_add_header ("Bcc", userid);
-		}
+
 		/*
 		 * remove duplicates from Newsgroups header
 		 */
-		strip_double_ngs (note_h_newsgroups);
+		strip_double_ngs (note_h.newsgroups);
 
-		msg_add_header ("Newsgroups", note_h_newsgroups);
+		msg_add_header ("Newsgroups", note_h.newsgroups);
 
 		/*
 		 * Write References and Message-Id as In-Reply-To to the mail
 		 */
-		if (note_h_references[0]) {
-			join_references (bigbuf, note_h_references, note_h_messageid);
+		if (note_h.references[0]) {
+			join_references (bigbuf, note_h.references, note_h.messageid);
 			msg_add_header ("In-Reply-To", bigbuf);
-		} else {
-			msg_add_header ("In-Reply-To", note_h_messageid);
-		}
+		} else
+			msg_add_header ("In-Reply-To", note_h.messageid);
 
-		if (*default_organization) {
+		if (*default_organization)
 			msg_add_header ("Organization", random_organization(default_organization));
-		}
-		if (*reply_to) {
+
+		if (*reply_to)
 			msg_add_header ("Reply-To", reply_to);
-		}
+
 		msg_add_x_headers (msg_headers_file);
 	}
 	start_line_offset = msg_write_headers (fp);
@@ -2632,17 +2554,16 @@ mail_to_author (
 		if (with_headers)
 			fseek (note_fp, 0L, SEEK_SET);
 		else
-			fseek (note_fp, note_mark[0], SEEK_SET);
+			fseek (note_fp, mark_body, SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials,
 		    with_headers ? TRUE : quote_signatures);
-	} else {
+	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
-	}
 
-	if (!use_mailreader_i) {
+	if (!use_mailreader_i)
 		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
-	}
+
 #ifdef WIN32
 	putc ('\0', fp);
 #endif
@@ -2667,14 +2588,13 @@ mail_to_author (
 
 	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj, TRUE));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
 		find_reply_to_addr (respnum, mail_to, TRUE);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
-	} else {
+	} else
 		ch = iKeyPostEdit;
-	}
 
 	forever {
 		switch (ch) {
@@ -2694,8 +2614,7 @@ mail_to_author (
 #ifdef HAVE_PGP
 			case iKeyPostPGP:
 				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
-				if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
-				    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+				if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
 					invoke_pgp_mail (nam, mail_to);
 				break;
 #endif
@@ -2709,22 +2628,17 @@ mail_to_author (
 			case iKeyPostSend:
 			case iKeyPostSend2:
 				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
-				if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
-				    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
-                                        t_bool ismail=TRUE;
-					sprintf (msg, txt_mailing_to, mail_to);
-					wait_message (msg);
+				if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
+					t_bool ismail=TRUE;
+					wait_message (0, txt_mailing_to, mail_to);
 					checknadd_headers (nam);
 					rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
-					strfmailer (mailer, subject, mail_to, nam,
-						    buf, sizeof (buf), default_mailer_format);
+					strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 					if (invoke_cmd (buf)) {
-						sprintf (msg, txt_mailed, 1, IS_PLURAL(1));
-						info_message (msg);
+						info_message (txt_mailed, 1, IS_PLURAL(1));
 						goto mail_to_author_done;
-					} else {
+					} else
 						error_message (txt_command_failed_s, buf);
-					}
 				}
 				break;	/* an error occurred */
 			default:
@@ -2775,15 +2689,15 @@ pcCopyArtHeader (
 	char *pcArt,
 	char *result)
 {
+	FILE *fp;
 	char buf[HEADER_LEN];
 	char buf2[HEADER_LEN];
-	const char *p;
 	char *q;
-	FILE *fp;
+	const char *p;
 	int found = FALSE;
 	int was_to = FALSE;
-	static char header[HEADER_LEN];
 	int c;
+	static char header[HEADER_LEN];
 
 	*header = '\0';
 
@@ -2793,24 +2707,23 @@ pcCopyArtHeader (
 	}
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		q = strrchr (buf, '\n');
-		if (q != 0) {
+		if (q != 0)
 			*q = '\0';
-		}
+
 		if (*buf == '\0')
 			break;
 
 		/* check for continued header */
 		while ((c = peek_char (fp)) != EOF && isspace (c) && c != '\n' && strlen (buf) < sizeof (buf) - 1) {
-			if (strlen (buf) > 0 && buf[strlen (buf) - 1] == '\n') {
+			if (strlen (buf) > 0 && buf[strlen (buf) - 1] == '\n')
 				buf[strlen (buf) - 1] = '\0';
-			}
+
 			fgets (buf + strlen (buf), sizeof buf - strlen (buf), fp);
 		}
 
 		switch (iHeader) {
 			case HEADER_TO:
-				if (STRNCMPEQ(buf, "To: ", 4)
-				    || STRNCMPEQ(buf, "Cc: ", 4)) {
+				if (STRNCMPEQ(buf, "To: ", 4) || STRNCMPEQ(buf, "Cc: ", 4)) {
 					my_strncpy (buf2, &buf[4], sizeof (buf2));
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
@@ -2823,21 +2736,24 @@ pcCopyArtHeader (
 				} else if ((*buf == ' ' || *buf == '\t') && was_to) {
 					yank_to_addr (buf, header);
 					found = TRUE;
-				} else {
+				} else
 					was_to = FALSE;
-				}
+
 				break;
+
 			case HEADER_NEWSGROUPS:
-				if (match_string (buf, "Newsgroups: ", header, sizeof (header))) {
+				if (match_string (buf, "Newsgroups: ", header, sizeof (header)))
 					found = TRUE;
-				}
+
 				break;
+
 			case HEADER_SUBJECT:
 				if (STRNCMPEQ(buf, "Subject: ", 9)) {
 					my_strncpy (header, &buf[9], sizeof (header));
 					found = TRUE;
 				}
 				break;
+
 			default:
 				break;
 		}
@@ -2845,11 +2761,11 @@ pcCopyArtHeader (
 	fclose (fp);
 
 	if (found) {
-		if (header[0] == ' ') {
+		if (header[0] == ' ')
 			p = &header[1];
-		} else {
+		else
 			p = header;
-		}
+
 		(void) strcpy (result, rfc1522_decode (p));
 		return TRUE;
 	}
@@ -2885,7 +2801,6 @@ cancel_article (
 	char buf[HEADER_LEN];
 	char cancel[HEADER_LEN];
 	char from_name[HEADER_LEN];
-
 #ifdef FORGERY
 	char line[HEADER_LEN];
 	char line2[HEADER_LEN];
@@ -2919,31 +2834,25 @@ cancel_article (
 #else
 	get_user_info (user_name, full_name);
 #endif
-
-	if (debug == 2) {
-		sprintf (msg, "From=[%s]  Cancel=[%s]", art->from, from_name);
-		error_message (msg, "");
-	}
+#ifdef DEBUG
+	if (debug == 2)
+		error_message ("From=[%s]  Cancel=[%s]", art->from, from_name);
+#endif
 	if (!strstr (from_name, art->from)) {
 #ifdef FORGERY
 		author = FALSE;
 #else
-		info_message (txt_art_cannot_cancel);
-		sleep(3); /* FIXME */
+		wait_message (3, txt_art_cannot_cancel);
 		return redraw_screen;
 #endif
 	} else {
-		do {
-			prompt_2 (txt_cancel_article, art->subject, option_default);
-			if ((option = (char) ReadCh ()) == '\r' || option == '\n')
-				option = option_default;
-		} while (!strchr ("\033dqs", option));
+		option = prompt_slk_response (option_default, "\033dqs", sized_message(txt_cancel_article, art->subject));
 
 		switch (option) {
 			case iKeyPostCancel:
 				break;
 			case iKeyPostSupersede:
-				repost_article (note_h_newsgroups, art, respnum, TRUE);
+				repost_article (note_h.newsgroups, art, respnum, TRUE);
 				return redraw_screen;
 			default:
 				return redraw_screen;
@@ -2969,50 +2878,53 @@ cancel_article (
 		msg_add_header ("Path", line2);
 	} else
 		msg_add_header ("Path", line);
-	if (art->name) {
+
+	if (art->name)
 		sprintf (line, "%s <%s>", art->name, art->from);
-	} else {
+	else
 		sprintf (line, "<%s>", art->from);
-	}
+
 	msg_add_header ("From", line);
 	if (!author) {
-		sprintf (line, "<cancel.%s", note_h_messageid + 1);
+		sprintf (line, "<cancel.%s", note_h.messageid + 1);
 		msg_add_header ("Message-ID", line);
 		msg_add_header ("X-Cancelled-By", from_name);
 	}
 #else
 	msg_add_header ("From", from_name);
 #endif
-	sprintf (buf, "cmsg cancel %s", note_h_messageid);
+	sprintf (buf, "cmsg cancel %s", note_h.messageid);
 	msg_add_header ("Subject", buf);
 
 	/*
 	 * remove duplicates from Newsgroups header
 	 */
-	strip_double_ngs (note_h_newsgroups);
+	strip_double_ngs (note_h.newsgroups);
 
-	msg_add_header ("Newsgroups", note_h_newsgroups);
+	msg_add_header ("Newsgroups", note_h.newsgroups);
 	if (prompt_followupto)
 		msg_add_header("Followup-To", "");
-	sprintf (buf, "cancel %s", note_h_messageid);
+	sprintf (buf, "cancel %s", note_h.messageid);
 	msg_add_header ("Control", buf);
-	if (group->moderated == 'm') {
+
+	if (group->moderated == 'm')
 		msg_add_header ("Approved", from_name);
-	}
-	if (group && group->attribute->organization != (char *) 0) {
+
+	if (group && group->attribute->organization != (char *) 0)
 		msg_add_header ("Organization", random_organization(group->attribute->organization));
-	}
-	if (*note_h_distrib) {
-		msg_add_header ("Distribution", note_h_distrib);
-	} else if (*my_distribution) {
+
+	if (*note_h.distrib)
+		msg_add_header ("Distribution", note_h.distrib);
+	else if (*my_distribution)
 		msg_add_header ("Distribution", my_distribution);
-	}
+
 	msg_write_headers (fp);
 	msg_free_headers ();
 
-	fprintf (fp, txt_article_cancelled, VERSION, RELEASEDATE);
 #ifdef FORGERY
-	if (!author) {
+	if (author)
+		fprintf (fp, txt_article_cancelled);
+	else {
 		fputc ('\n', fp);
 		fseek (note_fp, 0L, SEEK_SET);
 		copy_fp (note_fp, fp);
@@ -3021,6 +2933,7 @@ cancel_article (
 	invoke_editor (cancel, start_line_offset);
 	redraw_screen = TRUE;
 #else
+	fprintf (fp, txt_article_cancelled);
 	fclose (fp);
 #endif /* FORGERY */
 
@@ -3030,37 +2943,28 @@ cancel_article (
 #ifdef FORGERY
 	if (!author) {
 		my_fprintf (stderr, txt_warn_cancel_forgery);
-		my_fprintf (stderr, "From: %s\n", note_h_from);
-	} else {
+		my_fprintf (stderr, "From: %s\n", note_h.from);
+	} else
 		my_fprintf (stderr, txt_warn_cancel);
-	}
 #else
 	my_fprintf (stderr, txt_warn_cancel);
 #endif /* FORGERY */
 
-	my_fprintf (stderr, "Subject: %s\n", note_h_subj);
-	my_fprintf (stderr, "Date: %s\n", note_h_date);
-	my_fprintf (stderr, "Message-ID: %s\n", note_h_messageid);
-	my_fprintf (stderr, "Newsgroups: %s\n", note_h_newsgroups);
+	my_fprintf (stderr, "Subject: %s\n", note_h.subj);
+	my_fprintf (stderr, "Date: %s\n", note_h.date);
+	my_fprintf (stderr, "Message-ID: %s\n", note_h.messageid);
+	my_fprintf (stderr, "Newsgroups: %s\n", note_h.newsgroups);
 	Raw (oldraw);
 
 	forever {
-		do {
-			sprintf (msg, "%s [%.*s]: %c", txt_quit_cancel,
-				 cCOLS - ((int) strlen(txt_quit_cancel)+7), note_h_subj, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg) - 1);
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr ("\033deq", ch));
-
+		ch = prompt_slk_response(ch_default, "\033deq", sized_message(txt_quit_cancel, note_h.subj));
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (cancel, start_line_offset);
 				break;
 
 			case iKeyPostCancel:
-				wait_message (txt_cancelling_art);
+				wait_message (1, txt_cancelling_art);
 				if (submit_news_file (cancel)) {
 					info_message (txt_art_cancel);
 					if (pcCopyArtHeader (HEADER_SUBJECT, cancel, buf))
@@ -3090,11 +2994,11 @@ cancel_article (
 #define FromSameUser ((strstr (from_name, arts[respnum].from)) != 0)
 
 #ifndef FORGERY
-#define NotSuperseding (!supersede || (supersede && (!FromSameUser)))
-#define Superseding    (supersede && FromSameUser)
+#	define NotSuperseding (!supersede || (supersede && (!FromSameUser)))
+#	define Superseding    (supersede && FromSameUser)
 #else
-#define NotSuperseding (!supersede)
-#define Superseding    (supersede)
+#	define NotSuperseding (!supersede)
+#	define Superseding    (supersede)
 #endif
 
 int
@@ -3126,7 +3030,7 @@ repost_article (
 	/*
 	 * remove duplicates from Newsgroups header
 	 */
-	strip_double_ngs (note_h_newsgroups);
+	strip_double_ngs (note_h.newsgroups);
 
 	/*
 	 * Check if any of the newsgroups are moderated.
@@ -3138,23 +3042,21 @@ repost_article (
 		if (ptr != (char *) 0) {
 			strcpy (tmp, ptr + 1);
 			*ptr = '\0';
-		} else {
+		} else
 			done = TRUE;
-		}
+
 		psGrp = psGrpFind (buf);
 
 		if (psGrp && !tmpGrp)
 			tmpGrp = psGrp;
-
-		if (debug == 2) {
-			sprintf (msg, "Group=[%s]", buf);
-			wait_message (msg);
-		}
+#ifdef DEBUG
+		if (debug == 2)
+			wait_message (1, "Group=[%s]", buf);
+#endif
 		if (psGrp && psGrp->moderated == 'm') {
 			sprintf (msg, txt_group_is_moderated, buf);
 			if (prompt_yn (cLINES, msg, TRUE) != 1) {
-				info_message (txt_art_not_posted);
-				sleep (3);
+				wait_message (3, txt_art_not_posted);
 				return POSTED_NONE;
 			}
 		}
@@ -3177,9 +3079,9 @@ repost_article (
 	chmod (article, (S_IRUSR|S_IWUSR));
 
 	if (supersede) {
-#ifndef FORGERY
 		get_user_info (user_name, full_name);
 		get_from_name (from_name, psGrp);
+#ifndef FORGERY
 		if (FromSameUser) {
 			msg_add_header ("From", from_name);
 			if (*reply_to)
@@ -3188,29 +3090,36 @@ repost_article (
 		{
 			make_path_header (line, from_name);
 			msg_add_header ("Path", line);
-			if (art->name) {
+
+			if (art->name)
 				sprintf (line, "%s <%s>", art->name, arts[respnum].from);
-			} else {
+			else
 				sprintf (line, "<%s>", arts[respnum].from);
-			}
+
 			msg_add_header ("From", line);
 			find_reply_to_addr (respnum, line, FALSE);
 			msg_add_header ("Reply-To", line);
 			msg_add_header ("X-Superseded-By", from_name);
-			if (note_h_org[0])
-				msg_add_header ("Organization", note_h_org);
-			sprintf (line, "<supersede.%s", note_h_messageid + 1);
+
+			if (note_h.org[0])
+				msg_add_header ("Organization", note_h.org);
+
+			sprintf (line, "<supersede.%s", note_h.messageid + 1);
 			msg_add_header ("Message-ID", line);
 #endif
-			msg_add_header ("Supersedes", note_h_messageid);
-			if (note_h_followup[0])
-				msg_add_header ("Followup-To", note_h_followup);
-			if (note_h_keywords[0])
-				msg_add_header ("Keywords", note_h_keywords);
-			if (note_h_summary[0])
-				msg_add_header ("Summary", note_h_summary);
-			if (*note_h_distrib)
-				msg_add_header ("Distribution", note_h_distrib);
+			msg_add_header ("Supersedes", note_h.messageid);
+
+			if (note_h.followup[0])
+				msg_add_header ("Followup-To", note_h.followup);
+
+			if (note_h.keywords[0])
+				msg_add_header ("Keywords", note_h.keywords);
+
+			if (note_h.summary[0])
+				msg_add_header ("Summary", note_h.summary);
+
+			if (*note_h.distrib)
+				msg_add_header ("Distribution", note_h.distrib);
 		}
 	} else { /* !supersede */
 		get_user_info (user_name, full_name);
@@ -3219,10 +3128,10 @@ repost_article (
 		if (*reply_to)
 			msg_add_header ("Reply-To", reply_to);
 	}
-	msg_add_header ("Subject", note_h_subj);
+	msg_add_header ("Subject", note_h.subj);
 	msg_add_header ("Newsgroups", group);
 
-	if (note_h_references[0]) {
+	if (note_h.references[0]) {
 		/*
 		 * calling join_references prevents repost_article
 		 * to fail if References: contains a double space
@@ -3230,44 +3139,45 @@ repost_article (
 		 * adding the msgid of the original article to the
 		 * References header - is this needed?
 		 */
-		join_references (buf, note_h_references, "");
+		join_references (buf, note_h.references, "");
 		msg_add_header ("References", buf);
 	}
 	if (NotSuperseding) {
-		if (psGrp->attribute->organization != (char *) 0) {
+		if (psGrp->attribute->organization != (char *) 0)
 			msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
-		} else if (*default_organization) {
+		else if (*default_organization)
 			msg_add_header ("Organization", random_organization(default_organization));
-		}
-		if (*reply_to) {
+
+		if (*reply_to)
 			msg_add_header ("Reply-To", reply_to);
-		}
-		if (*note_h_distrib) {
-			msg_add_header ("Distribution", note_h_distrib);
-		} else if (*my_distribution) {
+
+		if (*note_h.distrib)
+			msg_add_header ("Distribution", note_h.distrib);
+		else if (*my_distribution)
 			msg_add_header ("Distribution", my_distribution);
-		}
+
 	}
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
 	msg_free_headers ();
 
 	if (NotSuperseding) {
-		fprintf (fp, txt_article_reposted1, note_h_newsgroups);
-		if (art->name) {
+		fprintf (fp, txt_article_reposted1, note_h.newsgroups);
+
+		if (art->name)
 			fprintf (fp, txt_article_reposted2a, art->name, art->from);
-		} else {
+		else
 			fprintf (fp, txt_article_reposted2b, art->from);
-		}
-		fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
+
+		fprintf (fp, "\n[ Posted on %s ]\n\n", note_h.date);
 	}
-	fseek (note_fp, note_mark[0], SEEK_SET);
+	fseek (note_fp, mark_body, SEEK_SET);
 	copy_fp (note_fp, fp);
 
 /* only append signature when NOT superseeding own articles */
-	if (NotSuperseding && signature_repost) {
+	if (NotSuperseding && signature_repost)
 		msg_write_signature (fp, FALSE, psGrp);
-	}
+
 	fclose (fp);
 
 	/* on supersede change default-key */
@@ -3276,22 +3186,18 @@ repost_article (
 		force_command = TRUE;
 	}
 	forever {
+repost_article_loop:
 		if (!force_command)
-			do {
-				prompt_2 (txt_quit_edit_xpost, note_h_subj, ch_default);
-				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-					ch = ch_default;
-			} while (!strchr (POST_KEYS, ch));
+			ch = prompt_slk_response (ch_default, POST_KEYS, sized_message(txt_quit_edit_xpost, note_h.subj));
 		else
 			ch = ch_default;
 
-repost_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
 				force_command = FALSE;
-				if (!pcCopyArtHeader (HEADER_SUBJECT, article, note_h_subj)) {
-					note_h_subj[0] = '\0';		/* no subject line, re-enter editor */
+				if (!pcCopyArtHeader (HEADER_SUBJECT, article, note_h.subj)) {
+					note_h.subj[0] = '\0';		/* no subject line, re-enter editor */
 					ch_default = iKeyPostEdit;
 					/*
 					 * To enforce re-entering the editor immediately when no
@@ -3325,10 +3231,10 @@ repost_article_loop:
 
 			case iKeyPostPost:
 			case iKeyPostPost2:
-				if (Superseding) {
-					wait_message (txt_superseding_art);
-				} else
-					wait_message (txt_repost_an_article);
+				if (Superseding)
+					wait_message (2, txt_superseding_art);
+				else
+					wait_message (2, txt_repost_an_article);
 
 				backup_article(article);
 
@@ -3339,9 +3245,9 @@ repost_article_loop:
 					goto repost_done;
 				} else {
 					ch = prompt_rejected();
-					if (ch==iKeyPostPostpone) {
+					if (ch==iKeyPostPostpone)
 						postpone_article(backup_article_name(article));
-					} else if (ch==iKeyPostEdit) {
+					else if (ch==iKeyPostEdit) {
 						rename(backup_article_name(article), article);
 						ch = iKeyPostEdit;
 						goto repost_article_loop;
@@ -3352,9 +3258,7 @@ repost_article_loop:
 						if (keep_dead_articles)
 							append_file (dead_articles, dead_article);
 #endif
-						sprintf (buf, txt_art_rejected, dead_article);
-						info_message (buf);
-						sleep (3);
+						wait_message (3, txt_art_rejected, dead_article);
 					}
 				return ret_code;
 			}
@@ -3370,13 +3274,13 @@ repost_done:
 		if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf)) {
 			update_active_after_posting (buf);
 
-		if (pcCopyArtHeader (HEADER_SUBJECT, article, buf))
-			update_posted_info_file (psGrp->name , 'x', buf);
+			if (pcCopyArtHeader (HEADER_SUBJECT, article, buf))
+				update_posted_info_file (psGrp->name , 'x', buf);
 		}
 repost_postponed:
-		if (unlink_article) {
+		if (unlink_article)
 			unlink (article);
-		}
+
 	return ret_code;
 }
 
@@ -3402,10 +3306,9 @@ msg_add_x_headers (
 				}
 			}
 		}
-		if (!strfpath (headers, file, sizeof (file),
-			     homedir, (char *) 0, (char *) 0, (char *) 0)) {
+		if (!strfpath (headers, file, sizeof (file), homedir, (char *) 0, (char *) 0, (char *) 0))
 			strcpy (file, headers);
-		}
+
 		if ((fp = fopen (file, "r")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp) != (char *) 0) {
 				if (line[0] != '\n' && line[0] != '#') {
@@ -3437,16 +3340,15 @@ msg_add_x_body (
 		if (body[0] != '/' && body[0] != '~') {
 			strcpy (line, body);
 			ptr = strrchr (line, '\n');
-			if (ptr) {
+			if (ptr)
 				*ptr = '\0';
-			}
+
 			fprintf (fp_out, "%s\n", line);
 			wrote++;
 		} else {
-			if (!strfpath (body, file, sizeof (file),
-			     homedir, (char *) 0, (char *) 0, (char *) 0)) {
+			if (!strfpath (body, file, sizeof (file), homedir, (char *) 0, (char *) 0, (char *) 0))
 				strcpy (file, body);
-			}
+
 			if ((fp = fopen (file, "r")) != (FILE *) 0) {
 				while (fgets (line, sizeof (line), fp) != (char *) 0) {
 					fputs (line, fp_out);
@@ -3467,16 +3369,15 @@ static void
 modify_headers (
 	char *line)
 {
-
 	char buf[HEADER_LEN];
 	char *chr;
 	char *chr2;
 
 	if (strncasecmp (line, "Newsgroups: ", 12) == 0) {
 		chr = strpbrk (line, "\t ");
-		while ((strchr ("\t ", *chr)) != (char *) 0) {
+		while ((strchr ("\t ", *chr)) != (char *) 0)
 			chr++;
-		}
+
 		chr2 = strchr (chr, '\n');
 		*chr2 = '\0';
 		strip_double_ngs (chr);
@@ -3485,18 +3386,17 @@ modify_headers (
 	}
 	if (strncasecmp (line, "Followup-To: ", 11) == 0) {
 		chr = strpbrk (line, "\t ");
-		while ((strchr ("\t ", *chr)) != (char *) 0) {
+		while ((strchr ("\t ", *chr)) != (char *) 0)
 			chr++;
-		}
+
 		chr2 = strchr (chr, '\n');
 		*chr2 = '\0';
 		strip_double_ngs (chr);
 		strcpy (buf, chr);
-		if ((*found_newsgroups == '\0') || (strcasecmp (found_newsgroups, buf))) {
+		if ((*found_newsgroups == '\0') || (strcasecmp (found_newsgroups, buf)))
 			sprintf (line, "Followup-To: %s\n", buf);
-		} else {
+		else
 			*line = '\0';
-		}
 	}
 }
 
@@ -3519,46 +3419,29 @@ checknadd_headers (
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				if (!gotit && line[0] == '\n') {
-					if (!no_advertising) {
-						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
+					if (advertising)
 #ifdef HAVE_SYS_UTSNAME_H
 #ifdef _AIX
-							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s.%s]\n\n",
-								 OS, VERSION, RELEASEDATE,
-								 system_info.sysname, system_info.version, system_info.release);
+						fprintf (fp_out, "User-Agent: %s/%s-%s (%s) (%s/%s-%s)\n\n",
+							PRODUCT, VERSION, RELEASEDATE, OS,
+							system_info.sysname, system_info.version, system_info.release);
 #else /* AIX */
-							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s %s]\n\n",
-								 OS, VERSION, RELEASEDATE,
-								 system_info.machine, system_info.sysname, system_info.release);
+						fprintf (fp_out, "User-Agent: %s/%s-%s (%s) (%s/%s (%s))\n\n",
+							PRODUCT, VERSION, RELEASEDATE, OS,
+							system_info.sysname, system_info.release, system_info.machine);
 #endif /* AIX */
 #else
-							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
-								 OS, VERSION, RELEASEDATE);
+						fprintf (fp_out, "User-Agent: %s/%s-%s (%s)\n\n",
+							PRODUCT, VERSION, RELEASEDATE, OS);
 #endif
-						} else {
-#ifdef HAVE_SYS_UTSNAME_H
-#ifdef _AIX
-							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s.%s]\n\n",
-								 OS, VERSION, RELEASEDATE,
-								 system_info.sysname, system_info.version, system_info.release);
-#else /* AIX */
-							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s %s]\n\n",
-								 OS, VERSION, RELEASEDATE,
-								 system_info.machine, system_info.sysname, system_info.release);
-#endif /* AIX */
-#else
-							fprintf (fp_out, "X-Newsreader: TIN [%s %s release %s]\n\n",
-								 OS, VERSION, RELEASEDATE);
-#endif
-						}
-					} else {
+					else
 						fprintf (fp_out, "\n");
-					}
+
 					gotit = TRUE;
 				} else {
-					if (!gotit) {
+					if (!gotit)
 						modify_headers (line);
-					}
+
 					fputs (line, fp_out);
 				}
 			}
@@ -3617,9 +3500,9 @@ insert_from_header (
 				fprintf (fp_out, "From: %s\n", from_name);
 
 			fseek(fp_in, 0L, SEEK_SET);
-			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
+			while (fgets (line, sizeof (line), fp_in) != (char *) 0)
 				fputs (line, fp_out);
-			}
+
 			fclose (fp_out);
 			fclose (fp_in);
 			rename_file (outfile, infile);
@@ -3653,7 +3536,7 @@ find_reply_to_addr (
 	fseek (note_fp, 0L, SEEK_SET);
 
 	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 &&
-	       found == FALSE && buf[0] != '\n') {
+	       !found && buf[0] != '\n') {
 		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (from_both, &buf[10]);
 			ptr = strchr (from_both, '\n');
@@ -3702,36 +3585,33 @@ find_reply_to_addr (
 		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (replyto, &buf[10]);
 			ptr = strchr (replyto, '\n');
-			if (ptr != (char *) 0) {
+			if (ptr != (char *) 0)
 				*ptr = '\0';
-			}
+
 			found_replyto = TRUE;
 		} else if (STRNCMPEQ(buf, "From: ", 6)) {
 			strcpy (from, &buf[6]);
 			ptr = strchr (from, '\n');
-			if (ptr != (char *) 0) {
+			if (ptr != (char *) 0)
 				*ptr = '\0';
-			}
+
 		}
 	}
 
 	/* We do this to save a redundant strcpy when we don't want to parse */
 
-	if (parse) {
+	if (parse)
 		dest = temp;
-	} else {
+	else
 		dest = from_addr;
-	}
 
-	if (found_replyto) {
+	if (found_replyto)
 		strcpy (dest, rfc1522_decode(replyto));
-	} else {
+	else
 		strcpy (dest, rfc1522_decode(from));
-	}
 
-	if (parse) {
+	if (parse)
 		parse_from (temp, from_addr, fullname);
-	}
 
 	fseek (note_fp, orig_offset, SEEK_SET);
 #endif
@@ -3746,7 +3626,6 @@ find_reply_to_addr (
 int
 reread_active_after_posting (void)
 {
-	char acBuf[PATH_LEN];
 	int i, modified = FALSE;
 	long lMinOld;
 	long lMaxOld;
@@ -3761,8 +3640,7 @@ reread_active_after_posting (void)
 				psGrp->art_was_posted = FALSE;
 
 				if (psGrp != (struct t_group *) 0) {
-					sprintf (acBuf, "Rereading %s...", psGrp->name);
-					wait_message (acBuf);
+					wait_message (0, "Rereading %s...", psGrp->name);
 					lMinOld = psGrp->xmin;
 					lMaxOld = psGrp->xmax;
 					vGrpGetArtInfo (
@@ -3815,15 +3693,15 @@ update_active_after_posting (
 	/*
 	 * remove duplicates from Newsgroups header
 	 */
-	strip_double_ngs (note_h_newsgroups);
+	strip_double_ngs (note_h.newsgroups);
 
 	src = newsgroups;
 	dst = group;
 
 	while (*src) {
-		if (*src != ' ') {
+		if (*src != ' ')
 			*dst = *src;
-		}
+
 		src++;
 		if (*dst == ',' || *dst == '\0') {
 			*dst = '\0';
@@ -3833,9 +3711,8 @@ update_active_after_posting (
 				psGrp->art_was_posted = TRUE;
 			}
 			dst = group;
-		} else {
+		} else
 			dst++;
-		}
 	}
 }
 
@@ -3854,19 +3731,17 @@ submit_mail_file (
 	{
 		if (pcCopyArtHeader (HEADER_TO, file, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, file, subject)) {
 			t_bool ismail=TRUE;
-			sprintf (buf, txt_mailing_to, mail_to);
-			wait_message (buf);
+			wait_message (0, txt_mailing_to, mail_to);
 
 			rfc15211522_encode (file, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
 
 			strfmailer (mailer, subject, mail_to, file,
 				  buf, sizeof (buf), default_mailer_format);
 
-			if (invoke_cmd (buf)) {
+			if (invoke_cmd (buf))
 				mailed = TRUE;
-			} else {
+			else
 				error_message (txt_command_failed_s, buf);
-			}
 		}
 	}
 	return mailed;
@@ -3881,10 +3756,6 @@ make_path_header (
 	char user_name[128];
 
 	get_user_info (user_name, full_name);
-
-#if 0 /* we don't need that here... */
-	get_from_name (from_name, (struct t_group *) 0);
-#endif
 
 	sprintf (line, "%s!%s", domain_name, user_name);
 	return;

@@ -18,7 +18,7 @@
 .if \n(mo=10 .ds mo October
 .if \n(mo=11 .ds mo November
 .if \n(mo=12 .ds mo December
-.TH TIN 1 "Version 1.3 unoff BETA" "" "LOCAL"
+.TH TIN 1 "Version 1.4" "" "LOCAL"
 .ds ]W \*(mo \n(dy, 19\n(yr
 .nh
 .SH NAME
@@ -66,6 +66,8 @@ groups this will be slow. However the number of unread articles in each
 group will be accurate.
 .TP
 .B -d
+don't load newsgroup descriptions (interactive mode).
+.sp
 delete index files for each group before indexing article (\fItind\fP index daemon
 only).
 .TP
@@ -98,17 +100,19 @@ Only load groups from the active file that are subscribed to in the
 user's \fI.newsrc\fP.  This allows a noticeable speedup when connecting
 via a slow line, but \fItin\fP cannot tell which groups are moderated.
 .TP
-.BI -q
-quick start without checking for new newsgroups.
-.sp
-Combine \fB-n\fR and \fB-q\fR for best speedup.
-.TP
 .BI -P
 purge group index files of articles that no longer exist.
 Care should be taken when using this command as it checks each and
 every article in each group that is accessed.
 On a low speed connection this can have an undesirable effect and it also
 knocks the hell out of your filesystem.
+.TP
+.BI -q
+Don't check for new newsgroups.
+.TP
+.B -Q
+Quick start. Start tin as quickly as possible. Currently this is 
+equivalent to \fB-nqd\fR
 .TP
 .B -r
 read news remotely from the default NNTP server specified in the
@@ -289,6 +293,11 @@ There may also be a character prefixing the line. An explanation follows:
 This group is unsubscribed. To see only your subscribed groups use the 'r'
 or 'y' toggle keys.
 .TP
+\fBM\fP
+This is a moderated group. Any posts you make will have to be approved by the
+group administrator before it will be made public. \fItin\fP will ask for
+confirmation before you post to a moderated group.
+.TP
 \fBN\fP
 This is a new newsgroup which has been created since you last used \fItin\fP.
 New newsgroups are not subscribed to by default. Subscribe to it in the normal
@@ -301,6 +310,15 @@ session.
 This group no longer exists. If you no longer wish to see this group then
 unsubscribe from it in the normal way. This flag will only appear if
 you have set strip_bogus=Ask in the Options Menu.
+.TP
+\fBX\fP
+You may no longer make posts to this group. Often a group will be superceded
+by a more appropriately named one.
+.TP
+\fB=\fP
+This group has been renamed and you may no longer post to it. If you do, then
+you will receive an error from your newsserver telling you the correct group
+to post to.
 .PP
 At the Group level the title contains the name of the group, the number
 of conversation threads, the threading-method, the total number of articles,
@@ -444,12 +462,6 @@ Show description of the current newsgroup at the last line.
 .TP
 \fBI\fP
 Toggle inverse video.
-.TP
-\fBl\fP
-List and allow selection of the available spool directories.  This feature
-requires a special library to be linked with \fItin\fP to create \fIcdtin\fP 
-which can then read news from an active news feed and also from multiple 
-CD-ROMs.
 .TP
 \fBm\fP
 Move the current group within the group selection list.
@@ -801,7 +813,7 @@ OFF=always apply the filter).
 Read the section \fIFiltering Articles\fP for more information.
 .TP
 \fB^H\fP
-Show all of the articles mail header.
+Toggle display of all the articles mail header.
 .TP
 \fB^K\fP
 Kill article(s) via a menu. Read the section \fIFiltering Articles\fP for 
@@ -1227,10 +1239,6 @@ if ON catchup group when leaving with the left arrow key. Default is ON
 Maximum length of the names of newsgroups to be displayed so that more of the 
 newgroup description can be displayed. Default is 32.
 .TP 4
-\fBhighlight_xcommentto\fP
-If ON X-Commento-To name is displayed in the upper-right corner, if OFF below
-the Summary-header. Default is OFF
-.TP 4
 \fBinverse_okay\fP
 If ON use inverse video for page headers at different levels. Default is ON.
 .TP 4
@@ -1389,7 +1397,8 @@ If ON show only subscribed to groups that contain unread articles.
 Default is OFF.
 .TP 4
 \fBshow_xcommentto\fP
-If ON, the real name in the X-Comment-To header is displayed. Default is OFF.
+If ON, the real name in the X-Comment-To header is displayed in the
+upper-right corner. Default is OFF.
 .TP 4
 \fBsigdashes\fP
 If ON prepend the signature with dashes '\n-- \n'. Default is ON.
@@ -1441,7 +1450,9 @@ Default is ON.
 If ON remove ~/.article after posting. Default is ON.
 .TP 4
 \fBuse_builtin_inews\fP
-Allows the builtin NNTP inews to be enabled/disabled. Default is ON (enabled).
+Allows the builtin NNTP inews to be enabled/disabled. This has no effect
+when reading/posting direct to local spool where external inews will alsways
+be used. Default is ON (enabled).
 .TP 4
 \fBuse_metamail\fP
 If ON metamail can/will be used to display MIME articles. Default is ON.

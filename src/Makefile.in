@@ -33,7 +33,7 @@ INS_MANUAL_EXT	= 1
 PROJECT	= tin
 EXE	= tin
 EXED	= tind
-VER	= 1.3
+VER	= 1.4
 MANEXT	= 1
 
 # directory structure
@@ -111,6 +111,7 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c \
+	$(SRCDIR)/read.c \
 	$(SRCDIR)/refs.c \
 	$(SRCDIR)/regex.c \
 	$(SRCDIR)/rfc1521.c \
@@ -128,6 +129,7 @@ CFILES	= \
 	$(SRCDIR)/xref.c
 #	$(SRCDIR)/msmail.c
 #	$(SRCDIR)/nntpw32.c
+#	$(SRCDIR)/nntpvms.c
 #	$(SRCDIR)/win32.c
 #	$(SRCDIR)/win32tcp.c
 #	$(SRCDIR)/os_2.c
@@ -172,6 +174,7 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/pgp.o \
 	$(OBJDIR)/post.o \
 	$(OBJDIR)/prompt.o \
+	$(OBJDIR)/read.o \
 	$(OBJDIR)/refs.o \
 	$(OBJDIR)/regex.o \
 	$(OBJDIR)/rfc1521.o \
@@ -192,6 +195,7 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 #	$(OBJDIR)/vms.o
 #	$(OBJDIR)/os_2.o
 #	$(OBJDIR)/nntpw32.o
+#	$(OBJDIR)/nntpvms.o
 
 
 ALL_FILES = $(HFILES) $(CFILES) $(NNTP)
@@ -390,6 +394,7 @@ $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_DEP) \
 				$(INCDIR)/version.h
 $(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
+$(OBJDIR)/read.o:		$(SRCDIR)/read.c $(TIN_DEP)
 $(OBJDIR)/refs.o:		$(SRCDIR)/refs.c $(TIN_DEP)
 $(OBJDIR)/regex.o:		$(SRCDIR)/regex.c $(TIN_DEP)
 $(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(TIN_DEP)
