@@ -1166,6 +1166,9 @@ eat_re (
 	int offsets[6];
 	int size_offsets = sizeof(offsets)/sizeof(int);
 
+	if (!s || !*s)
+		return "<No subject>";
+
 	do {
 		slen = strlen(s);
 		data = pcre_exec(strip_re_regex.re, strip_re_regex.extra, s, slen, 0, 0, offsets, size_offsets);
@@ -2267,6 +2270,11 @@ random_organization (
 	while (fgets(selorg, (int) sizeof(selorg), orgfp))
 		nool++;
 
+	if (!nool) {
+		fclose(orgfp);
+		return selorg;
+	}
+
 	rewind (orgfp);
 	sol = rand () % nool + 1;
 	nool = 0;
@@ -3142,7 +3150,7 @@ gnksa_check_domain_literal (
 {
 	char term;
 	int n;
-	int x1, x2, x3, x4;
+	unsigned int x1, x2, x3, x4;
 
 	/* parse domain literal into ip number */
 	x1 = x2 = x3 = x4 = 666;
@@ -3406,7 +3414,7 @@ gnksa_split_from (
 
 		/* get realname part */
 		addr_begin = addr_end + 1;
-		addr_end = addr_begin + strlen(addr_begin) -1;
+		addr_end = addr_begin + strlen(addr_begin) - 1;
 		/* strip surrounding whitespace */
 		while ((' ' == *addr_end) || ('\t' == *addr_end))
 			addr_end--;
@@ -3428,6 +3436,9 @@ gnksa_split_from (
 			strcpy(realname, addr_begin + 1);
 		}
 	}
+
+	if (!strchr(address, '@')) /* check for From: without an @ */
+		return GNKSA_ATSIGN_MISSING;
 
 	/* split successful */
 	return GNKSA_OK;

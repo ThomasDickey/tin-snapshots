@@ -463,7 +463,7 @@
 /*
  * define if closedir() does not return a status
  */
-#undef	CLOSEDIR_VIOD
+#undef	CLOSEDIR_VOID
 
 /*
  * define if your NNTP server needs an extra GROUP command before

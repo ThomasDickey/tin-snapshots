@@ -263,7 +263,7 @@ invoke_pgp_mail (
 	if (!pgp_available())
 		return;
 
-	ch = prompt_slk_response(ch_default, "beqs\033", txt_pgp_mail);
+	ch = prompt_slk_response(ch_default, "beqs\033", "%s", txt_pgp_mail);
 	switch (ch) {
 		case ESC:
 		case 'q':
@@ -304,7 +304,7 @@ invoke_pgp_news (
 	if (!pgp_available())
 		return;
 
-	ch = prompt_slk_response(ch_default, "iqs\033", txt_pgp_news);
+	ch = prompt_slk_response(ch_default, "iqs\033", "%s", txt_pgp_news);
 	switch (ch) {
 		case ESC:
 		case 'q':

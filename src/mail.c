@@ -62,6 +62,19 @@ read_mail_active_file (
 			continue;
 
 		/*
+		 * Update mailgroup info
+		 */
+		if ((ptr = psGrpFind (buf)) != NULL) {
+			if (strcmp(ptr->spooldir, my_spooldir) != 0) {
+				free(ptr->spooldir);
+				ptr->spooldir = my_strdup(my_spooldir);
+			}
+			ptr->xmax = max;
+			ptr->xmin = min;
+			continue;
+		}
+
+		/*
 		 * Load mailgroup into group hash table
 		 */
 		if ((ptr = psGrpAdd (buf)) == NULL)

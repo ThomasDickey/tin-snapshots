@@ -343,7 +343,7 @@ save_art_to_file (
 				return FALSE;
 			}
 
-			ch = prompt_slk_response(tinrc.default_save_mode, "aoq\033", txt_append_overwrite_quit, file);
+			ch = prompt_slk_response(tinrc.default_save_mode, "aoq\033", "%s", txt_append_overwrite_quit, file);
 			switch (ch) {
 				case iKeySaveAppendFile:
 					strcpy (mode, "a+");

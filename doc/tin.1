@@ -3,11 +3,11 @@
 .\" Module    : tin.1
 .\" Author    : I. Lea, U. Janssen
 .\" Created   : 1991-08-23
-.\" Updated   : 1999-11-19
+.\" Updated   : 2001-06-16
 .\" Notes     : still needs some work (but getting there ;)
 .\"
 .\"
-.TH tin 1 "November 19th, 1999" "1.4.1" "A Usenet newsreader"
+.TH tin 1 "June 16th, 2001" "1.4.6" "A Usenet newsreader"
 .\"
 .\"
 .SH NAME
@@ -1584,7 +1584,7 @@ kill_level was first present is tin-1.2 and has been resurrected for 1.4
 Allows 8bit characters unencoded in the header of mail message. Default is
 OFF. Turning it ON is effective only if \fBmail_mime_encoding\fR is also set
 to 8bit. Leaving it OFF is safe for most users and compliant to Internet
-Mail Standard (STD 11/RFC 822 and RFC 2047).
+Mail Standard (RFC 2822 and RFC 2047).
 .TP
 .B Mail address (mail_address)
 User's mail address (and fullname), if not username@host. This is used when
@@ -2795,40 +2795,41 @@ for \fBlibpcre\fR (Perl-compatible regular expression library).
 .PP
 I wish to thank the following people for supplying patches:
 .PP
-David Abbott, Earle Ake, Orbby S. Arka, Joachim Astel, Anton Aylward, Jens
-Chr. Bachem, George Baltz, Volker Barthelmann, Kirk Bauer, Paul Bauwens,
-Dieter Becker, Wolfgang Behrens, Fabrice Bellet, Greg Berigan, Enrik
-Berkhan, Juergen Bernau, Dan Berry, David Binderman, Andrey Blochintsev,
-Chris Blum, Fokke de Boer, Andreas Borchert, Mark Boucher, Bill Brolik,
-Herman ten Brugge, Martin Buck, Jeremy Buhler, Leila Burrell-Davis, Sean
-Casey, Peter Castro, Troy Cauble, Andrey A. Chernov, Albert Chin-A-Young,
-Park Chong-Dae, Tan Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven
-Cogswell, Don Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris
-Davies, John Davis, Borislav Deianov, Thomas E. Dickey, Olaf Dietrich, Theo
-Van Dinter, Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig Durland,
-Bernd Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf, Rob
-Engle, Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa,
-Jason Faultless, Michael Faurot, Werner Fleck, John M. Flinchbaugh, Andy
-Gabor, Torsten Gesang, Ruediger Geys, Callum Gibson, Mike Glendinning,
-Philippe Goujard, Dan Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed
-Hanway, Scott Hauck, Christian Haul, Per Headland, Arnold Hendriks, Daniel
-Hermans, Jose Herrero, Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher,
-Keith Howell, Tommy Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon
-Hyoung-Jo, Pieter Immelman, Jarkko Isokungas, Patrick St. Jean, Hal
-Jespersen, Park Sang Jin, Robbin Johnson, Jarkko Jormanainen, Nelson Kading,
-Geoffrey Keating, Karsten Keil, Charles S. Kerr, Fritz Kleeman, Andreas
-Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig,
-Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Florian Kuehnert,
-Kris Kugel, Manoj Kumar, Dawid Kuroczko, Yuri Kuzmenko, Olivier Lacroix,
-Geoff Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila,
-Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan
-Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
-David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
-Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
-De Marco, Dmitri A. Martynoff, Kazushi Marukawa, William McBrine, Owen Medd,
-Philipp Mergenthaler, Arkadiusz Miskiewicz, Soren Moller, Bruce Momjian,
-Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise, Udo Munk, John
-R. Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E.
+David Abbott, Earle Ake, Russ Allbery, Orbby S. Arka, Joachim Astel, Anton
+Aylward, Jens Chr. Bachem, George Baltz, Dieter Baron, Volker Barthelmann,
+Kirk Bauer, Paul Bauwens, Dieter Becker, Wolfgang Behrens, Fabrice Bellet,
+Greg Berigan, Enrik Berkhan, Juergen Bernau, Dan Berry, David Binderman,
+Andrey Blochintsev, Chris Blum, Fokke de Boer, Andreas Borchert, Mark
+Boucher, Bill Brolik, Herman ten Brugge, Martin Buck, Jeremy Buhler, Leila
+Burrell-Davis, Sean Casey, Peter Castro, Troy Cauble, Andrey A. Chernov,
+Albert Chin-A-Young, Park Chong-Dae, Tan Kwee Chuan, Boleslaw Ciesielski,
+Robert Claeson, Steven Cogswell, Don Costello, Bryan Curnutt, Ned Danieley,
+Lars Dannenberg, Chris Davies, John Davis, Borislav Deianov, Thomas E.
+Dickey, Olaf Dietrich, Herbert Martin Dietze, Theo Van Dinter, Ralf
+Doeblitz, Bryan Dongray, Michael Douglass, Craig Durland, Bernd Eckenfels,
+Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle, Olle Eriksson,
+Brent Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason Faultless,
+Michael Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor, Torsten
+Gesang, Ruediger Geys, Callum Gibson, Mike Glendinning, Philippe Goujard,
+Dan Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck,
+Christian Haul, Per Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero,
+Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy
+Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter
+Immelman, Jarkko Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin,
+Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten
+Keil, Charles S. Kerr, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz
+Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin
+Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel, Stephan Kulow, Manoj
+Kumar, Dawid Kuroczko, Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex
+Lange, Alain Lasserre, Stanislav Latishko, Hannu Laurila, Vincent Lefevre,
+Alexander Lehmann, Marty Leisner, Thomas Leitner, Hakan Lennestal, Kevin
+Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley, David-Michael Lincke,
+Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard Luebke, Clifford Luke,
+Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A.
+Martynoff, Kazushi Marukawa, William McBrine, Owen Medd, Philipp
+Mergenthaler, Arkadiusz Miskiewicz, Soren Moller, Bruce Momjian, Sergio
+Morales, Michael Morrell, Klaus Mueller, Mike Muise, Udo Munk, John R.
+Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E.
 O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb
 Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven Paulus, Walter
 Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim Pierce, Bill

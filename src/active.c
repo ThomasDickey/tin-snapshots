@@ -111,6 +111,10 @@ resync_active_file (
 	vWriteNewsrc ();
 	read_news_active_file ();
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+	read_mail_active_file ();
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
+
 	if (read_cmd_line_groups ())
 		command_line = TRUE;
 
