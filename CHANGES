@@ -1,3 +1,10 @@
+--unoff BETA release 960808 --
+
+148) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. check for HAVE_SELECT_INTP
+     BUG. get nntpserver name from file did not work
+     FIX. configure.in, autoconf.hin, art.c, nntplib.c
+
 --unoff BETA release 960807 --
 
 147) Tomasz Kloczko <kloczek@rudy.mif.pg.gda.pl>

@@ -223,6 +223,8 @@
 #undef	DECL_TPUTS
 #undef	DECL__FLSBUF
 
+#undef HAVE_SELECT_INTP
+
 /*
  * Define a symbol for the prototype arguments of a signal handler
  */

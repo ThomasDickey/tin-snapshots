@@ -542,6 +542,9 @@ CF_CHECK_DECL(\
 )
 fi
 
+AC_MSG_CHECKING(if select expects int * arguments)
+AC_EGREP_HEADER([select\(.*, *int *\*,],time.h,AC_DEFINE(HAVE_SELECT_INTP) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
+
 AC_FUNC_SETPGRP
 
 dnl After checking for functions in the default $LIBS, make a further check

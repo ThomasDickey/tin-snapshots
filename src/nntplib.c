@@ -167,34 +167,29 @@ getserverbyfile (file)
 		return (char *) 0;
 	}
 
-	if ((fp = fopen (file, "r")) == (FILE *) 0) {
-		return (char *) 0;
-	}
+	if ((fp = fopen (file, "r")) != (FILE *) 0) {
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		if (*buf == '\n' || *buf == '#') {
-			continue;
+		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+			if (*buf == '\n' || *buf == '#') {
+				continue;
+			}
+			cp = strrchr (buf, '\n');
+			if (cp) {
+				*cp = '\0';
+			}
+			(void) fclose (fp);
+			return (buf);
 		}
-		cp = strrchr (buf, '\n');
-		if (cp) {
-			*cp = '\0';
-		}
+
 		(void) fclose (fp);
-		return (buf);
-	}
 
-	(void) fclose (fp);
-
-	if (cp != (char *) 0) {
-		get_nntpserver (buf, cp);
-		return (buf);
+		if (cp != (char *) 0) {
+			get_nntpserver (buf, cp);
+			return (buf);
+		}
 	}
 
 	cp = GetConfigValue (_CONF_SERVER);
-
-	if (file == (char *) 0) {
-		return (char *) 0;
-	}
 
 	if (cp != (char *) 0) {
 		(void) strcpy (buf, cp);
