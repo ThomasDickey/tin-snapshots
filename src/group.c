@@ -1558,8 +1558,10 @@ bld_sline (i)
 	char from[HEADER_LEN];
 	char new_resps[8];
 	char art_cnt[9];
- 	struct t_art_stat sbuf;
+	struct t_art_stat sbuf;
 	register char *buffer;
+	char arts_sub[255];
+	char _from[255];
 
 	from[0] = '\0';
 	respnum = (int) base[i];
@@ -1610,9 +1612,13 @@ bld_sline (i)
 	}
 
 	j = INDEX2SNUM(i);
+	strncpy(arts_sub, arts[respnum].subject, len_subj+5);
+	strncpy(_from, from, len_from+5);
+	_from[len_from+1] = '\0';
+	arts_sub[len_subj-5+1] = '\0';
 	sprintf (buffer = screen[j].col, "  %4d%3s %s%-*.*s%s%-*.*s",
 		 i+1, new_resps, art_cnt, len_subj-5, len_subj-5,
-		 arts[respnum].subject, spaces, len_from, len_from, from);
+		 arts_sub, spaces, len_from, len_from, _from);
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++) {

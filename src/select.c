@@ -860,15 +860,9 @@ group_selection_page ()
 			strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
 			group_descript[blank_len+1] = '\0';
 
-			if (draw_arrow_mark) {
-				sprintf (screen[j].col, "  %c %4d %s  %-*.*s  %-*.*s\r\n",
-				         subs, i+1, new, groupname_len, groupname_len,
-				         active[n].name, blank_len, blank_len, group_descript);
-			} else {
-				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
-				         subs, i+1, new, groupname_len,
-				         active[n].name, blank_len, blank_len, group_descript);
-			}
+			sprintf (screen[j].col, "  %c %4d %s  %-*.*s  %-*.*s\r\n",
+			         subs, i+1, new, groupname_len, groupname_len,
+			         active[n].name, blank_len, blank_len, group_descript);
 		} else {
 			if (draw_arrow_mark) {
 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s\r\n",
