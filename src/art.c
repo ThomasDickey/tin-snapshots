@@ -145,8 +145,8 @@ index_group (group)
 		PrintStopWatch();
 #endif	/* PROFILE */
 
-debug_print_comment ("Before iReadNovFile");
-debug_print_bitmap (group, NULL);
+		debug_print_comment ("Before iReadNovFile");
+		debug_print_bitmap (group, NULL);
 
 		min = top_base ? base[0] : group->xmin;
 		max = top_base ? base[top_base-1] : min - 1;
@@ -497,13 +497,13 @@ make_threads (group, rethread)
 			arts[i].inthread = FALSE;
 
 #ifdef HAVE_REF_THREADING
-			if (arts[i].refptr == NULL) {
+			if (arts[i].refptr == 0) {
 				fprintf(stderr, "\nError  : art->refptr is NULL\n");
 				fprintf(stderr, "Artnum : %ld\n", arts[i].artnum);
 				fprintf(stderr, "Subject: %s\n", arts[i].subject);
 				fprintf(stderr, "From   : %s\n", arts[i].from);
 			}
-			assert(arts[i].refptr != NULL);
+			assert(arts[i].refptr != 0);
 
 			arts[i].refptr->article = i;
 #endif
@@ -610,8 +610,8 @@ parse_headers (buf, h)
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
 				if (!got_from) {
-					if ((match_header (ptrline, "From", buf2, NULL, HEADER_LEN) ||
-					    match_header (ptrline, "To", buf2, NULL, HEADER_LEN)) &&
+					if ((match_header (ptrline, "From", buf2, (char*)0, HEADER_LEN) ||
+					    match_header (ptrline, "To", buf2, (char*)0, HEADER_LEN)) &&
 					    *buf2 != '\0') {
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
@@ -624,7 +624,7 @@ parse_headers (buf, h)
 				break;
 			case 'R':	/* References: optional */
 				if (!got_refs) {
-					if (match_header (ptrline, "References", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "References", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						h->refs = my_strdup (buf2);
 						got_refs = TRUE;
 					}
@@ -632,7 +632,7 @@ parse_headers (buf, h)
 
 				/* Received:  If found its probably a mail article */
 				if (!got_received) {
-					if (match_header (ptrline, "Received", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Received", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						max_lineno = 50;
 						got_received = TRUE;
 					}
@@ -640,7 +640,7 @@ parse_headers (buf, h)
 				break;
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
-					if (match_header (ptrline, "Subject", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Subject", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						s = eat_re (buf2);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
@@ -649,7 +649,7 @@ parse_headers (buf, h)
 				break;
 			case 'D':	/* Date:  mandatory */
 				if (!got_date) {
-					if (match_header (ptrline, "Date", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Date", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						h->date = parsedate (buf2, (struct _TIMEINFO *) 0);
 						got_date = TRUE;
 					}
@@ -657,7 +657,7 @@ parse_headers (buf, h)
 				break;
 			case 'X':	/* Xref:  optional */
 				if (!got_xref) {
-					if (match_header (ptrline, "Xref", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Xref", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						h->xref = my_strdup (buf2);
 						got_xref = TRUE;
 					}
@@ -665,7 +665,7 @@ parse_headers (buf, h)
 				break;
 			case 'M':	/* Message-ID:  mandatory */
 				if (!got_msgid) {
-					if (match_header (ptrline, "Message-ID", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Message-ID", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						h->msgid = my_strdup (buf2);
 						got_msgid = TRUE;
 					}
@@ -673,14 +673,14 @@ parse_headers (buf, h)
 				break;
 			case 'L':	/* Lines:  optional */
 				if (!got_lines) {
-					if (match_header (ptrline, "Lines", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptrline, "Lines", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 						h->lines = atoi (buf2);
 						got_lines = TRUE;
 					}
 				}
 				break;
 			case 'A':	/* Archive-name:  optional */
-				if (match_header (ptrline, "Archive-name", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
+				if (match_header (ptrline, "Archive-name", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 					if ((s = strchr (buf2, '/')) != (char *) 0) {
 						if (STRNCMPEQ(s+1, "part", 4) ||
 						    STRNCMPEQ(s+1, "Part", 4)) {
@@ -875,7 +875,7 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		arts[top].date = parsedate (p, NULL);
+		arts[top].date = parsedate (p, (TIMEINFO*)0);
 		p = q + 1;
 
 		/*
@@ -1070,7 +1070,7 @@ vWriteNovFile (psGrp)
 	 * than W_OK, since we won't read it anyway.
 	 */
 
-	if((pcNovFile = pcFindNovFile (psGrp, R_OK))!=NULL)
+	if((pcNovFile = pcFindNovFile (psGrp, R_OK))!=0)
 		strcpy(tmp, pcNovFile);
 	else
 		strcpy(tmp, "");
@@ -1641,20 +1641,20 @@ char *
 safe_fgets (fp)
 	FILE *fp;
 {
-	char *buf	= NULL;
-	char *temp	= NULL;
+	char *buf	= 0;
+	char *temp	= 0;
 	int	next	= 0;
 	int	chunk	= 256;
 
 	buf = (char *) malloc (chunk * sizeof(char));
 
 	forever {
-		if (fgets (buf + next, chunk, fp) == NULL) {
+		if (fgets (buf + next, chunk, fp) == 0) {
 			if (next) {
 				return buf;
 			}
 			free (buf);
-			return NULL;
+			return 0;
 		}
 
 		if (buf[strlen(buf)-1] == '\n') {
@@ -1664,9 +1664,9 @@ safe_fgets (fp)
 		next += chunk - 1;
 
 		temp = (char *) realloc (buf, (next+chunk) * sizeof(char));
-		if (temp == NULL) {
+		if (temp == 0) {
 			free (buf);
-			return NULL;
+			return 0;
 		}
 		buf = temp;
 	}

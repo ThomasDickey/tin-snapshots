@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 07.12.96
+dnl Updated   : 06.01.97
 dnl Notes     : 
 dnl
-dnl Copyright 1996 by Thomas Dickey
+dnl Copyright 1996,1997 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -229,6 +229,18 @@ found-ncurses
 			[LIBS="$save_LIBS"])
 	fi
 	],[AC_MSG_RESULT(no)])
+
+## debugging libraries (do this after other libraries)
+debug_malloc=none
+AC_ARG_WITH(dbmalloc,
+	[  --with-dbmalloc         use Conor Cahill's dbmalloc library],
+	[AC_CHECK_LIB(dbmalloc,debug_malloc,
+	 AC_CHECK_HEADER(dbmalloc.h,debug_malloc=DBMALLOC))])
+
+AC_ARG_WITH(dmalloc,
+	[  --with-dmalloc          use Gray Watson's dmalloc library],
+	[AC_CHECK_LIB(dmalloc,dmalloc_debug,
+	 AC_CHECK_HEADER(dmalloc.h,debug_malloc=DMALLOC))])
 
 ## options for miscellaneous definitions
 AC_MSG_CHECKING(for mail-gateway)
@@ -653,8 +665,20 @@ fi
 CF_COMPTYPE
 CF_COREFILE
 
-### do this last, since it uses a partly-built autoconf.h
+### test this last, since it uses a partly-built autoconf.h
 CF_TIOCGWINSZ
+
+### append special libraries that get in the way of testing
+case $debug_malloc in
+DBMALLOC)
+	AC_DEFINE(USE_DBMALLOC)
+	LIBS="$LIBS -ldbmalloc"
+	;;
+DMALLOC)
+	AC_DEFINE(USE_DMALLOC)
+	LIBS="$LIBS -ldmalloc"
+	;;
+esac
 
 ### Finally, build autoconf.h and the makefiles
 CFLAGS="$CFLAGS $EXTRA_CFLAGS"

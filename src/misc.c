@@ -471,20 +471,28 @@ tin_done (ret)
 
 	cleanup_tmp_files ();
 
+#ifdef HAVE_COLOR
+	use_color=FALSE;
+	EndInverse();
+	ClearScreen();
+#endif
+
 #ifdef DOALLOC
-	no_leaks();		/* free permanent stuff */
+	no_leaks();	/* free permanent stuff */
 	show_alloc();	/* memory-leak testing */
+#endif
+
+#ifdef USE_DBMALLOC
+	/* force a dump, circumvents a bug in Linux libc */
+	{
+	extern int malloc_errfd;	/* FIXME */
+	malloc_dump(malloc_errfd);
+	}
 #endif
 
 #ifdef VMS
     if (ret == 0)
       ret = 1;
-#endif
-
-#ifdef HAVE_COLOR
-	use_color=FALSE;
-	EndInverse();
-	ClearScreen();
 #endif
 
 	exit (ret);
@@ -1065,16 +1073,20 @@ mail_check ()
  */
 
 #if 1
-#	define APPEND_TO(dest) do { *bp = '\0'; \
-										dest += sprintf (dest, "%s", bp = buf); \
-									} while (0)
-#	define RTRIM(p,buf) do { p--; \
-									while (p >= buf && isspace (*p)) \
-									*(p--) = '\0'; } while (0)
-#	define LTRIM(p,buf) for (p = buf ; \
-									p && isspace (*(p)) ; \
-									p++)
-#	define TRIM(p,buf) do { RTRIM (p,buf); LTRIM (p,buf); } while (0)
+# define APPEND_TO(dest, src) do { \
+                                   (dest) += \
+                                     sprintf ((dest), "%s", (src)); \
+			         } while (0)
+# define RTRIM(whatbuf, whatp) do { (whatp)--; \
+                          while ((whatp) >= (whatbuf) && \
+                                 isspace (*(whatp))) \
+			    *((whatp)--) = '\0'; } while (0)
+# define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf) ; \
+                          (whatp) && isspace (*(whatp)) ; \
+                          (whatp)++)
+# define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
+                                   LTRIM ((whatbuf), (whatp)); \
+                              } while (0)
 
 void
 parse_from (addr, addrspec, comment)
@@ -1082,101 +1094,136 @@ parse_from (addr, addrspec, comment)
   char *addrspec;
   char *comment;
 {
-  char buf[HEADER_LEN];
+  char atom_buf[HEADER_LEN];
+  char quoted_buf[HEADER_LEN];
+
+  char *atom_p = atom_buf;
+  char *quoted_p = quoted_buf;
+
   char asbuf[HEADER_LEN];
   char cmtbuf[HEADER_LEN];
 
   char *ap = addr,
-       *bp = buf,
        *asp = asbuf,
        *cmtp = cmtbuf;
   unsigned int state = 0;
-  unsigned int plevel = 0;
   /* 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
-     3 = in angle brackets, 4 = in parentheses (nesting level is plevel) */
+     3 = in angle brackets, 4 = in parentheses */
 
-  *bp = *asp = *cmtp = '\0';
+  unsigned int plevel = 0;
+  /* Parentheses nesting level */
+
+  unsigned int atom_type = 0;
+  /* 0 = unknown, 1 = address */
+
+  *asp = *cmtp = '\0';
   for (; *ap ; ap++) {
     switch (state) {
     case 0 :
       switch (*ap) {
       case '\"' :
-	APPEND_TO (asp);
-	bp = cmtp;
+	/* APPEND_TO (asp);
+	bp = cmtp; */
+        *atom_p = '\0';
+        quoted_p = quoted_buf;
+        *(quoted_p++) = '\"';
 	state = 1;
 	break;
       case '<' :
-	APPEND_TO (cmtp);
-	bp = asbuf;
+        *atom_p = '\0';
+	APPEND_TO (cmtp, atom_buf);
+        atom_p = atom_buf;
+        atom_type = 0;
+        asp = asbuf;
 	state = 3;
 	break;
       case '(' :
-	APPEND_TO (asp);
-	bp = cmtp;
+        *atom_p = '\0';
+	APPEND_TO (asp, atom_buf);
+        atom_p = atom_buf;
+        atom_type = 0;
 	plevel++;
 	state = 4;
 	break;
+      case ' ' : case '\t' :
+        if (atom_type == 1) {
+          *atom_p = '\0';
+          APPEND_TO (asp, atom_buf);
+          atom_p = atom_buf;   
+          atom_type = 0;
+        } else
+          *(atom_p++) = *ap;
+        break;
       default :
-	*(bp++) = *ap;
+	*(atom_p++) = *ap;
       break;
       }
       break;
     case 1 :
       if (*ap == '\"') {
-	*(cmtp = bp++) = '\0';
-	bp = asp;
+        switch (*(ap + 1)) {
+          case '@' : case '%' :
+            *(quoted_p++) = '\"'; *quoted_p = '\0';
+            APPEND_TO (asp, quoted_buf);
+            APPEND_TO (cmtp, atom_buf);
+             atom_type = 1;
+            break;
+          default :
+            *quoted_p = '\0';
+            APPEND_TO (asp, atom_buf);
+            APPEND_TO (cmtp, quoted_buf + 1);
+            break;
+        }
 	state = 0;
 	break;
       } else if (*ap == '\\')
 	state = 2;
-      *(bp++) = *ap;
+      *(quoted_p++) = *ap;
       break;
     case 2 :
-      *(bp++) = *ap;
+      *(quoted_p++) = *ap;
       state = 1;
       break;
     case 3 :
       if (*ap == '>') {
-	*(asp = bp++) = '\0';
-	bp = cmtp;
+	*asp = '\0';
 	state = 0;
       } else
-	*(bp++) = *ap;
+	*(asp++) = *ap;
       break;
     case 4 :
       switch (*ap) {
       case ')' :
 	if (!--plevel) {
-	  *(cmtp = bp++) = '\0';
-	  bp = asp;
+	  *cmtp = '\0';
 	  state = 0;
 	} else
-	  *(bp++) = *ap;
+	  *(cmtp++) = *ap;
 	break;
       case '(' :
 	plevel++;
       default :
-	*(bp++) = *ap;
+	*(cmtp++) = *ap;
         break;
       }
       break;
     default :
+      /* Does not happen. */
       goto FATAL;
     }
   }
 
-  *bp = '\0';
-
-  if (*cmtbuf == '\0' && *asbuf == '\0') {
-    for (asp = asbuf, bp = buf ; *bp ; asp++, bp++)
-      *asp = *bp;
-    *asp = '\0';
-  }
+  *cmtp = *asp = *atom_p = '\0';
+  if (state == 0)
+    if (atom_type == 0)
+      APPEND_TO (cmtp, atom_buf);
+    else if (atom_type == 1)
+      APPEND_TO (asp, atom_buf);
 
   /* Address specifier */
-  TRIM (asp,asbuf);
+  TRIM (asbuf, asp);
   /* Comment */
-  TRIM (cmtp,cmtbuf);
+  TRIM (cmtbuf, cmtp);
 
   strcpy (addrspec, asp);
   strcpy (comment, cmtp);

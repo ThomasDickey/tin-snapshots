@@ -119,9 +119,6 @@ extern char *get_uaf_fullname();
 #ifdef HAVE_STDLIB_H
 #	include <stdlib.h>
 #endif
-#ifdef HAVE_DBMALLOC
-#	include "dbmalloc.h"
-#endif
 
 /* prefer string.h because it's Posix */
 #ifdef HAVE_STRING_H
@@ -1604,7 +1601,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	F_OK	0	/* Test for existence of File */
 #endif
 
-#ifdef HAVE_DBMALLOC
+#ifdef USE_DBMALLOC
 #define my_malloc(size) malloc(size)
 #define my_realloc(ptr, size)	realloc((ptr), (size))
 #else
@@ -1692,14 +1689,19 @@ typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
  */
 typedef void (*BodyPtr) P_((char *, FILE *, int));
 
-#ifdef DBMALLOC
+#ifdef USE_DBMALLOC
 #	undef strchr
 #	undef strrchr
 #	undef NSET1
 #	undef NSET0
 #	define	NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] |	NTEST(n,b), 1)
 #	define	NSET0(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] & ~NTEST(n,b), 1)
-#	include "dbmalloc.h" /* dbmalloc 1.4 */
+#	include <dbmalloc.h> /* dbmalloc 1.4 */
+#endif
+
+#ifdef USE_DMALLOC
+#	include <dmalloc.h>
+#	define DMALLOC_FUNC_CHECK
 #endif
 
 #if defined(WIN32) && defined(DEBUG) && defined(CHECKHEAP)

@@ -14,7 +14,8 @@
 
 #include	"tin.h"
 
-#if defined(DBMALLOC)
+/* dbmalloc checks memset() parameters, so we'll use it to check the assignments */
+#ifdef USE_DBMALLOC
 #define BIT_OR(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] | (mask), 1)
 #define BIT_AND(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] & (mask), 1)
 #else
