@@ -5,17 +5,16 @@
 CC	= gcc
 
 COPTS	= -c \
-	-O2 \
-	-Wall \
-	-m486 \
+	-O2 -Wall -m486 \
 	-I$(INCDIR) \
 	-DNNTP_ONLY \
 	-DNNTP_INEWS \
 	-DDONT_LOG_USER \
-	-DHAVE_ISPELL \
 	-DUSE_ISO2ASC=\"2\" \
+	-DHAVE_ISPELL \
 	-DNO_ETIQUETTE \
-	-DHAVE_COLOR
+	-DHAVE_COLOR \
+	-DREF_THREADING
 
 #	-DHAVE_PGP
 #	-DMIME_BREAK_LONG_LINES
@@ -141,9 +140,10 @@ CFILES	= \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
-	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
+	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/prompt.c\
+	$(SRCDIR)/refs.c\
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
@@ -195,9 +195,10 @@ OFILES	= \
 	$(OBJDIR)/open.o \
 	$(OBJDIR)/page.o \
 	$(OBJDIR)/parsdate.o \
-	$(OBJDIR)/pgp.o \
 	$(OBJDIR)/post.o \
+	$(OBJDIR)/pgp.o \
 	$(OBJDIR)/prompt.o\
+	$(OBJDIR)/refs.o\
 	$(OBJDIR)/rfc1521.o \
 	$(OBJDIR)/rfc1522.o \
 	$(OBJDIR)/save.o \
@@ -219,7 +220,7 @@ OFILES	= \
 
 ALL_FILES	= $(HFILES) $(CFILES) $(NNTP)
 
-LINTFLAGS	=-a -c -h -n -x 
+LINTFLAGS	=-a -c -h -n -x -u
 
 all: linux
 
@@ -638,7 +639,7 @@ tags:
 	@$(TAGS) $(HFILES) $(CFILES) 
 
 lint:
-	@$(ECHO) "Linting source (results in ./LINT)..."
+	@$(ECHO) "Linting source (results in ../LINT)..."
 	@$(LINT) $(LINTFLAGS) \
 	-I$(INCDIR) \
 	-DNNTP_ONLY \

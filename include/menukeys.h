@@ -37,6 +37,7 @@
 /* group.c */
 
 #define iKeyGroupShell '!'
+#define iKeyGroupFirstPage '^'
 #define iKeyGroupLastPage '$'
 #define iKeyGroupLastViewed '-'
 #define iKeyGroupPipe '|'
@@ -120,6 +121,7 @@
 #define iKeyHelpPageUp4 'k'
 #define iKeyHelpHome ctrl('R')
 #define iKeyHelpHome2 'g'
+#define iKeyHelpHome3 '^'
 #define iKeyHelpEnd '$'
 #define iKeyHelpEnd2 'G'
 
@@ -148,6 +150,7 @@
 #define iKeyPageRedrawScr ctrl('L')
 #define iKeyPageRestartArt ctrl('R')
 #define iKeyPageRestartArt2 'g'
+#define iKeyPageRestartArt3 '^'
 #define iKeyPageToggleTabs ctrl('T')
 #define iKeyPageToggleRot ctrl('X')
 #define iKeyPageToggleRot2 '%'
@@ -176,7 +179,7 @@
 #define iKeyPagePrint 'o'
 #define iKeyPagePrevArt 'p'
 #define iKeyPagePrevUnreadArt 'P'
-#define iKeyPageQuickQuit 'Q'
+#define iKeyPageQuitTin 'Q'
 #define iKeyPageReplyQuote 'r'
 #define iKeyPageReply 'R'
 #define iKeyPageSave 's'
@@ -223,6 +226,7 @@
 /* select.c */
 
 #define iKeySelectShell '!'
+#define iKeySelectFirstPage '^'
 #define iKeySelectLastPage '$'
 #define iKeySelectSetRange '#'
 #define iKeySelectFSearchSubj '/'
@@ -272,6 +276,8 @@
 
 /* thread.c */
 
+#define iKeyThreadShell '!'
+#define iKeyThreadFirstPage '^'
 #define iKeyThreadLastPage '$'
 #define iKeyThreadSetRange '#'
 #define iKeyThreadReadArt '\r'

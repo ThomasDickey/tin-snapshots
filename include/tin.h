@@ -618,6 +618,11 @@ extern char *get_uaf_fullname();
 #	define		BLANK_PAGE_COLS 	0
 #endif
 
+/*
+ * Maximum permissible colour number
+ */
+#define		MAX_COLOR			15
+
 #define 	SCREEN_READ_UNREAD		6		/* position for "  +" / "   " */
 #define 	INDEX_TOP			2
 
@@ -804,6 +809,11 @@ extern char *get_uaf_fullname();
 #define 	ART_EXPIRED		-2
 
 /*
+ * art.parent, art.sibling, art.child
+ */
+#define		NO_THREAD		-1
+
+/*
  *  art.status
  */
 
@@ -938,8 +948,8 @@ typedef unsigned char	t_bitmap;
  *  struct t_article - article header
  *
  *  article.thread:
- *	-1 initial default
- *	-2 means article has expired (wasn't found in file search
+ *	-1 initial default (ART_NORMAL)
+ *	-2 means article has expired (wasn't found in file search) (ART_EXPIRED)
  *	of spool directory for the group)
  *	>=0 points to another arts[] (struct t_article)
  *
@@ -964,6 +974,11 @@ struct t_article
 	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
+#ifdef REF_THREADING
+	int parent;			/* Article followed up to */
+	int sibling;			/* Next followup to parent */
+	int child;			/* First followup to this article */
+#endif
 	unsigned int inthread:1;	/* 0 = thread head, 1 = thread follower */
 	unsigned int status:2;		/* 0 = read, 1 = unread, 2 = will return */
 	unsigned int killed:1;		/* 0 = not killed, 1 = killed */
@@ -1004,7 +1019,7 @@ struct t_attribute
 	unsigned int batch_save:1;		/* 0=none, 1=save -S/mail -M  */
 	unsigned int delete_tmp_files:1;	/* 0=leave, 1=delete */
 	unsigned int show_only_unread:1;	/* 0=all, 1=only unread */
-	unsigned int thread_arts:1;		/* 0=unthread, 1=thread */
+	unsigned int thread_arts:2;		/* 0=unthread, 1=subject, 2=refs */
 	unsigned int show_author:4;		/* 0=none, 1=name, 2=addr, 3=both */
 	unsigned int sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
 						   3=from descend, 4=from ascend,

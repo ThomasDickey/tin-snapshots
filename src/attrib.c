@@ -116,7 +116,8 @@ set_default_attributes (psAttrib)
  *  attribute.batch_save       = ON/OFF
  *  attribute.delete_tmp_files = ON/OFF
  *  attribute.show_only_unread = ON/OFF
- *  attribute.thread_arts      = ON/OFF
+ *  attribute.thread_arts      = NUM
+ *	  0=none, 1=subj, 2=refs
  *  attribute.show_author      = NUM
  *    0=none, 1=name, 2=addr, 3=both
  *  attribute.sort_art_type    = NUM
@@ -244,13 +245,13 @@ read_attributes_file (file, global_file)
 					set_attrib_str (ATTRIB_PRINTER, scope, buf);
 					break;
 				}
-				if (match_integer (line, "post_proc_type=", &num)) {
+				if (match_integer (line, "post_proc_type=", &num, POST_PROC_UUD_EXT_ZIP)) {
 					set_attrib_num (ATTRIB_POST_PROC_TYPE, scope, num);
 					break;
 				}
 				break;
 			case 'q':
-				if (match_integer (line, "quick_kill_header=", &num)) {
+				if (match_integer (line, "quick_kill_header=", &num, FILTER_LINES)) {
 					set_attrib_num (ATTRIB_QUICK_KILL_HEADER, scope, num);
 					break;
 					}
@@ -266,7 +267,7 @@ read_attributes_file (file, global_file)
 					set_attrib_num (ATTRIB_QUICK_KILL_EXPIRE, scope, num);
 					break;
 				}
-				if (match_integer (line, "quick_select_header=", &num)) {
+				if (match_integer (line, "quick_select_header=", &num, FILTER_LINES)) {
 					set_attrib_num (ATTRIB_QUICK_SELECT_HEADER, scope, num);
 					break;
 				}
@@ -303,17 +304,17 @@ read_attributes_file (file, global_file)
 					set_attrib_num (ATTRIB_SHOW_ONLY_UNREAD, scope, num);
 					break;
 				}
-				if (match_integer (line, "sort_art_type=", &num)) {
+				if (match_integer (line, "sort_art_type=", &num, SORT_BY_DATE_ASCEND)) {
 					set_attrib_num (ATTRIB_SORT_ART_TYPE, scope, num);
 					break;
 				}
-				if (match_integer (line, "show_author=", &num)) {
+				if (match_integer (line, "show_author=", &num, SHOW_FROM_BOTH)) {
 					set_attrib_num (ATTRIB_SHOW_AUTHOR, scope, num);
 					break;
 				}
 				break;
 			case 't':
-				if (match_boolean (line, "thread_arts=", &num)) {
+				if (match_integer (line, "thread_arts=", &num, THREAD_REFS)) {
 					set_attrib_num (ATTRIB_THREAD_ARTS, scope, num);
 					break;
 				}
@@ -592,8 +593,9 @@ write_attributes_file (file)
 	fprintf (fp, "#  auto_save_msg=ON/OFF\n");
 	fprintf (fp, "#  batch_save=ON/OFF\n");
 	fprintf (fp, "#  delete_tmp_files=ON/OFF\n");
-	fprintf (fp, "#  show_only_unread=ON/OFF\n");
-	fprintf (fp, "#  thread_arts=ON/OFF\n#\n");
+	fprintf (fp, "#  show_only_unread=ON/OFF\n#\n");
+	fprintf (fp, "#  thread_arts=NUM\n");
+	fprintf (fp, "#    0=none, 1=subj, 2=refs\n#\n");
 	fprintf (fp, "#  show_author=NUM\n");
 	fprintf (fp, "#    0=none, 1=name, 2=addr, 3=both\n#\n");
 	fprintf (fp, "#  sort_art_type=NUM\n");
@@ -644,8 +646,7 @@ write_attributes_file (file)
 		fprintf (fp, "printer=%s\n", psGrp->attribute->printer);
 		fprintf (fp, "show_only_unread=%s\n", 
 			print_boolean (psGrp->attribute->show_only_unread));
-		fprintf (fp, "thread_arts=%s\n", 
-			print_boolean (psGrp->attribute->thread_arts));
+		fprintf (fp, "thread_arts=%d\n", psGrp->attribute->thread_arts);
 		fprintf (fp, "auto_select=%s\n", 
 			print_boolean (psGrp->attribute->auto_select));
 		fprintf (fp, "auto_save=%s\n", 

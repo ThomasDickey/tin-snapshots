@@ -1,82 +1,82 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960519 (Sun May 19 01:40:14 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960521 (Tue May 21 01:01:51 MET DST 1996)
 ----------------------------------------------------
-  12215 ./CHANGES
-   7293 ./TODO
-   4442 ./Makefile
-  16972 ./INSTALL
+  13768 ./CHANGES
+   8093 ./TODO
+   4439 ./Makefile
+  17158 ./INSTALL
     132 ./MANIFEST
    1356 ./README
-   6179 ./THOUGHTS
-    900 ./tinpp
-  69115 ./doc/tin.1
+    913 ./tinpp
+  69402 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
    9622 ./include/config.h
-  32240 ./include/extern.h
+  32344 ./include/extern.h
     565 ./include/gst.h
-   9741 ./include/menukeys.h
+   9920 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
-   1690 ./include/patchlev.h
-  27280 ./include/proto.h
+   1777 ./include/patchlev.h
+  27365 ./include/proto.h
      89 ./include/rfc1521.h
     292 ./include/rfc1522.h
    1272 ./include/stpwatch.h
-  38733 ./include/tin.h
+  39077 ./include/tin.h
    4101 ./include/win32.h
     791 ./include/win32tcp.h
-  19287 ./src/active.c
+  19291 ./src/active.c
    8203 ./src/actived.c
   13012 ./src/amiga.c
    4427 ./src/amigatcp.c
-  34994 ./src/art.c
-  21879 ./src/attrib.c
+  36350 ./src/art.c
+  22033 ./src/attrib.c
    8262 ./src/charset.c
-   1448 ./src/color.c
-  40309 ./src/config.c
+   1463 ./src/color.c
+  40941 ./src/config.c
   19972 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
   18348 ./src/feed.c
-  35381 ./src/filter.c
+  35387 ./src/filter.c
   11250 ./src/getline.c
-  41858 ./src/group.c
+  41463 ./src/group.c
    2671 ./src/hashstr.c
-   9628 ./src/help.c
+   9650 ./src/help.c
   11855 ./src/inews.c
-  27948 ./src/init.c
-  40633 ./src/lang.c
+  27949 ./src/init.c
+  40781 ./src/lang.c
    2771 ./src/list.c
   12119 ./src/mail.c
-  16794 ./src/main.c
+  16806 ./src/main.c
   11022 ./src/memory.c
-  39126 ./src/misc.c
+  39115 ./src/misc.c
    7231 ./src/msmail.c
   33010 ./src/newsrc.c
-  25982 ./src/nntplib.c
+  26006 ./src/nntplib.c
   31433 ./src/nntpw32.c
-  26640 ./src/open.c
+  26641 ./src/open.c
    6305 ./src/os_2.c
-  34443 ./src/page.c
+  34474 ./src/page.c
   24108 ./src/parsdate.y
    7195 ./src/pgp.c
-  62752 ./src/post.c
+  63041 ./src/post.c
    4342 ./src/prompt.c
+   9953 ./src/refs.c
    4813 ./src/rfc1521.c
   11740 ./src/rfc1522.c
-  34131 ./src/save.c
-   4103 ./src/screen.c
+  34129 ./src/save.c
+   4116 ./src/screen.c
    9895 ./src/search.c
-  34611 ./src/select.c
+  34920 ./src/select.c
    5270 ./src/sigfile.c
   11103 ./src/signal.c
    5882 ./src/strftime.c
-  24491 ./src/thread.c
+  25092 ./src/thread.c
    5014 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
-  21854 ./src/Makefile
-1189605 total
+  21908 ./src/Makefile
+1200278 total

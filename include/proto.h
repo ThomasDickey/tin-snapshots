@@ -72,7 +72,7 @@ extern void show_config_menu P_((void));
 extern void expand_rel_abs_pathname P_((int line, int col, char *str));
 extern void show_menu_help P_((char *help_message));
 extern int match_boolean P_((char *line, char *pat, int *dst));
-extern int match_integer P_((char *line, char *pat, int *dst));
+extern int match_integer P_((char *line, char *pat, int *dst, int));
 extern int match_long P_((char *line, char *pat, long *dst));
 extern int match_string P_((char *line, char *pat, char *dst, size_t dstlen));
 extern char *print_boolean P_((int value));
@@ -209,7 +209,7 @@ extern void vGrpDelMailArt P_((struct t_group *psGrp, struct t_article *psArt));
 extern void vGrpDelMailArts P_((struct t_group *psGrp));
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 /* ./main.c */
-extern void main P_((int argc, char *argv[]));
+/*extern void main P_((int argc, char *argv[]));*/
 extern void read_cmd_line_options P_((int argc, char *argv[]));
 extern void usage P_((char *progname));
 extern int check_for_any_new_news P_((int check_any_unread, int start_any_unread));
@@ -406,6 +406,8 @@ extern int prompt_yn P_((int line, char *prompt, int default_answer));
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
 extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char **list, int));
 extern void continue_prompt P_((void));
+/* ./refs.c */
+extern void thread_by_reference P_((struct t_group *group));
 /* ./save.c */
 extern int check_start_save_any_news P_((int check_start_save));
 extern int save_art_to_file P_((int respnum, int indexnum, int mailbox, char *filename));

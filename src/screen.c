@@ -76,8 +76,10 @@ perror_message (template, str)
 			extern char *__sys_errlist[];
 #			define sys_errlist	__sys_errlist
 #		endif
-#	elif !(defined(BSD) && (BSD >= 199306))
+#	else
+#	if !(defined(BSD) && (BSD >= 199306))
 		extern char *sys_errlist[];
+#	endif
 #	endif
 #endif
 

@@ -577,7 +577,8 @@ Tag current article / thread for mailing ('m') / piping ('|') /
 printing ('o') / saving ('s') / reposting ('x').
 .TP
 \fBu\fP
-Toggle display to show all articles as unthreaded or threaded.
+Cycle the threading mode through no threading, threading by subject
+and threading by references.
 .TP
 \fBU\fP
 Untag all articles that were tagged.
@@ -950,10 +951,12 @@ If set ON the user is asked when quitting if all groups read during the
 current session should be marked read.
 .TP
 \fBThread articles\fP
-If set ON articles will be threaded in all groups (default), otherwise
-articles will be shown unthreaded. Threading/unthreading is possible on
+If set to NONE, articles will be shown unthreaded.
+If set to SUBJ (default), articles will be threaded on the Subject line.
+If set to REFS (experimental), articles will be threaded using
+References information.  Threading/unthreading is possible on
 a per group basis by setting the group attribute variable 'thread_arts'
-to ON/OFF in the file \fI$HOME/.tin/attributes\fP.
+to 0, 1 or 2 in the file \fI$HOME/.tin/attributes\fP.
 .TP
 \fBShow only unread\fP
 If set ON show only new/unread articles, otherwise show all articles.
@@ -1318,7 +1321,8 @@ unread article immediately instead of first paging through the current
 one. Default is ON.
 .TP 4
 \fBthread_articles\fP
-If ON all group will be threaded as default. Default is ON.
+Thread articles by 0=(nothing) 1=(Subject) 2=(References)
+Default is 1, thread by subject.
 .TP 4
 \fBthread_catchup_on_exit\fP
 If ON catchup group/thread when leaving with the left arrow key.
@@ -1362,7 +1366,7 @@ auto_save_msg=OFF
 batch_save=OFF
 delete_tmp_files=ON
 show_only_unread=OFF
-thread_arts=ON
+thread_arts=1
 show_author=1
 sort_art_type=5
 post_proc_type=1
@@ -1381,6 +1385,9 @@ All attributes are set to a reasonable default so you only have to
 specify the attribute that you want to change (i.e., savedir).
 .PP
 All toggle attributes are set by specifying ON/OFF. 
+.PP
+The thread_arts attribute is specified by a number from the following
+range: 0=none, 1=subject, 2=references.
 .PP
 The show_author attribute is specified by a number from the following 
 range: 0=none, 1=username, 2=network address, 3=both.

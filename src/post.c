@@ -739,6 +739,7 @@ quick_post_article ()
 	msg_add_header ("Keywords", "");
 
 	start_line_offset = msg_write_headers (fp);
+	fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	start_line_offset += 2;
 	msg_free_headers ();
 	if (psGrp) {
@@ -954,6 +955,7 @@ post_article (group, posted)
 	msg_add_header ("Keywords", "");
 
 	start_line_offset = msg_write_headers (fp);
+        fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	start_line_offset++;
 	msg_free_headers ();
 	lines = msg_add_x_body (fp, psGrp->attribute->x_body);
@@ -1278,6 +1280,8 @@ ignore_followup_to_poster:
 	
 		fseek (note_fp, note_mark[0], 0);
 		copy_fp (note_fp, fp, quote_chars);
+	} else {
+		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
 
 	msg_write_signature (fp, FALSE);
@@ -1798,6 +1802,8 @@ mail_to_author (group, respnum, copy_text)
 		}
 		fseek (note_fp, note_mark[0], 0);
 		copy_fp (note_fp, fp, quote_chars);
+	} else {
+		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
 
 	msg_write_signature (fp, TRUE);

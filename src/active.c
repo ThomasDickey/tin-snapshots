@@ -535,12 +535,12 @@ check_for_any_new_groups ()
 	}
 
 notify_groups_done:
-
+/*
 	if (cmd_line) {
 		printf ("\r\n");
 		fflush (stdout);
 	}
-
+*/
 	if (fp != (FILE *) 0) {
 		fclose (fp);
 	}

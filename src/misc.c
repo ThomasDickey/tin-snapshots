@@ -302,7 +302,7 @@ tin_done (ret)
 				if (ask) {
 					if (prompt_yn (cLINES, txt_catchup_all_read_groups, FALSE) == 1) {
 						ask = FALSE;
-						default_thread_arts = FALSE;	/* speeds up index loading */
+						default_thread_arts = THREAD_NONE;	/* speeds up index loading */
 					} else {
 						break;
 					}
@@ -1125,7 +1125,7 @@ eat_re (s)
  *  thread search later.  We store the hashes for subjects in the
  *  index file for speed.
  */
-
+#if 0
 long
 hash_s (s)
 	char *s;
@@ -1138,6 +1138,7 @@ hash_s (s)
 
 	return h;
 }
+#endif
 
 /*
  *  strncpy that stops at a newline and null terminates
@@ -1239,18 +1240,16 @@ get_author (thread, art, str)
 	struct t_article *art;
 	char *str;
 {
-	extern int threaded_on_subject;
+	extern int show_subject;
 	int author;
 
 	if (thread) {
-		if (threaded_on_subject) {
-			author = SHOW_FROM_BOTH;
-		} else {
+		if (show_subject)
 			author = show_author;
-		}
-	} else {
+		else
+			author = SHOW_FROM_BOTH;
+	} else
 		author = show_author;
-	}
 
 	switch (author) {
 		case SHOW_FROM_NONE:

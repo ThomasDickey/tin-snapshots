@@ -23,7 +23,7 @@
 extern int index_point;
 
 int thread_basenote = 0;
-int threaded_on_subject;
+int show_subject;
 
 static int top_thread = 0;
 static int thread_index_point = 0;
@@ -57,10 +57,7 @@ bld_tline (l, art)
 		off_both = 5;
 	}	
 
-	if (threaded_on_subject) {
-		len_from = (max_subj+max_from+off_both) - 8;
-		spaces = "";
-	} else {
+	if (show_subject) {
 		if (show_author != SHOW_FROM_NONE) {
 			len_from = max_from - 3;
 			len_subj = (max_subj+off_subj) - 5;
@@ -70,6 +67,9 @@ bld_tline (l, art)
 			len_subj = (max_from+max_subj+off_subj) - 5;
 			spaces = "";
 		}
+	} else {
+		len_from = (max_subj+max_from+off_both) - 8;
+		spaces = "";
 	}	
 
 	j = INDEX2TNUM(l);
@@ -90,7 +90,7 @@ bld_tline (l, art)
 	}
 	
 	from[0] = '\0';
-	if (threaded_on_subject || show_author != SHOW_FROM_NONE) {
+	if (!show_subject || show_author != SHOW_FROM_NONE) {
 		get_author (TRUE, art, from);
 	}	
 
@@ -157,8 +157,8 @@ draw_tline (i, full)
 
 /*
  * show current thread. If threaded on Subject: show
- *   <respnum> <name>    <respnum> <name>
- * If threaded on Archive-name: show
+ *   <respnum> <name> 
+ * If threaded on References: or Archive-name: show
  *   <respnum> <subject> <name>
  */
  
@@ -184,11 +184,13 @@ show_thread (group, group_path, respnum)
 		return FALSE;
 	}
 
-	if (arts[thread_respnum].archive != (char *) 0) {
-		threaded_on_subject = FALSE;
-	} else {
-		threaded_on_subject = TRUE;
-	}
+	/*
+	 * If threading by Refs, it helps to see the subject line
+	 */
+	if ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts == THREAD_REFS))
+		show_subject = TRUE;
+	else
+		show_subject = FALSE;
 
 	thread_index_point = top_thread;
 	if (space_mode) {
@@ -256,18 +258,7 @@ show_thread (group, group_path, respnum)
 						goto thread_page_down;
 
 					case KEYMAP_HOME:
-						if (thread_index_point != 0) {
-							if (0 < first_thread_on_screen) {
-								erase_thread_arrow ();
-								thread_index_point = 0;
-								show_thread_page ();
-							} else {
-								erase_thread_arrow ();
-								thread_index_point = 0;
-								draw_thread_arrow ();
-							}
-						}
-						break;
+						goto top_of_thread;
 					
 					case KEYMAP_END:
 						goto end_of_thread;
@@ -305,7 +296,29 @@ show_thread (group, group_path, respnum)
 				break;
 #endif /* ! WIN32 */
 
-			case iKeyThreadLastPage:	/* show last page of threads */
+#ifndef NO_SHELL_ESCAPE
+			case iKeyThreadShell:
+				shell_escape ();
+				show_thread_page ();
+				break;
+#endif
+
+			case iKeyThreadFirstPage:	/* show first page of articles */
+top_of_thread:
+				if (thread_index_point != 0) {
+					if (0 < first_thread_on_screen) {
+						erase_thread_arrow ();
+						thread_index_point = 0;
+						show_thread_page ();
+					} else {
+						erase_thread_arrow ();
+						thread_index_point = 0;
+						draw_thread_arrow ();
+					}
+				}
+				break;
+
+			case iKeyThreadLastPage:	/* show last page of articles */
 end_of_thread:			
 				if (thread_index_point < top_thread - 1) {
 					if (top_thread > last_thread_on_screen) {
@@ -530,12 +543,27 @@ thread_catchup:
 				break;
 				
 			case iKeyThreadToggleSubjDisplay:	/* toggle display of subject & subj/author */
-				if (! threaded_on_subject) {
+				if (show_subject) {
 					toggle_subject_from ();
 					show_thread_page ();
-				}	
+				}
 				break;
-				
+
+#ifdef REF_THREADING				
+case 'a':	/* Very dirty temp. hack - Show threaded tree */
+	if (group->attribute->thread_arts == THREAD_REFS) {
+		char ch[10];
+		int siz=10;
+
+		dump_thread(stderr, thread_respnum, 1);
+		puts("Press <RETURN>");
+		fgets(ch, siz, stdin);
+		show_thread_page ();
+	}
+
+	break;
+#endif
+
 			case iKeyThreadHelp:	/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();
@@ -643,7 +671,8 @@ thread_catchup:
 				break;
 
 			case iKeyPageDisplaySubject:
-				info_message(arts[respnum].subject);
+				n = choose_response (thread_basenote, thread_index_point);
+				info_message(arts[n].subject);
 				break;
 				
 			default:
@@ -712,11 +741,11 @@ show_thread_page ()
 
 	assert(first_thread_on_screen != 0 || index == thread_respnum);
 
-	if (threaded_on_subject) {
-		sprintf (msg, "Thread (%.*s)", cCOLS-23, arts[thread_respnum].subject);
-	} else {
+	if (show_subject)
 		sprintf (msg, "List Thread (%d of %d)", index_point+1, top_base);
-	}
+	else
+		sprintf (msg, "Thread (%.*s)", cCOLS-23, arts[thread_respnum].subject);
+
 	show_title (msg);
 
 	MoveCursor (INDEX_TOP, 0);
@@ -806,7 +835,7 @@ prompt_thread_num (ch)
 
 	clear_message ();
 
-	if ((num = prompt_num (ch, txt_read_art)) == -1) {
+	if ((num = prompt_num (ch, txt_select_art)) == -1) {
 		clear_message ();
 		return FALSE;
 	}

@@ -205,7 +205,7 @@ read_filter_file (file, global_file)
 		}
 		switch(tolower(buf[0])) {
 		case 'c':
-			if (match_integer (buf, "case=", &icase)) {
+			if (match_integer (buf, "case=", &icase, 1)) {
 				if (arr_ptr && ! expired_time) {
 					arr_ptr[i].icase = icase;
 				}
@@ -325,7 +325,7 @@ if (debug) {
 			}
 			break;
 		case 't':
-			if (match_integer (buf, "type=", &type)) {
+			if (match_integer (buf, "type=", &type, 1)) {
 if (debug) {
 	printf ("type=[%d][%s]\n", type, (type == 0 ? "KILL" : "SELECT"));
 	fflush (stdout);

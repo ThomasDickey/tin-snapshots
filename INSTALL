@@ -19,6 +19,7 @@ This following Makefile & ./include/tin.h defines are documented in detail:
   NOVROOTDIR               NO_PIPING                NO_POSTING
   NO_REGEX                 NO_SHELL_ESCAPE          SMALL_MEMORY_MACHINE
   SPOOLDIR                 USE_INN_NNTPLIB          USE_INVERSE_HACK
+  REF_THREADING
 
 
 News machine names
@@ -233,6 +234,10 @@ Contains the networking libraries needed to link with nntplib.o file.
 HAVE_TIN_NNTP_EXTS
 Define if you have a NNTP server that supports my XMOTD & XUSER patches.
 
+REF_THREADING
+Define if you want to be able to create threads based on the
+References: news header. Note that as of 15/05/96, this option is
+still somewhat experimental.
 
 Daemon options
 --------------

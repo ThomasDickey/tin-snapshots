@@ -15,11 +15,12 @@
 #include	"tin.h"
 
 #define MARK_OFFSET	8
+#define CURR_GROUP	(active[my_group[cur_groupnum]])
 
 /* what we do here is bizarre */
 /*
 #ifndef ART_ADJUST	
-#define ART_ADJUST(n)	(active[my_group[cur_groupnum]].attribute->show_only_unread \
+#define ART_ADJUST(n)	(CURR_GROUP.attribute->show_only_unread \
 				? ((n) > 1 ? (n) : 0) \
 				: ((n) > 0 ? (n) - 1 : 0))
 #endif
@@ -53,7 +54,7 @@ line_is_tagged (n)
 int n;
 {
 	int	code = 0;
-	if (active[my_group[cur_groupnum]].attribute->thread_arts) {
+	if (CURR_GROUP.attribute->thread_arts) {
 		register int i;
 		for (i = n; i >= 0; i = arts[i].thread) {
 			if (arts[i].tagged > code)
@@ -209,21 +210,7 @@ debug_print_bitmap (group, NULL);
 					goto group_page_down;
 
 				case KEYMAP_HOME:
-					if (! top_base) {
-						break;
-					}			
-					if (index_point != 0) {
-						if (0 < first_subj_on_screen) {
-							erase_subject_arrow ();
-							index_point = 0;
-							show_group_page ();
-						} else {
-							erase_subject_arrow ();
-							index_point = 0;
-							draw_subject_arrow ();
-						}
-					}
-					break;
+					goto top_of_list;
 					
 				case KEYMAP_END:
 					goto end_of_list;
@@ -272,7 +259,25 @@ debug_print_bitmap (group, NULL);
 				break;
 #endif
 
-			case iKeyGroupLastPage:	/* show last page of articles */
+			case iKeyGroupFirstPage: /*show first page of threads */
+top_of_list:
+				if (! top_base) {
+					break;
+				}			
+				if (index_point != 0) {
+					if (0 < first_subj_on_screen) {
+						erase_subject_arrow ();
+						index_point = 0;
+						show_group_page ();
+					} else {
+						erase_subject_arrow ();
+						index_point = 0;
+						draw_subject_arrow ();
+					}
+				}
+				break;
+
+			case iKeyGroupLastPage:	/* show last page of threads */
 end_of_list:
 				if (! top_base) {
 					break;
@@ -312,8 +317,7 @@ end_of_list:
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
 				if (index_point >= 0) {
 					feed_articles (FEED_PIPE, GROUP_LEVEL, 
-						&active[my_group[cur_groupnum]], 
-						(int) base[index_point]);
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 
@@ -662,9 +666,9 @@ group_catchup:
 					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, 'y') != 1) {
 						break;
 					}
-				    if (! active[my_group[cur_groupnum]].newsrc.num_unread || 
+				    if (! CURR_GROUP.newsrc.num_unread || 
 					    ! confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1) {
-						grp_mark_read (&active[my_group[cur_groupnum]], arts);
+						grp_mark_read (&CURR_GROUP, arts);
 					}
 					if (ch == iKeyGroupCatchupGotoNext) {
 						if (yn == 1) {
@@ -723,7 +727,7 @@ group_catchup:
 					break;
 				}
 				old_selected_arts = num_of_selected_arts;
-				thd_mark_read (&active[my_group[cur_groupnum]], base[index_point]);
+				thd_mark_read (&CURR_GROUP, base[index_point]);
 				if (num_of_selected_arts != old_selected_arts) {
 					show_group_title (TRUE);
 				}
@@ -779,8 +783,7 @@ group_list_thread:
 			case iKeyGroupMail:	/* mail article to somebody */
 				if (index_point >= 0) {
 					feed_articles (FEED_MAIL, GROUP_LEVEL, 
-						&active[my_group[cur_groupnum]], 
-						(int) base[index_point]);
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 
@@ -793,8 +796,8 @@ group_list_thread:
 				n = default_sort_art_type;
 				filter_state = change_config_file (group, TRUE);
 				if (filter_state == NO_FILTERING && n != default_sort_art_type) {
-					make_threads (&active[my_group[cur_groupnum]], TRUE);
-					find_base (&active[my_group[cur_groupnum]]);
+					make_threads (&CURR_GROUP, TRUE);
+					find_base (&CURR_GROUP);
 				}
 				set_subj_from_size (cCOLS);
 				index_point = find_new_pos (old_top, old_artnum, index_point);
@@ -838,8 +841,7 @@ group_list_thread:
 			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
 				if (index_point >= 0) {
 					feed_articles (FEED_PRINT, GROUP_LEVEL, 
-						&active[my_group[cur_groupnum]], 
-						(int) base[index_point]);
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 
@@ -899,14 +901,14 @@ group_list_thread:
 	 			 * exist after toggle. Otherwise we find the
 	 			 * next closest 
 	 			 */
- 				if (active[my_group[cur_groupnum]].attribute->show_only_unread) {
+ 				if (CURR_GROUP.attribute->show_only_unread) {
 					wait_message (txt_reading_all_arts);
  				} else {
 					wait_message (txt_reading_new_arts);
  				} 
  				i = -1;
  				if (index_point >= 0) {
- 					if (active[my_group[cur_groupnum]].attribute->show_only_unread || 
+ 					if (CURR_GROUP.attribute->show_only_unread || 
  					    new_responses (index_point)) {
  						i = base[index_point];
  					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
@@ -915,10 +917,10 @@ group_list_thread:
  						i = n;
  					}	
  				}
- 				active[my_group[cur_groupnum]].attribute->show_only_unread = 
- 					!active[my_group[cur_groupnum]].attribute->show_only_unread;
- 				auto_select_articles (&active[my_group[cur_groupnum]]);
- 				find_base (&active[my_group[cur_groupnum]]);
+ 				CURR_GROUP.attribute->show_only_unread = 
+ 					!CURR_GROUP.attribute->show_only_unread;
+ 				auto_select_articles (&CURR_GROUP);
+ 				find_base (&CURR_GROUP);
  				if (i >= 0 && (n = which_thread (i)) >= 0)
  					index_point = n;
  				else if (top_base > 0)
@@ -935,8 +937,7 @@ group_list_thread:
 			case iKeyGroupSave:	/* save articles with prompting */
 				if (index_point >= 0) {
 					feed_articles (FEED_SAVE, GROUP_LEVEL, 
-						&active[my_group[cur_groupnum]], 
-						(int) base[index_point]);
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 			
@@ -944,8 +945,7 @@ group_list_thread:
 				if (index_point >= 0) {
 					if (num_of_tagged_arts) {
 						feed_articles (FEED_SAVE_TAGGED, GROUP_LEVEL, 
-							&active[my_group[cur_groupnum]], 
-							(int) base[index_point]);
+							&CURR_GROUP, (int) base[index_point]);
 					} else {
 						info_message (txt_no_tagged_arts_to_save);
 					}
@@ -956,7 +956,7 @@ group_list_thread:
 				if (index_point >= 0) {
 					int tagged = TRUE;
 					n = (int) base[index_point];
-					if (active[my_group[cur_groupnum]].attribute->thread_arts) {
+					if (CURR_GROUP.attribute->thread_arts) {
 						int i;
 						/*
 						 * Unlike 'line_is_tagged()', this loop looks for any
@@ -1011,12 +1011,20 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupToggleThreading:	/* unthread/thread articles */
+			/*
+			 * If we have ref threading, cycle through the threading
+			 * types, otherwise act as a straight toggle
+			 */
+			case iKeyGroupToggleThreading:
  				if (index_point >= 0) {
-					active[my_group[cur_groupnum]].attribute->thread_arts = 
-						!active[my_group[cur_groupnum]].attribute->thread_arts;
-					make_threads (&active[my_group[cur_groupnum]], TRUE);
-					find_base (&active[my_group[cur_groupnum]]);
+					CURR_GROUP.attribute->thread_arts = 
+#ifdef REF_THREADING
+						++CURR_GROUP.attribute->thread_arts % (THREAD_REFS + 1);
+#else
+						!CURR_GROUP.attribute->thread_arts;
+#endif
+					make_threads (&CURR_GROUP, TRUE);
+					find_base (&CURR_GROUP);
 					show_group_page ();
 				}
 				break;
@@ -1047,8 +1055,7 @@ group_list_thread:
 			case iKeyGroupRepost:	/* repost current article */
 				if (index_point >= 0) {
 					feed_articles (FEED_REPOST, GROUP_LEVEL, 
-						&active[my_group[cur_groupnum]], 
-						(int) base[index_point]);
+						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
 
@@ -1057,8 +1064,8 @@ group_list_thread:
  					info_message (txt_no_arts);
 					break;
 				}
-				art_mark_will_return (&active[my_group[cur_groupnum]], &arts[base[index_point]]);
-				/* art_mark_unread (&active[my_group[cur_groupnum]], &arts[base[index_point]]); */
+ 				art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
+ 				/* art_mark_unread (&CURR_GROUP, &arts[base[index_point]]); */
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
@@ -1071,7 +1078,7 @@ group_list_thread:
  					info_message (txt_no_arts);
 					break;
 				}
-				thd_mark_unread (&active[my_group[cur_groupnum]], base[index_point]);
+				thd_mark_unread (&CURR_GROUP, base[index_point]);
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
@@ -1185,12 +1192,12 @@ do_auto_select_arts:
 				for (i=0; i < top; ++i) {
 					if (arts[i].status == ART_UNREAD && arts[i].selected != 1) {
 						debug_print_comment ("group.c: X command");
-						art_mark_read (&active[my_group[cur_groupnum]], &arts[i]);
+						art_mark_read (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = TRUE;
 					}
 				}
-				if (active[my_group[cur_groupnum]].attribute->show_only_unread) {
-					find_base (&active[my_group[cur_groupnum]]);
+				if (CURR_GROUP.attribute->show_only_unread) {
+					find_base (&CURR_GROUP);
 				}
 				xflag = TRUE;
 				index_point = 0;
@@ -1198,7 +1205,7 @@ do_auto_select_arts:
 				break;
 
 			case iKeyGroupDoAutoSel:	/* perform auto-selection on group */
-				if (auto_select_articles (&active[my_group[cur_groupnum]])) {
+				if (auto_select_articles (&CURR_GROUP)) {
 					update_group_page ();
 				}
 /*				break; */
@@ -1206,12 +1213,12 @@ undo_auto_select_arts:
 				for (i=0; i<top; ++i) {
 					if (arts[i].status == ART_READ && arts[i].zombie) {
 						debug_print_comment ("group.c: + command");
-						art_mark_unread (&active[my_group[cur_groupnum]], &arts[i]);
+						art_mark_unread (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = FALSE;
 					}
 				}
-				if (active[my_group[cur_groupnum]].attribute->show_only_unread) {
-					find_base (&active[my_group[cur_groupnum]]);
+				if (CURR_GROUP.attribute->show_only_unread) {
+					find_base (&CURR_GROUP);
 				}
 				xflag = FALSE;
 				index_point = 0;	/* do we want this ? */
@@ -1229,15 +1236,13 @@ undo_auto_select_arts:
 
 group_done:
 	set_xclick_off ();
-/*
 	if (index_point == GRP_QUIT) {
 		write_config_file (local_config_file);
 		tin_done (EXIT_OK);
 	}	
-*/
 	clear_note_area ();
 
-	vGrpDelMailArts (&active[my_group[cur_groupnum]]);
+	vGrpDelMailArts (&CURR_GROUP);
 
 #endif /* INDEX_DAEMON */
 }
@@ -1383,7 +1388,7 @@ prompt_subject_num (ch, group)
 
 	clear_message ();
 
-	if ((num = prompt_num (ch, txt_read_art)) == -1) {
+	if ((num = prompt_num (ch, txt_select_thread)) == -1) {
 		clear_message ();
 		return FALSE;
 	}
@@ -1521,7 +1526,7 @@ toggle_subject_from ()
 {
 /*
 	int i;
-	
+
 	i = my_group[cur_groupnum];
 
 	if (active[i].attribute->show_author != SHOW_FROM_NONE) {
@@ -1531,17 +1536,16 @@ toggle_subject_from ()
 			show_author = active[i].attribute->show_author;
 		}
 	} else {
-*/
+ */
 		if (++show_author > SHOW_FROM_BOTH) {
 			show_author = SHOW_FROM_NONE;
 		}
-/*		
+/*
 		 else {
 			show_author++;
 		}
 	}
-*/
-
+ */
 	set_subj_from_size (cCOLS);
 }
 
@@ -1577,7 +1581,7 @@ bld_sline (i)
 	/*
 	 * n is number of articles in this thread
 	 */
-	if (active[my_group[cur_groupnum]].attribute->show_only_unread)
+	if (CURR_GROUP.attribute->show_only_unread)
 		n = sbuf.unread + sbuf.seen;
 	else
 		n = sbuf.total;
@@ -1731,9 +1735,10 @@ show_group_title (clear_title)
 		}
 	}
 
-	if (active[num].attribute->thread_arts && default_thread_arts) {
-		sprintf (buf, "%s (%dT %dA %dK %dH%s%s)", 
+	if (active[num].attribute->thread_arts) {
+		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%s)", 
 			active[num].name, top_base, 
+			(active[num].attribute->thread_arts == THREAD_SUBJ) ? 'S' : 'R',
 			art_cnt, num_of_killed_arts, num_of_selected_arts,
 			(active[num].attribute->show_only_unread ? " R" : ""),
 			(active[num].moderated == 'm' ? " M" : ""));
