@@ -708,7 +708,7 @@ read_cmd_line_groups ()
 	int num;
 	register int i;
 
-	if  (num_cmdargs < max_cmdargs) {
+	if (num_cmdargs < max_cmdargs) {
 		group_top = 0;
 
 		for (num = num_cmdargs ; num < max_cmdargs ; num++) {
@@ -728,4 +728,3 @@ read_cmd_line_groups ()
 
 	return matched;
 }
-

@@ -768,7 +768,7 @@ iReadNovFile (group, min, max, expired)
 		return top;
 	}
 
-	while ((buf = regrettably_named_safe_fgets (fp)) != (char *) 0) {
+	while ((buf = safe_fgets (fp)) != (char *) 0) {
 		debug_nntp ("iReadNovFile", buf);
 		if (STRCMPEQ(buf, ".")) {
 			free (buf);
@@ -1604,14 +1604,14 @@ valid_artnum (art)
 }
 
 /*
- * regrettably_named_safe_fgets
+ * safe_fgets
  *
  * Return the next line from a file, regardless of how long it is.
  * Thanks to <emcmanus@gr.osf.org> for hugs, support and bug fixes.
  */
 
 char *
-regrettably_named_safe_fgets (f)
+safe_fgets (f)
 	FILE *f;
 {
 	char *buf   = NULL;

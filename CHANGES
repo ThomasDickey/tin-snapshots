@@ -1,3 +1,16 @@
+--unoff BETA release 960916 --
+
+170) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. removed some unused variables
+          [what is with the CASE_PROBLEM stuff (VMS only)?
+           someone removed it from help.c but left it lang.c/extern.h...]
+     FIX. lang.c, extern.h
+
+169) Hannu Laurila <Hannu.Laurila@japo.fi>
+     ADD. if no subscriptions could be found, don't subscribe to all
+          newsgroups - just add them to .newsrc
+     FIX. newsrc.c
+
 --unoff BETA release 960914 --
 
 168) Jarkko Isokungas <jti@iki.fi>
