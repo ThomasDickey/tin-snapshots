@@ -100,7 +100,7 @@ build_base64_rank_table ()
 
 static unsigned
 hex2bin (x)
-	char x;
+	int x;
 {
 	if (x >= '0' && x <= '9')
 		return (x - '0');
@@ -114,8 +114,8 @@ hex2bin (x)
 int
 mmdecode (what, encoding, delimiter, where, charset)
 	char *what;
-	char encoding;
-	char delimiter;
+	int encoding;
+	int delimiter;
 	char *where;
 	char *charset;
 {

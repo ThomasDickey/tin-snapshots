@@ -79,6 +79,7 @@
  * Data types
  */
 #undef	size_t
+#undef	RETSIGTYPE
 
 /*
  * The following xxx_H definitions are set by the 'configure' script to

@@ -100,7 +100,7 @@ extern char *get_uaf_fullname();
 #endif
 
 #ifdef HAVE_LIBC_H
-#include <libc.h>
+#	include <libc.h>
 #endif
 
 #ifdef HAVE_UNISTD_H
@@ -187,9 +187,7 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_TERMIOS_H
-#	if !defined(apollo) || !defined(NL0)
-#		include <termios.h>
-#	endif
+#	include <termios.h>
 #endif
 
 #if SYSTEM_LOOKS_LIKE_SCO
@@ -225,11 +223,9 @@ extern char *get_uaf_fullname();
 #			undef	HZ /* looks like a bug in M_XENIX includefiles */
 #		endif
 #	endif
-#	if defined(NeXT)
-/* on NeXT curses.h and something included from libc.h both define TRUE/FALSE */
-#		undef TRUE
-#		undef FALSE
-#	endif
+/* it doesn't do any harm, and <curses.h> may have conflicting defs */
+#	undef TRUE
+#	undef FALSE
 #	include <curses.h>
 #endif
 
@@ -448,7 +444,7 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_PRINTER "/usr/bin/lpr"
 #		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_MAILBOX "/var/mail"
-#		define	DEFAULT_SUM		"cksum -o 1 <"
+#		define	DEFAULT_SUM		"/usr/bin/cksum -o 1 <"
 #										/* < above, otherwise get filename output too */
 #	else
 #		ifndef DEFAULT_EDITOR

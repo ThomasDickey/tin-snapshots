@@ -1372,13 +1372,11 @@ ignore_followup_to_poster:
 	/*
 	 * Append to References: line if its already there
 	 */
-	if (art_type != GROUP_TYPE_MAIL) {
-		if (note_h_references[0]) {
-			join_references (bigbuf, note_h_references, note_h_messageid);
-			msg_add_header ("References", bigbuf);
-		} else {
-			msg_add_header ("References", note_h_messageid);
-		}
+	if (note_h_references[0]) {
+		join_references (bigbuf, note_h_references, note_h_messageid);
+		msg_add_header ("References", bigbuf);
+	} else {
+		msg_add_header ("References", note_h_messageid);
 	}
 
 	if (psGrp && psGrp->attribute->organization != (char *) 0) {
@@ -1952,6 +1950,7 @@ mail_to_author (group, respnum, copy_text)
 	char nam[100];
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
+	char bigbuf[HEADER_LEN];
 	char mailreader_subject[PATH_LEN];      /* for calling external mailreader */
 	char initials[64];
 	char ch, ch_default = iKeyPostSend;
@@ -1995,6 +1994,17 @@ mail_to_author (group, respnum, copy_text)
 		strip_double_ngs(note_h_newsgroups);
 
 		msg_add_header ("Newsgroups", note_h_newsgroups);
+
+		/*
+		 * Append to References: line if its already there
+		 */
+		if (note_h_references[0]) {
+			join_references (bigbuf, note_h_references, note_h_messageid);
+			msg_add_header ("References", bigbuf);
+		} else {
+			msg_add_header ("References", note_h_messageid);
+		}
+
 		if (*default_organization) {
 			msg_add_header ("Organization", default_organization);
 		}
@@ -2426,6 +2436,8 @@ delete_article (group, art, respnum)
 
 /*
  * Repost an already existing article to another group (ie. local group)
+ *
+ * (the code should be cleaned up some day - too much #ifdes)
  */
 
 int
@@ -2435,22 +2447,20 @@ repost_article (group, art, respnum, supersede)
 	int respnum;
 	int supersede;
 {
-	char 	buf[HEADER_LEN];
-	char 	tmp[HEADER_LEN];
-	int	done		= FALSE;
-	char 	ch;
-	char 	ch_default	= iKeyPostPost;
-	FILE 	*fp;
-	int 	ret_code 	= POSTED_NONE;
- 	struct t_group 	*psGrp;
- 	char 	*ptr;
+	char	buf[HEADER_LEN];
+	char	tmp[HEADER_LEN];
+	int	done = FALSE;
+	char	ch;
+	char	ch_default = iKeyPostPost;
+	FILE	*fp;
+	int	ret_code = POSTED_NONE;
+ 	struct t_group *psGrp;
+ 	char	*ptr;
 	char	line[HEADER_LEN];
 	char	from_name[HEADER_LEN];
-#ifndef FORGERY
-	char host_name[PATH_LEN];
-	char user_name[128];
-	char full_name[128];
-#endif
+	char	host_name[PATH_LEN];
+	char	user_name[128];
+	char	full_name[128];
 
 	msg_init_headers ();
 
@@ -2546,6 +2556,13 @@ repost_article (group, art, respnum, supersede)
 			msg_add_header ("Distribution", note_h_distrib);
 #ifndef FORGERY
 		}
+#endif
+	} else { /* ! supersede */
+#ifdef FORGERY
+		get_host_name (host_name);
+      get_user_info (user_name, full_name);
+      get_from_name (user_name, host_name, full_name, from_name);
+      msg_add_header ("From", from_name);
 #endif
 	}
 

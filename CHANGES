@@ -1,3 +1,24 @@
+--unoff BETA release 961021 --
+
+203) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. References:-header (In-Reply-to:) to mail-reply
+     FIX. post.c
+
+202) Thomas E. Dickey <dickey@clark.net>
+     Nickolai Zeldovich <kolya@zepa.net>
+     ADD. apollo porting (still in progress)
+     ADD. core test for FreeBSD
+     FIX. several supplied patches
+
+201) Andrey A. Chernov <ache@nagual.ru>
+     ADD. full path to cksum
+     FIX. tin.h
+
+200) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. with --enable-forgery reposting of an article fails
+          ('x' 'a' 'r' <group> 'p' -> 441 missing From:)
+     FIX. post.c
+
 --unoff BETA release 961020 --
 
 199) David E. O'Brien <obrien@cs.ucdavis.edu>
