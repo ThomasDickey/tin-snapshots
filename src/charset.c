@@ -268,7 +268,7 @@ iIsArtTexEncoded (
 	 * TODO: This is a farce. Reread the whole art !!
 	 *       should be done as part of single pass when article is pulled down
 	 */
-	if ((fp = open_art_fp ((char *)group_path, art, 0)) == (FILE *) 0)
+	if ((fp = open_art_fp ((char *)group_path, art, 0, TRUE)) == (FILE *) 0)
 		return FALSE;
 
 	while (fgets (line, sizeof line, fp) != (char *) 0) {

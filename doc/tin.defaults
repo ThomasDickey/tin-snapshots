@@ -9,15 +9,14 @@
 # defaults at compile time, so usually editing this file is not
 # needed. An exception are distributed binaries which run on
 # different machines, here some configuration might be necessary.
-# 
+#
 
 ############# global options ####################################
 
-
 # domainname - this sets a global domain name used in From lines
-# 
+#
 # set your full domain name without a trailing dot
-# 
+#
 #domainname=domain.com
 
 # organization - defines the name of your organization
@@ -38,7 +37,7 @@
 # administration if you want to deal with your lusers problems on
 # your own.
 #
-#bugaddress=tin-bugs@tin.org 
+#bugaddress=tin-bugs@tin.org
 
 # inewsdir - defines the directory containing of the inews executable
 #
@@ -48,6 +47,15 @@
 # include it
 #
 #inewsdir=/usr/lib/news
+
+# mm_charset - the default charset to be used in MIME«s
+#              Content-Type header
+#
+# luser may change this setting in their tinrcs but it's a good
+# idea to set mm_charset here for providing a default
+# in most western countries ISO-8859-1 might be the best value
+#
+#mm_charset=iso-8859-1
 
 ############# reading from a local spool #########################
 #
@@ -96,7 +104,7 @@
 #
 #newsgroupsfile=/usr/lib/news/newsgroups
 
-# subscriptionsfile - the full pathname of your newssystem's 
+# subscriptionsfile - the full pathname of your newssystem's
 #                     subscriptions file
 #
 # usually the newsgroups file is newslibdir, so you only have

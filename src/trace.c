@@ -27,7 +27,7 @@ _tracef(const char *fmt, ...)
 	if (!fp)
 		abort();
 
-	va_start(ap,fmt);
+	va_start(ap, fmt);
 	if (fmt != 0) {
 		vfprintf(fp, fmt, ap);
 		fputc('\n', fp);

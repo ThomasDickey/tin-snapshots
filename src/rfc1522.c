@@ -3,7 +3,7 @@
  *  Module    : rfc1522.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 1996-08-15
+ *  Updated   : 1998-04-05
  *  Notes     : MIME header encoding/decoding stuff
  *  Copyright : (c) Copyright 1995-98 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
@@ -20,7 +20,8 @@
    NOT to be treated differently than other characters
    in unstructured headers like Subject, Keyword and Summary
    c.f. RFC 2047 */
-#define isbetween(c,s) (isspace((unsigned char)c) || ((s) && ((c) == '(' || (c) == ')')) || (c) == '"')
+
+#define isbetween(c, s) (isspace((unsigned char)c) || ((s) && ((c) == '(' || (c) == ')' || (c) == '"')))
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.
@@ -28,10 +29,15 @@
  */
 
 #ifndef MM_CHARSET
-#define MM_CHARSET "US-ASCII"
+#	define MM_CHARSET "US-ASCII"
 #endif
 
 #define NOT_RANKED 255
+
+#if 0
+/* inside a quoted word these 7bit chars need to be encoded too */
+#define RFC2047_ESPECIALS "[]<>.;@,=?_\"\\"
+#endif /* 0 */
 
 const char base64_alphabet[64] =
 {
@@ -47,7 +53,7 @@ static int quoteflag;
 /*
  * local prototypes
  */
-static int contains_nonprintables (char *w,t_bool isstruct_head);
+static int contains_nonprintables (char *w, t_bool isstruct_head);
 static int do_b_encode (char *w, char *b, int max_ewsize, t_bool isstruct_head);
 static int rfc1522_do_encode (char *what, char **where, t_bool break_long_line);
 static int sizeofnextword (char *w);
@@ -317,7 +323,7 @@ do_b_encode(
 		*(t++) = *(w++);
 	}
 
-/*  if ( len8 & (unsigned long) 1 && !isbetween(*w,isstruct_head)  )  */
+/* if (len8 & (unsigned long) 1 && !isbetween(*w,isstruct_head)) */
 	if (len8 != len8 / 2 * 2 && !isbetween(*w, isstruct_head) && (*w))
 		t--;
 
@@ -333,7 +339,7 @@ do_b_encode(
    instead of each fragment of it.
    This will ensure that  either Q or B encoding will be used in a single
    header(i.e. two encoding won't  be mixed in a single header line.
-   Mixing two encodings is not a violation of RFC 2047 but  may break
+   Mixing two encodings is not a violation of RFC 2047 but may break
    some news/mail clients.
  */
 
@@ -519,10 +525,11 @@ rfc1522_do_encode(
 				}
 				isbroken_within = FALSE;
 				while (*what && !isbetween(*what, isstruct_head)) {
-					if (is_EIGHT_BIT(what)
-						 || *what == '='
-						 || *what == '?'
-						 || *what == '_') {
+#if 0
+					if (is_EIGHT_BIT(what) || (strchr (RFC2047_ESPECIALS, *what))) {
+#else
+					if (is_EIGHT_BIT(what) || !isalnum(*what)) {
+#endif /* 0 */
 						sprintf(buf2, "=%2.2X", *EIGHT_BIT(what));
 						*t++ = buf2[0];
 						*t++ = buf2[1];

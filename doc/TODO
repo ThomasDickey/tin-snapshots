@@ -92,9 +92,6 @@ o  reposting of a thread does not work
 o  with --enable-forgery reposting of an thread reposts only the first
    article ('x' 't' 'r' <group> 'p')
 
-o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
-   try to remove the lock file if it is really created (cleanup_tmp_files())
-
 o  if no INEWSDIR is given INEWSDIR is set to NEWSLIBDIR which is not always
    true (Linux) ... search $NEWSLIBDIR, /usr/bin/,... in that case.
 
@@ -106,11 +103,12 @@ o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
    useless!
 
-o  Followup-To: line is not examined whether the mentioned group(s) are valid
-   on this server.
+o  Followup-To: line is not examined whether the mentioned group(s) are
+   valid on this server.
 
-o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
-   is examined whether it contains several groups...
+o  sort Followup-To:/Newsgroups: after stripping doubled newsgroups and
+   before checking if they are identical, if so, strip Followup-To: and
+   use unsorted but stripped Newsgroups:-line only
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
@@ -130,12 +128,14 @@ o  According to 026) in CHANGES, some of the config files can be
 o  full_page_scroll=OFF is not implemented in page.c (article viewer)
    and config.c (option 'M'enu)
 
-o  (Y)ank in after resync-time ends up in a double re-read of the active file
+o  'Y'ank in after resync-time ends up in a double re-read of the active file
 
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
 o  remove built in path of external commands (metamail, ispell, ...)
+   [for metamail $METAMAIL could be used to override systempath and
+    progname]
 
 o  when enabling the 'cc/bcc on every message that is sent', and
    then mailing a message to myself, tin will print the message
@@ -146,6 +146,12 @@ o  when enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
+o  use libuu (uudeview) for uudecoding
+   (http://www.informatik.uni-frankfurt.de/~fp/uudeview/)
+
+o  check if server supports 'LIST MOTD' (i.e. INN 2.0) and display it
+   on startup.
+
 o  fix check_upgrade() (config.c)
    - check if TINRC_VERSION machtes (allready done, but used string is 'wrong'
      as it's still talking about tin-unoff)
@@ -161,8 +167,10 @@ o  if using mailreader_i add In-Reply-To: header and rename Newsgroups:
 o  if using "-n" commandline switch you can't subscribe to newsgroups not
    present in your newsrc - a simple check against the server
    [i.e. GROUP $newsgroup] would help - and if the server understands
-    LIST newsgroups pattern we could also fetch the description without
-    loosing "-n" speed improvements]
+    LIST NEWSGROUPS pattern or XGTITLE pattern we could also fetch the
+    description without loosing "-n" speed improvements; if the server
+    understands LIST ACTIVE pattern we could also get group attribute
+    (modereated, etc.)]
 
 o  word highlighting shouldn't be enabled in signatures, as '*'
    and '_' characters may be used for ASCII art (e.g. '___').
@@ -171,7 +179,7 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 o  allow changing From: in mail-replys
 
 o  item_by_item_etiquette_warnings [compile-time?]
-   (i.e. enable x-posts without f'up waring, disable long-sig waring)
+   (i.e. enable x-posts without f'up waring, disable long-sig warning)
 
 o  Menu/tinrc/attributes entry for TeX2ISO_Conversion=ON/OFF
    [toggle via '"']
@@ -193,9 +201,8 @@ o  MIME-pgp support according to RFC2015
 
 o  add RFC1468/1922 support
 
-o  unique newsgroups after editing article
-
 o  add feature save selected/tagged files sequentially to the same file
+   (like it's currently done when prepending filename with '=')
 
 o  add feature Cc:
 
@@ -236,6 +243,10 @@ o  Additions to the pager:
 o  Add to the 'M'enu:
         DEFAULT_MAILER
 
+o  Add to the POST_INFO-level:
+        '?','/' search
+        'h' help-screen
+
 o  Add a commandline switch that prints out all values of cpp-symbols etc.
 
 o  Reorganize tinrc into related sections for easier editing
@@ -246,6 +257,12 @@ o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
    A key code to reset to the system defaults
    Maybe a file which could be used to force settings (eg inews & mailer)
    (tin.defaults [--with-defaults-dir] is a start)
+
+o  - remove global filter file (TIN_LIBDIR/filter) as you don't know which
+     pattermatchingstyle the user has defined
+   - think about removing global attributes files (TIN_LIBDIR/attributes)
+   - move global files (TIN_LIBDIR/tinrc, TIN_LIBDIR/attributes) to
+     TIN_DEFAULTS_DIR
 
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the
@@ -294,6 +311,11 @@ o  Bounce duplicate Message-ID's when the headers are read. This will
 
 Internal Changes
 ----------------
+o  use XGTITLE (if available) if -n cmd-line flag is present
+
+o  check where snprintf() would be usefull and if system has one
+   (mutt comes with one).
+
 o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
    add configure option for those
 
@@ -341,7 +363,11 @@ o  tin.defaults is not mentioned in manpage/INSTALL
 
 Not yet classified
 ------------------
+o  strip Xref:-header if saving news in batch mode (-S)
+
 o  tin in batchmode dumps core if getting a SIGINT, useful?
+
+o  'tin -N|-M address' dosn't work out of cron
 
 o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
    's' subscribes you to the curent group and does _not_ skip to the next
@@ -410,3 +436,6 @@ o  add command: mark all articles older than <date> as read
 
 o  fix kill/hot mechanism so that it is possible to match articles on
    arbitrary headers
+   i.e.: killing on References only would be nice
+
+o  don't strip "Re: " out of the subject before applying the filter on it

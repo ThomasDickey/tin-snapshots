@@ -400,7 +400,7 @@ void set_signal_handlers (void)
 			 * without job-control
 			 */
 			do_sigtstp = TRUE;
-			/* FALLTHRU */
+			/* FALLTHROUGH */
 #endif
 		default:
 			signal (code, signal_handler);

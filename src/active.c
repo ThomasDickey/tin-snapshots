@@ -3,7 +3,7 @@
  *  Module    : active.c
  *  Author    : I. Lea
  *  Created   : 1992-02-16
- *  Updated   : 1998-01-05
+ *  Updated   : 1998-05-02
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -23,27 +23,19 @@
  */
 #define ACTIVE_SEP		" \n"
 
+
+char acSaveActiveFile[PATH_LEN];
+char acSaveDir[PATH_LEN];
 t_bool force_reread_active_file = FALSE;
 static time_t active_timestamp;  /* time active file read (local) */
 
-/* FIXME: make local */
-char	acHomeDir[PATH_LEN];
-char	acSaveActiveFile[PATH_LEN];
-char	acSaveDir[PATH_LEN];
-int	iAllGrps;		/* Always FALSE */
-int	iRecursive;		/* Does nothing */
-int	iVerbose;		/* Test only ? Always FALSE */
-#ifndef M_AMIGA
-	struct	passwd *psPwd;
-	struct	passwd sPwd;
-#endif
 
 /*
  * Local prototypes
  */
 static void set_active_timestamp (void);
 static int find_newnews_index (char *cur_newnews_host);
-static int parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
+static t_bool parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
@@ -56,7 +48,6 @@ static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
  *  Get default array size for active[] from environment (AmigaDOS)
  *  or just return the standard default.
  */
-
 int
 get_active_num (void)
 {
@@ -69,6 +60,7 @@ get_active_num (void)
 #endif
 	return DEFAULT_ACTIVE_NUM;
 }
+
 
 static void
 set_active_timestamp (void)
@@ -111,7 +103,7 @@ resync_active_file (void)
 
 	command_line = read_cmd_line_groups ();
 
-	read_newsrc (newsrc, command_line ? FALSE : TRUE);
+	read_newsrc (newsrc, (command_line ? FALSE : TRUE));
 
 	if (command_line)		/* Can't show only unread groups with cmd line groups */
 		show_only_unread_groups = FALSE;
@@ -176,37 +168,39 @@ active_add(
 	}
 }
 
+
 /*
  * Decide how to handle a bogus groupname.
  * If we process them interactively, create an empty active[] for this
  * group and mark it bogus for display in the group selection page
  * Otherwise, bogus groups are dealt with when newsrc is written.
  */
-int
+t_bool
 process_bogus(
 	char *name) /* return value is always ignored */
 {
 	struct t_group *ptr;
 
 	if (strip_bogus != BOGUS_ASK)
-		return(0);
+		return FALSE;
 
 	if ((ptr = psGrpAdd(name)) == NULL)
-		return(0);
+		return FALSE;
 
-	active_add(ptr, 0L, 1L, 0L, "n");
-	ptr->bogus = TRUE;						/* Mark it bogus */
+	active_add (ptr, 0L, 1L, 0L, "n");
+	ptr->bogus = TRUE;		/* Mark it bogus */
 
 	if (my_group_add(name) < 0)
-		return(1);							/* Return code is ignored */
+		return TRUE;
 
-	return(0);								/* Nothing was printed yet */
+	return FALSE;		/* Nothing was printed yet */
 }
+
 
 /*
  * Parse line from news or mail active files
  */
-int
+t_bool
 parse_active_line (
 	char *line,
 	long *max,
@@ -216,7 +210,7 @@ parse_active_line (
 	char *p, *q, *r;
 
 	if (line[0] == '#' || line[0] == '\0')
-		return(FALSE);
+		return FALSE;
 
 	strtok(line, ACTIVE_SEP);		/* skip group name */
 	p = strtok((char *)0, ACTIVE_SEP);	/* group max count */
@@ -225,14 +219,14 @@ parse_active_line (
 
 	if (!p || !q || !r) {
 		error_message (txt_bad_active_file, line);
-		return(FALSE);
+		return FALSE;
 	}
 
 	*max = atol (p);
 	*min = atol (q);
 	strcpy(moderated, r);
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -242,7 +236,7 @@ parse_active_line (
  * Use vGrpGetArtInfo() to obtain min/max/count for the group
  * We can't know the 'moderator' status and always return 'y'
  */
-static int
+static t_bool
 parse_newsrc_active_line (
 	char *buf,
 	long *count,
@@ -255,23 +249,23 @@ parse_newsrc_active_line (
 	ptr = strpbrk (buf, ":!");
 
 	if (!ptr || *ptr != SUBSCRIBED)		/* Invalid line or unsubscribed */
-		return(FALSE);
+		return FALSE;
 
 	*ptr = '\0';					/* Now buf is the group name */
 
 	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min))
-		return(FALSE);
+		return FALSE;
 
 	strcpy (moderated, "y");
 
-	return(TRUE);
+	return TRUE;
 }
+
 
 /*
  * Load the active file into active[]
  * Check and preload any new newgroups into my_group[]
  */
-
 void
 read_news_active_file (void)
 {
@@ -279,10 +273,9 @@ read_news_active_file (void)
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	char *ptr;
-	struct stat newsrc_stat;
 	struct t_group *grpptr;
-	long processed = 0;
-	long count = -1L, min = 1, max = 0;
+	long processed = 0L;
+	long count = -1L, min = 1L, max = 0L;
 
 	/*
 	 * Ignore -n if no .newsrc can be found or .newsrc is empty
@@ -290,8 +283,7 @@ read_news_active_file (void)
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 	if (newsrc_active) {
-		fstat (fileno(fp), &newsrc_stat);
-		if (!newsrc_stat.st_size)
+		if (file_size(newsrc) <= 0)
 			newsrc_active = FALSE;
 	}
 
@@ -303,10 +295,14 @@ read_news_active_file (void)
 
 			if (cmd_line)
 				my_fputc ('\n', stderr);
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 			if (read_news_via_nntp)
+#endif
 				error_message (txt_cannot_open, news_active_file);
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 			else
 				error_message (txt_cannot_open_active_file, news_active_file, progname);
+#endif
 
 			tin_done (EXIT_ERROR);
 		}
@@ -358,8 +354,8 @@ read_news_active_file (void)
 	/*
 	 *  Exit if active file wasn't read correctly or is empty
 	 */
-	if (tin_errno || !num_active) {
-		error_message (txt_active_file_is_empty, news_active_file);
+	if (tin_errno || !num_active) { /* FIXME: move string to lang.c */
+		error_message (txt_active_file_is_empty, (read_news_via_nntp ? "servers active-file" : news_active_file));
 		tin_done (EXIT_ERROR);
 	}
 
@@ -371,6 +367,7 @@ read_news_active_file (void)
 	check_for_any_new_groups ();
 }
 
+
 /*
  * Check for any newly created newsgroups.
  *
@@ -380,7 +377,6 @@ read_news_active_file (void)
  * If reading news via NNTP issue a NEWGROUPS command.
  * Format:   (as active file) Groupname Maxart Minart moderated
  */
-
 static void
 check_for_any_new_groups (void)
 {
@@ -462,6 +458,7 @@ check_for_any_new_groups (void)
 	}
 }
 
+
 /*
  * Subscribe to a new news group:
  * Handle the AUTOSUBSCRIBE/AUTOUNSUBSCRIBE env vars
@@ -518,6 +515,7 @@ subscribe_new_group (
 	} else
 		active[my_group[idx]].newgroup = TRUE;
 }
+
 
 /*
  * See if group is a member of group_list, returning a boolean.
@@ -577,6 +575,7 @@ match_group_list (
 	return (accept);
 }
 
+
 /*
  * Add or update an entry to the in-memory newnews[] array (The times newgroups
  * were last checked for a particular news server)
@@ -631,6 +630,7 @@ load_newnews_info (
 #endif
 }
 
+
 /*
  * Return the index of cur_newnews_host in newnews[] or -1 if not found
  */
@@ -647,6 +647,7 @@ find_newnews_index (
 
 	return -1;
 }
+
 
 /*
  * Get a single status char from the moderated field. Used on selection screen
@@ -680,8 +681,6 @@ create_save_active_file (void)
 
 	vInitVariables ();
 
-	iRecursive = TRUE;	/* FIXME: vInitVariables() just set this to FALSE */
-
 	vPrintActiveHead (acSaveActiveFile);
 	strcpy (acGrpPath, acSaveDir);
 	vMakeGrpList (acSaveActiveFile, acSaveDir, acGrpPath);
@@ -695,6 +694,11 @@ vInitVariables (void)
 	char	acTempActiveFile[PATH_LEN];
 	char	acMailActiveFile[PATH_LEN];
 	char	acMailDir[PATH_LEN];
+	char	acHomeDir[PATH_LEN];
+#ifndef M_AMIGA
+	struct passwd *psPwd;
+	struct passwd sPwd;
+#endif
 
 #ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
@@ -708,7 +712,7 @@ vInitVariables (void)
 		memcpy (&sPwd, psPwd, sizeof (struct passwd));
 		psPwd = &sPwd;
 	}
-#endif
+#endif /* M_AMIGA */
 
 	if ((pcPtr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		strcpy (acHomeDir, pcPtr);
@@ -722,7 +726,7 @@ vInitVariables (void)
 #else
 	} else
 		strcpy (acHomeDir, "T:");
-#endif
+#endif /* M_AMIGA */
 
 #ifdef WIN32
 #	define DOTTINDIR "tin"
@@ -734,9 +738,6 @@ vInitVariables (void)
 	sprintf (acSaveActiveFile, "%s/%s/%s", acHomeDir, DOTTINDIR, ACTIVE_SAVE_FILE);
 	sprintf (acMailDir, "%s/Mail", acHomeDir);
 	sprintf (acSaveDir, "%s/News", acHomeDir);
-	iAllGrps = FALSE;
-	iRecursive = FALSE;
-	iVerbose = FALSE;
 }
 
 
@@ -749,15 +750,12 @@ vMakeGrpList (
 	char	*pcPtr;
 	char	acFile[PATH_LEN];
 	char	acPath[PATH_LEN];
-	DIR		*tDirFile;
+	DIR	*tDirFile;
 	DIR_BUF	*tFile;
-	int		iIsDir;
+	int	iIsDir;
 	long	lArtMax;
 	long	lArtMin;
 	struct	stat sStatInfo;
-
-	if (iVerbose)
-		my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 
 	if (access (pcGrpPath, R_OK))
 		return;
@@ -771,8 +769,7 @@ vMakeGrpList (
 	if (tDirFile != (DIR *) 0) {
 		iIsDir = FALSE;
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-			strncpy (acFile, tFile->d_name, (size_t) D_NAMLEN(tFile));
-			acFile[D_NAMLEN(tFile)] = '\0';
+			STRCPY(acFile, tFile->d_name);
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
 
 #if 0
@@ -789,8 +786,6 @@ vMakeGrpList (
 			if (iIsDir) {
 				iIsDir = FALSE;
 				strcpy (pcGrpPath, acPath);
-				if (iVerbose)
-					my_printf ("Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 
 				vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath);
 				vFindArtMaxMin (pcGrpPath, &lArtMax, &lArtMin);
@@ -817,7 +812,7 @@ vAppendGrpLine (
 	char	acGrpName[PATH_LEN];
 	FILE	*hFp;
 
-	if (!iAllGrps && (lArtMax == 0 && lArtMin == 1))
+	if (lArtMax == 0 && lArtMin == 1)
 		return;
 
 	if ((hFp = fopen (pcActiveFile, "a+")) != (FILE *) 0) {
@@ -827,6 +822,7 @@ vAppendGrpLine (
 		fclose (hFp);
 	}
 }
+
 
 #ifdef INDEX_DAEMON
 void
@@ -839,6 +835,7 @@ vMakeActiveMyGroup (void)
 	for (iNum = 0; iNum < num_active; iNum++)
 		my_group[group_top++] = iNum;
 }
+
 
 /*
  *  Load the last updated time for each group in the active file so that
@@ -892,6 +889,7 @@ if (debug == 2)
 	}
 	fclose (fp);
 }
+
 
 /*
  *  Save the last updated time for each group to ~/.tin/group.times

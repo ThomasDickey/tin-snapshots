@@ -2,8 +2,8 @@
 .\" Project   : tin - a Usenet newsreader
 .\" Module    : tin.1
 .\" Author    : I. Lea, U. Janssen
-.\" Created   : 23.08.1991
-.\" Updated   : 08.01.1998
+.\" Created   : 1991-08-23
+.\" Updated   : 1998-04-09
 .\" Notes     : still needs some work
 .\"
 .\"
@@ -19,7 +19,7 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-rzCR \|]\|]
+.RB [\| \-rzCRX \|]\|]
 .RB [\| \-cuvSUZ \|]
 .RB [\| \-N \||\| -M
 .IR address \|]
@@ -44,7 +44,7 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-zCR \|]\|]
+.RB [\| \-zCRX \|]\|]
 .RB [\| \-cvSZ \|]
 .RB [\| \-N \||\| -M
 .IR address \|]
@@ -116,7 +116,7 @@ Don't load newsgroup descriptions (interactive mode).
 .sp
 Delete index files for each group before indexing article (\fBtind\fR index
 daemon only).
-.TP       
+.TP
 .BI -D " debug-level"
 Enter debug-level (1 = NNTP, 2 = all).
 .TP
@@ -210,6 +210,9 @@ Print version and date information.
 .TP
 .B -w
 Quick mode to post an article and then exit.
+.TP
+.B -X
+Don't save any files (i.e. \fI$HOME/.newsrc\fP) if quitting \fBtin\fR.
 .TP
 .B -z
 Only start \fBtin\fR if there is any new/unread news. If there is news
@@ -328,7 +331,7 @@ command-line switch!).
 If a thread has unread articles in it it's marked with a `+' in font of the
 total number of articles in the thread.
 If a thread has hot articles in it (see also section FILTERING ARTICLES)
-it's marked with a `*' in font of the  total number of articles in the thread.
+it's marked with a `*' in font of the total number of articles in the thread.
 There might also be shown the number of lines of the first (unread) article
 in the thread right before the subject - this is controlled by
 the 'show_lines' option.
@@ -522,7 +525,7 @@ Unsubscribe to groups matching user specified pattern.
 Print \fBtin\fR version information.
 .TP
 .B w
-Post an article to current group. If posting fails for some reason, you'll  
+Post an article to current group. If posting fails for some reason, you'll
 get the chance to edit (`e')the article again, postpone (`o') it for later
 processing (see also ``\fB-o\fR''command-line switch) or discard (`q') it.
 .TP
@@ -823,7 +826,7 @@ Choose first article in thread.
 .B $
 Choose last article in thread.
 .TP
-\fB/\fR                       
+\fB/\fR
 Choose article by subject string forward search
 .TP
 .B ?
@@ -878,7 +881,7 @@ Save tagged articles automatically without user prompts
 .B t
 Toggle tag status of current article for mailing (`m') / piping (`|')
 / printing (`o') / saving (`s') / reposting (`x').
-.TP    
+.TP
 .B U
 Untag all tagged threads
 .TP
@@ -1175,7 +1178,7 @@ After that, the users own configuration file is read from
 system-wide defaults to new users who have no private tinrc yet.
 .TP
 The following variables are user configurable by editing \fI$HOME/.tin/tinrc\fP
-directly. Most of them can be set in the GLOBAL OPTIONS MENU which is could 
+directly. Most of them can be set in the GLOBAL OPTIONS MENU which is could
 be accessed by pressing `M' at all levels. It allows the user to customize the
 behavior of \fBtin\fR. The options are saved to the file \fI$HOME/.tin/tinrc\fP.
 Use <SPACE> to toggle the required option and <CR> to set. Use `/', `?' to search
@@ -1240,9 +1243,10 @@ If set ON articles/threads will be saved in batch mode when save
 ``\fB-S\fR'' or mail ``\fB-M\fR'' is specified on the command line.
 Default is OFF.
 .TP
-.B Show mini menu at each level (beginner_level)
+.B Show mini menu & posting etiquette (beginner_level)
 If set ON a mini menu of the most useful commands will be displayed at the
-bottom of the screen for each level. Default is ON.
+bottom of the screen for each level. Also a short posting etiquette will be
+displayed after composing an article. Default is ON.
 .TP
 .B Cache NNTP overview files locally (cache_overview_files)
 If ON, create local copies of NNTP overview files. This can be used to
@@ -1335,7 +1339,7 @@ ON = filter case sensitive, OFF = ignore case. Default is OFF.
 .TP
 .B default_filter_kill_expire
 Defaults for quick (1 key) kill filter expire.
-ON = limit to 'default_filter_days',  OFF = don't ever expire. Default is OFF.
+ON = limit to 'default_filter_days', OFF = don't ever expire. Default is OFF.
 .TP
 .B default_filter_kill_global
 Defaults for quick (1 key) kill filter global.
@@ -1384,7 +1388,7 @@ used for mailing articles to other people.
 Default is '%M "%T" < %F' (i.e., /bin/mail "iain" < .article). The flexible
 format allows other mailers with different command line parameters to be used
 such as 'elm -s "%S" "%T" < "%F"' (i.e., elm -s "subject" "iain" < .article)
-or 'sendmail  -oem -t  < %F' (i.e. sendmail -oem -t < .article).
+or 'sendmail -oem -t < %F' (i.e. sendmail -oem -t < .article).
 .TP
 .B default_move_group
 .TP
@@ -1473,23 +1477,23 @@ last failed posting in \fI$HOME/dead.article\fP. Default is ON.
 If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
 .TP
 .B Use 8bit characters in mail headers (mail_8bit_header)
-Allows 8bit characters unencoded in the header of mail message.
-Default is OFF. Turning it ON is effective only if \fBmail_mime_encoding\fR is
-also set to 8bit. Leaving it OFF is safe for most users and compliant
-to Internet Mail Standard(STD 11/RFC 822 and RFC 2047).
+Allows 8bit characters unencoded in the header of mail message. Default is
+OFF. Turning it ON is effective only if \fBmail_mime_encoding\fR is also set
+to 8bit. Leaving it OFF is safe for most users and compliant to Internet
+Mail Standard (STD 11/RFC 822 and RFC 2047).
 .TP
 .B Mail address (mail_address)
 User's mail address, if not username@host.
 .TP
 .B MIME encoding in mail messages (mail_mime_encoding)
-MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable, 7bit)
-Default is 8bit and no encoding(or charset conversion) is performed
-(i.e., local charset is used as it is). 
-If set to 7bit, CJK text in 8bit encoding(EUC-CN,EUC-TW,
-EUC-JP,EUC-KR,Big5,Shift_JIS) is supposed to be converted into 
-ISO-2022-KR/JP/CN. Only EUC-KR to ISO-2022-KR conversion
-has been implemented, however.  Accordingly, setting it to 7bit has 
-no effect on MIME charsets/encodings other than EUC-KR(Korean).  
+MIME encoding of the body in mail message, if necessary (8bit, base64,
+quoted-printable, 7bit) Default is 8bit and no encoding (or charset
+conversion) is performed (i.e., local charset is used as it is). If set to
+7bit, CJK text in 8bit encoding (EUC-CN, EUC-TW, EUC-JP, EUC-KR, Big5,
+Shift_JIS) is supposed to be converted into ISO-2022-KR/JP/CN. Only EUC-KR
+to ISO-2022-KR conversion has been implemented, however. Accordingly,
+setting it to 7bit has no effect on MIME charsets/encodings other than
+EUC-KR (Korean).
 .TP
 .B Quote line when mailing (mail_quote_format)
 Default is "In article %M you wrote:"
@@ -1500,11 +1504,11 @@ If ON mark articles that are saved as read. Default is ON.
 .B MM_CHARSET (mm_charset)
 Charset supported locally, which is also used for MIME header (charset
 parameter and charset name in header encoding)
-in mail and news posting unless local charset/encoding needs to be 
+in mail and news posting unless local charset/encoding needs to be
 converted into other charset/encoding as in case of EUC-KR which
 is converted to ISO-2022-KR if \fBmail_mime_encoding\fR is set to 7bit.
 Possible values include ISO-8859-X (where X is 1 to 10), EUC-JP, EUC-CN,
-EUC-KR, EUC-TW,Big5, Shift_JIS, and so forth.
+EUC-KR, EUC-TW, Big5, Shift_JIS, and so forth.
 If \fBMIME_STRICT_CHARSET\fR is defined at the compile time, text in
 charset other than the value of this parameter is considered
 not displayable and represented as '?'. Otherwise, all character
@@ -1517,7 +1521,7 @@ These are internal timers used by tin to keep track of new newsgroups. Do not
 change them unless you understand what they are for.
 .TP
 .B Display these header fields (or *) (news_headers_to_display)
-Which news headers you wish to see. If you want to see _all_ the headers, 
+Which news headers you wish to see. If you want to see _all_ the headers,
 place an '*' as this value. This is the only way a wildcard can be used.
 If you enter 'X-' as the value, you will see all headers beginning
 with 'X-' (like X-Alan or X-Pape). You can list more than one by delimiting with
@@ -1549,19 +1553,19 @@ Default is ON.
 Allows 8bit characters unencoded in the header of news article.
 Default is OFF. Only enacted if \fBpost_mime_encoding\fR is also set to 8bit.
 In a number of local hiearchies where 8bit characters are used,
-using unencoded(raw) 8bit characters in header is acceptable and sometimes
+using unencoded (raw) 8bit characters in header is acceptable and sometimes
 even recommended so that you need to check the convention adopted in
 the local hierarchy of your interest to determine what to do with this and
 \fBpost_mime_encoding\fR.
 .TP
 .B MIME encoding in news messages (post_mime_encoding)
-MIME encoding of the body in news message, if necessary. (8bit, base64, quoted-printable, 7bit)
-Default is 8bit, which leads to no encoding (or charset conversion, i.e.,
-local charset is posted as it is). If set to 7bit, Chinese and Japanese
-text(in 8bit encodings such as EUC-CN,EUC-TW,EUC-JP,Shift_JIS,Big5) 
-is supposed to be  converted into ISO-2022-CN/JP, but it's NOT 
-yet implemented. Therefore,  currently  7bit has NO effect(i.e. equivalent to
-8bit) whatever MIME charset/encoding is chosen.
+MIME encoding of the body in news message, if necessary. (8bit, base64,
+quoted-printable, 7bit) Default is 8bit, which leads to no encoding (or
+charset conversion, i.e., local charset is posted as it is). If set to 7bit,
+Chinese and Japanese text (in 8bit encodings such as EUC-CN, EUC-TW, EUC-JP,
+Shift_JIS, Big5) is supposed to be converted into ISO-2022-CN/JP, but it's
+NOT yet implemented. Therefore, currently 7bit has NO effect (i.e.
+equivalent to 8bit) whatever MIME charset/encoding is chosen.
 .TP
 .B post_process_command
 Full pathname of a command to be run after successfully uudecoding an
@@ -1703,8 +1707,8 @@ If OFF don't show signatures when displaying articles.
 If ON, the real name in the ``X-Comment-To:'' header is displayed in the
 upper-right corner. Default is OFF.
 .TP
-.B Prepend signature with "-- " (sigdashes)
-If ON prepend the signature with dashes '\n-- \n'. Default is ON.
+.B Prepend signature with '\en-- \en' (sigdashes)
+If ON prepend the signature with sigdashes. Default is ON.
 .TP
 .B Add signature when reposting (signature_repost)
 If ON add signature to reposted articles.
@@ -1716,15 +1720,20 @@ types are allowed:
 .ti -\w'\(em'u
 \(emdon't sort articles (none=0).
 .ti -\w'\(em'u
-\(emsort articles by `Subject:'' field (descending=1 & ascending=2).
+\(emsort articles by ``Subject:'' field (descending=1 & ascending=2).
 .ti -\w'\(em'u
-\(emsort articles by `From:'' field (descending=3 & ascending=4).
+\(emsort articles by ``From:'' field (descending=3 & ascending=4).
 .ti -\w'\(em'u
-\(emsort articles by `Date:'' field (descending=5 & ascending=6).
+\(emsort articles by ``Date:'' field (descending=5 & ascending=6).
 .ti -\w'\(em'u
 \(emsort articles by filtering score (descending=7 & ascending=8).
 .in -.5i
 Sort by ascending Date (6) is the default.
+.TP
+.B Spamtrap warning address parts (spamtrap_warning_addresses)
+Set this option to a list of comma-separated strings to be warned if you are
+replying to an article by mail where the e-mail address contains one of
+these strings. The matching is case-insensitive.
 .TP
 .B Space goes to next unread article (space_goto_next_unread)
 If ON the SPACE command will goto next unread article at article viewer
@@ -2027,7 +2036,7 @@ In <abcINN123@ecrc.de>, Iain Lea (iain@ecrc.de) wrote:
 The quoted text section of an article is marked by a preceding quote string
 at the beginning of each quoted line. The default quote string is set
 to '>_'. The default can be changed by setting the tinrc variable 'quote_chars'
-to ones own preference.  (note that '_' underline is used to represent a
+to ones own preference. (note that '_' underline is used to represent a
 space).
 .\"
 .\"
@@ -2499,7 +2508,7 @@ Global configuration file.
 .\"
 .\"
 .SH BUGS
-This manpage is not up to date and really should be improved.
+See the TODO-file which comes with the source.
 .\"
 .\"
 .SH HISTORY
@@ -2610,29 +2619,30 @@ Geoffrey Keating, Karsten Keil, Fritz Kleeman, Andreas Kies, Janne
 Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig
 Koenigsson, Martin Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel,
 Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre,
-Hannu Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas
-Leitner, Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis,
-Andreas Ley, David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff,
-Reinhard Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon,
-Giuseppe De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Soren
-Moller, Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike
-Muise, Udo Munk, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen,
-David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien
-Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven Paulus,
-Walter Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim Pierce,
-Bill Poitras, Scott W. Powers, Wolfgang Prediger, Thomas Quinot, Stefan
-Rapp, Ted Richards, Steve Robbins, Ollivier Robert, Branden Robinson, Jim
-Robinson, Stephen Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton
-Royston, Rich Salz, Gary Sanders, Nickolay Saukh, John Sauter, Christopher
-Sawtell, Holger Schif, Volker Schmidt, John Schmitz, Torsten Schneider,
-Stefan Scholl, Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart
-Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer, Jungshik Shin,
-Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman, Cliff Stanford,
-Steve Starck, Jason Steiner, Ralf Stephan, Helmrich Streitmatter, Michael
-Stenns, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek
-Terveer, Carsten Theis, Julian Thompson, David Tiller, Andry Timonin, Mark
-Tomlin, Michael Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason
-Wessel, Cary Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Billy Y.,
+Stanislav Latishko, Hannu Laurila, Vincent Lefevre, Alexander Lehmann, Marty
+Leisner, Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua Choon Leong,
+Chris Lewis, Andreas Ley, David-Michael Lincke, Otto Lind, Richard Lloyd,
+Florian Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp, David
+MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi
+Marukawa, Owen Medd, Philipp Mergenthaler, Soren Moller, Bruce Momjian,
+Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise, Udo Munk, Daniel
+Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael
+O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker,
+Tom Parry, Jim Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins,
+Colin Perkins, Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers,
+Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Ted Richards, Steve Robbins,
+Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman, Roland
+Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders,
+Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif, Volker
+Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz,
+Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug
+Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark
+Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
+Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
+Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
+Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
+Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
+Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
 Nickolai Zeldovich, Zbigniew Zych
 .\"
 .\"

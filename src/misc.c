@@ -30,10 +30,10 @@ static void write_input_history_file (void);
 	static int to_network (int c);
 #endif /* LOCAL_CHARSET */
 
-#ifdef M_UNIX
+
 /*
  * append_file instead of rename_file
- * minimum error trapping - only unix support
+ * minimum error trapping
  */
 void
 append_file (
@@ -55,7 +55,7 @@ append_file (
 	fclose (fp_old);
 	fclose (fp_new);
 }
-#endif  /* M_UNIX */
+
 
 void
 asfail (
@@ -66,24 +66,24 @@ asfail (
 	my_fprintf (stderr, "%s: assertion failure: %s (%d): %s\n", progname, file, line, cond);
 	my_fflush (stderr);
 
-	/*
-	 * create a core dump
-	 */
+/*
+ * create a core dump
+ */
 #ifdef HAVE_COREFILE
-#ifdef SIGABRT
-	sigdisp(SIGABRT, SIG_DFL);
-	kill (process_id, SIGABRT);
-#else
-#	ifdef SIGILL
-		sigdisp(SIGILL, SIG_DFL);
-		kill (process_id, SIGILL);
+#	ifdef SIGABRT
+		sigdisp(SIGABRT, SIG_DFL);
+		kill (process_id, SIGABRT);
 #	else
-#		ifdef SIGIOT
-			sigdisp(SIGIOT, SIG_DFL);
-			kill (process_id, SIGIOT);
-#		endif
-#	endif
-#endif
+#		ifdef SIGILL
+			sigdisp(SIGILL, SIG_DFL);
+			kill (process_id, SIGILL);
+#		else
+#			ifdef SIGIOT
+				sigdisp(SIGIOT, SIG_DFL);
+				kill (process_id, SIGIOT);
+#			endif	/* SIGIOT */
+#		endif	/* SIGILL */
+#	endif	/* SIGABRT */
 #endif	/* HAVE_COREFILE */
 
 	exit(1);
@@ -155,7 +155,7 @@ copy_body (
 		sprintf(prefixbuf, prefix, initl);
 	else {
 		/* strip tailing space from quote-char for quoting quoted lines */
-		strcpy(prefixbuf,prefix);
+		strcpy(prefixbuf, prefix);
 		if (prefixbuf[strlen(prefixbuf)-1] == ' ')
 			prefixbuf[strlen(prefixbuf)-1] = '\0';
 	}
@@ -373,7 +373,7 @@ tin_done (
 	/*
 	 * check if any groups were read & ask if they should marked read
 	 */
-	if (catchup_read_groups && !cmd_line) {
+	if (catchup_read_groups && !cmd_line && !no_write) {
 		for (i = 0 ; i < group_top ; i++) {
 			group = &active[my_group[i]];
 			if (group->read_during_session) {
@@ -397,24 +397,26 @@ tin_done (
 	 * Save the newsrc file. If it fails for some reason, give the user a
 	 * chance to try again
 	 */
-	forever {
-		if (vWriteNewsrc ()) {
-			info_message(txt_newsrc_saved);
-			break;
+	if (!no_write) {
+		forever {
+			if (vWriteNewsrc ()) {
+				info_message(txt_newsrc_saved);
+				break;
+			}
+
+			if (!prompt_yn (cLINES, txt_newsrc_again, TRUE))
+				break;
 		}
 
-		if (!prompt_yn (cLINES, txt_newsrc_again, TRUE))
-			break;
-	}
-
-	write_input_history_file ();
+		write_input_history_file ();
 #if 0 /* FIXME */
-	write_attributes_file (local_attributes_file);
+		write_attributes_file (local_attributes_file);
 #endif
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-	write_mail_active_file ();
+		write_mail_active_file ();
 #endif
+	}
 
 	/* Do this sometime after we save the newsrc in case this hangs up for any reason */
 	if (ret != EXIT_NNTP_ERROR)
@@ -466,7 +468,6 @@ tin_done (
 }
 
 
-
 /*
  * strip_double_ngs ()
  * Strip duplicate newsgroups from within a given list of comma
@@ -475,7 +476,6 @@ tin_done (
  * 14-Jun-'96 Sven Paulus <sven@oops.sub.de>
  *
  */
-
 void
 strip_double_ngs (
 	char *ngs_list)
@@ -640,7 +640,7 @@ rename_file (
 		new_filename = &new_filename_vms[0];
 	}
 
-	if (rename(old_filename,new_filename))
+	if (rename(old_filename, new_filename))
 		perror_message (txt_rename_error, old_filename, new_filename);
 }
 #endif /* VMS */
@@ -689,9 +689,13 @@ invoke_cmd (
 	set_signal_catcher (TRUE);
 	Raw (TRUE);
 	InitWin ();
-#if defined(SIGWINCH)
-	handle_resize(FALSE);
-#endif
+
+#if 1
+#	if defined(SIGWINCH)
+		handle_resize(FALSE);
+		/* seems to be troublesome on RedHat5.0 Linux2.0.33/glibc2.0.6/libncurses1.9.9 */
+#	endif
+#endif /* 1 */
 
 #ifdef VMS
 	return ret != 0;
@@ -837,7 +841,6 @@ base_name (
 /*
  *  Return TRUE if new mail has arrived
  */
-
 t_bool
 mail_check (void)
 {
@@ -903,25 +906,25 @@ mail_check (void)
  * Rewritten from scratch by Th. Quinot, 1997-01-03
  */
 
-# ifdef lint
+#ifdef lint
 static int once;
-# define ONCE while(once)
-# else
-# define ONCE while(0)
-# endif
+#	define ONCE while(once)
+#else
+#	define ONCE while(0)
+#endif
 
-# define APPEND_TO(dest, src) do { \
+#define APPEND_TO(dest, src) do { \
 	(void) sprintf ((dest), "%s", (src)); \
 	(dest)=strchr((dest), '\0'); \
 	} ONCE
-# define RTRIM(whatbuf, whatp) do { (whatp)--; \
+#define RTRIM(whatbuf, whatp) do { (whatp)--; \
 	while ((whatp) >= (whatbuf) && \
 	(*(whatp)==' ')) \
 	*((whatp)--) = '\0'; } ONCE
-# define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
+#define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
 	(whatp) && (*(whatp) == ' '); \
 	(whatp)++)
-# define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
+#define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
 	LTRIM ((whatbuf), (whatp)); \
 	} ONCE
 
@@ -1069,11 +1072,10 @@ FATAL:
 	strcpy(addrspec, "error@hell");
 	*comment = '\0';
 }
-# undef APPEND_TO
-# undef RTRIM
-# undef LTRIM
-# undef TRIM
-
+#undef APPEND_TO
+#undef RTRIM
+#undef LTRIM
+#undef TRIM
 
 
 /*
@@ -1085,7 +1087,6 @@ FATAL:
  *
  *  now also strips trailing (was: ...) (obw)
  */
-
 char *
 eat_re (
 	char *s,
@@ -1123,6 +1124,7 @@ eat_re (
 
 	return s;
 }
+
 
 /*
  * Clear tag status of all articles. If articles were untagged, return TRUE
@@ -1204,6 +1206,7 @@ get_author (
 	*(str + len) = '\0';				/* NULL terminate */
 }
 
+
 void
 toggle_inverse_video (void)
 {
@@ -1217,27 +1220,30 @@ toggle_inverse_video (void)
 	}
 }
 
+
 void
 show_inverse_video_status (void)
 {
 		info_message ((inverse_okay ? txt_inverse_on : txt_inverse_off));
 }
 
+
 #ifdef HAVE_COLOR
 t_bool
 toggle_color (void)
 {
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 	if (!has_colors()) {
 		use_color = 0;
 		info_message (txt_no_colorterm);
 		return FALSE;
 	} else
-#endif /* USE_CURSES */
+#	endif /* USE_CURSES */
 		use_color = !use_color;
 
 	return TRUE;
 }
+
 
 void
 show_color_status (void)
@@ -1247,20 +1253,17 @@ show_color_status (void)
 #endif /* HAVE_COLOR */
 
 
-/*
- * moved from art.c
- *
- */
+/* moved from art.c */
 #ifdef WIN32
-/* Don't want the overhead of windows.h */
-int kbhit(void);
+	/* Don't want the overhead of windows.h */
+	int kbhit(void);
 #endif
+
 
 /*
  * input_pending() waits for input during time given
  * by delay in msec. The original behaviour of input_pending()
  * (in art.c's threading code) is delay=0
- *
  */
 static int
 input_pending (int delay)
@@ -1306,10 +1309,11 @@ input_pending (int delay)
 #endif /* HAVE_SELECT */
 
 #if defined(HAVE_POLL) && !defined(HAVE_SELECT)
-	static int Timeout = delay;
+	static int Timeout;
 	static long nfds = 1;
 	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
 
+	Timeout = delay;
 	if (poll (fds, nfds, Timeout) < 0) /* Error on poll */
 		return FALSE;
 
@@ -1330,7 +1334,6 @@ input_pending (int delay)
 
 	return FALSE;
 }
-
 
 
 int
@@ -1406,7 +1409,7 @@ get_arrow_key (int prech)
 
 #	ifndef VMS
 #		ifdef M_AMIGA
-	if (WaitForChar(Input(),1000) == DOSTRUE)
+	if (WaitForChar(Input(), 1000) == DOSTRUE)
 		return prech;
 #		else	/* !M_AMIGA */
 	if (!input_pending(0)) {
@@ -1559,11 +1562,11 @@ get_arrow_key (int prech)
 #endif /* USE_CURSES */
 }
 
+
 /*
  * Check for lock file to stop multiple copies of tind or tin -U running
  * and if it does not exist create it so this is the only copy running
  */
-
 void
 create_index_lock_file (
 	char *the_lock_file)
@@ -1594,6 +1597,7 @@ create_index_lock_file (
 	}
 }
 
+
 /*
  * strfquote() - produce formatted quote string
  *   %A  Articles Email address
@@ -1605,7 +1609,6 @@ create_index_lock_file (
  *   %C  First Name of author
  *   %I  Initials of author
  */
-
 int
 strfquote (
 	char *group,
@@ -1640,6 +1643,9 @@ strfquote (
 					goto out;
 				case 'n':	/* linefeed */
 					strcpy (tbuf, "\n");
+					break;
+				case 't':	/* tab */
+					strcpy (tbuf, "\t");
 					break;
 				default:
 					tbuf[0] = '%';
@@ -1739,7 +1745,6 @@ out:
  *   %F  Filename
  *   %N  Linenumber
  */
-
 static int
 strfeditor (
 	char *editor,
@@ -1837,6 +1842,7 @@ out:
 		return 0;
 }
 
+
 /*
  * strfpath - produce formatted pathname expansion. Handles following forms:
  *   ~/News    -> /usr/iain/News
@@ -1846,7 +1852,6 @@ out:
  *   +file     -> /usr/iain/News/group.name/file
  *   ~/News/%G -> /usr/iain/News/group.name
  */
-
 int
 strfpath (
 	char *format,
@@ -2062,10 +2067,12 @@ strfpath (
 	}
 }
 
+
 enum quote_enum {
 	no_quote = 0,
 	dbl_quote,
 	sgl_quote };
+
 
 static char *
 escape_shell_meta (
@@ -2116,6 +2123,7 @@ escape_shell_meta (
 	return buf;
 }
 
+
 /*
  * strfmailer() - produce formatted mailer string
  *   %M  Mailer
@@ -2124,7 +2132,6 @@ escape_shell_meta (
  *   %S  Subject
  *   %U  User
  */
-
 int
 strfmailer (
 	char *the_mailer,
@@ -2195,13 +2202,13 @@ strfmailer (
 					strcpy (tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject,ismail), quote_area));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject, ismail), quote_area));
 					break;
 				case 'T':	/* To */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to,ismail), quote_area));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to, ismail), quote_area));
 					break;
 				case 'U':	/* User */
-					strcpy (tbuf, rfc1522_encode (userid,ismail));
+					strcpy (tbuf, rfc1522_encode (userid, ismail));
 					break;
 				default:
 					tbuf[0] = '%';
@@ -2227,7 +2234,6 @@ out:
 
 /*
  * get_initials() - get initial letters of a posters name
- *
  */
 int
 get_initials (
@@ -2304,22 +2310,25 @@ make_group_path (
 #endif
 }
 
+
 /*
  * Delete tmp index & local newsgroups file
  */
-
 void
 cleanup_tmp_files (void)
 {
 	char acFile[PATH_LEN];
 
-	if (read_news_via_nntp && xover_supported) {
+	if (read_news_via_nntp && xover_supported && !cache_overview_files) {
 		sprintf (acFile, "%s%d.idx", TMPDIR, process_id);
 		unlink (acFile);
 	}
+
 	if (! cache_overview_files)
 		unlink (local_newsgroups_file);
-	unlink (lock_file);
+
+	if (batch_mode || update_fork)
+		unlink (lock_file);
 }
 
 #if !defined(M_UNIX)
@@ -2333,23 +2342,28 @@ make_post_process_cmd (
 	char currentdir[PATH_LEN];
 
 	get_cwd (currentdir);
-	chdir (dir);
+	my_chdir (dir);
 #ifdef M_OS2
 	backslash (file);
 #endif
 	sh_format (buf, sizeof(buf), cmd, file);
 	invoke_cmd (buf);
-	chdir (currentdir);
+	my_chdir (currentdir);
 }
 #endif /*! M_UNIX */
 
-int
-stat_file (
+
+/*
+ * returns filesize in bytes
+ * -1 in case of an error (file not found, or !S_IFREG)
+ */
+long /* we use long here as off_t might be unsigned on some systems */
+file_size (
 	char *file)
 {
-	struct stat st;
+	struct stat statbuf;
 
-	return (stat (file, &st) == -1 ? FALSE : TRUE);
+	return (stat (file, &statbuf) == -1 ? -1L : (((statbuf.st_mode & S_IFMT) == S_IFREG) ? (long) statbuf.st_size : -1L));
 }
 
 
@@ -2361,10 +2375,10 @@ vPrintBugAddress (void)
 	my_fflush (stderr);
 }
 
+
 /*
  *  Copy file from pcSrcFile to pcDstFile
  */
-
 int
 iCopyFile (
 	char	*pcSrcFile,
@@ -2407,7 +2421,6 @@ iCopyFile (
 /*
  * take a peek at the next char in file
  */
-
 int
 peek_char (
 	FILE *fp)
@@ -2418,18 +2431,232 @@ peek_char (
 	return c;
 }
 
-#ifdef LOCAL_CHARSET
 
+char *
+random_organization(
+	char *in_org)
+{
+	static char selorg[512];
+	int nool = 0, sol;
+	FILE *orgfp;
+	time_t epoch;
+
+	*selorg = '\0';
+
+	if (*in_org != '/')
+		return in_org;
+
+	time (&epoch);
+	srand ((unsigned int) epoch);
+
+	if ((orgfp = fopen(in_org, "r")) == NULL)
+		return selorg;
+
+	/* count lines */
+	while (fgets(selorg, sizeof(selorg), orgfp))
+		nool++;
+
+	fseek(orgfp, 0L, SEEK_SET);
+	sol = rand () % nool + 1;
+	nool = 0;
+	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))
+		nool++;
+
+	fclose(orgfp);
+
+	return selorg;
+}
+
+
+void
+read_input_history_file (void) {
+	FILE *fp;
+	char buf[HEADER_LEN];
+	int his_w = 0, his_e = 0;
+	char *chr, *chr1;
+	int his_free = 0;
+
+	/* this is usually .tin/.inputhistory */
+	if ((fp = fopen(local_input_history_file, "r")) == NULL)
+		return;
+
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_input_history_file);
+
+	/* to be safe ;-) */
+	memset((void *) input_history, 0, sizeof(input_history));
+	memset((void *) hist_last, 0, sizeof(hist_last));
+	memset((void *) hist_pos, 0, sizeof(hist_pos));
+
+
+	while (fgets(buf, sizeof(buf), fp)) {
+
+		if ((chr = my_malloc(strlen(buf)+1)) != NULL) {
+			strcpy(chr, buf);
+			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
+				*chr1 = '\0';
+			if (*chr)
+				input_history[his_w][his_e] = chr;
+			else {
+				/* empty lines in tin_getline's history buf are stored as NULL pointers */
+				input_history[his_w][his_e] = NULL;
+
+				/* get the empty slot in the circular buf */
+				if (!his_free)
+					his_free = his_e;
+			}
+		}
+
+		his_e++;
+		/* check if next type is reached */
+		if (his_e >= HIST_SIZE) {
+			hist_last[his_w] = his_free;
+			hist_pos[his_w] = hist_last[his_w];
+			his_free = 0;
+			his_e = 0;
+			his_w++;
+		}
+		/* check if end is reached */
+		if (his_w > HIST_MAXNUM)
+			break;
+	}
+
+	fclose(fp);
+
+	if (cmd_line)
+		printf ("\r\n");
+
+}
+
+
+static void
+write_input_history_file(void) {
+	FILE *fp;
+	int his_w, his_e;
+	char *chr;
+
+	if ((fp = fopen(local_input_history_file, "w")) == NULL)
+		return;
+
+	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
+		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
+			/* write an empty line for empty slots */
+			if (input_history[his_w][his_e] == NULL)
+				fprintf(fp, "\n");
+			else {
+				if ((chr = strpbrk(input_history[his_w][his_e], "\n\r")) != NULL)
+					*chr = '\0';
+				fprintf(fp, "%s\n", input_history[his_w][his_e]);
+			}
+		}
+	}
+
+	fclose(fp);
+}
+
+
+/*
+ * quotes wildcards * ? \ [ ] with \
+ */
+char *
+quote_wild(
+	char *str)
+{
+	static char buff[2*LEN];	/* on the safe side */
+	char *target;
+
+	for (target = buff; *str != '\0'; str++) {
+		if (wildcard) { /* regex */
+			/*
+			 * quote meta characters ()[]{}\^$*+?.
+			 * replace whitespace with '\s' (pcre)
+			 */
+			if (*str == '(' || *str == ')' || *str == '[' || *str == ']' || *str == '{' || *str == '}'
+			    || *str == '\\' || *str == '^' || *str == '$'
+			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
+			    || *str == ' ' || *str == '\t') {
+				*target++ = '\\';
+				*target++ = ((*str == ' ' || *str == '\t')? 's' : *str);
+			} else
+				*target++ = *str;
+		} else {	/* wildmat */
+			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
+				*target++ = '\\';
+			*target++ = *str;
+		}
+	}
+	*target = '\0';
+	return (buff);
+}
+
+
+/*
+ * quotes whitespace in regexps for pcre
+ */
+char *
+quote_wild_whitespace(
+	char *str)
+{
+	static char buff[2*LEN];	/* on the safe side */
+	char *target;
+
+	for (target = buff; *str != '\0'; str++) {
+		if (wildcard) { /* regex */
+			/*
+			 * replace whitespace with '\s' (pcre)
+			 */
+			if (*str == ' ' || *str == '\t') {
+				*target++ = '\\';
+				*target++ = 's';
+			} else
+				*target++ = *str;
+		} else	/* wildmat */
+			*target++ = *str;
+	}
+	*target = '\0';
+	return (buff);
+}
+
+
+/*
+ * strip_address () removes the realname part from a given e-mail address
+ */
+void
+strip_address (
+	char *the_address,
+	char *stripped_address)
+{
+	char *start_pos;
+	char *end_pos;
+
+	/* skip realname in address */
+	if ((start_pos = strchr (the_address, '<')) == (char *) 0) {
+		/* address in user@domain (realname) syntax or realname is missing */
+		strcpy (stripped_address, the_address);
+		start_pos = stripped_address;
+		if ((end_pos = strchr (start_pos, ' ')) == (char *) 0)
+			end_pos = start_pos+strlen(start_pos);
+	} else {
+		start_pos++; /* skip '<' */
+		strcpy (stripped_address, start_pos);
+		start_pos=stripped_address;
+		if ((end_pos = strchr (start_pos, '>')) == (char *) 0)
+		end_pos = start_pos+strlen(start_pos); /* skip '>' */
+	}
+	*(end_pos) = '\0';
+}
+
+
+#ifdef LOCAL_CHARSET
 /*
  * convert between local and network charset (e.g. NeXT and latin1)
  */
 
+#	define CHARNUM 256
+#	define BAD (-1)
 
-#define CHARNUM 256
-#define BAD (-1)
-
-#include "l1_next.tab"
-#include "next_l1.tab"
+#	include "l1_next.tab"
+#	include "next_l1.tab"
 
 static int
 to_local (
@@ -2474,217 +2701,4 @@ buffer_to_network (
 	for(; *b; b++)
 		*b = to_network(*b);
 }
-
 #endif /* LOCAL_CHARSET */
-
-
-char *
-random_organization(
-	char *in_org)
-{
-	static char selorg[512];
-	int nool = 0, sol;
-	FILE *orgfp;
-	time_t epoch;
-
-	*selorg = '\0';
-
-	if (*in_org != '/')
-		return in_org;
-
-	time (&epoch);
-	srand ((unsigned int) epoch);
-
-	if ((orgfp = fopen(in_org, "r")) == NULL)
-		return selorg;
-
-	/* count lines */
-	while (fgets(selorg, sizeof(selorg), orgfp))
-		nool++;
-
-	fseek(orgfp, 0L, SEEK_SET);
-	sol = rand () % nool + 1;
-	nool = 0;
-	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))
-		nool++;
-
-	fclose(orgfp);
-
-	return selorg;
-}
-
-void
-read_input_history_file (void) {
-	FILE *fp;
-	char buf[HEADER_LEN];
-	int his_w = 0, his_e = 0;
-	char *chr, *chr1;
-	int his_free = 0;
-
-	/* this is usually .tin/.inputhistory */
-	if ((fp = fopen(local_input_history_file, "r")) == NULL)
-		return;
-
-	if (INTERACTIVE)
-		wait_message (0, txt_reading_input_history_file);
-
-	/* to be safe ;-) */
-	memset((void *) input_history, 0, sizeof(input_history));
-	memset((void *) hist_last, 0, sizeof(hist_last));
-	memset((void *) hist_pos, 0, sizeof(hist_pos));
-
-
-	while (fgets(buf, sizeof(buf), fp)) {
-
-		if ((chr = my_malloc(strlen(buf)+1)) != NULL) {
-			strcpy(chr, buf);
-			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
-				*chr1 = '\0';
-			if (*chr)
-				input_history[his_w][his_e] = chr;
-			else {
-				/* empty lines in getline's history buf are stored as NULL pointers */
-				input_history[his_w][his_e] = NULL;
-
-				/* get the empty slot in the circular buf */
-				if (!his_free)
-					his_free = his_e;
-			}
-		}
-
-		his_e++;
-		/* check if next type is reached */
-		if (his_e >= HIST_SIZE) {
-			hist_last[his_w] = his_free;
-			hist_pos[his_w] = hist_last[his_w];
-			his_free = 0;
-			his_e = 0;
-			his_w++;
-		}
-		/* check if end is reached */
-		if (his_w > HIST_MAXNUM)
-			break;
-	}
-
-	fclose(fp);
-
-	if (cmd_line)
-		printf ("\r\n");
-
-}
-
-static void
-write_input_history_file(void) {
-	FILE *fp;
-	int his_w, his_e;
-	char *chr;
-
-	if ((fp = fopen(local_input_history_file, "w")) == NULL)
-		return;
-
-	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
-		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
-			/* write an empty line for empty slots */
-			if (input_history[his_w][his_e] == NULL)
-				fprintf(fp, "\n");
-			else {
-				if ((chr = strpbrk(input_history[his_w][his_e], "\n\r")) != NULL)
-					*chr = '\0';
-				fprintf(fp, "%s\n", input_history[his_w][his_e]);
-			}
-		}
-	}
-
-	fclose(fp);
-}
-
-/*
- * quotes wildcards * ? \ [ ] with \
- */
-
-char *
-quote_wild(
-	char *str)
-{
-	static char buff[2*LEN];	/* on the safe side */
-	char *target;
-
-	for (target = buff; *str != '\0'; str++) {
-		if (wildcard) { /* regex */
-			/*
-			 * quote meta characters ()[]{}\^$*+?.
-			 * replace whitespace with '\s' (pcre)
-			 */
-			if (*str == '(' || *str == ')' || *str == '[' || *str == ']' || *str == '{' || *str == '}'
-			    || *str == '\\' || *str == '^' || *str == '$'
-			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
-			    || *str == ' ' || *str == '\t') {
-				*target++ = '\\';
-				*target++ = ((*str == ' ' || *str == '\t')? 's' : *str);
-			} else
-				*target++ = *str;
-		} else {	/* wildmat */
-			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
-				*target++ = '\\';
-			*target++ = *str;
-		}
-	}
-	*target = '\0';
-	return (buff);
-}
-
-/*
- * quotes whitespace in regexps for pcre
- */
-
-char *
-quote_wild_whitespace(
-	char *str)
-{
-	static char buff[2*LEN];	/* on the safe side */
-	char *target;
-
-	for (target = buff; *str != '\0'; str++) {
-		if (wildcard) { /* regex */
-			/*
-			 * replace whitespace with '\s' (pcre)
-			 */
-			if (*str == ' ' || *str == '\t' ) {
-				*target++ = '\\';
-				*target++ = 's';
-			} else
-				*target++ = *str;
-		} else	/* wildmat */
-			*target++ = *str;
-	}
-	*target = '\0';
-	return (buff);
-}
-
-/*
- * strip_address () removes the realname part from a given e-mail address
- */
-void
-strip_address (
-	char *the_address,
-	char *stripped_address)
-{
-	char *start_pos;
-	char *end_pos;
-
-	/* skip realname in address */
-	if ((start_pos = strchr (the_address, '<')) == (char *) 0) {
-		/* address in user@domain (realname) syntax or realname is missing */
-		strcpy (stripped_address, the_address);
-		start_pos = stripped_address;
-		if ((end_pos = strchr (start_pos, ' ')) == (char *) 0)
-			end_pos = start_pos+strlen(start_pos);
-	} else {
-		start_pos++; /* skip '<' */
-		strcpy (stripped_address, start_pos);
-		start_pos=stripped_address;
-		if ((end_pos = strchr (start_pos, '>')) == (char *) 0)
-		end_pos = start_pos+strlen(start_pos); /* skip '>' */
-	}
-	*(end_pos) = '\0';
-}

@@ -23,7 +23,7 @@ constext txt_added_groups[] = "Added %d group%s";
 constext txt_append_overwrite_quit[] = "File %s exists. a)ppend, o)verwrite, q)uit: ";
 constext txt_art_cancel[] = "Article cancelled (deleted).";
 constext txt_art_cannot_cancel[] = "Article cannot be cancelled (deleted).";
-constext txt_art_newsgroups[] = "Your article will be posted to the following newsgroup%s:\n";
+constext txt_art_newsgroups[] = "\nYour article:\n  \"%s\"\nwill be posted to the following newsgroup%s:\n";
 constext txt_art_not_posted[] = "Article not posted!";
 constext txt_art_not_saved[] = "Article not saved";
 constext txt_art_pager_com[] = "Article Level Commands (page %d of %d)";
@@ -37,12 +37,11 @@ constext txt_art_parent_killed[] = "Parent article has been killed";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
 constext txt_article_cancelled[] = "Article cancelled by author\n";
 constext txt_article_cannot_open[] = "get_article: can't open %s: ";
-constext txt_article_reposted1[] = "\n[ Article reposted from %s ]";
-constext txt_article_reposted2a[] = "\n[ Author was %s <%s> ]";
-constext txt_article_reposted2b[] = "\n[ Author was %s ]";
+constext txt_article_reposted[] = "This is a repost of the following article:";
 constext txt_auth_failed[] = "%d Authentication failed";
-constext txt_auth_pass_needed[] = "Server expects authentication. Please enter password: ";
-constext txt_auth_user_needed[] = "Server expects authentication. Please enter username: ";
+constext txt_auth_needed[] = "Server expects authentication.\n";
+constext txt_auth_pass[] = "    Please enter password: ";
+constext txt_auth_user[] = "    Please enter username: ";
 constext txt_author_search_backwards[] = "Author search backwards [%s]> ";
 constext txt_author_search_forwards[] = "Author search forwards [%s]> ";
 constext txt_authorization_ok[] = "Authorized for user: %s\n";
@@ -51,7 +50,7 @@ constext txt_autosubscribed[] = "\nAutosubscribed to %s";
 constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
 constext txt_autoselecting_articles[] = "Autoselecting articles (use 'X' to see all unread) ...";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
-constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";
+constext txt_bad_article[] = "Article to be posted resulted in errors/warnings. q)uit, M)enu, e)dit: ";
 constext txt_bad_command[] = "Bad command. Type 'h' for help.";
 constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
@@ -62,7 +61,9 @@ constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
 constext txt_cannot_get_term_entry[] = "%s: Can't get entry for TERM\n";
 constext txt_cannot_open[] = "Can't open %s";
-constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+	constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
+#endif /* NNTP_ABLE || NNTP_ONLY */
 constext txt_cannot_post[] = "*** Posting not allowed ***";
 constext txt_cannot_post_group[] = "Posting is not allowed to %s";
 constext txt_cannot_write_index[] = "Can't write index %s";
@@ -113,24 +114,36 @@ constext txt_end_of_thread[] = "*** End of thread ***";
 constext txt_enter_message_id[] = "Enter Message-ID to goto> ";
 constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
-constext txt_error_sender_in_header_not_allowed[] = "Error on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
-constext txt_error_header_and_body_not_separate[] = "Error: No blank line found after header.\n\n";
-constext txt_error_header_line_bad_charset[] = "Error: Bad charset for non-7bit encoding (must not be us-ascii)\n\n";
-constext txt_error_header_line_blank[] = "Error: Article starts with blank line instead of header\n\n";
-constext txt_error_header_line_colon[] = "Error: Header on line %d does not have a colon after the header name:\n%s\n\n";
-constext txt_superseding_art[] = "Superseding article...";
-constext txt_error_header_line_comma[] = "Error: the \"%s:\" line has spaces in it that MUST be removed. The\n\
-only allowable space is the one separating the colon (:) from the contents.\n\
-Use a comma (,) to separate multiple newsgroup names.\n\n";
-constext txt_error_header_line_empty_newsgroups[] = "Error: the \"Newsgroups:\" line lists no newsgroups.\n\n";
-constext txt_error_header_line_groups_contd[] =
-"Error: The \"%s:\" line is continued in the next line. Since the line\n\
-may not contain whitespace, this is not allowed. Please write all groups\n\
-into a single line.\n\n";
-constext txt_error_header_line_missing_newsgroups[] = "Error: the \"Newsgroups:\" line is missing from the articles header.\n\n";
-constext txt_error_header_line_missing_subject[] = "Error: the \"Subject:\" line is missing from the articles header.\n\n";
-constext txt_error_header_line_missing_target[] = "Error: the \"To:\" line is missing from the articles header.\n\n";
-constext txt_error_header_line_space[] = "Error: Header on line %d does not have a space after the colon:\n%s\n\n";
+constext txt_error_sender_in_header_not_allowed[] = "\nError on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
+constext txt_error_header_and_body_not_separate[] = "\nError: No blank line found after header.\n";
+constext txt_error_header_line_bad_charset[] = "\n\
+Error: Posting contains non-ASCII characters but MM_CHARSET is set to\n\
+       US-ASCII  - please change this setting to a suitable value for\n\
+       your language  using the  M)enu of configurable  options or by\n\
+       editing tinrc.\n";
+constext txt_error_header_line_bad_encoding[] = "\n\
+Error: Posting contains  non-ASCII characters  but the  MIME encoding\n\
+       for news  messages  is set  to \"7bit\"  -  please change this\n\
+       setting to \"8bit\" or \"quoted-printable\" depending  on what\n\
+       is more common  in your part  of the world.  This can  be done\n\
+       using the M)enu of configurable options or by editing tinrc.\n";
+constext txt_error_header_line_blank[] = "\nError: Article starts with blank line instead of header\n";
+constext txt_error_header_line_colon[] = "\nError: Header on line %d does not have a colon after the header name:\n%s\n";
+constext txt_error_header_line_comma[] = "\n\
+Error: the \"%s:\" line has spaces  in it that MUST be removed.\n\
+       The only allowable  space is the one  separating the colon (:)\n\
+       from  the  contents.  Use a  comma  (,)  to separate  multiple\n\
+       newsgroup names.\n";
+constext txt_error_header_line_empty_subject[] = "\nError: the \"Subject:\" line is empty.\n";
+constext txt_error_header_line_empty_newsgroups[] = "\nError: the \"Newsgroups:\" line lists no newsgroups.\n";
+constext txt_error_header_line_groups_contd[] ="\n\
+Error: The \"%s:\" line is  continued in  the next line.  Since\n\
+       the line  may not  contain  whitespace,  this is  not allowed.\n\
+       Please write all newsgroups into a single line.\n";
+constext txt_error_header_line_missing_newsgroups[] = "\nError: the \"Newsgroups:\" line is missing from the articles header.\n";
+constext txt_error_header_line_missing_subject[] = "\nError: the \"Subject:\" line is missing from the articles header.\n";
+constext txt_error_header_line_missing_target[] = "\nError: the \"To:\" line is missing from the articles header.\n";
+constext txt_error_header_line_space[] = "\nError: Header on line %d does not have a space after the colon:\n%s\n";
 constext txt_error_no_enter_permission[] = "No permissions to go into %s\n";
 constext txt_error_no_read_permission[] = "No read permissions for %s\n";
 constext txt_error_no_such_file[] = "File %s does not exist\n";
@@ -149,6 +162,7 @@ constext txt_warn_update[] = "\n\nYou are upgrading to tin %s from an earlier ve
 Some values in your configuration file have changed\nRead WHATSNEW, etc...\n";
 constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter wildcard subscribe pattern> ";
+constext txt_superseding_art[] = "Superseding article...";
 constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
@@ -302,11 +316,7 @@ constext txt_help_inverse_okay[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_j[] = "j k\t  down (k = up) one line" cCRLF;
 constext txt_help_quick_kill[] = "]\t  quickly kill an article using defaults" cCRLF;
 constext txt_help_quick_select[] = "[\t  quickly auto-select (hot) an article using defaults" cCRLF;
-
-#ifdef M_UNIX
-	constext txt_help_keep_dead_articles[] = "Keep all failed articles in ~/dead.articles. <SPACE> toggles & <CR> sets.";
-#endif
-
+constext txt_help_keep_dead_articles[] = "Keep all failed articles in ~/dead.articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_keep_posted_articles[] = "Keep all posted articles in ~/Mail/posted. <SPACE> toggles & <CR> sets.";
 constext txt_help_l[] = "l\t  list articles within current thread (bring up Thread sub-menu)" cCRLF;
 constext txt_help_m[] = "m\t  move chosen group within list" cCRLF;
@@ -388,6 +398,7 @@ constext txt_help_signature_repost[] = "Add signature when reposting articles. <
 constext txt_help_sigfile[] = "Enter path/! command/--none to create your default signature. <CR> sets.";
 constext txt_help_sort_art_type[] = "Sort articles by Subject, From, Date or Score. <SPACE> toggles & <CR> sets.";
 constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_spamtrap_warning_addresses[] = "Enter address elements about which you want to be warned. <CR> sets.";
 constext txt_help_pgdn_goto_next[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_start_editor_offset[] = "Start editor with line offset. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_blanks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -473,6 +484,7 @@ constext txt_inverse_on[] = "Inverse video enabled";
 constext txt_last_resp[] = "-- Last response --";
 constext txt_lines[] = "Lines %s  ";
 constext txt_listing_archive[] = cCRLF cCRLF "Listing %s archive..." cCRLF;
+constext txt_mail[] = "Mail";
 constext txt_mail_art_to[] = "Mail article(s) to [%.*s]> ";
 constext txt_mail_bug_report[] = "Mail bug report...";
 constext txt_mail_bug_report_confirm[] = "Mail BUG REPORT to %s? (y/n): ";
@@ -568,7 +580,7 @@ constext txt_opt_auto_list_thread[] = "List thread using right arrow key  : ";
 constext txt_opt_auto_reconnect[] = "Reconnect to server automatically  : ";
 constext txt_opt_auto_save[] = "Use Archive-name: header for save  : ";
 constext txt_opt_batch_save[] = "Save articles in batch mode (-S)   : ";
-constext txt_opt_beginner_level[] = "Show mini menu at each level       : ";
+constext txt_opt_beginner_level[] = "Show mini menu & posting etiquette : ";
 constext txt_opt_cache_overview_files[] = "Cache NNTP overview files locally  : ";
 constext txt_opt_catchup_read_groups[] = "Catchup read groups when quitting  : ";
 
@@ -606,11 +618,7 @@ constext txt_opt_force_screen_redraw[] = "Force redraw after certain commands: "
 constext txt_opt_group_catchup_on_exit[] = "Catchup group using left key       : ";
 constext txt_opt_groupname_max_length[] = "Max. length of group names shown   : ";
 constext txt_opt_inverse_okay[] = "Use inverse video for page headers : ";
-
-#ifdef M_UNIX
-	constext txt_opt_keep_dead_articles[] = "Keep failed arts in ~/dead.articles: ";
-#endif
-
+constext txt_opt_keep_dead_articles[] = "Keep failed arts in ~/dead.articles: ";
 constext txt_opt_keep_posted_articles[] = "Keep posted arts in ~/Mail/posted  : ";
 constext txt_opt_mail_8bit_header[] = "Use 8bit characters in mail headers: ";
 constext txt_opt_mail_address[] = "Mail address                       : ";
@@ -652,6 +660,7 @@ constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
 constext txt_opt_sigfile[] = "Create signature from path/command : ";
 constext txt_opt_sort_art_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
+constext txt_opt_spamtrap_warning_addresses[] = "Spamtrap warning address parts     : ";
 constext txt_opt_pgdn_goto_next[] = "PgDn goes to next article at EOF   : ";
 constext txt_opt_start_editor_offset[] = "Start editor with line offset      : ";
 constext txt_opt_strip_blanks[] = "Strip blanks of end of lines       : ";
@@ -701,6 +710,7 @@ constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s
 #endif /* HAVE_PGP */
 
 #ifndef DONT_HAVE_PIPING
+	constext txt_pipe[] = "Pipe";
 	constext txt_pipe_to_command[] = "Pipe to command [%.*s]> ";
 	constext txt_piping[] = "Piping...";
 #else
@@ -708,11 +718,14 @@ constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s
 		constext txt_pipe_to_command[] = "";
 		constext txt_piping[] = "";
 #	endif /* VMS */
-	constext txt_piping_not_enabled[] = "Piping not enabled. Recompile without -DNO_PIPING.";
+	constext txt_piping_not_enabled[] = "Piping not enabled.";
 #endif /* DONT_HAVE_PIPING */
 
 constext txt_plural[] = "s";
 constext txt_posted_info_file[] = "# Summary of mailed/posted messages viewable by 'W' command from within tin.\n";
+constext txt_print[] = "Print";
+constext txt_repost[] = "Repost";
+constext txt_save[] = "Save";
 constext txt_screen_too_small[] = "%s: screen is too small\n";
 constext txt_screen_too_small_exiting[] = "screen is too small, tin is exiting\n";
 constext txt_tinrc_add_posted_to_filter[] = "# If ON add posted articles to filter for highlighting follow-ups\n";
@@ -734,7 +747,8 @@ constext txt_tinrc_auto_save[] = "# if ON articles/threads with Archive-name: in
 # be automatically saved with the Archive-name & part/patch no.\n";
 constext txt_tinrc_batch_save[] = "# if ON articles/threads will be saved in batch mode when save -S\n\
 # or mail -M is specified on the command line\n";
-constext txt_tinrc_beginner_level[] = "# If ON show a mini menu of useful commands at each level\n";
+constext txt_tinrc_beginner_level[] = "# If ON show a mini menu of useful commands at each level\n\
+# and posting etiquette after composing a article\n";
 constext txt_tinrc_cache_overview_files[] = "# If ON, create local copies of NNTP overview files.\n";
 constext txt_tinrc_catchup_read_groups[] = "# if ON ask user if read groups should all be marked read\n";
 #ifdef HAVE_COLOR
@@ -807,9 +821,7 @@ constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file w
 ############################################################################\n\n";
 constext txt_tinrc_info_in_last_line[] = "# if ON use print current subject or newsgroup description in the last line\n";
 constext txt_tinrc_inverse_okay[] = "# if ON use inverse video for page headers at different levels\n";
-#ifdef M_UNIX
-	constext txt_tinrc_keep_dead_articles[] = "# if ON keep all failed postings in ~/dead.articles\n";
-#endif /* M_UNIX */
+constext txt_tinrc_keep_dead_articles[] = "# if ON keep all failed postings in ~/dead.articles\n";
 constext txt_tinrc_keep_posted_articles[] = "# if ON keep all postings in ~/Mail/posted\n";
 #ifdef LOCAL_CHARSET
 	constext txt_tinrc_local_charset[] = "# whether or not to automatically convert to a local charset that is\n\
@@ -880,6 +892,8 @@ constext txt_tinrc_quote_empty_lines[] = "# If ON quote empty lines, too\n";
 constext txt_tinrc_quote_signatures[] = "# If ON quote signatures, too\n";
 constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
+constext txt_tinrc_spamtrap_warning_addresses[] = "# a comma-delimeted list of address-parts you want to be\n\
+# about when trying to reply by email.\n";
 constext txt_tinrc_news_headers_to_display[] = "# Which news headers you wish to see. If you want to see _all_ the headers,\n\
 # place an '*' as this value. This is the only way a wildcard can be used.\n\
 # If you enter 'X-' as the value, you will see all headers beginning with\n\
@@ -989,10 +1003,9 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 #endif
 
 /*
- * MIME-Content-Types.
+ * MIME-Content-Transfer-Encodings.
  */
-constext *txt_mime_types[] = { txt_8bit, txt_base64, txt_quoted_printable,
-				txt_7bit };
+constext *txt_mime_encodings[] = { txt_8bit, txt_base64, txt_quoted_printable, txt_7bit };
 
 /*
  * Array of possible post processing descriptions and short-keys
@@ -1173,29 +1186,45 @@ constext txt_unthreading_arts[] = "Unthreading articles...";
 #endif /* HAVE_METAMAIL */
 constext txt_uudecoding[] = "Uudecoding %s";
 constext txt_value_out_of_range[] = "\n%s%d out of range (0 - %d). Reset to 0";
-constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns. Line %d is the first long one:\n%-100s\n\n";
-constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";
-constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";
-constext txt_warn_not_in_newsrc[] = "Warning: \"%s\" is not in your newsrc, it may be invalid at this site!\n";
-constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n";
+constext txt_warn_art_line_too_long[] = "\nWarning: posting exceeds %d columns. Line %d is the first long one:\n%-100s\n";
+constext txt_warn_blank_subject[] = "\nWarning: \"Subject:\" contains only whitespaces.\n";
+constext txt_warn_cancel[] = "Read carefully!\n\n\
+  You are about to cancel an article seemingly written by you. This will wipe\n\
+  the article from most  news servers  throughout the world,  but there is no\n\
+  guarantee that it will work.\n\nThis is the article you are about to cancel:\n\n";
+#ifdef FORGERY
+	constext txt_warn_cancel_forgery[] = "Read carefully!\n\n\
+  You are about to cancel an article seemingly not written by you.  This will\n\
+  wipe the article from lots of news servers throughout the world;\n\
+  Usenet's majority  considers this  rather inappropriate,  to say the least.\n\
+  Only press 'd'  if you are  absolutely positive  that you are ready to take\n\
+  the rap.\n\nThis is the article you are about to cancel:\n\n";
+#endif /* FORGERY */
+constext txt_warn_followup_to_several_groups[] = "\nWarning: Followup-To set to more than one newsgroup!\n";
+constext txt_warn_missing_followup_to[] = "\nWarning: cross-posting to %d newsgroups and no Followup-To line!\n";
+constext txt_warn_not_in_newsrc[] = "\nWarning: \"%s\" is not in your newsrc, it may be invalid at this site!\n";
+constext txt_warn_not_valid_newsgroup[] = "\nWarning: \"%s\" is not a valid newsgroup at this site!\n";
 constext txt_warn_suspicious_mail[] = "Warning: this mail address may contain a spamtrap. Continue or Abort? (c/a) ";
-constext txt_warn_posting_etiquette[] = "\n\
+#ifndef NO_ETIQUETTE
+	constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
-  to just the  key points to which you are  responding, or  people will think\n\
+  to just the  key points to which you are  responding,  or people will think\n\
   you are a dweeb!  Many people have the habit of skipping any article  whose\n\
-  first page  is largely  quoted material.  Format your  article to fit in 80\n\
-  columns, since  that's the  conventional size.  If your  lines are too long\n\
+  first page is largely  quoted material.  Format your article to fit in less\n\
+  then 80 chars,  since that's the conventional size  (72 is a good choice as\n\
+  it allows quoting without exceeding the limit).  If your lines are too long\n\
   they'll wrap  around  ugly and  people won't  read what you  write.  If you\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
+#endif /* NO_ETIQUETTE */
 constext txt_warn_sig_too_long[] ="\n\
-  Warning: Your signature is longer than %d lines.  Since signatures usually do\n\
-  not transport any useful information, they should be as  short as possible.\n\n";
-constext txt_warn_multiple_sigs[] ="\n\
-  Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";
-constext txt_warn_wrong_sig_format[] = "\n\
-  Warning: Signatures should start with '-- \\n' not with '--\\n'.\n\n";
-constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\nTin will try to use XHDR XREF instead (slows down things a bit).\n";
+Warning: Your signature  is longer than %d lines.  Since signatures usually do\n\
+         not  transport any  useful information,  they should be as  short as\n\
+         possible.\n";
+constext txt_warn_multiple_sigs[] ="\nWarning: Found %d '-- \\n' lines, this may confuse some people.\n";
+constext txt_warn_wrong_sig_format[] = "\nWarning: Signatures should start with '-- \\n' not with '--\\n'.\n";
+constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\n\
+Tin will try to use XHDR XREF instead (slows down things a bit).\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";
@@ -1203,18 +1232,6 @@ constext txt_yanking_all_groups[] = "Yanking in all groups...";
 constext txt_yanking_sub_groups[] = "Yanking in subscribed to groups...";
 constext txt_yes[] = "Yes";
 constext txt_you_have_mail[] = "    You have mail\n";
-#ifdef FORGERY
-	constext txt_warn_cancel_forgery[] = "Read carefully!\n\n\
-  You are about to cancel an article seemingly not written by you.  This\n\
-  will wipe the article from lots of news servers throughout the world;\n\
-  Usenet's majority considers this rather inappropriate, to say the least.\n\
-  Only press 'd' if you are absolutely positive that you are ready to take\n\
-  the rap.\n\nThis is the article you are about to cancel:\n\n";
-#endif /* FORGERY */
-constext txt_warn_cancel[] = "Read carefully!\n\n\
-  You are about to cancel an article seemingly written by you.  This will\n\
-  wipe the article from most news servers throughout the world, but there is\n\
-  no guarantee that it will work.\n\nThis is the article you are about to cancel:\n\n";
 constext txt_all_groups[] = "All groups";
 constext txt_filter_text_type[] = "Apply pattern to    : ";
 constext txt_from_line_only[] = "From: line (ignore case)        ";
@@ -1285,28 +1302,7 @@ constext txt_filter_score_help[] = "Enter the score weight (range 0 < score <= 1
 	constext txt_env_var_not_found[] = "Environment variable %s not found. Set and retry...";
 #endif /* M_AMIGA */
 #ifdef HAVE_FASCIST_NEWSADMIN
-	constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to more than one newsgroup!\n\n";
-	constext txt_error_missing_followup_to[] = "Error: cross-posting to %d newsgroups and no Followup-To line!\n\n";
-	constext txt_error_not_valid_newsgroup[] = "Error: \"%s\" is not a valid newsgroup!\n\n";
+	constext txt_error_followup_to_several_groups[] = "\nError: Followup-To set to more than one newsgroup!\n";
+	constext txt_error_missing_followup_to[] = "\nError: cross-posting to %d newsgroups and no Followup-To line!\n";
+	constext txt_error_not_valid_newsgroup[] = "\nError: \"%s\" is not a valid newsgroup!\n";
 #endif /* HAVE_FASCIST_NEWSADMIN */
-
-#if 0 /* unused */
-	constext txt_abort_indexing[] = "Do you want to abort indexing group? (y/n): ";
-	constext txt_abort_searching[] = "Do you want to abort searching? (y/n): ";
-	constext txt_connection_to_server_broken[] = "Connection to server broken";
-	constext txt_help_g_c[] = "c\t  mark group as all read" cCRLF;
-#	ifdef CASE_PROBLEM
-		constext txt_help_t_BIGK[] = "K\t  Mark thread as read & return" cCRLF;
-#	else
-		constext txt_help_t_K[] = "K\t  Mark thread as read & return" cCRLF;
-#	endif /* CASE_PROBLEM */
-	constext txt_help_t_tab[] = "<TAB>\t  read next unread article" cCRLF;
-	constext txt_help_space_toggles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-	constext txt_subscribe_to_new_group[] = "Subscribe to new group %s (Yy/Nn) [%c]: ";
-	constext txt_subscribing_to[] = "Subscribing to %s";
-	constext txt_tinrc_col_markdash[] = "";
-	constext txt_tinrc_mail_mime_encoding[] = "";
-	constext txt_tinrc_mail_quote_format[] = "";
-	constext txt_tinrc_thread_catchup_on_exit[] = "";
-	constext txt_tinrc_xpost_quote_format[] = "";
-#endif /* 0 */

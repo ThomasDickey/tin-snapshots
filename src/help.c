@@ -459,12 +459,15 @@ show_info_page (
 
 			case iKeySearchSubjF:
 			case iKeySearchSubjB:
-				old_help = pos_help;
-				pos_help = search_help(ch == iKeySearchSubjF, pos_help, max_line-1);
-				cur_page = pos_help / help_lines + 1;
-				if (old_help != pos_help)
-					old_page = -1;
-				break;
+				if (type == HELP_INFO) {
+					old_help = pos_help;
+					pos_help = search_help (ch == iKeySearchSubjF, pos_help, max_line-1);
+					cur_page = pos_help / help_lines + 1;
+					if (old_help != pos_help)
+						old_page = -1;
+					break;
+				}
+			/* FALLTHROUGH */
 
 			default:
 				ClearScreen ();
@@ -549,8 +552,8 @@ show_mini_help (
 			center_line (line+1, FALSE, txt_mini_page_2);
 			center_line (line+2, FALSE, txt_mini_page_3);
 			break;
-		default:
-			error_message ("Unknown display level");
+		default: /* should not happen */
+			error_message ("Unknown display level"); /* FIXME: -> lang.c */
 			break;
 	}
 #ifdef HAVE_COLOR

@@ -17,12 +17,12 @@
 #include	"extern.h"
 #include	"menukeys.h"
 
+
 /*
  *  prompt_num
  *  get a number from the user
  *  Return -1 if missing or bad number typed
  */
-
 int
 prompt_num (
 	int ch,
@@ -35,7 +35,7 @@ prompt_num (
 
 	sprintf (msg, "%c", ch);
 
-	if ((p = getline (prompt, TRUE, msg, 0, HIST_OTHER)) != (char *) 0) {
+	if ((p = tin_getline (prompt, TRUE, msg, 0, HIST_OTHER)) != (char *) 0) {
 		strcpy (msg, p);
 		num = atoi (msg);
 	} else
@@ -46,23 +46,40 @@ prompt_num (
 	return (num);
 }
 
+
 /*
  *  prompt_string
  *  get a string from the user
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
-
 int
 prompt_string (
 	const char *prompt,
 	char *buf,
 	int which_hist)
 {
+	return prompt_default_string (prompt, buf, 0, (char *) NULL, which_hist);
+}
+
+
+/*
+ * prompt_default_string
+ * get a string from the user, display default value
+ * Return TRUE if a valid string was typed, FALSE otherwise
+ */
+int
+prompt_default_string (
+	const char *prompt,
+	char *buf,
+	int buf_len,
+	char *default_prompt,
+	int which_hist)
+{
 	char *p;
 
 	clear_message ();
 
-	if ((p = getline (prompt, FALSE, (char *) 0, 0, which_hist)) == (char *) 0) {
+	if ((p = tin_getline (prompt, FALSE, default_prompt, buf_len, which_hist)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
 		return FALSE;
@@ -74,12 +91,12 @@ prompt_string (
 	return TRUE;
 }
 
+
 /*
  *  prompt_menu_string
  *  get a string from the user
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
-
 int
 prompt_menu_string (
 	int line,
@@ -97,13 +114,14 @@ prompt_menu_string (
 
 	MoveCursor (line, col);
 
-	if ((p = getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (var, p);
 
 	return TRUE;
 }
+
 
 /*
  * prompt_yn
@@ -112,7 +130,6 @@ prompt_menu_string (
  * The function returns 1 if the user decided "yes", -1 if the user wanted
  * to escape, or 0 for any other key or decision.
  */
-
 int
 prompt_yn (
 	int line,
@@ -120,7 +137,7 @@ prompt_yn (
 	t_bool default_answer)
 {
 	int ch, prompt_ch;
-	int yn_loop = TRUE;
+	t_bool yn_loop = TRUE;
 
 /*	fflush(stdin);*/		/* Prevent finger trouble from making important decisions */
 
@@ -246,6 +263,7 @@ prompt_list (
 	return(var - adjust);
 }
 
+
 /*
  * Special case of prompt_list() Toggle between ON and OFF
  */
@@ -263,18 +281,18 @@ prompt_on_off (
 	*var = (ret != 0);
 }
 
+
 /*
  * Displays option text and actual option value for string based options in
  * one line, help text for that option near the bottom of the screen. Allows
- * change of the old value by normal editing; history function of getline()
+ * change of the old value by normal editing; history function of tin_getline()
  * will be used properly so that editing won't leave the actual line. Note
  * that "option" is the number the user will see, which is not the same as
  * the array position for this option in option_table (since the latter
  * starts counting with zero instead of one).
  * The function returns TRUE, if the value was changed, FALSE otherwise.
  */
-
-int
+t_bool
 prompt_option_string (
 	int option) /* return value is always ignored */
 {
@@ -286,7 +304,7 @@ prompt_option_string (
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
-	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (variable, p);
@@ -294,18 +312,18 @@ prompt_option_string (
 	return TRUE;
 }
 
+
 /*
  * Displays option text and actual option value for number based options in
  * one line, help text for that option near the bottom of the screen. Allows
- * change of the old value by normal editing; history function of getline()
+ * change of the old value by normal editing; history function of tin_getline()
  * will be used properly so that editing won't leave the actual line. Note
  * that "option" is the number the user will see, which is not the same as
  * the array position for this option in option_table (since the latter
  * starts counting with zero instead of one).
  * The function returns TRUE if the value was changed, FALSE otherwise.
  */
-
-int
+t_bool
 prompt_option_num (
 	int option) /* return value is always ignored */
 {
@@ -316,10 +334,10 @@ prompt_option_num (
 
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 	sprintf (&number[0], "%d", *(option_table[option].variable));
 
-	if ((p = getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	strcpy (number, p);
@@ -331,6 +349,7 @@ prompt_option_num (
 	return TRUE;
 }
 
+
 /*
  * Displays option text and actual option value for character based options
  * in one line, help text for that option near the bottom of the screen.
@@ -340,8 +359,7 @@ prompt_option_num (
  * zero instead of one).
  * The function returns TRUE if the value was changed, FALSE otherwise.
  */
-
-int
+t_bool
 prompt_option_char (
 	int option) /* return value is always ignored */
 {
@@ -355,9 +373,9 @@ prompt_option_char (
 
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
-	if ((p = getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0)
+	if ((p = tin_getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0)
 		return FALSE;
 
 	*variable = p[0];
@@ -366,6 +384,7 @@ prompt_option_char (
 
 	return TRUE;
 }
+
 
 /*
  * Format a message such that it'll fit within the screen width
@@ -388,6 +407,7 @@ sized_message(
 	sprintf (msg, format, have, subject);
 	return(msg);
 }
+
 
 /*
  * Implement the Single-Letter-Key mini menus at the bottom of the screen
@@ -420,6 +440,7 @@ prompt_slk_response(
 
 	return(ch);
 }
+
 
 /*
  * Wait until a key is pressed. We specify the <RETURN> key otherwise
@@ -455,5 +476,4 @@ continue_prompt (void)
 	cmd_line = FALSE;
 	my_retouch();
 #endif /* USE_CURSES */
-
 }

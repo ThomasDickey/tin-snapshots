@@ -30,7 +30,7 @@ Major additions
 
 . Now auto-configures and builds out of the box
      Much improved configurability. No more messy Makefiles to edit.
-    
+
 . Configuration menu completely rewritten ('M')
   Most tinrc values can now be set in here.
   Searchable with '/' and '?'
@@ -68,7 +68,7 @@ Other enhancements
    Group menu
    ----------
    'K', 'z', 'Z' now understand ranges
- 
+
    Thread menu
    -----------
    '/'

@@ -44,7 +44,7 @@ static int last_thread_on_screen = 0;
 #ifndef INDEX_DAEMON
 static int find_unexpired (struct t_msgid *ptr);
 static int has_sibling (struct t_msgid *ptr);
-static int prompt_thread_num (int ch);
+static void prompt_thread_num (int ch);
 static void bld_tline (int l, struct t_article *art);
 static void draw_tline (int i, int full);
 static void draw_thread_arrow (void);
@@ -77,13 +77,13 @@ bld_tline (
 	 * Start with 2 spaces for ->
 	 * then index number of the message and whitespace (2+4+1 chars)
 	 */
-	sprintf (buff, "  %s ", tin_itoa(l, 4));
+	sprintf (buff, "  %s ", tin_ltoa(l, 4));
 
 	/*
 	 * Add the article flags, tag number, or whatever (3 chars)
 	 */
 	if (art->tagged)
-		strcat (buff, tin_itoa(art->tagged, 3));
+		strcat (buff, tin_ltoa(art->tagged, 3));
 	else {
 		strcat(buff, "   ");
 		if (art->inrange) {
@@ -112,7 +112,7 @@ bld_tline (
 	 */
 	if (show_lines) {
 		strcat (buff, "[");
-		strcat (buff, ((art->lines != -1) ? tin_itoa(art->lines, 4): "   ?"));
+		strcat (buff, ((art->lines != -1) ? tin_ltoa(art->lines, 4): "   ?"));
 		strcat (buff, "]  ");
 	}
 
@@ -189,12 +189,8 @@ bld_tline (
 			get_author (TRUE, art, buff + cCOLS - len_from, len_from);
 		}
 
-	} else {
-		/*
-		 * Add the author info. This is always shown if subject is not
-		 */
+	} else /* Add the author info. This is always shown if subject is not */
 		get_author (TRUE, art, buff+strlen(buff), cCOLS-strlen(buff));
-	}
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	Convert2Printable (buff);
@@ -295,9 +291,8 @@ show_thread (
 
 	thread_index_point = top_thread;
 	if (space_mode) {
-		i = new_responses (thread_basenote);
-		if (i) {
-			for (n=0, i = base[thread_basenote]; i >= 0 ; i = arts[i].thread, n++) {
+		if ((i = new_responses (thread_basenote))) {
+			for (n = 0, i = base[thread_basenote]; i >= 0 ; i = arts[i].thread, n++) {
 				if (arts[i].status == ART_UNREAD) {
 					if (arts[i].thread == ART_EXPIRED)
 						art_mark_read (group, &arts[i]);
@@ -747,9 +742,9 @@ show_thread_page (void)
 	if (thread_index_point > top_thread - 1)
 		thread_index_point = top_thread - 1;
 
-	if (NOTESLINES <= 0) {
+	if (NOTESLINES <= 0)
 		first_thread_on_screen = 0;
-	} else {
+	else {
 		first_thread_on_screen = (thread_index_point / NOTESLINES) * NOTESLINES;
 		if (first_thread_on_screen < 0)
 			first_thread_on_screen = 0;
@@ -844,11 +839,8 @@ draw_thread_arrow (void)
 	}
 	stow_cursor();
 
-	if (info_in_last_line) {
-		clear_message();
-		/* We do it this way in case there are formatting chars in the subject */
-		center_line (cLINES, FALSE, arts[find_response (thread_basenote, thread_index_point)].subject);
-	}
+	if (info_in_last_line)
+		info_message ("%s", arts[find_response (thread_basenote, thread_index_point)].subject);
 }
 #endif /* INDEX_DAEMON */
 
@@ -871,9 +863,9 @@ erase_thread_arrow (void)
 
 
 #ifndef INDEX_DAEMON
-static int
+static void
 prompt_thread_num (
-	int ch) /* return value is always ignored */
+	int ch)
 {
 	int num;
 
@@ -881,15 +873,13 @@ prompt_thread_num (
 
 	if ((num = prompt_num (ch, txt_select_art)) == -1) {
 		clear_message ();
-		return FALSE;
+		return;
 	}
 
 	if (num >= top_thread)
 		num = top_thread - 1;
 
 	move_to_response (num);
-
-	return TRUE;
 }
 #endif /* INDEX_DAEMON */
 
@@ -1005,11 +995,12 @@ stat_thread (
 	sbuf->total  = 0;
 	sbuf->unread = 0;
 	sbuf->seen   = 0;
-	sbuf->inrange = 0;
 	sbuf->deleted = 0;
+	sbuf->inrange = 0;
 	sbuf->selected_total = 0;
 	sbuf->selected_unread= 0;
 	sbuf->selected_seen  = 0;
+	sbuf->art_mark = ART_MARK_READ;
 
 	for (i = (int) base[n]; i >= 0; i = arts[i].thread) {
 		++sbuf->total;
@@ -1019,25 +1010,22 @@ stat_thread (
 		if (arts[i].delete)
 			++sbuf->deleted;
 
-		if (arts[i].status == ART_UNREAD) {
+		if (arts[i].status == ART_UNREAD)
 			++sbuf->unread;
-		} else if (arts[i].status == ART_WILL_RETURN) {
+		else if (arts[i].status == ART_WILL_RETURN)
 			++sbuf->seen;
-		}
 
 		if (arts[i].selected) {
 			++sbuf->selected_total;
-			if (arts[i].status == ART_UNREAD) {
+			if (arts[i].status == ART_UNREAD)
 				++sbuf->selected_unread;
-			} else if (arts[i].status == ART_WILL_RETURN) {
+			else if (arts[i].status == ART_WILL_RETURN)
 				++sbuf->selected_seen;
-			}
 		}
 
 #if 0
-		if (arts[i].killed) {
+		if (arts[i].killed)
 			++sbuf->killed;
-		}
 #endif
 	}
 

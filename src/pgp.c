@@ -12,7 +12,8 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
+#include "tin.h"
+#include "extern.h"
 #include "tcurses.h"
 
 #ifdef HAVE_PGP
@@ -51,7 +52,7 @@
 /*
  * local prototypes
  */
-static int pgp_available (void);
+static t_bool pgp_available (void);
 static void do_pgp (int what, char *file, char *mail_to);
 static void join_files (char *file);
 static void pgp_append_public_key (char *file);
@@ -68,9 +69,9 @@ join_files (
 	char buf[LEN];
 	FILE *art, *header, *text;
 
-	if ((header = fopen(hdr, "r")) == (FILE *) 0) {
+	if ((header = fopen(hdr, "r")) == (FILE *) 0)
 		return;
-	}
+
 	if ((text = fopen(ct, "r")) == (FILE *) 0) {
 		fclose(header);
 		return;
@@ -196,7 +197,7 @@ pgp_append_public_key (
 	sh_format (cmd, sizeof(cmd), "%s %s -kxa %s %s", PGPNAME, pgpopts, buf, keyfile);
 #	else
 #		ifdef HAVE_PGP_5
-	sh_format (cmd, sizeof(cmd), "%sk %s -xa %s %s", PGPNAME, pgpopts, buf, keyfile);
+	sh_format (cmd, sizeof(cmd), "%sk %s -xa %s -o %s", PGPNAME, pgpopts, buf, keyfile);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 
@@ -219,18 +220,18 @@ pgp_append_public_key (
 	}
 }
 
-static int
+static t_bool
 pgp_available (void)
 {
 	FILE *f;
 	char keyring[PATH_LEN];
 
 	joinpath(keyring, pgp_data, PGP_PUBRING);
-	if ((f = fopen(keyring, "r")) == (FILE *) 0) {
-		return (0);
-	} else {
+	if ((f = fopen(keyring, "r")) == (FILE *) 0)
+		return FALSE;
+	else {
 		fclose(f);
-		return (1);
+		return TRUE;
 	}
 }
 
@@ -252,10 +253,18 @@ invoke_pgp_mail (
 			break;
 
 		case 's':
+#ifdef HAVE_PGP_5
+			ClearScreen();
+			MoveCursor (cLINES - 7, 0);
+#endif /* HAVE_PGP_5 */
 			do_pgp(SIGN, nam, NULL);
 			break;
 
 		case 'b':
+#ifdef HAVE_PGP_5
+			ClearScreen();
+			MoveCursor (cLINES - 7, 0);
+#endif /* HAVE_PGP_5 */
 			do_pgp(SIGN | ENCRYPT, nam, mail_to);
 			break;
 
@@ -285,10 +294,20 @@ invoke_pgp_news(
 			break;
 
 		case 's':
+#ifdef HAVE_PGP_5
+			info_message (" ");
+			MoveCursor (cLINES - 7, 0);
+			my_printf("\n");
+#endif /* HAVE_PGP_5 */
 			do_pgp(SIGN, the_article, NULL);
 			break;
 
 		case 'i':
+#ifdef HAVE_PGP_5
+			info_message (" ");
+			MoveCursor (cLINES - 7, 0);
+			my_printf("\n");
+#endif /* HAVE_PGP_5 */
 			do_pgp(SIGN, the_article, NULL);
 			pgp_append_public_key(the_article);
 			break;

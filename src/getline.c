@@ -1,6 +1,6 @@
 /*
  *  Project   : tin - a Usenet reader
- *  Module    : getline.c
+ *  Module    : tin_getline.c
  *  Author    : Chris Thewalt & Iain Lea
  *  Created   : 1991-11-09
  *  Updated   : 1994-07-27
@@ -61,7 +61,7 @@ int (*gl_out_hook) (char *) = 0;
 int (*gl_tab_hook) (char *, int, int *) = gl_tab;
 
 char *
-getline (
+tin_getline (
 	const char *prompt,
 	int number_only,
 	char *str,
@@ -223,7 +223,7 @@ gl_addchar (
 	int i;
 
 	if (gl_cnt >= BUF_SIZE - 1) {
-		error_message ("getline: input buffer overflow");
+		error_message ("tin_getline: input buffer overflow");
 		exit (1);
 	}
 
@@ -247,7 +247,7 @@ gl_newline (int w)
 	int loc = gl_width - 5;	/* shifts line back to start position */
 
 	if (gl_cnt >= BUF_SIZE - 1) {
-		error_message ("getline: input buffer overflow");
+		error_message ("tin_getline: input buffer overflow");
 		exit (1);
 	}
 	hist_add (w);		/* only adds if nonblank */

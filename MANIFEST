@@ -1,105 +1,105 @@
-MANIFEST for tin-pre-1.4-980226 (Thu Feb 26 16:39:06 CET 1998)
+MANIFEST for tin-1.4.0-980505 (Tue May  5 12:22:42 CEST 1998)
 ----------------------------------------------------
-   8543 ./Makefile
-   4037 ./MANIFEST
+   8545 ./Makefile
+   4039 ./MANIFEST
    1188 ./README
    2208 ./README.VMS
-  52600 ./aclocal.m4
+  53964 ./aclocal.m4
     673 ./conf-tin
   20446 ./config.guess
   19236 ./config.sub
- 218555 ./configure
-  18841 ./configure.in
+ 221953 ./configure
+  19297 ./configure.in
    4765 ./install.sh
   11864 ./makefile.in
     661 ./mkdirs.sh
- 121043 ./doc/CHANGES
+ 125622 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
-  16484 ./doc/INSTALL
-  15939 ./doc/TODO
-   1720 ./doc/WHATSNEW
-  12686 ./doc/auth.txt
-   7942 ./doc/filtering
-   3369 ./doc/internals.txt
+  16535 ./doc/INSTALL
+  17011 ./doc/TODO
+   2876 ./doc/WHATSNEW
+  12688 ./doc/auth.txt
+   8179 ./doc/filtering
+   3661 ./doc/internals.txt
   23621 ./doc/iso2asc.txt
-  34970 ./doc/minimal-netkeeping
+  35264 ./doc/good-netkeeping-seal
    1615 ./doc/umlaute.txt
-   3341 ./doc/tin.defaults
-  87703 ./doc/tin.1
-   1011 ./tools/metamutt
+   3635 ./doc/tin.defaults
+  88158 ./doc/tin.1
+   1621 ./tools/metamutt
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
-   1193 ./include/bugrep.h
+   1213 ./include/bugrep.h
    8208 ./include/config.h
-  54047 ./include/extern.h
-  13261 ./include/menukeys.h
-   5089 ./include/nntplib.h
-  23808 ./include/proto.h
+  54035 ./include/extern.h
+  13199 ./include/menukeys.h
+   5088 ./include/nntplib.h
+  24097 ./include/proto.h
    2220 ./include/stpwatch.h
    2551 ./include/tcurses.h
-  49295 ./include/tin.h
+  49264 ./include/tin.h
    3392 ./include/tnntp.h
     971 ./include/trace.h
     991 ./include/version.h
-  21217 ./src/active.c
-  37804 ./src/art.c
-  23450 ./src/attrib.c
-   9716 ./src/auth.c
-   8925 ./src/charset.c
-   7874 ./src/color.c
-  56265 ./src/config.c
-  20886 ./src/curses.c
-  11824 ./src/debug.c
+  20845 ./src/active.c
+  37986 ./src/art.c
+  23382 ./src/attrib.c
+   9909 ./src/auth.c
+   8931 ./src/charset.c
+   7873 ./src/color.c
+  56570 ./src/config.c
+  20901 ./src/curses.c
+  11826 ./src/debug.c
    2305 ./src/envarg.c
-  18837 ./src/feed.c
-  44075 ./src/filter.c
-  11253 ./src/getline.c
-  42218 ./src/group.c
+  19739 ./src/feed.c
+  43937 ./src/filter.c
+  11269 ./src/getline.c
+  42344 ./src/group.c
    3003 ./src/hashstr.c
-   7490 ./src/header.c
-  10468 ./src/help.c
-   6817 ./src/inews.c
-  37305 ./src/init.c
-   1388 ./src/joinpath.c
-  85695 ./src/lang.c
-   2938 ./src/list.c
-  10136 ./src/mail.c
-  21829 ./src/main.c
-   8677 ./src/makecfg.c
+   7555 ./src/header.c
+  10578 ./src/help.c
+   8128 ./src/inews.c
+  37791 ./src/init.c
+   1391 ./src/joinpath.c
+  86086 ./src/lang.c
+   2933 ./src/list.c
+  10058 ./src/mail.c
+  22095 ./src/main.c
+   8674 ./src/makecfg.c
    8468 ./src/memory.c
-  54245 ./src/misc.c
-  34807 ./src/newsrc.c
-  23068 ./src/nntplib.c
+  54765 ./src/misc.c
+  34973 ./src/newsrc.c
+  23061 ./src/nntplib.c
    5771 ./src/nrctbl.c
-  22356 ./src/open.c
-  39319 ./src/page.c
-  24113 ./src/parsdate.y
-   7753 ./src/pgp.c
-  90377 ./src/post.c
-  10108 ./src/prompt.c
-   8031 ./src/read.c
-  23377 ./src/refs.c
+  23022 ./src/open.c
+  39563 ./src/page.c
+  24169 ./src/parsdate.y
+   8191 ./src/pgp.c
+  92146 ./src/post.c
+  10510 ./src/prompt.c
+   8048 ./src/read.c
+  23485 ./src/refs.c
    1783 ./src/regex.c
-  11879 ./src/rfc1521.c
-  22281 ./src/rfc1522.c
-  33156 ./src/save.c
-   5169 ./src/screen.c
-  11974 ./src/search.c
-  35490 ./src/select.c
-   5999 ./src/sigfile.c
-   9521 ./src/signal.c
+  11876 ./src/rfc1521.c
+  22459 ./src/rfc1522.c
+  33138 ./src/save.c
+   5168 ./src/screen.c
+  11996 ./src/search.c
+  34959 ./src/select.c
+   6021 ./src/sigfile.c
+   9524 ./src/signal.c
    5658 ./src/strftime.c
-   9901 ./src/string.c
-   6159 ./src/tcurses.c
-  29065 ./src/thread.c
-   1038 ./src/trace.c
+   9874 ./src/string.c
+   6144 ./src/tcurses.c
+  28887 ./src/thread.c
+   1039 ./src/trace.c
    4336 ./src/wildmat.c
-   6080 ./src/xref.c
+   6131 ./src/xref.c
    4987 ./amiga/README
-   5086 ./amiga/tin.readme
+   5085 ./amiga/tin.readme
    9999 ./amiga/smakefile
    4987 ./amiga/actived.c
-  17223 ./amiga/amiga.c
+  17222 ./amiga/amiga.c
    6373 ./amiga/amigatcp.c
    2371 ./amiga/amiga.h
    2167 ./amiga/amigatcp.h
@@ -125,39 +125,39 @@ MANIFEST for tin-pre-1.4-980226 (Thu Feb 26 16:39:06 CET 1998)
    1705 ./vms/vmsfile.c
    5652 ./vms/vmspwd.c
     389 ./vms/vmstimval.h
-  10521 ./pcre/ChangeLog
+  11125 ./pcre/ChangeLog
    2020 ./pcre/Makefile.in
    2243 ./pcre/Makefile.orig
    7165 ./pcre/Performance
   10388 ./pcre/README
    8249 ./pcre/Tech.Notes
    2379 ./pcre/pgrep.1
-  45325 ./pcre/pcre.3
+  46646 ./pcre/pcre.3
    5063 ./pcre/pcreposix.3
    4557 ./pcre/maketables.c
- 103700 ./pcre/pcre.c
+ 104554 ./pcre/pcre.c
    7563 ./pcre/pcreposix.c
    4756 ./pcre/pgrep.c
    9003 ./pcre/study.c
-  11016 ./pcre/internal.h
-   1739 ./pcre/pcre.h
+  11030 ./pcre/internal.h
+   1775 ./pcre/pcre.h
    2154 ./pcre/pcreposix.h
-  19543 ./pcre/pcretest.c
+  19658 ./pcre/pcretest.c
    2988 ./pcre/perltest
-  48592 ./pcre/testinput
-   3745 ./pcre/testinput2
-  57771 ./pcre/testoutput
-  12322 ./pcre/testoutput2
-   9091 ./include/autoconf.hin
-  11951 ./src/Makefile.in
+  48717 ./pcre/testinput
+   4183 ./pcre/testinput2
+  57928 ./pcre/testoutput
+  13585 ./pcre/testoutput2
+   9149 ./include/autoconf.hin
+  11971 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   4305 ./src/tincfg.tbl
+   4468 ./src/tincfg.tbl
    8747 ./src/descrip.mms
    1677 ./pcre/pcre.mms
    7092 ./old/msmail.c
    4443 ./old/nntpvms.c
-  31232 ./old/nntpw32.c
+  31133 ./old/nntpw32.c
    6967 ./old/os_2.c
   12414 ./old/win32.c
    2143 ./old/win32tcp.c
@@ -165,4 +165,4 @@ MANIFEST for tin-pre-1.4-980226 (Thu Feb 26 16:39:06 CET 1998)
    2225 ./old/os_2.h
    3753 ./old/win32.h
     786 ./old/win32tcp.h
-2607433 total
+2632653 total

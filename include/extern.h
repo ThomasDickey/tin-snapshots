@@ -111,6 +111,9 @@ extern unsigned long inet_addr (const char *);
 #ifdef DECL_IOCTL
 extern int ioctl (int, unsigned long, void *);
 #endif
+#ifdef DECL_ISASCII
+extern int isascii (int c);
+#endif
 #ifdef DECL_MALLOC
 extern void * malloc (size_t);
 #endif
@@ -347,6 +350,7 @@ extern char quote_chars[PATH_LEN];
 extern char rcdir[PATH_LEN];
 extern char reply_to[LEN];
 extern char save_active_file[PATH_LEN];
+extern char spamtrap_warning_addresses[LEN];
 extern char spooldir[PATH_LEN];
 extern char subscriptions_file[PATH_LEN];
 extern char txt_help_bug_report[LEN];
@@ -365,7 +369,7 @@ extern constext *help_select[];
 extern constext *help_thread[];
 extern constext *txt_colors[];
 extern constext *txt_marks[];
-extern constext *txt_mime_types[NUM_MIME_TYPES];
+extern constext *txt_mime_encodings[NUM_MIME_ENCODINGS];
 extern constext *txt_onoff[];
 extern constext *txt_post_process[];
 extern constext *txt_show_from[];
@@ -396,13 +400,12 @@ extern constext txt_art_thread_regex_tag[];
 extern constext txt_art_unavailable[];
 extern constext txt_article_cancelled[];
 extern constext txt_article_cannot_open[];
-extern constext txt_article_reposted1[];
-extern constext txt_article_reposted2a[];
-extern constext txt_article_reposted2b[];
+extern constext txt_article_reposted[];
 extern constext txt_at_s[];
 extern constext txt_auth_failed[];
-extern constext txt_auth_pass_needed[];
-extern constext txt_auth_user_needed[];
+extern constext txt_auth_pass[];
+extern constext txt_auth_user[];
+extern constext txt_auth_needed[];
 extern constext txt_author_search_backwards[];
 extern constext txt_author_search_forwards[];
 extern constext txt_authorization_fail[];
@@ -425,7 +428,9 @@ extern constext txt_cannot_get_nntp_server_name[];
 extern constext txt_cannot_get_term[];
 extern constext txt_cannot_get_term_entry[];
 extern constext txt_cannot_open[];
-extern constext txt_cannot_open_active_file[];
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+	extern constext txt_cannot_open_active_file[];
+#endif
 extern constext txt_cannot_post[];
 extern constext txt_cannot_post_group[];
 extern constext txt_cannot_write_index[];
@@ -457,9 +462,11 @@ extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
 extern constext txt_error_header_and_body_not_separate[];
 extern constext txt_error_header_line_bad_charset[];
+extern constext txt_error_header_line_bad_encoding[];
 extern constext txt_error_header_line_blank[];
 extern constext txt_error_header_line_colon[];
 extern constext txt_error_header_line_comma[];
+extern constext txt_error_header_line_empty_subject[];
 extern constext txt_error_header_line_empty_newsgroups[];
 extern constext txt_error_header_line_groups_contd[];
 extern constext txt_error_header_line_missing_newsgroups[];
@@ -587,6 +594,7 @@ extern constext txt_help_i_tab[];
 extern constext txt_help_i_tilda[];
 extern constext txt_help_inverse_okay[];
 extern constext txt_help_j[];
+extern constext txt_help_keep_dead_articles[];
 extern constext txt_help_keep_posted_articles[];
 extern constext txt_help_kill_scope[];
 extern constext txt_help_l[];
@@ -665,6 +673,7 @@ extern constext txt_help_sigfile[];
 extern constext txt_help_signature_repost[];
 extern constext txt_help_sort_art_type[];
 extern constext txt_help_space_goto_next_unread[];
+extern constext txt_help_spamtrap_warning_addresses[];
 extern constext txt_help_start_editor_offset[];
 extern constext txt_help_strip_blanks[];
 extern constext txt_help_strip_bogus[];
@@ -715,6 +724,7 @@ extern constext txt_last[];
 extern constext txt_last_resp[];
 extern constext txt_lines[];
 extern constext txt_listing_archive[];
+extern constext txt_mail[];
 extern constext txt_mail_art_to[];
 extern constext txt_mail_bug_report[];
 extern constext txt_mail_bug_report_confirm[];
@@ -816,6 +826,7 @@ extern constext txt_opt_full_page_scroll[];
 extern constext txt_opt_group_catchup_on_exit[];
 extern constext txt_opt_groupname_max_length[];
 extern constext txt_opt_inverse_okay[];
+extern constext txt_opt_keep_dead_articles[];
 extern constext txt_opt_keep_posted_articles[];
 extern constext txt_opt_mail_8bit_header[];
 extern constext txt_opt_mail_mime_encoding[];
@@ -841,6 +852,7 @@ extern constext txt_opt_quote_empty_lines[];
 extern constext txt_opt_quote_signatures[];
 extern constext txt_opt_reread_active_file_secs[];
 extern constext txt_opt_save_to_mmdf_mailbox[];
+extern constext txt_opt_spamtrap_warning_addresses[];
 extern constext txt_opt_savedir[];
 extern constext txt_opt_show_author[];
 extern constext txt_opt_show_description[];
@@ -892,6 +904,7 @@ extern constext txt_post_subject[];
 extern constext txt_posted_info_file[];
 extern constext txt_posting[];
 extern constext txt_postpone_repost[];
+extern constext txt_print[];
 extern constext txt_printed[];
 extern constext txt_printing[];
 extern constext txt_quick_filter_kill[];
@@ -923,6 +936,7 @@ extern constext txt_reconnect_to_news_server[];
 extern constext txt_remove_bogus[];
 extern constext txt_rename_error[];
 extern constext txt_reply_to_author[];
+extern constext txt_repost[];
 extern constext txt_repost_an_article[];
 extern constext txt_repost_group[];
 extern constext txt_rereading_active_file[];
@@ -931,6 +945,7 @@ extern constext txt_resp_redirect[];
 extern constext txt_resp_to_poster[];
 extern constext txt_resp_x_of_n[];
 extern constext txt_return_key[];
+extern constext txt_save[];
 extern constext txt_save_config[];
 extern constext txt_save_filename[];
 extern constext txt_saved[];
@@ -1024,6 +1039,7 @@ extern constext txt_tinrc_groupname_max_length[];
 extern constext txt_tinrc_header[];
 extern constext txt_tinrc_info_in_last_line[];
 extern constext txt_tinrc_inverse_okay[];
+extern constext txt_tinrc_keep_dead_articles[];
 extern constext txt_tinrc_keep_posted_articles[];
 extern constext txt_tinrc_mail_8bit_header[];
 extern constext txt_tinrc_mail_address[];
@@ -1047,6 +1063,7 @@ extern constext txt_tinrc_quote_empty_lines[];
 extern constext txt_tinrc_quote_signatures[];
 extern constext txt_tinrc_reread_active_file_secs[];
 extern constext txt_tinrc_save_to_mmdf_mailbox[];
+extern constext txt_tinrc_spamtrap_warning_addresses[];
 extern constext txt_tinrc_show_author[];
 extern constext txt_tinrc_show_description[];
 extern constext txt_tinrc_show_last_line_prev_page[];
@@ -1085,6 +1102,7 @@ extern constext txt_unthreading_arts[];
 extern constext txt_uudecoding[];
 extern constext txt_value_out_of_range[];
 extern constext txt_warn_art_line_too_long[];
+extern constext txt_warn_blank_subject[];
 extern constext txt_warn_cancel[];
 extern constext txt_warn_difficulties[];
 extern constext txt_warn_followup_to_several_groups[];
@@ -1092,7 +1110,6 @@ extern constext txt_warn_missing_followup_to[];
 extern constext txt_warn_multiple_sigs[];
 extern constext txt_warn_not_in_newsrc[];
 extern constext txt_warn_not_valid_newsgroup[];
-extern constext txt_warn_posting_etiquette[];
 extern constext txt_warn_sig_too_long[];
 extern constext txt_warn_suspicious_mail[];
 extern constext txt_warn_update[];
@@ -1230,6 +1247,7 @@ extern t_bool default_show_only_unread;
 extern t_bool delete_index_file;
 extern t_bool display_mime_header_asis;
 extern t_bool display_mime_allheader_asis;
+extern t_bool do_rfc1521_decoding;
 extern t_bool draw_arrow_mark;
 extern t_bool force_reread_active_file;
 extern t_bool force_screen_redraw;
@@ -1245,6 +1263,7 @@ extern t_bool mail_news;
 extern t_bool mark_saved_read;
 extern t_bool newsrc_active;
 extern t_bool note_end;					/* end of article ? */
+extern t_bool no_write;
 extern t_bool pos_first_unread;
 extern t_bool post_8bit_header;
 extern t_bool post_article_and_exit;
@@ -1353,6 +1372,7 @@ extern constext txt_opt_mail_address[];
 #endif
 
 #ifndef DONT_HAVE_PIPING
+	extern constext txt_pipe[];
 	extern constext txt_pipe_to_command[];
 	extern constext txt_piping[];
 #else
@@ -1515,23 +1535,21 @@ extern constext txt_opt_mail_address[];
 
 #ifdef LOCAL_CHARSET
 	extern constext txt_tinrc_local_charset[];
-	extern int use_local_charset;
+	extern t_bool use_local_charset;
 #endif /* LOCAL_CHARSET */
 
 #ifdef M_AMIGA
 	extern constext txt_env_var_not_found[];
-	extern int tin_bbs_mode;
+	extern t_bool tin_bbs_mode;
 #endif /* M_AMIGA */
 
 #ifdef M_OS2
 	extern char TMPDIR[PATH_LEN];
 #endif /* M_OS2 */
 
-#ifdef M_UNIX
-	extern constext txt_help_keep_dead_articles[];
-	extern constext txt_opt_keep_dead_articles[];
-	extern constext txt_tinrc_keep_dead_articles[];
-#endif /* M_UNIX */
+#ifndef NO_ETIQUETTE
+	extern constext txt_warn_posting_etiquette[];
+#endif /* NO_ETIQUETTE */
 
 #ifndef NO_SHELL_ESCAPE
 	extern constext txt_help_shell[];
@@ -1544,23 +1562,5 @@ extern constext txt_opt_mail_address[];
 #ifdef NNTP_ABLE
 	extern unsigned short nntp_tcp_port;
 #endif
-
-#if 0 /* unused */
-extern constext txt_abort_indexing[];
-extern constext txt_abort_searching[];
-extern constext txt_connection_to_server_broken[];
-extern constext txt_help_cr[];
-extern constext txt_help_g_c[];
-extern constext txt_help_g_l[];
-extern constext txt_help_space_toggles[];
-extern constext txt_help_t_K[];
-extern constext txt_help_t_tab[];
-extern constext txt_tinrc_mail_mime_encoding[];
-extern constext txt_tinrc_mail_quote_format[];
-extern constext txt_tinrc_thread_catchup_on_exit[];
-extern constext txt_tinrc_xpost_quote_format[];
-extern constext txt_subscribe_to_new_group[];
-extern constext txt_subscribing_to[];
-#endif /* 0 */
 
 #endif /* !EXTERN_H */

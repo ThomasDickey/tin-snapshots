@@ -95,13 +95,14 @@
 	mail_quote_format		OPT_STRING
 	advertising			OPT_ON_OFF
 	mm_charset			OPT_STRING
-	post_mime_encoding		txt_mime_types	NUM_MIME_TYPES
+	post_mime_encoding		txt_mime_encodings	NUM_MIME_ENCODINGS
 	post_8bit_header		OPT_ON_OFF
-	mail_mime_encoding		txt_mime_types	NUM_MIME_TYPES
+	mail_mime_encoding		txt_mime_encodings	NUM_MIME_ENCODINGS
 	mail_8bit_header		OPT_ON_OFF
 	strip_blanks			OPT_ON_OFF
 	auto_cc				OPT_ON_OFF
 	auto_bcc			OPT_ON_OFF
+	spamtrap_warning_addresses	OPT_STRING
 	default_filter_days		OPT_NUM
 	add_posted_to_filter		OPT_ON_OFF
 

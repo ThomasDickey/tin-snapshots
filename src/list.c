@@ -105,9 +105,8 @@ psGrpFind (
 {
 	int i;
 
-	if ((i = find_group_index(pcGrpName)) != -1) {
+	if ((i = find_group_index(pcGrpName)) != -1)
 		return &active[i];
-	}
 
 	return (struct t_group *) 0;
 }

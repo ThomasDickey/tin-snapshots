@@ -19,15 +19,14 @@
  */
 
 /*
- * special itoa()
+ * special ltoa()
  * converts value into a string with a len of digits
  * last char may be one of the following
  * Kilo, Mega, Giga, Terra
  */
-
 char *
-tin_itoa (
-	int value,	/* change to long int if needed */
+tin_ltoa (
+	long value,
 	int digits)
 {
 	static char buffer[256];
@@ -35,22 +34,22 @@ tin_itoa (
 	int len;
 	int i=0;
 
-	sprintf (buffer, "%d", value);
+	sprintf (buffer, "%ld", value);
 	len = (int) strlen (buffer);
 
 	while (len > digits) {
-		len-=3;
+		len -= 3;
 		i++;
 	}
 
 	if (i) {
 		while (len < (digits-1))
-			buffer[len++]=' ';
+			buffer[len++] = ' ';
 
 		buffer[digits-1] = power[i];
 		buffer[digits] = '\0';
 	} else
-		sprintf(buffer, "%*d", digits, value);
+		sprintf (buffer, "%*ld", digits, value);
 
 	return (buffer);
 }
@@ -474,7 +473,7 @@ sh_format (char *dst,
 	va_list ap;
 	int quote = 0;
 
-	va_start(ap,fmt);
+	va_start(ap, fmt);
 
 	while (*fmt != 0) {
 		int ch = *fmt++;

@@ -22,7 +22,7 @@ char default_save_file[PATH_LEN];
 char default_regex_pattern[LEN];
 char default_repost_group[LEN];
 char proc_ch_default;			/* set in change_config_file () */
-
+t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
 
 /*
  * Local prototypes
@@ -53,7 +53,9 @@ feed_articles (
 	char option = iKeyFeedSupersede;
 	char option_default = iKeyFeedSupersede;
 	constext *prompt;
+#ifndef DONT_HAVE_PIPING
 	FILE *fp = (FILE *) 0;
+#endif
 	int ch, ch_default;
 	int b, i, j;
 	int confirm;
@@ -79,7 +81,7 @@ feed_articles (
 		clear_message ();
 		return;
 	}
-#endif
+#endif /* DONT_HAVE_PIPING */
 
 	set_xclick_off ();
 
@@ -99,19 +101,21 @@ feed_articles (
 
 	switch (function) {
 		case FEED_MAIL:
-			prompt = "Mail";
+			prompt = txt_mail;
 			break;
+#ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
-			prompt = "Pipe";
+			prompt = txt_pipe;
 			break;
+#endif /* !DONT_HAVE_PIPING */
 		case FEED_PRINT:
-			prompt = "Print";
+			prompt = txt_print;
 			break;
 		case FEED_SAVE:
-			prompt = "Save";
+			prompt = txt_save;
 			break;
 		case FEED_REPOST:
-			prompt = "Repost";
+			prompt = txt_repost;
 			break;
 		default:
 			prompt = "";
@@ -177,6 +181,8 @@ feed_articles (
 				}
 			}
 			break;
+
+#ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 			sprintf (msg, txt_pipe_to_command,
 				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
@@ -203,6 +209,8 @@ feed_articles (
 			wait_message (0, txt_piping);
 			EndWin();
 			break;
+#endif /* !DONT_HAVE_PIPING */
+
 		case FEED_PRINT:
 			sprintf (command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
 			break;
@@ -252,20 +260,23 @@ feed_articles (
 							my_strncpy (my_mailbox, filename+1, sizeof (my_mailbox));
 						else {
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
-							/*
-							 *  convert 1st letter to uppercase
-							 */
-							if (my_mailbox[0] >= iKeyFeedArt && my_mailbox[0] <= 'z')
-								my_mailbox[0] = my_mailbox[0] - 32;
+							/* convert 1st letter to uppercase */
+							if (islower(my_mailbox[0]))
+								my_mailbox[0] = (char) toupper (my_mailbox[0]);
 						}
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
-						proc_ch = prompt_slk_response(proc_ch_default, "eElLnqsu\033",
-									txt_post_process_type);
+						proc_ch = prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
 						}
+						/* FIXME, ugly hack */
+						/* check if rfc1521 decoding is needed */
+						if (proc_ch == 'n')
+							do_rfc1521_decoding = FALSE;
+						else
+							do_rfc1521_decoding = TRUE;
 					}
 				}
 			}
@@ -339,19 +350,23 @@ feed_articles (
 					redraw_screen = mail_to_someone (respnum, address, FALSE, TRUE, &processed_ok);
 					break;
 
+#ifndef DONT_HAVE_PIPING
 				case FEED_PIPE:
-					fseek (note_fp, 0L, SEEK_SET);
-					if (got_sig_pipe)
-						goto got_sig_pipe_while_piping;
-					copy_fp (note_fp, fp);
+					if (art_open (&arts[respnum], group_path, FALSE) == 0) {
+						fseek (note_fp, 0L, SEEK_SET);
+						if (got_sig_pipe)
+							goto got_sig_pipe_while_piping;
+						copy_fp (note_fp, fp);
+					}
 					break;
+#endif /* !DONT_HAVE_PIPING */
 
 				case FEED_PRINT:
 					processed_ok = print_file (command, respnum, 1);
 					break;
 
 				case FEED_SAVE:
-					if (art_open (&arts[respnum], group_path) == 0) {
+					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) == 0) {
 						add_to_save_list (0, &arts[respnum], is_mailbox, TRUE, filename);
 						processed_ok = save_art_to_file (respnum, 0, FALSE, "");
 					}
@@ -359,7 +374,7 @@ feed_articles (
 
 				case FEED_REPOST:
 					if (can_post)
-						redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
+						redraw_screen = repost_article (group_name, respnum, supersede);
 					else
 						info_message (txt_cannot_post);
 					break;
@@ -400,12 +415,16 @@ feed_articles (
 						confirm = (processed_ok ? FALSE : TRUE);
 						break;
 
+#ifndef DONT_HAVE_PIPING
 					case FEED_PIPE:
+						if (art_open (&arts[i], group_path, FALSE))
+							break;
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
 						fseek (note_fp, 0L, SEEK_SET);
 						copy_fp (note_fp, fp);
 						break;
+#endif /* !DONT_HAVE_PIPING */
 
 					case FEED_PRINT:
 						processed_ok = print_file (command, i, processed+1);
@@ -417,7 +436,7 @@ feed_articles (
 
 					case FEED_REPOST:
 						if (can_post)
-							redraw_screen = repost_article (group_name, &arts[i], i, supersede);
+							redraw_screen = repost_article (group_name, i, supersede);
 						else
 							info_message (txt_cannot_post);
 						break;
@@ -457,12 +476,16 @@ feed_articles (
 								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
+#ifndef DONT_HAVE_PIPING
 							case FEED_PIPE:
+								if (art_open (&arts[j], group_path, FALSE))
+									break;
 								if (got_sig_pipe)
 									goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
+#endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
@@ -475,7 +498,7 @@ feed_articles (
 
 							case FEED_REPOST:
 								if (can_post)
-									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+									redraw_screen = repost_article (group_name, j, supersede);
 								else
 									info_message (txt_cannot_post);
 								break;
@@ -528,12 +551,16 @@ feed_articles (
 								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
+#ifndef DONT_HAVE_PIPING
 							case FEED_PIPE:
+								if (art_open (&arts[j], group_path, FALSE))
+									break;
 								if (got_sig_pipe)
 									goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
+#endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
@@ -545,7 +572,7 @@ feed_articles (
 
 							case FEED_REPOST:
 								if (can_post)
-									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+									redraw_screen = repost_article (group_name, j, supersede);
 								else
 									info_message (txt_cannot_post);
 								break;
@@ -592,7 +619,9 @@ feed_articles (
 		sleep (2);
 	}
 #endif
+
 	switch (function) {
+#ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 got_sig_pipe_while_piping:
 			got_sig_pipe = FALSE;
@@ -601,6 +630,8 @@ got_sig_pipe_while_piping:
 			continue_prompt ();
 			redraw_screen = TRUE;
 			break;
+#endif /* !DONT_HAVE_PIPING */
+
 		case FEED_SAVE:
 		case FEED_SAVE_TAGGED:
 			if (proc_ch != 'n' && !is_mailbox)
@@ -618,10 +649,9 @@ got_sig_pipe_while_piping:
 		redraw_screen = TRUE;
 
 	if (level == PAGE_LEVEL) {
-		if (ch != iKeyFeedArt) {
-			if (art_open (&arts[respnum], group_path) != 0)
-				return;			/* This is bad */
-		} else if (force_screen_redraw)
+		if (art_open (&arts[respnum], group_path, TRUE) != 0)
+			return;			/* This is bad */
+		if (force_screen_redraw)
 			redraw_screen = TRUE;
 		note_end = orig_note_end;
 		note_page = orig_note_page;
@@ -756,7 +786,7 @@ does_article_exist (
 		if (stat_article (art->artnum, path))
 			retcode = TRUE;
 	} else {
-		if (art_open (art, path) != ART_UNAVAILABLE)
+		if (art_open (art, path, TRUE) != ART_UNAVAILABLE)
 			retcode = TRUE;		/* Even if the user aborted, the art still exists */
 	}
 

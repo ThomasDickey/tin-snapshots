@@ -903,13 +903,13 @@ PROFILE_ON();
 
 				case 'r':		/* Window bounds report */
 					ptr = (char *)&buf[bufp+1];
-					strtol(ptr,&ptr,10);
+					strtol(ptr, &ptr, 10);
 					ptr++;
-					strtol(ptr,&ptr,10);
+					strtol(ptr, &ptr, 10);
 					ptr++;
-					new_lines = strtol(ptr,&ptr,10);
+					new_lines = strtol(ptr, &ptr, 10);
 					ptr++;
-					new_columns = strtol(ptr,&ptr,10);
+					new_columns = strtol(ptr, &ptr, 10);
 					buflen = bufp;
 					if (getscrsize)
 						return 0;
@@ -917,10 +917,11 @@ PROFILE_ON();
 
 				case '|':		/* Raw Input Events */
 					ptr = (char *)&buf[bufp+1];
-					class = strtol(ptr,&ptr,10);
+					class = strtol(ptr, &ptr, 10);
 					ptr++;
-					switch (class)
-					{	int x,y;
+					switch (class) {
+						int x, y;
+
 						case 12:	/* Window resized */
 							buflen = bufp; /* Must do this before raise() */
 							raise(SIGWINCH);
@@ -971,7 +972,7 @@ AmiGetWinSize(int *lines, int *columns)
 {
 #ifndef INDEX_DAEMON
 	if (_getwinsize) {
-		tputs (_getwinsize,1,outchar);	/* identify yourself */
+		tputs (_getwinsize, 1, outchar);	/* identify yourself */
 		my_flush ();
 		AmiReadCh(1);		/* Look for the identification */
 		*lines = new_lines;

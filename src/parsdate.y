@@ -98,6 +98,7 @@ static time_t	DSTcorrect(time_t, time_t);
 static time_t	RelativeMonth(time_t, time_t);
 static int	LookupWord(char	*, int);
 static int	date_lex(void);
+static int	GetTimeInfo(TIMEINFO *Now);
 
 /*
  * The 'date_error()' function is declared here to work around a defect in
@@ -224,9 +225,9 @@ numzone	: tSNUMBER {
 	    int	i;
 
 	    /* Unix and GMT and numeric timezones -- a little confusing. */
-	    if ($1 < 0) {
+	    if ((int)$1 < 0) {
 		/* Don't work with negative modulus. */
-		$1 = -$1;
+		$1 = -(int)$1;
 	 	if ($1 > 9999 || (i = $1 % 100) >= 60) {
 	 		YYABORT;
 	 	}
@@ -753,7 +754,7 @@ date_lex(void)
 }
 
 
-int
+static int
 GetTimeInfo(
     TIMEINFO		*Now)
 {

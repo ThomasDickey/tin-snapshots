@@ -59,7 +59,7 @@ ECHO	= echo
 LINT	= @LINT@
 LN	= ln
 LS	= ls -l
-MV	= mv
+MV	= mv -f
 RM	= rm
 TAGS	= ctags
 ETAGS	= etags
@@ -298,6 +298,7 @@ clean:
 	@$(ECHO) "Cleaning Philip Hazel's Perl regular expressions library..."
 	@$(CD) ../pcre && $(MAKE) @cf_cv_makeflags@ clean
 
+laundry \
 dirty:
 	@$(ECHO) "I'm sorry, this is not supported yet ..."
 
@@ -331,7 +332,7 @@ tincfg.h:			$(SRCDIR)/tincfg.tbl \
 	./makecfg $(SRCDIR)/tincfg.tbl tincfg.h
 
 makecfg:			$(OBJDIR)/makecfg.o
-	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg
+	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg @LIBS@
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h

@@ -623,12 +623,18 @@ compile_branch(int options, int *brackets, uschar **codeptr,
 int repeat_type, op_type;
 int repeat_min, repeat_max;
 int bravalue, length;
+int greedy_default, greedy_non_default;
 register int c;
 register uschar *code = *codeptr;
 const uschar *ptr = *ptrptr;
 const uschar *oldptr;
 uschar *previous = NULL;
 uschar class[32];
+
+/* Set up the default and non-default settings for greediness */
+
+greedy_default = ((options & PCRE_UNGREEDY) != 0);
+greedy_non_default = greedy_default ^ 1;
 
 /* Switch on next character until the end of the branch */
 
@@ -907,10 +913,13 @@ for (;; ptr++)
       goto FAILED;
       }
 
-    /* If the next character is '?' this is a minimizing repeat. Advance to the
+    /* If the next character is '?' this is a minimizing repeat, by default,
+    but if PCRE_UNGREEDY is set, it works the other way round. Advance to the
     next character. */
 
-    if (ptr[1] == '?') { repeat_type = 1; ptr++; } else repeat_type = 0;
+    if (ptr[1] == '?')
+      { repeat_type = greedy_non_default; ptr++; }
+    else repeat_type = greedy_default;
 
     /* If the maximum is zero then the minimum must also be zero; Perl allows
     this case, so we do too - by simply omitting the item altogether. */
@@ -999,13 +1008,19 @@ for (;; ptr++)
         /* If the mininum is 1 and the previous item was a character string,
         we either have to put back the item that got cancelled if the string
         length was 1, or add the character back onto the end of a longer
-        string. For a character type nothing need be done; it will just get put
-        back naturally. */
+        string. For a character type nothing need be done; it will just get
+        put back naturally. Note that the final character is always going to
+        get added below. */
 
         else if (*previous == OP_CHARS)
           {
           if (code == previous) code += 2; else previous[1]++;
           }
+
+        /*  For a single negated character we also have to put back the
+        item that got cancelled. */
+
+        else if (*previous == OP_NOT) code++;
 
         /* If the maximum is unlimited, insert an OP_STAR. */
 
@@ -1149,6 +1164,8 @@ for (;; ptr++)
         case 'm':
         case 's':
         case 'x':
+        case 'U':
+        case 'X':
         ptr++;
         while (*ptr != ')') ptr++;
         previous = NULL;
@@ -1752,7 +1769,7 @@ while ((c = *(++ptr)) != 0)
         ptr += 2;
         break;
         }
-      /* Else fall thourh */
+      /* Else fall through */
 
       /* Else loop setting valid options until ) is met. Anything else is an
       error. */
@@ -1780,6 +1797,16 @@ while ((c = *(++ptr)) != 0)
           {
           options |= PCRE_EXTENDED;
           length -= spaces;          /* Already counted spaces */
+          continue;
+          }
+        else if (c == 'X')
+          {
+          options |= PCRE_EXTRA;
+          continue;
+          }
+        else if (c == 'U')
+          {
+          options |= PCRE_UNGREEDY;
           continue;
           }
         else if (c == ')') break;
@@ -1987,14 +2014,15 @@ printf("Length = %d top_bracket = %d top_backref=%d\n",
 
 if (re->options != 0)
   {
-  printf("%s%s%s%s%s%s%s\n",
+  printf("%s%s%s%s%s%s%s%s\n",
     ((re->options & PCRE_ANCHORED) != 0)? "anchored " : "",
     ((re->options & PCRE_CASELESS) != 0)? "caseless " : "",
     ((re->options & PCRE_EXTENDED) != 0)? "extended " : "",
     ((re->options & PCRE_MULTILINE) != 0)? "multiline " : "",
     ((re->options & PCRE_DOTALL) != 0)? "dotall " : "",
     ((re->options & PCRE_DOLLAR_ENDONLY) != 0)? "endonly " : "",
-    ((re->options & PCRE_EXTRA) != 0)? "extra " : "");
+    ((re->options & PCRE_EXTRA) != 0)? "extra " : "",
+    ((re->options & PCRE_UNGREEDY) != 0)? "ungreedy " : "");
   }
 
 if ((re->options & PCRE_FIRSTSET) != 0)

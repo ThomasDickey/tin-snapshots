@@ -196,7 +196,7 @@ debug_print_base (void)
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 		for (i = 0; i < top_base; i++)
-			fprintf (fp, "base[%3d]=[%5ld]\n",i,base[i]);
+			fprintf (fp, "base[%3d]=[%5ld]\n", i, base[i]);
 		fflush (fp);
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));

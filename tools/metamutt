@@ -1,10 +1,16 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.4 1998/01/20 11:04:25 urs Exp $
+# $Id: metamutt,v 1.6 1998/03/31 12:33:53 roland Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
 # work as a filter without any problems.
+# 
+# This script was written to use it in combination with the tin news
+# reader, where you have to set the envionment variable
+# METAMAIL=metamutt, but it should work with other programs, too.
+#
+# Pressing "g" allows you to post a Followup to a newsgroup.
 #
 # (c) 1997,98 Roland Rosenfeld <roland@spinnaker.rhein.de>
 #
@@ -25,20 +31,30 @@ do
     esac
 done
 
+# create mbox message:
+echo "From PIPE `date`" > $TMP-mbox
+cat $* - | sed 's/^From />From /' >> $TMP-mbox
+
 # create special muttrc for metamutt:
 cat > $TMP-rc<<EOF
 source ~/.muttrc
 set pager_index_lines=0
+bind pager \t next-page
 bind pager i quit
 bind pager q quit
 bind pager x quit
+macro pager g ":set sendmail=$TMP-inews dsn_notify='' dsn_return=''\n:my_hdr `formail -X Newsgroups < $TMP-mbox`\nr"
 bind index q quit
 push "\n"
 EOF
 
-# create a mbox message:
-echo "From PIPE `date`" > $TMP-mbox
-cat $* - | sed 's/^From />From /' >> $TMP-mbox
+# create special inews which removes mail only headers:
+cat > $TMP-inews<<EOF
+#! /bin/sh
+formail -I To -I Cc -I Bcc -I Fcc -I From\  -I In-Reply-To \
+    -R X-Mailer User-Agent | inews -h
+EOF
+chmod 700 $TMP-inews
 
 # run mutt on mbox message with special muttrc:
 mutt -F $TMP-rc -R -f $TMP-mbox </dev/tty >/dev/tty

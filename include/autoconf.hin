@@ -65,6 +65,7 @@
 #undef	HAVE_ISPELL
 #undef	HAVE_METAMAIL
 #undef	HAVE_PGP
+#undef	HAVE_PGP_5
 #undef	HAVE_SUM
 
 /*
@@ -151,6 +152,7 @@
 #undef	HAVE_GETHOSTBYNAME
 #undef	HAVE_GETSERVBYNAME
 #undef	HAVE_IS_XTERM
+#undef	HAVE_ISASCII
 #undef	HAVE_MEMCMP
 #undef	HAVE_MEMCPY
 #undef	HAVE_MEMSET
@@ -232,6 +234,7 @@
 #undef	DECL_INET_ADDR
 #undef	DECL_INET_NTOA
 #undef	DECL_IOCTL
+#undef	DECL_ISASCII
 #undef	DECL_MALLOC
 #undef	DECL_MEMSET
 #undef	DECL_MKTEMP

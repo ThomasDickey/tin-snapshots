@@ -104,7 +104,7 @@ happens to the wCNews "active" if you use the actived, but on the other
 hand I am not too keen on making a samba dance with my running hard disk
 in hand either.
 
-You might need a wrapper script like the one described in the README. 
+You might need a wrapper script like the one described in the README.
 
 b) ADE-gcc
 Put tin where appropriate. Don't forget to set the NNTPSERVER variable

@@ -261,7 +261,6 @@
 #	ifdef HAVE_DIRENT_H
 #		include <dirent.h>
 #		define	DIR_BUF struct dirent
-#		define	D_NAMLEN(p)	(p)->d_reclen
 #	else
 #		ifdef HAVE_SYS_DIR_H
 #			include <sys/dir.h>
@@ -270,40 +269,33 @@
 #			include <sys/ndir.h>
 #		endif
 #		define	DIR_BUF struct direct
-#		define	D_NAMLEN(p)	(p)->d_namlen
 #	endif
 #else
 #	ifdef M_AMIGA
 #		include "amiga.h"
 #		define	DIR_BUF 	struct dirent
-#		define	D_NAMLEN(p)	(p)->d_reclen
 #	endif
 #	ifdef M_OS2
 #		include "os_2.h"
 #		define	DIR_BUF 	struct dirent
-#		define	D_NAMLEN(p)	(p)->d_reclen
 #	endif
 #	ifdef WIN32
 #		include "win32.h"
 #		define	DIR_BUF 	struct direct
-#		define	D_NAMLEN(p)	(p)->d_namlen
 #	endif
 #	ifdef M_XENIX
 #		include <sys/ndir.h>
 #		define	DIR_BUF 	struct direct
-#		define	D_NAMLEN(p)	(p)->d_namlen
 #	endif
 #	ifdef VMS
 #		include "ndir.h"
 #		define 	DIR_BUF 	struct direct
-#		define 	D_NAMLEN(p)	(p)->d_namlen
 #	endif
 #endif	/* !HAVE_CONFIG_H */
 
 #ifndef DIR_BUF
 #	include <dirent.h>
 #	define	DIR_BUF 	struct dirent
-#	define	D_NAMLEN(p)	(p)->d_reclen
 #endif
 
 #ifndef HAVE_UNLINK
@@ -317,6 +309,13 @@
 #if !defined(STDIN_FILENO)
 #	define	STDIN_FILENO	0
 #endif
+
+/*
+ * If OS misses the isascii() function
+ */
+#ifndef HAVE_ISASCII
+#	define isascii(c) (!((c) & ~0177))
+#endif /* HAVE_ISASCII */
 
 /*
  * Setup support for reading from NNTP
@@ -673,7 +672,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #endif
 
 /* safe strcpy into fixed-legth buffer */
-#define	STRCPY(dst, src)	(dst[sizeof(dst) - 1] = 0, strncpy(dst, src, sizeof(dst) -1))
+#define	STRCPY(dst, src)	(dst[sizeof(dst) - 1] = '\0', strncpy(dst, src, sizeof(dst) -1))
 
 #define	STRCMPEQ(s1, s2)	(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define	STRNCMPEQ(s1, s2, n)	(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
@@ -761,9 +760,14 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define TIN_TIMEOUT		2			/* Client side timeout */
 
 /*
- * Number of mime types
+ * Number of MIME Encodings
  */
-#define	NUM_MIME_TYPES	4
+#define	NUM_MIME_ENCODINGS	4
+
+#define MIME_ENCODING_8BIT	0
+#define MIME_ENCODING_BASE64	1
+#define MIME_ENCODING_QP	2
+#define MIME_ENCODING_7BIT	3
 
 /*
  * Number of charset-traslation tables (iso2asci)
@@ -1917,8 +1921,8 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 
 /* define some standard places to look for a tin.defaults file */
 #define TIN_DEFAULTS_BUILTIN "/etc/opt/tin","/etc/tin","/etc","/usr/local/lib/tin","/usr/local/lib","/usr/local/etc/tin","/usr/local/etc","/usr/lib/tin","/usr/lib",NULL
-#ifdef	TIN_DEFAULTS_PATH
-#	define TIN_DEFAULTS TIN_DEFAULTS_PATH,TIN_DEFAULTS_BUILTIN
+#ifdef	TIN_DEFAULTS_DIR
+#	define TIN_DEFAULTS TIN_DEFAULTS_DIR,TIN_DEFAULTS_BUILTIN
 #else
 #	define TIN_DEFAULTS TIN_DEFAULTS_BUILTIN
 #endif

@@ -55,7 +55,7 @@ static int
 submit_inews (
 	char *name)
 {
-	int	ret_code = FALSE;
+	t_bool ret_code = FALSE;
 
 #if !defined(INDEX_DAEMON)
 
@@ -64,9 +64,12 @@ submit_inews (
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
+	int auth_error = 0;
 #		ifndef FORGERY
 	int	ismail=FALSE;
 #		endif /* FORGERY */
+	int respcode;
+	t_bool leave_loop = FALSE;
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, name);
@@ -88,7 +91,6 @@ submit_inews (
 		} else
 			break; /* end of headers */
 	}
-	rewind(fp);
 
 	if (from_name[0]=='\0') {
 		/* we could silently add a From: line here if we want to... */
@@ -99,68 +101,102 @@ submit_inews (
 
 
 	/*
-	 * Check that at least one '.' comes after the '@' in the From: line
+	 * check for @ and that at least one '.' comes after the '@' in the From: line
 	 */
+	/* see also post.c/insert_from_header() */
 	if ((ptr = strchr (from_name, '@')) != (char *) 0) {
-		if ((ptr = strchr (ptr, '.')) == (char *) 0) {
-			error_message ("Invalid  From: %s line. Read the INSTALL file again.", from_name);
+		if ((ptr = strchr (ptr, '.')) == (char *) 0) { /* no '.' */
+			error_message (txt_invalid_from, from_name);
 			fclose (fp);
 			return ret_code;
 		}
+	} else { /* no '@' */
+		error_message (txt_invalid_from, from_name);
+		fclose (fp);
+		return ret_code;
 	}
 
 	/*
 	 * Send POST command to NNTP server
 	 * Receive CONT_POST or ERROR response code from NNTP server
 	 */
-	if (nntp_command("POST", CONT_POST, line) == NULL) {
-		error_message ("%s", line);
-		fclose (fp);
-		return ret_code;
-	}
-
-	/*
-	 * Send Path: and From: article headers
-	 */
-#		ifndef FORGERY
-	sprintf (line, "Path: %s", PATHMASTER);
-	put_server (line);
-
-	if ((ptr = build_sender())) {
-		if(sender_needed(rfc1522_decode(from_name), ptr)) {
-			sprintf (line, "Sender: %s", rfc1522_encode(ptr,ismail));
-			put_server (line);
+	do {
+		rewind(fp);
+		if (nntp_command("POST", CONT_POST, line) == NULL) {
+			error_message ("%s", line);
+			fclose (fp);
+			return ret_code;
 		}
-	}
+
+		/*
+		 * Send Path: and From: article headers
+		 */
+#		ifndef FORGERY
+		sprintf (line, "Path: %s", PATHMASTER);
+		put_server (line);
+
+		if ((ptr = build_sender())) {
+			if(sender_needed(rfc1522_decode(from_name), ptr) == 1) {
+				sprintf (line, "Sender: %s", rfc1522_encode(ptr, ismail));
+				put_server (line);
+			}
+		}
 #		endif /* !FORGERY */
 
-	/*
-	 * Send article 1 line at a time ending with "."
-	 */
-	while (fgets (line, sizeof (line), fp) != (char *) 0) {
 		/*
-		 * Remove linefeed from line
+		 * Send article 1 line at a time ending with "."
 		 */
-		if ((ptr = strrchr (line, '\n')) != (char *) 0)
-			*ptr = '\0';
+		while (fgets (line, sizeof (line), fp) != (char *) 0) {
+			/*
+			 * Remove linefeed from line
+			 */
+			if ((ptr = strrchr (line, '\n')) != (char *) 0)
+				*ptr = '\0';
+
+			/*
+			 * If line starts with a '.' add another '.' to stop truncation
+			 */
+			if (line[0] == '.')
+				u_put_server (".");
+
+			u_put_server (line);
+			u_put_server ("\r\n");
+		}
+
+		put_server (".");
 
 		/*
-		 * If line starts with a '.' add another '.' to stop truncation
+		 * Receive OK_POSTED or ERROR response code from NNTP server
+		 * Don't use get_respcode at this point, because then we would not
+		 * recognize if posting has failed due to missing authentication in
+		 * which case the complete posting has to be resent. Besides, because
+		 * of the put_server(".") above a "." would be resent as the last
+		 * "command".
 		 */
-		if (line[0] == '.')
-			u_put_server (".");
+		respcode = get_only_respcode (line);
+		leave_loop = TRUE;
 
-		u_put_server (line);
-		u_put_server ("\r\n");
-	}
+		/*
+		 * Don't leave this loop if we only tried once to post and an
+		 * authentication request was received. Leave loop on any other
+		 * response or any further authentication requests.
+		 */
+		if (((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO))
+				&& (auth_error++ < 1) && (authenticate (nntp_server, userid, FALSE))) {
+					leave_loop = FALSE;
+		}
+	} while (!leave_loop);
 
-	put_server (".");
 	fclose (fp);
 
 	/*
-	 * Receive OK_POSTED or ERROR response code from NNTP server
+	 * FIXME: The displayed message may be wrong if authentication has
+	 * failed.  (The message will be sth. like "Authentication required"
+	 * which is not really wrong but misleading. The problem is that
+	 * authenticate() does only return a bool value and not the server
+	 * response.)
 	 */
-	if (get_respcode (line) != OK_POSTED) {
+	if (respcode != OK_POSTED) {
 		error_message ("Posting failed %s", line);
 		return ret_code;
 	}
@@ -189,10 +225,10 @@ submit_news_file (
 	checknadd_headers (name);
 
 	/* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
-	if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))
+	if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(txt_mime_encodings[post_mime_encoding], txt_7bit)))
 		post_mime_encoding = 0;	/* FIXME: txt_8bit */
 
-	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header, ismail);
+	rfc15211522_encode(name, txt_mime_encodings[post_mime_encoding], post_8bit_header, ismail);
 
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG
@@ -228,9 +264,10 @@ submit_news_file (
  * FIXME: do _real_ RFC822-parsing - currently this is a quick hack
  *        to cover the most usual cases...
  *
- * returnvalues:  FALSE = no Sender needed
- *                TRUE  = Sender needed
- *                -1    = error (no '.' and/or '@' in from and/or sender)
+ * returnvalues:  1 = Sender needed
+ *                0 = no Sender needed
+ *               -1 = error (no '.' and/or '@' in From)
+ *               -2 = error (no '.' and/or '@' in Sender)
  */
 #if defined (NNTP_INEWS) && !defined(FORGERY)
 static int sender_needed (
@@ -266,23 +303,23 @@ static int sender_needed (
 		sender_login_pos++; /* skip '<' */
 
 	if ((sender_at_pos = strchr (sender_login_pos, '@')) == (char *) 0)
-		return -1; /* no '@' in sender */
+		return -2; /* no '@' in sender */
 
 	if (strncasecmp (from_login_pos, sender_login_pos, (from_at_pos - from_login_pos)))
-		return TRUE; /* login differs */
+		return 1; /* login differs */
 
 	if (strchr (from_at_pos, '.') == (char *) 0)
 		return -1; /* no '.' in from */
 
 	if ((sender_dot_pos = strchr (sender_at_pos, '.')) == (char *) 0)
-		return -1; /* no '.' in sender */
+		return -2; /* no '.' in sender */
 
 	if (strncasecmp (from_at_pos, sender_at_pos, (from_end_pos - from_at_pos))) {
 		/* skip the 'hostname' in sender */
 		if (strncasecmp (from_at_pos+1, sender_dot_pos+1, (from_end_pos - from_at_pos - 1)))
-			return TRUE; /* domainname differs */
+			return 1; /* domainname differs */
 	}
 
-	return FALSE;
+	return 0;
 }
 #endif /* NNTP_INEWS && !FORGERY */

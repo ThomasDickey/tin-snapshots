@@ -242,12 +242,9 @@ read_groups_descriptions (
 
 			psGrp->description = my_strdup (p);
 #if 0 /* not useful for cache_overview_files */
-			if (psGrp->type == GROUP_TYPE_NEWS) {
-				if (fp_save != (FILE *) 0 &&
-						read_news_via_nntp &&
-						!read_local_newsgroups_file) {
+			if (psGrp->type == GROUP_TYPE_NEWS)
+				if (fp_save != (FILE *) 0 && read_news_via_nntp && !read_local_newsgroups_file) {
 					fprintf (fp_save, "%s\n", buf);
-				}
 			}
 #endif /* 0 */
 		}
@@ -294,7 +291,7 @@ vFindArtMaxMin (
 	tDirFile = opendir (pcGrpPath);
 	if (tDirFile != (DIR *) 0) {
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-			lArtNum = atol (tFile->d_name/*, (int) D_NAMLEN(tFile)*/); /* should be '\0' terminated ... */
+			lArtNum = atol (tFile->d_name);
 			if (lArtNum >= 1) {
 				if (lArtNum > *plArtMax) {
 					*plArtMax = lArtNum;
@@ -386,16 +383,13 @@ vGrpDelMailArt (
 
 	if (psArt->delete) {
 		art_mark_undeleted (psArt);
-		info_message ("Article undeleted");
+		info_message ("Article undeleted"); /* FIXME: -> lang.c */
 	} else {
 		art_mark_deleted (psArt);
-		info_message ("Article deleted");
+		info_message ("Article deleted"); /* FIXME: -> lang.c */
 	}
 }
-#endif	/* INDEX_DAEMON */
 
-
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 vGrpDelMailArts (
 	struct t_group *psGrp)
@@ -407,7 +401,7 @@ vGrpDelMailArts (
 	struct	t_article *psArt;
 
 	if (psGrp->type == GROUP_TYPE_MAIL) {
-		wait_message (1, "Processing mail messages marked for deletion");
+		wait_message (1, "Processing mail messages marked for deletion"); /* FIXME: -> lang.c */
 
 		vMakeGrpPath (psGrp->spooldir, psGrp->name, acGrpPath);
 
@@ -428,7 +422,7 @@ vGrpDelMailArts (
 			vWriteNovFile (psGrp);
 	}
 }
-#endif	/* !INDEX_DAEMON */
+#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING*/
 
 
 int

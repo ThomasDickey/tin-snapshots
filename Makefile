@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 980226
+PVER	= 980514
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -137,7 +137,7 @@ DOC	= \
 	$(DOCDIR)/filtering \
 	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/iso2asc.txt \
-	$(DOCDIR)/minimal-netkeeping \
+	$(DOCDIR)/good-netkeeping-seal \
 	$(DOCDIR)/umlaute.txt \
 	$(DOCDIR)/tin.defaults \
 	$(DOCDIR)/$(EXE).$(MANEXT)

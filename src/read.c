@@ -277,11 +277,11 @@ DEBUG_IO((stderr, "Oversized read !%s!\n", dynbuf));
  * We can't just stop reading a socket once we are through with it. This drains out any
  * pending data on the NNTP port
  */
+#ifdef NNTP_ABLE
 void
 drain_buffer (
 	FILE *fp)
 {
-#ifdef NNTP_ABLE
 	char buf[NNTP_STRLEN];
 	int i=0;
 
@@ -294,9 +294,8 @@ DEBUG_IO((stderr, "Drain %s\n", buf));
 		if (++i % MODULO_COUNT_NUM == 0)
 			spin_cursor();
 	}
-
-#endif
 }
+#endif /* NNTP_ABLE */
 
 /* It works the same way as fgets except that it converts
  * new line character into ' ' if the first character following it
@@ -326,7 +325,7 @@ fgets_hdr (
 				*(++s1) = (char) c;
 			} else {
 				c = (int) *s1;
-				ungetc(c,f);
+				ungetc(c, f);
 				s1--;
 				break;
 			}
@@ -343,7 +342,7 @@ fgets_hdr (
 				continue;
 			} else {
 				c = (int) *s1;
-				ungetc(c,f);
+				ungetc(c, f);
 				s1--;
 				break;
 			}

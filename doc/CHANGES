@@ -1,3 +1,117 @@
+-- 1.4.0 release 980514 --
+
+585) Stanislav Latishko <sl@sl.spb.su>
+     BUG. possible NULL-pointer reference in tind
+     ADD. allow/expand "\t" into '\t' in strfquote()
+     FIX. misc.c, refs.c
+
+584) Simon Hosie <gumboot@clear.net.nz>
+     ADD. minor code cleanup
+     FIX. post.c
+
+583) Urs Janssen <urs@tin.org>
+     BUG. compile with -DDONT_HAVE_PIPING didn't work
+     BUG. broken newsrc-lines could cause a core-dump
+     BUG. if starting with on comandline group, tin doesn't display
+          any groupnames after leaving group-level
+     BUG. no check for empty but present Followup-To line if posting
+          to multiple newsgroups
+     ADD. disable etiquette warning if beginner_level is off
+     ADD. cleaned up repost_article() to meet alt.humor.best-of-usenet
+          criteria
+     ADD. strip doubled newsgroups from Followup-To: before checking
+          if it contains several groups
+     ADD. searching in posted_message-file disabled
+     ADD. allow <TAB> as filedseperator in ~/.newsauth
+     ADD. check for empty / all whitespace Subject
+     ADD. updated pcre (1.07 -> 1.09)
+     ADD. -X cmd-line switch
+     ADD. minor code cleanup
+     FIX. extern.h, menukeys.h, proto.h, active.c, art.c, auth.c,
+          feed.c, help.c, lang.c, main.c, misc.c, newsrc.c, post.c,
+          read.c, save.c, select.c, xref.c, pcre/*
+
+581) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. depending on the auth-request authentication sometimes failed
+     BUG. article was not resent on authentication request after POST command
+     ADD. prompt default user name on authentication request
+     FIX. proto.h, auth.c, inews.c, open.c, prompt.c
+
+580) Kazushi Marukawa <jam@pobox.com>
+     BUG. writing out of final ".\r\n" could fail on some systems.
+     BUG. mail_addres was extracted after MIME-decoding From:-line
+          but parse_from() can't handle multiple '@'/'('
+     BUG. @LIBS@ was mssing in makecfg make-rule
+     BUG. From:-line was not MIME-encodet in NOV-file entrys
+          created by tin
+     FIX. Makefile[.in], art.c, nntplib.c, post.c
+
+579) Dirk Nimmich <nimmich@uni-muenster.de>
+     Urs Janssen <urs@tin.org>
+     BUG. when saving/piping MIME-encoded articles they were automatically
+          decoded but that's only usefull if any postprocessing is done
+     FIX. extern.h, proto.h, charset.c, feed.c, lang.c, open.c, page.c
+          save.c, search.c
+
+578) Hans Werner Strube <strube@physik3.gwdg.de>
+     BUG. unset TIN_DEFAULTS_PATH instead of TIN_DEFAULTS_DIR used
+          to locate the system-wide tin.defaults file
+     FIX. tin.h
+
+577) Sven Paulus <sven@tin.org>
+     ADD. spamtrap_warning_addresses option to .tin/tinrc
+     ADD. mm_charset option tin.defaults
+     BUG. off by one error in option numers for OPT_CHAR/OPT_NUM
+     BUG. MIME type and MIME encoding behaviour was a little confusing
+     FIX. extern.h, tin.h, config.c, inews.c, init.c, lang.c, post.c
+          prompt.c, rfc1522.c, tincfg.tbl
+
+576) Philipp Mergenthaler <s_mergen@ira.uka.de>
+     BUG. art_cnt[] was to small to hold terminating '\0'
+     FIX. group.c
+
+575) Dirk Nimmich <nimmich@uni-muenster.de>
+     Jens Wuepper <wuepper@math.uni-hamburg.de>
+     BUG. !alnum-chars were not always MIME encode where they should
+     FIX. rfc1522.c
+
+574) Helmut.Bohr@t-online.de (Helmut Bohr)
+     ADD. configure check for pgp-5
+     FIX. configure[.in], autoconf.h[in], pgp.c
+
+573) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+572) Thomas E. Dickey <dickey@clark.net>
+     BUG. if giving syntacticaly wrong args to some configure options
+          it didn't fallback to a usefull value.
+     FIX. aclocal.m4,configure[.in]
+
+571) Jason Faultless <jason@radar.demon.co.uk>
+     FIX. Crash on 'L' when message already read
+     ADD. Better fix for message bar crash from 468/9
+     ADD. minor cleanup
+
+570) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     BUG. negative numerical timezone information was misinterpreted
+          on systems with unsigned time_t (i.e. OpenVMS)
+     FIX. parsedate.y
+
+569) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. charset/encoding mismatch considered an error even when there
+          are no 8bit characters in the body
+     ADD. check for 7bit encoding when posting 8bit article
+     FIX. extern.h, lang.c, post.c
+
+568) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. removed D_NAMLEN() macro
+     FIX. tin.h, active.c, mail.c, open.c
+
+567) Thomas E. Dickey <dickey@clark.net>
+     BUG. check for color support was broken for old ncurses version
+     FIX. aclocal.m4, configure[.in]
+
 -- pre-1.4 release 980226 --
 
 566) Michael Stenns <stenns@hal.tci.uni-hannover.de>
@@ -215,7 +329,7 @@
           it's usually present in the body.
      FIX. post.c
 
-529) Thomas E. Dickey <dickey@clark.net>   
+529) Thomas E. Dickey <dickey@clark.net>
      ADD. use new function sh_format(), to quote filenames that require it
           for shell commands.
      ADD. implement '?','/' in help screen.
@@ -341,7 +455,7 @@
      FIX. several supplied patches
 
 509) Ralf Doeblitz <doeblitz@gmx.de>
-     BUG. random filter type (msgid or msgid_last) was created when 
+     BUG. random filter type (msgid or msgid_last) was created when
           creating new filter entries with message-id filtering.
      FIX. filter.c
 

@@ -38,7 +38,7 @@ static int parse_headers (FILE *fp, struct t_article *h);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
-static t_bool read_group (struct t_group *group, char *group_path, int *pcount);
+static int read_group (struct t_group *group, char *group_path, int *pcount);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
 
@@ -110,8 +110,7 @@ find_base (
  *
  *  Returns FALSE if the user aborted the indexing, otherwise TRUE
  */
-
-int
+t_bool
 index_group (
 	struct t_group *group)
 {
@@ -125,7 +124,7 @@ index_group (
 	register int i;
 
 	if (group == (struct t_group *) 0)
-		return (TRUE);
+		return TRUE;
 
 	if (INTERACTIVE)
 		wait_message (0, txt_group, group->name);
@@ -149,7 +148,7 @@ index_group (
 #endif /* PROFILE */
 
 	if (setup_hard_base (group, group_path) < 0)
-		return(FALSE);
+		return FALSE;
 
 #ifdef PROFILE
 	EndStopWatch();
@@ -225,7 +224,7 @@ index_group (
 	 * Create the reference tree. The msgid and ref ptrs will
 	 * be free()d now that the NovFile has been written.
 	 */
-	build_references(group);
+	build_references (group);
 
 	/*
 	 * Needs access to the reference tree
@@ -253,8 +252,9 @@ index_group (
 	if ((modified || filtered) && !batch_mode)
 		clear_message ();
 
-	return (TRUE);
+	return TRUE;
 }
+
 
 /*
  * Index a group.  Assumes any existing NOV index has already been loaded.
@@ -263,8 +263,7 @@ index_group (
  *    FALSE  loaded index but not modified
  *    -1     user aborted indexing operation
  */
-
-static t_bool
+static int
 read_group (
 	struct t_group *group,
 	char *group_path,
@@ -276,21 +275,27 @@ read_group (
 	int respnum, total = 0;
 	long art;
 	register int i;
-	static char dir[PATH_LEN] = "";
 	t_bool modified = FALSE;
+#ifndef NNTP_ONLY
+	static char dir[PATH_LEN] = "";
+#endif /* !NNTP_ONLY */
 
 	/*
 	 * change to groups spooldir to optimize fopen()'s on local articles
 	 */
 #ifdef INDEX_DAEMON
-	if (dir[0] == 0)
-#endif
-		get_cwd (dir);						/* TODO: no point via NNTP ? */
-
-	joinpath (buf, group->spooldir, group_path);
-	my_chdir (buf);
-
-	buf[0] = '\0';
+	if (dir[0] == 0) {
+#else
+#	ifndef NNTP_ONLY
+	if (!read_news_via_nntp) {
+#	endif /* !NNTP_ONLY */
+#endif /* INDEX_DAEMON */
+#ifndef NNTP_ONLY
+		get_cwd (dir);
+		joinpath (buf, group->spooldir, group_path);
+		my_chdir (buf);
+	}
+#endif /* !NNTP_ONLY */
 
 	/*
 	 *  Count num of arts to index so the user has an idea of index time
@@ -348,7 +353,10 @@ read_group (
 
 		TIN_FCLOSE(fp);
 		if (tin_errno) {
-			chdir (dir);
+#ifndef NNTP_ONLY
+			if (!read_news_via_nntp)
+				my_chdir (dir);
+#endif /* !NNTP_ONLY */
 			return(-1);
 		}
 
@@ -381,9 +389,12 @@ read_group (
 	*pcount = count;
 
 	/*
-	 * change to previous dir before indexing started
+	 * if !nntp change to previous dir before indexing started
 	 */
-	my_chdir (dir);
+#ifndef NNTP_ONLY
+	if (!read_news_via_nntp)
+		my_chdir (dir);
+#endif /* NNTP_ONLY */
 
 	return modified;
 }
@@ -399,7 +410,6 @@ read_group (
  * . One of the following is true:
  *    1) The subject lines are the same
  *    2) Both are part of the same archive (name's match and arch bit set)
- *
  */
 static void
 thread_by_subject(void)
@@ -643,6 +653,7 @@ parse_headers (
 		ptrline = ptr;
 		lineno++;		/* TODO is this needed ? */
 
+		/* FIXME: sort cases */
 		switch (toupper((unsigned char)*ptrline)) {
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
@@ -653,7 +664,7 @@ parse_headers (
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (*art_full_name)
-							h->name = hash_str (art_full_name);
+							h->name = hash_str (rfc1522_decode(art_full_name));
 						got_from = TRUE;
 					}
 				}
@@ -677,7 +688,7 @@ parse_headers (
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
 					if (match_header (ptrline+1, "ubject", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						s = eat_re (buf2, FALSE);
+						s = eat_re (rfc1522_decode(buf2), FALSE);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
 					}
@@ -724,7 +735,7 @@ parse_headers (
 							s = strrchr (h->part, '\n');
 							if (s != (char *) 0)
 								*s = '\0';
-						} else if (STRNCMPEQ(s+1,"patch",5) || STRNCMPEQ(s+1,"Patch",5)) {
+						} else if (STRNCMPEQ(s+1, "patch", 5) || STRNCMPEQ(s+1, "Patch", 5)) {
 							h->patch = my_strdup (s+6);
 							s = strrchr (h->patch, '\n');
 							if (s != (char *) 0)
@@ -903,11 +914,11 @@ sleep(1);
 		} else
 			*q = '\0';
 
-		parse_from (rfc1522_decode (p), art_from_addr, art_full_name);
+		parse_from (p, art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
 
 		if (*art_full_name)
-			arts[top].name = hash_str (art_full_name);
+			arts[top].name = hash_str (rfc1522_decode(art_full_name));
 
 		p = q + 1;
 		/*
@@ -1023,7 +1034,7 @@ sleep(1);
 
 #ifdef SHOW_PROGRESS
 		if (artnum % MODULO_COUNT_NUM == 0)
-			show_progress(msg, artnum, max);
+			show_progress(msg, (int) artnum, (int) max); /* we might loose accuracy here, but that shouldn't hurt */
 #endif
 
 		top++;
@@ -1050,9 +1061,7 @@ sleep(1);
  *    7.  Byte count     (Skipped - not used)     [mandatory]
  *    8.  Lines: line    (ie. 23)                 [mandatory]
  *    9.  Xref: line     (ie. alt.test:389)       [optional]
- *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
-
 void
 vWriteNovFile (
 	struct t_group *psGrp)
@@ -1121,12 +1130,6 @@ vWriteNovFile (
 				if (psArt->xref)
 					fprintf (hFp, "\tXref: %s", psArt->xref);
 
-				if (psArt->archive)
-					fprintf (hFp, "\tArchive-name: %s/%s%s",
-						psArt->archive,
-						(psArt->part ? "part" : "patch"),
-						(psArt->part ? psArt->part : psArt->patch));
-
 				fprintf (hFp, "\n");
 			}
 		}
@@ -1179,7 +1182,6 @@ vWriteNovFile (
  *  Repeat until no such file or we find an existing file that matches
  *  our group. Return pointer to path or NULL if not found.
  */
-
 char *
 pcFindNovFile (
 	struct t_group *psGrp,
@@ -1625,7 +1627,7 @@ pcPrintFrom (
 	*acFrom = '\0';
 
 	if (psArt->name != (char *) 0)
-		sprintf (acFrom, "%s <%s>", psArt->name, psArt->from);
+		sprintf (acFrom, "%s <%s>", rfc1522_encode(psArt->name, FALSE), psArt->from);
 	else
 		strcpy (acFrom, psArt->from);
 

@@ -291,7 +291,7 @@ get_tcp_socket (
 	 * Allocate a t_call structure and initialize it.
 	 * Let t_alloc() initialize the addr structure of the t_call structure.
 	 */
-	if ((callptr = (struct t_call *) t_alloc (s,T_CALL,T_ADDR)) == NULL){
+	if ((callptr = (struct t_call *) t_alloc (s, T_CALL, T_ADDR)) == NULL){
 		t_error ("t_alloc");
 		t_close (s);
 		return (-EPROTO);
@@ -443,7 +443,7 @@ get_tcp_socket (
 #else	/* no name server */
 
 #ifdef EXCELAN
-	if ((s = socket (SOCK_STREAM,(struct sockproto *)NULL,&sock_in,SO_KEEPALIVE)) < 0) {
+	if ((s = socket (SOCK_STREAM, (struct sockproto *)NULL, &sock_in, SO_KEEPALIVE)) < 0) {
 		perror ("socket");
 		return (-errno);
 	}
@@ -651,7 +651,12 @@ fprintf(stderr, "Timeout - sending STAT\n");
 
 #endif /* 0 */
 
+#if 0
 	s_printf (nntp_wr_fp, "%s\r\n", string);
+#else
+	s_puts (string, nntp_wr_fp);
+	s_puts ("\r\n", nntp_wr_fp);
+#endif /* 0 */
 	(void) s_flush (nntp_wr_fp);
 
 	return;
@@ -818,11 +823,9 @@ nntp_respcode (
 		case OK_GROUP:
 			text = "211  Group selected";
 			break;
+		case OK_MOTD:
 		case OK_GROUPS:
 			text = "215  Newsgroups follow";
-			break;
-		case OK_XMOTD:
-			text = "217  News motd file follows";
 			break;
 		case OK_XINDEX:
 			text = "218  Group index file follows";
@@ -899,9 +902,6 @@ nntp_respcode (
 		case ERR_NCING:
 			text = "412  Not currently in newsgroup";
 			break;
-		case ERR_XMOTD:
-			text = "417  No news motd file";
-			break;
 		case ERR_XINDEX:
 			text = "418  No index file for this group";
 			break;
@@ -959,6 +959,7 @@ nntp_respcode (
 		case ERR_ACCESS:
 			text = "502  Access to server denied";
 			break;
+		case ERR_MOTD:
 		case ERR_FAULT:
 			text = "503  Program fault, command not performed";
 			break;
