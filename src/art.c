@@ -1621,7 +1621,7 @@ safe_fgets (f)
 
 	buf = (char *) malloc (chunk * sizeof(char));
 
-	while (1) {
+	forever {
 		if (fgets (buf + next, chunk, f) == NULL) {
 			if (next) {
 				return buf;

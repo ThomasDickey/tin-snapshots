@@ -1,3 +1,14 @@
+--unoff BETA release 960927 --
+
+174) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
+     BUG. malloc-problems on severral machines
+     FIX. group.c
+
+173) Stefan Rapp <s.rapp@hrz.uni-dortmund.de>
+     BUG. with highligthed bar and show description an, descrition was not
+          always truncated to the correct length
+     FIX. select.c
+
 --unoff BETA release 960923 --
 
 172) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
