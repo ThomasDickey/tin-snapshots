@@ -20,8 +20,8 @@ o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
 
 o  fix article superseding that it enters the editor immediately
 
-o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
-   true (Linux) ... search $LIBDIR, /usr/bin/,... in that case.
+o  if no INEWSDIR is given INEWSDIR is set to NEWSLIBDIR which is not always
+   true (Linux) ... search $NEWSLIBDIR, /usr/bin/,... in that case.
 
 o  if external inews could not be found posting fails but no dead.article
    is saved :(
@@ -115,7 +115,7 @@ o  move architecture dependent files to subdirectories, clean up architecture
 
 o  split tin.h/proto.h for better dependencies in make
 
-o  join Makefile and makefile
+o  join Makefile and makefile (not entirely possible)
 
 o  unique newsgroups after editing article
 
@@ -192,10 +192,6 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
-o  Don't put anything else than [-g] -O to CFLAGS (f.e. -DSYMBOL), put all
-   definitions to autoconf.h[in] (to be able to override CFLAGS in make calls
-   without overriding -DSYMBOLS)
-
 o  move all strings to lang.c
 
 o  looks like, that while being connected to a server, new newsgroups are
@@ -221,7 +217,7 @@ o  what is with USE_GENAUTH in open.c?
 o  what is with setup_soft_base - anyone remembering where it was used and
    the the code was not stripped after it was considered as no longer needed?
 
-o  check all switch()s for missing defaults 
+o  check all switch()s for missing defaults (this can be done by some compilers)
 
 o  repost ('x') ignores ~/.tin/headers & ~/.tin/attributes - bug or
    feature?!

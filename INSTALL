@@ -16,9 +16,9 @@ This following Makefile & ./include/tin.h defines are documented in detail:
   HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_REGEX
   HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_SHELL_ESCAPE
   HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SMALL_MEMORY_MACHINE
-  HAVE_MMDF_MAILER           LIBDIR                     SPOOLDIR
-  HAVE_POLL                  LOG_USER                   USE_INN_NNTPLIB
-  HAVE_POSIX_JC              NETLIBS                    USE_INVERSE_HACK
+  HAVE_MMDF_MAILER           LOG_USER                   SPOOLDIR
+  HAVE_POLL                  NETLIBS                    USE_INN_NNTPLIB
+  HAVE_POSIX_JC              NEWSLIBDIR                 USE_INVERSE_HACK
 
 News machine names
 ------------------
@@ -188,7 +188,7 @@ Compiler flags (-D<name> define directives)
 News directory structure
 ------------------------
 
-LIBDIR
+NEWSLIBDIR
 Define if news software is not in /usr/lib/news.
 
 SPOOLDIR
@@ -198,7 +198,7 @@ NOVROOTDIR
 Define if news overview (NOV) files are not stored in SPOOLDIR.
 
 INEWSDIR
-Define if bnews/cnews program 'inews' is not in LIBDIR.
+Define if bnews/cnews program 'inews' is not in NEWSLIBDIR.
 
 NNTP - Reading & posting news
 ----------------------------- 

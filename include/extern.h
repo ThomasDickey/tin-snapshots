@@ -250,9 +250,6 @@ extern char default_sigfile[PATH_LEN];
 extern char default_signature[PATH_LEN];
 extern char default_subject_search[LEN];
 extern char error_response[];
-#ifdef NNTP_ABLE
-extern int  get_server_nolf; /* from open.c */
-#endif
 extern char global_attributes_file[PATH_LEN];
 extern char global_config_file[PATH_LEN];
 extern char global_filter_file[PATH_LEN];
@@ -271,13 +268,12 @@ extern char local_newsrctable_file[PATH_LEN];
 extern char lock_file[PATH_LEN];
 extern char mail_active_file[PATH_LEN];
 extern char mail_mime_encoding[LEN];
-extern int  mail_8bit_header;    /* J. Shin */
-extern char mm_charset[LEN];     /* J. Shin */
 extern char mail_news_user[LEN];
 extern char mail_quote_format[PATH_LEN];
 extern char mailbox[PATH_LEN];
 extern char mailer[PATH_LEN];
 extern char mailgroups_file[PATH_LEN];
+extern char mm_charset[LEN];
 extern char motd_file[PATH_LEN];
 extern char motd_file_info[PATH_LEN];
 extern char msg[LEN];
@@ -307,9 +303,8 @@ extern char note_h_summary[HEADER_LEN];			/* Summary: */
 extern char novrootdir[PATH_LEN];
 extern char page_header[LEN];
 extern char pgp_data[PATH_LEN];
-extern char post_proc_command[PATH_LEN];
 extern char post_mime_encoding[LEN];
-extern int  post_8bit_header;    /* J. Shin */
+extern char post_proc_command[PATH_LEN];
 extern char posted_info_file[PATH_LEN];
 extern char posted_msgs_file[PATH_LEN];
 extern char proc_ch_default;
@@ -410,14 +405,11 @@ extern constext txt_error_header_line_missing_subject[];
 extern constext txt_error_header_line_missing_target[];
 extern constext txt_error_header_line_space[];
 extern constext txt_error_missing_followup_to[];
-extern constext txt_error_not_valid_newsgroup[];
-extern constext txt_error_no_read_permission[];
-extern constext txt_error_no_write_permission[];
 extern constext txt_error_no_enter_permission[];
+extern constext txt_error_no_read_permission[];
 extern constext txt_error_no_such_file[];
-extern constext txt_warn_difficulties[];
-extern constext txt_nrctbl_create[];
-extern constext txt_nrctbl_default[];
+extern constext txt_error_no_write_permission[];
+extern constext txt_error_not_valid_newsgroup[];
 extern constext txt_external_mail_done[];
 extern constext txt_extracting_archive[];
 extern constext txt_extracting_shar[];
@@ -462,8 +454,8 @@ extern constext txt_help_b[];
 extern constext txt_help_batch_save[];
 extern constext txt_help_beginner_level[];
 extern constext txt_help_bug[];
-extern constext txt_help_c[];
 extern constext txt_help_cC[];
+extern constext txt_help_c[];
 extern constext txt_help_catchup_groups[];
 extern constext txt_help_ck[];
 extern constext txt_help_colon[];
@@ -512,6 +504,7 @@ extern constext txt_help_group_catchup_on_exit[];
 extern constext txt_help_groupname_length[];
 extern constext txt_help_h[];
 extern constext txt_help_hash[];
+extern constext txt_help_highlight_xcommentto[];
 extern constext txt_help_i[];
 extern constext txt_help_i_4[];
 extern constext txt_help_i_coma[];
@@ -523,7 +516,6 @@ extern constext txt_help_i_search[];
 extern constext txt_help_i_star[];
 extern constext txt_help_i_tab[];
 extern constext txt_help_i_tilda[];
-extern constext txt_help_highlight_xcommentto[];
 extern constext txt_help_inverse_okay[];
 extern constext txt_help_j[];
 extern constext txt_help_keep_posted_articles[];
@@ -698,8 +690,10 @@ extern constext txt_no_search_string[];
 extern constext txt_no_spooldirs[];
 extern constext txt_no_subject[];
 extern constext txt_no_tagged_arts_to_save[];
-extern constext txt_not_in_active_file[];
 extern constext txt_not_exist[];
+extern constext txt_not_in_active_file[];
+extern constext txt_nrctbl_create[];
+extern constext txt_nrctbl_default[];
 extern constext txt_opt_art_marked_deleted[];
 extern constext txt_opt_art_marked_inrange[];
 extern constext txt_opt_art_marked_return[];
@@ -910,6 +904,7 @@ extern constext txt_uudecoding[];
 extern constext txt_warn_art_line_too_long[];
 extern constext txt_warn_cancel[];
 extern constext txt_warn_cancel_forgery[];
+extern constext txt_warn_difficulties[];
 extern constext txt_warn_followup_to_several_groups[];
 extern constext txt_warn_missing_followup_to[];
 extern constext txt_warn_not_valid_newsgroup[];
@@ -996,6 +991,7 @@ extern int last_resp;
 extern int last_subj_on_screen;
 extern int local_filtered_articles;
 extern int local_index;
+extern int mail_8bit_header;
 extern int mail_news;
 extern int mark_saved_read;
 extern int max_active;
@@ -1020,8 +1016,8 @@ extern int num_of_selected_arts;
 extern int num_of_tagged_arts;
 extern int num_save;
 extern int num_spooldir;
-/* extern int option_lines_per_page; */
 extern int pos_first_unread;
+extern int post_8bit_header;
 extern int post_article_and_exit;
 extern int print_header;
 extern int process_id;
@@ -1125,9 +1121,9 @@ extern constext txt_help_col_invers[];
 extern constext txt_help_col_message[];
 extern constext txt_help_col_minihelp[];
 extern constext txt_help_col_normal[];
-extern constext txt_help_col_signature[];
 extern constext txt_help_col_quote[];
 extern constext txt_help_col_response[];
+extern constext txt_help_col_signature[];
 extern constext txt_help_col_subject[];
 extern constext txt_help_col_text[];
 extern constext txt_help_col_title[];
@@ -1189,6 +1185,10 @@ extern char TMPDIR[PATH_LEN];
 #ifdef M_UNIX
 extern constext txt_help_keep_dead_articles[];
 extern constext txt_opt_keep_dead_articles[];
+#endif
+
+#ifdef NNTP_ABLE
+extern int  get_server_nolf; /* from open.c */
 #endif
 
 #ifndef NO_SHELL_ESCAPE

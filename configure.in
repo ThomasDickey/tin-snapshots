@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 09.07.96
+dnl Updated   : 24.08.96
 dnl Notes     : 
 dnl
 dnl Copyright 1996 by Thomas Dickey
@@ -153,7 +153,6 @@ CF_WITH_PATH(inews-dir,
 	[  --with-inews-dir=PATH   directory containing \"inews\"],
 	INEWSDIR,$INEWSPATH)
 AC_MSG_RESULT($INEWSDIR)
-test ".$INEWSDIR" != ".$NEWSLIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
 
 ## !NNTP_ONLY
 if test "$USE_SPOOLDIR" = "yes"; then
@@ -163,8 +162,10 @@ if test "$USE_SPOOLDIR" = "yes"; then
 		[  --with-inn-nntplib=PATH specify INN-NNTP library],
 		INN_NNTPLIB)
 	AC_MSG_RESULT($INN_NNTPLIB)
-	test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
+else
+	INN_NNTPLIB=""
 fi
+AC_SUBST(INN_NNTPLIB)
 
 ### Look for ncurses in the usual places, accommodating compilers that don't
 ### search /usr/local by default.
@@ -258,7 +259,14 @@ AC_ARG_WITH(nntp-default-server,
 	 esac])
 AC_MSG_RESULT($NNTP_DEFAULT_SERVER)
 fi
-AC_SUBST(NNTP_DEFAULT_SERVER)
+
+## These options are interdependent, so we delay defining them til now:
+test -n "$NNTP_DEFAULT_SERVER" \
+	&& AC_DEFINE_UNQUOTED(NNTP_DEFAULT_SERVER,"$NNTP_DEFAULT_SERVER")
+test ".$INEWSDIR" != ".$NEWSLIBDIR" && AC_DEFINE_UNQUOTED(INEWSDIR,"$INEWSDIR")
+AC_DEFINE_UNQUOTED(NEWSLIBDIR,"$NEWSLIBDIR")
+AC_DEFINE_UNQUOTED(NOVROOTDIR,"$NOVROOTDIR")
+AC_DEFINE_UNQUOTED(SPOOLDIR,"$SPOOLDIR")
 
 ## optional features
 AC_MSG_CHECKING(whether to use MH style mail handling)

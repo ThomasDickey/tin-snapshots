@@ -442,7 +442,7 @@ subject are listed.
 .TP
 \fBy\fP
 The first time this command is called it will yank in all groups from
-\fI$LIBDIR/active\fP that are not in \fI$HOME/.newsrc\fP.
+\fI$NEWSLIBDIR/active\fP that are not in \fI$HOME/.newsrc\fP.
 After any groups have been subscribed/unsubscribed to, this command
 if pressed again will reread \fI$HOME/.newsrc\fP and display only
 the subscribed groups.
@@ -963,7 +963,7 @@ If set ON show only new/unread articles, otherwise show all articles.
 .TP
 \fBShow description\fP
 If set ON show a short descriptive text for each displayed newsgroup.
-The text used is taken from the \fI$LIBDIR/newsgroups\fP file.
+The text used is taken from the \fI$NEWSLIBDIR/newsgroups\fP file.
 .TP
 \fBShow Author\fP
 If set 'None' only the ``Subject:'' line will be displayed.  If set 'Addr'
@@ -1643,7 +1643,7 @@ Define this variable if you do not want the .save directory in
 in \fI/tmp/.save\fP you would set TIN_INDEX_SAVEDIR to \fI/tmp\fP.
 .TP
 \fBTIN_LIBDIR\fP
-Define this variable if you want to override the LIBDIR path that was compiled
+Define this variable if you want to override the NEWSLIBDIR path that was compiled
 into the tin binary via the Makefile.
 .TP
 \fBTIN_SPOOLDIR\fP
@@ -1655,7 +1655,7 @@ Define this variable if you want to override the NOVROOTDIR path that was
 compiled into the tin binary via the Makefile.
 .TP
 \fBTIN_ACTIVEFILE\fP
-Define this variable if you want to override the LIBDIR/active path that was 
+Define this variable if you want to override the NEWSLIBDIR/active path that was 
 compiled into the tin binary via the Makefile.
 .TP
 \fBNNTPSERVER\fP

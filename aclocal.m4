@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 09.07.96
+dnl Updated   : 24.08.96
 dnl Notes     : 
 dnl
 dnl Copyright 1996 by Thomas Dickey
@@ -686,5 +686,5 @@ no) withval=""
   ;;
 esac
 $3="$withval"
-AC_SUBST($3)dnl
+AC_DEFINE_UNQUOTED($3,"$withval")dnl
 ])dnl

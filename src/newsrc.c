@@ -176,7 +176,7 @@ create_newsrc (newsrc_file)
 
 /*
  * Automatically subscribe user to newsgroups specified in
- * LIBDIR/subscribe (locally) or same file but from NNTP
+ * NEWSLIBDIR/subscribe (locally) or same file but from NNTP
  * server (LIST AUTOSUBSCRIBE) and create .newsrc
  */
 

@@ -364,22 +364,22 @@ extern char *get_uaf_fullname();
 #			define	SPOOLDIR	"/usr/spool/news"
 #		endif /* VMS */
 #	endif /* !SPOOLDIR */
-#	ifndef LIBDIR
+#	ifndef NEWSLIBDIR
 #		ifdef VMS
-#			define	LIBDIR		"NEWSLIB:[000000]"
+#			define	NEWSLIBDIR	"NEWSLIB:[000000]"
 #		else
-#			define	LIBDIR		"/usr/lib/news"
+#			define	NEWSLIBDIR	"/usr/lib/news"
 #		endif /* VMS */
-#	endif /* !LIBDIR */
+#	endif /* !NEWSLIBDIR */
 #	ifndef NOVROOTDIR
 #		define          NOVROOTDIR      SPOOLDIR
 #	endif /* !NOVROOTDIR */
 #	ifndef INEWSDIR
-#		define		INEWSDIR	LIBDIR
+#		define		INEWSDIR	NEWSLIBDIR
 #	endif /* INEWSDIR */
 #else
 #	undef	SPOOLDIR
-#	undef	LIBDIR
+#	undef	NEWSLIBDIR
 #	undef	NOVROOTDIR
 #endif /* !NNTP_ONLY */
 #endif /* !HAVE_CONFIG_H */
@@ -1206,7 +1206,7 @@ struct t_newsrc
 struct t_group
 {
 	char *name;				/* newsgroup / mailbox name */
-	char *description;			/* text from LIBDIR/newsgroups file */
+	char *description;			/* text from NEWSLIBDIR/newsgroups file */
 	char *spooldir; 			/* groups spool directory */
 	char moderated; 			/* state of group moderation */
 	long count;				/* article number count */
