@@ -39,7 +39,7 @@ static	char nntp_line[NNTP_STRLEN];
 #	define	s_flush		fflush
 #	define	s_fclose	fclose
 #	define	s_gets		fgets
-#	define  s_close		close
+#	define	s_close		close
 #	define	s_puts		my_fputs
 #	define	s_dup		dup
 #	define	s_init()	(1)
