@@ -1,6 +1,22 @@
 Bugs
 ----
-o  tins killfile editor does not quote brackets, stars and questionmarks
+o  tin via nntp crashes if you try to read an article in a newsgroup which
+   does not exist on that server.
+   (try: echo "blubber.suelz: 1\n" >> ~/.newsrc; tin -r
+    'g' blubber.suelz 'r' 'l' *boooooom*) 
+
+o  tin may crash when using a broken overview-file
+   make read_nov_overview more stable (ignore ctrl-m's etc.)
+
+o  if reading news from a local spool with xover support tin assumes that he
+   could update the overview files - that's not always true (reading via
+   NFS) - if this fails, tin creates own overview-files in ~/.tin/.news/
+   DULL!!!
+
+o  tin assumes that overview-files are named ".overview" - that's not always
+   true -> use "overview", "ov", ... as fall-back names.
+
+o  tins killfile editor does not quote brackets, stars and question marks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
 
@@ -51,8 +67,21 @@ o  marking latest article with 'K' does not jump to top of newsgroup if
 o  screen.c:center_line() no range check for cCOLS. Excessively long
    messages cause a scroll and no redraw
 
+o  tin does not warn you if you try to save into a directory and not into
+   a file. 
+
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
+
+o  When tagging/autoselecting files to be saved and decoded, if a tagged
+   article is expired from the server (WHY do they show up? they are
+   expired...), it is untouched, and remains marked as unread.
+
+o  marking hot-articles read with 'K' and then post-process the newsgroup
+   also processes the read articles
+
+o  mark_read with 'K' in 'l'ist_thread is not working, after you leave
+   the group the articles are marked as unread again.
 
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
 
@@ -180,9 +209,6 @@ o  kill-file may get messed up if using multiple news servers with feeds
    losing all references to the moved groups)
 
 o  sometimes kill-file entries are duplicated
-
-o  marking hot-articles read with 'K' and then post-process the newsgroup
-   also processes the read articles
 
 o  killing articles with Lines: 0 does not work
 

@@ -204,17 +204,17 @@ int
 InitScreen ()
 {
 #ifndef INDEX_DAEMON
-	char termname[40], *p;
+	char the_termname[40], *p;
 
 	if ((p = getenv ("TERM")) == (char *) 0) {
 		fprintf (stderr, "%s: TERM variable must be set to use screen capabilities\n", progname);
 		return (FALSE);
 	}
-	if (strcpy (termname, p) == NULL) {
+	if (strcpy (the_termname, p) == NULL) {
 		fprintf (stderr,"%s: Can't get TERM variable\n", progname);
 		return (FALSE);
 	}
-	if (tgetent (_terminal, termname) != 1) {
+	if (tgetent (_terminal, the_termname) != 1) {
 		fprintf (stderr,"%s: Can't get entry for TERM\n", progname);
 		return (FALSE);
 	}
@@ -245,7 +245,7 @@ InitScreen ()
 	_cursoron = NULL;
 	_cursoroff = NULL;
 
-	if (STRCMPEQ(termname, "xterm")) {
+	if (STRCMPEQ(the_termname, "xterm")) {
 		xclicks = TRUE;
 		_xclickinit	= "\033[?9h";
 		_xclickend	= "\033[?9l";

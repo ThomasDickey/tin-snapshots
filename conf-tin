@@ -1,6 +1,6 @@
 #!/bin/sh
 # Remove the files created by this script before running it.
-rm -f config.cache config.status config.log
+#rm -f config.cache config.status config.log
 rm -f makefile src/Makefile include/autoconf.h
 
 if test ! -f configure
@@ -83,7 +83,7 @@ CC="$CC" \
 	--disable-debug \
 	--enable-prototypes \
 	--enable-warnings \
- 	--with-mail-domain=/etc/NNTP_INEWS_DOMAIN \
-  	--enable-nntp \
+	--with-mail-domain=/etc/NNTP_INEWS_DOMAIN \
+	--enable-nntp \
 	--enable-nntp-only \
         $OPTS $* 2>&1 |tee -a $OUT

@@ -351,7 +351,7 @@ _get_references(refptr, depth)
 			sleep(2);
 		}
 
-		refs = my_malloc(HEADER_LEN);
+		refs = (char *) my_malloc(HEADER_LEN);
 		len  = 0;
 	} else
 		refs = _get_references(refptr->parent, depth+1);
@@ -387,7 +387,7 @@ get_references(refptr)
 
 	refs[len-1] = '\0';
 
-	refs = my_realloc(refs, len);
+	refs = (char *) my_realloc(refs, len);
 
 	return(refs);
 }
@@ -796,7 +796,7 @@ void
 collate_subjects()
 {
 	int i, j, art;
-	int *aptr;
+	char *aptr;
 
 	/*
  	 * Run through the root messages of each thread. We have to traverse
@@ -810,7 +810,7 @@ collate_subjects()
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = (int*)arts[i].subject - 2;
+		aptr = arts[i].subject - 2;
 
 		j = *aptr;
 

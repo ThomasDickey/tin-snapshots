@@ -625,6 +625,8 @@ extern char *get_uaf_fullname();
 #define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
 #define		NEWSRCTABLE_FILE	"newsrctable"
+/* NEWNEWSRC_FILE will actually be .newnewsrc<pid> if SINGLETASKING is not
+   defined */
 #define 	NEWNEWSRC_FILE		".newnewsrc"
 #define 	OLDNEWSRC_FILE		".oldnewsrc"
 #define 	OVERVIEW_FILE		".overview"

@@ -597,7 +597,7 @@ update_index_files ()
 		if (update_fork) {
 			catchup = FALSE;		/* turn off msgs when running forked */ 
 			verbose = FALSE;
-			switch (fork ()) {		/* fork child to update indexes in background */
+			switch ((int) fork ()) {		/* fork child to update indexes in background */
 				case -1:			/* error forking */	
 					perror_message ("Failed to start background indexing process", "");
 					break;

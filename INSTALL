@@ -375,3 +375,40 @@ to use one of the 7 conversion tables for different languages.
 i.e., Adding -DUSE_ISO2ASC=\"2\" to the COPTS line in the Makefile would 
 be useful in the german language newsgroups. For more detailed info
 read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
+
+
+
+Compiled & installed on the following machines:
+-----------------------------------------------
+
+1)	i486 & Linux 1.2.13 with gcc 2.7.0
+	i586 & Linux 2.0.0  with gcc 2.7.2p
+	i486 & Linux 2.0.8  with gcc 2.7.2
+
+2)	HP 9000/825 & HP-UX 8.00 with cc
+	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2
+	HP 9000/735 & HP-UX 9.02 with gcc 2.6.3
+	HP 9000/715 & HP-UX 9.05 with gcc 2.7.2
+	HP 9000/720 & HP-UX 9.05 with cc
+	HP 9000/720 & HP-UX 9.05 with gcc 2.7.2
+	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
+
+3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
+	VAX 8350 & Ultrix 4.0 with gcc 2.7.2
+
+4)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
+	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
+
+5)	AlphaStation ??? & OSF/1 v3.2 with cc
+	AlphaStation ??? & OSF/1 v3.2 with gcc 2.7.1
+
+6)	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
+
+7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
+
+8)	i486 & BSDI 2.0 with gcc 1.42
+	i486 & BSDI 2.0 with gcc 2.6.3
+
+9)	i486 & NetBSD 1.1 with gcc 2.4.5
+
+10)	IBM PowerPC RS6000/40p & AIX 4.1.4.0 with 2.7.2

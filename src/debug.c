@@ -430,27 +430,27 @@ vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 
 
 void 
-debug_print_filter (fp, num, filter)
+debug_print_filter (fp, num, the_filter)
 	FILE *fp;
 	int num;
-	struct t_filter *filter;	
+	struct t_filter *the_filter;	
 {
 #ifdef DEBUG
 	fprintf (fp, "[%3d]  scope=[%s] inscope=[%s] type=[%d][%s] case=[%d][%s] lines=[%d %d]\n", 
-		num, (filter->scope ? filter->scope : ""),
-		(filter->inscope ? "TRUE" : "FILTER"),
-		filter->type, (filter->type == 0 ? "KILL" : "SELECT"), 
-		filter->icase, (filter->icase == 0 ? "FALSE" : "TRUE"), 
-		filter->lines_cmp, filter->lines_num);
+		num, (the_filter->scope ? the_filter->scope : ""),
+		(the_filter->inscope ? "TRUE" : "FILTER"),
+		the_filter->type, (the_filter->type == 0 ? "KILL" : "SELECT"), 
+		the_filter->icase, (the_filter->icase == 0 ? "FALSE" : "TRUE"), 
+		the_filter->lines_cmp, the_filter->lines_num);
 	fprintf (fp, "       subj=[%s] from=[%s] msgid=[%s]\n", 
-		(filter->subj  ? filter->subj  : ""),
-		(filter->from  ? filter->from  : ""),
-		(filter->msgid ? filter->msgid : ""));
+		(the_filter->subj  ? the_filter->subj  : ""),
+		(the_filter->from  ? the_filter->from  : ""),
+		(the_filter->msgid ? the_filter->msgid : ""));
 
-	if (filter->time) {
+	if (the_filter->time) {
 		fprintf (fp, "       time=[%ld][%s", 
-			filter->time, 
-			(filter->time ? ctime (&filter->time) : "]\n"));
+			the_filter->time, 
+			(the_filter->time ? ctime (&the_filter->time) : "]\n"));
 	}
 #endif
 }

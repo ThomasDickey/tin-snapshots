@@ -498,7 +498,7 @@ submit_news_file (name, lines)
 
 	checknadd_headers (name, lines);
 
-	rfc15211522_encode(name);
+	rfc15211522_encode(name, post_mime_encoding);
 
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG

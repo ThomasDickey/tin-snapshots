@@ -729,7 +729,7 @@ char *str_dup (str)
 	char *duplicate = (char *) 0;
 
 	if (str != (char *) 0) {
-		duplicate = my_malloc (strlen (str)+1);
+		duplicate = (char *) my_malloc (strlen (str)+1);
 		strcpy (duplicate, str);
 	}
 	return duplicate;
@@ -743,7 +743,11 @@ invoke_cmd (nam)
 	int ret;
 
 #if defined(__hpux)
+#if defined(__STDC__)
+       RETSIGTYPE (*suspchld)(int sig);
+#else
        RETSIGTYPE (*suspchld)();
+#endif
 #endif
 
 #ifdef SIGTSTP
