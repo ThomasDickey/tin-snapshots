@@ -69,7 +69,8 @@ strcasestr (haystack, needle)
 /* check if a line is a MIME boundary, returns 0 if false, 1 if normal
    boundary and 2 if closing boundary */
 
-int boundary_cmp(line, boundary)
+static int
+boundary_cmp(line, boundary)
 	char *line;
 	char *boundary;
 {

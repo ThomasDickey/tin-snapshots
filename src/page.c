@@ -859,12 +859,7 @@ print_a_line:
 			if (first_char != skip_include) {
 				skip_include = '\0';
 #ifdef HAVE_COLOR
-				if (!below_sig)
-					print_color(buf2);
-				else {
-					fcol(col_signature);
-					printf ("%s\r\n", buf2);
-				}
+				print_color (buf2, below_sig);
 #else
 				printf ("%s\r\n", buf2);
 #endif
@@ -873,12 +868,7 @@ print_a_line:
 			}
 		} else {
 #ifdef HAVE_COLOR
-			if (!below_sig)
-				print_color(buf2);
-			else {
-				fcol(col_signature);
-				printf ("%s\r\n", buf2);
-			}
+			print_color (buf2, below_sig);
 #else
 			printf ("%s\r\n", buf2);
 #endif

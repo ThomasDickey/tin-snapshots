@@ -1227,7 +1227,7 @@ struct t_group
 	int next;				/* next active entry in hash chain */
 	int subscribed;		/*  subscribed/unsubscribed to group */
 	/*
-	** wasting 15 bits per group here
+	** wasting sizeof (int) * 8 - 1 bits per group here
 	** unsigned int subscribe:1;
 	** should do the job -> newsrc.c needs some (more) work
 	*/

@@ -61,7 +61,7 @@ extern void Convert2Printable P_((unsigned char* buf));
 /* color.c */
 extern void fcol P_((int color));
 extern void bcol P_((int color));
-extern void print_color P_((char *str));
+extern void print_color P_((char *str, t_bool signature));
 
 /* config.c */
 extern int read_config_file P_((char *file, int global_file));
@@ -226,7 +226,7 @@ extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 extern int main P_((int argc, char *argv[]));
 extern void read_cmd_line_options P_((int argc, char *argv[]));
 extern void usage P_((char *theProgname));
-extern int check_for_any_new_news P_((int CheckAnyUnread, int StartAnyUnread));
+extern int check_for_any_new_news P_((t_bool CheckAnyUnread, t_bool StartAnyUnread));
 extern void save_or_mail_new_news P_((void));
 extern void update_index_files P_((void));
 extern void show_intro_page P_((void));

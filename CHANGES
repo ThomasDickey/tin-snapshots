@@ -1,3 +1,13 @@
+--unoff BETA release 970118 --
+
+288) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. wordhighlighting in signatures
+     FIX. proto.h, color.c, page.c
+
+287) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-cleanup (mainly int -> t_bool)
+     FIX. extern.h, proto.h, init.c, main.c, rfc1521.c
+
 --unoff BETA release 970115 --
 
 286) Urs Janssen <urs@akk.uni-karlsruhe.de>
