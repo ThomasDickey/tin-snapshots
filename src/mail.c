@@ -236,7 +236,7 @@ read_groups_descriptions (fp, fp_save)
 		if (buf[0] == '#' || buf[0] == '\n') {
 			continue;
 		}
-		p = (char *) strrchr (buf, '\n');
+		p = strrchr (buf, '\n');
 		if (p != (char *) 0) {
 			*p = '\0';
 		}

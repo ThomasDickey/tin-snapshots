@@ -824,12 +824,12 @@ print_a_line:
 
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
-			ConvertTeX2Iso ((unsigned char *)buf3, (unsigned char *)buf2);
+			ConvertTeX2Iso (buf3, buf2);
 		}
 
 		if (iso2asc_supported >= 0) {
 			strcpy (buf3, buf2);
-			ConvertIso2Asc ((unsigned char *)buf3, (unsigned char*)buf2, iso2asc_supported);
+			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
 		}
 
 		first_char = buf2[0] ? buf2[0] : first_char;
@@ -1212,7 +1212,7 @@ art_open (art, group_path)
 	art_close ();	/* just in case */
 
 	if (tex2iso_supported) {
-		tex2iso_article = iIsArtTexEncoded (art, (unsigned char *)group_path);
+		tex2iso_article = iIsArtTexEncoded (art, group_path);
 		if (tex2iso_article) {
 			wait_message ("TeX2Iso encoded article");
 		}
@@ -1334,7 +1334,7 @@ art_open (art, group_path)
 	 */
 	if (! note_h_newsgroups[0]) {
 		strcpy (note_h_newsgroups, group_path);
-		while ((ptr = (char *) strchr (note_h_newsgroups, '/'))) {
+		while ((ptr = strchr (note_h_newsgroups, '/'))) {
 			*ptr = '.';
 		}
 	}

@@ -54,9 +54,9 @@ extern void set_attrib_num P_((int type, char *scope, int num));
 extern void set_attrib P_((struct t_group *psGrp, int type, char *str, int num));
 extern void write_attributes_file P_((char *file));
 /* ./charset.c */
-extern void ConvertIso2Asc P_((unsigned char *iso, unsigned char *asc, int t));
-extern void ConvertTeX2Iso P_((unsigned char *from, unsigned char *to));
-extern int iIsArtTexEncoded P_((long art, unsigned char *group_path));
+extern void ConvertIso2Asc P_((char *iso, char *asc, int t));
+extern void ConvertTeX2Iso P_((char *from, char *to));
+extern int iIsArtTexEncoded P_((long art, char *group_path));
 /* ./color.c */
 extern void fcol P_((int color));
 extern void bcol P_((int color));

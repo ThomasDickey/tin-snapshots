@@ -1228,7 +1228,7 @@ toggle_my_groups (only_unread_groups, group)
 
 		group_top = 0;
 		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-			ptr = (char *) strchr (buf, ':');
+			ptr = strchr (buf, ':');
 			if (ptr != (char *) 0) {
 				*ptr = '\0';
 				if ((i = find_group_index (buf)) >= 0) {

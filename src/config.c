@@ -463,6 +463,8 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	fclose (fp);

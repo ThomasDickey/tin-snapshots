@@ -35,18 +35,23 @@
 #undef	HAVE_MH_MAIL_HANDLING
 #undef	NNTP_ABLE
 #undef	NNTP_ONLY
+
 #ifndef	HAVE_COLOR
 #undef	HAVE_COLOR
 #endif
+
 #ifndef	HAVE_REF_THREADING
 #undef	HAVE_REF_THREADING
 #endif
-#undef	NO_ETIQUETTE
+
+#undef	DEFAULT_ISO2ASC
+#undef	FORGERY
+#undef	LOG_USER
+#undef	MIME_BASE64_ALLOWED	
 #undef	MIME_BREAK_LONG_LINES
 #undef	MIME_STRICT_CHARSET
 #undef	MM_CHARSET
-#undef	FORGERY
-#undef	LOG_USER
+#undef	NO_ETIQUETTE
 #undef	USE_INN_NNTPLIB
 
 /*
@@ -204,6 +209,7 @@
 #undef	DECL_SOCKET
 #undef	DECL_SSCANF
 #undef	DECL_STRCASECMP
+#undef	DECL_STRCHR
 #undef	DECL_STRFTIME
 #undef	DECL_STRNCASECMP
 #undef	DECL_STRTOL

@@ -204,7 +204,7 @@ parse_active_line (line, max, min, moderated)
 
 	if (*r) {
 		strcpy (moderated, r);
-		r = (char *) strchr (moderated, '\n');
+		r = strchr (moderated, '\n');
 		if (*r) {
 			*r = '\0';
 		}
@@ -822,7 +822,7 @@ load_newnews_info (info)
 
 	my_strncpy (buf, info, sizeof (buf));
 	
-	ptr = (char *) strchr (buf, ' '); 
+	ptr = strchr (buf, ' '); 
 	if (ptr != (char *) 0) {
 		the_time = atol (ptr);
 		*ptr = '\0';

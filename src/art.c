@@ -669,7 +669,7 @@ parse_headers (buf, h)
 				break;
 			case 'A':	/* Archive-name:  optional */
 				if (match_header (ptrline, "Archive-name", buf2, HEADER_LEN)) {
-					if ((s = (char *) strchr (buf2, '/')) != (char *) 0) {
+					if ((s = strchr (buf2, '/')) != (char *) 0) {
 						if (STRNCMPEQ(s+1, "part", 4) || 
 						    STRNCMPEQ(s+1, "Part", 4)) {
 							h->part = str_dup (s+5);
@@ -980,7 +980,7 @@ sleep(1);
 				while (*q && *q == ' ') {
 					q++;
 				}
-				if ((s = (char *) strchr (q, '/')) != (char *) 0) {
+				if ((s = strchr (q, '/')) != (char *) 0) {
 					if (STRNCMPEQ(s+1, "part", 4) || 
 					    STRNCMPEQ(s+1, "Part", 4)) {
 						arts[top].part = str_dup (s+5);

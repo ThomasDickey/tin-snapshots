@@ -1,43 +1,43 @@
-MANIFEST for tin-1.3-unoff-BETA-960725 (Thu Jul 25 19:55:37 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960729 (Mon Jul 29 16:57:48 MET DST 1996)
 ----------------------------------------------------
-  28805 ./CHANGES
-  11870 ./TODO
+  29433 ./CHANGES
+  11813 ./TODO
    5181 ./Makefile
   16997 ./INSTALL
    2112 ./MANIFEST
    1243 ./README
     896 ./tinpp
   19318 ./aclocal.m4
- 123883 ./configure
-  14067 ./configure.in
+ 125202 ./configure
+  14628 ./configure.in
    4771 ./install.sh
   11493 ./makefile.in
-   1430 ./conf-tin
+   1025 ./conf-tin
   69407 ./doc/tin.1
    1822 ./doc/hashing.doc
    2513 ./include/amiga.h
    2131 ./include/amigatcp.h
    8483 ./include/config.h
-  34018 ./include/extern.h
+  34206 ./include/extern.h
    9596 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
    1649 ./include/patchlev.h
-  29172 ./include/proto.h
+  29127 ./include/proto.h
    1376 ./include/stpwatch.h
   41728 ./include/tin.h
    4101 ./include/win32.h
     791 ./include/win32tcp.h
-  19440 ./src/active.c
+  19422 ./src/active.c
    8167 ./src/actived.c
   13034 ./src/amiga.c
    4426 ./src/amigatcp.c
-  35981 ./src/art.c
+  35963 ./src/art.c
   23226 ./src/attrib.c
-   8270 ./src/charset.c
+   8266 ./src/charset.c
    1480 ./src/color.c
-  43972 ./src/config.c
+  43993 ./src/config.c
   19759 ./src/curses.c
   12378 ./src/debug.c
    2826 ./src/envarg.c
@@ -47,25 +47,25 @@ MANIFEST for tin-1.3-unoff-BETA-960725 (Thu Jul 25 19:55:37 MET DST 1996)
   40961 ./src/group.c
    3211 ./src/hashstr.c
    8979 ./src/help.c
-  11877 ./src/inews.c
+  11841 ./src/inews.c
   28665 ./src/init.c
   41288 ./src/lang.c
    2791 ./src/list.c
-  12050 ./src/mail.c
+  12041 ./src/mail.c
   17629 ./src/main.c
   10966 ./src/memory.c
   45149 ./src/misc.c
    7234 ./src/msmail.c
   33037 ./src/newsrc.c
-  26134 ./src/nntplib.c
-  31349 ./src/nntpw32.c
+  26295 ./src/nntplib.c
+  31340 ./src/nntpw32.c
    3814 ./src/nrctbl.c
-  27359 ./src/open.c
+  27539 ./src/open.c
    6300 ./src/os_2.c
-  35005 ./src/page.c
+  34996 ./src/page.c
   24098 ./src/parsdate.y
    6575 ./src/pgp.c
-  74335 ./src/post.c
+  74326 ./src/post.c
    4873 ./src/prompt.c
      53 ./src/proto.sed
   23376 ./src/refs.c
@@ -74,7 +74,7 @@ MANIFEST for tin-1.3-unoff-BETA-960725 (Thu Jul 25 19:55:37 MET DST 1996)
   33938 ./src/save.c
    4386 ./src/screen.c
    9644 ./src/search.c
-  34773 ./src/select.c
+  34764 ./src/select.c
    5270 ./src/sigfile.c
   10912 ./src/signal.c
    5882 ./src/strftime.c
@@ -84,6 +84,6 @@ MANIFEST for tin-1.3-unoff-BETA-960725 (Thu Jul 25 19:55:37 MET DST 1996)
    2130 ./src/win32tcp.c
    6295 ./src/xref.c
    5522 ./src/vms.c
-   6764 ./include/autoconf.hin
+   6837 ./include/autoconf.hin
   11054 ./src/Makefile.in
-1440937 total
+1443440 total

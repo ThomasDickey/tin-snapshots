@@ -181,7 +181,7 @@ getserverbyfile (file)
 		if (*buf == '\n' || *buf == '#') {
 			continue;
 		}
-		cp = (char *) strrchr (buf, '\n');
+		cp = strrchr (buf, '\n');
 		if (cp) {
 			*cp = '\0';
 		}
@@ -226,7 +226,7 @@ server_init (machine, service, port)
 #ifdef DECNET
 	char	*cp;
 
-	cp = (char *) strchr(machine, ':');
+	cp = strchr (machine, ':');
 
 	if (cp && cp[1] == ':') {
 		*cp = '\0';
@@ -820,9 +820,15 @@ static int reconnecting = 0;
 	 * some broken newsposters/newsservers have \r's in the middle
 	 * of .overview records...
 	 */
-	if ((cp = (char *) strchr (string, '\n')) != NULL) {
+	if ((cp = strchr (string, '\n')) != NULL) {
 		*cp-- = '\0';
 		if (*cp == '\r') *cp = '\0';
+		get_server_nolf=0;
+	} else {
+		if(strlen(string)>0 && string[strlen(string)-1]=='\r')
+			string[strlen(string)-1]='\0';
+		/* tell the calling function that the line is incomplete */
+		get_server_nolf=1;
 	}
 
 	return 0;
@@ -870,9 +876,9 @@ int get_server (char *string, int size)
 #ifndef USE_SFGETS
 	memcpy(string, p, SIOLINELEN(sockt_rd) + 1);
 #endif
-	if ((cp = (char *) strchr (string, '\r')) != NULL) {
+	if ((cp = strchr (string, '\r')) != NULL) {
 		*cp = '\0';
-	} else if ((cp = (char *) strchr (string, '\n')) != NULL) {
+	} else if ((cp = strchr (string, '\n')) != NULL) {
 		*cp = '\0';
 	}
 
