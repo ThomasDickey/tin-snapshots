@@ -28,6 +28,8 @@
 
 #define HpGlitch(func)			/*nothing*/
 
+extern int cmdReadCh (void);
+
 extern char *screen_contents(int row, int col, char *buffer);
 extern void MoveCursor(int row,int col);
 extern void my_erase(void);

@@ -1,5 +1,17 @@
 Bugs
 ----
+o  tin does not rfc1522-decode news_headers_to_display
+
+o  tin ignores some file-permissions (.newsrc will be set to 644)
+
+o  src/Makefile ignores cf_cv_makeflags
+
+o  if you compile dubug.c with -O3 on IRIX (5.3) & native-compiler tin won't
+   compile at all... - use -O2 for debug.c!!
+
+o  - fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
+   - 'any key' sems to be only 'return'
+
 o  join show_xcommentto/news_headers_to_display, remove auto-display of
    Keywords/Summary as it could be controlled by news_headers_to_display
 
@@ -216,6 +228,8 @@ o  when From: only contains "First-name Last-name" tin strips the space
 
 Internal Changes
 ----------------
+o  cleanup inews.c (domain/hostname & Path generation...)
+
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to

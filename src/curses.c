@@ -16,6 +16,8 @@
 
 #if USE_CURSES
 
+#define ReadCh cmdReadCh
+
 void my_dummy(void) { }	/* ANSI C requires non-empty file */
 
 #else	/* !USE_CURSES */
@@ -985,51 +987,6 @@ AmiGetWinSize(int *lines, int *columns)
 
 #endif /* M_AMIGA */
 
-#ifdef M_UNIX
-
-int
-ReadCh (void)
-{
-#ifndef INDEX_DAEMON
-	register int result;
-#ifndef READ_CHAR_HACK
-	char ch;
-#endif /* READ_CHAR_HACK */
-
-	fflush(stdout);
-#ifdef READ_CHAR_HACK
-#undef getc
-	while ((result = getc(stdin)) == EOF) {
-		if (feof(stdin))
-			break;
-
-#ifdef EINTR
-		if (ferror(stdin) && errno != EINTR)
-#else
-		if (ferror(stdin))
-#endif /* EINTR */
-			break;
-
-		clearerr(stdin);
-	}
-
-	return ((result == EOF) ? EOF : result & 0xFF);
-
-#else
-#ifdef EINTR
-	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR)
-		;	/* spin on signal interrupts */
-#else
-	result = read (0, &ch, 1);
-#endif	/* EINTR */
-
-	return((result <= 0) ? EOF : ch & 0xFF);
-
-#endif	/* READ_CHAR_HACK */
-#endif	/* INDEX_DAEMON */
-}
-
-#endif	/* M_UNIX */
 #endif	/* !VMS */
 
 /*
@@ -1107,3 +1064,52 @@ cursoroff (void)
 }
 
 #endif /* !USE_CURSES */
+
+/*
+ * The UNIX version of ReadCh is used both in termcap and curses configurations.
+ */
+#ifdef M_UNIX
+
+int
+ReadCh (void)
+{
+#ifndef INDEX_DAEMON
+	register int result;
+#ifndef READ_CHAR_HACK
+	char ch;
+#endif /* READ_CHAR_HACK */
+
+	fflush(stdout);
+#ifdef READ_CHAR_HACK
+#undef getc
+	while ((result = getc(stdin)) == EOF) {
+		if (feof(stdin))
+			break;
+
+#ifdef EINTR
+		if (ferror(stdin) && errno != EINTR)
+#else
+		if (ferror(stdin))
+#endif /* EINTR */
+			break;
+
+		clearerr(stdin);
+	}
+
+	return ((result == EOF) ? EOF : result & 0xFF);
+
+#else
+#ifdef EINTR
+	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR)
+		;	/* spin on signal interrupts */
+#else
+	result = read (0, &ch, 1);
+#endif	/* EINTR */
+
+	return((result <= 0) ? EOF : ch & 0xFF);
+
+#endif	/* READ_CHAR_HACK */
+#endif	/* INDEX_DAEMON */
+}
+
+#endif	/* M_UNIX */

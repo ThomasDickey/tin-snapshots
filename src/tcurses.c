@@ -34,6 +34,7 @@ t_bool inverse_okay = TRUE;
 void setup_screen (void) {
 	/* FIXME */
 	cmd_line = FALSE;
+	bcol(col_back);
 }
 
 /*
@@ -49,7 +50,6 @@ int InitScreen (void)
 	cCOLS = COLS;
 	cLINES = LINES - 1;
 	raw(); noecho(); cbreak();
-	/* FIXME: need to integrate with Raw() */
 
 	keypad(stdscr, TRUE);
 	if (has_colors()) {
@@ -78,19 +78,26 @@ void EndWin(void)
 	endwin();
 }
 
+static int _inraw;
+
 /*
  */
 void Raw(int state)
 {
-	/* FIXME */
+	if (state && !_inraw) {
+		reset_prog_mode();
+		_inraw = TRUE;
+	} else if (!state && _inraw) {
+		reset_shell_mode();
+		_inraw = FALSE;
+	}
 }
 
 /*
  */
 int RawState(void)
 {
-	return 0;
-	/* FIXME */
+	return _inraw;
 }
 
 
@@ -167,10 +174,16 @@ MoveCursor(int row, int col)
 int
 ReadCh(void)
 {
-	int ch = getch();
-	if (ch == ESC || ch >= KEY_MIN) {
-		ungetch(ch);
-		ch = ESC;
+	int ch;
+
+	if (cmd_line)
+		ch = cmdReadCh();
+	else {
+		ch = getch();
+		if (ch == ESC || ch >= KEY_MIN) {
+			ungetch(ch);
+			ch = ESC;
+		}
 	}
 	return ch;
 }

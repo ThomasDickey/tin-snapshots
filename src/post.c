@@ -1321,11 +1321,11 @@ pickup_postponed_articles(
 
   sprintf(question, "do you want to see postponed articles (%d)? ", count);
 
-  if(ask && prompt_yn(cLINES, question, TRUE)!=1) {
+  if(ask && prompt_yn(cLINES, question, TRUE) != 1) {
     return FALSE;
   }
 
-	for(i=0;i<count;i++) {
+	for(i = 0; i < count; i++) {
 		if(!fetch_postponed_article(article, subject, newsgroups))
 			return TRUE;
 		if (!all) {
@@ -2442,9 +2442,10 @@ mail_bug_report (void)
 				if (prompt_yn (cLINES, msg, FALSE) == 1) {
 					if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
 					    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
+                                                t_bool ismail=TRUE;
 						sprintf (msg, txt_mailing_to, mail_to);
 						wait_message (msg);
-						rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header);
+						rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
 						strfmailer (mailer, subject, mail_to, nam,
 							    buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
@@ -2628,10 +2629,11 @@ mail_to_author (
 				my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
 				if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
 				    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
+                                        t_bool ismail=TRUE;
 					sprintf (msg, txt_mailing_to, mail_to);
 					wait_message (msg);
 					checknadd_headers (nam, lines);
-					rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header);
+					rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
 					strfmailer (mailer, subject, mail_to, nam,
 						    buf, sizeof (buf), default_mailer_format);
 					if (invoke_cmd (buf)) {
@@ -3421,18 +3423,30 @@ checknadd_headers (
 					if (!no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
 #ifdef HAVE_SYS_UTSNAME_H
+#ifdef _AIX
+							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s.%s]\n\n",
+								 OS, VERSION, RELEASEDATE, 
+								 system_info.sysname, system_info.version, system_info.release);
+#else /* AIX */
 							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s %s]\n\n",
 								 OS, VERSION, RELEASEDATE, 
 								 system_info.machine, system_info.sysname, system_info.release);
+#endif /* AIX */
 #else
 							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
 #endif
 						} else {
 #ifdef HAVE_SYS_UTSNAME_H
+#ifdef _AIX
+							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s.%s]\n\n",
+								 OS, VERSION, RELEASEDATE, 
+								 system_info.sysname, system_info.version, system_info.release);
+#else /* AIX */
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s %s]\n\n",
 								 OS, VERSION, RELEASEDATE, 
 								 system_info.machine, system_info.sysname, system_info.release);
+#endif /* AIX */
 #else
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s release %s]\n\n",
 								 OS, VERSION, RELEASEDATE);
@@ -3730,10 +3744,11 @@ submit_mail_file (
 		if (pcCopyArtHeader (HEADER_TO, file, mail_to)
 		    && pcCopyArtHeader (HEADER_SUBJECT, file, subject)) {
 
+                        t_bool ismail=TRUE;
 			sprintf (buf, txt_mailing_to, mail_to);
 			wait_message (buf);
 
-			rfc15211522_encode (file, txt_mime_types[mail_mime_encoding], mail_8bit_header);
+			rfc15211522_encode (file, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
 
 			strfmailer (mailer, subject, mail_to, file,
 				  buf, sizeof (buf), default_mailer_format);
@@ -3767,7 +3782,9 @@ make_path_header (
 #if defined(INEWS_MAIL_GATEWAY) || defined(INEWS_MAIL_DOMAIN)
 	if (*(INEWS_MAIL_GATEWAY)) {
 		strcpy (line, user_name);
-	} else if (*(INEWS_MAIL_DOMAIN)) {
+	}
+#if defined(INEWS_MAIL_DOMAIN)
+	else if (*(INEWS_MAIL_DOMAIN)) {
 		strcpy (line, INEWS_MAIL_DOMAIN);
 		get_domain_name (line, domain_name);
 		if (*domain_name == '.') {
@@ -3781,6 +3798,7 @@ make_path_header (
 	} else {
 		sprintf (line, "%s!%s", host_name, user_name);
 	}
+#endif /* INEWS_MAIL_DOMAIN */
 #else
 	sprintf (line, "%s!%s", host_name, user_name);
 #endif

@@ -1,3 +1,40 @@
+--unoff BETA release 970314 --
+
+348) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. splitt longe header lines in mail message
+     FIX. several supplied patches
+
+347) T.E.Dickey <dickey@clark.net>
+     ADD. even more curses support:
+          + ifdef'd to use the termcap version of ReadCh when curses isn't
+	    active.
+          + fix a couple of background color bugs that appear with SVr4
+            curses (but not ncurses).
+          + add missing include, ifdefs to debug.c
+          + add decoding for curses backspace and delete keys.
+          + implement curses raw mode.
+     BUG. fixes for parsdate.y to workaround redefinition of const by bison
+
+346) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Thomas Koenig <Thomas.Koenig@ciw.uni-karlsruhe.de>
+     ADD. configure check for usage of system() ; system_status
+     BUG. removed getfqdn() call as it opens up some problems
+          with INEWS_MAIL_DOMAIN - inews.c should be rewritten!!
+     FIX. autoconf.h[in], configure[.in], misc.c, inews.c
+
+345) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. fix wrong byte-count in article-pager (introduced in 340)
+     FIX. open.c
+
+344) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. tab_goto_next_unread=OFF && news_headers_to_display!="" didn't
+          work
+     FIX. page.c
+
+343) Sven Paulus <sven@oops.sub.de>
+     ADD. hide licence number on AIX
+     FIX. post.c
+
 --unoff BETA release 970309 --
 
 342) Urs Janssen <urs@akk.uni-karlsruhe.de>

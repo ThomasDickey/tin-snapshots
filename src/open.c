@@ -1116,14 +1116,14 @@ stuff_nntp (
 #endif
 	}
 
+	fclose(fp);
+
 	if (stat (fnam, &sb) < 0)
 		note_size = 0;
 	else
 		note_size = sb.st_size;
 
-	/* Reopen for writing. Possible with fcntl() but how portably ? */
-	fclose(fp);
-	if ((fp = fopen (fnam, "r")) == (FILE *) 0) {
+	if ((fp = fopen (fnam, "r")) == (FILE *) 0) {	/* Reopen for writing. */
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}

@@ -43,8 +43,8 @@
 #undef	DEFAULT_ISO2ASC
 #undef	FORGERY
 #undef	INEWSDIR
-#undef	INEWS_MAIL_DOMAIN
 #undef	INEWS_MAIL_GATEWAY
+#undef	INEWS_MAIL_DOMAIN
 #undef	INN_NNTPLIB
 #undef	MIME_BASE64_ALLOWED
 #undef	MIME_BREAK_LONG_LINES
@@ -357,12 +357,6 @@
  */
 #undef	DONT_HAVE_TM_GMTOFF
 
-/*
- * The OSF1 compiler doesn't seem to have any predefined symbols.
- * This is ours.
- */
-#undef OSF1
-
 #if 0 /* FIXME: test-not-impl */
 
 #if defined(COHERENT)
@@ -382,8 +376,11 @@
 #endif
 #endif /* FIXME */
 
+#undef USE_SYSTEM_STATUS
+
 /*
  * Use this if you want pid attached to the end of .article filename
  */
 #undef APPEND_PID
+
 #undef HAVE_COFFEE

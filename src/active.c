@@ -111,10 +111,11 @@ resync_active_file (void)
 		read_mailgroups_file ();
 #endif
 		read_newsgroups_file ();
+
 #endif /* #if 0 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
-		if (command_line)		/* Can't show all groups with cmd line groups */
+		if (command_line)		/* Can't show only unread groups with cmd line groups */
 			show_only_unread_groups = FALSE;
 		else
 			toggle_my_groups (show_only_unread_groups, old_group);

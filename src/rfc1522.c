@@ -280,8 +280,11 @@ contains_nonprintables (
 	}
 	if (nonprint) {
 #ifdef MIME_BASE64_ALLOWED
+/* Use B encoding if charset is EUC-KR for backward compatibility 
+                                with old Korean mail program */
 		if (chars + 2 * (nonprint + schars) /* QP size */ >
-		    (chars * 4 + 3) / 3 /* B64 size */)
+		    (chars * 4 + 3) / 3 /* B64 size */
+                    || ! strcasecmp(mm_charset,"EUC-KR") )
 			return 'B';
 #endif
 		return 'Q';
@@ -289,7 +292,10 @@ contains_nonprintables (
 	return 0;
 }
 
-#ifdef MIME_BREAK_LONG_LINES
+/* Uncommented this conditional compilation statement
+   in order to implement mandatory break-up of long lines
+   in mail messages in accordance with rfc 2047(rfc 1522) */
+/* #ifdef MIME_BREAK_LONG_LINES */
 static int
 sizeofnextword (
 	char *w)
@@ -303,13 +309,14 @@ sizeofnextword (
 		x++;
 	return x - w;
 }
-#endif
+/* #endif */
 
 
 static int
 rfc1522_do_encode (
 	char *what,
-	char **where)
+	char **where,
+        t_bool break_long_line)
 {
 	/* We need to meet several partly contradictional requirements here.
 	   First of all, a line containing MIME encodings must not be longer
@@ -338,10 +345,20 @@ rfc1522_do_encode (
 	int encoding;		/* which encoding to use ('B' or 'Q') */
 	int any_quoting_done = 0;
 
-#ifdef MIME_BREAK_LONG_LINES
+/* Uncommented this and other conditional compilation statement
+   depending on MIME_BREAK_LONG_LINES in this function 
+   in order to implement mandatory break-up of long lines
+   in mail messages in accordance with RFC 2047(RFC 1522). 
+   Whether or not long lines are broken up depends on
+   boolean variable break_long_line, instead.
+   break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
+   is defined, but it's TRUE for mail messages regardless of whether or not
+   MIME_BREAK_LONG_LINES is defined
+*/
+/* #ifdef MIME_BREAK_LONG_LINES */
 	int column = 0;		/* current column */
 	int word_cnt = 0;
-#endif
+/* #endif */
 	int ewsize = 0;		/* size of current encoded-word */
 	char buf[2048];		/* buffer for encoded stuff */
 	char buf2[64];		/* buffer for this and that */
@@ -350,23 +367,23 @@ rfc1522_do_encode (
 
 	t = buf;
 	while (*what) {
-#ifdef MIME_BREAK_LONG_LINES
-		word_cnt++;
-#endif
+                if (break_long_line == TRUE) {
+		   word_cnt++;
+                }
 		if ((encoding = contains_nonprintables (what))) {
 			if (!quoting) {
 				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
 				ewsize = mystrcat (&t, buf2);
-#ifdef MIME_BREAK_LONG_LINES
-				if (word_cnt == 2) {
-					/* Make sure we fit the first encoded
+                                if (break_long_line==TRUE) {
+					if (word_cnt == 2) {
+				       	/* Make sure we fit the first encoded
 					 * word in with the header keyword,
 					 * since we cannot break the line
 					 * directly after the keyword.
 					 */
-					ewsize = t - buf;
-				}
-#endif
+						ewsize = t - buf;
+					}
+                                }
 				quoting = TRUE;
 				any_quoting_done = TRUE;
 			}
@@ -450,62 +467,85 @@ rfc1522_do_encode (
 	*t = 0;
 	/* Pass 2: break long lines if there are MIME-sequences in the result */
 	c = buf;
-#ifdef MIME_BREAK_LONG_LINES
-	column = 0;
-	if (any_quoting_done) {
-		word_cnt = 1;	/* note, if the user has typed a
-				   continuation line, we will consider the
-				   initial whitespace to be delimiting
-				   word one (well, just assume an empty
-				   word). */
-		while (*c) {
-			if (isspace ((unsigned char)*c)) {
-				/* According to rfc1522, header lines
-				 * containing encoded words are limited to 76
-				 * chars, but if the first line is too long
-				 * (due to a long header keyword), we cannot
-				 * stick to that, since we would break the line
-				 * directly after the keyword's colon, which is
-				 * not allowed.  The same is necessary for a
-				 * continuation line with an unencoded word
-				 * that is too long.
-				 */
-				if (sizeofnextword (c) + column > 76 && word_cnt != 1) {
-					*((*where)++) = '\n';
-					column = 0;
-				}
-				if (c > buf && !isspace ((unsigned char)*(c - 1))) {
-					word_cnt++;
-				}
-				*((*where)++) = *c++;
-				column++;
-			} else
-				while (*c && !isspace ((unsigned char)*c)) {
+        if (break_long_line==TRUE) {
+		column = 0;
+		if (any_quoting_done) {
+			word_cnt = 1;	/* note, if the user has typed a
+					   continuation line, we will consider the
+					   initial whitespace to be delimiting
+					   word one (well, just assume an empty
+					   word). */
+			while (*c) {
+				if (isspace ((unsigned char)*c)) {
+					/* According to rfc1522, header lines
+					 * containing encoded words are limited to 76
+					 * chars, but if the first line is too long
+					 * (due to a long header keyword), we cannot
+					 * stick to that, since we would break the line
+					 * directly after the keyword's colon, which is
+					 * not allowed.  The same is necessary for a
+					 * continuation line with an unencoded word
+					 * that is too long.
+					 */
+					if (sizeofnextword (c) + column > 76 && word_cnt != 1) {
+						*((*where)++) = '\n';
+						column = 0;
+					}
+					if (c > buf && !isspace ((unsigned char)*(c - 1))) {
+						word_cnt++;
+					}
 					*((*where)++) = *c++;
 					column++;
-				}
+				} else
+					while (*c && !isspace ((unsigned char)*c)) {
+						*((*where)++) = *c++;
+						column++;
+					}
+			}
+		} 
+                else {
+			while (*c)
+				*((*where)++) = *c++;
 		}
-	} else
-#endif
-	{
+        }
+	else {     /* break_long_line == FALSE */
 		while (*c)
 			*((*where)++) = *c++;
 	}
+      
 	**where = 0;
 	return any_quoting_done;
 }
 
 char *
 rfc1522_encode (
-	char *s)
+	char *s,
+        t_bool ismail)
 {
 	static char buf[2048];
 	char *b;
 	int x;
+/* break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
+   is defined, but it's TRUE for mail messages regardless of whether or not
+   MIME_BREAK_LONG_LINES is defined */
+#ifdef MIME_BREAK_LONG_LINES
+        t_bool break_long_line=TRUE;
+#else
+        t_bool break_long_line=FALSE;
+#endif
+
+/* Even if MIME_BREAK_LONG_LINES is NOT defined,
+   long headers in mail messages should be broken up in 
+   accordance with RFC 2047(1522) */
+#ifndef MIME_BREAK_LONG_LINES
+        if ( ismail == TRUE) {
+            break_long_line=TRUE;
+        }
+#endif
 
 	get_mm_charset ();
 	b = buf;
-	x = rfc1522_do_encode (s, &b);
+	x = rfc1522_do_encode (s, &b,break_long_line);
 	quoteflag = quoteflag || x;
 	return buf;
 }
@@ -514,7 +554,8 @@ void
 rfc15211522_encode (
 	char *filename,
 	constext *mime_encoding,
-        t_bool  allow_8bit_header)
+        t_bool  allow_8bit_header,
+        t_bool ismail)
 {
 	FILE *f;
 	FILE *g;
@@ -546,7 +587,7 @@ rfc15211522_encode (
                         if (allow_8bit_header)
                            fputs(header,g);
                         else
-			   fputs (rfc1522_encode (header), g);
+			   fputs (rfc1522_encode (header,ismail), g);
 			fputc ('\n', g);
 			header[0] = '\0';
 			d = header;

@@ -666,12 +666,12 @@ invoke_cmd (
 	ret = system (nam);
 	signal (SIGCHLD, suspchld);
 #else
-# if defined(SIGCHLD) && !defined(_AIX) && !defined(__DECC) && !defined(OSF1)
-	system (nam);
-	ret = system_status;
-# else
-	ret = system (nam);
-# endif
+#	if USE_SYSTEM_STATUS
+		system(nam);
+		ret = system_status;
+#	else
+		ret = system (nam);
+#	endif
 #endif
 
 #ifdef SIGTSTP
@@ -1261,6 +1261,12 @@ get_arrow_key (void)
 	int code = KEYMAP_UNKNOWN;
 
 	switch (ch) {
+		case KEY_BACKSPACE:
+			code = '\b';
+			break;
+		case KEY_DC:
+			code = '\177';
+			break;
 		case KEY_UP:
 			code = KEYMAP_UP;
 			break;
@@ -2075,6 +2081,7 @@ strfmailer (
 			}
 		}
 		if (*format == '%') {
+                        t_bool ismail=TRUE;
 			switch (*++format) {
 				case '\0':
 					*s++ = '%';
@@ -2089,13 +2096,13 @@ strfmailer (
 					strcpy (tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject), quote_area));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject,ismail), quote_area));
 					break;
 				case 'T':	/* To */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to), quote_area));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to,ismail), quote_area));
 					break;
 				case 'U':	/* User */
-					strcpy (tbuf, rfc1522_encode (userid));
+					strcpy (tbuf, rfc1522_encode (userid,ismail));
 					break;
 				default:
 					tbuf[0] = '%';

@@ -58,15 +58,6 @@ typedef char	*STRING;
 
 
 /*
-**  An entry in the lexical lookup table.
-*/
-typedef struct _TABLE {
-    const char *name;
-    int		type;
-    time_t	value;
-} TABLE;
-
-/*
 **  Daylight-savings mode:  on, off, or not yet known.
 */
 typedef enum _DSTMODE {
@@ -102,13 +93,25 @@ static MERIDIAN	yyMeridian;
 static time_t	yyRelMonth;
 static time_t	yyRelSeconds;
 
-static void	date_error(const char *);
 static time_t	ToSeconds(time_t, time_t, time_t, MERIDIAN);
 static time_t	Convert(time_t, time_t, time_t, time_t, time_t, time_t, MERIDIAN, DSTMODE);
 static time_t	DSTcorrect(time_t, time_t);
 static time_t	RelativeMonth(time_t, time_t);
 static int	LookupWord(char	*, int);
 static int	date_lex(void);
+
+/*
+ * The 'date_error()' function is declared here to work around a defect in
+ * bison 1.22, which redefines 'const' further down in this file, making it
+ * impossible to put a prototype here, and the function later.  We're using
+ * 'const' on the parameter to quiet gcc's -Wwrite-strings warning.
+ */
+/* ARGSUSED */
+static void
+date_error(const char *s)
+{
+    /* NOTREACHED */
+}
 
 %}
 
@@ -304,6 +307,15 @@ o_merid	: /* NULL */ {
 
 %%
 
+/*
+**  An entry in the lexical lookup table.
+*/
+typedef struct _TABLE {
+    const char *name;
+    int		type;
+    time_t	value;
+} TABLE;
+
 /* Month and day table. */
 static const TABLE MonthDayTable[] = {
     { "january",	tMONTH,  1 },
@@ -462,17 +474,6 @@ static const TABLE	TimezoneTable[] = {
     { "hdt",	tDAYZONE,  HOUR(10) },	/* -- expired 1986 */
 #endif	/* 0 */
 };
-
-
-
-/* ARGSUSED */
-static void
-date_error(
-    const char	*s)
-{
-    /* NOTREACHED */
-}
-
 
 static time_t
 ToSeconds(

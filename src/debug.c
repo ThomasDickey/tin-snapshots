@@ -13,6 +13,7 @@
  */
 
 #include "tin.h"
+#include "tcurses.h"
 
 int debug;
 
@@ -283,7 +284,9 @@ debug_print_active (void)
 				group->count, group->xmax, group->xmin, group->moderated);
 			fprintf (fp, " nxt=[%4d] hash=[%ld]  description=[%s]\n", group->next,
 				hash_groupname (group->name), (group->description ? group->description : ""));
+#ifdef DEBUG_NEWSRC
 			debug_print_newsrc (&group->newsrc, fp);
+#endif
 			debug_print_attributes (group->attribute, fp);
 		}
 		fclose (fp);

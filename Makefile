@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970309
+PVER		= 970314
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -117,6 +117,8 @@ TOP	= \
 	$(TOPDIR)/README \
 	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
+	$(TOPDIR)/config.guess \
+	$(TOPDIR)/config.sub \
 	$(TOPDIR)/configure \
 	$(TOPDIR)/configure.in \
 	$(TOPDIR)/install.sh \
@@ -242,7 +244,7 @@ version :
 
 distclean:
 	-@$(MAKE) clean
-	@$(RM) -f config.*
+	@$(RM) -f config.cache config.log config.status
 	@$(RM) -f $(INCDIR)/autoconf.h
 	@$(RM) -f $(SRCDIR)/Makefile
 	@$(RM) -f td-conf.out
