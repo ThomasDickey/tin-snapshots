@@ -1,9 +1,13 @@
+--unoff BETA release 960717 --
+
+118) Dean Takemori <dean@uhheph.phys.hawaii.edu>
+     BUG. username of .newsauth was truncated if full path of
+          .newsauth is shorter than the server password username line
+     FIX. open.c
+
 --unoff BETA release 960716 --
 
 117) Dieter Stueken <stueken@uni-muenster.de>
-     BUG. authorization only checks the first 'few' bytes of the
-          newsservername due to using sizeof(server) instead of
-          strlen(server)
      ADD. user argument to .newsauth
      FIX. open.c
 

@@ -33,7 +33,7 @@ write_newsrctable_file()
 		return; 
 	
 	fprintf(fp, "# NNTP-server -> newrc translation table and NNTP-server\n");
-	fprintf(fp, "# shortname list for %s %s.\n#\n", progname, VERSION);
+	fprintf(fp, "# shortname list for %s %s\n#\n", progname, VERSION);
 	fprintf(fp, "# the format of this file is\n");
 	fprintf(fp, "#   <FQDN of NNTP-server> <newsrc file> <shortname> ...\n#\n");
 	fprintf(fp, "# if <newsrc file> is given without path, $HOME is assumed as its location\n#\n");

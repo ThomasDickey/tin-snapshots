@@ -64,7 +64,7 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  tin sometimes crashes (thread.c) 710/892
+o  tin sometimes crashes (thread.c) 710/892/987
 
 New features
 ------------
@@ -77,7 +77,7 @@ o  add expansion of $HOME and/or ~ to newsrctable
 
 o  add
        --enable-mime-base64           (default off)
-       --disable-piping               (default on)
+       --disable-piping               (default off)
        --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
