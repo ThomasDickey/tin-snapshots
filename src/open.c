@@ -936,9 +936,7 @@ authenticate ()
 	new_env = my_malloc (strlen (tmpbuf)+1);
 	strcpy (new_env, tmpbuf);
  	putenv (new_env);
-	if (old_env) {
-		free (old_env);
-	}
+	FreeIfNeeded(old_env);
 	old_env = new_env;
 #else
 	sprintf (tmpbuf, "%d.%d.%d",

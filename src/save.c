@@ -442,9 +442,9 @@ save_thread_to_file (is_mailbox, group_path)
 				sprintf (save_thread_info, txt_thread_saved_to_many,
 					first_savefile, get_last_savefile ());
 			}
-			if (first_savefile != (char *) 0) {
-				free (first_savefile);
-			}
+
+			FreeIfNeeded(first_savefile);
+
 		}
 		info_message (save_thread_info);
 		sleep (2);
@@ -1313,9 +1313,7 @@ uudecode_file (pp, file_out_dir, file_out)
 					sleep (3);
 				}
 
-				if (file != (char *) 0) {
-					free (file);
-				}
+				FreeIfNeeded(file);
 			}
 		}
 	}

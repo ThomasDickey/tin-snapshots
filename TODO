@@ -1,5 +1,7 @@
 Bugs
 ----
+o  subscribe to newgroups does not work if tin is started with the -n flag
+
 o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
 
