@@ -311,7 +311,7 @@ show_thread (
 	}
 
 	/*
-	 * If we explicitly want to enter part way down a thread, do so 
+	 * If we explicitly want to enter part way down a thread, do so
 	 */
 	if (thread_depth)
 		thread_index_point = thread_depth;
@@ -1322,5 +1322,5 @@ move_to_response(
         thread_index_point = n;
         show_thread_page ();
     }
-}  
+}
 #endif /* INDEX_DAEMON */

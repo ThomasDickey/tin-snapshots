@@ -1,7 +1,7 @@
 Compilation and installation notes for tin - 96-12-02 (still incomplete!)
 -----------------------------------------------------
 
-Note: The section 'News machine names' is now at the beginning as it 
+Note: The section 'News machine names' is now at the beginning as it
       seemed to be the most sought after section.
 
 This following configure options and defines are documented in detail:
@@ -18,22 +18,22 @@ This following configure options and defines are documented in detail:
   --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
   --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
   --with-inews-dir	     DONT_REREAD_ACTIVE_FILE
-  
+
 
 News machine names
 ------------------
 
 --with-domain-name
-Defines the name of your news gateway machine. Useful if you don't want 
+Defines the name of your news gateway machine. Useful if you don't want
 your internal network visible to the outside world, or if your inews script
 or NNTP server rewrites your address for you.
-If the first letter of the string is a '/' the gateway name will be read from 
+If the first letter of the string is a '/' the gateway name will be read from
 the specified file.
 
-Example 1: If you are on machine 'tragic' at network domain 'confusion.com', 
+Example 1: If you are on machine 'tragic' at network domain 'confusion.com',
 Tin will assume your From: line should read "user@tragic.confusion.com".  If
-your inews script instead rewrites your address as "user@confusion.com", you 
-will be unable to cancel your own postings.  To make your posts and cancels 
+your inews script instead rewrites your address as "user@confusion.com", you
+will be unable to cancel your own postings.  To make your posts and cancels
 work properly, define -DDOMAIN_NAME=\"confusion.com\"
 
 General Notes on Building Tin
@@ -45,7 +45,7 @@ A list of these machines can be found at the end of this file.
 
 This file is long (so was the yellow brick road) but please read it all
 as it could save you problems later and we don't want an unhappy ending
-do we ? :-)  
+do we ? :-)
 
 Tin can be compiled to read news in any of the following ways:
 
@@ -58,7 +58,7 @@ Tin can be compiled to read news in any of the following ways:
 If the remote server supports NOV overview indexing, then tin will retrieve
 overview data on the fly using the NNTP XOVER extension.
 Otherwise tin will create its own NOV style index files on the local machine
-for each user in $HOME/.tin/.index 
+for each user in $HOME/.tin/.index
 
 
 Many machines require the name of the news gateway machine or the news
@@ -97,7 +97,7 @@ Note1: If you want to retrieve tin index files from your NNTP server,
        More info. concerning my NNTP patches & the tin daemon can be
        found in the INSTALL.NNTP file.  If you don't use NNTP, just
        install tind on the machine that has the news spool directory.
-   4)  Apply my NNTP patches to your nntpd server or this will not work 
+   4)  Apply my NNTP patches to your nntpd server or this will not work
        with NNTP!!!. (If you want tind locally read Note3).
    5)  Edit the Makefile and add -DINDEX_DAEMON to your COPTS entry and
        remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap, and
@@ -120,32 +120,32 @@ Testing Tin
 -----------
 
 Of course you _were_ going to test it before installing it for anyone else
-to use, weren't you?  This is just a little reminder and some suggestions 
+to use, weren't you?  This is just a little reminder and some suggestions
 on what to test first, and where to look first if it's broken.
 
 Things to test:
 
 1) Check that you can read news from several local and world-wide groups.
-   If this fails, check that the NNTP define directives are correctly set, 
-   and for local news systems, that the News directory structure define 
+   If this fails, check that the NNTP define directives are correctly set,
+   and for local news systems, that the News directory structure define
    directives are correctly set.  For NNTP versions, check that the server is
-   actually running and can be connected to from your machine.  This should 
+   actually running and can be connected to from your machine.  This should
    help you find and fix some of the most common problems.
 
    If reading news works fine, then:
 
-2) Check that you can post a test message to a local distribution group, 
-   preferably a test-only group.  (Remember, the world does not care to 
-   know whether you are testing Tin.)  If it fails, check that the 
-   INEWSDIR define is correctly set, that NNTP_INEWS is correctly set, and 
-   that the News machine name define directives are correctly set.  If 
-   possible, check whether you can post via some other mechanism, such as 
+2) Check that you can post a test message to a local distribution group,
+   preferably a test-only group.  (Remember, the world does not care to
+   know whether you are testing Tin.)  If it fails, check that the
+   INEWSDIR define is correctly set, that NNTP_INEWS is correctly set, and
+   that the News machine name define directives are correctly set.  If
+   possible, check whether you can post via some other mechanism, such as
    Pnews.  This should help you isolate and fix the most common problems.
 
    If posting news works fine, then:
 
-3) Check that you can cancel one of your test postings.  If not, it is 
-   almost certain that your News machine defines need to be set correctly, 
+3) Check that you can cancel one of your test postings.  If not, it is
+   almost certain that your News machine defines need to be set correctly,
    because Tin thinks your From: line is different from what has actually
    been posted.  See the section on News machine names below.
 
@@ -155,7 +155,7 @@ ingenuity.
 
 
 Detailed list of configure options (beginning with '--') and compiler flags
-(-D<name> directives) 
+(-D<name> directives)
 
 News directory structure
 ------------------------
@@ -176,7 +176,7 @@ Define if news overview (NOV) files are not stored in SPOOLDIR.
 Define if bnews/cnews program 'inews' is not in NEWSLIBDIR.
 
 NNTP - Reading & posting news
------------------------------ 
+-----------------------------
 
 --enable-nntp (default: on)
 Define if you wish to read news locally and remotely via an NNTP server.
@@ -191,11 +191,11 @@ Can be overridden by setting the environment variable NNTPSERVER.
 NNTP_INEWS
 Define if you want to use my built-in NNTP POST routine so that you no
 longer have to rely on the mini-inews from NNTP to be installed on each
-client machine. Also check that DOMAIN_NAME & INEWS_MAIL_DOMAIN 
-are correctly set to produce a correct From: headers for your site.
-If defined then the ~/.tin/tinrc variable "use_builtin_inews" default will
-be set to OFF rather than ON. The tinrc file is created automatically for
-each user the first time they use tin.
+client machine. Also check that DOMAIN_NAME is correctly set to produce a
+correct From: headers for your site. If defined then the ~/.tin/tinrc
+variable "use_builtin_inews" default will be set to OFF rather than ON. The
+tinrc file is created automatically for each user the first time they use
+tin.
 
 NNTP_SERVER_FILE
 Only define if your NNTP-server file is other than /etc/nntpserver.
@@ -221,7 +221,7 @@ Miscellaneous options
 
 --enable-debug
 Define if you want tin to log debug info. to files in /tmp. Activated
-by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for 
+by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for
 logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
 BASE and NNTP.
 
@@ -231,7 +231,6 @@ yourself.  The !cyberspam and cancel conventions are supported.  Be
 careful with this feature, it should not be used in an free accessible
 tin.  This feature does not work with INN using the INN-inews (when
 using without NNTP), because INN-inews rejects these cancels.
-This also allows the user to set his mail address in tinrc.
 
 --enable-8bit-keys
 Define if your terminal generates 8-bit controls.  For Unix systems we
@@ -279,7 +278,7 @@ the correct path to INN library.
 Define if you want tin to do ISO-8859-1 Charset to ASCII conversations
 by default for all groups. You must specify a value of "0-6" to get tin
 to use one of the 7 conversion tables for different languages.
-i.e., Adding -DUSE_ISO2ASC=\"2\" to the COPTS line in the Makefile would 
+i.e., Adding -DUSE_ISO2ASC=\"2\" to the COPTS line in the Makefile would
 be useful in the german language newsgroups. For more detailed info
 read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
@@ -311,16 +310,16 @@ The reread period can be set in seconds by setting the tinrc variable
 'reread_active_file_secs='
 
 HAVE_FASCIST_NEWSADMIN
-Define if you want users articles to be posted to groups that your site 
-receives.  This will change the warning that a group that the user is 
-posting to was not found in the sites active file to an error in the 
+Define if you want users articles to be posted to groups that your site
+receives.  This will change the warning that a group that the user is
+posting to was not found in the sites active file to an error in the
 article checking routine therefore causing the user to remove the group
 from his/her posting or to abort the posting of the article.
 
 HAVE_MMDF_MAILER
 Define if your machine uses a MMDF type mailer instead of sendmail.
-It is defined as default on SCO Unix machines. It can be dynamically 
-changed by setting the tinrc variable save_to_mmdf_mailbox to ON. 
+It is defined as default on SCO Unix machines. It can be dynamically
+changed by setting the tinrc variable save_to_mmdf_mailbox to ON.
 
 NO_POSTING
 Do not allow posting/followup of articles.
@@ -332,7 +331,7 @@ NO_SHELL_ESCAPE
 Do not allow shell escapes.
 
 USE_INVERSE_HACK
-Define if you want inverse video and highlighted bar disabled. Can be 
+Define if you want inverse video and highlighted bar disabled. Can be
 toggled in tin by the 'I' command and highlight bar by 'M' command.
 
 SMALL_MEMORY_MACHINE
@@ -374,7 +373,7 @@ Compiled & installed on the following machines:
 
 6)	Sun SPARCstation 10 & SunOS 5.5 with cc 3.0.1
 	Sun SPARCStation 20 & SunOS 5.5.1 with gcc 2.7.2
-	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0 
+	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0
 	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1

@@ -19,30 +19,6 @@
 #ifndef TIN_H
 #define TIN_H 1
 
-#if 0
-/* these are the only two defines I found on MacOS */
-#if defined (__POWERPC__) || defined (__CFM68K__)
-
-#	define __MAC_OS__ 1
-
-/* FIXME */
-#	undef HAVE_CONFIG_H	/* just in case */
-#	define HAVE_ATOI 1	/* MacOS comes with atoi() */
-
-#  undef SYSTEM_LOOKS_LIKE_SCO
- 
-/* MacOS doesn't have these - so ignore them */
-#	define NO_SHELL_ESCAPE	1
-#  define DONT_HAVE_PIPING	1
-#	define access(a,b)	(0)
-#	define chmod(a,b)	(0)
-
-/* someone has to write make_post_cmd() for MacOS someday */
-#	define make_post_cmd(a,b)	(0)
-
-#endif /* (__POWERPC__) || (__CFM68K__) */
-#endif /* 0 */
-
 #ifdef HAVE_CONFIG_H
 #	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
 #else
@@ -1653,14 +1629,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	TMPDIR		""
 #endif
 
-#ifdef M_AMIGA
-#	undef S_ISDIR
-#endif 
 #if !defined(S_ISDIR)
-#	if defined(M_AMIGA)
-#		define st_mode st_attr
-#		define S_ISDIR(m)	(((m) & ST_DIRECT) == ST_DIRECT)
-#	endif
 #	if defined(WIN32)
 #		define S_ISDIR(m)	((m) & _S_IFDIR)
 #	else
@@ -1668,7 +1637,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #			define S_ISDIR(m)   ((m) & S_IF_DIR)
 #		endif
 #	endif
-#	if defined(M_UNIX) || defined(VMS)
+#	if defined(M_UNIX) || defined(VMS) || defined(M_AMIGA)
 #		define S_ISDIR(m)   (((m) & S_IFMT) == S_IFDIR)
 #	endif
 #endif

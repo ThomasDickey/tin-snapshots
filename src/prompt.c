@@ -230,16 +230,20 @@ prompt_list (
 	int ch, var_orig;
 	int i;
 	size_t width = 0;
+	int adjust = (strcasecmp(list[0], txt_default) == 0);
 
 	set_alarm_clock_off ();
+
+	var  += adjust;
+	size += adjust;
+
+	var_orig = var;
 
 	/*
 	 * Find the length of longest printable text
 	 */
 	for (i = 0; i < size; i++)
 		width = MAX(width, strlen(list[i]));
-
-	var_orig = var;
 
 	show_menu_help (help_text);
 	cursoron ();
@@ -269,7 +273,7 @@ prompt_list (
 
 	set_alarm_clock_on ();
 
-	return(var);
+	return(var - adjust);
 }
 
 /*
@@ -448,6 +452,9 @@ continue_prompt (void)
 {
 	set_alarm_clock_off ();
 
+#if USE_CURSES
+	cmd_line = TRUE;
+#endif
 	info_message (txt_return_key);
 	(void) ReadCh ();
 #if USE_CURSES

@@ -2049,7 +2049,7 @@ ignore_followup_to_poster:
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
 			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
-			   initials);
+			   initials, with_headers ? TRUE : quote_signatures);
 	} else {
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 	}
@@ -2256,7 +2256,7 @@ mail_to_someone (
 		}
 		fseek (note_fp, note_mark[0], SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials);
+		copy_body (note_fp, fp, quote_chars, initials, quote_signatures);
 	} else {
 		fseek (note_fp, 0L, SEEK_SET);
 		fprintf (fp, "-- forwarded message --\n");
@@ -2624,7 +2624,8 @@ mail_to_author (
 		else
 			fseek (note_fp, note_mark[0], SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials);
+		copy_body (note_fp, fp, quote_chars, initials,
+		    with_headers ? TRUE : quote_signatures);
 	} else {
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 	}

@@ -28,22 +28,6 @@
 extern int mkdir(char *path);
 #define mkdir(p,m) mkdir(p)
 
-/* Replace Aztec's stat function with one that gives ST_DIRECT info */
-
-struct mystat {
-        char st_attr;
-        long st_mtime;
-        long st_size;
-};
-#undef stat
-#define stat mystat
-
-#define ST_DELETE       0x01
-#define ST_EXECUTE      0x02
-#define ST_WRITE        0x04
-#define ST_READ         0x08
-#define ST_DIRECT       0x10   /* Aztec's stat() doesn't give this information */
-
 /* For opendir(), and readdir() */
 
 struct dirent {
@@ -70,7 +54,6 @@ typedef struct
 extern DIR *opendir (char *name);
 extern struct dirent *readdir (DIR *di);
 extern void closedir (DIR *di);
-extern int stat(char *name, struct stat *buf);
 
 extern FILE *popen (char *command, char *mode);
 extern int pclose (FILE *pipe);

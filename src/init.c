@@ -168,37 +168,37 @@ int use_local_charset=TRUE;
 #endif
 
 #ifdef HAVE_COLOR
-int use_color;						/* enables/disables ansi-color support under linux-console and color-xterm */
-int col_back;						/* standard background color */
-int col_invers_fg;				/* color of inverse text (foreground) */
-int col_invers_bg;				/* color of inverse text (background) */
-int col_text;						/* color of textlines*/
-int col_minihelp;					/* color of mini help menu*/
-int col_help;						/* color of help pages */
-int col_message;					/* color of message lines at bottom */
-int col_quote;						/* color of quotelines */
-int col_head;						/* color of headerlines */
-int col_newsheaders;				/* color of actual news header fields */
-int col_subject;					/* color of article subject */
-int col_response;					/* color of respone counter */
-int col_from;						/* color of sender (From:) */
-int col_normal;					/* standard foreground color */
-int col_title;						/* color of Help/Mail-Sign */
-int col_signature;				/* color of signature */
-int word_highlight;				/* word highlighting on/off */
-int word_h_display_marks;		/* display * or _ when highlighting or space or nothing*/
-int col_markstar;					/* text highlighting with *stars* */
-int col_markdash;					/* text highlighting with _underdashes_ */
-t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
+int use_color;			/* enables/disables ansi-color support under linux-console and color-xterm */
+int col_back;			/* standard background color */
+int col_invers_fg;		/* color of inverse text (foreground) */
+int col_invers_bg;		/* color of inverse text (background) */
+int col_text;			/* color of textlines*/
+int col_minihelp;		/* color of mini help menu*/
+int col_help;			/* color of help pages */
+int col_message;		/* color of message lines at bottom */
+int col_quote;			/* color of quotelines */
+int col_head;			/* color of headerlines */
+int col_newsheaders;		/* color of actual news header fields */
+int col_subject;		/* color of article subject */
+int col_response;		/* color of respone counter */
+int col_from;			/* color of sender (From:) */
+int col_normal;			/* standard foreground color */
+int col_title;			/* color of Help/Mail-Sign */
+int col_signature;		/* color of signature */
+int word_highlight;		/* word highlighting on/off */
+int word_h_display_marks;	/* display * or _ when highlighting or space or nothing*/
+int col_markstar;		/* text highlighting with *stars* */
+int col_markdash;		/* text highlighting with _underdashes_ */
+t_bool use_color_tinrc;		/* like use_color but stored in tinrc */
 t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 #endif
 
 t_bool alternative_handling=TRUE;
-t_bool auto_bcc;					/* add your name to bcc automatically */
-t_bool auto_cc;					/* add your name to cc automatically */
-t_bool auto_list_thread;		/* list thread when entering it using right arrow */
-t_bool beginner_level;			/* beginner level (shows mini help a la elm) */
-t_bool catchup = FALSE;			/* mark all arts read in all subscribed groups */
+t_bool auto_bcc;		/* add your name to bcc automatically */
+t_bool auto_cc;			/* add your name to cc automatically */
+t_bool auto_list_thread;	/* list thread when entering it using right arrow */
+t_bool beginner_level;		/* beginner level (shows mini help a la elm) */
+t_bool catchup = FALSE;		/* mark all arts read in all subscribed groups */
 t_bool catchup_read_groups;	/* ask if read groups are to be marked read */
 t_bool check_any_unread = FALSE;
 t_bool check_for_new_newsgroups;	/* don't check for new newsgroups */
@@ -214,42 +214,44 @@ t_bool default_filter_kill_global;
 t_bool default_filter_select_case;
 t_bool default_filter_select_expire;
 t_bool default_filter_select_global;
-t_bool default_show_only_unread;	/* show only new/unread arts or all arts */
-t_bool delete_index_file;		/* delete index file before indexing (tind only) */
+t_bool default_show_only_unread; /* show only new/unread arts or all arts */
+t_bool delete_index_file;	/* delete index file before indexing (tind only) */
 t_bool display_mime_header_asis=FALSE;	/* rfc 1522 header will be decoded by default */
-t_bool draw_arrow_mark;			/* draw -> or highlighted bar */
+t_bool draw_arrow_mark;		/* draw -> or highlighted bar */
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
-t_bool full_page_scroll;		/* page half/full screen of articles/groups */
+t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool got_sig_pipe = FALSE;
 t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
 t_bool highlight_xcommentto;	/* set TRUE to show X-Comment-To inverse in the upper right corner */
 t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
-t_bool mail_news;					/* mail all arts to specified user */
+t_bool mail_news;		/* mail all arts to specified user */
 t_bool mail_news_to_posted;	/* mail all arts to specified user */
-t_bool mark_saved_read;			/* mark saved article/thread as read */
+t_bool mark_saved_read;		/* mark saved article/thread as read */
 t_bool newsrc_active;
 t_bool no_advertising = FALSE;
-t_bool pos_first_unread;		/* position cursor at first/last unread article */
+t_bool pos_first_unread;	/* position cursor at first/last unread article */
 t_bool post_8bit_header=FALSE;	/* allow 8bit chars. in header when posting to newsgroup */
 t_bool post_article_and_exit;	/* quick post of an article then exit (elm like) */
 t_bool post_postponed_and_exit;	/* post postponed articles and exit */
-t_bool print_header;				/* print all of mail header or just Subject: & From lines */
+t_bool print_header;		/* print all of mail header or just Subject: & From lines */
 t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
-t_bool prompt_followupto;    /* display empty Followup-To header in editor */
-t_bool purge_index_files;		/* stat all articles to see if they still exist */
+t_bool prompt_followupto;	/* display empty Followup-To header in editor */
+t_bool purge_index_files;	/* stat all articles to see if they still exist */
 t_bool quote_empty_lines;	/* quote empty lines, too */
+t_bool quote_signatures;	/* quote signatures */
 t_bool read_local_newsgroups_file;	/* read newsgroups file locally or via NNTP */
 t_bool read_news_via_nntp = FALSE;	/* read news locally or via NNTP */
 t_bool read_saved_news = FALSE;	/* tin -R read saved news from tin -S */
-t_bool save_news;					/* save all arts to savedir structure */
+t_bool save_news;		/* save all arts to savedir structure */
 t_bool save_to_mmdf_mailbox;	/* save mail to MMDF/mbox format mailbox */
 t_bool show_description;
-t_bool show_last_line_prev_page;	/* set TRUE to see last line of prev page (ala nn) */
+t_bool show_last_line_prev_page; /* set TRUE to see last line of prev page (ala nn) */
 t_bool show_lines;
+t_bool show_signatures;		/* show signatures when displaying articles */
 t_bool show_only_unread_groups;	/* set TRUE to see only subscribed groups with new news */
-t_bool show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
-t_bool sigdashes;					/* set TRUE to prepend every signature with dashes */
-t_bool signature_repost;		/* set TRUE to add signature when reposting articles */
+t_bool show_xcommentto;		/* set TRUE to show X-Comment-To-Header */
+t_bool sigdashes;		/* set TRUE to prepend every signature with dashes */
+t_bool signature_repost;	/* set TRUE to add signature when reposting articles */
 t_bool space_goto_next_unread;
 t_bool start_any_unread = FALSE;
 t_bool start_editor_offset;
@@ -258,13 +260,13 @@ t_bool strip_newsrc=FALSE;
 t_bool tab_after_X_selection;	/* set TRUE if you want auto TAB after X */
 t_bool tab_goto_next_unread;
 t_bool thread_catchup_on_exit;	/* catchup thread with left arrow key or not */
-t_bool update;						/* update index files only mode */
+t_bool update;			/* update index files only mode */
 t_bool update_fork = FALSE;	/* update index files by forked tin -u */
 t_bool use_builtin_inews;
-t_bool use_keypad;				/* enables/disables scroll keys on supported terminals */
-t_bool use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
-t_bool use_mouse;					/* enables/disables mouse support under xterm */
-t_bool verbose = FALSE;			/* update index files only mode */
+t_bool use_keypad;		/* enables/disables scroll keys on supported terminals */
+t_bool use_mailreader_i;	/* invoke user's mailreader earlier to use more of its features (i = interactive) */
+t_bool use_mouse;		/* enables/disables mouse support under xterm */
+t_bool verbose = FALSE;		/* update index files only mode */
 t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
@@ -277,8 +279,8 @@ t_bool xref_supported = TRUE;
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 
 #ifdef HAVE_METAMAIL
-t_bool use_metamail;				/* enables/disables metamail on MIME messages */
-t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
+t_bool use_metamail;		/* enables/disables metamail on MIME messages */
+t_bool ask_for_metamail;	/* enables/disables the metamail query if a MIME message is going to be displayed */
 #endif
 
 #ifdef HAVE_SYS_UTSNAME_H
@@ -288,6 +290,66 @@ struct utsname system_info;
 #ifndef M_AMIGA
 struct passwd *myentry;
 struct passwd pwdentry;
+#endif
+
+#ifdef HAVE_COLOR
+
+#define DFT_FORE -1
+#define DFT_BACK -2
+#define DFT_INIT -3
+
+static const struct {
+	int	*colorp;
+	int	color_dft;	/* -2 back, -1 fore, >=0 normal */
+} our_colors[] = {
+	{ &col_back,       DFT_BACK },
+	{ &col_from,        2 },
+	{ &col_head,        2 },
+	{ &col_help,       DFT_FORE },
+	{ &col_invers_bg,   4 },
+	{ &col_invers_fg,   7 },
+	{ &col_markdash,   13 },
+	{ &col_markstar,   11 },
+	{ &col_message,     6 },
+	{ &col_minihelp,    3 },
+	{ &col_newsheaders, 9 },
+	{ &col_normal,     DFT_FORE },
+	{ &col_quote,       2 },
+	{ &col_response,    2 },
+	{ &col_signature,   4 },
+	{ &col_subject,     6 },
+	{ &col_text,       DFT_FORE },
+	{ &col_title,       4 },
+};
+
+static void preinit_colors(void)
+{
+	size_t n;
+
+	for (n = 0; n < SIZEOF(our_colors); n++)
+		*(our_colors[n].colorp) = DFT_INIT;
+}
+
+void postinit_colors(void)
+{
+	size_t n;
+
+	for (n = 0; n < SIZEOF(our_colors); n++) {
+		if (*(our_colors[n].colorp) == DFT_INIT) {
+			switch (our_colors[n].color_dft) {
+			case DFT_FORE:
+				*(our_colors[n].colorp) = default_fcol;
+				break;
+			case DFT_BACK:
+				*(our_colors[n].colorp) = default_bcol;
+				break;
+			default:
+				*(our_colors[n].colorp) = our_colors[n].color_dft;
+				break;
+			}
+		}
+	}
+}
 #endif
 
 /*
@@ -501,6 +563,7 @@ void init_selfinfo (void)
 	prompt_followupto = FALSE;
 	purge_index_files = FALSE;
 	quote_empty_lines = FALSE;
+	quote_signatures = TRUE;
 	read_local_newsgroups_file = FALSE;
 	reread_active_file = TRUE;
 	reread_active_file_secs = REREAD_ACTIVE_FILE_SECS;
@@ -514,6 +577,7 @@ void init_selfinfo (void)
 	show_lines = TRUE;
 	show_description = TRUE;
 	show_only_unread_groups = FALSE;
+	show_signatures = TRUE;
 	show_xcommentto = FALSE;
 	highlight_xcommentto = FALSE;
 	sigdashes = TRUE;
@@ -551,26 +615,9 @@ void init_selfinfo (void)
 	ask_for_metamail = TRUE;
 #endif
 #ifdef HAVE_COLOR
+	preinit_colors();
 	use_color = FALSE;
 	use_color_tinrc = FALSE;
-	col_back = 0;
-	col_invers_bg = 4;
-	col_invers_fg = 7;
-	col_text = 7;
-	col_minihelp = 3;
-	col_help = 7;
-	col_message = 6;
-	col_quote = 2;
-	col_head = 2;
-	col_newsheaders = 9;
-	col_subject = 6;
-	col_response = 2;
-	col_from = 2;
-	col_normal = 7;
-	col_title = 4;
-	col_signature = 4;
-	col_markstar = 11;
-	col_markdash = 13;
 	word_highlight = TRUE;
 	word_highlight_tinrc = TRUE;
 	word_h_display_marks = 2; /* display space instead of marks */

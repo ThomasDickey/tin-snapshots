@@ -12,6 +12,9 @@ SRCDIR   = /src
 INCDIR   = /include
 OBJDIR   = /obj
 
+# Timezone stuff for faster spool access
+TZSET = _tzset.o
+
 # Include the next two lines to enable an NNTP version of TIN.
 # To use AS225 rather than AmiTCP, also include "def AS225".
 
@@ -173,7 +176,7 @@ OBJECTS = \
         $(OBJDIR)/win32.o \
         $(OBJDIR)/win32tcp.o \
         $(OBJDIR)/xref.o \
-        $(OBJDIR)/_tzset.o \
+#        $(OBJDIR)/_tzset.o \
 #        $(OBJDIR)/parsdate.c \
 
 
@@ -188,12 +191,15 @@ OBJECTS = \
 # targets
 #
 
-all: _tzset.o $(PROJECT) $(ACTIVED) $(GSTFILE)
+all: $(TZSET) $(PROJECT) $(ACTIVED) $(GSTFILE)
 
 $(PROJECT):     $(OBJDIR) $(OBJECTS)
         $(CC) $(LDFLAGS) pname=$@ <with <(ram:tmp)
-        $(OBJECTS)
+        $(OBJECTS) $(OBJDIR)/$(TZSET)
         <
+
+$(TZSET): sc:source/_tzset.c
+        $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
 
 $(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)
         $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/activeda.o
@@ -205,16 +211,14 @@ $(GSTFILE): $(HEADERS)
 $(OBJDIR):
         -@makedir $(OBJDIR)
 
+
+
 #/*vb*/
 makecfg: $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o $(GSTFILE)
         $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o
 /*vb*/
 $(INCDIR)/tincfg.h: $(SRCDIR)/tincfg.tbl makecfg
         makecfg $(SRCDIR)/tincfg.tbl $(INCDIR)/tincfg.h
-
-# this could really be more elegant (obw)
-_tzset.o: sc:source/_tzset.c
-        $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
 
 clean:
         -gst $(GSTFILE) unload

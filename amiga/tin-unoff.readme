@@ -18,7 +18,7 @@ check the docs in the main directory. It may be, that this file is not
 really up-to-date. Query the document version string for the last
 change:
 
-$VER: tin-unoff.readme 0.1 (28.08.97)
+$VER: tin-unoff.readme 0.2 (03.09.97)
 
 1. Building tin-unoff.
 
@@ -46,6 +46,8 @@ You need an additional package, sorry, but I have to make an
 archaeological excursion for the source I need to replace these
 functions. The dateparser needs an installed yacc/bison to compile. If
 you are using yacc, edit the smakefile accordingly (search for "YACC").
+I am using the bison from ADE and it works fine, although the parser
+skeleton contains an alloca(). (Yikes!)
 
 If you are building a NNTP-version, the correct SDK's must be installed.
 AmiTCP SDK is available from Aminet, the AS/Inet 225 SDK is available
@@ -108,15 +110,28 @@ Put tin where appropriate. Don't forget to set the NNTPSERVER variable
 if you didn't set a default server at compile-time, this might cause
 problems (see doc/TODO)
 
+Caveats:
+
+a) The Amiga port of metamail 2.3a as it lies on Aminet has a really
+broken I/O handling. With some combinations of parameters and
+non-existing stdio (run <>NIL:) it doesn't open a CON: window like it is
+supposed to do, but just spawns new processes over and over again. In
+the other combinations it just does nothing, so the piping of MIME
+articles doesn't work. I tried some workarounds, but no avail. The
+problem is clearly not within tin, it is the problem of metamail.
+Volunteers searched for porting a new version.
+
 3. Credits
 
-Thanks go to all those people who put their time into the port of this
-great program before. Among them:
+Thanks go to all those people who put their time into the Amiga port of
+this great program before. Among them:
 
 Mark Tomlinson
 Geoff McCaughan
 Reinhard Luebke
 Volker Barthelmann
+
+Also a big "Thank You" to Iain Lea for the original program.
 
 I hope no name is missing here.
 

@@ -1039,24 +1039,26 @@ print_a_line:
 
 		first_char = buf2[0] ? buf2[0] : first_char;
 
-		if (skip_include) {
-			if (first_char != skip_include) {
-				skip_include = '\0';
+		if ((below_sig == FALSE) || (show_signatures == TRUE)) {
+			if (skip_include) {
+				if (first_char != skip_include) {
+					skip_include = '\0';
+#ifdef HAVE_COLOR
+					print_color (buf2, below_sig);
+#else
+					my_printf ("%s" cCRLF, buf2);
+#endif
+					note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
+					note_page++;
+				}
+			} else {
 #ifdef HAVE_COLOR
 				print_color (buf2, below_sig);
 #else
 				my_printf ("%s" cCRLF, buf2);
 #endif
 				note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
-				note_page++;
 			}
-		} else {
-#ifdef HAVE_COLOR
-			print_color (buf2, below_sig);
-#else
-			my_printf ("%s" cCRLF, buf2);
-#endif
-			note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 		}
 
 		if (first) {

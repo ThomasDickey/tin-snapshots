@@ -149,7 +149,8 @@ copy_body (
 	FILE *fp_ip,
 	FILE *fp_op,
 	char *prefix,
-	char *initl)
+	char *initl,
+	t_bool with_sig)
 {
 	char buf[8192];
 	char buf2[8192];
@@ -190,6 +191,8 @@ copy_body (
 	if (strstr(zprefix, "%s")) sprintf(prefixbuf, zprefix, initl);
 
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
+		if (!with_sig && !strcmp(buf, "-- \n"))
+			break;
 		if (strstr(zprefix, "%s")) { /* initials wanted */
 			if (buf[0] != '\n') {
 				if (strchr(buf, '>')) {
@@ -1344,9 +1347,6 @@ get_arrow_key (int prech)
 	int code = KEYMAP_UNKNOWN;
 
 	switch (ch) {
-		case KEY_BACKSPACE:
-			code = '\b';
-			break;
 		case KEY_DC:
 			code = KEYMAP_DEL;
 			break;

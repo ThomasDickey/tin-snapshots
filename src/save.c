@@ -634,15 +634,7 @@ create_sub_dir (
 			my_mkdir (dir, (S_IRWXU|S_IRUGO|S_IXUGO));
 			return TRUE;
 		}
-#ifdef M_AMIGA
-		if (st.st_attr & ST_DIRECT) {
-#else
-#	ifdef M_OS2
-		if (st.st_mode & S_IFDIR) {
-#	else
-		if ((st.st_mode & S_IFMT) == S_IFDIR) {
-#	endif
-#endif
+		if S_ISDIR(st.st_mode) {
 			return TRUE;
 		} else {
 			return FALSE;

@@ -42,6 +42,7 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_YACC
 AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
+CF_ANSI_CC
 
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
@@ -511,6 +512,7 @@ AC_CHECK_FUNCS(\
 	poll \
 	putenv \
 	rewinddir \
+	resizeterm \
 	select \
 	setegid \
 	seteuid \
@@ -531,6 +533,7 @@ AC_CHECK_FUNCS(\
 	tzset \
 	uname \
 	unlink \
+	use_default_colors \
 	usleep \
 )
 

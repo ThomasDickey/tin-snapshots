@@ -845,7 +845,7 @@ show_intro_page (void)
 		Raw (FALSE);
 	}
 
-	my_printf (txt_intro_page);
+	my_fputs (txt_intro_page, stdout);
 	my_flush();
 
 	if (!cmd_line) {

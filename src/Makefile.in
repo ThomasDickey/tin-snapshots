@@ -13,7 +13,7 @@ CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 DAEMON	= # -DINDEX_DAEMON # -DACTIVE_DAEMON
-CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@ 
+CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
 LD	= $(CC)
@@ -23,7 +23,7 @@ YACC	= @YACC@
 LIBS	= @LIBS@ @INN_NNTPLIB@
 
 # Where do you want the binary & manual page installed?
-INSTALL_PREFIX = @INSTALL_PREFIX@
+INSTALL_PREFIX	= @INSTALL_PREFIX@
 INS_BINARY_DIR	= @bindir@
 INS_DAEMON_DIR	= @NEWSLIBDIR@
 INS_MANUAL_DIR	= @mandir@/man
@@ -201,9 +201,9 @@ LINTFLAGS=-a -c -h -n -x $(CPPOPTS) \
 	-DHAVE_ISPELL \
 	-DHAVE_COLOR
 
-all: $(BINDIR)/$(EXE) 
+all: $(BINDIR)/$(EXE)
 
-.SUFFIXES : .i
+.SUFFIXES: .i
 
 .c.o:
 @SHOW_CC@
@@ -286,7 +286,7 @@ install_daemon: $(INSTALL_PREFIX)$(INS_DAEMON_DIR)
 tags:
 	@$(ECHO) "Generating tags (results in ./tags)..."
 	@-$(RM) -f tags
-	@$(TAGS) $(HFILES) $(CFILES) 
+	@$(TAGS) $(HFILES) $(CFILES)
 
 lint:	$(CFILES) $(OBJDIR)/parsdate.c tincfg.h
 	@$(ECHO) "Linting source (results in ./LINT)..."
@@ -304,7 +304,7 @@ clean:
 distclean \
 clobber: clean
 	@$(ECHO) "Clobbering..."
-	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) actived tags 
+	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) actived tags
 
 cflow:
 	@$(ECHO) "Creating cflow for $(PROJECT)..."

@@ -24,12 +24,12 @@ static char **ulBuildArgv(char *cmd, int *new_argc);
 static int check_upgrade (char *buf);
 static int match_list ( char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
-static void highlight_option (int option);   
+static void highlight_option (int option);
 static void print_any_option (int the_option);
-static void print_option (enum option_enum the_option);   
+static void print_option (enum option_enum the_option);
 static void show_config_page (int page_no);
 static void unhighlight_option (int option);
-   
+
 
 enum state { IGNORE, CHECK, UPGRADE };
 
@@ -45,7 +45,7 @@ check_upgrade(
 {
 	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
 		return(IGNORE);
-	else {
+	else { /* FIXME: move strings to lang.c */
 		my_fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
 		my_fprintf(stderr, "Some values in your configuration file have changed\n");
 		my_fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
@@ -150,58 +150,58 @@ read_config_file (
 				break;
 			}
 #ifdef HAVE_COLOR
-			if (match_integer (buf, "col_back=", &col_back, MAX_COLOR)) {
+			if (match_color (buf, "col_back=", &col_back, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_invers_bg=", &col_invers_bg, MAX_COLOR)) {
+			if (match_color (buf, "col_invers_bg=", &col_invers_bg, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_invers_fg=", &col_invers_fg, MAX_COLOR)) {
+			if (match_color (buf, "col_invers_fg=", &col_invers_fg, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_text=", &col_text, MAX_COLOR)) {
+			if (match_color (buf, "col_text=", &col_text, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_minihelp=", &col_minihelp, MAX_COLOR)) {
+			if (match_color (buf, "col_minihelp=", &col_minihelp, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_help=", &col_help, MAX_COLOR)) {
+			if (match_color (buf, "col_help=", &col_help, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_message=", &col_message, MAX_COLOR)) {
+			if (match_color (buf, "col_message=", &col_message, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_quote=", &col_quote, MAX_COLOR)) {
+			if (match_color (buf, "col_quote=", &col_quote, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_head=", &col_head, MAX_COLOR)) {
+			if (match_color (buf, "col_head=", &col_head, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_newsheaders=", &col_newsheaders, MAX_COLOR)) {
+			if (match_color (buf, "col_newsheaders=", &col_newsheaders, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_subject=", &col_subject, MAX_COLOR)) {
+			if (match_color (buf, "col_subject=", &col_subject, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_response=", &col_response, MAX_COLOR)) {
+			if (match_color (buf, "col_response=", &col_response, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_from=", &col_from, MAX_COLOR)) {
+			if (match_color (buf, "col_from=", &col_from, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_normal=", &col_normal, MAX_COLOR)) {
+			if (match_color (buf, "col_normal=", &col_normal, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_title=", &col_title, MAX_COLOR)) {
+			if (match_color (buf, "col_title=", &col_title, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_signature=", &col_signature, MAX_COLOR)) {
+			if (match_color (buf, "col_signature=", &col_signature, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_markstar=", &col_markstar, MAX_COLOR)) {
+			if (match_color (buf, "col_markstar=", &col_markstar, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_markdash=", &col_markdash, MAX_COLOR)) {
+			if (match_color (buf, "col_markdash=", &col_markdash, MAX_COLOR)) {
 				break;
 			}
 #endif
@@ -462,6 +462,9 @@ read_config_file (
 			if (match_boolean (buf, "quote_empty_lines=", &quote_empty_lines)) {
 				break;
 			}
+			if (match_boolean (buf, "quote_signatures=", &quote_signatures)) {
+				break;
+			}
 			break;
 
 		case 'r':
@@ -499,6 +502,9 @@ read_config_file (
 				break;
 			}
 			if (match_boolean (buf, "show_lines=" , &show_lines)) {
+				break;
+			}
+			if (match_boolean (buf, "show_signatures=", &show_signatures)) {
 				break;
 			}
 			if (match_boolean (buf, "save_to_mmdf_mailbox=", &save_to_mmdf_mailbox)) {
@@ -598,11 +604,11 @@ read_config_file (
 		}
 	}
 	fclose (fp);
-	
+
 	/*
 	 * sort out conflicting settings
 	 */
-	 
+
 	/* nobody likes to navigate blind */
 	if (!(draw_arrow_mark || inverse_okay)) {
 		draw_arrow_mark = TRUE;
@@ -613,7 +619,7 @@ read_config_file (
 		strip_blanks = FALSE;
 	}
 #endif
-	
+
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
@@ -816,6 +822,12 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_quote_empty_lines);
 	fprintf (fp, "quote_empty_lines=%s\n\n", print_boolean(quote_empty_lines));
+
+	fprintf (fp, txt_tinrc_quote_signatures);
+	fprintf (fp, "quote_signatures=%s\n\n", print_boolean(quote_signatures));
+
+	fprintf (fp, txt_tinrc_show_signatures);
+	fprintf (fp, "show_signatures=%s\n\n", print_boolean(show_signatures));
 
 	fprintf (fp, txt_tinrc_news_quote_format);
 	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
@@ -1071,6 +1083,10 @@ print_any_option (
 			my_printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option - 1].var_index]));
 			break;
 		case OPT_LIST:
+			if (*(option_table[act_option - 1].variable) < 0) {
+				my_printf("%s", txt_default);
+				break;
+			}
 			my_printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
 			break;
 		case OPT_STRING:
@@ -1134,7 +1150,7 @@ refresh_config_page (
 			act_option = 1;
 		}
 	}
-	
+
 	/* determine on which page act_option would be */
 	desired_page = (int) (act_option - 1) / option_lines_per_page;
 
@@ -1163,7 +1179,7 @@ change_config_file (
 	int mime_type = 0;
 
 	set_signals_config ();
-	
+
 	actual_option_page = -1;
 	option = 1;
 
@@ -1549,7 +1565,7 @@ change_config_file (
 						 * case OPT_DEFAULT_SORT_ART_TYPE:
 						 *	break;
 						 */
-						 
+
 						default:
 							break;
 					} /* switch (option) */
@@ -1713,6 +1729,47 @@ match_boolean (
 	return FALSE;
 }
 
+#ifdef HAVE_COLOR
+int
+match_color (
+	char *line,
+	const char *pat,
+	int *dst,
+	int maxlen)
+{
+	size_t	n;
+	size_t	patlen = strlen (pat);
+
+	if (STRNCMPEQ(line, pat, patlen)) {
+		int found = FALSE;
+		for (n = 0; n < MAX_COLOR+1; n++) {
+			if (!strcasecmp(&line[patlen], txt_colors[n])) {
+				found = TRUE;
+				*dst = (int) n;
+				if (*dst > maxlen)
+					*dst = -1;
+			}
+		}
+
+		if (!found)
+			*dst = atoi (&line[patlen]);
+
+		if (maxlen)  {
+			if ((*dst < -1) || (*dst > maxlen)) {
+				my_fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
+				*dst = 0;
+			}
+		}
+#ifndef HAVE_USE_DEFAULT_COLORS
+		if (*dst < 0)
+			*dst = 0;
+#endif
+
+		return TRUE;
+	}
+	return FALSE;
+}
+#endif
 
 /*
  * If pat matches the start of line, convert rest of line to an integer, dst
@@ -1901,7 +1958,7 @@ show_config_page (
 static char **
 ulBuildArgv(
 	char *cmd,
-	int *new_argc) 
+	int *new_argc)
 {
 	char **new_argv=NULL;
 	char *buf=NULL, *tmp=NULL;
