@@ -18,7 +18,6 @@ cat >>$OUT <<EOF/
 EOF/
 OPTS="$*"
 
-#INSTALL="td-install"
 CC="${CC-cc}"
 
 # a few things missing in configure
@@ -27,55 +26,23 @@ if test -z "$CFLAGS" ; then
 	case `uname -s` in
 	HP-UX)
 		# The basic K&R compiler on HP/UX doesn't
-		# support -O/-g options, but the comercial one does
+		# support -O/-g options, but the commercial one does
 		# -> trust $CFLAGS
-		if test "$CC" != "cc" ; then
-			CFLAGS="-O"
-		fi
+		test "$CC" != "cc" && test -z "$CFLAGS" && CFLAGS="-O"
 		;;
 	*)
 	CFLAGS="-O"
 	esac
 fi
 
-
-# (congig.guess should be included sometimes)
+# (config.guess should be included sometimes)
 NETLIBS=""
-
-# is this still needed? thomas?
-case `uname -s` in
-#api20|opera15)
-#	# SCO
-#	NETLIBS="-lsocket"
-#	;;
-#AIX)
-#	;;
-#CLIX)
-#	NETLIBS="-lbsd"
-#	;;
-#Linux)
-#	INSTALL=install
-#	;;
-#SunOS)
-#	# Solaris (5.x) requires netlibs; SunOS (4.x) doesn't
-#	case `uname -r` in
-#	5.*)
-#		NETLIBS="-lsocket -lnsl"
-#		;;
-#	esac
-#	;;
-#UNIX_SV)
-#	NETLIBS="-lresolv -lsocket -lnsl"
-#	;;
-esac
-
 
 if test -n "$NETLIBS" ; then
 	LIBS="$LIBS $NETLIBS"
 	export LIBS
 fi
 
-#INSTALL="$INSTALL"
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \

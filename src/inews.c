@@ -225,7 +225,7 @@ get_host_name (host_name)
 			if ((fp = fopen (nntp_inews_gateway, "r")) != (FILE *) 0) {
 				if (fgets (host, sizeof (host), fp) != (char *) 0) {
 					strcpy (host_name, host);
-					ptr = (char *) strrchr (host_name, '\n');
+					ptr = strrchr (host_name, '\n');
 					if (ptr != (char *) 0) {
 						*ptr = '\0';
 					}
@@ -329,14 +329,14 @@ get_user_info (user_name, full_name)
 #else
 #ifndef VMS
 		my_strncpy (buf, myentry->pw_gecos, 128);
-		ptr = (char *) strchr (buf, ',');
+		ptr = strchr (buf, ',');
 		if (ptr != (char *) 0) {
 			*ptr = '\0';			
 		}
 		/*
 		 * check if SYSV (& lastname) hack is in gecos field
 		 */
-		ptr = (char *) strchr (buf, '&');
+		ptr = strchr (buf, '&');
 		if (ptr != (char *) 0) {
 			*ptr++ = '\0';
 			strcpy (tmp, userid);
@@ -470,7 +470,7 @@ get_domain_name (inews_domain, domain)
 	if (inews_domain[0] == '/') {
 		if ((fp = fopen (inews_domain, "r")) != (FILE *) 0) {
 			if (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-				ptr = (char *) strrchr (buf, '\n');
+				ptr = strrchr (buf, '\n');
 				if (ptr != (char *) 0) {
 					*ptr = '\0';
 					strcpy (domain, buf);

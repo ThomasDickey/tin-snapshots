@@ -273,6 +273,12 @@ CF_ARG_DISABLE(etiquette,
 	[AC_DEFINE(NO_ETIQUETTE)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(whether to allow base64 coding in headers)
+CF_ARG_ENABLE(mime-base64,
+	[--enable-mime-base64      allow base64 encoding in headers if shorter],
+	[AC_DEFINE(MIME_BASE64_ALLOWED)])
+AC_MSG_RESULT($enableval)
+
 AC_MSG_CHECKING(whether to strictly observe RFC1522 and break long lines)
 CF_ARG_ENABLE(break-long-lines,
   	[  --enable-break-long-lines
@@ -293,6 +299,12 @@ CF_WITH_DFTENV(mime-default-charset,
                           fallback for \$MM_CHARSET],
 	MM_CHARSET,US-ASCII)
 AC_MSG_RESULT($MM_CHARSET)
+
+AC_MSG_CHECKING(for default ISO/ASCII table)
+CF_WITH_DFTENV(iso-to-ascii,
+	[  --iso-to-ascii          ISO -> ASCII conversion],
+	DEFAULT_ISO2ASC,-1)
+AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
 AC_MSG_CHECKING(whether to enable forged cancels)
 CF_ARG_ENABLE(forgery,
@@ -451,6 +463,7 @@ AC_CHECK_FUNCS(\
 
 CF_FUNC_FORK
 
+dnl These return non-int values, and can be troublesome if not declared
 CF_CHECK_DECL(\
 	errno \
 	getenv \
@@ -460,6 +473,7 @@ CF_CHECK_DECL(\
 	getservbyname \
 	inet_ntoa \
 	popen \
+	strchr \
 	tgetstr \
 	tgoto \
 )
@@ -526,12 +540,12 @@ dnl	-lnsl -lsocket
 dnl	-lsocket
 dnl	-lbsd
 NETLIBS=""
-AC_CHECK_FUNC(gethostname,[],[
+AC_CHECK_FUNC(gethostname,[AC_DEFINE(HAVE_GETHOSTNAME)],[
 	AC_CHECK_LIB(nsl,gethostname,
 		[AC_DEFINE(HAVE_GETHOSTNAME)
 		NETLIBS="-lnsl $NETLIBS"],,
 		[$NETLIBS])])
-AC_CHECK_FUNC(socket,[],[
+AC_CHECK_FUNC(socket,[AC_DEFINE(HAVE_SOCKET)],[
 	AC_CHECK_LIB(socket,socket,
 		[AC_DEFINE(HAVE_SOCKET)
 		NETLIBS="-lsocket $NETLIBS"],
@@ -544,7 +558,7 @@ AC_CHECK_FUNC(gethostbyname,[AC_DEFINE(HAVE_GETHOSTBYNAME)],[
 		[AC_DEFINE(HAVE_GETHOSTBYNAME)
 		NETLIBS="-lnsl $NETLIBS"],,
 		[$NETLIBS])])
-AC_CHECK_FUNC(strcasecmp,[],[
+AC_CHECK_FUNC(strcasecmp,[AC_DEFINE(HAVE_STRCASECMP)],[
 	AC_CHECK_LIB(resolv,strcasecmp,
 		[AC_DEFINE(HAVE_STRCASECMP)
 		NETLIBS="-lresolv $NETLIBS"],,

@@ -36,6 +36,9 @@ int	can_post = TRUE;
 
 char *nntp_server;
 
+#ifdef NNTP_ABLE
+int get_server_nolf=0; /* this will only be set by our own nntplib.c */
+#endif
 
 int
 nntp_open ()
@@ -952,6 +955,7 @@ stuff_nntp (fnam)
 	FILE *fp;
 /*	int count = 0; */
 	struct stat sb;
+	int last_line_nolf=0;
 
 	sprintf (fnam, "%stin_nntpXXXXXX", TMPDIR);
 	mktemp (fnam);
@@ -974,12 +978,16 @@ stuff_nntp (fnam)
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
 #endif
-		if (STRCMPEQ(line, ".")) {	/* end of text */
+		if (!last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
 			break;
 		}
-		strcat (line, "\n");
-		if (line[0] == '.') {		/* reduce leading .'s */
-			fputs (&line[1], fp);
+		if(!get_server_nolf) {
+			strcat (line, "\n");
+			if (line[0] == '.') {	/* reduce leading .'s */
+				fputs (&line[1], fp);
+			} else {
+				fputs (line, fp);
+			}
 		} else {
 			fputs (line, fp);
 		}
@@ -1053,7 +1061,7 @@ log_user ()
 	get_user_info (dummy, buf);
 
 	if (read_news_via_nntp && xuser_supported) {
-		if ((ptr = (char *) strchr(buf, ','))) {
+		if ((ptr = strchr (buf, ','))) {
 			*ptr = '\0';
 		}
 		sprintf (line, "xuser %s (%s)", myentry->pw_name, buf);
@@ -1146,7 +1154,7 @@ authorization (server, authuser)
 		 * strip trailing newline character
 		 */
 
-		ptr = (char *) strchr (line, '\n');
+		ptr = strchr (line, '\n');
 		if(ptr != (char *) 0)
 			*ptr = '\0';
 
@@ -1154,7 +1162,7 @@ authorization (server, authuser)
 		 * Get server from 1st part of the line
 		 */
 
-		ptr = (char *) strchr (line, ' ');
+		ptr = strchr (line, ' ');
 
 		if(ptr == (char *) 0)		/* no passwd, no auth, skip */
 			continue;
@@ -1179,7 +1187,7 @@ authorization (server, authuser)
 		ptr = authpass;			/* continue searching here */
 
 		if(*authpass == '"') {		/* skip "embedded" password string */
-			ptr = strrchr(authpass,'"');
+			ptr = strrchr (authpass,'"');
 			if((ptr != (char *) 0) && (ptr > authpass)) {
 				authpass++;
 				*ptr++ = '\0';	/* cut off trailing " */
@@ -1187,7 +1195,7 @@ authorization (server, authuser)
 				ptr = authpass;
 		}
 
-		ptr = strchr(ptr,' ');		/* find next separating blank */
+		ptr = strchr (ptr,' ');		/* find next separating blank */
 
 		if(ptr != (char *) 0) {		/* a 3rd argument follows */
 			while(*ptr == ' ')	/* skip any blanks */

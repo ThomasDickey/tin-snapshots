@@ -102,9 +102,7 @@ o  compile-time option: generate own MSGIDs on host with a proper FQDN
 o  add expansion of $HOME and/or ~ to newsrctable
 
 o  add
-       --enable-mime-base64           (default off)
        --disable-piping               (default off)
-       --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY undef SPOOLDIR etc...
@@ -203,6 +201,8 @@ o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 o  what is with NEW_HASH_METHOD in misc.c?
 
 o  what is with HAVE_GENERIC_AUTHINFO in open.c?
+
+o  check all switch()s for missing defaults 
 
 o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and

@@ -1365,7 +1365,7 @@ ignore_followup_to_poster:
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
 				msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 			} else {
-				ptr = (char *) strchr (note_h_newsgroups, ',');
+				ptr = strchr (note_h_newsgroups, ',');
 				if (ptr) {
 					msg_add_header ("Followup-To", note_h_newsgroups);
 				}

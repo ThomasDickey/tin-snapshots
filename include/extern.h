@@ -142,6 +142,10 @@ extern int sscanf P_((const char *, const char *, ...));
 #ifdef DECL_STRCASECMP
 extern int strcasecmp P_((const char *, const char *));
 #endif
+#ifdef DECL_STRCHR
+extern char *strchr P_((const char *, int));
+extern char *strrchr P_((const char *, int));
+#endif
 #ifdef DECL_STRFTIME
 extern int strftime P_((char *, int, char *, struct tm *));
 #endif
@@ -246,6 +250,9 @@ extern char default_sigfile[PATH_LEN];
 extern char default_signature[PATH_LEN];
 extern char default_subject_search[LEN];
 extern char error_response[];
+#ifdef NNTP_ABLE
+extern int  get_server_nolf; /* from open.c */
+#endif
 extern char global_attributes_file[PATH_LEN];
 extern char global_config_file[PATH_LEN];
 extern char global_filter_file[PATH_LEN];

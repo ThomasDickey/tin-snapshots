@@ -1,3 +1,20 @@
+--unoff BETA release 960729 --
+
+128) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. tin had problems with xover lines longer than 1024 chars
+     FIX. extern.h, nntplib.c, open.c
+
+127) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup
+     ADD. configure options: --enable-mime-base64, --with-iso-to-ascii
+     ADD. autoconf'd declaration of strchr/strrchr
+     FIX. several supplied patches
+
+126) Torsten Neumann <torsten@imke.infodrom.north.de>
+     BUG. missing default condition in read_config_file caused tin to
+          crash on several systems
+     FIX. config.c
+
 --unoff BETA release 960725 --
 
 125) Alexander Lehmann <alex@hal.rhein-main.de>

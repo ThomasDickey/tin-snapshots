@@ -20,17 +20,19 @@
  *  included by  (root@aspic.han.de) on 11/04/93
  */
 
-#define	SUB			"?"
-#define	ISO_TABLES	7
+#define SUB         "?"
+#define ISO_TABLES  7
+#define ISO_EXTRA   0xa0 /* beginning of second range of printable chars */
+#define EIGHT_BIT(ptr) (unsigned char *)ptr
 
-/* 
+/*
  * TABSTOP(x) is the column of the character after the TAB
  * at column x. First column is 0, of course.
  */
 
-#define	TABSTOP(x)	(((x) - ((x)&7)) + 8)
+#define TABSTOP(x)  (((x) - ((x)&7)) + 8)
 
-static constext *iso2asc[ISO_TABLES][96] =
+static constext *iso2asc[ISO_TABLES][256-ISO_EXTRA] =
 {
 	{
 	" ","!","c",SUB,SUB,"Y","|",SUB,"\"","(c)","a","<<","-","-","(R)","-",
@@ -108,80 +110,81 @@ static constext *iso2asc[ISO_TABLES][96] =
 	}
 };
 
-/* 
- * german tex style to latin1 conversion (by root@aspic, 12/04/93) 
+/*
+ * german tex style to latin1 conversion (by root@aspic, 12/04/93)
  */
- 
+
 #define	TEX_SUBST	15
 #define	SPACES		"                                                                                                         "
 
-static char *tex_from[TEX_SUBST] = 
+static char *tex_from[TEX_SUBST] =
 {
 	"\"a","\\\"a","\"o","\\\"o","\"u","\\\"u","\"A","\\\"A","\"O","\\\"O","\"U","\\\"U","\"s","\\\"s","\\3"
 };
-static char *tex_to[TEX_SUBST] = 
+static char *tex_to[TEX_SUBST] =
 {
 	"ä", "ä", "ö", "ö", "ü", "ü", "Ä", "Ä", "Ö", "Ö", "Ü", "Ü", "ß", "ß", "ß"
 };
-        
+
 /*
- *  Now the convertion function...
+ *  Now the conversion function...
  */
 
 void
 ConvertIso2Asc (iso, asc, t)
-	unsigned char *iso;
-	unsigned char *asc;
+	char *iso;
+	char *asc;
 	int t;
 {
-	char *p, **tab;
+	char *p;
+	constext **tab;
 	int first;   /* flag for first SPACE/TAB after other characters */
 	int i, a;    /* column counters in iso and asc */
-  
-	if (iso == (unsigned char *) 0 || 
-	    asc == (unsigned char *) 0) {
+
+	if (iso == 0 ||
+	    asc == 0) {
 		return;
 	}
-  
-	tab = (char **) (iso2asc[t] - 0xa0);
+
+	tab = (iso2asc[t] - ISO_EXTRA);
 	first = 1;
 	i = a = 0;
-	while (*iso) {
-		if (*iso > 0x9f) {
-			p = tab[*(iso++)]; i++;
+	while (*iso != '\0') {
+		if (*EIGHT_BIT(iso) >= ISO_EXTRA) {
+			p = tab[*EIGHT_BIT(iso)]; iso++, i++;
 			first = 1;
-			while (*p) { 
-				*(asc++) = *(p++); 
-				a++; 
+			while (*p) {
+				*(asc++) = *(p++);
+				a++;
 			}
 		} else {
 			if (a > i && ((*iso == ' ') || (*iso == '\t'))) {
-				/* 
-				 * spaces or TABS should be removed 
+				/*
+				 * spaces or TABS should be removed
 				 */
 				if (*iso == ' ') {
-	  				/* 
-	  				 * only the first space after a letter must not be removed 
-	  				 */
-					if (first) { 
-						*(asc++) = ' '; 
-						a++; 
-						first = 0; 
+					/*
+					 * only the first space after a letter must not be removed
+					 */
+					if (first) {
+						*(asc++) = ' ';
+						a++;
+						first = 0;
 					}
 					i++;
 				} else {   /* here: *iso == '\t' */
 					if (a >= TABSTOP(i)) {
-						/* 
-						 * remove TAB or replace it with SPACE if necessary 
+						/*
+						 * remove TAB or replace it with SPACE if necessary
 						 */
-						if (first) { 
-							*(asc++) = ' '; 
-							a++; 
-							first = 0; 
+						if (first) {
+							*(asc++) = ' ';
+							a++;
+							first = 0;
 						}
 					} else {
-						/* 
-						 * TAB will correct the column difference 
+						/*
+						 * TAB will correct the column difference
 						 */
 						*(asc++) = '\t';   /* = *iso */
 						a = TABSTOP(a);    /* = TABSTOP(i), because i < a < TABSTOP(i) */
@@ -190,16 +193,16 @@ ConvertIso2Asc (iso, asc, t)
 				}
 				iso++;
 			} else {
-				/* 
-				 * just copy the characters and advance the column counters 
+				/*
+				 * just copy the characters and advance the column counters
 				 */
 				if (*iso == '\t') {
 					a = i = TABSTOP(i);  /* = TABSTOP(a), because here a = i */
 				} else if (*iso == '\b') {
-					a--; 
+					a--;
 					i--;
 				} else {
-					a++; 
+					a++;
 					i++;
 				}
 				*(asc++) = *(iso++);
@@ -208,31 +211,31 @@ ConvertIso2Asc (iso, asc, t)
 		}
 	}
 	*asc = 0;
-   
+
 	return;
 }
- 
+
 
 void
 ConvertTeX2Iso (from, to)
-	unsigned char *from;
-	unsigned char *to;
+	char *from;
+	char *to;
 {
 	size_t len, col, spaces;  /* length of from, col counter, spaces to add */
 	size_t subst_len;
 	int i, ex;
- 
+
 	*to = '\0';
-	len = strlen ((char *)from);
+	len = strlen (from);
 	col = 0;
- 
+
 	spaces = 0;
 	while (col < len) {
 		i = subst_len = ex = 0;
 		while ((i < TEX_SUBST) && !ex) {
 			subst_len = strlen (tex_from[i]);
-			if (! strncmp ((char *)from + col, tex_from[i], subst_len)) {
-				strcat ((char *)to, tex_to[i]);
+			if (! strncmp (from + col, tex_from[i], subst_len)) {
+				strcat (to, tex_to[i]);
 				spaces += subst_len - 1;
 				col += subst_len - 1;
 				ex = 1;
@@ -240,24 +243,24 @@ ConvertTeX2Iso (from, to)
 			i++;
 		}
 		if (! ex)
-			strncat ((char *)to, (char *)from + col, 1);
+			strncat (to, from + col, 1);
 		if (from[col] == ' ') {
-			strncat ((char *)to, SPACES, spaces);
+			strncat (to, SPACES, spaces);
 			spaces = 0;
 		}
- 
+
 		col++;
 	}
 }
 
-/* 
- * Check for german TeX encoding 
+/*
+ * Check for german TeX encoding
  */
- 
+
 int
 iIsArtTexEncoded (art, group_path)
 	long art;
-	unsigned char *group_path;
+	char *group_path;
 {
 	char line[LEN];
 	FILE *fp;

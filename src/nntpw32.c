@@ -361,7 +361,7 @@ getserverbyfile (file)
 		if (*buf == '\n' || *buf == '#') {
 			continue;
 		}
-		cp = (char *) strrchr (buf, '\n');
+		cp = strrchr (buf, '\n');
 		if (cp) {
 			*cp = '\0';
 		}
