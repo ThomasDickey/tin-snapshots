@@ -148,7 +148,7 @@ vWriteNewsrcLine (
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
 	} else {
- 		if (WRITE_NEWSRC(sub))
+ 		if (sub == SUBSCRIBED || !strip_newsrc)
  			fprintf (fp, "%s%c %s\n", grp, sub, seq);
 	}
 }
@@ -169,11 +169,7 @@ vWriteNewsrc (void)
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
 		return;
 
-#ifdef VMS
-	if ((fp_op = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
-#else
-	if ((fp_op = fopen (newnewsrc, "w")) != (FILE *) 0) {
-#endif
+	if ((fp_op = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
 		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
 
@@ -246,11 +242,7 @@ auto_subscribe_groups (
 	if ((fp_subs = open_subscription_fp ()) != (FILE *) 0) {
 		wait_message (txt_autosubscribing_groups);
 
-#ifdef VMS
-		if ((fp_newsrc = fopen (newsrc_file, "w", "fop=cif")) != (FILE *) 0) {
-#else
-		if ((fp_newsrc = fopen (newsrc_file, "w")) != (FILE *) 0) {
-#endif
+		if ((fp_newsrc = fopen (newsrc_file, "w" FOPEN_OPTS)) != (FILE *) 0) {
 			if (newsrc_mode) {
 				chmod (newsrc_file, newsrc_mode);
 			}
@@ -293,14 +285,11 @@ backup_newsrc (void)
 		joinpath (buf, homedir, OLDNEWSRC_FILE);
 #endif
 		unlink (buf);	/* because rn makes a link of .newsrc -> .oldnewsrc */
-#ifdef VMS
-		if ((fp_op = fopen (buf, "w", "fop=cif")) != (FILE *) 0) {
-#else
-		if ((fp_op = fopen (buf, "w")) != (FILE *) 0) {
-#endif
-			if (newsrc_mode) {
+
+		if ((fp_op = fopen (buf, "w" FOPEN_OPTS)) != (FILE *) 0) {
+			if (newsrc_mode)
 				chmod (buf, newsrc_mode);
-			}
+
 			while ((line = getaline (fp_ip)) != (char *) 0) {
 				fprintf (fp_op, "%s\n", line);
 				free (line);
@@ -332,11 +321,7 @@ subscribe (
 	int found = FALSE;
 	int sub;
 
-#ifdef VMS
-	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) == (FILE *) 0)
-#else
-	if ((newfp = fopen (newnewsrc, "w")) == (FILE *) 0)
-#endif
+	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) == (FILE *) 0)
 		return;
 
 	if (newsrc_mode)
@@ -352,15 +337,11 @@ subscribe (
 				seq = pcParseNewsrcLine (line, grp, &sub);
 
 				if (STRCMPEQ(grp, group->name)) {
- 					if (WRITE_NEWSRC(sub_state))
- 						fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
-
+ 					fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
 					group->subscribed = SUB_BOOL(sub_state);
 					found = TRUE;
-
 				} else {
-					if (WRITE_NEWSRC(sub))
- 						fprintf (newfp, "%s%c %s\n", grp, sub, seq);
+					fprintf (newfp, "%s%c %s\n", grp, sub, seq);
 				}
 			}
 			free (line);
@@ -368,11 +349,8 @@ subscribe (
 
 		fclose (fp);
 
-		/* NB: for bogus groups, if we didn't find it, then we can't be here
-		 *     as it wouldn't have been added in the 1st place */
 		if (!found) {
- 			if (WRITE_NEWSRC(sub_state))
- 				fprintf (newfp, "%s%c\n", group->name, sub_state);
+			fprintf (newfp, "%s%c\n", group->name, sub_state);
 			group->subscribed = SUB_BOOL(sub_state);
 		}
 	}
@@ -395,14 +373,11 @@ reset_newsrc (void)
 	int sub;
 	long i;
 
-#ifdef VMS
-	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
-#else
-	if ((newfp = fopen (newnewsrc, "w")) != (FILE *) 0) {
-#endif
-		if (newsrc_mode) {
+	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
+
+		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
-		}
+
 		if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
 			while ((line = getaline (fp)) != (char *) 0) {
 				(void) pcParseNewsrcLine (line, grp, &sub);
@@ -438,11 +413,8 @@ delete_group (
 	FILE *newfp;
 	int sub;
 
-#ifdef VMS
-	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
-#else
-	if ((newfp = fopen (newnewsrc, "w")) != (FILE *) 0) {
-#endif
+	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
+
 		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
 
@@ -817,6 +789,7 @@ parse_unread_arts (
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(group->xmax-bitmin+1));
 		NSETRNG0(newbitmap, 0, group->xmax - bitmin);
 	}
+
 	for (i = 0; i < top; i++) {
 		if (arts[i].artnum < bitmin)
 			arts[i].status = ART_READ;
@@ -827,17 +800,20 @@ parse_unread_arts (
 		} else {
 			arts[i].status = ART_UNREAD;
 		}
+
 		if (arts[i].status == ART_UNREAD && arts[i].artnum >= bitmin) {
 			NSET1(newbitmap, arts[i].artnum - bitmin);
 			unread++;
 		}
 	}
+
 	group->newsrc.xmin = bitmin;
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xbitlen = group->xmax - bitmin + 1;
 	if (group->newsrc.xbitmap != (t_bitmap *) 0) {
 		free(group->newsrc.xbitmap);
 	}
+
 	group->newsrc.xbitmap = newbitmap;
 	group->newsrc.num_unread = unread;
 }
@@ -937,20 +913,15 @@ pos_group_in_newsrc (
 	int newnewsrc_created = FALSE;
 	int sub_created = FALSE, unsub_created = FALSE;
 
-	if ((fp_in = fopen (newsrc, "r")) == (FILE *) 0) {
+	if ((fp_in = fopen (newsrc, "r")) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
-#ifdef VMS
-	if ((fp_out = fopen (newnewsrc, "w", "fop=cif")) == (FILE *) 0) {
-#else
-	if ((fp_out = fopen (newnewsrc, "w")) == (FILE *) 0) {
-#endif
+
+	if ((fp_out = fopen (newnewsrc, "w" FOPEN_OPTS)) == (FILE *) 0)
 		goto rewrite_group_done;
-	}
+
 	newnewsrc_created = TRUE;
-	if (newsrc_mode) {
+	if (newsrc_mode)
 		chmod (newnewsrc, newsrc_mode);
-	}
 
 #ifdef VMS
 	joinpath (buf, TMPDIR, "subrc");
@@ -959,10 +930,10 @@ pos_group_in_newsrc (
 	joinpath (buf, TMPDIR, "unsubrc");
 	sprintf (unsub, "%s.%d", buf, process_id);
 
-	if ((fp_sub = fopen (sub, "w", "fop=cif")) == (FILE *) 0) {
+	if ((fp_sub = fopen (sub, "w" FOPEN_OPTS)) == (FILE *) 0) {
 		goto rewrite_group_done;
 	}
-	if ((fp_unsub = fopen (unsub, "w", "fop=cif")) == (FILE *) 0) {
+	if ((fp_unsub = fopen (unsub, "w" FOPEN_OPTS)) == (FILE *) 0) {
 		fclose(fp_sub);
 		unlink(sub);
 		goto rewrite_group_done;

@@ -23,24 +23,24 @@ can be reproduced in groups with as few articles as possible.
 
    and rebuilding will do it.
 
-2) Start Tin, directing error output to a file, eg:
+2) Start Tin as normal
 
-   ./tin 2>Refs.dump
+   ./tin
 
 3) If the problem only occurs when entering a group, enter the group in
-   question. Only the first group you enter will be logged to file.
+   question. Make sure the first group you enter is the one causing the
+   problem.
 
-4) Quit Tin
+4) Quit Tin.
 
-You should now have two files, Refs.info and whatever file you directed
-error output into.
+You should now have two files, Refs.info and Refs.dump
 
 Submit these two files with information on what you think the problem is
 (if it isn't already obvious), such as:
 
 a) The Subject line of the thread causing the problem
-b) Whether the problem occurs only in certain threading modes
+b) Does the problem occur only in certain threading modes
 
 The .overview file from the offending newsgroup would be of great help too.
 
-J. Faultless (03/12/96)
+J. Faultless (04/04/97)

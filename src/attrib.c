@@ -591,11 +591,7 @@ write_attributes_file (
 	strcpy (file_tmp, file);
 	strcat (file_tmp, ".tmp");
 
-#ifdef VMS
-	if ((fp = fopen (file_tmp, "w", "fop=cif")) == (FILE *) 0) {
-#else
-	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
-#endif
+	if ((fp = fopen (file_tmp, "w" FOPEN_OPTS)) == (FILE *) 0) {
 		error_message (txt_filesystem_full_backup, ATTRIBUTES_FILE);
 		/* free memory for tmp-filename */
 		free (file_tmp);

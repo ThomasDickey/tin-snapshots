@@ -650,8 +650,10 @@ get_server (
 	errno = 0;
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 		if (errno != EINTR) {
-			if (nntp_wr_fp) s_fclose (nntp_wr_fp);
-			if (nntp_rd_fp) s_fclose (nntp_rd_fp);
+			if (nntp_wr_fp)
+				s_fclose (nntp_wr_fp);
+			if (nntp_rd_fp)
+				s_fclose (nntp_rd_fp);
 			nntp_wr_fp = nntp_rd_fp = NULL;
 			ring_bell ();
 
@@ -660,7 +662,8 @@ get_server (
 ** but a reconnect after a connection time out often fails on the first try
 ** -> REconnection attempts should be done 2-3 times
 */
-			if (reconnecting) return -1;
+			if (reconnecting)
+				return -1;
 			if (prompt_yn2 (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				tin_done(EXIT_NNTP_ERROR);
 				/*return -2;*/
@@ -698,14 +701,17 @@ get_server (
 	 * of .overview records...
 	 */
 	if ((cp = strchr (string, '\n')) != NULL) {
-		*cp-- = '\0';
-		if (*cp == '\r') *cp = '\0';
 		get_server_nolf=0;
+		*cp-- = '\0';
+		if (*cp == '\r')
+			*cp = '\0';
 	} else {
-		if (strlen(string)>0 && string[strlen(string)-1]=='\r')
-			string[strlen(string)-1]='\0';
 		/* tell the calling function that the line is incomplete */
+		int len;
+
 		get_server_nolf=1;
+		if (string[0] != '\0' && string[len=strlen(string)-1] == '\r')
+			string[len]='\0';
 	}
 
 	return 0;

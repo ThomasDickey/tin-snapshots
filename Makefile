@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970402
+PVER		= 970406
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -15,6 +15,7 @@ INCDIR	= ./include
 OBJDIR	= ./src
 SRCDIR	= ./src
 AMGDIR	= ./amiga
+TOLDIR	= ./tools
 
 HFILES	= \
 	$(INCDIR)/config.h \
@@ -110,14 +111,17 @@ DOC	= \
 	$(DOCDIR)/TODO \
 	$(DOCDIR)/WHATSNEW \
 	$(DOCDIR)/auth.txt \
-	$(DOCDIR)/hashing.doc \
+	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/$(EXE).$(MANEXT)
+
+TOL	= \
+	$(TOLDIR)/tinpp \
+	$(TOLDIR)/expand_aliases.tgz
 
 TOP	= \
 	$(TOPDIR)/Makefile \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
-	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
 	$(TOPDIR)/config.guess \
 	$(TOPDIR)/config.sub \
@@ -127,7 +131,7 @@ TOP	= \
 	$(TOPDIR)/makefile.in \
 	$(TOPDIR)/conf-tin
 
-ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) $(AMIGA) \
+ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
 	$(SRCDIR)/l1_next.tab \
@@ -207,7 +211,7 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh ./tinpp
+	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh tools/tinpp
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."

@@ -1,22 +1,17 @@
-              Authentication to a NNTP server with tin
+                  Authentication to a NNTP server with tin
 
-Tin's authentication behaviour now conforms the "Common NNTP Extensions"
-(see below). There are several ways of authentication described in that text
-which are referred to as Original AUTHINFO, AUTHINFO GENERIC, and AUTHINFO
-SIMPLE. By default, tin only supports the Original AUTHINFO method when
-compiled with NNTP_ABLE.
+Tin is able to do authentication to news servers according to the "Common
+NNTP Extensions" (see below). There are several ways of authentication
+described in that text which are referred to as Original AUTHINFO, AUTHINFO
+GENERIC, and AUTHINFO SIMPLE. Tin supports the Original AUTHINFO and the
+AUTHINFO GENERIC methods. In addition to answers to authentication requests
+as described in the "Common NNTP Extensions", tin also provides
+authentication at connection startup.
 
-In the past, tin automatically authenticated itself to the server with the
-Original AUTHINFO method when connecting to it if it (the server) did not
-react with an error message; no more authentication would be done. This
-behaviour is not accurate, since the server need not accept any volunteered
-authentication. Furthermore, an authentication request by the server was not
-reacted on properly.
-
-By this time, tin only authenticates itself to the server when necessary
-(i.e. upon request). To archive this, every time a NNTP command is answered
-with an authentication request, tin tries to authenticate and then sends the
-command again. (See open.c: get_respcode()).
+Authentication is always done in the same manner: First, tin tries an
+AUTHINFO GENERIC authorization. If this fails, Original AUTHINFO is used.
+Authentication requests will be handled whenever they occur; the command
+that caused the request will be sent again.
 
 For an authentication with the Original AUTHINFO method, tin needs a
 user-name and a password for the current news server. This information is
@@ -27,26 +22,42 @@ news.server1 password1 [username1]
 news.server2 password2 [username2]
 ...
 
-The first line matching the current news server is taken. If no username is
-given for the current news-server, the user-id is assumed.
+The first line matching the current news server is taken. The delimiters
+between the fields MUST be spaces. If a password contains spaces, you have
+to surround the whole password by double quotes. If no user-name is given
+for the current news server, the user-id of the user who started tin is
+assumed.
 
 Security consideration: tin does not prove if the .newsauth file could be
 read by others. The user is responsible for accurate permissions.
 
-If you do not have a .newsauth file in your TIN_HOME directory, tin now
-prompts you for a username and a password.
+If you do not have a .newsauth file in your TIN_HOME directory, tin prompts
+you for a user-name and a password. This is NOT done at connection startup,
+because there is no way for tin to find out if an authentication at this
+time is needed. If you need to authenticate at the beginning of your news
+session, you MUST provide a .newsauth file.
 
 The AUTHINFO GENERIC authentication was implemented by someone else and has
 not been tested by me since I do not know a server that supports this.
-Therefore, it is turned off by default; to turn this feature on, add a
--DHAVE_GENERIC_AUTHINFO to the make command when compiling tin.
+
+To use AUTHINFO GENERIC, set up an environment variable NNTPAUTH with the
+command and its parameters to invoke for authentication. The content of
+NNTPAUTH is also used as the authenticator in the AUTHINFO GENERIC response
+to the server. The environment variable NNTP_AUTH_FDS is used to store file
+descriptors for reading from and writing to the server, and for a temporary
+file ("cookie"); the three descriptors are separated by dots. The
+authentication command can take use of NNTP_AUTH_FDS when invoked; it should
+exit successful if the authentication was accepted.
+
+If NNTPAUTH is empty or not available, tin sends an "authinfo generic any
+<user-id>" command to the server and expects the result as an NNTP response
+code.
 
 The AUTHINFO SIMPLE authentication method is not supported by tin. If you
-need this, drop me a message or see the source code in open.c:get_respcode
-(), open.c:authenticate (), and open.c:authorization (). With the
+need this, drop me a message or see the source code in auth.c. With the
 specification below, the implementation should not be difficult.
 
-Dirk Nimmich (96-10-24)
+Dirk Nimmich (97-04-05)
 <nimmich@uni-muenster.de>
 
  ---- cut here ---- Barber: Common NNTP Extensions ----

@@ -219,28 +219,6 @@ select_read_group:
 					break;
 				}
 
-#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
-				/*
-				 * If via NNTP, check that group exists. 
-				 * NB: With -n, no need as group command was already used to
-				 * get the min/max/count info in parse_newsrc_active_line()
-				 */
-				if (read_news_via_nntp && !newsrc_active && CURR_GROUP.type==GROUP_TYPE_NEWS) {
-					char	acBuf[NNTP_STRLEN];
-					char	acLine[NNTP_STRLEN];
-
-					sprintf (acBuf, "group %s", CURR_GROUP.name);
-					put_server (acBuf);
-					get_server (acLine, NNTP_STRLEN);
-					if (atoi (acLine) != OK_GROUP) {
-						if (strlen (acLine) > 4)
-							info_message (acLine);
-						else
-							info_message (txt_not_exist);
-						break;
-					}
-				}
-#endif
 				n = my_group[cur_groupnum];
 				if (active[n].xmin <= active[n].xmax) {
 					space_mode = pos_first_unread;
@@ -626,7 +604,8 @@ select_done:
 					break;
 
 				if (CURR_GROUP.subscribed) {
-					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, "u");
+					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
+											2, CURR_GROUP.newgroup ? "N" : "u");
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
 					sprintf(buf, txt_unsubscribed_to, CURR_GROUP.name);
 					info_message(buf);
@@ -888,10 +867,10 @@ show_selection_page (void)
 		n = my_group[i];
 		if (active[n].bogus)		/* Group is not in active list */
 			subs = 'D';
+		else if (active[n].subscribed)	/* Important that this preceeds Newgroup */
+			subs = ' ';
 		else if (active[n].newgroup)
 			subs = 'N';		/* New (but unsubscribed) group */
-		else if (active[n].subscribed)
-			subs = ' ';
 		else
 	 		subs = 'u';		/* unsubscribed group */
 
@@ -1284,6 +1263,8 @@ set_groupname_len (
 
 /*
  * Toggle my_group[] between all groups / only unread groups
+ * We make a special case for Newgroups (always appear, at the top)
+ * and Bogus groups if strip_bogus = BOGUS_ASK
  */
 void
 toggle_my_groups (
@@ -1338,7 +1319,7 @@ toggle_my_groups (
 			if ((i = find_group_index (buf)) >= 0) {
 				if (only_unread_groups) {
 /* TODO - no attempt is made here to prevent duplicates */
-					if (active[i].newsrc.num_unread) {
+					if (active[i].newsrc.num_unread || (active[i].bogus && strip_bogus == BOGUS_ASK)) {
 						my_group[group_top] = i;
 						group_top++;
 					}

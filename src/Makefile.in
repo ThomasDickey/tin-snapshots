@@ -75,6 +75,7 @@ CFILES	= \
 	$(SRCDIR)/actived.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
+	$(SRCDIR)/auth.c \
 	$(SRCDIR)/charset.c \
 	$(SRCDIR)/color.c \
 	$(SRCDIR)/config.c \
@@ -133,6 +134,7 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/actived.o \
 	$(OBJDIR)/art.o \
 	$(OBJDIR)/attrib.o \
+	$(OBJDIR)/auth.o \
 	$(OBJDIR)/charset.o \
 	$(OBJDIR)/color.o \
 	$(OBJDIR)/config.o \
@@ -321,6 +323,7 @@ $(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(TIN_DEP)
 $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_DEP) \
 				$(INCDIR)/stpwatch.h
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
+$(OBJDIR)/auth.o:		$(SRCDIR)/auth.c $(TIN_DEP)
 $(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(TIN_DEP)
 $(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_DEP)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP) \
