@@ -297,3 +297,19 @@ iIsArtTexEncoded (art, group_path)
 
 	return FALSE;
 }
+
+
+/*
+ *  Replace all non printable characters by '?'
+ */
+void
+Convert2Printable (buf)
+	unsigned char *buf;
+{
+	unsigned char *c;
+	for (c=buf; *c; c++) {
+		if (!my_isprint(*c)) {
+			*c = '?';
+		}
+	}
+}

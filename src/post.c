@@ -1641,8 +1641,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	forever {
 		if (confirm_to_mail && (!use_mailreader_i)) {
 			do {
-				sprintf (msg, "%s [%.*s]: %c", txt_quit_edit_send,
-				       cCOLS - 36, note_h_subj, ch_default);
+				sprintf (msg, txt_quit_edit_send,
+					cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg) - 1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
@@ -1652,6 +1652,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (nam, start_line_offset);
+				if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+					subject[0] = '\0';
 				redraw_screen = TRUE;
 				break;
 
@@ -1688,8 +1690,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		}
 		if (mail_to_poster) {
 			do {
-				sprintf (msg, "%s [Re: %.*s]: %c", txt_quit_edit_send,
-					 cCOLS - 36, eat_re (note_h_subj), ch_default);
+				sprintf (msg, txt_quit_edit_send,
+					 cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg) - 1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
@@ -2442,6 +2444,7 @@ repost_article (group, art, respnum, supersede)
 	char host_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
+	int force_command = FALSE;
 
 	msg_init_headers ();
 
@@ -2595,24 +2598,40 @@ repost_article (group, art, respnum, supersede)
 	fclose (fp);
 
 	/* on supersede change default-key */
-	if (Superseding)
+	if (Superseding) {
 		ch_default = iKeyPostEdit;
+		force_command = TRUE;
+	}
 	forever {
-		do {
-			sprintf (msg, txt_quit_edit_xpost,
-				 cCOLS - (strlen (txt_quit_edit_xpost) - 1),
-				 note_h_subj, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg) - 1);
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (POST_KEYS, ch));
+		if (!force_command)
+			do {
+				sprintf (msg, txt_quit_edit_xpost,
+					 cCOLS - (strlen (txt_quit_edit_xpost) - 1),
+					 note_h_subj, ch_default);
+				wait_message (msg);
+				MoveCursor (cLINES, (int) strlen (msg) - 1);
+				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+					ch = ch_default;
+			} while (!strchr (POST_KEYS, ch));
+		else
+			ch = ch_default;
 
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				ret_code = POSTED_REDRAW;
-				ch_default = iKeyPostPost;
+				force_command = FALSE;
+				if (!pcCopyArtHeader (HEADER_SUBJECT, article, note_h_subj)) {
+					note_h_subj[0] = '\0';		/* no subject line, re-enter editor */
+					ch_default = iKeyPostEdit;
+					/*
+					 * To enforce re-entering the editor immediately when no
+					 * subject is given, uncomment the following line
+					 */
+					 /* force_command = TRUE	*/ 
+				} else {
+					ret_code = POSTED_REDRAW;
+					ch_default = iKeyPostPost;
+				}
 				break;
 
 #ifdef HAVE_ISPELL

@@ -739,6 +739,8 @@ rename_file (old_filename, new_filename)
 /*
  * Handrolled version of strdup(), presumably to take advantage of
  * the enhanced error detection in my_malloc
+ *
+ * also, strdup is not mandatory in ANSI-C
  */
 char *my_strdup (str)
 	char *str;
@@ -1395,6 +1397,20 @@ my_strstr (text, pattern)
 	return (NULL);
 }
 #endif
+
+
+int
+my_isprint (c)
+	int c;
+{
+	/* See son-of-1036 4.4 for more information about printable characters */
+#ifndef NO_LOCALE
+	return (isprint(c) || c==8 || c==9 || c==12);
+#else
+	/* dirty hack for iso-8859-1, if locale isn't installed correct */
+	return (isprint(c) || c==8 || c==9 || c==12 || c>=160);
+#endif
+}
 
 
 void

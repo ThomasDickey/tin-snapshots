@@ -1189,8 +1189,12 @@ authorization (server, authuser)
 	get_server (line2, PATH_LEN);
 	ret = atoi (line2);
 	if (ret != NEED_AUTHDATA) {
-		strcpy (error_response, line2);
-		return FALSE;
+		if (ret == OK_AUTH)
+			return TRUE;
+		else {
+			strcpy (error_response, line2);
+			return FALSE;
+		}
 	}
 
 	sprintf (line2, "authinfo pass %s", authpass);

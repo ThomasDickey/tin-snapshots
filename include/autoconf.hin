@@ -60,6 +60,7 @@
 #undef	NO_ETIQUETTE
 #undef	SPOOLDIR
 #undef	USE_INN_NNTPLIB
+#undef	NO_LOCALE
 
 /*
  * These are defined if the corresponding program is found during configuration
@@ -74,6 +75,7 @@
  */
 #undef	inline
 #undef	const
+#undef  HAVE_NESTED_PARAMS
 
 /*
  * Data types
@@ -234,6 +236,7 @@
 #undef	DECL__FLSBUF
 
 #undef HAVE_SELECT_INTP
+#undef HAVE_TYPE_SIGACTION
 #undef HAVE_TYPE_UNIONWAIT
 
 /*

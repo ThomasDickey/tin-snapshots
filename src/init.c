@@ -266,7 +266,7 @@ void init_selfinfo ()
 	umask (real_umask);
 #endif	/* M_AMIGA */
 
-#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
+#if defined(HAVE_SETLOCALE) && defined(LC_ALL) && !defined(NO_LOCALE)
 	setlocale (LC_ALL, "");
 #endif
 

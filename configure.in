@@ -335,6 +335,12 @@ CF_ARG_ENABLE(forgery,
 	[AC_DEFINE(FORGERY)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(whether to enable locale support)
+CF_ARG_DISABLE(locale,
+	[  --enable-locale         enable locale support],
+	[AC_DEFINE(NO_LOCALE)])
+AC_MSG_RESULT($enableval)
+
 ###	checks for operator characteristics (should be the last option)
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,
