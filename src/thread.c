@@ -32,14 +32,14 @@ static int top_thread = 0;
 static int thread_respnum = 0;
 static int first_thread_on_screen = 0;
 static int last_thread_on_screen = 0;
-static void bld_tline (int l, struct t_article *art);
-static void draw_tline (int i, int full);
 #endif
 
 /*
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
+static void bld_tline (int l, struct t_article *art);
+static void draw_tline (int i, int full);
 static int prompt_thread_num (int ch);
 static void update_thread_page (void);
 static void draw_thread_arrow (void);
@@ -58,7 +58,7 @@ bld_tline (
 	struct t_article *art)
 {
 	int i;
-	size_t len_from;
+	int len_from;
 	char mark;
 	struct t_msgid *ptr;
 #if USE_CURSES
@@ -160,7 +160,7 @@ bld_tline (
 		 * If we need to show the author, pad out to the start of the author field,
 		 */
 		if (len_from) {
-			for (i=strlen(buff); i < (cCOLS - len_from); i++)
+			for (i = strlen(buff); i < (cCOLS - len_from); i++)
 				*(buff + i) = ' ';
 
 			/*
@@ -289,20 +289,18 @@ show_thread (
 		if (i) {
 			for (n=0, i = base[thread_basenote]; i >= 0 ; i = arts[i].thread, n++) {
 				if (arts[i].status == ART_UNREAD) {
-					if (arts[i].thread == ART_EXPIRED) {
+					if (arts[i].thread == ART_EXPIRED)
 						art_mark_read (group, &arts[i]);
-					} else {
+					else
 						thread_index_point = n;
-					}
 					break;
 				}
 			}
 		}
 	}
 
-	if (thread_index_point < 0) {
+	if (thread_index_point < 0)
 		thread_index_point = 0;
-	}
 
 	/*
 	 * If we explicitly want to enter part way down a thread, do so
@@ -317,11 +315,10 @@ show_thread (
 		ch = ReadCh ();
 
 		if (ch >= '0' && ch <= '9') {	/* 0 goes to basenote */
-			if (top_thread == 1) {
+			if (top_thread == 1)
 				info_message (txt_no_responses);
-			} else {
+			else
 				prompt_thread_num (ch);
-			}
 			continue;
 		}
 		switch (ch) {
@@ -339,11 +336,10 @@ show_thread (
 						goto thread_down;
 
 					case KEYMAP_LEFT:
-						if (thread_catchup_on_exit) {
+						if (thread_catchup_on_exit)
 							goto thread_catchup;
-						} else {
+						else
 							goto thread_done;
-						}
 
 					case KEYMAP_RIGHT:
 						goto thread_read_article;
@@ -366,10 +362,8 @@ show_thread (
 						{
 							case MOUSE_BUTTON_1:
 							case MOUSE_BUTTON_3:
-								if (xrow < INDEX2LNUM(first_thread_on_screen) ||
-									xrow > INDEX2LNUM(last_thread_on_screen-1)) {
+								if (xrow < INDEX2LNUM(first_thread_on_screen) || xrow > INDEX2LNUM(last_thread_on_screen-1))
 									goto thread_page_down;
-								}
 								erase_thread_arrow ();
 								thread_index_point = xrow-INDEX2LNUM(first_thread_on_screen)+first_thread_on_screen;
 								draw_thread_arrow ();
@@ -377,15 +371,12 @@ show_thread (
 									goto thread_read_article;
 								break;
 							case MOUSE_BUTTON_2:
-								if (xrow < INDEX2LNUM(first_thread_on_screen) ||
-									xrow > INDEX2LNUM(last_thread_on_screen-1)) {
+								if (xrow < INDEX2LNUM(first_thread_on_screen) || xrow > INDEX2LNUM(last_thread_on_screen-1))
 									goto thread_page_up;
-								}
-								if (thread_catchup_on_exit) {
+								if (thread_catchup_on_exit)
 									goto thread_catchup;
-								} else {
+								else
 									goto thread_done;
-								}
 							default:
 								break;
 						}
@@ -418,33 +409,28 @@ end_of_thread:
 				break;
 
 			case iKeySetRange:	/* set range */
-				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point)) {
+				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point))
 					show_thread_page ();
-				}
 				break;
 
 			case iKeyThreadSave: /* save articles with prompting */
-				if (index_point >= 0) {
-					feed_articles (FEED_SAVE, THREAD_LEVEL,
-						&CURR_GROUP, (int) base[index_point]);
-				}
+				if (index_point >= 0)
+					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
 				break;
 
 			case iKeyThreadSaveTagged:   /* save tagged articles without prompting */
 				if (index_point >= 0) {
-					if (num_of_tagged_arts) {
-						feed_articles (FEED_SAVE_TAGGED, THREAD_LEVEL,
-							&CURR_GROUP, (int) base[index_point]);
-					} else {
+					if (num_of_tagged_arts)
+						feed_articles (FEED_SAVE_TAGGED, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
+					else
 						info_message (txt_no_tagged_arts_to_save);
-					}
 				}
 				break;
 
 			case iKeyThreadReadArt:
 			case iKeyThreadReadArt2:	/* read current article within thread */
 thread_read_article:
-				n = choose_response (thread_basenote, thread_index_point);
+				n = find_response (thread_basenote, thread_index_point);
 				n = show_page (group, group_path, n, &thread_index_point);
 				if (n != GRP_NOREDRAW) {
 					if (local_filtered_articles) {
@@ -461,12 +447,12 @@ thread_read_article:
 
 			case iKeyThreadReadNextArtOrThread:
 thread_tab_pressed:
- 				space_mode = TRUE;
-				if (thread_index_point == 0) {
+				space_mode = TRUE;
+				if (thread_index_point == 0)
 					n = thread_respnum;
-				} else {
-					n = choose_response (thread_basenote, thread_index_point);
-				}
+				else
+					n = find_response (thread_basenote, thread_index_point);
+
 				for (i = n ; i != -1 ; i = arts[i].thread) {
 					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN)) {
 						n = show_page (group, group_path, i, &thread_index_point);
@@ -495,17 +481,6 @@ thread_tab_pressed:
 thread_page_down:
 				if (thread_index_point + 1 == top_thread) {
 					move_to_response(0);
-#if 0
-					if (0 < first_thread_on_screen) {
-						erase_thread_arrow ();
-						thread_index_point = 0;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = 0;
-						draw_thread_arrow ();
-					}
-#endif
 					break;
 				}
 				erase_thread_arrow ();
@@ -537,31 +512,9 @@ thread_page_down:
 thread_down:
 				if (thread_index_point + 1 >= top_thread) {
 					move_to_response(0);
-#if 0
-					HpGlitch(erase_thread_arrow ());
-					if (0 < first_thread_on_screen) {
-						thread_index_point = 0;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = 0;
-						draw_thread_arrow ();
-					}
-#endif
 					break;
 				}
 				move_to_response(thread_index_point + 1);
-#if 0
-				if (thread_index_point + 1 >= last_thread_on_screen) {
-					erase_thread_arrow ();
-					thread_index_point++;
-					show_thread_page ();
-				} else {
-					erase_thread_arrow ();
-					thread_index_point++;
-					draw_thread_arrow ();
-				}
-#endif
 				break;
 
 			case iKeyUp:
@@ -569,31 +522,9 @@ thread_down:
 thread_up:
 				if (thread_index_point == 0) {
 					move_to_response(top_thread - 1);
-#if 0
-					HpGlitch(erase_thread_arrow ());
-					if (top_thread > last_thread_on_screen) {
-						thread_index_point = top_thread - 1;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = top_thread - 1;
-						draw_thread_arrow ();
-					}
-#endif
 					break;
 				}
 				move_to_response(thread_index_point - 1);
-#if 0
-				HpGlitch(erase_thread_arrow ());
-				if (thread_index_point <= first_thread_on_screen) {
-					thread_index_point--;
-					show_thread_page ();
-				} else {
-					erase_thread_arrow ();
-					thread_index_point--;
-					draw_thread_arrow ();
-				}
-#endif
 				break;
 
 			case iKeyPageUp:		/* page up */
@@ -602,43 +533,31 @@ thread_up:
 thread_page_up:
 				if (thread_index_point == 0) {
 					move_to_response (top_thread - 1);
-#if 0
-					HpGlitch(erase_thread_arrow ());
-					if (top_thread > last_thread_on_screen) {
-						thread_index_point = top_thread - 1;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = top_thread - 1;
-						draw_thread_arrow ();
-					}
-#endif
 					break;
 				}
 				clear_message ();
 				erase_thread_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = thread_index_point % scroll_lines) > 0) {
+				if ((n = thread_index_point % scroll_lines) > 0)
 					thread_index_point = thread_index_point - n;
-				} else {
+				else
 					thread_index_point = ((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines;
-				}
-				if (thread_index_point < 0) {
+
+				if (thread_index_point < 0)
 					thread_index_point = 0;
-				}
-				if (thread_index_point < first_thread_on_screen
-				|| thread_index_point >= last_thread_on_screen)
+
+				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
 					show_thread_page ();
 				else
 					draw_thread_arrow ();
+
 				break;
 
 			case iKeyThreadCatchupConditional:	/* catchup thread but ask for confirmation */
 thread_catchup:
 				if (ch == iKeyThreadCatchupConditional) {
-					if (confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1) {
+					if (confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1)
 						break;
-					}
 				}
 				thd_mark_read (group, base[thread_basenote]);
 				goto thread_done;
@@ -648,11 +567,14 @@ thread_catchup:
 				goto thread_done;
 
 			case iKeyThreadMarkArtRead: /* mark article as read */
-				n = choose_response (thread_basenote, thread_index_point);
+				n = find_response (thread_basenote, thread_index_point);
 				art_mark_read (group, &arts[n]);
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
-				goto thread_down;
+
+				n = which_response(next_unread (n));
+				move_to_response(n);
+				break;
 
 			case iKeyThreadToggleSubjDisplay:	/* toggle display of subject & subj/author */
 				if (show_subject) {
@@ -702,24 +624,24 @@ thread_catchup:
 				ret_code = GRP_QUIT;
 				goto thread_done;
 
- 			case iKeyThreadTag:			/* tag/untag art for mailing/piping/printing/saving */
+			case iKeyThreadTag:			/* tag/untag art for mailing/piping/printing/saving */
 
 				/* Find index of current article */
-				if ((n = choose_response (thread_basenote, thread_index_point)) < 0)
+				if ((n = find_response (thread_basenote, thread_index_point)) < 0)
 					break;
 
- 				if (arts[n].tagged) {
+				if (arts[n].tagged) {
 					decr_tagged(arts[n].tagged);
- 					arts[n].tagged = 0;
- 					--num_of_tagged_arts;
- 					info_message (txt_untagged_art);
+					arts[n].tagged = 0;
+					--num_of_tagged_arts;
+					info_message (txt_untagged_art);
 					update_thread_page();						/* Must update whole page */
- 				} else {
- 					arts[n].tagged = ++num_of_tagged_arts;
+				} else {
+					arts[n].tagged = ++num_of_tagged_arts;
 					info_message (txt_tagged_art);
 					bld_tline (thread_index_point, &arts[n]);	/* Update just this line */
 					draw_tline (thread_index_point, FALSE);
- 				}
+				}
 
 				/* Automatically advance to next art if not at end of thread */
 				if (thread_index_point + 1 < top_thread)
@@ -746,23 +668,23 @@ thread_catchup:
 				break;
 
 			case iKeyThreadMarkArtUnread:		/* mark article as unread */
-				n = choose_response (thread_basenote, thread_index_point);
+				n = find_response (thread_basenote, thread_index_point);
 				art_mark_will_return (group, &arts[n]); /*art_mark_unread (group, &arts[n]);*/
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
-				info_message (txt_art_marked_as_unread);
+				info_message (txt_marked_as_unread, "Article");
 				draw_thread_arrow ();
 				break;
 
 			case iKeyThreadMarkThdUnread:		/* mark thread as unread */
 				thd_mark_unread (group, base[thread_basenote]);
 				update_thread_page ();
-				info_message (txt_thread_marked_as_unread);
+				info_message (txt_marked_as_unread, "Thread");
 				break;
 
 			case iKeyThreadMarkArtSel:		/* mark article as selected */
 			case iKeyThreadToggleArtSel:		/* toggle article as selected */
-				n = choose_response (thread_basenote, thread_index_point);
+				n = find_response (thread_basenote, thread_index_point);
 
 				if (n < 0)
 					break;
@@ -777,11 +699,6 @@ thread_catchup:
 				if (thread_index_point + 1 < top_thread)
 					goto thread_down;
 				draw_thread_arrow ();
-#if 0
-				info_message (flag
-					      ? txt_art_marked_as_selected
-					      : txt_art_marked_as_deselected)
-#endif
 				break;
 
 			case iKeyThreadReverseSel:		/* reverse selections */
@@ -800,9 +717,8 @@ thread_catchup:
 
 			case iKeyPostponed:	/* post postponed article */
 				if (can_post) {
-					if (pickup_postponed_articles(FALSE, FALSE)) {
+					if (pickup_postponed_articles(FALSE, FALSE))
 						show_thread_page();
-					}
 				} else {
 					info_message(txt_cannot_post);
 				}
@@ -835,17 +751,15 @@ show_thread_page (void)
 
 	ClearScreen ();
 
-	if (thread_index_point > top_thread - 1) {
+	if (thread_index_point > top_thread - 1)
 		thread_index_point = top_thread - 1;
-	}
 
 	if (NOTESLINES <= 0) {
 		first_thread_on_screen = 0;
 	} else {
 		first_thread_on_screen = (thread_index_point / NOTESLINES) * NOTESLINES;
-		if (first_thread_on_screen < 0) {
+		if (first_thread_on_screen < 0)
 			first_thread_on_screen = 0;
-		}
 	}
 
 	last_thread_on_screen = first_thread_on_screen + NOTESLINES;
@@ -854,13 +768,11 @@ show_thread_page (void)
 		last_thread_on_screen = top_thread;
 		first_thread_on_screen = (top_thread / NOTESLINES) * NOTESLINES;
 
-		if (first_thread_on_screen == last_thread_on_screen ||
-			first_thread_on_screen < 0) {
-			if (first_thread_on_screen < 0) {
+		if (first_thread_on_screen == last_thread_on_screen || first_thread_on_screen < 0) {
+			if (first_thread_on_screen < 0)
 				first_thread_on_screen = 0;
-			} else {
+			else
 				first_thread_on_screen = last_thread_on_screen - NOTESLINES;
-			}
 		}
 	}
 
@@ -869,7 +781,7 @@ show_thread_page (void)
 		last_thread_on_screen = 0;
 	}
 
-	the_index = choose_response (thread_basenote, first_thread_on_screen);
+	the_index = find_response (thread_basenote, first_thread_on_screen);
 
 	assert(first_thread_on_screen != 0 || the_index == thread_respnum);
 
@@ -878,24 +790,27 @@ show_thread_page (void)
 	else
 		sprintf (msg, "Thread (%.*s)", cCOLS-23, arts[thread_respnum].subject);
 
+	/*
+	 * Slight misuse of the 'msg' buffer here. We need to clear it so that progress messages
+	 * are displayed correctly
+	 */
 	show_title (msg);
+	msg[0] = '\0';
 
 	MoveCursor (INDEX_TOP, 0);
 
 	for (j=0, i = first_thread_on_screen; j < NOTESLINES && i < last_thread_on_screen; i++, j++) {
 		bld_tline (i, &arts[the_index]);
 		draw_tline (i, TRUE);
-		if ((the_index = next_response (the_index)) == -1) {
+		if ((the_index = next_response (the_index)) == -1)
 			break;
-		}
 	}
 
 	CleartoEOS ();
 	show_mini_help (THREAD_LEVEL);
 
-	if (last_thread_on_screen == top_thread) {
+	if (last_thread_on_screen == top_thread)
 		info_message (txt_end_of_thread);
-	}
 
 	draw_thread_arrow ();
 
@@ -909,15 +824,14 @@ update_thread_page (void)
 {
 	register int i, j, the_index;
 
-	the_index = choose_response (thread_basenote, first_thread_on_screen);
+	the_index = find_response (thread_basenote, first_thread_on_screen);
 	assert(first_thread_on_screen != 0 || the_index == thread_respnum);
 
 	for (j=0, i = first_thread_on_screen; j < NOTESLINES && i < last_thread_on_screen; ++i, ++j) {
 		bld_tline (i, &arts[the_index]);
 		draw_tline (i, FALSE);
-		if ((the_index = next_response (the_index)) == -1) {
+		if ((the_index = next_response (the_index)) == -1)
 			break;
-		}
 	}
 
 	draw_thread_arrow();
@@ -942,10 +856,12 @@ draw_thread_arrow (void)
 	stow_cursor();
 
 /*
-** show current subject in the last line - this is done a bit to often
-** and could slow down things, but I like it
-*/
-	info_message (arts[(choose_response (thread_basenote, thread_index_point))].subject);
+ * show current subject in the last line - this is done a bit to often
+ * and could slow down things, but I like it
+ */
+	clear_message();
+	/* We do it this way in case there are formatting chars in the subject */
+	center_line (cLINES, FALSE, arts[find_response (thread_basenote, thread_index_point)].subject);
 }
 #endif /* INDEX_DAEMON */
 
@@ -986,17 +902,6 @@ prompt_thread_num (
 
 	move_to_response (num);
 
-#if 0
-	if (num >= first_thread_on_screen && num < last_thread_on_screen) {
-		erase_thread_arrow ();
-		thread_index_point = num;
-		draw_thread_arrow ();
-	} else {
-		erase_thread_arrow ();
-		thread_index_point = num;
-		show_thread_page ();
-	}
-#endif
 	return TRUE;
 }
 #endif /* INDEX_DAEMON */
@@ -1014,9 +919,8 @@ new_responses (
 	int sum = 0;
 
 	for (i = (int) base[thread]; i >= 0; i = arts[i].thread) {
-		if (arts[i].status != ART_READ) {
+		if (arts[i].status != ART_READ)
 			sum++;
-		}
 	}
 
 	return sum;
@@ -1043,14 +947,12 @@ which_thread (
 
 	for (i = 0; i < top_base; i++) {
 		for (j = (int) base[i] ; j >= 0 ; j = arts[j].thread) {
-			if (j == n) {
+			if (j == n)
 				return i;
-			}
 		}
 	}
 
-	sprintf (msg, "%d", n);
-	error_message (txt_cannot_find_base_art, msg);
+	error_message (txt_cannot_find_base_art, n);
 
 	return -1;
 }
@@ -1124,12 +1026,12 @@ stat_thread (
 
 	for (i = (int) base[n]; i >= 0; i = arts[i].thread) {
 		++sbuf->total;
-		if (arts[i].inrange) {
+		if (arts[i].inrange)
 			++sbuf->inrange;
-		}
-		if (arts[i].delete) {
+
+		if (arts[i].delete)
 			++sbuf->deleted;
-		}
+
 		if (arts[i].status == ART_UNREAD) {
 			++sbuf->unread;
 		} else if (arts[i].status == ART_WILL_RETURN) {
@@ -1181,15 +1083,13 @@ next_response (
 {
 	int i;
 
-	if (arts[n].thread >= 0) {
+	if (arts[n].thread >= 0)
 		return arts[n].thread;
-	}
 
 	i = which_thread (n) + 1;
 
-	if (i >= top_base) {
+	if (i >= top_base)
 		return -1;
-	}
 
 	return (int) base[i];
 }
@@ -1227,22 +1127,23 @@ prev_response (
 	resp = which_response (n);
 
 	if (resp > 0)
-		return choose_response (which_thread (n), resp-1);
+		return find_response (which_thread (n), resp-1);
 
 	i = which_thread (n) - 1;
 
 	if (i < 0)
 		return -1;
 
-	return choose_response (i, num_of_responses (i));
+	return find_response (i, num_of_responses (i));
 }
 
 /*
  *  return response number n from thread i
+ *	ie return the index in arts[] of the nth followup to thread base 'i'
  */
 
 int
-choose_response (
+find_response (
 	int i,
 	int n)
 {
@@ -1269,21 +1170,17 @@ next_unread (
 	int cur_base_art = n;
 
 	while (n >= 0) {
-		if (((arts[n].status == ART_UNREAD)
-		     || (arts[n].status == ART_WILL_RETURN))
-		     && arts[n].thread != ART_EXPIRED) {
+		if (((arts[n].status == ART_UNREAD) || (arts[n].status == ART_WILL_RETURN)) && arts[n].thread != ART_EXPIRED)
 			return n;
-		}
+
 		n = next_response (n);
 	}
 
 	n = base[0];
 	while (n != cur_base_art) {
-		if (((arts[n].status == ART_UNREAD)
-		     || (arts[n].status == ART_WILL_RETURN))
-		     && arts[n].thread != ART_EXPIRED) {
+		if (((arts[n].status == ART_UNREAD) || (arts[n].status == ART_WILL_RETURN)) && arts[n].thread != ART_EXPIRED)
 			return n;
-		}
+
 		n = next_response (n);
 	}
 
@@ -1299,9 +1196,9 @@ prev_unread (
 	int n)
 {
 	while (n >= 0) {
-		if (arts[n].status == ART_UNREAD && arts[n].thread != ART_EXPIRED) {
+		if (arts[n].status == ART_UNREAD && arts[n].thread != ART_EXPIRED)
 			return n;
-		}
+
 		n = prev_response (n);
 	}
 
@@ -1309,22 +1206,21 @@ prev_unread (
 }
 
 /*
- * Move the on-screen pointer & internal variable to the given thread number
+ * Move the on-screen pointer & internal variable to the given reponse
+ * within the thread
  */
 #ifndef INDEX_DAEMON
 void
 move_to_response(
 	int n)
 {
-/*	HpGlitch(erase_thread_arrow ());*/
-    if (n >= first_thread_on_screen && n < last_thread_on_screen) {
-        erase_thread_arrow ();
-        thread_index_point = n;
-        draw_thread_arrow ();
-    } else {
-        erase_thread_arrow ();
-        thread_index_point = n;
-        show_thread_page ();
-    }
+	HpGlitch(erase_thread_arrow ());
+	erase_thread_arrow ();
+	thread_index_point = n;
+
+	if (n >= first_thread_on_screen && n < last_thread_on_screen)
+		draw_thread_arrow ();
+	else
+		show_thread_page ();
 }
 #endif /* INDEX_DAEMON */

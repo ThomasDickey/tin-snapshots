@@ -1,5 +1,5 @@
 #
-# $VER: tin_makefile 2.1 (24.09.97)
+# $VER: tin_makefile 2.1a (19.10.97)
 #
 # This is especially for use with the SAS/C developing system
 # version 6.55 and above
@@ -161,6 +161,7 @@ OBJECTS = \
         $(OBJDIR)/pgp.o \
         $(OBJDIR)/post.o \
         $(OBJDIR)/prompt.o\
+        $(OBJDIR)/read.o \
         $(OBJDIR)/refs.o\
         $(OBJDIR)/rfc1521.o\
         $(OBJDIR)/rfc1522.o\
@@ -277,6 +278,7 @@ $(SRCDIR)/parsdate.c:           $(SRCDIR)/parsdate.y $(GSTFILE)
 $(OBJDIR)/pgp.o:                $(SRCDIR)/pgp.c $(GSTFILE)
 $(OBJDIR)/post.o:               $(SRCDIR)/post.c $(GSTFILE)
 $(OBJDIR)/prompt.o:             $(SRCDIR)/prompt.c $(GSTFILE)
+$(OBJDIR)/read.o:               $(SRCDIR)/read.c $(GSTFILE)
 $(OBJDIR)/refs.o:               $(SRCDIR)/refs.c $(GSTFILE)
 $(OBJDIR)/rfc1521.o:            $(SRCDIR)/rfc1521.c $(GSTFILE)
 $(OBJDIR)/rfc1522.o:            $(SRCDIR)/rfc1522.c $(GSTFILE)

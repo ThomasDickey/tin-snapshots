@@ -28,11 +28,11 @@ and the final score of the article decides if it is regular, marked hot
 or killed. All in all very simple, one wonders why this hasn't already
 been done.
 
-The standard "kill" and standard "select" have the score SCORE_KILL and
-SCORE_SELECT (-> 4) respectively.
+The standard "kill" and standard "select" already in your filter-file have
+the score SCORE_KILL and SCORE_SELECT (-> 4) respectively.
 
 
-2. Changes to the killfile format
+2. Changes to the filter-file format
 
 Tin understands the additional "score" command in the filter-file now.
 
@@ -41,34 +41,48 @@ Old:
 scope=*
 type=0
 case=0
-subj=**$$$**
+subj=*$$$*
 
 New:
 
-scope=*
+group=*
 type=0
 case=0
 score=-100
-subj=**$$$**
+subj=*$$$*
 #####
 
 So you can give the individual rule a weight, based on your opinion
-about the rule. If you want to be sure to never read a certain
-individual again, give the rule a score of (-)9000. The sign is not
-important by now, the direction (+ or -) is still determined by the
+about the rule. E.g. if you want to be sure to never read a certain
+individual again, you may give the rule a score of (-)9000. The sign is
+not important by now, the direction (+ or -) is still determined by the
 "type" of a rule. So the following
 
-scope=*
+group=*
 type=0
 case=0
 score=100
-subj=**$$$**
+subj=*$$$*
 #####
 
 will be equivalent with the rule above for now. When tin writes it's
-filterfile the signs are rewritten to match the types. This is intended
+filter-file the signs are rewritten to match the types. This is intended
 for backwards *and* future compatibility. A future version of tin will
 delete the "type"-line and write only the score.
+
+If you want only "classical" filtering and don't want to mess around
+with score values, you can use the magic words "kill" and "hot" as score
+values in your filter file. Example:
+
+group=*
+type=0
+case=0
+score=kill
+subj=*$$$*
+#####
+
+These are handled as default values at program initialization time and
+may be somewhat easier to remember.
 
 You might have noticed by the examples above that tin inserts a line of
 hashes between two rules now. This is *not* required, it just improves
@@ -101,7 +115,7 @@ SCORE_KILL is the default score given for any kill rule, if no other
 is specified.
 recommended: -SCORE_DEFAULT
 
-SCORE_SELECT is the default score for any autoselection rule, if no
+SCORE_SELECT is the default score for any auto-selection rule, if no
 other is specified.
 recommended: SCORE_DEFAULT
 
@@ -126,11 +140,28 @@ scope selection:
 scope=pattern
 group=newsgroup
 
+was the "old" format. It is still understood, when tin reads the
+filter-file. The subdivision in local and global filter was removed, so
+when tin writes it, it is rewritten to:
+
+group=newsgroup_pattern_list
+
+newsgroup_pattern_list is a comma-separated list of newsgroup_patterns
+
+newsgroup_patterns can be a pattern (wildmat-style) or !pattern,
+negating the match of pattern. Yes, this is the same format as for the
+AUTO(UN)SUBSCRIBE environment variable
+
+Tin doesn't rework your filter file, the new pattern matching is only
+used when you enter new entries by hand.
+
 additional info:
 
 type=num    num: 0=kill, 1=autoselect
 case=num    num: 0=casesensitive, 1=caseinsensitive
-score=num   num: score value of rule
+score=num   num: score value of rule, can now also be one of the magic words
+                "kill" or "hot", which are equivalent to
+                SCORE_KILL and SCORE_SELECT respectively.
 time=num    num: time_t value; when rule expires.
 
 matches:        matched to:
@@ -144,12 +175,17 @@ xref_max=num                } Xref: ; potentially obsolete, collects
 xref_score=num,pattern      } scores for crossposting in other
                             } newsgroups
 
-patterns should be delimited with "*", verbatim wildcards in patterns
-must be escaped with "\".
+When you are using wildmat pattern-matching, patterns in ~/.tin/filter
+should be delimited with "*", verbatim wildcards in patterns must be
+escaped with "\". When using the built-in filter-file functions, tin tries
+to take care of it for itself, except when you are entering text in the
+builtin kill/hot-menu. Then you have to quote manually because tin
+doesn't know if e.g. "\[" is already quoted or not.
 
 
 6. TODO
 
+- make the time value in the filter file more human readable.
 - convert SCORE_LIM_* to global variables
 - rewrite filtering order to get optimal performance
 - sort articles by score/TAB reads article with next highest score

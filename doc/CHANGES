@@ -1,3 +1,123 @@
+-- pre-1.4 release 971102 --
+
+475) Urs Janssen <urs@tin.org>
+     ADD. better test if Sender is needed
+     FIX. inews.c
+
+474) Thomas E. Dickey <dickey@clark.net>
+     ADD. "-lgen" to $LIBS if needed for linking with the regexpr.h
+          style of regular expressions.
+     ADD. search commands to the config screen
+     BUG. corrects interpretation of the --without-ncurses configure option.
+     BUG. enables/disables ncurses mouse as indicated by the config setting
+          use_mouse.
+     FIX. aclocal.m4, configure[.in], extern.h, proto.h, config.c, search.c
+          tcurses.c
+
+473) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. news_headers_to_display support completely rewritten.
+     ADD. continuation lines support
+     ADD. ^H now toggles the display of headers (it doesn't display them only
+          once as before.
+     ADD. news_headers_to_[not_]display configurable using "M"enu
+     ADD. set a usefull default value for news_headers_to_display
+     REM. highlight_xcommentto and show_xcommentto merged to show_xcommentto,
+          which displays X-Comment-To in the upper right corner.
+     FIX. page.c and some other files
+
+472) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. Sort by score
+     ADD. minor cleanup
+     FIX. several supplied patches
+
+471) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. changed pager layout
+     ADD. col_newsheaders configureable using "M"enu
+     BUG. light-colors had wrong index
+     FIX. color.c, tincfg.tbl, lang.c, page.c extern.h
+
+470) Urs Janssen <urs@tin.org>
+     ADD. unlink_article also works for .letter
+     ADD. hide built_in_inews if running spool only
+     ADD. minor code cleanup
+     FIX. several patches
+
+469) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. Support for 'x' and '=' active file flags.
+          More informative flags on the selection page and
+          group page
+     BUG. Suppress -v when not in batch_mode
+     BUG. Reconnection timeouts sometimes broken
+     BUG. formatting chars in message bar could cause a crash
+     ADD. Sub/Unsub pattern now accept full group lists
+     ADD. code cleanup
+
+468) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. cleanup newsrc parsing
+     ADD. 'K' in thread menu now skips to next unread
+     BUG. no check for full disk when getting article
+     BUG. bogus group removal msg not displayed properly
+     BUG. aborting during save of articles would produce
+          unpredictable effects
+     BUG. formatting chars in subject crashed message bar
+     BUG. possible crash at startup in some cases
+     BUG. 'c'atchup group returns to selection page even if you
+          answered 'n' to confirmation
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+467) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup; cosmetic patch
+     FIX. several supplied patches
+
+466) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. cleanup *_message()
+     ADD. joined single letter key prompts
+     ADD. renamed stuff_nntp() to get_article()
+     BUG. show_progess sometimes trashed screen-layout
+     FIX. several supplied patches
+
+465) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. varargs *_message() functions
+     BUG. 'm'ove group was broken
+     ADD. minor code cleanup; cosmetic patch
+     FIX. several supplied patches
+
+464) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. replaced X-Newsreader:/X-Mailer: by User-Agent:-header (RFC 1945)
+     FIX. version.h, post.c
+
+463) Urs Janssen <urs@karlsruhe.org>
+     BUG. no line-warp after "Xref: not supported" warning
+     FIX. xref.c, lang.c, extern.h
+
+462) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. rewrite all I/O and NNTP data handling
+     ADD. extensive internal changes
+     ADD. new -d and -Q options
+     ADD. code clean-up
+     REM. all references to obselete 'cdtin'
+
+461) Thomas E. Dickey <dickey@clark.net>
+     ADD. modify ncurses/gpm link test to work with recent changes to ncurses
+     ADD. improve ifdef-test for union wait.
+     ADD. modify CF_WITH_PATH to work better when the prefix that's used in
+          the default value is not given.
+     ADD. identify ncurses version (for bug reports)
+     FIX. aclocal.m4
+
+460) Urs Janssen <urs@tin.org>
+     BUG. check for gethostbyname was missing
+     FIX. configure[.in]
+
+459) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. improved scoring
+     FIX. several supplied patches
+
+458) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     BUG. X-Superseded-By:-header is broken (introduced in 443)
+     FIX. post.c
+
 --unoff BETA release 971018 --
 
 457) Jason Faultless <jason@radar.demon.co.uk>

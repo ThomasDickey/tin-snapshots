@@ -71,7 +71,7 @@
  */
 #undef	inline
 #undef	const
-#undef  HAVE_NESTED_PARAMS
+#undef	HAVE_NESTED_PARAMS
 
 /*
  * Data types

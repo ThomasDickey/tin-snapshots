@@ -28,31 +28,6 @@ static int parse_newsrc_active_line (char *buf, long *count, long *max, long *mi
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
-#if 0 /* never used */
-/*
- *  Compare two pointers to "group_t" structures - used in qsort.
- */
-
-int
-cmp_group_p (
-	t_comptype *group1,
-	t_comptype *group2)
-{
-	return (strcmp ((*(group_p *) group1)->name, (*(group_p *) group2)->name));
-}
-
-/*
- *  Compare two pointers to "notify_t" structures - used in qsort.
- */
-
-int
-cmp_notify_p (
-	t_comptype *notify1,
-	t_comptype *notify2)
-{
-	return (strcmp ((*(notify_p *) notify1)->name, (*(notify_p *) notify2)->name));
-}
-#endif /* 0 */
 
 /*
  *  Get default array size for active[] from environment (AmigaDOS)
@@ -66,11 +41,8 @@ get_active_num (void)
 	char *ptr;
 	int num;
 
-	ptr = getenv (ENV_VAR_GROUPS);
-	if (ptr != (char *) 0) {
-		num = atoi (ptr);
-		return (num ? num : DEFAULT_ACTIVE_NUM);
-	}
+	if ((ptr = getenv (ENV_VAR_GROUPS)) != (char *) 0)
+		return ((num = atoi (ptr)) ? num : DEFAULT_ACTIVE_NUM);
 #endif
 	return DEFAULT_ACTIVE_NUM;
 }
@@ -91,37 +63,45 @@ resync_active_file (void)
 		reread_active_for_posted_arts = FALSE;
 		reread = TRUE;
 
-		if (cur_groupnum >= 0 && group_top) {
+		if (cur_groupnum >= 0 && group_top)
 			strcpy (old_group, CURR_GROUP.name);
-		} else {
+		else
 			old_group[0] = '\0';
-		}
+
 		vWriteNewsrc ();
-#if 0	/* 1.3beta behaviour, check the on-spool counts */
+#if 0
+		/* 1.3beta behaviour, check the on-spool counts 
+		 * it's slow but it works!
+		 */
 		vGrpGetSubArtInfo ();
-#endif
-		/* original 1.2 behaviour, reload the active[] array and all its dependants */
+#else
+		/* original 1.2 behaviour, reload the active[] array and all its
+		 * dependants.
+		 * it's much faster, but sometimes articles aren't displayed!
+		 */
 		free_active_arrays ();
 		max_active = get_active_num ();
 		expand_active ();
 
 		init_group_hash();
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+#	if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mail_active_file ();
-#endif
+#	endif
 		group_top = 0;
 		read_news_active_file ();
 
 		read_attributes_file (local_attributes_file, FALSE);
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+
+#	if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		read_mailgroups_file ();
-#endif
+#	endif
 		read_newsgroups_file ();
 		/* end of former 1.2 behaviour */
+#endif
 
 		command_line = read_cmd_line_groups ();
-		read_newsrc (newsrc, command_line ? 0 : 1);
 
+		read_newsrc (newsrc, command_line ? 0 : 1);
 		if (command_line)		/* Can't show only unread groups with cmd line groups */
 			show_only_unread_groups = FALSE;
 		else
@@ -155,6 +135,9 @@ active_add(
 	ptr->description = (char *) 0;
 	/* spool - see below */
 	ptr->moderated = moderated[0];
+	if (moderated[0] == '=')
+		wait_message(3, "\nNote: Any posts to %s should be sent to %s\n", ptr->name, moderated+1);
+
 	ptr->count = count;
 	ptr->xmax = max;
 	ptr->xmin = min;
@@ -169,7 +152,6 @@ active_add(
 	ptr->newsrc.xbitmap = (t_bitmap *) 0;
 	ptr->attribute = (struct t_attribute *) 0;
 	ptr->glob_filter = &glob_filter;
-	ptr->grps_filter = (struct t_filters *) 0;
 	vSetDefaultBitmap (ptr);
 #ifdef INDEX_DAEMON
 	ptr->last_updated_time = (time_t) 0;
@@ -181,7 +163,7 @@ active_add(
 	if (moderated[0] == '/')
 #endif
 	{
-		ptr->type = GROUP_TYPE_SAVE;
+		ptr->type = GROUP_TYPE_SAVE;		/* What is this ? */
 		ptr->spooldir = my_strdup(moderated);
 	} else {
 		ptr->type = GROUP_TYPE_NEWS;
@@ -228,7 +210,7 @@ parse_active_line (
 {
 	char *p, *q, *r;
 
-	if (line[0] == '#' || line[0] == '\n')
+	if (line[0] == '#' || line[0] == '\0')
 		return(FALSE);
 
 	strtok(line, ACTIVE_SEP);		/* skip group name */
@@ -253,7 +235,7 @@ parse_active_line (
  * Parse a line from the .newsrc file
  * Returns TRUE or FALSE accordingly
  * Use vGrpGetArtInfo() to obtain min/max/count for the group
- * We can't know the 'moderator' status and always return 'n'
+ * We can't know the 'moderator' status and always return 'y'
  */
 static int
 parse_newsrc_active_line (
@@ -275,7 +257,7 @@ parse_newsrc_active_line (
 	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min) != 0)
 		return(FALSE);
 
-	strcpy (moderated, "n");
+	strcpy (moderated, "y");
 
 	return(TRUE);
 }
@@ -291,16 +273,18 @@ read_news_active_file (void)
 	FILE *fp = 0;
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
-	struct t_group *ptr;
-	long min, max, count;
+	char *ptr;
+	struct t_group *grpptr;
+	long count = -1L, min = 1, max = 0;
 
+	/*
+	 * Ignore -n if no .newsrc can be found
+	 */
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 
-	if (SHOW_UPDATE) {
-		wait_message (newsrc_active ? txt_reading_news_newsrc_file
-					    : txt_reading_news_active_file);
-	}
+	if (INTERACTIVE)
+		wait_message (0, newsrc_active ? txt_reading_news_newsrc_file : txt_reading_news_active_file);
 
 	if (!newsrc_active) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
@@ -309,8 +293,7 @@ read_news_active_file (void)
 				my_fputc ('\n', stderr);
 
 #ifdef NNTP_ABLE
-				sprintf (msg, txt_cannot_open_active_file, news_active_file, progname);
-				error_message (msg, "");
+				error_message (txt_cannot_open_active_file, news_active_file, progname);
 #else
 				error_message (txt_cannot_open, news_active_file);
 #endif
@@ -318,96 +301,53 @@ read_news_active_file (void)
 			tin_done (EXIT_ERROR);
 		}
 	}
-
-	forever {
-		count = -1L;
-		min = 1;
-		max = 0;
-		if (fgets (buf, sizeof(buf), fp) == (char *)0)
-			break;
+/* TODO should we move default count,max,min here as in v1.3, these should really be explicitly set */
+	while ((ptr = tin_fgets (buf, sizeof(buf), fp)) != (char *)0) {
 
 		if (newsrc_active) {
-			if (!parse_newsrc_active_line (buf, &count, &max, &min, moderated))
+			if (!parse_newsrc_active_line (ptr, &count, &max, &min, moderated))
 				continue;
 		} else {
-			if (!parse_active_line (buf, &max, &min, moderated))
+			if (!parse_active_line (ptr, &max, &min, moderated))
 				continue;
 		}
-
-		/*
-		 * Don't load group into active[] from active file if
-		 * 'x'  junked group
-		 * '='  aliased group
-		 */
-		/* FIXME! - IMHO that's a bug
-		 * just mark 'x' group as 'no post' and
-		 * issue a waring for '=' groups that your posting will be redirected...
-		 */
-		if (moderated[0] == 'x' || moderated[0] == '=')
-			continue;
 
 		/*
 		 * Load group into group hash table
 		 * Error => duplicate group
 		 */
-		if ((ptr = psGrpAdd(buf)) == NULL)
+		if ((grpptr = psGrpAdd(ptr)) == NULL)
 			continue;
 
 		/*
 		 * Load the new group in active[]
 		 */
-		active_add(ptr, count, max, min, moderated);
+		active_add(grpptr, count, max, min, moderated);
 
-		if (num_active % 100 == 0 && !update)
+#ifdef SHOW_PROGRESS		/* Spin the arrow as we read the active file */
+		if (num_active % ((newsrc_active) ? 5 : MODULO_COUNT_NUM) == 0)
 			spin_cursor ();
+#endif
 	}
-	fclose (fp);
+
+	if (newsrc_active)
+		fclose(fp);
+	else
+		TIN_FCLOSE (fp);
 
 	/*
-	 *  exit if active file is empty
+	 *  Exit if active file wasn't read or is empty
 	 */
-	if (!num_active) {
+	if (tin_errno != 0 || !num_active) {
 		error_message (txt_active_file_is_empty, news_active_file);
 		tin_done (EXIT_ERROR);
 	}
 
-	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
-		wait_message ("\n");
-	}
+	if (INTERACTIVE2)
+		wait_message (0, "\n");
 
 	check_for_any_new_groups ();
 }
-
-#if 0
-/*
- *  create ~/.tin/active if it does not exist (local news only)
- */
-void
-backup_active (
-	int create)
-{
-	char buf[PATH_LEN];
-	FILE *fp;
-	register int i;
-	struct stat sb;
-
-	joinpath (buf, rcdir, "active");
-
-	if (create) {
-		if (stat (buf, &sb) != -1) {
-			return;
-		}
-	}
-
-	if ((fp = fopen (buf, "w" FOPEN_OPTS)) != (FILE *) 0) {
-		for (i = 0; i < num_active ; i++) {	/* for each group */
-			fprintf (fp, "%s\n", active[i].name);
-		}
-		fclose (fp);
-		chmod (buf, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
-	}
-}
-#endif /* 0 */
 
 /*
  * Check for any newly created newsgroups.
@@ -429,12 +369,11 @@ check_for_any_new_groups (void)
 	FILE *fp = (FILE *) 0;
 	time_t the_newnews_time = (time_t) 0;
 	time_t old_newnews_time;
-	time_t creation_time = (time_t) 0;
 
-	if ((!check_for_new_newsgroups || (update && !update_fork)))
+	if (!check_for_new_newsgroups || !INTERACTIVE)
 		return;
 
-	wait_message (txt_checking_new_groups);
+	wait_message (0, txt_checking_new_groups);
 
 	time (&the_newnews_time);
 
@@ -456,65 +395,50 @@ check_for_any_new_groups (void)
 		old_newnews_time = (time_t) 0;
 	}
 
-#if 0
+#ifdef DEBUG
 	if (debug == 2) {
-		sprintf (msg, "Newnews old=[%ld]  new=[%ld]",
-			old_newnews_time, the_newnews_time);
-		error_message (msg, "");
+		error_message("Newnews old=[%ld]  new=[%ld]", old_newnews_time, the_newnews_time);
 		sleep (2);
 	}
 #endif
 
-	if ((fp = open_newgroups_fp (newnews_index)) == (FILE *) 0)
-		goto notify_groups_done;
-
-	/*
-	 * Need these later. They list user-defined groups to be
-	 * automatically subscribed or unsubscribed.
-	 */
-	autosubscribe = getenv ("AUTOSUBSCRIBE");
-	autounsubscribe = getenv ("AUTOUNSUBSCRIBE");
-
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-
-		if ((ptr = strchr (buf, '\n')) != (char *) 0)
-			*ptr = '\0';
+	if ((fp = open_newgroups_fp (newnews_index)) != (FILE *) 0) {
 
 		/*
-		 * No need to check for final '.' this is done by stuff_nntp()
+		 * Need these later. They list user-defined groups to be
+		 * automatically subscribed or unsubscribed.
 		 */
-		if (read_news_via_nntp) {
-#if 0
-			if (buf[0] == '.') {
-				break;
-			} else }
-#endif
-			if ((ptr = strchr (buf, ' ')) != (char *) 0)
-				*ptr = '\0';
+		autosubscribe = getenv ("AUTOSUBSCRIBE");
+		autounsubscribe = getenv ("AUTOUNSUBSCRIBE");
 
-		} else {
+		while (tin_fgets (buf, sizeof (buf), fp) != (char *) 0) {
+
+			/*
+			 * Split the group name off and subscribe. If we're reading local,
+			 * we must check the creation date manually
+			 */
 			if ((ptr = strchr (buf, ' ')) != (char *) 0) {
-				creation_time = (time_t) atol (ptr);
+
+				if (!read_news_via_nntp && ((time_t) atol (ptr) < old_newnews_time || old_newnews_time == (time_t) 0))
+					continue;
+
 				*ptr = '\0';
 			}
-			if (creation_time < old_newnews_time ||
-											old_newnews_time == (time_t) 0) {
-				continue;
-			}
+
+			subscribe_new_group(buf, autosubscribe, autounsubscribe);
 		}
-		subscribe_new_group(buf, autosubscribe, autounsubscribe);
+
+		TIN_FCLOSE (fp);
+		if (tin_errno != 0)
+			return;				/* Don't update the time if we quit */
 	}
 
-	if (fp != (FILE *) 0)
-		fclose (fp);
-notify_groups_done:		/* TODO - this can be eliminated */
-
 	/*
-	 * update attribute field / create new entry with new date
+	 * Update or create the in-memory 'last time newgroups checked' array
 	 */
-	if (newnews_index >= 0) {
+	if (newnews_index >= 0)
 		newnews[newnews_index].time = the_newnews_time;
-	} else {
+	else {
 		sprintf (buf, "%s %ld", new_newnews_host, the_newnews_time);
 		load_newnews_info (buf);
 	}
@@ -538,6 +462,9 @@ subscribe_new_group (
 	int idx;
 	struct t_group *ptr;
 
+	/*
+	 * If we explicitly don't auto subscribe to this group, then don't bother going on
+	 */
 	if ((autounsubscribe != (char *) 0) && match_group_list (group, autounsubscribe))
 		return;
 
@@ -566,9 +493,8 @@ subscribe_new_group (
 		 * effectively loses the group, and it will be reread by read_newsrc()
 		 */
 		group_top--;
-	} else {
+	} else
 		active[my_group[idx]].newgroup = TRUE;
-	}
 }
 
 /*
@@ -596,11 +522,12 @@ match_group_list (
 		 * find end/length of this entry
 		 */
 		separator = strchr (group_list, ',');
-		if (separator != (char *) 0) {
+
+		if (separator != (char *) 0)
 			group_len = separator-group_list;
-		} else {
+		else
 			group_len = list_len;
-		}
+
 		if ((negate = ('!' == *group_list))) {
 			/*
 			 * a '!' before the pattern inverts sense of match
@@ -617,15 +544,15 @@ match_group_list (
 		/*
 		 * case-insensitive wildcard match
 		 */
-		if (GROUP_MATCH(group, pattern, TRUE)) {
+		if (GROUP_MATCH(group, pattern, TRUE))
 			accept = !negate;	/* matched!*/
-		}
+
 		/*
 		 * now examine next entry if any
 		 */
-		if ((char) 0 != group_list[group_len]) {
+		if ((char) 0 != group_list[group_len])
 			group_len++;	/* skip the separator */
-		}
+
 		group_list += group_len;
 		list_len -= group_len;
 	}
@@ -653,17 +580,16 @@ read_group_times_file (void)
 	time_t updated_time;
 	struct t_group *psGrp;
 
-	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0) {
+	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0)
 		return;
-	}
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		/*
 		 * read the group name
 		 */
-		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++) {
+		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
 			*q = *p;
-		}
+
 		*q = '\0';
 
 		/*
@@ -676,13 +602,14 @@ read_group_times_file (void)
 		 */
 		psGrp = psGrpFind (group);
 
-		if (psGrp) {
+		if (psGrp)
 			psGrp->last_updated_time = updated_time;
-		}
 
-if (debug == 2) {
+#ifdef DEBUG
+if (debug == 2)
 	my_printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
-}
+#endif
+
 	}
 	fclose (fp);
 }
@@ -697,21 +624,21 @@ write_group_times_file (void)
 	FILE *fp;
 	register int i;
 
-	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0) {
+	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0)
 		return;
-	}
 
-	for (i = 0 ; i < num_active ; i++) {
+	for (i = 0 ; i < num_active ; i++)
 		fprintf (fp, "%s %ld\n", active[i].name, active[i].last_updated_time);
-	}
+
 	fclose (fp);
 }
 #endif	/* INDEX_DAEMON */
 
 /*
- * Load the newnews[] array. (times newgroups were last checked on each server)
- * If this is first server, preinitialise the array
- * Add the server info passed to the array, growing it if needed
+ * Add an entry to the in-memory newnews[] array (The times newgroups were last
+ * checked for on each news server)
+ * If this is first time we've been called, zero out the array.
+ * Growing the array if needed
  */
 void
 load_newnews_info (
@@ -732,24 +659,20 @@ load_newnews_info (
 		}
 	}
 
-	/* TODO: Surely this is superfluous with strdup */
+	/* TODO: Surely this is a waste of time, we strdup() this 10 lines lower down */
 	my_strncpy (buf, info, sizeof (buf));
 
-	ptr = strchr (buf, ' ');
-	if (ptr != (char *) 0) {
+	if ((ptr = strchr (buf, ' ')) != (char *) 0) {
 		the_time = (time_t) atol (ptr);
 		*ptr = '\0';
-		if (num_newnews >= max_newnews) {
+		if (num_newnews >= max_newnews)
 			expand_newnews ();
-		}
+
 		newnews[num_newnews].host = my_strdup (buf);
 		newnews[num_newnews].time = the_time;
-#if 0
-		if (debug == 2) {
-			sprintf (buf, "ACTIVE host=[%s] time=[%ld]",
-				newnews[num_newnews].host, newnews[num_newnews].time);
-			error_message ("%s", buf);
-		}
+#ifdef DEBUG
+		if (debug == 2)
+			error_message("ACTIVE host=[%s] time=[%ld]", newnews[num_newnews].host, newnews[num_newnews].time);
 #endif
 		num_newnews++;
 	}
@@ -767,13 +690,13 @@ find_newnews_index (
 	for (i = 0 ; i < num_newnews ; i++) {
 		if (STRCMPEQ(cur_newnews_host, newnews[i].host))
 			return(i);
-  	}
+	}
 
 	return (-1);
 }
 
 /*
- *  check for message of the day (motd) file
+ * check for message of the day (motd) file
  *
  * If reading news locally stat() the active file to get its
  * mtime otherwise do a XMOTD command to the NNTP server
@@ -783,19 +706,20 @@ void
 read_motd_file (void)
 {
 #ifndef INDEX_DAEMON
-
-	char buf[NNTP_STRLEN];
 	char motd_file_date[32];
-	FILE *fp;
-	int lineno = 0;
 	time_t new_motd_date = (time_t) 0;
 	time_t old_motd_date = (time_t) 0;
 	struct stat sb;
 	struct tm *tm;
+#ifdef HAVE_TIN_NNTP_EXTS
+	char buf[NNTP_STRLEN];
+	char *line;
+	FILE *fp;
+	int lineno = 0;
+#endif /* HAVE_TIN_NNTP_EXTS */
 
-	if (update && !update_fork) {
+	if (!INTERACTIVE)
 		return;
-	}
 
 	old_motd_date = (time_t) atol (motd_file_info);
 
@@ -803,9 +727,9 @@ read_motd_file (void)
 	 * reading news locally (local) or via NNTP (server name)
 	 */
 	if (read_news_via_nntp) {
-		if (!old_motd_date) {
+		if (!old_motd_date)
 			strcpy (motd_file_date, "920101 000000");
-		} else {
+		else {
 			tm = localtime (&old_motd_date);
 			sprintf (motd_file_date, "%02d%02d%02d %02d%02d%02d",
 				tm->tm_year, tm->tm_mon+1, tm->tm_mday,
@@ -813,30 +737,29 @@ read_motd_file (void)
 		}
 		time (&new_motd_date);
 	} else {
-		if (stat (motd_file, &sb) >=0) {
+		if (stat (motd_file, &sb) >=0)
 			new_motd_date = sb.st_mtime;
-		}
 	}
 
 	if (old_motd_date && new_motd_date > old_motd_date) {
+#ifdef HAVE_TIN_NNTP_EXTS
 		if ((fp = open_motd_fp (motd_file_date)) != (FILE *) 0) {
-			while (fgets (buf, sizeof (buf), fp) != 0) {
-				if (buf[0] == '.') {
-					break;
-				}
-				my_printf ("%s", buf);
+			while ((line = tin_fgets (buf, sizeof (buf), fp)) != 0) {
+				my_printf ("%s", line);
 				lineno++;
 			}
-			fclose (fp);
+			TIN_FCLOSE (fp);
 
+/* TODO probably needs testing */
 			if (lineno) {
-				wait_message (txt_return_key);
+				wait_message (0, txt_return_key);
 				Raw (TRUE);
 				ReadCh ();
 				Raw (FALSE);
-				wait_message ("\n");
+				wait_message (0, "\n");
 			}
 		}
+#endif
 	}
 
 	/*
@@ -847,6 +770,26 @@ read_motd_file (void)
 #endif	/* INDEX_DAEMON */
 }
 
+/*
+ * Get a single status char from the moderated field. Used on selection screen
+ * and in header of group screen
+ */
+int
+group_flag(int ch)
+{
+	switch (ch) {
+		case 'm':
+			return 'M';
+		case 'x':
+		case 'n':
+			return 'X';
+		case '=':
+			return '=';
+		default:
+			return ' ';
+	}
+}
+
 #ifdef INDEX_DAEMON
 void
 vMakeActiveMyGroup (void)
@@ -855,8 +798,7 @@ vMakeActiveMyGroup (void)
 
 	group_top = 0;
 
-	for (iNum = 0; iNum < num_active; iNum++) {
+	for (iNum = 0; iNum < num_active; iNum++)
 		my_group[group_top++] = iNum;
-	}
 }
 #endif

@@ -30,16 +30,16 @@ read_mail_active_file (void)
 	long	count = -1L;
 	long	min, max;
 
-	if (SHOW_UPDATE)
-		wait_message (txt_reading_mail_active_file);
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_mail_active_file);
 
 	/*
 	 * Open the mail active file
 	 */
 	if ((fp = open_mail_active_fp ("r")) == (FILE *) 0) {
-		if (cmd_line) {
+		if (cmd_line)
 			my_fputc ('\n', stderr);
-		}
+
 		error_message (txt_cannot_open, mail_active_file);
 		/*
 		 * FIXME - maybe do an autoscan of maildir, create & do a reopen ?
@@ -53,9 +53,8 @@ read_mail_active_file (void)
 my_printf ("Line=[%s", buf);
 my_flush();
 */
-		if (!parse_active_line (buf, &max, &min, spooldir) || *buf == '\0') {
+		if (!parse_active_line (buf, &max, &min, spooldir) || *buf == '\0')
 			continue;
-		}
 
 		/*
 		 * Load mailgroup into group hash table
@@ -87,9 +86,8 @@ my_flush();
 	}
 	fclose (fp);
 
-	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
-		wait_message ("\n");
-	}
+	if (INTERACTIVE2)
+		wait_message (0, "\n");
 }
 
 
@@ -131,20 +129,18 @@ read_mailgroups_file (void)
 {
 	FILE *fp;
 
-	if (show_description == FALSE || save_news || catchup) {
+	if (!show_description || save_news || catchup)
 		return;
-	}
 
 	if ((fp = open_mailgroups_fp ()) != (FILE *) 0) {
-		wait_message (txt_reading_mailgroups_file);
+		wait_message (0, txt_reading_mailgroups_file);
 
 		read_groups_descriptions (fp, (FILE *) 0);
 
 		fclose (fp);
 
-		if (cmd_line && !(update || verbose)) {
-			wait_message ("\n");
-		}
+/*PLOK2*/		if (cmd_line && !(update || verbose))
+			wait_message (0, "\n");
 	}
 }
 #endif	/* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
@@ -161,30 +157,29 @@ read_newsgroups_file (void)
 	FILE *fp;
 	FILE *fp_save = (FILE *) 0;
 
-	if (show_description == FALSE || save_news || catchup) {
+	if (!show_description || save_news || catchup)
 		return;
-	}
 
-	wait_message (txt_reading_newsgroups_file);
+	wait_message (0, txt_reading_newsgroups_file);
 
 	if ((fp = open_newsgroups_fp ()) != (FILE *) 0) {
-		if (read_news_via_nntp && !read_local_newsgroups_file) {
+
+		if (read_news_via_nntp && !read_local_newsgroups_file)
 			fp_save = fopen (local_newsgroups_file, "w" FOPEN_OPTS);
-		}
 
 		read_groups_descriptions (fp, fp_save);
-
-		fclose (fp);
 
 		if (fp_save != (FILE *) 0) {
 			fclose (fp_save);
 			read_local_newsgroups_file = TRUE;
 		}
+
+		TIN_FCLOSE (fp);
 	}
 
-	if (cmd_line && !(update || verbose)) {
-		wait_message ("\n");
-	}
+/*PLOK2*/	if (cmd_line && !(batch_mode || verbose))
+		wait_message (0, "\n");
+
 #endif	/* INDEX_DAEMON */
 }
 
@@ -192,6 +187,8 @@ read_newsgroups_file (void)
  *  Read groups descriptions from opened file & make local backup copy
  *  of all groups that don't have a 'x' in the active file moderated
  *  field & if reading groups of type GROUP_TYPE_NEWS.
+ *  Aborting this early won't have any adverse affects, just some missing
+ *  descriptions.
  */
 
 void
@@ -203,17 +200,20 @@ read_groups_descriptions (
 	char buf[LEN];
 	char group[PATH_LEN];
 	char *p, *q;
+#ifdef SHOW_PROGRESS
 	int count = 0;
+#endif
 	struct t_group *psGrp;
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		if (buf[0] == '#' || buf[0] == '\n') {
+	while (tin_fgets (buf, sizeof (buf), fp) != (char *) 0) {
+		if (buf[0] == '#' || buf[0] == '\0')
 			continue;
-		}
+
+#if 0 /* tin_fgets() strips \n for us */
 		p = strrchr (buf, '\n');
-		if (p != (char *) 0) {
+		if (p != (char *) 0)
 			*p = '\0';
-		}
+#endif
 /*
  *  This was moved from below and simplified.  I can't test here for the
  *  type of group being read, because that requires having found the
@@ -221,33 +221,39 @@ read_groups_descriptions (
  *  newsgroups file to only subscribed-to groups when tin is called with
  *  the "-q" option.
  */
-		if (fp_save != (FILE *) 0 &&
-		    read_news_via_nntp &&
-		    ! read_local_newsgroups_file) {
+		if ((fp_save != (FILE *) 0) && read_news_via_nntp && !read_local_newsgroups_file)
 			fprintf (fp_save, "%s\n", buf);
-		}
 
-		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++) {
+		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
 			*q = *p;
-		}
+
 		*q = '\0';
 
-		while (*p == '\t' || *p == ' ') {
+		while (*p == '\t' || *p == ' ')
 			p++;
-		}
 
 		psGrp = psGrpFind (group);
 
 		if (psGrp != (struct t_group *) 0 && psGrp->description == (char *) 0) {
 			q = p;
-			while ((q = strchr (q, '\t')) != (char *) 0) {
+			while ((q = strchr (q, '\t')) != (char *) 0)
 				*q = ' ';
-			}
+
 			psGrp->description = my_strdup (p);
+#if 0 /* not usefull for cache_overview_files */
+			if (psGrp->type == GROUP_TYPE_NEWS) {
+				if (fp_save != (FILE *) 0 &&
+						read_news_via_nntp &&
+						!read_local_newsgroups_file) {
+					fprintf (fp_save, "%s\n", buf);
+				}
+			}
+#endif /* 0 */
 		}
-		if (++count % 100 == 0) {
+#ifdef SHOW_PROGRESS
+		if (++count % 100 == 0)
 			spin_cursor ();
-		}
+#endif
 	}
 #endif	/* INDEX_DAEMON */
 }
@@ -291,9 +297,8 @@ vFindArtMaxMin (
 			if (lArtNum >= 1) {
 				if (lArtNum > *plArtMax) {
 					*plArtMax = lArtNum;
-					if (*plArtMin == 0) {
+					if (*plArtMin == 0)
 						*plArtMin = lArtNum;
-					}
 				} else if (lArtNum < *plArtMin) {
 					*plArtMin = lArtNum;
 				}
@@ -301,9 +306,8 @@ vFindArtMaxMin (
 		}
 		closedir (tDirFile);
 	}
-	if (*plArtMin == 0) {
+	if (*plArtMin == 0)
 		*plArtMin = 1;
-	}
 }
 
 void
@@ -337,9 +341,8 @@ vMakeGrpPath (
 	joinpath (pcGrpPath, pcBaseDir, pcGrpName);
 
 	pcPtr = pcGrpPath + strlen (pcBaseDir);
-	while ((pcPtr = strchr (pcPtr, '.')) != (char *) 0) {
+	while ((pcPtr = strchr (pcPtr, '.')) != (char *) 0)
 		*pcPtr = '/';
-	}
 }
 
 /*
@@ -369,9 +372,8 @@ vMakeGrpName (
 	strcpy (pcGrpName, ++pcPtrPath);
 
 	pcPtrName = pcGrpName;
-	while ((pcPtrName = strchr (pcPtrName, '/')) != (char *) 0) {
+	while ((pcPtrName = strchr (pcPtrName, '/')) != (char *) 0)
 		*pcPtrName = '.';
-	}
 }
 
 
@@ -404,7 +406,7 @@ vGrpDelMailArts (
 	struct	t_article *psArt;
 
 	if (psGrp->type == GROUP_TYPE_MAIL) {
-		wait_message ("Processing mail messages marked for deletion");
+		wait_message (1, "Processing mail messages marked for deletion");
 
 		vMakeGrpPath (psGrp->spooldir, psGrp->name, acGrpPath);
 
@@ -419,8 +421,8 @@ vGrpDelMailArts (
 		}
 
 /* MAYBE also check if min / max article was deleted.  If so then update
-   the active[] entry for the group and rewrite the mail.active file
-*/
+ * the active[] entry for the group and rewrite the mail.active file
+ */
 		if (iUpdateIndexFile)
 			vWriteNovFile (psGrp);
 	}

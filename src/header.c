@@ -31,31 +31,27 @@ void)
 	gethostname(hostname, sizeof(hostname));
 #else
 #	if defined(M_AMIGA) || defined(M_OS2)
-	if ((ptr = getenv("NodeName")) != (char *) 0) {
+	if ((ptr = getenv("NodeName")) != (char *) 0)
 		strncpy(hostname, ptr, MAXHOSTNAMELEN);
-	}
 #	else
 #		if defined(WIN32)
-	if ((ptr = getenv("COMPUTERNAME")) != (char *) 0) {
+	if ((ptr = getenv("COMPUTERNAME")) != (char *) 0)
 		strncpy(hostname, ptr, MAXHOSTNAMELEN);
-	}
 #		endif /* WIN32 */
 #	endif /* M_AMIGA || M_OS2 */
 #endif /* HAVE_GETHOSTBYNAME */
 #ifdef HAVE_SYS_UTSNAME_H
-	if (! *hostname){
+	if (! *hostname)
 		strcpy(hostname, system_info.nodename);
-	}
 #endif /* HAVE_SYS_UTSNAME_H */
 	if (! *hostname) {
-		if ((ptr = getenv("HOST")) != (char *) 0) {
+		if ((ptr = getenv("HOST")) != (char *) 0)
 			strncpy (hostname, ptr, MAXHOSTNAMELEN);
-		} else {
-			if ((ptr = getenv("HOSTNAME")) != (char *) 0) {
+		else {
+			if ((ptr = getenv("HOSTNAME")) != (char *) 0)
 				strncpy (hostname, ptr, MAXHOSTNAMELEN);
-			} else {
+			else
 				hostname[0]='\0';
-			}
 		}
 	}
 	hostname[MAXHOSTNAMELEN]='\0';
@@ -70,9 +66,9 @@ get_domain_name (
 	void)
 {
 	char *ptr;
-	static char domain[8192];
 	char buff[MAXHOSTNAMELEN];
 	FILE *fp;
+	static char domain[8192];
 
 #	if defined(M_AMIGA)
 /* Damn compiler bugs...
@@ -86,9 +82,8 @@ static const char *domain_name_hack = DOMAIN_NAME;
 
 	domain[0]='\0';
 
-	if (strlen(DOMAIN_NAME)) {
+	if (strlen(DOMAIN_NAME))
 		strcpy(domain, DOMAIN_NAME);
-	}
 
 #	if defined(M_AMIGA)
 	if (strchr(domain, ':')) { /* absolute AmigaOS paths contain one, RFC-hostnames don't */
@@ -98,22 +93,20 @@ static const char *domain_name_hack = DOMAIN_NAME;
 		/* If 1st letter is '/' read domianname from specified file */
 		if ((fp = fopen (domain, "r")) != (FILE *) 0) {
 			while (fgets (buff, sizeof (buff), fp) != (char *) 0) {
-				if (buff[0] == '#' || buff[0] == '\n') {
+				if (buff[0] == '#' || buff[0] == '\n')
 					continue;
-				}
-				if((ptr = strrchr (buff, '\n'))) {
+
+				if ((ptr = strrchr (buff, '\n'))) {
 					*ptr = '\0';
-				strcpy (domain, buff);
+					strcpy (domain, buff);
 				}
 			}
-			if (domain[0] == '/') {
-				/* file was empty */
+			if (domain[0] == '/') /* file was empty */
 				domain[0]='\0';
-			}
+
 			fclose (fp);
-		} else {
+		} else
 			domain[0]='\0';
-		}
 	}
 	domain[MAXHOSTNAMELEN]='\0';
 	return (domain);
@@ -155,29 +148,31 @@ get_fqdn(
 	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
 		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
 			in.s_addr=(*hp->h_addr);
-	sprintf(fqdn,"%s",hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
 
-        if (!*fqdn || (fqdn[strlen(fqdn)-1]<='9')) {
-	  *fqdn=0;
-	  inf=fopen("/etc/resolv.conf","r");
-	  if (inf) {
-	    while(fgets(line,MAXLINELEN,inf)) {
-	      line[MAXLINELEN]=0;
-	      str_trim(line);
-	      if (strncmp(line,"domain ",7)==0) {
-		domain=line+7;
-		break;
-	      }
-	      if (strncmp(line,"search ",7)==0) {
-		domain=line+7;
-	        cp=strchr(domain,' ');
-		if (cp) *cp=0;
-		break;
-	      }
-	    }
-	    if (domain) sprintf(fqdn,"%s.%s",name,domain);
-	  }
-	  fclose(inf);
+	sprintf(fqdn,"%s",hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
+	if (!*fqdn || (fqdn[strlen(fqdn)-1]<='9')) {
+		*fqdn=0;
+		inf=fopen("/etc/resolv.conf","r");
+		if (inf) {
+			while(fgets(line,MAXLINELEN,inf)) {
+				line[MAXLINELEN]=0;
+				str_trim(line);
+				if (strncmp(line,"domain ",7)==0) {
+					domain=line+7;
+					break;
+				}
+				if (strncmp(line,"search ",7)==0) {
+					domain=line+7;
+					cp=strchr(domain,' ');
+					if (cp)
+						*cp=0;
+					break;
+				}
+			}
+			if (domain)
+				sprintf(fqdn,"%s.%s",name,domain);
+		}
+		fclose(inf);
 	}
 
 	return(fqdn);
@@ -199,12 +194,10 @@ get_user_info (
 	user_name[0]='\0';
 	full_name[0]='\0';
 
-	if ((ptr=get_full_name())) {
+	if ((ptr=get_full_name()))
 		strcpy(full_name,ptr);
-	}
-	if ((ptr=get_user_name())) {
+	if ((ptr=get_user_name()))
 		strcpy(user_name,ptr);
-	}
 #endif /* INDEX_DAEMON */
 }
 
@@ -223,9 +216,8 @@ get_user_name(
 	pw = getpwuid (getuid ());
 	strcpy (username, pw->pw_name);
 #else
-	if ((p = getenv ("USER"))) {
+	if ((p = getenv ("USER")))
 		strncpy (username, p, 128);
-	}
 #endif
 	return(username);
 }
@@ -253,21 +245,18 @@ get_full_name(
 
 	pw = getpwuid (getuid ());
 	strncpy (buf, pw->pw_gecos, sizeof (fullname));
-	if ((p = strchr (buf, ','))) {
+	if ((p = strchr (buf, ',')))
 		*p = '\0';
-	}
 	if ((p = strchr (buf, '&'))) {
 		*p++ = '\0';
 		strcpy (tmp, pw->pw_name);
 		/* strcpy(tmp, get_user_name()); */
-		if (*tmp && *tmp >= 'a' && *tmp <= 'z') {
+		if (*tmp && *tmp >= 'a' && *tmp <= 'z')
 			*tmp = *tmp - 32;
-		}
 		sprintf (fullname, "%s%s%s", buf, tmp, p);
-	} else {
+	} else
 		strcpy (fullname, buf);
-	}
-return (fullname);
+	return (fullname);
 }
 
 /*
@@ -286,7 +275,7 @@ get_from_name (
 	char *fromhost = GetConfigValue (_CONF_FROMHOST);
 
 	if (!(fromhost && *fromhost))
-          fromhost = domain_name;
+		fromhost = domain_name;
 
 	if (thisgrp && (thisgrp->attribute->from != (char *) 0)) {
 		strcpy(from_name, thisgrp->attribute->from);
@@ -302,12 +291,10 @@ get_from_name (
 	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);
 	else
 	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
-
-	if (debug == 2) {
-		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
-			from_name, get_user_name(), domain_name, get_full_name());
-		error_message (msg, "");
-	}
+#ifdef DEBUG
+	if (debug == 2)
+		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());
+#endif
 
 #endif /* INDEX_DAEMON */
 }
@@ -341,12 +328,10 @@ build_sender (void)
 		{
 			strcat(sender, ptr);
 			strcat(sender, ">");
-		} else {
+		} else
 			return 0;
-		}
-	} else {
+	} else
 		return 0;
-	}
 	return (sender);
 }
 #endif

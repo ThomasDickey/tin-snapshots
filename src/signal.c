@@ -142,9 +142,9 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 #	ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
 #	endif
-	if (sigaction (sig, &sa, &osa) < 0) {
+	if (sigaction (sig, &sa, &osa) < 0)
 		return SIG_ERR;
-	}
+
 	return (osa.sa_handler);
 }
 
@@ -180,18 +180,14 @@ signal_name(int code)
 void
 handle_resize (int repaint)
 {
-	char buf[LEN];
-
 #ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
 	signal (SIGWINCH, signal_handler);
 #endif
 
-	if (cLINES < MIN_LINES_ON_TERMINAL ||
-	    cCOLS < MIN_COLUMNS_ON_TERMINAL) {
-	    	wait_message(txt_screen_too_small_exiting);
+	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
 	    	ring_bell ();
-	    	sleep(3); /* FIXME */
+	    	wait_message(3, txt_screen_too_small_exiting);
 	    	tin_done (EXIT_ERROR);
 	}
 
@@ -208,8 +204,7 @@ handle_resize (int repaint)
 		switch (my_context) {
 		case cArt:
 			ClearScreen ();
-			sprintf (buf, txt_group, glob_art_group);
-			wait_message (buf);
+			wait_message (0, txt_group, glob_art_group);
 			break;
 		case cConfig:
 			refresh_config_page (-1);
@@ -250,13 +245,13 @@ handle_suspend (void)
 	set_keypad_off ();
 	set_xclick_off ();
 	Raw (FALSE);
-	wait_message (txt_suspended_message);
+	wait_message (0, txt_suspended_message);
 
 	kill (0, SIGSTOP);
 
 	sigdisp (SIGTSTP, signal_handler);
 
-	if (!update) {
+	if (!batch_mode) {
 		Raw (TRUE);
 		handle_resize (TRUE);
 	}
@@ -280,7 +275,7 @@ void _CDECL signal_handler (int sig)
 #ifdef SIGINT
 		case SIGINT:
 #	if !defined(M_AMIGA) && !defined(__SASC)
-			if (!update) {
+			if (!batch_mode) {
 				signal (sig, signal_handler);
 				return;
 			}
@@ -323,8 +318,7 @@ void _CDECL signal_handler (int sig)
 	}
 	Raw (FALSE);
 	EndWin ();
-	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n",
-		progname, signal_name(sig), sig);
+	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
 #if defined(SIGUSR1)
 	if (sig == SIGUSR1)
 		tin_done (- SIGUSR1);
@@ -445,22 +439,18 @@ set_win_size (
 
 #ifdef TIOCGSIZE
 	if (ioctl (0, TIOCGSIZE, &win) == 0) {
-		if (win.ts_lines != 0) {
+		if (win.ts_lines != 0)
 			*num_lines = win.ts_lines - 1;
-		}
-		if (win.ts_cols != 0) {
+		if (win.ts_cols != 0)
 			*num_cols = win.ts_cols;
-		}
 	}
 #else
 #  ifdef TIOCGWINSZ
 	if (ioctl (0, TIOCGWINSZ, &win) == 0) {
-		if (win.ws_row != 0) {
+		if (win.ws_row != 0)
 			*num_lines = win.ws_row - 1;
-		}
-		if (win.ws_col != 0) {
+		if (win.ws_col != 0)
 			*num_cols = win.ws_col;
-		}
 	}
 #  else
 #    ifdef M_AMIGA
@@ -476,20 +466,17 @@ set_win_size (
 
 	RIGHT_POS = *num_cols - 20;
 	MORE_POS  = *num_cols - 15;
-	if (beginner_level) {
+	if (beginner_level)
 		NOTESLINES = *num_lines - INDEX_TOP - MINI_HELP_LINES;
-	} else {
+	else
 		NOTESLINES = *num_lines - INDEX_TOP - 1;
-	}
-	if (NOTESLINES <= 0) {
+	if (NOTESLINES <= 0)
 		NOTESLINES = 1;
-	}
 
-	if (*num_lines != old_lines || *num_cols != old_cols) {
+	if (*num_lines != old_lines || *num_cols != old_cols)
 		return TRUE;
-	} else {
+	else
 		return FALSE;
-	}
 }
 
 void set_signals_art    (void) { my_context = cArt; }

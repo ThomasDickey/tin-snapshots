@@ -25,11 +25,11 @@ char proc_ch_default;			/* set in change_config_file () */
 
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 #ifndef INDEX_DAEMON
-static int does_article_exist (int function, long artnum, char *path);
-static int print_file (char *command, int respnum, int count);
+	static int does_article_exist (int function, struct t_article *art, char *path);
+	static int print_file (char *command, int respnum, int count);
 #endif
 
 
@@ -41,7 +41,6 @@ feed_articles (
 	int respnum)
 {
 #ifndef INDEX_DAEMON
-
 	char address[LEN];
 	char command[LEN];
 	char filename[PATH_LEN], *p;
@@ -50,10 +49,10 @@ feed_articles (
 	char my_mailbox[PATH_LEN];
 	char pattern[LEN];
 	char save_file[PATH_LEN];
-	constext *prompt;
 	char proc_ch = proc_ch_default;
 	char option = iKeyFeedSupersede;
 	char option_default = iKeyFeedSupersede;
+	constext *prompt;
 	FILE *fp = (FILE *) 0;
 	int ch, ch_default;
 	int b, i, j;
@@ -61,13 +60,13 @@ feed_articles (
 	int proceed;
 	int processed_ok = TRUE;
 	int is_mailbox = FALSE;
-	int orig_note_end = 0;
 	int orig_note_page = 0;
 	int processed = 0;
 	int redraw_screen = FALSE;
 	int ret1 = FALSE;
 	int ret2 = FALSE;
 	int supersede = FALSE;
+	t_bool orig_note_end = FALSE;
 #ifndef FORGERY
 	char from_name[PATH_LEN];
 	char user_name[128];
@@ -76,13 +75,15 @@ feed_articles (
 
 #ifdef DONT_HAVE_PIPING
 	if (function == FEED_PIPE) {
-		error_message (txt_piping_not_enabled, "");
+		error_message (txt_piping_not_enabled);
 		clear_message ();
 		return;
 	}
 #endif
 
 	set_xclick_off ();
+
+	/* when beeing the pager, remember current possition in article */
 	if (level == PAGE_LEVEL) {
 		orig_note_end = note_end;
 		orig_note_page = note_page;
@@ -92,6 +93,7 @@ feed_articles (
 
 	/*
 	 * try and work out what default the user wants
+	 * This is dumb. If you have _any_ selected arts, then it picks 'h'
 	 */
 	if (num_of_tagged_arts) {
 		ch_default = iKeyFeedTag;
@@ -130,18 +132,9 @@ feed_articles (
 	/*
 	 * If not automatic, ask what the user wants to save
 	 */
-	if (((!default_auto_save || arts[respnum].archive == (char *) 0) ||
-		(default_auto_save && function != FEED_SAVE) ||
-		ch_default == iKeyFeedTag) && function != FEED_SAVE_TAGGED) {
-		do {
-			sprintf (msg, "%s%s%c", prompt, txt_art_thread_regex_tag, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = ReadCh ()) == '\r' || ch == '\n') {
-				ch = ch_default;
-			}
-		} while (!strchr ("ahpqtT\033", ch));
-	} else {
+	if (((!default_auto_save || arts[respnum].archive == (char *) 0) || (default_auto_save && function != FEED_SAVE) || ch_default == iKeyFeedTag) && function != FEED_SAVE_TAGGED)
+		ch = prompt_slk_response (ch_default, "ahpqtT\033", "%s%s", prompt, txt_art_thread_regex_tag);
+	else {
 		filename[0] = '\0';
 		ch = ch_default;
 	}
@@ -158,14 +151,12 @@ feed_articles (
 				clear_message ();
 				return;
 			}
-			if (strlen (pattern)) {
-				my_strncpy (default_regex_pattern, pattern,
-					sizeof (default_regex_pattern));
-			} else {
-				if (default_regex_pattern[0]) {
-					my_strncpy (pattern, default_regex_pattern,
-						sizeof (default_regex_pattern));
-				} else {
+			if (strlen (pattern))
+				my_strncpy (default_regex_pattern, pattern, sizeof (default_regex_pattern));
+			else {
+				if (default_regex_pattern[0])
+					my_strncpy (pattern, default_regex_pattern, sizeof (default_regex_pattern));
+				else {
 					info_message (txt_no_match);
 					return;
 				}
@@ -178,18 +169,17 @@ feed_articles (
 
 	switch (function) {
 		case FEED_MAIL:
-			sprintf (msg, txt_mail_art_to,
-				cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
+			sprintf (msg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
 			if (!prompt_string (msg, address, HIST_MAIL_ADDRESS)) {
 				clear_message ();
 				return;
 			}
-			if (strlen (address)) {
+			if (strlen (address))
 				strcpy (default_mail_address, address);
-			} else {
-				if (default_mail_address[0]) {
+			else {
+				if (default_mail_address[0])
 					strcpy (address, default_mail_address);
-				} else {
+				else {
 					info_message (txt_no_mail_address);
 					return;
 				}
@@ -202,12 +192,12 @@ feed_articles (
 				clear_message ();
 				return;
 			}
-			if (strlen (command)) {
+			if (strlen (command))
 				strcpy (default_pipe_command, command);
-			} else {
-				if (default_pipe_command[0]) {
+			else {
+				if (default_pipe_command[0])
 					strcpy (command, default_pipe_command);
-				} else {
+				else {
 					info_message (txt_no_command);
 					return;
 				}
@@ -218,28 +208,24 @@ feed_articles (
 				perror_message (txt_command_failed_s, command);
 				return;
 			}
-			wait_message (txt_piping);
+			wait_message (0, txt_piping);
 			Raw (FALSE);
 			break;
 		case FEED_PRINT:
-			if (cmd_line_printer[0]) {
-				sprintf (command, "%s %s",
-					cmd_line_printer, REDIRECT_OUTPUT);
-			} else {
+			if (cmd_line_printer[0])
+				sprintf (command, "%s %s", cmd_line_printer, REDIRECT_OUTPUT);
+			else
 				sprintf (command, "%s %s", group->attribute->printer, REDIRECT_OUTPUT);
-			}
 			break;
 		case FEED_SAVE:		/* ask user for filename to save to */
 		case FEED_SAVE_TAGGED:
 			free_save_array ();
-			if ((default_auto_save == FALSE ||
-				arts[respnum].archive == (char *) 0)) {
+			if ((!default_auto_save || arts[respnum].archive == (char *) 0)) {
 
-				if (group->attribute->savefile != (char *) 0) {
+				if (group->attribute->savefile != (char *) 0)
 					strcpy (save_file, group->attribute->savefile);
-				} else {
+				else
 					strcpy (save_file, default_save_file);
-				}
 
 				if (function != FEED_SAVE_TAGGED) {
 					sprintf (msg, txt_save_filename, save_file);
@@ -253,23 +239,22 @@ feed_articles (
 					if (group->attribute->savefile != (char *) 0) {
 						free (group->attribute->savefile);
 						group->attribute->savefile = my_strdup (filename);
-					} else {
+					} else
 						strcpy (default_save_file, filename);
-					}
 
 					my_strncpy (default_save_file, filename,
 						sizeof (default_save_file));
 				} else {
-					if (save_file[0]) {
+					if (save_file[0])
 						my_strncpy (filename, save_file, sizeof (filename));
-					} else {
+					else {
 						info_message (txt_no_filename);
 						return;
 					}
 				}
-				for (p = filename; *p && (*p == ' ' || *p == '\t'); p++) {
+				for (p = filename; *p && (*p == ' ' || *p == '\t'); p++)
 					continue;
-				}
+
 				if (!*p) {
 					info_message (txt_no_filename);
 					return;
@@ -281,26 +266,20 @@ feed_articles (
 				if (function != FEED_SAVE_TAGGED) {
 					is_mailbox = create_path (filename);
 					if (is_mailbox) {
-						if ((int) strlen (filename) > 1) {
+						if ((int) strlen (filename) > 1)
 							my_strncpy (my_mailbox, filename+1, sizeof (my_mailbox));
-						} else {
+						else {
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
 							/*
 							 *  convert 1st letter to uppercase
 							 */
-							if (my_mailbox[0] >= iKeyFeedArt && my_mailbox[0] <= 'z') {
+							if (my_mailbox[0] >= iKeyFeedArt && my_mailbox[0] <= 'z')
 								my_mailbox[0] = my_mailbox[0] - 32;
-							}
 						}
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
-						do {
-							sprintf (msg, "%s%c", txt_post_process_type, proc_ch_default);
-							wait_message (msg);
-							MoveCursor (cLINES, (int) strlen (msg)-1);
-							if ((proc_ch = (char) ReadCh ()) == '\n' || proc_ch == '\r')
-								proc_ch = proc_ch_default;
-						} while (!strchr ("eElLnqsu\033", proc_ch));
+						proc_ch = prompt_slk_response(proc_ch_default, "eElLnqsu\033",
+									txt_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
@@ -308,12 +287,12 @@ feed_articles (
 					}
 				}
 			}
-			wait_message (txt_saving);
+			wait_message (0, txt_saving);
 			break;
 		case FEED_REPOST:	/* repost article */
-			if (!can_post) {
+			if (!can_post)
 				info_message(txt_cannot_post);
-			} else {
+			else {
 #ifndef FORGERY
 				get_user_info (user_name, full_name);
 				get_from_name (from_name, (struct t_group *) 0);
@@ -321,11 +300,8 @@ feed_articles (
 				if (strstr (from_name, arts[respnum].from)) {
 #endif
 					/* repost or supersede ? */
-					do {
-						prompt_2 (txt_supersede_article, arts[respnum].subject, option_default);
-						if ((option = (char) ReadCh ()) == '\r' || option == '\n')
-							option = option_default;
-					} while (!strchr ("qrs\033", option));
+			        option = prompt_slk_response (option_default, "\033qrs",
+								sized_message(txt_supersede_article, arts[respnum].subject));
 
 					switch (option) {
 						case iKeyFeedSupersede:
@@ -373,9 +349,8 @@ feed_articles (
 	switch (ch) {
 		case iKeyFeedArt:		/* article */
 			if (level == GROUP_LEVEL) {
-				if (!does_article_exist (function, arts[respnum].artnum, group_path)) {
+				if (!does_article_exist (function, &arts[respnum], group_path))
 					break;
-				}
 			}
 			switch (function) {
 				case FEED_MAIL:
@@ -384,7 +359,8 @@ feed_articles (
 
 				case FEED_PIPE:
 					fseek (note_fp, 0L, SEEK_SET);
-					if (got_sig_pipe) goto got_sig_pipe_while_piping;
+					if (got_sig_pipe)
+						goto got_sig_pipe_while_piping;
 					copy_fp (note_fp, fp);
 					break;
 
@@ -393,60 +369,53 @@ feed_articles (
 					break;
 
 				case FEED_SAVE:
-					note_page = art_open (arts[respnum].artnum, group_path);
-					if (note_page != ART_UNAVAILABLE) {
+					if (art_open (&arts[respnum], group_path) == 0) {
 						add_to_save_list (0, &arts[respnum], is_mailbox, TRUE, filename);
 						processed_ok = save_art_to_file (respnum, 0, FALSE, "");
 					}
 					break;
 
 				case FEED_REPOST:
-					if (can_post) {
+					if (can_post)
 						redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
-					} else {
+					else 
 						info_message(txt_cannot_post);
-					}
 					break;
 
 				default:
 					break;
 			}
-			if (processed_ok) {
+
+			if (processed_ok)
 				processed++;
-			} else {
+			else
 				break;
-			}
-			if (mark_saved_read) {
-				if (processed_ok) {
-					art_mark_read (group, &arts[respnum]);
-				}
-			}
-			if (level == GROUP_LEVEL) {
+
+			if (mark_saved_read && processed_ok)
+				art_mark_read (group, &arts[respnum]);
+
+			if (level == GROUP_LEVEL)
 				art_close ();
-			}
+
 			break;
 
 		case iKeyFeedThd: 		/* thread */
 			confirm = TRUE;
 			for (i = (int) base[b]; i >= 0; i = arts[i].thread) {
-				if (level == PAGE_LEVEL) {
+				if (level == PAGE_LEVEL)
 					art_close ();
-				}
-				if (!does_article_exist (function, arts[i].artnum, group_path)) {
+
+				if (!does_article_exist (function, &arts[i], group_path))
 					continue;
-				}
-				if (process_only_unread && arts[i].status == ART_READ) {
+
+				if (process_only_unread && arts[i].status == ART_READ)
 					continue;
-				}
+
 				switch (function) {
 					case FEED_MAIL:
 						processed_ok = TRUE;
 						mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-						if (processed_ok) {
-							confirm = FALSE;
-						} else {
-							confirm = TRUE;
-						}
+						confirm = (processed_ok ? FALSE : TRUE);
 						break;
 
 					case FEED_PIPE:
@@ -465,24 +434,21 @@ feed_articles (
 						break;
 
 					case FEED_REPOST:
-						if (can_post) {
+						if (can_post)
 							redraw_screen = repost_article (group_name, &arts[i], i, supersede);
-						} else {
+						else
 							info_message(txt_cannot_post);
-						}
 						break;
 
 					default:
 						break;
 				}
-				if (processed_ok) {
+				if (processed_ok)
 					processed++;
-				}
-				if (mark_saved_read) {
-					if (processed_ok) {
-						art_mark_read (group, &arts[i]);
-					}
-				}
+
+				if (mark_saved_read && processed_ok)
+					art_mark_read (group, &arts[i]);
+
 				art_close ();
 			}
 			if (function == FEED_SAVE) {
@@ -496,25 +462,22 @@ feed_articles (
 			for (i=1 ; i <= num_of_tagged_arts ; i++) {
 				for (j=0 ; j < top ; j++) {
 					if (arts[j].tagged && arts[j].tagged == i) {
-						if (level == PAGE_LEVEL) {
+						if (level == PAGE_LEVEL)
 							art_close ();
-						}
-						if (!does_article_exist (function, arts[j].artnum, group_path)) {
+
+						if (!does_article_exist (function, &arts[j], group_path))
 							continue;
-						}
+
 						switch (function) {
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								if (processed_ok) {
-									confirm = FALSE;
-								} else {
-									confirm = TRUE;
-								}
+								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
 							case FEED_PIPE:
-								if (got_sig_pipe) goto got_sig_pipe_while_piping;
+								if (got_sig_pipe)
+									goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
@@ -529,31 +492,28 @@ feed_articles (
 								break;
 
 							case FEED_REPOST:
-								if (can_post) {
+								if (can_post)
 									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
-								} else {
+								else
 									info_message(txt_cannot_post);
-								}
 								break;
 
 							default:
 								break;
 						}
-						if (processed_ok) {
+						if (processed_ok)
 							processed++;
-						}
-						if (mark_saved_read) {
-							if (processed_ok) {
-								art_mark_read (group, &arts[j]);
-							}
-						}
+
+						if (mark_saved_read && processed_ok)
+							art_mark_read (group, &arts[j]);
+
 						art_close ();
 					}
 				}
 			}
-			if (function == FEED_SAVE || function == FEED_SAVE_TAGGED) {
+			if (function == FEED_SAVE || function == FEED_SAVE_TAGGED)
 				(void) save_regex_arts (is_mailbox, group_path);
-			}
+
 			untag_all_articles ();
 			break;
 
@@ -564,35 +524,33 @@ feed_articles (
 				for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 					proceed = FALSE;
 					if (ch == iKeyFeedPat) {
-						if (REGEX_MATCH(arts[j].subject, pattern, TRUE)) {
+						if (REGEX_MATCH(arts[j].subject, pattern, TRUE))
 							proceed = TRUE;
-						}
-					} else if (arts[j].selected) {
-						proceed = TRUE;
-					}
+					} else
+						if (arts[j].selected)
+							proceed = TRUE;
+
 					if (proceed) {
 						if (level == PAGE_LEVEL) {
 							art_close ();
 						}
-						if (!does_article_exist (function, arts[j].artnum, group_path)) {
+						if (!does_article_exist (function, &arts[j], group_path)) {
 							continue;
 						}
 						if (process_only_unread && arts[j].status == ART_READ) {
 							continue;
 						}
 						switch (function) {
+
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								if (processed_ok) {
-									confirm = FALSE;
-								} else {
-									confirm = TRUE;
-								}
+								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
 							case FEED_PIPE:
-								if (got_sig_pipe) goto got_sig_pipe_while_piping;
+								if (got_sig_pipe)
+									goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
@@ -606,35 +564,31 @@ feed_articles (
 								break;
 
 							case FEED_REPOST:
-								if (can_post) {
+								if (can_post)
 									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
-								} else {
+								else
 									info_message(txt_cannot_post);
-								}
 								break;
 
 							default:
 								break;
 						}
-						if (processed_ok) {
+						if (processed_ok)
 							processed++;
-						}
-						if (mark_saved_read) {
-							if (processed_ok) {
-								art_mark_read (group, &arts[j]);
-								if (ch == iKeyFeedHot) {
-									arts[j].selected = FALSE;
-									num_of_selected_arts--;
-								}
+
+						if (mark_saved_read && processed_ok) {
+							art_mark_read (group, &arts[j]);
+							if (ch == iKeyFeedHot) {
+								arts[j].selected = FALSE;
+								num_of_selected_arts--;
 							}
 						}
 	 					art_close ();
 					}
 				}
 			}
-			if (function == FEED_SAVE) {
+			if (function == FEED_SAVE)
 				(void) save_regex_arts (is_mailbox, group_path);
-			}
 			break;
 		default:
 			break;
@@ -643,20 +597,21 @@ feed_articles (
 	/*
 	 * Now work out what (if anything) needs to be redrawn
 	 */
+#ifdef DEBUG
 	if (debug == 2) {
 		my_printf ("REDRAW=[%d]  ", redraw_screen);
 		my_flush ();
 	}
-
+#endif
 	if (!use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
-
+#ifdef DEBUG
 	if (debug == 2) {
 		my_printf ("REDRAW=[%d]", redraw_screen);
 		my_flush ();
 		sleep (2);
 	}
-
+#endif
 	switch (function) {
 		case FEED_PIPE:
 got_sig_pipe_while_piping:
@@ -668,9 +623,8 @@ got_sig_pipe_while_piping:
 			break;
 		case FEED_SAVE:
 		case FEED_SAVE_TAGGED:
-			if (proc_ch != 'n' && is_mailbox == FALSE) {
-				ret2 = post_process_files (proc_ch, (t_bool)(function == FEED_SAVE ? FALSE : TRUE));
-			}
+			if (proc_ch != 'n' && !is_mailbox)
+				ret2 = post_process_files (proc_ch, (t_bool) (function == FEED_SAVE ? FALSE : TRUE));
 			free_save_array ();
 			break;
 		default:
@@ -678,30 +632,28 @@ got_sig_pipe_while_piping:
 	}
 
 	if (level == GROUP_LEVEL || level == THREAD_LEVEL)
-		ret1 = (mark_saved_read ? TRUE : FALSE);
+		ret1 = mark_saved_read;
 
-	if ((ret1 || ret2) && is_mailbox == FALSE)
+	if ((ret1 || ret2) && !is_mailbox)
 		redraw_screen = TRUE;
 
 	if (level == PAGE_LEVEL) {
 		if (ch != iKeyFeedArt) {
-			note_page = art_open (arts[respnum].artnum, group_path);
-		} else if (force_screen_redraw) {
+			if (art_open (&arts[respnum], group_path) != 0)
+				return;			/* This is bad */
+		} else if (force_screen_redraw)
 			redraw_screen = TRUE;
-		}
 		note_end = orig_note_end;
 		note_page = orig_note_page;
 		fseek (note_fp, note_mark[note_page], SEEK_SET);
 		if (redraw_screen) {
-			if (note_page == 0) {
+			if (!note_page)
 				show_note_page (group->name, respnum);
-			} else {
+			else
 				redraw_page (group->name, respnum);
-			}
 		} else {
-			if (function == FEED_PIPE) {
+			if (function == FEED_PIPE)
 				clear_message ();
-			}
 		}
 	} else {
 		if (redraw_screen) {
@@ -719,21 +671,16 @@ got_sig_pipe_while_piping:
 	}
 
 	if (function == FEED_MAIL) {
-		if (use_mailreader_i) {
-			strcpy (msg, txt_external_mail_done);
-			info_message (msg);
-		} else {
-			sprintf (msg, txt_mailed, processed, IS_PLURAL(processed));
-			info_message (msg);
-		}
+		if (use_mailreader_i)
+			info_message (txt_external_mail_done);
+		else
+			info_message (txt_mailed, processed, IS_PLURAL(processed));
+
 	} else if (function == FEED_PRINT) {
-		sprintf (msg, txt_printed, processed, IS_PLURAL(processed));
-		info_message (msg);
+		info_message (txt_printed, processed, IS_PLURAL(processed));
 	} else if (function == FEED_SAVE || function == FEED_SAVE_TAGGED) {
-		if (ch == iKeyFeedArt) {
-			sprintf (msg, txt_saved, processed, IS_PLURAL(processed));
-			info_message (msg);
-		}
+		if (ch == iKeyFeedArt)
+			info_message (txt_saved, processed, IS_PLURAL(processed));
 	}
 
 #endif /* INDEX_DAEMON */
@@ -749,12 +696,12 @@ print_file (
 {
 	FILE *fp;
 #ifdef DONT_HAVE_PIPING
-	char cmd[255],  file[255];
+	char cmd[255], file[255];
+
 	strcpy(cmd, command);
 #endif
 
-	sprintf (msg, "%s%d", txt_printing, count);
-	wait_message (msg);
+	wait_message (1, "%s%d", txt_printing, count);
 
 #ifdef DONT_HAVE_PIPING
 	sprintf(file, TIN_PRINTFILE, respnum);
@@ -767,20 +714,17 @@ print_file (
 		return FALSE;
 	}
 
-	if (print_header) {
+	if (print_header)
 		fseek(note_fp, 0L, SEEK_SET);
-	} else {
-		fprintf (fp, "Newsgroups: %s\n", note_h_newsgroups);
-		if (arts[respnum].from == arts[respnum].name ||
-			arts[respnum].name == (char *) 0) {
+	else {
+		fprintf (fp, "Newsgroups: %s\n", note_h.newsgroups);
+		if (arts[respnum].from == arts[respnum].name || arts[respnum].name == (char *) 0)
 			fprintf (fp, "From: %s\n", arts[respnum].from);
-		} else {
-			fprintf (fp, "From: %s <%s>\n",
-				arts[respnum].name, arts[respnum].from);
-		}
-		fprintf (fp, "Subject: %s\n", note_h_subj);
-		fprintf (fp, "Date: %s\n\n", note_h_date);
-		fseek (note_fp, note_mark[0], SEEK_SET);
+		else
+			fprintf (fp, "From: %s <%s>\n", arts[respnum].name, arts[respnum].from);
+		fprintf (fp, "Subject: %s\n", note_h.subj);
+		fprintf (fp, "Date: %s\n\n", note_h.date);
+		fseek (note_fp, mark_body, SEEK_SET);
 	}
 	copy_fp (note_fp, fp);
 
@@ -823,20 +767,17 @@ get_post_proc_type (
 static int
 does_article_exist (
 	int function,
-	long artnum,
+	struct t_article *art,
 	char *path)
 {
 	int retcode = FALSE;
 
 	if (function == FEED_SAVE) {
-		if (stat_article (artnum, path)) {
+		if (stat_article (art->artnum, path))
 			retcode = TRUE;
-		}
 	} else {
-		note_page = art_open (artnum, path);
-		if (note_page != ART_UNAVAILABLE) {
-			retcode = TRUE;
-		}
+		if (art_open (art, path) != ART_UNAVAILABLE)
+			retcode = TRUE;		/* Even if the user aborted, the art still exists */
 	}
 
 	return retcode;

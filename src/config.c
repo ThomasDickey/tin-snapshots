@@ -18,7 +18,6 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-static char **ulBuildArgv(char *cmd, int *new_argc);
 static int match_list ( char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
 static void show_config_page (void);
@@ -39,7 +38,7 @@ check_upgrade(
 		return(IGNORE);
 	else {
 		error_message (txt_warn_update, VERSION);
-		error_message (txt_return_key, "");
+		error_message (txt_return_key);
 		ReadCh();
 		return(UPGRADE);
 	}
@@ -62,12 +61,8 @@ read_config_file (
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
 		return FALSE;
 
-	if (SHOW_UPDATE) {
-		if (global_file)
-			wait_message (txt_reading_global_config_file);
-		else
-			wait_message (txt_reading_config_file);
-	}
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_config_file, (global_file) ? "global " : "");
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '#' || buf[0] == '\n') {
@@ -78,9 +73,9 @@ read_config_file (
 
 		switch(tolower((unsigned char)buf[0])) {
 		case 'a':
-			if (match_boolean (buf, "auto_save=", &default_auto_save)) {
+			if (match_boolean (buf, "auto_save=", &default_auto_save))
 				break;
-			}
+
 			if (match_string (buf, "art_marked_deleted=", buf, sizeof (buf))) {
 				art_marked_deleted = buf[0];
 				break;
@@ -102,111 +97,110 @@ read_config_file (
 				break;
 			}
 #ifdef HAVE_METAMAIL
-			if (match_boolean (buf, "ask_for_metamail=", &ask_for_metamail)) {
+			if (match_boolean (buf, "ask_for_metamail=", &ask_for_metamail))
 				break;
-			}
 #endif
-			if (match_boolean (buf, "auto_cc=", &auto_cc)) {
+			if (match_boolean (buf, "auto_cc=", &auto_cc))
 				break;
-			}
-			if (match_boolean (buf, "auto_bcc=", &auto_bcc)) {
+
+			if (match_boolean (buf, "auto_bcc=", &auto_bcc))
 				break;
-			}
-			if (match_boolean (buf, "auto_list_thread=", &auto_list_thread)) {
+
+			if (match_boolean (buf, "auto_list_thread=", &auto_list_thread))
 				break;
-			}
-			if (match_boolean (buf, "alternative_handling=", &alternative_handling)) {
+
+			if (match_boolean (buf, "alternative_handling=", &alternative_handling))
 				break;
-			}
+
 			break;
 
 		case 'b':
-			if (match_boolean (buf, "batch_save=", &default_batch_save)) {
+			if (match_boolean (buf, "batch_save=", &default_batch_save))
 				break;
-			}
-			if (match_boolean (buf, "beginner_level=", &beginner_level)) {
+
+			if (match_boolean (buf, "beginner_level=", &beginner_level))
 				break;
-			}
+
 			break;
 
 		case 'c':
-			if (match_boolean (buf, "cache_overview_files=", &cache_overview_files)) {
+			if (match_boolean (buf, "cache_overview_files=", &cache_overview_files))
 				break;
-			}
-			if (match_boolean (buf, "catchup_read_groups=", &catchup_read_groups)) {
+
+			if (match_boolean (buf, "catchup_read_groups=", &catchup_read_groups))
 				break;
-			}
-			if (match_boolean (buf, "confirm_action=", &confirm_action)) {
+
+			if (match_boolean (buf, "confirm_action=", &confirm_action))
 				break;
-			}
-			if (match_boolean (buf, "confirm_to_quit=", &confirm_to_quit)) {
+
+			if (match_boolean (buf, "confirm_to_quit=", &confirm_to_quit))
 				break;
-			}
+
 #ifdef HAVE_COLOR
-			if (match_color (buf, "col_back=", &col_back, MAX_COLOR)) {
+			if (match_color (buf, "col_back=", &col_back, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_invers_bg=", &col_invers_bg, MAX_COLOR)) {
+
+			if (match_color (buf, "col_invers_bg=", &col_invers_bg, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_invers_fg=", &col_invers_fg, MAX_COLOR)) {
+
+			if (match_color (buf, "col_invers_fg=", &col_invers_fg, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_text=", &col_text, MAX_COLOR)) {
+
+			if (match_color (buf, "col_text=", &col_text, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_minihelp=", &col_minihelp, MAX_COLOR)) {
+
+			if (match_color (buf, "col_minihelp=", &col_minihelp, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_help=", &col_help, MAX_COLOR)) {
+
+			if (match_color (buf, "col_help=", &col_help, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_message=", &col_message, MAX_COLOR)) {
+
+			if (match_color (buf, "col_message=", &col_message, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_quote=", &col_quote, MAX_COLOR)) {
+
+			if (match_color (buf, "col_quote=", &col_quote, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_head=", &col_head, MAX_COLOR)) {
+
+			if (match_color (buf, "col_head=", &col_head, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_newsheaders=", &col_newsheaders, MAX_COLOR)) {
+
+			if (match_color (buf, "col_newsheaders=", &col_newsheaders, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_subject=", &col_subject, MAX_COLOR)) {
+
+			if (match_color (buf, "col_subject=", &col_subject, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_response=", &col_response, MAX_COLOR)) {
+
+			if (match_color (buf, "col_response=", &col_response, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_from=", &col_from, MAX_COLOR)) {
+
+			if (match_color (buf, "col_from=", &col_from, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_normal=", &col_normal, MAX_COLOR)) {
+
+			if (match_color (buf, "col_normal=", &col_normal, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_title=", &col_title, MAX_COLOR)) {
+
+			if (match_color (buf, "col_title=", &col_title, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_signature=", &col_signature, MAX_COLOR)) {
+
+			if (match_color (buf, "col_signature=", &col_signature, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_markstar=", &col_markstar, MAX_COLOR)) {
+
+			if (match_color (buf, "col_markstar=", &col_markstar, MAX_COLOR))
 				break;
-			}
-			if (match_color (buf, "col_markdash=", &col_markdash, MAX_COLOR)) {
+
+			if (match_color (buf, "col_markdash=", &col_markdash, MAX_COLOR))
 				break;
-			}
+
 #endif
 			break;
 
 		case 'd':
-			if (match_string (buf, "default_editor_format=", default_editor_format, sizeof (default_editor_format))) {
+			if (match_string (buf, "default_editor_format=", default_editor_format, sizeof (default_editor_format)))
 				break;
-			}
-			if (match_string (buf, "default_mailer_format=", default_mailer_format, sizeof (default_mailer_format))) {
+
+			if (match_string (buf, "default_mailer_format=", default_mailer_format, sizeof (default_mailer_format)))
 				break;
-			}
+
 			if (match_string (buf, "default_savedir=", default_savedir, sizeof (default_savedir))) {
 				if (default_savedir[0] == '.' && strlen (default_savedir) == 1) {
 					get_cwd (buf);
@@ -218,179 +212,179 @@ read_config_file (
 				joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
 				break;
 			}
-			if (match_string (buf, "default_printer=", default_printer, sizeof (default_printer))) {
+			if (match_string (buf, "default_printer=", default_printer, sizeof (default_printer)))
 				break;
-			}
-			if (match_string (buf, "default_sigfile=", default_sigfile, sizeof (default_sigfile))) {
+
+			if (match_string (buf, "default_sigfile=", default_sigfile, sizeof (default_sigfile)))
 				break;
-			}
-			if (match_integer (buf, "default_filter_days=", &default_filter_days, 0)) {
+
+			if (match_integer (buf, "default_filter_days=", &default_filter_days, 0))
 				break;
-			}
-			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header, FILTER_LINES)) {
+
+			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header, FILTER_LINES))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global)) {
+
+			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_kill_case=", &default_filter_kill_case)) {
+
+			if (match_boolean (buf, "default_filter_kill_case=", &default_filter_kill_case))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire)) {
+
+			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire))
 				break;
-			}
-			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header, FILTER_LINES)) {
+
+			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header, FILTER_LINES))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global)) {
+
+			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_select_case=", &default_filter_select_case)) {
+
+			if (match_boolean (buf, "default_filter_select_case=", &default_filter_select_case))
 				break;
-			}
-			if (match_boolean (buf, "default_filter_select_expire=", &default_filter_select_expire)) {
+
+			if (match_boolean (buf, "default_filter_select_expire=", &default_filter_select_expire))
 				break;
-			}
+
 			if (match_string (buf, "default_save_mode=", buf, sizeof (buf))) {
 				default_save_mode = buf[0];
 				break;
 			}
-			if (match_string (buf, "default_author_search=", default_author_search, sizeof (default_author_search))) {
+			if (match_string (buf, "default_author_search=", default_author_search, sizeof (default_author_search)))
 				break;
-			}
-			if (match_string (buf, "default_goto_group=", default_goto_group, sizeof (default_goto_group))) {
+
+			if (match_string (buf, "default_goto_group=", default_goto_group, sizeof (default_goto_group)))
 				break;
-			}
-			if (match_string (buf, "default_group_search=", default_group_search, sizeof (default_group_search))) {
+
+			if (match_string (buf, "default_config_search=", default_config_search, sizeof (default_config_search)))
 				break;
-			}
-			if (match_string (buf, "default_subject_search=", default_subject_search, sizeof (default_subject_search))) {
+
+			if (match_string (buf, "default_group_search=", default_group_search, sizeof (default_group_search)))
 				break;
-			}
-			if (match_string (buf, "default_art_search=", default_art_search, sizeof (default_art_search))) {
+
+			if (match_string (buf, "default_subject_search=", default_subject_search, sizeof (default_subject_search)))
 				break;
-			}
-			if (match_string (buf, "default_repost_group=", default_repost_group, sizeof (default_repost_group))) {
+
+			if (match_string (buf, "default_art_search=", default_art_search, sizeof (default_art_search)))
 				break;
-			}
-			if (match_string (buf, "default_mail_address=", default_mail_address, sizeof (default_mail_address))) {
+
+			if (match_string (buf, "default_repost_group=", default_repost_group, sizeof (default_repost_group)))
 				break;
-			}
-			if (match_integer (buf, "default_move_group=", &default_move_group, 0)) {
+
+			if (match_string (buf, "default_mail_address=", default_mail_address, sizeof (default_mail_address)))
 				break;
-			}
-			if (match_string (buf, "default_pipe_command=", default_pipe_command, sizeof (default_pipe_command))) {
+
+			if (match_integer (buf, "default_move_group=", &default_move_group, 0))
 				break;
-			}
-			if (match_string (buf, "default_post_newsgroups=", default_post_newsgroups, sizeof (default_post_newsgroups))) {
+
+			if (match_string (buf, "default_pipe_command=", default_pipe_command, sizeof (default_pipe_command)))
 				break;
-			}
-			if (match_string (buf, "default_post_subject=", default_post_subject, sizeof (default_post_subject))) {
+
+			if (match_string (buf, "default_post_newsgroups=", default_post_newsgroups, sizeof (default_post_newsgroups)))
 				break;
-			}
-			if (match_string (buf, "default_regex_pattern=", default_regex_pattern, sizeof (default_regex_pattern))) {
+
+			if (match_string (buf, "default_post_subject=", default_post_subject, sizeof (default_post_subject)))
 				break;
-			}
-			if (match_string (buf, "default_range_group=", default_range_group, sizeof (default_range_group))) {
+
+			if (match_string (buf, "default_regex_pattern=", default_regex_pattern, sizeof (default_regex_pattern)))
 				break;
-			}
-			if (match_string (buf, "default_range_select=", default_range_select, sizeof (default_range_select))) {
+
+			if (match_string (buf, "default_range_group=", default_range_group, sizeof (default_range_group)))
 				break;
-			}
-			if (match_string (buf, "default_range_thread=", default_range_thread, sizeof (default_range_thread))) {
+
+			if (match_string (buf, "default_range_select=", default_range_select, sizeof (default_range_select)))
 				break;
-			}
-			if (match_string (buf, "default_save_file=", default_save_file, sizeof (default_save_file))) {
+
+			if (match_string (buf, "default_range_thread=", default_range_thread, sizeof (default_range_thread)))
 				break;
-			}
-			if (match_string (buf, "default_select_pattern=", default_select_pattern, sizeof (default_select_pattern))) {
+
+			if (match_string (buf, "default_save_file=", default_save_file, sizeof (default_save_file)))
 				break;
-			}
-			if (match_string (buf, "default_shell_command=", default_shell_command, sizeof (default_shell_command))) {
+
+			if (match_string (buf, "default_select_pattern=", default_select_pattern, sizeof (default_select_pattern)))
 				break;
-			}
-			if (match_boolean (buf, "display_mime_header_asis=", &display_mime_header_asis)) {
+
+			if (match_string (buf, "default_shell_command=", default_shell_command, sizeof (default_shell_command)))
 				break;
-			}
-			if (match_boolean (buf, "draw_arrow=", &draw_arrow_mark)) {
+
+			if (match_boolean (buf, "display_mime_header_asis=", &display_mime_header_asis))
 				break;
-			}
+
+			if (match_boolean (buf, "display_mime_allheader_asis=", &display_mime_allheader_asis))
+				break;
+
+			if (match_boolean (buf, "draw_arrow=", &draw_arrow_mark))
+				break;
+
 			break;
 
 		case 'f':
-			if (match_boolean (buf, "full_page_scroll=", &full_page_scroll)) {
+			if (match_boolean (buf, "full_page_scroll=", &full_page_scroll))
 				break;
-			}
-			if (match_boolean (buf, "force_screen_redraw=", &force_screen_redraw)) {
+
+			if (match_boolean (buf, "force_screen_redraw=", &force_screen_redraw))
 				break;
-			}
+
 			break;
 
 		case 'g':
-			if (match_integer (buf, "groupname_max_length=", &groupname_max_length, 132)) {
+			if (match_integer (buf, "groupname_max_length=", &groupname_max_length, 132))
 				break;
-			}
-			if (match_boolean (buf, "group_catchup_on_exit=", &group_catchup_on_exit)) {
-				break;
-			}
-			break;
 
-		case 'h':
-			if (match_boolean (buf, "highlight_xcommentto=", &highlight_xcommentto)) {
+			if (match_boolean (buf, "group_catchup_on_exit=", &group_catchup_on_exit))
 				break;
-			}
+
 			break;
 
 		case 'i':
-			if (match_boolean (buf, "inverse_okay=", &inverse_okay)) {
+			if (match_boolean (buf, "inverse_okay=", &inverse_okay))
 				break;
-			}
+
 			break;
 
 		case 'k':
 #ifdef M_UNIX
-			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles)) {
+			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles))
 				break;
-			}
 #endif
-			if (match_boolean (buf, "keep_posted_articles=", &keep_posted_articles)) {
+
+			if (match_boolean (buf, "keep_posted_articles=", &keep_posted_articles))
 				break;
-			}
+
 			break;
 
 		case 'l':
 #ifdef LOCAL_CHARSET
-			if (match_boolean (buf, "local_charset=", &use_local_charset)) {
+			if (match_boolean (buf, "local_charset=", &use_local_charset))
 				break;
-			}
 #endif
+
 			break;
 
 		case 'm':
-			if (match_list (buf, "mail_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &mail_mime_encoding)) {
+			if (match_list (buf, "mail_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &mail_mime_encoding))
 				break;
-			}
+
 			/* option to toggle 8bit char. in header of mail message */
 			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
 				if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit))
-					mail_8bit_header=FALSE;
+					mail_8bit_header = FALSE;
 				break;
 			}
-			if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset))) {
+
+			if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset)))
 				break;
-			}
-			if (match_string (buf, "motd_file_info=", motd_file_info, sizeof (motd_file_info))) {
+
+			if (match_string (buf, "motd_file_info=", motd_file_info, sizeof (motd_file_info)))
 				break;
-			}
-			if (match_boolean (buf, "mark_saved_read=", &mark_saved_read)) {
+			if (match_boolean (buf, "mark_saved_read=", &mark_saved_read))
 				break;
-			}
-			if (match_string (buf, "mail_address=", mail_address, sizeof (mail_address))) {
+
+			if (match_string (buf, "mail_address=", mail_address, sizeof (mail_address)))
 				break;
-			}
-			if (match_string (buf, "mail_quote_format=", mail_quote_format, sizeof (mail_quote_format))) {
+
+			if (match_string (buf, "mail_quote_format=", mail_quote_format, sizeof (mail_quote_format)))
 				break;
-			}
+
 			break;
 
 		case 'n':
@@ -399,52 +393,62 @@ read_config_file (
 				break;
 			}
 			/* pick which news headers to display */
-			if (match_string(buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
-				news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
+			if (match_string(buf, "news_headers_to_display=", 
+								  news_headers_to_display, 
+								  sizeof (news_headers_to_display))) {
+				news_headers_to_display_array 
+					= ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 				break;
 			}
-			/* pick which news headers to NOT display -- swp */
-			if (match_string(buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
-				news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
+			/* pick which news headers to NOT display */
+			if (match_string(buf, "news_headers_to_not_display=",
+								  news_headers_to_not_display,
+								  sizeof (news_headers_to_not_display))) {
+				news_headers_to_not_display_array 
+					= ulBuildArgv(news_headers_to_not_display,
+									  &num_headers_to_not_display);
 				break;
 			}
-			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format))) {
+
+			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format)))
 				break;
-			}
-			if (match_boolean (buf, "no_advertising=", &no_advertising)) {
+
+			if (match_boolean (buf, "advertising=", &advertising))
 				break;
-			}
+
 			break;
 
 		case 'p':
-			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding)) {
+			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding))
 				break;
-			}
+
 			/* option to toggle 8bit char. in header of news message */
 			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
 				if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit))
-					post_8bit_header=FALSE;
+					post_8bit_header = FALSE;
 				break;
 			}
-			if (match_boolean (buf, "print_header=", &print_header)) {
+
+			if (match_boolean (buf, "print_header=", &print_header))
 				break;
-			}
-			if (match_boolean (buf, "pos_first_unread=", &pos_first_unread)) {
+
+			if (match_boolean (buf, "pos_first_unread=", &pos_first_unread))
 				break;
-			}
+
 			if (match_integer (buf, "post_process_type=", &default_post_proc_type, POST_PROC_UUD_EXT_ZIP)) {
 				proc_ch_default = get_post_proc_type (default_post_proc_type);
 				break;
 			}
-			if (match_string (buf, "post_process_command=", post_proc_command, sizeof(post_proc_command))) {
+
+			if (match_string (buf, "post_process_command=", post_proc_command, sizeof(post_proc_command)))
 				break;
-			}
-			if (match_boolean (buf, "process_only_unread=", &process_only_unread)) {
+
+			if (match_boolean (buf, "process_only_unread=", &process_only_unread))
 				break;
-			}
-			if (match_boolean (buf, "prompt_followupto=", &prompt_followupto)) {
+
+			if (match_boolean (buf, "prompt_followupto=", &prompt_followupto))
 				break;
-			}
+
 			break;
 
 		case 'q':
@@ -452,72 +456,73 @@ read_config_file (
 				quote_dash_to_space (quote_chars);
 				break;
 			}
-			if (match_boolean (buf, "quote_empty_lines=", &quote_empty_lines)) {
+
+			if (match_boolean (buf, "quote_empty_lines=", &quote_empty_lines))
 				break;
-			}
-			if (match_boolean (buf, "quote_signatures=", &quote_signatures)) {
+
+			if (match_boolean (buf, "quote_signatures=", &quote_signatures))
 				break;
-			}
+
 			break;
 
 		case 'r':
-			if (match_integer (buf, "reread_active_file_secs=", &reread_active_file_secs, 10000)) {
+			if (match_integer (buf, "reread_active_file_secs=", &reread_active_file_secs, 10000))
 				break;
-			}
+
 			break;
 
 		case 's':
-			if (match_boolean (buf, "sigdashes=", &sigdashes)) {
+			if (match_boolean (buf, "sigdashes=", &sigdashes))
 				break;
-			}
-			if (match_boolean (buf, "signature_repost=", &signature_repost)) {
+
+			if (match_boolean (buf, "signature_repost=", &signature_repost))
 				break;
-			}
-			if (match_boolean (buf, "start_editor_offset=", &start_editor_offset)) {
+
+			if (match_boolean (buf, "start_editor_offset=", &start_editor_offset))
 				break;
-			}
-			if (match_boolean (buf, "show_only_unread_groups=", &show_only_unread_groups)) {
+
+			if (match_boolean (buf, "show_only_unread_groups=", &show_only_unread_groups))
 				break;
-			}
-			if (match_boolean (buf, "show_only_unread=", &default_show_only_unread)) {
+
+			if (match_boolean (buf, "show_only_unread=", &default_show_only_unread))
 				break;
-			}
-			if (match_boolean (buf, "show_description=", &show_description)) {
+
+			if (match_boolean (buf, "show_description=", &show_description))
 				break;
-			}
-			if (match_integer (buf, "show_author=", &default_show_author, SHOW_FROM_BOTH)) {
+
+			if (match_integer (buf, "show_author=", &default_show_author, SHOW_FROM_BOTH))
 				break;
-			}
-			if (match_integer (buf, "sort_article_type=", &default_sort_art_type, SORT_BY_DATE_ASCEND)) {
+
+			if (match_integer (buf, "sort_article_type=", &default_sort_art_type, SORT_BY_SCORE_ASCEND))
 				break;
-			}
-			if (match_boolean (buf, "show_last_line_prev_page=", &show_last_line_prev_page)) {
+
+			if (match_boolean (buf, "show_last_line_prev_page=", &show_last_line_prev_page))
 				break;
-			}
-			if (match_boolean (buf, "show_lines=" , &show_lines)) {
+
+			if (match_boolean (buf, "show_lines=" , &show_lines))
 				break;
-			}
-			if (match_boolean (buf, "show_signatures=", &show_signatures)) {
+
+			if (match_boolean (buf, "show_signatures=", &show_signatures))
 				break;
-			}
-			if (match_boolean (buf, "save_to_mmdf_mailbox=", &save_to_mmdf_mailbox)) {
+
+			if (match_boolean (buf, "save_to_mmdf_mailbox=", &save_to_mmdf_mailbox))
 				break;
-			}
-			if (match_boolean (buf, "strip_blanks=", &strip_blanks)) {
+
+			if (match_boolean (buf, "strip_blanks=", &strip_blanks))
 				break;
-			}
-			if (match_integer (buf, "strip_bogus=", &strip_bogus, BOGUS_ASK)) {
+
+			if (match_integer (buf, "strip_bogus=", &strip_bogus, BOGUS_ASK))
 				break;
-			}
-			if (match_boolean (buf, "strip_newsrc=", &strip_newsrc)) {
+
+			if (match_boolean (buf, "strip_newsrc=", &strip_newsrc))
 				break;
-			}
-			if (match_boolean (buf, "show_xcommentto=", &show_xcommentto)) {
+
+			if (match_boolean (buf, "show_xcommentto=", &show_xcommentto))
 				 break;
-			}
-			if (match_boolean (buf, "space_goto_next_unread=", &space_goto_next_unread)) {
+
+			if (match_boolean (buf, "space_goto_next_unread=", &space_goto_next_unread))
 				break;
-			}
+
 			break;
 
 		case 't':
@@ -527,40 +532,43 @@ read_config_file (
 					default_thread_arts = THREAD_MAX;
 				break;
 			}
-			if (match_boolean (buf, "tab_after_X_selection=", &tab_after_X_selection)) {
+
+			if (match_boolean (buf, "tab_after_X_selection=", &tab_after_X_selection))
 				break;
-			}
-			if (match_boolean (buf, "tab_goto_next_unread=", &tab_goto_next_unread)) {
+
+			if (match_boolean (buf, "tab_goto_next_unread=", &tab_goto_next_unread))
 				break;
-			}
-			if (match_boolean (buf, "thread_catchup_on_exit=", &thread_catchup_on_exit)) {
+
+			if (match_boolean (buf, "thread_catchup_on_exit=", &thread_catchup_on_exit))
 				break;
-			}
+
 			break;
 
 		case 'u':
-			if (match_boolean (buf, "unlink_article=", &unlink_article)) {
+			if (match_boolean (buf, "unlink_article=", &unlink_article))
 				break;
-			}
-			if (match_boolean (buf, "use_builtin_inews=", &use_builtin_inews)) {
+
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+			if (match_boolean (buf, "use_builtin_inews=", &use_builtin_inews))
 				break;
-			}
-			if (match_boolean (buf, "use_mailreader_i=", &use_mailreader_i)) {
+#endif
+
+			if (match_boolean (buf, "use_mailreader_i=", &use_mailreader_i))
 				break;
-			}
-			if (match_boolean (buf, "use_mouse=", &use_mouse)) {
+
+			if (match_boolean (buf, "use_mouse=", &use_mouse))
 				break;
-			}
+
 #ifdef HAVE_KEYPAD
-			if (match_boolean (buf, "use_keypad=", &use_keypad)) {
+			if (match_boolean (buf, "use_keypad=", &use_keypad))
 				break;
-			}
 #endif
+
 #ifdef HAVE_METAMAIL
-			if (match_boolean (buf, "use_metamail=", &use_metamail)) {
+			if (match_boolean (buf, "use_metamail=", &use_metamail))
 				break;
-			}
 #endif
+
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "use_color=", &use_color_tinrc)) {
 				use_color=use_color_tinrc;
@@ -570,26 +578,28 @@ read_config_file (
 			break;
 		case 'w':
 #ifdef HAVE_REGEX_FUNCS
-			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) {
+			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) { /* FIXME - TRUE+1 is not defined! */
 				wildcard_func = (wildcard) ? match_regex : wildmat;
 				break;
 			}
 #endif
+
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "word_highlight=", &word_highlight_tinrc)) {
 				word_highlight=word_highlight_tinrc;
 				break;
 			}
-			if (match_integer (buf, "word_h_display_marks=", &word_h_display_marks, MAX_MARK)) {
+
+			if (match_integer (buf, "word_h_display_marks=", &word_h_display_marks, MAX_MARK))
 				 break;
-			}
 #endif
+
 			break;
 
 		case 'x':
-			if (match_string (buf, "xpost_quote_format=", xpost_quote_format, sizeof (xpost_quote_format))) {
+			if (match_string (buf, "xpost_quote_format=", xpost_quote_format, sizeof (xpost_quote_format)))
 				break;
-			}
+
 			break;
 
 		default:
@@ -603,19 +613,16 @@ read_config_file (
 	 */
 
 	/* nobody likes to navigate blind */
-	if (!(draw_arrow_mark || inverse_okay)) {
+	if (!(draw_arrow_mark || inverse_okay))
 		draw_arrow_mark = TRUE;
-	}
 #if 0
 	/* with invers video bar strip tailing blanks looks ugly */
-	if (!draw_arrow_mark && strip_blanks) {
+	if (!draw_arrow_mark && strip_blanks)
 		strip_blanks = FALSE;
-	}
 #endif
 
-	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
-		wait_message ("\n");
-	}
+	if (INTERACTIVE2)
+		wait_message (0, "\n");
 
 	return TRUE;
 }
@@ -635,7 +642,7 @@ write_config_file (
 
 	/* alloc memory for tmp-filename */
 	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
-		wait_message (txt_out_of_memory2);
+		wait_message (0, txt_out_of_memory2);
 		return;
 	}
 	/* generate tmp-filename */
@@ -649,13 +656,12 @@ write_config_file (
 		return;
 	}
 
-	if (!cmd_line) {
-		wait_message (txt_saving);
-	}
+	if (!cmd_line)
+		wait_message (0, txt_saving);
 
-	if (!default_editor_format[0]) {
+	if (!default_editor_format[0])
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
-	}
+
 	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE);
 
 	fprintf (fp, txt_tinrc_default_savedir);
@@ -734,14 +740,14 @@ write_config_file (
 	fprintf (fp, txt_tinrc_news_headers_to_display);
 	fprintf (fp, "news_headers_to_display=");
 	for (i=0; i<num_headers_to_display; i++) {
-		fprintf (fp, " %s",news_headers_to_display_array[i]);
+		fprintf (fp, "%s ",news_headers_to_display_array[i]);
 	}
 	fprintf (fp, "\n\n");
 
 	fprintf (fp, txt_tinrc_news_headers_to_not_display);
 	fprintf (fp, "news_headers_to_not_display=");
 	for (i=0; i<num_headers_to_not_display; i++) {
-		fprintf (fp, " %s",news_headers_to_not_display_array[i]);
+		fprintf (fp, "%s ",news_headers_to_not_display_array[i]);
 	}
 	fprintf (fp, "\n\n");
 
@@ -756,9 +762,6 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_show_xcommentto);
 	fprintf (fp, "show_xcommentto=%s\n\n", print_boolean(show_xcommentto));
-
-	fprintf (fp, txt_tinrc_highlight_xcommentto);
-	fprintf (fp, "highlight_xcommentto=%s\n\n", print_boolean(highlight_xcommentto));
 
 	fprintf (fp, txt_tinrc_print_header);
 	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));
@@ -804,8 +807,8 @@ write_config_file (
 	fprintf (fp, txt_tinrc_signature_repost);
 	fprintf (fp, "signature_repost=%s\n\n", print_boolean (signature_repost));
 
-	fprintf (fp, txt_tinrc_no_advertising);
-	fprintf (fp, "no_advertising=%s\n\n", print_boolean (no_advertising));
+	fprintf (fp, txt_tinrc_advertising);
+	fprintf (fp, "advertising=%s\n\n", print_boolean (advertising));
 
 	fprintf (fp, txt_tinrc_reread_active_file_secs);
 	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
@@ -851,8 +854,10 @@ write_config_file (
 	fprintf (fp, txt_tinrc_force_screen_redraw);
 	fprintf (fp, "force_screen_redraw=%s\n\n", print_boolean (force_screen_redraw));
 
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	fprintf (fp, txt_tinrc_use_builtin_inews);
 	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
+#endif
 
 	fprintf (fp, txt_tinrc_auto_list_thread);
 	fprintf (fp, "auto_list_thread=%s\n\n", print_boolean (auto_list_thread));
@@ -966,12 +971,15 @@ write_config_file (
 	fprintf (fp, txt_tinrc_display_mime_header_asis);
 	fprintf (fp, "display_mime_header_asis=%s\n\n", print_boolean(display_mime_header_asis));
 
-#ifdef HAVE_METAMAIL
- 	fprintf (fp, txt_tinrc_use_metamail);
- 	fprintf (fp, "use_metamail=%s\n\n", print_boolean (use_metamail));
+	fprintf (fp, txt_tinrc_display_mime_allheader_asis);
+	fprintf (fp, "display_mime_allheader_asis=%s\n\n", print_boolean(display_mime_allheader_asis));
 
- 	fprintf (fp, txt_tinrc_ask_for_metamail);
- 	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
+#ifdef HAVE_METAMAIL
+	fprintf (fp, txt_tinrc_use_metamail);
+	fprintf (fp, "use_metamail=%s\n\n", print_boolean (use_metamail));
+
+	fprintf (fp, txt_tinrc_ask_for_metamail);
+	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
 
 #ifdef HAVE_KEYPAD
@@ -979,15 +987,15 @@ write_config_file (
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
 #endif
 
- 	fprintf (fp, txt_tinrc_alternative_handling);
+	fprintf (fp, txt_tinrc_alternative_handling);
 	fprintf (fp, "alternative_handling=%s\n\n", print_boolean (alternative_handling));
- 	fprintf (fp, txt_tinrc_strip_newsrc);
+	fprintf (fp, txt_tinrc_strip_newsrc);
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
- 	fprintf (fp, txt_tinrc_strip_bogus);
+	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
 
 #ifdef HAVE_REGEX_FUNCS
- 	fprintf (fp, txt_tinrc_wildcard);
+	fprintf (fp, txt_tinrc_wildcard);
 	fprintf (fp, "wildcard=%d\n\n", wildcard);
 #endif
 
@@ -1005,6 +1013,7 @@ write_config_file (
 	fprintf (fp, "default_save_mode=%c\n", default_save_mode);
 	fprintf (fp, "default_author_search=%s\n", default_author_search);
 	fprintf (fp, "default_goto_group=%s\n", default_goto_group);
+	fprintf (fp, "default_config_search=%s\n", default_config_search);
 	fprintf (fp, "default_group_search=%s\n", default_group_search);
 	fprintf (fp, "default_subject_search=%s\n", default_subject_search);
 	fprintf (fp, "default_art_search=%s\n", default_art_search);
@@ -1338,9 +1347,9 @@ change_config_file (
 			case iKeyPageDown3:
 				unhighlight_option (option);
 				first_option_on_screen += option_lines_per_page;
-				if (first_option_on_screen > LAST_OPT) {
+				if (first_option_on_screen > LAST_OPT)
 					first_option_on_screen = 0;
-				}
+
 				option = first_option_on_screen;
 				highlight_option (option);
 				break;
@@ -1355,6 +1364,16 @@ change_config_file (
 					break;
 				}
 				highlight_option (option);
+				break;
+
+			case iKeySearchSubjF:
+			case iKeySearchSubjB:
+				old_option = option;
+				option = search_config(ch == iKeySearchSubjF, option, LAST_OPT);
+				if (option != old_option) {
+					unhighlight_option (old_option);
+					highlight_option (option);
+				} 	
 				break;
 
 			case iKeyConfigSelect:
@@ -1399,15 +1418,13 @@ change_config_file (
 								find_base (group);
 								if (space_mode) {
 									for (i = 0; i < top_base; i++) {
-										if (new_responses (i)) {
+										if (new_responses (i))
 											break;
-										}
 									}
-									if (i < top_base) {
+									if (i < top_base)
 										index_point = i;
-									} else {
+									else
 										index_point = top_base - 1;
-									}
 								} else {
 									index_point = top_base - 1;
 								}
@@ -1417,7 +1434,7 @@ change_config_file (
 						/* draw -> / highlighted bar */
 						case OPT_DRAW_ARROW_MARK:
 							unhighlight_option (option);
-							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
+							if (!draw_arrow_mark && !inverse_okay) {
 								inverse_okay = TRUE;
 								RepaintOption(OPT_INVERSE_OKAY);
 							}
@@ -1425,9 +1442,9 @@ change_config_file (
 
 						/* draw inversed screen header lines */
 						/* draw inversed group/article/option line if draw_arrow_mark is OFF */
- 	   					case OPT_INVERSE_OKAY:
+						case OPT_INVERSE_OKAY:
 							unhighlight_option (option);
-							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
+							if (!draw_arrow_mark && !inverse_okay) {
 								draw_arrow_mark = TRUE;	/* we don't want to navigate blindly */
 								RepaintOption(OPT_DRAW_ARROW_MARK);
 							}
@@ -1479,7 +1496,6 @@ change_config_file (
 						 * case OPT_FORCE_SCREEN_REDRAW:
 						 * case OPT_FULL_PAGE_SCROLL:
 						 * case OPT_GROUP_CATCHUP_ON_EXIT:
-						 * case OPT_HIGHLIGHT_XCOMMENTTO:
 						 * case OPT_KEEP_POSTED_ARTICLES:
 						 * case OPT_MARK_SAVED_READ:
 						 * case OPT_NO_ADVERTISING:
@@ -1499,10 +1515,13 @@ change_config_file (
 						 * case OPT_TAB_GOTO_NEXT_UNREAD:
 						 * case OPT_THREAD_CATCHUP_ON_EXIT:
 						 * case OPT_UNLINK_ARTICLE:
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 						 * case OPT_USE_BUILTIN_INEWS:
+#endif
 						 * case OPT_USE_MAILREADER_I:
 						 * case OPT_USE_MOUSE:
 						 * case OPT_DISPLAY_MIME_HEADER_ASIS:
+						 * case OPT_DISPLAY_MIME_ALLHEADER_ASIS:
 #ifdef HAVE_KEYPAD
 						 * case OPT_USE_KEYPAD:
 #endif
@@ -1556,9 +1575,8 @@ change_config_file (
 							break;
 
 						case OPT_DEFAULT_SHOW_AUTHOR:
-							if (group != (struct t_group *) 0) {
+							if (group != (struct t_group *) 0)
 								group->attribute->show_author = default_show_author;
-							}
 							break;
 
 #ifdef HAVE_REGEX_FUNCS
@@ -1611,6 +1629,25 @@ change_config_file (
 						case OPT_XPOST_QUOTE_FORMAT:
 						case OPT_MAIL_ADDRESS:
 							prompt_option_string (option);
+							break;
+
+						case OPT_NEWS_HEADERS_TO_DISPLAY:
+							prompt_option_string (option);
+							free (*news_headers_to_display_array);
+							free (news_headers_to_display_array);
+							news_headers_to_display_array 
+								= ulBuildArgv(news_headers_to_display, 
+												  &num_headers_to_display);
+							break;
+
+
+						case OPT_NEWS_HEADERS_TO_NOT_DISPLAY:
+							prompt_option_string (option);
+							free (*news_headers_to_not_display_array);
+							free (news_headers_to_not_display_array);
+							news_headers_to_not_display_array 
+								= ulBuildArgv(news_headers_to_not_display,
+												  &num_headers_to_not_display);
 							break;
 
 						case OPT_DEFAULT_MAILDIR:
@@ -1872,9 +1909,9 @@ match_string (
 	if (STRNCMPEQ(line, pat, patlen)) {
 		strncpy (dst, &line[patlen], dstlen);
 		ptr = strrchr (dst, '\n');
-		if (ptr != (char *) 0) {
+		if (ptr != (char *) 0)
 			*ptr = '\0';
-		}
+
 		return TRUE;
 	}
 	return FALSE;
@@ -1899,9 +1936,8 @@ quote_dash_to_space (
 	char *ptr;
 
 	for (ptr = str; *ptr; ptr++) {
-		if (*ptr == '_') {
+		if (*ptr == '_')
 			*ptr = ' ';
-		}
 	}
 }
 
@@ -1918,11 +1954,10 @@ quote_space_to_dash (
 
 	dst = buf;
 	for (ptr = str; *ptr; ptr++) {
-		if (*ptr == ' ') {
+		if (*ptr == ' ')
 			*dst = '_';
-		} else {
+		else
 			*dst = *ptr;
-		}
 		dst++;
 	}
 	*dst = '\0';
@@ -1971,7 +2006,7 @@ show_config_page (void)
  * Watch out for the frees! You must free(*argv) and then free(argv)! NOTHING
  *   ELSE!! Do _NOT_ free the individual args of argv.
  */
-static char **
+extern char **
 ulBuildArgv(
 	char *cmd,
 	int *new_argc)
@@ -1985,7 +2020,8 @@ ulBuildArgv(
 		return (NULL);
 	}
 
-	for(tmp=cmd; isspace (*tmp); tmp++);
+	for(tmp=cmd; isspace (*tmp); tmp++)
+		;
 	buf = my_strdup(tmp);
 	if (!buf) {
 		*new_argc = 0;

@@ -34,11 +34,12 @@
 	default_thread_arts		txt_thread	THREAD_MAX+1
 	show_description		OPT_ON_OFF
 	default_show_author		txt_show_from	SHOW_FROM_BOTH+1
-	default_sort_art_type		txt_sort_type	SORT_BY_DATE_ASCEND+1
+	news_headers_to_display		OPT_STRING
+	news_headers_to_not_display	OPT_STRING
+	default_sort_art_type		txt_sort_type	SORT_BY_SCORE_ASCEND+1
 	default_maildir			OPT_STRING
 	save_to_mmdf_mailbox		OPT_ON_OFF
 	show_xcommentto			OPT_ON_OFF
-	highlight_xcommentto		OPT_ON_OFF
 	print_header			OPT_ON_OFF
 	default_printer			OPT_STRING
 	default_batch_save		OPT_ON_OFF
@@ -55,7 +56,7 @@
 	default_sigfile			OPT_STRING
 	sigdashes			OPT_ON_OFF
 	signature_repost		OPT_ON_OFF
-	no_advertising			OPT_ON_OFF
+	advertising			OPT_ON_OFF
 	reread_active_file_secs		OPT_NUM
 	quote_chars			OPT_STRING
 	quote_empty_lines		OPT_ON_OFF
@@ -72,7 +73,9 @@
 	art_marked_selected		OPT_CHAR
 	art_marked_unread		OPT_CHAR
 	force_screen_redraw		OPT_ON_OFF
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	use_builtin_inews		OPT_ON_OFF
+#endif
 	auto_list_thread		OPT_ON_OFF
 	use_mouse			OPT_ON_OFF
 	strip_blanks			OPT_ON_OFF
@@ -91,6 +94,7 @@
 	col_message			txt_colors	MAX_COLOR+1
 	col_quote			txt_colors	MAX_COLOR+1
 	col_head			txt_colors	MAX_COLOR+1
+	col_newsheaders			txt_colors	MAX_COLOR+1
 	col_subject			txt_colors	MAX_COLOR+1
 	col_response			txt_colors	MAX_COLOR+1
 	col_from			txt_colors	MAX_COLOR+1
@@ -108,6 +112,7 @@
 	mail_mime_encoding		txt_mime_types	NUM_MIME_TYPES
 	mail_8bit_header		OPT_ON_OFF
 	display_mime_header_asis	OPT_ON_OFF
+	display_mime_allheader_asis	OPT_ON_OFF
 #ifdef	HAVE_METAMAIL
 	use_metamail			OPT_ON_OFF
 	ask_for_metamail		OPT_ON_OFF
@@ -115,7 +120,6 @@
 #ifdef	HAVE_KEYPAD
 	use_keypad			OPT_ON_OFF
 #endif
-
 	alternative_handling		OPT_ON_OFF
 	strip_newsrc			OPT_ON_OFF
 	strip_bogus			txt_strip_bogus BOGUS_ASK+1
@@ -123,4 +127,3 @@
 	wildcard			txt_wildcard	2
 #endif
 	cache_overview_files		OPT_ON_OFF
-

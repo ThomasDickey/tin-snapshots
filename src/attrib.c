@@ -53,8 +53,8 @@
 #define	ATTRIB_QUOTE_CHARS		31
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 #ifndef INDEX_DAEMON
 	static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
 	static void set_attrib_num (int type, char *scope, int num);
@@ -77,24 +77,20 @@ static void
 set_default_attributes (
 	struct t_attribute *psAttrib)
 {
-
 	psAttrib->global = FALSE;	/* global/group specific */
 	psAttrib->maildir = default_maildir;
 	psAttrib->savedir = default_savedir;
 	psAttrib->savefile = (char *) 0;
 	psAttrib->sigfile = default_sigfile;
-	psAttrib->organization =
-		(default_organization ? default_organization : (char *) 0);
+	psAttrib->organization = (default_organization ? default_organization : (char *) 0);
 	psAttrib->from = (char *) 0;
 	psAttrib->followup_to = (char *) 0;
 	psAttrib->printer = default_printer;
-	psAttrib->quick_kill_scope =
-		(default_filter_kill_global ? my_strdup("*") : (char *) 0);
+	psAttrib->quick_kill_scope = (default_filter_kill_global ? my_strdup("*") : (char *) 0);
 	psAttrib->quick_kill_header = default_filter_kill_header;
 	psAttrib->quick_kill_case = default_filter_kill_case;
 	psAttrib->quick_kill_expire = default_filter_kill_expire;
-	psAttrib->quick_select_scope =
-		(default_filter_select_global ? my_strdup("*") : (char *) 0);
+	psAttrib->quick_select_scope = (default_filter_select_global ? my_strdup("*") : (char *) 0);
 	psAttrib->quick_select_header = default_filter_select_header;
 	psAttrib->quick_select_case = default_filter_select_case;
 	psAttrib->quick_select_expire = default_filter_select_expire;
@@ -114,7 +110,6 @@ set_default_attributes (
 	psAttrib->x_comment_to = FALSE;
 	psAttrib->news_quote_format = news_quote_format;
 	psAttrib->quote_chars = quote_chars;
-
 }
 #endif	/* INDEX_DAEMON */
 
@@ -142,6 +137,7 @@ set_default_attributes (
  *    0=none, 1=subj descend, 2=subj ascend
  *    3=from descend, 4=from ascend
  *    5=date descend, 6=date ascend
+ *    7=score descend, 8=score ascend
  *  attribute.post_proc_type   = NUM
  *    0=none, 1=unshar, 2=uudecode
  *    3=uudecode & list zoo (unix) / lha (AmigaDOS) archive
@@ -168,6 +164,7 @@ set_default_attributes (
  *  attribute.news_quote_format = STRING
  *  attribute.quote_chars = STRING
  */
+
 #define MATCH_BOOLEAN(pattern, type) \
 	if (match_boolean (line, pattern, &flag)) { \
 		set_attrib_num (type, scope, flag != FALSE); \
@@ -191,7 +188,6 @@ read_attributes_file (
 	int	global_file)
 {
 #ifndef INDEX_DAEMON
-
 	char buf[LEN];
 	char line[LEN];
 	char scope[LEN];
@@ -209,19 +205,14 @@ read_attributes_file (
 	}
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
-		if (SHOW_UPDATE) {
-			if (global_file) {
-				wait_message (txt_reading_global_attributes_file);
-			} else {
-				wait_message (txt_reading_attributes_file);
-			}
-		}
+		if (INTERACTIVE)
+			wait_message (0, txt_reading_attributes_file, (global_file) ? "global " : "");
 
 		scope[0] = '\0';
 		while (fgets (line, sizeof (line), fp) != (char *) 0) {
-			if (line[0] == '#' || line[0] == '\n') {
+			if (line[0] == '#' || line[0] == '\n')
 				continue;
-			}
+
 			switch(tolower((unsigned char)line[0])) {
 			case 'a':
 				MATCH_BOOLEAN (
@@ -322,16 +313,16 @@ read_attributes_file (
 				MATCH_STRING (
 					"sigfile=",
 					ATTRIB_SIGFILE);
-				if (match_string (line, "scope=", scope, sizeof (scope))) {
+				if (match_string (line, "scope=", scope, sizeof (scope)))
 					break;
-				}
+
 				MATCH_BOOLEAN (
 					"show_only_unread=",
 					ATTRIB_SHOW_ONLY_UNREAD);
 				MATCH_INTEGER (
 					"sort_art_type=",
 					ATTRIB_SORT_ART_TYPE,
-					SORT_BY_DATE_ASCEND);
+					SORT_BY_SCORE_ASCEND);
 				MATCH_INTEGER (
 					"show_author=",
 					ATTRIB_SHOW_AUTHOR,
@@ -366,16 +357,14 @@ read_attributes_file (
 	 */
 	if (!global_file) {
 		for (i = 0; i < num_active ; i++) {
-			if (active[i].attribute == (struct t_attribute *) 0) {
+			if (active[i].attribute == (struct t_attribute *) 0)
 				active[i].attribute = &glob_attributes;
-			}
 		}
 	}
 /* debug_print_filter_attributes(); */
 
-	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
-		wait_message ("\n");
-	}
+	if (INTERACTIVE2)
+		wait_message (0, "\n");
 
 #endif	/* INDEX_DAEMON */
 }
@@ -398,9 +387,10 @@ set_attrib_str (
 		if (!strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
-if (debug) {
+#ifdef DEBUG
+if (debug)
 	my_printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
-}
+#endif
 				set_attrib (psGrp, type, str, -1);
 			}
 		} else {
@@ -408,9 +398,10 @@ if (debug) {
 				psGrp = &active[i];
 /* TODO can we use match_group_list() here for better effect ? */
 				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
-if (debug) {
+#ifdef DEBUG
+if (debug)
 	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
-}
+#endif
 					set_attrib (psGrp, type, str, -1);
 				}
 			}
@@ -437,9 +428,10 @@ set_attrib_num (
 		if (!strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
-if (debug) {
+#ifdef DEBUG
+if (debug)
 	my_printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
-}
+#endif
 				set_attrib (psGrp, type, "", num);
 			}
 		} else {
@@ -447,9 +439,10 @@ if (debug) {
 				psGrp = &active[i];
 /* TODO use match_group_list() here too ? */
 				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
-if (debug) {
+#ifdef DEBUG
+if (debug)
 	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
-}
+#endif
 					set_attrib (psGrp, type, "", num);
 				}
 			}
@@ -471,8 +464,7 @@ set_attrib (
 	 * Setup attributes for this group
 	 */
 	if (psGrp->attribute == (struct t_attribute *) 0) {
-		psGrp->attribute =
-			(struct t_attribute *) my_malloc (sizeof (struct t_attribute));
+		psGrp->attribute = (struct t_attribute *) my_malloc (sizeof (struct t_attribute));
 		set_default_attributes (psGrp->attribute);
 	}
 
@@ -601,7 +593,7 @@ write_attributes_file (
 
 	/* alloc memory for tmp-filename */
 	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
-		wait_message (txt_out_of_memory2);
+		wait_message (2, txt_out_of_memory2);
 		return;
 	}
 	/* generate tmp-filename */
@@ -615,8 +607,8 @@ write_attributes_file (
 		return;
 	}
 
-	if (!cmd_line && SHOW_UPDATE)
-		wait_message (txt_writing_attributes_file);
+	if (!cmd_line && INTERACTIVE)
+		wait_message (0, txt_writing_attributes_file);
 
 	fprintf (fp, "# Group attributes file for the TIN newsreader\n#\n");
 	fprintf (fp, "#  scope=STRING (ie. alt.sources or *sources*) [mandatory]\n#\n");
@@ -642,6 +634,7 @@ write_attributes_file (
 	fprintf (fp, "#    0=none, 1=subj descend, 2=subj ascend,\n");
 	fprintf (fp, "#    3=from descend, 4=from ascend,\n");
 	fprintf (fp, "#    5=date descend, 6=date ascend\n#\n");
+	fprintf (fp, "#    7=score descend, 8=score ascend\n#\n");
 	fprintf (fp, "#  post_proc_type=NUM\n");
 	fprintf (fp, "#    0=none, 1=unshar, 2=uudecode,\n");
 #ifdef M_AMIGA
@@ -744,6 +737,7 @@ write_attributes_file (
 			quote_space_to_dash (psGrp->attribute->quote_chars));
 	}
 #endif /* 0 */
+
 	if (ferror (fp) | fclose (fp)){
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
 		/* free memory for tmp-filename */

@@ -26,15 +26,15 @@ int yank_in_active_file = TRUE;
 
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 #ifndef INDEX_DAEMON
 static int next_unread_group (int enter_group);
 static int prompt_group_num (int ch);
 static int reposition_group (struct t_group *group, int default_num);
 static void catchup_group (struct t_group *group, int goto_next_unread_group);
-static void goto_next_group_on_screen (void);
 static void yank_active_file (void);
+static void subscribe_pattern (const char *prompt, const char *message, const char *result, t_bool state);
 #endif
 
 static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
@@ -54,7 +54,6 @@ selection_index (
 	int INDEX_BOTTOM;
 	int posted_flag;
 	int scroll_lines;
-	int subscribe_num;
 
 	cur_groupnum = start_groupnum;
 
@@ -68,7 +67,7 @@ selection_index (
 	set_alarm_signal ();		/* set alarm signal for resync_active_file () */
 
 	/*
-	 * If user specified on cmd line only 1 groupname (eg. tin alt.sources)
+	 * If user specified only 1 cmd line groupname (eg. tin alt.sources)
 	 * then enter the group immediately.  Don't scream at the use of a goto.
 	 */
 	if (num_cmd_line_groups == 1) {
@@ -162,42 +161,19 @@ selection_index (
 
 			case iKeyFirstPage:	/* show first page of groups */
 top_of_list:
-				if (group_top == 0) {
-					break;
-				}
-				if (cur_groupnum != 0) {
-					if (0 < first_group_on_screen) {
-						erase_group_arrow ();
-						cur_groupnum = 0;
-						show_selection_page ();
-					} else {
-						erase_group_arrow ();
-						cur_groupnum = 0;
-						draw_group_arrow ();
-					}
-				}
+				if (group_top)
+					move_to_group(0);
 				break;
 
 			case iKeyLastPage:	/* show last page of groups */
 end_of_list:
-				if (group_top == 0) {
-					break;
-				}
-				if (cur_groupnum != group_top - 1) {
-					erase_group_arrow();
-					cur_groupnum = group_top - 1;
-
-					if (group_top - 1 >= last_group_on_screen)
-						show_selection_page();
-					else
-						draw_group_arrow();
-				}
+				if (group_top)
+					move_to_group(group_top - 1);
 				break;
 
 			case iKeySetRange:	/* set range */
-				if (iSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1)) {
-						show_selection_page ();
-				}
+				if (iSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1))
+					show_selection_page ();
 				break;
 
 			case iKeySearchSubjF:	/* search forward */
@@ -209,7 +185,7 @@ end_of_list:
 			case iKeySelectReadGrp:	/* go into group */
 			case iKeySelectReadGrp2:
 select_read_group:
-				if (group_top == 0) {
+				if (!group_top) {
 					info_message (txt_no_groups);
 					break;
 				}
@@ -220,23 +196,21 @@ select_read_group:
 				}
 
 				n = my_group[cur_groupnum];
-				if (active[n].xmin <= active[n].xmax) {
+				if (active[n].xmax > 0 && (active[n].xmin <= active[n].xmax)) {
 					space_mode = pos_first_unread;
 					clear_message ();
 					do {
 						index_point = GRP_UNINDEXED;
 						group_page (&CURR_GROUP);
 					} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
-					if (index_point == GRP_QUIT) {
+					if (index_point == GRP_QUIT)
 						goto select_done;
-					}
 #ifndef DONT_REREAD_ACTIVE_FILE
 					if (!reread_active_file)
 #endif
 						show_selection_page ();
-				} else {
+				} else
 					info_message (txt_no_arts);
-				}
 				break;
 
 			case iKeyPageDown3:
@@ -245,27 +219,17 @@ select_read_group:
 				/* FALLTHROUGH */
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
-				if (next_unread_group (TRUE) == GRP_QUIT) {
+				if (next_unread_group (TRUE) == GRP_QUIT)
 					goto select_done;
-				}
 				break;
 
 			case iKeyPageDown:		/* page down */
 			case iKeyPageDown2:
 select_page_down:
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
 				if (cur_groupnum == group_top - 1) {
-					if (0 < first_group_on_screen) {
-						erase_group_arrow();
-						cur_groupnum = 0;
-						show_selection_page();
-					} else {
-						erase_group_arrow();
-						cur_groupnum = 0;
-						draw_group_arrow();
-					}
+					move_to_group(0);
 					break;
 				}
 				erase_group_arrow ();
@@ -273,9 +237,8 @@ select_page_down:
 				cur_groupnum = ((cur_groupnum + scroll_lines) / scroll_lines) * scroll_lines;
 				if (cur_groupnum >= group_top) {
 					cur_groupnum = (group_top / scroll_lines) * scroll_lines;
-					if (cur_groupnum < group_top - 1) {
+					if (cur_groupnum < group_top - 1)
 						cur_groupnum = group_top - 1;
-					}
 				}
 
 				if (cur_groupnum <= first_group_on_screen
@@ -294,59 +257,25 @@ select_page_down:
 			case iKeyDown:		/* line down */
 			case iKeyDown2:
 select_down:
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
-				if (cur_groupnum + 1 >= group_top) {
-					if (0 < first_group_on_screen) {
-						erase_group_arrow();
-						cur_groupnum = 0;
-						show_selection_page();
-					} else {
-						erase_group_arrow();
-						cur_groupnum = 0;
-						draw_group_arrow();
-					}
-					break;
-				}
-				if (cur_groupnum + 1 >= last_group_on_screen) {
-					erase_group_arrow();
-					cur_groupnum++;
-					show_selection_page();
-				} else {
-					erase_group_arrow();
-					cur_groupnum++;
-					draw_group_arrow();
-				}
+
+				if (cur_groupnum + 1 >= group_top)
+					move_to_group(0);
+				else
+					move_to_group(cur_groupnum + 1);
 				break;
 
 			case iKeyUp:		/* line up */
 			case iKeyUp2:
 select_up:
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
-				if (cur_groupnum == 0) {
-					HpGlitch(erase_group_arrow ());
-					if (group_top > last_group_on_screen) {
-						cur_groupnum = group_top - 1;
-						show_selection_page ();
-					} else {
-						erase_group_arrow ();
-						cur_groupnum = group_top - 1;
-						draw_group_arrow ();
-					}
-					break;
-				}
-				HpGlitch(erase_group_arrow ());
-				if (cur_groupnum <= first_group_on_screen) {
-					cur_groupnum--;
-					show_selection_page ();
-				} else {
-					erase_group_arrow ();
-					cur_groupnum--;
-					draw_group_arrow ();
-				}
+
+				if (cur_groupnum == 0)
+					move_to_group (group_top - 1);
+				else
+					move_to_group (cur_groupnum - 1);
 				break;
 
 			case iKeySelectResetNewsrc:	/* reset .newsrc */
@@ -362,33 +291,21 @@ select_up:
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 select_page_up:
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
 				if (cur_groupnum == 0) {
-					HpGlitch(erase_group_arrow ());
-					if (group_top > last_group_on_screen) {
-						cur_groupnum = group_top - 1;
-						show_selection_page ();
-					} else {
-						erase_group_arrow ();
-						cur_groupnum = group_top - 1;
-						draw_group_arrow ();
-					}
+					move_to_group (group_top - 1);
 					break;
 				}
 				erase_group_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = cur_groupnum % scroll_lines) > 0) {
+				if ((n = cur_groupnum % scroll_lines) > 0)
 					cur_groupnum = cur_groupnum - n;
-				} else {
+				else
 					cur_groupnum = ((cur_groupnum - scroll_lines) / scroll_lines) * scroll_lines;
-				}
-				if (cur_groupnum < 0) {
+				if (cur_groupnum < 0)
 					cur_groupnum = 0;
-				}
-				if (cur_groupnum < first_group_on_screen
-				||  cur_groupnum >= last_group_on_screen)
+				if (cur_groupnum < first_group_on_screen ||  cur_groupnum >= last_group_on_screen)
 					show_selection_page ();
 				else
 					draw_group_arrow ();
@@ -396,17 +313,15 @@ select_page_up:
 
 			case iKeySelectCatchup:	/* catchup - mark all articles as read */
 			case iKeySelectCatchupGotoNext:	/* and goto next unread group */
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
 				catchup_group (&CURR_GROUP, (ch == iKeySelectCatchupGotoNext));
 				break;
 
 			case iKeySelectToggleSubjDisplay:	/* toggle newsgroup descriptions */
 				show_description = !show_description;
-				if (show_description) {
+				if (show_description)
 					read_newsgroups_file ();
-				}
 				set_groupname_len (FALSE);
 				show_selection_page ();
 				break;
@@ -453,32 +368,34 @@ select_page_up:
 #endif
 
 			case iKeySelectDisplayGroupInfo:	/* display group description */
-				if (group_top == 0) {
+				if (!group_top)
 					info_message (txt_no_groups);
-				} else {
-					info_message (
-						(CURR_GROUP.description ?  CURR_GROUP.description :
-					 	"*** No description ***"));
+				else {
+					clear_message ();
+					center_line (cLINES, FALSE, CURR_GROUP.description ?  CURR_GROUP.description : txt_no_description);
 				}
 				break;
 
 			case iKeySelectMoveGrp:	/* reposition group within group list */
-				if (CURR_GROUP.subscribed) {
-					n = cur_groupnum;
-					cur_groupnum = reposition_group (&active[my_group[n]], n);
-					HpGlitch(erase_group_arrow ());
-					if (cur_groupnum < first_group_on_screen ||
-						cur_groupnum >= last_group_on_screen ||
-						cur_groupnum != n) {
-						show_selection_page ();
-					} else {
-						i = cur_groupnum;
-						cur_groupnum = n;
-						erase_group_arrow ();
-						cur_groupnum = i;
-						clear_message ();
-						draw_group_arrow ();
-					}
+				if (!CURR_GROUP.subscribed) {
+					wait_message(0, txt_info_not_subscribed);
+					break;
+				}
+
+				n = cur_groupnum;
+				cur_groupnum = reposition_group (&active[my_group[n]], n);
+				HpGlitch(erase_group_arrow ());
+				if (cur_groupnum < first_group_on_screen ||
+					cur_groupnum >= last_group_on_screen ||
+					cur_groupnum != n) {
+					show_selection_page ();
+				} else {
+					i = cur_groupnum;
+					cur_groupnum = n;
+					erase_group_arrow ();
+					cur_groupnum = i;
+					clear_message ();
+					draw_group_arrow ();
 				}
 				break;
 
@@ -494,9 +411,8 @@ select_page_up:
 				break;
 
 			case iKeySelectNextUnreadGrp:	/* goto next unread group */
-				if (next_unread_group (FALSE) == GRP_QUIT) {
+				if (next_unread_group (FALSE) == GRP_QUIT)
 					goto select_done;
-				}
 				break;
 
 			case iKeyQuit:	/* quit */
@@ -518,9 +434,8 @@ select_done:
 				break;
 
 			case iKeySelectQuitNoWrite:	/* quit, but don't save configuration */
-				if (prompt_yn (cLINES, txt_quit_no_write, TRUE) == 1) {
+				if (prompt_yn (cLINES, txt_quit_no_write, TRUE) == 1)
 					tin_done (EXIT_OK);
-				}
 				show_selection_page ();
 				break;
 
@@ -530,11 +445,8 @@ select_done:
 	 			 * all subscribed to groups and only groups
 	 			 * that contain unread articles
 	 			 */
- 				show_only_unread_groups = !show_only_unread_groups;
-				if (show_only_unread_groups)
-					wait_message (txt_reading_new_groups);
-				else
-					wait_message (txt_reading_all_groups);
+				show_only_unread_groups = !show_only_unread_groups;
+				wait_message (0, txt_reading_groups, (show_only_unread_groups) ? "unread" : "all");
 
 				toggle_my_groups (show_only_unread_groups, "");
 				set_groupname_len (FALSE);
@@ -548,75 +460,30 @@ select_done:
 				break;
 
 			case iKeySelectSubscribe:	/* subscribe to current group */
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
 				if (!CURR_GROUP.subscribed && !CURR_GROUP.bogus) {
 					subscribe (&CURR_GROUP, SUBSCRIBED);
 					show_selection_page();
-					sprintf (buf, txt_subscribed_to, CURR_GROUP.name);
-					info_message (buf);
+					info_message (txt_subscribed_to, CURR_GROUP.name);
 				}
 				break;
 
 			case iKeySelectSubscribePat:	/* subscribe to groups matching pattern */
-/* TODO this should be combined with UnsubPat - they are almost identical */
-				/* If no groups in active[] then break otherwise loop thru looking
-				   for matches. If found and group is not subscribed add it to end
-				   of my_group[]. */
-				if (num_active == 0) {
-					break;
-				}
-				if (prompt_string (txt_subscribe_pattern, buf, HIST_OTHER) && buf[0]) {
-					wait_message (txt_subscribing);
-					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
-/* TODO use match_group_list() here ? */
-						if (GROUP_MATCH (active[my_group[i]].name, buf, TRUE)) {
-			   		 		if (!active[my_group[i]].subscribed) {
-								spin_cursor ();
-								subscribe (&active[my_group[i]], SUBSCRIBED);
-								subscribe_num++;
-							}
-						}
-					}
-					if (num_active > group_top) {
-						for (i=0 ; i < num_active ; i++) {
-							if (GROUP_MATCH (active[i].name, buf, TRUE)) {
-				   		 		if (!active[i].subscribed) {
-									spin_cursor ();
-									subscribe (&active[i], SUBSCRIBED);
-									(void) my_group_add (active[i].name);
-									grp_mark_unread (&active[i]);
-									subscribe_num++;
-								}
-							}
-						}
-					}
-					if (subscribe_num) {
-						toggle_my_groups (show_only_unread_groups, "");
-						set_groupname_len (FALSE);
-						show_selection_page ();
-						sprintf (buf, txt_subscribed_num_groups, subscribe_num);
-						info_message (buf);
-					} else {
-						info_message (txt_no_match);
-					}
-				} else {
-					clear_message ();
-				}
+				subscribe_pattern (txt_subscribe_pattern,
+								txt_subscribing, txt_subscribed_num_groups, TRUE);
 				break;
 
 			case iKeySelectUnsubscribe:	/* unsubscribe to current group */
-				if (group_top == 0)
+				if (!group_top)
 					break;
 
 				if (CURR_GROUP.subscribed) {
 					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
 											2, CURR_GROUP.newgroup ? "N" : "u");
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
-					sprintf(buf, txt_unsubscribed_to, CURR_GROUP.name);
-					info_message(buf);
-					goto_next_group_on_screen ();
+					info_message(txt_unsubscribed_to, CURR_GROUP.name);
+					move_to_group (cur_groupnum + 1);
 				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
@@ -629,43 +496,8 @@ select_done:
 				break;
 
 			case iKeySelectUnsubscribePat:	/* unsubscribe to groups matching pattern */
-				if (num_active == 0) {
-					break;
-				}
-				if (prompt_string (txt_unsubscribe_pattern, buf, HIST_OTHER) && buf[0]) {
-					wait_message (txt_unsubscribing);
-					for (subscribe_num=0, i=0 ; i < group_top ; i++) {
-						if (GROUP_MATCH (active[my_group[i]].name, buf, TRUE)) {
-			   		 		if (active[my_group[i]].subscribed) {
-								spin_cursor ();
-								subscribe (&active[my_group[i]], UNSUBSCRIBED);
-								subscribe_num++;
-							}
-						}
-					}
-					if (num_active > group_top) {
-						for (i=0 ; i < num_active ; i++) {
-							if (GROUP_MATCH (active[i].name, buf, TRUE)) {
-				   		 		if (active[i].subscribed) {
-									spin_cursor ();
-									subscribe (&active[i], UNSUBSCRIBED);
-									subscribe_num++;
-								}
-							}
-						}
-					}
-					if (subscribe_num) {
-						toggle_my_groups (show_only_unread_groups, "");
-						set_groupname_len (FALSE);
-						show_selection_page ();
-						sprintf (buf, txt_unsubscribed_num_groups, subscribe_num);
-						info_message (buf);
-					} else {
-						info_message (txt_no_match);
-					}
-				} else {
-					clear_message ();
-				}
+				subscribe_pattern (txt_unsubscribe_pattern,
+								txt_unsubscribing, txt_unsubscribed_num_groups, FALSE);
 				break;
 
 			case iKeyVersion:	/* show tin version */
@@ -674,7 +506,7 @@ select_done:
 
 			case iKeySelectPost:	/* post a basenote */
 				if (can_post) {
-					if (group_top == 0) {
+					if (!group_top) {
 						if (!prompt_string (txt_post_newsgroup, buf, HIST_POST_NEWSGROUPS))
 							break;
 						if (buf[0] == '\0')
@@ -713,7 +545,7 @@ select_done:
 
 			case iKeySelectYankActive:	/* pull in rest of groups from active */
 				if (yank_in_active_file) {
-					wait_message (txt_yanking_all_groups);
+					wait_message (0, txt_yanking_all_groups);
 					set_alarm_clock_off ();
 					n = group_top;
 					if (group_top) {
@@ -733,11 +565,11 @@ select_done:
 					 * If there are now more groups than before, we did yank something
 					 */
 					if (n < group_top) {
-						if (n) {
+						if (n) {				/* Keep us positioned on the group we were before */
 							cur_groupnum = my_group_add (buf);
 						}
 						sprintf (buf, txt_added_groups, group_top - n,
-							group_top - n == 1 ? "" : txt_plural);
+							(group_top - n) == 1 ? "" : txt_plural);
 						set_groupname_len (yank_in_active_file);
 						show_selection_page ();
 						info_message (buf);
@@ -745,8 +577,8 @@ select_done:
 						info_message (txt_no_groups_to_yank_in);
 					}
 					yank_in_active_file = FALSE;
-				} else {
-					wait_message (txt_yanking_sub_groups);
+				} else {												/* Yank out */
+					wait_message (0, txt_yanking_sub_groups);
 					vWriteNewsrc ();
 					toggle_my_groups(show_only_unread_groups, "");
 					HpGlitch(erase_group_arrow ());
@@ -763,9 +595,8 @@ select_done:
 				break;
 
 			case iKeySelectMarkGrpUnread:	/* mark group unread */
-				if (group_top == 0) {
+				if (!group_top)
 					break;
-				}
 				grp_mark_unread (&CURR_GROUP);
 				if (CURR_GROUP.newsrc.num_unread) {
 					strcpy (msg, tin_itoa(CURR_GROUP.newsrc.num_unread, 5));
@@ -847,16 +678,16 @@ show_selection_page (void)
 		}
 	}
 
-	if (group_top == 0) {
+	if (!group_top) {
 		first_group_on_screen = 0;
 		last_group_on_screen = 0;
 	}
 
 	if (show_description) {
 		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 2;
- 	} else {
+	} else {
 		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 4;
- 	}
+	}
 
 	for (j=0, i=first_group_on_screen; i < last_group_on_screen; i++, j++) {
 #if USE_CURSES
@@ -868,15 +699,24 @@ show_selection_page (void)
 			strcpy (new, "    #");
 		} else if (active[my_group[i]].newsrc.num_unread) {
 			strcpy (new, tin_itoa(active[my_group[i]].newsrc.num_unread, 5));
- 		} else {
- 			strcpy (new, "     ");
- 		}
+		} else {
+			strcpy (new, "     ");
+		}
 
 		n = my_group[i];
-		if (active[n].bogus)		/* Group is not in active list */
+
+		/*
+	 	 * Display a flag for this group if needed
+		 * . Bogus groups are dumped immediately
+		 * . Normal subscribed groups may be
+		 *   ' ' normal, 'X' not postable, 'M' moderated, '=' renamed
+		 * . Newgroups are 'N'
+		 * . Unsubscribed groups are 'u'
+		 */
+		if (active[n].bogus)					/* Group is not in active list */
 			subs = 'D';
-		else if (active[n].subscribed)	/* Important that this preceeds Newgroup */
-			subs = ' ';
+		else if (active[n].subscribed)			/* Important that this preceeds Newgroup */
+			subs = group_flag (active[n].moderated);
 		else if (active[n].newgroup)
 			subs = 'N';		/* New (but unsubscribed) group */
 		else
@@ -904,21 +744,17 @@ show_selection_page (void)
 				         (groupname_len+blank_len), active[n].name);
 			}
 		} else {
-			if (draw_arrow_mark) {
- 				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF,
-				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name);
-			} else {
- 				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF,
-				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name,
- 					 blank_len, " ");
-			}
- 		}
- 		if (strip_blanks) {
+			if (draw_arrow_mark)
+				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF, subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name);
+			else
+				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF, subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name, blank_len, " ");
+		}
+		if (strip_blanks) {
 			strip_line (sptr);
 			strcat (sptr, cCRLF);
 		}
- 		CleartoEOLN ();
- 		my_fputs (sptr, stdout);
+		CleartoEOLN ();
+		my_fputs (sptr, stdout);
 	}
 
 	CleartoEOS ();
@@ -1022,20 +858,20 @@ choose_new_group (void)
 		}
 	}
 
-	for (p = buf; *p && (*p == ' ' || *p == '\t'); p++) {
+	/*
+	 * Skip leading whitespace, ignore blank strings
+	 */
+	for (p = buf; *p && (*p == ' ' || *p == '\t'); p++)
 		continue;
-	}
-	if (*p == '\0') {
+
+	if (*p == '\0')
 		return -1;
-	}
 
 	clear_message ();
 
 	idx = my_group_add (p);
-	if (idx == -1) {
-		sprintf (msg, txt_not_in_active_file, p);
-		info_message (msg);
-	}
+	if (idx == -1)
+		info_message (txt_not_in_active_file, p);
 
 	return idx;
 }
@@ -1104,24 +940,21 @@ reposition_group (
 	}
 
 	if (strlen (pos)) {
-		if (pos[0] == '$') {
+		if (pos[0] == '$')
 			pos_num = group_top;
-		} else {
+		else
 			pos_num = atoi (pos);
-		}
 	} else {
-		if (default_move_group) {
+		if (default_move_group)
 			pos_num = default_move_group;
-		} else {
+		else
 			return default_num;
-		}
 	}
 
-	if (pos_num > group_top) {
+	if (pos_num > group_top)
 		pos_num = group_top;
-	} else if (pos_num <= 0) {
+	else if (pos_num <= 0)
 		pos_num = 1;
-	}
 
 	newgroups = skip_newgroups();
 
@@ -1129,12 +962,11 @@ reposition_group (
 	 * Can't move into newgroups, they aren't in .newsrc
 	 */
 	if (pos_num <= newgroups) {
-		error_message(txt_skipping_newgroups, "");
+		error_message(txt_skipping_newgroups);
 		return(default_num);
 	}
 
-	sprintf (buf, txt_moving, group->name);
-	wait_message (buf);
+	wait_message (0, txt_moving, group->name);
 
 	/*
 	 * seems to have the side effect of rearranging
@@ -1164,15 +996,14 @@ catchup_group (
 	struct t_group *group,
 	int goto_next_unread_group)
 {
-	sprintf (msg, txt_mark_group_read, group->name);
-
-	if (!confirm_action || prompt_yn (cLINES, msg, TRUE) == 1) {
+	if (!confirm_action || prompt_yn (cLINES,
+					sized_message(txt_mark_group_read, group->name), TRUE) == 1) {
 		grp_mark_read (group, NULL);
 
 		mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
 			9, "     ");
 
-		goto_next_group_on_screen ();
+		move_to_group(cur_groupnum + 1);
 
 		if (goto_next_unread_group) {
 			next_unread_group (FALSE);
@@ -1367,22 +1198,69 @@ toggle_my_groups (
 }
 
 
-#ifndef INDEX_DAEMON
+/*
+ * Subscribe or unsubscribe from a list of groups. List can be full list as supported
+ * by match_group_list()
+ */
 static void
-goto_next_group_on_screen (void)
+subscribe_pattern (
+	const char *prompt,
+	const char *message,
+	const char *result,
+	t_bool state)
 {
-	HpGlitch(erase_group_arrow ());
+	char buf[LEN];
+	int i, subscribe_num;
 
-	if (cur_groupnum+1 < last_group_on_screen) {
-		erase_group_arrow ();
-		cur_groupnum++;
-		draw_group_arrow ();
-	} else {
-		cur_groupnum++;
-		show_selection_page ();
+	if (!num_active)
+		return;
+
+	if (!prompt_string (prompt, buf, HIST_OTHER) || !buf[0]) {
+		clear_message ();
+		return;
 	}
+
+	wait_message (0, message);
+
+	/* TODO - so why precisely do we have these 2 separate passes ? */
+
+	for (subscribe_num=0, i=0 ; i < group_top ; i++) {
+		if (match_group_list (active[my_group[i]].name, buf)) {
+			if (active[my_group[i]].subscribed != (state != FALSE)) {
+				spin_cursor ();
+				subscribe (&active[my_group[i]], SUB_CHAR(state));
+				subscribe_num++;
+			}
+		}
+	}
+
+	if (num_active > group_top) {
+		for (i=0 ; i < num_active ; i++) {
+			if (match_group_list (active[i].name, buf)) {
+				if (active[i].subscribed != (state != FALSE)) {
+					spin_cursor ();
+					/* If found and group is not subscribed add it to end of my_group[]. */
+					subscribe (&active[i], SUB_CHAR(state));
+					if (state) {
+						my_group_add (active[i].name);
+/* TODO grp_mark_unread() or something needs to do a GrpGetArtInfo to get initial count right */
+						grp_mark_unread (&active[i]);
+					}
+					subscribe_num++;
+				}
+			}
+		}
+	}
+
+	if (subscribe_num) {
+		toggle_my_groups (show_only_unread_groups, "");
+		set_groupname_len (FALSE);
+		show_selection_page ();
+		info_message (result, subscribe_num);
+	} else
+		info_message (txt_no_match);
 }
-#endif	/* INDEX_DAEMON */
+
 
 /*
  * Strip trailing blanks, \r and \n
@@ -1394,9 +1272,9 @@ strip_line (
 {
 	char *ptr = line + strlen(line) - 1;
 
-	while ((ptr >= line) && (*ptr == ' ' || *ptr == '\r' || *ptr == '\n')) {
+	while ((ptr >= line) && (*ptr == ' ' || *ptr == '\r' || *ptr == '\n'))
 		ptr--;
-	}
+
 	*++ptr = '\0';
 }
 
@@ -1441,24 +1319,21 @@ iSetRange (
 			return iRetCode;
 	}
 /*
-	sprintf (acRng, "Min=[%d] Max=[%d] Cur=[%d] DefRng=[%s]",
+	error_message ("Min=[%d] Max=[%d] Cur=[%d] DefRng=[%s]",
 		iNumMin, iNumMax, iNumCur, pcPtr);
-	error_message (acRng, "");
 */
 	sprintf (msg, txt_enter_range, pcPtr);
 
-	if (!prompt_string (msg, acRng, HIST_OTHER)) {
+	if (!prompt_string (msg, acRng, HIST_OTHER))
 		return iRetCode;
-	}
 
-	if (strlen (acRng)) {
+	if (strlen (acRng))
 		strcpy (pcPtr, acRng);
-	} else {
-		if (*pcPtr) {
+	else {
+		if (*pcPtr)
 			strcpy (acRng, pcPtr);
-		} else {
+		else 
 			return iRetCode;
-		}
 	}
 
 	/*
@@ -1468,33 +1343,29 @@ iSetRange (
 		info_message ("Invalid range - valid are '0-9.$' eg. 1-$");
 	} else {
 /*
-		sprintf (msg, "DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]",
+		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]",
 			pcPtr, acRng, iRngMin, iRngMax);
-		info_message (msg);
 */
 		iRetCode = TRUE;
 		switch (iLevel)
 		{
 			case SELECT_LEVEL:
 				vDelRange (iLevel, iNumMax);
-				for (iIndex = iRngMin-1; iIndex < iRngMax; iIndex++) {
+				for (iIndex = iRngMin-1; iIndex < iRngMax; iIndex++)
 					active[my_group[iIndex]].inrange = TRUE;
-				}
 				break;
 			case GROUP_LEVEL:
 				vDelRange (iLevel, iNumMax);
 				for (iIndex = iRngMin-1; iIndex < iRngMax; iIndex++) {
-					for (iNum = (int) base[iIndex] ; iNum != -1 ; iNum = arts[iNum].thread) {
+					for (iNum = (int) base[iIndex] ; iNum != -1 ; iNum = arts[iNum].thread)
 						arts[iNum].inrange = TRUE;
-					}
 				}
 				break;
 			case THREAD_LEVEL:
 				vDelRange (iLevel, group_top);
 				for (iNum = 0, iIndex = base[thread_basenote]; iIndex >= 0 ; iIndex = arts[iIndex].thread, iNum++) {
-					if (iNum >= iRngMin && iNum <= iRngMax) {
+					if (iNum >= iRngMin && iNum <= iRngMax)
 						arts[iIndex].inrange = TRUE;
-					}
 				}
 				break;
 			default:
@@ -1605,3 +1476,27 @@ vDelRange (
 			break;
 	}
 }
+
+
+#ifndef INDEX_DAEMON
+/*
+ * Move the on-screen pointer & internal variable to the given group
+ */
+void
+move_to_group(
+	int n)
+{
+	if (cur_groupnum == n)
+		return;
+
+	HpGlitch(erase_group_arrow ());
+	erase_group_arrow ();
+	cur_groupnum = n;
+
+	if (n >= first_group_on_screen && n < last_group_on_screen)
+		draw_group_arrow ();
+	else
+		show_selection_page ();
+}
+
+#endif /* INDEX_DAEMON */

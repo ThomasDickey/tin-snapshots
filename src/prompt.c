@@ -12,6 +12,8 @@
  *              right notice, and it must be included in any copy made
  */
 
+#include	<stdarg.h>
+
 #include	"tin.h"
 #include	"tcurses.h"
 #include	"extern.h"
@@ -40,9 +42,8 @@ prompt_num (
 	if ((p = getline (prompt, TRUE, msg, 0, HIST_OTHER)) != (char *) 0) {
 		strcpy (msg, p);
 		num = atoi (msg);
-	} else {
+	} else
 		num = -1;
-	}
 
 	clear_message ();
 
@@ -99,6 +100,13 @@ prompt_menu_string (
 
 	set_alarm_clock_off ();
 
+	/*
+	 * clear buffer - this is needed, otherwise a lost
+	 * connection right before a resync_active() call
+	 * would lead to a 'n' answer to the reconect prompt
+	 */
+	fflush(stdin);
+
 	MoveCursor (line, col);
 
 	if ((p = getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0) {
@@ -130,13 +138,7 @@ prompt_yn (
 	int yn_loop = TRUE;
 
 	set_alarm_clock_off ();
-
-	/*
-	 * clear buffer - this is needed, otherwise a lost
-	 * connection right before a resync_active() call
-	 * would lead to a 'n' answer to the reconect prompt
-	 */
-	fflush(stdin);
+/*	fflush(stdin);*/		/* Prevent finger trouble from making important decisions */
 
 	while (yn_loop) {
 		prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
@@ -148,9 +150,9 @@ prompt_yn (
 		my_flush ();
 		MoveCursor (line, (int) strlen (prompt));
 
-		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
+		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r'))
 			ch = prompt_ch;
-		}
+
 		yn_loop = FALSE; /* normal case: leave loop */
 
 		switch (ch) {
@@ -185,15 +187,14 @@ prompt_yn (
 		}
 	}
 
-	if (line == cLINES) {
+	if (line == cLINES)
 		clear_message ();
-	} else {
+	else {
 		MoveCursor (line, (int) strlen (prompt));
-		if (ch == ESC) {
+		if (ch == ESC)
 			my_fputc (prompt_ch, stdout);
-		} else {
+		else
 			my_fputc (ch, stdout);
-		}
 	}
 	cursoroff ();
 	my_flush ();
@@ -224,8 +225,8 @@ prompt_list (
 {
 	int ch, var_orig;
 	int i;
-	size_t width = 0;
 	int adjust = (strcasecmp(list[0], txt_default) == 0);
+	size_t width = 0;
 
 	set_alarm_clock_off ();
 
@@ -351,9 +352,9 @@ prompt_option_num (
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
 	sprintf (&number[0], "%d", *(option_table[option].variable));
 
-	if ((p = getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0) {
+	if ((p = getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
-	}
+
 	strcpy (number, p);
 	num = atoi (number);
 	*(option_table[option].variable) = num;
@@ -405,35 +406,58 @@ prompt_option_char (
 	return TRUE;
 }
 
-
-void
-prompt_1 (
+/*
+ * Format a message such that it'll fit within the screen width
+ * Useful for fitting long Subjects and newsgroup names into prompts
+ * TODO - maybe add a '...' to the string to show it was truncated. See center_line()
+ */
+char *
+sized_message(
 	const char *format,
-	int ch_default)
+	const char *subject)
 {
-	sprintf (msg, "%s%c", format, ch_default);
-	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (format));
-}
-
-
-void
-prompt_2(
-	const char *format,
-	const char *subject,
-	int ch_default)
-{
-	int have = cCOLS - strlen (format) + 4;
+	/* The formatting info (%.*s) wastes 4 chars, but our prompt needs 1 char */
+	int have = cCOLS - strlen (format) + 4 - 1;
 	int want = strlen(subject);
 
 	if (want > 0 && subject[want-1] == '\n')
 		want--;
 	if (have > want)
 		have = want;
-	sprintf (msg, format, have, subject, ch_default);
+	sprintf (msg, format, have, subject);
+	return(msg);
+}
 
-	wait_message (msg);
-	MoveCursor (cLINES, (int) strlen (msg) - 1);
+/*
+ * Implement the Single-Letter-Key mini menus at the bottom of the screen
+ * eg, Press a)ppend, o)verwrite, q)uit :
+ */
+int
+prompt_slk_response(
+	int ch_default,
+	const char *responses,
+	const char *fmt, ...)
+{
+	va_list ap;
+	char ch;
+	char buf[LEN];
+
+	va_start (ap, fmt);
+	vsprintf(buf, fmt, ap);	/* We need to do this, else wait_message() will clobber us */
+	va_end (ap);
+
+	do {
+		wait_message (0, "%s%c", buf, ch_default);
+
+		/* Get the cursor _just_ right */
+		MoveCursor (cLINES, (int) strlen (buf));
+
+		if ((ch = ReadCh ()) == '\r' || ch == '\n')
+			ch = ch_default;
+
+	} while (!strchr (responses, ch));
+
+	return(ch);
 }
 
 /*
@@ -462,10 +486,11 @@ continue_prompt (void)
 		case KEY_PREFIX:
 #endif
 			(void) get_arrow_key(ch);
+		/* FALLTHROUGH */
 		default:
 			break;
 	}
-#endif /* WIN32 */
+#endif /* !WIN32 */
 
 #if USE_CURSES
 	cmd_line = FALSE;

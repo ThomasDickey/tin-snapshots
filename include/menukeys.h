@@ -231,7 +231,7 @@
 #ifdef HAVE_PGP
 #	define iKeyPagePGPCheckArticle ctrl('G')
 #endif
-#define iKeyPageDisplayHeaders ctrl('H')
+#define iKeyPageToggleHeaders ctrl('H')
 #define iKeyPageNextUnread '\t'
 #define iKeyPageNextThd '\n'
 #define iKeyPageAutoKill ctrl('K')

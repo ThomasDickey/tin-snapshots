@@ -40,22 +40,22 @@ int	iRecursive;
 int	iVerbose;
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static void vAppendGrpLine (char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir);
 static void vInitVariables (void);
 static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
 
 #ifdef ACTIVE_DAEMON
-static void vReadCmdLineOptions (int iNumArgs, char *pacArgs[]);
-static void vPrintUsage (char *pcProgName);
-static void vUpdateActiveFile (char *pcActiveFile, char *pcDir);
-static void vParseGrpLine (char *pcLine, char *pcGrpName, long *plArtMax, long *plArtMin, char *pcModerated);
+	static void vReadCmdLineOptions (int iNumArgs, char *pacArgs[]);
+	static void vPrintUsage (char *pcProgName);
+	static void vUpdateActiveFile (char *pcActiveFile, char *pcDir);
+	static void vParseGrpLine (char *pcLine, char *pcGrpName, long *plArtMax, long *plArtMin, char *pcModerated);
 #endif /* ACTIVE_DAEMON */
 
 #ifndef M_AMIGA
-struct	passwd *psPwd;
-struct	passwd sPwd;
+	struct	passwd *psPwd;
+	struct	passwd sPwd;
 #endif
 
 #ifdef ACTIVE_DAEMON
@@ -104,56 +104,53 @@ vParseGrpLine (
 	*pcGrpName = '\0';
 	*pcModerated = '\0';
 
-	if (*pcLine == '#' || *pcLine == '\n') {
+	if (*pcLine == '#' || *pcLine == '\n')
 		return;
-	}
 
 	pcPtr = strrchr (pcLine, '\n');
-	if (pcPtr != (char *) 0) {
+	if (pcPtr != (char *) 0)
 		*pcPtr = '\0';
-	}
 
 	/*
 	 * Group name
 	 */
 	pcPtr = pcLine;
-	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t')
 		pcPtr++;
-	}
+
 	*pcPtr++ = '\0';
 	strcpy (pcGrpName, pcLine);
 
 	/*
 	 * Art max
 	 */
-	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t'))
 		pcPtr++;
-	}
+
 	*plArtMax = atol (pcPtr);
 
 	/*
 	 * Art min
 	 */
-	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t')
 		pcPtr++;
-	}
-	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t'))
 		pcPtr++;
-	}
+
 	*plArtMin = atol (pcPtr);
 
 	/*
 	 * 4th field (Moderated/base maildir)
 	 */
-	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t')
 		pcPtr++;
-	}
-	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t'))
 		pcPtr++;
-	}
+
 	strcpy (pcModerated, pcPtr);
 }
-
 #endif	/* ACTIVE_DAEMON */
 
 
@@ -181,12 +178,12 @@ vInitVariables (void)
 
 #ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
-	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr)) {
+	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr))
 		psPwd = getpwnam (pcPtr);
-	}
-	if (psPwd == (struct passwd *) 0) {
+
+	if (psPwd == (struct passwd *) 0)
 		psPwd = getpwuid (getuid ());
-	}
+
 	if (psPwd != (struct passwd *) 0) {
 		memcpy (&sPwd, psPwd, sizeof (struct passwd));
 		psPwd = &sPwd;
@@ -341,12 +338,11 @@ vMakeGrpList (
 	long	lArtMin;
 	struct	stat sStatInfo;
 
-if (iVerbose) {
-my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
-}
-	if (access (pcGrpPath, R_OK) != 0) {
+	if (iVerbose)
+		my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
+
+	if (access (pcGrpPath, R_OK) != 0)
 		return;
-	}
 
 	tDirFile = opendir (pcGrpPath);
 
@@ -368,26 +364,23 @@ my_printf ("STAT=[%s]\n", acPath);
 			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
 				if (stat (acPath, &sStatInfo) != -1) {
-					if (S_ISDIR(sStatInfo.st_mode)) {
+					if (S_ISDIR(sStatInfo.st_mode))
 						iIsDir = TRUE;
-					}
 				}
 			}
 			if (iIsDir) {
 				iIsDir = FALSE;
 				strcpy (pcGrpPath, acPath);
-				if (iVerbose) {
+				if (iVerbose)
 					my_printf ("Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
-				}
 
 				vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath);
 				vFindArtMaxMin (pcGrpPath, &lArtMax, &lArtMin);
 				vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir);
 
 				pcPtr = strrchr (pcGrpPath, '/');
-				if (pcPtr != (char *) 0) {
+				if (pcPtr != (char *) 0)
 					*pcPtr = '\0';
-				}
 			}
 		}
 		closedir (tDirFile);
@@ -405,9 +398,8 @@ vAppendGrpLine (
 	char	acGrpName[PATH_LEN];
 	FILE	*hFp;
 
-	if (!iAllGrps && (lArtMax == 0 && lArtMin == 1)) {
+	if (!iAllGrps && (lArtMax == 0 && lArtMin == 1))
 		return;
-	}
 
 	if ((hFp = fopen (pcActiveFile, "a+")) != (FILE *) 0) {
 		vMakeGrpName (pcBaseDir, acGrpName, pcGrpPath);

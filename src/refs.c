@@ -49,6 +49,11 @@ static void dump_thread (FILE *fp, struct t_msgid *msgid, int level);
 #endif /* 0 */
 
 /*
+ * Set if the the sorting algorithm goes 'upwards'
+ */
+t_bool sort_ascend;
+
+/*
  * The msgids are all hashed into a big array, with overspill
  */
 struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
@@ -121,23 +126,23 @@ add_to_parent(
 
 	/*
 	 * Add this followup to the sibling chain of our parent.
-	 * arts[] is already date sorted (ASCEND or DESCEND) and thus adding
-	 * at the end of the chain does what we want.
-	 * Reference data goes at the start of the chain if ASCEND (because
-	 * we presume unavailable arts have expired), otherwise at the end.
+	 * arts[] has been sorted by build_references and we add at the start or end
+	 * of the chain depending on whether the sort method is ASCEND or DESCEND
+	 * Unavailable articles go at the start of the chain if ASCEND (because
+	 * we presume unavailable arts (ie REF_REF links) have expired), otherwise at the end.
 	 * ie: if ASCEND && REF
-	 *	       add_to_start
+	 *        add_to_start
 	 *     else
 	 *        add_to_end
 	 */
-	if ((CURR_GROUP.attribute && (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND)) &&
-		(ptr->article == ART_NORMAL)) {
+	if (sort_ascend && (ptr->article == ART_UNAVAILABLE)) {
 		/* Add to start */
 		ptr->sibling = ptr->parent->child;
 		ptr->parent->child = ptr;
 	} else {
 		/* Add to end */
-		for (p = ptr->parent->child; p->sibling != NULL; p = p->sibling);
+		for (p = ptr->parent->child; p->sibling != NULL; p = p->sibling)
+			;
 
 /*		ptr->sibling is already NULL */
 		p->sibling = ptr;
@@ -178,10 +183,10 @@ add_msgid(
 	struct t_msgid *i = NULL;
 	unsigned int h;
 
- 	if (!msgid) {
- 		error_message("add_msgid: NULL msgid\n", "");
- 		exit(1);
- 	}
+	if (!msgid) {
+		error_message("add_msgid: NULL msgid\n");
+		exit(1);
+	}
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
@@ -251,7 +256,7 @@ add_msgid(
 			return(i);
 		}
 
-		error_message("Error: Impossible combination of conditions !\n", "");
+		error_message("Error: Impossible combination of conditions !\n");
 		return(i);
 	}
 
@@ -265,7 +270,7 @@ add_msgid(
 	strcpy(ptr->txt, msgid);
 	ptr->parent = newparent;
 	ptr->child = ptr->sibling = NULL;
-	ptr->article = (key == MSGID_REF ? top : ART_NORMAL);
+	ptr->article = (key == MSGID_REF ? top : ART_UNAVAILABLE);
 
 	add_to_parent(ptr);
 
@@ -512,7 +517,7 @@ clear_art_ptrs(void)
 
 	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {
 		for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next)
-			ptr->article = ART_NORMAL;
+			ptr->article = ART_UNAVAILABLE;
 	}
 }
 
@@ -538,13 +543,9 @@ dump_thread(
 	len = strlen(ptr);
 	i = cCOLS - len - 20;
 
-	if (msgid->article >= 0) {
-		sprintf(ptr+len, "%-*.*s   %-17.17s", i, i,
-				arts[msgid->article].subject,
-				(arts[msgid->article].name) ?
-					arts[msgid->article].name :
-					arts[msgid->article].from);
-	} else
+	if (msgid->article >= 0)
+		sprintf(ptr+len, "%-*.*s   %-17.17s", i, i, arts[msgid->article].subject, (arts[msgid->article].name) ? arts[msgid->article].name : arts[msgid->article].from);
+	else
 		sprintf(ptr+len, "%-*.*s", i, i, "[- Unavailable -]");
 
 	fprintf(fp, "%s\n", ptr);
@@ -619,12 +620,12 @@ dump_msgid_threads(void)
 
 #if 0
 #define SKIP_ART(ptr)	\
-	(ptr && (ptr->article == ART_NORMAL || \
-		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+	(ptr && (ptr->article == ART_UNAVAILABLE || \
+		(arts[ptr->article].thread != ART_UNAVAILABLE || arts[ptr->article].killed)))
 #endif /* 0 */
 
 #define SKIP_ART(ptr)	\
-	(ptr && (ptr->article == ART_NORMAL || arts[ptr->article].thread != ART_NORMAL))
+	(ptr && (ptr->article == ART_UNAVAILABLE || arts[ptr->article].thread != ART_UNAVAILABLE))
 
 static struct t_msgid *
 find_next(
@@ -703,7 +704,7 @@ build_thread(
 	/*
 	 * If the root article has gone, advance to the first valid one
 	 */
-	if (ptr->article == ART_NORMAL)
+	if (ptr->article == ART_UNAVAILABLE)
 		ptr = find_next(ptr);
 
 	/*
@@ -740,9 +741,8 @@ thread_by_reference(void)
 	for (i=0; i<MSGID_HASH_SIZE; i++) {
 		if (msgids[i] != NULL) {
 			for (ptr = msgids[i]; ptr!=NULL; ptr = ptr->next) {
-				if (ptr->parent == NULL) {
+				if (ptr->parent == NULL)
 					build_thread(ptr);
-				}
 			}
 		}
 	}
@@ -782,7 +782,7 @@ collate_subjects(void)
 	struct t_hashnode *h;
 
 	/*
- 	 * Run through the root messages of each thread. We have to traverse
+	 * Run through the root messages of each thread. We have to traverse
 	 * using arts[] and not msgids[] to preserve the sorting.
 	 */
 	for (i = 0; i < top; i++) {
@@ -812,7 +812,8 @@ collate_subjects(void)
 							 arts[i].archive == arts[j].archive))) {
 /*DEBUG_PRINT((dbgfd, "RES: %d is now inthread, at end of %d\n", i, j));*/
 
-				for (art = j; arts[art].thread >= 0; art = arts[art].thread);
+				for (art = j; arts[art].thread >= 0; art = arts[art].thread)
+					;
 
 				arts[art].thread = i;
 				arts[i].inthread = TRUE;
@@ -851,9 +852,16 @@ build_references(
 	struct t_article *art;
 	char *s;
 
-/* TODO - do we need this test, we may _want_ to sort on artnum for some reason */
+	/*
+	 * The articles are currently unsorted, and are as they were put by setup_hard_base()
+	 */
 	if (group->attribute && group->attribute->sort_art_type != SORT_BY_NOTHING)
 		sort_arts (group->attribute->sort_art_type);
+
+	sort_ascend = (group->attribute->sort_art_type == SORT_BY_SUBJ_ASCEND ||
+					group->attribute->sort_art_type == SORT_BY_FROM_ASCEND ||
+					group->attribute->sort_art_type == SORT_BY_DATE_ASCEND ||
+					group->attribute->sort_art_type == SORT_BY_SCORE_ASCEND);
 
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.dump", "w");

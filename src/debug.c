@@ -19,8 +19,8 @@ int debug;
 
 #ifdef DEBUG
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static void debug_print_group_hash (void);
 static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
 static void debug_print_base (void);
@@ -83,13 +83,6 @@ debug_nntp (
 }
 
 
-void
-debug_nntp_respcode (
-	int respcode)
-{
-	debug_nntp ("get_respcode", nntp_respcode (respcode));
-}
-
 /*
  *  tin specific debug routines
  */
@@ -102,9 +95,8 @@ debug_print_arts (void)
 	if (debug != 2)
 		return;
 
-	for (i = 0; i < top; i++) {	/* for each group */
+	for (i = 0; i < top; i++)	/* for each group */
 		debug_print_header (&arts[i]);
-	}
 }
 
 
@@ -131,28 +123,20 @@ debug_print_header (
 			(s->msgid ? s->msgid : ""),
 			(s->refs ? s->refs : ""));
 
-		if (s->archive) {
- 			fprintf (fp, "arch=[%-38s]  ", s->archive);
- 		} else {
- 			fprintf (fp, "arch=[]  ");
- 		}
- 		if (s->part) {
- 			fprintf (fp, "part=[%s]  ", s->part);
- 		} else {
- 			fprintf (fp, "part=[]  ");
- 		}
- 		if (s->patch) {
- 			fprintf (fp, "patch=[%s]\n", s->patch);
- 		} else {
- 			fprintf (fp, "patch=[]\n");
- 		}
-		fprintf (fp,"thread=[%d]  inthread=[%d]  status=[%d]\n\n",
-			s->thread, s->inthread, s->status);
-/*		fprintf (fp,"thread=[%s]  inthread=[%s]  status=[%s]\n",
-			(s->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"),
-			(s->inthread ? "TRUE" : "FALSE"),
-			(s->status ? "TRUE" : "FALSE"));
-*/
+		if (s->archive)
+			fprintf (fp, "arch=[%-38s]  ", s->archive);
+		else
+			fprintf (fp, "arch=[]  ");
+		if (s->part)
+			fprintf (fp, "part=[%s]  ", s->part);
+		else
+			fprintf (fp, "part=[]  ");
+		if (s->patch)
+			fprintf (fp, "patch=[%s]\n", s->patch);
+		else
+			fprintf (fp, "patch=[]\n");
+		fprintf (fp,"thread=[%d]  inthread=[%d]  status=[%d]\n\n", s->thread, s->inthread, s->status);
+/*		fprintf (fp,"thread=[%s]  inthread=[%s]  status=[%s]\n", (s->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"), (s->inthread ? "TRUE" : "FALSE"), (s->status ? "TRUE" : "FALSE")); */
 		fflush (fp);
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
@@ -177,23 +161,19 @@ debug_save_comp (void)
 
 			fprintf (fp,"subj=[%-38s]\n", save[i].subject);
 			fprintf (fp,"dir=[%s]  file=[%s]\n", save[i].dir, save[i].file);
-			if (save[i].archive) {
+			if (save[i].archive)
 				fprintf (fp, "arch=[%-38s]  ", save[i].archive);
-			} else {
+			else
 				fprintf (fp, "arch=[]  ");
-			}
-			if (save[i].part) {
+			if (save[i].part)
 				fprintf (fp, "part=[%s]  ", save[i].part);
-			} else {
+			else
 				fprintf (fp, "part=[]  ");
-			}
-			if (save[i].patch) {
+			if (save[i].patch)
 				fprintf (fp, "patch=[%s]\n", save[i].patch);
-			} else {
+			else
 				fprintf (fp, "patch=[]\n");
-			}
-			fprintf (fp,"index=[%d]  saved=[%d]  mailbox=[%d]\n\n",
-				save[i].index, save[i].saved, save[i].is_mailbox);
+			fprintf (fp,"index=[%d]  saved=[%d]  mailbox=[%d]\n\n", save[i].index, save[i].saved, save[i].is_mailbox);
 		}
 		fflush (fp);
 		fclose (fp);
@@ -215,9 +195,8 @@ debug_print_base (void)
 	sprintf (file, "%sBASE", TMPDIR);
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		for (i = 0; i < top_base; i++) {
+		for (i = 0; i < top_base; i++)
 			fprintf (fp, "base[%3d]=[%5ld]\n",i,base[i]);
-		}
 		fflush (fp);
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
@@ -313,13 +292,10 @@ vDbgPrintMalloc (
 		if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 			iTotal += iSize;
 			/* sometimes size_t is long */
-			if (iIsMalloc) {
-				fprintf (fp, "%10s:%-4d Malloc  %6ld. Total %d\n",
-					pcFile, iLine, (long)iSize, iTotal);
-			} else {
-				fprintf (fp, "%10s:%-4d Realloc %6ld. Total %d\n",
-					pcFile, iLine, (long)iSize, iTotal);
-			}
+			if (iIsMalloc)
+				fprintf (fp, "%10s:%-4d Malloc  %6ld. Total %d\n", pcFile, iLine, (long)iSize, iTotal);
+			else
+				fprintf (fp, "%10s:%-4d Realloc %6ld. Total %d\n", pcFile, iLine, (long)iSize, iTotal);
 			fclose (fp);
 			chmod (file, (S_IRUGO|S_IWUGO));
 		}
@@ -344,11 +320,8 @@ debug_print_filter (
 		(the_filter->from  ? the_filter->from  : ""),
 		(the_filter->msgid ? the_filter->msgid : ""));
 
-	if (the_filter->time) {
-		fprintf (fp, "       time=[%ld][%s",
-			the_filter->time,
-			(the_filter->time ? ctime (&the_filter->time) : "]\n"));
-	}
+	if (the_filter->time)
+		fprintf (fp, "       time=[%ld][%s", the_filter->time, (the_filter->time ? ctime (&the_filter->time) : "]\n"));
 }
 
 
@@ -375,22 +348,21 @@ debug_print_filters (void)
 		for (i=0 ; i < num ; i++) {
 			debug_print_filter (fp, i, &the_filter[i]);
 			fprintf (fp, "\n");
- 		}
+		}
 		fprintf (fp, "*** END GLOBAL FILTER ***\n");
 
-		for (j=0 ; j < num_active ; j++) {
+/*		for (j=0 ; j < num_active ; j++) {
 			if (active[j].grps_filter) {
 				num = active[j].grps_filter->num;
 				the_filter = active[j].grps_filter->filter;
 				fprintf (fp, "\n*** group=[%3d] [%s]\n", num, active[j].name);
-				for (i=0 ; i < num ; i++) {
+				for (i=0 ; i < num ; i++)
 					debug_print_filter (fp, i, &the_filter[i]);
- 				}
- 			}
- 		}
+			}
+		} */
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
- 	}
+	}
 }
 
 
@@ -405,9 +377,8 @@ debug_print_active_hash (void)
 	int collisions[32];
 	register i, j;
 
-	for (i = 0; i < 32; i++) {
+	for (i = 0; i < 32; i++)
 		collisions[i] = 0;
-	}
 
 	for (i = 0; i < TABLE_SIZE; i++) {
 /*
@@ -421,14 +392,12 @@ debug_print_active_hash (void)
 			empty++;
 		} else {
 			number = 1;
-			for (j=group_hash[i]; active[j].next >= 0; j=active[j].next) {
+			for (j=group_hash[i]; active[j].next >= 0; j=active[j].next)
 				number++;
-			}
-			if (number > 31) {
+			if (number > 31)
 				my_printf ("MEGA HASH COLLISION > 31 HASH[%d]=[%d]!!!\n", i, number);
-			} else {
+			else
 				collisions[number]++;
-			}
 		}
 	}
 
@@ -437,9 +406,8 @@ debug_print_active_hash (void)
 	my_printf ("01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32\n");
 	my_printf ("-----------------------------------------------------------------------------------------------\n");
 	for (i = 0; i < 32; i++) {
-		if (i) {
+		if (i)
 			my_printf ("%2d ", collisions[i]);
-		}
 	}
 	my_printf ("\n");
 }
@@ -450,9 +418,8 @@ debug_print_group_hash (void)
 {
 	int i;
 
-	for (i = 0; i < TABLE_SIZE; i++) {
+	for (i = 0; i < TABLE_SIZE; i++)
 		my_printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
-	}
 }
 #endif	/* DEBUG */
 
@@ -484,9 +451,8 @@ debug_print_bitmap (
 	char file[PATH_LEN];
 	FILE *fp;
 
-	if (debug != 3) {
+	if (debug != 3)
 		return;
-	}
 
 	sprintf (file, "%sBITMAP", TMPDIR);
 
@@ -531,13 +497,11 @@ debug_print_newsrc (
 			fprintf (fp, "%d",
 				(NTEST(NewSrc->xbitmap, i - NewSrc->xmin) == ART_READ ?
 				ART_READ : ART_UNREAD));
-			if ((j++ % 8) == 7 && i < NewSrc->xmax) {
+			if ((j++ % 8) == 7 && i < NewSrc->xmax)
 				fprintf (fp, " ");
-			}
 		}
 	}
 	fprintf (fp, "]\n");
 	fflush (fp);
 }
 #endif	/* DEBUG_NEWSRC */
-

@@ -18,14 +18,11 @@
 constext txt_1_resp[] = "1 Response" cCRLF;
 constext txt_7bit[] = "7bit";
 constext txt_8bit[] = "8bit";
-constext txt_abort_indexing[] = "Do you want to abort indexing group? (y/n): ";
-constext txt_abort_searching[] = "Do you want to abort searching? (y/n): ";
 constext txt_active_file_is_empty[] = "\n%s contains no newsgroups. Exiting.";
 constext txt_added_groups[] = "Added %d group%s";
 constext txt_append_overwrite_quit[] = "File %s exists. a)ppend, o)verwrite, q)uit: ";
 constext txt_art_cancel[] = "Article cancelled (deleted).";
 constext txt_art_cannot_cancel[] = "Article cannot be cancelled (deleted).";
-constext txt_art_marked_as_unread[] = "Article marked as unread";
 constext txt_art_newsgroups[] = "Your article will be posted to the following newsgroup%s:\n";
 constext txt_art_not_posted[] = "Article not posted!";
 constext txt_art_not_saved[] = "Article not saved";
@@ -37,7 +34,8 @@ constext txt_art_thread_regex_tag[] = " a)rticle, t)hread, h)ot, p)attern, T)agg
 constext txt_art_unavailable[] = "Article unavailable";
 constext txt_art_parent_none[] = "Article has no parent";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
-constext txt_article_cancelled[] = "Article cancelled from within tin [v%s release %s]\n";
+constext txt_article_cancelled[] = "Article cancelled by author\n";
+constext txt_article_cannot_open[] = "get_article: can't open %s: ";
 constext txt_article_reposted1[] = "\n[ Article reposted from %s ]";
 constext txt_article_reposted2a[] = "\n[ Author was %s <%s> ]";
 constext txt_article_reposted2b[] = "\n[ Author was %s ]";
@@ -57,13 +55,16 @@ constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
 constext txt_caching_disabled[] = "Overview caching not supported; Tin is setuid";
 constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
-constext txt_cannot_find_base_art[] = "Can't find base article %s";
+constext txt_cannot_find_base_art[] = "Can't find base article %d";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
 constext txt_cannot_get_term_entry[] = "%s: Can't get entry for TERM\n";
 constext txt_cannot_open[] = "Can't open %s";
+#ifdef NNTP_ABLE
 constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
+#endif
 constext txt_cannot_post[] = "*** Posting not allowed ***";
+constext txt_cannot_post_group[] = "Posting is not allowed to %s";
 constext txt_cannot_write_index[] = "Can't write index %s";
 constext txt_cannot_write_to_directory[] = "%s is a directory";
 constext txt_catchup_all_read_groups[] = "Catchup all groups entered during this session? (y/n): ";
@@ -78,7 +79,6 @@ constext txt_color_on[] = "ANSI color enabled";
 constext txt_command_failed_s[] = "Command failed: %s\n";
 constext txt_connecting[] = "Connecting to %s...";
 constext txt_connecting_port[] = "Connecting to %s:%d...";
-constext txt_connection_to_server_broken[] = "Connection to server broken";
 constext txt_continue[] = "Continue? (y/n): ";
 #ifdef M_AMIGA
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Mark Tomlinson.";
@@ -95,7 +95,7 @@ char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin
 #ifdef WIN32
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
 #endif
-constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): %c";
+constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): ";
 constext txt_cancelling_art[] = "Cancelling article...";
 constext txt_creating_active[] = "Creating active file for saved groups...\n";
 constext txt_creating_newsrc[] = "Creating newsrc file...\n";
@@ -210,6 +210,7 @@ constext txt_help_col_invers_fg[] = "<SPACE> toggles, <CR> sets, <ESC> cancels."
 constext txt_help_col_invers_bg[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_message[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_minihelp[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_col_newsheaders[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_normal[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_quote[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_response[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -240,6 +241,7 @@ constext txt_help_ctrl_l[] = "^L\t  redraw page" cCRLF;
 constext txt_help_d[] = "d\t  toggle display of subject or subject plus author" cCRLF;
 constext txt_help_dash[] = "-\t  display last article viewed" cCRLF;
 constext txt_help_display_mime_header_asis[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_display_mime_allheader_asis[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_draw_arrow_mark[] = "Draw -> or highlighted bar for selection. <SPACE> toggles & <CR> sets.";
 constext txt_help_e[] =  "e\t  edit article (mail-groups only)" cCRLF;
 constext txt_help_editor_format[] = "Enter %E for editor, %F for filename, %N for line-number, <CR> to set.";
@@ -265,7 +267,6 @@ constext txt_help_group_catchup_on_exit[] = "<SPACE> toggles, <CR> sets, <ESC> c
 constext txt_help_groupname_max_length[] = "Enter maximum length of newsgroup names displayed. <CR> sets.";
 constext txt_help_h[] = "h H\t  get help (H = toggle mini help menu display)" cCRLF;
 constext txt_help_hash[] = "#\t  choose range of articles to be affected by next command" cCRLF;
-constext txt_help_highlight_xcommentto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_i[] = "q\t  return to group index page" cCRLF;
 constext txt_help_i_caret_dollar[] = "^ $\t  choose first ($ = last) thread in list" cCRLF;
 constext txt_help_i_coma[] = "@\t  toggle all selections (all articles)" cCRLF;
@@ -291,14 +292,16 @@ constext txt_help_m[] = "m\t  move chosen group within list" cCRLF;
 constext txt_help_mail_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_mail_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_mail_address[] = "Enter default mail address. <CR> sets.";
-constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-Id %N Name %C First Name";
+constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-ID %N Name %C First Name";
 constext txt_help_maildir[] = "The directory where articles/threads are to be saved in mailbox format.";
 constext txt_help_mailer_format[] = "Enter %M for mailer, %S for subject, %T for to, %F for filename, <CR> to set.";
 constext txt_help_mark_saved_read[] = "Mark saved articles/threads as read. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_mm_charset[] = "Enter charset name for MIME (e.g. US-ASCII, ISO-8859-1, EUC-KR), <CR> to set.";
 constext txt_help_n[] = "N\t  choose next group with unread news" cCRLF;
 constext txt_help_news_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-Id %N Name %C First Name";
-constext txt_help_no_advertising[] = "If ON, do not include X-Newsreader: header. <SPACE> toggles & <CR> sets.";
+constext txt_help_news_headers_to_display[] = "Space separated list of header fields";
+constext txt_help_news_headers_to_not_display[] = "Space separated list of header fields";
+constext txt_help_advertising[] = "If ON, include User-Agent: header. <SPACE> toggles & <CR> sets.";
 constext txt_help_o[] = "o\t  output article/thread/hot/pattern/tagged articles to printer" cCRLF;
 constext txt_help_p_caret_dollar[] = "^ $\t  display first ($ = last) page of article" cCRLF;
 constext txt_help_p_coma[] = "@\t  reverse article selections" cCRLF;
@@ -360,7 +363,7 @@ constext txt_help_show_xcommentto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels
 constext txt_help_sigdashes[] = "Prepend signature with \"-- \" on own line. <SPACE> toggles & <CR> sets.";
 constext txt_help_signature_repost[] = "Add signature when reposting articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_sigfile[] = "Enter path/! command/--none to create your default signature. <CR> sets.";
-constext txt_help_sort_art_type[] = "Sort articles by Subject, From or Date fields. <SPACE> toggles & <CR> sets.";
+constext txt_help_sort_art_type[] = "Sort articles by Subject, From, Date or Score. <SPACE> toggles & <CR> sets.";
 constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_start_editor_offset[] = "Start editor with line offset. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_blanks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -378,7 +381,9 @@ constext txt_help_thread_arts[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_thread_catchup_on_exit[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_u[] = "u\t  cycle through threading options available" cCRLF;
 constext txt_help_unlink_article[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_help_use_builtin_inews[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+	constext txt_help_use_builtin_inews[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+#endif
 #ifdef HAVE_COLOR
 constext txt_help_use_color_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif
@@ -408,6 +413,7 @@ constext txt_info_add_select[] = "Auto-selection filter added";
 constext txt_info_do_postpone[] = "Storing article for later posting";
 constext txt_info_postponed[] = "%d postponed article%s, reuse with ^O...\n";
 constext txt_info_nopostponed[] = "*** No postponed articles ***";
+constext txt_info_not_subscribed[] = "You are not subscribed to this group";
 constext txt_is_tex_ecoded[]= "TeX2Iso encoded article";
 
 #if !defined(INDEX_DAEMON) && !defined(ACTIVE_DAEMON)
@@ -440,8 +446,9 @@ constext txt_mail_bug_report_confirm[] = "Mail BUG REPORT to %s%s? (y/n): ";
 constext txt_mail_quote[] = "In article %M you wrote:";
 constext txt_mailed[] = "-- %d Article%s mailed --";
 constext txt_mailing_to[] = "Mailing to %s...";
+constext txt_marked_as_unread[] = "%s marked as unread";
 constext txt_mark_all_read[] = "Mark all articles as read? (y/n): ";
-constext txt_mark_group_read[] = "Mark group %s as read? (y/n): ";
+constext txt_mark_group_read[] = "Mark group %.*s as read? (y/n): ";
 constext txt_mark_thread_read[] = "Mark thread as read? (y/n): ";
 constext txt_matching_cmd_line_groups[] = "Matching %s groups...";
 constext txt_mini_group_1[] = "<n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,";
@@ -467,6 +474,7 @@ constext txt_no[] = "No ";
 constext txt_no_arts[] = "*** No articles ***";
 constext txt_no_arts_posted[] = "No articles have been posted";
 constext txt_no_command[] = "No command";
+constext txt_no_description[] = "*** No description ***";
 constext txt_no_filename[] = "No filename";
 constext txt_no_group[] = "No group";
 constext txt_no_groups[] = "*** No groups ***";
@@ -522,6 +530,7 @@ constext txt_opt_col_invers_fg[] = "Color for inverse text (foreground): ";
 constext txt_opt_col_invers_bg[] = "Color for inverse text (background): ";
 constext txt_opt_col_message[] = "Color of status messages           : ";
 constext txt_opt_col_minihelp[] = "Color of mini help menu            : ";
+constext txt_opt_col_newsheaders[] = "Color of actual news header fields : ";
 constext txt_opt_col_normal[] = "Standard foreground color          : ";
 constext txt_opt_col_quote[] = "Color of quoted lines              : ";
 constext txt_opt_col_response[] = "Color of response counter          : ";
@@ -536,14 +545,14 @@ constext txt_opt_col_markdash[] = "Color of highlighting with _dash_  : ";
 #endif
 constext txt_opt_confirm_action[] = "Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = "Confirm before quitting            : ";
-constext txt_opt_display_mime_header_asis[] = "Display RFC 1522 header undecoded  : ";
+constext txt_opt_display_mime_header_asis[] = "Display RFC 2047 header undecoded  : ";
+constext txt_opt_display_mime_allheader_asis[] = "Display RFC2047 ^H-header undecoded: ";
 constext txt_opt_draw_arrow_mark[] = "Draw -> instead of highlighted bar : ";
 constext txt_opt_editor_format[] = "Invocation of your editor          : ";
 constext txt_opt_filter_days[] = "No. of days a filter entry is valid: ";
 constext txt_opt_force_screen_redraw[] = "Force redraw after certain commands: ";
 constext txt_opt_group_catchup_on_exit[] = "Catchup group using left key       : ";
 constext txt_opt_groupname_max_length[] = "Max. length of group names shown   : ";
-constext txt_opt_highlight_xcommentto[] = "Highlight X-Comment-To: header     : ";
 constext txt_opt_inverse_okay[] = "Use inverse video for page headers : ";
 #ifdef M_UNIX
 constext txt_opt_keep_dead_articles[] = "Keep failed arts in ~/dead.articles: ";
@@ -558,8 +567,10 @@ constext txt_opt_maildir[] = "Mail directory                     : ";
 constext txt_opt_mailer_format[] = "Invocation of your mail command    : ";
 constext txt_opt_mark_saved_read[] = "Mark saved articles/threads as read: ";
 constext txt_opt_mm_charset[] = "MM_CHARSET                         : ";
+constext txt_opt_news_headers_to_display[] = "Display these header fields (or *) : ";
+constext txt_opt_news_headers_to_not_display[] = "Do not display these header fields : ";
 constext txt_opt_news_quote_format[] = "Quote line when following up       : ";
-constext txt_opt_no_advertising[] = "Insert no advertising X-Newsreader : ";
+constext txt_opt_advertising[] = "Insert 'User-Agent:'-header        : ";
 constext txt_opt_pos_first_unread[] = "Goto first unread article in group : ";
 constext txt_opt_post_8bit_header[] = "Use 8bit characters in news headers: ";
 constext txt_opt_post_mime_encoding[] = "MIME encoding in news messages     : ";
@@ -596,7 +607,9 @@ constext txt_opt_tab_goto_next_unread[] = "Tab goes to next unread article    : 
 constext txt_opt_thread_arts[] = "Thread articles by                 : ";
 constext txt_opt_thread_catchup_on_exit[] = "Catchup thread by using left key   : ";
 constext txt_opt_unlink_article[] = "Remove ~/.article after posting    : ";
-constext txt_opt_use_builtin_inews[] = "Use builtin inews                  : ";
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+	constext txt_opt_use_builtin_inews[] = "Use builtin inews                  : ";
+#endif
 #ifdef HAVE_COLOR
 constext txt_opt_use_color_tinrc[] = "Use ANSI color                     : ";
 #endif
@@ -691,15 +704,16 @@ constext txt_tinrc_default_printer[] = "# print program with parameters used to 
 constext txt_tinrc_default_savedir[] = "# directory where articles/threads are saved\n";
 constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to be used when posting/replying\n\
 # default_sigfile=file       appends file as signature\n\
-# default_sigfile=!command  executes external command to generate a signature\n\
+# default_sigfile=!command   executes external command to generate a signature\n\
 # default_sigfile=--none     don't append a signature\n";
 constext txt_tinrc_defaults[] = "# default action/prompt strings\n";
 constext txt_tinrc_display_mime_header_asis[] = "# if ON, RFC 1522 (now RFC 2047)-style header fields are displayed\n\
 # without decoding. No effect on header displayed at the top of\n\
 # each page in article mode and summary mode (they are always decoded).\n\
 # default is OFF so that RFC 1522 (RFC 2047)-style headers (designated in\n\
-# news_header_to_display or displayed with CTRL-h (full header option))\n\
-# will be decoded back to 8bit when displayed.\n";
+# news_header_to_display) will be decoded back to 8bit when displayed.\n";
+constext txt_tinrc_display_mime_allheader_asis[] = "# similar to display_mime_header_asis, but works on CTRL-h (show all headers)\n\
+# instead of news_headers_to_display\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
 # header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: 5=Lines:\n\
@@ -712,10 +726,8 @@ constext txt_tinrc_group_catchup_on_exit[] = "# if ON catchup group/thread when 
 constext txt_tinrc_groupname_max_length[] = "# Maximum length of the names of newsgroups displayed\n";
 constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file was automatically saved by %s %s %s\n#\n\
 # Do not edit while tin is running, since all your changes to this file\n\
-# would be overwritten when you leave tin.\n#\n\
+# will be overwritten when you leave tin.\n#\n\
 ############################################################################\n\n";
-constext txt_tinrc_highlight_xcommentto[] = "# If ON X-Comment-To name is displayed in the upper-right corner,\n\
-# if OFF below the Summary-Header\n";
 constext txt_tinrc_inverse_okay[] = "# if ON use inverse video for page headers at different levels\n";
 #ifdef M_UNIX
 constext txt_tinrc_keep_dead_articles[] = "# if ON keep all failed postings in ~/dead.articles\n";
@@ -745,14 +757,14 @@ constext txt_tinrc_mm_charset[] = "# charset supported locally which is also use
 constext txt_tinrc_motd_file_info[] = "# news motd file dates from server used for detecting new motd info\n";
 constext txt_tinrc_newnews[] = "# host & time info used for detecting new groups (don't touch)\n";
 constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/following-up an article\n\
-# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M Message-ID\n\
+# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M Message-Id\n\
 # %%N Full Name  %%C First Name\n";
-constext txt_tinrc_no_advertising[] = "# turn off advertising in header (X-Newsreader/X-Mailer)\n";
+constext txt_tinrc_advertising[] = "# if ON include advertising User-Agent: header\n";
 constext txt_tinrc_pos_first_unread[] = "# if ON put cursor at first unread art in group otherwise last art\n";
 constext txt_tinrc_post_8bit_header[] = "# if ON, 8bit characters in news posting is NOT encoded.\n\
 # default is OFF. Thus 8bit character is encoded by default.\n\
 # 8bit chars in header is encoded regardless of the value of this\n\
-# parameter unless post_mime_encoding is 8bit as well. \n";
+# parameter unless post_mime_encoding is 8bit as well.\n";
 constext txt_tinrc_post_mime_encoding[] = "# MIME encoding (8bit, base64, quoted-printable, 7bit) of the body\n\
 # for mails and posts, if necessary. QP is efficient for most European\n\
 # character sets (ISO-8859-X) with small fraction of non-US-ASCII chars,\n\
@@ -805,11 +817,14 @@ constext txt_tinrc_show_lines[] = "# show number of lines of first unread articl
 constext txt_tinrc_show_only_unread[] = "# if ON show only new/unread articles otherwise show all.\n";
 constext txt_tinrc_show_only_unread_groups[] = "# if ON show only subscribed to groups that contain unread articles.\n";
 constext txt_tinrc_show_signatures[] = "# If OFF don't show signatures when displaying articles\n";
-constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed\n";
+constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed in the\n\
+# upper-right corner. You can use news_headers_to_display=X-Comment-To\n\
+# instead of this\n";
 constext txt_tinrc_sigdashes[] = "# if ON prepend the signature with dashes '\\n-- \\n'\n";
 constext txt_tinrc_signature_repost[] = "# if ON add signature to reposted articles\n";
 constext txt_tinrc_sort_article_type[] = "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n\
-# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n";
+# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend)\n\
+# 7=(Score descend) 8=(Score ascend).\n";
 constext txt_tinrc_space_goto_next_unread[] = "# if ON the SPACE command will goto next unread article at article viewer\n\
 # level when the end of the article is reached (rn-style pager)\n";
 constext txt_tinrc_start_editor_offset[] = "# if ON editor will be started with cursor offset into the file\n\
@@ -821,7 +836,9 @@ constext txt_tinrc_tab_after_X_selection[] = "# if ON a TAB command will be auto
 constext txt_tinrc_tab_goto_next_unread[] = "# if ON the TAB command will goto next unread article at article viewer level\n";
 constext txt_tinrc_thread_articles[] = "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n";
 constext txt_tinrc_unlink_article[] = "# if ON remove ~/.article after posting.\n";
-constext txt_tinrc_use_builtin_inews[] = "# if ON use the builtin mini inews otherwise use an external inews program\n";
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+	constext txt_tinrc_use_builtin_inews[] = "# if ON use the builtin mini inews for posting via NNTP\n# otherwise use an external inews program\n";
+#endif
 #ifdef HAVE_COLOR
 constext txt_tinrc_use_color[] = "# if ON using ANSI-color\n";
 #endif /* HAVE_COLOR */
@@ -920,7 +937,9 @@ constext *txt_sort_type[] = {
 		"From: field (descending)",
 		"From: field (ascending)",
 		"Date: field (descending)",
-		"Date: field (ascending)"
+		"Date: field (ascending)",
+		"Score (descending)",
+		"Score (ascending)"
 };
 
 /* Ways of handling bogus groups */
@@ -950,34 +969,34 @@ constext txt_post_processing_failed[] = "Post processing failed";
 constext txt_post_processing_finished[] = "-- post processing completed --";
 constext txt_post_subject[] = "Post subject [%s]> ";
 constext txt_posting[] = "Posting article...";
-constext txt_postpone_repost[] = "Post postponed articles [%.*s]? (y/Y/A/n/q): %c";
+constext txt_postpone_repost[] = "Post postponed articles [%.*s]? (y/Y/A/n/q): ";
 constext txt_printed[] = "%d Article%s printed";
 constext txt_printing[] = "Printing...";
 constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";
 constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
 constext txt_quit[] = "Do you really want to quit? (y/n): ";
-constext txt_quit_cancel[] = "e)dit cancel message, q)uit, d)elete";
+constext txt_quit_cancel[] = "e)dit cancel message, q)uit, d)elete [%.*s]: ";
 constext txt_quit_no_write[] = "Do you really want to quit without saving your configuration? (y/n): ";
 
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, g) pgp, p)ost, p(o)stpone: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost, p(o)stpone [%.*s]: %c";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end [%.*s]: ";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost, p(o)stpone [%.*s]: ";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, g) pgp, p)ost, p(o)stpone: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost, p(o)stpone [%.*s]: %c";
+constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end [%.*s]: ";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost, p(o)stpone [%.*s]: ";
 #endif /* HAVE_ISPELL */
 #else
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, p)ost, p(o)stpone: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost, p(o)stpone [%.*s]: %c";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end [%.*s]: ";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost, p(o)stpone [%.*s]: ";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost, p(o)stpone: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, s)end [%.*s]: %c";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost, p(o)stpone [%.*s]: %c";
+constext txt_quit_edit_send[] = "q)uit, e)dit, s)end [%.*s]: ";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost, p(o)stpone [%.*s]: ";
 #endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */
 constext txt_quit_edit_postpone[] = "q)uit, e)dit, p(o)stpone: ";
@@ -986,22 +1005,17 @@ constext txt_catchup_despite_tags[] = "You have tagged articles in this group - 
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
 constext txt_quoted_printable[] = "quoted-printable";
 constext txt_read_resp[] = "Read response> ";
-constext txt_reading_all_arts[] = "Reading all articles...";
-constext txt_reading_all_groups[] = "Reading all groups...";
-constext txt_reading_article[] = "Reading... ";
-constext txt_reading_attributes_file[] = "Reading attributes file...";
-constext txt_reading_config_file[] = "Reading config file...";
-constext txt_reading_filter_file[] = "Reading filter file...";
-constext txt_reading_global_attributes_file[] = "Reading global attributes file...";
-constext txt_reading_global_config_file[] = "Reading global config file...";
-constext txt_reading_global_filter_file[] = "Reading global filter file...";
+constext txt_reading_article[] = "Reading ('q' to quit)... ";
+constext txt_reading_arts[] = "Reading %sarticles...";
+constext txt_reading_attributes_file[] = "Reading %sattributes file...";
+constext txt_reading_config_file[] = "Reading %sconfig file...";
+constext txt_reading_filter_file[] = "Reading %sfilter file...";
 constext txt_reading_input_history_file[] = "Reading input history file...";
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 constext txt_reading_mail_active_file[] = "Reading mail active file... ";
 constext txt_reading_mailgroups_file[] = "Reading mailgroups file... ";
 #endif /* !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING) */
-constext txt_reading_new_arts[] = "Reading unread articles...";
-constext txt_reading_new_groups[] = "Reading unread groups...";
+constext txt_reading_groups[] = "Reading %s groups...";
 constext txt_reading_news_active_file[] = "Reading groups from active file... ";
 constext txt_reading_news_newsrc_file[] = "Reading groups from newsrc file only... ";
 constext txt_reading_newsgroups_file[] = "Reading newsgroups file... ";
@@ -1017,7 +1031,7 @@ constext txt_reset_newsrc[] = "Reset newsrc? (y/n): ";
 constext txt_resp_redirect[] = "Responses have been directed to the following newsgroups";
 constext txt_resp_to_poster[] = "Responses have been directed to poster. Mail/Post/Quit (m/p/q): ";
 constext txt_resp_x_of_n[] = "RespNo %3d of %3d" cCRLF;
-constext txt_s_at_s[] = "%s at %s";
+constext txt_at_s[] = " at %s";
 constext txt_save_config[] = "Save configuration before continuing? (y/n): ";
 constext txt_save_filename[] = "Save filename [%s]> ";
 constext txt_saved[] = "-- %d Article%s saved --";
@@ -1030,7 +1044,7 @@ constext txt_search_backwards[] = "Search backwards [%s]> ";
 constext txt_search_body[] = "Search body [%s]> ";
 constext txt_search_forwards[] = "Search forwards [%s]> ";
 constext txt_searching[] = "Searching...";
-constext txt_searching_body[] = "Searching ('q' to abort)...         ";
+constext txt_searching_body[] = "Searching article %d of %d ('q' to abort)...";
 constext txt_select_art[] = "Select article> ";
 constext txt_select_config_file_option[] = "Select option number before text or use arrow keys and <CR>. 'q' to quit.";
 constext txt_select_group[] = "Select group> ";
@@ -1038,12 +1052,11 @@ constext txt_select_pattern[] = "Enter selection pattern [%s]> ";
 constext txt_select_thread[] = "Select thread > ";
 constext txt_server_name_in_file_env_var[] = "Put the server name in the file %s,\nor set the environment variable NNTPSERVER";
 constext txt_shell_escape[] = "Enter shell command [%s]> ";
-constext txt_skipping_newgroups[] = "Cannot move into new newgroups. Subscribe first...";
-constext txt_stuff_nntp_cannot_open[] = "stuff_nntp: can't open %s: ";
+constext txt_skipping_newgroups[] = "Cannot move into new newsgroups. Subscribe first...";
 constext txt_subscribed_num_groups[] = "subscribed to %d groups";
 constext txt_subscribed_to[] = "Subscribed to %s";
 constext txt_subscribing[] = "Subscribing... ";
-constext txt_supersede_article[] = "Repost or supersede article(s) [%.*s]? (r/s/q): %c";
+constext txt_supersede_article[] = "Repost or supersede article(s) [%.*s]? (r/s/q): ";
 constext txt_supersede_group[] = "Supersede article(s) to group(s) [%s]> ";
 constext txt_suspended_message[] = "\nStopped. Type 'fg' to restart TIN\n";
 constext txt_tagged_art[] = "Tagged article";
@@ -1053,7 +1066,6 @@ constext txt_there_is_no_news[] = "There is no news\n";
 constext txt_thread_com[] = "Thread Level Commands (page %d of %d)";
 constext txt_thread_marked_as_deselected[] = "Thread deselected";
 constext txt_thread_marked_as_selected[] = "Thread selected";
-constext txt_thread_marked_as_unread[] = "Thread marked as unread";
 constext txt_thread_not_saved[] = "Thread not saved";
 constext txt_thread_page[] = "T %d of %d (p %d), %s:  %s";
 constext txt_thread_resp_page[] = "T %d of %d, R %d/%d (p %d), %s:  %s";
@@ -1061,12 +1073,10 @@ constext txt_thread_saved_to_many[] = "Thread saved to %s - %s";
 constext txt_thread_x_of_n[] = "%sThread %4s of %4s" cCRLF;
 constext txt_threading_arts[] = "Threading articles...";
 #ifdef HAVE_COLOR
-constext txt_toggled_high_off[] = "Toggled word highlighting off";
-constext txt_toggled_high_on[] = "Toggled word highlighting on";
+constext txt_toggled_high[] = "Toggled word highlighting %s";
 #endif
 constext txt_toggled_rot13[] = "Toggled rot13 encoding";
-constext txt_toggled_tex2iso_off[] = "Toggled german TeX encoding off";
-constext txt_toggled_tex2iso_on[] = "Toggled german TeX encoding on";
+constext txt_toggled_tex2iso[] = "Toggled german TeX encoding %s";
 constext txt_type_h_for_help[] = "           h=help\n";
 constext txt_unsubscribed_num_groups[] = "unsubscribed from %d groups";
 constext txt_unsubscribed_to[] = "Unsubscribed from %s";
@@ -1101,6 +1111,7 @@ constext txt_warn_multiple_sigs[] ="\n\
   Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";
 constext txt_warn_wrong_sig_format[] = "\n\
   Warning: Signatures should start with '-- \\n' not with '--\\n'.\n\n";
+constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\nTin will be unable to mark crossposts read.\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";
@@ -1172,10 +1183,10 @@ constext txt_error_not_valid_newsgroup[] = "Error: \"%s\" is not a valid newsgro
 #endif /* HAVE_FASCIST_NEWSADMIN */
 
 #if 0 /* unused */
-constext txt_help_col_newsheaders[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_help_cr[] = "<CR>\t  Read news from selected spooldir" cCRLF;
+constext txt_abort_indexing[] = "Do you want to abort indexing group? (y/n): ";
+constext txt_abort_searching[] = "Do you want to abort searching? (y/n): ";
+constext txt_connection_to_server_broken[] = "Connection to server broken";
 constext txt_help_g_c[] = "c\t  mark group as all read" cCRLF;
-constext txt_help_g_l[] = "l\t  list and select another spooldir" cCRLF;
 #	ifdef CASE_PROBLEM
 constext txt_help_t_BIGK[] = "K\t  Mark thread as read & return" cCRLF;
 #	else
@@ -1183,8 +1194,6 @@ constext txt_help_t_K[] = "K\t  Mark thread as read & return" cCRLF;
 #	endif /* CASE_PROBLEM */
 constext txt_help_t_tab[] = "<TAB>\t  read next unread article" cCRLF;
 constext txt_help_space_toggles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_mini_spooldir_1[] = "<n>=set current to n, CR=selects spooldir, h)elp, j=line down, k=line up, q)uit";
-constext txt_opt_col_newsheaders[] = "Color of actual news header fields : ";
 constext txt_subscribe_to_new_group[] = "Subscribe to new group %s (Yy/Nn) [%c]: ";
 constext txt_subscribing_to[] = "Subscribing to %s";
 constext txt_tinrc_col_markdash[] = "";

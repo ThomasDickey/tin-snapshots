@@ -15,8 +15,8 @@
 #include	"tin.h"
 
 #if 0
-static int iGrpCurNum = -1;
-static int iGrpMaxNum = -1;
+	static int iGrpCurNum = -1;
+	static int iGrpMaxNum = -1;
 #endif
 
 int group_hash[TABLE_SIZE];			/* group name --> active[] */
@@ -28,9 +28,8 @@ init_group_hash (void)
 
 	if (num_active == -1) {
 		num_active = 0;
-		for (i = 0; i < TABLE_SIZE; i++) {
+		for (i = 0; i < TABLE_SIZE; i++)
 			group_hash[i] = -1;
-		}
 	}
 }
 
@@ -66,7 +65,8 @@ my_printf ("hash=[%s] [%ld]\n", group, val);
 
 	while (*ptr) {
 		hash_value = (hash_value << 1) ^ *ptr++;
-		if (++len & 7) continue;
+		if (++len & 7)
+			continue;
 		hash_value %= TABLE_SIZE;
 	}
 	hash_value %= TABLE_SIZE;
@@ -92,9 +92,9 @@ find_group_index (
 	 * hash linked list chaining
 	 */
 	while (i >= 0) {
-		if (STRCMPEQ(group, active[i].name)) {
+		if (STRCMPEQ(group, active[i].name))
 			return i;
-		}
+
 		i = active[i].next;
 	}
 
@@ -137,10 +137,9 @@ psGrpAdd (
 
 	h = hash_groupname (group);
 
-	if (group_hash[h] == -1) {
+	if (group_hash[h] == -1)
 		group_hash[h] = num_active;
-
-	} else {							/* hash linked list chaining */
+	else {	/* hash linked list chaining */
 
 		for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
 			if (STRCMPEQ(active[i].name, group))
@@ -170,9 +169,8 @@ psGrpFirst (void)
 	if (iGrpMaxNum) {
 		iGrpCurNum = 0;
 		return &active[iGrpCurNum];
-	} else {
+	} else
 		return (struct t_group *) 0;
-	}
 }
 
 struct t_group *
@@ -181,9 +179,8 @@ psGrpLast (void)
 	if (iGrpMaxNum) {
 		iGrpCurNum = iGrpMaxNum - 1;
 		return &active[iGrpCurNum];
-	} else {
+	} else
 		return (struct t_group *) 0;
-	}
 }
 
 struct t_group *

@@ -16,12 +16,12 @@
 
 /* dbmalloc checks memset() parameters, so we'll use it to check the assignments */
 #ifdef USE_DBMALLOC
-#define BIT_OR(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] | (mask), 1)
-#define BIT_AND(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] & (mask), 1)
+#	define BIT_OR(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] | (mask), 1)
+#	define BIT_AND(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] & (mask), 1)
 #else
-#define BIT_OR(n,b,mask)	n[NOFFSET(b)] |= mask
-#define BIT_AND(n,b,mask)	n[NOFFSET(b)] &= mask
-#endif
+#	define BIT_OR(n,b,mask)	n[NOFFSET(b)] |= mask
+#	define BIT_AND(n,b,mask)	n[NOFFSET(b)] &= mask
+#endif /* USE_DBMALLOC */
 
 /*
  *  Read NEWSLIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
@@ -32,26 +32,27 @@ int
 overview_xref_support (void)
 {
 	char buf[HEADER_LEN];
-	char *ptr;
 	FILE *fp;
-	int supported = TRUE;
+	int supported;
 
-	fp = open_overview_fmt_fp ();
+	supported = FALSE;
 
-	if (fp != (FILE *) 0) {
-		supported = FALSE;
-		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-			ptr = strrchr (buf, '\n');
-			if (ptr != (char *) 0) {
-				*ptr = '\0';
-			}
+	if ((fp = open_overview_fmt_fp ()) != (FILE *) 0) {
+		while ((tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
 			if (STRCMPEQ(buf, "Xref:full")) {
 				supported = TRUE;
+				drain_buffer(fp);
 				break;
 			}
 		}
-		fclose (fp);
+		TIN_FCLOSE (fp);
+		/* If user aborted with 'q', then we continue regardless. If Xref was
+		 * found, then fair enough. If not, tough. No real harm done
+		 */
 	}
+
+	if (!supported)
+		wait_message (2, txt_warn_xref_not_supported);
 
 	return supported;
 }
@@ -72,46 +73,45 @@ art_mark_xref_read (
 	long artnum;
 	struct t_group *psGrp;
 
-	if (art->xref == '\0') {
+	if (art->xref == '\0')
 		return;
-	}
 
 	xref_ptr = art->xref;
 
 	/*
 	 *  check sitename matches nodename of current machine (ignore for now!)
 	 */
-	while (*xref_ptr != ' ' && *xref_ptr) {
+	while (*xref_ptr != ' ' && *xref_ptr)
 		xref_ptr++;
-	}
 
 	/*
 	 *  tokenize each pair and update that newsgroup if it is in my_group[].
 	 */
 	forever {
-		while (*xref_ptr == ' ') {
+		while (*xref_ptr == ' ')
 			xref_ptr++;
-		}
+
 		group = xref_ptr;
-		while (*xref_ptr != ':' && *xref_ptr) {
+		while (*xref_ptr != ':' && *xref_ptr)
 			xref_ptr++;
-		}
-		if (*xref_ptr != ':') {
+
+		if (*xref_ptr != ':')
 			break;
-		}
+
 		ptr = xref_ptr++;
 		artnum = atol (xref_ptr);
-		while (*xref_ptr >= '0' && *xref_ptr <= '9') {
+		while (*xref_ptr >= '0' && *xref_ptr <= '9')
 			xref_ptr++;
-		}
-		if (&ptr[1] == xref_ptr) {
+
+		if (&ptr[1] == xref_ptr)
 			break;
-		}
+
 		c = *ptr;
 		*ptr = 0;
 
 		psGrp = psGrpFind (group);
 
+#ifdef DEBUG
 		if (debug == 3) {
 			sprintf (msg, "LOOKUP Xref: [%s:%ld] active=[%s] num_unread=[%ld]",
 				group, artnum,
@@ -121,17 +121,18 @@ art_mark_xref_read (
 			debug_print_comment (msg);
 			debug_print_bitmap (psGrp, NULL);
 #endif
-			error_message (msg, "");
+			error_message (msg);
 		}
+#endif /* DEBUG */
 
 		if (psGrp && psGrp->newsrc.xbitmap) {
 			if (artnum >= psGrp->newsrc.xmin && artnum <= psGrp->xmax) {
-			    artread = (NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ ? TRUE : FALSE);
+			    artread = ((NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ) ? TRUE : FALSE);
 				if (!artread) {
 					NSET0(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin);
-					if (psGrp->newsrc.num_unread > 0) {
+					if (psGrp->newsrc.num_unread > 0)
 						psGrp->newsrc.num_unread--;
-					}
+#ifdef DEBUG
 					if (debug == 3) {
 						sprintf (msg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
 							group, artnum, psGrp->newsrc.num_unread);
@@ -141,6 +142,7 @@ art_mark_xref_read (
 #endif
 						wait_message (msg);
 					}
+#endif /* DEBUG */
 				}
 			}
 		}
@@ -160,7 +162,7 @@ NSETRNG1 (
 	register long i;
 
 	if (bitmap == (t_bitmap *) 0) {
-		error_message ("NSETRNG1() failed. Bitmap == NULL", "");
+		error_message ("NSETRNG1() failed. Bitmap == NULL");
 		return;
 	}
 
@@ -192,7 +194,7 @@ NSETRNG0 (
 	register long i;
 
 	if (bitmap == (t_bitmap *) 0) {
-		error_message ("NSETRNG0() failed. Bitmap == NULL", "");
+		error_message ("NSETRNG0() failed. Bitmap == NULL");
 		return;
 	}
 

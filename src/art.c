@@ -34,8 +34,9 @@ static int artnum_comp (t_comptype *p1, t_comptype *p2);
 static int date_comp (t_comptype *p1, t_comptype *p2);
 static int from_comp (t_comptype *p1, t_comptype *p2);
 static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
-static int parse_headers (char *buf, struct t_article *h);
+static int parse_headers (FILE *fp, struct t_article *h);
 static int read_group (struct t_group *group, char *group_path, int *pcount);
+static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
 static void print_expired_arts (int num_expired);
@@ -66,12 +67,12 @@ find_base (
 
 	if (group->attribute && group->attribute->show_only_unread) {
 		for (i = 0; i < top; i++) {
-			if (IGNORE_ART(i) || arts[i].inthread != FALSE) {
+			if (IGNORE_ART(i) || arts[i].inthread)
 				continue;
-			}
-			if (top_base >= max_art) {
+
+			if (top_base >= max_art)
 				expand_art ();
-			}
+
 			if (arts[i].status == ART_UNREAD) {
 				base[top_base++] = i;
 			} else {
@@ -85,12 +86,12 @@ find_base (
 		}
 	} else {
 		for (i = 0; i < top; i++) {
-			if (IGNORE_ART(i) || arts[i].inthread != FALSE) {
+			if (IGNORE_ART(i) || arts[i].inthread)
 				continue;
-			}
-			if (top_base >= max_art) {
+
+			if (top_base >= max_art)
 				expand_art ();
-			}
+
 			base[top_base++] = i;
 		}
 	}
@@ -122,10 +123,8 @@ index_group (
 	if (group == (struct t_group *) 0)
 		return (TRUE);
 
-	if (!update) {
-		sprintf (msg, txt_group, group->name);
-		wait_message (msg);
-	}
+	if (INTERACTIVE)
+		wait_message (0, txt_group, group->name);
 
 	make_group_path (group->name, group_path);
 	glob_art_group = group->name;
@@ -163,12 +162,18 @@ index_group (
 	max = top_base ? base[top_base-1] : min - 1;
 
 	/*
+	 * Quit now if no articles
+	 */
+	if (max < 0)
+		return FALSE;
+
+	/*
 	 * Read in the existing index via XOVER or the index file
 	 */
 	if (iReadNovFile (group, min, max, &expired) == -1) {
 		/* user aborted indexing */
 		set_alarm_clock_on ();
-		return (FALSE);
+		return FALSE;
 	}
 
 	/*
@@ -183,7 +188,7 @@ index_group (
 	if ((modified = read_group (group, group_path, &count)) == -1) {
 		/* user aborted indexing */
 		set_alarm_clock_on ();
-		return (FALSE);
+		return FALSE;
 	}
 
 	/*
@@ -239,7 +244,7 @@ index_group (
 
 	find_base (group);
 
-	if ((modified || filtered) && !update)
+	if ((modified || filtered) && !batch_mode)
 		clear_message ();
 
 	set_alarm_clock_on ();
@@ -260,10 +265,9 @@ read_group (
 	char *group_path,
 	int *pcount)
 {
-	char *ptr, buf[PATH_LEN];
-	char progress[PATH_LEN];
-	char temp[16];
-	int count = 0;
+	FILE *fp;
+	char buf[PATH_LEN];
+	int count = 0, res;
 	int modified = FALSE;
 	int respnum, total = 0;
 	long art;
@@ -276,30 +280,30 @@ read_group (
 #ifdef INDEX_DAEMON
 	if (dir[0] == 0)
 #endif
-	get_cwd (dir);						/* TODO: no point via NNTP ? */
+		get_cwd (dir);						/* TODO: no point via NNTP ? */
+
 	joinpath (buf, group->spooldir, group_path);
 	my_chdir (buf);
 
 	buf[0] = '\0';
 
-	sprintf (progress, txt_group, group->name);
-
 	/*
 	 *  Count num of arts to index so the user has an idea of index time
 	 */
 	for (i = 0; i < top_base; i++) {
-		if (base[i] <= last_read_article || valid_artnum (base[i]) >= 0) {
+		if (base[i] <= last_read_article || valid_artnum (base[i]) >= 0)
 			continue;
-		}
+
 		total++;
 	}
 
 	/*
 	 * Reset the next article number index (for when HEAD fails)
 	 */
-	temp[0] = '\0';
 	head_next = -1;
+
 	for (i = 0; i < top_base; i++) {	/* for each article # */
+
 		art = base[i];
 
 		/*
@@ -308,15 +312,17 @@ read_group (
 		 *  reading the header.
 		 */
 		if ((respnum = valid_artnum (art)) >= 0 || art <= last_read_article) {
-			if (respnum >= 0) {
+			if (respnum >= 0)
 				arts[respnum].thread = ART_NORMAL;
-			}
+
 			continue;
 		}
 
-		if ((ptr = open_art_header (art)) == (char *) 0) {
+		/*
+		 * Try and open the article
+	 	 */
+		if ((fp = open_art_header (art)) == (FILE *) 0)
 			continue;
-		}
 
 		/*
 		 * we've modified the index so it will need to be re-written
@@ -326,15 +332,22 @@ read_group (
 		/*
 		 *  Add article to arts[]
 		 */
-		if (top >= max_art) {
+		if (top >= max_art)
 			expand_art();
-		}
 
 		set_article (&arts[top]);
 		arts[top].artnum = art;
 		arts[top].thread = ART_NORMAL;
 
-		if (!parse_headers (ptr, &arts[top])) {
+		res = parse_headers (fp, &arts[top]);
+
+		TIN_FCLOSE(fp);
+		if (tin_errno != 0) {
+			chdir (dir);
+			return(-1);
+		}
+
+		if (!res) {
 			sprintf (buf, "FAILED parse_header(%ld)", art);
 #ifdef DEBUG
 			debug_nntp ("read_group", buf);
@@ -345,21 +358,12 @@ read_group (
 		last_read_article = arts[top].artnum;	/* used if arts are killed */
 		top++;
 
-		if (++count % MODULO_COUNT_NUM == 0 && !update) {
-			if (input_pending (0)) {
-				buf[0] = ReadCh();
-				if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
-					if (prompt_yn (cLINES, txt_abort_indexing, TRUE) == 1) {
-						chdir (dir);
-						return -1;
-					} else {
-						show_progress (temp, progress, 0, total);
-					}
-				}
-			}
-			show_progress (temp, progress, count, total);
-		}
-		if (update && verbose) {
+#ifdef SHOW_PROGRESS
+		if (++count % MODULO_COUNT_NUM == 0)
+			show_progress (msg, count, total);
+#endif
+
+		if (batch_mode && verbose) {
 			my_fputc ('.', stdout);
 			my_flush();
 		}
@@ -395,8 +399,7 @@ read_group (
 static void
 thread_by_subject(void)
 {
-	register int i;		/* gcc, at least, will ignore 'register' as */
-	register int j;		/* it can do a better job itself */
+	int i, j;
 	struct t_hashnode *h;
 
 	for (i = 0; i < top; i++) {
@@ -416,7 +419,7 @@ thread_by_subject(void)
 			/*
 			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
 			 */
-			if (!IGNORE_ART(i) && arts[i].inthread == FALSE &&
+			if (!IGNORE_ART(i) && !arts[i].inthread &&
 						   ((arts[i].subject == arts[j].subject) ||
 						   ((arts[i].part || arts[i].patch) &&
 							 arts[i].archive == arts[j].archive))) {
@@ -461,24 +464,22 @@ make_threads (
 
 	if (!cmd_line) {
 		if (group->attribute && group->attribute->thread_arts == THREAD_NONE)
-			wait_message (txt_unthreading_arts);
+			info_message (txt_unthreading_arts);
 		else
-			wait_message (txt_threading_arts);
+			info_message (txt_threading_arts);
 	}
 
-#if 0
-	if (debug == 2) {
-		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]",
+#ifdef DEBUG
+	if (debug == 2)
+		error_message ("rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]",
 				rethread, default_thread_arts, group->attribute->thread_arts);
-		error_message (msg, "");
-	}
 #endif
 
 	/*
-	 * Sort all the articles by date ascending or descending.
+	 * Sort all the articles using the preferred method
 	 * When find_base() is called, the bases are created ordered
 	 * on arts[] and so the base messages under all threading systems
-	 * will be date sorted.
+	 * will be sorted in this way.
 	 */
 	if (group->attribute)
 		sort_arts (group->attribute->sort_art_type);
@@ -561,6 +562,10 @@ sort_arts (
 		case SORT_BY_DATE_ASCEND:
 			SortBy(date_comp);
 			break;
+		case SORT_BY_SCORE_DESCEND:
+		case SORT_BY_SCORE_ASCEND:
+			SortBy(score_comp);
+			break;
 		default:
 			break;
 	}
@@ -568,35 +573,32 @@ sort_arts (
 
 static int
 parse_headers (
-	char *buf,
+	FILE *fp,
 	struct t_article *h)
 {
+	char buf[HEADER_LEN];
 	char buf2[HEADER_LEN];
 	char art_from_addr[HEADER_LEN];
 	char art_full_name[HEADER_LEN];
 	char *ptr, *ptrline, *s;
-	int flag, n;
+	int flag = FALSE;				/* TODO what's this for now ? */
 	int lineno = 0;
 	int max_lineno = 25;
-	int got_archive = FALSE;
-	int got_date = FALSE;
-	int got_from = FALSE;
-	int got_lines = FALSE;
-	int got_msgid = FALSE;
-	int got_received = FALSE;
-	int got_refs = FALSE;
-	int got_subject = FALSE;
-	int got_xref = FALSE;
+	t_bool got_archive, got_date, got_from, got_lines;
+	t_bool got_msgid, got_received, got_refs, got_subject, got_xref;
 
-	if ((n = strlen (buf))== 0) {
-		return FALSE;
-	}
+	got_archive = got_date = got_from = got_lines = FALSE;
+	got_msgid = got_received = got_refs = got_subject = got_xref = FALSE;
 
-	buf[--n] = '\0';
+	while ((ptr = tin_fgets(buf, sizeof(buf), fp)) != NULL) {
 
-	ptr = buf;
+		/*
+		 * Look for end of headers - only applies when reading local spool
+		 */
+		if (!read_news_via_nntp && *ptr == '\0')
+			break;
 
-	forever {
+#if 0 /* TODO join broken continuation headers */
 		for (ptrline = ptr; *ptr; ptr++) {
 			if (*ptr == '\n') {
 				/* Join continuation lines */
@@ -605,18 +607,21 @@ parse_headers (
 					continue;
 				}
 				/* End of header? */
-				if (*(ptr + 1) == '\n') {
+				if (*(ptr + 1) == '\n')
 					*ptr = '\0';
-				}
+
 				break;
 			}
-			if ((*(unsigned char *)ptr) < ' ') {
+			if ((*(unsigned char *)ptr) < ' ')
 				*ptr = ' ';
-			}
+
 		}
+
 		flag = *ptr;
 		*ptr++ = '\0';
-		lineno++;
+#endif /* 0 */
+		ptrline = ptr;
+		lineno++;		/* TODO is this needed ? */
 
 		switch (toupper((unsigned char)*ptrline)) {
 			case 'F':	/* From:  mandatory */
@@ -725,27 +730,31 @@ parse_headers (
 				break;
 		} /* switch */
 
-		if (!flag || lineno > max_lineno || got_archive) {
-			/*
-			 * The sonofRFC1036 states that the following hdrs are
-			 * mandatory. It also states that Subject, Newsgroups
-			 * and Path are too.
-			 */
-			if (got_from && got_date && got_msgid) {
+	} /* while */
 
-				if (!got_subject)
-					h->subject = hash_str ("<No subject>");
+	if (tin_errno != 0)
+		return FALSE;
+
+	/* TODO its possible some of these tests must go back to break; the main loop */
+	if (!flag || (lineno > max_lineno) || got_archive) {
+		/*
+		 * The sonofRFC1036 states that the following hdrs are
+		 * mandatory. It also states that Subject, Newsgroups
+		 * and Path are too. Ho hum.
+		 */
+		if (got_from && got_date && got_msgid) {
+			if (!got_subject)
+				h->subject = hash_str ("<No subject>");
 
 #ifdef DEBUG
-				debug_print_header (h);
+			debug_print_header (h);
 #endif
-				return TRUE;
-			} else
-				return FALSE;
-		}
-	} /* forever */
+			return TRUE;
+		} else
+			return FALSE;
+	}
 
-	/* NOTREACHED */
+	return FALSE;
 }
 
 /*
@@ -772,17 +781,16 @@ iReadNovFile (
 	long max,
 	int *expired)
 {
- 	char	*p, *q;
+	char	*p, *q;
 	char	*buf;
- 	char	art_full_name[HEADER_LEN];
+	char	buf2[HEADER_LEN];
+	char	art_full_name[HEADER_LEN];
 	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
 	long	artnum;
 #if 0
 char *s; /* needed for Archive-Name: */
-char	buf2[HEADER_LEN];
 #endif /* 0 */
-
 
 	top = 0;
 	last_read_article = 0L;
@@ -809,31 +817,17 @@ char	buf2[HEADER_LEN];
 	/*
 	 * open the overview file (whether it be local or via nntp)
 	 */
-	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0) {
+	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0)
 		return top;
-	}
 
-	while ((buf = safe_fgets (fp)) != (char *) 0) {
-
-		if (input_pending (0)) {
-			buf[0] = ReadCh();
-			if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
-				if (prompt_yn (cLINES, txt_abort_indexing, TRUE) == 1)
-					return(-1);
-			}
-		}
+	while ((buf = tin_fgets (buf2, sizeof(buf2), fp)) != (char *) 0) {
 
 #ifdef DEBUG
 		debug_nntp ("iReadNovFile", buf);
 #endif
-		if (STRCMPEQ(buf, ".")) {
-			free (buf);
-			break;
-		}
 
-		if (top >= max_art) {
+		if (top >= max_art)
 			expand_art ();
-		}
 
 		p = buf;
 
@@ -860,13 +854,12 @@ sleep(1);
 		}
 		set_article (&arts[top]);
 		arts[top].artnum = last_read_article = artnum;
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (Artnum) '%s'", buf);
 			debug_nntp ("iReadNovFile", "Bad overview record (Artnum)");
 #endif
-			free (buf);
 			continue;
 		} else {
 			p = q + 1;
@@ -875,54 +868,49 @@ sleep(1);
 		/*
 		 * READ subject
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (Subject) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Subject)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
-		arts[top].subject = hash_str (eat_re(rfc1522_decode(p),FALSE));
+
+		arts[top].subject = hash_str (eat_re(rfc1522_decode(p), FALSE));
 		p = q + 1;
 
 		/*
 		 * READ author
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (From) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (From)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
+
 		parse_from (rfc1522_decode (p), art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
-		if (art_full_name[0]) {
+
+		if (art_full_name[0])
 			arts[top].name = hash_str (art_full_name);
-		}
+
 		p = q + 1;
 		/*
 		 * READ article date
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (Date) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Date)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
+
 		arts[top].date = parsedate (p, (TIMEINFO*)0);
 		p = q + 1;
 
@@ -935,14 +923,13 @@ sleep(1);
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
+
 		if (*p)
 			arts[top].msgid = my_strdup (p);
-		else
+		else		/* TODO is no msg-id allowed in rfc ? */
 			arts[top].msgid = '\0';
 
 		p = q + 1;
@@ -950,17 +937,15 @@ sleep(1);
 		/*
 		 * READ article references
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (References) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (References)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
+
 		if (*p)
 			arts[top].refs = my_strdup (p);
 		else
@@ -971,28 +956,27 @@ sleep(1);
 		/*
 		 * SKIP article bytes
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
+		if ((q = strchr (p, '\t')) == (char *) 0) {
 #ifdef DEBUG
 			error_message ("Bad overview record (Bytes) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Bytes)");
 #endif
-			free (buf);
 			continue;
-		} else {
+		} else
 			*q = '\0';
-		}
+
 		p = (q == (char *) 0 ? (char *) 0 : q + 1);
 
 		/*
 		 * READ article lines
 		 */
 		if (p != (char *) 0) {
-			q = strchr (p, '\t');
-			if (q != (char *) 0)
+			if ((q = strchr (p, '\t')) != (char *) 0)
 				*q = '\0';
+
 			if(isdigit((unsigned char)*p))
 				arts[top].lines = atoi (p);
+
 			p = (q == (char *) 0 ? (char *) 0 : q + 1);
 		}
 
@@ -1000,30 +984,29 @@ sleep(1);
 		 * READ article xrefs
 		 */
 		if (p != (char *) 0 && xref_supported) {
-			q = strstr (p, "Xref: ");
-			if (q == (char *) 0) {
+			if ((q = strstr (p, "Xref: ")) == (char *) 0)
 				q = strstr (p, "xref: ");
-			}
+
 			if (q != (char *) 0) {
 				p = q + 6;
 				q = p;
-				while (*q && *q != '\t') {
+				while (*q && *q != '\t')
 					q++;
-				}
+
 				*q = '\0';
 				q = strrchr (p, '\n');
-				if (q != (char *) 0) {
+				if (q != (char *) 0)
 					*q = '\0';
-				}
+
 				q = p;
-				while (*q && *q == ' ') {
+				while (*q && *q == ' ')
 					q++;
-				}
+
 				arts[top].xref = my_strdup (q);
 			}
 		}
 
-#if 0 /* nobody has archive-name: in his overview-format! really! */
+#if 0 /* nobody stores Archive-name in overview-files! */
 		/*
 		 * READ article archive-name
 		 */
@@ -1032,18 +1015,19 @@ sleep(1);
 			if (q != (char *) 0) {
 				p = q + 14;
 				q = p;
-				while (*q && *q != '\t') {
+				while (*q && *q != '\t')
 					q++;
-				}
+
 				*q = '\0';
 				q = strrchr (p, '\n');
-				if (q != (char *) 0) {
+				if (q != (char *) 0)
 					*q = '\0';
-				}
+
 				q = p;
-				while (*q && *q == ' ') {
+				while (*q && *q == ' ')
 					q++;
-				}
+
+/* TODO don't use CMPEQ then !! */
 				if ((s = strchr (q, '/')) != (char *) 0) {
 					if (STRNCMPEQ(s+1, "part", 4) ||
 					    STRNCMPEQ(s+1, "Part", 4)) {
@@ -1072,10 +1056,19 @@ sleep(1);
 #ifdef DEBUG
 		debug_print_header (&arts[top]);
 #endif
+
+#ifdef SHOW_PROGRESS
+		if (artnum % MODULO_COUNT_NUM == 0)
+			show_progress(msg, artnum, max);
+#endif
+
 		top++;
-		free (buf);
 	}
- 	fclose (fp);
+
+	TIN_FCLOSE (fp);
+
+	if (tin_errno != 0)
+		return(-1);
 
 	return top;
 }
@@ -1135,10 +1128,10 @@ vWriteNovFile (
 		set_real_uid_gid ();
 		return;
 	}
-
-	if (debug) {
+#ifdef DEBUG
+	if (debug)
 		error_message ("WRITE file=[%s]", pcNovFile);
-	}
+#endif
 
 	hFp = open_xover_fp (psGrp, "w", 0L, 0L);
 
@@ -1165,15 +1158,15 @@ vWriteNovFile (
 			 		0,	/* bytes */
 			 		psArt->lines);
 
-			 	if (psArt->xref) {
+			 	if (psArt->xref)
 				 	fprintf (hFp, "\tXref: %s", psArt->xref);
-				}
-			 	if (psArt->archive) {
+
+			 	if (psArt->archive)
 				 	fprintf (hFp, "\tArchive-name: %s/%s%s",
 				 		psArt->archive,
 				 		(psArt->part ? "part" : "patch"),
 				 		(psArt->part ? psArt->part : psArt->patch));
-				}
+
 				fprintf (hFp, "\n");
 			}
 		}
@@ -1241,9 +1234,8 @@ pcFindNovFile (
 	static char acNovFile[PATH_LEN];
 	unsigned long lHash;
 
-	if (psGrp == (struct t_group *) 0) {
+	if (psGrp == (struct t_group *) 0)
 		return (char *) 0;
-	}
 
 	overview_index_filename = FALSE;	/* Write groupname in nov file ? */
 
@@ -1287,9 +1279,8 @@ pcFindNovFile (
 
 			sprintf (acNovFile, "%s/%lu.%d", pcDir, lHash, iNum);
 
-			if ((hFp = fopen (acNovFile, "r")) == (FILE *) 0) {
+			if ((hFp = fopen (acNovFile, "r")) == (FILE *) 0)
 				return acNovFile;
-			}
 
 			/*
 			 * Don't follow, why should a zero length index file
@@ -1302,13 +1293,12 @@ pcFindNovFile (
 			fclose (hFp);
 
 			pcPtr = strrchr (acBuf, '\n');
-			if (pcPtr != (char *) 0) {
+			if (pcPtr != (char *) 0)
 				*pcPtr = '\0';
-			}
 
-			if (STRCMPEQ(acBuf, psGrp->name)) {
+			if (STRCMPEQ(acBuf, psGrp->name))
 				return acNovFile;
-			}
+
 		}
 	}
 
@@ -1334,9 +1324,8 @@ do_update (void)
 	struct stat stinfo;
 #endif
 
-	if (verbose) {
+	if (verbose)
 		time (&beg_epoch);
-	}
 
 	/*
 	 * load last updated times for each group (tind daemon only)
@@ -1358,9 +1347,8 @@ do_update (void)
 		if (verbose) my_printf ("NOV path=[%s]\n", novpath);
 		vCreatePath (novpath);
 		if (stat (buf, &stinfo) == -1) {
-			if (verbose) {
+			if (verbose)
 				error_message (txt_cannot_stat_group, buf);
-			}
 			continue;
 		}
 
@@ -1368,51 +1356,48 @@ do_update (void)
 
 		index_time = (time_t)0;
 		pcNovFile = pcFindNovFile (psGrp, R_OK);
-		if (debug) {
+#ifdef DEBUG
+		if (debug)
 			error_message ("READ file=[%s]", pcNovFile);
-		}
-		if (pcNovFile == (char *) 0) {
+#endif
+		if (pcNovFile == (char *) 0)
 			continue;
-		}
 
 		if (stat (pcNovFile, &stinfo) == -1) {
-			if (verbose) {
+			if (verbose)
 				my_printf (txt_cannot_stat_index_file, psGrp->name, pcNovFile);
-			}
+
 		} else {
-			if (delete_index_file) {
+			if (delete_index_file)
 				unlink (pcNovFile);
-			}
+
 			index_time = stinfo.st_mtime;
 		}
-
-		if (debug == 2) {
+#ifdef DEBUG
+		if (debug == 2)
 			my_printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n",
 				pcNovFile, index_time,
 				psGrp->last_updated_time, group_time);
-		}
-
+#endif
 		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 ||
 		    (psGrp->last_updated_time > index_time) ||
 		    (group_time > psGrp->last_updated_time) ||
-		    purge_index_files) {
+		    purge_index_files)
 			psGrp->last_updated_time = group_time;
-		} else {
+		else
 			continue;
-		}
 #endif
 
 		if (verbose) {
 			my_printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
 			my_flush();
 		}
-		if (!index_group (psGrp)) {
+		if (!index_group (psGrp))
 			continue;
-		}
+
 		if (catchup) {
-			for (j = 0; j < top; j++) {
+			for (j = 0; j < top; j++)
 				art_mark_read (psGrp, &arts[j]);
-			}
 		}
 	}
 
@@ -1425,11 +1410,8 @@ do_update (void)
 
 	if (verbose) {
 		time (&end_epoch);
-		sprintf (msg, txt_catchup_update_info,
-			(catchup ? "Caughtup" : "Updated"),
-			group_top, IS_PLURAL(group_top),
-			(int)(end_epoch - beg_epoch));
-		wait_message (msg);
+		wait_message (0, txt_catchup_update_info,
+			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (int)(end_epoch - beg_epoch));
 	}
 }
 
@@ -1444,16 +1426,15 @@ artnum_comp (
 	/*
 	 * s1->artnum less than s2->artnum
 	 */
-	if (s1->artnum < s2->artnum) {
+	if (s1->artnum < s2->artnum)
 		return -1;
-	}
 
 	/*
 	 * s1->artnum greater than s2->artnum
 	 */
-	if (s1->artnum > s2->artnum) {
+	if (s1->artnum > s2->artnum)
 		return 1;
-	}
+
 	return 0;
 }
 
@@ -1519,33 +1500,59 @@ date_comp (
 		/*
 		 * s1->date less than s2->date
 		 */
-		if (s1->date < s2->date) {
+		if (s1->date < s2->date)
 			return -1;
-		}
+
 		/*
 		 * s1->date greater than s2->date
 		 */
-		if (s1->date > s2->date) {
+		if (s1->date > s2->date)
 			return 1;
-		}
+
 	} else {
 		/*
 		 * s2->date less than s1->date
 		 */
-		if (s2->date < s1->date) {
+		if (s2->date < s1->date)
 			return -1;
-		}
+
 		/*
 		 * s2->date greater than s1->date
 		 */
-		if (s2->date > s1->date) {
+		if (s2->date > s1->date)
 			return 1;
-		}
+
+	}
+	return 0;
+}
+
+/*
+ * Same again, but for art[].score
+ */
+static int
+score_comp (
+	t_comptype *p1,
+	t_comptype *p2)
+{
+	const struct t_article *s1 = (const struct t_article *) p1;
+	const struct t_article *s2 = (const struct t_article *) p2;
+
+	if (CURR_GROUP.attribute->sort_art_type == SORT_BY_SCORE_ASCEND) {
+		if (s1->score < s2->score)
+			return -1;
+
+		if (s1->score > s2->score)
+			return 1;
+	} else {
+		if (s2->score < s1->score)
+			return -1;
+
+		if (s2->score > s1->score)
+			return 1;
 	}
 
 	return 0;
 }
-
 
 void
 set_article (
@@ -1587,74 +1594,31 @@ valid_artnum (
 	register int dctop = top;
 	register int cur = 1;
 
-	while (dctop /= 2) {
+	while (dctop /= 2)
 		cur = cur << 1;
-	}
+
 	range = cur / 2;
 	cur--;
 
 	forever {
-		if (arts[cur].artnum == art) {
+		if (arts[cur].artnum == art)
 			return cur;
-		}
+
 		prev = cur;
-		if (arts[cur].artnum < art) {
+		if (arts[cur].artnum < art)
 			cur = cur + range;
-		} else {
+		else
 			cur = cur - range;
-		}
-		if (prev == cur) {
+
+		if (prev == cur)
 			return -1;
-		}
-		if (cur >= top) {
+
+		if (cur >= top)
 			cur = top - 1;
-		}
+
 		range = range / 2;
 	}
 }
-
-/*
- * safe_fgets
- *
- * Return the next line from a file, regardless of how long it is.
- * Thanks to <emcmanus@gr.osf.org> for hugs, support and bug fixes.
- */
-
-char *
-safe_fgets (
-	FILE *fp)
-{
-	char *buf	= 0;
-	char *temp	= 0;
-	int	next	= 0;
-	int	chunk	= 256;
-
-	buf = (char *) malloc (chunk * sizeof(char));
-
-	forever {
-		if (fgets (buf + next, chunk, fp) == 0) {
-			if (next) {
-				return buf;
-			}
-			free (buf);
-			return 0;
-		}
-
-		if (buf[strlen(buf)-1] == '\n') {
-			return buf;
-		}
-
-		next += chunk - 1;
-
-		temp = (char *) realloc (buf, (next+chunk) * sizeof(char));
-		if (temp == 0) {
-			free (buf);
-			return 0;
-		}
-		buf = temp;
-	}
-}
-
 
 static void
 print_expired_arts (
@@ -1663,15 +1627,15 @@ print_expired_arts (
 	int i;
 
 	if (cmd_line && verbose) {
-		if (debug) {
+#ifdef DEBUG
+		if (debug)
 			my_printf ("Expired Index Arts=[%d]", num_expired);
-		}
-		for (i = 0; i < num_expired; i++) {
+#endif
+		for (i = 0; i < num_expired; i++)
 			my_fputc ('P', stdout);
-		}
-		if (num_expired) {
+
+		if (num_expired)
 			my_flush();
-		}
 	}
 }
 
@@ -1705,11 +1669,10 @@ pcPrintFrom (
 
 	*acFrom = '\0';
 
-	if (psArt->name != (char *) 0) {
+	if (psArt->name != (char *) 0)
 		sprintf (acFrom, "%s <%s>", psArt->name, psArt->from);
-	} else {
+	else
 		strcpy (acFrom, psArt->from);
-	}
 
 	return acFrom;
 }

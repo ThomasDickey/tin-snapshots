@@ -18,7 +18,7 @@
 #define L_CURL '{'
 #define R_CURL '}'
 
-#define MAXNAME 24 /* maximum name-length (just for readability formatting) */
+#define MAXNAME 27 /* maximum name-length (just for readability formatting) */
 
 #define MYDATA struct mydata
 MYDATA {

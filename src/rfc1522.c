@@ -192,7 +192,7 @@ rfc1522_decode(
 	const char *c, *d;
 	char *t;
 	static char buffer[2048];
-	char charset[1024]; /* just in case */
+	char charset[1024];
 	char encoding;
 	char adjacentflag = 0;
 
@@ -501,7 +501,7 @@ rfc1522_do_encode(
    they are made of only 7bit chars) */
 		if (contains_nonprintables(what, isstruct_head) || isbroken_within) {
 			if (encoding == 'Q') {
-				if (quoting == FALSE) {
+				if (!quoting) {
 					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
 					ewsize = mystrcat(&t, buf2);
 					if (break_long_line) {
@@ -658,7 +658,7 @@ rfc1522_do_encode(
 			while (*c)
 				*((*where)++) = *c++;
 		}
-	} else {							  /* break_long_line == FALSE */
+	} else {							  /* !break_long_line */
 		while (*c)
 			*((*where)++) = *c++;
 	}

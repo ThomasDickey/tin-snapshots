@@ -72,11 +72,7 @@ int InitScreen (void)
 #endif
 	}
 	postinit_colors();
-#ifdef NCURSES_MOUSE_VERSION
-	(void) mousemask(
-		(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
-		(mmask_t *)0);
-#endif
+	set_xclick_on();
 	return (TRUE);
 }
 
@@ -195,15 +191,27 @@ void set_keypad_off (void) { if (!cmd_line) keypad(stdscr,FALSE); }
 
 
 /*
- * Ncurses mouse support is turned on/off when the keypad code is on/off.
- * Tin doesn't really need separate functions for this, though the termcap
- * version implements them separately.
+ * Ncurses mouse support is turned on/off when the keypad code is on/off,
+ * as well as when we enable/disable the mousemask.
  */
-void set_xclick_on (void) { }
+void set_xclick_on (void)
+{
+#ifdef NCURSES_MOUSE_VERSION
+	if (use_mouse)
+		mousemask(
+			(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
+			(mmask_t *)0);
+#endif
+}
 
 /*
  */
-void set_xclick_off (void) { }
+void set_xclick_off (void)
+{
+#ifdef NCURSES_MOUSE_VERSION
+	(void) mousemask(0, (mmask_t *)0);
+#endif
+}
 
 void
 MoveCursor(int row, int col)

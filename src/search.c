@@ -30,6 +30,7 @@ static int search_thread (int i, char *pattern);
  */
 
 char default_author_search[LEN];
+char default_config_search[LEN];
 char default_group_search[LEN];
 char default_subject_search[LEN];
 char default_art_search[LEN];
@@ -58,18 +59,18 @@ get_search_pattern(
 	if (!prompt_string (tmpbuf, pattern, which_hist))
 		return NULL;
 
-	if (pattern[0] != '\0') {
+	if (pattern[0] != '\0')
 		strcpy (def, pattern);
-	} else {
-		if (def[0]) {
+	else {
+		if (def[0])
 			strcpy (pattern, def);
-		} else {
+		else {
 			info_message (txt_no_search_string);
 			return NULL;
 		}
 	}
 
-	wait_message (txt_searching);
+	wait_message (0, txt_searching);
 	stow_cursor();
 
 	if (wildcard)			/* ie, not wildmat() */
@@ -97,13 +98,8 @@ search_author (
 	char group_path[PATH_LEN];
 	int i;
 
-	if (!(buf = get_search_pattern(
-				forward,
-				txt_author_search_forwards,
-				txt_author_search_backwards,
-				default_author_search,
-				HIST_AUTHOR_SEARCH
-	))) return -1;
+	if (!(buf = get_search_pattern(forward, txt_author_search_forwards, txt_author_search_backwards, default_author_search, HIST_AUTHOR_SEARCH)))
+		return -1;
 
 	if (!read_news_via_nntp || active[the_index].type != GROUP_TYPE_NEWS)
 		make_group_path (active[the_index].name, group_path);
@@ -118,20 +114,16 @@ search_author (
 		} else {
 			i = prev_response (i);
 			if (i < 0)
-				i = base[top_base - 1] +
-					num_of_responses (top_base - 1);
+				i = base[top_base - 1] + num_of_responses (top_base - 1);
 		}
 
-		if (active[the_index].attribute->show_only_unread &&
-		    arts[i].status != ART_UNREAD) {
+		if (active[the_index].attribute->show_only_unread && arts[i].status != ART_UNREAD)
 			continue;
-		}
 
-		if (arts[i].name == (char *) 0) {
+		if (arts[i].name == (char *) 0)
 			strcpy (buf2, arts[i].from);
-		} else {
+		else
 			sprintf (buf2, "%s <%s>", arts[i].name, arts[i].from);
-		}
 
 		if (REGEX_MATCH (buf2, buf, TRUE)) {
 			/*
@@ -146,6 +138,41 @@ search_author (
 
 	info_message ((msg[0] == '\0') ? txt_no_match : msg);
 	return -1;
+}
+
+/*
+ * Called by config.c
+ */
+int
+search_config(int forward, int current, int last)
+{
+	int n;
+	int incr = forward ? 1 : -1;
+	int result = current;
+	char *buf;
+
+	if (!(buf = get_search_pattern(
+				forward,
+				txt_search_forwards,
+				txt_search_backwards,
+				default_group_search,
+				HIST_CONFIG_SEARCH
+	))) return result;
+
+	n = current + incr;
+	do {
+		if (n < 0)
+			n = last;
+		else if (n > last)
+			n = 0;
+		if (REGEX_MATCH (option_table[n].option_text, buf, TRUE)) {
+			result = n;
+			break;
+		}
+		n += incr;
+	} while (n != current);
+	clear_message ();
+	return result;
 }
 
 /*
@@ -165,13 +192,8 @@ search_group (
 		return;
 	}
 
-	if (!(buf = get_search_pattern(
-				forward,
-				txt_search_forwards,
-				txt_search_backwards,
-				default_group_search,
-				HIST_GROUP_SEARCH
-	))) return;
+	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
+		return;
 
 	i = cur_groupnum;
 
@@ -189,24 +211,14 @@ search_group (
 		/*
 		 * Get the group name & description into buf2
 		 */
-		if (show_description && active[my_group[i]].description) {
-			sprintf (buf2, "%s %s", active[my_group[i]].name,
-				active[my_group[i]].description);
-		} else {
+		if (show_description && active[my_group[i]].description)
+			sprintf (buf2, "%s %s", active[my_group[i]].name, active[my_group[i]].description);
+		else
 			strcpy (buf2, active[my_group[i]].name);
-		}
 
 		if (REGEX_MATCH (buf2, buf, TRUE)) {
-			HpGlitch(erase_group_arrow ());
-			if (i >= first_group_on_screen && i < last_group_on_screen) {
-				clear_message ();
-				erase_group_arrow ();
-				cur_groupnum = i;
-				draw_group_arrow ();
-			} else {
-				cur_groupnum = i;
-				show_selection_page ();
-			}
+			move_to_group(i);
+			clear_message();
 			return;
 		}
 	} while (i != cur_groupnum);
@@ -259,13 +271,8 @@ search_subject_thread(
 	char *buf;
 	int i, depth;
 
-	if (!(buf = get_search_pattern(
-				forward,
-				txt_search_forwards,
-				txt_search_backwards,
-				default_subject_search,
-				HIST_GROUP_SEARCH
-	))) return;
+	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_subject_search, HIST_GROUP_SEARCH)))
+		return;
 
 	/*
 	 * Advance to our current position in the thread
@@ -280,7 +287,7 @@ search_subject_thread(
 
 	move_to_response(depth+offset);
 	clear_message();
-  	return;
+	return;
 }
 #endif
 
@@ -352,17 +359,7 @@ search_subject_group (
 	}
 
 	/* Otherwise update the on-screen pointer */
-	HpGlitch(erase_subject_arrow());
-
-	if (i >= first_subj_on_screen && i < last_subj_on_screen) {
-		clear_message ();
-		erase_subject_arrow ();
-		index_point = i;
-		draw_subject_arrow ();
-	} else {
-		index_point = i;
-		show_group_page ();
-	}
+	move_to_thread(i);
 
 	return(-1);				/* No furthur action needed in group.c */
 }
@@ -382,8 +379,8 @@ search_article (
 	char *p, *q;
 	int ctrl_L;
 	int i, j;
-	int orig_note_end;
-	int orig_note_page;
+	int local_note_page = note_page; /* copy current position in article */
+	t_bool local_note_end = note_end;
 
 	if (!(pattern = get_search_pattern(
 				forward,
@@ -393,24 +390,19 @@ search_article (
 				HIST_ART_SEARCH
 	))) return FALSE;
 
-	/*
-	 *  save current position in article
-	 */
-	orig_note_end = note_end;
-	orig_note_page = note_page;
-
-	while (!note_end) {
+	while (!local_note_end) {
 		note_line = 1;
 		ctrl_L = FALSE;
 
-		if (note_page == 0) {
+		if (local_note_page < 1)
 			note_line += 4;
-		} else {
+			/* FIXME: offset is wrong with news_headers_to_display */
+		else
 			note_line += 2;
-		}
+
 		while (note_line < cLINES) {
 			if (fgets (buf, sizeof buf, note_fp) == NULL) {
-				note_end = TRUE;
+				local_note_end = TRUE;
 				break;
 			}
 			buf[LEN-1] = '\0';
@@ -431,10 +423,9 @@ search_article (
 				} else if (*p == '\t') {
 					i = q - buf2;
 					j = (i|7) + 1;
-
-					while (i++ < j) {
+					while (i++ < j)
 						*q++ = ' ';
-					}
+
 				} else if (((*p) & 0xFF) < ' ') {
 					*q++ = '^';
 					*q++ = ((*p) & 0xFF) + '@';
@@ -445,23 +436,19 @@ search_article (
 			*q = '\0';
 
 			if (REGEX_MATCH (buf2, pattern, TRUE)) {
-				fseek (note_fp, note_mark[note_page], SEEK_SET);
+				fseek (note_fp, note_mark[local_note_page], SEEK_SET);
 				return TRUE;
 			}
 
 			note_line += ((int) strlen(buf2) / cCOLS) + 1;
 
-			if (ctrl_L) {
+			if (ctrl_L)
 				break;
-			}
 		}
-		if (!note_end) {
-			note_mark[++note_page] = ftell (note_fp);
-		}
+		if (!local_note_end)
+			note_mark[++local_note_page] = ftell (note_fp);
 	}
 
-	note_end = orig_note_end;
-	note_page = orig_note_page;
 	fseek (note_fp, note_mark[note_page], SEEK_SET);
 	info_message ((msg[0] == '\0') ? txt_no_match : msg);
 	return FALSE;
@@ -469,7 +456,11 @@ search_article (
 
 
 /*
- * Search article body. Used only by search_body()
+ * Scan the body of an article for a string.
+ * used only by search_body()
+ * Returns:		TRUE	String found
+ *				FALSE	Not found
+ *				-1		User aborted the search
  */
 static int
 search_art_body (
@@ -478,21 +469,33 @@ search_art_body (
 	char *pat)
 {
 	char buf[LEN];
+	char *line;
 	FILE *fp;
 
-	fp = open_art_fp (group_path, art->artnum);
-
-	if (fp == (FILE *) 0) {
-		return FALSE;
+	if ((fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0) {
+		if (tin_errno != 0)
+			return -1;
+		else
+			return FALSE;
 	}
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		if (buf[0] == '\n') {
+	/*
+	 * Skip the header
+	 */
+	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
+		if (line[0] == '\0')
 			break;
-		}
 	}
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	if (tin_errno != 0) {
+		fclose(fp);
+		return(-1);
+	}
+
+	/*
+	 * Now search the body
+	 */
+	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
 		if (REGEX_MATCH (buf, pat, TRUE)) {
 			fclose (fp);
 			return TRUE;
@@ -500,6 +503,10 @@ search_art_body (
 	}
 
 	fclose (fp);
+
+	if (tin_errno != 0)
+		return -1;
+
 	return FALSE;
 }
 
@@ -511,13 +518,9 @@ search_body (
 	struct t_group *group,
 	int current_art)
 {
-	char buf2[LEN];
 	char group_path[PATH_LEN];
 	char *pat;
-	char temp[20];
-	int aborted = FALSE;
-	int art_cnt = 0, i;
-	int count = 0;
+	int art_cnt = 0, i, j = 0;
 
 	if (!(pat = get_search_pattern(
 				1,
@@ -538,9 +541,8 @@ search_body (
 		}
 	} else {
 		for (i = 0 ; i < top ; i++) {
-			if (!IGNORE_ART(i)) {
+			if (!IGNORE_ART(i))
 				art_cnt++;
-			}
 		}
 	}
 
@@ -548,39 +550,25 @@ search_body (
 
 	do {
 		i = next_response (i);
-		if (i < 0) {
+		if (i < 0)
 			i = base[0];
-		}
 
-		if (group->attribute->show_only_unread && arts[i].status == ART_READ) {
+		sprintf(msg, txt_searching_body, ++j, art_cnt);
+
+		if (group->attribute->show_only_unread && arts[i].status == ART_READ)
 			continue;
+
+		switch (search_art_body (group_path, &arts[i], pat)) {
+			case TRUE:					/* Found it okay */
+				return i;
+
+			case -1:					/* User aborted search */
+				return -1;
 		}
 
-		if (search_art_body (group_path, &arts[i], pat)) {
-			return i;
-		}
-
-		if (count % MODULO_COUNT_NUM == 0) {
-			if (input_pending (0)) {
-				if (read (STDIN_FILENO, buf2, sizeof (buf2)-1)) {
-					if (buf2[0] == ESC || buf2[0] == 'q' || buf2[0] == 'Q') {
-						if (prompt_yn (cLINES, txt_abort_searching, TRUE) == 1) {
-							aborted = TRUE;
-							break;
-						} else {
-							show_progress(temp, txt_searching_body, 0, art_cnt);
-						}
-					}
-				}
-			}
-			show_progress(temp, txt_searching_body, count, art_cnt);
-		}
-		count++;
 	} while (i != current_art);
 
-	if (!aborted) {
-		info_message ((msg[0] == '\0') ? txt_no_match : msg);
-	}
+	info_message ((msg[0] == '\0') ? txt_no_match : msg);
 
 	return -1;
 }

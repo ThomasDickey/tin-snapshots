@@ -70,8 +70,9 @@ boundary_cmp(
 		return 0;
 }
 
-/* KNOWN BUG: this function is also called before piping and saving
-   articles, so these get saved with incorrect MIME headers */
+/* TODO: this function is also called before piping and saving
+   articles, so these get saved with incorrect MIME headers.
+   [ I have a plan to sort all this out - Jason ] */
 
 FILE *
 rfc1521_decode(

@@ -44,14 +44,14 @@ tin_itoa (
 	}
 
 	if (i) {
-		while (len < (digits-1)) {
+		while (len < (digits-1))
 			buffer[len++]=' ';
-		}
+
 		buffer[digits-1] = power[i];
 		buffer[digits] = '\0';
-	} else {
+	} else
 		sprintf(buffer, "%*d", digits, value);
-	}
+
 	return (buffer);
 }
 
@@ -69,8 +69,8 @@ char *my_strdup (
 	char *duplicate = (char *) 0;
 
 	if (str != (char *) 0) {
-		duplicate = (char *) my_malloc (strlen (str)+2);
-		duplicate[strlen(str)+1]= '\0';
+		duplicate = (char *) my_malloc (strlen (str)+1);
+/*		duplicate[strlen(str)+1]= '\0';*/
 		strcpy (duplicate, str);
 	}
 	return duplicate;
@@ -166,7 +166,8 @@ void modifiedstrncpy(
 	while (*source) {
 		if (*source!= 1) {
 			*c++ = *source++;
-			if (!--count) break;
+			if (!--count)
+				break;
 		}
 		else source++;
 	}
@@ -176,9 +177,9 @@ void modifiedstrncpy(
 	else
 		c = buf;
 
-	while (--size) {
-	        *target++ = *c++;
-	}
+	while (--size)
+		*target++ = *c++;
+
 	*target = 0;
 }
 
@@ -215,9 +216,8 @@ strpbrk (
 
 	for (ptr1 = str1; *ptr1 != '\0'; ptr1++) {
 		for (ptr2 = str2; *ptr2 != '\0';) {
-			if (*ptr1 == *ptr2++) {
+			if (*ptr1 == *ptr2++)
 				return (ptr1);
-			}
 		}
 	}
 	return (char *) 0;
@@ -376,9 +376,8 @@ strcasecmp (
 {
 	int r;
 	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
-		if (*p == '\0') {
+		if (*p == '\0')
 			return (0);
-		}
 	}
 
 	return r;
@@ -393,11 +392,9 @@ strncasecmp(
 	size_t n)
 {
 	int r=0;
-	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;
-			++p, ++q, --n) {
-		if (*p == '\0') {
+	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0; ++p, ++q, --n) {
+		if (*p == '\0')
 			return (0);
-		}
 	}
 	return n ? r : 0;
 }
@@ -441,7 +438,9 @@ str_trim(
 		}
 	}
 	/* delete trailing blank */
-	if (ws) wp--;
+	if (ws)
+		wp--;
+
 	*wp = 0;
 
 	return(string);

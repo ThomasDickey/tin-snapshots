@@ -1,16 +1,11 @@
 Bugs
 ----
+o  -z is 'broken' (terminal in wrong mode)
+    [Holger Smolinski <smolinsk@majestix.physik.uni-dortmund.de>]
+
 o  external inews, ~/.signature and base64 encoding MUST 'fail'
    (article will be encoded, signature will be not!)
    [Sven Paulus <sven@karlsruhe.org>]
-
-o  print a 'usage error' and quit tin when it is started with '-v' only.
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
-o  wait_message() is 'broken': it does not wait
-   (check where wait_message should wait or where info_message should be
-    used instead... or add a 2nd argument (seconds) to wait_message...)
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  -N and -M commandline switches are broken
    -N does not enter batch mode and does not mail out any articles
@@ -32,12 +27,8 @@ o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    [Jason C Lin <jlin@hawaii.edu>]
    [I can't reproduce this - jason@radar.demon.co.uk]
 
-o  word_h_display_marks, word_highlighting and wildcard are sometimes
-   reseted to their default value.
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
-o  tin does not assure that you are in nnrpd after a reconnect -> issue a
-   mode reader after a reconnect.
+o  word_h_display_marks, word_highlighting and wildcard (tinrc) are
+   sometimes reset to their default value.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
@@ -47,7 +38,7 @@ o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
    [Stan Brooks <stabro@almatel.net>]
 
 o  tin does not care about resizing the xterm it's running in.
-   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de>]
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
    [I can't reproduce this, what OS? - sven@karlsruhe.org]
 
 o  tin (sometimes?) overwrites the newsgroup-number and number of unread
@@ -55,7 +46,7 @@ o  tin (sometimes?) overwrites the newsgroup-number and number of unread
    strip_blanks=OFF - the bugs seems to be related to the screen-width and
    does not show up on small screens, but in large xterms...
    (sounds like a calculation error with float -> int values [urs])
-   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de>]
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
 
 o  sometimes tin truncates newsgroup-names after turning off newsgroup
    descriptions.
@@ -70,25 +61,12 @@ o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
    compile at all... - use -O2 for debug.c!!
 
 o  - fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
-   - 'any key' seems to be only 'return'
 
-o  - join show_xcommentto/news_headers_to_display, remove auto-display of
-     Keywords/Summary as it could be controlled by news_headers_to_display
-   - crsr/page-up/down does not work in large articles.
+o  - crsr/page-up/down does not work in large articles.
 
 o  --enable-curses has several bugs
    (screen redraw is broken, tty-settings get messed up, color might not
     work, ...)
-
-o  mark group as read warps into the next line if the group-name is very long
-
-o  if the server refuses reader-connections after MODE READER
-   tin claims that the connection has timed out instead of displaying the
-   '400'-message
-
-o  fix nntp_open/get_server (as reconnect often fails on the first try
-   nntp_open should return different values for 'different' errors
-   so we can try to reconnect more then once - see open.c/nntplib.[ch])
 
 o  sender-patch
    If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
@@ -98,11 +76,10 @@ o  sender-patch
    ad a Sender:-line
 
 o  'K' is still a bit inconsistent
-   - in the group menu (group.c) it jumps to the next thread containing unread
-     articles.
-   - in the thread menu (thread.c) it jumps to the next article
-   - in the article pager (page.c) it marks the whole thread as unread
-     and jumps to the next thread containing unread articles
+   - in the group and thread menu it marks current item read & jumps to the
+     next unread item.
+   - in the article pager (page.c) it marks the whole current thread as read
+     and jumps to the next unread article.
 
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always
@@ -132,7 +109,7 @@ o  if no INEWSDIR is given INEWSDIR is set to NEWSLIBDIR which is not always
 
 o  if external inews could not be found posting fails but no dead.article
    is saved :(
-   fall-back to build_in_inews would be good...
+   fall-back to build_in_inews would be good if running NNTP_ONLY
 
 o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
@@ -167,14 +144,7 @@ o  (Y)ank in after resync-time ends up in a double re-read of the active file
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
-o  kill-file may get messed up if using multiple news servers with feeds
-   that are not identical (moving some groups entries under new groups and
-   losing all references to the moved groups)
-
-o  sometimes (when using tins kill-menu) kill-file entries are
-   duplicated/get lost or messed up
-
-o  remove build in path of external commands (metamail, pgp, ...)
+o  remove built in path of external commands (metamail, ispell, ...)
 
 o  when enabling the 'cc/bcc on every message that is sent', and
    then mailing a message to myself, tin will print the message
@@ -199,7 +169,7 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 o  allow changing From: in mail-replys
 
-o  item_by_item_etiquette_warnings [compiletime?]
+o  item_by_item_etiquette_warnings [compile-time?]
    (i.e. enable x-posts without f'up waring, disable long-sig waring)
 
 o  auto_reconnect=ON/OFF ['M'enu]
@@ -248,24 +218,25 @@ o  add feature goto using the 'G' key
 o  Additions to the thread menu :
 	'/','?' (search subject)
 	'B' (body search)
-	'M' (option menu)	- not easy if the threading changes!
+	'M' (option menu)
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
 	''  r ought to be toggle show all/show only unread
 	'f' (post a followup)
+	'-' (goto last article)
 	keys to goto previous/next thread
 
 o  Additions to the pager:
 	'l' (goto thread menu)
 
-o  Additions to the 'M'enu:
-        '/', '?' searching
+o  Add to the 'M'enu:
+	'/', '?' searching
         news_headers_to_display
         news_headers_not_to_display
         DEFAULT_MAILER
 
-o  Additions to the 'h'elp-screen:
-        '/', '?' searching
+o  Add to the 'h'elp-screen:
+	'/', '?' searching
 
 o  Add a commandline switch that prints out all values of cpp-symbols etc.
 
@@ -301,7 +272,7 @@ o  posting to a binaries group should warn if no followup is set to another
 o  when posting to a group containing uppercase-letters: bring up a
    warning: "Newsgroup-names should be all lowercase, correct it? (Y/n)"
 
-   (g)oto group (and (S)ubscribe pattern) is case sensitive
+   (g)oto group is case sensitive
    also newsgroup names in the command-line are case sensitive
    better would be: check if they exist and if not ask if you would like to
    convert newsgroup name to lowercase
@@ -324,6 +295,9 @@ o  when server responses with:
 o  when From: only contains "First-name Last-name" tin strips the space
    misc.c:parse_from() ??
 
+o  Bounce duplicate Message-ID's when the headers are read. This will
+   make the threading code happier too.
+
 Internal Changes
 ----------------
 o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
@@ -331,12 +305,6 @@ o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
 
 o  change all system()/popen() calls to fork() and exec() calls
    [close security holes]
-
-o  use "XPAT header range wildmat" for searches (if newsserver supports xpat)
-   i.e.
-   GROUP alt.test
-   XPAT Subject - *test*
-   should be much faster then the current Subject-search.
 
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
@@ -358,10 +326,7 @@ o  join Makefile and makefile (not entirely possible)
 
 o  move all strings to lang.c
 
-o  cleanup (=rewrite) post.c/inews.c/header.c/page.c/filter.c/main.c
-
-o  rework the message routines (wait_message, error_message) to use variable
-   length argument lists
+o  cleanup (=rewrite) post.c/inews.c/header.c/page.c
 
 o  is art->inthread really needed, surely art->thread contains enough
    information
@@ -372,16 +337,19 @@ o  check where tin_done() should be called instead of using exit()
 
 Docs/online help
 ----------------
-o  man page is well out of date and is buggy. Rewrite.
+o  man page is well out of date and is buggy. update
 
 o  toggle behavior of 't'ag is not mentioned in the man-page
-
-o  print a message at startup if server doesn't grok XOVER
 
 o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  If you enter tin with -f <file> and file does not exist, it
+   creates a new one containing all groups unsubscribed. -f
+   should only work if <file> exists
+   [IMHO this is a feature, not a bug (urs)]
+
 o  currently the Sender: header includes the hostname ->
    if you configure with --with-domian-name=foo.bar
    and post from junk.foo.bar a Sender: header is included even if you don't
@@ -397,24 +365,9 @@ o  what is with $ADD_ADDRESS?!
 o  what is tin -C (count articles)? - if running in batch-mode (-Z)
    -v gives a summary...
 
-o  tin -n -q does not show descriptions - but tin -q or tin -n does -
-   wouldn't it be better to add a new flag to prevent tin form loading
-   newsgroups file?
-
-o  looks like, that while being connected to a server, new newsgroups are
-   not recognized and that tin writes a timestamp of the last time it read
-   the active-file (not connection time?), so it is possible that you never
-   see some new newsgroups. (not, sure about that, could have been a fault
-   with the test-news-server)
-
-o  select range and process selected range seems not to work
-
 o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 
-o  what is with NEW_HASH_METHOD in misc.c?
-
-o  what is with setup_soft_base - anyone remembering where it was used and
-   why the code was not stripped after it was considered as no longer needed?
+o  what is with NEW_HASH_METHOD in list.c?
 
 o  repost ('x') ignores ~/.tin/headers & ~/.tin/attributes - bug or
    feature?!
@@ -441,8 +394,6 @@ o  article save with auto_save=ON & Archive-name: doesn't not work correctly
 o  shows up cross-postings multiple times even if read once before getting
    a resync/reread active/newsrc-file
 
-o  if answering (c)atchup with (n) you are leaving the group... not useful
-
 o  numbering of Hot articles is wrong after (post)processing them
    (6T 0A 0K -5H R)
 
@@ -451,9 +402,6 @@ o  fix reposition of cursor after reading active file... annoying!
 o  think about group numbering in "only unread" display mode
    (using different numbers in show all/show only unread leads to some
     problems, f.e. group moving)
-
-o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
-   cnews-server
 
 o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
    to 'duplicated'-headers and multiple signatures

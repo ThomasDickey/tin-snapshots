@@ -15,9 +15,10 @@
 #ifndef VERSION_H
 #	define VERSION_H	1
 
-#	define VERSION		"1.3 unoff BETA"
-#	define RELEASEDATE	"971018"
-#	define TINRC_VERSION	"1.0"
+#	define PRODUCT		"tin"
+#	define VERSION		"pre-1.4"
+#	define RELEASEDATE	"971102"
+#	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA
 #		define	OS	"AMIGA"

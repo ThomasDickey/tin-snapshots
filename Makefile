@@ -3,9 +3,9 @@
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
-LVER		= 1.3
-PVER		= 971018
-VER		= $(LVER)-unoff-BETA-$(PVER)
+LVER		= 1.4
+PVER		= 971102
+VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
 TOPDIR	= .
@@ -67,6 +67,7 @@ CFILES	= \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
 	$(SRCDIR)/nntpw32.c \
+	$(SRCDIR)/nntpvms.c \
 	$(SRCDIR)/nrctbl.c \
 	$(SRCDIR)/open.c \
 	$(SRCDIR)/os_2.c \
@@ -75,6 +76,7 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c \
+	$(SRCDIR)/read.c \
 	$(SRCDIR)/refs.c \
 	$(SRCDIR)/regex.c \
 	$(SRCDIR)/rfc1521.c \
@@ -96,7 +98,7 @@ CFILES	= \
 	$(SRCDIR)/xref.c \
 	$(SRCDIR)/vms.c
 
-AMIGA	=\
+AMIGA	= \
 	$(AMGDIR)/README \
 	$(AMGDIR)/tin-unoff.readme \
 	$(AMGDIR)/smakefile \
@@ -113,9 +115,10 @@ DOC	= \
 	$(DOCDIR)/TODO \
 	$(DOCDIR)/WHATSNEW \
 	$(DOCDIR)/auth.txt \
-	$(DOCDIR)/minimal-netkeeping \
+	$(DOCDIR)/filtering \
 	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/iso2asc.txt \
+	$(DOCDIR)/minimal-netkeeping \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
 TOL	= \

@@ -340,11 +340,12 @@ run slightly slower but be more efficient in how memory is allocated and
 reclaimed.
 
 
+
 Compiled & installed on the following machines:
 -----------------------------------------------
 
 1)	i486 & Linux 1.2.13 with gcc 2.7.0
-	i486 & Linux 2.0.30 with gcc 2.7.2.2
+	i486 & Linux 2.0.31 with gcc 2.7.2.2
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
@@ -394,7 +395,7 @@ Compiled & installed on the following machines:
 12)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
 	with SCO OpenServer Development System (ver 5.0.0a)
 
-13)     i386 & XENIX 2.3.3 with gcc 1.37.1
+13)	i386 & XENIX 2.3.3 with gcc 1.37.1
 
 14)	NeXT Computer & NeXTSTEP 3.3 with gcc 2.5.8
 

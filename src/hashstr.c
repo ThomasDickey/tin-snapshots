@@ -31,9 +31,9 @@
 #define		HASHNODE_TABLE_SIZE	2411
 
 #ifdef M_AMIGA
-struct t_hashnode **table=0;
+	struct t_hashnode **table=0;
 #else
-struct t_hashnode *table[HASHNODE_TABLE_SIZE];
+	struct t_hashnode *table[HASHNODE_TABLE_SIZE];
 #endif
 
 static struct t_hashnode *add_string (const char *s);
@@ -55,7 +55,8 @@ hash_str (
 		h = 0;
 		while (*t) {
 			h = (h << 1) ^ *t++;
-			if (++len & 7) continue;
+			if (++len & 7)
+				continue;
 			h %= (long) HASHNODE_TABLE_SIZE;
 		}
 		h %= (long) HASHNODE_TABLE_SIZE;
@@ -64,9 +65,8 @@ hash_str (
 	p = &table[h];
 
 	while (*p) {
-		if (STRCMPEQ(s, (*p)->txt)) {
+		if (STRCMPEQ(s, (*p)->txt))
 			return (*p)->txt;
-		}
 		p = &(*p)->next;
 	}
 
@@ -110,14 +110,12 @@ hash_init (void)
 	int i;
 
 #ifdef M_AMIGA
-	if (!table) {
+	if (!table)
 		table = (struct t_hashnode **) my_malloc (HASHNODE_TABLE_SIZE * sizeof (void *));
-	}
 #endif
 
-	for (i = 0; i < HASHNODE_TABLE_SIZE; i++) {
+	for (i = 0; i < HASHNODE_TABLE_SIZE; i++)
 		table[i] = (struct t_hashnode *) 0;
-	}
 }
 
 
