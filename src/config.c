@@ -212,6 +212,7 @@ read_config_file (
 				break;
 			}
 			if (match_string (buf, "default_maildir=", default_maildir, sizeof (default_maildir))) {
+				joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
 				break;
 			}
 			if (match_string (buf, "default_printer=", default_printer, sizeof (default_printer))) {

@@ -120,7 +120,7 @@ int default_show_author;		/* show_author value from 'M' menu in tinrc */
 int default_sort_art_type;		/* sort arts[] array by subject,from or date field */
 int default_thread_arts;		/* threading system for viewing articles */
 int global_filtered_articles;	/* globally killed / auto-selected articles */
-int group_top;						/* one past top of my_group */
+int group_top;						/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
@@ -821,7 +821,7 @@ got_bug_addr:;
 	sprintf (txt_help_bug_report, txt_help_bug, bug_addr);
 
 #ifdef HAVE_PGP
-	pgpopts = get_val("PGPOPTS", "");
+	pgpopts = (char *) get_val("PGPOPTS", "");
 	if ((ptr = getenv("PGPPATH")) != (char *) 0)
 		strcpy (pgp_data, ptr);
 	else

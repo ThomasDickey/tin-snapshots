@@ -300,13 +300,6 @@ CF_ARG_DISABLE(color,
 	[AC_DEFINE(HAVE_COLOR)])
 AC_MSG_RESULT($enableval)
 
-AC_MSG_CHECKING(whether to enable reference-based threading)
-CF_ARG_DISABLE(ref-threading,
-	[  --disable-ref-threading
-                          disable reference-based threading],,
-	[AC_DEFINE(HAVE_REF_THREADING)])
-AC_MSG_RESULT($enableval)
-
 AC_MSG_CHECKING(whether to enable posting-etiquette)
 CF_ARG_DISABLE(etiquette,
 	[  --disable-etiquette     disable printing of posting-etiquette],

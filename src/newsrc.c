@@ -766,13 +766,16 @@ parse_unread_arts (
 
 	bitmin = group->newsrc.xmin;
 	bitmax = group->newsrc.xmax;
+
 	if (group->xmax >= bitmin) {
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(group->xmax-bitmin+1));
 		NSETRNG0(newbitmap, 0, group->xmax - bitmin);
 	}
 	for (i = 0; i < top; i++) {
-		if (arts[i].artnum < bitmin) arts[i].status = ART_READ;
-		else if (arts[i].artnum > bitmax) arts[i].status = ART_UNREAD;
+		if (arts[i].artnum < bitmin)
+			arts[i].status = ART_READ;
+		else if (arts[i].artnum > bitmax)
+			arts[i].status = ART_UNREAD;
 		else if (NTEST(group->newsrc.xbitmap, arts[i].artnum - bitmin) == ART_READ) {
 			arts[i].status = ART_READ;
 		} else {

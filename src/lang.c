@@ -984,7 +984,7 @@ constext txt_thread_not_saved[] = "Thread not saved";
 constext txt_thread_page[] = "T %d of %d (p %d), %s:  %s";
 constext txt_thread_resp_page[] = "T %d of %d, R %d/%d (p %d), %s:  %s";
 constext txt_thread_saved_to_many[] = "Thread saved to %s - %s";
-constext txt_thread_x_of_n[] = "%sThread %4d of %4d\r\n";
+constext txt_thread_x_of_n[] = "%sThread %4s of %4s\r\n";
 constext txt_threading_arts[] = "Threading articles...";
 #ifdef HAVE_COLOR
 constext txt_toggled_high_off[] = "Toggled word highlighting off";

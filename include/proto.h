@@ -422,6 +422,7 @@ extern void show_selection_page (void);
 extern void erase_group_arrow (void);
 extern void draw_group_arrow (void);
 extern int choose_new_group (void);
+extern int skip_newgroups (void);
 extern int add_my_group (char *group, int add);
 extern void set_groupname_len (int all_groups);
 extern void toggle_my_groups (t_bool only_unread_groups, const char *group);

@@ -1,11 +1,15 @@
 Bugs
 ----
-o  on some systems (my linux 2.0.26/gcc 2.7.2.1) - tin claims that the
-   connection has timed out if the server refueses the connection.
-   on hp-ux 8.0/cc it works the way it should... 
+o  rangecheck for ISO2ASC is missing (ISO2ASC > 7 may lead to SIGSEGVs)
+
+o  mark group as read warps into the next line if the groupname is very long
+
+o  on some systems (my Linux 2.0.26/gcc 2.7.2.1) - tin claims that the
+   connection has timed out if the server refuses the connection.
+   on HP-UX 8.0/cc it works the way it should... 
 
 o  fix nntp_open/get_server (as reconnect often fails on the first try
-   nntp_open should return differrent values for 'different' errors
+   nntp_open should return different values for 'different' errors
    so we can try to reconnect more then once - see open.c/nntplib.[ch])
 
 o  sender-patch
@@ -29,13 +33,10 @@ o  tin crashes if started with too small a screen size
 
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always
-   have an effect.  This is because the OptionMenu in {group,page}.c
+   have an effect.  This is because the Option-Menu in {group,page}.c
    doesn't reread the attributes, whereas select.c does. It might be better
    to fix the problem properly in config.c by flashing changes to all
    groups using default attributes.
-
-o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
-   (thread_x_of_n, group.c) (use tin_itoa would help)
 
 o  ispell checks all headers
 
@@ -116,7 +117,7 @@ o  add abillity to strip bogus newsgroups from newsrc
 
 o  add support for ispell language change
 
-o  add rfc1468/1922 (rfc2045-2049) support
+o  add RFC1468/1922 (RFC2045-2049) support
 
 o  add a weed-out list like in elm so the user could specify which headers
    he'd like to see and which not (attrib.c)
@@ -336,7 +337,7 @@ o  numbering of Hot articles is wrong after (post)processing them
 o  fix reposition of cursor after reading active file... annoying! 
 
 o  think about group numbering in "only unread" display mode
-   (using different numbers in show all/show only unrerad leads to some
+   (using different numbers in show all/show only unread leads to some
     problems, f.e. group moving)
 
 o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
@@ -354,7 +355,7 @@ o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
 Filtering enhancements
 ----------------------
 o  add command: mark all articles older than <date> as read
-   (usefull when subscribing to a new group with high-traffic...)
+   (useful when subscribing to a new group with high-traffic...)
 
 o  fix kill/hot mechanism that you could kill/mark hot everything which
    contains abc OR def... like "tin *|* tin|* tin *" -even better would be

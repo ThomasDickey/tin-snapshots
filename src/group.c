@@ -281,15 +281,13 @@ end_of_list:
 					break;
 				}
 				if (index_point != top_base - 1) {
-					if (top_base - 1 >= last_subj_on_screen) {
-						erase_subject_arrow ();
-						index_point = top_base - 1;
+					erase_subject_arrow ();
+					index_point = top_base - 1;
+
+					if (top_base - 1 >= last_subj_on_screen)
 						show_group_page ();
-					} else {
-						erase_subject_arrow ();
-						index_point = top_base - 1;
+					else
 						draw_subject_arrow ();
-					}
 				}
 				break;
 
@@ -1018,18 +1016,10 @@ group_list_thread:
 				}
 				break;
 
-			/*
-			 * If we have ref threading, cycle through the threading
-			 * types, otherwise act as a straight toggle
-			 */
-			case iKeyGroupToggleThreading:
+			case iKeyGroupToggleThreading:	/* Cycle through the threading types */
 
 				CURR_GROUP.attribute->thread_arts =
-#ifdef HAVE_REF_THREADING
-						++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
-#else
-						!CURR_GROUP.attribute->thread_arts;
-#endif
+							++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
  				if (index_point >= 0) {
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);
@@ -1512,7 +1502,10 @@ set_subj_from_size (
 {
 	int size, show_author;
 
-	show_author = CURR_GROUP.attribute->show_author;
+	if (cur_groupnum == 0)
+		show_author = default_show_author;
+	else
+		show_author = CURR_GROUP.attribute->show_author;
 
 	if (show_author == SHOW_FROM_BOTH) {
 		max_subj = (num_cols / 2) - 4;

@@ -249,6 +249,9 @@ constext *help_page[] = {
 		txt_help_empty_line,
 	txt_help_ctrl_h,
 	txt_help_p_d,
+#ifdef HAVE_PGP
+	txt_help_ctrl_g,
+#endif
 		txt_help_empty_line,
 	txt_help_W,
 		txt_help_empty_line,

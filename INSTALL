@@ -6,7 +6,7 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
-  --enable-ref-threading     --with-nntp-default-server --enable-debug
+                             --with-nntp-default-server --enable-debug
   --with-iso-to-ascii        --enable-nntp-only         --with-nov-dir
   --with-ispell              --with-inews-dir           --with-mail-domain
   --enable-mh-mail-handling  --with-mail-gateway        --with-spooldir
@@ -79,33 +79,21 @@ Tin can be compiled to read news in any of the following ways:
 
   o  locally and remotely via NNTP (rtin or tin -r option) (--enable-nntp).
 
-TODO - is this dead yet ?
-  o  remotely from another machine via NNTP but creating tin index files
-     on local machine for each user in $HOME/.tin/.index 
-     (--enable-nntp-only).
+  o  remotely via NNTP (--enable-nntp-only).
 
-TODO - is this still supported ?
-  o  remotely from another machine via NNTP and also retrieving tin index
-     files from remote machine via NNTP (--enable-nntp-only). This
-     option requires that my NNTP patch be applied to your NNTP 1.5.11t5 
-     server nntpd. On the NNTP server the index daemon of tin
-     'tind' needs to be run from cron to update the index files at regular 
-     intervals (not required if INN/Cnews generate NOV index files).
+If the remote server supports NOV overview indexing, then tin will retrieve
+overview data on the fly using the NNTP XOVER extension.
+Otherwise tin will create its own NOV style index files on the local machine
+for each user in $HOME/.tin/.index 
 
-TODO this is automatic if NOV is found
-  o  remotely from another machine via NNTP and retrieving NOV style index
-     files from remote machine via the NNTP XOVER extension 
-     (--enable-nntp-only). 
 
 Many machines require the name of the news gateway machine or the news
 domain to be set via the --with-mail-gateway or the --with-mail-domain
 configure options.  This is true of both NNTP and local news systems.
 
 
-Building Tin (Normal & Daemon versions) 
----------------------------------------
-
-Normal version:
+Building the Normal version:
+----------------------------
 
 1)  Type './configure --help' to see which options are needed for your
     local setup.
@@ -115,7 +103,10 @@ Normal version:
     Alternatively goto the src subdirectory and type 'make'
 4)  Type 'make install' to install.
 
-Index daemon version: (only if your server doesn't support NOV overview files)
+Building the Index daemon version:
+----------------------------------
+
+(only if your server doesn't support NOV overview files)
 
 Note1: If you want to retrieve tin index files from your NNTP server,
        or if you don't run NNTP but want to install tin setuid and have
@@ -124,28 +115,28 @@ Note1: If you want to retrieve tin index files from your NNTP server,
        you will need the tind index file daemon; create it using the
        following steps:
 
-  1)  Build and install the 'Normal version' of tin as specified by the
-      above 4 points.
-  2)  Run "make clean" to delete the *.o files from the normal version.
-  3)  The tind index daemon needs to be installed on your NNTP server,
-      or on your stand-alone news server if you're not using NNTP.
-      More info. concerning my NNTP patches & the tin daemon can be
-      found in the INSTALL.NNTP file.  If you don't use NNTP, just
-      install tind on the machine that has the news spool directory.
-  4)  Apply my NNTP patches to your nntpd server or this will not work 
-      with NNTP!!!. (If you want tind locally read Note3).
-  5)  Edit the Makefile and add -DINDEX_DAEMON to your COPTS entry and
-      remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap, and
-      any other screen-handling libraries used, as tind does not need to
-      be linked with curses and it will save a good 30-50K on the size of
-      tind.
-  6)  Type 'make <system type>' to compile tind daemon for your NNTP server
-      or stand-alone news server.  This creates tind as the file "tin".
-  7)  Rename the file "tin" to "tind" (i.e. mv tin tind).
-  8)  Type 'make install_daemon' to install tind daemon on your NNTP server
-      or stand-alone news server.
-  9)  Add the following line to your system cron to run tind every 30 mins:
-        00,30 * * * * su news -c '/usr/lib/news/tind'
+   1)  Build and install the 'Normal version' of tin as specified by the
+       above 4 points.
+   2)  Run "make clean" to delete the *.o files from the normal version.
+   3)  The tind index daemon needs to be installed on your NNTP server,
+       or on your stand-alone news server if you're not using NNTP.
+       More info. concerning my NNTP patches & the tin daemon can be
+       found in the INSTALL.NNTP file.  If you don't use NNTP, just
+       install tind on the machine that has the news spool directory.
+   4)  Apply my NNTP patches to your nntpd server or this will not work 
+       with NNTP!!!. (If you want tind locally read Note3).
+   5)  Edit the Makefile and add -DINDEX_DAEMON to your COPTS entry and
+       remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap, and
+       any other screen-handling libraries used, as tind does not need to
+       be linked with curses and it will save a good 30-50K on the size of
+       tind.
+   6)  Type 'make <system type>' to compile tind daemon for your NNTP server
+       or stand-alone news server.  This creates tind as the file "tin".
+   7)  Rename the file "tin" to "tind" (i.e. mv tin tind).
+   8)  Type 'make install_daemon' to install tind daemon on your NNTP server
+       or stand-alone news server.
+   9)  Add the following line to your system cron to run tind every 30 mins:
+              00,30 * * * * su news -c '/usr/lib/news/tind'
 
 Note2: tind must be run as user 'news' and the normal tin must have
        the correct permissions to read the central index files!
@@ -223,10 +214,6 @@ Define if you [want to | can] ONLY read news remotely via an NNTP server.
 Defines the name of the default NNTP server that tin should connect to.
 Overrides the value of NNTP_SERVER_FILE. Can be overridden by setting the
 environment variable NNTPSERVER.
-
---enable-ref-threading (default: on)
-Define if you want to be able to create threads based on the
-References: news header.
 
 NNTP_INEWS
 Define if you want to use my built-in NNTP POST routine so that you no
