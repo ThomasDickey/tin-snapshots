@@ -74,7 +74,7 @@ OPTFILE  =
 .ENDIF
 .ENDIF
 
-.IFDEF DEBUG
+.IFDEF DEBUGGER
 PCRELIB    = LIBPCREDBG_$(COMP)_$(OS_TYP).OLB
 PCREPOSLIB = LIBPCREPOSIXDBG_$(COMP)_$(OS_TYP).OLB
 CFLAGS     = $(COMPFLAG)/NOOPTIMIZE/DEBUG
@@ -87,7 +87,7 @@ CFLAGS     = $(COMPFLAG)/OPTIMIZE
 
 ##########################################################################
 
-MODPCRE     = chartables.obj study.obj pcre.obj
+MODPCRE     = maketables.obj get.obj study.obj pcre.obj
 MODPCREPOS  = pcreposix.obj
 
 all           : libpcre libpcreposix pcretest.exe pgrep.exe
@@ -123,7 +123,7 @@ $(PCRELIB)(study)           :  study.c pcre.h internal.h
         LIBR/REPLACE $(MMS$TARGET) $(MMS$TARGET_NAME)
         delete /nolog $(MMS$TARGET_NAME).OBJ;*
 
-$(PCRELIB)(pcre)            :  pcre.c pcre.h internal.h
+$(PCRELIB)(pcre)            :  pcre.c pcre.h chartables.c internal.h
         $(CC)$(CFLAGS) $(MMS$SOURCE)
         LIBR/REPLACE $(MMS$TARGET) $(MMS$TARGET_NAME)
         delete /nolog $(MMS$TARGET_NAME).OBJ;*
@@ -152,7 +152,7 @@ PCRE.OPT      :
     @ write optfile "!Linker Options File for $(COMPILER) on OpenVMS/Alpha"
     @ write optfile "gnu_cc_library:libgcc/libr"
     @ write optfile "sys$share:vaxcrtl/libr"
-   @ write optfile "gnu_cc_library:crt0.obj"
+    @ write optfile "gnu_cc_library:crt0.obj"
 .ENDIF
     @ close optfile
 .ENDIF
@@ -167,17 +167,17 @@ pgrep.obj      :  pgrep.c pcre.h
 chartables.obj :  chartables.c
 maketables.obj :  maketables.c
 
-chartables.c :    maketables.exe
+chartables.c :    dftables.exe
         CURRENT_OUTPUT = f$trnlnm("SYS$OUTPUT")
 	DEFINE SYS$OUTPUT chartables.c
-	run maketables
+	run dftables
 	DEASS SYS$OUTPUT
 	DEFINE SYS$OUTPUT 'CURRENT_OUTPUT'
 
-maketables.exe :     maketables.obj $(OPTFILE)
-        link maketables $(LOPT)
+dftables.exe :     dftables.obj maketables.obj $(OPTFILE)
+        link dftables $(LOPT)
 
-# We deliberately omit maketables and chartables.c from 'make clean'; once made
+# We deliberately omit dftables and chartables.c from 'make clean'; once made
 # chartables.c shouldn't change, and if people have edited the tables by hand,
 # you don't want to throw them away.
 
@@ -192,5 +192,5 @@ clean :
     @ if f$search("$(PCREPOSLIB);*") .nes. "" then Delete/Log $(PCREPOSLIB);*
     @ ! 
     @ if f$search("chartables.c;*") .nes. "" then Delete/Log chartables.c;*
-    @ if f$search("maketables.exe;*") .nes. "" then Delete/Log maketables.exe;*
+    @ if f$search("dftables.exe;*") .nes. "" then Delete/Log dftables.exe;*
 

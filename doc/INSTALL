@@ -587,16 +587,19 @@ m68k-cbm-netbsd1.4                     egcs 2.91.60 (pre-1.4 release 19990927)  
 vax-unknown-netbsd1.4M                 egcs 2.91.60 (pre-1.4 release 19990927)        <laura@tin.org>
 i386-unknown-netbsd1.4.1               egcs 2.91.60 (1.4.0 release 19991113)          <urs@tin.org>
 
-i386-unknown-freebsd2.2                gcc 2.7.2.1  (1.4.0 release 19991113)          <urs@tin.org>
+i386-unknown-freebsd2.2                gcc 2.7.2.1  (1.4.4 release 20000803)          <urs@tin.org>
 i386-unknown-freebsd3.1                gcc 2.7.2.1  (pre-1.4 release 19990927)        <goose@muffin.org>
 i386-unknown-freebsd3.2                egcs 2.91.60 (pre-1.4 release 19990927)        <goose@muffin.org>
+
+i386-unknown-openbsd2.7                gcc 2.95.2   (tin 1.4.4 release 20000803)      <ry04@rz.uni-karlsruhe.de>
 
 sparc-sun-sunos4.1.3                   gcc 2.6.0    (pre-1.4 release 19990927)        <andy@tin.org>
 sparc-sun-solaris2.5                   gcc 2.7.2    (pre-1.4 release 19990927)        <urs@tin.org>
 sparc-sun-solaris2.5.1                 gcc 2.8.1    (1.4.0 release 19991113)          <urs@tin.org>
 sparc-sun-solaris2.6                   gcc 2.8.1    (pre-1.4 release 19990927)        <dk@ssw.krakow.pl>
+sparc-sun-solaris2.7                   gcc 2.8.1    (1.4.4 release 20000803)          <ry04@rz.uni-karlsruhe.de>
 
-mips-sgi-irix5.2                       cc 3.18      (1.4.4 release 20000502)          <sven@tin.org>
+mips-sgi-irix5.2                       cc 3.18      (1.4.3 release 20000502)          <sven@tin.org>
 mips-sgi-irix5.3                       cc 3.19      (1.4.3 release 20000502)          <sven@tin.org>
 mips-sgi-irix6.2                       cc 7.000     (1.4.0 release 19991113)          <andy@tin.org>
 mips-sgi-irix6.2                       gcc 2.7.2.2  (pre-1.4 release 19990927)        <turin@incubus.de>

@@ -15,6 +15,9 @@
 #ifndef TIN_H
 #	include "tin.h"
 #endif /* !TIN_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
 #ifndef TCURSES_H
 #	include "tcurses.h"	/* to define cCRLF */
 #endif /* !TCURSES_H */
@@ -1858,3 +1861,10 @@ struct opttxt txt_cache_overview_files = {
 	"# If ON, create local copies of NNTP overview files.\n"
 };
 
+char *tin_version(void)
+{
+	static char result[80];
+	sprintf (result, "Version: %s release %s (\"%s\")",
+		VERSION, RELEASEDATE, RELEASENAME);
+	return result;
+}

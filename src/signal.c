@@ -187,7 +187,9 @@ allow_resize (
 #	ifdef SIGWINCH
 	sigaction(SIGWINCH, &sa, &osa);
 #	endif /* SIGWINCH */
+#	ifdef SIGTSTP
 	sigaction(SIGTSTP, &sa, &osa);
+#	endif /* SIGTSTP */
 #endif /* HAVE_POSIX_JC */
 }
 
@@ -211,11 +213,11 @@ signal_name (
  * the current context
  * This should NOT be called from an interrupt context
  */
-#if defined(SIGWINCH) || defined(SIGTSTP)
 void
 handle_resize (
 	t_bool repaint)
 {
+#if defined(SIGWINCH) || defined(SIGTSTP)
 #	ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
 #	endif /* SIGWINCH */
@@ -274,8 +276,8 @@ handle_resize (
 			break;
 	}
 	my_fflush(stdout);
-}
 #endif /* SIGWINCH || SIGTSTP */
+}
 
 #ifdef SIGTSTP
 static void

@@ -16,8 +16,8 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION 	"1.4.4"
-#	define RELEASEDATE	"20000803"
+#	define VERSION 	"1.4.5"
+#	define RELEASEDATE	"20001121"
 #	define RELEASENAME	"Vet for the Insane"
 #	define TINRC_VERSION	"1.2"
 

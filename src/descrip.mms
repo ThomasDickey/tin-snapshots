@@ -1,5 +1,6 @@
 # Makefile for tin - for tin compiler flag options read INSTALL and README.
 #
+VERSION	= 1.4.5
 
 .IFDEF DEF_NNTP
 .ELSE
@@ -12,18 +13,30 @@ DEF_NNTP = NNTP_DEFAULT_SERVER="""news.rrzn.uni-hannover.de"""
 #
 # The only tcp option currently supported is SOCKETSHR_TCP
 #
+# SOCKETSHR_STATIC is a development aid so we can link statically against a
+# copy of socketshr in the "bin:" directory.
+
 .IFDEF TCP
 .ELSE
 #TCP = UCX
 TCP = SOCKETSHR_TCP
+.IFDEF SOCKETSHR_STATIC
+SOCKETSHR_LIBS = bin:socketlib/lib
+SOCKETSHR_INCS = ,bin:
+.ELSE
+SOCKETSHR_LIBS = socketshr/share
+SOCKETSHR_INCS =
+.ENDIF
 .ENDIF
 
 .IFDEF ALPHA
 OS_STR  = OpenVMS/ALPHA
+OS_TYP	= ALPHA
 .ENDIF
 
 .IFDEF VAX
 OS_STR  = OpenVMS/VAX
+OS_TYP	= VAX
 .ENDIF
 
 .IFDEF OS_STR
@@ -37,24 +50,65 @@ OS_STR  = OpenVMS/VAX
         @ WRITE SYS$OUTPUT "   on OpenVMS/Vax:"
         @ WRITE SYS$OUTPUT "   $MMS /MACRO=(vax=1)"
         @ WRITE SYS$OUTPUT ""
-        @ WRITE SYS$OUTPUT "   Another example:"
+        @ WRITE SYS$OUTPUT "   other examples:"
         @ WRITE SYS$OUTPUT "   $MMS /MACRO=(vax=1,gnuc=1,tcp=socketshr_tcp)"
+        @ WRITE SYS$OUTPUT "   $MMS /MACRO=(vax=1,debug=1)"
+        @ WRITE SYS$OUTPUT "   $MMS /MACRO=(vax=1,debugger=1)"
         @ return 44  ! %SYSTEM-F-ABORT, abort
 
 .ENDIF
 
 
 DEF_OS   = OS="""$(OS_STR)"""
-DEFINES  = HAVE_ISPELL,DONT_HAVE_NNTP_EXTS,VMS,$(TCP),$(DEF_NNTP),$(DEF_OS)
 
+# Define "DEBUG" to compile-in runtime traces with the -"D" option.
 .IFDEF DEBUG
-DBG = /debug /nooptim
-LFLAGS = /debug/nomap
-TARGET = tin_debug$(EXE)
-TINLIB = TINDBG.OLB
-.ELSE # !DEBUG
-TARGET = tin$(EXE)
-TINLIB = TIN.OLB
+DEF_TEST = ,DEBUG
+.ELSE
+DEF_TEST =
+.ENDIF
+
+DEFINES  = HAVE_ISPELL,DONT_HAVE_NNTP_EXTS,VMS,$(TCP),$(DEF_NNTP),$(DEF_OS)$(DEF_TEST)
+INCLUDES = [-.include],[-.vms],[-.PCRE]$(SOCKETSHR_INCS)
+
+# Comment/uncomment one of these to get no listings, or long listings.
+# DEC's runtime environment reports errors based on the line numbers in these
+# listings, so they're useful for analyzing fatal errors.
+LIST_OPT = /list/show=expans
+#LIST_OPT = /list/show=all
+
+.IFDEF VAXC
+CC = cc
+CDEFS = /include=($(INCLUDES))/define=($(DEFINES))/nowarning$(LIST_OPT)
+GLOMOD = $(TINLIB)/LIBRARY,
+COMP = VAXC
+.ELSE
+.IFDEF  GNUC
+CC	= gcc
+CDEFS = /include=($(INCLUDES))/define=($(DEFINES))
+GLOMOD = $(TINLIB)/LIBRARY,
+COMP = GNUC
+.ELSE
+CC = cc/decc
+CDEFS = /include=($(INCLUDES))/define=($(DEFINES))/nowarning$(LIST_OPT)
+COMP = DECC
+.ENDIF
+.ENDIF
+
+# Define "DEBUGGER" to make an executable that you can use the debug program
+# to analyze problems.
+.IFDEF DEBUGGER
+DBG	= /debug /nooptim
+LFLAGS	= /debug/map
+TARGET	= tin_debug$(EXE)
+PCRELIB	= LIBPCREDBG_$(COMP)_$(OS_TYP).OLB
+TINLIB	= TINDBG.OLB
+VMSLIB	= LIBVMSDBG_$(COMP)_$(OS_TYP).OLB
+.ELSE # !DEBUGGER
+TARGET	= tin$(EXE)
+PCRELIB	= LIBPCRE_$(COMP)_$(OS_TYP).OLB
+TINLIB	= TIN.OLB
+VMSLIB	= LIBVMS_$(COMP)_$(OS_TYP).OLB
 .IFDEF VAXC
 DBG = /optim
 .ELSE
@@ -66,34 +120,14 @@ DBG = /optim
 .ENDIF
 .ENDIF
 
-.IFDEF VAXC
-CC = cc
-CDEFS = /include=([-.include],[-.vms],[-.PCRE])/define=($(DEFINES))/nowarning/list/show=expans
-GLOMOD = $(TINLIB)/LIBRARY/INCL=LANG,
-COMPILER = VAXC
-.ELSE
-.IFDEF  GNUC
-CC	= gcc
-CDEFS = /include=([-.include],[-.vms],[-.PCRE])/define=($(DEFINES))
-GLOMOD = $(TINLIB)/LIBRARY/INCL=LANG,
-COMPILER = GNUC
-.ELSE
-CC = cc/decc
-CDEFS = /include=([-.include],[-.vms],[-.PCRE])/define=($(DEFINES))/nowarning/list/show=expans
-COMPILER = DECC
-.ENDIF
-.ENDIF
-
 .IFDEF VAX
-GLOMOD = $(TINLIB)/LIBRARY/INCL=LANG,
+GLOMOD = $(TINLIB)/LIBRARY,
 .ELSE
 GLOMOD =
 .ENDIF
 
-#CDEFS = /include=([-.include],[-.vms],[-.PCRE])/define=($(DEFINES))/nowarning/list/show=all
-
-LFLAGS = /nomap
-.ENDIF # !DEBUG
+LFLAGS = /map
+.ENDIF # !DEBUGGER
 
 .IFDEF VAXC
 OPTS    =
@@ -109,8 +143,8 @@ OPTS    = /prefix=(all,except=ENDWIN)
 
 CFLAGS = $(DBG) $(OPTS) $(CDEFS)
 
-LIBS    = [-.vms]libvms/libr,[-.pcre]pcrelib/libr
 INCDIR  = [-.include]
+LIBS	= [-.vms]$(VMSLIB)/libr,[-.pcre]$(PCRELIB)/libr
 
 .IFDEF BISON
 YACC = bison/fixed
@@ -155,11 +189,11 @@ all : opt pcrelib vmslib  tincfg.h tin
 # very large.
 #
 opt :
-	@ write sys$output "Creating linker options file on ''OS_STR' for ''TCP' with ''COMPILER'"
+	@ write sys$output "Creating linker options file on $(OS_STR) for $(TCP) with $(COMP)"
 	@ open/write optfile [-.vms]tin.opt
-        @ write optfile "!Options file for tin pre-1.4 on ''OS_STR' for ''TCP' with ''COMPILER'"
+        @ write optfile "!Options file for tin $(VERSION) on $(OS_STR) for $(TCP) with $(COMP)"
 	@ if ("$(TCP)" .eqs. "SOCKETSHR_TCP") then write optfile "!Using Socketshr TCP/IP"
-	@ if ("$(TCP)" .eqs. "SOCKETSHR_TCP") then write optfile "socketshr/share"
+	@ if ("$(TCP)" .eqs. "SOCKETSHR_TCP") then write optfile "$(SOCKETSHR_LIBS)"
 .ifdef VAXC
         @ write optfile "!VAXC options"
         @ write optfile "sys$share:vaxcrtl/share"

@@ -518,8 +518,7 @@ tin_done (
 #endif /* USE_DBMALLOC */
 
 #ifdef VMS
-	if (!ret)
-		ret = 1;
+	ret = !ret;
 	vms_close_stdin (); /* free resources used by ReadCh */
 #endif /* VMS */
 
@@ -753,6 +752,9 @@ invoke_cmd (
 	ret = system (nam);
 #endif /* USE_SYSTEM_STATUS */
 	TRACE(("return %d", ret))
+#ifdef VMS
+	ret = !ret;	  /* good enough to test success/fail */
+#endif
 
 	set_signal_catcher (TRUE);
 	if (!save_cmd_line) {
@@ -764,11 +766,7 @@ invoke_cmd (
 	if (ret != 0)
 		error_message (txt_command_failed, nam);
 
-#ifdef VMS
-	return ret != 0;
-#else
 	return ret == 0;
-#endif /* VMS */
 }
 
 
@@ -3553,3 +3551,17 @@ parse_from (
 	return gnksa_do_check_from(from, address, realname);
 }
 #endif /* 1 */
+
+/*
+ * This is a work-around for a conflict between the sleep() function with
+ * OpenVMS 6.x using socketshr.  It does not appear to be needed for
+ * executables built on OpenVMS 7.x
+ */
+#ifdef SOCKETSHR_TCP
+#	if defined(__DECC) && __CRTL_VER < 70000000
+int my_sleep(unsigned n)
+{
+	return 0;
+}
+#	endif
+#endif

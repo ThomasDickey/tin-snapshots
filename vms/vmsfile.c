@@ -2,31 +2,6 @@
 #include <stdio.h>
 #include "parse.h"
 
-#if 0
-extern char *strdup();
-
-char **split(char *spliton, char *target)
-{
-  static char *buffer[100];
-  static char *t = 0;
-  char **p;
-
-  if (t)
-    free(t);
-
-
-  while ((t = strdup(target)) == NULL)
-    sleep(2);			/* just wait for out of memory condition
-				   to go away */
-
-  for (p = &buffer[0], *p = strtok(t, spliton);
-       *p;
-       *(++p) = strtok(NULL, spliton)) ;
-
-  return buffer;
-}
-#endif
-
 void joinpath(char *result, const char *dir, const char *file)
 {
   struct filespec *spec;

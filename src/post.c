@@ -1251,6 +1251,7 @@ check_moderated (
 	char *group;
 	char newsgroups[HEADER_LEN];
 	struct t_group *psretGrp = NULL;
+	int vnum = 0, bnum = 0;
 
 	/* Take copy - strtok() modifies its args */
 	STRCPY(newsgroups, groups);
@@ -1260,9 +1261,11 @@ check_moderated (
 	do {
 		struct t_group *psGrp;
 
+		vnum++; /* number of newsgroups */
+
 		if (!(psGrp = psGrpFind (group))) {
-			error_message (txt_not_in_active_file, group);
-			return NULL;
+			bnum++; /* number of groups not in active file */
+			continue;
 		}
 
 		if (!psretGrp)				/* Save ptr to the 1st group */
@@ -1303,7 +1306,12 @@ check_moderated (
 		}
 	} while ((group = strtok (NULL, ",")) != NULL);
 
-	return psretGrp;
+	if (vnum > bnum)
+		return psretGrp;
+	else {
+		error_message (txt_not_in_active_file, group);
+		return NULL;
+	}
 }
 
 

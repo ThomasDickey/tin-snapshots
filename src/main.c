@@ -15,12 +15,12 @@
 #ifndef TIN_H
 #	include "tin.h"
 #endif /* !TIN_H */
-#ifndef TCURSES_H
-#	include "tcurses.h"
-#endif /* !TCURSES_H */
 #ifndef VERSION_H
 #	include  "version.h"
 #endif /* !VERSION_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 #ifndef BUGREP_H
 #	include  "bugrep.h"
 #endif /* !BUGREP_H */
@@ -583,11 +583,11 @@ read_cmd_line_options (
 
 			case 'V':
 #if defined(__DATE__) && defined(__TIME__)
-				error_message ("Version: %s release %s (\"%s\") %s %s",
-					VERSION, RELEASEDATE, RELEASENAME, __DATE__, __TIME__);
+				error_message ("%s %s %s",
+					tin_version(), __DATE__, __TIME__);
 #else
-				error_message ("Version: %s release %s (\"%s\")",
-					VERSION, RELEASEDATE, RELEASENAME);
+				error_message ("%s",
+					tin_version());
 #endif /* __DATE__  && __TIME__ */
 				exit (EXIT_SUCCESS);
 				/* keep lint quiet: */

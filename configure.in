@@ -537,7 +537,6 @@ AC_CHECK_HEADERS(\
 	sys/pty.h \
 	sys/select.h \
 	sys/stream.h \
-	sys/socket.h \
 	sys/time.h \
 	sys/timeb.h \
 	sys/times.h \
@@ -547,6 +546,9 @@ AC_CHECK_HEADERS(\
 	time.h \
 	unistd.h \
 	waitstatus.h \
+)
+CF_CHECK_HEADERS(\
+	sys/socket.h \
 )
 
 ###	Checks that depend on existence-checks for headers

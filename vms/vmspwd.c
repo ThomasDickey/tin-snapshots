@@ -8,6 +8,8 @@ sys_getuid ()
   return (getgid () << 16) | getuid ();
 }
 
+#if  __CRTL_VER < 70000000
+
 /* Define this symbol to actually read SYSUAF.DAT.  This requires either
    SYSPRV or a readable SYSUAF.DAT. */
 
@@ -21,9 +23,8 @@ sys_getuid ()
 
 static struct UAF retuaf;
 
-struct UAF *
-get_uaf_name (uname)
-     char * uname;
+static struct UAF *
+get_uaf_name (char * uname)
 {
   register status;
   struct FAB uaf_fab;
@@ -85,9 +86,8 @@ get_uaf_name (uname)
   return &retuaf;
 }
 
-struct UAF *
-get_uaf_uic (uic)
-     unsigned long uic;
+static struct UAF *
+get_uaf_uic (unsigned long uic)
 {
   register status;
   struct FAB uaf_fab;
@@ -152,9 +152,8 @@ get_uaf_uic (uic)
 
 static struct passwd retpw;
 
-struct passwd *
-cnv_uaf_pw (up)
-     struct UAF * up;
+static struct passwd *
+cnv_uaf_pw (struct UAF * up)
 {
   char * ptr;
 
@@ -188,8 +187,7 @@ static struct passwd retpw;
 #endif /* not READ_SYSUAF */
 
 struct passwd *
-getpwnam (name)
-     char * name;
+getpwnam (char * name)
 {
 #ifdef READ_SYSUAF
   struct UAF *up;
@@ -228,8 +226,7 @@ getpwnam (name)
 }
 
 struct passwd *
-getpwuid (uid)
-     unsigned long uid;
+getpwuid (unsigned long uid)
 {
 #ifdef READ_SYSUAF
   struct UAF * up;
@@ -246,3 +243,5 @@ getpwuid (uid)
     return 0;
 #endif /* not READ_SYSUAF */
 }
+
+#endif  /* __CRTL_VER < 70000000 */
