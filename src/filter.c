@@ -1094,7 +1094,7 @@ quick_filter_select (
 int
 quick_filter_select_posted_art (
 	struct t_group *group,
-	char *subj)
+	char *subj)	/* return value is always ignored */
 {
 	int filtered = FALSE;
 	struct t_article art;
@@ -1290,7 +1290,7 @@ iAddFilterRule (
  */
 
 static int
-unfilter_articles (void)
+unfilter_articles (void) /* return value is always ignored */
 {
 	int unkilled = 0;
 	register int i;

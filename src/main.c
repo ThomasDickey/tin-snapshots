@@ -361,6 +361,8 @@ read_cmd_line_options (
 #		else
 				error_message (txt_option_not_enabled, "-DHAVE_COLOR");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #		endif
 				break;
 #	else
@@ -390,6 +392,8 @@ read_cmd_line_options (
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #endif
 				break;
 
@@ -411,6 +415,8 @@ read_cmd_line_options (
 #		else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #		endif
 				break;
 #	endif /* !M_AMIGA */
@@ -418,7 +424,8 @@ read_cmd_line_options (
 			case 'H':
 				show_intro_page ();
 				exit (EXIT_OK);
-
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 #endif /* !INDEX_DAEMON */
 
 			case 'I':
@@ -428,6 +435,8 @@ read_cmd_line_options (
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #endif
 				break;
 
@@ -448,6 +457,8 @@ read_cmd_line_options (
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #	endif
 				break;
 
@@ -471,6 +482,8 @@ read_cmd_line_options (
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #	endif
 				break;
 
@@ -495,6 +508,8 @@ read_cmd_line_options (
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #	endif
 				break;
 
@@ -505,6 +520,8 @@ read_cmd_line_options (
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
+				/* keep lint quiet: */
+				/* NOTREACHED */
 #	endif
 				break;
 
@@ -524,7 +541,8 @@ read_cmd_line_options (
 #endif
 				error_message (msg, "");
 				exit (EXIT_OK);
-
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 #ifndef INDEX_DAEMON
 			case 'w':	/* post article & exit */
 				post_article_and_exit = TRUE;
@@ -739,7 +757,7 @@ update_index_files (void)
 		}
 
 		cCOLS = 132;				/* set because curses has not started */
-#ifdef HAVE_FORK
+#	ifdef HAVE_FORK
 		if (update_fork) {
 			catchup = FALSE;		/* turn off msgs when running forked */
 			verbose = FALSE;
@@ -750,16 +768,16 @@ update_index_files (void)
 				case 0:				/* child process */
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
-#ifdef BSD
-#if defined(__FreeBSD__) || defined(__NetBSD__)
+#		ifdef BSD
+#			if defined(__FreeBSD__) || defined(__NetBSD__)
 					setsid();
-#else
-#	ifdef __osf__
+#			else
+#				ifdef __osf__
 					setpgid (0, 0);
-#	else
+#				else
 					setpgrp (0, process_id);	/* reset process group leader to this process */
-#	endif
-#	ifdef TIOCNOTTY
+#				endif /* __osf__ */
+#				ifdef TIOCNOTTY
 					{
 						int fd;
 
@@ -768,14 +786,14 @@ update_index_files (void)
 							close (fd);
 						}
 					}
-#	endif
-#endif
-#else
-#	if HAVE_SETPGRP
+#				endif /* TIOCNOTTY */
+#			endif /* __FreeBSD__ || __NetBSD__ */
+#		else
+#			ifdef HAVE_SETPGRP /* who defines this? */
 					setpgrp ();
 					signal (SIGHUP, SIG_IGN);	/* make immune from process group leader death */
-#	endif
-#endif
+#			endif /* HAVE_SETPGRP */
+#		endif /* BSD */
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */
 					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */
 					nntp_open ();				/* connect server if we are using nntp */

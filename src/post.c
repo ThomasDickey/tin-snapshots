@@ -69,14 +69,16 @@ static void msg_add_x_headers (char *headers);
 static void setup_check_article_screen (int *init);
 static void update_active_after_posting (char *newsgroups);
 static t_bool check_for_spamtrap (char *addr);
+static char prompt_rejected(void);
+static char prompt_to_continue(void);
+static char prompt_to_send(const char *subject);
+static char prompt_to_edit(void);
 
 #ifdef FORGERY
 static void make_path_header (char *line, char *from_name);
 #endif /* FORGERY */
 
-
-
-static int
+static char
 prompt_to_edit(void)
 {
 	int ch;
@@ -90,7 +92,7 @@ prompt_to_edit(void)
 	return ch;
 }
 
-static int
+static char
 prompt_to_send(
 	const char *subject)
 {
@@ -105,7 +107,7 @@ prompt_to_send(
 	return ch;
 }
 
-static int
+static char
 prompt_to_continue(void)
 {
 	int ch;
@@ -119,7 +121,7 @@ prompt_to_continue(void)
 	return ch;
 }
 
-static int
+static char
 prompt_rejected(void)
 {
 	int ch;
@@ -955,6 +957,7 @@ quick_post_article_loop:
 				if (ch == iKeyPostEdit) {
 					break;
 				}
+			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
 				if (unlink_article)
@@ -977,7 +980,7 @@ quick_post_article_loop:
   			case iKeyPostPost:
   				wait_message (txt_posting);
 				backup_article (article);
-				if (submit_news_file (article, lines)) {
+				if (submit_news_file (article)) {
 					unlink(backup_article_name(article));
 					Raw (FALSE);
 					info_message (txt_art_posted);
@@ -1112,7 +1115,7 @@ post_existing_article_loop:
 				} else {
 				  psGrp=NULL;
 				}
-				if (submit_news_file (article, lines)) {
+				if (submit_news_file (article)) {
 					unlink(backup_article_name(article));
 					Raw(FALSE);
 					info_message (txt_art_posted);
@@ -1529,6 +1532,7 @@ post_article_loop:
 				if (ch == iKeyPostEdit) {
 					break;
 				}
+			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
 				if (unlink_article)
@@ -1552,7 +1556,7 @@ post_article_loop:
 				wait_message (txt_posting);
 				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article, lines)) {
+					if (submit_news_file (article)) {
 						*posted_flag = TRUE;
 					}
 				} else {
@@ -1926,7 +1930,7 @@ ignore_followup_to_poster:
 
 	if (psGrp && psGrp->attribute->x_comment_to && *note_h_from) {
 		parse_from(note_h_from, bigbuf, buf);
-		sprintf(bigbuf, "(%s)", buf);
+		sprintf(bigbuf, "%s", buf);
 		msg_add_header ("X-Comment-To", bigbuf);
 	}
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
@@ -1975,7 +1979,7 @@ ignore_followup_to_poster:
 	if (art_type != GROUP_TYPE_MAIL) {
 		if (*note_h_distrib) {
 			msg_add_header ("Distribution", note_h_distrib);
-		} else {
+		} else if (*my_distribution) {
 			msg_add_header ("Distribution", my_distribution);
 		}
 	}
@@ -2014,7 +2018,7 @@ ignore_followup_to_poster:
 		}
 
 		if (with_headers)
-			fseek (note_fp, 0, 0);
+			fseek (note_fp, 0L, 0);
 		else
 			fseek (note_fp, note_mark[0], 0);
 		get_initials (respnum, initials, sizeof (initials));
@@ -2041,6 +2045,7 @@ post_response_loop:
 				if (ch == iKeyPostEdit) {
 					break;
 				}
+			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
 				if (unlink_article)
@@ -2065,7 +2070,7 @@ post_response_loop:
 				wait_message (txt_posting);
 				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article, lines)) {
+					if (submit_news_file (article)) {
 						ret_code = POSTED_OK;
 					}
 				} else {
@@ -2307,7 +2312,7 @@ mail_to_someone_done:
 }
 
 int
-mail_bug_report (void)
+mail_bug_report (void) /* return value is always ignored */
 {
 	char buf[LEN], nam[100];
 	const char *domain;
@@ -2499,7 +2504,7 @@ mail_to_author (
 	char *group,
 	int respnum,
 	int copy_text,
-	int with_headers)
+	int with_headers) /* return value is always ignored */
 {
 	char buf[LEN];
 	char from_addr[HEADER_LEN];
@@ -2511,7 +2516,6 @@ mail_to_author (
 	char initials[64];
 	char ch;
 	FILE *fp;
-	int lines = 0;
 	int redraw_screen = FALSE;
 	t_bool spamtrap_found = FALSE;
 
@@ -2591,7 +2595,7 @@ mail_to_author (
 			}
 		}
 		if (with_headers)
-			fseek (note_fp, 0, 0);
+			fseek (note_fp, 0L, 0);
 		else
 			fseek (note_fp, note_mark[0], 0);
 		get_initials (respnum, initials, sizeof (initials));
@@ -2673,7 +2677,7 @@ mail_to_author (
                                         t_bool ismail=TRUE;
 					sprintf (msg, txt_mailing_to, mail_to);
 					wait_message (msg);
-					checknadd_headers (nam, lines);
+					checknadd_headers (nam);
 					rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header,ismail);
 					strfmailer (mailer, subject, mail_to, nam,
 						    buf, sizeof (buf), default_mailer_format);
@@ -2962,7 +2966,7 @@ cancel_article (
 	}
 	if (*note_h_distrib) {
 		msg_add_header ("Distribution", note_h_distrib);
-	} else {
+	} else if (*my_distribution) {
 		msg_add_header ("Distribution", my_distribution);
 	}
 	msg_write_headers (fp);
@@ -3019,7 +3023,7 @@ cancel_article (
 
 			case iKeyPostCancel:
 				wait_message (txt_cancelling_art);
-				if (submit_news_file (cancel, 0)) {
+				if (submit_news_file (cancel)) {
 					info_message (txt_art_cancel);
 					if (pcCopyArtHeader (HEADER_SUBJECT, cancel, buf))
 						update_posted_info_file (group->name, iKeyPostCancel, buf);
@@ -3203,7 +3207,7 @@ repost_article (
 		}
 		if (*note_h_distrib) {
 			msg_add_header ("Distribution", note_h_distrib);
-		} else {
+		} else if (*my_distribution) {
 			msg_add_header ("Distribution", my_distribution);
 		}
 	}
@@ -3290,7 +3294,7 @@ repost_article_loop:
 
 				backup_article(article);
 
-				if (submit_news_file (article, 0)) {
+				if (submit_news_file (article)) {
 					info_message (txt_art_posted);
 					unlink(backup_article_name(article));
 					ret_code = POSTED_OK;
@@ -3460,8 +3464,7 @@ modify_headers (
 
 void
 checknadd_headers (
-	char *infile,
-	int lines)	/* unused */
+	char *infile)
 {
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
@@ -3478,15 +3481,6 @@ checknadd_headers (
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				if (!gotit && line[0] == '\n') {
-/*
- * IMHO it's the newsservers job to create a Lines:-header
- * (tin creates a wrong Lines:-header for pgp-signed articles...)
- */
-#if 0
-					if (lines) {
-						fprintf (fp_out, "Lines: %d\n", lines);
-					}
-#endif
 					if (!no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
 #ifdef HAVE_SYS_UTSNAME_H
@@ -3569,21 +3563,10 @@ insert_from_header (
 			if (ptr != (char *) 0) {
 				ptr = strchr (ptr, '.');
 				if (ptr == (char *) 0) {
-					error_message (txt_invalid_from1, from_name);
+					error_message (txt_invalid_from, from_name);
 					return FALSE;
 				}
 			}
-
-#if 0  /* WTFIT?  And who did that anyway? */
-			/*
-			 * Check that domain is not of type  host.subdomain.domain
-			 */
-			ptr = strstr (from_name, "subdomain.domain");
-			if (ptr != (char *) 0) {
-				error_message (txt_invalid_from2, from_name);
-				return FALSE;
-			}
-#endif			
 
 			while ((fgets (line, sizeof (line), fp_in) != (char *) 0) && in_header) {
 				if (!strncasecmp(line, "From:", 5))

@@ -192,15 +192,14 @@ submit_inews (
 
 int
 submit_news_file (
-	char *name,
-	int   lines)
+	char *name)
 {
 	char buf[LEN];
 	char *cp = buf;
 	int ret_code;
 	t_bool ismail=FALSE;
 
-	checknadd_headers (name, lines);
+	checknadd_headers (name);
 
     /* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
     if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))

@@ -298,7 +298,7 @@ feed_articles (
 							sprintf (msg, "%s%c", txt_post_process_type, proc_ch_default);
 							wait_message (msg);
 							MoveCursor (cLINES, (int) strlen (msg)-1);
-							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
+							if ((proc_ch = (char) ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (!strchr ("eElLnqsu\033", proc_ch));
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
@@ -764,7 +764,7 @@ print_file (
  * Return the single char hotkey corresponding to the post process type
  * No range check here, it was constrained when the config file was read
  */
-int
+char
 get_post_proc_type (
 	int proc_type)
 {

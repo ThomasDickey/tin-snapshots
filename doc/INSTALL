@@ -6,19 +6,18 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
-                             --with-nntp-default-server --enable-debug
-  --with-iso-to-ascii        --enable-nntp-only         --with-nov-dir
-  --with-ispell              --with-inews-dir
-  --enable-mh-mail-handling  --with-domain-name         --with-spooldir
-  --with-inn-nntplib         --with-libdir              --enable-nntp
-  --with-metamail            --with-pgp                 --with-ncurses
-  --enable-color             --enable-etiquette         --enable-forgery
-  --enable-locale
-  NNTP_INEWS                 DONT_HAVE_PIPING           NNTP_SERVER_FILE
-  DONT_REREAD_ACTIVE_FILE    HAVE_FASCIST_NEWSADMIN     NO_POSTING
-  HAVE_TIN_NNTP_EXTS         INDEX_DAEMON               NO_WILDMAT
-  NO_SHELL_ESCAPE            SMALL_MEMORY_MACHINE       USE_INVERSE_HACK
-  HAVE_MMDF_MAILER
+  --enable-8bit-keys	     --with-inn-nntplib		HAVE_FASCIST_NEWSADMIN
+  --enable-color	     --with-iso-to-ascii	HAVE_MMDF_MAILER
+  --enable-curses	     --with-ispell		HAVE_TIN_NNTP_EXTS
+  --enable-debug	     --with-libdir		INDEX_DAEMON
+  --enable-etiquette	     --with-metamail		NNTP_INEWS
+  --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
+  --enable-locale	     --with-nntp-default-server NO_POSTING
+  --enable-mh-mail-handling  --with-nov-dir		NO_SHELL_ESCAPE
+  --enable-nntp		     --with-pgp			NO_WILDMAT
+  --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
+  --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
+  --with-inews-dir	     DONT_REREAD_ACTIVE_FILE
   
 
 News machine names
@@ -234,6 +233,15 @@ tin.  This feature does not work with INN using the INN-inews (when
 using without NNTP), because INN-inews rejects these cancels.
 This also allows the user to set his mail address in tinrc.
 
+--enable-8bit-keys
+Define if your terminal generates 8-bit controls.  For Unix systems we
+assume this may imply your arrow keys begin either with CSI (0x9b) or SS3
+(0x8f).  Most ANSI terminals generate 7-bit controls (e.g., CSI is
+"<esc>["), but some such as VT220 can be configured more efficiently to
+generate 8-bit prefix codes, saving a byte per control sequence.  This
+applies to cursor movement at the same time.  The actual codes are read
+from termcap (this does not affect the curses configuration).
+
 --enable-color
 Define if you want to have ANSI-color support.  This works on most
 color displays and the color xterm.  The color mode can be switched
@@ -277,6 +285,14 @@ read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
 --with-ncurses
 Define this if you want to link with ncurses instead of termcap.
+
+--enable-curses
+Define this if you wish to use the curses screen optimizing rather than
+termcap.  This has been tested well only with ncurses 4.1; it should work
+(except for mouse support and screen resizing) with SVr4 curses (Solaris
+2.5 is known to have a bug in libc which prevents use of curses, ncurses
+works well on that platform).  To build with ncurses screen optimizing,
+you must give both the --with-ncurses and --enable-curses options.
 
 --enable-etiquette (default: on)
 If enabled, prints netiquette before posting.
@@ -343,6 +359,8 @@ Compiled & installed on the following machines:
 	HP 9000/715 & HP-UX 9.07 with gcc 2.7.2
 	HP 9000/819 & HP-UX 10.10 with cc
 	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
+	HP 9000/829 & HP-UX 10.20 with cc
+	HP 9000/829 & HP-UX 10.20 with gcc 2.7.2.2
 
 3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
 	VAX 8350 & Ultrix 4.0 with gcc 2.7.2

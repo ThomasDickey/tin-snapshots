@@ -97,7 +97,7 @@ selection_index (
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 #endif /* WIN32 */
 					case KEYMAP_UP:
 						goto select_up;
@@ -242,6 +242,7 @@ select_read_group:
 			case iKeyPageDown3:
 				if (!space_goto_next_unread)
 					goto select_page_down;
+				/* FALLTHROUGH */
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
 				if (next_unread_group (TRUE) == GRP_QUIT) {
@@ -483,7 +484,7 @@ select_page_up:
 
 			case iKeyOptionMenu:	/* option menu */
 				set_alarm_clock_off ();
-				change_config_file (NULL);
+				(void) change_config_file(NULL);
 				set_signals_select ();	/* just to be sure */
 				free_attributes_array ();
 				read_attributes_file (global_attributes_file, TRUE);

@@ -31,7 +31,8 @@ if test -z "$CFLAGS" ; then
 		test "$CC" != "cc" && test -z "$CFLAGS" && CFLAGS="-O"
 		;;
 	*)
-	CFLAGS="-O"
+		CFLAGS="-O"
+		;;
 	esac
 fi
 
@@ -41,6 +42,7 @@ fi
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
+	--enable-prototypes \
 	--disable-echo \
 	--enable-nntp-only \
 	--disable-mime-strict-charset \

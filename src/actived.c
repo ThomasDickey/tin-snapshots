@@ -50,6 +50,7 @@ static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
 static void vReadCmdLineOptions (int iNumArgs, char *pacArgs[]);
 static void vPrintUsage (char *pcProgName);
 static void vUpdateActiveFile (char *pcActiveFile, char *pcDir);
+static void vParseGrpLine (char *pcLine, char *pcGrpName, long *plArtMax, long *plArtMin, char *pcModerated);
 #endif /* ACTIVE_DAEMON */
 
 #ifndef M_AMIGA
@@ -88,6 +89,69 @@ main (
 	vUpdateActiveFile (acMailActiveFile, acMailDir);
 	vUpdateActiveFile (acSaveActiveFile, acSaveDir);
 	return 0;
+}
+
+static void
+vParseGrpLine (
+	char	*pcLine,
+	char	*pcGrpName,
+	long	*plArtMax,
+	long	*plArtMin,
+	char	*pcModerated)
+{
+	char	*pcPtr;
+
+	*pcGrpName = '\0';
+	*pcModerated = '\0';
+
+	if (*pcLine == '#' || *pcLine == '\n') {
+		return;
+	}
+
+	pcPtr = strrchr (pcLine, '\n');
+	if (pcPtr != (char *) 0) {
+		*pcPtr = '\0';
+	}
+
+	/*
+	 * Group name
+	 */
+	pcPtr = pcLine;
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+		pcPtr++;
+	}
+	*pcPtr++ = '\0';
+	strcpy (pcGrpName, pcLine);
+
+	/*
+	 * Art max
+	 */
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+		pcPtr++;
+	}
+	*plArtMax = atol (pcPtr);
+
+	/*
+	 * Art min
+	 */
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+		pcPtr++;
+	}
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+		pcPtr++;
+	}
+	*plArtMin = atol (pcPtr);
+
+	/*
+	 * 4th field (Moderated/base maildir)
+	 */
+	while (*pcPtr && *pcPtr != ' ' && *pcPtr != '\t') {
+		pcPtr++;
+	}
+	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
+		pcPtr++;
+	}
+	strcpy (pcModerated, pcPtr);
 }
 
 #endif	/* ACTIVE_DAEMON */

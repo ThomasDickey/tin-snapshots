@@ -245,7 +245,7 @@ get_val (
 int
 invoke_editor (
 	char *filename,
-	int lineno)
+	int lineno) /* return value is always ignored */
 {
 	char buf[PATH_LEN],fnameb[PATH_LEN];
 	char editor_format[PATH_LEN];
@@ -291,7 +291,7 @@ invoke_editor (
 #ifdef HAVE_ISPELL
 int
 invoke_ispell (
-	char *nam)
+	char *nam) /* return value is always ignored */
 {
 	char buf[PATH_LEN];
 	char *my_ispell;
@@ -1001,6 +1001,7 @@ parse_from (
 						break;
 					case '(' :
 						plevel++;
+					/* FALLTHROUGH */
 					default :
 						*(cmtp++) = *ap;
 					break;
@@ -1258,14 +1259,15 @@ input_pending (int delay)
 		ungetch(ch);
 	nodelay(stdscr, FALSE);
 	return (ch != ERR);
-#else
+
+#else	/* !USE_CURSES */
+
 #	ifdef WIN32
 	return kbhit() ? TRUE : FALSE;
 #	endif /* WIN32 */
 #	ifdef M_AMIGA
 	return (WaitForChar(Input(), 1000*delay) == DOSTRUE) ? TRUE : FALSE;
 #	endif /* M_AMIGA */
-#endif /* USE_CURSES */
 
 #ifdef HAVE_SELECT
 	int fd = STDIN_FILENO;
@@ -1316,13 +1318,15 @@ input_pending (int delay)
 	}
 #endif /* HAVE_POLL && !HAVE_SELECT */
 
+#endif /* USE_CURSES */
+
 	return FALSE;
 }
 
 
 
 int
-get_arrow_key (void)
+get_arrow_key (int prech)
 {
 #if USE_CURSES
 #if NCURSES_MOUSE_VERSION
@@ -1431,7 +1435,7 @@ get_arrow_key (void)
 #endif	/* HAVE_USLEEP */
 
 		if (!input_pending(0))
-			return ESC;
+			return prech;
 	}
 #else	/* M_AMIGA */
 	if (input_pending(0))
@@ -2158,7 +2162,7 @@ strfmailer (
 	char *filename,
 	char *s,
 	size_t maxsize,
-	char *format)
+	char *format) /* return value is always ignored */
 {
 	char *endp = s + maxsize;
 	char *start = s;
@@ -2267,7 +2271,7 @@ int
 get_initials (
 	int respnum,
 	char *s,
-	int maxsize)
+	int maxsize) /* return value is always ignored */
 {
 	char tbuf[PATH_LEN];
 	int i, j;
@@ -2362,7 +2366,7 @@ cleanup_tmp_files (void)
 	unlink (lock_file);
 }
 
-
+#if !defined(M_UNIX)
 void
 make_post_process_cmd (
 	char *cmd,
@@ -2381,7 +2385,7 @@ make_post_process_cmd (
 	invoke_cmd (buf);
 	chdir (currentdir);
 }
-
+#endif /*! M_UNIX */
 
 int
 stat_file (
@@ -2539,7 +2543,7 @@ random_organization(
 	while (fgets(selorg, sizeof(selorg), orgfp))
 		nool++;
 
-	fseek(orgfp, 0, SEEK_SET);
+	fseek(orgfp, 0L, SEEK_SET);
 	sol = rand () % nool + 1;
 	nool = 0;
 	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))

@@ -1,4 +1,34 @@
---unoff BETA release 970813 --
+--unoff BETA release 970819 --
+
+422) Phil Edge <phil@edge.demon.co.uk>
+     BUG. On followup, cancel and repost an empty Distribution
+          header was added if the original article doesn't have a
+          Distribution header and the DISTRIBUTION environment variable
+          isn't set.
+     FIX. post.c
+
+421) Thomas E. Dickey <dickey@clark.net>
+     ADD. improves the configure script that configures ncurses
+     ADD. configure script option --enable-8bit-keys to turn on code
+	  that allows 8-bit controls for arrow and function keys.
+     ADD. adds includes for ctype.h and sys/socket.h to the test program used
+	  for checking prototypes.
+     ADD. library-check for -lmytinto to build on FreeBSD.
+     BUG. corrects some logic that prevented 8-bit controls from working.
+     BUG. corrects some ifdef's that broke ncurses/curses configuration.
+     BUG. minor tweaks to makefiles to work with configure --srcdir option,
+	  and to autoconfigure for lint program.
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
+          Makefile[.in], config.c, getline.c, group.c, help.c, misc.c
+          page.c, prompt.c, select.c, thread.c
+
+420) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-cleanup (removed unused variables, fixed a few
+          type-mismatches, etc.)
+     FIX. extern,h, proto.h, autoconf.h[in], configure[.in]
+          Makefile[.in], *.c
+
+--unoff BETA release 970817 --
 
 419) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. missplaced #ifdefs moved

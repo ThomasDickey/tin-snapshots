@@ -61,7 +61,7 @@ nntp_open (void)
 		/* do this only once at start-up */
 		if (nntp_server == (char *) 0) {
 			nntp_server = getserverbyfile (NNTP_SERVER_FILE);
-			nntp_tcp_port = atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
+			nntp_tcp_port = (unsigned short) atoi (get_val("NNTPPORT", NNTP_TCP_PORT));
 		}
 		if (nntp_server == (char *) 0) {
 			error_message (txt_cannot_get_nntp_server_name, "");
@@ -325,23 +325,23 @@ open_motd_fp (
 	if (read_news_via_nntp) {
 #if defined(NNTP_ABLE) && defined(HAVE_TIN_NNTP_EXTS)
 		sprintf (line, "xmotd %s", motd_file_date);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_motd_fp", line);
-#endif
+#	endif /* DEBUG */
 		put_server (line);
 		if (get_respcode () != OK_XMOTD) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_motd_fp", "NOT_OK");
-#endif
+#	endif /* DEBUG */
 			return (FILE *) 0;
 		}
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_motd_fp", "OK");
-#endif
+#	endif /* DEBUG */
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif
+#endif /* NNTP_ABLE && HAVE_TIN_NNTP_EXTS */
 	} else {
 		return fopen (motd_file, "r");
 	}
@@ -355,18 +355,18 @@ open_subscription_fp (void)
 #ifdef NNTP_ABLE
 		put_server ("list subscriptions");
 		if (get_respcode () != OK_GROUPS) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_subscription_fp", "NOT_OK");
-#endif
+#	endif /* DEBUG */
 			return (FILE *) 0;
 		}
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_subscription_fp", "OK");
-#endif
+#	endif /* DEBUG */
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif
+#endif /* NNTP_ABLE */
 	} else {
 		return fopen (subscriptions_file, "r");
 	}
@@ -391,7 +391,7 @@ open_mailgroups_fp (void)
 {
 	return fopen (mailgroups_file, "r");
 }
-#endif
+#endif /* HAVE_MH_MAIL_HANDLING */
 
 /*
  * If reading via NNTP, allow the special case where the user's telling us to
@@ -427,7 +427,7 @@ extract_groups_from_newsrc(void)
 	}
 	return 0;
 }
-#endif
+#endif /* NNTP_ABLE */
 
 /*
  * If reading via NNTP the newsgroups file will be saved to ~/.tin/newsgroups
@@ -441,31 +441,31 @@ open_newsgroups_fp (void)
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		if (read_local_newsgroups_file) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
-#endif
+#	endif /* DEBUG */
 			return fopen (local_newsgroups_file, "r");
 		} else if (newsrc_active && !check_for_new_newsgroups) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using info in .newsrc");
-#endif
+#	endif /* DEBUG */
 			return extract_groups_from_newsrc();
 		} else {
 			put_server ("list newsgroups");
 			if (get_respcode () != OK_GROUPS) {
-#ifdef DEBUG
+#	ifdef DEBUG
 				debug_nntp ("open_newsgroups_fp", "NOT_OK");
-#endif
+#	endif /* DEBUG */
 				return (FILE *) 0;
 			}
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "OK");
-#endif
+#	endif /* DEBUG */
 			return nntp_to_fp ();
 		}
 #else
 		return (FILE *) 0;
-#endif
+#endif /* NNTP_ABLE */
 	} else {
 		return fopen (newsgroups_file, "r");
 	}
@@ -485,29 +485,29 @@ open_xover_fp (
 	char *pcNovFile;
 #ifdef NNTP_ABLE
 	char acLine[NNTP_STRLEN];
-#endif
+#endif /* NNTP_ABLE */
 
 	if (read_news_via_nntp && xover_supported &&
 	    *pcMode == 'r' && psGrp->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (acLine, "xover %ld-%ld", lMin, lMax);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_xover_fp", acLine);
-#endif
+#	endif /* DEBUG */
 		put_server (acLine);
 		if (get_respcode () != OK_XOVER) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_xover_fp", "NOT_OK");
-#endif
+#	endif /* DEBUG */
 			return (FILE *) 0;
 		}
 #ifdef DEBUG
 		debug_nntp ("open_xover_fp", "OK");
-#endif
+#endif /* DEBUG */
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif
+#endif /* NNTP_ABLE */
 	} else {
 		pcNovFile = pcFindNovFile (psGrp, (*pcMode == 'r' ? R_OK : W_OK));
 
@@ -530,11 +530,6 @@ stat_article (
 	long art,
 	char *group_path)
 {
-/*
-#ifdef NNTP_ABLE
-	int respcode;
-#endif
-*/
 	char buf[NNTP_STRLEN];
 	int i;
 	int art_exists = TRUE;
@@ -545,14 +540,14 @@ stat_article (
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "stat %ld", art);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("stat_article", buf);
-#endif
+#	endif /* DEBUG */
 		put_server (buf);
 		if (get_respcode () != OK_NOTEXT) {
 			art_exists = FALSE;
 		}
-#endif
+#endif /* NNTP_ABLE */
 	} else {
 		joinpath (buf, active[i].spooldir, group_path);
 		sprintf (&buf[strlen (buf)], "/%ld", art);
@@ -572,7 +567,7 @@ open_art_header (
 #ifdef NNTP_ABLE
 	int safe_nntp_strlen, full, len;
 	char *ptr;
-#endif
+#endif /* NNTP_ABLE */
 	char buf[NNTP_STRLEN];
 	FILE *fp;
 	int items = 0;
@@ -590,27 +585,31 @@ open_art_header (
 		}
 		sprintf (buf, "head %ld", art);
 
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_art_header", buf);
-#endif
+#	endif /* DEBUG */
 
 		put_server (buf);
 		if (get_respcode () != OK_HEAD) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("open_art_header", "NOT_OK_HEAD - Find NEXT");
-#endif
+#	endif /* DEBUG */
 			/*
 			 *  HEAD failed, try to find NEXT
 			 */
 			put_server ("next");
 			switch (get_server (buf, NNTP_STRLEN)) {
-			case -1:
-				error_message (txt_connection_to_server_broken, "");
-				tin_done (EXIT_NNTP_ERROR);
-			case -2:
-				tin_done (0);
-			default:
-				break;
+				case -1:
+					error_message (txt_connection_to_server_broken, "");
+					tin_done (EXIT_NNTP_ERROR);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
+				case -2:
+					tin_done (0);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
+				default:
+					break;
 			}
 			if (atoi (buf) == OK_NOTEXT) {
 				ptr = buf;
@@ -624,9 +623,9 @@ open_art_header (
 			}
 			return (char *) 0;
 		}
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("open_art_header", "OK_HEAD");
-#endif
+#	endif /* DEBUG */
 
 		full = FALSE;
 		safe_nntp_strlen = NNTP_STRLEN - 2;
@@ -639,13 +638,17 @@ open_art_header (
 				len = safe_nntp_strlen;
 			}
 			switch (get_server (ptr, len)) {
-			case -1:
-				error_message (txt_connection_to_server_broken, "");
-				tin_done (EXIT_NNTP_ERROR);
-			case -2:
-				tin_done (0);
-			default:
-				break;
+				case -1:
+					error_message (txt_connection_to_server_broken, "");
+					tin_done (EXIT_NNTP_ERROR);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
+				case -2:
+					tin_done (0);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
+				default:
+					break;
 			}
 			if (STRCMPEQ(ptr, ".")) {	/* end of text */
 				break;
@@ -668,7 +671,7 @@ open_art_header (
 		}
 #else
 		return (char *) 0;
-#endif
+#endif /* NNTP_ABLE */
 	} else {
 		sprintf (buf, "%ld", art);
 		fp = fopen (buf, "r");
@@ -900,8 +903,12 @@ setup_hard_base (
 			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			case -2:
 				tin_done (0);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			default:
 				break;
 		}
@@ -918,8 +925,12 @@ setup_hard_base (
 					case -1:
 						error_message (txt_connection_to_server_broken, "");
 						tin_done (EXIT_NNTP_ERROR);
+						/* keep lint quiet: */
+						/* FALLTHROUGH */
 					case -2:
 						tin_done (0);
+						/* keep lint quiet: */
+						/* FALLTHROUGH */
 					default:
 						break;
 				}
@@ -951,8 +962,12 @@ setup_hard_base (
 				case -1:
 					error_message (txt_connection_to_server_broken, "");
 					tin_done (EXIT_NNTP_ERROR);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
 				case -2:
 					tin_done (0);
+					/* keep lint quiet: */
+					/* FALLTHROUGH */
 				default:
 					break;
 			}
@@ -1037,8 +1052,12 @@ get_respcode (void)
 		case -1:
 			error_message (txt_connection_to_server_broken, "");
 			tin_done (EXIT_NNTP_ERROR);
+			/* keep lint quiet: */
+			/* FALLTHROUGH */
 		case -2:
 			tin_done (0);
+			/* keep lint quiet: */
+			/* FALLTHROUGH */
 		default:
 			break;
 	}
@@ -1102,8 +1121,12 @@ stuff_nntp (
 			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			case -2:
 				tin_done (0);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			default:
 				break;
 		}
@@ -1246,12 +1269,14 @@ vGrpGetArtInfo (
 	char	acBuf[NNTP_STRLEN];
 	DIR		*tDirFile;
 	DIR_BUF	*tFile;
+	long	lArtNum;
+#ifdef M_AMIGA
 	long	lArtMin;
 	long	lArtMax;
-	long	lArtNum;
 
 	lArtMin = *plArtMin;
 	lArtMax = *plArtMax;
+#endif
 
 	if (read_news_via_nntp && iGrpType == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
@@ -1268,8 +1293,14 @@ vGrpGetArtInfo (
 			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			case -2:
 				tin_done (0);
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
+			default:
+				break;
 		}
 
 #ifdef DEBUG
@@ -1292,17 +1323,18 @@ vGrpGetArtInfo (
 			case ERR_ACCESS:
 				error_message (cCRLF "%s", acLine);
 				tin_done (EXIT_NNTP_ERROR);
-
+				/* keep lint quiet: */
+				/* FALLTHROUGH */
 			default:
-#ifdef DEBUG
+#	ifdef DEBUG
 				debug_nntp ("NOT_OK", acLine);
-#endif
+#	endif /* DEBUG */
 				return(-1);
 		}
 #else
 		my_fprintf(stderr, "Unreachable ?\n");
 		return(0);
-#endif	/* #ifdef NNTP_ABLE */
+#endif	/* NNTP_ABLE */
 	} else {
 #ifdef M_AMIGA
 		if (!lArtMin)
@@ -1318,10 +1350,10 @@ vGrpGetArtInfo (
 
 /* TODO - Surely this is spurious, the opendir will fail anyway */
 /*		  unless there is some subtle permission check if tin is suid news? */
-#if 0
+#	if 0
 		if (access (acBuf, R_OK) != 0)
 			return(-1);
-#endif
+#	endif /* 0 */
 
 		if ((tDirFile = opendir (acBuf)) != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
@@ -1341,7 +1373,7 @@ vGrpGetArtInfo (
 		} else {
 			return(-1);
 		}
-#endif	/* #ifdef M_AMIGA */
+#endif /* M_AMIGA */
 	}
 
 	return(0);

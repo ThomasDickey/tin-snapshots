@@ -64,7 +64,7 @@ regex_error(
 	regex_t preg)
 {
 	char errmsg[LEN];
-	size_t size;
+	size_t size;	/* 'unused' */
 
 	if ((size = regerror(error, &preg, errmsg, sizeof(errmsg))) > sizeof(errmsg))
 		sprintf(msg, "Start of regex error: %s", errmsg);
@@ -110,7 +110,7 @@ match_regex(
 	switch (error = regexec(&preg, string, 0, NULL, 0)) {
 		case REG_NOERROR:						/* Found */
 			ret = TRUE;
-
+		/* FALLTHROUGH */
 		case REG_NOMATCH:						/* Not found */
 			break;
 

@@ -58,7 +58,7 @@ void refresh_color(void)
 {
 	set_colors(current_fcol, current_bcol);
 }
-#endif
+#endif /* USE_CURSES */
 
 /* setting foregroundcolor */
 void
@@ -74,13 +74,13 @@ fcol (
 			my_printf("\033[%d;%dm", bold, ((color & 7) + 30));
 			if (!bold)
 				bcol(current_bcol);
-#endif
+#endif /* USE_CURSES */
 			current_fcol = color;
 		}
 	}
 #if USE_CURSES
 	else set_colors(7, 0);
-#endif
+#endif /* USE_CURSES */
 }
 
 /* setting backgroundcolor */

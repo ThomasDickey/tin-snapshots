@@ -103,7 +103,7 @@ get_nntpserver (
 int
 get_newsrcname (
 	char *newsrc_name,
-	const char *nntpserver_name)
+	const char *nntpserver_name) /* return value is always ignored */
 {
 	FILE	*fp;
 	char	line[LEN];
@@ -214,6 +214,8 @@ get_newsrcname (
 						return TRUE;
 					case iKeyQuit:
 						exit(0);
+						/* keep lint quiet: */
+						/* FALLTHROUGH */
 					case ESC:
 					default:
 						break;

@@ -50,7 +50,6 @@ char default_signature[PATH_LEN];
 char global_attributes_file[PATH_LEN];
 char global_config_file[PATH_LEN];
 char global_filter_file[PATH_LEN];
-char group_times_file[PATH_LEN];
 char homedir[PATH_LEN];
 char index_maildir[PATH_LEN];
 char index_newsdir[PATH_LEN];
@@ -102,6 +101,10 @@ char xpost_quote_format[PATH_LEN];
 char domain_name[MAXHOSTNAMELEN];
 char host_name[MAXHOSTNAMELEN];
 char mail_address[LEN];			/* user's mail address */
+
+#ifdef INDEX_DAEMON
+char group_times_file[PATH_LEN];
+#endif
 
 #ifdef VMS
 char rcdir_asfile[PATH_LEN];	/* rcdir expressed as dev:[dir]tin.dir, for stat() */
@@ -265,7 +268,10 @@ t_bool verbose = FALSE;			/* update index files only mode */
 t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
-t_bool xuser_supported = FALSE;
+
+#ifdef HAVE_TIN_NNTP_EXTS
+	t_bool xuser_supported = FALSE;
+#endif
 
 /* History entries */
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];

@@ -565,6 +565,7 @@ set_attrib (
 			break;
 		case ATTRIB_QUOTE_CHARS:
 			psGrp->attribute->quote_chars = my_strdup (str);
+			break;
 		default:
 			break;
 	}

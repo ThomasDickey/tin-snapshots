@@ -480,7 +480,7 @@ grp_mark_unread (
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xmin = group->xmin;
 
-	if (bitlength) NSETRNG1(group->newsrc.xbitmap, 0, bitlength - 1);
+	if (bitlength) NSETRNG1(group->newsrc.xbitmap, 0L, bitlength - 1L);
 
 #ifdef DEBUG_NEWSRC
 	debug_print_bitmap (group, NULL);
@@ -587,7 +587,7 @@ parse_bitmap_seq (
 		if (group->newsrc.xbitlen > 0) {
 			group->newsrc.xbitmap =
 				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
-			NSETRNG1(group->newsrc.xbitmap, 0, group->newsrc.xbitlen - 1);
+			NSETRNG1(group->newsrc.xbitmap, 0L, group->newsrc.xbitlen - 1L);
 		}
 
 		if (min <= high) {
@@ -617,7 +617,7 @@ parse_bitmap_seq (
 		if (group->newsrc.xbitlen > 0) {
 			group->newsrc.xbitmap =
 				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
-			NSETRNG1(group->newsrc.xbitmap, 0, group->newsrc.xbitlen - 1);
+			NSETRNG1(group->newsrc.xbitmap, 0L, group->newsrc.xbitlen - 1L);
 		}
 /*
 sprintf (msg, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
@@ -767,7 +767,7 @@ parse_unread_arts (
 
 	if (group->xmax >= bitmin) {
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(group->xmax-bitmin+1));
-		NSETRNG0(newbitmap, 0, group->xmax - bitmin);
+		NSETRNG0(newbitmap, 0L, group->xmax - bitmin);
 	}
 
 	for (i = 0; i < top; i++) {
@@ -1156,7 +1156,7 @@ if (group->newsrc.xmax > group->xmax) {
 	if (group->newsrc.xbitmap == (t_bitmap *) 0) {
 		group->newsrc.xbitmap = (t_bitmap *)my_malloc (BITS_TO_BYTES(bitlen));
 		if (group->newsrc.xmin > first)
-			NSETRNG0 (group->newsrc.xbitmap, 0, group->newsrc.xmin - first - 1);
+			NSETRNG0 (group->newsrc.xbitmap, 0L, group->newsrc.xmin - first - 1L);
 		if (bitlen > group->newsrc.xmin - first)
 			NSETRNG1 (group->newsrc.xbitmap, group->newsrc.xmin - first, bitlen - 1);
 #ifdef DEBUG_NEWSRC
@@ -1177,7 +1177,7 @@ if (group->newsrc.xmax > group->xmax) {
 		/* Mark earlier articles as read, updating num_unread */
 
 		if (first < group->newsrc.xmin) {
-			NSETRNG0 (newbitmap, 0, group->newsrc.xmin - first - 1);
+			NSETRNG0 (newbitmap, 0L, group->newsrc.xmin - first - 1L);
 		}
 		{	long i;
 			for (i = group->newsrc.xmin; i < min; i++) {

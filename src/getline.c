@@ -121,7 +121,7 @@ getline (
 #ifdef HAVE_KEY_PREFIX
 				case KEY_PREFIX:
 #endif
-					switch (get_arrow_key ()) {
+					switch (get_arrow_key (c)) {
 						case KEYMAP_UP:
 						case KEYMAP_PAGE_UP:
 							hist_prev (which_hist);
