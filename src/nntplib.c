@@ -171,7 +171,7 @@ server_init (
 	sockt_wr = s_dup (sockt_rd);
 #ifdef TLI
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
-    		t_error ("server_init: t_sync");
+		t_error ("server_init: t_sync");
 		nntp_rd_fp = NULL;		/* from above */
 		return (-1);
 	}
@@ -311,8 +311,8 @@ get_tcp_socket (
 		return (-1);
 	}
 #else
-    sp = (struct servent *) malloc (sizeof (struct servent));
-    sp->s_port = htons (IPPORT_NNTP);
+	sp = (struct servent *) malloc (sizeof (struct servent));
+	sp->s_port = htons (IPPORT_NNTP);
 #endif
 	/* If not a raw ip address, try nameserver */
 	if (!isdigit((unsigned char)*machine) ||

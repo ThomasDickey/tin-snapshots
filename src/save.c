@@ -683,14 +683,14 @@ add_to_save_list (
 		expand_save ();
 	}
 
-	save[num_save].index   = the_index;
-	save[num_save].saved   = FALSE;
+	save[num_save].index = the_index;
+	save[num_save].saved = FALSE;
 	save[num_save].is_mailbox = is_mailbox;
-	save[num_save].dir     = (char *) 0;
-	save[num_save].file    = (char *) 0;
+	save[num_save].dir = (char *) 0;
+	save[num_save].file = (char *) 0;
 	save[num_save].archive = (char *) 0;
-	save[num_save].part    = (char *) 0;
-	save[num_save].patch   = (char *) 0;
+	save[num_save].part = (char *) 0;
+	save[num_save].patch = (char *) 0;
 
 	save[num_save].subject = my_strdup (the_article->subject);
 	if (archive_save && the_article->archive) {
@@ -909,7 +909,7 @@ save_filename (
 		joinpath (filename, save[i].dir, save[i].archive);
 		if (create_sub_dir (i)) {
 #ifdef VMS
-	    sprintf(&filename[strlen(filename)], "%s.%s%s", save[i].archive, LONG_PATH_PART, p);
+			sprintf(&filename[strlen(filename)], "%s.%s%s", save[i].archive, LONG_PATH_PART, p);
 #else
 			sprintf (&filename[strlen(filename)], "/%s.%s%s", save[i].archive, LONG_PATH_PART, p);
 #endif
@@ -1171,7 +1171,7 @@ post_process_uud (
 								fprintf (fp_out, "%s", u);
 							}
 							if (t[0] != 'M') {
-							    fprintf (fp_out, "%s", t);
+								fprintf (fp_out, "%s", t);
 							}
 							fprintf (fp_out, "%s\n", s);
 						}
@@ -1186,10 +1186,10 @@ post_process_uud (
 						} else if (STRNCMPEQ("end", s, 3)) {
 							state = END;
 							if (u[0] != 'M') {
-							    fprintf (fp_out, "%s", u);
+								fprintf (fp_out, "%s", u);
 							}
 							if (t[0] != 'M') {
-							    fprintf (fp_out, "%s", t);
+								fprintf (fp_out, "%s", t);
 							}
 							fprintf (fp_out, "%s\n", s);
 						}

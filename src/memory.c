@@ -359,8 +359,8 @@ free_save_array (void)
 		FreeAndNull(save[i].part);
 		FreeAndNull(save[i].patch);
 		
-		save[i].index   = -1;
-		save[i].saved   = FALSE;
+		save[i].index = -1;
+		save[i].saved = FALSE;
 		save[i].is_mailbox = FALSE;
 	}
 

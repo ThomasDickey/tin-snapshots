@@ -772,13 +772,13 @@ thread_catchup:
 				}
 				update_thread_page ();
 				break;
-/*
+#if 0
 			case iKeyThreadDisplaySubject:
 				info_message (arts[(choose_response (thread_basenote, thread_index_point))].subject);
 				break;
-*/
+#endif
 			default:
-			    info_message (txt_bad_command);
+				info_message (txt_bad_command);
 		}
 	}
 

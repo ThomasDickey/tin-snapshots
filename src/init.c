@@ -97,12 +97,8 @@ char txt_help_bug_report[LEN];	/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
 
-#ifndef MAXHOSTNAMELEN
-#	define MAXHOSTNAMELEN 255
-#endif
-
-char domain_name[MAXHOSTNAMELEN+2]="";
-char host_name[MAXHOSTNAMELEN+2]="";
+char domain_name[MAXHOSTNAMELEN]="";
+char host_name[MAXHOSTNAMELEN]="";
 
 #ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
@@ -291,6 +287,9 @@ void init_selfinfo (void)
 	FILE *fp;
 	struct stat sb;
 
+	host_name[0]='\0';
+	domain_name[0]='\0';
+
 #ifndef M_AMIGA
 #	ifdef HAVE_SYS_UTSNAME_H
 	if (uname(&system_info) < 0) {
@@ -301,20 +300,30 @@ void init_selfinfo (void)
 #	endif /* HAVE_SYS_UTSNAME_H */
 #endif /* M_AMIGA */
 
-	strcpy (host_name, get_host_name());
+	if ((ptr = get_host_name()) != (char *) 0) {
+		strcpy (host_name, ptr);
+	}
 
 #ifdef DOMAIN_NAME
-	strcpy (domain_name, get_domain_name());
+	if ((ptr = get_domain_name()) != (char *) 0) {
+		strcpy (domain_name, ptr);
+	}
 #endif /* DOMAIN_NAME */
 
 #ifdef HAVE_GETHOSTBYNAME
-	if (! *domain_name) {
-		/* no domain-name defined get fqdn instead */
-		strcpy(domain_name, get_fqdn(host_name));
+	if (domain_name[0]=='\0') {
+		if (host_name[0]=='\0') {
+			ptr = get_fqdn((char *)NULL);
+		} else {
+			ptr = get_fqdn(host_name);
+		}
+		if (ptr != (char *)NULL) {
+			strcpy (domain_name, ptr);
+		}
 	}
 #endif /* HAVE_GETHOSTBYNAME */
 	
-	if (! *domain_name) {
+	if (domain_name[0]=='\0') {
 		error_message ("Can't get a (full-qualified) domain-name!\n", "");
 		tin_done(1);
 	}
@@ -449,7 +458,7 @@ void init_selfinfo (void)
 	default_sort_art_type = SORT_BY_DATE_ASCEND;
 	default_thread_arts = THREAD_MAX;
 	delete_index_file = FALSE;
-        display_mime_header_asis=FALSE;
+	display_mime_header_asis=FALSE;
 	force_screen_redraw = FALSE;
 	full_page_scroll = TRUE;
 	group_catchup_on_exit = TRUE;
