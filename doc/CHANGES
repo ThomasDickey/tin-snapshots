@@ -1,8 +1,68 @@
+-- pre-1.4 release 971127 --
+
+502) Sven Paulus <sven@tin.org>
+     ADD. -p cmd-line falg
+     FIX. Makefile, extern.h, Makefile[.in], init.c, main.c, nrctbl.c
+          open.c
+
+501) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. moved some strings to lang.c
+     ADD. filtering on Message-ID and last References: entry only
+     ADD. missing metachars to quote_wild()
+     FIX. extern.h, tin.h, filter.c, misc.c
+
+500) Thomas E. Dickey <dickey@clark.net>
+     BUG. wrong initialization of colors for the normal (non-ncurses4.1)
+          case.
+     BUG. missing initialization of posted[] array end-marker.
+     ADD. generate pcre/Makefile (needed for --srcdir option, as well as to
+          solve various portability problems).
+     ADD. configure test for bcopy/memmove
+     ADD. minor fix for ncurses vs gpm library configure-test
+     ADD. remove configure-macro for regular expressions
+     ADD. improved test for 'union wait' in configure-script
+     FIX. aclocal.m4, configure.[in], makefile[.in], pcre/internal.h,
+          pcre/pcre.c, pcre/Makefile.in, color.c, misc.c, post.c, tcurses.c
+          Makefile[.in]
+
+499) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. Autosubscribed groups are not postable
+     BUG. Killed articles incorrectly threaded
+     BUG. 'u' crashed on killed parents
+     ADD. Better behaviour on 'Y'
+     ADD. Some new DEBUG_NEWSRC code
+
+498) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. fixed typo in msgid filtering code
+     FIX. filter.c
+
+497) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. included pcre into amiga-version
+     BUG. moved misplaced label
+     FIX. amiga.h smakefile open.c
+
+496) Enrik Berkhan <enrik@tin.org>
+     Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. minor manpage update
+     BUG. fixed wrong type in fgets_hdr()
+     BUG. fixed 12pm bug in parsedate.y
+     ADD. check for $YACC on HP-UX/cc
+     FIX. prasedate.y, read.c, tin.1, conf-tin
+
 -- pre-1.4 release 971123 --
+
+495) Sven Paulus <sven@tin.org>
+     ADD. changed regex code to Philip Hazel's <ph10@cus.cam.ac.uk>
+          pcre library, which provides enhanced capabilities and
+          speed improvements. pcre is now included within TIN
+          distribution and should compile on all platforms
+     ADD. cache for compiled regexp patterns
+     FIX. filter.c, regex.c, new pcre-subdirectory
 
 494) Sven Paulus <sven@tin.org>
      ADD. new config option "add_posted_to_filter"
-     BUG. "quick_filter_select_posted_art" didn't add group name to scope
+     BUG. quick_filter_select_posted_art() didn't add group name to scope
      FIX. extern.h, proto.h, config.c, filter.c, init.c, lang.c, post.c,
           tincfg.tbl
 
@@ -1040,7 +1100,7 @@
 
 325) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. changing OPT_DEFAULT_SHOW_AUTHOR in 'M'enu at top-level SIGSEGVs
-     BUG. no rage-check for ISO2ASC
+     BUG. no range-check for ISO2ASC
      BUG. wrong prototype for hand-rolled atol
      FIX. config.c, init.c, string.c
 
@@ -1878,7 +1938,7 @@
 179) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. wrong argument order for interactive external mailer elm
      BUG. mar'K' article as read in 'l'ist_thread does not work
-     ADD. rage check to center_line()
+     ADD. range check to center_line()
      ADD. <tab> no longer skips over ART_WILL_RETURN articles
      FIX. several patches
 

@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 08.11.97
+dnl Updated   : 24.11.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -473,6 +473,40 @@ AC_MSG_RESULT($cf_cv_func_fork)
 test $cf_cv_func_fork = yes && AC_DEFINE(HAVE_FORK)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check for memmove, or a bcopy that can handle overlapping copy.  If neither
+dnl is found, add our own version of memmove to the list of objects.
+AC_DEFUN([CF_FUNC_MEMMOVE],
+[
+if test ".$ac_cv_func_memmove" != .yes ; then
+	if test ".$ac_cv_func_bcopy" = ".yes" ; then
+		AC_MSG_CHECKING(if bcopy does overlapping moves)
+		AC_CACHE_VAL(cf_cv_good_bcopy,[
+			AC_TRY_RUN([
+int main() {
+	static char data[] = "abcdefghijklmnopqrstuwwxyz";
+	char temp[40];
+	bcopy(data, temp, sizeof(data));
+	bcopy(temp+10, temp, 15);
+	bcopy(temp+5, temp+15, 10);
+	exit (strcmp(temp, "klmnopqrstuwwxypqrstuwwxyz"));
+}
+		],
+		[cf_cv_good_bcopy=yes],
+		[cf_cv_good_bcopy=no],
+		[cf_cv_good_bcopy=unknown])
+		])
+		AC_MSG_RESULT($cf_cv_good_bcopy)
+	else
+		cf_cv_good_bcopy=no
+	fi
+	if test $cf_cv_good_bcopy = yes ; then
+		AC_DEFINE(USE_OK_BCOPY)
+	else
+		AC_DEFINE(USE_MY_MEMMOVE)
+	fi
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check if the 'system()' function returns a usable status, or if not, try
 dnl to use the status returned by a SIGCHLD.
 AC_DEFUN([CF_FUNC_SYSTEM],
@@ -720,8 +754,15 @@ dnl and the linker will record a dependency.
 AC_DEFUN([CF_NCURSES_LIBS],
 [AC_REQUIRE([CF_NCURSES_CPPFLAGS])
 
+	# This works, except for the special case where we find gpm, but
+	# ncurses is in a nonstandard location via $LIBS, and we really want
+	# to link gpm.
 cf_ncurses_LIBS=""
-AC_CHECK_LIB(gpm,Gpm_Open,[AC_CHECK_LIB(gpm,initscr,,[cf_ncurses_LIBS="-lgpm"])])
+cf_ncurses_SAVE="$LIBS"
+AC_CHECK_LIB(gpm,Gpm_Open,
+	[AC_CHECK_LIB(gpm,initscr,
+		[LIBS="$cf_ncurses_SAVE"],
+		[cf_ncurses_LIBS="-lgpm"])])
 
 case $host_os in #(vi
 freebsd*)
@@ -896,38 +937,6 @@ AC_CHECK_LIB($2,$1,[
 	unset ac_cv_func_$1 2>/dev/null
 	$4],
 	[[$]$3])
-])dnl
-dnl ---------------------------------------------------------------------------
-dnl Attempt to determine if we've got one of the flavors of regular-expression
-dnl code that we can support.
-AC_DEFUN([CF_REGEX],
-[
-AC_MSG_CHECKING([for regular-expression headers])
-AC_CACHE_VAL(cf_cv_regex,[
-AC_TRY_LINK([#include <sys/types.h>
-#include <regex.h>],[
-	regex_t *p;
-	int x = regcomp(p, "", 0);
-	int y = regexec(p, "", 0, 0, 0);
-	regfree(p);
-	],[cf_cv_regex="regex.h"],[
-	AC_TRY_LINK([#include <regexp.h>],[
-		char *p = compile("", "", "", 0);
-		int x = step("", "");
-	],[cf_cv_regex="regexp.h"],[
-		cf_save_LIBS="$LIBS"
-		LIBS="-lgen $LIBS"
-		AC_TRY_LINK([#include <regexpr.h>],[
-			char *p = compile("", "", "");
-			int x = step("", "");
-		],[cf_cv_regex="regexpr.h"],[LIBS="$cf_save_LIBS"])])])
-])
-AC_MSG_RESULT($cf_cv_regex)
-case $cf_cv_regex in
-	regex.h)   AC_DEFINE(HAVE_REGEX_H_FUNCS) ;;
-	regexp.h)  AC_DEFINE(HAVE_REGEXP_H_FUNCS) ;;
-	regexpr.h) AC_DEFINE(HAVE_REGEXPR_H_FUNCS) ;;
-esac
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
@@ -1267,15 +1276,16 @@ AC_DEFUN([CF_UNION_WAIT],
 AC_REQUIRE([CF_WAIT_HEADERS])
 AC_MSG_CHECKING([for union wait])
 AC_CACHE_VAL(cf_cv_type_unionwait,[
-	AC_TRY_COMPILE($cf_wait_headers,
+	AC_TRY_LINK($cf_wait_headers,
 	[int x;
 	 int y = WEXITSTATUS(x);
 	 int z = WTERMSIG(x);
+	 wait(&x);
 	],
 	[cf_cv_type_unionwait=no
 	 echo compiles ok w/o union wait 1>&AC_FD_CC
 	],[
-	AC_TRY_COMPILE($cf_wait_headers,
+	AC_TRY_LINK($cf_wait_headers,
 	[union wait x;
 #ifdef WEXITSTATUS
 	 int y = WEXITSTATUS(x);
@@ -1283,6 +1293,7 @@ AC_CACHE_VAL(cf_cv_type_unionwait,[
 #ifdef WTERMSIG
 	 int z = WTERMSIG(x);
 #endif
+	 wait(&x);
 	],
 	[cf_cv_type_unionwait=yes
 	 echo compiles ok with union wait and possibly macros too 1>&AC_FD_CC

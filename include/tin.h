@@ -1080,7 +1080,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FILTER_FROM_CASE_SENSITIVE		2
 #define	FILTER_FROM_CASE_IGNORE		3
 #define	FILTER_MSGID		4
-#define	FILTER_LINES		5
+#define	FILTER_MSGID_LAST	5
+#define	FILTER_LINES		6
 
 #define	FILTER_LINES_NO		0
 #define	FILTER_LINES_EQ		1
@@ -1410,6 +1411,7 @@ struct t_filter
 	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;			/* kill/auto select */
 	unsigned int icase:2;			/* Case sensitive filtering */
+	unsigned int fullref:2;			/* use full references or last entry only */
 };
 
 /*
@@ -1422,6 +1424,7 @@ struct t_filter_rule
 	char scope[PATH_LEN];
 	int  counter;
 	int  icase;
+	int  fullref;
 	int  lines_cmp;
 	int  lines_num;
 	t_bool from_ok:1;

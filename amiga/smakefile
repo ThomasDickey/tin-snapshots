@@ -1,5 +1,5 @@
 #
-# $VER: tin_makefile 2.1a (19.10.97)
+# $VER: tin_makefile 2.2 (25.11.97)
 #
 # This is especially for use with the SAS/C developing system
 # version 6.55 and above
@@ -12,6 +12,7 @@ AMIDIR   = /amiga
 SRCDIR   = /src
 INCDIR   = /include
 OBJDIR   = /obj
+REDIR    = /pcre
 
 # Timezone stuff for faster spool access (obw)
 TZSET    = _tzset.o
@@ -42,7 +43,7 @@ GSTFILE  = $(AMIDIR)/tin.gst
 #SCOPTIONS = strmer data=near parms=register nover errrexx ignore=85,93,104,105 \
 #                    idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) cpu=$(CPU)
 SCOPTIONS = strmer nover ignore=85,93,104,105 \
- idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) data=far
+ idir=netinclude: idir=$(INCDIR) idir=$(REDIR) gst=$(GSTFILE) data=far
 
 # comment the next two lines, for the final release
 
@@ -107,6 +108,7 @@ HEADERS = \
         $(INCDIR)/msmail.h \
         $(INCDIR)/nntplib.h \
         $(INCDIR)/os_2.h \
+        $(REDIR)/pcre.h \
         $(INCDIR)/proto.h \
         $(INCDIR)/stpwatch.h \
         $(INCDIR)/tin.h \
@@ -128,6 +130,7 @@ OBJECTS = \
         $(OBJDIR)/attrib.o \
         $(OBJDIR)/auth.o \
         $(OBJDIR)/charset.o \
+        $(OBJDIR)/chartables.o \
         $(OBJDIR)/color.o \
         $(OBJDIR)/config.o \
         $(OBJDIR)/curses.o \
@@ -158,11 +161,13 @@ OBJECTS = \
         $(OBJDIR)/os_2.o \
         $(OBJDIR)/page.o \
         $(OBJDIR)/parsdate.o \
+        $(OBJDIR)/pcre.o \
         $(OBJDIR)/pgp.o \
         $(OBJDIR)/post.o \
         $(OBJDIR)/prompt.o\
         $(OBJDIR)/read.o \
-        $(OBJDIR)/refs.o\
+        $(OBJDIR)/refs.o \
+        $(OBJDIR)/regex.o \
         $(OBJDIR)/rfc1521.o\
         $(OBJDIR)/rfc1522.o\
         $(OBJDIR)/save.o \
@@ -173,6 +178,7 @@ OBJECTS = \
         $(OBJDIR)/signal.o \
         $(OBJDIR)/strftime.o \
         $(OBJDIR)/string.o \
+        $(OBJDIR)/study.o \
         $(OBJDIR)/thread.o \
         $(OBJDIR)/vms.o \
         $(OBJDIR)/wildmat.o \
@@ -201,7 +207,7 @@ $(PROJECT):     $(OBJDIR) $(OBJECTS)
         $(OBJECTS) $(OBJDIR)/$(TZSET)
         <
 
-$(TZSET): $(TZSOURCE) $(OBJDIR) # /*obw*/
+$(TZSET): sc:source/_tzset.c $(OBJDIR)
         $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
 
 $(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)
@@ -214,7 +220,11 @@ $(GSTFILE): $(HEADERS)
 $(OBJDIR):
         -@makedir $(OBJDIR)
 
+chartables.c: maketables
+        maketables >$(SRCDIR)/chartables.c
 
+maketables: maketables.o
+        $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/maketables.o
 
 #/*vb*/
 makecfg: $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o $(GSTFILE)
@@ -242,6 +252,7 @@ $(OBJDIR)/art.o:                $(SRCDIR)/art.c $(GSTFILE)
 $(OBJDIR)/attrib.o:             $(SRCDIR)/attrib.c $(GSTFILE)
 $(OBJDIR)/auth.o:               $(SRCDIR)/auth.c $(GSTFILE)
 $(OBJDIR)/charset.o:            $(SRCDIR)/charset.c $(GSTFILE)
+$(OBJDIR)/chartables.o:         $(REDIR)/chartables.c $(GSTFILE)
 $(OBJDIR)/color.o:              $(SRCDIR)/color.c $(GSTFILE)
 $(OBJDIR)/config.o:             $(SRCDIR)/config.c $(GSTFILE) $(INCDIR)/tincfg.h
 $(OBJDIR)/curses.o:             $(SRCDIR)/curses.c $(GSTFILE)
@@ -262,6 +273,7 @@ $(OBJDIR)/list.o:               $(SRCDIR)/list.c $(GSTFILE)
 $(OBJDIR)/mail.o:               $(SRCDIR)/mail.c $(GSTFILE)
 $(OBJDIR)/main.o:               $(SRCDIR)/main.c $(GSTFILE)
 $(OBJDIR)/makecfg.o:            $(SRCDIR)/makecfg.c $(GSTFILE)
+$(OBJDIR)/maketables.o:         $(REDIR)/maketables.c $(GSTFILE)
 $(OBJDIR)/memory.o:             $(SRCDIR)/memory.c $(GSTFILE)
 $(OBJDIR)/misc.o:               $(SRCDIR)/misc.c $(GSTFILE)
 $(OBJDIR)/msmail.o:             $(SRCDIR)/msmail.c $(GSTFILE)
@@ -275,11 +287,13 @@ $(OBJDIR)/page.o:               $(SRCDIR)/page.c $(GSTFILE)
 #$(OBJDIR)/parsdate.o:           $(AMIDIR)/parsdate.c $(GSTFILE)
 $(OBJDIR)/parsdate.o:           $(SRCDIR)/parsdate.c $(GSTFILE)
 $(SRCDIR)/parsdate.c:           $(SRCDIR)/parsdate.y $(GSTFILE)
+$(OBJDIR)/pcre.o:               $(REDIR)/pcre.c $(GSTFILE)
 $(OBJDIR)/pgp.o:                $(SRCDIR)/pgp.c $(GSTFILE)
 $(OBJDIR)/post.o:               $(SRCDIR)/post.c $(GSTFILE)
 $(OBJDIR)/prompt.o:             $(SRCDIR)/prompt.c $(GSTFILE)
 $(OBJDIR)/read.o:               $(SRCDIR)/read.c $(GSTFILE)
 $(OBJDIR)/refs.o:               $(SRCDIR)/refs.c $(GSTFILE)
+$(OBJDIR)/regex.o:              $(SRCDIR)/regex.c $(GSTFILE)
 $(OBJDIR)/rfc1521.o:            $(SRCDIR)/rfc1521.c $(GSTFILE)
 $(OBJDIR)/rfc1522.o:            $(SRCDIR)/rfc1522.c $(GSTFILE)
 $(OBJDIR)/save.o:               $(SRCDIR)/save.c $(GSTFILE)
@@ -290,6 +304,7 @@ $(OBJDIR)/sigfile.o:            $(SRCDIR)/sigfile.c $(GSTFILE)
 $(OBJDIR)/signal.o:             $(SRCDIR)/signal.c $(GSTFILE)
 $(OBJDIR)/strftime.o:           $(SRCDIR)/strftime.c $(GSTFILE)
 $(OBJDIR)/string.o:             $(SRCDIR)/string.c $(GSTFILE)
+$(OBJDIR)/study.o:              $(REDIR)/study.c $(GSTFILE)
 $(OBJDIR)/thread.o:             $(SRCDIR)/thread.c $(GSTFILE)
 $(OBJDIR)/vms.o:                $(SRCDIR)/vms.c $(GSTFILE)
 $(OBJDIR)/wildmat.o:            $(SRCDIR)/wildmat.c $(GSTFILE)

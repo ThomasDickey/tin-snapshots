@@ -254,21 +254,29 @@ end_of_article:
 				break;
 
 			case iKeyPageGotoParent:		/* Goto parent of this article */
+			{
+				struct t_msgid *parent = arts[respnum].refptr->parent;
 
-				if (arts[respnum].refptr->parent == NULL) {
+				if (parent == NULL) {
 					info_message(txt_art_parent_none);
 					break;
 				}
 
-				if (arts[respnum].refptr->parent->article == ART_UNAVAILABLE) {
+				if (parent->article == ART_UNAVAILABLE) {
 					info_message(txt_art_parent_unavail);
 					break;
 				}
 
-				art_close ();
-				respnum = arts[respnum].refptr->parent->article;
-				goto restart;
+				if (arts[parent->article].killed) {
+					info_message(txt_art_parent_killed);
+					break;
+				}
 
+				art_close ();
+				respnum = parent->article;
+
+				goto restart;
+			}
 
 			case iKeyPagePipe:	/* pipe article/thread/tagged arts to command */
 				feed_articles (FEED_PIPE, PAGE_LEVEL, group, respnum);

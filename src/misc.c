@@ -292,9 +292,10 @@ invoke_ispell (
 #endif
 	}
 
-	wait_message (0, "%s %s", ispell, nam);
+	sprintf(buf,"%s %s", ispell, nam);
 
-	sprintf(buf,"%s %s",ispell,nam);
+	wait_message (0, buf);
+
 	return invoke_cmd (buf);
 }
 #endif
@@ -857,20 +858,27 @@ mail_check (void)
  * Rewritten from scratch by Th. Quinot, 1997-01-03
  */
 
+# ifdef lint
+static int once;
+# define ONCE while(once)
+# else
+# define ONCE while(0)
+# endif
+
 # define APPEND_TO(dest, src) do { \
 	(void) sprintf ((dest), "%s", (src)); \
 	(dest)=strchr((dest), '\0'); \
-	} while (0)
+	} ONCE
 # define RTRIM(whatbuf, whatp) do { (whatp)--; \
 	while ((whatp) >= (whatbuf) && \
 	(*(whatp)==' ')) \
-	*((whatp)--) = '\0'; } while (0)
+	*((whatp)--) = '\0'; } ONCE
 # define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
 	(whatp) && (*(whatp) == ' '); \
 	(whatp)++)
 # define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
 	LTRIM ((whatbuf), (whatp)); \
-	} while (0)
+	} ONCE
 
 void
 parse_from (
@@ -2602,13 +2610,29 @@ quote_wild(
 
 	for (target = buff; *str != '\0'; str++) {
 		if (wildcard) { /* regex */
-			if (*str == '[' || *str == ']')		/* FIXME: is that really enough? */
-				 *target++ = '\\';
+		/* FIXME: is that really enough? is it perhaps too much? */
+			/*
+			 * quote meta characters ()[]{}\^$*+?.
+			 * replace whitespace with '\s' (pcre)
+			 */
+			if (*str == '(' || *str == ')' || *str == '[' || *str == ']' || *str == '{' || *str == '}'
+			    || *str == '\\' || *str == '^' || *str == '$'
+			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
+			    || *str == ' ' || *str == '\t' ) {
+				*target++ = '\\';
+				if (*str == ' ' || *str == '\t') {
+					*target++ = 's';
+				} else {
+					*target++ = *str;
+				}
+			} else {
+				*target++ = *str;
+			}
 		} else {	/* wildmat */
 			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
 				*target++ = '\\';
+			*target++ = *str;
 		}
-		*target++ = *str;
 	}
 	*target = '\0';
 	return (buff);

@@ -43,6 +43,15 @@
  */
 
 /*
+ * Format strings for adding new filters
+ * padding with "*" is done in wildmat mode only
+ */
+
+#define iAFR_FORMAT1 ((wildcard) ? "%s" : "*%s*")
+#define iAFR_FORMAT2 ((wildcard) ? "%s (%s)" : "*%s (%s)*")
+
+
+/*
  * global filter array
  */
 
@@ -110,6 +119,7 @@ vSetFilter (
 		psFilter->scope = (char *) 0;
 		psFilter->inscope = TRUE;
 		psFilter->icase = FALSE;
+		psFilter->fullref = TRUE;
 		psFilter->subj = (char *) 0;
 		psFilter->from = (char *) 0;
 		psFilter->msgid = (char *) 0;
@@ -299,8 +309,18 @@ if (debug) {
 			break;
 		case 'm':
 			if (match_string (buf+1, "sgid=", msgid, sizeof (msgid))) {
-				if (arr_ptr)
+				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
+					arr_ptr[i].fullref = TRUE;
+				}
+				break;
+			}
+			if (match_string (buf+1, "sgid_last=", msgid, sizeof (msgid))) {
+				if (arr_ptr) {
+					arr_ptr[i].msgid = my_strdup (msgid);
+					arr_ptr[i].fullref = FALSE;
+				}
+				break;
 			}
 			break;
 		case 's':
@@ -477,25 +497,7 @@ vWriteFilterFile (
 	 */
 	time (&lCurTime);
 
-	/* FIXME: move to lang.c ! */
-	fprintf (hFp, "# Global & local filter file for the TIN newsreader\n#\n");
-	fprintf (hFp, "# Global format:\n");
-	fprintf (hFp, "#   group=STRING      Newsgroups list (e.g. comp.*,!*sources*)    [mandatory]\n");
-	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
-	fprintf (hFp, "#   case=NUM          Compare=0 / ignore=1 case when filtering\n");
-	fprintf (hFp, "#   score=NUM         Score to give (e.g. 70)\n");
-	fprintf (hFp, "#   subj=STRING       Subject: line (e.g. How to be a wizard)\n");
-	fprintf (hFp, "#   from=STRING       From: line (e.g. *Craig Shergold*)\n");
-	fprintf (hFp, "#   msgid=STRING      Message-ID: line (e.g. <123@ether.net>)\n");
-	fprintf (hFp, "#   lines=NUM         Lines: line\n");
-	fprintf (hFp, "#   either:\n");
-	fprintf (hFp, "#   xref_max=NUM      Maximum score (e.g. 5)\n");
-	fprintf (hFp, "#   xref_score=NUM,PATTERN score for pattern (e.g 0,*.answers)\n");
-	fprintf (hFp, "#   ...\n");
-	fprintf (hFp, "#   or:\n");
-	fprintf (hFp, "#   xref=PATTERN      Kill pattern (e.g. alt.flame*)\n");
-	fprintf (hFp, "#   \n");
-	fprintf (hFp, "#   time=NUM          Filter period in days (default %d)\n#\n", default_filter_days);
+	fprintf (hFp, txt_filter_file, default_filter_days);
 	fflush (hFp);
 
 	/*
@@ -559,8 +561,12 @@ my_flush ();
 		if (ptr->filter[i].from != (char *) 0)
 			fprintf (fp, "from=%s\n", ptr->filter[i].from);
 
-		if (ptr->filter[i].msgid != (char *) 0)
-			fprintf (fp, "msgid=%s\n", ptr->filter[i].msgid);
+		if (ptr->filter[i].msgid != (char *) 0) {
+			if (ptr->filter[i].fullref)
+				fprintf (fp, "msgid=%s\n", ptr->filter[i].msgid);
+			else
+				fprintf (fp, "msgid_last=%s\n", ptr->filter[i].msgid);
+		}
 
 		if (ptr->filter[i].lines_cmp != FILTER_LINES_NO) {
 			switch (ptr->filter[i].lines_cmp) {
@@ -687,6 +693,7 @@ filter_menu (
 	rule.from_ok = FALSE;
 	rule.lines_ok = FALSE;
 	rule.msgid_ok = FALSE;
+	rule.fullref = TRUE;
 	rule.subj_ok = FALSE;
 	rule.type = type;
 	rule.score = 0;
@@ -721,11 +728,7 @@ filter_menu (
 		ptr_filter_quit_edit_save = txt_quit_edit_save_select;
 	}
 
-	/*
-	 *  TODO: move all scoring text to lang.c
-	 */
-
-	ptr_filter_score = "Enter score for rule (default=100): ";
+	ptr_filter_score = txt_filter_score;
 
 	len = cCOLS - 30;
 
@@ -738,7 +741,7 @@ filter_menu (
 		strcpy (buf, art->from);
 
 	sprintf (text_from, ptr_filter_from, len, len, buf);
-	sprintf (text_msgid, ptr_filter_msgid, len, len, MSGID(art));
+	sprintf (text_msgid, ptr_filter_msgid, len-2, len-2, MSGID(art));
 
 	ClearScreen ();
 
@@ -804,14 +807,31 @@ filter_menu (
 		 * Message-Id:
 		 */
 		if (rule.subj_ok || rule.from_ok)
-			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_no, txt_yes, (char *)0, (char *)0, (char *)0);
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_no, txt_full, txt_last, (char *)0, (char *)0);
 		else 
-			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_yes, txt_no, (char *)0, (char *)0, (char *)0);
+			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_full, txt_last, txt_no, (char *)0, (char *)0);
 
 		if (i == -1)
 			return FALSE;
-		else
-			rule.msgid_ok = (rule.subj_ok || rule.from_ok) ? (i != FALSE) : (i == FALSE);
+		else {
+			switch ((rule.subj_ok || rule.from_ok) ? i : i+1) {
+			case 0:
+			case 3:
+				rule.msgid_ok = FALSE;
+				rule.fullref  = FALSE;
+				break;
+
+			case 1:
+				rule.msgid_ok = TRUE;
+				rule.fullref  = TRUE;
+				break;
+
+			case 2:
+				rule.msgid_ok = TRUE;
+				rule.fullref  = FALSE;
+				break;
+			}
+		}
 
 	}
 
@@ -851,7 +871,7 @@ filter_menu (
 	 * Scoring value
 	 */
 	buf[0] = '\0';
-	show_menu_help("Enter the score weight (range 0 < score <= 10000)"); /* FIXME: a sprintf() is necessary here */
+	show_menu_help(txt_filter_score_help); /* FIXME: a sprintf() is necessary here */
 
 	if (!prompt_menu_string(INDEX_TOP+8, (int)strlen(ptr_filter_score), buf))
 		return FALSE;
@@ -1000,7 +1020,8 @@ quick_filter_kill (
 	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES);
-	rule.msgid_ok = (header == FILTER_MSGID);
+	rule.msgid_ok = (header == FILTER_MSGID) || (header == FILTER_MSGID_LAST);
+	rule.fullref = (header == FILTER_MSGID);
 
 	if (header == FILTER_FROM_CASE_SENSITIVE || header == FILTER_FROM_CASE_IGNORE)
 		rule.from_ok = TRUE;
@@ -1060,7 +1081,8 @@ quick_filter_select (
 	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES);
-	rule.msgid_ok = (header == FILTER_MSGID);
+	rule.msgid_ok = (header == FILTER_MSGID) || (header == FILTER_MSGID_LAST);
+	rule.fullref = (header == FILTER_MSGID);
 
 	if (header == FILTER_FROM_CASE_SENSITIVE || header == FILTER_FROM_CASE_IGNORE)
 		rule.from_ok = TRUE;
@@ -1114,6 +1136,7 @@ quick_filter_select_posted_art (
 		rule.from_ok = FALSE;
 		rule.lines_ok = FALSE;
 		rule.msgid_ok = FALSE;
+		rule.fullref = TRUE;
 		rule.subj_ok = TRUE;
 		rule.text[0] = '\0';
 		if (strlen(group->name) > sizeof(rule.scope)-1)
@@ -1144,6 +1167,7 @@ iAddFilterRule (
 	struct t_article *psArt,
 	struct t_filter_rule *psRule)
 {
+
 	char acBuf[PATH_LEN];
 	int iFiltered = FALSE;
 	int *plNum, *plMax;
@@ -1192,10 +1216,18 @@ iAddFilterRule (
 	}
 
 	if (psRule->text[0]) {
+		/*
+		 * quoting metacharacters and/or wildcards should not be necessary for
+		 * manually entered strings
+		 * we should assume that the users does know what he is doing and allow
+		 * him to enter regular expressions or wilmat patterns
+		 */
+#if 0
 		if (psRule->check_string)
-			sprintf (acBuf, "*%s*", quote_wild(psRule->text));
+			sprintf (acBuf, iAFR_FORMAT1, quote_wild(psRule->text));
 		else
-			sprintf (acBuf, "*%s*", psRule->text);
+#endif
+			sprintf (acBuf, iAFR_FORMAT1, psRule->text);
 
 		switch (psRule->counter) {
 			case FILTER_SUBJ_CASE_IGNORE:
@@ -1214,6 +1246,11 @@ iAddFilterRule (
 				break;
 			case FILTER_MSGID:
 				psPtr[*plNum].msgid = my_strdup (acBuf);
+				psPtr[*plNum].fullref = TRUE;
+				break;
+			case FILTER_MSGID_LAST:
+				psPtr[*plNum].msgid = my_strdup (acBuf);
+				psPtr[*plNum].fullref = FALSE;
 				break;
 			default:
 				break;
@@ -1223,22 +1260,25 @@ iAddFilterRule (
 	} else {
 		if (psRule->subj_ok) {
 			if (psRule->check_string)
-				sprintf (acBuf, "*%s*", quote_wild (psArt->subject));
+				sprintf (acBuf, iAFR_FORMAT1, quote_wild (psArt->subject));
 			else
-				sprintf (acBuf, "*%s*", psArt->subject);
+				sprintf (acBuf, iAFR_FORMAT1, psArt->subject);
 
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
 		if (psRule->from_ok) {
 			if (psArt->name != (char *) 0)
-				sprintf (acBuf, "*%s (%s)*", psArt->from, psArt->name);
+				sprintf (acBuf, iAFR_FORMAT2, psArt->from, psArt->name);
 			else
-				sprintf (acBuf, "*%s*", psArt->from);
+				sprintf (acBuf, iAFR_FORMAT1, psArt->from);
 
 			psPtr[*plNum].from = my_strdup (acBuf);
 		}
+		/*
+		 * message-ids should be quoted
+		 */
 		if (psRule->msgid_ok) {
-			sprintf (acBuf, "*%s*", MSGID(psArt));
+			sprintf (acBuf, iAFR_FORMAT1, quote_wild (MSGID(psArt)));
 			psPtr[*plNum].msgid = my_strdup (acBuf);
 		}
 		if (psRule->subj_ok || psRule->from_ok ||
@@ -1251,13 +1291,14 @@ iAddFilterRule (
 	if (iFiltered) {
 #ifdef DEBUG
 		if (debug)
-			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] line=[%d %d] time=[%ld]",
+			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%s] line=[%d %d] time=[%ld]",
 				(psPtr[*plNum-1].inscope ? "TRUE" : "FALSE"),
 				(psRule->scope ? psRule->scope : ""),
 				psPtr[*plNum-1].type, psPtr[*plNum-1].icase,
 				(psPtr[*plNum-1].subj ? psPtr[*plNum-1].subj : ""),
 				(psPtr[*plNum-1].from ? psPtr[*plNum-1].from : ""),
 				(psPtr[*plNum-1].msgid ? psPtr[*plNum-1].msgid : ""),
+				(psPtr[*plNum-1].fullref ? "TRUE" : "FALSE"),
 				psPtr[*plNum-1].lines_cmp, psPtr[*plNum-1].lines_num,
 				psPtr[*plNum-1].time);
 #endif
@@ -1440,8 +1481,7 @@ filter_articles (
 								}
 							}
 						}
-						if (regex_cache_from[j].re &&
-						  regex_cache_from[j].extra) {
+						if (regex_cache_from[j].re) {
 							regex_errpos = pcre_exec(regex_cache_from[j].re,
 							    regex_cache_from[j].extra,
 							    buf,
@@ -1457,20 +1497,30 @@ filter_articles (
 
 				/*
 				 * Filter on Message-ID: line
-				 * Apply to Message-ID: & References: lines
+				 * Apply to Message-ID: & References: lines or
+				 * Message-ID: & last entry from References: line
 				 * Case is important here
 				 */
 				if (ptr[j].msgid != (char *) 0) {
 
 					struct t_article *art = &arts[i];
 					char *refs = NULL;
+					char *myrefs;
 /* TODO nice idea del'd; better apply one rule on all fitting
  * TODO articles, so we can switch to an appropriate algorithm
  * TODO for each kind of rule, including the deleted one.
  */
 
+					/* myrefs does not need to be freed */
+					/* use full references header or just the last entry ? */
+					if (ptr[j].fullref) {
+						myrefs = REFS(art, refs);
+					} else {
+						myrefs = (art->refptr->parent) ? art->refptr->parent->txt : "";
+					}
+
 					if (!wildcard) {
-						if (wildmat(REFS(art, refs), ptr[j].msgid, FALSE) ||
+						if (wildmat(myrefs, ptr[j].msgid, FALSE) ||
 						 wildmat(MSGID(art), ptr[j].msgid, FALSE))
 							SET_FILTER(group, i, j);
 					} else {
@@ -1489,11 +1539,7 @@ filter_articles (
 								}
 							}
 						}
-						if (regex_cache_msgid[j].re && regex_cache_msgid[j].extra) {
-							char * myrefs;
-
-							/* myrefs does not need to be freed */
-							myrefs = REFS(arts, refs);
+						if (regex_cache_msgid[j].re) {
 							regex_errpos = 
 								pcre_exec(regex_cache_msgid[j].re,
 								regex_cache_msgid[j].extra,
@@ -1514,7 +1560,7 @@ filter_articles (
 								if (regex_errpos >= 0) {
 									SET_FILTER(group, i, j);
 								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-									 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+									sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 							}
 						}
 					}		                                                
@@ -1613,8 +1659,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 												}
 											}
 										}
-										if (regex_cache_xref[j].re &&
-										  regex_cache_xref[j].extra) {
+										if (regex_cache_xref[j].re) {
 											regex_errpos =
 											  pcre_exec(regex_cache_xref[j].re,
 											    regex_cache_xref[j].extra,

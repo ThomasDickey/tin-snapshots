@@ -17,8 +17,8 @@ Major additions
 	Word highlighting
 
 . References based threading
-	u to toggle online, settable in tinrc and in attributes
-    Various thread menu additions & enhancements
+	'u' to toggle online, settable in tinrc and in attributes
+	Various thread menu additions & enhancements
 
 . Now auto-configures and builds out of the box
 	Much improved configurability
@@ -34,6 +34,9 @@ Major additions
 . Newsserver authorisation fully supported
 
 . Scoring
+
+. Uses libpcre (Perl-compatible regular expression Librarie) for
+  regex-patterns
 
 Plus of course, countless bug fixes and doubtless some new ones.
 

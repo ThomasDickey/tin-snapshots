@@ -619,14 +619,9 @@ dump_msgid_threads(void)
  *     (it's already threaded/expired OR it has been autokilled)
  */
 
-#if 0 /* this one dumps core if parent is killed and you do 'u' */
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || \
-		(arts[ptr->article].thread != ART_UNAVAILABLE || arts[ptr->article].killed)))
-#else
-#define SKIP_ART(ptr)	\
-	(ptr && (ptr->article == ART_UNAVAILABLE || arts[ptr->article].thread != ART_UNAVAILABLE))
-#endif
+		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
 
 static struct t_msgid *
 find_next(
@@ -703,9 +698,9 @@ build_thread(
 	struct t_msgid *newptr;
 
 	/*
-	 * If the root article has gone, advance to the first valid one
+	 * If the root article is gone/expired/killed, find the first valid one
 	 */
-	if (ptr->article == ART_UNAVAILABLE)
+	if (SKIP_ART (ptr))
 		ptr = find_next(ptr);
 
 	/*
@@ -750,6 +745,7 @@ thread_by_reference(void)
 
 #ifdef DEBUG_REFS
 	fprintf(dbgfd, "Full dump of threading info...\n");
+	fprintf(dbgfd, "%3s %3s %3s %3s : %3s %3s\n", "#", "Par", "Sib", "Chd", "In", "Thd");
 
 	for (i=0 ; i < top ; i++) {
 		fprintf(dbgfd, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,

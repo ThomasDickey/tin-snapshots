@@ -553,7 +553,7 @@ parse_bitmap_seq (
 #ifdef DEBUG_NEWSRC
 	{
 		char buf[NEWSRC_LINE];
-		sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
+		sprintf (buf, "Parsing [%s%c %.*s]", group->name, SUB_CHAR(group->subscribed), (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
 		debug_print_comment(buf);
 		debug_print_bitmap(group,NULL);
 	}

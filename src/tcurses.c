@@ -3,7 +3,7 @@
  *  Module    : tcurses.c
  *  Author    : Thomas Dickey
  *  Created   : 02.03.97
- *  Updated   : 24.09.97
+ *  Updated   : 24.11.97
  *  Notes     : This is a set of wrapper functions adapting the termcap
  *		interface of tin to use SVr4 curses (e.g., ncurses).
  *
@@ -50,7 +50,11 @@ int InitScreen (void)
 {
 #ifdef NCURSES_VERSION
 #ifdef USE_TRACE
+#ifdef TRACE_CCALLS
 	trace(TRACE_CALLS|TRACE_CCALLS);
+#else
+	trace(TRACE_CALLS);
+#endif
 #endif
 #endif
 	TRACE(("InitScreen"))
@@ -364,6 +368,6 @@ screen_contents(int row, int col, char *buffer)
 
 #else
 
-static void my_tcurses(void) { }	/* ANSI C requires non-empty file */
-
+void my_tcurses(void); /* proto-type - sehr sinning ,- )*/
+void my_tcurses(void) { }	/* ANSI C requires non-empty file */
 #endif

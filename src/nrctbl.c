@@ -181,7 +181,7 @@ get_newsrcname (
 				char ch;
 				char default_ch = iKeyNrctblAlternative;
 
-				Raw(TRUE);
+/*				Raw(TRUE);*/
 				do {
 					/* XXXX - very ugly code, but curses
 					   are not initialized yet */
@@ -196,7 +196,7 @@ get_newsrcname (
 						ch = default_ch;
 				} while (!strchr ("\033acdq", ch));
 				printf("%c\n", ch);
-				Raw(FALSE);
+/*				Raw(FALSE); */
 
 				switch(ch) {
 					case iKeyNrctblCreate:

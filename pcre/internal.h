@@ -52,6 +52,10 @@ define a macro for memmove() if USE_BCOPY is defined. */
 #include <string.h>
 #include "pcre.h"
 
+#ifndef offsetof
+#define offsetof(p_type,field) ((size_t)&(((p_type*)0)->field))
+#endif
+
 /* Private options flags start at the most significant end of the two bytes.
 The public options defined in pcre.h start at the least significant end. Make
 sure they don't overlap! */

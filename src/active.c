@@ -56,63 +56,35 @@ int
 resync_active_file (void)
 {
 	char old_group[HEADER_LEN];
-	int reread = FALSE;
 	int command_line;
 
-	if (reread_active_file) {
-		reread_active_for_posted_arts = FALSE;
-		reread = TRUE;
+	if (!reread_active_file)
+		return FALSE;
 
-		if (cur_groupnum >= 0 && group_top)
-			strcpy (old_group, CURR_GROUP.name);
-		else
-			old_group[0] = '\0';
+	reread_active_for_posted_arts = FALSE;
 
-		vWriteNewsrc ();
-#if 0
-		/* 1.3beta behaviour, check the on-spool counts 
-		 * it's slow but it works!
-		 */
-		vGrpGetSubArtInfo ();
-#else
-		/* original 1.2 behaviour, reload the active[] array and all its
-		 * dependants.
-		 * it's much faster, but sometimes articles aren't displayed!
-		 */
-		free_active_arrays ();
-		max_active = get_active_num ();
-		expand_active ();
+	if (cur_groupnum >= 0 && group_top)
+		strcpy (old_group, CURR_GROUP.name);
+	else
+		old_group[0] = '\0';
 
-		init_group_hash();
-#	if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-		read_mail_active_file ();
-#	endif
-		group_top = 0;
-		read_news_active_file ();
+	vWriteNewsrc ();
+	read_news_active_file ();
 
-		read_attributes_file (local_attributes_file, FALSE);
+	command_line = read_cmd_line_groups ();
 
-#	if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-		read_mailgroups_file ();
-#	endif
-		read_newsgroups_file ();
-		/* end of former 1.2 behaviour */
-#endif
+	read_newsrc (newsrc, command_line ? 0 : 1);
 
-		command_line = read_cmd_line_groups ();
+	if (command_line)		/* Can't show only unread groups with cmd line groups */
+		show_only_unread_groups = FALSE;
+	else
+		toggle_my_groups (show_only_unread_groups, old_group);
 
-		read_newsrc (newsrc, command_line ? 0 : 1);
-		if (command_line)		/* Can't show only unread groups with cmd line groups */
-			show_only_unread_groups = FALSE;
-		else
-			toggle_my_groups (show_only_unread_groups, old_group);
+	set_groupname_len (FALSE);
+	set_alarm_signal ();
+	show_selection_page ();
 
-		set_groupname_len (FALSE);
-		set_alarm_signal ();
-		show_selection_page ();
-	}
-
-	return reread;
+	return TRUE;
 }
 
 /* List of allowed seperator chars in active file */
@@ -277,6 +249,7 @@ read_news_active_file (void)
 	char *ptr;
 	struct stat newsrc_stat;
 	struct t_group *grpptr;
+	long processed = 0;
 	long count = -1L, min = 1, max = 0;
 
 	/*
@@ -307,7 +280,7 @@ read_news_active_file (void)
 			tin_done (EXIT_ERROR);
 		}
 	}
-/* TODO should we move default count,max,min here as in v1.3, these should really be explicitly set */
+
 	while ((ptr = tin_fgets (buf, sizeof(buf), fp)) != (char *)0) {
 
 		if (newsrc_active) {
@@ -318,22 +291,32 @@ read_news_active_file (void)
 				continue;
 		}
 
+#ifdef SHOW_PROGRESS		/* Spin the arrow as we read the active file */
+		if (++processed % ((newsrc_active) ? 5 : MODULO_COUNT_NUM) == 0)
+			spin_cursor ();
+#endif
 		/*
 		 * Load group into group hash table
-		 * Error => duplicate group
+		 * NULL means group already present, so we just fixup the counters
+		 * This call may implicitly ++num_active
 		 */
-		if ((grpptr = psGrpAdd(ptr)) == NULL)
+		if ((grpptr = psGrpAdd(ptr)) == NULL) {
+			if ((grpptr = psGrpFind(ptr)) == NULL)
+				continue;
+
+			if (grpptr->xmin != min || grpptr->xmax != max) {
+				grpptr->xmin = min;
+				grpptr->xmax = max;
+				grpptr->count = count;
+				expand_bitmap(grpptr, grpptr->xmin);
+			}
 			continue;
+		}
 
 		/*
 		 * Load the new group in active[]
 		 */
 		active_add(grpptr, count, max, min, moderated);
-
-#ifdef SHOW_PROGRESS		/* Spin the arrow as we read the active file */
-		if (num_active % ((newsrc_active) ? 5 : MODULO_COUNT_NUM) == 0)
-			spin_cursor ();
-#endif
 	}
 
 	if (newsrc_active)
@@ -484,7 +467,7 @@ subscribe_new_group (
 			my_fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
 
 		if ((ptr = psGrpAdd(group)) != NULL)
-			active_add(ptr, 0L, 1L, 0L, "n");
+			active_add(ptr, 0L, 1L, 0L, "y");
 
 		if ((idx = my_group_add(group)) < 0)
 			return;

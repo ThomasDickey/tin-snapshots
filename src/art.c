@@ -195,8 +195,15 @@ index_group (
 	 * Do this before calling art_mark_read if you want
 	 * the unread count to be correct.
 	 */
-
+#ifdef DEBUG_NEWSRC
+	debug_print_comment ("Before parse_unread_arts()");
+	debug_print_bitmap (group, NULL);
+#endif
 	parse_unread_arts (group);
+#ifdef DEBUG_NEWSRC
+	debug_print_comment ("After parse_unread_arts()");
+	debug_print_bitmap (group, NULL);
+#endif
 
 	/*
 	 * Stat all articles to see if any have expired
@@ -419,7 +426,7 @@ thread_by_subject(void)
 			/*
 			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
 			 */
-			if (!IGNORE_ART(i) && !arts[i].inthread &&
+			if (/*!IGNORE_ART(i) &&*/ !arts[i].inthread &&
 						   ((arts[i].subject == arts[j].subject) ||
 						   ((arts[i].part || arts[i].patch) &&
 							 arts[i].archive == arts[j].archive))) {
@@ -434,6 +441,20 @@ thread_by_subject(void)
 		 */
 		h->aptr = i;
 	}
+
+#if 0
+	fprintf(stderr, "Subj dump\n");
+	fprintf(stderr, "%3s %3s %3s %3s : %3s %3s\n", "#", "Par", "Sib", "Chd", "In", "Thd");
+	for (i=0 ; i < top ; i++) {
+		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
+			(arts[i].refptr->parent)  ? arts[i].refptr->parent->article : -2,
+			(arts[i].refptr->sibling) ? arts[i].refptr->sibling->article : -2,
+			(arts[i].refptr->child)   ? arts[i].refptr->child->article : -2,
+			arts[i].inthread, arts[i].thread, arts[i].refptr->txt, arts[i].subject);
+	}
+#endif
+
+
 }
 
 /*
@@ -590,8 +611,11 @@ parse_headers (
 	got_archive = got_date = got_from = got_lines = FALSE;
 	got_msgid = got_received = got_refs = got_subject = got_xref = FALSE;
 
+#if 1 /* join continuation headers */
+	while ((ptr = fgets_hdr(buf, sizeof(buf), fp)) != NULL) {
+#else
 	while ((ptr = tin_fgets(buf, sizeof(buf), fp)) != NULL) {
-
+#endif
 		/*
 		 * Look for end of headers - only applies when reading local spool
 		 */
@@ -620,6 +644,7 @@ parse_headers (
 		flag = *ptr;
 		*ptr++ = '\0';
 #endif /* 0 */
+
 		ptrline = ptr;
 		lineno++;		/* TODO is this needed ? */
 

@@ -2276,9 +2276,9 @@ for (;;)
     int number = (*ecode - OP_BRA) << 1;
     int save_offset1, save_offset2;
 
-    #ifdef DEBUG
+#ifdef DEBUG
     printf("start bracket %d\n", number/2);
-    #endif
+#endif
 
     if (number > 0 && number < md->offset_end)
       {
@@ -2286,9 +2286,9 @@ for (;;)
       save_offset2 = md->offset_vector[number+1];
       md->offset_vector[number] = eptr - md->start_subject;
 
-      #ifdef DEBUG
+#ifdef DEBUG
       printf("saving %d %d\n", save_offset1, save_offset2);
-      #endif
+#endif
       }
 
     /* Recurse for all the alternatives. */
@@ -2300,9 +2300,9 @@ for (;;)
       }
     while (*ecode == OP_ALT);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     printf("bracket %d failed\n", number/2);
-    #endif
+#endif
 
     if (number > 0 && number < md->offset_end)
       {
@@ -2441,9 +2441,9 @@ for (;;)
 
       number = (*prev - OP_BRA) << 1;
 
-      #ifdef DEBUG
+#ifdef DEBUG
       printf("end bracket %d\n", number/2);
-      #endif
+#endif
 
       if (number > 0)
         {
@@ -2811,7 +2811,7 @@ for (;;)
       register int length = ecode[1];
       ecode += 2;
 
-      #ifdef DEBUG
+#ifdef DEBUG
       if (eptr >= md->end_subject)
         printf("matching subject <null> against pattern ");
       else
@@ -2822,7 +2822,7 @@ for (;;)
         }
       pchars(ecode, length, FALSE, md);
       printf("\n");
-      #endif
+#endif
 
       if (length > md->end_subject - eptr) return FALSE;
       if (md->caseless)
@@ -2879,10 +2879,10 @@ for (;;)
     maximum. Alternatively, if maximizing, find the maximum number of
     characters and work backwards. */
 
-    #ifdef DEBUG
+#ifdef DEBUG
     printf("matching %c{%d,%d} against subject %.*s\n", c, min, max,
       max, eptr);
-    #endif
+#endif
 
     if (md->caseless)
       {
@@ -3006,10 +3006,10 @@ for (;;)
     maximum. Alternatively, if maximizing, find the maximum number of
     characters and work backwards. */
 
-    #ifdef DEBUG
+#ifdef DEBUG
     printf("negative matching %c{%d,%d} against subject %.*s\n", c, min, max,
       max, eptr);
-    #endif
+#endif
 
     if (md->caseless)
       {
@@ -3259,9 +3259,9 @@ for (;;)
     /* There's been some horrible disaster. */
 
     default:
-    #ifdef DEBUG
+#ifdef DEBUG
     printf("Unknown opcode %d\n", *ecode);
-    #endif
+#endif
     md->errorcode = PCRE_ERROR_UNKNOWN_NODE;
     return FALSE;
     }
@@ -3349,9 +3349,9 @@ if (re->top_backref > 0 && re->top_backref + 1 >= ocount/2)
   ocount = re->top_backref * 2 + 2;
   match_block.offset_vector = (pcre_malloc)(ocount * sizeof(int));
   if (match_block.offset_vector == NULL) return PCRE_ERROR_NOMEMORY;
-  #ifdef DEBUG
+#ifdef DEBUG
   printf("Got memory to hold back references\n");
-  #endif
+#endif
   }
 else match_block.offset_vector = offsets;
 
@@ -3445,11 +3445,11 @@ do
       }
     }
 
-  #ifdef DEBUG
+#ifdef DEBUG
   printf(">>>> Match against: ");
   pchars(start_match, end_subject - start_match, TRUE, &match_block);
   printf("\n");
-  #endif
+#endif
 
   /* When a match occurs, substrings will be set for all internal extractions;
   we just need to set up the whole thing as substring 0 before returning. If
@@ -3472,16 +3472,16 @@ do
         {
         memcpy(offsets + 2, match_block.offset_vector + 2,
           (offsetcount - 2) * sizeof(int));
-        #ifdef DEBUG
+#ifdef DEBUG
         printf("Copied offsets; freeing temporary memory\n");
-        #endif
+#endif
         }
       if (match_block.end_offset_top > offsetcount)
         match_block.offset_overflow = TRUE;
 
-      #ifdef DEBUG
+#ifdef DEBUG
       printf("Freeing temporary memory\n");
-      #endif
+#endif
 
       (pcre_free)(match_block.offset_vector);
       }
@@ -3494,9 +3494,9 @@ do
       offsets[1] = match_block.end_match_ptr - match_block.start_subject;
       }
 
-    #ifdef DEBUG
+#ifdef DEBUG
     printf(">>>> returning %d\n", rc);
-    #endif
+#endif
     return rc;
     }
   }

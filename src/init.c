@@ -365,6 +365,11 @@ void postinit_colors(void)
 }
 #endif
 
+#ifdef NNTP_ABLE
+	unsigned short nntp_tcp_port;
+#endif /* NNTP_ABLE */
+
+
 /*
  * Get users home directory, userid, and a bunch of other stuff!
  */
@@ -813,6 +818,10 @@ void init_selfinfo (void)
 		sprintf (lock_file, "%stin.%s.LCK", TMPDIR, userid);
 #	else
 		sprintf (lock_file, "%s%s.LCK", TMPDIR, userid);
+#endif
+
+#ifdef NNTP_ABLE
+	nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 #endif
 
 #ifdef VMS

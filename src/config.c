@@ -584,7 +584,7 @@ read_config_file (
 #endif
 			break;
 		case 'w':
-			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) { /* FIXME - TRUE+1 is not defined! */
+			if (match_integer (buf, "wildcard=", &wildcard, 2)) {
 				wildcard_func = (wildcard) ? match_regex : wildmat;
 				break;
 			}
