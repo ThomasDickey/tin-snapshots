@@ -941,8 +941,8 @@ extern char *get_uaf_fullname();
  * used by t_group & my_group[]
  */
 
-#define	UNSUBSCRIBED		'!'
-#define	SUBSCRIBED		':'
+#define	UNSUBSCRIBED	'!'
+#define	SUBSCRIBED	':'
 
 /*
  * filter_type used in struct t_filter
@@ -1209,7 +1209,12 @@ struct t_group
 	unsigned int read_during_session:1;	/* marked TRUE if group entered during session */
 	unsigned int art_was_posted:1;		/* marked TRUE if art was posted to group */
 	int next;				/* next active entry in hash chain */
-	int subscribed; 			/*  subscribed/unsubscribed to group */
+	int subscribed;		/*  subscribed/unsubscribed to group */
+	/*
+	** wasting 15 bits per group here
+	** unsigned int subscribe:1;
+	** should do the job -> newsrc.c needs some (more) work
+	*/
 	struct t_newsrc newsrc; 		/* newsrc bitmap specific info. */
 	struct t_attribute *attribute;		/* group specific attributes */
 	struct t_filters *glob_filter;		/* points to global filter array */

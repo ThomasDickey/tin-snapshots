@@ -1074,8 +1074,8 @@ mail_check ()
 
 #if 1
 # define APPEND_TO(dest, src) do { \
-                                   (dest) += \
-                                     sprintf ((dest), "%s", (src)); \
+                                     (void) sprintf ((dest), "%s", (src)); \
+                                     (dest)=strchr((dest), '\0'); \
 			         } while (0)
 # define RTRIM(whatbuf, whatp) do { (whatp)--; \
                           while ((whatp) >= (whatbuf) && \
@@ -1090,147 +1090,147 @@ mail_check ()
 
 void
 parse_from (addr, addrspec, comment)
-  char *addr;
-  char *addrspec;
-  char *comment;
+	char *addr;
+	char *addrspec;
+	char *comment;
 {
-  char atom_buf[HEADER_LEN];
-  char quoted_buf[HEADER_LEN];
+	char atom_buf[HEADER_LEN];
+	char quoted_buf[HEADER_LEN];
 
-  char *atom_p = atom_buf;
-  char *quoted_p = quoted_buf;
+	char *atom_p = atom_buf;
+	char *quoted_p = quoted_buf;
 
-  char asbuf[HEADER_LEN];
-  char cmtbuf[HEADER_LEN];
+	char asbuf[HEADER_LEN];
+	char cmtbuf[HEADER_LEN];
 
-  char *ap = addr,
-       *asp = asbuf,
-       *cmtp = cmtbuf;
-  unsigned int state = 0;
-  /* 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
-     3 = in angle brackets, 4 = in parentheses */
+	char *ap = addr,
+		 *asp = asbuf,
+		*cmtp = cmtbuf;
+	unsigned int state = 0;
+/* 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
+** 3 = in angle brackets, 4 = in parentheses
+*/
 
-  unsigned int plevel = 0;
-  /* Parentheses nesting level */
+	unsigned int plevel = 0;
+	/* Parentheses nesting level */
 
-  unsigned int atom_type = 0;
-  /* 0 = unknown, 1 = address */
+	unsigned int atom_type = 0;
+	/* 0 = unknown, 1 = address */
 
-  *asp = *cmtp = '\0';
-  for (; *ap ; ap++) {
-    switch (state) {
-    case 0 :
-      switch (*ap) {
-      case '\"' :
-	/* APPEND_TO (asp);
-	bp = cmtp; */
-        *atom_p = '\0';
-        quoted_p = quoted_buf;
-        *(quoted_p++) = '\"';
-	state = 1;
-	break;
-      case '<' :
-        *atom_p = '\0';
-	APPEND_TO (cmtp, atom_buf);
-        atom_p = atom_buf;
-        atom_type = 0;
-        asp = asbuf;
-	state = 3;
-	break;
-      case '(' :
-        *atom_p = '\0';
-	APPEND_TO (asp, atom_buf);
-        atom_p = atom_buf;
-        atom_type = 0;
-	plevel++;
-	state = 4;
-	break;
-      case ' ' : case '\t' :
-        if (atom_type == 1) {
-          *atom_p = '\0';
-          APPEND_TO (asp, atom_buf);
-          atom_p = atom_buf;   
-          atom_type = 0;
-        } else
-          *(atom_p++) = *ap;
-        break;
-      default :
-	*(atom_p++) = *ap;
-      break;
-      }
-      break;
-    case 1 :
-      if (*ap == '\"') {
-        switch (*(ap + 1)) {
-          case '@' : case '%' :
-            *(quoted_p++) = '\"'; *quoted_p = '\0';
-            APPEND_TO (asp, quoted_buf);
-            APPEND_TO (cmtp, atom_buf);
-             atom_type = 1;
-            break;
-          default :
-            *quoted_p = '\0';
-            APPEND_TO (asp, atom_buf);
-            APPEND_TO (cmtp, quoted_buf + 1);
-            break;
-        }
-	state = 0;
-	break;
-      } else if (*ap == '\\')
-	state = 2;
-      *(quoted_p++) = *ap;
-      break;
-    case 2 :
-      *(quoted_p++) = *ap;
-      state = 1;
-      break;
-    case 3 :
-      if (*ap == '>') {
-	*asp = '\0';
-	state = 0;
-      } else
-	*(asp++) = *ap;
-      break;
-    case 4 :
-      switch (*ap) {
-      case ')' :
-	if (!--plevel) {
-	  *cmtp = '\0';
-	  state = 0;
-	} else
-	  *(cmtp++) = *ap;
-	break;
-      case '(' :
-	plevel++;
-      default :
-	*(cmtp++) = *ap;
-        break;
-      }
-      break;
-    default :
-      /* Does not happen. */
-      goto FATAL;
-    }
-  }
-
-  *cmtp = *asp = *atom_p = '\0';
-  if (state == 0)
-    if (atom_type == 0)
-      APPEND_TO (cmtp, atom_buf);
-    else if (atom_type == 1)
-      APPEND_TO (asp, atom_buf);
-
-  /* Address specifier */
-  TRIM (asbuf, asp);
-  /* Comment */
-  TRIM (cmtbuf, cmtp);
-
-  strcpy (addrspec, asp);
-  strcpy (comment, cmtp);
-  return;
+	*asp = *cmtp = '\0';
+	for (; *ap ; ap++) {
+		switch (state) {
+			case 0 :
+				switch (*ap) {
+					case '\"' :
+						/*
+							APPEND_TO (asp);
+							bp = cmtp;
+						*/
+						*atom_p = '\0';
+						quoted_p = quoted_buf;
+						*(quoted_p++) = '\"';
+						state = 1;
+						break;
+					case '<' :
+						*atom_p = '\0';
+						APPEND_TO (cmtp, atom_buf);
+						atom_p = atom_buf;
+						atom_type = 0;
+						asp = asbuf;
+						state = 3;
+						break;
+					case '(' :
+						*atom_p = '\0';
+						APPEND_TO (asp, atom_buf);
+						atom_p = atom_buf;
+						atom_type = 0;
+						plevel++;
+						state = 4;
+						break;
+					case ' ' : case '\t' :
+						if (atom_type == 1) {
+							*atom_p = '\0';
+							APPEND_TO (asp, atom_buf);
+							atom_p = atom_buf;
+							atom_type = 0;
+						} else
+							*(atom_p++) = *ap;
+						break;
+					default :
+						*(atom_p++) = *ap;
+						break;
+				}
+				break;
+			case 1 :
+				if (*ap == '\"') {
+					switch (*(ap + 1)) {
+						case '@' : case '%' :
+							*(quoted_p++) = '\"'; *quoted_p = '\0';
+							APPEND_TO (asp, quoted_buf);
+							APPEND_TO (cmtp, atom_buf);
+							atom_type = 1;
+							break;
+						default :
+							*quoted_p = '\0';
+							APPEND_TO (asp, atom_buf);
+							APPEND_TO (cmtp, quoted_buf + 1);
+							break;
+					}
+					state = 0;
+					break;
+				} else if (*ap == '\\')
+					state = 2;
+				*(quoted_p++) = *ap;
+				break;
+			case 2 :
+				*(quoted_p++) = *ap;
+				state = 1;
+				break;
+			case 3 :
+				if (*ap == '>') {
+					*asp = '\0';
+					state = 0;
+				} else
+					*(asp++) = *ap;
+				break;
+			case 4 :
+				switch (*ap) {
+					case ')' :
+						if (!--plevel) {
+							*cmtp = '\0';
+							state = 0;
+						} else
+							*(cmtp++) = *ap;
+						break;
+					case '(' :
+						plevel++;
+					default :
+						*(cmtp++) = *ap;
+					break;
+				}
+				break;
+			default :
+				/* Does not happen. */
+				goto FATAL;
+		}
+	}
+	*cmtp = *asp = *atom_p = '\0';
+	if (state == 0)
+		if ((atom_type == 1) || !asbuf[0])
+			APPEND_TO (asp, atom_buf);
+		else
+			APPEND_TO (cmtp, atom_buf);
+	/* Address specifier */
+	TRIM (asbuf, asp);
+	/* Comment */
+	TRIM (cmtbuf, cmtp);
+	strcpy (addrspec, asp);
+	strcpy (comment, cmtp);
+	return;
 FATAL:
-  addrspec = "error@hell";
-  *comment = '\0';
+	addrspec = "error@hell";
+	*comment = '\0';
 }
 # undef APPEND_TO
 # undef RTRIM

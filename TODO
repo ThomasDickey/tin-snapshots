@@ -1,5 +1,8 @@
 Bugs
 ----
+o  show_arts_from was not 'updated' correctly if changig in the options menu
+   (it's written to the tinrc - but is ignored in the current session)
+
 o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
    szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag
              number 2 - *bingo!*
