@@ -62,6 +62,7 @@ extern void write_attributes_file P_((char *file));
 extern void ConvertIso2Asc P_((char *iso, char *asc, int t));
 extern void ConvertTeX2Iso P_((char *from, char *to));
 extern int iIsArtTexEncoded P_((long art, char *group_path));
+extern void Convert2Printable P_((unsigned char* buf));
 
 /* color.c */
 extern void fcol P_((int color));
@@ -280,6 +281,7 @@ extern int untag_all_articles P_((void));
 #ifndef HAVE_STRSTR
 extern char *my_strstr P_((char *text, char *pattern));
 #endif
+extern int my_isprint P_((int c));
 extern void get_author P_((int thread, struct t_article *art, char *str));
 extern void toggle_inverse_video P_((void));
 extern void show_inverse_video_status P_((void));

@@ -834,6 +834,8 @@ print_a_line:
 			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
 		}
 
+		Convert2Printable ((unsigned char*) buf2);
+
 		first_char = buf2[0] ? buf2[0] : first_char;
 
 		if (skip_include) {

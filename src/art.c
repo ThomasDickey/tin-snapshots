@@ -1701,11 +1701,20 @@ static char *
 pcPrintDate (lSecs)
 	long	lSecs;
 {
-	static	char acDate[80];
+	static	char acDate[25];
 	struct	tm *psTm;
 
+	static char *months_a[] = {
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+	};
+
 	psTm = localtime (&lSecs);
-	(void) my_strftime (acDate, sizeof (acDate), "%d %b %Y %X", psTm);
+	sprintf(acDate, "%02d %s %04d %02d:%02d:%02d",
+			psTm->tm_mday,
+			months_a[psTm->tm_mon],
+			1900+psTm->tm_year,
+			psTm->tm_hour, psTm->tm_min, psTm->tm_sec);
 
 	return acDate;
 }

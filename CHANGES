@@ -1,3 +1,22 @@
+--unoff BETA release 961115 --
+
+217) Thomas E. Dickey <dickey@clark.net>
+     BUG. some variables are missing
+     FIX. autoconf.h[in]
+
+216) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. filter support on Xref:-line
+     FIX. tin.h filter.c misc.c
+
+215) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. editor is not entered automatically on 's'upersede article
+     BUG. edited subject is not displayed correctly in statusline
+     FIX. lang.c post.c
+
+214) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. locale support
+     FIX. several supplied patches
+
 --unoff BETA release 961109 --
 
 213) Andrey A. Chernov <ache@nagual.ru>

@@ -82,6 +82,9 @@ vSetFilter (psFilter)
 		psFilter->msgid = (char *) 0;
 		psFilter->lines_cmp = FILTER_LINES_EQ;
 		psFilter->lines_num = 0;
+		psFilter->xref = (char *) 0;
+		psFilter->xref_max=0;
+		psFilter->xref_score_cnt=0;
 		psFilter->time = 0L;
 	}
 }
@@ -106,6 +109,10 @@ free_filter_item (ptr)
 	if (ptr->msgid != (char *) 0) {
 		free ((char *) ptr->msgid);
 		ptr->msgid = (char *) 0;
+	}
+	if (ptr->xref != (char *) 0) {
+		free ((char *) ptr->xref);
+		ptr->xref = (char *) 0;
 	}
 }
 
@@ -166,15 +173,21 @@ read_filter_file (file, global_file)
 	char from[HEADER_LEN];
 	char msgid[HEADER_LEN];
 	char lines[HEADER_LEN];
+	char xref[HEADER_LEN];
 	FILE *fp;
 	int expired = FALSE;
 	int expired_time = FALSE;
 	int global = TRUE;
 	int i = 0;
 	int icase = 0, type = -1;
+	int xref_max = 0;
+	int xref_score_cnt=0;
+	int xref_score_value=0;
+	char xref_score[HEADER_LEN];
 	time_t current_secs = 0L;
 	long secs = 0L;
 	struct t_group *psGrp;
+	char *s;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0) {
 		return FALSE;
@@ -301,6 +314,7 @@ if (debug) {
 				from[0] = '\0';
 				msgid[0] = '\0';
 				lines[0] = '\0';
+				xref[0] = '\0';
 				icase = 0;
 				secs = 0L;
 				psGrp = (struct t_group *) 0;	/* fudge for out of order rules */
@@ -374,6 +388,39 @@ if (debug) {
 				break;
 			}
 			break;
+		case 'x':
+			if (match_string (buf, "xref=", xref, sizeof (xref))) {
+				if (arr_ptr && ! expired_time) {
+					if (arr_ptr[i].icase) {
+						str_lwr (xref, xref);
+					}
+					arr_ptr[i].xref = my_strdup (xref);
+				}
+				break;
+			}
+			if (match_integer (buf, "xref_max=", &xref_max, 1000)) {
+				if (arr_ptr && ! expired_time) {
+					arr_ptr[i].xref_max = xref_max;
+				}
+				break;
+			}
+			if (match_string (buf, "xref_score=", xref_score, sizeof(xref_score))) {
+				if (arr_ptr && !expired_time) {
+					if (xref_score_cnt < 10) {
+						if (isdigit(xref_score[0])) {
+							xref_score_value = atoi(xref_score);
+							if ((s = strchr(xref_score, ',')))
+								s++;
+							arr_ptr[i].xref_scores[xref_score_cnt] = xref_score_value;
+							arr_ptr[i].xref_score_strings[xref_score_cnt] = (s != NULL ? my_strdup(s) : NULL);
+							arr_ptr[i].xref_score_cnt++;
+							xref_score_cnt++;
+						}
+					}
+				}
+				break;
+			}
+			break;
 		}
 	}
 	fclose (fp);
@@ -416,22 +463,33 @@ vWriteFilterFile (pcFile)
 
 	fprintf (hFp, "# Global & local filter file for the TIN newsreader\n#\n");
 	fprintf (hFp, "# Global format:\n");
-	fprintf (hFp, "#   scope=STRING      Newsgroups (ie. comp.*)    [mandatory]\n");
+	fprintf (hFp, "#   scope=STRING      Newsgroups (e.g. comp.*)    [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
 	fprintf (hFp, "#   case=NUM          Compare=0 / ignore=1 case when filtering\n");
-	fprintf (hFp, "#   subj=STRING       Subject: line (ie. How to be a wizard)\n");
-	fprintf (hFp, "#   from=STRING       From: line (ie. *Craig Shergold*)\n");
-	fprintf (hFp, "#   msgid=STRING      Message-ID: line (ie. <123@ether.net>)\n");
+	fprintf (hFp, "#   subj=STRING       Subject: line (e.g. How to be a wizard)\n");
+	fprintf (hFp, "#   from=STRING       From: line (e.g. *Craig Shergold*)\n");
+	fprintf (hFp, "#   msgid=STRING      Message-ID: line (e.g. <123@ether.net>)\n");
 	fprintf (hFp, "#   lines=NUM         Lines: line (default 0)\n");
+	fprintf (hFp, "#   either:\n");
+	fprintf (hFp, "#   xref_max=NUM      Maximum score (e.g. 5)\n");
+	fprintf (hFp, "#   xref_score=NUM,PATTERN score for pattern (e.g 0,*.answers)\n");
+	fprintf (hFp, "#   ...\n");
+	fprintf (hFp, "#   or:\n");
+	fprintf (hFp, "#   xref=PATTERN      Kill pattern (e.g. alt.flame*)\n");
+	fprintf (hFp, "#   \n");
+
 	fprintf (hFp, "#   time=NUM          Filter period in days (default %d)\n#\n", default_filter_days);
 	fprintf (hFp, "# Local format:\n");
-	fprintf (hFp, "#   group=STRING      Newsgroup (ie. alt.flame)  [mandatory]\n");
+	fprintf (hFp, "#   group=STRING      Newsgroup (e.g. alt.flame)  [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
 	fprintf (hFp, "#   case=NUM          Compare=0 / ignore=1 case when filtering\n");
 	fprintf (hFp, "#   subj=STRING       Subject: line\n");
 	fprintf (hFp, "#   from=STRING       From: line\n");
 	fprintf (hFp, "#   msgid=STRING      Message-ID: line\n");
 	fprintf (hFp, "#   lines=NUM         Lines: line\n");
+	fprintf (hFp, "#   xref_max=NUM      as above\n");
+	fprintf (hFp, "#   xref_score=NUM,PATTERN\n");
+	fprintf (hFp, "#   xref=PATTERN\n");
 	fprintf (hFp, "#   time=NUM          Filter period in days\n#\n");
 	fprintf (hFp, "#   type=...\n\n");
 	fflush (hFp);
@@ -485,6 +543,7 @@ vWriteFilterArray (fp, global, ptr, theTime)
 	long theTime;
 {
 	register int i;
+	int j;
 
 	if (ptr == (struct t_filters *) 0) {
 		return;
@@ -536,6 +595,16 @@ fflush (stdout);
 					case FILTER_LINES_GT:
 						fprintf (fp, "lines=>%d\n", ptr->filter[i].lines_num);
 						break;
+				}
+			}
+			if (ptr->filter[i].xref != NULL) {
+				fprintf (fp, "xref=%s\n", ptr->filter[i].xref);
+			}
+			if (ptr->filter[i].xref_max > 0) {
+				fprintf (fp, "xref_max=%d\n", ptr->filter[i].xref_max);
+				
+				for(j=0;j<ptr->filter[i].xref_score_cnt;j++) {
+				  fprintf (fp, "xref_score=%d%s%s\n", ptr->filter[i].xref_scores[j], ptr->filter[i].xref_score_strings[j] ? "," : "", ptr->filter[i].xref_score_strings[j]);
 				}
 			}
 			if (ptr->filter[i].time) {
@@ -1134,6 +1203,9 @@ iAddFilterRule (psGrp, psArt, psRule)
 	psPtr[*plNum].msgid = (char *) 0;
 	psPtr[*plNum].lines_cmp = psRule->lines_cmp;
 	psPtr[*plNum].lines_num = psRule->lines_num;
+	psPtr[*plNum].xref = (char *) 0;
+	psPtr[*plNum].xref_max = 0;
+	psPtr[*plNum].xref_score_cnt = 0;
 
 	if (psRule->global && (psRule->scope[0] != '*' && psRule->scope[1] != '\0')) {
 		psPtr[*plNum].scope = my_strdup (psRule->scope);
@@ -1270,7 +1342,7 @@ filter_articles (group)
 	int filtered = FALSE;
 	int num, inscope;
 	int global_filter;
-	register int i, j;
+	register int i, j, k;
 	struct t_filter *ptr;
 
 	num_of_killed_arts = 0;
@@ -1384,7 +1456,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				/*
 				 * Filter on Lines: line
 				 */
-				if (ptr[j].lines_num > 0 && arts[i].lines) {
+				if (ptr[j].lines_num > 0 && arts[i].lines>=0) {
 					switch (ptr[j].lines_cmp) {
 						case FILTER_LINES_EQ:
 							if (arts[i].lines == ptr[j].lines_num) {
@@ -1417,6 +1489,72 @@ sleep (1);
 							}
 							break;
 					}
+				}
+
+				/*
+				 * Filter on Xref: lines
+				 */
+				if(arts[i].xref && *arts[i].xref!='\0' &&
+				   strlen(group->name)>4 &&
+				   strcmp(group->name+strlen(group->name)-5, ".test")!=0) {
+				  /* don't do anything in *.test groups */
+
+				  if (ptr[j].xref_max > 0 || ptr[j].xref != (char*)0) {
+				    char *s,*e;
+				    int group_count;
+
+				    s=arts[i].xref;
+
+				    while(*s && !isspace(*s)) s++;
+				    while(*s && isspace(*s)) s++;
+
+				    group_count=0;
+
+				    while(*s) {
+				      e=s;
+				      while(*e && *e!=':' && !isspace(*e)) e++;
+
+				      if(ptr[j].xref_max > 0) {
+					strncpy(buf, s, e-s);
+					buf[e-s]='\0';
+					for(k=0;k<ptr[j].xref_score_cnt;k++) {
+					  if(STR_MATCH(buf, ptr[j].xref_score_strings[k])) {
+					    group_count+=ptr[j].xref_scores[k];
+					    break;
+					  }
+					}
+					if(k==ptr[j].xref_score_cnt)
+					  group_count++;
+				      }
+
+				      if(ptr[j].xref != (char*)0) {
+					strncpy(buf, s, e-s);
+					buf[e-s]='\0';
+					/* don't kill when we are
+                                           actually in that group */
+					if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf)!=0) {
+					  if (ptr[j].icase) {
+					    str_lwr (buf, acStr);
+					    pcPtr = acStr;
+					  } else {
+					    pcPtr = buf;
+					  }
+					  if (STR_MATCH (pcPtr, ptr[j].xref)) {
+					    group_count=-1;
+					    break;
+					  }
+					}
+				      }
+  
+				      s=e;
+				      while(*s && !isspace(*s)) s++;
+				      while(*s && isspace(*s)) s++;
+				    }
+				    if(group_count==-1 ||
+				       group_count>ptr[j].xref_max) {
+				      SET_FILTER(group, i, j);
+				    }
+				  }
 				}
 
 				if (IS_KILLED(i) || !filtered) {

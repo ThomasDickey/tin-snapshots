@@ -17,17 +17,12 @@ o  if reading news from a local spool with xover support tin assumes that he
    NFS) - if this fails, tin creates own overview-files in ~/.tin/.news/
    DULL!!!
 
-o  tin assumes that overview-files are named ".overview" - that's not always
-   true -> use "overview", "ov", ... as fall-back names.
-
 o  tins kill-file editor does not quote brackets, stars and question marks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
 
 o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())
-
-o  fix article superseding that it enters the editor immediately
 
 o  if no INEWSDIR is given INEWSDIR is set to NEWSLIBDIR which is not always
    true (Linux) ... search $NEWSLIBDIR, /usr/bin/,... in that case.
@@ -39,10 +34,6 @@ o  if external inews could not be found posting fails but no dead.article
 o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
    useless!
-
-o  mailing an article (not with an external mailer) with editing the subject
-   in the editor shows you the old subject after leaving the editor :-(
-   but uses the new one :)
 
 o  Followup-To: line is not examined weather the mentioned group(s) are valid
    on this server (btw. with nntp_only & tin -n this feature is useless
@@ -100,9 +91,14 @@ o  compile-time option: generate own MSGIDs on host with a proper FQDN
     own postings)
 
 o  add
+       --with-overview-names
+         (tin assumes that overview-files are named ".overview" 
+          that's not always true)
+
        --disable-piping               (default off)
        check for str[n]casecmp() and if necesarry define it to
        my_str[n]icmp()
+
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 
@@ -200,6 +196,7 @@ Not yet classified
 ------------------
 o  on some AIX mail (f.e. /usr/bin/mail) prints out an error (but the mail
    is sent)
+   (maybe this is related to a missing -DRS6000 in the Makefile)
 
 o  move all strings to lang.c
 
@@ -311,9 +308,6 @@ o  fix kill/hot mechanism that you could kill/mark hot everything which
    a routine which recognizes word-delimiters so that "tin:" or "'tin'"
    would be also matched in an expression like "^tin^" and which would not
    match "posting"
-
-o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
-   (Velveeta-kill)
 
 o  fix kill/hot mechanism so that it is possible do kill articles with
    "X-*" headers (X-Mailer: Bazilla 47.11 etc.)

@@ -3,7 +3,7 @@
  *  Module    : color.c
  *  Original  : Olaf Kaluza <olaf@criseis.ruhr.de>
  *  Author    : Roland Rosenfeld <roland@spinnaker.rhein.de>
- *              Giuseppe De Marco <gdemarco@freenet.hut.fi> (light-colors)
+ *              Giuseppe De Marco <gdm@rebel.net> (light-colors)
  *  Created   : 02-06-95
  *  Updated   : 06-03-95, 30-03-96, 22-04-96
  *  Notes     : This are the basic function for ansi-color

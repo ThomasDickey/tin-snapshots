@@ -660,21 +660,21 @@ constext txt_quit_no_write[] = "Do you really want to quit without saving your c
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, g) pgp, p)ost: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end [%.*s]: %c";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost [%.*s]: %c";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, g) pgp, p)ost: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end [%.*s]: %c";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost [%.*s]: %c";
 #endif /* HAVE_ISPELL */
 #else
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, p)ost: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end [%.*s]: %c";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost [%.*s]: %c";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost: ";
-constext txt_quit_edit_send[] = "q)uit, e)dit, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, s)end [%.*s]: %c";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
 #endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */

@@ -145,7 +145,7 @@ extern char *get_uaf_fullname();
 #	include <prototypes.h>
 #endif
 
-#ifdef HAVE_LOCALE_H
+#if defined(HAVE_LOCALE_H) && !defined(NO_LOCALE)
 #	include <locale.h>
 #endif
 
@@ -1267,6 +1267,11 @@ struct t_filter
 	char *msgid;				/* Message-ID: line */
 	char lines_cmp; 			/* Lines compare <> */
 	int  lines_num; 			/* Lines: line	    */
+  char *xref;                                   /* groups in xref line */
+  int xref_max; /* maximal number of groups in newsgroups line */
+  int xref_score_cnt;
+  int xref_scores[10];
+  char *xref_score_strings[10];
 	time_t time;				/* expire time in seconds */
 	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;			/* kill/auto select */
