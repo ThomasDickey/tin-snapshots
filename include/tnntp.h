@@ -35,7 +35,7 @@
 #	define	s_end()
 #endif
 
-#ifdef NNTP_ABLE
+#if defined(NNTP_ABLE) || defined(HAVE_GETHOSTBYNAME)
 #	ifdef HAVE_NETDB_H
 #		include <netdb.h>
 #	endif

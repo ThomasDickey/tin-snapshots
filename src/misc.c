@@ -902,10 +902,10 @@ mail_check (void)
 	} while (0)
 # define RTRIM(whatbuf, whatp) do { (whatp)--; \
 	while ((whatp) >= (whatbuf) && \
-	isspace (*(whatp))) \
+	(*(whatp)==' ')) \
 	*((whatp)--) = '\0'; } while (0)
 # define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf) ; \
-	(whatp) && isspace (*(whatp)) ; \
+	(whatp) && (*(whatp) == ' ') ; \
 	(whatp)++)
 # define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
 	LTRIM ((whatbuf), (whatp)); \
