@@ -30,7 +30,6 @@
 **  Get the number of elements in a fixed-size array, or a pointer just
 **  past the end of it.
 */
-#define SIZEOF(array)	((int)(sizeof array / sizeof array[0]))
 #define ENDOF(array)	(&array[SIZEOF(array)])
 
 #define CTYPE(isXXXXX, c) (((unsigned char)(c) < 128) && isXXXXX((c)))

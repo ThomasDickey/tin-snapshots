@@ -90,7 +90,7 @@ mmdecode(
 	decode_gt128 = TRUE;
 #endif
 	t = where;
-	encoding = tolower(encoding);
+	encoding = tolower((unsigned char)encoding);
 	if (encoding == 'q') {		  /* quoted-printable */
 		int x;
 		unsigned hi, lo;
@@ -214,7 +214,7 @@ rfc1522_decode(
 			*e = 0;
 			if (*c == '?') {
 				c++;
-				encoding = tolower(*c);
+				encoding = tolower((unsigned char)*c);
 				if (encoding == 'b')
 					mmdecode((char *) 0, 'b', 0, (char *) 0, (char *) 0);		/* flush */
 				c++;

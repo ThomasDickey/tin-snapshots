@@ -216,7 +216,7 @@ read_filter_file (
 		if (*buf == '#' || *buf == '\n') {
 			continue;
 		}
-		switch(tolower(buf[0])) {
+		switch(tolower((unsigned char)buf[0])) {
 		case 'c':
 			if (match_integer (buf, "case=", &icase, 1)) {
 				if (arr_ptr && !expired_time) {
@@ -702,17 +702,6 @@ filter_menu (
 	int filtered = TRUE;
 	struct t_filter_rule rule;
 
-#ifdef SIGTSTP
-	RETSIGTYPE (*susp)(SIG_ARGS);
-
-	susp = (RETSIGTYPE (*)(SIG_ARGS)) 0;
-
-	if (do_sigtstp) {
-		susp = sigdisp (SIGTSTP, SIG_DFL);
-		sigdisp (SIGTSTP, SIG_IGN);
-	}
-#endif
-
 	rule.text[0] = '\0';
 	rule.scope[0] = '\0';
 	rule.counter = 0;
@@ -975,12 +964,6 @@ filter_menu (
 			filtered = iAddFilterRule (group, art, &rule);
 
 filter_done:
-
-#ifdef SIGTSTP
-			if (do_sigtstp) {
-				sigdisp (SIGTSTP, susp);
-			}
-#endif
 			return (filtered);
 
 		default:

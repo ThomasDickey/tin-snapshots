@@ -17,7 +17,7 @@
 #include "tin.h"
 #include "tcurses.h"
 
-#ifdef USE_CURSES
+#if USE_CURSES
 
 #include <stdarg.h>
 

@@ -1643,6 +1643,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
 #endif
 
+#define SIZEOF(array)	((int)(sizeof array / sizeof array[0]))
+
 #define FreeIfNeeded(p) if (p != (char *)0) free((char *)p)
 #define FreeAndNull(p)  if (p != (char *)0) { free((char *)p); p = (char *)0; }
 

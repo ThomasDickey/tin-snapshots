@@ -67,12 +67,6 @@ read_newsrc (
 		newsrc_mode = buf.st_mode;
 	}
 
-/*
-#ifdef USE_CURSES
-	if (!cmd_line)
-	scrollok(stdscr, TRUE);
-#endif
-*/
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
 		if (SHOW_UPDATE)
 			wait_message (txt_reading_newsrc);

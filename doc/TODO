@@ -180,6 +180,9 @@ o  When enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
+o  Menu/tinrc/attributes entry for TeX2ISO_Conversion=ON/OFF
+   [toggle via '"']
+
 o  Rather than cc/bcc, I'd like to see tin simply append the
    message to a mail folder, whose name is given by a setting
    in the (M)enu command, possibly overridden by the current
@@ -192,6 +195,8 @@ o  have the default answer to "do you really want to send this
    [I hate all those empty bugreports ,-)]
 
 o  add support for ispell language change
+
+o  MIME-pgp support according to RFC2015
 
 o  add RFC1468/1922 support
 

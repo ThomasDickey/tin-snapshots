@@ -212,8 +212,8 @@ generate_tbl (
 			fprintf (ofp, "\tOPT_");
 			while (*s != '\0') {
 				fprintf (ofp, "%c",
-					 isalpha (*s) && islower (*s)
-					 ? toupper (*s)
+					 isalpha ((unsigned char)*s) && islower ((unsigned char)*s)
+					 ? toupper ((unsigned char)*s)
 					 : *s);
 				s++;
 			}

@@ -1429,8 +1429,4 @@ extern int get_server_nolf; /* from open.c */
 extern constext txt_help_shell[];
 #endif
 
-#ifdef SIGTSTP
-extern int do_sigtstp;
-#endif
-
 #endif /* !EXTERN_H */

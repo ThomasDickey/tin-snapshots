@@ -415,8 +415,8 @@ fgetpwent (
 	*line = 0;
 	_pw.pw_dir = ++line;
 	if ((_pw.pw_dir[1] == ':') &&
-	    (tolower (_pw.pw_dir[0]) >= 'c') &&
-	    (tolower (_pw.pw_dir[0]) <= 'z')) {
+	    (tolower ((unsigned char)_pw.pw_dir[0]) >= 'c') &&
+	    (tolower ((unsigned char)_pw.pw_dir[0]) <= 'z')) {
 		line += 2;
 	}
 	while ((*line) && (*line != ':')) {
