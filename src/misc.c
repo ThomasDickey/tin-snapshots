@@ -15,52 +15,41 @@
 #include	"tin.h"
 #include	"version.h"
 
-
 /*
- * itoa() limited to 4 chars
+ * special itoa()
+ * converts value into buffer with a max width of digits
  * last char my be one of the following
- * K - kilo for values betwen 10000 and 999999
- * M - mega for values > 9999999
+ * Kilo, Mega, Giga, Terra
  *
  * warning: NO! range check is done
- * be sure buffer is at least 4 chars wide
+ * be sure buffer is at least digits+1 chars wide
+ * and digits is >=3
  */
 
 char *
-tin_itoa (buffer, value)
-	int value;
+tin_itoa (buffer, value, digits)
 	char *buffer;
+	int value;	/* change value to long int if needed */
+	int digits;
 {
-	sprintf (buffer, "%4d", value);
-	if (value<=9999) {
-	/* do noting */
-	} else {
-		if (value<=99999) {
-			buffer[2]=' ';
-			buffer[3]='K';
-		} else {
-			if (value<=999999) {
-				buffer[3]='K';
-			} else {
-				if (value<=9999999) {
-					buffer[1]=' ';
-					buffer[2]=' ';
-					buffer[3]='M';
-				} else {
-					if (value<=99999999) {
-						buffer[2]=' ';
-						buffer[3]='M';
-					} else {
-						if (value<=999999999) {
-							buffer[3]='M';
-						}
-					}
-				}
-			}
-		}
+	int len;
+	int i=0;
+	char test[256];	/* that should be enought */
+	char power[5]=" KMGT";
+	
+	sprintf (test, "%d", value);
+	len = strlen (test);
+	while (len > digits) {
+		value/=1000;
+		len-=3;
+		i++;
 	}
-	buffer[4]='\0';
-	return(buffer);
+	sprintf(buffer, "%d", value);
+	if (i) {
+		buffer[len] = power[i];
+		buffer[len+1] = '\0';
+	}
+	return (buffer);
 }
 
 

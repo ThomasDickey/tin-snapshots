@@ -994,7 +994,6 @@ extern int last_subj_on_screen;
 extern int local_filtered_articles;
 extern int local_index;
 extern int mail_8bit_header;
-extern size_t mail_mime_encoding;
 extern int mail_news;
 extern int mark_saved_read;
 extern int max_active;
@@ -1022,7 +1021,6 @@ extern int num_spooldir;
 extern int pos_first_unread;
 extern int post_8bit_header;
 extern int post_article_and_exit;
-extern size_t post_mime_encoding;
 extern int print_header;
 extern int process_id;
 extern int process_only_unread;
@@ -1082,6 +1080,8 @@ extern long *base;
 extern long head_next;
 extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
 extern long note_size;
+extern size_t mail_mime_encoding;
+extern size_t post_mime_encoding;
 extern struct passwd *myentry;
 extern struct t_article *arts;
 extern struct t_attribute glob_attributes;
@@ -1193,7 +1193,7 @@ extern constext txt_opt_keep_dead_articles[];
 #endif
 
 #ifdef NNTP_ABLE
-extern int  get_server_nolf; /* from open.c */
+extern int get_server_nolf; /* from open.c */
 #endif
 
 #ifndef NO_SHELL_ESCAPE

@@ -78,7 +78,7 @@ bld_tline (l, art)
 	j = INDEX2TNUM(l);
 
 	if (art->tagged) {
-		sprintf (new_resps, "%3d", art->tagged);
+		sprintf (new_resps, "%3s", tin_itoa(smal_buffer, art->tagged, 3));
 	} else {
 		if (art->inrange) {
 			mark = art_marked_inrange;
@@ -98,18 +98,18 @@ bld_tline (l, art)
 	}
 
 	if (art->lines != -1) {
-		sprintf (lines, "%4.4s", tin_itoa(smal_buffer, art->lines));
+		sprintf (lines, "%4s", tin_itoa(smal_buffer, art->lines, 4));
 	} else {
 		strcpy (lines, "   ?");
 	}
 
 	if (show_lines) {
-		sprintf (screen[j].col, "  %4.4s%3s  [%4.4s]  %-*.*s%s%-*.*s",
-			 tin_itoa(smal_buffer, l), new_resps, lines, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %4s%3s  [%4s]  %-*.*s%s%-*.*s",
+			 tin_itoa(smal_buffer, l, 4), new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {
-		sprintf (screen[j].col, "  %4.4s%3s  %-*.*s%s%-*.*s",
-			 tin_itoa(smal_buffer, l), new_resps, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %4s%3s  %-*.*s%s%-*.*s",
+			 tin_itoa(smal_buffer, l, 4), new_resps, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	}
 

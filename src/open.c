@@ -1285,7 +1285,7 @@ vGrpGetSubArtInfo ()
 				psGrp->newsrc.num_unread = psGrp->count;
 			}
 			if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
-				expand_bitmap(psGrp,psGrp->xmin);
+				expand_bitmap(psGrp, psGrp->xmin);
 #ifdef DEBUG
 	printf ("\r\nMin/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]",
 		iNum, psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
