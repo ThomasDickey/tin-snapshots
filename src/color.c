@@ -294,6 +294,9 @@ print_color (
 				 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
 				fcol (col_quote);
 				color = col_quote;
+			} else if (in_headers) {
+				color = col_newsheaders;
+				fcol (col_newsheaders);
 			} else {
 				fcol (col_text);
 			}

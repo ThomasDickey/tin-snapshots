@@ -1,3 +1,37 @@
+--unoff BETA release 970306 --
+
+337) T.E.Dickey <dickey@clark.net>
+     ADD. even more curses support
+          + wrap functions that write to stderr (fprintf, fflush) so they'll
+            write to curses screen.
+          + implement decoding for arrow keys
+          + correct error from previous patch that changed cLINES to cLINES-1
+          + move call on EndWin() to ensure that program exits curses
+            correctly.
+     ADD. split-out tnntp.h to use in inews.c (fixes compiler warnings)
+     FIX. several supplied patches
+
+336) Scott W. Powers <spowers@shire.ncsa.uiuc.edu>
+     ADD. weed-in/out-list for headers_to_display
+     FIX. extern.h, color.c, config.c, init.c, lang.c, page.c
+
+335) Urs Janssen <urs@akk.uni-karlsruhe.de
+     BUG. used /bin/mail as defualt_mailer on SysV-systems
+     FIX. tin.h
+
+334) Andrey A. Chernov <ache@null.net>
+     BUG. ~/.tin/headers file not used for "Reply to author..."
+     GUG. joinpath for ~/.tin/headers is duplicated
+     FIX. init.c, post.c
+
+333) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. typo
+     FIX. configure[.in]
+
+332) Chua Choon Leong <chuacl@iscs.nus.sg>
+     BUG. invoke_cmd() returnes wrong status on OSF1
+     FIX. misc.c
+
 --unoff BETA release 970304 --
 
 331) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>

@@ -1,5 +1,8 @@
 Bugs
 ----
+o  join show_xcommentto/news_headers_to_display, remove auto-display of
+   Keywords/Summary as it could be controlled by news_headers_to_display
+
 o  --enable-curses has several bugs
    (screen redraw is brocken, tyy-settings get messed up, color might not
     work, ...)
@@ -120,9 +123,6 @@ o  add abillity to strip bogus newsgroups from newsrc
 o  add support for ispell language change
 
 o  add RFC1468/1922 (RFC2045-2049) support
-
-o  add a weed-out list like in elm so the user could specify which headers
-   he'd like to see and which not (attrib.c)
 
 o  unique newsgroups after editing article
 

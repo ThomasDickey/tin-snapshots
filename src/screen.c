@@ -28,7 +28,7 @@ void
 stow_cursor(void)
 {
 	if (!cmd_line)
-		MoveCursor (cLINES-1, 0);
+		MoveCursor (cLINES, 0);
 }
 
 void
@@ -39,7 +39,7 @@ info_message (
 #ifdef HAVE_COLOR
 	fcol(col_message);
 #endif
-	center_line (cLINES-1, FALSE, str);	/* center the message at screen bottom */
+	center_line (cLINES, FALSE, str);	/* center the message at screen bottom */
 #ifdef HAVE_COLOR
 	fcol(col_normal);
 #endif
@@ -73,8 +73,8 @@ error_message (
 
 	clear_message ();	  /* Clear any old messages hanging around */
 
-	fprintf (stderr, template, str);
-	fflush (stderr);
+	my_fprintf (stderr, template, str);
+	my_fflush (stderr);
 
 	if (cmd_line) {
 		my_fputc ('\n', stderr);
@@ -114,12 +114,12 @@ perror_message (
 	sprintf (str2, template, str);
 	err = errno;
 #ifdef HAVE_STRERROR
-	fprintf (stderr, "%s: Error: %s", str2, strerror(err));
+	my_fprintf (stderr, "%s: Error: %s", str2, strerror(err));
 #else
 #  ifdef HAVE_SYSERRLIST
-	fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
+	my_fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
 #  else
-	fprintf (stderr, "%s: Error: %i", str2, err);
+	my_fprintf (stderr, "%s: Error: %i", str2, err);
 #  endif
 #endif
 	errno = 0;
@@ -138,7 +138,7 @@ void
 clear_message (void)
 {
 	if (!cmd_line) {
-		MoveCursor (cLINES-1, 0);
+		MoveCursor (cLINES, 0);
 		CleartoEOLN ();
 		cursoroff ();
 		my_flush();
@@ -163,6 +163,7 @@ center_line (
 		MoveCursor (line, pos);
 		if (inverse) {
 			StartInverse ();
+			my_flush();
 		}
 	}
 	if ((int) strlen (str) >= cCOLS) {
@@ -173,6 +174,8 @@ center_line (
 		my_fputs (str, stdout);
 	}
 	
+	my_flush();
+
 	if (!cmd_line) {
 		if (inverse) {
 			EndInverse ();

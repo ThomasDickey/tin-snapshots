@@ -79,7 +79,7 @@ static void do_prompt1 (
 {
 	sprintf (msg, "%s%c", format, ch_default);
 	wait_message (msg);
-	MoveCursor (cLINES-1, (int) strlen (format));
+	MoveCursor (cLINES, (int) strlen (format));
 }
 
 static void
@@ -98,7 +98,7 @@ do_prompt2(
 	sprintf (msg, format, have, subject, ch_default);
 
 	wait_message (msg);
-	MoveCursor (cLINES-1, (int) strlen (msg) - 1);
+	MoveCursor (cLINES, (int) strlen (msg) - 1);
 }
 
 static int
@@ -136,9 +136,10 @@ prompt_rejected(void)
 	int ch;
 	char ch_default = iKeyPostPostpone;
 
+/* fix screen pos. */
 	Raw(FALSE);
-	fprintf(stderr, "\n\n%s\n\n", txt_post_error_ask_postpone);
-	fflush(stderr);
+	my_fprintf(stderr, "\n\n%s\n\n", txt_post_error_ask_postpone);
+	my_fflush(stderr);
 	Raw(TRUE);
 
 	do {
@@ -515,8 +516,8 @@ check_article_to_be_posted (
 		}
 		if ((cnt == 1) && (len == 0)) {
 			setup_check_article_screen (&init);
-			fprintf (stderr, txt_error_header_line_blank);
-			fflush (stderr);
+			my_fprintf (stderr, txt_error_header_line_blank);
+			my_fflush (stderr);
 			errors++;
 			end_of_header = TRUE;
 			break;
@@ -535,15 +536,15 @@ check_article_to_be_posted (
 		cp = strchr (line, ':');
 		if (cp == (char *) 0) {
 			setup_check_article_screen (&init);
-			fprintf (stderr, txt_error_header_line_colon, cnt, line);
-			fflush (stderr);
+			my_fprintf (stderr, txt_error_header_line_colon, cnt, line);
+			my_fflush (stderr);
 			errors++;
 			continue;
 		}
 		if (cp[1] != ' ') {
 			setup_check_article_screen (&init);
-			fprintf (stderr, txt_error_header_line_space, cnt, line);
-			fflush (stderr);
+			my_fprintf (stderr, txt_error_header_line_space, cnt, line);
+			my_fflush (stderr);
 			errors++;
 		}
 		if (cp - line == 7 && !strncasecmp (line, "Subject", 7)) {
@@ -551,8 +552,8 @@ check_article_to_be_posted (
 		}
 #ifndef FORGERY
 		if (cp - line == 4 && !strncasecmp (line, "From", 4)) {
-			fprintf (stderr, txt_error_from_in_header_not_allowed, cnt);
-			fflush (stderr);
+			my_fprintf (stderr, txt_error_from_in_header_not_allowed, cnt);
+			my_fflush (stderr);
 			errors++;
 		}
 #endif
@@ -563,8 +564,8 @@ check_article_to_be_posted (
 			}
 			if (strchr (cp, ' ')) {
 				setup_check_article_screen (&init);
-				fprintf (stderr, txt_error_header_line_comma, "Newsgroups");
-				fflush (stderr);
+				my_fprintf (stderr, txt_error_header_line_comma, "Newsgroups");
+				my_fflush (stderr);
 				errors++;
 				continue;
 			}
@@ -592,8 +593,8 @@ check_article_to_be_posted (
 			}
 			if (!ngcnt) {
 				setup_check_article_screen (&init);
-				fprintf (stderr, txt_error_header_line_empty_newsgroups);
-				fflush (stderr);
+				my_fprintf (stderr, txt_error_header_line_empty_newsgroups);
+				my_fflush (stderr);
 				errors++;
 				continue;
 			}
@@ -601,8 +602,8 @@ check_article_to_be_posted (
 				ungetc(c, fp);
 				if (isspace (c) && c != '\n') {
 					setup_check_article_screen (&init);
-					fprintf (stderr, txt_error_header_line_groups_contd, "Newsgroups");
-					fflush (stderr);
+					my_fprintf (stderr, txt_error_header_line_groups_contd, "Newsgroups");
+					my_fflush (stderr);
 					errors++;
 					continue;
 				}
@@ -617,8 +618,8 @@ check_article_to_be_posted (
 				found_followup_to_several_groups = TRUE;
 			if (strchr (cp, ' ')) {
 				setup_check_article_screen (&init);
-				fprintf (stderr, txt_error_header_line_comma, "Followup-To");
-				fflush (stderr);
+				my_fprintf (stderr, txt_error_header_line_comma, "Followup-To");
+				my_fflush (stderr);
 				errors++;
 				continue;
 			}
@@ -626,8 +627,8 @@ check_article_to_be_posted (
 				ungetc(c, fp);
 				if (isspace(c) && c != '\n' ) {
 					setup_check_article_screen (&init);
-					fprintf (stderr, txt_error_header_line_groups_contd, "Followup-To");
-					fflush (stderr);
+					my_fprintf (stderr, txt_error_header_line_groups_contd, "Followup-To");
+					my_fflush (stderr);
 					errors++;
 					continue;
 				}
@@ -637,14 +638,14 @@ check_article_to_be_posted (
 
 	if (!found_subject_line) {
 		setup_check_article_screen (&init);
-		fprintf (stderr, txt_error_header_line_missing_subject);
-		fflush (stderr);
+		my_fprintf (stderr, txt_error_header_line_missing_subject);
+		my_fflush (stderr);
 		errors++;
 	}
 	if (!found_newsgroups_line && art_type == GROUP_TYPE_NEWS) {
 		setup_check_article_screen (&init);
-		fprintf (stderr, txt_error_header_line_missing_newsgroups);
-		fflush (stderr);
+		my_fprintf (stderr, txt_error_header_line_missing_newsgroups);
+		my_fflush (stderr);
 		errors++;
 	}
 	/*
@@ -667,15 +668,15 @@ check_article_to_be_posted (
 		}
 		if (col > MAX_COL && !got_long_line) {
 			setup_check_article_screen (&init);
-			fprintf (stderr, txt_warn_art_line_too_long, MAX_COL, cnt, line);
-			fflush (stderr);
+			my_fprintf (stderr, txt_warn_art_line_too_long, MAX_COL, cnt, line);
+			my_fflush (stderr);
 			got_long_line = TRUE;
 		}
 	}
 	if (!end_of_header) {
 		setup_check_article_screen (&init);
-		fprintf (stderr, txt_error_header_and_body_not_separate);
-		fflush (stderr);
+		my_fprintf (stderr, txt_error_header_and_body_not_separate);
+		my_fflush (stderr);
 		errors++;
 	}
 	if (ngcnt && errors == 0) {
@@ -683,20 +684,20 @@ check_article_to_be_posted (
 		 * Print a note about each newsgroup
 		 */
 		setup_check_article_screen (&init);
-		fprintf (stderr, txt_art_newsgroups, ngcnt == 1 ? "" : "s");
-		fflush (stderr);
+		my_fprintf (stderr, txt_art_newsgroups, ngcnt == 1 ? "" : "s");
+		my_fflush (stderr);
 		for (i = 0; i < ngcnt; i++) {
 			psGrp = psGrpFind (ngptrs[i]);
 			if (psGrp) {
-				fprintf (stderr, "  %s\t%s\n", ngptrs[i],
+				my_fprintf (stderr, "  %s\t%s\n", ngptrs[i],
 					 (psGrp->description ? psGrp->description : ""));
-				fflush (stderr);
+				my_fflush (stderr);
 			} else {
 #ifdef HAVE_FASCIST_NEWSADMIN
-				fprintf (stderr, txt_error_not_valid_newsgroup, ngptrs[i]);
+				my_fprintf (stderr, txt_error_not_valid_newsgroup, ngptrs[i]);
 				errors++;
 #else
-				fprintf (stderr,
+				my_fprintf (stderr,
 					(newsrc_active ? /* did we read the whole active file? */
 						txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup ),
 					ngptrs[i]);
@@ -706,24 +707,24 @@ check_article_to_be_posted (
 		}
 		if (!found_followup_to && ngcnt > 1 && !errors) {
 #ifdef HAVE_FASCIST_NEWSADMIN
-			fprintf (stderr, txt_error_missing_followup_to, ngcnt);
+			my_fprintf (stderr, txt_error_missing_followup_to, ngcnt);
 			errors++;
 #else
-			fprintf (stderr, txt_warn_missing_followup_to, ngcnt);
+			my_fprintf (stderr, txt_warn_missing_followup_to, ngcnt);
 #endif
 		}
 		if (found_followup_to_several_groups && !errors) {
 #ifdef HAVE_FASCIST_NEWSADMIN
-			fprintf (stderr, txt_error_followup_to_several_groups);
+			my_fprintf (stderr, txt_error_followup_to_several_groups);
 			errors++;
 #else
-			fprintf (stderr, txt_warn_followup_to_several_groups);
+			my_fprintf (stderr, txt_warn_followup_to_several_groups);
 #endif
 		}
 #ifndef NO_ETIQUETTE
-		fprintf (stderr, txt_warn_posting_etiquette);
+		my_fprintf (stderr, txt_warn_posting_etiquette);
 #endif
-		fflush (stderr);
+		my_fflush (stderr);
 	}
 	fclose (fp);
 
@@ -798,7 +799,7 @@ quick_post_article (
 	sprintf (buf, txt_post_newsgroups, default_post_newsgroups);
 
 	if (!prompt_string (buf, group)) {
-		fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
+		my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 		return;
 	}
 	if (strlen (group)) {
@@ -808,7 +809,7 @@ quick_post_article (
 		if (default_post_newsgroups[0]) {
 			my_strncpy (group, default_post_newsgroups, sizeof (group));
 		} else {
-			fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
+			my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 			return;
 		}
 	}
@@ -839,14 +840,14 @@ quick_post_article (
 		}
 		if (!psGrp) {
 			Raw (FALSE);
-			fprintf (stderr, "\nGroup %s not found in active file. Exiting...\n", buf);
+			my_fprintf (stderr, "\nGroup %s not found in active file. Exiting...\n", buf);
 			return;
 		}
 		if (psGrp->moderated == 'm') {
 			sprintf (msg, txt_group_is_moderated, buf);
 			if (prompt_yn (cLINES, msg, TRUE) != 1) {
 				Raw (FALSE);
-				fprintf (stderr, "\nExiting...\n");
+				my_fprintf (stderr, "\nExiting...\n");
 				return;
 			}
 		}
@@ -857,7 +858,7 @@ quick_post_article (
 
 	if (!prompt_string (buf, subj)) {
 		Raw (FALSE);
-		fprintf (stderr, "%s\n", txt_no_quick_subject);
+		my_fprintf (stderr, "%s\n", txt_no_quick_subject);
 		return;
 	}
 	if (strlen (subj)) {
@@ -868,7 +869,7 @@ quick_post_article (
 			my_strncpy (subj, default_post_subject, sizeof (subj));
 		} else {
 			Raw (FALSE);
-			fprintf (stderr, "%s\n", txt_no_quick_subject);
+			my_fprintf (stderr, "%s\n", txt_no_quick_subject);
 			return;
 		}
 	}
@@ -2545,6 +2546,7 @@ mail_to_author (
 		if (*reply_to) {
 			msg_add_header ("Reply-To", reply_to);
 		}
+		msg_add_x_headers (msg_headers_file);
 	}
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
@@ -2923,19 +2925,19 @@ cancel_article (
 
 #ifdef FORGERY
 	if (!author) {
-		fprintf (stderr, txt_warn_cancel_forgery);
-		fprintf (stderr, "From: %s\n", note_h_from);
+		my_fprintf (stderr, txt_warn_cancel_forgery);
+		my_fprintf (stderr, "From: %s\n", note_h_from);
 	} else {
-		fprintf (stderr, txt_warn_cancel);
+		my_fprintf (stderr, txt_warn_cancel);
 	}
 #else
-	fprintf (stderr, txt_warn_cancel);
+	my_fprintf (stderr, txt_warn_cancel);
 #endif /* FORGERY */
 
-	fprintf (stderr, "Subject: %s\n", note_h_subj);
-	fprintf (stderr, "Date: %s\n", note_h_date);
-	fprintf (stderr, "Message-ID: %s\n", note_h_messageid);
-	fprintf (stderr, "Newsgroups: %s\n", note_h_newsgroups);
+	my_fprintf (stderr, "Subject: %s\n", note_h_subj);
+	my_fprintf (stderr, "Date: %s\n", note_h_date);
+	my_fprintf (stderr, "Message-ID: %s\n", note_h_messageid);
+	my_fprintf (stderr, "Newsgroups: %s\n", note_h_newsgroups);
 	Raw (oldraw);
 
 	forever {
@@ -2943,7 +2945,7 @@ cancel_article (
 			sprintf (msg, "%s [%.*s]: %c", txt_quit_cancel,
 				 cCOLS - ((int) strlen(txt_quit_cancel)+7), note_h_subj, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES-1, (int) strlen (msg) - 1);
+			MoveCursor (cLINES, (int) strlen (msg) - 1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (!strchr ("\033deq", ch));

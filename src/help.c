@@ -471,7 +471,7 @@ display_info_page (void)
 		}
 	}
 
-	center_line (cLINES-1, FALSE, txt_hit_space_for_more);
+	center_line (cLINES, FALSE, txt_hit_space_for_more);
 #ifdef HAVE_COLOR
 	fcol(col_normal);
 #endif

@@ -19,6 +19,12 @@
 
 #if USE_CURSES
 
+#include <stdarg.h>
+
+#ifndef attr_get
+#define	attr_get() getattrs(stdscr)
+#endif
+
 int cLINES;
 int cCOLS;
 t_bool inverse_okay = TRUE;
@@ -41,12 +47,19 @@ int InitScreen (void)
 	initscr();
 	set_win_size(&cLINES, &cCOLS);
 	cCOLS = COLS;
-	cLINES = LINES;
+	cLINES = LINES - 1;
 	raw(); noecho(); cbreak();
-	/* FIXME */
+	/* FIXME: need to integrate with Raw() */
+
+	keypad(stdscr, TRUE);
 	if (has_colors()) {
 		start_color();
 	}
+#ifdef NCURSES_VERSION
+	(void) mousemask(
+		(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
+		(mmask_t *)0);
+#endif
 	return (TRUE);
 }
 
@@ -150,6 +163,18 @@ MoveCursor(int row, int col)
 	move(row,col);
 }
 
+
+int
+ReadCh(void)
+{
+	int ch = getch();
+	if (ch == ESC || ch >= KEY_MIN) {
+		ungetch(ch);
+		ch = ESC;
+	}
+	return ch;
+}
+
 void
 my_printf(const char *fmt, ...)
 {
@@ -157,6 +182,18 @@ my_printf(const char *fmt, ...)
 	va_start(ap, fmt);
 	if (cmd_line)
 		vprintf(fmt, ap);
+	else
+		vwprintw(stdscr, fmt, ap);
+	va_end(ap);
+}
+
+void
+my_fprintf(FILE *stream, const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	if (cmd_line)
+		vfprintf(stream, fmt, ap);
 	else
 		vwprintw(stdscr, fmt, ap);
 	va_end(ap);
@@ -196,10 +233,10 @@ void my_erase()
 }
 
 void
-my_flush()
+my_fflush(FILE *stream)
 {
 	if (cmd_line)
-		fflush(stdout);
+		fflush(stream);
 	else
 		refresh();
 }

@@ -24,6 +24,7 @@ static int match_list ( char *line, constext *pat, constext *const *table, size_
 static void expand_rel_abs_pathname (int line, int col, char *str);
 static void print_any_option (int the_option);
 static void show_config_page (int page_no);
+static char **ulBuildArgv(char *cmd, int *new_argc);
 
 enum state { IGNORE, CHECK, UPGRADE };
 
@@ -40,10 +41,10 @@ check_upgrade(
 	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
 		return(IGNORE);
 	else {
-		fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
-		fprintf(stderr, "Some values in your configuration file have changed\n");
-		fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
-		fprintf(stderr, txt_cmdline_hit_any_key);
+		my_fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
+		my_fprintf(stderr, "Some values in your configuration file have changed\n");
+		my_fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
+		my_fprintf(stderr, txt_cmdline_hit_any_key);
 		ReadCh();
 		return(UPGRADE);
 	}
@@ -169,6 +170,9 @@ read_config_file (
 				break;
 			}
 			if (match_integer (buf, "col_head=", &col_head, MAX_COLOR)) {
+				break;
+			}
+			if (match_integer (buf, "col_newsheaders=", &col_newsheaders, MAX_COLOR)) {
 				break;
 			}
 			if (match_integer (buf, "col_subject=", &col_subject, MAX_COLOR)) {
@@ -393,6 +397,16 @@ read_config_file (
 		case 'n':
 			if (match_string (buf, "newnews=", newnews_info, sizeof (newnews_info))) {
 				load_newnews_info (newnews_info);
+				break;
+			}
+			/* pick which news headers to display */
+			if (match_string(buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
+				news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
+				break;
+			}
+			/* pick which news headers to NOT display -- swp */
+			if (match_string(buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
+				news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
 				break;
 			}
 			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format))) {
@@ -696,6 +710,20 @@ write_config_file (
 	fprintf (fp, txt_tinrc_show_author);
 	fprintf (fp, "show_author=%d\n\n", default_show_author);
 
+	fprintf (fp, txt_tinrc_news_headers_to_display);
+	fprintf (fp, "news_headers_to_display=");
+	for (i=0; i<num_headers_to_display; i++) {
+		fprintf (fp, " %s",news_headers_to_display_array[i]);
+	}
+	fprintf (fp, "\n\n");
+
+	fprintf (fp, txt_tinrc_news_headers_to_not_display);
+	fprintf (fp, "news_headers_to_not_display=");
+	for (i=0; i<num_headers_to_not_display; i++) {
+		fprintf (fp, " %s",news_headers_to_not_display_array[i]);
+	}
+	fprintf (fp, "\n\n");
+
 	fprintf (fp, txt_tinrc_sort_article_type);
 	fprintf (fp, "sort_article_type=%d\n\n", default_sort_art_type);
 
@@ -846,6 +874,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_col_head);
 	fprintf (fp, "col_head=%d\n\n", col_head);
+
+	fprintf (fp, txt_tinrc_col_newsheaders);
+	fprintf (fp, "col_newsheaders=%d\n\n", col_newsheaders);
 
 	fprintf (fp, txt_tinrc_col_subject);
 	fprintf (fp, "col_subject=%d\n\n", col_subject);
@@ -1631,7 +1662,7 @@ match_integer (
 
 		if (maxlen)  {
 			if ((*dst < 0) || (*dst > maxlen)) {
-				fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
+				my_fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
 				*dst = 0;
 			}
 		}
@@ -1785,4 +1816,63 @@ show_config_page (
 	show_menu_help (txt_select_config_file_option);
 	my_flush();
 	stow_cursor();
+}
+
+
+/*
+ * Written by: Brad Viviano and Scott Powers (bcv & swp)
+ *
+ * Takes a 1d string and turns it into a 2d array of strings.
+ *
+ * Watch out for the frees! You must free(*argv) and then free(argv)! NOTHING
+ *   ELSE!! Do _NOT_ free the individual args of argv.
+ */
+static char **
+ulBuildArgv(
+	char *cmd,
+	int *new_argc) 
+{
+	char **new_argv=NULL;
+	char *buf=NULL, *tmp=NULL;
+	int i=0;
+
+	if (!cmd && !*cmd) {
+		*new_argc = 0;
+		return (NULL);
+	}
+
+	for(tmp=cmd; isspace (*tmp); tmp++);
+	buf = my_strdup(tmp);
+	if (!buf) {
+		*new_argc = 0;
+		return (NULL);
+	}
+
+	tmp=buf;
+
+	new_argv = (char **) calloc (1, sizeof (char *));
+	if (!new_argv) {
+		free (buf);
+		*new_argc = 0;
+		return (NULL);
+	}
+
+	new_argv[0]=NULL;
+	while (*tmp) {
+		if (!isspace(*tmp)) { /*found the begining of a word*/
+			new_argv[i]=tmp;
+				for (; *tmp && !isspace(*tmp); tmp++);
+				if (*tmp) {
+					*tmp = '\0';
+					tmp++;
+				}
+			i++;
+			new_argv = (char **) realloc (new_argv, ((i+1) * sizeof (char *)));
+			new_argv[i] = NULL;
+		} else {
+			tmp++;
+		}
+	}
+	*new_argc = i;
+	return (new_argv);
 }

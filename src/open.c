@@ -1417,7 +1417,7 @@ vGrpGetArtInfo (
 				return(-1);
 		}
 #else
-		fprintf(stderr, "Unreachable ?\n");
+		my_fprintf(stderr, "Unreachable ?\n");
 		return(0);
 #endif	/* #ifdef NNTP_ABLE */
 	} else {

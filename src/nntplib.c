@@ -16,30 +16,12 @@
 
 #include "tin.h"
 #include "tcurses.h"
-
-#ifdef VMS
-#	include "sio.h"
-#endif
+#include "tnntp.h"
 
 char	last_put[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
 	static	char nntp_line[NNTP_STRLEN];
-#endif
-
-#ifdef M_AMIGA
-#	include "amigatcp.h"
-#else
-#	define	s_printf	fprintf
-#	define	s_fdopen	fdopen
-#	define	s_flush	fflush
-#	define	s_fclose	fclose
-#	define	s_gets	fgets
-#	define	s_close	close
-#	define	s_puts	my_fputs
-#	define	s_dup		dup
-#	define	s_init()	(1)
-#	define	s_end()
 #endif
 
 #ifndef VMS
@@ -50,76 +32,6 @@ char	last_put[NNTP_STRLEN];
 #else /* VMS */
 	int	sockt_rd = -1, sockt_wr = -1;
 #endif /* !VMS */
-
-#ifdef NNTP_ABLE
-#	ifdef HAVE_NETDB_H
-#		include <netdb.h>
-#	endif
-
-#	ifdef TLI
-#		include	<fcntl.h>
-#		include	<tiuser.h>
-#		include	<stropts.h>
-#		include	<sys/socket.h>
-#		include	<netinet/in.h>
-#		define	IPPORT_NNTP	((unsigned short) 119)
-#	else
-#	ifdef VMS
-#		ifdef MULTINET
-#			include "MULTINET_ROOT:[multinet.include]errno.h"
-#			include "MULTINET_ROOT:[multinet.include]netdb.h"
-#			include "MULTINET_ROOT:[multinet.include.vms]inetiodef.h"
-#			include "MULTINET_ROOT:[multinet.include.sys]socket.h"
-#			include "MULTINET_ROOT:[multinet.include.netinet]in.h"
-#			define netopen	socket_open
-#			define netread	socket_read
-#			define netwrite socket_write
-#			define netclose socket_close
-#		else
-#			ifdef UCX
-#				include <errno.h>
-#				include <iodef.h>
-#				include <in.h>
-#				include <socket.h>
-#				define 	netopen	open
-#				define 	netread	read
-#				define 	netwrite	write
-#				define 	netclose	close
-#				define	IPPORT_NNTP	((unsigned short) 119)
-#			endif /* UCX */
-#		endif /* MULTINET */
-#	else /* !VMS */
-#		include <sys/socket.h>
-#		include <netinet/in.h>
-#		ifdef HAVE_NETLIB_H
-#			include <netlib.h>
-#		endif
-#		ifndef EXCELAN
-#		endif
-#		if defined(__GNUC__) && defined(sun)
-			extern int connect (int s, struct sockaddr *name, int namelen);
-			extern char *inet_ntoa (struct in_addr in);
-#		endif
-#		ifdef HAVE_ARPA_INET_H
-#			include <arpa/inet.h>
-#		endif
-#	endif /* !VMS */
-#	endif /* !TLI */
-
-#	ifdef EXCELAN
-		extern int connect (int, struct sockaddr *);
-		extern unsigned short htons (unsigned short);
-		extern unsigned long rhost (char **);
-		extern int rresvport (int);
-		extern int socket (int, struct sockproto *, struct sockaddr_in *, int);
-#	endif
-
-#	ifdef DECNET
-#		include <netdnet/dn.h>
-#		include <netdnet/dnetdb.h>
-#	endif
-
-#endif /* NNTP_ABLE */
 
 /*
  * getserverbyfile(file)
@@ -330,7 +242,7 @@ get_tcp_socket (
 	if (!isdigit((unsigned char)*machine) ||
 	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
 		if ((hp = gethostbyname (machine)) == NULL) {
-			fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
+			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
 			return (-1);
 		}
@@ -395,7 +307,7 @@ get_tcp_socket (
 
 #ifdef HAVE_GETSERVBYNAME
 	if ((sp = (struct servent *) getservbyname (service, "tcp")) ==  NULL) {
-		fprintf (stderr, "%s/tcp: Unknown service.\n", service);
+		my_fprintf (stderr, "%s/tcp: Unknown service.\n", service);
 		return (-1);
 	}
 #else
@@ -420,7 +332,7 @@ get_tcp_socket (
 		hp = &def;
 	}
 	if (hp == NULL) {
-		fprintf (stderr, "\n%s: Unknown host.\n", machine);
+		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
 		return (-1);
 	}
 
@@ -457,7 +369,7 @@ get_tcp_socket (
 		memcpy((char *) &sock_in.sin_addr, *cp, hp->h_length);
 
 		if (x < 0) {
-			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
+			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
 		}
 #if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
 #define	HPSOCKSIZE 0x8000
@@ -478,12 +390,12 @@ get_tcp_socket (
 		if (x == 0) {
 			break;
 		}
-		fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr));
+		my_fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr));
 		perror ("");
 		(void) s_close (s);
 	}
 	if (x < 0) {
-		fprintf (stderr, "Giving up...\n");
+		my_fprintf (stderr, "Giving up...\n");
 		return (-1);
 	}
 #else	/* no name server */
@@ -499,7 +411,7 @@ get_tcp_socket (
 	/* set up addr for the connect */
 
 	if ((sock_in.sin_addr.s_addr = rhost (&machine)) == -1) {
-		fprintf (stderr, "\n%s: Unknown host.\n", machine);
+		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
 		return (-1);
 	}
 	/* And then connect */
@@ -573,7 +485,7 @@ get_dnet_socket (
 			break;
 		default:
 			if ((np = getnodebyname (machine)) == NULL) {
-				fprintf (stderr, "%s: Unknown host.\n", machine);
+				my_fprintf (stderr, "%s: Unknown host.\n", machine);
 				return (-1);
 			} else {
 				memcpy((char *) sdn.sdn_add.a_addr, np->n_addr, np->n_length);

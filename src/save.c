@@ -339,7 +339,7 @@ save_art_to_file (
 				sprintf (buf, txt_append_overwrite_quit, file);
 				sprintf (msg, "%s%c", buf, ch_default);
 				wait_message (msg);
-				MoveCursor (cLINES-1, (int) strlen (buf));
+				MoveCursor (cLINES, (int) strlen (buf));
 				if ((ch = (char) ReadCh ()) == '\n' || ch == '\r')
 					ch = ch_default;
 			} while (!strchr ("aoq\033", ch));
@@ -1198,7 +1198,7 @@ post_process_uud (
 						break;
 
 					default:
-						fprintf (stderr, "\r\nError: ASSERT - default state\n");
+						my_fprintf (stderr, cCRLF "Error: ASSERT - default state\n");
 						fclose (fp_in);
 						fclose (fp_out);
 						unlink (file_out);

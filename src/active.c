@@ -513,7 +513,7 @@ subscribe_new_group (
 	 */
 	if ((idx = my_group_add(group)) < 0) {
 		if (!newsrc_active)
-			fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
+			my_fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
 
 		if ((ptr = psGrpAdd(group)) != NULL)
 			active_add(ptr, group, 0, 1, 0, "n");
@@ -523,7 +523,7 @@ subscribe_new_group (
 	}
 
 	if ((autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
-		fprintf(stderr, "\nAutosubscribed to %s", group);
+		my_fprintf(stderr, "\nAutosubscribed to %s", group);
 
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
 		/*

@@ -137,7 +137,7 @@ feed_articles (
 		do {
 			sprintf (msg, "%s%s%c", prompt, txt_art_thread_regex_tag, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES-1, (int) strlen (msg)-1);
+			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = ReadCh ()) == '\r' || ch == '\n') {
 				ch = ch_default;
 			}
@@ -298,7 +298,7 @@ feed_articles (
 						do {
 							sprintf (msg, "%s%c", txt_post_process_type, proc_ch_default);
 							wait_message (msg);
-							MoveCursor (cLINES-1, (int) strlen (msg)-1);
+							MoveCursor (cLINES, (int) strlen (msg)-1);
 							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (!strchr ("eElLnqsu\033", proc_ch));
