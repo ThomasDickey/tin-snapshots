@@ -22,7 +22,7 @@ CF_SYS_NAME
 echo "Configuring `make version` for $SYS_NAME"
 
 case "$SYS_NAME" in
-AIX*)	AC_DEFINE(RS6000);;
+OSF1*)   AC_DEFINE(OSF1);;
 esac
 
 ###	Checks for programs.

@@ -465,7 +465,7 @@ extern char *get_uaf_fullname();
 #			define	DEFAULT_EDITOR		"/bin/vedit"
 #		endif
 #	endif
-#	ifdef RS6000
+#	ifdef _AIX
 #		define	DEFAULT_PRINTER "/bin/lp"
 #		define	READ_CHAR_HACK
 #	endif
@@ -740,7 +740,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define		INDEX_TOP	2
 
-#ifdef NO_REGEX
+#ifdef NO_WILDMAT
 #	define	STR_MATCH(s1,s2)	(strstr (s1, s2) != 0)
 #else
 #	define	STR_MATCH(s1,pat)	(wildmat (s1, pat))

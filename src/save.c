@@ -425,7 +425,8 @@ save_thread_to_file (
 	}
 
 	for (i=0 ; i < num_save ; i++) {
-		sprintf (msg, "%s%d", txt_saving, ++count);
+		/* the tailing spaces are needed for SHOW_PROGRESS */
+		sprintf (msg, "%s%d  ", txt_saving, ++count); 
 		wait_message (msg);
 
 		if (is_mailbox) {
@@ -480,7 +481,7 @@ save_regex_arts (
 	int i, ret_code = FALSE;
 
 	for (i=0 ; i < num_save ; i++) {
-		sprintf(msg, "%s%d", txt_saving, i+1);
+		sprintf (msg, "%s%d  ", txt_saving, i+1);
 		wait_message (msg);
 
 		if (is_mailbox) {
@@ -1260,12 +1261,7 @@ uudecode_file (
 		 */
 		if ((file = get_archive_file (file_out_dir)) != (char *) 0) {
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
-			my_printf (txt_checksum_of_file, file);
-			my_flush ();
-			if ((fp_in = popen (buf, "r")) == (FILE *) 0) {
-				my_printf ("Cannot execute %s" cCRLF, buf);
-				my_flush ();
-			} else {
+			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
 				if (stat (file, &st) != -1) {
 					file_size = (int) st.st_size;
 				}
@@ -1276,7 +1272,12 @@ uudecode_file (
 					}
 				}
 				pclose (fp_in);
+				my_printf (txt_checksum_of_file, file);
+				my_flush ();
 				my_printf ("%s  %8d bytes" cCRLF cCRLF, buf, file_size);
+				my_flush ();
+			} else {
+				my_printf ("Cannot execute %s" cCRLF, buf);
 				my_flush ();
 			}
 

@@ -68,7 +68,7 @@ constext txt_catchup_update_info[] = "%s %d group%s in %ld seconds\n";
 constext txt_check_article[] = "Check Prepared Article";
 constext txt_checking_new_groups[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
-constext txt_checksum_of_file[] = cCRLF cCRLF "Checksum of %s..." cCRLF cCRLF;
+constext txt_checksum_of_file[] = cCRLF "Checksum of %s" cCRLF;
 constext txt_cmdline_hit_any_key[] = "Press any key to continue...";
 constext txt_color_off[] = "ANSI color disabled";
 constext txt_color_on[] = "ANSI color enabled";
@@ -135,19 +135,19 @@ constext txt_filesystem_full_backup[] = "Error making backup of %s file. Filesys
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
 constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
 constext txt_warn_difficulties[] = "Okay, but you may run into difficulties later\n";
-#ifdef NO_REGEX
+#ifdef NO_WILDMAT
 constext txt_feed_pattern[] = "Enter pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter subscribe pattern> ";
 constext txt_unsubscribe_pattern[] = "Enter unsubscribe pattern> ";
 #else
-constext txt_feed_pattern[] = "Enter regex pattern [%s]> ";
-constext txt_subscribe_pattern[] = "Enter regex subscribe pattern> ";
-constext txt_unsubscribe_pattern[] = "Enter regex unsubscribe pattern> ";
+constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
+constext txt_subscribe_pattern[] = "Enter wildcard subscribe pattern> ";
+constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
 #endif
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
-constext txt_group[] = "Group %s ('q' to quit)...";
+constext txt_group[] = "Group %s ('q' to quit)... ";
 #else
-constext txt_group[] = "Group %s...";
+constext txt_group[] = "Group %s... ";
 #endif
 constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
 constext txt_group_select_com[] = "Top Level Commands (page %d of %d)";
@@ -1017,7 +1017,7 @@ constext txt_untagged_art[] = "Untagged article";
 constext txt_untagged_thread[] = "Untagged thread";
 constext txt_unthreading_arts[] = "Unthreading articles...";
 constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
-constext txt_uudecoding[] = "Uudecoding %s...";
+constext txt_uudecoding[] = "Uudecoding %s";
 constext txt_value_out_of_range[] = "\n%s%d out of range (0 - %d). Reset to 0";
 constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";

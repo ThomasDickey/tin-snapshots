@@ -358,9 +358,10 @@
 #undef	DONT_HAVE_TM_GMTOFF
 
 /*
- * The AIX compiler doesn't seem to have any predefined symbols.  This is ours.
+ * The OSF1 compiler doesn't seem to have any predefined symbols.
+ * This is ours.
  */
-#undef RS6000
+#undef OSF1
 
 #if 0 /* FIXME: test-not-impl */
 

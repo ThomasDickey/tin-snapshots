@@ -80,14 +80,11 @@ read_newsrc (
 			seq = pcParseNewsrcLine (line, grp, &sub);
 
 			if (sub == SUBSCRIBED) {
-/* TODO used to be my_group_find() if command line groups supplied.
- *      Since cmd line groups are completely broken, so what !
- */
 				if ((i = my_group_add (grp)) >= 0) {
 					active[my_group[i]].subscribed = SUB_BOOL(sub);
 					parse_bitmap_seq (&active[my_group[i]], seq);
 				} else {
-/* TODO - create dummy group and mark as Deleteable ? */
+/* TODO - create a dummy group and mark as 'D'eleteable ? */
 					my_fprintf(stderr, "\nBogus %s in .newsrc, not in active", grp);
 					errors++;
 				}

@@ -154,6 +154,9 @@ isalp (
 	}
 }
 
+/*
+ * Lookahead to find matching closing highlight character
+ */
 static t_bool
 check_valid_mark (
 	const char *s,
@@ -173,6 +176,9 @@ check_valid_mark (
 	return FALSE;
 }
 
+/*
+ * Like fputs(), but highlights words denoted by * and _ in colour
+ */
 static void
 color_fputs (
 	const char *s,
@@ -271,6 +277,10 @@ color_fputs (
 	}
 }
 
+/*
+ * Output a line of text to the screen with colour if needed
+ * word highlights, signatures and 'quote' lines will be coloured
+ */
 void
 print_color (
 	char *str,
