@@ -26,7 +26,7 @@
 
 	static char * RegEx_Init (char *instring);
 	static char * RegEx_Error (int code);
-      
+
 	static char *
 	RegEx_Init (
 		char *instring)

@@ -21,12 +21,12 @@
 /*
 ** Local prototypes
 */
-static char * escape_shell_meta (char *source, int quote_area);      
+static char * escape_shell_meta (char *source, int quote_area);
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
 	static int to_local (int c);
-	static int to_network (int c);	   
+	static int to_network (int c);
 #endif /* LOCAL_CHARSET */
 
 #if 0
@@ -406,9 +406,9 @@ tin_done (
 	}
 
 	vWriteNewsrc ();
-	
+
 	write_input_history_file ();
-	
+
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	write_mail_active_file ();
 #endif
@@ -505,13 +505,13 @@ strip_double_ngs (
 
 			over2 = FALSE;
 			ncnt2 = 0;
-			
+
 			/* now compare with each inner newsgroup on the list,
 			 * which is behind the momentary outer newsgroup
 			 * if it is different from the outer newsgroup, append
 			 * to list, strip double-commas
 			 */
-			
+
 			while (!over2) {
 				ncnt2++;
 				strcpy(ngroup2, cmplist);
@@ -522,7 +522,7 @@ strip_double_ngs (
 				} else {
 					over2 = TRUE;
 				}
-				
+
 				if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
 					&& (strlen(ngroup2) != 0)) {
 					strcat(newlist, ",");
@@ -1054,7 +1054,7 @@ FATAL:
  *	  ^   ^
  *    Re^2: Reorganization of misc.jobs
  *
- *  now also strips trailing (was: ...) (obw) 
+ *  now also strips trailing (was: ...) (obw)
  */
 
 char *
@@ -1411,7 +1411,7 @@ get_arrow_key (int prech)
 	if (!input_pending(0)) {
 #ifdef HAVE_USLEEP
 		int i=0;
-		
+
 		wait_a_while(i) {
 			usleep(SECOND_CHARACTER_DELAY * 1000);
 			i++;
@@ -1420,7 +1420,7 @@ get_arrow_key (int prech)
 #ifdef HAVE_SELECT
 		struct timeval tvptr;
 		int i=0;
-		
+
 		wait_a_while(i) {
 			tvptr.tv_sec = 0;
 			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 1000;
@@ -2340,7 +2340,7 @@ make_group_path (
 			*path = *name;
 		name++;
 		path++;
-	} 
+	}
 	*path = '\0';
 #if 0	/* TODO */
 	strcpy (path, name);
@@ -2564,13 +2564,13 @@ random_organization(
 	fclose(orgfp);
 
 	return selorg;
-}	
+}
 
 #if 0
 static void
 dump_input_history (void) {
 	int his_w, his_e;
-	
+
 	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
 		fprintf(stderr, "Abschnitt %d: last=%d\n", his_w, hist_last[his_w]);
 		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
@@ -2579,7 +2579,7 @@ dump_input_history (void) {
 		}
 	}
 
-}	
+}
 #endif
 
 void
@@ -2590,10 +2590,10 @@ read_input_history_file (void) {
 	char *chr, *chr1;
 	int his_free = 0;
 
-	/* this is usually .tin/.inputhistory */	
+	/* this is usually .tin/.inputhistory */
 	if ((fp = fopen(local_input_history_file, "r")) == NULL)
 		return;
-	
+
         if (SHOW_UPDATE)
 		wait_message (txt_reading_input_history_file);
 
@@ -2604,12 +2604,12 @@ read_input_history_file (void) {
 
 
 	while (fgets(buf, sizeof(buf), fp)) {
-		
+
 		if ((chr = malloc(strlen(buf)+1)) != NULL) {
 			strcpy(chr, buf);
 			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
 				*chr1 = '\0';
-			if (*chr) 
+			if (*chr)
 				input_history[his_w][his_e] = chr;
 			else {
 				/* empty lines in getline's history buf
@@ -2642,8 +2642,6 @@ read_input_history_file (void) {
         if (cmd_line) {
 		printf ("\r\n");
 	}
-
-	
 }
 
 static void
@@ -2653,10 +2651,10 @@ write_input_history_file(void) {
 	char *chr;
 
 /*	dump_input_history(); */
-	
+
 	if ((fp = fopen(local_input_history_file, "w")) == NULL)
 		return;
-	
+
 	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
 		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
 			/* write an empty line for empty slots */
@@ -2669,11 +2667,11 @@ write_input_history_file(void) {
 			}
 		}
 	}
-	
+
 	fclose(fp);
 }
 
-/* 
+/*
  * quotes wildcards * ? \ [ ] with \
  */
 

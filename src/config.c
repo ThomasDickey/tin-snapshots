@@ -45,11 +45,9 @@ check_upgrade(
 {
 	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
 		return(IGNORE);
-	else { /* FIXME: move strings to lang.c */
-		my_fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
-		my_fprintf(stderr, "Some values in your configuration file have changed\n");
-		my_fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
-		my_fprintf(stderr, txt_return_key);
+	else {
+		error_message (txt_warn_update, VERSION);
+		error_message (txt_return_key, "");
 		ReadCh();
 		return(UPGRADE);
 	}

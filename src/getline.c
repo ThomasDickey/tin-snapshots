@@ -148,7 +148,7 @@ getline (
 						case KEYMAP_INS:
 							gl_addchar (' ');
 							break;
-						default: 
+						default:
 							return (char *) 0;
 					}
 					break;

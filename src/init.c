@@ -399,7 +399,7 @@ void init_selfinfo (void)
 		}
 	}
 #endif /* HAVE_GETHOSTBYNAME */
-	
+
 	if (domain_name[0]=='\0') {
 		error_message ("Can't get a (fully-qualified) domain-name!\n", "");
 		tin_done(1);

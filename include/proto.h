@@ -104,18 +104,18 @@ extern void xclick (int state);
 	extern void debug_nntp_respcode (int respcode);
 	extern void debug_print_active (void);
 	extern void debug_print_arts (void);
-	extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
-	extern void debug_print_comment (const char *comment);
 	extern void debug_print_filters (void);
 	extern void debug_print_header (struct t_article *s);
 	extern void debug_save_comp (void);
 	extern void vDbgPrintMalloc (int iIsMalloc, const char *pcFile, int iLine, size_t iSize);
 #endif /* DEBUG */
 #ifdef DEBUG_NEWSRC
-	extern void debug_print_comment (const char *comment);
-	extern void debug_print_newsrc (struct t_group *group, struct t_article *art);
 	extern void debug_print_newsrc (struct t_newsrc *NewSrc, FILE *fp);
 #endif /* DEBUG_NEWSRC */
+#if defined(DEBUG) || defined (DEBUG_NEWSRC)
+	extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
+	extern void debug_print_comment (const char *comment);
+#endif /* DEBUG || DEBUG_NEWSRC */
 
 /* envarg.c */
 extern void envargs (int *Pargc, char ***Pargv, const char *envstr);
@@ -304,7 +304,7 @@ extern void art_mark_read (struct t_group *group, struct t_article *art);
 extern void art_mark_unread (struct t_group *group, struct t_article *art);
 extern void art_mark_will_return (struct t_group *group, struct t_article *art);
 extern void backup_newsrc (void);
-extern void catchup_newsrc_file (char *newsrc_file);
+extern void catchup_newsrc_file (void);
 extern void delete_group (char *group);
 extern void expand_bitmap (struct t_group *group, long min);
 extern void grp_mark_read (struct t_group *group, struct t_article *psArt);

@@ -512,7 +512,7 @@ group_page_down:
 					n = (int) base[index_point];
 					old_artnum = arts[n].artnum;
 					if (quick_filter_select (group, &arts[n])) {
-						info_message ("Auto-selection filter added");
+						info_message (txt_info_add_select);
 						if (filter_articles (group)) {
 							make_threads (group, FALSE);
 							find_base (group);
@@ -533,7 +533,7 @@ group_page_down:
 					n = (int) base[index_point];
 					old_artnum = arts[n].artnum;
 					if (quick_filter_kill (group, &arts[n])) {
-						info_message ("Kill filter added");
+						info_message (txt_info_add_kill);
 						if (filter_articles (group)) {
 							make_threads (group, FALSE);
 							find_base (group);
@@ -791,7 +791,7 @@ group_catchup:
 					range_active = FALSE;			/* Range has gone now */
 					show_group_page();
 				}
-					
+
 				if ((n = which_thread (n)) < 0) {
 					error_message ("Internal error: K which_thread < 0", "");
 					break;
@@ -1085,9 +1085,13 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupPostponed:	/* post postponed article */
-				if(pickup_postponed_articles(FALSE, FALSE)) {
-					show_group_page ();
+			case iKeyPostponed:	/* post postponed article */
+				if (can_post) {
+					if (pickup_postponed_articles(FALSE, FALSE)) {
+						show_group_page ();
+					}
+				} else {
+					info_message(txt_cannot_post);
 				}
 				break;
 
@@ -1636,7 +1640,7 @@ toggle_subject_from (void)
  *
  * WARNING: the routine is tightly coupled with draw_sline() in the sense
  * that draw_sline() expects bld_sline() to place the article mark
- * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the 
+ * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the
  * screen[].col.
  * So, if you change the format used in this routine, be sure to check
  * that the value of MARK_OFFSET (tin.h) is still correct.
@@ -1678,7 +1682,7 @@ bld_sline (
 	 *	art in thread - add the following:
 	 *	n--;
 	 */
-	 
+
 	if ((j = line_is_tagged(respnum)) != 0) {
 		strcpy (new_resps, tin_itoa(j, 3));
 	} else {
@@ -1727,7 +1731,7 @@ bld_sline (
 	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, from);
-	
+
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++) {
 		if (!(isprint(buffer[n]) || ((unsigned char) buffer[n] >= 0xa0))) {

@@ -595,7 +595,7 @@ my_flush ();
 			}
 			if (ptr->filter[i].xref_max > 0) {
 				fprintf (fp, "xref_max=%d\n", ptr->filter[i].xref_max);
-				
+
 				for(j=0;j<ptr->filter[i].xref_score_cnt;j++) {
 				  fprintf (fp, "xref_score=%d%s%s\n", ptr->filter[i].xref_scores[j], ptr->filter[i].xref_score_strings[j] ? "," : "", ptr->filter[i].xref_score_strings[j]);
 				}
@@ -1424,7 +1424,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					    REGEX_MATCH (MSGID(art), ptr[j].msgid, FALSE)) {
 						SET_FILTER(group, i, j);
 					}
-					
+
 					FreeIfNeeded(refs);
 
 				}
@@ -1516,7 +1516,7 @@ wait_message (msg); sleep (1);
 					  }
 					}
 				      }
-  
+
 				      s=e;
 				      while(*s && !isspace(*s)) s++;
 				      while(*s && isspace(*s)) s++;

@@ -804,6 +804,16 @@ thread_catchup:
 				update_thread_page ();
 				break;
 
+			case iKeyPostponed:	/* post postponed article */
+				if (can_post) {
+					if (pickup_postponed_articles(FALSE, FALSE)) {
+						show_thread_page();
+					}
+				} else {
+					info_message(txt_cannot_post);
+				}
+				break;
+
 			default:
 				info_message (txt_bad_command);
 		}

@@ -1843,6 +1843,15 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #	endif
 #endif
 
+/* FIXME - check also for mktemp/mkstemp/tmpfile */
+#ifdef HAVE_TEMPNAM
+#	define my_tempnam(a,b) tempnam(a,b)      
+#else
+#	ifdef HAVE_TMPNAM
+#		define my_tempnam(a,b) tmpnam('\0')
+#	endif /* HAVE_TMPNAM */
+#endif /* HAVE_TEMPNAM */
+
 #define IS_PLURAL(x) (x != 1 ? txt_plural : "")
 
 #endif /* !TIN_H */

@@ -1,3 +1,23 @@
+--unoff BETA release 970916 --
+
+439) Martin Buck <martin-2.buck@student.uni-ulm.de>
+     BUG. joining of continuied headerlines didn't work
+     FIX. art.c
+
+438) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. closed possible security hole with -DEBUG_NEWSRC
+     ADD. minor code cleanup (moved some strings)
+     ADD. '^O' to thread-'l'evel
+     ADD. check if posting is allowed before calling several posting
+          routines
+     FIX. configure[.in], autoconf.h[in], extern.h, menukeys.h, tin.h
+          config.c, feed.c, lang.c, main.c, newsrc.c, page.c, post.c,
+          select.c, thread.c
+
+437) Sven Paulus <sven@karlsruhe.org>
+     BUG. -c was broken
+     FIX. newsrc.c
+
 --unoff BETA release 970911 --
 
 436) Thomas E. Dickey <dickey@clark.net>

@@ -159,9 +159,11 @@ main (
 	read_motd_file ();
 
 	/*
-	 *  Read input history 
+	 *  Read input history
 	 */
-	read_input_history_file ();
+#ifndef INDEX_DAEMON
+	read_input_history_file (); /* FIXME: not needed in batch-mode */
+#endif
 
 #ifdef WIN32
 	/*
@@ -200,7 +202,7 @@ main (
 	/*
 	 *  Read in users filter preferences file
 	 *  This has to be done before quick post
-	 *  because the filters will be updated!!![eb]
+	 *  because the filters will be updated!
 	 */
 #ifndef INDEX_DAEMON
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
@@ -228,12 +230,10 @@ main (
 	}
 #endif /* INDEX_DAEMON */
 
-	if((count=count_postponed_articles())) {
-		if(count==1) {
-			printf("there is one postponed article, use '^O' to reuse it\n");
-		} else {
-			printf("there are %d postponed articles, use '^O' to reuse them\n", count);
-		}
+	if ((count=count_postponed_articles())) {
+		char warning[256];
+		sprintf(warning, txt_info_postponed, count, IS_PLURAL(count));
+		wait_message(warning); /* FIXME: wait_message doesn't wait anymore */
 		sleep(2);
 	}
 
@@ -272,7 +272,7 @@ main (
 		show_only_unread_groups = FALSE;
 	else
 		toggle_my_groups (show_only_unread_groups, "");
-#endif
+#endif /* INDEX_DAEMON */
 
 	/*
 	 * This updates the min/max/unread counters for all subscribed groups using
@@ -299,7 +299,7 @@ main (
 	/*
 	 *  Catchup newsrc file (-c option)
 	 */
-	catchup_newsrc_file (newsrc);
+	catchup_newsrc_file ();
 
 	/*
 	 *  Update index files
@@ -592,7 +592,7 @@ read_cmd_line_options (
 		else {
 #if defined(HAVE_SYS_UTSNAME_H) && defined(HAVE_UNAME)
 			struct utsname uts;
-			(int) uname(&uts);			
+			(int) uname(&uts);
 			get_newsrcname(newsrc,uts.nodename);
 #else	/* NeXT, Apollo */
 			char nodenamebuf[32];
@@ -649,7 +649,7 @@ usage (
 
 #	ifndef NNTP_ONLY
 	error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
-#	endif /* NNTP_ONLY */	
+#	endif /* NNTP_ONLY */
 
 	error_message ("  -m dir   mailbox directory [default=%s]", default_maildir);
 	error_message ("  -M user  mail new news to specified user (batch mode)", "");
@@ -685,7 +685,7 @@ usage (
 
 #else /* INDEX_DAEMON */
 	error_message ("%s Tin index file daemon.\n", cvers);
-	error_message ("Usage: %s [options] [newsgroups]", theProgname);	
+	error_message ("Usage: %s [options] [newsgroups]", theProgname);
 	error_message ("  -d       delete index file before indexing articles", "");
 
 #	ifdef DEBUG

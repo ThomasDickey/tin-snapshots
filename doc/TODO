@@ -1,10 +1,9 @@
 Bugs
 ----
-o  -c commandline switch only works properly together with -S, but it
-   might be useful without any other switch to catchup all groups.
-   it seems to trash some newsrc entrys when used without -S and/or
-   not to catchup anything.
-   [Michael Faurot <mfaurot@clark.net>]
+o  wait_message() is 'broken': it does not wait
+   (check where wait_message should wait or where info_message should be
+    used instead... or add a 2nd argument (seconds) to wait_message...)
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  -N and -M commandline switches are broken
    -N does not enter batch mode and does not mail out any articles
@@ -203,8 +202,6 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 o  allow changing From: in mail-replys
 
-o  '/', '?' searching in 'M'enu and 'h'elp-screen
-
 o  item_by_item_etiquette_warnings [compiletime?]
    (i.e. enable x-posts without f'up waring, disable long-sig waring)
 
@@ -252,21 +249,26 @@ o  add feature goto using the 'G' key
    etc...
 
 o  Additions to the thread menu :
-	'/' (search subject)
+	'/','?' (search subject)
+	'B' (body search)
 	'M' (option menu)	- not easy if the threading changes!
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
 	''  r ought to be toggle show all/show only unread
 	'f' (post a followup)
 	keys to goto previous/next thread
-        '^O' post postponed article
 
-o  Add 'l' (goto thread menu) to the article pager
+o  Additions to the pager:
+	'l' (goto thread menu)
 
-o  Add to the 'M'enu:
+o  Additions to the 'M'enu:
+        '/', '?' searching
         news_headers_to_display
         news_headers_not_to_display
         DEFAULT_MAILER
+
+o  Additions to the 'h'elp-screen:
+        '/', '?' searching
 
 o  Add a commandline switch that prints out all values of cpp-symbols etc.
 
@@ -361,7 +363,7 @@ o  join Makefile and makefile (not entirely possible)
 
 o  move all strings to lang.c
 
-o  cleanup (=rewrite) post.c/inews.c/header.c/page.c/filter.c
+o  cleanup (=rewrite) post.c/inews.c/header.c/page.c/filter.c/main.c
 
 o  rework the message routines (wait_message, error_message) to use variable
    length argument lists

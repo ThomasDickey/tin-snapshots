@@ -185,6 +185,9 @@ extern long strtol (const char *, char **, int);
 #ifdef DECL_SYSTEM
 extern int system (char *);
 #endif
+#ifdef DECL_TEMPNAM
+extern char *tempnam (const char *, const char *);
+#endif
 #ifdef DECL_TGETENT
 extern int tgetent (char *, char *);
 #endif
@@ -677,9 +680,15 @@ extern constext txt_help_xpost_quote_format[];
 extern constext txt_help_y[];
 extern constext txt_hit_space_for_more[];
 extern constext txt_index_page_com[];
+extern constext txt_info_add_kill[];
+extern constext txt_info_add_select[];
+extern constext txt_info_do_postpone[];
+extern constext txt_info_postponed[];
+extern constext txt_info_nopostponed[];
 extern constext txt_invalid_from[];
 extern constext txt_inverse_off[];
 extern constext txt_inverse_on[];
+extern constext txt_is_tex_ecoded[];
 extern constext txt_kill_from[];
 extern constext txt_kill_lines[];
 extern constext txt_kill_menu[];
@@ -1047,12 +1056,13 @@ extern constext txt_warn_cancel[];
 extern constext txt_warn_difficulties[];
 extern constext txt_warn_followup_to_several_groups[];
 extern constext txt_warn_missing_followup_to[];
+extern constext txt_warn_multiple_sigs[];
 extern constext txt_warn_not_in_newsrc[];
 extern constext txt_warn_not_valid_newsgroup[];
-extern constext txt_warn_suspicious_mail[];
 extern constext txt_warn_posting_etiquette[];
 extern constext txt_warn_sig_too_long[];
-extern constext txt_warn_multiple_sigs[];
+extern constext txt_warn_suspicious_mail[];
+extern constext txt_warn_update[];
 extern constext txt_warn_wrong_sig_format[];
 extern constext txt_writing_attributes_file[];
 extern constext txt_x_resp[];

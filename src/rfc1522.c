@@ -15,10 +15,10 @@
 #include "tin.h"
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
-/* Modified to return TRUE for '(' and ')' only if 
+/* Modified to return TRUE for '(' and ')' only if
    it's in structured header field. '(' and ')' are
    NOT to be treated differently than other characters
-   in unstructured headers like Subject, Keyword and Summary 
+   in unstructured headers like Subject, Keyword and Summary
    c.f. RFC 2047 */
 #define isbetween(c,s) (isspace((unsigned char)c) ||   ( (s) == TRUE && ((c) == '(' || (c) == ')') ) || (c) == '"')
 /*
@@ -50,8 +50,8 @@ static int quoteflag;
 static int contains_nonprintables (char *w,t_bool isstruct_head);
 static int do_b_encode (char *w, char *b, int max_ewsize, t_bool isstruct_head);
 static int rfc1522_do_encode (char *what, char **where, t_bool break_long_line);
-static int sizeofnextword (char *w);                             
-static int which_encoding (char *w);                             
+static int sizeofnextword (char *w);
+static int which_encoding (char *w);
 static unsigned hex2bin (int x);
 static void build_base64_rank_table (void);
 static void str2b64 (char *from, char *to);
@@ -261,7 +261,7 @@ rfc1522_decode(
 	return buffer;
 }
 
-/* adopted by J. Shin(jshin@pantheon.yale.edu) from 
+/* adopted by J. Shin(jshin@pantheon.yale.edu) from
    Woohyung Choi's(whchoi@cosmos.kaist.ac.kr) sdn2ks and ks2sdn */
 
 static void
@@ -330,7 +330,7 @@ do_b_encode(
 
 /* find out whether encoding is necessary and which encoding
    to use if necessary by scanning the whole header field
-   instead of each fragment of it.  
+   instead of each fragment of it.
    This will ensure that  either Q or B encoding will be used in a single
    header(i.e. two encoding won't  be mixed in a single header line.
    Mixing two encodings is not a violation of RFC 2047 but  may break
@@ -358,7 +358,7 @@ which_encoding(
 		w++;
 	}
 	if (nonprint) {
-/* Always use B encoding regardless of the efficiency if charset is 
+/* Always use B encoding regardless of the efficiency if charset is
    EUC-KR for backward compatibility with old Korean mail program */
 		if (chars + 2 * (nonprint + schars) /* QP size */ >
 			 (chars * 4 + 3) / 3	  /* B64 size */
@@ -450,9 +450,9 @@ rfc1522_do_encode(
 	int any_quoting_done = 0;
 
 /* Uncommented this and other conditional compilation statement
-   depending on MIME_BREAK_LONG_LINES in this function 
+   depending on MIME_BREAK_LONG_LINES in this function
    in order to implement mandatory break-up of long lines
-   in mail messages in accordance with RFC 2047(RFC 1522). 
+   in mail messages in accordance with RFC 2047(RFC 1522).
    Whether or not long lines are broken up depends on
    boolean variable break_long_line, instead.
    break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
@@ -496,7 +496,7 @@ rfc1522_do_encode(
 		if (break_long_line == TRUE) {
 			word_cnt++;
 		}
-/* if a word with 8bit chars is broken in the middle, whatever follows 
+/* if a word with 8bit chars is broken in the middle, whatever follows
    after the point where it's split should be encoded (i.e. even if
    they are made of only 7bit chars) */
 		if (contains_nonprintables(what, isstruct_head) || isbroken_within) {
@@ -550,7 +550,7 @@ rfc1522_do_encode(
 					*t++ = '?';
 					*t++ = '=';
 					ewsize += 2;
-/* if a word with 8bit chars is broken in the middle, whatever follows 
+/* if a word with 8bit chars is broken in the middle, whatever follows
    after the point where it's split should be encoded (i.e. even if
    they are made of only 7bit chars) */
 					if (ewsize >= 70 - strlen(mm_charset) && (contains_nonprintables(what, isstruct_head) || isbroken_within)) {
@@ -575,9 +575,9 @@ rfc1522_do_encode(
 					}					  /* end of while */
 				}						  /* end of else */
 			} else {					  /* end of Q encoding and beg. of B encoding */
-				/* if what immediately precedes the current fragment with 8bit char is 
+				/* if what immediately precedes the current fragment with 8bit char is
 				   encoded word, the leading spaces should be encoded together with
-				   8bit chars following them. No need to worry about '(',')' and '"' 
+				   8bit chars following them. No need to worry about '(',')' and '"'
 				   as they're already excluded with contain_nonprintables used in outer if-clause */
 				while (*what && (!isbetween(*what, isstruct_head) || rightafter_ew)) {
 
@@ -601,7 +601,7 @@ rfc1522_do_encode(
 				}
 				rightafter_ew = TRUE;
 				word_cnt--;			  /* compensate double counting */
-				/* if encoded word is followed by 7bit-only fragment, we need to 
+				/* if encoded word is followed by 7bit-only fragment, we need to
 				   eliminate ' ' inserted in while-block above */
 				if (!contains_nonprintables(what, isstruct_head)) {
 					t--;
@@ -688,7 +688,7 @@ rfc1522_encode(
 #endif
 
 /* Even if MIME_BREAK_LONG_LINES is NOT defined,
-   long headers in mail messages should be broken up in 
+   long headers in mail messages should be broken up in
    accordance with RFC 2047(1522) */
 #ifndef MIME_BREAK_LONG_LINES
 	if (ismail == TRUE) {

@@ -253,7 +253,7 @@ end_of_article:
 					}
 
 					/*
-					 * Goto this article 
+					 * Goto this article
 					 */
 					art_close ();
 					respnum = msgid->article;
@@ -542,8 +542,11 @@ page_up:
 				break;
 
 			case iKeyPageCancel:	/* delete an article */
-				if (cancel_article (group, &arts[respnum], respnum)) {
-					redraw_page (group->name, respnum);
+				if (can_post) {
+					if (cancel_article (group, &arts[respnum], respnum))
+						redraw_page (group->name, respnum);
+				} else {
+					info_message (txt_cannot_post);
 				}
 				break;
 
@@ -561,7 +564,7 @@ page_up:
 					info_message (txt_cannot_post);
 					break;
 				}
-				(void) post_response (group->name, respnum, 
+				(void) post_response (group->name, respnum,
 				  (ch == iKeyPageFollowupQuote || ch == iKeyPageFollowupQuoteHeaders) ? TRUE : FALSE,
 				  ch == iKeyPageFollowupQuoteHeaders ? TRUE : FALSE);
 				redraw_page (group->name, respnum);
@@ -741,9 +744,13 @@ return_to_index:
 				}
 				break;
 
-			case iKeyPagePostponed:	/* post postponed article */
-				if (pickup_postponed_articles (FALSE, FALSE)) {
-					redraw_page (group->name, respnum);
+			case iKeyPostponed:	/* post postponed article */
+				if (can_post) {
+					if (pickup_postponed_articles (FALSE, FALSE)) {
+						redraw_page (group->name, respnum);
+					}
+				} else {
+					info_message(txt_cannot_post);
 				}
 				break;
 
@@ -782,7 +789,7 @@ return_to_index:
 						info_message(txt_toggled_high_off);
 				}
 				break;
-#endif				
+#endif
 
 			default:
 				info_message(txt_bad_command);
@@ -996,7 +1003,7 @@ print_a_line:
 /* decode RFC 1522(RFC 2047) style headers back to 8bit before
    further processiing. It doesn't work if header part is longer
    than a pageful. A quick patch would be remove check for
-   in_headers, but that would introduce an uncessary load 
+   in_headers, but that would introduce an uncessary load
    as well as make it impossible to have header-like lines
    in article body. Somehow, in_headers is set to FALSE
    even if we're still in header part of article when
@@ -1071,7 +1078,7 @@ print_a_line:
 			break;
 		}
 	}
-	
+
 	if (!show_last_line_prev_page) {
 		note_mark[++note_page] = ftell (note_fp);
 	} else {
@@ -1181,7 +1188,7 @@ show_first_header (
 
 	if (grplen < maxlen)
 		maxlen = grplen;
-		
+
 	/*
 	 * Aesthetics - Add 3 to compensate for the fact that
 	 * the left hand margin (date) is longer than the right hand margin
@@ -1441,7 +1448,7 @@ art_open (
 	if (tex2iso_supported) {
 		tex2iso_article = iIsArtTexEncoded (art, group_path);
 		if (tex2iso_article) {
-			wait_message ("TeX2Iso encoded article");
+			wait_message (txt_is_tex_ecoded);
 		}
 	} else {
 		tex2iso_article = FALSE;
@@ -1490,8 +1497,8 @@ art_open (
 		}
 
 		for (ptr = buf ; *ptr && ((*ptr != '\n') || (ptr[1] != '\0')); ptr++) {
-			if ((((*ptr) & 0xFF) < ' ') 
-				&& (*ptr != '\n') 
+			if ((((*ptr) & 0xFF) < ' ')
+				&& (*ptr != '\n')
 				&& ((*ptr != '\t') || (!is_summary)))
 				*ptr = ' ';
 		}
@@ -1717,7 +1724,7 @@ match_header (
 		 */
 
 #ifdef LOCAL_CHARSET
-		/* 
+		/*
 		 * we have a bit of a problem here, if the header
 		 * contains 8 bit character, they were already
 		 * converted to local charset in rfc1521_decode, they

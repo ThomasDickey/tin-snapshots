@@ -31,7 +31,7 @@ static void create_newsrc (char *newsrc_file);
 static void parse_bitmap_seq (struct t_group *group, char *seq);
 static void print_bitmap_seq (FILE *fp, struct t_group *group);
 static void vWriteNewsrcLine (FILE *fp, char *line);
-      
+
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
  *  active[] entries.
@@ -1068,36 +1068,35 @@ rewrite_group_done:
 	return ret_code;
 }
 
+
 /*
  *  catchup all groups in .newsrc
  */
-
 void
-catchup_newsrc_file (
-	char *newsrc_file)
+catchup_newsrc_file (void)
 {
-	FILE *fp;
 	register int i;
+	struct t_group *group;
 
-	if (catchup && !update) {
-		if ((fp = fopen (newsrc_file, "w")) != (FILE *) 0) {
-			if (newsrc_mode) {
-				chmod (newsrc_file, newsrc_mode);
-			}
-			for (i = 0 ; i < group_top ; i++) {
+	if (!catchup)
+		return;
 
- 				if (active[my_group[i]].subscribed || !strip_newsrc) {
- 					fprintf (fp, "%s%c 1-%ld\n",
- 						active[my_group[i]].name,
-						SUB_CHAR(active[my_group[i]].subscribed),
- 						active[my_group[i]].xmax);
- 				}
-			}
-			fclose (fp);
+	for (i = 0 ; i < group_top ; i++) {
+		group = &active[my_group[i]];
+		group->newsrc.present = TRUE;
+		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
+			free ((char *) group->newsrc.xbitmap);
+			group->newsrc.xbitmap = (t_bitmap *) 0;
 		}
-		tin_done (EXIT_OK);
+		group->newsrc.xmax = group->xmax;
+		group->newsrc.xmin = group->xmax+1;
+		group->newsrc.num_unread = 0;
+		group->newsrc.xbitlen = 0;
 	}
+
+	tin_done (EXIT_OK);
 }
+
 
 /*
  * Break down a line of .newsrc file
@@ -1145,14 +1144,14 @@ expand_bitmap (
 */
 if (group->newsrc.xmax > group->xmax) {
 #ifdef DEBUG
-	my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);	
+	my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);
 	sleep(4);
 #endif
 /*
 ** (silently) fix it - we trust our newsrc
 */
 	group->xmax = group->newsrc.xmax;
-} 
+}
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
 		group->newsrc.xmin = group->newsrc.xmax + 1;
 
@@ -1389,8 +1388,11 @@ void
 vNewsrcTestHarness (void)
 {
 	char seq[20000];
+	char *temp_file = NULL;
 	FILE *fp;
 	int i;
+	int retry = 10; /* max. retrys */
+	int fd;
 	long rng_min, rng_max;
 	struct t_group group;
 
@@ -1420,24 +1422,43 @@ vNewsrcTestHarness (void)
 			group.newsrc.xmin = 1;
 			group.newsrc.xmax = 0;
 		}
-		fp = fopen ("/tmp/NEWSRC", "w");
-		my_printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
 
-		parse_bitmap_seq (&group, seq);
+		while (retry) {
+		/* FIXME - this is secure now, but doesn't write any debug output */
+		/* (it didn't before too) */
+			if ((temp_file = my_tempnam ("","NEWSRC")) != (char *) 0) {
+				if ((fd = open (temp_file, (O_CREAT|O_EXCL),(S_IRUSR|S_IWUSR))) !=-1) {
+					if ((fp = fopen (temp_file, "w")) != (FILE *) 0) {
+						my_printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
+						parse_bitmap_seq (&group, seq);
+						debug_print_newsrc (&group.newsrc, stdout);
+						print_bitmap_seq (fp, &group);
+						my_printf("   PRINT Seq=[");
+						print_bitmap_seq (stdout, &group);
+						fclose(fp);
+					} else {
+						retry--;
+					}
+					close(fd);
+					break;
+				} else {
+					retry--;
+				}
+			} else {
+				retry--;
+			}
+		}
+
 		debug_print_newsrc (&group.newsrc, stdout);
-		print_bitmap_seq (fp, &group);
 
-		my_printf("   PRINT Seq=[");
-		print_bitmap_seq (stdout, &group);
-
-		fclose (fp);
-
-		debug_print_newsrc (&group.newsrc, stdout);
-
-		fp = fopen ("/tmp/NEWSRC", "r");
-		fgets (seq, sizeof(seq), fp);
-		seq[strlen(seq)-1] = '\0';
-		fclose (fp);
+		if (!retry) {
+			error_message (txt_cannot_create_uniq_name,"");
+		} else {
+			fp = fopen (temp_file, "r");
+			fgets (seq, sizeof(seq), fp);
+			seq[strlen(seq)-1] = '\0';
+			fclose (fp);
+		}
 	}
 #ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 	set_bitmap_range_read (&group.newsrc, rng_min, rng_max);
