@@ -431,10 +431,14 @@ select_page_up:
 				break;
 
 			case iKeySelectDisplayGroupInfo:	/* display group description */
-				info_message (
-					(active[my_group[cur_groupnum]].description ?
-					 active[my_group[cur_groupnum]].description :
-					 "*** No description ***"));
+				if (group_top == 0) {
+					info_message (txt_no_groups);
+				} else {
+					info_message (
+						(active[my_group[cur_groupnum]].description ?
+					 	active[my_group[cur_groupnum]].description :
+					 	"*** No description ***"));
+				}
 				break;
 
 			case iKeySelectMoveGrp:	/* reposition group within group list */

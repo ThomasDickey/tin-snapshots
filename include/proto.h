@@ -237,6 +237,7 @@ extern char *my_realloc1 P_((char *file, int line, char *p, size_t size));
 /* ./misc.c */
 extern void asfail P_((char *file, int line, char *cond));
 extern void copy_fp P_((FILE *fp_ip, FILE *fp_op, char *prefix));
+extern void copy_body P_((FILE *fp_ip, FILE *fp_op, char *prefix, char *initl));
 extern char *get_val P_((char *env, char *def));
 extern int invoke_editor P_((char *filename, int lineno));
 extern int invoke_ispell P_((char *nam));
@@ -273,6 +274,7 @@ extern int strfquote P_((char *group, int respnum, char *s, int maxsize, char *f
 extern int strfeditor P_((char *editor, int linenum, char *filename, char *s, int maxsize, char *format));
 extern int strfpath P_((char *format, char *str, int maxsize, char *homedir, char *maildir, char *savedir, char *group));
 extern int strfmailer P_((char *mailer, char *subject, char *to, char *filename, char *s, int maxsize, char *format));
+extern int get_initials P_((int respnum, char *s, int maxsize));
 extern void get_cwd P_((char *buf));
 extern void make_group_path P_((char *name, char *path));
 extern void cleanup_tmp_files P_((void));

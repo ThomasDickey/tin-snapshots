@@ -670,9 +670,8 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 				update_thread_page ();
 				break;
 
-			case iKeyPageDisplaySubject:
-				n = choose_response (thread_basenote, thread_index_point);
-				info_message(arts[n].subject);
+			case iKeyThreadDisplaySubject:
+				info_message(arts[(choose_response (thread_basenote, thread_index_point))].subject);
 				break;
 				
 			default:

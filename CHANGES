@@ -1,3 +1,15 @@
+--950824BETA  PLMC.960522 --
+
+044) Sven Paulus <sven@oops.sub.de>
+     ADD. FIDO-sytle quoting
+          %s in quote_chars will be replaced by your initials
+     FIX. several supplied patches
+
+043) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. got SIGSEGV on iKeyGroupDisplaySubject in an empty newsgroup
+     ADD. little code clean-up
+     FIX. art.c, group.c, thread.c
+
 --950824BETA  PLMC.960521 --
 
 042) Jason Faultless (jason@radar.demon.co.uk)
