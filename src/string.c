@@ -21,28 +21,6 @@
 
 
 /*
-**  find first occurrence of any char from str2 in str1
-*/
-
-char *
-tin_strpbrk (str1, str2)
-	char *str1;
-	char *str2;
-{
-	register char *ptr1;
-	register char *ptr2;
-
-	for (ptr1 = str1; *ptr1 != '\0'; ptr1++) {
-		for (ptr2 = str2; *ptr2 != '\0';) {
-			if (*ptr1 == *ptr2++) {
-				return (ptr1);
-			}
-		}
-	}
-	return (char *) 0;
-}
-
-/*
  * special itoa()
  * converts value into a string with a len of digits
  * last char may be one of the following
@@ -80,62 +58,6 @@ tin_itoa (value, digits)
 }
 
 
-long
-my_strtol (str, ptr, use_base)
-	/* const */ char *str;
-	char **ptr;
-	int use_base;
-{
-#ifndef HAVE_STRTOL
-#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
-#define MBASE 36
-
-	long	val;
-	int	xx, sign;
-
-	val = 0L;
-	sign = 1;
-
-	if (use_base < 0 || use_base > MBASE)
-		goto OUT;
-	while (isspace ((unsigned char)*str))
-		++str;
-	if (*str == '-') {
-		++str;
-		sign = -1;
-	} else if (*str == '+')
-		++str;
-	if (use_base == 0) {
-		if (*str == '0') {
-			++str;
-			if (*str == 'x' || *str == 'X') {
-				++str;
-				use_base = 16;
-			} else
-				use_base = 8;
-		} else
-			use_base = 10;
-	} else if (use_base == 16)
-		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
-			str += 2;
-		/*
-		 * for any base > 10, the digits incrementally following
-		 * 9 are assumed to be "abc...z" or "ABC...Z"
-		 */
-		while (isalnum ((unsigned char)*str) && (xx = DIGIT (*str)) < use_base) {
-			/* accumulate neg avoids surprises near maxint */
-			val = use_base * val - xx;
-			++str;
-		}
-OUT:
-	if (ptr != (char **) 0)
-		*ptr = str;
-
-	return (sign * (-val));
-#else
-	return strtol (str, ptr, use_base);
-#endif
-}
 
 /*
  * Handrolled version of strdup(), presumably to take advantage of
@@ -156,72 +78,7 @@ char *my_strdup (str)
 	return duplicate;
 }
 
-/*
- *  Convert a string to a long, only look at first n characters
- */
 
-long
-my_atol (s, n)
-	char *s;
-	int n;
-{
-	long ret = 0;
-
-#ifdef QNX42
-	ret = atol (s);
-#else
-	while (*s && n--) {
-		if (*s >= '0' && *s <= '9')
-			ret = ret * 10 + (*s - '0');
-		else
-			return -1;
-		s++;
-	}
-#endif
-
-	return ret;
-}
-
-/*
- *  strcmp that ignores case
- */
-
-#define FOLD_TO_UPPER(a)	(toupper ((int) (a)))
-
-#ifndef HAVE_STRCASECMP
-int
-my_stricmp (p, q)
-	/* const */ char *p;
-	/* const */ char *q;
-{
-	int r;
-	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
-		if (*p == '\0') {
-			return (0);
-		}
-	}
-
-	return r;
-}
-#endif
-
-#ifndef HAVE_STRNCASECMP
-int
-my_strnicmp(p, q, n)
-	/* const */ char *p;
-	/* const */ char *q;
-	size_t n;
-{
-	int r=0;
-	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;
-			++p, ++q, --n) {
-		if (*p == '\0') {
-			return (0);
-		}
-	}
-	return n ? r : 0;
-}
-#endif
 
 /*
  *  strncpy that stops at a newline and null terminates
@@ -241,63 +98,6 @@ my_strncpy (p, q, n)
 	*p = '\0';
 }
 
-#ifndef HAVE_STRSTR
-/*
- * ANSI C strstr () - Uses Boyer-Moore algorithm.
- */
-char *
-my_strstr (text, pattern)
-	char *text;
-	char *pattern;
-{
-	register unsigned char *p, *t;
-	register int i, j, *delta;
-	register size_t p1;
-	int deltaspace[256];
-	size_t textlen;
-	size_t patlen;
-
-	textlen = strlen (text);
-	patlen = strlen (pattern);
-
-	/* algorithm fails if pattern is empty */
-	if ((p1 = patlen) == 0)
-		return (text);
-
-	/* code below fails (whenever i is unsigned) if pattern too long */
-	if (p1 > textlen)
-		return (NULL);
-
-	/* set up deltas */
-	delta = deltaspace;
-	for (i = 0; i <= 255; i++)
-		delta[i] = p1;
-	for (p = (unsigned char *) pattern, i = p1; --i > 0;)
-		delta[*p++] = i;
-
-	/*
-	 * From now on, we want patlen - 1.
-	 * In the loop below, p points to the end of the pattern,
-	 * t points to the end of the text to be tested against the
-	 * pattern, and i counts the amount of text remaining, not
-	 * including the part to be tested.
-	 */
-	p1--;
-	p = (unsigned char *) pattern + p1;
-	t = (unsigned char *) text + p1;
-	i = textlen - patlen;
-	forever {
-		if (*p == *t && memcmp ((p - p1), (t - p1), p1) == 0)
-			return ((char *)t - p1);
-		j = delta[*t];
-		if (i < j)
-			break;
-		i -= j;
-		t += j;
-	}
-	return (NULL);
-}
-#endif
 
 /* this strcpy variant removes \n and "" */
 void
@@ -358,7 +158,7 @@ char *source;
 size_t size;
 int decode;
 {
-        char buf[2048];
+	char buf[2048];
 	int count;
 	char *c;
 
@@ -375,10 +175,231 @@ int decode;
 	if(decode)
 		c = rfc1522_decode(buf);
 	else
-		c=buf;
+		c = buf;
 
 	while (--size) {
 	        *target++ = *c++;
 	}
 	*target = 0;
 }
+
+
+void
+str_lwr (src, dst)
+	char *src;
+	char *dst;
+{
+	while (*src) {
+		*dst++ = (char)tolower((int)*src);
+		src++;
+	}
+	*dst = '\0';
+}
+
+
+/*
+** normal systems come with these...
+*/
+
+#ifndef HAVE_STRPBRK
+/*
+**  find first occurrence of any char from str2 in str1
+*/
+
+char *
+strpbrk (str1, str2)
+	char *str1;
+	char *str2;
+{
+	register char *ptr1;
+	register char *ptr2;
+
+	for (ptr1 = str1; *ptr1 != '\0'; ptr1++) {
+		for (ptr2 = str2; *ptr2 != '\0';) {
+			if (*ptr1 == *ptr2++) {
+				return (ptr1);
+			}
+		}
+	}
+	return (char *) 0;
+}
+#endif
+
+#ifndef HAVE_STRSTR
+/*
+ * ANSI C strstr () - Uses Boyer-Moore algorithm.
+ */
+char *
+strstr (text, pattern)
+	char *text;
+	char *pattern;
+{
+	register unsigned char *p, *t;
+	register int i, j, *delta;
+	register size_t p1;
+	int deltaspace[256];
+	size_t textlen;
+	size_t patlen;
+
+	textlen = strlen (text);
+	patlen = strlen (pattern);
+
+	/* algorithm fails if pattern is empty */
+	if ((p1 = patlen) == 0)
+		return (text);
+
+	/* code below fails (whenever i is unsigned) if pattern too long */
+	if (p1 > textlen)
+		return (NULL);
+
+	/* set up deltas */
+	delta = deltaspace;
+	for (i = 0; i <= 255; i++)
+		delta[i] = p1;
+	for (p = (unsigned char *) pattern, i = p1; --i > 0;)
+		delta[*p++] = i;
+
+	/*
+	 * From now on, we want patlen - 1.
+	 * In the loop below, p points to the end of the pattern,
+	 * t points to the end of the text to be tested against the
+	 * pattern, and i counts the amount of text remaining, not
+	 * including the part to be tested.
+	 */
+	p1--;
+	p = (unsigned char *) pattern + p1;
+	t = (unsigned char *) text + p1;
+	i = textlen - patlen;
+	forever {
+		if (*p == *t && memcmp ((p - p1), (t - p1), p1) == 0)
+			return ((char *)t - p1);
+		j = delta[*t];
+		if (i < j)
+			break;
+		i -= j;
+		t += j;
+	}
+	return (NULL);
+}
+#endif
+
+#ifndef HAVE_ATOL
+/*
+** handrolled atol
+*/
+long
+atol (s)
+	char *s;
+{
+	long ret = 0;
+	while (*s) {
+		if (*s >= '0' && *s <= '9')
+			ret = ret * 10 + (*s - '0');
+		else
+			return -1;
+		s++;
+	}
+	return ret;
+}
+#endif /* HAVE_ATOL */
+
+#ifndef HAVE_STRTOL
+/* fix me - put me in tin.h */
+#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
+#define MBASE 36
+long
+strtol (str, ptr, use_base)
+	/* const */ char *str;
+	char **ptr;
+	int use_base;
+{
+
+	long	val;
+	int	xx, sign;
+
+	val = 0L;
+	sign = 1;
+
+	if (use_base < 0 || use_base > MBASE)
+		goto OUT;
+	while (isspace ((unsigned char)*str))
+		++str;
+	if (*str == '-') {
+		++str;
+		sign = -1;
+	} else if (*str == '+')
+		++str;
+	if (use_base == 0) {
+		if (*str == '0') {
+			++str;
+			if (*str == 'x' || *str == 'X') {
+				++str;
+				use_base = 16;
+			} else
+				use_base = 8;
+		} else
+			use_base = 10;
+	} else if (use_base == 16)
+		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+			str += 2;
+		/*
+		 * for any base > 10, the digits incrementally following
+		 * 9 are assumed to be "abc...z" or "ABC...Z"
+		 */
+		while (isalnum ((unsigned char)*str) && (xx = DIGIT (*str)) < use_base) {
+			/* accumulate neg avoids surprises near maxint */
+			val = use_base * val - xx;
+			++str;
+		}
+OUT:
+	if (ptr != (char **) 0)
+		*ptr = str;
+
+	return (sign * (-val));
+}
+#undef DIGIT(x)
+#undef MBASE
+#endif /* HAVE_STRTOL */
+
+
+/*
+ *  strcmp that ignores case
+ */
+
+/*fix me - put me in tin.h */
+#define FOLD_TO_UPPER(a)	(toupper ((int) (a)))
+
+#ifndef HAVE_STRCASECMP
+int
+strcasecmp (p, q)
+	/* const */ char *p;
+	/* const */ char *q;
+{
+	int r;
+	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
+		if (*p == '\0') {
+			return (0);
+		}
+	}
+
+	return r;
+}
+#endif
+
+#ifndef HAVE_STRNCASECMP
+int
+strncasecmp(p, q, n)
+	/* const */ char *p;
+	/* const */ char *q;
+	size_t n;
+{
+	int r=0;
+	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;
+			++p, ++q, --n) {
+		if (*p == '\0') {
+			return (0);
+		}
+	}
+	return n ? r : 0;
+}
+#endif

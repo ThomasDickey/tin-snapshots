@@ -123,7 +123,6 @@ art_mark_xref_read (art)
 		}
 
 		if (psGrp && psGrp->newsrc.xbitmap) {
-/*			check_bitmap (psGrp); */
 			if (artnum >= psGrp->newsrc.xmin && artnum <= psGrp->xmax) {
 			    artread = (NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ ? TRUE : FALSE);
 				if (!artread) {
@@ -163,7 +162,6 @@ NSETRNG1 (bitmap, low, high)
 
 	if (high >= low) {
 		if (NOFFSET(high) == NOFFSET(low)) {
-/* printf ("Single BYTE -- NOFFSET(L %ld) == NOFFSET(H %ld)\n", low, high); */
 			for (i=low; i <= high; i++) {
 				NSET1(bitmap, i);
 			}
@@ -188,7 +186,6 @@ NSETRNG0 (bitmap, low, high)
 	long high;
 {
 	register long i;
-/* t_bitmap mask; */
 
 	if (bitmap == (t_bitmap *) 0) {
 		error_message ("NSETRNG0() failed. Bitmap == NULL", "");
@@ -197,58 +194,17 @@ NSETRNG0 (bitmap, low, high)
 
 	if (high >= low) {
 		if (NOFFSET(high) == NOFFSET(low)) {
-/* printf ("Single BYTE -- NOFFSET(L %ld) == NOFFSET(H %ld)\n", low, high); */
 			for (i=low; i <= high; i++) {
 				NSET0(bitmap, i);
 			}
 		} else {
-
-/*			mask = ~(NBITSON << NBITIDX(low));
-printf ("Multi BYTE - BEG mask=[0x%x][%d]\n", mask, mask);
-*/
 			BIT_AND(bitmap, low, ~(NBITSON << NBITIDX(low)));
 
 			if (NOFFSET(high) > NOFFSET(low) + 1) {
-/* printf ("Multi BYTE - MID\n"); */
 				memset (&bitmap[NOFFSET(low) + 1], 0,
 					(size_t) (NOFFSET(high)-NOFFSET(low)-1));
 			}
-/*			mask = NBITNEG1 << NBITIDX(high);
-printf ("Multi BYTE - END mask=[0x%x][%d]\n", mask, mask);
-*/
 			BIT_AND(bitmap, high, NBITNEG1 << NBITIDX(high));
 		}
 	}
 }
-
-/*
- * 1085-1088
- * low  4
- * high 4
- * Newsrc    81 82 83 84 85 86 87 88  89 90 91 92 93 94 95 96  97 98 99
- * Bits       0  1  2  3  4  5  6  7   0  1  2  3  4  5  6  7   0  1  2
- *           ----------------------------------------------------------
- * Default    1  1  1  1  1  1  1  1   1  1  1  1  1  1  1  1   1  1  1
- * Desired    1  1  1  1  0  0  0  0   1  1  1  1  1  1  1  1   1  1  1
- *
- * Mask       (NBITNEG1 << NBITIDX(high)) | ~(NBITSON << NBITIDX(low))
- *            (0xFE << NBITIDX(4)) | ~(0xFF << NBITIDX(4))
- * NBITIDX       ((4) & NMAXBIT)  ((4) & NMAXBIT)
- * Bit AND          00001000         00001000
- *                & 01111111       & 01111111
- *                ----------       ----------
- *                  00001000         00001000
- *            (0xFE << 4) | ~(0xFF << 4)
- *                11111110 << 4    11111111 << 4
- *                11100000         11110000
- *            11100000 | ~11110000
- * Complement    ~11110000  Convert all 0->1 1->0
- *                00001111
- * Bit OR     11100000 | 11110000
- *                11100000
- *              | 11110000
- *              ----------
- * Mask           11110000
- * COMPUTER       11111111 ???
- *
- */

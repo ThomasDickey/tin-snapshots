@@ -1550,9 +1550,6 @@ out:
 }
 
 
-
-
-
 /*
  * strfeditor() - produce formatted editor string
  *   %E  Editor

@@ -188,7 +188,7 @@ parse_newsrc_active_line (buf, count, max, min, moderated)
 {
 	char	*ptr;
 
-	ptr = tin_strpbrk (buf, ":!");
+	ptr = strpbrk (buf, ":!");
 
 	if (!ptr || *ptr != ':')		/* Invalid line or unsubscribed */
 		return(FALSE);

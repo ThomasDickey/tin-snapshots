@@ -1126,12 +1126,7 @@ vWriteNovFile (psGrp)
 
 		fclose (hFp);
 		chmod (pcNovFile, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
-		
-#if 0		/* I'm pretty sure we don't need to do this at this stage JBF */
-		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
-		        sort_arts (psGrp->attribute->sort_art_type);
-		}
-#endif /* 0 */
+
 	}
 	set_real_uid_gid ();
 }
@@ -1220,16 +1215,6 @@ pcFindNovFile (psGrp, iMode)
 					if (access (acNovFile, iMode) == 0) {
 						overview_index_filename = TRUE;
 					}
-				} else {
-/*
-				don't change the .overview files of the
-				news system, even if we have write premission,
-				it would require locking, which is different
-				from system to system
-					if (access (acBuf, iMode) == 0) {
-						overview_index_filename = TRUE;
-					}
-*/
 				}
 				if (!overview_index_filename) {
 					pcDir = index_newsdir;
@@ -1258,7 +1243,6 @@ pcFindNovFile (psGrp, iMode)
 			 */
 			if (fgets (acBuf, sizeof (acBuf), hFp) == (char *) 0) {
 				fclose (hFp);
-/*				return (char *) 0;*/
 				return acNovFile;
 			}
 			fclose (hFp);

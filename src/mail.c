@@ -353,7 +353,7 @@ vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
 	tDirFile = opendir (pcGrpPath);
 	if (tDirFile != (DIR *) 0) {
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-			lArtNum = my_atol (tFile->d_name, (int) D_NAMLEN(tFile));
+			lArtNum = atol (tFile->d_name/*, (int) D_NAMLEN(tFile)*/); /* should be '\0' terminated ... */
 			if (lArtNum >= 1) {
 				if (lArtNum > *plArtMax) {
 					*plArtMax = lArtNum;

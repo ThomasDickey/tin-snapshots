@@ -18,6 +18,7 @@
 
 #ifdef NNTP_ABLE
 static FILE * extract_groups_from_newsrc P_((void));
+static int authenticate P_((void));
 static int authorization P_((char *server, char *authuser));
 #endif
 
@@ -873,7 +874,7 @@ setup_hard_base (group, group_path)
 		d = opendir (buf);
 		if (d != NULL) {
 			while ((e = readdir (d)) != NULL) {
-				art = my_atol (e->d_name, D_NAMLEN(e));
+				art = atol (e->d_name/*, D_NAMLEN(e)*/); /*e->d_name should be '\0' terminated... */
 				if (art >= 1) {
 					total++;
 					if (top_base >= max_art)
@@ -894,19 +895,17 @@ setup_hard_base (group, group_path)
 	return total;
 }
 
-#ifdef HAVE_GENERIC_AUTHINFO
-
 /*
  * process authinfo generic.
  * 0 means succeeded.
  * 1 means failed
  */
 
-int
+static int
 authenticate ()
 {
-	extern FILE *nntp_rd_fp, *nntp_wr_fp;
-	char tmpbuf[NNTP_STRLEN], *authval, *p;
+#ifdef NNTP_ABLE /* former: HAVE_GENERIC_AUTHINFO */
+	char tmpbuf[NNTP_STRLEN], *authval;
 	char *authcmd;
 	FILE *fp;
 	int builtinauth = 0;
@@ -936,7 +935,7 @@ authenticate ()
 	}
 
 	strcpy (tmpbuf, "authinfo generic ");
-	if (authval = getenv ("NNTPAUTH")) {
+	if ((authval = getenv ("NNTPAUTH"))) {
 		strcat (tmpbuf, authval);
 	} else {
 		strcat (tmpbuf, "any ");
@@ -965,9 +964,10 @@ authenticate ()
 		get_server (tmpbuf, sizeof(tmpbuf));
 		return (atoi (tmpbuf) != OK_AUTH);	/* 0 = okay */
 	}
+#else
+	return 1;	/* authentication "failed" */
+#endif	/* NNTP_ABLE; former: HAVE_GENERIC_AUTHINFO */
 }
-
-#endif	/* HAVE_GENERIC_AUTHINFO */
 
 /*
  *  Get a response code from the server and return it to the caller
@@ -996,36 +996,24 @@ get_respcode ()
 
 	respcode = atoi (line);
 
-	switch (respcode) {
-		case ERR_NOAUTH:
-			strcpy (savebuf, last_put);
-			if (!authorization (nntp_server, userid)) {
-				sprintf (line, txt_auth_failed, ERR_ACCESS);
-			} else {
-				strcpy (last_put, savebuf);
-				put_server (last_put);
-				get_server (line, NNTP_STRLEN);
-			}
-			break;
-	
-#ifdef HAVE_GENERIC_AUTHINFO
-		case NEED_AUTHINFO:
-			strcpy (savebuf, last_put);
-
-			if (authenticate ()) {
-				sprintf(line, txt_auth_failed, ERR_ACCESS);
-				wait_message (line);
-			} else {
-				strcpy (last_put, savebuf);
-				put_server (last_put);
-				get_server (line, NNTP_STRLEN);
-			}
-			break;
-#endif
-		default:
-			break;
+	if ((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) {
+		/*
+		 * Server requires authentication.
+		 */
+		strcpy (savebuf, last_put);
+		/*
+		 * First, try generic authentication; if this fails, try
+		 * AUTHINFO USER/PASS.
+		 */
+		if (authenticate () && !authorization (nntp_server, userid)) {
+			sprintf (line, txt_auth_failed, ERR_ACCESS);
+		} else {
+			strcpy (last_put, savebuf);
+			put_server (last_put);
+			get_server (line, NNTP_STRLEN);
+		}
+		respcode = atoi (line);
 	}
-	respcode = atoi (line);
 	return respcode;
 #else
 	return 0;
@@ -1421,7 +1409,7 @@ fprintf(stderr, "IN vGGAI %s cnt=%ld, min=%ld max %ld\n",
 
 		if ((tDirFile = opendir (acBuf)) != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-				lArtNum = my_atol (tFile->d_name, (int) D_NAMLEN(tFile));
+				lArtNum = atol (tFile->d_name/*, (int) D_NAMLEN(tFile)*/); /* should be '\0' terminated... */
 				if (lArtNum >= 1) {
 					if (lArtNum > *plArtMax) {
 						*plArtMax = lArtNum;

@@ -410,7 +410,6 @@ my_malloc1 (file, line, size)
 	vDbgPrintMalloc (TRUE, file, line, size);
 #endif
 
-/*	if ((p = (char *) calloc (1, size)) == NULL) { */
 	if ((p = (char *) malloc (size)) == NULL) {
 
 		sprintf (buf, txt_out_of_memory, progname, size, file, line);

@@ -89,6 +89,7 @@ char save_active_file[PATH_LEN];
 char spooldir[PATH_LEN];		/* directory where news is */
 char subscriptions_file[PATH_LEN];
 char txt_help_bug_report[LEN];	/* address to add send bug reports to */
+char tagline_file[PATH_LEN];
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
 

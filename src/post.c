@@ -810,6 +810,11 @@ quick_post_article ()
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
+	
+	if (psGrp->attribute->mail_address && *psGrp->attribute->mail_address)
+	{
+		strcpy (from_name, psGrp->attribute->mail_address);
+	}
 	msg_add_header ("From", from_name);
 #endif
 	msg_add_header ("Subject", subj);
@@ -875,7 +880,7 @@ quick_post_article ()
 
 			case iKeyPostPost:
 				wait_message (txt_posting);
-				if (submit_news_file (article, lines)) {
+				if (submit_news_file (psGrp,  article, lines)) {
 					Raw (FALSE);
 					info_message (txt_art_posted);
 					goto post_article_done;
@@ -1002,6 +1007,10 @@ post_article (group, posted_flag)
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
+	if (psGrp->attribute->mail_address && *psGrp->attribute->mail_address)
+	{
+		strcpy (from_name, psGrp->attribute->mail_address);
+	}
 	msg_add_header ("From", from_name);
 #endif
 	msg_add_header ("Subject", subj);
@@ -1071,7 +1080,7 @@ post_article (group, posted_flag)
 			case iKeyPostPost:
 				wait_message (txt_posting);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article, lines)) {
+					if (submit_news_file (psGrp, article, lines)) {
 						*posted_flag = TRUE;
 					}
 				} else {
@@ -1411,14 +1420,17 @@ post_response (group, respnum, copy_text)
 		return ret_code;
 	}
 	chmod (article, (S_IRUSR|S_IWUSR));
+	psGrp = psGrpFind (group);
 
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
+	if (psGrp->attribute->mail_address && *psGrp->attribute->mail_address)
+	{
+		strcpy (from_name, psGrp->attribute->mail_address);
+	}
 	msg_add_header ("From", from_name);
 #endif
-
-	psGrp = psGrpFind (group);
 
 	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj));
 	msg_add_header ("Subject", bigbuf);
@@ -1549,7 +1561,7 @@ post_response (group, respnum, copy_text)
 			case iKeyPostPost:
 				wait_message (txt_posting);
 				if (art_type == GROUP_TYPE_NEWS) {
-					if (submit_news_file (article, lines)) {
+					if (submit_news_file (psGrp, article, lines)) {
 						ret_code = POSTED_OK;
 					}
 				} else {
@@ -2309,13 +2321,23 @@ cancel_article (group, art, respnum)
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 		return FALSE;
 	}
+	if (group->attribute->mail_address && *group->attribute->mail_address)
+	{
+		strcpy (from_name, group->attribute->mail_address);
+	} else
+	{
 #ifdef FORGERY
-	make_path_header (line, from_name);
+		make_path_header (line, from_name);
+		if (group->attribute->mail_address && *group->attribute->mail_address)
+		{
+			strcpy (from_name, group->attribute->mail_address);
+		}
 #else
-	get_host_name (host_name);
-	get_user_info (user_name, full_name);
-	get_from_name (user_name, host_name, full_name, from_name);
+		get_host_name (host_name);
+		get_user_info (user_name, full_name);
+		get_from_name (user_name, host_name, full_name, from_name);
 #endif
+	}
 
 	if (debug == 2) {
 		sprintf (msg, "From=[%s]  Cancel=[%s]", art->from, from_name);
@@ -2448,7 +2470,7 @@ cancel_article (group, art, respnum)
 
 			case iKeyPostCancel:
 				wait_message (txt_cancelling_art);
-				if (submit_news_file (cancel, 0)) {
+				if (submit_news_file (group, cancel, 0)) {
 					info_message (txt_art_cancel);
 					if (pcCopyArtHeader (HEADER_SUBJECT, cancel, buf))
 						update_posted_info_file (group->name, iKeyPostCancel, buf);
@@ -2570,7 +2592,12 @@ repost_article (group, art, respnum, supersede)
 		get_host_name (host_name);
 		get_user_info (user_name, full_name);
 		get_from_name (user_name, host_name, full_name, from_name);
-
+		
+		if (psGrp->attribute->mail_address && *psGrp->attribute->mail_address)
+		{
+			strcpy (from_name, psGrp->attribute->mail_address);
+		}
+                                         
 		if (FromSameUser)
 #else
 		make_path_header (line, from_name);
@@ -2601,6 +2628,10 @@ repost_article (group, art, respnum, supersede)
 		get_host_name (host_name);
 		get_user_info (user_name, full_name);
 		get_from_name (user_name, host_name, full_name, from_name);
+		if (psGrp->attribute->mail_address && *psGrp->attribute->mail_address)
+		{
+			strcpy (from_name, psGrp->attribute->mail_address);
+		}
 		msg_add_header ("From", from_name);
 #endif
 	}
@@ -2716,7 +2747,7 @@ repost_article (group, art, respnum, supersede)
 				} else
 					wait_message (txt_repost_an_article);
 
-				if (submit_news_file (article, 0)) {
+				if (submit_news_file (psGrp, article, 0)) {
 					info_message (txt_art_posted);
 					ret_code = POSTED_OK;
 					goto repost_done;
@@ -3167,14 +3198,8 @@ update_active_after_posting (newsgroups)
 			*dst = '\0';
 			psGrp = psGrpFind (group);
 			if (psGrp != (struct t_group *) 0 && psGrp->subscribed == SUBSCRIBED) {
-/*
-   error_message ("Updating %s...", group);
- */
 				reread_active_for_posted_arts = TRUE;
 				psGrp->art_was_posted = TRUE;
-/*
-   clear_message ();
- */
 			}
 			dst = group;
 		} else {

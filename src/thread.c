@@ -188,7 +188,7 @@ draw_tline (i, full)
 #ifndef INDEX_DAEMON
 	size_t tlen;
 	int j, x;
-	int k = THREAD_MARK_OFFSET;
+	int k = MARK_OFFSET;
 	char *s;
 
 	j = INDEX2TNUM(i);
@@ -204,8 +204,8 @@ draw_tline (i, full)
 		}
 	} else {
 		tlen = 3; /* tagged/mark is 3 chars wide */
-		s = &screen[j].col[THREAD_MARK_OFFSET-2];
-		x = THREAD_MARK_OFFSET-2;
+		s = &screen[j].col[MARK_OFFSET-2];
+		x = MARK_OFFSET-2;
 	}
 
 	MoveCursor(INDEX2LNUM(i), x);

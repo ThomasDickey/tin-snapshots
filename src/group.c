@@ -1545,10 +1545,10 @@ toggle_subject_from ()
  *
  * WARNING: the routine is tightly coupled with draw_sline() in the sense
  * that draw_sline() expects bld_sline() to place the article mark
- * (read_art_makr, selected_art_mark, etc) at GROUP_MARK_OFFSET in the 
+ * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the 
  * screen[].col.
  * So, if you change the format used in this routine, be sure to check
- * that the value of GROUP_MARK_OFFSET (tin.h) is still correct.
+ * that the value of MARK_OFFSET (tin.h) is still correct.
  * Yes, this is somewhat kludgy.
  */
 
@@ -1663,7 +1663,7 @@ draw_sline (i, full)
 #ifndef INDEX_DAEMON
 	size_t tlen;
 	int j, x;
-	int k = GROUP_MARK_OFFSET;
+	int k = MARK_OFFSET;
 	char *s;
 
 	j = INDEX2SNUM(i);

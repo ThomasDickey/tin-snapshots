@@ -47,10 +47,11 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 /*
 ** Local prototypes
 */
-static int submit_inews P_((char *name));
+static int submit_inews P_((struct t_group *group, char *name));
 
 static int
-submit_inews (name)
+submit_inews (group,name)
+	struct t_group *group;
 	char *name;
 {
 	int	ret_code = FALSE;
@@ -75,9 +76,15 @@ submit_inews (name)
 		return ret_code;
 	}
 
-	get_host_name (host_name);
-	get_user_info (user_name, full_name);
-	get_from_name (user_name, host_name, full_name, from_name);
+	if (group && group->attribute->mail_address && *group->attribute->mail_address)
+	{
+		strcpy (from_name,group->attribute->mail_address);
+	} else
+	{
+		get_host_name (host_name);
+		get_user_info (user_name, full_name);
+		get_from_name (user_name, host_name, full_name, from_name);
+	}
 
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line
@@ -89,7 +96,7 @@ submit_inews (name)
 			error_message ("Invalid  From: %s  line. Read the INSTALL file again.", from_name);
 			fclose (fp);
 			return ret_code;
-		}
+	}
 	}
 
 	/*
@@ -106,7 +113,7 @@ submit_inews (name)
 	 * Send POST command to NNTP server
 	 */
 	put_server ("post");
-
+		
 	/*
 	 * Receive CONT_POST or ERROR response code from NNTP server
 	 */
@@ -114,7 +121,7 @@ submit_inews (name)
 		error_message ("%s", nntp_respcode (respcode));
 		debug_nntp ("submit_inews", nntp_respcode (respcode));
 		fclose (fp);
-		return ret_code;
+	return ret_code;
 	}
 
 	/*
@@ -499,7 +506,8 @@ get_domain_name (inews_domain, domain)
 
 
 int
-submit_news_file (name, lines)
+submit_news_file (group, name, lines)
+	struct t_group *group;
 	char *name;
 	int   lines;
 {
@@ -522,7 +530,7 @@ submit_news_file (name, lines)
 			error_message ("Using BUILTIN inews", "");
 		}
 #endif /* DEBUG */
-		ret_code = submit_inews (name);
+		ret_code = submit_inews (group, name);
 	} else {
 #ifdef DEBUG
 		if (debug == 2) {
