@@ -1,8 +1,5 @@
 Bugs
 ----
-o  using other mailers than sendmail without use_mailreader_i=ON may leed to
-   multiple signatures
-
 o  tins killfile editor does not quote brackets, stars and questionmarks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
@@ -87,6 +84,10 @@ o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
 
 o  split tin.h/proto.h for better dependencies in make
+
+o  rename several general key definitions
+   (f.e. why use iKey'module'Quit when Quit is always the same key
+    use iKeyQuit instead...)
 
 o  join Makefile and makefile
 
@@ -277,5 +278,8 @@ o  fix kill/hot mechanism so that it is possible do kill articles with
 o  fix sending out a 'group' for each newsgroup on 'Y' when connected to a
    cnews-server
 
-o  mailers other than sendmail (f.e. elm) may have 'problems' with
-   'duplicated'-headers
+o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
+   to 'duplicated'-headers and multiple signatures
+
+o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
+   ignores start_line_offset

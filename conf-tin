@@ -19,10 +19,30 @@ EOF/
 OPTS="$*"
 
 #INSTALL="td-install"
-CFLAGS="-O"
 CC="${CC-cc}"
 
+# a few things missing in configure
+
+if test -z "$CFLAGS" ; then
+	case `uname -s` in
+	HP-UX)
+		# The basic K&R compiler on HP/UX doesn't
+		# support -O/-g options, but the comercial one does
+		# -> trust $CFLAGS
+		if test "$CC" != "cc" ; then
+			CFLAGS="-O"
+		fi
+		;;
+	*)
+	CFLAGS="-O"
+	esac
+fi
+
+
+# (congig.guess should be included sometimes)
 NETLIBS=""
+
+# is this still needed? thomas?
 case `uname -s` in
 #api20|opera15)
 #	# SCO
@@ -36,12 +56,6 @@ case `uname -s` in
 #Linux)
 #	INSTALL=install
 #	;;
-HP-UX)
-	# The K&R compiler on HP/UX doesn't support -O/-g options.
-	if test "$CC" = "cc" ; then
-		CFLAGS=""
-	fi
-	;;
 #SunOS)
 #	# Solaris (5.x) requires netlibs; SunOS (4.x) doesn't
 #	case `uname -r` in
@@ -54,6 +68,7 @@ HP-UX)
 #	NETLIBS="-lresolv -lsocket -lnsl"
 #	;;
 esac
+
 
 if test -n "$NETLIBS" ; then
 	LIBS="$LIBS $NETLIBS"

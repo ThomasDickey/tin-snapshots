@@ -1,3 +1,10 @@
+--unoff BETA release 960722 --
+
+123) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed variable-shadowing)
+     BUG. conf-tin overrides $CFLAGS
+     FIX. conf-tin, proto.h, open.c, save.c, search.c, thread.c
+
 --unoff BETA release 960721 --
 
 122) Daniel Naber <dnaber@pluto.teuto.de>

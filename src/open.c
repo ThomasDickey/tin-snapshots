@@ -236,8 +236,8 @@ open_overview_fmt_fp ()
  */
 
 FILE *
-open_newgroups_fp (index)
-	int index;
+open_newgroups_fp (the_index)
+	int the_index;
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
@@ -246,11 +246,11 @@ open_newgroups_fp (index)
 
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
-		if (index == -1) {
+		if (the_index == -1) {
 			return (FILE *) 0;
 		}
 
-		tm = localtime (&newnews[index].time);
+		tm = localtime (&newnews[the_index].time);
 		sprintf (line, "newgroups %02d%02d%02d %02d%02d%02d",
 			tm->tm_year, tm->tm_mon+1, tm->tm_mday,
 			tm->tm_hour, tm->tm_min, tm->tm_sec);
