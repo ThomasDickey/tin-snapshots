@@ -1,3 +1,68 @@
+-- pre-1.4 release 980202 --
+
+553) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. VMS port
+     FIX. several supplied patches
+
+552) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. default_filter_kill_case and default_filter_select_case
+          ignored, interpreted wrong (ON must be false)
+     BUG. empty scope written to filter file
+     FIX. config.c, filter.c
+
+551) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. fixed display-gaps caused by missing articles in the
+          threading tree
+     FIX. thread.c
+
+550) Urs Janssen <urs@tin.org>
+     ADD. Support for configure --with-defaults-dir, used for
+          tin.defaults, new Makefile options to install this file
+     BUG. cleanup of init.c
+     FIX. Makefile, configure.in, Makefile.in, init.c
+
+549) Sven Paulus <sven@tin.org>
+     ADD. new system-wide defaults file "tin.defaults" (primarily
+          aimed for making binary distributions of TIN)
+     BUG. GetConfigValue() was more than useless if compiled without
+          INN library
+     FIX. Makefile, tin.defaults, autoconf.hin, extern.h, proto.h,
+          tin.h, makefile.in, art.c, header.c, inews.c, init.c,
+          nntplib.c, nntpw32.c
+
+548) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. MIME related documentation updated
+     FIX. tin.1, lang.c, rfc1521.c, rfc1522.c
+
+547) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. rewrote active file reread-stuff
+     REM. file-pointer-fix from patch nr. 511
+     FIX. several supplied patches
+
+546) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     FIX. several patches
+
+545) Branden Robinson <branden@purdue.edu>
+     ADD. iKeyPostponed2 ('O')
+     FIX. menukeys.h
+
+544) Thomas E. Dickey <dickey@clark.net>
+     BUG. some display-problems with --enable-curses and metamail
+     FIX. feed.c, page.c
+
+543) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. metamutt - a shell script to call mutt as mimeparser
+     FIX. metamutt
+
+542) Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. $METAMAIL to set external mime-parser (i.e. metamutt vs. metamail)
+     FIX. page.c
+
+541) Sven Paulus <sven@tin.org>
+     BUG. deep threads could thrash display
+     FIX. thread.c
+
 -- pre-1.4 release 980117 --
 
 540) Jason Faultless <jason@radar.demon.co.uk>

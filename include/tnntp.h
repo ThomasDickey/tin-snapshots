@@ -15,24 +15,40 @@
 #ifndef TNNTP_H
 #define TNNTP_H 1
 
-#ifdef VMS
-#	include "sio.h"
-#endif
-
-#ifdef M_AMIGA
-#	include "amigatcp.h"
-#else
-#	define	s_printf	fprintf
-#	define	s_fdopen	fdopen
-#	define	s_flush	fflush
-#	define	s_fclose	fclose
-#	define	s_gets	fgets
-#	define	s_close	close
-#	define	s_puts	fputs
-#	define	s_dup		dup
+#if defined (VMS) && defined (SOCKETSHR_TCP)
+#	ifdef __GNUC__
+#		define __SOCKET_TYPEDEFS
+#	endif
+#	include <netdb.h>
+#	include <in.h>
+#	include <inet.h>
+#	include <socket.h>
+#	define	s_printf	si_fprintf
+#	define	s_fdopen	si_fdopen
+#	define	s_flush	si_fflush
+#	define	s_fclose	si_fclose
+#	define	s_gets	si_fgets
+#	define	s_close	si_close
+#	define	s_puts	si_fputs
+#	define	s_dup
 #	define	s_init()	(1)
 #	define	s_end()
-#endif
+#else
+#	ifdef M_AMIGA
+#		include "amigatcp.h"
+#	else
+#		define	s_printf	fprintf
+#		define	s_fdopen	fdopen
+#		define	s_flush	fflush
+#		define	s_fclose	fclose
+#		define	s_gets	fgets
+#		define	s_close	close
+#		define	s_puts	fputs
+#		define	s_dup		dup
+#		define	s_init()	(1)
+#		define	s_end()
+#		endif /* M_AMIGA */
+#endif /* VMS && SOCKETSHR_TCP */
 
 #if defined(NNTP_ABLE) || defined(HAVE_GETHOSTBYNAME)
 #	ifdef HAVE_NETDB_H
@@ -108,10 +124,10 @@
 #endif
 
 #ifdef DECL_CONNECT
-extern int  connect(int  sockfd, struct sockaddr *serv_addr, int addrlen);
+	extern int  connect(int  sockfd, struct sockaddr *serv_addr, int addrlen);
 #endif
 #ifdef DECL_INET_NTOA
-extern char *inet_ntoa (struct in_addr);
+	extern char *inet_ntoa (struct in_addr);
 #endif
 
 #endif /* TNNTP_H */

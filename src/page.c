@@ -44,7 +44,7 @@ t_bool note_end;				/* we're done showing this article */
 t_bool show_all_headers = FALSE;	/* CTRL-H with headers specified */
 t_bool show_prev_header = FALSE;	/* remember display status of last line */
 
-static int tex2iso_article;
+static t_bool tex2iso_article;
 
 /*
  * Local prototypes
@@ -78,7 +78,7 @@ show_page (
 	int ret_code;
 	long old_artnum;
 	long art;
-	struct stat note_stat_blubb;
+	struct stat note_stat_article;
 
 	local_filtered_articles = FALSE;	/* used in thread level */
 
@@ -117,16 +117,15 @@ restart:
 	art_mark_read (group, &arts[respnum]);
 
 	/* Get article size */
-	fstat(fileno(note_fp), &note_stat_blubb);
-	note_size = note_stat_blubb.st_size;
+	fstat(fileno(note_fp), &note_stat_article);
+	note_size = note_stat_article.st_size;
 	show_note_page (group->name, respnum);
 
 	forever {
 		ch = ReadCh ();
 
 		if (ch >= '0' && ch <= '9') {
-			n = which_thread (respnum);
-			if (!num_of_responses (n))
+			if (!num_of_responses (which_thread (respnum)))
 				info_message (txt_no_responses);
 			else {
 				n = prompt_response (ch, respnum);
@@ -385,7 +384,7 @@ page_goto_next_unread:
 
 			case iKeyPageToggleHeaders:	/* toggle display of article headers */
 				if (note_page == ART_UNAVAILABLE) {
-					if ((n  = next_response (respnum)) == -1)
+					if ((n = next_response (respnum)) == -1)
 						return (which_thread (respnum));
 					respnum = n;
 					goto restart;
@@ -408,10 +407,7 @@ page_goto_next_unread:
 
 			/* haeh? */
 			case iKeyPageToggleTabs:	/* toggle tab stops 8 vs 4 */
-				if (tabwidth == 8)
-					tabwidth = 4;
-				else
-					tabwidth = 8;
+				tabwidth = ((tabwidth == 8) ? 4 : 8);
 				redraw_page (group->name, respnum);
 				break;
 
@@ -716,7 +712,8 @@ return_to_index:
 					redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPostponed:	/* post postponed article */
+			case iKeyPostponed:
+			case iKeyPostponed2:	/* post postponed article */
 				if (can_post) {
 					if (pickup_postponed_articles (FALSE, FALSE))
 						redraw_page (group->name, respnum);
@@ -839,18 +836,15 @@ show_note_page (
 	static char buf[HEADER_LEN];
 	t_bool below_sig;				/* are we in the signature? */
 	t_bool ctrl_L = FALSE;		/* form feed character detected */
-	t_bool first  = TRUE;
+	t_bool first = TRUE;
 
-	if (beginner_level)
-		lines = cLINES - (MINI_HELP_LINES - 1);
-	else
-		lines = cLINES;
+	lines = (beginner_level ? (cLINES - (MINI_HELP_LINES - 1)) : cLINES);
 
 	ClearScreen ();
 
 	note_line = 1;
 
-	if (note_page == 0) {
+	if (!note_page) {
 		buf2[0] = '\0';
 		doing_pgdn = FALSE;
 		show_first_header (respnum, group);
@@ -858,7 +852,7 @@ show_note_page (
 		show_cont_header (respnum);
 
 #ifdef HAVE_METAMAIL
-	if (note_page == 0 && *note_h.mimeversion && *note_h.contenttype
+	if (!note_page && *note_h.mimeversion && *note_h.contenttype
 		 && (!STRNCMPEQ("text/plain", note_h.contenttype, 10))
 		 && use_metamail) {
 		if (!ask_for_metamail || prompt_yn (cLINES, txt_use_mime, TRUE) == 1) {
@@ -948,15 +942,15 @@ print_a_line:
 		 */
 
 		if (in_headers
-			 && ( (!display_mime_header_asis && !show_all_headers)
-					|| (!display_mime_allheader_asis && show_all_headers) ) )  {
+			 && ((!display_mime_header_asis && !show_all_headers)
+					|| (!display_mime_allheader_asis && show_all_headers)))  {
 			/* check if it's a continuation header line */
-			if ( buf2[0] != ' ' && buf2[0] != '\t' ) {
+			if (buf2[0] != ' ' && buf2[0] != '\t') {
 				char header_name[80];
 				size_t header_name_len;
 				/* necessary, if there were only blanks in the header line, which
 					are stripped by strip_line (buf2) above */
-				if ( strstr(buf2, ": ") ) {
+				if (strstr (buf2, ": ")) {
 					header_name_len = strstr(buf2,": ")-buf2;
 					strncpy(header_name,buf2,header_name_len);
 					header_name[header_name_len]='\0';
@@ -1028,10 +1022,7 @@ print_a_line:
 		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 		StartInverse ();
 
-		if (arts[respnum].thread != -1)
-			my_fputs (txt_next_resp, stdout);
-		else
-			my_fputs (txt_last_resp, stdout);
+		my_fputs (((arts[respnum].thread != -1) ? txt_next_resp : txt_last_resp), stdout);
 
 		my_flush ();
 		EndInverse ();
@@ -1058,34 +1049,41 @@ print_a_line:
 #if defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON)
 static void
 show_mime_article (
-	FILE	*fp,
-	struct	t_article *art)
+	FILE *fp,
+	struct t_article *art)
 {
-	char	buf[PATH_LEN];
-	FILE	*mime_fp;
-	long	offset;
+	FILE *mime_fp;
+	char *mm;
+	char buf[PATH_LEN];
+	long offset;
 
-	Raw(FALSE);
+	EndWin();
 	offset = ftell (fp);
 	rewind (fp);
-	sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
-	mime_fp = popen (buf, "w");
+	if ((mm=getenv("METAMAIL")))
+		sprintf (buf, mm);
+	else
+		sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 
-	while (fgets (buf, sizeof (buf), fp) != 0)
-		my_fputs (buf, mime_fp);
+	if ((mime_fp = popen (buf, "w"))) {
+		while (fgets (buf, sizeof (buf), fp) != 0)
+			fputs (buf, mime_fp);
 
-	fflush (mime_fp);
-	pclose (mime_fp);
+		fflush (mime_fp);
+		pclose (mime_fp);
+	} else
+		info_message (txt_error_metamail_failed, strerror(errno));
+
 	note_end = TRUE;
 	Raw(TRUE);
+	InitWin ();
+	continue_prompt ();
+
 	fseek (fp, offset, SEEK_SET);	/* goto old position */
 	MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 	StartInverse ();
 
-	if (art->thread != -1)
-		my_fputs (txt_next_resp, stdout);
-	else
-		my_fputs (txt_last_resp, stdout);
+	my_fputs (((art->thread != -1) ? txt_next_resp : txt_last_resp), stdout);
 
 	my_flush ();
 	EndInverse ();
@@ -1200,19 +1198,13 @@ show_first_header (
 		my_fputs (buf, stdout);
 	}
 
-	if (note_h.subj[0])
-		strcpy (buf, note_h.subj);
-	else
-		strcpy (buf, arts[respnum].subject);
+	strcpy (buf, (*note_h.subj ? note_h.subj: arts[respnum].subject));
 
 	buf[RIGHT_POS - 5 - n] = '\0';
 
 	pos = ((cCOLS - (int) strlen (buf)) / 2) - 2;
 
-	if (pos > n)
-		MoveCursor (1, pos);
-	else
-		MoveCursor (1, n);
+	MoveCursor (1, ((pos > n) ? pos : n));
 
 	Convert2Printable (buf);
 
@@ -1229,7 +1221,7 @@ show_first_header (
 	if (whichresp)
 		my_printf (txt_resp_x_of_n, whichresp, x_resp);
 	else {
-		if (x_resp == 0)
+		if (!x_resp)
 			my_fputs (txt_no_resp, stdout);
 		else if (x_resp == 1)
 			my_fputs (txt_1_resp, stdout);
@@ -1345,30 +1337,18 @@ art_open (
 	struct t_article *art,
 	char *group_path)
 {
-	char buf[8192];
 	char *ptr;
-	int c;
-	int is_summary;
+	char buf[8192];
+	int c, is_summary;
 
 	art_close ();	/* just in case */
 
-	if (tex2iso_supported) {
-		tex2iso_article = iIsArtTexEncoded (art->artnum, group_path);
+	if ((tex2iso_article = (tex2iso_supported ? iIsArtTexEncoded (art->artnum, group_path) : FALSE)))
+		wait_message (0, txt_is_tex_ecoded);
 
-		if (tex2iso_article)
-			wait_message (0, txt_is_tex_ecoded);
-
-	} else
-		tex2iso_article = FALSE;
-
-	if ((note_fp = open_art_fp (group_path, art->artnum, art->lines))
-		 == (FILE *) 0) {
+	if ((note_fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0) {
 		note_page = ART_UNAVAILABLE;		/* Flag error for later */
-
-		if (tin_errno == 0)
-			return (ART_UNAVAILABLE);
-		else
-			return (ART_ABORT);
+		return ((tin_errno == 0) ? ART_UNAVAILABLE : ART_ABORT);
 	}
 
 	note_h.from[0] = '\0';
@@ -1462,7 +1442,7 @@ art_open (
 	/*
 	 * If Newsgroups is empty its a good bet the article is a mail article
 	 */
-	if (!note_h.newsgroups[0]) {
+	if (!*note_h.newsgroups) {
 		strcpy (note_h.newsgroups, group_path);
 		while ((ptr = strchr (note_h.newsgroups, '/')))
 			*ptr = '.';
@@ -1560,12 +1540,7 @@ show_last_page (void)
 	}
 
 	while (!note_end) {
-		note_line = 1;
-
-		if (note_page == 0)
-			note_line += 4;
-		else
-			note_line += 2;
+		note_line = (!note_page ? 5 : 3);
 
 		while (note_line < cLINES) {
 			if (fgets (buf, sizeof buf, note_fp) == 0) {

@@ -14,7 +14,7 @@
 #include "tin.h"
 #include "tcurses.h"
 
-#if USE_CURSES
+#ifdef USE_CURSES
 
 #define ReadCh cmdReadCh
 
@@ -35,9 +35,9 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 #include <iodef.h>
 #include <ssdef.h>
 #include <dvidef.h>
-#ifdef __GNUC__
-#include <sys$routines.h>
-#include <lib$routines.h>
+#ifdef __GNUC__ /* M.St. 22.01.98 */
+#include <vms/sys$routines.h>
+#include <vms/lib$routines.h>
 #endif
 #endif
 
@@ -60,7 +60,7 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 
 #ifdef HAVE_CONFIG_H
 
-#if HAVE_TERMIOS_H && HAVE_TCGETATTR && HAVE_TCSETATTR
+#if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR) && defined(HAVE_TCSETATTR)
 #	ifdef HAVE_IOCTL_H
 #		include <ioctl.h>
 #	else
@@ -74,12 +74,12 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 #	define USE_POSIX_TERMIOS 1
 #	define TTY struct termios
 #else
-#	if HAVE_TERMIO_H
+#	ifdef HAVE_TERMIO_H
 #		include <termio.h>
 #		define USE_TERMIO 1
 #		define TTY struct termio
 #	else
-#		if HAVE_SGTTY_H
+#		ifdef HAVE_SGTTY_H
 #			include <sgtty.h>
 #			define USE_SGTTY 1
 #			define TTY struct sgttyb
@@ -299,10 +299,10 @@ SetupScreen (void)
 	/*
 	 * kludge to workaround no inverse
 	 */
-	if (_setinverse == 0) {
+	if (!_setinverse) {
 		_setinverse = _setunderline;
 		_clearinverse = _clearunderline;
-		if (_setinverse == 0)
+		if (!_setinverse)
 			draw_arrow_mark = 1;
 	}
 #ifdef HAVE_COLOR
@@ -400,15 +400,7 @@ InitScreen (void)
 		_columns = COLS;
 	}
 #endif	/* M_OS2 */
-
-	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
-		my_fprintf(stderr, txt_screen_too_small, progname);
-		return (FALSE);
-	}
-
-	InitWin ();
-
-#ifdef VMS
+#ifdef VMS  /* moved from below InitWin () M.St. 22.01.98 */
 	{
 		int input_chan, status;
 		int item_code, eightbit;
@@ -481,6 +473,14 @@ InitScreen (void)
 #endif /* HAVE_IS_XTERM */
 	}
 #endif /* VMS */
+
+	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
+		my_fprintf(stderr, txt_screen_too_small, progname);
+		return (FALSE);
+	}
+
+	InitWin ();
+
 	Raw (FALSE);
 
 	return (TRUE);
@@ -501,8 +501,10 @@ ScreenSize (int *num_lines, int *num_columns)
 {
 #ifndef INDEX_DAEMON
 
-	if (_lines == 0) _lines = DEFAULT_LINES_ON_TERMINAL;
-	if (_columns == 0) _columns = DEFAULT_COLUMNS_ON_TERMINAL;
+	if (!_lines)
+		_lines = DEFAULT_LINES_ON_TERMINAL;
+	if (!_columns)
+		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
 
 	*num_lines = _lines - 1;		/* assume index from zero*/
 	*num_columns = _columns;		/* assume index from one */
@@ -730,7 +732,7 @@ ToggleInverse (void)
 {
 #ifndef INDEX_DAEMON
 
-	if (in_inverse == 0)
+	if (!in_inverse)
 		StartInverse();
 	else
 		EndInverse();
@@ -883,7 +885,7 @@ static int buflen = 0, bufp = 0;
 	int result;
 	unsigned char ch;
 
-	while (getscrsize || buflen == 0) {
+	while (getscrsize || !buflen) {
 PROFILE_OFF();
 		result = read (0, (char *)&buf[buflen], 1);
 PROFILE_ON();

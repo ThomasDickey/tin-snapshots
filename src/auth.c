@@ -103,10 +103,8 @@ authinfo_generic (void)
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
 #endif
 
-	if (!builtinauth)
-		return (invoke_cmd (authval));	/* TODO - is it possible that we should have drained server here ? */
-	else
-		return (get_respcode(NULL) == OK_AUTH);
+		/* TODO - is it possible that we should have drained server here ? */
+		return (builtinauth ? (get_respcode(NULL) == OK_AUTH) : invoke_cmd (authval));
 }
 
 /*

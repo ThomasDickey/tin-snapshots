@@ -363,10 +363,7 @@ save_art_to_file (
 	save[i].saved = TRUE;
 
 	if (filename == 0) {
-		if (is_mailbox)
-			sprintf (save_art_info, txt_saved_to_mailbox, get_first_savefile ());
-		else
-			sprintf (save_art_info, txt_art_saved_to, get_first_savefile ());
+		sprintf (save_art_info, (is_mailbox ? txt_saved_to_mailbox : txt_art_saved_to), get_first_savefile ());
 		info_message (save_art_info);
 	}
 
@@ -472,16 +469,13 @@ save_regex_arts (
 		}
 	}
 
-	if (!num_save)
-		info_message (txt_no_match);
-	else {
+	if (num_save) {
 		if (is_mailbox)
 			sprintf (buf, txt_saved_to_mailbox, get_first_savefile ());
 		else
 			sprintf (buf, txt_saved_pattern_to, get_first_savefile (), get_last_savefile ());
-		info_message (buf);
 	}
-
+	info_message (num_save ? buf : txt_no_match);
 	return ret_code;
 }
 #endif /* !INDEX_DAEMON */
@@ -653,13 +647,7 @@ add_to_save_list (
 	}
 
 	if (is_mailbox) {
-		if ((int) strlen (path) > 1) {
-			if (path[0] == '=')
-				my_strncpy (file, path+1, sizeof (file));
-			else
-				my_strncpy (file, path, sizeof (file));
-		} else
-			my_strncpy (file, glob_group, sizeof (file));
+		my_strncpy (file, ((strlen (path) > 1) ? ((path[0] == '=') ? (path+1) : path) : glob_group), sizeof (file));
 
 		i = my_group[cur_groupnum];
 		if (!strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
@@ -673,7 +661,7 @@ add_to_save_list (
 		save[num_save].dir = my_strdup (tmp);
 		save[num_save].file = my_strdup (file);
 	} else {
-		if (path[0]) {
+		if (*path) {
 #ifdef VMS
 #include "parse.h"
 			struct filespec *spec;
@@ -728,7 +716,7 @@ add_to_save_list (
 			dir[0] = 0;
 #endif
 
-		if (dir[0])
+		if (*dir)
 			save[num_save].dir = my_strdup (dir);
 		else {
 			i = my_group[cur_groupnum];
@@ -743,14 +731,7 @@ add_to_save_list (
 			save[num_save].dir = my_strdup (tmp);
 		}
 
-		if (file[0])
-			save[num_save].file = my_strdup (file);
-		else {
-			if (path[0])
-				save[num_save].file = my_strdup (path);
-			else
-				save[num_save].file = my_strdup (save[num_save].archive);
-		}
+		save[num_save].file = my_strdup (*file ? file : (*path ? path : save[num_save].archive));
 	}
 	num_save++;
 
@@ -1174,11 +1155,12 @@ uudecode_file (
 	char	*file_out_dir,
 	char	*file_out)
 {
-	char	buf[LEN];
-	char	*file, *ptr;
-	FILE	*fp_in;
-	int	i, file_size = 0;
-	struct	stat st;
+	FILE *fp_in;
+	char *file, *ptr;
+	char buf[LEN];
+	int i;
+	off_t	file_size = 0;
+	struct stat st;
 
 	wait_message (1, txt_uudecoding, file_out);
 
@@ -1195,7 +1177,7 @@ uudecode_file (
 			sh_format (buf, sizeof(buf), "%s %s", DEFAULT_SUM, file);
 			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
 				if (stat (file, &st) != -1)
-					file_size = (int) st.st_size;
+					file_size = st.st_size;
 				if (fgets (buf, sizeof (buf), fp_in) != 0) {
 					ptr = strchr (buf, '\n');
 					if (ptr != 0)
@@ -1204,7 +1186,7 @@ uudecode_file (
 				pclose (fp_in);
 				my_printf (txt_checksum_of_file, file);
 				my_flush ();
-				my_printf ("%s  %8d bytes" cCRLF cCRLF, buf, file_size);
+				my_printf ("%s  %8d bytes" cCRLF cCRLF, buf, (int)file_size);
 				my_flush ();
 			} else {
 				my_printf ("Cannot execute %s" cCRLF, buf);

@@ -156,10 +156,7 @@ my_strftime (
 			break;
 
 		case 'p':	/* am or pm based on 12-hour clock */
-			if (timeptr->tm_hour < 12)
-				strcpy(tbuf, ampm[0]);
-			else
-				strcpy(tbuf, ampm[1]);
+			strcpy(tbuf, ampm[((timeptr->tm_hour < 12) ? 0 : 1)]);
 			break;
 
 		case 'S':	/* second, 00 - 61 */

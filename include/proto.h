@@ -4,10 +4,10 @@
 /* active.c */
 extern int get_active_num (void);
 extern int group_flag (int ch);
-extern int match_group_list (char *group, char *group_list);
 extern int parse_active_line (char *line, long *max, long *min, char *moderated);
 extern int process_bogus(char *name);
 extern int resync_active_file (void);
+extern t_bool match_group_list (char *group, char *group_list);
 extern void create_save_active_file (void);
 extern void load_newnews_info (char *info);
 extern void read_news_active_file (void);
@@ -37,7 +37,7 @@ extern void write_attributes_file (char *file);
 #endif /* !INDEX_DAEMON && NNTP_ABLE */
 
 /* charset.c */
-extern int iIsArtTexEncoded (long art, char *group_path);
+extern t_bool iIsArtTexEncoded (long art, char *group_path);
 extern void Convert2Printable (char* buf);
 extern void ConvertBody2Printable (char* buf);
 extern void ConvertIso2Asc (char *iso, char *asc, int t);
@@ -166,7 +166,9 @@ extern void get_from_name (char *from_name, struct t_group *thisgrp);
 extern void get_user_info (char *user_name, char *full_name);
 
 /* init.c */
+#ifdef USE_INN_NNTPLIB
 extern char *GetConfigValue (const char *name);
+#endif
 extern int create_mail_save_dirs (void);
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 extern void init_selfinfo (void);
@@ -238,7 +240,6 @@ extern int get_initials (int respnum, char *s, int maxsize);
 extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
-extern int mail_check (void);
 extern int my_chdir (char *path);
 extern int my_isprint (int c);
 extern int my_mkdir (char *path, mode_t mode);
@@ -248,6 +249,7 @@ extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
 extern int untag_all_articles (void);
+extern t_bool mail_check (void);
 extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
@@ -301,7 +303,7 @@ extern void expand_bitmap (struct t_group *group, long min);
 extern void grp_mark_read (struct t_group *group, struct t_article *psArt);
 extern void grp_mark_unread (struct t_group *group);
 extern void parse_unread_arts (struct t_group *group);
-extern void read_newsrc (char *newsrc_file, int allgroups);
+extern void read_newsrc (char *newsrc_file, t_bool allgroups);
 extern void reset_newsrc (void);
 extern void subscribe (struct t_group *group, int sub_state);
 extern void thd_mark_read (struct t_group *group, long thread);
@@ -320,9 +322,8 @@ extern t_bool vWriteNewsrc (void);
 extern char *getserverbyfile (const char *file);
 extern char *get_server (char *string, int size);
 #ifdef DEBUG
-extern const char *nntp_respcode (int respcode);
-#endif
-extern int get_tcp_socket (char *machine, char *service, unsigned port);
+	extern const char *nntp_respcode (int respcode);
+#endif /* DEBUG */
 extern int server_init (char *machine, const char *service, int port, char *text);
 extern void close_server (void);
 extern void put_server (const char *string);
@@ -346,9 +347,9 @@ extern int get_respcode (char *);
 extern int nntp_open (void);
 extern int setup_hard_base (struct t_group *group, char *group_path);
 extern int stat_article (long art, char *group_path);
-extern void vGet1GrpArtInfo(struct t_group *grp);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
 extern void nntp_close (void);
+extern void vGet1GrpArtInfo(struct t_group *grp);
 extern void vGrpGetSubArtInfo (void);
 #ifdef HAVE_MH_MAIL_HANDLING
 	extern FILE *open_mail_active_fp (const char *mode);
@@ -385,6 +386,7 @@ extern int mail_to_someone (int respnum, char *address, int mail_to_poster, int 
 extern int post_article (char *group, int *posted_flag);
 extern int post_response (char *group, int respnum, int copy_text, int with_headers);
 extern int repost_article (char *group, struct t_article *art, int respnum, int supersede);
+extern int reread_active_file (void);
 extern int reread_active_after_posting (void);
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
@@ -499,9 +501,6 @@ extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);
 extern int set_win_size (int *num_lines, int *num_cols);
 extern void _CDECL signal_handler (SIG_ARGS);
 extern void handle_resize (int repaint);
-extern void set_alarm_clock_off (void);
-extern void set_alarm_clock_on (void);
-extern void set_alarm_signal (void);
 extern void set_signal_catcher (int flag);
 extern void set_signal_handlers (void);
 extern void set_signals_art (void);

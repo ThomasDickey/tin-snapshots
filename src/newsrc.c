@@ -45,13 +45,12 @@ static void print_bitmap_seq (FILE *fp, struct t_group *group);
 void
 read_newsrc (
 	char *newsrc_file,
-	int allgroups)
+	t_bool allgroups)
 {
 	FILE *fp;
 	char *grp, *seq;
 	char buf[HEADER_LEN];
-	int sub;
-	int i;
+	int sub, i;
 	struct stat statbuf;
 
 	if (allgroups)
@@ -153,10 +152,17 @@ vWriteNewsrc (void)
 	char *line;
 	char buf[HEADER_LEN];
 	int tot = 0;
+	struct stat note_stat_newsrc;
 	t_bool write_ok = FALSE;
 
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
 		return write_ok;
+
+	/* get size of original newsrc */
+	fstat (fileno(fp_ip), &note_stat_newsrc);
+
+	if (!note_stat_newsrc.st_size)
+		return TRUE; /* newsrc is empty */
 
 	if ((fp_op = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
 		if (newsrc_mode)
@@ -177,7 +183,7 @@ vWriteNewsrc (void)
 
 	fclose (fp_ip);
 
-	if (tot == 0) {
+	if (!tot) {
 		error_message (txt_newsrc_nogroups);
 		return TRUE;		/* So we don't get prompted to try again */
 	}
@@ -581,10 +587,7 @@ parse_bitmap_seq (
 		if (high > group->xmax)
 			high = group->xmax;
 
-		if (low <= 1)
-			min = high + 1;
-		else
-			min = 1;
+		min = ((low <= 1) ? (high + 1) : 1);
 
 		if (group->xmin > min)
 			min = group->xmin;
@@ -641,12 +644,8 @@ wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
 	if (gotseq) {
 		if (group->xmax > high)
 			sum += group->xmax - high;
-	} else {
-		if (group->count >= 0)
-			sum = (int) group->count;
-		else
-			sum = (int) (group->xmax - group->xmin) + 1;
-	}
+	} else
+		sum = (int) ((group->count >= 0) ? group->count : ((group->xmax - group->xmin) + 1));
 
 	group->newsrc.num_unread = sum;
 #ifdef DEBUG_NEWSRC
@@ -1165,7 +1164,7 @@ expand_bitmap (
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
 		group->newsrc.xmin = group->newsrc.xmax + 1;
 
-	if (min == 0)
+	if (!min)
 		first = min = group->newsrc.xmin;
 	else if (min >= group->newsrc.xmin)
 		first = group->newsrc.xmin;
@@ -1255,7 +1254,7 @@ art_mark_read (
 			debug_print_bitmap (group, art);
 #endif
 		}
-		if ((art->status  == ART_UNREAD) || (art->status == ART_WILL_RETURN)) {
+		if ((art->status == ART_UNREAD) || (art->status == ART_WILL_RETURN)) {
 			art_mark_xref_read (art);
 
 			if (group != (struct t_group *) 0 && group->newsrc.num_unread)

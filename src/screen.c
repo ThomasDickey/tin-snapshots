@@ -17,7 +17,7 @@
 
 char msg[LEN];
 
-#if !USE_CURSES
+#ifndef USE_CURSES
 	struct t_screen *screen;
 #endif
 
@@ -134,7 +134,7 @@ perror_message (const char *fmt, ...)
 #				define sys_errlist	__sys_errlist
 #			endif
 #		else
-#			if DECL_SYS_ERRLIST
+#			ifdef DECL_SYS_ERRLIST
 				extern char *sys_errlist[];
 #			endif
 #		endif
@@ -181,7 +181,7 @@ clear_message (void)
 		MoveCursor (cLINES, 0);
 		CleartoEOLN ();
 		cursoroff ();
-#if !USE_CURSES
+#ifndef USE_CURSES
 		my_flush();
 #endif
 	}
@@ -241,12 +241,12 @@ draw_arrow (
 	if (draw_arrow_mark)
 		my_fputs ("->", stdout);
 	else {
-#if USE_CURSES
+#ifdef USE_CURSES
 		char buffer[BUFSIZ];
 		char *s = screen_contents(line, 0, buffer);
 #else
 		char *s = screen[line-INDEX_TOP].col;
-#endif
+#endif /* USE_CURSES */
 		StartInverse ();
 		my_fputs (s, stdout);
 		EndInverse ();
@@ -264,12 +264,12 @@ erase_arrow (
 	if (draw_arrow_mark)
 		my_fputs ("  ", stdout);
 	else {
-#if USE_CURSES
+#ifdef USE_CURSES
 		char buffer[BUFSIZ];
 		char *s = screen_contents(line, 0, buffer);
 #else
 		char *s = screen[line-INDEX_TOP].col;
-#endif
+#endif /* USE_CURSES */
 		EndInverse ();
 		my_fputs (s, stdout);
 	}
@@ -288,10 +288,8 @@ show_title (
 #ifdef HAVE_COLOR
 		fcol(col_title);
 #endif
-		if (mail_check ())		/* you have mail message in */
-			my_fputs (txt_you_have_mail, stdout);
-		else
-			my_fputs (txt_type_h_for_help, stdout);
+		/* you have mail message in */
+		my_fputs ((mail_check () ? txt_you_have_mail : txt_type_h_for_help) , stdout);
 
 #ifdef HAVE_COLOR
 		fcol(col_normal);
@@ -304,14 +302,14 @@ show_title (
 void
 ring_bell (void)
 {
-#if USE_CURSES
+#ifdef USE_CURSES
 	if (!cmd_line)
 		beep();
 	else {
 #endif
 	my_fputc ('\007', stdout);
 	my_flush();
-#if USE_CURSES
+#ifdef USE_CURSES
 	}
 #endif
 }
@@ -321,7 +319,7 @@ void
 spin_cursor (void)
 {
 	static const char *buf = "|/-\\|/-\\";
-	static int i = 0;
+	static unsigned char i = 0;
 
 	if (batch_mode)
 		return;
@@ -429,7 +427,7 @@ perror_message (
 #				define sys_errlist	__sys_errlist
 #			endif
 #		else
-#			if DECL_SYS_ERRLIST
+#			ifdef DECL_SYS_ERRLIST
 				extern char *sys_errlist[];
 #			endif
 #		endif

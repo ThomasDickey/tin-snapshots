@@ -18,23 +18,33 @@
 #include "tcurses.h"
 #include "tnntp.h"
 
+#ifdef VMS  /* M.St. 15.01.98 */
+#	undef VMS
+#endif
+
 /* Copy of last NNTP command sent, so we can retry it if needed */
 char	last_put[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
 	TCP *nntp_rd_fp = NULL;
 	TCP *nntp_wr_fp = NULL;
-	TCP *nntp_rd_fp_real = NULL;
-	TCP *nntp_wr_fp_real = NULL;
 #endif
+
+/*
+ * local prototypes
+ */
+#ifdef NNTP_ABLE
+	static int get_tcp_socket (char *machine, char *service, unsigned port);
+#endif
+
 
 /* Close the NNTP connection with prejudice */
 #define NNTP_HARD_CLOSE					\
-	if (nntp_wr_fp_real)						\
-		s_fclose (nntp_wr_fp_real);			\
-	if (nntp_rd_fp_real)						\
-		s_fclose (nntp_rd_fp_real);			\
-	nntp_rd_fp_real = nntp_wr_fp_real = nntp_rd_fp = nntp_wr_fp = NULL;
+	if (nntp_wr_fp)						\
+		s_fclose (nntp_wr_fp);			\
+	if (nntp_rd_fp)						\
+		s_fclose (nntp_rd_fp);			\
+	nntp_rd_fp = nntp_wr_fp = NULL;
 
 /*
  * getserverbyfile(file)
@@ -110,10 +120,17 @@ getserverbyfile (
 		}
 	}
 
+#ifdef USE_INN_NNTPLIB
 	if ((cp = GetConfigValue (_CONF_SERVER)) != (char *) 0) {
-		(void) strcpy (buf, cp);
+		(void) STRCPY(buf, cp);
 		return (buf);
 	}
+#endif /* USE_INN_NNTPLIB */
+
+#ifdef NNTP_DEFAULT_SERVER
+	if (*(NNTP_DEFAULT_SERVER))
+		return NNTP_DEFAULT_SERVER;
+#endif	/* NNTP_DEFAULT_SERVER */
 
 #endif /* NNTP_ABLE */
 	return (char *) 0;	/* No entry */
@@ -143,13 +160,13 @@ server_init (
 	int port,
 	char *text)
 {
-	char *	service = (char *)cservice; /* but calls non-const funcs */
+	char *service = (char *)cservice; /* but calls non-const funcs */
 #ifndef VMS
 	int	sockt_rd, sockt_wr;
 #endif
 
 #if defined (M_AMIGA) || defined(WIN32)
-	if (s_init() == 0)                /* some initialisation ... */
+	if (!s_init())		/* some initialisation ... */
 		return -1;
 #endif
 
@@ -161,9 +178,8 @@ server_init (
 	if (cp && cp[1] == ':') {
 		*cp = '\0';
 		sockt_rd = get_dnet_socket (machine, service);
-	} else {
+	} else
 		sockt_rd = get_tcp_socket (machine, service, port);
-	}
 #else
 	sockt_rd = get_tcp_socket (machine, service, port);
 #endif
@@ -178,10 +194,7 @@ server_init (
 	 * open a fp for reading and writing -- we have to open
 	 * up two separate fp's, one for reading, one for writing.
 	 */
-
-	nntp_rd_fp = nntp_wr_fp = NULL;
-
-	if ((nntp_rd_fp_real = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
+	if ((nntp_rd_fp = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
 		perror ("server_init: fdopen #1");
 		return (-errno);
 	}
@@ -194,17 +207,16 @@ server_init (
 #ifdef TLI
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
 		t_error ("server_init: t_sync");
+		nntp_rd_fp = NULL;		/* from above */
 		return (-EPROTO);
 	}
 #endif
 
-	if ((nntp_wr_fp_real = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
+	if ((nntp_wr_fp = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
 		perror ("server_init: fdopen #2");
+		nntp_rd_fp = NULL;		/* from above */
 		return (-errno);
 	}
-
-	nntp_rd_fp = stdin;      /* we shouldn't ever use those */
-	nntp_wr_fp = stdout;     /* and it will be obvious if we try */
 #else /* VMS */
 	sockt_wr = sockt_rd;
 #endif
@@ -234,7 +246,7 @@ server_init (
  */
 
 #ifdef NNTP_ABLE
-int
+static int
 get_tcp_socket (
 	char *machine,		/* remote host */
 	char *service,		/* nttp/smtp etc. */
@@ -312,7 +324,7 @@ get_tcp_socket (
 		return (-EPROTO);
 	}
 
-	if (ioctl (s,  I_PUSH, "tirdwr") < 0) {
+	if (ioctl (s, I_PUSH, "tirdwr") < 0) {
 		perror ("I_PUSH(tirdwr)");
 		t_close (s);
 		return (-EPROTO);
@@ -562,7 +574,7 @@ void
 u_put_server (
 	const char *string)
 {
-	s_puts(string, nntp_wr_fp_real);
+	s_puts(string, nntp_wr_fp);
 }
 #endif
 
@@ -617,8 +629,8 @@ DEBUG_IO((stderr, "put_server(%s)\n", string));
 			 * Don't use nntp_command() here - this is a lower level
 			 */
 fprintf(stderr, "Timeout - sending STAT\n");
-			s_printf (nntp_wr_fp_real, "STAT\r\n");
-			s_flush (nntp_wr_fp_real);
+			s_printf (nntp_wr_fp, "STAT\r\n");
+			s_flush (nntp_wr_fp);
 			respcode = get_respcode (NULL);
 
 			if (respcode == -1) {
@@ -638,8 +650,8 @@ fprintf(stderr, "Timeout - sending STAT\n");
 
 #endif /* 0 */
 
-	s_printf (nntp_wr_fp_real, "%s\r\n", string);
-	(void) s_flush (nntp_wr_fp_real);
+	s_printf (nntp_wr_fp, "%s\r\n", string);
+	(void) s_flush (nntp_wr_fp);
 
 	return;
 }
@@ -673,7 +685,7 @@ DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 
 	strcpy (buf, last_put);			/* Keep copy here, it will be clobbered a lot otherwise */
 
-	if (nntp_open () == 0) {
+	if (!nntp_open ()) {
 
 		/*
 		 * Re-establish our current group and resend last command
@@ -682,7 +694,7 @@ DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 DEBUG_IO((stderr, "Rejoin current group\n"));
 			sprintf (last_put, "GROUP %s", glob_group);
 			put_server (last_put);
-			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp_real);
+			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
 DEBUG_IO((stderr, "Read (%s)\n", last_put));
 		}
 DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
@@ -721,12 +733,13 @@ get_server (
 	/*
 	 * NULL socket reads indicates socket has closed. Try a few times more
 	 */
-	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp_real) == (char *) 0) {
+	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 
 #ifdef DEBUG
 		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
 			perror_message("get_server()");
 #endif
+
 		retry = reconnect(retry);			/* Will abort when out of tries */
 	}
 
@@ -757,10 +770,10 @@ close_server (void)
 	info_message("Disconnecting from server...");
 	nntp_command("QUIT", OK_GOODBYE, NULL);
 
-	(void) s_fclose (nntp_wr_fp_real);
-	(void) s_fclose (nntp_rd_fp_real);
+	(void) s_fclose (nntp_wr_fp);
+	(void) s_fclose (nntp_rd_fp);
 	s_end();
-	nntp_wr_fp_real = nntp_rd_fp_real = nntp_wr_fp = nntp_rd_fp = NULL;
+	nntp_wr_fp = nntp_rd_fp = NULL;
 }
 #endif /* NNTP_ABLE */
 #endif /* VMS */

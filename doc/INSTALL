@@ -17,7 +17,7 @@ This following configure options and defines are documented in detail:
   --enable-nntp		     --with-pgp
   --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
   --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
-  --with-inews-dir	     DONT_REREAD_ACTIVE_FILE
+  --with-inews-dir
 
 
 News machine names
@@ -49,7 +49,7 @@ do we ? :-)
 
 Tin can be compiled to read news in any of the following ways:
 
-  o  locally from your machines news spool dir (default /usr/spool/news).
+  o  locally from your machines news spool dir (default /var/spool/news).
 
   o  locally and remotely via NNTP (rtin or tin -r option) (--enable-nntp).
 
@@ -165,7 +165,7 @@ Define if news software is not in /usr/lib/news.
 (only needed if not running --enable-nntp-only)
 
 --with-spooldir=PATH
-Define if news articles are not in /usr/spool/news.
+Define if news articles are not in /var/spool/news.
 (only needed if not running --enable-nntp-only)
 
 --with-nov-dir=PATH
@@ -301,11 +301,6 @@ try --disable-locale, otherwise you won't see any 8-bit-characters.
 DONT_HAVE_PIPING
 Define if your system does not support piping of articles to shell commands.
 
-DONT_REREAD_ACTIVE_FILE
-Define if you do not want the active file to be reread periodically.
-The reread period can be set in seconds by setting the tinrc variable
-'reread_active_file_secs='
-
 HAVE_FASCIST_NEWSADMIN
 Define if you want users articles to be posted to groups that your site
 receives.  This will change the warning that a group that the user is
@@ -341,7 +336,8 @@ reclaimed.
 Compiled & installed on the following machines:
 -----------------------------------------------
 
-1)	i486 & Linux 1.2.13 with gcc 2.7.0
+1)	i486 & Linux 0.99.14w with gcc  2.5.7
+	i486 & Linux 1.2.13 with gcc 2.7.0
 	i486 & Linux 2.0.33 with gcc 2.7.2.2
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
@@ -386,8 +382,9 @@ Compiled & installed on the following machines:
 	Sun 3/60 & NetBSD 1.2G with gcc 2.7.2.2
 
 10)	i386 & FreeBSD 2.1.0 with 2.7.2
+	i586 & FreeBSD 3.0-SNAP-971208 with 2.7.2.1
 
-11)	IBM PowerPC RS6000/40p & AIX 4.1.5.0 with gcc 2.7.2.2
+11)	IBM PowerPC RS6000/40p & AIX 4.1.5.0 with gcc 2.8.0
 	IBM 7012/320H & AIX 3.2 with gcc 2.3.3
 
 12)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
@@ -404,3 +401,6 @@ Compiled & installed on the following machines:
 	with Motorola Configurable C Compilation System (CCCS) 1.0
 
 17)	Amiga 4000 & AmigaOS 3.0 with SAS/C 6.57
+
+18)	OpenVMS/Alpha 6.2, DEC C V5.0-003,                  SOCKETSHR_TCP
+	OpenVMS/Vax   5.3, GCC 2.7.2 (Pat Ranking edition), SOCKETSHR_TCP

@@ -153,6 +153,9 @@ extern int select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
 #ifdef DECL_SETEGID
 extern int setegid (gid_t);
 #endif
+#ifdef DECL_SETENV
+extern int setenv (const char *, const char *, int);
+#endif
 #ifdef DECL_SETEUID
 extern int seteuid (uid_t);
 #endif
@@ -161,7 +164,7 @@ extern int seteuid (uid_t);
 extern pid_t setpgrp (void);
 #else
 extern int setpgrp (int, int);
-#endif
+#endif /* SETPGRP_VOID */
 #endif /* DECL_SETPGRP */
 #ifdef DECL_SETREGID
 extern int setregid (gid_t, gid_t);
@@ -306,6 +309,7 @@ extern char homedir[PATH_LEN];
 extern char index_maildir[PATH_LEN];
 extern char index_newsdir[PATH_LEN];
 extern char index_savedir[PATH_LEN];
+extern char inewsdir[PATH_LEN];
 extern char last_put[];
 extern char libdir[PATH_LEN];
 extern char local_attributes_file[PATH_LEN];
@@ -331,6 +335,7 @@ extern char news_quote_format[PATH_LEN];
 extern char newsgroups_file[PATH_LEN];
 extern char newsrc[PATH_LEN];
 extern char novrootdir[PATH_LEN];
+extern char novfilename[PATH_LEN];
 extern char page_header[LEN];
 extern char post_proc_command[PATH_LEN];
 extern char posted_info_file[PATH_LEN];
@@ -464,6 +469,7 @@ extern constext txt_error_no_enter_permission[];
 extern constext txt_error_no_read_permission[];
 extern constext txt_error_no_such_file[];
 extern constext txt_error_no_write_permission[];
+extern constext txt_error_metamail_failed[];
 extern constext txt_error_sender_in_header_not_allowed[];
 extern constext txt_external_mail_done[];
 extern constext txt_extracting_archive[];
@@ -1158,7 +1164,6 @@ extern int process_id;
 extern int real_gid;
 extern int real_uid;
 extern int real_umask;
-extern int reread_active_file;
 extern int reread_active_file_secs;
 extern int show_subject;
 extern int space_mode;
@@ -1224,6 +1229,7 @@ extern t_bool delete_index_file;
 extern t_bool display_mime_header_asis;
 extern t_bool display_mime_allheader_asis;
 extern t_bool draw_arrow_mark;
+extern t_bool force_reread_active_file;
 extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;
 extern t_bool got_sig_pipe;
@@ -1313,25 +1319,45 @@ extern constext txt_opt_mail_address[];
 
 /* This fixes ambiguities on platforms that don't distinguish extern case */
 #ifdef CASE_PROBLEM
-#define txt_help_B	txt_help_BIGB
-#define txt_help_D	txt_help_BIGD
-#define txt_help_I	txt_help_BIGI
-#define txt_help_K	txt_help_BIGK
-#define txt_help_L	txt_help_BIGL
-#define txt_help_M	txt_help_BIGM
-#define txt_help_S	txt_help_BIGS
-#define txt_help_T	txt_help_BIGT
-#define txt_help_U	txt_help_BIGU
-#define txt_help_W	txt_help_BIGW
-#define txt_help_X	txt_help_BIGX
-#define txt_help_p_S	txt_help_p_BIGS
-#define txt_help_t_K	txt_help_t_BIGK
+#	define txt_help_B	txt_help_BIGB
+#	define txt_help_D	txt_help_BIGD
+#	define txt_help_I	txt_help_BIGI
+#	define txt_help_K	txt_help_BIGK
+#	define txt_help_L	txt_help_BIGL
+#	define txt_help_M	txt_help_BIGM
+#	define txt_help_S	txt_help_BIGS
+#	define txt_help_T	txt_help_BIGT
+#	define txt_help_U	txt_help_BIGU
+#	define txt_help_W	txt_help_BIGW
+#	define txt_help_X	txt_help_BIGX
+#	define txt_help_p_S	txt_help_p_BIGS
+#	define txt_help_t_K	txt_help_t_BIGK
+#endif
+
+#ifdef VMS /* M.St. 15.01.98 */
+	extern constext txt_help_BIGB[];
+	extern constext txt_help_BIGD[];
+	extern constext txt_help_BIGI[];
+	extern constext txt_help_BIGK[];
+	extern constext txt_help_BIGL[];
+	extern constext txt_help_BIGM[];
+	extern constext txt_help_BIGS[];
+	extern constext txt_help_BIGT[];
+	extern constext txt_help_BIGU[];
+	extern constext txt_help_BIGW[];
+	extern constext txt_help_BIGX[];
+	extern constext txt_help_p_BIGS[];
+	extern constext txt_help_t_BIGK[];
 #endif
 
 #ifndef DONT_HAVE_PIPING
 	extern constext txt_pipe_to_command[];
 	extern constext txt_piping[];
 #else
+#	ifdef VMS /* M.St. 15.01.98 */
+		extern constext txt_pipe_to_command[];
+		extern constext txt_piping[];
+#	endif
 	extern constext txt_piping_not_enabled[];
 #endif /* DONT_HAVE_PIPING */
 

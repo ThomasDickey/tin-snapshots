@@ -14,10 +14,10 @@
 
 #ifdef WIN32
 
-#	define	s_printf
-#	define	s_flush
-#	define	s_puts
-#	define	s_end()
+#define	s_printf
+#define	s_flush
+#define	s_puts
+#define	s_end()
 
 typedef struct {
 	int fd;
@@ -27,6 +27,6 @@ int s_init(void);
 TCP *s_fdopen(int s, const char *mode);
 void s_close(int s);
 int s_dup(int fd);
-char *s_gets(LPSTR nntp_line, DWORD length, TCP *tp);
+char *s_gets(LPSTR nntp_line, DWORD length, TCP * tp);
 
 #endif /* WIN32 */

@@ -174,7 +174,7 @@ get_mm_charset(
 {
 	char *c;
 
-	if (!mm_charset[0]) {
+	if (!*mm_charset) {
 		c = getenv("MM_CHARSET");
 		if (!c)
 			strcpy(mm_charset, MM_CHARSET);
@@ -298,12 +298,12 @@ do_b_encode(
 	t_bool isstruct_head)
 {
 
-	char tmp[60];					  /* strings to be B encoded */
-	int len8 = 0;					  /* the number of  trailing 8bit chars, which
-										     should be even(i.e. the first and second byte
-										     of wide_char should NOT be split into two
-										     encoded words) in order  to be compatible with
-										     some CJK mail client */
+	char tmp[60];				/* strings to be B encoded */
+	int len8 = 0;				/* the number of trailing 8bit chars, which
+									   should be even(i.e. the first and second byte
+									   of wide_char should NOT be split into two
+									   encoded words) in order  to be compatible with
+									   some CJK mail client */
 	char *t = tmp;
 
 	int count = max_ewsize / 4 * 3;
@@ -817,21 +817,21 @@ rfc15211522_encode(
 	if (!strcasecmp(mime_encoding, txt_7bit)) {
 		encoding = '7';
 
-/* For EUC-KR, 7bit means ISO-2022-KR encoding specified in RFC 1557 */
+/* For EUC-KR, 7bit means conversion to ISO-2022-KR  specified in RFC 1557 */
 
 		if (!strcasecmp(mm_charset, "euc-kr"))
 			body_encode = rfc1557_encode;
 
 /*
  * Not only EUC-JP but also other Japanese charsets such as
- * SJIS and JIS might need RFC 1468 encoding. To be confirmed.
+ * SJIS  might need RFC 1468 encoding. To be confirmed.
  */
 		else if (!strcasecmp(mm_charset, "euc-jp"))
 			body_encode = rfc1468_encode;
 
 /*
  * Not only  EUC-CN but also other Chinese charsets such as
- * BIG5 and Traditional might need RFC 1922 encoding. To be confirmed.
+ * BIG5 and EUC-TW might need RFC 1922 encoding. To be confirmed.
  */
 		else if (!strcasecmp(mm_charset, "euc-cn"))
 			body_encode = rfc1922_encode;

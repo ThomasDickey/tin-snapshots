@@ -152,10 +152,7 @@ group_page (
 			if (new_responses (i))
 				break;
 		}
-		if (i < top_base)
-			index_point = i;
-		else
-			index_point = top_base - 1;
+		index_point = ((i < top_base) ? i : (top_base - 1));
 	} else
 		index_point = top_base - 1;
 
@@ -366,10 +363,7 @@ sleep(3);
 			case iKeyGroupNextUnreadArtOrGrp:	/* goto next unread article/group */
 group_tab_pressed:
 				space_mode = TRUE;
-				if (index_point < 0)
-					n = -1;
-				else
-					n = next_unread ((int) base[index_point]);
+				n = ((index_point < 0) ? -1 : next_unread ((int) base[index_point]));
 				if (index_point < 0 || n < 0) {
 					for (i = cur_groupnum+1 ; i < group_top ; i++) {
 						if (active[my_group[i]].newsrc.num_unread > 0)
@@ -506,11 +500,7 @@ group_page_down:
 group_down:
 				if (!top_base)
 					break;
-
-				if (index_point + 1 >= top_base)
-					move_to_thread (0);
-				else
-					move_to_thread (index_point + 1);
+				move_to_thread ((index_point + 1 >= top_base) ? 0 : (index_point + 1));
 				break;
 
 			case iKeyUp:		/* line up */
@@ -518,11 +508,7 @@ group_down:
 group_up:
 				if (!top_base)
 					break;
-
-				if (index_point == 0)
-					move_to_thread (top_base - 1);
-				else
-					move_to_thread (index_point - 1);
+				move_to_thread ((index_point == 0) ? (top_base - 1) : (index_point - 1));
 				break;
 
 			case iKeyPageUp:		/* page up */
@@ -870,8 +856,7 @@ group_list_thread:
 
 				i = -1;
 				if (index_point >= 0) {
-					if (CURR_GROUP.attribute->show_only_unread ||
-					    new_responses (index_point)) {
+					if (CURR_GROUP.attribute->show_only_unread || new_responses (index_point)) {
 						i = base[index_point];
 					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
 						i = n;
@@ -994,7 +979,8 @@ group_list_thread:
 					show_group_page ();
 				break;
 
-			case iKeyPostponed:	/* post postponed article */
+			case iKeyPostponed:
+			case iKeyPostponed2:	/* post postponed article */
 				if (can_post) {
 					if (pickup_postponed_articles(FALSE, FALSE)) {
 						show_group_page ();
@@ -1449,10 +1435,7 @@ find_new_pos (
 		}
 	}
 
-	if (cur_pos < top_base)
-		return cur_pos;
-	else
-		return (top_base - 1);
+	return ((cur_pos < top_base)? cur_pos : (top_base - 1));
 }
 
 
@@ -1469,7 +1452,7 @@ mark_screen (
 		stow_cursor();
 		my_flush ();
 	} else {
-#if USE_CURSES
+#ifdef USE_CURSES
 		int y, x;
 		getyx(stdscr, y, x);
 		mvaddstr(INDEX_TOP + screen_row, screen_col, value);
@@ -1499,23 +1482,15 @@ set_subj_from_size (
 	 * This function is called early during startup when we only have
 	 * very limited information loaded.
 	 */
-	if (group_top && CURR_GROUP.attribute)
-		show_author = CURR_GROUP.attribute->show_author;
-	else
-		show_author = default_show_author;
-
-	if (show_author == SHOW_FROM_BOTH)
-		max_subj = (num_cols / 2) - 4;
-	else
-		max_subj = (num_cols / 2) + 3;
-
+	show_author = ((group_top && CURR_GROUP.attribute) ? CURR_GROUP.attribute->show_author : default_show_author);
+	max_subj = ((show_author == SHOW_FROM_BOTH) ? ((num_cols / 2) - 4): ((num_cols / 2) + 3));
 	max_from = (num_cols - max_subj) - 17;
 
 	if (show_author != SHOW_FROM_BOTH) {
 		if (max_from > 25) {
 			size = max_from - 25;
 			max_from = 25;
-			max_subj = max_subj + size;
+			max_subj += size;
 		}
 	}
 
@@ -1559,7 +1534,7 @@ static void
 bld_sline (
 	int i)
 {
-#if USE_CURSES
+#ifdef USE_CURSES
 	char buffer[BUFSIZ];	/* FIXME: allocate? */
 #else
 	char *buffer;
@@ -1580,21 +1555,17 @@ bld_sline (
 	/*
 	 * n is number of articles in this thread
 	 */
-	if (CURR_GROUP.attribute->show_only_unread)
-		n = sbuf.unread + sbuf.seen;
-	else
-		n = sbuf.total;
+	n = ((CURR_GROUP.attribute->show_only_unread) ? (sbuf.unread + sbuf.seen) : sbuf.total);
 	/*
 	 * if you like to see the number of responses excluding the fist
 	 *	art in thread - add the following:
 	 *	n--;
 	 */
 
-	if ((j = line_is_tagged(respnum))) {
+	if ((j = line_is_tagged(respnum)))
 		strcpy (new_resps, tin_itoa(j, 3));
-	} else {
+	else
 		sprintf (new_resps, "  %c", sbuf.art_mark);
-	}
 
 	/*
 	 * Find index of first unread in this thread
@@ -1607,22 +1578,19 @@ bld_sline (
 				char tmp_buffer[4];
 				strcpy (tmp_buffer, tin_itoa(n, 3));
 				sprintf (art_cnt, "%s %s ", tmp_buffer, tin_itoa(arts[j].lines, 4));
-			} else {
+			} else
 				sprintf (art_cnt, "%s    ? ", tin_itoa(n, 3));
-			}
 		} else {
-			if (arts[j].lines != -1) {
+			if (arts[j].lines != -1)
 				sprintf (art_cnt, "    %s ", tin_itoa(arts[j].lines, 4));
-			} else {
+			else
 				strcpy (art_cnt, "       ? ");
-			}
 		}
 	} else {
-		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
+		if (n > 1) /* change this to (n > 0) if you do a n-- above */
 			sprintf (art_cnt, "%s ", tin_itoa(n, 3));
-		} else {
+		else
 			strcpy (art_cnt, "    ");
-		}
 	}
 
 	if (CURR_GROUP.attribute->show_author != SHOW_FROM_NONE)
@@ -1632,7 +1600,7 @@ bld_sline (
 	j = INDEX2SNUM(i);
 	arts_sub[len_subj-5+1] = '\0';
 
-#if !USE_CURSES
+#ifndef USE_CURSES
 	buffer = screen[j].col;
 #endif
 	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
@@ -1668,7 +1636,7 @@ draw_sline (
 	int tlen;
 	int x = full ? 0 : 6;
 	int k = MARK_OFFSET;
-#if USE_CURSES
+#ifdef USE_CURSES
 	char buffer[BUFSIZ];
 	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
 #else
@@ -1681,9 +1649,9 @@ draw_sline (
 			CleartoEOLN ();
 		}
 		tlen = strlen (s);	/* notes new line length */
-	} else {
+	} else
 		tlen = 12; /* ??? */
-	}
+
 	MoveCursor (INDEX2LNUM(i), x);
 	if (tlen)
 		my_printf("%.*s", tlen, s);
@@ -1718,14 +1686,12 @@ show_group_title (
 	num = my_group[cur_groupnum];
 
 	if (active[num].attribute->show_only_unread) {
-		for (i = 0 ; i < top_base ; i++) {
+		for (i = 0 ; i < top_base ; i++)
 			art_cnt += new_responses (i);
-		}
 	} else {
 		for (i = 0 ; i < top ; i++) {
-			if (!IGNORE_ART(i)) {
+			if (!IGNORE_ART(i))
 				++art_cnt;
-			}
 		}
 	}
 

@@ -16,6 +16,15 @@
 #include	"tcurses.h"
 #include	"trace.h"
 
+
+#if defined (VMS) && defined (SIGBUS)
+	/*
+	 * SIGBUS works on VMS, but many useful information will be hidden
+	 * if catched by signal handler.
+	 */
+#	undef SIGBUS
+#endif
+
 /*
  * Needed for resizing under an xterm
  */
@@ -50,8 +59,6 @@
 #ifdef MINIX
 #	undef SIGTSTP
 #endif /* !MINIX */
-
-static unsigned int time_remaining;
 
 /*
  * local prototypes
@@ -193,13 +200,13 @@ handle_resize (int repaint)
 	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
 
 	if (repaint) {
-#if USE_CURSES
-#ifdef HAVE_RESIZETERM
+#ifdef USE_CURSES
+#	ifdef HAVE_RESIZETERM
 		resizeterm(cLINES+1, cCOLS+1);
-#else
+#	else
 		my_retouch();
-#endif
-#endif
+#	endif /* HAVE_RESIZETERM */
+#endif /* USE_CURSES */
 		switch (my_context) {
 		case cArt:
 			ClearScreen ();
@@ -262,12 +269,12 @@ handle_suspend (void)
 void _CDECL signal_handler (int sig)
 {
 #ifdef SIGCHLD
-#if HAVE_TYPE_UNIONWAIT
+#	ifdef HAVE_TYPE_UNIONWAIT
 	union wait wait_status;
-#else
+#	else
 	int wait_status = 1;
-#endif
-#endif
+#	endif /* HAVE_TYPE_UNIONWAIT */
+#endif /* SIGCHLD */
 
 	/* In this case statement, we handle only the non-fatal signals */
 	switch (sig) {
@@ -290,12 +297,6 @@ void _CDECL signal_handler (int sig)
 			return;
 #endif
 
-#if defined(SIGALRM) && !defined(DONT_REREAD_ACTIVE_FILE)
-		case SIGALRM:
-			set_alarm_signal ();
-			reread_active_file = TRUE;
-			return;
-#endif
 #ifdef SIGPIPE
 		case SIGPIPE:
 			got_sig_pipe = TRUE;
@@ -392,35 +393,6 @@ void set_signal_handlers (void)
 }
 
 
-void set_alarm_signal (void)
-{
-#ifndef DONT_REREAD_ACTIVE_FILE
-	(void) alarm (0);
-#if !defined(M_OS2) && !defined(WIN32) && !defined(M_AMIGA)
-	signal (SIGALRM, signal_handler);
-#endif
-	alarm (reread_active_file_secs);
-#endif
-	reread_active_file = FALSE;
-}
-
-
-void set_alarm_clock_on (void)
-{
-#ifndef DONT_REREAD_ACTIVE_FILE
-	alarm (time_remaining);
-#endif
-}
-
-
-void set_alarm_clock_off (void)
-{
-#ifndef DONT_REREAD_ACTIVE_FILE
-	time_remaining = alarm (0);
-#endif
-}
-
-
 int
 set_win_size (
 	int *num_lines,
@@ -439,7 +411,9 @@ set_win_size (
 	old_lines = *num_lines;
 	old_cols = *num_cols;
 
+#ifndef USE_CURSES
 	init_screen_array (FALSE);		/* deallocate screen array */
+#endif
 
 #ifdef TIOCGSIZE
 	if (ioctl (0, TIOCGSIZE, &win) == 0) {
@@ -449,38 +423,34 @@ set_win_size (
 			*num_cols = win.ts_cols;
 	}
 #else
-#  ifdef TIOCGWINSZ
+#	ifdef TIOCGWINSZ
 	if (ioctl (0, TIOCGWINSZ, &win) == 0) {
 		if (win.ws_row != 0)
 			*num_lines = win.ws_row - 1;
 		if (win.ws_col != 0)
 			*num_cols = win.ws_col;
 	}
-#  else
-#    ifdef M_AMIGA
+#	else
+#		ifdef M_AMIGA
 	AmiGetWinSize(num_lines, num_cols);
 	(*num_lines)--;
-#    endif
-#  endif
-#endif
+#		endif /* M_AMIGA */
+#	endif /* TIOCGWINSZ */
+#endif /* TIOCGSIZE */
 
+#ifndef USE_CURSES
 	init_screen_array (TRUE);		/* allocate screen array for resize */
+#endif
 
 	set_subj_from_size (*num_cols);
 
 	RIGHT_POS = *num_cols - 20;
 	MORE_POS  = *num_cols - 15;
-	if (beginner_level)
-		NOTESLINES = *num_lines - INDEX_TOP - MINI_HELP_LINES;
-	else
-		NOTESLINES = *num_lines - INDEX_TOP - 1;
+	NOTESLINES = *num_lines - INDEX_TOP - (beginner_level ? MINI_HELP_LINES : 1);
 	if (NOTESLINES <= 0)
 		NOTESLINES = 1;
 
-	if (*num_lines != old_lines || *num_cols != old_cols)
-		return TRUE;
-	else
-		return FALSE;
+	return (*num_lines != old_lines || *num_cols != old_cols);
 }
 
 void set_signals_art    (void) { my_context = cArt; }

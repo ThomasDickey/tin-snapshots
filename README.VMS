@@ -1,0 +1,74 @@
+WARNING, this is still a BETA release!
+It is still a work in progress and might not compile on all machines
+
+It has been installed on the following OpenVMS platforms:
+
+1) OpenVMS/Alpha 6.2, DEC C V5.0-003,                  SOCKETSHR_TCP
+2) OpenVMS/Vax   5.3, GCC 2.7.2 (Pat Ranking edition), SOCKETSHR_TCP
+
+Pre-Requisites:
+
+  This Tin version builds currently only against the SOCKETSHR shareable image.
+
+  SOCKETSHR provides a complete BSD compatible socket library.
+  It requires the NETLIB software to interface with the underlying TCP/IP
+  transport. NETLIB provides an interface to all available TCP/IP
+  transports for OpenVMS.
+
+  For building the image either MMS or MMK is required.
+
+  SOCKETSHR is freeware and available from:
+
+    http://alder.cc.kcl.ac.uk/fileserv/zip/socketshr_src_09d-5.zip
+    http://www.ifn.ing.tu-bs.de/ifn/sonst/socketshr.html
+    ftp://ftp2.kcl.ac.uk/zip/socketshr_src_09D-5.zip
+
+  NETLIB is freeware and available from:
+
+    http://alder.cc.kcl.ac.uk/fileserv/zip/netlib022.zip
+    http://www.madgoat.com/netlib.html
+    ftp://ftp2.kcl.ac.uk/zip/netlib022.zip
+
+  MMK is freeware and available from:
+
+    http://www.madgoat.com/mmk.html
+
+Quick Install:
+
+    $set def [.src]
+
+    On ALPHA:
+
+    $mms /macro=(alpha=1)
+
+    or on a VAX
+
+    $mms /macro=(vax=1)
+
+    or on a VAX with GCC
+
+    $mms /macro=(vax=1,gnuc=1)
+
+install with:
+
+    Define tin as a foreign command:
+
+    $tin :== $device:[dir.sub]tin.exe
+
+
+Install at your own risk.
+
+Please do NOT mail any bug-reports concerning THIS version to Iain Lea but
+to tin-bugs@tin.org. Before mailing a bug-report please check if you are
+using the latest release, and if not, please upgrade first! Have a look at
+the TODO file for known bugs. If you still think you found a bug, please use
+tins mail_bugreport function (shift-R) and write in english.
+
+The latest release is available at:
+<ftp://ftp.tin.org/pub/news/clients/tin/current/>
+or it's mirrors.
+
+If you have additional questions or like to be informed about the
+latest new features/version you may subscribe to the (developers)
+tin mailing lists; to subscribe write to majordomo@tin.org,asking
+in the body to: subscribe <listname> and/or read news.software.readers.

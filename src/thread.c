@@ -19,9 +19,13 @@
 #define INDEX2TNUM(i)	((i) % NOTESLINES)
 #define TNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(TNUM2LNUM(INDEX2TNUM(i)))
+#define EXPIRED(a) ((a)->article == ART_UNAVAILABLE || \
+		    arts[(a)->article].thread == ART_EXPIRED)
 
+#if 0 /* needed by old threading tree */
 /* String of spaces to use to show depth of threading */
 #define THREAD_SPACER		"  "
+#endif /* 0 */
 
 int thread_basenote = 0;
 int show_subject;
@@ -38,15 +42,16 @@ static int last_thread_on_screen = 0;
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
+static int find_unexpired (struct t_msgid *ptr);
+static int has_sibling (struct t_msgid *ptr);
+static int prompt_thread_num (int ch);
 static void bld_tline (int l, struct t_article *art);
 static void draw_tline (int i, int full);
-static int prompt_thread_num (int ch);
-static void update_thread_page (void);
 static void draw_thread_arrow (void);
 static void erase_thread_arrow (void);
 static void make_prefix (struct t_msgid *art, char *prefix);
-#endif
-
+static void update_thread_page (void);
+#endif /* !INDEX_DAEMON */
 
 /*
  * Build one line of the thread page display. Looks long winded, but
@@ -58,17 +63,15 @@ bld_tline (
 	int l,
 	struct t_article *art)
 {
-	int i;
-	int len_from;
 	char mark;
-#if USE_CURSES
+#ifdef USE_CURSES
 	char buff[BUFSIZ];
 #else
 	char *buff = screen[INDEX2TNUM(l)].col;
-#endif
-#if 0 /* not needed with mutt-like threading tree */
+#endif /* USE_CURSES */
+	int i;
+	int len_from;
 	struct t_msgid *ptr;
-#endif
 
 	/*
 	 * Start with space for ->
@@ -81,9 +84,9 @@ bld_tline (
 	/*
 	 * Add the article flags, tag number, or whatever (3 chars)
 	 */
-	if (art->tagged) {
+	if (art->tagged)
 		strcat (buff, tin_itoa(art->tagged, 3));
-	} else {
+	else {
 		strcat(buff, "   ");
 
 		if (art->inrange) {
@@ -110,12 +113,7 @@ bld_tline (
 	 */
 	if (show_lines) {
 		strcat (buff, "[");
-
-		if (art->lines != -1)
-			strcat (buff, tin_itoa(art->lines, 4));
-		else
-			strcat (buff, "   ?");
-
+		strcat (buff, ((art->lines != -1) ? tin_itoa(art->lines, 4): "   ?"));
 		strcat (buff, "]  ");
 	}
 
@@ -132,10 +130,7 @@ bld_tline (
 		 * TODO why the -3 ???
 		 * show_lines takes up 8 chars if enabled
 		 */
-		if (CURR_GROUP.attribute->show_author != SHOW_FROM_NONE)
-			len_from = (max_from - 3) + 8 * (1 - show_lines);
-		else
-			len_from = 0;
+		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - show_lines) : 0);
 
 #if 0 /* old insertion code, obsolete with mutt like threading tree */
 		/*
@@ -155,10 +150,8 @@ bld_tline (
 
 		make_prefix(art->refptr, buff+strlen(buff));
 
-		if ((int)strlen(buff) >= cCOLS) { /* If extremely nested */
-			WriteLine(INDEX2LNUM(l), buff);
-			return;
-		}
+		if ((int)strlen(buff) >= cCOLS) /* If extremely nested */
+			buff[cCOLS] = '\0';
 
 #if 0 /* see #if 0 above */
 		}
@@ -170,17 +163,15 @@ bld_tline (
 		i = cCOLS - strlen(buff) - len_from;
 
 		if (len_from)	/* Leave gap before author */
-			i=i-2;
+			i -= 2;
 		/*
 		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
 		 * Hide subject if same as parent's.
 		 */
 
 		if (i > 0) {
-			if (!(art->refptr->parent &&
-			  art->refptr->parent->article != ART_UNAVAILABLE &&
-			  arts[art->refptr->parent->article].subject ==
-			  art->subject))
+			for (ptr = art->refptr->parent; ptr && EXPIRED (ptr); ptr = ptr->parent);
+			if (!(ptr && arts[ptr->article].subject == art->subject))
 				strncat(buff, art->subject, i);
 
 			*(buff + strlen(buff)) = '\0';	/* Just in case */
@@ -233,12 +224,12 @@ draw_tline (
 	int tlen;
 	int x = full ? 0 : (MARK_OFFSET-2);
 	int k = MARK_OFFSET;
-#if USE_CURSES
+#ifdef USE_CURSES
 	char buffer[BUFSIZ];
 	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
 #else
 	char *s = &(screen[INDEX2TNUM(i)].col[x]);
-#endif
+#endif /* USE_CURSES */
 
 	if (full) {
 		if (strip_blanks) {
@@ -246,9 +237,8 @@ draw_tline (
 			CleartoEOLN ();
 		}
 		tlen = strlen (s);	/* note new line length */
-	} else {
+	} else
 		tlen = 3; /* tagged/mark is 3 chars wide */
-	}
 
 	MoveCursor(INDEX2LNUM(i), x);
 	if (tlen)
@@ -302,10 +292,7 @@ show_thread (
 	/*
 	 * If threading by Refs, it helps to see the subject line
 	 */
-	if ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts >= THREAD_REFS))
-		show_subject = TRUE;
-	else
-		show_subject = FALSE;
+	show_subject = ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts >= THREAD_REFS));
 
 	thread_index_point = top_thread;
 	if (space_mode) {
@@ -470,10 +457,7 @@ thread_read_article:
 			case iKeyThreadReadNextArtOrThread:
 thread_tab_pressed:
 				space_mode = TRUE;
-				if (thread_index_point == 0)
-					n = thread_respnum;
-				else
-					n = find_response (thread_basenote, thread_index_point);
+				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, thread_index_point));
 
 				for (i = n ; i != -1 ; i = arts[i].thread) {
 					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN)) {
@@ -556,10 +540,9 @@ thread_page_up:
 				clear_message ();
 				erase_thread_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				if ((n = thread_index_point % scroll_lines) > 0)
-					thread_index_point = thread_index_point - n;
-				else
-					thread_index_point = ((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines;
+
+				thread_index_point = (((n = thread_index_point % scroll_lines) > 0)? (thread_index_point - n) : (((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines));
+
 				if (thread_index_point < 0)
 					thread_index_point = 0;
 				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
@@ -699,10 +682,7 @@ thread_catchup:
 				n = find_response (thread_basenote, thread_index_point);
 				if (n < 0)
 					break;
-				if (ch == iKeyThreadToggleArtSel && arts[n].selected == 1)
-					flag = 0;
-				else
-					flag = 1;
+				flag = (!(ch == iKeyThreadToggleArtSel && arts[n].selected == 1));
 				arts[n].selected = flag;
 /*				update_thread_page (); */
 				bld_tline (thread_index_point, &arts[n]);
@@ -724,7 +704,8 @@ thread_catchup:
 				update_thread_page ();
 				break;
 
-			case iKeyPostponed:	/* post postponed article */
+			case iKeyPostponed:
+			case iKeyPostponed2:	/* post postponed article */
 				if (can_post) {
 					if (pickup_postponed_articles(FALSE, FALSE))
 						show_thread_page();
@@ -781,12 +762,8 @@ show_thread_page (void)
 		last_thread_on_screen = top_thread;
 		first_thread_on_screen = (top_thread / NOTESLINES) * NOTESLINES;
 
-		if (first_thread_on_screen == last_thread_on_screen || first_thread_on_screen < 0) {
-			if (first_thread_on_screen < 0)
-				first_thread_on_screen = 0;
-			else
-				first_thread_on_screen = last_thread_on_screen - NOTESLINES;
-		}
+		if (first_thread_on_screen == last_thread_on_screen || first_thread_on_screen < 0)
+			first_thread_on_screen = ((first_thread_on_screen < 0) ? 0 : last_thread_on_screen - NOTESLINES);
 	}
 
 	if (top_thread == 0) {
@@ -883,9 +860,9 @@ erase_thread_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
-	if (draw_arrow_mark) {
+	if (draw_arrow_mark)
 		my_fputs ("  ", stdout);
-	} else {
+	else {
 		HpGlitch(EndInverse ());
 		draw_tline (thread_index_point, TRUE);
 	}
@@ -1065,20 +1042,7 @@ stat_thread (
 #endif
 	}
 
-
-	if (sbuf->inrange)
-		sbuf->art_mark = art_marked_inrange;
-	else if (sbuf->deleted)
-		sbuf->art_mark = art_marked_deleted;
-	else if (sbuf->selected_unread)
-		sbuf->art_mark = art_marked_selected;
-	else if (sbuf->unread)
-		sbuf->art_mark = art_marked_unread;
-	else if (sbuf->seen)
-		sbuf->art_mark = art_marked_return;
-	else
-		sbuf->art_mark = ART_MARK_READ;
-
+	sbuf->art_mark = (sbuf->inrange ? art_marked_inrange : (sbuf->deleted ? art_marked_deleted : (sbuf->selected_unread ? art_marked_selected : (sbuf->unread ? art_marked_unread : (sbuf->seen ? art_marked_return : ART_MARK_READ)))));
 	return(sbuf->total);
 }
 
@@ -1162,9 +1126,8 @@ find_response (
 
 	j = (int) base[i];
 
-	while (n-- > 0 && arts[j].thread >= 0) {
+	while (n-- > 0 && arts[j].thread >= 0)
 		j = arts[j].thread;
-	}
 
 	return j;
 }
@@ -1237,6 +1200,26 @@ move_to_response (
 #endif /* INDEX_DAEMON */
 
 
+static int
+find_unexpired (
+	struct t_msgid *ptr)
+{
+	return ptr && (!EXPIRED (ptr) || find_unexpired (ptr->child) || find_unexpired (ptr->sibling));
+}
+
+static int
+has_sibling (
+	struct t_msgid *ptr)
+{
+	do {
+		if (find_unexpired (ptr->sibling))
+			return TRUE;
+		ptr = ptr->parent;
+	} while (ptr && EXPIRED (ptr));
+	return FALSE;
+}
+
+
 /*
  * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
  */
@@ -1250,7 +1233,7 @@ make_prefix (
 	int depth = 0;
 
 	for (ptr = art->parent; ptr; ptr = ptr->parent)
-		depth++;
+		depth += !EXPIRED (ptr);
 
 	if (depth == 0) {
 		prefix[0] = '\0';
@@ -1260,19 +1243,15 @@ make_prefix (
 	prefix_ptr = depth * 2 - 1;
 	strcpy (&prefix[prefix_ptr], "->");
 	prefix_ptr--;
-	if (art->sibling)
-		prefix[prefix_ptr] = '+';
-	else
-		prefix[prefix_ptr] = '`';
+	prefix[prefix_ptr] = (has_sibling (art) ? '+' : '`');
 
-	for (ptr = art->parent; ptr->parent; ptr = ptr->parent) {
+	for (ptr = art->parent; prefix_ptr != 0; ptr = ptr->parent) {
+		if (EXPIRED (ptr))
+			continue;
 		prefix_ptr--;
 		prefix[prefix_ptr] = ' ';
 		prefix_ptr--;
-		if (ptr->sibling)
-			prefix[prefix_ptr] = '|';
-		else
-			prefix[prefix_ptr] = ' ';
+		prefix[prefix_ptr] = (has_sibling (ptr) ? '|' : ' ');
 	}
 	return;
 }

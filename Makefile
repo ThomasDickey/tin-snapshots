@@ -8,7 +8,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 980117
+PVER		= 980202
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -18,17 +18,17 @@ INCDIR	= ./include
 OBJDIR	= ./src
 SRCDIR	= ./src
 AMGDIR	= ./amiga
-TOLDIR	= ./tools
+VMSDIR	= ./vms
 PCREDIR	= ./pcre
+TOLDIR	= ./tools
+OLDDIR	= ./old
 
 HFILES	= \
 	$(INCDIR)/bugrep.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
-	$(INCDIR)/msmail.h \
 	$(INCDIR)/nntplib.h \
-	$(INCDIR)/os_2.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tcurses.h \
@@ -36,8 +36,6 @@ HFILES	= \
 	$(INCDIR)/tnntp.h \
 	$(INCDIR)/trace.h \
 	$(INCDIR)/version.h \
-	$(INCDIR)/win32.h \
-	$(INCDIR)/win32tcp.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
@@ -67,14 +65,10 @@ CFILES	= \
 	$(SRCDIR)/makecfg.c \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
-	$(SRCDIR)/msmail.c \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
-	$(SRCDIR)/nntpw32.c \
-	$(SRCDIR)/nntpvms.c \
 	$(SRCDIR)/nrctbl.c \
 	$(SRCDIR)/open.c \
-	$(SRCDIR)/os_2.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
 	$(SRCDIR)/pgp.c \
@@ -97,10 +91,7 @@ CFILES	= \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/trace.c \
 	$(SRCDIR)/wildmat.c \
-	$(SRCDIR)/win32.c \
-	$(SRCDIR)/win32tcp.c \
-	$(SRCDIR)/xref.c \
-	$(SRCDIR)/vms.c
+	$(SRCDIR)/xref.c
 
 AMIGA	= \
 	$(AMGDIR)/README \
@@ -111,6 +102,30 @@ AMIGA	= \
 	$(AMGDIR)/amigatcp.c \
 	$(AMGDIR)/amiga.h \
 	$(AMGDIR)/amigatcp.h
+
+VMS	= \
+	$(VMSDIR)/dir.h \
+	$(VMSDIR)/filetypes.h \
+	$(VMSDIR)/getopt.c \
+	$(VMSDIR)/getopt.h \
+	$(VMSDIR)/getopt1.c \
+	$(VMSDIR)/getpass.c \
+	$(VMSDIR)/isxterm.c \
+	$(VMSDIR)/libvms.mms \
+	$(VMSDIR)/ndir.h \
+	$(VMSDIR)/parsdate.c \
+	$(VMSDIR)/parse.c \
+	$(VMSDIR)/parse.h \
+	$(VMSDIR)/pwd.h \
+	$(VMSDIR)/qsort.c \
+	$(VMSDIR)/select.h \
+	$(VMSDIR)/strings.h \
+	$(VMSDIR)/uaf.h \
+	$(VMSDIR)/vms.c \
+	$(VMSDIR)/vmsdir.c \
+	$(VMSDIR)/vmsfile.c \
+	$(VMSDIR)/vmspwd.c \
+	$(VMSDIR)/vmstimval.h
 
 DOC	= \
 	$(DOCDIR)/CHANGES \
@@ -124,9 +139,11 @@ DOC	= \
 	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/minimal-netkeeping \
 	$(DOCDIR)/umlaute.txt \
+	$(DOCDIR)/tin.defaults \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
 TOL	= \
+	$(TOLDIR)/metamutt \
 	$(TOLDIR)/tinpp \
 	$(TOLDIR)/expand_aliases.tgz
 
@@ -134,15 +151,16 @@ TOP	= \
 	$(TOPDIR)/Makefile \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
+	$(TOPDIR)/README.VMS \
 	$(TOPDIR)/aclocal.m4 \
+	$(TOPDIR)/conf-tin \
 	$(TOPDIR)/config.guess \
 	$(TOPDIR)/config.sub \
 	$(TOPDIR)/configure \
 	$(TOPDIR)/configure.in \
 	$(TOPDIR)/install.sh \
-	$(TOPDIR)/mkdirs.sh \
 	$(TOPDIR)/makefile.in \
-	$(TOPDIR)/conf-tin
+	$(TOPDIR)/mkdirs.sh
 
 PCRE	= \
 	$(PCREDIR)/ChangeLog \
@@ -169,31 +187,47 @@ PCRE	= \
 	$(PCREDIR)/testoutput \
 	$(PCREDIR)/testoutput2
 
-ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(PCRE) \
+OLD    = \
+	$(OLDDIR)/msmail.c \
+	$(OLDDIR)/nntpvms.c \
+	$(OLDDIR)/nntpw32.c \
+	$(OLDDIR)/os_2.c \
+	$(OLDDIR)/win32.c \
+	$(OLDDIR)/win32tcp.c \
+	$(OLDDIR)/msmail.h \
+	$(OLDDIR)/os_2.h \
+	$(OLDDIR)/win32.h \
+	$(OLDDIR)/win32tcp.h
+
+MISC	= \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
 	$(SRCDIR)/l1_next.tab \
 	$(SRCDIR)/next_l1.tab \
-	$(SRCDIR)/tincfg.tbl
+	$(SRCDIR)/tincfg.tbl \
+	$(SRCDIR)/descrip.mms \
+	$(PCREDIR)/pcre.mms
 
-ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(PCREDIR)
+ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(VMS) $(PCRE) $(MISC) $(OLD)
+
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(VMSDIR) $(PCREDIR) $(OLDDIR)
 
 # standard commands
-CD		= cd
-CHMOD		= chmod
-CP		= cp -p
-ECHO		= echo
-LS		= ls -l
-MAKE		= make
-MV		= mv
-NROFF		= groff -Tascii
-RM		= rm
-SHELL		= /bin/sh
-TAR		= gtar
-BZIP2		= bzip2
-WC		= wc
-SED		= sed
-TR		= tr
+CD	= cd
+CHMOD	= chmod
+CP	= cp -p
+ECHO	= echo
+LS	= ls -l
+MAKE	= make
+MV	= mv
+NROFF	= groff -Tascii
+RM	= rm
+SHELL	= /bin/sh
+TAR	= gtar
+BZIP2	= bzip2
+WC	= wc
+SED	= sed
+TR	= tr
 
 all:
 	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
@@ -251,8 +285,8 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh
-	@$(CHMOD) 755 $(TOLDIR)/tinpp $(PCREDIR)/perltest
+	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh ./mkdirs.sh
+	@$(CHMOD) 755 $(TOLDIR)/tinpp $(TOLDIR)/metamutt $(PCREDIR)/perltest
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
@@ -299,7 +333,7 @@ dist:
 	@$(MAKE) tar
 
 version :
-	@$(ECHO) "TIN v$(VER)"
+	@$(ECHO) "TIN $(VER)"
 
 distclean:
 	@-$(MAKE) clean

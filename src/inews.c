@@ -25,18 +25,18 @@ static int submit_inews (char *name);
 
 #if 0
 #ifdef VMS
-#   ifdef MULTINET
+#	ifdef MULTINET
 #		define netwrite	socket_write
 #		include "multinet_root:[multinet.include]netdb.h"
-#   else
+#	else
 #		define netwrite	write
 #		include <netdb.h>
-#   endif
+#	endif
 #else
 #	ifdef HAVE_NETDB_H
 #		include	<netdb.h>
 #	endif
-#endif
+#endif /* VMS */
 
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -207,11 +207,11 @@ submit_news_file (
 #endif /* DEBUG */
 
 #ifdef M_UNIX
-#	ifdef INEWSDIR
-		strcpy (buf, INEWSDIR);
-		strcat (buf, "/");
-		cp += strlen (cp);
-#	endif /* INEWSDIR */
+		if (*inewsdir) {
+			strcpy (buf, inewsdir);
+			strcat (buf, "/");
+			cp += strlen (cp);
+		}
 		sh_format (cp, sizeof(buf) - (cp - buf), "inews -h < %s", name);
 #else
 		make_post_cmd (cp, name);

@@ -26,7 +26,7 @@ extern char * _nc_visbuf(const char *s);
 extern	char *_tracechar(int c);
 
 extern	void	_tracef ( const char *, ... )
-#if __GNUC__
+#if defined(__GNUC__)
 	__attribute__ ((format(printf,1,2)))
 #endif
 	;

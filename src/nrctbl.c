@@ -81,10 +81,7 @@ get_nntpserver (
 			}
 		}
 		fclose(fp);
-		if (found)
-			strcpy(nntpserver_name, name_found);
-		else
-			strcpy(nntpserver_name, nick_name);
+		strcpy(nntpserver_name, (found ? name_found : nick_name));
 	} else {
 		write_newsrctable_file();
 		strcpy(nntpserver_name, nick_name);
@@ -150,7 +147,8 @@ get_newsrcname (
 					joinpath (newsrc_name, homedir, tmp_newsrc);
 			}
 			(void) strcpy (dir, newsrc_name);
-			*strrchr (dir, '/') = (char) 0;
+			if (strchr (dir, '/'))
+				*strrchr (dir, '/') = (char) 0;
 
 			if (!error) {
 			/* FIXME - write a global permssion check routine */

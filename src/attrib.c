@@ -671,7 +671,7 @@ write_attributes_file (
 	fprintf (fp, "############################################################################\n\n");
 
 /*
- * some usefull defaults
+ * some useful defaults
  */
 	fprintf (fp, "# in *sources* set post process type to shar\n");
 	fprintf (fp, "scope=*sources*\n");

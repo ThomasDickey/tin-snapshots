@@ -31,8 +31,6 @@ prompt_num (
 	char *p;
 	int num;
 
-	set_alarm_clock_off ();
-
 	clear_message ();
 
 	sprintf (msg, "%c", ch);
@@ -44,8 +42,6 @@ prompt_num (
 		num = -1;
 
 	clear_message ();
-
-	set_alarm_clock_on ();
 
 	return (num);
 }
@@ -64,20 +60,16 @@ prompt_string (
 {
 	char *p;
 
-	set_alarm_clock_off ();
-
 	clear_message ();
 
 	if ((p = getline (prompt, FALSE, (char *) 0, 0, which_hist)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
-		set_alarm_clock_on ();
 		return FALSE;
 	}
 	strcpy (buf, p);
 
 	clear_message ();
-	set_alarm_clock_on ();
 
 	return TRUE;
 }
@@ -96,8 +88,6 @@ prompt_menu_string (
 {
 	char *p;
 
-	set_alarm_clock_off ();
-
 	/*
 	 * clear buffer - this is needed, otherwise a lost
 	 * connection right before a resync_active() call
@@ -107,13 +97,10 @@ prompt_menu_string (
 
 	MoveCursor (line, col);
 
-	if ((p = getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0) {
-		set_alarm_clock_on ();
+	if ((p = getline ("", FALSE, var, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
-	}
-	strcpy (var, p);
 
-	set_alarm_clock_on ();
+	strcpy (var, p);
 
 	return TRUE;
 }
@@ -135,7 +122,6 @@ prompt_yn (
 	int ch, prompt_ch;
 	int yn_loop = TRUE;
 
-	set_alarm_clock_off ();
 /*	fflush(stdin);*/		/* Prevent finger trouble from making important decisions */
 
 	while (yn_loop) {
@@ -189,15 +175,10 @@ prompt_yn (
 		clear_message ();
 	else {
 		MoveCursor (line, (int) strlen (prompt));
-		if (ch == ESC)
-			my_fputc (prompt_ch, stdout);
-		else
-			my_fputc (ch, stdout);
+		my_fputc (((ch == ESC) ? prompt_ch : ch), stdout);
 	}
 	cursoroff ();
 	my_flush ();
-
-	set_alarm_clock_on ();
 
 	return (tolower ((unsigned char)ch) == tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
@@ -226,11 +207,8 @@ prompt_list (
 	int adjust = (strcasecmp(list[0], txt_default) == 0);
 	size_t width = 0;
 
-	set_alarm_clock_off ();
-
-	var  += adjust;
+	var += adjust;
 	size += adjust;
-
 	var_orig = var;
 
 	/*
@@ -264,8 +242,6 @@ prompt_list (
 	}
 
 	cursoroff ();
-
-	set_alarm_clock_on ();
 
 	return(var - adjust);
 }
@@ -306,19 +282,14 @@ prompt_option_string (
 	char *p;
 	char *variable = OPT_STRING_list[option_table[option].var_index];
 
-	set_alarm_clock_off ();
-
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
-	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0) {
-		set_alarm_clock_on ();
+	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0)
 		return FALSE;
-	}
-	strcpy (variable, p);
 
-	set_alarm_clock_on ();
+	strcpy (variable, p);
 
 	return TRUE;
 }
@@ -343,8 +314,6 @@ prompt_option_num (
 	char *p;
 	int num;
 
-	set_alarm_clock_off ();
-
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
@@ -358,7 +327,6 @@ prompt_option_num (
 	*(option_table[option].variable) = num;
 
 	clear_message ();
-	set_alarm_clock_on ();
 
 	return TRUE;
 }
@@ -385,21 +353,16 @@ prompt_option_char (
 	input[0] = *variable;
 	input[1] = '\0';
 
-	set_alarm_clock_off ();
-
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
 
-	if ((p = getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0) {
-		set_alarm_clock_on ();
+	if ((p = getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0)
 		return FALSE;
-	}
 
 	*variable = p[0];
 
 	clear_message ();
-	set_alarm_clock_on ();
 
 	return TRUE;
 }
@@ -469,9 +432,7 @@ continue_prompt (void)
 {
 	int ch;
 
-	set_alarm_clock_off ();
-
-#if USE_CURSES
+#ifdef USE_CURSES
 	cmd_line = TRUE;
 #endif
 	info_message (txt_return_key);
@@ -490,10 +451,9 @@ continue_prompt (void)
 	}
 #endif /* !WIN32 */
 
-#if USE_CURSES
+#ifdef USE_CURSES
 	cmd_line = FALSE;
 	my_retouch();
-#endif
+#endif /* USE_CURSES */
 
-	set_alarm_clock_on ();
 }

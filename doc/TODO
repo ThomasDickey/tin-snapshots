@@ -66,6 +66,17 @@ o  'K' is still a bit inconsistent
    - in the article pager (page.c) it marks the whole current thread as read
      and jumps to the next unread article.
 
+o  'c' and 'C' are a bit inconsistent
+   - 'C' (captial c) catches up the current group and enters the next group
+      containing unread articles - this works at any level except the
+      thread display level where only the current thread is marked read;
+      no matter if using 'c' or 'C' - both do the same in the thread level.
+      'C' should enter the next thread containing unread articles or skip to
+      the next group, then we would need another key to catchup threads.
+    - 'c' (small c) catches up the current group and skips the pointer to
+      the next group - this works on any level except the pager where the
+      pointer stays at the current group.
+
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always
    have an effect.  This is because the Option-Menu in {group,page}.c
@@ -147,6 +158,7 @@ o  fix check_upgrade() (config.c)
 
 o  if using mailreader_i add In-Reply-To: header and rename Newsgroups:
    to X-Newsgroups (RFC 822 doesn't define a Newsgroups:-header)
+   [might be impossible]
 
 o  if using "-n" commandline switch you can't subscribe to newsgroups not
    present in your newsrc - a simple check against the server
@@ -210,6 +222,7 @@ o  Additions to the group menu :
 o  Additions to the thread menu :
 	'/','?' (search subject)
 	'B' (body search)
+        'D' (cancel article)
 	'M' (option menu)
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
@@ -234,6 +247,7 @@ o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
    store the differences from this.
    A key code to reset to the system defaults
    Maybe a file which could be used to force settings (eg inews & mailer)
+   (tin.defaults [--with-defaults-dir] is a start)
 
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the
@@ -297,12 +311,12 @@ o  add
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 
-o  move architecture dependent files to subdirectories, clean up architecture
-   independent files, rename several defines, remove useless doubled defines
+o  clean up architecture independent files, rename several defines,
+   remove useless doubled defines
 
 o  split tin.h/proto.h for better dependencies in make
 
-o  check where int/long/... should be replaced by size_t/uid_t/mode_t/...
+o  check where int/long/... should be replaced by size_t/uid_t/mode_t/off_t...
 
 o  join Makefile and makefile (not entirely possible)
 
@@ -317,19 +331,23 @@ o  remove annoying casts to (t_hashnode *)aptr in {art,refs}.c
 
 o  check where tin_done() should be called instead of using exit()
 
+o  check where STRCPY() should be used
+
 Docs/online help
 ----------------
 o  man page is still out dated and buggy
 
 o  error message when tin -uv and using xover is misleading
 
+o  tin.defaults is not mentioned in manpage/INSTALL
+
 Not yet classified
 ------------------
-o  tin in batchmode dumps core if getting a SIGINT, usefull?
+o  tin in batchmode dumps core if getting a SIGINT, useful?
 
 o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
    's' subscribes you to the curent group and does _not_ skip to the next
-       group (annoying wehen subscribing to multiple groups, but usefull
+       group (annoying wehen subscribing to multiple groups, but useful
        when subsribing to a single group right before reading it)
    'u' unsubsribes you form the curent goup and skips to the next group.
 
@@ -390,7 +408,7 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 Filtering enhancements
 ----------------------
 o  add command: mark all articles older than <date> as read
-   (usefull when subscribing to a new group with high-traffic...)
+   (useful when subscribing to a new group with high-traffic...)
 
 o  fix kill/hot mechanism so that it is possible to match articles on
    arbitrary headers
