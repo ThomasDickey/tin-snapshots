@@ -99,9 +99,7 @@ void __interrupt __chkabort (void)
  */
 
 int
-chmod (file, mode)
-	const char *file;
-	int mode;
+chmod (const chat *file, int mode)
 {
 	return 0;
 }
@@ -111,8 +109,7 @@ unsigned short umask (unsigned short mask)
 	return mask;
 }
 
-time_t time(pt)
-	time_t *pt;
+time_t time(time_t *pt)
 {
 	time_t t;
 	struct DateStamp ds;
@@ -128,12 +125,16 @@ time_t time(pt)
  * use the task address for pid which is unique.
  */
 
-int
-getpid (void)
+int getpid (void)
 {
 	return ((long) FindTask(0L) >> 2);
 }
 
+void *alloca(size_t dummy)
+{
+	return NULL; /* fails, fails, fails! */
+}
+    
 /*
  *  dopkt() by A. Finkel, P. Lindsay, C. Scheppner
  *  Send a packet in a 1.3-compatible manner
@@ -141,13 +142,14 @@ getpid (void)
  *  reply packet
  */
 
-static LONG dopkt(pid,action,args,nargs)
-struct MsgPort *pid;	/* process identifier			*/
-						/* handler message port)		*/
-LONG action,			/* packet type (desired action)	*/
-	 args[],			/* a pointer to an argument list*/
-	 nargs;				/* number of arguments in list 	*/
+static LONG dopkt(struct MsgPort *pid, LONG action, LONG args[], LONG nargs)
 
+/*
+ * struct MsgPort *pid;    process identifier (handler message port)
+ * LONG action;            packet type (desired action)
+ * LONG args[];            a pointer to an argument list
+ * LONG nargs;             number of arguments in list
+/*
 {	struct MsgPort	*replyport;
 	struct StandardPacket *packet;
 
@@ -207,10 +209,7 @@ int rawcon(int setraw)
 
 #ifndef INDEX_DAEMON
 int
-tputs (str, count, func)
-	char *str;
-	int count;
-	void (*func)(int);
+tputs (char *str, int count, void (*func)(int))
 {
 	if (! str) {
 		return 0;
@@ -234,10 +233,7 @@ tputs (str, count, func)
 int tin_bbs_mode = FALSE;
 
 void
-joinpath (str, dir, file)
-	char *str;
-	char *dir;
-	char *file;
+joinpath (char *str, const char *dir, const char *file)
 {
 	char c, *p;
 
@@ -264,9 +260,7 @@ joinpath (str, dir, file)
 }
 
 
-unsigned int
-sleep (seconds)
-	unsigned int seconds;
+unsigned int sleep (unsigned int seconds)
 {
 	if (seconds) Delay (50*seconds);
 	return seconds;
@@ -276,8 +270,7 @@ sleep (seconds)
  * I'm not really sure how well popen and pclose work, but they seem OK
  */
 
-FILE *
-popen (command, mode)
+FILE *popen (char *command, char *mode)
 	char *command;
 	char *mode;
 {
@@ -287,7 +280,7 @@ popen (command, mode)
 	sprintf(pname, "PIPE:%08X", FindTask(NULL));
 
 	if (mode[0] == 'w') {
-		sprintf (cmd, "run >NIL: %s %s", command, pname);
+		sprintf (cmd, "run %s %s", command, pname);
 		system (cmd);
 		return fopen (pname, mode);
 	} else {
@@ -300,9 +293,7 @@ popen (command, mode)
 }
 
 
-int
-pclose (pipe)
-	FILE *pipe;
+int pclose (FILE *pipe)
 {
 	return fclose (pipe);
 }
@@ -311,9 +302,7 @@ pclose (pipe)
  * Directory stuff
  */
 
-DIR *
-opendir (name)
-	char *name;
+DIR *opendir (char *name)
 {
 	DIR *di;
 
@@ -353,9 +342,7 @@ opendir (name)
 }
 
 
-struct dirent *
-readdir (di)
-	DIR *di;
+struct dirent *readdir (DIR *di)
 {
 	static struct dirent de;
 
@@ -384,9 +371,7 @@ readdir (di)
 }
 
 
-void
-closedir (di)
-	DIR *di;
+void closedir (DIR *di)
 {
 	if (DOSBase->dl_lib.lib_Version >= 37) {
 		if (di->more)
@@ -400,11 +385,7 @@ closedir (di)
 	free (di);
 }
 
-int
-getopt (argc, argv, options)
-	int argc;
-	char **argv;
-	char *options;
+int getopt (int argc, char **argv, char *options)
 {
 	char c, *z;
 	static int subind = 0;
@@ -452,9 +433,7 @@ getopt (argc, argv, options)
 }
 
 
-int
-system (str)
-	const char *str;
+int system (const  char *str)
 {
 	if (DOSBase->dl_lib.lib_Version >= 36) {
 		return (System ((char *)str, 0L));
@@ -469,10 +448,7 @@ system (str)
  * ST_DIRECT though
  */
 
-int
-stat (name, buf)
-	char *name;
-	struct stat *buf;
+int stat (char *name, struct stat *buf)
 {
 	BPTR dirlock;
 	register struct FileInfoBlock *inf;
@@ -501,9 +477,7 @@ stat (name, buf)
  * rom. If not, it resorts to looking in the ENV: directory.
  */
 
-char *
-getenv (name)
-	register const char *name;
+char *getenv (register const char *name)
 {
 	register FILE *fp;
 	register char *ptr;
@@ -535,10 +509,7 @@ getenv (name)
 
 
 int
-setenv (name, value, notused)
-	char *name;
-	char *value;
-	int notused;
+setenv (char *name, char *value, int notused)
 {
 	if (DOSBase->dl_lib.lib_Version >= 36) {
 		SetVar ((char *)name,(char *)value,strlen(value)+1,GVF_LOCAL_ONLY);
@@ -547,9 +518,7 @@ setenv (name, value, notused)
 }
 
 
-char *
-mktemp (template)
-	char *template;
+char *mktemp (char *template)
 {
 	static const char letters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	static size_t count = 0;
@@ -572,10 +541,7 @@ mktemp (template)
 }
 
 
-void
-make_post_cmd (cmd, name)
-	char *cmd;
-	char *name;
+void make_post_cmd (char *cmd, char *name)
 {
 	char *p;
 
@@ -595,7 +561,9 @@ static struct {
 } temp_fp[NUM_TEMP_FP];
 
 void log_unlink(FILE *fp, char *fname)
-{	int i;
+{
+	int i;
+
 	for (i=0; i<NUM_TEMP_FP; i++) {
 		if (temp_fp[i].fp == (FILE *) 0) {
 			temp_fp[i].fp = fp;
@@ -607,9 +575,9 @@ void log_unlink(FILE *fp, char *fname)
 
 #undef fclose
 
-int
-tmp_close(FILE *fp)
-{	int i, ret;
+int tmp_close(FILE *fp)
+{
+	int i, ret;
 
 	ret = fclose(fp);
 	for (i=0; i<NUM_TEMP_FP; i++) {

@@ -121,11 +121,15 @@ DoMatch(
  *  User-level routine.  Returns TRUE or FALSE.
  */
 
-int
+t_bool
 wildmat(
 	const char *text,
-	char *p)
+	char *p,
+	t_bool icase)
 {
+	char tbuff[LEN];
+	char pbuff[LEN];
+
 	/*
 	 * Make sure the pattern is not NULL
 	 */
@@ -135,5 +139,11 @@ wildmat(
 	if (p[0] == '*' && p[1] == '\0')
 		return TRUE;
 #endif /* OPTIMIZE_JUST_STAR */
-	return DoMatch(text, p) == TRUE;
+
+	if (icase) {
+		str_lwr(tbuff, text);
+		str_lwr(pbuff, p);
+	}
+
+	return DoMatch((icase)?tbuff:text, (icase)?pbuff:p) == TRUE;
 }

@@ -170,6 +170,7 @@ extern void init_selfinfo (void);
 extern int create_mail_save_dirs (void);
 /*extern char *GetFQDN (void);*/
 extern char *GetConfigValue (const char *name);
+extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 
 /* joinpath.c */
 extern void joinpath (char *result, const char *dir, const char *file);
@@ -375,6 +376,9 @@ extern void thread_by_reference (void);
 extern void collate_subjects (void);
 extern void build_references (struct t_group *group);
 
+/* regex.c */
+extern t_bool match_regex(const char *string, char *pattern, t_bool icase);
+
 /* rfc1521.c */
 extern unsigned char bin2hex (unsigned int x);
 extern FILE *rfc1521_decode (FILE *file);
@@ -472,7 +476,7 @@ extern int mystrcat (char **t, const char *s);
 extern void my_strncpy (char *p, const char *q, int n);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
 extern void strcpynl (char *to, const char *from);
-extern void str_lwr (const char *src, char *dst);
+extern void str_lwr (char *dst, const char *src);
 extern char * str_trim (char *string);
 
 #ifndef HAVE_STRCASECMP
@@ -513,7 +517,7 @@ extern int next_unread (int n);
 extern int prev_unread (int n);
 
 /* wildmat.c */
-extern int wildmat (const char *text, char *p);
+extern t_bool wildmat (const char *text, char *p, t_bool icase);
 
 /* xref.c */
 extern int overview_xref_support (void);

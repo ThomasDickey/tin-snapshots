@@ -61,8 +61,8 @@ get_nntpserver (
 	FILE	*fp;
 	char	line[LEN];
 	char	*line_entry;
-	int	line_entry_counter;
 	char	name_found[PATH_LEN];
+	int	line_entry_counter;
 	int	found = 0;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
@@ -108,8 +108,8 @@ get_newsrcname (
 	FILE	*fp;
 	char	line[LEN];
 	char	*line_entry;
-	int	line_entry_counter;
 	char	name_found[PATH_LEN];
+	int	line_entry_counter;
 	int	found = 0;
 	int	do_cpy = 0;
 

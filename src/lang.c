@@ -136,15 +136,9 @@ constext txt_filesystem_full_backup[] = "Error making backup of %s file. Filesys
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
 constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
 constext txt_warn_difficulties[] = "Okay, but you may run into difficulties later\n";
-#ifdef NO_WILDMAT
-constext txt_feed_pattern[] = "Enter pattern [%s]> ";
-constext txt_subscribe_pattern[] = "Enter subscribe pattern> ";
-constext txt_unsubscribe_pattern[] = "Enter unsubscribe pattern> ";
-#else
 constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter wildcard subscribe pattern> ";
 constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
-#endif
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
 constext txt_group[] = "Group %s ('q' to quit)... ";
 #else
@@ -401,6 +395,7 @@ constext txt_help_s_i[] ="i\t  show description of chosen newsgroup" cCRLF;
 constext txt_help_use_mouse[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_v[] = "v\t  show version information" cCRLF;
 constext txt_help_w[] = "w\t  post (write) article to current group" cCRLF;
+constext txt_help_wildcard[] = "WILDMAT for normal wildcards, REGEX for full regular expression matching.";
 constext txt_help_x[] = "x\t  repost chosen article to another group" cCRLF;
 constext txt_help_xpost_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-ID %N Name %C First Name";
 constext txt_help_y[] = "Y\t  yank in active file to see any new news" cCRLF;
@@ -586,7 +581,8 @@ constext txt_opt_use_mailreader_i[] = "Use interactive mail reader        : ";
 #ifdef HAVE_METAMAIL
 constext txt_opt_use_metamail[] = "Use metamail upon MIME articles    : ";
 #endif
-constext txt_opt_use_mouse[] = "Use mouse in xterm                 : ";
+constext txt_opt_use_mouse[] =	"Use mouse in xterm                 : ";
+constext txt_opt_wildcard[] =	"Wildcard matching                  : ";
 constext txt_opt_xpost_quote_format[] = "Quote line when cross-posting      : ";
 constext txt_option_not_enabled[] = "Option not enabled. Recompile with %s.";
 constext txt_options_menu[] = "Options Menu";
@@ -803,6 +799,7 @@ constext txt_tinrc_use_mailreader_i[] = "# interactive mailreader: if ON mailrea
 constext txt_tinrc_use_metamail[] = "# if ON metamail can/will be used to display MIME articles\n";
 #endif /* HAVE_METAMAIL */
 constext txt_tinrc_use_mouse[] = "# If ON enable mouse key support on xterm terminals\n";
+constext txt_tinrc_wildcard[] = "# Wildcard matching 0=(wildmat) 1=(regex)\n";
 #ifdef HAVE_COLOR
 constext txt_tinrc_word_h_display_marks[] = "# Should the leading and ending stars and dashes also be displayed,\n\
 # even when they are highlighting marks?\n\
@@ -821,6 +818,11 @@ constext *txt_onoff[] = { "OFF", "ON" };
  * Threading types
  */
 constext *txt_thread[] = { "None", "Subject", "References", "Both Subject and References" };
+
+/*
+ * Whether to use wildmat() or regexec() for matching strings
+ */
+constext *txt_wildcard[] = { "WILDMAT", "REGEX" };
 
 /*
  * How the From: line is displayed.

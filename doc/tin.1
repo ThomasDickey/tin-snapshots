@@ -66,7 +66,7 @@ groups this will be slow. However the number of unread articles in each
 group will be accurate.
 .TP
 .B -d
-delete index files for each group before indexing article (tind index daemon
+delete index files for each group before indexing article (\fItind\fP index daemon
 only).
 .TP
 .BI -f " file"
@@ -1451,6 +1451,13 @@ Allows the mouse key support in a xterm to be enabled/disabled. Default is OFF.
 .TP 4
 \fBuse_color\fP
 If enabled tin uses ansi-colors. Default is OFF.
+.TP 4
+\fBwildcard\fP
+Allows you to select how \fItin\fP matches strings. The default is 0 and
+uses the wildmat notation, which is how this has traditionally been handled.
+Setting this to 1 allows you to use full POSIX regular expressions. You
+will probably want to update your filter file if you use this regularly.
+NB: Newsgroup names will always be matched using the wildmat notation.
 .SH "GROUP ATTRIBUTES"
 \fITin\fP allows certain attributes to be set on a per group basis. These
 group attributes are read from the file \fI$HOME/.tin/attributes\fP.
@@ -1618,10 +1625,11 @@ mail, pipe etc.
 Tagged articles must have already been tagged with the 't' command.
 All tagged articles can be untagged by the 'U' untag command.
 .PP
-If regex pattern matching is selected you are asked to enter a regular
-expression (i.e., to match all articles subject lines containing 'net News'
-you must enter '*net News*').  Any articles that match the
-entered expression will be mailed, piped etc.
+If regex pattern is selected you are asked to enter a pattern
+(i.e., to match all articles subject lines containing 'net News' you enter
+*net News*).
+Any articles that match the entered expression will be mailed, piped etc.
+See also the wildcard= tinrc variable for advanced pattern matching options.
 .PP
 To save articles to a mailbox with the name of the current newsgroup
 (i.e., Alt.sources) enter '=' or '=<mailbox name>' when asked for the

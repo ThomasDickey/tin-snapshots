@@ -604,9 +604,9 @@ match_group_list (
 		strncpy (pattern, group_list, group_len);
 		pattern[group_len] = (char) 0;
 		/*
-		 * wildcard match
+		 * case-insensitive wildcard match
 		 */
-		if (STR_MATCH(group, pattern)) {
+		if (GROUP_MATCH(group, pattern, TRUE)) {
 			accept = !negate;	/* matched!*/
 		}
 		/*

@@ -558,8 +558,16 @@ read_config_file (
 			}
 #endif
 			break;
-
+#ifdef HAVE_POSIX_REGEX
 		case 'w':
+			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) {
+				if (wildcard == 0)
+					wildcard_func = wildmat;
+				else
+					wildcard_func = match_regex;
+				break;
+			}
+#endif
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "word_highlight=", &word_highlight_tinrc)) {
 				word_highlight=word_highlight_tinrc;
@@ -956,6 +964,10 @@ write_config_file (
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
  	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
+#ifdef HAVE_POSIX_REGEX
+ 	fprintf (fp, txt_tinrc_wildcard);
+	fprintf (fp, "wildcard=%d\n\n", wildcard);
+#endif
 
 	fprintf (fp, txt_tinrc_filter);
 	fprintf (fp, "default_filter_kill_header=%d\n", default_filter_kill_header);
@@ -1466,6 +1478,15 @@ change_config_file (
 								group->attribute->show_author = default_show_author;
 							}
 							break;
+
+#ifdef HAVE_POSIX_REGEX
+						case OPT_WILDCARD:
+							if (wildcard == 0)
+								wildcard_func = wildmat;
+							else
+								wildcard_func = match_regex;
+							break;
+#endif
 
 						/*
 						 * the following don't need any further action

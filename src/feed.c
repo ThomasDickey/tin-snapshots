@@ -535,7 +535,7 @@ feed_articles (
 				for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 					proceed = FALSE;
 					if (ch == iKeyFeedPat) {
-						if (STR_MATCH(arts[j].subject, pattern)) {
+						if (REGEX_MATCH(arts[j].subject, pattern, TRUE)) {
 							proceed = TRUE;
 						}
 					} else if (arts[j].selected) {
