@@ -187,11 +187,11 @@ void cursoroff (void) { if (!cmd_line) curs_set(0); }
 
 /*
  */
-void set_keypad_on (void) { if (!cmd_line) keypad(stdscr,TRUE); }
+void set_keypad_on (void) { if (!cmd_line) keypad(stdscr, TRUE); }
 
 /*
  */
-void set_keypad_off (void) { if (!cmd_line) keypad(stdscr,FALSE); }
+void set_keypad_off (void) { if (!cmd_line) keypad(stdscr, FALSE); }
 
 
 /*
@@ -220,9 +220,9 @@ void set_xclick_off (void)
 void
 MoveCursor(int row, int col)
 {
-	TRACE(("MoveCursor %d,%d", row,col))
+	TRACE(("MoveCursor %d,%d", row, col))
 	if (!cmd_line)
-		move(row,col);
+		move(row, col);
 }
 
 
@@ -377,6 +377,6 @@ write_line(int row, char *buffer)
 
 #else
 
-void my_tcurses(void); /* proto-type - sehr sinning ,- )*/
+void my_tcurses(void); /* proto-type */
 void my_tcurses(void) { }	/* ANSI C requires non-empty file */
 #endif

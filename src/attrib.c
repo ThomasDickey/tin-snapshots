@@ -737,15 +737,13 @@ write_attributes_file (
 	}
 #endif /* 0 */
 
-	if (ferror (fp) | fclose (fp)){
+	if (ferror (fp) | fclose (fp))
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
-		free (file_tmp);	/* free memory for tmp-filename */
-		return;
-	} else {
+	else {
 		rename_file (file_tmp, file);
 		chmod (file, (S_IRUSR|S_IWUSR));
-		free (file_tmp);	/* free memory for tmp-filename */
 	}
+	free (file_tmp);	/* free memory for tmp-filename */
 
 #endif	/* INDEX_DAEMON */
 }

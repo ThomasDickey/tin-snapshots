@@ -266,7 +266,7 @@ show_title (
 		fcol(col_title);
 #endif
 		/* you have mail message in */
-		my_fputs ((mail_check () ? txt_you_have_mail : txt_type_h_for_help) , stdout);
+		my_fputs ((mail_check () ? txt_you_have_mail : txt_type_h_for_help), stdout);
 
 #ifdef HAVE_COLOR
 		fcol(col_normal);

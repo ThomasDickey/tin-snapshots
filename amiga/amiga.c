@@ -143,7 +143,7 @@ void *alloca(size_t dummy)
 {
         return NULL; /* fails, fails, fails! */
 }
-    
+
 /*
  *  dopkt() by A. Finkel, P. Lindsay, C. Scheppner
  *  Send a packet in a 1.3-compatible manner
@@ -246,7 +246,7 @@ tputs (char *str, int count, void (*func)(int))
  * name may be an assign!
  */
 
-int tin_bbs_mode = FALSE;
+t_bool tin_bbs_mode = FALSE;
 
 void
 joinpath (char *str, const char *dir, const char *file)

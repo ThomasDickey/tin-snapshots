@@ -39,9 +39,10 @@ joinpath(
  * "foo:baz/bar" -styled paths should always work on Amiga
  */
 #ifdef __amigaos
-	if (result[0] == '/' )
-		while( result[tmp++]=result[tmp2++] );
-	while( result[i] != '/' && result[i] != ':' )
+	if (result[0] == '/')
+		while (result[tmp++] = result[tmp2++])
+			;
+	while (result[i] != '/' && result[i] != ':')
 		i++;
 	result[i]=':';
 #endif /* __amigaos */

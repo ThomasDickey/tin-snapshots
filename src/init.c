@@ -55,10 +55,12 @@ char default_select_pattern[LEN];
 char default_shell_command[LEN];	/* offers user default choice */
 char default_sigfile[PATH_LEN];
 char default_signature[PATH_LEN];
+char domain_name[MAXHOSTNAMELEN];
 char global_attributes_file[PATH_LEN];
 char global_config_file[PATH_LEN];
 char global_filter_file[PATH_LEN];
 char homedir[PATH_LEN];
+char host_name[MAXHOSTNAMELEN];
 char index_maildir[PATH_LEN];
 char index_newsdir[PATH_LEN];
 char index_savedir[PATH_LEN];
@@ -72,12 +74,13 @@ char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
 char local_newsrctable_file[PATH_LEN];
 char lock_file[PATH_LEN];		/* contains name of index lock file */
 char mail_active_file[PATH_LEN];
+char mail_address[LEN];			/* user's mail address */
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mailbox[PATH_LEN];			/* system mailbox for each user */
 char mailer[PATH_LEN];			/* mail program */
 char mailgroups_file[PATH_LEN];
-char mm_charset[LEN]="";		/* MIME charset: moved from rfc1522.c */
+char mm_charset[LEN];		/* MIME charset: moved from rfc1522.c */
 char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char my_distribution[LEN];		/* Distribution: */
 char news_headers_to_display[LEN];		/* which headers to display */
@@ -101,14 +104,12 @@ char quote_chars[PATH_LEN];	/* quote chars for posting/mails ": " */
 char rcdir[PATH_LEN];
 char reply_to[LEN];				/* Reply-To: address */
 char save_active_file[PATH_LEN];
+char spamtrap_warning_addresses[LEN];
 char spooldir[PATH_LEN];		/* directory where news is */
 char subscriptions_file[PATH_LEN];
 char txt_help_bug_report[LEN];	/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
-char domain_name[MAXHOSTNAMELEN];
-char host_name[MAXHOSTNAMELEN];
-char mail_address[LEN];			/* user's mail address */
 
 #ifdef INDEX_DAEMON
 	char group_times_file[PATH_LEN];
@@ -136,7 +137,7 @@ int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
 int default_sort_art_type;		/* method used to sort arts[] */
 int default_thread_arts;		/* threading system for viewing articles */
-int global_filtered_articles;		/* globally killed / auto-selected articles */
+int global_filtered_articles;	/* globally killed / auto-selected articles */
 int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
@@ -146,7 +147,7 @@ int in_headers;			/* color in headers */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
 int local_index;			/* do private indexing? */
-int mail_mime_encoding;
+int mail_mime_encoding = MIME_ENCODING_7BIT;
 int max_from = 0;
 int max_subj = 0;
 int num_headers_to_display;		/* num headers to display -- swp */
@@ -154,7 +155,7 @@ int num_headers_to_not_display;	/* num headers to not display -- swp */
 int num_of_killed_arts;
 int num_of_selected_arts;		/* num articles marked 'hot' */
 int num_of_tagged_arts;
-int post_mime_encoding;
+int post_mime_encoding = MIME_ENCODING_7BIT;
 int process_id;		/* FIXME: use pid_t instead of int */
 int real_gid;
 int real_uid;
@@ -170,10 +171,6 @@ int tin_uid;
 int top = 0;
 int top_base;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
-
-#ifdef LOCAL_CHARSET
-	int use_local_charset=TRUE;
-#endif
 
 #ifdef HAVE_COLOR
 	int use_color;			/* enables/disables ansi-color support under linux-console and color-xterm */
@@ -201,8 +198,8 @@ int xmouse, xrow, xcol;			/* xterm button pressing information */
 	t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 #endif
 
+t_bool no_write = FALSE; /* do not write newsrc on quit (-X cmd-line flag) */
 t_bool reread_active_for_posted_arts;
-
 t_bool add_posted_to_filter;
 t_bool alternative_handling;
 t_bool auto_bcc;		/* add your name to bcc automatically */
@@ -219,8 +216,7 @@ t_bool confirm_action;
 t_bool confirm_to_quit;
 t_bool count_articles;			/* count articles on spooldir or via GROUP cmd */
 t_bool created_rcdir;			/* checks if first time tin is started */
-t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command
-					when dangerous signal exit */
+t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command when dangerous signal exit */
 t_bool default_auto_save;		/* save thread with name from Archive-name: field */
 t_bool default_batch_save;		/* save arts if -M/-S command line switch specified */
 t_bool default_filter_kill_case;
@@ -241,7 +237,7 @@ t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
 t_bool info_in_last_line;
 t_bool keep_dead_articles;
 t_bool keep_posted_articles;
-t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
+t_bool mail_8bit_header = FALSE;	/* allow 8bit chars. in header of mail message */
 t_bool mail_news;		/* mail all arts to specified user */
 t_bool mark_saved_read;		/* mark saved article/thread as read */
 t_bool newsrc_active;
@@ -290,6 +286,9 @@ t_bool verbose = FALSE;		/* update index files only mode */
 t_bool (*wildcard_func) (const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
+#ifdef LOCAL_CHARSET
+	t_bool use_local_charset = TRUE;
+#endif
 
 /* History entries */
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
@@ -415,7 +414,7 @@ void init_selfinfo (void)
 	}
 #endif /* HAVE_GETHOSTBYNAME */
 
-	if (domain_name[0]=='\0') {
+	if (domain_name[0]=='\0') { /* FIXME: -> lang.c */
 		error_message ("Can't get a (fully-qualified) domain-name!\n");
 		tin_done(EXIT_ERROR);
 	}
@@ -633,7 +632,7 @@ void init_selfinfo (void)
 	use_builtin_inews = TRUE;
 	use_keypad = FALSE;
 	use_mailreader_i = FALSE;
-	use_mouse = FALSE; /* default changed to FALSE (eb) */
+	use_mouse = FALSE;
 	wildcard_func = wildmat;
 #ifdef HAVE_METAMAIL
 #	ifdef M_AMIGA
@@ -699,6 +698,8 @@ void init_selfinfo (void)
 	strcpy (bug_addr, BUG_REPORT_ADDRESS);
 	bug_nntpserver1[0] = '\0';
 	bug_nntpserver2[0] = '\0';
+	spamtrap_warning_addresses[0] = '\0';
+	mm_charset[0] = '\0';
 
 	/*
 	 * Amiga uses assigns which end in a ':' and won't work with a '/'
@@ -772,8 +773,13 @@ void init_selfinfo (void)
 	}
 
 	/* read_site_config() might have changed the value of libdir */
+	/* FIXME: we'd better use TIN_DEFAULTS_DIR instead of TIN_LIBDIR here */
 	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
 	joinpath (global_config_file, libdir, CONFIG_FILE);
+	/*
+	 * FIXME: as we don't know which patternmatzching style the user
+	 * has defined a global filter file is useless
+	 */
 	joinpath (global_filter_file, libdir, FILTER_FILE);
 
 #ifdef VMS
@@ -820,15 +826,17 @@ void init_selfinfo (void)
 #endif /* VMS */
 	joinpath (default_sigfile, homedir, ".Sig");
 	joinpath (default_signature, homedir, ".signature");
-	if (!index_newsdir[0]) {
+
+	if (!index_newsdir[0])
 #ifdef VMS
-	joindir (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
+		joindir (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
 #else /* VMS */
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
 #endif /* VMS */
-	}
+
 	if (stat (index_newsdir, &sb) == -1)
 		my_mkdir (index_newsdir, S_IRWXUGO);
+
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
 #else /* VMS */
@@ -1109,6 +1117,8 @@ static int read_site_config (void)
 		if (match_string (buf, "bugaddress=", bug_addr, sizeof (bug_addr)))
 			continue;
 		if (match_string (buf, "organization=", default_organization, sizeof (default_organization)))
+			continue;
+		if (match_string (buf, "mm_charset=", mm_charset, sizeof (mm_charset)))
 			continue;
 	}
 

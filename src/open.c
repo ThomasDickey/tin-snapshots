@@ -3,7 +3,7 @@
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-24
+ *  Updated   : 1998-04-18
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
@@ -57,9 +57,8 @@ nntp_open (void)
 #endif
 
 	/* do this only once at start-up */
-	if (!is_reconnect) {
+	if (!is_reconnect)
 		nntp_server = getserverbyfile (NNTP_SERVER_FILE);
-	}
 
 	if (nntp_server == (char *) 0) {
 		error_message (txt_cannot_get_nntp_server_name);
@@ -231,6 +230,61 @@ nntp_close (void)
  *    -1  on an error
  *  If 'message' is not NULL, then any trailing text after the response
  *	 code is copied into it.
+ *  Does not perform authentication if required; use get_respcode()
+ *  instead.
+ */
+
+int
+get_only_respcode (
+	char *message)
+{
+#ifdef NNTP_ABLE
+	char line[NNTP_STRLEN];
+	char *ptr, *end;
+	int respcode;
+
+	ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
+
+	if (tin_errno || ptr == NULL)
+		return -1;
+
+	respcode = (int) strtol(ptr, &end, 10);
+DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
+
+	if ((respcode == ERR_FAULT /* || respcode == ERR_GOODBYE ??? */) &&
+	    last_put[0] != '\0') {
+		/*
+		 * Maybe server timed out.
+		 * If so, retrying will force a reconnect.
+		 */
+#ifdef DEBUG
+		debug_nntp ("get_only_respcode", "timeout");
+#endif
+		put_server (last_put);
+		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
+
+		if (tin_errno)
+			return(-1);
+
+		respcode = (int) strtol(ptr, &end, 10);
+DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
+	}
+	if (message != NULL)				/* Pass out the rest of the text */
+		strcpy(message, end);
+
+	return respcode;
+#else
+	return 0;
+#endif
+}
+
+/*
+ *  Get a response code from the server.
+ *  Returns:
+ *    +ve NNTP return code
+ *    -1  on an error
+ *  If 'message' is not NULL, then any trailing text after the response
+ *	 code is copied into it.
  *  Performs authentication if required and repeats the last command if
  *  necessary after a timeout.
  */
@@ -240,38 +294,12 @@ get_respcode (
 	char *message)
 {
 #ifdef NNTP_ABLE
-	char line[NNTP_STRLEN];
 	char savebuf[NNTP_STRLEN];
+	char line[NNTP_STRLEN];
 	char *ptr, *end;
 	int respcode;
 
-	ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
-
-	if (tin_errno || ptr == NULL)
-		return(-1);
-
-	respcode = (int) strtol(ptr, &end, 10);
-DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
-
-	if ((respcode == ERR_FAULT /* || respcode == ERR_GOODBYE ??? */) &&
-	    last_put[0] != '\0') {
-		/*
-		 * Maybe server timed out.
-		 * If so, retrying will force a reconnect.
-		 */
-#ifdef DEBUG
-		debug_nntp ("get_respcode", "timeout");
-#endif
-		put_server (last_put);
-		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
-
-		if (tin_errno)
-			return(-1);
-
-		respcode = (int) strtol(ptr, &end, 10);
-DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
-	}
-
+	respcode = get_only_respcode (message);
 	if ((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) {
 		/*
 		 * Server requires authentication.
@@ -288,16 +316,17 @@ DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 			ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
 
 			if (tin_errno)
-				return(-1);
+				return -1;
+
+			respcode = (int) strtol(ptr, &end, 10);
+			if (message != NULL)				/* Pass out the rest of the text */
+				strcpy(message, end);
 
 		} else {
-			error_message(txt_auth_failed, ERR_ACCESS);
-			return(-1);
+			error_message (txt_auth_failed, ERR_ACCESS);
+			return -1;
 		}
 	}
-
-	if (message != NULL)				/* Pass out the rest of the text */
-		strcpy(message, end);
 
 	return respcode;
 #else
@@ -671,7 +700,8 @@ FILE *
 open_art_fp (
 	char *group_path,
 	long art,
-	int lines)
+	int lines,
+	t_bool rfc1521decode)
 {
 	char buf[NNTP_STRLEN];
 	int i;
@@ -704,11 +734,15 @@ open_art_fp (
 #endif
 
 	/*
-	 * Do a bit of 1521 decoding. If art_fp=NULL, then it returns NULL
+	 * Do a bit of 1521 decoding, if appropriate.
+	 * If art_fp=NULL, then it returns NULL
 	 */
-	fp = rfc1521_decode(art_fp);
-	if (fp != art_fp)
-		note_size = 0;
+	if (rfc1521decode) {
+		fp = rfc1521_decode(art_fp);
+		if (fp != art_fp)
+			note_size = 0;
+	} else
+		fp = art_fp;
 
 	return fp;
 }
@@ -870,7 +904,7 @@ setup_hard_base (
 
 		if ((d = opendir (buf)) != NULL) {
 			while ((e = readdir (d)) != NULL) {
-				art = atol (e->d_name/*, D_NAMLEN(e)*/); /*e->d_name should be '\0' terminated... */
+				art = atol (e->d_name);
 				if (art >= 1) {
 					total++;
 					if (top_base >= max_art)

@@ -1,8 +1,8 @@
 dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
-dnl Created   : 24.08.95
-dnl Updated   : 20.02.98
+dnl Created   : 1995-08-24
+dnl Updated   : 1998-04-01
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997,1998 by Thomas Dickey
@@ -127,6 +127,27 @@ ifelse($3,,[    :]dnl
 ])dnl
   ])])dnl
 dnl ---------------------------------------------------------------------------
+dnl Restricted form of AC_ARG_WITH that requires user to specify a value
+dnl $1 = option name
+dnl $2 = help message
+dnl $3 = variable to set with the --with value
+dnl $4 = default value, if any
+AC_DEFUN([CF_ARG_WITH],
+[AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
+ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
+ifelse($4,,[test -n "$withval" && \
+],[test -z "$withval" && withval=no
+])dnl
+case "$withval" in #(vi
+yes)
+  AC_ERROR(expected a value for --with-$1)
+  ;; #(vi
+no) withval=""
+  ;;
+esac
+$3="$withval"
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check for missing declarations in the system headers (adapted from vile).
 dnl
 dnl CHECK_DECL_FLAG and CHECK_DECL_HDRS must be set in configure.in
@@ -170,6 +191,9 @@ AC_DEFUN([CF_CHECK_ERRNO],
 AC_MSG_CHECKING([declaration of $1])
 AC_CACHE_VAL(cf_cv_dcl_$1,[
     AC_TRY_COMPILE([
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 #include <stdio.h>
 #include <sys/types.h>
 #include <errno.h> ],
@@ -245,13 +269,13 @@ dnl ---------------------------------------------------------------------------
 dnl Check if curses supports color.  (Note that while SVr3 curses supports
 dnl color, it does this differently from SVr4 curses; more work would be needed
 dnl to accommodate SVr3).
-dnl 
+dnl
 AC_DEFUN([CF_COLOR_CURSES],
 [
 AC_MSG_CHECKING(if curses supports color attributes)
 AC_CACHE_VAL(cf_cv_color_curses,[
 	AC_TRY_LINK([
-#include <$cf_cv_ncurses_header>
+#include <${cf_cv_ncurses_header-curses.h}>
 ],
 	[chtype x = COLOR_BLUE;
 	 has_colors();
@@ -489,7 +513,7 @@ if test "$cf_cv_need_curses_h" != no ; then
 		cf_cv_need_curses_h=termcap.h
 	elif test "$cf_cv_have_term_h" = yes ; then
 		cf_cv_need_curses_h=term.h
-	else 
+	else
 		cf_cv_need_curses_h=no
 	fi
 fi
@@ -799,6 +823,33 @@ AC_DEFUN([CF_MSG_LOG],[
 echo "(line __oline__) testing $* ..." 1>&AC_FD_CC
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check for pre-1.9.9g ncurses (among other problems, the most obvious is
+dnl that color combinations don't work).
+AC_DEFUN([CF_NCURSES_BROKEN],
+[
+AC_REQUIRE([CF_NCURSES_VERSION])
+if test "$cf_cv_ncurses_version" != no ; then
+AC_MSG_CHECKING(for obsolete/broken version of ncurses)
+AC_CACHE_VAL(cf_cv_ncurses_broken,[
+AC_TRY_COMPILE([
+#include <$cf_cv_ncurses_header>],[
+#if defined(NCURSES_VERSION) && defined(wgetbkgd)
+	make an error
+#else
+	int x = 1
+#endif
+],
+	[cf_cv_ncurses_broken=no],
+	[cf_cv_ncurses_broken=yes])
+])
+AC_MSG_RESULT($cf_cv_ncurses_broken)
+if test "$cf_cv_ncurses_broken" = yes ; then
+	AC_MSG_WARN(hmm... you should get an up-to-date version of ncurses)
+	AC_DEFINE(NCURSES_BROKEN)
+fi
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Look for the SVr4 curses clone 'ncurses' in the standard places, adjusting
 dnl the CPPFLAGS variable.
 dnl
@@ -1024,9 +1075,9 @@ dnl Look for the default editor (vi)
 AC_DEFUN([CF_PATH_EDITOR],
 [
 AC_MSG_CHECKING(for default editor)
-AC_ARG_WITH(editor,
+CF_ARG_WITH(editor,
     [  --with-editor=PROG      specify editor (default: vi)],
-    [DEFAULT_EDITOR=$withval],[
+    [DEFAULT_EDITOR])
 if test -z "$DEFAULT_EDITOR" ; then
     if test -n "$EDITOR" ; then
     	DEFAULT_EDITOR="$EDITOR"
@@ -1036,7 +1087,6 @@ if test -z "$DEFAULT_EDITOR" ; then
 	AC_PATH_PROG(DEFAULT_EDITOR,vi,vi,$PATH:/usr/bin:/usr/ucb)
     fi
 fi
-])
 AC_MSG_RESULT($DEFAULT_EDITOR)
 AC_DEFINE_UNQUOTED(DEFAULT_EDITOR,"$DEFAULT_EDITOR")
 ])dnl
@@ -1046,9 +1096,9 @@ dnl actual mail-file, to verify this, but that is not always easy to arrange.
 AC_DEFUN([CF_PATH_MAILBOX],
 [
 AC_MSG_CHECKING(for incoming-mail directory)
-AC_ARG_WITH(mailbox,
+CF_ARG_WITH(mailbox,
     [  --with-mailbox=DIR      directory for incoming mailboxes],
-    [DEFAULT_MAILBOX=$withval],[
+    [DEFAULT_MAILBOX])
 if test -z "$DEFAULT_MAILBOX" ; then
 for cf_dir in \
 	/var/spool/mail \
@@ -1063,7 +1113,6 @@ for cf_dir in \
 	fi
     done
 fi
-])
 if test -n "$DEFAULT_MAILBOX" ; then
 	AC_DEFINE_UNQUOTED(DEFAULT_MAILBOX,"$DEFAULT_MAILBOX")
 else
@@ -1076,22 +1125,22 @@ dnl Look for the program that sends outgoing mail.
 AC_DEFUN([CF_PATH_MAILER],
 [
 AC_PATH_PROG(DEFAULT_MAILER,sendmail,,$PATH:/usr/sbin:/usr/lib)
-AC_ARG_WITH(mailer,
+CF_ARG_WITH(mailer,
      [  --with-mailer=PROG      specify default mailer-program],
-     [DEFAULT_MAILER=$withval],[
+     [DEFAULT_MAILER])
 if test -z "$DEFAULT_MAILER" ; then
 AC_PATH_PROG(DEFAULT_MAILER,mailx,,$PATH:/usr/bin)
 fi
 if test -z "$DEFAULT_MAILER" ; then
 AC_PATH_PROG(DEFAULT_MAILER,mail,,$PATH:/usr/bin)
 fi
+AC_MSG_CHECKING(for default mailer)
 if test -n "$DEFAULT_MAILER" ; then
 	AC_DEFINE_UNQUOTED(DEFAULT_MAILER,"$DEFAULT_MAILER")
 else
 	DEFAULT_MAILER=none
 fi
 AC_MSG_RESULT($DEFAULT_MAILER)
-])
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl See if sum can take -r
@@ -1692,13 +1741,16 @@ fi
 dnl ---------------------------------------------------------------------------
 dnl Wrapper for AC_ARG_WITH to inherit/override an environment variable's
 dnl "#define" in the compile.
+dnl $1 = option name
+dnl $2 = help-message
+dnl $3 = name of variable to inherit/override
+dnl $4 = default value of variable, if any
 AC_DEFUN([CF_WITH_DFTENV],
 [AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
 ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
 case "$withval" in #(vi
 yes|no)
-  echo 'configure: error: expected a value for $3' 1>&2
-  exit 1
+  AC_ERROR(expected a value for --with-$1)
   ;;
 esac
 $3="$withval"
@@ -1754,8 +1806,7 @@ changequote([,])dnl
 AC_ARG_WITH($1,[$2],ifelse($3,,
 [case "$withval" in #(vi
   yes[)]
-   echo 'configure: error: "--with-$1" requires value' 1>&2
-   exit 1
+   AC_ERROR(expected a value for --with-$1)
    ;; #(vi
   no[)]
    ;; #(vi
@@ -1779,19 +1830,11 @@ dnl ---------------------------------------------------------------------------
 dnl Wrapper for AC_ARG_WITH to ensure that if the user supplies a value, it is
 dnl not simply defaulting to yes/no.  Empty strings are ok if the macro is
 dnl invoked without a default value
+dnl $1 = option name
+dnl $2 = help-message
+dnl $3 = variable to inherit/override
+dnl $4 = default value, if any.
 AC_DEFUN([CF_WITH_VALUE],
-[AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
-ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
-ifelse($4,,[test -n "$withval" && \
-],[test -z "$withval" && withval=no
-])dnl
-case "$withval" in #(vi
-yes) echo 'configure: error: expected a value for $3' 1>&2
-  exit 1
-  ;; #(vi
-no) withval=""
-  ;;
-esac
-$3="$withval"
-AC_DEFINE_UNQUOTED($3,"$withval")dnl
+[CF_ARG_WITH($1,[$2],[$3],[$4])
+ AC_DEFINE_UNQUOTED($3,"$withval")dnl
 ])dnl

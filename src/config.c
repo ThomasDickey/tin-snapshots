@@ -18,12 +18,12 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-static int match_list ( char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
+static t_bool match_list (char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
 static void show_config_page (void);
 
 #ifdef HAVE_COLOR
-	static int match_color (char *line, const char *pat, int *dst, int maxlen);
+	static t_bool match_color (char *line, const char *pat, int *dst, int maxlen);
 #endif
 
 enum state { IGNORE, CHECK, UPGRADE };
@@ -373,10 +373,8 @@ read_config_file (
 			break;
 
 		case 'k':
-#ifdef M_UNIX
 			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles))
 				break;
-#endif
 
 			if (match_boolean (buf, "keep_posted_articles=", &keep_posted_articles))
 				break;
@@ -392,12 +390,12 @@ read_config_file (
 			break;
 
 		case 'm':
-			if (match_list (buf, "mail_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &mail_mime_encoding))
+			if (match_list (buf, "mail_mime_encoding=", txt_mime_encodings, NUM_MIME_ENCODINGS, &mail_mime_encoding))
 				break;
 
 			/* option to toggle 8bit char. in header of mail message */
 			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
-				if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit))
+				if (strcasecmp(txt_mime_encodings[mail_mime_encoding], txt_8bit))
 					mail_8bit_header = FALSE;
 				break;
 			}
@@ -423,13 +421,13 @@ read_config_file (
 			}
 
 			/* pick which news headers to display */
-			if (match_string(buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
+			if (match_string (buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
 				news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 				break;
 			}
 
 			/* pick which news headers to NOT display */
-			if (match_string(buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
+			if (match_string (buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
 				news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
 				break;
 			}
@@ -440,12 +438,12 @@ read_config_file (
 			break;
 
 		case 'p':
-			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding))
+			if (match_list (buf, "post_mime_encoding=", txt_mime_encodings, NUM_MIME_ENCODINGS, &post_mime_encoding))
 				break;
 
 			/* option to toggle 8bit char. in header of news message */
 			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
-				if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit))
+				if (strcasecmp(txt_mime_encodings[post_mime_encoding], txt_8bit))
 					post_8bit_header = FALSE;
 				break;
 			}
@@ -496,25 +494,28 @@ read_config_file (
 			break;
 
 		case 's':
+			if (match_integer (buf, "show_author=", &default_show_author, SHOW_FROM_BOTH))
+				break;
+
+			if (match_boolean (buf, "show_description=", &show_description))
+				break;
+
+			if (match_boolean (buf, "show_only_unread=", &default_show_only_unread))
+				break;
+
+			if (match_boolean (buf, "show_only_unread_groups=", &show_only_unread_groups))
+				break;
+
 			if (match_boolean (buf, "sigdashes=", &sigdashes))
 				break;
 
 			if (match_boolean (buf, "signature_repost=", &signature_repost))
 				break;
 
+			if (match_string (buf, "spamtrap_warning_addresses=", spamtrap_warning_addresses, sizeof (spamtrap_warning_addresses)))
+				break;
+
 			if (match_boolean (buf, "start_editor_offset=", &start_editor_offset))
-				break;
-
-			if (match_boolean (buf, "show_only_unread_groups=", &show_only_unread_groups))
-				break;
-
-			if (match_boolean (buf, "show_only_unread=", &default_show_only_unread))
-				break;
-
-			if (match_boolean (buf, "show_description=", &show_description))
-				break;
-
-			if (match_integer (buf, "show_author=", &default_show_author, SHOW_FROM_BOTH))
 				break;
 
 			if (match_integer (buf, "sort_article_type=", &default_sort_art_type, SORT_BY_SCORE_ASCEND))
@@ -769,13 +770,13 @@ write_config_file (
 	fprintf (fp, txt_tinrc_news_headers_to_display);
 	fprintf (fp, "news_headers_to_display=");
 	for (i=0; i<num_headers_to_display; i++)
-		fprintf (fp, "%s ",news_headers_to_display_array[i]);
+		fprintf (fp, "%s ", news_headers_to_display_array[i]);
 	fprintf (fp, "\n\n");
 
 	fprintf (fp, txt_tinrc_news_headers_to_not_display);
 	fprintf (fp, "news_headers_to_not_display=");
 	for (i=0; i<num_headers_to_not_display; i++)
-		fprintf (fp, "%s ",news_headers_to_not_display_array[i]);
+		fprintf (fp, "%s ", news_headers_to_not_display_array[i]);
 	fprintf (fp, "\n\n");
 
 	fprintf (fp, txt_tinrc_info_in_last_line);
@@ -820,10 +821,8 @@ write_config_file (
 	fprintf (fp, txt_tinrc_unlink_article);
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
 
-#ifdef M_UNIX
 	fprintf (fp, txt_tinrc_keep_dead_articles);
 	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
-#endif
 
 	fprintf (fp, txt_tinrc_keep_posted_articles);
 	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
@@ -839,6 +838,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_signature_repost);
 	fprintf (fp, "signature_repost=%s\n\n", print_boolean (signature_repost));
+
+	fprintf (fp, txt_tinrc_spamtrap_warning_addresses);
+	fprintf (fp, "spamtrap_warning_addresses=%s\n\n", spamtrap_warning_addresses);
 
 	fprintf (fp, txt_tinrc_advertising);
 	fprintf (fp, "advertising=%s\n\n", print_boolean (advertising));
@@ -978,10 +980,8 @@ write_config_file (
 	fprintf (fp, "col_markdash=%d\n\n", col_markdash);
 #endif
 
-	if (*mail_address) {
-		fprintf (fp, txt_tinrc_mail_address);
-		fprintf (fp, "mail_address=%s\n\n", mail_address);
-	}
+	fprintf (fp, txt_tinrc_mail_address);
+	fprintf (fp, "mail_address=%s\n\n", mail_address);
 
 	fprintf (fp, txt_tinrc_mm_charset);
 	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
@@ -992,8 +992,8 @@ write_config_file (
 #endif
 
 	fprintf (fp, txt_tinrc_post_mime_encoding);
-	fprintf (fp, "post_mime_encoding=%s\n", txt_mime_types[post_mime_encoding]);
-	fprintf (fp, "mail_mime_encoding=%s\n\n", txt_mime_types[mail_mime_encoding]);
+	fprintf (fp, "post_mime_encoding=%s\n", txt_mime_encodings[post_mime_encoding]);
+	fprintf (fp, "mail_mime_encoding=%s\n\n", txt_mime_encodings[mail_mime_encoding]);
 
 	fprintf (fp, txt_tinrc_post_8bit_header);
 	fprintf (fp, "post_8bit_header=%s\n\n", print_boolean(post_8bit_header));
@@ -1251,7 +1251,7 @@ change_config_file (
 	int original_list_value;
 	int option, old_option;
 	int ret_code = NO_FILTERING;
-	int mime_type = 0;
+	int mime_encoding = MIME_ENCODING_7BIT;
 	t_bool change_option = FALSE;
 	t_bool original_on_off_value;
 
@@ -1317,7 +1317,7 @@ change_config_file (
 		switch (ch) {
 			case iKeyQuit:
 				write_config_file (local_config_file);
-				/* FALLTHRU */
+				/* FALLTHROUGH */
 			case iKeyConfigNoSave:
 				clear_note_area ();
 				return ret_code;
@@ -1483,7 +1483,7 @@ change_config_file (
 							break;
 
 						case OPT_MAIL_8BIT_HEADER:
-							if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit)) {
+							if (strcasecmp(txt_mime_encodings[mail_mime_encoding], txt_8bit)) {
 								mail_8bit_header = FALSE;
 								MoveCursor (option_row(OPT_MAIL_8BIT_HEADER), 3);
 								print_option (OPT_MAIL_8BIT_HEADER);
@@ -1491,7 +1491,7 @@ change_config_file (
 							break;
 
 						case OPT_POST_8BIT_HEADER:
-							if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit)) {
+							if (strcasecmp(txt_mime_encodings[post_mime_encoding], txt_8bit)) {
 								post_8bit_header = FALSE;
 								MoveCursor (option_row(OPT_POST_8BIT_HEADER), 3);
 								print_option (OPT_POST_8BIT_HEADER);
@@ -1567,9 +1567,7 @@ change_config_file (
 						 * case OPT_ASK_FOR_METAMAIL:
 						 * case OPT_USE_METAMAIL:
 #endif
-#ifdef M_UNIX
 						 * case OPT_KEEP_DEAD_ARTICLES:
-#endif
 #ifdef HAVE_COLOR
 						 * case OPT_WORD_HIGHLIGHT_TINRC:
 #endif
@@ -1583,7 +1581,7 @@ change_config_file (
 					original_list_value = *(option_table[option].variable);
 					*(option_table[option].variable) = prompt_list (option_row(option),
 								OPT_ARG_COLUMN,
-								*(option_table[option].variable), /*default_post_proc_type,*/
+								*(option_table[option].variable), /* default_post_proc_type */
 								option_table[option].help_text,
 								option_table[option].option_text,
 								option_table[option].opt_list,
@@ -1664,6 +1662,7 @@ change_config_file (
 						case OPT_QUOTE_CHARS:
 						case OPT_XPOST_QUOTE_FORMAT:
 						case OPT_MAIL_ADDRESS:
+						case OPT_SPAMTRAP_WARNING_ADDRESSES:
 							prompt_option_string (option);
 							break;
 
@@ -1673,7 +1672,6 @@ change_config_file (
 							free (news_headers_to_display_array);
 							news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 							break;
-
 
 						case OPT_NEWS_HEADERS_TO_NOT_DISPLAY:
 							prompt_option_string (option);
@@ -1687,7 +1685,8 @@ change_config_file (
 						case OPT_DEFAULT_SAVEDIR:
 						case OPT_DEFAULT_SIGFILE:
 #ifdef M_AMIGA
-							if (tin_bbs_mode) break;
+							if (tin_bbs_mode)
+								break;
 #endif
 							prompt_option_string (option);
 							expand_rel_abs_pathname (option_row(option),
@@ -1698,19 +1697,19 @@ change_config_file (
 
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
-							mime_type = *(option_table[option].variable);
-							mime_type = prompt_list (option_row(option),
+							mime_encoding = *(option_table[option].variable);
+							mime_encoding = prompt_list (option_row(option),
 										OPT_ARG_COLUMN,
-										mime_type,
+										mime_encoding,
 										option_table[option].help_text,
 										option_table[option].option_text,
 										option_table[option].opt_list,
 										option_table[option].opt_count
 										);
-							*(option_table[option].variable) = mime_type;
+							*(option_table[option].variable) = mime_encoding;
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
-							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
+							if (strcasecmp(txt_mime_encodings[mime_encoding], txt_8bit)) {
 								if (option == (int)OPT_POST_MIME_ENCODING) {
 									post_8bit_header = FALSE;
 									RepaintOption(OPT_POST_8BIT_HEADER);
@@ -1763,10 +1762,10 @@ change_config_file (
 	} /* forever */
 } /* change_config_file */
 
+
 /*
  *  expand ~/News to /usr/username/News and print to screen
  */
-
 static void
 expand_rel_abs_pathname (
 	int line,
@@ -1776,9 +1775,9 @@ expand_rel_abs_pathname (
 	char buf[LEN];
 
 	if (str[0] == '~') {
-		if (strlen (str) == 1) {
+		if (strlen (str) == 1)
 			strcpy (str, homedir);
-		} else {
+		else {
 			joinpath (buf, homedir, str+2);
 			strcpy (str, buf);
 		}
@@ -1804,7 +1803,7 @@ show_menu_help (
 }
 
 
-int
+t_bool
 match_boolean (
 	char *line,
 	const char *pat,
@@ -1820,7 +1819,7 @@ match_boolean (
 }
 
 #ifdef HAVE_COLOR
-static int
+static t_bool
 match_color (
 	char *line,
 	const char *pat,
@@ -1831,7 +1830,7 @@ match_color (
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
-		int found = FALSE;
+		t_bool found = FALSE;
 		for (n = 0; n < MAX_COLOR+1; n++) {
 			if (!strcasecmp(&line[patlen], txt_colors[n])) {
 				found = TRUE;
@@ -1861,7 +1860,7 @@ match_color (
  * If maxlen is set, constrain value to 0 <= dst <= maxlen and return TRUE.
  * If no match is made, return FALSE.
  */
-int
+t_bool
 match_integer (
 	char *line,
 	const char *pat,
@@ -1885,13 +1884,13 @@ match_integer (
 }
 
 
-int
+t_bool
 match_long (
 	char *line,
 	const char *pat,
 	long *dst)
 {
-	size_t	patlen = strlen (pat);
+	size_t patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		*dst = atol (&line[patlen]);
@@ -1900,8 +1899,9 @@ match_long (
 	return FALSE;
 }
 
+
 /* If the 'pat' keyword matches, lookup & return an index into the table */
-static int
+static t_bool
 match_list (
 	char *line,
 	constext *pat,
@@ -1917,7 +1917,7 @@ match_list (
 		line += patlen;
 		*dst = 0;	/* default, if no match */
 		for (n = 0; n < tablelen; n++) {
-			if (match_string(line, table[n], temp, sizeof(temp))) {
+			if (match_string (line, table[n], temp, sizeof(temp))) {
 				*dst = (int)n;
 				break;
 			}
@@ -1927,7 +1927,8 @@ match_list (
 	return FALSE;
 }
 
-int
+
+t_bool
 match_string (
 	char *line,
 	const char *pat,
@@ -2005,9 +2006,6 @@ show_config_page (void)
 {
 	int i, lines_to_print = option_lines_per_page;
 
-#ifdef USE_CURSES
-	ClearScreen ();
-#endif
 	center_line (0, TRUE, txt_options_menu);
 
 	/*

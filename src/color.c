@@ -308,7 +308,7 @@ color_fputs (
 					} else /* print normal character */
 						my_fputc(*p, stream);
 				} else {
-					if (!isalp(*( p + 1)) && col2) {
+					if (!isalp(*(p + 1)) && col2) {
 						switch (word_h_display_marks) {
 						case 1: /* print mark */
 							my_fputc(*p, stream);

@@ -32,13 +32,13 @@ static const char *spaces = "XXXX";
 /*
  * Local prototypes
  */
-static void draw_sline (int i, int full);
+static void draw_sline (int i, t_bool full);
 static void draw_subject_arrow (void);
 static void erase_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
 	static int line_is_tagged (int n);
-	static int prompt_subject_num (int ch);
+	static void prompt_subject_num (int ch);
 	static void bld_sline (int i);
 	static void update_group_page (void);
 	static void show_group_title (int clear_title);
@@ -175,8 +175,9 @@ group_page (
 		set_xclick_on ();
 		ch = ReadCh ();
 
-		if (ch > '0' && ch <= '9') {	/* 0 goes to basenote */
-			(void) prompt_subject_num (ch);
+		if (ch > '0' && ch <= '9') {			/* 0 goes to basenote */
+			if (top_base)
+				prompt_subject_num (ch);
 			continue;
 		}
 		switch (ch) {
@@ -593,6 +594,7 @@ group_catchup:								/* came here on group exit via left arrow */
 								case 1:						/* We caught up - advance group */
 									if (cur_groupnum + 1 < group_top)
 										cur_groupnum++;
+									/* FALLTHROUGH */
 								default:					/* Just leave the group */
 									goto group_done;
 							}
@@ -628,7 +630,7 @@ group_catchup:								/* came here on group exit via left arrow */
 
 			case iKeyGroupToggleHelpDisplay:	/* toggle mini help menu */
 				toggle_mini_help (GROUP_LEVEL);
-				show_group_page();
+				show_group_page ();
 				break;
 
 			case iKeyGroupToggleInverseVideo:	/* toggle inverse video */
@@ -698,7 +700,7 @@ show_group_page();
 				 */
 				if (range_active) {
 					range_active = FALSE;			/* Range has gone now */
-					show_group_page();
+					show_group_page ();
 				}
 
 				if ((n = which_thread (n)) < 0) {
@@ -845,31 +847,8 @@ group_list_thread:
 				space_mode = FALSE;
 				goto group_done;
 
-			case iKeyGroupToggleReadDisplay:
-				/*
-				 * If in show_only_unread mode or there  are
-				 * unread articles we know this thread  will
-				 * exist after toggle. Otherwise we find the
-				 * next closest
-				 */
-				wait_message (0, txt_reading_arts, (CURR_GROUP.attribute->show_only_unread) ? "all " : "unread ");
-
-				i = -1;
-				if (index_point >= 0) {
-					if (CURR_GROUP.attribute->show_only_unread || new_responses (index_point)) {
-						i = base[index_point];
-					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
-						i = n;
-					} else if ((n = next_unread ((int)base[index_point])) >= 0) {
-						i = n;
-					}
-				}
-				CURR_GROUP.attribute->show_only_unread = !CURR_GROUP.attribute->show_only_unread;
-				find_base (&CURR_GROUP);
-				if (i >= 0 && (n = which_thread (i)) >= 0)
-					index_point = n;
-				else if (top_base > 0)
-					index_point = top_base - 1;
+			case iKeyGroupToggleReadUnread:
+				toggle_read_unread(FALSE);
 				show_group_page ();
 				break;
 
@@ -982,15 +961,13 @@ group_list_thread:
 			case iKeyPostponed:
 			case iKeyPostponed2:	/* post postponed article */
 				if (can_post) {
-					if (pickup_postponed_articles(FALSE, FALSE)) {
+					if (pickup_postponed_articles(FALSE, FALSE))
 						show_group_page ();
-					}
-				} else {
+				} else
 					info_message(txt_cannot_post);
-				}
 				break;
 
-			case iKeyGroupDisplayPostHist:	/* display messages posted by user */
+			case iKeyDisplayPostHist:	/* display messages posted by user */
 				if (user_posted_messages ())
 					show_group_page ();
 				break;
@@ -1023,15 +1000,15 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(msg, "Base article range");
+					strcpy(msg, "Base article range"); /* FIXME: -> lang.c */
 				} else {
 					art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
-					strcpy(msg, "Base article");
+					strcpy(msg, "Base article"); /* FIXME: -> lang.c */
 				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
-				draw_sline(index_point, FALSE);
+				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
 				info_message (txt_marked_as_unread, msg);
 				break;
@@ -1057,7 +1034,7 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(msg, "Thread range");
+					strcpy(msg, "Thread range"); /* FIXME: -> lang.c */
 				} else {
 					thd_mark_unread (&CURR_GROUP, base[index_point]);
 					strcpy(msg, "Thread");
@@ -1065,7 +1042,7 @@ group_list_thread:
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
-				draw_sline(index_point, FALSE);
+				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
 				info_message (txt_marked_as_unread, msg);
 				break;
@@ -1090,7 +1067,7 @@ group_list_thread:
 				}
 				assert (n > 0);
 				bld_sline(index_point);
-				draw_sline(index_point, FALSE);
+				draw_sline (index_point, FALSE);
 
 				info_message (flag
 					      ? txt_thread_marked_as_selected
@@ -1124,7 +1101,7 @@ group_list_thread:
 				}
 				if (buf[0] == '\0') {
 					if (default_select_pattern[0] == '\0') {
-						info_message ("No previous expression");
+						info_message ("No previous expression"); /* FIXME: -> lang.c */
 						break;
 					}
 					sprintf (pat, REGEX_FMT, default_select_pattern);
@@ -1210,7 +1187,7 @@ undo_auto_select_arts:
 
 			case iKeyToggleInfoLastLine:
 				info_in_last_line = !info_in_last_line;
-				show_group_page();
+				show_group_page ();
 				break;
 
 			default:
@@ -1221,7 +1198,8 @@ undo_auto_select_arts:
 group_done:
 	set_xclick_off ();
 	if (index_point == GRP_QUIT) {
-		write_config_file (local_config_file);
+		if (!no_write)
+			write_config_file (local_config_file);
 		tin_done (EXIT_OK);
 	}
 	clear_note_area ();
@@ -1249,17 +1227,15 @@ show_group_page (void)
 	CleartoEOLN ();
 	MoveCursor (INDEX_TOP, 0);
 
-	if (index_point >= top_base) {
+	if (index_point >= top_base)
 		index_point = top_base - 1;
-	}
 
-	if (NOTESLINES <= 0) {
+	if (NOTESLINES <= 0)
 		first_subj_on_screen = 0;
-	} else {
+	else {
 		first_subj_on_screen = (index_point / NOTESLINES) * NOTESLINES;
-		if (first_subj_on_screen < 0) {
+		if (first_subj_on_screen < 0)
 			first_subj_on_screen = 0;
-		}
 	}
 
 	last_subj_on_screen = first_subj_on_screen + NOTESLINES;
@@ -1270,11 +1246,10 @@ show_group_page (void)
 
 		if (first_subj_on_screen == last_subj_on_screen ||
 			first_subj_on_screen < 0) {
-			if (first_subj_on_screen < 0) {
+			if (first_subj_on_screen < 0)
 				first_subj_on_screen = 0;
-			} else {
+			else
 				first_subj_on_screen = last_subj_on_screen - NOTESLINES;
-			}
 		}
 	}
 
@@ -1289,7 +1264,7 @@ show_group_page (void)
 
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
 		bld_sline(i);
-		draw_sline(i, TRUE);
+		draw_sline (i, TRUE);
 	}
 
 	CleartoEOS ();
@@ -1335,17 +1310,14 @@ draw_subject_arrow (void)
 		my_flush ();
 	} else {
 		StartInverse();
-		draw_sline(index_point, TRUE);
+		draw_sline (index_point, TRUE);
 		EndInverse();
 	}
 	if (info_in_last_line) {
 		struct t_art_stat statbuf;
-		int j;
 
-		stat_thread(index_point, &statbuf);
-		j = (statbuf.unread) ? next_unread(base[index_point]) : base[index_point];
-		clear_message();
-		center_line (cLINES, FALSE, arts[j].subject);
+		stat_thread (index_point, &statbuf);
+		info_message ("%s", arts[(statbuf.unread ? next_unread(base[index_point]) : base[index_point])].subject);
 	} else {
 		if (last_subj_on_screen == top_base)
 			info_message(txt_end_of_arts);
@@ -1362,27 +1334,24 @@ erase_subject_arrow (void)
 		my_fputs ("  ", stdout);
 	} else {
 		HpGlitch(EndInverse ());
-		draw_sline(index_point, TRUE);
+		draw_sline (index_point, TRUE);
 	}
 	my_flush ();
 }
 
 
 #ifndef INDEX_DAEMON
-static int
+static void
 prompt_subject_num (
 	int ch)
 {
 	int num;
 
-	if (!top_base)
-		return FALSE;
-
 	clear_message ();
 
 	if ((num = prompt_num (ch, txt_select_thread)) == -1) {
 		clear_message ();
-		return FALSE;
+		return;
 	}
 
 	num--;		/* index from 0 (internal) vs. 1 (user) */
@@ -1394,8 +1363,6 @@ prompt_subject_num (
 		num = top_base - 1;
 
 	move_to_thread (num);
-
-	return TRUE;
 }
 #endif /* INDEX_DAEMON */
 
@@ -1405,6 +1372,42 @@ clear_note_area (void)
 {
 	MoveCursor (INDEX_TOP, 0);
 	CleartoEOS ();
+}
+
+/*
+ * If in show_only_unread mode or there are unread articles we know this thread
+ * will exist after toggle. Otherwise we find the next closest to return to.
+ * 'force' can be set to force tin to show all messages
+ */
+void
+toggle_read_unread (
+	t_bool force)
+{
+	int i, n;
+
+	if (force)
+		CURR_GROUP.attribute->show_only_unread = TRUE;	/* Yes - really, we change it in a bit */
+
+	wait_message (0, txt_reading_arts, (CURR_GROUP.attribute->show_only_unread) ? "all " : "unread ");
+
+	i = -1;
+
+	if (index_point >= 0) {
+		if (CURR_GROUP.attribute->show_only_unread || new_responses (index_point))
+			i = base[index_point];
+		else if ((n = prev_unread ((int)base[index_point])) >= 0)
+			i = n;
+		else if ((n = next_unread ((int)base[index_point])) >= 0)
+			i = n;
+	}
+
+	CURR_GROUP.attribute->show_only_unread = !CURR_GROUP.attribute->show_only_unread;
+
+	find_base (&CURR_GROUP);
+	if (i >= 0 && (n = which_thread (i)) >= 0)
+		index_point = n;
+	else if (top_base > 0)
+		index_point = top_base - 1;
 }
 
 /*
@@ -1422,16 +1425,14 @@ find_new_pos (
 {
 	int i, pos;
 
-	if (top == old_top) {
+	if (top == old_top)
 		return cur_pos;
-	}
 
 	for (i = 0 ; i < top ; i++) {
 		if (arts[i].artnum == old_artnum) {
 			pos = which_thread (arts[i].artnum);
-			if (pos >= 0) {
+			if (pos >= 0)
 				return pos;
-			}
 		}
 	}
 
@@ -1459,15 +1460,13 @@ mark_screen (
 		move(y, x);
 #else
 		int i;
-		for (i=0 ; value[i] != '\0'; i++) {
+		for (i=0 ; value[i] != '\0'; i++)
 			screen[screen_row].col[screen_col+i] = value[i];
-		}
 #endif
-		if (level == SELECT_LEVEL) {
+		if (level == SELECT_LEVEL)
 			draw_group_arrow();
-		} else {
+		else
 			draw_subject_arrow();
-		}
 	}
 }
 
@@ -1497,14 +1496,13 @@ set_subj_from_size (
 	if (show_author != SHOW_FROM_NONE) {
 		len_from = max_from - BLANK_GROUP_COLS;
 		len_subj = max_subj;
-		len_subj += 5 * (1 - show_lines);
 		spaces = "  ";
 	} else {
 		len_from = 0;
 		len_subj = (max_subj+max_from+2) - BLANK_GROUP_COLS;
-		len_subj += 5 * (1 - show_lines);
 		spaces = "";
 	}
+		len_subj += 5 * (1 - show_lines);
 }
 
 
@@ -1517,6 +1515,7 @@ toggle_subject_from (void)
 	set_subj_from_size (cCOLS);
 }
 
+
 /*
  * Build subject line given an index into base[].
  *
@@ -1528,7 +1527,6 @@ toggle_subject_from (void)
  * that the value of MARK_OFFSET (tin.h) is still correct.
  * Yes, this is somewhat kludgy.
  */
-
 #ifndef INDEX_DAEMON
 static void
 bld_sline (
@@ -1541,7 +1539,7 @@ bld_sline (
 #endif
 	char from[HEADER_LEN];
 	char new_resps[8];
-	char art_cnt[9];
+	char art_cnt[10];
 	char arts_sub[255];
 	int respnum;
 	int n, j;
@@ -1563,7 +1561,7 @@ bld_sline (
 	 */
 
 	if ((j = line_is_tagged(respnum)))
-		strcpy (new_resps, tin_itoa(j, 3));
+		strcpy (new_resps, tin_ltoa(j, 3));
 	else
 		sprintf (new_resps, "  %c", sbuf.art_mark);
 
@@ -1576,19 +1574,19 @@ bld_sline (
 		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
 			if (arts[j].lines != -1) {
 				char tmp_buffer[4];
-				strcpy (tmp_buffer, tin_itoa(n, 3));
-				sprintf (art_cnt, "%s %s ", tmp_buffer, tin_itoa(arts[j].lines, 4));
+				strcpy (tmp_buffer, tin_ltoa(n, 3));
+				sprintf (art_cnt, "%s %s ", tmp_buffer, tin_ltoa(arts[j].lines, 4));
 			} else
-				sprintf (art_cnt, "%s    ? ", tin_itoa(n, 3));
+				sprintf (art_cnt, "%s    ? ", tin_ltoa(n, 3));
 		} else {
 			if (arts[j].lines != -1)
-				sprintf (art_cnt, "    %s ", tin_itoa(arts[j].lines, 4));
+				sprintf (art_cnt, "    %s ", tin_ltoa(arts[j].lines, 4));
 			else
 				strcpy (art_cnt, "       ? ");
 		}
 	} else {
 		if (n > 1) /* change this to (n > 0) if you do a n-- above */
-			sprintf (art_cnt, "%s ", tin_itoa(n, 3));
+			sprintf (art_cnt, "%s ", tin_ltoa(n, 3));
 		else
 			strcpy (art_cnt, "    ");
 	}
@@ -1604,7 +1602,7 @@ bld_sline (
 	buffer = screen[j].col;
 #endif
 	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
-		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
+		 tin_ltoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, from);
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
@@ -1630,7 +1628,7 @@ bld_sline (
 static void
 draw_sline (
 	int i,
-	int full)
+	t_bool full)
 {
 #ifndef INDEX_DAEMON
 	int tlen;

@@ -101,9 +101,8 @@ main (
 	init_selfinfo ();
 	init_group_hash ();
 
-	if (update_fork || (batch_mode && verbose) || !batch_mode) {
+	if (update_fork || (batch_mode && verbose) || !batch_mode)
 		error_message (cvers);		/* TODO Why to stderr ?? */
-	}
 
 	/*
 	 *  Read user local & global config files
@@ -261,7 +260,7 @@ main (
 		show_only_unread_groups = FALSE;
 	else
 		toggle_my_groups (show_only_unread_groups, "");
-#endif
+#endif /* INDEX_DAEMON */
 
 	/*
 	 * This updates the min/max/unread counters for all subscribed groups using
@@ -334,9 +333,9 @@ main (
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCdD:f:g:hHI:m:M:nNop:qQrRs:SuUvVwzZ"
+#		define OPTIONS "acCdD:f:g:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
 #	else /* M_AMIGA */ /* may need some work */
-#		define OPTIONS "BcCdD:f:hHI:m:M:nNop:qQrRs:SuUvVwzZ"
+#		define OPTIONS "BcCdD:f:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
 #	endif
 #else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"
@@ -468,7 +467,7 @@ read_cmd_line_options (
 				break;
 
 			case 'N':	/* mail new news to your posts */
-				my_strncpy (mail_news_user, userid ,sizeof(userid));
+				my_strncpy (mail_news_user, userid, sizeof(userid));
 				mail_news = TRUE;
 				batch_mode = TRUE;
 				break;
@@ -573,6 +572,10 @@ read_cmd_line_options (
 				post_article_and_exit = TRUE;
 				break;
 
+			case 'X':	/* don't save ~/.newsrc on exit */
+				no_write = TRUE;
+				break;
+
 			case 'z':
 				start_any_unread = TRUE;
 				break;
@@ -600,7 +603,7 @@ read_cmd_line_options (
 #if defined(HAVE_SYS_UTSNAME_H) && defined(HAVE_UNAME)
 			struct utsname uts;
 			(int) uname(&uts);
-			get_newsrcname(newsrc,uts.nodename);
+			get_newsrcname(newsrc, uts.nodename);
 #else	/* NeXT, Apollo */
 			char nodenamebuf[32];
 #	if defined(M_AMIGA)
@@ -608,7 +611,7 @@ read_cmd_line_options (
 #	else
 			(int) gethostname(nodenamebuf, sizeof(nodenamebuf));
 #	endif
-			get_newsrcname(newsrc,nodenamebuf);
+			get_newsrcname(newsrc, nodenamebuf);
 #endif
 		}
 	}
@@ -693,7 +696,12 @@ usage (
 #	endif /* NNTP_ABLE */
 
 	error_message ("  -q       don't check for new newsgroups");
+
+#  ifdef NNTP_ABLE
 	error_message ("  -Q       quick start. Same as -nqd");
+#	else
+	error_message ("  -Q       quick start. Same as -qd");
+#	endif /* NNTP_ABLE */
 
 #	ifdef NNTP_ABLE
 		if (!read_news_via_nntp) {
@@ -713,6 +721,7 @@ usage (
 	error_message ("  -v       verbose output for batch mode options");
 	error_message ("  -V       print version & date information");
 	error_message ("  -w       post an article and exit");
+	error_message ("  -X       don't save any files on quit");
 	error_message ("  -z       start if any unread news");
 	error_message ("  -Z       return status indicating if any unread news (batch mode)");
 

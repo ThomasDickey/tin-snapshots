@@ -45,61 +45,60 @@ msg_write_signature (
 		flag = TRUE;
 #endif
 
-	if (!thisgroup)
-		goto default_sig;
+	if (thisgroup) {
 
-	if (!strcmp(thisgroup->attribute->sigfile, "--none"))
-		return;
+		if (!strcmp(thisgroup->attribute->sigfile, "--none"))
+			return;
 
-	if (thisgroup->attribute->sigfile[0] == '!') {
-		char cmd[PATH_LEN];
-		FILE *pipe_fp;
-		char *sigcmd;
-		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-		if ((sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4)) != NULL) {
-			sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
-			if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
-				while (fgets (cmd, PATH_LEN, pipe_fp))
-					fputs (cmd, fp);
-				pclose (pipe_fp);
-			}
-			free(sigcmd);
-		} else
-			wait_message (2, txt_out_of_memory2);
+		if (thisgroup->attribute->sigfile[0] == '!') {
+			char cmd[PATH_LEN];
+			FILE *pipe_fp;
+			char *sigcmd;
+			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+			if ((sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4)) != NULL) {
+				sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
+				if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
+					while (fgets (cmd, PATH_LEN, pipe_fp))
+						fputs (cmd, fp);
+					pclose (pipe_fp);
+				}
+				free(sigcmd);
+			} else
+				wait_message (2, txt_out_of_memory2);
 
-		return;
-	}
-	get_cwd (cwd);
-
-	if (!strfpath (thisgroup->attribute->sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name)) {
-		if (!strfpath (default_sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name))
-			joinpath (path, homedir, ".Sig");
-	}
-
-	/*
-	 *  Check to see if sigfile is a directory & if it is  generate a
-	 *  random signature from sigs in sigdir. If the file ~/.sigfixed
-	 *  exists (fixed part of random sig) then  read it  in first and
-	 *  append the random sig part onto the end.
-	 */
-	if ((sigfp = open_random_sig (path)) != (FILE *) 0) {
-#ifdef DEBUG
-		if (debug == 2)
-			error_message ("USING random sig=[%s]", sigfile);
-#endif
-		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-		joinpath (path, homedir, ".sigfixed");
-		if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
-			copy_fp (fixfp, fp);
-			fclose (fixfp);
+			return;
 		}
-		copy_fp (sigfp, fp);
-		fclose (sigfp);
-		my_chdir (cwd);
-		return;
+		get_cwd (cwd);
+
+		if (!strfpath (thisgroup->attribute->sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name)) {
+			if (!strfpath (default_sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name))
+				joinpath (path, homedir, ".Sig");
+		}
+
+		/*
+		 *  Check to see if sigfile is a directory & if it is  generate a
+		 *  random signature from sigs in sigdir. If the file ~/.sigfixed
+		 *  exists (fixed part of random sig) then  read it  in first and
+		 *  append the random sig part onto the end.
+		 */
+		if ((sigfp = open_random_sig (path)) != (FILE *) 0) {
+	#ifdef DEBUG
+			if (debug == 2)
+				error_message ("USING random sig=[%s]", sigfile);
+	#endif
+			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+			joinpath (path, homedir, ".sigfixed");
+			if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
+				copy_fp (fixfp, fp);
+				fclose (fixfp);
+			}
+			copy_fp (sigfp, fp);
+			fclose (sigfp);
+			my_chdir (cwd);
+			return;
+		}
 	}
 
-default_sig:
 	/*
 	 *  Use ~/.signature or ~/.Sig or custom .Sig files
 	 */
@@ -215,7 +214,6 @@ if (debug == 2)
 				dp = NULL;
 			else {	/* if we have a non-dot entry */
 				if (stat (dp->d_name, &st) == -1) {
-gak:
 					closedir (dirp);
 					return (1);
 				}
@@ -224,11 +222,11 @@ gak:
 						/*
 						 * do subdirectories
 						 */
-						if (my_chdir (dp->d_name) < 0)
-							goto gak;
-						if ((c = thrashdir (sigdir)) == 1)
-							goto gak;
-						else if (c == -1) {
+						if ((my_chdir (dp->d_name) < 0) || ((c = thrashdir (sigdir)) == 1)) {
+							closedir (dirp);
+							return (1);
+						}
+						if (c == -1) {
 							/*
 							 * the one we picked was an
 							 * empty dir so try again.

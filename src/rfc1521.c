@@ -83,13 +83,15 @@ rfc1521_decode(
 	char content_charset[128];
 	char content_transfer_encoding[128];
 	char boundary[128];
-	const char *charset;
 	char encoding = '\0';
-	off_t hdr_pos;
+	const char *charset;
+	long hdr_pos;
 
 	if (!file)
 		return file;
+
 	f = tmpfile();
+
 	if (!f)
 		return file;
 
@@ -140,7 +142,7 @@ rfc1521_decode(
 			rewind(file);
 			rewind(f);
 
-/*        fgets_hdr is called instead of fgets. See the comment above */
+			/* fgets_hdr is called instead of fgets. See the comment above */
 			while (fgets_hdr(buf, sizeof (buf), file)) {
 				if (strncasecmp(buf, "Content-Type: ", 14) != 0 &&
 					 strncasecmp(buf, "Content-Transfer-Encoding: ", 27) != 0) {

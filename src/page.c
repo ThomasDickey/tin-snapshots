@@ -100,7 +100,7 @@ restart:
 	rotate = 0;			/* normal mode, not rot13 */
 	art = arts[respnum].artnum;
 
-	switch (art_open (&arts[respnum], group_path)) {
+	switch (art_open (&arts[respnum], group_path, TRUE)) {
 
 		case ART_UNAVAILABLE:
 			art_mark_read (group, &arts[respnum]);
@@ -248,6 +248,14 @@ end_of_article:
 					 */
 					art_close ();
 					respnum = msgid->article;
+
+					/*
+					 * Force the threading to include this art, else we can't find
+					 * it in a thread and tin crashes...
+					 */
+					if (arts[msgid->article].status == ART_READ)
+						toggle_read_unread(TRUE);
+
 					goto restart;
 				}
 				break;
@@ -721,7 +729,7 @@ return_to_index:
 					info_message(txt_cannot_post);
 				break;
 
-			case iKeyPagePostHist:	/* display messages posted by user */
+			case iKeyDisplayPostHist:	/* display messages posted by user */
 				if (user_posted_messages ()) {
 					set_signals_page ();
 					redraw_page (group->name, respnum);
@@ -742,8 +750,7 @@ return_to_index:
 				goto page_down;
 
 			case iKeyToggleInfoLastLine: /* this is _not_ correct, we do not toggle status here */
-				clear_message();
-				center_line (cLINES, FALSE, arts[respnum].subject);
+				info_message ("%s", arts[respnum].subject);
 				break;
 
 #ifdef HAVE_COLOR
@@ -952,13 +959,13 @@ print_a_line:
 					are stripped by strip_line (buf2) above */
 				if (strstr (buf2, ": ")) {
 					header_name_len = strstr(buf2,": ")-buf2;
-					strncpy(header_name,buf2,header_name_len);
+					strncpy(header_name, buf2, header_name_len);
 					header_name[header_name_len]='\0';
-					match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
-					strcpy(buf2+header_name_len+2,buf3);
+					match_header(buf2, header_name, buf3, (char *) 0, HEADER_LEN);
+					strcpy(buf2+header_name_len+2, buf3);
 				}
 			} else
-				strcpy(buf2,rfc1522_decode(buf2));
+				strcpy(buf2, rfc1522_decode(buf2));
 		}
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
@@ -1167,10 +1174,10 @@ show_first_header (
 	else {
 		char x[5];
 
-		/* Can't eval tin_itoa() more than once in a statement due to statics */
-		strcpy(x, tin_itoa(which_thread(respnum) + 1, 4));
+		/* Can't eval tin_ltoa() more than once in a statement due to statics */
+		strcpy(x, tin_ltoa(which_thread(respnum) + 1, 4));
 
-		sprintf (tmp, txt_thread_x_of_n, buf, x, tin_itoa(top_base, 4));
+		sprintf (tmp, txt_thread_x_of_n, buf, x, tin_ltoa(top_base, 4));
 		my_fputs (tmp, stdout);
 	}
 
@@ -1297,13 +1304,13 @@ show_cont_header (
 			whichresp,
 			maxresp,
 			note_page + 1,
-			arts[respnum].name?arts[respnum].name:arts[respnum].from,note_h.subj);
+			arts[respnum].name ? arts[respnum].name : arts[respnum].from, note_h.subj);
 	} else {
 		sprintf(buf, txt_thread_page,
 			whichbase + 1,
 			top_base,
 			note_page + 1,
-			arts[respnum].name?arts[respnum].name:arts[respnum].from,note_h.subj);
+			arts[respnum].name ? arts[respnum].name : arts[respnum].from, note_h.subj);
 	}
 	strip_line (buf);
 
@@ -1335,7 +1342,8 @@ show_cont_header (
 int
 art_open (
 	struct t_article *art,
-	char *group_path)
+	char *group_path,
+	t_bool rfc1521decode)
 {
 	char *ptr;
 	char buf[8192];
@@ -1346,7 +1354,7 @@ art_open (
 	if ((tex2iso_article = (tex2iso_supported ? iIsArtTexEncoded (art->artnum, group_path) : FALSE)))
 		wait_message (0, txt_is_tex_ecoded);
 
-	if ((note_fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0) {
+	if ((note_fp = open_art_fp (group_path, art->artnum, art->lines, rfc1521decode)) == (FILE *) 0) {
 		note_page = ART_UNAVAILABLE;		/* Flag error for later */
 		return ((tin_errno == 0) ? ART_UNAVAILABLE : ART_ABORT);
 	}
@@ -1379,19 +1387,16 @@ art_open (
 		is_summary = (strncasecmp (buf, "Summary: ", 9) == 0);
 
 		/* check for continued header line */
-		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
-		      && strlen(buf)<sizeof(buf)-1) {
-			if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+		while((c = peek_char(note_fp)) != EOF && isspace(c) && c != '\n' && (strlen(buf) < (sizeof(buf)-1))) {
+			if (strlen(buf) > 0 && buf[strlen(buf)-1] == '\n') {
 				if (!is_summary)
-					buf[strlen(buf)-1]='\0';
+					buf[strlen(buf)-1] = '\0';
 			}
 			fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
 		}
 
 		for (ptr = buf ; *ptr && ((*ptr != '\n') || (ptr[1] != '\0')); ptr++) {
-			if ((((*ptr) & 0xFF) < ' ')
-				&& (*ptr != '\n')
-				&& ((*ptr != '\t') || (!is_summary)))
+			if ((((*ptr) & 0xFF) < ' ') && (*ptr != '\n') && ((*ptr != '\t') || (!is_summary)))
 				*ptr = ' ';
 		}
 		*ptr = '\0';
@@ -1535,9 +1540,8 @@ show_last_page (void)
 	char buf3[LEN+50];
 	t_bool ctrl_L;		/* form feed character detected */
 
-	if (note_end) {
+	if (note_end)
 		return FALSE;
-	}
 
 	while (!note_end) {
 		note_line = (!note_page ? 5 : 3);

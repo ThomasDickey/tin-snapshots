@@ -1,14 +1,14 @@
 /*
- * Project   : tin - a Usenet reader
- * Module    : header.c
- * Author    : Urs Janssen <urs@tin.org>
- * Created   : 1997-03-10
- * Updated   : 1997-03-19
- * Copyright : (c) Copyright 1997-98 by Urs Janssen
- *             You may  freely  copy or  redistribute  this software,
- *             so  long as there is no profit made from its use, sale
- *             trade or  reproduction.  You may not change this copy-
- *             right notice, and it must be included in any copy made.
+ *  Project   : tin - a Usenet reader
+ *  Module    : header.c
+ *  Author    : Urs Janssen <urs@tin.org>
+ *  Created   : 1997-03-10
+ *  Updated   : 1997-03-19
+ *  Copyright : (c) Copyright 1997-98 by Urs Janssen
+ *              You may  freely  copy or  redistribute  this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change this copy-
+ *              right notice, and it must be included in any copy made.
  */
 
 #include "tin.h"
@@ -121,7 +121,7 @@ get_fqdn(
 {
 	char	name[MAXHOSTNAMELEN+2];
 	char	line[MAXLINELEN+1];
-	char	*cp,*domain;
+	char	*cp, *domain;
 	static char	fqdn[1024];
 	struct hostent	*hp;
 	struct in_addr	in;
@@ -130,26 +130,26 @@ get_fqdn(
 	*fqdn=0;
 	domain=NULL;
 
-	name[MAXHOSTNAMELEN]='\0';
+	name[MAXHOSTNAMELEN] = '\0';
 	if (host) {
-		if (strchr(host,'.'))
+		if (strchr(host, '.'))
 			return host;
-		(void)strncpy(name,host,MAXHOSTNAMELEN);
+		(void) strncpy(name, host, MAXHOSTNAMELEN);
 	} else
-		if (gethostname(name,MAXHOSTNAMELEN))
+		if (gethostname(name, MAXHOSTNAMELEN))
 			return(NULL);
 
-	if ('0'<=*name&&*name<='9') {
-		in.s_addr=inet_addr(name);
-		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
-			in.s_addr=(*hp->h_addr);
-		return(hp&&strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in));
+	if ('0' <= *name && *name <= '9') {
+		in.s_addr = inet_addr(name);
+		if ((hp = gethostbyaddr((char *)&in.s_addr, 4, AF_INET)))
+			in.s_addr = (*hp->h_addr);
+		return(hp && strchr(hp->h_name, '.') ? hp->h_name : inet_ntoa(in));
 	}
-	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
-		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
-			in.s_addr=(*hp->h_addr);
+	if ((hp = gethostbyname(name)) && !strchr(hp->h_name, '.'))
+		if ((hp = gethostbyaddr(hp->h_addr, hp->h_length, hp->h_addrtype)))
+			in.s_addr = (*hp->h_addr);
 
-	sprintf(fqdn,"%s",hp ? strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in) : NULL);
+	sprintf(fqdn,"%s", hp ? strchr(hp->h_name, '.') ? hp->h_name : inet_ntoa(in) : NULL);
 	if (!*fqdn || (fqdn[strlen(fqdn)-1] <= '9')) {
 		*fqdn = 0;
 		inf = fopen("/etc/resolv.conf", "r");
@@ -161,11 +161,11 @@ get_fqdn(
 					domain = line + 7;
 					break;
 				}
-				if (strncmp(line,"search ", 7) == 0) {
+				if (strncmp(line, "search ", 7) == 0) {
 					domain = line + 7;
 					cp = strchr(domain, ' ');
 					if (cp)
-						*cp=0;
+						*cp = 0;
 					break;
 				}
 			}
@@ -248,7 +248,7 @@ get_full_name(
 	}
 
 #ifdef VMS
-	strncpy (fullname, fix_fullname(get_uaf_fullname()),sizeof (fullname));
+	strncpy (fullname, fix_fullname(get_uaf_fullname()), sizeof (fullname));
 #else  /* !VMS */
 	pw = getpwuid (getuid ());
 	strncpy (buf, pw->pw_gecos, sizeof (fullname));
@@ -299,7 +299,7 @@ get_from_name (
 		return;
 	}
 
-	sprintf (from_name,((strchr(get_full_name(), '.')) ? "\"%s\" <%s@%s>" : "%s <%s@%s>"), get_full_name(), get_user_name(), fromhost);
+	sprintf (from_name, ((strchr(get_full_name(), '.')) ? "\"%s\" <%s@%s>" : "%s <%s@%s>"), get_full_name(), get_user_name(), fromhost);
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());
@@ -309,9 +309,9 @@ get_from_name (
 }
 
 /*
-** build_sender()
-** return (*(user@fq.domainna.me))
-*/
+ * build_sender()
+ * returns *(Full_Name <user@fq.domainna.me>)
+ */
 #ifndef FORGERY
 char *
 build_sender (void)

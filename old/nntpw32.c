@@ -147,11 +147,9 @@ nntp_respcode(respcode)
 		case OK_GROUP:
 			text = "211  Group selected";
 			break;
+		case OK_MOTD:
 		case OK_GROUPS:
 			text = "215  Newsgroups follow";
-			break;
-		case OK_XMOTD:
-			text = "217  News motd file follows";
 			break;
 		case OK_XINDEX:
 			text = "218  Group index file follows";
@@ -228,9 +226,6 @@ nntp_respcode(respcode)
 		case ERR_NCING:
 			text = "412  Not currently in newsgroup";
 			break;
-		case ERR_XMOTD:
-			text = "417  No news motd file";
-			break;
 		case ERR_XINDEX:
 			text = "418  No index file for this group";
 			break;
@@ -288,6 +283,7 @@ nntp_respcode(respcode)
 		case ERR_ACCESS:
 			text = "502  Access to server denied";
 			break;
+		case ERR_MOTD:
 		case ERR_FAULT:
 			text = "503  Program fault, command not performed";
 			break;

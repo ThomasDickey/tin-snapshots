@@ -4,10 +4,10 @@
 /* active.c */
 extern int get_active_num (void);
 extern int group_flag (int ch);
-extern int parse_active_line (char *line, long *max, long *min, char *moderated);
-extern int process_bogus(char *name);
 extern int resync_active_file (void);
 extern t_bool match_group_list (char *group, char *group_list);
+extern t_bool parse_active_line (char *line, long *max, long *min, char *moderated);
+extern t_bool process_bogus (char *name);
 extern void create_save_active_file (void);
 extern void load_newnews_info (char *info);
 extern void read_news_active_file (void);
@@ -19,7 +19,7 @@ extern void read_news_active_file (void);
 
 /* art.c */
 extern char *pcFindNovFile (struct t_group *psGrp, int iMode);
-extern int index_group (struct t_group *group);
+extern t_bool index_group (struct t_group *group);
 extern void do_update (void);
 extern void find_base (struct t_group *group);
 extern void make_threads (struct t_group *group, int rethread);
@@ -49,19 +49,19 @@ extern void fcol (int color);
 extern void print_color (char *str, t_bool signature);
 
 /* config.c */
+extern char **ulBuildArgv(char *cmd, int *new_argc);
 extern char *quote_space_to_dash (char *str);
 extern const char *print_boolean (t_bool value);
 extern int change_config_file (struct t_group *group);
-extern int match_boolean (char *line, const char *pat, t_bool *dst);
-extern int match_integer (char *line, const char *pat, int *dst, int maxlen);
-extern int match_long (char *line, const char *pat, long *dst);
-extern int match_string (char *line, const char *pat, char *dst, size_t dstlen);
 extern int option_row(int option);
 extern int read_config_file (char *file, int global_file);
+extern t_bool match_boolean (char *line, const char *pat, t_bool *dst);
+extern t_bool match_integer (char *line, const char *pat, int *dst, int maxlen);
+extern t_bool match_long (char *line, const char *pat, long *dst);
+extern t_bool match_string (char *line, const char *pat, char *dst, size_t dstlen);
 extern void quote_dash_to_space (char *str);
 extern void refresh_config_page (int act_option);
 extern void show_menu_help (const char *help_message);
-extern char **ulBuildArgv(char *cmd, int *new_argc);
 extern void write_config_file (char *file);
 
 /* curses.c */
@@ -128,7 +128,7 @@ extern void free_all_filter_arrays (void);
 extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
 
 /* getline.c */
-extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
+extern char *tin_getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
 
 /* group.c */
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
@@ -139,7 +139,10 @@ extern void mark_screen (int level, int screen_row, int screen_col, const char *
 extern void set_subj_from_size (int num_cols);
 extern void show_group_page (void);
 extern void toggle_subject_from (void);
-extern void move_to_thread (int n);
+#ifndef INDEX_DAEMON
+	extern void toggle_read_unread(t_bool force);
+	extern void move_to_thread (int n);
+#endif
 
 /* hashstr.c */
 extern char *hash_str (const char *s);
@@ -244,12 +247,13 @@ extern int my_chdir (char *path);
 extern int my_isprint (int c);
 extern int my_mkdir (char *path, mode_t mode);
 extern int peek_char (FILE *fp);
-extern int stat_file (char *file);
 extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format);
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
 extern int untag_all_articles (void);
+extern long file_size (char *file);
 extern t_bool mail_check (void);
+extern void append_file (char *old_filename, char *new_filename);
 extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
 extern void cleanup_tmp_files (void);
@@ -282,11 +286,9 @@ extern void vPrintBugAddress (void);
 #ifdef HAVE_ISPELL
 	extern int invoke_ispell (char *nam);
 #endif /* HAVE_ISPELL */
-#ifdef M_UNIX
-	extern void append_file (char *old_filename, char *new_filename);
-#else
+#ifndef M_UNIX
 	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
-#endif /* M_UNIX */
+#endif /* !M_UNIX */
 #ifndef	NO_SHELL_ESCAPE
 	extern void shell_escape (void);
 #endif /* NO_SHELL_ESCAPE */
@@ -335,7 +337,7 @@ extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 
 /* open.c */
 extern FILE *nntp_command(const char *, int, char *);
-extern FILE *open_art_fp (char *group_path, long art, int lines);
+extern FILE *open_art_fp (char *group_path, long art, int lines, t_bool rfc1521decode);
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
 extern FILE *open_newsgroups_fp (void);
@@ -344,6 +346,7 @@ extern FILE *open_subscription_fp (void);
 extern FILE *open_xover_fp (struct t_group *psGrp, const char *pcMode, long lMin, long lMax);
 extern FILE *open_art_header (long art);
 extern int get_respcode (char *);
+extern int get_only_respcode (char *);
 extern int nntp_open (void);
 extern int setup_hard_base (struct t_group *group, char *group_path);
 extern int stat_article (long art, char *group_path);
@@ -357,7 +360,7 @@ extern void vGrpGetSubArtInfo (void);
 #endif /* HAVE_MH_MAIL_HANDLING */
 
 /* page.c */
-extern int art_open (struct t_article *art, char *group_path);
+extern int art_open (struct t_article *art, char *group_path, t_bool rfc1521decode);
 extern int match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
 extern void art_close (void);
 extern void redraw_page (char *group, int respnum);
@@ -368,7 +371,6 @@ extern void yank_to_addr (char *orig, char *addr);
 #endif /* INDEX_DAEMON */
 
 /* parsdate.y */
-extern int GetTimeInfo (TIMEINFO *Now);
 extern time_t parsedate (char *p, TIMEINFO *now);
 
 /* pgp.c */
@@ -385,7 +387,7 @@ extern int mail_to_author (char *group, int respnum, int copy_text, int with_hea
 extern int mail_to_someone (int respnum, char *address, int mail_to_poster, int confirm_to_mail, int *mailed_ok);
 extern int post_article (char *group, int *posted_flag);
 extern int post_response (char *group, int respnum, int copy_text, int with_headers);
-extern int repost_article (char *group, struct t_article *art, int respnum, int supersede);
+extern int repost_article (char *group, int respnum, int supersede);
 extern int reread_active_file (void);
 extern int reread_active_after_posting (void);
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
@@ -396,22 +398,25 @@ extern void quick_post_article (t_bool postponed_only);
 
 /* prompt.c */
 extern char *sized_message (const char *format, const char *subject);
+extern int prompt_default_string (const char *prompt, char *buf, int buf_len, char *default_prompt, int which_hist);
 extern int prompt_list (int row, int col, int var, constext *help_text, constext *prompt_text, constext *list[], int size);
 extern int prompt_menu_string (int line, int col, char *var);
 extern int prompt_num (int ch, const char *prompt);
-extern int prompt_option_char (int option);
-extern int prompt_option_num (int option);
-extern int prompt_option_string (int option);
 extern int prompt_slk_response (int ch_default, const char *responses, const char *fmt, ...);
 extern int prompt_string (const char *prompt, char *buf, int which_hist);
 extern int prompt_yn (int line, const char *prompt, t_bool default_answer);
+extern t_bool prompt_option_char (int option);
+extern t_bool prompt_option_num (int option);
+extern t_bool prompt_option_string (int option);
 extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 
 /* read.c */
 extern char *fgets_hdr (char *s, size_t size, FILE *f);
 extern char *tin_fgets (char *buffer, size_t len, FILE *fp);
-extern void drain_buffer (FILE *fp);
+#ifdef NNTP_ABLE
+	extern void drain_buffer (FILE *fp);
+#endif /* NNTP_ABLE */
 
 /* refs.c */
 extern char *get_references (struct t_msgid *refptr);
@@ -446,14 +451,14 @@ extern int create_path (char *path);
 extern int post_process_files (int proc_type_ch, t_bool auto_delete);
 extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
 extern int save_comp (t_comptype *p1, t_comptype *p2);
-#ifndef INDEX_DAEMON
-	extern int save_regex_arts (int is_mailbox, char *group_path);
-	extern int save_thread_to_file (int is_mailbox, char *group_path);
-#endif
 extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
 extern void delete_processed_files (t_bool auto_delete);
 extern void print_art_seperator_line (FILE *fp, int the_mailbox);
 extern void sort_save_list (void);
+#ifndef INDEX_DAEMON
+	extern int save_regex_arts (int is_mailbox, char *group_path);
+	extern t_bool save_thread_to_file (int is_mailbox, char *group_path);
+#endif
 
 /* screen.c */
 extern void center_line (int line, int inverse, const char *str);
@@ -518,7 +523,7 @@ extern size_t my_strftime (char *s, size_t maxsize, const char *format, struct t
 extern char *my_strdup (const char *str);
 extern char *str_trim (char *string);
 extern char *strcasestr (char *haystack, const char *needle);
-extern char *tin_itoa (int value, int digits);
+extern char *tin_ltoa (long value, int digits);
 extern int sh_format(char *dst, size_t len, const char *fmt, ...);
 extern size_t mystrcat (char **t, const char *s);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);

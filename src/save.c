@@ -185,7 +185,7 @@ check_start_save_any_news (
 #endif
 					}
 
-					switch (art_open (&arts[j], group_path)) {
+					switch (art_open (&arts[j], group_path, do_rfc1521_decoding)) {
 						case ART_UNAVAILABLE:
 							continue;
 						case ART_ABORT:				/* User 'q'uit */
@@ -373,7 +373,7 @@ save_art_to_file (
 }
 
 
-int
+t_bool /* return value is always ignored */
 save_thread_to_file (
 	int is_mailbox,
 	char *group_path)
@@ -400,10 +400,10 @@ save_thread_to_file (
 		else
 			sprintf (file, "%s.%03d", save[i].file, i+1);
 
-		switch (art_open (&arts[save[i].index], group_path)) {
+		switch (art_open (&arts[save[i].index], group_path, do_rfc1521_decoding)) {
 
 			case ART_ABORT:					/* User 'q'uit */
-				return (FALSE);
+				return FALSE;
 
 			case ART_UNAVAILABLE:			/* Ignore, just keep going */
 				continue;
@@ -455,7 +455,7 @@ save_regex_arts (
 		else
 			sprintf (buf, "%s.%03d", save[i].file, i+1);
 
-		switch (art_open (&arts[save[i].index], group_path)) {
+		switch (art_open (&arts[save[i].index], group_path, do_rfc1521_decoding)) {
 
 			case ART_ABORT:					/* User 'q'uit */
 				return (ret_code);
@@ -1120,8 +1120,8 @@ post_process_uud (
 						unlink (file_out);
 						return;
 				}
-				strcpy (u,t);
-				strcpy (t,s);
+				strcpy (u, t);
+				strcpy (t, s);
 				/*
 				 *  read next line & if error goto next file in save array
 				 */
@@ -1159,8 +1159,6 @@ uudecode_file (
 	char *file, *ptr;
 	char buf[LEN];
 	int i;
-	off_t	file_size = 0;
-	struct stat st;
 
 	wait_message (1, txt_uudecoding, file_out);
 
@@ -1176,8 +1174,6 @@ uudecode_file (
 		if ((file = get_archive_file (file_out_dir)) != 0) {
 			sh_format (buf, sizeof(buf), "%s %s", DEFAULT_SUM, file);
 			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
-				if (stat (file, &st) != -1)
-					file_size = st.st_size;
 				if (fgets (buf, sizeof (buf), fp_in) != 0) {
 					ptr = strchr (buf, '\n');
 					if (ptr != 0)
@@ -1186,12 +1182,10 @@ uudecode_file (
 				pclose (fp_in);
 				my_printf (txt_checksum_of_file, file);
 				my_flush ();
-				my_printf ("%s  %8d bytes" cCRLF cCRLF, buf, (int)file_size);
-				my_flush ();
-			} else {
+				my_printf ("%s  %10ld bytes" cCRLF cCRLF, buf, file_size (file));
+			} else
 				my_printf ("Cannot execute %s" cCRLF, buf);
-				my_flush ();
-			}
+			my_flush ();
 
 			/* If defined, invoke post processor command */
 			if (*post_proc_command) {

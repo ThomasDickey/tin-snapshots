@@ -34,6 +34,7 @@ static void create_newsrc (char *newsrc_file);
 static void parse_bitmap_seq (struct t_group *group, char *seq);
 static void print_bitmap_seq (FILE *fp, struct t_group *group);
 
+
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
  *  active[] entries.
@@ -59,7 +60,7 @@ read_newsrc (
 	/*
 	 * make a .newsrc if one doesn't exist & auto subscribe to set groups
 	 */
-	if (!stat_file (newsrc_file)) {
+	if (file_size (newsrc_file) == -1L) {
 		create_newsrc (newsrc_file);
 		auto_subscribe_groups (newsrc_file);
 	}
@@ -110,8 +111,14 @@ iWriteNewsrcLine (
 
 	seq = pcParseNewsrcLine (line, &sub);
 
-	if (line[0] == 0 || sub == 0)		/* Insurance against blank line */
+	if (line[0] == '\0' || sub == 0)		/* Insurance against blank line */
 		return 0;
+
+	if (seq == NULL) {		/* line has no ':' or '!' in it */
+		if (strip_bogus == BOGUS_REMOVE)
+			wait_message(2, txt_remove_bogus, line);
+		return 0;
+	}
 
 	/*
 	 * Find the group in active. If we cannot, then junk it if bogus groups
@@ -121,8 +128,8 @@ iWriteNewsrcLine (
 	psGrp = psGrpFind (line);
 
 	if (strip_bogus == BOGUS_REMOVE) {
-		if (psGrp == NULL || psGrp->bogus) {
-			wait_message(1, txt_remove_bogus, line);
+		if (psGrp == NULL || psGrp->bogus) { /* group dosen't exist */
+			wait_message(2, txt_remove_bogus, line);
 			return 0;
 		}
 	}
@@ -169,7 +176,7 @@ vWriteNewsrc (void)
 			chmod (newnewsrc, newsrc_mode);
 
 		while ((line = tin_fgets (buf, sizeof(buf), fp_ip)) != (char *) 0)
-			tot += iWriteNewsrcLine(fp_op,line);
+			tot += iWriteNewsrcLine(fp_op, line);
 
 		/*
 		 * Don't rename if either fclose() fails or ferror() is set
@@ -195,10 +202,10 @@ vWriteNewsrc (void)
 #endif	/* INDEX_DAEMON */
 }
 
+
 /*
  *  Create a newsrc from active[] groups. Subscribe to all groups.
  */
-
 static void
 create_newsrc (
 	char *newsrc_file)
@@ -217,12 +224,12 @@ create_newsrc (
 	}
 }
 
+
 /*
  * Automatically subscribe user to newsgroups specified in
  * NEWSLIBDIR/subscribe (locally) or same file but from NNTP
  * server (LIST SUBSCRIPTIONS) and create .newsrc
  */
-
 static void
 auto_subscribe_groups (
 	char *newsrc_file)
@@ -247,7 +254,7 @@ auto_subscribe_groups (
 		chmod (newsrc_file, newsrc_mode);
 
 /* TODO test me ! */
-	while (( ptr = tin_fgets (buf, sizeof (buf), fp_subs)) != (char *) 0) {
+	while ((ptr = tin_fgets (buf, sizeof (buf), fp_subs)) != (char *) 0) {
 		if (ptr[0] != '#') {
 			if (psGrpFind (ptr) != 0)
 				fprintf (fp_newsrc, "%s:\n", ptr);
@@ -262,10 +269,10 @@ auto_subscribe_groups (
 	TIN_FCLOSE (fp_subs);
 }
 
+
 /*
  * make a backup of users .newsrc in case of the bogie man
  */
-
 void
 backup_newsrc (void)
 {
@@ -298,11 +305,11 @@ backup_newsrc (void)
 #endif /* INDEX_DAEMON */
 }
 
+
 /*
  * Subscribe/unsubscribe to a group in .newsrc.
  *	This involves rewriting the .newsrc with the new info
  */
-
 void
 subscribe (
 	struct t_group *group,
@@ -405,6 +412,7 @@ reset_newsrc (void)
 		vSetDefaultBitmap (&active[my_group[i]]);
 }
 
+
 /*
  * Rewrite the newsrc file, without the specified group
  */
@@ -442,6 +450,7 @@ delete_group (
 			rename_file (newnewsrc, newsrc);
 	}
 }
+
 
 void
 grp_mark_read (
@@ -546,10 +555,10 @@ thd_mark_unread (
 		art_mark_will_return (group, &arts[i]); /* art_mark_unread (group, &arts[i]); */
 }
 
+
 /*
  * Parse the newsrc sequence for the specified group
  */
-
 static void
 parse_bitmap_seq (
 	struct t_group *group,
@@ -574,9 +583,10 @@ parse_bitmap_seq (
 		char buf[NEWSRC_LINE];
 		sprintf (buf, "Parsing [%s%c %.*s]", group->name, SUB_CHAR(group->subscribed), (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
 		debug_print_comment(buf);
-		debug_print_bitmap(group,NULL);
+		debug_print_bitmap(group, NULL);
 	}
 #endif
+
 	if (ptr) {
 		gotseq = TRUE;
 		ptr = pcParseGetSeq (ptr, &low, &high);
@@ -653,6 +663,7 @@ wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
 #endif
 }
 
+
 /*
  * Parse a subsection of the newsrc sequencer ie., 1-34,23-90,93,97-99
  * would parse the sequence if called in a loop in the following way:
@@ -661,7 +672,6 @@ wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
  *   3rd call would parse    93 and return 97-99
  *   4th call would parse 97-99 and return NULL
  */
-
 static char *
 pcParseSubSeq (
 	struct	t_group *psGrp,
@@ -746,10 +756,10 @@ pcParseGetSeq(
 	return pcSeq;
 }
 
+
 /*
  * Loop thru arts[] array marking state of each article READ/UNREAD
  */
-
 void
 parse_unread_arts (
 	struct t_group *group)
@@ -793,6 +803,7 @@ parse_unread_arts (
 	group->newsrc.xbitmap = newbitmap;
 	group->newsrc.num_unread = unread;
 }
+
 
 static void
 print_bitmap_seq (
@@ -871,7 +882,6 @@ print_bitmap_seq (
 /*
  *  rewrite .newsrc and position group at specifed position
  */
-
 int
 pos_group_in_newsrc (
 	struct t_group *group,
@@ -942,9 +952,9 @@ pos_group_in_newsrc (
 			found = TRUE;
 			continue;
 		} else if (strchr (line, SUBSCRIBED) != (char *) 0) {
-			iWriteNewsrcLine(fp_sub,line);
+			iWriteNewsrcLine(fp_sub, line);
 		} else if (strchr (line, UNSUBSCRIBED) != (char *) 0) {
-			iWriteNewsrcLine(fp_unsub,line);
+			iWriteNewsrcLine(fp_unsub, line);
 		} else {								/* options line at beginning of .newsrc */
 			fprintf (fp_sub, "%s\n", line);
 			option_line = TRUE;
@@ -1048,6 +1058,7 @@ rewrite_group_done:
 	return ret_code;
 }
 
+
 /*
  *  catchup all groups in .newsrc
  */
@@ -1138,6 +1149,7 @@ pcParseNewsrcLine (
 	return ptr;
 }
 #endif
+
 
 void
 expand_bitmap (
@@ -1271,6 +1283,7 @@ art_mark_read (
 	}
 }
 
+
 void
 art_mark_unread (
 	struct t_group *group,
@@ -1300,11 +1313,12 @@ art_mark_unread (
 	}
 }
 
-/* make a funktion art_mark(group, art, FLAG)
+
+/*
+ * make a funktion art_mark(group, art, FLAG)
  * could be uses for art_mark_will_return(),
  * art_mark_unread(),...
  */
-
 void
 art_mark_will_return (
 	struct t_group *group,
@@ -1330,6 +1344,7 @@ art_mark_will_return (
 	}
 }
 
+
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 art_mark_deleted (
@@ -1353,6 +1368,7 @@ wait_message(2, "FIXME  article marked for undeletion");
 }
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
+
 void
 vSetDefaultBitmap (
 	struct t_group *group)
@@ -1370,6 +1386,7 @@ vSetDefaultBitmap (
 		group->newsrc.xmax = group->xmin-1;
 	}
 }
+
 
 /* TEST harness */
 #ifdef DEBUG_NEWSRC
@@ -1421,7 +1438,7 @@ vNewsrcTestHarness (void)
 		/* FIXME - this is secure now, but doesn't write any debug output */
 		/* (it didn't before too) */
 			if ((temp_file = my_tempnam ("","NEWSRC")) != (char *) 0) {
-				if ((fd = open (temp_file, (O_CREAT|O_EXCL),(S_IRUSR|S_IWUSR))) !=-1) {
+				if ((fd = open (temp_file, (O_CREAT|O_EXCL), (S_IRUSR|S_IWUSR))) !=-1) {
 					if ((fp = fopen (temp_file, "w")) != (FILE *) 0) {
 						my_printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
 						parse_bitmap_seq (&group, seq);

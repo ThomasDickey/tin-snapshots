@@ -138,11 +138,15 @@ search_author (
 	return -1;
 }
 
+
 /*
  * Called by config.c
  */
 int
-search_config(int forward, int current, int last)
+search_config(
+	int forward,
+	int current,
+	int last)
 {
 	int n;
 	int incr = forward ? 1 : -1;
@@ -226,11 +230,15 @@ search_group (
 }
 #endif /* !INDEX_DAEMON */
 
+
 /*
  * Called by help.c
  */
 int
-search_help(int forward, int current, int last)
+search_help(
+	int forward,
+	int current,
+	int last)
 {
 	int n;
 	int incr = forward ? 1 : -1;
@@ -504,9 +512,9 @@ search_art_body (
 	FILE *fp;
 
 #if 1 /* see also screen.c show_progress ()*/
-	if ((fp = open_art_fp (group_path, art->artnum, -art->lines)) == (FILE *) 0)
+	if ((fp = open_art_fp (group_path, art->artnum, -art->lines, TRUE)) == (FILE *) 0)
 #else
-	if ((fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0)
+	if ((fp = open_art_fp (group_path, art->artnum, art->lines, TRUE)) == (FILE *) 0)
 #endif
 		return ((tin_errno != 0) ? -1 : FALSE);
 

@@ -202,13 +202,11 @@ score=kill
 subj=([cd]news|diablo)
 
 ### this should mark all articles about tin, rtin, tind, ktin or cdtin as hot
-### (the rule is not 100% exact, but this doesn't matter as the other
-###  subjects which might match don't make sense and will not be used)
 group=*
 type=1
 case=1
 score=hot
-subj=\b[ckr]?[d]?tin[d]?[0-9]*\b
+subj=\b((cd)|[rk]?)?tin(d|pre)?[-\.0-9]*\b
 
 ### mark own articles and followups to own articles as hot in all groups
 ### except local ones
@@ -218,15 +216,15 @@ group=*,!akk.*,!tin.*
 type=1
 case=1
 score=hot
-from=urs@(.*\.|)((akk\.uni-karlsruhe|dana)\.de|(karlsruhe|tin|akk)\.org|ka\.nu|argh\.net)
+from=urs@(.*\.)?((akk\.uni-karlsruhe|dana)\.de|(karlsruhe|tin|akk)\.org|ka\.nu|argh\.net)
 msgid=@akk3\.akk\.uni-karlsruhe\.de>
 
 ### stupid ppl. sometimes read control.cancel to see if there are any
 ### forged cancels around... the next rule helps you a bit
 ### ignore know despammers and net.* cancels
 group=control.cancel
-type=0 
-case=1 
+type=0
+case=1
 score=kill
 from=(news@news\.msfc\.nasa\.gov|clewis@ferret\.ocunix\.on\.ca|jem@xpat\.com|(jeremy|lysander)@exit109\.com|howardk@iswest\.com|cosmo.roadkill.*rauug\.mil\.wi\.us|spamless@pacbell\.net|cwilkins@.*\.clark\.net)
 msgid_only=<net-monitor-cancel
@@ -243,14 +241,14 @@ subj=[\$\*\!]{3,}
 lines=<3
 xref_max=10
 
-#####    
+#####
 ### mark own articles and direct replies based on message-id
 ### use 2*hot as score to unkill otherwise killed articles
-group=*  
-type=1         
+group=*
+type=1
 case=1
-score=200              
-msgid_last=doeblitz\.ts\.rz\.tu-bs\.de                                          
+score=200
+msgid_last=doeblitz\.ts\.rz\.tu-bs\.de
 #####
 ### unmark own articles based on message-id
 ### -> only f'ups to own articles keep marked hot

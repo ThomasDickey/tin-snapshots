@@ -3,8 +3,9 @@
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
  *  Created   : 1997-04-05
- *  Updated   : 1997-12-19
- *  Notes     : Routines to authenticate to a news server via NNTP
+ *  Updated   : 1998-04-18
+ *  Notes     : Routines to authenticate to a news server via NNTP.
+ *              DON'T USE get_respcode() THROUGHOUT THIS CODE.
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -104,11 +105,11 @@ authinfo_generic (void)
 #endif
 
 		/* TODO - is it possible that we should have drained server here ? */
-		return (builtinauth ? (get_respcode(NULL) == OK_AUTH) : invoke_cmd (authval));
+		return (builtinauth ? (get_only_respcode(NULL) == OK_AUTH) : invoke_cmd (authval));
 }
 
 /*
- * Read the $TIN_HOME/.newsauth file and put authentication username
+ * Read the $HOME/.newsauth file and put authentication username
  * and password for the specified server in the given strings.
  * Returns TRUE if at least a password was found, FALSE if there was
  * no .newsauth file or no matching server.
@@ -152,7 +153,7 @@ read_newsauth_file (
 			 * Get server from 1st part of the line
 			 */
 
-			ptr = strchr (line, ' ');
+			ptr = strpbrk (line, " \t");
 
 			if (ptr == (char *) 0)		/* no passwd, no auth, skip */
 				continue;
@@ -166,17 +167,17 @@ read_newsauth_file (
 			 * Get password from 2nd part of the line
 			 */
 
-			while (*ptr == ' ')
-				ptr++;		/* skip any blanks */
+			while (*ptr == ' ' || *ptr == '\t')
+				ptr++;	/* skip any blanks */
 
 			_authpass = ptr;
 
-			if (*_authpass == '"') {		/* skip "embedded" password string */
+			if (*_authpass == '"') {	/* skip "embedded" password string */
 				ptr = strrchr (_authpass, '"');
 				if ((ptr != (char *) 0) && (ptr > _authpass)) {
 					_authpass++;
 					*ptr++ = '\0';	/* cut off trailing " */
-				} else			/* no matching ", proceede as normal */
+				} else	/* no matching ", proceede as normal */
 					ptr = _authpass;
 			}
 
@@ -184,10 +185,10 @@ read_newsauth_file (
 			 * Get user from 3rd part of the line
 			 */
 
-			ptr = strchr (ptr, ' ');		/* find next separating blank */
+			ptr = strpbrk (ptr, " \t");	/* find next separating blank */
 
-			if (ptr != (char *) 0) {		/* a 3rd argument follows */
-				while (*ptr == ' ')	/* skip any blanks */
+			if (ptr != (char *) 0) {	/* a 3rd argument follows */
+				while (*ptr == ' ' || *ptr == '\t')	/* skip any blanks */
 					*ptr++ = '\0';
 				if (*ptr != '\0')	/* if its not just empty */
 					strcpy (authuser, ptr);	/* so will replace default user */
@@ -221,7 +222,7 @@ do_authinfo_original (
 	debug_nntp ("authorization", line);
 #endif
 	put_server (line);
-	if ((ret = get_respcode(NULL)) != NEED_AUTHDATA)
+	if ((ret = get_only_respcode(NULL)) != NEED_AUTHDATA)
 		return ret;
 
 	if ((authpass == (char *) 0) || (*authpass == '\0')) {
@@ -237,15 +238,15 @@ do_authinfo_original (
 	debug_nntp ("authorization", line);
 #endif
 	put_server (line);
-	wait_message(2, (((ret = get_respcode(line)) == OK_AUTH) ? txt_authorization_ok : txt_authorization_fail), authuser);
+	wait_message(2, (((ret = get_only_respcode(line)) == OK_AUTH) ? txt_authorization_ok : txt_authorization_fail), authuser);
 	return ret;
 }
 
 /*
  * NNTP user authorization. Returns TRUE if authorization succeeded,
  * FALSE if not.
- * Password read from ~/.newsauth or, if not present or no matching server
- * found, from console.
+ * Password read from ~/.newsauth or, if not present or no matching
+ * server found, from console.
  * The ~/.newsauth authorization file has the format:
  *   nntpserver1 password [user]
  *   nntpserver2 password [user]
@@ -302,8 +303,8 @@ authinfo_original (
 	/*
 	 * At this point, either authentication with username/password pair from
 	 * .newsauth has failed or there's no .newsauth file respectively no
-	 * matching username/password for the current server.  If we are not at
-	 * startup we ask the user to enter such a pair by hand.  Don't ask him
+	 * matching username/password for the current server. If we are not at
+	 * startup we ask the user to enter such a pair by hand. Don't ask him
 	 * at startup because if he doesn't need to authenticate (we don't know),
 	 * the "Server expects authentication" messages are annoying (and even
 	 * wrong).
@@ -313,16 +314,20 @@ authinfo_original (
 	 * that the server doesn't want a password; so only ask for it if needed.
 	 */
 	if (!startup) {
-/* FIXME: add default value to prompt */
-		if (! prompt_string(txt_auth_user_needed, authusername, HIST_OTHER)) {
+		int state;
+		wait_message (0, txt_auth_needed);
+		state = RawState();
+		Raw(TRUE);
+		if (! prompt_default_string(txt_auth_user, authuser, PATH_LEN, authusername, HIST_OTHER)) {
 #ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
 #endif /* DEBUG */
 			return FALSE;
 		}
-
 		clear_message ();
-		ptr = getpass (txt_auth_pass_needed);
+		Raw(state);
+		printf ("\n");
+		ptr = getpass (txt_auth_pass);
 		authpass = strncpy (authpassword, ptr, PATH_LEN);
 		ret = do_authinfo_original (server, authuser, authpass);
 	}

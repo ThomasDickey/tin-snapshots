@@ -15,7 +15,7 @@ that caused the request will be sent again.
 
 For an authentication with the Original AUTHINFO method, tin needs a
 user-name and a password for the current news server. This information is
-obtained from a file .newsauth in the TIN_HOME directory. The format of the
+obtained from a file .newsauth in the $HOME directory. The format of the
 .newsauth file is as follows:
 
 news.server1 password1 [username1]
@@ -23,15 +23,15 @@ news.server2 password2 [username2]
 ...
 
 The first line matching the current news server is taken. The delimiters
-between the fields MUST be spaces. If a password contains spaces, you have
-to surround the whole password by double quotes. If no user-name is given
-for the current news server, the user-id of the user who started tin is
-assumed.
+between the fields MUST be spaces or TABS. If a password contains spaces,
+you have to surround the whole password by double quotes. If no user-name is
+given for the current news server, the user-id of the user who started tin
+is assumed.
 
 Security consideration: tin does not prove if the .newsauth file could be
 read by others. The user is responsible for accurate permissions.
 
-If you do not have a .newsauth file in your TIN_HOME directory, tin prompts
+If you do not have a .newsauth file in your $HOME directory, tin prompts
 you for a user-name and a password. This is NOT done at connection startup,
 because there is no way for tin to find out if an authentication at this
 time is needed. If you need to authenticate at the beginning of your news

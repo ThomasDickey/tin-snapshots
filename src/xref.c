@@ -16,11 +16,11 @@
 
 /* dbmalloc checks memset() parameters, so we'll use it to check the assignments */
 #ifdef USE_DBMALLOC
-#	define BIT_OR(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] | (mask), 1)
-#	define BIT_AND(n,b,mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] & (mask), 1)
+#	define BIT_OR(n, b, mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] | (mask), 1)
+#	define BIT_AND(n, b, mask)	memset(n+NOFFSET(b), n[NOFFSET(b)] & (mask), 1)
 #else
-#	define BIT_OR(n,b,mask)	n[NOFFSET(b)] |= mask
-#	define BIT_AND(n,b,mask)	n[NOFFSET(b)] &= mask
+#	define BIT_OR(n, b, mask)	n[NOFFSET(b)] |= mask
+#	define BIT_AND(n, b, mask)	n[NOFFSET(b)] &= mask
 #endif /* USE_DBMALLOC */
 
 static void read_xref_header (struct t_article *art);
@@ -41,9 +41,11 @@ overview_xref_support (void)
 
 	if ((fp = open_overview_fmt_fp ()) != (FILE *) 0) {
 		while ((tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
-			if (STRCMPEQ(buf, "Xref:full")) {
+			if (!strcasecmp(buf, "Xref:full")) {
 				supported = TRUE;
+#ifdef NNTP_ABLE
 				drain_buffer(fp);
+#endif /* NNTP_ABLE */
 				break;
 			}
 		}
