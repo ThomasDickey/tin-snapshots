@@ -78,7 +78,8 @@
 	use_color_tinrc			OPT_ON_OFF
 	col_normal			txt_colors	MAX_COLOR+1
 	col_back			txt_colors	MAX_COLOR+1
-	col_invers			txt_colors	MAX_COLOR+1
+	col_invers_bg			txt_colors	MAX_COLOR+1
+	col_invers_fg			txt_colors	MAX_COLOR+1
 	col_text			txt_colors	MAX_COLOR+1
 	col_minihelp			txt_colors	MAX_COLOR+1
 	col_help			txt_colors	MAX_COLOR+1

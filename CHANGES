@@ -1,3 +1,18 @@
+--unoff BETA release 970101 --
+
+267) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. detection of _highlighted_ *words* directly followed by a , or .
+     FIX. color.c
+
+266) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. quoting/escaping of arguments in strf_mailer()
+     FIX. misc.c
+
+265) Thomas Quinot <operator@cuivre.fdn.fr>
+     ADD. 'K'ill article now cycles throught the list (group.c)
+     ADD. inervers_bg/fg-color
+     FIX. several supplied patches
+
 --unoff BETA release 961231 --
 
 264) Urs Janssen <urs@akk.uni-karlsruhe.de>

@@ -15,6 +15,10 @@
 #include	"tin.h"
 #include	"version.h"
 
+/* local prototypes */
+
+static char * escape_shell_meta P_((char *source, int quote_area));
+
 /*
  * special itoa()
  * converts value into a string with a len of digits
@@ -2188,6 +2192,60 @@ sleep (2);
 	}
 }
 
+enum quote_enum {
+	no_quote = 0,
+	dbl_quote,
+	sgl_quote };
+
+static char *
+escape_shell_meta (source, quote_area)
+	char *source;
+	int quote_area;
+{
+	static char buf[PATH_LEN];
+	char *dest = buf;
+
+	switch (quote_area) {
+		case no_quote:
+			while (*source) {
+				if (*source == '\'' || *source == '\\' || *source == '"' ||
+					*source == '$' || *source == '`' || *source == '*' ||
+					*source == '&' || *source == '|' || *source == '<' ||
+					*source == '>' || *source == ';' || *source == '(' ||
+					*source == ')')
+					*dest++ = '\\';
+				*dest++ = *source++;
+			}
+			break;
+
+		case dbl_quote:
+			while (*source) {
+				if (*source == '\\' || *source == '"' || *source == '$' ||
+					*source == '`')
+					*dest++ = '\\';
+				*dest++ = *source++;
+			}
+			break;
+
+		case sgl_quote:
+			while (*source) {
+				if (*source == '\'') {
+					*dest++ = '\'';
+					*dest++ = '\\';
+					*dest++ = '\'';
+				}
+				*dest++ = *source++;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	*dest = '\0';
+	return buf;
+}
+
 /*
  * strfmailer() - produce formatted mailer string
  *   %M  Mailer
@@ -2210,7 +2268,7 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];
-	int i;
+	int i, quote_area = no_quote;
 
 	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0) {
 		return 0;
@@ -2224,6 +2282,10 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 		tbuf[0] = '\0';
 
 		if (*format != '\\' && *format != '%') {
+			if (*format == '"' && quote_area != sgl_quote)
+				quote_area = (quote_area == dbl_quote ? no_quote : dbl_quote);
+			if (*format == '\'' && quote_area != dbl_quote)
+				quote_area = (quote_area == sgl_quote ? no_quote : sgl_quote);
 			*s++ = *format;
 			continue;
 		}
@@ -2242,7 +2304,7 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 					tbuf[2] = '\0';
 					break;
 			}
-			i = strlen(tbuf);
+			i = strlen (tbuf);
 			if (i) {
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);
@@ -2261,19 +2323,19 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 					*s++ = '%';
 					continue;
 				case 'F':	/* Filename */
-					strcpy(tbuf, filename);
+					strcpy (tbuf, filename);
 					break;
 				case 'M':	/* Mailer */
 					strcpy (tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy(tbuf, rfc1522_encode(subject));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject), quote_area));
 					break;
 				case 'T':	/* To */
-					strcpy(tbuf, rfc1522_encode(to));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to), quote_area));
 					break;
 				case 'U':	/* User */
-					strcpy(tbuf, rfc1522_encode(userid));
+					strcpy (tbuf, rfc1522_encode (userid));
 					break;
 				default:
 					tbuf[0] = '%';
@@ -2281,7 +2343,7 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 					tbuf[2] = '\0';
 					break;
 			}
-			i = strlen(tbuf);
+			i = strlen (tbuf);
 			if (i) {
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);

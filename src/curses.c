@@ -674,7 +674,8 @@ StartInverse ()
 	if (_setinverse && inverse_okay) {
 #ifdef HAVE_COLOR
 		if (use_color) {
-			bcol(col_invers);
+			bcol(col_invers_bg);
+			fcol(col_invers_fg);
 		} else {
 			tputs (_setinverse, 1, outchar);
 		}
@@ -700,6 +701,7 @@ EndInverse ()
 	if (_clearinverse && inverse_okay) {
 #ifdef HAVE_COLOR
 		if (use_color) {
+			fcol(col_normal);
 			bcol(col_back);
 		} else {
 			tputs (_clearinverse, 1, outchar);

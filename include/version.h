@@ -17,7 +17,7 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"961231"
+#define RELEASEDATE	"970101"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

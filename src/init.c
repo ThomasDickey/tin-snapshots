@@ -167,7 +167,8 @@ int ask_for_metamail;			/* enables/disables the metamail query if a MIME message
 int use_color;				/* enables/disables ansi-color support under linux-console and color-xterm */
 int use_color_tinrc;		/* like use_color but stored in tinrc */
 int col_back;				/* standard bacground color */
-int col_invers;				/* color of inverse text */
+int col_invers_fg;			/* color of inverse text (foreground) */
+int col_invers_bg;			/* color of inverse text (background) */
 int col_text;				/* color of textlines*/
 int col_minihelp;			/* color of mini help menu*/
 int col_help;				/* color of help pages */
@@ -457,7 +458,8 @@ void init_selfinfo ()
 	use_color = FALSE;
 	use_color_tinrc = FALSE;
 	col_back = 0;
-	col_invers = 4;
+	col_invers_bg = 4;
+	col_invers_fg = 7;
 	col_text = 7;
 	col_minihelp = 3;
 	col_help = 7;
