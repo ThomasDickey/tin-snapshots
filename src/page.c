@@ -680,12 +680,14 @@ return_to_index:
 
 #ifdef HAVE_COLOR
 			case iKeyPageToggleHighlight:
-				word_highlight = !word_highlight;
-				redraw_page(group->name, respnum);
-				if (word_highlight)
-					info_message(txt_toggled_high_on);
-				else
-					info_message(txt_toggled_high_off);
+				if(use_color) { /* make sure we have color turned on */
+					word_highlight = !word_highlight;
+					redraw_page(group->name, respnum);
+					if (word_highlight)
+						info_message(txt_toggled_high_on);
+					else
+						info_message(txt_toggled_high_off);
+				}
 				break;
 #endif				
 
