@@ -1,3 +1,17 @@
+--unoff BETA release 960622 --
+
+091) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. Hashing of Message-ID and References headers in msgid cache
+          o Saves memory
+          o Much faster reference threading
+          o Better reference threading
+     ADD. Rewrote reference threading to use msgid cache. The entire
+          reference tree is now used to collate and build threads,
+          even where respective articles no longer exist
+     BUG. Expired articles could still included in reference based threads
+     BUG. Thread Toggle key didn't work if no unread messages remained
+     FIX. several supplied patches
+
 --unoff BETA release 960619 --
 
 090) Chris Blum <chris@phil.uni-sb.de>
@@ -253,7 +267,6 @@
 
 042) Jason Faultless <jason@radar.demon.co.uk>
      ADD. Initial implementation of references based threading.
-          See refs.c for more information, TODO etc..
           o Can be set on Options Menu
           o 'u' in group mode cycles through none, subj, refs
           When in a group, threading type appears at top as (S) or (R)

@@ -230,7 +230,7 @@ parse_newsrc_active_line (fp, group, count, max, min, moderated)
 			continue;
 		}
 		*ptr = '\0';
-		
+
 		vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min);
 
 		strcpy (group, buf);
@@ -250,20 +250,22 @@ parse_newsrc_active_line (fp, group, count, max, min, moderated)
 void
 read_news_active_file ()
 {
-	FILE *fp;
+	FILE *fp = NULL;
 	char buf[LEN];
 	char moderated[PATH_LEN];
 	int i;
 	long count = -1L , h;
 	long min = 1, max = 0;
 		
+	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
+		newsrc_active = FALSE;
+
 	if ((update && update_fork) || ! update) {
-		wait_message (txt_reading_news_active_file);
+		wait_message (newsrc_active?txt_reading_news_newsrc_file:
+									txt_reading_news_active_file
+		);
 	}
 
-	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0)) {
-		newsrc_active = FALSE;
-	}
 	if (!newsrc_active) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
 			if (compiled_with_nntp) {

@@ -654,6 +654,7 @@ extern constext txt_reading_filter_file[];
 extern constext txt_reading_new_groups[];
 extern constext txt_reading_article[];
 extern constext txt_reading_news_active_file[];
+extern constext txt_reading_news_newsrc_file[];
 extern constext txt_reading_mail_active_file[];
 extern constext txt_reading_global_attributes_file[];
 extern constext txt_reading_attributes_file[];

@@ -727,6 +727,10 @@ rename_file (old_filename, new_filename)
 #endif	/* M_UNIX */
 
 
+/*
+ * Handrolled version of strdup(), presumably to take advantage of
+ * the enhanced error detection in my_malloc
+ */
 char *str_dup (str)
 	char *str;
 {
@@ -1169,30 +1173,6 @@ parse_from (from_line, eaddr, fname)
 
 
 /*
- * Parses references according to son-of-1036, stripping multiple whitespace
- *
- */
-
-char *
-parse_references (r)
-     char *r;
-{
-  char *ref;
-  char *x;
-
-  ref=malloc(strlen(r)+1);  /* reasonable upper boundary for result size */
-  x=ref;
-  while (*r) {
-    while (*r && !isspace(*r)) *x++=*r++;
-    while (*r && isspace(*r)) r++;
-    if (*r) *x++=' ';
-  }
-  *x='\0';
-  return ref;
-}
-
-
-/*
  *  Convert a string to a long, only look at first n characters
  */
 
@@ -1260,6 +1240,7 @@ my_strnicmp(p, q, n)
  *
  *	  Re: Reorganization of misc.jobs
  *	  ^   ^
+ *    Re^2: Reorganization of misc.jobs
  */
 
 char *
@@ -1278,10 +1259,13 @@ eat_re (s)
 				break;
 		} else
 			break;
-		while (*s == ' ')
+
+		while (*s == ' ')		/* And skip leading whitespace */
 			s++;
-		for (e = s; *e; e++)
+
+		for (e = s; *e; e++)	/* NULL out trailing whitespace */
 			;
+
 		while (e-- > s && isspace(*e)) {
 			*e = '\0';
 		}

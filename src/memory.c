@@ -183,6 +183,8 @@ free_all_arrays ()
 
 	free_art_array ();
 
+	free_msgids ();
+
 	if (arts != (struct t_article *) 0) {
 		free ((char *) arts);
 		arts = (struct t_article *) 0;
@@ -248,14 +250,11 @@ free_art_array ()
 			free ((char *) arts[i].xref);
 			arts[i].xref = NULL;
 		}
-		if (arts[i].refs != (char *) 0) {
-			free ((char *) arts[i].refs);
-			arts[i].refs = NULL;
-		}
-		if (arts[i].msgid != (char *) 0) {
-			free ((char *) arts[i].msgid);
-			arts[i].msgid = NULL;
-		}
+
+		/* .refs & .msgid are cleared in free_msgids() */
+
+		arts[i].refs = NULL;
+		arts[i].msgid = NULL;
 	}
 }
 

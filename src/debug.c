@@ -111,6 +111,7 @@ debug_print_header (s)
 #ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
+	char *refs;
 
 	if (debug != 2)
 		return;
@@ -124,9 +125,11 @@ debug_print_header (s)
 			(s->selected ? "TRUE" : "FALSE"));
 		fprintf (fp,"subj=[%-38s]\n", s->subject);
 		fprintf (fp,"date=[%ld]  from=[%s]  name=[%s]\n", s->date, s->from, s->name);
-		fprintf (fp,"msgid=[%s]  refs=[%s]\n", 
-			(s->msgid ? s->msgid : ""),
-			(s->refs ? s->refs : ""));
+		fprintf (fp,"msgid=[%s]  refs=[%s]\n", MSGID(s), REFS(s, refs);
+
+		if (refs)
+			free(refs);
+
  		if (s->archive) {
  		    fprintf (fp, "arch=[%-38s]  ", s->archive);
  		} else {
