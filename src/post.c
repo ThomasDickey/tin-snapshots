@@ -2295,7 +2295,7 @@ delete_article (group, art, respnum)
 			case iKeyPostDelete:
 				break;
 			case iKeyPostSupersede:
-				repost_article (group->name, art, respnum, TRUE);
+				repost_article (note_h_newsgroups, art, respnum, TRUE);
 				return(0);
 			default:
 				return(0);

@@ -414,6 +414,22 @@ extern char *get_uaf_fullname();
 #endif
 
 #ifdef BSD
+
+/*
+ * To catch 4.3 Net2 code base or newer
+ * (e.g. FreeBSD 1.x, 4.3/Reno, NetBSD 0.9, 386BSD, BSD/386 1.1 and below).
+ * use
+ * #if (defined(BSD) && (BSD >= 199103))
+ *
+ * To detect if the code is being compiled on a 4.4 code base or newer
+ * (e.g. FreeBSD 2.x, 4.4, NetBSD 1.0, BSD/386 2.0 or above).
+ * use
+ * #if (defined(BSD) && (BSD >= 199306))
+ *
+ * (defined in <sys/param.h>)
+ *
+ */
+
 #	ifndef HAVE_MEMCMP
 #		define		memcmp(s1, s2, n)	bcmp(s2, s1, n)
 #	endif
@@ -432,13 +448,15 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_PRINTER "/usr/bin/lpr"
 #		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_MAILBOX "/var/mail"
+#		define	DEFAULT_SUM		"cksum -o 1 <"
+#										/* < above, otherwise get filename output too */
 #	else
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR	"/usr/ucb/vi"
 #		endif
 #		define	DEFAULT_PRINTER "/usr/ucb/lpr"
+#		define	DEFAULT_SUM		"sum"
 #	endif
-#	define		DEFAULT_SUM		"sum"
 #	ifdef DGUX
 #		define	DEFAULT_MAILBOX "/usr/mail"
 #		define	USE_INVERSE_HACK

@@ -612,6 +612,9 @@ update_index_files ()
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
 #ifdef BSD
+#ifdef __FreeBSD__
+					setsid();
+#else
 #	ifdef __osf__
 					setpgid (0, 0);
 #	else
@@ -627,6 +630,7 @@ update_index_files ()
 						}
 					}
 #	endif
+#endif
 #else
 #	if HAVE_SETPGRP
 					setpgrp ();

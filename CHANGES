@@ -1,3 +1,23 @@
+--unoff BETA release 961020 --
+
+199) David E. O'Brien <obrien@cs.ucdavis.edu>
+     ADD. FreeBSD porting
+     FIX. tin.h
+
+198) Andrey A. Chernov <ache@nagual.ru>
+     ADD. FreeBSD porting
+     FIX. curses.c, init.c, main.c
+
+197) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Supersede did not work correctly on crossposts
+     ADD. minor code cleanup
+     FIX. lang.c, post.c
+
+196) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. 'g' goto group does not work with show_only_unread_groups=ON &
+          show_only_unread=ON but having no articles to read
+     FIX. select.c
+
 --unoff BETA release 961018 --
 
 195) Alexander Lehmann <alex@hal.rhein-main.de>

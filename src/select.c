@@ -972,10 +972,6 @@ choose_new_group ()
 	char *p;
 	int idx;
 
-	if (! group_top && show_only_unread_groups) {
-		return -1;
-	}
-
 	sprintf (msg, txt_newsgroup, default_goto_group);
 
 	if (! prompt_string (msg, buf)) {
