@@ -1473,7 +1473,6 @@ void
 toggle_color ()
 {
 	use_color = !use_color;
-	use_color_tinrc = use_color;
 }
 
 void

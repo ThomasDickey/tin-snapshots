@@ -1,8 +1,8 @@
-MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960618 (Wed Jun 19 01:41:03 MET DST 1996)
 ----------------------------------------------------
-  20470 ./CHANGES
-   8996 ./TODO
-   4984 ./Makefile
+  21018 ./CHANGES
+   9368 ./TODO
+   5147 ./Makefile
   17138 ./INSTALL
    2110 ./MANIFEST
    1493 ./README
@@ -24,7 +24,7 @@ MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
    1513 ./include/patchlev.h
-  28696 ./include/proto.h
+  28742 ./include/proto.h
    1272 ./include/stpwatch.h
   40301 ./include/tin.h
    4101 ./include/win32.h
@@ -37,7 +37,7 @@ MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
   22615 ./src/attrib.c
    8262 ./src/charset.c
    1480 ./src/color.c
-  42067 ./src/config.c
+  42462 ./src/config.c
   20838 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
@@ -46,15 +46,15 @@ MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
   11250 ./src/getline.c
   41651 ./src/group.c
    2671 ./src/hashstr.c
-   9723 ./src/help.c
-  11884 ./src/inews.c
+   9725 ./src/help.c
+  11885 ./src/inews.c
   28316 ./src/init.c
   42261 ./src/lang.c
    2771 ./src/list.c
   12025 ./src/mail.c
   17500 ./src/main.c
   11022 ./src/memory.c
-  45640 ./src/misc.c
+  45610 ./src/misc.c
    7234 ./src/msmail.c
   33064 ./src/newsrc.c
   26168 ./src/nntplib.c
@@ -65,14 +65,14 @@ MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
   34463 ./src/page.c
   24128 ./src/parsdate.y
    7249 ./src/pgp.c
-  65611 ./src/post.c
+  66534 ./src/post.c
    4378 ./src/prompt.c
      53 ./src/proto.sed
   10075 ./src/refs.c
    5419 ./src/rfc1521.c
   12304 ./src/rfc1522.c
   34234 ./src/save.c
-   4290 ./src/screen.c
+   4294 ./src/screen.c
    9895 ./src/search.c
   35083 ./src/select.c
    5270 ./src/sigfile.c
@@ -86,4 +86,4 @@ MANIFEST for tin-1.3-unoff-BETA-960617 (Tue Jun 18 01:33:47 MET DST 1996)
    5549 ./src/vms.c
    5619 ./include/autoconf.hin
   10386 ./src/Makefile.in
-1386531 total
+1388955 total

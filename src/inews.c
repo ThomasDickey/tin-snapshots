@@ -494,7 +494,7 @@ submit_news_file (name, lines)
 	char *cp = buf;
 	int ret_code;
 
-	insert_x_headers (name, lines);
+	checknadd_headers (name, lines);
 
 	rfc15211522_encode(name);
 

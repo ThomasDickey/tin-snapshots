@@ -551,7 +551,7 @@ show_mini_help (level)
 			break;
 	}
 #ifdef HAVE_COLOR
-	fcol(col_text);
+	fcol(col_normal);
 #endif
 }
 

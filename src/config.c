@@ -499,6 +499,11 @@ write_config_file (file)
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
 	}
 	
+	fprintf (fp, "# tin 1.3 unoff configuration file\n#\n");
+	fprintf (fp, "# This file was automatically saved by tin\n#\n");
+	fprintf (fp, "# Do not edit while tin is running, since all your changes to this file\n");
+	fprintf (fp, "# would be overwritten when you leave tin.\n#\n");
+	fprintf (fp, "############################################################################\n#\n");
 	fprintf (fp, "# if ON articles/threads with Archive-name: in mail header will\n");
 	fprintf (fp, "# be automatically saved with the Archive-name & part/patch no.\n");
 	fprintf (fp, "auto_save=%s\n\n", print_boolean (default_auto_save));
@@ -530,31 +535,31 @@ write_config_file (file)
 	fprintf (fp, "# These are *only* for foreground:\n");
 	fprintf (fp, "#  8-gray        9-lightred   10-lightgreen  11-yellow\n");
 	fprintf (fp, "# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n");
-	fprintf (fp, "#Standard-Background-Color\n");
+	fprintf (fp, "# Standard-Background-Color\n");
 	fprintf (fp, "col_back=%d\n\n", col_back);
-	fprintf (fp, "#Color for inverse text\n");
+	fprintf (fp, "# Color for inverse text\n");
 	fprintf (fp, "col_invers=%d\n\n", col_invers);
-	fprintf (fp, "#Color of textlines\n");
+	fprintf (fp, "# Color of textlines\n");
 	fprintf (fp, "col_text=%d\n\n", col_text);
-	fprintf (fp, "#Color of mini help menu\n");
+	fprintf (fp, "# Color of mini help menu\n");
 	fprintf (fp, "col_minihelp=%d\n\n", col_minihelp);
-	fprintf (fp, "#Color of messages in last line\n");
+	fprintf (fp, "# Color of messages in last line\n");
 	fprintf (fp, "col_message=%d\n\n", col_message);
-	fprintf (fp, "#Color of quotelines\n");
+	fprintf (fp, "# Color of quotelines\n");
 	fprintf (fp, "col_quote=%d\n\n", col_quote);
-	fprintf (fp, "#Color of headerlines\n");
+	fprintf (fp, "# Color of headerlines\n");
 	fprintf (fp, "col_head=%d\n\n", col_head);
-	fprintf (fp, "#Color of article subject\n");
+	fprintf (fp, "# Color of article subject\n");
 	fprintf (fp, "col_subject=%d\n\n", col_subject);
-	fprintf (fp, "#Color of response counter\n");
+	fprintf (fp, "# Color of response counter\n");
 	fprintf (fp, "col_response=%d\n\n", col_response);
-	fprintf (fp, "#Color of sender (From:)\n");
+	fprintf (fp, "# Color of sender (From:)\n");
 	fprintf (fp, "col_from=%d\n\n", col_from);
-	fprintf (fp, "#Standard foreground color\n");
+	fprintf (fp, "# Standard foreground color\n");
 	fprintf (fp, "col_normal=%d\n\n", col_normal);
-	fprintf (fp, "#Color of Help/Mail-Sign\n");
+	fprintf (fp, "# Color of Help/Mail-Sign\n");
 	fprintf (fp, "col_title=%d\n\n", col_title);
-	fprintf (fp, "#Color of signature\n");
+	fprintf (fp, "# Color of signature\n");
 	fprintf (fp, "col_signature=%d\n\n", col_signature);
 #endif
 	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
