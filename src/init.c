@@ -12,12 +12,14 @@
  *              right notice, and it must be included in any copy made
  */
 
+
 #include	"tin.h"
 #include	"tnntp.h"
 #include	"trace.h"
 #include	"menukeys.h"
 #include	"version.h"
 #include	"bugrep.h"
+
 
 /*
  * local prototypes
@@ -210,7 +212,6 @@ t_bool check_for_new_newsgroups;	/* don't check for new newsgroups */
 t_bool cmd_line;				/* batch / interactive mode */
 t_bool confirm_action;
 t_bool confirm_to_quit;
-t_bool count_articles;			/* count articles on spooldir or via GROUP cmd */
 t_bool created_rcdir;			/* checks if first time tin is started */
 t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command when dangerous signal exit */
 t_bool default_auto_save;		/* save thread with name from Archive-name: field */
@@ -525,7 +526,6 @@ void init_selfinfo (void)
 	cmdline_nntpserver[0] = '\0';
 	confirm_action = TRUE;
 	confirm_to_quit = TRUE;
-	count_articles = FALSE;
 	created_rcdir = FALSE;
 #ifdef USE_INVERSE_HACK
 	inverse_okay = FALSE;
@@ -655,8 +655,8 @@ void init_selfinfo (void)
 	strncpy (news_quote_format, txt_news_quote, sizeof (news_quote_format));
 	strncpy (xpost_quote_format, txt_xpost_quote, sizeof (xpost_quote_format));
 
-	sprintf (page_header, "%s %s release %s [%s%s%s]",
-		progname, VERSION, RELEASEDATE, OS,
+	sprintf (page_header, "%s %s release %s (\"%s\") [%s%s%s]",
+		progname, VERSION, RELEASEDATE, RELEASENAME, OS,
 		(tex2iso_supported ? " TeX2ISO" : ""),
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
 	sprintf (cvers, txt_copyright_notice, page_header);

@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.6 1998/03/31 12:33:53 roland Exp $
+# $Id: metamutt,v 1.8 1998/08/12 09:04:01 urs Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
@@ -32,20 +32,21 @@ do
 done
 
 # create mbox message:
-echo "From PIPE `date`" > $TMP-mbox
+echo "From PIPE `env LC_ALL=C date`" > $TMP-mbox
 cat $* - | sed 's/^From />From /' >> $TMP-mbox
 
 # create special muttrc for metamutt:
 cat > $TMP-rc<<EOF
 source ~/.muttrc
 set pager_index_lines=0
+set quit=yes
 bind pager \t next-page
 bind pager i quit
 bind pager q quit
 bind pager x quit
-macro pager g ":set sendmail=$TMP-inews dsn_notify='' dsn_return=''\n:my_hdr `formail -X Newsgroups < $TMP-mbox`\nr"
+macro pager g ":set sendmail=$TMP-inews dsn_notify='' dsn_return=''<return>:my_hdr `formail -X Newsgroups < $TMP-mbox`<return>r"
 bind index q quit
-push "\n"
+push "<return>"
 EOF
 
 # create special inews which removes mail only headers:

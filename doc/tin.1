@@ -3,11 +3,11 @@
 .\" Module    : tin.1
 .\" Author    : I. Lea, U. Janssen
 .\" Created   : 1991-08-23
-.\" Updated   : 1998-04-09
+.\" Updated   : 1998-08-08
 .\" Notes     : still needs some work
 .\"
 .\"
-.TH tin 1 "January 8th, 1998" "1.4" "A Usenet newsreader"
+.TH tin 1 "August 8th, 1998" "1.4" "A Usenet newsreader"
 .\"
 .\"
 .SH NAME
@@ -19,7 +19,7 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-rzCX \|]\|]
+.RB [\| \-rzX \|]\|]
 .RB [\|[\| \-R \||\| -S \|]
 .RB -s
 .IR News-dir \|]
@@ -45,7 +45,7 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-zCX \|]\|]
+.RB [\| \-zX \|]\|]
 .RB [\| \-cvZ \|]
 .RB [\|[\| -S \|]
 .RB -s
@@ -107,11 +107,6 @@ Toggle ANSI color (default is off).
 .B -c
 Create/update index files for every group in \fI$HOME/.newsrc\fP or file
 specified by the ``\fB-f\fR'' option and mark all articles as read.
-.TP
-.B -C
-Count articles for each subscribed group at startup. With a large number of
-groups this will be slow. However the number of unread articles in each
-group will be accurate. (Not needed if also using ``\fB-n\fR'' option.)
 .TP
 .B -d
 Don't load newsgroup descriptions (interactive mode).

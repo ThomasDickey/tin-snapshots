@@ -365,7 +365,6 @@ extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long
 extern long setup_hard_base (struct t_group *group, char *group_path);
 extern void nntp_close (void);
 extern void vGet1GrpArtInfo(struct t_group *grp);
-extern void vGrpGetSubArtInfo (void);
 #ifdef HAVE_MH_MAIL_HANDLING
 	extern FILE *open_mail_active_fp (const char *mode);
 	extern FILE *open_mailgroups_fp (void);

@@ -12,8 +12,10 @@
  *              right notice, and it must be included in any copy made
  */
 
+
 #include	"tin.h"
 #include	"tnntp.h"
+
 
 /*
  * local prototypes
@@ -86,8 +88,7 @@ submit_inews (
 				strcpy(from_name, ptr+2);
 				if((ptr = strchr(from_name, '\n')))
 					*ptr='\0';
-
-			break; /* found From: */
+				break; /* found From: */
 			}
 		} else
 			break; /* end of headers */

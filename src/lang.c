@@ -822,7 +822,8 @@ constext txt_tinrc_force_screen_redraw[] = "# if ON a screen redraw will always 
 constext txt_tinrc_full_page_scroll[] = "# if ON scroll full page of groups/articles otherwise half a page\n";
 constext txt_tinrc_group_catchup_on_exit[] = "# if ON catchup group/thread when leaving with the left arrow key.\n";
 constext txt_tinrc_groupname_max_length[] = "# Maximum length of the names of newsgroups displayed\n";
-constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file was automatically saved by %s %s %s\n#\n\
+constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n\
+# This file was automatically saved by %s %s %s (\"%s\")\n#\n\
 # Do not edit while tin is running, since all your changes to this file\n\
 # will be overwritten when you leave tin.\n#\n\
 ############################################################################\n\n";

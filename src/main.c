@@ -57,6 +57,22 @@ main (
 	int count;
 	t_bool tmp_no_write;
 
+	/* happy birthday */
+	{
+		char user_name[128];
+		char full_name[128];
+
+		get_user_info(user_name, full_name);
+		if ((!strcmp(user_name,"laura") && !strcmp(full_name, "Bettina Fink"))) {
+				time_t btime = (time_t) 0;
+				(void) time(&btime);
+				if (btime >= 903391200 && btime <= 903477599)
+					printf("@}-'-,---  Happy brithday Bettina!  ---,--`{@\n");
+			printf("This tin's for you, for you and just for you!\n");
+			sleep(3);
+		}
+	}
+
 	cmd_line = TRUE;
 	debug = 0;	/* debug OFF */
 
@@ -69,14 +85,14 @@ main (
 		argc = _WBArgc;
 		argv = _WBArgv;
 	}
-#endif
+#endif /* M_AMIGA && __SASC */
 
 	set_signal_handlers ();
 
 	base_name (argv[0], progname);
 #ifdef VMS
 	argv[0] = progname;
-#endif
+#endif /* VMS */
 
 #ifdef NNTP_ONLY
 	read_news_via_nntp = TRUE;
@@ -90,7 +106,7 @@ main (
 #		else
 			error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 			exit (EXIT_FAILURE);
-#		endif
+#		endif /* NNTP_ABLE */
 	}
 #endif /* NNTP_ONLY */
 
@@ -121,7 +137,7 @@ main (
 
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
-#endif
+#endif /* INDEX_DAEMON */
 
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
 #	ifndef USE_CURSES
@@ -132,8 +148,8 @@ main (
 		}
 		EndInverse ();
 	}
-#	endif
-#endif
+#	endif /* !USE_CURSES */
+#endif /* M_UNIX && !INDEX_DAEMON */
 
 	/*
 	 *  Connect to nntp server?
@@ -174,9 +190,9 @@ main (
 	/*
 	 *  Load the mail & news active files into active[]
 	 */
-	if (read_saved_news) {
+	if (read_saved_news)
 		create_save_active_file ();
-	}
+
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mail_active_file ();
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
@@ -273,16 +289,6 @@ main (
 #endif /* INDEX_DAEMON */
 
 	/*
-	 * This updates the min/max/unread counters for all subscribed groups using
-	 * 'correct' data from spool or NNTP GROUP rather than less reliable data
-	 * from the active file. Normally this only happens when entering a
-	 * group, as it takes longer.
-	 * if running in batch-mode (-Z) -v gives a summary!
-	 */
-	if (count_articles && !newsrc_active)
-		vGrpGetSubArtInfo ();
-
-	/*
 	 *  Check/start if any new/unread articles
 	 */
 	start_groupnum = check_for_any_new_news (check_any_unread, start_any_unread);
@@ -337,15 +343,15 @@ main (
 	return(0); /* not reached */
 }
 
+
 /*
  * process command line options
  */
-
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "acdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	else
-#		define OPTIONS "BcCdD:f:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "BcdD:f:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	endif /* M_AMIGA */
 #else
 #	define OPTIONS "dD:f:hI:PvV"
@@ -383,11 +389,6 @@ read_cmd_line_options (
 			case 'c':
 				catchup = TRUE;
 				batch_mode = TRUE;
-				break;
-
-/* what is it good for? */
-			case 'C':
-				count_articles = TRUE;
 				break;
 
 			case 'd':
@@ -567,11 +568,11 @@ read_cmd_line_options (
 
 			case 'V':
 #if defined(__DATE__) && defined(__TIME__)
-				error_message ("Version: %s release %s  %s %s",
-					VERSION, RELEASEDATE, __DATE__, __TIME__);
+				error_message ("Version: %s release %s (\"%s\") %s %s",
+					VERSION, RELEASEDATE, RELEASENAME, __DATE__, __TIME__);
 #else
-				error_message ("Version: %s release %s",
-					VERSION, RELEASEDATE);
+				error_message ("Version: %s release %s (\"%s\")",
+					VERSION, RELEASEDATE, RELEASENAME);
 #endif /* __DATE__  && __TIME__ */
 				exit (EXIT_SUCCESS);
 				/* keep lint quiet: */
@@ -679,7 +680,6 @@ usage (
 #	endif /* !M_AMIGA */
 
 	error_message ("  -c       mark all news as read in subscribed newsgroups (batch mode)");
-	error_message ("  -C       count unread articles");
 	error_message ("  -d       don't show newsgroup descriptions");
 
 #	ifdef DEBUG
@@ -797,22 +797,20 @@ check_for_any_new_news (
 	return (i);
 }
 
+
 /*
  *  mail any new articles to specified user
  *  or
  *  save any new articles to savedir structure for later reading
  */
-
 static void
 save_or_mail_new_news (void)
 {
-	t_bool i;
-
 	if (mail_news || save_news) {
-		i = catchup;			/* set catchup to FALSE */
-		catchup = FALSE;
+		t_bool i = catchup;
+		catchup = FALSE;	/* set catchup to FALSE */
 		do_update ();
-		catchup = i;			/* set catchup to previous value */
+		catchup = i;		/* set catchup to previous value */
 		check_start_save_any_news (mail_news ? MAIL_ANY_NEWS : SAVE_ANY_NEWS);
 		tin_done (EXIT_SUCCESS);
 	}
@@ -832,7 +830,7 @@ update_index_files (void)
 		}
 
 		cCOLS = 132;				/* set because curses has not started */
-#	ifdef HAVE_FORK
+#ifdef HAVE_FORK
 		if (update_fork) {
 			catchup = FALSE;		/* turn off msgs when running forked */
 			verbose = FALSE;
@@ -843,16 +841,16 @@ update_index_files (void)
 				case 0:				/* child process */
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
-#		if defined(BSD) /* FIXME: check for setsid/setpgid/... and remove OS depending ifdefs */
-#			if defined(__FreeBSD__) || defined(__NetBSD__)
+#	if defined(BSD) /* FIXME: check for setsid/setpgid/... and remove OS depending ifdefs */
+#		if defined(__FreeBSD__) || defined(__NetBSD__)
 					setsid();
-#			else
-#				ifdef __osf__
+#		else
+#			ifdef __osf__
 					setpgid (0, 0);
-#				else
+#			else
 					setpgrp (0, process_id);	/* reset process group leader to this process */
-#				endif /* __osf__ */
-#				ifdef TIOCNOTTY
+#			endif /* __osf__ */
+#			ifdef TIOCNOTTY
 					{
 						int fd;
 
@@ -861,18 +859,18 @@ update_index_files (void)
 							close (fd);
 						}
 					}
-#				endif /* TIOCNOTTY */
-#			endif /* __FreeBSD__ || __NetBSD__ */
-#		else
-#			ifdef HAVE_SETPGRP
-#					ifdef SETPGRP_VOID
+#			endif /* TIOCNOTTY */
+#		endif /* __FreeBSD__ || __NetBSD__ */
+#	else
+#		ifdef HAVE_SETPGRP
+#				ifdef SETPGRP_VOID
 						setpgrp ();
-#					else
+#				else
 						setpgrp (0, process_id);
-#					endif /* SETPGRP_VOID */
+#				endif /* SETPGRP_VOID */
 					signal (SIGHUP, SIG_IGN);	/* make immune from process group leader death */
-#			endif /* HAVE_SETPGRP */
-#		endif /* BSD */
+#		endif /* HAVE_SETPGRP */
+#	endif /* BSD */
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */
 
 					if (nntp_open () != 0)				/* connect server if we are using nntp */
@@ -896,6 +894,7 @@ update_index_files (void)
 		}
 	}
 }
+
 
 /*
  *  display page of general info. for first time user.
@@ -923,7 +922,8 @@ show_intro_page (void)
 		continue_prompt ();
 	}
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * Wildcard match any newsgroups on the command line. Sort of like a limited

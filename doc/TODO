@@ -1,11 +1,11 @@
 Bugs
 ----
-o '-X' doesn't disable changing the killfile and the tinrc from
-  inside tin
-  [Urs Janssen <urs@tin.org>]
+o  '-X' doesn't disable changing the killfile and the tinrc from
+   inside tin
+   [Urs Janssen <urs@tin.org>]
 
-o in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
-  batch_save etc. is broken.
+o  in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
+   batch_save etc. is broken.
      scope=*
      batch_save=OFF
      scope=foo.bar
@@ -322,10 +322,6 @@ o  Bounce duplicate Message-ID's when the headers are read. This will
 
 Internal Changes
 ----------------
-o  -C (count articles) now should be obsolete
-   (use -l -Z -[v] for a quick check; -Z [-v] for a exact one)
-   -> remove -C
-
 o  use XGTITLE (if available) if -n cmd-line flag is present
 
 o  check where snprintf() would be usefull and if system has one
@@ -459,6 +455,11 @@ o  fix kill/hot mechanism so that it is possible to match articles on
 o  don't strip "Re: " out of the subject before applying the filter on it
 
 o  cleanup xref-filter (xref_score is no longer needed with score).
+
+o  allow any given amount of days in default_filter_days not only
+   {1, 2, 4} * 28 days
+
+o  allow expiering filter entrys n-days after the last time they matched
 
 Fixed allready?:
 ----------------

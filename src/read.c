@@ -33,7 +33,8 @@ static int offset = 0;
 static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
 #ifdef NNTP_ABLE
 	static t_bool wait_for_input (FILE *fd);
-#endif
+#endif /* NNTP_ABLE */
+
 
 #ifdef NNTP_ABLE
 /*
@@ -46,17 +47,21 @@ static t_bool
 wait_for_input (
 	FILE *fd)
 {
-#	ifdef VMS
+#	ifndef HAVE_SELECT
+#		ifdef VMS
 	int ch = ReadChNowait ();
 
 	if (ch == 'q' || ch == 'z' || ch == ESC) {
+		/* FIXME -> lang.c */
 		if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
 			return TRUE;
 	}
 	if (ch == 'Q') {
+		/* FIXME -> lang.c */
 		if (prompt_yn (cLINES, "Do you want to exit tin immediately ? (y/n): ", FALSE) == 1)
 			tin_done (EXIT_SUCCESS);
 	}
+#		endif /* VMS */
 #	else
 	int nfds, ch;
 	fd_set readfds;
@@ -125,11 +130,15 @@ wait_for_input (
 		}
 
 	}
-#	endif /* VMS */
-	/*NOTREACHED*/
+#	endif /* !HAVE_SELECT */
+#	ifdef M_AMIGA
+	return (WaitForChar(Input(), 0) == DOSTRUE) ? TRUE : FALSE;
+#	endif /* M_AMIGA */
+/* FIXME, insert !HAVE_SELECT code here */
 	return FALSE;
 }
 #endif /* NNTP_ABLE */
+
 
 /*
  * Support routine to read a fixed size buffer. This does most of the
@@ -146,7 +155,7 @@ tin_read (
 	t_bool header)
 {
 	char *ptr;
-	char c;
+	signed char c;
 	int i;
 #ifdef NNTP_ABLE
 	t_bool check_dot_only_line;
@@ -180,7 +189,7 @@ tin_read (
 		ptr = get_server(buffer, len);
 	else
 		ptr = fgets (buffer, len, fp);
-#else /* NNTP_ABLE */
+#else
 	errno = 0;		/* To check errno after read, clear it here */
 
 	ptr = fgets (buffer, len, fp);
@@ -221,18 +230,20 @@ tin_read (
 		} else
 #endif /* NNTP_ABLE */
 		{
-			if (header && i == 0) {
-				/* Find a header separator, don't check next line. */
-			} else if (header) {
-				while ((c = fgetc (get_nntp_fp(fp))) == ' ' || c == '\t')
-					partial_read = TRUE;
+			if (header) {
+				if (!i) {
+					/* Find a header separator, don't check next line. */
+				} else {
+					while ((c = fgetc (get_nntp_fp(fp))) == ' ' || c == '\t')
+						partial_read = TRUE;
 
-				/* Push back the 1st char after the now-skipped whitespace */
-				if (c != EOF) {
-					ungetc(c, get_nntp_fp(fp));
-					/* TODO - is this portable ? Push back a single ' ' to compress the white-space */
-					if (partial_read)
-						ungetc(' ', get_nntp_fp(fp));
+					/* Push back the 1st char after the now-skipped whitespace */
+					if (c != EOF) {
+						ungetc(c, get_nntp_fp(fp));
+						/* TODO - is this portable ? Push back a single ' ' to compress the white-space */
+						if (partial_read)
+							ungetc(' ', get_nntp_fp(fp));
+					}
 				}
 			}
 		}
@@ -243,6 +254,7 @@ tin_read (
 
 	return(buffer);
 }
+
 
 /*
  * This is the main routine for reading news data from local spool or NNTP.
@@ -294,7 +306,7 @@ tin_fgets (
 
 	dynbuf = (char *) my_malloc (INIT * sizeof(char));
 	size = INIT;
-#endif
+#endif /* 1 */
 
 	if ((ptr = tin_read(dynbuf, size, fp, header)) == NULL)
 		return ptr;
@@ -340,6 +352,7 @@ DEBUG_IO((stderr, "tin_fgets (%s)\n", (dynbuf) ? dynbuf : "NULL"));
 
 	return (dynbuf);
 }
+
 
 /*
  * We can't just stop reading a socket once we are through with it. This drains out any

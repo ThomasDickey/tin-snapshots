@@ -15,9 +15,9 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
-#ifdef	PROFILE
+#ifdef PROFILE
 #	include	"stpwatch.h"
-#endif
+#endif /* PROFILE */
 
 #define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
 
@@ -54,7 +54,6 @@ static int read_group (struct t_group *group, char *group_path, int *pcount);
  *  thread.  Articles which have been expired have their .thread set to
  *  ART_EXPIRED
  */
-
 void
 find_base (
 	struct t_group *group)
@@ -66,7 +65,7 @@ find_base (
 
 #ifdef DEBUG
 	debug_print_arts ();
-#endif
+#endif /* DEBUG */
 
 	if (group->attribute && group->attribute->show_only_unread) {
 		for (i = 0; i < top; i++) {
@@ -100,6 +99,7 @@ find_base (
 	}
 }
 
+
 /*
  *  Main group indexing routine.
  *
@@ -129,7 +129,7 @@ index_group (
 	i = 45; /* len of "Group %s ('q' to quit)... 'low'/'high'" */
 #else
 	i = 31; /* len of "Group %s ... 'low'/'high'" */
-#endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
+#endif /* HAVE_POLL || HAVE_SELECT */
 
 	/* very small screen */
 	if (cCOLS < i)
@@ -167,7 +167,7 @@ index_group (
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Before iReadNovFile");
 	debug_print_bitmap (group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	min = top_base ? base[0] : group->xmin;
 	max = top_base ? base[top_base-1] : min - 1;
@@ -204,12 +204,12 @@ index_group (
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Before parse_unread_arts()");
 	debug_print_bitmap (group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 	parse_unread_arts (group);
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("After parse_unread_arts()");
 	debug_print_bitmap (group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	/*
 	 * Stat all articles to see if any have expired
@@ -219,7 +219,7 @@ index_group (
 			expired = 1;
 #ifdef DEBUG_NEWSRC
 			debug_print_comment ("art.c: index_group() purging...");
-#endif
+#endif /* DEBUG_NEWSRC */
 			art_mark_read (group, &arts[i]);
 			print_expired_arts (expired);
 		}
@@ -244,16 +244,16 @@ index_group (
 		my_flush ();
 	}
 
-#ifdef	PROFILE
+#ifdef PROFILE
 	BegStopWatch("make_thread");
-#endif	/* PROFILE */
+#endif /* PROFILE */
 
 	make_threads (group, FALSE);
 
-#ifdef	PROFILE
+#ifdef PROFILE
 	EndStopWatch();
 	PrintStopWatch();
-#endif	/* PROFILE */
+#endif /* PROFILE */
 
 	find_base (group);
 
@@ -372,7 +372,7 @@ read_group (
 			sprintf (buf, "FAILED parse_header(%ld)", art);
 #ifdef DEBUG
 			debug_nntp ("read_group", buf);
-#endif
+#endif /* DEBUG */
 			continue;
 		}
 
@@ -468,7 +468,7 @@ thread_by_subject(void)
 			(arts[i].refptr->child)   ? arts[i].refptr->child->article : -2,
 			arts[i].inthread, arts[i].thread, arts[i].refptr->txt, arts[i].subject);
 	}
-#endif
+#endif /* 0 */
 }
 
 
@@ -490,7 +490,6 @@ thread_by_subject(void)
  *  to delete all threading information, not to rethread
  *
  */
-
 void
 make_threads (
 	struct t_group *group,
@@ -505,7 +504,7 @@ make_threads (
 	if (debug == 2)
 		error_message ("rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]",
 				rethread, default_thread_arts, group->attribute->thread_arts);
-#endif
+#endif /* DEBUG */
 
 	/*
 	 * Sort all the articles using the preferred method
@@ -779,7 +778,6 @@ parse_headers (
  *    9.  Xref: line     (ie. alt.test:389)       [optional]
  *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
-
 static int
 iReadNovFile (
 	struct t_group *group,
@@ -831,7 +829,7 @@ iReadNovFile (
 
 #ifdef DEBUG
 		debug_nntp ("iReadNovFile", buf);
-#endif
+#endif /* DEBUG */
 
 		if (top >= max_art)
 			expand_art ();
@@ -854,7 +852,7 @@ iReadNovFile (
 my_printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
 my_flush();
 (void) sleep(1);
-#endif
+#endif /* 0 */
 		if (artnum < group->xmin) {
 			(*expired)++;
 			continue;
@@ -866,7 +864,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (Artnum) '%s'", buf);
 			debug_nntp ("iReadNovFile", "Bad overview record (Artnum)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			p = q + 1;
@@ -878,7 +876,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (Subject) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Subject)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -893,7 +891,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (From) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (From)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -912,7 +910,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (Date) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Date)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -928,7 +926,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -945,7 +943,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (References) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (References)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -961,7 +959,7 @@ my_flush();
 #ifdef DEBUG
 			error_message ("Bad overview record (Bytes) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Bytes)");
-#endif
+#endif /* DEBUG */
 			continue;
 		} else
 			*q = '\0';
@@ -1012,7 +1010,7 @@ my_flush();
 		 */
 #ifdef DEBUG
 		debug_print_header (&arts[top]);
-#endif
+#endif /* DEBUG */
 
 		if (artnum % MODULO_COUNT_NUM == 0)
 			show_progress(mesg, (int) artnum, (int) max); /* we might loose accuracy here, but that shouldn't hurt */
@@ -1027,6 +1025,7 @@ my_flush();
 
 	return top;
 }
+
 
 /*
  *  Write an Nov/Xover index file. Fields are separated by TAB.
@@ -1080,7 +1079,7 @@ vWriteNovFile (
 #ifdef DEBUG
 	if (debug)
 		error_message ("WRITE file=[%s]", pcNovFile);
-#endif
+#endif /* DEBUG */
 
 	hFp = open_xover_fp (psGrp, "w", 0L, 0L);
 
@@ -1120,7 +1119,6 @@ vWriteNovFile (
 	}
 	set_real_uid_gid ();
 }
-
 
 
 /*
@@ -1300,10 +1298,10 @@ do_update (void)
 
 		index_time = (time_t)0;
 		pcNovFile = pcFindNovFile (psGrp, R_OK);
-#ifdef DEBUG
+#	ifdef DEBUG
 		if (debug)
 			error_message ("READ file=[%s]", pcNovFile);
-#endif
+#	endif /* DEBUG */
 		if (pcNovFile == (char *) 0)
 			continue;
 
@@ -1317,12 +1315,12 @@ do_update (void)
 
 			index_time = stinfo.st_mtime;
 		}
-#ifdef DEBUG
+#	ifdef DEBUG
 		if (debug == 2)
 			my_printf ("[%s] idxtime=[%lu]  old=[%lu]  new=[%lu]\n",
 				pcNovFile, (unsigned long int) index_time,
 				(unsigned long int) psGrp->last_updated_time, (unsigned long int) group_time);
-#endif
+#	endif /* DEBUG */
 		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 ||
 		    (psGrp->last_updated_time > index_time) ||
 		    (group_time > psGrp->last_updated_time) ||
@@ -1330,7 +1328,7 @@ do_update (void)
 			psGrp->last_updated_time = group_time;
 		else
 			continue;
-#endif
+#endif /* INDEX_DAEMON */
 
 		if (verbose) {
 			my_printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
@@ -1358,6 +1356,7 @@ do_update (void)
 			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (unsigned long int) (end_epoch - beg_epoch));
 	}
 }
+
 
 static int
 artnum_comp (
@@ -1470,6 +1469,7 @@ date_comp (
 	return 0;
 }
 
+
 /*
  * Same again, but for art[].score
  */
@@ -1497,6 +1497,7 @@ score_comp (
 
 	return 0;
 }
+
 
 void
 set_article (
@@ -1560,6 +1561,7 @@ valid_artnum (
 	}
 }
 
+
 static void
 print_expired_arts (
 	int num_expired)
@@ -1570,7 +1572,7 @@ print_expired_arts (
 #ifdef DEBUG
 		if (debug)
 			my_printf ("Expired Index Arts=[%d]", num_expired);
-#endif
+#endif /* DEBUG */
 		for (i = 0; i < num_expired; i++)
 			my_fputc ('P', stdout);
 
@@ -1578,6 +1580,7 @@ print_expired_arts (
 			my_flush();
 	}
 }
+
 
 static char *
 pcPrintDate (
@@ -1601,6 +1604,7 @@ pcPrintDate (
 	return acDate;
 }
 
+
 static char *
 pcPrintFrom (
 	struct t_article *psArt)
@@ -1616,6 +1620,7 @@ pcPrintFrom (
 
 	return acFrom;
 }
+
 
 #ifdef INDEX_DAEMON
 static void

@@ -395,7 +395,9 @@ vGrpDelMailArts (
 	char acGrpPath[PATH_LEN];
 	int iNum;
 	struct t_article *psArt;
+#if 0 /* see comment below */
 	t_bool bUpdateIndexFile = FALSE;
+#endif /* 0 */
 
 	if (psGrp->type == GROUP_TYPE_MAIL || psGrp->type == GROUP_TYPE_SAVE) {
 		wait_message (1, (psGrp->type == GROUP_TYPE_MAIL) ? txt_processing_mail_arts : txt_processing_saved_arts);
@@ -406,7 +408,9 @@ vGrpDelMailArts (
 				sprintf (acArtFile, "%s/%ld", acGrpPath, psArt->artnum);
 				unlink (acArtFile);
 				psArt->thread = ART_EXPIRED;
+#if 0 /* see comment below */
 				bUpdateIndexFile = TRUE;
+#endif /* 0 */
 			}
 		}
 

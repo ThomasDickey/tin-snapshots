@@ -20,8 +20,11 @@ OPTS="$*"
 
 CC="${CC-cc}"
 
-# set --with-domain-name and
-#     --with-nntp-default-server to your local needs
+# set
+#	--with-domain-name=doma.in
+# and
+#	--with-nntp-default-server=news.doma.in
+# to your local needs
 
 CFLAGS="$CFLAGS" \
 CC="$CC" \

@@ -1,3 +1,25 @@
+-- pre-1.4 release 980818 --
+
+607) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+606) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. initialisation of h_addr_list was missing
+     FIX. nntplib.c
+
+605) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. configure check for libuu, inet_aton()
+     ADD. removed -C cmd-line flag (did the same as -l -n which is default)
+     BUG. default signal-handler was missing
+     FIX. configure[.in], autoconf.h[in], tin.h, init.c, mail.c, main.c,
+          page.c, open.c, nntplib.c, read.c, save.c, signal.c, strftime.c
+
+604) Kazushi Marukawa <jam@pobox.com>
+     ADD. speedup reading low/high marks for each group via GROUP
+     FIX. extern.h, active.c, nntplib.c
+
 -- pre-1.4 release 980730 --
 
 603) Thomas E. Dickey <dickey@clark.net>

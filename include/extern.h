@@ -1222,7 +1222,6 @@ extern t_bool check_for_new_newsgroups;
 extern t_bool cmd_line;
 extern t_bool confirm_action;
 extern t_bool confirm_to_quit;
-extern t_bool count_articles;
 extern t_bool created_rcdir;
 extern t_bool dangerous_signal_exit; /* TRUE if SIGHUP, SIGTERM, SIGUSR1 */
 extern t_bool default_auto_save;
@@ -1272,6 +1271,7 @@ extern t_bool quote_signatures;
 extern t_bool read_local_newsgroups_file;
 extern t_bool read_news_via_nntp;
 extern t_bool read_saved_news;
+extern t_bool reconnected_in_last_get_server;
 extern t_bool reread_active_for_posted_arts;
 extern t_bool save_news;
 extern t_bool save_to_mmdf_mailbox;

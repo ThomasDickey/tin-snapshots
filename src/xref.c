@@ -12,7 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
+
 #include	"tin.h"
+
 
 /* dbmalloc checks memset() parameters, so we'll use it to check the assignments */
 #ifdef USE_DBMALLOC
