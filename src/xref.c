@@ -117,8 +117,10 @@ art_mark_xref_read (
 				group, artnum,
 				(psGrp ? psGrp->name : ""),
 				(psGrp ? psGrp->newsrc.num_unread : 0));
+#ifdef DEBUG_NEWSRC
 			debug_print_comment (msg);
 			debug_print_bitmap (psGrp, NULL);
+#endif
 			error_message (msg, "");
 		}
 
@@ -133,8 +135,10 @@ art_mark_xref_read (
 					if (debug == 3) {
 						sprintf (msg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
 							group, artnum, psGrp->newsrc.num_unread);
+#ifdef DEBUG_NEWSRC
 						debug_print_comment (msg);
 						debug_print_bitmap (psGrp, NULL);
+#endif
 						wait_message (msg);
 					}
 				}

@@ -691,9 +691,9 @@ draw_percent_mark (
 }
 
 /*
- * setuid/setgid - SYSV, Posix (with caveat about portability!)
- * seteuid/setegid - BSD 4.3
+ * seteuid/setegid - BSD 4.3 (based on POSIX setuid/setgid)
  * setreuid/setregid - BSD 4.2
+ * setuid/setgid - SYSV, POSIX (Std003.1-1988)
  */
 void
 set_real_uid_gid (void)
@@ -704,31 +704,30 @@ set_real_uid_gid (void)
 
 	umask (real_umask);
 
-#if HAVE_SETREUID && HAVE_SETREGID
-	if (setreuid (-1, real_uid) == -1) {
-		perror_message ("Error setreuid(real) failed", "");
-	}
-	if (setregid (-1, real_gid) == -1) {
-		perror_message ("Error setregid(real) failed", "");
-	}
-#else
-#  if HAVE_SETEUID && HAVE_SETEGID
+#	if HAVE_SETEUID && HAVE_SETEGID
 	if (seteuid (real_uid) == -1) {
 		perror_message ("Error seteuid(real) failed", "");
 	}
 	if (setegid (real_gid) == -1) {
 		perror_message ("Error setegid(real) failed", "");
 	}
-#  else
+#	else
+#		if HAVE_SETREUID && HAVE_SETREGID
+	if (setreuid (-1, real_uid) == -1) {
+		perror_message ("Error setreuid(real) failed", "");
+	}
+	if (setregid (-1, real_gid) == -1) {
+		perror_message ("Error setregid(real) failed", "");
+	}
+#		else
 	if (setuid (real_uid) == -1) {
 		perror_message ("Error setuid(real) failed", "");
 	}
 	if (setgid (real_gid) == -1) {
 		perror_message ("Error setgid(real) failed", "");
 	}
-#  endif
-#endif
-
+#		endif /* HAVE_SETREUID && HAVE_SETREGID */
+#	endif /* HAVE_SETEUID && HAVE_SETEGID */
 #endif	/* HAVE_SET_GID_UID */
 }
 
@@ -741,31 +740,30 @@ set_tin_uid_gid (void)
 
 	umask (0);
 
-#if HAVE_SETREUID && HAVE_SETREGID
-	if (setreuid (-1, tin_uid) == -1) {
-		perror_message ("Error setreuid(tin) failed", "");
-	}
-	if (setregid (-1, tin_gid) == -1) {
-		perror_message ("Error setregid(tin) failed", "");
-	}
-#else
-#  if HAVE_SETEUID && HAVE_SETEGID
+#	if HAVE_SETEUID && HAVE_SETEGID
 	if (seteuid (tin_uid) == -1) {
 		perror_message ("Error seteuid(real) failed", "");
 	}
 	if (setegid (tin_gid) == -1) {
 		perror_message ("Error setegid(real) failed", "");
 	}
-#  else
+#	else
+#		if HAVE_SETREUID && HAVE_SETREGID
+	if (setreuid (-1, tin_uid) == -1) {
+		perror_message ("Error setreuid(tin) failed", "");
+	}
+	if (setregid (-1, tin_gid) == -1) {
+		perror_message ("Error setregid(tin) failed", "");
+	}
+#		else
 	if (setuid (tin_uid) == -1) {
 		perror_message ("Error setuid(tin) failed", "");
 	}
 	if (setgid (tin_gid) == -1) {
 		perror_message ("Error setgid(tin) failed", "");
 	}
-#  endif
-#endif
-
+#		endif /* HAVE_SETREUID && HAVE_SETREGID */
+#	endif /* HAVE_SETEUID && HAVE_SETEGID */
 #endif	/* HAVE_SET_GID_UID */
 }
 
@@ -1261,9 +1259,13 @@ input_pending (int delay)
 	nodelay(stdscr, FALSE);
 	return (ch != ERR);
 #else
-#ifdef WIN32
+#	ifdef WIN32
 	return kbhit() ? TRUE : FALSE;
-#endif
+#	endif /* WIN32 */
+#	ifdef M_AMIGA
+	return (WaitForChar(Input(), 1000*delay) == DOSTRUE) ? TRUE : FALSE;
+#	endif /* M_AMIGA */
+#endif /* USE_CURSES */
 
 #ifdef HAVE_SELECT
 	int fd = STDIN_FILENO;
@@ -1281,13 +1283,13 @@ input_pending (int delay)
 	if (select (1, (int *)&fdread, NULL, NULL, &tvptr))
 #else
 	if (select (1, &fdread, NULL, NULL, &tvptr))
-#endif
+#endif /* HAVE_SELECT_INTP */
 	{
 		if (FD_ISSET(fd, &fdread)) {
 			return TRUE;
 		}
 	}
-#endif	/* HAVE_SELECT */
+#endif /* HAVE_SELECT */
 
 #if defined(HAVE_POLL) && !defined(HAVE_SELECT)
 	static int Timeout = delay;
@@ -1312,10 +1314,9 @@ input_pending (int delay)
 		default:
 			return FALSE;
 	}
-#endif	/* HAVE_POLL */
+#endif /* HAVE_POLL && !HAVE_SELECT */
 
 	return FALSE;
-#endif
 }
 
 
@@ -1394,6 +1395,7 @@ get_arrow_key (void)
 	while (!input_pending(0) \
 		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
 
+#ifndef M_AMIGA
 	if (!input_pending(0)) {
 #ifdef HAVE_USLEEP
 		int i=0;
@@ -1427,9 +1429,14 @@ get_arrow_key (void)
 #endif	/* HAVE_POLL */
 #endif	/* HAVE_SELECT */
 #endif	/* HAVE_USLEEP */
+
 		if (!input_pending(0))
 			return ESC;
 	}
+#else	/* M_AMIGA */
+	if (input_pending(0))
+		return ESC;
+#endif	/* !M_AMIGA */
 
 	ch = ReadCh ();
 	if (ch == '[' || ch == 'O')  {

@@ -31,18 +31,19 @@ static int max_cmdargs;
 /*
 ** Local prototypes
 */
-static void read_cmd_line_options (int argc, char *argv[]);
-static void usage (char *theProgname);
 static int check_for_any_new_news (t_bool CheckAnyUnread, t_bool StartAnyUnread);
 static void save_or_mail_new_news (void);
-static void update_index_files (void);
 static void show_intro_page (void);
-
+#ifndef ACTIVE_DAEMON
+static void update_index_files (void);
+static void usage (char *theProgname);
+static void read_cmd_line_options (int argc, char *argv[]);
+#endif /* ACTIVE_DAEMON */
 
 /*
 **  OK lets start the ball rolling...
 */
-
+#ifndef ACTIVE_DAEMON
 int
 main (
 	int argc,
@@ -181,7 +182,9 @@ main (
 	 * Initialise active[] and add new newsgroups to start of my_group[]
 	 */
 	read_news_active_file ();
+#ifdef DEBUG
 	debug_print_active();
+#endif
 
 	/*
 	 *  Load the local & global group specific attribute files
@@ -196,7 +199,9 @@ main (
 	 */
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+#ifdef DEBUG
 	debug_print_filters ();
+#endif
 
 	/*
 	 *  Quick post an article & exit if -w specified
@@ -204,7 +209,9 @@ main (
 	if (post_article_and_exit || post_postponed_and_exit) {
 		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+#ifdef DEBUG
 		debug_print_filters ();
+#endif
 		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_OK);
 	}
@@ -317,6 +324,7 @@ main (
 	selection_index (start_groupnum, num_cmd_line_groups);
 	return(0); /* not reached */
 }
+#endif /* !ACTIVE_DAEMON */
 
 /*
  * process command line options
@@ -332,6 +340,7 @@ main (
 #	define OPTIONS "dD:f:hI:PvV"
 #endif
 
+#ifndef ACTIVE_DAEMON
 static void
 read_cmd_line_options (
 	int argc,
@@ -342,7 +351,7 @@ read_cmd_line_options (
 
 	envargs (&argc, &argv, "TINRC");
 
-	while ((ch = getopt (argc, argv, OPTIONS)) != EOF) {
+	while ((ch = getopt (argc, argv, OPTIONS)) != -1) {
 		switch (ch) {
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
@@ -565,13 +574,11 @@ read_cmd_line_options (
 #endif
 		}
 	}
-
 }
 
 /*
  * usage
  */
-
 static void
 usage (
 	char *theProgname)
@@ -664,6 +671,7 @@ usage (
 
 	error_message ("\nMail bug reports/comments to %s", BUG_REPORT_ADDRESS);
 }
+#endif /* !ACTIVE_DAEMON */
 
 /*
  *  check/start if any new/unread articles
@@ -720,7 +728,7 @@ save_or_mail_new_news (void)
 /*
  *  update index files
  */
-
+#ifndef ACTIVE_DAEMON
 static void
 update_index_files (void)
 {
@@ -788,8 +796,8 @@ update_index_files (void)
 			tin_done (EXIT_OK);
 		}
 	}
-
 }
+#endif /* !ACTIVE_DAEMON */
 
 /*
  *  display page of general info. for first time user.

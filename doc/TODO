@@ -1,6 +1,17 @@
 Bugs
 ----
+o  -c commandline switch only works propperly together with -S, but it
+   might be usefull without any other switch to catchup all groups.
+   it seems to trash some newsrc entrys when used without -S and/or
+   not to catchup anything.
+   [Michael Faurot <mfaurot@clark.net>]
+
 o  tin needs a terminal in batch mode - thus it can't run out of cron!
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
+o  -N and -M comandline switches are broken
+   -N does not enter batch mode and does not mail out any articles
+   -M always mails to your address
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  a problem concerning .tin/posted: when I post a postponed followup,
@@ -12,9 +23,6 @@ o  after resubscribing to a newgroup which is still in the .newsrc, tin
    ignores the old related .newsrc entry and marks all articles as
    unread.
    [Sven Manias <sven.manias@stud.uni-karlsruhe.de>]
-
-o  -N amd -M comandline switches are broken
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.
@@ -70,6 +78,9 @@ o  new subscribed groups won't show up in the same session if:
      'y'ank out
    as tin does not check if the group contains any articles [we should send
    a GROUP or LISTGROUP to the server after 's'ubscribe]
+   also the cursor postion gets 'lost' after 'y'ank in 'y'ank out - it'll
+   be placed to the first group in your list, not to the one it has pointed
+   to before the yanks.
 
 o  supersedes does not work if one of the Newsgroups is not present in the
    active file.
@@ -194,16 +205,24 @@ o  sometimes (when using tins kill-menu) kill-file entries are
 
 o  remove build in path of external commands (metamail, pgp, ...)
 
-o  When enabling the 'cc/bcc on every message that is sent', and
+o  when enabling the 'cc/bcc on every message that is sent', and
    then mailing a message to myself, tin will print the message
-   "Mailing to ... gary gary".  A nice touch would be if tin
+   "Mailing to ... gary gary".  a nice touch would be if tin
    checks the mail_to line, and doesn't add the user's name
-   twice.  Yes, sendmail removes the duplicate ... but it'd
+   twice.  yes, sendmail removes the duplicate ... but it'd
    be better if tin caught this case first.
 
 New features
 ------------
-o  Word highlighting shouldn't be enabled in signatures, as '*'
+o  add a mutt-like threading tree
+
+o  if using "-n" commandline switch you can't subscribe to newsgroups not
+   present in your newsrc - a simple check against the server
+   [i.e. GROUP $newsgroup] would help - and if the server understands
+    LIST newsgroups pattern we could also fetch the description without
+    loosing "-n" speed improvements]
+
+o  word highlighting shouldn't be enabled in signatures, as '*'
    and '_' characters may be used for ASCII art (e.g. '___').
    [Vincent Lefevre <vlefevre@ens-lyon.fr>]
 
@@ -333,6 +352,9 @@ o  when From: only contains "First-name Last-name" tin strips the space
 
 Internal Changes
 ----------------
+o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
+   add configure option for those
+
 o  check where "~" is used instead of homedir
 
 o  change all system()/popen() calls to fork() and exec() calls

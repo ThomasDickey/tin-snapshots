@@ -173,7 +173,8 @@ OBJECTS = \
         $(OBJDIR)/win32.o \
         $(OBJDIR)/win32tcp.o \
         $(OBJDIR)/xref.o \
-#        $(OBJDIR)/parsdate.y \
+        $(OBJDIR)/_tzset.o \
+#        $(OBJDIR)/parsdate.c \
 
 
 #
@@ -187,7 +188,7 @@ OBJECTS = \
 # targets
 #
 
-all: $(PROJECT) $(ACTIVED) $(GSTFILE)
+all: _tzset.o $(PROJECT) $(ACTIVED) $(GSTFILE)
 
 $(PROJECT):     $(OBJDIR) $(OBJECTS)
         $(CC) $(LDFLAGS) pname=$@ <with <(ram:tmp)
@@ -211,10 +212,15 @@ makecfg: $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o $(GSTFILE)
 $(INCDIR)/tincfg.h: $(SRCDIR)/tincfg.tbl makecfg
         makecfg $(SRCDIR)/tincfg.tbl $(INCDIR)/tincfg.h
 
+# this could really be more elegant (obw)
+_tzset.o: sc:source/_tzset.c
+        $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
+
 clean:
         -gst $(GSTFILE) unload
         -delete $(OBJDIR)/\#?.o #?.lnk
         -delete $(GSTFILE)(%|.info) $(ACTIVED)(%|.info) $(PROJECT)(%|.info)
+        -delete $(SRCDIR)/parsdate.c
 
 #
 # dependencies

@@ -41,7 +41,9 @@ authinfo_generic (void)
 	static char *old_env = 0;
 #endif
 
+#ifdef DEBUG
 	debug_nntp ("authorization", "authinfo generic");
+#endif
 
 	/*
 	 * If we have authenticated before, NNTP_AUTH_FDS already
@@ -57,7 +59,9 @@ authinfo_generic (void)
 		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);		
 		if (!mktemp (tempfile)) {
 			error_message (txt_cannot_create_uniq_name, "");
+#ifdef DEBUG
 			debug_nntp ("authorization", txt_cannot_create_uniq_name);
+#endif
 			return FALSE;
 		} else {
 			fp = fopen (tempfile, "w+");
@@ -218,7 +222,9 @@ do_authinfo_original (
 	}
 
 	if ((authpass == (char *) 0) || (*authpass == '\0')) {
+#ifdef DEBUG
 		debug_nntp ("authorization", "failed: no password");
+#endif
 		error_message (txt_nntp_authorization_failed, server);
 		return ERR_AUTHBAD;
 	}
@@ -258,7 +264,9 @@ authinfo_original (
 	char authusername[PATH_LEN] = "";
 	char authpassword[PATH_LEN] = "";
 
+#ifdef DEBUG
 	debug_nntp ("authorization", "original authinfo");
+#endif
 
 	authuser = strncpy (authusername, authuser, PATH_LEN);
 	authpass = authpassword;
@@ -283,7 +291,9 @@ authinfo_original (
 		if (read_newsauth_file (server, authuser, authpass)) {
 			ret = do_authinfo_original (server, authuser, authpass);
 			if (!(already_failed = (ret != OK_AUTH))) {
+#ifdef DEBUG
 				debug_nntp ("authorization", "succeeded");
+#endif
 				return TRUE;
 			}
 		}
@@ -305,7 +315,9 @@ authinfo_original (
 	if (!startup) {
 		clear_message ();
 		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN, HIST_OTHER)) == (char *) 0) {
+#ifdef DEBUG
 			debug_nntp ("authorization", "failed: no username");
+#endif
 			return FALSE;
 		}
 		authuser = strncpy (authusername, ptr, PATH_LEN);
@@ -315,7 +327,9 @@ authinfo_original (
 		authpass = strncpy (authpassword, ptr, PATH_LEN);
 		ret = do_authinfo_original (server, authuser, authpass);
 	}
+#ifdef DEBUG
 	debug_nntp ("authorization", (ret == OK_AUTH ? "succeeded" : "failed"));
+#endif
 	return (ret == OK_AUTH);
 }
 

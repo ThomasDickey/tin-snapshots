@@ -38,7 +38,11 @@ extern void read_attributes_file (char *file, int global_file);
 extern void write_attributes_file (char *file);
 
 /* auth.c */
-extern t_bool authenticate (char *server, char *user, t_bool startup);
+#if !defined (INDEX_DAEMON) && defined (NNTP_ABLE)
+	extern t_bool authenticate (char *server, char *user, t_bool startup);
+#else
+	extern void no_authenticate (void);
+#endif /* !INDEX_DAEMON && NNTP_ABLE */
 
 /* charset.c */
 extern int iIsArtTexEncoded (long art, char *group_path);
@@ -54,7 +58,7 @@ extern void print_color (char *str, t_bool signature);
 /* config.c */
 extern char *quote_space_to_dash (char *str);
 extern const char *print_boolean (t_bool value);
-extern int change_config_file (struct t_group *group, int filter_at_once);
+extern int change_config_file (struct t_group *group);
 extern int match_boolean (char *line, const char *pat, t_bool *dst);
 extern int match_integer (char *line, const char *pat, int *dst, int maxlen);
 extern int match_long (char *line, const char *pat, long *dst);
@@ -91,20 +95,22 @@ extern void setup_screen (void);
 extern void xclick (int state);
 
 /* debug.c */
-extern void debug_delete_files (void);
-extern void debug_nntp (const char *func, const char *line);
-extern void debug_nntp_respcode (int respcode);
-extern void debug_print_active (void);
-extern void debug_print_arts (void);
-extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
-extern void debug_print_comment (const char *comment);
-extern void debug_print_filters (void);
-extern void debug_print_header (struct t_article *s);
-extern void debug_save_comp (void);
 #ifdef DEBUG
+	extern void debug_delete_files (void);
+	extern void debug_nntp (const char *func, const char *line);
+	extern void debug_nntp_respcode (int respcode);
+	extern void debug_print_active (void);
+	extern void debug_print_arts (void);
+	extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
+	extern void debug_print_comment (const char *comment);
+	extern void debug_print_filters (void);
+	extern void debug_print_header (struct t_article *s);
+	extern void debug_save_comp (void);
 	extern void vDbgPrintMalloc (int iIsMalloc, const char *pcFile, int iLine, size_t iSize);
 #endif /* DEBUG */
 #ifdef DEBUG_NEWSRC
+	extern void debug_print_comment (const char *comment);
+	extern void debug_print_newsrc (struct t_group *group, struct t_article *art);
 	extern void debug_print_newsrc (struct t_newsrc *NewSrc, FILE *fp);
 #endif /* DEBUG_NEWSRC */
 

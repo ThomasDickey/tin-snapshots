@@ -167,8 +167,10 @@ group_page (
 
 	show_group_page ();
 
+#ifdef DEBUG_NEWSRC
 debug_print_comment ("group.c: before while(1) loop...");
 debug_print_bitmap (group, NULL);
+#endif
 
 	forever {
 		set_xclick_on ();
@@ -840,7 +842,7 @@ group_list_thread:
 					old_artnum = arts[n].artnum;
 				}
 				n = default_sort_art_type;
-				filter_state = change_config_file (group, TRUE);
+				filter_state = change_config_file (group);
 				set_signals_group ();	/* Just to be sure */
 				if (filter_state == NO_FILTERING && n != default_sort_art_type) {
 					make_threads (&CURR_GROUP, TRUE);
@@ -1265,7 +1267,9 @@ do_auto_select_arts:
 				}
 				for (i=0; i < top; ++i) {
 					if (arts[i].status == ART_UNREAD && arts[i].selected != 1) {
+#ifdef DEBUG_NEWSRC
 						debug_print_comment ("group.c: X command");
+#endif
 						art_mark_read (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = TRUE;
 					}
@@ -1286,7 +1290,9 @@ do_auto_select_arts:
 undo_auto_select_arts:
 				for (i=0; i<top; ++i) {
 					if (arts[i].status == ART_READ && arts[i].zombie) {
+#ifdef DEBUG_NEWSRC
 						debug_print_comment ("group.c: + command");
+#endif
 						art_mark_unread (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = FALSE;
 					}

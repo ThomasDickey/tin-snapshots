@@ -1302,6 +1302,7 @@ prev_unread (
 /*
  * Move the on-screen pointer & internal variable to the given thread number
  */
+#ifndef INDEX_DAEMON
 void
 move_to_response(
 	int n)
@@ -1317,3 +1318,4 @@ move_to_response(
         show_thread_page ();
     }
 }  
+#endif /* INDEX_DAEMON */

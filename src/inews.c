@@ -124,7 +124,9 @@ submit_inews (
 	 */
 	if ((respcode = get_respcode ()) != CONT_POST) {
 		error_message ("%s", nntp_respcode (respcode));
+#ifdef DEBUG
 		debug_nntp ("submit_inews", nntp_respcode (respcode));
+#endif
 		fclose (fp);
 		return ret_code;
 	}
@@ -173,7 +175,9 @@ submit_inews (
 	 */
 	if ((respcode = get_respcode ()) != OK_POSTED) {
 		error_message ("%s", nntp_respcode (respcode));
+#ifdef DEBUG
 		debug_nntp ("submit_inews", nntp_respcode (respcode));
+#endif
 		return ret_code;
   	}
 

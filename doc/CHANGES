@@ -1,4 +1,21 @@
---unoff BETA release 970730 --
+--unoff BETA release 970813 --
+
+419) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. missplaced #ifdefs moved
+     ADD. minor code-cleanup
+     FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c,
+          search.c, thread.c, proto.h, Makefile.in
+
+418) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. get_arrow_keys()/AmigaOS doesn't work
+     ADD. minor code-cleanup (AmigaOS)
+     FIX. several supplied patches
+
+417) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. minor code clean-up (mainly debug-message related)
+     FIX. several supplied patches
+
+--unoff BETA release 970731 --
 
 416) Thomas E. Dickey <dickey@clark.net>
      ADD. logic to use 'poll() in get_arrow_key()
