@@ -426,7 +426,7 @@ extern void free_msgids P_((void));
 extern struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *parent));
 extern struct t_msgid *parse_references P_((char *r));
 extern char *get_references P_((struct t_msgid *refptr));
-extern void thread_by_reference P_((struct t_group *group));
+extern void thread_by_reference P_((void));
 /* ./rfc1521.c */
 extern void strcpynl P_((char *to, char *from));
 extern unsigned char bin2hex P_((unsigned int x));

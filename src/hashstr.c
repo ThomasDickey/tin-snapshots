@@ -72,10 +72,24 @@ hash_str (s)
 	}
 
 	*p = add_string (s);
-	return (*p)->s;
+	return (*p)->s;			/* Return ptr to text, _not_ the struct */
 }
 
 
+/*
+ * Add a string to the hash table
+ * Each entry will have the following structure:
+ *
+ * char *s		-+			Pointer to the text
+ * char *next	 |			Pointer to the next hashnode in chain
+ * int			 |			'magic' ptr used to speed subj threading
+ * int			 |			Unknown ptr ?
+ * T		 <---+			The text itself. The ptr that hash_str()
+ * E					    returns points here - the earlier fields
+ * X						are 'hidden'.
+ * T
+ * \0						String terminator
+ */
 static struct t_hashnode *
 add_string (s)
 	char *s;
@@ -87,10 +101,13 @@ add_string (s)
 		+ sizeof (int) * 2 + strlen(s) + 1);
 
 	p->next = (struct t_hashnode *) 0;
+
 	iptr = (int *) &p[1];
-	*iptr++ = -1;
-	*iptr++ = -1;
-	p->s = (char *) iptr;
+
+	*iptr++ = -1;			/* Initialise 'magic' ptr to -1 */
+	*iptr++ = -1;			/* TODO: Is this ever used ? */
+
+	p->s = (char *) iptr;	/* Bolt the text onto the end */
 	strcpy (p->s, s);
 
 	return p;

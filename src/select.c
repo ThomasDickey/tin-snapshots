@@ -199,7 +199,7 @@ select_read_group:
 					clear_message ();
 					do {
 						index_point = GRP_UNINDEXED;
-						group_page (&active[my_group[cur_groupnum]]);
+						group_page (&CURR_GROUP);
 					} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
 					if (index_point == GRP_QUIT) {
 						goto select_done;
@@ -375,7 +375,7 @@ select_page_up:
 				if (group_top == 0) {
 					break;
 				}
-				catchup_group (&active[my_group[cur_groupnum]], (ch == iKeySelectCatchupGotoNext));
+				catchup_group (&CURR_GROUP, (ch == iKeySelectCatchupGotoNext));
 			    break;
 
 			case iKeySelectToggleSubjDisplay:	/* toggle newsgroup descriptions */
@@ -444,14 +444,13 @@ select_page_up:
 					info_message (txt_no_groups);
 				} else {
 					info_message (
-						(active[my_group[cur_groupnum]].description ?
-					 	active[my_group[cur_groupnum]].description :
+						(CURR_GROUP.description ?  CURR_GROUP.description :
 					 	"*** No description ***"));
 				}
 				break;
 
 			case iKeySelectMoveGrp:	/* reposition group within group list */
-				if (active[my_group[cur_groupnum]].subscribed == SUBSCRIBED) {
+				if (CURR_GROUP.subscribed == SUBSCRIBED) {
 					n = cur_groupnum;
 					cur_groupnum = reposition_group (&active[my_group[n]], n);
 					if (_hp_glitch) {
@@ -540,10 +539,10 @@ select_done:
 				if (group_top == 0) {
 					break;
 				}
-				if (active[my_group[cur_groupnum]].subscribed != SUBSCRIBED) {
+				if (CURR_GROUP.subscribed != SUBSCRIBED) {
 					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, " ");
-					subscribe (&active[my_group[cur_groupnum]], SUBSCRIBED);
-					sprintf (buf, txt_subscribed_to, active[my_group[cur_groupnum]].name);
+					subscribe (&CURR_GROUP, SUBSCRIBED);
+					sprintf (buf, txt_subscribed_to, CURR_GROUP.name);
 					info_message (buf);
 				}
 			    break;
@@ -597,10 +596,10 @@ select_done:
 				if (group_top == 0) {
 					break;
 				}
-				if (active[my_group[cur_groupnum]].subscribed == SUBSCRIBED) {
+				if (CURR_GROUP.subscribed == SUBSCRIBED) {
 					mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 2, "u");
-					subscribe (&active[my_group[cur_groupnum]], '!');
-					sprintf(buf, txt_unsubscribed_to, active[my_group[cur_groupnum]].name);
+					subscribe (&CURR_GROUP, '!');
+					sprintf(buf, txt_unsubscribed_to, CURR_GROUP.name);
 					info_message(buf);
 				}
 				goto_next_group_on_screen ();
@@ -663,7 +662,7 @@ select_done:
 							break;
 						}
 					} else {
-						strcpy (post_group, active[my_group[cur_groupnum]].name);
+						strcpy (post_group, CURR_GROUP.name);
 					}
 					if (post_article (post_group, &posted_flag)) {
 						group_selection_page ();
@@ -683,7 +682,7 @@ select_done:
 					set_alarm_clock_off ();
 					n = group_top;
 					if (group_top) {
-						strcpy (buf, active[my_group[cur_groupnum]].name);
+						strcpy (buf, CURR_GROUP.name);
 					}
 					vWriteNewsrc ();
 					group_top = 0;
@@ -726,9 +725,9 @@ select_done:
 				if (group_top == 0) {
 					break;
 				}
-				grp_mark_unread (&active[my_group[cur_groupnum]]);
-				if (active[my_group[cur_groupnum]].newsrc.num_unread) {
-					sprintf (msg, "%5ld", active[my_group[cur_groupnum]].newsrc.num_unread);
+				grp_mark_unread (&CURR_GROUP);
+				if (CURR_GROUP.newsrc.num_unread) {
+					sprintf (msg, "%5ld", CURR_GROUP.newsrc.num_unread);
 				} else {
 					strcpy (msg, "     ");
 				}
@@ -1128,7 +1127,7 @@ next_unread_group (enter_group)
 		clear_message ();
 		do {
 			index_point = GRP_UNINDEXED;
-			group_page (&active[my_group[cur_groupnum]]);
+			group_page (&CURR_GROUP);
 		} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
 		if (index_point == GRP_QUIT) {
 			return GRP_QUIT;

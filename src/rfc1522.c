@@ -252,7 +252,7 @@ contains_nonprintables(w)
 		if (*w<32||*w>127) nonprint++;
 		if (!nonprint && *w=='=' && *(w+1)=='?') nonprint=1;
 #ifdef MIME_BASE64_ALLOWED
-		if (*w=='=' || *w=='?') schars++;
+		if (*w=='=' || *w=='?' || *w=='_') schars++;
 		chars++;
 #endif		
 		w++;
@@ -346,7 +346,7 @@ rfc1522_do_encode(what, where)
 				any_quoting_done=1;
 			}
 			while (*what && !isspace(*what)&&*what!='('&&*what!=')') {
-				if (*what<32||*what>127||*what=='='||*what=='?') {
+				if (*what<32||*what>127||*what=='='||*what=='?'||*what=='_') {
 					sprintf((char *)buf2,"=%2.2X",*what);
 					*t++=buf2[0];
 					*t++=buf2[1];

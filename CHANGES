@@ -1,3 +1,13 @@
+--unoff BETA release 960702 --
+
+102) Chris Blum <chris@phil.uni-sb.de
+     BUG. '_' aka <space> was not decoded right
+     FIX. rfc1522.c
+
+101) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. reference-threading code cleanup
+     FIX. several supplied patches
+
 --unoff BETA release 960701 --
 
 100) Thomas E. Dickey <dickey@clark.net>

@@ -99,7 +99,7 @@ resync_active_file ()
 		reread = TRUE;
 		
 		if (cur_groupnum >= 0 && group_top) {
-			strcpy (old_group, active[my_group[cur_groupnum]].name);
+			strcpy (old_group, CURR_GROUP.name);
 		} else {
 			old_group[0] = '\0';
 		}

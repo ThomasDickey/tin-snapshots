@@ -16,7 +16,6 @@
 #include	"menukeys.h"
 
 #define MARK_OFFSET	8
-#define CURR_GROUP	(active[my_group[cur_groupnum]])
 
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))

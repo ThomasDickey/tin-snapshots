@@ -92,13 +92,18 @@ hash_msgid(key)
  * If we are not the first child & we have a ptr to an article header,
  * we can use the date to sort us into the list of siblings.
  */
-#define DATE(x)		(arts[x->article].date)
+/*TODO I suppose becuase of the way arts[] was sorted, that we'll always
+ *     go at the end of the siblings ?
+ */
+#define ARTPTR(x)		(&arts[x->article])
 
 static void
 add_to_parent(ptr)
 	struct t_msgid *ptr;
 {
 #ifdef HAVE_REF_THREADING
+	struct t_msgid *p;
+
 	if (!ptr->parent)
 		return;
 
@@ -106,38 +111,42 @@ add_to_parent(ptr)
 		ptr->parent->child = ptr;
 		return;
 	}
-	ptr->sibling = ptr->parent->child;
-	ptr->parent->child = ptr;
-#if 0
-fprintf(stderr, "add sibling: Artptr = %d, ArtDate %ld, 1st Sib %ld\n",
-	ptr->article,
-	(ptr->article != ART_NORMAL) ? DATE(ptr) : 0,
-	(ptr->parent->child->article != ART_NORMAL) ? DATE(ptr->parent->child) : 0);
 
 	/*
-	 * If we don't have a date to look at, or our date preceeds the current
-	 * 1st sibling, we go at the start of the sibling list
+	 * If we don't have a date to look at, or our date preceeds our parents'
+	 * 1st child, we replace it and go at the start of the sibling list
 	 */
-	 if (ptr->article == ART_NORMAL ||
-	     (date_comp(DATE(ptr), DATE(ptr->parent->child))) {
-
-fprintf(stderr, "1st sibling (%s)\n"), (ptr->article != ART_NORMAL)?"YES":"");
+	if (ptr->article == ART_NORMAL) {
 
 		ptr->sibling = ptr->parent->child;
 		ptr->parent->child = ptr;
-	/*
-	 * Traverse the sibling list, find the right point to insert this art
-	 */
-	 } else {
-	 	for (p = ptr->parent->child; p->sibling != NULL; p = p->sibling) {
-	 		if (date_comp(DATE(ptr), DATE(p)) 1)
-	 		break;
-	 }
-	 
-	 ptr->sibling = p->sibling;
-	 p->sibling = ptr;
+
+	} else {
+		/*
+		 * Traverse the sibling list, find the right point to insert this art
+		 */
+		for (p = ptr->parent->child; p->sibling != NULL; p = p->sibling) {
+
+			/*
+			 * Skip siblings with no date available
+			 */
+			if (p->article == ART_NORMAL)
+				continue;
+
+#if 0
+			if (date_comp(ARTPTR(ptr), ARTPTR(p)) != -1)
+				fprintf(stderr, "Same or After\n");
+			else
+				fprintf(stderr, "Before\n");
+#endif
+		}
+	
+		/*
+		 * Stick at the end for now, this is most common case by far
+		 */
+		ptr->sibling = p->sibling;
+		p->sibling = ptr;
 	}
-#endif /* 0 */
 
 #endif /* HAVE_REF_THREADING */
 }
@@ -754,8 +763,7 @@ build_thread(ptr)
  * parent / child / sibling  / article pointers in the msgid hash.
  */
 void
-thread_by_reference (group)
-	struct t_group *group;
+thread_by_reference()
 {
 	int i;
 	struct t_msgid *ptr;
