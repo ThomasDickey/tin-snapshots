@@ -40,7 +40,9 @@ extern void make_threads P_((struct t_group *group, int rethread));
 extern void sort_arts P_((int sort_art_type));
 extern int parse_headers P_((char *buf, struct t_article *h));
 extern int iReadNovFile P_((struct t_group *group, long min, long max, int *expired));
+#ifndef NNTP_ONLY
 extern void vWriteNovFile P_((struct t_group *psGrp));
+#endif
 extern char *pcFindNovFile P_((struct t_group *psGrp, int iMode));
 extern void do_update P_((void));
 extern void set_article P_((struct t_article *art));

@@ -189,7 +189,27 @@ select_read_group:
 					info_message (txt_no_groups);
 					break;
 				}
-				
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+				/*
+				 * veryfy if group is valid
+				 */
+				if (read_news_via_nntp) {
+					char    acBuf[NNTP_STRLEN];
+					char	acLine[NNTP_STRLEN];
+
+					sprintf (acBuf, "group %s", CURR_GROUP.name);
+					put_server (acBuf);
+					get_server (acLine, NNTP_STRLEN);
+					if (atoi (acLine) != OK_GROUP) {
+						if (strlen (acLine) > 4) {
+							info_message (acLine);
+						} else {
+							info_message (txt_not_exist);
+						}
+						break;
+					}
+				}
+#endif
 				n = my_group[cur_groupnum];
 				if (active[n].xmin <= active[n].xmax) {
 					space_mode = pos_first_unread;

@@ -153,13 +153,13 @@ getserverbyfile (file)
 	static char	buf[256];
 
 	if (cmdline_nntpserver[0] != '\0') {
-		(void) get_nntpserver (buf, cmdline_nntpserver);
+		get_nntpserver (buf, cmdline_nntpserver);
 		return (buf);
 	}
 
 	cp = getenv ("NNTPSERVER");
 	if (cp != (char *) 0) {
-		(void) get_nntpserver (buf, cp);
+		get_nntpserver (buf, cp);
 		return (buf);
 	}
 

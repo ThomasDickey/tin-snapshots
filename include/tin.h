@@ -585,18 +585,16 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef SMALL_MEMORY_MACHINE
-#	define		DEFAULT_ACTIVE_NUM	1800
 #	define		DEFAULT_ARTICLE_NUM	600
 #	define		DEFAULT_SAVE_NUM	10
 #	define		DEFAULT_SPOOLDIR_NUM	5
-#	define		DEFAULT_NEWNEWS_NUM	5
 #else
-#	define		DEFAULT_ACTIVE_NUM	1800
 #	define		DEFAULT_ARTICLE_NUM	1200
 #	define		DEFAULT_SAVE_NUM	30
 #	define		DEFAULT_SPOOLDIR_NUM	10
-#	define		DEFAULT_NEWNEWS_NUM	5
 #endif
+#	define		DEFAULT_ACTIVE_NUM	1800
+#	define		DEFAULT_NEWNEWS_NUM	5
 
 #ifdef VMS
 #define 	RCDIR			"TIN"
@@ -689,7 +687,7 @@ extern char *get_uaf_fullname();
 #endif
 
 #ifndef DEFAULT_COMMENT
-#	define	DEFAULT_COMMENT		": "	/* used when by follow-ups & replys */
+#	define	DEFAULT_COMMENT		"> "	/* used when by follow-ups & replys */
 #endif
 #ifndef ART_MARK_UNREAD
 #	define	ART_MARK_UNREAD		'+'	/* used to show that an art is unread */

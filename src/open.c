@@ -676,6 +676,12 @@ base_comp (p1, p2)
 	return 0;
 }
 
+
+/*
+ * looks like setup_soft_base is not needed... -> strip the code
+ * anyone remembering who #if'ed it out? or where it was used?
+ */
+
 /*
  *  Read the article numbers existing in arts[] that was filled from nov file.
  *  Returns total number of articles in group.
