@@ -60,7 +60,8 @@ AC_MSG_CHECKING(if you want to compile-in debug support)
 CF_ARG_ENABLE(debug,
 	[  --enable-debug          turn on debug/profiling/traces],
 	[ENABLE_DEBUG=''
-    CFLAGS="-g $CFLAGS"],
+    CFLAGS="-g $CFLAGS"
+    LDFLAGS="-g $LDFLAGS"],
 	[ENABLE_DEBUG='#'
     test -z "$save_CFLAGS" && CFLAGS=`echo $CFLAGS|sed -e 's/-g //'`])
 AC_MSG_RESULT($enableval)
@@ -122,13 +123,13 @@ CF_WITH_PATH(spooldir,
 AC_MSG_RESULT($SPOOLDIR)
 
 AC_MSG_CHECKING(for news overview-directory path)
-CF_WITH_PATH(overviewdir,
+CF_WITH_PATH(nov-dir,
 	[  --with-nov-dir=PATH     news overview-directory],
 	NOVROOTDIR,$SPOOLDIR)
 AC_MSG_RESULT($NOVROOTDIR)
 
-AC_MSG_CHECKING(for news overview-directory path)
-CF_WITH_PATH(inewsdir,
+AC_MSG_CHECKING(for directory containing \"inews\")
+CF_WITH_PATH(inews-dir,
 	[  --with-inews-dir=PATH   directory containing \"inews\"],
 	INEWSDIR,$LIBDIR)
 AC_MSG_RESULT($INEWSDIR)
@@ -152,12 +153,12 @@ AC_MSG_RESULT($INEWS_MAIL_GATEWAY)
 AC_MSG_CHECKING(for mail-domain)
 CF_WITH_VALUE(mail-domain,
 	[  --with-mail-domain      sets \$INEWS_MAIL_DOMAIN],
-	INEWS_MAIL_DOMAIN,unspecified)
+	INEWS_MAIL_DOMAIN)
 AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
 
 AC_MSG_CHECKING(for INEWS domain)
 if test -z "$INEWS_DOMAIN" ; then
-if test "$INEWS_MAIL_DOMAIN" = unspecified ; then
+if test -z "$INEWS_MAIL_DOMAIN" ; then
 	INEWS_DOMAIN=.`(hostname || uname -n) 2>/dev/null | sed 1q`
 	if test "$INEWS_DOMAIN" = "." ; then
 		INEWS_DOMAIN=".localhost"
@@ -250,6 +251,7 @@ AC_ARG_WITH(coffee,
 	;;
 	esac],
 	AC_MSG_RESULT(no))
+
 ###	checks for compiler characteristics
 CF_MAKEFLAGS
 AC_LANG_C

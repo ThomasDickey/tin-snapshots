@@ -19,12 +19,16 @@
 #include <ctype.h>
 
 
+/* this strcpy variant removes \n and "" */
 void
 strcpynl(to, from)
 	char *to;
 	char *from;
 {
-	while (*from&&*from!='\r'&&*from!='\n') *to++=*from++;
+	while (*from&&*from!='\r'&&*from!='\n') {
+		if (*from=='"') from++; /* this is just plain silly */
+		else *to++=*from++;
+	}
 	*to=0;
 }
 

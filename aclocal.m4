@@ -628,8 +628,10 @@ ifelse($4,,[test -n "$withval" && \
 ],[test -z "$withval" && withval=no
 ])dnl
 case "$withval" in #(vi
-yes|no)	echo 'configure: error: expected a value for $3' 1>&2
+yes) echo 'configure: error: expected a value for $3' 1>&2
   exit 1
+  ;; #(vi
+no) withval=""
   ;;
 esac
 $3="$withval"

@@ -1,3 +1,14 @@
+--unoff BETA release 960619 --
+
+090) Chris Blum <chris@phil.uni-sb.de>
+     BUG. '"' in mime-encoded-headers caused some trouble
+     FIX. rfc1521.c
+
+089) Thomas E. Dickey <dickey@clark.net>
+     ADD. top-level 'distclean' ignores errors
+     ADD. autoconf cleanup, name fixing, etc.
+     FIX. Makefile, aclocal.m4, configure.in, src/Makefile.in
+
 --unoff BETA release 960618 --
 
 088) Urs Janssen <urs@akk.uni-karlsruhe.de>
