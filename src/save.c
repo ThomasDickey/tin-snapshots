@@ -1039,7 +1039,7 @@ get_last_savefile ()
 int
 post_process_files (proc_type_ch, auto_delete)
 	int proc_type_ch;
-	int auto_delete;
+	t_bool auto_delete;
 {
 	if (any_saved_files ()) {
 		wait_message (txt_post_processing);
@@ -1078,7 +1078,7 @@ post_process_files (proc_type_ch, auto_delete)
 void
 post_process_uud (pp, auto_delete)
 	int pp;
-	int auto_delete;
+	t_bool auto_delete;
 {
 #ifndef INDEX_DAEMON
 
@@ -1326,7 +1326,7 @@ uudecode_file (pp, file_out_dir, file_out)
 
 void
 post_process_sh (auto_delete)
-	int auto_delete;
+	t_bool auto_delete;
 {
 #ifndef INDEX_DAEMON
 
@@ -1481,7 +1481,7 @@ get_archive_file (dir)
 
 void
 delete_processed_files (auto_delete)
-	int auto_delete;
+	t_bool auto_delete;
 {
 #ifndef INDEX_DAEMON
 

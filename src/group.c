@@ -1496,9 +1496,9 @@ set_subj_from_size (num_cols)
 	int size;
 
 	if (show_author == SHOW_FROM_BOTH) {
-              max_subj = (num_cols / 2) - 4;
+		max_subj = (num_cols / 2) - 4;
 	} else {
-              max_subj = (num_cols / 2) + 3;
+		max_subj = (num_cols / 2) + 3;
 	}
 	max_from = (num_cols - max_subj) - 17;
 
@@ -1538,9 +1538,10 @@ toggle_subject_from ()
  *
  * WARNING: the routine is tightly coupled with draw_sline() in the sense
  * that draw_sline() expects bld_sline() to place the article mark
- * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the screen[].col.
+ * (read_art_makr, selected_art_mark, etc) at GROUP_MARK_OFFSET in the 
+ * screen[].col.
  * So, if you change the format used in this routine, be sure to check
- * that the value of MARK_OFFSET (tin.h) is still correct.
+ * that the value of GROUP_MARK_OFFSET (tin.h) is still correct.
  * Yes, this is somewhat kludgy.
  */
 
@@ -1557,7 +1558,6 @@ bld_sline (i)
 	struct t_art_stat sbuf;
 	register char *buffer;
 	char arts_sub[255];
-	char _from[255];
 
 	from[0] = '\0';
 	respnum = (int) base[i];
@@ -1612,19 +1612,17 @@ bld_sline (i)
 		}
 	}
 
-	if (show_author != SHOW_FROM_NONE) {
-		get_author (FALSE, &arts[j], from);
-	}
+	if (show_author != SHOW_FROM_NONE)
+		get_author (FALSE, &arts[j], from, len_from);
 
 	strncpy(arts_sub, arts[j].subject, len_subj+5);
 	j = INDEX2SNUM(i);
-	strncpy(_from, from, len_from+5);
-	_from[len_from+1] = '\0';
 	arts_sub[len_subj-5+1] = '\0';
 
+/* TODO - is len_from still needed now get_author has a len field?? */
 	sprintf (buffer = screen[j].col, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
-		 arts_sub, spaces, len_from, len_from, _from);
+		 arts_sub, spaces, len_from, len_from, from);
 	
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++) {
@@ -1658,7 +1656,7 @@ draw_sline (i, full)
 #ifndef INDEX_DAEMON
 	size_t tlen;
 	int j, x;
-	int k = MARK_OFFSET;
+	int k = GROUP_MARK_OFFSET;
 	char *s;
 
 	j = INDEX2SNUM(i);

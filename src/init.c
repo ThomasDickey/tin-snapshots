@@ -60,7 +60,7 @@ char mail_active_file[PATH_LEN];
 char mail_address[LEN];			/* user's mail address */
 #endif
 int mail_mime_encoding;
-int mail_8bit_header=FALSE;               /* allow 8bit chars. in header of mail message */
+t_bool mail_8bit_header=FALSE;		/* allow 8bit chars. in header of mail message */
 char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
@@ -104,12 +104,12 @@ char art_marked_inrange;
 char art_marked_return;
 char art_marked_selected;
 char art_marked_unread;
-int auto_list_thread;			/* list thread when entering it using right arrow */
+t_bool auto_list_thread;		/* list thread when entering it using right arrow */
 int NOTESLINES;				/* set in set_win_size () */
 int RIGHT_POS;				/* set in set_win_size () */
 int MORE_POS;				/* set in set_win_size () */
-int confirm_action;
-int confirm_to_quit;
+t_bool confirm_action;
+t_bool confirm_to_quit;
 int max_subj = 0;
 int max_from = 0;
 int got_sig_pipe = FALSE;
@@ -125,10 +125,10 @@ int read_saved_news = FALSE;		/* tin -R read saved news from tin -S */
 int real_gid;
 int real_uid;
 int real_umask;
-int show_description;
-int strip_blanks;
-int sigdashes;				/* set TRUE to prepend every signature with dashes */
-int start_editor_offset;
+t_bool show_description;
+t_bool strip_blanks;
+t_bool sigdashes;			/* set TRUE to prepend every signature with dashes */
+t_bool start_editor_offset;
 int tin_uid;
 int tin_gid;
 int top = 0;
@@ -136,36 +136,36 @@ int top_base;
 int check_any_unread = FALSE;
 int start_any_unread = FALSE;
 
-int beginner_level;			/* beginner level (shows mini help a la elm) */
-int catchup_read_groups;		/* ask if read groups are to be marked read */
+t_bool beginner_level;			/* beginner level (shows mini help a la elm) */
+t_bool catchup_read_groups;		/* ask if read groups are to be marked read */
 int cmd_line;				/* batch / interactive mode */
 int check_for_new_newsgroups;		/* don't check for new newsgroups */
 int count_articles;			/* count articles on spooldir or via GROUP cmd */
 int created_rcdir;			/* checks if first time tin is started */
-int default_auto_save;			/* save thread with name from Archive-name: field */
+t_bool default_auto_save;		/* save thread with name from Archive-name: field */
 int default_auto_save_msg;		/* save posted message to ~/Mail/posted */
-int default_batch_save;			/* save arts if -M/-S command line switch specified */
+t_bool default_batch_save;		/* save arts if -M/-S command line switch specified */
 int default_filter_days;		/* num of days an article  filter can be active */
 int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
-int default_show_only_unread;		/* show only new/unread arts or all arts */
+t_bool default_show_only_unread;	/* show only new/unread arts or all arts */
 int default_sort_art_type;		/* sort arts[] array by subject,from or date field */
 int default_thread_arts;		/* threading system for viewing articles */
 int delete_index_file;			/* delete index file before indexing (tind only) */
-int draw_arrow_mark;			/* draw -> or highlighted bar */
-int force_screen_redraw;		/* force screen redraw after external (shell) commands */
-int full_page_scroll;			/* page half/full screen of articles/groups */
-int group_catchup_on_exit;		/* catchup group with left arrow key or not */
-int thread_catchup_on_exit;		/* catchup thread with left arrow key or not */
+t_bool draw_arrow_mark;			/* draw -> or highlighted bar */
+t_bool force_screen_redraw;		/* force screen redraw after external (shell) commands */
+t_bool full_page_scroll;		/* page half/full screen of articles/groups */
+t_bool group_catchup_on_exit;		/* catchup group with left arrow key or not */
+t_bool thread_catchup_on_exit;		/* catchup thread with left arrow key or not */
 int groupname_max_length;		/* max len of group names to display on screen */
 int use_keypad;				/* enables/disables scroll keys on supported terminals */
 #ifdef HAVE_METAMAIL
-int use_metamail;			/* enables/disables metamail on MIME messages */
-int ask_for_metamail;			/* enables/disables the metamail query if a MIME message is going to be displayed */
+t_bool use_metamail;			/* enables/disables metamail on MIME messages */
+t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
 #endif
 #ifdef HAVE_COLOR
 int use_color;				/* enables/disables ansi-color support under linux-console and color-xterm */
-int use_color_tinrc;		/* like use_color but stored in tinrc */
+t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
 int col_back;				/* standard bacground color */
 int col_invers_fg;			/* color of inverse text (foreground) */
 int col_invers_bg;			/* color of inverse text (background) */
@@ -182,61 +182,61 @@ int col_normal;				/* standard foreground color */
 int col_title;				/* color of Help/Mail-Sign */
 int col_signature;			/* color of signature */
 int word_highlight;			/* word highlighting on/off */
-int word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
-int word_h_display_marks;	/* display * or _ when highlighting or space or nothing*/
+t_bool word_highlight_tinrc;		/* like word_highlight but stored in tinrc */
+int word_h_display_marks;		/* display * or _ when highlighting or space or nothing*/
 int col_markstar;			/* text highlighting with *stars* */
 int col_markdash;			/* text highlighting with _underdashes_ */
 #endif
-int use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
-int use_mouse;				/* enables/disables mouse support under xterm */
-int auto_cc;				/* add your name to cc automatically */
-int auto_bcc;				/* add your name to bcc automatically */
+t_bool use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
+t_bool use_mouse;			/* enables/disables mouse support under xterm */
+t_bool auto_cc;				/* add your name to cc automatically */
+t_bool auto_bcc;			/* add your name to bcc automatically */
 int global_filtered_articles;		/* globally killed / auto-selected articles */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
-int iso2asc_supported;		/* Convert ISO-Latin1 to Ascii */
-int mark_saved_read;		/* mark saved article/thread as read */
+int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
+t_bool mark_saved_read;			/* mark saved article/thread as read */
 int newsrc_active;
 int num_of_selected_arts;
 int num_of_killed_arts;
 int num_of_tagged_arts;
 int process_id;
-int pos_first_unread;			/* position cursor at first/last unread article */
+t_bool pos_first_unread;		/* position cursor at first/last unread article */
 int default_post_proc_type;		/* type of post processing to be performed */
 int post_article_and_exit;		/* quick post of an article then exit (elm like) */
-int post_8bit_header=FALSE;                   /* allow 8bit chars. in header when posting to newsgroup */
-int print_header;			/* print all of mail header or just Subject: & From lines */
+t_bool post_8bit_header=FALSE;		/* allow 8bit chars. in header when posting to newsgroup */
+t_bool print_header;			/* print all of mail header or just Subject: & From lines */
 int purge_index_files;			/* stat all articles to see if they still exist */
-int default_filter_kill_header;
-int default_filter_kill_global;
-int default_filter_kill_case;
-int default_filter_kill_expire;
-int default_filter_select_header;
-int default_filter_select_global;
-int default_filter_select_case;
-int default_filter_select_expire;
-int process_only_unread;		/* save/print//mail/pipe unread/all articles */
+t_bool default_filter_kill_header;
+t_bool default_filter_kill_global;
+t_bool default_filter_kill_case;
+t_bool default_filter_kill_expire;
+t_bool default_filter_select_header;
+t_bool default_filter_select_global;
+t_bool default_filter_select_case;
+t_bool default_filter_select_expire;
+t_bool process_only_unread;		/* save/print//mail/pipe unread/all articles */
 int read_local_newsgroups_file;		/* read newsgroups file locally or via NNTP */
 int mail_news_to_posted;		/* mail all arts to specified user */
 int mail_news;				/* mail all arts to specified user */
 int save_news;				/* save all arts to savedir structure */
-int save_to_mmdf_mailbox;		/* save mail to MMDF/mbox format mailbox */
+t_bool save_to_mmdf_mailbox;		/* save mail to MMDF/mbox format mailbox */
 int show_author;
-int show_lines;
-int show_last_line_prev_page;		/* set TRUE to see last line of prev page (ala nn) */
-int show_only_unread_groups;		/* set TRUE to see only subscribed groups with new news */
-int show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
-int highlight_xcommentto;		/* set TRUE to show X-Comment-To inverse in the upper right corner */
+t_bool show_lines;
+t_bool show_last_line_prev_page;	/* set TRUE to see last line of prev page (ala nn) */
+t_bool show_only_unread_groups;		/* set TRUE to see only subscribed groups with new news */
+t_bool show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
+t_bool highlight_xcommentto;		/* set TRUE to show X-Comment-To inverse in the upper right corner */
 int system_status;
-int tab_after_X_selection;		/* set TRUE if you want auto TAB after X */
-int tab_goto_next_unread;
-int space_goto_next_unread;
+t_bool tab_after_X_selection;		/* set TRUE if you want auto TAB after X */
+t_bool tab_goto_next_unread;
+t_bool space_goto_next_unread;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
 int update;				/* update index files only mode */
-int use_builtin_inews;
+t_bool use_builtin_inews;
 int xref_supported = TRUE;
 int xover_supported = FALSE;
 int xuser_supported = FALSE;
-int no_advertising = FALSE;
+t_bool no_advertising = FALSE;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
 int reread_active_file_secs;		/* reread active file interval in seconds */
 #ifdef LOCAL_CHARSET
@@ -387,7 +387,7 @@ void init_selfinfo ()
 	default_show_author = SHOW_FROM_NAME;
 	default_show_only_unread = TRUE;
 	default_sort_art_type = SORT_BY_DATE_ASCEND;
-	default_thread_arts = THREAD_SUBJ;
+	default_thread_arts = THREAD_MAX;
 	delete_index_file = FALSE;
 	force_screen_redraw = FALSE;
 	full_page_scroll = TRUE;

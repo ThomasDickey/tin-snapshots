@@ -414,6 +414,7 @@ AC_CHECK_HEADERS(\
 	curses.h \
 	errno.h \
 	fcntl.h \
+	getopt.h \
 	ioctl.h \
 	libc.h \
 	locale.h \

@@ -38,7 +38,7 @@ int	can_post = FALSE;
 int	can_post = TRUE;
 #endif
 
-char *nntp_server;
+char *nntp_server = (char *)0;
 
 #ifdef NNTP_ABLE
 int get_server_nolf=0; /* this will only be set by our own nntplib.c */
@@ -54,9 +54,10 @@ nntp_open ()
 	if (read_news_via_nntp) {
 		debug_nntp ("nntp_open", "BEGIN");
 
-		nntp_server = getserverbyfile (NNTP_SERVER_FILE);
-		nntp_tcp_port = atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
-
+		if (nntp_server == (char *) 0) {
+			nntp_server = getserverbyfile (NNTP_SERVER_FILE);
+			nntp_tcp_port = atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
+		}
 		if (nntp_server == (char *) 0) {
 			error_message (txt_cannot_get_nntp_server_name, "");
 			error_message (txt_server_name_in_file_env_var, NNTP_SERVER_FILE);
@@ -1025,7 +1026,9 @@ stuff_nntp (fnam)
 #ifdef NNTP_ABLE
 	char line[HEADER_LEN];
 	FILE *fp;
-/*	int count = 0; */
+#ifdef SLOW_OPEN_GROUP
+	int count = 0;
+#endif
 	struct stat sb;
 	int last_line_nolf=0;
 
@@ -1065,11 +1068,10 @@ stuff_nntp (fnam)
 		} else {
 			fputs (line, fp);
 		}
-/*
-		if (++count % 50 == 0) {
+#ifdef SLOW_OPEN_GROUP
+		if (++count % 50 == 0)
 			spin_cursor ();
-		}
-*/
+#endif
 	}
 	fclose (fp);
 
@@ -1268,9 +1270,8 @@ vGrpGetSubArtInfo ()
 	long	lMaxOld;
 	struct	t_group *psGrp;
 
-	if ((update && update_fork) || !update) {
+	if (SHOW_UPDATE)
 		wait_message (txt_rereading_active_file);
-	}
 
 	for (iNum = 0 ; iNum < num_active ; iNum++) {
 		psGrp = &active[iNum];
@@ -1314,9 +1315,10 @@ vGrpGetSubArtInfo ()
 
 /*
  *  Find the total, max & min articles number for specified group
+ *  Use nntp GROUP command or read local spool
+ *  Return 0, or -ve on error
  */
-
-void
+int
 vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 	char	*pcSpoolDir;
 	char	*pcGrpName;
@@ -1326,81 +1328,91 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 	long	*plArtMin;
 {
 	char	acBuf[NNTP_STRLEN];
-#ifdef NNTP_ABLE
-	char	acLine[NNTP_STRLEN];
-	long	lDummy;
-#endif
 	DIR		*tDirFile;
 	DIR_BUF	*tFile;
 	long	lArtMin;
 	long	lArtMax;
 	long	lArtNum;
 
+#if 0
+fprintf(stderr, "IN vGGAI %s cnt=%ld, min=%ld max %ld\n",
+								pcGrpName, *plArtCount, *plArtMin, *plArtMax);
+#endif
+
 	lArtMin = *plArtMin;
 	lArtMax = *plArtMax;
 
-	*plArtCount = 0;
-	*plArtMax = 0;
-	*plArtMin = 1;
-
 	if (read_news_via_nntp && iGrpType == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
+		char	acLine[NNTP_STRLEN];
+		long	lDummy;
 
 		sprintf (acBuf, "group %s", pcGrpName);
-
 		debug_nntp ("vGrpGetArtInfo", acBuf);
-
 		put_server (acBuf);
 
 		switch (get_server (acLine, NNTP_STRLEN)) {
-		case -1:
-			error_message (txt_connection_to_server_broken, "");
-			tin_done (EXIT_NNTP_ERROR);
-		case -2:
-			tin_done (0);
-		default:
-			break;
-		}
-
-		if (atoi (acLine) != OK_GROUP) {
-			debug_nntp ("NOT_OK", acLine);
-			if (atoi (acLine) == ERR_ACCESS) {
-				error_message ("\r\n%s", acLine);
+			case -1:
+				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
-			}
-			*plArtMin = lArtMin;
-			*plArtMax = lArtMax;
-			return;
+			case -2:
+				tin_done (0);
 		}
 
 		debug_nntp ("vGrpGetArtInfo", acLine);
 
-		sscanf (acLine, "%ld %ld %ld %ld", &lDummy, plArtCount, plArtMin, plArtMax);
+		switch (atoi(acLine)) {
+
+			case OK_GROUP:
+				if (sscanf (acLine, "%ld %ld %ld %ld", &lDummy, plArtCount, plArtMin, plArtMax) != 4)
+					error_message("Trashed response to GROUP command, %s", acLine);
+				break;
+
+			case ERR_NOGROUP:
+				*plArtCount = 0;
+				*plArtMin = 1;
+				*plArtMax = 0;
+				return(-ERR_NOGROUP);
+
+			case ERR_ACCESS:
+				error_message ("\r\n%s", acLine);
+				tin_done (EXIT_NNTP_ERROR);
+
+			default:
+				debug_nntp ("NOT_OK", acLine);
+				return(-1);
+		}
 #else
-		*plArtMin = lArtMin;
-		*plArtMax = lArtMax;
-		return;
-#endif
+		fprintf(stderr, "Unreachable ?\n");
+		return(0);
+#endif	/* #ifdef NNTP_ABLE */
 	} else {
-#ifndef M_AMIGA
+#ifdef M_AMIGA
+		if (!lArtMin)
+			*plArtMin = 1;
+		*plArtMax = lArtMax;
+		*plArtCount = lArtMax - *plArtMin + 1;
+#else
+		*plArtCount = 0;
+		*plArtMin = 1;
+		*plArtMax = 0;
+
 		vMakeGrpPath (pcSpoolDir, pcGrpName, acBuf);
 
-		if (access (acBuf, R_OK) != 0) {
-			*plArtMin = lArtMin;
-			*plArtMax = lArtMax;
-			return;
-		}
+/* TODO - Surely this is spurious, the opendir will fail anyway */
+#if 0
+		if (access (acBuf, R_OK) != 0)
+			return(-1);
+#endif
 
-		tDirFile = opendir (acBuf);
-		if (tDirFile != (DIR *) 0) {
+		if ((tDirFile = opendir (acBuf)) != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
 				lArtNum = lAtol (tFile->d_name, (int) D_NAMLEN(tFile));
 				if (lArtNum >= 1) {
 					if (lArtNum > *plArtMax) {
 						*plArtMax = lArtNum;
-						if (*plArtMin == 0) {
+						if (*plArtMin == 0)
 							*plArtMin = lArtNum;
-						}
 					} else if (lArtNum < *plArtMin) {
 						*plArtMin = lArtNum;
 					}
@@ -1408,16 +1420,21 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 				}
 			}
 			closedir (tDirFile);
+		} else {
+			return(-1);
 		}
-#else
-		if (!lArtMin) *plArtMin = 1;
-		*plArtMax = lArtMax;
-		*plArtCount = lArtMax - *plArtMin + 1;
-#endif
+#endif	/* #ifdef M_AMIGA */
 	}
 
+#if 0
+	/*
+	 * If the group has 0 articles available, retain the old min/max values
+	 */
 	if (*plArtCount == 0) {
 		*plArtMin = lArtMin;
 		*plArtMax = lArtMax;
 	}
+#endif
+
+	return(0);
 }

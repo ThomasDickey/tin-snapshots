@@ -95,6 +95,7 @@
 #undef	HAVE_DIRENT_H
 #undef	HAVE_ERRNO_H
 #undef	HAVE_FCNTL_H
+#undef	HAVE_GETOPT_H
 #undef	HAVE_IOCTL_H
 #undef	HAVE_LIBC_H
 #undef	HAVE_LOCALE_H

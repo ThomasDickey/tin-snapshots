@@ -161,7 +161,8 @@ type_is_int(p)
 	MYDATA *p;
 {
 	return strcmp(p->type, "OPT_STRING")
-	  &&   strcmp(p->type, "OPT_CHAR");
+	  &&   strcmp(p->type, "OPT_CHAR")
+	  &&   strcmp(p->type, "OPT_ON_OFF");
 }
 
 static char *
@@ -171,6 +172,8 @@ typename_of(p)
 	if (!strcmp(p->type, "OPT_STRING")
 	 || !strcmp(p->type, "OPT_CHAR"))
 	 	return "char *";
+	if (!strcmp(p->type, "OPT_ON_OFF"))
+		return "t_bool *";
 	return "int *";
 }
 

@@ -178,7 +178,7 @@ read_filter_file (file, global_file)
 		return FALSE;
 	}
 
-	if ((update && update_fork) || !update) {
+	if (SHOW_UPDATE) {
 		if (global_file) {
 			wait_message (txt_reading_global_filter_file);
 		} else {

@@ -1224,7 +1224,7 @@ set_groupname_len (all_groups)
 
 void
 toggle_my_groups (only_unread_groups, group)
-	int only_unread_groups;
+	t_bool only_unread_groups;
 	char *group;
 {
 #ifndef INDEX_DAEMON

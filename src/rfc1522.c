@@ -564,7 +564,7 @@ void
 rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	char *filename;
 	char *mime_encoding;
-        int  allow_8bit_header;
+        t_bool  allow_8bit_header;
 {
 	FILE *f;
 	FILE *g;

@@ -98,7 +98,8 @@ main (argc, argv)
 	 */
 	read_cmd_line_options (argc, argv);
 
-	if (!read_news_via_nntp) {
+	if (newsrc_active && !read_news_via_nntp) {
+		printf("Reading off local spool: -n ignored\n");
 		newsrc_active = FALSE;
 	}
 

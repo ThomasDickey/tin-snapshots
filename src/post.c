@@ -42,9 +42,9 @@
 
 char found_newsgroups[HEADER_LEN];
 
-int unlink_article = TRUE;
-int keep_dead_articles = TRUE;
-int keep_posted_articles = TRUE;
+t_bool unlink_article = TRUE;
+t_bool keep_dead_articles = TRUE;
+t_bool keep_posted_articles = TRUE;
 int reread_active_for_posted_arts = FALSE;
 struct t_posted *posted;
 

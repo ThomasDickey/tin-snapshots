@@ -43,7 +43,7 @@ read_config_file (file, global_file)
 		return FALSE;
 	}
 
-	if ((update && update_fork) || !update) {
+	if (SHOW_UPDATE) {
 		if (global_file) {
 			wait_message (txt_reading_global_config_file);
 		} else {
@@ -196,7 +196,7 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "default_filter_days=", &default_filter_days, 0)) {
 				break;
 			}
-			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header, 0)) {
+			if (match_boolean (buf, "default_filter_kill_header=", &default_filter_kill_header)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global)) {
@@ -208,7 +208,7 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire)) {
 				break;
 			}
-			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header, 0)) {
+			if (match_boolean (buf, "default_filter_select_header=", &default_filter_select_header)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global)) {
@@ -1023,7 +1023,7 @@ print_option (the_option)
 	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
-			printf("%s ", print_boolean(*(option_table[act_option - 1].variable)));
+			printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option - 1].var_index]));
 			break;
 		case OPT_LIST:
 			printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
@@ -1112,7 +1112,8 @@ change_config_file (group, filter_at_once)
 {
 	int ch, i;
 	int change_option = FALSE;
-	int original_on_off_value, original_list_value;
+	t_bool original_on_off_value;
+	int original_list_value;
 	int option, old_option;
 	int ret_code = NO_FILTERING;
 	int mime_type = 0;
@@ -1270,10 +1271,10 @@ change_config_file (group, filter_at_once)
 		if (change_option) {
 			switch (option_table[option - 1].var_type) {
 				case OPT_ON_OFF:
-					original_on_off_value = *(option_table[option - 1].variable);
+					original_on_off_value = *OPT_ON_OFF_list[option_table[option - 1].var_index];
 					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page,
 						OPT_ARG_COLUMN,
-						option_table[option - 1].variable,
+						OPT_ON_OFF_list[option_table[option - 1].var_index],
 						option_table[option - 1].help_text,
 						option_table[option - 1].option_text
 						);
@@ -1614,7 +1615,7 @@ int
 match_boolean (line, pat, dst)
 	char *line;
 	char *pat;
-	int *dst;
+	t_bool *dst;
 {
 	size_t	patlen = strlen (pat);
 
@@ -1640,7 +1641,7 @@ match_integer (line, pat, dst, maxlen)
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
-		*dst = atoi (&line[patlen]);
+		*dst = (t_bool) atoi (&line[patlen]);
 
 		if (maxlen)  {
 			if ((*dst < 0) || (*dst > maxlen)) {
@@ -1721,9 +1722,9 @@ match_string (line, pat, dst, dstlen)
 
 char *
 print_boolean (value)
-	int value;
+	t_bool value;
 {
-	return (value ? txt_onoff[(int) TRUE] : txt_onoff[(int) FALSE]);
+	return txt_onoff[value != FALSE];
 }
 
 /*

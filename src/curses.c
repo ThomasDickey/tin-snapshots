@@ -53,7 +53,7 @@
 
 int cLINES = DEFAULT_LINES_ON_TERMINAL - 1;
 int cCOLS  = DEFAULT_COLUMNS_ON_TERMINAL;
-int inverse_okay = TRUE;
+t_bool inverse_okay = TRUE;
 static int _inraw = FALSE;	/* are we IN rawmode?    */
 int _hp_glitch = FALSE;		/* standout not erased by overwriting on HP terms */
 static int xclicks=FALSE;	/* do we have an xterm? */
