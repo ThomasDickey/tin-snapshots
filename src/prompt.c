@@ -312,7 +312,7 @@ prompt_option_string (
 
 	show_menu_help (option_table[option].help_text);
 	MoveCursor (option_row(option), 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
+	sprintf (&prompt[0], "-> %3d. %s ", option+1, option_table[option].option_text);
 
 	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();

@@ -307,10 +307,14 @@ void
 ring_bell (void)
 {
 #if USE_CURSES
-	beep();
-#else
+	if (!cmd_line)
+		beep();
+	else {
+#endif
 	my_fputc ('\007', stdout);
 	my_flush();
+#if USE_CURSES
+	}
 #endif
 }
 
@@ -348,7 +352,12 @@ show_progress (
 		return;
 
 	MoveCursor(cLINES, 0);
-	my_printf ("%s%4d/%-4d", txt, count, total);
+#if 1 /* see also search.c search_art_body () */
+	if (total < 0)
+		my_printf ("%s", txt);
+	else
+#endif
+		my_printf ("%s%4d/%-4d", txt, count, total);
 	my_flush();
 }
 

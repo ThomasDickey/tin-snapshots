@@ -1,4 +1,4 @@
-MANIFEST for tin-pre-1.4-971102 (Sun Nov  2 09:00:44 CET 1997)
+MANIFEST for tin-pre-1.4-971105 (Wed Nov  5 06:56:21 CET 1997)
 ----------------------------------------------------
    6686 ./Makefile
    2870 ./MANIFEST
@@ -12,7 +12,7 @@ MANIFEST for tin-pre-1.4-971102 (Sun Nov  2 09:00:44 CET 1997)
     650 ./mkdirs.sh
   11664 ./makefile.in
     964 ./conf-tin
- 101655 ./doc/CHANGES
+ 103025 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
   16483 ./doc/INSTALL
   15734 ./doc/TODO
@@ -27,81 +27,81 @@ MANIFEST for tin-pre-1.4-971102 (Sun Nov  2 09:00:44 CET 1997)
    1661 ./tools/expand_aliases.tgz
    1043 ./include/bugrep.h
    8454 ./include/config.h
-  51808 ./include/extern.h
+  51958 ./include/extern.h
   13280 ./include/menukeys.h
     718 ./include/msmail.h
    5089 ./include/nntplib.h
    2233 ./include/os_2.h
-  24176 ./include/proto.h
+  24178 ./include/proto.h
    2388 ./include/stpwatch.h
    1933 ./include/tcurses.h
-  49447 ./include/tin.h
+  49512 ./include/tin.h
    2734 ./include/tnntp.h
     873 ./include/trace.h
     920 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  18496 ./src/active.c
+  18482 ./src/active.c
    9812 ./src/actived.c
   37847 ./src/art.c
   23432 ./src/attrib.c
    9728 ./src/auth.c
    8946 ./src/charset.c
-   7710 ./src/color.c
-  55483 ./src/config.c
+   7778 ./src/color.c
+  55567 ./src/config.c
   21312 ./src/curses.c
   12178 ./src/debug.c
    2300 ./src/envarg.c
   19121 ./src/feed.c
   38046 ./src/filter.c
   11249 ./src/getline.c
-  41484 ./src/group.c
+  41498 ./src/group.c
    2997 ./src/hashstr.c
    7195 ./src/header.c
   10226 ./src/help.c
    6657 ./src/inews.c
-  35704 ./src/init.c
+  35910 ./src/init.c
     962 ./src/joinpath.c
-  81062 ./src/lang.c
+  81387 ./src/lang.c
    3778 ./src/list.c
   10109 ./src/mail.c
   21745 ./src/main.c
    8656 ./src/makecfg.c
    8390 ./src/memory.c
-  50885 ./src/misc.c
+  51002 ./src/misc.c
    7228 ./src/msmail.c
   34273 ./src/newsrc.c
   22160 ./src/nntplib.c
   31268 ./src/nntpw32.c
    4405 ./src/nntpvms.c
    6326 ./src/nrctbl.c
-  21602 ./src/open.c
+  22066 ./src/open.c
    6272 ./src/os_2.c
-  39124 ./src/page.c
+  39258 ./src/page.c
   24083 ./src/parsdate.y
    6353 ./src/pgp.c
-  90205 ./src/post.c
-  10700 ./src/prompt.c
+  90404 ./src/post.c
+  10702 ./src/prompt.c
    6119 ./src/read.c
   23016 ./src/refs.c
    3013 ./src/regex.c
   11289 ./src/rfc1521.c
   22306 ./src/rfc1522.c
   33154 ./src/save.c
-   7199 ./src/screen.c
-  11381 ./src/search.c
-  34668 ./src/select.c
+   7347 ./src/screen.c
+  11531 ./src/search.c
+  34860 ./src/select.c
    5680 ./src/sigfile.c
    9607 ./src/signal.c
    5681 ./src/strftime.c
    7422 ./src/string.c
-   5764 ./src/tcurses.c
-  27421 ./src/thread.c
+   5794 ./src/tcurses.c
+  27467 ./src/thread.c
     971 ./src/trace.c
    4336 ./src/wildmat.c
   12575 ./src/win32.c
    2134 ./src/win32tcp.c
-   4911 ./src/xref.c
+   4914 ./src/xref.c
    5597 ./src/vms.c
    4987 ./amiga/README
    5107 ./amiga/tin-unoff.readme
@@ -116,4 +116,4 @@ MANIFEST for tin-pre-1.4-971102 (Sun Nov  2 09:00:44 CET 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    4244 ./src/tincfg.tbl
-1979990 total
+1983745 total

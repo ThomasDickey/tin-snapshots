@@ -28,6 +28,8 @@ char art_marked_selected;
 char art_marked_unread;
 char article[PATH_LEN];			/* ~/.article file */
 char bug_addr[LEN];				/* address to add send bug reports to */
+char bug_nntpserver1[PATH_LEN];		/* welcome message of NNTP server used */
+char bug_nntpserver2[PATH_LEN];		/* welcome message of NNTP server used */
 char cmd_line_printer[PATH_LEN];	/* printer program specified on cmd line */
 char cmdline_nntpserver[PATH_LEN];
 char cvers[LEN];
@@ -692,6 +694,8 @@ void init_selfinfo (void)
 	}
 
 	strcpy (bug_addr, BUG_REPORT_ADDRESS);
+	bug_nntpserver1[0] = '\0';
+	bug_nntpserver2[0] = '\0';
 #if defined(M_UNIX) || defined (M_AMIGA) || defined(VMS)
 	strcpy (default_mailer_format, MAILER_FORMAT);
 #else

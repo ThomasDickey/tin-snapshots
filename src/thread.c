@@ -398,14 +398,12 @@ show_thread (
 top_of_thread:
 				if (thread_index_point != 0)
 					move_to_response(0);
-
 				break;
 
 			case iKeyLastPage:	/* show last page of articles */
 end_of_thread:
 				if (thread_index_point < top_thread - 1)
 					move_to_response(top_thread - 1);
-
 				break;
 
 			case iKeySetRange:	/* set range */
@@ -485,20 +483,16 @@ thread_page_down:
 				}
 				erase_thread_arrow ();
 				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				thread_index_point = ((thread_index_point + scroll_lines) /
-							scroll_lines) * scroll_lines;
+				thread_index_point = ((thread_index_point + scroll_lines) / scroll_lines) * scroll_lines;
 				if (thread_index_point >= top_thread) {
 					thread_index_point = (top_thread / scroll_lines) * scroll_lines;
-					if (thread_index_point < top_thread - 1) {
+					if (thread_index_point < top_thread - 1)
 						thread_index_point = top_thread - 1;
-					}
 				}
-				if (thread_index_point < first_thread_on_screen ||
-					thread_index_point >= last_thread_on_screen) {
+				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
 					show_thread_page ();
-				} else {
+				else
 					draw_thread_arrow ();
-				}
 				break;
 
 			case iKeyThreadRedrawScr:		/* redraw screen */
@@ -542,15 +536,12 @@ thread_page_up:
 					thread_index_point = thread_index_point - n;
 				else
 					thread_index_point = ((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines;
-
 				if (thread_index_point < 0)
 					thread_index_point = 0;
-
 				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
 					show_thread_page ();
 				else
 					draw_thread_arrow ();
-
 				break;
 
 			case iKeyThreadCatchupConditional:	/* catchup thread but ask for confirmation */
@@ -571,8 +562,10 @@ thread_catchup:
 				art_mark_read (group, &arts[n]);
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
-
-				n = which_response(next_unread (n));
+				n = next_unread (n);
+				if (n == -1) /* no more articles in this thread _and_ group */
+					goto thread_done;
+				n = which_response (n);
 				move_to_response(n);
 				break;
 
@@ -593,9 +586,7 @@ thread_catchup:
 				/* Subject won't change within thread if not ref threading */
 				if (CURR_GROUP.attribute->thread_arts < THREAD_REFS)
 					break;
-
 				search_subject_thread (ch == iKeySearchSubjF, thread_respnum, thread_index_point);
-
 				break;
 
 			case iKeyThreadToggleHelpDisplay:	/* toggle mini help menu */
@@ -611,9 +602,10 @@ thread_catchup:
 
 #ifdef HAVE_COLOR
 			case iKeyThreadToggleColor:		/* toggle color */
-				toggle_color ();
-				show_thread_page ();
-				show_color_status ();
+				if (toggle_color ()) {
+					show_thread_page ();
+					show_color_status ();
+				}
 				break;
 #endif
 
@@ -625,11 +617,9 @@ thread_catchup:
 				goto thread_done;
 
 			case iKeyThreadTag:			/* tag/untag art for mailing/piping/printing/saving */
-
 				/* Find index of current article */
 				if ((n = find_response (thread_basenote, thread_index_point)) < 0)
 					break;
-
 				if (arts[n].tagged) {
 					decr_tagged(arts[n].tagged);
 					arts[n].tagged = 0;
@@ -642,11 +632,9 @@ thread_catchup:
 					bld_tline (thread_index_point, &arts[n]);	/* Update just this line */
 					draw_tline (thread_index_point, FALSE);
 				}
-
 				/* Automatically advance to next art if not at end of thread */
 				if (thread_index_point + 1 < top_thread)
 					goto thread_down;
-
 				draw_thread_arrow ();
 				break;
 
@@ -685,7 +673,6 @@ thread_catchup:
 			case iKeyThreadMarkArtSel:		/* mark article as selected */
 			case iKeyThreadToggleArtSel:		/* toggle article as selected */
 				n = find_response (thread_basenote, thread_index_point);
-
 				if (n < 0)
 					break;
 				if (ch == iKeyThreadToggleArtSel && arts[n].selected == 1)
@@ -702,16 +689,14 @@ thread_catchup:
 				break;
 
 			case iKeyThreadReverseSel:		/* reverse selections */
-				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread) {
+				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread)
 					arts[i].selected = (arts[i].selected ? 0 : 1);
-				}
 				update_thread_page ();
 				break;
 
 			case iKeyThreadUndoSel:			/* undo selections */
-				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread) {
+				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread)
 					arts[i].selected = 0;
-				}
 				update_thread_page ();
 				break;
 
@@ -719,9 +704,8 @@ thread_catchup:
 				if (can_post) {
 					if (pickup_postponed_articles(FALSE, FALSE))
 						show_thread_page();
-				} else {
+				} else
 					info_message(txt_cannot_post);
-				}
 				break;
 
 			default:

@@ -361,9 +361,10 @@ select_page_up:
 
 #ifdef HAVE_COLOR
 			case iKeySelectToggleColor:		/* toggle color */
-				toggle_color ();
-				show_selection_page ();
-				show_color_status ();
+				if (toggle_color ()) {
+					show_selection_page ();
+					show_color_status ();
+				}
 				break;
 #endif
 
@@ -1486,17 +1487,26 @@ void
 move_to_group(
 	int n)
 {
+	char lbuf[128];
+	
 	if (cur_groupnum == n)
 		return;
 
 	HpGlitch(erase_group_arrow ());
 	erase_group_arrow ();
 	cur_groupnum = n;
+	clear_message ();
 
 	if (n >= first_group_on_screen && n < last_group_on_screen)
 		draw_group_arrow ();
 	else
 		show_selection_page ();
+	
+	if (CURR_GROUP.aliasedto) {
+		sprintf(lbuf, "please use %.100s instead", CURR_GROUP.aliasedto);
+		center_line (cLINES, FALSE, lbuf);
+	}
+
 }
 
 #endif /* INDEX_DAEMON */

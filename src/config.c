@@ -1479,7 +1479,12 @@ change_config_file (
 #ifdef HAVE_COLOR
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
-							use_color = use_color_tinrc;
+#if USE_CURSES
+							if (!has_colors())
+								use_color = 0;
+							else
+#endif
+								use_color = use_color_tinrc;
 							break;
 #endif
 						/*

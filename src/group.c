@@ -635,9 +635,10 @@ group_catchup:
 
 #ifdef HAVE_COLOR
 			case iKeyGroupToggleColor:
-				toggle_color ();
-				show_group_page ();
-				show_color_status ();
+				if (toggle_color ()) {
+					show_group_page ();
+					show_color_status ();
+				}
 				break;
 #endif
 
