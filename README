@@ -1,156 +1,36 @@
-This is version 1.3 PL0 (patchlevel 0) of the tin newsreader.
+WARNING, this is NOT an official release, just a patched version with
+several additions/bug-fixes over the latest 'official' beta release (for
+more information have a look at the CHANGES file).
+Due to work is still in progress it might not compile on all machines.
 
-o  Compiles & runs on Unix, AmigaDOS, Windows/NT, VMS & OS/2 (Unfinished)
-o  Based more on Notes and tass than rn type newreaders.
-o  Full screen, easy to use with on-line help at all levels.
-o  Reads news locally (ie. /usr/spool/news) and/or via NNTP/INN.
-o  Supports the NOV/Xover news overview index file standard.
-o  Threads on Subject: and/or Archive-name: mail headers.
-o  Four different operating levels:
-   -  Group selection level
-   -  Thread selection level
-   -  Article selection level
-   -  Article viewer
-o  Same interface to mail, pipe, print and save articles.
-o  Auto unpacking of multi-part shar & uuencoded articles.
-o  Killing and auto-selection (hot) of articles.
-o  PGP support for news and mail messages.
-o  History of user posted articles.
-o  Reposting of articles from one newsgroup to another.
-o  Batch mode to mail/save new news when user is on holiday.
-o  Random signature generator on a per newsgroup basis.
-o  Builtin NNTP mini-inews (ie. 1 binary does everything).
-o  NNTP 1.5.11 extensions XMOTD & XUSER to allow better admin.
+Be sure to configure the Makefile in src/ to your local setup!
 
--------------------------------------------------------------------------------
+Install at your own risk.
 
-Major improvements over tin 1.2 PL2 are the following:
+Please do NOT send any bug-reports concerning THIS version to Iain Lea
+but to urs@akk.uni-karlsruhe.de
 
-o  Added support for Windows/NT.
-o  Added support for VAX/VMS.
-o  Added more support for AmigaDOS machines.
-o  Added more support for Apple AUX machines.
-o  Added more support for Apollo machines.
-o  Added more support for NeXT machines.
-o  Added more support for Pyramid machines.
-o  Added more support for QNX machines.
-o  Added more support for Sequent machines.
-o  Added NNTP support for AmigaDOS machines.
-o  Added 'Introduction to tin' document for beginners.
-o  Added 'Command reference to tin' document.
-o  Added FAQ document for often asked questions I get in email.
-o  Added new filtering routines for killing and auto-selecting articles.
-o  Added PGP support to news and mail messages.
-o  Added new group attribute routines that allow attribute scoping.
-o  Added ISO-8859-1 and german style TeX2ISO character support.
-o  Added append/overwrite option when saving a message to a file that exists.
-o  Added automatic saving of posted messages to mailbox $HOME/Mail/posted.
-o  Added support for posting and followup-to's on gatewayed mailing lists.
-o  Added support for AUTHINFO GENERIC posting authorization.
-o  Added global attributes, filter and tinrc sitewide files.
-o  Added automatic support for adding extra headers to message to be posted.
-o  Added automatic support for adding bolilerplate text to message body.
-o  Added NNTPPORT env var to allow setting tcp port to other than default 119.
-o  Added Y/N when subscribing to new groups that will sub/unsub all new groups.
-o  Added ~/.tin/headers file to allow user to add extra header lines easily.
-o  Added '[' command to allow 1 key quick auto-selection (hot) filtering.
-o  Added ']' command to allow 1 key quick kill filtering.
-o  Added mailer format string (ie. 'elm -s %S %T < %F') via tinrc variable.
-o  Added automatic support for ispell if running on Linux.
-o  Added -C count articles command line option.
-o  Added 'auto_list_thread=' tinrc variable to list thread with right arrow.
-o  Added 'use_mouse=' tinrc variable to control mouse support in a xterm.
-o  Added Lines: header to posted articles.
-o  Added X-Comment-To: header support for FIDO gatewayed articles.
-o  Added checks for valid From: line when posting an article.
-o  Added automatic entry to group index if only 1 group matched from cmdline.
-o  Added mailreading support of MH style mail folders (requires Procmail).
-o  Added better support for mouse operation (ie. in xterm's).
-o  Added german language manual page.
-o  Changed threading algorithm from O(n^2) to O(n) for x8-x30 speedup.
-o  Changed directory structure for source, includes and documentation.
-o  Changed kill command to ^K and auto-selection (hot) command to ^A.
-o  Changed group quit with left arrow key to also catchup group.
-o  Changed nntpd server patch to be against nntp 1.5.11t5 version.
-o  Changed index file support to read and write nov style index files.
-o  Removed support for tin style XINDEX files.
-o  Removed -p printer command line option.
-o  Removed ^K & Z commands from group selection screen.
-o  Removed USE_CLEARSCREEN and associated code.
-o  Fixed xref support when reading news locally.
-o  Fixed writing newsrc to a full filesystem.
-o  Fixed checking of newsgroups that was causing multi-MByte images.
-o  Fixed assertion error when killing an article at article viewer level.
-o  Fixed auto subscribe function when starting the first time. 
-o  Fixed a bug in the nntp speedup patch (that I accidentially added :().
-o  Fixed checking for new newsgroups when reading from local spooldir.
-o  Fixed 'c' group catchup command to return without marking group read.
-o  Fixed 'd' command that could cause buffer corruption in screen display.
-o  Fixed 't' tagging command that caused complete screen refresh.
-o  Fixed 'S' command to subscribe against all groups not just newsrc ones.
-o  Fixed 'u' unthread command to toggle at group index screen..
-o  Fixed '=' commands help text to say that it matches specified patterns.
-o  Fixed -w command line option when first group in active is moderated.
-o  Fixed -P command line option for purging old articles.
-o  Fixed 'n' when asked to reconnect to news server.
-o  Fixed uudecod'ing of multiple articles saved to a single file.
-o  Fixed newsgroup description reading code to strip out any tabs.
-o  Fixed date formatting using strftime() on certain machines.
-o  Fixed parsing of Reply-To: mail address field.
-o  Fixed marking of articles as read & unread in certain cases.
-o  Fixed group hashing routine that returned wrong group in *rare* cases.
-o  Fixed mouse problems when suspended in an xterm window.
-o  Fixed getopt() function in AmigaDOS & OS/2 code.
-o  Fixed parsing of whitespace in subject lines.
-o  Fixed typos in the manual page including 'R' being used for bug Reports.
-o  Fixed Path: header generation in builtin nntp inews.
-o  Fixed 'm' mail command when mailing a thread and q)uit is entered.
-o  Fixed parsing of MET DST type dates.
+The latest official release and beta release is available at:
+ftp://ftp.scn.de/pub/tin/
 
--------------------------------------------------------------------------------
+The latest patched beta release is available at:
+ftp://ftp.akk.uni-karlsruhe.de/pub/tin/
 
-For compilation and installation information read the INSTALL file.
 
-For frequently asked questions read the ./doc/FAQ file.
+Compiled & installed on the following machines:
+-----------------------------------------------
 
-For info. about the AmigaDOS port read the ./amiga/README file.
+1)	i486 & Linux 1.2.13 with gcc 2.7.0
 
-For info. about the OS/2 port read the ./os2/README file.
+2)	HP 9000/825 & HP-UX 8.00 with cc -Aa -D_HPUX_SOURCE
 
-For more bug fixes, changes & additions read the CHANGES & TODO files.
+3)	HP 9000/720 & HP-UX 9.05 with cc -Ae
+	HP 9000/720 & HP-UX 9.05 with gcc 2.6.3
 
-For info. about my NNTP patches read the ./nntp/README & ./nntp/INSTALL files.
+4)	HP 9000/735 & HP-UX 9.02 with gcc 2.6.3
 
-For ftp & non-ftp source & binary availability read the ./doc/HOWTOGET file.
+5)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
 
-For an internal overview of tin read the ./doc/HACKERS file.
+6)	AlphaStation 600 5/266 Digital UNIX 3.2 with cc
 
-For PGP support options read the ./doc/README.PGP file.
-
--------------------------------------------------------------------------------
-
-Thanx to all the people that sent me bug fixes and comments especially:
-
-    Thomas Dickey - newsrc routines and misc.
-    Mark Tomlinson - Amiga port and misc.
-    Markus Kuhn & Tilman Burmester - iso2asc routines
-    Alan Silverstein - rewrote help screens
-    Paul Kramer - tin introduction document
-    Nigel Ellis - Windows NT support
-    Andrew Greer - VAX/VMS support
-    Steve Madsen - pgp support
-
-I still want to hear of any bug reports, gripes or comments that 
-you have but *PLEASE PLEASE PLEASE* read the INSTALL, ./doc/FAQ, 
-TODO and ./doc/tin.1 manual page before doing anything :-)!.
-
-Also please make sure you have the newest release of tin before
-reporting any  problems to me.  My time is limited  and I don't
-want to have to backtrack to assist with an old problem when it 
-may have already been fixed in the newest release.
-
-I read & reply (time permitting) to questions that are posted to 
-the newsgroup news.software.readers
-
-Enjoy
-	Iain  (iain@scn.de)
+7)	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3

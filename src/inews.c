@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include        "rfc1522.h"
 
 #ifdef VMS
 #   include <ctype.h>
@@ -58,8 +59,10 @@ submit_inews (name)
 #if !defined(INDEX_DAEMON) && !defined(XSPOOLDIR)
 
 #ifdef NNTP_INEWS
+#ifndef FORGERY
 	char	buf[PATH_LEN];
 	char	domain_name[PATH_LEN];
+#endif /* !FORGERY */
 	char	from_name[PATH_LEN];
 	char	host_name[PATH_LEN];
 	char	full_name[128];
@@ -118,6 +121,7 @@ submit_inews (name)
 	/*
 	 * Send Path: and From: article headers
 	 */
+#ifndef FORGERY
 #if defined(INEWS_MAIL_GATEWAY) || defined(INEWS_MAIL_DOMAIN)
 	if (*(INEWS_MAIL_GATEWAY)) {
 		sprintf (line, "Path: %s", PATHMASTER);
@@ -140,8 +144,9 @@ submit_inews (name)
 #endif	
 	put_server (line);
 
-	sprintf (line, "From: %s", from_name);
+	sprintf (line, "From: %s", rfc1522_encode(from_name));
 	put_server (line);
+#endif /* !FORGERY */
 
 	/*
 	 * Send article 1 line at a time ending with "."
@@ -327,10 +332,7 @@ get_user_info (user_name, full_name)
 	ptr = (char *) get_val ("REALNAME", "Unknown");
 	my_strncpy (full_name, ptr, 128);
 	strcpy (user_name, userid);
-#else		
-	if ((ptr = (char *) getenv ("NAME")) != (char *) 0) {
-		my_strncpy (full_name, ptr, 128);
-	} else {	
+#else
 #ifndef VMS
 		my_strncpy (buf, myentry->pw_gecos, 128);
 		ptr = (char *) strchr (buf, ',');
@@ -354,8 +356,19 @@ get_user_info (user_name, full_name)
 #else
 		strcpy(full_name, fix_fullname(get_uaf_fullname()));
 #endif
+
+	if ((ptr = (char *) getenv ("NAME")) != (char *) 0) {
+		my_strncpy (full_name, ptr, 128); }
+		
+	/* 
+	 * haha, supplying a from: line is not allowed, but this!
+	 */
+
+	if (userid == (char *) 0) {
+		ptr = get_val ("USER", "please-set-USER-variable");
+	} else {
+		ptr = (char *) userid;
 	}
-	ptr = get_val ("USER", userid);
 	my_strncpy (user_name, ptr, 128);
 #endif
 
@@ -484,6 +497,8 @@ submit_news_file (name, lines)
 
 	insert_x_headers (name, lines);
 
+	rfc15211522_encode(name);
+
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG
 		if (debug == 2) {
@@ -514,5 +529,3 @@ submit_news_file (name, lines)
 
 	return ret_code;
 }
-
-

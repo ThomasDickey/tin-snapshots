@@ -106,7 +106,7 @@ getline (prompt, number_only, str)
 	}
 	while ((c = ReadCh ()) != EOF) {
 		c &= 0xff;	
-		if (isprint (c)) {
+		if (isprint (c) || ( c>=0xa0 && c<=0xff )) {
 			if (number_only) {
 				if (isdigit (c) && gl_cnt < 6) {	/* num < 100000 */
 				    gl_addchar (c);

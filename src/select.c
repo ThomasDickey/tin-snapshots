@@ -60,7 +60,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 		goto select_read_group;
 	}
 
-	while (TRUE) {
+	forever {
 		if (! resync_active_file ()) {	/* reread active file if alarm set */
 			if (reread_active_after_posting ()) {
 				group_selection_page ();
@@ -140,7 +140,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 									goto select_page_up;
 								}
 								goto select_done;
-								break;
+								/* break; */
 						}
 						break;
 				}
@@ -387,13 +387,18 @@ select_page_up:
 				n = choose_new_group ();
 				if (n >= 0) {
 					erase_group_arrow ();
-					if (active[my_group[n]].subscribed != SUBSCRIBED) {
+					/* why differentiate between subscribed
+					   and unsubscribed groups here?
+					   auto-subscribe does not seem to be
+					   intuitive! */
+/*					if (active[my_group[n]].subscribed != SUBSCRIBED) {
 						subscribe (&active[my_group[n]], SUBSCRIBED);
 						cur_groupnum = reposition_group (
 							&active[my_group[n]], (n ? n : cur_groupnum));
-					} else {
+						toggle_my_groups (show_only_unread_groups, "");
+					} else  { */
 						cur_groupnum = n;
-					}
+/*					} */
 					set_groupname_len (FALSE);				
 					if (cur_groupnum < first_group_on_screen ||
 						cur_groupnum >= last_group_on_screen ||
@@ -420,6 +425,13 @@ select_page_up:
 				erase_group_arrow ();
 				toggle_inverse_video ();
 				group_selection_page ();
+				break;
+
+			case iKeySelectDisplayGroupInfo:	/* display group description */
+				info_message (
+					(active[my_group[cur_groupnum]].description ?
+					 active[my_group[cur_groupnum]].description :
+					 "*** No description ***"));
 				break;
 
 			case iKeySelectMoveGrp:	/* reposition group within group list */
@@ -695,7 +707,15 @@ select_done:
 				}
 				mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, msg);
 				break;
-				
+
+#ifdef HAVE_COLOR
+			case iKeySelectColor:  /* toggle color */
+				use_color = !use_color;
+				use_color_tinrc = use_color;
+				group_selection_page();  /* redraw page */
+				break;
+#endif
+
 			default:
 			    info_message(txt_bad_command);
 		}
@@ -1008,7 +1028,10 @@ reposition_group (group, default_num)
 
 	sprintf (buf, txt_moving, group->name);
 	wait_message (buf);
-	
+
+	/* seems to have the side effect of rearranging
+	   my_groups, so show_only_unread_groups has to be updated */
+	show_only_unread_groups = FALSE;	
 	if (pos_group_in_newsrc (group, pos_num)) {
 		read_newsrc (newsrc, 1);
 		default_move_group = pos_num;

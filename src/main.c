@@ -158,9 +158,21 @@ main (argc, argv)
 	read_attributes_file (local_attributes_file, FALSE);
 
 	/*
+	 *  Read in users filter preferences file
+	 *  This has to be done before quick post
+	 *  because the filters will be updated!!! [eb]
+	 */
+	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
+	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+	debug_print_filters ();
+	
+	/*
 	 *  Quick post an article & exit if -w specified
 	 */
 	if (post_article_and_exit) {
+		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
+		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+		debug_print_filters ();
 		quick_post_article ();
 		tin_done (EXIT_OK);
 	}
@@ -176,13 +188,6 @@ main (argc, argv)
 		write_config_file (local_config_file);
 	}	
 
-	/*
-	 *  Read in users filter preferences file
-	 */
-	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
-	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-	debug_print_filters ();
-	
 	num_cmd_line_groups = read_cmd_line_groups ();
 
 #ifdef INDEX_DAEMON
@@ -261,7 +266,11 @@ main (argc, argv)
 #	ifdef M_AMIGA
 #		define OPTIONS "BcCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
 #	else
-#		define OPTIONS "cCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#               ifdef HAVE_COLOR
+#		        define OPTIONS "acCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#               else
+#		        define OPTIONS "cCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#               endif
 #	endif
 #endif
 
@@ -276,6 +285,11 @@ read_cmd_line_options (argc, argv)
 	
 	while ((ch = getopt (argc, argv, OPTIONS)) != EOF) {
 		switch (ch) {
+#ifdef HAVE_COLOR
+			case 'a':
+				use_color = !use_color;
+				break;
+#endif
 #ifdef M_AMIGA
 			case 'B':
 			{	extern int tin_bbs_mode;
@@ -441,6 +455,9 @@ usage (progname)
 #endif
 	error_message ("Usage: %s [options] [newsgroups]", progname);
 #ifndef INDEX_DAEMON
+#ifdef HAVE_COLOR
+	error_message ("  -a       toggle color flag","");
+#endif
 #	ifdef M_AMIGA
 	error_message ("  -B       BBS mode. File operations limited to home directories.","");
 #	endif

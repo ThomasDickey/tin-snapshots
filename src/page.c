@@ -13,39 +13,44 @@
  */
 
 #include	"tin.h"
+#include        "rfc1522.h"
 
-char note_h_path[LEN];				/* Path:         */
-char note_h_date[PATH_LEN];			/* Date:         */
-char note_h_subj[LEN];				/* Subject:      */
-char note_h_org[PATH_LEN];			/* Organization: */
+char note_h_path[LEN];			/* Path:         */
+char note_h_date[PATH_LEN];		/* Date:         */
+char note_h_subj[LEN];			/* Subject:      */
+char note_h_org[PATH_LEN];		/* Organization: */
 char note_h_newsgroups[LEN];		/* Newsgroups:   */
 char note_h_messageid[PATH_LEN];	/* Message-ID:   */
 char note_h_references[LEN];		/* References:   */
 char note_h_distrib[PATH_LEN];		/* Distribution: */
-char note_h_keywords[LEN];			/* Keywords:     */
-char note_h_summary[LEN];			/* Summary:      */
-char note_h_followup[LEN];			/* Followup-To:  */
+char note_h_keywords[LEN];		/* Keywords:     */
+char note_h_summary[LEN];		/* Summary:      */
+char note_h_followup[LEN];		/* Followup-To:  */
 char note_h_mimeversion[PATH_LEN];	/* Mime-Version: */
 char note_h_contenttype[LEN];		/* Content-Type: */
 char note_h_contentenc[LEN];		/* Content-Transfer-Encoding: */
-char note_h_xcommentto[LEN];		/* X-Comment-To: (Used by FIDO) */
+char note_h_xcommentto[LEN];		/* for X-Comment-To: (Used by FIDO) */
+char note_h_ftnto[LEN];			/* Old X-Comment-To: (Used by FIDO) */
 
 char *glob_page_group;
 
-FILE *note_fp;					/* the body of the current article */
+FILE *note_fp;				/* the body of the current article */
 
 int glob_respnum;
-int last_resp;					/* current & previous article for - command */
-int note_end;					/* we're done showing this article */
+int last_resp;				/* current & previous article for - command */
+int note_end;				/* we're done showing this article */
 int note_line;
-int note_page;					/* what page we're on */
-int rotate;						/* 0=normal, 13=rot13 decode */
+int note_page;				/* what page we're on */
+int rotate;				/* 0=normal, 13=rot13 decode */
 int this_resp;
 int doing_pgdn;
 int tabwidth = 8;
+char skip_include;
+char buf2[LEN+50];
+char first_char;
 
 long note_mark[MAX_PAGES];		/* ftells on beginnings of pages */
-long note_size;					/* stat size in bytes of article */
+long note_size;				/* stat size in bytes of article */
 
 static int tex2iso_article;
 
@@ -108,7 +113,7 @@ restart:
 		show_note_page (group->name, respnum);
 	}
 
-	while (TRUE) {
+	forever {
 		ch = ReadCh ();
 
 		if (ch >= '0' && ch <= '9') {
@@ -158,15 +163,16 @@ restart:
 									goto page_down;
 								}
 								goto page_goto_next_unread;
-								break;
+								/* break; */
 							case MOUSE_BUTTON_2:
 								if (xrow < 3 || xrow >= cLINES-1) {
 									goto page_up;
 								}
 								goto return_to_index;
-								break;
+								/* break; */
 							case MOUSE_BUTTON_3:
-								if (xcut_and_paste || mouse_click_on) {
+								/* if (xcut_and_paste || mouse_click_on) { */
+								if (mouse_click_on) {
 									set_xclick_off ();
 									mouse_click_on = FALSE;
 								} else {
@@ -281,6 +287,7 @@ page_down:
 
 			case iKeyPageNextUnread: 	/* goto next unread article */
 page_goto_next_unread:
+				skip_include = '\0';
 				if (! tab_goto_next_unread) {
 					if (note_page == ART_UNAVAILABLE) {
 						n = next_unread (next_response (respnum));
@@ -661,6 +668,15 @@ return_to_index:
 				info_message (txt_art_marked_as_unread);
 				break;
 
+			case iKeyPageSkipIncludedText:	/* skip included text */
+				skip_include = first_char;
+				goto page_down;
+				break;
+
+			case iKeyPageDisplaySubject:
+				info_message(arts[respnum].subject);
+				break;
+
 			default:
 			    info_message(txt_bad_command);
 		}
@@ -733,7 +749,6 @@ show_note_page (group, respnum)
 {
 #ifndef INDEX_DAEMON
 
-	char buf2[LEN+50];
 	char buf3[2*LEN+200];
 	int ctrl_L = FALSE;		/* form feed character detected */
 	int first  = TRUE;
@@ -780,9 +795,10 @@ show_note_page (group, respnum)
 	}
 #endif
 
+	if (skip_include) note_page--;
 	while (note_line < lines) {
+		note_mark[note_page+1] = ftell (note_fp);
 		if (show_last_line_prev_page) {
-			note_mark[note_page+1] = ftell (note_fp);
 			if (doing_pgdn && first && buf2[0]) {
 				goto print_a_line;
 			}
@@ -790,6 +806,7 @@ show_note_page (group, respnum)
 		first = FALSE;
 		if (fgets (buf, sizeof (buf), note_fp) == NULL) {
 			note_end = TRUE;
+			skip_include = '\0';
 			break;
 		}
 
@@ -813,15 +830,38 @@ print_a_line:
 			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
 		}
 		
-		printf("%s\r\n", buf2);
+		first_char = buf2[0] ? buf2[0] : first_char;
+
+		if (skip_include) {
+			if (first_char != skip_include) {
+				skip_include = '\0';
+#ifdef HAVE_COLOR
+				print_color(buf2);
+#else
+				printf ("%s\r\n", buf2);
+#endif
+				note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
+				note_page++;
+			}
+		} else {
+#ifdef HAVE_COLOR
+			print_color(buf2);
+#else
+			printf ("%s\r\n", buf2);
+#endif
+			note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
+		}
+
+#ifdef HAVE_COLOR
+		fcol(col_foot);
+#endif
+
 		if (first) {
 			EndInverse ();
 		}	
 		first = FALSE;
 		doing_pgdn = FALSE;
 		
-		note_line += ((int) strlen (buf2) / cCOLS) + 1;
-
 		if (ctrl_L) {
 			break;
 		}
@@ -909,6 +949,7 @@ show_first_header (respnum, group)
 {
 	char buf[LEN];
 	char tmp[LEN];
+	char ftbuf[LEN];	/* Fido-To-Line */
 	int whichresp;
 	int x_resp;
 	int pos, i, n;
@@ -937,8 +978,27 @@ show_first_header (respnum, group)
 	}
 	buf[i] = '\0';
 
-	sprintf (tmp, txt_thread_x_of_n, buf, which_thread (respnum) + 1, top_base);
-	my_fputs (tmp, stdout);
+#ifdef HAVE_COLOR
+	fcol(col_head);
+#endif
+
+	if (note_h_ftnto[0] && show_xcommentto && highlight_xcommentto) {
+		my_fputs (buf, stdout);
+		if (strchr(note_h_ftnto, '('))
+			strcpy(ftbuf, strchr(note_h_ftnto, '(') + 1);
+		else
+			strcpy(ftbuf, note_h_ftnto);
+		if (strrchr(ftbuf, ')')) strrchr(ftbuf, ')')[0] = '\0';
+		if (strlen(ftbuf) > 19) ftbuf[19] = '\0';
+		StartInverse ();
+		my_fputs (ftbuf, stdout);
+		EndInverse ();
+		my_fputs ("\r\n", stdout);
+	}
+	else {
+    		sprintf (tmp, txt_thread_x_of_n, buf, which_thread (respnum) + 1, top_base);
+    		my_fputs (tmp, stdout);
+	}    		
 
 	if (arts[respnum].lines < 0) {
 		strcpy (tmp, "?");
@@ -949,6 +1009,10 @@ show_first_header (respnum, group)
 	sprintf (buf, txt_lines, tmp);
 	n = strlen (buf);
 	my_fputs (buf, stdout);
+
+#ifdef HAVE_COLOR
+	fcol(col_subject);
+#endif
 
 	if (tex2iso_article) {
 		*buf = '\0';
@@ -976,6 +1040,10 @@ show_first_header (respnum, group)
 	my_fputs (buf, stdout);
 	EndInverse ();
 
+#ifdef HAVE_COLOR
+	fcol(col_response);
+#endif
+
 	MoveCursor (1, RIGHT_POS);
 	if (whichresp)
 		printf (txt_resp_x_of_n, whichresp, x_resp);
@@ -987,6 +1055,10 @@ show_first_header (respnum, group)
 		else
 			printf (txt_x_resp, x_resp);
 	}
+
+#ifdef HAVE_COLOR
+	fcol(col_normal);
+#endif
 
 	if (*note_h_org) {
 		if (arts[respnum].name) {
@@ -1015,7 +1087,16 @@ show_first_header (respnum, group)
 		strcat (buf, tmp);
 	}
 	strip_line (buf, strlen (buf));
+
+#ifdef HAVE_COLOR
+	fcol(col_from);
+#endif
+
 	printf ("%s\r\n\r\n", buf);
+
+#ifdef HAVE_COLOR
+	fcol(col_normal);
+#endif
 
 	note_line += 4;
 
@@ -1043,7 +1124,12 @@ show_first_header (respnum, group)
 		}
 	}
 
-	if (note_h_keywords[0] || note_h_summary[0]) {
+	if (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto) {
+		printf ("X-Comment-To: %s\r\n", note_h_ftnto);
+		note_line++;
+	}
+
+	if (note_h_keywords[0] || note_h_summary[0] || (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto)) {
 		printf ("\r\n");
 		note_line++;
 	}
@@ -1072,19 +1158,30 @@ show_cont_header (respnum)
 			whichresp,
 			maxresp,
 			note_page + 1,
-			note_h_subj);
+                        arts[respnum].name?arts[respnum].name:arts[respnum].from,
+                        note_h_subj);
 	} else {
 		sprintf(buf, txt_thread_page,
 			whichbase + 1,
 			top_base,
 			note_page + 1,
-			note_h_subj);
+                        arts[respnum].name?arts[respnum].name:arts[respnum].from,
+                        note_h_subj);
 	}
 	strip_line (buf, strlen (buf));
 	if (cCOLS) {
 		buf[cCOLS-1] = '\0';
 	}
+
+#ifdef HAVE_COLOR
+	fcol(col_head);
+#endif
+
 	printf("%s\r\n\r\n", buf);
+
+#ifdef HAVE_COLOR
+	fcol(col_normal);
+#endif
 
 	note_line += 2;
 }
@@ -1107,7 +1204,7 @@ art_open (art, group_path)
 		tex2iso_article = iIsArtTexEncoded (art, group_path);
 		if (tex2iso_article) {
 			wait_message ("TeX2Iso encoded article");
-			sleep(2);
+			/* sleep(2); */
 		}
 	} else {
 		tex2iso_article = FALSE;
@@ -1132,6 +1229,7 @@ art_open (art, group_path)
 	note_h_contenttype[0] = '\0';
 	note_h_contentenc[0] = '\0';
 	note_h_xcommentto[0] = '\0';
+	note_h_ftnto[0] = '\0';
 
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
 		buf[8191] = '\0';
@@ -1204,9 +1302,18 @@ art_open (art, group_path)
 			str_lwr (note_h_contentenc, note_h_contentenc);
 			continue;
 		}
-        if (match_header (buf, "From", note_h_xcommentto, LEN)) {
-            continue;
+		if (match_header (buf, "From", note_h_xcommentto, LEN)) {
+			continue;
 		}
+		if (match_header (buf, "X-Comment-To", note_h_ftnto, LEN)) {
+			continue;
+		}
+	}
+
+	{
+	  char *x;
+	  x=parse_references(note_h_references);
+	  strcpy(note_h_references,x); free(x);
 	}
 
 	note_mark[0] = ftell (note_fp);
@@ -1350,6 +1457,33 @@ show_last_page ()
 }
 
 
+void modifiedstrncpy(target, source, size)
+char *target;
+char *source;
+int size;
+{
+        char buf[2048];
+	int count;
+	char *c;
+
+	count=sizeof(buf)-1;
+	c=buf;
+	while (*source) {
+		if (*source!=1) {
+			*c++=*source++;
+			if (!--count) break;
+		}
+		else source++;
+	}
+	*c=0;
+	c=rfc1522_decode(buf);
+	while (--size) {
+	        *target++=*c++;
+	}
+	*target=0;
+}
+
+
 int 
 match_header (buf, pat, body, len)
 	char *buf;
@@ -1369,7 +1503,7 @@ match_header (buf, pat, body, len)
 		while (buf[plen] == ' ') {
 			plen++;
 		}
-		strncpy (body, &buf[plen], len);
+		modifiedstrncpy (body, &buf[plen], len);
 		body[len - 1] = '\0';
 		return TRUE;
 	}

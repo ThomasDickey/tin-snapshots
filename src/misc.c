@@ -13,6 +13,44 @@
  */
 
 #include	"tin.h"
+#include        "rfc1522.h"
+
+#ifdef M_UNIX
+/*
+ * my_append_file instead of rename_file
+ * minimum error trapping - only unix support
+ */
+void
+append_file (old_filename, new_filename)
+	char *old_filename;
+	char *new_filename;
+{
+	char buf[1024];
+	size_t n;
+	FILE *fp_old, *fp_new;
+
+	if ((fp_new = fopen (new_filename, "r")) == (FILE *) 0) {
+		sprintf (buf, txt_cannot_open, new_filename);
+		perror_message (buf, "ONE");
+		return;
+	}
+	if ((fp_old = fopen (old_filename, "a+")) == (FILE *) 0) {
+		sprintf (buf, txt_cannot_open, old_filename);
+		perror_message (buf, "ONE");
+		fclose (fp_new);
+		return;
+	}
+	while ((n = fread(buf,1,sizeof(buf),fp_new)) > 0) {
+		if (n != fwrite(buf,1,n,fp_old)) {
+			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+			perror_message (msg, "");
+			return;
+		}
+	}
+	fclose (fp_old);
+ 	fclose (fp_new);
+}
+#endif  /* M_UNIX */	
 
 void
 asfail (file, line, cond)
@@ -116,9 +154,9 @@ invoke_editor (filename, lineno)
 	static int first = TRUE;
 
 	if (first) {
-		my_editor = (char *) getenv ("VISUAL");
+		my_editor = (char *) getenv ("EDITOR");
 
-		strcpy (editor, my_editor != NULL ? my_editor : get_val ("EDITOR", DEFAULT_EDITOR));
+		strcpy (editor, my_editor != NULL ? my_editor : get_val ("VISUAL", DEFAULT_EDITOR));
 		first = FALSE;
 	}
 
@@ -304,6 +342,13 @@ tin_done (ret)
     if (ret == 0)
       ret = 1;
 #endif
+
+#ifdef HAVE_COLOR
+	use_color=FALSE;
+	EndInverse();
+	ClearScreen();
+#endif
+
 	exit (ret);
 }
 
@@ -471,6 +516,7 @@ rename_file (old_filename, new_filename)
 			if ((fp_new = fopen (new_filename, "w")) == (FILE *) 0) {
 				sprintf (buf, txt_cannot_open, new_filename);
 				perror_message (buf, "ONE");
+				fclose (fp_old);
 				return;
 			}
 			copy_fp (fp_old, fp_new, "");
@@ -951,6 +997,31 @@ parse_from (from_line, eaddr, fname)
 	}
 }
 
+
+/*
+ * Parses references according to son-of-1036, stripping multiple whitespace
+ *
+ */
+
+char *
+parse_references (r)
+     char *r;
+{
+  char *ref;
+  char *x;
+
+  ref=malloc(strlen(r)+1);  /* reasonable upper boundary for result size */
+  x=ref;
+  while (*r) {
+    while (*r && !isspace(*r)) *x++=*r++;
+    while (*r && isspace(*r)) r++;
+    if (*r) *x++=' ';
+  }
+  *x='\0';
+  return ref;
+}
+
+
 /*
  *  Convert a string to a long, only look at first n characters
  */
@@ -1004,7 +1075,7 @@ my_strnicmp(p, q, n)
 	char *q;
 	size_t n;
 {
-	int r;
+	int r=0;
 	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;
 			++p, ++q, --n) {
 		if (*p == '\0') {
@@ -1448,7 +1519,7 @@ strfquote (group, respnum, s, maxsize, format)
 					break;
 				case 'F':	/* Articles Address+Name */
 					if (arts[respnum].name) {
-						sprintf (tbuf, "%s (%s)",
+						sprintf (tbuf, "%s <%s>",
 							arts[respnum].name,
 							arts[respnum].from);
 					} else {
@@ -1898,13 +1969,13 @@ strfmailer (mailer, subject, to, filename, s, maxsize, format)
 					strcpy (tbuf, mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy(tbuf, subject);
+					strcpy(tbuf, rfc1522_encode(subject));
 					break;
 				case 'T':	/* To */
-					strcpy(tbuf, to);
+					strcpy(tbuf, rfc1522_encode(to));
 					break;
 				case 'U':	/* User */
-					strcpy(tbuf, userid);
+					strcpy(tbuf, rfc1522_encode(userid));
 					break;
 				default:
 					tbuf[0] = '%';

@@ -286,12 +286,12 @@ iIsArtTexEncoded (art, group_path)
 		for (i = 1; i < len; i++) {
 			if (((line[i] == '\\') || (line[i] == '\"')) &&
 			    (isalnum(line[i-1])) && (isalnum(line[i+1]))) {
-				art_close ();
+				fclose (fp);
 				return TRUE;
 			}
 		}
 	}
-	art_close ();
+	fclose (fp);
 
 	return FALSE;
 }

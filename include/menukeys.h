@@ -83,7 +83,7 @@
 #define iKeyGroupPrevGroup 'p'
 #define iKeyGroupPrevUnreadArt 'P'
 #define iKeyGroupQuit 'q'
-#define iKeyGroupQuit2 'i'
+/* #define iKeyGroupQuit2 'i' */
 #define iKeyGroupQuitTin 'Q'
 #define iKeyGroupToggleReadDisplay 'r'
 #define iKeyGroupBugReport 'R'
@@ -106,6 +106,7 @@
 #define iKeyGroupSelThdIfUnreadSelected ';'
 #define iKeyGroupMarkUnselArtRead 'X'
 #define iKeyGroupDoAutoSel '+'
+#define iKeyGroupDisplaySubject 'i'
 
 /* help.c */
 
@@ -186,6 +187,8 @@
 #define iKeyPagePostHist 'W'
 #define iKeyPageRepost 'x'
 #define iKeyPageMarkArtUnread 'z'
+#define iKeyPageSkipIncludedText ':'
+#define iKeyPageDisplaySubject 'i'
 
 /* post.c */
 
@@ -237,6 +240,7 @@
 #define iKeySelectUp ctrl('P')
 #define iKeySelectUp2 'k'
 #define iKeySelectResetNewsrc ctrl('R')
+#define iKeySelectColor 'a'
 #define iKeySelectPageUp 'b'
 #define iKeySelectPageUp2 ctrl('U')
 #define iKeySelectPageUp3 ctrl('B')
@@ -246,6 +250,7 @@
 #define iKeySelectGoto 'g'
 #define iKeySelectHelp 'h'
 #define iKeySelectToggleHelpDisplay 'H'
+#define iKeySelectDisplayGroupInfo 'i'
 #define iKeySelectToggleInverseVideo 'I'
 #define iKeySelectMoveGrp 'm'
 #define iKeySelectOptionsMenu 'M'
@@ -302,7 +307,8 @@
 #define iKeyThreadToggleArtSel '.'
 #define iKeyThreadReverseSel '@'
 #define iKeyThreadUndoSel '~'
-
+#define iKeyThreadDisplaySubject 'i'
+ 
 /* virtual.c */
 
 #define iKeyVirtualLastPage '$'

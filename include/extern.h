@@ -148,6 +148,7 @@ extern char bug_addr[LEN];
 extern char cmd_line_printer[PATH_LEN];
 extern char cvers[LEN];
 extern char dead_article[PATH_LEN];
+extern char dead_articles[PATH_LEN];
 extern char default_art_search[LEN];
 extern char default_author_search[LEN];
 extern char default_editor_format[PATH_LEN];
@@ -190,9 +191,11 @@ extern char mail_active_file[PATH_LEN];
 extern char mail_quote_format[PATH_LEN];
 extern char news_active_file[PATH_LEN];
 extern char news_quote_format[PATH_LEN];
+extern char xpost_quote_format[PATH_LEN];
 extern char mail_news_user[LEN];
 extern char mailbox[PATH_LEN];
 extern char mailer[PATH_LEN];
+extern char mime_encoding[LEN];
 extern char motd_file[PATH_LEN];
 extern char motd_file_info[PATH_LEN];
 extern char msg[LEN];
@@ -358,6 +361,7 @@ extern constext txt_help_ck[];
 extern constext txt_help_cr[];
 extern constext txt_help_catchup_groups[];
 extern constext txt_help_confirm_action[];
+extern constext txt_help_colon[];
 extern constext txt_help_ctrl_a[];
 extern constext txt_help_quick_kill[];
 extern constext txt_help_quick_select[];
@@ -367,6 +371,9 @@ extern constext txt_help_ctrl_g[];
 extern constext txt_help_ctrl_h[];
 extern constext txt_help_ctrl_k[];
 extern constext txt_help_ctrl_l[];
+#ifdef HAVE_COLOR
+extern constext txt_help_color[];
+#endif
 extern constext txt_help_d[];
 extern constext txt_help_dash[];
 extern constext txt_help_draw_arrow[];
@@ -471,6 +478,8 @@ extern constext txt_help_v[];
 extern constext txt_help_w[];
 extern constext txt_help_x[];
 extern constext txt_help_y[];
+extern constext txt_help_s_i[];
+extern constext txt_help_g_t_p_i[];
 extern constext txt_hit_any_key[];
 extern constext txt_cmdline_hit_any_key[];
 extern constext txt_hit_space_for_more[];
@@ -708,6 +717,7 @@ extern constext txt_use_mime[];
 extern constext txt_uudecoding[];
 extern constext txt_writing_attributes_file[];
 extern constext txt_writing_index_file[];
+extern constext txt_xpost_quote[];
 extern constext txt_x_resp[];
 extern constext txt_yanking_all_groups[];
 extern constext txt_yanking_sub_groups[];
@@ -828,6 +838,7 @@ extern int max_save;
 extern int max_spooldir;
 extern int newsrc_active;
 extern int nntp_codeno;
+extern int no_advertizing;
 extern int num_active;
 extern int num_newnews;
 extern int num_kill;
@@ -852,6 +863,8 @@ extern int reread_active_file;
 extern int save_news;
 extern int save_to_mmdf_mailbox;
 extern int show_author;
+extern int show_xcommentto;
+extern int highlight_xcommentto;
 extern int show_description;
 extern int show_last_line_prev_page;
 extern int show_only_unread_groups;
@@ -879,6 +892,24 @@ extern int use_keypad;
 extern int use_metamail;
 extern int ask_for_metamail;
 #endif
+#ifdef HAVE_COLOR
+extern int use_color;
+extern int use_color_tinrc;
+extern int col_back;
+extern int col_invers;
+extern int col_text;
+extern int col_foot;
+extern int col_quote;
+extern int col_head;
+extern int col_subject;
+extern int col_response;
+extern int col_from;
+extern int col_normal;
+extern int col_title;
+extern int col_highlight1;
+extern int col_highlight2;
+extern int col_highlight3;
+#endif
 extern int use_mouse;
 extern int check_any_unread;
 extern int start_any_unread;
@@ -886,10 +917,18 @@ extern int xref_supported;
 extern int xover_supported;
 extern int xuser_supported;
 extern int xmouse;
+/*
 extern int xcut_and_paste;
+*/
 extern int xcol;
 extern int xrow;
 extern int reread_active_file_secs;
+
+/* keep all dead articles in dead.articles */
+extern int keep_dead_articles;
+
+/* keep all posted articles in ~/Mail/posted */
+extern int keep_posted_articles;
 
 extern long *base;
 extern time_t new_newnews_time;

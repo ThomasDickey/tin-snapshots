@@ -759,7 +759,7 @@ close_server ()
 #endif /* NNTP_ABLE */
 }
 
-#endif WIN32IP
+#endif /* WIN32IP */
 
 /*=-=-=-=-=-=-=-=-=-=-=-=*
  * Named pipes Transport *

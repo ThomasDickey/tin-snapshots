@@ -165,7 +165,7 @@ group_page (group)
 debug_print_comment ("group.c: before while(1) loop...");
 debug_print_bitmap (group, NULL);
 
-	while (TRUE) {
+	forever {
 		set_xclick_on ();
 		ch = ReadCh ();
 
@@ -259,7 +259,7 @@ debug_print_bitmap (group, NULL);
 							} else {
 								goto group_done;
 							}
-							break;
+							/* break; */
 					}
 				}				
 				break;
@@ -409,7 +409,7 @@ group_tab_pressed:
 	
 			case iKeyGroupPageDown:		/* page down */
 			case iKeyGroupPageDown2:
-			case iKeyGroupPageDown3:		/* vi style */
+			case iKeyGroupPageDown3:	/* vi style */
 group_page_down:
 				if (! top_base) {
 					break;
@@ -520,14 +520,14 @@ group_page_down:
 				}
 				break;
 
-			case iKeyGroupRedrawScr:		/* redraw screen */
+			case iKeyGroupRedrawScr:	/* redraw screen */
 			case iKeyGroupRedrawScr2:
 			case iKeyGroupRedrawScr3:
 				ClearScreen ();
 				set_xclick_off ();
 				show_group_page ();
 				break;
-
+				
 			case iKeyGroupDown:
 			case iKeyGroupDown2:		/* line down */
 group_down:
@@ -742,12 +742,12 @@ group_catchup:
 					break;
 				}
 
-				if (n < first_subj_on_screen || n >= last_subj_on_screen) {
+				if (/* n < first_subj_on_screen || */ n >= last_subj_on_screen) {
 					if (_hp_glitch)
 						erase_subject_arrow ();
 					index_point = n;
 					show_group_page ();
-				} else {
+				} else if (n > index_point) {
 					erase_subject_arrow ();
 					index_point = n;
 					draw_subject_arrow ();
@@ -878,7 +878,7 @@ group_list_thread:
 				break;
 
 			case iKeyGroupQuit:	/* return to group selection page */
-			case iKeyGroupQuit2:
+/*			case iKeyGroupQuit2: */
 				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, 'y') != 1) {
 					break;
 				}
@@ -1216,7 +1216,11 @@ undo_auto_select_arts:
 				index_point = 0;	/* do we want this ? */
  				show_group_page ();
 				break;
-				
+
+			case iKeyGroupDisplaySubject:
+				info_message(arts[(int)base[index_point]].subject);
+				break;
+
 			default:
 			    info_message (txt_bad_command);
 		}
@@ -1485,9 +1489,9 @@ set_subj_from_size (num_cols)
 	int size;
 	
 	if (show_author == SHOW_FROM_BOTH) {
-		max_subj = (num_cols / 2) - 2;
+              max_subj = (num_cols / 2) - 4;
 	} else {
-		max_subj = (num_cols / 2) + 5;
+              max_subj = (num_cols / 2) + 3;
 	}
 	max_from = (num_cols - max_subj) - 17;
 
@@ -1555,7 +1559,7 @@ bld_sline (i)
 	int n, j;
 	char from[LEN];
 	char new_resps[8];
-	char art_cnt[8];
+	char art_cnt[9];
  	struct t_art_stat sbuf;
 	register char *buffer;
 
@@ -1577,11 +1581,19 @@ bld_sline (i)
 		sprintf (new_resps, "  %c", sbuf.art_mark);
 	}
 
+	j = (sbuf.unread) ? next_unread(respnum) : respnum;
+
 /*	if (n) { T.Dickey 941027 */
 	if (n > 1) {
-		sprintf (art_cnt, "%-3d", n); 
+		if (arts[j].lines != -1)
+			sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
+		else
+			sprintf (art_cnt, "%-3d ?    ", n);
 	} else {
-		strcpy (art_cnt, "   ");
+		if (arts[j].lines != -1)
+			sprintf (art_cnt, "    %-4d ", arts[j].lines);
+		else
+			strcpy (art_cnt, "    ?    ");
 	}
 	
 	if (show_author != SHOW_FROM_NONE) {
@@ -1590,12 +1602,16 @@ bld_sline (i)
 	
 	j = INDEX2SNUM(i);
 	sprintf (buffer = screen[j].col, "  %4d%3s %s%-*.*s%s%-*.*s",
-		 i+1, new_resps, art_cnt, len_subj, len_subj, 
+		 i+1, new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts[respnum].subject, spaces, len_from, len_from, from);
 	
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++)
+#if 0  /* CHRIS behaves badly with some environments */
 		if (!isprint(buffer[n]))
+#else
+		if (buffer[n]&127<32)
+#endif
 			buffer[n] = '?';
 
 #endif /* INDEX_DAEMON */
@@ -1638,9 +1654,10 @@ draw_sline (i, full)
 			CleartoEOLN ();
 		}
 	} else {
-		tlen  = 7;
+              tlen  = 12;
 		s = &screen[j].col[6];
 		x = 6;
+/* ..0001..+.???.????. */
 		if (strip_blanks) {		
 			tlen = strlen (s);	/* notes new line length */
 			strip_line (s, tlen);

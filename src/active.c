@@ -288,7 +288,7 @@ read_news_active_file ()
 
 	strcpy (moderated, "y");
 
-	while (1) {
+	forever {
 		if (newsrc_active) {
 			if (! parse_newsrc_active_line (fp, buf, &count, &max, &min, moderated)) {
 				break;
