@@ -57,21 +57,7 @@ main (
 	int count;
 	t_bool tmp_no_write;
 
-	/* happy birthday */
-	{
-		char user_name[128];
-		char full_name[128];
-
-		get_user_info(user_name, full_name);
-		if ((!strcmp(user_name,"laura") && !strcmp(full_name, "Bettina Fink"))) {
-				time_t btime = (time_t) 0;
-				(void) time(&btime);
-				if (btime >= 903391200 && btime <= 903477599)
-					printf("@}-'-,---  Happy brithday Bettina!  ---,--`{@\n");
-			printf("This tin's for you, for you and just for you!\n");
-			sleep(3);
-		}
-	}
+	set_signal_handlers ();
 
 	cmd_line = TRUE;
 	debug = 0;	/* debug OFF */
@@ -86,8 +72,6 @@ main (
 		argv = _WBArgv;
 	}
 #endif /* M_AMIGA && __SASC */
-
-	set_signal_handlers ();
 
 	base_name (argv[0], progname);
 #ifdef VMS
@@ -349,7 +333,7 @@ main (
  */
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "aAcdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	else
 #		define OPTIONS "BcdD:f:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	endif /* M_AMIGA */
@@ -380,6 +364,17 @@ read_cmd_line_options (
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* HAVE_COLOR */
+				break;
+
+			case 'A':
+#		ifdef NNTP_ABLE
+				force_auth_on_conn_open = TRUE;
+#		else
+				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
+				exit (EXIT_FAILURE);
+				/* keep lint quiet: */
+				/* NOTREACHED */
+#		endif /* NNTP_ABLE */
 				break;
 #	else
 			case 'B':
@@ -674,7 +669,9 @@ usage (
 #		ifdef HAVE_COLOR
 			error_message ("  -a       toggle color flag");
 #		endif /* HAVE_COLOR */
-
+#		ifdef NNTP_ABLE
+			error_message ("  -A       force authentication on connect");
+#		endif /* NNTP_ABLE */
 #	else
 		error_message ("  -B       BBS mode. File operations limited to home directories.");
 #	endif /* !M_AMIGA */

@@ -14,7 +14,7 @@ This following configure options and defines are documented in detail:
   --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
   --enable-locale	     --with-nntp-default-server NO_POSTING
   --enable-mh-mail-handling  --with-nov-dir		NO_SHELL_ESCAPE
-  --enable-nntp		     --with-pgp
+  --enable-nntp		     --with-pgp			LOCAL-CHARSET
   --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
   --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
   --with-inews-dir	     --with-defaults-dir	--disable-xhdr-xref
@@ -282,6 +282,14 @@ i.e., Adding -DUSE_ISO2ASC=\"2\" to the CPPOPTS line in the Makefile would
 be useful in the german language newsgroups. For more detailed info
 read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
+LOCAL_CHARSET
+Define LOCAL_CHARSET if you like charset conversertions.
+set LOCAL-CHARSET to one of the following values:
+	437	ibm437<->iso-8859-1 conversation
+	850	ibm850<->iso-8859-1 conversation
+	1	next<->iso-8859-1 conversation
+	unset	no conversation (default)
+
 --with-ncurses
 Define this if you want to link with ncurses instead of termcap.
 
@@ -390,6 +398,7 @@ Compiled & installed on the following machines:
 
 10)	i386 & FreeBSD 2.1.0 with gcc 2.7.2
 	i586 & FreeBSD 2.2.7 with tcc 4.0 (TenDRA-4.1.2)
+	i486 & FreeBSD 2.2.7 with gcc 2.7.2.1
 	i586 & FreeBSD 3.0-SNAP-971208 with gcc 2.7.2.1
 
 11)	IBM PowerPC RS6000/40p & AIX 4.1.5.0 with gcc 2.8.1

@@ -195,17 +195,13 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	else {
 		if (!is_reconnect)
 			wait_message(2, "Your server does not support the NNTP XOVER command.\nTin will use local index files instead.\n");
+	}
 
-#	if 0	/* It seems this breaks the M$ newsserver */
-		/*
-		 * Try to authenticate. If XOVER exists, then authentication will already
-		 * have been forced by XOVER
-		 */
-#		ifdef DEBUG
-			debug_nntp ("nntp_open", "authenticate");
-#		endif /* DEBUG */
+	if (force_auth_on_conn_open) {
+#	ifdef DEBUG
+		debug_nntp ("nntp_open", "authenticate");
+#	endif /* DEBUG */
 		authenticate (nntp_server, userid, TRUE);
-#	endif /* 0 */
 	}
 
 #endif	/* NNTP_ABLE */

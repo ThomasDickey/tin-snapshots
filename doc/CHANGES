@@ -1,4 +1,30 @@
--- pre-1.4 release 980818 --
+-- pre-1.4 release 981002 "Phobia" --
+
+612) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt
+     FIX. metamutt
+
+611) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. -A cmd-line switch to force auth on connect
+     FIX. extern.h, init.c, main.c, open.c
+
+610) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. if the shell tin is running in is SIGHUP tin could fall into
+          a endless loop
+     FIX. read.c, signal.c
+
+609) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. conversation tables vor ibm437/ibm850 <-> iso-8859-1
+     FIX. ibm437_l1.tab, ibm850_l1.tab, l1_ibm437.tab, l1_ibm850.tab,
+          l1_next.tab, next_l1.tab, misc.c
+
+608) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. <ESC> now aborts shell_escape '!' request
+     ADD. updated pcre (1.09 -> 2.00)
+     FIX. misc.c, signal.c, pcre/*
+
+-- pre-1.4 release 980818 "Laura" --
 
 607) Roland Rosenfeld <roland@spinnaker.rhein.de>
      ADD. updated metamutt
@@ -44,7 +70,7 @@
      FIX. init.c, misc.c, nntplib.c, prompt.c
 
 600) Greg Berigan <gberigan@cse.unl.edu>
-     ADD. support for persistant-headers 
+     ADD. support for persistant-headers
      ADD. minor code cleanup
      FIX. tin.h, page.c, post.c
 

@@ -81,7 +81,7 @@ static const char * signal_name(int code);
 #endif /* SIGTSTP */
 
 enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
-static enum context my_context;
+static int my_context = cMain;
 
 static const struct {
 	int	code;
@@ -203,7 +203,7 @@ handle_resize (
 		tin_done (EXIT_FAILURE);
 	}
 
-	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
+	TRACE(("handle_resize(%d:%d)", my_context, repaint))
 
 	if (repaint) {
 #	ifdef USE_CURSES
@@ -251,7 +251,6 @@ handle_resize (
 			show_thread_page ();
 			break;
 		case cMain:
-		default:
 			break;
 		}
 		my_fflush(stdout);
@@ -263,7 +262,7 @@ handle_resize (
 static void
 handle_suspend (void)
 {
-	TRACE(("handle_suspend(%d)", (int)my_context))
+	TRACE(("handle_suspend(%d)", my_context))
 
 	set_keypad_off ();
 	set_xclick_off ();
@@ -335,8 +334,10 @@ signal_handler (
 		default:
 			break;
 	}
+#if 0
 	Raw (FALSE);
 	EndWin ();
+#endif /* 0 */
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
 #if defined(SIGHUP)
 	if (sig == SIGHUP) {
@@ -401,7 +402,6 @@ void set_signal_handlers (void)
 	int code;
 	RETSIGTYPE (*ptr)(SIG_ARGS);
 
-	my_context = cMain;
 	for (n = 0; n < SIZEOF(signal_list); n++) {
 		switch ((code = signal_list[n].code)) {
 #ifdef SIGTSTP

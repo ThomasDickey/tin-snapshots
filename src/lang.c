@@ -846,7 +846,7 @@ constext txt_tinrc_mail_address[] = "# user's mail address, if not username@host
 constext txt_tinrc_mark_saved_read[] = "# if ON mark articles that are saved as read\n";
 constext txt_tinrc_mm_charset[] = "# charset supported locally which is also used for MIME header and\n\
 # Content-Type header unless news and mail need to be encoded in other\n\
-# charsets as in case of  EUC-KR for Korean which needs to be converted to\n\
+# charsets as in case of EUC-KR for Korean which needs to be converted to\n\
 # ISO-2022-KR in mail message.\n\
 # If not set, the value of the environment variable MM_CHARSET is used.\n\
 # Set to US-ASCII or compile time default if neither of them is defined.\n\
@@ -879,7 +879,7 @@ constext txt_tinrc_post_mime_encoding[] = "# MIME encoding (8bit, base64, quoted
 # terminal emulators and editors appear to have native support of\n\
 # ISO-2022-JP). In case of Chinese, the situation seems to be more\n\
 # complicated(different newsgroups and hierarchies for Chinese use different\n\
-# MIME charsets and encodings) and no special handling is  yet implemented.\n\
+# MIME charsets and encodings) and no special handling is yet implemented.\n\
 # Summing up 7bit does NOT have any effect on MIME charset other than EUC-KR\n";
 constext txt_tinrc_post_process_command[] = "# if set, command to be run after a successful uudecode\n";
 #ifdef M_AMIGA

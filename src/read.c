@@ -41,7 +41,6 @@ static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
  * Used by the I/O read routine to look for keyboard input
  * Returns TRUE if user aborted with 'q' or 'z' (lynx-style)
  *         FALSE otherwise
- * Exits via tin_done() on irrecoverable errors
  */
 static t_bool
 wait_for_input (
@@ -83,16 +82,14 @@ wait_for_input (
 		if ((nfds = select(STDIN_FILENO+1, &readfds, NULL, NULL, &tv)) == -1) {
 			if (errno != EINTR) {
 				perror_message("select() failed");
-				tin_done(EXIT_FAILURE);
-			}
+				exit(EXIT_FAILURE);
+			} else
+				return FALSE;
 		}
 
 		/* No input pending */
-		if (nfds == 0) {
-/*			fprintf(stderr, "Timeout...Treating as user initiated abort ? \n");*/
-/* TODO What do we do here ? Drain ? don't drain ? */
+		if (nfds == 0)
 			return FALSE;
-		}
 
 		/*
 		 * Something is waiting. See what's cooking...
@@ -104,7 +101,8 @@ wait_for_input (
 			 * user input 1st so they get chance to quit on busy (or stalled) reads
 			 */
 			if (FD_ISSET(STDIN_FILENO, &readfds)) {
-				ch = ReadCh();
+				if ((ch = ReadCh()) == EOF)
+					return FALSE;
 
 				if (ch == 'q' || ch == 'z' || ch == ESC) {
 					if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)

@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"980818"
-#	define RELEASENAME	"Laura"
+#	define RELEASEDATE	"981002"
+#	define RELEASENAME	"Phobia"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

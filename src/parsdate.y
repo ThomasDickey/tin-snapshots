@@ -228,15 +228,15 @@ numzone	: tSNUMBER {
 	    if ((int)$1 < 0) {
 		/* Don't work with negative modulus. */
 		$1 = -(int)$1;
-	 	if ($1 > 9999 || (i = $1 % 100) >= 60) {
-	 		YYABORT;
-	 	}
+		if ($1 > 9999 || (i = $1 % 100) >= 60) {
+			YYABORT;
+		}
 		$$ = ($1 / 100) * 60 + i;
 	    }
 	    else {
-	 	if ($1 > 9999 || (i = $1 % 100) >= 60) {
-	 		YYABORT;
-	 	}
+		if ($1 > 9999 || (i = $1 % 100) >= 60) {
+			YYABORT;
+		}
 		$$ = -(($1 / 100) * 60 + i);
 	    }
 	}
