@@ -31,11 +31,14 @@ int default_bcol = 0;
 static int current_fcol = 7;
 static int current_bcol = 0;
 
+#define isalp(c)	(isgraph ((unsigned char) (c)))
+
+
 /*
  * local prototypes
  */
-static t_bool check_valid_mark (const char *s, int c);
-static t_bool isalp (int c);
+static t_bool check_valid_mark (const char *s);
+static void put_mark_char (int c, FILE *stream);
 static void color_fputs (const char *s, FILE *stream, int color);
 
 #ifdef USE_CURSES
@@ -52,12 +55,12 @@ set_colors (
 	} *list;
 	static int nextpair;
 
-#ifndef HAVE_USE_DEFAULT_COLORS
+#	ifndef HAVE_USE_DEFAULT_COLORS
 	if (fcolor < 0)
 		fcolor = default_fcol;
 	if (bcolor < 0)
 		bcolor = default_bcol;
-#endif
+#	endif /* !HAVE_USE_DEFAULT_COLORS */
 	if (cmd_line || !use_color || !has_colors()) {
 		current_fcol = default_fcol;
 		current_bcol = default_bcol;
@@ -154,86 +157,51 @@ bcol (
 			if (color < 0)
 				color = default_bcol;
 			my_printf("\033[%dm", (color + 40));
-#endif
+#endif /* USE_CURSES */
 			current_bcol = color;
 		}
 	}
 #ifdef USE_CURSES
 	else
 		set_colors(default_fcol, default_bcol);
-#endif
+#endif /* USE_CURSES */
 }
 
-static t_bool
-isalp (
-	int c)
-{
-	if (isalnum(c))
-		return TRUE;
-
-	switch (c) {
-/*		case '.': */
-		case ':':
-		case '!':
-		case '\"':		/* for emacs: " */
-		case '\'':
-/*		case ',': */
-		case '(':
-		case ')':
-		case '{':
-		case '}':
-		case '[':
-		case ']':
-		case '=':
-		case '<':
-/*		case '>': */
-		case '$':
-		case '%':
-		case '&':
-/*		case '/': */
-		case '?':
-#ifdef NO_LOCALE
-		/* if you have not installed locale and want to read German umlauts: */
-		case 'ß':
-		case 'ä':
-		case 'ö':
-		case 'ü':
-		case 'Ä':
-		case 'Ö':
-		case 'Ü':
-#endif
-		case '+':
-		case '-':
-		case '#':
-		case ';':
-		case '@':
-		case '\\':
-			return TRUE;
-
-		default:
-			return FALSE;
-	}
-}
 
 /*
  * Lookahead to find matching closing highlight character
  */
 static t_bool
 check_valid_mark (
-	const char *s,
-	int c)
+	const char *s)
 {
 	const char *p;
+	int c = *s;
 
-	for (p=s+2; p < (s+strlen(s)); p++) {
-		if (!isalp(*p) && *(p + 1) == c)
-			return FALSE;
-		else
-			if (!isalp(*(p + 1)) && *p == c)
-				return TRUE;
-	}
-	return FALSE;
+	if (s[1] == '\0' || s[1] == c || !isalp(s[1]))
+		return FALSE;
+	p = strpbrk(s+2, "*_");
+	return (p != NULL && *p == c && isalp(p[-1]) && !isalp(p[1]));
 }
+
+
+static void
+put_mark_char (
+	int c,
+	FILE *stream)
+{
+	switch (word_h_display_marks) {
+		case 1: /* print mark */
+			my_fputc(c, stream);
+			break;
+		case 2: /* print space */
+			my_fputc(' ', stream);
+			break;
+		default: /* print nothing */
+			break;
+	}
+}
+
 
 /*
  * Like fputs(), but highlights words denoted by * and _ in colour
@@ -245,89 +213,25 @@ color_fputs (
 	int color)
 {
 	const char *p;
-	int col1=0, col2=0;
+	const char* eos = strchr(s, '\0');
+	t_bool hilite = FALSE;
 
-	for (p=s; p < (s + strlen(s)); p++) {
-		switch (*p) {
-			case '*':
-				if ((p > s) && !isalp(*(p - 1)) && !isalp(*(p + 1))) {
+	for (p=s; p < eos; p++) {
+		if (*p == '*' || *p == '_') {
+			if (! hilite) {
+				if ((p == s || !isalp(p[-1])) && check_valid_mark(p)) {
+					hilite = TRUE;
+					fcol(*p == '*' ? col_markstar : col_markdash);
+					put_mark_char(*p, stream);
+				} else /* print normal character */
 					my_fputc(*p, stream);
-					break;
-				} else if ((p == s) || !isalp(*(p - 1))) {
-					if (check_valid_mark(p, '*')) {
-						col1=1;
-						fcol(col_markstar);
-						switch (word_h_display_marks) {
-						case 1: /* print mark */
-							my_fputc(*p, stream);
-							break;
-						case 2: /* print space */
-							my_fputc(' ', stream);
-							break;
-						default: /* print nothing */
-							break;
-						}
-					} else /* print normal character */
-						my_fputc(*p, stream);
-				} else {
-					if (!isalp(*(p + 1)) && col1) {
-						switch (word_h_display_marks) {
-						case 1: /* print mark */
-							my_fputc(*p, stream);
-							break;
-						case 2: /* print space */
-							my_fputc(' ', stream);
-							break;
-						default: /* print nothing */
-							break;
-						}
-						fcol(color);
-					} else
-						my_fputc(*p, stream);
-				}
-				break;
-
-			case '_':
-				if ((p > s) && !isalp(*(p - 1)) && !isalp(*(p + 1))) {
-					my_fputc(*p, stream);
-					break;
-				} else if ((p == s) || !isalp(*(p - 1))) {
-					if (check_valid_mark(p, '_')) {
-						col2=1;
-						fcol(col_markdash);
-						switch (word_h_display_marks) {
-						case 1: /* print mark */
-							my_fputc(*p, stream);
-							break;
-						case 2: /* print space */
-							my_fputc(' ', stream);
-							break;
-						default: /* print nothing */
-							break;
-						}
-					} else /* print normal character */
-						my_fputc(*p, stream);
-				} else {
-					if (!isalp(*(p + 1)) && col2) {
-						switch (word_h_display_marks) {
-						case 1: /* print mark */
-							my_fputc(*p, stream);
-							break;
-						case 2: /* print space */
-							my_fputc(' ', stream);
-							break;
-						default: /* print nothing */
-							break;
-						}
-						fcol(color);
-					} else
-						my_fputc(*p, stream);
-				}
-				break;
-
-			default: /* p is no mark char */
-				my_fputc(*p, stream);
-				break;
+			} else {
+				hilite = FALSE;
+				put_mark_char(*p, stream);
+				fcol(color);
+			}
+		} else {
+			my_fputc(*p, stream);
 		}
 	}
 }

@@ -89,7 +89,7 @@ read_xref_header (
 			return;
 
 		while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
-			while (*ptr && isspace(*ptr))
+			while (*ptr && isspace((int)*ptr))
 				ptr++;
 			if (*ptr == '.')
 				break;
@@ -102,7 +102,7 @@ read_xref_header (
 				if (q == NULL)
 					continue;
 				ptr = q;
-				while (*ptr && isspace(*ptr))
+				while (*ptr && isspace((int)*ptr))
 					ptr++;
 				q = strchr (ptr, '\n');
 				if (q)
@@ -166,7 +166,7 @@ art_mark_xref_read (
 
 		ptr = xref_ptr++;
 		artnum = atol (xref_ptr);
-		while (isdigit(*xref_ptr))
+		while (isdigit((int)*xref_ptr))
 			xref_ptr++;
 
 		if (&ptr[1] == xref_ptr)

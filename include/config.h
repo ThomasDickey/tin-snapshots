@@ -2,14 +2,14 @@
  *  Project   : tin - a Usenet reader
  *  Module    : config.h
  *  Author    : I.Lea
- *  Created   : 03-09-92
- *  Updated   : 18-06-95
+ *  Created   : 1992-09-03
+ *  Updated   : 1995-08-18
  *  Notes     : #defines to determine different OS capabilites
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *              You may  freely  copy or  redistribute  this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change this copy-
+ *              right notice, and it must be included in any copy made
  */
 
 /* functions that we'll assume we have unless there's a special reason */

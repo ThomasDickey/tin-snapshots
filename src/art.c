@@ -125,6 +125,7 @@ index_group (
 	if (group == (struct t_group *) 0)
 		return TRUE;
 
+	/* TODO - can this be based on strlen(txt_group) ? */
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
 	i = 45; /* len of "Group %s ('q' to quit)... 'low'/'high'" */
 #else
@@ -171,6 +172,11 @@ index_group (
 
 	min = top_base ? base[0] : group->xmin;
 	max = top_base ? base[top_base-1] : min - 1;
+
+	if (use_getart_limit && (getart_limit > 0)) {
+		if (top_base && (top_base > getart_limit))
+			min = base[top_base-getart_limit];
+	}
 
 	/*
 	 * Quit now if no articles
@@ -254,8 +260,6 @@ index_group (
 	EndStopWatch();
 	PrintStopWatch();
 #endif /* PROFILE */
-
-	find_base (group);
 
 	if ((modified || filtered) && !batch_mode)
 		clear_message ();
@@ -552,24 +556,26 @@ make_threads (
 	if (group->attribute)
 	switch (group->attribute->thread_arts) {
 		case THREAD_NONE:
-			return;
+			break;
 
 		case THREAD_SUBJ:
 			thread_by_subject();
-			return;
+			break;
 
 		case THREAD_REFS:
 			thread_by_reference();
-			return;
+			break;
 
 		case THREAD_BOTH:
 			thread_by_reference();
 			collate_subjects();
-			return;
+			break;
 
 		default: /* not reached */
-			return;
+			break;
 	}
+
+	find_base (group);
 }
 
 
@@ -638,7 +644,7 @@ parse_headers (
 					if ((match_header (ptr+1, "rom", (char*)0, buf, HEADER_LEN) ||
 					    match_header (ptr+1, "o", (char*)0, buf, HEADER_LEN)) &&
 					    *buf != '\0') {
-						parse_from (buf, art_from_addr, art_full_name);
+						h->gnksa_code = parse_from (buf, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (*art_full_name)
 							h->name = hash_str (eat_tab(rfc1522_decode(art_full_name)));
@@ -646,7 +652,7 @@ parse_headers (
 					}
 				}
 				break;
-			case 'R':	/* References: optional */
+			case 'R':	/* References:  optional */
 				if (!got_refs) {
 					if (match_header (ptr+1, "eferences", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
 						h->refs = my_strdup (buf);
@@ -896,7 +902,7 @@ my_flush();
 		} else
 			*q = '\0';
 
-		parse_from (p, art_from_addr, art_full_name);
+		arts[top].gnksa_code = parse_from (p, art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
 
 		if (*art_full_name)
@@ -973,7 +979,7 @@ my_flush();
 			if ((q = strchr (p, '\t')) != (char *) 0)
 				*q = '\0';
 
-			if(isdigit((unsigned char)*p))
+			if (isdigit((unsigned char)*p))
 				arts[top].lines = atoi (p);
 
 			p = (q == (char *) 0 ? (char *) 0 : q + 1);
@@ -1072,7 +1078,7 @@ vWriteNovFile (
 	strcpy(tmp, ((((pcNovFile = pcFindNovFile (psGrp, R_OK)) != 0)) ? pcNovFile : ""));
 	pcNovFile = pcFindNovFile (psGrp, W_OK);
 
-	if(strcmp(tmp, pcNovFile)!=0) {
+	if (strcmp(tmp, pcNovFile) != 0) {
 		set_real_uid_gid ();
 		return;
 	}
@@ -1193,7 +1199,7 @@ pcFindNovFile (
 			break;
 		case GROUP_TYPE_NEWS:
 			if (read_news_via_nntp && xover_supported && ! cache_overview_files)
-				sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
+				sprintf (acNovFile, "%s%d.idx", TMPDIR, (int) process_id);
 			else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);
 				sprintf (acNovFile, "%s/%s", acBuf, novfilename);
@@ -1253,7 +1259,7 @@ do_update (void)
 {
 	char group_path[PATH_LEN];
 	register int i, j;
-	time_t beg_epoch, end_epoch;
+	time_t beg_epoch;
 	struct t_group *psGrp;
 #ifdef INDEX_DAEMON
 	char *pcNovFile;
@@ -1296,7 +1302,7 @@ do_update (void)
 
 		group_time = stinfo.st_mtime;
 
-		index_time = (time_t)0;
+		index_time = (time_t) 0;
 		pcNovFile = pcFindNovFile (psGrp, R_OK);
 #	ifdef DEBUG
 		if (debug)
@@ -1321,7 +1327,7 @@ do_update (void)
 				pcNovFile, (unsigned long int) index_time,
 				(unsigned long int) psGrp->last_updated_time, (unsigned long int) group_time);
 #	endif /* DEBUG */
-		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 ||
+		if (index_time == (time_t) 0 || psGrp->last_updated_time == (time_t) 0 ||
 		    (psGrp->last_updated_time > index_time) ||
 		    (group_time > psGrp->last_updated_time) ||
 		    purge_index_files)
@@ -1351,9 +1357,8 @@ do_update (void)
 #endif /* INDEX_DAEMON */
 
 	if (verbose) {
-		(void) time (&end_epoch);
 		wait_message (0, txt_catchup_update_info,
-			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (unsigned long int) (end_epoch - beg_epoch));
+			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (unsigned long int) (time(NULL) - beg_epoch));
 	}
 }
 

@@ -19,6 +19,16 @@
 #include	"trace.h"
 
 /*
+ * defines to control GNKSA-checks behaviour:
+ * - ENFORCE_RFC1034
+ *   require domain name components not to start with a digit
+ *
+ * - REQUIRE_BRACKETS_IN_DOMAIN_LITERAL
+ *   require domain literals to be enclosed in square brackets
+ */
+
+
+/*
  * Local prototypes
  */
 static char *escape_shell_meta (char *source, int quote_area);
@@ -172,7 +182,7 @@ copy_body (
 						buf2[i] = buf[i];
 						if (buf[i] != ' ')
 							status_space = TRUE;
-						if ((status_space) && !(isalpha(buf[i]) || buf[i] == '>'))
+						if ((status_space) && !(isalpha((int)buf[i]) || buf[i] == '>'))
 							status_char = FALSE;
 					}
 					buf2[i] = '\0';
@@ -482,21 +492,20 @@ void
 strip_double_ngs (
 	char *ngs_list)
 {
-	char	*ptr;				/* start of next (outer) newsgroup  */
-	char	*ptr2;			/* temporary pointer                */
-	char	ngroup1[HEADER_LEN];	/* outer newsgroup to compare       */
-	char	ngroup2[HEADER_LEN];	/* inner newsgroup to compare       */
-	char	cmplist[HEADER_LEN];	/* last loops output                */
-	char	newlist[HEADER_LEN];	/* the newly generated list without */
+	char *ptr;			/* start of next (outer) newsgroup */
+	char *ptr2;			/* temporary pointer */
+	char ngroup1[HEADER_LEN];	/* outer newsgroup to compare */
+	char ngroup2[HEADER_LEN];	/* inner newsgroup to compare */
+	char cmplist[HEADER_LEN];	/* last loops output */
+	char newlist[HEADER_LEN];	/* the newly generated list without */
 										/* any duplicates of the first nwsg */
-	int	ncnt1;			/* counter for the first newsgroup  */
-	int	ncnt2;			/* counter for the second newsgroup */
-	t_bool over1;			/* TRUE when the outer loop is over */
-	t_bool over2;			/* TRUE when the inner loop is over */
+	int ncnt1;			/* counter for the first newsgroup */
+	int ncnt2;			/* counter for the second newsgroup */
+	t_bool over1;		/* TRUE when the outer loop is over */
+	t_bool over2;		/* TRUE when the inner loop is over */
 
-	/* shortcut, if the is only 1 group */
+	/* shortcut, check if there is only 1 group */
 	if (strchr(ngs_list, ',') != (char *) 0) {
-
 		over1 = FALSE;
 		ncnt1 = 0;
 		strcpy(newlist, ngs_list);	/* make a "working copy" */
@@ -518,7 +527,8 @@ strip_double_ngs (
 			over2 = FALSE;
 			ncnt2 = 0;
 
-			/* now compare with each inner newsgroup on the list,
+			/*
+			 * now compare with each inner newsgroup on the list,
 			 * which is behind the momentary outer newsgroup
 			 * if it is different from the outer newsgroup, append
 			 * to list, strip double-commas
@@ -908,6 +918,7 @@ mail_check (void)
 	return FALSE;
 }
 
+#if 0
 /*
  * Returns the user name and E-mail address of the user
  *
@@ -1087,6 +1098,7 @@ FATAL:
 #undef LTRIM
 #undef TRIM
 
+#endif
 
 /*
  *  Return a pointer into s eliminating any leading Re:'s.  Example:
@@ -1208,7 +1220,7 @@ get_author (
 			break;
 		case SHOW_FROM_BOTH:
 			if (art->name) {
-				char buff[LEN];			/* TODO eliminate this ? */
+				char buff[LEN];			/* TODO eliminate this with snprintf() */
 
 				sprintf (buff, "%s <%s>", art->name, art->from);
 				strncpy (str, buff, len);
@@ -1523,14 +1535,14 @@ get_arrow_key (
 			return KEYMAP_PAGE_DOWN;
 #	endif
 
-		case 'H':		/* at386  Home */
+		case 'H':		/* at386 Home */
 #	ifdef QNX42
 		case 0xA0:
 #	endif
 			return KEYMAP_HOME;
 
-		case 'F':		/* ansi   End */
-		case 'Y':		/* at386  End */
+		case 'F':		/* ansi  End */
+		case 'Y':		/* at386 End */
 #	ifdef QNX42
 		case 0xA8:
 #	endif
@@ -1549,11 +1561,11 @@ get_arrow_key (
 			return KEYMAP_PAGE_UP;
 
 		case '6':		/* vt200 PgUp */
-			(void) ReadCh ();	/* eat the ~  */
+			(void) ReadCh ();	/* eat the ~ */
 			return KEYMAP_PAGE_DOWN;
 
 		case '1':		/* vt200 PgUp */
-			ch = ReadCh (); /* eat the ~  */
+			ch = ReadCh (); /* eat the ~ */
 			if (ch == '5') {	/* RS/6000 PgUp is 150g, PgDn is 154g */
 				ch1 = ReadCh ();
 				(void) ReadCh ();
@@ -1565,7 +1577,7 @@ get_arrow_key (
 			return KEYMAP_HOME;
 
 		case '4':		/* vt200 PgUp */
-			(void) ReadCh ();	/* eat the ~  */
+			(void) ReadCh ();	/* eat the ~ */
 			return KEYMAP_END;
 
 		case 'M':		/* xterminal button press */
@@ -1609,7 +1621,7 @@ create_index_lock_file (
 		}
 	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
 		(void) time (&epoch);
-		fprintf (fp, "%6d  %s\n", process_id, ctime (&epoch));
+		fprintf (fp, "%6d  %s\n", (int) process_id, ctime (&epoch));
 		fclose (fp);
 		chmod (the_lock_file, (mode_t)(S_IRUSR|S_IWUSR));
 	}
@@ -1870,11 +1882,11 @@ out:
  *   $var/News -> /env/var/News
  *   =file     -> /usr/iain/Mail/file
  *   +file     -> /usr/iain/News/group.name/file
- *   ~/News/%G -> /usr/iain/News/group.name
+ *   ~/News/%G -> /usr/iain/News/group.name		currently not implemented
  *
  * Inputs:
  *   format		The string to be converted
- *   str		Return buffer
+ *   str			Return buffer
  *   maxsize	Size of str
  *   dir/group	The strings to be substituted in this case
  * Returns:
@@ -2043,22 +2055,21 @@ strfpath (
 						my_strncpy (tmp, group, sizeof(tmp));
 #else
 						my_strncpy (tmp, group, 14);
-#endif
-						/*
-						 *  convert 1st letter to uppercase
-						 */
-						if (tmp[0] >= 'a' && tmp[0] <= 'z')
-							tmp[0] = tmp[0] - 32;
+#endif /* HAVE_LONG_FILE_NAMES */
+#if 0 /* this looks ugly */
+						/* convert 1st letter to uppercase */
+						tmp[0] = (char) toupper(tmp[0]);
+#endif /* 0 */
 #ifndef VMS
 						joinpath (tbuf, buf, tmp);
-#ifdef WIN32
+#	ifdef WIN32
 						strcat (tbuf, "\\");
-#else
+#	else
 						strcat (tbuf, "/");
-#endif
-#else /* VMS */
+#	endif /* WIN32 */
+#else
 			joindir (tbuf, buf, tmp);
-#endif
+#endif /* VMS */
 						i = strlen (tbuf);
 						if (i) {
 							if (str + i < endp - 1) {
@@ -2076,9 +2087,11 @@ strfpath (
 				} else
 					*str++ = *format;
 				break;
+#if 0 /* %G is not implemented at the moment */
 			case '%':	/* Different forms of parsing cmds */
 				*str++ = *format;
 				break;
+#endif /* 0 */
 			default:
 				break;
 		}
@@ -2256,9 +2269,8 @@ strfmailer (
 					}
 				} else if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
 					s += strlen(s);
-				} else {
+				} else
 					return 0;
-				}
 			}
 		}
 	}
@@ -2291,7 +2303,7 @@ get_initials (
 	iflag = FALSE;
 	j = 0;
 	for (i=0; tbuf[i] && j < maxsize-1; i++) {
-		if (isalpha(tbuf[i])) {
+		if (isalpha((int)tbuf[i])) {
 			if (!iflag) {
 				s[j++] = tbuf[i];
 				iflag = TRUE;
@@ -2346,7 +2358,7 @@ cleanup_tmp_files (void)
 	char acNovFile[PATH_LEN];
 
 	if (read_news_via_nntp && xover_supported && !cache_overview_files) {
-		sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
+		sprintf (acNovFile, "%s%d.idx", TMPDIR, (int) process_id);
 		unlink (acNovFile);
 	}
 
@@ -2458,18 +2470,16 @@ char *
 random_organization(
 	char *in_org)
 {
-	static char selorg[512];
-	int nool = 0, sol;
 	FILE *orgfp;
-	time_t epoch;
+	int nool = 0, sol;
+	static char selorg[512];
 
 	*selorg = '\0';
 
 	if (*in_org != '/')
 		return in_org;
 
-	(void) time (&epoch);
-	srand ((unsigned int) epoch);
+	srand ((unsigned int) time(NULL));
 
 	if ((orgfp = fopen(in_org, "r")) == NULL)
 		return selorg;
@@ -2493,10 +2503,9 @@ random_organization(
 void
 read_input_history_file (void) {
 	FILE *fp;
+	char *chr;
 	char buf[HEADER_LEN];
-	int his_w = 0, his_e = 0;
-	char *chr, *chr1;
-	int his_free = 0;
+	int his_w = 0, his_e = 0, his_free = 0;
 
 	/* this is usually .tin/.inputhistory */
 	if ((fp = fopen(local_input_history_file, "r")) == NULL)
@@ -2510,23 +2519,20 @@ read_input_history_file (void) {
 	memset((void *) hist_last, 0, sizeof(hist_last));
 	memset((void *) hist_pos, 0, sizeof(hist_pos));
 
-
 	while (fgets(buf, (int) sizeof(buf), fp)) {
 
-		if ((chr = (char *) my_malloc(strlen(buf)+1)) != NULL) {
-			strcpy(chr, buf);
-			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
-				*chr1 = '\0';
-			if (*chr)
-				input_history[his_w][his_e] = chr;
-			else {
-				/* empty lines in tin_getline's history buf are stored as NULL pointers */
-				input_history[his_w][his_e] = NULL;
+		if ((chr = strpbrk(buf, "\n\r")) != NULL)
+			*chr = '\0';
 
-				/* get the empty slot in the circular buf */
-				if (!his_free)
-					his_free = his_e;
-			}
+		if (*buf)
+			input_history[his_w][his_e] = my_strdup(buf);
+		else {
+			/* empty lines in tin_getline's history buf are stored as NULL pointers */
+			input_history[his_w][his_e] = NULL;
+
+			/* get the empty slot in the circular buf */
+			if (!his_free)
+				his_free = his_e;
 		}
 
 		his_e++;
@@ -2534,28 +2540,25 @@ read_input_history_file (void) {
 		if (his_e >= HIST_SIZE) {
 			hist_last[his_w] = his_free;
 			hist_pos[his_w] = hist_last[his_w];
-			his_free = 0;
-			his_e = 0;
+			his_free = his_e = 0;
 			his_w++;
 		}
 		/* check if end is reached */
 		if (his_w > HIST_MAXNUM)
 			break;
 	}
-
 	fclose(fp);
 
 	if (cmd_line)
 		printf ("\r\n");
-
 }
 
 
 static void
 write_input_history_file(void) {
 	FILE *fp;
-	int his_w, his_e;
 	char *chr;
+	int his_w, his_e;
 
 	if ((fp = fopen(local_input_history_file, "w")) == NULL)
 		return;
@@ -2584,8 +2587,8 @@ char *
 quote_wild(
 	char *str)
 {
-	static char buff[2*LEN];	/* on the safe side */
 	char *target;
+	static char buff[2*LEN];	/* on the safe side */
 
 	for (target = buff; *str != '\0'; str++) {
 		if (wildcard) { /* regex */
@@ -2619,8 +2622,8 @@ char *
 quote_wild_whitespace(
 	char *str)
 {
-	static char buff[2*LEN];	/* on the safe side */
 	char *target;
+	static char buff[2*LEN];	/* on the safe side */
 
 	for (target = buff; *str != '\0'; str++) {
 		if (wildcard) { /* regex */
@@ -2648,8 +2651,8 @@ strip_address (
 	char *the_address,
 	char *stripped_address)
 {
-	char *start_pos;
 	char *end_pos;
+	char *start_pos;
 
 	/* skip realname in address */
 	if ((start_pos = strchr (the_address, '<')) == (char *) 0) {
@@ -2663,9 +2666,95 @@ strip_address (
 		strcpy (stripped_address, start_pos);
 		start_pos = stripped_address;
 		if ((end_pos = strchr (start_pos, '>')) == (char *) 0)
-		end_pos = start_pos+strlen(start_pos); /* skip '>' */
+			end_pos = start_pos+strlen(start_pos); /* skip '>' */
 	}
 	*(end_pos) = '\0';
+}
+
+
+/*
+ * Return the new line index following a PageUp request.
+ * Take half page scrolling into account
+ */
+int
+page_up(
+	int curslot,
+	int maxslot)
+{
+	int n, scroll_lines;
+
+	if (curslot == 0)
+		return (maxslot - 1);
+
+	scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
+
+	if ((n = curslot % scroll_lines) > 0)
+		curslot -= n;
+	else
+		curslot = ((curslot - scroll_lines) / scroll_lines) * scroll_lines;
+
+	return ((curslot < 0) ? 0 : curslot);
+}
+
+/*
+ * Return the new line index following a PageDown request.
+ * Take half page scrolling into account
+ */
+int
+page_down(
+	int curslot,
+	int maxslot)
+{
+	int scroll_lines;
+
+	if (curslot == maxslot - 1)
+		return 0;
+
+	scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
+
+	curslot = ((curslot + scroll_lines) / scroll_lines) * scroll_lines;
+
+	if (curslot >= maxslot) {
+		curslot = (maxslot / scroll_lines) * scroll_lines;
+		if (curslot < maxslot - 1)
+			curslot = maxslot - 1;
+	}
+
+	return (curslot);
+}
+
+
+/*
+ * Calculate the first and last objects that will appear on the current screen
+ * based on the current position and the max available
+ */
+void
+set_first_screen_item (
+	int cur,
+	int max,
+	int *first,
+	int *last)
+{
+	if (NOTESLINES <= 0)
+		*first = 0;
+	else {
+		*first = (cur / NOTESLINES) * NOTESLINES;
+		if (*first < 0)
+			*first = 0;
+	}
+
+	*last = *first + NOTESLINES;
+
+	if (*last >= max) {
+		*last = max;
+		*first = (max / NOTESLINES) * NOTESLINES;
+
+		if (*first == *last || *first < 0)
+			*first = ((*first < 0) ? 0 : *last - NOTESLINES);
+	}
+
+	if (!max)
+		*first = *last = 0;
 }
 
 
@@ -2674,23 +2763,22 @@ strip_address (
  * convert between local and network charset (e.g. NeXT and latin1)
  */
 
-#define CHARNUM 256
-#define BAD (-1)
+#	define CHARNUM 256
+#	define BAD (-1)
 
 /* use the appropriate conversion tables */
-#if LOCAL_CHARSET == 437
-#	warning "using local charset ibm437"
-#	include "l1_ibm437.tab"
-#	include "ibm437_l1.tab"
-#elif LOCAL_CHARSET == 850
-#	warning "using local charset ibm850"
-#	include "l1_ibm850.tab"
-#	include "ibm850_l1.tab"
-#else
-#	warning "using local charset next"
-#	include "l1_next.tab"
-#	include "next_l1.tab"
-#endif
+#	if LOCAL_CHARSET == 437
+#		include "l1_ibm437.tab"
+#		include "ibm437_l1.tab"
+#	else
+#		if LOCAL_CHARSET == 850
+#			include "l1_ibm850.tab"
+#			include "ibm850_l1.tab"
+#		else
+#			include "l1_next.tab"
+#			include "next_l1.tab"
+#		endif /* 850 */
+#	endif /* 437 */
 
 static int
 to_local (
@@ -2720,7 +2808,7 @@ to_network (
 {
 	if (use_local_charset) {
 		c = c_local_network[(unsigned char) c];
-		if (c==BAD)
+		if (c == BAD)
 			return '?';
 		else
 			return c;
@@ -2736,3 +2824,822 @@ buffer_to_network (
 		*b = to_network(*b);
 }
 #endif /* LOCAL_CHARSET */
+
+
+/*
+ * checking of mail adresses for GNKSA compliance
+ *
+ * son-of-rfc1036:
+ *   article         = 1*header separator body
+ *   header          = start-line *continuation
+ *   start-line      = header-name ":" space [ nonblank-text ] eol
+ *   continuation    = space nonblank-text eol
+ *   header-name     = 1*name-character *( "-" 1*name-character )
+ *   name-character  = letter / digit
+ *   letter          = <ASCII letter A-Z or a-z>
+ *   digit           = <ASCII digit 0-9>
+ *   separator       = eol
+ *   body            = *( [ nonblank-text / space ] eol )
+ *   eol             = <EOL>
+ *   nonblank-text   = [ space ] text-character *( space-or-text )
+ *   text-character  = <any ASCII character except NUL (ASCII 0),
+ *                       HT (ASCII 9), LF (ASCII 10), CR (ASCII 13),
+ *                       or blank (ASCII 32)>
+ *   space           = 1*( <HT (ASCII 9)> / <blank (ASCII 32)> )
+ *   space-or-text   = space / text-character
+ *   encoded-word  = "=?" charset "?" encoding "?" codes "?="
+ *   charset       = 1*tag-char
+ *   encoding      = 1*tag-char
+ *   tag-char      = <ASCII printable character except !()<>@,;:\"[]/?=>
+ *   codes         = 1*code-char
+ *   code-char     = <ASCII printable character except ?>
+ *   From-content  = address [ space "(" paren-phrase ")" ]
+ *                 /  [ plain-phrase space ] "<" address ">"
+ *   paren-phrase  = 1*( paren-char / space / encoded-word )
+ *   paren-char    = <ASCII printable character except ()<>\>
+ *   plain-phrase  = plain-word *( space plain-word )
+ *   plain-word    = unquoted-word / quoted-word / encoded-word
+ *   unquoted-word = 1*unquoted-char
+ *   unquoted-char = <ASCII printable character except !()<>@,;:\".[]>
+ *   quoted-word   = quote 1*( quoted-char / space ) quote
+ *   quote         = <" (ASCII 34)>
+ *   quoted-char   = <ASCII printable character except "()<>\>
+ *   address       = local-part "@" domain
+ *   local-part    = unquoted-word *( "." unquoted-word )
+ *   domain        = unquoted-word *( "." unquoted-word )
+ *
+ * legal TLDs: .uucp, .bitnet and all valid internet top level domains
+*/
+
+
+/*
+ * legal domain name components according to RFC 1034
+ * includes also '.' as valid separator
+ */
+static char gnksa_legal_fqdn_chars[256] = {
+/*         0 1 2 3  4 5 6 7  8 9 a b  c d e f */
+/* 0x00 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x10 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x20 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,1,0,
+/* 0x30 */ 1,1,1,1, 1,1,1,1, 1,1,0,0, 0,0,0,0,
+/* 0x40 */ 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x50 */ 1,1,1,1, 1,1,1,1, 1,1,1,0, 0,0,0,0,
+/* 0x60 */ 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x70 */ 1,1,1,1, 1,1,1,1, 1,1,1,0, 0,0,0,0,
+/* 0x80 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x90 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xa0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xb0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xc0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xd0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xe0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xf0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
+};
+
+
+/*
+ * legal localpart components according to son-of-rfc1036
+ * includes also '.' as valid separator
+ */
+static char gnksa_legal_localpart_chars[256] = {
+/*         0 1 2 3  4 5 6 7  8 9 a b  c d e f */
+/* 0x00 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x10 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x20 */ 0,0,0,1, 1,1,1,1, 0,0,1,1, 0,1,1,1,
+/* 0x30 */ 1,1,1,1, 1,1,1,1, 1,1,0,0, 0,1,0,1,
+/* 0x40 */ 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x50 */ 1,1,1,1, 1,1,1,1, 1,1,1,0, 0,0,1,1,
+/* 0x60 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x70 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,0,
+/* 0x80 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x90 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xa0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xb0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xc0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xd0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xe0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xf0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
+};
+
+
+/*
+ * known two letter country codes
+ */
+static char gnksa_country_codes[26*26] = {
+/*      A B C D E  F G H I J  K L M N O  P Q R S T  U V W X Y Z */
+/* A */ 0,0,1,1,1, 1,1,0,1,0, 0,1,1,1,1, 0,1,1,1,1, 1,0,1,0,0,1,
+/* B */ 1,1,0,1,1, 1,1,1,1,1, 0,0,1,1,1, 0,0,1,1,1, 0,1,1,0,1,1,
+/* C */ 1,0,1,1,0, 1,1,1,1,0, 1,1,1,1,1, 0,0,1,0,0, 1,1,0,1,1,1,
+/* D */ 0,0,0,0,1, 0,0,0,0,1, 1,0,1,0,1, 0,0,0,0,0, 0,0,0,0,0,1,
+/* E */ 0,0,1,0,1, 0,1,1,0,0, 0,0,0,0,0, 0,0,1,1,1, 0,0,0,0,0,0,
+/* F */ 0,0,0,0,0, 0,0,0,1,1, 1,0,1,0,1, 0,0,1,0,0, 0,0,0,1,0,0,
+/* G */ 1,1,0,1,1, 1,1,1,1,0, 0,1,1,1,0, 1,1,1,1,1, 1,0,1,0,1,0,
+/* H */ 0,0,0,0,0, 0,0,0,0,0, 1,0,1,1,0, 0,0,1,0,1, 1,0,0,0,0,0,
+/* I */ 0,0,0,1,1, 0,0,0,0,0, 0,1,1,1,1, 0,1,1,1,1, 0,0,0,0,0,0,
+/* J */ 0,0,0,0,1, 0,0,0,0,0, 0,0,1,0,1, 1,0,0,0,0, 0,0,0,0,0,0,
+/* K */ 0,0,0,0,1, 0,1,0,1,0, 0,0,1,1,0, 1,0,1,0,0, 0,0,1,0,1,1,
+/* L */ 1,1,1,0,0, 0,0,0,1,0, 1,0,0,0,0, 0,0,1,1,1, 1,1,0,0,1,0,
+/* M */ 1,0,1,1,0, 0,1,1,0,0, 1,1,1,1,1, 1,1,1,1,1, 1,1,1,1,1,1,
+/* N */ 1,0,1,0,1, 1,1,0,1,0, 0,1,0,0,1, 1,0,1,0,0, 1,0,0,0,0,1,
+/* O */ 0,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
+/* P */ 1,0,0,0,1, 1,1,1,0,0, 1,1,1,1,0, 0,0,1,0,1, 0,0,1,0,1,0,
+/* Q */ 1,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
+/* R */ 0,0,0,0,1, 0,0,0,0,0, 0,0,0,0,1, 0,0,0,0,0, 1,0,1,0,0,0,
+/* S */ 1,1,1,1,1, 0,1,1,1,1, 1,1,1,1,1, 0,0,1,0,1, 1,1,0,0,1,1,
+/* T */ 0,0,1,1,0, 1,1,1,0,1, 1,0,1,1,1, 1,0,1,0,1, 0,1,1,0,0,1,
+/* U */ 1,0,0,0,0, 0,1,0,0,0, 1,0,1,0,0, 0,0,0,1,0, 0,0,0,0,1,1,
+/* V */ 1,0,1,0,1, 0,1,0,1,0, 0,0,0,1,0, 0,0,0,0,0, 1,0,0,0,0,0,
+/* W */ 0,0,0,0,0, 1,0,0,0,0, 0,0,0,0,0, 0,0,0,1,0, 0,0,0,0,0,0,
+/* X */ 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
+/* Y */ 0,0,0,0,1, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,1, 1,0,0,0,0,0,
+/* Z */ 1,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,0,0,0,1
+/*      A B C D E  F G H I J  K L M N O  P Q R S T  U V W X Y Z */
+};
+
+
+/*
+ * valid domains with 3 or more characters
+ *
+ * later add: nom, rec, web, arts, firm, info, shop
+ */
+static const char *gnksa_domain_list[] = {
+	"com",
+	"edu",
+	"gov",
+	"int",
+	"mil",
+	"net",
+	"org",
+	"arpa",
+	"uucp",
+	"bitnet",
+	"invalid",
+	/* sentinel */
+	""
+};
+
+
+/*
+ * return error message string for given code
+ */
+const char *
+gnksa_strerror(
+	int errcode)
+{
+	const char *message;
+
+	switch (errcode) {
+		case GNKSA_INTERNAL_ERROR:
+			message = txt_error_gnksa_internal;
+			break;
+
+		case GNKSA_LANGLE_MISSING:
+			message = txt_error_gnksa_langle;
+			break;
+
+		case GNKSA_LPAREN_MISSING:
+			message = txt_error_gnksa_lparen;
+			break;
+
+		case GNKSA_RPAREN_MISSING:
+			message = txt_error_gnksa_rparen;
+			break;
+
+		case GNKSA_ATSIGN_MISSING:
+			message = txt_error_gnksa_atsign;
+			break;
+
+		case GNKSA_SINGLE_DOMAIN:
+			message = txt_error_gnksa_sgl_domain;
+			break;
+
+		case GNKSA_INVALID_DOMAIN:
+			message = txt_error_gnksa_inv_domain;
+			break;
+
+		case GNKSA_ILLEGAL_DOMAIN:
+			message = txt_error_gnksa_ill_domain;
+			break;
+
+		case GNKSA_UNKNOWN_DOMAIN:
+			message = txt_error_gnksa_unk_domain;
+			break;
+
+		case GNKSA_INVALID_FQDN_CHAR:
+			message = txt_error_gnksa_fqdn;
+			break;
+
+		case GNKSA_ZERO_LENGTH_LABEL:
+			message = txt_error_gnksa_zero;
+			break;
+
+		case GNKSA_ILLEGAL_LABEL_LENGTH:
+			message = txt_error_gnksa_length;
+			break;
+
+		case GNKSA_ILLEGAL_LABEL_HYPHEN:
+			message = txt_error_gnksa_hyphen;
+			break;
+
+		case GNKSA_ILLEGAL_LABEL_BEGNUM:
+			message = txt_error_gnksa_begnum;
+			break;
+
+		case GNKSA_BAD_DOMAIN_LITERAL:
+			message = txt_error_gnksa_bad_lit;
+			break;
+
+		case GNKSA_LOCAL_DOMAIN_LITERAL:
+			message = txt_error_gnksa_local_lit;
+			break;
+
+		case GNKSA_RBRACKET_MISSING:
+			message = txt_error_gnksa_rbracket;
+			break;
+
+		case GNKSA_LOCALPART_MISSING:
+			message = txt_error_gnksa_lp_missing;
+			break;
+
+		case GNKSA_INVALID_LOCALPART:
+			message = txt_error_gnksa_lp_invalid;
+			break;
+
+		case GNKSA_ZERO_LENGTH_LOCAL_WORD:
+			message = txt_error_gnksa_lp_zero;
+			break;
+
+		case GNKSA_ILLEGAL_UNQUOTED_CHAR:
+			message = txt_error_gnksa_rn_unq;
+			break;
+
+		case GNKSA_ILLEGAL_QUOTED_CHAR:
+			message = txt_error_gnksa_rn_qtd;
+			break;
+
+		case GNKSA_ILLEGAL_ENCODED_CHAR:
+			message = txt_error_gnksa_rn_enc;
+			break;
+
+		case GNKSA_BAD_ENCODE_SYNTAX:
+			message = txt_error_gnksa_rn_encsyn;
+			break;
+
+		case GNKSA_OK:
+		default:
+			/* shouldn't happen */
+			message = "";
+			break;
+	}
+
+	return message;
+}
+
+
+/*
+ * decode realname into displayable string
+ * this only does RFC822 decoding, decoding RFC2047 encoded parts must
+ * be done by another call to the appropriate function
+ */
+int
+gnksa_dequote_plainphrase(
+	char *realname,
+	char *decoded)
+{
+	char *rpos;	/* read position */
+	char *wpos;	/* write position */
+	int state;
+
+	state = 0;
+	rpos = realname;
+	wpos = decoded;
+	while (*rpos) {
+		switch (state) {
+			case 0:
+				/* in unquoted word */
+				switch (*rpos) {
+					case '"':
+						state = 1;
+						rpos++;
+						break;
+
+					case '!':
+					case '(':
+					case ')':
+					case '<':
+					case '>':
+					case '@':
+					case ',':
+					case ';':
+					case ':':
+					case '\\':
+					case '.':
+					case '[':
+					case ']':
+						return GNKSA_ILLEGAL_UNQUOTED_CHAR;
+						break;
+
+					case '=':
+						*(wpos++) = *(rpos++);
+						if ('?' == *rpos) {
+							state = 2;
+							*(wpos++) = *(rpos++);
+						} else
+							state = 0;
+						break;
+
+					default:
+						state = 0;
+						*(wpos++) = *(rpos++);
+						break;
+				}
+				break;
+
+			case 1:
+				/* in quoted word */
+				switch (*rpos) {
+					case '"':
+						state = 0;
+						rpos++;
+						break;
+
+					case '(':
+					case ')':
+					case '<':
+					case '>':
+					case '\\':
+						return GNKSA_ILLEGAL_QUOTED_CHAR;
+						break;
+
+					default:
+						state = 1;
+						*(wpos++) = *(rpos++);
+						break;
+				}
+				break;
+
+			case 2:
+				/* in encoded word, charset part */
+				switch (*rpos) {
+					case '?':
+						state = 3;
+						*(wpos++) = *(rpos++);
+						break;
+
+					case '!':
+					case '(':
+					case ')':
+					case '<':
+					case '>':
+					case '@':
+					case ',':
+					case ';':
+					case ':':
+					case '\\':
+					case '"':
+					case '[':
+					case ']':
+					case '/':
+					case '=':
+						return GNKSA_ILLEGAL_ENCODED_CHAR;
+						break;
+
+					default:
+						state = 2;
+						*(wpos++) = *(rpos++);
+						break;
+				}
+				break;
+
+			case 3:
+				/* in encoded word, encoding part */
+				switch (*rpos) {
+					case '?':
+						state = 4;
+						*(wpos++) = *(rpos++);
+						break;
+
+					case '!':
+					case '(':
+					case ')':
+					case '<':
+					case '>':
+					case '@':
+					case ',':
+					case ';':
+					case ':':
+					case '\\':
+					case '"':
+					case '[':
+					case ']':
+					case '/':
+					case '=':
+						return GNKSA_ILLEGAL_ENCODED_CHAR;
+						break;
+
+					default:
+						state = 3;
+						*(wpos++) = *(rpos++);
+						break;
+				}
+				break;
+
+			case 4:
+				/* in encoded word, codes part */
+				switch (*rpos) {
+					case '?':
+						*(wpos++) = *(rpos++);
+						if ('=' == *rpos) {
+							state = 0;
+							*(wpos++) = *(rpos++);
+						} else
+							return GNKSA_BAD_ENCODE_SYNTAX;
+						break;
+
+					default:
+						state = 4;
+						*(wpos++) = *(rpos++);
+						break;
+					}
+				break;
+
+			default:
+				/* shouldn't happen */
+				return GNKSA_INTERNAL_ERROR;
+		}
+	}
+	/* successful */
+	*wpos = '\0';
+	return GNKSA_OK;
+}
+
+
+/*
+ * check domain literal
+ */
+int
+gnksa_check_domain_literal(
+	char *domain)
+{
+	char term;
+	int n;
+	int x1, x2, x3, x4;
+
+	/* parse domain literal into ip number */
+	x1 = x2 = x3 = x4 = 666;
+	term = '\0';
+
+	if ('[' == *domain) { /* literal bracketed */
+		n = sscanf(domain, "[%u.%u.%u.%u%c", &x1, &x2, &x3, &x4, &term);
+		if (5 != n)
+			return GNKSA_BAD_DOMAIN_LITERAL;
+
+		if (']' != term)
+			return GNKSA_BAD_DOMAIN_LITERAL;
+
+	} else { /* literal not bracketed */
+#ifdef REQUIRE_BRACKETS_IN_DOMAIN_LITERAL
+		return GNKSA_RBRACKET_MISSING;
+#else
+		n = sscanf(domain, "%u.%u.%u.%u%c", &x1, &x2, &x3, &x4, &term);
+		/* there should be no terminating character present */
+		if (4 != n)
+			return GNKSA_BAD_DOMAIN_LITERAL;
+#endif /* REQUIRE_BRACKETS_IN_DOMAIN_LITERAL */
+	}
+
+	/* check ip parts for legal range */
+	if ((255 < x1) || (255 < x2) || (255 < x3) || (255 < x4))
+		return GNKSA_BAD_DOMAIN_LITERAL;
+
+	/* check for private ip or localhost */
+	if ((0 == x1)											/* local network */
+		|| (10 == x1)										/* private class A */
+		|| ((172 == x1) && (16 == (x2 & 0xf0)))	/* private class B */
+		|| ((192 == x1) && (168 == x2))				/* private class C */
+		|| (127 == x1))									/* localhost */
+		return GNKSA_LOCAL_DOMAIN_LITERAL;
+
+
+	return GNKSA_OK;
+}
+
+
+int
+gnksa_check_domain (
+	char *domain)
+{
+	char *aux;
+	char *last;
+	int i;
+	int result;
+
+	/* check for domain literal */
+	if ('[' == *domain) /* check value of domain literal */
+		 return gnksa_check_domain_literal(domain);
+
+	/* check for leading or trailing dot */
+	if (('.' == *domain) || ('.' == *(domain+strlen(domain)-1)))
+		return GNKSA_ZERO_LENGTH_LABEL;
+
+	/* look for TLD start */
+	aux = strrchr(domain, '.');
+	if (NULL == aux)
+		return GNKSA_SINGLE_DOMAIN;
+
+	aux++;
+
+	/* check existence of toplevel domain */
+	switch ((int) strlen(aux)) {
+		case 1:
+			/* no numeric components allowed */
+			if (('0' <= *aux) && ('9' >= *aux))
+				return gnksa_check_domain_literal(domain);
+
+			/* single letter TLDs do not exist */
+			return GNKSA_ILLEGAL_DOMAIN;
+			break;
+
+		case 2:
+			/* no numeric components allowed */
+			if (('0' <= *aux) && ('9' >= *aux)
+			    && ('0' <= *(aux + 1)) && ('9' >= *(aux + 1)))
+			    return gnksa_check_domain_literal(domain);
+
+			if (('a' <= *aux) && ('z' >= *aux)
+			    && ('a' <= *(aux + 1)) && ('z' >= *(aux + 1))) {
+				i = ((*aux - 'a') * 26) + (*(aux + 1)) - 'a';
+				if (!gnksa_country_codes[i])
+					return GNKSA_UNKNOWN_DOMAIN;
+			} else
+				return GNKSA_ILLEGAL_DOMAIN;
+			break;
+
+		case 3:
+			/* no numeric components allowed */
+			if (('0' <= *aux) && ('9' >= *aux)
+			    && ('0' <= *(aux + 1)) && ('9' >= *(aux + 1))
+			    && ('0' <= *(aux + 2)) && ('9' >= *(aux + 2)))
+			    return gnksa_check_domain_literal(domain);
+		/* FALLTHROUGH */
+		default:
+			/* check for valid domains */
+			result = GNKSA_INVALID_DOMAIN;
+			for (i = 0; *gnksa_domain_list[i]; i++) {
+				if (!strcmp(aux, gnksa_domain_list[i]))
+					result = GNKSA_OK;
+			}
+			if (GNKSA_OK != result)
+				return result;
+			break;
+	}
+
+	/* check for illegal labels */
+	last = domain;
+	for (aux = domain; *aux; aux++) {
+		if ('.' == *aux) {
+			if (aux - last - 1 > 63)
+				return GNKSA_ILLEGAL_LABEL_LENGTH;
+
+			if ('.' == *(aux + 1))
+				return GNKSA_ZERO_LENGTH_LABEL;
+
+			if (('-' == *(aux + 1)) || ('-' == *(aux - 1)))
+				return GNKSA_ILLEGAL_LABEL_HYPHEN;
+
+#ifdef ENFORCE_RFC1034
+			if (('0' <= *(aux + 1)) && ('9' >= *(aux + 1)))
+				return GNKSA_ILLEGAL_LABEL_BEGNUM;
+#endif /* ENFORCE_RFC1034 */
+			last = aux;
+		}
+	}
+
+	/* check for illegal characters in FQDN */
+	for (aux = domain; *aux; aux++) {
+		if (!gnksa_legal_fqdn_chars[(int) *aux])
+			return GNKSA_INVALID_FQDN_CHAR;
+	}
+
+	return GNKSA_OK;
+}
+
+
+/*
+ * check localpart of address
+ */
+int
+gnksa_check_localpart(
+	char *localpart)
+{
+	char *aux;
+
+	/* no localpart at all? */
+	if (!*localpart)
+		return GNKSA_LOCALPART_MISSING;
+
+	/* check for zero-length domain parts */
+	if (('.' == *localpart) || ('.' == *(localpart + strlen(localpart) -1)))
+		return GNKSA_ZERO_LENGTH_LOCAL_WORD;
+
+	for (aux = localpart; *aux; aux++) {
+		if (('.' == *aux) && ('.' == *(aux + 1)))
+			return GNKSA_ZERO_LENGTH_LOCAL_WORD;
+	}
+
+	/* check for illegal characters in FQDN */
+	for (aux = localpart; *aux; aux++) {
+		if (!gnksa_legal_localpart_chars[(int) *aux])
+			return GNKSA_INVALID_LOCALPART;
+	}
+
+	return GNKSA_OK;
+}
+
+
+/*
+ * split mail address into realname and address parts
+ */
+int
+gnksa_split_from(
+	char *from,
+	char *address,
+	char *realname)
+{
+	char *addr_begin;
+	char *addr_end;
+	char work[HEADER_LEN];
+
+	/* init return variables */
+	*address = *realname = '\0';
+
+	/* copy raw address into work area */
+	strncpy(work, from, 998);
+	work[998] = '\0';
+	work[999] = '\0';
+
+	/* skip trailing whitespace */
+	addr_end = work + strlen(work) - 1;
+	while ((' ' == *addr_end) || ('\t' == *addr_end))
+		addr_end--;
+
+	*(addr_end + 1) = '\0';
+	*(addr_end + 2) = '\0';
+
+	if ('>' == *addr_end) {
+		/* route-address used */
+
+		/* get address part */
+		addr_begin = addr_end;
+		while (('<' != *addr_begin) && (addr_begin > work))
+			addr_begin--;
+
+		if ('<' != *addr_begin) /* syntax error in mail address */
+			return GNKSA_LANGLE_MISSING;
+
+		/* copy route address */
+		*addr_end = *addr_begin = '\0';
+		strcpy(address, addr_begin + 1);
+
+		/* get realname part */
+		addr_end = addr_begin - 1;
+		addr_begin = work;
+
+		/* strip surrounding whitespace */
+		while ((' ' == *addr_end) || ('\t' == *addr_end))
+			addr_end--;
+
+		while ((' ' == *addr_begin) || ('\t' == *addr_begin))
+			addr_begin++;
+
+		*++addr_end = '\0';
+		/* copy realname */
+		strcpy(realname, addr_begin);
+	} else {
+		/* old-style address used */
+
+		/* get address part */
+		/* skip leading whitespace */
+		addr_begin = work;
+		while ((' ' == *addr_begin) || ('\t' == *addr_begin))
+			addr_begin++;
+
+		/* scan forward to next whitespace or null */
+		addr_end = addr_begin;
+		while ((' ' != *addr_end) && ('\t' != *addr_end) && (*addr_end))
+			addr_end++;
+
+		*addr_end = '\0';
+		/* copy route address */
+		strcpy(address, addr_begin);
+
+		/* get realname part */
+		addr_begin = addr_end + 1;
+		addr_end = addr_begin + strlen(addr_begin) -1;
+		/* strip surrounding whitespace */
+		while ((' ' == *addr_end) || ('\t' == *addr_end))
+			addr_end--;
+
+		while ((' ' == *addr_begin) || ('\t' == *addr_begin))
+			addr_begin++;
+
+		/* any realname at all? */
+		if (*addr_begin) {
+			/* check for parentheses */
+			if ('(' != *addr_begin)
+				return GNKSA_LPAREN_MISSING;
+
+			if (')' != *addr_end)
+				return GNKSA_RPAREN_MISSING;
+
+			/* copy realname */
+			*addr_end = '\0';
+			strcpy(realname, addr_begin + 1);
+		} else /* no realname */
+			realname[0] = '\0';
+	}
+
+	/* split successful */
+	return GNKSA_OK;
+}
+
+
+/*
+ * restrictive check for valid address conforming to RFC 1036, son-of-rfc1036
+ * and draft-usefor-article-xx.txt
+ */
+int
+gnksa_do_check_from(
+	char *from,
+	char *address,
+	char *realname)
+{
+	char *addr_begin;
+	char *aux;
+	char decoded[HEADER_LEN] = "";
+	int result;
+
+	/* split from */
+	if (GNKSA_OK != (result = gnksa_split_from(from, address, realname))) /* error detected */
+		return result;
+
+	/* parse address */
+	addr_begin = strrchr(address, '@');
+	if (NULL == addr_begin)
+		return GNKSA_ATSIGN_MISSING;
+
+	/* temporarily terminate string at separator position */
+	*addr_begin++ = '\0';
+
+	/* convert FQDN part to lowercase */
+	for (aux = addr_begin; *aux; aux++)
+		*aux = tolower(*aux);
+
+	if (GNKSA_OK != (result = gnksa_check_domain(addr_begin)))	/* error detected */
+		return result;
+
+	if (GNKSA_OK != (result = gnksa_check_localpart(address)))	/* error detected */
+		return result;
+
+	/* restore separator character */
+	*--addr_begin= '@';
+
+	/* check realname */
+	if (GNKSA_OK != (result = gnksa_dequote_plainphrase(realname, decoded)))	/* error detected */
+		return result;
+	else	/* copy dequoted realname to result variable */
+		strcpy(realname, decoded);
+
+	/* successful */
+	return GNKSA_OK;
+}
+
+
+/*
+ * check given address
+ */
+int
+gnksa_check_from(
+	char *from)
+{
+	char address[HEADER_LEN] = "";
+	char realname[HEADER_LEN] = "";
+
+	return gnksa_do_check_from(from, address, realname);
+}
+
+
+#if 1
+/*
+ * parse given address
+ * return error code on GNKSA check failure
+ */
+int
+parse_from(
+	char *from,
+	char *address,
+	char *realname)
+{
+	return gnksa_do_check_from(from, address, realname);
+}
+#endif /* 1 */

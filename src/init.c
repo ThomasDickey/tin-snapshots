@@ -129,8 +129,7 @@ char xpost_quote_format[PATH_LEN];
 int MORE_POS;				/* set in set_win_size () */
 int NOTESLINES;				/* set in set_win_size () */
 int RIGHT_POS;				/* set in set_win_size () */
-int default_auto_save_msg;		/* save posted message to ~/Mail/posted */
-int default_filter_days;		/* num of days an article  filter can be active */
+int default_filter_days;		/* num of days an article filter can be active */
 int default_filter_kill_header;
 int default_filter_select_header;
 int default_post_proc_type;		/* type of post processing to be performed */
@@ -167,6 +166,8 @@ uid_t tin_uid;
 int top = 0;
 int top_base;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
+
+int getart_limit = 0;	/* number of article to get */
 
 #ifdef HAVE_COLOR
 	int col_back;			/* standard background color */
@@ -266,6 +267,7 @@ t_bool save_to_mmdf_mailbox;	/* save mail to MMDF/mbox format mailbox */
 t_bool show_description;
 t_bool show_last_line_prev_page; /* set TRUE to see last line of prev page (ala nn) */
 t_bool show_lines;
+t_bool show_score;
 t_bool show_signatures;		/* show signatures when displaying articles */
 t_bool show_only_unread_groups;	/* set TRUE to see only subscribed groups with new news */
 t_bool show_xcommentto;		/* set TRUE to show X-Comment-To in upper right corner */
@@ -284,6 +286,7 @@ t_bool batch_mode;			/* update index files only mode */
 t_bool unlink_article;
 t_bool update_fork = FALSE;	/* update index files by forked tin -u */
 t_bool use_builtin_inews;
+t_bool use_getart_limit = FALSE;
 t_bool use_keypad;		/* enables/disables scroll keys on supported terminals */
 t_bool use_mailreader_i;	/* invoke user's mailreader earlier to use more of its features (i = interactive) */
 t_bool use_mouse;		/* enables/disables mouse support under xterm */
@@ -496,9 +499,8 @@ void init_selfinfo (void)
 		my_strncpy (homedir, ptr, sizeof (homedir));
 	} else if (!myentry) {
 		strcpy (homedir, "/tmp");
-	} else {
+	} else
 		my_strncpy (homedir, myentry->pw_dir, sizeof (homedir));
-	}
 #endif	/* M_AMIGA */
 
 	/*
@@ -539,7 +541,6 @@ void init_selfinfo (void)
 #endif
 	dangerous_signal_exit = FALSE;
 	default_auto_save = FALSE;
-	default_auto_save_msg = FALSE;
 	default_batch_save = FALSE;
 	default_filter_days = DEFAULT_FILTER_DAYS;
 	default_filter_kill_header = FILTER_SUBJ_CASE_SENSITIVE;
@@ -602,6 +603,7 @@ void init_selfinfo (void)
 #endif
 	show_last_line_prev_page = FALSE;
 	show_lines = TRUE;
+	show_score = FALSE;
 	show_description = TRUE;
 	show_only_unread_groups = FALSE;
 	show_signatures = TRUE;
@@ -688,8 +690,7 @@ void init_selfinfo (void)
 	post_proc_command[0] = '\0';
 	proc_ch_default = 'n';
 	strcpy (news_headers_to_display, "Newsgroups Followup-To Summary Keywords");
-	news_headers_to_display_array = ulBuildArgv(news_headers_to_display,
-															  &num_headers_to_display);
+	news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 	news_headers_to_not_display[0] = '\0';
 	news_headers_to_not_display_array = NULL;
 
@@ -820,7 +821,7 @@ void init_selfinfo (void)
 	joinpath (article, homedir, ".article");
 #endif /* VMS */
 #ifdef APPEND_PID
-	sprintf (article+strlen(article), ".%d", process_id);
+	sprintf (article+strlen(article), ".%d", (int) process_id);
 #endif /* APPEND_PID */
 	joinpath (dead_article, homedir, "dead.article");
 	joinpath (dead_articles, homedir, "dead.articles");
@@ -840,12 +841,6 @@ void init_selfinfo (void)
 #else /* VMS */
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
 #endif /* VMS */
-
-/* check is done in ~ line 921 again, so this is not needed */
-#if 0
-	if (stat (index_newsdir, &sb) == -1)
-		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
-#endif /* 0 */
 
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
@@ -878,9 +873,9 @@ void init_selfinfo (void)
 #else /* WIN32 */
 	joinpath (newsrc, homedir, NEWSRC_FILE);
 	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
-#ifdef APPEND_PID
-	sprintf(newnewsrc+strlen(newnewsrc), "%d", process_id);
-#endif /* APPEND_PID */
+#	ifdef APPEND_PID
+	sprintf(newnewsrc+strlen(newnewsrc), "%d", (int) process_id);
+#	endif /* APPEND_PID */
 #endif /* WIN32 */
 	joinpath (posted_info_file, rcdir, POSTED_FILE);
 	joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
@@ -1050,19 +1045,17 @@ create_mail_save_dirs (void)
 	char path[PATH_LEN];
 	struct stat sb;
 
-	if (!strfpath (default_maildir, path, sizeof (path),
-	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
+	if (!strfpath (default_maildir, path, sizeof (path), homedir, (char *) 0, (char *) 0, (char *) 0))
 		joinpath (path, homedir, DEFAULT_MAILDIR);
-	}
+
 	if (stat (path, &sb) == -1) {
 		my_mkdir (path, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;
 	}
 
-	if (!strfpath (default_savedir, path, sizeof (path),
-	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
+	if (!strfpath (default_savedir, path, sizeof (path), homedir, (char *) 0, (char *) 0, (char *) 0))
 		joinpath (path, homedir, DEFAULT_SAVEDIR);
-	}
+
 	if (stat (path, &sb) == -1) {
 		my_mkdir (path, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;

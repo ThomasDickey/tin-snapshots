@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : tnntp.h
  *  Author    : Thomas Dickey <dickey@clark.net>
- *  Created   : 05.03.1997
- *  Updated   : 01.12.1997
+ *  Created   : 1997-03-05
+ *  Updated   : 1997-12-01
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1997 by Thomas Dickey
  *	             You may  freely  copy or  redistribute  this software,

@@ -242,9 +242,8 @@ msg_add_header (
 			if (STRCMPEQ(msg_headers[i].name, new_name)) {
 				FreeAndNull (msg_headers[i].text);
 				if (text) {
-					for (p = text; *p && (*p == ' ' || *p == '\t'); p++) {
+					for (p = text; *p && (*p == ' ' || *p == '\t'); p++)
 						;
-					}
 					new_text = my_strdup (p);
 					ptr = strchr (new_text, '\n');
 					if (ptr)
@@ -262,9 +261,8 @@ msg_add_header (
 		if (!(done || msg_headers[i].name)) {
 			msg_headers[i].name = my_strdup (new_name);
 			if (text) {
-				for (p = text; *p && (*p == ' ' || *p == '\t'); p++) {
+				for (p = text; *p && (*p == ' ' || *p == '\t'); p++)
 					;
-				}
 				new_text = my_strdup (p);
 				ptr = strchr (new_text, '\n');
 				if (ptr)
@@ -451,7 +449,7 @@ check_article_to_be_posted (
 	char line[HEADER_LEN], *cp, *cp2;
 	char subject[HEADER_LEN];
 	int cnt = 0;
-	int col, len, i;
+	int col, len, i = 0;
 	int errors = 0;
 	int init = TRUE;
 	int ngcnt = 0;
@@ -543,11 +541,69 @@ check_article_to_be_posted (
 			errors++;
 		}
 #endif /* !FORGERY */
+		if (cp - line == 8 && !strncasecmp (line, "Approved", 8)) {
+			if (beginner_level) {
+				StartInverse();
+				my_fprintf (stderr, txt_error_approved, i);
+				my_fflush (stderr);
+				EndInverse();
+#ifdef HAVE_FASCIST_NEWSADMIN
+				errors++;
+#endif /* HAVE_FASCIST_NEWSADMIN */
+			}
+			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+				StartInverse();
+				my_fprintf (stderr, txt_error_bad_approved, i);
+				my_fprintf (stderr, gnksa_strerror(i), i);
+				my_fflush (stderr);
+				EndInverse();
+#ifndef FORGERY
+				errors++;
+#endif /* !FORGERY */
+			}
+		}
+		if (cp - line == 4 && !strncasecmp (line, "From", 4)) {
+			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+				StartInverse();
+				my_fprintf (stderr, txt_error_bad_from, i);
+				my_fprintf (stderr, gnksa_strerror(i), i);
+				my_fflush (stderr);
+				EndInverse();
+#ifndef FORGERY
+				errors++;
+#endif /* !FORGERY */
+			}
+		}
+
+		if (cp - line == 8 && !strncasecmp (line, "Reply-To", 8)) {
+			if (GNKSA_OK != (i = gnksa_check_from (cp+1))) {
+				StartInverse();
+				my_fprintf (stderr, txt_error_bad_replyto, i);
+				my_fprintf (stderr, gnksa_strerror(i), i);
+				my_fflush (stderr);
+				EndInverse();
+#ifndef FORGERY
+				errors++;
+#endif /* !FORGERY */
+			}
+		}
+		if (cp - line == 10 && !strncasecmp (line, "Message-Id", 10)) {
+			i = gnksa_check_from (cp+1);
+			if ((GNKSA_OK != i) && (GNKSA_LOCALPART_MISSING > i)) {
+				StartInverse();
+				my_fprintf (stderr, txt_error_bad_msgidfqdn, i);
+				my_fprintf (stderr, gnksa_strerror(i), i);
+				my_fflush (stderr);
+				EndInverse();
+#ifndef FORGERY
+				errors++;
+#endif /* !FORGERY */
+			}
+		}
 		if (cp - line == 10 && !strncasecmp (line, "Newsgroups", 10)) {
 			found_newsgroups_line = TRUE;
-			for (cp = line + 11; *cp == ' '; cp++) {
+			for (cp = line + 11; *cp == ' '; cp++)
 				;
-			}
 			if (strchr (cp, ' ')) {
 				setup_check_article_screen (&init);
 				StartInverse();
@@ -586,7 +642,7 @@ check_article_to_be_posted (
 				errors++;
 				continue;
 			}
-			if((c = fgetc(fp)) != EOF) {
+			if ((c = fgetc(fp)) != EOF) {
 				ungetc(c, fp);
 				if (isspace (c) && c != '\n') {
 					setup_check_article_screen (&init);
@@ -600,9 +656,8 @@ check_article_to_be_posted (
 			}
 		}
 		if (cp - line == 11 && !strncasecmp (line, "Followup-To", 11)) {
-			for (cp = line + 12; *cp == ' '; cp++) {
+			for (cp = line + 12; *cp == ' '; cp++)
 				;
-			}
 			if (strlen(cp)) /* Followup-To not empty*/
 				found_followup_to = TRUE;
 			strip_double_ngs (cp);
@@ -617,7 +672,7 @@ check_article_to_be_posted (
 				errors++;
 				continue;
 			}
-			if((c = fgetc(fp)) != EOF) {
+			if ((c = fgetc(fp)) != EOF) {
 				ungetc(c, fp);
 				if (isspace(c) && c != '\n') {
 					setup_check_article_screen (&init);
@@ -1017,7 +1072,7 @@ quick_post_article (
 	if (psGrp)
 		start_line_offset += msg_add_x_body (fp, psGrp->attribute->x_body);
 
-	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
+	msg_write_signature (fp, FALSE, &CURR_GROUP);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -1096,6 +1151,7 @@ post_article_done:
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
 			if (add_posted_to_filter)
 				quick_filter_select_posted_art (psGrp, subj);
+
 			update_posted_info_file (group, 'w', subj);
 		} else
 			subj[0] = '\0';
@@ -1218,14 +1274,16 @@ post_article_done:
 	if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
 		update_active_after_posting (group);
 
-		/* Hmmm? What's the difference between subject and subj?  */
+		/* Hmmm? What's the difference between subject and subj? */
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-		   /* we currently do not add autoselect for
+		   /*
+		    * we currently do not add autoselect for
 		    * crossposted postponed articles, since we don't
 		    * know in which group the article was actually in
 		    */
 			if (add_posted_to_filter && !strchr(group, ',') && (psGrp = psGrpFind(group)))
 				quick_filter_select_posted_art (psGrp, subj);
+
 			update_posted_info_file (group, strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
 		} else
 			subj[0] = '\0';
@@ -1583,7 +1641,7 @@ post_article (
 	msg_free_headers ();
 	lines = msg_add_x_body (fp, psGrp->attribute->x_body);
 	start_line_offset += lines;
-	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
+	msg_write_signature (fp, FALSE, &CURR_GROUP);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -1688,8 +1746,10 @@ post_article_postponed:
 }
 
 
-/* yeah, right, that's from the same Chris who is telling Jason he's
-   doing obfuscated C :-) */
+/*
+ * yeah, right, that's from the same Chris who is telling Jason he's
+ * doing obfuscated C :-)
+ */
 static void
 appendid (
 	char **where,
@@ -1775,13 +1835,16 @@ is_crosspost (
 	return (count>=2) ? TRUE : FALSE;
 }
 
-/* Widespread news software like INN's nnrpd restricts the size of several
-   headers, notably the references header, to 512 characters.  Oh well...
-   guess that's what son-of-1036 calls a "desparate last resort" :-/
-   From TIN's point of view, this could be HEADER_LEN. */
+/*
+ * Widespread news software like INN's nnrpd restricts the size of several
+ * headers, notably the references header, to 512 characters.  Oh well...
+ * guess that's what son-of-1036 calls a "desparate last resort" :-/
+ * From TIN's point of view, this could be HEADER_LEN.
+ */
 #define MAXREFSIZE 512
 
-/* TODO - if we have the art[x] that we are following up to, then
+/*
+ * TODO - if we have the art[x] that we are following up to, then
  *        get_references(art[x].refptr) will give us the new refs line
  */
 
@@ -1791,18 +1854,23 @@ join_references (
 	char *oldrefs,
 	const char *newref)
 {
-	/* First of all: shortening references is a VERY BAD IDEA.
-	   Nevertheless, current software usually has restrictions in
-	   header length (their programmers seem to misinterpret RFC821
-	   as valid for news, and the command length limit of RFC977
-	   as valid for headers) */
-	/* construct a new references line, then trim it if necessary */
-	/* do some sanity cleanups: remove damaged ids, make
-	   sure there is space between ids (tabs and commas are stripped) */
-	/* note that we're not doing strict son-of-1036 here: we don't
-	   take any precautions to keep the last three message ids, but
-	   it's not very likely that MAXREFSIZE chars can't hold at least
-	   4 refs */
+	/*
+	 * First of all: shortening references is a VERY BAD IDEA.
+	 * Nevertheless, current software usually has restrictions in
+	 * header length (their programmers seem to misinterpret RFC821
+	 * as valid for news, and the command length limit of RFC977
+	 * as valid for headers)
+	 *
+	 * construct a new references line, then trim it if necessary
+	 *
+	 * do some sanity cleanups: remove damaged ids, make
+	 * sure there is space between ids (tabs and commas are stripped)
+	 *
+	 * note that we're not doing strict son-of-1036 here: we don't
+	 * take any precautions to keep the last three message ids, but
+	 * it's not very likely that MAXREFSIZE chars can't hold at least
+	 * 4 refs
+	 */
 	char *b, *c, *d;
 	const char *e;
 	int space;
@@ -1859,28 +1927,29 @@ join_references (
 	free (b);
 	return;
 
-	/* son-of-1036 says:
-	   Followup agents SHOULD not shorten References  headers.   If
-	   it  is absolutely necessary to shorten the header, as a des-
-	   perate last resort, a followup agent MAY do this by deleting
-	   some  of  the  message IDs.  However, it MUST not delete the
-	   first message ID, the last three message IDs (including that
-	   of  the immediate precursor), or any message ID mentioned in
-	   the body of the followup.  If it is possible  for  the  fol-
-	   lowup agent to determine the Subject content of the articles
-	   identified in the References header, it MUST not delete  the
-	   message  ID of any article where the Subject content changed
-	   (other than by prepending of a back  reference).   The  fol-
-	   lowup  agent MUST not delete any message ID whose local part
-	   ends with "_-_" (underscore (ASCII 95), hyphen  (ASCII  45),
-	   underscore);  followup  agents are urged to use this form to
-	   mark subject changes, and to avoid using it otherwise.
-	   [...]
-	   When a References header is shortened, at least three blanks
-	   SHOULD be left between adjacent message IDs  at  each  point
-	   where  deletions  were  made.  Software preparing new Refer-
-	   ences headers SHOULD preserve multiple blanks in older  Ref-
-	   erences content.
+	/*
+	 * son-of-1036 says:
+	 * Followup agents SHOULD not shorten References  headers.   If
+	 * it  is absolutely necessary to shorten the header, as a des-
+	 * perate last resort, a followup agent MAY do this by deleting
+	 * some  of  the  message IDs.  However, it MUST not delete the
+	 * first message ID, the last three message IDs (including that
+	 * of  the immediate precursor), or any message ID mentioned in
+	 * the body of the followup.  If it is possible  for  the  fol-
+	 * lowup agent to determine the Subject content of the articles
+	 * identified in the References header, it MUST not delete  the
+	 * message  ID of any article where the Subject content changed
+	 * (other than by prepending of a back  reference).   The  fol-
+	 * lowup  agent MUST not delete any message ID whose local part
+	 * ends with "_-_" (underscore (ASCII 95), hyphen  (ASCII  45),
+	 * underscore);  followup  agents are urged to use this form to
+	 * mark subject changes, and to avoid using it otherwise.
+	 * [...]
+	 * When a References header is shortened, at least three blanks
+	 * SHOULD be left between adjacent message IDs  at  each  point
+	 * where  deletions  were  made.  Software preparing new Refer-
+	 * ences headers SHOULD preserve multiple blanks in older  Ref-
+	 * erences content.
 	 */
 }
 
@@ -1910,14 +1979,14 @@ post_response (
 	wait_message (0, txt_post_a_followup);
 
 	/*
-	 *  Remove duplicates in Newsgroups and Followup-To line
+	 * Remove duplicates in Newsgroups and Followup-To line
 	 */
 	strip_double_ngs (note_h.newsgroups);
 	if (*note_h.followup)
 		strip_double_ngs (note_h.followup);
 
 	if (*note_h.followup && STRCMPEQ(note_h.followup, "poster")) {
-/*		clear_message ();*/
+/*		clear_message (); */
 		ch = prompt_slk_response(iKeyPageMail, "\033mpyq", txt_resp_to_poster);
 		switch (ch) {
 			case iKeyPostPost:
@@ -1983,9 +2052,8 @@ post_response (
 	sprintf (bigbuf, "Re: %s", eat_re (note_h.subj, TRUE));
 	msg_add_header ("Subject", bigbuf);
 
-	if (psGrp && psGrp->attribute->x_comment_to && *note_h.from) {
+	if (psGrp && psGrp->attribute->x_comment_to && *note_h.from)
 		msg_add_header ("X-Comment-To", note_h.from);
-	}
 	if (*note_h.followup && strcmp (note_h.followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h.followup);
 		if (prompt_followupto)
@@ -2077,7 +2145,7 @@ post_response (
 	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 
-	msg_write_signature (fp, FALSE, &active[my_group[cur_groupnum]]);
+	msg_write_signature (fp, FALSE, &CURR_GROUP);
 	fclose (fp);
 
 	ch = iKeyPostEdit;
@@ -2208,7 +2276,7 @@ mail_to_someone (
 #else
 	joinpath (nam, homedir, ".letter");
 #	ifdef APPEND_PID
-		sprintf (nam+strlen(nam), ".%d", process_id);
+		sprintf (nam+strlen(nam), ".%d", (int) process_id);
 #	endif /* APPEND_PID */
 #endif /* VMS */
 	if ((fp = fopen (nam, "w")) == NULL) {
@@ -2271,7 +2339,7 @@ mail_to_someone (
 	}
 
 	if (!use_mailreader_i)
-		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
+		msg_write_signature (fp, TRUE, &CURR_GROUP);
 
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2361,7 +2429,7 @@ mail_bug_report (void) /* return value is always ignored */
 
 	joinpath (nam, homedir, ".bugreport");
 #ifdef APPEND_PID
-	sprintf (nam+strlen(nam), ".%d", process_id);
+	sprintf (nam+strlen(nam), ".%d", (int) process_id);
 #endif /* APPEND_PID */
 
 	if ((fp = fopen (nam, "w")) == NULL) {
@@ -2459,7 +2527,7 @@ mail_bug_report (void) /* return value is always ignored */
 	start_line_offset += 6;
 
 	if (!use_mailreader_i)
-		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
+		msg_write_signature (fp, TRUE, &CURR_GROUP);
 
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2562,7 +2630,7 @@ mail_to_author (
 #else
 	joinpath (nam, homedir, ".letter");
 #	ifdef APPEND_PID
-		sprintf (nam+strlen(nam), ".%d", process_id);
+		sprintf (nam+strlen(nam), ".%d", (int) process_id);
 #	endif /* APPEND_PID */
 #endif /* VMS */
 	if ((fp = fopen (nam, "w")) == NULL) {
@@ -2638,7 +2706,7 @@ mail_to_author (
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 
 	if (!use_mailreader_i)
-		msg_write_signature (fp, TRUE, &active[my_group[cur_groupnum]]);
+		msg_write_signature (fp, TRUE, &CURR_GROUP);
 
 #ifdef WIN32
 	putc ('\0', fp);
@@ -2863,7 +2931,8 @@ pcCopyArtHeader (
 			break;
 	}
 
-	/* This should show the name of the offending file, but I didn't want to
+	/*
+	 * This should show the name of the offending file, but I didn't want to
 	 * add unnecessary message-text.
 	 */
 	error_message (p, pcArt);
@@ -2944,7 +3013,7 @@ cancel_article (
 
 	joinpath (cancel, homedir, ".cancel");
 #ifdef APPEND_PID
-	sprintf (cancel+strlen(cancel), ".%d", process_id);
+	sprintf (cancel+strlen(cancel), ".%d", (int) process_id);
 #endif /* APPEND_PID */
 
 	if ((fp = fopen (cancel, "w")) == (FILE *) 0) {
@@ -3230,8 +3299,10 @@ repost_article (
 
 	if (NotSuperseding) {
 		fprintf (fp, "[ %-72s ]\n", txt_article_reposted);
-      /* all string lengths are calculated to a maximum line length
-         of 76 characters, this should look ok (sven@tin.org) */
+		/*
+		 * all string lengths are calculated to a maximum line length
+		 * of 76 characters, this should look ok (sven@tin.org)
+		 */
 		if (*note_h.from)
 			fprintf (fp, "[ From: %-66s ]\n", note_h.from);
 		if (*note_h.subj)
@@ -3269,8 +3340,9 @@ repost_article_loop:
 					/*
 					 * To enforce re-entering the editor immediately when no
 					 * subject is given, uncomment the following line
+					 *
+					 * force_command = TRUE
 					 */
-					 /* force_command = TRUE */
 				} else {
 					ret_code = POSTED_REDRAW;
 					ch_default = iKeyPostPost;
@@ -3477,9 +3549,9 @@ checknadd_headers (
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
 #ifdef VMS
-		sprintf (outfile, "%s-%d", infile, process_id);
+		sprintf (outfile, "%s-%d", infile, (int) process_id);
 #else
-		sprintf (outfile, "%s.%d", infile, process_id);
+		sprintf (outfile, "%s.%d", infile, (int) process_id);
 #endif /* VMS */
 		*found_newsgroups = '\0';
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
@@ -3535,9 +3607,9 @@ insert_from_header (
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
 #ifdef VMS
-		sprintf (outfile, "%s-%d", infile, process_id);
+		sprintf (outfile, "%s-%d", infile, (int) process_id);
 #else
-		sprintf (outfile, "%s.%d", infile, process_id);
+		sprintf (outfile, "%s.%d", infile, (int) process_id);
 #endif /* VMS */
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			get_user_info (user_name, full_name);
@@ -3546,6 +3618,7 @@ insert_from_header (
 			/*
 			 * Check that at least one '.' comes after the '@' in the From: line
 			 */
+			 /* why not gnksa_check_from()? */
 			if ((ptr = strchr (from_name, '@')) != (char *) 0) {
 				if ((ptr = strchr (ptr, '.')) == (char *) 0) { /* no '.' */
 					error_message (txt_invalid_from, from_name);
@@ -3603,9 +3676,8 @@ find_reply_to_addr (
 		if (STRNCASECMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (from_both, &buf[10]);
 			ptr = strchr (from_both, '\n');
-			if (ptr != (char *) 0) {
+			if (ptr != (char *) 0)
 				*ptr = '\0';
-			}
 			parse_from (from_both, from_addr, from_name);
 			if (*from_name)
 				sprintf (buf, "%s (%s)", from_addr, from_name);

@@ -2,9 +2,9 @@
  *  Project   : tin - a Usenet reader
  *  Module    : tcurses.h
  *  Author    : Thomas Dickey <dickey@clark.net>
- *  Created   : 02.03.1997
- *  Updated   : 02.03.1997
- *  Notes     : #include files, #defines & struct's
+ *  Created   : 1997-03-02
+ *  Updated   : 1997-03-02
+ *  Notes     : curses #include files, #defines & struct's
  *  Copyright : (c) Copyright 1997 by Thomas Dickey
  *	             You may  freely  copy or  redistribute  this software,
  *	             so  long as there is no profit made from its use, sale

@@ -36,19 +36,6 @@ static int vms_open_channel (char * device);
 static int stdin_chan = 0;  /* vms channel to sys$input */
 static int stdin_ef   = 0;  /* event flag for read from stdin_chan */
 
-/* Get the name of current user */
-char *
-getlogin (void)
-{
-	char *p;
-
-	if ((p = getenv ("USER")) == NULL) {
-		return ( (char *) 0);
-	}
-
-	return (p);
-}
-
 
 /* return a pointer to string descriptor for zero terminated strings */
 struct dsc$descriptor *desz(char *c$_str)
@@ -121,6 +108,7 @@ char *fix_fullname(char *p)
 }
 
 #ifndef INDEX_DAEMON
+#ifndef tputs
 
 int tputs (char * str, int zzz, OutcPtr func)
 {
@@ -141,26 +129,8 @@ int tputs (char * str, int zzz, OutcPtr func)
 }
 
 #endif
+#endif
 
-FILE *
-popen (
-	char *command,
-	char *mode)
-{
-	return ((FILE *) 0);
-}
-
-
-void
-pclose (FILE *pipe)
-{
-	return;
-}
-
-void tzset(void)
-{
-	return;
-}
 
 void
 make_post_cmd (cmd, name)
@@ -325,26 +295,5 @@ char * vms_errmsg (int error_number)
   if (!message) message = "unknown error code";
   return message;
 }
-
-/*
- *  setenv (char *name, char *value, int notused)
- */
-int setenv (char *name, char *value, int notused)
-{
-  int status = 0;
-  char command[LEN];
-
-  if (name && value)
-  {
-    if (sprintf(command,"define/nolog/job %s \"%s\" ",name,value) > sizeof command)
-    {
-	fprintf (stderr, "FATAL buffer overflow in setenv");
-	tin_done (EXIT_FAILURE);
-    }
-    status = system(command);
-  }
-  return status;
-}
-
 
 #endif /* VMS */

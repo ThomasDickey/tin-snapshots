@@ -499,10 +499,6 @@ dump_msgids(void)
  * each article that exists in the spool, using the intelligence of
  * the reference tree to locate the 'next' article in the thread.
  *
- * TODO:
- * . We could differentiate between bona fide root messages
- *   and root messages whose parent has expired on the group menu
- *	 (currently + is unread, - is marked unread and ' ' is read)
  */
 
 /*
@@ -620,7 +616,7 @@ dump_msgid_threads(void)
 
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || \
-		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+		(arts[ptr->article].thread != ART_NORMAL /*|| arts[ptr->article].killed*/)))
 
 static struct t_msgid *
 find_next(

@@ -33,6 +33,7 @@
 	art_marked_unread		OPT_CHAR
 	groupname_max_length		OPT_NUM
 	show_lines			OPT_ON_OFF
+	show_score			OPT_ON_OFF
 	full_page_scroll		OPT_ON_OFF
 	show_last_line_prev_page	OPT_ON_OFF
 	show_signatures			OPT_ON_OFF
@@ -55,6 +56,10 @@
 #ifdef	HAVE_KEYPAD
 	use_keypad			OPT_ON_OFF
 #endif
+
+; getart_limit options
+	use_getart_limit		OPT_ON_OFF
+	getart_limit			OPT_NUM
 
 ; colour options
 #ifdef	HAVE_COLOR

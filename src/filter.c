@@ -67,7 +67,7 @@ static void free_filter_item (struct t_filter *ptr);
 	static void vSetFilter (struct t_filter *psFilter);
 	static void vWriteFilterArray (FILE *fp, struct t_filters *ptr, time_t theTime);
 	static void vWriteFilterFile (char *pcFile);
-#endif
+#endif /* !INDEX_DAEMON */
 
 /*
  * Filter cache structure using Philip Hazel's Perl regular expression
@@ -118,6 +118,8 @@ vSetFilter (
 		psFilter->msgid = (char *) 0;
 		psFilter->lines_cmp = FILTER_LINES_NO;
 		psFilter->lines_num = 0;
+		psFilter->gnksa_cmp = FILTER_LINES_NO;
+		psFilter->gnksa_num = 0;
 		psFilter->score = 0;
 		psFilter->xref = (char *) 0;
 		psFilter->xref_max = 0;
@@ -195,6 +197,7 @@ read_filter_file (
 	char from[HEADER_LEN];
 	char msgid[HEADER_LEN];
 	char lines[HEADER_LEN];
+	char gnksa[HEADER_LEN];
 	char xref[HEADER_LEN];
 	char xref_score[HEADER_LEN];
 	char scbuf[PATH_LEN];
@@ -260,7 +263,7 @@ if (debug) {
 	my_printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
 	my_flush ();
 }
-#endif
+#endif /* DEBUG */
 				arr_num = &glob_filter.num;
 				arr_max = &glob_filter.max;
 				if (*arr_num >= (*arr_max - 1))
@@ -279,6 +282,21 @@ if (debug) {
 				icase = 0;
 				secs = (time_t) 0;
 				psGrp = (struct t_group *) 0;   /* fudge for out of order rules */
+				break;
+			}
+			if (match_string (buf+1, "nksa=", gnksa, sizeof (gnksa))) {
+				if (arr_ptr && !expired_time) {
+					if (gnksa[0] == '<') {
+						arr_ptr[i].gnksa_cmp = FILTER_LINES_LT;
+						arr_ptr[i].gnksa_num = atoi (&gnksa[1]);
+					} else if (gnksa[0] == '>') {
+						arr_ptr[i].gnksa_cmp = FILTER_LINES_GT;
+						arr_ptr[i].gnksa_num = atoi (&gnksa[1]);
+					} else {
+						arr_ptr[i].gnksa_cmp = FILTER_LINES_EQ;
+						arr_ptr[i].gnksa_num = atoi (gnksa);
+					}
+				}
 				break;
 			}
 		break;
@@ -332,7 +350,7 @@ if (debug) {
 	my_printf ("scope=[%s] num=[%d]\n", scope, glob_filter.num);
 	my_flush ();
 }
-#endif
+#endif /* DEBUG */
 				global = TRUE;
 				arr_num = &glob_filter.num;
 				arr_max = &glob_filter.max;
@@ -365,7 +383,7 @@ if (debug) {
 		my_flush ();
 	}
 } /* FIXME: Only global filters now */
-#endif
+#endif /* DEBUG */
 				break;
 			}
 
@@ -379,7 +397,7 @@ if (debug) {
 	my_printf ("score=[%d]\n", score);
 	my_flush();
 }
-#endif
+#endif /* DEBUG */
 				if (arr_ptr && !expired_time) {
 					if (score > SCORE_MAX)
 						score = SCORE_MAX;
@@ -406,7 +424,7 @@ if (debug) {
 	my_printf ("type=[%d][%s]\n", type, (!type ? "KILL" : "SELECT"));
 	my_flush ();
 }
-#endif
+#endif /* DEBUG */
 				if (arr_ptr) {
 					arr_ptr[i].type = (unsigned) type;
 					arr_ptr[i].score = (!type ? SCORE_KILL : SCORE_SELECT);
@@ -422,7 +440,7 @@ if (debug) {
 	my_printf ("EXPIRED  secs=[%lu]  current_secs=[%lu]\n", (unsigned long int) secs, (unsigned long int) current_secs);
 	my_flush ();
 }
-#endif
+#endif /* DEBUG */
 						(*arr_num)--;
 						expired_time = TRUE;
 						expired = TRUE;
@@ -448,7 +466,7 @@ if (debug) {
 			if (match_string (buf+1, "ref_score=", xref_score, sizeof(xref_score))) {
 				if (arr_ptr && !expired_time) {
 					if (xref_score_cnt < 10) {
-						if (isdigit(xref_score[0])) {
+						if (isdigit((int)xref_score[0])) {
 							xref_score_value = atoi(xref_score);
 							if ((s = strchr(xref_score, ',')))
 								s++;
@@ -487,15 +505,9 @@ vWriteFilterFile (
 	char *pcFile)
 {
 	FILE *hFp;
-	time_t lCurTime;
 
 	if ((hFp = fopen (pcFile, "w")) == (FILE *) 0)
 		return;
-
-	/*
-	 * Get current time for checking rules against expire times
-	 */
-	(void) time (&lCurTime);
 
 	fprintf (hFp, txt_filter_file, default_filter_days);
 	fflush (hFp);
@@ -503,7 +515,7 @@ vWriteFilterFile (
 	/*
 	 * Save global filters
 	 */
-	vWriteFilterArray (hFp, &glob_filter, lCurTime);
+	vWriteFilterArray (hFp, &glob_filter, time(NULL));
 
 	fclose (hFp);
 	chmod (pcFile, (mode_t)(S_IRUSR|S_IWUSR));
@@ -591,6 +603,23 @@ my_flush ();
 					break;
 			}
 		}
+
+		if (ptr->filter[i].gnksa_cmp != FILTER_LINES_NO) {
+			switch (ptr->filter[i].gnksa_cmp) {
+				case FILTER_LINES_EQ:
+					fprintf (fp, "gnksa=%d\n", ptr->filter[i].gnksa_num);
+					break;
+				case FILTER_LINES_LT:
+					fprintf (fp, "gnksa=<%d\n", ptr->filter[i].gnksa_num);
+					break;
+				case FILTER_LINES_GT:
+					fprintf (fp, "gnksa=>%d\n", ptr->filter[i].gnksa_num);
+					break;
+				default:
+					break;
+			}
+		}
+
 		if (ptr->filter[i].xref != NULL)
 			fprintf (fp, "xref=%s\n", ptr->filter[i].xref);
 
@@ -1007,36 +1036,45 @@ filter_menu (
 }
 
 /*
- * Quick command to add a kill filter to specified groups filter
+ * Quick command to add an auto-select / kill filter to specified groups filter
  */
 
 t_bool
-quick_filter_kill (
+quick_filter (
+	int type,
 	struct t_group *group,
 	struct t_article *art)
 {
-	int header;
+	char *scope;
+	int header, expire, icase;
 	struct t_filter_rule rule;
+
+	if (type == FILTER_KILL) {
+		header = group->attribute->quick_kill_header;
+		expire = group->attribute->quick_kill_expire;
+		icase = group->attribute->quick_kill_case;
+		scope = group->attribute->quick_kill_scope;
+	} else {
+		header = group->attribute->quick_select_header;
+		expire = group->attribute->quick_select_expire;
+		icase = group->attribute->quick_select_case;
+		scope = group->attribute->quick_select_scope;
+	}
 
 #ifdef DEBUG
 	if (debug)
-		error_message ("KILL header=[%d] scope=[%s] expire=[%s] case=[%d]",
-			group->attribute->quick_kill_header,
-			(group->attribute->quick_kill_scope ?
-				group->attribute->quick_kill_scope : ""),
-			(group->attribute->quick_kill_expire ? "ON" : "OFF"),
-			group->attribute->quick_kill_case);
-#endif
-
-	header = group->attribute->quick_kill_header;
+		error_message ("%s header=[%d] scope=[%s] expire=[%s] case=[%d]",
+			(type == FILTER_KILL) ? "KILL" : "SELECT",
+			header, (scope ? scope : ""), (expire ? "ON" : "OFF"), icase);
+#endif /* DEBUG */
 
 	/*
 	 * Setup rules
 	 */
 	rule.counter = 0;
 	rule.scope[0] = '\0';
-	if (group->attribute->quick_kill_scope)
-		strcpy (rule.scope, group->attribute->quick_kill_scope);
+	if (scope)
+		strcpy (rule.scope, scope);
 
 	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
@@ -1047,64 +1085,14 @@ quick_filter_kill (
 	rule.subj_ok = (header == FILTER_SUBJ_CASE_SENSITIVE || header == FILTER_SUBJ_CASE_IGNORE);
 
 	rule.text[0] = '\0';
-	rule.type = FILTER_KILL;
-	rule.icase = group->attribute->quick_kill_case;
-	rule.expire_time = group->attribute->quick_kill_expire;
+	rule.type = type;
+	rule.icase = icase;
+	rule.expire_time = expire;
 	rule.check_string = TRUE;
-	rule.score = SCORE_KILL;
+	rule.score = (type == FILTER_KILL) ? SCORE_KILL : SCORE_SELECT;
 
 	return (bAddFilterRule (group, art, &rule));
 }
-
-
-/*
- * Quick command to add an auto-select filter to specified groups filter
- */
-t_bool
-quick_filter_select (
-	struct t_group *group,
-	struct t_article *art)
-{
-	int header;
-	struct t_filter_rule rule;
-
-#ifdef DEBUG
-	if (debug)
-		error_message ("SELECT header=[%d] scope=[%s] expire=[%s] case=[%d]",
-			group->attribute->quick_select_header,
-			(group->attribute->quick_select_scope ?
-				group->attribute->quick_select_scope : ""),
-			(group->attribute->quick_select_expire ? "ON" : "OFF"),
-			group->attribute->quick_select_case);
-#endif
-
-	header = group->attribute->quick_select_header;
-
-	/*
-	 * Setup rules
-	 */
-	rule.counter = 0;
-	rule.scope[0] = '\0';
-	if (group->attribute->quick_select_scope)
-		strcpy (rule.scope, group->attribute->quick_select_scope);
-
-	rule.lines_cmp = FILTER_LINES_NO;
-	rule.lines_num = 0;
-	rule.lines_ok = (header == FILTER_LINES);
-	rule.msgid_ok = (header == FILTER_MSGID) || (header == FILTER_MSGID_LAST);
-	rule.fullref = header; /* value is directly used to select correct filter type */
-	rule.from_ok = (header == FILTER_FROM_CASE_SENSITIVE || header == FILTER_FROM_CASE_IGNORE);
-	rule.subj_ok = (header == FILTER_SUBJ_CASE_SENSITIVE || header == FILTER_SUBJ_CASE_IGNORE);
-	rule.text[0] = '\0';
-	rule.type = FILTER_SELECT;
-	rule.icase = group->attribute->quick_select_case;
-	rule.expire_time = group->attribute->quick_select_expire;
-	rule.check_string = TRUE;
-	rule.score = SCORE_SELECT;
-
-	return (bAddFilterRule (group, art, &rule));
-}
-
 
 /*
  * Quick command to add an auto-select filter to the article that user
@@ -1174,6 +1162,7 @@ bAddFilterRule (
 	struct t_filter_rule *psRule)
 {
 	char acBuf[PATH_LEN];
+	char sbuf[(sizeof(acBuf)/2)]; /* half as big as acBuf so quote_wild(sbuf) fits into acBuf */
 	int *plNum, *plMax;
 	t_bool bFiltered = FALSE;
 	time_t lCurTime;
@@ -1254,19 +1243,26 @@ bAddFilterRule (
 		bFiltered = TRUE;
 		(*plNum)++;
 	} else {
+		/*
+		 * STRCPY() truncates subject/from/message-id so it fits
+		 * into acBuf even after quote_wild()
+		 */
 		if (psRule->subj_ok) {
-			sprintf (acBuf, REGEX_FMT, (psRule->check_string ? quote_wild (psArt->subject) : psArt->subject));
+			STRCPY(sbuf, psArt->subject);
+			sprintf (acBuf, REGEX_FMT, (psRule->check_string ? quote_wild (sbuf) : sbuf));
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
 		if (psRule->from_ok) {
-			sprintf (acBuf, REGEX_FMT, quote_wild (psArt->from));
+			STRCPY(sbuf, psArt->from);
+			sprintf (acBuf, REGEX_FMT, quote_wild (sbuf));
 			psPtr[*plNum].from = my_strdup (acBuf);
 		}
 		/*
 		 * message-ids should be quoted
 		 */
 		if (psRule->msgid_ok) {
-			sprintf (acBuf, REGEX_FMT, quote_wild (MSGID(psArt)));
+			STRCPY(sbuf, MSGID(psArt));
+			sprintf (acBuf, REGEX_FMT, quote_wild (sbuf));
 			psPtr[*plNum].msgid = my_strdup (acBuf);
 			psPtr[*plNum].fullref = psRule->fullref;
 		}
@@ -1288,7 +1284,7 @@ bAddFilterRule (
 				(psPtr[*plNum-1].msgid ? psPtr[*plNum-1].msgid : ""),
 				psPtr[*plNum-1].fullref, psPtr[*plNum-1].lines_cmp,
 				psPtr[*plNum-1].lines_num, (unsigned long int) psPtr[*plNum-1].time);
-#endif
+#endif /* DEBUG */
 
 #ifndef INDEX_DAEMON
 		vWriteFilterFile (local_filter_file);
@@ -1311,7 +1307,7 @@ unfilter_articles (void) /* return value is always ignored */
 	register int i;
 
 	for (i = 0; i < top; i++) {
-		if (arts[i].killed) {
+		if (IS_KILLED(i)) {
 			arts[i].killed = FALSE;
 			arts[i].status = ART_UNREAD;
 			arts[i].score = 0;
@@ -1415,7 +1411,7 @@ filter_articles (
 						if (!regex_cache_subj[j].re) {
 							if ((regex_cache_subj[j].re = pcre_compile(ptr[j].subj,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos)) == NULL)
+							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
 								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_subj[j].re) {
 								regex_cache_subj[j].extra = pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
@@ -1454,7 +1450,7 @@ filter_articles (
 						if (!regex_cache_from[j].re) {
 							if ((regex_cache_from[j].re = pcre_compile(ptr[j].from,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos)) == NULL)
+							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
 								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_from[j].re) {
 								regex_cache_from[j].extra = pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
@@ -1488,7 +1484,8 @@ filter_articles (
 					char *refs = NULL;
 					const char *myrefs = NULL;
 
-/* TODO nice idea del'd; better apply one rule on all fitting
+/*
+ * TODO nice idea del'd; better apply one rule on all fitting
  * TODO articles, so we can switch to an appropriate algorithm
  * TODO for each kind of rule, including the deleted one.
  */
@@ -1518,7 +1515,7 @@ filter_articles (
 						if (!regex_cache_msgid[j].re) {
 							if ((regex_cache_msgid[j].re = pcre_compile(ptr[j].msgid,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-							  &regex_errmsg, &regex_errpos)) == NULL)
+							  &regex_errmsg, &regex_errpos, NULL)) == NULL)
 								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_msgid[j].re) {
 								regex_cache_msgid[j].extra = pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
@@ -1556,7 +1553,7 @@ filter_articles (
 				/*
 				 * Filter on Lines: line
 				 */
-				if (ptr[j].lines_cmp != FILTER_LINES_NO && arts[i].lines>=0) {
+				if ((ptr[j].lines_cmp != FILTER_LINES_NO) && (arts[i].lines >= 0)) {
 					switch (ptr[j].lines_cmp) {
 						case FILTER_LINES_EQ:
 							if (arts[i].lines == ptr[j].lines_num) {
@@ -1588,45 +1585,70 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 				}
 
 				/*
+				 * Filter on GNKSA code
+				 */
+				if ((ptr[j].gnksa_cmp != FILTER_LINES_NO) && (arts[i].gnksa_code >= 0)) {
+					switch (ptr[j].gnksa_cmp) {
+						case FILTER_LINES_EQ:
+							if (arts[i].gnksa_code == ptr[j].gnksa_num) {
+								SET_FILTER(group, i, j);
+							}
+							break;
+						case FILTER_LINES_LT:
+							if (arts[i].gnksa_code < ptr[j].gnksa_num) {
+								SET_FILTER(group, i, j);
+							}
+							break;
+						case FILTER_LINES_GT:
+							if (arts[i].gnksa_code > ptr[j].gnksa_num) {
+								SET_FILTER(group, i, j);
+							}
+							break;
+						default:
+							break;
+					}
+				}
+
+				/*
 				 * Filter on Xref: lines
 				 */
-				if(arts[i].xref && *arts[i].xref!='\0') {
+				if (arts[i].xref && *arts[i].xref != '\0') {
 					if (ptr[j].xref_max > 0 || ptr[j].xref != (char*)0) {
 						char *s, *e;
 						int group_count;
 
 						s = arts[i].xref;
 
-						while(*s && !isspace(*s))
+						while(*s && !isspace((int)*s))
 							s++;
-						while(*s && isspace(*s))
+						while(*s && isspace((int)*s))
 							s++;
 
 						group_count=0;
 
 						while(*s) {
 							e = s;
-							while (*e && *e != ':' && !isspace(*e))
+							while (*e && *e != ':' && !isspace((int)*e))
 								e++;
 
-							if(ptr[j].xref_max > 0) {
+							if (ptr[j].xref_max > 0) {
 								strncpy(buf, s, e-s);
 								buf[e-s] = '\0';
-								for(k = 0; k < ptr[j].xref_score_cnt; k++) {
-									if(GROUP_MATCH(buf, ptr[j].xref_score_strings[k], TRUE)) {
+								for (k = 0; k < ptr[j].xref_score_cnt; k++) {
+									if (GROUP_MATCH(buf, ptr[j].xref_score_strings[k], TRUE)) {
 										group_count += ptr[j].xref_scores[k];
 										break;
 									}
 								}
-								if(k == ptr[j].xref_score_cnt)
+								if (k == ptr[j].xref_score_cnt)
 									group_count++;
 							}
-							if(ptr[j].xref != (char*)0) {
+							if (ptr[j].xref != (char*)0) {
 								strncpy(buf, s, e-s);
 								buf[e-s] = '\0';
 								/* don't filter when we are actually in that group */
 								/* Group names shouldn't be case sensitive in any case. Whatever */
-								if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf) != 0) {
+								if (ptr[j].type != FILTER_KILL || strcmp(group->name, buf) != 0) {
 									if (!wildcard) {
 										if (wildmat(buf, ptr[j].xref, ptr[j].icase))
 											group_count = -1;
@@ -1634,7 +1656,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 										if (!regex_cache_xref[j].re) {
 											if ((regex_cache_xref[j].re = pcre_compile(ptr[j].xref,
 											  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
-											  &regex_errmsg, &regex_errpos)) == NULL)
+											  &regex_errmsg, &regex_errpos, NULL)) == NULL)
 												sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 											if (regex_cache_xref[j].re) {
 												regex_cache_xref[j].extra =
@@ -1659,12 +1681,12 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 								}
 							}
 							s=e;
-							while(*s && !isspace(*s))
+							while(*s && !isspace((int)*s))
 								s++;
-							while(*s && isspace(*s))
+							while(*s && isspace((int)*s))
 								s++;
 						}
-						if(group_count==-1 || group_count>ptr[j].xref_max) {
+						if (group_count == -1 || group_count>ptr[j].xref_max) {
 							SET_FILTER(group, i, j);
 						}
 					}
@@ -1698,7 +1720,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	 * all articles have scored, so do kill & select
 	 */
 
-	for (i=0; i<top; i++) {
+	for (i = 0; i < top; i++) {
 		if (arts[i].score <= SCORE_LIM_KILL) {
 			arts[i].killed = TRUE;
 			filtered = TRUE;

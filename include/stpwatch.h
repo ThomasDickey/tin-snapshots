@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : stpwatch.h
  *  Author    : I. Lea
- *  Created   : 03.08.1993
- *  Updated   : 05.04.1997
+ *  Created   : 1993-08-03
+ *  Updated   : 1997-04-05
  *  Notes     : Simple stopwatch routines for timing code using timeb
  *	             or gettimeofday structs
  *  Copyright : (c) Copyright 1991-98 by Iain Lea

@@ -64,12 +64,14 @@ submit_inews (
 	t_bool ret_code = FALSE;
 
 	char	from_name[PATH_LEN];
+	char	message_id[PATH_LEN];
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
 	int auth_error = 0;
 	int respcode;
 	t_bool leave_loop = FALSE;
+	t_bool id_in_article = FALSE;
 #		ifndef FORGERY
 	t_bool ismail = FALSE;
 #		endif /* FORGERY */
@@ -79,29 +81,33 @@ submit_inews (
 		return ret_code;
 	}
 
-	from_name[0]='\0';
+	from_name[0] = '\0';
+	message_id[0] = '\0';
 
 	while (fgets (line, (int) sizeof (line), fp) != NULL) {
 		if (line[0] != '\n') {
 			ptr = strchr (line, ':');
 			if (ptr - line == 4 && !strncasecmp (line, "From", 4)) {
 				strcpy(from_name, ptr+2);
-				if((ptr = strchr(from_name, '\n')))
-					*ptr='\0';
-				break; /* found From: */
+				if ((ptr = strchr(from_name, '\n')))
+					*ptr = '\0';
+			}
+			if (ptr - line == 10 && !strncasecmp (line, "Message-ID", 10)) {
+				strcpy(message_id, ptr+2);
+				id_in_article = TRUE;
+				if ((ptr = strchr(message_id, '\n')))
+					*ptr = '\0';
 			}
 		} else
 			break; /* end of headers */
 	}
 
-	if (from_name[0]=='\0') {
+	if (from_name[0] == '\0') {
 		/* we could silently add a From: line here if we want to... */
-		error_message ("From: line missing.");
+		error_message (txt_error_no_from);
 		fclose (fp);
 		return ret_code;
 	}
-
-
 	/*
 	 * check for @ and that at least one '.' comes after the '@' in the From: line
 	 */
@@ -118,6 +124,7 @@ submit_inews (
 		return ret_code;
 	}
 
+
 	/*
 	 * Send POST command to NNTP server
 	 * Receive CONT_POST or ERROR response code from NNTP server
@@ -131,6 +138,28 @@ submit_inews (
 		}
 
 		/*
+		 * check article if it contains a Message-ID header
+		 * if not scan line if it contains a Message-ID
+		 * if it's present: use it.
+		 */
+		if (message_id[0] == '\0') {
+			char * ptr2;
+
+			/* simple syntax check - locate last '<' */
+			if ((ptr = strrchr (line, '<')) != (char *) 0) {
+				/* search next '>' */
+				if ((ptr2 = strchr (ptr, '>')) != (char *) 0) {
+					/* terminate string */
+					*++ptr2 = '\0';
+					/* check for @ and no whitespaces */
+					if ((strchr(ptr, '@') != (char *) 0) && (strpbrk(ptr, " \t") == (char *) 0))
+						/* copy Message-ID */
+						strcpy(message_id, ptr);
+				}
+			}
+		}
+
+		/*
 		 * Send Path: and From: article headers
 		 */
 #		ifndef FORGERY
@@ -138,12 +167,20 @@ submit_inews (
 		put_server (line);
 
 		if ((ptr = build_sender())) {
-			if(sender_needed(rfc1522_decode(from_name), ptr) == 1) {
+			if (sender_needed(rfc1522_decode(from_name), ptr) == 1) {
 				sprintf (line, "Sender: %s", rfc1522_encode(ptr, ismail));
 				put_server (line);
 			}
 		}
 #		endif /* !FORGERY */
+
+		/*
+		 * check if Message-ID comes from the server
+		 */
+		if (*message_id && !id_in_article) {
+				sprintf (line, "Message-ID: %s", message_id);
+				put_server (line);
+		}
 
 		/*
 		 * Send article 1 line at a time ending with "."
@@ -175,6 +212,16 @@ submit_inews (
 		 * of the put_server(".") above a "." would be resent as the last
 		 * "command".
 		 */
+		 /*
+		  * here we could add a check if the server returns the
+		  * Message-ID in the response string...
+		  * if it does so, compare it with message_id (if set)
+		  * and pass it to update_posted_info_file() and
+		  * quick_filter_select_posted_art() if add_posted_to_filter
+		  * is set
+		  * make sure, that quick_filter_select_posted_art() and
+		  * update_posted_info_file() arn't called twice!
+		  */
 		respcode = get_only_respcode (line);
 		leave_loop = TRUE;
 
@@ -183,10 +230,8 @@ submit_inews (
 		 * authentication request was received. Leave loop on any other
 		 * response or any further authentication requests.
 		 */
-		if (((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO))
-				&& (auth_error++ < 1) && (authenticate (nntp_server, userid, FALSE))) {
-					leave_loop = FALSE;
-		}
+		if (((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) && (auth_error++ < 1) && (authenticate (nntp_server, userid, FALSE)))
+			leave_loop = FALSE;
 	} while (!leave_loop);
 
 	fclose (fp);

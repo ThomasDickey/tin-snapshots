@@ -46,7 +46,7 @@ hash_str (
 	struct t_hashnode **p;	/* used to descend the spillover structs */
 
 	if (s == (char *) 0)
-		return ((char *) 0);
+		return (char *) 0;
 
 	{
 		const unsigned char *t = (const unsigned char *) s;

@@ -95,7 +95,7 @@ feed_articles (
 	 * try and work out what default the user wants
 	 * This is dumb. If you have _any_ selected arts, then it picks 'h'
 	 */
-	ch_default = (num_of_tagged_arts ? iKeyFeedTag : (num_of_selected_arts ? iKeyFeedHot : ((num_of_responses (b)) ? iKeyFeedThd : iKeyFeedArt)));
+	ch_default = (num_of_tagged_arts ? iKeyFeedTag : (num_of_selected_arts ? iKeyFeedHot : ((HAS_FOLLOWUPS (b)) ? iKeyFeedThd : iKeyFeedArt)));
 
 	switch (function) {
 		case FEED_MAIL:
@@ -258,9 +258,11 @@ feed_articles (
 							my_strncpy (my_mailbox, filename+1, sizeof (my_mailbox));
 						else {
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
+#if 0 /* this is looks ugly */
 							/* convert 1st letter to uppercase */
 							if (islower(my_mailbox[0]))
 								my_mailbox[0] = (char) toupper (my_mailbox[0]);
+#endif /* 0 */
 						}
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */

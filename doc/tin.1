@@ -29,6 +29,8 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\| \-o \||\| \-w \|]\|]
 .RB [\| \-D
 .IR debug-level \|]
+.RB [\| \-G
+.IR article-limit \|]
 .RB [\| \-f
 .IR newsrc-file \|]
 .RB [\| \-g
@@ -55,6 +57,8 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\| \-o \||\| \-w \|]\|]
 .RB [\| \-D
 .IR debug-level \|]
+.RB [\| \-G
+.IR article-limit \|]
 .RB [\| \-f
 .IR newsrc-file \|]
 .RB [\| \-g
@@ -70,6 +74,8 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\| \-d \||\| \-P  \||\| \-v \|]
 .RB [\| \-D
 .IR debug-level \|]
+.RB [\| \-G
+.IR article-limit \|]
 .RB [\| \-f
 .IR newsrc-file \|]
 .RB [\| \-I
@@ -105,7 +111,7 @@ it.
 Toggle ANSI color (default is off).
 .TP
 .B -A
-Force authenticaion on initial connect.
+Force authentication on initial connect.
 .TP
 .B -c
 Create/update index files for every group in \fI$HOME/.newsrc\fP or file
@@ -127,6 +133,9 @@ Use the specified file of subscribed to newsgroups in place of
 .BI -g " server"
 Use the server and newsrc specified in \fI$HOME/.tin/newsrctable\fP.
 .TP
+.BI -G " article-limit"
+Limit the number of articles/group to retrieve from the server.
+.TP
 .B -h
 Help listing all command line options.
 .TP
@@ -141,7 +150,7 @@ as reading news via NNTP only.
 .TP
 .BI -l
 Get number of articles per group from the \fIactive\fP file - this might
-result in incorrect counts but usualy is faster as the default
+result in incorrect article counts but is usually faster than the default
 which is to read the active file and then check the article count via a
 GROUP command ``\fB-ln\fR''.
 .TP
@@ -445,9 +454,9 @@ pressing CTRL-V first. The postpone-menu offers the following actions: `y' =
 reload and spawn editor; `Y' = post article (without spawning editor); `A' =
 post all postponed articles (without spawning editor); `n' = skip this
 article; `q' = quit postponed menu. Currently there is no 'simple' way to
-delete a posponed article from the posponed-file, you have to use the
-following commandsequence instead: reload it with '^O', enter editor with
-'y', quit editor, discard posting with 'q'. See also ``\fB-o\fR''
+delete a posponed article from the postponed-file, you have to use the
+following command sequence instead: reload it with '^O', enter editor
+with 'y', quit editor, discard posting with 'q'. See also ``\fB-o\fR''
 command-line switch.
 .TP
 .B ^R
@@ -464,12 +473,12 @@ group selection list looking for unread groups.
 Toggle use of ANSI color.
 .TP
 .B c
-Mark current group as all read with confirmation and goto next group
-in group selection list.
+Make current group as all read [after confirmation] and move to the next group
+in the group selection list.
 .TP
 .B C
-Mark current group as all read and goto next unread group in group
-selection list.
+Mark current group as all read [after confirmation] and enter the next unread
+group in the group selection list.
 .TP
 .B d
 Toggle display to show just the group name or the group name and the groups
@@ -564,10 +573,10 @@ starting \fBtin\fR.
 Mark all articles in the current group as unread.
 .TP
 .B /
-Group forward search.
+Search the group names and descriptions (if displayed).
 .TP
 .B ?
-Group backward search.
+Backward search through the group names and descriptions.
 .\"
 .\"
 .SH "GROUP INDEX COMMANDS"
@@ -581,8 +590,8 @@ Auto select article(s) via a menu. Read the section FILTERING ARTICLES
 for more information.
 .TP
 .B [
-Auto select article(s) with a single key. The defaults used for selection
-are set via the following four tinrc config variables:
+Auto select article(s) with a single key [after confirmation]. The defaults
+used for selection are set via the following four tinrc config variables:
 .in +.3i
 default_filter_select_header
 .in +.3i
@@ -609,8 +618,8 @@ Kill article(s) via a menu. Read the section FILTERING ARTICLES for
 more information.
 .TP
 .B ]
-Kill article(s) with a single key. The defaults used for killing
-are set via the following four tinrc config variables:
+Kill article(s) with a single key [after confirmation]. The defaults used for
+killing are set via the following four tinrc config variables:
 .in +.3i
 default_filter_kill_header
 .in +.3i
@@ -647,24 +656,31 @@ View next unread article or group.
 .TP
 .B a
 Author forward search.
+This searches for articles with a specific From: line.
 .TP
 .B A
 Author backward search.
+Otherwise, see 'a' above.
 .TP
 .B B
 Search the body of all articles in group (can be slow).
 .TP
 .B c
-Mark all articles as read with confirmation.
+Mark all articles as read [after confirmation] then return to the
+group selection list.
 .TP
 .B C
-Mark all articles as read and goto next group with unread news.
+Mark all articles as read [after confirmation] and enter the next group
+with unread news.
 .TP
 .B d
 Toggle display to show just the subject or the subject and author.
 .TP
 .B g
 Choose a new group by name.
+.TP
+.B G
+Toggle article/group limit.
 .TP
 .B h
 Help screen of group index commands.
@@ -682,8 +698,7 @@ Toggle inverse video.
 Mark article/thread as read and advance to next unread article/thread.
 .TP
 .B l
-List the author of each response in current thread and enter thread
-selection level.
+Open the thread under the current cursor position.
 .TP
 .B m
 Mail current article / thread / auto selected (hot) articles /
@@ -722,7 +737,7 @@ Quit \fBtin\fR.
 Save current article / thread / auto selected (hot) articles /
 articles matching pattern / tagged articles to file / files /
 mailbox. To save to a mailbox enter '=' or '=mailbox' when asked
-for filename to save to. To save in <newsgroup name>/<filename>
+for filename to save to. To save in <News.group.name>/<filename>
 format enter '+filename'. Environment variables are allowed within
 a filename (i.e., \fI$SOURCES/dir/filename\fP).
 .TP
@@ -840,19 +855,35 @@ Choose first article in thread.
 Choose last article in thread.
 .TP
 \fB/\fR
-Choose article by subject string forward search
+Search forward for a specified subject.
 .TP
 .B ?
-Choose article by subject string backward search
+Search backwards for a specified subject.
 .TP
 .B #
 Choose range of articles to be affected by next command.
 .TP
+.B -
+Show last message viewed.
+.TP
 .B 4
 Select article 4 within thread.
 .TP
+.B a
+Author forward search.
+This searches for articles with a specific From: line. The search will
+wrap over into the next thread if nothing is found in the current one.
+.TP
+.B A
+Author backward search.
+Otherwise, see 'a' above.
+.TP
 .B c
-Mark thread as read after confirmation and return to previous level.
+Mark thread as read [after confirmation] and return to the group index page.
+.TP
+.B C
+Mark thread as read [after confirmation] and enter the next thread containing
+unread news.
 .TP
 .B d
 Toggle display to show just the subject or the subject and author.
@@ -1002,12 +1033,13 @@ Author backward search.
 Search the body of all articles in group (can be slow).
 .TP
 .B c
-Mark all articles as read with confirmation and return to group selection
-level.
+Mark the current thread as read [after confirmation] and return to
+the group index page.
 .TP
 .B C
-Mark current group as all read and goto next unread group in group
-selection list.
+Mark the rest of the current thread as read [after confirmation] and enter the
+next thread with unread articles.  If no unread articles are left in this
+group, enter the next group with unread news.
 .TP
 .B d
 Toggle rot-13 decoding for this article.
@@ -1046,7 +1078,10 @@ Toggle inverse video.
 Mark article as read and advance to next unread article.
 .TP
 .B K
-Mark thread as read and advance to next unread thread.
+Mark rest of thread as read and advance to next unread thread.
+.TP
+.B l
+Show the thread that the current article is a part of
 .TP
 .B L
 Look up article by ``Message:-ID:''.
@@ -1137,10 +1172,10 @@ Do not use this to crosspost your own articles.
 Mark article as unread.
 .TP
 .B /
-Article forward search.
+Forward search the text of this article.
 .TP
 .B ?
-Article backward search
+Backward search the text of this article.
 .TP
 .B !
 Shell escape.
@@ -1324,12 +1359,13 @@ Color of text-lines
 Color of Help/Mail-Sign
 .TP
 .B Confirm commands before executing (confirm_action)
-Allows certain commands (i.e., `c' catchup) that require user confirmation
-to be executed immediately if set OFF.
-Default is ON.
+Ask for confirmation before executing certain dangerous commands
+(e.g., `c'atchup).  Default is ON. Commands that this affects are
+marked in this manual with '[after confirmation]'.
 .TP
-.B Confirm before quitting (confirm_quit)
-If ON confirm with ``y''/``n'' before quitting. Default is ON.
+.B Confirm before quitting (confirm_to_quit)
+If ON you will be asked to confirm that you wish to exit tin when you use
+the 'q' command. Default is ON.
 .\"
 .\" most of the default_* settings are not available the 'M'enu
 .TP
@@ -1468,8 +1504,13 @@ If set ON scrolling of groups will be a full page at a time,
 otherwise half a page at a time. Currently this is not implemented in the
 pager and in the GLOBAL OPTIONS MENU.
 .TP
+.B Number of articles per group to get (getart_limit)
+If \fBuse_getart_limit\fR is ON and getart_limit is > 0 not more than
+getart_limit articles/group are fetched from the server. Default is 0, which
+means no limit.
+.TP
 .B Catchup group using left key (group_catchup_on_exit)
-if ON catchup group when leaving with the left arrow key. Default is ON.
+If ON catchup group when leaving with the left arrow key. Default is ON.
 .TP
 .B Max. length of group names shown (groupname_max_length)
 Maximum length of the names of newsgroups to be displayed so that more of the
@@ -1554,7 +1595,7 @@ Format of quote line when posting/following up an article (%A=Address, %D=Date,
 %F=Addr+Name, %G=Groupname, %M=Message-Id, %N=Name).
 Default is "%F wrote:"
 .TP
-.B PgDn goes to next artice at EOF (pgdn_goto_next)
+.B PgDn goes to next article at EOF (pgdn_goto_next)
 If ON the PGDN or DOWN command will goto next article when pressed
 at end of message
 .TP
@@ -1565,7 +1606,7 @@ Default is ON.
 .B Use 8bit characters in news headers (post_8bit_header)
 Allows 8bit characters unencoded in the header of news article.
 Default is OFF. Only enacted if \fBpost_mime_encoding\fR is also set to 8bit.
-In a number of local hiearchies where 8bit characters are used,
+In a number of local hierarchies where 8bit characters are used,
 using unencoded (raw) 8bit characters in header is acceptable and sometimes
 even recommended so that you need to check the convention adopted in
 the local hierarchy of your interest to determine what to do with this and
@@ -1694,7 +1735,7 @@ Default is 2, authors full.
 .B Show description of each newsgroup (show_description)
 If ON show a short group description text after newsgroup name at
 the group selection level. The ``\fB-d\fR'' commandline flag will override
-the setting and trun descriptions off.
+the setting and turn descriptions off.
 The text used is taken from the \fI$NEWSLIBDIR/newsgroups\fP file.
 Default is ON.
 .TP
@@ -1803,6 +1844,10 @@ Allows the builtin NNTP inews to be enabled/disabled. This has no effect
 when reading/posting direct to local spool where external \fBinews\fR(1)
 will always be used. Default is ON (enabled).
 .TP
+.B Limit number of articles fetched from server (use_getart_limit)
+If enabled \fBtin\fR fetches max. \fBgetart_limit\fR articles/group from the
+server. Default is OFF.
+.TP
 .B Use ANSI color (use_color)
 If enabled \fBtin\fR uses ANSI-colors. Default is OFF.
 .TP
@@ -1874,8 +1919,6 @@ equivalents. The following group attributes are available:
 .B auto_select
 .TP
 .B auto_save
-.TP
-.B auto_save_msg
 .TP
 .B batch_save
 .TP
@@ -2611,52 +2654,53 @@ I wish to thank the following people for supplying patches:
 .PP
 David Abbott, Earle Ake, Orbby S. Arka, Joachim Astel, Anton Aylward, Jens
 Chr. Bachem, George Baltz, Volker Barthelmann, Kirk Bauer, Paul Bauwens,
-Dieter Becker, Greg Berigan, Enrik Berkhan, Juergen Bernau, Dan Berry, David
-Binderman, Andrey Blochintsev, Chris Blum, Fokke de Boer, Andreas Borchert,
-Mark Boucher, Bill Brolik, Herman ten Brugge, Martin Buck, Leila
-Burrell-Davis, Sean Casey, Peter Castro, Troy Cauble, Andrey A. Chernov, Tan
-Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven Cogswell, Don
-Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris Davies, John
-Davis, Borislav Deianov, Thomas E. Dickey, Theo Van Dinter, Ralf Doeblitz,
-Bryan Dongray, Michael Douglass, Craig Durland, Bernd Eckenfels, Phil Edge,
-Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle, Olle Eriksson, Brent
-Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason Faultless, Michael
-Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor, Torsten Gesang,
-Callum Gibson, Mike Glendinning, Philippe Goujard, Dan Greenspan, Karlo
-Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per
-Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom
-Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun
-Huang, Steve Hunt, Jeff Hurwitt, Pieter Immelman, Jarkko Isokungas, Patrick
-St. Jean, Hal Jespersen, Park Sang Jin, Robbin Johnson, Jarkko Jormanainen,
-Nelson Kading, Geoffrey Keating, Karsten Keil, Fritz Kleeman, Andreas Kies,
-Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig
-Koenigsson, Martin Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel,
-Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre,
-Stanislav Latishko, Hannu Laurila, Vincent Lefevre, Alexander Lehmann, Marty
-Leisner, Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua Choon Leong,
-Chris Lewis, Andreas Ley, David-Michael Lincke, Otto Lind, Richard Lloyd,
-Florian Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp, David
-MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi
-Marukawa, Owen Medd, Philipp Mergenthaler, Soren Moller, Bruce Momjian,
-Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise, Udo Munk, Daniel
-Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael
-O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker,
-Tom Parry, Jim Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins,
-Colin Perkins, Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers,
-Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards,
-Steve Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Stephen
-Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz,
-Gary Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger
-Schif, Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl,
-Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav
-Serrander, Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda,
-Andreas Siegert, Mark Smith, Steve Spearman, Cliff Stanford, Steve Starck,
-Jason Steiner, Ralf Stephan, Michael Stenns, Helmrich Streitmatter, Hans
-Werner Strube, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman,
-Derek Terveer, Carsten Theis, Julian Thompson, David Tiller, Andry Timonin,
-Mark Tomlin, Michael Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha,
-Jason Wessel, Cary Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens
-Wuepper, Billy Y., Nickolai Zeldovich, Zbigniew Zych
+Dieter Becker, Fabrice Bellet, Greg Berigan, Enrik Berkhan, Juergen Bernau,
+Dan Berry, David Binderman, Andrey Blochintsev, Chris Blum, Fokke de Boer,
+Andreas Borchert, Mark Boucher, Bill Brolik, Herman ten Brugge, Martin Buck,
+Leila Burrell-Davis, Sean Casey, Peter Castro, Troy Cauble, Andrey A.
+Chernov, Tan Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven
+Cogswell, Don Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris
+Davies, John Davis, Borislav Deianov, Thomas E. Dickey, Theo Van Dinter,
+Ralf Doeblitz, Bryan Dongray, Michael Douglass, Craig Durland, Bernd
+Eckenfels, Phil Edge, Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle,
+Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason
+Faultless, Michael Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor,
+Torsten Gesang, Callum Gibson, Mike Glendinning, Philippe Goujard, Dan
+Greenspan, Karlo Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck,
+Christian Haul, Per Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero,
+Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy
+Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter
+Immelman, Jarkko Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin,
+Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten
+Keil, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven
+Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas
+Kroener, Florian Kuehnert, Kris Kugel, Manoj Kumar, Yuri Kuzmenko, Olivier
+Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Stanislav Latishko, Hannu
+Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner,
+Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
+David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
+Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
+De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Philipp
+Mergenthaler, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
+Klaus Mueller, Mike Muise, Udo Munk, Daniel Naber, Torsten Neumann, Dirk
+Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov,
+Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson,
+Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins, Eric
+Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
+Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards, Steve Robbins,
+Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman, Roland
+Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders,
+Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif, Volker
+Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz,
+Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug
+Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark
+Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
+Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
+Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
+Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
+Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
+Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
+Nickolai Zeldovich, Zbigniew Zych
 .\"
 .\"
 .SH AUTHOR

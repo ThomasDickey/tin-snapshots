@@ -22,15 +22,15 @@
 #define EXPIRED(a) ((a)->article == ART_UNAVAILABLE || \
 		    arts[(a)->article].thread == ART_EXPIRED)
 
-int thread_basenote = 0;
+int thread_basenote = 0;						/* Index in base[] of basenote */
 t_bool show_subject;
 
 #ifndef INDEX_DAEMON
-	static int thread_index_point = 0;
-	static int top_thread = 0;
-	static int thread_respnum = 0;
-	static int first_thread_on_screen = 0;
-	static int last_thread_on_screen = 0;
+	static int thread_index_point = 0;			/* Current screen cursor position in thread */
+	static int top_thread = 0;					/* Essentially = # arts in current thread */
+	static int thread_respnum = 0;				/* Art # of basenote ie base[thread_basenote] */
+	static int first_thread_on_screen = 0;		/* response # at top of screen */
+	static int last_thread_on_screen = 0;		/* response # at end of screen */
 #endif /* !INDEX_DAEMON */
 
 /*
@@ -39,12 +39,14 @@ t_bool show_subject;
 #ifndef INDEX_DAEMON
 	static t_bool find_unexpired (struct t_msgid *ptr);
 	static t_bool has_sibling (struct t_msgid *ptr);
+	static void fixup_thread (int basenote, int respnum);
 	static void prompt_thread_num (int ch);
 	static void bld_tline (int l, struct t_article *art);
 	static void draw_tline (int i, t_bool full);
 	static void draw_thread_arrow (void);
 	static void erase_thread_arrow (void);
 	static void make_prefix (struct t_msgid *art, char *prefix);
+	static void move_to_response (int n);
 	static void update_thread_page (void);
 #endif /* !INDEX_DAEMON */
 
@@ -90,9 +92,11 @@ bld_tline (
 
 /*
  * TODO - add kill_level
- * } else if (art->killed) {
- *		mark = 'K';
  */
+#if 1
+		} else if (art->killed) {
+			mark = 'K';
+#endif /* 1 */
 
 		} else
 			mark = ART_MARK_READ;
@@ -102,14 +106,29 @@ bld_tline (
 
 	strcat(buff, "  ");					/* 2 more spaces */
 
+
 	/*
-	 * Add the number of lines if enabled (inside [], 8 chars total)
+	 * Add the number of lines and/or the score if enabled
+	 * (inside "[,]", 1+4[+1+6]+1+2 chars total)
 	 */
-	if (show_lines) {
+	if (show_lines || show_score) /* add [ */
 		strcat (buff, "[");
+
+	if (show_lines) /* add lines */
 		strcat (buff, ((art->lines != -1) ? tin_ltoa(art->lines, 4): "   ?"));
-		strcat (buff, "]  ");
+
+	if (show_score) {
+		char tmp_score[15];
+
+		if (show_lines) /* insert a sperator if show lines and score */
+			strcat (buff, ",");
+
+		sprintf (tmp_score, "%6d", art->score);
+		strcat (buff, tmp_score); /* add score */
 	}
+
+	if (show_lines||show_score) /* add closing ] and two spaces */
+		strcat (buff, "]  ");
 
 	/*
 	 * There are two formats for the rest of the line:
@@ -119,12 +138,39 @@ bld_tline (
 	 * Add the subject and author information if required
 	 */
 	if (show_subject) {
-		/*
-		 * Work out in advance the length of the author field if needed
-		 * TODO why the -3 ???
-		 * show_lines takes up 8 chars if enabled
-		 */
+
+#if 0 /* old code without show_score */
+		/* Work out in advance the length of the author field if needed */
+		/* OUCH! never use 'n * (1 - bool)' */
 		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - show_lines) : 0);
+#else
+		if (CURR_GROUP.attribute->show_author == SHOW_FROM_NONE)
+				len_from = 0;
+		else {
+			/* compute max. screen width */
+			len_from = cCOLS - 7;	/* arrow_mark + index. num + space */
+			if (show_lines || show_score)
+				len_from -= 4;	/* [] + two taling spaces */
+
+			if (show_lines) {
+				len_from -= 4;	/* lines */
+				if (show_score)
+					len_from--;	/* seperator */
+			}
+
+			if (show_score)
+				len_from -= 6;	/* score */
+
+			if (CURR_GROUP.attribute->show_author == SHOW_FROM_BOTH)
+				len_from /= 2; /* if SHOW_FROM_BOTH use 50% for author info */
+			else
+				len_from /= 3; /* otherwise use 33% for author info */
+
+			if (len_from < 0) /* security check - small screen ? */
+				len_from = 0;
+			}
+
+#endif /* 0 */
 
 		/*
 		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
@@ -218,8 +264,8 @@ draw_tline (
 	MoveCursor(INDEX2LNUM(i), x);
 	if (tlen)
 		my_printf("%.*s", tlen, s);
-
-	/* it is somewhat less efficient to go back and redo that art mark
+	/*
+	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
 	if (s[k-x] == art_marked_selected) {
@@ -236,31 +282,39 @@ draw_tline (
 
 #ifndef INDEX_DAEMON
 /*
- * show current thread. If threaded on Subject: show
+ * Show current thread.
+ * If threaded on Subject: show
  *   <respnum> <name>
  * If threaded on References: or Archive-name: show
  *   <respnum> <subject> <name>
+ * Return values:
+ *		>= 0				Normal return to group level
+ *		GRP_RETURN		Return to selection screen
+ *		GRP_QUIT			'Q'uit all the way out
+ *		GRP_NEXT			Catchup goto next group
+ *		GRP_NEXTUNREAD	Catchup enter next unread thread
+ *		GRP_KILLED		Thread was killed at art level ?????
  */
 int
-show_thread (
+thread_page (
 	struct t_group *group,
-	char *group_path,
-	int respnum,
-	int thread_depth)
+	int respnum,				/* base[] article of thread to view */
+	int thread_depth)			/* initial depth in thread */
 {
-	int ret_code = TRUE;
+	char buf[LEN];
+	int ret_code = 0;
 	int ch;
 	int i, n;
-	int scroll_lines;
 	int flag;
+	t_bool ignore_unavail = FALSE;	/* Set if we keep going after an 'article unavailable' */
 
-	thread_respnum = respnum;
+	thread_respnum = respnum;		/* Bodge to make this variable global */
 	thread_basenote = which_thread (thread_respnum);
 	top_thread = num_of_responses (thread_basenote) + 1;
 
 	if (top_thread <= 0) {
 		info_message (txt_no_resps_in_thread);
-		return FALSE;
+		return 0;
 	}
 
 	/*
@@ -268,16 +322,25 @@ show_thread (
 	 */
 	show_subject = ((arts[thread_respnum].archive != (char *)0) || (group->attribute->thread_arts >= THREAD_REFS));
 
+	/*
+	 * Set the cursor to the last response unless space_mode is active
+	 * or an explicit thread_depth has been specified
+	 */
 	thread_index_point = top_thread;
-	if (space_mode) {
-		if ((i = new_responses (thread_basenote))) {
-			for (n = 0, i = base[thread_basenote]; i >= 0; i = arts[i].thread, n++) {
-				if (arts[i].status == ART_UNREAD) {
-					if (arts[i].thread == ART_EXPIRED)
-						art_mark_read (group, &arts[i]);
-					else
-						thread_index_point = n;
-					break;
+
+	if (thread_depth)
+		thread_index_point = thread_depth;
+	else {
+		if (space_mode) {
+			if ((i = new_responses (thread_basenote))) {
+				for (n = 0, i = base[thread_basenote]; i >= 0; i = arts[i].thread, n++) {
+					if (arts[i].status == ART_UNREAD) {
+						if (arts[i].thread == ART_EXPIRED)
+							art_mark_read (group, &arts[i]);
+						else
+							thread_index_point = n;
+						break;
+					}
 				}
 			}
 		}
@@ -286,12 +349,7 @@ show_thread (
 	if (thread_index_point < 0)
 		thread_index_point = 0;
 
-	/*
-	 * If we explicitly want to enter part way down a thread, do so
-	 */
-	if (thread_depth)
-		thread_index_point = thread_depth;
-
+	/* Now we know where the cursor is, actually put something on the screen */
 	show_thread_page ();
 
 	forever {
@@ -393,6 +451,14 @@ end_of_thread:
 					move_to_response(top_thread - 1);
 				break;
 
+			case iKeyPageLastViewed:	/* show last viewed article */
+				if (this_resp < 0) {
+					info_message (txt_no_last_message);
+					break;
+				}
+				i = this_resp;
+				goto enter_pager;
+
 			case iKeySetRange:	/* set range */
 				if (bSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point))
 					show_thread_page ();
@@ -415,20 +481,8 @@ end_of_thread:
 			case iKeyThreadReadArt:
 			case iKeyThreadReadArt2:	/* read current article within thread */
 thread_read_article:
-				n = find_response (thread_basenote, thread_index_point);
-				n = show_page (group, group_path, n, &thread_index_point);
-				if (n != GRP_NOREDRAW) {
-					if (local_filtered_articles) {
-						ret_code = GRP_KILLED;
-						goto thread_done;
-					} else if (n == thread_basenote) {
-						show_thread_page ();
-					} else {
-						index_point = n;
-						goto thread_done;
-					}
-				}
-				break;
+				i = find_response (thread_basenote, thread_index_point);
+				goto enter_pager;
 
 			case iKeyThreadReadNextArtOrThread:
 thread_tab_pressed:
@@ -436,24 +490,54 @@ thread_tab_pressed:
 				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, thread_index_point));
 
 				for (i = n; i != -1; i = arts[i].thread) {
-					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN)) {
-						n = show_page (group, group_path, i, &thread_index_point);
+					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN))
 						break;
-					}
 				}
-				if (i == -1) {
-					ret_code = GRP_GOTONEXT;
+
+				if (i == -1) {					/* We ran out of thread */
+					ret_code = GRP_NEXTUNREAD;
 					goto thread_done;
-				} else if (n == GRP_NOREDRAW) {
-					goto thread_tab_pressed;
-				} else if (local_filtered_articles) {
-					ret_code = GRP_KILLED;
-					goto thread_done;
-				} else if (n == thread_basenote) {
-					show_thread_page ();
-				} else {
-					index_point = n;
-					goto thread_done;
+				}
+
+				ignore_unavail = TRUE;
+
+				/*
+				 * General entry point into the pager. 'i' is the arts[i] we wish to view
+				 */
+enter_pager:
+				n = show_page (group, i, &thread_index_point);
+
+				/*
+				 * In some cases, we want to keep going after an ARTFAIL
+				 */
+				if (ignore_unavail) {
+					ignore_unavail = FALSE;
+					if (n == GRP_ARTFAIL)
+						n = GRP_NEXTUNREAD;
+				}
+
+				switch (n) {
+
+					case GRP_ARTFAIL:
+					case GRP_GOTOTHREAD:
+						show_thread_page();
+						break;
+
+					case GRP_RETURN:
+					case GRP_NEXT:				/* Skip to next thread */
+						ret_code = n;
+						goto thread_done;
+
+					case GRP_NEXTUNREAD:
+						goto thread_tab_pressed;
+
+					default:
+						if (local_filtered_articles) {
+							ret_code = GRP_KILLED; /* ?? */
+							goto thread_done;
+						}
+						show_thread_page();
+						fixup_thread (n, this_resp);
 				}
 				break;
 
@@ -461,22 +545,7 @@ thread_tab_pressed:
 			case iKeyPageDown2:
 			case iKeyPageDown3:
 thread_page_down:
-				if (thread_index_point + 1 == top_thread) {
-					move_to_response(0);
-					break;
-				}
-				erase_thread_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-				thread_index_point = ((thread_index_point + scroll_lines) / scroll_lines) * scroll_lines;
-				if (thread_index_point >= top_thread) {
-					thread_index_point = (top_thread / scroll_lines) * scroll_lines;
-					if (thread_index_point < top_thread - 1)
-						thread_index_point = top_thread - 1;
-				}
-				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
-					show_thread_page ();
-				else
-					draw_thread_arrow ();
+				move_to_response (page_down (thread_index_point, top_thread));
 				break;
 
 			case iKeyThreadRedrawScr:		/* redraw screen */
@@ -509,33 +578,20 @@ thread_up:
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 thread_page_up:
-				if (thread_index_point == 0) {
-					move_to_response (top_thread - 1);
-					break;
-				}
-				clear_message ();
-				erase_thread_arrow ();
-				scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
-
-				thread_index_point = (((n = thread_index_point % scroll_lines) > 0) ? (thread_index_point - n) : (((thread_index_point - scroll_lines) / scroll_lines) * scroll_lines));
-
-				if (thread_index_point < 0)
-					thread_index_point = 0;
-				if (thread_index_point < first_thread_on_screen || thread_index_point >= last_thread_on_screen)
-					show_thread_page ();
-				else
-					draw_thread_arrow ();
+				move_to_response (page_up (thread_index_point, top_thread));
 				break;
 
-			case iKeyThreadCatchupConditional:	/* catchup thread but ask for confirmation */
-thread_catchup:
-				if (ch == iKeyThreadCatchupConditional && confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1)
-					break;
-				thd_mark_read (group, base[thread_basenote]);
-				goto thread_done;
+			case iKeyThreadCatchup:					/* catchup thread, move to next one */
+			case iKeyThreadCatchupNextUnread:	/* -> next with unread arts */
+thread_catchup:										/* come here when exiting thread via <- */
+				sprintf(buf, txt_mark_thread_read, (ch == iKeyThreadCatchupNextUnread) ? txt_enter_next_thread : "");
 
-			case iKeyThreadCatchup:	/* mark thread as read immediately */
+				if (confirm_action && prompt_yn (cLINES, buf, TRUE) != 1)
+					break;
+
 				thd_mark_read (group, base[thread_basenote]);
+
+				ret_code = (ch == iKeyThreadCatchupNextUnread ? GRP_NEXTUNREAD : GRP_NEXT);
 				goto thread_done;
 
 			case iKeyThreadMarkArtRead: /* mark article as read */
@@ -543,8 +599,7 @@ thread_catchup:
 				art_mark_read (group, &arts[n]);
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
-				n = next_unread (n);
-				if (n == -1) /* no more articles in this thread _and_ group */
+				if ((n = next_unread (n)) == -1) /* no more articles in this thread _and_ group */
 					goto thread_done;
 				n = which_response (n);
 				move_to_response(n);
@@ -562,12 +617,22 @@ thread_catchup:
 				show_thread_page ();
 				break;
 
-			case iKeySearchSubjF:	/* forward/backward search */
-/*			case iKeySearchSubjB: we don't have backwards pointers to do this easily */
-				/* Subject won't change within thread if not ref threading */
-				if (CURR_GROUP.attribute->thread_arts < THREAD_REFS)
-					break;
-				search_subject_thread (ch == iKeySearchSubjF, thread_respnum, thread_index_point);
+			case iKeySearchSubjF:			/* subject search */
+			case iKeySearchSubjB:
+				if ((n = search (SEARCH_SUBJ, find_response (thread_basenote, thread_index_point),
+										(ch == iKeySearchSubjF))) != -1) {
+					fixup_thread (which_thread (n), n);
+					move_to_response (thread_index_point);
+				}
+				break;
+
+			case iKeySearchAuthF:			/* author search */
+			case iKeySearchAuthB:
+				if ((n = search (SEARCH_AUTH, find_response (thread_basenote, thread_index_point),
+										(ch == iKeySearchAuthF))) != -1) {
+					fixup_thread (which_thread (n), n);
+					move_to_response (thread_index_point);
+				}
 				break;
 
 			case iKeyThreadToggleHelpDisplay:	/* toggle mini help menu */
@@ -716,31 +781,11 @@ show_thread_page (void)
 
 	ClearScreen ();
 
+	/* TODO - if we ever count threads from 1 and not 0, then fold this into set_first_screen_item() */
 	if (thread_index_point > top_thread - 1)
 		thread_index_point = top_thread - 1;
 
-	if (NOTESLINES <= 0)
-		first_thread_on_screen = 0;
-	else {
-		first_thread_on_screen = (thread_index_point / NOTESLINES) * NOTESLINES;
-		if (first_thread_on_screen < 0)
-			first_thread_on_screen = 0;
-	}
-
-	last_thread_on_screen = first_thread_on_screen + NOTESLINES;
-
-	if (last_thread_on_screen >= top_thread) {
-		last_thread_on_screen = top_thread;
-		first_thread_on_screen = (top_thread / NOTESLINES) * NOTESLINES;
-
-		if (first_thread_on_screen == last_thread_on_screen || first_thread_on_screen < 0)
-			first_thread_on_screen = ((first_thread_on_screen < 0) ? 0 : last_thread_on_screen - NOTESLINES);
-	}
-
-	if (top_thread == 0) {
-		first_thread_on_screen = 0;
-		last_thread_on_screen = 0;
-	}
+	set_first_screen_item (thread_index_point, top_thread, &first_thread_on_screen, &last_thread_on_screen);
 
 	the_index = find_response (thread_basenote, first_thread_on_screen);
 
@@ -797,10 +842,8 @@ update_thread_page (void)
 
 	draw_thread_arrow();
 }
-#endif /* !INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static void
 draw_thread_arrow (void)
 {
@@ -819,10 +862,8 @@ draw_thread_arrow (void)
 	if (info_in_last_line)
 		info_message ("%s", arts[find_response (thread_basenote, thread_index_point)].subject);
 }
-#endif /* !INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static void
 erase_thread_arrow (void)
 {
@@ -836,10 +877,28 @@ erase_thread_arrow (void)
 	}
 	my_flush ();
 }
-#endif /* !INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
+/*
+ * Fix all the internal pointers if the current thread/response has
+ * changed.
+ */
+void
+fixup_thread (
+	int basenote,
+	int respnum)
+{
+	if (basenote != thread_basenote) {
+		thread_basenote = basenote;
+		top_thread = num_of_responses (thread_basenote) + 1;
+		thread_respnum = base[thread_basenote];
+		index_point = basenote;
+		show_thread_page();
+	}
+
+	move_to_response (which_response(respnum));		/* Redraw screen etc.. */
+}
+
 static void
 prompt_thread_num (
 	int ch)
@@ -896,12 +955,31 @@ int
 which_thread (
 	int n)
 {
-	register int i, j;
+	int i, j;
 
 	for (i = 0; i < top_base; i++) {
 		for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 			if (j == n)
+#ifdef JUST_TESTING
+			{
+				/* We can much more rapidly locate the topmost available parent than
+				 * the brute force method above. This is definitely the Right Way to
+				 * go in 1.5
+				 */
+				int val = n;
+				struct t_msgid *ptr;
+
+				for (ptr = arts[n].refptr; ptr->parent; ptr = ptr->parent) {
+					if (ptr->parent->article != ART_UNAVAILABLE)
+						val = ptr->parent->article;
+				}
+				fprintf(stderr, "TEST: which_thread found %d, actual is %d\n", val, base[i]);
+
 				return i;
+			}
+#else
+				return i;
+#endif
 		}
 	}
 
@@ -912,7 +990,7 @@ which_thread (
 
 
 /*
- *  Find how deep in a thread a response is.  Start counting at zero
+ *  Find how deep in its' thread arts[n] is.  Start counting at zero
  */
 int
 which_response (
@@ -979,6 +1057,7 @@ stat_thread (
 	sbuf->selected_unread= 0;
 	sbuf->selected_seen  = 0;
 	sbuf->art_mark = ART_MARK_READ;
+	sbuf->score = 0 /*-(SCORE_MAX) */;
 
 	for (i = (int) base[n]; i >= 0; i = arts[i].thread) {
 		++sbuf->total;
@@ -988,9 +1067,16 @@ stat_thread (
 		if (arts[i].delete_it)
 			++sbuf->deleted;
 
-		if (arts[i].status == ART_UNREAD)
+		if (arts[i].status == ART_UNREAD) {
 			++sbuf->unread;
-		else if (arts[i].status == ART_WILL_RETURN)
+			/* we use the maximum article score for the complete thread */
+			if ((arts[i].score > sbuf->score) && (arts[i].score > 0))
+				sbuf->score = arts[i].score;
+			else {
+				if ((arts[i].score < sbuf->score) && (sbuf->score <= 0))
+					sbuf->score = arts[i].score;
+			}
+		} else if (arts[i].status == ART_WILL_RETURN)
 			++sbuf->seen;
 
 		if (arts[i].selected) {
@@ -1013,7 +1099,7 @@ stat_thread (
 
 
 /*
- *  Find the next response.  Go to the next basenote if there
+ *  Find the next response to arts[n].  Go to the next basenote if there
  *  are no more responses in this thread
  */
 int
@@ -1055,6 +1141,7 @@ next_thread (
 /*
  *  Find the previous response.  Go to the last response in the previous
  *  thread if we go past the beginning of this thread.
+ *  Return -1 if we are are the start of the group
  */
 int
 prev_response (
@@ -1078,8 +1165,7 @@ prev_response (
 
 
 /*
- *  return response number n from thread i
- *	ie return the index in arts[] of the nth followup to thread base 'i'
+ *  return index in arts[] of the 'n'th response in thread base 'i'
  */
 int
 find_response (
@@ -1098,8 +1184,9 @@ find_response (
 
 
 /*
- *  Find the next unread response in this group. If no response is found
- *  from current point to the end restart from beginning of articles.
+ *  Find the next unread response to art[n] in this group. If no response is found
+ *  from current point to the end restart from beginning of articles. If no more
+ *  responses can be found, return -1
  */
 int
 next_unread (
@@ -1149,7 +1236,7 @@ prev_unread (
  * Move the on-screen pointer & internal variable to the given reponse
  * within the thread
  */
-void
+static void
 move_to_response (
 	int n)
 {

@@ -1,3 +1,72 @@
+-- pre-1.4 release 981114 "The Watchman" --
+
+621) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. minor VMS-code cleanup
+     FIX. vms/*
+
+620) Fabrice Bellet <Fabrice.Bellet@imag.fr>
+     BUG. insecure usage of fprintf()
+     FIX. save.c
+
+619) Manoj Kumar <manoj@sasi.com>
+     ADD. speed up highlighting code
+     FIX. color.c
+
+618) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. the cursor position gets 'lost' after 'y'ank in 'y'ank out
+     FIX. select.c
+
+617) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt (1.11 -> 1.13)
+     FIX. metamutt
+
+616) Urs Janssen <urs@tin.org>
+     ADD. removed --enable-forgery configure option
+     ADD. support for serverside generated Message-IDs in POST response
+     ADD. minor code cleanup
+     ADD. updated pcre (2.00 -> 2.01)
+     BUG. possible bufferoverflow in show_cont_header() and bAddFilterRule()
+     FIX. active.c, config.c, filter.c, group.c, inews.c, main.c, misc.c,
+          page.c, regexp.c, autoconf.h[in], configure[.in], pcre/*
+
+615) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. fix inconsistencies in [Cc]atchup and other menus
+     ADD. cleaned up navigation between menus and commented existing code
+     ADD. 'l'ist thread to pager
+     ADD. '-' enter previous article to thread menu
+     ADD. 'a', 'A', '?' searching to thread menu
+     ADD. article position lost when cycling threading mode
+     ADD. big code cleanup
+     BUG. wrong values returned from show_page()
+     BUG. core dump when using 'N' and 'P' on unavailable articles
+     BUG. author search in group menu entered the article unlike Subject
+          search
+     BUG. -> on thread menu and art unavailable, screen redraw was needed
+          to remove the +
+     BUG. more bad handling of art unavailable on group page
+     BUG. tiny memleak in read_input_history_file()
+     BUG. various inconsistencies / minor errors in searching
+     REM. unnecessary checks for error returns from my_malloc()
+     REM. #ifdef SHOW_PROGESS - it is on by default
+     REM. auto_save_msg, it was not used
+     FIX. tin.1, extern.h, menukeys.h, proto.h, tin.h, active.c, art.c,
+          attrib.c, config.c, filter.c, group.c, help.c, init.c, lang.c,
+          main.c, misc.c, newsrc.c, page.c, post.c, prompt.c, read.c
+          save.c, search.c, select.c, sigfile.c, thread.c
+
+614) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. show_score in thread/group-level
+     ADD. GNKSA-checks for vaild From/Sender/Approved
+     FIX. extern.h, proto.h, tin.h, version.h, config.c, group.c, init.c
+          lang.c, misc.c, post.c, thread.c, tincfg.tbl
+
+613) Jeon Hyoung-Jo <hjjeon@cclab.kaist.ac.kr>
+     ADD. -G cmd-line switch/getart_limit,use_getart_limit
+          to limit the number of articles/group being fetched from
+          the server
+     FIX. extern.h, menukeys.h, art.c, config.c, group.c, help.c,
+          init.c, lang.c, main.c, tincfg.tbl
+
 -- pre-1.4 release 981002 "Phobia" --
 
 612) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -14,7 +83,7 @@
      FIX. read.c, signal.c
 
 609) Ralf Doeblitz <doeblitz@gmx.de>
-     ADD. conversation tables vor ibm437/ibm850 <-> iso-8859-1
+     ADD. conversion tables for ibm437/ibm850 <-> iso-8859-1
      FIX. ibm437_l1.tab, ibm850_l1.tab, l1_ibm437.tab, l1_ibm850.tab,
           l1_next.tab, next_l1.tab, misc.c
 
@@ -70,13 +139,13 @@
      FIX. init.c, misc.c, nntplib.c, prompt.c
 
 600) Greg Berigan <gberigan@cse.unl.edu>
-     ADD. support for persistant-headers
+     ADD. support for persistent-headers
      ADD. minor code cleanup
      FIX. tin.h, page.c, post.c
 
 599) Ralf Doeblitz <doeblitz@gmx.de>
      ADD. random-sigs now allow different sigfixed-parts via
-          random_sigdir/.sigfixed which has a hiher precedence
+          random_sigdir/.sigfixed which has a higher precedence
           as ~/.sigfixed
      BUG. typo in vWriteFilterArray()
      FIX. filter.c, sigfile.c
@@ -86,15 +155,15 @@
      FIX. select.c
 
 597) Sven Paulus <sven@tin.org>
-     BUG. possible bufferoverrun
+     BUG. possible buffer overrun
      FIX. init.c
 
 596) Kazushi Marukawa <jam@pobox.com>
      BUG. tin now handles "LIST ACTIVE"/"GROUP" differences correct
      BUG. tins mailgroup feature was broken
-     BUG. parse_headers() used mime-decoced data which might be toublesome
+     BUG. parse_headers() used mime-decoded data which might be troublesome
      ADD. '-l' cmd-line switch to turn on "LIST ACTIVE" only-mode
-     ADD. changed '-R' to read saved news (-S) offline
+     ADD. changed '-R' to read saved news (-S) off-line
      ADD. -s option to -R to point -R to the saved spool
      FIX. extern.h, active.c, art.c, group.c, inews.c, init.c, mail.c,
           main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c,
@@ -125,9 +194,9 @@
 592) Urs Janssen <urs@tin.org>
      BUG. defines for HAVE_SETPGRP and SETPGRP_VOID were missing
      ADD. --disable-xhdr-xref switch to configure in case it slows down
-          your readingprocess too much.
+          your reading process too much.
      ADD. check for empty domain_name is now done after site_config-file
-          is read (simplyfies binarie dist.)
+          is read (simplifies binarie dist.)
      ADD. changed msg_add_x_headers() that "x_headers=foo" without
           a ':' in it is no longer treated as filename in the current
           dir, you could still use '/' or '~' to indicate that's a
@@ -163,7 +232,7 @@
      FIX. getline.c
 
 586) Thomas E. Dickey <dickey@clark.net>
-     BUG. use of null pointer in sprintf
+     BUG. use of null pointer in sprintf()
      BUG. misplaced fclose
      BUG. correct conflicting definitions of isascii
      BUG. duplicate switch cases
@@ -227,7 +296,7 @@
 579) Dirk Nimmich <nimmich@uni-muenster.de>
      Urs Janssen <urs@tin.org>
      BUG. when saving/piping MIME-encoded articles they were automatically
-          decoded but that's only usefull if any postprocessing is done
+          decoded but that's only useful if any post-processing is done
      FIX. extern.h, proto.h, charset.c, feed.c, lang.c, open.c, page.c
           save.c, search.c
 
@@ -239,7 +308,7 @@
 577) Sven Paulus <sven@tin.org>
      ADD. spamtrap_warning_addresses option to .tin/tinrc
      ADD. mm_charset option tin.defaults
-     BUG. off by one error in option numers for OPT_CHAR/OPT_NUM
+     BUG. off by one error in option numbers for OPT_CHAR/OPT_NUM
      BUG. MIME type and MIME encoding behaviour was a little confusing
      FIX. extern.h, tin.h, config.c, inews.c, init.c, lang.c, post.c
           prompt.c, rfc1522.c, tincfg.tbl
@@ -262,8 +331,8 @@
      FIX. metamutt
 
 572) Thomas E. Dickey <dickey@clark.net>
-     BUG. if giving syntacticaly wrong args to some configure options
-          it didn't fallback to a usefull value.
+     BUG. if giving syntactically wrong args to some configure options
+          it didn't fallback to a useful value.
      FIX. aclocal.m4,configure[.in]
 
 571) Jason Faultless <jason@radar.demon.co.uk>
@@ -314,7 +383,7 @@
 
 563) Florian Kuehnert <sutok@gmx.de>
      Urs Janssen <urs@tin.org>
-     ADD. skip article header when spellchecking
+     ADD. skip article header when spell checking
      BUG. append_file() was broken
      FIX. misc.c
 
@@ -1525,7 +1594,7 @@
 
 367) Urs Janssen <urs@akk.uni-karlsruhe.de>
      Thomas E. Dickey <dickey@clark.net>
-     BUG. reamed valid in prompt.c as Suns K&R compiler didn't like it.
+     BUG. renamed valid in prompt.c as Suns K&R compiler didn't like it.
      BUG. '\t' was treated as 8bit-char
      FIX. prompt.c, tin.h
 

@@ -12,7 +12,8 @@
  *              right notice, and it must be included in any copy made
  */
 
-/* TODO -- use txt_help_empty_line to organize listed commands, possibly
+/*
+ * TODO -- standardize the layout of these screens
  * like this:
  *
  * navigation within the level
@@ -168,6 +169,10 @@ constext *help_group[] = {
 #endif
 		txt_help_empty_line,
 	txt_help_g_t_p_i,
+	txt_help_g_G,
+#ifdef HAVE_COLOR
+	txt_help_color,
+#endif
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -183,13 +188,17 @@ constext *help_thread[] = {
 	txt_help_t_caret_dollar,
 	txt_help_t_num,
 	txt_help_i_search,
+	txt_help_a,
 	txt_help_t_cr,
 	txt_help_p_tab,
+	txt_help_dash,
 		txt_help_empty_line,
 	txt_help_hash,
 		txt_help_empty_line,
 	txt_help_p_z,
-	txt_help_ck,
+	txt_help_thd_c,
+	txt_help_thd_C,
+	txt_help_thd_K,
 	txt_help_t,
 	txt_help_U,
 		txt_help_empty_line,
@@ -204,6 +213,9 @@ constext *help_thread[] = {
 		txt_help_empty_line,
 	txt_help_d,
 	txt_help_I,
+#ifdef HAVE_COLOR
+	txt_help_color,
+#endif
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
@@ -266,6 +278,7 @@ constext *help_page[] = {
 		txt_help_empty_line,
 	txt_help_W,
 		txt_help_empty_line,
+	txt_help_l,
 	txt_help_T,
 	txt_help_i,
 	txt_help_q,
@@ -279,6 +292,7 @@ constext *help_page[] = {
 	txt_help_M,
 	txt_help_I,
 #ifdef HAVE_COLOR
+	txt_help_color,
 	txt_help__,
 #endif
 		txt_help_empty_line,

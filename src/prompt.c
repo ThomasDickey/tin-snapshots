@@ -248,7 +248,8 @@ prompt_list (
 			/*
 			 * Increment list, looping around at the max
 			 */
-			var = ++var % size;
+			++var;
+			var %= size;
 
 			my_printf("%-*s", (int)width, list[var]);
 			my_flush ();
@@ -399,7 +400,7 @@ prompt_string_default(
 	char *prompt,
 	char *def,
 	const char *failtext,
-	int  history)
+	int history)
 {
 	char pattern[LEN];
 

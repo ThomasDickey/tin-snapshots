@@ -21,19 +21,28 @@ static char tmpbuf[LEN];
  * local prototypes
  */
 static char * get_search_pattern (int forward, const char *fwd_msg, const char *bwd_msg, char *def, int which_hist);
-static int search_art_body (char *group_path, struct t_article *art, char *pat);
-static int search_thread (int i, char *pattern);
 
+/*
+ * The search function may place error text into mesg
+ */
+#define MATCH_MSG	(mesg[0] ? mesg : txt_no_match)
 
 /*
  * last search patterns (from tinrc file)
  */
-
 char default_author_search[LEN];
 char default_config_search[LEN];
 char default_group_search[LEN];
 char default_subject_search[LEN];
 char default_art_search[LEN];
+
+#ifndef INDEX_DAEMON
+	/*
+	 * Kludge to maintain counters for body search
+	 */
+	static int total_cnt = 0, curr_cnt = 0;
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * Obtain the search pattern, save it in the default buffer.
@@ -65,62 +74,6 @@ get_search_pattern(
 	 */
 	sprintf(tmpbuf, "*%s*", def);
 	return(tmpbuf);
-}
-
-
-/*
- * Called by group.c & page.c
- */
-int
-search_author (
-	int the_index,
-	int current_art,
-	int forward)
-{
-	char *buf;
-	char buf2[LEN];
-	char group_path[PATH_LEN];
-	int i;
-
-	if (!(buf = get_search_pattern(forward, txt_author_search_forwards, txt_author_search_backwards, default_author_search, HIST_AUTHOR_SEARCH)))
-		return -1;
-
-	if (!read_news_via_nntp || active[the_index].type != GROUP_TYPE_NEWS)
-		make_group_path (active[the_index].name, group_path);
-
-	i = current_art;
-
-	do {
-		if (forward) {
-			i = next_response (i);
-			if (i < 0)
-				i = base[0];
-		} else {
-			if ((i = prev_response (i)) < 0)
-				i = find_response(top_base - 1, num_of_responses (top_base - 1));
-		}
-
-		if (active[the_index].attribute->show_only_unread && arts[i].status != ART_UNREAD)
-			continue;
-
-		if (arts[i].name == (char *) 0)
-			strcpy (buf2, arts[i].from);
-		else
-			sprintf (buf2, "%s <%s>", arts[i].name, arts[i].from);
-
-		if (REGEX_MATCH (buf2, buf, TRUE)) {
-			/*
-			 * check if article still exists
-			 */
-			if (stat_article (arts[i].artnum, group_path)) {
-				clear_message ();
-				return i;
-			}
-		}
-	} while (i != current_art);
-
-	info_message (txt_no_match);
-	return -1;
 }
 
 
@@ -166,53 +119,56 @@ search_config (
 
 #ifndef INDEX_DAEMON
 /*
+ * Search active[] looking for a groupname
  * Called by select.c
+ * Return index into active of matching groupname or -1
  */
-void
-search_group (
+int
+search_active (
 	int forward)
 {
 	char *buf;
 	char buf2[LEN];
+ 	char *ptr = buf2;
 	int i;
 
 	if (!group_top) {
 		info_message (txt_no_groups);
-		return;
+		return -1;
 	}
 
-	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
-		return;
+	if (!(buf = get_search_pattern( forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
+		return -1;
 
 	i = cur_groupnum;
 
 	do {
-		if (forward)
+		if (forward) {
 			i++;
-		else
+			if (i >= group_top)
+				i = 0;
+		} else {
 			i--;
-
-		if (i >= group_top)
-			i = 0;
-		if (i < 0)
-			i = group_top - 1;
+			if (i < 0)
+				i = group_top - 1;
+		}
 
 		/*
 		 * Get the group name & description into buf2
 		 */
-		if (show_description && active[my_group[i]].description)
+		if (show_description && active[my_group[i]].description) {
 			sprintf (buf2, "%s %s", active[my_group[i]].name, active[my_group[i]].description);
-		else
-			strcpy (buf2, active[my_group[i]].name);
+			ptr = buf2;
+		} else
+			ptr = active[my_group[i]].name;
 
-		if (REGEX_MATCH (buf2, buf, TRUE)) {
-			move_to_group(i);
-			clear_message();
-			return;
+		if (REGEX_MATCH (ptr, buf, TRUE)) {
+			return i;
 		}
 	} while (i != cur_groupnum);
 
-	info_message (txt_no_match);
+	info_message (MATCH_MSG);
+	return -1;
 }
 #endif /* !INDEX_DAEMON */
 
@@ -256,145 +212,204 @@ search_help (
 	return result;
 }
 
+
+#ifndef INDEX_DAEMON
 /*
- * Internal function - traverse a thread looking for a subject match
- * Return -1 if not found, or the depth in the thread of the match
- * Performance note: we can compare hashed subjects directly as they
- * point to the same address. This is much cheaper than a REGEX_MATCH()
+ * Scan the body of an arts[i] for searchbuf
+ * used only by search_body()
+ * Returns:	1	String found
+ *          0	Not found
+ *			-1	User aborted search
  */
 static int
-search_thread(
+body_search (
 	int i,
-	char *pattern)
+	char *searchbuf)
 {
-	int art, depth = 0;
-	char *old_subject = 0;
+	char group_path[PATH_LEN];
+	char *line;
+	int  code;
+	struct t_article *art = &arts[i];
+	FILE *fp;
 
-	for (art = i; art >= 0; art = arts[art].thread, ++depth) {
-
-		/*
-		 * Speed hack, if the subject remains constant, skip the check
-		 */
-		if (arts[art].subject == old_subject)
-			continue;
-
-		old_subject = arts[art].subject;
-
-		if (REGEX_MATCH(old_subject, pattern, TRUE))
-			return(depth);
-	}
-
-	return(-1);
-}
-
-/*
- * Search a thread for a subject. Reposition cursor & update internal
- * pointers as needed.
- */
-#ifndef INDEX_DAEMON
-void
-search_subject_thread(
-	int forward,
-	int baseart,
-	int offset)
-{
-	char *buf;
-	int i, depth;
-
-	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_subject_search, HIST_GROUP_SEARCH)))
-		return;
+	if (!read_news_via_nntp || CURR_GROUP.type != GROUP_TYPE_NEWS)
+		make_group_path (CURR_GROUP.name, group_path);
 
 	/*
-	 * Advance to our current position in the thread
+	 * open_art_fp() will display 'mesg' if not null instead of the default progress counter
 	 */
-	for (i = 0; i < offset; i++)
-		baseart = arts[baseart].thread;
+	sprintf(mesg, txt_searching_body, ++curr_cnt, total_cnt);
 
-	if ((depth = search_thread(baseart, buf)) == -1) {
-		info_message (txt_no_match);
-		return;
+#if 1 /* see also screen.c show_progress ()*/
+	if ((fp = open_art_fp (group_path, art->artnum, -art->lines, TRUE)) == (FILE *) 0)
+#else
+	if ((fp = open_art_fp (group_path, art->artnum, art->lines, TRUE)) == (FILE *) 0)
+#endif
+		return ((tin_errno != 0) ? -1 : 0);
+
+	/*
+	 * Skip the header
+	 */
+	while ((line = tin_fgets (fp, TRUE)) != (char *) 0) {
+		if (*line == '\0')
+			break;
 	}
 
-	move_to_response(depth+offset);
-	clear_message();
-	return;
+	if (tin_errno != 0) {			/* User aborted search */
+		code = -1;
+		goto exit_search;
+	}
+
+	/*
+	 * Now search the body
+	 */
+	while ((line = tin_fgets (fp, FALSE)) != (char *) 0) {
+		if (REGEX_MATCH (line, searchbuf, TRUE)) {
+			code = 1;
+			goto exit_search;
+		}
+	}
+
+	if (tin_errno != 0) {			/* User abort */
+		code = -1;
+		goto exit_search;
+	}
+
+	code = 0;						/* Didn't find it */
+exit_search:
+	fclose (fp);					/* open_art_fp() returns a real fd */
+	return code;
 }
-#endif
 
 /*
- * Search the current group for a subject. Reposition the cursor if needed.
- * If the match happened inside a thread (ie after a subject change within a thread)
- * return the depth in the thread of the matching article. Otherwise -1.
+ * Match searchbuff against the From: information in arts[i]
+ * 1 = found, 0 = not found
  */
-#ifndef INDEX_DAEMON
-int
-search_subject_group (
-	int forward)
+static int
+author_search (
+	int i,
+	char *searchbuf)
 {
-	char *buf;
-	int i, j, depth=0;
-	t_bool found = FALSE;
+	char buf[LEN];
+	char *ptr = buf;
+
+	if (arts[i].name == (char *) 0)
+		ptr = arts[i].from;
+	else
+		sprintf (buf, "%s <%s>", arts[i].name, arts[i].from);
+
+	return (REGEX_MATCH (ptr, searchbuf, TRUE)) ? 1 : 0;
+}
+
+/*
+ * Match searchbuff against the Subject: information in arts[i]
+ * 1 = found, 0 = not found
+ */
+static int
+subject_search (
+	int i,
+	char *searchbuf)
+{
+	return (REGEX_MATCH (arts[i].subject, searchbuf, TRUE)) ? 1 : 0;
+}
+
+
+/*
+ * Returns index into arts[] of matching article or -1
+ */
+static int
+search_group (
+	int forward,
+	int current_art,
+	char *searchbuff,
+	int (*search_func) (int i, char *searchbuff))
+{
+	char group_path[PATH_LEN];
+	int i;
 
 	if (index_point < 0) {
 		info_message (txt_no_arts);
 		return 0;
 	}
 
-	if (!(buf = get_search_pattern(
-				forward,
-				txt_search_forwards,
-				txt_search_backwards,
-				default_subject_search,
-				HIST_SUBJECT_SEARCH
-	))) return -1;
+	if (!read_news_via_nntp || CURR_GROUP.type != GROUP_TYPE_NEWS)
+		make_group_path (CURR_GROUP.name, group_path);
 
-	i = index_point;						/* Search from current position */
+	i = current_art;
 
 	do {
-		forward ? i++ : i--;
-
-		if (i >= top_base)
-			i = 0;
-
-		if (i < 0)
-			i = top_base - 1;
-
-		j = (int) base[i];				/* Get index in arts[] of thread root */
-
-		if (CURR_GROUP.attribute->thread_arts < THREAD_REFS) {
-			if (REGEX_MATCH(arts[j].subject, buf, TRUE)) {
-				found = TRUE;
-				break;
-			}
+		if (forward) {
+			if ((i = next_response (i)) < 0)
+				i = base[0];
 		} else {
-			/*
-			 * With threading on References, Subject lines can change mid thread.
-			 * We must descend the thread in these cases
-			 */
-			if ((depth = search_thread (j, buf)) != -1) {
-				found = TRUE;
-				break;
-			}
+			if ((i = prev_response (i)) < 0)
+				i = find_response(top_base - 1, num_of_responses (top_base - 1));
 		}
 
-	} while (i != index_point && !found);
+		/* Only search displayed articles */
+		if (CURR_GROUP.attribute->show_only_unread && arts[i].status != ART_UNREAD)
+			continue;
 
-	if (!found) {
-		info_message (txt_no_match);
-		return(-1);
-	}
+		switch (search_func (i, searchbuff)) {
+			case 1:								/* Found */
+				clear_message ();
+				return i;
+			case -1:							/* User abort */
+				return -1;
+		}
 
-	if (depth != 0) {
-		index_point = i;
-		return(depth);		/* group.c needs to enter this thread */
-	}
+	} while (i != current_art);
 
-	/* Otherwise update the on-screen pointer */
-	move_to_thread(i);
-	clear_message();
-	return(-1);				/* No furthur action needed in group.c */
+	info_message (MATCH_MSG);
+	return -1;
 }
+
+
+/*
+ * Generic entry point to search for fields in arts[]
+ * Returns index into arts[] of matching article or -1
+ */
+int
+search (
+	int key,
+	int current_art,
+	int forward)
+{
+	char *buf = '\0';
+	int (*search_func) (int i, char *searchbuff) = author_search;
+
+	switch (key) {
+		case SEARCH_SUBJ:
+			if (!(buf = get_search_pattern(
+					forward,
+					txt_search_forwards,
+					txt_search_backwards,
+					default_subject_search,
+					HIST_SUBJECT_SEARCH
+			))) return -1;
+
+			search_func = subject_search;
+			break;
+
+		case SEARCH_AUTH:
+		default:
+			if (!(buf = get_search_pattern(
+					forward,
+					txt_author_search_forwards,
+					txt_author_search_backwards,
+					default_author_search,
+					HIST_AUTHOR_SEARCH
+			))) return -1;
+
+			search_func = author_search;
+			break;
+	}
+
+	return (search_group (forward, current_art, buf, search_func));
+}
+
 #endif /* !INDEX_DAEMON */
+
 
 /*
  * page.c (search current article body)
@@ -439,9 +454,9 @@ search_article (
 			 * maps control chars to '^char'
 			 */
 			for (p = buf, q = buf2;	*p && *p != '\n' && q<&buf2[LEN]; p++) {
-				if (*p == '\b' && q > buf2) {
+				if (*p == '\b' && q > buf2)
 					q--;
-				} else if (*p == '\f') {		/* ^L */
+				else if (*p == '\f') {		/* ^L */
 					*q++ = '^';
 					*q++ = 'L';
 					ctrl_L = TRUE;
@@ -454,9 +469,8 @@ search_article (
 				} else if (((*p) & 0xFF) < ' ') {
 					*q++ = '^';
 					*q++ = ((*p) & 0xFF) + '@';
-				} else {
+				} else
 					*q++ = *p;
-				}
 			}
 			*q = '\0';
 
@@ -475,118 +489,40 @@ search_article (
 	}
 
 	fseek (note_fp, note_mark[note_page], SEEK_SET);
-	info_message (txt_no_match);
+	info_message (MATCH_MSG);
 	return FALSE;
 }
 
 
-/*
- * Scan the body of an article for a string.
- * used only by search_body()
- * Returns:	TRUE  String found
- *          FALSE Not found
- *          -1	   User aborted the search
- */
-static int
-search_art_body (
-	char *group_path,
-	struct t_article *art,
-	char *pat)
-{
-	char *line;
-	FILE *fp;
-
-#if 1 /* see also screen.c show_progress ()*/
-	if ((fp = open_art_fp (group_path, art->artnum, -art->lines, TRUE)) == (FILE *) 0)
-#else
-	if ((fp = open_art_fp (group_path, art->artnum, art->lines, TRUE)) == (FILE *) 0)
-#endif
-		return ((tin_errno != 0) ? -1 : FALSE);
-
-	/*
-	 * Skip the header
-	 */
-	while ((line = tin_fgets (fp, TRUE)) != (char *) 0) {
-		if (*line == '\0')
-			break;
-	}
-
-	if (tin_errno != 0) {
-		fclose(fp);
-		return(-1);
-	}
-
-	/*
-	 * Now search the body
-	 */
-	while ((line = tin_fgets (fp, FALSE)) != (char *) 0) {
-		if (REGEX_MATCH (line, pat, TRUE)) {
-			fclose (fp);
-			return TRUE;
-		}
-	}
-
-	TIN_FCLOSE (fp);
-
-	if (tin_errno != 0)
-		return -1;
-
-	return FALSE;
-}
-
+#ifndef INDEX_DAEMON
 /*
  * Search the bodies of all the articles in current group
  */
 int
 search_body (
-	struct t_group *group,
 	int current_art)
 {
-	char group_path[PATH_LEN];
-	char *pat;
-	int art_cnt = 0, i, j = 0;
+	char *buf;
+	int i;
 
-	if (!(pat = get_search_pattern(1, txt_search_body, txt_search_body, default_art_search, HIST_ART_SEARCH)))
+	if (!(buf = get_search_pattern(1, txt_search_body, txt_search_body, default_art_search, HIST_ART_SEARCH)))
 		return -1;
 
-	make_group_path (group->name, group_path);
+	total_cnt = curr_cnt = 0;			/* Reset global counter of articles done */
 
 	/*
 	 * Count up the articles to be processed for the progress meter
 	 */
-	if (group->attribute->show_only_unread) {
+	if (CURR_GROUP.attribute->show_only_unread) {
 		for (i = 0; i < top_base; i++)
-			art_cnt += new_responses (i);
+			total_cnt += new_responses (i);
 	} else {
 		for (i = 0; i < top; i++) {
 			if (!IGNORE_ART(i))
-				art_cnt++;
+				total_cnt++;
 		}
 	}
 
-	i = current_art;
-
-	do {
-		i = next_response (i);
-		if (i < 0)
-			i = base[0];
-
-		if (group->attribute->show_only_unread && arts[i].status == ART_READ)
-			continue;
-
-		sprintf(mesg, txt_searching_body, ++j, art_cnt);
-
-		switch (search_art_body (group_path, &arts[i], pat)) {
-			case TRUE:					/* Found it okay */
-				return i;
-
-			case -1:					/* User aborted search */
-				return -1;
-		}
-
-	} while (i != current_art);
-
-	info_message (txt_no_match);
-
-	return -1;
+	return (search_group (1, current_art, buf, body_search));
 }
+#endif /* !INDEX_DAEMON */

@@ -294,9 +294,8 @@ vFindArtMaxMin (
 					*plArtMax = lArtNum;
 					if (*plArtMin == 0)
 						*plArtMin = lArtNum;
-				} else if (lArtNum < *plArtMin) {
+				} else if (lArtNum < *plArtMin)
 					*plArtMin = lArtNum;
-				}
 			}
 		}
 		closedir (tDirFile);
@@ -447,7 +446,7 @@ iArtEdit (
 	if (psGrp->type != GROUP_TYPE_NEWS) {
 		vMakeGrpPath (psGrp->spooldir, psGrp->name, acTmpFile);
 		sprintf (acArtFile, "%s/%ld", acTmpFile, psArt->artnum);
-		sprintf (acTmpFile, "%s%d.art", TMPDIR, process_id);
+		sprintf (acTmpFile, "%s%d.art", TMPDIR, (int) process_id);
 		if (copy_file (acArtFile, acTmpFile)) {
 			invoke_editor (acTmpFile, 1);
 			rename_file (acTmpFile, acArtFile);

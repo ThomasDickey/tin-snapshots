@@ -23,14 +23,13 @@
 /*
  * local prototypes
  */
-
 static void write_newsrctable_file (void);
+
 
 /*
  * write_newsrctable_file()
  * create newsrctable file in local rc directory
  */
-
 static void
 write_newsrctable_file (void)
 {
@@ -51,7 +50,6 @@ write_newsrctable_file (void)
  * ---> extend to allow nameserver-lookups, if search in table
  *      failed
  */
-
 void
 get_nntpserver (
 	char *nntpserver_name,
@@ -88,11 +86,12 @@ get_nntpserver (
 	}
 }
 
-/* get_newsrcname()
+
+/*
+ * get_newsrcname()
  * get name of newsrc file with given name of nntp server
  * returns TRUE if name was found, FALSE if the search failed
  */
-
 int
 get_newsrcname (
 	char *newsrc_name,
@@ -211,8 +210,8 @@ get_newsrcname (
 			}
 			return TRUE;
 		}
-	} else {
+	} else
 		write_newsrctable_file();
-	}
+
 	return FALSE;
 }

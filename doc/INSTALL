@@ -11,7 +11,7 @@ This following configure options and defines are documented in detail:
   --enable-curses	     --with-ispell              HAVE_LIBUU
   --enable-debug	     --with-libdir		INDEX_DAEMON
   --enable-etiquette	     --with-metamail		NNTP_INEWS
-  --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
+  --with-ncurses	     FORGERY			NNTP_SERVER_FILE
   --enable-locale	     --with-nntp-default-server NO_POSTING
   --enable-mh-mail-handling  --with-nov-dir		NO_SHELL_ESCAPE
   --enable-nntp		     --with-pgp			LOCAL-CHARSET
@@ -222,13 +222,6 @@ by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for
 logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
 BASE and NNTP.
 
---enable-forgery
-Define if you want to be able to cancel postings you did not write
-yourself.  The !cyberspam and cancel conventions are supported.  Be
-careful with this feature, it should not be used in an free accessible
-tin.  This feature does not work with INN using the INN-inews (when
-using without NNTP), because INN-inews rejects these cancels.
-
 --enable-8bit-keys
 Define if your terminal generates 8-bit controls.  For Unix systems we
 assume this may imply your arrow keys begin either with CSI (0x9b) or SS3
@@ -319,6 +312,13 @@ posting to was not found in the sites active file to an error in the
 article checking routine therefore causing the user to remove the group
 from his/her posting or to abort the posting of the article.
 
+FORGERY
+Define if you want to be able to cancel postings you did not write
+yourself.  The !cyberspam and cancel conventions are supported.  Be
+careful with this feature, it should not be used in an free accessible
+tin.  This feature does not work with INN using the INN-inews (when
+using without NNTP), because INN-inews rejects these cancels.
+
 HAVE_MMDF_MAILER
 Define if your machine uses a MMDF type mailer instead of sendmail.
 It is defined as default on SCO Unix machines. It can be dynamically
@@ -385,6 +385,8 @@ Compiled & installed on the following machines:
 	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
 	Sun 3/60 & SunOS 4.1.1_U1 with gcc 2.7.2.2
 	sparc-sun-solaris2.5.1 with Sun Sparcworks compiler (v 4.2)
+	Sun SPARCsystem 600 & SunOS 5.5.1 with gcc 2.8.1
+	i686 & SunOS 5.6 with gcc 2.8.1
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
 

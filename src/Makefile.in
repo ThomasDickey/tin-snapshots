@@ -10,7 +10,6 @@ exec_prefix	= @exec_prefix@
 top_srcdir	= @top_srcdir@
 srcdir		= @srcdir@
 VPATH		= $(srcdir)
-@SET_MAKE@
 
 # Compiler, linker & parser commands
 CC	= @CC@

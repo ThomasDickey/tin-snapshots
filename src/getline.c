@@ -39,7 +39,7 @@
 #define DEL	'\177'
 
 static char gl_buf[BUF_SIZE];	/* input buffer */
-static int gl_init_done = 0;  /* -1 is terminal, 1 is batch  */
+static int gl_init_done = 0;  /* -1 is terminal, 1 is batch */
 static const char *gl_prompt;	/* to save the prompt string */
 static int gl_width = 0;	/* net size available for input */
 static int gl_pos, gl_cnt = 0;	/* position and size of input */
@@ -317,13 +317,13 @@ gl_kill_back_word (void)
 	int i, cur;
 
 	/* delete spaces */
-	for (i = gl_pos - 1; i >= 0 && isspace(gl_buf[i]); --i)
+	for (i = gl_pos - 1; i >= 0 && isspace((int)gl_buf[i]); --i)
 		;
 	/* delete not alnum characters but graph characters */
-	for (; i >= 0 && isgraph(gl_buf[i]) && !isalnum(gl_buf[i]); --i)
+	for (; i >= 0 && isgraph((int)gl_buf[i]) && !isalnum((int)gl_buf[i]); --i)
 		;
 	/* delete all graph characters except '/' */
-	for (; i >= 0 && gl_buf[i] != '/' && isgraph(gl_buf[i]); --i)
+	for (; i >= 0 && gl_buf[i] != '/' && isgraph((int)gl_buf[i]); --i)
 		;
 	i++;
 	if (i != gl_pos) {

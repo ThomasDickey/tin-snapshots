@@ -232,7 +232,7 @@ parse_active_line (
 
 
 /*
- * Load the active information into active[] by coundint the min/max/count
+ * Load the active information into active[] by counting the min/max/count
  * for each news group.
  * Parse a line from the .newsrc file
  * Send GROUP command to NNTP server directly to keep window.
@@ -359,9 +359,8 @@ read_newsrc_active_file (void)
 						window--;
 						continue;
 				}
-			} else {
+			} else
 				continue;
-			}
 #endif /* NNTP_ABLE */
 		} else {
 			if (vGrpGetArtInfo (spooldir, ptr, GROUP_TYPE_NEWS, &count, &max, &min))

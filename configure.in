@@ -382,12 +382,6 @@ CF_WITH_DFTENV(iso-to-ascii,
 	DEFAULT_ISO2ASC,-1)
 AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
-AC_MSG_CHECKING(whether to enable forged cancels)
-CF_ARG_ENABLE(forgery,
-	[  --enable-forgery        enable forged cancel support],
-	[AC_DEFINE(FORGERY)])
-AC_MSG_RESULT($enableval)
-
 AC_MSG_CHECKING(whether to enable locale support)
 CF_ARG_DISABLE(locale,
 	[  --disable-locale        disable locale support],

@@ -1,5 +1,14 @@
 Bugs
 ----
+o  searching in the pager is broken; it doesn't actually search the first
+   page.
+
+o  using libuu for decoding articles breaks
+   post_process_types=3 and post_process_command
+   (fix this and join post_process_types/post_process_command (i.e
+    provide a script which handles all post_process_types) and kick
+    non-libuu code afterwards)
+
 o  '-X' doesn't disable changing the killfile and the tinrc from
    inside tin
    [Urs Janssen <urs@tin.org>]
@@ -13,28 +22,29 @@ o  in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
    'tin -S' saves all groups, not only foo.bar
    [Urs Janssen <urs@tin.org>]
 
-o  '-d' cmd-line switch tunrs of show_description in the tinrc, thus
-   afer once using '-d' (or -Q) you have to explicitly turn it on
+o  '-d' cmd-line switch turns of show_description in the tinrc, thus
+   after once using '-d' (or -Q) you have to explicitly turn it on
    again.
    [Urs Janssen <urs@tin.org>]
 
 o  '-s' cmd-line switch specifies the spooldir also in the tinrc.
    [Urs Janssen <urs@tin.org>]
 
-o  multiple calls of '/' are 'corrupting' the previus_page-pionter
-   page-up jumps 'near' the last page before the search (should we remeber
-   the previus page here (if so, we must hit the exact position again, IMHO
-   this is usefull) or just go up one page?
+o  multiple calls of '/' are 'corrupting' the previous page-pointer
+   page-up jumps 'near' the last page before the search (should we
+   remember the previous page here (if so, we must hit the exact
+   position again, IMHO this is useful) or just go up one page?
    [Dirk Nimmich <nimmich@uni-muenster.de>]
 
 o  strfmailer() calls rfc1522_encode() for Subject/To even with
-   use_mailreader_i=ON (not very usefull as modern mailreaders
+   use_mailreader_i=ON (not very useful as modern mail-readers
    also try to mime-encode these line which would lead to a double encoded
    subject (with inner encoding 'broken' due to escape_shell_meta() call
    in strfmailer())
 
 o  external inews, ~/.signature and base64 encoding MUST 'fail'
    (article will be encoded, signature will be not!)
+   -> issue a warning in that case (base64 + external inews)
    [Sven Paulus <sven@karlsruhe.org>]
 
 o  a problem concerning .tin/posted: when I post a postponed followup,
@@ -42,10 +52,6 @@ o  a problem concerning .tin/posted: when I post a postponed followup,
    "References:" header, the article should be regarded as a followup.
    [Vincent Lefevre <vlefevre@ens-lyon.fr>]
    (970919 - partial solution by checking for "Re: " in subject -sp)
-
-o  the cursor position gets 'lost' after 'y'ank in 'y'ank out - it'll
-   be placed to the first(last?) group in your list, not to the one it
-   pointed to before the yanks.
 
 o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
    ~/.signature ~/.signature is used instead of ~/.tin/sig
@@ -57,6 +63,17 @@ o  commas in real-name might cause problems in mail-replys
    -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
 
 o  fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
+
+o  fix check_upgrade() (config.c)
+   - check if TINRC_VERSION machtes (already done, but used string is 'wrong'
+     as it's still talking about tin-unoff)
+   - check if TINRC_VERSION is 'older' (mismatch and not newer) as in the
+     config file, give a warnings and the possibilliy to qiit without saving
+     config file
+   - check if TINRC_VERSION is 'newer' (already done) and give a warning
+
+o  add version number to other config-files (i.e. attributes, filter) and
+   do the same checks as for TINRC_VERSION/tinrc
 
 o  sender-patch
    If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
@@ -70,17 +87,6 @@ o  'K' is still a bit inconsistent
      next unread item.
    - in the article pager (page.c) it marks the whole current thread as read
      and jumps to the next unread article.
-
-o  'c' and 'C' are a bit inconsistent
-   - 'C' (captial c) catches up the current group and enters the next group
-      containing unread articles - this works at any level except the
-      thread display level where only the current thread is marked read;
-      no matter if using 'c' or 'C' - both do the same in the thread level.
-      'C' should enter the next thread containing unread articles or skip to
-      the next group, then we would need another key to catchup threads.
-    - 'c' (small c) catches up the current group and skips the pointer to
-      the next group - this works on any level except the pager where the
-      pointer stays at the current group.
 
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always
@@ -138,6 +144,8 @@ o  if a colored signature wraps over a page-break, the coloring gets lost
 
 o  full_page_scroll=OFF is not implemented in page.c (article viewer)
    and config.c (option 'M'enu)
+   [ in page.c it is meaningless anyway; half/full page scroll only relates
+     to cursor positioning, not page scrolling. The pager has no cursor ]
 
 o  keyboard 'end' does not always scroll to the end.
    Sometimes there are a few lines missing.
@@ -149,11 +157,18 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 New features
 ------------
+o  add Message-ID param to quick_filter_select_posted_art() and
+   update_posted_info_file() so we could log the Message-ID in the
+   filter and posting history file if we know it (see inews.c.
+   submit_inews()).
+
 o  lock news/tinrc via flock, lockf, fcntl or dotfile-locking (depending
    on which mechanism is available)
 
 o  add cmd-line/tinrc-switch to fetch only headers of unread articles;
-   in that case, make 'r' readin the reast of the articles
+   in that case, make 'r' reading the rest of the articles
+   [-G is a start]
+   allow setting a per group limit via attributes
 
 o  use libuu (uudeview) for uudecoding
    (http://www.informatik.uni-frankfurt.de/~fp/uudeview/)
@@ -167,25 +182,17 @@ o  Add a trunc() function or something similar for shortening long strings
 o  check if server supports 'LIST MOTD' (i.e. INN 2.0) and display it
    on startup.
 
-o  fix check_upgrade() (config.c)
-   - check if TINRC_VERSION machtes (allready done, but used string is 'wrong'
-     as it's still talking about tin-unoff)
-   - check if TINRC_VERSION is 'older' (missmatch and not newer) then in the
-     config file, give a warings and the possibilliy to qiit without saving
-     config file
-   - check if TINRC_VERSION is 'newer' (allreday done) and give a warning
-
-o  if using mailreader_i add In-Reply-To: header and rename Newsgroups:
-   to X-Newsgroups (RFC 822 doesn't define a Newsgroups:-header)
-   [might be impossible]
-
 o  if using "-n" commandline switch you can't subscribe to newsgroups not
    present in your newsrc - a simple check against the server
    [i.e. GROUP $newsgroup] would help - and if the server understands
     LIST NEWSGROUPS pattern or XGTITLE pattern we could also fetch the
     description without loosing "-n" speed improvements; if the server
     understands LIST ACTIVE pattern we could also get group attribute
-    (modereated, etc.)]
+    (moderated, etc.)]
+
+o  if using mailreader_i add In-Reply-To: header and rename Newsgroups:
+   to X-Newsgroups (RFC 822 doesn't define a Newsgroups:-header)
+   [might be impossible]
 
 o  allow changing From: in mail-replys
 
@@ -233,30 +240,25 @@ o  add feature goto using the 'G' key
    etc...
 
 o  Additions to the group menu :
-        'L' (lookup message-id)
+     'L' (lookup message-id)
 
 o  Additions to the thread menu :
-	'/','?' (search subject)
-	'B' (body search)
-        'D' (cancel article)
-	'M' (option menu)
-	'w' (post an article)
-	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
-	''  r ought to be toggle show all/show only unread
-	'f' (post a followup)
-	'-' (goto last article)
-	'L' (lookup message-id)
-	keys to goto previous/next thread
-
-o  Additions to the pager:
-	'l' (goto thread menu)
+     'B' (body search)
+     'D' (cancel article)
+     'M' (option menu)
+     'w' (post an article)
+     'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
+     ''  r ought to be toggle show all/show only unread
+     'f' (post a followup)
+     'L' (lookup message-id)
+     keys to goto previous/next thread
 
 o  Add to the 'M'enu:
-        DEFAULT_MAILER
+     DEFAULT_MAILER
 
 o  Add to the POST_INFO-level:
-        '?','/' search
-        'h' help-screen
+     '?','/' search
+     'h' help-screen
 
 o  Add a commandline switch that prints out all values of cpp-symbols etc.
 
@@ -270,7 +272,7 @@ o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
    (tin.defaults [--with-defaults-dir] is a start)
 
 o  - remove global filter file (TIN_LIBDIR/filter) as you don't know which
-     pattermatchingstyle the user has defined
+     patter-matching-style the user has defined
    - think about removing global attributes files (TIN_LIBDIR/attributes)
    - move global files (TIN_LIBDIR/tinrc, TIN_LIBDIR/attributes) to
      TIN_DEFAULTS_DIR
@@ -323,8 +325,9 @@ o  Bounce duplicate Message-ID's when the headers are read. This will
 Internal Changes
 ----------------
 o  use XGTITLE (if available) if -n cmd-line flag is present
+   (see open.c)
 
-o  check where snprintf() would be usefull and if system has one
+o  check where snprintf() would be useful and if system has one
    (mutt comes with one).
 
 o  clean-up INDEX_DAEMON code add configure option for it
@@ -375,7 +378,7 @@ o  check code with lclint (http://www.sds.lcs.mit.edu/lclint/)
 
 Docs/online help
 ----------------
-o  man page is still out dated (and buggy)
+o  man page still needs work
 
 o  error message when tin -uv and using xover is misleading
 
@@ -391,13 +394,13 @@ o  strip Xref:-header if saving news in batch mode (-S)?
 
 o  tin in batchmode dumps core if getting a SIGINT, useful?
 
-o  'tin -N|-M address' dosn't work out of cron
+o  'tin -N|-M address' doesn't work out of cron
 
 o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
-   's' subscribes you to the curent group and does _not_ skip to the next
-       group (annoying wehen subscribing to multiple groups, but useful
-       when subsribing to a single group right before reading it)
-   'u' unsubsribes you form the curent goup and skips to the next group.
+   's' subscribes you to the current group and does _not_ skip to the next
+       group (annoying when subscribing to multiple groups, but useful
+       when subscribing to a single group right before reading it)
+   'u' unsubsribes you form the current group and skips to the next group.
 
 o  what is with the conflicting settings? should we disallow those, or leave
    it to the user to realise that i.e. strip_blanks=ON && inverse_okay=ON
@@ -459,9 +462,9 @@ o  cleanup xref-filter (xref_score is no longer needed with score).
 o  allow any given amount of days in default_filter_days not only
    {1, 2, 4} * 28 days
 
-o  allow expiering filter entrys n-days after the last time they matched
+o  allow expiring filter entrys n-days after the last time they matched
 
-Fixed allready?:
+Fixed already?:
 ----------------
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.

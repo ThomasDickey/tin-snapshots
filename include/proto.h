@@ -123,8 +123,7 @@ extern char get_post_proc_type (int proc_type);
 extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
 extern t_bool filter_articles (struct t_group *group);
 extern t_bool filter_menu (int type, struct t_group *group, struct t_article *art);
-extern t_bool quick_filter_kill (struct t_group *group, struct t_article *art);
-extern t_bool quick_filter_select (struct t_group *group, struct t_article *art);
+extern t_bool quick_filter (int type, struct t_group *group, struct t_article *art);
 extern t_bool quick_filter_select_posted_art (struct t_group *group, char *subj);
 extern void free_all_filter_arrays (void);
 #ifndef INDEX_DAEMON
@@ -139,12 +138,12 @@ extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
 extern void clear_note_area (void);
 extern void decr_tagged (int tag);
 extern void mark_screen (int level, int screen_row, int screen_col, const char *value);
+extern void pos_first_unread_thread (void);
 extern void set_subj_from_size (int num_cols);
 extern void show_group_page (void);
 extern void toggle_subject_from (void);
 #ifndef INDEX_DAEMON
-	extern void group_page (struct t_group *group);
-	extern void move_to_thread (int n);
+	extern int group_page (struct t_group *group);
 	extern void toggle_read_unread(t_bool force);
 #endif /* !INDEX_DAEMON */
 
@@ -235,7 +234,9 @@ extern void expand_art (void);
 extern void expand_newnews (void);
 extern void expand_save (void);
 extern void init_alloc (void);
-extern void init_screen_array (int allocate);
+#ifndef USE_CURSES
+	extern void init_screen_array (int allocate);
+#endif
 extern void free_all_arrays (void);
 extern void free_art_array (void);
 extern void free_attributes_array (void);
@@ -255,6 +256,8 @@ extern int invoke_editor (char *filename, int lineno);
 extern int my_chdir (char *path);
 extern int my_isprint (int c);
 extern int my_mkdir (char *path, mode_t mode);
+extern int page_up (int curslot, int maxslot);
+extern int page_down (int curslot, int maxslot);
 extern int peek_char (FILE *fp);
 extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format);
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
@@ -274,9 +277,12 @@ extern void draw_percent_mark (long cur_num, long max_num);
 extern void get_author (int thread, struct t_article *art, char *str, size_t len);
 extern void get_cwd (char *buf);
 extern void make_group_path (char *name, char *path);
+#if 0
 extern void parse_from (char *from_line, char *eaddr, char *fname);
+#endif
 extern void read_input_history_file (void);
 extern void rename_file (char *old_filename, char *new_filename);
+extern void set_first_screen_item (int cur, int max, int *first, int *last);
 extern void set_real_uid_gid (void);
 extern void set_tin_uid_gid (void);
 extern void show_inverse_video_status (void);
@@ -289,6 +295,17 @@ extern void vPrintBugAddress (void);
 	extern void buffer_to_local (char *b);
 	extern void buffer_to_network (char *b);
 #endif /* LOCAL_CHARSET */
+extern const char *gnksa_strerror(int errcode);
+extern int gnksa_dequote_plainphrase(char *realname, char *decoded);
+extern int gnksa_check_domain_literal(char *domain);
+extern int gnksa_check_domain(char *domain);
+extern int gnksa_check_localpart(char *localpart);
+extern int gnksa_split_from(char *from, char *address, char *realname);
+extern int gnksa_do_check_from(char *from, char *address, char *realname);
+extern int gnksa_check_from(char *from);
+#if 1
+extern int parse_from(char *from, char *address, char *realname);
+#endif
 #ifdef HAVE_COLOR
 	extern t_bool toggle_color (void);
 	extern void show_color_status (void);
@@ -371,12 +388,12 @@ extern void vGet1GrpArtInfo(struct t_group *grp);
 #endif /* HAVE_MH_MAIL_HANDLING */
 
 /* page.c */
-extern int art_open (struct t_article *art, char *group_path, t_bool rfc1521decode);
 extern t_bool match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
 extern void art_close (void);
 extern void redraw_page (char *group, int respnum);
 #ifndef INDEX_DAEMON
-	extern int show_page (struct t_group *group, char *group_path, int respnum, int *threadnum);
+	extern int art_open (struct t_article *art, char *group_path, t_bool rfc1521decode);
+	extern int show_page (struct t_group *group, int respnum, int *threadnum);
 	extern void show_note_page (char *group, int respnum);
 #endif /* !INDEX_DAEMON */
 
@@ -485,14 +502,14 @@ extern void stow_cursor (void);
 extern void wait_message (int delay, const char *fmt, ...);
 
 /* search.c */
+extern int search (int key, int current_art, int forward);
+extern int search_active (int forward);
 extern int search_article (int forward);
-extern int search_author (int the_index, int current_art, int forward);
-extern int search_body (struct t_group *group, int current_art);
 extern int search_config (int forward, int current, int last);
 extern int search_help (int forward, int current, int last);
-extern int search_subject_group (int forward);
-extern void search_group (int forward);
-extern void search_subject_thread (int forward, int baseart, int offset);
+#ifndef INDEX_DAEMON
+	extern int search_body (int current_art);
+#endif /* !INDEX_DAEMON */
 
 /* select.c */
 extern int add_my_group (char *group, t_bool add);
@@ -500,12 +517,11 @@ extern int choose_new_group (void);
 extern int skip_newgroups (void);
 extern t_bool bSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern void draw_group_arrow (void);
-extern void selection_index (int start_groupnum, int num_cmd_line_groups);
+extern void selection_page (int start_groupnum, int num_cmd_line_groups);
 extern void set_groupname_len (t_bool all_groups);
 extern void show_selection_page (void);
 extern void strip_line (char *line);
 extern void toggle_my_groups (t_bool only_unread_groups, const char *group);
-extern void move_to_group (int n);
 
 /* sigfile.c */
 extern void msg_write_signature (FILE *fp, t_bool flag, struct t_group *thisgroup);
@@ -578,10 +594,9 @@ extern int prev_unread (int n);
 extern int stat_thread (int n, struct t_art_stat *sbuf);
 extern int which_response (int n);
 extern int which_thread (int n);
-extern void move_to_response (int n);
 extern void show_thread_page (void);
 #ifndef INDEX_DAEMON
-	extern int show_thread (struct t_group *group, char *group_path, int respnum, int thread_depth);
+	extern int thread_page (struct t_group *group, int respnum, int thread_depth);
 #endif /* !INDEX_DAEMON */
 
 /* wildmat.c */

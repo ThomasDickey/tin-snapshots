@@ -456,8 +456,38 @@ extern constext txt_end_of_arts[];
 extern constext txt_end_of_groups[];
 extern constext txt_end_of_thread[];
 extern constext txt_enter_message_id[];
+extern constext txt_enter_next_thread[];
 extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
+extern constext txt_error_approved[];
+extern constext txt_error_bad_approved[];
+extern constext txt_error_bad_from[];
+extern constext txt_error_bad_replyto[];
+extern constext txt_error_bad_msgidfqdn[];
+extern constext txt_error_gnksa_internal[];
+extern constext txt_error_gnksa_langle[];
+extern constext txt_error_gnksa_lparen[];
+extern constext txt_error_gnksa_rparen[];
+extern constext txt_error_gnksa_atsign[];
+extern constext txt_error_gnksa_sgl_domain[];
+extern constext txt_error_gnksa_inv_domain[];
+extern constext txt_error_gnksa_ill_domain[];
+extern constext txt_error_gnksa_unk_domain[];
+extern constext txt_error_gnksa_fqdn[];
+extern constext txt_error_gnksa_zero[];
+extern constext txt_error_gnksa_length[];
+extern constext txt_error_gnksa_hyphen[];
+extern constext txt_error_gnksa_begnum[];
+extern constext txt_error_gnksa_bad_lit[];
+extern constext txt_error_gnksa_local_lit[];
+extern constext txt_error_gnksa_rbracket[];
+extern constext txt_error_gnksa_lp_missing[];
+extern constext txt_error_gnksa_lp_invalid[];
+extern constext txt_error_gnksa_lp_zero[];
+extern constext txt_error_gnksa_rn_unq[];
+extern constext txt_error_gnksa_rn_qtd[];
+extern constext txt_error_gnksa_rn_enc[];
+extern constext txt_error_gnksa_rn_encsyn[];
 extern constext txt_error_header_and_body_not_separate[];
 extern constext txt_error_header_line_bad_charset[];
 extern constext txt_error_header_line_bad_encoding[];
@@ -473,6 +503,7 @@ extern constext txt_error_header_line_missing_target[];
 extern constext txt_error_header_line_space[];
 extern constext txt_error_no_domain_name[];
 extern constext txt_error_no_enter_permission[];
+extern constext txt_error_no_from[];
 extern constext txt_error_no_read_permission[];
 extern constext txt_error_no_such_file[];
 extern constext txt_error_no_write_permission[];
@@ -562,6 +593,7 @@ extern constext txt_help_full_page_scroll[];
 extern constext txt_help_g[];
 extern constext txt_help_g_caret_dollar[];
 extern constext txt_help_g_cr[];
+extern constext txt_help_g_G[];
 extern constext txt_help_g_ctrl_r[];
 extern constext txt_help_g_d[];
 extern constext txt_help_g_hash[];
@@ -574,6 +606,7 @@ extern constext txt_help_g_tab[];
 extern constext txt_help_g_x[];
 extern constext txt_help_g_y[];
 extern constext txt_help_g_z[];
+extern constext txt_help_getart_limit[];
 extern constext txt_help_group_catchup_on_exit[];
 extern constext txt_help_groupname_max_length[];
 extern constext txt_help_h[];
@@ -662,6 +695,7 @@ extern constext txt_help_show_author[];
 extern constext txt_help_show_description[];
 extern constext txt_help_show_last_line_prev_page[];
 extern constext txt_help_show_lines[];
+extern constext txt_help_show_score[];
 extern constext txt_help_show_only_unread[];
 extern constext txt_help_show_only_unread_groups[];
 extern constext txt_help_show_signatures[];
@@ -680,6 +714,9 @@ extern constext txt_help_t[];
 extern constext txt_help_t_caret_dollar[];
 extern constext txt_help_t_cr[];
 extern constext txt_help_t_num[];
+extern constext txt_help_thd_c[];
+extern constext txt_help_thd_C[];
+extern constext txt_help_thd_K[];
 extern constext txt_help_tab_after_X_selection[];
 extern constext txt_help_tab_goto_next_unread[];
 extern constext txt_help_tex[];
@@ -690,6 +727,7 @@ extern constext txt_help_u[];
 extern constext txt_help_unlink_article[];
 extern constext txt_help_use_builtin_inews[];
 extern constext txt_help_use_color_tinrc[];
+extern constext txt_help_use_getart_limit[];
 extern constext txt_help_use_mailreader_i[];
 extern constext txt_help_use_mouse[];
 extern constext txt_help_v[];
@@ -729,7 +767,7 @@ extern constext txt_mail_bug_report_confirm[];
 extern constext txt_mail_quote[];
 extern constext txt_mailed[];
 extern constext txt_mailing_to[];
-extern constext txt_mark_all_read[];
+extern constext txt_mark_arts_read[];
 extern constext txt_mark_group_read[];
 extern constext txt_mark_thread_read[];
 extern constext txt_marked_as_unread[];
@@ -819,6 +857,7 @@ extern constext txt_opt_editor_format[];
 extern constext txt_opt_filter_days[];
 extern constext txt_opt_force_screen_redraw[];
 extern constext txt_opt_full_page_scroll[];
+extern constext txt_opt_getart_limit[];
 extern constext txt_opt_group_catchup_on_exit[];
 extern constext txt_opt_groupname_max_length[];
 extern constext txt_opt_inverse_okay[];
@@ -854,6 +893,7 @@ extern constext txt_opt_show_author[];
 extern constext txt_opt_show_description[];
 extern constext txt_opt_show_last_line_prev_page[];
 extern constext txt_opt_show_lines[];
+extern constext txt_opt_show_score[];
 extern constext txt_opt_show_only_unread[];
 extern constext txt_opt_show_only_unread_groups[];
 extern constext txt_opt_show_signatures[];
@@ -874,13 +914,13 @@ extern constext txt_opt_thread_catchup_on_exit[];
 extern constext txt_opt_unlink_article[];
 extern constext txt_opt_use_builtin_inews[];
 extern constext txt_opt_use_color_tinrc[];
+extern constext txt_opt_use_getart_limit[];
 extern constext txt_opt_use_mailreader_i[];
 extern constext txt_opt_use_mouse[];
 extern constext txt_opt_wildcard[];
 extern constext txt_opt_xpost_quote_format[];
 extern constext txt_option_not_enabled[];
 extern constext txt_options_menu[];
-extern constext txt_out_of_memory2[];
 extern constext txt_out_of_memory[];
 extern constext txt_pcre_error_at[];
 extern constext txt_pcre_error_num[];
@@ -916,6 +956,8 @@ extern constext txt_quit_edit_send[];
 extern constext txt_quit_edit_xpost[];
 extern constext txt_quit_no_write[];
 extern constext txt_quoted_printable[];
+extern constext txt_read_abort[];
+extern constext txt_read_exit[];
 extern constext txt_read_resp[];
 extern constext txt_reading_article[];
 extern constext txt_reading_arts[];
@@ -1030,6 +1072,8 @@ extern constext txt_tinrc_draw_arrow[];
 extern constext txt_tinrc_filter[];
 extern constext txt_tinrc_force_screen_redraw[];
 extern constext txt_tinrc_full_page_scroll[];
+extern constext txt_tinrc_use_getart_limit[];
+extern constext txt_tinrc_getart_limit[];
 extern constext txt_tinrc_group_catchup_on_exit[];
 extern constext txt_tinrc_groupname_max_length[];
 extern constext txt_tinrc_header[];
@@ -1064,6 +1108,7 @@ extern constext txt_tinrc_show_author[];
 extern constext txt_tinrc_show_description[];
 extern constext txt_tinrc_show_last_line_prev_page[];
 extern constext txt_tinrc_show_lines[];
+extern constext txt_tinrc_show_score[];
 extern constext txt_tinrc_show_only_unread[];
 extern constext txt_tinrc_show_only_unread_groups[];
 extern constext txt_tinrc_show_signatures[];
@@ -1139,6 +1184,7 @@ extern int default_sort_art_type;
 extern int default_thread_arts;
 extern int first_group_on_screen;
 extern int first_subj_on_screen;
+extern int getart_limit;
 extern int glob_respnum;
 extern int group_hash[TABLE_SIZE];
 extern int group_top;
@@ -1261,6 +1307,7 @@ extern t_bool list_active;
 extern t_bool newsrc_active;
 extern t_bool note_end;					/* end of article ? */
 extern t_bool no_write;
+extern t_bool pgdn_goto_next;
 extern t_bool pos_first_unread;
 extern t_bool post_8bit_header;
 extern t_bool post_article_and_exit;
@@ -1281,6 +1328,7 @@ extern t_bool save_to_mmdf_mailbox;
 extern t_bool show_description;
 extern t_bool show_last_line_prev_page;
 extern t_bool show_lines;
+extern t_bool show_score;
 extern t_bool show_only_unread_groups;
 extern t_bool show_signatures;
 extern t_bool show_subject;
@@ -1289,7 +1337,6 @@ extern t_bool sigdashes;
 extern t_bool signature_repost;
 extern t_bool space_goto_next_unread;
 extern t_bool space_mode;
-extern t_bool pgdn_goto_next;
 extern t_bool start_any_unread;
 extern t_bool start_editor_offset;
 extern t_bool strip_blanks;
@@ -1301,6 +1348,7 @@ extern t_bool unlink_article;
 extern t_bool batch_mode;
 extern t_bool update_fork;
 extern t_bool use_builtin_inews;
+extern t_bool use_getart_limit;
 extern t_bool use_keypad;
 extern t_bool use_mailreader_i;
 extern t_bool use_mouse;
@@ -1337,6 +1385,39 @@ extern char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 extern char mail_address[LEN];
 extern constext txt_help_mail_address[];
 extern constext txt_opt_mail_address[];
+
+/* defines for GNKSA checking */
+/* success/undefined failure */
+#define GNKSA_OK			0
+#define GNKSA_INTERNAL_ERROR		1
+/* general syntax */
+#define GNKSA_LANGLE_MISSING		100
+#define GNKSA_LPAREN_MISSING		101
+#define GNKSA_RPAREN_MISSING		102
+#define GNKSA_ATSIGN_MISSING		103
+/* FQDN checks */
+#define GNKSA_SINGLE_DOMAIN		200
+#define GNKSA_INVALID_DOMAIN		201
+#define GNKSA_ILLEGAL_DOMAIN		202
+#define GNKSA_UNKNOWN_DOMAIN		203
+#define GNKSA_INVALID_FQDN_CHAR		204
+#define GNKSA_ZERO_LENGTH_LABEL		205
+#define GNKSA_ILLEGAL_LABEL_LENGTH	206
+#define GNKSA_ILLEGAL_LABEL_HYPHEN	207
+#define GNKSA_ILLEGAL_LABEL_BEGNUM	208
+#define GNKSA_BAD_DOMAIN_LITERAL	209
+#define GNKSA_LOCAL_DOMAIN_LITERAL	210
+#define GNKSA_RBRACKET_MISSING		211
+/* localpart checks */
+#define GNKSA_LOCALPART_MISSING		300
+#define GNKSA_INVALID_LOCALPART		301
+#define GNKSA_ZERO_LENGTH_LOCAL_WORD	302
+/* realname checks */
+#define GNKSA_ILLEGAL_UNQUOTED_CHAR	400
+#define GNKSA_ILLEGAL_QUOTED_CHAR	401
+#define GNKSA_ILLEGAL_ENCODED_CHAR	402
+#define GNKSA_BAD_ENCODE_SYNTAX		403
+
 
 /* This fixes ambiguities on platforms that don't distinguish extern case */
 #ifdef CASE_PROBLEM
@@ -1381,7 +1462,7 @@ extern constext txt_opt_mail_address[];
 		extern constext txt_piping[];
 #	endif
 	extern constext txt_piping_not_enabled[];
-#endif /* DONT_HAVE_PIPING */
+#endif /* !DONT_HAVE_PIPING */
 
 #ifdef FORGERY
 	extern constext txt_warn_cancel_forgery[];
