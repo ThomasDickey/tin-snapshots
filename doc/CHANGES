@@ -1,3 +1,17 @@
+--unoff BETA release 970424 --
+
+378) Thomas E. Dickey <dickey@clark.net>
+     REM. useless ifdefs for __hpux
+     FIX. misc.c
+
+377) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. when using an external mailer, parse From: line upon replies.
+     FIX. post.c
+
+376) (sorry, lost the mail-address of the person who reported it!)
+     REM. str_lwr patch from 374 as it opens up problems with iso-8859-*
+          charsets
+
 --unoff BETA release 970417 --
 
 375) Thomas E. Dickey <dickey@clark.net>

@@ -260,6 +260,12 @@ o  when From: only contains "First-name Last-name" tin strips the space
 
 Internal Changes
 ----------------
+o  use "XPAT header range wildmat" for searches (if newsserver supports xpat)
+   i.e.
+   GROUP alt.test
+   XPAT Subject - *test*
+   should be much faster then the current Subject-search.
+
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
