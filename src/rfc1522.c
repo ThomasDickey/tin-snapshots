@@ -14,18 +14,16 @@
 
 
 
-/*
- * allow base64 encoding in headers if the
- * result is shorter than quoted printable
- * encoding. THIS IS NOT YET IMPLEMENTED,
- * so leave this off
- */
-#undef MIME_BASE64_ALLOWED
 
 #include "tin.h"
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
-#define isbetween(c) (isspace((unsigned char)c) || (c) == '(' || (c) == ')' || (c) == '"')
+/* Modified to return TRUE for '(' and ')' only if 
+   it's in structured header field. '(' and ')' are
+   NOT to be treated differently than other characters
+   in unstructured headers like Subject, Keyword and Summary 
+   c.f. RFC 2047 */
+#define isbetween(c,s) (isspace((unsigned char)c) ||   ( (s) == TRUE && ((c) == '(' || (c) == ')') ) || (c) == '"')
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.
@@ -50,7 +48,8 @@ static int base64_rank_table_built;
 static int quoteflag;
 
 static void
-build_base64_rank_table (void)
+build_base64_rank_table (
+	void)
 {
 	int i;
 
@@ -160,7 +159,8 @@ mmdecode (
 }
 
 void
-get_mm_charset (void)
+get_mm_charset (
+	void)
 {
 	char *c;
 
@@ -251,14 +251,135 @@ rfc1522_decode (
 	return buffer;
 }
 
-static int
-contains_nonprintables (
-	char *w)
+/* adopted by J. Shin(jshin@pantheon.yale.edu) from 
+ Woohyung Choi's(whchoi@cosmos.kaist.ac.kr) sdn2ks and ks2sdn */
+
+static void 
+str2b64(
+  char *from,
+  char *to) 
 {
-#ifdef MIME_BASE64_ALLOWED
+
+  unsigned long tmp;
+  short int i, count;
+
+  while (*from) {
+      for (i=count=0, tmp=0; i < 3 ; i++) 
+           if (*from)
+           { 
+                 tmp= (tmp << 8) | (unsigned long) (*from++ & 0x0ff);
+                 count++;
+            }
+           else
+                 tmp = (tmp << 8) | (unsigned long) 0;
+           
+       *to++ = base64_alphabet[(0x0fc0000 & tmp) >> 18];
+       *to++ = base64_alphabet[(0x003f000 & tmp) >> 12];
+       *to++ = count >= 2 ? base64_alphabet[(0x0000fc0 & tmp) >> 6] : '=';
+       *to++ = count >= 3 ? base64_alphabet[0x000003f & tmp] : '=' ; 
+   }
+
+   *to = '\0';
+   return ; 
+}
+   
+         
+
+
+
+  
+static int
+do_b_encode(
+ char *w,
+ char *b,
+ int max_ewsize,
+ t_bool isstruct_head)
+{
+
+  char tmp[60];   /* strings to be B encoded */
+  int len8=0;        /* the number of  trailing 8bit chars, which 
+                      should be even(i.e. the first and second byte
+                      of wide_char should NOT be split into two
+                      encoded words) in order  to be compatible with
+                      some CJK mail client */
+  char *t=tmp;
+
+  int count  = max_ewsize / 4 * 3;
+  t_bool isleading_between=TRUE; /* are we still processing leading space */     
+
+  while ( count-- > 0 && (! isbetween(*w,isstruct_head) || isleading_between) && *w ) {
+      len8 += is_EIGHT_BIT(w) ? 1 : (-len8);
+      if ( !isbetween(*w,isstruct_head) ) {
+          isleading_between=FALSE;
+      }
+      *(t++) = *(w++);
+  }
+
+/*  if ( len8 & (unsigned long) 1 && !isbetween(*w,isstruct_head)  )  */
+    if ( len8 != len8/2*2 && !isbetween(*w,isstruct_head) &&  (*w)  )  
+     t--;
+
+  *t = '\0';
+                  
+  str2b64(tmp,b);
+
+  return t-tmp;
+}
+
+      
+
+
+   
+
+   
+
+/* find out whether encoding is necessary and which encoding
+   to use if necessary by scanning the whole header field
+   instead of each fragment of it.  
+   This will ensure that  either Q or B encoding will be used in a single
+   header(i.e. two encoding won't  be mixed in a single header line.
+   Mixing two encodings is not a violation of RFC 2047 but  may break
+   some news/mail clients.
+*/
+
+static int
+which_encoding(
+  char *w)
+{
 	int chars = 0;
 	int schars = 0;
-#endif
+	int nonprint = 0;
+
+	while (*w && isspace ((unsigned char)*w) )
+		w++;
+	while (*w) {
+		if (is_EIGHT_BIT(w))
+			nonprint++;
+		if (!nonprint && *w == '=' && *(w + 1) == '?')
+			nonprint = TRUE;
+		if (*w == '=' || *w == '?' || *w == '_')
+			schars++;
+		chars++;
+		w++;
+	}
+	if (nonprint) {
+/* Always use B encoding regardless of the efficiency if charset is 
+   EUC-KR for backward compatibility with old Korean mail program */
+		if (chars + 2 * (nonprint + schars) /* QP size */ >
+		    (chars * 4 + 3) / 3 /* B64 size */
+                    || ! strcasecmp(mm_charset,"EUC-KR") )
+			return 'B';
+		return 'Q';
+	}
+	return 0;
+}
+
+/* now only checks if there's any 8bit chars in a given "fragment" */
+static int
+contains_nonprintables (
+	char *w,
+        t_bool isstruct_head)
+{
 	int nonprint = 0;
 
 	/* first skip all leading whitespaces */
@@ -266,28 +387,15 @@ contains_nonprintables (
 		w++;
 
 	/* then check the next word */
-	while (*w && !isbetween(*w)) {
+	while (*w && !isbetween(*w,isstruct_head)) {
 		if (is_EIGHT_BIT(w))
 			nonprint++;
 		if (!nonprint && *w == '=' && *(w + 1) == '?')
 			nonprint = TRUE;
-#ifdef MIME_BASE64_ALLOWED
-		if (*w == '=' || *w == '?' || *w == '_')
-			schars++;
-		chars++;
-#endif
 		w++;
 	}
 	if (nonprint) {
-#ifdef MIME_BASE64_ALLOWED
-/* Use B encoding if charset is EUC-KR for backward compatibility 
-                                with old Korean mail program */
-		if (chars + 2 * (nonprint + schars) /* QP size */ >
-		    (chars * 4 + 3) / 3 /* B64 size */
-                    || ! strcasecmp(mm_charset,"EUC-KR") )
-			return 'B';
-#endif
-		return 'Q';
+		return 1;
 	}
 	return 0;
 }
@@ -341,7 +449,9 @@ rfc1522_do_encode (
 	   then, in a second pass, we replace all SPACEs inside encoded
 	   words by '_', break long lines, etc. */
 
-	int quoting = 0;	/* currently inside quote block? */
+	t_bool  quoting = FALSE;   /* currently inside quote block? */
+        t_bool  rightafter_ew=FALSE; 
+        t_bool  isbroken_within=FALSE; /* is word broken due to length restriction on encoded of word? */
 	int encoding;		/* which encoding to use ('B' or 'Q') */
 	int any_quoting_done = 0;
 
@@ -361,17 +471,32 @@ rfc1522_do_encode (
 /* #endif */
 	int ewsize = 0;		/* size of current encoded-word */
 	char buf[2048];		/* buffer for encoded stuff */
-	char buf2[64];		/* buffer for this and that */
+	char buf2[80];		/* buffer for this and that */
 	char *c;
 	char *t;
+        t_bool isstruct_head=TRUE; /* are we dealing with structured header? */
+        int ew_taken_len;
+        
 
 	t = buf;
+
+        if ( !strncasecmp(what,"Subject: ",9) || !strncasecmp(what,"Summary: ",9) || !strncasecmp(what,"Keywords: ",10) ) {
+             isstruct_head=FALSE;
+        }
+
+        encoding = which_encoding(what);
+        ew_taken_len = strlen(mm_charset) + 7; /* the minimum encoded word length without any encoded text */
+
 	while (*what) {
                 if (break_long_line == TRUE) {
-		   word_cnt++;
+		          word_cnt++;
                 }
-		if ((encoding = contains_nonprintables (what))) {
-			if (!quoting) {
+/* if a word with 8bit chars is broken in the middle, whatever follows 
+   after the point where it's split should be encoded (i.e. even if
+   they are made of only 7bit chars) */
+                if ( contains_nonprintables(what,isstruct_head) || isbroken_within  )  {
+                    if( encoding == 'Q') {
+	               if (quoting==FALSE) {
 				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
 				ewsize = mystrcat (&t, buf2);
                                 if (break_long_line==TRUE) {
@@ -387,7 +512,8 @@ rfc1522_do_encode (
 				quoting = TRUE;
 				any_quoting_done = TRUE;
 			}
-			while (*what && !isbetween(*what)) {
+                        isbroken_within = FALSE;
+			while (*what && !isbetween(*what,isstruct_head)) {
 				if (is_EIGHT_BIT(what)
 				    || *what == '='
 				    || *what == '?'
@@ -410,60 +536,83 @@ rfc1522_do_encode (
 				 * header keyword, I think).
 				 */
 				if (ewsize >= 71) {
+                                        isbroken_within=TRUE;
 					break;
 				}
 			}
-			if (!contains_nonprintables (what) || ewsize >= 60) {
+			if (!contains_nonprintables (what,isstruct_head) || ewsize >= 70 - strlen(mm_charset)) {
 				/* next word is 'clean', close encoding */
 				*t++ = '?';
 				*t++ = '=';
 				ewsize += 2;
-#ifdef MIME_BREAK_LONG_LINES
-/* if our line is too long, but the next word will not be quoted, we
-   just use the space that separates the words as header continuation
-   space. Note that apparently the xover files in INN convert the nl
-   also to space, which inserts a 2nd space into our string. This is
-   not a problem when we continue with a quoted word, since whitespace
-   between quoted words is ignored. (We could insert a quoted space
-   like =?us-ascii?Q?_?= after the line break, but that's kind of
-   ugly. As long as we are threading by Refs, it will work, but
-   threading by Subject will break with this. Since we parse the
-   header lines ourself before generating followups, at least the
-   error will not be in the next article. */
-#else
-/* if we do not break long lines, we could just continue with the
-   encoded text, but rfc1522 says that encoded words are only
-   non-whitespace strings of up to 75 chars, delimited by whitespace
-   or the line start/end, so we break and insert a space here also. */
-#endif
-				if (ewsize >= 60 && contains_nonprintables (what)) {
+/* if a word with 8bit chars is broken in the middle, whatever follows 
+   after the point where it's split should be encoded (i.e. even if
+   they are made of only 7bit chars) */
+				if (ewsize >= 70-strlen(mm_charset) && ( contains_nonprintables (what,isstruct_head) || isbroken_within) ) {
 					*t++ = ' ';
 					ewsize++;
 				}
-				quoting = 0;
-			} else {
-				/* process whitespace in-between by quoting it properly */
-				while (*what && isspace ((unsigned char)*what)) {
-					if (*what == 32 /* not ' ', compare chapter 4!*/) {
-						*t++ = '_';
-						ewsize++;
-					} else {
-						sprintf (buf2, "=%2.2X", *EIGHT_BIT(what));
-						*t++ = buf2[0];
-						*t++ = buf2[1];
-						*t++ = buf2[2];
-						ewsize += 3;
-					}
-					what++;
-				}
-			}
-		} else {
-			while (*what && !isbetween(*what))
-				*t++ = *what++;		/* output word unencoded */
-			while (*what && isbetween(*what))
-				*t++ = *what++;		/* output trailing whitespace unencoded */
-		}
-	}
+				quoting = FALSE;
+                         } else {
+                                /* process whitespace in-between by quoting it properly */
+                                while (*what && isspace ((unsigned char)*what)) 
+                                {
+                                        if (*what == 32 /* not ' ', compare chapter 4!*/) {
+                                                *t++ = '_';
+                                                ewsize++;
+                                        } else {
+                                                sprintf (buf2, "=%2.2X", *EIGHT_BIT(what));
+                                                *t++ = buf2[0];
+                                                *t++ = buf2[1];
+                                                *t++ = buf2[2];
+                                                ewsize += 3;
+                                        }
+                                        what++;
+                                } /* end of while */
+                           } /* end of else */
+                     } else {  /* end of Q encoding and beg. of B encoding */
+              /* if what immediately precedes the current fragment with 8bit char is 
+               encoded word, the leading spaces should be encoded together with
+               8bit chars following them. No need to worry about '(',')' and '"' 
+               as they're already excluded with contain_nonprintables used in outer if-clause*/
+                           while (*what && (!isbetween(*what,isstruct_head) || rightafter_ew) ) {
+
+                                  sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
+                                  ewsize = mystrcat (&t, buf2);
+
+                                  if (word_cnt == 2) {
+                                           ewsize = t - buf;
+                                  }
+
+                                  what += do_b_encode(what,buf2,75-ew_taken_len,isstruct_head);
+                                  ewsize += mystrcat(&t,buf2);
+                                  *t++ = '?';
+                                  *t++ = '=';
+                                  *t++ = ' ';
+                                  ewsize += 3;
+                                  if (break_long_line == TRUE) {
+                                     word_cnt++;
+                                  }
+                                  rightafter_ew = FALSE;
+                                  any_quoting_done=TRUE;
+                           }
+                           rightafter_ew = TRUE;
+                           word_cnt--; /* compensate double counting */
+         /* if encoded word is followed by 7bit-only fragment, we need to 
+            eliminate ' ' inserted in while-block above */
+                           if (!contains_nonprintables (what,isstruct_head) ) {
+                               t--;
+                               ewsize--;
+                           }
+                     }  /* end of B encoding */
+	      } else {
+	              while (*what && !isbetween(*what,isstruct_head))
+	   	             *t++ = *what++;		/* output word unencoded */
+		      while (*what && isbetween(*what,isstruct_head))
+		             *t++ = *what++;		/* output trailing whitespace unencoded */
+                      rightafter_ew = FALSE;
+	      }
+	}  /* end of pass 1 while  loop */
 	*t = 0;
 	/* Pass 2: break long lines if there are MIME-sequences in the result */
 	c = buf;

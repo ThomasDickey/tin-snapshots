@@ -311,6 +311,9 @@ read_config_file (
 			if (match_string (buf, "default_shell_command=", default_shell_command, sizeof (default_shell_command))) {
 				break;
 			}
+			if (match_boolean (buf, "display_rfc1522_header_undecoded=", &display_rfc1522_header_undecoded)) {
+				break;
+			}
 			if (match_boolean (buf, "draw_arrow=", &draw_arrow_mark)) {
 				break;
 			}
@@ -929,6 +932,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_mail_8bit_header);
 	fprintf (fp, "mail_8bit_header=%s\n\n", print_boolean(mail_8bit_header));
+
+	fprintf (fp, txt_tinrc_display_rfc1522_header_undecoded);
+	fprintf (fp, "display_rfc1522_header_undecoded=%s\n\n", print_boolean(display_rfc1522_header_undecoded));
 
 #ifdef HAVE_METAMAIL
  	fprintf (fp, txt_tinrc_use_metamail);

@@ -242,45 +242,30 @@ AC_ARG_WITH(dmalloc,
 	 AC_CHECK_HEADER(dmalloc.h,debug_malloc=DMALLOC))])
 
 ## options for miscellaneous definitions
-AC_MSG_CHECKING(for mail-gateway)
-CF_WITH_VALUE(mail-gateway,
-	[  --with-mail-gateway     sets \$INEWS_MAIL_GATEWAY],
-	INEWS_MAIL_GATEWAY)
-AC_MSG_RESULT($INEWS_MAIL_GATEWAY)
-
-if test -z "$INEWS_MAIL_GATEWAY" ; then
-	AC_MSG_CHECKING(for mail-domain)
-	CF_WITH_VALUE(mail-domain,
-		[  --with-mail-domain      sets \$INEWS_MAIL_DOMAIN],
-		INEWS_MAIL_DOMAIN)
-	AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
-fi
-
-AC_MSG_CHECKING(for INEWS domain)
-if test -z "$INEWS_DOMAIN" ; then
-if test -z "$INEWS_MAIL_DOMAIN" ; then
-	INEWS_DOMAIN=.`(hostname || uname -n) 2>/dev/null | sed 1q`
-	if test "$INEWS_DOMAIN" = "." ; then
-		INEWS_DOMAIN=".localhost"
-	fi
-else
-	INEWS_DOMAIN="$INEWS_MAIL_DOMAIN"
-fi
-fi
-AC_MSG_RESULT($INEWS_DOMAIN)
+AC_MSG_CHECKING(for domain-name)
+AC_ARG_WITH(domain-name,
+	[  --with-domain-name     sets \$DOMAIN_NAME],
+	DOMAIN_NAME=$withval
+	if test "$DOMAIN_NAME" != ""; then
+		AC_DEFINE_UNQUOTED(DOMAIN_NAME, "${withval}")
+	fi)
+AC_MSG_RESULT($DOMAIN_NAME)
 
 if test "$USE_NNTP" = "yes" ; then
 AC_MSG_CHECKING(for NNTP default-server)
 AC_ARG_WITH(nntp-default-server,
 	[  --with-nntp-default-server
-                          (default: news\$INEWS_DOMAIN)
-                          (sets \$NNTP_DEFAULT_SERVER)],
+                          (sets \$NNTP_DEFAULT_SERVER)
+                          (default: news\$DOMAIN_NAME)],
 	[NNTP_DEFAULT_SERVER=$withval],
-	[test -z "$NNTP_DEFAULT_SERVER" && case "$INEWS_DOMAIN" in #(((
-	 /*)	NNTP_DEFAULT_SERVER="news.`cat $INEWS_DOMAIN`" ;;
-	 .*)	NNTP_DEFAULT_SERVER="news$INEWS_DOMAIN"       ;;
-	 *)	NNTP_DEFAULT_SERVER="news.$INEWS_DOMAIN"      ;;
-	 esac])
+	[if test "$DOMAIN_NAME" != "" ; then
+		test -z "$NNTP_DEFAULT_SERVER" && case "$DOMAIN_NAME" in #(((
+	 	/*)	NNTP_DEFAULT_SERVER="news.`cat $DOMAIN_NAME`" ;;
+	 	*)	NNTP_DEFAULT_SERVER="news.$INEWS_DOMAIN"      ;;
+	 	esac
+	else
+		NNTP_DEFAULT_SERVER="news"
+	fi])
 AC_MSG_RESULT($NNTP_DEFAULT_SERVER)
 fi
 
@@ -310,13 +295,6 @@ AC_MSG_CHECKING(whether to enable posting-etiquette)
 CF_ARG_DISABLE(etiquette,
 	[  --disable-etiquette     disable printing of posting-etiquette],
 	[AC_DEFINE(NO_ETIQUETTE)])
-AC_MSG_RESULT($enableval)
-
-AC_MSG_CHECKING(whether to allow base64 encoding in headers)
-CF_ARG_ENABLE(mime-base64,
-	[  --enable-mime-base64    allow base64 encoding in headers if shorter
-                         ],
-	[AC_DEFINE(MIME_BASE64_ALLOWED)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to strictly observe RFC1522 and break long lines)

@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970314
+PVER		= 970317
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -205,7 +205,7 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./tinpp ./configure ./install.sh
+	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh ./tinpp
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."

@@ -16,8 +16,8 @@ OBJDIR   = /obj
 # To use AS225 rather than AmiTCP, also include "def AS225".
 
 # /*vb*/
-NNTPDEF  = def NNTP_ABLE def INEWS_MAIL_DOMAIN="$$DOMAIN" \
- def INEWS_MAIL_GATEWAY="" def UNISTD_H def CLIB_NETLIB_PROTOS_H
+NNTPDEF  = def NNTP_ABLE def def DOMAIN_NAME="$$DOMAIN" \
+ def UNISTD_H def CLIB_NETLIB_PROTOS_H
 
 # Next line enables tind to be created
 # NB: change PROJECT and GSTFILE to tind also!
@@ -132,6 +132,7 @@ OBJECTS = \
         $(OBJDIR)/getline.o \
         $(OBJDIR)/group.o \
         $(OBJDIR)/hashstr.o \
+        $(OBJDIR)/header.o \
         $(OBJDIR)/help.o\
         $(OBJDIR)/inews.o \
         $(OBJDIR)/init.o \
@@ -236,6 +237,7 @@ $(OBJDIR)/filter.o:             $(SRCDIR)/filter.c $(GSTFILE)
 $(OBJDIR)/getline.o:            $(SRCDIR)/getline.c $(GSTFILE)
 $(OBJDIR)/group.o:              $(SRCDIR)/group.c $(GSTFILE)
 $(OBJDIR)/hashstr.o:            $(SRCDIR)/hashstr.c $(GSTFILE)
+$(OBJDIR)/header.o:             $(SRCDIR)/header.c $(GSTFILE)
 $(OBJDIR)/help.o:               $(SRCDIR)/help.c $(GSTFILE)
 $(OBJDIR)/inews.o:              $(SRCDIR)/inews.c $(GSTFILE)
 $(OBJDIR)/init.o:               $(SRCDIR)/init.c $(GSTFILE)

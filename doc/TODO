@@ -1,6 +1,7 @@
 Bugs
 ----
-o  tin does not rfc1522-decode news_headers_to_display
+o  commas in realname might cause problems in mailreplys
+   -> rewrite To: before mailing to old-sylte noation user@dom.in (relaname)
 
 o  tin ignores some file-permissions (.newsrc will be set to 644)
 
@@ -134,7 +135,7 @@ o  add abillity to strip bogus newsgroups from newsrc
 
 o  add support for ispell language change
 
-o  add RFC1468/1922 (RFC2045-2049) support
+o  add RFC1468/1922 support
 
 o  unique newsgroups after editing article
 
@@ -228,8 +229,6 @@ o  when From: only contains "First-name Last-name" tin strips the space
 
 Internal Changes
 ----------------
-o  cleanup inews.c (domain/hostname & Path generation...)
-
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to

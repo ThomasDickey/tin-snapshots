@@ -40,82 +40,32 @@
 
 #define	PATHMASTER	"not-for-mail"
 
-#if defined(M_AMIGA) && (defined (INEWS_MAIL_GATEWAY) || defined (INEWS_MAIL_DOMAIN))
-/* Damn compiler bugs...
- * Without this hack, SASC 6.55 produces a TST.B d16(pc),
- * which is illegal on a 68000
- */
-static const char *inews_mail_gateway = INEWS_MAIL_GATEWAY;
-static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
-
-#undef INEWS_MAIL_GATEWAY
-#undef INEWS_MAIL_DOMAIN
-#define INEWS_MAIL_GATEWAY inews_mail_gateway
-#define INEWS_MAIL_DOMAIN inews_mail_domain
-#endif
-
-#ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN 255
-#endif
-
-static const char *
-getfqdn (
-	const char *host)
-{
-	char	name[MAXHOSTNAMELEN+2];
-	const struct hostent *hp;
-	struct in_addr	in;
-
-	name[MAXHOSTNAMELEN]='\0';
-	if (host)
-		(void)strncpy(name,host,MAXHOSTNAMELEN);
-	else
-		if (gethostname(name,MAXHOSTNAMELEN))
-			return(NULL);
-
-	if ('0'<=*name&&*name<='9') {
-		in.s_addr=inet_addr(name);
-		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
-			in.s_addr=(*hp->h_addr);
-		return((hp&&strchr(hp->h_name,'.')) ? hp->h_name : inet_ntoa(in));
-	}
-	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
-		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
-			in.s_addr=(*hp->h_addr);
-	return(hp?strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in) : 0);
-}
-
-
 static int
 submit_inews (
 	char *name)
 {
 	int	ret_code = FALSE;
 
-#if !defined(INDEX_DAEMON) /* && !defined(XSPOOLDIR) */
+#if !defined(INDEX_DAEMON)
 
 #ifdef NNTP_INEWS
-#if !defined(FORGERY) && defined INEWS_MAIL_DOMAIN
-	char	buf[NNTP_STRLEN];
-	char	domain_name[NNTP_STRLEN];
-#endif /* !FORGERY && INEWS_MAIL_DOMAIN */
 	char	from_name[PATH_LEN];
-	char	host_name[PATH_LEN];
 	char	full_name[128];
 	char	user_name[128];
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
 	int	respcode;
-        int     ismail=FALSE;
+#ifndef FORGERY
+	int	ismail=FALSE;
+#endif
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		return ret_code;
 	}
 
-	get_host_name (host_name);
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, host_name, full_name, from_name);
+	get_from_name (user_name, full_name, from_name);
 
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line
@@ -159,32 +109,10 @@ submit_inews (
 	 * Send Path: and From: article headers
 	 */
 #ifndef FORGERY
-#if defined(INEWS_MAIL_GATEWAY) || defined(INEWS_MAIL_DOMAIN)
-	if (*(INEWS_MAIL_GATEWAY)) {
-		sprintf (line, "Path: %s", PATHMASTER);
-	}
-#if defined(INEWS_MAIL_DOMAIN)
-	else if (*(INEWS_MAIL_DOMAIN)) {
-		strcpy (buf, INEWS_MAIL_DOMAIN);
-		get_domain_name (buf, domain_name);
-		if (*domain_name == '.') {
-			sprintf (line, "Path: %s%s!%s", host_name, domain_name, PATHMASTER);
-		} else {
-			/* mail mark@garden.equinox.gen.nz if you think
-			 * host_name should be domain_name here...
-			 */
-			sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
-		}
-	} else {
-		sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
-	}
-#endif /* INEWS_MAIL_DOMAIN */
-#else
-	sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
-#endif
+	sprintf (line, "Path: %s", PATHMASTER);
 	put_server (line);
 
-	sprintf (line, "From: %s", rfc1522_encode(from_name,ismail));
+	sprintf (line, "From: %s", rfc1522_encode(from_name, ismail));
 	put_server (line);
 #endif /* !FORGERY */
 
@@ -228,138 +156,6 @@ submit_inews (
 #endif /* INDEX_DAEMON */
 
 	return ret_code;
-}
-
-/*
- * Find real hostname / substitute hostname if news gateway name
- */
-
-void
-get_host_name (
-	char *host_name)
-{
-#ifndef INDEX_DAEMON
-
-	const char *ptr;
-	char *s;
-	char host[PATH_LEN];
-	char nntp_inews_gateway[PATH_LEN];
-#ifdef NEWSLIBDIR
-	char sitename[PATH_LEN];
-#endif
-	FILE *fp, *sfp;
-
-	host_name[0] = '\0';
-	nntp_inews_gateway[0] = '\0';
-
-#ifdef INEWS_MAIL_GATEWAY
-	if (*(INEWS_MAIL_GATEWAY)) {
-		strcpy (nntp_inews_gateway, INEWS_MAIL_GATEWAY);
-	}
-#endif
-
-	if (nntp_inews_gateway[0]) {
-		/*
-		 * If 1st letter is '$' read gateway name from shell variable
-		 */
-		if (nntp_inews_gateway[0] == '$' && nntp_inews_gateway[1]) {
-			ptr = getenv (&nntp_inews_gateway[1]);
-			if (ptr != 0) {
-				strncpy (nntp_inews_gateway, ptr, sizeof (nntp_inews_gateway));
-			}
-		}
-		/*
-		 * If 1st letter is '/' read gateway name from specified file
-		 */
-		if (nntp_inews_gateway[0] == '/') {
-			if ((fp = fopen (nntp_inews_gateway, "r")) != (FILE *) 0) {
-				if (fgets (host, sizeof (host), fp) != (char *) 0) {
-					strcpy (host_name, host);
-					s = strrchr (host_name, '\n');
-					if (s != 0) {
-						*s = '\0';
-					}
-				}
-				fclose (fp);
-			}
-			if (! host_name[0]) {
-				strcpy (host_name, "PROBLEM_WITH_YOUR_MAIL_GATEWAY_FILE");
-			} 
-		} else {
-			strcpy (host_name, nntp_inews_gateway);
-		}
-	} else {
-		/*
-		 * Get the FQDN that the article will have from
-		 * 1 of 5 locations:
-** is the order ok? **
-		 *   NEWSLIBDIR/sitename 
-		 *   NEWSLIBDIR/mailname
-		 *   getfqdn()
-		 *   /etc/HOSTNAME (linux)
-		 *   uname()
-		 */
-#ifdef NEWSLIBDIR
-			joinpath (sitename, NEWSLIBDIR, "sitename");
-			sfp = fopen (sitename, "r");
-#ifndef M_AMIGA
-			if (sfp == (FILE *) 0) {
-				sprintf (sitename, "%s/mailname", NEWSLIBDIR);
-				sfp = fopen (sitename, "r");
-			}
-#endif /* !M_AMIGA */
-#endif /* NEWSLIBDIR */
-		if (sfp != (FILE *) 0) {
-			fgets (host, sizeof (host), sfp);
-			if (strlen (host) != 0) {
-				s = strrchr (host, '\n');
-				if (s != 0) {
-					*s = '\0';
-				}
-			}
-			fclose (sfp);
-		} else {
-/*
-** we should do do a getfqdn() somewhere here if
-** !(strlen(INEWS_MAIL_DOMIAN))
-**
-** ----
-**
-** this whole thing should be rewritten:
-** at startup do:
-** domainname=INEWS_MAIL_GATEWAY, if !domainname
-** domainname=INEWS_MAIL_DOMAIN, if !domainname
-** domainname=NEWSLIBDIR/sitename, if !domainname
-** domainname=NEWSLIBDIR/mailname, if !domainname
-** domainname=getfqdn(), if !domainname
-** domainname=/etc/HOSTNAME, if !domainname
-** domainname=uname(&uts_name)
-** in one function, use it for Path/From generation.
-*/
-
-#					if defined(M_AMIGA) || defined(M_OS2)
-						my_strncpy (host, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (host));
-#					else
-#						if defined(WIN32)
-							my_strncpy (host, get_val ("COMPUTERNAME", "PROBLEM_WITH_COMPUTERNAME"), sizeof (host));
-#						else
-#						ifndef M_AMIGA
-							sfp = fopen ("/etc/HOSTNAME", "r");
-							if (sfp == (FILE *) 0)
-#						endif
-					{
-						struct utsname uts_name;
-
-						uname (&uts_name);
-						my_strncpy (host, uts_name.nodename, sizeof (host));
-					}
-#						endif
-#					endif
-		}
-		strcpy (host_name, host);
-	}
-
-#endif /* INDEX_DAEMON */
 }
 
 /*
@@ -432,15 +228,10 @@ get_user_info (
 void
 get_from_name (
 	char *user_name,
-	char *host_name,
 	char *full_name,
 	char *from_name)
 {
 #ifndef INDEX_DAEMON
-
-	char domain[PATH_LEN];
-	char nntp_inews_domain[PATH_LEN];
-	char *ptr;
 
 #ifdef FORGERY
 	if (*mail_address) {
@@ -449,97 +240,15 @@ get_from_name (
 	}
 #endif
 
-	domain[0] = '\0';
-	nntp_inews_domain[0] = '\0';
-
-#ifdef INEWS_MAIL_DOMAIN
-	if (*(INEWS_MAIL_DOMAIN)) {
-		strcpy (nntp_inews_domain, INEWS_MAIL_DOMAIN);
-	}
-#endif
-
-	if (!nntp_inews_domain[0]) {
-		ptr = GetConfigValue (_CONF_FROMHOST);
-		if (ptr != (char *) 0) {
-			strncpy (nntp_inews_domain, ptr, sizeof (nntp_inews_domain));
-		}
-	}
-
-	if (nntp_inews_domain[0]) {
-		get_domain_name (nntp_inews_domain, domain);
-
-		if (domain[0] == '.') {
-			/*
-			 * If host_name is a FQDN just get the hostname from it
-			 * as a INEWS_MAIL_DOMAIN was specified to override it.
-			 */
-			ptr = strchr (host_name, '.');
-			if (ptr != (char *) 0) {
-				*ptr = '\0';
-			}
-			sprintf (from_name, "%s <%s@%s%s>",
-				full_name, user_name, host_name, domain);
-		} else {
-			sprintf (from_name, "%s <%s@%s>", full_name, user_name, domain);
-		}
-	} else {
-		if (host_name[0] == '%') {
-			sprintf (from_name, "%s%s (%s)", user_name, host_name, full_name);
-		} else {
-			sprintf (from_name, "%s <%s@%s>", full_name, user_name, host_name);
-		}
-	}
+	sprintf (from_name, "%s <%s@%s>", full_name, user_name, domain_name);
 
 	if (debug == 2) {
 		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
-			from_name, user_name, host_name, full_name);
+			from_name, user_name, domain_name, full_name);
 		error_message (msg, "");
 	}
 
 #endif /* INDEX_DAEMON */
-}
-
-
-void
-get_domain_name (
-	char	*inews_domain,
-	char	*domain)
-{
-	char	*ptr;
-	char	buf[PATH_LEN];
-	FILE	*fp;
-
-	*domain = '\0';
-
-	/*
-	 * If 1st letter is '$' read domain name from shell variable
-	 */
-	if (inews_domain[0] == '$' && inews_domain[1]) {
-		ptr = getenv (&inews_domain[1]);
-		if (ptr != (char *) 0) {
-			strcpy (inews_domain, ptr);
-		}
-	}
-	/*
-	 * If 1st letter is '/' read domain name from specified file
-	 */
-	if (inews_domain[0] == '/') {
-		if ((fp = fopen (inews_domain, "r")) != (FILE *) 0) {
-			if (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-				ptr = strrchr (buf, '\n');
-				if (ptr != (char *) 0) {
-					*ptr = '\0';
-					strcpy (domain, buf);
-				}
-			}
-			fclose (fp);
-		}
-		if (!domain[0]) {
-			strcpy (domain, "PROBLEM_WITH_YOUR_MAIL_DOMAIN_FILE");
-		}
-	} else {
-		strcpy (domain, inews_domain);
-	}
 }
 
 
@@ -551,7 +260,7 @@ submit_news_file (
 	char buf[LEN];
 	char *cp = buf;
 	int ret_code;
-        t_bool ismail=FALSE;
+	t_bool ismail=FALSE;
 
 	checknadd_headers (name, lines);
 
@@ -560,7 +269,7 @@ submit_news_file (
 	 || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))
              post_mime_encoding = 0;	/* FIXME: txt_8bit */
 
-	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header,ismail);
+	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header, ismail);
 
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG
