@@ -1,9 +1,9 @@
-MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961202 (Tue Dec  3 03:13:50 MET 1996)
 ----------------------------------------------------
-  49889 ./CHANGES
+  50147 ./CHANGES
   12753 ./TODO
    5341 ./Makefile
-  17459 ./INSTALL
+  17122 ./INSTALL
    2256 ./MANIFEST
    1659 ./README
     896 ./tinpp
@@ -46,7 +46,7 @@ MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
   19301 ./src/feed.c
   39895 ./src/filter.c
   10935 ./src/getline.c
-  41325 ./src/group.c
+  41305 ./src/group.c
    3202 ./src/hashstr.c
    9486 ./src/help.c
   12147 ./src/inews.c
@@ -60,7 +60,7 @@ MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
   47598 ./src/misc.c
    7228 ./src/msmail.c
   33311 ./src/newsrc.c
-  26409 ./src/nntplib.c
+  26408 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6134 ./src/nrctbl.c
   28687 ./src/open.c
@@ -68,7 +68,7 @@ MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
   35728 ./src/page.c
   24090 ./src/parsdate.y
    6524 ./src/pgp.c
-  75707 ./src/post.c
+  75716 ./src/post.c
    9044 ./src/prompt.c
     160 ./src/proto.sed
   22467 ./src/refs.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961201 (Sun Dec  1 21:20:46 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1578682 total
+1578591 total

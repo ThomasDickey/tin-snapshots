@@ -1145,7 +1145,7 @@ join_references (buffer, oldrefs, newref)
 	char *b, *c, *d;
 	int space;
 
-	b = malloc (strlen (oldrefs) + strlen (newref) + 64);
+	b = (char *) malloc (strlen (oldrefs) + strlen (newref) + 64);
 	c = b;
 	d = oldrefs;
 	space = 0;

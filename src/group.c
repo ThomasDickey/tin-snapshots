@@ -1589,11 +1589,11 @@ bld_sline (i)
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
 	if (show_lines) {
-		if (n >= 2) {
+		if (n > 1) {
 			if (arts[j].lines != -1)
-				sprintf (art_cnt, "%-3d %-4d ", n-1, arts[j].lines);
+				sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
 			else
-				sprintf (art_cnt, "%-3d ?    ", n-1);
+				sprintf (art_cnt, "%-3d ?    ", n);
 		} else {
 			if (arts[j].lines != -1)
 				sprintf (art_cnt, "    %-4d ", arts[j].lines);
@@ -1601,19 +1601,19 @@ bld_sline (i)
 				strcpy (art_cnt, "    ?    ");
 		}
 	} else {
-		if (n >= 2) {
-			sprintf(art_cnt, "%-3d ", n-1);
+		if (n > 1) {
+			sprintf(art_cnt, "%-3d ", n);
 		} else {
 			sprintf(art_cnt, "    ");
 		}
 	}
 
 	if (show_author != SHOW_FROM_NONE) {
-		get_author (FALSE, &arts[respnum], from);
+		get_author (FALSE, &arts[j], from);
 	}
 
+	strncpy(arts_sub, arts[j].subject, len_subj+5);
 	j = INDEX2SNUM(i);
-	strncpy(arts_sub, arts[respnum].subject, len_subj+5);
 	strncpy(_from, from, len_from+5);
 	_from[len_from+1] = '\0';
 	arts_sub[len_subj-5+1] = '\0';
