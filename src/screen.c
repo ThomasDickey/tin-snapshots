@@ -19,8 +19,8 @@ struct t_screen *screen;
 
 
 void
-info_message (str)
-	char *str;
+info_message (
+	char *str)
 {
 	clear_message ();				/* Clear any old messages hanging around */
 #ifdef HAVE_COLOR
@@ -37,8 +37,8 @@ info_message (str)
 
 
 void
-wait_message (str)
-	char *str;
+wait_message (
+	char *str)
 {
 	clear_message ();	  /* Clear any old messages hanging around */
 #ifdef HAVE_COLOR
@@ -54,9 +54,9 @@ wait_message (str)
 
 
 void
-error_message (template, str)
-	char *template;
-	char *str;
+error_message (
+	char *template,
+	char *str)
 {
 	errno = 0;
 
@@ -76,9 +76,9 @@ error_message (template, str)
 
 
 void
-perror_message (template, str)
-	char *template;
-	char *str;
+perror_message (
+	char *template,
+	char *str)
 {
 #ifndef HAVE_STRERROR
 #   ifdef HAVE_SYSERRLIST
@@ -124,7 +124,7 @@ perror_message (template, str)
 
 
 void
-clear_message ()
+clear_message (void)
 {
 	if (!cmd_line) {
 		MoveCursor (cLINES, 0);
@@ -136,10 +136,10 @@ clear_message ()
 
 
 void
-center_line (line, inverse, str)
-	int line;
-	int inverse;
-	char *str;
+center_line (
+	int line,
+	int inverse,
+	char *str)
 {
 	int pos;
 
@@ -173,8 +173,8 @@ center_line (line, inverse, str)
 
 
 void
-draw_arrow (line)
-	int line;
+draw_arrow (
+	int line)
 {
 	MoveCursor (line, 0);
 
@@ -192,8 +192,8 @@ draw_arrow (line)
 
 
 void
-erase_arrow (line)
-	int line;
+erase_arrow (
+	int line)
 {
 	MoveCursor (line, 0);
 
@@ -208,8 +208,8 @@ erase_arrow (line)
 
 
 void
-show_title (title)
-	char *title;
+show_title (
+	char *title)
 {
 	int col;
 
@@ -233,7 +233,7 @@ show_title (title)
 
 
 void
-ring_bell ()
+ring_bell (void)
 {
 	my_fputc ('\007', stdout);
 	fflush (stdout);
@@ -241,7 +241,7 @@ ring_bell ()
 
 
 void
-spin_cursor ()
+spin_cursor (void)
 {
 	static char *buf = "|/-\\|/-\\";
 	static int i = 0;
@@ -261,11 +261,11 @@ spin_cursor ()
  */
 
 void
-show_progress (dst, txt, count, total)
-	char *dst;
-	char *txt;
-	int count;
-	int total;
+show_progress (
+	char *dst,
+	char *txt,
+	int count,
+	int total)
 {
 	register char *s;
 

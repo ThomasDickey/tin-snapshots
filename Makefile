@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970124
+PVER		= 970126
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -206,7 +206,7 @@ tar:
 	@$(TAR) cvzf $(PROJECT)$(VER).tgz -C ../ \
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
-	| $(SED) 's,^\./,$(PVER)/,' \
+	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
  	| $(TR) "[\012]" " "`
 	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
 	@$(LS) $(PROJECT)$(VER).tgz

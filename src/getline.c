@@ -67,12 +67,12 @@ int (*gl_out_hook) P_((char *)) = 0;
 int (*gl_tab_hook) P_((char *, int, int *)) = gl_tab;
 
 char *
-getline (prompt, number_only, str, max_chars, passwd)
-	char *prompt;
-	int number_only;
-	char *str;
-	int max_chars;
-	int passwd;
+getline (
+	char *prompt,
+	int number_only,
+	char *str,
+	int max_chars,
+	int passwd)
 {
 	int c, i, loc, tmp, gl_max;
 
@@ -195,8 +195,8 @@ getline (prompt, number_only, str, max_chars, passwd)
  */
 
 static void
-gl_addchar (c)
-	int c;
+gl_addchar (
+	int c)
 {
 	int i;
 
@@ -218,7 +218,7 @@ gl_addchar (c)
  */
 
 static void
-gl_newline ()
+gl_newline (void)
 {
 	int change = gl_cnt;
 	int len = gl_cnt;
@@ -246,8 +246,8 @@ gl_newline ()
  */
 
 static void
-gl_del (loc)
-	int loc;
+gl_del (
+	int loc)
 {
 	int i;
 
@@ -265,7 +265,7 @@ gl_del (loc)
  */
 
 static void
-gl_kill ()
+gl_kill (void)
 {
 	if (gl_pos < gl_cnt) {
 		gl_buf[gl_pos] = '\0';
@@ -280,7 +280,7 @@ gl_kill ()
  */
 
 static void
-gl_redraw ()
+gl_redraw (void)
 {
 	if (gl_init_done == -1) {
 		my_fputc ('\n', stdout);
@@ -301,9 +301,9 @@ gl_redraw ()
  */
 
 static void
-gl_fixup (change, cursor)
-	int change;
-	int cursor;
+gl_fixup (
+	int change,
+	int cursor)
 {
 	static int gl_shift;	/* index of first on screen character */
 	static int off_right;	/* true if more text right of screen */
@@ -400,10 +400,10 @@ gl_fixup (change, cursor)
  */
 
 static int
-gl_tab (buf, offset, loc)
-	char *buf;
-	int offset;
-	int *loc;
+gl_tab (
+	char *buf,
+	int offset,
+	int *loc)
 {
 	int i, count, len;
 
@@ -423,7 +423,7 @@ gl_tab (buf, offset, loc)
  */
 
 static void
-hist_init ()
+hist_init (void)
 {
 	int i;
 
@@ -432,7 +432,7 @@ hist_init ()
 }
 
 static void
-hist_add ()
+hist_add (void)
 {
 	char *p = gl_buf;
 
@@ -454,7 +454,7 @@ hist_add ()
  */
 
 static void
-hist_prev ()
+hist_prev (void)
 {
 	int next;
 
@@ -479,7 +479,7 @@ hist_prev ()
  */
 
 static void
-hist_next ()
+hist_next (void)
 {
 	if (hist_pos != hist_last) {
 		hist_pos = (hist_pos + 1) % HIST_SIZE;

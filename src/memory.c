@@ -60,7 +60,7 @@ static void expand_spooldirs P_((void));
  */
 
 void
-init_alloc ()
+init_alloc (void)
 {
 	/*
 	 * active file arrays
@@ -99,7 +99,7 @@ init_alloc ()
 
 
 void
-expand_art ()
+expand_art (void)
 {
 	max_art += max_art / 2;		/* increase by 50% */
 
@@ -109,7 +109,7 @@ expand_art ()
 
 
 void
-expand_active ()
+expand_active (void)
 {
 	max_active += max_active / 2;		/* increase by 50% */
 
@@ -125,7 +125,7 @@ expand_active ()
 
 
 void
-expand_save ()
+expand_save (void)
 {
 	max_save += max_save / 2;		/* increase by 50% */
 
@@ -135,7 +135,7 @@ expand_save ()
 
 #if 0 /*never used */
 static void
-expand_spooldirs ()
+expand_spooldirs (void)
 {
 	max_spooldir += max_spooldir / 2;	/* increase by 50% */
 
@@ -145,7 +145,7 @@ expand_spooldirs ()
 #endif /* 0 */
 
 void
-expand_newnews ()
+expand_newnews (void)
 {
 	max_newnews += max_newnews / 2;			/* increase by 50% */
 
@@ -155,8 +155,8 @@ expand_newnews ()
 
 
 void
-init_screen_array (allocate)
-	int allocate;
+init_screen_array (
+	int allocate)
 {
 	int i;
 
@@ -181,7 +181,7 @@ init_screen_array (allocate)
 
 
 void
-free_all_arrays ()
+free_all_arrays (void)
 {
 	hash_reclaim ();
 
@@ -231,7 +231,7 @@ free_all_arrays ()
 
 
 void
-free_art_array ()
+free_art_array (void)
 {
 	register int i;
 
@@ -257,7 +257,7 @@ free_art_array ()
 
 
 void
-free_attributes_array ()
+free_attributes_array (void)
 {
 	register int i;
 	struct t_group *psGrp;
@@ -303,7 +303,7 @@ free_attributes_array ()
 
 
 void
-free_active_arrays ()
+free_active_arrays (void)
 {
 	register int i;
 
@@ -345,7 +345,7 @@ free_active_arrays ()
 
 
 void
-free_save_array ()
+free_save_array (void)
 {
 	int i;
 
@@ -368,7 +368,7 @@ free_save_array ()
 
 
 static void
-free_spooldirs_array ()
+free_spooldirs_array (void)
 {
 	int i;
 
@@ -385,7 +385,7 @@ free_spooldirs_array ()
 
 
 static void
-free_newnews_array ()
+free_newnews_array (void)
 {
 	int i;
 
@@ -398,10 +398,10 @@ free_newnews_array ()
 
 
 void *
-my_malloc1 (file, line, size)
-	char *file;
-	int line;
-	size_t size;
+my_malloc1 (
+	char *file,
+	int line,
+	size_t size)
 {
 	char	buf[128];
 	char	*p;
@@ -424,11 +424,11 @@ my_malloc1 (file, line, size)
 
 
 void *
-my_realloc1 (file, line, p, size)
-	char *file;
-	int line;
-	char *p;
-	size_t size;
+my_realloc1 (
+	char *file,
+	int line,
+	char *p,
+	size_t size)
 {
 	char	buf[128];
 

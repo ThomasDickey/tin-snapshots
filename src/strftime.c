@@ -32,11 +32,11 @@ extern int daylight;
  */
 
 size_t
-my_strftime (s, maxsize, format, timeptr)
-	char *s;
-	size_t maxsize;
-	char *format;
-	struct tm *timeptr;
+my_strftime (
+	char *s,
+	size_t maxsize,
+	char *format,
+	struct tm *timeptr)
 {
 #ifdef HAVE_STRFTIME
 	return strftime (s, maxsize, format, timeptr);

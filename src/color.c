@@ -32,8 +32,8 @@ static void color_fputs P_((const char *s, FILE *stream, int color));
 
 /* setting foregroundcolor */
 void
-fcol (color)
-	int color;
+fcol (
+	int color)
 {
 	if (use_color) {
 		if (color >= 0 && color <= 15) {
@@ -48,8 +48,8 @@ fcol (color)
 
 /* setting backgroundcolor */
 void
-bcol (color)
-	int color;
+bcol (
+	int color)
 {
 	if (use_color) {
 		if (color >= 0 && color <= 7) {
@@ -60,8 +60,8 @@ bcol (color)
 }
 
 static t_bool
-isalp (c)
-	int c;
+isalp (
+	int c)
 {
 	if (isalnum(c)) {
 		return TRUE;
@@ -87,7 +87,7 @@ isalp (c)
 		case '&':
 /*		case '/': */
 		case '?':
-#ifdef NOLOCALE
+#ifdef NO_LOCALE
 		/* if you have not installed locale and want to reed german umlauts: */
 		case 'ß':
 		case 'ä':
@@ -111,9 +111,9 @@ isalp (c)
 }
 
 static t_bool
-check_valid_mark (s, c)
-	const char *s;
-	int c;
+check_valid_mark (
+	const char *s,
+	int c)
 {
 	const char *p;
 
@@ -130,10 +130,10 @@ check_valid_mark (s, c)
 }
 
 static void
-color_fputs (s, stream, color)
-	const char *s;
-	FILE *stream;
-	int color;
+color_fputs (
+	const char *s,
+	FILE *stream,
+	int color)
 {
 	const char *p;
 	int col1=0, col2=0;
@@ -228,9 +228,9 @@ color_fputs (s, stream, color)
 }
 
 void
-print_color (str, signature)
-	char *str;
-	t_bool signature;
+print_color (
+	char *str,
+	t_bool signature)
 {
 	int color = col_text;
 

@@ -42,9 +42,9 @@ static void show_intro_page P_((void));
 */
 
 int
-main (argc, argv)
-	int argc;
-	char *argv[];
+main (
+	int argc,
+	char *argv[])
 {
 	int num_cmd_line_groups = 0;
 	int start_groupnum = 0;
@@ -298,9 +298,9 @@ main (argc, argv)
 #endif
 
 static void
-read_cmd_line_options (argc, argv)
-	int argc;
-	char *argv[];
+read_cmd_line_options (
+	int argc,
+	char *argv[])
 {
 	int ch;
 	int newsrc_set = 0;
@@ -534,8 +534,8 @@ read_cmd_line_options (argc, argv)
  */
 
 static void
-usage (theProgname)
-	char *theProgname;
+usage (
+	char *theProgname)
 {
 #ifndef INDEX_DAEMON
 	error_message ("%s A Usenet reader.\n", cvers);
@@ -630,9 +630,9 @@ usage (theProgname)
  */
 
 static int
-check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
-	t_bool CheckAnyUnread;
-	t_bool StartAnyUnread;
+check_for_any_new_news (
+	t_bool CheckAnyUnread,
+	t_bool StartAnyUnread)
 {
 	int i = 0;
 
@@ -659,7 +659,7 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
  */
 
 static void
-save_or_mail_new_news ()
+save_or_mail_new_news (void)
 {
 	t_bool i;
 
@@ -682,7 +682,7 @@ save_or_mail_new_news ()
  */
 
 static void
-update_index_files ()
+update_index_files (void)
 {
 	if (update || update_fork) {
 		if (!catchup && (read_news_via_nntp && xover_supported)) {
@@ -756,7 +756,7 @@ update_index_files ()
  */
 
 static void
-show_intro_page ()
+show_intro_page (void)
 {
 	if (cmd_line) {
 		wait_message (cvers);
@@ -796,7 +796,7 @@ show_intro_page ()
 
 
 int
-read_cmd_line_groups ()
+read_cmd_line_groups (void)
 {
 	char buf[PATH_LEN];
 	int matched = 0;

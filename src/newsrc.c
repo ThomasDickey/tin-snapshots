@@ -40,9 +40,9 @@ static void delete_group P_((char *group));
  */
 
 void
-read_newsrc (newsrc_file, allgroups)
-	char *newsrc_file;
-	int allgroups;
+read_newsrc (
+	char *newsrc_file,
+	int allgroups)
 {
 	char *line;
 	char *seq;
@@ -98,9 +98,9 @@ fflush(stdout);
 
 
 static void
-vWriteNewsrcLine (fp,line)
-FILE *fp;
-char *line;
+vWriteNewsrcLine (
+	FILE *fp,
+	char *line)
 {
 	char grp[HEADER_LEN];
 	char *seq;
@@ -131,7 +131,7 @@ fprintf(stderr, "%s not found in active. Unchanged\n", grp); */
  */
 
 void
-vWriteNewsrc ()
+vWriteNewsrc (void)
 {
 #ifndef INDEX_DAEMON
 	char *line;
@@ -175,8 +175,8 @@ vWriteNewsrc ()
  */
 
 static void
-create_newsrc (newsrc_file)
-	char *newsrc_file;
+create_newsrc (
+	char *newsrc_file)
 {
 	FILE *fp;
 	register int i;
@@ -201,8 +201,8 @@ create_newsrc (newsrc_file)
  */
 
 static void
-auto_subscribe_groups (newsrc_file)
-	char *newsrc_file;
+auto_subscribe_groups (
+	char *newsrc_file)
 {
 	char *ptr, buf[HEADER_LEN];
 	FILE *fp_newsrc;
@@ -249,7 +249,7 @@ auto_subscribe_groups (newsrc_file)
  */
 
 void
-backup_newsrc ()
+backup_newsrc (void)
 {
 #ifndef INDEX_DAEMON
 	char *line;
@@ -289,9 +289,9 @@ backup_newsrc ()
  */
 
 void
-subscribe (group, sub_state)
-	struct t_group *group;
-	int sub_state;
+subscribe (
+	struct t_group *group,
+	int sub_state)
 {
 	char *line;
 	char *seq;
@@ -349,7 +349,7 @@ subscribe (group, sub_state)
 
 
 void
-reset_newsrc ()
+reset_newsrc (void)
 {
 	char *line;
 	char grp[HEADER_LEN];
@@ -389,8 +389,8 @@ reset_newsrc ()
 
 #if 0 /* never used */
 static void
-delete_group (group)
-	char *group;
+delete_group (
+	char *group)
 {
 	char *line;
 	char *seq;
@@ -429,9 +429,9 @@ delete_group (group)
 #endif /* 0 */
 
 void
-grp_mark_read (group, psArt)
-	struct t_group *group;
-	struct t_article *psArt;
+grp_mark_read (
+	struct t_group *group,
+	struct t_article *psArt)
 {
 	register int i;
 
@@ -457,8 +457,8 @@ grp_mark_read (group, psArt)
 
 
 void
-grp_mark_unread (group)
-	struct t_group *group;
+grp_mark_unread (
+	struct t_group *group)
 {
 	int bitlength;
 	t_bitmap *newbitmap = (t_bitmap *)0;
@@ -499,9 +499,9 @@ grp_mark_unread (group)
 
 
 void
-thd_mark_read (group, thread)
-	struct t_group *group;
-	long thread;
+thd_mark_read (
+	struct t_group *group,
+	long thread)
 {
 	register int i;
 
@@ -516,9 +516,9 @@ thd_mark_read (group, thread)
 
 
 void
-thd_mark_unread (group, thread)
-	struct t_group *group;
-	long thread;
+thd_mark_unread (
+	struct t_group *group,
+	long thread)
 {
 	register int i;
 
@@ -536,9 +536,9 @@ thd_mark_unread (group, thread)
  */
 
 static void
-parse_bitmap_seq (group, seq)
-	struct t_group *group;
-	char *seq;
+parse_bitmap_seq (
+	struct t_group *group,
+	char *seq)
 {
 	char *ptr;
 	int sum = 0;
@@ -555,12 +555,12 @@ parse_bitmap_seq (group, seq)
 		ptr++;
 	}
 #ifdef DEBUG_NEWSRC
-{
-char buf[NEWSRC_LINE];
-sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
-debug_print_comment(buf);
-debug_print_bitmap(group,NULL);
-}
+	{
+	char buf[NEWSRC_LINE];
+	sprintf (buf, "Parsing [%s%c %.*s]", group->name, group->subscribed, (int) (NEWSRC_LINE-strlen(group->name)-20), ptr);
+	debug_print_comment(buf);
+	debug_print_bitmap(group,NULL);
+	}
 #endif
 	if (*ptr) {
 		gotseq = TRUE;
@@ -666,12 +666,12 @@ wait_message (msg);
  */
 
 static char *
-pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
-	struct	t_group *psGrp;
-	char	*pcSeq;
-	long	*plLow;
-	long	*plHigh;
-	int		*piSum;
+pcParseSubSeq (
+	struct	t_group *psGrp,
+	char	*pcSeq,
+	long	*plLow,
+	long	*plHigh,
+	int	*piSum)
 {
 	long	lBitMin;
 	long	lBitMax;
@@ -728,10 +728,10 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 
 
 static char *
-pcParseGetSeq(pcSeq, plLow, plHigh)
-	char *pcSeq;
-	long *plLow;
-	long *plHigh;
+pcParseGetSeq(
+	char *pcSeq,
+	long *plLow,
+	long *plHigh)
 {
 	*plLow = strtol (pcSeq, &pcSeq, 10);
 
@@ -764,8 +764,8 @@ pcParseGetSeq(pcSeq, plLow, plHigh)
  */
 
 void
-parse_unread_arts (group)
-	struct t_group *group;
+parse_unread_arts (
+	struct t_group *group)
 {
 	long	bitmin, bitmax;
 	register int i;
@@ -802,9 +802,9 @@ parse_unread_arts (group)
 }
 
 static void
-print_bitmap_seq (fp, group)
-	FILE *fp;
-	struct t_group *group;
+print_bitmap_seq (
+	FILE *fp,
+	struct t_group *group)
 {
 	int flag = FALSE;
 	long artnum;
@@ -876,9 +876,9 @@ print_bitmap_seq (fp, group)
  */
 
 int
-pos_group_in_newsrc (group, pos)
-	struct t_group *group;
-	int pos;
+pos_group_in_newsrc (
+	struct t_group *group,
+	int pos)
 {
 	char buf[HEADER_LEN];
 	char sub[HEADER_LEN];
@@ -1065,8 +1065,8 @@ rewrite_group_done:
  */
 
 void
-catchup_newsrc_file (newsrc_file)
-	char *newsrc_file;
+catchup_newsrc_file (
+	char *newsrc_file)
 {
 	FILE *fp;
 	register int i;
@@ -1092,10 +1092,10 @@ catchup_newsrc_file (newsrc_file)
 
 
 static char *
-pcParseNewsrcLine (line, grp, sub)
-	char *line;
-	char *grp;
-	int *sub;
+pcParseNewsrcLine (
+	char *line,
+	char *grp,
+	int *sub)
 {
 	char *grpptr = grp;
 	static char *ptr;
@@ -1120,9 +1120,9 @@ pcParseNewsrcLine (line, grp, sub)
 }
 
 void
-expand_bitmap (group, min)
-	struct t_group *group;
-	long min;
+expand_bitmap (
+	struct t_group *group,
+	long min)
 {
 	long bitlen;
 	long first;
@@ -1228,9 +1228,9 @@ error_message (msg, "");
 
 
 void
-art_mark_read (group, art)
-	struct t_group *group;
-	struct t_article *art;
+art_mark_read (
+	struct t_group *group,
+	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
 		if (group != (struct t_group *) 0) {
@@ -1257,9 +1257,9 @@ art_mark_read (group, art)
 }
 
 void
-art_mark_unread (group, art)
-	struct t_group *group;
-	struct t_article *art;
+art_mark_unread (
+	struct t_group *group,
+	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
 		if (art->status == ART_READ) {
@@ -1291,9 +1291,9 @@ art_mark_unread (group, art)
  */
 
 void
-art_mark_will_return (group, art)
-	struct t_group *group;
-	struct t_article *art;
+art_mark_will_return (
+	struct t_group *group,
+	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
 		if (art->status == ART_READ) {
@@ -1316,8 +1316,8 @@ art_mark_will_return (group, art)
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-art_mark_deleted (art)
-	struct t_article *art;
+art_mark_deleted (
+	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
 		art->delete = TRUE;
@@ -1327,8 +1327,8 @@ wait_message("FIXME  article marked for deletion");
 
 
 void
-art_mark_undeleted (art)
-	struct t_article *art;
+art_mark_undeleted (
+	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
 		art->delete = FALSE;
@@ -1338,8 +1338,8 @@ wait_message("FIXME  article marked for undeletion");
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 void
-vSetDefaultBitmap (group)
-	struct t_group *group;
+vSetDefaultBitmap (
+	struct t_group *group)
 {
 	if (group != (struct t_group *) 0) {
 		group->newsrc.num_unread = 0;
@@ -1355,8 +1355,8 @@ vSetDefaultBitmap (group)
 }
 
 static char *
-getaline(fp)
-	FILE *fp;
+getaline(
+	FILE *fp)
 {
 	char *res=safe_fgets(fp);
 
@@ -1374,7 +1374,7 @@ static void set_bitmap_range_unread P_((struct t_newsrc *newsrc, long beg, long 
 #endif
 
 void
-vNewsrcTestHarness ()
+vNewsrcTestHarness (void)
 {
 	char seq[20000];
 	FILE *fp;
@@ -1447,10 +1447,10 @@ debug_print_newsrc (&group.newsrc, stdout);
 
 #ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 static void
-set_bitmap_range_read (newsrc, beg, end)
-	struct	t_newsrc *newsrc;
-	long	beg;
-	long	end;
+set_bitmap_range_read (
+	struct	t_newsrc *newsrc,
+	long	beg,
+	long	end)
 {
 	long	length, offset;
 
@@ -1471,10 +1471,10 @@ newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 
 
 static void
-set_bitmap_range_unread (newsrc, beg, end)
-	struct	t_newsrc *newsrc;
-	long	beg;
-	long	end;
+set_bitmap_range_unread (
+	struct	t_newsrc *newsrc,
+	long	beg,
+	long	end)
 {
 	long	length, offset;
 

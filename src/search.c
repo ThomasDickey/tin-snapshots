@@ -34,10 +34,10 @@ static int search_art_body P_((char *group_path, struct t_article *art, char *pa
 */
 
 int
-search_author (the_index, current_art, forward)
-	int the_index;
-	int current_art;
-	int forward;
+search_author (
+	int the_index,
+	int current_art,
+	int forward)
 {
 	char buf[LEN];
 	char buf2[LEN];
@@ -119,8 +119,8 @@ search_author (the_index, current_art, forward)
  */
 
 void
-search_group (forward)
-	int forward;
+search_group (
+	int forward)
 {
 	char buf[LEN];
 	char buf2[LEN];
@@ -205,8 +205,8 @@ search_group (forward)
  * Search for a Subject line in the current group
  */
 void
-search_subject (forward)
-	int forward;
+search_subject (
+	int forward)
 {
 	char buf[LEN];
 	char buf2[LEN];
@@ -312,8 +312,8 @@ found_something:
  */
 
 int
-search_article (forward)
-	int forward;
+search_article (
+	int forward)
 {
 	char buf[LEN];
 	char buf2[LEN];
@@ -423,9 +423,9 @@ search_article (forward)
 
 
 int
-search_body (group, current_art)
-	struct t_group *group;
-	int current_art;
+search_body (
+	struct t_group *group,
+	int current_art)
 {
 	char buf2[LEN];
 	char group_path[PATH_LEN];
@@ -512,10 +512,10 @@ search_body (group, current_art)
 
 
 static int
-search_art_body (group_path, art, pat)
-	char *group_path;
-	struct t_article *art;
-	char *pat;
+search_art_body (
+	char *group_path,
+	struct t_article *art,
+	char *pat)
 {
 	char buf[LEN];
 	FILE *fp;

@@ -29,7 +29,7 @@
  */
 
 int
-overview_xref_support ()
+overview_xref_support (void)
 {
 	char buf[HEADER_LEN];
 	char *ptr;
@@ -62,8 +62,8 @@ overview_xref_support ()
  */
 
 void
-art_mark_xref_read (art)
-	struct t_article *art;
+art_mark_xref_read (
+	struct t_article *art)
 {
 	char *xref_ptr;
 	char *group;
@@ -148,10 +148,10 @@ art_mark_xref_read (art)
  * Set bits [low..high] of 'bitmap' to 1's
  */
 void
-NSETRNG1 (bitmap, low, high)
-	t_bitmap *bitmap;
-	long low;
-	long high;
+NSETRNG1 (
+	t_bitmap *bitmap,
+	long low,
+	long high)
 {
 	register long i;
 
@@ -180,10 +180,10 @@ NSETRNG1 (bitmap, low, high)
  * Set bits [low..high] of 'bitmap' to 0's
  */
 void
-NSETRNG0 (bitmap, low, high)
-	t_bitmap *bitmap;
-	long low;
-	long high;
+NSETRNG0 (
+	t_bitmap *bitmap,
+	long low,
+	long high)
 {
 	register long i;
 

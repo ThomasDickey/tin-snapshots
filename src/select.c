@@ -38,9 +38,9 @@ static void vDelRange P_((int iLevel, int iNumMax));
 
 
 void
-selection_index (start_groupnum, num_cmd_line_groups)
-	int start_groupnum;
-	int num_cmd_line_groups;
+selection_index (
+	int start_groupnum,
+	int num_cmd_line_groups)
 {
 #ifndef INDEX_DAEMON
 
@@ -786,7 +786,7 @@ select_done:
 
 
 void
-group_selection_page ()
+group_selection_page (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -930,8 +930,8 @@ group_selection_page ()
 
 
 static int
-prompt_group_num (ch)
-	int ch;
+prompt_group_num (
+	int ch)
 {
 	int num;
 
@@ -966,21 +966,21 @@ prompt_group_num (ch)
 
 
 void
-erase_group_arrow ()
+erase_group_arrow (void)
 {
 	erase_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
 }
 
 
 void
-draw_group_arrow ()
+draw_group_arrow (void)
 {
 	draw_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
 }
 
 
 static void
-yank_active_file ()
+yank_active_file (void)
 {
 	reread_active_file = TRUE;
 	resync_active_file ();
@@ -988,7 +988,7 @@ yank_active_file ()
 
 
 int
-choose_new_group ()
+choose_new_group (void)
 {
 	char buf[LEN];
 	char *p;
@@ -1035,9 +1035,9 @@ choose_new_group ()
  */
 
 int
-add_my_group (group, add)
-	char *group;
-	int add;
+add_my_group (
+	char *group,
+	int add)
 {
 	int i,j;
 
@@ -1057,9 +1057,9 @@ add_my_group (group, add)
 }
 
 static int
-reposition_group (group, default_num)
-	struct t_group *group;
-	int default_num;
+reposition_group (
+	struct t_group *group,
+	int default_num)
 {
 	char buf[LEN];
 	char pos[LEN];
@@ -1110,9 +1110,9 @@ reposition_group (group, default_num)
 
 
 static void
-catchup_group (group, goto_next_unread_group)
-	struct t_group *group;
-	int goto_next_unread_group;
+catchup_group (
+	struct t_group *group,
+	int goto_next_unread_group)
 {
 	sprintf (msg, txt_mark_group_read, group->name);
 
@@ -1132,8 +1132,8 @@ catchup_group (group, goto_next_unread_group)
 
 
 static int
-next_unread_group (enter_group)
-	int enter_group;
+next_unread_group (
+	int enter_group)
 {
 	int i, all_groups_read = TRUE;
 
@@ -1193,8 +1193,8 @@ next_unread_group (enter_group)
  */
 
 void
-set_groupname_len (all_groups)
-	int all_groups;
+set_groupname_len (
+	int all_groups)
 {
 	int len;
 	register int i;
@@ -1234,9 +1234,9 @@ set_groupname_len (all_groups)
 }
 
 void
-toggle_my_groups (only_unread_groups, group)
-	t_bool only_unread_groups;
-	char *group;
+toggle_my_groups (
+	t_bool only_unread_groups,
+	char *group)
 {
 #ifndef INDEX_DAEMON
 	char buf[NEWSRC_LINE];
@@ -1315,7 +1315,7 @@ toggle_my_groups (only_unread_groups, group)
 
 
 static void
-goto_next_group_on_screen ()
+goto_next_group_on_screen (void)
 {
 	if (_hp_glitch) {
 		erase_group_arrow ();
@@ -1336,9 +1336,9 @@ goto_next_group_on_screen ()
  */
 
 void
-strip_line (line, len)
-	char *line;
-	size_t len;
+strip_line (
+	char *line,
+	size_t len)
 {
 	char *ptr = line + (len - 1);
 
@@ -1360,11 +1360,11 @@ strip_line (line, len)
  */
 
 int
-iSetRange (iLevel, iNumMin, iNumMax, iNumCur)
-	int iLevel;
-	int iNumMin;
-	int iNumMax;
-	int iNumCur;
+iSetRange (
+	int iLevel,
+	int iNumMin,
+	int iNumMax,
+	int iNumCur)
 {
 	char *pcPtr;
 	char acRng[PATH_LEN];
@@ -1455,13 +1455,13 @@ iSetRange (iLevel, iNumMin, iNumMax, iNumCur)
 }
 
 static int
-iParseRange (pcRange, iNumMin, iNumMax, iNumCur, piRngMin, piRngMax)
-	char *pcRange;
-	int iNumMin;
-	int iNumMax;
-	int iNumCur;
-	int *piRngMin;
-	int *piRngMax;
+iParseRange (
+	char *pcRange,
+	int iNumMin,
+	int iNumMax,
+	int iNumCur,
+	int *piRngMin,
+	int *piRngMax)
 {
 	char *pcPtr;
 	int iDone = FALSE;
@@ -1518,9 +1518,9 @@ iParseRange (pcRange, iNumMin, iNumMax, iNumCur, piRngMin, piRngMax)
 
 
 static void
-vDelRange (iLevel, iNumMax)
-	int iLevel;
-	int iNumMax;
+vDelRange (
+	int iLevel,
+	int iNumMax)
 {
 	int iIndex;
 
@@ -1550,4 +1550,3 @@ vDelRange (iLevel, iNumMax)
 			break;
 	}
 }
-

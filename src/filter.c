@@ -58,9 +58,9 @@ static void vWriteFilterArray P_((FILE *fp, int global, struct t_filters *ptr, l
 
 
 struct t_filter *
-psExpandFilterArray (ptr, num)
-	struct t_filter *ptr;
-	int *num;
+psExpandFilterArray (
+	struct t_filter *ptr,
+	int *num)
 {
 	size_t block;
 	struct t_filter *new;
@@ -80,8 +80,8 @@ psExpandFilterArray (ptr, num)
 
 
 static void
-vSetFilter (psFilter)
-	struct t_filter *psFilter;
+vSetFilter (
+	struct t_filter *psFilter)
 {
 	if (psFilter != (struct t_filter *) 0)
 	{
@@ -103,8 +103,8 @@ vSetFilter (psFilter)
 
 
 static void
-free_filter_item (ptr)
-	struct t_filter *ptr;
+free_filter_item (
+	struct t_filter *ptr)
 {
 	FreeAndNull(ptr->scope);
 	FreeAndNull(ptr->subj);
@@ -114,8 +114,8 @@ free_filter_item (ptr)
 }
 
 static void
-free_filter_array (ptr)
-	struct t_filters *ptr;
+free_filter_array (
+	struct t_filters *ptr)
 {
 	register int i;
 
@@ -136,7 +136,7 @@ free_filter_array (ptr)
 
 
 void
-free_all_filter_arrays ()
+free_all_filter_arrays (void)
 {
 	register int i;
 
@@ -158,9 +158,9 @@ free_all_filter_arrays ()
  */
 
 int
-read_filter_file (file, global_file)
-	char	*file;
-	int	global_file;
+read_filter_file (
+	char	*file,
+	int	global_file)
 {
 #ifndef INDEX_DAEMON
 	char buf[HEADER_LEN];
@@ -442,8 +442,8 @@ if (debug) {
  */
 
 static void
-vWriteFilterFile (pcFile)
-	char *pcFile;
+vWriteFilterFile (
+	char *pcFile)
 {
 #ifndef	INDEX_DAEMON
 	FILE *hFp;
@@ -535,11 +535,11 @@ should work - but didn't with changing order of filterfile
 */
 
 static void
-vWriteFilterArray (fp, global, ptr, theTime)
-	FILE *fp;
-	int global;
-	struct t_filters *ptr;
-	long theTime;
+vWriteFilterArray (
+	FILE *fp,
+	int global,
+	struct t_filters *ptr,
+	long theTime)
 {
 	register int i;
 	int j;
@@ -618,15 +618,15 @@ fflush (stdout);
 
 
 static int
-get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
-	int x;
-	char *help;
-	char *prompt;
-	char *opt1;
-	char *opt2;
-	char *opt3;
-	char *opt4;
-	char *opt5;
+get_choice (
+	int x,
+	char *help,
+	char *prompt,
+	char *opt1,
+	char *opt2,
+	char *opt3,
+	char *opt4,
+	char *opt5)
 {
 	int ch, n = 0, i = 0;
 	char *argv[5];
@@ -669,10 +669,10 @@ get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
  */
 
 int
-filter_menu (type, group, art)
-	int type;
-	struct t_group *group;
-	struct t_article *art;
+filter_menu (
+	int type,
+	struct t_group *group,
+	struct t_article *art)
 {
 	char *ptr;
 	char *ptr_filter_from;
@@ -991,9 +991,9 @@ filter_done:
  */
 
 int
-quick_filter_kill (group, art)
-	struct t_group *group;
-	struct t_article *art;
+quick_filter_kill (
+	struct t_group *group,
+	struct t_article *art)
 {
 	int header;
 	int filtered;
@@ -1052,9 +1052,9 @@ quick_filter_kill (group, art)
  */
 
 int
-quick_filter_select (group, art)
-	struct t_group *group;
-	struct t_article *art;
+quick_filter_select (
+	struct t_group *group,
+	struct t_article *art)
 {
 	int header;
 	int filtered;
@@ -1115,9 +1115,9 @@ quick_filter_select (group, art)
  */
 
 int
-quick_filter_select_posted_art (group, subj)
-	struct t_group *group;
-	char *subj;
+quick_filter_select_posted_art (
+	struct t_group *group,
+	char *subj)
 {
 	int filtered = FALSE;
 	struct t_article art;
@@ -1162,10 +1162,10 @@ quick_filter_select_posted_art (group, subj)
  */
 
 static int
-iAddFilterRule (psGrp, psArt, psRule)
-	struct t_group *psGrp;
-	struct t_article *psArt;
-	struct t_filter_rule *psRule;
+iAddFilterRule (
+	struct t_group *psGrp,
+	struct t_article *psArt,
+	struct t_filter_rule *psRule)
 {
 	char acBuf[PATH_LEN];
 	int iFiltered = FALSE;
@@ -1315,7 +1315,7 @@ iAddFilterRule (psGrp, psArt, psRule)
  */
 
 static int
-unfilter_articles ()
+unfilter_articles (void)
 {
 	int unkilled = 0;
 	register int i;
@@ -1340,8 +1340,8 @@ unfilter_articles ()
  */
 
 int
-filter_articles (group)
-	struct t_group *group;
+filter_articles (
+	struct t_group *group)
 {
 	char buf[LEN];
 	char acStr[LEN], *pcPtr;
@@ -1608,8 +1608,8 @@ sleep (1);
  */
 
 int
-auto_select_articles (group)
-	struct t_group *group;
+auto_select_articles (
+	struct t_group *group)
 {
 	filter_articles (group);
 	return (TRUE);
@@ -1617,8 +1617,8 @@ auto_select_articles (group)
 
 
 static int
-set_filter_scope (group)
-	struct t_group *group;
+set_filter_scope (
+	struct t_group *group)
 {
 	int i, num, inscope;
 	struct t_filter *ptr;
@@ -1641,8 +1641,8 @@ set_filter_scope (group)
 }
 
 static char *
-pcChkRegexStr (pcStr)
-	char *pcStr;
+pcChkRegexStr (
+	char *pcStr)
 {
 	char *pcSrcPtr;
 	char *pcDstPtr;

@@ -57,9 +57,9 @@ static int DoMatch P_((char *text, char *p));
  */
 
 static int
-DoMatch(text, p)
-	register char *text;
-	register char *p;
+DoMatch(
+	register char *text,
+	register char *p)
 {
 #ifndef INDEX_DAEMON
 	register int last;
@@ -124,9 +124,9 @@ DoMatch(text, p)
  */
 
 int
-wildmat(text, p)
-	char *text;
-	char *p;
+wildmat(
+	char *text,
+	char *p)
 {
 	/*
 	 * Make sure the pattern is not NULL

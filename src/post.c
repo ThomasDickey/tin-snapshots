@@ -98,9 +98,9 @@ static void make_path_header P_((char *line, char *from_name));
 #endif /* FORGERY */
 
 
-static void do_prompt1 (format, ch_default)
-	char *format;
-	int ch_default;
+static void do_prompt1 (
+	char *format,
+	int ch_default)
 {
 	sprintf (msg, "%s%c", format, ch_default);
 	wait_message (msg);
@@ -108,10 +108,10 @@ static void do_prompt1 (format, ch_default)
 }
 
 static void
-do_prompt2(format, subject, ch_default)
-	char *format;
-	char *subject;
-	int ch_default;
+do_prompt2(
+	char *format,
+	char *subject,
+	int ch_default)
 {
 	int have = cCOLS - strlen (format) + 4;
 	int want = strlen(subject);
@@ -127,7 +127,7 @@ do_prompt2(format, subject, ch_default)
 }
 
 static int
-prompt_to_edit()
+prompt_to_edit(void)
 {
 	int ch;
 	char ch_default = iKeyPostPost;
@@ -141,8 +141,8 @@ prompt_to_edit()
 }
 
 static int
-prompt_to_send(subject)
-	char *subject;
+prompt_to_send(
+	char *subject)
 {
 	int ch;
 	char ch_default = iKeyPostSend;
@@ -175,8 +175,8 @@ prompt_rejected()
 }
 
 static t_bool
-repair_article(result)
-	char *result;
+repair_article(
+	char *result)
 {
 	int ch;
 
@@ -198,8 +198,8 @@ repair_article(result)
    submit_news_file adds headers, does q-p conversion etc */
 
 static char *
-backup_article_name(the_article)
-char *the_article;
+backup_article_name(
+	char *the_article)
 {
   static char name[PATH_LEN];
 
@@ -210,8 +210,8 @@ char *the_article;
 }
 
 static void
-backup_article(the_article)
-char *the_article;
+backup_article(
+	char *the_article)
 {
   char line[LEN];
   FILE *in, *out;
@@ -232,7 +232,7 @@ char *the_article;
 }
 
 static void
-msg_init_headers ()
+msg_init_headers (void)
 {
 	int i;
 
@@ -243,7 +243,7 @@ msg_init_headers ()
 }
 
 static void
-msg_free_headers ()
+msg_free_headers (void)
 {
 	int i;
 
@@ -254,9 +254,9 @@ msg_free_headers ()
 }
 
 static void
-msg_add_header (name, text)
-	char *name;
-	char *text;
+msg_add_header (
+	char *name,
+	char *text)
 {
 	char *ptr;
 	char *new_name = (char *) 0;
@@ -317,8 +317,8 @@ msg_add_header (name, text)
 }
 
 static int
-msg_write_headers (fp)
-	FILE *fp;
+msg_write_headers (
+	FILE *fp)
 {
 	int i;
 	int wrote = 1;
@@ -337,7 +337,7 @@ msg_write_headers (fp)
 }
 
 t_bool
-user_posted_messages ()
+user_posted_messages (void)
 {
 	char buf[LEN];
 	FILE *fp;
@@ -414,10 +414,10 @@ user_posted_messages ()
 }
 
 static void
-update_posted_info_file (group, action, subj)
-	char *group;
-	int action;
-	char *subj;
+update_posted_info_file (
+	char *group,
+	int action,
+	char *subj)
 {
 	char buf[LEN];
 	char tmp_post[LEN];
@@ -453,9 +453,9 @@ update_posted_info_file (group, action, subj)
 }
 
 static void
-update_posted_msgs_file (file, addr)
-	char *file;
-	char *addr;
+update_posted_msgs_file (
+	char *file,
+	char *addr)
 {
 	char buf[LEN];
 	FILE *fp_in, *fp_out;
@@ -499,10 +499,10 @@ update_posted_msgs_file (file, addr)
  */
 
 static t_bool
-check_article_to_be_posted (the_article, art_type, lines)
-	char *the_article;
-	int art_type;
-	int *lines;
+check_article_to_be_posted (
+	char *the_article,
+	int art_type,
+	int *lines)
 {
 	FILE *fp;
 	char *ngptrs[NGLIMIT];
@@ -757,8 +757,8 @@ check_article_to_be_posted (the_article, art_type, lines)
 }
 
 static void
-setup_check_article_screen (init)
-	int *init;
+setup_check_article_screen (
+	int *init)
 {
 	if (*init) {
 		ClearScreen ();
@@ -774,7 +774,7 @@ setup_check_article_screen (init)
  */
 
 void
-quick_post_article ()
+quick_post_article (void)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -1166,9 +1166,9 @@ post_article_postponed:
 
 
 static void
-append_postponed_file (file, addr)
-	char *file;
-	char *addr;
+append_postponed_file (
+	char *file,
+	char *addr)
 {
 	char buf[LEN];
 	FILE *fp_in, *fp_out;
@@ -1195,7 +1195,7 @@ append_postponed_file (file, addr)
 /* count how any articles are in postponed.articles. Essentially, we
  * count '^From ' lines */
 
-int count_postponed_articles()
+int count_postponed_articles(void)
 {
   FILE *fp=fopen(postponed_articles_file,"r");
   int count=0;
@@ -1217,10 +1217,10 @@ int count_postponed_articles()
    file */
 
 static int
-fetch_postponed_article(tmp_file, subject, newsgroups)
-char tmp_file[];
-char subject[];
-char newsgroups[];
+fetch_postponed_article(
+	char tmp_file[],
+	char subject[],
+	char newsgroups[])
 {
   char postponed_tmp[PATH_LEN];
   FILE *in;
@@ -1303,8 +1303,8 @@ char newsgroups[];
 /* pick up any postponed article and ask if the user want to use it */
 
 int
-pickup_postponed_articles(ask)
-int ask;
+pickup_postponed_articles(
+	int ask)
 {
   char newsgroups[HEADER_LEN];
   char subject[HEADER_LEN];
@@ -1344,8 +1344,8 @@ int ask;
 
 
 static void
-postpone_article(the_article)
-char *the_article;
+postpone_article(
+	char *the_article)
 {
   wait_message("storing article for later posting");
   append_postponed_file(article, userid);
@@ -1356,9 +1356,9 @@ char *the_article;
  */
 
 int
-post_article (group, posted_flag)
-	char *group;
-	int *posted_flag;
+post_article (
+	char *group,
+	int *posted_flag)
 {
 	FILE *fp;
 	char ch;
@@ -1563,9 +1563,9 @@ post_article_postponed:
 /* yeah, right, that's from the same Chris who is telling Jason he's
    doing obfuscated C :-) */
 static void
-appendid (where, what)
-	char **where;
-	char **what;
+appendid (
+	char **where,
+	char **what)
 {
 	char *oldpos;
 
@@ -1586,8 +1586,8 @@ appendid (where, what)
 }
 
 static t_bool
-must_include (id)
-	char *id;
+must_include (
+	char *id)
 {
 	while (*id && *id != '<')
 		id++;
@@ -1605,8 +1605,8 @@ must_include (id)
 }
 
 static void
-skip_id (id)
-	char **id;
+skip_id (
+	char **id)
 {
 	while (**id && isspace ((unsigned char)**id))
 		(*id)++;
@@ -1617,8 +1617,8 @@ skip_id (id)
 }
 
 static t_bool
-damaged_id (id)
-	char *id;
+damaged_id (
+	char *id)
 {
 	while (*id && isspace ((unsigned char)*id))
 		id++;
@@ -1636,8 +1636,8 @@ damaged_id (id)
  * t_article, so we use this.
  */
 static t_bool
-is_crosspost (xref)
-	char *xref;
+is_crosspost (
+	char *xref)
 {
 	int count=0;
 	for (;*xref;xref++) 
@@ -1657,10 +1657,10 @@ is_crosspost (xref)
  */
 
 static void
-join_references (buffer, oldrefs, newref)
-	char *buffer;
-	char *oldrefs;
-	char *newref;
+join_references (
+	char *buffer,
+	char *oldrefs,
+	char *newref)
 {
 	/* First of all: shortening references is a VERY BAD IDEA.
 	   Nevertheless, current software usually has restrictions in
@@ -1755,10 +1755,10 @@ join_references (buffer, oldrefs, newref)
 }
 
 int /* return code is currently ignored! */
-post_response (group, respnum, copy_text)
-	char *group;
-	int respnum;
-	int copy_text;
+post_response (
+	char *group,
+	int respnum,
+	int copy_text)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -2052,12 +2052,12 @@ post_response_postponed:
 }
 
 int
-mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
-	int respnum;
-	char *address;
-	int mail_to_poster;
-	int confirm_to_mail;
-	int *mailed_ok;
+mail_to_someone (
+	int respnum,
+	char *address,
+	int mail_to_poster,
+	int confirm_to_mail,
+	int *mailed_ok)
 {
 	char nam[HEADER_LEN];
 	char subject[HEADER_LEN];
@@ -2221,7 +2221,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 }
 
 int
-mail_bug_report ()
+mail_bug_report (void)
 {
 	char buf[LEN], nam[100];
 	char *gateway;
@@ -2429,10 +2429,10 @@ mail_bug_report ()
 }
 
 int
-mail_to_author (group, respnum, copy_text)
-	char *group;
-	int respnum;
-	int copy_text;
+mail_to_author (
+	char *group,
+	int respnum,
+	int copy_text)
 {
 	char buf[LEN];
 	char from_addr[HEADER_LEN];
@@ -2615,10 +2615,10 @@ mail_to_author (group, respnum, copy_text)
  */
 
 static int
-pcCopyArtHeader (iHeader, pcArt, result)
-	int iHeader;
-	char *pcArt;
-	char *result;
+pcCopyArtHeader (
+	int iHeader,
+	char *pcArt,
+	char *result)
 {
 	char buf[HEADER_LEN];
 	char buf2[HEADER_LEN];
@@ -2720,10 +2720,10 @@ pcCopyArtHeader (iHeader, pcArt, result)
 }
 
 t_bool
-cancel_article (group, art, respnum)
-	struct t_group *group;
-	struct t_article *art;
-	int respnum;
+cancel_article (
+	struct t_group *group,
+	struct t_article *art,
+	int respnum)
 {
 	char ch, ch_default = iKeyPostCancel;
 	char buf[HEADER_LEN];
@@ -2933,11 +2933,11 @@ cancel_article (group, art, respnum)
 #endif
 
 int
-repost_article (group, art, respnum, supersede)
-	char *group;
-	struct t_article *art;
-	int respnum;
-	int supersede;
+repost_article (
+	char *group,
+	struct t_article *art,
+	int respnum,
+	int supersede)
 {
 	char buf[HEADER_LEN];
 	char tmp[HEADER_LEN];
@@ -3210,8 +3210,8 @@ repost_article (group, art, respnum, supersede)
 }
 
 static void
-msg_add_x_headers (headers)
-	char *headers;
+msg_add_x_headers (
+	char *headers)
 {
 	char *ptr;
 	char file[PATH_LEN];
@@ -3252,9 +3252,9 @@ msg_add_x_headers (headers)
 }
 
 static int
-msg_add_x_body (fp_out, body)
-	FILE *fp_out;
-	char *body;
+msg_add_x_body (
+	FILE *fp_out,
+	char *body)
 {
 	char *ptr;
 	char file[PATH_LEN];
@@ -3293,8 +3293,8 @@ msg_add_x_body (fp_out, body)
 }
 
 static void
-modify_headers (line)
-	char *line;
+modify_headers (
+	char *line)
 {
 
 	char buf[HEADER_LEN];
@@ -3330,9 +3330,9 @@ modify_headers (line)
 }
 
 void
-checknadd_headers (infile, lines)
-	char *infile;
-	int lines;
+checknadd_headers (
+	char *infile,
+	int lines)
 {
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
@@ -3381,8 +3381,8 @@ checknadd_headers (infile, lines)
 
 #ifndef M_AMIGA
 static t_bool
-insert_from_header (infile)
-	char *infile;
+insert_from_header (
+	char *infile)
 {
 	char *ptr;
 	char from_name[HEADER_LEN];
@@ -3440,9 +3440,9 @@ insert_from_header (infile)
 #endif
 
 static void
-find_reply_to_addr (respnum, from_addr)
-	int respnum;	/* we don't need that in the #else part */
-	char *from_addr;
+find_reply_to_addr (
+	int respnum,	/* we don't need that in the #else part */
+	char *from_addr)
 {
 #if 0
 	/*
@@ -3535,7 +3535,7 @@ find_reply_to_addr (respnum, from_addr)
  */
 
 int
-reread_active_after_posting ()
+reread_active_after_posting (void)
 {
 	char acBuf[PATH_LEN];
 	int i, modified = FALSE;
@@ -3602,8 +3602,8 @@ reread_active_after_posting ()
  */
 
 static void
-update_active_after_posting (newsgroups)
-	char *newsgroups;
+update_active_after_posting (
+	char *newsgroups)
 {
 	char *src, *dst;
 	char group[HEADER_LEN];
@@ -3638,8 +3638,8 @@ update_active_after_posting (newsgroups)
 }
 
 static int
-submit_mail_file (file)
-	char *file;
+submit_mail_file (
+	char *file)
 {
 	char buf[HEADER_LEN];
 	char mail_to[HEADER_LEN];
@@ -3675,8 +3675,8 @@ submit_mail_file (file)
 
 #ifdef FORGERY
 static void
-make_path_header (line, from_name)
-	char *line, *from_name;
+make_path_header (
+	char *line, char *from_name)
 {
 	char domain_name[PATH_LEN];
 	char host_name[PATH_LEN];

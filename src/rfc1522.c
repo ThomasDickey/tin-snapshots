@@ -59,7 +59,7 @@ static int sizeofnextword P_((char *w));
 #endif
 
 static void
-build_base64_rank_table ()
+build_base64_rank_table (void)
 {
 	int i;
 
@@ -73,8 +73,8 @@ build_base64_rank_table ()
 }
 
 static unsigned
-hex2bin (x)
-	int x;
+hex2bin (
+	int x)
 {
 	if (x >= '0' && x <= '9')
 		return (x - '0');
@@ -86,12 +86,12 @@ hex2bin (x)
 }
 
 int
-mmdecode (what, encoding, delimiter, where, charset)
-	char *what;
-	int encoding;
-	int delimiter;
-	char *where;
-	char *charset;
+mmdecode (
+	char *what,
+	int encoding,
+	int delimiter,
+	char *where,
+	char *charset)
 {
 	char *t;
 	int decode_gt128 = 0;
@@ -169,7 +169,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 }
 
 void
-get_mm_charset ()
+get_mm_charset (void)
 {
 	char *c;
 
@@ -185,8 +185,8 @@ get_mm_charset ()
 }
 
 char *
-rfc1522_decode (s)
-	char *s;
+rfc1522_decode (
+	char *s)
 {
 	char *c, *d, *t;
 	static char buffer[2048];
@@ -260,8 +260,8 @@ rfc1522_decode (s)
 }
 
 static int
-contains_nonprintables (w)
-	char *w;
+contains_nonprintables (
+	char *w)
 {
 #ifdef MIME_BASE64_ALLOWED
 	int chars = 0;
@@ -299,8 +299,8 @@ contains_nonprintables (w)
 
 #ifdef MIME_BREAK_LONG_LINES
 static int
-sizeofnextword (w)
-	char *w;
+sizeofnextword (
+	char *w)
 {
 	char *x;
 
@@ -315,9 +315,9 @@ sizeofnextword (w)
 
 
 static int
-rfc1522_do_encode (what, where)
-	char *what;
-	char **where;
+rfc1522_do_encode (
+	char *what,
+	char **where)
 {
 	/* We need to meet several partly contradictional requirements here.
 	   First of all, a line containing MIME encodings must not be longer
@@ -504,8 +504,8 @@ rfc1522_do_encode (what, where)
 }
 
 char *
-rfc1522_encode (s)
-	char *s;
+rfc1522_encode (
+	char *s)
 {
 	static char buf[2048];
 	char *b;
@@ -519,10 +519,10 @@ rfc1522_encode (s)
 }
 
 void
-rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
-	char *filename;
-	char *mime_encoding;
-        t_bool  allow_8bit_header;
+rfc15211522_encode (
+	char *filename,
+	char *mime_encoding,
+        t_bool  allow_8bit_header)
 {
 	FILE *f;
 	FILE *g;

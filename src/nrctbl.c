@@ -30,7 +30,7 @@ static void write_newsrctable_file P_((void));
  */
 
 static void
-write_newsrctable_file()
+write_newsrctable_file(void)
 {
 	FILE	*fp;
 
@@ -59,9 +59,9 @@ write_newsrctable_file()
  */
 
 void
-get_nntpserver (nntpserver_name, nick_name)
-	char *nntpserver_name;
-	char *nick_name;
+get_nntpserver (
+	char *nntpserver_name,
+	char *nick_name)
 {
 	FILE	*fp;
 	char	line[LEN];
@@ -106,9 +106,9 @@ get_nntpserver (nntpserver_name, nick_name)
  */
 
 int
-get_newsrcname (newsrc_name, nntpserver_name)
-	char *newsrc_name;
-	char *nntpserver_name;
+get_newsrcname (
+	char *newsrc_name,
+	char *nntpserver_name)
 {
 	FILE	*fp;
 	char	line[LEN];

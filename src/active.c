@@ -42,9 +42,9 @@ static void backup_active P_((int create));
  */
 
 int
-cmp_group_p (group1, group2)
-	t_comptype *group1;
-	t_comptype *group2;
+cmp_group_p (
+	t_comptype *group1,
+	t_comptype *group2)
 {
 	return (strcmp ((*(group_p *) group1)->name, (*(group_p *) group2)->name));
 }
@@ -54,9 +54,9 @@ cmp_group_p (group1, group2)
  */
 
 int
-cmp_notify_p (notify1, notify2)
-	t_comptype *notify1;
-	t_comptype *notify2;
+cmp_notify_p (
+	t_comptype *notify1,
+	t_comptype *notify2)
 {
 	return (strcmp ((*(notify_p *) notify1)->name, (*(notify_p *) notify2)->name));
 }
@@ -68,7 +68,7 @@ cmp_notify_p (notify1, notify2)
  */
 
 int
-get_active_num ()
+get_active_num (void)
 {
 #ifdef ENV_VAR_GROUPS
 	char *ptr;
@@ -89,7 +89,7 @@ get_active_num ()
  */
 
 int
-resync_active_file ()
+resync_active_file (void)
 {
 	char old_group[HEADER_LEN];
 	int reread = FALSE;
@@ -141,11 +141,11 @@ resync_active_file ()
  * Parse line from news or mail active files
  */
 int
-parse_active_line (line, max, min, moderated)
-	char *line;
-	long *max;
-	long *min;
-	char *moderated;
+parse_active_line (
+	char *line,
+	long *max,
+	long *min,
+	char *moderated)
 {
 	char *p, *q, *r;
 
@@ -179,12 +179,12 @@ parse_active_line (line, max, min, moderated)
  * We can't know the 'moderator' status and always return 'n'
  */
 static int
-parse_newsrc_active_line (buf, count, max, min, moderated)
-	char *buf;
-	long *count;
-	long *max;
-	long *min;
-	char *moderated;
+parse_newsrc_active_line (
+	char *buf,
+	long *count,
+	long *max,
+	long *min,
+	char *moderated)
 {
 	char	*ptr;
 
@@ -213,7 +213,7 @@ fprintf(stderr, "vGGAI OUT, cnt=%ld, min=%ld, max=%ld\n", *count, *max, *min);
  */
 
 void
-read_news_active_file ()
+read_news_active_file (void)
 {
 	FILE *fp = 0;
 	char buf[HEADER_LEN];
@@ -338,8 +338,8 @@ read_news_active_continue:;
  *  create ~/.tin/active if it does not exist (local news only)
  */
 void
-backup_active (create)
-	int create;
+backup_active (
+	int create)
 {
 	char buf[PATH_LEN];
 	FILE *fp;
@@ -378,7 +378,7 @@ backup_active (create)
  */
 
 static void
-check_for_any_new_groups ()
+check_for_any_new_groups (void)
 {
 	char *autosubscribe, *autounsubscribe;
 	char *ptr, buf[NNTP_STRLEN];
@@ -505,10 +505,10 @@ notify_groups_done:
  */
 
 static void
-prompt_subscribe_group (group, autosubscribe, autounsubscribe)
-	char *group;
-	char *autosubscribe;
-	char *autounsubscribe;
+prompt_subscribe_group (
+	char *group,
+	char *autosubscribe,
+	char *autounsubscribe)
 {
 	int ch, ch_default = iKeyActiveNo;
 	int idx;
@@ -605,9 +605,9 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 
 
 static int
-match_group_list (group, group_list)
-	char *group;
-	char *group_list;
+match_group_list (
+	char *group,
+	char *group_list)
 {
 	char *separator;
 	char pattern[HEADER_LEN];
@@ -671,7 +671,7 @@ match_group_list (group, group_list)
  */
 
 void
-read_group_times_file ()
+read_group_times_file (void)
 {
 #ifdef INDEX_DAEMON
 
@@ -723,7 +723,7 @@ if (debug == 2) {
  */
 
 void
-write_group_times_file ()
+write_group_times_file (void)
 {
 #ifdef INDEX_DAEMON
 
@@ -746,8 +746,8 @@ write_group_times_file ()
 
 
 void
-load_newnews_info (info)
-	char *info;
+load_newnews_info (
+	char *info)
 {
 	char *ptr;
 	char buf[NNTP_STRLEN];
@@ -787,8 +787,8 @@ load_newnews_info (info)
 
 
 static int
-find_newnews_index (cur_newnews_host)
-	char *cur_newnews_host;
+find_newnews_index (
+	char *cur_newnews_host)
 {
 	int i, found = FALSE;
 
@@ -810,7 +810,7 @@ find_newnews_index (cur_newnews_host)
  */
 
 void
-read_motd_file ()
+read_motd_file (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -882,7 +882,7 @@ read_motd_done:
 }
 
 void
-vMakeActiveMyGroup ()
+vMakeActiveMyGroup (void)
 {
 	register int iNum;
 

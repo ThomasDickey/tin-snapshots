@@ -21,8 +21,8 @@ static int count_args P_((char *s));
 
 
 static int
-count_args (s)
-	char *s;
+count_args (
+	char *s)
 {
 	int ch, count = 0;
 
@@ -42,10 +42,10 @@ count_args (s)
 
 
 void
-envargs (Pargc, Pargv, envstr)
-	int *Pargc;
-	char ***Pargv;
-	char *envstr;
+envargs (
+	int *Pargc,
+	char ***Pargv,
+	char *envstr)
 {
 	char *envptr;			/* value returned by getenv */
 	char *bufptr;			/* copy of env info */

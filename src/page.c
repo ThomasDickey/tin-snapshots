@@ -65,11 +65,11 @@ static int prompt_response P_((int ch, int respnum));
 static int show_last_page P_((void));
 
 int
-show_page (group, group_path, respnum, threadnum)
-	struct t_group *group;
-	char *group_path;
-	int respnum;
-	int *threadnum;		/* to allow movement in thread mode */
+show_page (
+	struct t_group *group,
+	char *group_path,
+	int respnum,
+	int *threadnum)		/* to allow movement in thread mode */
 {
 #ifndef INDEX_DAEMON
 
@@ -714,9 +714,9 @@ return_to_index:
 
 
 void
-redraw_page (group, respnum)
-	char *group;
-	int respnum;
+redraw_page (
+	char *group,
+	int respnum)
 {
 	if (note_page == ART_UNAVAILABLE) {
 		ClearScreen ();
@@ -730,11 +730,11 @@ redraw_page (group, respnum)
 }
 
 static int
-expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
-	char *tobuf;
-	char *frombuf;
-	int length;
-	int do_rotation;
+expand_ctrl_chars(
+	char *tobuf,
+	char *frombuf,
+	int length,
+	int do_rotation)
 {
 	char *p, *q;
 	int ctrl_L = FALSE;
@@ -770,9 +770,9 @@ expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
 }
 
 void
-show_note_page (group, respnum)
-	char *group;
-	int respnum;
+show_note_page (
+	char *group,
+	int respnum)
 {
 #ifndef INDEX_DAEMON
 
@@ -943,9 +943,9 @@ print_a_line:
 
 
 static void
-show_mime_article (fp, art)
-	FILE	*fp;
-	struct	t_article *art;
+show_mime_article (
+	FILE	*fp,
+	struct	t_article *art)
 {
 	char	buf[PATH_LEN];
 	FILE	*mime_fp;
@@ -978,9 +978,9 @@ show_mime_article (fp, art)
 
 
 static void
-show_first_header (respnum, group)
-	int respnum;
-	char *group;
+show_first_header (
+	int respnum,
+	char *group)
 {
 	char buf[HEADER_LEN];
 	char tmp[LEN];
@@ -1172,8 +1172,8 @@ show_first_header (respnum, group)
 
 
 static void
-show_cont_header (respnum)
-	int respnum;
+show_cont_header (
+	int respnum)
 {
 	int maxresp;
 	int whichresp;
@@ -1221,9 +1221,9 @@ show_cont_header (respnum)
 
 
 int
-art_open (art, group_path)
-	long art;
-	char *group_path;
+art_open (
+	long art,
+	char *group_path)
 {
 	char buf[8192];
 	char *ptr;
@@ -1348,7 +1348,7 @@ art_open (art, group_path)
 
 
 void
-art_close ()
+art_close (void)
 {
 	if (note_fp && note_page != ART_UNAVAILABLE) {
 		fclose (note_fp);
@@ -1358,9 +1358,9 @@ art_close ()
 
 
 static int
-prompt_response (ch, respnum)
-	int ch;
-	int respnum;
+prompt_response (
+	int ch,
+	int respnum)
 {
 	int num;
 
@@ -1376,9 +1376,9 @@ prompt_response (ch, respnum)
 
 
 void
-yank_to_addr (orig, addr)
-	char *orig;
-	char *addr;
+yank_to_addr (
+	char *orig,
+	char *addr)
 {
 	char *p;
 	int open_parens;
@@ -1417,7 +1417,7 @@ yank_to_addr (orig, addr)
 
 
 static int
-show_last_page ()
+show_last_page (void)
 {
 	char buf[LEN];
 	char buf3[LEN+50];
@@ -1483,12 +1483,12 @@ show_last_page ()
  * 			portion of buf (ie with pat: and leading space removed)
  */
 int
-match_header (buf, pat, body, nodec_body, len)
-	char *buf;
-	char *pat;
-	char *body;
-	char *nodec_body;
-	size_t len;
+match_header (
+	char *buf,
+	char *pat,
+	char *body,
+	char *nodec_body,
+	size_t len)
 {
 	size_t	plen = strlen (pat);
 

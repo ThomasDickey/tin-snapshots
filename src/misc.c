@@ -28,9 +28,9 @@ static int strfeditor P_((char *editor, int linenum, char *filename, char *s, si
  * minimum error trapping - only unix support
  */
 void
-append_file (old_filename, new_filename)
-	char *old_filename;
-	char *new_filename;
+append_file (
+	char *old_filename,
+	char *new_filename)
 {
 	char buf[1024];
 	size_t n;
@@ -60,10 +60,10 @@ append_file (old_filename, new_filename)
 #endif  /* M_UNIX */
 
 void
-asfail (file, line, cond)
-	char	*file;
-	int	line;
-	char	*cond;
+asfail (
+	char	*file,
+	int	line,
+	char	*cond)
 {
 	fprintf (stderr, "%s: assertion failure: %s (%d): %s\n",
 		progname, file, line, cond);
@@ -94,10 +94,10 @@ asfail (file, line, cond)
 
 
 void
-copy_fp (fp_ip, fp_op, prefix)
-	FILE *fp_ip;
-	FILE *fp_op;
-	char *prefix;
+copy_fp (
+	FILE *fp_ip,
+	FILE *fp_op,
+	char *prefix)
 {
 	char buf[8192];
 	int retcode;
@@ -134,11 +134,11 @@ copy_fp (fp_ip, fp_op, prefix)
 }
 
 void
-copy_body (fp_ip, fp_op, prefix, initl)
-	FILE *fp_ip;
-	FILE *fp_op;
-	char *prefix;
-	char *initl;
+copy_body (
+	FILE *fp_ip,
+	FILE *fp_op,
+	char *prefix,
+	char *initl)
 {
 	char buf[8192];
 	char buf2[8192];
@@ -219,9 +219,9 @@ copy_body (fp_ip, fp_op, prefix, initl)
 }
 
 char *
-get_val (env, def)
-	char *env;		/* Environment variable we're looking for	*/
-	char *def;		/* Default value if no environ value found	*/
+get_val (
+	char *env,		/* Environment variable we're looking for	*/
+	char *def)		/* Default value if no environ value found	*/
 {
 	char *ptr;
 
@@ -232,9 +232,9 @@ get_val (env, def)
 
 
 int
-invoke_editor (filename, lineno)
-	char *filename;
-	int lineno;
+invoke_editor (
+	char *filename,
+	int lineno)
 {
 	char buf[PATH_LEN];
 	char editor_format[PATH_LEN];
@@ -273,8 +273,8 @@ invoke_editor (filename, lineno)
 
 #ifdef HAVE_ISPELL
 int
-invoke_ispell (nam)
-	char *nam;
+invoke_ispell (
+	char *nam)
 {
 	char buf[PATH_LEN];
 	char *my_ispell;
@@ -305,7 +305,7 @@ invoke_ispell (nam)
 
 #ifndef NO_SHELL_ESCAPE
 void
-shell_escape ()
+shell_escape (void)
 {
 	char shell[LEN];
 	char *p;
@@ -371,8 +371,8 @@ shell_escape ()
 
 
 void
-tin_done (ret)
-	int ret;
+tin_done (
+	int ret)
 {
 	int ask = TRUE;
 	register int i, j;
@@ -458,8 +458,8 @@ tin_done (ret)
  */
 
 void
-strip_double_ngs (ngs_list)
-	char *ngs_list;
+strip_double_ngs (
+	char *ngs_list)
 {
 
 	char	ngroup1[HEADER_LEN];	/* outer newsgroup to compare       */
@@ -532,9 +532,9 @@ strip_double_ngs (ngs_list)
 
 
 int
-my_mkdir (path, mode)
-	char *path;
-	int mode;
+my_mkdir (
+	char *path,
+	int mode)
 {
 #ifndef HAVE_MKDIR
 	char buf[LEN];
@@ -555,8 +555,8 @@ my_mkdir (path, mode)
 }
 
 int
-my_chdir (path)
-	char *path;
+my_chdir (
+	char *path)
 {
 	int retcode;
 
@@ -573,9 +573,9 @@ my_chdir (path)
 
 #ifdef M_UNIX
 void
-rename_file (old_filename, new_filename)
-	char *old_filename;
-	char *new_filename;
+rename_file (
+	char *old_filename,
+	char *new_filename)
 {
 	char buf[1024];
 	FILE *fp_old, *fp_new;
@@ -617,9 +617,9 @@ rename_file (old_filename, new_filename)
  */
 
 void
-rename_file (old_filename, new_filename)
-	char *old_filename;
-	char *new_filename;
+rename_file (
+	char *old_filename,
+	char *new_filename)
 {
 	char buf[1024];
 
@@ -635,8 +635,8 @@ rename_file (old_filename, new_filename)
 
 
 int
-invoke_cmd (nam)
-	char *nam;
+invoke_cmd (
+	char *nam)
 {
 	int ret;
 
@@ -694,9 +694,9 @@ invoke_cmd (nam)
 
 
 void
-draw_percent_mark (cur_num, max_num)
-	long cur_num;
-	long max_num;
+draw_percent_mark (
+	long cur_num,
+	long max_num)
 {
 	char buf[32];
 	int percent;
@@ -724,7 +724,7 @@ draw_percent_mark (cur_num, max_num)
  * setreuid/setregid - BSD 4.2
  */
 void
-set_real_uid_gid ()
+set_real_uid_gid (void)
 {
 #ifdef HAVE_SET_GID_UID
 	if (local_index)
@@ -761,7 +761,7 @@ set_real_uid_gid ()
 }
 
 void
-set_tin_uid_gid ()
+set_tin_uid_gid (void)
 {
 #ifdef HAVE_SET_GID_UID
 	if (local_index)
@@ -799,9 +799,9 @@ set_tin_uid_gid ()
 
 
 void
-base_name (dirname, program)
-	char *dirname;		/* argv[0] */
-	char *program;		/* progname is returned */
+base_name (
+	char *dirname,		/* argv[0] */
+	char *program)		/* progname is returned */
 {
 	int i;
 #ifdef VMS
@@ -835,7 +835,7 @@ base_name (dirname, program)
  */
 
 int
-mail_check ()
+mail_check (void)
 {
 #ifndef WIN32 /* No unified mail transport on WIN32 */
 	char *mailbox_name;
@@ -916,10 +916,10 @@ mail_check ()
                               } while (0)
 
 void
-parse_from (addr, addrspec, comment)
-	char *addr;
-	char *addrspec;
-	char *comment;
+parse_from (
+	char *addr,
+	char *addrspec,
+	char *comment)
 {
 	char atom_buf[HEADER_LEN];
 	char quoted_buf[HEADER_LEN];
@@ -1071,8 +1071,8 @@ FATAL:
  */
 
 char *
-eat_re (s)
-	char *s;
+eat_re (
+	char *s)
 {
 	char *e;
 
@@ -1110,8 +1110,8 @@ eat_re (s)
  */
 #if 0
 long
-hash_s (s)
-	char *s;
+hash_s (
+	char *s)
 {
 	long h = 0;
 	unsigned char *t = (unsigned char *) s;
@@ -1125,7 +1125,7 @@ hash_s (s)
 
 
 int
-untag_all_articles ()
+untag_all_articles (void)
 {
 	int untagged = FALSE;
 	register int i;
@@ -1143,8 +1143,8 @@ untag_all_articles ()
 
 
 int
-my_isprint (c)
-	int c;
+my_isprint (
+	int c)
 {
 	/* See son-of-1036 4.4 for more information about printable characters */
 #ifndef NO_LOCALE
@@ -1167,10 +1167,10 @@ my_isprint (c)
  * The data will be null terminated
  */
 void
-get_author (thread, art, str, len)
-	int thread, len;
-	struct t_article *art;
-	char *str;
+get_author (
+	int thread,
+	struct t_article *art,
+	char *str, int len)
 {
 	int author;
 
@@ -1209,7 +1209,7 @@ get_author (thread, art, str, len)
 }
 
 void
-toggle_inverse_video ()
+toggle_inverse_video (void)
 {
 	inverse_okay = !inverse_okay;
 	if (inverse_okay) {
@@ -1222,7 +1222,7 @@ toggle_inverse_video ()
 }
 
 void
-show_inverse_video_status ()
+show_inverse_video_status (void)
 {
 	if (inverse_okay) {
 		info_message (txt_inverse_on);
@@ -1233,13 +1233,13 @@ show_inverse_video_status ()
 
 #ifdef HAVE_COLOR
 void
-toggle_color ()
+toggle_color (void)
 {
 	use_color = !use_color;
 }
 
 void
-show_color_status ()
+show_color_status (void)
 {
 	if (use_color) {
 		info_message (txt_color_on);
@@ -1250,7 +1250,7 @@ show_color_status ()
 #endif /* HAVE_COLOR */
 
 int
-get_arrow_key ()
+get_arrow_key (void)
 {
 	int ch;
 	int ch1;
@@ -1364,8 +1364,8 @@ get_arrow_key ()
  */
 
 void
-create_index_lock_file (the_lock_file)
-	char *the_lock_file;
+create_index_lock_file (
+	char *the_lock_file)
 {
 	char buf[64];
 	FILE *fp;
@@ -1407,12 +1407,12 @@ create_index_lock_file (the_lock_file)
  */
 
 int
-strfquote (group, respnum, s, maxsize, format)
-	char *group;
-	int respnum;
-	char *s;
-	size_t maxsize;
-	char *format;
+strfquote (
+	char *group,
+	int respnum,
+	char *s,
+	size_t maxsize,
+	char *format)
 {
 	char *endp = s + maxsize;
 	char *start = s;
@@ -1558,13 +1558,13 @@ out:
  */
 
 static int
-strfeditor (editor, linenum, filename, s, maxsize, format)
-	char *editor;
-	int linenum;
-	char *filename;
-	char *s;
-	size_t maxsize;
-	char *format;
+strfeditor (
+	char *editor,
+	int linenum,
+	char *filename,
+	char *s,
+	size_t maxsize,
+	char *format)
 {
 	char *endp = s + maxsize;
 	char *start = s;
@@ -1669,14 +1669,14 @@ out:
  */
 
 int
-strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
-	char *format;
-	char *str;
-	size_t maxsize;
-	char *the_homedir;
-	char *maildir;
-	char *savedir;
-	char *group;
+strfpath (
+	char *format,
+	char *str,
+	size_t maxsize,
+	char *the_homedir,
+	char *maildir,
+	char *savedir,
+	char *group)
 {
 	char *endp = str + maxsize;
 	char *start = str;
@@ -1903,9 +1903,9 @@ enum quote_enum {
 	sgl_quote };
 
 static char *
-escape_shell_meta (source, quote_area)
-	char *source;
-	int quote_area;
+escape_shell_meta (
+	char *source,
+	int quote_area)
 {
 	static char buf[PATH_LEN];
 	char *dest = buf;
@@ -1961,14 +1961,14 @@ escape_shell_meta (source, quote_area)
  */
 
 int
-strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
-	char *the_mailer;
-	char *subject;
-	char *to;
-	char *filename;
-	char *s;
-	size_t maxsize;
-	char *format;
+strfmailer (
+	char *the_mailer,
+	char *subject,
+	char *to,
+	char *filename,
+	char *s,
+	size_t maxsize,
+	char *format)
 {
 	char *endp = s + maxsize;
 	char *start = s;
@@ -2073,10 +2073,10 @@ out:
  */
 
 int
-get_initials (respnum, s, maxsize)
-	int respnum;
-	char *s;
-	int maxsize;
+get_initials (
+	int respnum,
+	char *s,
+	int maxsize)
 {
 	char tbuf[PATH_LEN];
 	int i, j;
@@ -2107,8 +2107,8 @@ get_initials (respnum, s, maxsize)
 
 
 
-void get_cwd (buf)
-	char *buf;
+void get_cwd (
+	char *buf)
 {
 #ifdef HAVE_GETCWD
 	getcwd (buf, PATH_LEN);
@@ -2119,9 +2119,9 @@ void get_cwd (buf)
 
 
 void
-make_group_path (name, path)
-	char *name;
-	char *path;
+make_group_path (
+	char *name,
+	char *path)
 {
 	char *ptr;
 
@@ -2146,7 +2146,7 @@ make_group_path (name, path)
  */
 
 void
-cleanup_tmp_files ()
+cleanup_tmp_files (void)
 {
 	char acFile[PATH_LEN];
 
@@ -2160,10 +2160,10 @@ cleanup_tmp_files ()
 
 
 void
-make_post_process_cmd (cmd, dir, file)
-	char *cmd;
-	char *dir;
-	char *file;
+make_post_process_cmd (
+	char *cmd,
+	char *dir,
+	char *file)
 {
 	char buf[LEN];
 	char currentdir[PATH_LEN];
@@ -2180,8 +2180,8 @@ make_post_process_cmd (cmd, dir, file)
 
 
 int
-stat_file (file)
-	char *file;
+stat_file (
+	char *file)
 {
 	struct stat st;
 
@@ -2190,7 +2190,7 @@ stat_file (file)
 
 
 void
-vPrintBugAddress ()
+vPrintBugAddress (void)
 {
 	fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s%s\n",
 		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS, add_addr);
@@ -2202,9 +2202,9 @@ vPrintBugAddress ()
  */
 
 int
-iCopyFile (pcSrcFile, pcDstFile)
-	char	*pcSrcFile;
-	char	*pcDstFile;
+iCopyFile (
+	char	*pcSrcFile,
+	char	*pcDstFile)
 {
 	char	acBuffer[8192];
 	FILE	*hFpDst;
@@ -2248,8 +2248,8 @@ iCopyFile (pcSrcFile, pcDstFile)
  */
 
 int
-peek_char (fp)
-	FILE *fp;
+peek_char (
+	FILE *fp)
 {
 	int c=fgetc(fp);
 	if (c!=EOF)
@@ -2271,8 +2271,8 @@ peek_char (fp)
 #include "next_l1.tab"
 
 static int
-to_local (c)
-	int c;
+to_local (
+	int c)
 {
 	if (use_local_charset) {
 		c = c_l1_next[(unsigned char)c];
@@ -2284,16 +2284,16 @@ to_local (c)
 }
 
 void
-buffer_to_local (b)
-	char *b;
+buffer_to_local (
+	char *b)
 {
 	for(; *b; b++)
 		*b = to_local(*b);
 }
 
 static int
-to_network (c)
-	int c;
+to_network (
+	int c)
 {
 	if (use_local_charset) {
 		c = c_next_l1[(unsigned char) c];
@@ -2305,8 +2305,8 @@ to_network (c)
 }
 
 void
-buffer_to_network (b)
-	char *b;
+buffer_to_network (
+	char *b)
 {
 	for(; *b; b++)
 		*b = to_network(*b);

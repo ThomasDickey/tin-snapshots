@@ -56,8 +56,16 @@ static FILE *open_xhdr_fp P_((char *header, long min, long max));
 #endif
 #endif
 
+/* fixme - return different values for different errors
+** i.e.: -1 = connection refused
+**       -2 = connection timed out
+**
+** this is needed because get_server often fails to reconnect
+** to the server on a first try...
+*/
+
 int
-nntp_open ()
+nntp_open (void)
 {
 #ifdef NNTP_ABLE
 	int ret;
@@ -162,7 +170,7 @@ nntp_open ()
 
 
 void
-nntp_close ()
+nntp_close (void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp) {
@@ -177,8 +185,8 @@ nntp_close ()
  */
 
 FILE *
-open_mail_active_fp (mode)
-	char *mode;
+open_mail_active_fp (
+	char *mode)
 {
 	return fopen (mail_active_file, mode);
 }
@@ -188,7 +196,7 @@ open_mail_active_fp (mode)
  */
 
 FILE *
-open_news_active_fp ()
+open_news_active_fp (void)
 {
 #ifdef NNTP_ABLE
 	int respcode;
@@ -218,7 +226,7 @@ open_news_active_fp ()
  */
 
 FILE *
-open_overview_fmt_fp ()
+open_overview_fmt_fp (void)
 {
 	char line[NNTP_STRLEN];
 
@@ -253,8 +261,8 @@ open_overview_fmt_fp ()
  */
 
 FILE *
-open_newgroups_fp (the_index)
-	int the_index;
+open_newgroups_fp (
+	int the_index)
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
@@ -296,8 +304,8 @@ open_newgroups_fp (the_index)
  */
 
 FILE *
-open_motd_fp (motd_file_date)
-	char *motd_file_date;
+open_motd_fp (
+	char *motd_file_date)
 {
 #if defined(NNTP_ABLE) && defined(HAVE_TIN_NNTP_EXTS)
 	char line[NNTP_STRLEN];
@@ -324,7 +332,7 @@ open_motd_fp (motd_file_date)
 
 
 FILE *
-open_subscription_fp ()
+open_subscription_fp (void)
 {
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
@@ -348,7 +356,7 @@ open_subscription_fp ()
  */
 
 FILE *
-open_mailgroups_fp ()
+open_mailgroups_fp (void)
 {
 	return fopen (mailgroups_file, "r");
 }
@@ -363,7 +371,7 @@ open_mailgroups_fp ()
  */
 #ifdef NNTP_ABLE
 static FILE *
-extract_groups_from_newsrc()
+extract_groups_from_newsrc(void)
 {
 	FILE *ifp, *ofp;
 	char buf[LEN];
@@ -396,7 +404,7 @@ extract_groups_from_newsrc()
  */
 
 FILE *
-open_newsgroups_fp ()
+open_newsgroups_fp (void)
 {
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
@@ -428,11 +436,11 @@ open_newsgroups_fp ()
  */
 
 FILE *
-open_xover_fp (psGrp, pcMode, lMin, lMax)
-	struct t_group *psGrp;
-	char *pcMode;
-	long lMin;
-	long lMax;
+open_xover_fp (
+	struct t_group *psGrp,
+	char *pcMode,
+	long lMin,
+	long lMax)
 {
 	char *pcNovFile;
 #ifdef NNTP_ABLE
@@ -472,9 +480,9 @@ open_xover_fp (psGrp, pcMode, lMin, lMax)
  */
 
 int
-stat_article (art, group_path)
-	long art;
-	char *group_path;
+stat_article (
+	long art,
+	char *group_path)
 {
 /*
 #ifdef NNTP_ABLE
@@ -510,8 +518,8 @@ stat_article (art, group_path)
 }
 
 char *
-open_art_header (art)
-	long art;
+open_art_header (
+	long art)
 {
 #ifdef NNTP_ABLE
 	int safe_nntp_strlen, full, len;
@@ -631,9 +639,9 @@ sleep (1);
  */
 
 FILE *
-open_art_fp (group_path, art)
-	char *group_path;
-	long art;
+open_art_fp (
+	char *group_path,
+	long art)
 {
 	char buf[NNTP_STRLEN];
 	int i;
@@ -686,10 +694,10 @@ open_art_fp (group_path, art)
 
 #if 0
 static FILE *
-open_xhdr_fp (header, min, max)
-	char *header;
-	long min;
-	long max;
+open_xhdr_fp (
+	char *header,
+	long min,
+	long max)
 {
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
@@ -722,9 +730,9 @@ open_xhdr_fp (header, min, max)
  */
 
 static int
-base_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+base_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	long *a = (long *) p1;
 	long *b = (long *) p2;
@@ -772,9 +780,9 @@ setup_soft_base (group)
  */
 
 int
-setup_hard_base (group, group_path)
-	struct t_group *group;
-	char *group_path;
+setup_hard_base (
+	struct t_group *group,
+	char *group_path)
 {
 	char buf[NNTP_STRLEN];
 #ifdef NNTP_ABLE
@@ -902,7 +910,7 @@ setup_hard_base (group, group_path)
  */
 
 static int
-authenticate ()
+authenticate (void)
 {
 #ifdef NNTP_ABLE /* former: HAVE_GENERIC_AUTHINFO */
 	char tmpbuf[NNTP_STRLEN], *authval;
@@ -924,11 +932,18 @@ authenticate ()
 	}
 
 	if (cookiefd == -1) {
-		char *tempfile = mktemp ("/tmp/tinAXXXXXX");
-		fp = fopen (tempfile, "w+");
-		if (!fp) {
-			error_message ("Can't open %s", tempfile);
+		char *tempfile;
+		
+		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);		
+		if (!mktemp(tempfile)) {
+			error_message ("Can't create unique tempfile-name","");
 			return 1;
+		} else {
+			fp = fopen (tempfile, "w+");
+			if (!fp) {
+				error_message ("Can't open %s", tempfile);
+				return 1;
+			}
 		}
 		(void) unlink (tempfile);
 		cookiefd = fileno (fp);
@@ -975,7 +990,7 @@ authenticate ()
  */
 
 int
-get_respcode ()
+get_respcode (void)
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
@@ -1022,8 +1037,8 @@ get_respcode ()
 
 
 int
-stuff_nntp (fnam)
-	char *fnam;
+stuff_nntp (
+	char *fnam)
 {
 #ifdef NNTP_ABLE
 	char line[HEADER_LEN];
@@ -1088,7 +1103,7 @@ stuff_nntp (fnam)
 
 
 FILE *
-nntp_to_fp ()
+nntp_to_fp (void)
 {
 #ifdef NNTP_ABLE
 	char fnam[PATH_LEN];
@@ -1133,9 +1148,9 @@ nntp_to_fp ()
  */
 
 static int
-authorization (server, authuser)
-	char *server;
-	char *authuser;
+authorization (
+	char *server,
+	char *authuser)
 {
 	char line[PATH_LEN];
 	char line2[PATH_LEN];
@@ -1264,7 +1279,7 @@ authorization (server, authuser)
 #endif /* NNTP_ABLE */
 
 void
-vGrpGetSubArtInfo ()
+vGrpGetSubArtInfo (void)
 {
 #ifndef INDEX_DAEMON
 	int	iNum;
@@ -1318,16 +1333,16 @@ vGrpGetSubArtInfo ()
 /*
  *  Find the total, max & min articles number for specified group
  *  Use nntp GROUP command or read local spool
- *  Return 0, or -ve on error
+ *  Return 0, or -1 on error
  */
 int
-vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
-	char	*pcSpoolDir;
-	char	*pcGrpName;
-	int	iGrpType;
-	long	*plArtCount;
-	long	*plArtMax;
-	long	*plArtMin;
+vGrpGetArtInfo (
+	char	*pcSpoolDir,
+	char	*pcGrpName,
+	int	iGrpType,
+	long	*plArtCount,
+	long	*plArtMax,
+	long	*plArtMin)
 {
 	char	acBuf[NNTP_STRLEN];
 	DIR		*tDirFile;

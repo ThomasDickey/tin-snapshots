@@ -74,8 +74,8 @@ static char *get_archive_file P_((char *dir));
  */
 
 int
-check_start_save_any_news (check_start_save)
-	int check_start_save;
+check_start_save_any_news (
+	int check_start_save)
 {
 #ifndef INDEX_DAEMON
 
@@ -303,11 +303,11 @@ check_start_save_any_news (check_start_save)
 
 
 int
-save_art_to_file (respnum, indexnum, the_mailbox, filename)
-	int respnum;
-	int indexnum;
-	int the_mailbox;
-	char *filename;
+save_art_to_file (
+	int respnum,
+	int indexnum,
+	int the_mailbox,
+	char *filename)
 {
 #ifndef INDEX_DAEMON
 
@@ -404,9 +404,9 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 
 
 int
-save_thread_to_file (is_mailbox, group_path)
-	int is_mailbox;
-	char *group_path;
+save_thread_to_file (
+	int is_mailbox,
+	char *group_path)
 {
 #ifndef INDEX_DAEMON
 
@@ -468,9 +468,9 @@ save_thread_to_file (is_mailbox, group_path)
 
 
 int
-save_regex_arts (is_mailbox, group_path)
-	int is_mailbox;
-	char *group_path;
+save_regex_arts (
+	int is_mailbox,
+	char *group_path)
 {
 #ifndef INDEX_DAEMON
 
@@ -516,8 +516,8 @@ save_regex_arts (is_mailbox, group_path)
 }
 
 int
-create_path (path)
-	char *path;
+create_path (
+	char *path)
 {
 	int mbox_format = FALSE;
 
@@ -621,8 +621,8 @@ create_path (path)
 
 
 static int
-create_sub_dir (i)
-	int i;
+create_sub_dir (
+	int i)
 {
 #ifndef INDEX_DAEMON
 
@@ -660,12 +660,12 @@ create_sub_dir (i)
  */
 
 void
-add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
-	int the_index;
-	struct t_article *the_article;
-	int is_mailbox;
-	int archive_save;
-	char *path;
+add_to_save_list (
+	int the_index,
+	struct t_article *the_article,
+	int is_mailbox,
+	int archive_save,
+	char *path)
 {
 #ifndef INDEX_DAEMON
 	char tmp[PATH_LEN];
@@ -814,7 +814,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
  */
 
 void
-sort_save_list ()
+sort_save_list (void)
 {
 	qsort ((char *) save, (size_t)num_save, sizeof (struct t_save), save_comp);
 	debug_save_comp ();
@@ -826,9 +826,9 @@ sort_save_list ()
  */
 
 int
-save_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+save_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	struct t_save *s1 = (struct t_save *) p1;
 	struct t_save *s2 = (struct t_save *) p2;
@@ -874,8 +874,8 @@ save_comp (p1, p2)
 
 
 char *
-save_filename (i)
-	int i;
+save_filename (
+	int i)
 {
 	char *p;
 	static char *filename;
@@ -924,7 +924,7 @@ save_filename (i)
 
 
 static char *
-get_first_savefile ()
+get_first_savefile (void)
 {
 	char *file;
 	int i;
@@ -986,7 +986,7 @@ get_first_savefile ()
 
 
 static char *
-get_last_savefile ()
+get_last_savefile (void)
 {
 	char *file;
 	int i;
@@ -1048,9 +1048,9 @@ get_last_savefile ()
 
 
 int
-post_process_files (proc_type_ch, auto_delete)
-	int proc_type_ch;
-	t_bool auto_delete;
+post_process_files (
+	int proc_type_ch,
+	t_bool auto_delete)
 {
 	if (any_saved_files ()) {
 		wait_message (txt_post_processing);
@@ -1087,9 +1087,9 @@ post_process_files (proc_type_ch, auto_delete)
 
 
 static void
-post_process_uud (pp, auto_delete)
-	int pp;
-	t_bool auto_delete;
+post_process_uud (
+	int pp,
+	t_bool auto_delete)
 {
 #ifndef INDEX_DAEMON
 
@@ -1228,10 +1228,10 @@ post_process_uud (pp, auto_delete)
  */
 
 static void
-uudecode_file (pp, file_out_dir, file_out)
-	int	pp;
-	char	*file_out_dir;
-	char	*file_out;
+uudecode_file (
+	int	pp,
+	char	*file_out_dir,
+	char	*file_out)
 {
 	char	buf[LEN];
 	char	*file, *ptr;
@@ -1336,8 +1336,8 @@ uudecode_file (pp, file_out_dir, file_out)
  */
 
 static void
-post_process_sh (auto_delete)
-	t_bool auto_delete;
+post_process_sh (
+	t_bool auto_delete)
 {
 #ifndef INDEX_DAEMON
 
@@ -1445,8 +1445,8 @@ post_process_sh (auto_delete)
  */
 
 static char *
-get_archive_file (dir)
-	char *dir;
+get_archive_file (
+	char *dir)
 {
 	char buf[LEN];
 	char *file;
@@ -1491,8 +1491,8 @@ get_archive_file (dir)
 
 
 void
-delete_processed_files (auto_delete)
-	t_bool auto_delete;
+delete_processed_files (
+	t_bool auto_delete)
 {
 #ifndef INDEX_DAEMON
 
@@ -1521,7 +1521,7 @@ delete_processed_files (auto_delete)
 }
 
 static int
-any_saved_files ()
+any_saved_files (void)
 {
 	int i, saved = FALSE;
 
@@ -1536,9 +1536,9 @@ any_saved_files ()
 }
 
 void
-print_art_seperator_line (fp, the_mailbox)
-	FILE *fp;
-	int the_mailbox;
+print_art_seperator_line (
+	FILE *fp,
+	int the_mailbox)
 {
 	int sep = 0x01;	/* Ctrl-A */
 

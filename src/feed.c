@@ -31,11 +31,11 @@ static int print_file P_((char *command, int respnum, int count));
 
 
 void
-feed_articles (function, level, group, respnum)
-	int function;
-	int level;
-	struct t_group *group;
-	int respnum;
+feed_articles (
+	int function,
+	int level,
+	struct t_group *group,
+	int respnum)
 {
 #ifndef INDEX_DAEMON
 
@@ -703,10 +703,10 @@ got_sig_pipe_while_piping:
 
 
 static int
-print_file (command, respnum, count)
-	char *command;
-	int respnum;
-	int count;
+print_file (
+	char *command,
+	int respnum,
+	int count)
 {
 	FILE *fp;
 #ifdef DONT_HAVE_PIPING
@@ -762,8 +762,8 @@ print_file (command, respnum, count)
  * No range check here, it was constrained when the config file was read
  */
 int
-get_post_proc_type (proc_type)
-	int proc_type;
+get_post_proc_type (
+	int proc_type)
 {
 	return(ch_post_process[proc_type]);
 }
@@ -779,10 +779,10 @@ get_post_proc_type (proc_type)
  */
 
 static int
-does_article_exist (function, artnum, path)
-	int function;
-	long artnum;
-	char *path;
+does_article_exist (
+	int function,
+	long artnum,
+	char *path)
 {
 	int retcode = FALSE;
 

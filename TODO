@@ -1,5 +1,13 @@
 Bugs
 ----
+o  on some systems (my linux 2.0.26/gcc 2.7.2.1) - tin claims that the
+   connection has timed out if the server refueses the connection.
+   on hp-ux 8.0/cc it works the way it should... 
+
+o  fix nntp_open/get_server (as reconnect often fails on the first try
+   nntp_open should return differrent values for 'different' errors
+   so we can try to reconnect more then once - see open.c/nntplib.c)
+
 o  sender-patch
    If user ads From:-line, accept it but build a Sender:-line
    [If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the

@@ -31,7 +31,7 @@ static void debug_print_group_hash P_((void));
  */
 
 void
-debug_delete_files ()
+debug_delete_files (void)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -63,9 +63,9 @@ debug_delete_files ()
  */
 
 void
-debug_nntp (func, line)
-	char *func;
-	char *line;
+debug_nntp (
+	char *func,
+	char *line)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -86,8 +86,8 @@ debug_nntp (func, line)
 
 
 void
-debug_nntp_respcode (respcode)
-	int respcode;
+debug_nntp_respcode (
+	int respcode)
 {
 #ifdef DEBUG
 	debug_nntp ("get_respcode", nntp_respcode (respcode));
@@ -99,7 +99,7 @@ debug_nntp_respcode (respcode)
  */
 
 void
-debug_print_arts ()
+debug_print_arts (void)
 {
 #ifdef DEBUG
 	int i;
@@ -115,8 +115,8 @@ debug_print_arts ()
 
 
 void
-debug_print_header (s)
-	struct t_article *s;
+debug_print_header (
+	struct t_article *s)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -169,7 +169,7 @@ debug_print_header (s)
 
 
 void
-debug_save_comp ()
+debug_save_comp (void)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -213,8 +213,8 @@ debug_save_comp ()
 
 
 void
-debug_print_comment (comment)
-	char *comment;
+debug_print_comment (
+	char *comment)
 {
 #ifdef DEBUG_NEWSRC
 	char file[PATH_LEN];
@@ -235,7 +235,7 @@ debug_print_comment (comment)
 
 #ifdef DEBUG
 static void
-debug_print_base ()
+debug_print_base (void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
@@ -259,7 +259,7 @@ debug_print_base ()
 
 
 void
-debug_print_active ()
+debug_print_active (void)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -296,9 +296,9 @@ debug_print_active ()
 
 #ifdef DEBUG
 static void
-debug_print_attributes (attr, fp)
-	struct t_attribute *attr;
-	FILE *fp;
+debug_print_attributes (
+	struct t_attribute *attr,
+	FILE *fp)
 {
 	if (attr == 0)
 		return;
@@ -333,9 +333,9 @@ debug_print_attributes (attr, fp)
 
 
 void
-debug_print_bitmap (group, art)
-	struct t_group *group;
-	struct t_article *art;
+debug_print_bitmap (
+	struct t_group *group,
+	struct t_article *art)
 {
 #ifdef DEBUG_NEWSRC
 	char file[PATH_LEN];
@@ -373,9 +373,9 @@ debug_print_bitmap (group, art)
 
 
 void
-debug_print_newsrc (NewSrc, fp)
-	struct t_newsrc *NewSrc;
-	FILE *fp;
+debug_print_newsrc (
+	struct t_newsrc *NewSrc,
+	FILE *fp)
 {
 #ifdef DEBUG_NEWSRC
 	register int i, j;
@@ -402,11 +402,11 @@ debug_print_newsrc (NewSrc, fp)
 
 
 void
-vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
-	int		iIsMalloc;
-	char	*pcFile;
-	int		iLine;
-	size_t	iSize;
+vDbgPrintMalloc (
+	int	iIsMalloc,
+	char	*pcFile,
+	int	iLine,
+	size_t	iSize)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -434,10 +434,10 @@ vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 
 
 void
-debug_print_filter (fp, num, the_filter)
-	FILE *fp;
-	int num;
-	struct t_filter *the_filter;
+debug_print_filter (
+	FILE *fp,
+	int num,
+	struct t_filter *the_filter)
 {
 #ifdef DEBUG
 	fprintf (fp, "[%3d]  scope=[%s] inscope=[%s] type=[%d][%s] case=[%d][%s] lines=[%d %d]\n",
@@ -461,7 +461,7 @@ debug_print_filter (fp, num, the_filter)
 
 
 void
-debug_print_filters ()
+debug_print_filters (void)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -511,7 +511,7 @@ debug_print_filters ()
  */
 
 static void
-debug_print_active_hash ()
+debug_print_active_hash (void)
 {
 	int empty = 0, number;
 	int collisions[32];
@@ -559,7 +559,7 @@ debug_print_active_hash ()
 
 #ifdef DEBUG
 static void
-debug_print_group_hash ()
+debug_print_group_hash (void)
 {
 	int i;
 
