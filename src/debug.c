@@ -61,8 +61,8 @@ debug_delete_files (void)
 
 void
 debug_nntp (
-	char *func,
-	char *line)
+	const char *func,
+	const char *line)
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -211,7 +211,7 @@ debug_save_comp (void)
 
 void
 debug_print_comment (
-	char *comment)
+	const char *comment)
 {
 #ifdef DEBUG_NEWSRC
 	char file[PATH_LEN];
@@ -346,7 +346,7 @@ debug_print_bitmap (
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
-			group->name, group->subscribed,
+			group->name, SUB_CHAR(group->subscribed),
 			group->xmin, group->xmax, group->count,
 			group->newsrc.num_unread);
 		if (art != (struct t_article *) 0) {
@@ -401,7 +401,7 @@ debug_print_newsrc (
 void
 vDbgPrintMalloc (
 	int	iIsMalloc,
-	char	*pcFile,
+	const char *pcFile,
 	int	iLine,
 	size_t	iSize)
 {

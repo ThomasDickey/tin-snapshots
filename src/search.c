@@ -191,7 +191,7 @@ search_group (
 				draw_group_arrow ();
 			} else {
 				cur_groupnum = i;
-				group_selection_page ();
+				show_selection_page ();
 			}
 			return;
 		}

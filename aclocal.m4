@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 29.09.96
+dnl Updated   : 02.02.97
 dnl Notes     : 
 dnl
-dnl Copyright 1996 by Thomas Dickey
+dnl Copyright 1996,1997 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -318,6 +318,53 @@ AC_CACHE_VAL(cf_cv_extern_errno,[
 		[cf_cv_extern_errno=no])])
 AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check if the compiler supports useful warning options.  There's a few that
+dnl we don't use, simply because they're too noisy:
+dnl
+dnl	-Wcast-qual (a little too noisy -- later)
+dnl	-Wconversion (useful in older versions of gcc, but not in gcc 2.7.x)
+dnl	-Wredundant-decls (system headers make this too noisy)
+dnl	-Wtraditional (combines too many unrelated messages, only a few useful)
+dnl	-Wshadow
+dnl	-pedantic
+dnl
+AC_DEFUN([CF_GCC_WARNINGS],
+[EXTRA_CFLAGS=""
+if test -n "$GCC"
+then
+	changequote(,)dnl
+	cat > conftest.$ac_ext <<EOF
+#line __oline__ "configure"
+int main(int argc, char *argv[]) { return argv[argc-1] == 0; }
+EOF
+	changequote([,])dnl
+	AC_CHECKING([for gcc warning options])
+	cf_save_CFLAGS="$CFLAGS"
+	EXTRA_CFLAGS="-W -Wall"
+	for cf_opt in \
+		Wbad-function-cast \
+		Wcast-align \
+		Wcast-qual \
+		Winline \
+		Wmissing-declarations \
+		Wmissing-prototypes \
+		Wnested-externs \
+		Wpointer-arith \
+		Wwrite-strings \
+		Wshadow \
+		Wstrict-prototypes
+	do
+		CFLAGS="$cf_save_CFLAGS $EXTRA_CFLAGS -$cf_opt"
+		if AC_TRY_EVAL(ac_compile); then
+			test -n "$verbose" && AC_MSG_RESULT(... -$cf_opt)
+			EXTRA_CFLAGS="$EXTRA_CFLAGS -$cf_opt"
+		fi
+	done
+	rm -f conftest*
+	CFLAGS="$cf_save_CFLAGS"
+fi
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
@@ -747,7 +794,7 @@ AC_ARG_WITH($1,[$2],ifelse($3,,
   *[)]
    # user supplied option-value for "--with-$1=path"
    AC_MSG_CHECKING(for $1)
-   ac_cv_path_[cf_path_name]="$withval"
+   ac_cv_path_]cf_path_name[="$withval"
    AC_DEFINE(cf_have_name)dnl
    AC_MSG_RESULT($withval)
    ;;
@@ -780,3 +827,27 @@ esac
 $3="$withval"
 AC_DEFINE_UNQUOTED($3,"$withval")dnl
 ])dnl
+dnl ---------------------------------------------------------------------------
+dnl See if sum can take -r
+AC_DEFUN([CF_PROG_SUM_R],
+[
+if test $ac_cv_path_PATH_SUM
+then
+AC_MSG_CHECKING([if $ac_cv_path_PATH_SUM takes -r])
+AC_CACHE_VAL(ac_cv_prog_sum_r,[
+if AC_TRY_COMMAND($ac_cv_path_PATH_SUM -r config.log 1>&AC_FD_CC)
+then
+	ac_cv_prog_sum_r=yes
+else
+	ac_cv_prog_sum_r=no
+fi
+])
+if test $ac_cv_prog_sum_r = yes; then
+	AC_DEFINE(SUM_TAKES_DASH_R)
+	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM -r")
+else
+	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM")
+fi
+AC_MSG_RESULT($ac_cv_prog_sum_r)
+fi
+])

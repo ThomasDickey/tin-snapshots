@@ -46,7 +46,7 @@ msg_write_signature (
 
 	i = my_group[cur_groupnum];
 
-	if (!strcmp(active[i].attribute->sigfile, "---none")) {
+	if (!strcmp(active[i].attribute->sigfile, "--none")) {
 		return;
 	}
 	if (active[i].attribute->sigfile[0] == '!') {

@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 06.01.97
+dnl Updated   : 02.02.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -47,6 +47,10 @@ CF_WITH_PROGRAM(metamail,
 
 CF_WITH_PROGRAM(pgp,
 [  --with-pgp              (default: from system path)])
+
+CF_WITH_PROGRAM(sum,
+[  --with-sum              (default: from system path)])
+CF_PROG_SUM_R
 
 ### check for this early, since it'll override several options
 AC_MSG_CHECKING(if NNTP-support will be used)
@@ -108,20 +112,11 @@ CF_ARG_ENABLE(warnings,
 	[  --enable-warnings       turn on GCC compiler warnings],
 	[with_warnings=yes],
 	[with_warnings=no])
-	# gcc 2.5.8 doesn't recognize some other useful options that could
-	# be configured if you have gcc 2.6.3:
-	# -Wbad-function-cast
-	# -Wmissing-declarations
-	#
-	# We should also use
-	# -Wshadow
-	# -pedantic
-	#
-	if test "$enableval" = "yes"
-	then
-		EXTRA_CFLAGS="-Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
-	fi
-AC_MSG_RESULT($enableval)
+AC_MSG_RESULT($with_warnings)
+if test "$with_warnings" = "yes"
+then
+	CF_GCC_WARNINGS
+fi
 fi
 
 ## !NNTP_ONLY
@@ -489,7 +484,8 @@ CF_SYS_ERRLIST
 
 ###	Checks for library functions.
 AC_CHECK_FUNCS(\
-	atol\
+	atoi \
+	atol \
 	ftime \
 	getcwd \
 	is_xterm \
@@ -538,32 +534,38 @@ CF_CHECK_DECL(\
 	tgoto \
 )
 
-dnl Check for prototype(s) for termcap functions.  These may appear in
-dnl either curses.h or termcap.h
-
 if test $with_decl_check = yes; then
 CF_CHECK_DECL(\
 	_flsbuf \
+	atoi \
+	atol \
 	bcopy \
 	bzero \
+	calloc \
 	fclose \
 	fdopen \
+	fileno \
 	fflush \
 	fprintf \
 	fputc \
 	fputs \
 	fread \
+	free \
 	fseek \
 	fwrite \
 	getcwd \
 	gethostname \
 	getopt \
 	ioctl \
+	malloc \
 	memset \
 	mktemp \
 	pclose \
 	perror \
 	printf \
+	putenv \
+	qsort \
+	realloc \
 	rewind \
 	select \
 	setegid \

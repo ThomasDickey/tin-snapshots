@@ -30,11 +30,11 @@ int create_subdir = TRUE;
  */
 
 struct archiver_t {
-	char *name;
-	char *ext;
-	char *test;
-	char *list;
-	char *extract;
+	constext *name;
+	constext *ext;
+	constext *test;
+	constext *list;
+	constext *extract;
 } archiver[] = {
 	{ "",		"",		"",		"",		""	},
 	{ "",		"",		"",		"",		""	},
@@ -52,8 +52,8 @@ struct archiver_t {
 ** Local prototypes
 */
 static int any_saved_files (void);
-static char *get_first_savefile (void);
-static char *get_last_savefile (void);
+static const char *get_first_savefile (void);
+static const char *get_last_savefile (void);
 static void post_process_uud (int pp, t_bool auto_delete);
 static void uudecode_file (int pp, char *file_out_dir, char *file_out);
 static void post_process_sh (t_bool auto_delete);
@@ -306,7 +306,7 @@ save_art_to_file (
 	int respnum,
 	int indexnum,
 	int the_mailbox,
-	char *filename)
+	const char *filename)
 {
 #ifndef INDEX_DAEMON
 
@@ -411,7 +411,7 @@ save_thread_to_file (
 
 	char file[PATH_LEN];
 	char save_thread_info[LEN];
-	char *first_savefile;
+	const char *first_savefile;
 	int count = 0;
 	int i;
 
@@ -440,7 +440,7 @@ save_thread_to_file (
 
 	first_savefile = get_first_savefile ();
 
-	if (first_savefile == (char *) 0) {
+	if (strlen(first_savefile) == 0) {
 		info_message (txt_thread_not_saved);
 	} else {
 		if (is_mailbox) {
@@ -829,8 +829,8 @@ save_comp (
 	t_comptype *p1,
 	t_comptype *p2)
 {
-	struct t_save *s1 = (struct t_save *) p1;
-	struct t_save *s2 = (struct t_save *) p2;
+	const struct t_save *s1 = (const struct t_save *) p1;
+	const struct t_save *s2 = (const struct t_save *) p2;
 
 	/*
 	 * Sort on Archive-name: part & patch otherwise Subject:
@@ -922,7 +922,7 @@ save_filename (
 }
 
 
-static char *
+static const char *
 get_first_savefile (void)
 {
 	char *file;
@@ -984,7 +984,7 @@ get_first_savefile (void)
 }
 
 
-static char *
+static const char *
 get_last_savefile (void)
 {
 	char *file;

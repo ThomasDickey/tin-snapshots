@@ -22,8 +22,8 @@
 void
 joinpath(
 	char	*result,
-	char	*dir,
-	char	*file)
+	const char *dir,
+	const char *file)
 {
 #ifdef M_UNIX
 	(void) strcpy(result, dir);

@@ -194,7 +194,7 @@ void set_alarm_clock_off (void)
 void _CDECL signal_handler (
 	int sig)
 {
-	char *sigtext;
+	const char *sigtext;
 #ifdef SIGCHLD
 #if HAVE_TYPE_UNIONWAIT
 	union wait wait_status;
@@ -703,7 +703,7 @@ void select_resize (
 
 	if (resized || sig == 0) {
 		ClearScreen ();
-		group_selection_page ();
+		show_selection_page ();
 	}
 }
 

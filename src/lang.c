@@ -63,7 +63,7 @@ constext txt_cannot_write_index[] = "Can't write index %s";
 constext txt_catchup_all_read_groups[] = "Catchup all groups entered during this session? (y/n): ";
 constext txt_catchup_update_info[] = "%s %d group%s in %ld seconds\n";
 constext txt_check_article[] = "Check Prepared Article";
-constext txt_checking_active_file[] = "Checking for new groups...";
+constext txt_checking_new_groups[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
 constext txt_checksum_of_file[] = "\r\n\r\nChecksum of %s...\r\n\r\n";
 constext txt_cmdline_hit_any_key[] = "Press any key to continue...";
@@ -357,7 +357,7 @@ constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> 
 constext txt_help_space_toggles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_start_editor_offset[] = "Start editor with line offset. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_strip_blanks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_help_strip_newsrc[] = "Do you want to strip unsubscribed articles out of .newsrc";
+constext txt_help_strip_newsrc[] = "Do you want to strip unsubscribed groups from .newsrc";
 constext txt_help_t[] = "t\t  tag current article for reposting/mailing/piping/printing/saving\r\n";
 constext txt_help_tab_after_X_selection[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_tab_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -590,6 +590,197 @@ constext txt_pipe_to_command[] = "Pipe to command [%.*s]> ";
 constext txt_piping[] = "Piping...";
 constext txt_piping_not_enabled[] = "Piping not enabled. Recompile without -DNO_PIPING.";
 constext txt_plural[] = "s";
+constext txt_tinrc_alternative_handling[] = "# If ON strip multipart/alternative messages automatically\n";
+constext txt_tinrc_art_marked_deleted[] = "# character used to show that an art was deleted (default 'D')\n";
+constext txt_tinrc_art_marked_inrange[] = "# character used to show that an art is in a range (default '#')\n";
+constext txt_tinrc_art_marked_return[] = "# character used to show that an art will return (default '-')\n";
+constext txt_tinrc_art_marked_selected[] = "# character used to show that an art was auto-selected (default '*')\n";
+constext txt_tinrc_art_marked_unread[] = "# character used to show that an art was unread (default '+')\n";
+#ifdef HAVE_METAMAIL
+constext txt_tinrc_ask_for_metamail[] = "# if ON tin will ask before using metamail to display MIME messages\n\
+# this only occurs, if use_metamail is also switched ON\n";
+#endif /* HAVE_METAMAIL */
+constext txt_tinrc_auto_bcc[] = "# if ON automatically put your name in the Bcc: field when mailing an article\n";
+constext txt_tinrc_auto_cc[] = "# if ON automatically put your name in the Cc: field when mailing an article\n";
+constext txt_tinrc_auto_list_thread[] = "# if ON automatically list thread when entering it using right arrow key.\n";
+constext txt_tinrc_auto_save[] = "# if ON articles/threads with Archive-name: in mail header will\n\
+# be automatically saved with the Archive-name & part/patch no.\n";
+constext txt_tinrc_batch_save[] = "# if ON articles/threads will be saved in batch mode when save -S\n\
+# or mail -M is specified on the command line\n";
+constext txt_tinrc_beginner_level[] = "# If ON show a mini menu of useful commands at each level\n";
+constext txt_tinrc_catchup_read_groups[] = "# if ON ask user if read groups should all be marked read\n";
+#ifdef HAVE_COLOR
+constext txt_tinrc_col_back[] = "# Standard-Background-Color\n";
+constext txt_tinrc_col_from[] = "# Color of sender (From:)\n";
+constext txt_tinrc_col_head[] = "# Color of headerlines\n";
+constext txt_tinrc_col_help[] = "# Color of help pages\n";
+constext txt_tinrc_col_invers_bg[] = "# Color of background for inverse text\n";
+constext txt_tinrc_col_invers_fg[] = "# Color of foreground for inverse text\n";
+constext txt_tinrc_col_markdash[] = "";
+constext txt_tinrc_col_markstar[] = "# Color of word highlighting. There are two posibilities for\n\
+# in Articles: *stars* and _underdashes_\n";
+constext txt_tinrc_col_message[] = "# Color of messages in last line\n";
+constext txt_tinrc_col_minihelp[] = "# Color of mini help menu\n";
+constext txt_tinrc_col_normal[] = "# Standard foreground color\n";
+constext txt_tinrc_col_response[] = "# Color of response counter\n";
+constext txt_tinrc_col_quote[] = "# Color of quotelines\n";
+constext txt_tinrc_col_signature[] = "# Color of signature\n";
+constext txt_tinrc_col_subject[] = "# Color of article subject\n";
+constext txt_tinrc_col_text[] = "# Color of textlines\n";
+constext txt_tinrc_col_title[] = "# Color of Help/Mail-Sign\n";
+constext txt_tinrc_colors[] = "# For coloradjust use the following numbers\n\
+#  0-black       1-red         2-green        3-brown\n\
+#  4-blue        5-pink        6-cyan         7-white\n\
+# These are *only* for foreground:\n\
+#  8-gray        9-lightred   10-lightgreen  11-yellow\n\
+# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n";
+#endif /* HAVE_COLOR */
+constext txt_tinrc_confirm_action[] = "# if ON confirm certain commands with y/n before executing\n";
+constext txt_tinrc_confirm_to_quit[] = "# if ON confirm with y/n before quitting ('Q' never asks)\n";
+constext txt_tinrc_default_editor_format[] = "# Format of editor line including parameters\n\
+# %%E Editor  %%F Filename  %%N Linenumber\n";
+constext txt_tinrc_default_filter_days[] = "# Num of days a short term filter will be active\n";
+constext txt_tinrc_default_maildir[] = "# (-m) directory where articles/threads are saved in mailbox format\n";
+constext txt_tinrc_default_mailer_format[] = "# Format of mailer line including parameters\n\
+# %%M Mailer  %%S Subject  %%T To  %%F Filename  %%U User (AmigaDOS)\n\
+# ie. to use elm as your mailer:    elm -s \"%%S\" \"%%T\" < %%F\n\
+# ie. elm interactive          :    elm -i %%F -s \"%%S\" \"%%T\"\n";
+constext txt_tinrc_default_printer[] = "# print program with parameters used to print articles/threads\n";
+constext txt_tinrc_default_savedir[] = "# directory where articles/threads are saved\n";
+constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to be used when posting/replying\n\
+# default_sigfile=file       appends file as signature\n\
+# default_sigfile=!command  executes external command to generate a signature\n\
+# default_sigfile=--none     don't append a signature\n";
+constext txt_tinrc_defaults[] = "# default action/prompt strings\n";
+constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
+constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
+# header=NUM  0=Subject: 1=From: 2=Message-Id:\n\
+# global=ON/OFF  ON=apply to all groups OFF=apply to current group\n\
+# case=ON/OFF    ON=filter case sensitive OFF=ignore case\n\
+# expire=ON/OFF  ON=limit to default_filter_days OFF=don't ever expire\n";
+constext txt_tinrc_force_screen_redraw[] = "# if ON a screen redraw will always be done after certain external commands\n";
+constext txt_tinrc_full_page_scroll[] = "# if ON scroll full page of groups/articles otherwise half a page\n";
+constext txt_tinrc_group_catchup_on_exit[] = "# if ON catchup group/thread when leaving with the left arrow key.\n";
+constext txt_tinrc_groupname_max_length[] = "# Maximum length of the names of newsgroups displayed\n";
+constext txt_tinrc_header[] = "# This file was automatically saved by tin\n#\n\
+# Do not edit while tin is running, since all your changes to this file\n\
+# would be overwritten when you leave tin.\n#\n\
+############################################################################\n\n";
+constext txt_tinrc_highlight_xcommentto[] = "# If ON X-Commento-To name is displayed in the upper-right corner,\n\
+# if OFF below the Summary-Header\n";
+constext txt_tinrc_inverse_okay[] = "# if ON use inverse video for page headers at different levels\n";
+#ifdef M_UNIX
+constext txt_tinrc_keep_dead_articles[] = "# if ON keep all failed postings in ~/dead.articles\n";
+#endif /* M_UNIX */
+constext txt_tinrc_keep_posted_articles[] = "# if ON keep all postings in ~/Mail/posted\n";
+#ifdef LOCAL_CHARSET
+constext txt_tinrc_local_charset[] = "# whether or not to automatically convert to a local charset that is\n\
+# different from the one defined in mm_charset. Currently only NeXTstep is\n\
+# supported. Set to OFF when logged in from a iso-8859-1 environment.\n";
+#endif /* LOCAL_CHARSET */
+constext txt_tinrc_mail_8bit_header[] = "# if ON, 8bit characters in mail message is NOT encoded.\n\
+# default is OFF. Thus 8bit character is encoded by default.\n\
+# 8bit chars in header is encoded regardless of the value of this parameter\n\
+# unless mail_mime_encoding is 8bit as well. Note that RFC 1552/1651/1652\n\
+# prohibit 8bit characters in mail header so that you are advised NOT to\n\
+# turn it ON unless you have some compelling reason as is the case of\n\
+# Korean users with localized sendmail.\n";
+#ifdef FORGERY
+constext txt_tinrc_mail_address[] = "# user's mail address, if not username@host\n";
+#endif /* FORGERY */
+constext txt_tinrc_mail_mime_encoding[] = "";
+constext txt_tinrc_mail_quote_format[] = "";
+constext txt_tinrc_mark_saved_read[] = "# if ON mark articles that are saved as read\n";
+constext txt_tinrc_mm_charset[] = "# charset supported locally  which is also used for MIME header and\n\
+# Content-Type header unless news and mail need to be encoded in other\n\
+# charsets as in ISO-2022-KR encoding of EUC-KR in mail message.\n\
+# If not set, the value of the environment variable MM_CHARSET is used.\n\
+# Set to US-ASCII or compile time default if neither of them is defined.\n\
+# If MIME_STRICT_CHARSET is defined at compile-time, charset other than\n\
+# mm_charset is considered not displayable and represented as '?'.\n";
+constext txt_tinrc_motd_file_info[] = "# news motd file dates from server used for detecting new motd info\n";
+constext txt_tinrc_newnews[] = "# host & time info used for detecting new groups (don't touch)\n";
+constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/followingup an article\n\
+# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n\
+# %%N Full Name  %%C First Name\n";
+constext txt_tinrc_no_advertising[] = "# turn off advertising in header (X-Newsreader/X-Mailer)\n";
+constext txt_tinrc_pos_first_unread[] = "# if ON put cursor at first unread art in group otherwise last art\n";
+constext txt_tinrc_post_8bit_header[] = "# if ON, 8bit characters in news posting is NOT encoded.\n\
+# default is OFF. Thus 8bit character is encoded by default.\n\
+# 8bit chars in header is encoded regardless of the value of this\n\
+# parameter unless post_mime_encoding is 8bit as well. \n";
+constext txt_tinrc_post_mime_encoding[] = "# MIME encoding (8bit, base64, quoted-printable, 7bit) of the body\n\
+# for mails and posts, if necessary. QP is efficient for most European\n\
+# character sets (ISO-8859-X) with small fraction of non-US-ASCII chars,\n\
+# while Base64 is more efficient for most 8bit East Asian charsets.\n\
+# For EUC-KR, 7bit encoding specifies that EUC charsets be converted\n\
+# to corresponding ISO-2022-KR. The same may be true of EUC-JP/CN.\n\
+# For other charsets used in Japan and China, it seems more complicated.\n\
+# Korean users should set post_mime_encoding to 8bit and mail_mime_encoding\n\
+# to 7bit. With mm_charset to EUC-KR, post_mime_encoding set to 7bit does\n\
+# NOT lead to encoding of EUC-KR into ISO-2022-KR in news-postings since\n\
+# it's never meant to be used for Usenet news. Perhaps, it's not the case\n\
+# for EUC-JP and EUC-CN.\n\
+# Handling of Chinese and Japanese characters is not yet implemented.\n";
+constext txt_tinrc_post_process_command[] = "# if set, command to be run after a successful uudecode\n";
+#ifdef M_AMIGA
+constext txt_tinrc_post_process_type[] = "# type of post processing to perform after saving articles.\n\
+# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list lha)\n\
+# 4=(uud & extract lha) 5=(uud & list zip) 6=(uud & extract zip)\n";
+#else
+constext txt_tinrc_post_process_type[] = "# type of post processing to perform after saving articles.\n\
+# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list zoo)\n\
+# 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip)\n";
+#endif /* M_AMIGA */
+constext txt_tinrc_print_header[] = "# if ON print all of mail header otherwise Subject: & From: lines\n";
+constext txt_tinrc_process_only_unread[] = "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n";
+constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups and replys.\n\
+# '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
+constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";
+constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
+constext txt_tinrc_show_author[] = "# part of from field to display 0) none 1) address 2) full name 3) both\n";
+constext txt_tinrc_show_description[] = "# if ON show group description text after newsgroup name at\n\
+# group selection level\n";
+constext txt_tinrc_show_last_line_prev_page[] = "# if ON show the last line of the previous page as first line of next page\n";
+constext txt_tinrc_show_lines[] = "# show number of lines of first unread article in thread listing (ON/OFF)\n";
+constext txt_tinrc_show_only_unread[] = "# if ON show only new/unread articles otherwise show all.\n";
+constext txt_tinrc_show_only_unread_groups[] = "# if ON show only subscribed to groups that contain unread articles.\n";
+constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed\n";
+constext txt_tinrc_sigdashes[] = "# if ON prepend the signature with dashes '\\n-- \\n'\n";
+constext txt_tinrc_sort_article_type[] = "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n\
+# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n";
+constext txt_tinrc_space_goto_next_unread[] = "# if ON the SPACE command will goto next unread article at article viewer\n\
+# level when the end of the article is reached (rn-style pager)\n";
+constext txt_tinrc_start_editor_offset[] = "# if ON editor will be started with cursor offset into the file\n\
+# otherwise the cursor will be positioned at the first line\n";
+constext txt_tinrc_strip_blanks[] = "# If ON strip blanks from end of lines to speedup display on slow terminals\n";
+constext txt_tinrc_strip_newsrc[] = "# If ON strip unsubscribed groups from newsrc\n";
+constext txt_tinrc_tab_after_X_selection[] = "# if ON a TAB command will be automatically done after the X command\n";
+constext txt_tinrc_tab_goto_next_unread[] = "# if ON the TAB command will goto next unread article at article viewer level\n";
+constext txt_tinrc_thread_articles[] = "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n";
+constext txt_tinrc_thread_catchup_on_exit[] = "";
+constext txt_tinrc_unlink_article[] = "# if ON remove ~/.article after posting.\n";
+constext txt_tinrc_use_builtin_inews[] = "# if ON use the builtin mini inews otherwise use an external inews program\n";
+#ifdef HAVE_COLOR
+constext txt_tinrc_use_color[] = "# if ON using ansi-color\n";
+#endif /* HAVE_COLOR */
+#ifdef HAVE_KEYPAD
+constext txt_tinrc_use_keypad[] = "# If ON enable scroll keys on terminals that support it\n";
+#endif /* HAVE_KEYPAD */
+constext txt_tinrc_use_mailreader_i[] = "# interactive mailreader: if ON mailreader will be invoked earlier for\n\
+# reply so you can use more of its features (eg. MIME, pgp, ...)\n\
+# this option has to suit default_mailer_format\n";
+#ifdef HAVE_METAMAIL
+constext txt_tinrc_use_metamail[] = "# if ON metamail can/will be used to display MIME articles\n";
+#endif /* HAVE_METAMAIL */
+constext txt_tinrc_use_mouse[] = "# If ON enable mouse key support on xterm terminals\n";
+#ifdef HAVE_COLOR
+constext txt_tinrc_word_h_display_marks[] = "# Should the leading and ending stars and dashes also be displayed,\n\
+# even when they are highlighting marks?\n\
+# 0 - no    1 - yes, display mark    2 - print a space instead\n";
+constext txt_tinrc_word_highlight[] = "# Enable word highlighting?\n";
+#endif /* HAVE_COLOR */
+constext txt_tinrc_xpost_quote_format[] = "";
 
 /*
  * OFF ~ FALSE, ON ~ TRUE

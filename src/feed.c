@@ -47,7 +47,7 @@ feed_articles (
 	char my_mailbox[PATH_LEN];
 	char pattern[LEN];
 	char save_file[PATH_LEN];
-	char *prompt;
+	constext *prompt;
 	char proc_ch = proc_ch_default;
 	char option = iKeyFeedSupersede;
 	char option_default = iKeyFeedSupersede;

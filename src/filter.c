@@ -616,16 +616,16 @@ fflush (stdout);
 static int
 get_choice (
 	int x,
-	char *help,
-	char *prompt,
-	char *opt1,
-	char *opt2,
-	char *opt3,
-	char *opt4,
-	char *opt5)
+	const char *help,
+	const char *prompt,
+	const char *opt1,
+	const char *opt2,
+	const char *opt3,
+	const char *opt4,
+	const char *opt5)
 {
 	int ch, n = 0, i = 0;
-	char *argv[5];
+	const char *argv[5];
 
 	if (opt1)
 		argv[n++] = opt1;
@@ -671,16 +671,16 @@ filter_menu (
 	struct t_article *art)
 {
 	char *ptr;
-	char *ptr_filter_from;
-	char *ptr_filter_lines;
-	char *ptr_filter_menu;
-	char *ptr_filter_msgid;
-	char *ptr_filter_scope;
-	char *ptr_filter_subj;
-	char *ptr_filter_text;
-	char *ptr_filter_time;
-	char *ptr_filter_help_scope;
-	char *ptr_filter_quit_edit_save;
+	const char *ptr_filter_from;
+	const char *ptr_filter_lines;
+	const char *ptr_filter_menu;
+	const char *ptr_filter_msgid;
+	const char *ptr_filter_scope;
+	const char *ptr_filter_subj;
+	const char *ptr_filter_text;
+	const char *ptr_filter_time;
+	const char *ptr_filter_help_scope;
+	const char *ptr_filter_quit_edit_save;
 	char argv[4][PATH_LEN];
 	char buf[LEN];
 	char text_from[PATH_LEN];

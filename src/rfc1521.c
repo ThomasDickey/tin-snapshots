@@ -80,7 +80,7 @@ rfc1521_decode (
 	char content_type[128];
 	char content_transfer_encoding[128];
 	char boundary[128];
-	char *charset;
+	const char *charset;
 	char encoding = '\0';
 	off_t hdr_pos;
 

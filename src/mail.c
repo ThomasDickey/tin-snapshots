@@ -76,7 +76,8 @@ fflush(stdout);
 		active[num_active].inrange = FALSE;
 		active[num_active].read_during_session = FALSE;
 		active[num_active].art_was_posted = FALSE;
-		active[num_active].subscribed = UNSUBSCRIBED;	/* not in my_group[] yet */
+		active[num_active].subscribed = FALSE;		/* not in my_group[] yet */
+		active[num_active].newgroup = FALSE;		/* not in my_group[] yet */
 		active[num_active].newsrc.xbitmap = (t_bitmap *) 0;
 		active[num_active].attribute = (struct t_attribute *) 0;
 		active[num_active].glob_filter = &glob_filter;

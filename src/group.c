@@ -26,10 +26,10 @@ int last_subj_on_screen;
 
 static int len_from;
 static int len_subj;
-static char *spaces = "XXXX";
+static const char *spaces = "XXXX";
 
 /*
-** Locla prototypes
+** Local prototypes
 */
 static int bld_sline (int i);
 static int draw_sline (int i, int full);
@@ -108,7 +108,6 @@ group_page (
 	 * Set the group attributes
 	 */
 	group->read_during_session = TRUE;
-	show_author = group->attribute->show_author;
 
  	proc_ch_default = get_post_proc_type (group->attribute->post_proc_type);
 
@@ -1475,7 +1474,7 @@ mark_screen (
 	int level,
 	int screen_row,
 	int screen_col,
-	char *value)
+	const char *value)
 {
 	int i, len;
 
@@ -1503,7 +1502,9 @@ void
 set_subj_from_size (
 	int num_cols)
 {
-	int size;
+	int size, show_author;
+
+	show_author = CURR_GROUP.attribute->show_author;
 
 	if (show_author == SHOW_FROM_BOTH) {
 		max_subj = (num_cols / 2) - 4;
@@ -1537,9 +1538,9 @@ set_subj_from_size (
 void
 toggle_subject_from (void)
 {
-	if (++show_author > SHOW_FROM_BOTH) {
-		show_author = SHOW_FROM_NONE;
-	}
+	if (++CURR_GROUP.attribute->show_author > SHOW_FROM_BOTH)
+		CURR_GROUP.attribute->show_author = SHOW_FROM_NONE;
+
 	set_subj_from_size (cCOLS);
 }
 
@@ -1622,14 +1623,13 @@ bld_sline (
 		}
 	}
 
-	if (show_author != SHOW_FROM_NONE)
+	if (CURR_GROUP.attribute->show_author != SHOW_FROM_NONE)
 		get_author (FALSE, &arts[j], from, len_from);
 
 	strncpy(arts_sub, arts[j].subject, len_subj+5);
 	j = INDEX2SNUM(i);
 	arts_sub[len_subj-5+1] = '\0';
 
-/* TODO - is len_from still needed now get_author has a len field?? */
 	sprintf (buffer = screen[j].col, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, from);
@@ -1673,13 +1673,12 @@ draw_sline (
 
 	if (full) {
 		s = screen[j].col;
-		tlen = strlen (s);
 		x = 0;
 		if (strip_blanks) {
-			strip_line (s, tlen);
-			tlen = strlen (s);	/* notes new line length */
+			strip_line (s);
 			CleartoEOLN ();
 		}
+		tlen = strlen (s);	/* notes new line length */
 	} else {
 		tlen = 12; /* ??? */
 		s = &screen[j].col[6];

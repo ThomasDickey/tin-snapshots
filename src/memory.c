@@ -396,7 +396,7 @@ free_newnews_array (void)
 
 void *
 my_malloc1 (
-	char *file,
+	const char *file,
 	int line,
 	size_t size)
 {
@@ -422,7 +422,7 @@ my_malloc1 (
 
 void *
 my_realloc1 (
-	char *file,
+	const char *file,
 	int line,
 	char *p,
 	size_t size)

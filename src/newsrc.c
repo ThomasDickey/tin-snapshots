@@ -32,9 +32,10 @@ static void auto_subscribe_groups (char *newsrc_file);
 
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
- *  active[] entries. Newsrc contains *only* subscribed to groups.
+ *  active[] entries.
+ *  If allgroups is set, then my_group[] is completely overwritten,
+ *  otherwise, groups are appended to the current my_group[]
  */
-
 void
 read_newsrc (
 	char *newsrc_file,
@@ -48,9 +49,8 @@ read_newsrc (
 	int i;
 	struct stat buf;
 
-	if (allgroups) {
+	if (allgroups)
 		group_top = 0;
-	}
 
 	/*
 	 * make a .newsrc if one does'nt exist & auto subscribe to set groups
@@ -70,16 +70,20 @@ read_newsrc (
 
 		while ((line = getaline (fp)) != (char *) 0) {
 			seq = pcParseNewsrcLine (line, grp, &sub);
-/*
-printf("line=[%s] grp=[%s] sub=[%c] seq=[%s]\n", line, grp, sub, seq);
-fflush(stdout);
-*/
+
 			if (sub == SUBSCRIBED) {
-				if ((i = add_my_group (grp, allgroups)) >= 0) {
-					active[my_group[i]].subscribed = sub;
+/* TODO !!! - ponder carefully ramifications of changing 'allgroups' to '1' in
+ * the following line !!!
+ * shouldn't make any difference - only had effect if cmd line groups
+ * supplied, these are added by read_cmd_line_groups, so duplicate won't
+ * make any difference ??
+ */
+				if ((i = add_my_group (grp, 1)) >= 0) {
+					active[my_group[i]].subscribed = SUB_BOOL(sub);
 					parse_bitmap_seq (&active[my_group[i]], seq);
 				} else {
-/*fprintf(stderr, "Bogus %s in .newsrc, not in active\n", grp);*/
+/*TODO - fake an entry - mark as deletion material ? */
+					fprintf(stderr, "Bogus %s in .newsrc, not in active\n", grp);
 				}
 			}
 			free (line);
@@ -109,16 +113,13 @@ vWriteNewsrcLine (
 	}
 	psGrp = psGrpFind (grp);
 
-	if ((psGrp && psGrp->newsrc.present) &&
-		!(psGrp->subscribed != ':' && strip_newsrc)) {
-		fprintf (fp, "%s%c ", psGrp->name, psGrp->subscribed);
+/* 	if ((psGrp && psGrp->newsrc.present) && !(!psGrp->subscribed && strip_newsrc)) {*/
+ 	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
+		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
 	} else {
-/*TODO
-fprintf(stderr, "%s not found in active. Unchanged\n", grp); */
-		if (!(sub!=':' && strip_newsrc)) {
-			fprintf (fp, "%s%c %s\n", grp, sub, seq);
-		}
+ 		if (WRITE_NEWSRC(sub))
+ 			fprintf (fp, "%s%c %s\n", grp, sub, seq);
 	}
 }
 
@@ -313,25 +314,24 @@ subscribe (
 					seq = pcParseNewsrcLine (line, grp, &sub);
 
 					if (STRCMPEQ(grp, group->name)) {
-						if (!(sub_state!=':' && strip_newsrc)) {
-							fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
-						}
-						group->subscribed = sub_state;
+
+ 						if (WRITE_NEWSRC(sub_state))
+ 							fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
+
+						group->subscribed = SUB_BOOL(sub_state);
 						found = TRUE;
 					} else {
-						if (!(sub!=':' && strip_newsrc)) {
-							fprintf (newfp, "%s%c %s\n", grp, sub, seq);
-						}
+ 						if (WRITE_NEWSRC(sub))
+ 							fprintf (newfp, "%s%c %s\n", grp, sub, seq);
 					}
 				}
 				free (line);
 			}
 			fclose (fp);
 			if (!found) {
-				if (!(sub_state!=':' && strip_newsrc)) {
-					fprintf (newfp, "%s%c\n", group->name, sub_state);
-				}
-				group->subscribed = sub_state;
+ 				if (WRITE_NEWSRC(sub_state))
+ 					fprintf (newfp, "%s%c\n", group->name, sub_state);
+				group->subscribed = SUB_BOOL(sub_state);
 			}
 		}
 		if (ferror (newfp) | fclose (newfp)) {
@@ -944,13 +944,13 @@ pos_group_in_newsrc (
 	group_len = strlen (group->name);
 
 	while ((line = getaline(fp_in)) != (char *) 0) {
-		if (STRNCMPEQ(group->name, line, group_len) && line[group_len] == ':') {
+		if (STRNCMPEQ(group->name, line, group_len) && line[group_len] == SUBSCRIBED) {
 			newsgroup = line;
 			found = TRUE;
 			continue;	/* Don't free line */
-		} else if (strchr (line, ':') != (char *) 0) {
+		} else if (strchr (line, SUBSCRIBED) != (char *) 0) {
 			vWriteNewsrcLine(fp_sub,line);
-		} else if (strchr (line, '!') != (char *) 0) {
+		} else if (strchr (line, UNSUBSCRIBED) != (char *) 0) {
 			vWriteNewsrcLine(fp_unsub,line);
 		} else {	/* options line at beginning of .newsrc */
 			fprintf (fp_sub, "%s\n", line);
@@ -1073,12 +1073,14 @@ catchup_newsrc_file (
 				chmod (newsrc_file, newsrc_mode);
 			}
 			for (i = 0 ; i < group_top ; i++) {
-				if (!(active[my_group[i]].subscribed != ':' && strip_newsrc)) {
-					fprintf (fp, "%s%c 1-%ld\n",
-						active[my_group[i]].name,
-						active[my_group[i]].subscribed,
-						active[my_group[i]].xmax);
-				}
+
+/* 				if (!(!active[my_group[i]].subscribed && strip_newsrc)) {*/
+ 				if (active[my_group[i]].subscribed || !strip_newsrc) {
+ 					fprintf (fp, "%s%c 1-%ld\n",
+ 						active[my_group[i]].name,
+						SUB_CHAR(active[my_group[i]].subscribed),
+ 						active[my_group[i]].xmax);
+ 				}
 			}
 			fclose (fp);
 		}
@@ -1086,7 +1088,10 @@ catchup_newsrc_file (
 	}
 }
 
-
+/*
+ * Break down a line of .newsrc file
+ * The sequence information [ eg; 1-3,10,12 ] is returned
+ */
 static char *
 pcParseNewsrcLine (
 	char *line,
@@ -1098,7 +1103,7 @@ pcParseNewsrcLine (
 
 	ptr = line;
 
-	while (*ptr && *ptr != ' ' && *ptr != ':' && *ptr != '!') {
+	while (*ptr && *ptr != ' ' && *ptr != SUBSCRIBED && *ptr != UNSUBSCRIBED) {
 			*grpptr = *ptr;
 			grpptr++;
 			ptr++;
@@ -1386,7 +1391,7 @@ vNewsrcTestHarness (void)
 	group.xmax = atoi (get_val ("TIN_MAX", "0"));
 	group.count = atoi (get_val ("TIN_COUNT", "-1"));
 	group.type = GROUP_TYPE_NEWS;
-	group.subscribed = SUBSCRIBED;
+	group.subscribed = TRUE;
 	group.newsrc.xbitmap = (t_bitmap *) 0;
 	vSetDefaultBitmap (&group);
 

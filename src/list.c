@@ -39,7 +39,7 @@ init_group_hash (void)
  */
 unsigned long
 hash_groupname (
-	char *group)
+	const char *group)
 {
 #ifdef NEW_HASH_METHOD	/* still testing */
 	unsigned long hash = 0L, g, val;
@@ -62,7 +62,7 @@ printf ("hash=[%s] [%ld]\n", group, val);
 #else
 	unsigned long hash_value = 0L;
 	unsigned int len = 0;
-	unsigned char *ptr = (unsigned char *) group;
+	const unsigned char *ptr = (const unsigned char *) group;
 
 	while (*ptr) {
 		hash_value = (hash_value << 1) ^ *ptr++;
@@ -80,7 +80,7 @@ printf ("hash=[%s] [%ld]\n", group, val);
  */
 int
 find_group_index (
-	char *group)
+	const char *group)
 {
 	int i;
 	long h;

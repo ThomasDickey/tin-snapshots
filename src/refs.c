@@ -395,7 +395,7 @@ free_msgids(void)
 	}
 }
 
-#if 0
+#if 0	/* But please don't remove it */
 static void
 dump_msgids(void)
 {
@@ -636,18 +636,6 @@ find_next(
 			while(ptr != NULL && ptr->sibling == NULL)
 				ptr = ptr->parent;
 
-#if 0	/* TODO The fix for self-referencing reference loops obseletes this */
-				/*
-				 * Skip self referencing arts
-				 */
-				if (ptr ==  ptr->parent) {
-					DEBUG_PRINT((stderr, "Self Referencing article avoided\n"));
-					return (NULL);
-				} else
-					ptr = ptr->parent;
-			}
-#endif
-
 			/*
 			 * We've backtracked up to the parent with a suitable sibling
 			 * go round once again to move to this sibling
@@ -748,7 +736,6 @@ thread_by_reference(void)
  * We add joined threads onto the end of the .thread chain of the previous
  * thread. arts[] is already sorted, so the sorting of these will be
  * correct.
- * TODO: merged threads don't display with 'a' - only 1st thread shows up
  */
 void
 collate_subjects(void)
@@ -818,7 +805,7 @@ collate_subjects(void)
  * 3) Add rest of References header to the cache. This information is less
  *    reliable than the info added in 2) and is only used to fill in any
  *    gaps in the reference tree - no information is superceded.
- * 4) Free() up the msgid and refs headers once cached
+ * 4) free() up the msgid and refs headers once cached
  */
 void
 build_references(
@@ -840,23 +827,24 @@ build_references(
 	for (i = 0; i < top; i++) {
 		art = &arts[i];
 
-#ifndef INFERIOR_REF_HANDLING
 		if (art->refs) {
 
+			strip_line(art->refs);
+
 			/*
-			 * Must strip trailing white space from Refs: lines
+			 * Add the last ref, and then trim it to save wasting time adding
+			 * it again later
 			 */
-			while (*(art->refs + strlen(art->refs) - 1) == ' ')
-				*(art->refs + strlen(art->refs) - 1) = '\0';
+			if ((s = strrchr(art->refs, ' ')) != NULL) {
+				art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, s+1, NULL));
+				*s = '\0';
+			} else {
+				art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, art->refs, NULL));
+				free(art->refs);
+				art->refs = (char *) 0;
+			}
 
-			if ((s = strrchr(art->refs, ' ')) != NULL)
-				++s;						/* More than 1 ref - use last */
-			else
-				s = art->refs;				/* Only 1 ref - use it */
-
-			art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, s, NULL));
 		} else
-#endif
 			art->refptr = add_msgid(MSGID_REF, art->msgid, NULL);
 
 		free(art->msgid);					/* Now cached - discard this */
@@ -877,7 +865,6 @@ build_references(
 		 * Use add_msgid() to add the references, this will neatly sort out
 		 * all the special cases, circular refs, child/sibling ptrs etc..
 		 */
-/* TODO there is a lot of redundancy here still */
 		add_msgid(MSGID_REF, art->refptr->txt, parse_references(art->refs));
 
 		free(art->refs);

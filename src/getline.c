@@ -42,7 +42,7 @@ char *hist_buf[HIST_SIZE];
 int hist_pos, hist_last;
 int is_passwd;
 static char gl_buf[BUF_SIZE];	/* input buffer */
-static char *gl_prompt;		/* to save the prompt string */
+static const char *gl_prompt;	/* to save the prompt string */
 static int gl_init_done = 0;	/* -1 is terminal, 1 is batch  */
 static int gl_width = 0;	/* net size available for input */
 static int gl_pos, gl_cnt = 0;	/* position and size of input */
@@ -68,7 +68,7 @@ int (*gl_tab_hook) (char *, int, int *) = gl_tab;
 
 char *
 getline (
-	char *prompt,
+	const char *prompt,
 	int number_only,
 	char *str,
 	int max_chars,

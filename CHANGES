@@ -1,3 +1,36 @@
+--unoff BETA release 970202 --
+
+309) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. rewrite new newsgroup handling
+     ADD. make newsrc->subscribed a bitfield
+     ADD. better reference parsing
+     ADD. partial fix for show_author update problem
+     ADD. code-cleanup / other minor changes
+     FIX. several supplied patches
+
+308) Theo van Dinter <felicity@kluge.net>
+     BUG. typo
+     FIX. sigfile.c
+
+307) T.E.Dicky  <dickey@clark.net>
+     ADD. more fallback prototypes (e.g., atoi), from warnings I got
+	  running with gcc -traditional on Linux 2.0.0
+     ADD. makes the gcc warnings autoconfigured
+     ADD. makes strings 'const' (tested with gcc -Write-strings).
+     FIX. several supplied patches
+
+306) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. autoconf support for sum
+     FIX. several supplied patches
+
+305) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. code cleaup (moved stings to lang.c)
+     FIX. severap supplied patches
+
+304) Sven Paulus <sven@oops.sub.de>
+     BUG. Summery/Keywords are overwritten on a superseede
+     FIX. post.c
+
 --unoff BETA release 970127 --
 
 303) Volker Barthelmann <volker@vb.franken.de>
