@@ -95,12 +95,12 @@ bld_tline (l, art)
 	}	
 
 	if (art->lines != -1) {
-		sprintf (lines, "%4d", art->lines);
+		sprintf (lines, "%-4d", art->lines);
 	} else {
 		strcpy (lines, "   ?");
 	}
 	
-	sprintf (screen[j].col, "  %4d%3s  [%4s]  %-*.*s%s%-*.*s",
+	sprintf (screen[j].col, "  %4d%3s  [%-4s]  %-*.*s%s%-*.*s",
 		 l, new_resps, lines, len_subj, len_subj, art->subject, 
 		 spaces, len_from, len_from, from);
 
@@ -540,7 +540,7 @@ thread_catchup:
 				art_mark_xref_read (&arts[n]);
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
-				break;
+				goto thread_down;
 				
 			case iKeyThreadToggleSubjDisplay:	/* toggle display of subject & subj/author */
 				if (show_subject) {

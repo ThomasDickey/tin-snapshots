@@ -600,8 +600,10 @@ update_index_files ()
 					}	
 #	endif
 #else
+#	if HAVE_SETPGRP
 					setpgrp ();
 					signal (SIGHUP, SIG_IGN);	/* make immune from process group leader death */
+#	endif
 #endif
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */			
 					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */			

@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960529
+PVER		= 960606
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 

@@ -1,59 +1,76 @@
 #!/bin/sh
-# rm -f config.cache config.status config.log
-
-rm makefile src/Makefile include/autoconf.h
+# Remove the files created by this script before running it.
+rm -f config.cache config.status config.log
+rm -f makefile src/Makefile include/autoconf.h
 
 if test ! -f configure
 then
-        autoconf
+	autoconf
 fi
 
-INSTALL="td-install"
+OUT=td-conf.out
+cat >>$OUT <<EOF/
+** `date`
+** node: `uname -a`
+** from: `pwd`
+** user: `id`
+** conf: $*
+EOF/
+OPTS="$*"
+
+#INSTALL="td-install"
 CFLAGS="-O"
 CC="${CC-cc}"
-TOP="/usr/local/"
 
 NETLIBS=""
 case `uname -s` in
-api20|opera15)
-        NETLIBS="-lsocket"
-        ;;
-AIX)
-        ;;
-CLIX)
-        NETLIBS="-lbsd"
-        ;;
-Linux)
-        INSTALL=install
-        ;;
+#api20|opera15)
+#	# SCO
+#	NETLIBS="-lsocket"
+#	;;
+#AIX)
+#	;;
+#CLIX)
+#	NETLIBS="-lbsd"
+#	;;
+#Linux)
+#	INSTALL=install
+#	;;
 HP-UX)
-        ;;
-SunOS)
-        case `uname -r` in
-        5.*)
-                NETLIBS="-lsocket -lnsl"
-                ;;
-        esac
-        ;;
-UNIX_SV)
-        NETLIBS="-lresolv -lsocket -lnsl"
-        ;;
+	# The K&R compiler on HP/UX doesn't support -O/-g options.  It also
+	# doesn't have 'alloca()', needed by bison.
+	if test "$CC" = "cc" ; then
+		YACC=byacc; export YACC
+		CFLAGS=""
+	fi
+	;;
+#SunOS)
+#	# Solaris (5.x) requires netlibs; SunOS (4.x) doesn't
+#	case `uname -r` in
+#	5.*)
+#		NETLIBS="-lsocket -lnsl"
+#		;;
+#	esac
+#	;;
+#UNIX_SV)
+#	NETLIBS="-lresolv -lsocket -lnsl"
+#	;;
 esac
 
 if test -n "$NETLIBS" ; then
-        LIBS="$LIBS $NETLIBS"
-        export LIBS
+	LIBS="$LIBS $NETLIBS"
+	export LIBS
 fi
 
-INSTALL="$INSTALL" \
+#INSTALL="$INSTALL"
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
-        --disable-echo \
-        --disable-debug \
-        --enable-prototypes \
-        --enable-warnings \
+	--disable-echo \
+	--disable-debug \
+	--enable-prototypes \
+	--enable-warnings \
 	--with-libdir="" \
 	--with-spooldir="" \
-	--enable-nntp-only
+	--enable-nntp-only \
         $OPTS $* 2>&1 |tee -a $OUT

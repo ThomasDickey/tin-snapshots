@@ -1,3 +1,32 @@
+--950824BETA  PLMC.960606 --
+
+061) Daniel Naber <dnaber@pluto.teuto.de>
+     ADD. so coloring below sigdashes
+     FIX. page.c
+
+060) Chris Blum <chris@phil.uni-sb.de>
+     BUG. useless mime-headers without mimeencoding in the body
+     FIX. rfc1522.c
+
+059) Thomas E. Dickey <dickey@clark.net>
+     ADD. more autoconf-stuff
+     FIX. several supplied patches
+
+058) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. color was wrong when pressing 'K' mark_article_unread
+     BUG. 'x' repost_article only came up with the fullname (without
+          address)
+     FIX. thread.c, post.c
+
+057) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. no range limit for Lines:
+     FIX. page.c, thread.c
+
+056) Sven Paulus <sven@oops.sub.de>
+     ADD. even more FIDO-style quoting stuff
+          %S like %s but with keeping older quotings
+     FIX. several supplied patches
+
 --950824BETA  PLMC.960529 --
 
 055) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -61,7 +90,7 @@
 --950824BETA  PLMC.960522 --
 
 044) Sven Paulus <sven@oops.sub.de>
-     ADD. FIDO-sytle quoting
+     ADD. FIDO-style quoting
           %s in quote_chars will be replaced by your initials
      FIX. several supplied patches
 

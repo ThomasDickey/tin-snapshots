@@ -19,7 +19,7 @@
  * These are set as configure options, some must be guarded by ifdefs because
  * they're also used in makefile rules (e.g., lint, proto).
  */
-#undef	HAVE_MAIL_HANDLING
+#undef	HAVE_MH_MAIL_HANDLING
 #undef	NNTP_ABLE
 #undef	NNTP_ONLY
 #ifndef	HAVE_COLOR
@@ -149,7 +149,9 @@
 #undef	DECL_FREAD
 #undef	DECL_FSEEK
 #undef	DECL_FWRITE
+#undef	DECL_GETCWD
 #undef	DECL_GETHOSTNAME
+#undef	DECL_GETLOGIN
 #undef	DECL_GETOPT
 #undef	DECL_IOCTL
 #undef	DECL_MEMSET
@@ -235,13 +237,6 @@
 #undef	DONT_HAVE_TM_GMTOFF
 
 #if 0 /* FIXME: test-not-impl */
-#if defined(M_AMIGA)
-#	define	SMALL_MEMORY_MACHINE
-#endif
-
-#if defined(M_AMIGA)
-#	define	DONT_REREAD_ACTIVE_FILE
-#endif
 
 #if defined(COHERENT)
 #	define	HAVE_SETTZ
@@ -274,4 +269,3 @@
 #	endif
 #endif
 #endif /* FIXME */
-

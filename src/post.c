@@ -1282,7 +1282,9 @@ ignore_followup_to_poster:
 	
 		fseek (note_fp, note_mark[0], 0);
 		get_initials(respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials);
+		copy_body (note_fp, fp,
+			(psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
+			initials);
 	} else {
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
@@ -2220,8 +2222,11 @@ repost_article (group, art, respnum)
 
 #ifndef FORGERY
 	fprintf (fp, "\n[ Article reposted from %s ]", note_h_newsgroups);
-	get_author (FALSE, art, buf);
-	fprintf (fp, "\n[ Author was %s ]", buf);
+	if (art->name) {
+		fprintf (fp, "\n[ Author was %s <%s> ]", art->name, art->from);
+	} else {
+		fprintf (fp, "\n[ Author was %s ]", art->from);
+	}
 	fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
 #endif
 
