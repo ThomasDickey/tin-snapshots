@@ -435,6 +435,7 @@ extern int prompt_num P_((int ch, char *prompt));
 extern int prompt_string P_((char *prompt, char *buf));
 extern int prompt_menu_string P_((int line, int col, char *var));
 extern int prompt_yn P_((int line, char *prompt, int default_answer));
+extern int prompt_yn2 P_((int line, char *prompt, int default_answer));
 extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char *list[], int size));
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
 extern int prompt_option_string P_((int option));

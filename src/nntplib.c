@@ -796,7 +796,7 @@ static int reconnecting = 0;
 			nntp_wr_fp = nntp_rd_fp = NULL;
 			ring_bell ();
 			if (reconnecting) return -1;
-			if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
+			if (prompt_yn2 (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				return -2;
 			}
 			reconnecting = 1;
@@ -851,7 +851,7 @@ int get_server (char *string, int size)
 		if (errno != EINTR) {
 			netclose(sockt_rd);
 			ring_bell ();
-			if (!prompt_yn (cLINES, txt_reconnect_to_news_server, 'y')) {
+			if (!prompt_yn2 (cLINES, txt_reconnect_to_news_server, 'y')) {
 				return -1;
 			}
 			clear_message ();
