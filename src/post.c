@@ -3461,7 +3461,7 @@ modify_headers (
 void
 checknadd_headers (
 	char *infile,
-	int lines)
+	int lines)	/* unused */
 {
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];

@@ -59,6 +59,7 @@ INSTALL	= @INSTALL@
 
 HFILES	= \
 	../include/autoconf.h \
+	$(INCDIR)/bugrep.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -324,11 +325,12 @@ tincfg.h:			$(SRCDIR)/tincfg.tbl \
 	./makecfg $(SRCDIR)/tincfg.tbl tincfg.h
 
 makecfg:			$(OBJDIR)/makecfg.o
-	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg
+	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg $(LIBS)
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
-$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(TIN_DEP)
+$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(TIN_DEP) \
+				$(INCDIR)/bugrep.h
 $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_DEP) \
 				$(INCDIR)/stpwatch.h
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
@@ -356,17 +358,20 @@ $(OBJDIR)/help.o:		$(SRCDIR)/help.c $(TIN_DEP) \
 $(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(TIN_DEP)
 $(OBJDIR)/init.o:		$(SRCDIR)/init.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
-				$(INCDIR)/version.h
+				$(INCDIR)/version.h \
+				$(INCDIR)/bugrep.h
 $(OBJDIR)/joinpath.o:		$(SRCDIR)/joinpath.c $(TIN_DEP)
 $(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(TIN_DEP)
 $(OBJDIR)/list.o:		$(SRCDIR)/list.c $(TIN_DEP)
 $(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(TIN_DEP)
 $(OBJDIR)/main.o:		$(SRCDIR)/main.c $(TIN_DEP) \
-				$(INCDIR)/version.h
+				$(INCDIR)/version.h \
+				$(INCDIR)/bugrep.h
 $(OBJDIR)/makecfg.o:		$(SRCDIR)/makecfg.c $(TIN_DEP)
 $(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(TIN_DEP)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_DEP) \
-				$(INCDIR)/version.h
+				$(INCDIR)/version.h \
+				$(INCDIR)/bugrep.h
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(TIN_DEP)
 $(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(TIN_DEP)
 $(OBJDIR)/nrctbl.o:		$(SRCDIR)/nrctbl.c $(TIN_DEP) \

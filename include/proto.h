@@ -70,6 +70,7 @@ extern OUTC_RETTYPE outchar (OUTC_ARGS);
 extern int InitScreen (void);
 extern int RawState (void);
 extern int ReadCh (void);
+extern int SetupScreen (void);
 extern void ClearScreen (void);
 extern void CleartoEOLN (void);
 extern void CleartoEOS (void);

@@ -13,9 +13,10 @@
  */
 
 #include	"tin.h"
-#include "tnntp.h"
+#include	"tnntp.h"
 #include	"menukeys.h"
 #include	"version.h"
+#include	"bugrep.h"
 
 char active_times_file[PATH_LEN];
 char add_addr[LEN];				/* address to add to rR reply to author with mail */

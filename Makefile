@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970724
+PVER		= 970731
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -18,6 +18,7 @@ AMGDIR	= ./amiga
 TOLDIR	= ./tools
 
 HFILES	= \
+	$(INCDIR)/bugrep.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \

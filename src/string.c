@@ -1,9 +1,9 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : string.c
- *  Author    : 
+ *  Author    : Urs Janssen <urs@akk.uni-karlsruhe.de>
  *  Created   : 20.01.1997
- *  Updated   : 22.03.1997
+ *  Updated   : 30.07.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1997 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
@@ -14,11 +14,9 @@
 
 #include	"tin.h"
 
-
 /*
 ** this file needs some work
 */
-
 
 /*
  * special itoa()

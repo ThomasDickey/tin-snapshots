@@ -15,6 +15,7 @@
 #include	"tin.h"
 #include	"tcurses.h"
 #include	"version.h"
+#include	"bugrep.h"
 #include	"trace.h"
 
 /*
@@ -1252,6 +1253,14 @@ int kbhit(void);
 int
 input_pending (int delay)
 {
+#if USE_CURSES
+	int ch;
+	nodelay(stdscr, TRUE);
+	if ((ch = getch()) != ERR)
+		ungetch(ch);
+	nodelay(stdscr, FALSE);
+	return (ch != ERR);
+#else
 #ifdef WIN32
 	return kbhit() ? TRUE : FALSE;
 #endif
@@ -1269,10 +1278,11 @@ input_pending (int delay)
 	FD_SET(fd, &fdread);
 
 #ifdef HAVE_SELECT_INTP
-	if (select (1, (int *)&fdread, NULL, NULL, &tvptr)) {
+	if (select (1, (int *)&fdread, NULL, NULL, &tvptr))
 #else
-	if (select (1, &fdread, NULL, NULL, &tvptr)) {
+	if (select (1, &fdread, NULL, NULL, &tvptr))
 #endif
+	{
 		if (FD_ISSET(fd, &fdread)) {
 			return TRUE;
 		}
@@ -1305,8 +1315,8 @@ input_pending (int delay)
 #endif	/* HAVE_POLL */
 
 	return FALSE;
+#endif
 }
-
 
 
 
@@ -1317,16 +1327,9 @@ get_arrow_key (void)
 #if NCURSES_MOUSE_VERSION
 	MEVENT my_event;
 #endif
-	int ch;
+	int ch = getch();
 	int code = KEYMAP_UNKNOWN;
 
-	if (!input_pending(0)) {
-		sleep(1);
-		if (!input_pending(0))
-			return ESC;
-	}
-
-	ch = getch();
 	switch (ch) {
 		case KEY_BACKSPACE:
 			code = '\b';
@@ -1387,12 +1390,16 @@ get_arrow_key (void)
 	int ch;
 	int ch1;
 
+#define wait_a_while(i) \
+	while (!input_pending(0) \
+		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
+
 	if (!input_pending(0)) {
 #ifdef HAVE_USLEEP
 		int i=0;
 		
-		while (!input_pending(0) && i < 10) {
-			usleep(SECOND_CHARACTER_DELAY * 100);
+		wait_a_while(i) {
+			usleep(SECOND_CHARACTER_DELAY * 1000);
 			i++;
 		}
 #else	/* !HAVE_USLEEP */
@@ -1400,14 +1407,24 @@ get_arrow_key (void)
 		struct timeval tvptr;
 		int i=0;
 		
-		while (!input_pending(0) && i < 10) {
+		wait_a_while(i) {
 			tvptr.tv_sec = 0;
-			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 100;
+			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 1000;
 			select (0, NULL, NULL, NULL, &tvptr);
 			i++;
 		}
 #else  /* !HAVE_SELECT */
+#ifdef HAVE_POLL
+		struct pollfd fds[1];
+		int i=0;
+
+		wait_a_while(i) {
+			poll(fds, 0, SECOND_CHARACTER_DELAY);
+			i++;
+		}
+#else
 		sleep(1);
+#endif	/* HAVE_POLL */
 #endif	/* HAVE_SELECT */
 #endif	/* HAVE_USLEEP */
 		if (!input_pending(0))

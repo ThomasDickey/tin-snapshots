@@ -6,7 +6,6 @@
  *  Updated   : 15-08-93
  *  Notes     : Relatively quick-and-dirty implemenation of ANSI library
  *              routine for System V Unix systems.
- *              It's written in old-style C for maximal portability.
  *              If target system already has strftime() call the #define
  *              HAVE_STRFTIME can be set to use it.
  *  Example   : time (&secs);

@@ -1,11 +1,19 @@
 Bugs
 ----
+o  tin needs a terminal in batch mode - thus it can't run out of cron!
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
+o  a problem concerning .tin/posted: when I post a postponed followup,
+   a 'w' is written to the file instead of a 'f'. If there's a
+   "References:" header, the article should be regarded as a followup.
+   [Vincent Lefevre <vlefevre@ens-lyon.fr>]
+
 o  after resubscribing to a newgroup which is still in the .newsrc, tin
    ignores the old related .newsrc entry and marks all articles as
    unread.
    [Sven Manias <sven.manias@stud.uni-karlsruhe.de>]
 
-o  -N comandline swith seems to be broken
+o  -N amd -M comandline switches are broken
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
