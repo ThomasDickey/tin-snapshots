@@ -15,7 +15,7 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-#define MARK_OFFSET	8
+#define MARK_OFFSET	9
 
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))
@@ -1524,10 +1524,10 @@ set_subj_from_size (num_cols)
 		len_from = max_from - BLANK_GROUP_COLS;
 		len_subj = max_subj;
 		len_subj += 5 * (1 - show_lines);
-		spaces = "   ";
+		spaces = "  ";
 	} else {
 		len_from = 0;
-		len_subj = (max_subj+max_from+3) - BLANK_GROUP_COLS;
+		len_subj = (max_subj+max_from+2) - BLANK_GROUP_COLS;
 		len_subj += 5 * (1 - show_lines);
 		spaces = "";
 	}
@@ -1683,18 +1683,10 @@ draw_sline (i, full)
 			CleartoEOLN ();
 		}
 	} else {
-              tlen  = 12;
+		tlen = 12; /* ??? */
 		s = &screen[j].col[6];
 		x = 6;
-/* ..0001..+.???.????. */
-		if (strip_blanks) {
-			tlen = strlen (s);	/* notes new line length */
-			strip_line (s, tlen);
-/*			CleartoEOLN ();
-*/
-		}
 	}
-
 	MoveCursor (INDEX2LNUM(i), x);
 #ifdef VMS
 	sys_fwrite (s, 1, tlen, stdout);

@@ -1,15 +1,15 @@
-MANIFEST for tin-1.3-unoff-BETA-961216 (Tue Dec 17 01:36:10 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961218 (Wed Dec 18 16:44:42 MET 1996)
 ----------------------------------------------------
-  53903 ./CHANGES
-  13317 ./TODO
+  54140 ./CHANGES
+  13375 ./TODO
    5341 ./Makefile
-  17166 ./INSTALL
+  17216 ./INSTALL
    2260 ./MANIFEST
    1659 ./README
     896 ./tinpp
   21854 ./aclocal.m4
  144951 ./configure
-  16186 ./configure.in
+  16267 ./configure.in
    4771 ./install.sh
   11609 ./makefile.in
    1013 ./conf-tin
@@ -46,7 +46,7 @@ MANIFEST for tin-1.3-unoff-BETA-961216 (Tue Dec 17 01:36:10 MET 1996)
   19436 ./src/feed.c
   40043 ./src/filter.c
   10935 ./src/getline.c
-  41733 ./src/group.c
+  41577 ./src/group.c
    3202 ./src/hashstr.c
    9590 ./src/help.c
   12146 ./src/inews.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961216 (Tue Dec 17 01:36:10 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3653 ./src/tincfg.tbl
-1608341 insgesamt
+1608530 insgesamt
