@@ -29,7 +29,6 @@ char note_h_followup[LEN];		/* Followup-To:  */
 char note_h_mimeversion[PATH_LEN];	/* Mime-Version: */
 char note_h_contenttype[LEN];		/* Content-Type: */
 char note_h_contentenc[LEN];		/* Content-Transfer-Encoding: */
-char note_h_xcommentto[LEN];		/* for X-Comment-To: (Used by FIDO) */
 char note_h_ftnto[LEN];			/* Old X-Comment-To: (Used by FIDO) */
 
 char *glob_page_group;
@@ -1243,7 +1242,6 @@ art_open (art, group_path)
 	note_h_mimeversion[0] = '\0';
 	note_h_contenttype[0] = '\0';
 	note_h_contentenc[0] = '\0';
-	note_h_xcommentto[0] = '\0';
 	note_h_ftnto[0] = '\0';
 
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
@@ -1315,9 +1313,6 @@ art_open (art, group_path)
 		}
 		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, LEN)) {
 			str_lwr (note_h_contentenc, note_h_contentenc);
-			continue;
-		}
-		if (match_header (buf, "From", note_h_xcommentto, LEN)) {
 			continue;
 		}
 		if (match_header (buf, "X-Comment-To", note_h_ftnto, LEN)) {

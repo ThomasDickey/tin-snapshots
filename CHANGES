@@ -1,10 +1,16 @@
+--unoff BETA release 960616 --
+
+083) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. note_h_from overrides note_h_xcommentto
+     FIX. page.c, post.c
+
 --unoff BETA release 960613 --
 
 082) Thomas E. Dickey <dickey@clark.net>
      ADD. even more autoconf stuff; code cleanup
      FIX. several supplied patches
 
-081) Branden Robinson <branden@ecn.purdue.edu>
+081) Branden Robinson <branden@purdue.edu>
      REM. multiple screen redraw keys
      FIX. several supplied patches
 

@@ -51,5 +51,4 @@ Compiled & installed on the following machines:
 10)	i486 & BSDI 2.0 with gcc 1.42
 	i486 & BSDI 2.0 with gcc 2.6.3
 
-11)	i486 & NetBSD 1.1 with gcc 2.7.2
- 
+11)	i486 & NetBSD 1.1 with gcc 2.4.5
