@@ -3,7 +3,7 @@
  *  Module    : header.c
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 1997-03-10
- *  Updated   : 1997-03-19
+ *  Updated   : 2003-03-12
  *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -109,7 +109,11 @@ static const char *domain_name_hack = DOMAIN_NAME;
 					strcpy (domain, buff);
 				}
 			}
-			if (domain[0] == '/') /* file was empty */
+#	ifdef M_AMIGA
+			if (strchr(domain, ':'))
+#	else
+			if (domain[0] == '/')
+#	endif /* M_AMIGA */
 				domain[0]='\0';
 
 			fclose (fp);

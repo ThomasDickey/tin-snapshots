@@ -1,9 +1,9 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : refs.c
- *  Author    : Jason Faultless <jason@radar.tele2.co.uk>
+ *  Author    : Jason Faultless <jason@altarstone.com>
  *  Created   : 1996-05-09
- *  Updated   : 1998-01-04
+ *  Updated   : 2003-03-11
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@macgyver.tele2.co.uk>
  *              hash_msgid, free_msgid
@@ -19,7 +19,7 @@
 #endif /* !TIN_H */
 
 #define MAX_REFS	100			/* Limit recursion depth */
-#define REF_SEP	" "			/* Separator chars in ref headers */
+#define REF_SEP	" \t"			/* Separator chars in ref headers */
 
 /* Produce disgusting amounts of output to help me tame this thing */
 #undef DEBUG_REFS
@@ -332,8 +332,7 @@ parse_references (
 	DEBUG_PRINT((dbgfd, "parse_references: %s\n", r));
 
 	/*
-	 * Break the refs down, using a space as delimiters
-	 * A msgid can't contain a space, right ?
+	 * Break the refs down, using REF_SEP as delimiters
 	 */
 	if ((ptr = strtok(r, REF_SEP)) == NULL)
 		return(NULL);
@@ -850,7 +849,7 @@ build_references (
 {
 	int i;
 	struct t_article *art;
-	char *s;
+	char *s, *t;
 
 #ifndef INDEX_DAEMON
 	/*
@@ -895,6 +894,15 @@ build_references (
 				DEBUG_PRINT((dbgfd, "removing circular reference to%s\n", s));
 				*s = '\0';
 			}
+			while (((t = strrchr(art->refs, '\t')) != NULL) && (!strcmp(art->msgid, t + 1))) {
+				/*
+				 * Remove circular reference to current article
+				 */
+				DEBUG_PRINT((dbgfd, "removing circular reference to%s\n", t));
+				*t = '\0';
+			}
+			if (t > s)
+				s = t;
 			if (s != NULL) {
 				art->refptr = add_msgid(MSGID_REF, art->msgid, add_msgid(REF_REF, s+1, NULL));
 				*s = '\0';

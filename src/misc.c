@@ -3,7 +3,7 @@
  *  Module    : misc.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-31
+ *  Updated   : 2003-02-15
  *  Notes     :
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -2395,12 +2395,13 @@ quote_wild (
 	for (target = buff; *str != '\0'; str++) {
 		if (tinrc.wildcard) { /* regex */
 			/*
-			 * quote meta characters ()[]{}\^$*+?.
+			 * quote meta characters ()[]{}\^$*+?.#
 			 * replace whitespace with '\s' (pcre)
 			 */
 			if (*str == '(' || *str == ')' || *str == '[' || *str == ']' || *str == '{' || *str == '}'
 			    || *str == '\\' || *str == '^' || *str == '$'
 			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
+			    || *str == '#'
 			    || *str == ' ' || *str == '\t') {
 				*target++ = '\\';
 				*target++ = ((*str == ' ' || *str == '\t')? 's' : *str);

@@ -1,14 +1,19 @@
--- 1.4.7 release 20030201 "" --
+-- 1.4.7 release 20030311 "" --
 
 047) Urs Janssen <urs@tin.org>
      REM. handling for 202/203 return codes (see 028)
      REM. some unused macros
+     BUG. used PCRE_EXTENDED without quoting #
      FIX. nntplib.h, proto.h, attrib.c, curses.c, filter.c, misc.c, open.c
-          pgp.c, save.c, strftime.c, string.c
+          pgp.c, regex.c, save.c, strftime.c, string.c
 
 046) Urs Janssen <urs@tin.org>
-     BUG. comma separate group list in attribute scope didn't work
-     FIX. attrib.c
+     BUG. comma separated group list in attribute scope didn't work
+     BUG. "." might be resend as last command after a reconnect
+     BUG. part of the threading code aussumed that References are always
+          space separated
+     ADD. allow .pro-TLD
+     FIX. policy.h, attrib.c, inews.c, nntplib.c, refs.c
 
 045) Urs Janssen <urs@tin.org>
      ADD. remove Message-IDs with illegal chars (i.e. 8bit chars) from
@@ -178,7 +183,7 @@
      ADD. smarter check wehen quotes around realnames are needed
      FIX. header.c
 
-014) Jason Faultless <jason@radar.tele2.co.uk>
+014) Jason Faultless <jason@altarstone.com>
      BUG. Sender: errors on posting hung NNTP socket
      BUG. possible buffer overrun in the wildmat code
      FIX. inews.c, wildmat.c
@@ -208,19 +213,19 @@
      FIX. INSTALL, auth.txt, extern.h, nntplib.h, proto.h, auth.c, inews.c,
           lang.c, nntplib.c, open.c
 
-009) Jason Faultless <jason@radar.tele2.co.uk>
+009) Jason Faultless <jason@altarstone.com>
      BUG. -z did not restore terminal modes
      BUG. manpage had '[' and ']' in thread section instead of pager
      FIX. tin.1, menukeys.h, main.c, page.c
 
-008) Jason Faultless <jason@radar.tele2.co.uk>
+008) Jason Faultless <jason@altarstone.com>
      Urs Janssen <urs@tin.org>
      BUG. removed annyoing "Reading attributes file ..."-messages
           for each new group
      ADD. speed-up start when there are several new groups on the server
      FIX. active.c, attrib.c, lang.c, main.c
 
-007) Jason Faultless <jason@radar.tele2.co.uk>
+007) Jason Faultless <jason@altarstone.com>
      BUG. Counter not correct when un't'agging in pager
      BUG. PGP not available message over-written too quickly
      BUG. Broken behaviour of 'g' when no groups on group selection page
@@ -242,7 +247,7 @@
      ADD. add X-Headers in cancels and reposts
      FIX. post.c
 
-003) Jason Faultless <jason@radar.tele2.co.uk>
+003) Jason Faultless <jason@altarstone.com>
      BUG. fixed the newgroup during session hack which didn't work
           with leafnode
      BUG. Possible core when entering newgroups

@@ -3,7 +3,7 @@
  *  Module    : nntplib.c
  *  Author    : S. Barber & I. Lea
  *  Created   : 1991-01-12
- *  Updated   : 1997-12-22
+ *  Updated   : 2003-03-06
  *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (1991-02-10)
  *  Copyright : (c) Copyright 1991-99 by Stan Barber & Iain Lea
  *              Permission is hereby granted to copy, reproduce, redistribute
@@ -740,17 +740,13 @@ void
 put_server (
 	const char *string)
 {
-	/*
-	 * We remember the last thing we wrote, in case we have to do a command retry in the future
-	 */
-	DEBUG_IO((stderr, "put_server(%s)\n", string));
-	strcpy (last_put, string);
-
-	s_puts (string, nntp_wr_fp);
-	s_puts ("\r\n", nntp_wr_fp);
-	(void) s_flush (nntp_wr_fp);
-
-	return;
+	if (*string && strlen(string)) {
+		DEBUG_IO((stderr, "put_server(%s)\n", string));
+		s_puts(string, nntp_wr_fp);
+		s_puts("\r\n", nntp_wr_fp);
+		strcpy(last_put, string);
+	}
+	(void) s_flush(nntp_wr_fp);
 }
 #	endif /* NNTP_ABLE */
 

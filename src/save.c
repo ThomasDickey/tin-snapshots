@@ -30,7 +30,7 @@
 
 #undef OFF
 
-#ifndef HAVE_LIBUU   
+#ifndef HAVE_LIBUU
 #	define INITIAL		1
 #	define MIDDLE		2
 #	define OFF		3
