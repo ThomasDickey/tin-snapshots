@@ -70,7 +70,6 @@ feed_articles (
 	int supersede = FALSE;
 #ifndef FORGERY
 	char from_name[PATH_LEN];
-	char host_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
 #endif
@@ -315,7 +314,7 @@ feed_articles (
 #ifndef FORGERY
 			get_host_name (host_name);
 			get_user_info (user_name, full_name);
-			get_from_name (user_name, host_name, full_name, from_name);
+			get_from_name (user_name, full_name, from_name);
 
 			if (strstr (from_name, arts[respnum].from)) {
 #endif

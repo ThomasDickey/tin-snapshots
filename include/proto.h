@@ -148,11 +148,14 @@ extern void display_info_page (void);
 extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
 
+/* header.c */
+extern void get_domain_name (char *domain);
+extern void get_host_name (char *host);
+extern char *  get_fqdn (char *host);
+
 /* inews.c */
-extern void get_host_name (char *host_name);
 extern void get_user_info (char *user_name, char *full_name);
-extern void get_from_name (char *user_name, char *host_name, char *full_name, char *from_name);
-extern void get_domain_name (char *inews_domain, char *domain);
+extern void get_from_name (char *user_name, char *full_name, char *from_name);
 extern int submit_news_file (char *name, int lines);
 
 /* init.c */

@@ -2264,7 +2264,6 @@ int
 mail_bug_report (void)
 {
 	char buf[LEN], nam[100];
-	const char *gateway;
 	const char *domain;
 	char ch;
 	char mail_to[HEADER_LEN];
@@ -2362,12 +2361,7 @@ mail_bug_report (void)
 	is_debug = FALSE;
 #endif
 #ifdef INEWS_MAIL_GATEWAY
-	gateway = INEWS_MAIL_GATEWAY;
-#else
-	gateway = 0;
-#endif
-#ifdef INEWS_MAIL_DOMAIN
-	domain = INEWS_MAIL_DOMAIN;
+	domain = DOMAIN_NAME;
 #else
 	domain = 0;
 #endif
@@ -2381,9 +2375,8 @@ mail_bug_report (void)
 		 is_nntp,
 		 is_nntp_only,
 		 xover_supported);
-	fprintf (fp, "CFG3: debug=%d gateway=[%s] domain=[%s]\n",
+	fprintf (fp, "CFG3: debug=%d domain=[%s]\n",
 		 is_debug,
-		 (gateway ? gateway : ""),
 		 (domain ? domain : ""));
 	fprintf (fp, "CFG4: threading=%d", default_thread_arts);
 	start_line_offset++;
@@ -2789,7 +2782,6 @@ cancel_article (
 	char line2[HEADER_LEN];
 	char author = TRUE;
 #else
-	char host_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
 #endif
@@ -2814,9 +2806,8 @@ cancel_article (
 #ifdef FORGERY
 	make_path_header (line, from_name);
 #else
-	get_host_name (host_name);
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, host_name, full_name, from_name);
+	get_from_name (user_name, full_name, from_name);
 #endif
 
 	if (debug == 2) {
@@ -3013,7 +3004,6 @@ repost_article (
 	char *ptr;
 	char line[HEADER_LEN];
 	char from_name[HEADER_LEN];
-	char host_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
 	int force_command = FALSE;
@@ -3078,9 +3068,8 @@ repost_article (
 
 	if (supersede) {
 #ifndef FORGERY
-		get_host_name (host_name);
 		get_user_info (user_name, full_name);
-		get_from_name (user_name, host_name, full_name, from_name);
+		get_from_name (user_name, full_name, from_name);
 
 		if (FromSameUser)
 #else
@@ -3113,9 +3102,8 @@ repost_article (
 		}
 	} else {		/* !supersede */
 #ifdef FORGERY
-		get_host_name (host_name);
 		get_user_info (user_name, full_name);
-		get_from_name (user_name, host_name, full_name, from_name);
+		get_from_name (user_name, full_name, from_name);
 		msg_add_header ("From", from_name);
 #endif
 	}
@@ -3477,7 +3465,6 @@ insert_from_header (
 {
 	char *ptr;
 	char from_name[HEADER_LEN];
-	char host_name[PATH_LEN];
 	char full_name[128];
 	char user_name[128];
 	char line[HEADER_LEN];
@@ -3491,9 +3478,8 @@ insert_from_header (
 		sprintf (outfile, "%s.%d", infile, process_id);
 #endif
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
-			get_host_name (host_name);
 			get_user_info (user_name, full_name);
-			get_from_name (user_name, host_name, full_name, from_name);
+			get_from_name (user_name, full_name, from_name);
 
 			/*
 			 * Check that at least one '.' comes after the '@' in the From: line
@@ -3770,38 +3756,13 @@ static void
 make_path_header (
 	char *line, char *from_name)
 {
-	char domain_name[PATH_LEN];
-	char host_name[PATH_LEN];
 	char full_name[128];
 	char user_name[128];
 
-	get_host_name (host_name);
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, host_name, full_name, from_name);
+	get_from_name (user_name, full_name, from_name);
 
-#if defined(INEWS_MAIL_GATEWAY) || defined(INEWS_MAIL_DOMAIN)
-	if (*(INEWS_MAIL_GATEWAY)) {
-		strcpy (line, user_name);
-	}
-#if defined(INEWS_MAIL_DOMAIN)
-	else if (*(INEWS_MAIL_DOMAIN)) {
-		strcpy (line, INEWS_MAIL_DOMAIN);
-		get_domain_name (line, domain_name);
-		if (*domain_name == '.') {
-			sprintf (line, "%s%s!%s", host_name, domain_name, user_name);
-		} else {
-			/* mail mark@garden.equinox.gen.nz if you think
-			 * host_name should be domain_name here...
-			 */
-			sprintf (line, "%s!%s", host_name, user_name);
-		}
-	} else {
-		sprintf (line, "%s!%s", host_name, user_name);
-	}
-#endif /* INEWS_MAIL_DOMAIN */
-#else
-	sprintf (line, "%s!%s", host_name, user_name);
-#endif
+	sprintf (line, "%s!%s", domain_name, user_name);
 	return;
 }
 #endif /* FORGERY */

@@ -1,3 +1,14 @@
+--unoff BETA release 970317 --
+
+350) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. automatic use of B-encoding if it's shorter then Q-encoding
+     ADD. display_rfc1522_header_undecoded swithc to tinrc
+     FIX. several supplied patches
+
+349) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. reworte INEWS_MAIL_* stuff
+     FIX. several patches
+
 --unoff BETA release 970314 --
 
 348) Jungshik Shin <jshin@pantheon.yale.edu>
@@ -1890,7 +1901,7 @@
 --950824BETA  PLMC.960428 --
 
 028) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     BUG. -DFORGERY without INEWS_MAIL_DOMAIN or INEWS_MAIL_GATEWAY
+     BUG. -DFORGERY without INEWS_MAIL_DOMAIN or DOMAIN_NAME
           did not work
      BUG. mail_to_someone did not use auto_cc
      ADD. auto_bcc switch

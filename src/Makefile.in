@@ -86,6 +86,7 @@ CFILES	= \
 	$(SRCDIR)/getline.c \
 	$(SRCDIR)/group.c \
 	$(SRCDIR)/hashstr.c \
+	$(SRCDIR)/header.c \
 	$(SRCDIR)/help.c \
 	$(SRCDIR)/inews.c \
 	$(SRCDIR)/init.c \
@@ -141,6 +142,7 @@ OFILES	= @ALLOCA@ \
 	$(OBJDIR)/getline.o \
 	$(OBJDIR)/group.o \
 	$(OBJDIR)/hashstr.o \
+	$(OBJDIR)/header.o \
 	$(OBJDIR)/help.o \
 	$(OBJDIR)/inews.o \
 	$(OBJDIR)/init.o \
@@ -334,6 +336,7 @@ $(OBJDIR)/getline.o:		$(SRCDIR)/getline.c $(TIN_DEP)
 $(OBJDIR)/group.o:		$(SRCDIR)/group.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/hashstr.o:		$(SRCDIR)/hashstr.c $(TIN_DEP)
+$(OBJDIR)/header.o:		$(SRCDIR)/header.c $(TIN_DEP)
 $(OBJDIR)/help.o:		$(SRCDIR)/help.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(TIN_DEP)

@@ -240,6 +240,7 @@ constext txt_help_ctrl_k[] = "^K\t  kill an article via a menu" cCRLF;
 constext txt_help_ctrl_l[] = "^L\t  redraw page" cCRLF;
 constext txt_help_d[] = "d\t  toggle display of subject or subject plus author" cCRLF;
 constext txt_help_dash[] = "-\t  display last article viewed" cCRLF;
+constext txt_help_display_rfc1522_header_undecoded[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_draw_arrow_mark[] = "Draw -> or highlighted bar for selection. <SPACE> toggles & <CR> sets.";
 constext txt_help_e[] =  "e\t  edit article (mail-groups only)" cCRLF;
 constext txt_help_editor_format[] = "Enter %E for editor, %F for filename, %N for line-number, <CR> to set.";
@@ -518,6 +519,7 @@ constext txt_opt_col_markdash[] = "Color of highlighting with _dash_  : ";
 #endif
 constext txt_opt_confirm_action[] = "Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = "Confirm before quitting            : ";
+constext txt_opt_display_rfc1522_header_undecoded[] = "Display RFC 1522 header undecoded  : ";
 constext txt_opt_draw_arrow_mark[] = "Draw -> instead of highlighted bar : ";
 constext txt_opt_editor_format[] = "Invocation of your editor          : ";
 constext txt_opt_filter_days[] = "No. of days a filter entry is valid: ";
@@ -662,6 +664,9 @@ constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to b
 # default_sigfile=!command  executes external command to generate a signature\n\
 # default_sigfile=--none     don't append a signature\n";
 constext txt_tinrc_defaults[] = "# default action/prompt strings\n";
+constext txt_tinrc_display_rfc1522_header_undecoded[] = "# if ON, RFC 1522(now RFC 2047)-style header is displayed without decoding.\n\
+# default is OFF so that RFC 1522(RFC 2047) style header will be decoded back\n\
+# to 8bit when displayed.\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
 # header=NUM  0=Subject: 1=From: 2=Message-Id:\n\
