@@ -97,10 +97,8 @@ char subscriptions_file[PATH_LEN];
 char txt_help_bug_report[LEN];	/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
-
 char domain_name[MAXHOSTNAMELEN];
 char host_name[MAXHOSTNAMELEN];
-
 char mail_address[LEN];			/* user's mail address */
 
 #ifdef VMS
@@ -346,6 +344,7 @@ void init_selfinfo (void)
 	setlocale (LC_ALL, "");
 #endif
 
+/* FIXME: move to get_user_name() [header.c] */
 #ifdef M_AMIGA
 	if ((ptr = getenv ("USERNAME")) != (char *) 0) {
 		my_strncpy (userid, ptr, sizeof (userid));
@@ -838,42 +837,36 @@ got_active:
 	add_addr[0] = '\0';
 	if ((ptr = getenv ("ADD_ADDRESS")) != (char *) 0) {
 		my_strncpy (add_addr, ptr, sizeof (add_addr));
-		goto got_add_addr;
-	}
-
-	joinpath (nam, rcdir, "add_address");
-	if ((fp = fopen (nam, "r")) != (FILE *) 0) {
-		if (fgets (add_addr, sizeof (add_addr), fp) != (char *) 0) {
-			ptr = strrchr (add_addr, '\n');
-			if (ptr != (char *) 0) {
-				*ptr = '\0';
+	} else {
+		joinpath (nam, rcdir, "add_address");
+		if ((fp = fopen (nam, "r")) != (FILE *) 0) {
+			if (fgets (add_addr, sizeof (add_addr), fp) != (char *) 0) {
+				ptr = strrchr (add_addr, '\n');
+				if (ptr != (char *) 0) {
+					*ptr = '\0';
+				}
 			}
+			fclose (fp);
 		}
-		fclose (fp);
 	}
-
-got_add_addr:;
 
 	/*
 	 *  check enviroment for BUG_ADDRESS
 	 */
 	if ((ptr = getenv ("BUG_ADDRESS")) != (char *) 0) {
 		my_strncpy (bug_addr, ptr, sizeof (bug_addr));
-		goto got_bug_addr;
-	}
-
-	joinpath (nam, rcdir, "bug_address");
-	if ((fp = fopen (nam, "r")) != (FILE *) 0) {
-		if (fgets (bug_addr, sizeof (bug_addr), fp) != (char *) 0) {
-			ptr = strrchr (bug_addr, '\n');
-			if (ptr != (char *) 0) {
-				*ptr = '\0';
+	} else {
+		joinpath (nam, rcdir, "bug_address");
+		if ((fp = fopen (nam, "r")) != (FILE *) 0) {
+			if (fgets (bug_addr, sizeof (bug_addr), fp) != (char *) 0) {
+				ptr = strrchr (bug_addr, '\n');
+				if (ptr != (char *) 0) {
+					*ptr = '\0';
+				}
 			}
+			fclose (fp);
 		}
-		fclose (fp);
 	}
-
-got_bug_addr:;
 	sprintf (txt_help_bug_report, txt_help_bug, bug_addr);
 
 #ifdef HAVE_PGP
@@ -921,18 +914,6 @@ int create_mail_save_dirs (void)
 
 
 #ifndef USE_INN_NNTPLIB
-
-/*
-char *
-GetFQDN (void)
-{
-	static char *fqdn = (char *) 0;
-
-	return fqdn;
-}
-*/
-
-
 char *
 GetConfigValue (
 	const char *name)
@@ -1018,5 +999,4 @@ got_org:	/* goto */
 
 	return conf_value;
 }
-
 #endif	/* USE_INN_NNTPLIB */

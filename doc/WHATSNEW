@@ -20,7 +20,7 @@ Major additions
 	u to toggle online, settable in tinrc and in attributes
     Various thread menu additions & enhancements
 
-. Now autoconfigures and builds out of the box
+. Now auto-configures and builds out of the box
 	Much improved configurability
 
 . Configuration menu completely rewritten ('M')

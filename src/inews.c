@@ -50,8 +50,6 @@ submit_inews (
 
 #ifdef NNTP_INEWS
 	char	from_name[PATH_LEN];
-	char	full_name[128];
-	char	user_name[128];
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
@@ -61,11 +59,35 @@ submit_inews (
 #endif
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
+		perror_message (txt_cannot_open, name);
 		return ret_code;
 	}
 
-	get_user_info (user_name, full_name);
-	get_from_name (from_name);
+	from_name[0]='\0';
+
+	while (fgets (line, sizeof (line), fp) != NULL) {
+		if (line[0] != '\n') {
+			ptr = strchr (line, ':');
+			if (ptr - line == 4 && !strncasecmp (line, "From", 4)) {
+				strcpy(from_name, ptr+2);
+				if((ptr = strchr(from_name, '\n'))) {
+					*ptr='\0';
+				}
+			break; /* found From: */
+			}
+		} else {
+			break; /* end of headers */
+		}
+	}
+	rewind(fp);
+	
+	if (from_name[0]=='\0') {
+		/* we could silently add a From: line here if we want to... */
+		error_message ("From: line missing.", "");
+		fclose (fp);
+		return ret_code;
+	}
+	
 
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line
@@ -113,7 +135,7 @@ submit_inews (
 	put_server (line);
 
 	if ((ptr = build_sender())) {
-		if(strcasecmp(from_name, ptr)) {
+		if(strcasecmp(rfc1522_decode(from_name), ptr)) {
 			sprintf (line, "Sender: %s", rfc1522_encode(ptr,ismail));
 			put_server (line);
 		}

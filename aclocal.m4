@@ -360,10 +360,6 @@ AC_DEFUN([CF_FUNC_SYSTEM],
 AC_MSG_CHECKING(if the system function returns usable child-status)
 AC_CACHE_VAL(cf_cv_system_status,[
 	AC_TRY_RUN([
-	int main() { exit(system("exit 23") != (23 << 8)); }
-	],
-	[cf_cv_system_status=yes],[
-	AC_TRY_RUN([
 #include <stdio.h>
 #include <signal.h>
 #if HAVE_SYS_WAIT_H
@@ -394,6 +390,9 @@ int main()
 }
 ],
 	[cf_cv_system_status=no],
+	[AC_TRY_RUN(
+	[int main() { exit(system("exit 23") != (23 << 8)); }],
+	[cf_cv_system_status=yes],
 	[cf_cv_system_status=unknown],
 	[cf_cv_system_status=unknown])],
 	[cf_cv_system_status=unknown])

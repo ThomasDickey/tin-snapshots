@@ -1,23 +1,26 @@
 Bugs
 ----
-o  commas in realname might cause problems in mailreplys
-   -> rewrite To: before mailing to old-sylte noation user@dom.in (relaname)
+o  supersedes does not work if one of the Newsgroups is not present in the
+   active file.
+
+o  commas in real-name might cause problems in mail-replys
+   -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
 
 o  tin ignores some file-permissions (.newsrc will be set to 644)
 
 o  src/Makefile ignores cf_cv_makeflags
 
-o  if you compile dubug.c with -O3 on IRIX (5.3) & native-compiler tin won't
+o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
    compile at all... - use -O2 for debug.c!!
 
 o  - fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
-   - 'any key' sems to be only 'return'
+   - 'any key' seems to be only 'return'
 
 o  join show_xcommentto/news_headers_to_display, remove auto-display of
    Keywords/Summary as it could be controlled by news_headers_to_display
 
 o  --enable-curses has several bugs
-   (screen redraw is brocken, tyy-settings get messed up, color might not
+   (screen redraw is broken, tty-settings get messed up, color might not
     work, ...)
 
 o  mark group as read warps into the next line if the groupname is very long
@@ -137,7 +140,7 @@ New features
 ------------
 o  Rather than cc/bcc, I'd like to see tin simply append the
    message to a mail folder, whose name is given by a setting
-   in the (M)enu command, possibly overidden by the current
+   in the (M)enu command, possibly overridden by the current
    setting of "record" environment variable.  The folder would
    have to be locked using a convention that will hold off
    the various Unix mailer programs.
@@ -187,7 +190,7 @@ o  Add to the 'M'enu:
         news_headers_not_to_display
         DEFAULT_MAILER
 
-o  Add a comandline swith that prints out all values of cpp-symbols etc.
+o  Add a comandline switch that prints out all values of cpp-symbols etc.
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
@@ -241,7 +244,7 @@ o  when posting to a group containing uppercase-letters: bring up a
 
 o  when server responses with:
    "441 The newsgroup "foo.bar" has been renamed to "bar.foo"."
-   ask the user if he want's to post to "bar.foo" instead of "foo.bar"
+   ask the user if he wants to post to "bar.foo" instead of "foo.bar"
    (Y/n)
 
 o  when From: only contains "First-name Last-name" tin strips the space
@@ -291,7 +294,7 @@ o  print a message at startup if server doesn't grok XOVER
 
 o  error message when tin -uv and using xover is misleading
 
-o  manpage claims that -R does not work but it does
+o  man-page claims that -R does not work but it does
 
 Not yet classified
 ------------------
@@ -299,7 +302,7 @@ o  what is tin -C (count articles)? - if running in batch-mode (-Z)
    -v gives a summary...
 
 o  tin -n -q does not show descriptions - but tin -q or tin -n does -
-   wouldn't it be better to add a new flaq to prevent tin form loading
+   wouldn't it be better to add a new flag to prevent tin form loading
    newsgroups file?
 
 o  looks like, that while being connected to a server, new newsgroups are

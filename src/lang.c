@@ -1040,12 +1040,15 @@ constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgr
 constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
   to just the  key points to which you are  responding, or  people will think\n\
-  you are a dweeb! Many people have the habit of skipping any article  whose\n\
+  you are a dweeb!  Many people have the habit of skipping any article  whose\n\
   first page  is largely  quoted material.  Format your  article to fit in 80\n\
   columns, since  that's the  conventional size.  If your  lines are too long\n\
   they'll wrap  around  ugly and  people won't  read what you  write.  If you\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
+constext txt_warn_sig_too_long[] ="\n\
+  Warning: Your signature is longer then %d lines. Since signatures usualy do\n\
+  not transport any useful  information they  should be as short as  possible.\n\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";

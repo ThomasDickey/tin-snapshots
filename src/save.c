@@ -1147,7 +1147,7 @@ post_process_uud (
 
 		my_strncpy (buf, save_filename (i), sizeof (buf));
 		if ((fp_in = fopen (buf, "r")) != (FILE *) 0) {
-			if (fgets (s, sizeof s, fp_in) == (char *) 0) {
+			if (fgets (s, sizeof (s), fp_in) == (char *) 0) {
 				fclose (fp_in);
 				continue;
 			}
@@ -1210,7 +1210,7 @@ post_process_uud (
 				/*
 				 *  read next line & if error goto next file in save array
 				 */
-				if (fgets (s, sizeof s, fp_in) == (char *) 0) {
+				if (fgets (s, sizeof (s), fp_in) == (char *) 0) {
 					break;
 				}
 			}
@@ -1265,7 +1265,7 @@ uudecode_file (
 				if (stat (file, &st) != -1) {
 					file_size = (int) st.st_size;
 				}
-				if (fgets (buf, sizeof buf, fp_in) != (char *) 0) {
+				if (fgets (buf, sizeof (buf), fp_in) != (char *) 0) {
 					ptr = strchr (buf, '\n');
 					if (ptr != (char *) 0) {
 						*ptr = '\0';
@@ -1407,7 +1407,7 @@ post_process_sh (
 				ptr3 = sh_pattern_3;
 
 				while (!feof (fp_in)) {
-					if (fgets (buf, sizeof buf, fp_in)) {
+					if (fgets (buf, sizeof (buf), fp_in)) {
 						/*
 						 *  find #!/bin/sh or #!/bin/sh pattern
 						 */
