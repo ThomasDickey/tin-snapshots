@@ -1,18 +1,37 @@
 Bugs
 ----
+o '-X' doesn't disable changing the killfile and the tinrc from
+  inside tin
+  [Urs Janssen <urs@tin.org>]
+
+o in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
+  batch_save etc. is broken.
+     scope=*
+     batch_save=OFF
+     scope=foo.bar
+     batch_save=ON
+   'tin -S' saves all groups, not only foo.bar
+   [Urs Janssen <urs@tin.org>]
+
+o  '-d' cmd-line switch tunrs of show_description in the tinrc, thus
+   afer once using '-d' (or -Q) you have to explicitly turn it on
+   again.
+   [Urs Janssen <urs@tin.org>]
+
+o  '-s' cmd-line switch specifies the spooldir also in the tinrc.
+   [Urs Janssen <urs@tin.org>]
+
 o  multiple calls of '/' are 'corrupting' the previus_page-pionter
    page-up jumps 'near' the last page before the search (should we remeber
    the previus page here (if so, we must hit the exact position again, IMHO
    this is usefull) or just go up one page?
+   [Dirk Nimmich <nimmich@uni-muenster.de>]
 
 o  strfmailer() calls rfc1522_encode() for Subject/To even with
    use_mailreader_i=ON (not very usefull as modern mailreaders
    also try to mime-encode these line which would lead to a double encoded
    subject (with inner encoding 'broken' due to escape_shell_meta() call
    in strfmailer())
-
-o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
-   [Urs Janssen <urs@tin.org>]
 
 o  external inews, ~/.signature and base64 encoding MUST 'fail'
    (article will be encoded, signature will be not!)
@@ -28,41 +47,16 @@ o  the cursor position gets 'lost' after 'y'ank in 'y'ank out - it'll
    be placed to the first(last?) group in your list, not to the one it
    pointed to before the yanks.
 
-o  The subject lines for the 1st newsgroup in .newsrc is truncated when
-   the author field is toggled off using the 'd' command.
-   [Jason C Lin <jlin@hawaii.edu>]
-   [I can't reproduce this - jason@radar.demon.co.uk]
-
 o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
    ~/.signature ~/.signature is used instead of ~/.tin/sig
    (does not happen if a sigfile is specified via attributes i.e.
     scope=*.test sigfile=--none [urs])
    [Stan Brooks <stabro@almatel.net>]
 
-o  tin (sometimes?) overwrites the newsgroup-number and number of unread
-   articles with spaces when turning on newsgroup descriptions with
-   strip_blanks=OFF - the bugs seems to be related to the screen-width and
-   does not show up on small screens, but in large xterms...
-   (sounds like a calculation error with float -> int values [urs])
-   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
-
-o  sometimes tin truncates newsgroup-names after turning off newsgroup
-   descriptions.
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
 o  commas in real-name might cause problems in mail-replys
    -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
 
-o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
-   compile at all... - use -O2 for debug.c!!
-
 o  fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
-
-o  --enable-curses has several bugs
-   (screen redraw is broken, tty-settings get messed up, color might not
-    work, ...)
-   [seems to work properly with ncurses and SVr4 curses - need specifics
-   dickey@clark.net]
 
 o  sender-patch
    If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
@@ -95,9 +89,6 @@ o  In cases where a tinrc variable is stored in group->attributes
    to fix the problem properly in config.c by flashing changes to all
    groups using default attributes.
 
-o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
-   ???
-
 o  reposting of a thread does not work
 
 o  with --enable-forgery reposting of an thread reposts only the first
@@ -110,18 +101,12 @@ o  if external inews could not be found posting fails but no dead.article
    is saved :(
    fall-back to build_in_inews would be good if running NNTP_ONLY
 
-o  if postings fails tin rereads the article numbers for the group you
-   tried to post in to sync with your new article which does not exist,
-   useless!
-
 o  Followup-To: line is not examined whether the mentioned group(s) are
    valid on this server.
 
 o  sort Followup-To:/Newsgroups: after stripping doubled newsgroups and
    before checking if they are identical, if so, strip Followup-To: and
    use unsorted but stripped Newsgroups:-line only
-
-o  if a colored signature wraps over a page-break, the coloring gets lost
 
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
@@ -130,19 +115,8 @@ o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
    expired! (cnews only?)), it is untouched, and remains marked as unread.
 
-o  Colors are not reset when tin is suspended with ^Z (signal.c)
-   Other tty characteristics (eg echo) are not reset after a fatal signal
-
 o  According to 026) in CHANGES, some of the config files can be
    trashed on a bad write (except .newsrc/tinrc/attributes)
-
-o  full_page_scroll=OFF is not implemented in page.c (article viewer)
-   and config.c (option 'M'enu)
-
-o  'Y'ank in after resync-time ends up in a double re-read of the active file
-
-o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
-   is missing for SCO
 
 o  remove built in path of external commands (metamail, ispell, ...)
    [for metamail $METAMAIL could be used to override systempath and
@@ -155,10 +129,40 @@ o  when enabling the 'cc/bcc on every message that is sent', and
    twice.  yes, sendmail removes the duplicate ... but it'd
    be better if tin caught this case first.
 
+Pager Problems
+--------------
+o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
+   [Urs Janssen <urs@tin.org>]
+
+o  if a colored signature wraps over a page-break, the coloring gets lost
+
+o  full_page_scroll=OFF is not implemented in page.c (article viewer)
+   and config.c (option 'M'enu)
+
+o  keyboard 'end' does not always scroll to the end.
+   Sometimes there are a few lines missing.
+   [Mark-Oliver Wolter <mow@mow.physik.uni-bremen.de>]
+
+o  word highlighting shouldn't be enabled in signatures, as '*'
+   and '_' characters may be used for ASCII art (e.g. '___').
+   [Vincent Lefevre <vlefevre@ens-lyon.fr>]
+
 New features
 ------------
+o  lock news/tinrc via flock, lockf, fcntl or dotfile-locking (depending
+   on which mechanism is available)
+
+o  add cmd-line/tinrc-switch to fetch only headers of unread articles;
+   in that case, make 'r' readin the reast of the articles
+
 o  use libuu (uudeview) for uudecoding
    (http://www.informatik.uni-frankfurt.de/~fp/uudeview/)
+
+o  Add a trunc() function or something similar for shortening long strings
+   like a group name to a fixed length ending in ... (like center_line does)
+   for embedding into status messages.
+   Maybe somehow merge with sized_message(), then you can use
+   message(txt, trunc(group, 20)) etc.
 
 o  check if server supports 'LIST MOTD' (i.e. INN 2.0) and display it
    on startup.
@@ -182,10 +186,6 @@ o  if using "-n" commandline switch you can't subscribe to newsgroups not
     description without loosing "-n" speed improvements; if the server
     understands LIST ACTIVE pattern we could also get group attribute
     (modereated, etc.)]
-
-o  word highlighting shouldn't be enabled in signatures, as '*'
-   and '_' characters may be used for ASCII art (e.g. '___').
-   [Vincent Lefevre <vlefevre@ens-lyon.fr>]
 
 o  allow changing From: in mail-replys
 
@@ -215,9 +215,9 @@ o  add RFC1468/1922 support
 o  add feature save selected/tagged files sequentially to the same file
    (like it's currently done when prepending filename with '=')
 
-o  add feature Cc:
-
 o  add counter to post-processing commands (processing file x of y)
+
+o  add feature Cc:
 
 o  add feature show_new_newsgroups_since
 
@@ -322,13 +322,17 @@ o  Bounce duplicate Message-ID's when the headers are read. This will
 
 Internal Changes
 ----------------
+o  -C (count articles) now should be obsolete
+   (use -l -Z -[v] for a quick check; -Z [-v] for a exact one)
+   -> remove -C
+
 o  use XGTITLE (if available) if -n cmd-line flag is present
 
 o  check where snprintf() would be usefull and if system has one
    (mutt comes with one).
 
-o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
-   add configure option for those
+o  clean-up INDEX_DAEMON code add configure option for it
+   (or remove the tind-code (IMHO it's no longer needed))
 
 o  change all system()/popen() calls to fork() and exec() calls
    [close security holes]
@@ -349,11 +353,18 @@ o  split tin.h/proto.h for better dependencies in make
 
 o  check where int/long/... should be replaced by size_t/uid_t/mode_t/off_t...
 
+o  add check for sizeof char, short, int, long, ...
+   make sure that the code works even with 'uncommon' values
+   (i.e. char = 1 byte with 32 bit)
+
 o  join Makefile and makefile (not entirely possible)
 
 o  move all strings to lang.c
 
 o  cleanup (=rewrite) post.c/inews.c/header.c/page.c
+
+o  cleanup main.c/init_selfinfo()
+   ('strace -e trace=file tin' and you know what I mean)
 
 o  is art->inthread really needed, surely art->thread contains enough
    information
@@ -368,7 +379,7 @@ o  check code with lclint (http://www.sds.lcs.mit.edu/lclint/)
 
 Docs/online help
 ----------------
-o  man page is still out dated and buggy
+o  man page is still out dated (and buggy)
 
 o  error message when tin -uv and using xover is misleading
 
@@ -380,7 +391,7 @@ o  'B'ody search doesn't jump to the match in the article
    (IMHO this is confusing inside the pager (at least if the hit
     is in the current article), but ok at any other level).
 
-o  strip Xref:-header if saving news in batch mode (-S)
+o  strip Xref:-header if saving news in batch mode (-S)?
 
 o  tin in batchmode dumps core if getting a SIGINT, useful?
 
@@ -395,9 +406,6 @@ o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
 o  what is with the conflicting settings? should we disallow those, or leave
    it to the user to realise that i.e. strip_blanks=ON && inverse_okay=ON
    looks ugly?
-
-o  what is tin -C (count articles)? - if running in batch-mode (-Z)
-   -v gives a summary...
 
 o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 
@@ -449,3 +457,45 @@ o  fix kill/hot mechanism so that it is possible to match articles on
    i.e.: killing on References only would be nice
 
 o  don't strip "Re: " out of the subject before applying the filter on it
+
+o  cleanup xref-filter (xref_score is no longer needed with score).
+
+Fixed allready?:
+----------------
+o  The subject lines for the 1st newsgroup in .newsrc is truncated when
+   the author field is toggled off using the 'd' command.
+   [Jason C Lin <jlin@hawaii.edu>]
+   [I can't reproduce this - jason@radar.demon.co.uk]
+
+o  tin (sometimes?) overwrites the newsgroup-number and number of unread
+   articles with spaces when turning on newsgroup descriptions with
+   strip_blanks=OFF - the bugs seems to be related to the screen-width and
+   does not show up on small screens, but in large xterms...
+   (sounds like a calculation error with float -> int values [urs])
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
+
+o  sometimes tin truncates newsgroup-names after turning off newsgroup
+   descriptions.
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
+o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
+   compile at all... - use -O2 for debug.c!!
+
+o  --enable-curses has several bugs
+   (screen redraw is broken, tty-settings get messed up, color might not
+    work, ...)
+   [seems to work properly with ncurses and SVr4 curses - need specifics
+    dickey@clark.net]
+
+o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
+   ???
+
+o  if postings fails tin rereads the article numbers for the group you
+   tried to post in to sync with your new article which does not exist,
+   useless!
+
+o  Colors are not reset when tin is suspended with ^Z (signal.c)
+   Other tty characteristics (eg echo) are not reset after a fatal signal
+
+o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
+   is missing for SCO

@@ -47,25 +47,10 @@ get_search_pattern(
 	char *def,
 	int which_hist)
 {
-	char pattern[LEN];
-
-	clear_message ();
-
 	sprintf (tmpbuf, (forward ? fwd_msg : bwd_msg), def);
 
-	if (!prompt_string (tmpbuf, pattern, which_hist))
-		return NULL;
-
-	if (pattern[0] != '\0')
-		strcpy (def, pattern);
-	else {
-		if (*def)
-			strcpy (pattern, def);
-		else {
-			info_message (txt_no_search_string);
-			return NULL;
-		}
-	}
+	if (!prompt_string_default(tmpbuf, def, txt_no_search_string, which_hist))
+		return (NULL);
 
 	wait_message (0, txt_searching);
 	stow_cursor();
@@ -78,14 +63,14 @@ get_search_pattern(
 	/*
 	 * A gross hack to simulate substrings with wildmat()
 	 */
-	sprintf(tmpbuf, "*%s*", pattern);
+	sprintf(tmpbuf, "*%s*", def);
 	return(tmpbuf);
 }
+
 
 /*
  * Called by group.c & page.c
  */
-
 int
 search_author (
 	int the_index,
@@ -143,7 +128,7 @@ search_author (
  * Called by config.c
  */
 int
-search_config(
+search_config (
 	int forward,
 	int current,
 	int last)
@@ -177,6 +162,7 @@ search_config(
 	clear_message ();
 	return result;
 }
+
 
 #ifndef INDEX_DAEMON
 /*
@@ -235,7 +221,7 @@ search_group (
  * Called by help.c
  */
 int
-search_help(
+search_help (
 	int forward,
 	int current,
 	int last)
@@ -347,7 +333,7 @@ search_subject_group (
 {
 	char *buf;
 	int i, j, depth=0;
-	int found = FALSE;
+	t_bool found = FALSE;
 
 	if (index_point < 0) {
 		info_message (txt_no_arts);
@@ -507,7 +493,6 @@ search_art_body (
 	struct t_article *art,
 	char *pat)
 {
-	char buf[LEN];
 	char *line;
 	FILE *fp;
 
@@ -521,8 +506,8 @@ search_art_body (
 	/*
 	 * Skip the header
 	 */
-	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
-		if (line[0] == '\0') /* tin_fgets() strips tailing \n */
+	while ((line = tin_fgets (fp, TRUE)) != (char *) 0) {
+		if (*line == '\0')
 			break;
 	}
 
@@ -534,14 +519,14 @@ search_art_body (
 	/*
 	 * Now search the body
 	 */
-	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
+	while ((line = tin_fgets (fp, FALSE)) != (char *) 0) {
 		if (REGEX_MATCH (line, pat, TRUE)) {
 			fclose (fp);
 			return TRUE;
 		}
 	}
 
-	fclose (fp);
+	TIN_FCLOSE (fp);
 
 	if (tin_errno != 0)
 		return -1;
@@ -589,7 +574,7 @@ search_body (
 		if (group->attribute->show_only_unread && arts[i].status == ART_READ)
 			continue;
 
-		sprintf(msg, txt_searching_body, ++j, art_cnt);
+		sprintf(mesg, txt_searching_body, ++j, art_cnt);
 
 		switch (search_art_body (group_path, &arts[i], pat)) {
 			case TRUE:					/* Found it okay */

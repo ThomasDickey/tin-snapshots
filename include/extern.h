@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : extern.h
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 31.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1998-07-13
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -31,12 +31,14 @@ extern int _flsbuf (int, FILE *);
 extern int atoi (char *);
 #endif
 #ifdef DECL_ATOL
-extern int atol (char *);
+extern long atol (char *);
 #endif
-#ifdef DECL_BCOPY
+#ifndef HAVE_MEMCPY
+#	ifdef DECL_BCOPY
 extern int bcopy (char *, char *, int);
-#endif
-#ifdef DECL_BZERO
+#	endif /* DECL_BCOPY */
+#endif /* !HAVE_MEMCPY */
+#ifdef DECL_BZERO /* FD_ZERO() might use this */
 extern void bzero (char *, int);
 #endif
 #ifdef DECL_CALLOC
@@ -109,7 +111,7 @@ extern struct servent *getservbyname (const char *, const char *);
 extern unsigned long inet_addr (const char *);
 #endif
 #ifdef DECL_IOCTL
-extern int ioctl (int, unsigned long, void *);
+extern int ioctl (int, int, void *);
 #endif
 #if defined(DECL_ISASCII) && !defined(isascii)
 extern int isascii (int);
@@ -246,9 +248,7 @@ extern char *optarg;
 /*
  * Local variables
  */
-
 extern FILE *note_fp;				/* body of current article */
-extern TCP *nntp_rd_fp, *nntp_wr_fp;
 extern char **news_headers_to_display_array;
 extern char **news_headers_to_not_display_array;
 extern char *OPT_CHAR_list[];
@@ -323,7 +323,7 @@ extern char mailbox[PATH_LEN];
 extern char mailer[PATH_LEN];
 extern char mailgroups_file[PATH_LEN];
 extern char mm_charset[LEN];
-extern char msg[LEN];
+extern char mesg[LEN];
 extern char msg_headers_file[PATH_LEN];
 extern char my_distribution[LEN];
 extern char newnewsrc[PATH_LEN];
@@ -396,6 +396,7 @@ extern constext txt_art_thread_regex_tag[];
 extern constext txt_art_unavailable[];
 extern constext txt_article_cancelled[];
 extern constext txt_article_cannot_open[];
+extern constext txt_article_cannot_reopen[];
 extern constext txt_article_reposted[];
 extern constext txt_at_s[];
 extern constext txt_auth_failed[];
@@ -413,6 +414,8 @@ extern constext txt_bad_active_file[];
 extern constext txt_bad_article[];
 extern constext txt_bad_command[];
 extern constext txt_base64[];
+extern constext txt_batch_update_unavail[];
+extern constext txt_batch_update_failed[];
 extern constext txt_begin_of_art[];
 extern constext txt_caching_disabled[];
 extern constext txt_cancel_article[];
@@ -754,7 +757,6 @@ extern constext txt_newsrc_nogroups[];
 extern constext txt_newsrc_saved[];
 extern constext txt_next_resp[];
 extern constext txt_nntp_authorization_failed[];
-extern constext txt_nntp_to_fp_cannot_reopen[];
 extern constext txt_no[];
 extern constext txt_no_arts[];
 extern constext txt_no_arts_posted[];
@@ -1138,7 +1140,6 @@ extern int default_thread_arts;
 extern int first_group_on_screen;
 extern int first_subj_on_screen;
 extern int glob_respnum;
-extern int global_filtered_articles;
 extern int group_hash[TABLE_SIZE];
 extern int group_top;
 extern int groupname_len;
@@ -1148,7 +1149,6 @@ extern int iso2asc_supported;
 extern int last_group_on_screen;
 extern int last_resp;
 extern int last_subj_on_screen;
-extern int local_filtered_articles;
 extern int mail_mime_encoding;
 extern int max_active;
 extern int max_art;
@@ -1167,12 +1167,7 @@ extern int num_of_selected_arts;
 extern int num_of_tagged_arts;
 extern int num_save;
 extern int post_mime_encoding;
-extern int process_id;
-extern int real_gid;
-extern int real_uid;
 extern int reread_active_file_secs;
-extern int show_subject;
-extern int space_mode;
 extern int start_line_offset;
 extern int strip_bogus;
 extern int system_status;
@@ -1180,8 +1175,6 @@ extern int tex2iso_supported;
 extern int this_resp;
 extern int thread_basenote;
 extern int tin_errno;
-extern int tin_gid;
-extern int tin_uid;
 extern int top;
 extern int top_base;
 extern int wildcard;
@@ -1195,7 +1188,12 @@ extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
 extern long mark_body;					/* ftell on beginning of body */
 extern long note_size;
 
+extern gid_t real_gid;
+extern gid_t tin_gid;
 extern mode_t real_umask;
+extern pid_t process_id;
+extern uid_t real_uid;
+extern uid_t tin_uid;
 
 extern struct passwd *myentry;
 extern struct t_article *arts;
@@ -1244,17 +1242,20 @@ extern t_bool draw_arrow_mark;
 extern t_bool force_reread_active_file;
 extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;
+extern t_bool global_filtered_articles;
 extern t_bool got_sig_pipe;
 extern t_bool group_catchup_on_exit;
 extern t_bool in_headers; /* colorful headers */
 extern t_bool inverse_okay;
 extern t_bool info_in_last_line;
+extern t_bool local_filtered_articles;
 extern t_bool local_index;
 extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
 extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
 extern t_bool mail_8bit_header;
 extern t_bool mail_news;
 extern t_bool mark_saved_read;
+extern t_bool list_active;
 extern t_bool newsrc_active;
 extern t_bool note_end;					/* end of article ? */
 extern t_bool no_write;
@@ -1279,10 +1280,12 @@ extern t_bool show_last_line_prev_page;
 extern t_bool show_lines;
 extern t_bool show_only_unread_groups;
 extern t_bool show_signatures;
+extern t_bool show_subject;
 extern t_bool show_xcommentto;
 extern t_bool sigdashes;
 extern t_bool signature_repost;
 extern t_bool space_goto_next_unread;
+extern t_bool space_mode;
 extern t_bool pgdn_goto_next;
 extern t_bool start_any_unread;
 extern t_bool start_editor_offset;
@@ -1519,7 +1522,11 @@ extern constext txt_opt_mail_address[];
 	extern constext txt_cannot_stat_group[];
 	extern constext txt_cannot_stat_index_file[];
 #else
+	extern constext txt_art_deleted[];
+	extern constext txt_art_undeleted[];
 	extern constext txt_intro_page[];
+	extern constext txt_processing_mail_arts[];
+	extern constext txt_processing_saved_arts[];
 #endif /* INDEX_DAEMON */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)

@@ -33,11 +33,11 @@ prompt_num (
 
 	clear_message ();
 
-	sprintf (msg, "%c", ch);
+	sprintf (mesg, "%c", ch);
 
-	if ((p = tin_getline (prompt, TRUE, msg, 0, HIST_OTHER)) != (char *) 0) {
-		strcpy (msg, p);
-		num = atoi (msg);
+	if ((p = tin_getline (prompt, TRUE, mesg, 0, HIST_OTHER)) != (char *) 0) {
+		strcpy (mesg, p);
+		num = atoi (mesg);
 	} else
 		num = -1;
 
@@ -144,12 +144,14 @@ prompt_yn (
 	while (yn_loop) {
 		prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
 
-		MoveCursor (line, 0);
-		CleartoEOLN ();
+		if (!cmd_line) {
+			MoveCursor (line, 0);
+			CleartoEOLN ();
+		}
 		my_printf ("%s%c", prompt, prompt_ch);
-		cursoron ();
+		if (!cmd_line) cursoron ();
 		my_flush ();
-		MoveCursor (line, (int) strlen (prompt));
+		if (!cmd_line) MoveCursor (line, (int) strlen (prompt));
 
 		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r'))
 			ch = prompt_ch;
@@ -188,14 +190,16 @@ prompt_yn (
 		}
 	}
 
-	if (line == cLINES)
-		clear_message ();
-	else {
-		MoveCursor (line, (int) strlen (prompt));
-		my_fputc (((ch == ESC) ? prompt_ch : ch), stdout);
+	if (!cmd_line) {
+		if (line == cLINES)
+			clear_message ();
+		else {
+			MoveCursor (line, (int) strlen (prompt));
+			my_fputc (((ch == ESC) ? prompt_ch : ch), stdout);
+		}
+		cursoroff ();
+		my_flush ();
 	}
-	cursoroff ();
-	my_flush ();
 
 	return (tolower ((unsigned char)ch) == tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
@@ -385,6 +389,39 @@ prompt_option_char (
 	return TRUE;
 }
 
+/*
+ * Get a string. Make it the new default.
+ * If none given, use the default.
+ * Return the string or NULL if we can't get anything useful
+ */
+char *
+prompt_string_default(
+	char *prompt,
+	char *def,
+	const char *failtext,
+	int  history)
+{
+	char pattern[LEN];
+
+	clear_message();
+
+	if (!prompt_string (prompt, pattern, history)) {
+		clear_message();
+		return NULL;
+	}
+
+	if (pattern[0] != '\0')			/* got a string - make it the default */
+		my_strncpy (def, pattern, LEN);
+	else {
+		if (def[0] == '\0')	{		/* no default - give up */
+			info_message (failtext);
+			return NULL;
+		}
+	}
+
+	return(def);					/* use the default */
+}
+
 
 /*
  * Format a message such that it'll fit within the screen width
@@ -404,8 +441,8 @@ sized_message(
 		want--;
 	if (have > want)
 		have = want;
-	sprintf (msg, format, have, subject);
-	return(msg);
+	sprintf (mesg, format, have, subject);
+	return(mesg);
 }
 
 

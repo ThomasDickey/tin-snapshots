@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 980618
+PVER	= 980730
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -24,6 +24,7 @@ TOLDIR	= ./tools
 OLDDIR	= ./old
 
 HFILES	= \
+	$(INCDIR)/bool.h \
 	$(INCDIR)/bugrep.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \

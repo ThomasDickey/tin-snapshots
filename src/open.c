@@ -16,11 +16,15 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
-#if 0
+
+/*
+ * local prototypes
+ */
+static int base_comp (t_comptype *p1, t_comptype *p2);
+#if 0 /* currently unused */
 	static FILE * open_xhdr_fp (char *header, long min, long max);
 #endif /* 0 */
 
-static int base_comp (t_comptype *p1, t_comptype *p2);
 
 long head_next;
 
@@ -32,13 +36,13 @@ long head_next;
 
 char *nntp_server = (char *)0;
 
+
 /*
  * Open a connection to the NNTP server
- * Returns:   0	success
- *	         > 0	NNTP error response code
- *          < 0	-errno from system call or similar error
+ * Returns: 0	success
+ *        > 0	NNTP error response code
+ *        < 0	-errno from system call or similar error
  */
-
 int
 nntp_open (void)
 {
@@ -197,15 +201,15 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		 * have been forced by XOVER
 		 */
 #		ifdef DEBUG
-		debug_nntp ("nntp_open", "authenticate");
-#	endif /* DEBUG */
+			debug_nntp ("nntp_open", "authenticate");
+#		endif /* DEBUG */
 		authenticate (nntp_server, userid, TRUE);
 #	endif /* 0 */
 	}
 
 #endif	/* NNTP_ABLE */
 
-DEBUG_IO((stderr, "nntp_open okay\n"));
+	DEBUG_IO((stderr, "nntp_open okay\n"));
 	return 0;
 }
 
@@ -227,9 +231,9 @@ nntp_close (void)
  *  Get a response code from the server.
  *  Returns:
  *    +ve NNTP return code
- *    -1  on an error
+ *    -1  on an error or user abort. We don't differentiate.
  *  If 'message' is not NULL, then any trailing text after the response
- *	 code is copied into it.
+ *  code is copied into it.
  *  Does not perform authentication if required; use get_respcode()
  *  instead.
  */
@@ -239,11 +243,10 @@ get_only_respcode (
 	char *message)
 {
 #ifdef NNTP_ABLE
-	char line[NNTP_STRLEN];
 	char *ptr, *end;
 	int respcode;
 
-	ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
+	ptr = tin_fgets (FAKE_NNTP_FP, FALSE);
 
 	if (tin_errno || ptr == NULL)
 		return -1;
@@ -261,10 +264,10 @@ DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
 		debug_nntp ("get_only_respcode", "timeout");
 #endif
 		put_server (last_put);
-		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
+		ptr = tin_fgets (FAKE_NNTP_FP, FALSE);
 
 		if (tin_errno)
-			return(-1);
+			return -1;
 
 		respcode = (int) strtol(ptr, &end, 10);
 DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
@@ -295,7 +298,6 @@ get_respcode (
 {
 #ifdef NNTP_ABLE
 	char savebuf[NNTP_STRLEN];
-	char line[NNTP_STRLEN];
 	char *ptr, *end;
 	int respcode;
 
@@ -307,13 +309,13 @@ get_respcode (
 #ifdef DEBUG
 		debug_nntp ("get_respcode", "authentication");
 #endif
-		strcpy (savebuf, last_put);		/* Take copy, as authenticate() will clobber this */
+		strncpy (savebuf, last_put, NNTP_STRLEN);		/* Take copy, as authenticate() will clobber this */
 
 		if (authenticate (nntp_server, userid, FALSE)) {
 			strcpy (last_put, savebuf);
 
 			put_server (last_put);
-			ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
+			ptr = tin_fgets (FAKE_NNTP_FP, FALSE);
 
 			if (tin_errno)
 				return -1;
@@ -348,7 +350,6 @@ nntp_command (
 	int success,
 	char *message)
 {
-/*	int respcode; */
 DEBUG_IO((stderr, "nntp_command (%s)\n", command));
 #ifdef DEBUG
 	debug_nntp ("nntp command", command);
@@ -367,7 +368,7 @@ DEBUG_IO((stderr, "nntp_command (%s)\n", command));
 #ifdef DEBUG
 	debug_nntp (command, "OK");
 #endif
-	return nntp_rd_fp;
+	return FAKE_NNTP_FP;
 }
 #endif
 
@@ -379,7 +380,7 @@ FILE *
 open_news_active_fp (void)
 {
 #ifdef NNTP_ABLE
-	if (read_news_via_nntp)
+	if (read_news_via_nntp && !read_saved_news)
 		return (nntp_command ("LIST", OK_GROUPS, NULL));
 	else
 #endif
@@ -396,7 +397,7 @@ open_overview_fmt_fp (void)
 	char line[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
-	if (read_news_via_nntp) {
+	if (read_news_via_nntp && !read_saved_news) {
 		if (!xover_supported)
 			return (FILE *) 0;
 
@@ -423,22 +424,22 @@ open_newgroups_fp (
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
-	struct tm *tm;
+	struct tm *ngtm;
 
-	if (read_news_via_nntp) {
+	if (read_news_via_nntp && !read_saved_news) {
 		if (idx == -1)
 			return (FILE *) 0;
 
-		tm = localtime (&newnews[idx].time);
+		ngtm = localtime (&newnews[idx].time);
 /*
  * in the current draft NEWGROUPS is allowed to take a 4 digit year
  * componennt - but even with a 2 digit year componennt it is y2k
- * compilant... we should switch over to tm->tm_year + 1900
+ * compilant... we should switch over to ngtm->tm_year + 1900
  * after most of the server could handle the new format
  */
 		sprintf (line, "NEWGROUPS %02d%02d%02d %02d%02d%02d",
-			tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
-			tm->tm_hour, tm->tm_min, tm->tm_sec);
+			ngtm->tm_year % 100, ngtm->tm_mon + 1, ngtm->tm_mday,
+			ngtm->tm_hour, ngtm->tm_min, ngtm->tm_sec);
 
 		return (nntp_command (line, OK_NEWGROUPS, NULL));
 	} else
@@ -454,7 +455,7 @@ FILE *
 open_subscription_fp (void)
 {
 #ifdef NNTP_ABLE
-	if (read_news_via_nntp)
+	if (read_news_via_nntp && !read_saved_news)
 		return (nntp_command ("LIST SUBSCRIPTIONS", OK_GROUPS, NULL));
 	else
 #endif
@@ -492,7 +493,7 @@ open_newsgroups_fp (void)
 {
 #ifdef NNTP_ABLE
 	FILE *result;
-	if (read_news_via_nntp) {
+	if (read_news_via_nntp && !read_saved_news) {
 		if (read_local_newsgroups_file) {
 			result = fopen (local_newsgroups_file, "r");
 			if (result != NULL) {
@@ -620,16 +621,14 @@ open_art_header (
  */
 static FILE *
 get_article (
+	FILE *art_fp,
 	int lines)
 {
-	char tempfile[PATH_LEN];
-	char line[HEADER_LEN];
-	char *ptr;
 	FILE *fp;
-	struct stat sb;
-#ifdef SHOW_PROGRESS
+	char *ptr;
+	char tempfile[PATH_LEN];
 	int count = 0;
-#endif
+	struct stat sb;
 
 	sprintf (tempfile, "%stin_nntpXXXXXX", TMPDIR);
 	mktemp (tempfile);
@@ -639,7 +638,7 @@ get_article (
 		return ((FILE *) 0);
 	}
 
-	while ((ptr = tin_fgets(line, sizeof(line), (FILE*)nntp_rd_fp)) != NULL) {
+	while ((ptr = tin_fgets(art_fp, FALSE)) != NULL) {
 		fputs (ptr, fp);
 		fputs ("\n", fp);		/* The one case where we do need the \n */
 								/* as rfc1521_decode() still expects this */
@@ -647,10 +646,10 @@ get_article (
 		 * Use the default message if one hasn't been supplied
 		 * Body search is currently the only function that has a different message
 		 */
-#ifdef SHOW_PROGRESS
+
 		if (lines && ++count % MODULO_COUNT_NUM == 0)
-			show_progress((*msg=='\0') ? txt_reading_article : msg, count, lines);
-#endif
+			show_progress((*mesg=='\0') ? txt_reading_article : mesg, count, lines);
+
 	}
 
 	if (tin_errno) {
@@ -673,7 +672,7 @@ get_article (
 	note_size = ((stat (tempfile, &sb) < 0) ? 0 : sb.st_size);
 
 	if ((fp = fopen (tempfile, "r")) == (FILE *) 0) {	/* Reopen for just reading */
-		perror_message (txt_nntp_to_fp_cannot_reopen, tempfile);
+		perror_message (txt_article_cannot_reopen, tempfile);
 		return (FILE *) 0;
 	}
 
@@ -718,12 +717,13 @@ open_art_fp (
 
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
+		FILE *nntp_fp;
 
 		sprintf (buf, "ARTICLE %ld", art);
-		if (nntp_command (buf, OK_ARTICLE, NULL) == NULL)
+		if ((nntp_fp = nntp_command (buf, OK_ARTICLE, NULL)) == NULL)
 			return (FILE *) 0;
 
-		art_fp = get_article (lines);
+		art_fp = get_article (nntp_fp, lines);
 	} else {
 #endif /* NNTP_ABLE */
 		joinpath (buf, active[i].spooldir, group_path);
@@ -753,31 +753,11 @@ open_art_fp (
 	return fp;
 }
 
-/* This will come in useful for filtering on non-overview hdr fields */
-#if 0
-static FILE *
-open_xhdr_fp (
-	char *header,
-	long min,
-	long max)
-{
-#ifdef NNTP_ABLE
-	if (read_news_via_nntp) {
-		char buf[NNTP_STRLEN];
-
-		sprintf(buf, "XHDR %s %ld-%ld", header, min, max);
-		return(nntp_command(buf, OK_HEAD));
-	} else
-#endif
-		return (FILE *) 0;		/* Some trick implementation for local spool... */
-}
-#endif /* 0 */
 
 
 /*
  *  Longword comparison routine for the qsort()
  */
-
 static int
 base_comp (
 	t_comptype *p1,
@@ -788,8 +768,10 @@ base_comp (
 
 	if (*a < *b)
 		return -1;
+
 	if (*a > *b)
 		return 1;
+
 	return 0;
 }
 
@@ -811,7 +793,6 @@ base_comp (
  * top_base is one past top.
  * Returns total number of articles in group, or -1 on error
  */
-
 long
 setup_hard_base (
 	struct t_group *group,
@@ -851,7 +832,7 @@ setup_hard_base (
 			debug_nntp ("setup_base", buf);
 #endif
 
-			while ((ptr = tin_fgets(buf, sizeof(buf), (FILE*)nntp_rd_fp)) != NULL) {
+			while ((ptr = tin_fgets(FAKE_NNTP_FP, FALSE)) != NULL) {
 				if (top_base >= max_art)
 					expand_art ();
 
@@ -940,37 +921,32 @@ vGet1GrpArtInfo (
 	long	lMinOld = grp->xmin;
 	long	lMaxOld = grp->xmax;
 
-	vGrpGetArtInfo (
-		grp->spooldir,
-		grp->name,
-		grp->type,
-		&grp->count,
-		&grp->xmax,
-		&grp->xmin);
+	vGrpGetArtInfo (grp->spooldir, grp->name, grp->type, &grp->count, &grp->xmax, &grp->xmin);
 
 	if (grp->newsrc.num_unread > grp->count) {
 #ifdef DEBUG
 		my_printf (cCRLF "Unread WRONG %s unread=[%ld] count=[%ld]", grp->name, grp->newsrc.num_unread, grp->count);
 		my_flush ();
-#endif
+#endif /* DEBUG */
 		grp->newsrc.num_unread = grp->count;
 	}
 
 	if (grp->xmin != lMinOld || grp->xmax != lMaxOld) {
-		expand_bitmap(grp, grp->xmin);
+		expand_bitmap(grp, 0);
 #ifdef DEBUG
 		my_printf (cCRLF "Min/Max DIFF %s old=[%ld-%ld] new=[%ld-%ld]", grp->name, lMinOld, lMaxOld, grp->xmin, grp->xmax);
 		my_flush ();
-#endif
+#endif /* DEBUG */
 	}
 }
+
 
 void
 vGrpGetSubArtInfo (void)
 {
 #ifndef INDEX_DAEMON
-	int	iNum;
-	struct	t_group *psGrp;
+	int iNum;
+	struct t_group *psGrp;
 
 	if (INTERACTIVE)
 		wait_message (0, txt_rereading_active_file);
@@ -981,18 +957,18 @@ vGrpGetSubArtInfo (void)
 		if (psGrp->subscribed) {
 			vGet1GrpArtInfo(psGrp);
 
-#ifdef SHOW_PROGRESS
 			if (iNum % 5 == 0)
 				spin_cursor ();
-#endif
+
 		}
 	}
 	if (cmd_line) {
 		printf ("\r\n");
 		fflush (stdout);
 	}
-#endif
+#endif /* !INDEX_DAEMON */
 }
+
 
 /*
  *  Find the total, max & min articles number for specified group
@@ -1008,26 +984,26 @@ vGrpGetArtInfo (
 	long	*plArtMax,
 	long	*plArtMin)
 {
-	char	acBuf[NNTP_STRLEN];
-	DIR		*tDirFile;
-	DIR_BUF	*tFile;
-	long	lArtNum;
+	DIR *tDirFile;
+	DIR_BUF *tFile;
+	char acBuf[NNTP_STRLEN];
+	long lArtNum;
 #ifdef M_AMIGA
-	long	lArtMin;
-	long	lArtMax;
+	long lArtMin;
+	long lArtMax;
 
 	lArtMin = *plArtMin;
 	lArtMax = *plArtMax;
-#endif
+#endif /* M_AMIGA */
 
 	if (read_news_via_nntp && iGrpType == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
-		char	acLine[NNTP_STRLEN];
+		char acLine[NNTP_STRLEN];
 
 		sprintf (acBuf, "GROUP %s", pcGrpName);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("vGrpGetArtInfo", acBuf);
-#endif
+#	endif /* DEBUG */
 		put_server (acBuf);
 
 		switch (get_respcode(acLine)) {
@@ -1045,7 +1021,7 @@ vGrpGetArtInfo (
 
 			case ERR_ACCESS:
 				error_message (cCRLF "%s", acLine);
-				tin_done (EXIT_NNTP_ERROR);
+				tin_done (NNTP_ERROR_EXIT);
 				/* keep lint quiet: */
 				/* FALLTHROUGH */
 			default:
@@ -1057,7 +1033,7 @@ vGrpGetArtInfo (
 #else
 		my_fprintf(stderr, "Unreachable ?\n");
 		return(0);
-#endif	/* NNTP_ABLE */
+#endif /* NNTP_ABLE */
 	} else {
 #ifdef M_AMIGA
 		if (!lArtMin)
@@ -1101,3 +1077,24 @@ vGrpGetArtInfo (
 
 	return(0);
 }
+
+
+/* This will come in useful for filtering on non-overview hdr fields */
+#if 0
+static FILE *
+open_xhdr_fp (
+	char *header,
+	long min,
+	long max)
+{
+#	ifdef NNTP_ABLE
+	if (read_news_via_nntp && !read_saved_news) {
+		char buf[NNTP_STRLEN];
+
+		sprintf(buf, "XHDR %s %ld-%ld", header, min, max);
+		return(nntp_command(buf, OK_HEAD));
+	} else
+#	endif /* NNTP_ABLE */
+		return (FILE *) 0;		/* Some trick implementation for local spool... */
+}
+#endif /* 0 */

@@ -37,12 +37,13 @@ t_bool
 overview_xref_support (void)
 {
 	FILE *fp;
-	char buf[HEADER_LEN];
+	char *ptr;
 	t_bool supported = FALSE;
 
 	if ((fp = open_overview_fmt_fp ()) != (FILE *) 0) {
-		while ((tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
-			if (!strcasecmp(buf, "Xref:full")) {
+		while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
+
+			if (!strcasecmp(ptr, "Xref:full")) {
 				supported = TRUE;
 #ifdef NNTP_ABLE
 				drain_buffer(fp);
@@ -76,16 +77,16 @@ read_xref_header (
 {
 	/* xref_supported means already supported in xover record */
 	if (!xref_supported && read_news_via_nntp && art && !art->xref) {
+		FILE *fp;
 		char *ptr, *q;
 		char buf[HEADER_LEN];
 		long artnum = 0;
 
 		sprintf(buf, "XHDR XREF %ld", art->artnum);
-		put_server (buf);
-		if (get_respcode (NULL) != OK_HEAD)
+		if ((fp = nntp_command (buf, OK_HEAD, NULL)) == NULL)
 			return;
-		while (tin_fgets (buf, sizeof (buf) -1, (FILE *) nntp_rd_fp)) {
-			ptr = buf;
+
+		while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
 			while (*ptr && isspace(*ptr))
 				ptr++;
 			if (*ptr == '.')
@@ -95,7 +96,7 @@ read_xref_header (
 			 */
 			artnum = atol (ptr);
 			if ((artnum == art->artnum) && !art->xref && !strstr (ptr, "(none)")) {
-				q = strchr (ptr, ' ');	/* skip artikel number */
+				q = strchr (ptr, ' ');	/* skip article number */
 				if (q == NULL)
 					continue;
 				ptr = q;
@@ -126,8 +127,8 @@ art_mark_xref_read (
 	char *xref_ptr;
 	char *group;
 	char *ptr, c;
-	int artread;
 	long artnum;
+	t_bool artread;
 	struct t_group *psGrp;
 
 #ifdef NNTP_ABLE
@@ -176,15 +177,15 @@ art_mark_xref_read (
 
 #ifdef DEBUG
 		if (debug == 3) {
-			sprintf (msg, "LOOKUP Xref: [%s:%ld] active=[%s] num_unread=[%ld]",
+			sprintf (mesg, "LOOKUP Xref: [%s:%ld] active=[%s] num_unread=[%ld]",
 				group, artnum,
 				(psGrp ? psGrp->name : ""),
 				(psGrp ? psGrp->newsrc.num_unread : 0));
 #	ifdef DEBUG_NEWSRC
-			debug_print_comment (msg);
+			debug_print_comment (mesg);
 			debug_print_bitmap (psGrp, NULL);
 #	endif /* DEBUG_NEWSRC */
-			error_message (msg);
+			error_message (mesg);
 		}
 #endif /* DEBUG */
 
@@ -197,13 +198,13 @@ art_mark_xref_read (
 						psGrp->newsrc.num_unread--;
 #ifdef DEBUG
 					if (debug == 3) {
-						sprintf (msg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
+						sprintf (mesg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
 							group, artnum, psGrp->newsrc.num_unread);
 #	ifdef DEBUG_NEWSRC
-						debug_print_comment (msg);
+						debug_print_comment (mesg);
 						debug_print_bitmap (psGrp, NULL);
 #	endif /* DEBUG_NEWSRC */
-						wait_message (2, msg);
+						wait_message (2, mesg);
 					}
 #endif /* DEBUG */
 				}

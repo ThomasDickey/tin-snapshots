@@ -20,7 +20,7 @@ static const char * get_full_name(void);
 /* find hostname */
 const char *
 get_host_name (
-void)
+	void)
 {
 	char *ptr;
 	static char hostname[MAXHOSTNAMELEN+1]; /* need space for '\0' */

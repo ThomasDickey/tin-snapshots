@@ -171,8 +171,10 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 
 #endif /* HAVE_POSIX_JC */
 
+
 static const char *
-signal_name(int code)
+signal_name(
+	int code)
 {
 	size_t n;
 	const char *name = "unknown";
@@ -187,7 +189,8 @@ signal_name(int code)
 
 #if defined(SIGWINCH) || defined(SIGTSTP)
 void
-handle_resize (int repaint)
+handle_resize (
+	int repaint)
 {
 #ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
@@ -197,7 +200,7 @@ handle_resize (int repaint)
 	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
 		ring_bell ();
 		wait_message(3, txt_screen_too_small_exiting);
-		tin_done (EXIT_ERROR);
+		tin_done (EXIT_FAILURE);
 	}
 
 	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
@@ -212,23 +215,15 @@ handle_resize (int repaint)
 #endif /* USE_CURSES */
 		switch (my_context) {
 		case cArt:
-			{
-				int i = 0;
-				ClearScreen ();
-
-/* FIXME: ugly code */
-/* calculate maxlen of groupname to display */
+			ClearScreen ();
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
-				i += 24; /* len of "Group %s ('q' to quit)... " */
+			/* strlen("Group %s ('q' to quit)... 'low'/'high'") = 45 */
+			wait_message (0, txt_group, cCOLS - 45, glob_art_group);
 #else
-				i += 10; /* len of "Group %s ... " */
+			/* strlen("Group %s ... 'low'/'high'") = 31 */
+			wait_message (0, txt_group, cCOLS - 31, glob_art_group);
 #endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
-#ifdef SHOW_PROGRESS
-				i += 21; /* low+'/'+high */
-#endif /* ifdef SHOW_PROGRESS */
-				wait_message (0, txt_group, cCOLS - i, glob_art_group);
-				break;
-		}
+			break;
 		case cConfig:
 			refresh_config_page (-1);
 			break;
@@ -287,7 +282,9 @@ handle_suspend (void)
 }
 #endif
 
-void _CDECL signal_handler (int sig)
+void _CDECL
+signal_handler (
+	int sig)
 {
 #ifdef SIGCHLD
 #	ifdef HAVE_TYPE_UNIONWAIT
@@ -383,11 +380,13 @@ void _CDECL signal_handler (int sig)
 	/* do this so we can get a traceback (doesn't dump core) */
 	abort();
 #else
-	exit (EXIT_ERROR);
+	exit (EXIT_FAILURE);
 #endif
 }
 
-void set_signal_catcher (int flag)
+void
+set_signal_catcher (
+	int flag)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp)

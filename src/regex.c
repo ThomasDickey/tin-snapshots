@@ -31,7 +31,7 @@ match_regex(
 	int error;
 	pcre *re;
 
-	msg[0] = '\0';
+	mesg[0] = '\0';
 
 	if (icase)
 		flags |= PCRE_CASELESS;
@@ -40,7 +40,7 @@ match_regex(
 	 * Compile the expression internally.
 	 */
 	if ((re = pcre_compile(pattern, flags, &errmsg, &error)) == NULL) {
-		sprintf(msg, txt_pcre_error_at, errmsg, error);
+		sprintf(mesg, txt_pcre_error_at, errmsg, error);
 		return(FALSE);
 	}
 
@@ -65,7 +65,7 @@ match_regex(
 	else if (error == -1)
 		ret = FALSE;
 	else
-		sprintf(msg, txt_pcre_error_num, error);
+		sprintf(mesg, txt_pcre_error_num, error);
 
 	free(re);
 	return(ret);

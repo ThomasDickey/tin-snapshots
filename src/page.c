@@ -53,12 +53,14 @@ static t_bool tex2iso_article;
 /*
  * Local prototypes
  */
+
 #ifndef INDEX_DAEMON
-	static void show_first_header (int respnum, char *group);
-	static void show_cont_header (int respnum);
 	static int prompt_response (int ch, int respnum);
 	static int show_last_page (void);
 	static t_bool expand_ctrl_chars (char *tobuf, char *frombuf, int length, int do_rotation);
+	static void add_persist (char *p_header, char *p_content);
+	static void show_cont_header (int respnum);
+	static void show_first_header (int respnum, char *group);
 #	ifdef HAVE_METAMAIL
 		static void show_mime_article (FILE *fp, struct t_article *art);
 #	endif /* HAVE_METAMAIL */
@@ -75,14 +77,14 @@ show_page (
 	char buf[LEN];
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
-	int mouse_click_on = TRUE;
 	int old_sort_art_type = default_sort_art_type;
 	int old_top;
 	int posted_flag;
 	int ret_code;
 	long old_artnum;
 	long art;
-	struct stat note_stat_article;
+	struct stat note_stat;
+	t_bool mouse_click_on = TRUE;
 
 	local_filtered_articles = FALSE;	/* used in thread level */
 
@@ -121,8 +123,11 @@ restart:
 	art_mark_read (group, &arts[respnum]);
 
 	/* Get article size */
-	fstat(fileno(note_fp), &note_stat_article);
-	note_size = note_stat_article.st_size;
+	if (fstat(fileno(note_fp), &note_stat) == -1)
+		note_size = 0;
+	else
+		note_size = note_stat.st_size;
+
 	show_note_page (group->name, respnum);
 
 	forever {
@@ -403,7 +408,7 @@ page_goto_next_unread:
 				} else {
 					note_page = 0;
 					note_end = FALSE;
-					fseek(note_fp, 0L, SEEK_SET);
+					rewind (note_fp);
 					show_all_headers = !show_all_headers;
 					show_note_page (group->name, respnum);
 				}
@@ -473,7 +478,7 @@ begin_of_article:
 				} else {
 					note_page = 0;
 					note_end = FALSE;
-					fseek (note_fp, 0L, SEEK_SET);
+					rewind (note_fp);
 					show_note_page (group->name, respnum);
 				}
 				break;
@@ -696,6 +701,15 @@ return_to_index:
 				feed_articles (FEED_SAVE, PAGE_LEVEL, group, respnum);
 				break;
 
+			case iKeyPageAutoSaveTagged:   /* Auto-save tagged articles without prompting */
+				if (index_point >= 0) {
+					if (num_of_tagged_arts)
+						feed_articles (FEED_AUTOSAVE_TAGGED, PAGE_LEVEL, &CURR_GROUP, (int) base[index_point]);
+					else
+						info_message (txt_no_tagged_arts_to_save);
+					}
+				break;
+
 			case iKeyPageTag:	/* tag/untag article for saving */
 				if (arts[respnum].tagged) {
 					arts[respnum].tagged = 0;
@@ -843,12 +857,12 @@ show_note_page (
 	int respnum)
 {
 	char buf3[2*HEADER_LEN+200];
-	int do_display_header;
 	int lines;
 	int i;
 	static char buf[HEADER_LEN];
 	t_bool below_sig;				/* are we in the signature? */
 	t_bool ctrl_L = FALSE;		/* form feed character detected */
+	t_bool do_display_header;
 	t_bool first = TRUE;
 
 	lines = (beginner_level ? (cLINES - (MINI_HELP_LINES - 1)) : cLINES);
@@ -903,27 +917,27 @@ show_note_page (
 					continue;				/* so don't display this line, too */
 			} else {
 				/* no continuation line */
-				do_display_header = 0; /* default: don't display header */
+				do_display_header = FALSE; /* default: don't display header */
 				if (num_headers_to_display
 					 && (news_headers_to_display_array[0][0] == '*')) {
-					do_display_header = 1; /* wild do */
+					do_display_header = TRUE; /* wild do */
 				} else {
 					for (i = 0; i < num_headers_to_display; i++) {
 						if (!strncasecmp (buf, news_headers_to_display_array[i],
 											strlen (news_headers_to_display_array[i]))) {
-							do_display_header = 1;
+							do_display_header = TRUE;
 							break;
 						}
 					}
 				}
 				if (num_headers_to_not_display
 					 && (news_headers_to_not_display_array[0][0] == '*')) {
-					do_display_header = 0; /* wild don't: doesn't make sense! */
+					do_display_header = FALSE; /* wild don't: doesn't make sense! */
 				} else {
 					for (i = 0; i < num_headers_to_not_display; i++) {
 						if (!strncasecmp (buf, news_headers_to_not_display_array[i],
 									  strlen (news_headers_to_not_display_array[i]))) {
-							do_display_header = 0;
+							do_display_header = FALSE;
 							break;
 						}
 					}
@@ -1352,6 +1366,9 @@ art_open (
 {
 	char *ptr;
 	char buf[8192];
+	char p_header[8192];
+	char p_content[8192];
+	struct t_header_list *pptr, *pqtr;
 	int c, is_summary;
 
 	art_close ();	/* just in case */
@@ -1380,6 +1397,13 @@ art_open (
 	note_h.contenttype[0] = '\0';
 	note_h.contentenc[0] = '\0';
 	note_h.ftnto[0] = '\0';
+	if (note_h.persist != NULL) {
+		for (pptr = note_h.persist; pptr != NULL; pptr = pqtr) {
+			pqtr = pptr->next;
+			free (pptr);
+		}
+	}
+	note_h.persist = NULL;
 
 	while (fgets(buf, (int) sizeof(buf), note_fp) != 0) {
 		buf[sizeof(buf)-1] = '\0';
@@ -1442,6 +1466,20 @@ art_open (
 		}
 		if (match_header (buf, "X-Comment-To", note_h.ftnto, (char*)0, HEADER_LEN))
 			continue;
+		if (match_header (buf, "Author-IDs", note_h.authorids, (char*)0, HEADER_LEN))
+			continue;
+		if (match_header (buf, "P-Author-IDs", note_h.authorids, (char*)0, HEADER_LEN))
+			continue;
+		if (match_header (buf, "X-P-Author-IDs", note_h.authorids, (char*)0, HEADER_LEN))
+			continue;
+		if (match_header (buf, "P-", p_content, p_header, HEADER_LEN)) {
+			add_persist (p_header, p_content);
+			continue;
+		}
+		if (match_header (buf, "X-P-", p_content, p_header, HEADER_LEN)) {
+			add_persist (p_header, p_content);
+			continue;
+		}
 	}
 
 	mark_body = ftell (note_fp);
@@ -1555,6 +1593,7 @@ match_header (
 	char *nodec_body,
 	size_t len)
 {
+	size_t hlen;
 	size_t plen = strlen (pat);
 
 	/* A quick check on the length before calling strnicmp() etc. */
@@ -1563,14 +1602,17 @@ match_header (
 	 * Does ': ' follow the header text ?
 	 */
 	if (buf[plen] != ':' || buf[plen+1] != ' ')
-		return FALSE;
+		if (pat[plen-1] != '-') /* or are we searching for a prefix? */
+			return FALSE;
 
 	/*
-	 * If the header matches, skip the ': ' and any leading whitespace
+	 * If the header matches, skip past the ': ' and any leading whitespace
 	 */
 	if (strncasecmp(buf, pat, plen) == 0) {
-		plen += 2;
-
+		while (buf[plen] != ' ')
+			plen++;
+		hlen = plen - 1;
+		plen++;
 		while (buf[plen] == ' ')
 			plen++;
 
@@ -1591,10 +1633,15 @@ match_header (
 		buffer_to_network(buf+plen);
 #endif
 
-		modifiedstrncpy (body, &buf[plen], len, TRUE);
-		body[len - 1] = '\0';
+		if (body) {
+			modifiedstrncpy (body, &buf[plen], len, TRUE);
+			body[len - 1] = '\0';
+		}
 
-		if(nodec_body) {
+		if (pat[strlen(pat)-1] == '-') {
+			strncpy (nodec_body, &buf[0], len);
+			nodec_body[hlen] = '\0';
+		} else if (nodec_body) {
 			modifiedstrncpy (nodec_body, &buf[plen], len, FALSE);
 			nodec_body[len - 1] = '\0';
 		}
@@ -1603,4 +1650,31 @@ match_header (
 	}
 
 	return FALSE;
+}
+
+
+static void
+add_persist (
+	char *p_header,
+	char *p_content)
+{
+	struct t_header_list *pptr;
+
+	if (note_h.persist != NULL) {
+		for (pptr = note_h.persist; pptr->next != NULL; pptr = pptr->next);
+		pptr->next = (struct t_header_list *) malloc(sizeof(struct t_header_list));
+		if (pptr->next != NULL) {
+			pptr = pptr->next;
+			strcpy(pptr->header, p_header);
+			strcpy(pptr->content, p_content);
+			pptr->next = NULL;
+		}
+	} else {
+		note_h.persist = (struct t_header_list *) malloc(sizeof(struct t_header_list));
+		if (note_h.persist != NULL) {
+			strcpy(note_h.persist->header, p_header);
+			strcpy(note_h.persist->content, p_content);
+			note_h.persist->next = NULL;
+		}
+	}
 }

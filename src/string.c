@@ -55,7 +55,6 @@ tin_ltoa (
 }
 
 
-
 /*
  * Handrolled version of strdup(), presumably to take advantage of
  * the enhanced error detection in my_malloc
@@ -66,12 +65,13 @@ char *my_strdup (
 	const char *str)
 {
 	size_t len = strlen (str) + 1;
-	void *new = my_malloc (len);
+	void *ptr = my_malloc (len);
 
-	if (new == NULL)
+	if (ptr == NULL)
 		return NULL;
 
-	return (char *) memcpy (new, str, len);
+	memcpy (ptr, str, len);
+	return (char *) ptr;
 }
 
 
@@ -192,14 +192,13 @@ str_lwr (
 
 
 /*
-** normal systems come with these...
-*/
+ * normal systems come with these...
+ */
 
 #ifndef HAVE_STRPBRK
 /*
-**  find first occurrence of any char from str2 in str1
-*/
-
+ * find first occurrence of any char from str2 in str1
+ */
 char *
 strpbrk (
 	char *str1,
@@ -278,9 +277,9 @@ strstr (
 
 #ifndef HAVE_ATOL
 /*
-** handrolled atol
-*/
-long int
+ * handrolled atol
+ */
+long
 atol (
 	const char *s)
 {
@@ -306,12 +305,8 @@ strtol (
 	char **ptr,
 	int use_base)
 {
-
-	long	val;
-	int	xx, sign;
-
-	val = 0L;
-	sign = 1;
+	long val = 0L;
+	int xx = 0, sign = 1;
 
 	if (use_base < 0 || use_base > MBASE)
 		goto OUT;
@@ -339,7 +334,7 @@ strtol (
 		 * for any base > 10, the digits incrementally following
 		 * 9 are assumed to be "abc...z" or "ABC...Z"
 		 */
-		while (isalnum ((unsigned char)*str) && (xx = DIGIT (*str)) < use_base) {
+		while (isalnum ((unsigned char)*str) && (xx = DIGIT(*str)) < use_base) {
 			/* accumulate neg avoids surprises near maxint */
 			val = use_base * val - xx;
 			++str;
@@ -408,31 +403,23 @@ strncasecmp(
 char *
 str_trim(
 	char *string)
-	{
-	char	*rp,	/* reading string pointer */
-			*wp;	/* writing string pointer */
-	int	ws = 1;	/* white space flag */
+{
+	char *rp;		/* reading string pointer */
+	char *wp;		/* writing string pointer */
+	t_bool ws = TRUE;		/* white space flag */
 
-	/* loop over string */
-	for (wp = rp = string; *rp; rp++) {
-
-	/* is it a white space? */
-		if (*rp == ' ' || *rp == '\t' || *rp == '\n' || *rp == '\r') {
-
-			/* was the last character not a white space? */
-			if (ws == 0) {
-				/* store a blank */
-				*wp++ = ' ';
-				ws = 1;
+	for (wp = rp = string; *rp; rp++) {		/* loop over string */
+		if (isspace(*rp)) {		/* is it a white space? */
+			if (!ws) {		/* was the last character not a white space? */
+				*wp++ = ' ';		/* store a blank */
+				ws = TRUE;
 			}
 		} else /* no white space */ {
-			/* store the character */
-			*wp++ = *rp;
-			ws = 0;
+			*wp++ = *rp;		/* store the character */
+			ws = FALSE;
 		}
 	}
-	/* delete trailing blank */
-	if (ws)
+	if (ws)		/* delete trailing blank */
 		wp--;
 
 	*wp = '\0';
@@ -582,15 +569,16 @@ sh_format (char *dst,
 #				define sys_errlist	__sys_errlist
 #			endif /* !sys_errlist */
 #		else
-#			ifndef DECL_SYS_ERRLIST
+#			ifdef DECL_SYS_ERRLIST
 				extern char *sys_errlist[];
-#			endif /* !DECL_SYS_ERRLIST */
+#			endif /* DECL_SYS_ERRLIST */
 #		endif /* M_AMIGA */
 		extern int sys_nerr;
 #	endif /* HAVE_SYS_ERRLIST */
 
 char *
-my_strerror(int n)
+my_strerror(
+	int n)
 {
 	static char temp[32];
 #	ifdef HAVE_SYS_ERRLIST

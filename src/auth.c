@@ -94,14 +94,18 @@ authinfo_generic (void)
 	put_server (tmpbuf);
 
 #ifdef HAVE_PUTENV
-	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
+	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d",
+			fileno (get_nntp_fp(FAKE_NNTP_FP)),
+			fileno (get_nntp_wr_fp(FAKE_NNTP_FP)), cookiefd);
 	new_env = (char *) my_malloc (strlen (tmpbuf) + 1);
 	strcpy (new_env, tmpbuf);
 	(void) putenv (new_env);
 	FreeIfNeeded (old_env);
 	old_env = new_env;
 #else
-	sprintf (tmpbuf, "%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
+	sprintf (tmpbuf, "%d.%d.%d",
+			fileno (get_nntp_fp(FAKE_NNTP_FP)),
+			fileno (get_nntp_wr_fp(FAKE_NNTP_FP)), cookiefd);
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
 #endif
 

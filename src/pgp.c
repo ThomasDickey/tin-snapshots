@@ -59,7 +59,7 @@ static void pgp_append_public_key (char *file);
 static void split_file (char *file);
 
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
-const char *pgpopts = 0;
+const char *pgpopts = "";
 char pgp_data[PATH_LEN];
 
 static void
@@ -323,7 +323,8 @@ pgp_check_article(void)
 {
 	FILE *art;
 	char the_article[PATH_LEN], buf[LEN], cmd[LEN];
-	int pgp_signed = 0, pgp_key = 0;
+	t_bool pgp_signed = FALSE;
+	t_bool pgp_key = FALSE;
 
 	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
@@ -343,9 +344,9 @@ pgp_check_article(void)
 	fgets(buf, LEN, note_fp);
 	while (!feof(note_fp)) {
 		if (!strcmp(buf, PGP_SIG_TAG))
-			pgp_signed = 1;
+			pgp_signed = TRUE;
 		if (!strcmp(buf, PGP_KEY_TAG))
-			pgp_key = 1;
+			pgp_key = TRUE;
 		fputs(buf, art);
 		fgets(buf, LEN, note_fp);
 	}
@@ -370,7 +371,7 @@ pgp_check_article(void)
 		my_printf("\n");
 		Raw(TRUE);
 	}
-	if (pgp_key) {
+	if (pgp_key) { /* FIXME: -> lang.c */
 		strcpy (buf, "Add key(s) to public keyring? ");
 		if (prompt_yn (cLINES, buf, FALSE) == 1) {
 			Raw (FALSE);

@@ -233,7 +233,7 @@ gl_addchar (
 
 	if (gl_cnt >= BUF_SIZE - 1) {
 		error_message ("tin_getline: input buffer overflow");
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 
 	for (i = gl_cnt; i >= gl_pos; i--) {
@@ -249,7 +249,8 @@ gl_addchar (
  */
 
 static void
-gl_newline (int w)
+gl_newline (
+	int w)
 {
 	int change = gl_cnt;
 	int len = gl_cnt;
@@ -257,7 +258,7 @@ gl_newline (int w)
 
 	if (gl_cnt >= BUF_SIZE - 1) {
 		error_message ("tin_getline: input buffer overflow");
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 	hist_add (w);		/* only adds if nonblank */
 	if (gl_out_hook) {
@@ -311,7 +312,7 @@ gl_kill (void)
  */
 
 static void
-gl_kill_back_word ()
+gl_kill_back_word (void)
 {
 	int i, cur;
 
@@ -477,7 +478,8 @@ gl_tab (
 }
 
 static void
-hist_add (int w)
+hist_add (
+	int w)
 {
 	char *p = gl_buf;
 
@@ -499,7 +501,8 @@ hist_add (int w)
  */
 
 static void
-hist_prev (int w)
+hist_prev (
+	int w)
 {
 	int next;
 
@@ -519,12 +522,13 @@ hist_prev (int w)
 	gl_fixup (0, BUF_SIZE);
 }
 
+
 /*
  * loads next hist entry into input buffer, clears on last
  */
-
 static void
-hist_next (int w)
+hist_next (
+	int w)
 {
 	if (hist_pos[w] != hist_last[w]) {
 		hist_pos[w] = (hist_pos[w] + 1) % HIST_SIZE;

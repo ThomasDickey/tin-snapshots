@@ -114,9 +114,9 @@ debug_print_header (
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 		fprintf (fp,"art=[%5ld] tag=[%s] kill=[%s] selected=[%s]\n", s->artnum,
-			(s->tagged ? "TRUE" : "FALSE"),
-			(s->killed ? "TRUE" : "FALSE"),
-			(s->selected ? "TRUE" : "FALSE"));
+			bool_unparse(s->tagged),
+			bool_unparse(s->killed),
+			bool_unparse(s->selected));
 		fprintf (fp,"subj=[%-38s]\n", s->subject);
 		fprintf (fp,"date=[%ld]  from=[%s]  name=[%s]\n", s->date, s->from, s->name);
 		fprintf (fp,"msgid=[%s]  refs=[%s]\n",
@@ -136,7 +136,7 @@ debug_print_header (
 		else
 			fprintf (fp, "patch=[]\n");
 		fprintf (fp,"thread=[%d]  inthread=[%d]  status=[%d]\n\n", s->thread, s->inthread, s->status);
-/*		fprintf (fp,"thread=[%s]  inthread=[%s]  status=[%s]\n", (s->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"), (s->inthread ? "TRUE" : "FALSE"), (s->status ? "TRUE" : "FALSE")); */
+/*		fprintf (fp,"thread=[%s]  inthread=[%s]  status=[%s]\n", (s->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"), bool_unparse(s->inthread), bool_unparse(s->status)); */
 		fflush (fp);
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
@@ -258,11 +258,11 @@ debug_print_attributes (
 	fprintf (fp, "select_header=[%d] select_global=[%s] select_expire=[%s]\n",
 		attr->quick_select_header,
 		(attr->quick_select_scope ? attr->quick_select_scope : ""),
-		(attr->quick_select_expire ? "TRUE" : "FALSE"));
+		bool_unparse(attr->quick_select_expire));
 	fprintf (fp, "kill_header  =[%d] kill_global  =[%s] kill_expire  =[%s]\n",
 		attr->quick_kill_header,
 		(attr->quick_kill_scope ? attr->quick_kill_scope : ""),
-		(attr->quick_kill_expire ? "TRUE" : "FALSE"));
+		bool_unparse(attr->quick_kill_expire));
 	fprintf (fp, "maildir=[%s] savedir=[%s] savefile=[%s]\n",
 		(attr->maildir == (char *) 0 ? "" : attr->maildir),
 		(attr->savedir == (char *) 0 ? "" : attr->savedir),
@@ -311,7 +311,7 @@ debug_print_filter (
 		num, (the_filter->scope ? the_filter->scope : ""),
 		(the_filter->inscope ? "TRUE" : "FILTER"),
 		the_filter->type, (the_filter->type == 0 ? "KILL" : "SELECT"),
-		the_filter->icase, (the_filter->icase == 0 ? "FALSE" : "TRUE"),
+		the_filter->icase, bool_unparse(bool_not(the_filter->icase)),
 		the_filter->lines_cmp, the_filter->lines_num);
 	fprintf (fp, "       subj=[%s] from=[%s] msgid=[%s]\n",
 		(the_filter->subj  ? the_filter->subj  : ""),
@@ -454,13 +454,13 @@ debug_print_bitmap (
 		if (art != (struct t_article *) 0) {
 			fprintf (fp, "art=[%5ld] tag=[%s] kill=[%s] selected=[%s] subj=[%s]\n",
 				art->artnum,
-				(art->tagged ? "TRUE" : "FALSE"),
-				(art->killed ? "TRUE" : "FALSE"),
-				(art->selected ? "TRUE" : "FALSE"),
+				bool_unparse(art->tagged),
+				bool_unparse(art->killed),
+				bool_unparse(art->selected),
 				art->subject);
 			fprintf (fp, "thread=[%s]  inthread=[%s]  status=[%s]\n",
 				(art->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"),
-				(art->inthread ? "TRUE" : "FALSE"),
+				bool_unparse(art->inthread),
 				(art->status == ART_READ ? "READ" : "UNREAD"));
 		}
 		debug_print_newsrc (&group->newsrc, fp);

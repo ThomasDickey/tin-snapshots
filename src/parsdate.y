@@ -106,11 +106,11 @@ static int	GetTimeInfo(TIMEINFO *Now);
  * impossible to put a prototype here, and the function later.  We're using
  * 'const' on the parameter to quiet gcc's -Wwrite-strings warning.
  */
-/* ARGSUSED */
+/*ARGSUSED*/
 static void
 date_error(const char *s)
 {
-    /* NOTREACHED */
+    /*NOTREACHED*/
 }
 
 %}

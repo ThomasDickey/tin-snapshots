@@ -22,18 +22,16 @@ char default_save_file[PATH_LEN];
 char default_regex_pattern[LEN];
 char default_repost_group[LEN];
 char proc_ch_default;			/* set in change_config_file () */
+
+#ifndef INDEX_DAEMON
 t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
 
 /*
  * Local prototypes
  */
-#ifndef INDEX_DAEMON
-	static int does_article_exist (int function, struct t_article *art, char *path);
-	static int print_file (char *command, int respnum, int count);
-#endif
+static int does_article_exist (int function, struct t_article *art, char *path);
+static int print_file (char *command, int respnum, int count);
 
-
-#ifndef INDEX_DAEMON
 void
 feed_articles (
 	int function,
@@ -55,7 +53,6 @@ feed_articles (
 	constext *prompt;
 	int ch, ch_default;
 	int b, i, j;
-	int proceed;
 	int processed_ok = TRUE;
 	int is_mailbox = FALSE;
 	int orig_note_page = 0;
@@ -66,6 +63,7 @@ feed_articles (
 	int supersede = FALSE;
 	t_bool confirm;
 	t_bool orig_note_end = FALSE;
+	t_bool proceed;
 #	ifndef DONT_HAVE_PIPING
 	FILE *fp = (FILE *) 0;
 #	endif /* !DONT_HAVE_PIPING */
@@ -128,7 +126,7 @@ feed_articles (
 	/*
 	 * If not automatic, ask what the user wants to save
 	 */
-	if (((!default_auto_save || arts[respnum].archive == (char *) 0) || (default_auto_save && function != FEED_SAVE) || ch_default == iKeyFeedTag) && function != FEED_SAVE_TAGGED)
+	if (((!default_auto_save || arts[respnum].archive == (char *) 0) || (default_auto_save && function != FEED_SAVE) || ch_default == iKeyFeedTag) && function != FEED_AUTOSAVE_TAGGED)
 		ch = prompt_slk_response (ch_default, "ahpqtT\033", "%s%s", prompt, txt_art_thread_regex_tag);
 	else {
 		filename[0] = '\0';
@@ -142,8 +140,8 @@ feed_articles (
 			return;
 
 		case iKeyFeedPat:
-			sprintf (msg, txt_feed_pattern, default_regex_pattern);
-			if (!prompt_string (msg, pattern, HIST_REGEX_PATTERN)) {
+			sprintf (mesg, txt_feed_pattern, default_regex_pattern);
+			if (!prompt_string (mesg, pattern, HIST_REGEX_PATTERN)) {
 				clear_message ();
 				return;
 			}
@@ -165,8 +163,8 @@ feed_articles (
 
 	switch (function) {
 		case FEED_MAIL:
-			sprintf (msg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
-			if (!prompt_string (msg, address, HIST_MAIL_ADDRESS)) {
+			sprintf (mesg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
+			if (!prompt_string (mesg, address, HIST_MAIL_ADDRESS)) {
 				clear_message ();
 				return;
 			}
@@ -184,9 +182,9 @@ feed_articles (
 
 #	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
-			sprintf (msg, txt_pipe_to_command,
+			sprintf (mesg, txt_pipe_to_command,
 				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
-			if (!prompt_string (msg, command, HIST_PIPE_COMMAND)) {
+			if (!prompt_string (mesg, command, HIST_PIPE_COMMAND)) {
 				clear_message ();
 				return;
 			}
@@ -215,15 +213,15 @@ feed_articles (
 			sprintf (command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
 			break;
 		case FEED_SAVE:		/* ask user for filename to save to */
-		case FEED_SAVE_TAGGED:
+		case FEED_AUTOSAVE_TAGGED:
 			free_save_array ();
 			if ((!default_auto_save || arts[respnum].archive == (char *) 0)) {
 				strcpy (save_file, ((group->attribute->savefile != (char *) 0) ? group->attribute->savefile : default_save_file));
 
-				if (function != FEED_SAVE_TAGGED) {
-					sprintf (msg, txt_save_filename, save_file);
+				if (function != FEED_AUTOSAVE_TAGGED) {
+					sprintf (mesg, txt_save_filename, save_file);
 
-					if (!prompt_string (msg, filename, HIST_SAVE_FILE)) {
+					if (!prompt_string (mesg, filename, HIST_SAVE_FILE)) {
 						clear_message ();
 						return;
 					}
@@ -253,7 +251,7 @@ feed_articles (
 					info_message (txt_no_filename);
 					return;
 				}
-				if (function != FEED_SAVE_TAGGED) {
+				if (function != FEED_AUTOSAVE_TAGGED) {
 					is_mailbox = create_path (filename);
 					if (is_mailbox) {
 						if ((int) strlen (filename) > 1)
@@ -297,11 +295,11 @@ feed_articles (
 
 					switch (option) {
 						case iKeyFeedSupersede:
-							sprintf (msg, txt_supersede_group, default_repost_group);
+							sprintf (mesg, txt_supersede_group, default_repost_group);
 							supersede = TRUE;
 							break;
 						case iKeyFeedRepost:
-							sprintf (msg, txt_repost_group, default_repost_group);
+							sprintf (mesg, txt_repost_group, default_repost_group);
 							supersede = FALSE;
 							break;
 						default:
@@ -310,11 +308,11 @@ feed_articles (
 					}
 #	ifndef FORGERY
 				} else {
-					sprintf (msg, txt_repost_group, default_repost_group);
+					sprintf (mesg, txt_repost_group, default_repost_group);
 					supersede = FALSE;
 				}
 #	endif /* !FORGERY */
-				if (!prompt_string (msg, group_name, HIST_REPOST_GROUP)) {
+				if (!prompt_string (mesg, group_name, HIST_REPOST_GROUP)) {
 					clear_message ();
 					return;
 				}
@@ -411,7 +409,7 @@ feed_articles (
 					case FEED_MAIL:
 						processed_ok = TRUE;
 						mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-						confirm = (processed_ok ? FALSE : TRUE);
+						confirm = bool_not(processed_ok);
 						break;
 
 #	ifndef DONT_HAVE_PIPING
@@ -472,7 +470,7 @@ feed_articles (
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								confirm = (processed_ok ? FALSE : TRUE);
+								confirm = bool_not(processed_ok);
 								break;
 
 #	ifndef DONT_HAVE_PIPING
@@ -492,7 +490,7 @@ feed_articles (
 								break;
 
 							case FEED_SAVE:
-							case FEED_SAVE_TAGGED:
+							case FEED_AUTOSAVE_TAGGED:
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 
@@ -516,7 +514,7 @@ feed_articles (
 					}
 				}
 			}
-			if (function == FEED_SAVE || function == FEED_SAVE_TAGGED)
+			if (function == FEED_SAVE || function == FEED_AUTOSAVE_TAGGED)
 				(void) save_regex_arts (is_mailbox, group_path);
 
 			untag_all_articles ();
@@ -548,7 +546,7 @@ feed_articles (
 							case FEED_MAIL:
 								processed_ok = TRUE;
 								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
-								confirm = (processed_ok ? FALSE : TRUE);
+								confirm = bool_not(processed_ok);
 								break;
 
 #	ifndef DONT_HAVE_PIPING
@@ -633,7 +631,7 @@ got_sig_pipe_while_piping:
 #	endif /* !DONT_HAVE_PIPING */
 
 		case FEED_SAVE:
-		case FEED_SAVE_TAGGED:
+		case FEED_AUTOSAVE_TAGGED:
 			if (proc_ch != 'n' && !is_mailbox)
 				ret2 = post_process_files (proc_ch, (t_bool) (function == FEED_SAVE ? FALSE : TRUE));
 			free_save_array ();
@@ -688,16 +686,14 @@ got_sig_pipe_while_piping:
 
 	} else if (function == FEED_PRINT) {
 		info_message (txt_printed, processed, IS_PLURAL(processed));
-	} else if (function == FEED_SAVE || function == FEED_SAVE_TAGGED) {
+	} else if (function == FEED_SAVE || function == FEED_AUTOSAVE_TAGGED) {
 		if (ch == iKeyFeedArt)
 			info_message (txt_saved, processed, IS_PLURAL(processed));
 	}
 
 }
-#endif /* !INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static int
 print_file (
 	char *command,
@@ -750,18 +746,7 @@ print_file (
 
 	return (TRUE);	/* a hack that will check if file was really checked later */
 }
-#endif /* !INDEX_DAEMON */
 
-/*
- * Return the single char hotkey corresponding to the post process type
- * No range check here, it was constrained when the config file was read
- */
-char
-get_post_proc_type (
-	int proc_type)
-{
-	return(ch_post_process[proc_type]);
-}
 
 /*
  * Opening an article here & also later in the save
@@ -772,8 +757,6 @@ get_post_proc_type (
  * it the first time which saves a lot and almost
  * gets us the elusive free lunch!
  */
-
-#ifndef INDEX_DAEMON
 static int
 does_article_exist (
 	int function,
@@ -793,3 +776,15 @@ does_article_exist (
 	return retcode;
 }
 #endif /* !INDEX_DAEMON */
+
+
+/*
+ * Return the single char hotkey corresponding to the post process type
+ * No range check here, it was constrained when the config file was read
+ */
+char
+get_post_proc_type (
+	int proc_type)
+{
+	return(ch_post_process[proc_type]);
+}

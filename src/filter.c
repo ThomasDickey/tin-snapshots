@@ -58,9 +58,9 @@ struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
  * Local prototypes
  */
 static int get_choice (int x, const char *help, const char *prompt, const char *opt1, const char *opt2, const char *opt3, const char *opt4, const char *opt5);
-static int iAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
 static int unfilter_articles (void);
 static int set_filter_scope (struct t_group *group);
+static t_bool bAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
 static void free_filter_array (struct t_filters *ptr);
 static void free_filter_item (struct t_filter *ptr);
 #ifndef INDEX_DAEMON
@@ -122,7 +122,7 @@ vSetFilter (
 		psFilter->xref = (char *) 0;
 		psFilter->xref_max = 0;
 		psFilter->xref_score_cnt = 0;
-		psFilter->time = 0L;
+		psFilter->time = (time_t) 0;
 		psFilter->next = (struct t_filter *) 0;
 	}
 }
@@ -182,7 +182,7 @@ free_all_filter_arrays (void) /* FIXME: use free_filter_array() instead */
  */
 
 #ifndef INDEX_DAEMON
-int
+t_bool
 read_filter_file (
 	char	*file,
 	t_bool global_file)
@@ -198,17 +198,17 @@ read_filter_file (
 	char xref[HEADER_LEN];
 	char xref_score[HEADER_LEN];
 	char scbuf[PATH_LEN];
-	int expired = FALSE;
-	int expired_time = FALSE;
-	int global = TRUE;
 	int i = 0;
 	int icase = 0, type = -1;
 	int score = 0;
 	int xref_max = 0;
 	int xref_score_cnt = 0;
 	int xref_score_value = 0;
-	time_t secs = 0L;
-	time_t current_secs = 0L;
+	t_bool expired = FALSE;
+	t_bool expired_time = FALSE;
+	t_bool global = TRUE;
+	time_t secs = (time_t) 0;
+	time_t current_secs = (time_t) 0;
 	struct t_group *psGrp;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
@@ -541,8 +541,8 @@ my_flush ();
 my_printf ("PtrType=[%d] FilType=[%d]" cCRLF, ptr->filter[i].type, write_filter_type);
 my_flush ();
 */
-		fprintf (fp, "type=%ud\n", ptr->filter[i].type);
-		fprintf (fp, "case=%ud\n", ptr->filter[i].icase);
+		fprintf (fp, "type=%u\n", ptr->filter[i].type);
+		fprintf (fp, "case=%u\n", ptr->filter[i].icase);
 		switch (ptr->filter[i].score) {
 			case SCORE_KILL:
 				fprintf (fp, "score=kill\n");
@@ -662,7 +662,7 @@ get_choice (
  * Can be configured for kill or auto-selection screens.
  */
 
-int
+t_bool
 filter_menu (
 	int type,
 	struct t_group *group,
@@ -974,7 +974,7 @@ filter_menu (
 		switch (ch) {
 
 		case iKeyFilterEdit:
-			iAddFilterRule (group, art, &rule); /* save the rule */
+			bAddFilterRule (group, art, &rule); /* save the rule */
 			start_line_offset = 22; /* FIXME: check it out */
 			invoke_editor (local_filter_file, start_line_offset);
 			unfilter_articles ();
@@ -995,7 +995,7 @@ filter_menu (
 			/*
 			 * Add the filter rule and save it to the filter file
 			 */
-			return (iAddFilterRule (group, art, &rule));
+			return (bAddFilterRule (group, art, &rule));
 			/* keep lint quiet: */
 			/* FALLTHROUGH */
 
@@ -1010,7 +1010,7 @@ filter_menu (
  * Quick command to add a kill filter to specified groups filter
  */
 
-int
+t_bool
 quick_filter_kill (
 	struct t_group *group,
 	struct t_article *art)
@@ -1053,14 +1053,14 @@ quick_filter_kill (
 	rule.check_string = TRUE;
 	rule.score = SCORE_KILL;
 
-	return (iAddFilterRule (group, art, &rule));
+	return (bAddFilterRule (group, art, &rule));
 }
+
 
 /*
  * Quick command to add an auto-select filter to specified groups filter
  */
-
-int
+t_bool
 quick_filter_select (
 	struct t_group *group,
 	struct t_article *art)
@@ -1102,24 +1102,33 @@ quick_filter_select (
 	rule.check_string = TRUE;
 	rule.score = SCORE_SELECT;
 
-	return (iAddFilterRule (group, art, &rule));
+	return (bAddFilterRule (group, art, &rule));
 }
+
 
 /*
  * Quick command to add an auto-select filter to the article that user
  * has just posted. Selects on Subject: line with limited expire time.
- * Don't precess if MAILGROUP.
+ * Don't process if MAILGROUP.
  */
-int
+t_bool
 quick_filter_select_posted_art (
 	struct t_group *group,
 	char *subj)	/* return value is always ignored */
 {
-	int filtered = FALSE;
-	struct t_article art;
-	struct t_filter_rule rule;
+	t_bool filtered = FALSE;
 
 	if (group->type == GROUP_TYPE_NEWS) {
+		struct t_article art;
+		struct t_filter_rule rule;
+
+#ifdef __cplusplus /* keep C++ quiet */
+		rule.scope[0] = '\0';
+#endif /* __cplusplus */
+
+		if (strlen(group->name) > (sizeof(rule.scope) -1)) /* groupname to long? */
+			return FALSE;
+
 		/*
 		 * Setup dummy article with posted articles subject
 		 */
@@ -1138,16 +1147,15 @@ quick_filter_select_posted_art (
 		rule.fullref = FILTER_MSGID;
 		rule.subj_ok = TRUE;
 		rule.text[0] = '\0';
-		if (strlen(group->name) > sizeof(rule.scope)-1)
-			return FALSE;
-		strcpy(rule.scope, group->name);
 		rule.type = FILTER_SELECT;
 		rule.icase = FALSE;
 		rule.expire_time = TRUE;
 		rule.check_string = TRUE;
 		rule.score = SCORE_SELECT;
 
-		filtered = iAddFilterRule (group, &art, &rule);
+		strcpy(rule.scope, group->name);
+
+		filtered = bAddFilterRule (group, &art, &rule);
 
 		FreeIfNeeded(art.subject);
 
@@ -1159,15 +1167,15 @@ quick_filter_select_posted_art (
 /*
  * API to add filter rule to the local or global filter array
  */
-static int
-iAddFilterRule (
+static t_bool
+bAddFilterRule (
 	struct t_group *psGrp,
 	struct t_article *psArt,
 	struct t_filter_rule *psRule)
 {
 	char acBuf[PATH_LEN];
-	int iFiltered = FALSE;
 	int *plNum, *plMax;
+	t_bool bFiltered = FALSE;
 	time_t lCurTime;
 	struct t_filter *psPtr;
 
@@ -1204,16 +1212,16 @@ iAddFilterRule (
 	switch(psRule->expire_time)
 	{
 		case 1:
-			psPtr[*plNum].time = lCurTime + (default_filter_days * 86400L);  /*  86400 = 60 * 60 * 24 */
+			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 86400);  /*  86400 = 60 * 60 * 24 */
 			break;
 		case 2:
-			psPtr[*plNum].time = lCurTime + (default_filter_days * 172800L); /* 172800 = 60 * 60 * 24 * 2 */
+			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 172800); /* 172800 = 60 * 60 * 24 * 2 */
 			break;
 		case 3:
-			psPtr[*plNum].time = lCurTime + (default_filter_days * 345600L); /* 345600 = 60 * 60 * 24 * 4 */
+			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 345600); /* 345600 = 60 * 60 * 24 * 4 */
 			break;
 		default:
-			psPtr[*plNum].time = 0L;
+			psPtr[*plNum].time = (time_t) 0;
 			break;
 	}
 
@@ -1243,7 +1251,7 @@ iAddFilterRule (
 				assert(0 != 0);
 				break;
 		}
-		iFiltered = TRUE;
+		bFiltered = TRUE;
 		(*plNum)++;
 	} else {
 		if (psRule->subj_ok) {
@@ -1263,16 +1271,16 @@ iAddFilterRule (
 			psPtr[*plNum].fullref = psRule->fullref;
 		}
 		if (psRule->subj_ok || psRule->from_ok || psRule->msgid_ok || psRule->lines_ok) {
-			iFiltered = TRUE;
+			bFiltered = TRUE;
 			(*plNum)++;
 		}
 	}
 
-	if (iFiltered) {
+	if (bFiltered) {
 #ifdef DEBUG
 		if (debug)
 			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%d] line=[%d %d] time=[%lu]",
-				(psPtr[*plNum-1].inscope ? "TRUE" : "FALSE"),
+				bool_unparse(psPtr[*plNum-1].inscope),
 				(psRule->scope ? psRule->scope : ""),
 				psPtr[*plNum-1].type, psPtr[*plNum-1].icase,
 				(psPtr[*plNum-1].subj ? psPtr[*plNum-1].subj : ""),
@@ -1287,15 +1295,15 @@ iAddFilterRule (
 #endif /* !INDEX_DAEMON */
 	}
 
-	return iFiltered;
+	return bFiltered;
 }
+
 
 /*
  * We assume that any articles which are tagged as killed are also
  * tagged as being read BECAUSE they were killed. So, we retag
  * them as being unread.
  */
-
 static int
 unfilter_articles (void) /* return value is always ignored */
 {
@@ -1322,22 +1330,22 @@ unfilter_articles (void) /* return value is always ignored */
  * In global rules check if scope field set to determine if
  * filter applys to current group.
  */
-int
+t_bool
 filter_articles (
 	struct t_group *group)
 {
 	char buf[LEN];
-	int filtered = FALSE;
+	const char *regex_errmsg = 0;
 	int num, inscope;
+	int regex_errpos;
+/*	int score; */
 	register int i, j, k;
 	struct t_filter *ptr; /*, *curr; */
 	struct regex_cache *regex_cache_subj = NULL;
 	struct regex_cache *regex_cache_from = NULL;
 	struct regex_cache *regex_cache_msgid = NULL;
 	struct regex_cache *regex_cache_xref = NULL;
-	const char *regex_errmsg = 0;
-	int regex_errpos;
-/*	int score; */
+	t_bool filtered = FALSE;
 
 	num_of_killed_arts = 0;
 	num_of_selected_arts = 0;
@@ -1408,11 +1416,11 @@ filter_articles (
 							if ((regex_cache_subj[j].re = pcre_compile(ptr[j].subj,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
+								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_subj[j].re) {
 								regex_cache_subj[j].extra = pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL)
-									sprintf(msg, txt_pcre_error_text, regex_errmsg);
+									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_subj[j].re) {
@@ -1425,7 +1433,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(mesg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1447,11 +1455,11 @@ filter_articles (
 							if ((regex_cache_from[j].re = pcre_compile(ptr[j].from,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
+								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_from[j].re) {
 								regex_cache_from[j].extra = pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL)
-									sprintf(msg, txt_pcre_error_text, regex_errmsg);
+									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_from[j].re) {
@@ -1463,7 +1471,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(mesg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1511,11 +1519,11 @@ filter_articles (
 							if ((regex_cache_msgid[j].re = pcre_compile(ptr[j].msgid,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
+								sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_msgid[j].re) {
 								regex_cache_msgid[j].extra = pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL)
-									sprintf(msg, txt_pcre_error_text, regex_errmsg);
+									sprintf(mesg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_msgid[j].re) {
@@ -1528,7 +1536,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(mesg, txt_pcre_error_num, regex_errpos);
 							else  { /* No match, try Message-ID */
 								regex_errpos =
 								  pcre_exec(regex_cache_msgid[j].re,
@@ -1539,7 +1547,7 @@ filter_articles (
 								if (regex_errpos >= 0) {
 									SET_FILTER(group, i, j);
 								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-									sprintf(msg, txt_pcre_error_num, regex_errpos);
+									sprintf(mesg, txt_pcre_error_num, regex_errpos);
 							}
 						}
 					}
@@ -1627,12 +1635,12 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											if ((regex_cache_xref[j].re = pcre_compile(ptr[j].xref,
 											  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 											  &regex_errmsg, &regex_errpos)) == NULL)
-												sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
+												sprintf(mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 											if (regex_cache_xref[j].re) {
 												regex_cache_xref[j].extra =
 												  pcre_study(regex_cache_xref[j].re, 0, &regex_errmsg);
 												if (regex_errmsg != NULL)
-													sprintf(msg, txt_pcre_error_text, regex_errmsg);
+													sprintf(mesg, txt_pcre_error_text, regex_errmsg);
 											}
 										}
 										if (regex_cache_xref[j].re) {
@@ -1645,7 +1653,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											if (regex_errpos >= 0)
 												group_count = -1;
 											else if (regex_errpos != PCRE_ERROR_NOMATCH)
-												sprintf(msg, txt_pcre_error_num, regex_errpos);
+												sprintf(mesg, txt_pcre_error_num, regex_errpos);
 										}
 									}
 								}

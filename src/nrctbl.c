@@ -201,7 +201,7 @@ get_newsrcname (
 						joinpath(newsrc_name, homedir, name_found);
 						return TRUE;
 					case iKeyNrctblQuit:
-						exit(0);
+						exit (EXIT_SUCCESS);
 						/* keep lint quiet: */
 						/* FALLTHROUGH */
 					case ESC:
@@ -212,7 +212,7 @@ get_newsrcname (
 			return TRUE;
 		}
 	} else {
-		(void) write_newsrctable_file();
+		write_newsrctable_file();
 	}
 	return FALSE;
 }

@@ -28,11 +28,12 @@
 #define END		4
 
 #ifndef INDEX_DAEMON
-	static int create_subdir = TRUE;  /* FIXME: is it still needed? it's alawys true */
+	static t_bool create_subdir = TRUE;  /* FIXME: is it still needed? it's alawys true */
 
+#	ifndef HAVE_LIBUU
 	/*
- 	 * types of archive programs
-  	 */
+	 * types of archive programs
+	 */
 	static struct archiver_t {
 		constext *name;
 		constext *ext;
@@ -43,31 +44,34 @@
 		{ "",		"",		"",		"",		""	},
 		{ "",		"",		"",		"",		""	},
 		{ "",		"",		"",		"",		""	},
-#	ifdef M_AMIGA
+#		ifdef M_AMIGA
 		{ "lha",	"lha",		"t",		"l",		"x" },
-#else
+#		else
 		{ "zoo",	"zoo",		"-test",	"-list",	"-extract" },
-#endif
+#		endif /* M_AMIGA */
 		{ "unzip",	"zip",		"-t",		"-l",		"-o"	},
 		{ (char *) 0,	(char *) 0,	(char *) 0,	(char *) 0,	(char *) 0 }
 	};
+#	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
 
 /*
  * Local prototypes
  */
-static int any_saved_files (void);
+static t_bool any_saved_files (void);
 static t_bool create_sub_dir (int i);
-
 #ifndef INDEX_DAEMON
 	static char *get_first_savefile (void);
-	static char *get_archive_file (char *dir);
+	static char *save_filename (int i);
 	static const char *get_last_savefile (void);
 	static void delete_processed_files (t_bool auto_delete);
 	static void post_process_sh (t_bool auto_delete);
 	static void post_process_uud (int pp, t_bool auto_delete);
-	static void uudecode_file (int pp, char *file_out_dir, char *file_out);
+#	ifndef HAVE_LIBUU
+		static char *get_archive_file (char *dir);
+		static void uudecode_file (int pp, char *file_out_dir, char *file_out);
+#	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
 /*
@@ -87,22 +91,22 @@ check_start_save_any_news (
 	int check_start_save)
 {
 #ifndef INDEX_DAEMON
-
-	char buf[LEN], logfile[LEN];
-	char group_path[PATH_LEN];
-	char savefile[PATH_LEN];
-	char subject[HEADER_LEN];
-	char path[PATH_LEN];
-	char *ich;
 	FILE *fp;
 	FILE *fp_log = (FILE *) 0;
-	int i, j, print_group;
+	char *ich;
+	char buf[LEN], logfile[LEN];
+	char group_path[PATH_LEN];
+	char path[PATH_LEN];
+	char savefile[PATH_LEN];
+	char subject[HEADER_LEN];
 	int check_arts;
-	int log_opened = TRUE;
-	int print_first = TRUE;
+	int i, j;
 	int saved_arts = 0;
-	int unread_news = FALSE;
 	struct t_group *group;
+	t_bool log_opened = TRUE;
+	t_bool print_first = TRUE;
+	t_bool print_group;
+	t_bool unread_news = FALSE;
 	time_t epoch;
 
 	switch (check_start_save) {
@@ -113,11 +117,11 @@ check_start_save_any_news (
 			break;
 		case MAIL_ANY_NEWS:
 		case SAVE_ANY_NEWS:
-#ifdef VMS
+#	ifdef VMS
 			joinpath (logfile, rcdir, "log.");
-#else
+#	else
 			sprintf (logfile, "%s/log", rcdir);
-#endif
+#	endif /* VMS */
 			if ((fp_log = fopen (logfile, "w" FOPEN_OPTS)) == NULL) {
 				perror_message (txt_cannot_open, logfile);
 				fp_log = stdout;
@@ -170,11 +174,11 @@ check_start_save_any_news (
 						print_group = FALSE;
 						/* saved_groups++; */
 						if (check_start_save == SAVE_ANY_NEWS) {
-#ifdef VMS
+#	ifdef VMS
 							sprintf (buf, "[.%s]dummy", group_path);
-#else
+#	else
 							sprintf (buf, "%s/dummy", group_path);
-#endif
+#	endif /* VMS */
 							create_path (buf);
 						}
 					}
@@ -184,11 +188,11 @@ check_start_save_any_news (
 					else {
 						if (!strfpath (group->attribute->savedir, path, sizeof (path), homedir, (char *) 0, (char *) 0, group->name))
 							joinpath (path, homedir, DEFAULT_SAVEDIR);
-#ifdef VMS
+#	ifdef VMS
 						sprintf (savefile, "%s.%s]%ld", path, group_path, arts[j].artnum);
-#else
+#	else
 						sprintf (savefile, "%s/%s/%ld", path, group_path, arts[j].artnum);
-#endif
+#	endif /* VMS */
 					}
 
 					switch (art_open (&arts[j], group_path, do_rfc1521_decoding)) {
@@ -397,7 +401,7 @@ save_thread_to_file (
 	}
 
 	for (i = 0; i < num_save; i++) {
-		/* the tailing spaces are needed for SHOW_PROGRESS */
+		/* the tailing spaces are needed for the progress-meter */
 		wait_message (0, "%s%d  ", txt_saving, ++count);
 
 		if (is_mailbox)
@@ -487,10 +491,8 @@ int
 create_path (
 	char *path)
 {
-	int mbox_format = FALSE;
-
+	t_bool mbox_format = FALSE;
 #ifndef INDEX_DAEMON
-
 	char tmp[PATH_LEN];
 	char buf[PATH_LEN];
 	int i, j, len;
@@ -607,10 +609,10 @@ create_sub_dir (
 	return FALSE;
 }
 
+#ifndef INDEX_DAEMON
 /*
  *  add files to be saved to save array
  */
-
 void
 add_to_save_list (
 	int the_index,
@@ -619,7 +621,6 @@ add_to_save_list (
 	int archive_save,
 	char *path)
 {
-#ifndef INDEX_DAEMON
 	char tmp[PATH_LEN];
 	char dir[PATH_LEN];
 	char file[PATH_LEN];
@@ -655,33 +656,33 @@ add_to_save_list (
 		i = my_group[cur_groupnum];
 		if (!strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
-#ifdef VMS
+#	ifdef VMS
 			joindir (tmp, homedir, DEFAULT_MAILDIR);
-#else
+#	else
 			joinpath (tmp, homedir, DEFAULT_MAILDIR);
-#endif
+#	endif /* VMS */
 		}
 		save[num_save].dir = my_strdup (tmp);
 		save[num_save].file = my_strdup (file);
 	} else {
 		if (*path) {
-#ifdef VMS
-#include "parse.h"
+#	ifdef VMS
+#	include "parse.h"
 			struct filespec *spec;
 
 			spec = sysparse(path);
 			sprintf(dir, "%s%s", spec->dev, spec->dir);
 			strcpy(file, spec->filename);
-#else /* !VMS */
+#	else
 			for (i = strlen (path); i; i--) {
-#ifdef WIN32
+#		ifdef WIN32
 				/*
-				** Under WIN32, paths can be in form D:\a\b\c\file.  Optionally,
-				** User can override the default, so we need to deal with input in
-				** Form: D:\a\b\c\F:\x\y\article or D:\a\b\c\\x\y\article.
-				** In these cases, we want to use F:\x\y\article or \x\y\article
-				** as the basepath.
-				*/
+				 * Under WIN32, paths can be in form D:\a\b\c\file. Optionally,
+				 * User can override the default, so we need to deal with input in
+				 * Form: D:\a\b\c\F:\x\y\article or D:\a\b\c\\x\y\article.
+				 * In these cases, we want to use F:\x\y\article or \x\y\article
+				 * as the basepath.
+				 */
 				if (path[i] == '\\') {
 					int j;
 					for (j=i-1; j; j--) {
@@ -702,22 +703,22 @@ add_to_save_list (
 					}
 					strcpy (file, path+i+1);
 					break;
-#else /* !WIN32 */
+#		else
 				if (path[i] == '/') {
 					strncpy (dir, path, (size_t)i);
 					dir[i] = '\0';
 					strcpy (file, path+i+1);
 					break;
-#endif /* WIN32 */
+#		endif /* WIN32 */
 				}
 			}
-#endif /* !VMS */
+#	endif /* VMS */
 		}
 
-#ifdef M_AMIGA
+#	ifdef M_AMIGA
 		if (tin_bbs_mode)
 			dir[0] = 0;
-#endif
+#	endif /* M_AMIGA */
 
 		if (*dir)
 			save[num_save].dir = my_strdup (dir);
@@ -725,11 +726,11 @@ add_to_save_list (
 			i = my_group[cur_groupnum];
 			if (!strfpath (active[i].attribute->savedir, tmp, sizeof (tmp),
 			    homedir, (char *) 0, (char *) 0, active[i].name)) {
-#ifdef VMS
+#	ifdef VMS
 				joindir (tmp, homedir, DEFAULT_SAVEDIR);
-#else
+#	else
 				joinpath (tmp, homedir, DEFAULT_SAVEDIR);
-#endif
+#	endif /* VMS */
 			}
 			save[num_save].dir = my_strdup (tmp);
 		}
@@ -737,14 +738,13 @@ add_to_save_list (
 		save[num_save].file = my_strdup (*file ? file : (*path ? path : save[num_save].archive));
 	}
 	num_save++;
-
-#endif /* !INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
+
 
 /*
  *  print save array of files to be saved
  */
-
 void
 sort_save_list (void)
 {
@@ -799,7 +799,8 @@ save_comp (
 }
 
 
-char *
+#ifndef INDEX_DAEMON
+static char *
 save_filename (
 	int i)
 {
@@ -807,10 +808,10 @@ save_filename (
 	static char *filename;
 
 	FreeIfNeeded(filename);	/* leak only the last instance */
-#ifdef DOALLOC
+#	ifdef DOALLOC
 	if (i < 0)
 		return 0;
-#endif
+#	endif /* DOALLOC */
 	filename = (char *) my_malloc(PATH_LEN);
 
 	if (save[i].is_mailbox) {
@@ -821,32 +822,33 @@ save_filename (
 	if (!default_auto_save || (!(save[i].part || save[i].patch))) {
 		joinpath (filename, save[i].dir, save[i].file);
 		if (num_save != 1) {
-#ifdef VMS
+#	ifdef VMS
 			sprintf (&filename[strlen(filename)], "-%03d", i+1);
-#else
+#	else
 			sprintf (&filename[strlen(filename)], ".%03d", i+1);
-#endif
+#	endif /* VMS */
 
 		}
 	} else if ((p = save[i].part) || (p = save[i].patch)) {
 		joinpath (filename, save[i].dir, save[i].archive);
 		if (create_sub_dir (i)) {
-#ifdef VMS
+#	ifdef VMS
 			sprintf(&filename[strlen(filename)], "%s.%s%s", save[i].archive, LONG_PATH_PART, p);
-#else
+#	else
 			sprintf (&filename[strlen(filename)], "/%s.%s%s", save[i].archive, LONG_PATH_PART, p);
-#endif
+#	endif /* VMS */
 		} else {
-#ifdef VMS
+#	ifdef VMS
 			sprintf (&filename[strlen(filename)], "%s%s", LONG_PATH_PART, p);
-#else
+#	else
 			sprintf (&filename[strlen(filename)], ".%s%s", LONG_PATH_PART, p);
-#endif
+#	endif /* VMS */
 		}
 	}
 
 	return filename;
 }
+#endif /* INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -1022,35 +1024,106 @@ post_process_uud (
 	int pp,
 	t_bool auto_delete)
 {
-	char s[LEN], t[LEN], u[LEN];
+	FILE *fp_in;
+	char t[LEN], u[LEN];
 	char buf[LEN];
 	char file_out[PATH_LEN];
 	char file_out_dir[PATH_LEN];
-	FILE *fp_in, *fp_out = NULL;
 	int i, state;
 	int open_out_file;
+#	ifndef HAVE_LIBUU
+	FILE *fp_out = NULL;
+	char s[LEN];
+#	else
+	int errors = 0;
+	uulist *item;
+#	endif /* !HAVE_LIBUU */
 
 	t[0] = '\0';
 	u[0] = '\0';
 
 	my_strncpy (file_out_dir, save_filename (0), sizeof (file_out_dir));
 	for (i = strlen(file_out_dir); i > 0; i--) {
-#ifdef VMS
+#	ifdef VMS
 		if (file_out_dir[i] == ']') {
 			file_out_dir[i+1] = '\0';
-#else
+#	else
 		if (file_out_dir[i] == '/') {
 			file_out_dir[i] = '\0';
-#endif
+#	endif /* VMS */
 			break;
 		}
 	}
 
-#ifdef VMS
+
+#	ifdef HAVE_LIBUU
+	UUInitialize();
+
+	/* Blatant unixism here! */
+	sprintf(file_out, "%s/", file_out_dir);
+
+	/* Clumsy, but file_out is already declared, so might as well use it */
+	UUSetOption(UUOPT_SAVEPATH, 0, file_out);
+	for (i = 0; i < num_save; i++) {
+		if (!save[i].saved)
+			continue;
+
+		my_strncpy (buf, save_filename(i), sizeof (buf));
+		if ((fp_in = fopen (buf, "r")) != (FILE *)NULL) {
+			UULoadFile(buf, NULL, 0);
+			fclose(fp_in);
+		}
+	}
+
+#if 0 /* uudeview's "intelligent" multi-part detection */
+	UUSmerge (0);
+	UUSmerge (1);
+	UUSmerge (99);
+#endif /* 0 */
+
+	i = open_out_file = 0;
+	item = UUGetFileListItem(i);
+	my_printf(cCRLF);
+	while (item != NULL) {
+		state = UUDecodeFile(item, NULL);
+		if (state == UURET_OK) {
+			/* open_out_file already declared, might as well use it */
+			open_out_file++;
+			my_printf("%s successfuly decoded." cCRLF, item->filename);
+		} else {
+			errors++;
+			if (item->filename == NULL)
+				my_printf("Error decoding %s : ", item->subfname);
+			else
+				my_printf("Error decoding %s : ", item->filename);
+
+			if (item->state & UUFILE_MISPART) {
+				my_printf("Missing parts." cCRLF);
+			} else if (item->state & UUFILE_NOBEGIN) {
+				my_printf("No beginning." cCRLF);
+			} else if (item->state & UUFILE_NOEND) {
+				my_printf("No end." cCRLF);
+			} else if (item->state & UUFILE_NODATA) {
+				my_printf("No data." cCRLF);
+			} else {
+				my_printf("Unknown error." cCRLF);
+			}
+		}
+		i++;
+		item = UUGetFileListItem(i);
+		my_flush();
+	}
+	/* FIXME -> lang.c */
+	my_printf("%d files successfully written from %d articles. %d error%s occured." cCRLF, open_out_file, num_save, errors, IS_PLURAL(errors));
+	UUCleanUp();
+	delete_processed_files (auto_delete); /* TRUE = auto-delete files */
+	return;
+#	else
+#		ifdef VMS
 	sprintf (file_out, "%suue.%05d", file_out_dir, process_id);
-#else
+#		else
 	sprintf (file_out, "%s/uue%05d", file_out_dir, process_id);
-#endif
+#		endif /* VMS */
 	state = INITIAL;
 	open_out_file = TRUE;
 
@@ -1142,6 +1215,7 @@ post_process_uud (
 
 	delete_processed_files (auto_delete); /* TRUE = auto-delete files */
 	unlink (file_out);
+#	endif /* HAVE_LIBUU */
 }
 #endif /* !INDEX_DAEMON */
 
@@ -1150,6 +1224,7 @@ post_process_uud (
  *  uudecode a single file
  */
 #ifndef INDEX_DAEMON
+#	ifndef HAVE_LIBUU
 static void
 uudecode_file (
 	int	pp,
@@ -1162,21 +1237,13 @@ uudecode_file (
 
 	wait_message (0, txt_uudecoding, file_out);
 
-#if !defined(M_UNIX)
+#		if !defined(M_UNIX)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
-#else
+#		else
 
 	chdir (file_out_dir); /* FIXME: remove useles cds below and in loopcalls */
-#	ifdef HAVE_LIBUU
-	/* quick hack to test libuu */
-	UUInitialize ();
-	UULoadFile (file_out, NULL, 0);
-   if (UUDecodeFile (UUGetFileListItem (0), NULL) == UURET_OK)
-#	else
 	sh_format (buf, sizeof(buf), "uudecode %s", file_out);
-	if (invoke_cmd (buf))
-#	endif /* HAVE_LIBUU */
-	{
+	if (invoke_cmd (buf)) {
 		/*
 		 *  Sum file
 		 */
@@ -1249,11 +1316,9 @@ uudecode_file (
 			}
 		}
 	}
-#	ifdef HAVE_LIBUU
-	UUCleanUp ();
-#	endif /* HAVE_LIBUU*/
-#endif /* M_UNIX */
+#		endif /* M_UNIX */
 }
+#	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
 
@@ -1265,17 +1330,17 @@ static void
 post_process_sh (
 	t_bool auto_delete)
 {
+	FILE *fp_in, *fp_out;
+	char *ptr1, *ptr2, *ptr3;
 	char buf[LEN];
 	char file_in[PATH_LEN];
 	char file_out[PATH_LEN];
 	char file_out_dir[PATH_LEN];
-	char *ptr1, *ptr2, *ptr3;
 	char sh_pattern_1[16];
 	char sh_pattern_2[16];
 	char sh_pattern_3[64];
-	FILE *fp_in, *fp_out;
-	int found_header;
 	int i, j;
+	t_bool found_header;
 
 	strcpy (sh_pattern_1, "# !/bin/sh");
 	strcpy (sh_pattern_2, "#!/bin/sh");
@@ -1283,22 +1348,22 @@ post_process_sh (
 
 	my_strncpy (file_out_dir, save_filename (0), sizeof (file_out_dir));
 	for (i = strlen(file_out_dir); i > 0; i--) {
-#ifdef VMS
+#	ifdef VMS
 		if (file_out_dir[i] == ']') {
 			file_out_dir[i+1] = '\0';
-#else
+#	else
 		if (file_out_dir[i] == '/') {
 			file_out_dir[i] = '\0';
-#endif
+#	endif /* VMS */
 			break;
 		}
 	}
 
-#ifdef VMS
+#	ifdef VMS
 	sprintf (file_out, "%ssh.%05d", file_out_dir, process_id);
-#else
+#	else
 	sprintf (file_out, "%s/sh%05d", file_out_dir, process_id);
-#endif
+#	endif /* VMS */
 
 	for (j = 0; j < num_save; j++) {
 		if (!save[j].saved)
@@ -1335,16 +1400,16 @@ post_process_sh (
 			}
 			fclose (fp_out);
 
-#if !defined(M_UNIX)
+#	if !defined(M_UNIX)
 			make_post_process_cmd (DEFAULT_UNSHAR, file_out_dir, file_out);
-#else
+#	else
 			sh_format (buf, sizeof(buf), "cd %s; sh %s", file_out_dir, file_out);
 			my_fputs (cCRLF, stdout);
 			my_flush ();
 			Raw (FALSE);
 			invoke_cmd (buf);
 			Raw (TRUE);
-#endif
+#	endif /* M_UNIX */
 			unlink (file_out);
 		}
 	}
@@ -1352,11 +1417,12 @@ post_process_sh (
 }
 #endif /* !INDEX_DAEMON */
 
+
 /*
  * Returns the most recently modified file in the specified drectory
  */
-
 #ifndef INDEX_DAEMON
+#	ifndef HAVE_LIBUU
 static char *
 get_archive_file (
 	char *dir)
@@ -1379,11 +1445,11 @@ get_archive_file (
 
 	dp = (DIR_BUF *) readdir (dirp);
 	while (dp != (DIR_BUF *) 0) {
-#ifdef VMS
+#		ifdef VMS
 		joinpath (buf, dir, dp->d_name);
-#else
+#		else
 		sprintf (buf, "%s/%s", dir, dp->d_name);
-#endif
+#		endif /* VMS */
 		stat (buf, &sbuf);
 		if ((sbuf.st_mtime > last) && S_ISREG(sbuf.st_mode)) {
 			last = sbuf.st_mtime;
@@ -1400,6 +1466,7 @@ get_archive_file (
 
 	return file;
 }
+#	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
 
@@ -1408,9 +1475,8 @@ static void
 delete_processed_files (
 	t_bool auto_delete)
 {
-
-	int delete_it = FALSE;
 	int i;
+	t_bool delete_it = FALSE;
 
 	if (any_saved_files ()) {
 		if (CURR_GROUP.attribute->delete_tmp_files || auto_delete)
@@ -1431,10 +1497,11 @@ delete_processed_files (
 #endif /* !INDEX_DAEMON */
 
 
-static int
+static t_bool
 any_saved_files (void)
 {
-	int i, saved = FALSE;
+	int i;
+	t_bool saved = FALSE;
 
 	for (i = 0; i < num_save; i++) {
 		if (save[i].saved) {
@@ -1454,7 +1521,7 @@ print_art_seperator_line (
 	FILE *fp,
 	int the_mailbox)
 {
-	int sep = 0x01;	/* Ctrl-A */
+	char sep = '\1';	/* Ctrl-A */
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);

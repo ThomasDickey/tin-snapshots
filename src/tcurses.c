@@ -107,7 +107,8 @@ static int _inraw;
 
 /*
  */
-void Raw(int state)
+void Raw(
+	int state)
 {
 	if (state && !_inraw) {
 		TRACE(("reset_prog_mode"))
@@ -218,7 +219,9 @@ void set_xclick_off (void)
 }
 
 void
-MoveCursor(int row, int col)
+MoveCursor(
+	int row,
+	int col)
 {
 	TRACE(("MoveCursor %d,%d", row, col))
 	if (!cmd_line)
@@ -247,7 +250,9 @@ ReadCh(void)
 }
 
 void
-my_printf(const char *fmt, ...)
+my_printf(
+	const char *fmt,
+	...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -265,7 +270,10 @@ my_printf(const char *fmt, ...)
 }
 
 void
-my_fprintf(FILE *stream, const char *fmt, ...)
+my_fprintf(
+	FILE *stream,
+	const char *fmt,
+	...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -284,7 +292,9 @@ my_fprintf(FILE *stream, const char *fmt, ...)
 }
 
 void
-my_fputc(int ch, FILE *fp)
+my_fputc(
+	int ch,
+	FILE *fp)
 {
 	TRACE(("my_fputc(%s)", _tracechar(ch)))
 	if (cmd_line) {
@@ -297,7 +307,9 @@ my_fputc(int ch, FILE *fp)
 }
 
 void
-my_fputs(const char *str, FILE *fp)
+my_fputs(
+	const char *str,
+	FILE *fp)
 {
 	TRACE(("my_fputs(%s)", _nc_visbuf(str)))
 	if (cmd_line) {
@@ -329,7 +341,8 @@ void my_erase(void)
 }
 
 void
-my_fflush(FILE *stream)
+my_fflush(
+	FILE *stream)
 {
 	if (cmd_line)
 		fflush(stream);
@@ -349,7 +362,10 @@ my_retouch(void)
 }
 
 char *
-screen_contents(int row, int col, char *buffer)
+screen_contents(
+	int row,
+	int col,
+	char *buffer)
 {
 	int y, x;
 	int len = COLS - col;
@@ -364,7 +380,9 @@ screen_contents(int row, int col, char *buffer)
 }
 
 void
-write_line(int row, char *buffer)
+write_line(
+	int row,
+	char *buffer)
 {
 	int len = strlen(buffer);
 

@@ -17,7 +17,7 @@
 
 #ifndef INDEX_DAEMON
 	static void read_groups_descriptions (FILE *fp, FILE *fp_save);
-#endif /* !INDEX_DAMON*/
+#endif /* !INDEX_DAEMON */
 
 /*
  *  Load the mail active file into active[]
@@ -29,10 +29,10 @@ read_mail_active_file (void)
 {
 	char	buf[LEN];
 	char	my_spooldir[PATH_LEN];
-	struct	t_group *ptr;
 	FILE	*fp;
 	long	count = -1L;
 	long	min, max;
+	struct	t_group *ptr;
 
 	if (INTERACTIVE)
 		wait_message (0, txt_reading_mail_active_file);
@@ -146,7 +146,7 @@ read_mailgroups_file (void)
 			wait_message (0, "\n");
 	}
 }
-#endif	/* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
+#endif /* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
 
 /*
  *  Load the text description from NEWSLIBDIR/newsgroups for each group into the
@@ -200,23 +200,16 @@ read_groups_descriptions (
 	FILE *fp,
 	FILE *fp_save)
 {
-	char buf[LEN];
+	char *ptr;
 	char group[PATH_LEN];
 	char *p, *q;
-	struct t_group *psGrp;
-#	ifdef SHOW_PROGRESS
 	int count = 0;
-#	endif /* SHOW_PROGRESS */
+	struct t_group *psGrp;
 
-	while (tin_fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		if (buf[0] == '#' || buf[0] == '\0')
+	while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
+		if (*ptr == '#' || *ptr == '\0')
 			continue;
 
-#	if 0 /* tin_fgets() strips \n for us */
-		p = strrchr (buf, '\n');
-		if (p != (char *) 0)
-			*p = '\0';
-#	endif /* 0 */
 /*
  *  This was moved from below and simplified.  I can't test here for the
  *  type of group being read, because that requires having found the
@@ -225,9 +218,9 @@ read_groups_descriptions (
  *  the "-q" option.
  */
 		if ((fp_save != (FILE *) 0) && read_news_via_nntp && !read_local_newsgroups_file)
-			fprintf (fp_save, "%s\n", buf);
+			fprintf (fp_save, "%s\n", ptr);
 
-		for (p = buf, q = group; *p && *p != ' ' && *p != '\t'; p++, q++)
+		for (p = ptr, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
 			*q = *p;
 
 		*q = '\0';
@@ -243,17 +236,18 @@ read_groups_descriptions (
 				*q = ' ';
 
 			psGrp->description = my_strdup (p);
+
 #	if 0 /* not useful for cache_overview_files */
-			if (psGrp->type == GROUP_TYPE_NEWS)
-				if (fp_save != (FILE *) 0 && read_news_via_nntp && !read_local_newsgroups_file) {
-					fprintf (fp_save, "%s\n", buf);
+			if (psGrp->type == GROUP_TYPE_NEWS) {
+				if (fp_save != (FILE *) 0 && read_news_via_nntp && !read_local_newsgroups_file)
+					fprintf (fp_save, "%s\n", ptr);
 			}
 #	endif /* 0 */
 		}
-#	ifdef SHOW_PROGRESS
+
 		if (++count % 100 == 0)
 			spin_cursor ();
-#	endif /* SHOW_PROGRESS */
+
 	}
 }
 #endif /* !INDEX_DAEMON */
@@ -378,7 +372,7 @@ vMakeGrpName (
 }
 
 
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+#ifndef INDEX_DAEMON
 void
 vGrpDelMailArt (
 	struct t_article *psArt)
@@ -386,10 +380,10 @@ vGrpDelMailArt (
 
 	if (psArt->delete_it) {
 		art_mark_undeleted (psArt);
-		info_message ("Article undeleted"); /* FIXME: -> lang.c */
+		info_message (txt_art_undeleted);
 	} else {
 		art_mark_deleted (psArt);
-		info_message ("Article deleted"); /* FIXME: -> lang.c */
+		info_message (txt_art_deleted);
 	}
 }
 
@@ -397,35 +391,41 @@ void
 vGrpDelMailArts (
 	struct t_group *psGrp)
 {
-	char	acArtFile[PATH_LEN];
-	char	acGrpPath[PATH_LEN];
-	int		iNum;
-	int		iUpdateIndexFile = FALSE;
-	struct	t_article *psArt;
+	char acArtFile[PATH_LEN];
+	char acGrpPath[PATH_LEN];
+	int iNum;
+	struct t_article *psArt;
+	t_bool bUpdateIndexFile = FALSE;
 
-	if (psGrp->type == GROUP_TYPE_MAIL) {
-		wait_message (1, "Processing mail messages marked for deletion"); /* FIXME: -> lang.c */
-
+	if (psGrp->type == GROUP_TYPE_MAIL || psGrp->type == GROUP_TYPE_SAVE) {
+		wait_message (1, (psGrp->type == GROUP_TYPE_MAIL) ? txt_processing_mail_arts : txt_processing_saved_arts);
 		vMakeGrpPath (psGrp->spooldir, psGrp->name, acGrpPath);
-
 		for (iNum = 0; iNum < top; iNum++) {
 			psArt = &arts[iNum];
 			if (psArt->delete_it) {
 				sprintf (acArtFile, "%s/%ld", acGrpPath, psArt->artnum);
 				unlink (acArtFile);
 				psArt->thread = ART_EXPIRED;
-				iUpdateIndexFile = TRUE;
+				bUpdateIndexFile = TRUE;
 			}
 		}
 
-/* MAYBE also check if min / max article was deleted.  If so then update
+#if 0
+/*
+ * current tin's build_references() is changed to free msgid and refs,
+ * therefore we cannot call vWriteNovFile after it. I simply commented
+ * out this codes, NovFile will update at next time.
+ */
+/*
+ * MAYBE also check if min / max article was deleted. If so then update
  * the active[] entry for the group and rewrite the mail.active file
  */
-		if (iUpdateIndexFile)
+		if (bUpdateIndexFile)
 			vWriteNovFile (psGrp);
+#endif /* 0 */
 	}
 }
-#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING*/
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -444,7 +444,7 @@ iArtEdit (
 		vMakeGrpPath (psGrp->spooldir, psGrp->name, acTmpFile);
 		sprintf (acArtFile, "%s/%ld", acTmpFile, psArt->artnum);
 		sprintf (acTmpFile, "%s%d.art", TMPDIR, process_id);
-		if (iCopyFile (acArtFile, acTmpFile)) {
+		if (copy_file (acArtFile, acTmpFile)) {
 			invoke_editor (acTmpFile, 1);
 			rename_file (acTmpFile, acArtFile);
 			return TRUE;

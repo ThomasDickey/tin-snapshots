@@ -3,7 +3,7 @@
  *  Module    : sigfile.c
  *  Author    : M. Gleason & I. Lea
  *  Created   : 1992-10-17
- *  Updated   : 1998-02-22
+ *  Updated   : 1998-07-20
  *  Notes     : Generate random signature for posting/mailing etc.
  *  Copyright : (c) Copyright 1989-98 by Mike Gleason & Iain Lea
  *	             You may  freely  copy or  redistribute  this software,
@@ -29,31 +29,32 @@ static char sigfile[PATH_LEN];
 static FILE *open_random_sig (char *sigdir);
 static int thrashdir (char *sigdir);
 
+
 void
 msg_write_signature (
 	FILE *fp,
-	int flag,
+	t_bool flag,
 	struct t_group *thisgroup)
 {
-	char path[PATH_LEN];
-	char cwd[PATH_LEN];
 	FILE *fixfp;
 	FILE *sigfp;
+	char cwd[PATH_LEN];
+	char path[PATH_LEN];
+	char pathfixed[PATH_LEN];
 
 #ifdef NNTP_INEWS
 	if (read_news_via_nntp && use_builtin_inews)
 		flag = TRUE;
-#endif
+#endif /* NNTP_INEWS */
 
 	if (thisgroup) {
-
 		if (!strcmp(thisgroup->attribute->sigfile, "--none"))
 			return;
 
 		if (thisgroup->attribute->sigfile[0] == '!') {
-			char cmd[PATH_LEN];
 			FILE *pipe_fp;
 			char *sigcmd;
+			char cmd[PATH_LEN];
 			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 			if ((sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4)) != NULL) {
 				sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
@@ -76,21 +77,36 @@ msg_write_signature (
 		}
 
 		/*
-		 *  Check to see if sigfile is a directory & if it is  generate a
-		 *  random signature from sigs in sigdir. If the file ~/.sigfixed
-		 *  exists (fixed part of random sig) then  read it  in first and
-		 *  append the random sig part onto the end.
+		 * Check to see if sigfile is a directory & if it is
+		 * generate a random signature from sigs in sigdir. If
+		 * the file path/.sigfixed or ~/.sigfixed exists (fixed
+		 * part of random sig) then read it in first and append
+		 * the random sig part onto the end.
 		 */
 		if ((sigfp = open_random_sig (path)) != (FILE *) 0) {
 #ifdef DEBUG
 			if (debug == 2)
 				error_message ("USING random sig=[%s]", sigfile);
-#endif
+#endif /* DEBUG */
 			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-			joinpath (path, homedir, ".sigfixed");
-			if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
+			joinpath (pathfixed, path, ".sigfixed");
+#ifdef DEBUG
+			if (debug == 2)
+				error_message ("TRYING fixed sig=[%s]", pathfixed);
+#endif /* DEBUG */
+			if ((fixfp = fopen (pathfixed, "r")) != (FILE *) 0) {
 				copy_fp (fixfp, fp);
 				fclose (fixfp);
+			} else {
+				joinpath (pathfixed, homedir, ".sigfixed");
+#ifdef DEBUG
+				if (debug == 2)
+					error_message ("TRYING fixed sig=[%s]", pathfixed);
+#endif /* DEBUG */
+				if ((fixfp = fopen (pathfixed, "r")) != (FILE *) 0) {
+					copy_fp (fixfp, fp);
+					fclose (fixfp);
+				}
 			}
 			copy_fp (sigfp, fp);
 			fclose (sigfp);
@@ -100,7 +116,7 @@ msg_write_signature (
 	}
 
 	/*
-	 *  Use ~/.signature or ~/.Sig or custom .Sig files
+	 * Use ~/.signature or ~/.Sig or custom .Sig files
 	 */
 	if ((sigfp = fopen (default_signature, "r")) != (FILE *) 0) {
 		if (flag) {
@@ -123,8 +139,8 @@ static FILE *
 open_random_sig (
 	char *sigdir)
 {
-	time_t epoch;
 	struct stat st;
+	time_t epoch;
 
 	if (stat (sigdir, &st) != -1) {
 		if (S_ISDIR(st.st_mode)) {
@@ -136,13 +152,13 @@ open_random_sig (
 #ifdef DEBUG
 				if (debug == 2)
 					error_message ("NO sigfile=[%s]", sigfile);
-#endif
+#endif /* DEBUG */
 				return (FILE *) 0;
 			} else {
 #ifdef DEBUG
 				if (debug == 2)
 					error_message ("sigfile=[%s]", sigfile);
-#endif
+#endif /* DEBUG */
 				return fopen (sigfile, "r");
 			}
 		}
@@ -174,13 +190,14 @@ thrashdir (
 
 	/*
 	 * consider "." and ".." non-entries
+	 * consider all entries starting with "." non-entries
 	 */
 	cwd = (char *) my_malloc (PATH_LEN + 1);
 #ifndef M_AMIGA
 	if (numentries < 3 || cwd == (char *) 0) {
 #else
 	if (numentries == 0 || cwd == (char *) 0) {
-#endif
+#endif /* !M_AMIGA */
 		closedir (dirp);
 		return (-1);
 	}
@@ -188,29 +205,30 @@ thrashdir (
 	get_cwd (cwd);
 	recurse = strcmp (cwd, sigdir);
 
-	/* If we are using the root sig directory, we don't want
+	/*
+	 * If we are using the root sig directory, we don't want
 	 * to recurse, or else we might use a custom sig intended
 	 * for a specific newsgroup (and not this one).
 	 */
 	for (safeguard=0, dp=NULL; safeguard<MAXLOOPS && dp==NULL; safeguard++) {
 #ifdef DEBUG
-if (debug == 2)
-	error_message ("sig loop=[%d] recurse=[%d]", safeguard, recurse);
-#endif
+	if (debug == 2)
+		error_message ("sig loop=[%d] recurse=[%d]", safeguard, recurse);
+#endif /* DEBUG */
 #ifdef HAVE_REWINDDIR
 		rewinddir (dirp);
 #else
 		closedir (dirp);
 		if ((dirp = opendir (CURRENTDIR)) == NULL)
 			return (1);
-#endif
+#endif /* HAVE_REWINDDIR */
 		pick = rand () % numentries + 1;
 		while (--pick >= 0) {
 			if ((dp = readdir (dirp)) == NULL)
 				break;
 		}
 		if (dp != NULL) {	/* if we could open the dir entry */
-			if (!strcmp (dp->d_name, CURRENTDIR) || !strcmp (dp->d_name, ".."))
+			if (!strcmp (dp->d_name, CURRENTDIR) || (dp->d_name[0] == '.'))
 				dp = NULL;
 			else {	/* if we have a non-dot entry */
 				if (stat (dp->d_name, &st) == -1) {
@@ -242,12 +260,12 @@ if (debug == 2)
 					strcat (sigfile, "\\");
 #else
 					strcat (sigfile, "/");
-#endif
+#endif /* WIN32 */
 					strcat (sigfile, dp->d_name);
 #ifdef DEBUG
-if (debug == 2)
-	error_message ("Found a file=[%s]", sigfile);
-#endif
+					if (debug == 2)
+						error_message ("Found a file=[%s]", sigfile);
+#endif /* DEBUG */
 				}
 			}
 		}
@@ -256,7 +274,7 @@ if (debug == 2)
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("return 0: sigfile=[%s]", sigfile);
-#endif
+#endif /* DEBUG */
 	closedir (dirp);
 
 	return (0);

@@ -30,7 +30,7 @@ extern void vWriteNovFile (struct t_group *psGrp);
 
 /* attrib.c */
 #ifndef INDEX_DAEMON
-	extern void read_attributes_file (char *file, int global_file);
+	extern void read_attributes_file (char *file, t_bool global_file);
 	extern void write_attributes_file (char *file);
 #endif /* !INDEX_DAEMON */
 
@@ -120,15 +120,15 @@ extern char get_post_proc_type (int proc_type);
 #endif /* !INDEX_DAEMON */
 
 /* filter.c */
-extern int filter_articles (struct t_group *group);
-extern int filter_menu (int type, struct t_group *group, struct t_article *art);
-extern int quick_filter_kill (struct t_group *group, struct t_article *art);
-extern int quick_filter_select (struct t_group *group, struct t_article *art);
-extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
 extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
+extern t_bool filter_articles (struct t_group *group);
+extern t_bool filter_menu (int type, struct t_group *group, struct t_article *art);
+extern t_bool quick_filter_kill (struct t_group *group, struct t_article *art);
+extern t_bool quick_filter_select (struct t_group *group, struct t_article *art);
+extern t_bool quick_filter_select_posted_art (struct t_group *group, char *subj);
 extern void free_all_filter_arrays (void);
 #ifndef INDEX_DAEMON
-	extern int read_filter_file (char *file, t_bool global_file);
+	extern t_bool read_filter_file (char *file, t_bool global_file);
 #endif /* !INDEX_DAEMON */
 
 /* getline.c */
@@ -138,14 +138,14 @@ extern char *tin_getline (const char *prompt, int number_only, char *str, int ma
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
 extern void clear_note_area (void);
 extern void decr_tagged (int tag);
-extern void group_page (struct t_group *group);
 extern void mark_screen (int level, int screen_row, int screen_col, const char *value);
 extern void set_subj_from_size (int num_cols);
 extern void show_group_page (void);
 extern void toggle_subject_from (void);
 #ifndef INDEX_DAEMON
-	extern void toggle_read_unread(t_bool force);
+	extern void group_page (struct t_group *group);
 	extern void move_to_thread (int n);
+	extern void toggle_read_unread(t_bool force);
 #endif /* !INDEX_DAEMON */
 
 /* hashstr.c */
@@ -177,8 +177,8 @@ extern void get_from_name (char *from_name, struct t_group *thisgrp);
 extern void get_user_info (char *user_name, char *full_name);
 
 /* init.c */
-extern int create_mail_save_dirs (void);
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
+extern t_bool create_mail_save_dirs (void);
 extern void init_selfinfo (void);
 #ifdef HAVE_COLOR
 	extern void postinit_colors (void);
@@ -216,12 +216,12 @@ extern void vPrintActiveHead (char *pcActiveFile);
 extern void vPrintGrpLine (FILE *hFp, char *pcGrpName, long lArtMax, long lArtMin, char *pcBaseDir);
 #ifndef INDEX_DAEMON
 	extern int iArtEdit (struct t_group *psGrp, struct t_article *psArt);
+	extern void vGrpDelMailArts (struct t_group *psGrp);
+	extern void vGrpDelMailArt (struct t_article *psArt);
 #endif /* !INDEX_DAEMON */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	extern void read_mail_active_file (void);
 	extern void read_mailgroups_file (void);
-	extern void vGrpDelMailArt (struct t_article *psArt);
-	extern void vGrpDelMailArts (struct t_group *psGrp);
 	extern void write_mail_active_file (void);
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
@@ -250,7 +250,6 @@ extern char *quote_wild_whitespace(char *str);
 extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
-extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
 extern int invoke_cmd (char *nam);
 extern int invoke_editor (char *filename, int lineno);
 extern int my_chdir (char *path);
@@ -260,9 +259,10 @@ extern int peek_char (FILE *fp);
 extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format);
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
-extern int untag_all_articles (void);
 extern long file_size (char *file);
+extern t_bool copy_file (char *pcSrcFile, char *pcDstFile);
 extern t_bool mail_check (void);
+extern t_bool untag_all_articles (void);
 extern void append_file (char *old_filename, char *new_filename);
 extern void asfail (const char *file, int line, const char *cond);
 extern void base_name (char *dirname, char *program);
@@ -299,7 +299,7 @@ extern void vPrintBugAddress (void);
 #ifndef M_UNIX
 	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
 #endif /* !M_UNIX */
-#ifndef	NO_SHELL_ESCAPE
+#ifndef NO_SHELL_ESCAPE
 	extern void shell_escape (void);
 #endif /* !NO_SHELL_ESCAPE */
 
@@ -322,24 +322,26 @@ extern void thd_mark_read (struct t_group *group, long thread);
 extern void thd_mark_unread (struct t_group *group, long thread);
 extern void vSetDefaultBitmap (struct t_group *group);
 extern t_bool vWriteNewsrc (void);
+#ifndef INDEX_DAEMON
+	extern void art_mark_deleted (struct t_article *art);
+	extern void art_mark_undeleted (struct t_article *art);
+#endif /* !INDEX_DAEMON */
 #ifdef DEBUG_NEWSRC
 	extern void vNewsrcTestHarness (void);
 #endif /* DEBUG_NEWSRC */
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-	extern void art_mark_deleted (struct t_article *art);
-	extern void art_mark_undeleted (struct t_article *art);
-#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /* nntplib.c */
+extern FILE *get_nntp_fp(FILE *fp);
+extern FILE *get_nntp_wr_fp(FILE *fp);
 extern char *getserverbyfile (const char *file);
 extern char *get_server (char *string, int size);
-#ifdef DEBUG
-	extern const char *nntp_respcode (int respcode);
-#endif /* DEBUG */
 extern int server_init (char *machine, const char *service, int port, char *text);
 extern void close_server (void);
 extern void put_server (const char *string);
 extern void u_put_server (const char *string);
+#ifdef DEBUG
+	extern const char *nntp_respcode (int respcode);
+#endif /* DEBUG */
 
 /* nrctbl.c */
 extern int get_newsrcname (char *newsrc_name, const char *nntpserver_name);
@@ -392,19 +394,22 @@ extern time_t parsedate (char *p, TIMEINFO *now);
 /* post.c */
 extern int count_postponed_articles (void);
 extern int mail_bug_report (void);
-extern int mail_to_author (char *group, int respnum, int copy_text, int with_headers);
+extern int mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
 extern int mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
 extern int post_article (char *group, int *posted_flag);
-extern int post_response (char *group, int respnum, int copy_text, int with_headers);
-extern int repost_article (char *group, int respnum, int supersede);
-extern int reread_active_after_posting (void);
-extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
+extern int post_response (char *group, int respnum, int copy_text, t_bool with_headers);
+extern int repost_article (const char *group, int respnum, int supersede);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
+extern t_bool reread_active_after_posting (void);
 extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile);
 extern void quick_post_article (t_bool postponed_only);
+#ifndef INDEX_DAEMON
+	extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
+#endif /* !INDEX_DAEMON */
 
 /* prompt.c */
+extern char *prompt_string_default (char *prompt, char *def, const char *failtext, int history);
 extern char *sized_message (const char *format, const char *subject);
 extern int prompt_default_string (const char *prompt, char *buf, int buf_len, char *default_prompt, int which_hist);
 extern int prompt_list (int row, int col, int var, constext *help_text, constext *prompt_text, constext *list[], int size);
@@ -420,8 +425,7 @@ extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 
 /* read.c */
-extern char *fgets_hdr (char *s, size_t size, FILE *f);
-extern char *tin_fgets (char *buffer, size_t len, FILE *fp);
+extern char *tin_fgets (FILE *fp, t_bool header);
 #ifdef NNTP_ABLE
 	extern void drain_buffer (FILE *fp);
 #endif /* NNTP_ABLE */
@@ -453,18 +457,17 @@ extern void get_mm_charset (void);
 extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool allow_8bit_header,t_bool ismail);
 
 /* save.c */
-extern char *save_filename (int i);
 extern int check_start_save_any_news (int check_start_save);
 extern int create_path (char *path);
 extern int post_process_files (int proc_type_ch, t_bool auto_delete);
 extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
 extern int save_comp (t_comptype *p1, t_comptype *p2);
-extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
 extern void print_art_seperator_line (FILE *fp, int the_mailbox);
 extern void sort_save_list (void);
 #ifndef INDEX_DAEMON
 	extern int save_regex_arts (int is_mailbox, char *group_path);
 	extern t_bool save_thread_to_file (int is_mailbox, char *group_path);
+	extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
 #endif /* !INDEX_DAEMON */
 
 /* screen.c */
@@ -495,18 +498,18 @@ extern void search_subject_thread (int forward, int baseart, int offset);
 /* select.c */
 extern int add_my_group (char *group, t_bool add);
 extern int choose_new_group (void);
-extern int iSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern int skip_newgroups (void);
+extern t_bool bSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern void draw_group_arrow (void);
 extern void selection_index (int start_groupnum, int num_cmd_line_groups);
-extern void set_groupname_len (int all_groups);
+extern void set_groupname_len (t_bool all_groups);
 extern void show_selection_page (void);
 extern void strip_line (char *line);
 extern void toggle_my_groups (t_bool only_unread_groups, const char *group);
 extern void move_to_group (int n);
 
 /* sigfile.c */
-extern void msg_write_signature (FILE *fp, int flag, struct t_group *thisgroup);
+extern void msg_write_signature (FILE *fp, t_bool flag, struct t_group *thisgroup);
 
 /* signal.c */
 extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);

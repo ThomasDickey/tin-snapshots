@@ -36,7 +36,7 @@ failed (
 	const char *message)
 {
 	perror (message);
-	exit (1);
+	exit (EXIT_FAILURE);
 }
 
 static FILE *

@@ -183,7 +183,7 @@ set_default_attributes (
 void
 read_attributes_file (
 	char	*file,
-	int	global_file)
+	t_bool global_file)
 {
 	char buf[LEN];
 	char line[LEN];
@@ -383,9 +383,9 @@ set_attrib_str (
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 #ifdef DEBUG
-if (debug)
-	my_printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
-#endif
+				if (debug)
+					my_printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
+#endif /* DEBUG */
 				set_attrib (psGrp, type, str, -1);
 			}
 		} else {
@@ -394,9 +394,9 @@ if (debug)
 /* TODO can we use match_group_list() here for better effect ? */
 				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
 #ifdef DEBUG
-if (debug)
-	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
-#endif
+					if (debug)
+						my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Str=[%s]\n", scope, psGrp->name, type, str);
+#endif /* DEBUG */
 					set_attrib (psGrp, type, str, -1);
 				}
 			}
@@ -422,9 +422,9 @@ set_attrib_num (
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 #ifdef DEBUG
-if (debug)
-	my_printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
-#endif
+				if (debug)
+					my_printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
+#endif /* DEBUG */
 				set_attrib (psGrp, type, "", num);
 			}
 		} else {
@@ -433,9 +433,9 @@ if (debug)
 /* TODO use match_group_list() here too ? */
 				if (GROUP_MATCH (psGrp->name, scope, TRUE)) {
 #ifdef DEBUG
-if (debug)
-	my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
-#endif
+					if (debug)
+						my_printf ("SCOPE=[%s] Group=[%s] Type=[%2d] Num=[%d]\n", scope, psGrp->name, type, num);
+#endif /* DEBUG */
 					set_attrib (psGrp, type, "", num);
 				}
 			}

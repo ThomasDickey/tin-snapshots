@@ -311,9 +311,9 @@
 /*
  * If OS misses the isascii() function
  */
-#ifndef HAVE_ISASCII
+#if !defined(HAVE_ISASCII) && !defined(isascii)
 #	define isascii(c) (!((c) & ~0177))
-#endif /* !HAVE_ISASCII */
+#endif /* !HAVE_ISASCII && !isascii */
 
 /*
  * Setup support for reading from NNTP
@@ -326,6 +326,8 @@
 #		define	NNTP_INEWS
 #	endif
 #endif
+
+#define FAKE_NNTP_FP		(FILE *) 9999
 
 /*
  *  Time idle after which to check (via STAT) if nntp connection is still ok
@@ -637,25 +639,14 @@
 #define	_CONF_ORGANIZATION	"organization"
 #define	_CONF_SERVER	"server"
 
-#ifndef FALSE
-#	define	FALSE	0
-#endif
-
-#ifndef TRUE
-#	define	TRUE	(!FALSE)
-#endif
-
-typedef unsigned t_bool;	/* don't make this a char or short! */
-
-#define bool_equal(a,b) ((a) ? (b) : !(b))
-#define bool_not(b) ((b) ? FALSE : TRUE)
-#define bool_unparse(b) ((b) ? "true" : "false")
+#include <bool.h>
 
 #ifndef MAX
 #	define	MAX(a,b)	((a > b) ? a : b)
 #endif
 
 #ifndef forever
+/*@notfunction@*/
 #	define	forever	for(;;)
 #endif
 
@@ -794,7 +785,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  * Only close off our stream when reading on local spool
  */
 #ifdef NNTP_ABLE
-#	define TIN_FCLOSE(x)	if (!read_news_via_nntp) fclose(x)
+#	define TIN_FCLOSE(x)	if (x != FAKE_NNTP_FP) fclose(x)
 #else
 #	define TIN_FCLOSE(x)	fclose(x)
 #endif /* NNTP_ABLE */
@@ -816,7 +807,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  */
 #define	GROUP_TYPE_MAIL	0
 #define	GROUP_TYPE_NEWS	1
-#define	GROUP_TYPE_SAVE	2		/* What on earth is this ? */
+#define	GROUP_TYPE_SAVE	2	/* saved news, read with tin -R */
 
 /*
  * used by get_arrow_key()
@@ -873,7 +864,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	FEED_PIPE		2
 #define	FEED_PRINT		3
 #define	FEED_SAVE		4
-#define	FEED_SAVE_TAGGED		5
+#define	FEED_AUTOSAVE_TAGGED		5
 #define	FEED_REPOST		6
 
 #if 0
@@ -974,10 +965,15 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	GRP_NOREDRAW		-5		/* Unclear meaning ? */
 #define	GRP_KILLED		-6		/* thread was killed at art level */
 
-#define	EXIT_OK			0
-#define	EXIT_ERROR		1
-#define	EXIT_NNTP_ERROR		2
+#ifndef EXIT_SUCCESS
+#	define EXIT_SUCCESS	0	/* Successful exit status */
+#endif /* !EXIT_SUCCESS */
 
+#ifndef EXIT_FAILURE
+#	define EXIT_FAILURE	1	/* Failing exit status */
+#endif /* !EXIT_FAILURE */
+
+#define	NNTP_ERROR_EXIT	2
 
 /*
  * Assertion verifier
@@ -993,8 +989,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	ESC	27
 
-/* Turn on nice progress indicators */
-#define	SHOW_PROGRESS
 
 /*
  * return codes for change_config_file ()
@@ -1283,7 +1277,7 @@ struct t_attribute
  */
 struct t_newsrc
 {
-	int	present;			/* update newsrc ? */
+	t_bool	present;			/* update newsrc ? */
 	long	num_unread;			/* unread articles in group */
 	long	xmax;				/* newsrc max */
 	long	xmin;				/* newsrc min */
@@ -1402,6 +1396,13 @@ struct t_filter_rule
 	int expire_time;
 };
 
+struct t_header_list
+{
+	char header[HEADER_LEN];
+	char content[HEADER_LEN];
+	struct t_header_list *next;
+};
+
 struct t_header
 {
 	char from[HEADER_LEN];		/* From: */
@@ -1420,6 +1421,8 @@ struct t_header
 	char contenttype[HEADER_LEN];	/* Content-Type: */
 	char contentenc[HEADER_LEN];	/* Content-Transfer-Encoding: */
 	char ftnto[HEADER_LEN];		/* Old X-Comment-To: (Used by FIDO) */
+	char authorids[HEADER_LEN];	/* Author-IDs: (USEFOR, 2nd Son of 1036) */
+	struct t_header_list *persist;	/* P-ersistent headers (USEFOR, 2nd Son of 1036) */
 };
 
 struct t_save
@@ -1432,7 +1435,7 @@ struct t_save
 	char *patch;
 	int index;
 	int saved;
-	int is_mailbox;
+	t_bool is_mailbox;
 };
 
 struct t_screen
@@ -1555,7 +1558,7 @@ typedef struct t_notify *notify_p;
 #define	MOUSE_BUTTON_2		1
 #define	MOUSE_BUTTON_3		2
 
-#define	EDITOR_FORMAT_OFF		"%E %F"
+#define	TIN_EDITOR_FMT_OFF		"%E %F"
 
 #ifdef M_AMIGA
 #	define	NEWSGROUPS_FILE 	"newsdescrip"
@@ -1565,7 +1568,7 @@ typedef struct t_notify *notify_p;
 #	define	ENV_VAR_MAILER		"TIN_MAIL"
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	ENV_VAR_SHELL		"SHELL"
-#	define	EDITOR_FORMAT_ON	"%E %F"
+#	define	TIN_EDITOR_FMT_ON	"%E %F"
 #	define	MAILER_FORMAT		"%M <%F -f %U"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR			"T:"
@@ -1579,7 +1582,7 @@ extern void joinpath (char *result, const char *dir, const char *file);
 #	define	ENV_VAR_MAILER		"TIN_MAILER"
 /*#	define	ENV_VAR_SHELL		"SHELL"*/
 #	define	ENV_VAR_POSTER		"TIN_POST"
-#	define	EDITOR_FORMAT_ON	"%E %F"
+#	define	TIN_EDITOR_FMT_ON	"%E %F"
 #	define METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR "SYS$SCRATCH:"
 #	ifdef	HAVE_KEY_PREFIX
@@ -1597,7 +1600,7 @@ extern void joindir (char *result, const char *dir, const char *file);
 #	define	ENV_VAR_MAILER		"TIN_MAIL"
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	ENV_VAR_SHELL		"COMSPEC"
-#	define	EDITOR_FORMAT_ON	"%E %F"
+#	define	TIN_EDITOR_FMT_ON	"%E %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
 #endif
@@ -1610,7 +1613,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	ENV_VAR_MAILER		"TIN_MAIL"
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	ENV_VAR_SHELL		"COMSPEC"
-#	define	EDITOR_FORMAT_ON	"%E +%N %F"
+#	define	TIN_EDITOR_FMT_ON	"%E +%N %F"
 #	define	MAILER_FORMAT		"%M -t %T -f %U -s \"%S\" -F %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
@@ -1622,7 +1625,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	REDIRECT_PGP_OUTPUT		"> /dev/null"
 #	define	ENV_VAR_MAILER		"MAILER"
 #	define	ENV_VAR_SHELL		"SHELL"
-#	define	EDITOR_FORMAT_ON		"%E +%N %F"
+#	define	TIN_EDITOR_FMT_ON		"%E +%N %F"
 #	define	MAILER_FORMAT		"%M -t < %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR		"/tmp/"
@@ -1648,8 +1651,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #ifndef ENV_VAR_SHELL
 #	define	ENV_VAR_SHELL		""
 #endif
-#ifndef EDITOR_FORMAT_ON
-#	define	EDITOR_FORMAT_ON		""
+#ifndef TIN_EDITOR_FMT_ON
+#	define	TIN_EDITOR_FMT_ON		""
 #endif
 #ifndef MAILER_FORMAT
 #	define	MAILER_FORMAT		""

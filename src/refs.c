@@ -185,7 +185,7 @@ add_msgid(
 
 	if (!msgid) {
 		error_message("add_msgid: NULL msgid\n");
-		exit(1);
+		exit (EXIT_FAILURE);
 	}
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
@@ -626,7 +626,7 @@ static struct t_msgid *
 find_next(
 	struct t_msgid *ptr)
 {
-	static int bottom = FALSE;
+	static t_bool bottom = FALSE;
 
 	/*
 	 * Keep going while we haven't bottomed out and we haven't
@@ -817,7 +817,7 @@ collate_subjects(void)
 		}
 
 		/*
-		 * Update the magic marker with the highest numbered msg in
+		 * Update the magic marker with the highest numbered mesg in
 		 * arts[] that has been used in this thread so far
 		 */
 		h->aptr = i;

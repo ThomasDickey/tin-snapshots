@@ -21,7 +21,7 @@ int default_move_group;
 int cur_groupnum = 0;
 int first_group_on_screen;
 int last_group_on_screen;
-int space_mode;
+t_bool space_mode;
 
 
 /*
@@ -29,25 +29,27 @@ int space_mode;
  */
 #ifndef INDEX_DAEMON
 	static int continual_key (int ch, int ch1);
-	static int next_unread_group (int enter_group);
+	static int next_unread_group (t_bool enter_group);
 	static void prompt_group_num (int ch);
 	static int reposition_group (struct t_group *group, int default_num);
-	static void catchup_group (struct t_group *group, int goto_next_unread_group);
+	static void catchup_group (struct t_group *group, t_bool goto_next_unread_group);
 	static void yank_active_file (void);
 	static void subscribe_pattern (const char *prompt, const char *message, const char *result, t_bool state);
 #endif /* !INDEX_DAEMON */
 
-static t_bool iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
+static t_bool bParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
 static void vDelRange (int iLevel, int iNumMax);
 static void erase_group_arrow (void);
+
 
 /*
  *  TRUE, if we should check whether it's time to reread the active file
  *  after this keypress.
  */
-
 static int
-continual_key (int ch, int ch1)
+continual_key (
+	int ch,
+	int ch1)
 {
 	switch(ch) {
 #ifndef NO_SHELL_ESCAPE
@@ -99,7 +101,7 @@ selection_index (
 	int INDEX_BOTTOM;
 	int posted_flag;
 	int scroll_lines;
-	int yank_in_active_file = TRUE;
+	t_bool yank_in_active_file = TRUE;
 
 	cur_groupnum = start_groupnum;
 
@@ -225,7 +227,7 @@ end_of_list:
 				break;
 
 			case iKeySetRange:	/* set range */
-				if (iSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1))
+				if (bSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1))
 					show_selection_page ();
 				break;
 
@@ -461,9 +463,9 @@ select_done:
 				if (!confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
 					if (!no_write)
 						write_config_file (local_config_file);
-					tin_done (EXIT_OK);	/* Tin END */
+					tin_done (EXIT_SUCCESS);	/* Tin END */
 				}
-				if (prompt_yn (cLINES, txt_save_config, TRUE) == 1) {
+				if (!no_write && prompt_yn (cLINES, txt_save_config, TRUE) == 1) {
 					write_config_file (local_config_file);
 					vWriteNewsrc ();
 				}
@@ -471,13 +473,14 @@ select_done:
 				break;
 
 			case iKeySelectQuit2:	/* quit, no ask */
-				write_config_file (local_config_file);
-				tin_done (EXIT_OK);
+				if (!no_write)
+					write_config_file (local_config_file);
+				tin_done (EXIT_SUCCESS);
 				break;
 
 			case iKeySelectQuitNoWrite:	/* quit, but don't save configuration */
 				if (prompt_yn (cLINES, txt_quit_no_write, TRUE) == 1)
-					tin_done (EXIT_OK);
+					tin_done (EXIT_SUCCESS);
 				show_selection_page ();
 				break;
 
@@ -525,7 +528,7 @@ select_done:
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
 					info_message(txt_unsubscribed_to, CURR_GROUP.name);
 					move_to_group (cur_groupnum + 1);
-				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK) {
+				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK && !no_write) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
 					vWriteNewsrc();	/* save current newsrc */
@@ -586,14 +589,16 @@ select_done:
 					n = group_top;
 					if (group_top)
 						strcpy (buf, CURR_GROUP.name);
-					vWriteNewsrc ();
-
 					/*
 					 * Reset counter and read in all the groups in active[]
 					 */
 					group_top = 0;
 					for (i = 0; i < num_active; i++)
+#if 0
 						(void) my_group_add (active[i].name);
+#else
+						my_group[group_top++] = i;
+#endif
 
 					/*
 					 * If there are now more groups than before, we did yank something
@@ -610,7 +615,6 @@ select_done:
 					yank_in_active_file = FALSE;
 				} else {												/* Yank out */
 					wait_message (0, txt_yanking_sub_groups);
-					vWriteNewsrc ();
 					toggle_my_groups(show_only_unread_groups, "");
 					HpGlitch(erase_group_arrow ());
 					cur_groupnum = group_top - 1;
@@ -624,15 +628,16 @@ select_done:
 				yank_active_file ();
 				break;
 
-			case iKeySelectMarkGrpUnread:	/* mark group unread */
+			case iKeySelectMarkGrpUnread:
+			case iKeySelectMarkGrpUnread2:	/* mark group unread */
 				if (!group_top)
 					break;
 				grp_mark_unread (&CURR_GROUP);
 				if (CURR_GROUP.newsrc.num_unread)
-					strcpy (msg, tin_ltoa(CURR_GROUP.newsrc.num_unread, 5));
+					strcpy (mesg, tin_ltoa(CURR_GROUP.newsrc.num_unread, 5));
 				else
-					strcpy (msg, "     ");
-				mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, msg);
+					strcpy (mesg, "     ");
+				mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, mesg);
 				break;
 
 			default:
@@ -845,9 +850,9 @@ choose_new_group (void)
 	char *p;
 	int idx;
 
-	sprintf (msg, txt_newsgroup, default_goto_group);
+	sprintf (mesg, txt_newsgroup, default_goto_group);
 
-	if (!prompt_string (msg, buf, HIST_GOTO_GROUP))
+	if (!prompt_string (mesg, buf, HIST_GOTO_GROUP))
 		return -1;
 
 	if (strlen (buf))
@@ -989,7 +994,7 @@ reposition_group (
 static void
 catchup_group (
 	struct t_group *group,
-	int goto_next_unread_group)
+	t_bool goto_next_unread_group)
 {
 	if (!confirm_action || prompt_yn (cLINES, sized_message(txt_mark_group_read, group->name), TRUE) == 1) {
 		grp_mark_read (group, NULL);
@@ -1003,9 +1008,10 @@ catchup_group (
 
 static int
 next_unread_group (
-	int enter_group)
+	t_bool enter_group)
 {
-	int i, all_groups_read = TRUE;
+	int i;
+	t_bool all_groups_read = TRUE;
 
 	for (i = cur_groupnum; i < group_top; i++) {
 		if (active[my_group[i]].newsrc.num_unread != 0) {
@@ -1065,7 +1071,7 @@ next_unread_group (
  */
 void
 set_groupname_len (
-	int all_groups)
+	t_bool all_groups)
 {
 	int len;
 	register int i;
@@ -1253,6 +1259,7 @@ strip_line (
 	*++ptr = '\0';
 }
 
+
 /*
  * Allows user to specify an group/article range that a followup
  * command will operate on (eg. catchup articles 1-56) # 1-56 K
@@ -1263,9 +1270,8 @@ strip_line (
  *   1-$     mark grp/art 1 thru last
  *   .-$     mark grp/art current thru last
  */
-
-int
-iSetRange (
+t_bool
+bSetRange (
 	int iLevel,
 	int iNumMin,
 	int iNumMax,
@@ -1275,9 +1281,9 @@ iSetRange (
 	char acRng[PATH_LEN];
 	int iIndex;
 	int iNum;
-	int iRetCode = FALSE;
 	int iRngMin;
 	int iRngMax;
+	t_bool bRetCode = FALSE;
 
 	switch (iLevel)
 	{
@@ -1291,16 +1297,16 @@ iSetRange (
 			pcPtr = default_range_thread;
 			break;
 		default:
-			return iRetCode;
+			return bRetCode;
 	}
 /*
 	error_message ("Min=[%d] Max=[%d] Cur=[%d] DefRng=[%s]",
 		iNumMin, iNumMax, iNumCur, pcPtr);
 */
-	sprintf (msg, txt_enter_range, pcPtr);
+	sprintf (mesg, txt_enter_range, pcPtr);
 
-	if (!prompt_string (msg, acRng, HIST_OTHER))
-		return iRetCode;
+	if (!prompt_string (mesg, acRng, HIST_OTHER))
+		return bRetCode;
 
 	if (strlen (acRng))
 		strcpy (pcPtr, acRng);
@@ -1308,21 +1314,20 @@ iSetRange (
 		if (*pcPtr)
 			strcpy (acRng, pcPtr);
 		else
-			return iRetCode;
+			return bRetCode;
 	}
 
 	/*
 	 * Parse range string
 	 */
-	if (!iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
+	if (!bParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
 		/* FIXME -> lang.c */
 		info_message ("Invalid range - valid are '0-9.$' eg. 1-$");
 	else {
 /*
-		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]",
-			pcPtr, acRng, iRngMin, iRngMax);
+		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]", pcPtr, acRng, iRngMin, iRngMax);
 */
-		iRetCode = TRUE;
+		bRetCode = TRUE;
 		switch (iLevel)
 		{
 			case SELECT_LEVEL:
@@ -1345,16 +1350,16 @@ iSetRange (
 				}
 				break;
 			default:
-				iRetCode = FALSE;
+				bRetCode = FALSE;
 				break;
 		}
 	}
-
-	return iRetCode;
+	return bRetCode;
 }
 
+
 static t_bool
-iParseRange (
+bParseRange (
 	char *pcRange,
 	int iNumMin,
 	int iNumMax,
@@ -1363,19 +1368,19 @@ iParseRange (
 	int *piRngMax)
 {
 	char *pcPtr;
-	t_bool iRetCode = FALSE;
-	t_bool iSetMax = FALSE;
-	t_bool iDone = FALSE;
+	t_bool bRetCode = FALSE;
+	t_bool bSetMax = FALSE;
+	t_bool bDone = FALSE;
 
 	pcPtr = pcRange;
 	*piRngMin = -1;
 	*piRngMax = -1;
 
-	while (*pcPtr && !iDone) {
+	while (*pcPtr && !bDone) {
 		if (*pcPtr >= '0' && *pcPtr <= '9') {
-			if (iSetMax) {
+			if (bSetMax) {
 				*piRngMax = atoi (pcPtr);
-				iDone = TRUE;
+				bDone = TRUE;
 			} else
 				*piRngMin = atoi (pcPtr);
 			while (*pcPtr >= '0' && *pcPtr <= '9')
@@ -1383,19 +1388,19 @@ iParseRange (
 		} else {
 			switch (*pcPtr) {
 				case '-':
-					iSetMax = TRUE;
+					bSetMax = TRUE;
 					break;
 				case '.':
-					if (iSetMax) {
+					if (bSetMax) {
 						*piRngMax = iNumCur;
-						iDone = TRUE;
+						bDone = TRUE;
 					} else
 						*piRngMin = iNumCur;
 					break;
 				case '$':
-					if (iSetMax) {
+					if (bSetMax) {
 						*piRngMax = iNumMax;
-						iDone = TRUE;
+						bDone = TRUE;
 					}
 					break;
 				default:
@@ -1406,9 +1411,9 @@ iParseRange (
 	}
 
 	if (*piRngMin >= iNumMin && *piRngMax > iNumMin && *piRngMax <= iNumMax)
-		iRetCode = TRUE;
+		bRetCode = TRUE;
 
-	return iRetCode;
+	return bRetCode;
 }
 
 
@@ -1470,6 +1475,6 @@ move_to_group(
 		show_selection_page ();
 
 	if (CURR_GROUP.aliasedto) /* FIXME -> lang.c */
-		info_message ("please use %.100s instead", CURR_GROUP.aliasedto);
+		info_message ("Please use %.100s instead", CURR_GROUP.aliasedto);
 }
 #endif /* !INDEX_DAEMON */

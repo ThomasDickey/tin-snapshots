@@ -22,31 +22,26 @@
 #define EXPIRED(a) ((a)->article == ART_UNAVAILABLE || \
 		    arts[(a)->article].thread == ART_EXPIRED)
 
-#if 0 /* needed by old threading tree */
-/* String of spaces to use to show depth of threading */
-#define THREAD_SPACER		"  "
-#endif /* 0 */
-
 int thread_basenote = 0;
-int show_subject;
+t_bool show_subject;
 
 #ifndef INDEX_DAEMON
-static int thread_index_point = 0;
-static int top_thread = 0;
-static int thread_respnum = 0;
-static int first_thread_on_screen = 0;
-static int last_thread_on_screen = 0;
-#endif
+	static int thread_index_point = 0;
+	static int top_thread = 0;
+	static int thread_respnum = 0;
+	static int first_thread_on_screen = 0;
+	static int last_thread_on_screen = 0;
+#endif /* !INDEX_DAEMON */
 
 /*
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
-	static int find_unexpired (struct t_msgid *ptr);
-	static int has_sibling (struct t_msgid *ptr);
+	static t_bool find_unexpired (struct t_msgid *ptr);
+	static t_bool has_sibling (struct t_msgid *ptr);
 	static void prompt_thread_num (int ch);
 	static void bld_tline (int l, struct t_article *art);
-	static void draw_tline (int i, int full);
+	static void draw_tline (int i, t_bool full);
 	static void draw_thread_arrow (void);
 	static void erase_thread_arrow (void);
 	static void make_prefix (struct t_msgid *art, char *prefix);
@@ -131,17 +126,6 @@ bld_tline (
 		 */
 		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - show_lines) : 0);
 
-#if 0 /* old insertion code, obsolete with mutt like threading tree */
-		/*
-		 * Indent the subject according to the current depth of threading
-		 */
-		for (ptr = art->refptr; ptr->parent != NULL; ptr = ptr->parent) {
-			strcat(buff, THREAD_SPACER);
-
-			if ((int)strlen(buff) >= cCOLS)	/* If extremely nested */
-				return;
-#endif /* 0 */
-
 		/*
 		 * Mutt-like thread tree. by sjpark@sparcs.kaist.ac.kr
 		 * Insert tree-structure strings "`->", "+->", ...
@@ -151,10 +135,6 @@ bld_tline (
 
 		if ((int)strlen(buff) >= cCOLS) /* If extremely nested */
 			buff[cCOLS] = '\0';
-
-#if 0 /* see #if 0 above */
-		}
-#endif /* 0 */
 
 		/*
 		 * Copy in the subject up to where the author (if any) starts
@@ -214,7 +194,7 @@ bld_tline (
 static void
 draw_tline (
 	int i,
-	int full)
+	t_bool full)
 {
 	int tlen;
 	int x = full ? 0 : (MARK_OFFSET-2);
@@ -414,7 +394,7 @@ end_of_thread:
 				break;
 
 			case iKeySetRange:	/* set range */
-				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point))
+				if (bSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point))
 					show_thread_page ();
 				break;
 
@@ -423,10 +403,10 @@ end_of_thread:
 					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, find_response (thread_basenote, thread_index_point));
 				break;
 
-			case iKeyThreadSaveTagged:   /* save tagged articles without prompting */
+			case iKeyThreadAutoSaveTagged:   /* Auto-save tagged articles without prompting */
 				if (thread_basenote >= 0) {
 					if (num_of_tagged_arts)
-						feed_articles (FEED_SAVE_TAGGED, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
+						feed_articles (FEED_AUTOSAVE_TAGGED, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
 					else
 						info_message (txt_no_tagged_arts_to_save);
 				}
@@ -767,16 +747,16 @@ show_thread_page (void)
 	assert(first_thread_on_screen != 0 || the_index == thread_respnum);
 
 	if (show_subject)
-		sprintf (msg, "List Thread (%d of %d)", index_point+1, top_base);
+		sprintf (mesg, "List Thread (%d of %d)", index_point+1, top_base);
 	else
-		sprintf (msg, "Thread (%.*s)", cCOLS-23, arts[thread_respnum].subject);
+		sprintf (mesg, "Thread (%.*s)", cCOLS-23, arts[thread_respnum].subject);
 
 	/*
-	 * Slight misuse of the 'msg' buffer here. We need to clear it so that progress messages
+	 * Slight misuse of the 'mesg' buffer here. We need to clear it so that progress messages
 	 * are displayed correctly
 	 */
-	show_title (msg);
-	msg[0] = '\0';
+	show_title (mesg);
+	mesg[0] = '\0';
 
 	MoveCursor (INDEX_TOP, 0);
 
@@ -884,7 +864,6 @@ prompt_thread_num (
 /*
  *  Return the number of unread articles there are within a thread
  */
-
 int
 new_responses (
 	int thread)
@@ -900,6 +879,7 @@ new_responses (
 	return sum;
 }
 
+
 /*
  *  Which base note (an index into base[]) does a respnum
  *  (an index into arts[]) correspond to?
@@ -912,7 +892,6 @@ new_responses (
  *  the article of interest has been read as well as all other articles in
  *  the thread,  thus resulting in no base[] entry for it.
  */
-
 int
 which_thread (
 	int n)
@@ -931,10 +910,10 @@ which_thread (
 	return -1;
 }
 
+
 /*
  *  Find how deep in a thread a response is.  Start counting at zero
  */
-
 int
 which_response (
 	int n)
@@ -954,6 +933,7 @@ which_response (
 
 	return num;
 }
+
 
 /*
  *  Given an index into base[], find the number of responses for
@@ -979,10 +959,10 @@ num_of_responses (
 	return sum - 1;
 }
 
+
 /*
  * Given an index into base[], return relevant statistics
  */
-
 int
 stat_thread (
 	int n,
@@ -1024,7 +1004,7 @@ stat_thread (
 #if 0
 		if (arts[i].killed)
 			++sbuf->killed;
-#endif
+#endif /* 0 */
 	}
 
 	sbuf->art_mark = (sbuf->inrange ? art_marked_inrange : (sbuf->deleted ? art_marked_deleted : (sbuf->selected_unread ? art_marked_selected : (sbuf->unread ? art_marked_unread : (sbuf->seen ? art_marked_return : ART_MARK_READ)))));
@@ -1036,7 +1016,6 @@ stat_thread (
  *  Find the next response.  Go to the next basenote if there
  *  are no more responses in this thread
  */
-
 int
 next_response (
 	int n)
@@ -1054,11 +1033,11 @@ next_response (
 	return (int) base[i];
 }
 
+
 /*
  *  Given a respnum (index into arts[]), find the respnum of the
  *  next basenote
  */
-
 int
 next_thread (
 	int n)
@@ -1072,11 +1051,11 @@ next_thread (
 	return (int) base[i];
 }
 
+
 /*
  *  Find the previous response.  Go to the last response in the previous
  *  thread if we go past the beginning of this thread.
  */
-
 int
 prev_response (
 	int n)
@@ -1097,11 +1076,11 @@ prev_response (
 	return find_response (i, num_of_responses (i));
 }
 
+
 /*
  *  return response number n from thread i
  *	ie return the index in arts[] of the nth followup to thread base 'i'
  */
-
 int
 find_response (
 	int i,
@@ -1117,11 +1096,11 @@ find_response (
 	return j;
 }
 
+
 /*
  *  Find the next unread response in this group. If no response is found
  *  from current point to the end restart from beginning of articles.
  */
-
 int
 next_unread (
 	int n)
@@ -1146,10 +1125,10 @@ next_unread (
 	return -1;
 }
 
+
 /*
  *  Find the previous unread response in this thread
  */
-
 int
 prev_unread (
 	int n)
@@ -1164,11 +1143,12 @@ prev_unread (
 	return -1;
 }
 
+
+#ifndef INDEX_DAEMON
 /*
  * Move the on-screen pointer & internal variable to the given reponse
  * within the thread
  */
-#ifndef INDEX_DAEMON
 void
 move_to_response (
 	int n)
@@ -1182,17 +1162,17 @@ move_to_response (
 	else
 		show_thread_page ();
 }
-#endif /* !INDEX_DAEMON */
 
 
-static int
+static t_bool
 find_unexpired (
 	struct t_msgid *ptr)
 {
 	return ptr && (!EXPIRED (ptr) || find_unexpired (ptr->child) || find_unexpired (ptr->sibling));
 }
 
-static int
+
+static t_bool
 has_sibling (
 	struct t_msgid *ptr)
 {
@@ -1205,7 +1185,6 @@ has_sibling (
 }
 
 
-#ifndef INDEX_DAEMON  
 /*
  * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
  */
@@ -1214,9 +1193,9 @@ make_prefix (
 	struct t_msgid *art,
 	char *prefix)
 {
-	struct t_msgid *ptr;
 	int prefix_ptr;
 	int depth = 0;
+	struct t_msgid *ptr;
 
 	for (ptr = art->parent; ptr; ptr = ptr->parent)
 		depth += (!EXPIRED (ptr) ? 1 : 0);

@@ -23,7 +23,7 @@
 
 char *glob_art_group;
 static long last_read_article;
-static int overview_index_filename = FALSE;
+static t_bool overview_index_filename = FALSE;
 
 /*
  * Local prototypes
@@ -34,17 +34,13 @@ static int artnum_comp (t_comptype *p1, t_comptype *p2);
 static int date_comp (t_comptype *p1, t_comptype *p2);
 static int from_comp (t_comptype *p1, t_comptype *p2);
 static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
-static int parse_headers (FILE *fp, struct t_article *h);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
+static t_bool parse_headers (FILE *fp, struct t_article *h);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
-#ifndef NNTP_ONLY
-	static int read_group (struct t_group *group, char *group_path, int *pcount);
-#else
-	static int read_group (int *pcount);
-#endif /* !NNTP_ONLY */
+static int read_group (struct t_group *group, char *group_path, int *pcount);
 #ifdef INDEX_DAEMON
 	static void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
@@ -124,22 +120,16 @@ index_group (
 	int modified;
 	long min;
 	long max;
-	register int i = 0;
+	register int i;
 
 	if (group == (struct t_group *) 0)
 		return TRUE;
 
-/* FIXME: ugly code */
-/* calculate maxlen of groupname to display */
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
-	i += 24; /* len of "Group %s ('q' to quit)... " */
+	i = 45; /* len of "Group %s ('q' to quit)... 'low'/'high'" */
 #else
-	i += 10; /* len of "Group %s ... " */
+	i = 31; /* len of "Group %s ... 'low'/'high'" */
 #endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
-
-#ifdef SHOW_PROGRESS
-	i += 21; /* low+'/'+high */
-#endif /* ifdef SHOW_PROGRESS */
 
 	/* very small screen */
 	if (cCOLS < i)
@@ -204,11 +194,7 @@ index_group (
 	/*
 	 * Add any articles to arts[] that are new or were killed
 	 */
-#ifndef NNTP_ONLY
 	if ((modified = read_group (group, group_path, &count)) == -1)
-#else
-	if ((modified = read_group (&count)) == -1)
-#endif /* NNTP_ONLY */
 		return FALSE;	/* user aborted indexing */
 
 	/*
@@ -287,39 +273,35 @@ index_group (
  */
 static int
 read_group (
-#ifndef NNTP_ONLY
 	struct t_group *group,
 	char *group_path,
-#endif /* NNTP_ONLY*/
 	int *pcount)
 {
 	FILE *fp;
 	char buf[PATH_LEN];
-	int count = 0, res;
+	int count = 0;
 	int respnum, total = 0;
 	long art;
 	register int i;
+	t_bool res;
 	t_bool modified = FALSE;
-#ifndef NNTP_ONLY
 	static char dir[PATH_LEN] = "";
-#endif /* !NNTP_ONLY */
 
 	/*
 	 * change to groups spooldir to optimize fopen()'s on local articles
 	 */
 #ifdef INDEX_DAEMON
-	if (dir[0] == 0) {
+	if (dir[0] == 0)
+		get_cwd (dir);
+	joinpath (buf, group->spooldir, group_path);
+	my_chdir (buf);
 #else
-#	ifndef NNTP_ONLY
-	if (!read_news_via_nntp) {
-#	endif /* !NNTP_ONLY */
-#endif /* INDEX_DAEMON */
-#ifndef NNTP_ONLY
+	if (!read_news_via_nntp || group->type != GROUP_TYPE_NEWS) {
 		get_cwd (dir);
 		joinpath (buf, group->spooldir, group_path);
 		my_chdir (buf);
 	}
-#endif /* !NNTP_ONLY */
+#endif /* INDEX_DAEMON */
 
 	/*
 	 *  Count num of arts to index so the user has an idea of index time
@@ -377,10 +359,12 @@ read_group (
 
 		TIN_FCLOSE(fp);
 		if (tin_errno) {
-#ifndef NNTP_ONLY
-			if (!read_news_via_nntp)
+#ifdef INDEX_DAEMON
+			my_chdir (dir);
+#else
+			if (!read_news_via_nntp || group->type != GROUP_TYPE_NEWS)
 				my_chdir (dir);
-#endif /* !NNTP_ONLY */
+#endif /* INDEX_DAEMON */
 			return(-1);
 		}
 
@@ -395,10 +379,8 @@ read_group (
 		last_read_article = arts[top].artnum;	/* used if arts are killed */
 		top++;
 
-#ifdef SHOW_PROGRESS
 		if (++count % MODULO_COUNT_NUM == 0)
-			show_progress (msg, count, total);
-#endif
+			show_progress (mesg, count, total);
 
 		if (batch_mode && verbose) {
 			my_fputc ('.', stdout);
@@ -415,10 +397,12 @@ read_group (
 	/*
 	 * if !nntp change to previous dir before indexing started
 	 */
-#ifndef NNTP_ONLY
-	if (!read_news_via_nntp)
+#ifdef INDEX_DAEMON
+	my_chdir (dir);
+#else
+	if (!read_news_via_nntp || group->type != GROUP_TYPE_NEWS)
 		my_chdir (dir);
-#endif /* NNTP_ONLY */
+#endif /* INDEX_DAEMON */
 
 	return modified;
 }
@@ -468,7 +452,7 @@ thread_by_subject(void)
 		}
 
 		/*
-		 * Update the magic marker with the highest numbered msg in
+		 * Update the magic marker with the highest numbered mesg in
 		 * arts[] that has been used in this thread so far
 		 */
 		h->aptr = i;
@@ -485,8 +469,8 @@ thread_by_subject(void)
 			arts[i].inthread, arts[i].thread, arts[i].refptr->txt, arts[i].subject);
 	}
 #endif
-
 }
+
 
 /*
  *  Go through the articles in arts[] and create threads. There are
@@ -619,17 +603,16 @@ sort_arts (
 	}
 }
 
-static int
+
+static t_bool
 parse_headers (
 	FILE *fp,
 	struct t_article *h)
 {
 	char buf[HEADER_LEN];
-	char buf2[HEADER_LEN];
 	char art_from_addr[HEADER_LEN];
 	char art_full_name[HEADER_LEN];
-	char *ptr, *ptrline, *s;
-	int flag = FALSE;				/* TODO what's this for now ? */
+	char *ptr, *s;
 	int lineno = 0;
 	int max_lineno = 25;
 	t_bool got_archive, got_date, got_from, got_lines;
@@ -638,54 +621,25 @@ parse_headers (
 	got_archive = got_date = got_from = got_lines = FALSE;
 	got_msgid = got_received = got_refs = got_subject = got_xref = FALSE;
 
-#if 1 /* join continuation headers */
-	while ((ptr = fgets_hdr(buf, sizeof(buf), fp)) != NULL) {
-		if (*buf != '\0' && buf[strlen(buf)-1] == '\n')
-			buf[strlen(buf)-1] = '\0';
-#else
-	while ((ptr = tin_fgets(buf, sizeof(buf), fp)) != NULL) {
-#endif
+	while ((ptr = tin_fgets(fp, TRUE)) != NULL) {
 		/*
-		 * Look for end of headers - only applies when reading local spool
+		 * Look for the end of informations which tin want to get.
+		 * Applies when reading local spool and via NNTP.
 		 */
-		if (!read_news_via_nntp && *ptr == '\0')
+		if (lineno > max_lineno || got_archive)
 			break;
 
-#if 0 /* TODO join broken continuation headers */
-		for (ptrline = ptr; *ptr; ptr++) {
-			if (*ptr == '\n') {
-				/* Join continuation lines */
-				if (*(ptr + 1) == ' ' || *(ptr + 1) == '\t') {
-					*ptr = ' ';
-					continue;
-				}
-				/* End of header? */
-				if (*(ptr + 1) == '\n')
-					*ptr = '\0';
-
-				break;
-			}
-			if ((*(unsigned char *)ptr) < ' ')
-				*ptr = ' ';
-
-		}
-
-		flag = *ptr;
-		*ptr++ = '\0';
-#endif /* 0 */
-
-		ptrline = ptr;
-		lineno++;		/* TODO is this needed ? */
+		lineno++;		/* TODO Why is this needed ? */
 
 		/* FIXME: sort cases */
-		switch (toupper((unsigned char)*ptrline)) {
+		switch (toupper((unsigned char)*ptr)) {
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
 				if (!got_from) {
-					if ((match_header (ptrline+1, "rom", buf2, (char*)0, HEADER_LEN) ||
-					    match_header (ptrline+1, "o", buf2, (char*)0, HEADER_LEN)) &&
-					    *buf2 != '\0') {
-						parse_from (buf2, art_from_addr, art_full_name);
+					if ((match_header (ptr+1, "rom", (char*)0, buf, HEADER_LEN) ||
+					    match_header (ptr+1, "o", (char*)0, buf, HEADER_LEN)) &&
+					    *buf != '\0') {
+						parse_from (buf, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (*art_full_name)
 							h->name = hash_str (eat_tab(rfc1522_decode(art_full_name)));
@@ -695,15 +649,15 @@ parse_headers (
 				break;
 			case 'R':	/* References: optional */
 				if (!got_refs) {
-					if (match_header (ptrline+1, "eferences", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						h->refs = my_strdup (buf2);
+					if (match_header (ptr+1, "eferences", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->refs = my_strdup (buf);
 						got_refs = TRUE;
 					}
 				}
 
 				/* Received:  If found its probably a mail article */
 				if (!got_received) {
-					if (match_header (ptrline+1, "eceived", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
+					if (match_header (ptr+1, "eceived", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
 						max_lineno = 50;
 						got_received = TRUE;
 					}
@@ -711,8 +665,8 @@ parse_headers (
 				break;
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
-					if (match_header (ptrline+1, "ubject", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						s = eat_re (eat_tab(rfc1522_decode(buf2)), FALSE);
+					if (match_header (ptr+1, "ubject", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						s = eat_re (eat_tab(rfc1522_decode(buf)), FALSE);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
 					}
@@ -720,39 +674,39 @@ parse_headers (
 				break;
 			case 'D':	/* Date:  mandatory */
 				if (!got_date) {
-					if (match_header (ptrline+1, "ate", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						h->date = parsedate (buf2, (struct _TIMEINFO *) 0);
+					if (match_header (ptr+1, "ate", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->date = parsedate (buf, (struct _TIMEINFO *) 0);
 						got_date = TRUE;
 					}
 				}
 				break;
 			case 'X':	/* Xref:  optional */
 				if (!got_xref) {
-					if (match_header (ptrline+1, "ref", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						h->xref = my_strdup (buf2);
+					if (match_header (ptr+1, "ref", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->xref = my_strdup (buf);
 						got_xref = TRUE;
 					}
 				}
 				break;
 			case 'M':	/* Message-ID:  mandatory */
 				if (!got_msgid) {
-					if (match_header (ptrline+1, "essage-ID", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						h->msgid = my_strdup (buf2);
+					if (match_header (ptr+1, "essage-ID", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->msgid = my_strdup (buf);
 						got_msgid = TRUE;
 					}
 				}
 				break;
 			case 'L':	/* Lines:  optional */
 				if (!got_lines) {
-					if (match_header (ptrline+1, "ines", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						h->lines = atoi (buf2);
+					if (match_header (ptr+1, "ines", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+						h->lines = atoi (buf);
 						got_lines = TRUE;
 					}
 				}
 				break;
 			case 'A':	/* Archive-name:  optional */
-				if (match_header (ptrline+1, "rchive-name", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-					if ((s = strchr (buf2, '/')) != (char *) 0) {
+				if (match_header (ptr+1, "rchive-name", (char*)0, buf, HEADER_LEN) && *buf != '\0') {
+					if ((s = strchr (buf, '/')) != (char *) 0) {
 						if (STRNCMPEQ(s+1, "part", 4) || STRNCMPEQ(s+1, "Part", 4)) {
 							h->part = my_strdup (s+5);
 							s = strrchr (h->part, '\n');
@@ -765,11 +719,11 @@ parse_headers (
 								*s = '\0';
 						}
 						if (h->part || h->patch) {
-							s = buf2;
+							s = buf;
 							while (*s && *s != '/')
 								s++;
 							*s = '\0';
-							s = buf2;
+							s = buf;
 							h->archive = hash_str (s);
 							got_archive = TRUE;
 						}
@@ -782,29 +736,32 @@ parse_headers (
 
 	} /* while */
 
+#ifdef NNTP_ABLE
+	if (ptr)
+		drain_buffer(fp);
+#endif /* NNTP_ABLE */
+
 	if (tin_errno)
 		return FALSE;
 
-	/* TODO its possible some of these tests must go back to break; the main loop */
-	if (!flag || (lineno > max_lineno) || got_archive) {
-		/*
-		 * The sonofRFC1036 states that the following hdrs are
-		 * mandatory. It also states that Subject, Newsgroups
-		 * and Path are too. Ho hum.
-		 */
-		if (got_from && got_date && got_msgid) {
-			if (!got_subject)
-				h->subject = hash_str ("<No subject>");
+	/*
+	 * The sonofRFC1036 states that the following hdrs are
+	 * mandatory. It also states that Subject, Newsgroups
+	 * and Path are too. Ho hum.
+	 */
+	if (got_from && got_date && got_msgid) {
+		if (!got_subject)
+			h->subject = hash_str ("<No subject>");
 
 #ifdef DEBUG
-			debug_print_header (h);
-#endif
-			return TRUE;
-		}
+		debug_print_header (h);
+#endif /* DEBUG */
+		return TRUE;
 	}
 
 	return FALSE;
 }
+
 
 /*
  *  Read in an Nov/Xover index file. Fields are separated by TAB.
@@ -832,7 +789,6 @@ iReadNovFile (
 {
 	char	*p, *q;
 	char	*buf;
-	char	buf2[HEADER_LEN];
 	char	art_full_name[HEADER_LEN];
 	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
@@ -851,7 +807,7 @@ iReadNovFile (
  *  next article past last_read_article; there's no reason to read them
  *  from NNTP if they're cached locally.
  */
-	if (cache_overview_files && read_news_via_nntp && xover_supported) {
+	if (cache_overview_files && read_news_via_nntp && xover_supported && group->type == GROUP_TYPE_NEWS) {
 		read_news_via_nntp = FALSE;
 		iReadNovFile (group, min, max, expired);
 		read_news_via_nntp = TRUE;
@@ -866,12 +822,12 @@ iReadNovFile (
 	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0)
 		return top;
 
-#if 1 /* see missing arts comment in group.c */
+#if 1
 	if (group->xmax > max)
 		group->xmax = max;
 #endif /* 1 */
 
-	while ((buf = tin_fgets (buf2, sizeof(buf2), fp)) != (char *) 0) {
+	while ((buf = tin_fgets (fp, FALSE)) != (char *) 0) {
 
 #ifdef DEBUG
 		debug_nntp ("iReadNovFile", buf);
@@ -977,7 +933,7 @@ my_flush();
 		} else
 			*q = '\0';
 
-		/* TODO is no msg-id allowed in rfc ? */
+		/* TODO is no mesg-id allowed in rfc ? */
 		arts[top].msgid = ((*p) ? (my_strdup (p)) : ((char *) '\0'));
 
 		p = q + 1;
@@ -1058,10 +1014,8 @@ my_flush();
 		debug_print_header (&arts[top]);
 #endif
 
-#ifdef SHOW_PROGRESS
 		if (artnum % MODULO_COUNT_NUM == 0)
-			show_progress(msg, (int) artnum, (int) max); /* we might loose accuracy here, but that shouldn't hurt */
-#endif
+			show_progress(mesg, (int) artnum, (int) max); /* we might loose accuracy here, but that shouldn't hurt */
 
 		top++;
 	}
@@ -1292,10 +1246,10 @@ pcFindNovFile (
 	return acNovFile;
 }
 
+
 /*
  *  Run the index file updater only for the groups we've loaded.
  */
-
 void
 do_update (void)
 {
@@ -1309,7 +1263,7 @@ do_update (void)
 	char novpath[PATH_LEN];
 	time_t group_time, index_time;
 	struct stat stinfo;
-#endif
+#endif /* INDEX_DAEMON */
 
 	if (verbose)
 		(void) time (&beg_epoch);
@@ -1331,8 +1285,11 @@ do_update (void)
 		joinpath (buf, psGrp->spooldir, group_path);
 		joinpath (novpath, novrootdir, group_path);
 
-		if (verbose) my_printf ("NOV path=[%s]\n", novpath);
+		if (verbose)
+			my_printf ("NOV path=[%s]\n", novpath);
+
 		vCreatePath (novpath);
+
 		if (stat (buf, &stinfo) == -1) {
 			if (verbose)
 				error_message (txt_cannot_stat_group, buf);
@@ -1548,7 +1505,7 @@ set_article (
 	art->subject	= (char *) 0;
 	art->from	= (char *) 0;
 	art->name	= (char *) 0;
-	art->date	= 0L;
+	art->date	= (time_t) 0;
 	art->xref	= (char *) 0;
 	art->msgid	= (char *) 0;
 	art->refs	= (char *) 0;
@@ -1582,7 +1539,7 @@ valid_artnum (
 	register int cur = 1;
 
 	while ((dctop /= 2))
-		cur = cur << 1;
+		cur *= 2;
 
 	range = cur / 2;
 	cur--;

@@ -13,21 +13,21 @@
  */
 
 
-#undef SYSTEM_NAME
+#undef	SYSTEM_NAME
 
 /*
  * If we're able to run the 'configure' script, it's close enough to UNIX for
- * our purposes.  (It's predefined on SCO).
+ * our purposes. (It's predefined on SCO).
  */
-#ifndef M_UNIX
-#define M_UNIX
-#endif
+#ifndef	M_UNIX
+#	define M_UNIX
+#endif /* !M_UNIX */
 
 /*
  * SCO requires special handling
  */
-#undef NEED_TIMEVAL_FIX
-#undef NEED_PTEM_H
+#undef	NEED_TIMEVAL_FIX
+#undef	NEED_PTEM_H
 
 /*
  * These are set as configure options, some must be guarded by ifdefs because
@@ -37,9 +37,9 @@
 #undef	NNTP_ABLE
 #undef	NNTP_ONLY
 
-#ifndef	HAVE_COLOR
-#undef	HAVE_COLOR
-#endif
+#ifndef HAVE_COLOR
+#	undef	HAVE_COLOR
+#endif /* !HAVE_COLOR */
 
 #undef	DEFAULT_ISO2ASC
 #undef	DOMAIN_NAME
@@ -78,6 +78,7 @@
 /*
  * Data types
  */
+#undef	gid_t
 #undef	mode_t
 #undef	off_t
 #undef	pid_t
@@ -303,7 +304,7 @@
 /*
  * define if setpgrp() takes no arguments
  */
-#undef SETPGRP_VOID
+#undef	SETPGRP_VOID
 
 /*
  * Define this if it's safe to redefine the signal constants with prototypes.
@@ -330,13 +331,13 @@
 #undef	PATH_SUM_R
 
 #if 0 /* FIXME */
-#if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
-	defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
-#	if !defined(M_OS2)
-#		define	HAVE_POSIX_JC
+#	if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
+		defined(SVR4) || defined(UMAXV) || defined(__NetBSD__)
+#		if !defined(M_OS2)
+#			define	HAVE_POSIX_JC
+#		endif
 #	endif
-#endif
-#endif
+#endif /* 0 */
 
 /*
  * Define this if the host system has long (>14 character) filenames
@@ -389,9 +390,9 @@
  * Definitions for debugging-malloc libraries
  */
 #ifndef __BUILD__
-#undef	USE_DBMALLOC	/* use Conor Cahill's dbmalloc library */
-#undef	USE_DMALLOC	/* use Gray Watson's dmalloc library */
-#endif
+#	undef	USE_DBMALLOC	/* use Conor Cahill's dbmalloc library */
+#	undef	USE_DMALLOC	/* use Gray Watson's dmalloc library */
+#endif /* !__BUILD__ */
 
 /*
  * Define if the system doesn't support pipes, or if it is not a desired
@@ -406,37 +407,36 @@
 
 #if defined(__hpux)
 #	define	HAVE_KEYPAD
-#endif
+#endif /* __hpux */
 
 /*
  * Not all platforms have either strerror or sys_errlist[].
  */
-#undef HAVE_SYS_ERRLIST
+#undef	HAVE_SYS_ERRLIST
 
 #if 0 /* FIXME: test-not-impl */
+#	if defined(supermax)
+#		define	HAVE_BROKEN_TGETSTR
+#	endif /* supermax */
+#endif /* 0 */
 
-#if defined(supermax)
-#	define	HAVE_BROKEN_TGETSTR
-#endif
-#endif /* FIXME */
-
-#undef USE_SYSTEM_STATUS
+#undef	USE_SYSTEM_STATUS
 
 /*
  * Use this if you want pid attached to the end of .article filename
  */
-#undef APPEND_PID
+#undef	APPEND_PID
 
 /*
  * allow fallback to XHDR XREF if XOVER isn't supported?
  */
-#undef XHDR_XREF
+#undef	XHDR_XREF
 
 /*
  * The directory, where tin looks first for its tin.defaults file
  * can be left empty, tin searches for some standard places
  * XXXXX please define surrounded with double quotes! XXXXX
  */
-#undef TIN_DEFAULTS_DIR
+#undef	TIN_DEFAULTS_DIR
 
-#undef HAVE_COFFEE
+#undef	HAVE_COFFEE

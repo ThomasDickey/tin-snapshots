@@ -29,9 +29,11 @@ bin2hex(
 	return x - 10 + 'A';
 }
 
-/* check if a line is a MIME boundary, returns 0 if false, 1 if normal
-   boundary and 2 if closing boundary */
 
+/*
+ * check if a line is a MIME boundary
+ * returns 0 if false, 1 if normal boundary and 2 if closing boundary
+ */
 static int
 boundary_cmp(
 	char *line,
@@ -68,21 +70,24 @@ boundary_cmp(
 		return 0;
 }
 
-/* TODO: this function is also called before piping and saving
-   articles, so these get saved with incorrect MIME headers.
-   [ I have a plan to sort all this out - Jason ] */
 
+/*
+ * TODO: this function is also called before piping and saving
+ * articles, so these get saved with incorrect MIME headers.
+ * [ I have a plan to sort all this out - Jason ]
+ */
 FILE *
 rfc1521_decode(
 	FILE * file)
 {
 	FILE *f;
-	char buf[2048];
-	char buf2[2048];
+	char *line;
+	char buf[HEADER_LEN];
+	char buf2[HEADER_LEN];
+	char boundary[128];
 	char content_type[128];
 	char content_charset[128];
 	char content_transfer_encoding[128];
-	char boundary[128];
 	char encoding = '\0';
 	const char *charset;
 	long hdr_pos;
@@ -100,64 +105,51 @@ rfc1521_decode(
 	content_transfer_encoding[0] = '\0';
 
 	/* pass article header unchanged */
-	while (fgets_hdr(buf, sizeof (buf), file)) {
+	while ((line = tin_fgets (file, TRUE)) != (char *) 0) {
 #ifdef LOCAL_CHARSET
-		buffer_to_local(buf);
+		buffer_to_local(line);
 #endif
-		fputs(buf, f);
-		/* NOTE:  I know it is a bug not to merge header lines starting
-		 * with whitespace to the preceding one, but I guess we can
-		 * live with that here.
-		 */
+		fputs(line, f);
+		fputs("\n", f);
 
-		/* Note: Actually, this is not the case. Especially,
-		 * MS Outlook Express produces multiple line header
-		 * for C-T header field. We have to take care of it
-		 * to detect multipart/alternative in this case. Hence,
-		 * a new function fgets_hdr is defined in string.c and
-		 * invoked in while loop above (J. Shin)
-		 */
-		if (!strncasecmp(buf, "Content-Type: ", 14)) {
-			strcpynl(content_type, buf + 14);
-		} else if (!strncasecmp(buf, "Content-Transfer-Encoding: ", 27)) {
-			strcpynl(content_transfer_encoding, buf + 27);
+		if (!strncasecmp(line, "Content-Type: ", 14)) {
+			STRCPY(content_type, line + 14);
+		} else if (!strncasecmp(line, "Content-Transfer-Encoding: ", 27)) {
+			STRCPY(content_transfer_encoding, line + 27);
 		}
-		if (*buf == '\r' || *buf == '\n')
+		if (*line == '\0')		/* End of header */
 			break;
 	}
 
+	/*
+	 * If we have an article of type multipart/alternative, we scan if for a
+	 * part that is text/plain and use only that. This should take care of the
+	 * text/html articles that seem to pop up more and more.
+	 */
 	if (alternative_handling) {
-		/* if we have an article of type multipart/alternative, we
-		 * scan if for a part that is text/plain and use only that.
-		 * This should take care of the text/html articles that seem
-		 * to pop up more and more. When NS4 gets released this will
-		 * be even more of a problem.
-		 */
 
 		if (strcasestr(content_type, "multipart/alternative") &&
 			 strcasestr(content_type, "boundary=") &&
 			 (!*content_transfer_encoding ||
 			  strcasecmp(content_transfer_encoding, "7bit") == 0)) {
+
 			/* first copy the header without the two lines */
 			rewind(file);
 			rewind(f);
 
-			/* fgets_hdr is called instead of fgets. See the comment above */
-			while (fgets_hdr(buf, sizeof (buf), file)) {
-				if (strncasecmp(buf, "Content-Type: ", 14) != 0 &&
-					 strncasecmp(buf, "Content-Transfer-Encoding: ", 27) != 0) {
-					if (*buf == '\r' || *buf == '\n')
+			while ((line = tin_fgets(file, TRUE)) != (char *) 0) {
+				if (strncasecmp(line, "Content-Type: ", 14) != 0 && strncasecmp(line, "Content-Transfer-Encoding: ", 27) != 0) {
+					/* don't copy the empty line, since we add header lines later */
+					if (*line == '\0')
 						break;
-					/* don't copy the empty line, since we add header
-					   lines later */
-					fputs(buf, f);
+					fputs(line, f);
+					fputs("\n", f);
 				}
 			}
 
 			/*
-			 * now search for the start of each part
+			 * Now search for the start of each part
 			 */
-
 			strcpynl(boundary, strcasestr(content_type, "boundary=") + 9);
 
 			fputs("X-Conversion-Note: multipart/alternative contents have been removed.\n", f);
@@ -166,13 +158,14 @@ rfc1521_decode(
 			hdr_pos = ftell(f);
 
 			while (!feof(file)) {
-				while (fgets(buf, (int) sizeof(buf), file)) {
+
+				while (fgets(buf, (int) sizeof (buf), file)) {
 					if (boundary_cmp(buf, boundary)) {
 						if (boundary_cmp(buf, boundary) == 2) {
 							break;
 						}
 						fseek(f, hdr_pos, SEEK_SET);
-						while (fgets(buf, (int) sizeof(buf), file)) {
+						while (fgets(buf, (int) sizeof (buf), file)) {
 							if (strncasecmp(buf, "Content-Type: ", 14) == 0 &&
 							strncasecmp(buf, "Content-Type: text/plain", 24) != 0) {
 								/* different type, ignore it */
@@ -185,7 +178,7 @@ rfc1521_decode(
 
 						/* now copy the part body */
 
-						while (fgets(buf, (int) sizeof(buf), file)) {
+						while (fgets(buf, (int) sizeof (buf), file)) {
 							if (boundary_cmp(buf, boundary))
 								break;
 							fputs(buf, f);
@@ -200,7 +193,8 @@ rfc1521_decode(
 				;
 			}
 		}
-	}
+	} /* alternative_handling */
+
 #ifndef LOCAL_CHARSET
 	/*
 	 * if we have a different local charset, we also convert articles
@@ -214,6 +208,7 @@ rfc1521_decode(
 		rewind(file);
 		return file;
 	}
+
 	/*
 	 * see if type text/plain. if content-type is empty,
 	 * "text/plain; charset=us-ascii" is implicit.
@@ -253,7 +248,7 @@ rfc1521_decode(
 
 		if (encoding == 'b')
 			(void) mmdecode(NULL, 'b', 0, NULL, NULL);		/* flush */
-		while (fgets(buf, (int) sizeof(buf), file)) {
+		while (fgets(buf, (int) sizeof (buf), file)) {
 			i = mmdecode(buf, encoding, '\0', buf2, charset);
 			if (i >= 0)
 				buf2[i] = '\0';
@@ -269,10 +264,12 @@ rfc1521_decode(
 		return f;
 	}
 #ifdef LOCAL_CHARSET
-	/* if we have a different local charset, we also have to convert
-	   8bit articles (and we also convert 7bit articles thay may contain
-	   accented characters due to incorrectly configured newsreaders */
-	while (fgets(buf, 2048, file)) {
+	/*
+	 * If we have a different local charset, we also have to convert
+	 * 8bit articles (and we also convert 7bit articles thay may contain
+	 * accented characters due to incorrectly configured newsreaders
+	 */
+	while (fgets(buf, HEADER_LEN, file)) {
 		buffer_to_local(buf);
 		fputs(buf, f);
 	}
@@ -290,9 +287,10 @@ rfc1521_decode(
 #define HI4BITS(c) (unsigned char)(*EIGHT_BIT(c) >> 4)
 #define LO4BITS(c) (unsigned char)(*c & 0xf)
 
-/* A MIME replacement for fputs.  e can be 'b' for base64, 'q' for
- * quoted-printable, or 8 (default) for 8bit.  Long lines get broken in
- * encoding modes.  If line is the null pointer, flush internal buffers.
+/*
+ * A MIME replacement for fputs. e can be 'b' for base64, 'q' for
+ * quoted-printable, or 8 (default) for 8bit. Long lines get broken in
+ * encoding modes. If line is the null pointer, flush internal buffers.
  */
 void
 rfc1521_encode(

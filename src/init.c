@@ -136,14 +136,12 @@ int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
 int default_sort_art_type;		/* method used to sort arts[] */
 int default_thread_arts;		/* threading system for viewing articles */
-int global_filtered_articles;	/* globally killed / auto-selected articles */
 int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
 int hist_last[HIST_MAXNUM+1];
 int hist_pos[HIST_MAXNUM+1];
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
-int local_filtered_articles;		/* locally killed / auto-selected articles */
 int mail_mime_encoding = MIME_ENCODING_7BIT;
 int max_from = 0;
 int max_subj = 0;
@@ -153,17 +151,17 @@ int num_of_killed_arts;
 int num_of_selected_arts;		/* num articles marked 'hot' */
 int num_of_tagged_arts;
 int post_mime_encoding = MIME_ENCODING_7BIT;
-int process_id;		/* FIXME: use pid_t instead of int */
-int real_gid;
-int real_uid;
+pid_t process_id;
+gid_t real_gid;
+uid_t real_uid;
 int reread_active_file_secs;		/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int strip_bogus = BOGUS_KEEP;
 int wildcard = FALSE;			/* Use wildmat, not regex */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
-int tin_gid;
-int tin_uid;
+gid_t tin_gid;
+uid_t tin_uid;
 int top = 0;
 int top_base;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
@@ -230,16 +228,19 @@ t_bool display_mime_allheader_asis=TRUE;	/* rfc 1522/2047 all heades (^H) will n
 t_bool draw_arrow_mark;		/* draw -> or highlighted bar */
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
+t_bool global_filtered_articles;	/* globally killed / auto-selected articles */
 t_bool got_sig_pipe = FALSE;
 t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
 t_bool in_headers;			/* color in headers */
 t_bool info_in_last_line;
 t_bool keep_dead_articles;
 t_bool keep_posted_articles;
+t_bool local_filtered_articles;		/* locally killed / auto-selected articles */
 t_bool local_index;			/* do private indexing? */
 t_bool mail_8bit_header = FALSE;	/* allow 8bit chars. in header of mail message */
 t_bool mail_news;		/* mail all arts to specified user */
 t_bool mark_saved_read;		/* mark saved article/thread as read */
+t_bool list_active;
 t_bool newsrc_active;
 t_bool advertising = TRUE;
 t_bool pos_first_unread;	/* position cursor at first/last unread article */
@@ -406,8 +407,8 @@ void init_selfinfo (void)
 #endif /* DOMAIN_NAME */
 
 #ifdef HAVE_GETHOSTBYNAME
-	if (domain_name[0]=='\0') {
-		cptr = ((host_name[0]=='\0') ? get_fqdn((char *) 0) : get_fqdn(host_name));
+	if (domain_name[0] == '\0') {
+		cptr = ((host_name[0] == '\0') ? get_fqdn((char *) 0) : get_fqdn(host_name));
 		if (cptr != (char *)NULL)
 			strcpy (domain_name, cptr);
 	}
@@ -437,13 +438,13 @@ void init_selfinfo (void)
 		my_strncpy (userid, ptr, sizeof (userid));
 	} else {
 		error_message (txt_env_var_not_found, "USERNAME");
-		tin_done (EXIT_ERROR);
+		tin_done (EXIT_FAILURE);
 	}
 	if ((ptr = getenv ("HOME")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
 	} else {
 		error_message (txt_env_var_not_found, "HOME");
-		tin_done (EXIT_ERROR);
+		tin_done (EXIT_FAILURE);
 	}
 #else
 	myentry = (struct passwd *) 0;
@@ -461,7 +462,7 @@ void init_selfinfo (void)
 #	if defined(M_OS2) || defined(WIN32)
 	if (myentry == (struct passwd *) 0) {
 		fprintf (stderr, "Environment variable USER not set.\n");
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 #	else
 #		ifdef VMS
@@ -569,6 +570,7 @@ void init_selfinfo (void)
 	keep_dead_articles = TRUE;
 	keep_posted_articles = TRUE;
 	mark_saved_read = TRUE;
+	list_active = FALSE;
 	newsrc_active = FALSE;
 	num_headers_to_display = 0;
 	num_headers_to_not_display = 0;
@@ -744,7 +746,7 @@ void init_selfinfo (void)
 	 */
 	if (domain_name[0]=='\0') {
 		error_message (txt_error_no_domain_name);
-		tin_done(EXIT_ERROR);
+		tin_done(EXIT_FAILURE);
 	}
 
 	/*
@@ -836,8 +838,11 @@ void init_selfinfo (void)
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
 #endif /* VMS */
 
+/* check is done in ~ line 921 again, so this is not needed */
+#if 0
 	if (stat (index_newsdir, &sb) == -1)
 		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
+#endif /* 0 */
 
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
@@ -898,6 +903,8 @@ void init_selfinfo (void)
 	nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 #	endif /* NNTP_ABLE */
 
+/* this was allready done in line ~800 */
+#if 0
 #	ifdef VMS
 	if (stat (rcdir_asfile, &sb) == -1)
 #	else
@@ -907,6 +914,8 @@ void init_selfinfo (void)
 		created_rcdir = TRUE;
 		my_mkdir (rcdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 	}
+#endif /* 0 */
+
 	if (tin_uid != real_uid) {
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", spooldir), INDEX_NEWSDIR);
 		set_tin_uid_gid ();
@@ -914,21 +923,25 @@ void init_selfinfo (void)
 			my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 
 		set_real_uid_gid ();
-	} else if (stat (index_newsdir, &sb) == -1) {
-		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
+	} else {
+		if (stat (index_newsdir, &sb) == -1)
+			my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 	}
+
 	if (stat (posted_info_file, &sb) == -1) {
 		if ((fp = fopen (posted_info_file, "w")) != (FILE *) 0) {
 			fprintf (fp, txt_posted_info_file);
 			fclose (fp);
 		}
 	}
+
 	if (stat (msg_headers_file, &sb) == -1) {
 		if ((fp = fopen (msg_headers_file, "w")) != (FILE *) 0) {
 			fprintf (fp, txt_msg_headers_file);
 			fclose (fp);
 		}
 	}
+
 	if (stat (local_attributes_file, &sb) == -1)
 		write_attributes_file (local_attributes_file);
 
@@ -974,7 +987,7 @@ void init_selfinfo (void)
 #ifdef HAVE_PGP
 	pgpopts = get_val("PGPOPTS", "");
 	if ((ptr = getenv("PGPPATH")) != (char *) 0)
-		strcpy (pgp_data, ptr);
+		my_strncpy (pgp_data, ptr, sizeof(pgp_data));
 	else
 		joinpath (pgp_data, homedir, ".pgp");
 #endif /* HAVE_PGP */
@@ -1014,22 +1027,22 @@ set_up_private_index_cache (void)
 	*to = 0;
 	if (stat (index_newsdir, &sb) == -1)
 		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("set_up_private_index_cache", index_newsdir);
-#endif
+#	endif /* DEBUG */
 	joinpath (local_newsgroups_file, index_newsdir, NEWSGROUPS_FILE);
 	return;
 }
+#endif /* !INDEX_DAEMON */
 
-#endif
 
 /*
  * Create default mail & save directories if they do not exist
  */
-
-int create_mail_save_dirs (void)
+t_bool
+create_mail_save_dirs (void)
 {
-	int created = FALSE;
+	t_bool created = FALSE;
 #ifndef INDEX_DAEMON
 	char path[PATH_LEN];
 	struct stat sb;
@@ -1057,6 +1070,7 @@ int create_mail_save_dirs (void)
 	return (created);
 }
 
+
 /*
  * read_site_config()
  *
@@ -1081,7 +1095,7 @@ static int read_site_config (void)
 		if ((fp = fopen(buf, "r")) != NULL)
 			break;
 	}
-		
+
 	if (!fp)
 		return -1;
 

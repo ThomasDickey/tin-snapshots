@@ -16,7 +16,6 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-
 /*
  * List of allowed seperator chars in active file
  * unsed in parse_active_line()
@@ -27,7 +26,6 @@
 t_bool force_reread_active_file = FALSE;
 
 static char acSaveActiveFile[PATH_LEN];
-static char acSaveDir[PATH_LEN];
 static time_t active_timestamp;  /* time active file read (local) */
 
 
@@ -37,6 +35,7 @@ static time_t active_timestamp;  /* time active file read (local) */
 static void set_active_timestamp (void);
 static int find_newnews_index (char *cur_newnews_host);
 static t_bool parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
+static void _read_news_active_file (t_bool newsrc_act);
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
@@ -87,9 +86,9 @@ t_bool
 resync_active_file (void)
 {
 	char old_group[HEADER_LEN];
-	int command_line;
+	t_bool command_line = FALSE;
 
-	if (!reread_active_file ())
+	if (no_write || !reread_active_file ())	/* don't resync with no_write */
 		return FALSE;
 
 	reread_active_for_posted_arts = FALSE;
@@ -102,9 +101,10 @@ resync_active_file (void)
 	vWriteNewsrc ();
 	read_news_active_file ();
 
-	command_line = read_cmd_line_groups ();
+	if (read_cmd_line_groups ())
+		command_line = TRUE;
 
-	read_newsrc (newsrc, (command_line ? FALSE : TRUE));
+	read_newsrc (newsrc, bool_not(command_line));
 
 	if (command_line)		/* Can't show only unread groups with cmd line groups */
 		show_only_unread_groups = FALSE;
@@ -161,7 +161,7 @@ active_add(
 	if (moderated[0] == '/')
 #endif
 	{
-		ptr->type = GROUP_TYPE_SAVE;		/* What is this ? */
+		ptr->type = GROUP_TYPE_SAVE;
 		ptr->spooldir = my_strdup(moderated);
 	} else {
 		ptr->type = GROUP_TYPE_NEWS;
@@ -182,7 +182,7 @@ process_bogus(
 {
 	struct t_group *ptr;
 
-	if (strip_bogus != BOGUS_ASK)
+	if (read_saved_news)
 		return FALSE;
 
 	if ((ptr = psGrpAdd(name)) == NULL)
@@ -245,7 +245,7 @@ parse_newsrc_active_line (
 	long *min,
 	char *moderated)
 {
-	char	*ptr;
+	char *ptr;
 
 	ptr = strpbrk (buf, ":!");
 
@@ -267,37 +267,41 @@ parse_newsrc_active_line (
  * Load the active file into active[]
  * Check and preload any new newgroups into my_group[]
  */
-void
-read_news_active_file (void)
+static void
+_read_news_active_file (
+	t_bool newsrc_act)
 {
-	FILE *fp = 0;
-	char buf[HEADER_LEN];
-	char moderated[PATH_LEN];
+	FILE *fp = (FILE *) 0;
 	char *ptr;
+	static char ngname[NNTP_STRLEN+1];
+	char moderated[PATH_LEN];
 	struct t_group *grpptr;
 	long count = -1L, min = 1L, max = 0L;
-#ifdef SHOW_PROGRESS
 	long processed = 0L;
-#endif /* SHOW_PROGRESS */
 
 	/*
-	 * Ignore -n if no .newsrc can be found or .newsrc is empty
+	 * return immediately if no .newsrc can be found or .newsrc is empty
+	 * when function asked to use .newsrc
 	 */
-	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
-		newsrc_active = FALSE;
-	if (newsrc_active) {
-		if (file_size(newsrc) <= 0)
-			newsrc_active = FALSE;
+	if (newsrc_act && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
+		return;
+
+	if (newsrc_act) {
+		if (file_size(newsrc) <= 0) {
+			fclose(fp);
+			return;
+		}
 	}
 
 	if (INTERACTIVE)
-		wait_message (0, newsrc_active ? txt_reading_news_newsrc_file : txt_reading_news_active_file);
+		wait_message (0, newsrc_act ? txt_reading_news_newsrc_file : txt_reading_news_active_file);
 
-	if (!newsrc_active) {
+	if (!newsrc_act) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
 
 			if (cmd_line)
 				my_fputc ('\n', stderr);
+
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 			if (read_news_via_nntp)
 #endif
@@ -307,13 +311,15 @@ read_news_active_file (void)
 				error_message (txt_cannot_open_active_file, news_active_file, progname);
 #endif
 
-			tin_done (EXIT_ERROR);
+			tin_done (EXIT_FAILURE);
 		}
 	}
 
-	while ((ptr = tin_fgets (buf, sizeof(buf), fp)) != (char *)0) {
+	while ((ptr = tin_fgets (fp, FALSE)) != (char *)0) {
 
-		if (newsrc_active) {
+		if (newsrc_act) {
+			STRCPY(ngname, ptr);
+			ptr = ngname;
 			if (!parse_newsrc_active_line (ptr, &count, &max, &min, moderated))
 				continue;
 		} else {
@@ -321,10 +327,9 @@ read_news_active_file (void)
 				continue;
 		}
 
-#ifdef SHOW_PROGRESS		/* Spin the arrow as we read the active file */
-		if (++processed % ((newsrc_active) ? 5 : MODULO_COUNT_NUM) == 0)
+		if (++processed % ((newsrc_act) ? 5 : MODULO_COUNT_NUM) == 0)
 			spin_cursor ();
-#endif /* SHOW_PROGRESS */
+
 		/*
 		 * Load group into group hash table
 		 * NULL means group already present, so we just fixup the counters
@@ -338,7 +343,7 @@ read_news_active_file (void)
 				grpptr->xmin = min;
 				grpptr->xmax = max;
 				grpptr->count = count;
-				expand_bitmap(grpptr, grpptr->xmin);
+				expand_bitmap(grpptr, 0);
 			}
 			continue;
 		}
@@ -349,7 +354,7 @@ read_news_active_file (void)
 		active_add (grpptr, count, max, min, moderated);
 	}
 
-	if (newsrc_active)
+	if (newsrc_act)
 		fclose(fp);
 	else
 		TIN_FCLOSE (fp);
@@ -359,12 +364,50 @@ read_news_active_file (void)
 	 */
 	if (tin_errno || !num_active) { /* FIXME: move string to lang.c */
 		error_message (txt_active_file_is_empty, (read_news_via_nntp ? "servers active-file" : news_active_file));
-		tin_done (EXIT_ERROR);
+		tin_done (EXIT_FAILURE);
 	}
+
+	if (INTERACTIVE2 && !newsrc_act)
+		wait_message (0, "\n");
+}
+
+
+/*
+ * Load the active file into active[]
+ * Check and preload any new newgroups into my_group[]
+ */
+void
+read_news_active_file (void)
+{
+	FILE *fp = 0;
+
+	/*
+	 * Ignore -n if no .newsrc can be found or .newsrc is empty
+	 */
+	if (newsrc_active) {
+		if ((fp = fopen (newsrc, "r")) == (FILE *) 0) {
+			list_active = TRUE;
+			newsrc_active = FALSE;
+		} else
+			fclose(fp);
+
+		if (file_size(newsrc) <= 0) {
+			list_active = TRUE;
+			newsrc_active = FALSE;
+		}
+	}
+
+	/* Read an active file if it is allowed */
+	if (list_active)
+		_read_news_active_file (FALSE);
+
+	/* Read .newsrc and check each group */
+	if (newsrc_active)
+		_read_news_active_file (TRUE);
 
 	set_active_timestamp ();
 
-	if (INTERACTIVE2)
+	if (INTERACTIVE2 && (!list_active || (list_active && newsrc_active)))
 		wait_message (0, "\n");
 
 	check_for_any_new_groups ();
@@ -385,7 +428,7 @@ check_for_any_new_groups (void)
 {
 	FILE *fp;
 	char *autosubscribe, *autounsubscribe;
-	char *ptr, buf[NNTP_STRLEN];
+	char *ptr, *line, buf[NNTP_STRLEN];
 	char old_newnews_host[PATH_LEN];
 	char new_newnews_host[PATH_LEN];
 	int newnews_index;
@@ -426,23 +469,24 @@ check_for_any_new_groups (void)
 		autosubscribe = getenv ("AUTOSUBSCRIBE");
 		autounsubscribe = getenv ("AUTOUNSUBSCRIBE");
 
-		while (tin_fgets (buf, sizeof (buf), fp) != (char *) 0) {
+		while ((line = tin_fgets (fp, FALSE)) != (char *) 0) {
 
 			/*
 			 * Split the group name off and subscribe. If we're reading local,
 			 * we must check the creation date manually
 			 */
-			if ((ptr = strchr (buf, ' ')) != (char *) 0) {
+			if ((ptr = strchr (line, ' ')) != (char *) 0) {
 				if (!read_news_via_nntp && ((time_t) atol (ptr) < old_newnews_time || old_newnews_time == (time_t) 0))
 					continue;
 
 				*ptr = '\0';
 			}
 
-			subscribe_new_group (buf, autosubscribe, autounsubscribe);
+			subscribe_new_group (line, autosubscribe, autounsubscribe);
 		}
 
 		TIN_FCLOSE (fp);
+
 		if (tin_errno)
 			return;				/* Don't update the time if we quit */
 	}
@@ -492,8 +536,8 @@ subscribe_new_group (
 	 * mismatch in the active.times data and we ignore the newgroup.
 	 */
 	if ((idx = my_group_add(group)) < 0) {
-		if (!newsrc_active) {
-/*			my_fprintf(stderr, "subscribe_new_group: %s not in active[] && !newsrc_active\n", group); */
+		if (list_active) {
+/*			my_fprintf(stderr, "subscribe_new_group: %s not in active[] && list_active\n", group); */
 			return;
 		}
 
@@ -558,7 +602,7 @@ match_group_list (
 		 * copy out the entry and terminate it properly
 		 */
 		strncpy (pattern, group_list, group_len);
-		pattern[group_len] = (char) 0;
+		pattern[group_len] = '\0';
 		/*
 		 * case-insensitive wildcard match
 		 */
@@ -677,32 +721,31 @@ group_flag (
 void
 create_save_active_file (void)
 {
-	char	acGrpPath[PATH_LEN];
+	char acGrpPath[PATH_LEN];
 
 	my_printf (txt_creating_active);
 
 	vInitVariables ();
 
 	vPrintActiveHead (acSaveActiveFile);
-	strcpy (acGrpPath, acSaveDir);
-	vMakeGrpList (acSaveActiveFile, acSaveDir, acGrpPath);
+	strcpy (acGrpPath, default_savedir);
+	vMakeGrpList (acSaveActiveFile, default_savedir, acGrpPath);
 }
 
 
 static void
 vInitVariables (void)
 {
-	char	*pcPtr;
-	char	acTempActiveFile[PATH_LEN];
-	char	acMailActiveFile[PATH_LEN];
-	char	acMailDir[PATH_LEN];
-	char	acHomeDir[PATH_LEN];
+	char *pcPtr;
+	char acTempActiveFile[PATH_LEN];
+	char acMailActiveFile[PATH_LEN];
+	char acMailDir[PATH_LEN];
+	char acHomeDir[PATH_LEN];
+	char acSaveDir[PATH_LEN];
 #ifndef M_AMIGA
 	struct passwd *psPwd;
 	struct passwd sPwd;
-#endif
 
-#ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
 	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr))
 		psPwd = getpwnam (pcPtr);
@@ -714,7 +757,7 @@ vInitVariables (void)
 		memcpy (&sPwd, psPwd, sizeof (struct passwd));
 		psPwd = &sPwd;
 	}
-#endif /* M_AMIGA */
+#endif /* !M_AMIGA */
 
 	if ((pcPtr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		strcpy (acHomeDir, pcPtr);
@@ -728,7 +771,7 @@ vInitVariables (void)
 #else
 	} else
 		strcpy (acHomeDir, "T:");
-#endif /* M_AMIGA */
+#endif /* !M_AMIGA */
 
 #ifdef WIN32
 #	define DOTTINDIR "tin"
@@ -749,34 +792,26 @@ vMakeGrpList (
 	char	*pcBaseDir,
 	char	*pcGrpPath)
 {
-	char	*pcPtr;
-	char	acFile[PATH_LEN];
-	char	acPath[PATH_LEN];
-	DIR	*tDirFile;
-	DIR_BUF	*tFile;
-	int	iIsDir;
-	long	lArtMax;
-	long	lArtMin;
-	struct	stat sStatInfo;
+	DIR *tDirFile;
+	DIR_BUF *tFile;
+	char *pcPtr;
+	char acFile[PATH_LEN];
+	char acPath[PATH_LEN];
+	int iIsDir;
+	long lArtMax;
+	long lArtMin;
+	struct stat sStatInfo;
 
 	if (access (pcGrpPath, R_OK))
 		return;
 
 	tDirFile = opendir (pcGrpPath);
 
-#if 0
-	my_printf ("opendir(%s)\n", pcGrpPath);
-#endif
-
 	if (tDirFile != (DIR *) 0) {
 		iIsDir = FALSE;
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
 			STRCPY(acFile, tFile->d_name);
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
-
-#if 0
-	my_printf ("STAT=[%s]\n", acPath);
-#endif
 
 			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
@@ -811,8 +846,8 @@ vAppendGrpLine (
 	long	lArtMin,
 	char	*pcBaseDir)
 {
-	char	acGrpName[PATH_LEN];
-	FILE	*hFp;
+	FILE *hFp;
+	char acGrpName[PATH_LEN];
 
 	if (lArtMax == 0 && lArtMin == 1)
 		return;
@@ -851,10 +886,10 @@ vMakeActiveMyGroup (void)
 void
 read_group_times_file (void)
 {
+	FILE *fp;
 	char *p, *q;
 	char buf[HEADER_LEN];
 	char group[HEADER_LEN];
-	FILE *fp;
 	time_t updated_time;
 	struct t_group *psGrp;
 
@@ -884,8 +919,8 @@ read_group_times_file (void)
 			psGrp->last_updated_time = updated_time;
 
 #	ifdef DEBUG
-if (debug == 2)
-	my_printf ("group=[%-40.40s]  [%lu]\n", psGrp->name, (unsigned long int) psGrp->last_updated_time);
+		if (debug == 2)
+			my_printf ("group=[%-40.40s]  [%lu]\n", psGrp->name, (unsigned long int) psGrp->last_updated_time);
 #	endif /* DEBUG */
 
 	}
