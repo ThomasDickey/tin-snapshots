@@ -14,30 +14,6 @@ dnl
 dnl Macros used in TIN auto-configuration script.
 dnl
 dnl ---------------------------------------------------------------------------
-dnl (macros from ftp.clark.net:/pub/dickey/autoconf)
-dnl ---------------------------------------------------------------------------
-AC_DEFUN(AC_FUNC_SETPGRP,
-[AC_CACHE_CHECK(whether setpgrp takes no argument, ac_cv_func_setpgrp_void,
-AC_TRY_RUN([
-/*
- * If this system has a BSD-style setpgrp, which takes arguments, exit
- * successfully.
- */
-main()
-{
-    if (setpgrp(1,1) == -1)
-	exit(0);
-    else
-	exit(1);
-}
-], ac_cv_func_setpgrp_void=no, ac_cv_func_setpgrp_void=yes,
-   AC_MSG_ERROR(cannot check setpgrp if cross compiling))
-)
-if test $ac_cv_func_setpgrp_void = yes; then
-  AC_DEFINE(SETPGRP_VOID)
-fi
-])dnl
-dnl ---------------------------------------------------------------------------
 dnl ---------------------------------------------------------------------------
 dnl Test for ANSI token substitution (used in 'assert').
 AC_DEFUN([CF_ANSI_ASSERT],
@@ -498,7 +474,37 @@ else
 fi
 AC_MSG_RESULT($ac_cv_prog_sum_r)
 fi
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Attempt to determine if we've got one of the flavors of regular-expression
+dnl code that we can support.
+AC_DEFUN([CF_REGEX],
+[
+AC_MSG_CHECKING([for regular-expression headers])
+AC_CACHE_VAL(cf_cv_regex,[
+AC_TRY_LINK([#include <sys/types.h>
+#include <regex.h>],[
+	regex_t *p;
+	int x = regcomp(p, "", 0);
+	int y = regexec(p, "", 0, 0, 0);
+	regfree(p);
+	],[cf_cv_regex="regex.h"],[
+	AC_TRY_LINK([#include <regexp.h>],[
+		char *p = compile("", "", "", 0);
+		int x = step("", "");
+	],[cf_cv_regex="regexp.h"],[
+		AC_TRY_LINK([#include <regexpr.h>],[
+			char *p = compile("", "", "");
+			int x = step("", "");
+		],[cf_cv_regex="regexpr.h"])])])
 ])
+AC_MSG_RESULT($cf_cv_regex)
+case $cf_cv_regex in
+	regex.h)   AC_DEFINE(HAVE_REGEX_H_FUNCS) ;;
+	regexp.h)  AC_DEFINE(HAVE_REGEXP_H_FUNCS) ;;
+	regexpr.h) AC_DEFINE(HAVE_REGEXPR_H_FUNCS) ;;
+esac
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
 dnl follow the AC_CHECK_FUNCS call.
@@ -599,7 +605,8 @@ test $cf_cv_dcl_sys_errlist = no && AC_DEFINE(DECL_SYS_ERRLIST)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Derive the system name, as a check for reusing the autoconf cache
-AC_DEFUN([CF_SYS_NAME],[
+AC_DEFUN([CF_SYS_NAME],
+[
 SYS_NAME=`(uname -s -r || uname -a || hostname) 2>/dev/null | sed 1q`
 test -z "$SYS_NAME" && SYS_NAME=unknown
 AC_DEFINE_UNQUOTED(SYS_NAME,"$SYS_NAME")

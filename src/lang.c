@@ -939,7 +939,7 @@ constext txt_quit_edit_send[] = "q)uit, e)dit, s)end [%.*s]: %c";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost, p(o)stpone [%.*s]: %c";
 #endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */
-constext txt_quit_postpone[] = "q)uit, p(o)stpone: ";
+constext txt_quit_edit_postpone[] = "q)uit, e)dit, p(o)stpone: ";
 
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to more than one newsgroup!\n\n";

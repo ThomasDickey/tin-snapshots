@@ -88,7 +88,7 @@ void
 my_strncpy (
 	char *p,
 	const char *q,
-	int n)		/* we should use size_t instead of int */
+	size_t n)
 {
 	while (n--) {
 		if (!*q || *q == '\n')
@@ -138,12 +138,12 @@ strcasestr (
 	return NULL;
 }
 
-int
+size_t
 mystrcat (
 	char **t,
 	const char *s)
 {
-	int len = 0;
+	size_t len = 0;
 
 	while (*s) {
 		*((*t)++) = *s++;

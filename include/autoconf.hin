@@ -254,6 +254,13 @@
 #undef HAVE_TYPE_UNIONWAIT
 
 /*
+ * Define a symbol to control which, if any, regular expression package we use.
+ */
+#undef HAVE_REGEX_H_FUNCS
+#undef HAVE_REGEXP_H_FUNCS
+#undef HAVE_REGEXPR_H_FUNCS
+
+/*
  * Define a symbol to control whether we use curses, or the termcap/terminfo
  * interface
  */

@@ -558,7 +558,7 @@ read_config_file (
 			}
 #endif
 			break;
-#ifdef HAVE_POSIX_REGEX
+#ifdef HAVE_REGEX_FUNCS
 		case 'w':
 			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) {
 				wildcard_func = (wildcard) ? match_regex : wildmat;
@@ -961,7 +961,7 @@ write_config_file (
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
  	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
-#ifdef HAVE_POSIX_REGEX
+#ifdef HAVE_REGEX_FUNCS
  	fprintf (fp, txt_tinrc_wildcard);
 	fprintf (fp, "wildcard=%d\n\n", wildcard);
 #endif
@@ -1476,7 +1476,7 @@ change_config_file (
 							}
 							break;
 
-#ifdef HAVE_POSIX_REGEX
+#ifdef HAVE_REGEX_FUNCS
 						case OPT_WILDCARD:
 							wildcard_func = (wildcard) ? match_regex : wildmat;
 							break;

@@ -1060,7 +1060,7 @@ skip_newgroups(void)
 int
 add_my_group (
 	char *group,
-	int add)
+	t_bool add)
 {
 	int i,j;
 

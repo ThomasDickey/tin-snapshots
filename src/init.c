@@ -873,7 +873,7 @@ got_active:
 	sprintf (txt_help_bug_report, txt_help_bug, bug_addr);
 
 #ifdef HAVE_PGP
-	pgpopts = (char *) get_val("PGPOPTS", "");
+	pgpopts = get_val("PGPOPTS", "");
 	if ((ptr = getenv("PGPPATH")) != (char *) 0)
 		strcpy (pgp_data, ptr);
 	else

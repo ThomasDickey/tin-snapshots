@@ -41,7 +41,8 @@
 #define ENCRYPT 0x02
 
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
-char *pgpopts = (char *)NULL, pgp_data[PATH_LEN];
+const char *pgpopts = 0;
+char pgp_data[PATH_LEN];
 
 static void
 join_files (
