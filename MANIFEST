@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-961207 (Sun Dec  8 13:36:27 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
 ----------------------------------------------------
-  51505 ./CHANGES
+  51618 ./CHANGES
   12600 ./TODO
    5341 ./Makefile
   17122 ./INSTALL
@@ -27,7 +27,7 @@ MANIFEST for tin-1.3-unoff-BETA-961207 (Sun Dec  8 13:36:27 MET 1996)
    2233 ./include/os_2.h
   29576 ./include/proto.h
    1376 ./include/stpwatch.h
-  42543 ./include/tin.h
+  42511 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
@@ -57,7 +57,7 @@ MANIFEST for tin-1.3-unoff-BETA-961207 (Sun Dec  8 13:36:27 MET 1996)
   17820 ./src/main.c
    5124 ./src/makecfg.c
   10990 ./src/memory.c
-  48348 ./src/misc.c
+  48322 ./src/misc.c
    7228 ./src/msmail.c
   33311 ./src/newsrc.c
   26408 ./src/nntplib.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961207 (Sun Dec  8 13:36:27 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1592953 insgesamt
+1593170 insgesamt

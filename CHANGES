@@ -1,3 +1,9 @@
+--unoff BETA release 961208 --
+
+238) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. see 236)
+     FIX. misc.c
+
 --unoff BETA release 961207 --
 
 237) Thomas E. Dickey <dickey@clark.net>

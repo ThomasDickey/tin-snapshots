@@ -591,7 +591,7 @@ extern char *get_uaf_fullname();
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
-#define	NEWSRCTABLE_FILE	"newsrctable"
+#define 	NEWSRCTABLE_FILE	"newsrctable"
 /* NEWNEWSRC_FILE will actually be .newnewsrc<pid> if SINGLETASKING is not
    defined */
 #define 	NEWNEWSRC_FILE		".newnewsrc"
@@ -1240,13 +1240,13 @@ struct t_filter
 	char *subj;				/* Subject: line    */
 	char *from;				/* From: line	    */
 	char *msgid;				/* Message-ID: line */
-	char lines_cmp; 			/* Lines compare <> */
+	char lines_cmp;				/* Lines compare <> */
 	int  lines_num; 			/* Lines: line	    */
-  char *xref;                                   /* groups in xref line */
-  int xref_max; /* maximal number of groups in newsgroups line */
-  int xref_score_cnt;
-  int xref_scores[10];
-  char *xref_score_strings[10];
+	char *xref;				/* groups in xref line */
+	int xref_max;				/* maximal number of groups in newsgroups line */
+	int xref_score_cnt;
+	int xref_scores[10];
+	char *xref_score_strings[10];
 	time_t time;				/* expire time in seconds */
 	unsigned int inscope:4;			/* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;			/* kill/auto select */
