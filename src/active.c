@@ -19,7 +19,7 @@ char new_newnews_host[PATH_LEN];
 int group_hash[TABLE_SIZE];			/* group name --> active[] */
 int reread_active_file = FALSE;
 int newnews_index = -1;
-time_t new_newnews_time;
+time_t new_newnews_time;			/* FIXME: never set */
 
 
 void
@@ -91,7 +91,7 @@ resync_active_file ()
 	extern int reread_active_for_posted_arts;
 	char old_group[PATH_LEN];
 	int reread = FALSE;
-	int cmd_line;
+	int command_line;
 	
 	if (reread_active_file) {
 		reread_active_for_posted_arts = FALSE;
@@ -114,9 +114,9 @@ resync_active_file ()
 		read_mailgroups_file ();
 		read_newsgroups_file ();
 */
-		cmd_line = read_cmd_line_groups ();
-		read_newsrc (newsrc, cmd_line ? 0 : 1);
-		if (!cmd_line) {
+		command_line = read_cmd_line_groups ();
+		read_newsrc (newsrc, command_line ? 0 : 1);
+		if (!command_line) {
 			toggle_my_groups (show_only_unread_groups, old_group);
 		}
 		set_groupname_len (FALSE);
@@ -438,7 +438,7 @@ check_for_any_new_groups ()
 	char *ptr, buf[LEN];
 	char old_newnews_host[PATH_LEN];
 	FILE *fp = (FILE *) 0;
-	time_t new_newnews_time = (time_t)0;
+	time_t the_newnews_time = (time_t)0;
 	time_t old_newnews_time;
 	time_t creation_time = (time_t)0;
 
@@ -448,7 +448,7 @@ check_for_any_new_groups ()
 	
 	wait_message (txt_checking_active_file);
 
-	time (&new_newnews_time);
+	time (&the_newnews_time);
 
 	/*
 	 * find out if we have read news from here before otherwise -1
@@ -470,9 +470,9 @@ check_for_any_new_groups ()
 
 	if (! read_news_via_nntp && newnews_index >= 0) {
 /*
-		new_active_size = new_newnews_time;
+		new_active_size = the_newnews_time;
 		old_active_size = new_newnews_size[active_index].attribute;
-		if (new_newnews_time <= old_active_size) {
+		if (the_newnews_time <= old_active_size) {
 			goto notify_groups_done;
 		}
 */
@@ -480,7 +480,7 @@ check_for_any_new_groups ()
 
 	if (debug == 2) {
 		sprintf (msg, "Newnews old=[%ld]  new=[%ld]", 
-			old_newnews_time, new_newnews_time);
+			old_newnews_time, the_newnews_time);
 		error_message (msg, "");						
 		sleep (2);
 	}
@@ -547,9 +547,9 @@ notify_groups_done:
 	 * update attribute field/create new entry with new size/date
 	 */
 	if (newnews_index >= 0) {
-		newnews[newnews_index].time = new_newnews_time;
+		newnews[newnews_index].time = the_newnews_time;
 	} else {
-		sprintf (buf, "%s %ld", new_newnews_host, new_newnews_time);
+		sprintf (buf, "%s %ld", new_newnews_host, the_newnews_time);
 		load_newnews_info (buf);
 	}
 }

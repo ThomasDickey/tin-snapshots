@@ -1016,6 +1016,12 @@ extern char *get_uaf_fullname();
 typedef unsigned char	t_bitmap;
 
 /*
+ * Keys for add_msgid()
+ */
+#define REF_REF				1		/* Add a ref->ref entry */
+#define MSGID_REF			2		/* Add a msgid->ref entry */
+
+/*
  * Size of msgid hash table
  */
 #define MSGID_HASH_SIZE		2609

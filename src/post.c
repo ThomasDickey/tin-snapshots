@@ -16,9 +16,7 @@
 
 #define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); fflush (stdout); Raw (TRUE);}
 
-#define MAX_MSG_HEADERS	20
-
-#undef nl	/* SunOS 4.x K&R compiler */
+#define	MAX_MSG_HEADERS	20
 
 extern char note_h_distrib[PATH_LEN];			/* Distribution: */
 extern char note_h_followup[LEN];			/* Followup-To: */
@@ -36,7 +34,7 @@ extern char note_h_summary[LEN];			/* Summary: */
 extern char note_h_mimeversion[PATH_LEN];		/* Mime-Version: */
 extern char note_h_contenttype[LEN];			/* Content-Type: */
 extern char note_h_contentenc[LEN];			/* Content-Transfer-Encoding: */
-#endif
+#endif /* FORGERY */
 
 extern FILE *note_fp;					/* the body of the current article */
 extern long note_mark[MAX_PAGES];			/* ftells on beginnings of pages */
@@ -341,8 +339,8 @@ update_posted_msgs_file (file, addr)
  */
 
 int 
-check_article_to_be_posted (article, art_type, lines)
-	char *article;
+check_article_to_be_posted (the_article, art_type, lines)
+	char *the_article;
 	int  art_type;
 	int  *lines;
 {
@@ -364,8 +362,8 @@ check_article_to_be_posted (article, art_type, lines)
 	int oldraw;	/* save previous raw state */
 	struct t_group *psGrp;
 
-	if ((fp = fopen (article, "r")) == (FILE *) 0) {
-		perror_message (txt_cannot_open, article);
+	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
+		perror_message (txt_cannot_open, the_article);
 		return FALSE;
 	}
 
@@ -863,9 +861,9 @@ post_article_done:
  */
 
 int 
-post_article (group, posted)
+post_article (group, posted_flag)
 	char	*group;
-	int	*posted;
+	int	*posted_flag;
 {
 	FILE	*fp;
 	char	ch;
@@ -897,7 +895,7 @@ post_article (group, posted)
 		return redraw_screen;
 	}
 
-	*posted = FALSE;
+	*posted_flag = FALSE;
 
 	if (psGrp->moderated == 'm') {
 		sprintf (msg, txt_group_is_moderated, group);
@@ -1015,14 +1013,14 @@ post_article (group, posted)
 			wait_message (txt_posting);
 			if (art_type == GROUP_TYPE_NEWS) {			
 				if (submit_news_file (article, lines)) {
-					*posted = TRUE;
+					*posted_flag = TRUE;
 				}
 			} else {
 				if (submit_mail_file (article)) {
-					*posted = TRUE;
+					*posted_flag = TRUE;
 				}
 			}
-			if (*posted) {
+			if (*posted_flag) {
 				info_message (txt_art_posted);
 				sleep(1);
 				goto post_article_done;
@@ -1049,7 +1047,7 @@ post_article (group, posted)
 	}
 
 post_article_done:
-	if (*posted) {
+	if (*posted_flag) {
 		if (art_type == GROUP_TYPE_NEWS) {
 			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf))
 				update_active_after_posting (buf);
@@ -1089,7 +1087,7 @@ join_references (buffer, oldrefs, newref)
 	char *newref;
 {
         char *c;
-	int bl, nl, ol;
+	int buflen, newlen, oldlen;
 	int stripflag = 0;
 
 	/* TODO
@@ -1099,7 +1097,7 @@ join_references (buffer, oldrefs, newref)
 	 * We don't currently comply with this very well.
 	 * Much wide-spread software, notably INN, comes with a default maximum
 	 * header size of 512 characters, so let's make sure we don't break
-	 * this limit else our article won't get far. [is this still the case ?]
+	 * this limit else our article won't get far. [is this still the case?]
 	 */
 
 	/* Always keep the first reference */
@@ -1108,17 +1106,17 @@ join_references (buffer, oldrefs, newref)
 		*c++=*oldrefs++;
 	*c++=' '; while (isspace(*oldrefs)) oldrefs++;
 	*c=0;
-	bl=strlen(buffer);
-	nl=strlen(newref);
-	ol=strlen(oldrefs);
+	buflen=strlen(buffer);
+	newlen=strlen(newref);
+	oldlen=strlen(oldrefs);
 
 	/* now see if it will break the limit if we include the next reference;
 	 * 14 is just the size of the References header and required whitespace
 	 */
-	while (bl+nl+ol+14>=MAXREFSIZE) {
+	while (buflen+newlen+oldlen+14>=MAXREFSIZE) {
 		/* won't do, so clip off the next reference */
-		while (*oldrefs && !isspace(*oldrefs)) { oldrefs++; ol--; }
-		while (*oldrefs && isspace(*oldrefs)) { oldrefs++; ol--; }
+		while (*oldrefs && !isspace(*oldrefs)) { oldrefs++; oldlen--; }
+		while (*oldrefs && isspace(*oldrefs)) { oldrefs++; oldlen--; }
 		if (!stripflag) {
 			stripflag=1;
 			*c++=' ';
@@ -1181,11 +1179,9 @@ post_response (group, respnum, copy_text)
 		switch (ch) {
 		case iKeyPostPost:
 			goto ignore_followup_to_poster;
-			/* break; */
 		case iKeyPostQuit:
 		case iKeyPostQuit2:
 			return ret_code;
-			/* break; */
 		}
 		{
 			char save_followup[LEN];
@@ -1303,6 +1299,11 @@ ignore_followup_to_poster:
 			fprintf (fp, "%s\n", buf);
 			}
 		start_line_offset++;
+		
+		/*
+		 * check if xpost_quote_format or news_quote_format
+		 * is longer than 1 line and correct start_line_offset
+		 */  
 		{ char *s;			
 			for (s=buf; *s; s++) {
 				if (*s == '\n') ++start_line_offset;
@@ -2890,7 +2891,6 @@ make_path_header (line, from_name)
 		}
 	} else {
 		sprintf (line, "%s!%s", host_name, user_name);
-/*		} */
 	}
 #else
 	sprintf (line, "%s!%s", host_name, user_name);

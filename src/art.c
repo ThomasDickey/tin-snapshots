@@ -13,10 +13,12 @@
  */
 
 #include	"tin.h"
-#include	"stpwatch.h"
+
+#ifdef	PROFILE
+#	include	"stpwatch.h"
+#endif	/* PROFILE */
 
 #define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
-#define CorruptIndex(n)  error = n; goto corrupt_index;
 
 char *glob_art_group;
 static long last_read_article;
@@ -26,7 +28,6 @@ static int read_group P_((struct t_group *group, char *group_path, int *pcount))
 static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
 static int subj_comp P_((t_comptype *p1, t_comptype *p2));
 static int from_comp P_((t_comptype *p1, t_comptype *p2));
-static int date_comp P_((t_comptype *p1, t_comptype *p2));
 static char *pcPrintDate P_((long lSecs));
 static char *pcPrintFrom P_((struct t_article *psArt));
 static void print_expired_arts P_((int num_expired));
@@ -85,50 +86,6 @@ find_base (group)
 	}
 }
 
-/* 
- *  Count the number of non-expired articles in arts[]
- */
-
-#if 0
-int
-num_of_arts ()
-{
-	int sum = 0;
-	register int i;
-
-	for (i = 0; i < top; i++) {
-		if (arts[i].thread != ART_EXPIRED) {
-			sum++;
-		}
-	}
-
-	return sum;
-}
-#endif
-
-/*
- *  Return TRUE if arts[] contains any expired articles
- *  (articles we have an entry for which don't have a 
- *  corresponding article file in the spool directory)
- */
-
-#if 0
-int
-purge_needed (group_path)
-	char *group_path;
-{
-	register int i;
-
-	for (i = 0; i < top; i++) {
-		if (arts[i].thread == ART_EXPIRED) {
-			return TRUE;
-		}
-	}
-	
-	return FALSE;
-}
-#endif
-
 /*
  *  Main group indexing routine.
  *
@@ -173,36 +130,27 @@ index_group (group)
 		 *  and then create base[] article numbers from loaded articles.
 		 *  If nov file does not exist then create base[] with setup_base().
 		 */
-BegStopWatch("setup_base");
+#ifdef	PROFILE
+	BegStopWatch("setup_base");
+#endif	/* PROFILE */
 
 		artcount = setup_hard_base (group, group_path);
 
-EndStopWatch();
-PrintStopWatch();
-
+#ifdef	PROFILE
+	EndStopWatch();
+	PrintStopWatch();
+#endif	/* PROFILE */
 
 debug_print_comment ("Before iReadNovFile");
 debug_print_bitmap (group, NULL);
 
 		min = top_base ? base[0] : group->xmin;
 		max = top_base ? base[top_base-1] : min - 1;
-/*
-		min = group->xmin;
-		max = group->xmax;
-
-sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
-*/
 		/*
 		 * Read in the existing index via XOVER or the index file
 		 */
 		artcount = iReadNovFile (group, min, max, &expired);
-/*
-		if (artcount) {
-			artcount = setup_soft_base (group);
-		} else {
-			artcount = setup_hard_base (group, group_path);
-		}
-*/
+
 		if (expired) {
 			print_expired_arts (expired);
 		}
@@ -254,10 +202,16 @@ sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 		/* nothing to be done here, because all possibly encoded
 		   headers in the arts structure have already been decoded. */
 
-BegStopWatch("make_thread");
+#ifdef	PROFILE
+	BegStopWatch("make_thread");
+#endif	/* PROFILE */
+
 		make_threads (group, FALSE);
-EndStopWatch();
-PrintStopWatch();
+
+#ifdef	PROFILE
+	EndStopWatch();
+	PrintStopWatch();
+#endif	/* PROFILE */
 
 		find_base (group);
 	
@@ -395,7 +349,7 @@ read_group (group, group_path, pcount)
 	 */
 	*pcount = count;
 
-    /*
+	/*
 	 * change to previous dir before indexing started
 	 */
 	my_chdir (dir);
@@ -508,13 +462,10 @@ make_threads (group, rethread)
 	 */
 
 	for (i = 0; i < top; i++) {
-#ifndef OLD_THREADING
 		int *aptr; 
-#endif
 		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i))
 			continue;
 
-#ifndef OLD_THREADING
 		aptr = (int*)arts[i].subject;
 		aptr -=2;
 		j = *aptr;	
@@ -534,18 +485,6 @@ make_threads (group, rethread)
 		} 
 
 		*aptr = i; 
-#else
-		for (j = i+1; j < top; j++) {
-			if (! IGNORE_ART(j) && arts[j].inthread == FALSE &&
-			   ((arts[i].subject == arts[j].subject) ||
-			   ((arts[i].part || arts[i].patch) &&
-			   arts[i].archive == arts[j].archive))) {
-				arts[i].thread = j;
-				arts[j].inthread = TRUE;
-				break;
-			}
-		}
-#endif
 	}
 }
 
@@ -742,20 +681,22 @@ parse_headers (buf, h)
 		} /* switch */
 
 		if (! flag || lineno > max_lineno || got_archive) {
-			if (got_from && got_date) {
+			/*
+			 * The sonofRFC1036 states that the following hdrs are
+			 * mandatory. It also states that Subject, Newsgroups
+			 * and Path are too.
+			 */
+			if (got_from && got_date && got_msgid) {
 
 				if (! got_subject)
 					h->subject = hash_str ("<No subject>");
 
 				/*
-				 * If we have msgid, add it in, using refs as parent
-				 * TODO: RFC1036 says the Message-ID is Mandatory 
+				 * Add the msgid to the cache, the refs are the parent
 				 */
-				if (got_msgid) {
-					h->msgid = add_msgid(msgid, h->refs);
-					free(msgid);
-				}
-
+				h->msgid = add_msgid(MSGID_REF, msgid, h->refs);
+				free(msgid);
+				
 				debug_print_header (h);
 				return TRUE;
 			} else {
@@ -936,9 +877,9 @@ sleep(1);
 		p = q + 1;
 
 		/*
-		 * Now we have the references, add in the msgid
+		 * We now have the Refs & Message-ID. Add it to the cache.
 		 */
-		arts[top].msgid = add_msgid(msgid, arts[top].refs);
+		arts[top].msgid = add_msgid(MSGID_REF, msgid, arts[top].refs);
 		free(msgid);
  
 		/* 
@@ -1138,28 +1079,6 @@ vWriteNovFile (psGrp)
 }
 
 /*
- *  Create pointer to static group path
- */
-
-#if 0
-
-char *
-pcFindGrpPath (psGrp)
-	struct t_group *psGrp;
-{
-	static char acGrpPath[PATH_LEN];
-
-	if (psGrp == (struct t_group *) 0) {
-		return (char *) 0;
-	}
-
-	vMakeGrpPath (novrootdir, psGrp->name, acGrpPath);
-
-	return acGrpPath;
-}
-#endif	/* 0 */
-
-/*
  *  A complex little function to determine where to read the index file 
  *  from and where to write it.
  *
@@ -1324,19 +1243,12 @@ do_update ()
 	for (i = 0; i < group_top; i++) {
 		psGrp = &active[my_group[i]];
 		make_group_path (psGrp->name, group_path);
-
 #ifdef INDEX_DAEMON
-		
 		joinpath (buf, psGrp->spooldir, group_path);
-
 		joinpath (novpath, novrootdir, group_path);
-if (verbose) {
-	printf ("NOV path=[%s]\n", novpath);
-}
-/*		if (access (novpath, W_OK) == 0) { */
-			vCreatePath (novpath);
-/*		} */
-		
+
+		if (verbose) printf ("NOV path=[%s]\n", novpath);
+		vCreatePath (novpath);
 		if (stat (buf, &stinfo) == -1) {
 			if (verbose) {
 				error_message (txt_cannot_stat_group, buf);
@@ -1475,7 +1387,16 @@ from_comp (p1, p2)
 }
 
 
-static int
+/*
+ * Works like strcmp() for comparing time_t type values
+ * Return codes:
+ * 	-1:		If p1 is before p2
+ *	 0:		If they are the same time
+ *   1:		If p1 is after p2
+ * If the sort order is _not_  DATE_ASCEND then the sense of the above
+ * is reversed.
+ */
+int
 date_comp (p1, p2)
 	t_comptype *p1;
 	t_comptype *p2;
@@ -1697,34 +1618,5 @@ vCreatePath (pcPath)
 	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
 printf ("CREATE Path=[%s]\n", acCmd);
 	system (acCmd);
-}
-#endif
-
-#ifdef XXX
-char *
-pcFindNovFile (psGrp)
-	struct t_group *psGrp;
-{
-	char *p;
-	char dir[PATH_LEN];
-	char buf[PATH_LEN];
-	FILE *fp;
-	int i;
-	static char file[PATH_LEN];
-	unsigned long h;
-
-	if (psGrp == (struct t_group *) 0) {
-		return (char *) 0;
-	}
-
-	overview_index_filename = FALSE;
-
-#ifdef INDEX_DAEMON
-	vMakeGrpPath (novrootdir, group->name, dir);
-/* ADD here path creation code */
-	sprintf (file, "%s/%s", dir, OVERVIEW_FILE);
-	overview_index_filename = TRUE;
-	return file;
-#endif
 }
 #endif

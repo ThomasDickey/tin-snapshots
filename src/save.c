@@ -293,10 +293,10 @@ check_start_save_any_news (check_start_save)
 
 
 int 
-save_art_to_file (respnum, indexnum, mailbox, filename)
+save_art_to_file (respnum, indexnum, the_mailbox, filename)
 	int respnum;
 	int indexnum;
-	int mailbox;
+	int the_mailbox;
 	char *filename;
 {
 #ifndef INDEX_DAEMON
@@ -313,7 +313,7 @@ save_art_to_file (respnum, indexnum, mailbox, filename)
 	struct stat st;
 	
 	if (strlen (filename)) {
-		is_mailbox = mailbox;
+		is_mailbox = the_mailbox;
 		i = indexnum;
 	}
 
@@ -351,7 +351,7 @@ save_art_to_file (respnum, indexnum, mailbox, filename)
 
 	if (debug == 2) {
 		sprintf (msg, "Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]", 
-			respnum, indexnum, mailbox, filename, file, mode);
+			respnum, indexnum, the_mailbox, filename, file, mode);
 		error_message (msg, "");
 	}
 
@@ -369,7 +369,7 @@ save_art_to_file (respnum, indexnum, mailbox, filename)
 	}
 	copy_fp (note_fp, fp, "");
 
-	print_art_seperator_line (fp, mailbox);
+	print_art_seperator_line (fp, the_mailbox);
 
 	fclose (fp);
 	fseek (note_fp, note_mark[note_page], 0);
@@ -648,9 +648,9 @@ create_sub_dir (i)
  */
 
 void 
-add_to_save_list (index, article, is_mailbox, archive_save, path)
+add_to_save_list (index, the_article, is_mailbox, archive_save, path)
 	int index;
-	struct t_article *article;
+	struct t_article *the_article;
 	int is_mailbox;
 	int archive_save;
 	char *path;
@@ -677,14 +677,14 @@ add_to_save_list (index, article, is_mailbox, archive_save, path)
 	save[num_save].part    = (char *) 0;
 	save[num_save].patch   = (char *) 0;
 
-	save[num_save].subject = str_dup (article->subject);
-	if (archive_save && article->archive) {
-		save[num_save].archive = str_dup (article->archive);
-		if (article->part) {
-			save[num_save].part = str_dup (article->part);
+	save[num_save].subject = str_dup (the_article->subject);
+	if (archive_save && the_article->archive) {
+		save[num_save].archive = str_dup (the_article->archive);
+		if (the_article->part) {
+			save[num_save].part = str_dup (the_article->part);
 		}
-		if (article->patch) {
-			save[num_save].patch = str_dup (article->patch);
+		if (the_article->patch) {
+			save[num_save].patch = str_dup (the_article->patch);
 		}
 	}
 
@@ -1529,18 +1529,18 @@ any_saved_files ()
 }
 
 void 
-print_art_seperator_line (fp, mailbox)
+print_art_seperator_line (fp, the_mailbox)
 	FILE *fp;
-	int mailbox;
+	int the_mailbox;
 {
 	int sep = 0x01;	/* Ctrl-A */
 
 	if (debug == 2) {	
-		sprintf (msg, "Mailbox=[%d]  MMDF=[%d]", mailbox, save_to_mmdf_mailbox);
+		sprintf (msg, "Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);
 		error_message (msg, "");
 	}
 	
-	if (mailbox && save_to_mmdf_mailbox) {
+	if (the_mailbox && save_to_mmdf_mailbox) {
 		fprintf (fp, "%c%c%c%c\n", sep, sep, sep, sep);
 	} else {
 		my_fputc ('\n', fp);

@@ -175,20 +175,6 @@ NSETRNG1 (bitmap, low, high)
 			BIT_OR(bitmap, high, ~ (NBITNEG1 << NBITIDX(high)));
 		}
 	}
-#ifdef XXX
-	if (high-- > low) {
-		if (NOFFSET(high) == NOFFSET(low)) {
-			BIT_OR(bitmap, low, (NBITSON << NBITIDX(low)) & ~ (NBITNEG1 << NBITIDX(high)));
-		} else {
-			BIT_OR(bitmap, low, (NBITSON << NBITIDX(low)));
-			if (NOFFSET(high) > NOFFSET(low) + 1) {
-				memset (&bitmap[NOFFSET(low) + 1], NBITSON,
-					(size_t) (NOFFSET(high)-NOFFSET(low)-1));
-			}
-			BIT_OR(bitmap, high, ~ (NBITNEG1 << NBITIDX(high)));
-		}
-	}
-#endif
 }
 
 /*
@@ -232,20 +218,6 @@ printf ("Multi BYTE - END mask=[0x%x][%d]\n", mask, mask);
 			BIT_AND(bitmap, high, NBITNEG1 << NBITIDX(high));
 		}
 	}
-#ifdef XXX
-	if (high-- > low) {
-		if (NOFFSET(high) == NOFFSET(low)) {
-			BIT_AND(bitmap, low, (NBITNEG1 << NBITIDX(high)) | ~ (NBITSON << NBITIDX(low)));
-		} else {
-			BIT_AND(bitmap, low, ~ (NBITSON << NBITIDX(low)));
-			if (NOFFSET(high) > NOFFSET(low) + 1) {
-				memset (&bitmap[NOFFSET(low) + 1], 0,
-					(size_t) (NOFFSET(high)-NOFFSET(low)-1));
-			}
-			BIT_AND(bitmap, high, (NBITNEG1 << NBITIDX(high)));
-		}
-	}
-#endif
 }
 
 /*

@@ -25,19 +25,15 @@
 #   endif
 #else
 #	ifdef HAVE_NETDB_H
-#		ifdef apollo
-#			include	</bsd4.3/usr/include/netdb.h>
-#		else
-#			include	<netdb.h>
-#		endif
+#		include	<netdb.h>
 #	endif
 #endif
 
 #define	PATHMASTER	"not-for-mail"
 
 #if defined(M_AMIGA) && (defined (INEWS_MAIL_GATEWAY) || defined (INEWS_MAIL_DOMAIN))
-/* Damn compiler bugs... */
-/* Without this hack, SASC 6.55 produces a TST.B d16(pc),
+/* Damn compiler bugs...
+ * Without this hack, SASC 6.55 produces a TST.B d16(pc),
  * which is illegal on a 68000
  */
 static const char *inews_mail_gateway = INEWS_MAIL_GATEWAY;

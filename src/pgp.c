@@ -232,8 +232,8 @@ invoke_pgp_mail (nam, mail_to)
 }
 
 void
-invoke_pgp_news(article)
-	char *article;
+invoke_pgp_news(the_article)
+	char *the_article;
 {
 #ifdef HAVE_PGP
 	char ch, ch_default = 's';
@@ -255,12 +255,12 @@ invoke_pgp_news(article)
 			break;
 
 		case 's':
-			do_pgp(SIGN, article, NULL);
+			do_pgp(SIGN, the_article, NULL);
 			break;
 
 		case 'i':
-			do_pgp(SIGN, article, NULL);
-			pgp_append_public_key(article);
+			do_pgp(SIGN, the_article, NULL);
+			pgp_append_public_key(the_article);
 			break;
 	}
 #endif

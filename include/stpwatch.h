@@ -23,31 +23,14 @@ struct timeb end_tb;
 
 #define LSECS 700000000
 
-#define BegStopWatch(msg) \
-	{ \
-		strcpy (msg_tb, msg); \
-		ftime (&beg_tb); \
-	}
+#define BegStopWatch(msg)	{strcpy (msg_tb, msg); ftime (&beg_tb);}
 	
-#define EndStopWatch() \
-	{ \
-		ftime (&end_tb); \
-	}
+#define EndStopWatch()		{ftime (&end_tb);}
 
-#define PrintStopWatch() \
-	{ \
-		sprintf (tmp_tb, "%s: Beg=[%ld.%d] End=[%ld.%d] Elapsed=[%ld]", \
-			msg_tb, beg_tb.time, beg_tb.millitm, \
-			end_tb.time, end_tb.millitm, \
-			(((end_tb.time - LSECS) * 1000) + end_tb.millitm) - \
-			(((beg_tb.time - LSECS) * 1000) + beg_tb.millitm)); \
-		error_message (tmp_tb, ""); \
-	}
-
-#else
-
-#define BegStopWatch(msg)
-#define EndStopWatch()
-#define PrintStopWatch()
-	
+#define PrintStopWatch()	{sprintf (tmp_tb, "%s: Beg=[%ld.%d] End=[%ld.%d] Elapsed=[%ld]", \
+				 msg_tb, beg_tb.time, beg_tb.millitm, \
+				 end_tb.time, end_tb.millitm, \
+				 (((end_tb.time - LSECS) * 1000) + end_tb.millitm) - \
+				 (((beg_tb.time - LSECS) * 1000) + beg_tb.millitm)); \
+				 error_message (tmp_tb, "");}
 #endif	/* PROFILE */

@@ -291,9 +291,11 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 'k':
+#ifdef M_UNIX
 			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles)) {
 				break;
 			}
+#endif
 			if (match_boolean (buf, "keep_posted_articles=", &keep_posted_articles)) {
 				break;
 			}
@@ -621,8 +623,10 @@ write_config_file (file)
 	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
+#ifdef M_UNIX
 	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
 	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
+#endif
 	fprintf (fp, "# if ON keep all failed postings in ~/Mail/posted\n");
 	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
 	fprintf (fp, "# if ON show only subscribed to groups that contain unread articles.\n");

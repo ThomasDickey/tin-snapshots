@@ -33,6 +33,7 @@ static char *_get_references P_((struct t_msgid *refptr, int depth));
 static void _free_list P_((struct t_msgid *ptr));
 static unsigned int hash_msgid P_((char *key));
 #ifdef DEBUG_REFS
+static void dump_msgid_thread  P_((struct t_msgid *ptr, int level));
 static void dump_msgid_threads P_((void));
 #endif
 #ifdef HAVE_REF_THREADING
@@ -88,7 +89,11 @@ hash_msgid(key)
 
 /*-------------------------------------------------------------------------
  * Thread us into our parents' list of children.
+ * If we are not the first child & we have a ptr to an article header,
+ * we can use the date to sort us into the list of siblings.
  */
+#define DATE(x)		(arts[x->article].date)
+
 void
 add_to_parent(ptr)
 	struct t_msgid *ptr;
@@ -99,25 +104,62 @@ add_to_parent(ptr)
 
 	if (ptr->parent->child == NULL)	{		/* We are 1st child */
 		ptr->parent->child = ptr;
-	} else {
-		/* TODO: use date_comp() to insert siblings by date */
+		return;
+	}
+	ptr->sibling = ptr->parent->child;
+	ptr->parent->child = ptr;
+#if 0
+fprintf(stderr, "add sibling: Artptr = %d, ArtDate %ld, 1st Sib %ld\n",
+	ptr->article,
+	(ptr->article != ART_NORMAL) ? DATE(ptr) : 0,
+	(ptr->parent->child->article != ART_NORMAL) ? DATE(ptr->parent->child) : 0);
+
+	/*
+	 * If we don't have a date to look at, or our date preceeds the current
+	 * 1st sibling, we go at the start of the sibling list
+	 */
+	 if (ptr->article == ART_NORMAL ||
+	     (date_comp(DATE(ptr), DATE(ptr->parent->child))) {
+
+fprintf(stderr, "1st sibling (%s)\n"), (ptr->article != ART_NORMAL)?"YES":"");
+
 		ptr->sibling = ptr->parent->child;
 		ptr->parent->child = ptr;
+	/*
+	 * Traverse the sibling list, find the right point to insert this art
+	 */
+	 } else {
+	 	for (p = ptr->parent->child; p->sibling != NULL; p = p->sibling) {
+	 		if (date_comp(DATE(ptr), DATE(p)) 1)
+	 		break;
+	 }
+	 
+	 ptr->sibling = p->sibling;
+	 p->sibling = ptr;
 	}
-#endif
+#endif /* 0 */
+
+#endif /* HAVE_REF_THREADING */
 }
 
 /*-------------------------------------------------------------------------
  * Adds or updates a message id in the cache.
- * If the message id is new, add it.
- * If parent is defined, update this information & add child / sibling ptrs
- * Returns a ptr to the structure containing the msgid
- * NB: By definition, a msgid can only have one parent and the 1st one
- *     assigned stands.
- * TODO - better handling on duplicate parent assignment ?
+ * . If the message id is new, add it to the cache, creating parent, child
+ *   & sibling ptrs as needed.
+ *
+ * . If the message id is a duplicate, then:
+ *     a)If no change is required to the parent, return
+ *       *** If now MSG_REF and .article is not set, update ptrs with info
+ *
+ *     b)If a parent is given where there was none before, add the parent
+ *          and link the msgid into the ref tree.
+ *
+ *     c)If a conflicting parent is given, overide the old one if MSG_REF
+ *
  */
 struct t_msgid *
-add_msgid(msgid, newparent)
+add_msgid(key, msgid, newparent)
+	int key;
 	char *msgid;
 	struct t_msgid *newparent;
 {
@@ -130,6 +172,10 @@ add_msgid(msgid, newparent)
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
+#ifdef DEBUG_REFS
+	fprintf(stderr, "---------------- Add %s %s\n", (key==MSGID_REF)?"MSG":"REF", msgid);
+#endif
+
 	/*
 	 * Look for this message id in the cache. Broken software will sometimes
 	 * not preserve the original case of a message-id.
@@ -139,23 +185,53 @@ add_msgid(msgid, newparent)
 		if (strcasecmp(i->txt, msgid) == 0) {
 
 			/*
-			 * Only update the parent if not already set. In theory, a
-			 * message-id can only follow up to one other message id. Due
-			 * to broken headers, this is not always the case.
+			 * CASE 1
+			 * No parent given or parent not changed - no update required
 			 */
-
-			/* Parent update not required */
 			if ((newparent == NULL) || (newparent == i->parent)) {
 #ifdef DEBUG_REFS
 				if (newparent == i->parent)
 					fprintf(stderr, "dup: %s -> no change\n", msgid);
+				else
+					fprintf(stderr, "nop: No parent specified\n");
 #endif
 				return(i);
 			}
 				
-			/* Change from null -> not-null */
+			/*
+			 * CASE2
+			 * A parent has been given where there was none before.
+			 * Need to change parent from null -> not-null & update ptrs
+			 */
 			if (i->parent == NULL) {
+				/*
+				 * Check for circular reference paths by looking for the
+				 * new parents presence in this thread
+				 * I'm assuming here that if we do find the parent, then this can only
+				 * happen in a broken ref thread and so the rest of this block is pointless
+				 * as it only applies when we're a MSGID_REF
+				 */
+				for (ptr = newparent; ptr != NULL; ptr = ptr->parent) {
+					if (strcasecmp(ptr->txt, msgid) == 0) {
+#ifdef DEBUG_REFS
+						fprintf(stderr, "Avoiding circular reference! (key=%s)!!!\n", (key==MSGID_REF)?"MSG":"REF");
+#endif
+						return(i);
+					}
+				}
+
 				i->parent = newparent;
+
+				/*
+				 * If the update is because we have the message
+				 * proper rather than just a ref to it, we create
+			 	 * a ptr to the article for use in date searching etc...
+				 */
+				if (i->article == ART_NORMAL && key == MSGID_REF) {
+/*fprintf(stderr, "updating with MSGID_REF, art %d\n", top);*/
+					i->article = top;
+				}
+
 				add_to_parent(i);
 #ifdef DEBUG_REFS
 				fprintf(stderr, "set: %s -> %s\n", msgid,
@@ -164,16 +240,26 @@ add_msgid(msgid, newparent)
 				return(i);
 			}
 
-			/* This is bad - caused by bad headers ? */
-/* TODO - add preference to msgids over refs to cut this down */
+			/*
+			 * CASE 3
+			 * A new parent has been given that conflicts with the current
+			 * one. This is bad - caused by incorrectly trimmed or
+			 * otherwise corrupt references.
+			 * If the information is from a message-ID header, then
+			 * it will override previous information from a Refs: header
+			 * as this information is more correct.
+			 */
 			if (i->parent != newparent) {
 #ifdef DEBUG_REFS
-				fprintf(stderr, "Warning: %s -> %s (already %s)!\n",
-								msgid, (newparent)?newparent->txt:"None",
-								i->parent->txt);
+				fprintf(stderr, "Warning: %s -> %s (already %s)\n",
+					msgid, (newparent)?newparent->txt:"None",
+					i->parent->txt);
+				if (key == MSGID_REF)
+					fprintf(stderr, "NB: TODO: Should override previous parent!\n");
 #endif
+				return(i);
 			}
-
+			fprintf(stderr, "Impossible: combination of conditions !\n");
 			return(i);
 		}
 	}
@@ -192,7 +278,8 @@ add_msgid(msgid, newparent)
 	ptr->parent = newparent;
 #ifdef HAVE_REF_THREADING
 	ptr->child = ptr->sibling = NULL;
-	add_to_parent(ptr);					/* Setup children / siblings */
+	ptr->article = (key == MSGID_REF ? top : ART_NORMAL);
+	add_to_parent(ptr);
 #endif
 
 	/*
@@ -223,6 +310,10 @@ parse_references (r)
 	if (!r)
 		return(NULL);
 
+#ifdef DEBUG_REFS
+	fprintf(stderr, "Refs: %s\n", r);
+#endif
+
 	/*
 	 * Break the refs down, using ' ' and <TAB> as delimiters
 	 * A msgid can't contain a ' ', right ?
@@ -230,12 +321,14 @@ parse_references (r)
 	if ((ptr = strtok(r, " \t")) == NULL)
 		return(NULL);
 
-	parent = NULL;					/* By defn, top of thread has no parent */
-	current = add_msgid(ptr, parent);
-
+	/*
+	 * By definition, the head of the thread has no parent
+	 */
+	parent = NULL;
+	current = add_msgid(REF_REF, ptr, parent);
 	while ((ptr = strtok(NULL, " \t")) != NULL) {
 		parent = current;
-		current = add_msgid(ptr, parent);
+		current = add_msgid(REF_REF, ptr, parent);
 	}
 
 	return(current);
@@ -257,7 +350,7 @@ _get_references(refptr, depth)
 	if (refptr->parent == NULL || depth > MAX_REFS) {
 
 		if (depth > MAX_REFS) {
-			fprintf(stderr, "Warning: Too many refs (%d). Truncated\n", MAX_REFS);
+			fprintf(stderr, "Warning: Too many refs near to %s. Truncated\n", refptr->txt);
 			sleep(2);
 		}
 
@@ -431,14 +524,10 @@ dump_msgids()
  * TODO:
  * 
  * . Add threading on both references & subject.
- *   (ought to be able to reuse the current thread on subject code ??)
+ *  (reuse the current thread on subject code ??)
  * 
  * . When inserting sibling messages, we currently insert at the head of
- *   the list. This should be sorted by date. This isn't easy, as the
- *	 date isn't always available when the tree is built.
- *   (Could this be done in find_next(), by choosing the 'next' based
- *	  on date_comp() of all possible children, skipping those that
- * 	  are already inthread==TRUE as an elimination policy ?)
+ *   the list. This should be sorted by date.
  *
  * . We could differentiate between bona fide root messages
  *   and root messages whose parent has expired on the group menu
@@ -454,6 +543,10 @@ clear_art_ptrs()
 {
 	int i;
     struct t_msgid *ptr;
+/*
+fprintf(stderr, "NB: clearing all art ptrs\n");
+sleep(2);
+*/
 
 	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {
 		for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next)

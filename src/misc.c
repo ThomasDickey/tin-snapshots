@@ -524,10 +524,10 @@ strip_double_ngs (ngs_list)
 
 
 long
-my_strtol (str, ptr, base)
+my_strtol (str, ptr, use_base)
 	char	*str;
 	char	**ptr;
-	int	base;
+	int	use_base;
 {
 #ifndef HAVE_STRTOL
 #define DIGIT(x) (isdigit(x)? ((x)-'0'): (10+tolower(x)-'a'))
@@ -539,7 +539,7 @@ my_strtol (str, ptr, base)
 	val = 0L;
 	sign = 1;
 
-	if (base < 0 || base > MBASE)
+	if (use_base < 0 || use_base > MBASE)
 		goto OUT;
 	while (isspace (*str))
 		++str;
@@ -548,26 +548,26 @@ my_strtol (str, ptr, base)
 		sign = -1;
 	} else if (*str == '+')
 		++str;
-	if (base == 0) {
+	if (use_base == 0) {
 		if (*str == '0') {
 			++str;
 			if (*str == 'x' || *str == 'X') {
 				++str;
-				base = 16;
+				use_base = 16;
 			} else
-				base = 8;
+				use_base = 8;
 		} else
-			base = 10;
-	} else if (base == 16)
+			use_base = 10;
+	} else if (use_base == 16)
 		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
 			str += 2;
 		/*
 		 * for any base > 10, the digits incrementally following
 		 * 9 are assumed to be "abc...z" or "ABC...Z"
 		 */
-		while (isalnum (*str) && (xx = DIGIT (*str)) < base) {
+		while (isalnum (*str) && (xx = DIGIT (*str)) < use_base) {
 			/* accumulate neg avoids surprises near maxint */
-			val = base * val - xx;
+			val = use_base * val - xx;
 			++str;
 		}
 OUT:
@@ -576,7 +576,7 @@ OUT:
 
 	return (sign * (-val));
 #else
-	return strtol (str, ptr, base);
+	return strtol (str, ptr, use_base);
 #endif
 }
 
@@ -734,13 +734,13 @@ rename_file (old_filename, new_filename)
 char *str_dup (str)
 	char *str;
 {
-	char *dup = (char *) 0;
+	char *duplicate = (char *) 0;
 
 	if (str != (char *) 0) {
-		dup = my_malloc (strlen (str)+1);
-		strcpy (dup, str);
+		duplicate = my_malloc (strlen (str)+1);
+		strcpy (duplicate, str);
 	}
-	return dup;
+	return duplicate;
 }
 
 
@@ -1585,16 +1585,16 @@ get_arrow_key ()
  */
 
 void
-create_index_lock_file (lock_file)
-	char *lock_file;
+create_index_lock_file (the_lock_file)
+	char *the_lock_file;
 {
 	char buf[64];
 	FILE *fp;
 	time_t epoch;
 	struct stat sb;
 
-	if (stat (lock_file, &sb) == 0) {
-		if ((fp = fopen (lock_file, "r")) != (FILE *) 0) {
+	if (stat (the_lock_file, &sb) == 0) {
+		if ((fp = fopen (the_lock_file, "r")) != (FILE *) 0) {
 			fgets (buf, sizeof (buf), fp);
 			fclose (fp);
 #ifdef INDEX_DAEMON
@@ -1607,11 +1607,11 @@ create_index_lock_file (lock_file)
 			error_message (msg, "");
 			exit (1);
 		}
-	} else	if ((fp = fopen (lock_file, "w")) != (FILE *) 0) {
+	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
 		time (&epoch);
 		fprintf (fp, "%6d  %s\n", process_id, ctime (&epoch));
 		fclose (fp);
-		chmod (lock_file, 0600);
+		chmod (the_lock_file, 0600);
 	}
 }
 
@@ -1895,11 +1895,11 @@ out:
  */
 
 int
-strfpath (format, str, maxsize, homedir, maildir, savedir, group)
+strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 	char *format;
 	char *str;
 	int maxsize;
-	char *homedir;
+	char *the_homedir;
 	char *maildir;
 	char *savedir;
 	char *group;
@@ -1931,10 +1931,11 @@ strfpath (format, str, maxsize, homedir, maildir, savedir, group)
 		 * If just a normal part of the pathname copy it
 		 */
 #ifdef VMS
-		if (! strchr ("~=+", *format)) {
+		if (! strchr ("~=+", *format))
 #else
-		if (! strchr ("~$=+", *format)) {
+		if (! strchr ("~$=+", *format))
 #endif
+		{
 			*str++ = *format;
 			continue;
 		}
@@ -1943,7 +1944,7 @@ strfpath (format, str, maxsize, homedir, maildir, savedir, group)
 			case '~':	/* Users or another users homedir */
 				switch (*++format) {
 					case '/':	/* users homedir */
-						joinpath (tbuf, homedir, "");
+						joinpath (tbuf, the_homedir, "");
 						break;
 					default:	/* some other users homedir */
 #ifndef M_AMIGA
@@ -2037,7 +2038,7 @@ strfpath (format, str, maxsize, homedir, maildir, savedir, group)
 				 * Only convert if 1st char in format
 				 */
 				if (startp == format && savedir != (char *) 0) {
-					if (strfpath (savedir, buf, sizeof (buf), homedir,
+					if (strfpath (savedir, buf, sizeof (buf), the_homedir,
 					    (char *) 0, (char *) 0, (char *) 0)) {
 
 #ifdef HAVE_LONG_FILE_NAMES
@@ -2112,8 +2113,8 @@ sleep (2);
  */
 
 int
-strfmailer (mailer, subject, to, filename, s, maxsize, format)
-	char *mailer;
+strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
+	char *the_mailer;
 	char *subject;
 	char *to;
 	char *filename;
@@ -2178,7 +2179,7 @@ strfmailer (mailer, subject, to, filename, s, maxsize, format)
 					strcpy(tbuf, filename);
 					break;
 				case 'M':	/* Mailer */
-					strcpy (tbuf, mailer);
+					strcpy (tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
 					strcpy(tbuf, rfc1522_encode(subject));

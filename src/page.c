@@ -53,7 +53,7 @@ long note_size;				/* stat size in bytes of article */
 
 static int tex2iso_article;
 
-static int expand_ctrl_chars P_((char *tobuf, char *frombuf, int length, int rotate));
+static int expand_ctrl_chars P_((char *tobuf, char *frombuf, int length, int do_rotate));
 
 
 int 
@@ -71,7 +71,7 @@ show_page (group, group_path, respnum, threadnum)
 	int mouse_click_on = TRUE;
 	int old_sort_art_type = default_sort_art_type;
 	int old_top;
-	int posted;
+	int posted_flag;
 	int ret_code;
 	long old_artnum;
 	long art;
@@ -641,7 +641,7 @@ return_to_index:
 				break;
 
 			case iKeyPagePost:	/* post a basenote */
-				if (post_article (group->name, &posted)) {
+				if (post_article (group->name, &posted_flag)) {
 					redraw_page (group->name, respnum);
 				}
 				break;
@@ -696,11 +696,11 @@ redraw_page (group, respnum)
 }
 
 static int
-expand_ctrl_chars(tobuf, frombuf, length, rotate)
+expand_ctrl_chars(tobuf, frombuf, length, do_rotation)
 	char *tobuf;
 	char *frombuf;
 	int length;
-	int rotate;
+	int do_rotation;
 {
 	char *p, *q;
 	int ctrl_L = FALSE;
@@ -720,11 +720,11 @@ expand_ctrl_chars(tobuf, frombuf, length, rotate)
 			*q++ = '^';
 			*q++ = ((*p) & 0xFF) + '@';
 			if (*p == 12) ctrl_L = TRUE;
-		} else if (rotate) {
+		} else if (do_rotation) {
 			if (*p >= 'A' && *p <= 'Z')
-				*q++ = (*p - 'A' + rotate) % 26 + 'A';
+				*q++ = (*p - 'A' + do_rotation) % 26 + 'A';
 			else if (*p >= 'a' && *p <= 'z')
-				*q++ = (*p - 'a' + rotate) % 26 + 'a';
+				*q++ = (*p - 'a' + do_rotation) % 26 + 'a';
 			else 
 				*q++ = *p;
 		} else
@@ -1414,7 +1414,7 @@ int
 show_last_page ()
 {
 	char buf[LEN];
-	char buf2[LEN+50];
+	char buf3[LEN+50];
 	int ctrl_L;		/* form feed character detected */
 	long tmp_pos;
 	
@@ -1444,9 +1444,9 @@ show_last_page ()
 			}
 			buf[sizeof (buf)-1] = '\0';
 
-			ctrl_L = expand_ctrl_chars (buf2, buf, sizeof (buf), 0);
+			ctrl_L = expand_ctrl_chars (buf3, buf, sizeof (buf), 0);
 
-			note_line += ((int) strlen (buf2) / cCOLS) + 1;
+			note_line += ((int) strlen (buf3) / cCOLS) + 1;
 
 			if (ctrl_L) {
 				break;
