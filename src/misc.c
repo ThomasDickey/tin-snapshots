@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : misc.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.91
- *  Updated   : 22.12.97
+ *  Created   : 01.04.1991
+ *  Updated   : 31.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute	this software,
@@ -259,7 +259,7 @@ invoke_editor (
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
 
 	if (!retcode)
-		sprintf (buf, "%s %s", editor, filename);
+		sh_format (buf, sizeof(buf), "%s %s", editor, filename);
 
 	retcode = invoke_cmd (buf);
 #ifdef EDITOR_BACKUP_FILE_EXT
@@ -293,7 +293,7 @@ invoke_ispell (
 #endif
 	}
 
-	sprintf(buf,"%s %s", ispell, nam);
+	sh_format (buf, sizeof(buf), "%s %s", ispell, nam);
 
 	wait_message (0, buf);
 
@@ -808,7 +808,7 @@ mail_check (void)
 	** we have to find some other way to figure out if the mailbox
 	** was modified (to bad that Iain removed the mail_setup() and
 	** mail_check() scheme used prior to 1.30 260694 which worked also
-	** on AmigaDOS). (R. Luebke 10.7.94)
+	** on AmigaDOS). (R. Luebke 10.7.1994)
 	*/
 
 	/* this is only a first try, but it seems to work :) */
@@ -2129,7 +2129,7 @@ strfmailer (
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];
-	int i, quote_area = no_quote;
+	int quote_area = no_quote;
 
 	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
@@ -2163,11 +2163,9 @@ strfmailer (
 					tbuf[2] = '\0';
 					break;
 			}
-			i = strlen (tbuf);
-			if (i) {
-				if (s + i < endp - 1) {
-					strcpy (s, tbuf);
-					s += i;
+			if (*tbuf) {
+				if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
+					s += strlen(s);
 				} else {
 					return 0;
 				}
@@ -2203,11 +2201,9 @@ strfmailer (
 					tbuf[2] = '\0';
 					break;
 			}
-			i = strlen (tbuf);
-			if (i) {
-				if (s + i < endp - 1) {
-					strcpy (s, tbuf);
-					s += i;
+			if (*tbuf) {
+				if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
+					s += strlen(s);
 				} else {
 					return 0;
 				}
@@ -2340,7 +2336,7 @@ make_post_process_cmd (
 #ifdef M_OS2
 	backslash (file);
 #endif
-	sprintf (buf, cmd, file);
+	sh_format (buf, sizeof(buf), cmd, file);
 	invoke_cmd (buf);
 	chdir (currentdir);
 }
@@ -2359,8 +2355,8 @@ stat_file (
 void
 vPrintBugAddress (void)
 {
-	my_fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s%s\n",
-		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS, add_addr);
+	my_fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s\n",
+		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS);
 	my_fflush (stderr);
 }
 
@@ -2612,7 +2608,6 @@ quote_wild(
 
 	for (target = buff; *str != '\0'; str++) {
 		if (wildcard) { /* regex */
-		/* FIXME: is that really enough? is it perhaps too much? */
 			/*
 			 * quote meta characters ()[]{}\^$*+?.
 			 * replace whitespace with '\s' (pcre)
@@ -2631,6 +2626,35 @@ quote_wild(
 		} else {	/* wildmat */
 			if (*str == '*' || *str == '\\' || *str == '[' || *str == ']' || *str == '?')
 				*target++ = '\\';
+			*target++ = *str;
+		}
+	}
+	*target = '\0';
+	return (buff);
+}
+
+/*
+ * quotes whitespace in regexps for pcre
+ */
+
+char *
+quote_wild_whitespace(
+	char *str)
+{
+	static char buff[2*LEN];	/* on the safe side */
+	char *target;
+
+	for (target = buff; *str != '\0'; str++) {
+		if (wildcard) { /* regex */
+			/*
+			 * replace whitespace with '\s' (pcre)
+			 */
+			if (*str == ' ' || *str == '\t' ) {
+				*target++ = '\\';
+				*target++ = 's';
+			} else
+				*target++ = *str;
+		} else {	/* wildmat */
 			*target++ = *str;
 		}
 	}

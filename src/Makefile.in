@@ -1,5 +1,9 @@
-# Source Makefile for tin - for configuration options read the ../doc/INSTALL file.
+# Source Makefile for tin 
+# - for configuration options read the ../doc/INSTALL file.
 #
+# Updated   : 31.12.1997
+#
+
 SHELL		= /bin/sh
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
@@ -13,7 +17,7 @@ CC	= @CC@
 CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
-DAEMON	= # -DINDEX_DAEMON # -DACTIVE_DAEMON
+DAEMON	= # -DINDEX_DAEMON
 CPPOPTS	= @DEFS@ -I. -I../include -I$(top_srcdir)/pcre -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
@@ -79,7 +83,6 @@ HFILES	= \
 
 CFILES	= \
 	$(SRCDIR)/active.c \
-	$(SRCDIR)/actived.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/auth.c \
@@ -143,7 +146,6 @@ EXTRALIBS = ../pcre/libpcre.a
 
 OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/active.o \
-	$(OBJDIR)/actived.o \
 	$(OBJDIR)/art.o \
 	$(OBJDIR)/attrib.o \
 	$(OBJDIR)/auth.o \
@@ -234,17 +236,6 @@ $(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
 	$(YACC) $(SRCDIR)/parsdate.y
 	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 
-actived:	$(OBJDIR)/lang.o \
-		$(OBJDIR)/joinpath.o \
-		$(SRCDIR)/actived.c \
-		$(SRCDIR)/mail.c
-	@$(ECHO) "Compiling actived..."
-	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON -c $(SRCDIR)/actived.c
-	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON -c $(SRCDIR)/mail.c
-	$(LD) $(LDFLAGS) actived.o mail.o $(OBJDIR)/joinpath.o $(OBJDIR)/lang.o -o actived $(LIBS)
-	@-$(RM) actived.o mail.o
-	@$(LS) actived
-
 $(BINDIR)/$(EXE): $(OFILES) $(EXTRALIBS)
 	@$(ECHO) "Linking $(EXE) v$(VER)..."
 	$(LD) $(LDFLAGS) -o $(BINDIR)/$(EXE) $(OFILES) $(NNTPLIB) $(NETLIBS) $(LIBS) $(DEBUG)
@@ -314,7 +305,7 @@ clean:
 	@-$(RM) -f core *~
 	@-$(RM) -f $(EXE) $(EXED)
 	@$(ECHO) "Cleaning Philip Hazel's Perl regular expressions library..."
-	@$(CD) ../pcre && $(MAKE) clean
+	@$(CD) ../pcre && $(MAKE) @cf_cv_makeflags@ clean
 
 dirty:
 	@$(ECHO) "I'm sorry, this is not supported yet ..."
@@ -326,7 +317,7 @@ clobber: clean
 
 cflow:
 	@$(ECHO) "Creating cflow for $(PROJECT)..."
-	@$(CFLOW) -I$(INCDIR) $(CFILES) > cflow.$(PROJECT) &
+	@$(CFLOW) -I$(INCDIR) -I$(SRCDIR) -I../pcre $(CFILES) > cflow.$(PROJECT)
 
 cscope:
 	@$(ECHO) "Creating cscope database $(PROJECT)..."
@@ -342,7 +333,7 @@ TIN_DEP	= \
 
 ../pcre/libpcre.a:
 	@$(ECHO) "Building Philip Hazel's Perl regular expressions library..."
-	@$(CD) ../pcre && $(MAKE) libpcre.a
+	@$(CD) ../pcre && $(MAKE) @cf_cv_makeflags@ libpcre.a
 
 tincfg.h:			$(SRCDIR)/tincfg.tbl \
 				makecfg
@@ -353,8 +344,6 @@ makecfg:			$(OBJDIR)/makecfg.o
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
-$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(TIN_DEP) \
-				$(INCDIR)/bugrep.h
 $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_DEP) \
 				$(INCDIR)/stpwatch.h
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)

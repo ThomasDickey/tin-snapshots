@@ -2,9 +2,9 @@
  *  Project   : tin - a Usenet reader
  *  Module    : nntplib.c
  *  Author    : S. Barber & I. Lea
- *  Created   : 12.01.91
- *  Updated   : 22.12.97
- *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (10.02.91)
+ *  Created   : 12.01.1991
+ *  Updated   : 22.12.1997
+ *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (10.02.1991)
  *  Copyright : (c) Copyright 1991-98 by Stan Barber & Iain Lea
  *              Permission is hereby granted to copy, reproduce, redistribute
  *              or otherwise use this software  as long as: there is no

@@ -376,7 +376,7 @@ Compiled & installed on the following machines:
 	Sun UltraSPARC Enterprise 2 & SunOS 5.5.1 with gcc 2.7.2
 	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0
 	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
-	Sun 3/60 & 4.1.1_U1 with gcc 2.7.2.2
+	Sun 3/60 & SunOS 4.1.1_U1 with gcc 2.7.2.2
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
 

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : string.c
- *  Author    : Urs Janssen <urs@akk.uni-karlsruhe.de>
+ *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 20.01.1997
- *  Updated   : 30.07.1997
+ *  Updated   : 31.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1997 by Urs Janssen
+ *  Copyright : (c) Copyright 1997-98 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -447,3 +447,84 @@ str_trim(
 	return(string);
 }
 
+/*
+ * Format a shell command, escaping blanks and other awkward characters that
+ * appear in the string arguments.  Replaces sprintf, except that we pass in
+ * the buffer limit, so we can refrain from trashing memory on very long
+ * pathnames.
+ *
+ * Returns the number of characters written (not counting null), or -1 if there
+ * is not enough room in the 'dst' buffer.
+ */
+int
+sh_format (char *dst,
+	size_t len,
+	const char *fmt,
+	...)
+{
+	int result = 0;
+	char *src;
+	char temp[20];
+	va_list ap;
+
+	va_start(ap,fmt);
+
+	while (*fmt != 0) {
+		int ch = *fmt++;
+
+		if (ch == '%') {
+			if (*fmt == 0) {
+				if (++result >= (int) len)
+					break;
+				*dst++ = '%';
+				break;
+			}
+
+			switch (*fmt++) {
+			case '%':
+				src = strcpy(temp, "%");
+				break;
+			case 's':
+				src = va_arg(ap, char *);
+				break;
+			case 'd':
+				sprintf(temp, "%d", va_arg(ap, int));
+				src = temp;
+				break;
+			default:
+				src = strcpy(temp, "");
+				break;
+			}
+
+			while (*src != '\0') {
+				if (++result >= (int) len)
+					break;
+				/*
+				 * This logic works for Unix.  Non-Unix systems
+				 * may require a different set of problem
+				 * chars, and may need quotes around the whole
+				 * string rather than escaping individual
+				 * chars.
+				 */
+				if (strchr("*%?$()[]{}|<>^&;#\\\"`'~", *src)) {
+					if (++result >= (int) len)
+						break;
+					*dst++ = '\\';
+				}
+				*dst++ = *src++;
+			}
+		} else {
+			if (++result >= (int) len)
+				break;
+			*dst++ = ch;
+		}
+	}
+	va_end(ap);
+
+	if (result+1 >= (int) len)
+		result = -1;
+	else
+		*dst = '\0';
+
+	return (result);
+}

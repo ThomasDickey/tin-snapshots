@@ -1,16 +1,15 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : tnntp.h
- *  Author    : Thomas Dickey
- *  Created   : 05.03.97
- *  Updated   : 01.12.97
+ *  Author    : Thomas Dickey <dickey@clark.net>
+ *  Created   : 05.03.1997
+ *  Updated   : 01.12.1997
  *  Notes     : #include files, #defines & struct's
- *
- *  Copyright 1997 by Thomas Dickey
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *  Copyright : (c) Copyright 1997 by Thomas Dickey
+ *	             You may  freely  copy or  redistribute  this software,
+ *	             so  long as there is no profit made from its use, sale
+ *	             trade or  reproduction.  You may not change this copy-
+ *	             right notice, and it must be included in any copy made
  */
 
 #ifndef TNNTP_H

@@ -160,17 +160,19 @@ additional info:
 type=num    num: 0=kill, 1=autoselect
 case=num    num: 0=casesensitive, 1=caseinsensitive
 score=num   num: score value of rule, can now also be one of the magic words
-                "kill" or "hot", which are equivalent to
-                SCORE_KILL and SCORE_SELECT respectively.
+                 "kill" or "hot", which are equivalent to
+                 SCORE_KILL and SCORE_SELECT respectively.
 time=num    num: time_t value; when rule expires.
 
-matches:        matched to:
+matches:            matched to:
 
-subj=pattern    Subject:
-from=pattern    From:
-msgid=pattern   Message-Id: *AND* References:
-lines=num       Lines: ; <num matches less than, >num matches more than.
-xref=pattern    Xref: ; filter crossposts to groups matching pattern
+subj=pattern        Subject:
+from=pattern        From:
+msgid=pattern       Message-Id: *AND* full References:
+msgid_last=pattern  Message-Id: and last last Reference:s entry only
+msgid_only=pattern  Message-Id:
+lines=num           Lines: ; <num matches less than, >num matches more than.
+xref=pattern        Xref: ; filter crossposts to groups matching pattern
 xref_max=num                } Xref: ; potentially obsolete, collects
 xref_score=num,pattern      } scores for crossposting in other
                             } newsgroups
@@ -183,14 +185,72 @@ builtin kill/hot-menu. Then you have to quote manually because tin
 doesn't know if e.g. "\[" is already quoted or not.
 
 
-6. TODO
+6. EXAMPLES
+
+6.1 WILDMAT EXAMPLES
+
+none given, too simple, find out yourself ,-)
+
+6.2 REGEXP EXAMPLES
+
+### this kills all articles about CNews, DNEWS or diablo
+### in news.software.* but not in news.software.readers
+group=news.software.*,!news.software.readers
+type=0
+case=1
+score=kill
+subj=([cd]news|diablo)
+
+### this should mark all articles about tin, rtin, tind, ktin or cdtin as hot
+### (the rule is not 100% exact, but this doesn't matter as the other
+###  subjects which might match don't make sense and will not be used)
+group=*
+type=1
+case=1
+score=hot
+subj=\b[ckr]?[d]?tin[d]?[0-9]*\b
+
+### mark own articles and followups to own articles as hot in all groups
+### except local ones
+### match From: (a bit complex) and/or
+### Message-ID: (I'm the only user who's posting on this server)
+group=*,!akk.*,!tin.*
+type=1
+case=1
+score=hot
+from=urs@(.*\.|)((akk\.uni-karlsruhe|dana)\.de|(karlsruhe|tin|akk)\.org|ka\.nu|argh\.net)
+msgid=@akk3\.akk\.uni-karlsruhe\.de>
+
+### stupid ppl. sometimes read control.cancel to see if there are any
+### forged cancels around... the next rule helps you a bit
+### ignore know despammers and net.* cancels
+group=control.cancel
+type=0 
+case=1 
+score=kill
+from=(news@news\.msfc\.nasa\.gov|clewis@ferret\.ocunix\.on\.ca|jem@xpat\.com|(jeremy|lysander)@exit109\.com|howardk@iswest\.com|cosmo.roadkill.*rauug\.mil\.wi\.us|spamless@pacbell\.net|cwilkins@.*\.clark\.net)
+msgid_only=<net-monitor-cancel
+
+### this might help when reading alt.*
+### ignore all postings with $$$ or *** or !!!
+### ignore all postings shorter then 3 lines
+### ignore all postings crossposted into more then 10 groups
+group=alt.*,
+type=0
+case=1
+score=-200
+subj=[\$\*\!]{3,}
+lines=<3
+xref_max=10
+
+
+7. TODO
 
 - make the time value in the filter file more human readable.
 - convert SCORE_LIM_* to global variables
 - rewrite filtering order to get optimal performance
-- sort articles by score/TAB reads article with next highest score
 - filtering on arbitrary header lines
 - convert .tin/filter, make "type" obsolete, maybe completely new file
-format
+  format
 - throw out "xref*" when it is obsolete for sure
 - maybe autoconf'able values?

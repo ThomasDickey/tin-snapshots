@@ -120,7 +120,7 @@ DEBUG_IO((stderr, "file ready\n"));
  * Support routine to read a fixed size buffer. This does most of the
  * hard work for tin_fgets()
  */
-int partial_read = FALSE;
+int partial_read;
 
 static char *
 tin_read (
@@ -130,6 +130,8 @@ tin_read (
 {
 	int i;
 	char *ptr;
+
+	partial_read = FALSE;
 
 #ifdef NNTP_ABLE
 	if (fp == (FILE*)nntp_rd_fp)
@@ -161,8 +163,6 @@ tin_read (
 	 * We strip trailing \r and \n here and here _only_
 	 */
 	if (buffer[i = strlen(buffer) - 1] == '\n') {
-		partial_read = FALSE;
-
 		if (buffer[i-1] == '\r')
 			*(buffer+i-1) = '\0';
 		else

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : debug.c
  *  Author    : I. Lea
- *  Created   : 01.04.91
- *  Updated   : 24.12.94
+ *  Created   : 01.04.1991
+ *  Updated   : 24.12.1994
  *  Notes     : debug routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,

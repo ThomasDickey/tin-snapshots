@@ -42,6 +42,10 @@ static int valid_artnum (long art);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
 
+#ifdef INDEX_DAEMON
+	static void vCreatePath (char *pcPath);
+#endif /* INDEX_DAEMON */
+   
 
 /*
  *  Construct the pointers to the base article in each thread.
@@ -1649,3 +1653,18 @@ pcPrintFrom (
 
 	return acFrom;
 }
+
+#ifdef INDEX_DAEMON
+static void
+vCreatePath (
+	char *pcPath)
+{
+	char acCmd[LEN];
+
+	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
+	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
+	my_printf ("CREATE Path=[%s]\n", acCmd);
+	system (acCmd);
+	}
+#endif /* INDEX_DAEMON */
+                  

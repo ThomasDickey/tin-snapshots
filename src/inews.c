@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : inews.c
- *  Author    : I.Lea
- *  Created   : 17-03-92
- *  Updated   : 22-08-95
+ *  Author    : I. Lea
+ *  Created   : 17.03.1992
+ *  Updated   : 31.12.1997
  *  Notes     : NNTP builtin version of inews
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -212,7 +212,7 @@ submit_news_file (
 		strcat (buf, "/");
 		cp += strlen (cp);
 #	endif /* INEWSDIR */
-		sprintf (cp, "inews -h < %s", name);
+		sh_format (cp, sizeof(buf) - (cp - buf), "inews -h < %s", name);
 #else
 		make_post_cmd (cp, name);
 #endif	/* M_UNIX */

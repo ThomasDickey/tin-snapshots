@@ -3,7 +3,7 @@
  *  Module    : extern.h
  *  Author    : I. Lea
  *  Created   : 01.04.1991
- *  Updated   : 22.12.1997
+ *  Updated   : 31.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -254,7 +254,6 @@ extern char *glob_group;
 extern char *glob_page_group;
 extern char *nntp_server;
 extern char active_times_file[PATH_LEN];
-extern char add_addr[LEN];
 extern char art_marked_deleted;
 extern char art_marked_inrange;
 extern char art_marked_return;
@@ -354,6 +353,8 @@ extern char domain_name[];
 extern char host_name[];
 
 extern const char base64_alphabet[64];
+extern const char *info_title;
+extern const char **info_help;
 extern constext *help_group[];
 extern constext *help_page[];
 extern constext *help_select[];
@@ -404,6 +405,7 @@ extern constext txt_authorization_fail[];
 extern constext txt_authorization_ok[];
 extern constext txt_auto_reconnect[];
 extern constext txt_autoselecting_articles[];
+extern constext txt_autosubscribed[];
 extern constext txt_autosubscribing_groups[];
 extern constext txt_bad_active_file[];
 extern constext txt_bad_article[];
@@ -731,6 +733,7 @@ extern constext txt_mini_thread_1[];
 extern constext txt_mini_thread_2[];
 extern constext txt_more[];
 extern constext txt_moving[];
+extern constext txt_msg_headers_file[];
 extern constext txt_msgid_line_only[];
 extern constext txt_news_quote[];
 extern constext txt_newsgroup[];
@@ -774,6 +777,7 @@ extern constext txt_not_exist[];
 extern constext txt_not_in_active_file[];
 extern constext txt_nrctbl_create[];
 extern constext txt_nrctbl_default[];
+extern constext txt_nrctbl_info[];
 extern constext txt_only[];
 extern constext txt_opt_add_posted_to_filter[];
 extern constext txt_opt_advertising[];
@@ -862,6 +866,9 @@ extern constext txt_option_not_enabled[];
 extern constext txt_options_menu[];
 extern constext txt_out_of_memory2[];
 extern constext txt_out_of_memory[];
+extern constext txt_pcre_error_at[];
+extern constext txt_pcre_error_num[];
+extern constext txt_pcre_error_text[];
 extern constext txt_plural[];
 extern constext txt_post_a_followup[];
 extern constext txt_post_an_article[];
@@ -874,6 +881,7 @@ extern constext txt_post_processing[];
 extern constext txt_post_processing_failed[];
 extern constext txt_post_processing_finished[];
 extern constext txt_post_subject[];
+extern constext txt_posted_info_file[];
 extern constext txt_posting[];
 extern constext txt_postpone_repost[];
 extern constext txt_printed[];
@@ -1223,7 +1231,6 @@ extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
 extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
 extern t_bool mail_8bit_header;
 extern t_bool mail_news;
-extern t_bool mail_news_to_posted;
 extern t_bool mark_saved_read;
 extern t_bool newsrc_active;
 extern t_bool note_end;					/* end of article ? */
@@ -1292,6 +1299,7 @@ extern time_t new_newnews_time;
 #define HIST_SHELL_COMMAND	15
 #define HIST_SUBJECT_SEARCH	16
 #define HIST_CONFIG_SEARCH	17
+#define HIST_HELP_SEARCH	18
 #define HIST_MAXNUM		18	/* must always be the same as the highest HIST_ value! */
 
 extern int hist_last[HIST_MAXNUM+1];
@@ -1467,11 +1475,9 @@ extern constext txt_opt_mail_address[];
 	extern char group_times_file[PATH_LEN];
 	extern constext txt_cannot_stat_group[];
 	extern constext txt_cannot_stat_index_file[];
-#endif /* INDEX_DAEMON */
-
-#if !defined(INDEX_DAEMON) && !defined(ACTIVE_DAEMON)
+#else
 	extern constext txt_intro_page[];
-#endif /* !INDEX_DAEMON && !ACTIVE_DAEMON */
+#endif /* INDEX_DAEMON */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	extern constext txt_reading_mail_active_file[];

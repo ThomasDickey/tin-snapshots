@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : group.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 21-12-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 31.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -32,14 +32,14 @@ static const char *spaces = "XXXX";
 /*
  * Local prototypes
  */
-static int draw_sline (int i, int full);
+static void draw_sline (int i, int full);
 static void draw_subject_arrow (void);
 static void erase_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
-	static int bld_sline (int i);
 	static int line_is_tagged (int n);
 	static int prompt_subject_num (int ch);
+	static void bld_sline (int i);
 	static void update_group_page (void);
 	static void show_group_title (int clear_title);
 	static void show_tagged_lines (void);
@@ -1141,13 +1141,13 @@ group_list_thread:
 						info_message ("No previous expression");
 						break;
 					}
-					sprintf (pat, "*%s*", default_select_pattern);
+					sprintf (pat, REGEX_FMT, default_select_pattern);
 				} else if (STRCMPEQ(buf, "*")) {	/* all */
 					strcpy (pat, buf);
 					strcpy (default_select_pattern, pat);
 				} else {
 					strcpy (default_select_pattern, buf);
-					sprintf (pat, "*%s*", default_select_pattern);
+					sprintf (pat, REGEX_FMT, default_select_pattern);
 				}
 
 				flag = 0;
@@ -1545,7 +1545,7 @@ toggle_subject_from (void)
  *
  * WARNING: the routine is tightly coupled with draw_sline() in the sense
  * that draw_sline() expects bld_sline() to place the article mark
- * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the
+ * (ART_MARK_READ, ART_MARK_SELECTED, etc) at MARK_OFFSET in the
  * screen[].col.
  * So, if you change the format used in this routine, be sure to check
  * that the value of MARK_OFFSET (tin.h) is still correct.
@@ -1553,9 +1553,9 @@ toggle_subject_from (void)
  */
 
 #ifndef INDEX_DAEMON
-static int
+static void
 bld_sline (
-	int i) /* return value is always ignored */
+	int i)
 {
 #if USE_CURSES
 	char buffer[BUFSIZ];	/* FIXME: allocate? */
@@ -1640,13 +1640,7 @@ bld_sline (
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	Convert2Printable (buffer);
 
-#if USE_CURSES
-	/* FIXME: draw_sline usually does this too */
-	mvaddstr(INDEX2LNUM(i), 0, buffer);
-	clrtoeol();
-#endif
-
-	return(0);
+	WriteLine(INDEX2LNUM(i), buffer);
 }
 #endif /* INDEX_DAEMON */
 
@@ -1663,10 +1657,10 @@ bld_sline (
  * code complexity and readability.
  */
 
-static int
+static void
 draw_sline (
 	int i,
-	int full) /* return value is always ignored */
+	int full)
 {
 #ifndef INDEX_DAEMON
 	int tlen;
@@ -1706,7 +1700,6 @@ draw_sline (
 	MoveCursor(INDEX2LNUM(i)+1, 0);
 
 #endif /* INDEX_DAEMON */
-	return(0);
 }
 
 

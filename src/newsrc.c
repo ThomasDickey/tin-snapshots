@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : newsrc.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 13-12-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 28.12.1997
  *  Notes     : ArtCount = (ArtMax - ArtMin) + 1  [could have holes]
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -240,7 +240,7 @@ auto_subscribe_groups (
 	if (ferror (fp_newsrc) | fclose (fp_newsrc))
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 
-	fclose (fp_subs);
+	TIN_FCLOSE (fp_subs);
 }
 
 /*

@@ -3,9 +3,9 @@
  *  Module    : rfc1521.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 27-05-96
+ *  Updated   : 03.01.98
  *  Notes     : MIME text/plain support
- *  Copyright : (c) Copyright 1995-96 by Chris Blum
+ *  Copyright : (c) Copyright 1995-98 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -82,6 +82,7 @@ rfc1521_decode(
 	char buf[2048];
 	char buf2[2048];
 	char content_type[128];
+	char content_charset[128];
 	char content_transfer_encoding[128];
 	char boundary[128];
 	const char *charset;
@@ -95,6 +96,7 @@ rfc1521_decode(
 		return file;
 
 	content_type[0] = '\0';
+	content_charset[0] = '\0';
 	content_transfer_encoding[0] = '\0';
 
 	/* pass article header unchanged */
@@ -230,8 +232,14 @@ rfc1521_decode(
 	charset = strcasestr(content_type, "charset=");
 	if (!charset)
 		charset = "US-ASCII";
-	else
+	else {
+		/*
+		 * copy only parameter value, removing quotes
+		 */
 		charset += 8;
+		strcpynl(content_charset, charset);
+		charset = content_charset;
+	}
 	get_mm_charset();
 
 	/* see if content transfer encoding requires decoding anyway */

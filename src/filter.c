@@ -3,7 +3,7 @@
  *  Module    : filter.c
  *  Author    : I. Lea
  *  Created   : 28.12.1992
- *  Updated   : 22.12.1997
+ *  Updated   : 30.12.1997
  *  Notes     : Filter articles. Kill & auto selection are supported.
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -42,12 +42,6 @@
  * at the end of filter_articles()
  */
 
-/*
- * Format strings for adding new filters
- * padding with "*" is done in wildmat mode only
- */
-
-#define iAFR_FORMAT1 ((wildcard) ? "%s" : "*%s*")
 #if 0
 /* 
  * format for From: in filter
@@ -1265,10 +1259,10 @@ iAddFilterRule (
 		 * him to enter regular expressions or wilmat patterns
 		 */
 		if (psRule->check_string)
-			sprintf (acBuf, iAFR_FORMAT1, quote_wild(psRule->text));
+			sprintf (acBuf, REGEX_FMT, quote_wild(psRule->text));
 		else
 #endif
-			sprintf (acBuf, iAFR_FORMAT1, psRule->text);
+			sprintf (acBuf, REGEX_FMT, psRule->text);
 
 		switch (psRule->counter) {
 			case FILTER_SUBJ_CASE_IGNORE:
@@ -1300,9 +1294,9 @@ iAddFilterRule (
 	} else {
 		if (psRule->subj_ok) {
 			if (psRule->check_string)
-				sprintf (acBuf, iAFR_FORMAT1, quote_wild (psArt->subject));
+				sprintf (acBuf, REGEX_FMT, quote_wild (psArt->subject));
 			else
-				sprintf (acBuf, iAFR_FORMAT1, psArt->subject);
+				sprintf (acBuf, REGEX_FMT, psArt->subject);
 
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
@@ -1318,7 +1312,7 @@ iAddFilterRule (
 				sprintf (acBuf, iAFR_FORMAT2, psArt->from, psArt->name);
 			else
 #endif
-				sprintf (acBuf, iAFR_FORMAT1, quote_wild (psArt->from));
+				sprintf (acBuf, REGEX_FMT, quote_wild (psArt->from));
 
 			psPtr[*plNum].from = my_strdup (acBuf);
 		}
@@ -1326,7 +1320,7 @@ iAddFilterRule (
 		 * message-ids should be quoted
 		 */
 		if (psRule->msgid_ok) {
-			sprintf (acBuf, iAFR_FORMAT1, quote_wild (MSGID(psArt)));
+			sprintf (acBuf, REGEX_FMT, quote_wild (MSGID(psArt)));
 			psPtr[*plNum].msgid = my_strdup (acBuf);
 			psPtr[*plNum].fullref = psRule->fullref;
 		}
@@ -1476,15 +1470,11 @@ filter_articles (
 							if ((regex_cache_subj[j].re = pcre_compile(ptr[j].subj,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, "Error in regex: %s at pos. %d",
-								   regex_errmsg, regex_errpos);
+								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_subj[j].re) {
-								regex_cache_subj[j].extra =
-								  pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL) {
-									sprintf(msg, "Error in regex: study - pcre internal error %s",
-									  regex_errmsg);
-								}
+								regex_cache_subj[j].extra = pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL)
+									sprintf(msg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_subj[j].re) {
@@ -1497,7 +1487,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+								 sprintf(msg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1518,15 +1508,11 @@ filter_articles (
 							if ((regex_cache_from[j].re = pcre_compile(ptr[j].from,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, "Error in regex: %s at pos. %d",
-								   regex_errmsg, regex_errpos);
+								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_from[j].re) {
-								regex_cache_from[j].extra =
-								  pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL) {
-									sprintf(msg, "Error in regex: study - pcre internal error %s",
-									  regex_errmsg);
-								}
+								regex_cache_from[j].extra = pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL)
+									sprintf(msg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_from[j].re) {
@@ -1538,7 +1524,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+								 sprintf(msg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1586,15 +1572,11 @@ filter_articles (
 							if ((regex_cache_msgid[j].re = pcre_compile(ptr[j].msgid,
 							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 							  &regex_errmsg, &regex_errpos)) == NULL)
-								sprintf(msg, "Error in regex: %s at pos. %d",
-								   regex_errmsg, regex_errpos);
+								sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 							if (regex_cache_msgid[j].re) {
-								regex_cache_msgid[j].extra =
-								  pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
-								if (regex_errmsg != NULL) {
-									sprintf(msg, "Error in regex: study - pcre internal error %s",
-									  regex_errmsg);
-								}
+								regex_cache_msgid[j].extra = pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL)
+									sprintf(msg, txt_pcre_error_text, regex_errmsg);
 							}
 						}
 						if (regex_cache_msgid[j].re) {
@@ -1607,7 +1589,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+								 sprintf(msg, txt_pcre_error_num, regex_errpos);
 							else  { /* No match, try Message-ID */
 								regex_errpos =
 								  pcre_exec(regex_cache_msgid[j].re,
@@ -1618,7 +1600,7 @@ filter_articles (
 								if (regex_errpos >= 0) {
 									SET_FILTER(group, i, j);
 								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-									sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+									sprintf(msg, txt_pcre_error_num, regex_errpos);
 							}
 						}
 					}
@@ -1706,15 +1688,12 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											if ((regex_cache_xref[j].re = pcre_compile(ptr[j].xref,
 											  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
 											  &regex_errmsg, &regex_errpos)) == NULL)
-												sprintf(msg, "Error in regex: %s at pos. %d",
-												  regex_errmsg, regex_errpos);
+												sprintf(msg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 											if (regex_cache_xref[j].re) {
 												regex_cache_xref[j].extra =
 												  pcre_study(regex_cache_xref[j].re, 0, &regex_errmsg);
-												if (regex_errmsg != NULL) {
-													sprintf(msg, "Error in regex: study - pcre internal error %s",
-													  regex_errmsg);
-												}
+												if (regex_errmsg != NULL)
+													sprintf(msg, txt_pcre_error_text, regex_errmsg);
 											}
 										}
 										if (regex_cache_xref[j].re) {
@@ -1727,7 +1706,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											if (regex_errpos >= 0)
 												group_count = -1;
 											else if (regex_errpos != PCRE_ERROR_NOMATCH)
-												 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+												 sprintf(msg, txt_pcre_error_num, regex_errpos);
 										}
 									}
 								}

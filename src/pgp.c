@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : pgp.c
  *  Author    : Steven J. Madsen
- *  Created   : 12.05.95
- *  Updated   : 09.12.97
+ *  Created   : 12.05.1995
+ *  Updated   : 31.12.1997
  *  Notes     : PGP support for article posting and mailing
  *  Copyright : (c) 1995-98 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,
@@ -153,15 +153,15 @@ do_pgp (
 		strcat(options, "e");
 	if (what & SIGN)
 		strcat(options, "s");
-	sprintf(cmd, "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
+	sh_format (cmd, sizeof(cmd), "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
 #	else
 #		ifdef HAVE_PGP_5
 
 	if (what & ENCRYPT && what & SIGN) {
 		strcat (options, "s");
-		sprintf (cmd, "%se %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
+		sh_format (cmd, sizeof(cmd), "%se %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
 	} else
-		sprintf (cmd, "%s%s %s %s %s %s", PGPNAME, (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt, mail_to ? mail_to : "");
+		sh_format (cmd, sizeof(cmd), "%s%s %s %s %s %s", PGPNAME, (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt, mail_to ? mail_to : "");
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 
@@ -183,10 +183,10 @@ pgp_append_public_key (
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
 
 #	ifdef HAVE_PGP_2
-	sprintf(cmd, "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
+	sh_format (cmd, sizeof(cmd), "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
 #	else
 #		ifdef HAVE_PGP_5
-	sprintf(cmd, "%sk %s -xa %s %s", PGPNAME, pgpopts, user, keyfile);
+	sh_format (cmd, sizeof(cmd), "%sk %s -xa %s %s", PGPNAME, pgpopts, user, keyfile);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 

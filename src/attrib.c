@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : attrib.c
  *  Author    : I. Lea
- *  Created   : 01.12.93
- *  Updated   : 20.12.97
+ *  Created   : 01.12.1993
+ *  Updated   : 20.12.1997
  *  Notes     : Group attribute routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -573,7 +573,7 @@ set_attrib (
 	}
 
 }
-#endif	/* INDEX_DAEMON */
+#endif /* INDEX_DAEMON */
 
 /*
  *  Save the group attributes from active[].attribute to ~/.tin/attributes
@@ -602,14 +602,14 @@ write_attributes_file (
 
 	if ((fp = fopen (file_tmp, "w" FOPEN_OPTS)) == (FILE *) 0) {
 		error_message (txt_filesystem_full_backup, ATTRIBUTES_FILE);
-		/* free memory for tmp-filename */
-		free (file_tmp);
+		free (file_tmp);	/* free memory for tmp-filename */
 		return;
 	}
 
 	if (!cmd_line && INTERACTIVE)
 		wait_message (0, txt_writing_attributes_file);
 
+	/* FIXME - move strings to lang.c */
 	fprintf (fp, "# Group attributes file for the TIN newsreader\n#\n");
 	fprintf (fp, "#  scope=STRING (ie. alt.sources or *sources*) [mandatory]\n#\n");
 	fprintf (fp, "#  maildir=STRING (ie. ~/Mail)\n");
@@ -740,14 +740,12 @@ write_attributes_file (
 
 	if (ferror (fp) | fclose (fp)){
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
-		/* free memory for tmp-filename */
-		free (file_tmp);
+		free (file_tmp);	/* free memory for tmp-filename */
 		return;
 	} else {
 		rename_file (file_tmp, file);
 		chmod (file, (S_IRUSR|S_IWUSR));
-		/* free memory for tmp-filename */
-		free (file_tmp);
+		free (file_tmp);	/* free memory for tmp-filename */
 	}
 
 #endif	/* INDEX_DAEMON */

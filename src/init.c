@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : init.c
  *  Author    : I. Lea
- *  Created   : 01.04.91
- *  Updated   : 21.12.98
+ *  Created   : 01.04.1991
+ *  Updated   : 28.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -20,7 +20,6 @@
 #include	"bugrep.h"
 
 char active_times_file[PATH_LEN];
-char add_addr[LEN];				/* address to add to rR reply to author with mail */
 char art_marked_deleted;
 char art_marked_inrange;
 char art_marked_return;
@@ -233,7 +232,6 @@ t_bool keep_dead_articles;
 t_bool keep_posted_articles;
 t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
 t_bool mail_news;		/* mail all arts to specified user */
-t_bool mail_news_to_posted;	/* mail all arts to specified user */
 t_bool mark_saved_read;		/* mark saved article/thread as read */
 t_bool newsrc_active;
 t_bool advertising = TRUE;
@@ -840,14 +838,13 @@ void init_selfinfo (void)
 	}
 	if (stat (posted_info_file, &sb) == -1) {
 		if ((fp = fopen (posted_info_file, "w")) != (FILE *) 0) {
-			fprintf (fp, "# Summary of mailed/posted messages viewable by 'W' command from within tin.\n");
+			fprintf (fp, txt_posted_info_file);
 			fclose (fp);
 		}
 	}
 	if (stat (msg_headers_file, &sb) == -1) {
 		if ((fp = fopen (msg_headers_file, "w")) != (FILE *) 0) {
-			fprintf (fp, "# Add extra header lines to mail/news messages.\n");
-			fprintf (fp, "# ie.  Organization: Bits & Bobs Inc.\n\n");
+			fprintf (fp, txt_msg_headers_file);
 			fclose (fp);
 		}
 	}
@@ -911,24 +908,6 @@ got_active:
 	my_distribution[0] = '\0';
 	if ((ptr = getenv ("DISTRIBUTION")) != (char *) 0)
 		my_strncpy (my_distribution, ptr, sizeof (my_distribution));
-
-	/*
-	 *  check enviroment for ADD_ADDRESS
-	 */
-	add_addr[0] = '\0';
-	if ((ptr = getenv ("ADD_ADDRESS")) != (char *) 0) {
-		my_strncpy (add_addr, ptr, sizeof (add_addr));
-	} else {
-		joinpath (nam, rcdir, "add_address");
-		if ((fp = fopen (nam, "r")) != (FILE *) 0) {
-			if (fgets (add_addr, sizeof (add_addr), fp) != (char *) 0) {
-				ptr = strrchr (add_addr, '\n');
-				if (ptr != (char *) 0)
-					*ptr = '\0';
-			}
-			fclose (fp);
-		}
-	}
 
 	/*
 	 *  check enviroment for BUG_ADDRESS

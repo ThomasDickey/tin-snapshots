@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : post.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 22-08-95
+ *  Author    : I. Lea
+ *  Created   : 01.04.1991
+ *  Updated   : 25.12.1997
  *  Notes     : mail/post/replyto/followup/repost & cancel articles
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -2131,23 +2131,16 @@ mail_to_someone (
 
 		msg_add_header ("To", mail_to);
 
-		if (mail_to_poster) {
+		if (mail_to_poster)
 			sprintf (subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
-			msg_add_header ("Subject", subject);
-		} else
-			msg_add_header ("Subject", subject);
+
+		msg_add_header ("Subject", subject);
 
 		if (auto_cc)
 			msg_add_header ("Cc", userid);
 
 		if (auto_bcc)
 			msg_add_header ("Bcc", userid);
-		/*
-		 * remove duplicates from Newsgroups header
-		 */
-		strip_double_ngs (note_h.newsgroups);
-
-		msg_add_header ("Newsgroups", note_h.newsgroups);
 
 		if (*default_organization)
 			msg_add_header ("Organization", random_organization(default_organization));
@@ -2287,7 +2280,7 @@ mail_bug_report (void) /* return value is always ignored */
 	chmod (nam, (S_IRUSR|S_IWUSR));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
-		sprintf (buf, "%s%s", bug_addr, add_addr);
+		sprintf (buf, "%s", bug_addr);
 		msg_add_header ("To", buf);
 
 		sprintf (subject, "BUG REPORT %s\n", page_header);
@@ -2388,7 +2381,7 @@ mail_bug_report (void) /* return value is always ignored */
 	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		sprintf (subject, "BUG REPORT %s", page_header);
-		sprintf (mail_to, "%s%s", bug_addr, add_addr);
+		sprintf (mail_to, "%s", bug_addr);
 		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -2423,7 +2416,7 @@ mail_bug_report (void) /* return value is always ignored */
 
 			case iKeyPostSend:
 			case iKeyPostSend2:
-				sprintf (msg, txt_mail_bug_report_confirm, bug_addr, add_addr);
+				sprintf (msg, txt_mail_bug_report_confirm, bug_addr);
 				if (prompt_yn (cLINES, msg, FALSE) == 1) {
 					if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						wait_message (0, txt_mailing_to, mail_to);
@@ -2509,7 +2502,10 @@ mail_to_author (
 		 */
 		strip_double_ngs (note_h.newsgroups);
 
-		msg_add_header ("Newsgroups", note_h.newsgroups);
+		/*
+		 * rename Newsgroups: to X-Newsgroups as RFC 822 dosn't define it.
+		 */
+		msg_add_header ("X-Newsgroups", note_h.newsgroups);
 
 		/*
 		 * Write References and Message-Id as In-Reply-To to the mail
@@ -3536,26 +3532,18 @@ find_reply_to_addr (
 				*ptr = '\0';
 			}
 			parse_from (from_both, from_addr, from_name);
-			if (from_name[0]) {
-				sprintf (buf, "%s%s (%s)", from_addr, add_addr, from_name);
-			} else {
-				strcat (from_addr, add_addr);
-			}
+			if (from_name[0])
+				sprintf (buf, "%s (%s)", from_addr, from_name);
 			found = TRUE;
 		}
 	}
 
 	if (!found) {
-		if (arts[respnum].name != (char *) 0 &&
-		    arts[respnum].name != arts[respnum].from) {
-			sprintf (buf, "%s%s (%s)",
-				 arts[respnum].from, add_addr,
-				 arts[respnum].name);
+		if (arts[respnum].name != (char *) 0 && arts[respnum].name != arts[respnum].from) {
+			sprintf (buf, "%s (%s)", arts[respnum].from, arts[respnum].name);
 			strcpy (from_addr, buf);
-		} else {
-			sprintf (from_addr, "%s%s",
-				 arts[respnum].from, add_addr);
-		}
+		} else
+			sprintf (from_addr, "%s", arts[respnum].from);
 	}
 	fseek (note_fp, orig_offset, SEEK_SET);
 #else

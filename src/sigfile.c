@@ -2,11 +2,11 @@
  *  Project   : tin - a Usenet reader
  *  Module    : sigfile.c
  *  Author    : M. Gleason & I. Lea
- *  Created   : 17.10.92
- *  Updated   : 20.12.97
+ *  Created   : 17.10.1992
+ *  Updated   : 20.12.1997
  *  Notes     : Generate random signature for posting/mailing etc.
- *  Copyright : (c) Copyright 1989-97 by Mike Gleason & Iain Lea
- *	             You may  freely  copy or  redistribute	this software,
+ *  Copyright : (c) Copyright 1989-98 by Mike Gleason & Iain Lea
+ *	             You may  freely  copy or  redistribute  this software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-
  *	             right notice, and it must be included in any copy made

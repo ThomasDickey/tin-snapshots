@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : thread.c
  *  Author    : I. Lea
- *  Created   : 01.04.91
- *  Updated   : 24.12.97
+ *  Created   : 01.04.1991
+ *  Updated   : 26.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -155,8 +155,10 @@ bld_tline (
 
 		make_prefix(art->refptr, buff+strlen(buff));
 
-		if ((int)strlen(buff) >= cCOLS)	/* If extremely nested */
+		if ((int)strlen(buff) >= cCOLS) { /* If extremely nested */
+		    WriteLine(INDEX2LNUM(l), buff);
 		    return;
+		}
 
 #if 0 /* see #if 0 above */
 		}
@@ -217,13 +219,7 @@ bld_tline (
 		*(buff + i) = '\0';
 	}
 
-#if USE_CURSES
-	/* FIXME: draw_tline usually does this too */
-	/* FIXME: there's an unintercepted return above */
-	mvaddstr(INDEX2LNUM(l), 0, buff);
-	clrtoeol();
-#endif
-	return;
+	WriteLine(INDEX2LNUM(l), buff);
 }
 #endif
 

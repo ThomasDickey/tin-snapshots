@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : help.c
- *  Author    : I.Lea
- *  Created   : 01-04-91
- *  Updated   : 22-12-94
+ *  Author    : I. Lea
+ *  Created   : 01.04.1991
+ *  Updated   : 31.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -25,9 +25,11 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
+const char *info_title;
+const char **info_help;
+
 static constext txt_help_empty_line[] = cCRLF;
-static const char *info_title;
-static const char **info_help;
+
 static int cur_page;
 static int group_len = 0;
 static int info_type;
@@ -354,9 +356,10 @@ show_info_page (
 	const char *help[],
 	const char *title)
 {
-	int max_line, len;
+	int max_line, len, ch;
 	int help_lines;
 	int old_page = 0;
+	int old_help;
 
 	if (NOTESLINES <= 0)
 		return;
@@ -404,7 +407,7 @@ show_info_page (
 
 		old_page = cur_page;
 
-		switch (ReadHelpCh()) {
+		switch (ch = ReadHelpCh()) {
 			case ESC:	/* common arrow keys */
 				break;
 
@@ -455,6 +458,15 @@ show_info_page (
 				if (cur_page != max_page)
 					cur_page = max_page;
 				pos_help = (max_page-1) * help_lines;
+				break;
+
+			case iKeySearchSubjF:
+			case iKeySearchSubjB:
+				old_help = pos_help;
+				pos_help = search_help(ch == iKeySearchSubjF, pos_help, max_line-1);
+				cur_page = pos_help / help_lines + 1;
+				if (old_help != pos_help)
+					old_page = -1;
 				break;
 
 			default:
