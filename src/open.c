@@ -47,6 +47,7 @@ nntp_open (void)
 	char line[NNTP_STRLEN];
 	int ret;
 	t_bool sec = FALSE;
+	static t_bool is_reconnect = FALSE;
 	static unsigned short nntp_tcp_port;
 
 	if (!read_news_via_nntp)
@@ -57,7 +58,7 @@ nntp_open (void)
 #endif
 
 	/* do this only once at start-up */
-	if (nntp_server == (char *) 0) {
+	if (!is_reconnect) {
 		nntp_server = getserverbyfile (NNTP_SERVER_FILE);
 		nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 	}
@@ -111,11 +112,13 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 			error_message (line);
 			return ret;
 	}
-	linep = line;
-	while (isspace(*linep))
-		linep++;
-	strncpy(bug_nntpserver1, linep, sizeof(bug_nntpserver1)-1);
-	bug_nntpserver1[sizeof(bug_nntpserver1)-1] = '\0';
+	if (!is_reconnect) {
+		linep = line;
+		while (isspace(*linep))
+			linep++;
+		strncpy(bug_nntpserver1, linep, sizeof(bug_nntpserver1)-1);
+		bug_nntpserver1[sizeof(bug_nntpserver1)-1] = '\0';
+	}
 
 	/*
 	 * Switch INN into NNRP mode with 'mode reader'
@@ -137,23 +140,32 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			break;
 
 		case ERR_ACCESS:
-		default:
 			error_message (line);
 			return ret;
+
+		case ERR_COMMAND:
+		default:
+			break;
+ 
 	}
-	if (!can_post)
-		wait_message(0, "%s\n", txt_cannot_post);
 
-	linep = line;
-	while (isspace(*linep))
-		linep++;
-	strncpy(bug_nntpserver2, linep, sizeof(bug_nntpserver2)-1);
-	bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
+   if (!is_reconnect) {
+		if (!can_post)
+			wait_message(0, "%s\n", txt_cannot_post);
 
-	if (sec)
-		wait_message(0, "%s\n", bug_nntpserver2);
-	else
-		wait_message(0, "%s\n", bug_nntpserver1);
+		linep = line;
+		while (isspace(*linep))
+			linep++;
+		strncpy(bug_nntpserver2, linep, sizeof(bug_nntpserver2)-1);
+		bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
+
+		if (sec)
+			wait_message(0, "%s\n", bug_nntpserver2);
+		else
+			wait_message(0, "%s\n", bug_nntpserver1);
+
+		is_reconnect = TRUE;
+	}
 
 	/*
 	 * Check if NNTP supports XOVER command
@@ -163,8 +175,8 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		xover_supported = TRUE;
 		/* TODO issue warning if old index files found ? */
 	else {
-
-		wait_message(2, "Your server does not support the NNTP XOVER command.\nTin will use local index files instead.\n");
+		if (!is_reconnect)
+			wait_message(2, "Your server does not support the NNTP XOVER command.\nTin will use local index files instead.\n");
 
 #if 0	/* It seems this breaks the M$ newsserver */
 		/*
@@ -690,7 +702,7 @@ open_art_fp (
 		else
 			note_size = sb.st_size;
 
-		art_fp=fopen (buf, "r");
+		art_fp = fopen (buf, "r");
 #ifdef NNTP_ABLE
 	}
 #endif
@@ -698,9 +710,9 @@ open_art_fp (
 	/*
 	 * Do a bit of 1521 decoding. If art_fp=NULL, then it returns NULL
 	 */
-	fp=rfc1521_decode(art_fp);
+	fp = rfc1521_decode(art_fp);
 	if (fp != art_fp)
-	  note_size=0;
+		note_size = 0;
 
 	return fp;
 }

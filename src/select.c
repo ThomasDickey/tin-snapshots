@@ -61,18 +61,17 @@ selection_index (
 	setbuf (stdin, 0);
 #endif
 
+	/*
+	 * If user specified only 1 cmd line groupname (eg. tin -r alt.sources)
+	 * then go there immediately.
+	 */
+	if (num_cmd_line_groups == 1)
+		goto select_read_group;
+
 	ClearScreen();
 	set_groupname_len (FALSE);	/* find longest subscribed to groupname */
 	show_selection_page ();	/* display group selection page */
 	set_alarm_signal ();		/* set alarm signal for resync_active_file () */
-
-	/*
-	 * If user specified only 1 cmd line groupname (eg. tin alt.sources)
-	 * then enter the group immediately.  Don't scream at the use of a goto.
-	 */
-	if (num_cmd_line_groups == 1) {
-		goto select_read_group;
-	}
 
 	forever {
 		if (!resync_active_file ()) {	/* reread active file if alarm set */
@@ -201,8 +200,11 @@ select_read_group:
 					clear_message ();
 					do {
 						index_point = GRP_UNINDEXED;
+						if (CURR_GROUP.bogus)
+							break;
 						group_page (&CURR_GROUP);
 					} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
+
 					if (index_point == GRP_QUIT)
 						goto select_done;
 #ifndef DONT_REREAD_ACTIVE_FILE
@@ -241,8 +243,7 @@ select_page_down:
 						cur_groupnum = group_top - 1;
 				}
 
-				if (cur_groupnum <= first_group_on_screen
-				||  cur_groupnum >= last_group_on_screen)
+				if (cur_groupnum <= first_group_on_screen || cur_groupnum >= last_group_on_screen)
 					show_selection_page ();
 				else
 					draw_group_arrow ();

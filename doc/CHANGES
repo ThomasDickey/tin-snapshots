@@ -1,3 +1,58 @@
+-- pre-1.4 release 971123 --
+
+494) Sven Paulus <sven@tin.org>
+     ADD. new config option "add_posted_to_filter"
+     BUG. "quick_filter_select_posted_art" didn't add group name to scope
+     FIX. extern.h, proto.h, config.c, filter.c, init.c, lang.c, post.c,
+          tincfg.tbl
+
+493) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. detection of multi-line Content-Type:-header
+     FIX. proto.h, rfc1521.c, read.c
+
+492) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. can't leave group via left arrow when answering catch-up-question
+          with no
+     BUG. crash when 'n' points to bogus group
+     FIX. group.c, select.c
+
+491) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. check for circular references
+     FIX. refs.c
+
+490) John M. Flinchbaugh <glynis@hjsoft.com>
+     BUG. calling invoke_cmd() with empty argument to start ispell
+     FIX. misc.c
+
+489) Thomas E. Dickey <dickey@clark.net>
+     BUG. remove special-case for -I/usr/local/include
+     BUG. minor fix to configure-test for union wait.
+     BUG. remove redundant aggregate initialization in auth.c
+     FIX. aclocal.m4, auth.c, group.c
+
+488) Urs Janssen <urs@tin.org>
+     ADD. check for initial or reconnection
+     ADD. check for empty .newsrc (needed for -n switch)
+     ADD. minor code cleanup
+     BUG. fixed return value in case of !SIGUSR1
+     FIX. autoconf.h[in], extern.h, open.c, misc.c, filter.c, post.c
+          active.c, configure[.in]
+
+487) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. read/post problems with ANU NEWS-servers
+     BUG. wrong message counter while searching
+     FIX. open.c, search.c
+
+486) Yuri Kuzmenko <yuri@cs.cracksoft.kiev.ua>
+     ADD. removed message_delay upon superseding/reposting
+     ADD. clean program termination when receiving a SIGTERM
+     ADD. config switch for PgDn behaviour at end of article
+     FIX. config.c, page.c, post.c, signal.c, tincfg.tbl
+
+485) Torsten Schneider <schneidt@mabi.de>
+     BUG. advertising switch was not respected
+     FIX. config.c
+
 -- pre-1.4 release 971106 --
 
 484) Ralf Doeblitz <doeblitz@gmx.de>
@@ -12,11 +67,11 @@
 -- pre-1.4 release 971105 --
 
 482) Ralf Doeblitz <doeblitz@gmx.de>
-     ADD. removed linecounter in body-search
+     ADD. removed line-counter in body-search
      FIX. screen.c, search.c
 
 481) Sven Paulus <sven@tin.org>
-     ADD. server infos to bugreprot
+     ADD. server info to bug-report
      ADD. moved some strings to lang.c
      ADD. moved aliased group 'warning' to select.c
      BUG. didn't notice no post if nnrpd was invoked via mode reader
@@ -40,7 +95,7 @@
      FIX. color.c
 
 477) Urs Janssen <urs@tin.org>
-     BUG. pointer into article_arry could get negative
+     BUG. pointer into article_array could get negative
      FIX. thread.c
 
 476) Darrell Tangman <darrelltman@mindspring.com>
@@ -69,7 +124,7 @@
      ADD. ^H now toggles the display of headers (it doesn't display them only
           once as before.
      ADD. news_headers_to_[not_]display configurable using "M"enu
-     ADD. set a usefull default value for news_headers_to_display
+     ADD. set a useful default value for news_headers_to_display
      REM. highlight_xcommentto and show_xcommentto merged to show_xcommentto,
           which displays X-Comment-To in the upper right corner.
      FIX. page.c and some other files
@@ -81,7 +136,7 @@
 
 471) Roland Rosenfeld <roland@spinnaker.rhein.de>
      ADD. changed pager layout
-     ADD. col_newsheaders configureable using "M"enu
+     ADD. col_newsheaders configurable using "M"enu
      BUG. light-colors had wrong index
      FIX. color.c, tincfg.tbl, lang.c, page.c extern.h
 
@@ -123,7 +178,7 @@
      ADD. cleanup *_message()
      ADD. joined single letter key prompts
      ADD. renamed stuff_nntp() to get_article()
-     BUG. show_progess sometimes trashed screen-layout
+     BUG. show_progress sometimes trashed screen-layout
      FIX. several supplied patches
 
 465) Jason Faultless <jason@radar.demon.co.uk>
@@ -145,7 +200,7 @@
      ADD. extensive internal changes
      ADD. new -d and -Q options
      ADD. code clean-up
-     REM. all references to obselete 'cdtin'
+     REM. all references to obsolete 'cdtin'
 
 461) Thomas E. Dickey <dickey@clark.net>
      ADD. modify ncurses/gpm link test to work with recent changes to ncurses
@@ -219,7 +274,7 @@
           lang.c, makecfg.c, page.c, prompt.c, signal.c, tcurses.c, thread.c
 
 448) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     ADD. minor code cleanup (check for nonprintable chars)
+     ADD. minor code cleanup (check for non-printable chars)
      FIX. group.c, page.c, screen.c, thread.c
 
 447) Oliver B. Warzecha <obw@amarok.ping.de>
@@ -245,7 +300,7 @@
           main.c, misc.c, open.c, select.c, tincfg.tbl
 
 443) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
-     ADD. removed useles call of get_from_name() in make_path_header()
+     ADD. removed useless call of get_from_name() in make_path_header()
      FIX. post.c
 
 --unoff BETA release 970922 --
@@ -254,7 +309,7 @@
      Urs Janssen <urs@karlsruhe.org>
      BUG. quoting of quoted lines didn't strip tailing space from
           quote_chars
-     BUG. minor code cleanup (moved missplaced label, commented out
+     BUG. minor code cleanup (moved misplaced label, commented out
           buggy code)
      FIX. attrib.c, misc.c, post.c
 
@@ -283,7 +338,7 @@
 --unoff BETA release 970916 --
 
 439) Martin Buck <martin-2.buck@student.uni-ulm.de>
-     BUG. joining of continuied headerlines didn't work
+     BUG. joining of continued header-lines didn't work
      FIX. art.c
 
 438) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -366,7 +421,7 @@
 427) Jason Faultless <jason@radar.demon.co.uk>
      BUG. 'i' in group menu always shows subject of the base article
      BUG. newsrc entry was ignored when resubscribing to an unsubscribed group
-     BUG. newgroups are now skipped correctly when 'm'oving newsgroups
+     BUG. 'N'ewgroups are now skipped correctly when 'm'oving newsgroups
      BUG. 'd' behaved funny in first newsgroup (introduced in 313)
      ADD. when subscribing to a new group, the group counts are checked and
           num_unread is calculated and shown without having to enter the group
@@ -384,7 +439,7 @@
           makecfg.c, signal.c, tcurses.c
 
 425) Darrell Tangman <darrelltman@mindspring.com>
-     ADD. possibillity to shutdown tin cleanly via SIGUSR1
+     ADD. possibility to shutdown tin cleanly via SIGUSR1
      BUG. calculated wrong size of signal_list
      FIX. misc.c, signal.c
 
@@ -397,7 +452,7 @@
      FIX. page.c
 
 423) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. Makefile[.in] dosn't work with /bin/csh anymore
+     BUG. Makefile[.in] doesn't work with /bin/csh anymore
           [introduced in 420]
      BUG. empty X-Comment-To: is inserted if posting contains no realname
      BUG. prompting for username didn't allow to change the default
@@ -438,7 +493,7 @@
 --unoff BETA release 970817 --
 
 419) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. missplaced #ifdefs moved
+     BUG. misplaced #ifdefs moved
      ADD. minor code cleanup
      FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c,
           search.c, thread.c, proto.h, Makefile.in
@@ -654,7 +709,7 @@
 --unoff BETA release 970516 --
 
 382) Karsten Keil <keil@temic-ech.spacenet.de>
-     ADD. some addtional checks for NULL-pointers
+     ADD. some additional checks for NULL-pointers
      FIX. art.c, refs.c
 
 381) Bruce Momjian <root@candle.pha.pa.us>
@@ -670,7 +725,7 @@
      FIX. several supplied patches
 
 379) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     REM. insertion of Lines:-header (as it's not allways correct
+     REM. insertion of Lines:-header (as it's not always correct
           (pgp-signed articles)) and could/should be inserted by the
           server
      FIX. post.c
@@ -692,7 +747,7 @@
 --unoff BETA release 970417 --
 
 375) Thomas E. Dickey <dickey@clark.net>
-     BUG. tind didn't compile due to missplaced ifdefs
+     BUG. tind didn't compile due to misplaced ifdefs
      BUG. test for USE_SYSTEM_STATUS still didn't work on some systems
      FIX. aclocal.m4, tnntp.h, auth.c
 
@@ -729,7 +784,7 @@
 
 369) Torsten Neumann <torsten@londo.rhein-main.de>
      ADD. issue a warning double signatures or malformed signature
-          demiliters
+          delimiters
      ADD. tool/expand_aliases.tgz (might need some work)
      FIX. several supplied patches
 
@@ -737,7 +792,7 @@
      ADD. strip_bogus=ASK now shows groups even with show_only_unread=TRUE
      ADD. folded Message-ID text into t_msgid
      BUG. threading problem (from 309)
-     BUG. incorrect display of Newgroup flag (from 351)
+     BUG. incorrect display of 'N'ewgroup flag (from 351)
      ADD. general code cleanup
      FIX. several supplied patches
 
@@ -792,7 +847,7 @@
      FIX. several supplied patches
 
 358) Kevin Lentin <kevinl@cs.monash.edu.au>
-     BUG. When reading mail groups tin trys to connect the server
+     BUG. When reading mail groups tin tries to connect the server
      ADD. prompt_yn2() now allows only 'y','n','ESC' as a answer
      BUG. if you answer the reconnect to server question with no or the
           connection is broken the newsrc is written out before tin exits.
@@ -984,8 +1039,8 @@
 --unoff BETA release 970225 --
 
 325) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. changing OPT_DEFAULT_SHOW_AUTHOR in 'M'enu at top-level SIGSEVs
-     BUG. no rage-check for ISO2ASCI
+     BUG. changing OPT_DEFAULT_SHOW_AUTHOR in 'M'enu at top-level SIGSEGVs
+     BUG. no rage-check for ISO2ASC
      BUG. wrong prototype for hand-rolled atol
      FIX. config.c, init.c, string.c
 
@@ -1078,7 +1133,7 @@
 
 310) Sven Paulus <sven@oops.sub.de>
      ADD. inclusion of empty Followup-To: line (option)
-     ADD. keys for sending followups/replys with all headers quoted (^W,^E)
+     ADD. keys for sending followups/replies with all headers quoted (^W,^E)
      FIX. several supplied patches
 
 --unoff BETA release 970202 --
@@ -1787,7 +1842,7 @@
      FIX. several supplied patches
 
 185) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     ADD. tin stripped tabs out of ALL headers, but that's not usefull for
+     ADD. tin stripped tabs out of ALL headers, but that's not useful for
           Summary:
      FIX. page.c
 
@@ -1970,7 +2025,7 @@
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. SIGPIPE handling for feed_article
      BUG. TeX2ISO did not work without rereading article
-     BUG. article with selfrefereces caused endless loop
+     BUG. article with self-references caused endless loop
      BUG. when threading Both, wrong flag was showing up
      BUG. ~Mail/posted was not stored - brain-dead dependency removed
      ADD. minor code cleanup (added a few casts, striped tailing blanks,

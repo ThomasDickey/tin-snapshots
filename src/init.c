@@ -196,7 +196,10 @@ int xmouse, xrow, xcol;			/* xterm button pressing information */
 	t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 #endif
 
-t_bool alternative_handling=TRUE;
+t_bool reread_active_for_posted_arts;
+
+t_bool add_posted_to_filter;
+t_bool alternative_handling;
 t_bool auto_bcc;		/* add your name to bcc automatically */
 t_bool auto_cc;			/* add your name to cc automatically */
 t_bool auto_list_thread;	/* list thread when entering it using right arrow */
@@ -227,6 +230,8 @@ t_bool force_screen_redraw;	/* force screen redraw after external (shell) comman
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool got_sig_pipe = FALSE;
 t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
+t_bool keep_dead_articles;
+t_bool keep_posted_articles;
 t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
 t_bool mail_news;		/* mail all arts to specified user */
 t_bool mail_news_to_posted;	/* mail all arts to specified user */
@@ -241,6 +246,7 @@ t_bool print_header;		/* print all of mail header or just Subject: & From lines 
 t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
 t_bool prompt_followupto;	/* display empty Followup-To header in editor */
 t_bool purge_index_files;	/* stat all articles to see if they still exist */
+t_bool reread_active_for_posted_arts;
 t_bool quote_empty_lines;	/* quote empty lines, too */
 t_bool quote_signatures;	/* quote signatures */
 t_bool read_local_newsgroups_file;	/* read newsgroups file locally or via NNTP */
@@ -257,6 +263,7 @@ t_bool show_xcommentto;		/* set TRUE to show X-Comment-To in upper right corner 
 t_bool sigdashes;		/* set TRUE to prepend every signature with dashes */
 t_bool signature_repost;	/* set TRUE to add signature when reposting articles */
 t_bool space_goto_next_unread;
+t_bool pgdn_goto_next;
 t_bool start_any_unread = FALSE;
 t_bool start_editor_offset;
 t_bool strip_blanks;
@@ -265,6 +272,7 @@ t_bool tab_after_X_selection;	/* set TRUE if you want auto TAB after X */
 t_bool tab_goto_next_unread;
 t_bool thread_catchup_on_exit;	/* catchup thread with left arrow key or not */
 t_bool batch_mode;			/* update index files only mode */
+t_bool unlink_article;
 t_bool update_fork = FALSE;	/* update index files by forked tin -u */
 t_bool use_builtin_inews;
 t_bool use_keypad;		/* enables/disables scroll keys on supported terminals */
@@ -404,7 +412,7 @@ void init_selfinfo (void)
 
 	if (domain_name[0]=='\0') {
 		error_message ("Can't get a (fully-qualified) domain-name!\n");
-		tin_done(1);
+		tin_done(EXIT_ERROR);
 	}
 
 	process_id = getpid ();
@@ -494,6 +502,9 @@ void init_selfinfo (void)
 		local_index = TRUE;
 	}
 
+
+	add_posted_to_filter = TRUE;
+	alternative_handling = TRUE;
 	art_marked_deleted = ART_MARK_DELETED;
 	art_marked_inrange = MARK_INRANGE;
 	art_marked_return = ART_MARK_RETURN;
@@ -547,7 +558,8 @@ void init_selfinfo (void)
 	iso2asc_supported = atoi (get_val ("ISO2ASC", DEFAULT_ISO2ASC));
 	if (iso2asc_supported > NUM_ISO_TABLES)
 		iso2asc_supported = 0;
-
+	keep_dead_articles = TRUE;
+	keep_posted_articles = TRUE;
 	mark_saved_read = TRUE;
 	newsrc_active = FALSE;
 	num_headers_to_display = 0;
@@ -568,6 +580,7 @@ void init_selfinfo (void)
 	read_local_newsgroups_file = FALSE;
 	reread_active_file = TRUE;
 	reread_active_file_secs = REREAD_ACTIVE_FILE_SECS;
+	reread_active_for_posted_arts = TRUE;
 	save_news = FALSE;
 #ifdef HAVE_MMDF_MAILER
 	save_to_mmdf_mailbox = TRUE;
@@ -591,6 +604,7 @@ void init_selfinfo (void)
 	tab_after_X_selection = FALSE;
 	tab_goto_next_unread = TRUE;
 	space_goto_next_unread = FALSE;
+	pgdn_goto_next = TRUE;
 	tex2iso_supported = atoi (get_val ("TEX2ISO", "0"));
 	thread_catchup_on_exit = TRUE;
 #ifdef INDEX_DAEMON
@@ -599,6 +613,7 @@ void init_selfinfo (void)
 	batch_mode = FALSE;
 #endif
 	check_for_new_newsgroups = !batch_mode;
+	unlink_article = TRUE;
 	use_builtin_inews = TRUE;
 	use_keypad = FALSE;
 	use_mailreader_i = FALSE;

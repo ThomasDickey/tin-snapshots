@@ -330,7 +330,8 @@ debug_print_filters (void)
 {
 	char file[PATH_LEN];
 	FILE *fp;
-	int i, j, num;
+	int i, num;
+/* int j; */
 	struct t_filter *the_filter;
 
 	if (debug < 2)

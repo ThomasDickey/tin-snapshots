@@ -1,9 +1,7 @@
-WARNING, this is NOT an official release, but a patched version with
-many new features and bug-fixes over the last 'official' beta release from
-August 1995. (for more information have a look at the doc/WHATSNEW file).
-It is still a work in progress and might not compile on all machines (for a
-list of platforms on which tin-unoff has been installed and tested have a
-look at doc/INSTALL).
+WARNING, this is still a BETA release!
+It is still a work in progress and might not compile on all machines
+(for a list of platforms on which tin-unoff has been installed and
+tested have a look at doc/INSTALL).
 
 Quick Install:
 
@@ -23,18 +21,17 @@ install with:
 Install at your own risk.
 
 Please do NOT mail any bug-reports concerning THIS version to Iain Lea but
-to tin-bugs@tin.org. Before mailing a bug-report please check if you are using
-the latest release, and if not, please upgrade first! Have a look at the
-TODO file for known bugs. If you still think you found a bug, please use
+to tin-bugs@tin.org. Before mailing a bug-report please check if you are
+using the latest release, and if not, please upgrade first! Have a look at
+the TODO file for known bugs. If you still think you found a bug, please use
 tins mail_bugreport function (shift-R) and write in english.
 
-The latest official release and beta release is available at:
-ftp://ftp.sbs.de/pub/tin/
-
-The latest unoff release is available at:
-ftp://ftp.tin.org/pub/news/clients/tin-unoff/
+The latest release is available at:
+<ftp://ftp.tin.org/pub/news/clients/tin/current/>
 or it's mirrors.
 
-There is a mailing list concerning tin-unoff (mainly for the developers)
-it's address is: tin-unoff@rhein.de. If you would like to subscribe write
-to: majordomo@rhein.de, asking in the body to: subscribe tin-unoff
+If you have additional questions or like to be informed about the
+latest new features/version you may subscribe to the (developers)
+tin-unoff mailing lists; to subscribe write to majordomo@tin.org,
+asking in the body to: subscribe <listname> and/or read
+news.software.readers.

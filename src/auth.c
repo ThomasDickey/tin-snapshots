@@ -264,8 +264,8 @@ authinfo_original (
 	t_bool startup)
 {
 	char *authpass, *ptr;
-	char authusername[PATH_LEN] = "";
-	char authpassword[PATH_LEN] = "";
+	char authusername[PATH_LEN];
+	char authpassword[PATH_LEN];
 	int ret = ERR_AUTHBAD, changed;
 	static char last_server[PATH_LEN] = "";
 	static t_bool already_failed = FALSE;

@@ -66,6 +66,14 @@ static void free_filter_item (struct t_filter *ptr);
 	static void vWriteFilterFile (char *pcFile);
 #endif
 
+/* 
+** Filter cache structure using Philip Hazel's Perl regular expression
+** library (see pcre/pcre.[ch] for details)
+*/
+struct regex_cache {
+	pcre		*re;
+	pcre_extra	*extra;
+};
 
 struct t_filter *
 psExpandFilterArray (
@@ -385,7 +393,7 @@ if (debug) {
 				}
 				break;
 			}
-	 		if (match_long (buf+1, "ime=", &secs)) {
+			if (match_long (buf+1, "ime=", &secs)) {
 				if (arr_ptr && !expired_time) {
 					arr_ptr[i].time = secs;
 					if (secs && current_secs > secs) {
@@ -1076,7 +1084,6 @@ quick_filter_select (
 	return filtered;
 }
 
-#if 0 /* this sucks! (urs) */
 /*
  *  Quick command to add an auto-select filter to the article that user
  *  has just posted. Selects on Subject: line with limited expire time.
@@ -1109,7 +1116,9 @@ quick_filter_select_posted_art (
 		rule.msgid_ok = FALSE;
 		rule.subj_ok = TRUE;
 		rule.text[0] = '\0';
-		rule.scope[0] = '\0';
+		if (strlen(group->name) > sizeof(rule.scope)-1)
+			return FALSE;
+		strcpy(rule.scope, group->name);
 		rule.type = FILTER_SELECT;
 		rule.icase = FALSE;
 		rule.expire_time = TRUE;
@@ -1124,12 +1133,11 @@ quick_filter_select_posted_art (
 
 	return filtered;
 }
-#endif /* 0 */
 
 /*
  * API to add filter rule to the local or global filter array
  */
-
+/* ARGSUSED */
 static int
 iAddFilterRule (
 	struct t_group *psGrp,
@@ -1301,35 +1309,60 @@ filter_articles (
 	char buf[LEN];
 	int filtered = FALSE;
 	int num, inscope;
-	int global_filter;
 	register int i, j, k;
 	struct t_filter *ptr; /*, *curr; */
+	struct regex_cache *regex_cache_subj = NULL;
+	struct regex_cache *regex_cache_from = NULL;
+	struct regex_cache *regex_cache_msgid = NULL;
+	struct regex_cache *regex_cache_xref = NULL;
+	char *regex_errmsg = NULL;
+	int regex_errpos;
 /*	int score; */
 
 	num_of_killed_arts = 0;
 	num_of_selected_arts = 0;
-
+	
 	/*
 	 * check if there are any global filter rules
 	 */
-	 if (group->glob_filter->num == 0)
+	if (group->glob_filter->num == 0)
 		return filtered;
 
 	/*
 	 * Apply global filter rules first if there are any entries
 	 */
-	if (group->glob_filter->num) {
-		/*
-		 * Check if any scope rules are active for this group
-		 * ie. group=comp.os.linux.help  scope=comp.os.linux.*
-		 */
-		inscope = set_filter_scope (group);
-		if (!cmd_line)
-			wait_message (0, txt_filter_global_rules, inscope, group->glob_filter->num);
+	/*
+	 * Check if any scope rules are active for this group
+	 * ie. group=comp.os.linux.help  scope=comp.os.linux.*
+	 */
+	inscope = set_filter_scope (group);
+	if (!cmd_line)
+		wait_message (0, txt_filter_global_rules, inscope, group->glob_filter->num);
+	num = group->glob_filter->num;
+	ptr = group->glob_filter->filter;
 
-		num = group->glob_filter->num;
-		ptr = group->glob_filter->filter;
-		global_filter = TRUE;
+	/*
+	 * set up cache tables for all types of filter rules
+	 * (only for regexp matching)
+	 */
+	if (wildcard) {
+		int msiz;
+		
+		msiz = sizeof(struct regex_cache) * num;
+		regex_cache_subj = (struct regex_cache *) my_malloc(msiz);
+		regex_cache_from = (struct regex_cache *) my_malloc(msiz);
+		regex_cache_msgid = (struct regex_cache *) my_malloc(msiz);
+		regex_cache_xref = (struct regex_cache *) my_malloc(msiz);
+		for (j=0 ; j < num ; j++) {
+			regex_cache_subj[j].re = NULL;
+			regex_cache_subj[j].extra = NULL;
+			regex_cache_from[j].re = NULL;
+			regex_cache_from[j].extra = NULL;
+			regex_cache_msgid[j].re = NULL;
+			regex_cache_msgid[j].extra = NULL;
+			regex_cache_xref[j].re = NULL;
+			regex_cache_xref[j].extra = NULL;
+		}
 	}
 
 	/*
@@ -1346,9 +1379,40 @@ filter_articles (
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-					if (REGEX_MATCH (arts[i].subject, ptr[j].subj, ptr[j].icase))
-						SET_FILTER(group, i, j);
+					if (!wildcard) {
+						if (wildmat(arts[i].subject, ptr[j].subj, ptr[j].icase))
+							SET_FILTER(group, i, j);
+					} else {
+						if (!regex_cache_subj[j].re) {
+							if ((regex_cache_subj[j].re = pcre_compile(ptr[j].subj,
+							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
+							  &regex_errmsg, &regex_errpos)) == NULL)
+								sprintf(msg, "Error in regex: %s at pos. %d",
+								   regex_errmsg, regex_errpos);
+							if (regex_cache_subj[j].re) {
+								regex_cache_subj[j].extra = 
+								  pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL) {
+									sprintf(msg, "Error in regex: study - pcre internal error %s",
+									  regex_errmsg);
+								}
+							}
+						}
+						if (regex_cache_subj[j].re) {
+							regex_errpos = 
+							  pcre_exec(regex_cache_subj[j].re,
+							    regex_cache_subj[j].extra,
+							    arts[i].subject,
+							    strlen(arts[i].subject),
+							    0, NULL, 0);
+							if (regex_errpos >= 0) {
+								SET_FILTER(group, i, j);
+							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
+								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+						}
+					}		                                                
 				}
+				
 				/*
 				 * Filter on From: line
 				 */
@@ -1357,9 +1421,38 @@ filter_articles (
 						sprintf (buf, "%s (%s)", arts[i].from, arts[i].name);
 					else
 						strcpy (buf, arts[i].from);
-
-					if (REGEX_MATCH (buf, ptr[j].from, ptr[j].icase))
-						SET_FILTER(group, i, j);
+					if (!wildcard) {
+						if (wildmat(buf, ptr[j].from, ptr[j].icase))
+							SET_FILTER(group, i, j);
+					} else {
+						if (!regex_cache_from[j].re) {
+							if ((regex_cache_from[j].re = pcre_compile(ptr[j].from,
+							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
+							  &regex_errmsg, &regex_errpos)) == NULL)
+								sprintf(msg, "Error in regex: %s at pos. %d",
+								   regex_errmsg, regex_errpos);
+							if (regex_cache_from[j].re) {
+								regex_cache_from[j].extra = 
+								  pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL) {
+									sprintf(msg, "Error in regex: study - pcre internal error %s",
+									  regex_errmsg);
+								}
+							}
+						}
+						if (regex_cache_from[j].re &&
+						  regex_cache_from[j].extra) {
+							regex_errpos = pcre_exec(regex_cache_from[j].re,
+							    regex_cache_from[j].extra,
+							    buf,
+							    strlen(buf),
+							    0, NULL, 0);
+							if (regex_errpos >= 0) {
+								SET_FILTER(group, i, j);
+							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
+								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+						}
+					}		                                                
 				}
 
 				/*
@@ -1370,16 +1463,62 @@ filter_articles (
 				if (ptr[j].msgid != (char *) 0) {
 
 					struct t_article *art = &arts[i];
-					char *refs;
+					char *refs = NULL;
 /* TODO nice idea del'd; better apply one rule on all fitting
  * TODO articles, so we can switch to an appropriate algorithm
  * TODO for each kind of rule, including the deleted one.
  */
-					if (REGEX_MATCH (REFS(art, refs), ptr[j].msgid, FALSE) || REGEX_MATCH (MSGID(art), ptr[j].msgid, FALSE))
-						SET_FILTER(group, i, j);
 
+					if (!wildcard) {
+						if (wildmat(REFS(art, refs), ptr[j].msgid, FALSE) ||
+						 wildmat(MSGID(art), ptr[j].msgid, FALSE))
+							SET_FILTER(group, i, j);
+					} else {
+						if (!regex_cache_msgid[j].re) {
+							if ((regex_cache_msgid[j].re = pcre_compile(ptr[j].msgid,
+							  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
+							  &regex_errmsg, &regex_errpos)) == NULL)
+								sprintf(msg, "Error in regex: %s at pos. %d",
+								   regex_errmsg, regex_errpos);
+							if (regex_cache_msgid[j].re) {
+								regex_cache_msgid[j].extra = 
+								  pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
+								if (regex_errmsg != NULL) {
+									sprintf(msg, "Error in regex: study - pcre internal error %s",
+									  regex_errmsg);
+								}
+							}
+						}
+						if (regex_cache_msgid[j].re && regex_cache_msgid[j].extra) {
+							char * myrefs;
+
+							/* myrefs does not need to be freed */
+							myrefs = REFS(arts, refs);
+							regex_errpos = 
+								pcre_exec(regex_cache_msgid[j].re,
+								regex_cache_msgid[j].extra,
+								myrefs,
+								strlen(myrefs),
+								0, NULL, 0);
+							if (regex_errpos >= 0) {
+								SET_FILTER(group, i, j);
+							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
+								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+							else  { /* No match, try Message-ID */
+								regex_errpos = 
+								  pcre_exec(regex_cache_msgid[j].re,
+								    regex_cache_msgid[j].extra,
+								    MSGID(art),
+								    strlen(MSGID(art)),
+								    0, NULL, 0);
+								if (regex_errpos >= 0) {
+									SET_FILTER(group, i, j);
+								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
+									 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+							}
+						}
+					}		                                                
 					FreeIfNeeded(refs);
-
 				}
 				/*
 				 * Filter on Lines: line
@@ -1455,10 +1594,39 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 								/* don't filter when we are actually in that group */
 								/* Group names shouldn't be case sensitive in any case. Whatever */
 								if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf)!=0) {
-									if (REGEX_MATCH (buf, ptr[j].xref, ptr[j].icase)) {
-										group_count=-1;
-										break;
-									}
+									if (!wildcard) {
+										if (wildmat(buf, ptr[j].xref, ptr[j].icase))
+											group_count = -1;
+									} else {
+										if (!regex_cache_xref[j].re) {
+											if ((regex_cache_xref[j].re = pcre_compile(ptr[j].xref,
+											  PCRE_EXTENDED | ((ptr[j].icase) ? PCRE_CASELESS : 0),
+											  &regex_errmsg, &regex_errpos)) == NULL)
+												sprintf(msg, "Error in regex: %s at pos. %d",
+												  regex_errmsg, regex_errpos);
+											if (regex_cache_xref[j].re) {
+												regex_cache_xref[j].extra = 
+												  pcre_study(regex_cache_xref[j].re, 0, &regex_errmsg);
+												if (regex_errmsg != NULL) {
+													sprintf(msg, "Error in regex: study - pcre internal error %s",
+													  regex_errmsg);
+												}
+											}
+										}
+										if (regex_cache_xref[j].re &&
+										  regex_cache_xref[j].extra) {
+											regex_errpos =
+											  pcre_exec(regex_cache_xref[j].re,
+											    regex_cache_xref[j].extra,
+											    buf,
+											    strlen(buf),
+											    0, NULL, 0);
+											if (regex_errpos >= 0)
+												group_count = -1;
+											else if (regex_errpos != PCRE_ERROR_NOMATCH)
+												 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
+										}
+									}		                                                
 								}
 							}
 							s=e;
@@ -1473,6 +1641,27 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 				}
 			}
 		}
+	}
+
+	/*
+	 * throw away the contents of all regex_caches 
+	 *
+	 */
+	if (wildcard) {
+		for (j=0 ; j < num ; j++) {
+			FreeIfNeeded(regex_cache_subj[j].re);
+			FreeIfNeeded(regex_cache_subj[j].extra);
+			FreeIfNeeded(regex_cache_from[j].re);
+			FreeIfNeeded(regex_cache_from[j].extra);
+			FreeIfNeeded(regex_cache_msgid[j].re);
+			FreeIfNeeded(regex_cache_msgid[j].extra);
+			FreeIfNeeded(regex_cache_xref[j].re);
+			FreeIfNeeded(regex_cache_xref[j].extra);
+		}
+		free(regex_cache_subj);
+		free(regex_cache_from);
+		free(regex_cache_msgid);
+		free(regex_cache_xref);
 	}
 
 	/*

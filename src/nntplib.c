@@ -235,7 +235,7 @@ get_tcp_socket (
 		return (-EPROTO);
 	}
 	if (t_bind (s, (struct t_bind *) 0, (struct t_bind *) 0) < 0) {
-	   	t_error ("t_bind");
+		t_error ("t_bind");
 		t_close (s);
 		return (-EPROTO);
 	}
@@ -243,8 +243,7 @@ get_tcp_socket (
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
 
-	if (!isdigit((unsigned char)*machine) ||
-	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
+	if (!isdigit((unsigned char)*machine) || (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
 		if ((hp = gethostbyname (machine)) == NULL) {
 			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
@@ -320,8 +319,7 @@ get_tcp_socket (
 	sp->s_port = htons (IPPORT_NNTP);
 #endif
 	/* If not a raw ip address, try nameserver */
-	if (!isdigit((unsigned char)*machine) ||
-	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
+	if (!isdigit((unsigned char)*machine) || (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
 		/* Raw ip address, fake  */
@@ -646,7 +644,7 @@ reconnect(
 DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 
 	if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
-		tin_done(0);		/* user said no to reconnect */
+		tin_done(EXIT_OK);		/* user said no to reconnect */
 
 	clear_message ();
 
@@ -702,8 +700,10 @@ get_server (
 	 */
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 
+#ifdef DEBUG
 		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
 			perror_message("get_server()");
+#endif
 
 		retry = reconnect(retry);			/* Will abort when out of tries */
 	}

@@ -73,6 +73,12 @@ read_config_file (
 
 		switch(tolower((unsigned char)buf[0])) {
 		case 'a':
+			if (match_boolean (buf, "add_posted_to_filter=", &add_posted_to_filter))
+				break;
+
+			if (match_boolean (buf, "advertising=", &advertising))
+				break;
+
 			if (match_boolean (buf, "auto_save=", &default_auto_save))
 				break;
 
@@ -413,8 +419,6 @@ read_config_file (
 			if (match_string (buf, "news_quote_format=", news_quote_format, sizeof (news_quote_format)))
 				break;
 
-			if (match_boolean (buf, "advertising=", &advertising))
-				break;
 
 			break;
 
@@ -447,6 +451,9 @@ read_config_file (
 				break;
 
 			if (match_boolean (buf, "prompt_followupto=", &prompt_followupto))
+				break;
+
+			if (match_boolean (buf, "pgdn_goto_next=", &pgdn_goto_next))
 				break;
 
 			break;
@@ -577,12 +584,10 @@ read_config_file (
 #endif
 			break;
 		case 'w':
-#ifdef HAVE_REGEX_FUNCS
 			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) { /* FIXME - TRUE+1 is not defined! */
 				wildcard_func = (wildcard) ? match_regex : wildmat;
 				break;
 			}
-#endif
 
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "word_highlight=", &word_highlight_tinrc)) {
@@ -712,6 +717,9 @@ write_config_file (
 	fprintf (fp, txt_tinrc_space_goto_next_unread);
 	fprintf (fp, "space_goto_next_unread=%s\n\n", print_boolean (space_goto_next_unread));
 
+	fprintf (fp, txt_tinrc_pgdn_goto_next);
+	fprintf (fp, "pgdn_goto_next=%s\n\n", print_boolean (pgdn_goto_next));
+
 	fprintf (fp, txt_tinrc_tab_after_X_selection);
 	fprintf (fp, "tab_after_X_selection=%s\n\n", print_boolean (tab_after_X_selection));
 
@@ -797,6 +805,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_keep_posted_articles);
 	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
+
+	fprintf (fp, txt_tinrc_add_posted_to_filter);
+	fprintf (fp, "add_posted_to_filter=%s\n\n", print_boolean (add_posted_to_filter));
 
 	fprintf (fp, txt_tinrc_default_sigfile);
 	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
@@ -994,10 +1005,8 @@ write_config_file (
 	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
 
-#ifdef HAVE_REGEX_FUNCS
 	fprintf (fp, txt_tinrc_wildcard);
 	fprintf (fp, "wildcard=%d\n\n", wildcard);
-#endif
 
 	fprintf (fp, txt_tinrc_filter);
 	fprintf (fp, "default_filter_kill_header=%d\n", default_filter_kill_header);
@@ -1104,8 +1113,7 @@ print_option (
 static t_bool
 OptionOnPage(int option)
 {
-	if ((option >= first_option_on_screen)
-	 && (option <  first_option_on_screen + option_lines_per_page))
+	if ((option >= first_option_on_screen) && (option <  first_option_on_screen + option_lines_per_page))
 		return TRUE;
 	return FALSE;
 }
@@ -1236,7 +1244,7 @@ change_config_file (
 	set_xclick_off ();
 	forever {
 
-	 	highlight_option (option);
+		highlight_option (option);
 
 		stow_cursor();
 		ch = ReadCh ();
@@ -1584,11 +1592,9 @@ change_config_file (
 								group->attribute->show_author = default_show_author;
 							break;
 
-#ifdef HAVE_REGEX_FUNCS
 						case OPT_WILDCARD:
 							wildcard_func = (wildcard) ? match_regex : wildmat;
 							break;
-#endif
 
 						/*
 						 * the following don't need any further action
@@ -1771,9 +1777,9 @@ void
 show_menu_help (
 	const char *help_message)
 {
-	 MoveCursor (cLINES-2, 0);
-	 CleartoEOLN ();
-	 center_line (cLINES-2, FALSE, help_message);
+	MoveCursor (cLINES-2, 0);
+	CleartoEOLN ();
+	center_line (cLINES-2, FALSE, help_message);
 }
 
 

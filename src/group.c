@@ -574,24 +574,40 @@ group_page_up:
 
 			case iKeyGroupCatchup:			/* catchup & return to group menu */
 			case iKeyGroupCatchupGotoNext:	/* catchup & go to next group with unread */
-group_catchup:
+group_catchup:								/* came here on group exit via left arrow */
 				{	int yn = 1;
 
 					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, TRUE) != 1)
 						break;
 
-					if (!CURR_GROUP.newsrc.num_unread || !confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1)
+					if (!CURR_GROUP.newsrc.num_unread || !confirm_action ||
+									(yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1)
 						grp_mark_read (&CURR_GROUP, arts);
 
-					if (ch == iKeyGroupCatchupGotoNext) {
-						if (yn == 1)
-							goto group_tab_pressed;
-					} else {
-						if (yn == 1) {
-							if (cur_groupnum + 1 < group_top)
-								cur_groupnum++;
-							goto group_done;
-						}
+					switch (ch) {
+						case iKeyGroupCatchup:				/* Return to menu */
+							if (yn == 1) {
+								if (cur_groupnum + 1 < group_top)
+									cur_groupnum++;
+								goto group_done;
+							}
+							break;
+	
+						case iKeyGroupCatchupGotoNext:
+							if (yn == 1)
+								goto group_tab_pressed;
+							break;
+
+						default:							/* Must be <- group catchup on exit */
+							switch (yn) {
+								case -1:					/* ESCAPE - do nothing */
+									break;
+								case 1:						/* We caught up - advance group */
+									if (cur_groupnum + 1 < group_top)
+  										cur_groupnum++;
+								default:					/* Just leave the group */
+									goto group_done;
+							}
 					}
 				}
 				break;
@@ -838,7 +854,7 @@ group_list_thread:
 				space_mode = FALSE;
 				goto group_done;
 
-	 		case iKeyGroupToggleReadDisplay:
+			case iKeyGroupToggleReadDisplay:
 	 			/*
 	 			 * If in show_only_unread mode or there  are
 	 			 * unread articles we know this thread  will
@@ -1019,7 +1035,7 @@ group_list_thread:
 					show_group_page();
 					strcpy(msg, "Base article range");
 				} else {
-	 				art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
+					art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
 					strcpy(msg, "Base article");
 				}
 
@@ -1716,12 +1732,23 @@ show_group_title (
 		}
 	}
 
+#if 0 /* turn on the warned about missing articles - !FIXME! */
+	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c) %ldU %s",
+		active[num].name, top_base,
+		*txt_thread[active[num].attribute->thread_arts],
+		art_cnt, num_of_killed_arts, num_of_selected_arts,
+		(active[num].attribute->show_only_unread ? " R" : ""),
+		group_flag(active[num].moderated),
+		active[num].newsrc.num_unread, 
+		(art_cnt==active[num].newsrc.num_unread) ? "okay" : "articles missing!");
+#else
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated));
+#endif
 
 	if (clear_title) {
 		MoveCursor (0, 0);

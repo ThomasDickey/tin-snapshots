@@ -112,6 +112,7 @@ strcpynl (
 	*to = 0;
 }
 
+
 char *
 strcasestr (
 	char *haystack,

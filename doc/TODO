@@ -1,5 +1,7 @@
 Bugs
 ----
+o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
+
 o  -z is 'broken' (terminal in wrong mode)
     [Holger Smolinski <smolinsk@majestix.physik.uni-dortmund.de>]
 

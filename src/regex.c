@@ -15,74 +15,6 @@
 
 #include "tin.h"
 
-#ifdef HAVE_REGEX_FUNCS
-
-#ifdef HAVE_REGEX_H_FUNCS
-#	include <regex.h>
-	static void regex_error (int error, regex_t preg);
-#else
-#	undef RETURN
-	static int reg_errno;
-
-	static char * RegEx_Init (char *instring);
-	static char * RegEx_Error (int code);
-
-	static char *
-	RegEx_Init (
-		char *instring)
-	{
-		reg_errno = 0;
-		return instring;
-	}
-
-	static char *
-	RegEx_Error (
-		int code)
-	{
-		reg_errno = code;
-		return 0;
-	}
-#	define INIT 		   register char *sp = RegEx_Init(instring);
-#	define GETC()		   (*sp++)
-#	define PEEKC()		   (*sp)
-#	define UNGETC(c)	   (--sp)
-#	define RETURN(c)	   return(c)
-#	define ERROR(c) 	   return RegEx_Error(c)
-#	ifdef HAVE_REGEXP_H_FUNCS
-#		include <regexp.h>
-#	else
-#		ifdef HAVE_REGEXPR_H_FUNCS
-#			include <regexpr.h>
-#		endif
-#	endif
-#endif
-
-/* HP-UX doesn't define REG_NOERROR */
-#ifndef REG_NOERROR
-#	define REG_NOERROR 0
-#endif
-
-/*
- * regexec error routine to return an error message in the 'msg' global
- */
-#ifdef HAVE_REGEX_H_FUNCS
-static void
-regex_error(
-	int error,
-	regex_t preg)
-{
-	char errmsg[LEN];
-	size_t size;	/* 'unused' */
-
-	if ((size = regerror(error, &preg, errmsg, sizeof(errmsg))) > sizeof(errmsg))
-		sprintf(msg, "Start of regex error: %s", errmsg);
-	else
-		sprintf(msg, "Error in regex: %s", errmsg);
-
-	return;
-}
-#endif
-
 /*
  * See if pattern is matched in string. Return TRUE or FALSE
  * if icase=TRUE then ignore case in the compare
@@ -94,51 +26,47 @@ match_regex(
 	t_bool icase)
 {
 	int ret = FALSE;
-#ifdef HAVE_REGEX_H_FUNCS
-	int flags = REG_NOSUB | REG_EXTENDED;
+	int flags = PCRE_EXTENDED;
 	int error;
-	regex_t preg;
+	pcre *re;
+	char *errmsg;
 
 	msg[0] = '\0';
 
 	if (icase)
-		flags |= REG_ICASE;
+		flags |= PCRE_CASELESS;
 
 	/*
 	 * Compile the expression internally.
 	 */
-	if ((error = regcomp(&preg, pattern, flags)) != 0) {
-		regex_error(error, preg);
+	if ((re = pcre_compile(pattern, flags, &errmsg, &error)) == NULL) {
+		sprintf(msg, "Error in regex: %s at pos. %d", errmsg, error);
 		return(FALSE);
 	}
 
 	/*
-	 * Only a single compare is needed to see if a match exists
+	 * Since we are running the the compare only once,
+	 * we don't need to use pcre_study() to improve
+	 * performance
 	 */
-	switch (error = regexec(&preg, string, 0, NULL, 0)) {
-		case REG_NOERROR:		/* Found */
-			ret = TRUE;
-			break;
-		case REG_NOMATCH:		/* Not found */
-			break;
-		default:					/* Something wrong */
-			regex_error(error, preg);
-	}
 
-	regfree(&preg);
-#else
-	size_t buflen = BUFSIZ;
-	char *buffer = malloc(buflen);
-	char *preg;
-#	ifdef HAVE_REGEXP_H_FUNCS
-		preg = compile(pattern, buffer, buffer + buflen, 0);
-#	else
-		preg = compile(pattern, buffer, buffer + buflen);
-#	endif
-	ret = step(string, buffer);
-	free(buffer);
-#endif
+	/*
+	 * Only a single compare is needed to see if a match exists
+	 *
+	 * pcre_exec(precompile pattern, hints pointer, string to match,
+	 *           length of string (string may contain '\0', but not in
+	 *           out case), options, vector of offsets to be filled,
+	 *           number of elements in offsets);
+	 *           
+	 */
+	error = pcre_exec(re, NULL, string, strlen(string), 0, NULL, 0);
+	if (error >= 0)
+		ret = TRUE;
+	else if (error == -1)
+		ret = FALSE;
+	else
+		sprintf(msg, "Error in regex: pcre internal error %d", error);
+
+	free(re);
 	return(ret);
 }
-
-#endif /* HAVE_REGEX_FUNCS */

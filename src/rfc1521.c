@@ -98,7 +98,7 @@ rfc1521_decode(
 	content_transfer_encoding[0] = '\0';
 
 	/* pass article header unchanged */
-	while (fgets(buf, sizeof (buf), file)) {
+	while (fgets_hdr(buf, sizeof (buf), file)) {
 #ifdef LOCAL_CHARSET
 		buffer_to_local(buf);
 #endif
@@ -107,6 +107,12 @@ rfc1521_decode(
 		 * with whitespace to the preceding one, but I guess we can
 		 * live with that here.
 		 */
+                /* Note: Actually, this is not the case. Especially,
+                   MS Outlook Express produces multiple line header
+                   for C-T header field. We have to take care of it
+                   to detect multipart/alternative in this case. Hence,
+                   a new function fgets_hdr is defined in string.c and 
+                   invoked in while loop above J. Shin */
 		if (!strncasecmp(buf, "Content-Type: ", 14)) {
 			strcpynl(content_type, buf + 14);
 		} else if (!strncasecmp(buf, "Content-Transfer-Encoding: ", 27)) {
@@ -132,7 +138,8 @@ rfc1521_decode(
 			rewind(file);
 			rewind(f);
 
-			while (fgets(buf, sizeof (buf), file)) {
+/*        fgets_hdr is called instead of fgets. See the comment above */
+			while (fgets_hdr(buf, sizeof (buf), file)) {
 				if (strncasecmp(buf, "Content-Type: ", 14) != 0 &&
 					 strncasecmp(buf, "Content-Transfer-Encoding: ", 27) != 0) {
 					if (*buf == '\r' || *buf == '\n')

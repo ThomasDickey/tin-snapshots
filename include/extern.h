@@ -226,6 +226,16 @@ extern int _flsbuf (int, FILE *);
 extern char *getenv (const char *);
 #endif
 
+#ifdef DECL_FGETC 
+extern int fgetc (FILE * stream);
+#endif
+#ifdef DECL_RENAME
+extern int rename (const char *oldpath, const char *newpath);
+#endif
+#ifdef DECL_UNGETC
+extern int ungetc (int c, FILE *stream);
+#endif
+
 #ifdef DECL_ERRNO
 extern int errno;
 #endif
@@ -484,6 +494,7 @@ extern constext txt_help_U[];
 extern constext txt_help_W[];
 extern constext txt_help_X[];
 extern constext txt_help_a[];
+extern constext txt_help_add_posted_to_filter[];
 extern constext txt_help_alternative_handling[];
 extern constext txt_help_art_marked_deleted[];
 extern constext txt_help_art_marked_inrange[];
@@ -642,6 +653,7 @@ extern constext txt_help_signature_repost[];
 extern constext txt_help_sigfile[];
 extern constext txt_help_sort_art_type[];
 extern constext txt_help_space_goto_next_unread[];
+extern constext txt_help_pgdn_goto_next[];
 extern constext txt_help_start_editor_offset[];
 extern constext txt_help_strip_blanks[];
 extern constext txt_help_strip_bogus[];
@@ -758,6 +770,7 @@ extern constext txt_not_exist[];
 extern constext txt_not_in_active_file[];
 extern constext txt_nrctbl_create[];
 extern constext txt_nrctbl_default[];
+extern constext txt_opt_add_posted_to_filter[];
 extern constext txt_opt_alternative_handling[];
 extern constext txt_opt_art_marked_deleted[];
 extern constext txt_opt_art_marked_inrange[];
@@ -823,6 +836,7 @@ extern constext txt_opt_signature_repost[];
 extern constext txt_opt_sigfile[];
 extern constext txt_opt_sort_art_type[];
 extern constext txt_opt_space_goto_next_unread[];
+extern constext txt_opt_pgdn_goto_next[];
 extern constext txt_opt_start_editor_offset[];
 extern constext txt_opt_strip_blanks[];
 extern constext txt_opt_strip_bogus[];
@@ -950,6 +964,7 @@ extern constext txt_thread_saved_to_many[];
 extern constext txt_thread_x_of_n[];
 extern constext txt_threading_arts[];
 extern constext txt_time_default_days[];
+extern constext txt_tinrc_add_posted_to_filter[];
 extern constext txt_tinrc_alternative_handling[];
 extern constext txt_tinrc_art_marked_deleted[];
 extern constext txt_tinrc_art_marked_inrange[];
@@ -1020,6 +1035,7 @@ extern constext txt_tinrc_sigdashes[];
 extern constext txt_tinrc_signature_repost[];
 extern constext txt_tinrc_sort_article_type[];
 extern constext txt_tinrc_space_goto_next_unread[];
+extern constext txt_tinrc_pgdn_goto_next[];
 extern constext txt_tinrc_start_editor_offset[];
 extern constext txt_tinrc_strip_blanks[];
 extern constext txt_tinrc_strip_bogus[];
@@ -1162,6 +1178,7 @@ extern struct t_newnews *newnews;
 extern struct t_option option_table[];
 extern struct t_posted *posted;
 extern struct t_save *save;
+extern t_bool add_posted_to_filter;
 extern t_bool advertising;
 extern t_bool alternative_handling;
 extern t_bool auto_bcc;
@@ -1228,6 +1245,7 @@ extern t_bool show_xcommentto;
 extern t_bool sigdashes;
 extern t_bool signature_repost;
 extern t_bool space_goto_next_unread;
+extern t_bool pgdn_goto_next;
 extern t_bool start_any_unread;
 extern t_bool start_editor_offset;
 extern t_bool strip_blanks;

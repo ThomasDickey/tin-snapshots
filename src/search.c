@@ -361,7 +361,7 @@ search_subject_group (
 
 	/* Otherwise update the on-screen pointer */
 	move_to_thread(i);
-
+	clear_message();
 	return(-1);				/* No furthur action needed in group.c */
 }
 
@@ -558,10 +558,10 @@ search_body (
 		if (i < 0)
 			i = base[0];
 
-		sprintf(msg, txt_searching_body, ++j, art_cnt);
-
 		if (group->attribute->show_only_unread && arts[i].status == ART_READ)
 			continue;
+
+		sprintf(msg, txt_searching_body, ++j, art_cnt);
 
 		switch (search_art_body (group_path, &arts[i], pat)) {
 			case TRUE:					/* Found it okay */

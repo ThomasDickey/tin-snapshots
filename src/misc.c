@@ -294,6 +294,7 @@ invoke_ispell (
 
 	wait_message (0, "%s %s", ispell, nam);
 
+	sprintf(buf,"%s %s",ispell,nam);
 	return invoke_cmd (buf);
 }
 #endif
@@ -393,18 +394,22 @@ tin_done (
 
 	free_all_arrays ();
 #ifdef SIGUSR1
-	if (ret != - SIGUSR1) {
+	if (ret != -SIGUSR1) {
 #endif
-		if (!cmd_line)
-			ClearScreen ();
 #ifdef HAVE_COLOR
 		use_color=FALSE;
 		EndInverse();
-		ClearScreen();
+#else
+		if (!cmd_line)
 #endif
+		{
+			if (!ret)
+				ClearScreen ();
+		}
 		EndWin ();
 		Raw (FALSE);
 #ifdef SIGUSR1
+	} else {
 		ret = SIGUSR1;
 	}
 #endif
@@ -599,7 +604,7 @@ rename_file (
 	char buf[1024];
 
 	unlink (new_filename);
-	if (rename (old_filename, new_filename)==EOF)
+	if (rename (old_filename, new_filename) == EOF)
 		perror_message (txt_rename_error, old_filename, new_filename);
 
 	return;
@@ -2400,8 +2405,8 @@ int
 peek_char (
 	FILE *fp)
 {
-	int c=fgetc(fp);
-	if (c!=EOF)
+	int c = fgetc(fp);
+	if (c != EOF)
 		ungetc(c, fp);
 	return c;
 }

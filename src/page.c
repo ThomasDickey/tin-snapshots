@@ -318,11 +318,12 @@ page_down:
 				if (!space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
 						if (note_end) {
-							art_close();
-#if 0	/* set to 1 if you like pgdn to stop going to next article */
-							doing_pgdn = FALSE;
-							break;
-#endif
+							if (pgdn_goto_next)
+								art_close();
+							else {
+								doing_pgdn = FALSE;
+								break;
+							}
 						} else {
 							doing_pgdn = TRUE;
 							show_note_page (group->name, respnum);
@@ -939,7 +940,7 @@ print_a_line:
 		if (in_headers 
 			 && ( (!display_mime_header_asis && !show_all_headers) 
 					|| (!display_mime_allheader_asis && show_all_headers) ) )  {
-			/* check if it's  a continuation header line */
+			/* check if it's a continuation header line */
 			if ( buf2[0] != ' ' && buf2[0] != '\t' ) {
 				char header_name[80];
 				size_t header_name_len;

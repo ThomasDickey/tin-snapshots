@@ -119,6 +119,9 @@ static const struct {
 #ifdef SIGUSR1
 	{ SIGUSR1,	"SIGUSR1" },	/* User-defined signal 1 */
 #endif
+#ifdef SIGTERM
+	{ SIGTERM,	"SIGTERM" },	/* termination */
+#endif
 #ifdef SIGWINCH
 	{ SIGWINCH,	"SIGWINCH" },	/* window-size change */
 #endif
@@ -186,9 +189,9 @@ handle_resize (int repaint)
 #endif
 
 	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
-	    	ring_bell ();
-	    	wait_message(3, txt_screen_too_small_exiting);
-	    	tin_done (EXIT_ERROR);
+		ring_bell ();
+		wait_message(3, txt_screen_too_small_exiting);
+		tin_done (EXIT_ERROR);
 	}
 
 	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
@@ -323,6 +326,10 @@ void _CDECL signal_handler (int sig)
 	if (sig == SIGUSR1)
 		tin_done (- SIGUSR1);
 #endif
+#if defined(SIGTERM)
+	if (sig == SIGTERM)
+		tin_done (- SIGTERM);
+#endif
 #if defined(SIGBUS) || defined(SIGSEGV)
 	if (
 #	ifdef SIGBUS
@@ -340,7 +347,8 @@ void _CDECL signal_handler (int sig)
 #endif
 	cleanup_tmp_files ();
 
-#if defined(apollo) || defined(HAVE_COREFILE)
+#if 1
+/* #if defined(apollo) || defined(HAVE_COREFILE) */
 	/* do this so we can get a traceback (doesn't dump core) */
 	abort();
 #else

@@ -136,9 +136,7 @@ extern void free_all_filter_arrays (void);
 #ifndef INDEX_DAEMON
 	extern int read_filter_file (char *file, t_bool global_file);
 #endif /* INDEX_DAEMON */
-#if 0 /* this sucks! (urs) */
-	extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
-#endif /* 0 */
+extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
 
 /* getline.c */
 extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
@@ -427,6 +425,7 @@ extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 
 /* read.c */
+extern char *fgets_hdr (char *s, int size, FILE *f);
 extern char *tin_fgets (char *buffer, size_t len, FILE *fp);
 extern void drain_buffer (FILE *fp);
 

@@ -1,21 +1,21 @@
-MANIFEST for tin-pre-1.4-971106 (Wed Nov  5 22:34:20 CET 1997)
+MANIFEST for tin-pre-1.4-971123 (Sun Nov 23 14:19:43 CET 1997)
 ----------------------------------------------------
-   6686 ./Makefile
-   2870 ./MANIFEST
-   1404 ./README
-  41915 ./aclocal.m4
+   7379 ./Makefile
+   3418 ./MANIFEST
+   1197 ./README
+  42002 ./aclocal.m4
   20446 ./config.guess
   19236 ./config.sub
- 187846 ./configure
-  16305 ./configure.in
+ 185879 ./configure
+  16325 ./configure.in
    4765 ./install.sh
     650 ./mkdirs.sh
   11664 ./makefile.in
     964 ./conf-tin
- 103300 ./doc/CHANGES
+ 105304 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
   16483 ./doc/INSTALL
-  15734 ./doc/TODO
+  15797 ./doc/TODO
    1638 ./doc/WHATSNEW
   12686 ./doc/auth.txt
    6172 ./doc/filtering
@@ -27,74 +27,74 @@ MANIFEST for tin-pre-1.4-971106 (Wed Nov  5 22:34:20 CET 1997)
    1661 ./tools/expand_aliases.tgz
    1043 ./include/bugrep.h
    8454 ./include/config.h
-  51958 ./include/extern.h
+  52516 ./include/extern.h
   13280 ./include/menukeys.h
     718 ./include/msmail.h
    5089 ./include/nntplib.h
    2233 ./include/os_2.h
-  24178 ./include/proto.h
+  24185 ./include/proto.h
    2388 ./include/stpwatch.h
    1933 ./include/tcurses.h
-  49512 ./include/tin.h
+  49369 ./include/tin.h
    2734 ./include/tnntp.h
     873 ./include/trace.h
     920 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  18482 ./src/active.c
+  18648 ./src/active.c
    9812 ./src/actived.c
   37847 ./src/art.c
   23432 ./src/attrib.c
-   9728 ./src/auth.c
+   9718 ./src/auth.c
    8946 ./src/charset.c
    7760 ./src/color.c
-  55567 ./src/config.c
+  55879 ./src/config.c
   21312 ./src/curses.c
-  12178 ./src/debug.c
+  12188 ./src/debug.c
    2300 ./src/envarg.c
-  19121 ./src/feed.c
-  38046 ./src/filter.c
+  19120 ./src/feed.c
+  44900 ./src/filter.c
   11249 ./src/getline.c
-  41498 ./src/group.c
+  42471 ./src/group.c
    2997 ./src/hashstr.c
-   7195 ./src/header.c
+   7189 ./src/header.c
   10226 ./src/help.c
    6657 ./src/inews.c
-  35910 ./src/init.c
-    962 ./src/joinpath.c
-  81387 ./src/lang.c
+  36327 ./src/init.c
+    960 ./src/joinpath.c
+  81995 ./src/lang.c
    3778 ./src/list.c
   10109 ./src/mail.c
   21745 ./src/main.c
    8656 ./src/makecfg.c
    8390 ./src/memory.c
-  51002 ./src/misc.c
+  51062 ./src/misc.c
    7228 ./src/msmail.c
-  34273 ./src/newsrc.c
-  22160 ./src/nntplib.c
+  34269 ./src/newsrc.c
+  22173 ./src/nntplib.c
   31268 ./src/nntpw32.c
    4405 ./src/nntpvms.c
    6326 ./src/nrctbl.c
-  22151 ./src/open.c
+  22328 ./src/open.c
    6272 ./src/os_2.c
-  39258 ./src/page.c
+  39235 ./src/page.c
   24083 ./src/parsdate.y
    6353 ./src/pgp.c
-  90404 ./src/post.c
+  90151 ./src/post.c
   10702 ./src/prompt.c
-   6119 ./src/read.c
-  23162 ./src/refs.c
-   3013 ./src/regex.c
-  11289 ./src/rfc1521.c
+   7273 ./src/read.c
+  23485 ./src/refs.c
+   1817 ./src/regex.c
+  11777 ./src/rfc1521.c
   22306 ./src/rfc1522.c
   33154 ./src/save.c
    7347 ./src/screen.c
-  11531 ./src/search.c
-  34860 ./src/select.c
+  11548 ./src/search.c
+  34853 ./src/select.c
    5680 ./src/sigfile.c
-   9607 ./src/signal.c
+   9745 ./src/signal.c
    5681 ./src/strftime.c
-   7422 ./src/string.c
+   7423 ./src/string.c
    5794 ./src/tcurses.c
   27467 ./src/thread.c
     971 ./src/trace.c
@@ -111,9 +111,31 @@ MANIFEST for tin-pre-1.4-971106 (Wed Nov  5 22:34:20 CET 1997)
    6373 ./amiga/amigatcp.c
    2336 ./amiga/amiga.h
    2167 ./amiga/amigatcp.h
-   8718 ./include/autoconf.hin
-  12220 ./src/Makefile.in
+   6872 ./pcre/ChangeLog
+   2007 ./pcre/Makefile
+   7165 ./pcre/Performance
+  10254 ./pcre/README
+   7401 ./pcre/Tech.Notes
+   2379 ./pcre/pgrep.1
+  45318 ./pcre/pcre.3
+   5063 ./pcre/pcreposix.3
+   4557 ./pcre/maketables.c
+  99029 ./pcre/pcre.c
+   7546 ./pcre/pcreposix.c
+   4750 ./pcre/pgrep.c
+   8949 ./pcre/study.c
+  10766 ./pcre/internal.h
+   1584 ./pcre/pcre.h
+   2039 ./pcre/pcreposix.h
+  19266 ./pcre/pcretest.c
+   2988 ./pcre/perltest
+  46057 ./pcre/testinput
+   3509 ./pcre/testinput2
+  54238 ./pcre/testoutput
+  11547 ./pcre/testoutput2
+   8772 ./include/autoconf.hin
+  12544 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   4244 ./src/tincfg.tbl
-1984359 total
+   4276 ./src/tincfg.tbl
+2359925 total
