@@ -425,7 +425,7 @@ backup_active (create)
 			fprintf (fp, "%s\n", active[i].name);
 		}
 		fclose (fp);
-		chmod (buf, 0644);
+		chmod (buf, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
 	}
 }
 #endif

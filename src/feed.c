@@ -200,7 +200,7 @@ feed_articles (function, level, group, respnum)
 			}
 
 			got_sig_pipe = FALSE;
-			if ((fp = popen (command, "w")) == NULL) {
+			if ((fp = popen (command, "w")) == (FILE *) 0) {
 				perror_message (txt_command_failed_s, command);
 				return;
 			}
@@ -695,9 +695,9 @@ print_file (command, respnum, count)
 
 #ifdef DONT_HAVE_PIPING
     sprintf(file, TIN_PRINTFILE, respnum);
-	if ((fp = (FILE *) fopen(file,"w")) == NULL) {
+	if ((fp = fopen(file,"w")) == (FILE *) 0) {
 #else
-	if ((fp = popen (command, "w")) == NULL) {
+	if ((fp = popen (command, "w")) == (FILE *) 0) {
 #endif
 		perror_message (txt_command_failed_s, command);
 		return FALSE;

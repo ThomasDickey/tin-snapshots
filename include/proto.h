@@ -275,7 +275,7 @@ extern int my_stricmp P_((/* const */ char *p, /* const */ char *q));
 extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
 #endif
 extern char *eat_re P_((char *s));
-extern void my_strncpy P_((char *p, const char *q, int n));
+extern void my_strncpy P_((char *p, /* const */ char *q, int n));
 extern int untag_all_articles P_((void));
 #ifndef HAVE_STRSTR
 extern char *my_strstr P_((char *text, char *pattern));

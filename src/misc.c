@@ -33,7 +33,7 @@ tin_itoa (value, digits)
 	int i=0;
 
 	sprintf (buffer, "%d", value);
-	len = strlen (buffer);
+	len = (int) strlen (buffer);
 
 	while (len > digits) {
 		len-=3;
@@ -1348,16 +1348,11 @@ hash_s (s)
  *  strncpy that stops at a newline and null terminates
  */
 
-#if __STDC__
-void
-my_strncpy (char *p, const char *q, int n)
-#else
 void
 my_strncpy (p, q, n)
-	char	*p;
-	char	*q;
-	int	n;
-#endif /* __STDC__ */
+	char *p;
+	/* const */ char *q;
+	int n;		/* we should use size_t instead of int */
 {
 	while (n--) {
 		if (!*q || *q == '\n')
@@ -1681,7 +1676,7 @@ create_index_lock_file (the_lock_file)
 		time (&epoch);
 		fprintf (fp, "%6d  %s\n", process_id, ctime (&epoch));
 		fclose (fp);
-		chmod (the_lock_file, 0600);
+		chmod (the_lock_file, (S_IRUSR|S_IWUSR));
 	}
 }
 
@@ -2428,8 +2423,8 @@ stat_file (file)
 void
 vPrintBugAddress ()
 {
-	fprintf (stderr, "%s %s [%s]: send a DETAILED bug report to %s%s\n",
-		progname, VERSION, OS, BUG_REPORT_ADDRESS, add_addr);
+	fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s%s\n",
+		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS, add_addr);
 	fflush (stderr);
 }
 

@@ -1527,6 +1527,30 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define S_ISREG(m)   (((m) & S_IFMT) == S_IFREG)
 #endif
 
+#ifndef S_IRWXU /* should be defined in <sys/stat.h> */
+#	define S_IRWXU	0000700	/* read, write, execute permission (owner) */
+#	define S_IRUSR	0000400	/* read permission (owner) */
+#	define S_IWUSR	0000200	/* write permission (owner) */
+#	define S_IXUSR	0000100	/* execute permission (owner) */
+
+#	define S_IRWXG	0000070	/* read, write, execute permission (group) */
+#	define S_IRGRP	0000040	/* read permission (group) */
+#	define S_IWGRP	0000020	/* write permission (group) */
+#	define S_IXGRP	0000010	/* execute permission (group) */
+
+#	define S_IRWXO	0000007	/* read, write, execute permission (other) */
+#	define S_IROTH	0000004	/* read permission (other) */
+#	define S_IWOTH	0000002	/* write permission (other) */
+#	define S_IXOTH	0000001	/* execute permission (other) */
+#endif /* S_IRWXU */
+
+#ifndef S_IRWXUGO
+#	define S_IRWXUGO	(S_IRWXU|S_IRWXG|S_IRWXO)	/* read, write, execute permission (all) */
+#	define S_IRUGO	(S_IRUSR|S_IRGRP|S_IROTH)	/* read permission (all) */
+#	define S_IWUGO	(S_IWUSR|S_IWGRP|S_IWOTH)	/* write permission (all) */
+#	define S_IXUGO	(S_IXUSR|S_IXGRP|S_IXOTH)	/* execute permission (all) */
+#endif /* S_IRWXUGO */
+
 #ifdef DONT_HAVE_PIPING
 #	ifdef VMS
 #		define TIN_PRINTFILE "Sys$Scratch:TIN_PRINT%d.TMP"

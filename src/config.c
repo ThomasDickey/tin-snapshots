@@ -930,7 +930,7 @@ write_config_file (file)
 		return;
 	} else {
 		rename_file (file_tmp, file);
-		chmod (file, 0600);
+		chmod (file, (S_IRUSR|S_IWUSR));
 		/* free memory for tmp-filename */
 		free (file_tmp);
 	}

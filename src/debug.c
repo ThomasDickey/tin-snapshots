@@ -69,7 +69,7 @@ debug_nntp (func, line)
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 		fprintf (fp,"%s: %s\n", func, line);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -152,7 +152,7 @@ debug_print_header (s)
 */
 		fflush (fp);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -196,7 +196,7 @@ debug_save_comp ()
 		}
 		fflush (fp);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -218,7 +218,7 @@ debug_print_comment (comment)
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
 		fprintf (fp,"\n%s\n", comment);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -243,7 +243,7 @@ debug_print_base ()
 		}
 		fflush (fp);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -280,7 +280,7 @@ debug_print_active ()
 			debug_print_attributes (group->attribute, fp);
 		}
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -358,7 +358,7 @@ debug_print_bitmap (group, art)
 		}
 		debug_print_newsrc (&group->newsrc, fp);
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 #endif
 }
@@ -418,7 +418,7 @@ vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 					pcFile, iLine, (long)iSize, iTotal);
 			}
 			fclose (fp);
-			chmod (file, 0666);
+			chmod (file, (S_IRUGO|S_IWUGO));
 		}
 	}
 #endif
@@ -490,7 +490,7 @@ debug_print_filters ()
  			}
  		}
 		fclose (fp);
-		chmod (file, 0666);
+		chmod (file, (S_IRUGO|S_IWUGO));
  	}
 #endif
 }

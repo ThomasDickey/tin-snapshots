@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961210 (Tue Dec 10 07:02:55 MET 1996)
 ----------------------------------------------------
-  51618 ./CHANGES
-  12600 ./TODO
+  51759 ./CHANGES
+  12666 ./TODO
    5341 ./Makefile
   17122 ./INSTALL
    2260 ./MANIFEST
@@ -25,26 +25,26 @@ MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
-  29576 ./include/proto.h
+  29582 ./include/proto.h
    1376 ./include/stpwatch.h
-  42511 ./include/tin.h
+  43659 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  19491 ./src/active.c
+  19520 ./src/active.c
    8119 ./src/actived.c
   13003 ./src/amiga.c
    4429 ./src/amigatcp.c
-  37834 ./src/art.c
-  23852 ./src/attrib.c
+  37866 ./src/art.c
+  23865 ./src/attrib.c
    8460 ./src/charset.c
    1548 ./src/color.c
-  56823 ./src/config.c
+  56836 ./src/config.c
   20285 ./src/curses.c
-  12284 ./src/debug.c
+  12401 ./src/debug.c
    2278 ./src/envarg.c
-  19301 ./src/feed.c
-  39895 ./src/filter.c
+  19310 ./src/feed.c
+  39908 ./src/filter.c
   10935 ./src/getline.c
   41462 ./src/group.c
    3202 ./src/hashstr.c
@@ -57,7 +57,7 @@ MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
   17820 ./src/main.c
    5124 ./src/makecfg.c
   10990 ./src/memory.c
-  48322 ./src/misc.c
+  48323 ./src/misc.c
    7228 ./src/msmail.c
   33311 ./src/newsrc.c
   26408 ./src/nntplib.c
@@ -68,7 +68,7 @@ MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
   35747 ./src/page.c
   24090 ./src/parsdate.y
    6524 ./src/pgp.c
-  75716 ./src/post.c
+  75826 ./src/post.c
    9044 ./src/prompt.c
     160 ./src/proto.sed
   22467 ./src/refs.c
@@ -78,7 +78,7 @@ MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
    4573 ./src/screen.c
   10148 ./src/search.c
   35478 ./src/select.c
-   5731 ./src/sigfile.c
+   5667 ./src/sigfile.c
   12442 ./src/signal.c
    5772 ./src/strftime.c
   26206 ./src/thread.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-961208 (Mon Dec  9 00:58:32 MET 1996)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1593170 insgesamt
+1594804 insgesamt
