@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION 	"1.4.5"
-#	define RELEASEDATE	"20001121"
-#	define RELEASENAME	"Vet for the Insane"
+#	define RELEASEDATE	"20010409"
+#	define RELEASENAME	"One More Nightmare"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA

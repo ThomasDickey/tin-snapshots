@@ -893,7 +893,7 @@ Warning: You are using a non-plain transfer encoding (such as base64 or\n\
 constext txt_warn_update[] = "\n\nYou are upgrading to tin %s from an earlier version.\n\
 Some values in your configuration file have changed!\nRead WHATSNEW, etc...\n";
 
-constext txt_warn_newsrc[] = "Warning: tin wrote less groups to your %s\n\
+constext txt_warn_newsrc[] = "Warning: tin wrote fewer groups to your %s\n\
 than it read at startup. If you didn't unsubscribe from %ld group%s during\n\
 this session this indicates an error and you should backup your %s\n\
 before you start tin once again!\n";
