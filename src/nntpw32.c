@@ -11,7 +11,7 @@
  *              monetary  profit  gained  specifically  from the use or
  *              reproduction or this software, it is not  sold, rented,
  *              traded or otherwise marketed, and this copyright notice
- *              is included prominently in any copy made. 
+ *              is included prominently in any copy made.
  */
 
 #include "tin.h"
@@ -69,7 +69,7 @@ void DebugAssertDialog(LPSTR, DWORD, LPSTR);
  *	Side effects:	None.
  */
 
-int 
+int
 handle_server_response (response, nntpserver)
 	int	response;
 	char	*nntpserver;
@@ -305,7 +305,7 @@ nntp_respcode (respcode)
 }
 
 
-int	
+int
 nntp_message (respcode)
 	int respcode;
 {
@@ -400,7 +400,7 @@ int nntp_wr_fp = 0;
  *			for reading and writing to server.
  */
 
-int 
+int
 server_init (machine, service, port)
 	char	*machine;
 	char	*service;
@@ -445,7 +445,7 @@ server_init (machine, service, port)
  *	Errors:		Printed via perror.
  */
 
-int 
+int
 get_tcp_socket (machine, service, port)
 	char	*machine;	/* remote host */
 	char	*service;	/* nttp/smtp etc. */
@@ -470,7 +470,7 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 	/* If not a raw ip address, try nameserver */
-	if (!isdigit(*machine) || 
+	if (!isdigit(*machine) ||
 	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
@@ -517,7 +517,7 @@ get_tcp_socket (machine, service, port)
 			return (-1);
 		}
 		memcpy((char *) &sin.sin_addr, *cp, hp->h_length);
-		
+
 		if (x < 0) {
 			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sin.sin_addr));
 		}
@@ -566,7 +566,7 @@ get_tcp_socket (machine, service, port)
  * u_put_server -- send data to the server. Do not flush output.
  */
 
-void 
+void
 u_put_server (string)
 	char *string;
 {
@@ -594,7 +594,7 @@ u_put_server (string)
  *			fflush.
  */
 
-void 
+void
 put_server (string)
 	char *string;
 {
@@ -694,7 +694,7 @@ static int read_from_server (LPSTR nntp_line, DWORD length)
  *			Reopens connection when necessary and requested.
  */
 
-int 
+int
 get_server (string, size)
 	char	*string;
 	int	size;
@@ -742,7 +742,7 @@ get_server (string, size)
  *			after this routine is called.
  */
 
-void 
+void
 close_server ()
 {
 #ifdef NNTP_ABLE
@@ -869,7 +869,7 @@ static void real_put_server (LPCSTR plpvMessage, int fCRLF)
 /*
  * u_put_server -- send data to the server. Do not flush output.
  */
-_inline void 
+_inline void
 u_put_server (string)
 	char *string;
 {
@@ -1027,7 +1027,7 @@ void real_put_server (LPCSTR plpvMessage, int fCRLF)
 	length = (unsigned) strlen(plpvMessage);
 	packet = 0;
 
-	if(length - packet) 
+	if(length - packet)
 		{
 		cbWritten = netsend(LANA, LSN, (char *) plpvMessage + packet, length - packet);
 		assert(cbWritten!=-1);
@@ -1142,7 +1142,7 @@ int get_server (LPSTR nntp_line, DWORD length)
 	return (strlen (nntp_line));
 	}
 
-int	netaddname(unsigned lana, char *lname) 
+int	netaddname(unsigned lana, char *lname)
 	{
 	struct _NCB ncb={0};
 
@@ -1171,17 +1171,17 @@ int	netaddname(unsigned lana, char *lname)
  *                      all is ok, else -1 on error.
  */
 
-int	get_connection(unsigned *lana, char *machine) 
+int	get_connection(unsigned *lana, char *machine)
 	{
 	int s;
 
-	if((s = checknet()) < 0) 
+	if((s = checknet()) < 0)
 		{
 		netperror("Net not found");
 		}
 	else
 		{
-		if((s = netconnect(lana, machine, "nntp")) < 0) 
+		if((s = netconnect(lana, machine, "nntp")) < 0)
 			{
 			netperror("Trouble connecting");
 			}
@@ -1189,7 +1189,7 @@ int	get_connection(unsigned *lana, char *machine)
 	return s;
 	}
 
-void nethangup(unsigned lana, int lsn) 
+void nethangup(unsigned lana, int lsn)
 	{
 	struct _NCB ncb={0};
 
@@ -1200,22 +1200,22 @@ void nethangup(unsigned lana, int lsn)
 	passncb(&ncb);
 	}
 
-unsigned char netcall(unsigned lana, char *lname, char *rname) 
+unsigned char netcall(unsigned lana, char *lname, char *rname)
 	{
 	struct _NCB ncb={0};
 
-	if(lname == NULL) 
+	if(lname == NULL)
 		{
 	    /* use permanent node name */
-		if(netpname(lana, ncb.ncb_name) < 0) 
+		if(netpname(lana, ncb.ncb_name) < 0)
 			{
 			return 0;
 			}
 		}
-	else 
+	else
 		{
-		if ((netaddname(lana, lname) < 0) && 
-			(neterrno != NRC_DUPNAME)) 
+		if ((netaddname(lana, lname) < 0) &&
+			(neterrno != NRC_DUPNAME))
 			{
 			return 0;
 			}
@@ -1237,7 +1237,7 @@ unsigned char netcall(unsigned lana, char *lname, char *rname)
 	return rc;
 	}
 
-int	netconnect(unsigned *lana, char *rname, char *service) 
+int	netconnect(unsigned *lana, char *rname, char *service)
 	{
 	char    callname[NCBNAMSZ];
 	unsigned lsn=0;
@@ -1246,7 +1246,7 @@ int	netconnect(unsigned *lana, char *rname, char *service)
 	LANA_ENUM lenum={0};
 
 	/* find the valid lana numbers for the network */
-	if (netlana(&lenum)==0) 
+	if (netlana(&lenum)==0)
 		{
 		perror("No adapters found");
 		return -1;
@@ -1257,7 +1257,7 @@ int	netconnect(unsigned *lana, char *rname, char *service)
 	strcat(callname, ".srv");
 
 	// Try to connect to the service using the valid lana numbers
-	for (i=0; i < lenum.length; i++) 
+	for (i=0; i < lenum.length; i++)
 		{
 		if ((resetnet(lenum.lana[i])!=-1) && ((lsn = netcall(lenum.lana[i], NULL, callname)) != (unsigned char) 0))
 			break;
@@ -1276,11 +1276,11 @@ int	netconnect(unsigned *lana, char *rname, char *service)
 		}
 
 	/* tell the server daemon what service we want */
-	if(netsend(*lana, lsn, service, strlen(service) + 1) != -1) 
+	if(netsend(*lana, lsn, service, strlen(service) + 1) != -1)
 		{
-		if(netreceive(*lana, lsn, callname, 1) != -1) 
+		if(netreceive(*lana, lsn, callname, 1) != -1)
 			{
-			if(*callname == ACK_CHAR) 
+			if(*callname == ACK_CHAR)
 				{
 				return lsn;
 				}
@@ -1294,7 +1294,7 @@ int	netconnect(unsigned *lana, char *rname, char *service)
 	return -1;
 	}
 
-int netpname(unsigned lana, char *pname) 
+int netpname(unsigned lana, char *pname)
 	{
 	ADAPTER_STATUS stats={0};
 	struct _NCB ncb={0};
@@ -1309,7 +1309,7 @@ int netpname(unsigned lana, char *pname)
 
 	if(passncb(&ncb) < 0)
 		rc = -1;
-	else 
+	else
 		{
 		memset(pname, '\0', 10);
 		memcpy(pname + 10, stats.adapter_address, 6);
@@ -1323,7 +1323,7 @@ int netpname(unsigned lana, char *pname)
 ** This function needs to calculate the 'real' number of bytes returned
 ** into the buffer.
 */
-int	netreceive(unsigned lana, int lsn, char *data, unsigned nbytes) 
+int	netreceive(unsigned lana, int lsn, char *data, unsigned nbytes)
 	{
 	struct _NCB ncb = {0};
 	char buffer[PACKET_SIZE + 1]={0};
@@ -1343,12 +1343,12 @@ int	netreceive(unsigned lana, int lsn, char *data, unsigned nbytes)
 		rc = -1;
 	else
 		{
-		if (nbytes==1) 
+		if (nbytes==1)
 			{
 			rc = 1;
 			*data = *buffer;
 			}
-		else 
+		else
 			{
 			rc = strlen(buffer);
 			memcpy(data, buffer, rc);
@@ -1358,12 +1358,12 @@ int	netreceive(unsigned lana, int lsn, char *data, unsigned nbytes)
 	return rc;
 	}
 
-int	netsend(unsigned lana, int lsn, char *data, unsigned nbytes) 
+int	netsend(unsigned lana, int lsn, char *data, unsigned nbytes)
 	{
 	struct _NCB ncb={0};
 	char buffer[PACKET_SIZE + 1];
 
-	if(nbytes == 0) 
+	if(nbytes == 0)
 		{
 		neterrno = NRC_BUFLEN;
 		return -1;
@@ -1390,7 +1390,7 @@ int	netsend(unsigned lana, int lsn, char *data, unsigned nbytes)
 	return rc;
 	}
 
-int	checknet(void) 
+int	checknet(void)
 	{
 	struct _NCB ncb={0};
 
@@ -1429,7 +1429,7 @@ int	resetnet(unsigned lana)
 	return rc;
 	}
 
-int	netlana(LANA_ENUM *plenum) 
+int	netlana(LANA_ENUM *plenum)
 	{
 	struct _NCB ncb={0};
 
@@ -1454,7 +1454,7 @@ int	netlana(LANA_ENUM *plenum)
 
 #pragma optimize("a", on)
 #pragma optimize("gw", off)
-int passncb(PNCB ncb) 
+int passncb(PNCB ncb)
 	{
 	if (ncb->ncb_command & ASYNCH)
 		{
@@ -1471,7 +1471,7 @@ int passncb(PNCB ncb)
 
 		CloseHandle(ncb->ncb_event);
 		}
-	else 
+	else
 		{
 		neterrno = Netbios(ncb);
 		}
@@ -1485,7 +1485,7 @@ int passncb(PNCB ncb)
 #pragma optimize("a", off)
 
 void
-netperror(char *wintitle) 
+netperror(char *wintitle)
 	{
 	fprintf(stderr, "%s (NetBIOS code 0x%x)\n", wintitle, neterrno);
 	neterrno = 0;

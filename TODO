@@ -1,9 +1,5 @@
 Bugs
 ----
-o  TeX2ISO is buggy - (toggeling is broken)
-
-o  keep_posted_articles 'suddenly' stopped working :(
-
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
 
@@ -15,7 +11,7 @@ o  if reading news from a local spool with xover support tin assumes that he
 o  tin assumes that overview-files are named ".overview" - that's not always
    true -> use "overview", "ov", ... as fall-back names.
 
-o  tins killfile editor does not quote brackets, stars and question marks
+o  tins kill-file editor does not quote brackets, stars and question marks
    in the subject - this leads to unexpected results cause they are
    treated as wildcards
 
@@ -67,7 +63,7 @@ o  tin does not warn you if you try to save into a directory and not into
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
 
-o  When tagging/autoselecting files to be saved and decoded, if a tagged
+o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
    expired...), it is untouched, and remains marked as unread.
 
@@ -89,6 +85,8 @@ o  rereading the active file is buggy, it causes crashes on some machines and
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
+o  looks like Keywords & Summary in attributes/x_headers are ignored :(
+
 o  when changing the window size while in options menu, the article/group/
    thread overview will be displayed (depends from where you entered the
    options menu), but you are still in the options menu. Probably, the
@@ -97,6 +95,8 @@ o  when changing the window size while in options menu, the article/group/
 
 New features
 ------------
+o  add rfc1468/1922 support
+
 o  add a weed-out list like in elm so the user could specify which headers
    he'd like to see and which not (attrib.c)
 
@@ -114,10 +114,6 @@ o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
 
 o  split tin.h/proto.h for better dependencies in make
-
-o  rename several general key definitions
-   (f.e. why use iKey'module'Quit when Quit is always the same key
-    use iKeyQuit instead...)
 
 o  join Makefile and makefile
 
@@ -150,7 +146,7 @@ o  sender-patch
    (for canceling articles never look at the Sender:-line, always look at
    the From:-line)
 
-o  add counter to postprocessing commands (processing file x of y)
+o  add counter to post-processing commands (processing file x of y)
 
 o  add feature show_new_newsgroups_since
 
@@ -169,9 +165,6 @@ o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the
    newsgroups-line (N/y)
 
-o  Make the options menu multi-page more dynamically add more
-   configurable variables (use color, ...)
-
 o  bring up a warning on a long newsgroup/followup line (>=5 groups) and
    force the user to confirm every single group he wants to post in.
    (N/y)
@@ -189,27 +182,31 @@ o  when posting to a group which name has a uppercase-letter: bring up a
 
 Docs/online help
 ----------------
-
 o  man page is well out of date and is buggy. Rewrite.
 
 o  toggle behavior of 't'ag is not mentioned in the man-page
 
-o  show a warning at startup if news-server is read-only
-   print a message at startup if server doesn't grok XOVER
+o  print a message at startup if server doesn't grok XOVER
 
 o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
-o  looks like, that while beeing connected to a server, new newsgroups are
-   not recogniced and that tin writes a timestamp of the last time it read
+o  Don't put anything else than [-g] -O to CFLAGS (f.e. -DSYMBOL), put all
+   definitions to autoconf.h[in] (to be able to override CFLAGS in make calls
+   without overriding -DSYMBOLS)
+
+o  move all strings to lang.c
+
+o  looks like, that while being connected to a server, new newsgroups are
+   not recognized and that tin writes a timestamp of the last time it read
    the active-file (not connection time?), so it is possible that you never
    see some new newsgroups. (not, sure about that, could have been a fault
-   with the test-newsserver)
+   with the test-news-server)
 
 o  select range and process selected range seems not to work
 
-o  marking a thread as unread using 'Z' and then tabbing throug the unread
+o  marking a thread as unread using 'Z' and then tabbing through the unread
    articles will not catch the art_will_return marked articles - bug or
    feature?
 
@@ -233,7 +230,7 @@ o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and
    losing all references to the moved groups)
 
-o  sometimes (when using tins kill-menue) kill-file entries are
+o  sometimes (when using tins kill-menu) kill-file entries are
    duplicated/get lost or messed up
 
 o  killing articles with Lines: 0 does not work
@@ -258,7 +255,7 @@ o  if exiting tin with
 o  when last articles in a newsgroup were canceled, it shows that there are
    new articles in that group, even if entered that group in a session before
 
-o  article save with Archive-name: doesn't not work correctly
+o  article save with auto_save=ON & Archive-name: doesn't not work correctly
 
 o  shows up cross-postings multiple times even if read once before getting
    a resync/reread active/newsrc-file
@@ -327,7 +324,7 @@ o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
 o  fix kill/hot mechanism so that it is possible do kill articles with
    "X-*" headers (X-Mailer: Bazilla 47.11 etc.)
 
-o  add kill mechanism on Newsgrops:-line (f.e.: in junk I only want to see
+o  add kill mechanism on Newsgroups:-line (f.e.: in junk I only want to see
    all those articles which are not! posted to junk)
    group=junk
    type=0

@@ -61,7 +61,7 @@ select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exeptfds,
 }
 #endif
 #ifndef inet_ntoa
-char *inet_ntoa(struct in_addr addr) 
+char *inet_ntoa(struct in_addr addr)
 {
   return Inet_NtoA(addr.s_addr);
 }

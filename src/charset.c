@@ -149,7 +149,8 @@ ConvertIso2Asc (iso, asc, t)
 	i = a = 0;
 	while (*iso != '\0') {
 		if (*EIGHT_BIT(iso) >= ISO_EXTRA) {
-			p = tab[*EIGHT_BIT(iso)]; iso++, i++;
+			p = tab[*EIGHT_BIT(iso)];
+			iso++, i++;
 			first = 1;
 			while (*p) {
 				*(asc++) = *(p++);

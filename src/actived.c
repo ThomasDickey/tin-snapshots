@@ -48,15 +48,15 @@ struct	passwd sPwd;
 
 #ifdef ACTIVE_DAEMON
 
-void
+int
 main (iNumArgs, pacArgs)
 	int	iNumArgs;
 	char	*pacArgs[];
 {
 	char	acGrpPath[PATH_LEN];
-	
+
 	vInitVariables ();
-	
+
 	vReadCmdLineOptions (iNumArgs, pacArgs);
 
 	if (iRecursive) {
@@ -70,12 +70,13 @@ main (iNumArgs, pacArgs)
 
 		exit (1);
 	}
-		
+
 	/*
 	 * Open mail & save active files and update group entries
 	 */
 	vUpdateActiveFile (acMailActiveFile, acMailDir);
-	vUpdateActiveFile (acSaveActiveFile, acSaveDir);	 
+	vUpdateActiveFile (acSaveActiveFile, acSaveDir);
+	 return 0;
 }
 
 #endif	/* ACTIVE_DAEMON */
@@ -87,11 +88,11 @@ create_save_active_file ()
 	char	acGrpPath[PATH_LEN];
 
 	printf ("Creating active file for saved groups...\n");
-		
+
 	vInitVariables ();
 
 	iRecursive = TRUE;
-	
+
 	vPrintActiveHead (acSaveActiveFile);
 	strcpy (acGrpPath, acSaveDir);
 	vMakeGrpList (acSaveActiveFile, acSaveDir, acGrpPath);
@@ -102,16 +103,16 @@ void
 vInitVariables ()
 {
 	char	*pcPtr;
-	
+
 #ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
 	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr)) {
 		psPwd = getpwnam (pcPtr);
 	}
-	if (psPwd == (struct passwd *) 0) {	
+	if (psPwd == (struct passwd *) 0) {
 		psPwd = getpwuid (getuid ());
 	}
-	if (psPwd != (struct passwd *) 0) {	
+	if (psPwd != (struct passwd *) 0) {
 		memcpy (&sPwd, psPwd, sizeof (struct passwd));
 		psPwd = &sPwd;
 	}
@@ -132,7 +133,7 @@ vInitVariables ()
 		strcpy (acHomeDir, "T:");
 	}
 #endif
-	
+
 #ifdef WIN32
 #define DOTTINDIR "tin"
 #else
@@ -192,7 +193,7 @@ vReadCmdLineOptions (iNumArgs, pacArgs)
 				exit (1);
 		}
 	}
-}	
+}
 
 void
 vUpdateActiveFile (pcActiveFile, pcDir)
@@ -218,9 +219,9 @@ vUpdateActiveFile (pcActiveFile, pcDir)
 					my_fputs (acLine, hFpOp);
 				} else {
 					vMakeGrpPath (pcDir, acGrpName, acGrpPath);
-					
+
 					vFindArtMaxMin (acGrpPath, &lArtMax, &lArtMin);
-				
+
 					vPrintGrpLine (hFpOp, acGrpName, lArtMax, lArtMin, acGrpDir);
 				}
 			}
@@ -326,7 +327,7 @@ vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
 	if (! iAllGrps && (lArtMax == 0 && lArtMin == 1)) {
 		return;
 	}
-	
+
 	if ((hFp = fopen (pcActiveFile, "a+")) != (FILE *) 0) {
 		vMakeGrpName (pcBaseDir, acGrpName, pcGrpPath);
 		printf ("Appending=[%s %ld %ld %s]\n", acGrpName, lArtMax, lArtMin, pcBaseDir);

@@ -979,6 +979,7 @@ extern int force_screen_redraw;
 extern int full_page_scroll;
 extern int glob_respnum;
 extern int global_filtered_articles;
+extern int got_sig_pipe;
 extern int group_catchup_on_exit;
 extern int group_hash[TABLE_SIZE];
 extern int group_top;

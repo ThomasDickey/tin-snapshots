@@ -6,14 +6,14 @@
  *  Updated   : 22-12-94
  *  Notes     :
  *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *              You may  freely  copy or  redistribute	this software,
+ *              so  long as there is no profit made from its use, sale
+ *              trade or  reproduction.  You may not change th/////is copy-
+ *              right notice, and it must be included in any copy made
  */
 
 #include	"tin.h"
-#include 	"patchlev.h"
+#include "patchlev.h"
 
 #ifdef M_UNIX
 /*
@@ -40,8 +40,8 @@ append_file (old_filename, new_filename)
 		fclose (fp_new);
 		return;
 	}
-	while ((n = fread(buf,1,sizeof(buf),fp_new)) != 0) {
-		if (n != fwrite(buf,1,n,fp_old)) {
+	while ((n = fread (buf, 1, sizeof (buf), fp_new)) != 0) {
+		if (n != fwrite (buf, 1, n, fp_old)) {
 			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 			perror_message (msg, "");
 			return;
@@ -97,10 +97,12 @@ copy_fp (fp_ip, fp_op, prefix)
 
 	if (!prefix || !prefix[0]) {
 		size_t n;
-		while ((n = fread(buf,1,sizeof(buf),fp_ip)) != 0) {
-			if (n != fwrite(buf,1,n,fp_op)) {
-				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-				perror_message (msg, "");
+		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
+			if (n != fwrite (buf, 1, n, fp_op)) {
+				if (!got_sig_pipe) {
+					sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+					perror_message (msg, "");
+				}
 				return;
 			}
 		}
@@ -143,8 +145,8 @@ copy_body (fp_ip, fp_op, prefix, initl)
 
 	if (!prefix || !prefix[0]) {
 		size_t n;
-		while ((n = fread(buf,1,sizeof(buf),fp_ip)) != 0) {
-			if (n != fwrite(buf,1,n,fp_op)) {
+		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
+			if (n != fwrite (buf, 1, n, fp_op)) {
 				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 				perror_message (msg, "");
 				return;
@@ -183,7 +185,7 @@ copy_body (fp_ip, fp_op, prefix, initl)
 						    (buf[i] >= 'a' && buf[i] <= 'z') ||
 						    (buf[i] == '>'))) status_char = 0;
 					}
-					buf2[i] = '\0'; 
+					buf2[i] = '\0';
 					if (status_char) {  /* already quoted */
 						if (double_quote) {
 							retcode = fprintf (fp_op, "%s>%s", buf2, strchr(buf, '>'));
@@ -222,7 +224,7 @@ get_val (env, def)
 }
 
 
-int 
+int
 invoke_editor (filename, lineno)
 	char *filename;
 	int lineno;
@@ -263,7 +265,7 @@ invoke_editor (filename, lineno)
 }
 
 #ifdef HAVE_ISPELL
-int 
+int
 invoke_ispell (nam)
 	char *nam;
 {
@@ -435,13 +437,13 @@ tin_done (ret)
 
 /*
  * strip_double_ngs ()
- * Strip duplicate newsgroups from within a given list of comma 
+ * Strip duplicate newsgroups from within a given list of comma
  * separated groups
- * 
+ *
  * 14-Jun-'96 Sven Paulus <sven@oops.sub.de>
  *
  */
- 
+
 void
 strip_double_ngs (ngs_list)
 	char *ngs_list;
@@ -1282,11 +1284,16 @@ hash_s (s)
  *  strncpy that stops at a newline and null terminates
  */
 
+#if __STDC__
+void
+my_strncpy (char *p, const char *q, int n)
+#else
 void
 my_strncpy (p, q, n)
-	char *p;
-	/* const */ char *q;
-	int n;
+	char	*p;
+	char	*q;
+	int	n;
+#endif /* __STDC__ */
 {
 	while (n--) {
 		if (! *q || *q == '\n')
@@ -1704,7 +1711,7 @@ strfquote (group, respnum, s, maxsize, format)
 						}
 						if (strchr(" ._@", tbuf[i])) iflag = 1;
 					}
-					tbuf[j] = '\0';  
+					tbuf[j] = '\0';
 					break;
 				case 'M':	/* Articles MessageId */
 					strcpy (tbuf, note_h_messageid);
@@ -1979,7 +1986,7 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 							defbuf[i++] = *format++;
 						}
 					}
-					defbuf[i] = '\0'; 
+					defbuf[i] = '\0';
 				} else {
 					while (*format && *format != '/') {
 						tbuf[i++] = *format++;
@@ -2216,10 +2223,10 @@ out:
 		return 0;
 }
 
-/* 
+/*
  * get_initials() - get initial letters of a posters name
  *
- */ 
+ */
 
 int
 get_initials (respnum, s, maxsize)
@@ -2249,7 +2256,7 @@ get_initials (respnum, s, maxsize)
 		}
 		if (strchr(" ._@", tbuf[i])) iflag = 1;
 	}
-	s[j] = '\0';  
+	s[j] = '\0';
 
 	return 0;
 }
@@ -2395,7 +2402,7 @@ iCopyFile (pcSrcFile, pcDstFile)
 /*
  * take a peek at the next char in file
  */
- 
+
 int
 peek_char (fp)
 	FILE *fp;

@@ -396,7 +396,7 @@
 #endif
 
 /*
- * UCX (aka TCP/IP services for OpenVMS doesn't implement getservbyname 
+ * UCX (aka TCP/IP services for OpenVMS doesn't implement getservbyname
  */
 
 #define HAVE_GETSERVBYNAME

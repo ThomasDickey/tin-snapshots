@@ -65,7 +65,7 @@ show_tagged_lines ()
 	}
 }
 
-void 
+void
 decr_tagged (tag)
 	int tag;
 {
@@ -79,7 +79,7 @@ decr_tagged (tag)
 }
 
 
-void 
+void
 group_page (group)
 	struct t_group *group;
 {
@@ -103,7 +103,7 @@ group_page (group)
 	int old_group_top;
 
 	/*
-	 * Set the group attributes 
+	 * Set the group attributes
 	 */
 	group->read_during_session = TRUE;
 	show_author = group->attribute->show_author;
@@ -118,7 +118,7 @@ group_page (group)
 	last_resp = -1;
 	this_resp = -1;
 
-	/* 
+	/*
 	 * update index file. quit group level if user aborts indexing
 	 */
 	if (! index_group (group)) {
@@ -160,7 +160,7 @@ debug_print_bitmap (group, NULL);
 		if (ch > '0' && ch <= '9') {	/* 0 goes to basenote */
 			(void) prompt_subject_num (ch);
 			continue;
-		} 
+		}
 		switch (ch) {
 #ifndef WIN32
 			case ESC:	/* common arrow keys */
@@ -303,7 +303,7 @@ end_of_list:
 
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
 				if (index_point >= 0) {
-					feed_articles (FEED_PIPE, GROUP_LEVEL, 
+					feed_articles (FEED_PIPE, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
@@ -385,7 +385,7 @@ group_tab_pressed:
 					goto group_done;
 				}
 				index_point = show_page (group, group_path, n, &dummy);
-				if (index_point == GRP_NOREDRAW || 
+				if (index_point == GRP_NOREDRAW ||
 					index_point == GRP_CONTINUE) {
 					index_point = which_thread (n);
 					goto group_tab_pressed;	/* repeat TAB */
@@ -651,7 +651,7 @@ group_catchup:
 					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, 'y') != 1) {
 						break;
 					}
-				    if (! CURR_GROUP.newsrc.num_unread || 
+				    if (! CURR_GROUP.newsrc.num_unread ||
 					    ! confirm_action || (yn = prompt_yn (cLINES, txt_mark_all_read, TRUE)) == 1) {
 						grp_mark_read (&CURR_GROUP, arts);
 					}
@@ -679,8 +679,8 @@ group_catchup:
 				old_group_top = group_top;
 				n = choose_new_group ();
 				if (n >= 0 && n != cur_groupnum) {
-					/* 
-					 * if we added a group, set the length as appropriate 
+					/*
+					 * if we added a group, set the length as appropriate
 					 * for the group selection display
 					 */
 					if (old_group_top != group_top)
@@ -783,7 +783,7 @@ group_list_thread:
 
 			case iKeyGroupMail:	/* mail article to somebody */
 				if (index_point >= 0) {
-					feed_articles (FEED_MAIL, GROUP_LEVEL, 
+					feed_articles (FEED_MAIL, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
@@ -841,7 +841,7 @@ group_list_thread:
 
 			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
 				if (index_point >= 0) {
-					feed_articles (FEED_PRINT, GROUP_LEVEL, 
+					feed_articles (FEED_PRINT, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
@@ -886,7 +886,7 @@ group_list_thread:
 				}
 				goto group_done;
 
-			case iKeyGroupQuitTin:		/* quit */
+			case iKeyQuitTin:		/* quit */
 				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, 'y') != 1) {
 					break;
 				}
@@ -895,20 +895,20 @@ group_list_thread:
 				goto group_done;
 
 	 		case iKeyGroupToggleReadDisplay:
-	 			/* 
+	 			/*
 	 			 * If in show_only_unread mode or there  are
 	 			 * unread articles we know this thread  will
 	 			 * exist after toggle. Otherwise we find the
-	 			 * next closest 
+	 			 * next closest
 	 			 */
  				if (CURR_GROUP.attribute->show_only_unread) {
 					wait_message (txt_reading_all_arts);
  				} else {
 					wait_message (txt_reading_new_arts);
- 				} 
+ 				}
  				i = -1;
  				if (index_point >= 0) {
- 					if (CURR_GROUP.attribute->show_only_unread || 
+ 					if (CURR_GROUP.attribute->show_only_unread ||
  					    new_responses (index_point)) {
  						i = base[index_point];
  					} else if ((n = prev_unread ((int)base[index_point])) >= 0) {
@@ -917,7 +917,7 @@ group_list_thread:
  						i = n;
  					}
  				}
- 				CURR_GROUP.attribute->show_only_unread = 
+ 				CURR_GROUP.attribute->show_only_unread =
  					!CURR_GROUP.attribute->show_only_unread;
  				auto_select_articles (&CURR_GROUP);
  				find_base (&CURR_GROUP);
@@ -936,7 +936,7 @@ group_list_thread:
 
 			case iKeyGroupSave:	/* save articles with prompting */
 				if (index_point >= 0) {
-					feed_articles (FEED_SAVE, GROUP_LEVEL, 
+					feed_articles (FEED_SAVE, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
@@ -944,7 +944,7 @@ group_list_thread:
 			case iKeyGroupSaveTagged:	/* save tagged articles without prompting */
 				if (index_point >= 0) {
 					if (num_of_tagged_arts) {
-						feed_articles (FEED_SAVE_TAGGED, GROUP_LEVEL, 
+						feed_articles (FEED_SAVE_TAGGED, GROUP_LEVEL,
 							&CURR_GROUP, (int) base[index_point]);
 					} else {
 						info_message (txt_no_tagged_arts_to_save);
@@ -967,10 +967,10 @@ group_list_thread:
 								tagged = FALSE;
 						}
 						if (tagged) {
-							/* 
+							/*
 							 * Here we repeat the tagged test in both blocks
 							 * to leave the choice of tagged/untagged
-							 * determination politic in the previous lines. 
+							 * determination politic in the previous lines.
 							 */
 							info_message (txt_untagged_thread);
 							for (ii = n; ii != -1; ii = arts[ii].thread) {
@@ -1017,7 +1017,7 @@ group_list_thread:
 			 */
 			case iKeyGroupToggleThreading:
 
-				CURR_GROUP.attribute->thread_arts = 
+				CURR_GROUP.attribute->thread_arts =
 #ifdef HAVE_REF_THREADING
 						++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
 #else
@@ -1056,7 +1056,7 @@ group_list_thread:
 
 			case iKeyGroupRepost:	/* repost current article */
 				if (index_point >= 0) {
-					feed_articles (FEED_REPOST, GROUP_LEVEL, 
+					feed_articles (FEED_REPOST, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
@@ -1134,7 +1134,7 @@ group_list_thread:
  				xflag = 0;
   				update_group_page ();
   				break;
-  
+
  			case iKeyGroupSelPattern:	/* select matching patterns */
  				sprintf (msg, txt_select_pattern, default_select_pattern);
  				if (! prompt_string (msg, buf)) {
@@ -1154,7 +1154,7 @@ group_list_thread:
  					strcpy (default_select_pattern, buf);
  					sprintf (pat, "*%s*", default_select_pattern);
  				}
- 
+
  				flag = 0;
  				for (n=0; n < top_base; n++) {
  					char sub[HEADER_LEN];
@@ -1254,7 +1254,7 @@ group_done:
 }
 
 
-void 
+void
 show_group_page ()
 {
 #ifndef INDEX_DAEMON
@@ -1329,7 +1329,7 @@ show_group_page ()
 #endif /* INDEX_DAEMON */
 }
 
-void 
+void
 update_group_page ()
 {
 #ifndef INDEX_DAEMON
@@ -1348,7 +1348,7 @@ update_group_page ()
 }
 
 
-void 
+void
 draw_subject_arrow ()
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
@@ -1364,7 +1364,7 @@ draw_subject_arrow ()
 	MoveCursor (cLINES, 0);
 }
 
-void 
+void
 erase_subject_arrow ()
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
@@ -1421,7 +1421,7 @@ prompt_subject_num (ch)
 }
 
 
-void 
+void
 clear_note_area ()
 {
 	MoveCursor (INDEX_TOP, 0);
@@ -1435,7 +1435,7 @@ clear_note_area ()
  * "best attempt" to find a new index point.
  */
 
-int 
+int
 find_new_pos (old_top, old_artnum, cur_pos)
 	int old_top;
 	long old_artnum;
@@ -1446,7 +1446,7 @@ find_new_pos (old_top, old_artnum, cur_pos)
  	if (top == old_top) {
  		return cur_pos;
  	}
-  
+
 	for (i = 0 ; i < top ; i++) {
 		if (arts[i].artnum == old_artnum) {
  			pos = which_thread (arts[i].artnum);
@@ -1464,7 +1464,7 @@ find_new_pos (old_top, old_artnum, cur_pos)
 }
 
 
-void 
+void
 mark_screen (level, screen_row, screen_col, value)
 	int level;
 	int screen_row;
@@ -1493,7 +1493,7 @@ mark_screen (level, screen_row, screen_col, value)
 }
 
 
-void 
+void
 set_subj_from_size (num_cols)
 	int num_cols;
 {
@@ -1528,7 +1528,7 @@ set_subj_from_size (num_cols)
 }
 
 
-void 
+void
 toggle_subject_from ()
 {
 	if (++show_author > SHOW_FROM_BOTH) {
@@ -1538,17 +1538,17 @@ toggle_subject_from ()
 }
 
 /*
- * Build subject line given an index into base[]. 
+ * Build subject line given an index into base[].
  *
  * WARNING: the routine is tightly coupled with draw_sline() in the sense
  * that draw_sline() expects bld_sline() to place the article mark
  * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the screen[].col.
  * So, if you change the format used in this routine, be sure to check
- * that the value of MARK_OFFSET is still correct. 
+ * that the value of MARK_OFFSET is still correct.
  * Yes, this is somewhat kludgy.
  */
- 
-static int 
+
+static int
 bld_sline (i)
 	int i;
 {
@@ -1592,7 +1592,7 @@ bld_sline (i)
 			else
 				sprintf (art_cnt, "%-3d ?    ", n);
 		} else {
-			if (arts[j].lines != -1) 
+			if (arts[j].lines != -1)
 				sprintf (art_cnt, "    %-4d ", arts[j].lines);
 			else
 				strcpy (art_cnt, "    ?    ");
@@ -1631,14 +1631,14 @@ bld_sline (i)
  * WARNING: this routine is tightly coupled with bld_sline(); see the warning
  * associated with that routine for details. (C++ would be handy here.)
  *
- * NOTE: the 2nd argument is used to control whether the full line is 
+ * NOTE: the 2nd argument is used to control whether the full line is
  * redrawn or just the the parts of it that can be changed by a
  * command; i.e., the unread art count and the art mark. This will result
- * in a slightly more efficient update, though at the price of increased 
+ * in a slightly more efficient update, though at the price of increased
  * code complexity and readability.
  */
 
-static int 
+static int
 draw_sline (i, full)
 	int i;
 	int full;	/* unused at moment */
@@ -1698,7 +1698,7 @@ draw_sline (i, full)
 }
 
 
-void 
+void
 show_group_title (clear_title)
 	int clear_title;
 {
@@ -1723,14 +1723,14 @@ show_group_title (clear_title)
 	}
 
 	if (active[num].attribute->thread_arts) {
-		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%s)", 
-			active[num].name, top_base, 
+		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%s)",
+			active[num].name, top_base,
 			*txt_thread[active[num].attribute->thread_arts],
 			art_cnt, num_of_killed_arts, num_of_selected_arts,
 			(active[num].attribute->show_only_unread ? " R" : ""),
 			(active[num].moderated == 'm' ? " M" : ""));
 	} else {
-		sprintf (buf, "%s (%dU %dK %dH%s%s)", 
+		sprintf (buf, "%s (%dU %dK %dH%s%s)",
 			active[num].name,
 			art_cnt, num_of_killed_arts, num_of_selected_arts,
 			(active[num].attribute->show_only_unread ? " R" : ""),

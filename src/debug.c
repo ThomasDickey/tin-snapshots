@@ -19,7 +19,7 @@ int debug;
 /*
  *  nntp specific debug routines
  */
- 
+
 void
 debug_delete_files ()
 {
@@ -51,11 +51,11 @@ debug_delete_files ()
 /*
  *  nntp specific debug routines
  */
- 
+
 void
 debug_nntp (func, line)
-	char *func;	
-	char *line;	
+	char *func;
+	char *line;
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
@@ -75,20 +75,20 @@ debug_nntp (func, line)
 }
 
 
-void 
+void
 debug_nntp_respcode (respcode)
 	int respcode;
 {
 #ifdef DEBUG
 	debug_nntp ("get_respcode", nntp_respcode (respcode));
 #endif
-}	
+}
 
 /*
  *  tin specific debug routines
  */
- 
-void 
+
+void
 debug_print_arts ()
 {
 #ifdef DEBUG
@@ -104,7 +104,7 @@ debug_print_arts ()
 }
 
 
-void 
+void
 debug_print_header (s)
 	struct t_article *s;
 {
@@ -158,14 +158,14 @@ debug_print_header (s)
 }
 
 
-void 
+void
 debug_save_comp ()
 {
 #ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	int i;
-	
+
 	if (debug != 2)
 		return;
 
@@ -193,7 +193,7 @@ debug_save_comp ()
  			}
 			fprintf (fp,"index=[%d]  saved=[%d]  mailbox=[%d]\n\n",
 				save[i].index, save[i].saved, save[i].is_mailbox);
-		}	
+		}
 		fflush (fp);
 		fclose (fp);
 		chmod (file, 0666);
@@ -202,7 +202,7 @@ debug_save_comp ()
 }
 
 
-void 
+void
 debug_print_comment (comment)
 	char *comment;
 {
@@ -224,7 +224,7 @@ debug_print_comment (comment)
 }
 
 
-void 
+void
 debug_print_base ()
 {
 #ifdef DEBUG
@@ -249,7 +249,7 @@ debug_print_base ()
 }
 
 
-void 
+void
 debug_print_active ()
 {
 #ifdef DEBUG
@@ -257,7 +257,7 @@ debug_print_active ()
 	FILE *fp;
 	int i;
 	struct t_group *group;
-	
+
 	if (debug != 2)
 		return;
 
@@ -266,11 +266,11 @@ debug_print_active ()
 	if ((fp = fopen (file, "w")) != (FILE *) 0) {
 		for (i = 0; i < num_active; i++) {	/* for each group */
 			group = &active[i];
-/* 			fprintf (fp, "[%4d]=[%-28s] type=[%s] spooldir=[%s]\n", 
+/* 			fprintf (fp, "[%4d]=[%-28s] type=[%s] spooldir=[%s]\n",
 */
-			fprintf (fp, "[%4d]=[%s] type=[%s] spooldir=[%s]\n", 
-				i, group->name, 
-				(group->type == GROUP_TYPE_NEWS ? "NEWS" : "MAIL"), 
+			fprintf (fp, "[%4d]=[%s] type=[%s] spooldir=[%s]\n",
+				i, group->name,
+				(group->type == GROUP_TYPE_NEWS ? "NEWS" : "MAIL"),
 				group->spooldir);
 			fprintf (fp, "count=[%4ld] max=[%4ld] min=[%4ld] mod=[%c]\n",
 				group->count, group->xmax, group->xmin, group->moderated);
@@ -286,7 +286,7 @@ debug_print_active ()
 }
 
 
-void 
+void
 debug_print_attributes (attr, fp)
 	struct t_attribute *attr;
 	FILE *fp;
@@ -299,7 +299,7 @@ debug_print_attributes (attr, fp)
 		attr->show_only_unread,
 		attr->thread_arts,
 		attr->sort_art_type,
-		attr->show_author,  
+		attr->show_author,
 		attr->auto_select,
 		attr->auto_save,
 		attr->batch_save,
@@ -324,7 +324,7 @@ debug_print_attributes (attr, fp)
 }
 
 
-void 
+void
 debug_print_bitmap (group, art)
 	struct t_group *group;
 	struct t_article *art;
@@ -335,17 +335,17 @@ debug_print_bitmap (group, art)
 
 	if (debug != 3) {
 		return;
-	}	
-	
+	}
+
 	sprintf (file, "%sBITMAP", TMPDIR);
 
 	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n", 
+		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
 			group->name, group->subscribed,
 			group->xmin, group->xmax, group->count,
 			group->newsrc.num_unread);
 		if (art != (struct t_article *) 0) {
-			fprintf (fp, "art=[%5ld] tag=[%s] kill=[%s] selected=[%s] subj=[%s]\n", 
+			fprintf (fp, "art=[%5ld] tag=[%s] kill=[%s] selected=[%s] subj=[%s]\n",
 				art->artnum,
 				(art->tagged ? "TRUE" : "FALSE"),
 				(art->killed ? "TRUE" : "FALSE"),
@@ -364,7 +364,7 @@ debug_print_bitmap (group, art)
 }
 
 
-void 
+void
 debug_print_newsrc (NewSrc, fp)
 	struct t_newsrc *NewSrc;
 	FILE *fp;
@@ -373,13 +373,13 @@ debug_print_newsrc (NewSrc, fp)
 	register int i, j;
 
 	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
-		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen, 
+		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen,
 		NewSrc->num_unread, NewSrc->present);
 
 	fprintf (fp, "bitmap=[");
 	if (NewSrc->xbitlen && NewSrc->xbitmap) {
 		for (j=0, i=NewSrc->xmin; i <= NewSrc->xmax; i++) {
-			fprintf (fp, "%d", 
+			fprintf (fp, "%d",
 				(NTEST(NewSrc->xbitmap, i - NewSrc->xmin) == ART_READ ?
 				ART_READ : ART_UNREAD));
 			if ((j++ % 8) == 7 && i < NewSrc->xmax) {
@@ -393,7 +393,7 @@ debug_print_newsrc (NewSrc, fp)
 }
 
 
-void 
+void
 vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 	int		iIsMalloc;
 	char	*pcFile;
@@ -404,7 +404,7 @@ vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 	char file[PATH_LEN];
 	FILE *fp;
 	static int iTotal = 0;
-	
+
 	if (debug == 4) {
 		sprintf (file, "%sMALLOC", TMPDIR);
 		if ((fp = fopen (file, "a+")) != (FILE *) 0) {
@@ -425,34 +425,34 @@ vDbgPrintMalloc (iIsMalloc, pcFile, iLine, iSize)
 }
 
 
-void 
+void
 debug_print_filter (fp, num, the_filter)
 	FILE *fp;
 	int num;
-	struct t_filter *the_filter;	
+	struct t_filter *the_filter;
 {
 #ifdef DEBUG
-	fprintf (fp, "[%3d]  scope=[%s] inscope=[%s] type=[%d][%s] case=[%d][%s] lines=[%d %d]\n", 
+	fprintf (fp, "[%3d]  scope=[%s] inscope=[%s] type=[%d][%s] case=[%d][%s] lines=[%d %d]\n",
 		num, (the_filter->scope ? the_filter->scope : ""),
 		(the_filter->inscope ? "TRUE" : "FILTER"),
-		the_filter->type, (the_filter->type == 0 ? "KILL" : "SELECT"), 
-		the_filter->icase, (the_filter->icase == 0 ? "FALSE" : "TRUE"), 
+		the_filter->type, (the_filter->type == 0 ? "KILL" : "SELECT"),
+		the_filter->icase, (the_filter->icase == 0 ? "FALSE" : "TRUE"),
 		the_filter->lines_cmp, the_filter->lines_num);
-	fprintf (fp, "       subj=[%s] from=[%s] msgid=[%s]\n", 
+	fprintf (fp, "       subj=[%s] from=[%s] msgid=[%s]\n",
 		(the_filter->subj  ? the_filter->subj  : ""),
 		(the_filter->from  ? the_filter->from  : ""),
 		(the_filter->msgid ? the_filter->msgid : ""));
 
 	if (the_filter->time) {
-		fprintf (fp, "       time=[%ld][%s", 
-			the_filter->time, 
+		fprintf (fp, "       time=[%ld][%s",
+			the_filter->time,
 			(the_filter->time ? ctime (&the_filter->time) : "]\n"));
 	}
 #endif
 }
 
 
-void 
+void
 debug_print_filters ()
 {
 #ifdef DEBUG
@@ -460,7 +460,7 @@ debug_print_filters ()
 	FILE *fp;
 	int i, j, num;
 	struct t_filter *filter;
-	
+
 	if (debug < 2)
 		return;
 
@@ -471,19 +471,19 @@ debug_print_filters ()
 		 * print global filter
 		 */
 		num = glob_filter.num;
-		filter = glob_filter.filter; 
-		fprintf (fp, "*** BEG GLOBAL FILTER=[%3d] ***\n", num); 
+		filter = glob_filter.filter;
+		fprintf (fp, "*** BEG GLOBAL FILTER=[%3d] ***\n", num);
 		for (i=0 ; i < num ; i++) {
 			debug_print_filter (fp, i, &filter[i]);
-			fprintf (fp, "\n"); 
+			fprintf (fp, "\n");
  		}
-		fprintf (fp, "*** END GLOBAL FILTER ***\n"); 
+		fprintf (fp, "*** END GLOBAL FILTER ***\n");
 
 		for (j=0 ; j < num_active ; j++) {
 			if (active[j].grps_filter) {
-				num = active[j].grps_filter->num; 
-				filter = active[j].grps_filter->filter; 
-				fprintf (fp, "\n*** group=[%3d] [%s]\n", num, active[j].name); 
+				num = active[j].grps_filter->num;
+				filter = active[j].grps_filter->filter;
+				fprintf (fp, "\n*** group=[%3d] [%s]\n", num, active[j].name);
 				for (i=0 ; i < num ; i++) {
 					debug_print_filter (fp, i, &filter[i]);
  				}
@@ -500,7 +500,7 @@ debug_print_filters ()
 /*
  * Prints out hash distribution of active[]
  */
- 
+
 void
 debug_print_active_hash ()
 {
@@ -508,18 +508,18 @@ debug_print_active_hash ()
 	int empty = 0, number;
 	int collisions[32];
 	register i, j;
-			
+
 	for (i = 0; i < 32; i++) {
 		collisions[i] = 0;
 	}
-	
+
 	for (i = 0; i < TABLE_SIZE; i++) {
 /*
 		printf ("HASH[%4d]  ", i);
 */
 
 		if (group_hash[i] == -1) {
-/*		
+/*
 			printf ("EMPTY\n");
 */
 			empty++;
@@ -535,7 +535,7 @@ debug_print_active_hash ()
 			}
 		}
 	}
-	
+
 	printf ("HashTable Active=[%d] Size=[%d] Filled=[%d] Empty=[%d]\n",
 		num_active, TABLE_SIZE, TABLE_SIZE-empty, empty);
 	printf ("01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32\n");
@@ -555,7 +555,7 @@ debug_print_group_hash ()
 {
 #ifdef DEBUG
 	int i;
-	
+
 	for (i = 0; i < TABLE_SIZE; i++) {
 		printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
 	}

@@ -31,7 +31,7 @@ static char sigfile[PATH_LEN];
 static FILE *open_random_sig P_((char *sigdir));
 static int thrashdir P_((char *sigdir));
 
-void 
+void
 msg_write_signature (fp, flag)
 	FILE *fp;
 	int flag;
@@ -41,7 +41,7 @@ msg_write_signature (fp, flag)
 	FILE *fixfp;
 	FILE *sigfp;
 	int i;
-	
+
 #ifdef NNTP_INEWS
 	if (read_news_via_nntp && use_builtin_inews) {
 		flag = TRUE;
@@ -65,19 +65,19 @@ msg_write_signature (fp, flag)
 		return;
 	}
 	get_cwd (cwd);
-	
-	if (! strfpath (active[i].attribute->sigfile, path, sizeof (path), 
+
+	if (! strfpath (active[i].attribute->sigfile, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, active[i].name)) {
-		if (! strfpath (default_sigfile, path, sizeof (path), 
+		if (! strfpath (default_sigfile, path, sizeof (path),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
 			joinpath (path, homedir, ".Sig");
 		}
 	}
-	
+
 	/*
-	 *  Check to see if sigfile is a directory & if it is  generate a 
+	 *  Check to see if sigfile is a directory & if it is  generate a
 	 *  random signature from sigs in sigdir. If the file ~/.sigfixed
-	 *  exists (fixed part of random sig) then  read it  in first and 
+	 *  exists (fixed part of random sig) then  read it  in first and
 	 *  append the random sig part onto the end.
 	 */
 	if ((sigfp = open_random_sig (path)) != (FILE *) 0) {
@@ -88,14 +88,14 @@ msg_write_signature (fp, flag)
 		joinpath (path, homedir, ".sigfixed");
 		if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
 			copy_fp (fixfp, fp, "");
-			fclose (fixfp);	
+			fclose (fixfp);
 		}
 		copy_fp (sigfp, fp, "");
 		fclose (sigfp);
 		my_chdir (cwd);
 		return;
 	}
-	
+
 	/*
 	 *  Use ~/.signature or ~/.Sig or custom .Sig files
 	 */
@@ -129,7 +129,7 @@ open_random_sig (sigdir)
 			srand ((unsigned int) epoch);
 			my_chdir (sigdir);
 
-			if (thrashdir (sigdir) || ! sigfile[0]) { 
+			if (thrashdir (sigdir) || ! sigfile[0]) {
 				if (debug == 2) {
 					error_message ("NO sigfile=[%s]", sigfile);
 				}
@@ -142,12 +142,12 @@ open_random_sig (sigdir)
 			}
 		}
 	}
-	
+
 	return (FILE *) 0;
 }
 
 
-static int 
+static int
 thrashdir (sigdir)
 	char *sigdir;
 {
@@ -169,8 +169,8 @@ thrashdir (sigdir)
 		numentries++;
 	}
 
-	/* 
-	 * consider "." and ".." non-entries 
+	/*
+	 * consider "." and ".." non-entries
 	 */
 	cwd = (char *) my_malloc (PATH_LEN + 1);
 #ifndef M_AMIGA
@@ -187,7 +187,7 @@ thrashdir (sigdir)
 
 	/* If we are using the root sig directory, we don't want
 	 * to recurse, or else we might use a custom sig intended
-	 * for a specific newsgroup (and not this one). 
+	 * for a specific newsgroup (and not this one).
 	 */
 	for (safeguard=0, dp=NULL; safeguard<MAXLOOPS && dp==NULL; safeguard++) {
 if (debug == 2) {
@@ -209,7 +209,7 @@ if (debug == 2) {
 			}
 		}
 		if (dp != NULL) {	/* if we could open the dir entry */
-			if (! strcmp (dp->d_name, CURRENTDIR) || 
+			if (! strcmp (dp->d_name, CURRENTDIR) ||
 			    ! strcmp (dp->d_name, "..")) {
 				dp = NULL;
 			} else {	/* if we have a non-dot entry */
@@ -220,8 +220,8 @@ gak:
 				}
 				if (S_ISDIR(st.st_mode)) {
 					if (recurse) {
-						/* 
-						 * do subdirectories 
+						/*
+						 * do subdirectories
 						 */
 						if (my_chdir (dp->d_name) < 0) {
 							goto gak;
@@ -229,9 +229,9 @@ gak:
 						if ((c = thrashdir (sigdir)) == 1) {
 							goto gak;
 						} else if (c == -1) {
-							/* 
-							 * the one we picked was an 
-							 * empty dir so try again. 
+							/*
+							 * the one we picked was an
+							 * empty dir so try again.
 							 */
 							dp = NULL;
 							my_chdir (cwd);
@@ -260,6 +260,6 @@ if (debug == 2) {
 	error_message ("return 0: sigfile=[%s]", sigfile);
 }
 	closedir (dirp);
-	
+
 	return (0);
 }

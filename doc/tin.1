@@ -33,7 +33,7 @@ tin, rtin, tind \- A Netnews reader
 .SH DESCRIPTION
 .I Tin
 is a full-screen easy to use Netnews reader. It can read news locally
-(i.e. \fI/usr/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
+(i.e., \fI/usr/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
 via a NNTP (Network News Transport Protocol) server. It will automatically 
 utilize nov (news overview) style index files if available locally or via the 
 nntp xover command.
@@ -90,7 +90,7 @@ information read section Automatic Mailing and Saving New News.
 .TP
 .BI -n
 Only load groups from the active file that are also subscribed to in the
-users \fI.newsrc\fP.  This allows a noticeable speedup when connecting
+user's \fI.newsrc\fP.  This allows a noticeable speedup when connecting
 via a slow line.
 .TP
 .BI -q
@@ -174,14 +174,14 @@ option:
 .PP
 A slightly better method is to set \fItin\fP setuid news and have all index 
 files created and updated in the news spool directory 
-(i.e. \fI/usr/spool/news/.news\fP). This has the advantage that there will 
+(i.e., \fI/usr/spool/news/.news\fP). This has the advantage that there will 
 only be one copy of the index files on each machine on your network, but the 
 disadvantage is that you will have \fItin\fP running setuid news.
 .PP
 A better method is to install the \fItind\fP index file updating daemon and 
 have it create and update index files for all groups in your active file at
 regular intervals in the news spool directory 
-(i.e. \fI/usr/spool/news/.news\fP). This has the advantage that there will 
+(i.e., \fI/usr/spool/news/.news\fP). This has the advantage that there will 
 only be one copy of the index files on each machine on your network and 
 \fItin\fP must not be setuid news, but the disadvantage is that you will have 
 to have news permissions to install \fItind\fP and root permissions to install
@@ -191,7 +191,7 @@ files.
 The best method is to install the \fItind\fP index file updating daemon on your
 NNTP server and have it create and update index files for all groups in your
 active file at regular intervals in the news spool directory 
-(i.e. \fI/usr/spool/news/.news\fP).
+(i.e., \fI/usr/spool/news/.news\fP).
 This has the advantage that there will only be one copy of the index files on
 the NNTP server for the whole of your network, but the disadvantage is that you
 will have to install my NNTP server patches to allow \fItin\fP to retrieve 
@@ -220,7 +220,7 @@ To relieve news admins (and especially me) some features have been added.
 When a user starts \fItin\fP it is possible to inform them of any important 
 changes/information concerning the news system by displaying a message of the 
 day (motd) file. The motd file should be created in your news lib directory 
-(i.e. \fI/usr/lib/news/motd\fP) and should have file permissions set to 0644. 
+(i.e., \fI/usr/lib/news/motd\fP) and should have file permissions set to 0644. 
 The motd file will only be displayed if its contents is newer than the last
 time the user started \fItin\fP. If reading news via NNTP my XMOTD patch will
 have to have been applied to your NNTP server.
@@ -229,7 +229,7 @@ A user starting \fItin\fP for the first time can be automatically subscribed
 to a list of newsgroups that are deemed appropriate by the news administrator.  
 At our site the subscriptions file has 125 groups (our active file contains
 over 400 groups with many only being marginally interesting to most people).
-The subscriptions file should be created in your news lib directory (i.e.
+The subscriptions file should be created in your news lib directory (i.e.,
 \fI/usr/lib/news/subscriptions\fP) and should have file permissions set to 
 0644. If reading news via NNTP my LIST SUBSCRIPTIONS patch will have to 
 have been applied to your NNTP server.
@@ -311,26 +311,26 @@ An history list allows the easy reuse of previously entered strings.
 The following commands are available when editing a string:
 .PP
 .TP 10
-\fB^A,^E\fP
+\fB^A, ^E\fP
 move to beginning or end of line, respectively.
 .TP
-\fB^F,^B\fP
+\fB^F, ^B\fP
 nondestructive move forward or back one location, respectively.
 .TP
 \fB^D\fP
 delete the character currently under the cursor, or send EOF if no
 characters in the buffer.
 .TP
-\fB^H,<DEL>\fP
+\fB^H, <DEL>\fP
 delete character left of the cursor.
 .TP
 \fB^K\fP
 delete from cursor to end of line.
 .TP
-\fB^P,^N\fP
+\fB^P, ^N\fP
 move through history, previous and next, respectively.
 .TP
-\fB^L,^R\fP
+\fB^L, ^R\fP
 redraw the current line.
 .TP
 \fB<CR>\fP
@@ -570,7 +570,7 @@ articles matching pattern / tagged articles to file / files /
 mailbox.  To save to a mailbox enter '=' or '=mailbox' when asked
 for filename to save to.  To save in <newsgroup name>/<filename>
 format enter '+filename'.  Environment variables are allowed within
-a filename (i.e. \fI$SOURCES/dir/filename\fP).
+a filename (i.e., \fI$SOURCES/dir/filename\fP).
 .TP
 \fBt\fP
 Tag current article / thread for mailing ('m') / piping ('|') / 
@@ -850,7 +850,7 @@ articles matching pattern / tagged articles to file / files / mailbox.
 To save to a mailbox enter '=' or '=mailbox' when asked for filename
 to save to.  To save in <newsgroup name>/<filename> format enter '+filename'.
 Environment variables are allowed within a filename
-(i.e. \fI$SOURCES/dir/filename\fP).
+(i.e., \fI$SOURCES/dir/filename\fP).
 .TP
 \fBt\fP
 Tag current article for mailing ('m') / piping ('|') / printing ('o') /
@@ -927,7 +927,7 @@ within a file.
 Allows saved articles/threads to be automatically marked as read. 
 .TP
 \fBConfirm Command\fP
-Allows certain commands (i.e. 'c' catchup) that require user confirmation
+Allows certain commands (i.e., 'c' catchup) that require user confirmation
 to be executed immediately if set OFF.
 .TP
 \fBDraw arrow\fP
@@ -1165,7 +1165,7 @@ Maximum length of the names of newsgroups to be displayed so that more of the
 newgroup description can be displayed. Default is 32.
 .TP 4
 \fBhighlight_xcommentto\fP
-If ON X-Commento-To name is displayed in the upper-right corner,if OFF below
+If ON X-Commento-To name is displayed in the upper-right corner, if OFF below
 the Summary-header. Default is OFF
 .TP 4
 \fBinverse_okay\fP
@@ -1182,19 +1182,19 @@ also set to 8bit.  Leaving it OFF is safe for most users except for Korean
 users with localized sendmail.
 .TP 4
 \fBmail_mime_encoding\fP
-MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable,7bit)
+MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable, 7bit)
 Default is 8bit. If set to 7bit, CJK text is encoded into ISO-2022-KR/JP/CN.
-Currently, only ISO-2022-KR is implemented. No encoding(or charset conversion)
-is done(i.e. local charset is used as it is) if set to 8bit.
+Currently, only ISO-2022-KR is implemented. No encoding (or charset conversion)
+is done (i.e., local charset is used as it is) if set to 8bit.
 .TP 4
 \fBmm_charset\fP
-charset supported locally, which is also used for MIME header(charset 
+charset supported locally, which is also used for MIME header (charset 
 parameter and charset name in header encoding)
 in mail and news posting unless local charset needs to be encoded into
 other charset as in case of ISO-2022-KR encoding of EUC-KR in mail message.
-Possible values include ISO-8859-X(where X is 1 to 10), EUC-JP,EUC-CN,
-EUC-KR,and perhaps names for various Chinese and Japanese charsets(GB,Big5,
-SJIS,Shift JIS,and so forth).
+Possible values include ISO-8859-X (where X is 1 to 10), EUC-JP, EUC-CN,
+EUC-KR, and perhaps names for various Chinese and Japanese charsets (GB, Big5,
+SJIS, Shift JIS, and so forth).
 If MIME_STRICT_CHARSET is defined at the compile time, text in
 charset other than the value of this parameter is considered 
 not displayable and represented as '?'. Otherwise, all character
@@ -1229,10 +1229,10 @@ Allows 8bit characters unencoded in the header of news article.
 Default is OFF. Only enacted if post_mime_encoding is also set to 8bit.
 .TP 4
 \fBpost_mime_encoding\fP
-MIME encoding of the body in news message, if necessary. (8bit, base64, quoted-printable,7bit)
-Default is 8bit, which leads to no encoding(or charset conversion. i.e.
+MIME encoding of the body in news message, if necessary. (8bit, base64, quoted-printable, 7bit)
+Default is 8bit, which leads to no encoding (or charset conversion, i.e.,
 local charset is posted as it is). If set to 7bit, Chinese and Japanese 
-text is encoded into ISO-2022-CN/JP(not yet implemented). 7bit is 
+text is encoded into ISO-2022-CN/JP (not yet implemented). 7bit is 
 equivalent to 8bit for Korean news messages. 
 .TP 4
 \fBpost_process_type\fP
@@ -1452,7 +1452,7 @@ newsgroup or it can apply to all newsgroups. Once entered the user can
 abort the command and not save the kill description, edit the kill file 
 or save the kill description.
 .PP
-On starting \fItin\fP the users killfile \fI$HOME/.tin/filter\fP is read
+On starting \fItin\fP the user's killfile \fI$HOME/.tin/filter\fP is read
 and on entering a newsgroup any kill or select descriptions are applied.  
 .PP
 Articles that match a kill description are marked killed and are not 
@@ -1463,7 +1463,7 @@ with a ''*'' when displayed.
 and replying direct through mail to the author of an article.
 .PP
 Use the 'w' command to post an article to a newsgroup.  After entering
-the post subject the default editor (i.e. vi) or the editor specified
+the post subject the default editor (i.e., vi) or the editor specified
 by the $EDITOR environment variable will be started and the article can
 be entered.  To crosspost articles simply add a comma and the name of
 the newsgroup(s) to the end of the ``Newsgroups:'' line at the beginning of
@@ -1542,18 +1542,18 @@ Tagged articles must have already been tagged with the 't' command.
 All tagged articles can be untagged by the 'U' untag command.
 .PP
 If regex pattern matching is selected you are asked to enter a regular
-expression (i.e. to match all articles subject lines containing 'net News'
+expression (i.e., to match all articles subject lines containing 'net News'
 you must enter '*net News*').  Any articles that match the
 entered expression will be mailed, piped etc.
 .PP
 To save articles to a mailbox with the name of the current newsgroup
-(i.e. Alt.sources) enter '=' or '=<mailbox name>' when asked for the
+(i.e., Alt.sources) enter '=' or '=<mailbox name>' when asked for the
 save filename.
 .PP
 To save articles in <newsgroup name>/<filename> format enter '+<filename>'.
 .PP
 When saving articles you can specify whether the saved files should be
-post processed (i.e. unshar shell archive, uudecode multiple parts etc).
+post processed (i.e., unshar shell archive, uudecode multiple parts etc).
 A default process type can be set by the 'Process type:' in the 'M'
 options menu.
 .SH "AUTOMATIC MAILING AND SAVING NEW NEWS"
@@ -1624,22 +1624,22 @@ $HOME/.tin/headers file.
 .TP
 \fBTIN_HOMEDIR\fP
 Define this variable if you do not want the .tin directory in 
-\fI$HOME/.tin\fP. (i.e. if you want all tin's private files in \fI/tmp/.tin\fP
+\fI$HOME/.tin\fP. (i.e., if you want all tin's private files in \fI/tmp/.tin\fP
 you would set TIN_HOMEDIR to \fI/tmp\fP.
 .TP
 \fBTIN_INDEX_NEWSDIR\fP
 Define this variable if you do not want the .news directory in 
-\fI$HOME/.tin/.news\fP. (i.e. if you want all tin's news index files 
+\fI$HOME/.tin/.news\fP. (i.e., if you want all tin's news index files 
 in \fI/tmp/.news\fP you would set TIN_INDEX_NEWSDIR to \fI/tmp\fP.
 .TP
 \fBTIN_INDEX_MAILDIR\fP
 Define this variable if you do not want the .mail directory in 
-\fI$HOME/.tin/.mail\fP. (i.e. if you want all tin's mail index files 
+\fI$HOME/.tin/.mail\fP. (i.e., if you want all tin's mail index files 
 in \fI/tmp/.mail\fP you would set TIN_INDEX_MAILDIR to \fI/tmp\fP.
 .TP
 \fBTIN_INDEX_SAVEDIR\fP
 Define this variable if you do not want the .save directory in 
-\fI$HOME/.tin/.save\fP. (i.e. if you want all tin's save index files 
+\fI$HOME/.tin/.save\fP. (i.e., if you want all tin's save index files 
 in \fI/tmp/.save\fP you would set TIN_INDEX_SAVEDIR to \fI/tmp\fP.
 .TP
 \fBTIN_LIBDIR\fP
@@ -1672,12 +1672,12 @@ Set the article header field ``Distribution:'' to the contents of the
 variable instead of the system default.
 .TP
 \fBTEX2ISO\fP
-Set the article viewer to decode german style umlaut codes to ISO latin1.
+Set the article viewer to decode German style umlaut codes to ISO latin1.
 Value 0 has the same effect as not defining the variable. Use in combination
 with ISO2ASC.
 .TP
 \fBISO2ASC\fP
-Set the ISO to Ascii charset decoding table character to use in decoding 
+Set the ISO to ASCII charset decoding table character to use in decoding 
 an articles text. Values can range from 0 to 6.
 .TP
 \fBORGANIZATION\fP
@@ -1699,7 +1699,7 @@ recognized by the local host.  For example say the return address is
 \fIuser@bigvax\fP, but \fIbigvax\fP is not recognized by your host, so
 therefore the mail will not reach \fIuser\fP.  But the host \fIlittevax\fP
 is known to recognize your host and \fIbigvax\fP, so if ADD_ADDRESS is set
-(i.e. 'setenv ADD_ADDRESS @littevax' for csh or 'set ADD_ADDRESS @littevax'
+(i.e., 'setenv ADD_ADDRESS @littevax' for csh or 'set ADD_ADDRESS @littevax'
 and 'export ADD_ADDRESS' for sh) the address \fIuser@bigvax@littlevax\fP will
 be used and the mail will reach \fIuser@bigvax\fP.
 This variable has precedence over the file \fI$HOME/.tin/add_address\fP
@@ -1712,11 +1712,11 @@ set to the correct mail address.  This variable has precedence over the file
 .TP
 \fBMAILER\fP
 This variable has precedence over the default mailer that is used in all
-mailing operations within \fItin\fP (i.e. replying 'rR', and bug reports 'R').
+mailing operations within \fItin\fP (i.e., replying 'rR', and bug reports 'R').
 .TP
 \fBEDITOR\fP
-This variable has precedence over the default editor (i.e. vi) that is
-used in all editing operations within \fItin\fP (i.e. posting 'w', replying 'rR',
+This variable has precedence over the default editor (i.e., vi) that is
+used in all editing operations within \fItin\fP (i.e., posting 'w', replying 'rR',
 follow-ups 'fF' and bug reports 'R').
 .TP
 \fBAUTOSUBSCRIBE\fP
@@ -1749,19 +1749,19 @@ down a line (page at article viewer level).
 The following newsgroups provide useful information concerning news software:
 .in +.5i
 .ti -\w'\(em'u
-\(emnews.software.readers (info. about news user agents tin,rn,nn,vn etc.)
+\(emnews.software.readers (info. about news user agents tin, rn, nn, vn etc.)
 .ti -\w'\(em'u
 \(emnews.software.nntp (info. about NNTP)
 .ti -\w'\(em'u
-\(emnews.software.b (info. about news transport agents Bnews,Cnews and INN)
+\(emnews.software.b (info. about news transport agents Bnews, Cnews and INN)
 .ti -\w'\(em'u
 \(emnews.answers (Frequently Asked Questions (FAQ) about many different themes)
 .PP
-Many prompts (i.e. 'Mark everything as read? (y/n): y') within \fItin\fP 
+Many prompts (i.e., 'Mark everything as read? (y/n): y') within \fItin\fP 
 offer a default choice that the cursor is positioned on.  By pressing
 <CR> the default value is taken.
 .PP
-Many prompts (i.e. 'Post subject []>') within \fItin\fP can be aborted by
+Many prompts (i.e., 'Post subject []>') within \fItin\fP can be aborted by
 pressing ESC.
 .PP
 When \fItin\fP is run in an xterm window it will resize itself each time the 
@@ -1866,10 +1866,10 @@ mailgroups index files directory.
 saved newsgroups index files directory.
 .TP 2i
 \fI$HOME/.tin/active.mail\fP
-active file of users mailgroups.
+active file of user's mailgroups.
 .TP 2i
 \fI$HOME/.tin/active.save\fP
-active file of users saved newsgroups.
+active file of user's saved newsgroups.
 .TP 2i
 \fI$HOME/.tin/add_address\fP
 address to add to when replying through mail.
@@ -2056,7 +2056,7 @@ I wish to thank the following people for bug reports/comments:
 Jack Applin, Klaus Arzig, Scott Babb, Reiner Balling, Preston Bannister,
 Bill de Beabien, Volker Beyer, Etienne Bido, Roger Binns, Georg Biehler,
 Jean-Marc Bonnaudet, Eric Bowles, Sean Brady, Jack Bryans, Ian Brown,
-Andreas Brosig, Craig Bruce, Brett Carver,Tom Czarnik, Dave Datta, Mat
+Andreas Brosig, Craig Bruce, Brett Carver, Tom Czarnik, Dave Datta, Mat
 Davis, Karl Denninger, Klaus Dimmler, David Donovan, Peter Dressler, Phil
 Edwards, Gerhard Ermer, Hugh Fader, Miguel Farah, Joachim Feld, Paul Fox,
 Jay Geertsen, Herschel Gelman, Bernhard Gmelch, Jason Haar, Viet Hoang, Mike

@@ -49,15 +49,15 @@ struct dirent
 
 typedef struct
 {
-	unsigned long	_d_hdir;             
-	char			*_d_dirname;          
-	unsigned		_d_magic;            
-	unsigned		_d_nfiles;           
-	char			*_d_bufp;             
-	char			_d_buf[512];         
+	unsigned long	_d_hdir;
+	char			*_d_dirname;
+	unsigned		_d_magic;
+	unsigned		_d_nfiles;
+	char			*_d_bufp;
+	char			_d_buf[512];
 } DIR;
 
-struct passwd 
+struct passwd
 {
 	char	*pw_name;
 	char	*pw_passwd;
@@ -70,9 +70,9 @@ struct passwd
 	char	*pw_shell;
 };
 
-#if !defined(_POSIX_SOURCE) 
+#if !defined(_POSIX_SOURCE)
 
-struct comment 
+struct comment
 {
 	char	*c_dept;
 	char	*c_name;
@@ -80,7 +80,7 @@ struct comment
 	char	*c_bin;
 };
 
-#endif	/* _POSIX_SOURCE */ 
+#endif	/* _POSIX_SOURCE */
 
 extern int closedir (DIR *__dir);
 extern char getopt (int argc,char *argv[],char *options);

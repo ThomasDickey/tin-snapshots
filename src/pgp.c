@@ -16,8 +16,8 @@
 
 #ifdef HAVE_PGP
 
-/* 
- * name of environment variable of options to pass to PGP 
+/*
+ * name of environment variable of options to pass to PGP
  */
 #define PGPNAME "pgp"
 #define PGPOPTS "PGPOPTS"
@@ -76,14 +76,14 @@ join_files (file)
 	fclose(art);
 }
 
-static void 
+static void
 split_file (file)
 	char *file;
 {
 	int pid, mask;
 	char buf[LEN];
 	FILE *art, *header, *text;
-	
+
 	pid = getpid();
 	sprintf(hdr, HEADERS, TMPDIR, pid);
 	sprintf(pt, PLAINTEXT, TMPDIR, pid);
@@ -118,7 +118,7 @@ split_file (file)
 	umask(mask);
 }
 
-static void 
+static void
 do_pgp (what, file, mail_to)
 	int what;
 	char *file;
@@ -141,7 +141,7 @@ do_pgp (what, file, mail_to)
 	unlink(ct);
 }
 
-static void 
+static void
 pgp_append_public_key (file)
 	char *file;
 {
@@ -171,7 +171,7 @@ pgp_append_public_key (file)
 	}
 }
 
-static int 
+static int
 pgp_available ()
 {
 	FILE *f;
@@ -186,13 +186,13 @@ pgp_available ()
 	}
 }
 
-void 
+void
 invoke_pgp_mail (nam, mail_to)
 	char *nam;
 	char *mail_to;
 {
 	char ch, ch_default = 's';
-	
+
 	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return;
@@ -228,7 +228,7 @@ invoke_pgp_news(the_article)
 	char *the_article;
 {
 	char ch, ch_default = 's';
-	
+
 	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return;
@@ -256,7 +256,7 @@ invoke_pgp_news(the_article)
 	}
 }
 
-int 
+int
 pgp_check_article()
 {
 	FILE *art;

@@ -11,7 +11,7 @@
  *              monetary  profit  gained  specifically  from the use or
  *              reproduction or this software, it is not  sold, rented,
  *              traded or otherwise marketed, and this copyright notice
- *              is included prominently in any copy made. 
+ *              is included prominently in any copy made.
  */
 
 #include "tin.h"
@@ -50,7 +50,7 @@ static	char nntp_line[NNTP_STRLEN];
 #ifdef NNTP_ABLE
 TCP *nntp_rd_fp = NULL;
 TCP *nntp_wr_fp = NULL;
-#endif 
+#endif
 
 #else /* VMS */
 int	sockt_rd = -1, sockt_wr = -1;
@@ -215,7 +215,7 @@ getserverbyfile (file)
  *			for reading and writing to server.
  */
 
-int 
+int
 server_init (machine, service, port)
 	char	*machine;
 	char	*service;
@@ -277,7 +277,7 @@ server_init (machine, service, port)
 	}
 #else /* VMS */
 	sockt_wr = sockt_rd;
-#endif 
+#endif
 	/*
 	 * Now get the server's signon message
 	 */
@@ -303,7 +303,7 @@ server_init (machine, service, port)
  *	Errors:		Printed via perror.
  */
 
-int 
+int
 get_tcp_socket (machine, service, port)
 	char	*machine;	/* remote host */
 	char	*service;	/* nttp/smtp etc. */
@@ -312,7 +312,7 @@ get_tcp_socket (machine, service, port)
 #ifdef NNTP_ABLE
 	int	s = -1;
 	struct	sockaddr_in sock_in;
-	
+
 /* hp-ux 8.0, 9.05, 10.10 don't need it...
 #ifdef __hpux
 	int	socksize = 0;
@@ -320,7 +320,7 @@ get_tcp_socket (machine, service, port)
 #endif
 */
 
-#ifdef TLI 
+#ifdef TLI
 	extern struct	hostent *gethostbyname ();
 	struct	hostent *hp;
 	struct	t_call	*callptr;
@@ -337,7 +337,7 @@ get_tcp_socket (machine, service, port)
 		t_close (s);
 		return (-1);
 	}
-	memset((char *) &sock_in, '\0', sizeof (sock_in));	
+	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
 	if (!isdigit(*machine) ||
@@ -349,7 +349,7 @@ get_tcp_socket (machine, service, port)
 		}
 		memcopy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
 	}
-	
+
 	/*
 	 * Allocate a t_call structure and initialize it.
 	 * Let t_alloc() initialize the addr structure of the t_call structure.
@@ -392,7 +392,7 @@ get_tcp_socket (machine, service, port)
 		t_close (s);
 		return (-1);
 	}
-	
+
 #else /* !TLI */
 #ifndef EXCELAN
 	struct servent *sp;
@@ -416,7 +416,7 @@ get_tcp_socket (machine, service, port)
     sp->s_port = htons (IPPORT_NNTP);
 #endif
 	/* If not a raw ip address, try nameserver */
-	if (!isdigit(*machine) || 
+	if (!isdigit(*machine) ||
 	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
@@ -468,7 +468,7 @@ get_tcp_socket (machine, service, port)
 			return (-1);
 		}
 		memcpy((char *) &sock_in.sin_addr, *cp, hp->h_length);
-		
+
 		if (x < 0) {
 			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
 		}
@@ -561,7 +561,7 @@ get_tcp_socket (machine, service, port)
  *	Errors:		Printed via nerror.
  */
 
-int 
+int
 get_dnet_socket (machine, service)
 	char	*machine;
 	char	*service;
@@ -574,10 +574,10 @@ get_dnet_socket (machine, service)
 	memset((char *) &sdn, '\0', sizeof (sdn));
 
 	switch (s = sscanf (machine, "%d%*[.]%d", &area, &node)) {
-		case 1: 
+		case 1:
 			node = area;
 			area = 0;
-		case 2: 
+		case 2:
 			node += area*1024;
 			sdn.sdn_add.a_len = 2;
 			sdn.sdn_family = AF_DECnet;
@@ -639,7 +639,7 @@ get_dnet_socket (machine, service)
  *	Side effects:	None.
  */
 
-int 
+int
 handle_server_response (response, nntpserver)
 	int	response;
 	char	*nntpserver;
@@ -675,7 +675,7 @@ handle_server_response (response, nntpserver)
  * u_put_server -- send data to the server. Do not flush output.
  */
 
-void 
+void
 u_put_server (string)
 	char *string;
 {
@@ -707,7 +707,7 @@ u_put_server (string)
  *			fflush.
  */
 
-void 
+void
 put_server (string)
 	char *string;
 {
@@ -786,7 +786,7 @@ put_server (string)
  */
 
 #ifndef VMS
-int 
+int
 get_server (string, size)
 	char	*string;
 	int	size;
@@ -807,7 +807,7 @@ static int reconnecting = 0;
 			if (reconnecting) return -1;
 			if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				return -2;
-	/* there was no check for -2 in open.c !!!*/			
+	/* there was no check for -2 in open.c !!!*/
 			}
 			reconnecting = 1;
 			clear_message ();
@@ -821,7 +821,7 @@ static int reconnecting = 0;
 				put_server (buf);
 			}
 			reconnecting = 0;
-		}	
+		}
 	}
 
 	/*
@@ -910,7 +910,7 @@ int get_server (char *string, int size)
  *			after this routine is called.
  */
 
-void 
+void
 close_server ()
 {
 #ifdef NNTP_ABLE
@@ -1133,14 +1133,14 @@ nntp_respcode (respcode)
 			break;
 	}
 	return (text);
-	}	
+	}
 #else
 	return ("");
 #endif
 }
 
 
-int	
+int
 nntp_message (respcode)
 	int respcode;
 {

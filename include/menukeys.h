@@ -15,7 +15,8 @@
 /* general keys */
 
 #define iKeyQuit 'q'
-#define iKeyQuit2 ESC
+#define iKeyQuitTin 'Q'
+#define iKeyAbort ESC
 
 /* active.c */
 
@@ -91,7 +92,6 @@
 #define iKeyGroupOptionMenu 'M'
 #define iKeyGroupNextUnreadArt 'N'
 #define iKeyGroupPrevUnreadArt 'P'
-#define iKeyGroupQuitTin 'Q'
 #define iKeyGroupBugReport 'R'
 #define iKeyGroupSaveTagged 'S'
 #define iKeyGroupUntag 'U'
@@ -193,7 +193,6 @@
 #define iKeyPageOptionMenu 'M'
 #define iKeyPageNextUnreadArt 'N'
 #define iKeyPagePrevUnreadArt 'P'
-#define iKeyPageQuitTin 'Q'
 #define iKeyPageReply 'R'
 #define iKeyPageGroupSel 'T'
 #define iKeyPagePostHist 'W'
@@ -242,7 +241,6 @@
 
 /* save.c */
 
-#define iKeySaveDontSaveFile ESC
 #define iKeySaveAppendFile 'a'
 #define iKeySaveOverwriteFile 'o'
 #define iKeySaveDontSaveFile2 'q'
@@ -334,7 +332,6 @@
 #define iKeyThreadToggleHelpDisplay 'H'
 #define iKeyThreadToggleInverseVideo 'I'
 #define iKeyThreadMarkArtRead 'K'
-#define iKeyThreadQuitTin 'Q'
 #define iKeyThreadBugReport 'R'
 #define iKeyThreadMarkThdUnread 'Z'
 #define iKeyThreadFirstPage '^'

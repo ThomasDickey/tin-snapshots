@@ -1091,32 +1091,32 @@ log_user ()
 
 		if ((fp = fopen (log_file, "a+")) != (FILE *) 0) {
 			time (&epoch);
-			fprintf (fp, "%s%s: %-32s (%-8s) %s", 
+			fprintf (fp, "%s%s: %-32s (%-8s) %s",
 				VERSION, RELEASEDATE,
 #ifdef M_AMIGA
 				get_val ("REALNAME", "Unknown"),
 				get_val ("USERNAME", "Unknown"),
 #else
 				buf,
-				myentry->pw_name, 
+				myentry->pw_name,
 #endif
 				ctime (&epoch));
 			fclose (fp);
 			chmod (log_file, 0666);
-		}	
+
 #endif	/* LOG_USER */
 	}
 }
 
 /*
  * NNTP user authorization. Password read from ~/.newsauth
- * The ~/.newsauth authorization file has the format:  
+ * The ~/.newsauth authorization file has the format:
  *   nntpserver1 password [user]
  *   nntpserver2 password [user]
  *   etc.
  */
 
-void 
+void
 authorization (server, authuser)
 	char *server;
 	char *authuser;
@@ -1221,7 +1221,7 @@ authorization (server, authuser)
 
 		break;	/* if we end up here, everything seems OK */
 	}
-	fclose (fp); 
+	fclose (fp);
 
 	if (authpass == (char *) 0) {
 		error_message (txt_nntp_authorization_failed, server);

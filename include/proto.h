@@ -272,7 +272,7 @@ extern long my_atol P_((char *s, int n));
 extern int my_stricmp P_((/* const */ char *p, /* const */ char *q));
 extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
 extern char *eat_re P_((char *s));
-extern void my_strncpy P_((char *p, /* const */ char *q, int n));
+extern void my_strncpy P_((char *p, const char *q, int n));
 extern int untag_all_articles P_((void));
 extern char *str_str P_((char *text, char *pattern, size_t patlen));
 extern void get_author P_((int thread, struct t_article *art, char *str));
@@ -321,6 +321,9 @@ extern void art_mark_unread P_((struct t_group *group, struct t_article *art));
 extern void art_mark_will_return P_((struct t_group *group, struct t_article *art));
 extern void vSetDefaultBitmap P_((struct t_group *group));
 extern char *getaline P_((FILE *fp));
+#ifdef DEBUG_NEWSRC
+extern void vNewsrcTestHarness P_((void));
+#endif
 
 /* nntplib.c */
 extern char *getserverbyfile P_((char *file));
@@ -448,7 +451,7 @@ extern char *strcasestr P_((char *haystack, char *needle));
 extern FILE *rfc1521_decode P_((FILE *file));
 extern void rfc1521_encode P_((char *line, FILE *f, int e));
 /* added for EUC-KR/JP/CN support by Jungshik Shin */
-extern void rfc1557_encode P_((char *line, FILE *f, int e)); 
+extern void rfc1557_encode P_((char *line, FILE *f, int e));
 extern void rfc1468_encode P_((char *line, FILE *f, int e));
 extern void rfc1922_encode P_((char *line, FILE *f, int e));
 
@@ -600,7 +603,7 @@ extern void NSETRNG0 P_((t_bitmap *bitmap, long low, long high));
 	extern void read_mailgroups_file P_((void));
 	extern void vGrpDelMailArt P_((struct t_article *psArt));
 	extern void vGrpDelMailArts P_((struct t_group *psGrp));
-	
+
 	/* newsrc.c */
 	extern void art_mark_deleted P_((struct t_article *art));
 	extern void art_mark_undeleted P_((struct t_article *art));

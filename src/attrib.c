@@ -17,7 +17,7 @@
 /*
  * Defines used in setting attributes switch
  */
- 
+
 #define	ATTRIB_MAILDIR			0
 #define	ATTRIB_SAVEDIR			1
 #define	ATTRIB_SAVEFILE			2
@@ -51,7 +51,7 @@
 #define ATTRIB_QUOTE_CHARS		30
 
 /*
- * global attributes	
+ * global attributes
  */
 
 struct t_attribute glob_attributes;
@@ -59,7 +59,7 @@ struct t_attribute glob_attributes;
 /*
  * Per group attributes
  */
- 
+
 void
 set_default_attributes (psAttrib)
 	struct t_attribute *psAttrib;
@@ -71,7 +71,7 @@ set_default_attributes (psAttrib)
 	psAttrib->savedir = default_savedir;
 	psAttrib->savefile = (char *) 0;
 	psAttrib->sigfile = default_sigfile;
-	psAttrib->organization = 
+	psAttrib->organization =
 		(default_organization[0] ? default_organization : (char *) 0);
 	psAttrib->followup_to = (char *) 0;
 	psAttrib->printer = default_printer;
@@ -128,7 +128,7 @@ set_default_attributes (psAttrib)
  *    5=date descend, 6=date ascend
  *  attribute.post_proc_type   = NUM
  *    0=none, 1=unshar, 2=uudecode
- *    3=uudecode & list zoo (unix) / lha (AmigaDOS) archive 
+ *    3=uudecode & list zoo (unix) / lha (AmigaDOS) archive
  *    4=uudecode & extract zoo (unix) / lha (AmigaDOS) archive
  *    5=uudecode & list zip archive
  *    6=uudecode & extract zip archive
@@ -166,7 +166,7 @@ read_attributes_file (file, global_file)
 	FILE *fp;
 	int num;
 	register int i;
-	
+
 	/*
 	 * Initialize global attributes (default unless overridden)
 	 */
@@ -174,7 +174,7 @@ read_attributes_file (file, global_file)
 		set_default_attributes (&glob_attributes);
 		glob_attributes.global = TRUE;
 	}
-		
+
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
 		if ((update && update_fork) || ! update) {
 			if (global_file) {
@@ -183,7 +183,7 @@ read_attributes_file (file, global_file)
 				wait_message (txt_reading_attributes_file);
 			}
 	}
-	
+
 		scope[0] = '\0';
 		while (fgets (line, sizeof (line), fp) != (char *) 0) {
 			if (line[0] == '#' || line[0] == '\n') {
@@ -345,7 +345,7 @@ read_attributes_file (file, global_file)
 		}
 		fclose (fp);
 	}
-	
+
 	/*
 	 * Now setup the rest of the groups to use the default attributes
 	 */
@@ -382,7 +382,7 @@ set_attrib_str (type, scope, str)
 		 */
 		if (! strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
-			if (psGrp != (struct t_group *) 0) { 	
+			if (psGrp != (struct t_group *) 0) {
 if (debug) {
 	printf ("GROUP=[%s] Type=[%2d] Str=[%s]\n", psGrp->name, type, str);
 }
@@ -420,7 +420,7 @@ set_attrib_num (type, scope, num)
 		 */
 		if (! strchr (scope, '*')) {
 			psGrp = psGrpFind (scope);
-			if (psGrp != (struct t_group *) 0) { 	
+			if (psGrp != (struct t_group *) 0) {
 if (debug) {
 	printf ("GROUP=[%s] Type=[%2d] Num=[%d]\n", psGrp->name, type, num);
 }
@@ -454,14 +454,14 @@ set_attrib (psGrp, type, str, num)
 	 * Setup attributes for this group
 	 */
 	if (psGrp->attribute == (struct t_attribute *) 0) {
-		psGrp->attribute = 
+		psGrp->attribute =
 			(struct t_attribute *) my_malloc (sizeof (struct t_attribute));
 		set_default_attributes (psGrp->attribute);
 	}
 
 	/*
-	 * Now set the attribute for this group 
-	 */	 	
+	 * Now set the attribute for this group
+	 */
 	switch (type) {
 		case ATTRIB_MAILDIR:
 			psGrp->attribute->maildir = str_dup (str);
@@ -558,12 +558,12 @@ set_attrib (psGrp, type, str, num)
 		default:
 			break;
 	}
-	
+
 #endif	/* INDEX_DAEMON */
 }
 
 /*
- *  Save the group attributes from active[].attribute to ~/.tin/attributes 
+ *  Save the group attributes from active[].attribute to ~/.tin/attributes
  */
 
 void
@@ -609,19 +609,19 @@ write_attributes_file (file)
 	fprintf (fp, "#  show_author=NUM\n");
 	fprintf (fp, "#    0=none, 1=name, 2=addr, 3=both\n#\n");
 	fprintf (fp, "#  sort_art_type=NUM\n");
-	fprintf (fp, "#    0=none, 1=subj descend, 2=subj ascend,\n"); 
+	fprintf (fp, "#    0=none, 1=subj descend, 2=subj ascend,\n");
 	fprintf (fp, "#    3=from descend, 4=from ascend,\n");
 	fprintf (fp, "#    5=date descend, 6=date ascend\n#\n");
 	fprintf (fp, "#  post_proc_type=NUM\n");
-	fprintf (fp, "#    0=none, 1=unshar, 2=uudecode,\n"); 
+	fprintf (fp, "#    0=none, 1=unshar, 2=uudecode,\n");
 #ifdef M_AMIGA
-	fprintf (fp, "#    3=uudecode & list lha archive,\n"); 
+	fprintf (fp, "#    3=uudecode & list lha archive,\n");
 	fprintf (fp, "#    4=uudecode & extract lha archive\n");
 #else
-	fprintf (fp, "#    3=uudecode & list zoo archive,\n"); 
+	fprintf (fp, "#    3=uudecode & list zoo archive,\n");
 	fprintf (fp, "#    4=uudecode & extract zoo archive\n");
 #endif
-	fprintf (fp, "#    5=uudecode & list zip archive,\n"); 
+	fprintf (fp, "#    5=uudecode & list zip archive,\n");
 	fprintf (fp, "#    6=uudecode & extract zip archive\n#\n");
 	fprintf (fp, "#  mailing_list=STRING (ie. majordomo@list.org)\n");
 	fprintf (fp, "#  x_headers=STRING (ie. ~/.tin/extra-headers)\n");
@@ -648,20 +648,20 @@ write_attributes_file (file)
 	fprintf (fp, "############################################################################\n\n");
 
 /*
- * some usefull defaults 
+ * some usefull defaults
  */
 	fprintf (fp, "# in *sources* set post process type to shar\n");
 	fprintf (fp, "scope=*sources*\n");
 	fprintf (fp, "post_proc_type=1\n\n");
-	
+
 	fprintf (fp, "# in *binaries* set post process type to uudecode, remove tmp files\n");
-	fprintf (fp, "# and Followup-To: poster\n");        
+	fprintf (fp, "# and Followup-To: poster\n");
 	fprintf (fp, "scope=*binaries*\n");
 	fprintf (fp, "post_proc_type=2\n");
 	fprintf (fp, "delete_tmp_files=ON\n");
 	fprintf (fp, "followup_to=poster\n\n");
-		
-	
+
+
 	for (i = 0 ; i < num_active ; i++) {
 		psGrp = &active[i];
 		fprintf (fp, "scope=%s\n", psGrp->name);
@@ -672,45 +672,45 @@ write_attributes_file (file)
 		fprintf (fp, "sigfile=%s\n", psGrp->attribute->sigfile);
 		fprintf (fp, "followup_to=%s\n", psGrp->attribute->followup_to);
 		fprintf (fp, "printer=%s\n", psGrp->attribute->printer);
-		fprintf (fp, "show_only_unread=%s\n", 
+		fprintf (fp, "show_only_unread=%s\n",
 			print_boolean (psGrp->attribute->show_only_unread));
 		fprintf (fp, "thread_arts=%d\n", psGrp->attribute->thread_arts);
-		fprintf (fp, "auto_select=%s\n", 
+		fprintf (fp, "auto_select=%s\n",
 			print_boolean (psGrp->attribute->auto_select));
-		fprintf (fp, "auto_save=%s\n", 
+		fprintf (fp, "auto_save=%s\n",
 			print_boolean (psGrp->attribute->auto_save));
-		fprintf (fp, "auto_save_msg=%s\n", 
+		fprintf (fp, "auto_save_msg=%s\n",
 			print_boolean (psGrp->attribute->auto_save_msg));
-		fprintf (fp, "batch_save=%s\n", 
+		fprintf (fp, "batch_save=%s\n",
 			print_boolean (psGrp->attribute->batch_save));
-		fprintf (fp, "delete_tmp_files=%s\n", 
+		fprintf (fp, "delete_tmp_files=%s\n",
 			print_boolean (psGrp->attribute->delete_tmp_files));
 		fprintf (fp, "sort_art_type=%d\n", psGrp->attribute->sort_art_type);
 		fprintf (fp, "show_author=%d\n", psGrp->attribute->show_author);
 		fprintf (fp, "post_proc_type=%d\n", psGrp->attribute->post_proc_type);
-		fprintf (fp, "quick_kill_scope=%s\n", 
+		fprintf (fp, "quick_kill_scope=%s\n",
 			psGrp->attribute->quick_kill_scope);
-		fprintf (fp, "quick_kill_case=%s\n", 
+		fprintf (fp, "quick_kill_case=%s\n",
 			print_boolean (psGrp->attribute->quick_kill_case));
 		fprintf (fp, "quick_kill_expire=%s\n",
 			print_boolean (psGrp->attribute->quick_kill_expire));
 		fprintf (fp, "quick_kill_header=%d\n", psGrp->attribute->quick_kill_header);
-		fprintf (fp, "quick_select_scope=%s\n", 
+		fprintf (fp, "quick_select_scope=%s\n",
 			psGrp->attribute->quick_select_scope);
-		fprintf (fp, "quick_select_case=%s\n", 
+		fprintf (fp, "quick_select_case=%s\n",
 			print_boolean (psGrp->attribute->quick_select_case));
-		fprintf (fp, "quick_select_expire=%s\n", 
+		fprintf (fp, "quick_select_expire=%s\n",
 			print_boolean (psGrp->attribute->quick_select_expire));
 		fprintf (fp, "quick_select_header=%d\n\n", psGrp->attribute->quick_select_header);
 		fprintf (fp, "mailing_list=%s\n", psGrp->attribute->mailing_list);
 		fprintf (fp, "x_headers=%s\n", psGrp->attribute->x_headers);
 		fprintf (fp, "x_body=%s\n", psGrp->attribute->x_body);
-		fprintf (fp, "x_comment_to=%s\n", 
+		fprintf (fp, "x_comment_to=%s\n",
 			print_boolean (psGrp->attribute->x_comment_to));
 		fprintf (fp, "news_quote_format=%s\n",
 			psGrp->attribute->news_quote_format);
 		fprintf (fp, "quote_chars=%s\n",
-			quote_space_to_dash (psGrp->attribute->quote_chars)); 
+			quote_space_to_dash (psGrp->attribute->quote_chars));
 	}
 
 	fclose (fp);
@@ -725,25 +725,25 @@ debug_print_filter_attributes ()
 #ifndef INDEX_DAEMON
 	register int i;
 	struct t_group *psGrp;
-		
+
 	printf("\nBEG ***\n");
 
 	for (i = 0; i < num_active ; i++) {
 		psGrp = &active[i];
 		printf ("Grp=[%s] KILL   header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
 			psGrp->name, psGrp->attribute->quick_kill_header,
-			(psGrp->attribute->quick_kill_scope ? 
+			(psGrp->attribute->quick_kill_scope ?
 				psGrp->attribute->quick_kill_scope : ""),
 			(psGrp->attribute->quick_kill_case ? "ON" : "OFF"),
 			(psGrp->attribute->quick_kill_expire ? "ON" : "OFF"));
 		printf ("Grp=[%s] SELECT header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
 			psGrp->name, psGrp->attribute->quick_select_header,
-			(psGrp->attribute->quick_select_scope ? 
+			(psGrp->attribute->quick_select_scope ?
 				psGrp->attribute->quick_select_scope: ""),
 			(psGrp->attribute->quick_select_case ? "ON" : "OFF"),
 			(psGrp->attribute->quick_select_expire ? "ON" : "OFF"));
 	}
-	
+
 	printf("END ***\n");
 #endif	/* INDEX_DAEMON */
 }

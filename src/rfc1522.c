@@ -12,12 +12,15 @@
  *              right notice, and it must be included in any copy made.
  */
 
-#undef MIME_BASE64_ALLOWED	/*
-				   * allow base64 encoding in headers if the
-				   * result is shorter than quoted printable
-				   * encoding. THIS IS NOT YET IMPLEMENTED,
-				   * so leave this off
-				 */
+
+
+/*
+ * allow base64 encoding in headers if the
+ * result is shorter than quoted printable
+ * encoding. THIS IS NOT YET IMPLEMENTED,
+ * so leave this off
+ */
+#undef MIME_BASE64_ALLOWED
 
 #ifndef DEBUG_MIME
 #include "tin.h"
@@ -30,20 +33,23 @@
 #if HAVE_MALLOC_H
 #include <malloc.h>
 #endif
-#undef MIME_BREAK_LONG_LINES	/*
-				   * define this to make TIN strictly observe
-				   * RFC1522 and break lots of other software
-				 */
-#define MIME_STRICT_CHARSET	/*
-				   * define this to force MM_CHARSET obeyance
-				   * when decoding.  If you don't, everything
-				   * is thought to match your machine's charset
-				 */
+
+/*
+ * define this to make TIN strictly observe
+ * RFC1522 and break lots of other software
+ */
+#undef MIME_BREAK_LONG_LINES
+
+/*
+ * define this to force MM_CHARSET obeyance
+ * when decoding.  If you don't, everything
+ * is thought to match your machine's charset
+ */
+#define MIME_STRICT_CHARSET
 #endif /* DEBUG_MIME */
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
-#define isbetween(c) (isspace(c) || (c) == '(' || (c) == ')')
-
+#define isbetween(c) (isspace((unsigned char)c) || (c) == '(' || (c) == ')')
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.
@@ -56,8 +62,6 @@
 
 #define NOT_RANKED 255
 
-/* char mm_charset[128] = ""; */
-/* make it configurable in tinrc. move it to init.c  */
 const char base64_alphabet[64] =
 {
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -565,7 +569,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	int umlauts = 0;
 	int body_encoding_needed = 0;
 	char encoding;
-        void (*body_encode) ();
+	BodyPtr body_encode;
 
 	g = tmpfile ();
 	if (!g)
@@ -581,9 +585,9 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	while (fgets (buffer, 2048, f)) {
 		if (header[0]
 		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
-                        if ( allow_8bit_header )    
+                        if ( allow_8bit_header )
                            fputs(header,g);
-                        else 
+                        else
 			   fputs (rfc1522_encode (header), g);
 			fputc ('\n', g);
 			header[0] = '\0';
@@ -630,12 +634,12 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-                        if ( !strncasecmp(mm_charset,"euc-",4) && 
-                             !strcasecmp(mime_encoding,"7bit") ) 
-                            
+                        if ( !strncasecmp(mm_charset,"euc-",4) &&
+                             !strcasecmp(mime_encoding,"7bit") )
+
 			   fprintf (f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &mm_charset[4]);
-                        else 
-                               
+                        else
+
 			   fprintf (f, "Content-Type: text/plain; charset=%s\n", mm_charset);
 			fprintf (f, "Content-Transfer-Encoding: %s\n", mime_encoding);
 		} else {
@@ -645,39 +649,47 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	}
 	fputc ('\n', f);
 
-	if (!strcasecmp (mime_encoding, "base64"))
+	if (! strcasecmp (mime_encoding, "base64"))
 		encoding = 'b';
 	else if (!strcasecmp (mime_encoding, "quoted-printable"))
 		encoding = 'q';
-	else 
+	else
 		encoding = '8';
 
-	if (!body_encoding_needed)
+	if (! body_encoding_needed)
 		encoding = '8';
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-	if (!strcasecmp (mime_encoding, "7bit")) {
-          encoding = '7';
-/* For EUC-KR,7bit means ISO-2022-KR encoding specified in RFC 1557 */
-          if ( !strcasecmp(mm_charset,"euc-kr") )
-             body_encode = (void (*)() ) rfc1557_encode;
-/* Not only  EUC-JP but also other Japanese charsets such as
-SJIS and JIS might need RFC 1468 encoding. To be confirmed.  */
-          else if ( !strcasecmp(mm_charset,"euc-jp") )
-             body_encode = (void (*)() ) rfc1468_encode;
-/* Not only  EUC-CN but also other Chinese charsets such as
-BIG5 and Traditional  might need RFC 1922 encoding. To be confirmed.  */
-          else if ( !strcasecmp(mm_charset,"euc-cn") )
-             body_encode = (void (*)() ) rfc1922_encode;
-          else {
-             body_encode = (void (*)() ) rfc1521_encode;
-             encoding='8';
-          }
-        }
-        else
-             body_encode = (void (*)() ) rfc1521_encode;
-              
+	if (! strcasecmp (mime_encoding, "7bit")) {
+		encoding = '7';
+
+/* For EUC-KR, 7bit means ISO-2022-KR encoding specified in RFC 1557 */
+
+		if (! strcasecmp(mm_charset, "euc-kr"))
+			body_encode = rfc1557_encode;
+
+/*
+ * Not only  EUC-JP but also other Japanese charsets such as
+ * SJIS and JIS might need RFC 1468 encoding. To be confirmed.
+ */
+		else if (! strcasecmp(mm_charset, "euc-jp"))
+			body_encode = rfc1468_encode;
+
+/*
+ * Not only  EUC-CN but also other Chinese charsets such as
+ * BIG5 and Traditional  might need RFC 1922 encoding. To be confirmed.
+ */
+		else if (! strcasecmp(mm_charset, "euc-cn"))
+			body_encode = rfc1922_encode;
+		else {
+			body_encode = rfc1521_encode;
+			encoding='8';
+		}
+	}
+	else
+		body_encode = rfc1521_encode;
+
 	while (fgets (buffer, 2048, g)) {
 		body_encode (buffer, f, encoding);
 	}

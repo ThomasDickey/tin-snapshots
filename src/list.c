@@ -32,7 +32,7 @@ psGrpFind (pcGrpName)
 
 	iNum = group_hash[lHash];
 
-	/* 
+	/*
 	 * hash linked list chaining
 	 */
 	while (iNum >= 0) {

@@ -29,10 +29,10 @@ write_newsrctable_file()
 {
 
 	FILE *fp;
-	
+
 	if ((fp = fopen(local_newsrctable_file, "w")) == (FILE *) 0)
-		return; 
-	
+		return;
+
 	fprintf(fp, "# NNTP-server -> newrc translation table and NNTP-server\n");
 	fprintf(fp, "# shortname list for %s %s\n#\n", progname, VERSION);
 	fprintf(fp, "# the format of this file is\n");
@@ -42,7 +42,7 @@ write_newsrctable_file()
 	fprintf(fp, "#   news.sub.net             .newsrc-subnet  news subnet newssub\n");
 	fprintf(fp, "#   news.rz.uni-karlsruhe.de /tmp/nrc-rz     rz news.rz\n");
 	fprintf(fp, "#\n");
-	
+
 	fclose(fp);
 }
 
@@ -69,24 +69,24 @@ get_nntpserver (nntpserver_name, nick_name)
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
 		while ((fgets(line, sizeof(line), fp) != NULL) && (!found)) {
 			line_entry_counter = 0;
-			
+
 			if (!strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
 					line_entry_counter++;
-					
-					if (line_entry_counter == 1) 
+
+					if (line_entry_counter == 1)
 						strcpy(name_found, line_entry);
 
 					if ((line_entry_counter > 2) && (!strcasecmp(line_entry, nick_name)))
 						found = 1;
 				}
-			}			
+			}
 		}
 		fclose(fp);
 		if (found) strcpy(nntpserver_name, name_found);
 		else strcpy(nntpserver_name, nick_name);
 	}
-	else {	
+	else {
 		write_newsrctable_file();
 		strcpy(nntpserver_name, nick_name);
 	}
@@ -109,7 +109,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 	char	name_found[PATH_LEN];
 	int 	found = 0;
 	int	do_cpy = 0;
-	
+
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
 		while ((fgets(line, sizeof(line), fp) != NULL) && (found != 1)) {
 			line_entry_counter = 0;
@@ -117,7 +117,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			if (!strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL :line, " \t\n")) != NULL) {
 					line_entry_counter++;
-					
+
 					if ((line_entry_counter == 1) && (! strcasecmp(line_entry, nntpserver_name))) {
 						found = 1;
 						do_cpy = 1;
@@ -132,7 +132,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 						do_cpy = 0;
 					}
 				}
-			}			
+			}
 		}
 		fclose(fp);
 		if (found) {
@@ -187,16 +187,16 @@ get_newsrcname (newsrc_name, nntpserver_name)
 						sprintf (msg, "%s%c", txt_nrctbl_default, default_ch);
 					}
 					wait_message (msg);
-					
+
 					/*
 					 * FIXME - cursor possition is wrong &
 					 * <return> is needed at the end
 					 */
-					 
+
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = default_ch;
 				} while (! strchr ("\033cdiq", ch));
-				
+
 				switch(ch) {
 					case iKeyNrctblCreate:
 						/* FIXME this doesn't check if we could create the file */
@@ -216,7 +216,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 				}
 			}
 			return TRUE;
-		}	
+		}
 	}
 	else {
 		(void) write_newsrctable_file();

@@ -23,13 +23,13 @@ count_args (s)
 	int ch;
 
 	do {
-		/* 
-		 * count and skip args 
+		/*
+		 * count and skip args
 		 */
 		++count;
-		while ((ch = *s) != '\0' && ch != ' ') 
+		while ((ch = *s) != '\0' && ch != ' ')
 			++s;
-		while ((ch = *s) != '\0' && ch == ' ') 
+		while ((ch = *s) != '\0' && ch == ' ')
 			++s;
 	} while (ch);
 
@@ -51,61 +51,61 @@ envargs (Pargc, Pargv, envstr)
 	char **argvect;			/* copy of vector address */
 
 	/*
-	 * see if anything in the environment 
+	 * see if anything in the environment
 	 */
 	envptr = getenv (envstr);
 	if (envptr == (char *) 0 || *envptr == 0) {
 		return;
 	}
-	
-	/* 
-	 * count the args so we can allocate room for them 
+
+	/*
+	 * count the args so we can allocate room for them
 	 */
 	argc = count_args (envptr);
 	bufptr = (char *) my_malloc (strlen (envptr)+1);
 	strcpy (bufptr, envptr);
 
-	/* 
-	 * allocate a vector large enough for all args 
+	/*
+	 * allocate a vector large enough for all args
 	 */
 	argv = (char **) my_malloc ((argc+*Pargc+1)*sizeof(char *));
 	argvect = argv;
 
-	/* 
-	 * copy the program name first, that's always true 
+	/*
+	 * copy the program name first, that's always true
 	 */
 	*(argv++) = *((*Pargv)++);
 
-	/* 
-	 * copy the environment args first, may be changed 
+	/*
+	 * copy the environment args first, may be changed
 	 */
 	do {
 		*(argv++) = bufptr;
-		/* 
-		 * skip the arg and any trailing blanks 
+		/*
+		 * skip the arg and any trailing blanks
 		 */
-		while ((ch = *bufptr) != '\0' && ch != ' ') 
+		while ((ch = *bufptr) != '\0' && ch != ' ')
 			++bufptr;
-		if (ch == ' ') 
+		if (ch == ' ')
 			*(bufptr++) = '\0';
-		while ((ch = *bufptr) != '\0' && ch == ' ') 
+		while ((ch = *bufptr) != '\0' && ch == ' ')
 			++bufptr;
 	} while (ch);
 
-	/* 
-	 * now save old argc and copy in the old args 
+	/*
+	 * now save old argc and copy in the old args
 	 */
 	argc += *Pargc;
 	while (--(*Pargc))
 		*(argv++) = *((*Pargv)++);
 
-	/* 
-	 * finally, add a NULL after the last arg, like UNIX 
+	/*
+	 * finally, add a NULL after the last arg, like UNIX
 	 */
 	*argv = (char *) 0;
 
-	/* 
-	 * save the values and return 
+	/*
+	 * save the values and return
 	 */
 	*Pargv = argvect;
 	*Pargc = argc;
@@ -121,7 +121,7 @@ main (argc, argv)
 {
 	int ch;
 
-	envargs (&argc, &argv, "OPTS"); 
+	envargs (&argc, &argv, "OPTS");
 
 	while ((ch = getopt (argc, argv, "abc")) != EOF) {
 		switch (ch) {

@@ -779,7 +779,7 @@ quick_post_article ()
 			}
 
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -841,9 +841,7 @@ post_article_done:
 	}
 
 	if (keep_posted_articles) {
-	if (psGrp->attribute->auto_save_msg) {
 		update_posted_msgs_file (article, userid);
-	}
 	}
 
 	if (unlink_article) {
@@ -999,7 +997,7 @@ post_article (group, posted_flag)
 			}
 
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -1065,9 +1063,7 @@ post_article_done:
 			update_posted_info_file (group, 'w', subj);
 		}
 		if (keep_posted_articles) {
-		if (psGrp->attribute->auto_save_msg) {
 			update_posted_msgs_file (article, userid);
-		}
 	}
 	}
 
@@ -1293,7 +1289,7 @@ post_response (group, respnum, copy_text)
 		case iKeyPostPost:
 			goto ignore_followup_to_poster;
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			return ret_code;
 		}
 		{
@@ -1466,7 +1462,7 @@ ignore_followup_to_poster:
 			}
 
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -1537,10 +1533,8 @@ post_response_done:
 				sizeof (default_post_newsgroups));
 		}
 		if (keep_posted_articles) {
-		if (psGrp->attribute->auto_save_msg) {
 			update_posted_msgs_file (article, userid);
 		}
-	}
 	}
 
 	my_strncpy (default_post_subject, buf, sizeof (default_post_subject));
@@ -1650,7 +1644,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		fprintf(fp, "<------- end-of-forwarded-message --------\n");
 	}
 
-	if( ! use_mailreader_i ) {
+	if(! use_mailreader_i) {
 	msg_write_signature (fp, TRUE);
 	}
 
@@ -1659,18 +1653,18 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 #endif
 	fclose (fp);
 
-	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
-		ch = iKeyQuit2;
+	if(use_mailreader_i) {	/* user wants to use his own mailreader */
+		ch = iKeyAbort;
 		redraw_screen = TRUE;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
 		my_strncpy (mail_to, address, sizeof (mail_to));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (! invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
-	} 
+	}
 
 	forever {
-		if (confirm_to_mail && (! use_mailreader_i) ) {
+		if (confirm_to_mail && (! use_mailreader_i)) {
 			do {
 				sprintf (msg, "%s [%.*s]: %c", txt_quit_edit_send,
 					cCOLS-36, note_h_subj, ch_default);
@@ -1693,13 +1687,13 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 #endif
 
 #ifdef HAVE_PGP
-		        case iKeyPostPGP:
-			        invoke_pgp_mail (nam, mail_to);
+			case iKeyPostPGP:
+				invoke_pgp_mail (nam, mail_to);
 				break;
 #endif
 
 			case iKeyQuit:
-			case iKeyQuit2:
+			case iKeyAbort:
 				unlink (nam);
 				clear_message ();
 				*mailed_ok = FALSE;
@@ -1766,7 +1760,7 @@ mail_bug_report ()
 	}
 	chmod(nam, 0600);
 
-	if( ! use_mailreader_i ) {	/* tin should start editor */
+	if(! use_mailreader_i) {	/* tin should start editor */
 		sprintf (buf, "%s%s", bug_addr, add_addr);
 		msg_add_header ("To", buf);
 
@@ -1865,7 +1859,7 @@ mail_bug_report ()
 
 	start_line_offset +=5;
 
-	if( ! use_mailreader_i ) {
+	if(! use_mailreader_i) {
 		msg_write_signature (fp, TRUE);
 	}
 #ifdef WIN32
@@ -1873,8 +1867,8 @@ mail_bug_report ()
 #endif
 	fclose (fp);
 
-	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
-		ch = iKeyQuit2;
+	if(use_mailreader_i) {	/* user wants to use his own mailreader */
+		ch = iKeyAbort;
 		sprintf (subject, "BUG REPORT %s", page_header);
 		sprintf (mail_to, "%s%s", bug_addr, add_addr);
 		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
@@ -1897,13 +1891,13 @@ mail_bug_report ()
 #endif
 
 #ifdef HAVE_PGP
-		        case iKeyPostPGP:
-			        invoke_pgp_mail (nam, mail_to);
+			case iKeyPostPGP:
+				invoke_pgp_mail (nam, mail_to);
 				break;
 #endif
 
 			case iKeyQuit:
-			case iKeyQuit2:
+			case iKeyAbort:
 				unlink (nam);
 				clear_message ();
 				return TRUE;
@@ -2030,7 +2024,7 @@ mail_to_author (group, respnum, copy_text)
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
 
-	if( ! use_mailreader_i )  {
+	if(! use_mailreader_i)  {
 	msg_write_signature (fp, TRUE);
 	}
 
@@ -2039,8 +2033,8 @@ mail_to_author (group, respnum, copy_text)
 #endif
 	fclose (fp);
 
-	if( use_mailreader_i ) {	/* user wants to use his own mailreader for reply */
-		ch = iKeyQuit2;
+	if(use_mailreader_i) {	/* user wants to use his own mailreader for reply */
+		ch = iKeyAbort;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
 		my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
@@ -2065,15 +2059,15 @@ mail_to_author (group, respnum, copy_text)
 
 #ifdef HAVE_PGP
 		case iKeyPostPGP:
-		        my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
+			my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
 			if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
 			 && pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
-			        invoke_pgp_mail (nam, mail_to);
+				invoke_pgp_mail (nam, mail_to);
 			break;
 #endif
 
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			unlink (nam);
 			clear_message ();
 			return redraw_screen;
@@ -2156,12 +2150,11 @@ pcCopyArtHeader (iHeader, pcArt, result)
 			break;
 
 		/* check for continued header */
-		while((c=peek_char(fp))!=EOF && isspace(c) && c!='\n'
-		      && strlen(buf)<sizeof(buf)-1) {
-		  if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
-		    buf[strlen(buf)-1]='\0';
-		  }
-		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), fp);
+		while((c=peek_char(fp)) !=EOF && isspace(c) && c!='\n' && strlen(buf) < sizeof (buf)-1) {
+			if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+				buf[strlen(buf)-1]='\0';
+			}
+			fgets(buf+strlen(buf), sizeof buf-strlen(buf), fp);
 		}
 
 		switch (iHeader) {
@@ -2423,7 +2416,7 @@ delete_article (group, art, respnum)
 				}
 
 			case iKeyQuit:
-			case iKeyQuit2:
+			case iKeyAbort:
 				unlink (delete);
 				clear_message ();
 				return redraw_screen;
@@ -2444,9 +2437,9 @@ repost_article (group, art, respnum, supersede)
 {
 	char 	buf[HEADER_LEN];
 	char 	tmp[HEADER_LEN];
-	int	done 		= FALSE;
+	int	done		= FALSE;
 	char 	ch;
-	char 	ch_default 	= iKeyPostPost;
+	char 	ch_default	= iKeyPostPost;
 	FILE 	*fp;
 	int 	ret_code 	= POSTED_NONE;
  	struct t_group 	*psGrp;
@@ -2458,7 +2451,7 @@ repost_article (group, art, respnum, supersede)
 	char user_name[128];
 	char full_name[128];
 #endif
-                                
+
 	msg_init_headers ();
 
 	/*
@@ -2576,7 +2569,7 @@ repost_article (group, art, respnum, supersede)
 		}
 
 #ifndef FORGERY
-	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+	if (! supersede || (supersede && (! (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
 #else
 	if (! supersede) {
 #endif
@@ -2598,7 +2591,7 @@ repost_article (group, art, respnum, supersede)
 	msg_free_headers ();
 
 #ifndef FORGERY
-	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+	if (! supersede || (supersede && (! (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
 #else
 	if (! supersede) {
 #endif
@@ -2655,7 +2648,7 @@ repost_article (group, art, respnum, supersede)
 #endif
 
  		case iKeyQuit:
- 		case iKeyQuit2:
+ 		case iKeyAbort:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -2791,10 +2784,10 @@ msg_add_x_body (fp_out, body)
 
 void
 modify_headers (line)
-	char *line;
+	char	*line;
 {
 
-	char 	buf[HEADER_LEN];
+	char	buf[HEADER_LEN];
 	char	*chr;
 	char	*chr2;
 
@@ -2829,13 +2822,13 @@ modify_headers (line)
 
 void
 checknadd_headers (infile, lines)
-	char *infile;
-	int   lines;
+	char	*infile;
+	int	lines;
 {
-	char line[HEADER_LEN];
-	char outfile[PATH_LEN];
-	FILE *fp_in, *fp_out;
-	int gotit = FALSE;
+	char	line[HEADER_LEN];
+	char	outfile[PATH_LEN];
+	FILE	*fp_in, *fp_out;
+	int	gotit = FALSE;
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
 #ifdef VMS
@@ -2850,7 +2843,7 @@ checknadd_headers (infile, lines)
 					if (lines) {
 						fprintf (fp_out, "Lines: %d\n", lines);
 					}
-					if (!no_advertising) {
+					if (! no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
 							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
 								OS, VERSION, RELEASEDATE);
@@ -2880,7 +2873,7 @@ checknadd_headers (infile, lines)
 #ifndef M_AMIGA
 int
 insert_from_header (infile)
-  	char *infile;
+  	char	*infile;
 {
 	char	*ptr;
 	char	from_name[HEADER_LEN];
@@ -2942,14 +2935,14 @@ insert_from_header (infile)
 
 void
 find_reply_to_addr (respnum, from_addr)
-	int respnum;
-	char *from_addr;
+	int	respnum;
+	char	*from_addr;
 {
-	char *ptr, buf[HEADER_LEN];
-	char from_both[HEADER_LEN];
-	char from_name[HEADER_LEN];
-	int found = FALSE;
-	long orig_offset;
+	char	*ptr, buf[HEADER_LEN];
+	char	from_both[HEADER_LEN];
+	char	from_name[HEADER_LEN];
+	int	found = FALSE;
+	long	orig_offset;
 
 	orig_offset = ftell (note_fp);
 	fseek (note_fp, 0L, 0);
@@ -2997,11 +2990,11 @@ find_reply_to_addr (respnum, from_addr)
 int
 reread_active_after_posting ()
 {
-	char acBuf[PATH_LEN];
-	int i, modified = FALSE;
-	long lMinOld;
-	long lMaxOld;
-	struct t_group *psGrp;
+	char	acBuf[PATH_LEN];
+	int	i, modified = FALSE;
+	long	lMinOld;
+	long	lMaxOld;
+	struct	t_group *psGrp;
 
 	if (reread_active_for_posted_arts) {
 		reread_active_for_posted_arts = FALSE;
@@ -3026,23 +3019,25 @@ reread_active_after_posting ()
 
 					if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
-	printf ("\r\nUnread WRONG grp=[%s] unread=[%ld] count=[%ld]",
-		psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-	fflush(stdout);
+						printf ("\r\nUnread WRONG grp=[%s] unread=[%ld] count=[%ld]",
+						 psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
+						fflush(stdout);
 #endif
 						psGrp->newsrc.num_unread = psGrp->count;
 					}
 					if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
 #ifdef DEBUG
-	printf ("\r\nMin/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
-		psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-	fflush(stdout);
+						printf ("\r\nMin/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
+						 psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
+						fflush(stdout);
 #endif
+
 /*
 sprintf (acBuf, "EXPAND Min/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
 	psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
 error_message (acBuf, "");
 */
+
 						expand_bitmap (psGrp, psGrp->xmin);
 						modified = TRUE;
 					}

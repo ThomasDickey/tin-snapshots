@@ -29,10 +29,10 @@ static int max_cmdargs;
 /*
  *  OK lets start the ball rolling...
  */
- 
+
 int
 main (argc, argv)
-	int argc;	
+	int argc;
 	char *argv[];
 {
 	int num_cmd_line_groups = 0;
@@ -76,7 +76,7 @@ main (argc, argv)
 #endif
 
 	/*
-	 *  Set up initial array sizes, char *'s: homedir, newsrc, etc. 
+	 *  Set up initial array sizes, char *'s: homedir, newsrc, etc.
 	 */
 	init_alloc ();
 	hash_init ();
@@ -168,7 +168,7 @@ main (argc, argv)
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
 	debug_print_filters ();
-	
+
 	/*
 	 *  Quick post an article & exit if -w specified
 	 */
@@ -179,19 +179,19 @@ main (argc, argv)
 		quick_post_article ();
 		tin_done (EXIT_OK);
 	}
-	
+
 	/*
-	 *  Read text descriptions for mail & news groups from 
+	 *  Read text descriptions for mail & news groups from
 	 *  ~/.tin/mailgroups & LIBDIR/newsgroups respectively
 	 */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
 #endif
 	read_newsgroups_file ();
-	
+
 	if (create_mail_save_dirs ()) {
 		write_config_file (local_config_file);
-	}	
+	}
 
 	num_cmd_line_groups = read_cmd_line_groups ();
 
@@ -201,7 +201,7 @@ main (argc, argv)
 	backup_newsrc ();
 	read_newsrc (newsrc, num_cmd_line_groups ? 0 : 1);
 	if (! num_cmd_line_groups) {
-		toggle_my_groups (show_only_unread_groups, ""); 
+		toggle_my_groups (show_only_unread_groups, "");
 	}
 #endif
 
@@ -220,7 +220,7 @@ main (argc, argv)
 	 *  Save any new articles to savedir structure for later reading
 	 */
 	save_or_mail_new_news ();
-	
+
 	/*
 	 *  Catchup newsrc file (-c option)
 	 */
@@ -254,7 +254,7 @@ main (argc, argv)
 	if (created_rcdir && !update) {
 		show_intro_page ();
 	}
-	
+
 	/*
 	 *  Work loop
 	 */
@@ -280,16 +280,16 @@ main (argc, argv)
 #	endif
 #endif
 
-void 
+void
 read_cmd_line_options (argc, argv)
 	int argc;
 	char *argv[];
 {
 	int ch;
 	int newsrc_set = 0;
-	
+
 	envargs (&argc, &argv, "TINRC");
-	
+
 	while ((ch = getopt (argc, argv, OPTIONS)) != EOF) {
 		switch (ch) {
 #ifdef HAVE_COLOR
@@ -305,17 +305,17 @@ read_cmd_line_options (argc, argv)
 			case 'c':
 				catchup = TRUE;
 				break;
-				
+
 			case 'C':
 				count_articles = TRUE;
 				break;
-				
+
 			case 'd':		/* delete index file before indexing */
 				delete_index_file = TRUE;
 				break;
 
 			case 'D':		/* debug mode 1=NNTP 2=ALL */
-#ifdef DEBUG			
+#ifdef DEBUG
 				debug = atoi (optarg);
 				debug_delete_files ();
 				break;
@@ -364,7 +364,7 @@ read_cmd_line_options (argc, argv)
 				break;
 
 			case 'n':
-#ifdef NNTP_ABLE			
+#ifdef NNTP_ABLE
 				newsrc_active = TRUE;
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
@@ -381,7 +381,7 @@ read_cmd_line_options (argc, argv)
 				break;
 
 			case 'r':	/* read news remotely from default NNTP server */
-#ifdef NNTP_ABLE			
+#ifdef NNTP_ABLE
 				read_news_via_nntp = TRUE;
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
@@ -418,13 +418,13 @@ read_cmd_line_options (argc, argv)
 				break;
 
 			case 'V':
-#if defined(__DATE__) && defined(__TIME__)			
+#if defined(__DATE__) && defined(__TIME__)
 				sprintf (msg, "Version: %s release %s  %s %s",
 					VERSION, RELEASEDATE, __DATE__, __TIME__);
 #else
 				sprintf (msg, "Version: %s release %s",
 					VERSION, RELEASEDATE);
-#endif					
+#endif
 				error_message (msg, "");
 				exit (1);
 
@@ -452,8 +452,8 @@ read_cmd_line_options (argc, argv)
 	cmdargs = argv;
 	num_cmdargs = optind;
 	max_cmdargs = argc;
-	if (!newsrc_set) {
-		if ( read_news_via_nntp )
+	if (! newsrc_set) {
+		if (read_news_via_nntp)
 			get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
 		else {
 			struct utsname uts;
@@ -469,7 +469,7 @@ read_cmd_line_options (argc, argv)
  * usage
  */
 
-void 
+void
 usage (theProgname)
 	char *theProgname;
 {
@@ -513,7 +513,7 @@ usage (theProgname)
 		if (! read_news_via_nntp) {
 			error_message ("  -r       read news remotely from default NNTP server", "");
 		}
-#	endif /* NNTP_ABLE */	
+#	endif /* NNTP_ABLE */
 	error_message ("  -R       read news saved by -S option", "");
 	error_message ("  -s dir   save news directory [default=%s]", default_savedir);
 	error_message ("  -S       save new news for later reading (batch mode)", "");
@@ -538,18 +538,18 @@ usage (theProgname)
  *  check/start if any new/unread articles
  */
 
-int 
+int
 check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
 	int CheckAnyUnread;
 	int StartAnyUnread;
 {
 	int i = 0;
-	
+
 	if (CheckAnyUnread) {
 		i = check_start_save_any_news (CHECK_ANY_NEWS);
 		exit (i);
 	}
-	
+
 	if (StartAnyUnread) {
 		i = check_start_save_any_news (START_ANY_NEWS);
 		if (i == -1) {		/* no new/unread news so exit */
@@ -557,7 +557,7 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
 		}
 		update = FALSE;
 	}
-	
+
 	return (i);
 }
 
@@ -567,11 +567,11 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
  *  save any new articles to savedir structure for later reading
  */
 
-void 
+void
 save_or_mail_new_news ()
 {
 	int i;
-	
+
 	if (mail_news || save_news) {
 		i = catchup;			/* set catchup to FALSE */
 		catchup = FALSE;
@@ -590,7 +590,7 @@ save_or_mail_new_news ()
  *  update index files
  */
 
-void 
+void
 update_index_files ()
 {
 	if (update || update_fork) {
@@ -599,16 +599,16 @@ update_index_files ()
 			tin_done (EXIT_ERROR);
 		}
 
-		cCOLS = 132;				/* set because curses has not started */ 
+		cCOLS = 132;				/* set because curses has not started */
 #ifdef HAVE_FORK
 		if (update_fork) {
-			catchup = FALSE;		/* turn off msgs when running forked */ 
+			catchup = FALSE;		/* turn off msgs when running forked */
 			verbose = FALSE;
 			switch ((int) fork ()) {		/* fork child to update indexes in background */
-				case -1:			/* error forking */	
+				case -1:			/* error forking */
 					perror_message ("Failed to start background indexing process", "");
 					break;
-				case 0:				/* child process */	
+				case 0:				/* child process */
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
 #ifdef BSD
@@ -620,12 +620,12 @@ update_index_files ()
 #	ifdef TIOCNOTTY
 					{
 						int fd;
-	
+
 						if ((fd = open ("/dev/tty", O_RDWR)) >= 0) {
 							ioctl (fd, TIOCNOTTY, (char *) NULL);
 							close (fd);
-						}	
-					}	
+						}
+					}
 #	endif
 #else
 #	if HAVE_SETPGRP
@@ -633,18 +633,18 @@ update_index_files ()
 					signal (SIGHUP, SIG_IGN);	/* make immune from process group leader death */
 #	endif
 #endif
-					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */			
-					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */			
+					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */
+					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */
 					nntp_open ();				/* connect server if we are using nntp */
 					default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
 					do_update ();
 					tin_done (EXIT_OK);
 					break;
 				default:						/* parent process*/
-					break;					
-			}	
+					break;
+			}
 			update = FALSE;
-		} else 
+		} else
 #endif	/* HAVE_FORK */
 		{
 			create_index_lock_file (lock_file);
@@ -653,22 +653,22 @@ update_index_files ()
 			tin_done (EXIT_OK);
 		}
 	}
-	
+
 }
 
 /*
  *  display page of general info. for first time user.
  */
 
-void 
+void
 show_intro_page ()
 {
 	if (cmd_line) {
-		wait_message (cvers); 	
+		wait_message (cvers);
 	} else {
 		ClearScreen ();
-		center_line (0, TRUE, cvers); 
-		Raw (FALSE);	
+		center_line (0, TRUE, cvers);
+		Raw (FALSE);
 	}
 
 	printf ("\n\nWelcome to tin, a full screen threaded Netnews reader. It can read news locally\n");
@@ -694,38 +694,38 @@ show_intro_page ()
 	fflush (stdout);
 
 	if (! cmd_line) {
-		Raw (TRUE);	
+		Raw (TRUE);
 		continue_prompt ();
 	}
 }
 
 
-int 
+int
 read_cmd_line_groups ()
 {
 	char buf[PATH_LEN];
 	int matched = 0;
 	int num;
 	register int i;
-		
+
 	if  (num_cmdargs < max_cmdargs) {
-		group_top = 0;	
-	
+		group_top = 0;
+
 		for (num = num_cmdargs ; num < max_cmdargs ; num++) {
 			sprintf (buf, txt_matching_cmd_line_groups, cmdargs[num]);
 			wait_message (buf);
 
 			for (i = 0 ; i < num_active ; i++) {
-				if (wildmat (active[i].name, cmdargs[num])) {		
+				if (wildmat (active[i].name, cmdargs[num])) {
 					if (add_my_group (active[i].name, 1) != -1) {
 						active[i].subscribed = SUBSCRIBED;
 						matched++;
 					}
-				}	
-			}	
+				}
+			}
 		}
 	}
-	
+
 	return matched;
 }
 

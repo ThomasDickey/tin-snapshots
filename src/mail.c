@@ -19,7 +19,7 @@
  */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-void 
+void
 read_mail_active_file ()
 {
 	char	buf[LEN];
@@ -28,13 +28,13 @@ read_mail_active_file ()
 	int		i;
 	long	count = -1L, h;
 	long	min, max;
-		
+
 	if ((update && update_fork) || ! update) {
 		wait_message (txt_reading_mail_active_file);
 	}
 
 	/*
-	 * Open the mail active file 
+	 * Open the mail active file
 	 */
 	if ((fp = open_mail_active_fp ("r")) == (FILE *) 0) {
 		if (cmd_line) {
@@ -45,7 +45,7 @@ read_mail_active_file ()
 		 * FIXME - maybe do an autoscan of maildir, create & do a reopen ?
 		 */
 		write_mail_active_file ();
-		return;	
+		return;
 	}
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
@@ -118,7 +118,7 @@ read_mail_active_continue:;
  */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-void 
+void
 write_mail_active_file ()
 {
 	char acGrpPath[PATH_LEN];
@@ -143,16 +143,16 @@ write_mail_active_file ()
 #endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /*
- *  Load the text description from ~/.tin/mailgroups for each mail group into 
+ *  Load the text description from ~/.tin/mailgroups for each mail group into
  *  the active[] array.
  */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-void 
+void
 read_mailgroups_file ()
 {
 	FILE *fp;
-	
+
 	if (show_description == FALSE || save_news || catchup) {
 		return;
 	}
@@ -161,7 +161,7 @@ read_mailgroups_file ()
 		wait_message (txt_reading_mailgroups_file);
 
 		read_groups_descriptions (fp, (FILE *) 0);
-		
+
 		fclose (fp);
 
 		if (cmd_line && ! update && ! verbose) {
@@ -172,17 +172,17 @@ read_mailgroups_file ()
 #endif	/* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
 
 /*
- *  Load the text description from LIBDIR/newsgroups for each group into the 
+ *  Load the text description from LIBDIR/newsgroups for each group into the
  *  active[] array. Save a copy locally if reading via NNTP to save bandwidth.
  */
 
-void 
+void
 read_newsgroups_file ()
 {
 #ifndef INDEX_DAEMON
 	FILE *fp;
 	FILE *fp_save = (FILE *) 0;
-	
+
 	if (show_description == FALSE || save_news || catchup) {
 		return;
 	}
@@ -207,7 +207,7 @@ read_newsgroups_file ()
 			read_local_newsgroups_file = TRUE;
 		}
 	}
-	
+
 	if (cmd_line && ! update && ! verbose) {
 		wait_message ("\n");
 	}
@@ -215,12 +215,12 @@ read_newsgroups_file ()
 }
 
 /*
- *  Read groups descriptions from opened file & make local backup copy 
- *  of all groups that don't have a 'x' in the active file moderated 
+ *  Read groups descriptions from opened file & make local backup copy
+ *  of all groups that don't have a 'x' in the active file moderated
  *  field & if reading groups of type GROUP_TYPE_NEWS.
  */
 
-void 
+void
 read_groups_descriptions (fp, fp_save)
 	FILE *fp;
 	FILE *fp_save;
@@ -231,7 +231,7 @@ read_groups_descriptions (fp, fp_save)
 	char *p, *q;
 	int count = 0;
 	struct t_group *psGrp;
-	
+
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '#' || buf[0] == '\n') {
 			continue;
@@ -248,10 +248,10 @@ read_groups_descriptions (fp, fp_save)
 
 		while (*p == '\t' || *p == ' ') {
 			p++;
-		}	
+		}
 
 		psGrp = psGrpFind (group);
-		 
+
 		if (psGrp != (struct t_group *) 0 && psGrp->description == (char *) 0) {
 			q = p;
 			while ((q = strchr (q, '\t')) != (char *) 0) {
@@ -259,8 +259,8 @@ read_groups_descriptions (fp, fp_save)
 			}
 			psGrp->description = str_dup (p);
 			if (psGrp->type == GROUP_TYPE_NEWS) {
-				if (fp_save != (FILE *) 0 && 
-				    read_news_via_nntp && 
+				if (fp_save != (FILE *) 0 &&
+				    read_news_via_nntp &&
 				    ! read_local_newsgroups_file) {
 					fprintf (fp_save, "%s\n", buf);
 				}
@@ -269,7 +269,7 @@ read_groups_descriptions (fp, fp_save)
 		if (++count % 100 == 0) {
 			spin_cursor ();
 		}
-	}	
+	}
 #endif	/* INDEX_DAEMON */
 }
 
@@ -318,7 +318,7 @@ vParseGrpLine (pcLine, pcGrpName, plArtMax, plArtMin, pcModerated)
 	}
 	*pcPtr++ = '\0';
 	strcpy (pcGrpName, pcLine);
-	
+
 	/*
 	 * Art max
 	 */
@@ -361,7 +361,7 @@ vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
 	long	lArtNum;
 
 	*plArtMin = *plArtMax = 0L;
-	
+
 	if (access (pcGrpPath, R_OK) != 0) {
 		*plArtMin = 1L;
 		return;
@@ -397,7 +397,7 @@ vPrintGrpLine (hFp, pcGrpName, lArtMax, lArtMin, pcBaseDir)
 	long	lArtMin;
 	char	*pcBaseDir;
 {
-	fprintf (hFp, "%s %05ld %05ld %s\n", 
+	fprintf (hFp, "%s %05ld %05ld %s\n",
 		pcGrpName, lArtMax, lArtMin, pcBaseDir);
 }
 
@@ -426,11 +426,11 @@ lAtol (pcStr, iNum)
 
 /*
  * Given a base pathname & a newsgroup name build an absolute pathname.
- * base = /usr/spool/news 
- * newsgroup = alt.sources 
+ * base = /usr/spool/news
+ * newsgroup = alt.sources
  * absolute path = /usr/spool/news/alt/sources
  */
- 
+
 void
 vMakeGrpPath (pcBaseDir, pcGrpName, pcGrpPath)
 	char	*pcBaseDir;
@@ -438,9 +438,9 @@ vMakeGrpPath (pcBaseDir, pcGrpName, pcGrpPath)
 	char	*pcGrpPath;
 {
 	char	*pcPtr;
-	
+
 	joinpath (pcGrpPath, pcBaseDir, pcGrpName);
-	
+
 	pcPtr = pcGrpPath + strlen (pcBaseDir);
 	while ((pcPtr = strchr (pcPtr, '.')) != (char *) 0) {
 		*pcPtr = '/';
@@ -449,11 +449,11 @@ vMakeGrpPath (pcBaseDir, pcGrpName, pcGrpPath)
 
 /*
  * Given an absolute pathname & a base pathname build a newsgroup name
- * base = /usr/spool/news 
+ * base = /usr/spool/news
  * absolute path = /usr/spool/news/alt/sources
- * newsgroup = alt.sources 
+ * newsgroup = alt.sources
  */
- 
+
 void
 vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
 	char	*pcBaseDir;
@@ -463,16 +463,16 @@ vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
 	char	*pcPtrBase;
 	char	*pcPtrName;
 	char	*pcPtrPath;
-	
+
 	pcPtrBase = pcBaseDir;
 	pcPtrPath = pcGrpPath;
-	
+
 	while (*pcPtrBase && (*pcPtrBase == *pcPtrPath)) {
 		pcPtrBase++;
 		pcPtrPath++;
 	}
 	strcpy (pcGrpName, ++pcPtrPath);
-	
+
 	pcPtrName = pcGrpName;
 	while ((pcPtrName = strchr (pcPtrName, '/')) != (char *) 0) {
 		*pcPtrName = '.';
@@ -536,7 +536,7 @@ vGrpDelMailArts (psGrp)
 #endif	/* !INDEX_DAEMON */
 
 
-int 
+int
 iArtEdit (psGrp, psArt)
 	struct t_group *psGrp;
 	struct t_article *psArt;

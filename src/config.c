@@ -27,14 +27,14 @@ static void unhighlight_option P_((int option));
  *  read local & global configuration defaults
  */
 
-int 
+int
 read_config_file (file, global_file)
-	char 	*file;
-	int		global_file;
+	char	*file;
+	int	global_file;
 {
-	char newnews_info[PATH_LEN];
-	char buf[LEN];
-	FILE *fp;
+	char	newnews_info[PATH_LEN];
+	char	buf[LEN];
+	FILE	*fp;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0) {
 		return FALSE;
@@ -49,7 +49,7 @@ read_config_file (file, global_file)
 	}
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		if (buf[0] == '#' || buf[0] == '\n') { 
+		if (buf[0] == '#' || buf[0] == '\n') {
 			continue;
 		}
 		switch(tolower(buf[0])) {
@@ -313,7 +313,7 @@ read_config_file (file, global_file)
 				}
 				break;
 			}
-/* option to toggle 8bit char. in header of mail message */
+			/* option to toggle 8bit char. in header of mail message */
 			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
 				if (strcasecmp(mail_mime_encoding, "8bit"))
 					mail_8bit_header=FALSE;
@@ -512,7 +512,7 @@ read_config_file (file, global_file)
  *  write config defaults to ~/.tin/tinrc
  */
 
-void 
+void
 write_config_file (file)
 	char	*file;
 {
@@ -521,18 +521,18 @@ write_config_file (file)
 	int i;
 
 	/* alloc memory for tmp-filename */
-	if((file_tmp=(char *)malloc(strlen(file)+5)) == NULL) {
+	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
 		wait_message ("Out of memory!");
 		return;
 	}
 	/* generate tmp-filename */
-	strcpy(file_tmp,file);
-	strcat(file_tmp,".tmp");
+	strcpy (file_tmp, file);
+	strcat (file_tmp, ".tmp");
 
 	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
 		wait_message (txt_filesystem_full_config_backup);
 		/* free memory for tmp-filename */
-		free(file_tmp);
+		free (file_tmp);
 		return;
 	}
 
@@ -547,11 +547,110 @@ write_config_file (file)
 	fprintf (fp, "# This file was automatically saved by tin\n#\n");
 	fprintf (fp, "# Do not edit while tin is running, since all your changes to this file\n");
 	fprintf (fp, "# would be overwritten when you leave tin.\n#\n");
-	fprintf (fp, "############################################################################\n#\n");
+	fprintf (fp, "############################################################################\n\n");
+
+	fprintf (fp, "# directory where articles/threads are saved\n");
+	fprintf (fp, "default_savedir=%s\n\n", default_savedir);
 
 	fprintf (fp, "# if ON articles/threads with Archive-name: in mail header will\n");
 	fprintf (fp, "# be automatically saved with the Archive-name & part/patch no.\n");
 	fprintf (fp, "auto_save=%s\n\n", print_boolean (default_auto_save));
+
+	fprintf (fp, "# if ON mark articles that are saved as read\n");
+	fprintf (fp, "mark_saved_read=%s\n\n", print_boolean (mark_saved_read));
+
+	fprintf (fp, "# type of post processing to perform after saving articles.\n");
+#ifdef M_AMIGA
+	fprintf (fp, "# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list lha)\n");
+	fprintf (fp, "# 4=(uud & extract lha) 5=(uud & list zip) 6=(uud & extract zip)\n");
+#else
+	fprintf (fp, "# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list zoo)\n");
+	fprintf (fp, "# 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip)\n");
+#endif
+	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
+
+	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
+	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
+
+	fprintf (fp, "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n");
+	fprintf (fp, "process_only_unread=%s\n\n", print_boolean (process_only_unread));
+
+	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");
+	fprintf (fp, "confirm_action=%s\n\n", print_boolean (confirm_action));
+
+	fprintf (fp, "# if ON confirm with y/n before quitting ('Q' never asks)\n");
+	fprintf (fp, "confirm_to_quit=%s\n\n", print_boolean (confirm_to_quit));
+
+	fprintf (fp, "# if ON use -> otherwise highlighted bar for selection\n");
+	fprintf (fp, "draw_arrow=%s\n\n", print_boolean (draw_arrow_mark));
+
+	fprintf (fp, "# if ON use inverse video for page headers at different levels\n");
+	fprintf (fp, "inverse_okay=%s\n\n", print_boolean (inverse_okay));
+
+	fprintf (fp, "# if ON put cursor at first unread art in group otherwise last art\n");
+	fprintf (fp, "pos_first_unread=%s\n\n", print_boolean (pos_first_unread));
+
+	fprintf (fp, "# if ON show only new/unread articles otherwise show all.\n");
+	fprintf (fp, "show_only_unread=%s\n\n", print_boolean (default_show_only_unread));
+
+	fprintf (fp, "# if ON show only subscribed to groups that contain unread articles.\n");
+	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (show_only_unread_groups));
+
+	fprintf (fp, "# if ON the TAB command will goto next unread article at article viewer level\n");
+	fprintf (fp, "tab_goto_next_unread=%s\n\n", print_boolean (tab_goto_next_unread));
+
+	fprintf (fp, "# if ON the SPACE command will goto next unread article at article viewer\n");
+	fprintf (fp, "# level when the end of the article is reached (rn-style pager)\n");
+	fprintf (fp, "space_goto_next_unread=%s\n\n", print_boolean (space_goto_next_unread));
+
+	fprintf (fp, "# if ON a TAB command will be automatically done after the X command\n");
+	fprintf (fp, "tab_after_X_selection=%s\n\n", print_boolean (tab_after_X_selection));
+
+	fprintf (fp, "# if ON scroll full page of groups/articles otherwise half a page\n");
+	fprintf (fp, "full_page_scroll=%s\n\n", print_boolean (full_page_scroll));
+
+	fprintf (fp, "# if ON show the last line of the previous page as first line of next page\n");
+	fprintf (fp, "show_last_line_prev_page=%s\n\n", print_boolean (show_last_line_prev_page));
+
+	fprintf (fp, "# if ON ask user if read groups should all be marked read\n");
+	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
+
+	fprintf (fp, "# if ON catchup group/thread when leaving with the left arrow key.\n");
+	fprintf (fp, "group_catchup_on_exit=%s\n", print_boolean (group_catchup_on_exit));
+	fprintf (fp, "thread_catchup_on_exit=%s\n\n", print_boolean (thread_catchup_on_exit));
+
+	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n");
+	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
+
+	fprintf (fp, "# if ON show group description text after newsgroup name at\n");
+	fprintf (fp, "# group selection level\n");
+	fprintf (fp, "show_description=%s\n\n", print_boolean (show_description));
+
+	fprintf (fp, "# part of from field to display 0) none 1) address 2) full name 3) both\n");
+	fprintf (fp, "show_author=%d\n\n", default_show_author);
+
+	fprintf (fp, "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n");
+	fprintf (fp, "# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n");
+	fprintf (fp, "sort_article_type=%d\n\n", default_sort_art_type);
+
+	fprintf (fp, "# (-m) directory where articles/threads are saved in mailbox format\n");
+	fprintf (fp, "default_maildir=%s\n\n", default_maildir);
+
+	fprintf (fp, "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n");
+	fprintf (fp, "save_to_mmdf_mailbox=%s\n\n", print_boolean (save_to_mmdf_mailbox));
+
+	fprintf (fp, "# If ON, the realname in the X-Comment-To header is displayed\n");
+	fprintf (fp, "show_xcommentto=%s\n\n", print_boolean(show_xcommentto));
+
+	fprintf (fp, "# If ON X-Commento-To name is displayed in the upper-right corner,\n");
+	fprintf (fp, "# if OFF below the Summary-Header\n");
+	fprintf (fp, "highlight_xcommentto=%s\n\n", print_boolean(highlight_xcommentto));
+
+	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
+	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));
+
+	fprintf (fp, "# print program with parameters used to print articles/threads\n");
+	fprintf (fp, "default_printer=%s\n\n", default_printer);
 
 	fprintf (fp, "# if ON articles/threads will be saved in batch mode when save -S\n");
 	fprintf (fp, "# or mail -M is specified on the command line\n");
@@ -576,21 +675,90 @@ write_config_file (file)
 	fprintf (fp, "# this option has to suit default_mailer_format\n");
 	fprintf (fp, "use_mailreader_i=%s\n\n", print_boolean (use_mailreader_i));
 
-#ifdef FORGERY
-	if (*mail_address) {
-		fprintf (fp, "# user's mail address, if not username@host\n");
-		fprintf (fp, "mail_address=%s\n\n",mail_address);
-	}
+	fprintf (fp, "# show number of lines of first unread article in thread listing (ON/OFF)\n");
+	fprintf (fp, "show_lines=%s\n\n", print_boolean(show_lines));
+
+	fprintf (fp, "# if ON remove ~/.article after posting.\n");
+	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
+
+#ifdef M_UNIX
+	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
+	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
 #endif
 
-	fprintf (fp, "# if ON mark articles that are saved as read\n");
-	fprintf (fp, "mark_saved_read=%s\n\n", print_boolean (mark_saved_read));
+	fprintf (fp, "# if ON keep all postings in ~/Mail/posted\n");
+	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
 
-	fprintf (fp, "# if ON use inverse video for page headers at different levels\n");
-	fprintf (fp, "inverse_okay=%s\n\n", print_boolean (inverse_okay));
+	fprintf (fp, "# Signature path (random sigs)/file to be used when posting/replying\n");
+	fprintf (fp, "# default_sigfile=file       appends file as signature\n");
+	fprintf (fp, "# default_sigfile=! command  executes external command to generate a signature\n");
+	fprintf (fp, "# default_sigfile=--none     don't append a signature\n");
+	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
 
-	fprintf (fp, "# if ON use -> otherwise highlighted bar for selection\n");
-	fprintf (fp, "draw_arrow=%s\n\n", print_boolean (draw_arrow_mark));
+	fprintf (fp, "# if ON prepend the signature with dashes '\\n-- \\n'\n");
+	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));
+
+	fprintf (fp, "# turn off advertising in header (X-Newsreader/X-Mailer)\n");
+	fprintf (fp, "no_advertising=%s\n\n", print_boolean (no_advertising));
+
+	fprintf (fp, "# time interval in seconds between rereading the active file\n");
+	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
+
+	fprintf (fp, "# characters used in quoting to followups and replys.\n");
+	fprintf (fp, "# '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n");
+	fprintf (fp, "quote_chars=%s\n\n", quote_space_to_dash (quote_chars));
+
+	fprintf (fp, "# Format of quote line when mailing/posting/followingup an article\n");
+	fprintf (fp, "# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n");
+	fprintf (fp, "# %%N Full Name  %%C First Name\n");
+	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
+	fprintf (fp, "mail_quote_format=%s\n", mail_quote_format);
+	fprintf (fp, "xpost_quote_format=%s\n\n", xpost_quote_format);
+
+	fprintf (fp, "# if ON automatically put your name in the Cc: field when mailing an article\n");
+	fprintf (fp, "auto_cc=%s\n\n", print_boolean (auto_cc));
+
+	fprintf (fp, "# if ON automatically put your name in the Bcc: field when mailing an article\n");
+	fprintf (fp, "auto_bcc=%s\n\n", print_boolean (auto_bcc));
+
+	fprintf (fp, "# character used to show that an art was deleted (default 'D')\n");
+	fprintf (fp, "art_marked_deleted=%c\n\n", art_marked_deleted);
+
+	fprintf (fp, "# character used to show that an art is in a range (default '#')\n");
+	fprintf (fp, "art_marked_inrange=%c\n\n", art_marked_inrange);
+
+	fprintf (fp, "# character used to show that an art will return (default '-')\n");
+	fprintf (fp, "art_marked_return=%c\n\n", art_marked_return);
+
+	fprintf (fp, "# character used to show that an art was auto-selected (default '*')\n");
+	fprintf (fp, "art_marked_selected=%c\n\n", art_marked_selected);
+
+	fprintf (fp, "# character used to show that an art was unread (default '+')\n");
+	fprintf (fp, "art_marked_unread=%c\n\n", art_marked_unread);
+
+	fprintf (fp, "# if ON a screen redraw will always be done after certain external commands\n");
+	fprintf (fp, "force_screen_redraw=%s\n\n", print_boolean (force_screen_redraw));
+
+	fprintf (fp, "# if ON use the builtin mini inews otherwise use an external inews program\n");
+	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
+
+	fprintf (fp, "# if ON automatically list thread when entering it using right arrow key.\n");
+	fprintf (fp, "auto_list_thread=%s\n\n", print_boolean (auto_list_thread));
+
+	fprintf (fp, "# If ON enable mouse key support on xterm terminals\n");
+	fprintf (fp, "use_mouse=%s\n\n", print_boolean (use_mouse));
+
+	fprintf (fp, "# If ON strip blanks from end of lines to speedup display on slow terminals\n");
+	fprintf (fp, "strip_blanks=%s\n\n", print_boolean (strip_blanks));
+
+	fprintf (fp, "# Maximum length of the names of newsgroups displayed\n");
+	fprintf (fp, "groupname_max_length=%d\n\n", groupname_max_length);
+
+	fprintf (fp, "# If ON show a mini menu of useful commands at each level\n");
+	fprintf (fp, "beginner_level=%s\n\n", print_boolean (beginner_level));
+
+	fprintf (fp, "# Num of days a short term filter will be active\n");
+	fprintf (fp, "default_filter_days=%d\n\n", default_filter_days);
 
 #ifdef HAVE_COLOR
 	fprintf (fp, "# if ON using ansi-color\n");
@@ -602,6 +770,10 @@ write_config_file (file)
 	fprintf (fp, "# These are *only* for foreground:\n");
 	fprintf (fp, "#  8-gray        9-lightred   10-lightgreen  11-yellow\n");
 	fprintf (fp, "# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n");
+
+	fprintf (fp, "# Standard foreground color\n");
+	fprintf (fp, "col_normal=%d\n\n", col_normal);
+
 	fprintf (fp, "# Standard-Background-Color\n");
 	fprintf (fp, "col_back=%d\n\n", col_back);
 
@@ -635,9 +807,6 @@ write_config_file (file)
 	fprintf (fp, "# Color of sender (From:)\n");
 	fprintf (fp, "col_from=%d\n\n", col_from);
 
-	fprintf (fp, "# Standard foreground color\n");
-	fprintf (fp, "col_normal=%d\n\n", col_normal);
-
 	fprintf (fp, "# Color of Help/Mail-Sign\n");
 	fprintf (fp, "col_title=%d\n\n", col_title);
 
@@ -645,55 +814,42 @@ write_config_file (file)
 	fprintf (fp, "col_signature=%d\n\n", col_signature);
 #endif
 
-	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
-	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));
-
-	fprintf (fp, "# if ON put cursor at first unread art in group otherwise last art\n");
-	fprintf (fp, "pos_first_unread=%s\n\n", print_boolean (pos_first_unread));
-
-	fprintf (fp, "# if ON scroll full page of groups/articles otherwise half a page\n");
-	fprintf (fp, "full_page_scroll=%s\n\n", print_boolean (full_page_scroll));
-
-#ifdef HAVE_METAMAIL
- 	fprintf (fp, "# if ON metamail can/will be used to display MIME articles\n");
- 	fprintf (fp, "use_metamail=%s\n\n", print_boolean (use_metamail));
-
- 	fprintf (fp, "# if ON tin will ask before using metamail to display MIME messages\n");
- 	fprintf (fp, "# this only occurs, if use_metamail is also switched ON\n");
- 	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
+#ifdef FORGERY
+	if (*mail_address) {
+		fprintf (fp, "# user's mail address, if not username@host\n");
+		fprintf (fp, "mail_address=%s\n\n",mail_address);
+	}
 #endif
 
-	fprintf (fp, "# MIME encoding of the body for mails and posts, if necessary.\n");
-	fprintf (fp, "# (8bit, base64, quoted-printable,7bit), QP is efficient\n");
-	fprintf (fp, "# for most European character sets(ISO-8859-X) with small\n");
-	fprintf (fp, "# fraction of non-US-ASCII chars. while Base64 is more efficient\n");
-	fprintf (fp, "# for most 8bit East Asian char. sets\n");
-	fprintf (fp, "# For EUC-KR, 7bit encoding specifies that EUC charsets be\n");
-	fprintf (fp, "# converted to corresponding ISO-2022-KR. The same may be true of EUC-JP/CN.\n");
+	fprintf (fp, "# charset supported locally  which is also used for MIME header and\n");
+	fprintf (fp, "# Content-Type header unless news and mail need to be encoded in other\n");
+	fprintf (fp, "# charsets as in ISO-2022-KR encoding of EUC-KR in mail message.\n");
+	fprintf (fp, "# If not set, the value of the environment variable MM_CHARSET is used.\n");
+	fprintf (fp, "# Set to US-ASCII or compile time default if neither of them is defined.\n");
+	fprintf (fp, "# If MIME_STRICT_CHARSET is defined at compile-time, charset other than\n");
+	fprintf (fp, "# mm_charset is considered not displayable and represented as '?'.\n");
+	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
+
+	fprintf (fp, "# MIME encoding (8bit, base64, quoted-printable, 7bit) of the body\n");
+	fprintf (fp, "# for mails and posts, if necessary. QP is efficient for most European\n");
+	fprintf (fp, "# character sets (ISO-8859-X) with small fraction of non-US-ASCII chars,\n");
+	fprintf (fp, "# while Base64 is more efficient for most 8bit East Asian charsets.\n");
+	fprintf (fp, "# For EUC-KR, 7bit encoding specifies that EUC charsets be converted\n");
+	fprintf (fp, "# to corresponding ISO-2022-KR. The same may be true of EUC-JP/CN.\n");
 	fprintf (fp, "# For other charsets used in Japan and China, it seems more complicated.\n");
-	fprintf (fp, "# Korean users should set post_mime_encoding to 8bit\n");
-	fprintf (fp, "# and mail_mime_encoding to 7bit. With mm_charset to EUC-KR, post_mime_encoding\n");
-	fprintf (fp, "# set to 7bit does NOT lead to encoding of EUC-KR into ISO-2022-KR in news\n");
-	fprintf (fp, "# posting since it's never meant to be used for Usenet news.\n");
-	fprintf (fp, "# Perhaps,it's not the case for EUC-JP and EUC-CN. Handling of Chinese and\n");
-	fprintf (fp, "# Japanese characters is not yet implemented.\n");
+	fprintf (fp, "# Korean users should set post_mime_encoding to 8bit and mail_mime_encoding\n");
+	fprintf (fp, "# to 7bit. With mm_charset to EUC-KR, post_mime_encoding set to 7bit does\n");
+	fprintf (fp, "# NOT lead to encoding of EUC-KR into ISO-2022-KR in news-postings since\n");
+	fprintf (fp, "# it's never meant to be used for Usenet news. Perhaps, it's not the case\n");
+	fprintf (fp, "# for EUC-JP and EUC-CN.\n");
+	fprintf (fp, "# Handling of Chinese and Japanese characters is not yet implemented.\n");
 	fprintf (fp, "post_mime_encoding=%s\n", post_mime_encoding);
 	fprintf (fp, "mail_mime_encoding=%s\n\n", mail_mime_encoding);
 
-	fprintf (fp, "# charset supported locally  which is also used for MIME header and\n");
-	fprintf (fp, "# Content-Type header unless news and mail need to be encoded in other charset\n");
-	fprintf (fp, "# as in ISO-2022-KR encoding of EUC-KR in mail message.\n");
-	fprintf (fp, "# if not set,the value of the environment variable MM_CHARSET is used\n");
-	fprintf (fp, "# if it is not defined. Set to US-ASCII or compile time default if neither of\n");
-	fprintf (fp, "# them is defined.\n");
-	fprintf (fp, "# if MIME_STRICT_CHARSET is defined at compile-time, charset other than\n");
-	fprintf (fp, "# mm_charset is considered not displayable and represented in ?(question mark).\n");
-	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
-
 	fprintf (fp, "# if ON, 8bit characters in news posting is NOT encoded.\n");
 	fprintf (fp, "# default is OFF. Thus 8bit character is encoded by default.\n");
-	fprintf (fp, "# 8bit chars in header is encoded regardless of the value of this parameter\n");
-	fprintf (fp, "# unless post_mime_encoding is 8bit as well. \n");
+	fprintf (fp, "# 8bit chars in header is encoded regardless of the value of this\n");
+	fprintf (fp, "# parameter unless post_mime_encoding is 8bit as well. \n");
 	fprintf (fp, "post_8bit_header=%s\n\n", print_boolean(post_8bit_header));
 
 	fprintf (fp, "# if ON, 8bit characters in mail message is NOT encoded.\n");
@@ -705,176 +861,19 @@ write_config_file (file)
 	fprintf (fp, "# Korean users with localized sendmail.\n");
 	fprintf (fp, "mail_8bit_header=%s\n\n", print_boolean(mail_8bit_header));
 
-	fprintf (fp, "# if ON ask user if read groups should all be marked read\n");
-	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
+#ifdef HAVE_METAMAIL
+ 	fprintf (fp, "# if ON metamail can/will be used to display MIME articles\n");
+ 	fprintf (fp, "use_metamail=%s\n\n", print_boolean (use_metamail));
 
-	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");
-	fprintf (fp, "confirm_action=%s\n\n", print_boolean (confirm_action));
-
-	fprintf (fp, "# if ON confirm with y/n before quitting ('Q' never asks)\n");
-	fprintf (fp, "confirm_to_quit=%s\n\n", print_boolean (confirm_to_quit));
-
-	fprintf (fp, "# if ON show group description text after newsgroup name at\n");
-	fprintf (fp, "# group selection level\n");
-	fprintf (fp, "show_description=%s\n\n", print_boolean (show_description));
-
-	fprintf (fp, "# part of from field to display 0) none 1) address 2) full name 3) both\n");
-	fprintf (fp, "show_author=%d\n\n", default_show_author);
-
-	fprintf (fp, "# show number of lines of first unread article in thread listing (ON/OFF)\n");
-	fprintf (fp, "show_lines=%s\n\n", print_boolean(show_lines));
-
-	fprintf (fp, "# type of post processing to perform after saving articles.\n");
-#ifdef M_AMIGA
-	fprintf (fp, "# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list lha)\n");
-	fprintf (fp, "# 4=(uud & extract lha) 5=(uud & list zip) 6=(uud & extract zip)\n");
-#else
-	fprintf (fp, "# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list zoo)\n");
-	fprintf (fp, "# 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip)\n");
+ 	fprintf (fp, "# if ON tin will ask before using metamail to display MIME messages\n");
+ 	fprintf (fp, "# this only occurs, if use_metamail is also switched ON\n");
+ 	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
-	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
-
-	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
-	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
-
-	fprintf (fp, "# if ON remove ~/.article after posting.\n");
-	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
-
-#ifdef M_UNIX
-	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
-	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
-#endif
-
-	fprintf (fp, "# if ON keep all postings in ~/Mail/posted\n");
-	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
-
-	fprintf (fp, "# if ON show only subscribed to groups that contain unread articles.\n");
-	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (show_only_unread_groups));
-
-	fprintf (fp, "# if ON show only new/unread articles otherwise show all.\n");
-	fprintf (fp, "show_only_unread=%s\n\n", print_boolean (default_show_only_unread));
-
-	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n");
-	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
-
-	fprintf (fp, "# sort articles by 0=(nothing) 1=(Subject descend) 2=(Subject ascend)\n");
-	fprintf (fp, "# 3=(From descend) 4=(From ascend) 5=(Date descend) 6=(Date ascend).\n");
-	fprintf (fp, "sort_article_type=%d\n\n", default_sort_art_type);
-
-	fprintf (fp, "# directory where articles/threads are saved\n");
-	fprintf (fp, "default_savedir=%s\n\n", default_savedir);
-
-	fprintf (fp, "# (-m) directory where articles/threads are saved in mailbox format\n");
-	fprintf (fp, "default_maildir=%s\n\n", default_maildir);
-
-	fprintf (fp, "# print program with parameters used to print articles/threads\n");
-	fprintf (fp, "default_printer=%s\n\n", default_printer);
-
-	fprintf (fp, "# Signature path (random sigs)/file to be used when posting/replying to messages\n");
-	fprintf (fp, "# default_sigfile=file       appends file as signature\n");
-	fprintf (fp, "# default_sigfile=! command  executes external command to generate a signature\n");
-	fprintf (fp, "# default_sigfile=--none     don't append a signature\n");
-	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
-
-	fprintf (fp, "# if ON prepend the signature with dashes '\\n-- \\n'\n");
-	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));
-
-	fprintf (fp, "# turn off advertising in header (X-Newsreader/X-Mailer)\n");
-	fprintf (fp, "no_advertising=%s\n\n", print_boolean (no_advertising));
-
-	fprintf (fp, "# time interval in seconds between rereading the active file\n");
-	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
-
-	fprintf (fp, "# characters used in quoting to followups and replys.\n");
-	fprintf (fp, "# '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n");
-	fprintf (fp, "quote_chars=%s\n\n", quote_space_to_dash (quote_chars));
-
-	fprintf (fp, "# character used to show that an art was deleted (default 'D')\n");
-	fprintf (fp, "art_marked_deleted=%c\n\n", art_marked_deleted);
-
-	fprintf (fp, "# character used to show that an art is in a range (default '#')\n");
-	fprintf (fp, "art_marked_inrange=%c\n\n", art_marked_inrange);
-
-	fprintf (fp, "# character used to show that an art will return (default '-')\n");
-	fprintf (fp, "art_marked_return=%c\n\n", art_marked_return);
-
-	fprintf (fp, "# character used to show that an art was auto-selected (default '*')\n");
-	fprintf (fp, "art_marked_selected=%c\n\n", art_marked_selected);
-
-	fprintf (fp, "# character used to show that an art was unread (default '+')\n");
-	fprintf (fp, "art_marked_unread=%c\n\n", art_marked_unread);
-
-	fprintf (fp, "# if ON show the last line of the previous page as first line of next page\n");
-	fprintf (fp, "show_last_line_prev_page=%s\n\n", print_boolean (show_last_line_prev_page));
-
-	fprintf (fp, "# if ON a TAB command will be automatically done after the X command\n");
-	fprintf (fp, "tab_after_X_selection=%s\n\n", print_boolean (tab_after_X_selection));
-
-	fprintf (fp, "# if ON the TAB command will goto next unread article at article viewer level\n");
-	fprintf (fp, "tab_goto_next_unread=%s\n\n", print_boolean (tab_goto_next_unread));
-
-	fprintf (fp, "# if ON the SPACE command will goto next unread article at article viewer\n");
-	fprintf (fp, "# level when the end of the article is reached (rn-style pager)\n");
-	fprintf (fp, "space_goto_next_unread=%s\n\n", print_boolean (space_goto_next_unread));
-
-	fprintf (fp, "# if ON a screen redraw will always be done after certain external commands\n");
-	fprintf (fp, "force_screen_redraw=%s\n\n", print_boolean (force_screen_redraw));
-
-	fprintf (fp, "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n");
-	fprintf (fp, "save_to_mmdf_mailbox=%s\n\n", print_boolean (save_to_mmdf_mailbox));
-
-	fprintf (fp, "# if ON use the builtin mini inews otherwise use an external inews program\n");
-	fprintf (fp, "use_builtin_inews=%s\n\n", print_boolean (use_builtin_inews));
-
-	fprintf (fp, "# Format of quote line when mailing/posting/followingup an article\n");
-	fprintf (fp, "# %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n");
-	fprintf (fp, "# %%N Full Name  %%C First Name\n");
-	fprintf (fp, "news_quote_format=%s\n", news_quote_format);
-	fprintf (fp, "mail_quote_format=%s\n", mail_quote_format);
-	fprintf (fp, "xpost_quote_format=%s\n\n", xpost_quote_format);
-
-	fprintf (fp, "# if ON automatically put your name in the Cc: field when mailing an article\n");
-	fprintf (fp, "auto_cc=%s\n\n", print_boolean (auto_cc));
-
-	fprintf (fp, "# if ON automatically put your name in the Bcc: field when mailing an article\n");
-	fprintf (fp, "auto_bcc=%s\n\n", print_boolean (auto_bcc));
-
-	fprintf (fp, "# if ON catchup group/thread when leaving with the left arrow key.\n");
-	fprintf (fp, "group_catchup_on_exit=%s\n", print_boolean (group_catchup_on_exit));
-	fprintf (fp, "thread_catchup_on_exit=%s\n\n", print_boolean (thread_catchup_on_exit));
-
-	fprintf (fp, "# if ON automatically list thread when entering it using right arrow key.\n");
-	fprintf (fp, "auto_list_thread=%s\n\n", print_boolean (auto_list_thread));
-
-	fprintf (fp, "# If ON enable mouse key support on xterm terminals\n");
-	fprintf (fp, "use_mouse=%s\n\n", print_boolean (use_mouse));
 
 #ifdef HAVE_KEYPAD
 	fprintf (fp, "# If ON enable scroll keys on terminals that support it\n");
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
 #endif
-
-	fprintf (fp, "# If ON strip blanks from end of lines to speedup display on slow terminals\n");
-	fprintf (fp, "strip_blanks=%s\n\n", print_boolean (strip_blanks));
-
-	fprintf (fp, "# Maximum length of the names of newsgroups displayed\n");
-	fprintf (fp, "groupname_max_length=%d\n\n", groupname_max_length);
-
-	fprintf (fp, "# If ON show a mini menu of useful commands at each level\n");
-	fprintf (fp, "beginner_level=%s\n\n", print_boolean (beginner_level));
-
-	fprintf (fp, "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n");
-	fprintf (fp, "process_only_unread=%s\n\n", print_boolean (process_only_unread));
-
-	fprintf (fp, "# If ON, the realname in the X-Comment-To header is displayed\n");
-	fprintf (fp, "show_xcommentto=%s\n\n", print_boolean(show_xcommentto));
-
-	fprintf (fp, "# If ON X-Commento-To name is displayed in the upper-right corner,\n");
-	fprintf (fp, "# if OFF below the Summary-Header\n");
-	fprintf (fp, "highlight_xcommentto=%s\n\n", print_boolean(highlight_xcommentto));
-
-	fprintf (fp, "# Num of days a short term filter will be active\n");
-	fprintf (fp, "default_filter_days=%d\n\n", default_filter_days);
 
 	fprintf (fp, "# Defaults for quick (1 key) kill & auto-selection filters\n");
 	fprintf (fp, "# header=NUM  0=Subject: 1=From: 2=Message-Id:\n");
@@ -914,7 +913,7 @@ write_config_file (file)
 	fprintf (fp, "# news motd file dates from server used for detecting new motd info\n");
 	fprintf (fp, "motd_file_info=%s\n\n", motd_file_info);
 
-	fprintf (fp, "# host&time info used for detecting new groups (don't touch)\n");
+	fprintf (fp, "# host & time info used for detecting new groups (don't touch)\n");
 	if (! num_newnews) {
 		fprintf (fp, "newnews=%s %ld\n", new_newnews_host, new_newnews_time);
 	} else {
@@ -925,13 +924,13 @@ write_config_file (file)
 	if (ferror (fp) | fclose (fp)){
 		wait_message (txt_filesystem_full_config);
 		/* free memory for tmp-filename */
-		free(file_tmp);
+		free (file_tmp);
 		return;
 	} else {
-		rename_file(file_tmp, file);
+		rename_file (file_tmp, file);
 		chmod (file, 0600);
 		/* free memory for tmp-filename */
-		free(file_tmp);
+		free (file_tmp);
 	}
 }
 
@@ -978,7 +977,7 @@ print_option (act_option)
 	}
 }
 
-static void 
+static void
 highlight_option (option)
 	int option;
 {
@@ -988,7 +987,7 @@ highlight_option (option)
 	MoveCursor (cLINES, 0);
 }
 
-static void 
+static void
 unhighlight_option (option)
 	int option;
 {
@@ -1017,13 +1016,13 @@ refresh_config_page (act_option)
  *  options menu so that the user can dynamically change parameters
  */
 
-int 
+int
 change_config_file (group, filter_at_once)
 	struct t_group *group;
 	int filter_at_once;
 {
 	int ch, i;
-	int filter_changed = FALSE;
+/*	int filter_changed = FALSE; */
 	int change_option = FALSE;
 	int original_on_off_value, original_list_value;
 	int option, old_option;
@@ -1103,7 +1102,9 @@ change_config_file (group, filter_at_once)
 				write_config_file (local_config_file);
 				/* FALLTHRU */
 			case iKeyConfigNoSave:
-				if (filter_changed) {	/* FIXME who did this? what for? filter_changed is not changed ever */
+/* FIXME who did this? what for? filter_changed is not changed ever */
+/*
+				if (filter_changed) {
 					if (filter_at_once) {
 						global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 						local_filtered_articles = read_filter_file (local_filter_file, FALSE);
@@ -1121,7 +1122,7 @@ change_config_file (group, filter_at_once)
 					}
 					ret_code = FILTERING;
 				}
-
+*/
 				clear_note_area ();
 #ifdef SIGTSTP
 				if (do_sigtstp) {
@@ -1183,7 +1184,7 @@ change_config_file (group, filter_at_once)
 			case '1': case '2': case '3': case '4': case '5':
 			case '6': case '7': case '8': case '9':
 				unhighlight_option (option);
-				old_option = option; 
+				old_option = option;
 				option = prompt_num (ch, "Enter option number> ");
 				if (option < 1 || option > LAST_OPT) {
 					option = old_option;
@@ -1202,7 +1203,7 @@ change_config_file (group, filter_at_once)
 			switch (option_table[option - 1].var_type) {
 				case OPT_ON_OFF:
 					original_on_off_value = *((int *) option_table[option - 1].variable);
-					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page, 
+					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page,
 						OPT_ARG_COLUMN, option_table[option - 1].variable,
 						option_table[option - 1].help_text,
 						option_table[option - 1].option_text
@@ -1290,10 +1291,12 @@ change_config_file (group, filter_at_once)
 							}
 							break;
 
+#ifdef HAVE_COLOR
 						/* use ANSI color */
 						case OPT_USE_COLOR:
 							use_color = use_color_tinrc;
 							break;
+#endif
 
 						/*
 						 * the following do not need further action (if I'm right)
@@ -1331,7 +1334,7 @@ change_config_file (group, filter_at_once)
 
 				case OPT_LIST:
 					original_list_value = *((int *) option_table[option - 1].variable);
-					*((int *) option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page, 
+					*((int *) option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
 								OPT_ARG_COLUMN,
 								*((int *) option_table[option - 1].variable), /*default_post_proc_type,*/
 								option_table[option - 1].help_text,
@@ -1404,8 +1407,8 @@ change_config_file (group, filter_at_once)
 							if (tin_bbs_mode) break;
 #endif
 							prompt_option_string (option);
-							expand_rel_abs_pathname (INDEX_TOP + (option - 1) % option_lines_per_page, 
-								OPT_ARG_COLUMN + (int) strlen (option_table[option - 1].option_text), 
+							expand_rel_abs_pathname (INDEX_TOP + (option - 1) % option_lines_per_page,
+								OPT_ARG_COLUMN + (int) strlen (option_table[option - 1].option_text),
 								option_table[option - 1].variable
 								);
 							break;
@@ -1422,7 +1425,7 @@ change_config_file (group, filter_at_once)
 									mime_type = i;
 								}
 							}
-							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page, 
+							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
 										OPT_ARG_COLUMN,
 										mime_type,
 										option_table[option - 1].help_text,
@@ -1487,7 +1490,7 @@ change_config_file (group, filter_at_once)
 /*
  *  expand ~/News to /usr/username/News and print to screen
  */
- 
+
 static void
 expand_rel_abs_pathname (line, col, str)
 	int line;
@@ -1514,8 +1517,8 @@ expand_rel_abs_pathname (line, col, str)
 /*
  *  show_menu_help
  */
- 
-void 
+
+void
 show_menu_help (help_message)
 	char *help_message;
 {
@@ -1525,7 +1528,7 @@ show_menu_help (help_message)
 }
 
 
-int 
+int
 match_boolean (line, pat, dst)
 	char *line;
 	char *pat;
@@ -1546,7 +1549,7 @@ match_boolean (line, pat, dst)
  * If maxlen is set, constrain value to 0 <= dst <= maxlen and return TRUE.
  * If no match is made, return FALSE.
  */
-int 
+int
 match_integer (line, pat, dst, maxlen)
 	char *line;
 	char *pat;
@@ -1577,7 +1580,7 @@ match_long (line, pat, dst)
 	long *dst;
 {
 	size_t	patlen = strlen (pat);
-  
+
 	if (STRNCMPEQ(line, pat, patlen)) {
 		*dst = atol (&line[patlen]);
 		return TRUE;
@@ -1586,7 +1589,7 @@ match_long (line, pat, dst)
 }
 
 
-int 
+int
 match_string (line, pat, dst, dstlen)
 	char *line;
 	char *pat;
@@ -1619,7 +1622,7 @@ print_boolean (value)
  *  convert underlines to spaces in a string
  */
 
-void 
+void
 quote_dash_to_space (str)
 	char *str;
 {
@@ -1629,7 +1632,7 @@ quote_dash_to_space (str)
 		if (*ptr == '_') {
 			*ptr = ' ';
 		}
-	} 
+	}
 }
 
 /*
@@ -1661,7 +1664,7 @@ quote_space_to_dash (str)
  * display current configuration page
  * page numbering starts with zero; argument page_no is expected to be valid
  */
- 
+
 void
 show_config_page (page_no)
 	int page_no;
@@ -1677,7 +1680,7 @@ show_config_page (page_no)
 	 */
 	if (first_option_on_screen + option_lines_per_page > LAST_OPT)
 		lines_to_print = LAST_OPT - first_option_on_screen;
-	 
+
 	for (i = 0;i < lines_to_print;i++)
 	{
 		MoveCursor (INDEX_TOP + i, 3);

@@ -28,8 +28,8 @@ int create_subdir = TRUE;
 /*
  * types of archive programs
  */
- 
-struct archiver_t { 
+
+struct archiver_t {
 	char *name;
 	char *ext;
 	char *test;
@@ -62,7 +62,7 @@ static int any_saved_files P_((void));
  *  user and inform how many arts in which groups were mailed.
  */
 
-int 
+int
 check_start_save_any_news (check_start_save)
 	int check_start_save;
 {
@@ -74,7 +74,7 @@ check_start_save_any_news (check_start_save)
 	char subject[HEADER_LEN];
 	char path[PATH_LEN];
 	char *ich;
-	FILE *fp; 
+	FILE *fp;
 	FILE *fp_log = (FILE *) 0;
 	int i, j, print_group;
 	int check_arts;
@@ -137,7 +137,7 @@ check_start_save_any_news (check_start_save)
 						check_arts++;
 						break;
 					case START_ANY_NEWS:
-						return i;	/* return first group with unread news */ 
+						return i;	/* return first group with unread news */
 						/* NOTREACHED */
 					case MAIL_ANY_NEWS:
 					case SAVE_ANY_NEWS:
@@ -207,7 +207,7 @@ check_start_save_any_news (check_start_save)
 						saved_arts++;
 
 						if (check_start_save == MAIL_ANY_NEWS) {
-							strfmailer (mailer, arts[j].subject, mail_news_user, 
+							strfmailer (mailer, arts[j].subject, mail_news_user,
 								savefile, buf, sizeof (buf), default_mailer_format);
 							if (! invoke_cmd (buf)) {
 								error_message (txt_command_failed_s, buf);
@@ -242,14 +242,14 @@ check_start_save_any_news (check_start_save)
 				}
 				return 0;
 			}
-			/* NOTREACHED */ 
+			/* NOTREACHED */
 		case START_ANY_NEWS:
 			wait_message (txt_there_is_no_news);
 			return -1;
-			/* NOTREACHED */ 
+			/* NOTREACHED */
 		case MAIL_ANY_NEWS:
 		case SAVE_ANY_NEWS:
-			sprintf (buf, "\n%s %d article(s) from %d group(s)\n", 
+			sprintf (buf, "\n%s %d article(s) from %d group(s)\n",
 				(check_start_save == MAIL_ANY_NEWS ? "Mailed" : "Saved"),
 				saved_arts, group_top); /*saved_groups); */
 			fprintf (fp_log, "%s", buf);
@@ -263,7 +263,7 @@ check_start_save_any_news (check_start_save)
 						(check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid));
 					wait_message (buf);
 				}
-				strfmailer (mailer, subject, 
+				strfmailer (mailer, subject,
 					(check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid),
 					logfile, buf, sizeof (buf), default_mailer_format);
 				if (! invoke_cmd (buf)) {
@@ -279,7 +279,7 @@ check_start_save_any_news (check_start_save)
 }
 
 
-int 
+int
 save_art_to_file (respnum, indexnum, the_mailbox, filename)
 	int respnum;
 	int indexnum;
@@ -325,7 +325,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 				case iKeySaveOverwriteFile:
 					strcpy (mode, "w");
 					break;
-				case iKeySaveDontSaveFile:
+				case iKeyAbort:
 				case iKeySaveDontSaveFile2:
 					save[i].saved = FALSE;
 					info_message (txt_art_not_saved);
@@ -337,7 +337,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 	}
 
 	if (debug == 2) {
-		sprintf (msg, "Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]", 
+		sprintf (msg, "Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]",
 			respnum, indexnum, the_mailbox, filename, file, mode);
 		error_message (msg, "");
 	}
@@ -378,7 +378,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 }
 
 
-int 
+int
 save_thread_to_file (is_mailbox, group_path)
 	int is_mailbox;
 	char *group_path;
@@ -442,7 +442,7 @@ save_thread_to_file (is_mailbox, group_path)
 }
 
 
-int 
+int
 save_regex_arts (is_mailbox, group_path)
 	int is_mailbox;
 	char *group_path;
@@ -490,7 +490,7 @@ save_regex_arts (is_mailbox, group_path)
 #endif /* INDEX_DAEMON */
 }
 
-int 
+int
 create_path (path)
 	char *path;
 {
@@ -506,7 +506,7 @@ create_path (path)
 	i = my_group[cur_groupnum];
 
 	/*
-	 * expand "$var..." first, so variables starting with 
+	 * expand "$var..." first, so variables starting with
 	 * '+', '$' or '=' will be processed correctly later
 	 */
 	if (path[0] == '$') {
@@ -634,7 +634,7 @@ create_sub_dir (i)
  *  add files to be saved to save array
  */
 
-void 
+void
 add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 	int the_index;
 	struct t_article *the_article;
@@ -788,7 +788,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
  *  print save array of files to be saved
  */
 
-void 
+void
 sort_save_list ()
 {
 	qsort ((char *) save, (size_t)num_save, sizeof (struct t_save), save_comp);
@@ -800,7 +800,7 @@ sort_save_list ()
  *  ie. qsort(array, 5, 32, save_comp);
  */
 
-int 
+int
 save_comp (p1, p2)
 	t_comptype *p1;
 	t_comptype *p2;
@@ -809,7 +809,7 @@ save_comp (p1, p2)
 	struct t_save *s2 = (struct t_save *) p2;
 
 	/*
-	 * Sort on Archive-name: part & patch otherwise Subject: 
+	 * Sort on Archive-name: part & patch otherwise Subject:
 	 */
 	if (s1->archive != (char *) 0) {
 		if (s1->part != (char *) 0) {
@@ -1022,7 +1022,7 @@ get_last_savefile ()
 }
 
 
-int 
+int
 post_process_files (proc_type_ch, auto_delete)
 	int proc_type_ch;
 	int auto_delete;
@@ -1059,7 +1059,7 @@ post_process_files (proc_type_ch, auto_delete)
 }
 
 
-void 
+void
 post_process_uud (pp, auto_delete)
 	int pp;
 	int auto_delete;
@@ -1117,7 +1117,7 @@ post_process_uud (pp, auto_delete)
 				fclose (fp_in);
 				continue;
 			}
-			while (state != END) { 
+			while (state != END) {
 				switch (state) {
 					case INITIAL:
 						if (! strncmp ("begin ", s, 6)) {
@@ -1219,17 +1219,17 @@ uudecode_file (pp, file_out_dir, file_out)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #else
 	sleep (1);
-	sprintf (buf, "cd %s; uudecode %s", file_out_dir, file_out); 
+	sprintf (buf, "cd %s; uudecode %s", file_out_dir, file_out);
 	if (invoke_cmd (buf)) {
 		/*
 		 *  Sum file
 		 */
-		if ((file = get_archive_file (file_out_dir)) != (char *) 0) { 
-			sprintf (buf, "%s '%s'", DEFAULT_SUM, file); 
-			printf (txt_checksum_of_file, file); 
+		if ((file = get_archive_file (file_out_dir)) != (char *) 0) {
+			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
+			printf (txt_checksum_of_file, file);
 			fflush (stdout);
 			if ((fp_in = popen (buf, "r")) == (FILE *) 0) {
-				printf ("Cannot execute %s\r\n", buf); 
+				printf ("Cannot execute %s\r\n", buf);
 				fflush (stdout);
 			} else {
 				if (stat (file, &st) != -1) {
@@ -1242,7 +1242,7 @@ uudecode_file (pp, file_out_dir, file_out)
 					}
 				}
 				pclose (fp_in);
-				printf ("%s  %8d bytes\r\n\r\n", buf, file_size); 
+				printf ("%s  %8d bytes\r\n\r\n", buf, file_size);
 				fflush (stdout);
 			}
 
@@ -1262,7 +1262,7 @@ uudecode_file (pp, file_out_dir, file_out)
 					i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].test, file);
-					printf (txt_testing_archive, file); 
+					printf (txt_testing_archive, file);
 					fflush (stdout);
 					if (! invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
@@ -1275,7 +1275,7 @@ uudecode_file (pp, file_out_dir, file_out)
 					i = (pp == POST_PROC_UUD_LST_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].list, file);
-					printf (txt_listing_archive, file); 
+					printf (txt_listing_archive, file);
 					fflush (stdout);
 					if (! invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
@@ -1309,8 +1309,8 @@ uudecode_file (pp, file_out_dir, file_out)
 /*
  *  Unpack /bin/sh archives
  */
- 
-void 
+
+void
 post_process_sh (auto_delete)
 	int auto_delete;
 {
@@ -1403,7 +1403,7 @@ post_process_sh (auto_delete)
 #if !defined(M_UNIX)
 			make_post_process_cmd (DEFAULT_UNSHAR, file_out_dir, file_out);
 #else
-			sprintf (buf, "cd %s; sh %s", file_out_dir, file_out); 
+			sprintf (buf, "cd %s; sh %s", file_out_dir, file_out);
 			my_fputs ("\r\n", stdout);
 			fflush (stdout);
 			Raw (FALSE);
@@ -1419,7 +1419,7 @@ post_process_sh (auto_delete)
 }
 
 /*
- * Returns the most recently modified file in the specified drectory 
+ * Returns the most recently modified file in the specified drectory
  */
 
 char *
@@ -1439,8 +1439,8 @@ get_archive_file (dir)
 	}
 
 	if ((dirp = opendir (dir)) == (DIR *) 0) {
-		free (file); 
-		return (char *) 0; 
+		free (file);
+		return (char *) 0;
 	}
 
 	dp = (DIR_BUF *) readdir (dirp);
@@ -1459,16 +1459,16 @@ get_archive_file (dir)
 	}
 	closedir (dirp);
 
-	if (last == 0) { 
-		free (file); 
-		file = (char *) 0; 
+	if (last == 0) {
+		free (file);
+		file = (char *) 0;
 	}
 
 	return file;
 }
 
 
-void 
+void
 delete_processed_files (auto_delete)
 	int auto_delete;
 {
@@ -1513,7 +1513,7 @@ any_saved_files ()
 	return saved;
 }
 
-void 
+void
 print_art_seperator_line (fp, the_mailbox)
 	FILE *fp;
 	int the_mailbox;

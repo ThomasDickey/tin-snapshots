@@ -51,9 +51,9 @@ hash_str (s)
 
 	{
 		unsigned char *t = (unsigned char *) s;
-		int len;
+		int len = 0;
 
-		h = 0; len = 0;
+		h = 0;
 		while (*t) {
 			h = (h << 1) ^ *t++;
 			if (++len & 7) continue;
@@ -114,7 +114,7 @@ add_string (s)
 }
 
 
-void 
+void
 hash_init ()
 {
 	int i;
@@ -131,7 +131,7 @@ hash_init ()
 }
 
 
-void 
+void
 hash_reclaim ()
 {
 	int i;
