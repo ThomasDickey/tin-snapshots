@@ -83,8 +83,8 @@ fflush(stdout);
 		 * Load group info.
 		 */
 		active[num_active].type = GROUP_TYPE_MAIL;
-		active[num_active].name = str_dup (buf);
-		active[num_active].spooldir = str_dup (spooldir);
+		active[num_active].name = my_strdup (buf);
+		active[num_active].spooldir = my_strdup (spooldir);
 		active[num_active].description = (char *) 0;
 		active[num_active].count = count;
 		active[num_active].xmax = max;
@@ -257,7 +257,7 @@ read_groups_descriptions (fp, fp_save)
 			while ((q = strchr (q, '\t')) != (char *) 0) {
 				*q = ' ';
 			}
-			psGrp->description = str_dup (p);
+			psGrp->description = my_strdup (p);
 			if (psGrp->type == GROUP_TYPE_NEWS) {
 				if (fp_save != (FILE *) 0 &&
 				    read_news_via_nntp &&
@@ -526,11 +526,8 @@ vGrpDelMailArts (psGrp)
 /* MAYBE also check if min / max article was deleted.  If so then update
    the active[] entry for the group and rewrite the mail.active file
 */
-#ifndef NNTP_ONLY
-		if ((!read_news_via_nntp) && iUpdateIndexFile) {
+		if (iUpdateIndexFile)
 			vWriteNovFile (psGrp);
-		}
-#endif /* !NNTP_ONLY */
 	}
 }
 #endif	/* !INDEX_DAEMON */

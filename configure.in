@@ -71,7 +71,7 @@ CF_ARG_ENABLE(debug,
     CFLAGS="-g $CFLAGS"
     LDFLAGS="-g $LDFLAGS"],
 	[ENABLE_DEBUG='#'
-    test -z "$save_CFLAGS" && CFLAGS=`echo $CFLAGS|sed -e 's/-g //'`])
+    test -z "$save_CFLAGS" && CFLAGS=`echo $CFLAGS|sed -e 's/-g //' -e 's/-g$//'`])
 AC_MSG_RESULT($enableval)
 AC_SUBST(ENABLE_DEBUG)
 

@@ -74,8 +74,6 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  tin sometimes crashes (thread.c) 987
-
 o  rereading the active file is buggy, it causes crashes on some machines and
    sometimes it takes 50 times longer than the first read at startup...
 
@@ -117,8 +115,6 @@ o  join Makefile and makefile (not entirely possible)
 
 o  unique newsgroups after editing article
 
-o  add 'U'untag all command to thread level.
-
 o  add feature save selected/tagged files sequentially to the same file
 
 o  rewrite NGLIMIT handling (post.c)
@@ -141,7 +137,7 @@ o  sender-patch
    verified)]
    If user ads Sender:-line rename it to X-Unverifiable-Sender and
    ad a Sender:-line
-   (for canceling articles never look at the Sender:-line, always look at
+   (for cancelling articles never look at the Sender:-line, always look at
    the From:-line)
 
 o  add counter to post-processing commands (processing file x of y)
@@ -161,6 +157,8 @@ o  add feature goto using the 'G' key
 
 o  Add '/' (search subject) to the thread menu
    Add 'S' (autosave tagged) to the thread menu
+
+o  add 'U'untag all command to thread level.
 
 o  Add 'l' (goto thread menu) to the article pager
 
@@ -236,7 +234,7 @@ o  sometimes (when using tins kill-menu) kill-file entries are
 
 o  killing articles with Lines: 0 does not work
 
-o  forged canceling via Supersedes:/Also-Control:/Control:-header is possible
+o  forged cancelling via Supersedes:/Also-Control:/Control:-header is possible
    if it is supplied by hand (buildin_inews)
 
 o  f'uping with 'F' to a article which has Followup-To: poster set an then
@@ -253,7 +251,7 @@ o  if exiting tin with
    it up and than exits - but threading is not necessary for a catch-up!
    and it does a filter before exiting - stupid!
 
-o  when last articles in a newsgroup were canceled, it shows that there are
+o  when last articles in a newsgroup were cancelled, it shows that there are
    new articles in that group, even if entered that group in a session before
 
 o  article save with auto_save=ON & Archive-name: doesn't not work correctly

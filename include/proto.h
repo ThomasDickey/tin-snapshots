@@ -42,6 +42,7 @@ extern void make_threads P_((struct t_group *group, int rethread));
 extern void sort_arts P_((int sort_art_type));
 extern int parse_headers P_((char *buf, struct t_article *h));
 extern int iReadNovFile P_((struct t_group *group, long min, long max, int *expired));
+extern void vWriteNovFile P_((struct t_group *psGrp));
 extern char *pcFindNovFile P_((struct t_group *psGrp, int iMode));
 extern void do_update P_((void));
 extern void set_article P_((struct t_article *art));
@@ -262,7 +263,7 @@ extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
 extern unsigned long hash_groupname P_((char *group));
 extern void rename_file P_((char *old_filename, char *new_filename));
-extern char *str_dup P_((char *str));
+extern char *my_strdup P_((char *str));
 extern int invoke_cmd P_((char *nam));
 extern void draw_percent_mark P_((long cur_num, long max_num));
 extern void set_real_uid_gid P_((void));
@@ -597,12 +598,6 @@ extern int overview_xref_support P_((void));
 extern void art_mark_xref_read P_((struct t_article *art));
 extern void NSETRNG1 P_((t_bitmap *bitmap, long low, long high));
 extern void NSETRNG0 P_((t_bitmap *bitmap, long low, long high));
-
-
-#ifndef NNTP_ONLY
-	/* art.c */
-	extern void vWriteNovFile P_((struct t_group *psGrp));
-#endif /* !NNTP_ONLY */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	/* mail.c */

@@ -342,12 +342,12 @@ read_news_active_file ()
 			if (moderated[0] == '/') {
 #endif
 				active[num_active].type = GROUP_TYPE_SAVE;
-				active[num_active].spooldir = str_dup(moderated);
+				active[num_active].spooldir = my_strdup(moderated);
 			} else {
 				active[num_active].type = GROUP_TYPE_NEWS;
 				active[num_active].spooldir = spooldir;
 			}
-			active[num_active].name = str_dup (buf);
+			active[num_active].name = my_strdup (buf);
 			active[num_active].description = (char *) 0;
 			active[num_active].count = count;
 			active[num_active].xmax = max;
@@ -829,7 +829,7 @@ load_newnews_info (info)
 		if (num_newnews >= max_newnews) {
 			expand_newnews ();
 		}
-		newnews[num_newnews].host = str_dup (buf);
+		newnews[num_newnews].host = my_strdup (buf);
 		newnews[num_newnews].time = the_time;
 		if (debug == 2) {
 			sprintf (buf, "ACTIVE host=[%s] time=[%ld]",

@@ -540,7 +540,7 @@ my_strtol (str, ptr, use_base)
 	int use_base;
 {
 #ifndef HAVE_STRTOL
-#define DIGIT(x) (isdigit(x)? ((x)-'0'): (10+tolower(x)-'a'))
+#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
 #define MBASE 36
 
 	long	val;
@@ -551,7 +551,7 @@ my_strtol (str, ptr, use_base)
 
 	if (use_base < 0 || use_base > MBASE)
 		goto OUT;
-	while (isspace (*str))
+	while (isspace ((unsigned char)*str))
 		++str;
 	if (*str == '-') {
 		++str;
@@ -575,7 +575,7 @@ my_strtol (str, ptr, use_base)
 		 * for any base > 10, the digits incrementally following
 		 * 9 are assumed to be "abc...z" or "ABC...Z"
 		 */
-		while (isalnum (*str) && (xx = DIGIT (*str)) < use_base) {
+		while (isalnum ((unsigned char)*str) && (xx = DIGIT (*str)) < use_base) {
 			/* accumulate neg avoids surprises near maxint */
 			val = use_base * val - xx;
 			++str;
@@ -740,7 +740,7 @@ rename_file (old_filename, new_filename)
  * Handrolled version of strdup(), presumably to take advantage of
  * the enhanced error detection in my_malloc
  */
-char *str_dup (str)
+char *my_strdup (str)
 	char *str;
 {
 	char *duplicate = (char *) 0;
@@ -787,7 +787,7 @@ invoke_cmd (nam)
 	ret = system (nam);
 	signal (SIGCHLD, suspchld);
 #else
-# if defined(SIGCHLD) && !defined(RS6000)
+# if defined(SIGCHLD) && !defined(RS6000) && !defined(__DECC)
 	system (nam);
 	ret = system_status;
 # else
@@ -1047,7 +1047,7 @@ parse_from (from_line, eaddr, fname)
 		switch (state) {
 
 		case 'A':
-			if (isspace(*from_line)) /* Found first non-blank? */
+			if (isspace((unsigned char)*from_line)) /* Found first non-blank? */
 				break;		 /* No --> keep looking */
 
 			nonblank = from_line;
@@ -1087,7 +1087,7 @@ parse_from (from_line, eaddr, fname)
 
 			default:
 				newstate = state; /* stay in this state */
-				if (!isspace(*from_line))
+				if (!isspace((unsigned char)*from_line))
 					*addrptr++ = *from_line;
 			}  /* switch(*from_line) */
 			break;
@@ -1095,7 +1095,7 @@ parse_from (from_line, eaddr, fname)
 		case '<':
 			if (*from_line == '>')
 				newstate = '>';
-			else if (isspace(*from_line))
+			else if (isspace((unsigned char)*from_line))
 				*nameptr++ = *from_line;
 			else
 				*addrptr++ = *from_line;
@@ -1152,7 +1152,7 @@ parse_from (from_line, eaddr, fname)
 		strcpy(fname, "");
 	else {
 		while (--nameptr >= name) {
-			if (isspace(*nameptr) || (*nameptr == '"'))
+			if (isspace((unsigned char)*nameptr) || (*nameptr == '"'))
 				*nameptr = '\0';
 			else
 				break;
@@ -1162,7 +1162,7 @@ parse_from (from_line, eaddr, fname)
 
 		nameptr = name;
 		while (*(nameptr) != '\0') {
-			if (!(isspace(*nameptr) || (*nameptr == '"')))
+			if (!(isspace((unsigned char)*nameptr) || (*nameptr == '"')))
 				break;
 			else
 				nameptr++;
@@ -1255,7 +1255,7 @@ eat_re (s)
 				s += 3;
 			else if (*(s+2) == ' ' && *(s+3) == ':')
 				s += 4;
-			else if (*(s+2) == '^' && isdigit(*(s+3)) && *(s+4) == ':')
+			else if (*(s+2) == '^' && isdigit((unsigned char)*(s+3)) && *(s+4) == ':')
 				s += 5; 		/* hurray nn */
 			else
 				break;
@@ -1268,7 +1268,7 @@ eat_re (s)
 		for (e = s; *e; e++)	/* NULL out trailing whitespace */
 			;
 
-		while (e-- > s && isspace(*e)) {
+		while (e-- > s && isspace((unsigned char)*e)) {
 			*e = '\0';
 		}
 	}

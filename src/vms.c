@@ -98,14 +98,14 @@ char *fix_fullname(char *p)
   while (*q) {
     if (cc > 0) {
       if (cc > 1 && *(q-1) == 'c' && *(q-2) == 'M') {
-	if (islower(*q))
+	if (islower((unsigned char)*q))
 	  *q = toupper(*q);
       } else
-	if (isupper(*q))
+	if (isupper((unsigned char)*q))
 	  *q = tolower(*q);
     } else
       if (cc == 0)
-	if (islower(*q))
+	if (islower((unsigned char)*q))
 	  *q = toupper(*q);
     if (*q == '_' || *q == ' ') {
       *q = ' ';

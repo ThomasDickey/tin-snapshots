@@ -37,14 +37,14 @@
 #	endif
 #endif
 
-#ifdef __DECC
-#	include	<unixio.h>
-#else
-#	include	<stdio.h>
-#endif
 #include	<signal.h>
 
 #ifdef VMS
+#	ifdef __DECC
+#		include	<unixio.h>
+#	else
+#		include	<stdio.h>
+#	endif
 #	define NNTP_ONLY
 #	define NNTP_INEWS
 #	define DONT_HAVE_PIPING
@@ -66,6 +66,7 @@ extern char *get_uaf_fullname();
 #endif /* VMS */
 
 #ifndef VMS
+#	include	<stdio.h>
 #	if HAVE_ERRNO_H
 #		include	<errno.h>
 #	else
@@ -180,41 +181,6 @@ extern char *get_uaf_fullname();
 
 #ifdef HAVE_POLL_H
 #	include <poll.h>
-#endif
-
-/*
- * Needed for resizing under an xterm
- */
-
-#ifdef HAVE_TERMIOS_H
-#	include <termios.h>
-#endif
-
-#if SYSTEM_LOOKS_LIKE_SCO
-#	include <sys/stream.h>
-#	include <sys/ptem.h>
-#endif
-
-#if defined(SIGWINCH) && !defined(DONT_HAVE_SIGWINCH)
-#	if !defined(TIOCGWINSZ) && !defined(TIOCGSIZE)
-#		ifdef HAVE_SYS_STREAM_H
-#			include <sys/stream.h>
-#		endif
-#		ifdef HAVE_TERMIO_H
-#			include <termio.h>
-#		else
-#			ifdef HAVE_SYS_PTEM_H
-#				include <sys/ptem.h>
-#				include <sys/tty.h>
-#			endif
-#			ifdef HAVE_SYS_PTY_H
-#				if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
-#					include <sys/bsdtypes.h>
-#				endif
-#				include <sys/pty.h>
-#			endif
-#		endif
-#	endif
 #endif
 
 #ifdef HAVE_CURSES_H
@@ -445,7 +411,7 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_MAILBOX "/var/mail"
 #		define	DEFAULT_SUM		"/usr/bin/cksum -o 1 <"
-#										/* < above, otherwise get filename output too */
+		/* < above, otherwise get filename output too */
 #	else
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR	"/usr/ucb/vi"
@@ -749,6 +715,11 @@ extern char *get_uaf_fullname();
 #endif
 
 /*
+ * Number of mime types
+ */
+#define		NUM_MIME_TYPES	4
+
+/*
  * Maximum permissible colour number
  */
 #define		MAX_COLOR	15
@@ -866,7 +837,7 @@ extern char *get_uaf_fullname();
  * used in art.c
  * sort types on arts[] array
  */
- 
+
 #define	SORT_BY_NOTHING		0
 #define	SORT_BY_SUBJ_DESCEND		1
 #define	SORT_BY_SUBJ_ASCEND		2
@@ -1711,7 +1682,9 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 	extern void	no_leaks P_(( void ));
 #endif	/* DOALLOC */
 
-#ifdef __DECC
-#	define ferror(x)		(0)
-#	define EndWin		EndWind
+#ifdef __DECC		/* VMS */
+#	ifndef ferror
+#		define ferror(x)		(0)
+#		define EndWin		EndWind
+#	endif
 #endif

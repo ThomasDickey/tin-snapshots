@@ -90,7 +90,7 @@ msg_add_header (name, text)
 		/*
 		 * Remove : if one is attached to name
 		 */
-		new_name = str_dup (name);
+		new_name = my_strdup (name);
 		ptr = strchr (new_name, ':');
 		if (ptr) {
 			*ptr = '\0';
@@ -105,12 +105,12 @@ msg_add_header (name, text)
 					for (ptr = text; *ptr && (*ptr == ' ' || *ptr == '\t'); ptr++) {
 						;
 					}
-					new_text = str_dup (ptr);
+					new_text = my_strdup (ptr);
 					ptr = strchr (new_text, '\n');
 					if (ptr) {
 						*ptr = '\0';
 					}
-					msg_headers[i].text = str_dup (new_text);
+					msg_headers[i].text = my_strdup (new_text);
 				}
 				done = TRUE;
 			}
@@ -120,17 +120,17 @@ msg_add_header (name, text)
 		 * if header does not exist then add it
 		 */
 		if (!(done || msg_headers[i].name)) {
-			msg_headers[i].name = str_dup (new_name);
+			msg_headers[i].name = my_strdup (new_name);
 			if (text) {
 				for (ptr = text; *ptr && (*ptr == ' ' || *ptr == '\t'); ptr++) {
 					;
 				}
-				new_text = str_dup (ptr);
+				new_text = my_strdup (ptr);
 				ptr = strchr (new_text, '\n');
 				if (ptr) {
 					*ptr = '\0';
 				}
-				msg_headers[i].text = str_dup (new_text);
+				msg_headers[i].text = my_strdup (new_text);
 			}
 		}
 		FreeIfNeeded (new_name);
@@ -485,7 +485,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 	}
 	if (!end_of_header) {
 		setup_check_article_screen (&init);
-		fprintf (stderr, txt_error_header_and_body_not_seperate);
+		fprintf (stderr, txt_error_header_and_body_not_separate);
 		fflush (stderr);
 		errors++;
 	}
@@ -1057,7 +1057,7 @@ appendid (where, what)
 		(*what)++;
 	if (**what) {
 		while (**what && **what != '>'
-		       && !isspace (**what))
+		       && !isspace ((unsigned char)**what))
 			*(*where)++ = *(*what)++;
 		if (**what != '>')
 			*where = oldpos;
@@ -1091,10 +1091,10 @@ static void
 skip_id (id)
 	char **id;
 {
-	while (**id && isspace (**id))
+	while (**id && isspace ((unsigned char)**id))
 		(*id)++;
 	if (**id) {
-		while (**id && !isspace (**id))
+		while (**id && !isspace ((unsigned char)**id))
 			(*id)++;
 	}
 }
@@ -1103,7 +1103,7 @@ static int
 damaged_id (id)
 	char *id;
 {
-	while (*id && isspace (*id))
+	while (*id && isspace ((unsigned char)*id))
 		id++;
 	if (*id != '<')
 		return 1;
@@ -1883,7 +1883,7 @@ mail_bug_report ()
 					    && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						sprintf (msg, txt_mailing_to, mail_to);
 						wait_message (msg);
-						rfc15211522_encode (nam, mail_mime_encoding, mail_8bit_header);
+						rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header);
 						strfmailer (mailer, subject, mail_to, nam,
 							    buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
@@ -2064,7 +2064,7 @@ mail_to_author (group, respnum, copy_text)
 					sprintf (msg, txt_mailing_to, mail_to);
 					wait_message (msg);
 					checknadd_headers (nam, lines);
-					rfc15211522_encode (nam, mail_mime_encoding, mail_8bit_header);
+					rfc15211522_encode (nam, txt_mime_types[mail_mime_encoding], mail_8bit_header);
 					strfmailer (mailer, subject, mail_to, nam,
 						    buf, sizeof (buf), default_mailer_format);
 					if (invoke_cmd (buf)) {
@@ -2386,7 +2386,7 @@ cancel_article (group, art, respnum)
 				break;
 
 			case iKeyPostCancel:
-				wait_message (txt_canceling_art);
+				wait_message (txt_cancelling_art);
 				if (submit_news_file (cancel, 0)) {
 					info_message (txt_art_cancel);
 					if (pcCopyArtHeader (HEADER_SUBJECT, cancel, buf))
@@ -3082,7 +3082,7 @@ submit_mail_file (file)
 			sprintf (buf, txt_mailing_to, mail_to);
 			wait_message (buf);
 
-			rfc15211522_encode (file, mail_mime_encoding, mail_8bit_header);
+			rfc15211522_encode (file, txt_mime_types[mail_mime_encoding], mail_8bit_header);
 
 			strfmailer (mailer, subject, mail_to, file,
 				  buf, sizeof (buf), default_mailer_format);

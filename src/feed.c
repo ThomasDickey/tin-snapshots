@@ -238,7 +238,7 @@ feed_articles (function, level, group, respnum)
 				if (strlen (filename)) {
 					if (group->attribute->savefile != (char *) 0) {
 						free (group->attribute->savefile);
-						group->attribute->savefile = str_dup (filename);
+						group->attribute->savefile = my_strdup (filename);
 					} else {
 						strcpy (default_save_file, filename);
 					}
@@ -602,12 +602,7 @@ feed_articles (function, level, group, respnum)
 		case FEED_PIPE:
 got_sig_pipe_while_piping:
 			got_sig_pipe = FALSE;
-#if defined(SIGCHLD) && !defined(RS6000)
-			pclose (fp);
-			(void) system_status;
-#else
 			(void) pclose (fp);
-#endif
 			Raw (TRUE);
 			continue_prompt ();
 			redraw_screen = TRUE;

@@ -270,11 +270,11 @@ rfc1521_encode (line, f, e)
 		}
 		b = buffer;
 		while (*line) {
-			if (isspace (*line) && *line != '\n') {
+			if (isspace ((unsigned char)*line) && *line != '\n') {
 				char *l = line + 1;
 
 				while (*l) {
-					if (!isspace (*l)) {	/* it's not trailing whitespace, no encoding needed */
+					if (!isspace ((unsigned char)*l)) {    /* it's not trailing whitespace, no encoding needed */
 						*b++ = *line++;
 						xpos++;
 						break;

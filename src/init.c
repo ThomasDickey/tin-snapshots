@@ -59,7 +59,7 @@ char mail_active_file[PATH_LEN];
 #ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
 #endif
-char mail_mime_encoding[LEN] = "8bit";
+int mail_mime_encoding;
 int mail_8bit_header=FALSE;               /* allow 8bit chars. in header of mail message */
 char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char mail_news_user[LEN];		/* mail new news to this user address */
@@ -78,7 +78,7 @@ char newnewsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
-char post_mime_encoding[LEN] = "8bit";
+int post_mime_encoding;
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char progname[PATH_LEN];		/* program name */
@@ -335,7 +335,7 @@ void init_selfinfo ()
 	if (tin_uid != real_uid) {
 		local_index = FALSE;
 		set_real_uid_gid ();
-	} else {	/* index in users home directory ~/.tin/.index */
+	} else {	/* index in users home directory ~/.tin/.news */
 		local_index = TRUE;
 	}
 

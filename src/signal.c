@@ -14,6 +14,41 @@
 
 #include	"tin.h"
 
+/*
+ * Needed for resizing under an xterm
+ */
+
+#ifdef HAVE_TERMIOS_H
+#	include <termios.h>
+#endif
+
+#if SYSTEM_LOOKS_LIKE_SCO
+#	include <sys/stream.h>
+#	include <sys/ptem.h>
+#endif
+
+#if defined(SIGWINCH) && !defined(DONT_HAVE_SIGWINCH)
+#	if !defined(TIOCGWINSZ) && !defined(TIOCGSIZE)
+#		ifdef HAVE_SYS_STREAM_H
+#			include <sys/stream.h>
+#		endif
+#		ifdef HAVE_TERMIO_H
+#			include <termio.h>
+#		else
+#			ifdef HAVE_SYS_PTEM_H
+#				include <sys/ptem.h>
+#				include <sys/tty.h>
+#			endif
+#			ifdef HAVE_SYS_PTY_H
+#				if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
+#					include <sys/bsdtypes.h>
+#				endif
+#				include <sys/pty.h>
+#			endif
+#		endif
+#	endif
+#endif
+
 static unsigned int time_remaining;
 
 #ifndef WEXITSTATUS

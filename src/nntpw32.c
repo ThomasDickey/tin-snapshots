@@ -470,7 +470,7 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 	/* If not a raw ip address, try nameserver */
-	if (! isdigit(*machine) ||
+	if (! isdigit((unsigned char)*machine) ||
 	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
