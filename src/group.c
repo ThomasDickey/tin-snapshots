@@ -1589,7 +1589,7 @@ bld_sline (i)
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
 	if (show_lines) {
-		if (n > 1) {
+		if (n >= 1) {
 			if (arts[j].lines != -1)
 				sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
 			else
@@ -1601,7 +1601,7 @@ bld_sline (i)
 				strcpy (art_cnt, "    ?    ");
 		}
 	} else {
-		if (n > 1) {
+		if (n >= 1) {
 			sprintf(art_cnt, "%-3d ", n);
 		} else {
 			sprintf(art_cnt, "    ");

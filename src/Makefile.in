@@ -4,13 +4,14 @@ SHELL		= /bin/sh
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 srcdir		= @srcdir@
+VPATH		= $(srcdir)
 
 # Compiler, linker & parser commands
 CC	= @CC@
 CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_MIME -DDEBUG_REFS
-CPPOPTS	= @DEFS@ -I$(INCDIR) $(DEBUG) @CPPFLAGS@
+CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
 CPROTO_OPTS = -e -m $(CPPOPTS) \
@@ -41,7 +42,7 @@ VER	= 1.30
 MANEXT	= 1
 
 # directory structure
-DOCDIR	= ../doc
+DOCDIR	= $(srcdir)/../doc
 INCDIR	= $(srcdir)/../include
 BINDIR	= .
 OBJDIR	= .
@@ -204,17 +205,19 @@ all: $(BINDIR)/$(EXE)
 
 .c.o:
 @SHOW_CC@
-	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $*.c
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(srcdir)/$*.c
 
 .c.i:
 @SHOW_CC@
 	@ECHO_CC@$(CPP) -C $(CPPOPTS) $*.c >$@
 
-# explicit rule to allow running lint
-$(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
+# explicit rule to allow running lint, and to accommodate older 'make' programs
+$(OBJDIR)/parsdate.o: $(SRCDIR)/parsdate.y
 	@ echo expect 6 shift/reduce conflicts...
 	$(YACC) $(SRCDIR)/parsdate.y
 	$(MV) y.tab.c $@
+@SHOW_CC@
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(OBJDIR)/parsdate.c
 
 actived: $(SRCDIR)/actived.c $(SRCDIR)/mail.c
 	@$(ECHO) "Compiling actived..."
@@ -366,7 +369,7 @@ $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(TIN_DEP) \
 				$(INCDIR)/version.h
 $(OBJDIR)/page.o:		$(SRCDIR)/page.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
-$(OBJDIR)/parsdate.o:		$(OBJDIR)/parsdate.c $(TIN_DEP)
+$(OBJDIR)/parsdate.o:		$(OBJDIR)/parsdate.y $(TIN_DEP)
 $(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(TIN_DEP)
 $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \

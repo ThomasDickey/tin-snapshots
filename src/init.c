@@ -522,11 +522,12 @@ void init_selfinfo ()
 	joindir (rcdir, homedir, RCDIR); /* we're naming a directory here */
 	joinpath (rcdir_asfile, homedir, RCDIR);	/* for stat() */
 	strcat(rcdir_asfile, ".DIR");
-	if (stat (rcdir_asfile, &sb) == -1) {
+	if (stat (rcdir_asfile, &sb) == -1)
 #else
 	joinpath (rcdir, homedir, RCDIR);
-	if (stat (rcdir, &sb) == -1) {
+	if (stat (rcdir, &sb) == -1)
 #endif
+	{
 		created_rcdir = TRUE;
 		my_mkdir (rcdir, 0755);
 	}
@@ -642,10 +643,11 @@ void init_selfinfo ()
 #endif
 
 #ifdef VMS
-	if (stat (rcdir_asfile, &sb) == -1) {
+	if (stat (rcdir_asfile, &sb) == -1)
 #else
-	if (stat (rcdir, &sb) == -1) {
+	if (stat (rcdir, &sb) == -1)
 #endif
+	{
 		created_rcdir = TRUE;
 		my_mkdir (rcdir, 0755);
 	}
@@ -863,10 +865,11 @@ GetConfigValue (name)
 		 *  check enviroment for ORGANIZATION / NEWSORG
 		 */
 #ifdef apollo
-		if ((ptr = getenv ("NEWSORG")) != (char *) 0) {
+		if ((ptr = getenv ("NEWSORG")) != (char *) 0)
 #else
-		if ((ptr = getenv ("ORGANIZATION")) != (char *) 0) {
+		if ((ptr = getenv ("ORGANIZATION")) != (char *) 0)
 #endif
+		{
 			my_strncpy (conf_org, ptr, sizeof (conf_org));
 			goto got_org;
 		}
