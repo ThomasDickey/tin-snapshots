@@ -42,8 +42,6 @@ int optind = 1;
 
 #ifndef INDEX_DAEMON
 
-extern int outchar (int);
-
 int
 tputs (str, zzz, func)
 	register char *str;

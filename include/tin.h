@@ -219,6 +219,16 @@ extern char *get_uaf_fullname();
 #	include <curses.h>
 #endif
 
+#if 0	/* FIXME: this has prototypes, but opens up new problems! */
+#ifdef HAVE_TERM_H
+#	include <term.h>
+#endif
+#endif
+
+#ifdef HAVE_TERMCAP_H
+#	include <termcap.h>
+#endif
+
 /*
  * Directory handling code
  */
@@ -523,6 +533,25 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_PRINTER "/usr/bin/lp"
 #	endif
 #	define		DEFAULT_SUM		"sum -r"
+#endif
+
+/*
+ * Miscellaneous program-paths
+ */
+#ifndef PATH_ISPELL
+#	define	PATH_ISPELL	"ispell"
+#endif
+
+#ifndef PATH_METAMAIL
+#	define	PATH_METAMAIL	"metamail"
+#endif
+
+#ifndef PATH_HOSTNAME
+#	define	PATH_HOSTNAME	"hostname"
+#endif
+
+#ifndef PATH_UNAME
+#	define	PATH_UNAME	"uname"
 #endif
 
 #ifdef HAVE_LONG_FILE_NAMES
@@ -1389,7 +1418,6 @@ typedef char t_comptype;
 #define		MOUSE_BUTTON_3	2
 
 #define	EDITOR_FORMAT_OFF	"%E %F"
-#define	ISPELL_CMD		"ispell"
 
 #ifdef WIN32
 #	define	my_fputc(ch, stream)		cmd_line ? fputc (ch, stream) : addch (ch)
@@ -1412,7 +1440,7 @@ typedef char t_comptype;
 #	define	ENV_VAR_SHELL		"SHELL"
 #	define	EDITOR_FORMAT_ON	"%E %F"
 #	define	MAILER_FORMAT		"%M <%F -f %U"
-#	define	METAMAIL_CMD		"metamail -e -p -m \"tin\""
+#	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR			"T:"
 #	define	KEY_PREFIX		0x9b
 extern void joinpath (char *result, char *dir, char *file);
@@ -1426,7 +1454,7 @@ extern void joinpath (char *result, char *dir, char *file);
 /*#	define	ENV_VAR_SHELL		"SHELL"*/
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	EDITOR_FORMAT_ON	"%E %F"
-#	define METAMAIL_CMD "metamail -e -p -m \"tin\""
+#	define METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR "SYS$SCRATCH:"
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0x9b
@@ -1444,7 +1472,7 @@ extern void joindir (char *result, char *dir, char *file);
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	ENV_VAR_SHELL		"COMSPEC"
 #	define	EDITOR_FORMAT_ON	"%E %F"
-#	define	METAMAIL_CMD		"metamail -e -p -m \"tin\""
+#	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef WIN32
@@ -1458,7 +1486,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	ENV_VAR_SHELL		"COMSPEC"
 #	define	EDITOR_FORMAT_ON	"%E +%N %F"
 #	define	MAILER_FORMAT		"%M -t %T -f %U -s \"%S\" -F %F"
-#	define	METAMAIL_CMD		"metamail -e -p -m \"tin\""
+#	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef M_UNIX
@@ -1470,7 +1498,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	ENV_VAR_SHELL		"SHELL"
 #	define	EDITOR_FORMAT_ON	"%E +%N %F"
 #	define	MAILER_FORMAT		"%M \"%T\" < %F"
-#	define	METAMAIL_CMD		"metamail -e -p -m \"tin\""
+#	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR "/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0xff
@@ -1557,12 +1585,14 @@ extern void joinpath (char *result, char *dir, char *file);
 #ifdef M_AMIGA
 typedef const char __far constext;
 #else
-typedef char constext;
+typedef /* FIXME: const */ char constext;
 #endif
 
 #include	"extern.h"
 #include	"nntplib.h"
+#ifndef __CPROTO__
 #include	"proto.h"
+#endif
 
 #if defined(WIN32)
 #include	"msmail.h"

@@ -48,15 +48,6 @@ struct archiver_t {
 	{ (char *) 0,	(char *) 0,	(char *) 0,	(char *) 0,	(char *) 0 }
 };
 
-extern char *glob_group;
-extern char note_h_path[HEADER_LEN];	/* Path:	*/
-extern char note_h_date[HEADER_LEN];	/* Date:	*/
-extern FILE	*note_fp;		/* the body of the current article */
-extern int index_point;
-extern int note_end;
-extern int note_page;
-extern long note_mark[MAX_PAGES];
-
 static int any_saved_files P_((void));
 
 /*
@@ -83,7 +74,6 @@ check_start_save_any_news (check_start_save)
 	char subject[HEADER_LEN];
 	char path[PATH_LEN];
 	char *ich;
-	extern FILE *note_fp;
 	FILE *fp; 
 	FILE *fp_log = (FILE *) 0;
 	int i, j, print_group;
@@ -759,10 +749,8 @@ add_to_save_list (index, the_article, is_mailbox, archive_save, path)
 		}
 
 #ifdef M_AMIGA
-		{	extern int tin_bbs_mode;
-			if (tin_bbs_mode) {
-				dir[0] = 0;
-			}
+		if (tin_bbs_mode) {
+			dir[0] = 0;
 		}
 #endif
 
@@ -1240,7 +1228,7 @@ uudecode_file (pp, file_out_dir, file_out)
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file); 
 			printf (txt_checksum_of_file, file); 
 			fflush (stdout);
-			if ((fp_in = (FILE *) popen (buf, "r")) == (FILE *) 0) {
+			if ((fp_in = popen (buf, "r")) == (FILE *) 0) {
 				printf ("Cannot execute %s\r\n", buf); 
 				fflush (stdout);
 			} else {

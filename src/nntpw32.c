@@ -48,8 +48,6 @@ void DebugAssertDialog(LPSTR, DWORD, LPSTR);
 
 #endif /* NNTP_ABLE */
 
-extern	int errno;
-
 // Transport independant routines...
 
 /*
@@ -711,7 +709,6 @@ get_server (string, size)
 		if (nntp_open () != -1)
 		{
 			char buf[NNTP_STRLEN];
-			extern char *glob_group;
 
 			strcpy(buf, last_put);
 			if (glob_group != (char *) 0)
@@ -857,7 +854,6 @@ static void real_put_server (LPCSTR plpvMessage, int fCRLF)
 		strcpy (buf, plpvMessage);
 		if (nntp_open () != -1)
 		{
-			extern char *glob_group;
 			if (glob_group != (char *) 0)
 			{
 				char tmp[NNTP_STRLEN];

@@ -21,15 +21,11 @@
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(SNUM2LNUM(INDEX2SNUM(i)))
 
-extern char proc_ch_type;	/* feed.c */
-extern int last_resp;		/* page.c */
-extern int this_resp;		/* page.c */
-extern int note_page;		/* page.c */
-
 char *glob_group;
 int index_point;
 int first_subj_on_screen;
 int last_subj_on_screen;
+
 static int len_from;
 static int len_subj;
 static char *spaces = "XXXX";

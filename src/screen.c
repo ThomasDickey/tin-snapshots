@@ -80,17 +80,19 @@ perror_message (template, str)
 	char *template;
 	char *str;
 {
-#ifdef HAVE_SYSERRLIST
+#ifndef HAVE_STRERROR
+#   ifdef HAVE_SYSERRLIST
 #	ifdef M_AMIGA
 #		ifndef sys_errlist
 			extern char *__sys_errlist[];
 #			define sys_errlist	__sys_errlist
 #		endif
 #	else
-#	if !(defined(BSD) && (BSD >= 199306))
+#	if DECL_SYS_ERRLIST
 		extern char *sys_errlist[];
 #	endif
 #	endif
+#   endif
 #endif
 
 	char str2[512];
@@ -100,10 +102,14 @@ perror_message (template, str)
 
 	sprintf (str2, template, str);
 	err = errno;
-#ifdef HAVE_SYSERRLIST
-	fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
+#if HAVE_STRERROR
+	fprintf (stderr, "%s: Error: %s", str2, strerror(err));
 #else
+#  ifdef HAVE_SYSERRLIST
+	fprintf (stderr, "%s: %s", str2, sys_errlist[err]);
+#  else
 	fprintf (stderr, "%s: Error: %i", str2, err);
+#  endif
 #endif
 	errno = 0;
 

@@ -119,8 +119,6 @@ char *fix_fullname(char *p)
 
 #ifndef INDEX_DAEMON
 
-extern int outchar (int);
-
 int tputs (str, zzz, func)
 	register char *str;
 	int zzz;

@@ -21,8 +21,6 @@
 
 #define MARK_OFFSET 8
 
-extern int index_point;
-
 int thread_basenote = 0;
 int show_subject;
 
@@ -736,7 +734,6 @@ show_thread_page ()
 {
 #ifndef INDEX_DAEMON
 
-	extern int index_point;
 	int i, j;
 	static int index = 0;
 

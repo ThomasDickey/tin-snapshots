@@ -38,25 +38,6 @@
 
 
 
-extern char note_h_distrib[HEADER_LEN];			/* Distribution: */
-extern char note_h_followup[HEADER_LEN];		/* Followup-To: */
-extern char note_h_messageid[HEADER_LEN];		/* Message-ID:	*/
-extern char note_h_references[HEADER_LEN];		/* References:	*/
-extern char note_h_newsgroups[HEADER_LEN];		/* Newsgroups:	*/
-extern char note_h_subj[HEADER_LEN];			/* Subject:	*/
-extern char note_h_date[HEADER_LEN];			/* Date:	*/
-extern char note_h_from[HEADER_LEN];			/* From: */
-
-extern char note_h_org[HEADER_LEN];			/* Organization: */
-extern char note_h_keywords[HEADER_LEN];		/* Keywords: */
-extern char note_h_summary[HEADER_LEN];			/* Summary: */
-extern char note_h_mimeversion[HEADER_LEN];		/* Mime-Version: */
-extern char note_h_contenttype[HEADER_LEN];		/* Content-Type: */
-extern char note_h_contentenc[HEADER_LEN];		/* Content-Transfer-Encoding: */
-
-extern FILE *note_fp;					/* the body of the current article */
-extern long note_mark[MAX_PAGES];			/* ftells on beginnings of pages */
-
 char found_newsgroups[HEADER_LEN];
 
 int unlink_article = TRUE;
@@ -1112,10 +1093,11 @@ static void appendid(where, what)
 	char **what;
 {
 	char *oldpos;
-	oldpos=*where;
+	oldpos = *where;
 	while (**what && **what!='<') (*what)++;
 	if (**what) {
-		while (**what && **what!='>' && !isspace(**what)) *(*where)++=*(*what)++;
+		while (**what && **what != '>'
+		   && !isspace(**what)) *(*where)++ = *(*what)++;
 		if (**what!='>') *where=oldpos;
 		else {
 			(*what)++;
@@ -1652,7 +1634,9 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
 		fseek (note_fp, 0L, 0);
+		fprintf(fp, "-------- forwarded-message -------------->\n");
 		copy_fp (note_fp, fp, "");
+		fprintf(fp, "<------- end-of-forwarded-message --------\n");
 	}
 
 	msg_write_signature (fp, TRUE);
@@ -1783,8 +1767,13 @@ mail_bug_report ()
 	start_line_offset++;
 	msg_free_headers ();
 
-#ifdef HAVE_UNAME
-	if ((fp_uname = (FILE *) popen ("uname -a", "r")) != NULL) {
+#if HAVE_UNAME || HAVE_HOSTNAME
+#if HAVE_UNAME
+	(void) sprintf(buf, "%s -a", PATH_UNAME);
+#else
+	(void) strcpy(buf, PATH_HOSTNAME);
+#endif
+	if ((fp_uname = popen (buf, "r")) != NULL) {
 		while (fgets (buf, sizeof (buf), fp_uname) != NULL) {
 			fprintf (fp, "BOX1: %s", buf);
 			start_line_offset += 2;
@@ -2383,7 +2372,7 @@ repost_article (group, art, respnum, supersede)
 	char *group;
 	struct t_article *art;
 	int respnum;
-	char supersede;
+	int supersede;
 {
 	char 	buf[HEADER_LEN];
 	char 	tmp[HEADER_LEN];

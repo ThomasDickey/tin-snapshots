@@ -15,14 +15,6 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-extern char note_h_date[HEADER_LEN];	/* Date:	*/
-extern char note_h_newsgroups[HEADER_LEN];/* Newsgroups:	*/
-extern char note_h_subj[HEADER_LEN];	/* Subject:	*/
-extern FILE *note_fp;			/* the body of the current article */
-extern int note_end;			/* end of article ? */
-extern int note_page;			/* what page we're on */
-extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
-
 char default_mail_address[LEN];
 char default_pipe_command[LEN];
 char default_save_file[PATH_LEN];
@@ -221,7 +213,7 @@ feed_articles (function, level, group, respnum)
 				}
 			}
 
-			if ((fp = (FILE *) popen (command, "w")) == NULL) {
+			if ((fp = popen (command, "w")) == NULL) {
 				perror_message (txt_command_failed_s, command);
 				return;
 			}
@@ -703,7 +695,7 @@ print_file (command, respnum, count)
     sprintf(file, TIN_PRINTFILE, respnum);
 	if ((fp = (FILE *) fopen(file,"w")) == NULL) {
 #else
-	if ((fp = (FILE *) popen (command, "w")) == NULL) {
+	if ((fp = popen (command, "w")) == NULL) {
 #endif
 		perror_message (txt_command_failed_s, command);
 		return FALSE;

@@ -15,9 +15,6 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-extern int index_point;
-extern int thread_basenote;
-
 char default_goto_group[LEN];
 int default_move_group;
 int cur_groupnum = 0;

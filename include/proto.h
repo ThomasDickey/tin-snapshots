@@ -1,7 +1,7 @@
 #if __STDC__ || defined(__cplusplus)
 #	define P_(s) s
 #else
-#	define P_(s) ()  
+#	define P_(s) ()
 #endif
 
 /* ./active.c */
@@ -54,7 +54,6 @@ extern void set_attrib_str P_((int type, char *scope, char *str));
 extern void set_attrib_num P_((int type, char *scope, int num));
 extern void set_attrib P_((struct t_group *psGrp, int type, char *str, int num));
 extern void write_attributes_file P_((char *file));
-/* extern void debug_print_filter_attributes P_((void)); */
 /* ./charset.c */
 extern void ConvertIso2Asc P_((unsigned char *iso, unsigned char *asc, int t));
 extern void ConvertTeX2Iso P_((unsigned char *from, unsigned char *to));
@@ -190,7 +189,6 @@ extern struct t_group *psGrpFirst P_((void));
 extern struct t_group *psGrpLast P_((void));
 extern struct t_group *psGrpNext P_((void));
 extern struct t_group *psGrpPrev P_((void));
-/* extern void vGrpTest P_((void)); */
 /* ./mail.c */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 extern void read_mail_active_file P_((void));
@@ -398,7 +396,7 @@ extern int mail_bug_report P_((void));
 extern int mail_to_author P_((char *group, int respnum, int copy_text));
 extern int pcCopyArtHeader P_((int iHeader, char *pcArt, char *result));
 extern int delete_article P_((struct t_group *group, struct t_article *art, int respnum));
-extern int repost_article P_((char *group, struct t_article *art, int respnum, char supersede));
+extern int repost_article P_((char *group, struct t_article *art, int respnum, int supersede));
 extern void msg_add_x_headers P_((char *headers));
 extern int msg_add_x_body P_((FILE *fp_out, char *body));
 extern void modify_headers P_((char *line));
@@ -420,12 +418,12 @@ extern int prompt_list P_((int row, int col, int var, char *help_text, char *pro
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
 extern void continue_prompt P_((void));
 /* ./refs.c */
-extern void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
-extern void clear_art_ptrs P_((void));
-extern void free_msgids P_((void));
-extern struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *parent));
+extern struct t_msgid *add_msgid P_((int key, char *msgid, struct t_msgid *newparent));
 extern struct t_msgid *parse_references P_((char *r));
 extern char *get_references P_((struct t_msgid *refptr));
+extern void free_msgids P_((void));
+extern void clear_art_ptrs P_((void));
+extern void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
 extern void thread_by_reference P_((void));
 /* ./rfc1521.c */
 extern void strcpynl P_((char *to, char *from));

@@ -53,3 +53,5 @@ Compiled & installed on the following machines:
 	i486 & BSDI 2.0 with gcc 2.6.3
 
 11)	i486 & NetBSD 1.1 with gcc 2.4.5
+
+12)	IBM PowerPC RS6000/40p & AIX 4.1.4.0 with 2.7.2

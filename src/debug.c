@@ -462,7 +462,6 @@ void
 debug_print_filters ()
 {
 #ifdef DEBUG
-	extern struct t_filters glob_filter;
 	char file[PATH_LEN];
 	FILE *fp;
 	int i, j, num;

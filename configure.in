@@ -1,11 +1,15 @@
 dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
-dnl Created   : 
-dnl Updated   : 29.06.96
+dnl Created   : 24.08.95
+dnl Updated   : 09.07.96
 dnl Notes     : 
-dnl Copyright : 
 dnl
+dnl Copyright 1996 by Thomas Dickey
+dnl             You may  freely  copy or  redistribute  this software,
+dnl             so  long as there is no profit made from its use, sale
+dnl             trade or  reproduction.  You may not change this copy-
+dnl             right notice, and it must be included in any copy made
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
@@ -13,6 +17,8 @@ AC_PREREQ(2.0)
 AC_INIT(include/tin.h)
 AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
 AC_PREFIX_DEFAULT(/usr/local)
+
+CF_SYS_NAME
 
 ###	Checks for programs.
 save_CFLAGS="$CFLAGS"
@@ -89,6 +95,7 @@ CF_ARG_ENABLE(prototypes,
 AC_MSG_RESULT($enableval)
 
 ###	use option --enable-warnings to turn on all gcc warnings
+EXTRA_CFLAGS=""
 if test -n "$GCC"
 then
 AC_MSG_CHECKING(if you want to turn on gcc warnings)
@@ -107,7 +114,7 @@ CF_ARG_ENABLE(warnings,
 	#
 	if test -n "$with_warnings"
 	then
-		CFLAGS="$CFLAGS -Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
+		EXTRA_CFLAGS="-Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
 	fi
 AC_MSG_RESULT($enableval)
 fi
@@ -145,6 +152,58 @@ CF_WITH_VALUE(inn-nntplib,
 	INN_NNTPLIB)
 AC_MSG_RESULT($INN_NNTPLIB)
 test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
+
+### Look for ncurses in the usual places, accommodating compilers that don't
+### search /usr/local by default.
+AC_MSG_CHECKING(if you want ncurses library)
+found_ncurses=no
+AC_ARG_WITH(ncurses,
+	[  --with-ncurses          link with ncurses if available],
+	[save_CPPFLAGS="$CPPFLAGS"
+	found_headers=no
+	AC_MSG_RESULT(yes)
+	AC_MSG_CHECKING(for ncurses headers)
+	for p in \
+		. \
+		/usr/include/ncurses \
+		/usr/local/include \
+		/usr/local/include/ncurses
+	do
+		CPPFLAGS="$save_CPPFLAGS -I$p"
+		AC_EGREP_CPP(found-ncurses,[
+#include <curses.h>
+#ifdef NCURSES_VERSION
+found-ncurses
+#endif],found_headers=yes)
+		if test $found_headers = yes ; then
+			test $p = . \
+				&& p=/usr/include
+			AC_MSG_RESULT($p)
+			test $p != /usr/include \
+				&& CPPFLAGS="-I$p $save_CPPFLAGS"
+			test $p = /usr/local/include/ncurses \
+				&& CPPFLAGS="-I/usr/local/include $save_CPPFLAGS"
+			break
+		fi
+	done
+	if test $found_headers = yes ; then
+		save_LIBS="$LIBS"
+		case $LIBS in #(vi
+		*-lncurses*) ;; #(vi
+		*)	case $p in #(vi
+			/usr/local/*)
+				LIBS="-L/usr/local/lib $LIBS -lncurses"
+				;;
+			*)
+				LIBS="$LIBS -lncurses"
+				;;
+			esac
+		esac
+		AC_CHECK_LIB(ncurses, trace,
+			[found_ncurses=yes],
+			[LIBS="$save_LIBS"])
+	fi
+	],[AC_MSG_RESULT(no)])
 
 ## options for miscellaneous definitions
 AC_MSG_CHECKING(for mail-gateway)
@@ -247,7 +306,7 @@ CF_ARG_ENABLE(log-user,
 	[AC_DEFINE(LOG_USER)])
 AC_MSG_RESULT($enableval)
 
-###	checks for operator characteristics
+###	checks for operator characteristics (should be the last option)
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,
 	[  --with-coffee           coffee support],
@@ -315,6 +374,8 @@ AC_CHECK_HEADERS(\
 	sys/times.h \
 	sys/utsname.h \
 	sys/wait.h \
+	term.h \
+	termcap.h \
 	termio.h \
 	time.h \
 	unistd.h \
@@ -335,16 +396,21 @@ AC_TYPE_SIZE_T
 AC_TYPE_SIGNAL
 
 ###	Checks for libraries.
-AC_CHECK_LIB(termlib, tgoto, [LIBS="$LIBS -ltermlib" termlib=found])
-if test "$termlib" != found; then
+found_tcap=no
+if test $found_ncurses = yes ; then
+	found_tcap=yes
+else
+	AC_CHECK_LIB(termlib, tgoto, [LIBS="$LIBS -ltermlib" found_tcap=yes])
+fi
+if test "$found_tcap" != yes; then
 	# allow curses library for broken AIX system.
-	AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" termlib=found])
-	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" termlib=found])
+	AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" found_tcap=yes])
+	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
 fi
-if test "$termlib" != found; then
-	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" termlib=found])
+if test "$found_tcap" != yes; then
+	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
 fi
-if test "$termlib" != found; then
+if test "$found_tcap" != yes; then
 	AC_WARN([Can't find -ltermlib, -lcurses, or -ltermcap])
 fi
 
@@ -356,6 +422,7 @@ CF_SYS_ERRLIST
 AC_CHECK_FUNCS(\
 	bcopy \
 	bzero \
+	ftime \
 	getcwd \
 	is_xterm \
 	memcmp \
@@ -394,7 +461,11 @@ CF_CHECK_DECL(\
 	inet_ntoa \
 	popen \
 	tgetstr \
+	tgoto \
 )
+
+dnl Check for prototype(s) for termcap functions.  These may appear in
+dnl either curses.h or termcap.h
 
 if test $with_decl_check = yes; then
 CF_CHECK_DECL(\
@@ -433,6 +504,9 @@ CF_CHECK_DECL(\
 	strncasecmp \
 	strtol \
 	system \
+	tgetent \
+	tgetflag \
+	tgetnum \
 	time \
 	tolower \
 	toupper \
@@ -494,7 +568,6 @@ AC_MSG_RESULT($sigact_bad)
 
 CF_SET_GID_UID
 CF_TYPE_SIGACTION
-CF_TIOCGWINSZ
 CF_TERMIOS
 CF_TM_GMTOFF
 
@@ -506,4 +579,9 @@ fi
 CF_COMPTYPE
 CF_COREFILE
 
+### do this last, since it uses a partly-built autoconf.h
+CF_TIOCGWINSZ
+
+### Finally, build autoconf.h and the makefiles
+CFLAGS="$CFLAGS $EXTRA_CFLAGS"
 AC_OUTPUT(makefile src/Makefile)

@@ -383,6 +383,7 @@ page_goto_next_unread:
 
 			case iKeyPageFirstPage:		/* goto beginning of article */
 			case iKeyPageFirstPage2:
+			case iKeyPageFirstPage3:
 begin_of_article:
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
@@ -930,7 +931,7 @@ show_mime_article (fp, art)
 	offset = ftell (fp);
 	rewind (fp);
 	printf ("mime article\n");
-	sprintf (buf, METAMAIL_CMD);
+	sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 	mime_fp = popen (buf, "w");
 	while (fgets (buf, sizeof (buf), fp) != NULL) {
 		my_fputs (buf, mime_fp);

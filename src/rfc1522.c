@@ -106,8 +106,10 @@ mmdecode(what, encoding, delimiter, where, charset)
 		
 		while (*what!=delimiter) {
 			if (*what!='=') {
-				if (!delimiter || *what!='_')	*t++=*what++;
-				else *t++=' ',what++;
+				if (!delimiter || *what!='_')
+					*t++ = *what++;
+				else
+					*t++ = ' ', what++;
 				continue;
 			}
 			what++;
@@ -195,17 +197,17 @@ rfc1522_decode(s)
 				}
 			}
 			adjacentflag=0;
-			*t++=*c++;
+			*t++ = *c++;
 			continue;
 		}
 		d=c++;
 		if (*c=='?') {
 			char *e;
-			e=charset;
+			e = charset;
 			c++;
-			while (*c&&*c!='?') *e++=*c++;
-			*e=0;
-			if (*c=='?') {
+			while (*c && *c != '?') *e++ = *c++;
+			*e = 0;
+			if (*c == '?') {
 				c++;
 				encoding=tolower(*c);
 				if (encoding=='b')
@@ -227,7 +229,7 @@ rfc1522_decode(s)
 				}
 			}
 		}
-		while (d!=c) *t++=*d++;
+		while (d!=c) *t++ = *d++;
 	}
 	*t=0;
 	return buffer;
@@ -288,7 +290,7 @@ mystrcat(t,s)
 	int len=0;
 
 	while (*s) {
-		*((*t)++)=*s++;
+		*((*t)++) = *s++;
 		len++;
 	}
 	**t=0;
@@ -353,7 +355,7 @@ rfc1522_do_encode(what, where)
 					*t++=buf2[2];
 					ewsize+=3;
 				} else {
-					*t++=*what;
+					*t++ = *what;
 					ewsize++;
 				}
 				what++;
@@ -381,8 +383,10 @@ rfc1522_do_encode(what, where)
 				}
 			}
 		} else {
-			while (*what&&!isspace(*what)&&*what!='('&&*what!=')') *t++=*what++; /* output word unencoded */
-			while ((*what&&isspace(*what))||*what=='('||*what==')') *t++=*what++; /* output trailing whitespace unencoded */
+			while (*what&&!isspace(*what)&&*what!='('&&*what!=')')
+				*t++ = *what++; /* output word unencoded */
+			while ((*what&&isspace(*what))||*what=='('||*what==')')
+				*t++ = *what++; /* output trailing whitespace unencoded */
 		}
 	}
 	*t=0;
@@ -410,7 +414,7 @@ rfc1522_do_encode(what, where)
 	if (0);
 #endif
 	else {
-		while (*c) *((*where)++)=*c++;
+		while (*c) *((*where)++) = *c++;
 	}
 	**where=0;
 	return any_quoting_done;
@@ -464,7 +468,7 @@ rfc15211522_encode(filename)
 		}
 		if (buffer[0]=='\n'||buffer[0]=='\r') break;
 		c=buffer;
-		while (*c&&*c!='\r'&&*c!='\n') *d++=*c++;
+		while (*c&&*c!='\r'&&*c!='\n') *d++ = *c++;
 		*d=0;
 	}
 	fputc('\n',g);

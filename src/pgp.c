@@ -33,9 +33,6 @@
 #define SIGN 0x01
 #define ENCRYPT 0x02
 
-extern FILE *note_fp;
-extern long note_mark[MAX_PAGES];
-
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
 char *pgpopts = (char *)NULL, pgp_data[PATH_LEN];
 

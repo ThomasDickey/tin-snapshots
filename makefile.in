@@ -4,9 +4,11 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960705
+PVER		= 960713
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
+
+@SET_MAKE@
 
 # directory structure
 TOPDIR	= .
@@ -203,28 +205,28 @@ ALL_FILES = $(TOP) $(DOC) $(DOCDE) $(HFILES) $(CFILES) $(AMIGA) $(MISC) $(NNTP) 
 
 # standard commands
 @SET_MAKE@
-CD		= cd
+CD	= cd
 CHMOD	= chmod
 COMPRESS= compress
-CP		= cp -p
+CP	= cp -p
 CSCOPE	= cscope
 DIFF	= diff
 ECHO	= echo
-LS		= ls -l
-LP		= lpr -h
+LS	= ls -l
+LP	= lpr -h
 MKDIR	= mkdir
-MV		= mv
+MV	= mv
 NROFF	= nroff
 #NROFF	= groff -Tascii
-RM		= rm
+RM	= rm
 SHAR	= shar
 SHELL	= /bin/sh
-TAR		= tar
+TAR	= tar
 #TROFF	= troff
 TROFF	= groff
 UUENCODE= uuencode
-WC		= wc
-ZIP		= zip
+WC	= wc
+ZIP	= zip
 GZIP	= gzip -9
 
 all: 

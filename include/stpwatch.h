@@ -14,7 +14,7 @@
 
 #ifdef PROFILE
 
-#if HAVE_SYS_TIMEB_H
+#if HAVE_SYS_TIMEB_H && HAVE_FTIME
 #include <sys/timeb.h>
 
 char msg_tb[1024];

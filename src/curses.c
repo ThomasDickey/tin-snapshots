@@ -5,7 +5,7 @@
  *  Created   : 01-01-86
  *  Updated   : 17-05-94
  *  Notes     : This is a screen management library borrowed with permission
- *              from the Elm mail system. This library was hacked to provide 
+ *              from the Elm mail system. This library was hacked to provide
  *              what tin needs.
  *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
  *              The Elm Mail System  -  @Revision: 2.1 $   $State: Exp @
@@ -46,7 +46,7 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 
 #ifdef HAVE_CONFIG_H
 
-#if HAVE_TERMIOS_H
+#if HAVE_TERMIOS_H && HAVE_TCGETATTR && HAVE_TCSETATTR
 #	ifdef HAVE_IOCTL_H
 #		include <ioctl.h>
 #	else
@@ -111,25 +111,11 @@ static	TTY _raw_tty, _original_tty;
 
 #ifndef VMS
 #if (defined(M_AMIGA) && !defined(__SASC)) || defined(BSD) || defined(MINIX)
-#	ifdef TCGETA
-#		undef TCGETA
-#	endif
-#	define TCGETA	TIOCGETP
-#	ifdef TCSETAW
-#		undef TCSETAW
-#	endif
-#	define TCSETAW	TIOCSETP
 #	define USE_SGTTY 1
 struct sgttyb _raw_tty, _original_tty;
 #else
 #	if !defined(M_AMIGA) && !defined(M_OS2)
 #		if defined(HAVE_TERMIOS_H) || defined(sinix)
-#			ifndef TCGETA
-#				define TCGETA	STCGETA
-#			endif
-#			ifndef TCSETAW
-#				define TCSETAW	STCSETAW
-#			endif
 #			define USE_POSIX_TERMIOS 1
 struct termios _raw_tty, _original_tty;
 #		else
@@ -167,36 +153,30 @@ static int _columns, _line, _lines;
 
 #ifdef M_UNIX
 
-#ifndef HAVE_TCSETATTR
-#define tcsetattr(fd,cmd,arg) ioctl(fd, cmd, arg)
-#endif
-
-#ifndef HAVE_TCGETATTR
-#define tcgetattr(fd, arg)    ioctl(fd, TCGETA, arg)
+#if USE_POSIX_TERMIOS
+#	define SET_TTY(arg) tcsetattr (TTYIN, TCSANOW, arg)
+#	define GET_TTY(arg) tcgetattr (TTYIN, arg)
+#else
+#	if USE_TERMIO
+#		define SET_TTY(arg) ioctl (TTYIN, TCSETAW, arg)
+#		define GET_TTY(arg) ioctl (TTYIN, TCGETA, arg)
+#	else
+#		if USE_SGTTY
+#			define SET_TTY(arg) stty(TTYIN, arg)
+#			define GET_TTY(arg) gtty(TTYIN, arg)
+#		else
+			please-fix-me(thanks)
+#		endif
+#	endif
 #endif
 
 static char _terminal[1024];		/* Storage for terminal entry */
 static char _capabilities[1024];	/* String for cursor motion */
-
 static char *ptr = _capabilities;	/* for buffering         */
-
-/*
- * Prototypes for the termcap functions, if we cannot find them in a standard
- * header file (e.g., curses.h).
- */
-#if defined(DECL_TGETSTR)
-extern int	tgetent P_((char *, char *));	/* get termcap entry */
-extern char	*tgetstr P_((char *, char **));	/* Get termcap capability (string) */
-extern int	tgetflag P_((char *));			/* Get termcap capability (boolean) */
-extern int	tgetnum P_((char *));			/* Get termcap capability (number) */
-extern char	*tgoto P_((char *, int, int));	/* and the goto stuff    */
-#endif
 
 #endif	/* M_UNIX */
 
 static int in_inverse;			/* 1 when in inverse, 0 otherwise */
-
-int	outchar P_((int c));	/* char output for tputs */
 
 #endif /* INDEX_DAEMON */
 
@@ -225,7 +205,7 @@ InitScreen ()
 {
 #ifndef INDEX_DAEMON
 	char termname[40], *p;
-	
+
 	if ((p = getenv ("TERM")) == (char *) 0) {
 		fprintf (stderr, "%s: TERM variable must be set to use screen capabilities\n", progname);
 		return (FALSE);
@@ -250,7 +230,7 @@ InitScreen ()
 	_clearinverse   = tgetstr ("se", &ptr);
 	_setunderline   = tgetstr ("us", &ptr);
 	_clearunderline = tgetstr ("ue", &ptr);
-	_hp_glitch = tgetflag ("xs");
+	_hp_glitch      = tgetflag ("xs");
 #ifdef HAVE_BROKEN_TGETSTR
 	_terminalinit   = "";
 	_terminalend    = "";
@@ -297,8 +277,8 @@ InitScreen ()
 		_lines = DEFAULT_LINES_ON_TERMINAL;
 	if (_columns == -1)
 		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
-	/* 
-	 * kludge to workaround no inverse 
+	/*
+	 * kludge to workaround no inverse
 	 */
 	if (_setinverse == 0) {
 		_setinverse = _setunderline;
@@ -324,8 +304,8 @@ InitScreen ()
 
 	char *ptr;
 
-	/* 
-	 * we're going to assume a terminal here... 
+	/*
+	 * we're going to assume a terminal here...
 	 */
 
 	_clearscreen	= "\033[1;1H\033[J";
@@ -340,10 +320,10 @@ InitScreen ()
 #ifdef M_AMIGA
 	_terminalinit	= "\033[12{\033[0 p";
 	_terminalend	= "\033[12}\033[ p";
-	_cursoron		= "\033[ p";
-	_cursoroff		= "\033[0 p";
-	_cleartoeos		= "\033[J";
-	_getwinsize		= "\2330 q";
+	_cursoron	= "\033[ p";
+	_cursoroff	= "\033[0 p";
+	_cleartoeos	= "\033[J";
+	_getwinsize	= "\2330 q";
 #endif
 #if defined(M_OS2)
 	_cleartoeos	= NULL;
@@ -352,7 +332,7 @@ InitScreen ()
 	initscr ();
 #endif /* M_OS2 */
 #if defined(VMS)
-	_cleartoeos		= "\033[J";
+	_cleartoeos	= "\033[J";
 	_terminalinit	= NULL;
 	_terminalend	= "";
 #endif
@@ -371,8 +351,8 @@ InitScreen ()
 		_columns = atol (ptr);
 	}
 
-	/* 
-	 * If that failed, try get a response from the console itself 
+	/*
+	 * If that failed, try get a response from the console itself
 	 */
 #ifdef M_AMIGA
 	if (_lines == -1 || _columns == -1) {
@@ -488,7 +468,7 @@ InitScreen ()
 /*
  *  returns the number of lines and columns on the display.
  */
- 
+
 void
 ScreenSize (num_lines, num_columns)
 	int *num_lines, *num_columns;
@@ -513,7 +493,7 @@ InitWin ()
 	if (_terminalinit) {
 		tputs (_terminalinit, 1, outchar);
 		fflush (stdout);
-	}	
+	}
 	set_keypad_on ();
 	set_xclick_on ();
 
@@ -532,8 +512,8 @@ EndWin ()
 	}
 	set_keypad_off ();
 	set_xclick_off ();
-	
-	
+
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -543,7 +523,7 @@ set_keypad_on ()
 {
 #ifndef INDEX_DAEMON
 #    ifdef HAVE_KEYPAD
- 	if (use_keypad && _keypadxmit) {
+	if (use_keypad && _keypadxmit) {
 		tputs (_keypadxmit, 1, outchar);
 		fflush (stdout);
 	}
@@ -577,7 +557,7 @@ ClearScreen ()
 	tputs (_clearscreen, 1, outchar);
 	fflush (stdout);      /* clear the output buffer */
 	_line = 1;
-	
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -600,7 +580,7 @@ MoveCursor (row, col)
 	tputs (stuff, 1, outchar);
 	fflush (stdout);
 	_line = row + 1;
-	
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -651,7 +631,7 @@ CleartoEOS ()
 #ifndef INDEX_DAEMON
 
 	int i;
-	
+
 	if (_cleartoeos) {
 		tputs (_cleartoeos, 1, outchar);
 	} else {
@@ -768,20 +748,15 @@ Raw (state)
 	rawcon (state);
 #else
 	if (state == FALSE && _inraw) {
-#ifdef HAVE_TCSETATTR
-		(void) tcsetattr (TTYIN, TCSANOW, &_original_tty);
-#else
-		(void) ioctl (TTYIN, TCSETAW, &_original_tty);
-#endif
+		SET_TTY (&_original_tty);
 		_inraw = 0;
 	} else if (state == TRUE && ! _inraw) {
-		(void) tcgetattr (TTYIN, &_original_tty);
-		(void) tcgetattr (TTYIN, &_raw_tty);
-
-#if USE_SGTTY || defined(M_AMIGA) || defined(MINIX)
+		GET_TTY (&_original_tty);
+		GET_TTY (&_raw_tty);
+#if USE_SGTTY
 		_raw_tty.sg_flags &= ~(ECHO | CRMOD);	/* echo off */
 		_raw_tty.sg_flags |= CBREAK;		/* raw on */
-#ifdef M_AMIGA	
+#ifdef M_AMIGA
 		_raw_tty.sg_flags |= RAW; /* Manx-C 5.2 does not support CBREAK */
 #endif
 #else
@@ -789,12 +764,7 @@ Raw (state)
 		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue    */
 		_raw_tty.c_cc[VTIME] = '\0';	/* minimum time to wait for input */
 #endif
-
-#ifdef HAVE_TCSETATTR
-		(void) tcsetattr (TTYIN, TCSANOW, &_raw_tty);
-#else
-		(void) ioctl (TTYIN, TCSETAW, &_raw_tty);
-#endif
+		SET_TTY (&_raw_tty);
 		_inraw = 1;
 	}
 #endif	/* M_AMIGA */
@@ -815,7 +785,6 @@ ReadCh ()
 {
 #ifndef INDEX_DAEMON
 
-	extern int errno;
 	char ch;
 	KBDKEYINFO os2key;
 	int rc;
@@ -831,28 +800,28 @@ ReadCh ()
 		if (result == 0xe0) {
 			result = 0x1b;
 			switch (os2key.chScan) {
-				case 'H': 
+				case 'H':
 					secondkey = 'A';
 					break;
-				case 'P': 
+				case 'P':
 					secondkey = 'B';
 					break;
-				case 'K': 
+				case 'K':
 					secondkey = 'D';
 					break;
-				case 'M': 
+				case 'M':
 					secondkey = 'C';
 					break;
-				case 'I': 
+				case 'I':
 					secondkey = 'I';
 					break;
-				case 'Q': 
+				case 'Q':
 					secondkey = 'G';
 					break;
-				case 'G': 
+				case 'G':
 					secondkey = 'H';
 					break;
-				case 'O': 
+				case 'O':
 					secondkey = 'F';
 					break;
 				default:
@@ -979,7 +948,7 @@ ReadCh ()
 #ifndef INDEX_DAEMON
 	char ch;
 	register int result;
-	
+
 #ifdef READ_CHAR_HACK
 #undef getc
 	while ((result = getc(stdin)) == EOF) {

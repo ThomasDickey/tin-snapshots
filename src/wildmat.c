@@ -1,4 +1,4 @@
-/*  $Revision: 1.9 $
+/*  $Revision: 1.9.1.1 $
 **
 **  Do shell-style pattern matching for ?, \, [], and * characters.
 **  Might not be robust in face of malformed patterns; e.g., "foo[a-"
@@ -150,12 +150,6 @@ wildmat(text, p)
 
 
 #if	defined(TEST)
-#include <stdio.h>
-
-/* Yes, we use gets not fgets.  Sue me. */
-extern char	*gets();
-
-
 int
 main()
 {

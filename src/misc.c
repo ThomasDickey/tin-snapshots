@@ -280,7 +280,7 @@ invoke_ispell (nam)
 #else
 		my_ispell = getenv ("ISPELL");
 
-		strcpy (ispell, my_ispell != NULL ? my_ispell : ISPELL_CMD);
+		strcpy (ispell, my_ispell != NULL ? my_ispell : PATH_ISPELL);
 		first = FALSE;
 #endif
 	}
@@ -816,6 +816,11 @@ draw_percent_mark (cur_num, max_num)
 	EndInverse ();
 }
 
+/*
+ * setuid/setgid - SYSV, Posix (with caveat about portability!)
+ * seteuid/setegid - BSD 4.3
+ * setreuid/setregid - BSD 4.2
+ */
 void
 set_real_uid_gid ()
 {
@@ -825,7 +830,7 @@ set_real_uid_gid ()
 
 	umask (real_umask);
 
-#ifdef HAVE_SETREUID
+#if HAVE_SETREUID && HAVE_SETREGID
 	if (setreuid (-1, real_uid) == -1) {
 		perror_message ("Error setreuid(real) failed", "");
 	}
@@ -833,22 +838,13 @@ set_real_uid_gid ()
 		perror_message ("Error setregid(real) failed", "");
 	}
 #else
-#  if defined(BSD) && ! defined(sinix)
-#    ifdef sun
+#  if HAVE_SETEUID && HAVE_SETEGID
 	if (seteuid (real_uid) == -1) {
-		perror_message ("Error setreuid(real) failed", "");
+		perror_message ("Error seteuid(real) failed", "");
 	}
 	if (setegid (real_gid) == -1) {
-		perror_message ("Error setregid(real) failed", "");
+		perror_message ("Error setegid(real) failed", "");
 	}
-#    else
-	if (setreuid (tin_uid, real_uid) == -1) {
-		perror_message ("Error setreuid(real) failed", "");
-	}
-	if (setregid (tin_gid, real_gid) == -1) {
-		perror_message ("Error setregid(real) failed", "");
-	}
-#    endif	/* sun */
 #  else
 	if (setuid (real_uid) == -1) {
 		perror_message ("Error setuid(real) failed", "");
@@ -862,7 +858,6 @@ set_real_uid_gid ()
 #endif	/* HAVE_SET_GID_UID */
 }
 
-
 void
 set_tin_uid_gid ()
 {
@@ -872,7 +867,7 @@ set_tin_uid_gid ()
 
 	umask (0);
 
-#ifdef HAVE_SETREUID
+#if HAVE_SETREUID && HAVE_SETREGID
 	if (setreuid (-1, tin_uid) == -1) {
 		perror_message ("Error setreuid(tin) failed", "");
 	}
@@ -880,22 +875,13 @@ set_tin_uid_gid ()
 		perror_message ("Error setregid(tin) failed", "");
 	}
 #else
-#  if defined(BSD) && ! defined(sinix)
-#    ifdef sun
+#  if HAVE_SETEUID && HAVE_SETEGID
 	if (seteuid (tin_uid) == -1) {
-		perror_message ("Error setreuid(real) failed", "");
+		perror_message ("Error seteuid(real) failed", "");
 	}
 	if (setegid (tin_gid) == -1) {
-		perror_message ("Error setregid(real) failed", "");
+		perror_message ("Error setegid(real) failed", "");
 	}
-#    else
-	if (setreuid (real_uid, tin_uid) == -1) {
-		perror_message ("Error setreuid(tin) failed", "");
-	}
-	if (setregid (real_gid, tin_gid) == -1) {
-		perror_message ("Error setregid(tin) failed", "");
-	}
-#    endif	/* sun */
 #  else
 	if (setuid (tin_uid) == -1) {
 		perror_message ("Error setuid(tin) failed", "");
@@ -1386,7 +1372,6 @@ get_author (thread, art, str)
 	struct t_article *art;
 	char *str;
 {
-	extern int show_subject;
 	int author;
 
 	if (thread) {
@@ -1627,8 +1612,6 @@ strfquote (group, respnum, s, maxsize, format)
 	int maxsize;
 	char *format;
 {
-	extern char note_h_date[HEADER_LEN];
-	extern char note_h_messageid[HEADER_LEN];
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];

@@ -33,8 +33,6 @@
 #define EOF (-1)
 #endif
 
-extern int errno;
-
 #undef	s_close
 #undef	socket
 
