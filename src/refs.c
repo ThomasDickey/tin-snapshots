@@ -273,7 +273,7 @@ add_msgid(key, msgid, newparent)
 	 */
 	ptr = (struct t_msgid *)my_malloc(sizeof(struct t_msgid));
 
-	ptr->txt = str_dup(msgid);
+	ptr->txt = my_strdup(msgid);
 	ptr->parent = newparent;
 #ifdef HAVE_REF_THREADING
 	ptr->child = ptr->sibling = NULL;
@@ -637,7 +637,7 @@ dump_msgid_threads()
  */
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || \
-		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+		(arts[ptr->article].thread >= 0 || arts[ptr->article].killed)))
 
 static struct t_msgid *
 find_next(ptr)
@@ -809,7 +809,10 @@ collate_subjects()
 	 */
 	for (i = 0; i < top; i++) {
 
-		if (arts[i].inthread)			/* Ignore already threaded arts */
+		/*
+		 * Ignore already threaded and expired arts
+		 */
+		if (arts[i].inthread || IGNORE_ART(i))
 			continue;
 
 		/*

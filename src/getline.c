@@ -439,7 +439,7 @@ hist_add ()
 	while (*p == ' ' || *p == '\t')		/* only save nonblank line */
 		p++;
 	if (*p) {
-		hist_buf[hist_last] = str_dup (gl_buf);
+		hist_buf[hist_last] = my_strdup (gl_buf);
 		hist_last = (hist_last + 1) % HIST_SIZE;
 		if (hist_buf[hist_last]) {	/* erase next location */
 			free (hist_buf[hist_last]);

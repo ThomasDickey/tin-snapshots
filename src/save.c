@@ -664,14 +664,14 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 	save[num_save].part    = (char *) 0;
 	save[num_save].patch   = (char *) 0;
 
-	save[num_save].subject = str_dup (the_article->subject);
+	save[num_save].subject = my_strdup (the_article->subject);
 	if (archive_save && the_article->archive) {
-		save[num_save].archive = str_dup (the_article->archive);
+		save[num_save].archive = my_strdup (the_article->archive);
 		if (the_article->part) {
-			save[num_save].part = str_dup (the_article->part);
+			save[num_save].part = my_strdup (the_article->part);
 		}
 		if (the_article->patch) {
-			save[num_save].patch = str_dup (the_article->patch);
+			save[num_save].patch = my_strdup (the_article->patch);
 		}
 	}
 
@@ -695,8 +695,8 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 			joinpath (tmp, homedir, DEFAULT_MAILDIR);
 #endif
 		}
-		save[num_save].dir = str_dup (tmp);
-		save[num_save].file = str_dup (file);
+		save[num_save].dir = my_strdup (tmp);
+		save[num_save].file = my_strdup (file);
 	} else {
 		if (path[0]) {
 #ifdef VMS
@@ -755,7 +755,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 #endif
 
 		if (dir[0]) {
-			save[num_save].dir = str_dup (dir);
+			save[num_save].dir = my_strdup (dir);
 		} else {
 			i = my_group[cur_groupnum];
 			if (!strfpath (active[i].attribute->savedir, tmp, sizeof (tmp),
@@ -766,16 +766,16 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 				joinpath (tmp, homedir, DEFAULT_SAVEDIR);
 #endif
 			}
-			save[num_save].dir = str_dup (tmp);
+			save[num_save].dir = my_strdup (tmp);
 		}
 
 		if (file[0]) {
-			save[num_save].file = str_dup (file);
+			save[num_save].file = my_strdup (file);
 		} else {
 			if (path[0]) {
-				save[num_save].file = str_dup (path);
+				save[num_save].file = my_strdup (path);
 			} else {
-				save[num_save].file = str_dup (save[num_save].archive);
+				save[num_save].file = my_strdup (save[num_save].archive);
 			}
 		}
 	}
@@ -1328,7 +1328,7 @@ post_process_sh (auto_delete)
 	int found_header;
 	int i, j;
 
-	strcpy (sh_pattern_1, "#!/bin/sh");
+	strcpy (sh_pattern_1, "# !/bin/sh");
 	strcpy (sh_pattern_2, "#!/bin/sh");
 	strcpy (sh_pattern_3, "# This is a shell archive.");
 

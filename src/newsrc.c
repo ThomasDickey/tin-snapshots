@@ -1394,7 +1394,7 @@ vNewsrcTestHarness ()
 	rng_min = atoi (get_val ("TIN_RNG_MIN", "1"));
 	rng_max = atoi (get_val ("TIN_RNG_MAX", "1"));
 
-	group.name = str_dup("test.newsrc");
+	group.name = my_strdup("test.newsrc");
 	group.xmin = atoi (get_val ("TIN_MIN", "1"));
 	group.xmax = atoi (get_val ("TIN_MAX", "0"));
 	group.count = atoi (get_val ("TIN_COUNT", "-1"));

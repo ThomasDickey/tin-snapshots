@@ -225,11 +225,11 @@ rfc1522_decode (s)
 	t = buffer;
 	while (*c && t - buffer < 2048) {
 		if (*c != '=') {
-			if (adjacentflag && isspace (*c)) {
+			if (adjacentflag && isspace ((unsigned char)*c)) {
 				char *dd;
 
 				dd = c + 1;
-				while (isspace (*dd))
+				while (isspace ((unsigned char)*dd))
 					dd++;
 				if (*dd == '=') {	/* brute hack, makes mistakes under certain circumstances comp. 6.2 */
 					c++;
@@ -297,7 +297,7 @@ contains_nonprintables (w)
 	int nonprint = 0;
 
 	/* first skip all leading whitespaces */
-	while (*w && isspace (*w))
+	while (*w && isspace ((unsigned char)*w))
 		w++;
 
 	/* then check the next word */
@@ -332,9 +332,9 @@ sizeofnextword (w)
 	char *x;
 
 	x = w;
-	while (*x && isspace (*x))
+	while (*x && isspace ((unsigned char)*x))
 		x++;
-	while (*x && !isspace (*x))
+	while (*x && !isspace ((unsigned char)*x))
 		x++;
 	return x - w;
 }
@@ -474,7 +474,7 @@ rfc1522_do_encode (what, where)
 				quoting = 0;
 			} else {
 				/* process whitespace in-between by quoting it properly */
-				while (*what && isspace (*what)) {
+				while (*what && isspace ((unsigned char)*what)) {
 					if (*what == 32 /* not ' ', compare chapter 4!*/) {
 						*t++ = '_';
 						ewsize++;
@@ -507,7 +507,7 @@ rfc1522_do_encode (what, where)
 				   word one (well, just assume an empty
 				   word). */
 		while (*c) {
-			if (isspace (*c)) {
+			if (isspace ((unsigned char)*c)) {
 				/* According to rfc1522, header lines
 				 * containing encoded words are limited to 76
 				 * chars, but if the first line is too long
@@ -522,13 +522,13 @@ rfc1522_do_encode (what, where)
 					*((*where)++) = '\n';
 					column = 0;
 				}
-				if (c > buf && !isspace (*(c - 1))) {
+				if (c > buf && !isspace ((unsigned char)*(c - 1))) {
 					word_cnt++;
 				}
 				*((*where)++) = *c++;
 				column++;
 			} else
-				while (*c && !isspace (*c)) {
+				while (*c && !isspace ((unsigned char)*c)) {
 					*((*where)++) = *c++;
 					column++;
 				}
@@ -592,7 +592,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 		buffer_to_network(buffer);
 #endif
 		if (header[0]
-		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
+		    && (!isspace ((unsigned char)buffer[0]) || isreturn(buffer[0]))) {
                         if (allow_8bit_header)
                            fputs(header,g);
                         else

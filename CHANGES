@@ -1,3 +1,49 @@
+--unoff BETA release 961109 --
+
+213) Andrey A. Chernov <ache@nagual.ru>
+     BUG. called ctype-family macros with 8bit characters, which is illegal
+          in POSIX/ANSI-C
+     FIX. several supplied patches
+
+212) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. Expired articles sometimes incorrectly threaded when
+          threading both
+     FIX. refs.c
+     BUG. index files not written when reading via nntp and xover
+          not available (introduced in 138 & compounded later)
+     FIX. art.c, open.c
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+211) Thomas E. Dickey <dickey@clark.net>
+     ADD. replace include/conf.h with an automatically-generated table.
+	  (This fixes one of the two problems with the config.c rewrite: now
+	  the enum and table will track together -- the other, making it
+	  type-clean will be in a later patch -- when I have time).
+     BUG. fix a place in the configure script that I missed before (allowed
+	  some stray "-g" options to get into the makefile for non-debug
+	  build -- I was just arguing with autoconf's author tonight, who
+	  insists that everyone ought to use -g as he intends).
+     BUG. fix a place in tin.h where "#" line by itself broke SunOS K&R compile
+     BUG. disentangle some use of _DECC (someone on an OSF/1 box reports
+	  problems with this, which was, I believe, targeted for VMS).
+     ADD. move the <termios.h> includes out of tin.h (now only in curses.c
+	  and signal.c) -- on Apollo, termios.h redefines some symbols from
+	  sys/ioctl.h, producing _lots_ of compiler warnings.  (I did builds
+	  on several machines to ensure that there's no impact due to this).
+     ADD. some fixes aimed at supporting the configure --srcdir option (not
+	  complete yet -- I'll do more later).
+     BUG. make parsdate.o rule more explicit (IRIX's make couldn't cope:  I
+	  don't remember problems from the last time I did a bunch of
+	  regression builds, and figure that it got simplified by someone).
+     BUG. correct an error from cleanup in art.c that broke my local config
+	  (i.e., '-' is legal in that context).
+     BUG. remove bogus code in feed.c (noticed while resolving similarly
+	  ifdef'd code in misc.c)
+     BUG. modified ifdef in misc.c to fix Kevin Maguire's problem (on OSF/1)
+	  with pipes/return-codes.
+     FIX. several supplied patches
+
 --unoff BETA release 961101 --
 
 210) Dirk Nimmich <nimmich@uni-muenster.de>
@@ -640,7 +686,7 @@
 
 103) Greg Berigan <gberigan@cse.unl.edu>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. supersede option on reposting/canceling
+     ADD. supersede option on reposting/cancelling
      FIX. several patches
 
 --unoff BETA release 960702 --
@@ -1156,7 +1202,7 @@ L11) Roland Rosenfeld <roland@spinnaker.rhein.de>
 L10) Greg Berigan <gberigan@cse.unl.edu>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. -DNO_ETIQUETTE to stop printing posting-etiquette
-     ADD. -DFORGERIE to allow superseding and canceling
+     ADD. -DFORGERIE to allow superseding and cancelling
           (newsadmins only!)
      ADD. 'i' at group-selection-level to show group description
      ADD. xpost_quote_format
@@ -1329,7 +1375,7 @@ L03) Greg Berigan <gberigan@cse.unl.edu>
 --950824BETA PL0.950919 eb/uj/gb--
 
 005) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. reconnection to server could not be canceled
+     BUG. reconnection to server could not be cancelled
      FIX. open.c to recognize get_servers return value of -2
 
 --950824BETA PL0.950917 eb/uj/gb--

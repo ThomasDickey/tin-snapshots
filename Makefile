@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 961101
+PVER		= 961109
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -18,7 +18,6 @@ SRCDIR	= ./src
 HFILES	= \
 	$(INCDIR)/amiga.h \
 	$(INCDIR)/amigatcp.h \
-	$(INCDIR)/conf.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
@@ -57,6 +56,7 @@ CFILES	= \
 	$(SRCDIR)/list.c \
 	$(SRCDIR)/mail.c \
 	$(SRCDIR)/main.c \
+	$(SRCDIR)/makecfg.c \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
 	$(SRCDIR)/msmail.c \
@@ -114,7 +114,8 @@ ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
 	$(SRCDIR)/l1_next.tab \
-	$(SRCDIR)/next_l1.tab
+	$(SRCDIR)/next_l1.tab \
+	$(SRCDIR)/tincfg.tbl
 
 ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
 

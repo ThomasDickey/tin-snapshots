@@ -280,14 +280,14 @@ iIsArtTexEncoded (art, group_path)
 		while (line[i++] == ' ')
 			;  /* search for first non blank */
 		i--;
-		if (!isalnum(line[i])) {
+		if (!isalnum((unsigned char)line[i])) {
 			continue;  /*quoting char */
 		}
 
 		len = strlen (line) - 1;
 		for (i = 1; i < len; i++) {
 			if (((line[i] == '\\') || (line[i] == '\"')) &&
-			    (isalnum(line[i-1])) && (isalnum(line[i+1]))) {
+			    (isalnum((unsigned char)line[i-1])) && (isalnum((unsigned char)line[i+1]))) {
 				fclose (fp);
 				return TRUE;
 			}

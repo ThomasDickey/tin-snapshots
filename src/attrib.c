@@ -466,25 +466,25 @@ set_attrib (psGrp, type, str, num)
 	 */
 	switch (type) {
 		case ATTRIB_MAILDIR:
-			psGrp->attribute->maildir = str_dup (str);
+			psGrp->attribute->maildir = my_strdup (str);
 			break;
 		case ATTRIB_SAVEDIR:
-			psGrp->attribute->savedir = str_dup (str);
+			psGrp->attribute->savedir = my_strdup (str);
 			break;
 		case ATTRIB_SAVEFILE:
-			psGrp->attribute->savefile = str_dup (str);
+			psGrp->attribute->savefile = my_strdup (str);
 			break;
 		case ATTRIB_ORGANIZATION:
-			psGrp->attribute->organization = str_dup (str);
+			psGrp->attribute->organization = my_strdup (str);
 			break;
 		case ATTRIB_SIGFILE:
-			psGrp->attribute->sigfile = str_dup (str);
+			psGrp->attribute->sigfile = my_strdup (str);
 			break;
 		case ATTRIB_FOLLOWUP_TO:
-			psGrp->attribute->followup_to = str_dup (str);
+			psGrp->attribute->followup_to = my_strdup (str);
 			break;
 		case ATTRIB_PRINTER:
-			psGrp->attribute->printer = str_dup (str);
+			psGrp->attribute->printer = my_strdup (str);
 			break;
 		case ATTRIB_AUTO_SELECT:
 			psGrp->attribute->auto_select = num;
@@ -520,7 +520,7 @@ set_attrib (psGrp, type, str, num)
 			psGrp->attribute->quick_kill_header = num;
 			break;
 		case ATTRIB_QUICK_KILL_SCOPE:
-			psGrp->attribute->quick_kill_scope = str_dup (str);
+			psGrp->attribute->quick_kill_scope = my_strdup (str);
 			break;
 		case ATTRIB_QUICK_KILL_EXPIRE:
 			psGrp->attribute->quick_kill_expire = num;
@@ -532,7 +532,7 @@ set_attrib (psGrp, type, str, num)
 			psGrp->attribute->quick_select_header = num;
 			break;
 		case ATTRIB_QUICK_SELECT_SCOPE:
-			psGrp->attribute->quick_select_scope = str_dup (str);
+			psGrp->attribute->quick_select_scope = my_strdup (str);
 			break;
 		case ATTRIB_QUICK_SELECT_EXPIRE:
 			psGrp->attribute->quick_select_expire = num;
@@ -541,22 +541,22 @@ set_attrib (psGrp, type, str, num)
 			psGrp->attribute->quick_select_case = num;
 			break;
 		case ATTRIB_MAILING_LIST:
-			psGrp->attribute->mailing_list = str_dup (str);
+			psGrp->attribute->mailing_list = my_strdup (str);
 			break;
 		case ATTRIB_X_HEADERS:
-			psGrp->attribute->x_headers = str_dup (str);
+			psGrp->attribute->x_headers = my_strdup (str);
 			break;
 		case ATTRIB_X_BODY:
-			psGrp->attribute->x_body = str_dup (str);
+			psGrp->attribute->x_body = my_strdup (str);
 			break;
 		case ATTRIB_X_COMMENT_TO:
 			psGrp->attribute->x_comment_to = num;
 			break;
 		case ATTRIB_NEWS_QUOTE:
-			psGrp->attribute->news_quote_format = str_dup (str);
+			psGrp->attribute->news_quote_format = my_strdup (str);
 			break;
 		case ATTRIB_QUOTE_CHARS:
-			psGrp->attribute->quote_chars = str_dup (str);
+			psGrp->attribute->quote_chars = my_strdup (str);
 		default:
 			break;
 	}

@@ -219,7 +219,7 @@ read_filter_file (file, global_file)
 					if (arr_ptr[i].icase) {
 						str_lwr (from, from);
 					}
-					arr_ptr[i].from = str_dup (from);
+					arr_ptr[i].from = my_strdup (from);
 				}
 				break;
 			}
@@ -273,7 +273,7 @@ if (debug) {
 		case 'm':
 			if (match_string (buf, "msgid=", msgid, sizeof (msgid))) {
 				if (arr_ptr) {
-					arr_ptr[i].msgid = str_dup (msgid);
+					arr_ptr[i].msgid = my_strdup (msgid);
 				}
 				break;
 			}
@@ -296,7 +296,7 @@ if (debug) {
 				(*arr_num)++;
 				vSetFilter (&arr_ptr[i]);
 				expired_time = FALSE;
-				arr_ptr[i].scope = str_dup (scope);
+				arr_ptr[i].scope = my_strdup (scope);
 				subj[0] = '\0';
 				from[0] = '\0';
 				msgid[0] = '\0';
@@ -311,7 +311,7 @@ if (debug) {
 					if (arr_ptr[i].icase) {
 						str_lwr (subj, subj);
 					}
-					arr_ptr[i].subj = str_dup (subj);
+					arr_ptr[i].subj = my_strdup (subj);
 				}
 if (debug) {
 	if (global) {
@@ -1057,7 +1057,7 @@ quick_filter_select_posted_art (group, subj)
 		 * Setup dummy article with posted articles subject
 		 */
 		set_article (&art);
-		art.subject = str_dup (subj);
+		art.subject = my_strdup (subj);
 
 		/*
 		 * Setup rules
@@ -1136,7 +1136,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 	psPtr[*plNum].lines_num = psRule->lines_num;
 
 	if (psRule->global && (psRule->scope[0] != '*' && psRule->scope[1] != '\0')) {
-		psPtr[*plNum].scope = str_dup (psRule->scope);
+		psPtr[*plNum].scope = my_strdup (psRule->scope);
 	}
 
 	time (&lCurTime);
@@ -1162,7 +1162,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 		switch (psRule->counter) {
 			case FILTER_SUBJ_CASE_IGNORE:
 			case FILTER_SUBJ_CASE_SENSITIVE:
-				psPtr[*plNum].subj = str_dup (acBuf);
+				psPtr[*plNum].subj = my_strdup (acBuf);
 				if (psRule->counter == FILTER_SUBJ_CASE_IGNORE) {
 					str_lwr (psPtr[*plNum].subj, psPtr[*plNum].subj);
 					psPtr[*plNum].icase = TRUE;
@@ -1170,14 +1170,14 @@ iAddFilterRule (psGrp, psArt, psRule)
 				break;
 			case FILTER_FROM_CASE_IGNORE:
 			case FILTER_FROM_CASE_SENSITIVE:
-				psPtr[*plNum].from = str_dup (acBuf);
+				psPtr[*plNum].from = my_strdup (acBuf);
 				if (psRule->counter == FILTER_FROM_CASE_IGNORE) {
 					str_lwr (psPtr[*plNum].from, psPtr[*plNum].from);
 					psPtr[*plNum].icase = TRUE;
 				}
 				break;
 			case FILTER_MSGID:
-				psPtr[*plNum].msgid = str_dup (acBuf);
+				psPtr[*plNum].msgid = my_strdup (acBuf);
 				break;
 		}
 		iFiltered = TRUE;
@@ -1188,7 +1188,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 			if (psRule->check_string) {
 				strcpy (acBuf, pcChkRegexStr (acBuf));
 			}
-			psPtr[*plNum].subj = str_dup (acBuf);
+			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
 		if (psRule->from_ok) {
 			if (psArt->name != (char *) 0) {
@@ -1196,11 +1196,11 @@ iAddFilterRule (psGrp, psArt, psRule)
 			} else {
 				sprintf (acBuf, "*%s*", psArt->from);
 			}
-			psPtr[*plNum].from = str_dup (acBuf);
+			psPtr[*plNum].from = my_strdup (acBuf);
 		}
 		if (psRule->msgid_ok) {
 			sprintf (acBuf, "*%s*", MSGID(psArt));
-			psPtr[*plNum].msgid = str_dup (acBuf);
+			psPtr[*plNum].msgid = my_strdup (acBuf);
 		}
 		if (psRule->subj_ok || psRule->from_ok ||
 		    psRule->msgid_ok || psRule->lines_ok) {

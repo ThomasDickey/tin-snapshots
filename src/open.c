@@ -499,10 +499,10 @@ open_art_header (art)
 			}
 			if (atoi (buf) == OK_NOTEXT) {
 				ptr = buf;
-				while (isspace(*ptr)) {
+				while (isspace((unsigned char)*ptr)) {
 					ptr++;
 				}
-				while (isdigit(*ptr)) {
+				while (isdigit((unsigned char)*ptr)) {
 					ptr++;
 				}
 				head_next = atoi (ptr);

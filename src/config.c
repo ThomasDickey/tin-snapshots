@@ -14,9 +14,10 @@
 
 #include	"version.h"
 #include	"tin.h"
-#include	"conf.h"
+#include	"tincfg.h"
 #include	"menukeys.h"
 
+static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, size_t *dst));
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
 static void highlight_option P_((int option));
 static void print_option P_((int act_option));
@@ -311,18 +312,12 @@ read_config_file (file, global_file)
 #endif
 			break;
 		case 'm':
-			if (match_string (buf, "mail_mime_encoding=", mail_mime_encoding, sizeof (mail_mime_encoding))) {
-				if (strcasecmp(mail_mime_encoding, txt_8bit) &&
-					strcasecmp(mail_mime_encoding, txt_base64) &&
-					strcasecmp(mail_mime_encoding, txt_7bit) &&  /* For CJK charsets(EUC-CN/JP/KR and others */
-					strcasecmp(mail_mime_encoding, txt_quoted_printable)) {
-					strcpy(mail_mime_encoding, txt_8bit);
-				}
+			if (match_list (buf, "mail_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &mail_mime_encoding)) {
 				break;
 			}
 			/* option to toggle 8bit char. in header of mail message */
 			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
-				if (strcasecmp(mail_mime_encoding, txt_8bit))
+				if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit))
 					mail_8bit_header=FALSE;
 				break;
 			}
@@ -357,18 +352,12 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 'p':
-			if (match_string (buf, "post_mime_encoding=", post_mime_encoding, sizeof (post_mime_encoding))) {
-				if (strcasecmp(post_mime_encoding, txt_8bit) &&
-					strcasecmp(post_mime_encoding, txt_base64) &&
-					strcasecmp(post_mime_encoding, txt_7bit) && /* perhaps necessary for EUC-JP/CN */
-					strcasecmp(post_mime_encoding, txt_quoted_printable)) {
-					strcpy(post_mime_encoding, txt_8bit);
-				}
+			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding)) {
 				break;
 			}
 /* option to toggle 8bit char. in header of news message */
 			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
-				if (strcasecmp(post_mime_encoding, txt_8bit))
+				if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit))
 					post_8bit_header=FALSE;
 				break;
 			}
@@ -856,8 +845,8 @@ write_config_file (file)
 	fprintf (fp, "# it's never meant to be used for Usenet news. Perhaps, it's not the case\n");
 	fprintf (fp, "# for EUC-JP and EUC-CN.\n");
 	fprintf (fp, "# Handling of Chinese and Japanese characters is not yet implemented.\n");
-	fprintf (fp, "post_mime_encoding=%s\n", post_mime_encoding);
-	fprintf (fp, "mail_mime_encoding=%s\n\n", mail_mime_encoding);
+	fprintf (fp, "post_mime_encoding=%s\n", txt_mime_types[post_mime_encoding]);
+	fprintf (fp, "mail_mime_encoding=%s\n\n", txt_mime_types[mail_mime_encoding]);
 
 	fprintf (fp, "# if ON, 8bit characters in news posting is NOT encoded.\n");
 	fprintf (fp, "# default is OFF. Thus 8bit character is encoded by default.\n");
@@ -1283,7 +1272,7 @@ change_config_file (group, filter_at_once)
 							break;
 
 						case OPT_MAIL_8BIT_HEADER:
-							if (strcasecmp(mail_mime_encoding, txt_8bit)) {
+							if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit)) {
 								mail_8bit_header = FALSE;
 								MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
 								print_option (OPT_MAIL_8BIT_HEADER);
@@ -1291,7 +1280,7 @@ change_config_file (group, filter_at_once)
 							break;
 
 						case OPT_POST_8BIT_HEADER:
-							if (strcasecmp(post_mime_encoding, txt_8bit)) {
+							if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit)) {
 								post_8bit_header = FALSE;
 								MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
 								print_option (OPT_POST_8BIT_HEADER);
@@ -1310,7 +1299,7 @@ change_config_file (group, filter_at_once)
 
 #ifdef HAVE_COLOR
 						/* use ANSI color */
-						case OPT_USE_COLOR:
+						case OPT_USE_COLOR_TINRC:
 							use_color = use_color_tinrc;
 							break;
 #endif
@@ -1430,18 +1419,9 @@ change_config_file (group, filter_at_once)
 								);
 							break;
 
-						/*
-						 * special case: mime encoding options. The encoding
-						 * is stored as a string, but we want to select it
-						 * from a predefined list.
-						 */
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
-							for (i=0; i<4; i++) {
-								if (!strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
-									mime_type = i;
-								}
-							}
+							mime_type = *((int *) option_table[option - 1].variable);
 							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
 										OPT_ARG_COLUMN,
 										mime_type,
@@ -1450,7 +1430,7 @@ change_config_file (group, filter_at_once)
 										option_table[option - 1].opt_list,
 										option_table[option - 1].opt_count
 										);
-							strcpy (option_table[option - 1].variable, txt_mime_types[mime_type]);
+							*((int *) option_table[option - 1].variable) = mime_type;
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
 							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
@@ -1605,6 +1585,32 @@ match_long (line, pat, dst)
 	return FALSE;
 }
 
+/* If the 'pat' keyword matches, lookup & return an index into the table */
+static int
+match_list (line, pat, table, tablelen, dst)
+	char *line;
+	char *pat;
+	char **table;
+	size_t tablelen;
+	size_t *dst;
+{
+	size_t	patlen = strlen (pat);
+	size_t	n;
+	char	temp[LEN];
+
+	if (STRNCMPEQ(line, pat, patlen)) {
+		line += patlen;
+		*dst = 0;	/* default, if no match */
+		for (n = 0; n < tablelen; n++) {
+			if (match_string(line, table[n], temp, sizeof(temp))) {
+				*dst = n;
+				break;
+			}
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
 
 int
 match_string (line, pat, dst, dstlen)

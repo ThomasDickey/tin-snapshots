@@ -33,10 +33,8 @@ static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
 static int subj_comp P_((t_comptype *p1, t_comptype *p2));
 static int from_comp P_((t_comptype *p1, t_comptype *p2));
 static int date_comp P_((t_comptype *p1, t_comptype *p2));
-#ifndef NNTP_ONLY
 static char *pcPrintDate P_((long lSecs));
 static char *pcPrintFrom P_((struct t_article *psArt));
-#endif
 static void print_expired_arts P_((int num_expired));
 #ifdef INDEX_DAEMON
 static void vCreatePath P_((char *pcPath));
@@ -193,10 +191,8 @@ debug_print_bitmap (group, NULL);
 			}
 		}
 
-#ifndef NNTP_ONLY
-		if (/*((!read_news_via_nntp) && expired) || */ modified)
+		if (expired || modified)
 			vWriteNovFile (group);
-#endif
 
 		/*
 		 * Create the reference tree. The msgid and ref ptrs will
@@ -594,9 +590,9 @@ parse_headers (buf, h)
 	ptr = buf;
 
 	forever {
-		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace(*(ptr+1)) && *(ptr+1) != '\n')); ptr++) {
+		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace((unsigned char)*(ptr+1)) && *(ptr+1) != '\n')); ptr++) {
 			if (((*ptr) & 0xFF) < ' ') {
-				if (*ptr == '\n' && isspace(*(ptr+1)) && *(ptr+1) !='\n')
+				if (*ptr == '\n' && isspace((unsigned char)*(ptr+1)) && *(ptr+1) !='\n')
 					*ptr=1;
 				else
 					*ptr = ' ';
@@ -625,7 +621,7 @@ parse_headers (buf, h)
 			case 'R':	/* References: optional */
 				if (!got_refs) {
 					if (match_header (ptrline, "References", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
-						h->refs = str_dup (buf2);
+						h->refs = my_strdup (buf2);
 						got_refs = TRUE;
 					}
 				}
@@ -658,7 +654,7 @@ parse_headers (buf, h)
 			case 'X':	/* Xref:  optional */
 				if (!got_xref) {
 					if (match_header (ptrline, "Xref", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
-						h->xref = str_dup (buf2);
+						h->xref = my_strdup (buf2);
 						got_xref = TRUE;
 					}
 				}
@@ -666,7 +662,7 @@ parse_headers (buf, h)
 			case 'M':	/* Message-ID:  mandatory */
 				if (!got_msgid) {
 					if (match_header (ptrline, "Message-ID", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
-						h->msgid = str_dup (buf2);
+						h->msgid = my_strdup (buf2);
 						got_msgid = TRUE;
 					}
 				}
@@ -684,14 +680,14 @@ parse_headers (buf, h)
 					if ((s = strchr (buf2, '/')) != (char *) 0) {
 						if (STRNCMPEQ(s+1, "part", 4) ||
 						    STRNCMPEQ(s+1, "Part", 4)) {
-							h->part = str_dup (s+5);
+							h->part = my_strdup (s+5);
 							s = strrchr (h->part, '\n');
 							if (s != (char *) 0) {
 								*s = '\0';
 							}
 						} else if (STRNCMPEQ(s+1,"patch",5) ||
 								   STRNCMPEQ(s+1,"Patch",5)) {
-							h->patch = str_dup (s+6);
+							h->patch = my_strdup (s+6);
 							s = strrchr (h->patch, '\n');
 							if (s != (char *) 0) {
 								*s = '\0';
@@ -799,11 +795,11 @@ iReadNovFile (group, min, max, expired)
 		/*
 		 * Check to make sure article in nov file has not expired in group
 		 */
-/*
+#if 0
 printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
 fflush(stdout);
 sleep(1);
-*/
+#endif
 		if (artnum < group->xmin) {
 			(*expired)++;
 			continue;
@@ -892,7 +888,7 @@ sleep(1);
 			*q = '\0';
 		}
 		if (*p)
-			arts[top].msgid = str_dup (p);
+			arts[top].msgid = my_strdup (p);
 		else
 			arts[top].msgid = '\0';
 
@@ -913,7 +909,7 @@ sleep(1);
 			*q = '\0';
 		}
 		if (*p)
-			arts[top].refs = str_dup (p);
+			arts[top].refs = my_strdup (p);
 		else
 			arts[top].refs = '\0';
 
@@ -940,7 +936,7 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
-			if (!*p || (!isdigit(*p))) {
+			if (!*p || (!isdigit((unsigned char)*p) && *p != '-')) {
 #ifdef DEBUG
 				error_message ("Bad overview record (Lines) [%s]", p);
 				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");
@@ -951,10 +947,10 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		if(isdigit(*p))
-		  arts[top].lines = atoi (p);
+		if(isdigit((unsigned char)*p))
+			arts[top].lines = atoi (p);
 		else
-		  arts[top].lines = -1;
+			arts[top].lines = -1;
 
 		p = (q == (char *) 0 ? (char *) 0 : q + 1);
 
@@ -981,7 +977,7 @@ sleep(1);
 				while (*q && *q == ' ') {
 					q++;
 				}
-				arts[top].xref = str_dup (q);
+				arts[top].xref = my_strdup (q);
 			}
 		}
 
@@ -1008,10 +1004,10 @@ sleep(1);
 				if ((s = strchr (q, '/')) != (char *) 0) {
 					if (STRNCMPEQ(s+1, "part", 4) ||
 					    STRNCMPEQ(s+1, "Part", 4)) {
-						arts[top].part = str_dup (s+5);
+						arts[top].part = my_strdup (s+5);
 					} else if (STRNCMPEQ(s+1, "patch", 5) ||
 						   STRNCMPEQ(s+1, "Patch", 5)) {
-						arts[top].patch = str_dup (s+6);
+						arts[top].patch = my_strdup (s+6);
 					}
 					if (arts[top].part || arts[top].patch) {
 						strcpy (buf2, q);
@@ -1056,7 +1052,6 @@ sleep(1);
  *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
 
-#ifndef NNTP_ONLY
 void
 vWriteNovFile (psGrp)
 	struct t_group *psGrp;
@@ -1066,6 +1061,9 @@ vWriteNovFile (psGrp)
 	int		iNum;
 	struct	t_article *psArt;
 	char 	tmp[PATH_LEN];
+
+	if (xover_supported)		/* Don't write local index if we have XOVER */
+		return;
 
 	set_tin_uid_gid ();
 
@@ -1078,11 +1076,10 @@ vWriteNovFile (psGrp)
 	 * than W_OK, since we won't read it anyway.
 	 */
 
-	if((pcNovFile = pcFindNovFile (psGrp, R_OK))!=NULL) {
+	if((pcNovFile = pcFindNovFile (psGrp, R_OK))!=NULL)
 		strcpy(tmp, pcNovFile);
-	} else {
+	else
 		strcpy(tmp, "");
-	}
 
 	pcNovFile = pcFindNovFile (psGrp, W_OK);
 
@@ -1143,7 +1140,6 @@ vWriteNovFile (psGrp)
 	}
 	set_real_uid_gid ();
 }
-#endif /* !NNTP_ONLY */
 
 
 
@@ -1701,7 +1697,6 @@ print_expired_arts (num_expired)
 	}
 }
 
-#ifndef NNTP_ONLY
 static char *
 pcPrintDate (lSecs)
 	long	lSecs;
@@ -1731,7 +1726,6 @@ pcPrintFrom (psArt)
 
 	return acFrom;
 }
-#endif /* !NNTP_ONLY */
 
 #ifdef INDEX_DAEMON
 static void

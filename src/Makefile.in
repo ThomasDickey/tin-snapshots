@@ -64,8 +64,7 @@ TAGS	= ctags
 INSTALL	= @INSTALL@
 
 HFILES	= \
-	$(INCDIR)/autoconf.h \
-	$(INCDIR)/conf.h \
+	../include/autoconf.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -212,14 +211,14 @@ all: $(BINDIR)/$(EXE)
 	@ECHO_CC@$(CPP) -C $(CPPOPTS) $*.c >$@
 
 # explicit rule to allow running lint
-$(SRCDIR)/parsdate.c: $(SRCDIR)/parsdate.y
+$(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
 	@ echo expect 6 shift/reduce conflicts...
 	$(YACC) $(SRCDIR)/parsdate.y
-	$(MV) y.tab.c $(SRCDIR)/parsdate.c
+	$(MV) y.tab.c $@
 
-actived: actived.c mail.c
+actived: $(SRCDIR)/actived.c $(SRCDIR)/mail.c
 	@$(ECHO) "Compiling actived..."
-	$(CC) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON actived.c mail.c
+	$(CC) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON $(SRCDIR)/actived.c $(SRCDIR)/mail.c
 	$(LD) $(LDFLAGS) actived.o mail.o -o actived $(LIBS)
 	@$(LS) actived
 
@@ -270,15 +269,16 @@ tags:
 	@-$(RM) -f tags
 	@$(TAGS) $(HFILES) $(CFILES) 
 
-lint:	$(CFILES) $(SRCDIR)/parsdate.c
+lint:	$(CFILES) $(OBJDIR)/parsdate.c
 	@$(ECHO) "Linting source (results in ./LINT)..."
 	@$(LINT) $(LINTFLAGS) -DNNTP_ABLE `/bin/ls $(CFILES)|sed -e 's/\.y/.c/'` $(LIBS) > LINT
 
 clean:
 	@$(ECHO) "Cleaning..."
 	@-$(RM) -f $(OFILES)
-	@-$(RM) -f $(SRCDIR)/parsdate.c
+	@-$(RM) -f $(OBJDIR)/parsdate.c
 	@-$(RM) -f LINT *.ln
+	@-$(RM) -f makecfg makecfg.o tincfg.h
 	@-$(RM) -f *~
 	@-$(RM) -f $(EXE) $(EXED)
 
@@ -305,12 +305,19 @@ proto:
 	@$(LS) $(INCDIR)/proto.h
 
 TIN_DEP	= \
-	$(SRCDIR)/Makefile \
+	Makefile \
 	$(INCDIR)/tin.h \
-	$(INCDIR)/autoconf.h \
+	../include/autoconf.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/proto.h
+
+tincfg.h:			$(SRCDIR)/tincfg.tbl \
+				makecfg
+	./makecfg $(SRCDIR)/tincfg.tbl tincfg.h
+
+makecfg:			$(OBJDIR)/makecfg.o
+	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
@@ -321,7 +328,7 @@ $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
 $(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(TIN_DEP)
 $(OBJDIR)/color.o:		$(SRCDIR)/color.c $(TIN_DEP)
 $(OBJDIR)/config.o:		$(SRCDIR)/config.c $(TIN_DEP) \
-				$(INCDIR)/conf.h \
+				tincfg.h \
 				$(INCDIR)/menukeys.h \
 				$(INCDIR)/version.h
 $(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(TIN_DEP)
@@ -346,6 +353,7 @@ $(OBJDIR)/list.o:		$(SRCDIR)/list.c $(TIN_DEP)
 $(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(TIN_DEP)
 $(OBJDIR)/main.o:		$(SRCDIR)/main.c $(TIN_DEP) \
 				$(INCDIR)/version.h
+$(OBJDIR)/makecfg.o:		$(SRCDIR)/makecfg.c $(TIN_DEP)
 $(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(TIN_DEP)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_DEP) \
 				$(INCDIR)/version.h
@@ -358,7 +366,7 @@ $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(TIN_DEP) \
 				$(INCDIR)/version.h
 $(OBJDIR)/page.o:		$(SRCDIR)/page.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
-$(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(TIN_DEP)
+$(OBJDIR)/parsdate.o:		$(OBJDIR)/parsdate.c $(TIN_DEP)
 $(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(TIN_DEP)
 $(OBJDIR)/post.o:		$(SRCDIR)/post.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
