@@ -52,11 +52,8 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 }
 
 #else
-#ifdef NeXT
-/* NeXT's parser seems to somehow have problems with this syntax */
-RETSIGTYPE (*sigdisp(sig, func))()
-	int sig;
-	RETSIGTYPE (*func)();
+#ifdef HAVE_NESTED_PARAMS
+RETSIGTYPE (*sigdisp(int sig, RETSIGTYPE (_CDECL *func)(SIG_ARGS)))(SIG_ARGS)
 #else
 RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	int sig;

@@ -194,9 +194,15 @@ LINTFLAGS=-a -c -h -n -x $(CPPOPTS) \
 
 all: $(BINDIR)/$(EXE) 
 
+.SUFFIXES : .i
+
 .c.o:
 @SHOW_CC@
 	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $*.c
+
+.c.i:
+@SHOW_CC@
+	@ECHO_CC@$(CC) -E -C $(CPPOPTS) $*.c >$@
 
 # explicit rule to allow running lint
 $(SRCDIR)/parsdate.c: $(SRCDIR)/parsdate.y

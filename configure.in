@@ -356,6 +356,7 @@ AC_LANG_C
 AC_C_CONST
 AC_C_INLINE
 CF_ANSI_ASSERT
+CF_CHECK_NESTED_PARAMS
 
 ### check for alloca (only required for bison)
 case "$YACC" in
@@ -610,9 +611,20 @@ CF_TM_GMTOFF
 
 AC_SYS_LONG_FILE_NAMES
 CF_SIG_ARGS
+
+# GCC and Apollo compilers are quite noisy about signal constants (quiet them).
 if test -n "$GCC"; then
+  check_sig_const=yes
+elif test -f /sys/dm/dm ; then
+  check_sig_const=yes
+elif test -f /sys/dm/spm ; then
+  check_sig_const=no
+fi
+
+if test $check_sig_const = yes ; then
   CF_SIG_CONST
 fi
+
 CF_COMPTYPE
 CF_COREFILE
 

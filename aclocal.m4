@@ -268,7 +268,10 @@ AC_CACHE_VAL(cf_cv_corefile,[
 int found()
 {
 	struct stat sb;
-	return (stat("core", &sb) == 0 && ((sb.st_mode & S_IFMT) == S_IFREG));
+	return ((stat("core", &sb) == 0			/* UNIX */
+	   ||    stat("conftest.core", &sb) == 0	/* FreeBSD */
+		)
+		&& ((sb.st_mode & S_IFMT) == S_IFREG));
 }
 int main()
 {
@@ -365,6 +368,20 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([CF_MSG_LOG],
 echo "(line __oline__) testing $* ..." 1>&5
 )dnl
+dnl ---------------------------------------------------------------------------
+dnl Check if the compiler allows nested parameter lists (some don't)
+AC_DEFUN([CF_CHECK_NESTED_PARAMS],
+[
+AC_MSG_CHECKING([if nested parameters work])
+AC_CACHE_VAL(cf_cv_nested_params,[
+	AC_TRY_COMPILE([],
+	[extern void (*sigdisp(int sig, void (*func)(int sig)))(int sig)],
+	[cf_cv_nested_params=yes],
+	[cf_cv_nested_params=no])
+])
+AC_MSG_RESULT($cf_cv_nested_params)
+test $cf_cv_nested_params = yes && AC_DEFINE(HAVE_NESTED_PARAMS)
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
 dnl follow the AC_CHECK_FUNCS call.

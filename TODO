@@ -6,8 +6,8 @@ o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
 
 o  reposting of a thread does not work
 
-o  with --enable-forgery reposting of an article fails
-   'x' 'a' 'r' <group> 'p' -> 441 missing From:
+o  with --enable-forgery reposting of an thread reposts only the first
+   article ('x' 't' 'r' <group> 'p')
 
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
@@ -195,6 +195,9 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  on some AIX mail (f.e. /usr/bin/mail) prints out an error (but the mail
+   is sent)
+
 o  move all strings to lang.c
 
 o  looks like, that while being connected to a server, new newsgroups are
