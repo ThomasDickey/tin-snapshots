@@ -788,9 +788,8 @@ quick_post_article (
 	 *    the command line switch.
 	 */
 
-	if(pickup_postponed_articles(!postponed_only, postponed_only)
-		|| postponed_only)
-	  return;
+	if (pickup_postponed_articles(!postponed_only, postponed_only) || postponed_only)
+		return;
 
 	/*
 	 * Get groupname & subject for posting article.
@@ -899,16 +898,18 @@ quick_post_article (
 #endif
 	msg_add_header ("Subject", subj);
 	msg_add_header ("Newsgroups", group);
-	if (prompt_followupto)
-		msg_add_header("Followup-To:", "");
-	if (psGrp && psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
+	if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
+		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
+	} else {
+		if (prompt_followupto) {
+			msg_add_header("Followup-To", "");
+		}
 	}
 	if (*reply_to) {
 		msg_add_header ("Reply-To", reply_to);
 	}
-	if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
-		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
+	if (psGrp && psGrp->attribute->organization != (char *) 0) {
+		msg_add_header ("Organization", psGrp->attribute->organization);
 	}
 	if (*my_distribution) {
 		msg_add_header ("Distribution", my_distribution);
@@ -994,7 +995,7 @@ quick_post_article (
 		ch = prompt_to_edit();
 	}
 
-      post_article_done:
+post_article_done:
 	if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
 		update_active_after_posting (group);
 
@@ -1457,7 +1458,7 @@ post_article (
 		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 	} else {
 		if (prompt_followupto)
-			msg_add_header("Followup-To:", "");
+			msg_add_header("Followup-To", "");
 	}
 	if (*reply_to) {
 		msg_add_header ("Reply-To", reply_to);
@@ -1867,7 +1868,7 @@ post_response (
 			return ret_code;
 		}
 	}
-      ignore_followup_to_poster:
+ignore_followup_to_poster:
 	if ((fp = fopen (article, "w")) == NULL) {
 		perror_message (txt_cannot_open, article);
 		return ret_code;
@@ -1891,7 +1892,7 @@ post_response (
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h_followup);
 		if (prompt_followupto)
-			msg_add_header("Followup-To:",
+			msg_add_header("Followup-To",
   			  (strchr(note_h_followup, ',') != (char *) 0) ?
 			    note_h_followup : "");
 	} else {
@@ -1901,7 +1902,7 @@ post_response (
 		} else {
 			msg_add_header ("Newsgroups", note_h_newsgroups);
 			if (prompt_followupto)
-				msg_add_header("Followup-To:",
+				msg_add_header("Followup-To",
 	  			  (strchr(note_h_newsgroups, ',') != (char *) 0) ?
 				    note_h_newsgroups : "");
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
@@ -2199,7 +2200,6 @@ mail_to_someone (
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
 		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj));
-/*              my_strncpy (mail_to, address, sizeof (mail_to)); */
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -2254,7 +2254,7 @@ mail_to_someone (
 		}
 	}
 
-      mail_to_someone_done:
+mail_to_someone_done:
 	unlink (nam);
 
 	return redraw_screen;
@@ -2459,7 +2459,7 @@ mail_bug_report (void)
 		ch = prompt_to_send(subject);
 	}
 
-      mail_bug_report_done:
+mail_bug_report_done:
 	unlink (nam);
 
 	return TRUE;
@@ -2644,13 +2644,8 @@ mail_to_author (
 		ch = prompt_to_send(subject);
 	}
 
-      mail_to_author_done:
+mail_to_author_done:
 	update_posted_info_file (group, 'r', subject);
-/* Commented until decided if this should be done here or by mailer (ie. elm)
-   if (psGrp->attribute->auto_save_msg) {
-   update_posted_msgs_file (article, ?);
-   }
- */
 	unlink (nam);
 
 	return redraw_screen;
@@ -3250,14 +3245,14 @@ repost_article (
 		}
 	}
 
-	repost_done:
+repost_done:
 		if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf)) {
 			update_active_after_posting (buf);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, buf))
 			update_posted_info_file (psGrp->name, 'x', buf);
 		}
-	repost_postponed:
+repost_postponed:
 		if (unlink_article) {
 			unlink (article);
 		}
@@ -3634,12 +3629,12 @@ reread_active_after_posting (void)
 					lMinOld = psGrp->xmin;
 					lMaxOld = psGrp->xmax;
 					vGrpGetArtInfo (
-							    psGrp->spooldir,
-							       psGrp->name,
-							       psGrp->type,
-							       &psGrp->count,
-							       &psGrp->xmax,
-							       &psGrp->xmin);
+						psGrp->spooldir,
+						psGrp->name,
+						psGrp->type,
+						&psGrp->count,
+						&psGrp->xmax,
+						&psGrp->xmin);
 
 					if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
@@ -3655,12 +3650,6 @@ reread_active_after_posting (void)
 							psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
 						my_flush ();
 #endif
-
-/*
-   sprintf (acBuf, "EXPAND Min/Max DIFF grp=[%s] old=[%ld-%ld] new=[%ld-%ld]",
-   psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-   error_message (acBuf, "");
- */
 
 						expand_bitmap (psGrp, psGrp->xmin);
 						modified = TRUE;
@@ -3727,10 +3716,8 @@ submit_mail_file (
 	if (insert_from_header (file))
 #endif
 	{
-		if (pcCopyArtHeader (HEADER_TO, file, mail_to)
-		    && pcCopyArtHeader (HEADER_SUBJECT, file, subject)) {
-
-                        t_bool ismail=TRUE;
+		if (pcCopyArtHeader (HEADER_TO, file, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, file, subject)) {
+			t_bool ismail=TRUE;
 			sprintf (buf, txt_mailing_to, mail_to);
 			wait_message (buf);
 
@@ -3738,8 +3725,6 @@ submit_mail_file (
 
 			strfmailer (mailer, subject, mail_to, file,
 				  buf, sizeof (buf), default_mailer_format);
-
-/* error_message ("Mail=[%s]", buf); */
 
 			if (invoke_cmd (buf)) {
 				mailed = TRUE;

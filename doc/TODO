@@ -131,8 +131,6 @@ o  kill-file editor does not quote brackets, stars and question marks
 
 New features
 ------------
-o  add abillity to strip bogus newsgroups from newsrc
-
 o  add support for ispell language change
 
 o  add RFC1468/1922 support
@@ -259,9 +257,7 @@ o  rework the message routines (wait_message, error_message) to use variable
 o  is art->inthread really needed, surely art->thread contains enough
    information
 
-o  is there really a spurious int in t_hashnode ?
-   bring the hidden data fields into t_hashnode (see hashstr.c) and
-   remove annoying casts to int *
+o  remove annoying casts to (t_hashnode *)aptr in {art,refs}.c
 
 o  check where tin_done() should be called instead of using exit()
 

@@ -36,6 +36,8 @@ static void auto_subscribe_groups (char *newsrc_file);
  *  active[] entries.
  *  If allgroups is set, then my_group[] is completely overwritten,
  *  otherwise, groups are appended
+ *  Any bogus groups will be handled accordingly. Bogus groups will _not_
+ *  be subscribed to as a design principle.
  */
 void
 read_newsrc (
@@ -48,8 +50,10 @@ read_newsrc (
 	FILE *fp;
 	int sub;
 	int i;
-	int errors = 0;
 	struct stat buf;
+#ifdef USE_CURSES
+	int errors = 0;
+#endif
 
 	if (allgroups)
 		group_top = 0;
@@ -81,12 +85,12 @@ read_newsrc (
 
 			if (sub == SUBSCRIBED) {
 				if ((i = my_group_add (grp)) >= 0) {
-					active[my_group[i]].subscribed = SUB_BOOL(sub);
-					parse_bitmap_seq (&active[my_group[i]], seq);
+					if (!active[my_group[i]].bogus) {
+						active[my_group[i]].subscribed = SUB_BOOL(sub);
+						parse_bitmap_seq (&active[my_group[i]], seq);
+					}
 				} else {
-/* TODO - create a dummy group and mark as 'D'eleteable ? */
-					my_fprintf(stderr, "\nBogus %s in .newsrc, not in active", grp);
-					errors++;
+					process_bogus(grp);
 				}
 			}
 			free (line);
@@ -100,7 +104,7 @@ read_newsrc (
 /*
 #if USE_CURSES
 	if (!cmd_line) {
-		if (errors) {
+		if (errors) {		FIXME - possibly not needed now ?
 			beep();
 			continue_prompt ();
 		}
@@ -122,10 +126,23 @@ vWriteNewsrcLine (
 	struct t_group *psGrp;
 
 	seq = pcParseNewsrcLine (line, grp, &sub);
-	if (grp[0] == 0 || sub == 0) {		/* Insurance against blank line */
+	if (grp[0] == 0 || sub == 0)		/* Insurance against blank line */
 		return;
-	}
+
+	/*
+	 * Find the group in active. If we cannot, then junk it if bogus groups
+     * are set to auto removal. Also check for bogus flag just in case
+     * strip_bogus was changed since tin started
+	 */
 	psGrp = psGrpFind (grp);
+
+	if (strip_bogus == BOGUS_REMOVE) {
+		if (psGrp == NULL || psGrp->bogus) {
+			my_printf(txt_remove_bogus, grp);		/* TODO this gets cleared */
+			my_printf("\n");
+			return;
+		}
+	}
 
  	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
@@ -149,34 +166,37 @@ vWriteNewsrc (void)
 	FILE *fp_op;
 	int rename_ok = FALSE;
 
-	if ((fp_ip = fopen (newsrc, "r")) != (FILE *) 0) {
+	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
+		return;
+
 #ifdef VMS
-		if ((fp_op = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
+	if ((fp_op = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
 #else
-		if ((fp_op = fopen (newnewsrc, "w")) != (FILE *) 0) {
+	if ((fp_op = fopen (newnewsrc, "w")) != (FILE *) 0) {
 #endif
-			if (newsrc_mode) {
-				chmod (newnewsrc, newsrc_mode);
-			}
-			while ((line = getaline (fp_ip)) != (char *) 0) {
-				vWriteNewsrcLine(fp_op,line);
-				free (line);
-			}
-			/*
-			 * Don't rename if either fclose() fails or ferror() is set
-			 */
-			if (ferror (fp_op) | fclose (fp_op)) {
-				error_message (txt_filesystem_full, NEWSRC_FILE);
-				unlink (newnewsrc);
-			} else {
-				rename_ok = TRUE;
-			}
+		if (newsrc_mode)
+			chmod (newnewsrc, newsrc_mode);
+
+		while ((line = getaline (fp_ip)) != (char *) 0) {
+			vWriteNewsrcLine(fp_op,line);
+			free (line);
 		}
-		fclose (fp_ip);
-		if (rename_ok) {
-			rename_file (newnewsrc, newsrc);
+
+		/*
+		 * Don't rename if either fclose() fails or ferror() is set
+		 */
+		if (ferror (fp_op) | fclose (fp_op)) {
+			error_message (txt_filesystem_full, NEWSRC_FILE);
+			unlink (newnewsrc);
+		} else {
+			rename_ok = TRUE;
 		}
 	}
+
+	fclose (fp_ip);
+
+	if (rename_ok)
+		rename_file (newnewsrc, newsrc);
 #endif	/* INDEX_DAEMON */
 }
 
@@ -296,6 +316,7 @@ backup_newsrc (void)
 
 /*
  *  Subscribe/unsubscribe to a group in .newsrc.
+ *	This involves rewriting the .newsrc with the new info
  */
 
 void
@@ -312,48 +333,55 @@ subscribe (
 	int sub;
 
 #ifdef VMS
-	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
+	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) == (FILE *) 0)
 #else
-	if ((newfp = fopen (newnewsrc, "w")) != (FILE *) 0) {
+	if ((newfp = fopen (newnewsrc, "w")) == (FILE *) 0)
 #endif
-		if (newsrc_mode) {
-			chmod (newnewsrc, newsrc_mode);
-		}
-		if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
-			while ((line = getaline (fp)) != (char *) 0) {
-				if (STRNCMPEQ("options ", line, 8)) {
-					fprintf (newfp, "%s\n", line);
+		return;
+
+	if (newsrc_mode)
+		chmod (newnewsrc, newsrc_mode);
+
+	if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
+
+		while ((line = getaline (fp)) != (char *) 0) {
+
+			if (STRNCMPEQ("options ", line, 8)) {
+				fprintf (newfp, "%s\n", line);
+			} else {
+				seq = pcParseNewsrcLine (line, grp, &sub);
+
+				if (STRCMPEQ(grp, group->name)) {
+ 					if (WRITE_NEWSRC(sub_state))
+ 						fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
+
+					group->subscribed = SUB_BOOL(sub_state);
+					found = TRUE;
+
 				} else {
-					seq = pcParseNewsrcLine (line, grp, &sub);
-
-					if (STRCMPEQ(grp, group->name)) {
-
- 						if (WRITE_NEWSRC(sub_state))
- 							fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
-
-						group->subscribed = SUB_BOOL(sub_state);
-						found = TRUE;
-					} else {
- 						if (WRITE_NEWSRC(sub))
- 							fprintf (newfp, "%s%c %s\n", grp, sub, seq);
-					}
+					if (WRITE_NEWSRC(sub))
+ 						fprintf (newfp, "%s%c %s\n", grp, sub, seq);
 				}
-				free (line);
 			}
-			fclose (fp);
-			if (!found) {
- 				if (WRITE_NEWSRC(sub_state))
- 					fprintf (newfp, "%s%c\n", group->name, sub_state);
-				group->subscribed = SUB_BOOL(sub_state);
-			}
+			free (line);
 		}
-		if (ferror (newfp) | fclose (newfp)) {
-			error_message (txt_filesystem_full, NEWSRC_FILE);
-			unlink (newnewsrc);
-		} else {
-			rename_file (newnewsrc, newsrc);
+
+		fclose (fp);
+
+		/* NB: for bogus groups, if we didn't find it, then we can't be here
+		 *     as it wouldn't have been added in the 1st place */
+		if (!found) {
+ 			if (WRITE_NEWSRC(sub_state))
+ 				fprintf (newfp, "%s%c\n", group->name, sub_state);
+			group->subscribed = SUB_BOOL(sub_state);
 		}
 	}
+
+	if (ferror (newfp) | fclose (newfp)) {
+		error_message (txt_filesystem_full, NEWSRC_FILE);
+		unlink (newnewsrc);
+	} else
+		rename_file (newnewsrc, newsrc);
 }
 
 
@@ -396,8 +424,10 @@ reset_newsrc (void)
 	}
 }
 
-#if 0 /* never used */
-static void
+/*
+ * Rewrite the newsrc file, without the specified group
+ */
+void
 delete_group (
 	char *group)
 {
@@ -413,9 +443,9 @@ delete_group (
 #else
 	if ((newfp = fopen (newnewsrc, "w")) != (FILE *) 0) {
 #endif
-		if (newsrc_mode) {
+		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
-		}
+
 		if ((fp = fopen (newsrc, "r")) != (FILE *) 0) {
 			while ((line = getaline (fp)) != (char *) 0) {
 				seq = pcParseNewsrcLine (line, grp, &sub);
@@ -435,7 +465,6 @@ delete_group (
 		}
 	}
 }
-#endif /* 0 */
 
 void
 grp_mark_read (

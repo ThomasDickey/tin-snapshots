@@ -112,8 +112,10 @@ main (
 	read_cmd_line_options (argc, argv);
 
 	if (newsrc_active && !read_news_via_nntp) {
-		printf("Reading off local spool: -n ignored\n");
-		newsrc_active = FALSE;
+#ifdef NNTP_ABLE
+		info_message("Assuming -r in order to use -n\n");
+		read_news_via_nntp = TRUE;
+#endif	/* We won't get here without NNTP support */
 	}
 
 	/*
@@ -218,7 +220,7 @@ main (
 	 * new newsgroups
 	 */
 	num_cmd_line_groups = read_cmd_line_groups ();
-/* TODO - do we want cmd line groups b4 or after our newsrc groups ? */
+
 #ifdef INDEX_DAEMON
 	vMakeActiveMyGroup ();
 #else

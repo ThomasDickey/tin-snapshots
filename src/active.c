@@ -135,18 +135,16 @@ resync_active_file (void)
  * Populate a slot in the active[] array
  * TODO: 1) Have a preinitialised default slot and block assign it for speed
  * TODO: 2) Lump count/max/min/moderat into a t_active, big patch but much cleaner throughout tin
- * TODO: shift name to psGrpAdd
  */
 static void
 active_add(
 	struct t_group *ptr,
-	char *name,
 	long count,
 	long max,
 	long min,
 	const char *moderated)
 {
-	ptr->name = my_strdup(name);
+	/* name - pre-initialised when group is made */
 	ptr->description = (char *) 0;
 	/* spool - see below */
 	ptr->moderated = moderated[0];
@@ -159,6 +157,7 @@ active_add(
 	ptr->art_was_posted = FALSE;
 	ptr->subscribed = FALSE;			/* not in my_group[] yet */
 	ptr->newgroup = FALSE;
+	ptr->bogus = FALSE;
 	ptr->next = -1;						/* hash chain */
 	ptr->newsrc.xbitmap = (t_bitmap *) 0;
 	ptr->attribute = (struct t_attribute *) 0;
@@ -183,6 +182,32 @@ active_add(
 	}
 }
 
+/*
+ * Decide how to handle a bogus groupname.
+ * If we process them interactively, create an empty active[] for this
+ * group and mark it bogus for display in the group selection page
+ * Otherwise, bogus groups are dealt with when newsrc is written.
+ */
+int
+process_bogus(name)
+	char *name;
+{
+	struct t_group *ptr;
+
+	if (strip_bogus != BOGUS_ASK)
+		return(0);
+
+	if ((ptr = psGrpAdd(name)) == NULL)
+		return(0);
+
+	active_add(ptr, 0, 1, 0, "n");
+	ptr->bogus = TRUE;						/* Mark it bogus */
+
+	if (my_group_add(name) < 0)
+		return(1);							/* Return code is ignored */
+
+	return(0);								/* Nothing was printed yet */
+}
 
 /*
  * Parse line from news or mail active files
@@ -319,7 +344,7 @@ read_news_active_file (void)
 		/*
 		 * Load the new group in active[]
 		 */
-		active_add(ptr, buf, count, max, min, moderated);
+		active_add(ptr, count, max, min, moderated);
 
 		if (num_active % 100 == 0 && !update)
 			spin_cursor ();
@@ -518,7 +543,7 @@ subscribe_new_group (
 			my_fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
 
 		if ((ptr = psGrpAdd(group)) != NULL)
-			active_add(ptr, group, 0, 1, 0, "n");
+			active_add(ptr, 0, 1, 0, "n");
 
 		if ((idx = my_group_add(group)) < 0) 
 			return;
@@ -806,7 +831,7 @@ read_motd_file (void)
 		fclose (fp);
 
 		if (lineno) {
-			wait_message (txt_cmdline_hit_any_key);
+			wait_message (txt_return_key);
 			Raw (TRUE);
 			ReadCh ();
 			Raw (FALSE);

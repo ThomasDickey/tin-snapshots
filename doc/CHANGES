@@ -1,18 +1,42 @@
+--unoff BETA release 970320 --
+
+354) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-clenup; removed /etc/resolv.conf parsing
+     FIX. several patches
+
+353) Jungshik Shin <jshin@pantheon.yale.edu>
+     ADD. 'M'enu entry for display_rfc1522_header_undecoded (now
+          display_mime_header_asis)
+     FIX. several supplied patches
+
+352) T.E.Dickey <dickey@clark.net>
+     ADD. make a functional test for the system_status logic, tidying up of
+          aclocal.m4
+     BUG. correct a length used in tcurses.c in the innstr() call
+     FIX. aclocal.m4, configure[.in], tcurses.c
+
+351) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. handling for bogus groups in .newsrc
+     ADD. better string hashing, memory savings
+     ADD. better default for -n
+     BUG. removed references to the 'any' key
+     FIX. several supplied patches
+
 --unoff BETA release 970317 --
 
 350) Jungshik Shin <jshin@pantheon.yale.edu>
      ADD. automatic use of B-encoding if it's shorter then Q-encoding
-     ADD. display_rfc1522_header_undecoded swithc to tinrc
+     ADD. display_rfc1522_header_undecoded switch to tinrc
      FIX. several supplied patches
 
 349) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. reworte INEWS_MAIL_* stuff
+     ADD. rewrote INEWS_MAIL_* stuff
      FIX. several patches
 
 --unoff BETA release 970314 --
 
 348) Jungshik Shin <jshin@pantheon.yale.edu>
-     ADD. splitt longe header lines in mail message
+     ADD. split long header lines in mail message
      FIX. several supplied patches
 
 347) T.E.Dickey <dickey@clark.net>

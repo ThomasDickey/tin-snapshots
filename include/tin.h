@@ -862,6 +862,13 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 
 /*
+ * Different values of strip_bogus - the ways to handle bogus groups
+ */
+#define BOGUS_KEEP			0
+#define BOGUS_REMOVE		1
+#define BOGUS_ASK			2
+
+/*
  *  used in help.c
  */
 
@@ -1232,6 +1239,7 @@ struct t_group
 	t_bool art_was_posted:1;		/* TRUE if art was posted to group */
 	t_bool subscribed:1;			/* TRUE if subscribed to group */
 	t_bool newgroup:1;				/* TRUE is group was new this session */
+	t_bool bogus:1;					/* TRUE if group is not in active list */
 	int next;				/* next active entry in hash chain */
 	struct t_newsrc newsrc; 		/* newsrc bitmap specific info. */
 	struct t_attribute *attribute;		/* group specific attributes */
@@ -1248,8 +1256,9 @@ struct t_group
 
 struct t_hashnode
 {
-	char *s;				/* the string we're saving */
 	struct t_hashnode *next;		/* chain for spillover */
+	int  aptr;				/* used in subject threading */
+	char txt[1];			/* stub for the string data, \0 terminated */
 };
 
 /*

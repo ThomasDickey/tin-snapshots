@@ -972,23 +972,23 @@ print_a_line:
 		}
 
 /* decode RFC 1522(RFC 2047) style headers back to 8bit before
-	further processiing. It doesn't work if header part is longer
-	than a pageful. A quick patch would be remove check for
-	in_headers, but that would introduce an uncessary load
-	as well as make it impossible to have header-like lines
-	in article body. Somehow, in_headers is set to FALSE
-	even if we're still in header part of article when
-	header part is longer than a pageful. need to FIX */
-	
-		if (in_headers && ! display_rfc1522_header_undecoded) {
-			char header_name[80];
-			size_t header_name_len;
-			header_name_len = strstr(buf2,": ")-buf2;
-			strncpy(header_name,buf2,header_name_len);
-			header_name[header_name_len]='\0';
-			match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
-			strcpy(buf2+header_name_len+2,buf3);
-		}
+   further processiing. It doesn't work if header part is longer
+   than a pageful. A quick patch would be remove check for
+   in_headers, but that would introduce an uncessary load 
+   as well as make it impossible to have header-like lines
+   in article body. Somehow, in_headers is set to FALSE
+   even if we're still in header part of article when
+   header part is longer than a pageful. need to FIX */
+
+                if (in_headers && ! display_mime_header_asis) { 
+                    char header_name[80];
+                    size_t header_name_len;
+                    header_name_len = strstr(buf2,": ")-buf2;
+                    strncpy(header_name,buf2,header_name_len);
+                    header_name[header_name_len]='\0';
+                    match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
+                    strcpy(buf2+header_name_len+2,buf3);
+                }
 
 		if (!strcmp (buf2, "-- "))
 			below_sig = TRUE;			/* begin of signature */

@@ -734,7 +734,7 @@ void
 collate_subjects(void)
 {
 	int i, j, art;
-	int *aptr;
+	struct t_hashnode *h;
 
 	/*
  	 * Run through the root messages of each thread. We have to traverse
@@ -751,9 +751,9 @@ collate_subjects(void)
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = (int *)arts[i].subject - 2; /* arghh - see also art.c line 405*/
+		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *));
 
-		j = *aptr;
+		j = h->aptr;
 
 		if (j != -1 && j < i) {
 
@@ -778,7 +778,7 @@ collate_subjects(void)
 		 * Update the magic marker with the highest numbered msg in
 		 * arts[] that has been used in this thread so far
 		 */
-		*aptr = i;
+		h->aptr = i;
 	}
 
 	return;

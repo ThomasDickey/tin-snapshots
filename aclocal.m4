@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 12.03.97
+dnl Updated   : 17.03.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -232,6 +232,20 @@ CF_CHECK_1_DECL(${ac_func}, ${ac_tr_func})dnl
 done
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check if the compiler allows nested parameter lists (some don't)
+AC_DEFUN([CF_CHECK_NESTED_PARAMS],
+[
+AC_MSG_CHECKING([if nested parameters work])
+AC_CACHE_VAL(cf_cv_nested_params,[
+	AC_TRY_COMPILE([],
+	[extern void (*sigdisp(int sig, void (*func)(int sig)))(int sig)],
+	[cf_cv_nested_params=yes],
+	[cf_cv_nested_params=no])
+])
+AC_MSG_RESULT($cf_cv_nested_params)
+test $cf_cv_nested_params = yes && AC_DEFINE(HAVE_NESTED_PARAMS)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check if the compiler uses 'void *' for qsort's compare function parameters
 dnl (i.e., it's an ANSI prototype).
 AC_DEFUN([CF_COMPTYPE],
@@ -320,6 +334,74 @@ AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
+dnl machines) have a non-working 'fork()' entrypoint.
+AC_DEFUN([CF_FUNC_FORK],
+[AC_MSG_CHECKING([for fork])
+AC_CACHE_VAL(cf_cv_func_fork,[
+AC_TRY_RUN([
+int main()
+{
+	if (fork() < 0)
+		exit(1);
+	exit(0);
+}],	[cf_cv_func_fork=yes],
+	[cf_cv_func_fork=no],
+	[cf_cv_func_fork=unknown])
+])dnl
+AC_MSG_RESULT($cf_cv_func_fork)
+test $cf_cv_func_fork = yes && AC_DEFINE(HAVE_FORK)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check if the 'system()' function returns a usable status, or if not, try
+dnl to use the status returned by a SIGCHLD.
+AC_DEFUN([CF_FUNC_SYSTEM],
+[
+AC_MSG_CHECKING(if the system function returns usable child-status)
+AC_CACHE_VAL(cf_cv_system_status,[
+	AC_TRY_RUN([
+	int main() { exit(system("exit 23") != (23 << 8)); }
+	],
+	[cf_cv_system_status=yes],[
+	AC_TRY_RUN([
+#include <stdio.h>
+#include <signal.h>
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif
+
+RETSIGTYPE signal_handler (int sig)
+{
+#if HAVE_TYPE_UNIONWAIT
+	union wait wait_status;
+#else
+	int wait_status = 1;
+#endif
+	int system_status;
+	wait (&wait_status);
+	system_status = WEXITSTATUS(wait_status); /* should be nonzero */
+	exit(system_status == 0);
+}
+
+int main()
+{
+	/* this looks weird, but apparently the SIGCHLD gets there first on
+	 * machines where 'system()' doesn't return a usable code, so ...
+	 */
+	signal (SIGCHLD, signal_handler);
+	system("exit 23");
+	exit(1);
+}
+],
+	[cf_cv_system_status=no],
+	[cf_cv_system_status=unknown],
+	[cf_cv_system_status=unknown])],
+	[cf_cv_system_status=unknown])
+])
+AC_MSG_RESULT($cf_cv_system_status)
+test $cf_cv_system_status = no && AC_DEFINE(USE_SYSTEM_STATUS)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check if the compiler supports useful warning options.  There's a few that
 dnl we don't use, simply because they're too noisy:
 dnl
@@ -365,25 +447,6 @@ EOF
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
-dnl machines) have a non-working 'fork()' entrypoint.
-AC_DEFUN([CF_FUNC_FORK],
-[AC_MSG_CHECKING([for fork])
-AC_CACHE_VAL(cf_cv_func_fork,[
-AC_TRY_RUN([
-int main()
-{
-	if (fork() < 0)
-		exit(1);
-	exit(0);
-}],	[cf_cv_func_fork=yes],
-	[cf_cv_func_fork=no],
-	[cf_cv_func_fork=unknown])
-])dnl
-AC_MSG_RESULT($cf_cv_func_fork)
-test $cf_cv_func_fork = yes && AC_DEFINE(HAVE_FORK)
-])dnl
-dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
 dnl options to lower-levels.  It's very useful for "make -n" -- if we have it.
 dnl (GNU 'make' does both :-)
@@ -414,19 +477,29 @@ AC_DEFUN([CF_MSG_LOG],
 echo "(line __oline__) testing $* ..." 1>&5
 )dnl
 dnl ---------------------------------------------------------------------------
-dnl Check if the compiler allows nested parameter lists (some don't)
-AC_DEFUN([CF_CHECK_NESTED_PARAMS],
+dnl See if sum can take -r
+AC_DEFUN([CF_PROG_SUM_R],
 [
-AC_MSG_CHECKING([if nested parameters work])
-AC_CACHE_VAL(cf_cv_nested_params,[
-	AC_TRY_COMPILE([],
-	[extern void (*sigdisp(int sig, void (*func)(int sig)))(int sig)],
-	[cf_cv_nested_params=yes],
-	[cf_cv_nested_params=no])
+if test $ac_cv_path_PATH_SUM
+then
+AC_MSG_CHECKING([if $ac_cv_path_PATH_SUM takes -r])
+AC_CACHE_VAL(ac_cv_prog_sum_r,[
+if AC_TRY_COMMAND($ac_cv_path_PATH_SUM -r config.log 1>&AC_FD_CC)
+then
+	ac_cv_prog_sum_r=yes
+else
+	ac_cv_prog_sum_r=no
+fi
 ])
-AC_MSG_RESULT($cf_cv_nested_params)
-test $cf_cv_nested_params = yes && AC_DEFINE(HAVE_NESTED_PARAMS)
-])dnl
+if test $ac_cv_prog_sum_r = yes; then
+	AC_DEFINE(SUM_TAKES_DASH_R)
+	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM -r")
+else
+	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM")
+fi
+AC_MSG_RESULT($ac_cv_prog_sum_r)
+fi
+])
 dnl ---------------------------------------------------------------------------
 dnl Check for the functions that set effective/real uid/gid.  This has to
 dnl follow the AC_CHECK_FUNCS call.
@@ -825,27 +898,3 @@ esac
 $3="$withval"
 AC_DEFINE_UNQUOTED($3,"$withval")dnl
 ])dnl
-dnl ---------------------------------------------------------------------------
-dnl See if sum can take -r
-AC_DEFUN([CF_PROG_SUM_R],
-[
-if test $ac_cv_path_PATH_SUM
-then
-AC_MSG_CHECKING([if $ac_cv_path_PATH_SUM takes -r])
-AC_CACHE_VAL(ac_cv_prog_sum_r,[
-if AC_TRY_COMMAND($ac_cv_path_PATH_SUM -r config.log 1>&AC_FD_CC)
-then
-	ac_cv_prog_sum_r=yes
-else
-	ac_cv_prog_sum_r=no
-fi
-])
-if test $ac_cv_prog_sum_r = yes; then
-	AC_DEFINE(SUM_TAKES_DASH_R)
-	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM -r")
-else
-	AC_DEFINE_UNQUOTED(PATH_SUM_R, "$ac_cv_path_PATH_SUM")
-fi
-AC_MSG_RESULT($ac_cv_prog_sum_r)
-fi
-])

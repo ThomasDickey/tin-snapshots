@@ -97,8 +97,12 @@ char txt_help_bug_report[LEN];	/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
 
-char domain_name[256]="";
-char host_name[256]="";
+#ifndef MAXHOSTNAMELEN
+#	define MAXHOSTNAMELEN 255
+#endif
+
+char domain_name[MAXHOSTNAMELEN+2]="";
+char host_name[MAXHOSTNAMELEN+2]="";
 
 #ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
@@ -149,6 +153,7 @@ int real_uid;
 int real_umask;
 int reread_active_file_secs;		/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
+int strip_bogus=BOGUS_KEEP;
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
 int tin_gid;
@@ -210,7 +215,7 @@ t_bool default_filter_select_expire;
 t_bool default_filter_select_global;
 t_bool default_show_only_unread;	/* show only new/unread arts or all arts */
 t_bool delete_index_file;		/* delete index file before indexing (tind only) */
-t_bool display_rfc1522_header_undecoded=FALSE;	/* rfc 1522 header will be decoded by default */
+t_bool display_mime_header_asis=FALSE;	/* rfc 1522 header will be decoded by default */
 t_bool draw_arrow_mark;			/* draw -> or highlighted bar */
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
 t_bool full_page_scroll;		/* page half/full screen of articles/groups */
@@ -286,15 +291,28 @@ void init_selfinfo (void)
 	FILE *fp;
 	struct stat sb;
 
-	get_host_name(host_name);
-	get_domain_name(domain_name);
+#ifndef M_AMIGA
+#	ifdef HAVE_SYS_UTSNAME_H
+	if (uname(&system_info) < 0) {
+		strcpy(system_info.sysname, "unknown");
+		*system_info.machine = '\0';
+		*system_info.release = '\0';
+	}
+#	endif /* HAVE_SYS_UTSNAME_H */
+#endif /* M_AMIGA */
+
+	strcpy (host_name, get_host_name());
+
+#ifdef DOMAIN_NAME
+	strcpy (domain_name, get_domain_name());
+#endif /* DOMAIN_NAME */
 
 #ifdef HAVE_GETHOSTBYNAME
 	if (! *domain_name) {
 		/* no domain-name defined get fqdn instead */
 		strcpy(domain_name, get_fqdn(host_name));
 	}
-#endif
+#endif /* HAVE_GETHOSTBYNAME */
 	
 	if (! *domain_name) {
 		error_message ("Can't get a (full-qualified) domain-name!\n", "");
@@ -311,15 +329,6 @@ void init_selfinfo (void)
 	tin_gid = getegid ();
 	real_uid = getuid ();
 	real_gid = getgid ();
-
-#ifdef HAVE_SYS_UTSNAME_H
-	if (uname(&system_info) < 0) {
-		strcpy(system_info.sysname, "unknown");
-		*system_info.machine = '\0';
-		*system_info.release = '\0';
-	}
-#endif /* HAVE_SYS_UTSNAME_H */
-
 	real_umask = umask (0);
 	umask (real_umask);
 #endif	/* M_AMIGA */
@@ -440,7 +449,7 @@ void init_selfinfo (void)
 	default_sort_art_type = SORT_BY_DATE_ASCEND;
 	default_thread_arts = THREAD_MAX;
 	delete_index_file = FALSE;
-	display_rfc1522_header_undecoded=FALSE;
+        display_mime_header_asis=FALSE;
 	force_screen_redraw = FALSE;
 	full_page_scroll = TRUE;
 	group_catchup_on_exit = TRUE;

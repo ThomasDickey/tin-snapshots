@@ -44,7 +44,7 @@ check_upgrade(
 		my_fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
 		my_fprintf(stderr, "Some values in your configuration file have changed\n");
 		my_fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
-		my_fprintf(stderr, txt_cmdline_hit_any_key);
+		my_fprintf(stderr, txt_return_key);
 		ReadCh();
 		return(UPGRADE);
 	}
@@ -311,7 +311,7 @@ read_config_file (
 			if (match_string (buf, "default_shell_command=", default_shell_command, sizeof (default_shell_command))) {
 				break;
 			}
-			if (match_boolean (buf, "display_rfc1522_header_undecoded=", &display_rfc1522_header_undecoded)) {
+			if (match_boolean (buf, "display_mime_header_asis=", &display_mime_header_asis)) {
 				break;
 			}
 			if (match_boolean (buf, "draw_arrow=", &draw_arrow_mark)) {
@@ -496,6 +496,9 @@ read_config_file (
 				break;
 			}
 			if (match_boolean (buf, "strip_blanks=", &strip_blanks)) {
+				break;
+			}
+			if (match_integer (buf, "strip_bogus=", &strip_bogus, BOGUS_ASK)) {
 				break;
 			}
 			if (match_boolean (buf, "strip_newsrc=", &strip_newsrc)) {
@@ -933,8 +936,8 @@ write_config_file (
 	fprintf (fp, txt_tinrc_mail_8bit_header);
 	fprintf (fp, "mail_8bit_header=%s\n\n", print_boolean(mail_8bit_header));
 
-	fprintf (fp, txt_tinrc_display_rfc1522_header_undecoded);
-	fprintf (fp, "display_rfc1522_header_undecoded=%s\n\n", print_boolean(display_rfc1522_header_undecoded));
+	fprintf (fp, txt_tinrc_display_mime_header_asis);
+	fprintf (fp, "display_mime_header_asis=%s\n\n", print_boolean(display_mime_header_asis));
 
 #ifdef HAVE_METAMAIL
  	fprintf (fp, txt_tinrc_use_metamail);
@@ -953,6 +956,8 @@ write_config_file (
 	fprintf (fp, "alternative_handling=%s\n\n", print_boolean (alternative_handling));
  	fprintf (fp, txt_tinrc_strip_newsrc);
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
+ 	fprintf (fp, txt_tinrc_strip_bogus);
+	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
 
 	fprintf (fp, txt_tinrc_filter);
 	fprintf (fp, "default_filter_kill_header=%d\n", default_filter_kill_header);
@@ -1368,6 +1373,7 @@ change_config_file (
 								print_option (OPT_POST_8BIT_HEADER);
 							}
 							break;
+                                                   
 
 						/* show newsgroup description text next to newsgroups */
 						case OPT_SHOW_DESCRIPTION:
@@ -1404,6 +1410,7 @@ change_config_file (
 						 * case OPT_TAB_GOTO_NEXT_UNREAD:	case OPT_THREAD_CATCHUP_ON_EXIT:
 						 * case OPT_UNLINK_ARTICLE:		case OPT_USE_BUILTIN_INEWS:
 						 * case OPT_USE_MAILREADER_I:		case OPT_USE_MOUSE:
+                                                 * case OPT_DISPLAY_MIME_HEADER_ASIS:
 #ifdef HAVE_KEYPAD
 						 * case OPT_USE_KEYPAD:
 #endif

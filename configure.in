@@ -297,6 +297,7 @@ CF_ARG_DISABLE(etiquette,
 	[AC_DEFINE(NO_ETIQUETTE)])
 AC_MSG_RESULT($enableval)
 
+
 AC_MSG_CHECKING(whether to strictly observe RFC1522 and break long lines)
 CF_ARG_ENABLE(break-long-lines,
   	[  --enable-break-long-lines
@@ -638,15 +639,7 @@ CF_TM_GMTOFF
 
 AC_SYS_LONG_FILE_NAMES
 CF_SIG_ARGS
-
-
-AC_MSG_CHECKING(wether to use system_status)
-AC_TRY_COMPILE([], [int i = system_status;],
-	AC_MSG_RESULT(yes)
-	AC_DEFINE(USE_SYSTEM_STATUS),
-	AC_MSG_RESULT(no)
-)
-
+CF_FUNC_SYSTEM
 
 # GCC and Apollo compilers are quite noisy about signal constants (quiet them).
 if test -n "$GCC"; then

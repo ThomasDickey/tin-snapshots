@@ -386,7 +386,7 @@ thread_by_subject(void)
 {
 	register int i;		/* gcc, at least, will ignore 'register' as */
 	register int j;		/* it can do a better job itself */
-	int *aptr;
+	struct t_hashnode *h;
 
 	for (i = 0; i < top; i++) {
 
@@ -396,17 +396,9 @@ thread_by_subject(void)
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
+		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *));
 
-		/* 
-		 * Yehova: casting char * to int *
-		 * FIXME!! 
-		 * I think this can be fixed by declaring t_hashnode to properly
-		 * include these 'hidden' fields. See hashstr.c
-		 */
-		aptr = (int *)arts[i].subject;
-		aptr -=2;
-
-		j = *aptr;
+		j = h->aptr;
 
 		if (j != -1 && j < i) {
 
@@ -426,7 +418,7 @@ thread_by_subject(void)
 		 * Update the magic marker with the highest numbered msg in
 		 * arts[] that has been used in this thread so far
 		 */
-		*aptr = i;
+		h->aptr = i;
 	}
 }
 
