@@ -1,7 +1,27 @@
+--unoff BETA release 960817 --
+
+153) Jungshik Shin <jshin@pantheon.yale.edu>
+     Dirk Nimmich <nimmich@uni-muenster.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. Output of long lines in options menu did not stop at end of line
+          when using expand_rel_abs_pathname().
+     ADD. post/mail_8bit_header and mm_charset to options menue
+     ADD. iKeyQuit ('q') and iKeyQuit2 (ESC) now defined and used as
+          general quit keys.
+     ADD. make intsall* in toplevel makefile no compiles source if needed
+     FIX. several patches
+
 --unoff BETA release 960815 --
 
 152) Jungshik Shin <jshin@pantheon.yale.edu>
-     ADD. rfc1557 support
+     ADD. rfc1557 support:
+          7bit encoding for post_mime_encoding and mail_mime_encoding.
+          If mm_charset is one of CJK charset, 7bit means the body is to be
+          encoded in ISO-2022-JP/KR/CN (RFC1468/1557/1922).
+          ISO-2022-JP/CN/CN-ext is not yet supported.
+     ADD. mm_charset to tinrc to override $MM_CHARSET or compiletime defualt
+          post_8bit_header : on/off option
+          mail_8bit_header : on/off option
      FIX. several supplied patches
 
 151) Dirk Nimmich <nimmich@uni-muenster.de>

@@ -778,8 +778,8 @@ quick_post_article ()
 				break;
 			}
 
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -998,8 +998,8 @@ post_article (group, posted_flag)
 				break;
 			}
 
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -1292,8 +1292,8 @@ post_response (group, respnum, copy_text)
 		switch (ch) {
 		case iKeyPostPost:
 			goto ignore_followup_to_poster;
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			return ret_code;
 		}
 		{
@@ -1465,8 +1465,8 @@ ignore_followup_to_poster:
 				break;
 			}
 
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
@@ -1660,7 +1660,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	fclose (fp);
 
 	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
-		ch = iKeyPostQuit;
+		ch = iKeyQuit2;
 		redraw_screen = TRUE;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
 		my_strncpy (mail_to, address, sizeof (mail_to));
@@ -1698,8 +1698,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				break;
 #endif
 
-			case iKeyPostQuit:
-			case iKeyPostQuit2:
+			case iKeyQuit:
+			case iKeyQuit2:
 				unlink (nam);
 				clear_message ();
 				*mailed_ok = FALSE;
@@ -1788,7 +1788,7 @@ mail_bug_report ()
 		}
 		msg_add_x_headers (msg_headers_file);
 	}
-	
+
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
 	msg_free_headers ();
@@ -1874,7 +1874,7 @@ mail_bug_report ()
 	fclose (fp);
 
 	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
-		ch = iKeyPostQuit;
+		ch = iKeyQuit2;
 		sprintf (subject, "BUG REPORT %s", page_header);
 		sprintf (mail_to, "%s%s", bug_addr, add_addr);
 		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
@@ -1883,7 +1883,7 @@ mail_bug_report ()
 	} else {
 		ch = iKeyPostEdit;
 	}
-	
+
 	forever {
 		switch (ch) {
 			case iKeyPostEdit:
@@ -1902,8 +1902,8 @@ mail_bug_report ()
 				break;
 #endif
 
-			case iKeyPostQuit:
-			case iKeyPostQuit2:
+			case iKeyQuit:
+			case iKeyQuit2:
 				unlink (nam);
 				clear_message ();
 				return TRUE;
@@ -2040,7 +2040,7 @@ mail_to_author (group, respnum, copy_text)
 	fclose (fp);
 
 	if( use_mailreader_i ) {	/* user wants to use his own mailreader for reply */
-		ch = iKeyPostQuit;
+		ch = iKeyQuit2;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
 		my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
@@ -2072,8 +2072,8 @@ mail_to_author (group, respnum, copy_text)
 			break;
 #endif
 
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
+		case iKeyQuit:
+		case iKeyQuit2:
 			unlink (nam);
 			clear_message ();
 			return redraw_screen;
@@ -2163,7 +2163,7 @@ pcCopyArtHeader (iHeader, pcArt, result)
 		  }
 		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), fp);
 		}
-		
+
 		switch (iHeader) {
 			case HEADER_TO:
 				if (STRNCMPEQ(buf, "To: ", 4) || STRNCMPEQ(buf, "Cc: ", 4)) {
@@ -2422,8 +2422,8 @@ delete_article (group, art, respnum)
 					break;
 				}
 
-			case iKeyPostQuit:
-			case iKeyPostQuit2:
+			case iKeyQuit:
+			case iKeyQuit2:
 				unlink (delete);
 				clear_message ();
 				return redraw_screen;
@@ -2592,7 +2592,7 @@ repost_article (group, art, respnum, supersede)
 			msg_add_header ("Distribution", my_distribution);
 		}
 	}
-  	
+
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
 	msg_free_headers ();
@@ -2616,7 +2616,7 @@ repost_article (group, art, respnum, supersede)
 
 	msg_write_signature (fp, FALSE);
 	fclose (fp);
-	
+
 	/* on supersede change default-key */
 #ifndef FORGERY
 	if (supersede && (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))))
@@ -2654,8 +2654,8 @@ repost_article (group, art, respnum, supersede)
 			break;
 #endif
 
- 		case iKeyPostQuit:
- 		case iKeyPostQuit2:
+ 		case iKeyQuit:
+ 		case iKeyQuit2:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();

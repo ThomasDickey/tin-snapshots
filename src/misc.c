@@ -50,7 +50,7 @@ append_file (old_filename, new_filename)
 	fclose (fp_old);
  	fclose (fp_new);
 }
-#endif  /* M_UNIX */	
+#endif  /* M_UNIX */
 
 void
 asfail (file, line, cond)
@@ -217,7 +217,7 @@ get_val (env, def)
 	char *ptr;
 
 	ptr = getenv(env);
-	
+
 	return (ptr != (char *) 0 ? ptr : def);
 }
 
@@ -250,7 +250,7 @@ invoke_editor (filename, lineno)
 	} else {
 		strcpy (editor_format, EDITOR_FORMAT_OFF);
 	}
-	
+
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
 
 	if (! retcode) {
@@ -307,7 +307,7 @@ shell_escape ()
 #endif
 
 	sprintf (msg, txt_shell_escape, default_shell_command);
-	
+
 	if (! prompt_string (msg, shell))
 		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
 
@@ -331,7 +331,7 @@ shell_escape ()
 	MoveCursor (INDEX_TOP, 0);
 
 	set_alarm_clock_off ();
-	
+
 	EndWin ();
 	Raw (FALSE);
 
@@ -446,7 +446,7 @@ void
 strip_double_ngs (ngs_list)
 	char *ngs_list;
 {
-	
+
 	char	ngroup1[HEADER_LEN];	/* outer newsgroup to compare       */
 	char	ngroup2[HEADER_LEN];	/* inner newsgroup to compare       */
 	char	cmplist[HEADER_LEN];	/* last loops output                */
@@ -461,36 +461,36 @@ strip_double_ngs (ngs_list)
 
 	/* shortcut, if the is only 1 group */
 	if (strchr(ngs_list, ',') != (char *) 0) {
-	
-	    	over1 = FALSE;
-	    	ncnt1 = 0;
-	    	strcpy(newlist, ngs_list);	/* make a "working copy"            */
-	    	ptr = newlist;			/* the next outer newsg. is the 1st */
-	    	
-	    	while (! over1) {
-	    		ncnt1++;			/* inc. outer counter */
-	    		strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
-	    		ptr2 = strchr(ptr, ',');	/* search "," ...                  */
-	    		if (ptr2 != (char *) 0) {       /* if found ...                    */
-	    			*ptr2 = '\0';
-	    			strcpy(ngroup1, ptr);   /* chop off first outer newsgroup  */
-	    			ptr = ptr2 + 1;		/* pointer points to next newsgr.  */
-	    		} else {			/* ... if not: last group          */
-	    			over1 = TRUE;		/* wow, everything is done after . */
-	    			strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
-	    		}
-	
+
+		over1 = FALSE;
+		ncnt1 = 0;
+		strcpy(newlist, ngs_list);	/* make a "working copy"            */
+		ptr = newlist;			/* the next outer newsg. is the 1st */
+
+		while (! over1) {
+			ncnt1++;			/* inc. outer counter */
+			strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
+			ptr2 = strchr(ptr, ',');	/* search "," ...                  */
+			if (ptr2 != (char *) 0) {       /* if found ...                    */
+				*ptr2 = '\0';
+				strcpy(ngroup1, ptr);   /* chop off first outer newsgroup  */
+				ptr = ptr2 + 1;		/* pointer points to next newsgr.  */
+			} else {			/* ... if not: last group          */
+				over1 = TRUE;		/* wow, everything is done after . */
+				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
+			}
+
 /*			printf("1[%d]: %s\n", ncnt1, ngroup1); */ /* debug */
-	    		
-	    		over2 = FALSE;
-	    		ncnt2 = 0;
-	
+
+			over2 = FALSE;
+			ncnt2 = 0;
+
 	    		/* now compare with each inner newsgroup on the list,
 	    	         * which is behind the momentary outer newsgroup
 	    	         * if it is different from the outer newsgroup, append
 	    	         * to list, strip double-commas
 	    	         */
-	    				
+
 	    		while (! over2) {
 	    			ncnt2++;
 	    			strcpy(ngroup2, cmplist);
@@ -502,17 +502,17 @@ strip_double_ngs (ngs_list)
 	    			} else {
 	    				over2 = TRUE;
 	    			}
-    			
+
 	    			if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
     					&& (strlen(ngroup2) != 0)) {
 	    					strcat(newlist, ",");
-    						strcat(newlist, ngroup2);		
+    						strcat(newlist, ngroup2);
     				}
     			}
     		}
-    	
+
  	   	strcpy(ngs_list, newlist);	/* move string to its real location */
-	}		
+	}
 }
 
 
@@ -1689,7 +1689,7 @@ strfquote (group, respnum, s, maxsize, format)
 				case 'G':	/* Groupname of Article */
 					strcpy (tbuf, group);
 					break;
-				case 'I':	/* Initials of author */ 	
+				case 'I':	/* Initials of author */
 					if (arts[respnum].name != (char *) 0) {
 						strcpy (tbuf, arts[respnum].name);
 					} else {
@@ -1703,7 +1703,7 @@ strfquote (group, respnum, s, maxsize, format)
 							iflag = 0;
 						}
 						if (strchr(" ._@", tbuf[i])) iflag = 1;
-					}	
+					}
 					tbuf[j] = '\0';  
 					break;
 				case 'M':	/* Articles MessageId */
@@ -2248,9 +2248,9 @@ get_initials (respnum, s, maxsize)
 			iflag = 0;
 		}
 		if (strchr(" ._@", tbuf[i])) iflag = 1;
-	}	
+	}
 	s[j] = '\0';  
-	
+
 	return 0;
 }
 

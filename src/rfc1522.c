@@ -57,8 +57,7 @@
 #define NOT_RANKED 255
 
 /* char mm_charset[128] = ""; */
-/* make it configurable in tinrc. move it to init.c 
-   Jungshik Shin */ 
+/* make it configurable in tinrc. move it to init.c  */
 const char base64_alphabet[64] =
 {
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -582,7 +581,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	while (fgets (buffer, 2048, f)) {
 		if (header[0]
 		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
-                        if ( allow_8bit_header )     /* J. Shin */
+                        if ( allow_8bit_header )    
                            fputs(header,g);
                         else 
 			   fputs (rfc1522_encode (header), g);
@@ -629,7 +628,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 		fputs ("MIME-Version: 1.0\n", f);
 		if (body_encoding_needed) {
 
-/* added for EUC-KR/JP/CN by Jungshik Shin  */
+/* added for CJK charsets like EUC-KR/JP/CN and others */
 
                         if ( !strncasecmp(mm_charset,"euc-",4) && 
                              !strcasecmp(mime_encoding,"7bit") ) 
@@ -656,14 +655,19 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	if (!body_encoding_needed)
 		encoding = '8';
 
-/* added for EUC-KR/JP/CN by Jungshik Shin  */
+/* added for CJK charsets like EUC-KR/JP/CN and others */
 
 	if (!strcasecmp (mime_encoding, "7bit")) {
           encoding = '7';
+/* For EUC-KR,7bit means ISO-2022-KR encoding specified in RFC 1557 */
           if ( !strcasecmp(mm_charset,"euc-kr") )
              body_encode = (void (*)() ) rfc1557_encode;
+/* Not only  EUC-JP but also other Japanese charsets such as
+SJIS and JIS might need RFC 1468 encoding. To be confirmed.  */
           else if ( !strcasecmp(mm_charset,"euc-jp") )
              body_encode = (void (*)() ) rfc1468_encode;
+/* Not only  EUC-CN but also other Chinese charsets such as
+BIG5 and Traditional  might need RFC 1922 encoding. To be confirmed.  */
           else if ( !strcasecmp(mm_charset,"euc-cn") )
              body_encode = (void (*)() ) rfc1922_encode;
           else {

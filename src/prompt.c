@@ -306,7 +306,6 @@ prompt_option_string (option)
 	}
 	strcpy (option_table[option - 1].variable, p);
 	
-	show_config_page (actual_option_page);	/* quick fix to hide too long lines */
 	set_alarm_clock_on ();
 	
 	return TRUE;

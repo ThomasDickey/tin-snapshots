@@ -503,7 +503,7 @@ submit_news_file (name, lines)
 
 	checknadd_headers (name, lines);
 
-    /* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. J. Shin */
+    /* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
         if ( !strcasecmp(mm_charset,"euc-kr") && ! strcasecmp(post_mime_encoding,"7bit") )
              post_mime_encoding[0] = '8';
 

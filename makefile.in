@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960815
+PVER		= 960817
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -132,6 +132,7 @@ TOP	= \
 
 MISC	= \
 	$(SRCDIR)/Makefile \
+	$(SRCDIR)/proto.sed \
 	$(SRCDIR)/descrip.mms \
   	$(MISCDIR)/scroll.dif
 
@@ -324,6 +325,7 @@ uuencode:
  
 diff:
 	@$(ECHO) "Generating diffs against $(PROJECT)-$(BASE_VER)..."
+	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
 	@$(MAKE) nrfpage
 	@$(MAKE) manifest
 	@$(MAKE) chmod
@@ -380,6 +382,7 @@ ftptar:
 	@$(CP) $(VMS) $(PROJECT)-$(VER)/$(VMSDIR)
 	@$(CP) $(VMSSIO) $(PROJECT)-$(VER)/$(VMSSIODIR)
 	@$(CP) $(SRCDIR)/Makefile $(PROJECT)-$(VER)/$(SRCDIR)
+	@$(CP) $(SRCDIR)/proto.sed $(PROJECT)-$(VER)/$(SRCDIR)
 	@$(CP) $(SRCDIR)/descrip.mms $(PROJECT)-$(VER)/$(SRCDIR)
 	@$(CP) $(MISCDIR)/scroll.dif $(PROJECT)-$(VER)/$(MISCDIR)
 	@$(TAR) cvf $(PROJECT)-$(VER).tar $(PROJECT)-$(VER)
@@ -426,7 +429,6 @@ print:
 distclean:
 	cd src && make clobber
 	rm -f config.* makefile */Makefile include/autoconf.h
-	make configure
 
 configure: configure.in aclocal.m4
 	autoconf

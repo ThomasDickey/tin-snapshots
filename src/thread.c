@@ -54,7 +54,7 @@ bld_tline (l, art)
 	if (! draw_arrow_mark) {
 		off_subj = 2;
 		off_both = 5;
-	}	
+	}
 
 	if (show_subject) {
 		if (show_author != SHOW_FROM_NONE) {
@@ -72,8 +72,8 @@ bld_tline (l, art)
 		len_from = (max_subj+max_from+off_both) - 8;
 		len_from += 8 * (1 - show_lines);
 		spaces = "";
-	}	
-	
+	}
+
 	j = INDEX2TNUM(l);
 
 	if (art->tagged) {
@@ -90,11 +90,11 @@ bld_tline (l, art)
 		}
 		sprintf (new_resps, "  %c", mark);
 	}
-	
+
 	from[0] = '\0';
 	if (!show_subject || show_author != SHOW_FROM_NONE) {
 		get_author (TRUE, art, from);
-	}	
+	}
 
 	if (art->lines != -1) {
 		sprintf (lines, "%-4d", art->lines);
@@ -134,7 +134,7 @@ draw_tline (i, full)
 		s = screen[j].col;
 		tlen = strlen (s);
 		x = 0;
-		if (strip_blanks) {		
+		if (strip_blanks) {
 			strip_line (s, tlen);
 			tlen = strlen (s);	/* note new line length */
 			CleartoEOLN ();
@@ -255,7 +255,7 @@ show_thread (group, group_path, respnum)
 						} else {
 							goto thread_done;
 						}
-					
+
 					case KEYMAP_RIGHT:
 						goto thread_read_article;
 
@@ -267,7 +267,7 @@ show_thread (group, group_path, respnum)
 
 					case KEYMAP_HOME:
 						goto top_of_thread;
-					
+
 					case KEYMAP_END:
 						goto end_of_thread;
 
@@ -327,7 +327,7 @@ top_of_thread:
 				break;
 
 			case iKeyThreadLastPage:	/* show last page of articles */
-end_of_thread:			
+end_of_thread:
 				if (thread_index_point < top_thread - 1) {
 					if (top_thread > last_thread_on_screen) {
 						erase_thread_arrow ();
@@ -340,7 +340,7 @@ end_of_thread:
 					}
 				}
 				break;
-				
+
 			case iKeyThreadSetRange:	/* set range */
 				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point)) {
 					show_thread_page ();
@@ -394,7 +394,7 @@ thread_tab_pressed:
 					goto thread_done;
 				}
 				break;
-	
+
 			case iKeyThreadPageDown:		/* page down */
 			case iKeyThreadPageDown2:
 			case iKeyThreadPageDown3:
@@ -551,7 +551,7 @@ thread_catchup:
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
 				goto thread_down;
-				
+
 			case iKeyThreadToggleSubjDisplay:	/* toggle display of subject & subj/author */
 				if (show_subject) {
 					toggle_subject_from ();
@@ -559,7 +559,7 @@ thread_catchup:
 				}
 				break;
 
-#ifdef HAVE_REF_THREADING				
+#ifdef HAVE_REF_THREADING
 case 'a':	/* Very dirty temp. hack - Show threaded tree */
 {
 	char tmp[3];
@@ -593,7 +593,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 	break;
 }
 #endif
-			case iKeyThreadHelp:	/* help */
+			case iKeyThreadHelp:			/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();
 				break;
@@ -617,14 +617,14 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 				break;
 #endif
 
-			case iKeyThreadQuit:	/* return to previous level */
+			case iKeyQuit:				/* return to previous level */
 				goto thread_done;
 
-			case iKeyThreadQuitTin:	/* quit */
+			case iKeyThreadQuitTin:			/* quit */
 				ret_code = GRP_QUIT;
 				goto thread_done;
 
- 			case iKeyThreadTag:	/* tag/untag art for mailing/piping/printing/saving */
+ 			case iKeyThreadTag:			/* tag/untag art for mailing/piping/printing/saving */
 				n = choose_response (thread_basenote, thread_index_point);
 
  				if (n < 0)
@@ -645,17 +645,17 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 				draw_thread_arrow ();
 				break;
 
-			case iKeyThreadBugReport:	/* bug/gripe/comment mailed to author */
+			case iKeyThreadBugReport:		/* bug/gripe/comment mailed to author */
 				mail_bug_report ();
 				ClearScreen ();
 				show_thread_page ();
 				break;
 
-			case iKeyThreadVersion:	/* version */
+			case iKeyThreadVersion:			/* version */
 				info_message (cvers);
 				break;
 
-			case iKeyThreadMarkArtUnread:	/* mark article as unread */
+			case iKeyThreadMarkArtUnread:		/* mark article as unread */
 				n = choose_response (thread_basenote, thread_index_point);
 				art_mark_will_return (group, &arts[n]); /*art_mark_unread (group, &arts[n]);*/
 				bld_tline (thread_index_point, &arts[n]);
@@ -664,14 +664,14 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 				draw_thread_arrow ();
 				break;
 
-			case iKeyThreadMarkThdUnread:	/* mark thread as unread */
+			case iKeyThreadMarkThdUnread:		/* mark thread as unread */
 				thd_mark_unread (group, base[thread_basenote]);
 				update_thread_page ();
 				info_message (txt_thread_marked_as_unread);
 				break;
-				
-			case iKeyThreadMarkArtSel:	/* mark article as selected */
-			case iKeyThreadToggleArtSel:	/* toggle article as selected */
+
+			case iKeyThreadMarkArtSel:		/* mark article as selected */
+			case iKeyThreadToggleArtSel:		/* toggle article as selected */
 				n = choose_response (thread_basenote, thread_index_point);
 
 				if (n < 0)
@@ -694,14 +694,14 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 #endif
 				break;
 
-			case iKeyThreadReverseSel:	/* reverse selections */
+			case iKeyThreadReverseSel:		/* reverse selections */
 				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread) {
 					arts[i].selected = (arts[i].selected ? 0 : 1);
 				}
 				update_thread_page ();
 				break;
 
-			case iKeyThreadUndoSel:	/* undo selections */
+			case iKeyThreadUndoSel:			/* undo selections */
 				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread) {
 					arts[i].selected = 0;
 				}
@@ -711,7 +711,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 			case iKeyThreadDisplaySubject:
 				info_message(arts[(choose_response (thread_basenote, thread_index_point))].subject);
 				break;
-				
+
 			default:
 			    info_message (txt_bad_command);
 		}
@@ -736,7 +736,7 @@ show_thread_page ()
 	static int the_index = 0;
 
 	set_signals_thread ();
-	
+
 	ClearScreen ();
 
 	if (thread_index_point > top_thread - 1) {
@@ -791,7 +791,7 @@ show_thread_page ()
 		draw_tline (i, TRUE);
 		if ((the_index = next_response (the_index)) == -1) {
 			break;
-		}	
+		}
 	}
 
 	CleartoEOS ();
@@ -821,7 +821,7 @@ update_thread_page ()
 		draw_tline (i, FALSE);
 		if ((the_index = next_response (the_index)) == -1) {
 			break;
-		}	
+		}
 	}
 
 	draw_thread_arrow();
@@ -908,7 +908,7 @@ new_responses (thread)
 			sum++;
 		}
 	}
-	
+
 	return sum;
 }
 
@@ -1075,13 +1075,13 @@ next_response (n)
 	if (arts[n].thread >= 0) {
 		return arts[n].thread;
 	}
-	
+
 	i = which_thread (n) + 1;
 
 	if (i >= top_base) {
 		return -1;
 	}
-	
+
 	return (int) base[i];
 }
 
@@ -1158,7 +1158,7 @@ next_unread (n)
 	int n;
 {
 	int cur_base_art = n;
-	
+
 	while (n >= 0) {
 		if ((arts[n].status == ART_UNREAD 
 		     /* || arts[n].status == ART_WILL_RETURN */ ) 
@@ -1177,7 +1177,7 @@ next_unread (n)
 		}
 		n = next_response (n);
 	}
-	
+
 	return -1;
 }
 

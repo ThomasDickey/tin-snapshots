@@ -15,6 +15,7 @@
 /* general keys */
 
 #define iKeyQuit 'q'
+#define iKeyQuit2 ESC
 
 /* active.c */
 
@@ -37,21 +38,17 @@
 
 /* feed.c */
 
-#define iKeyFeedQuit ESC
 #define iKeyFeedTag 'T'
 #define iKeyFeedArt 'a'
 #define iKeyFeedHot 'h'
 #define iKeyFeedPat 'p'
-#define iKeyFeedQuit2 'q'
 #define iKeyFeedRepost 'r'
 #define iKeyFeedSupersede 's'
 #define iKeyFeedThd 't'
 
 /* filter.c */
 
-#define iKeyFilterQuit ESC
 #define iKeyFilterEdit 'e'
-#define iKeyFilterQuit2 'q'
 #define iKeyFilterSave 's'
 
 /* group.c */
@@ -118,7 +115,6 @@
 #define iKeyGroupNextGroup 'n'
 #define iKeyGroupPrint 'o'
 #define iKeyGroupPrevGroup 'p'
-#define iKeyGroupQuit 'q'
 #define iKeyGroupToggleReadDisplay 'r'
 #define iKeyGroupSave 's'
 #define iKeyGroupTag 't'
@@ -151,7 +147,6 @@
 #define iKeyNrctblCreate 'c'
 #define iKeyNrctblDefault 'd'
 #define iKeyNrctblIgnore 'i'
-#define iKeyNrctblQuit 'q'
 
 /* page.c */
 
@@ -217,7 +212,6 @@
 #define iKeyPageNextArt 'n'
 #define iKeyPagePrint 'o'
 #define iKeyPagePrevArt 'p'
-#define iKeyPageQuit 'q'
 #define iKeyPageReplyQuote 'r'
 #define iKeyPageSave 's'
 #define iKeyPageTag 't'
@@ -229,7 +223,6 @@
 
 /* post.c */
 
-#define iKeyPostQuit ESC
 #define iKeyPostDelete 'd'
 #define iKeyPostEdit 'e'
 #ifdef HAVE_PGP
@@ -239,7 +232,6 @@
 #	define iKeyPostIspell 'i'
 #endif
 #define iKeyPostPost 'p'
-#define iKeyPostQuit2 'q'
 #define iKeyPostSend 's'
 #define iKeyPostSupersede 's'
 
@@ -307,7 +299,6 @@
 #define iKeySelectUp2 'k'
 #define iKeySelectMoveGrp 'm'
 #define iKeySelectEnterNextUnreadGrp2 'n'
-#define iKeySelectQuit 'q'
 #define iKeySelectToggleReadDisplay 'r'
 #define iKeySelectSubscribe 's'
 #define iKeySelectUnsubscribe 'u'
@@ -354,7 +345,6 @@
 #define iKeyThreadDisplaySubject 'i'
 #define iKeyThreadDown2 'j'
 #define iKeyThreadUp2 'k'
-#define iKeyThreadQuit 'q'
 #define iKeyThreadTag 't'
 #define iKeyThreadVersion 'v'
 #define iKeyThreadMarkArtUnread 'z'

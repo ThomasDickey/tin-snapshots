@@ -208,7 +208,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 						sprintf(msg, "%s", txt_warn_difficulties);
 						wait_message (msg);
 						return TRUE;
-					case iKeyNrctblQuit:
+					case iKeyQuit:
 						exit(0);
 					case ESC:
 					default:
