@@ -41,7 +41,7 @@ prompt_num (ch, prompt)
 
 	sprintf (msg, "%c", ch);
 
-	if ((p = getline (prompt, TRUE, msg, 0)) != (char *) 0) {
+	if ((p = getline (prompt, TRUE, msg, 0, FALSE)) != (char *) 0) {
 		strcpy (msg, p);
 		num = atoi (msg);
 	} else {
@@ -72,7 +72,7 @@ prompt_string (prompt, buf)
 
 	clear_message ();
 
-	if ((p = getline (prompt, FALSE, (char *) 0, 0)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, (char *) 0, 0, FALSE)) == (char *) 0) {
 		buf[0] = '\0';
 		clear_message ();
 		set_alarm_clock_on ();
@@ -104,7 +104,7 @@ prompt_menu_string (line, col, var)
 
 	MoveCursor (line, col);
 
-	if ((p = getline ("", FALSE, var, 0)) == (char *) 0) {
+	if ((p = getline ("", FALSE, var, 0, FALSE)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -300,7 +300,7 @@ prompt_option_string (option)
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 
-	if ((p = getline (prompt, FALSE, option_table[option - 1].variable, 0)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, option_table[option - 1].variable, 0, FALSE)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
@@ -338,7 +338,7 @@ prompt_option_num (option)
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 	sprintf (&number[0], "%d", *((int *) option_table[option - 1].variable));
 
-	if ((p = getline (prompt, TRUE, number, 0)) == (char *) 0) {
+	if ((p = getline (prompt, TRUE, number, 0, FALSE)) == (char *) 0) {
 		return FALSE;
 	}
 	strcpy (number, p);
@@ -379,7 +379,7 @@ prompt_option_char (option)
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 
-	if ((p = getline (prompt, FALSE, p, 1)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, p, 1, FALSE)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}

@@ -1,4 +1,12 @@
---unoff BETA release 961021 --
+--unoff BETA release 961024 --
+
+204) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. No authentication upon request from server
+     BUG. attributes file trashed on a bad write (see 026)
+     ADD. Fall back on console input if no .newsauth is present
+     FIX. several supplied patches
+
+--unoff BETA release 961022 --
 
 203) Roland Rosenfeld <roland@spinnaker.rhein.de>
      ADD. References:-header (In-Reply-to:) to mail-reply

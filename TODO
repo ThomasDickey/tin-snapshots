@@ -70,7 +70,7 @@ o  When tagging/auto-selecting files to be saved and decoded, if a tagged
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
 
 o  According to 026) in CHANGES, some of the config files can be
-   trashed on a bad write
+   trashed on a bad write (except .newsrc/tinrc/attributes)
 
 o  full_page_scroll=OFF seems not to work
 
@@ -183,6 +183,11 @@ o  posting to a binaries group should warn if no followup is set to another
 o  when posting to a group which name has a uppercase-letter: bring up a
    warning: "Newsgroup-names should be all lowercase, correct it? (Y/n)"
 
+o  when server responses with:
+   "441 The newsgroup "foo.bar" has been renamed to "bar.foo"."
+   ask the user if he want's to post to "bar.foo" instead of "foo.bar"
+   (Y/n)
+
 Docs/online help
 ----------------
 o  man page is well out of date and is buggy. Rewrite.
@@ -213,8 +218,6 @@ o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 o  what is with NEW_HASH_METHOD in misc.c?
 
 o  what is with HAVE_GENERIC_AUTHINFO in open.c?
-
-o  what is with USE_GENAUTH in open.c?
 
 o  what is with setup_soft_base - anyone remembering where it was used and
    the the code was not stripped after it was considered as no longer needed?

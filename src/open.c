@@ -16,6 +16,8 @@
 #include	"tin.h"
 #include	"version.h"
 
+int authorization P_((char *server, char *authuser));
+
 int nntp_codeno = 0;
 long head_next;
 
@@ -136,10 +138,6 @@ nntp_open ()
 		}
 #endif	/* HAVE_TIN_NNTP_EXTS */
 
-		/*
-		 * Check if NNTP server expects user authorization
-		 */
-		authorization (nntp_server, userid);
 	}
 #endif	/* NNTP_ABLE */
 
@@ -918,14 +916,15 @@ get_respcode ()
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
+	char savebuf[NNTP_STRLEN];
 	int respcode;
 
 	switch (get_server (line, NNTP_STRLEN)) {
-	case -1:
-		error_message (txt_connection_to_server_broken, "");
-		tin_done (EXIT_NNTP_ERROR);
-	case -2:
-		tin_done (0);
+		case -1:
+			error_message (txt_connection_to_server_broken, "");
+			tin_done (EXIT_NNTP_ERROR);
+		case -2:
+			tin_done (0);
 	}
 
 	debug_nntp ("get_respcode", line);
@@ -935,22 +934,35 @@ get_respcode ()
 
 	respcode = atoi (line);
 
-#ifdef USE_GENAUTH
-	if (respcode == ERR_NOAUTH) {
-		char savebuf[NNTP_STRLEN];
+	switch (respcode) {
+		case ERR_NOAUTH:
+			strcpy (savebuf, last_put);
+			if (!authorization (nntp_server, userid)) {
+				sprintf (line, txt_auth_failed, ERR_ACCESS);
+			} else {
+				strcpy (last_put, savebuf);
+				put_server (last_put);
+				get_server (line, NNTP_STRLEN);
+			}
+			respcode = atoi (line);
+			break;
+	
+#ifdef HAVE_GENERIC_AUTHINFO
+		case NEED_AUTH:
+			strcpy (savebuf, last_put);
 
-		strcpy (savebuf, last_put);
-
-		if (authenticate ()) {
-			sprintf(line, "%d Authentication failed", ERR_ACCESS);
-		} else {
-			strcpy (last_put, savebuf);
-			put_server (last_put);
-			get_server (line, NNTP_STRLEN);
-		}
-		respcode = atoi (line);
-	}
+			if (authenticate ()) {
+				sprintf(line, txt_auth_failed, ERR_ACCESS);
+				wait_message (line);
+			} else {
+				strcpy (last_put, savebuf);
+				put_server (last_put);
+				get_server (line, NNTP_STRLEN);
+			}
+			respcode = atoi (line);
+			break;
 #endif
+	}
 	return respcode;
 #else
 	return 0;
@@ -1057,6 +1069,7 @@ nntp_to_fp ()
 #endif
 }
 
+#ifdef NNTP_ABLE
 /*
  * NNTP user authorization. Password read from ~/.newsauth
  * The ~/.newsauth authorization file has the format:
@@ -1065,140 +1078,134 @@ nntp_to_fp ()
  *   etc.
  */
 
-void
+int
 authorization (server, authuser)
 	char *server;
 	char *authuser;
 {
-	static char already_failed = 0;
 	char line[PATH_LEN];
 	char line2[PATH_LEN];
+	char authusername[PATH_LEN];
+	char authpassword[PATH_LEN];
 	char *authpass;
 	char *ptr;
 	FILE *fp;
 	int ret;
 
-	/*
-	 * Check if running via NNTP
-	 */
-	if (! read_news_via_nntp) {
-		return;
-	}
-
-	/*
-	 * don't try again if failed before
-	 */
-	if (already_failed) {
-		return;
-	}
-
-	/*
-	 * Lets check if the NNTP supports authorization
-	 */
 	debug_nntp ("authorization", "authinfo");
-	put_server ("authinfo");
-	if (get_respcode () == ERR_COMMAND) {
-		return;
-	}
 
 	joinpath (line, homedir, ".newsauth");
-
-	if ((fp = fopen (line,"r")) == (FILE *) 0)
-		return;
-
-	/*
-	 * Search through authorization file for correct NNTP server
-	 * File has format:  'nntp-server' 'password'
-	 * will return authpass != NULL if any match
-	 */
 	authpass = (char *) 0;
-	while (fgets (line, PATH_LEN, fp) != (char *) 0) {
-
+	
+	if ((fp = fopen (line,"r")) == (FILE *) 0) {
 		/*
-		 * strip trailing newline character
+		 * if no .newsauth-file given, fall back on console input
 		 */
-
-		ptr = strchr (line, '\n');
-		if (ptr != (char *) 0)
-			*ptr = '\0';
-
+		clear_message ();
+		if ((ptr = getline (txt_auth_user_needed, FALSE, authuser, PATH_LEN, FALSE)) == (char *) 0)
+			return FALSE;
+		strcpy (authusername, ptr);
+		authuser = &authusername[0];
+		clear_message ();
+		if ((ptr = getline (txt_auth_pass_needed, FALSE, (char *) 0, 0, TRUE)) == (char *) 0)
+			return FALSE;
+		strcpy (authpassword, ptr);
+		authpass = &authpassword[0];
+	} else {
 		/*
-		 * Get server from 1st part of the line
+		 * Search through authorization file for correct NNTP server
+		 * File has format:  'nntp-server' 'password'
+		 * will return authpass != NULL if any match
 		 */
+		while (fgets (line, PATH_LEN, fp) != (char *) 0) {
 
-		ptr = strchr (line, ' ');
+			/*
+			 * strip trailing newline character
+			 */
 
-		if (ptr == (char *) 0)		/* no passwd, no auth, skip */
-			continue;
+			ptr = strchr (line, '\n');
+			if (ptr != (char *) 0)
+				*ptr = '\0';
 
-		*ptr++ = '\0'; 			/* cut of server part */
+			/*
+			 * Get server from 1st part of the line
+			 */
 
-		if ((strcasecmp(line, server)))
-			continue;		/* wrong server, keep on */
+			ptr = strchr (line, ' ');
 
-		/*
-		 * Get password from 2nd part of the line
-		 */
+			if (ptr == (char *) 0)		/* no passwd, no auth, skip */
+				continue;
 
-		authpass = ptr;
-		while(*authpass == ' ')
-			authpass++;		/* skip any blanks */
+			*ptr++ = '\0'; 			/* cut of server part */
 
-		/*
-		 * Get user from 3rd part of the line
-		 */
+			if ((strcasecmp(line, server)))
+				continue;		/* wrong server, keep on */
 
-		ptr = authpass;			/* continue searching here */
+			/*
+			 * Get password from 2nd part of the line
+			 */
 
-		if (*authpass == '"') {		/* skip "embedded" password string */
-			ptr = strrchr (authpass,'"');
-			if ((ptr != (char *) 0) && (ptr > authpass)) {
-				authpass++;
-				*ptr++ = '\0';	/* cut off trailing " */
-			} else			/* no matching ", proceede as normal */
-				ptr = authpass;
+			authpass = ptr;
+			while (*authpass == ' ')
+				authpass++;		/* skip any blanks */
+
+			/*
+			 * Get user from 3rd part of the line
+			 */
+
+			ptr = authpass;			/* continue searching here */
+
+			if (*authpass == '"') {		/* skip "embedded" password string */
+				ptr = strrchr (authpass,'"');
+				if ((ptr != (char *) 0) && (ptr > authpass)) {
+					authpass++;
+					*ptr++ = '\0';	/* cut off trailing " */
+				} else			/* no matching ", proceede as normal */
+					ptr = authpass;
+			}
+
+			ptr = strchr (ptr,' ');		/* find next separating blank */
+
+			if (ptr != (char *) 0) {		/* a 3rd argument follows */
+				while(*ptr == ' ')	/* skip any blanks */
+					*ptr++ = '\0';
+				if (*ptr != '\0')	/* if its not just empty */
+					authuser = ptr;	/* so will replace default user */
+			}
+
+			break;	/* if we end up here, everything seems OK */
 		}
-
-		ptr = strchr (ptr,' ');		/* find next separating blank */
-
-		if (ptr != (char *) 0) {		/* a 3rd argument follows */
-			while(*ptr == ' ')	/* skip any blanks */
-				*ptr++ = '\0';
-			if (*ptr != '\0')	/* if its not just empty */
-				authuser = ptr;	/* so will replace default user */
-		}
-
-		break;	/* if we end up here, everything seems OK */
+		fclose (fp);
 	}
-	fclose (fp);
-
+	
 	if (authpass == (char *) 0) {
 		error_message (txt_nntp_authorization_failed, server);
-		return;
+		return FALSE;
 	}
 
 	sprintf (line2, "authinfo user %s", authuser);
 	put_server (line2);
-	ret = get_respcode ();
+	get_server (line2, PATH_LEN);
+	ret = atoi (line2);
 	if (ret != NEED_AUTHDATA) {
-		nntp_message (ret);
-		already_failed = 1;
-		return;
+		strcpy (error_response, line2);
+		return FALSE;
 	}
 
 	sprintf (line2, "authinfo pass %s", authpass);
 	put_server (line2);
-	ret = get_respcode ();
+	get_server (line, PATH_LEN);
+	ret = atoi (line);
 	if (ret != OK_AUTH) {
-		nntp_message (ret);
-		already_failed = 1;
-		return;
+		strcpy (error_response, line);
+		return FALSE;
 	}
 
 	sprintf (line, txt_authorization_ok, authuser);
 	wait_message (line);
-	return;
+	return TRUE;
 }
+#endif /* NNTP_ABLE */
 
 void
 vGrpGetSubArtInfo ()
@@ -1261,7 +1268,7 @@ void
 vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 	char	*pcSpoolDir;
 	char	*pcGrpName;
-	int		iGrpType;
+	int	iGrpType;
 	long	*plArtCount;
 	long	*plArtMax;
 	long	*plArtMin;

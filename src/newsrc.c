@@ -136,7 +136,7 @@ vWriteNewsrc ()
 			 * Don't rename if either fclose() fails or ferror() is set
 			 */
 			if (ferror (fp_op) | fclose (fp_op)) {
-				error_message (txt_filesystem_full, "");
+				error_message (txt_filesystem_full, "newsrc");
 				unlink (newnewsrc);
 			} else {
 				rename_ok = TRUE;
@@ -169,7 +169,7 @@ create_newsrc (newsrc_file)
 		}
 
 		if (ferror (fp) | fclose (fp)) {
-			error_message (txt_filesystem_full, "");
+			error_message (txt_filesystem_full, "newsrc");
 		}
 	}
 }
@@ -217,7 +217,7 @@ auto_subscribe_groups (newsrc_file)
 				}
 			}
 			if (ferror (fp_newsrc) | fclose (fp_newsrc)) {
-				error_message (txt_filesystem_full, "");
+				error_message (txt_filesystem_full, "newsrc");
 			}
 		}
 		fclose (fp_subs);
@@ -256,7 +256,7 @@ backup_newsrc ()
 				free (line);
 			}
 			if (ferror (fp_op) | fclose (fp_op)) {
-				error_message (txt_filesystem_full_backup, "");
+				error_message (txt_filesystem_full_backup, "newsrc");
 			}
 		}
 		fclose (fp_ip);
@@ -313,7 +313,7 @@ subscribe (group, sub_state)
 			}
 		}
 		if (ferror (newfp) | fclose (newfp)) {
-			error_message (txt_filesystem_full, "");
+			error_message (txt_filesystem_full, "newsrc");
 			unlink (newnewsrc);
 		} else {
 			rename_file (newnewsrc, newsrc);
@@ -349,7 +349,7 @@ reset_newsrc ()
 			fclose (fp);
 		}
 		if (ferror (newfp) | fclose (newfp)) {
-			error_message (txt_filesystem_full, "");
+			error_message (txt_filesystem_full, "newsrc");
 			unlink (newnewsrc);
 		} else {
 			rename_file (newnewsrc, newsrc);
@@ -393,7 +393,7 @@ delete_group (group)
 			fclose (fp);
 		}
 		if (ferror (newfp) | fclose (newfp)) {
-			error_message (txt_filesystem_full, "");
+			error_message (txt_filesystem_full, "newsrc");
 			unlink (newnewsrc);
 		} else {
 			rename_file (newnewsrc, newsrc);
@@ -936,7 +936,7 @@ pos_group_in_newsrc (group, pos)
 	if (ferror (fp_sub) | fclose (fp_sub)
 		| ferror (fp_unsub) | fclose (fp_unsub)) {
 
-		error_message (txt_filesystem_full, "");
+		error_message (txt_filesystem_full, "newsrc");
 		fp_sub = fp_unsub = NULL;
 		goto rewrite_group_done;
 	}
@@ -994,7 +994,7 @@ pos_group_in_newsrc (group, pos)
 	}
 
 	if (ferror (fp_out) | fclose (fp_out)) {
-		error_message (txt_filesystem_full, "");
+		error_message (txt_filesystem_full, "newsrc");
 	} else {
 		if (repositioned) {
 			cur_groupnum = pos;

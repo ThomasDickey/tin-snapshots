@@ -1,10 +1,10 @@
-MANIFEST for tin-1.3-unoff-BETA-961022 (Wed Oct 23 01:12:58 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
 ----------------------------------------------------
-  44298 ./CHANGES
-  12661 ./TODO
-   5290 ./Makefile
+  44586 ./CHANGES
+  12831 ./TODO
+   5314 ./Makefile
   17527 ./INSTALL
-   2213 ./MANIFEST
+   2236 ./MANIFEST
    1659 ./README
     896 ./tinpp
   20718 ./aclocal.m4
@@ -13,19 +13,20 @@ MANIFEST for tin-1.3-unoff-BETA-961022 (Wed Oct 23 01:12:58 MET DST 1996)
    4771 ./install.sh
   11609 ./makefile.in
    1014 ./conf-tin
-  71236 ./doc/tin.1
-   1822 ./doc/hashing.doc
    1330 ./doc/DEBUG_REFS
+  12018 ./doc/auth.txt
+   1727 ./doc/hashing.doc
+  71236 ./doc/tin.1
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
   12205 ./include/conf.h
    8482 ./include/config.h
-  40872 ./include/extern.h
+  40888 ./include/extern.h
   14068 ./include/menukeys.h
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
-  29558 ./include/proto.h
+  29508 ./include/proto.h
    1376 ./include/stpwatch.h
   42991 ./include/tin.h
     810 ./include/version.h
@@ -36,39 +37,39 @@ MANIFEST for tin-1.3-unoff-BETA-961022 (Wed Oct 23 01:12:58 MET DST 1996)
   13003 ./src/amiga.c
    4429 ./src/amigatcp.c
   37902 ./src/art.c
-  23169 ./src/attrib.c
+  23805 ./src/attrib.c
    8220 ./src/charset.c
    1560 ./src/color.c
-  56971 ./src/config.c
+  56977 ./src/config.c
   19730 ./src/curses.c
   12284 ./src/debug.c
    2800 ./src/envarg.c
   19459 ./src/feed.c
   35985 ./src/filter.c
-  10802 ./src/getline.c
+  10936 ./src/getline.c
   41333 ./src/group.c
    3204 ./src/hashstr.c
    9487 ./src/help.c
   12100 ./src/inews.c
   29402 ./src/init.c
-  55204 ./src/lang.c
+  55222 ./src/lang.c
    1739 ./src/list.c
   12059 ./src/mail.c
   17803 ./src/main.c
   10991 ./src/memory.c
   47075 ./src/misc.c
    7228 ./src/msmail.c
-  33234 ./src/newsrc.c
+  33288 ./src/newsrc.c
   26382 ./src/nntplib.c
   31334 ./src/nntpw32.c
    6143 ./src/nrctbl.c
-  26886 ./src/open.c
+  27513 ./src/open.c
    6246 ./src/os_2.c
   35696 ./src/page.c
   24090 ./src/parsdate.y
    6531 ./src/pgp.c
   74795 ./src/post.c
-   9002 ./src/prompt.c
+   9044 ./src/prompt.c
      53 ./src/proto.sed
   22368 ./src/refs.c
    8715 ./src/rfc1521.c
@@ -90,4 +91,4 @@ MANIFEST for tin-1.3-unoff-BETA-961022 (Wed Oct 23 01:12:58 MET DST 1996)
   10462 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-1554886 total
+1568797 total
