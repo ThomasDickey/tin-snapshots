@@ -3488,17 +3488,17 @@ checknadd_headers (
 					if (advertising)
 #ifdef HAVE_SYS_UTSNAME_H
 #	ifdef _AIX
-						fprintf (fp_out, "User-Agent: %s/%s-%s (%s) (%s/%s-%s)\n\n",
-							PRODUCT, VERSION, RELEASEDATE, OS,
+						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s) (%s/%s-%s)\n\n",
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS,
 							system_info.sysname, system_info.version, system_info.release);
 #	else /* AIX */
-						fprintf (fp_out, "User-Agent: %s/%s-%s (%s) (%s/%s (%s))\n\n",
-							PRODUCT, VERSION, RELEASEDATE, OS,
+						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s) (%s/%s (%s))\n\n",
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS,
 							system_info.sysname, system_info.release, system_info.machine);
 #	endif /* AIX */
 #else
-						fprintf (fp_out, "User-Agent: %s/%s-%s (%s)\n\n",
-							PRODUCT, VERSION, RELEASEDATE, OS);
+						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s)\n\n",
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS);
 #endif /* HAVE_SYS_UTSNAME_H */
 					else
 						fprintf (fp_out, "\n");

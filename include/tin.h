@@ -320,10 +320,10 @@
  */
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 #	ifndef NNTP_ABLE
-#		define	NNTP_ABLE
+#		define NNTP_ABLE	1
 #	endif
 #	ifndef NNTP_INEWS
-#		define	NNTP_INEWS
+#		define NNTP_INEWS	1
 #	endif
 #endif
 
@@ -565,9 +565,13 @@
 #ifdef PATH_SUM
 #	ifdef DEFAULT_SUM
 #		undef DEFAULT_SUM
-#	endif
-#	define DEFAULT_SUM PATH_SUM_R
-#endif
+#	endif /* DEFAULT_SUM */
+#	ifdef SUM_TAKES_DASH_R
+#		define DEFAULT_SUM PATH_SUM_R
+#	else
+#		define DEFAULT_SUM PATH_SUM
+#	endif /* SUM_TAKES_DASH_R */
+#endif /* PATH_SUM */
 
 #ifdef HAVE_LONG_FILE_NAMES
 #	define	LONG_PATH_PART	"part"
@@ -870,7 +874,7 @@
 #if 0
 #	define DEBUG_IO(x)	fprintf x
 #else
-#	define DEBUG_IO(x)
+#	define DEBUG_IO(x)	/* nothing */
 #endif
 
 /*
@@ -1583,7 +1587,7 @@ extern void joinpath (char *result, const char *dir, const char *file);
 /*#	define	ENV_VAR_SHELL		"SHELL"*/
 #	define	ENV_VAR_POSTER		"TIN_POST"
 #	define	TIN_EDITOR_FMT_ON	"%E %F"
-#	define METAMAIL_CMD		"%s -e -p -m \"tin\""
+#	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR "SYS$SCRATCH:"
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0x9b

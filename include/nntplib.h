@@ -3,8 +3,8 @@
  *  Module    : nntplib.h
  *  Author    : I.Lea
  *  Created   : 1991-04-01
- *  Updated   : 1998-04-23
- *  Notes     : nntp.h 1.5.11/1.6 with extensions for tin & CD-ROM
+ *  Updated   : 1998-07-31
+ *  Notes     : nntp.h 1.5.11/1.6 with extensions for tin
  *  Copyright : You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -19,51 +19,46 @@
 #		define	NNTP_SERVER_FILE	"uulib:nntpserver"
 #	else
 #		define	NNTP_SERVER_FILE	"/etc/nntpserver"
-#	endif
-#endif
+#	endif	/* M_AMIGA */
+#endif /* !NNTP_SERVER_FILE */
 
 #define	NNTP_TCP_NAME	"nntp"
 #define	NNTP_TCP_PORT	"119"
 
-#ifndef	SMTP_SERVER_FILE
-#	define	SMTP_SERVER_FILE	"/etc/smtpserver"
-#endif
-
-#define	SMTP_TCP_NAME	"smtp"
-#define	SMTP_TCP_PORT	"25"
-
-/* # seconds after which a read from the NNTP will timeout
+/*
+ * # seconds after which a read from the NNTP will timeout
  * NB: This is different from the NNTP server timing us out due to inactivity
  */
 #define NNTP_READ_TIMEOUT		30
 
-/* # times to try and reconnect to server after timeout */
-#define NNTP_TRY_RECONNECT		2
 /*
- *
+ * # times to try and reconnect to server after timeout
+ */
+#define NNTP_TRY_RECONNECT		2
+
+/*
  * @(#)Header: nntp.h,v 1.81 92/03/12 02:08:31 sob Exp $
  *
  * First digit:
  *
- *	1xx	Informative message
- *	2xx	Command ok
- *	3xx	Command ok so far, continue
- *	4xx	Command was correct, but couldn't be performed
- *		for some specified reason.
- *	5xx	Command unimplemented, incorrect, or a
- *		program error has occured.
+ *	1xx  Informative message
+ *	2xx  Command ok
+ *	3xx  Command ok so far, continue
+ *	4xx  Command was correct, but couldn't be performed
+ *	     for some specified reason.
+ *	5xx  Command unimplemented, incorrect, or a
+ *	     program error has occured.
  *
  * Second digit:
  *
- *	x0x	Connection, setup, miscellaneous
- *	x1x	Newsgroup selection
- *	x2x	Article selection
- *	x3x	Distribution
- *	x4x	Posting
+ *	x0x  Connection, setup, miscellaneous
+ *	x1x  Newsgroup selection
+ *	x2x  Article selection
+ *	x3x  Distribution
+ *	x4x  Posting
  */
-
 #define	CHAR_INF		'1'
-#define	CHAR_OK			'2'
+#define	CHAR_OK		'2'
 #define	CHAR_CONT		'3'
 #define	CHAR_ERR		'4'
 #define	CHAR_FATAL		'5'
@@ -117,7 +112,7 @@
 #define	ERR_NONEXT		421	/* No next article in this group */
 #define	ERR_NOPREV		422	/* No previous article in this group */
 #define	ERR_NOARTIG		423	/* No such article in this group */
-#define ERR_NOART		430	/* No such article at all */
+#define	ERR_NOART		430	/* No such article at all */
 #define	ERR_GOTIT		435	/* Already got that article, don't send */
 #define	ERR_XFERFAIL		436	/* Transfer failed */
 #define	ERR_XFERRJCT		437	/* Article rejected, don't resend */
@@ -139,7 +134,6 @@
 /*
  * RFC 977 defines this; don't change it.
  */
-
 #define	NNTP_STRLEN		512
 
 #endif /* !NNTPLIB_H */

@@ -32,13 +32,13 @@ static time_t active_timestamp;  /* time active file read (local) */
 /*
  * Local prototypes
  */
-static void set_active_timestamp (void);
 static int find_newnews_index (char *cur_newnews_host);
-static t_bool parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
-static void _read_news_active_file (t_bool newsrc_act);
-static void check_for_any_new_groups (void);
-static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
+static void check_for_any_new_groups (void);
+static void read_active_file (void);
+static void read_newsrc_active_file (void);
+static void set_active_timestamp (void);
+static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void vAppendGrpLine (char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir);
 static void vInitVariables (void);
 static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
@@ -57,7 +57,7 @@ get_active_num (void)
 
 	if ((ptr = getenv (ENV_VAR_GROUPS)) != (char *) 0)
 		return ((num = atoi (ptr)) ? num : DEFAULT_ACTIVE_NUM);
-#endif
+#endif /* ENV_VAR_GROUPS */
 	return DEFAULT_ACTIVE_NUM;
 }
 
@@ -153,13 +153,13 @@ active_add(
 	vSetDefaultBitmap (ptr);
 #ifdef INDEX_DAEMON
 	ptr->last_updated_time = (time_t) 0;
-#endif
+#endif /* INDEX_DAEMON */
 
 #ifdef WIN32				/* Paths are in form - x:\a\b\c */
 	if (strchr(moderated, '\\'))
 #else
 	if (moderated[0] == '/')
-#endif
+#endif /* WIN32 */
 	{
 		ptr->type = GROUP_TYPE_SAVE;
 		ptr->spooldir = my_strdup(moderated);
@@ -232,102 +232,145 @@ parse_active_line (
 
 
 /*
+ * Load the active information into active[] by coundint the min/max/count
+ * for each news group.
  * Parse a line from the .newsrc file
- * Returns TRUE or FALSE accordingly
- * Use vGrpGetArtInfo() to obtain min/max/count for the group
+ * Send GROUP command to NNTP server directly to keep window.
  * We can't know the 'moderator' status and always return 'y'
- */
-static t_bool
-parse_newsrc_active_line (
-	char *buf,
-	long *count,
-	long *max,
-	long *min,
-	char *moderated)
-{
-	char *ptr;
-
-	ptr = strpbrk (buf, ":!");
-
-	if (!ptr || *ptr != SUBSCRIBED)		/* Invalid line or unsubscribed */
-		return FALSE;
-
-	*ptr = '\0';					/* Now buf is the group name */
-
-	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min))
-		return FALSE;
-
-	strcpy (moderated, "y");
-
-	return TRUE;
-}
-
-
-/*
- * Load the active file into active[]
- * Check and preload any new newgroups into my_group[]
+ * But we don't change if the 'moderator' status is alredy checked by
+ * read_active_file()
  */
 static void
-_read_news_active_file (
-	t_bool newsrc_act)
+read_newsrc_active_file (void)
 {
 	FILE *fp = (FILE *) 0;
 	char *ptr;
-	static char ngname[NNTP_STRLEN+1];
 	char moderated[PATH_LEN];
-	struct t_group *grpptr;
+	int window = 0;
 	long count = -1L, min = 1L, max = 0L;
 	long processed = 0L;
+	static char ngname[NNTP_STRLEN];
+	struct t_group *grpptr;
+#ifdef NNTP_ABLE
+#	define NUM_SIMULTANEOUS_GROUP_COMMAND 50
+	char *ngnames[NUM_SIMULTANEOUS_GROUP_COMMAND];
+	int index_i = 0;
+	int index_o = 0;
+#endif /* NNTP_ABLE */
 
 	/*
 	 * return immediately if no .newsrc can be found or .newsrc is empty
 	 * when function asked to use .newsrc
 	 */
-	if (newsrc_act && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
+	if ((fp = fopen (newsrc, "r")) == (FILE *) 0)
 		return;
 
-	if (newsrc_act) {
-		if (file_size(newsrc) <= 0) {
-			fclose(fp);
-			return;
-		}
+	if (file_size(newsrc) <= 0) {
+		fclose(fp);
+		return;
 	}
 
 	if (INTERACTIVE)
-		wait_message (0, newsrc_act ? txt_reading_news_newsrc_file : txt_reading_news_active_file);
+		wait_message (0, txt_reading_news_newsrc_file);
 
-	if (!newsrc_act) {
-		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
-
-			if (cmd_line)
-				my_fputc ('\n', stderr);
-
-#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
-			if (read_news_via_nntp)
-#endif
-				error_message (txt_cannot_open, news_active_file);
-#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
-			else
-				error_message (txt_cannot_open_active_file, news_active_file, progname);
-#endif
-
-			tin_done (EXIT_FAILURE);
-		}
-	}
-
-	while ((ptr = tin_fgets (fp, FALSE)) != (char *)0) {
-
-		if (newsrc_act) {
+	while ((ptr = tin_fgets (fp, FALSE)) != (char *)0 || window != 0) {
+		if (ptr) {
+			char *p;
+			p = strpbrk (ptr, ":!");
+			if (!p || *p != SUBSCRIBED)	/* Invalid line or unsubscribed */
+				continue;
+			*p = '\0';			/* Now buf is the group name */
 			STRCPY(ngname, ptr);
 			ptr = ngname;
-			if (!parse_newsrc_active_line (ptr, &count, &max, &min, moderated))
+		}
+
+		if (read_news_via_nntp) {
+#ifdef NNTP_ABLE
+			char acBuf[NNTP_STRLEN];
+			char acLine[NNTP_STRLEN];
+			if (window < NUM_SIMULTANEOUS_GROUP_COMMAND && ptr) {
+				ngnames[index_i] = my_strdup(ptr);
+				sprintf (acBuf, "GROUP %s", ngnames[index_i]);
+#	ifdef DEBUG
+				debug_nntp ("read_newsrc_active_file", acBuf);
+#	endif /* DEBUG */
+				put_server (acBuf);
+				index_i = (index_i + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+				window++;
+			}
+			if (window == NUM_SIMULTANEOUS_GROUP_COMMAND || ptr == NULL) {
+				int respcode = get_respcode(acLine);
+
+				if (reconnected_in_last_get_server) {
+					/*
+					 * If tin reconnected, last output is resended to server.
+					 * So received data is for ngnames[last window_i].
+					 * We resend all buffered command except for last window_i.
+					 * And rotate buffer to use data received.
+					 */
+					int i;
+					int j = index_o;
+					for (i = 0; i < window - 1; i++) {
+						sprintf (acBuf, "GROUP %s", ngnames[j]);
+#	ifdef DEBUG
+						debug_nntp ("read_newsrc_active_file", acBuf);
+#	endif /* DEBUG */
+						put_server (acBuf);
+						j = (j + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+					}
+					if (--index_o < 0)
+						index_o = NUM_SIMULTANEOUS_GROUP_COMMAND - 1;
+					if (--index_i < 0)
+						index_i = NUM_SIMULTANEOUS_GROUP_COMMAND - 1;
+					if (index_i != index_o)
+						ngnames[index_o] = ngnames[index_i];
+				}
+
+				switch (respcode) {
+
+					case OK_GROUP:
+						if (sscanf (acLine, "%ld %ld %ld %s", &count, &min, &max, ngname) != 4)
+							error_message("Invalid response to GROUP command, %s", acLine);
+						if (strcmp(ngname, ngnames[index_o]) != 0)
+							error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]);
+						ptr = ngname;
+						free(ngnames[index_o]);
+						index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+						window--;
+						break;
+
+					case ERR_NOGROUP:
+						free(ngnames[index_o]);
+						index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+						window--;
+						continue;
+
+					case ERR_ACCESS:
+						error_message (cCRLF "%s", acLine);
+						tin_done (NNTP_ERROR_EXIT);
+						/* keep lint quiet: */
+						/* FALLTHROUGH */
+					default:
+#	ifdef DEBUG
+						debug_nntp ("NOT_OK", acLine);
+#	endif /* DEBUG */
+						free(ngnames[index_o]);
+						index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
+						window--;
+						continue;
+				}
+			} else {
 				continue;
+			}
+#endif /* NNTP_ABLE */
 		} else {
-			if (!parse_active_line (ptr, &max, &min, moderated))
+			if (vGrpGetArtInfo (spooldir, ptr, GROUP_TYPE_NEWS, &count, &max, &min))
 				continue;
 		}
 
-		if (++processed % ((newsrc_act) ? 5 : MODULO_COUNT_NUM) == 0)
+		strcpy (moderated, "y");
+
+		if (++processed % 5 == 0)
 			spin_cursor ();
 
 		/*
@@ -354,10 +397,7 @@ _read_news_active_file (
 		active_add (grpptr, count, max, min, moderated);
 	}
 
-	if (newsrc_act)
-		fclose(fp);
-	else
-		TIN_FCLOSE (fp);
+	fclose(fp);
 
 	/*
 	 *  Exit if active file wasn't read correctly or is empty
@@ -367,7 +407,86 @@ _read_news_active_file (
 		tin_done (EXIT_FAILURE);
 	}
 
-	if (INTERACTIVE2 && !newsrc_act)
+	if (INTERACTIVE2)
+		wait_message (0, "\n");
+}
+
+
+/*
+ * Load the active file into active[]
+ */
+static void
+read_active_file (void)
+{
+	FILE *fp = (FILE *) 0;
+	char *ptr;
+	char moderated[PATH_LEN];
+	long count = -1L, min = 1L, max = 0L;
+	long processed = 0L;
+	struct t_group *grpptr;
+
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_news_active_file);
+
+	if ((fp = open_news_active_fp ()) == (FILE *) 0) {
+
+		if (cmd_line)
+			my_fputc ('\n', stderr);
+
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+		if (read_news_via_nntp)
+#endif /* NNTP_ABLE || NNTP_ONLY */
+			error_message (txt_cannot_open, news_active_file);
+#if defined(NNTP_ABLE) || defined(NNTP_ONLY)
+		else
+			error_message (txt_cannot_open_active_file, news_active_file, progname);
+#endif /* NNTP_ABLE || NNTP_ONLY */
+
+		tin_done (EXIT_FAILURE);
+	}
+
+	while ((ptr = tin_fgets (fp, FALSE)) != (char *)0) {
+		if (!parse_active_line (ptr, &max, &min, moderated))
+			continue;
+
+		if (++processed % MODULO_COUNT_NUM == 0)
+			spin_cursor ();
+
+		/*
+		 * Load group into group hash table
+		 * NULL means group already present, so we just fixup the counters
+		 * This call may implicitly ++num_active
+		 */
+		if ((grpptr = psGrpAdd(ptr)) == NULL) {
+			if ((grpptr = psGrpFind(ptr)) == NULL)
+				continue;
+
+			if (grpptr->xmin != min || grpptr->xmax != max) {
+				grpptr->xmin = min;
+				grpptr->xmax = max;
+				grpptr->count = count;
+				expand_bitmap(grpptr, 0);
+			}
+			continue;
+		}
+
+		/*
+		 * Load the new group in active[]
+		 */
+		active_add (grpptr, count, max, min, moderated);
+	}
+
+	TIN_FCLOSE (fp);
+
+	/*
+	 *  Exit if active file wasn't read correctly or is empty
+	 */
+	if (tin_errno || !num_active) { /* FIXME: move string to lang.c */
+		error_message (txt_active_file_is_empty, (read_news_via_nntp ? "servers active-file" : news_active_file));
+		tin_done (EXIT_FAILURE);
+	}
+
+	if (INTERACTIVE2)
 		wait_message (0, "\n");
 }
 
@@ -399,16 +518,13 @@ read_news_active_file (void)
 
 	/* Read an active file if it is allowed */
 	if (list_active)
-		_read_news_active_file (FALSE);
+		read_active_file ();
 
 	/* Read .newsrc and check each group */
 	if (newsrc_active)
-		_read_news_active_file (TRUE);
+		read_newsrc_active_file ();
 
 	set_active_timestamp ();
-
-	if (INTERACTIVE2 && (!list_active || (list_active && newsrc_active)))
-		wait_message (0, "\n");
 
 	check_for_any_new_groups ();
 }
@@ -458,7 +574,7 @@ check_for_any_new_groups (void)
 		error_message("Newnews old=[%lu]  new=[%lu]", (unsigned long int) old_newnews_time, (unsigned long int) new_newnews_time);
 		(void) sleep (2);
 	}
-#endif
+#endif /* DEBUG */
 
 	if ((fp = open_newgroups_fp (newnews_index)) != (FILE *) 0) {
 
@@ -673,7 +789,7 @@ load_newnews_info (
 #ifdef DEBUG
 	if (debug == 2)
 		error_message("ACTIVE host=[%s] time=[%lu]", newnews[i].host, (unsigned long int) newnews[i].time);
-#endif
+#endif /* DEBUG */
 }
 
 

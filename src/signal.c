@@ -23,7 +23,7 @@
 	 * if catched by signal handler.
 	 */
 #	undef SIGBUS
-#endif
+#endif /* VMS && SIGBUS */
 
 /*
  * Needed for resizing under an xterm
@@ -34,31 +34,31 @@
 #else
 #	ifdef HAVE_TERMIO_H
 #		include <termio.h>
-#	endif
-#endif
+#	endif /* HAVE_TERMIO_H */
+#endif /* HAVE_TERMIOS_H */
 
 #ifdef NEED_PTEM_H
 #	include <sys/stream.h>
 #	include <sys/ptem.h>
-#endif
+#endif /* NEED_PTEM_H */
 
 #if defined(SIGWINCH) && !defined(DONT_HAVE_SIGWINCH)
 #	if !defined(TIOCGWINSZ) && !defined(TIOCGSIZE)
 #		ifdef HAVE_SYS_STREAM_H
 #			include <sys/stream.h>
-#		endif
+#		endif /* HAVE_SYS_STREAM_H */
 #		ifdef HAVE_SYS_PTY_H
 #			if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
 #				include <sys/bsdtypes.h>
-#			endif
+#			endif /* !_h_BSDTYPES && HAVE_SYS_BSDTYPES_H */
 #			include <sys/pty.h>
-#		endif
-#	endif
-#endif
+#		endif /* HAVE_SYS_PTY_H */
+#	endif /* !TIOCGWINSZ && !TIOCGSIZE */
+#endif /* SIGWINCH && !DONT_HAVE_SIGWINCH */
 
 #ifdef MINIX
 #	undef SIGTSTP
-#endif /* !MINIX */
+#endif /* MINIX */
 
 /*
  * local prototypes
@@ -89,48 +89,48 @@ static const struct {
 } signal_list[] = {
 #ifdef SIGINT
 	{ SIGINT,	"SIGINT" },	/* ctrl-C */
-#endif
+#endif /* SIGINT */
 #ifdef SIGQUIT
 	{ SIGQUIT,	"SIGQUIT " },	/* ctrl-\ */
-#endif
+#endif /* SIGQUIT */
 #ifndef WIN32
-#ifdef SIGILL
+#	ifdef SIGILL
 	{ SIGILL,	"SIGILL" },	/* illegal instruction */
-#endif
-#ifdef SIGFPE
+#	endif /* SIGILL */
+#	ifdef SIGFPE
 	{ SIGFPE,	"SIGFPE" },	/* floating point exception */
-#endif
-#ifdef SIGBUS
+#	endif /* SIGFPE */
+#	ifdef SIGBUS
 	{ SIGBUS,	"SIGBUS" },	/* bus error */
-#endif
-#ifdef SIGSEGV
+#	endif /* SIGBUS */
+#	ifdef SIGSEGV
 	{ SIGSEGV,	"SIGSEGV" },	/* segmentation violation */
-#endif
-#endif /* WIN32 */
+#	endif /* SIGSEGV */
+#endif /* !WIN32 */
 #ifdef SIGPIPE
 	{ SIGPIPE,	"SIGPIPE" },	/* broken pipe */
-#endif
+#endif /* SIGPIPE */
 #ifdef SIGCHLD
 	{ SIGCHLD,	"SIGCHLD" },	/* death of a child process */
-#endif
+#endif /* SIGCHLD */
 #ifdef SIGPWR
 	{ SIGPWR,	"SIGPWR" },	/* powerfail */
-#endif
+#endif /* SIGPWR */
 #ifdef SIGTSTP
 	{ SIGTSTP,	"SIGTSTP" },	/* terminal-stop */
-#endif
+#endif /* SIGTSTP */
 #ifdef SIGHUP
 	{ SIGHUP,	"SIGHUP" },	/* hang up signal */
-#endif
+#endif /* SIGHUP */
 #ifdef SIGUSR1
 	{ SIGUSR1,	"SIGUSR1" },	/* User-defined signal 1 */
-#endif
+#endif /* SIGUSR1 */
 #ifdef SIGTERM
 	{ SIGTERM,	"SIGTERM" },	/* termination */
-#endif
+#endif /* SIGTERM */
 #ifdef SIGWINCH
 	{ SIGWINCH,	"SIGWINCH" },	/* window-size change */
-#endif
+#endif /* SIGWINCH */
 };
 
 #ifdef HAVE_POSIX_JC
@@ -150,7 +150,7 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	sa.sa_flags = 0;
 #	ifdef SA_RESTART
 		sa.sa_flags |= SA_RESTART;
-#	endif
+#	endif /* SA_RESTART */
 	if (sigaction (sig, &sa, &osa) < 0)
 		return SIG_ERR;
 
@@ -158,13 +158,13 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 }
 
 #else
-#ifdef HAVE_NESTED_PARAMS
+#	ifdef HAVE_NESTED_PARAMS
 RETSIGTYPE (*sigdisp(int sig, RETSIGTYPE (_CDECL *func)(SIG_ARGS)))(SIG_ARGS)
-#else
+#	else
 RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	int sig;
 	RETSIGTYPE (_CDECL *func)(SIG_ARGS);
-#endif
+#	endif /* HAVE_NESTED_PARAMS */
 {
 	return (signal (sig, func));
 }
@@ -192,10 +192,10 @@ void
 handle_resize (
 	int repaint)
 {
-#ifdef SIGWINCH
+#	ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
 	signal (SIGWINCH, signal_handler);
-#endif
+#	endif /* SIGWINCH */
 
 	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
 		ring_bell ();
@@ -206,39 +206,37 @@ handle_resize (
 	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
 
 	if (repaint) {
-#ifdef USE_CURSES
-#	ifdef HAVE_RESIZETERM
+#	ifdef USE_CURSES
+#		ifdef HAVE_RESIZETERM
 		resizeterm(cLINES+1, cCOLS+1);
-#	else
+#		else
 		my_retouch();
-#	endif /* HAVE_RESIZETERM */
-#endif /* USE_CURSES */
+#		endif /* HAVE_RESIZETERM */
+#	endif /* USE_CURSES */
 		switch (my_context) {
 		case cArt:
 			ClearScreen ();
-#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+#	if defined(HAVE_POLL) || defined(HAVE_SELECT)
 			/* strlen("Group %s ('q' to quit)... 'low'/'high'") = 45 */
 			wait_message (0, txt_group, cCOLS - 45, glob_art_group);
-#else
+#	else
 			/* strlen("Group %s ... 'low'/'high'") = 31 */
 			wait_message (0, txt_group, cCOLS - 31, glob_art_group);
-#endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
+#	endif /* HAVE_POLL || HAVE_SELECT */
 			break;
 		case cConfig:
 			refresh_config_page (-1);
 			break;
 		case cHelp:
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 			display_info_page (TRUE);
-#else
+#	else
 			display_info_page();
-#endif /* USE_CURSES*/
+#	endif /* USE_CURSES*/
 			break;
 		case cGroup:
 			ClearScreen ();
 			show_group_page ();
-			break;
-		case cMain:
 			break;
 		case cPage:
 			ClearScreen ();
@@ -252,11 +250,14 @@ handle_resize (
 			ClearScreen ();
 			show_thread_page ();
 			break;
+		case cMain:
+		default:
+			break;
 		}
 		my_fflush(stdout);
 	}
 }
-#endif /* defined(SIGWINCH) || defined(SIGTSTP) */
+#endif /* SIGWINCH || SIGTSTP */
 
 #ifdef SIGTSTP
 static void
@@ -280,7 +281,7 @@ handle_suspend (void)
 	set_keypad_on ();
 	set_xclick_on ();
 }
-#endif
+#endif /* SIGTSTP */
 
 void _CDECL
 signal_handler (
@@ -303,9 +304,9 @@ signal_handler (
 				signal (sig, signal_handler);
 				return;
 			}
-#	endif
+#	endif /* !M_AMIGA && !__SASC */
 			break;
-#endif
+#endif /* SIGINT */
 
 #ifdef SIGCHLD
 		case SIGCHLD:
@@ -313,24 +314,24 @@ signal_handler (
 			signal (sig, signal_handler);	/* death of a child */
 			system_status = WEXITSTATUS(wait_status);
 			return;
-#endif
+#endif /* SIGCHLD */
 
 #ifdef SIGPIPE
 		case SIGPIPE:
 			got_sig_pipe = TRUE;
 			signal(sig, signal_handler);
 			return;
-#endif
+#endif /* SIGPIPE */
 #ifdef SIGTSTP
 		case SIGTSTP:
 			handle_suspend();
 			return;
-#endif
+#endif /* SIGTSTP */
 #ifdef SIGWINCH
 		case SIGWINCH:
 			handle_resize(FALSE);
 			return;
-#endif
+#endif /* SIGWINCH */
 		default:
 			break;
 	}
@@ -338,41 +339,38 @@ signal_handler (
 	EndWin ();
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
 #if defined(SIGHUP)
-	if (sig == SIGHUP)
-	{
+	if (sig == SIGHUP) {
 		dangerous_signal_exit = TRUE;
 		tin_done (- SIGHUP);
 	}
-#endif
+#endif /* SIGHUP */
 #if defined(SIGUSR1)
-	if (sig == SIGUSR1)
-	{
+	if (sig == SIGUSR1) {
 		dangerous_signal_exit = TRUE;
 		tin_done (- SIGUSR1);
 	}
-#endif
+#endif /* SIGUSR1 */
 #if defined(SIGTERM)
-	if (sig == SIGTERM)
-	{
+	if (sig == SIGTERM) {
 		dangerous_signal_exit = TRUE;
 		tin_done (- SIGTERM);
 	}
-#endif
+#endif /* SIGTERM */
 #if defined(SIGBUS) || defined(SIGSEGV)
 	if (
 #	ifdef SIGBUS
 		sig == SIGBUS
-#	endif
+#	endif /* SIGBUS */
 #	if defined(SIGBUS) && defined(SIGSEGV)
 		||
-#	endif
+#	endif /* SIGBUS && SIGSEGV */
 #	ifdef SIGSEGV
 		sig == SIGSEGV
-#	endif
+#	endif /* SIGSEGV */
 		) {
 		vPrintBugAddress ();
 	}
-#endif
+#endif /* SIGBUS || SIGSEGV */
 	cleanup_tmp_files ();
 
 #if 1
@@ -381,7 +379,7 @@ signal_handler (
 	abort();
 #else
 	exit (EXIT_FAILURE);
-#endif
+#endif /* 1 */ /* apollo || HAVE_COREFILE */
 }
 
 void
@@ -391,10 +389,10 @@ set_signal_catcher (
 #ifdef SIGTSTP
 	if (do_sigtstp)
 		signal(SIGTSTP, flag ? signal_handler : SIG_DFL);
-#endif
+#endif /* SIGTSTP */
 #ifdef SIGWINCH
 	signal(SIGWINCH, flag ? signal_handler : SIG_DFL);
-#endif
+#endif /* SIGWINCH */
 }
 
 void set_signal_handlers (void)
@@ -418,7 +416,7 @@ void set_signal_handlers (void)
 			 */
 			do_sigtstp = TRUE;
 			/* FALLTHROUGH */
-#endif
+#endif /* SIGTSTP */
 		default:
 			signal (code, signal_handler);
 		}
@@ -431,22 +429,22 @@ set_win_size (
 	int *num_lines,
 	int *num_cols)
 {
-	int	old_lines;
-	int	old_cols;
+	int old_lines;
+	int old_cols;
 #ifdef TIOCGSIZE
 	struct ttysize win;
 #else
 #  ifdef TIOCGWINSZ
 	struct winsize win;
-#  endif
-#endif
+#  endif /* TIOCGWINSZ */
+#endif /* TIOCGSIZE */
 
 	old_lines = *num_lines;
 	old_cols = *num_cols;
 
 #ifndef USE_CURSES
 	init_screen_array (FALSE);		/* deallocate screen array */
-#endif
+#endif /* !USE_CURSES */
 
 #ifdef TIOCGSIZE
 	if (ioctl (0, TIOCGSIZE, &win) == 0) {
@@ -473,7 +471,7 @@ set_win_size (
 
 #ifndef USE_CURSES
 	init_screen_array (TRUE);		/* allocate screen array for resize */
-#endif
+#endif /* !USE_CURSES */
 
 	set_subj_from_size (*num_cols);
 

@@ -2337,14 +2337,14 @@ make_group_path (
 void
 cleanup_tmp_files (void)
 {
-	char acFile[PATH_LEN];
+	char acNovFile[PATH_LEN];
 
 	if (read_news_via_nntp && xover_supported && !cache_overview_files) {
-		sprintf (acFile, "%s%d.idx", TMPDIR, process_id);
-		unlink (acFile);
+		sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
+		unlink (acNovFile);
 	}
 
-	if (! cache_overview_files)
+	if (!cache_overview_files)
 		unlink (local_newsgroups_file);
 
 	if (batch_mode || update_fork)
@@ -2390,8 +2390,8 @@ file_size (
 void
 vPrintBugAddress (void)
 {
-	my_fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s\n",
-		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS);
+	my_fprintf (stderr, "%s %s %s (\"%s\") [%s]: send a DETAILED bug report to %s\n",
+		progname, VERSION, RELEASEDATE, RELEASENAME, OS, BUG_REPORT_ADDRESS);
 	my_fflush (stderr);
 }
 

@@ -59,11 +59,11 @@ bld_tline (
 	struct t_article *art)
 {
 	char mark;
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 	char buff[BUFSIZ];
-#else
+#	else
 	char *buff = screen[INDEX2TNUM(l)].col;
-#endif /* USE_CURSES */
+#	endif /* USE_CURSES */
 	int i;
 	int len_from;
 	struct t_msgid *ptr;
@@ -187,7 +187,7 @@ bld_tline (
 
 	WriteLine(INDEX2LNUM(l), buff);
 }
-#endif
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -199,12 +199,12 @@ draw_tline (
 	int tlen;
 	int x = full ? 0 : (MARK_OFFSET-2);
 	int k = MARK_OFFSET;
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 	char buffer[BUFSIZ];
 	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
-#else
+#	else
 	char *s = &(screen[INDEX2TNUM(i)].col[x]);
-#endif /* USE_CURSES */
+#	endif /* USE_CURSES */
 
 	if (full) {
 		if (strip_blanks) {
@@ -232,7 +232,7 @@ draw_tline (
 	MoveCursor(INDEX2LNUM(i)+1, 0);
 	return;
 }
-#endif
+#endif /* !INDEX_DAEMON */
 
 #ifndef INDEX_DAEMON
 /*
@@ -306,13 +306,13 @@ show_thread (
 			continue;
 		}
 		switch (ch) {
-#ifndef WIN32
+#	ifndef WIN32
 			case ESC:	/* common arrow keys */
-#ifdef HAVE_KEY_PREFIX
+#		ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#endif
+#		endif /* HAVE_KEY_PREFIX */
 				switch (get_arrow_key (ch)) {
-#endif /* WIN32 */
+#	endif /* !WIN32 */
 					case KEYMAP_UP:
 						goto thread_up;
 
@@ -340,7 +340,7 @@ show_thread (
 					case KEYMAP_END:
 						goto end_of_thread;
 
-#ifndef WIN32
+#	ifndef WIN32
 					case KEYMAP_MOUSE:
 						switch (xmouse)
 						{
@@ -372,14 +372,14 @@ show_thread (
 						break;
 				}
 				break;
-#endif /* !WIN32 */
+#	endif /* !WIN32 */
 
-#ifndef NO_SHELL_ESCAPE
+#	ifndef NO_SHELL_ESCAPE
 			case iKeyShellEscape:
 				shell_escape ();
 				show_thread_page ();
 				break;
-#endif
+#	endif /* !NO_SHELL_ESCAPE */
 
 			case iKeyFirstPage:	/* show first page of articles */
 top_of_thread:
@@ -581,14 +581,14 @@ thread_catchup:
 				show_inverse_video_status ();
 				break;
 
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 			case iKeyThreadToggleColor:		/* toggle color */
 				if (toggle_color ()) {
 					show_thread_page ();
 					show_color_status ();
 				}
 				break;
-#endif
+#	endif /* HAVE_COLOR */
 
 			case iKeyQuit:				/* return to previous level */
 				goto thread_done;

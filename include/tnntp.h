@@ -18,7 +18,7 @@
 #if defined (VMS) && defined (SOCKETSHR_TCP)
 #	ifdef __GNUC__
 #		define __SOCKET_TYPEDEFS
-#	endif
+#	endif /* __GNUC__ */
 #	include <netdb.h>
 #	include <in.h>
 #	include <inet.h>
@@ -47,13 +47,13 @@
 #		define	s_dup		dup
 #		define	s_init()	(1)
 #		define	s_end()
-#		endif /* M_AMIGA */
+#	endif /* M_AMIGA */
 #endif /* VMS && SOCKETSHR_TCP */
 
 #if defined(NNTP_ABLE) || defined(HAVE_GETHOSTBYNAME)
 #	ifdef HAVE_NETDB_H
 #		include <netdb.h>
-#	endif
+#	endif /* HAVE_NETDB_H */
 #if defined( __amigaos__ ) /* JK 101097 */
 #	define IPPORT_NNTP ((unsigned short) 119)
 #endif /* !__amigaos__ */
@@ -65,44 +65,41 @@
 #		include	<netinet/in.h>
 #		define	IPPORT_NNTP	((unsigned short) 119)
 #	else
-
-#	ifdef VMS
-#		ifdef MULTINET
-#			include "MULTINET_ROOT:[multinet.include]errno.h"
-#			include "MULTINET_ROOT:[multinet.include]netdb.h"
-#			include "MULTINET_ROOT:[multinet.include.vms]inetiodef.h"
-#			include "MULTINET_ROOT:[multinet.include.sys]socket.h"
-#			include "MULTINET_ROOT:[multinet.include.netinet]in.h"
-#			define netopen	socket_open
-#			define netread	socket_read
-#			define netwrite socket_write
-#			define netclose socket_close
+#		ifdef VMS
+#			ifdef MULTINET
+#				include "MULTINET_ROOT:[multinet.include]errno.h"
+#				include "MULTINET_ROOT:[multinet.include]netdb.h"
+#				include "MULTINET_ROOT:[multinet.include.vms]inetiodef.h"
+#				include "MULTINET_ROOT:[multinet.include.sys]socket.h"
+#				include "MULTINET_ROOT:[multinet.include.netinet]in.h"
+#				define netopen	socket_open
+#				define netread	socket_read
+#				define netwrite socket_write
+#				define netclose socket_close
+#			else
+#				ifdef UCX
+#					include <errno.h>
+#					include <iodef.h>
+#					include <in.h>
+#					include <socket.h>
+#					define 	netopen	open
+#					define 	netread	read
+#					define 	netwrite	write
+#					define 	netclose	close
+#					define	IPPORT_NNTP	((unsigned short) 119)
+#				endif /* UCX */
+#			endif /* MULTINET */
 #		else
-#			ifdef UCX
-#				include <errno.h>
-#				include <iodef.h>
-#				include <in.h>
-#				include <socket.h>
-#				define 	netopen	open
-#				define 	netread	read
-#				define 	netwrite	write
-#				define 	netclose	close
-#				define	IPPORT_NNTP	((unsigned short) 119)
-#			endif /* UCX */
-#		endif /* MULTINET */
-#	else /* !VMS */
-#		include <sys/socket.h>
-#		include <netinet/in.h>
-#		ifdef HAVE_NETLIB_H
-#			include <netlib.h>
-#		endif
-#		ifndef EXCELAN
-#		endif
-#		ifdef HAVE_ARPA_INET_H
-#			include <arpa/inet.h>
-#		endif
-#	endif /* !VMS */
-#	endif /* !TLI */
+#			include <sys/socket.h>
+#			include <netinet/in.h>
+#			ifdef HAVE_NETLIB_H
+#				include <netlib.h>
+#			endif /* HAVE_NETLIB_H */
+#			ifdef HAVE_ARPA_INET_H
+#				include <arpa/inet.h>
+#			endif /* HAVE_ARPA_INET_H */
+#		endif /* VMS */
+#	endif /* TLI */
 
 #	ifdef EXCELAN
 		extern int connect (int, struct sockaddr *);
@@ -110,22 +107,22 @@
 		extern unsigned long rhost (char **);
 		extern int rresvport (int);
 		extern int socket (int, struct sockproto *, struct sockaddr_in *, int);
-#	endif
+#	endif /* EXCELAN */
 
 #	ifdef DECNET
 #		include <netdnet/dn.h>
 #		include <netdnet/dnetdb.h>
-#	endif
+#	endif /* DECNET */
 
-#endif /* NNTP_ABLE */
+#endif /* NNTP_ABLE || HAVE_GETHOSTBYNAME */
 
 #ifndef MAXHOSTNAMELEN
 #	define MAXHOSTNAMELEN 255
 #endif
 
 #ifdef DECL_CONNECT
-	extern int  connect(int  sockfd, struct sockaddr *serv_addr, int addrlen);
-#endif
+	extern int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
+#endif /* DECL_CONNECT */
 #ifdef DECL_INET_NTOA
 	extern char *inet_ntoa (struct in_addr);
 #endif

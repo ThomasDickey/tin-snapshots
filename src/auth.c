@@ -13,14 +13,17 @@
  *              right notice, and it must be included in any copy made
  */
 
+
+#include "nntplib.h"
 #include "tin.h"
+
 
 /*
  * we don't need authentication stuff at all if we are building an index
  * daemon or don't have NNTP support
  */
-
 #if !defined(INDEX_DAEMON) && defined(NNTP_ABLE)
+
 /*
  * local prototypes
  */
@@ -29,29 +32,29 @@ static t_bool authinfo_generic (void);
 static t_bool read_newsauth_file (char *server, char *authuser, char *authpass);
 static t_bool authinfo_original (char *server, char *authuser, t_bool startup);
 
+
 /*
  * Process AUTHINFO GENERIC method.
  * TRUE means succeeded.
  * FALSE means failed
  */
-
 static t_bool
 authinfo_generic (void)
 {
-	char tmpbuf[NNTP_STRLEN];
-	char authval[NNTP_STRLEN];
-	char *authcmd;
 	FILE *fp;
-	t_bool builtinauth = FALSE;
+	char *authcmd;
+	char authval[NNTP_STRLEN];
+	char tmpbuf[NNTP_STRLEN];
 	static int cookiefd = -1;
+	t_bool builtinauth = FALSE;
 #ifdef HAVE_PUTENV
 	char *new_env;
 	static char *old_env = 0;
-#endif
+#endif /* HAVE_PUTENV */
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "authinfo generic");
-#endif
+#endif /* DEBUG */
 
 	/*
 	 * If we have authenticated before, NNTP_AUTH_FDS already
@@ -68,7 +71,7 @@ authinfo_generic (void)
 			error_message (txt_cannot_create_uniq_name);
 #ifdef DEBUG
 			debug_nntp ("authorization", txt_cannot_create_uniq_name);
-#endif
+#endif /* DEBUG */
 			return FALSE;
 		} else {
 			if ((fp = fopen (tempfile, "w+")) != (FILE *) 0) {
@@ -107,11 +110,12 @@ authinfo_generic (void)
 			fileno (get_nntp_fp(FAKE_NNTP_FP)),
 			fileno (get_nntp_wr_fp(FAKE_NNTP_FP)), cookiefd);
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
-#endif
+#endif /* HAVE_PUTENV */
 
 		/* TODO - is it possible that we should have drained server here ? */
-		return (builtinauth ? (get_only_respcode(NULL) == OK_AUTH) : invoke_cmd (authval));
+		return (builtinauth ? (get_only_respcode(NULL) == OK_AUTH) : (invoke_cmd (authval) ? TRUE : FALSE));
 }
+
 
 /*
  * Read the $HOME/.newsauth file and put authentication username
@@ -119,17 +123,16 @@ authinfo_generic (void)
  * Returns TRUE if at least a password was found, FALSE if there was
  * no .newsauth file or no matching server.
  */
-
 static t_bool
 read_newsauth_file (
 	char *server,
 	char *authuser,
 	char *authpass)
 {
-	char line[PATH_LEN];
+	FILE *fp;
 	char *_authpass;
 	char *ptr;
-	FILE *fp;
+	char line[PATH_LEN];
 	int found = 0;
 
 	joinpath (line, homedir, ".newsauth");
@@ -208,11 +211,11 @@ read_newsauth_file (
 		return FALSE;
 }
 
+
 /*
  * Perform authentication with ORIGINAL AUTHINFO method. Return response
  * code from server.
  */
-
 static int
 do_authinfo_original (
 	char *server,
@@ -225,7 +228,7 @@ do_authinfo_original (
 	sprintf (line, "AUTHINFO USER %s", authuser);
 #ifdef DEBUG
 	debug_nntp ("authorization", line);
-#endif
+#endif /* DEBUG */
 	put_server (line);
 	if ((ret = get_only_respcode(NULL)) != NEED_AUTHDATA)
 		return ret;
@@ -233,7 +236,7 @@ do_authinfo_original (
 	if ((authpass == (char *) 0) || (*authpass == '\0')) {
 #ifdef DEBUG
 		debug_nntp ("authorization", "failed: no password");
-#endif
+#endif /* DEBUG */
 		error_message (txt_nntp_authorization_failed, server);
 		return ERR_AUTHBAD;
 	}
@@ -241,11 +244,12 @@ do_authinfo_original (
 	sprintf (line, "AUTHINFO PASS %s", authpass);
 #ifdef DEBUG
 	debug_nntp ("authorization", line);
-#endif
+#endif /* DEBUG */
 	put_server (line);
 	wait_message(2, (((ret = get_only_respcode(line)) == OK_AUTH) ? txt_authorization_ok : txt_authorization_fail), authuser);
 	return ret;
 }
+
 
 /*
  * NNTP user authorization. Returns TRUE if authorization succeeded,
@@ -257,7 +261,6 @@ do_authinfo_original (
  *   nntpserver2 password [user]
  *   etc.
  */
-
 static t_bool
 authinfo_original (
 	char *server,
@@ -273,7 +276,7 @@ authinfo_original (
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "original authinfo");
-#endif
+#endif /* DEBUG */
 
 	authpassword[0]='\0';
 	authuser = strncpy (authusername, authuser, PATH_LEN);
@@ -299,7 +302,7 @@ authinfo_original (
 			if (!(already_failed = (ret != OK_AUTH))) {
 #ifdef DEBUG
 				debug_nntp ("authorization", "succeeded");
-#endif
+#endif /* DEBUG */
 				return TRUE;
 			}
 		}
@@ -336,11 +339,14 @@ authinfo_original (
 		authpass = strncpy (authpassword, ptr, PATH_LEN);
 		ret = do_authinfo_original (server, authuser, authpass);
 	}
+
 #ifdef DEBUG
 	debug_nntp ("authorization", (ret == OK_AUTH ? "succeeded" : "failed"));
-#endif
+#endif /* DEBUG */
+
 	return (ret == OK_AUTH);
 }
+
 
 /*
  * Do authentication stuff. Return TRUE if authentication was successful,
@@ -357,7 +363,8 @@ authenticate (
 {
 	return (authinfo_generic () || authinfo_original (server, user, startup));
 }
+
 #else
 static void no_authenticate (void);
 static void no_authenticate (void) { }
-#endif
+#endif /* !INDEX_DAEMON && NNTP_ABLE */

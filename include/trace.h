@@ -12,21 +12,21 @@
  *	             right notice, and it must be included in any copy made
  */
 
-#ifndef	included_trace_h
-#	define	included_trace_h
+#ifndef included_trace_h
+#	define included_trace_h 1
 
 #	ifdef USE_TRACE
 #		ifdef NCURSES_VERSION
 
-extern char * _nc_visbuf(const char *s);
+extern char *_nc_visbuf(const char *s);
 
 #		else
 
 #			define _nc_visbuf(s) s
 
-extern	char *_tracechar(int c);
+extern char *_tracechar(int c);
 
-extern	void	_tracef ( const char *, ... )
+extern void	_tracef (const char *, ...)
 #			if defined(__GNUC__)
 	__attribute__ ((format(printf,1,2)))
 #			endif /* __GNUC__ */
@@ -38,4 +38,4 @@ extern	void	_tracef ( const char *, ... )
 #		define TRACE(p) /* nothing */
 #	endif /* USE_TRACE */
 
-#endif	/* included_trace_h */
+#endif /* included_trace_h */

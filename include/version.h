@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : version.h
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 24.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1998-08-10
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -17,7 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"980730"
+#	define RELEASEDATE	"980818"
+#	define RELEASENAME	"Laura"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

@@ -680,7 +680,7 @@ write_config_file (
 	if (!*default_editor_format)
 		strcpy (default_editor_format, TIN_EDITOR_FMT_ON);
 
-	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE);
+	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE, RELEASENAME);
 
 	fprintf (fp, txt_tinrc_default_savedir);
 	fprintf (fp, "default_savedir=%s\n\n", default_savedir);
@@ -1279,9 +1279,9 @@ change_config_file (
 			case ESC:	/* common arrow keys */
 #	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#	endif
+#	endif /* HAVE_KEY_PREFIX */
 				switch (get_arrow_key (ch)) {
-#endif
+#endif /* !WIN32 */
 					case KEYMAP_UP:
 						ch = iKeyUp;
 						break;
@@ -1310,7 +1310,7 @@ change_config_file (
 						break;
 				} /* switch (get_arrow_key ()) */
 				break;
-#endif
+#endif /* !WIN32 */
 			default:
 				break;
 		}	/* switch (ch) */

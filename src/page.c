@@ -1083,7 +1083,6 @@ show_mime_article (
 	char buf[PATH_LEN];
 	long offset;
 
-	EndWin();
 	offset = ftell (fp);
 	rewind (fp);
 	if ((mm = getenv("METAMAIL")))
@@ -1091,6 +1090,8 @@ show_mime_article (
 	else
 		sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 
+	EndWin();
+	Raw(FALSE);
 	if ((mime_fp = popen (buf, "w"))) {
 		while (fgets (buf, (int) sizeof(buf), fp) != 0)
 			fputs (buf, mime_fp);

@@ -13,6 +13,7 @@
  *              right notice, and it must be included in any copy made
  */
 
+
 #include	"tin.h"
 #include	"tcurses.h"
 
@@ -652,16 +653,18 @@ get_article (
 
 	}
 
-	if (tin_errno) {
+	if (ferror(fp) || tin_errno) {
 		fclose(fp);
-		goto error;
-	}
-
-	if (ferror(fp)) {
-		fclose(fp);
-		tin_errno = 1;
-		error_message(txt_filesystem_full, tempfile);
-		goto error;
+		if (!tin_errno) {
+			tin_errno = 1;
+			error_message(txt_filesystem_full, tempfile);
+		}
+#	if defined(M_AMIGA) || defined(WIN32)
+		log_unlink(fp, tempfile);
+#	else
+		unlink (tempfile);
+#	endif /* M_AMIGA || WIN32 */
+		return (FILE *) 0;
 	}
 
 	fclose(fp);
@@ -681,14 +684,13 @@ get_article (
 	 * It is impossible to delete an open file on the Amiga or Win32. So we keep a
 	 * copy of the file name and delete it when finished instead.
 	 */
-error:
-#if defined(M_AMIGA) || defined(WIN32)
+#	if defined(M_AMIGA) || defined(WIN32)
 	log_unlink(fp, tempfile);
-#else
+#	else
 	unlink (tempfile);
-#endif
+#	endif /* M_AMIGA || WIN32 */
 
-	return ((tin_errno == 0) ? fp : (FILE *) 0);
+	return fp;
 }
 #endif /* NNTP_ABLE */
 
@@ -938,35 +940,6 @@ vGet1GrpArtInfo (
 		my_flush ();
 #endif /* DEBUG */
 	}
-}
-
-
-void
-vGrpGetSubArtInfo (void)
-{
-#ifndef INDEX_DAEMON
-	int iNum;
-	struct t_group *psGrp;
-
-	if (INTERACTIVE)
-		wait_message (0, txt_rereading_active_file);
-
-	for (iNum = 0; iNum < num_active; iNum++) {
-		psGrp = &active[iNum];
-
-		if (psGrp->subscribed) {
-			vGet1GrpArtInfo(psGrp);
-
-			if (iNum % 5 == 0)
-				spin_cursor ();
-
-		}
-	}
-	if (cmd_line) {
-		printf ("\r\n");
-		fflush (stdout);
-	}
-#endif /* !INDEX_DAEMON */
 }
 
 

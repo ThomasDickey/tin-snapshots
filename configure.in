@@ -519,6 +519,16 @@ AC_CHECK_TYPE(time_t, long)
 AC_TYPE_SIGNAL
 
 ###	Checks for libraries.
+# libuu/uudeview
+# only define HAVE_LIBUU and HAVE_UUDEVIEW_H if both are found
+AC_CHECK_LIB(uu, UUInitialize,
+	[AC_CHECK_HEADER(uudeview.h,
+		[AC_DEFINE(HAVE_LIBUU)
+		AC_DEFINE(HAVE_UUDEVIEW_H)
+		LIBS="$LIBS -luu"]
+	)]
+)
+
 if test $use_curses = yes ; then
 	if test $found_ncurses != yes ; then
 		CF_CURSES_LIBS
@@ -579,6 +589,7 @@ AC_CHECK_FUNCS(\
 	bcopy \
 	ftime \
 	getcwd \
+	inet_aton \
 	is_xterm \
 	isascii \
 	link \

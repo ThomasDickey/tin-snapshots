@@ -16,9 +16,9 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-#ifdef HAVE_LIBUU /* define if you have libuu */
+#ifdef HAVE_UUDEVIEW_H
 #	include <uudeview.h>
-#endif /* HAVE_LIBUU */
+#endif /* HAVE_UUDEVIEW_H */
 
 #undef OFF
 

@@ -14,16 +14,21 @@
  *              is included prominently in any copy made.
  */
 
+
 #include "tin.h"
 #include "tcurses.h"
 #include "tnntp.h"
 
+
 #ifdef VMS  /* M.St. 15.01.98 */
 #	undef VMS
-#endif
+#endif /* VMS */
 
 /* Copy of last NNTP command sent, so we can retry it if needed */
-char	last_put[NNTP_STRLEN];
+char last_put[NNTP_STRLEN];
+
+/* Flag to show whether tin did reconnect in last get_server process */
+t_bool reconnected_in_last_get_server = FALSE;
 
 TCP *nntp_rd_fp = NULL;
 TCP *nntp_wr_fp = NULL;
@@ -33,7 +38,7 @@ TCP *nntp_wr_fp = NULL;
  */
 #ifdef NNTP_ABLE
 	static int get_tcp_socket (char *machine, char *service, unsigned short port);
-#endif
+#endif /* NNTP_ABLE */
 
 /* Close the NNTP connection with prejudice */
 #define NNTP_HARD_CLOSE					\
@@ -136,17 +141,17 @@ getserverbyfile (
 		}
 	}
 
-#ifdef USE_INN_NNTPLIB
+#	ifdef USE_INN_NNTPLIB
 	if ((cp = GetConfigValue (_CONF_SERVER)) != (char *) 0) {
 		(void) STRCPY(buf, cp);
 		return (buf);
 	}
-#endif /* USE_INN_NNTPLIB */
+#	endif /* USE_INN_NNTPLIB */
 
-#ifdef NNTP_DEFAULT_SERVER
+#	ifdef NNTP_DEFAULT_SERVER
 	if (*(NNTP_DEFAULT_SERVER))
 		return NNTP_DEFAULT_SERVER;
-#endif	/* NNTP_DEFAULT_SERVER */
+#	endif /* NNTP_DEFAULT_SERVER */
 
 #endif /* NNTP_ABLE */
 	return (char *) 0;	/* No entry */
@@ -221,7 +226,7 @@ server_init (
 		return (-errno);
 	}
 
-#		ifdef TLI
+#		ifdef TLI /* Transport Level Interface */
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
 		t_error ("server_init: t_sync");
 		nntp_rd_fp = NULL;
@@ -247,6 +252,7 @@ server_init (
 }
 #endif /* NNTP_ABLE */
 
+
 /*
  * get_tcp_socket -- get us a socket connected to the specified server.
  *
@@ -263,7 +269,6 @@ server_init (
  *
  *	Errors:		Returned & printed via perror.
  */
-
 #ifdef NNTP_ABLE
 static int
 get_tcp_socket (
@@ -274,7 +279,7 @@ get_tcp_socket (
 	int s = -1;
 	int save_errno = 0;
 	struct sockaddr_in sock_in;
-#ifdef TLI
+#	ifdef TLI /* Transport Level Interface */
 	char device[20];
 	char *env_device;
 	extern int t_errno;
@@ -303,7 +308,13 @@ get_tcp_socket (
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
 
-	if (!isdigit((unsigned char)*machine) || (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == INADDR_NONE) {
+	if (!isdigit((unsigned char)*machine) ||
+#		ifdef HAVE_INET_ATON
+	    !inet_aton(machine, &sock_in)
+#		else
+	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == INADDR_NONE)
+#		endif /* HAVE_INET_ATON */
+	{
 		if ((hp = gethostbyname (machine)) == NULL) {
 			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
@@ -363,38 +374,45 @@ get_tcp_socket (
 		return (-EPROTO);
 	}
 
-#else /* !TLI */
-#ifndef EXCELAN
+#	else /* not TLI */
+#		ifndef EXCELAN
 	struct servent *sp;
 	struct hostent *hp;
-#ifdef h_addr
+#			ifdef h_addr
 	int	x = 0;
 	register char **cp;
-	static char *alist[1];
-#endif /* h_addr */
+	static char *alist[2] = {0,0};
+#			endif /* h_addr */
 	static struct hostent def;
 	static struct in_addr defaddr;
 	static char namebuf[256];
 
-#ifdef HAVE_GETSERVBYNAME
+#			ifdef HAVE_GETSERVBYNAME
 	if ((sp = (struct servent *) getservbyname (service, "tcp")) ==  NULL) {
 		my_fprintf (stderr, "%s/tcp: Unknown service.\n", service);
 		return (-EHOSTUNREACH);
 	}
-#else
+#			else
 	sp = (struct servent *) my_malloc (sizeof (struct servent));
 	sp->s_port = htons (IPPORT_NNTP);
-#endif
+#			endif /* HAVE_GETSERVBYNAME */
+
 	/* If not a raw ip address, try nameserver */
-	if (!isdigit((unsigned char)*machine) || (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
+	if (!isdigit((unsigned char)*machine) ||
+#			ifdef HAVE_INET_ATON
+	    !inet_aton(machine, &defaddr))
+#			else
+	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1)
+#			endif /* HAVE_INET_ATON */
+	{
 		hp = gethostbyname (machine);
 	} else {
 		/* Raw ip address, fake */
-		(void) strcpy (namebuf, machine);
+		STRCPY(namebuf, machine);
 		def.h_name = (char *) namebuf;
-#ifdef h_addr
+#			ifdef h_addr
 		def.h_addr_list = alist;
-#endif
+#			endif /* h_addr */
 		def.h_addr = (char *) &defaddr;
 		def.h_length = sizeof (struct in_addr);
 		def.h_addrtype = AF_INET;
@@ -411,10 +429,10 @@ get_tcp_socket (
 	sock_in.sin_family = hp->h_addrtype;
 	sock_in.sin_port = htons (port);
 /*	sock_in.sin_port = sp->s_port; */
-#else /* EXCELAN */
+#		else
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
-#endif /* EXCELAN */
+#		endif /* !EXCELAN */
 
 	/*
 	 * The following is kinda gross.  The name server under 4.3
@@ -426,13 +444,11 @@ get_tcp_socket (
 	 * code...
 	 */
 
-#ifdef h_addr
-
+#		ifdef h_addr
 	/*
 	 * Get a socket and initiate connection -- use multiple addresses
 	 */
 	for (cp = hp->h_addr_list; cp && *cp; cp++) {
-
 		if ((s = socket (hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
 			perror ("socket");
 			return (-errno);
@@ -443,8 +459,8 @@ get_tcp_socket (
 		if (x < 0)
 			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
 
-#if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
-#	define HPSOCKSIZE 0x8000
+#			if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
+#				define HPSOCKSIZE 0x8000
 		getsockopt(s, SOL_SOCKET, SO_SNDBUF, (caddr_t)&socksize, (caddr_t)&socksizelen);
 		if (socksize < HPSOCKSIZE) {
 			socksize = HPSOCKSIZE;
@@ -457,7 +473,7 @@ get_tcp_socket (
 			socksize = HPSOCKSIZE;
 			setsockopt(s, SOL_SOCKET, SO_RCVBUF, (caddr_t)&socksize, sizeof(socksize));
 		}
-#endif /* __hpux && SVR4 */
+#			endif /* __hpux && SVR4 */
 
 		if ((x = connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in))) == 0)
 			break;
@@ -472,9 +488,9 @@ get_tcp_socket (
 		my_fprintf (stderr, "Giving up...\n");
 		return (-save_errno);					/* Return the last errno we got */
 	}
-#else	/* no name server */
+#		else	/* no name server */
 
-#ifdef EXCELAN
+#			ifdef EXCELAN
 	if ((s = socket (SOCK_STREAM, (struct sockproto *)NULL, &sock_in, SO_KEEPALIVE)) < 0) {
 		perror ("socket");
 		return (-errno);
@@ -498,7 +514,7 @@ get_tcp_socket (
 		return (-save_errno);
 	}
 
-#else /* not EXCELAN */
+#			else /* not EXCELAN */
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		perror ("socket");
 		return (-errno);
@@ -515,12 +531,13 @@ get_tcp_socket (
 		return (-save_errno);
 	}
 
-#endif /* !EXCELAN */
-#endif /* !h_addr */
-#endif /* !TLI */
+#			endif /* !EXCELAN */
+#		endif /* !h_addr */
+#	endif /* !TLI */
 	return (s);
 }
 #endif /* NNTP_ABLE */
+
 
 #ifdef DECNET
 /*
@@ -536,13 +553,12 @@ get_tcp_socket (
  *
  *	Errors:		Printed via nerror.
  */
-
 int
 get_dnet_socket (
 	char	*machine,
 	char	*service)
 {
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 	int	s, area, node;
 	struct	sockaddr_dn sdn;
 	struct	nodeent *getnodebyname(), *np;
@@ -590,11 +606,11 @@ get_dnet_socket (
 	}
 
 	return (s);
-#else
+#	else
 	return (-1);
-#endif /* NNTP_ABLE */
+#	endif /* NNTP_ABLE */
 }
-#endif
+#endif /* DECNET */
 
 
 /*
@@ -602,14 +618,14 @@ get_dnet_socket (
  */
 
 #ifndef VMS
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 void
 u_put_server (
 	const char *string)
 {
 	s_puts(string, nntp_wr_fp);
 }
-#endif
+#	endif /* NNTP_ABLE */
 
 
 /*
@@ -630,7 +646,6 @@ u_put_server (
  *			do the fprintf's yourself, and then a final
  *			fflush.
  */
-#ifndef VMS
 #	ifdef NNTP_ABLE
 void
 put_server (
@@ -649,13 +664,12 @@ put_server (
 	return;
 }
 #	endif /* NNTP_ABLE */
-#endif /* !VMS */
 
 /*
  * Reconnect to server after a timeout, reissue last command to
  * get us back into the pre-timeout state
  */
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 static int
 reconnect(
 	int retry)
@@ -722,6 +736,7 @@ get_server (
 {
 	int retry = NNTP_TRY_RECONNECT;
 
+	reconnected_in_last_get_server = FALSE;
 	errno = 0;
 
 	/*
@@ -729,16 +744,17 @@ get_server (
 	 */
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 
-#	ifdef DEBUG
+#		ifdef DEBUG
 		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
 			perror_message("get_server()");
-#	endif /* DEBUG */
+#		endif /* DEBUG */
 		retry = reconnect(retry);			/* Will abort when out of tries */
+		reconnected_in_last_get_server = TRUE;
 	}
 
 	return string;
 }
-#endif /* NNTP_ABLE */
+#	endif /* NNTP_ABLE */
 
 
 /*
@@ -753,7 +769,7 @@ get_server (
  *			You can't use "put_server" or "get_server"
  *			after this routine is called.
  */
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 void
 close_server (void)
 {
@@ -768,8 +784,8 @@ close_server (void)
 	s_end();
 	nntp_wr_fp = nntp_rd_fp = NULL;
 }
-#endif /* NNTP_ABLE */
-#endif /* VMS */
+#	endif /* NNTP_ABLE */
+#endif /* !VMS */
 
 #ifdef DEBUG
 /*
@@ -779,7 +795,7 @@ const char *
 nntp_respcode (
 	int respcode)
 {
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 	static const char *text;
 
 	switch (respcode) {
@@ -959,8 +975,8 @@ nntp_respcode (
 	}
 	return (text);
 
-#else
+#	else
 	return ("");
-#endif
+#	endif /* NNTP_ABLE */
 }
 #endif /* DEBUG */

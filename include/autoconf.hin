@@ -152,6 +152,7 @@
 #undef	HAVE_GETCWD
 #undef	HAVE_GETHOSTBYNAME
 #undef	HAVE_GETSERVBYNAME
+#undef	HAVE_INET_ATON
 #undef	HAVE_IS_XTERM
 #undef	HAVE_ISASCII
 #undef	HAVE_LINK
@@ -440,3 +441,9 @@
 #undef	TIN_DEFAULTS_DIR
 
 #undef	HAVE_COFFEE
+
+/*
+ * libuu - used in save.c
+ */
+#undef HAVE_UUDEVIEW_H
+#undef HAVE_LIBUU
