@@ -48,6 +48,7 @@
 #define	ATTRIB_AUTO_SAVE_MSG		27
 #define ATTRIB_X_COMMENT_TO		28
 #define ATTRIB_NEWS_QUOTE		29
+#define ATTRIB_QUOTE_CHARS		30
 
 /*
  * global attributes	
@@ -97,6 +98,7 @@ set_default_attributes (psAttrib)
 	psAttrib->post_proc_type = default_post_proc_type;
 	psAttrib->x_comment_to = FALSE;
 	psAttrib->news_quote_format = news_quote_format;
+	psAttrib->quote_chars = quote_chars;
 
 #endif	/* INDEX_DAEMON */
 }
@@ -148,6 +150,7 @@ set_default_attributes (psAttrib)
  *  attribute.x_headers = STRING
  *  attribute.x_comment_to = ON/OFF
  *  attribute.news_quote_format = STRING
+ *  attribute.quote_chars = STRING
  */
 
 void
@@ -281,6 +284,11 @@ read_attributes_file (file, global_file)
 				}
 				if (match_boolean (line, "quick_select_expire=", &num)) {
 					set_attrib_num (ATTRIB_QUICK_SELECT_EXPIRE, scope, num);
+					break;
+				}
+				if (match_string (line, "quote_chars=", buf, sizeof (buf))) {
+					quote_dash_to_space (buf);
+					set_attrib_str (ATTRIB_QUOTE_CHARS, scope, buf);
 					break;
 				}
 				break;
@@ -545,6 +553,8 @@ set_attrib (psGrp, type, str, num)
 		case ATTRIB_NEWS_QUOTE:
 			psGrp->attribute->news_quote_format = str_dup (str);
 			break;
+		case ATTRIB_QUOTE_CHARS:
+			psGrp->attribute->quote_chars = str_dup (str);
 		default:
 			break;
 	}
@@ -631,6 +641,7 @@ write_attributes_file (file)
 	fprintf (fp, "#    4=msgid 5=lines\n#\n");
 	fprintf (fp, "#  x_comment_to=ON/OFF\n");
 	fprintf (fp, "#  news_quote_format=STRING\n#\n");
+	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n#\n");
 	fprintf (fp, "# Note that it is best to put general (global scoping)\n");
 	fprintf (fp, "# entries first followed by group specific entries.\n\n");
 
@@ -679,7 +690,10 @@ write_attributes_file (file)
 		fprintf (fp, "x_body=%s\n", psGrp->attribute->x_body);
 		fprintf (fp, "x_comment_to=%s\n", 
 			print_boolean (psGrp->attribute->x_comment_to));
-		fprintf (fp, "news_quote_format=%s\n", psGrp->attribute->news_quote_format);
+		fprintf (fp, "news_quote_format=%s\n",
+			psGrp->attribute->news_quote_format);
+		fprintf (fp, "quote_chars=%s\n",
+			quote_space_to_dash (psGrp->attribute->quote_chars)); 
 	}
 
 	fclose (fp);

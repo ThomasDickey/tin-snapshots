@@ -137,10 +137,13 @@ copy_body (fp_ip, fp_op, prefix, initl)
 	extern int errno;
 #endif
 	char buf[8192];
+	char buf2[8192];
 	int retcode;
+	char zprefix[256];
 	char prefixbuf[256];
-	int statusspace;
-	int statuschar;
+	int status_space;
+	int status_char;
+	int double_quote;
 	int i;
 
 	if (!prefix || !prefix[0]) {
@@ -155,24 +158,43 @@ copy_body (fp_ip, fp_op, prefix, initl)
 		return;
 	}
 
-	if (strstr(prefix, "%s")) sprintf(prefixbuf, prefix, initl);
+	strcpy(zprefix, prefix);
+
+	if (strstr(prefix, "%S")) {
+		double_quote = 1;
+		status_char = 0;
+		for (i=0; prefix[i]; i++) {
+			if ((status_char) && (prefix[i] == 'S'))
+				zprefix[i] = 's';
+			if (prefix[i] == '%') status_char = 1;
+			else status_char = 0;
+		}
+	}
+	else double_quote = 0;
+
+	if (strstr(zprefix, "%s")) sprintf(prefixbuf, zprefix, initl);
 
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
 		if (buf[0] != '\n') {
-			if (strstr(prefix, "%s")) { /* initials wanted */
+			if (strstr(zprefix, "%s")) { /* initials wanted */
 				if (strchr(buf, '>')) {
-					statusspace = 0;
-					statuschar = 1;
-					for(i=0; buf[i] && (buf[i] != '>'); i++) {
-						if (buf[i] != ' ') statusspace = 1;
-						if ((statusspace) &&
+					status_space = 0;
+					status_char = 1;
+					for (i=0; buf[i] && (buf[i] != '>'); i++) {
+						buf2[i] = buf[i];
+						if (buf[i] != ' ') status_space = 1;
+						if ((status_space) &&
 						  !((buf[i] >= 'A' && buf[i] <= 'Z') ||
 						    (buf[i] >= 'a' && buf[i] <= 'z') ||
-						    (buf[i] == '>'))) statuschar = 0;
+						    (buf[i] == '>'))) status_char = 0;
 					}
-					if (statuschar) {  /* already quoted, do not quote again */
-						retcode = fprintf (fp_op, "%s", buf);
-					} else {
+					buf2[i] = '\0'; 
+					if (status_char) {  /* already quoted */
+						if (double_quote) {
+							retcode = fprintf (fp_op, "%s>%s", buf2, strchr(buf, '>'));
+						}
+						else retcode = fprintf (fp_op, "%s", buf);
+					} else {   /* ... to be quoted ... */
 						retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
 					}
 				} else {   /* line was not already quoted (no >) */
@@ -1535,6 +1557,7 @@ create_index_lock_file (lock_file)
  *   %M  Articles MessageId
  *   %N  Articles Name of author
  *   %C  First Name of author
+ *   %I  Initials of author
  */
 
 int
@@ -1550,7 +1573,7 @@ strfquote (group, respnum, s, maxsize, format)
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];
-	int i;
+	int i, j, iflag;
 
 	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0) {
 		return 0;
@@ -1617,6 +1640,23 @@ strfquote (group, respnum, s, maxsize, format)
 					break;
 				case 'G':	/* Groupname of Article */
 					strcpy (tbuf, group);
+					break;
+				case 'I':	/* Initials of author */ 	
+					if (arts[respnum].name != (char *) 0) {
+						strcpy (tbuf, arts[respnum].name);
+					} else {
+						strcpy (tbuf, arts[respnum].from);
+					}
+					j = 0;
+					iflag = 1;
+					for (i=0; tbuf[i]; i++) {
+						if (iflag) {
+							tbuf[j++] = tbuf[i];
+							iflag = 0;
+						}
+						if (strchr(" ._@", tbuf[i])) iflag = 1;
+					}	
+					tbuf[j] = '\0';  
 					break;
 				case 'M':	/* Articles MessageId */
 					strcpy (tbuf, note_h_messageid);
@@ -2138,7 +2178,7 @@ get_initials (respnum, s, maxsize)
 			s[j++] = tbuf[i];
 			iflag = 0;
 		}
-		if (tbuf[i] == ' ') iflag = 1;
+		if (strchr(" ._@", tbuf[i])) iflag = 1;
 	}	
 	s[j] = '\0';  
 	

@@ -39,7 +39,8 @@ Compiled & installed on the following machines:
 6)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
 	VAX 8350 & Ultrix 4.0 with gcc 2.7.2
 
-7)	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
+7)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
+	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
 
 8)	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
 

@@ -27,7 +27,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#if HAVE_MALLOC_H
 #include <malloc.h>
+#endif
 #undef MIME_BREAK_LONG_LINES	/*
 				 * define this to make TIN strictly observe
 				 * RFC1522 and break lots of other software
@@ -504,7 +506,12 @@ rfc15211522_encode(filename)
 	}
 
 	/* now add MIME headers as necessary */
+#if 0  /* RFC1522 does not require MIME headers just because there are
+	   encoded header lines */
   	if (quoteflag||umlauts) {
+#else
+	if (umlauts) {
+#endif
 		fputs("MIME-Version: 1.0\n",f);
 		if (body_encoding_needed) {
 			fprintf(f,"Content-Type: text/plain; charset=%s\n",mm_charset);

@@ -1,43 +1,43 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960529 (Wed May 29 20:51:53 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960606 (Thu Jun  6 17:29:57 MET DST 1996)
 ----------------------------------------------------
-  15936 ./CHANGES
+  16803 ./CHANGES
    9154 ./TODO
    5012 ./Makefile
   17174 ./INSTALL
    2092 ./MANIFEST
-   1266 ./README
+   1320 ./README
     913 ./tinpp
-  13185 ./aclocal.m4
-  87297 ./configure
-   9245 ./configure.in
+  16448 ./aclocal.m4
+ 100543 ./configure
+   9268 ./configure.in
    4771 ./install.sh
   11438 ./makefile.in
-    980 ./conf-tin
+   1241 ./conf-tin
   69402 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
-   9832 ./include/config.h
-  34822 ./include/extern.h
+   9210 ./include/config.h
+  31244 ./include/extern.h
     565 ./include/gst.h
   10025 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
-   1827 ./include/patchlev.h
+   1888 ./include/patchlev.h
   28562 ./include/proto.h
    1272 ./include/stpwatch.h
-  39833 ./include/tin.h
+  40242 ./include/tin.h
    4101 ./include/win32.h
     791 ./include/win32tcp.h
   19291 ./src/active.c
    8203 ./src/actived.c
   13012 ./src/amiga.c
-   4427 ./src/amigatcp.c
+   4445 ./src/amigatcp.c
   36344 ./src/art.c
-  22033 ./src/attrib.c
+  22549 ./src/attrib.c
    8262 ./src/charset.c
    1463 ./src/color.c
-  41438 ./src/config.c
+  41433 ./src/config.c
   19933 ./src/curses.c
   12381 ./src/debug.c
    2835 ./src/envarg.c
@@ -52,24 +52,24 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960529 (Wed May 29 20:51:53 MET DST 1996)
   40781 ./src/lang.c
    2771 ./src/list.c
   12009 ./src/mail.c
-  16806 ./src/main.c
+  16832 ./src/main.c
   11022 ./src/memory.c
-  41965 ./src/misc.c
+  42942 ./src/misc.c
    7234 ./src/msmail.c
   33022 ./src/newsrc.c
   26002 ./src/nntplib.c
   31433 ./src/nntpw32.c
   26395 ./src/open.c
    6305 ./src/os_2.c
-  34316 ./src/page.c
+  34991 ./src/page.c
   24128 ./src/parsdate.y
    7195 ./src/pgp.c
-  63052 ./src/post.c
+  63220 ./src/post.c
    4342 ./src/prompt.c
      53 ./src/proto.sed
   10088 ./src/refs.c
    5411 ./src/rfc1521.c
-  12321 ./src/rfc1522.c
+  12474 ./src/rfc1522.c
   34142 ./src/save.c
    4116 ./src/screen.c
    9895 ./src/search.c
@@ -77,12 +77,12 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960529 (Wed May 29 20:51:53 MET DST 1996)
    5270 ./src/sigfile.c
   11022 ./src/signal.c
    5882 ./src/strftime.c
-  25285 ./src/thread.c
+  25298 ./src/thread.c
    5014 ./src/wildmat.c
   12569 ./src/win32.c
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
-   5614 ./include/autoconf.hin
-  10463 ./src/Makefile.in
-1336013 total
+   5536 ./include/autoconf.hin
+  10116 ./src/Makefile.in
+1352113 total

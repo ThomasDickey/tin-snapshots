@@ -12,6 +12,8 @@
  *              right notice, and it must be included in any copy made
  */
 
+#include "tin.h"
+
 #if defined (M_AMIGA) && defined (NNTP_ABLE)
 
 #include <stdio.h>

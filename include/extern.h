@@ -22,112 +22,13 @@
 #define P_(s) ()
 #endif
 
-#ifdef apollo
-extern char *getlogin  P_((void));
-extern int access  P_((char *, int));
-extern int bcopy  P_((char *, char *, int));
-extern int bzero  P_((char *, int));
-extern int chdir  P_((char *));
-extern int chmod  P_((char *, int));
-extern int dup  P_((int));
-extern int gethostname  P_((char *, int));
-extern int ioctl  P_((int, unsigned long, void *));
-extern int mkdir  P_((char *, int));
-extern int setregid  P_((int, int));
-extern int setreuid  P_((int, int));
-extern int umask  P_((int));
-extern int wait  P_((int *));
-#endif
-
-#if defined(DEBUG) && (!defined(__GNUC__) && !defined(__DECC))
-
-extern unsigned int alarm  P_((unsigned int seconds));
-extern int close  P_((int fildes));
-extern int fork  P_((void));
-#if !defined (WIN32)
-extern int getpid  P_((void));
-#if !defined(DGUX) && !defined(M_AMIGA)
-extern unsigned short getuid  P_((void));
-extern unsigned short getegid  P_((void));
-extern unsigned short geteuid  P_((void));
-#endif /* DGUX */
-#endif /* !WIN32 */
-extern int kill  P_((int pid, int sig));
-#if defined(sun) && defined(HAVE_STDLIB_H)
-extern int bcopy  P_((char *p1, char *p2, int n));
-extern void bzero  P_((char *p, int n));
-extern int fclose  P_((FILE *fp));
-extern int fflush  P_((FILE *fp));
-extern int fprintf  P_((FILE *fp, const char *fmt, ...));
-extern int fputc  P_((int c, FILE *fp));
-extern int fputs  P_((const char *s, FILE *fp));
-extern size_t fread  P_((void *p, size_t size, size_t n, FILE *s));
-extern int fseek  P_((FILE *p, long off, int n));
-extern size_t fwrite  P_((void *p, size_t size, size_t n, FILE *s));
-extern int gethostname  P_((char *name, int namelen));
-extern char * getwd  P_((char *));
-extern int ioctl  P_((int fd, unsigned long req, void *p));
-extern void * memset  P_((void *p, int c, size_t n));
-extern int open  P_((const char *path, int oflag, ...));
-extern void perror  P_((const char *s));
-extern int printf  P_((const char *fmt, ...));
-extern int puts  P_((const char *s));
-extern void rewind  P_((FILE *s));
-extern int select  P_((int width, fd_set *r, fd_set *w, fd_set *e, struct timeval *t));
-extern int socket  P_((int domain, int type, int protocol));
-extern int sscanf  P_((const char *s, const char *fmt, ...));
-extern long strtol  P_((const char *s, char **d, int base));
-extern int system  P_((char *s));
-extern time_t time  P_((time_t *p));
-extern int tolower  P_((int c));
-extern int toupper  P_((int c));
-extern int wait  P_((int *s));
-#else
-#	ifndef M_AMIGA
-extern int open  P_((char *path, int oflag));
-#	endif
-#endif
-extern int pclose  P_((FILE *stream));
-#if !defined (linux) && !defined (WIN32)
-extern int tgetent  P_((char *bp, char *name));
-extern int tputs  P_((register char *cp, int count, int (*outc)(int)));
-extern int getopt  P_((int argc, char **argv, char *optstring));
-#	if defined(sun) && defined(HAVE_STDLIB_H)
-extern char *getcwd  P_((char *buf, size_t size));
-extern int link  P_((const char *path1, const char *path2));
-/*extern int read  P_((int fildes, void *buf, unsigned int nbyte)); */
-extern int setgid  P_((uid_t gid));
-extern int setegid  P_((uid_t gid));
-extern int setuid  P_((uid_t uid));
-extern int seteuid  P_((uid_t uid));
-extern int unlink  P_((const char *path));
-#	else
-extern char *getcwd  P_((char *buf, int size));
-extern int link  P_((char *path1, char *path2));
-/*extern int read  P_((int fildes, char *buf, unsigned int nbyte)); */
-#ifndef M_AMIGA
-extern int setgid  P_((int gid));
-extern int setuid  P_((int uid));
-#endif
-extern int unlink  P_((char *path));
-#	endif
-#endif
-#if !defined(sony) && !defined(linux) && !defined(M_AMIGA) && !defined(WIN32)
-#	ifndef DGUX
-extern unsigned short getgid  P_((void));
-#	endif /* DGUX */
-#	ifdef BSD
-extern void setpgrp  P_((int pid, int pgrp));
-#	else
-extern void setpgrp  P_((void));
-#	endif
-extern unsigned int sleep  P_((unsigned int seconds));
-#endif
-
-#endif
-
+/*
+ * The prototypes bracketed by DECL_xxxx ifdef's are used to get moderately
+ * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
+ * are enabled.
+ */
 #ifdef DECL_BCOPY
-extern int	bcopy P_((char *, char *, int));
+extern int bcopy P_((char *, char *, int));
 #endif
 #ifdef DECL_BZERO
 extern void bzero P_((char *, int));
@@ -142,31 +43,37 @@ extern int fflush P_((FILE *));
 extern int fprintf P_((FILE *, const char *, ...));
 #endif
 #ifdef DECL_FPUTC
-extern int fputc  P_((int c, FILE *fp));
+extern int fputc P_((int, FILE *));
 #endif
 #ifdef DECL_FPUTS
-extern int fputs  P_((const char *s, FILE *fp));
+extern int fputs P_((const char *, FILE *));
 #endif
 #ifdef DECL_FREAD
-extern size_t fread  P_((void *p, size_t size, size_t n, FILE *s));
+extern size_t fread P_((void *, size_t, size_t, FILE *));
 #endif
 #ifdef DECL_FSEEK
-extern int fseek  P_((FILE *p, long off, int n));
+extern int fseek P_((FILE *, long, int));
 #endif
 #ifdef DECL_FWRITE
-extern size_t fwrite  P_((void *p, size_t size, size_t n, FILE *s));
+extern size_t fwrite P_((void *, size_t, size_t, FILE *));
+#endif
+#ifdef DECL_GETCWD
+extern char *getcwd P_((char *, size_t));
 #endif
 #ifdef DECL_GETHOSTNAME
-extern int gethostname  P_((char *, int));
+extern int gethostname P_((char *, int));
+#endif
+#ifdef DECL_GETLOGIN
+extern char *getlogin P_((void));
 #endif
 #ifdef DECL_GETOPT
-extern int getopt  P_((int argc, char **argv, char *optstring));
+extern int getopt P_((int, char **, char *));
 #endif
 #ifdef DECL_IOCTL
-extern int ioctl  P_((int, unsigned long, void *));
+extern int ioctl P_((int, unsigned long, void *));
 #endif
 #ifdef DECL_MEMSET
-extern void * memset  P_((void *p, int c, size_t n));
+extern void * memset P_((void *, int, size_t));
 #endif
 #ifdef DECL_MKTEMP
 extern char * mktemp P_((char *));
@@ -175,59 +82,63 @@ extern char * mktemp P_((char *));
 extern int pclose P_((FILE *));
 #endif
 #ifdef DECL_PERROR
-extern void perror P_((const char *s));
+extern void perror P_((const char *));
 #endif
 #ifdef DECL_PRINTF
-extern int printf P_((const char *fmt, ...));
+extern int printf P_((const char *, ...));
 #endif
 #ifdef DECL_REWIND
-extern void rewind  P_((FILE *s));
+extern void rewind P_((FILE *));
 #endif
 #ifdef DECL_SELECT
-extern int select  P_((int width, fd_set *r, fd_set *w, fd_set *e, struct timeval *t));
+extern int select P_((int, fd_set *, fd_set *, fd_set *, struct timeval *));
 #endif
 #ifdef DECL_SETEGID
-extern int setegid  P_((uid_t gid));
+extern int setegid P_((uid_t));
 #endif
 #ifdef DECL_SETEUID
-extern int seteuid  P_((uid_t uid));
+extern int seteuid P_((uid_t));
 #endif
 #ifdef DECL_SETPGRP
-/* FIXME: setpgrp */
+#if SETPGRP_VOID
+extern void setpgrp P_((void));
+#else
+extern void setpgrp P_((int, int));
 #endif
+#endif /* DECL_SETPGRP */
 #ifdef DECL_SOCKET
-extern int socket  P_((int domain, int type, int protocol));
+extern int socket P_((int, int, int));
 #endif
 #ifdef DECL_SSCANF
-extern int sscanf  P_((const char *s, const char *fmt, ...));
+extern int sscanf P_((const char *, const char *, ...));
 #endif
 #ifdef DECL_STRFTIME
 extern int strftime P_((char *, int, char *, struct tm *));
 #endif
 #ifdef DECL_STRTOL
-extern long strtol P_((const char *s, char **d, int base));
+extern long strtol P_((const char *, char **, int));
 #endif
 #ifdef DECL_SYSTEM
-extern int system  P_((char *s));
+extern int system P_((char *));
 #endif
 #ifdef DECL_TIME
-extern time_t time  P_((time_t *p));
+extern time_t time P_((time_t *));
 #endif
 #ifdef DECL_TOLOWER
-extern int tolower  P_((int c));
+extern int tolower P_((int));
 #endif
 #ifdef DECL_TOUPPER
-extern int toupper  P_((int c));
+extern int toupper P_((int));
 #endif
 #ifdef DECL_TPUTS
-extern int tputs  P_((char *, int count, int (*outc)(int)));
+extern int tputs P_((char *, int, int (*)(int)));
 #endif
 #ifdef DECL__FLSBUF
 extern int _flsbuf P_((int, FILE *));
 #endif
 
 #if !__STDC__ || defined(DECL_GETENV)
-extern char *getenv  P_((char *));
+extern char *getenv P_((char *));
 #endif
 
 extern int optind;

@@ -747,6 +747,12 @@ show_note_page (group, respnum)
 {
 #ifndef INDEX_DAEMON
 
+	/* *** */
+	char firstchars[4];
+	char sigstart[] = "-- ";                /* + \n !!!! */
+	int below_sig = FALSE;
+	/* *** */
+	
 	char buf3[2*LEN+200];
 	int ctrl_L = FALSE;		/* form feed character detected */
 	int first  = TRUE;
@@ -792,6 +798,9 @@ show_note_page (group, respnum)
 #endif
 
 	if (skip_include) note_page--;
+	/* *** */
+	below_sig = FALSE;
+	/* *** */
 	while (note_line < lines) {
 		note_mark[note_page+1] = ftell (note_fp);
 		if (show_last_line_prev_page) {
@@ -814,6 +823,14 @@ print_a_line:
 		if (first) {
 			StartInverse ();
 		}	
+
+        	/* *** */
+        	strncpy(firstchars, buf2, 4);
+        	firstchars[3] = (char) '\0';
+		if( ! strcmp(firstchars, sigstart) )
+			below_sig = TRUE;
+		/* *** */
+                                                                                                        
 		strip_line (buf2, strlen (buf2));
 		
 		if (tex2iso_supported && tex2iso_article) {
@@ -832,7 +849,14 @@ print_a_line:
 			if (first_char != skip_include) {
 				skip_include = '\0';
 #ifdef HAVE_COLOR
-				print_color(buf2);
+				/* *** */
+				if( ! below_sig )
+					print_color(buf2);
+				else {
+					fcol(col_text);
+					printf ("%s\r\n", buf2);
+				}
+				/* *** */
 #else
 				printf ("%s\r\n", buf2);
 #endif
@@ -841,7 +865,14 @@ print_a_line:
 			}
 		} else {
 #ifdef HAVE_COLOR
-			print_color(buf2);
+			/* *** */
+			if( ! below_sig )
+				print_color(buf2);
+			else {
+				fcol(col_text);
+				printf ("%s\r\n", buf2);
+			}
+			/* *** */
 #else
 			printf ("%s\r\n", buf2);
 #endif
@@ -999,7 +1030,7 @@ show_first_header (respnum, group)
 	if (arts[respnum].lines < 0) {
 		strcpy (tmp, "?");
 	} else {
-		sprintf (tmp, "%d", arts[respnum].lines);
+		sprintf (tmp, "%-4d", arts[respnum].lines);
 	}
 
 	sprintf (buf, txt_lines, tmp);

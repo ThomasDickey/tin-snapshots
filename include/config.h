@@ -85,34 +85,30 @@
 #	undef	sinix		/* SNI Sinix (nsc32000) */
 #endif
 
-#if !defined(M_AMIGA)
-#	define	HAVE_CURSES_H
-#endif
-
 #if defined(SIGCHLD) || defined(__hpux)
 #	define	HAVE_SYS_WAIT_H
 #endif
 
-#if !defined(M_OS2) && !defined(WIN32) && !defined(M_AMIGA)
+#if !defined(M_OS2) && !defined(WIN32)
 #	define	HAVE_PWD_H
 #endif
 
-#if !defined(M_OS2) && !defined(WIN32) && !defined(M_AMIGA) && !defined(VMS)
+#if !defined(M_OS2) && !defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_PARAM_H
 #endif
 
 #if !defined(apollo) && !defined(gould) && !defined(MACH) && \
     !defined(mips) && !defined(__NeXT__) && !defined(M_OS2) && \
-	!defined(WIN32) && !defined (M_AMIGA)
+	!defined(WIN32)
 #	define	HAVE_UNISTD_H
 #endif
 
-#if !defined(M_AMIGA) && !defined(COHERENT) && !defined(MINIX) && \
+#if !defined(COHERENT) && !defined(MINIX) && \
     !defined(M_OS2) && !defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_IOCTL_H
 #endif
 
-#if !defined(M_AMIGA) && !defined(apollo) && !defined(BSD) && \
+#if !defined(apollo) && !defined(BSD) && \
     !defined(M_OS2) && !defined(sinix) && !defined(RS6000) && \
 	!defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_UTSNAME_H
@@ -134,7 +130,7 @@
 #	define	HAVE_STRING_H
 #endif
 
-#if defined(apollo) || defined(BSD) || defined(EPIX) || defined(M_AMIGA) || \
+#if defined(apollo) || defined(BSD) || defined(EPIX) || \
     defined(M_OS2) || defined(__osf__) || defined(UMAXV) || defined(WIN32)
 #	define	HAVE_FCNTL_H
 #endif
@@ -172,7 +168,7 @@
 #endif
 
 #if !defined(M_OS2) && !defined(SCO_UNIX) && !defined(u3b2) && \
-    !defined(WIN32) && !defined (M_AMIGA) && !defined(VMS)
+    !defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_TIME_H
 #endif
 
@@ -186,7 +182,7 @@
 #	define	HAVE_SYS_SELECT_H
 #endif
 
-#if defined(M_AMIGA) || defined(COHERENT) || defined(M_OS2) || \
+#if defined(COHERENT) || defined(M_OS2) || \
 	defined(QNX42) || defined(WIN32) || defined(VMS)
 #	define	HAVE_ERRNO_H
 #endif
@@ -214,7 +210,7 @@
 #endif
 
 #if defined(M_OS2) || defined(apollo) || defined(linux) || defined(SVR4) || \
-	defined(WIN32) || defined (M_AMIGA)
+	defined(WIN32)
 #	if !defined(HAVE_COMPTYPE_CHAR)
 #		define	HAVE_COMPTYPE_VOID
 #	endif
@@ -233,7 +229,7 @@
 #if defined(apollo) || defined(AUX) || defined(BSD) || defined(linux) || \
     defined(__hpux) || defined(__osf__) || defined(PTX) || defined(QNX42) || \
     defined(RS6000) || defined(sinix) || defined(SVR4) || defined(UMAXV) || \
-    defined(WIN32) || defined (M_AMIGA)
+    defined(WIN32)
 #	define	HAVE_LONG_FILENAMES
 #endif
 
@@ -291,8 +287,7 @@
 #	undef	HAVE_STRTOL
 #endif
 
-#if defined(__arm) || defined(COHERENT) || defined(pyr) || \
-    defined(sequent) || defined (M_AMIGA)
+#if defined(__arm) || defined(COHERENT) || defined(pyr) || defined(sequent)
 #	undef	HAVE_TZSET
 #endif
 
@@ -321,27 +316,10 @@
 #	undef HAVE_SELECT
 #endif
 
-#if !defined(apollo) && !defined(M_AMIGA) && !defined(COHERENT) && \
+#if !defined(apollo) && !defined(COHERENT) && \
     !defined(M_OS2) && !defined(supermax) && !defined(u3b2) && \
     !defined(HAVE_POLL) && !defined(WIN32)
 #	define	HAVE_SELECT
-#endif
-
-#if defined(M_AMIGA)
-#	define	SMALL_MEMORY_MACHINE
-#endif
-
-#if defined(M_AMIGA)
-#	define	SIG_ARGS /*nothing, since compiler doesn't handle it*/
-#	undef   DECL_SIG_CONST
-#endif
-
-#if defined(M_AMIGA)
-#	define	DONT_REREAD_ACTIVE_FILE
-#endif
-
-#if defined(M_AMIGA)
-#	define	HAVE_STDDEF_H
 #endif
 
 #if defined(COHERENT)
@@ -382,7 +360,7 @@
 #	define	HAVE_TCSETATTR
 #endif
 
-#if defined(M_AMIGA) || defined(QNX42) || defined(VMS)
+#if defined(QNX42) || defined(VMS)
 #	define HAVE_KEY_PREFIX
 #endif
 

@@ -22,6 +22,21 @@
 #include	"config.h"
 #endif
 
+/*
+ * Non-autoconf'able definitions for Amiga Developer Environment (gcc 2.7.2,
+ * etc).
+ */
+#if defined(__amiga__) || defined(__amiga)
+#  undef  M_UNIX
+#  define M_AMIGA
+#  define SMALL_MEMORY_MACHINE
+#  define DONT_REREAD_ACTIVE_FILE
+#  ifndef __GNUC__
+#    define  SIG_ARGS /*nothing, since compiler doesn't handle it*/
+#    undef   DECL_SIG_CONST
+#  endif
+#endif
+
 #ifdef __DECC
 #include	<unixio.h>
 #else
@@ -1081,6 +1096,7 @@ struct t_attribute
 						   3=uud & list zoo, 4=uud & ext zoo*/
 	unsigned int x_comment_to:1;		/* insert X-Comment-To: in Followup */
 	char *news_quote_format;		/* another way to begin a posting format */
+	char *quote_chars;			/* string to precede quoted text on each line */
 };
 
 /*
@@ -1354,7 +1370,7 @@ typedef char t_comptype;
 #	define	NEWSGROUPS_FILE 	"newsdescrip"
 #	define	BUG_REPORT_ADDRESS	"mark@garden.southern.gen.nz"
 #	define	REDIRECT_OUTPUT 	"> NIL:"
-#	define	REDIRECT_PGP_OUTPUT "> NIL:"
+#	define	REDIRECT_PGP_OUTPUT	"> NIL:"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"
 #	define	ENV_VAR_MAILER		"TIN_MAIL"
 #	define	ENV_VAR_POSTER		"TIN_POST"
@@ -1363,16 +1379,14 @@ typedef char t_comptype;
 #	define	MAILER_FORMAT		"%M <%F -f %U"
 #	define	METAMAIL_CMD		"metamail -e -p -m \"tin\""
 #	define	TMPDIR			"T:"
-#	ifdef	HAVE_KEY_PREFIX
-#		define	KEY_PREFIX	0x9b
-#	endif
+#	define	KEY_PREFIX		0x9b
 extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef VMS
 #	define	NEWSGROUPS_FILE 	"newsgroups"
 #	define	BUG_REPORT_ADDRESS	"mcquill@next.duq.edu"
 #	define	REDIRECT_OUTPUT 	""
-#	define	REDIRECT_PGP_OUTPUT ""
+#	define	REDIRECT_PGP_OUTPUT	""
 #	define	ENV_VAR_MAILER		"TIN_MAILER"
 /*#	define	ENV_VAR_SHELL		"SHELL"*/
 #	define	ENV_VAR_POSTER		"TIN_POST"
@@ -1535,7 +1549,7 @@ typedef char constext;
 #	undef NSET0
 #	define NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] |	NTEST(n,b), 1)
 #	define NSET0(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] & ~NTEST(n,b), 1)
-#	include "malloc.h" /* dbmalloc 1.4 */
+#	include "dbmalloc.h" /* dbmalloc 1.4 */
 #endif
 
 #if defined(WIN32) && defined(DEBUG) && defined(CHECKHEAP)

@@ -1,6 +1,31 @@
 dnl Macros used in TIN auto-configuration script.
 dnl
 dnl ---------------------------------------------------------------------------
+dnl (macros from ftp.clark.net:/pub/dickey/autoconf)
+dnl ---------------------------------------------------------------------------
+AC_DEFUN(AC_FUNC_SETPGRP,
+[AC_CACHE_CHECK(whether setpgrp takes no argument, ac_cv_func_setpgrp_void,
+AC_TRY_RUN([
+/*
+ * If this system has a BSD-style setpgrp, which takes arguments, exit
+ * successfully.
+ */
+main()
+{
+    if (setpgrp(1,1) == -1)
+	exit(0);
+    else
+	exit(1);
+}
+], ac_cv_func_setpgrp_void=no, ac_cv_func_setpgrp_void=yes,
+   AC_MSG_ERROR(cannot check setpgrp if cross compiling))
+)
+if test $ac_cv_func_setpgrp_void = yes; then
+  AC_DEFINE(SETPGRP_VOID)
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl ---------------------------------------------------------------------------
 dnl Test for ANSI token substitution (used in 'assert').
 AC_DEFUN([CF_ANSI_ASSERT],
 [
@@ -15,6 +40,33 @@ AC_CACHE_VAL(cf_cv_ansi_assert,[
 AC_MSG_RESULT($cf_cv_ansi_assert)
 test $cf_cv_ansi_assert = yes && AC_DEFINE(HAVE_ANSI_ASSERT)
 ])dnl
+dnl ---------------------------------------------------------------------------
+dnl Allow user to disable a normally-on option.
+AC_DEFUN([CF_ARG_DISABLE],
+[CF_ARG_OPTION($1,[$2 (default: on)],[$3],[$4],yes)])dnl
+dnl ---------------------------------------------------------------------------
+dnl Allow user to enable a normally-off option.
+AC_DEFUN([CF_ARG_ENABLE],
+[CF_ARG_OPTION($1,[$2 (default: off)],[$3],[$4],no)])dnl
+dnl ---------------------------------------------------------------------------
+dnl Restricted form of AC_ARG_ENABLE that ensures user doesn't give bogus
+dnl values.
+dnl
+dnl Parameters:
+dnl $1 = option name
+dnl $2 = help-string 
+dnl $3 = action to perform if option is not default
+dnl $4 = action if perform if option is default
+dnl $5 = default option value (either 'yes' or 'no')
+AC_DEFUN([CF_ARG_OPTION],
+[AC_ARG_ENABLE($1,[$2],[test "$enableval" != ifelse($5,no,yes,no) && enableval=ifelse($5,no,no,yes)
+  if test "$enableval" != "$5" ; then
+ifelse($3,,[    :]
+,[    $3])ifelse($4,,,[  else
+    $4])dnl
+  fi],[enableval=$5 ifelse($4,,,[
+  $4])dnl
+  ])])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for missing declarations in the system headers (adapted from vile).
 AC_DEFUN([CF_CHECK_1_DECL],
@@ -183,6 +235,12 @@ int found()
 }
 int main()
 {
+#ifdef __amiga__
+/* Nicholas d'Alterio (nagd@ic.ac.uk) reports that the check for ability to
+ * core dump causes the machine to crash - reason unknown (gcc 2.7.2)
+ */
+	exit(1);
+#else
 	int	pid, status;
 	if (found())
 		unlink("core");
@@ -192,13 +250,14 @@ int main()
 		while (wait(&status) <= 0)
 			;
 	} else {
-		abort();
+		abort();	/* this will dump core, if anything will */
 	}
 	if (found()) {
 		unlink("core");
 		exit(0);
 	}
 	exit(1);
+#endif
 }
 	],
 	[cf_cv_corefile=yes],
@@ -222,7 +281,7 @@ AC_CACHE_VAL(cf_cv_extern_errno,[
 	])
 AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = yes && AC_DEFINE(HAVE_EXTERN_ERRNO)
-])
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the system supports long (>14 character) filenames
 AC_DEFUN([CF_LONG_FILENAMES],
@@ -289,7 +348,7 @@ fi
 ])
 AC_MSG_RESULT($cf_cv_setuid_funcs)
 test $cf_cv_setuid_funcs = yes && AC_DEFINE(HAVE_SET_GID_UID)
-])
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for systems that have signal-handlers prototyped with one argument
 dnl versus those with more than one argument, define the symbol SIG_ARGS to
@@ -450,7 +509,7 @@ int main()
 	])
 AC_MSG_RESULT($cf_cv_use_tiocgwinsz)
 test $cf_cv_use_tiocgwinsz != yes && AC_DEFINE(BROKEN_TIOCGETWINSZ)
-])
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the tm-struct defines the '.tm_gmtoff' member (useful in decoding
 dnl dates).
@@ -492,7 +551,43 @@ AC_CACHE_VAL(cf_cv_type_sigaction,[
 	])
 AC_MSG_RESULT($cf_cv_type_sigaction)
 test $cf_cv_type_sigaction = yes && AC_DEFINE(HAVE_TYPE_SIGACTION)
-])
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Wrapper for AC_PATH_PROG, with command-line option.
+dnl Params:
+dnl $1 = program name
+dnl $2 = help-string (I'd use format, but someone's disable it in autoconf)
+dnl $3 = caller-supplied default if no --with option is given.  If this is
+dnl      blank, the macro uses AC_PATH_PROG.
+AC_DEFUN([CF_WITH_PROGRAM],
+[dnl
+changequote(<<,>>)dnl
+define(<<cf_path_name>>, PATH_<<>>translit($1, [a-z], [A-Z]))dnl
+define(<<cf_have_name>>, HAVE_<<>>translit($1, [a-z], [A-Z]))dnl
+changequote([,])dnl
+AC_ARG_WITH($1,[$2],ifelse($3,,
+[case "$withval" in #(vi
+  yes[)]
+   echo 'configure: error: "--with-$1" requires value' 1>&2
+   exit 1
+   ;; #(vi
+  no[)]
+   ;; #(vi
+  *[)]
+   # user supplied option-value for "--with-$1=path"
+   AC_MSG_CHECKING(for $1)
+   ac_cv_path_[cf_path_name]="$withval"
+   AC_DEFINE(cf_have_name)dnl
+   AC_MSG_RESULT($withval)
+   ;;
+ esac],[$3]),[
+  # user did not specify "--with-$1"; do automatic check
+  AC_PATH_PROG(cf_path_name,$1)
+  if test -n "$cf_path_name"; then
+    AC_DEFINE(cf_have_name)dnl
+  fi
+])dnl
+undefine([cf_path_name])undefine([cf_have_name])])dnl
 dnl ---------------------------------------------------------------------------
 dnl $1=uppercase($2)
 AC_DEFUN([CF_UPPER],
