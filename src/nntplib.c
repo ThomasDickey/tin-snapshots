@@ -2,9 +2,9 @@
  *  Project   : tin - a Usenet reader
  *  Module    : nntplib.c
  *  Author    : S. Barber & I. Lea
- *  Created   : 12.01.1991
- *  Updated   : 22.12.1997
- *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (10.02.1991)
+ *  Created   : 1991-01-12
+ *  Updated   : 1997-12-22
+ *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (1991-02-10)
  *  Copyright : (c) Copyright 1991-98 by Stan Barber & Iain Lea
  *              Permission is hereby granted to copy, reproduce, redistribute
  *              or otherwise use this software  as long as: there is no
@@ -221,6 +221,7 @@ server_init (
 	sockt_wr = sockt_rd;
 #endif
 
+	last_put[0] = '\0';		/* no retries in get_respcode */
 	/*
 	 * Now get the server's signon message
 	 */
@@ -349,7 +350,7 @@ get_tcp_socket (
 		return (-EHOSTUNREACH);
 	}
 #else
-	sp = (struct servent *) malloc (sizeof (struct servent));
+	sp = (struct servent *) my_malloc (sizeof (struct servent));
 	sp->s_port = htons (IPPORT_NNTP);
 #endif
 	/* If not a raw ip address, try nameserver */

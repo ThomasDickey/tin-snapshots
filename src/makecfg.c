@@ -2,7 +2,7 @@
  *  Project   : tin - a Usenet reader
  *  Module    : makecfg.c
  *  Author    : Thomas E. Dickey <dickey@clark.net>
- *  Created   : 23.08.1997
+ *  Created   : 1997-08-23
  *  Updated   :
  *  Notes     : #defines and structs for config.c
  *  Copyright : (c) Copyright 1997-98 by Thomas E. Dickey

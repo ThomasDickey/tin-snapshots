@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : feed.c
- *  Author    : I.Lea
- *  Created   : 31-08-91
- *  Updated   : 22-12-94
+ *  Author    : I. Lea
+ *  Created   : 1991-08-31
+ *  Updated   : 1994-12-22
  *  Notes     : provides same interface to mail,pipe,print and save commands
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

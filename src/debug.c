@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : debug.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 24.12.1994
+ *  Created   : 1991-04-01
+ *  Updated   : 1994-12-24
  *  Notes     : debug routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -269,7 +269,7 @@ debug_print_attributes (
 		(attr->savefile == (char *) 0 ? "" : attr->savefile));
 	fprintf (fp, "sigfile=[%s] followup_to=[%s]\n\n",
 		(attr->sigfile == (char *) 0 ? "" : attr->sigfile),
-		(attr->followup_to  == (char *) 0 ? "" : attr->followup_to));
+		(attr->followup_to == (char *) 0 ? "" : attr->followup_to));
 	fflush (fp);
 }
 

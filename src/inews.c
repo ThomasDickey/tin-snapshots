@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : inews.c
  *  Author    : I. Lea
- *  Created   : 17.03.1992
- *  Updated   : 31.12.1997
+ *  Created   : 1992-03-17
+ *  Updated   : 1997-12-31
  *  Notes     : NNTP builtin version of inews
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,

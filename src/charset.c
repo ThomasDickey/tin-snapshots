@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : charset.c
- *  Author    : M.Kuhn, T.Burmester
- *  Created   : 10-12-93
- *  Updated   : 28-02-94
+ *  Author    : M. Kuhn, T. Burmester
+ *  Created   : 1993-12-10
+ *  Updated   : 1994-02-28
  *  Notes     : ISO to ascii charset conversion routines
- *  Copyright : (c) Copyright 1991-94 by Markus Kuhn & Tilman Burmester
+ *  Copyright : (c) Copyright 1991-98 by Markus Kuhn & Tilman Burmester
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -17,7 +17,7 @@
 /*
  *  Table for the iso2asc convertion...
  *  iso2asc  by  (unrza3@cd4680fs.rrze.uni-erlangen.de)
- *  included by  (root@aspic.han.de) on 11/04/93
+ *  included by  (root@aspic.han.de)
  */
 
 #define SUB	"?"

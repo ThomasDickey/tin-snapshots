@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : search.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 27.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-27
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -514,7 +514,7 @@ search_art_body (
 	 * Skip the header
 	 */
 	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
-		if (line[0] == '\0')
+		if (line[0] == '\0') /* tin_fgets() strips tailing \n */
 			break;
 	}
 
@@ -527,7 +527,7 @@ search_art_body (
 	 * Now search the body
 	 */
 	while ((line = tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
-		if (REGEX_MATCH (buf, pat, TRUE)) {
+		if (REGEX_MATCH (line, pat, TRUE)) {
 			fclose (fp);
 			return TRUE;
 		}

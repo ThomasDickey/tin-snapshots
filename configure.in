@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 04.12.97
+dnl Updated   : 20.02.98
 dnl Notes     :
 dnl
-dnl Copyright 1996,1997 by Thomas Dickey
+dnl Copyright 1996,1997,1998 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -72,6 +72,10 @@ CF_WITH_PROGRAM(pgp,
 CF_WITH_PROGRAM(sum,
 [  --with-sum              (default: from system path)])
 CF_PROG_SUM_R
+
+CF_PATH_EDITOR
+CF_PATH_MAILER
+CF_PATH_MAILBOX
 
 ### check for this early, since it'll override several options
 AC_MSG_CHECKING(if NNTP-support will be used)
@@ -320,9 +324,9 @@ AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable ANSI-color)
 CF_ARG_DISABLE(color,
-	[  --disable-color         disable ANSI-color support],,
-	[AC_DEFINE(HAVE_COLOR)])
-AC_MSG_RESULT($enableval)
+	[  --disable-color         disable ANSI-color support])
+use_color=$enableval
+AC_MSG_RESULT($use_color)
 
 AC_MSG_CHECKING(whether to enable posting-etiquette)
 CF_ARG_DISABLE(etiquette,
@@ -616,6 +620,20 @@ CF_TM_GMTOFF
 AC_SYS_LONG_FILE_NAMES
 CF_SIG_ARGS
 CF_FUNC_SYSTEM
+
+# Check if we are trying to use curses+color, but cannot
+if test $use_color = yes ; then
+	if test $use_curses = yes ; then
+		CF_COLOR_CURSES
+		if test $cf_cv_color_curses = yes ; then
+			AC_DEFINE(HAVE_COLOR)
+		else
+			AC_MSG_WARN(This curses library does not support color)
+		fi
+	else
+		AC_DEFINE(HAVE_COLOR)
+	fi
+fi
 
 # GCC and Apollo compilers are quite noisy about signal constants (quiet them).
 if test -n "$GCC"; then

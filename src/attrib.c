@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : attrib.c
  *  Author    : I. Lea
- *  Created   : 01.12.1993
- *  Updated   : 20.12.1997
+ *  Created   : 1993-12-01
+ *  Updated   : 1997-12-20
  *  Notes     : Group attribute routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -592,13 +592,12 @@ write_attributes_file (
 #endif
 
 	/* alloc memory for tmp-filename */
-	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
+	if ((file_tmp = (char *) my_malloc (strlen (file)+5)) == NULL) {
 		wait_message (2, txt_out_of_memory2);
 		return;
 	}
 	/* generate tmp-filename */
-	strcpy (file_tmp, file);
-	strcat (file_tmp, ".tmp");
+	sprintf (file_tmp, "%s.tmp", file);
 
 	if ((fp = fopen (file_tmp, "w" FOPEN_OPTS)) == (FILE *) 0) {
 		error_message (txt_filesystem_full_backup, ATTRIBUTES_FILE);

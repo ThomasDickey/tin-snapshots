@@ -1,3 +1,80 @@
+-- pre-1.4 release 980226 --
+
+566) Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     ADD. fallback to "XHDR Xref" (if possible) if Xref is no present
+          in the overviewfile
+     FIX. lang.c, xref.c
+
+565) Kirk Bauer <kirk@kaybee.org>
+     Urs Janssen <urs@tin.org>
+     ADD. pass newsgroup name as first argument to external sigfile creator
+     FIX. sigfile.c
+
+564) Thomas E. Dickey <dickey@clark.net>
+     ADD. missing strerror() for SunOS 4.x
+     ADD. new/improved configure script checks for curses & termcap libraries
+          and headers.
+     ADD. configure options/checks for default editor, mailer and mailpath
+     ADD. configure check for curses-color support
+     ADD. ifdef in tin.h to reduce the noise when compiling on SunOS 4.x
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h,
+          screen.c, string.c
+
+563) Florian Kuehnert <sutok@gmx.de>
+     Urs Janssen <urs@tin.org>
+     ADD. skip article header when spellchecking
+     BUG. append_file() was broken
+     FIX. misc.c
+
+562) Sven Paulus <sven@tin.org>
+     ADD. 'z' (lynx style) as abort-key
+     FIX. read.c
+
+561) Yuri Kuzmenko <yuri@killer.cracksoft.kiev.ua>
+     BUG. tin sometimes freezes if getting a SIGHUP
+     FIX. init.c, open.c, signal.c
+
+560) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. tin retrys to connect after getting a 503 response from the
+          server
+     FIX. nntplib.c, open.c
+
+559) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. screen not cleared when scrolling by page
+     BUG. screen not redrawn when forcing redraw with
+          iKeyConfigRedrawScr
+     ADD. check for us-ascii when posting with non-7bit encoding
+     FIX. extern.h, config.c, lang.c, post.c
+
+558) Zbigniew Zych <zych@onet.pl>
+     Florian Kuehnert <sutok@gmx.de>
+     BUG. typos
+     FIX. lang.c, README
+
+557) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (1.05 -> 1.07)
+     FIX. pcre/*
+
+556) Thomas E. Dickey <dickey@clark.net>
+     BUG. sh_format() escaped allready escaped chars
+     FIX. save.c, string.c
+
+555) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. rule.icase sometimes used uninitialized
+     FIX. filter.c
+
+554) Henryk Bochmann <bochmann@TUDURZ.urz.tu-dresden.de>
+     Michael Stenns <stenns@hal.tci.uni-hannover.de>
+     Thomas E. Dickey <dickey@clark.net>
+     Urs Janssen <urs@tin.org>
+     BUG. preprocesser symbol for OpenBSD was missing
+     ADD. check for HP-UX >=10
+     BUG. #ifdef NO_SHELL_ESCAPE was missing
+     BUG. TIN_DEFAULTS_DIR didn't get defined due misspelling
+     BUG. removed missplaced barce
+     BUG. no automatic aggregate initialization
+     FIX. init.c, misc.c, select.c, tin.h, autoconf.h[in]
+
 -- pre-1.4 release 980202 --
 
 553) Michael Stenns <stenns@hal.tci.uni-hannover.de>

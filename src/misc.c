@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : misc.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.1991
- *  Updated   : 31.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute	this software,
@@ -51,7 +51,7 @@ append_file (
 		fclose (fp_new);
 		return;
 	}
-	copy_fp (fp_old, fp_new);
+	copy_fp (fp_new, fp_old);
 	fclose (fp_old);
 	fclose (fp_new);
 }
@@ -251,29 +251,76 @@ int
 invoke_ispell (
 	char *nam) /* return value is always ignored */
 {
+	FILE *fp_all, *fp_body, *fp_head;
 	char *my_ispell;
-	char buf[PATH_LEN];
+	char buf[PATH_LEN], nam_body[100], nam_head[100];
+	int retcode;
 	static char ispell[PATH_LEN];
 	static t_bool first = TRUE;
 
 	if (first) {
 #ifdef VMS
-	*my_ispell = '\0';
-	strcpy(ispell, "ispell");
-	first = FALSE;
+		*my_ispell = '\0';
+		strcpy (ispell, "ispell");
 #else
 		my_ispell = getenv ("ISPELL");
-
 		strcpy (ispell, my_ispell != NULL ? my_ispell : PATH_ISPELL);
-		first = FALSE;
 #endif
+		first = FALSE;
 	}
 
-	sh_format (buf, sizeof(buf), "%s %s", ispell, nam);
+	/*
+	 * Now seperating the header and body in two different files so that
+	 * the header is not checked by ispell
+	 */
 
-	wait_message (0, buf);
+	strncpy (nam_body, nam, 90);
+	strcat (nam_body, ".body");
 
-	return invoke_cmd (buf);
+	strncpy (nam_head, nam, 90);
+	strcat (nam_head, ".head");
+
+	if ((fp_all = fopen(nam, "r")) == (FILE *) 0) {
+		perror_message(txt_cannot_open, nam);
+		return FALSE;
+	}
+
+
+	if ((fp_head = fopen (nam_head, "w")) == NULL) {
+		perror_message(txt_cannot_open, nam_head);
+		fclose (fp_all);
+		return FALSE;
+	}
+
+	if ((fp_body = fopen (nam_body, "w")) == NULL) {
+		perror_message(txt_cannot_open, nam_body);
+		fclose (fp_head);
+		fclose (fp_all);
+		return FALSE;
+	}
+
+	while (fgets (buf, sizeof(buf), fp_all) != NULL) {
+		fputs (buf, fp_head);
+		if (buf[0] == '\n' || buf[0] == '\r') {
+			fclose (fp_head);
+			break;
+		}
+	}
+
+	while (fgets(buf, sizeof(buf), fp_all) != NULL)
+		fputs(buf, fp_body);
+
+	fclose (fp_body);
+	fclose (fp_all);
+
+	sh_format (buf, sizeof(buf), "%s %s", ispell, nam_body);
+	retcode = invoke_cmd(buf);
+
+	append_file (nam_head, nam_body);
+	unlink (nam_body);
+	rename_file (nam_head, nam);
+
+	return retcode;
 }
 #endif
 
@@ -506,13 +553,13 @@ my_mkdir (
 	char buf[LEN];
 	struct stat sb;
 
-	sprintf(buf, "mkdir %s", path);
+	sprintf(buf, "mkdir %s", path); /* redirect stderr to /dev/null ? */
 	if (stat (path, &sb) == -1) {
 		system (buf);
 		chmod (path, mode);
 	}
 #else
-#	if  defined(M_OS2) || defined(WIN32)
+#	if defined(M_OS2) || defined(WIN32)
 		return mkdir (path);
 #	else
 		return mkdir (path, mode);
@@ -1292,7 +1339,7 @@ get_arrow_key (int prech)
 #ifdef USE_CURSES
 #	ifdef NCURSES_MOUSE_VERSION
 	MEVENT my_event;
-#endif /* NCURSES_MOUSE_VERSION */
+#	endif /* NCURSES_MOUSE_VERSION */
 	int ch = getch();
 	int code = KEYMAP_UNKNOWN;
 
@@ -1327,7 +1374,7 @@ get_arrow_key (int prech)
 		case KEY_END:
 			code = KEYMAP_END;
 			break;
-#ifdef NCURSES_MOUSE_VERSION
+#	ifdef NCURSES_MOUSE_VERSION
 		case KEY_MOUSE:
 			if (getmouse(&my_event) != ERR) {
 				switch ((int) my_event.bstate) {
@@ -1346,7 +1393,7 @@ get_arrow_key (int prech)
 				code = KEYMAP_MOUSE;
 			}
 			break;
-#endif
+#	endif /* NCURSES_MOUSE_VERSION */
 	}
 	return code;
 #else	/* not USE_CURSES */
@@ -1356,23 +1403,22 @@ get_arrow_key (int prech)
 #define wait_a_while(i) \
 	while (!input_pending(0) \
 		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
-#ifdef M_AMIGA
+
+#	ifndef VMS
+#		ifdef M_AMIGA
 	if (WaitForChar(Input(),1000) == DOSTRUE)
 		return prech;
-#else	/* !M_AMIGA */
-#	ifdef VMS
-	;
-#	endif /* VMS */
+#		else	/* !M_AMIGA */
 	if (!input_pending(0)) {
-#ifdef HAVE_USLEEP
+#			ifdef HAVE_USLEEP
 		int i=0;
 
 		wait_a_while(i) {
 			usleep(SECOND_CHARACTER_DELAY * 1000);
 			i++;
 		}
-#else	/* !HAVE_USLEEP */
-#ifdef HAVE_SELECT
+#			else	/* !HAVE_USLEEP */
+#				ifdef HAVE_SELECT
 		struct timeval tvptr;
 		int i=0;
 
@@ -1382,8 +1428,8 @@ get_arrow_key (int prech)
 			select (0, NULL, NULL, NULL, &tvptr);
 			i++;
 		}
-#else  /* !HAVE_SELECT */
-#ifdef HAVE_POLL
+#				else  /* !HAVE_SELECT */
+#					ifdef HAVE_POLL
 		struct pollfd fds[1];
 		int i=0;
 
@@ -1391,18 +1437,16 @@ get_arrow_key (int prech)
 			poll(fds, 0, SECOND_CHARACTER_DELAY);
 			i++;
 		}
-#else /* !HAVE_POLL */
+#					else /* !HAVE_POLL */
 		sleep(1);
-	}
-
-#endif	/* HAVE_POLL */
-#endif	/* HAVE_SELECT */
-#endif	/* HAVE_USLEEP */
-
+#					endif	/* HAVE_POLL */
+#				endif	/* HAVE_SELECT */
+#			endif	/* HAVE_USLEEP */
 		if (!input_pending(0))
-				return prech;
+			return prech;
 	}
-#endif	/* M_AMIGA */
+#		endif	/* M_AMIGA */
+#	endif	/* !VMS */
 	ch = ReadCh ();
 	if (ch == '[' || ch == 'O')
 		ch = ReadCh ();
@@ -1410,65 +1454,65 @@ get_arrow_key (int prech)
 	switch (ch) {
 		case 'A':
 		case 'i':
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA1:
-#endif
+#	endif
 			return KEYMAP_UP;
 
 		case 'B':
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA9:
-#endif
+#	endif
 			return KEYMAP_DOWN;
 
 		case 'D':
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA4:
-#endif
+#	endif
 			return KEYMAP_LEFT;
 
 		case 'C':
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA6:
-#endif
+#	endif
 			return KEYMAP_RIGHT;
 
 		case 'I':		/* ansi  PgUp */
 		case 'V':		/* at386 PgUp */
 		case 'S':		/* 97801 PgUp */
 		case 'v':		/* emacs style */
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA2:
-#endif
-#ifdef M_AMIGA
+#	endif
+#	ifdef M_AMIGA
 			return KEYMAP_PAGE_DOWN;
-#else
+#	else
 			return KEYMAP_PAGE_UP;
-#endif
+#	endif
 
 		case 'G':		/* ansi  PgDn */
 		case 'U':		/* at386 PgDn */
 		case 'T':		/* 97801 PgDn */
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xAA:
-#endif
-#ifdef M_AMIGA
+#	endif
+#	ifdef M_AMIGA
 			return KEYMAP_PAGE_UP;
-#else
+#	else
 			return KEYMAP_PAGE_DOWN;
-#endif
+#	endif
 
 		case 'H':		/* at386  Home */
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA0:
-#endif
+#	endif
 			return KEYMAP_HOME;
 
 		case 'F':		/* ansi   End */
 		case 'Y':		/* at386  End */
-#ifdef QNX42
+#	ifdef QNX42
 		case 0xA8:
-#endif
+#	endif
 			return KEYMAP_END;
 
 		case '2':		/* vt200 Ins */
@@ -1512,7 +1556,7 @@ get_arrow_key (int prech)
 		default:
 			return KEYMAP_UNKNOWN;
 	}
-#endif
+#endif /* USE_CURSES */
 }
 
 /*
@@ -1914,7 +1958,7 @@ strfpath (
 				 */
 				envptr = getenv (tbuf);
 				if (envptr == (char *) 0 || (*envptr == '\0'))
-					strncpy(tbuf, defbuf, sizeof (tbuf)-1);
+					strncpy (tbuf, defbuf, sizeof (tbuf)-1);
 				else
 					strncpy (tbuf, envptr, sizeof (tbuf)-1);
 				i = strlen (tbuf);
@@ -2393,8 +2437,10 @@ to_local (
 {
 	if (use_local_charset) {
 		c = c_l1_next[(unsigned char)c];
-		if (c == BAD) return '?';
-		else return c;
+		if (c == BAD)
+			return '?';
+		else
+			return c;
 	} else
 		return c;
 }
@@ -2413,8 +2459,10 @@ to_network (
 {
 	if (use_local_charset) {
 		c = c_next_l1[(unsigned char) c];
-		if (c==BAD) return '?';
-		else return c;
+		if (c==BAD)
+			return '?';
+		else
+			return c;
 	} else
 		return c;
 }
@@ -2488,7 +2536,7 @@ read_input_history_file (void) {
 
 	while (fgets(buf, sizeof(buf), fp)) {
 
-		if ((chr = malloc(strlen(buf)+1)) != NULL) {
+		if ((chr = my_malloc(strlen(buf)+1)) != NULL) {
 			strcpy(chr, buf);
 			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
 				*chr1 = '\0';
@@ -2570,7 +2618,7 @@ quote_wild(
 			if (*str == '(' || *str == ')' || *str == '[' || *str == ']' || *str == '{' || *str == '}'
 			    || *str == '\\' || *str == '^' || *str == '$'
 			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
-			    || *str == ' ' || *str == '\t' ) {
+			    || *str == ' ' || *str == '\t') {
 				*target++ = '\\';
 				*target++ = ((*str == ' ' || *str == '\t')? 's' : *str);
 			} else

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : post.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 25.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-25
  *  Notes     : mail/post/replyto/followup/repost & cancel articles
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -152,8 +152,7 @@ backup_article_name(
 {
 	static char name[PATH_LEN];
 
-	strcpy(name, the_article);
-	strcat(name, ".bak");
+	sprintf(name, "%s.bak", the_article);
 	return name;
 }
 
@@ -419,7 +418,8 @@ update_posted_msgs_file (
  * 8.  Group(s) must be listed in the active file
  * 9.  No Sender: header allowed (limit forging) and rejection by
  *     inn servers
- * 10. Display an 'are you sure' message before posting article
+ * 10. Check for charset != US-ASCII when using non-7bit-encoding
+ * 11. Display an 'are you sure' message before posting article
  */
 
 static t_bool
@@ -448,6 +448,8 @@ check_article_to_be_posted (
 	t_bool found_followup_to_several_groups = FALSE;
 	t_bool got_long_line = FALSE;
 	t_bool saw_wrong_sig_dashes = FALSE;
+	t_bool mime_7bit = TRUE;
+	t_bool mime_usascii = TRUE;
 	struct t_group *psGrp;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
@@ -595,6 +597,22 @@ check_article_to_be_posted (
 		my_fflush (stderr);
 		errors++;
 	}
+
+	/* check for MIME Content-Type and Content-Transfer-Encoding */
+	get_mm_charset ();
+	if (strcasecmp (mm_charset, "US-ASCII")) {
+		mime_usascii = FALSE;
+	}
+	if (strcasecmp (txt_mime_types[post_mime_encoding], "7bit")) {
+		mime_7bit = FALSE;
+	}
+	if (!mime_7bit && mime_usascii) {
+		setup_check_article_screen (&init);
+		my_fprintf (stderr, txt_error_header_line_bad_charset);
+		my_fflush (stderr);
+		errors++;
+	}
+
 	/*
 	 * Check the body of the article for long lines
 	 * check if sig is shorter then 5 lines
@@ -1712,7 +1730,7 @@ join_references (
 	const char *e;
 	int space;
 
-	b = (char *) malloc (strlen (oldrefs) + strlen (newref) + 64);
+	b = (char *) my_malloc (strlen (oldrefs) + strlen (newref) + 64);
 	c = b;
 	e = oldrefs;
 	space = 0;

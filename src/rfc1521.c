@@ -3,7 +3,7 @@
  *  Module    : rfc1521.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 03.01.98
+ *  Updated   : 1998-01-03
  *  Notes     : MIME text/plain support
  *  Copyright : (c) Copyright 1995-98 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,

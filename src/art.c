@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : art.c
  *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 19-04-95
+ *  Created   : 1991-04-01
+ *  Updated   : 1995-04-19
  *  Notes     :
- *  Copyright : (c) Copyright 1991-95 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -35,10 +35,10 @@ static int date_comp (t_comptype *p1, t_comptype *p2);
 static int from_comp (t_comptype *p1, t_comptype *p2);
 static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
 static int parse_headers (FILE *fp, struct t_article *h);
-static t_bool read_group (struct t_group *group, char *group_path, int *pcount);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
+static t_bool read_group (struct t_group *group, char *group_path, int *pcount);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
 
@@ -273,11 +273,11 @@ read_group (
 	FILE *fp;
 	char buf[PATH_LEN];
 	int count = 0, res;
-	t_bool modified = FALSE;
 	int respnum, total = 0;
 	long art;
 	register int i;
 	static char dir[PATH_LEN] = "";
+	t_bool modified = FALSE;
 
 	/*
 	 * change to groups spooldir to optimize fopen()'s on local articles
@@ -766,8 +766,7 @@ parse_headers (
 			debug_print_header (h);
 #endif
 			return TRUE;
-		} else
-			return FALSE;
+		}
 	}
 
 	return FALSE;
@@ -1175,8 +1174,8 @@ vWriteNovFile (
  *       hash = TRUE
  *
  *  If hash = TRUE the index filename will be in format number.number.
- *  Hashing the groupname gets a number.  See if that #.1 file exists;
- *  if so, read first line. Is this the group we want?  If no, try #.2.
+ *  Hashing the groupname gets a number. See if that #.1 file exists;
+ *  if so, read first line. Is this the group we want? If no, try #.2.
  *  Repeat until no such file or we find an existing file that matches
  *  our group. Return pointer to path or NULL if not found.
  */

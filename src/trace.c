@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : trace.c
  *  Author    : Thomas Dickey <dickey@clark.net>
- *  Created   : 22.03.1997
- *  Updated   : 31.12.1997
+ *  Created   : 1997-03-22
+ *  Updated   : 1997-12-31
  *  Notes     : debugging support via TRACE macro.
  *  Copyright : (c) Copyright 1997-98 by Thomas Dickey
  *	             You may  freely  copy or  redistribute  this software,

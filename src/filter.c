@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : filter.c
  *  Author    : I. Lea
- *  Created   : 28.12.1992
- *  Updated   : 30.12.1997
+ *  Created   : 1992-12-28
+ *  Updated   : 1998-02-04
  *  Notes     : Filter articles. Kill & auto selection are supported.
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -22,7 +22,8 @@
 #define IS_KILLED(i)	(arts[i].killed)
 #define IS_SELECTED(i)	(arts[i].selected)
 
-/* SET_FILTER in group grp, current article arts[i], with rule ptr[j]
+/*
+ * SET_FILTER in group grp, current article arts[i], with rule ptr[j]
  *
  * filtering is now done this way:
  * a. set score for all articles and rules
@@ -95,11 +96,10 @@ psExpandFilterArray (
 	return new;
 }
 
+
 /*
  * vSetFilter() initialises a struct t_filter with default values
  */
-
-
 #ifndef INDEX_DAEMON
 static void
 vSetFilter (
@@ -126,10 +126,10 @@ vSetFilter (
 }
 #endif /* INDEX_DAEMON */
 
+
 /*
  * free_filter_item() frees all filter data (char *)
  */
-
 static void
 free_filter_item (
 	struct t_filter *ptr)
@@ -141,10 +141,10 @@ free_filter_item (
 	FreeAndNull(ptr->xref);
 }
 
+
 /*
  * free_filter_array() frees t_filter structs t_filters contains pointers to
  */
-
 static void
 free_filter_array (
 	struct t_filters *ptr)
@@ -701,6 +701,7 @@ filter_menu (
 	rule.msgid_ok = FALSE;
 	rule.fullref = FILTER_MSGID;
 	rule.subj_ok = FALSE;
+	rule.icase = FALSE;
 	rule.type = type;
 	rule.score = 0;
 	rule.expire_time = FALSE;
@@ -779,6 +780,24 @@ filter_menu (
 			return FALSE;
 
 		rule.counter = i;
+		switch (i) {
+			case FILTER_SUBJ_CASE_IGNORE:
+			case FILTER_FROM_CASE_IGNORE:
+				rule.icase = TRUE;
+				break;
+
+			case FILTER_SUBJ_CASE_SENSITIVE:
+			case FILTER_FROM_CASE_SENSITIVE:
+			case FILTER_MSGID:
+			case FILTER_MSGID_LAST:
+			case FILTER_MSGID_ONLY:
+				/* rule.icase is FALSE already, no assignment necessary */
+				break;
+
+			default: /* should not happen */
+				assert(0 != 0);
+				break;
+		}
 	}
 
 	if (!*rule.text) {
@@ -900,10 +919,8 @@ filter_menu (
 	/*
 	 * Expire time
 	 */
-	strcpy(double_time, "2x ");
-	strcat(double_time, text_time);
-	strcpy(quat_time, "4x ");
-	strcat(quat_time, text_time);
+	sprintf (double_time, "2x %s", text_time);
+	sprintf (quat_time, "4x %s", text_time);
 	i = get_choice (INDEX_TOP+9, txt_help_filter_time, ptr_filter_time, txt_unlimited_time, text_time, double_time, quat_time, (char *)0);
 
 	if (i == -1)
@@ -1213,6 +1230,7 @@ iAddFilterRule (
 			break;
 	}
 
+	psPtr[*plNum].icase = psRule->icase;
 	if (*psRule->text) {
 		sprintf (acBuf, REGEX_FMT, quote_wild_whitespace(psRule->text));
 
@@ -1220,15 +1238,11 @@ iAddFilterRule (
 			case FILTER_SUBJ_CASE_IGNORE:
 			case FILTER_SUBJ_CASE_SENSITIVE:
 				psPtr[*plNum].subj = my_strdup (acBuf);
-				if (psRule->counter == FILTER_SUBJ_CASE_IGNORE)
-					psPtr[*plNum].icase = TRUE;
 				break;
 
 			case FILTER_FROM_CASE_IGNORE:
 			case FILTER_FROM_CASE_SENSITIVE:
 				psPtr[*plNum].from = my_strdup (acBuf);
-				if (psRule->counter == FILTER_FROM_CASE_IGNORE)
-					psPtr[*plNum].icase = TRUE;
 				break;
 
 			case FILTER_MSGID:
@@ -1245,7 +1259,6 @@ iAddFilterRule (
 		iFiltered = TRUE;
 		(*plNum)++;
 	} else {
-		psPtr[*plNum].icase = psRule->icase;
 		if (psRule->subj_ok) {
 			sprintf (acBuf, REGEX_FMT, (psRule->check_string ? quote_wild (psArt->subject) : psArt->subject));
 			psPtr[*plNum].subj = my_strdup (acBuf);
@@ -1426,7 +1439,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(msg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1464,7 +1477,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(msg, txt_pcre_error_num, regex_errpos);
 						}
 					}
 				}
@@ -1529,7 +1542,7 @@ filter_articles (
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
-								 sprintf(msg, txt_pcre_error_num, regex_errpos);
+								sprintf(msg, txt_pcre_error_num, regex_errpos);
 							else  { /* No match, try Message-ID */
 								regex_errpos =
 								  pcre_exec(regex_cache_msgid[j].re,
@@ -1646,7 +1659,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											if (regex_errpos >= 0)
 												group_count = -1;
 											else if (regex_errpos != PCRE_ERROR_NOMATCH)
-												 sprintf(msg, txt_pcre_error_num, regex_errpos);
+												sprintf(msg, txt_pcre_error_num, regex_errpos);
 										}
 									}
 								}

@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : config.c
  *  Author    : I. Lea
- *  Created   : 01.04.1991
- *  Updated   : 15.12.1997
+ *  Created   : 1991-04-01
+ *  Updated   : 1997-12-15
  *  Notes     : Configuration file routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -542,7 +542,7 @@ read_config_file (
 				break;
 
 			if (match_boolean (buf, "show_xcommentto=", &show_xcommentto))
-				 break;
+				break;
 
 			if (match_boolean (buf, "space_goto_next_unread=", &space_goto_next_unread))
 				break;
@@ -615,7 +615,7 @@ read_config_file (
 			}
 
 			if (match_integer (buf, "word_h_display_marks=", &word_h_display_marks, MAX_MARK))
-				 break;
+				break;
 #endif
 
 			break;
@@ -665,13 +665,12 @@ write_config_file (
 	int i;
 
 	/* alloc memory for tmp-filename */
-	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
+	if ((file_tmp = (char *) my_malloc (strlen (file)+5)) == NULL) {
 		wait_message (0, txt_out_of_memory2);
 		return;
 	}
 	/* generate tmp-filename */
-	strcpy (file_tmp, file);
-	strcat (file_tmp, ".tmp");
+	sprintf (file_tmp, "%s.tmp", file);
 
 	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
 		error_message (txt_filesystem_full_backup, CONFIG_FILE);
@@ -1139,8 +1138,8 @@ OptionOnPage (
 #define TopOfPage(option) option_lines_per_page \
 			* ((option) / option_lines_per_page)
 
-#define OptionInPage(option) ((option) - first_option_on_screen)
-#define OptionIndex(option)  (OptionInPage(option) % option_lines_per_page)
+#define OptionInPage(option)	((option) - first_option_on_screen)
+#define OptionIndex(option)	(OptionInPage(option) % option_lines_per_page)
 
 int
 option_row (
@@ -1362,11 +1361,15 @@ change_config_file (
 				} else if (!first_option_on_screen) {
 					option = LAST_OPT;
 					first_option_on_screen = TopOfPage(option);
+					ClearScreen ();
+					show_config_page ();
 				} else if ((option -= option_lines_per_page) < 0) {
 					option = 0;
 					first_option_on_screen = 0;
 				} else {
 					first_option_on_screen -= option_lines_per_page;
+					ClearScreen ();
+					show_config_page ();
 				}
 				highlight_option (option);
 				break;
@@ -1380,6 +1383,8 @@ change_config_file (
 					first_option_on_screen = 0;
 
 				option = first_option_on_screen;
+				ClearScreen ();
+				show_config_page ();
 				highlight_option (option);
 				break;
 
@@ -1413,6 +1418,8 @@ change_config_file (
 			case iKeyConfigRedrawScr:	/* redraw screen */
 				my_retouch ();
 				set_xclick_off ();
+				ClearScreen ();
+				show_config_page ();
 				highlight_option (option);
 				break;
 

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : list.c
- *  Author    : I.Lea
- *  Created   : 18-12-93
- *  Updated   : 07-01-97
+ *  Author    : I. Lea
+ *  Created   : 1993-12-18
+ *  Updated   : 1997-01-07
  *  Notes     : Low level functions handling the active[] list and its group_hash index
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

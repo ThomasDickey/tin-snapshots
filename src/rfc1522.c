@@ -3,9 +3,9 @@
  *  Module    : rfc1522.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 08-15-96
+ *  Updated   : 1996-08-15
  *  Notes     : MIME header encoding/decoding stuff
- *  Copyright : (c) Copyright 1995-96 by Chris Blum
+ *  Copyright : (c) Copyright 1995-98 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
