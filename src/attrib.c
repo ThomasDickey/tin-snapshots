@@ -49,8 +49,6 @@
 #define	ATTRIB_X_COMMENT_TO		28
 #define	ATTRIB_NEWS_QUOTE		29
 #define	ATTRIB_QUOTE_CHARS		30
-#define ATTRIB_MAIL_ADDRESS		31
-#define ATTRIB_TAGLINEFILE		32
 
 /*
 ** Local prototypes
@@ -82,11 +80,6 @@ set_default_attributes (psAttrib)
 	psAttrib->savedir = default_savedir;
 	psAttrib->savefile = (char *) 0;
 	psAttrib->sigfile = default_sigfile;
-	#ifdef FORGERY
-	psAttrib->mail_address = mail_address;
-	#else
-	psAttrib->mail_address = 0;
-	#endif
 	psAttrib->organization =
 		(default_organization[0] ? default_organization : (char *) 0);
 	psAttrib->followup_to = (char *) 0;
@@ -115,7 +108,6 @@ set_default_attributes (psAttrib)
 	psAttrib->x_comment_to = FALSE;
 	psAttrib->news_quote_format = news_quote_format;
 	psAttrib->quote_chars = quote_chars;
-	psAttrib->tagline_file = tagline_file;
 
 #endif	/* INDEX_DAEMON */
 }
@@ -252,9 +244,6 @@ read_attributes_file (file, global_file)
 				break;
 			case 'm':
 				MATCH_STRING (
-					"mail_address=",
-					ATTRIB_MAIL_ADDRESS);
-				MATCH_STRING (
 					"maildir=",
 					ATTRIB_MAILDIR);
 				MATCH_STRING (
@@ -343,9 +332,6 @@ read_attributes_file (file, global_file)
 					"thread_arts=",
 					ATTRIB_THREAD_ARTS,
 					THREAD_MAX);
-				MATCH_STRING (
-					"taglinefile=",
-					ATTRIB_TAGLINEFILE);
 				break;
 			case 'x':
 				MATCH_STRING (
@@ -574,12 +560,6 @@ set_attrib (psGrp, type, str, num)
 			break;
 		case ATTRIB_QUOTE_CHARS:
 			psGrp->attribute->quote_chars = my_strdup (str);
-		case ATTRIB_MAIL_ADDRESS:
-			psGrp->attribute->mail_address = my_strdup (str);
-			break;
-		case ATTRIB_TAGLINEFILE:
-			psGrp->attribute->tagline_file = my_strdup(str);
-			break;
 		default:
 			break;
 	}
@@ -677,9 +657,7 @@ write_attributes_file (file)
 	fprintf (fp, "#    4=msgid 5=lines\n#\n");
 	fprintf (fp, "#  x_comment_to=ON/OFF\n");
 	fprintf (fp, "#  news_quote_format=STRING\n#\n");
-	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n");
-	fprintf (fp, "#  mail_address = STRING (ie. Arnold.Hendriks@p1.f1.n282.z2.fidonet.org)\n");
-	fprintf (fp, "#  taglinefile =  STRING (ie. ~/.taglines)\n#\n");
+	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n#\n");
 	fprintf (fp, "# Note that it is best to put general (global scoping)\n");
 	fprintf (fp, "# entries first followed by group specific entries.\n#\n");
 	fprintf (fp, "############################################################################\n\n");
@@ -748,8 +726,6 @@ write_attributes_file (file)
 			psGrp->attribute->news_quote_format);
 		fprintf (fp, "quote_chars=%s\n",
 			quote_space_to_dash (psGrp->attribute->quote_chars));
-		fprintf (fp, "mail_address=%s\n", psGrp->attribute->mail_address);
-		fprintf (fp, "taglinefile=%s\n", psGrp->attribute->tagline_file);
 	}
 
 	if (ferror (fp) | fclose (fp)){

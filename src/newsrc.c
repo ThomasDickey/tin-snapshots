@@ -113,13 +113,16 @@ char *line;
 	}
 	psGrp = psGrpFind (grp);
 
-	if (psGrp && psGrp->newsrc.present) {
+	if ((psGrp && psGrp->newsrc.present) &&
+		!(psGrp->subscribed != ':' && strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, psGrp->subscribed);
 		print_bitmap_seq (fp, psGrp);
 	} else {
 /*TODO
 fprintf(stderr, "%s not found in active. Unchanged\n", grp); */
-		fprintf (fp, "%s%c %s\n", grp, sub, seq);
+		if (!(sub!=':' && strip_newsrc)) {
+			fprintf (fp, "%s%c %s\n", grp, sub, seq);
+		}
 	}
 }
 
@@ -314,18 +317,24 @@ subscribe (group, sub_state)
 					seq = pcParseNewsrcLine (line, grp, &sub);
 
 					if (STRCMPEQ(grp, group->name)) {
-						fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
+						if (!(sub_state!=':' && strip_newsrc)) {
+							fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
+						}
 						group->subscribed = sub_state;
 						found = TRUE;
 					} else {
-						fprintf (newfp, "%s%c %s\n", grp, sub, seq);
+						if (!(sub!=':' && strip_newsrc)) {
+							fprintf (newfp, "%s%c %s\n", grp, sub, seq);
+						}
 					}
 				}
 				free (line);
 			}
 			fclose (fp);
 			if (!found) {
-				fprintf (newfp, "%s%c\n", group->name, sub_state);
+				if (!(sub_state!=':' && strip_newsrc)) {
+					fprintf (newfp, "%s%c\n", group->name, sub_state);
+				}
 				group->subscribed = sub_state;
 			}
 		}
@@ -1068,10 +1077,12 @@ catchup_newsrc_file (newsrc_file)
 				chmod (newsrc_file, newsrc_mode);
 			}
 			for (i = 0 ; i < group_top ; i++) {
-				fprintf (fp, "%s%c 1-%ld\n",
-					active[my_group[i]].name,
-					active[my_group[i]].subscribed,
-					active[my_group[i]].xmax);
+				if (!(active[my_group[i]].subscribed != ':' && strip_newsrc)) {
+					fprintf (fp, "%s%c 1-%ld\n",
+						active[my_group[i]].name,
+						active[my_group[i]].subscribed,
+						active[my_group[i]].xmax);
+				}
 			}
 			fclose (fp);
 		}

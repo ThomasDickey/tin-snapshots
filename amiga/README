@@ -1,0 +1,109 @@
+This is the Amiga port of TIN. To use it you will need to do the following:
+
+Have appropriate directories assigned (UULIB: UUNEWS:).
+Have these environment variables set:
+
+NODENAME
+USERNAME
+REALNAME
+HOME
+EDITOR
+
+TIN only works with a hierarchical news directory. This means you will
+need Dillon's UUCP1.16 or higher. TIN has been modified to work with
+Dillon's Sendmail & Postnews programs. These take different arguments
+from standard UNIX mail and news programs. With release 1.1 PL 9 of TIN
+two further environment variables can been defined:
+
+TIN_POST (default "uucp:c/postnews %s") and
+TIN_MAIL (default "uucp:c/sendmail <%s -f %s").
+
+If you set these variables, you can configure TIN for any other news/mail
+system. The %s in TIN_POST gets replaced with a filename containing the
+news article. TIN_MAIL's first %s is a filename, the second is the userid
+of the person sending the mail, and the third (if present), is the userid
+of the recipient of the mail.
+
+Printing is now available. You will have to edit the .tin/tinrc file to
+enable it. The "default_printer" string should be set to "copy PIPE: PRT:"
+instead of its default setting. This option has not been added to the
+internal menu of configurable options.
+
+The editor you use with TIN should not return instantly, so if you are
+using CED or TTX (or probably some others too) you will need to also add
+in the appropriate options in the environment variable EDITOR (see script
+file below) which will force your editor to wait until you've quit the
+editor. Unless you have an editor which understands the argument +7 to
+mean "start editing at line 7", you should set "Editor Offset" in the
+configuration menu (type shift-M) to OFF. An example startup script is
+given here (I've renamed tin to tin.exe so you can call this script TIN):
+
+----------------------------------
+; For WB2.0 users, the setenv's can be set's instead. This allows multiple
+; users to run with their own names etc. WB1.3 users have to use setenv.
+
+setenv USERNAME fred
+setenv REALNAME "Fred Flinstone"
+setenv NODENAME bedrock   ; This should be just your node name, not the
+                          ; entire domain.
+setenv HOME    dh0:news   ; wherever you want your news & index files
+                          ; stored
+setenv EDITOR  c:ed
+stack 40000               ; TIN requires a large stack!
+actived                   ; create a new active file
+delete uulib:active
+rename uulib:newsactive uulib:active
+tin.exe                   ; start tin itself
+---------------------------------
+
+Actived creates an "active" file. This is a standard file in Unix
+environments, but missing from DUUCP. Actived also sets the environment
+variable "TIN_GROUPS" to equal the number of newsgroups. This variable
+isn't necessary to run TIN, but allows TIN to save some memory. If you
+don't wish to run actived before TIN, you may wish to copy TIN_GROUPS
+to ENVARC: (WB 2.0+ !!).
+
+More options, and use of tin is explained in the file tin.nrf. (The
+standard manual page that comes with TIN).
+
+The following options have been disabled from the TIN source for the Amiga
+version:
+
+- Archive extraction. Note that 1.1 PL 9 has now enabled uudecoding and
+un-shar'ing of posted archives. This requires "uudecode" and "unshar" to
+be in the path.
+
+- Shell escape and piping to any shell command.
+
+- Ability to change News and Mail directories.
+
+- Re-reading of the active file while reading news has been disabled. So has
+updating index files in the background (-U option).
+
+These options were disabled partly to make TIN easier to port, but also
+to make it secure enough to run as a newsreader for a Bulletin Board.
+
+A TIND program (for creating/updating index files) exists, and is only any
+use on a BBS. To make TIN aware that you are using TIND to update the
+index, you must set the environment variable TIND (it doesn't matter what
+you set it to!). The index files are by default stored in the UUNEWS:
+directory, in a subdirectory called .index (as in UNIX). For performance
+reasons, you may wish to change the directory to a different drive. By
+setting the environment variable TIN_INDEX, you can force the index files
+to be stored in $TIN_INDEX/.index.
+
+Another two environment variables LINES and COLUMNS can be set to specify
+the size of your screen. Inside an Amiga window this isn't required, as TIN
+can query the window size, but once again, if you're running on anything
+other than the Amiga's console, this query string won't work. If TIN finds
+the LINES and COLUMNS environment variables set, it will not try to query
+the window size.
+
+If you are planning on using TIN in a multi-user environment, such as with
+a BBS, you should take a look at the companion archive to this one, which
+is called DLGTIN.LHA. Even though this has been set up explicitly for DLG,
+it contains executables and documentation which will be useful for any setup
+of this type.
+
+ - Mark Tomlinson         (mark@garden.equinox.gen.nz)
+   Geoff McCaughan        (geoff@satori.equinox.gen.nz)

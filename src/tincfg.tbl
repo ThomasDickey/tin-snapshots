@@ -113,4 +113,5 @@
 #endif
 
 	alternative_handling		OPT_ON_OFF
+	strip_newsrc		OPT_ON_OFF
 

@@ -76,7 +76,7 @@ extern char *get_uaf_fullname();
 #		include	<sys/errno.h>
 #	endif
 #	if !defined(errno)
-#		if DECL_ERRNO
+#		ifdef DECL_ERRNO
 			extern int errno;
 #		endif
 #	endif
@@ -208,7 +208,8 @@ extern char *get_uaf_fullname();
 
 #else	/* FIXME: most of the rest of this isn't necessary with autoconf */
 
-#if defined(BSD) && !defined(__386BSD__) && !defined(M_OS2)
+#if defined(BSD) && !defined(__386BSD__) && \
+	!defined(M_OS2) && !defined(M_AMIGA)
 #	ifdef sinix
 #		include <dir.h>
 #	else
@@ -323,6 +324,9 @@ extern char *get_uaf_fullname();
 #		ifdef VMS
 #			define	NEWSLIBDIR	"NEWSLIB:[000000]"
 #		else
+#			ifdef M_AMIGA
+#				define	NEWSLIBDIR	"uulib:"
+#			endif
 #			define	NEWSLIBDIR	"/usr/lib/news"
 #		endif /* VMS */
 #	endif /* !NEWSLIBDIR */
@@ -342,7 +346,7 @@ extern char *get_uaf_fullname();
 /*
  * Determine machine configuration for external programs & directories
  */
-#ifdef BSD
+#if defined(BSD) && !defined(M_AMIGA)
 
 /*
  * To catch 4.3 Net2 code base or newer
@@ -1159,8 +1163,6 @@ struct t_attribute
 	char *mailing_list;			/* mail list email address */
 	char *x_headers;			/* extra headers for message header */
 	char *x_body;				/* bolierplate text for message body */
-	char *mail_address;			/* from: line if other than default */
-	char *tagline_file;			/* tagline file if other than default */
 	unsigned global:1;			/* global/group specific */
 	unsigned quick_kill_header:3;		/* quick filter kill header */
 	unsigned quick_kill_expire:1;		/* quick filter kill limited/unlimited time */
@@ -1546,6 +1548,9 @@ extern void joinpath (char *result, char *dir, char *file);
 #	endif
 #endif
 
+#ifdef M_AMIGA
+#	undef S_ISDIR
+#endif 
 #if !defined(S_ISDIR)
 #	if defined(M_AMIGA)
 #		define st_mode st_attr
@@ -1662,7 +1667,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif	/* DECL_SIG_CONST */
 
 #ifdef M_AMIGA
-	typedef const char __far constext;
+	typedef const char /*__far*/ constext;
 #else
 	typedef /* FIXME: const */ char constext;
 #endif

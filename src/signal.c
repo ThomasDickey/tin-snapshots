@@ -166,7 +166,7 @@ void set_alarm_signal ()
 {
 #ifndef DONT_REREAD_ACTIVE_FILE
 	(void) alarm (0);
-#if !defined(M_OS2) && !defined(WIN32)
+#if !defined(M_OS2) && !defined(WIN32) && !defined(M_AMIGA)
 	signal (SIGALRM, signal_handler);
 #endif
 	alarm (reread_active_file_secs);

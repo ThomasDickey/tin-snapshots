@@ -146,7 +146,7 @@ extern void get_host_name P_((char *host_name));
 extern void get_user_info P_((char *user_name, char *full_name));
 extern void get_from_name P_((char *user_name, char *host_name, char *full_name, char *from_name));
 extern void get_domain_name P_((char *inews_domain, char *domain));
-extern int submit_news_file P_((struct t_group *group, char *name, int lines));
+extern int submit_news_file P_((char *name, int lines));
 
 /* init.c */
 extern void init_selfinfo P_((void));

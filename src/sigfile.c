@@ -22,212 +22,10 @@
 #	define CURRENTDIR ""
 #endif
 
-extern char note_h_ftnto[LEN];       /* X-Comment-To: (Used by FIDO) */
-
 static char sigfile[PATH_LEN];
 
 static FILE *open_random_sig P_((char *sigdir));
 static int thrashdir P_((char *sigdir));
-static char *process_tagline P_((char *tagline));
-static void add_tagline P_((FILE *fp, struct t_group *group));
-
-char *process_tagline (tagline)
-	char *tagline;
-{
-	static char pt_buf[1024];
-	char buf[256];
-	char *p=pt_buf,*b;
-
-	for (;*tagline;tagline++)
-	{
-		if (*tagline=='\n' || *tagline=='\r') continue; /* Skip CR and LF */
-	
-		b=buf;
-		if (*tagline=='@') /* Macro! */
-		{
-			if (tagline[1]=='@')
-			{
-				*p='@';
-				++tagline;
-				continue;
-			}
-			if (strncasecmp (tagline+1,"TFNAME",6)==0)
-			{
-				if (!*note_h_ftnto) return NULL; /* No TO:, so no expansion of TFName */
-				tagline+=6;
-
-				strcpy (b,note_h_ftnto);
-		
-				if (strchr(b,')'))
-				{
-					*strchr(b,')')=0;
-					if (strchr(b,'(')) b=strchr(b,'(')+1;
-				}
-
-				if (strchr(b,'@')) *strchr(b,'@')=0;
-				if (strchr(b,' ')) *strchr(b,' ')=0;
-				if (strchr(b,'<')) *strchr(b,'<')=0;
-				if (strchr(b,'.')) *strchr(b,'.')=0;
-
-
-				if (!*b) return NULL; /* Can't find a first name */
-
-				strcpy (p, b);
-				p+=strlen(p);
-				continue;
-			}
-			if (strncasecmp (tagline+1,"TLNAME",6)==0)
-			{
-				if (!*note_h_ftnto) return NULL; /* No TO:, so no expansion of TLName */
-				tagline+=6;
-	
-				strcpy (b,note_h_ftnto);
-
-				if (strchr(b,')'))
-				{
-					*strchr(b,')')=0;
-					if (strchr(b,'(')) b=strchr(b,'(')+1;
-				}
-
-				if (strchr(b,'@')) *strchr(b,'@')=0;
-				if (strchr(b,'<')) *strchr(b,'<')=0;
-				while (b[strlen(b)-1]=='.') b[strlen(b)-1]=0;
-				if (strrchr(b,'.')) b=strrchr(b,'.')+1;
-				while (b[strlen(b)-1]==' ') b[strlen(b)-1]=0;
-				if (strrchr(b,' ')) b=strrchr(b,' ')+1;
-
-				if (!*b) return NULL; /* Can't find a last name */
-
-				strcpy (p, b);
-				p+=strlen(p);
-				continue;
-			}
-			if (strncasecmp (tagline+1,"TNAME",5)==0)
-			{
-				if (!*note_h_ftnto) return NULL; /* No TO:, so no expansion of TName */
-				tagline+=5;
-
-				strcpy (b,note_h_ftnto);
-
-				if (strchr(b,')'))
-				{
-					*strchr(b,')')=0;
-					if (strchr(b,'('))
-					{
-						b=strchr(b,'(')+1;
-						strcpy (p,b);
-						p+=strlen(p);
-						continue;
-					}
-				}
-		
-				if (strchr(b,'@')) *strchr(b,'@')=0;
-				if (strchr(b,'<')) *strchr(b,'<')=0;
-
-				while (strchr(b,'.')) *strchr(b,'.')=' ';
-
-				while (b[strlen(b)-1]==' ') b[strlen(b)-1]=0;
-
-				if (!*b) return NULL; /* Can't find a nice name */
-
-				strcpy (p, b);
-				p+=strlen(p);
-				continue;
-			}
-		}
-		*p=*tagline;
-		p++;
-	}
-	*p=0;
-
-	return pt_buf;
-}
-
-void add_tagline (fp,group)
-	FILE *fp;
-	struct t_group *group;
-{
-	char pathfile[PATH_LEN],pathindex[PATH_LEN];
-	char taglinebuf[256],*tagline;
-	FILE *tagfile;
-	FILE *tagindex;
-	struct stat statfile,statindex;
-	char rebuild=0;
-	long lines;
-	long position;
-
-	if (!strfpath (group->attribute->tagline_file, pathfile, sizeof (pathfile)- (4*sizeof(char)),
-	    homedir, (char *) 0, (char *) 0, group->name)) 
-	{
-		if (!strfpath (tagline_file, pathfile, sizeof (pathfile)-(4*sizeof(char)),
-		    homedir, (char *) 0, (char *) 0, group->name)) 
-		{
-			return; /* I guess this means no tag lines... */
-		    
-		}
-	}
-	
-	{
-		long epoch;
-		time (&epoch);
-		srand ((unsigned int) epoch);
-	}
-
-	strcat (strcpy (pathindex,pathfile),".idx");
-
-	if (stat(pathfile,&statfile)) return;
-	if (stat(pathindex,&statindex)) rebuild=1;
-
-	if (statfile.st_mtime > statindex.st_mtime) rebuild=1;
-
-	tagfile=fopen (pathfile,"rt");
-	if (!tagfile) return;
-
-	if (rebuild)
-	{
-		tagindex=fopen (pathindex,"wb");
-		if (!tagindex) { fclose (tagfile); return; }
-
-		while (!feof(tagfile) && !ferror(tagfile) )
-		{
-			position=ftell(tagfile);
-			
-			*taglinebuf=0;
-			while ( (*taglinebuf==0 || *taglinebuf=='\n') && !feof(tagfile) && !ferror(tagfile) )
-				fgets (taglinebuf, 250, tagfile);
-
-			if (!feof(tagfile) && !ferror(tagfile) )
-				fwrite (&position,sizeof(position),1,tagindex);
-		}
-		fclose (tagindex);
-	}
-
-	if (stat(pathindex,&statindex)) return;
-	lines=statindex.st_size/sizeof(position);
-
-	tagindex=fopen (pathindex,"rb");
-	if (!tagindex) { fclose (tagfile); return; }
-
-	while (-1)
-	{
-		fseek (tagindex, sizeof(position)*((int) ((double)(lines)*rand()/(RAND_MAX+1.0))), SEEK_SET);
-
-		fread (&position,sizeof(position),1,tagindex);
-
-		fseek (tagfile, position, SEEK_SET);
-	
-		fgets (taglinebuf, 256, tagfile);
-
-		tagline=process_tagline(taglinebuf);
-		if (tagline) break;
-	}
-
-	fprintf (fp,"\n... %s",tagline);
-
-	fclose (tagfile);
-	fclose (tagindex);
-}
-
 
 void
 msg_write_signature (fp, flag)
@@ -249,7 +47,6 @@ msg_write_signature (fp, flag)
 	i = my_group[cur_groupnum];
 
 	if (!strcmp(active[i].attribute->sigfile, "---none")) {
-		add_tagline(fp,&active[i]);
 		return;
 	}
 	if (active[i].attribute->sigfile[0] == '!') {
@@ -261,7 +58,6 @@ msg_write_signature (fp, flag)
 				fputs (cmd, fp);
 			fclose (pipe_fp);
 		}
-		add_tagline(fp,&active[i]);
 		return;
 	}
 	get_cwd (cwd);
@@ -293,7 +89,6 @@ msg_write_signature (fp, flag)
 		copy_fp (sigfp, fp, "");
 		fclose (sigfp);
 		my_chdir (cwd);
-		add_tagline(fp,&active[i]);
 		return;
 	}
 
@@ -306,7 +101,6 @@ msg_write_signature (fp, flag)
 			copy_fp (sigfp, fp, "");
 		}
 		fclose (sigfp);
-		add_tagline(fp,&active[i]);
 		return;
 	}
 
@@ -314,7 +108,6 @@ msg_write_signature (fp, flag)
 		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
 		copy_fp (sigfp, fp, "");
 		fclose (sigfp);
-		add_tagline(fp,&active[i]);
 	}
 }
 

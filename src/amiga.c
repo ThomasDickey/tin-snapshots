@@ -50,9 +50,11 @@ static const char verstag[] = "$VER: tin " AMIVER " " __AMIGADATE__ "\0";
 int optind = 1;
 char *optarg;
 
+#if 0
 #ifdef __SASC
 long __stack = 40000;	/* TIN requires lots of stack */
 #endif
+#endif /* 0 */
 
 static APTR old_windowptr;
 

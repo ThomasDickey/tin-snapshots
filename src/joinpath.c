@@ -18,6 +18,7 @@
  * Concatenate dir+file, ensuring that we don't introduce extra '/', since some
  * systems (e.g., Apollo) use "//" for special purposes.
  */
+#ifndef M_AMIGA
 void
 joinpath(result, dir, file)
 	char	*result;
@@ -32,3 +33,4 @@ joinpath(result, dir, file)
 	(void) strcat(result, file != 0 ? file : "");
 #endif  /* M_UNIX */
 }
+#endif
