@@ -10,10 +10,6 @@ o  subscribe to newgroups does not work if tin is started with the -n flag
 o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
 
-o  'From: "Lastname, Firstname" <netscape@luser.dau>' is not displayed
-   correct at all levels - it appears as '"Lastname'
-   -> rewrite parse_from()
-
 o  on x*n+1 articles (n=articles on one screen) - <end> does not work
    correctly (it jumps to the (x*n)th artilce - f.e. 22 articles, 21 per
    page, <end> jumps to the 21st)

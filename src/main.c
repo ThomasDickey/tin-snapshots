@@ -199,7 +199,7 @@ main (argc, argv)
 	}
 #endif
 
-	if (/*count_articles && */ !newsrc_active) {
+	if (count_articles && !newsrc_active) {
 	/*
 	** what is count_articles good for?
 	** if running in batch-mode (-Z) -v gives a summary!
@@ -266,9 +266,9 @@ main (argc, argv)
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acD:f:g:hHI:m:M:nN:qrRs:SuUvVwzZ"
+#		define OPTIONS "acCD:f:g:hHI:m:M:nN:qrRs:SuUvVwzZ"
 #	else /* M_AMIGA */ /* may need some work */
-#		define OPTIONS "BcD:f:hHI:m:M:nN:qrRs:SuUvVwzZ"
+#		define OPTIONS "BcCD:f:hHI:m:M:nN:qrRs:SuUvVwzZ"
 #	endif
 #else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"
@@ -291,11 +291,11 @@ read_cmd_line_options (argc, argv)
 			case 'a':
 #		ifdef HAVE_COLOR
 				use_color = !use_color;
-				break;
 #		else
 				error_message (txt_option_not_enabled, "-DHAVE_COLOR");
 				exit (EXIT_ERROR);
 #		endif
+				break;
 #	else
 			case 'B':
 				tin_bbs_mode = TRUE;
@@ -305,11 +305,10 @@ read_cmd_line_options (argc, argv)
 				catchup = TRUE;
 				break;
 
-/* what is it good for?
+/* what is it good for? */
 			case 'C':
 				count_articles = TRUE;
 				break;
-*/
 
 #else
 			case 'd':		/* delete index file before indexing */
@@ -321,11 +320,11 @@ read_cmd_line_options (argc, argv)
 #ifdef DEBUG
 				debug = atoi (optarg);
 				debug_delete_files ();
-				break;
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
 				exit (EXIT_ERROR);
 #endif
+				break;
 
 			case 'f':	/* active (tind) / newsrc (tin) file */
 #ifdef INDEX_DAEMON
@@ -526,9 +525,8 @@ usage (theProgname)
 
 	error_message ("  -c       mark all news as read in subscribed newsgroups (batch mode)", "");
 
-/* what is it good for?
+/* what is it good for? */
 	error_message ("  -C       count unread articles", "");
-*/
 
 #	ifdef DEBUG
 	error_message ("  -D       debug mode 1=NNTP 2=ALL", "");

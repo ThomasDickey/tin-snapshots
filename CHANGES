@@ -1,3 +1,15 @@
+--unoff BETA release 970103 --
+
+269) Thomas Quinot <operator@cuivre.fdn.fr>
+     ADD. new parse_from()
+     FIX. misc.c
+
+268) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. get_server() removes everything before a '\n' in the
+          server-response -> somtimes it trashes error-messages
+     ADD. minor code clean-up
+     FIX. main.c, nntplib.c, open.c
+
 --unoff BETA release 970101 --
 
 267) Roland Rosenfeld <roland@spinnaker.rhein.de>

@@ -479,7 +479,7 @@ stat_article (art, group_path)
 		sprintf (buf, "stat %ld", art);
 		debug_nntp ("stat_article", buf);
 		put_server (buf);
-		if (/*(respcode = */ get_respcode ()/*)*/ != OK_NOTEXT) {
+		if (get_respcode () != OK_NOTEXT) {
 			art_exists = FALSE;
 		}
 #endif
@@ -979,9 +979,6 @@ get_respcode ()
 
 	debug_nntp ("get_respcode", line);
 
-	/* save error message from server */
-	strcpy(error_response, line);
-
 	respcode = atoi (line);
 
 	switch (respcode) {
@@ -994,7 +991,6 @@ get_respcode ()
 				put_server (last_put);
 				get_server (line, NNTP_STRLEN);
 			}
-			respcode = atoi (line);
 			break;
 	
 #ifdef HAVE_GENERIC_AUTHINFO
@@ -1009,12 +1005,12 @@ get_respcode ()
 				put_server (last_put);
 				get_server (line, NNTP_STRLEN);
 			}
-			respcode = atoi (line);
 			break;
 #endif
 		default:
 			break;
 	}
+	respcode = atoi (line);
 	return respcode;
 #else
 	return 0;
@@ -1245,7 +1241,7 @@ authorization (server, authuser)
 		if (ret == OK_AUTH)
 			return TRUE;
 		else {
-			strcpy (error_response, line2);
+/*			strcpy (error_response, line2); */
 			return FALSE;
 		}
 	}
@@ -1255,7 +1251,7 @@ authorization (server, authuser)
 	get_server (line, PATH_LEN);
 	ret = atoi (line);
 	if (ret != OK_AUTH) {
-		strcpy (error_response, line);
+/*		strcpy (error_response, line); */
 		return FALSE;
 	}
 
