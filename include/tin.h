@@ -508,14 +508,6 @@ extern char *get_uaf_fullname();
 #	define		DEFAULT_SUM		"sum -r"
 #endif /* BSD */
 
-#ifndef HAVE_STRCASECMP
-#	define strcasecmp my_stricmp
-#endif
-
-#ifndef HAVE_STRNCASECMP
-#	define strncasecmp my_strnicmp
-#endif
-
 /*
  * fallback values
  */
@@ -706,10 +698,9 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  * position of the unread/will_return/hot-mark
  * (used in group.c/thread.c)
  */
-#define	GROUP_MARK_OFFSET		9
-#define	THREAD_MARK_OFFSET		9
+#define	MARK_OFFSET	9
 
-#define			SELECT_MISC_COLS	21
+#define	SELECT_MISC_COLS	21
 #ifdef USE_INVERSE_HACK
 #	define		BLANK_GROUP_COLS	2
 #	define		BLANK_PAGE_COLS 	2
@@ -721,7 +712,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * Number of mime types
  */
-#define		NUM_MIME_TYPES	4
+#define	NUM_MIME_TYPES	4
 
 /*
  * Maximum permissible colour number
@@ -1168,6 +1159,8 @@ struct t_attribute
 	char *mailing_list;			/* mail list email address */
 	char *x_headers;			/* extra headers for message header */
 	char *x_body;				/* bolierplate text for message body */
+	char *mail_address;			/* from: line if other than default */
+	char *tagline_file;			/* tagline file if other than default */
 	unsigned global:1;			/* global/group specific */
 	unsigned quick_kill_header:3;		/* quick filter kill header */
 	unsigned quick_kill_expire:1;		/* quick filter kill limited/unlimited time */

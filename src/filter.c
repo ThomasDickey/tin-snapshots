@@ -613,8 +613,6 @@ fflush (stdout);
 		}
 	}
 
-/* continue_prompt (); */
-
 	fflush (fp);
 }
 

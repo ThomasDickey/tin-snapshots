@@ -1,3 +1,19 @@
+--unoff BETA release 970122 --
+
+292) Arnold Hendriks <arnold@poboxes.com>
+     ADD. tagline-support
+     ADD. different from for different newsgroups (attribute)
+          [I'm not happy with that WITHOUT insertion of Sender:]
+     FIX. several supplied patches
+
+291) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-cleanup
+     FIX. several patches
+
+290) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. tuned authorization stuff
+     FIX. open.c
+
 --unoff BETA release 970120 --
 
 289) Urs Janssen <urs@akk.uni-karlsruhe.de>

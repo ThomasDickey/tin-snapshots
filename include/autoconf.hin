@@ -138,6 +138,7 @@
  * The following are defined by the configure script if the corresponding
  * function is found in a library.
  */
+#undef	HAVE_ATOL
 #undef	HAVE_FORK
 #undef	HAVE_FTIME
 #undef	HAVE_GETCWD
@@ -149,6 +150,7 @@
 #undef	HAVE_MEMSET
 #undef	HAVE_MKDIR
 #undef	HAVE_POLL
+#undef	HAVE_PUTENV
 #undef	HAVE_REWINDDIR
 #undef	HAVE_SELECT
 #undef	HAVE_SETEGID
@@ -164,6 +166,8 @@
 #undef	HAVE_STRERROR
 #undef	HAVE_STRFTIME
 #undef	HAVE_STRNCASECMP
+#undef	HAVE_STRPBRK
+#undef	HAVE_STRSTR
 #undef	HAVE_STRTOL
 #undef	HAVE_TCGETATTR
 #undef	HAVE_TCSETATTR

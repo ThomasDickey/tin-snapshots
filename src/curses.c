@@ -900,13 +900,13 @@ PROFILE_ON();
 
 				case 'r':		/* Window bounds report */
 					ptr = (char *)&buf[bufp+1];
-					my_strtol(ptr,&ptr,10);
+					strtol(ptr,&ptr,10);
 					ptr++;
-					my_strtol(ptr,&ptr,10);
+					strtol(ptr,&ptr,10);
 					ptr++;
-					new_lines = my_strtol(ptr,&ptr,10);
+					new_lines = strtol(ptr,&ptr,10);
 					ptr++;
-					new_columns = my_strtol(ptr,&ptr,10);
+					new_columns = strtol(ptr,&ptr,10);
 					buflen = bufp;
 					if (getscrsize)
 						return 0;
@@ -914,7 +914,7 @@ PROFILE_ON();
 
 				case '|':		/* Raw Input Events */
 					ptr = (char *)&buf[bufp+1];
-					class = my_strtol(ptr,&ptr,10);
+					class = strtol(ptr,&ptr,10);
 					ptr++;
 					switch (class)
 					{	int x,y;

@@ -489,6 +489,7 @@ CF_SYS_ERRLIST
 
 ###	Checks for library functions.
 AC_CHECK_FUNCS(\
+	atol\
 	ftime \
 	getcwd \
 	is_xterm \
@@ -497,6 +498,7 @@ AC_CHECK_FUNCS(\
 	memset \
 	mkdir \
 	poll \
+	putenv \
 	rewinddir \
 	select \
 	setegid \
@@ -511,6 +513,8 @@ AC_CHECK_FUNCS(\
 	strchr \
 	strerror \
 	strftime \
+	strpbrk \
+	strstr \
 	strtol \
 	tzset \
 	uname \

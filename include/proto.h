@@ -146,7 +146,7 @@ extern void get_host_name P_((char *host_name));
 extern void get_user_info P_((char *user_name, char *full_name));
 extern void get_from_name P_((char *user_name, char *host_name, char *full_name, char *from_name));
 extern void get_domain_name P_((char *inews_domain, char *domain));
-extern int submit_news_file P_((char *name, int lines));
+extern int submit_news_file P_((struct t_group *group, char *name, int lines));
 
 /* init.c */
 extern void init_selfinfo P_((void));
@@ -408,7 +408,6 @@ extern void search_group P_((int forward));
 extern void search_subject P_((int forward));
 extern int search_article P_((int forward));
 extern int search_body P_((struct t_group *group, int current_art));
-extern void str_lwr P_((char *src, char *dst));
 
 /* select.c */
 extern void selection_index P_((int start_groupnum, int num_cmd_line_groups));
@@ -463,22 +462,30 @@ extern size_t my_strftime P_((char *s, size_t maxsize, char *format, struct tm *
 /* string.c */
 extern char *tin_itoa P_((int value, int digits));
 extern char *my_strdup P_((char *str));
-extern char *tin_strpbrk P_((char *str1, char *str2));
 extern char *strcasestr P_((char *haystack, char *needle));
 extern int mystrcat P_((char **t, char *s));
-extern long my_atol P_((char *s, int n));
-extern long my_strtol P_((/* const */ char *str, char **ptr, int use_base));
 extern void my_strncpy P_((char *p, /* const */ char *q, int n));
 extern void modifiedstrncpy P_((char *target, char *source, size_t size, int decode));
 extern void strcpynl P_((char *to, char *from));
+extern void str_lwr P_((char *src, char *dst));
+
 #ifndef HAVE_STRCASECMP
-extern int my_stricmp P_((/* const */ char *p, /* const */ char *q));
+extern int strcasecmp P_((/* const */ char *p, /* const */ char *q));
 #endif
 #ifndef HAVE_STRNCASECMP
-extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
+extern int strncasecmp P_((/* const */ char *p, /* const */ char *q, size_t n));
+#endif
+#ifndef HAVE_ATOL
+extern long atol P_((char *s));
+#endif
+#ifndef HAVE_STRPBRK
+extern char *strpbrk P_((char *str1, char *str2));
 #endif
 #ifndef HAVE_STRSTR
-extern char *my_strstr P_((char *text, char *pattern));
+extern char *strstr P_((char *text, char *pattern));
+#endif
+#ifndef HAVE_STRTOL
+extern long strtol P_((/* const */ char *str, char **ptr, int use_base));
 #endif
 
 /* thread.c */

@@ -724,14 +724,14 @@ pcParseGetSeq(pcSeq, plLow, plHigh)
 	long *plLow;
 	long *plHigh;
 {
-	*plLow = my_strtol (pcSeq, &pcSeq, 10);
+	*plLow = strtol (pcSeq, &pcSeq, 10);
 
 	if (*pcSeq == '-') {
 		/*
 		 * Range of articles
 		 */
 		pcSeq++;
-		*plHigh = my_strtol (pcSeq, &pcSeq, 10);
+		*plHigh = strtol (pcSeq, &pcSeq, 10);
 	} else {
 		/*
 		 * Single article
@@ -1244,7 +1244,6 @@ art_mark_read (group, art)
 		}
 	}
 }
-
 
 void
 art_mark_unread (group, art)

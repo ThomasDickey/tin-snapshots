@@ -432,18 +432,7 @@ select_page_up:
 				n = choose_new_group ();
 				if (n >= 0) {
 					erase_group_arrow ();
-					/* why differentiate between subscribed
-					   and unsubscribed groups here?
-					   auto-subscribe does not seem to be
-					   intuitive!*/
-/*					if (active[my_group[n]].subscribed != SUBSCRIBED) {
-						subscribe (&active[my_group[n]], SUBSCRIBED);
-						cur_groupnum = reposition_group (
-							&active[my_group[n]], (n ? n : cur_groupnum));
-						toggle_my_groups (show_only_unread_groups, "");
-					} else  { */
 						cur_groupnum = n;
-/*					} */
 					set_groupname_len (FALSE);
 					if (cur_groupnum < first_group_on_screen ||
 						cur_groupnum >= last_group_on_screen ||

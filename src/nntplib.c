@@ -95,8 +95,6 @@ char	last_put[NNTP_STRLEN];
 #			include <netlib.h>
 #		endif
 #		ifndef EXCELAN
-/* this was included above already */
-/*#			include <netdb.h>*/
 #		endif
 #		if defined(__GNUC__) && defined(sun)
 			extern int connect (int s, struct sockaddr *name, int namelen);
@@ -609,58 +607,6 @@ get_dnet_socket (machine, service)
 }
 #endif
 
-#if 0 /* this function is NEVER called */
-/*
- * handle_server_response
- *
- *	Print some informative messages based on the server's initial
- *	response code.  This is here so inews, rn, etc. can share
- *	the code.
- *
- *	Parameters:	"response" is the response code which the
- *			server sent us, presumably from "server_init",
- *			above.
- *			"nntpserver" is the news server we got the
- *			response code from.
- *
- *	Returns:	-1 if the error is fatal (and we should exit).
- *			0 otherwise.
- *
- *	Side effects:	None.
- */
-
-int
-handle_server_response (response, nntpserver)
-	int	response;
-	char	*nntpserver;
-{
-#ifdef NNTP_ABLE
-	switch (response) {
-		case OK_NOPOST:		/* fall through */
-   		 	printf ("NOTE: This machine does not have permission to post articles.\n");
-			printf ("      Please don't waste your time trying.\n\n");
-
-		case OK_CANPOST:
-			return (0);
-			/* break; */
-
-		case ERR_ACCESS:
-			printf ("This machine does not have permission to use the %s news server.\n", nntpserver);
-			return (-1);
-			/* break; */
-
-		default:
-			printf ("Unexpected response code from %s news server: %d\n",
-				nntpserver, response);
-			return (-1);
-			/* break; */
-    }
-	/*NOTREACHED*/
-#else
-	return (-1);
-#endif /* NNTP_ABLE */
-}
-#endif /* 0 */
 
 /*
  * u_put_server -- send data to the server. Do not flush output.

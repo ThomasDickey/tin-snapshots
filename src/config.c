@@ -95,7 +95,6 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "auto_list_thread=", &auto_list_thread)) {
 				break;
 			}
-			break;
 			if (match_boolean (buf, "alternative_handling=", &alternative_handling)) {
 				break;
 			}
@@ -473,6 +472,9 @@ read_config_file (file, global_file)
 				break;
 			}
 			if (match_boolean (buf, "thread_catchup_on_exit=", &thread_catchup_on_exit)) {
+				break;
+			}
+			if (match_string (buf, "taglinefile=", tagline_file, sizeof(tagline_file) )) {
 				break;
 			}
 			break;
@@ -939,6 +941,12 @@ write_config_file (file)
  	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
 
+	fprintf (fp, "# give a path to the tagline file. if empty or nonexisting, no taglines\n");
+	fprintf (fp, "# will be appended to the message. please note that TIN wil create an index\n");
+	fprintf (fp, "# with the same name as the taglines file (with .idx) appended, so make\n");
+	fprintf (fp, "# sure that permissions are OK to create the index.\n");
+	fprintf (fp, "taglinefile=%s\n\n", tagline_file);
+
 #ifdef HAVE_KEYPAD
 	fprintf (fp, "# If ON enable scroll keys on terminals that support it\n");
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
@@ -981,7 +989,7 @@ write_config_file (file)
 	fprintf (fp, "default_save_file=%s\n", default_save_file);
 	fprintf (fp, "default_select_pattern=%s\n", default_select_pattern);
 	fprintf (fp, "default_shell_command=%s\n\n", default_shell_command);
-
+	
 	fprintf (fp, "# news motd file dates from server used for detecting new motd info\n");
 	fprintf (fp, "motd_file_info=%s\n\n", motd_file_info);
 

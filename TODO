@@ -1,5 +1,15 @@
 Bugs
 ----
+o  sender-patch
+   If user ads From:-line, accept it but build a Sender:-line
+   [If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
+   Sender:-line nobody@akk.uni-karlsruhe.de (RFC 1413 reverse-lookup not
+   verified)]
+   If user ads Sender:-line rename it to X-Unverifiable-Sender and
+   ad a Sender:-line
+   (for cancelling articles never look at the Sender:-line, always look at
+   the From:-line)
+
 o  'K' is still a bit inconsistent
    - in the group menu (group.c) it jumps to the next thread containing unread
      articles.
@@ -121,15 +131,6 @@ o  add feature save selected/tagged files sequentially to the same file
 
 o  add feature Cc:
 
-o  sender-patch
-   If user ads From:-line, accept it but build a Sender:-line
-   [If reverse-lookup for Sender: 'fails' put it in the 'real name' part of the
-   Sender:-line nobody@akk.uni-karlsruhe.de (RFC 1413 reverse-lookup not
-   verified)]
-   If user ads Sender:-line rename it to X-Unverifiable-Sender and
-   ad a Sender:-line
-   (for cancelling articles never look at the Sender:-line, always look at
-   the From:-line)
 
 o  add counter to post-processing commands (processing file x of y)
 

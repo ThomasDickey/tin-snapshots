@@ -511,7 +511,7 @@ search_body (group, current_art)
 }
 
 
-int
+static int
 search_art_body (group_path, art, pat)
 	char *group_path;
 	struct t_article *art;
@@ -542,17 +542,4 @@ search_art_body (group_path, art, pat)
 
 	fclose (fp);
 	return FALSE;
-}
-
-
-void
-str_lwr (src, dst)
-	char *src;
-	char *dst;
-{
-	while (*src) {
-		*dst++ = (char)tolower((int)*src);
-		src++;
-	}
-	*dst = '\0';
 }

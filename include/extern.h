@@ -201,6 +201,7 @@ extern char *optarg;
  * Local variables
  */
 
+extern FILE *nntp_rd_fp, *nntp_wr_fp;
 extern FILE *note_fp;				/* body of current article */
 extern char *OPT_CHAR_list[];
 extern char *OPT_STRING_list[];
@@ -317,6 +318,7 @@ extern char reply_to[LEN];
 extern char save_active_file[PATH_LEN];
 extern char spooldir[PATH_LEN];
 extern char subscriptions_file[PATH_LEN];
+extern char tagline_file[PATH_LEN];
 extern char txt_help_bug_report[LEN];
 extern char userid[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
