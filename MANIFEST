@@ -1,4 +1,4 @@
-MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
+MANIFEST for tin-1.4.7 (Wed Mar 12 22:55:12 CET 2003)
 ----------------------------------------------------
   10401 ./Makefile
    5413 ./MANIFEST
@@ -7,14 +7,14 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
    1543 ./README.WIN
   65703 ./aclocal.m4
     804 ./conf-tin
-  41448 ./config.guess
-  29769 ./config.sub
+  41361 ./config.guess
+  29950 ./config.sub
  253090 ./configure
   20913 ./configure.in
    4765 ./install.sh
   11873 ./makefile.in
     777 ./mkdirs.sh
-   9566 ./doc/CHANGES
+   9834 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
   30988 ./doc/INSTALL
@@ -41,7 +41,7 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
   46690 ./include/extern.h
   13172 ./include/menukeys.h
    5238 ./include/nntplib.h
-  11985 ./include/policy.h
+  12027 ./include/policy.h
   25635 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
@@ -61,13 +61,13 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
   11967 ./src/debug.c
    2335 ./src/envarg.c
   19967 ./src/feed.c
-  42877 ./src/filter.c
+  42861 ./src/filter.c
   12595 ./src/getline.c
   47290 ./src/group.c
    3112 ./src/hashstr.c
-   8118 ./src/header.c
+   8170 ./src/header.c
   12130 ./src/help.c
-  10143 ./src/inews.c
+  10298 ./src/inews.c
   34789 ./src/init.c
    1447 ./src/joinpath.c
   90623 ./src/lang.c
@@ -76,9 +76,9 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
   23773 ./src/main.c
    8911 ./src/makecfg.c
    9347 ./src/memory.c
-  77411 ./src/misc.c
+  77434 ./src/misc.c
   37785 ./src/newsrc.c
-  27202 ./src/nntplib.c
+  27126 ./src/nntplib.c
    5942 ./src/nrctbl.c
   27190 ./src/open.c
   42378 ./src/page.c
@@ -86,12 +86,12 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
    8481 ./src/pgp.c
   97773 ./src/post.c
   12519 ./src/prompt.c
-   8874 ./src/read.c
-  23620 ./src/refs.c
-   2431 ./src/regex.c
+   8871 ./src/read.c
+  23845 ./src/refs.c
+   2365 ./src/regex.c
   13500 ./src/rfc1521.c
   22744 ./src/rfc1522.c
-  36314 ./src/save.c
+  36311 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
   35197 ./src/select.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.7 (Sat Feb  1 00:46:26 CET 2003)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3295863 total
+3296558 total

@@ -1,7 +1,7 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : read.c
- *  Author    : Jason Faultless <jason@radar.tele2.co.uk>
+ *  Author    : Jason Faultless <jason@altarstone.com>
  *  Created   : 1997-04-10
  *  Updated   : 1998-07-04
  *  Copyright : (c) 1997-99 by Jason Faultless

@@ -1,7 +1,7 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : regex.c
- *  Author    : Jason Faultless <jason@radar.tele2.co.uk>
+ *  Author    : Jason Faultless <jason@altarstone.com>
  *  Created   : 1997-02-21
  *  Updated   : 1997-02-25
  *  Notes     : Regular expression subroutines
@@ -28,20 +28,16 @@ match_regex (
 	t_bool icase)
 {
 	const char *errmsg;
-	int flags = PCRE_EXTENDED;
 	int error;
 	pcre *re;
 	t_bool ret = FALSE;
 
 	mesg[0] = '\0';
 
-	if (icase)
-		flags |= PCRE_CASELESS;
-
 	/*
 	 * Compile the expression internally.
 	 */
-	if ((re = pcre_compile(pattern, flags, &errmsg, &error, NULL)) == NULL) {
+	if ((re = pcre_compile(pattern, icase ? PCRE_CASELESS : 0, &errmsg, &error, NULL)) == NULL) {
 		sprintf(mesg, txt_pcre_error_at, errmsg, error);
 		return(FALSE);
 	}
@@ -87,7 +83,7 @@ compile_regex(
 	const char *regex_errmsg = 0;
 	int regex_errpos;
 
-	if ((cache->re = pcre_compile (regex, PCRE_EXTENDED | options, &regex_errmsg, &regex_errpos, NULL)) == NULL)
+	if ((cache->re = pcre_compile (regex, options, &regex_errmsg, &regex_errpos, NULL)) == NULL)
 		error_message (txt_pcre_error_at, regex_errmsg, regex_errpos);
 	else {
 		cache->extra = pcre_study (cache->re, 0, &regex_errmsg);

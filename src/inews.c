@@ -3,7 +3,7 @@
  *  Module    : inews.c
  *  Author    : I. Lea
  *  Created   : 1992-03-17
- *  Updated   : 1997-12-31
+ *  Updated   : 2003-03-06
  *  Notes     : NNTP builtin version of inews
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -195,10 +195,14 @@ submit_inews (
 		 * Send Path: (and Sender: if needed) headers
 		 */
 		sprintf (line, "Path: %s", PATHMASTER);
-		put_server (line);
+		u_put_server (line);
+		u_put_server("\r\n");
 
-		if (sender == 1)
-			put_server (sender_hdr);
+		if (sender == 1) {
+			u_put_server (sender_hdr);
+			u_put_server("\r\n");
+		}
+			
 #	endif /* !FORGERY */
 
 		/*
@@ -207,7 +211,8 @@ submit_inews (
 		if (*message_id) {
 			if (!id_in_article) {
 				sprintf (line, "Message-ID: %s", message_id);
-				put_server (line);
+				u_put_server (line);
+				u_put_server("\r\n");
 			}
 #	ifdef USE_CANLOCK
 			/* create a Cancel-Lock: */
@@ -219,7 +224,8 @@ submit_inews (
 				if ((lptr = build_canlock(message_id, get_secret())) != (const char *) 0) {
 					STRCPY(lock, lptr);
 					sprintf (line, "Cancel-Lock: %s", lock);
-					put_server (line);
+					u_put_server (line);
+					u_put_server("\r\n");
 				}
 			}
 #	endif /* USE_CANLOCK */
@@ -245,7 +251,8 @@ submit_inews (
 			u_put_server ("\r\n");
 		}
 
-		put_server (".");
+		u_put_server(".\r\n");
+		put_server(""); /* flush */
 
 		/*
 		 * Receive OK_POSTED or ERROR response code from NNTP server

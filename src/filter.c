@@ -117,7 +117,7 @@ test_regex(
 			return TRUE;
 	} else {
 		if (!cache->re) {
-			if ((cache->re = pcre_compile(regex, PCRE_EXTENDED | ((nocase) ? PCRE_CASELESS : 0),
+			if ((cache->re = pcre_compile(regex, ((nocase) ? PCRE_CASELESS : 0),
 												&regex_errmsg, &regex_errpos, NULL)) == NULL)
 				sprintf (mesg, txt_pcre_error_at, regex_errmsg, regex_errpos);
 			else {
