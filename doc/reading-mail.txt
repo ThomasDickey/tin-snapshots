@@ -1,0 +1,46 @@
+READING MAIL WITH TIN
+---------------------
+
+Requirements:
+
+Tin is able to read your mail providing it is stored in MH style folders
+(ie you have a directory for each mail folder and one numbered file per
+message).
+
+You must have built tin with the --enable-mh-mail-handling configure option.
+
+Your mail folders will be automatically merged in with your regular
+newsgroups on the main screen.
+
+Setup:
+
+You need a mail active file. The default location of this is ~/.tin/active.mail
+It contains one line per mail folder, each line has 4 fields.
+
+  1) Mail group name.
+     This must be the pathname of the mailbox relative to field #4 with
+     / changed to .
+
+  2) Max num.
+     Just put a large number here, something higher than the highest
+     message in the mailbox
+
+  3) Min num.
+     Put 0 here.
+
+  4) Path of mail spool directory.
+     This must be the full pathname to the root of the mail folder area.
+
+eg:
+
+Mail.inbox 10000 00000 /home/foo
+Mail.outbox 10000 00000 /home/foo
+
+This allows access to the 'inbox' and 'outbox' folders of user foo.
+They are accessed via /home/foo/Mail/inbox and /home/foo/Mail/outbox
+
+Usage:
+
+Start tin as normal.
+You'll have to subscribe to your mailgroups the first time you use them.
+

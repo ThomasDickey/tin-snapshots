@@ -227,7 +227,8 @@ Print version and date information.
 Quick mode to post an article and then exit.
 .TP
 .B -X
-Don't save any files (i.e. \fI$HOME/.newsrc\fP) if quitting \fBtin\fR.
+No-overwrite mode. \fI$HOME/.newsrc\fP and files in \fI$HOME/.tin\fP
+will not be overwritten but may be created if they don't exist.
 .TP
 .B -z
 Only start \fBtin\fR if there is any new/unread news. If there is news
@@ -700,6 +701,9 @@ Mark article/thread as read and advance to next unread article/thread.
 .B l
 Open the thread under the current cursor position.
 .TP
+.B L
+Look up article by ``Message:-ID:''.
+.TP
 .B m
 Mail current article / thread / auto selected (hot) articles /
 articles matching pattern / tagged articles to someone.
@@ -731,7 +735,7 @@ Go to previous unread article.
 Return to previous level.
 .TP
 .B Q
-Quit \fBtin\fR.
+Quit \fBtin\fR - don't ask the user to confirm.
 .TP
 .B s
 Save current article / thread / auto selected (hot) articles /
@@ -740,6 +744,9 @@ mailbox. To save to a mailbox enter '=' or '=mailbox' when asked
 for filename to save to. To save in <News.group.name>/<filename>
 format enter '+filename'. Environment variables are allowed within
 a filename (i.e., \fI$SOURCES/dir/filename\fP).
+.TP
+.B S
+Save tagged articles automatically without user prompts
 .TP
 .B t
 Toggle tag-status of current article / thread for mailing (`m') /
@@ -900,6 +907,9 @@ Toggle inverse video.
 .B K
 Mark thread as read.
 .TP
+.B L
+Look up article by ``Message:-ID:''.
+.TP
 .B O
 Reload postponed article. See also ``fB-o\fR'' command-line switch.
 .TP
@@ -907,7 +917,7 @@ Reload postponed article. See also ``fB-o\fR'' command-line switch.
 Return to previous level.
 .TP
 .B Q
-Quit \fBtin\fR.
+Quit \fBtin\fR - don't ask the user to confirm.
 .TP
 .B r
 Toggle display to show all articles or only unread articles.
@@ -1118,7 +1128,7 @@ Go to the previous unread article.
 Return to previous level.
 .TP
 .B Q
-Quit \fBtin\fR.
+Quit \fBtin\fR - don't ask the user to confirm.
 .TP
 .B r
 Reply through mail to the author of the current article with a copy of the
@@ -1135,6 +1145,9 @@ To save to a mailbox enter '=' or '=mailbox' when asked for filename
 to save to. To save in <newsgroup name>/<filename> format enter '+filename'.
 Environment variables are allowed within a filename
 (i.e., \fI$SOURCES/dir/filename\fP).
+.TP
+.B S
+Save tagged articles automatically without user prompts
 .TP
 .B t
 Toggle tag status of current article for mailing (`m') / piping (`|')
@@ -1174,9 +1187,9 @@ Mark article as unread.
 .B /
 Forward search the text of this article.
 .TP
-.B ?
-Backward search the text of this article.
-.TP
+.\".B ?
+.\"Backward search the text of this article.
+.\".TP
 .B !
 Shell escape.
 .TP
@@ -2228,7 +2241,7 @@ pressing 'r' will make them go away.
 .\"
 .\"
 .SH "XTERM BUTTONS"
-If the environment variable $\fBTERM\fR is set to \fBxterm\fR(1x),
+If the environment variable \fB$TERM\fR is set to \fBxterm\fR(1x),
 then button pressing can be used to select groups and articles.
 In this discussion, the buttons are assumed to be assigned conventionally
 (i.e., Button1 is the left button).

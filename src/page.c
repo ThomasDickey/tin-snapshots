@@ -18,8 +18,6 @@
 
 struct t_header note_h;
 
-char *glob_page_group;
-
 FILE *note_fp;					/* the body of the current article */
 
 int glob_respnum;
@@ -88,7 +86,7 @@ show_page (
 	char group_path[LEN];
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
-	int old_sort_art_type = default_sort_art_type;
+	int old_sort_art_type = tinrc.sort_article_type;
 	int old_top;
 	int posted_flag;
 	long old_artnum;
@@ -105,9 +103,6 @@ restart:
 		wait_message (0, txt_reading_article);
 
 	glob_respnum = respnum;
-	glob_page_group = group->name;
-
-	set_signals_page ();
 
 	/* Remember current & previous articles for '-' command */
 	if (respnum != this_resp) {
@@ -140,7 +135,28 @@ restart:
 	else
 		note_size = note_stat.st_size;
 
+#ifdef HAVE_METAMAIL
+	if (*note_h.mimeversion && *note_h.contenttype
+	    && (!STRNCMPEQ("text/plain", note_h.contenttype, 10))
+	    && tinrc.use_metamail) {
+		if (tinrc.ask_for_metamail) {
+			show_note_page (group->name, respnum);
+			if (prompt_yn (cLINES, txt_use_mime, TRUE) == 1) {
+				show_mime_article (note_fp, &arts[respnum]);
+				note_page = 0;
+				note_end = FALSE;
+				rewind (note_fp);
+				show_note_page (group->name, respnum);
+			}
+		} else {
+			show_mime_article (note_fp, &arts[respnum]);
+			show_note_page (group->name, respnum);
+		}
+	} else
+		show_note_page (group->name, respnum);
+#else
 	show_note_page (group->name, respnum);
+#endif /* HAVE_METAMAIL */
 
 	forever {
 		ch = ReadCh ();
@@ -228,7 +244,7 @@ end_of_article:
 				break;
 
 			case iKeyPageLastViewed:	/* show last viewed article */
-				if (last_resp < 0) {
+				if (last_resp < 0 || (which_thread(last_resp) == -1)) {
 					info_message (txt_no_last_message);
 					break;
 				}
@@ -238,44 +254,9 @@ end_of_article:
 
 			case iKeyLookupMessage:			/* Goto article by Message-ID */
 
-				if (prompt_string(txt_enter_message_id, buf+1, HIST_MESSAGE_ID) && buf[1]) {
-					char *ptr = buf+1;
-					struct t_msgid *msgid;
-
-					/*
-					 * If the user failed to supply Message-ID in <>, add them
-					 */
-					if (buf[1] != '<') {
-						buf[0] = '<';
-						strcat(buf, ">");
-						ptr = buf;
-					}
-
-					if ((msgid = find_msgid(ptr)) == NULL) {
-						info_message(txt_art_unavailable);
-						break;
-					}
-
-					/*
-					 * Is it expired or otherwise not on the spool ?
-					 */
-					if (msgid->article == ART_UNAVAILABLE) {
-						info_message(txt_art_unavailable);
-						break;
-					}
-
-					/*
-					 * Goto this article
-					 */
+				if ((i = prompt_msgid ()) != ART_UNAVAILABLE) {
 					art_close ();
-					respnum = msgid->article;
-
-					/*
-					 * Force the threading to include this art, else we can't find
-					 * it in a thread and tin crashes...
-					 */
-					if (arts[msgid->article].status == ART_READ)
-						toggle_read_unread(TRUE);
+					respnum = i;
 
 					goto restart;
 				}
@@ -350,10 +331,10 @@ end_of_article:
 			case iKeyPageDown2:
 			case iKeyPageDown3:
 page_down:
-				if (!space_goto_next_unread) {
+				if (!tinrc.space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
 						if (note_end) {
-							if (pgdn_goto_next)
+							if (tinrc.pgdn_goto_next)
 								art_close();
 							else {
 								doing_pgdn = FALSE;
@@ -391,7 +372,7 @@ page_down:
 page_goto_next_unread:
 				skip_include = '\0';
 				if (note_page != ART_UNAVAILABLE) {
-					if (!(tab_goto_next_unread || note_end)) {
+					if (!(tinrc.tab_goto_next_unread || note_end)) {
 						doing_pgdn = TRUE;
 						show_note_page (group->name, respnum);
 						break;
@@ -521,7 +502,7 @@ page_up:
 			case iKeyPageCatchup:			/* catchup - mark read, goto next */
 			case iKeyPageCatchupNextUnread:	/* goto next unread */
 				sprintf(buf, txt_mark_thread_read, (ch == iKeyPageCatchupNextUnread) ? txt_enter_next_thread : "");
-				if (!confirm_action || prompt_yn (cLINES, buf, TRUE) == 1) {
+				if (!tinrc.confirm_action || prompt_yn (cLINES, buf, TRUE) == 1) {
 					thd_mark_read (group, base[which_thread(respnum)]);
 					art_close ();
 					return (ch == iKeyPageCatchupNextUnread) ? GRP_NEXTUNREAD : GRP_NEXT;
@@ -571,7 +552,7 @@ return_to_index:
 				art_close ();
 
 				if (filter_state == NO_FILTERING &&
-					default_sort_art_type != old_sort_art_type) {
+					tinrc.sort_article_type != old_sort_art_type) {
 					make_threads (group, TRUE);
 				}
 
@@ -635,8 +616,6 @@ return_to_index:
 			case iKeyOptionMenu:	/* option menu */
 				if (change_config_file (group) == FILTERING)
 					filter_state = FILTERING;
-
-				set_signals_page ();		/* Just to be sure */
 				set_subj_from_size (cCOLS);
 				redraw_page (group->name, respnum);
 				break;
@@ -695,7 +674,7 @@ return_to_index:
 				feed_articles (FEED_SAVE, PAGE_LEVEL, group, respnum);
 				break;
 
-			case iKeyPageAutoSaveTagged:   /* Auto-save tagged articles without prompting */
+			case iKeyPageAutoSaveTagged:	/* Auto-save tagged articles without prompting */
 				if (index_point >= 0) {
 					if (num_of_tagged_arts)
 						feed_articles (FEED_AUTOSAVE_TAGGED, PAGE_LEVEL, &CURR_GROUP, (int) base[index_point]);
@@ -741,10 +720,8 @@ return_to_index:
 				break;
 
 			case iKeyDisplayPostHist:	/* display messages posted by user */
-				if (user_posted_messages ()) {
-					set_signals_page ();
+				if (user_posted_messages ())
 					redraw_page (group->name, respnum);
-				}
 				break;
 
 			case iKeyPageRepost:	/* repost current article */
@@ -844,6 +821,10 @@ expand_ctrl_chars (
 }
 #endif /* !INDEX_DAEMON */
 
+/*
+ * This is the core routine that actually gets a chunk of article onto the
+ * display
+ */
 #ifndef INDEX_DAEMON
 void
 show_note_page (
@@ -859,7 +840,9 @@ show_note_page (
 	t_bool do_display_header;
 	t_bool first = TRUE;
 
-	lines = (beginner_level ? (cLINES - (MINI_HELP_LINES - 1)) : cLINES);
+	signal_context = cPage;
+
+	lines = (tinrc.beginner_level ? (cLINES - (MINI_HELP_LINES - 1)) : cLINES);
 
 	ClearScreen ();
 
@@ -872,18 +855,6 @@ show_note_page (
 	} else
 		show_cont_header (respnum);
 
-#	ifdef HAVE_METAMAIL
-	if (!note_page && *note_h.mimeversion && *note_h.contenttype
-		 && (!STRNCMPEQ("text/plain", note_h.contenttype, 10))
-		 && use_metamail) {
-		if (!ask_for_metamail || prompt_yn (cLINES, txt_use_mime, TRUE) == 1) {
-			show_mime_article (note_fp, &arts[respnum]);
-			return;
-		}
-		show_first_header (respnum, group);
-	}
-#	endif /* HAVE_METAMAIL */
-
 	if (skip_include)
 		note_page--;
 
@@ -891,7 +862,7 @@ show_note_page (
 
 	while (note_line < lines) { /* loop show_note_page */
 
-		if (show_last_line_prev_page) {
+		if (tinrc.show_last_line_prev_page) {
 			note_mark[note_page+1] = ftell (note_fp);
 			if (doing_pgdn && first && buf2[0])
 				goto print_a_line;
@@ -941,7 +912,7 @@ show_note_page (
 				show_prev_header = do_display_header;	/* remember for cont. */
 				if (!do_display_header)
 					continue;
-			}  /* endif continuation line */
+			} /* endif continuation line */
 		} /* endif in_headers && !show_all_headers */
 
 		buf[sizeof (buf) - 1] = '\0';
@@ -959,13 +930,13 @@ print_a_line:
 
 		/*
 		 * RFC 2047 headers spanning two or more lines should be
-		 * concatenated, but it's not done, yet for feat that it may
-		 * distrupt other parts.
+		 * concatenated, but it's not done yet for fear that it may
+		 * disrupt other parts.
 		 */
 
 		if (in_headers
-			 && ((!display_mime_header_asis && !show_all_headers)
-					|| (!display_mime_allheader_asis && show_all_headers)))  {
+			 && ((!tinrc.display_mime_header_asis && !show_all_headers)
+					|| (!tinrc.display_mime_allheader_asis && show_all_headers)))  {
 			/* check if it's a continuation header line */
 			if (buf2[0] != ' ' && buf2[0] != '\t') {
 				/*
@@ -1004,7 +975,7 @@ print_a_line:
 
 		first_char = buf2[0] ? buf2[0] : first_char;
 
-		if (!below_sig || show_signatures) {
+		if (!below_sig || tinrc.show_signatures) {
 			if (skip_include) {
 				if (first_char != skip_include) {
 					skip_include = '\0';
@@ -1037,7 +1008,7 @@ print_a_line:
 
 	} /* loop show_note_page */
 
-	if (!show_last_line_prev_page)
+	if (!tinrc.show_last_line_prev_page)
 		note_mark[++note_page] = ftell (note_fp);
 	else
 		note_page++;
@@ -1046,7 +1017,7 @@ print_a_line:
 		note_end = TRUE;
 
 #	ifdef HAVE_COLOR
-	fcol(col_text);
+	fcol(tinrc.col_text);
 #	endif /* HAVE_COLOR */
 	if (note_end) {
 		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
@@ -1104,7 +1075,11 @@ show_mime_article (
 	} else
 		info_message (txt_error_metamail_failed, strerror(errno));
 
+	/* if we don't set note_end the undecoded article is displayed
+	   after metamail quits */
+#if 0
 	note_end = TRUE;
+#endif
 	Raw(TRUE);
 	InitWin ();
 	continue_prompt ();
@@ -1176,11 +1151,11 @@ show_first_header (
 	buf[i] = '\0';
 
 #	ifdef HAVE_COLOR
-	fcol(col_head);
+	fcol(tinrc.col_head);
 #	endif /* HAVE_COLOR */
 
 	/* Displaying the value of X-Comment-To header in the upper right corner */
-	if (note_h.ftnto[0] && show_xcommentto) {
+	if (note_h.ftnto[0] && tinrc.show_xcommentto) {
 		char ftbuf[HEADER_LEN]; /* FTN-To aka X-Comment-To */
 
 		my_fputs (buf, stdout);
@@ -1210,7 +1185,7 @@ show_first_header (
 		sprintf (tmp, "%-4d", arts[respnum].lines);
 
 #	ifdef HAVE_COLOR
-	fcol(col_head);
+	fcol(tinrc.col_head);
 #	endif /* HAVE_COLOR */
 
 	sprintf (buf, txt_lines, tmp);
@@ -1218,7 +1193,7 @@ show_first_header (
 	my_fputs (buf, stdout);
 
 #	ifdef HAVE_COLOR
-	fcol(col_subject);
+	fcol(tinrc.col_subject);
 #	endif /* HAVE_COLOR */
 
 	if (tex2iso_article) {
@@ -1244,7 +1219,7 @@ show_first_header (
 	EndInverse ();
 
 #	ifdef HAVE_COLOR
-	fcol(col_response);
+	fcol(tinrc.col_response);
 #	endif /* HAVE_COLOR */
 
 	MoveCursor (1, RIGHT_POS);
@@ -1260,7 +1235,7 @@ show_first_header (
 	}
 
 #	ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #	endif /* HAVE_COLOR */
 
 	if (arts[respnum].name)
@@ -1290,13 +1265,13 @@ show_first_header (
 	Convert2Printable (buf);
 
 #	ifdef HAVE_COLOR
-	fcol(col_from);
+	fcol(tinrc.col_from);
 #	endif /* HAVE_COLOR */
 
 	my_printf ("%s" cCRLF cCRLF, buf);
 
 #	ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #	endif /* HAVE_COLOR */
 
 	note_line += 4;
@@ -1345,13 +1320,13 @@ show_cont_header (
 	Convert2Printable (buf);
 
 #	ifdef HAVE_COLOR
-	fcol(col_head);
+	fcol(tinrc.col_head);
 #	endif /* HAVE_COLOR */
 
 	my_printf("%s" cCRLF cCRLF, buf);
 
 #	ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #	endif /* HAVE_COLOR */
 
 	free(buf);
@@ -1363,9 +1338,9 @@ show_cont_header (
 #ifndef INDEX_DAEMON
 /*
  * Returns:
- *		0						Art opened successfully
+ *		0				Art opened successfully
  *		ART_UNAVAILABLE	Couldn't find article
- *		ART_ABORT			User aborted during read of article
+ *		ART_ABORT		User aborted during read of article
  */
 int
 art_open (
@@ -1594,7 +1569,7 @@ show_last_page (
  * Returns:
  *	FALSE	Header was not matched.
  *	TRUE	Header was matched. body contains NULL terminated content
- *       portion of buf (ie with pat: and leading space removed)
+ *			portion of buf (ie with pat: and leading space removed)
  */
 t_bool
 match_header (

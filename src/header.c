@@ -310,8 +310,8 @@ get_from_name (
 		return;
 	}
 
-	if (*mail_address) {
-		strcpy(from_name, mail_address);
+	if (*tinrc.mail_address) {
+		strcpy(from_name, tinrc.mail_address);
 		return;
 	}
 
@@ -340,7 +340,7 @@ build_sender (
 	sender[0] = '\0';
 
 	if ((ptr = get_full_name()))
-		sprintf(sender, "%s ", ptr);
+		sprintf (sender, ((strchr(ptr, '.')) ? "\"%s\" " : "%s "), ptr);
 
 	if ((ptr = get_user_name())) {
 		strcat(sender, "<");

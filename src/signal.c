@@ -80,8 +80,8 @@ static void _CDECL signal_handler (SIG_ARGS);
 	static t_bool do_sigtstp = FALSE;
 #endif /* SIGTSTP */
 
-enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
-static int my_context = cMain;
+int signal_context = cMain;
+int need_resize = cNo;
 
 static const struct {
 	int	code;
@@ -161,6 +161,24 @@ RETSIGTYPE (*sigdisp(signum, func))(SIG_ARGS)
 #endif /* HAVE_POSIX_JC */
 }
 
+/*
+ * Block/unblock SIGWINCH/SIGTSTP restarting syscalls
+ */
+void
+allow_resize (
+	t_bool allow)
+{
+	struct sigaction sa, osa;
+
+	sa.sa_handler = signal_handler;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = 0;
+	if (!allow)
+		sa.sa_flags |= SA_RESTART;
+	sigaction(SIGWINCH, &sa, &osa);
+	sigaction(SIGTSTP, &sa, &osa);
+}
+
 static const char *
 signal_name (
 	int code)
@@ -176,17 +194,15 @@ signal_name (
 	return name;
 }
 
+/*
+ * Rescale the display buffer and redraw the contents according to
+ * the current context
+ */
 #if defined(SIGWINCH) || defined(SIGTSTP)
 void
 handle_resize (
-	int repaint)
+	t_bool repaint)
 {
-	static t_bool reentrant = FALSE;
-
-	assert (!reentrant);
-
-	reentrant = TRUE;
-
 #	ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
 	RESTORE_HANDLER (SIGWINCH, signal_handler);
@@ -198,26 +214,23 @@ handle_resize (
 		tin_done (EXIT_FAILURE);
 	}
 
-	TRACE(("handle_resize(%d:%d)", my_context, repaint))
+	TRACE(("handle_resize(%d:%d)", signal_context, repaint))
 
-	if (repaint) {
+	if (!repaint)
+		return;
+
 #	ifdef USE_CURSES
 #		ifdef HAVE_RESIZETERM
-		resizeterm(cLINES+1, cCOLS+1);
+/*	resizeterm(cLINES+1, cCOLS+1); */
+	resizeterm(cLINES+1, cCOLS);
 #		else
-		my_retouch();
+	my_retouch();
 #		endif /* HAVE_RESIZETERM */
 #	endif /* USE_CURSES */
-		switch (my_context) {
+
+	switch (signal_context) {
 		case cArt:
-			ClearScreen ();
-#	if defined(HAVE_POLL) || defined(HAVE_SELECT)
-			/* strlen("Group %s ('q' to quit)... 'low'/'high'") = 45 */
-			wait_message (0, txt_group, cCOLS - 45, glob_art_group);
-#	else
-			/* strlen("Group %s ... 'low'/'high'") = 31 */
-			wait_message (0, txt_group, cCOLS - 31, glob_art_group);
-#	endif /* HAVE_POLL || HAVE_SELECT */
+			show_art_msg (glob_group);
 			break;
 		case cConfig:
 			refresh_config_page (-1);
@@ -235,7 +248,7 @@ handle_resize (
 			break;
 		case cPage:
 			ClearScreen ();
-			redraw_page (glob_page_group, glob_respnum);
+			redraw_page (glob_group, glob_respnum);
 			break;
 		case cSelect:
 			ClearScreen ();
@@ -247,10 +260,8 @@ handle_resize (
 			break;
 		case cMain:
 			break;
-		}
-		my_fflush(stdout);
 	}
-	reentrant = FALSE;
+	my_fflush(stdout);
 }
 #endif /* SIGWINCH || SIGTSTP */
 
@@ -259,23 +270,26 @@ static void
 handle_suspend (
 	void)
 {
-	TRACE(("handle_suspend(%d)", my_context))
+	TRACE(("handle_suspend(%d)", signal_context))
 
 	set_keypad_off ();
-	set_xclick_off ();
+	if (!cmd_line)
+		set_xclick_off ();
+
 	Raw (FALSE);
 	wait_message (0, txt_suspended_message);
 
-	kill (0, SIGSTOP);
+	kill (0, SIGSTOP);				/* Put ourselves to sleep */
 
-	sigdisp (SIGTSTP, signal_handler);
+	RESTORE_HANDLER (SIGTSTP, signal_handler);
 
 	if (!batch_mode) {
 		Raw (TRUE);
-		handle_resize (TRUE);
+		need_resize = cRedraw;		/* Flag a redraw */
 	}
 	set_keypad_on ();
-	set_xclick_on ();
+	if (!cmd_line)
+		set_xclick_on ();
 }
 #endif /* SIGTSTP */
 
@@ -325,14 +339,14 @@ signal_handler (
 #endif /* SIGTSTP */
 #ifdef SIGWINCH
 		case SIGWINCH:
-			handle_resize(FALSE);
+			need_resize = cYes;
 			return;
 #endif /* SIGWINCH */
 		default:
 			break;
 	}
 #if 0
-	Raw (FALSE);
+	Raw (FALSE);	/* This is in tin_done() */
 	EndWin ();
 #endif /* 0 */
 	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n", progname, signal_name(sig), sig);
@@ -430,7 +444,7 @@ set_signal_handlers (
 }
 
 
-int
+t_bool
 set_win_size (
 	int *num_lines,
 	int *num_cols)
@@ -483,17 +497,9 @@ set_win_size (
 
 	RIGHT_POS = *num_cols - 20;
 	MORE_POS  = *num_cols - 15;
-	NOTESLINES = *num_lines - INDEX_TOP - (beginner_level ? MINI_HELP_LINES : 1);
+	NOTESLINES = *num_lines - INDEX_TOP - (tinrc.beginner_level ? MINI_HELP_LINES : 1);
 	if (NOTESLINES <= 0)
 		NOTESLINES = 1;
 
 	return (*num_lines != old_lines || *num_cols != old_cols);
 }
-
-void set_signals_art    (void) { my_context = cArt; }
-void set_signals_config (void) { my_context = cConfig; }
-void set_signals_group  (void) { my_context = cGroup; }
-void set_signals_help   (void) { my_context = cHelp; }
-void set_signals_page   (void) { my_context = cPage; }
-void set_signals_select (void) { my_context = cSelect; }
-void set_signals_thread (void) { my_context = cThread; }

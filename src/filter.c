@@ -282,7 +282,7 @@ if (debug) {
 				xref[0] = '\0';
 				icase = 0;
 				secs = 0L;
-				psGrp = (struct t_group *) 0;   /* fudge for out of order rules */
+				psGrp = (struct t_group *) 0;		/* fudge for out of order rules */
 				break;
 			}
 			if (match_string (buf+1, "nksa=", gnksa, sizeof (gnksa))) {
@@ -339,6 +339,16 @@ if (debug) {
 				if (arr_ptr) {
 					arr_ptr[i].msgid = my_strdup (msgid);
 					arr_ptr[i].fullref = FILTER_MSGID_ONLY;
+				}
+				break;
+			}
+			break;
+
+		case 'r':
+			if (match_string (buf+1, "efs_only=", msgid, sizeof (msgid))) {
+				if (arr_ptr) {
+					arr_ptr[i].msgid = my_strdup (msgid);
+					arr_ptr[i].fullref = FILTER_REFS_ONLY;
 				}
 				break;
 			}
@@ -507,10 +517,13 @@ vWriteFilterFile (
 {
 	FILE *hFp;
 
+	if (no_write)
+		return;
+
 	if ((hFp = fopen (pcFile, "w")) == (FILE *) 0)
 		return;
 
-	fprintf (hFp, txt_filter_file, default_filter_days);
+	fprintf (hFp, txt_filter_file, tinrc.default_filter_days);
 	fflush (hFp);
 
 	/*
@@ -583,6 +596,9 @@ my_flush ();
 					break;
 				case FILTER_MSGID_ONLY:
 					fprintf (fp, "msgid_only=%s\n", ptr->filter[i].msgid);
+					break;
+				case FILTER_REFS_ONLY:
+					fprintf (fp, "refs_only=%s\n", ptr->filter[i].msgid);
 					break;
 				default:
 					break;
@@ -770,7 +786,7 @@ filter_menu (
 
 	len = cCOLS - 30;
 
-	sprintf (text_time, txt_time_default_days, default_filter_days);
+	sprintf (text_time, txt_time_default_days, tinrc.default_filter_days);
 	sprintf (text_subj, ptr_filter_subj, len, len, art->subject);
 
 	strcpy (buf, art->from);
@@ -826,6 +842,7 @@ filter_menu (
 				break;
 
 			default: /* should not happen */
+				/* CONSTANTCONDITION */
 				assert(0 != 0);
 				break;
 		}
@@ -887,6 +904,7 @@ filter_menu (
 					break;
 
 				default: /* should not happen */
+					/* CONSTANTCONDITION */
 					assert(0 != 0);
 					break;
 			}
@@ -1202,13 +1220,13 @@ bAddFilterRule (
 	switch(psRule->expire_time)
 	{
 		case 1:
-			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 86400);  /*  86400 = 60 * 60 * 24 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 86400);		/*  86400 = 60 * 60 * 24 */
 			break;
 		case 2:
-			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 172800); /* 172800 = 60 * 60 * 24 * 2 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 172800);	/* 172800 = 60 * 60 * 24 * 2 */
 			break;
 		case 3:
-			psPtr[*plNum].time = lCurTime + (time_t) (default_filter_days * 345600); /* 345600 = 60 * 60 * 24 * 4 */
+			psPtr[*plNum].time = lCurTime + (time_t) (tinrc.default_filter_days * 345600);	/* 345600 = 60 * 60 * 24 * 4 */
 			break;
 		default:
 			psPtr[*plNum].time = (time_t) 0;
@@ -1233,11 +1251,13 @@ bAddFilterRule (
 			case FILTER_MSGID:
 			case FILTER_MSGID_LAST:
 			case FILTER_MSGID_ONLY:
+			case FILTER_REFS_ONLY:
 				psPtr[*plNum].msgid = my_strdup (acBuf);
 				psPtr[*plNum].fullref = psRule->counter;
 				break;
 
 			default: /* should not happen */
+				/* CONSTANTCONDITION */
 				assert(0 != 0);
 				break;
 		}
@@ -1370,7 +1390,7 @@ filter_articles (
 	 * set up cache tables for all types of filter rules
 	 * (only for regexp matching)
 	 */
-	if (wildcard) {
+	if (tinrc.wildcard) {
 		size_t msiz;
 
 		msiz = sizeof(struct regex_cache) * num;
@@ -1404,7 +1424,7 @@ filter_articles (
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-					if (!wildcard) {
+					if (!tinrc.wildcard) {
 						if (wildmat(arts[i].subject, ptr[j].subj, ptr[j].icase)) {
 							SET_FILTER(group, i, j);
 						}
@@ -1443,7 +1463,7 @@ filter_articles (
 						sprintf (buf, "%s (%s)", arts[i].from, arts[i].name);
 					else
 						strcpy (buf, arts[i].from);
-					if (!wildcard) {
+					if (!tinrc.wildcard) {
 						if (wildmat(buf, ptr[j].from, ptr[j].icase)) {
 							SET_FILTER(group, i, j);
 						}
@@ -1484,6 +1504,7 @@ filter_articles (
 					struct t_article *art = &arts[i];
 					char *refs = NULL;
 					const char *myrefs = NULL;
+					const char *mymsgid = NULL;
 
 /*
  * TODO nice idea del'd; better apply one rule on all fitting
@@ -1496,20 +1517,28 @@ filter_articles (
 					switch (ptr[j].fullref) {
 						case FILTER_MSGID:
 							myrefs = REFS(art, refs);
+							mymsgid = MSGID(art);
 							break;
 						case FILTER_MSGID_LAST:
 							myrefs = (art->refptr->parent) ? art->refptr->parent->txt : "";
+							mymsgid = MSGID(art);
 							break;
 						case FILTER_MSGID_ONLY:
 							myrefs = "";
+							mymsgid = MSGID(art);
+							break;
+						case FILTER_REFS_ONLY:
+							myrefs = REFS(art, refs);
+							mymsgid = "";
 							break;
 						default: /* should not happen */
+							/* CONSTANTCONDITION */
 							assert(0 != 0);
 							break;
 					}
 
-					if (!wildcard) {
-						if (wildmat(myrefs, ptr[j].msgid, FALSE) || wildmat(MSGID(art), ptr[j].msgid, FALSE)) {
+					if (!tinrc.wildcard) {
+						if (wildmat(myrefs, ptr[j].msgid, FALSE) || wildmat(mymsgid, ptr[j].msgid, FALSE)) {
 							SET_FILTER(group, i, j);
 						}
 					} else {
@@ -1539,8 +1568,8 @@ filter_articles (
 								regex_errpos =
 								  pcre_exec(regex_cache_msgid[j].re,
 								    regex_cache_msgid[j].extra,
-								    MSGID(art),
-								    strlen(MSGID(art)),
+								    mymsgid,
+								    strlen(mymsgid),
 								    0, NULL, 0);
 								if (regex_errpos >= 0) {
 									SET_FILTER(group, i, j);
@@ -1650,7 +1679,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 								/* don't filter when we are actually in that group */
 								/* Group names shouldn't be case sensitive in any case. Whatever */
 								if (ptr[j].type != FILTER_KILL || strcmp(group->name, buf) != 0) {
-									if (!wildcard) {
+									if (!tinrc.wildcard) {
 										if (wildmat(buf, ptr[j].xref, ptr[j].icase))
 											group_count = -1;
 									} else {
@@ -1699,7 +1728,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	/*
 	 * throw away the contents of all regex_caches
 	 */
-	if (wildcard) {
+	if (tinrc.wildcard) {
 		for (j = 0; j < num; j++) {
 			FreeIfNeeded(regex_cache_subj[j].re);
 			FreeIfNeeded(regex_cache_subj[j].extra);

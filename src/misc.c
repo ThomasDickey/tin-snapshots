@@ -193,16 +193,16 @@ copy_body (
 							status_char = FALSE;
 					}
 					buf2[i] = '\0';
-					if (status_char)  /* already quoted */
+					if (status_char)	/* already quoted */
 						retcode = fprintf (fp_op, "%s>%s", buf2, strchr(buf, '>'));
-					else   /* ... to be quoted ... */
+					else	/* ... to be quoted ... */
 						retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-				} else    /* line was not already quoted (no >) */
+				} else	/* line was not already quoted (no >) */
 					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-			} else /* line is empty */
-					retcode = fprintf (fp_op, "%s\n", (quote_empty_lines ? prefixbuf : ""));
-		} else {    /* no initials in quote_string, just copy */
-			if ((buf[0] != '\n') || quote_empty_lines) {
+			} else	/* line is empty */
+					retcode = fprintf (fp_op, "%s\n", (tinrc.quote_empty_lines ? prefixbuf : ""));
+		} else {		/* no initials in quote_string, just copy */
+			if ((buf[0] != '\n') || tinrc.quote_empty_lines) {
 				/* use blank-stripped quote string if line is already quoted */
 					retcode = fprintf (fp_op, "%s%s", ((buf[0]=='>') ? prefixbuf : prefix), buf);
 			} else
@@ -215,6 +215,11 @@ copy_body (
 	}
 }
 
+
+/*
+ * Lookup 'env' in the environment. If it exists, return its value,
+ * else return 'def'
+ */
 const char *
 get_val (
 	const char *env,	/* Environment variable we're looking for */
@@ -224,6 +229,7 @@ get_val (
 
 	return ((ptr = getenv(env)) != (char *) 0 ? ptr : def);
 }
+
 
 /*
  * IMHO it's not tin job to take care about dumb editor backupfiles
@@ -250,7 +256,7 @@ invoke_editor (
 		first = FALSE;
 	}
 
-	strcpy (editor_format, (start_editor_offset ? (*default_editor_format ? default_editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
+	strcpy (editor_format, (tinrc.start_editor_offset ? (*tinrc.default_editor_format ? tinrc.default_editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
 
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format);
 
@@ -353,7 +359,7 @@ shell_escape (
 	char *p;
 	char shell[LEN];
 
-	sprintf (mesg, txt_shell_escape, default_shell_command);
+	sprintf (mesg, txt_shell_escape, tinrc.default_shell_command);
 
 	if (!prompt_string (mesg, shell, HIST_SHELL_COMMAND))
 		return;
@@ -362,9 +368,9 @@ shell_escape (
 		continue;
 
 	if (*p)
-		my_strncpy (default_shell_command, p, sizeof(default_shell_command));
+		my_strncpy (tinrc.default_shell_command, p, sizeof(tinrc.default_shell_command));
 	else {
-		my_strncpy (shell, (*default_shell_command ? default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof(shell));
+		my_strncpy (shell, (*tinrc.default_shell_command ? tinrc.default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof(shell));
 		p = shell;
 	}
 
@@ -377,7 +383,7 @@ shell_escape (
 
 	continue_prompt ();
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		ClearScreen ();
 }
 #endif /* !NO_SHELL_ESCAPE */
@@ -391,17 +397,19 @@ tin_done (
 	t_bool ask = TRUE;
 	struct t_group *group;
 
+	signal_context = cMain;
+
 	/*
 	 * check if any groups were read & ask if they should marked read
 	 */
-	if (catchup_read_groups && !cmd_line && !no_write) {
+	if (tinrc.catchup_read_groups && !cmd_line && !no_write) {
 		for (i = 0; i < group_top; i++) {
 			group = &active[my_group[i]];
 			if (group->read_during_session) {
 				if (ask) {
 					if (prompt_yn (cLINES, txt_catchup_all_read_groups, FALSE) == 1) {
 						ask = FALSE;
-						default_thread_arts = THREAD_NONE;	/* speeds up index loading */
+						tinrc.thread_articles = THREAD_NONE;	/* speeds up index loading */
 					} else
 						break;
 				}
@@ -516,20 +524,20 @@ strip_double_ngs (
 	if (strchr(ngs_list, ',') != (char *) 0) {
 		over1 = FALSE;
 		ncnt1 = 0;
-		strcpy(newlist, ngs_list);	/* make a "working copy" */
-		ptr = newlist;			/* the next outer newsg. is the 1st */
+		strcpy(newlist, ngs_list);		/* make a "working copy" */
+		ptr = newlist;						/* the next outer newsg. is the 1st */
 
 		while (!over1) {
-			ncnt1++;			/* inc. outer counter */
+			ncnt1++;							/* inc. outer counter */
 			strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
 			ptr2 = strchr(ptr, ',');	/* search "," ... */
-			if (ptr2 != (char *) 0) {       /* if found ... */
+			if (ptr2 != (char *) 0) {	/* if found ... */
 				*ptr2 = '\0';
-				strcpy(ngroup1, ptr);   /* chop off first outer newsgroup */
-				ptr = ptr2 + 1;		/* pointer points to next newsgr. */
-			} else {			/* ... if not: last group */
-				over1 = TRUE;		/* wow, everything is done after . */
-				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup */
+				strcpy(ngroup1, ptr);	/* chop off first outer newsgroup */
+				ptr = ptr2 + 1;			/* pointer points to next newsgr. */
+			} else {							/* ... if not: last group */
+				over1 = TRUE;				/* wow, everything is done after . */
+				strcpy(ngroup1, ptr);	/* ... this last outer newsgroup */
 			}
 
 			over2 = FALSE;
@@ -720,8 +728,7 @@ invoke_cmd (
 		Raw (TRUE);
 		InitWin ();
 #if defined(SIGWINCH)
-		handle_resize(FALSE);
-		/* seems to be troublesome on RedHat5.0 Linux2.0.33/glibc2.0.6/libncurses1.9.9 */
+		handle_resize (FALSE);
 #endif /* SIGWINCH */
 	}
 
@@ -1251,13 +1258,13 @@ void
 toggle_inverse_video (
 	void)
 {
-	inverse_okay = !inverse_okay;
-	if (inverse_okay) {
+	tinrc.inverse_okay = !tinrc.inverse_okay;
+	if (tinrc.inverse_okay) {
 #ifndef USE_INVERSE_HACK
-		draw_arrow_mark = FALSE;
+		tinrc.draw_arrow_mark = FALSE;
 #endif /* !USE_INVERSE_HACK */
 	} else {
-		draw_arrow_mark = TRUE;
+		tinrc.draw_arrow_mark = TRUE;
 	}
 }
 
@@ -1266,7 +1273,7 @@ void
 show_inverse_video_status (
 	void)
 {
-		info_message ((inverse_okay ? txt_inverse_on : txt_inverse_off));
+		info_message ((tinrc.inverse_okay ? txt_inverse_on : txt_inverse_off));
 }
 
 
@@ -1477,7 +1484,7 @@ get_arrow_key (
 			select (0, NULL, NULL, NULL, &tvptr);
 			i++;
 		}
-#				else  /* !HAVE_SELECT */
+#				else /* !HAVE_SELECT */
 #					ifdef HAVE_POLL
 		struct pollfd fds[1];
 		int i=0;
@@ -1754,7 +1761,7 @@ strfquote (
 				case 'N':	/* Articles Name of author */
 					strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 					break;
-				case 'C':   /* First Name of author */
+				case 'C':	/* First Name of author */
 					if (arts[respnum].name != (char *) 0) {
 						strcpy (tbuf, arts[respnum].name);
 						if (strrchr (arts[respnum].name, ' '))
@@ -2374,12 +2381,12 @@ cleanup_tmp_files (
 {
 	char acNovFile[PATH_LEN];
 
-	if (read_news_via_nntp && xover_supported && !cache_overview_files) {
+	if (read_news_via_nntp && xover_supported && !tinrc.cache_overview_files) {
 		sprintf (acNovFile, "%s%d.idx", TMPDIR, (int) process_id);
 		unlink (acNovFile);
 	}
 
-	if (!cache_overview_files)
+	if (!tinrc.cache_overview_files)
 		unlink (local_newsgroups_file);
 
 	if (batch_mode || update_fork)
@@ -2582,6 +2589,9 @@ write_input_history_file (
 	char *chr;
 	int his_w, his_e;
 
+	if (!no_write)
+		return;
+
 	if ((fp = fopen(local_input_history_file, "w")) == NULL)
 		return;
 
@@ -2613,7 +2623,7 @@ quote_wild (
 	static char buff[2*LEN];	/* on the safe side */
 
 	for (target = buff; *str != '\0'; str++) {
-		if (wildcard) { /* regex */
+		if (tinrc.wildcard) { /* regex */
 			/*
 			 * quote meta characters ()[]{}\^$*+?.
 			 * replace whitespace with '\s' (pcre)
@@ -2648,7 +2658,7 @@ quote_wild_whitespace (
 	static char buff[2*LEN];	/* on the safe side */
 
 	for (target = buff; *str != '\0'; str++) {
-		if (wildcard) { /* regex */
+		if (tinrc.wildcard) { /* regex */
 			/*
 			 * replace whitespace with '\s' (pcre)
 			 */
@@ -2708,7 +2718,7 @@ page_up (
 	if (curslot == 0)
 		return (maxslot - 1);
 
-	scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
+	scroll_lines = (tinrc.full_page_scroll ? NOTESLINES : NOTESLINES / 2);
 
 	if ((n = curslot % scroll_lines) > 0)
 		curslot -= n;
@@ -2732,7 +2742,7 @@ page_down (
 	if (curslot == maxslot - 1)
 		return 0;
 
-	scroll_lines = (full_page_scroll ? NOTESLINES : NOTESLINES / 2);
+	scroll_lines = (tinrc.full_page_scroll ? NOTESLINES : NOTESLINES / 2);
 
 	curslot = ((curslot + scroll_lines) / scroll_lines) * scroll_lines;
 

@@ -10,7 +10,7 @@
  *  Updated   : 1996-12-15
  *  Notes     : This are the basic function for ansi-color
  *              and word highlighting
- *  Copyright : (c) 1995-99 by Olaf Kalzuga and Roland Rosenfeld
+ *  Copyright : (c) 1995-99 by Olaf Kalzua and Roland Rosenfeld
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -191,7 +191,7 @@ put_mark_char (
 	int c,
 	FILE *stream)
 {
-	switch (word_h_display_marks) {
+	switch (tinrc.word_h_display_marks) {
 		case 1: /* print mark */
 			my_fputc(c, stream);
 			break;
@@ -222,7 +222,7 @@ color_fputs (
 			if (! hilite) {
 				if ((p == s || !isalp(p[-1])) && check_valid_mark(p)) {
 					hilite = TRUE;
-					fcol(*p == '*' ? col_markstar : col_markdash);
+					fcol(*p == '*' ? tinrc.col_markstar : tinrc.col_markdash);
 					put_mark_char(*p, stream);
 				} else /* print normal character */
 					my_fputc(*p, stream);
@@ -246,12 +246,12 @@ print_color (
 	char *str,
 	t_bool signature)
 {
-	int color = col_text;
+	int color = tinrc.col_text;
 
 	if (use_color) {
 		if (signature) {
-			fcol (col_signature);
-			color = col_signature;
+			fcol (tinrc.col_signature);
+			color = tinrc.col_signature;
 		} else {
 			if (str[0] == '>'
 				 || str[0] == '|'
@@ -262,13 +262,13 @@ print_color (
 				 || (str[2] == '>' && str[1] != '-')
 				 || (str[3] == '>' && str[2] != '-')
 				 || (str[0] == ' ' && str[1] == ':' && str[2] != '-')) {
-				fcol (col_quote);
-				color = col_quote;
+				fcol (tinrc.col_quote);
+				color = tinrc.col_quote;
 			} else if (in_headers) {
-				color = col_newsheaders;
-				fcol (col_newsheaders);
+				color = tinrc.col_newsheaders;
+				fcol (tinrc.col_newsheaders);
 			} else
-				fcol (col_text);
+				fcol (tinrc.col_text);
 		}
 	}
 

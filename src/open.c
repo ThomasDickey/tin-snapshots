@@ -828,7 +828,7 @@ setup_hard_base (
 	if (read_news_via_nntp && group->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 
-#	if 0
+#	ifdef BROKEN_LISTGROUP
 		/*
 		 * Some nntp servers are broken and need an extra GROUP command
 		 * (reported by reorx@irc.pl). This affects (old?) versions of
@@ -837,7 +837,7 @@ setup_hard_base (
 		sprintf (buf, "GROUP %s", group->name);
 		if (nntp_command(buf, OK_GROUP, NULL) == NULL)
 			return(-1);
-#	endif /* 0*/
+#	endif /* BROKEN_LISTGROUP */
 
 		/*
 		 * See if LISTGROUP works

@@ -1,3 +1,71 @@
+-- pre-1.4 release 19990413 "Endemoniada" --
+
+645) Urs Janssen <urs@tin.org>
+     BUG. use_keypad was missing in t_config
+     ADD. --enable-broken-listgorup-fix
+     FIX. configure.[in], autoconf.h[in], extern.h, tinrc.h, config.c,
+          curses.c, init.c, open.c
+
+644) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. 'L'ookup Message-ID to group and thread menus
+     ADD. minor code cleanup
+     FIX. group.c, page.c, help.c, tin.1
+
+643) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. split config variables into new structure
+     BUG. online show_description toggles affected tinrc copy
+     BUG. search config menu used wrong default
+     FIX. tinrc.h, *.c
+
+642) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. mark thread read didn't always work
+     FIX. thread.c
+
+641) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. refs_only filter
+     FIX. tin.h, filter.c, lang.c
+
+640) Jason Faultless <jason@radar.tele2.co.uk>
+     ADD. code cleanup
+     ADD. some man-page corrections
+     REM. create_subdir, because it was constant
+     FIX. feed.c, save.c, tin.1
+
+639) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. respect mail_address for mail-replys if not using interactive
+          mailer (!use_mailreader_i)
+     FIX. post.c
+
+638) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. resizeterm() was called during malloc()/realloc() calls
+     BUG. fixup_thread() was called after show_thread_page()
+     BUG. confirm_to_quit=yes 'disabled' 'Q'
+     ADD. fixed '-' to work without toggeling show_only_unread
+     FIX. extern.h, menukeys.h, proto.h, tin.h, art.c, config.c, curses.c,
+          group.c, help.c, misc.c, page.c, select.c, signal.c, thread.c
+
+637) Borislav Deianov <borislav@CS.Cornell.EDU>
+     ADD. rewrote -X (no-overwrite) mode
+     BUG. reposting ('x') to a 'D'eleted group dumped core
+     BUG. the pager asks for metamail every time it's scrolled to the top
+     BUG. after metamail quits we are left in the pager with a blank screen
+     FIX. extern.h, active.c, art.c, attrib.c, config.c, filter.c, lang.c,
+          mail.c, main.c, misc.c, newsrc.c, page.c, post.c, save.c,
+          select.c, tin.1
+
+636) Urs Janssen <urs@tin.org>
+     ADD. updated pcre (2.03 -> 2.04)
+     ADD. automatically abort unmodified ('empty')
+          postings/followups/bugreports
+     ADD. check if realname in Sender: contais '.' and add "" if needed
+     BUG. posted_msgs_file wasn't updated if default_maildir was changed
+          via 'M'enu
+     FIX. config.c, header.c, post.c, pcre/*
+
+635) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. MH mail folder reading was broken
+     FIX. reading-mail.txt, active.c, mail.c
+
 -- pre-1.4 release 19990216 "Styrofoam" --
 
 634) Urs Janssen <urs@tin.org>

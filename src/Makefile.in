@@ -78,6 +78,7 @@ HFILES	= \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
+	$(INCDIR)/tinrc.h \
 	$(INCDIR)/version.h
 #	$(INCDIR)/config.h
 
@@ -321,6 +322,7 @@ cscope:
 TIN_DEP	= \
 	Makefile \
 	$(INCDIR)/tin.h \
+	$(INCDIR)/tinrc.h \
 	../include/autoconf.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/nntplib.h \

@@ -43,6 +43,9 @@
 
 #include	<signal.h>
 
+enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
+enum resizer { cNo, cYes, cRedraw };
+
 #ifdef VMS
 #	ifdef __DECC
 #		include <unixio.h>
@@ -770,7 +773,7 @@
 #define GROUP_MATCH(s1, pat, case)		(wildmat (s1, pat, case))
 
 #define REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
-#define REGEX_FMT (wildcard ? "%s" : "*%s*")
+#define REGEX_FMT (tinrc.wildcard ? "%s" : "*%s*")
 
 #define IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
@@ -1063,7 +1066,8 @@
 #define FILTER_MSGID		4
 #define FILTER_MSGID_LAST	5
 #define FILTER_MSGID_ONLY	6
-#define FILTER_LINES		7
+#define FILTER_REFS_ONLY	7
+#define FILTER_LINES		8
 
 #define FILTER_LINES_NO		0
 #define FILTER_LINES_EQ		1
@@ -1817,6 +1821,7 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 #endif /* M_AMIGA */
 
 #include	"extern.h"
+#include	"tinrc.h"
 #include	"nntplib.h"
 
 #ifndef __CPROTO__

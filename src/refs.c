@@ -5,7 +5,7 @@
  *  Created   : 1996-05-09
  *  Updated   : 1998-01-04
  *  Notes     : Cacheing of message ids / References based threading
- *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
+ *  Credits   : Richard Hodson <richard@macgyver.tele2.co.uk>
  *              hash_msgid, free_msgid
  *  Copyright : (c) 1996-99 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,

@@ -84,11 +84,11 @@ bld_tline (
 	else {
 		strcat(buff, "   ");
 		if (art->inrange) {
-			mark = art_marked_inrange;
+			mark = tinrc.art_marked_inrange;
 		} else if (art->status == ART_UNREAD) {
-			mark = (art->selected ? art_marked_selected : art_marked_unread);
+			mark = (art->selected ? tinrc.art_marked_selected : tinrc.art_marked_unread);
 		} else if (art->status == ART_WILL_RETURN) {
-			mark = art_marked_return;
+			mark = tinrc.art_marked_return;
 
 /*
  * TODO - add kill_level
@@ -111,23 +111,23 @@ bld_tline (
 	 * Add the number of lines and/or the score if enabled
 	 * (inside "[,]", 1+4[+1+6]+1+2 chars total)
 	 */
-	if (show_lines || show_score) /* add [ */
+	if (tinrc.show_lines || tinrc.show_score) /* add [ */
 		strcat (buff, "[");
 
-	if (show_lines) /* add lines */
+	if (tinrc.show_lines) /* add lines */
 		strcat (buff, ((art->lines != -1) ? tin_ltoa(art->lines, 4): "   ?"));
 
-	if (show_score) {
+	if (tinrc.show_score) {
 		char tmp_score[15];
 
-		if (show_lines) /* insert a sperator if show lines and score */
+		if (tinrc.show_lines) /* insert a sperator if show lines and score */
 			strcat (buff, ",");
 
 		sprintf (tmp_score, "%6d", art->score);
 		strcat (buff, tmp_score); /* add score */
 	}
 
-	if (show_lines||show_score) /* add closing ] and two spaces */
+	if (tinrc.show_lines||tinrc.show_score) /* add closing ] and two spaces */
 		strcat (buff, "]  ");
 
 	/*
@@ -142,23 +142,23 @@ bld_tline (
 #if 0 /* old code without show_score */
 		/* Work out in advance the length of the author field if needed */
 		/* OUCH! never use 'n * (1 - bool)' */
-		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - show_lines) : 0);
+		len_from = ((CURR_GROUP.attribute->show_author != SHOW_FROM_NONE) ? (max_from - 3) + 8 * (1 - tinrc.show_lines) : 0);
 #else
 		if (CURR_GROUP.attribute->show_author == SHOW_FROM_NONE)
 				len_from = 0;
 		else {
 			/* compute max. screen width */
 			len_from = cCOLS - 7;	/* arrow_mark + index. num + space */
-			if (show_lines || show_score)
+			if (tinrc.show_lines || tinrc.show_score)
 				len_from -= 4;	/* [] + two taling spaces */
 
-			if (show_lines) {
+			if (tinrc.show_lines) {
 				len_from -= 4;	/* lines */
-				if (show_score)
+				if (tinrc.show_score)
 					len_from--;	/* seperator */
 			}
 
-			if (show_score)
+			if (tinrc.show_score)
 				len_from -= 6;	/* score */
 
 			if (CURR_GROUP.attribute->show_author == SHOW_FROM_BOTH)
@@ -221,7 +221,7 @@ bld_tline (
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	Convert2Printable (buff);
 
-	if (!strip_blanks) {
+	if (!tinrc.strip_blanks) {
 		/*
 		 * Pad to end of line so that inverse bar looks 'good'
 		 */
@@ -253,7 +253,7 @@ draw_tline (
 #	endif /* USE_CURSES */
 
 	if (full) {
-		if (strip_blanks) {
+		if (tinrc.strip_blanks) {
 			strip_line (s);
 			CleartoEOLN ();
 		}
@@ -268,7 +268,7 @@ draw_tline (
 	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if (s[k-x] == art_marked_selected) {
+	if (s[k-x] == tinrc.art_marked_selected) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
 		my_fputc (s[k-x], stdout);
@@ -378,7 +378,7 @@ thread_page (
 						goto thread_down;
 
 					case KEYMAP_LEFT:
-						if (thread_catchup_on_exit)
+						if (tinrc.thread_catchup_on_exit)
 							goto thread_catchup;
 						else
 							goto thread_done;
@@ -416,7 +416,7 @@ thread_page (
 							case MOUSE_BUTTON_2:
 								if (xrow < INDEX2LNUM(first_thread_on_screen) || xrow > INDEX2LNUM(last_thread_on_screen-1))
 									goto thread_page_up;
-								if (thread_catchup_on_exit)
+								if (tinrc.thread_catchup_on_exit)
 									goto thread_catchup;
 								else
 									goto thread_done;
@@ -452,7 +452,7 @@ end_of_thread:
 				break;
 
 			case iKeyPageLastViewed:	/* show last viewed article */
-				if (this_resp < 0) {
+				if (this_resp < 0 || (which_thread(this_resp) == -1)) {
 					info_message (txt_no_last_message);
 					break;
 				}
@@ -469,7 +469,7 @@ end_of_thread:
 					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, find_response (thread_basenote, thread_index_point));
 				break;
 
-			case iKeyThreadAutoSaveTagged:   /* Auto-save tagged articles without prompting */
+			case iKeyThreadAutoSaveTagged:	/* Auto-save tagged articles without prompting */
 				if (thread_basenote >= 0) {
 					if (num_of_tagged_arts)
 						feed_articles (FEED_AUTOSAVE_TAGGED, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
@@ -540,8 +540,8 @@ enter_pager:
 							ret_code = GRP_KILLED; /* ?? */
 							goto thread_done;
 						}
-						show_thread_page();
 						fixup_thread (n, this_resp);
+						show_thread_page();
 				}
 				break;
 
@@ -588,14 +588,14 @@ thread_page_up:
 			case iKeyThreadCatchup:					/* catchup thread, move to next one */
 			case iKeyThreadCatchupNextUnread:	/* -> next with unread arts */
 thread_catchup:										/* come here when exiting thread via <- */
-				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, thread_index_point));
+				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, 0));
 				for (i = n; i != -1; i = arts[i].thread) {
 					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN))
 						break;
 				}
 				if (i != -1) {	/* still unread arts in the thread */
 					sprintf(buf, txt_mark_thread_read, (ch == iKeyThreadCatchupNextUnread) ? txt_enter_next_thread : "");
-					if (!confirm_action || (confirm_action && prompt_yn (cLINES, buf, TRUE) == 1))
+					if (!tinrc.confirm_action || (tinrc.confirm_action && prompt_yn (cLINES, buf, TRUE) == 1))
 						thd_mark_read (group, base[thread_basenote]);
 				}
 				ret_code = (ch == iKeyThreadCatchupNextUnread ? GRP_NEXTUNREAD : GRP_NEXT);
@@ -622,6 +622,13 @@ thread_catchup:										/* come here when exiting thread via <- */
 			case iKeyThreadHelp:			/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();
+				break;
+
+			 case iKeyLookupMessage:
+				if ((n = prompt_msgid ()) != ART_UNAVAILABLE) {
+					i = n;
+					goto enter_pager;
+				}
 				break;
 
 			case iKeySearchBody:			/* search article body */
@@ -749,14 +756,14 @@ thread_catchup:										/* come here when exiting thread via <- */
 				update_thread_page ();
 				break;
 
-			case iKeyThreadUndoSel:			/* undo selections */
+			case iKeyThreadUndoSel:		/* undo selections */
 				for (i = (int) base[thread_basenote]; i != -1; i = arts[i].thread)
 					arts[i].selected = 0;
 				update_thread_page ();
 				break;
 
 			case iKeyPostponed:
-			case iKeyPostponed2:	/* post postponed article */
+			case iKeyPostponed2:		/* post postponed article */
 				if (can_post) {
 					if (pickup_postponed_articles(FALSE, FALSE))
 						show_thread_page();
@@ -764,8 +771,8 @@ thread_catchup:										/* come here when exiting thread via <- */
 					info_message(txt_cannot_post);
 				break;
 
-			case iKeyToggleInfoLastLine:  /* display subject in last line */
-				info_in_last_line = !info_in_last_line;
+			case iKeyToggleInfoLastLine:		/* display subject in last line */
+				tinrc.info_in_last_line = !tinrc.info_in_last_line;
 				show_thread_page();
 				break;
 
@@ -792,7 +799,7 @@ show_thread_page (
 	int i, j;
 	static int the_index = 0;
 
-	set_signals_thread ();
+	signal_context = cThread;
 
 	ClearScreen ();
 
@@ -867,7 +874,7 @@ draw_thread_arrow (
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
-	if (draw_arrow_mark) {
+	if (tinrc.draw_arrow_mark) {
 		my_fputs ("->", stdout);
 		my_flush ();
 	} else {
@@ -877,7 +884,7 @@ draw_thread_arrow (
 	}
 	stow_cursor();
 
-	if (info_in_last_line)
+	if (tinrc.info_in_last_line)
 		info_message ("%s", arts[find_response (thread_basenote, thread_index_point)].subject);
 }
 
@@ -888,7 +895,7 @@ erase_thread_arrow (
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		my_fputs ("  ", stdout);
 	else {
 		HpGlitch(EndInverse ());
@@ -1116,7 +1123,7 @@ stat_thread (
 #endif /* 0 */
 	}
 
-	sbuf->art_mark = (sbuf->inrange ? art_marked_inrange : (sbuf->deleted ? art_marked_deleted : (sbuf->selected_unread ? art_marked_selected : (sbuf->unread ? art_marked_unread : (sbuf->seen ? art_marked_return : ART_MARK_READ)))));
+	sbuf->art_mark = (sbuf->inrange ? tinrc.art_marked_inrange : (sbuf->deleted ? tinrc.art_marked_deleted : (sbuf->selected_unread ? tinrc.art_marked_selected : (sbuf->unread ? tinrc.art_marked_unread : (sbuf->seen ? tinrc.art_marked_return : ART_MARK_READ)))));
 	return(sbuf->total);
 }
 

@@ -450,6 +450,13 @@
  */
 #undef	CLOSEDIR_VIOD
 
+/*
+ * define if your NNTP server needs an extra GROUP command before
+ * accepting a LISTGROUP command.
+ * (old versions of leafnode and NNTPcache need this)
+ */
+#undef	BROKEN_LISTGROUP
+
 #undef	HAVE_COFFEE
 
 /*

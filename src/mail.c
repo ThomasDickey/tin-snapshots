@@ -73,19 +73,21 @@ my_flush();
 		/*
 		 * Load group info. TODO - integrate with active_add()
 		 */
-		ptr->type = GROUP_TYPE_MAIL;
-		ptr->spooldir = my_strdup (my_spooldir);
+		ptr->aliasedto = (char *) 0;
 		ptr->description = (char *) 0;
+		ptr->spooldir = my_strdup (my_spooldir);
+		ptr->moderated = 'y';
 		ptr->count = count;
 		ptr->xmax = max;
 		ptr->xmin = min;
-		ptr->moderated = 'y';
-		ptr->next = -1;			/* hash chaining */
+		ptr->type = GROUP_TYPE_MAIL;
 		ptr->inrange = FALSE;
 		ptr->read_during_session = FALSE;
 		ptr->art_was_posted = FALSE;
 		ptr->subscribed = FALSE;		/* not in my_group[] yet */
 		ptr->newgroup = FALSE;
+		ptr->bogus = FALSE;
+		ptr->next = -1;			/* hash chaining */
 		ptr->newsrc.xbitmap = (t_bitmap *) 0;
 		ptr->attribute = (struct t_attribute *) 0;
 		ptr->glob_filter = &glob_filter;
@@ -110,6 +112,9 @@ write_mail_active_file (
 	FILE *fp;
 	register int i;
 	struct t_group *psGrp;
+
+	if (no_write && file_size (mail_active_file) != -1)
+		return;
 
 	vPrintActiveHead (mail_active_file);
 
@@ -173,7 +178,7 @@ read_newsgroups_file (
 
 	if ((fp = open_newsgroups_fp ()) != (FILE *) 0) {
 
-		if (read_news_via_nntp && !read_local_newsgroups_file)
+		if (read_news_via_nntp && !read_local_newsgroups_file && !no_write)
 			fp_save = fopen (local_newsgroups_file, "w" FOPEN_OPTS);
 
 		read_groups_descriptions (fp, fp_save);
@@ -264,6 +269,9 @@ vPrintActiveHead (
 	char	*pcActiveFile)
 {
 	FILE	*hFp;
+
+	if (no_write && file_size (pcActiveFile) != -1)
+		return;
 
 	if ((hFp = fopen (pcActiveFile, "w")) != (FILE *) 0) {
 		fprintf (hFp, "# [Mail/Save] active file. Format is like news active file:\n");

@@ -4,7 +4,7 @@
  *  Author    : I. Lea
  *  Created   : 1991-08-31
  *  Updated   : 1994-12-22
- *  Notes     : provides same interface to mail,pipe,print and save commands
+ *  Notes     : provides same interface to mail,pipe,print,save & repost commands
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -20,12 +20,7 @@
 
 #include	"menukeys.h"
 
-char default_mail_address[LEN];
-char default_pipe_command[LEN];
-char default_save_file[PATH_LEN];
-char default_regex_pattern[LEN];
-char default_repost_group[LEN];
-char proc_ch_default;			/* set in change_config_file () */
+char proc_ch_default;				/* set in change_config_file () */
 
 #ifndef INDEX_DAEMON
 t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
@@ -43,13 +38,10 @@ feed_articles (
 	struct t_group *group,
 	int respnum)
 {
-	char address[LEN];
-	char command[LEN];
+	char print_command[LEN];
 	char filename[PATH_LEN], *p;
 	char group_path[PATH_LEN];
-	char group_name[LEN];
 	char my_mailbox[PATH_LEN];
-	char pattern[LEN];
 	char save_file[PATH_LEN];
 	char proc_ch = proc_ch_default;
 	char option = iKeyFeedSupersede;
@@ -59,8 +51,8 @@ feed_articles (
 	int b, i, j;
 	int orig_note_page = 0;
 	int processed = 0;
-	int processed_ok = TRUE;
-	int is_mailbox = FALSE;
+	t_bool is_mailbox = FALSE;
+	t_bool processed_ok = TRUE;
 	t_bool redraw_screen = FALSE;
 	t_bool confirm;
 	t_bool orig_note_end = FALSE;
@@ -87,7 +79,7 @@ feed_articles (
 
 	set_xclick_off ();
 
-	/* when beeing the pager, remember current possition in article */
+	/* whilst in the pager, remember current possition in article */
 	if (level == PAGE_LEVEL) {
 		orig_note_end = note_end;
 		orig_note_page = note_page;
@@ -130,7 +122,7 @@ feed_articles (
 	/*
 	 * If not automatic, ask what the user wants to save
 	 */
-	if (((!default_auto_save || arts[respnum].archive == (char *) 0) || (default_auto_save && function != FEED_SAVE) || ch_default == iKeyFeedTag) && function != FEED_AUTOSAVE_TAGGED)
+	if (((!tinrc.auto_save || arts[respnum].archive == (char *) 0) || (tinrc.auto_save && function != FEED_SAVE) || ch_default == iKeyFeedTag) && function != FEED_AUTOSAVE_TAGGED)
 		ch = prompt_slk_response (ch_default, "ahpqtT\033", "%s%s", prompt, txt_art_thread_regex_tag);
 	else {
 		filename[0] = '\0';
@@ -144,20 +136,10 @@ feed_articles (
 			return;
 
 		case iKeyFeedPat:
-			sprintf (mesg, txt_feed_pattern, default_regex_pattern);
-			if (!prompt_string (mesg, pattern, HIST_REGEX_PATTERN)) {
-				clear_message ();
+			sprintf (mesg, txt_feed_pattern, tinrc.default_regex_pattern);
+			if (!(prompt_string_default(mesg, tinrc.default_regex_pattern, txt_no_match, HIST_REGEX_PATTERN))) {
+				clear_message();
 				return;
-			}
-			if (strlen (pattern))
-				my_strncpy (default_regex_pattern, pattern, sizeof (default_regex_pattern));
-			else {
-				if (*default_regex_pattern)
-					my_strncpy (pattern, default_regex_pattern, sizeof (default_regex_pattern));
-				else {
-					info_message (txt_no_match);
-					return;
-				}
 			}
 			break;
 
@@ -167,45 +149,24 @@ feed_articles (
 
 	switch (function) {
 		case FEED_MAIL:
-			sprintf (mesg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
-			if (!prompt_string (mesg, address, HIST_MAIL_ADDRESS)) {
-				clear_message ();
+			sprintf (mesg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), tinrc.default_mail_address);
+			if (!(prompt_string_default(mesg, tinrc.default_mail_address, txt_no_mail_address, HIST_MAIL_ADDRESS))) {
+				clear_message();
 				return;
-			}
-			if (strlen (address))
-				strcpy (default_mail_address, address);
-			else {
-				if (*default_mail_address)
-					strcpy (address, default_mail_address);
-				else {
-					info_message (txt_no_mail_address);
-					return;
-				}
 			}
 			break;
 
 #	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
-			sprintf (mesg, txt_pipe_to_command,
-				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
-			if (!prompt_string (mesg, command, HIST_PIPE_COMMAND)) {
+			sprintf (mesg, txt_pipe_to_command, cCOLS-(strlen(txt_pipe_to_command)+30), tinrc.default_pipe_command);
+			if (!(prompt_string_default (mesg, tinrc.default_pipe_command, txt_no_command, HIST_PIPE_COMMAND))) {
 				clear_message ();
 				return;
 			}
-			if (strlen (command))
-				strcpy (default_pipe_command, command);
-			else {
-				if (*default_pipe_command)
-					strcpy (command, default_pipe_command);
-				else {
-					info_message (txt_no_command);
-					return;
-				}
-			}
 
 			got_sig_pipe = FALSE;
-			if ((fp = popen (command, "w")) == (FILE *) 0) {
-				perror_message (txt_command_failed_s, command);
+			if ((fp = popen (tinrc.default_pipe_command, "w")) == (FILE *) 0) {
+				perror_message (txt_command_failed_s, tinrc.default_pipe_command);
 				return;
 			}
 			wait_message (0, txt_piping);
@@ -214,13 +175,13 @@ feed_articles (
 #	endif /* !DONT_HAVE_PIPING */
 
 		case FEED_PRINT:
-			sprintf (command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
+			sprintf (print_command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
 			break;
 		case FEED_SAVE:		/* ask user for filename to save to */
 		case FEED_AUTOSAVE_TAGGED:
 			free_save_array ();
-			if ((!default_auto_save || arts[respnum].archive == (char *) 0)) {
-				strcpy (save_file, ((group->attribute->savefile != (char *) 0) ? group->attribute->savefile : default_save_file));
+			if ((!tinrc.auto_save || arts[respnum].archive == (char *) 0)) {
+				strcpy (save_file, ((group->attribute->savefile != (char *) 0) ? group->attribute->savefile : tinrc.default_save_file));
 
 				if (function != FEED_AUTOSAVE_TAGGED) {
 					sprintf (mesg, txt_save_filename, save_file);
@@ -236,7 +197,7 @@ feed_articles (
 						free (group->attribute->savefile);
 						group->attribute->savefile = my_strdup (filename);
 					}
-					my_strncpy (default_save_file, filename, sizeof (default_save_file));
+					my_strncpy (tinrc.default_save_file, filename, sizeof (tinrc.default_save_file));
 				} else {
 					if (*save_file)
 						my_strncpy (filename, save_file, sizeof (filename));
@@ -295,11 +256,11 @@ feed_articles (
 
 					switch (option) {
 						case iKeyFeedSupersede:
-							sprintf (mesg, txt_supersede_group, default_repost_group);
+							sprintf (mesg, txt_supersede_group, tinrc.default_repost_group);
 							supersede = TRUE;
 							break;
 						case iKeyFeedRepost:
-							sprintf (mesg, txt_repost_group, default_repost_group);
+							sprintf (mesg, txt_repost_group, tinrc.default_repost_group);
 							supersede = FALSE;
 							break;
 						default:
@@ -308,26 +269,13 @@ feed_articles (
 					}
 #	ifndef FORGERY
 				} else {
-					sprintf (mesg, txt_repost_group, default_repost_group);
+					sprintf (mesg, txt_repost_group, tinrc.default_repost_group);
 					supersede = FALSE;
 				}
 #	endif /* !FORGERY */
-				if (!prompt_string (mesg, group_name, HIST_REPOST_GROUP)) {
+				if (!(prompt_string_default (mesg, tinrc.default_repost_group, txt_no_group, HIST_REPOST_GROUP))) {
 					clear_message ();
 					return;
-				}
-
-				if (strlen (group_name)) {
-					my_strncpy (default_repost_group, group_name,
-						sizeof (default_repost_group));
-				} else {
-					if (*default_repost_group) {
-						my_strncpy (group_name, default_repost_group,
-							sizeof (group_name));
-					} else {
-						info_message (txt_no_group);
-						return;
-					}
 				}
 			}
 			break;
@@ -344,7 +292,7 @@ feed_articles (
 			}
 			switch (function) {
 				case FEED_MAIL:
-					redraw_screen = mail_to_someone (respnum, address, FALSE, TRUE, &processed_ok);
+					redraw_screen = mail_to_someone (respnum, tinrc.default_mail_address, FALSE, TRUE, &processed_ok);
 					break;
 
 #	ifndef DONT_HAVE_PIPING
@@ -359,21 +307,19 @@ feed_articles (
 #	endif /* !DONT_HAVE_PIPING */
 
 				case FEED_PRINT:
-					processed_ok = print_file (command, respnum, 1);
+					processed_ok = print_file (print_command, respnum, 1);
 					break;
 
 				case FEED_SAVE:
 					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) == 0) {
-/*						add_to_save_list (0, &arts[respnum], is_mailbox, TRUE, filename);	*/
-/*   TODO - if this hack works, we can remove the 2nd param from add_to_save_list()			*/
-						add_to_save_list (respnum, &arts[respnum], is_mailbox, TRUE, filename);
-						processed_ok = save_art_to_file (respnum, 0, FALSE, "");
+						add_to_save_list (respnum, is_mailbox, TRUE, filename);
+						processed_ok = save_art_to_file (0, FALSE, "");
 					}
 					break;
 
 				case FEED_REPOST:
 					if (can_post)
-						redraw_screen = repost_article (group_name, respnum, supersede);
+						redraw_screen = repost_article (tinrc.default_repost_group, respnum, supersede);
 					else
 						info_message (txt_cannot_post);
 					break;
@@ -387,7 +333,7 @@ feed_articles (
 			else
 				break;
 
-			if (mark_saved_read && processed_ok)
+			if (tinrc.mark_saved_read && processed_ok)
 				art_mark_read (group, &arts[respnum]);
 
 			if (level == GROUP_LEVEL)
@@ -404,13 +350,13 @@ feed_articles (
 				if (!does_article_exist (function, &arts[i], group_path))
 					continue;
 
-				if (process_only_unread && arts[i].status == ART_READ)
+				if (tinrc.process_only_unread && arts[i].status == ART_READ)
 					continue;
 
 				switch (function) {
 					case FEED_MAIL:
 						processed_ok = TRUE;
-						mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
+						mail_to_someone (respnum, tinrc.default_mail_address, FALSE, confirm, &processed_ok);
 						confirm = bool_not(processed_ok);
 						break;
 
@@ -426,16 +372,16 @@ feed_articles (
 #	endif /* !DONT_HAVE_PIPING */
 
 					case FEED_PRINT:
-						processed_ok = print_file (command, i, processed+1);
+						processed_ok = print_file (print_command, i, processed+1);
 						break;
 
 					case FEED_SAVE:
-						add_to_save_list (i, &arts[i], is_mailbox, TRUE, filename);
+						add_to_save_list (i, is_mailbox, TRUE, filename);
 						break;
 
 					case FEED_REPOST:
 						if (can_post)
-							redraw_screen = repost_article (group_name, i, supersede);
+							redraw_screen = repost_article (tinrc.default_repost_group, i, supersede);
 						else
 							info_message (txt_cannot_post);
 						break;
@@ -446,14 +392,14 @@ feed_articles (
 				if (processed_ok)
 					processed++;
 
-				if (mark_saved_read && processed_ok)
+				if (tinrc.mark_saved_read && processed_ok)
 					art_mark_read (group, &arts[i]);
 
 				art_close ();
 			}
 			if (function == FEED_SAVE) {
 				sort_save_list ();
-				(void) save_thread_to_file (is_mailbox, group_path);
+				processed_ok = save_thread_to_file (is_mailbox, group_path);
 			}
 			break;
 
@@ -471,7 +417,7 @@ feed_articles (
 						switch (function) {
 							case FEED_MAIL:
 								processed_ok = TRUE;
-								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
+								mail_to_someone (respnum, tinrc.default_mail_address, FALSE, confirm, &processed_ok);
 								confirm = bool_not(processed_ok);
 								break;
 
@@ -488,17 +434,17 @@ feed_articles (
 #	endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
-								processed_ok = print_file (command, j, processed+1);
+								processed_ok = print_file (print_command, j, processed+1);
 								break;
 
 							case FEED_SAVE:
 							case FEED_AUTOSAVE_TAGGED:
-								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
+								add_to_save_list (j, is_mailbox, TRUE, filename);
 								break;
 
 							case FEED_REPOST:
 								if (can_post)
-									redraw_screen = repost_article (group_name, j, supersede);
+									redraw_screen = repost_article (tinrc.default_repost_group, j, supersede);
 								else
 									info_message (txt_cannot_post);
 								break;
@@ -509,7 +455,7 @@ feed_articles (
 						if (processed_ok)
 							processed++;
 
-						if (mark_saved_read && processed_ok)
+						if (tinrc.mark_saved_read && processed_ok)
 							art_mark_read (group, &arts[j]);
 
 						art_close ();
@@ -517,7 +463,7 @@ feed_articles (
 				}
 			}
 			if (function == FEED_SAVE || function == FEED_AUTOSAVE_TAGGED)
-				(void) save_regex_arts (is_mailbox, group_path);
+				processed_ok = save_regex_arts_to_file (is_mailbox, group_path);
 
 			untag_all_articles ();
 			break;
@@ -529,7 +475,7 @@ feed_articles (
 				for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 					proceed = FALSE;
 					if (ch == iKeyFeedPat) {
-						if (REGEX_MATCH(arts[j].subject, pattern, TRUE))
+						if (REGEX_MATCH(arts[j].subject, tinrc.default_regex_pattern, TRUE))
 							proceed = TRUE;
 					} else
 						if (arts[j].selected)
@@ -540,14 +486,14 @@ feed_articles (
 							art_close ();
 						if (!does_article_exist (function, &arts[j], group_path))
 							continue;
-						if (process_only_unread && arts[j].status == ART_READ)
+						if (tinrc.process_only_unread && arts[j].status == ART_READ)
 							continue;
 
 						switch (function) {
 
 							case FEED_MAIL:
 								processed_ok = TRUE;
-								mail_to_someone (respnum, address, FALSE, confirm, &processed_ok);
+								mail_to_someone (respnum, tinrc.default_mail_address, FALSE, confirm, &processed_ok);
 								confirm = bool_not(processed_ok);
 								break;
 
@@ -563,16 +509,16 @@ feed_articles (
 #	endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
-								processed_ok = print_file (command, j, processed+1);
+								processed_ok = print_file (print_command, j, processed+1);
 								break;
 
 							case FEED_SAVE:
-								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
+								add_to_save_list (j, is_mailbox, TRUE, filename);
 								break;
 
 							case FEED_REPOST:
 								if (can_post)
-									redraw_screen = repost_article (group_name, j, supersede);
+									redraw_screen = repost_article (tinrc.default_repost_group, j, supersede);
 								else
 									info_message (txt_cannot_post);
 								break;
@@ -583,7 +529,7 @@ feed_articles (
 						if (processed_ok)
 							processed++;
 
-						if (mark_saved_read && processed_ok) {
+						if (tinrc.mark_saved_read && processed_ok) {
 							art_mark_read (group, &arts[j]);
 							if (ch == iKeyFeedHot) {
 								arts[j].selected = FALSE;
@@ -595,7 +541,7 @@ feed_articles (
 				}
 			}
 			if (function == FEED_SAVE)
-				(void) save_regex_arts (is_mailbox, group_path);
+				processed_ok = save_regex_arts_to_file (is_mailbox, group_path);
 			break;
 		default:
 			break;
@@ -610,7 +556,7 @@ feed_articles (
 		my_flush ();
 	}
 #	endif /* DEBUG */
-	if (!use_mailreader_i)
+	if (!tinrc.use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
 #	ifdef DEBUG
 	if (debug == 2) {
@@ -634,7 +580,7 @@ got_sig_pipe_while_piping:
 
 		case FEED_SAVE:
 		case FEED_AUTOSAVE_TAGGED:
-			if (proc_ch != 'n' && !is_mailbox)
+			if (proc_ch != 'n' && !is_mailbox && processed_ok)
 				ret2 = post_process_files (proc_ch, (t_bool) (function == FEED_SAVE ? FALSE : TRUE));
 			free_save_array ();
 			break;
@@ -643,15 +589,15 @@ got_sig_pipe_while_piping:
 	}
 
 	if (level == GROUP_LEVEL || level == THREAD_LEVEL)
-		ret1 = mark_saved_read;
+		ret1 = tinrc.mark_saved_read;
 
-	if ((ret1 || ret2) && !is_mailbox)
+	if (ret1 || ret2)
 		redraw_screen = TRUE;
 
 	if (level == PAGE_LEVEL) {
 		if (art_open (&arts[respnum], group_path, TRUE) != 0)
 			return;			/* This is bad */
-		if (force_screen_redraw)
+		if (tinrc.force_screen_redraw)
 			redraw_screen = TRUE;
 		note_end = orig_note_end;
 		note_page = orig_note_page;
@@ -682,7 +628,7 @@ got_sig_pipe_while_piping:
 
 	switch (function) {
 		case FEED_MAIL:
-			if (use_mailreader_i)
+			if (tinrc.use_mailreader_i)
 				info_message (txt_external_mail_done);
 			else
 				info_message (txt_mailed, processed, IS_PLURAL(processed));
@@ -727,7 +673,7 @@ print_file (
 		return FALSE;
 	}
 
-	if (print_header)
+	if (tinrc.print_header)
 		fseek(note_fp, 0L, SEEK_SET);
 	else {
 		fprintf (fp, "Newsgroups: %s\n", note_h.newsgroups);

@@ -25,6 +25,7 @@ extern void do_update (void);
 extern void find_base (struct t_group *group);
 extern void make_threads (struct t_group *group, t_bool rethread);
 extern void set_article (struct t_article *art);
+extern void show_art_msg (char *group);
 extern void sort_arts (unsigned int sort_art_type);
 extern void vWriteNovFile (struct t_group *psGrp);
 
@@ -143,7 +144,6 @@ extern void show_group_page (void);
 extern void toggle_subject_from (void);
 #ifndef INDEX_DAEMON
 	extern int group_page (struct t_group *group);
-	extern void toggle_read_unread (t_bool force);
 #endif /* !INDEX_DAEMON */
 
 /* hashstr.c */
@@ -176,13 +176,13 @@ extern void get_user_info (char *user_name, char *full_name);
 
 /* init.c */
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
-extern t_bool create_mail_save_dirs (void);
 extern void init_selfinfo (void);
 #ifdef HAVE_COLOR
 	extern void postinit_colors (void);
 #endif /* HAVE_COLOR */
 #ifndef INDEX_DAEMON
-	void set_up_private_index_cache (void);
+	extern t_bool create_mail_save_dirs (void);
+	extern void set_up_private_index_cache (void);
 #endif /* !INDEX_DAEMON */
 #ifdef USE_INN_NNTPLIB
 	extern char *GetConfigValue (const char *name);
@@ -359,7 +359,9 @@ extern int get_newsrcname (char *newsrc_name, const char *nntpserver_name);
 extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 
 /* open.c */
-extern FILE *nntp_command (const char *, int, char *);
+#ifdef NNTP_ABLE
+	extern FILE *nntp_command (const char *, int, char *);
+#endif
 extern FILE *open_art_fp (char *group_path, long art, int lines, t_bool rfc1521decode);
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
@@ -406,7 +408,7 @@ extern int count_postponed_articles (void);
 extern int post_response (char *group, int respnum, int copy_text, t_bool with_headers);
 extern t_bool mail_bug_report (void);
 extern t_bool mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
-extern t_bool mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
+extern t_bool mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, t_bool *mailed_ok);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
 extern t_bool post_article (char *group, int *posted_flag);
 extern t_bool reread_active_after_posting (void);
@@ -419,18 +421,19 @@ extern void quick_post_article (t_bool postponed_only);
 #endif /* !INDEX_DAEMON */
 
 /* prompt.c */
-extern char *prompt_string_default (char *prompt, char *def, const char *failtext, int history);
+extern char *prompt_string_default (const char *prompt, char *def, const char *failtext, int history);
 extern char *sized_message (const char *format, const char *subject);
-extern int prompt_default_string (const char *prompt, char *buf, int buf_len, char *default_prompt, int which_hist);
 extern int prompt_list (int row, int col, int var, constext *help_text, constext *prompt_text, constext *list[], int size);
-extern int prompt_menu_string (int line, int col, char *var);
 extern int prompt_num (int ch, const char *prompt);
 extern int prompt_slk_response (int ch_default, const char *responses, const char *fmt, ...);
-extern int prompt_string (const char *prompt, char *buf, int which_hist);
 extern int prompt_yn (int line, const char *prompt, t_bool default_answer);
+extern int prompt_msgid (void);
+extern t_bool prompt_default_string (const char *prompt, char *buf, int buf_len, char *default_prompt, int which_hist);
+extern t_bool prompt_menu_string (int line, int col, char *var);
 extern t_bool prompt_option_char (int option);
 extern t_bool prompt_option_num (int option);
 extern t_bool prompt_option_string (int option);
+extern t_bool prompt_string (const char *prompt, char *buf, int which_hist);
 extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 
@@ -470,13 +473,13 @@ extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool 
 extern int check_start_save_any_news (int check_start_save);
 extern t_bool create_path (char *path);
 extern t_bool post_process_files (int proc_type_ch, t_bool auto_delete);
-extern t_bool save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
+extern t_bool save_art_to_file (int indexnum, t_bool the_mailbox, const char *filename);
 extern void print_art_seperator_line (FILE *fp, t_bool is_mailbox);
 extern void sort_save_list (void);
 #ifndef INDEX_DAEMON
-	extern t_bool save_regex_arts (int is_mailbox, char *group_path);
-	extern t_bool save_thread_to_file (int is_mailbox, char *group_path);
-	extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
+	extern t_bool save_regex_arts_to_file (t_bool is_mailbox, char *group_path);
+	extern t_bool save_thread_to_file (t_bool is_mailbox, char *group_path);
+	extern void add_to_save_list (int the_index, t_bool is_mailbox, int archive_save, char *path);
 #endif /* !INDEX_DAEMON */
 
 /* screen.c */
@@ -521,8 +524,9 @@ extern void msg_write_signature (FILE *fp, t_bool flag, struct t_group *thisgrou
 
 /* signal.c */
 extern RETSIGTYPE (*sigdisp (int sig, RETSIGTYPE (*func)(SIG_ARGS))) (SIG_ARGS);
-extern int set_win_size (int *num_lines, int *num_cols);
-extern void handle_resize (int repaint);
+extern t_bool set_win_size (int *num_lines, int *num_cols);
+extern void allow_resize(t_bool allow);
+extern void handle_resize (t_bool repaint);
 extern void set_signal_catcher (int flag);
 extern void set_signal_handlers (void);
 extern void set_signals_art (void);

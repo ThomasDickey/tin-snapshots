@@ -104,6 +104,7 @@ constext *help_group[] = {
 	txt_help_i_n,
 	txt_help_i_p,
 	txt_help_dash,
+	txt_help_L,
 	txt_help_l,
 		txt_help_empty_line,
 	txt_help_i_caret_dollar,
@@ -192,6 +193,7 @@ constext *help_thread[] = {
 	txt_help_t_cr,
 	txt_help_p_tab,
 	txt_help_dash,
+	txt_help_L,
 		txt_help_empty_line,
 	txt_help_hash,
 		txt_help_empty_line,
@@ -376,12 +378,12 @@ show_info_page (
 	int old_page = 0;
 	int old_help;
 
+	signal_context = cHelp;
+
 	if (NOTESLINES <= 0)
 		return;
 
-	help_lines = (beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
-
-	set_signals_help ();
+	help_lines = (tinrc.beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
 
 	cur_page = 1;
 	max_page = 1;
@@ -511,7 +513,7 @@ display_info_page (
 	int i, help_lines;
 
 #ifdef HAVE_COLOR
-	fcol(col_help);
+	fcol(tinrc.col_help);
 #endif /* HAVE_COLOR */
 #ifdef USE_CURSES
 	if (first)
@@ -521,7 +523,7 @@ display_info_page (
 	center_line (0, TRUE, buf);
 	MoveCursor (INDEX_TOP, 0);
 
-	help_lines = (beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
+	help_lines = (tinrc.beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
 
 	if (info_type == HELP_INFO) {
 		for (i = pos_help; i < (pos_help + help_lines) && info_help[i]; i++)
@@ -539,7 +541,7 @@ display_info_page (
 
 	center_line (cLINES, FALSE, txt_hit_space_for_more);
 #ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #endif /* HAVE_COLOR */
 }
 
@@ -550,13 +552,13 @@ show_mini_help (
 {
 	int line;
 
-	if (!beginner_level)
+	if (!tinrc.beginner_level)
 		return;
 
 	line = NOTESLINES + (MINI_HELP_LINES - 2);
 
 #ifdef HAVE_COLOR
-	fcol(col_minihelp);
+	fcol(tinrc.col_minihelp);
 #endif /* HAVE_COLOR */
 
 	switch (level) {
@@ -584,7 +586,7 @@ show_mini_help (
 			break;
 	}
 #ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #endif /* HAVE_COLOR */
 }
 
@@ -593,7 +595,7 @@ void
 toggle_mini_help (
 	int level)
 {
-	beginner_level = !beginner_level;
+	tinrc.beginner_level = !tinrc.beginner_level;
 	set_win_size (&cLINES, &cCOLS);
 	show_mini_help (level);
 }

@@ -126,7 +126,7 @@ rfc1521_decode (
 	 * part that is text/plain and use only that. This should take care of the
 	 * text/html articles that seem to pop up more and more.
 	 */
-	if (alternative_handling) {
+	if (tinrc.alternative_handling) {
 
 		if (strcasestr(content_type, "multipart/alternative") &&
 			 strcasestr(content_type, "boundary=") &&
@@ -153,7 +153,7 @@ rfc1521_decode (
 			strcpynl(boundary, strcasestr(content_type, "boundary=") + 9);
 
 			fputs("X-Conversion-Note: multipart/alternative contents have been removed.\n", f);
-			fputs("\tTo get the whole article, turn alternative_handling OFF\n", f);
+			fputs("\tTo get the whole article, turn tinrc.alternative_handling OFF\n", f);
 
 			hdr_pos = ftell(f);
 
@@ -192,7 +192,7 @@ rfc1521_decode (
 				;
 			}
 		}
-	} /* alternative_handling */
+	} /* tinrc.alternative_handling */
 
 #ifndef LOCAL_CHARSET
 	/*
@@ -422,7 +422,7 @@ rfc1521_encode (
 /*
  * EUC-KR -> ISO 2022-KR conversion for Korean mail exchange
  * NOT to be used for News posting, which is made certain
- * by setting post_mime_encoding to 8bit
+ * by setting tinrc.post_mime_encoding to 8bit
  */
 
 #define KSC 1

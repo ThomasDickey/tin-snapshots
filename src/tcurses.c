@@ -30,7 +30,6 @@
 
 int cLINES;
 int cCOLS;
-t_bool inverse_okay = TRUE;
 
 /*
  * Most of the logic corresponding to the termcap version is done in InitScreen.
@@ -38,7 +37,7 @@ t_bool inverse_okay = TRUE;
 void setup_screen (void)
 {
 	cmd_line = FALSE;
-	bcol(col_back);
+	bcol(tinrc.col_back);
 }
 
 /*
@@ -133,10 +132,10 @@ int RawState(void)
  */
 void StartInverse(void)
 {
-	if (inverse_okay) {
+	if (tinrc.inverse_okay) {
 		if (use_color) {
-			bcol(col_invers_bg);
-			fcol(col_invers_fg);
+			bcol(tinrc.col_invers_bg);
+			fcol(tinrc.col_invers_fg);
 		} else {
 			attrset(A_REVERSE);
 		}
@@ -149,7 +148,7 @@ static int isInverse(void)
 		short pair = PAIR_NUMBER(getattrs(stdscr));
 		short fg, bg;
 		pair_content(pair, &fg, &bg);
-		return (fg == col_invers_fg) && (bg == col_invers_bg);
+		return (fg == tinrc.col_invers_fg) && (bg == tinrc.col_invers_bg);
 	}
 
 	return (getattrs(stdscr) & A_REVERSE);
@@ -169,9 +168,9 @@ void ToggleInverse(void)
  */
 void EndInverse(void)
 {
-	if (inverse_okay && !cmd_line) {
-		fcol(col_normal);
-		bcol(col_back);
+	if (tinrc.inverse_okay && !cmd_line) {
+		fcol(tinrc.col_normal);
+		bcol(tinrc.col_back);
 		attroff(A_REVERSE);
 	}
 }
@@ -202,7 +201,7 @@ void set_keypad_off (void) { if (!cmd_line) keypad(stdscr, FALSE); }
 void set_xclick_on (void)
 {
 #	ifdef NCURSES_MOUSE_VERSION
-	if (use_mouse)
+	if (tinrc.use_mouse)
 		mousemask(
 			(BUTTON1_CLICKED|BUTTON2_CLICKED|BUTTON3_CLICKED),
 			(mmask_t *)0);
@@ -237,9 +236,15 @@ ReadCh(void)
 	if (cmd_line)
 		ch = cmdReadCh();
 	else {
+		allow_resize (TRUE);
 		ch = getch();
+		allow_resize (FALSE);
+		if (need_resize) {
+			handle_resize ((need_resize == cRedraw) ? TRUE : FALSE);
+			need_resize = cNo;
+		}
 		if (ch == KEY_BACKSPACE)
-			ch = '\010';    /* fix for Ctrl-H - show headers */
+			ch = '\010';	/* fix for Ctrl-H - show headers */
 		else if (ch == ESC || ch >= KEY_MIN) {
 			ungetch(ch);
 			ch = ESC;
@@ -394,7 +399,6 @@ write_line(
 }
 
 #else
-
 void my_tcurses(void); /* proto-type */
 void my_tcurses(void) { }	/* ANSI C requires non-empty file */
 #endif /* USE_CURSES */

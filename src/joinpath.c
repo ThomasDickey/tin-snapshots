@@ -33,7 +33,7 @@ joinpath (
 	if (result[0] == '\0' || result[strlen(result)-1] != '/')
 		(void) strcat(result, "/");
 	(void) strcat(result, file != 0 ? file : "");
-#	endif  /* M_UNIX */
+#	endif /* M_UNIX */
 /*
  * JK - horrible hack to convert "/foo/baz/bar" to "foo:baz/bar" (editors bug with *NIX-paths)
  * "foo:baz/bar" -styled paths should always work on Amiga

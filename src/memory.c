@@ -243,12 +243,12 @@ free_attributes_array (
 		psGrp = &active[i];
 		if (psGrp->attribute && !psGrp->attribute->global) {
 			if (psGrp->attribute->maildir != (char *) 0 &&
-				psGrp->attribute->maildir != default_maildir) {
+				psGrp->attribute->maildir != tinrc.maildir) {
 				free ((char *) psGrp->attribute->maildir);
 				psGrp->attribute->maildir = (char *) 0;
 			}
 			if (psGrp->attribute->savedir != (char *) 0 &&
-			    psGrp->attribute->savedir != default_savedir) {
+			    psGrp->attribute->savedir != tinrc.savedir) {
 				free ((char *) psGrp->attribute->savedir);
 				psGrp->attribute->savedir = (char *) 0;
 			}
@@ -258,12 +258,12 @@ free_attributes_array (
 				psGrp->attribute->organization = (char *) 0;
 			}
 			if (psGrp->attribute->sigfile != (char *) 0 &&
-			    psGrp->attribute->sigfile != default_sigfile) {
+			    psGrp->attribute->sigfile != tinrc.default_sigfile) {
 				free ((char *) psGrp->attribute->sigfile);
 				psGrp->attribute->sigfile = (char *) 0;
 			}
 			if (psGrp->attribute->printer != (char *) 0 &&
-			    psGrp->attribute->printer != default_printer) {
+			    psGrp->attribute->printer != tinrc.default_printer) {
 				free ((char *) psGrp->attribute->printer);
 				psGrp->attribute->printer = (char *) 0;
 			}

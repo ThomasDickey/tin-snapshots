@@ -29,11 +29,13 @@ char *glob_group;
 int index_point;
 
 static const char *spaces = "XXXX";
-static int first_subj_on_screen;
-static int last_subj_on_screen;
 static int len_from;
 static int len_subj;
-static int thread_depth;			/* Stating depth in threads we enter */
+#ifndef INDEX_DAEMON
+	static int first_subj_on_screen;
+	static int last_subj_on_screen;
+	static int thread_depth;			/* Stating depth in threads we enter */
+#endif /* !INDEX_DAEMON */
 
 /*
  * Local prototypes
@@ -51,6 +53,7 @@ static void draw_subject_arrow (void);
 	static void update_group_page (void);
 	static void show_group_title (t_bool clear_title);
 	static void show_tagged_lines (void);
+	static void toggle_read_unread (t_bool force);
 #endif /* !INDEX_DAEMON */
 
 
@@ -146,7 +149,7 @@ group_page (
 
 	proc_ch_default = get_post_proc_type (group->attribute->post_proc_type);
 
-	glob_group = group->name;
+	glob_group = group->name;			/* For global access to the current group */
 	num_of_tagged_arts = 0;
 
 	last_resp = -1;
@@ -202,13 +205,13 @@ group_page (
 					goto group_down;
 
 				case KEYMAP_LEFT:
-					if (group_catchup_on_exit)
+					if (tinrc.group_catchup_on_exit)
 						goto group_catchup;
 					else
 						goto group_done;
 
 				case KEYMAP_RIGHT:
-					if (auto_list_thread && index_point >= 0 && HAS_FOLLOWUPS (index_point)) {
+					if (tinrc.auto_list_thread && index_point >= 0 && HAS_FOLLOWUPS (index_point)) {
 						thread_depth = 0;
 						goto group_list_thread;
 					} else
@@ -237,7 +240,7 @@ group_page (
 							index_point = xrow-INDEX2LNUM(first_subj_on_screen)+first_subj_on_screen;
 							draw_subject_arrow ();
 							if (xmouse == MOUSE_BUTTON_1) {
-								if (auto_list_thread && HAS_FOLLOWUPS (index_point)) {
+								if (tinrc.auto_list_thread && HAS_FOLLOWUPS (index_point)) {
 									thread_depth = 0;
 									goto group_list_thread;
 								} else
@@ -247,7 +250,7 @@ group_page (
 						case MOUSE_BUTTON_2:
 							if (xrow < INDEX2LNUM(first_subj_on_screen) || xrow > INDEX2LNUM(last_subj_on_screen-1))
 								goto group_page_up;
-							if (group_catchup_on_exit)
+							if (tinrc.group_catchup_on_exit)
 								goto group_catchup;
 							else
 								goto group_done;
@@ -283,13 +286,14 @@ end_of_list:
 				break;
 
 			case iKeyGroupLastViewed:	/* go to last viewed article */
-				if (this_resp < 0) {
+				/*
+				 * If the last art is no longer in a thread then we can't display it
+				 */
+				if (this_resp < 0 || (which_thread(this_resp) == -1)) {
 					info_message (txt_no_last_message);
 					break;
 				}
 				n = this_resp;
-				if (arts[n].status == ART_READ)		/* Make article appear in a thread */
-					toggle_read_unread(TRUE);
 				goto enter_pager;
 
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
@@ -408,7 +412,7 @@ group_page_down:
 					info_message (txt_no_arts);
 					break;
 				}
-				if (!confirm_action || prompt_yn (cLINES, (ch == iKeyGroupQuickKill) ? txt_quick_filter_kill : txt_quick_filter_select, TRUE) == 1) {
+				if (!tinrc.confirm_action || prompt_yn (cLINES, (ch == iKeyGroupQuickKill) ? txt_quick_filter_kill : txt_quick_filter_select, TRUE) == 1) {
 					old_top = top;
 					n = (int) base[index_point];
 					old_artnum = arts[n].artnum;
@@ -461,7 +465,7 @@ group_catchup:									/* came here on group exit via left arrow */
 						break;
 
 					sprintf(buf, txt_mark_arts_read, (ch == iKeyGroupCatchupNextUnread) ? " and enter next unread group" : "");
-					if (!CURR_GROUP.newsrc.num_unread || !confirm_action || (yn = prompt_yn (cLINES, buf, TRUE)) == 1)
+					if (!CURR_GROUP.newsrc.num_unread || !tinrc.confirm_action || (yn = prompt_yn (cLINES, buf, TRUE)) == 1)
 						grp_mark_read (&CURR_GROUP, arts);
 
 					switch (ch) {
@@ -641,6 +645,13 @@ next_thread:
 				show_group_page ();
 				break;
 
+			case iKeyLookupMessage:
+				if ((i = prompt_msgid ()) != ART_UNAVAILABLE) {
+					n = i;
+					goto enter_pager;
+				}
+				break;
+
 			case iKeyGroupMail:	/* mail article to somebody */
 				if (index_point >= 0) {
 					feed_articles (FEED_MAIL, GROUP_LEVEL,
@@ -654,10 +665,9 @@ next_thread:
 					n = (int) base[index_point];
 					old_artnum = arts[n].artnum;
 				}
-				n = default_sort_art_type;
+				n = tinrc.sort_article_type;
 				filter_state = change_config_file (group);
-				set_signals_group ();	/* Just to be sure */
-				if (filter_state == NO_FILTERING && n != default_sort_art_type)
+				if (filter_state == NO_FILTERING && n != tinrc.sort_article_type)
 					make_threads (&CURR_GROUP, TRUE);
 				set_subj_from_size (cCOLS);
 				index_point = find_new_pos (old_top, old_artnum, index_point);
@@ -671,7 +681,7 @@ next_thread:
 				else {
 					cur_groupnum++;
 					index_point = GRP_NEXTUNREAD;
-					space_mode = pos_first_unread;
+					space_mode = tinrc.pos_first_unread;
 					goto group_done;
 				}
 				break;
@@ -714,7 +724,7 @@ enter_pager:
 					break;
 				}
 
-				space_mode = pos_first_unread; /* TODO space_mode sucks, kill it ? */
+				space_mode = tinrc.pos_first_unread; /* TODO space_mode sucks, kill it ? */
 
 				/*
 				 * In some cases, we have to keep going after an ARTFAIL
@@ -772,7 +782,7 @@ enter_pager:
 				else {
 					cur_groupnum = i;
 					index_point = GRP_NEXTUNREAD;
-					space_mode = pos_first_unread;
+					space_mode = tinrc.pos_first_unread;
 					goto group_done;
 				}
 				break;
@@ -796,9 +806,9 @@ enter_pager:
 
 			case iKeyGroupToggleGetartLimit:
 				clear_message ();
-				use_getart_limit = !use_getart_limit;
+				tinrc.use_getart_limit = !tinrc.use_getart_limit;
 				index_point = GRP_NEXTUNREAD;
-				space_mode = pos_first_unread;
+				space_mode = tinrc.pos_first_unread;
 				goto group_done;
 				/* NOTREACHED */
 				break;
@@ -1040,22 +1050,22 @@ enter_pager:
 				break;
 
 			case iKeyGroupSelPattern:	/* select matching patterns */
-				sprintf (mesg, txt_select_pattern, default_select_pattern);
+				sprintf (mesg, txt_select_pattern, tinrc.default_select_pattern);
 				if (!prompt_string (mesg, buf, HIST_SELECT_PATTERN))
 					break;
 
 				if (buf[0] == '\0') {
-					if (default_select_pattern[0] == '\0') {
+					if (tinrc.default_select_pattern[0] == '\0') {
 						info_message ("No previous expression"); /* FIXME: -> lang.c */
 						break;
 					}
-					sprintf (pat, REGEX_FMT, default_select_pattern);
+					sprintf (pat, REGEX_FMT, tinrc.default_select_pattern);
 				} else if (STRCMPEQ(buf, "*")) {	/* all */
 					strcpy (pat, buf);
-					strcpy (default_select_pattern, pat);
+					strcpy (tinrc.default_select_pattern, pat);
 				} else {
-					strcpy (default_select_pattern, buf);
-					sprintf (pat, REGEX_FMT, default_select_pattern);
+					strcpy (tinrc.default_select_pattern, buf);
+					sprintf (pat, REGEX_FMT, tinrc.default_select_pattern);
 				}
 
 				flag = 0;
@@ -1131,7 +1141,7 @@ undo_auto_select_arts:
 				break;
 
 			case iKeyToggleInfoLastLine:
-				info_in_last_line = !info_in_last_line;
+				tinrc.info_in_last_line = !tinrc.info_in_last_line;
 				show_group_page ();
 				break;
 
@@ -1159,7 +1169,7 @@ show_group_page (
 #ifndef INDEX_DAEMON
 	int i;
 
-	set_signals_group ();
+	signal_context = cGroup;
 
 	MoveCursor (0, 0);
 	CleartoEOLN ();
@@ -1175,7 +1185,7 @@ show_group_page (
 
 	set_first_screen_item (index_point, top_base, &first_subj_on_screen, &last_subj_on_screen);
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		CleartoEOS ();
 
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
@@ -1225,7 +1235,7 @@ draw_subject_arrow (
 #ifndef INDEX_DAEMON
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
-	if (draw_arrow_mark) {
+	if (tinrc.draw_arrow_mark) {
 		my_fputs ("->", stdout);
 		my_flush ();
 	} else {
@@ -1233,7 +1243,7 @@ draw_subject_arrow (
 		draw_sline (index_point, TRUE);
 		EndInverse();
 	}
-	if (info_in_last_line) {
+	if (tinrc.info_in_last_line) {
 		struct t_art_stat statbuf;
 
 		stat_thread (index_point, &statbuf);
@@ -1254,7 +1264,7 @@ erase_subject_arrow (
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		my_fputs ("  ", stdout);
 	else {
 		HpGlitch(EndInverse ());
@@ -1306,7 +1316,7 @@ clear_note_area (
  * will exist after toggle. Otherwise we find the next closest to return to.
  * 'force' can be set to force tin to show all messages
  */
-void
+static void
 toggle_read_unread (
 	t_bool force)
 {
@@ -1396,7 +1406,7 @@ mark_screen (
 	int screen_col,
 	const char *value)
 {
-	if (draw_arrow_mark) {
+	if (tinrc.draw_arrow_mark) {
 		MoveCursor(INDEX_TOP + screen_row, screen_col);
 		my_fputs (value, stdout);
 		stow_cursor();
@@ -1430,7 +1440,7 @@ set_subj_from_size (
 	 * This function is called early during startup when we only have
 	 * very limited information loaded.
 	 */
-	show_author = ((group_top && CURR_GROUP.attribute) ? CURR_GROUP.attribute->show_author : default_show_author);
+	show_author = ((group_top && CURR_GROUP.attribute) ? CURR_GROUP.attribute->show_author : tinrc.show_author);
 	max_subj = ((show_author == SHOW_FROM_BOTH) ? ((num_cols / 2) - 4): ((num_cols / 2) + 3));
 	max_from = (num_cols - max_subj) - 17;
 
@@ -1452,10 +1462,10 @@ set_subj_from_size (
 		spaces = "";
 	}
 
-	if (!show_lines)
+	if (!tinrc.show_lines)
 		len_subj += 5;
 
-	if (!show_score)
+	if (!tinrc.show_score)
 		len_subj += 7;
 }
 
@@ -1527,7 +1537,7 @@ bld_sline (
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
 
-	if (show_lines) {
+	if (tinrc.show_lines) {
 		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
 			if (arts[j].lines != -1) {
 				char tmp_buffer[4];
@@ -1558,7 +1568,7 @@ bld_sline (
 #ifndef USE_CURSES
 	buffer = screen[j].col;
 #endif /* !USE_CURSES */
-	if (show_score)
+	if (tinrc.show_score)
 		sprintf (buffer, "  %s %s %s%6d %-*.*s%s%-*.*s",
 			 tin_ltoa(i+1, 4), new_resps, art_cnt, sbuf.score,
 			 len_subj-12, len_subj-12, arts_sub,
@@ -1604,7 +1614,7 @@ draw_sline (
 #	endif /* USE_CURSES */
 
 	if (full) {
-		if (strip_blanks) {
+		if (tinrc.strip_blanks) {
 			strip_line (s);
 			CleartoEOLN ();
 		}
@@ -1620,7 +1630,7 @@ draw_sline (
 	 * it is somewhat less efficient to go back and redo that art mark
 	 * if selected, but it is quite readable as to what is happening
 	 */
-	if (s[k-x] == art_marked_selected) {
+	if (s[k-x] == tinrc.art_marked_selected) {
 		MoveCursor (INDEX2LNUM(i), k);
 		ToggleInverse ();
 		my_fputc (s[k-x], stdout);
@@ -1651,12 +1661,12 @@ show_group_title (
 		}
 	}
 
-if (use_getart_limit)
+if (tinrc.use_getart_limit)
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH [%dL]%s%c)",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
-		getart_limit,
+		tinrc.getart_limit,
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated));
 else

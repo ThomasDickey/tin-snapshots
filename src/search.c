@@ -26,15 +26,6 @@ static char * get_search_pattern (int forward, const char *fwd_msg, const char *
  */
 #define MATCH_MSG	(mesg[0] ? mesg : txt_no_match)
 
-/*
- * last search patterns (from tinrc file)
- */
-char default_author_search[LEN];
-char default_config_search[LEN];
-char default_group_search[LEN];
-char default_subject_search[LEN];
-char default_art_search[LEN];
-
 #ifndef INDEX_DAEMON
 	/*
 	 * Kludge to maintain counters for body search
@@ -63,7 +54,7 @@ get_search_pattern (
 	wait_message (0, txt_searching);
 	stow_cursor();
 
-	if (wildcard) {			/* ie, not wildmat() */
+	if (tinrc.wildcard) {			/* ie, not wildmat() */
 		strcpy(def, quote_wild_whitespace (def));
 		return(def);
 	}
@@ -95,7 +86,7 @@ search_config (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_group_search,
+				tinrc.default_search_config,
 				HIST_CONFIG_SEARCH
 	))) return result;
 
@@ -137,7 +128,7 @@ search_active (
 		return -1;
 	}
 
-	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, default_group_search, HIST_GROUP_SEARCH)))
+	if (!(buf = get_search_pattern(forward, txt_search_forwards, txt_search_backwards, tinrc.default_search_group, HIST_GROUP_SEARCH)))
 		return -1;
 
 	i = cur_groupnum;
@@ -191,7 +182,7 @@ search_help (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_group_search,
+				tinrc.default_search_group,
 				HIST_HELP_SEARCH
 	))) return result;
 
@@ -384,7 +375,7 @@ search (
 					forward,
 					txt_search_forwards,
 					txt_search_backwards,
-					default_subject_search,
+					tinrc.default_search_subject,
 					HIST_SUBJECT_SEARCH
 			))) return -1;
 
@@ -397,7 +388,7 @@ search (
 					forward,
 					txt_author_search_forwards,
 					txt_author_search_backwards,
-					default_author_search,
+					tinrc.default_search_author,
 					HIST_AUTHOR_SEARCH
 			))) return -1;
 
@@ -432,7 +423,7 @@ search_article (
 				forward,
 				txt_search_forwards,
 				txt_search_backwards,
-				default_art_search,
+				tinrc.default_search_art,
 				HIST_ART_SEARCH
 	))) return FALSE;
 
@@ -505,7 +496,7 @@ search_body (
 	char *buf;
 	int i;
 
-	if (!(buf = get_search_pattern(1, txt_search_body, txt_search_body, default_art_search, HIST_ART_SEARCH)))
+	if (!(buf = get_search_pattern(1, txt_search_body, txt_search_body, tinrc.default_search_art, HIST_ART_SEARCH)))
 		return -1;
 
 	total_cnt = curr_cnt = 0;			/* Reset global counter of articles done */

@@ -107,7 +107,7 @@ mmdecode (
 	t_bool decode_gt128 = FALSE;
 
 #ifdef MIME_STRICT_CHARSET
-	if (charset && !strcasecmp(charset, mm_charset))
+	if (charset && !strcasecmp(charset, tinrc.mm_charset))
 #endif /* MIME_STRICT_CHARSET */
 		decode_gt128 = TRUE;
 
@@ -182,8 +182,8 @@ void
 get_mm_charset (
 	void)
 {
-	if (!*mm_charset) {
-		STRCPY(mm_charset, get_val("MM_CHARSET", MM_CHARSET));
+	if (!*tinrc.mm_charset) {
+		STRCPY(tinrc.mm_charset, get_val("MM_CHARSET", MM_CHARSET));
 	}
 }
 
@@ -364,11 +364,13 @@ which_encoding (
 		w++;
 	}
 	if (nonprint) {
-/* Always use B encoding regardless of the efficiency if charset is
-   EUC-KR for backward compatibility with old Korean mail program */
+/*
+ * Always use B encoding regardless of the efficiency if charset is
+ * EUC-KR for backward compatibility with old Korean mail program
+ */
 		if (chars + 2 * (nonprint + schars) /* QP size */ >
 			 (chars * 4 + 3) / 3	  /* B64 size */
-			 || !strcasecmp(mm_charset, "EUC-KR"))
+			 || !strcasecmp(tinrc.mm_charset, "EUC-KR"))
 			return 'B';
 		return 'Q';
 	}
@@ -503,7 +505,7 @@ rfc1522_do_encode (
 
 	t = buf;
 	encoding = which_encoding(what);
-	ew_taken_len = strlen(mm_charset) + 7;		/* the minimum encoded word length without any encoded text */
+	ew_taken_len = strlen(tinrc.mm_charset) + 7;		/* the minimum encoded word length without any encoded text */
 
 	while (*what) {
 		if (break_long_line)
@@ -516,7 +518,7 @@ rfc1522_do_encode (
 		if (contains_nonprintables(what, isstruct_head) || isbroken_within) {
 			if (encoding == 'Q') {
 				if (!quoting) {
-					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
+					sprintf(buf2, "=?%s?%c?", tinrc.mm_charset, encoding);
 					ewsize = mystrcat(&t, buf2);
 					if (break_long_line) {
 						if (word_cnt == 2) {
@@ -560,7 +562,7 @@ rfc1522_do_encode (
 						break;
 					}
 				}
-				if (!contains_nonprintables(what, isstruct_head) || ewsize >= 70 - strlen(mm_charset)) {
+				if (!contains_nonprintables(what, isstruct_head) || ewsize >= 70 - strlen(tinrc.mm_charset)) {
 					/* next word is 'clean', close encoding */
 					*t++ = '?';
 					*t++ = '=';
@@ -570,7 +572,7 @@ rfc1522_do_encode (
  * after the point where it's split should be encoded (i.e. even if
  * they are made of only 7bit chars)
  */
-					if (ewsize >= 70 - strlen(mm_charset) && (contains_nonprintables(what, isstruct_head) || isbroken_within)) {
+					if (ewsize >= 70 - strlen(tinrc.mm_charset) && (contains_nonprintables(what, isstruct_head) || isbroken_within)) {
 						*t++ = ' ';
 						ewsize++;
 					}
@@ -600,7 +602,7 @@ rfc1522_do_encode (
 				 */
 				while (*what && (!isbetween(*what, isstruct_head) || rightafter_ew)) {
 
-					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
+					sprintf(buf2, "=?%s?%c?", tinrc.mm_charset, encoding);
 					ewsize = mystrcat(&t, buf2);
 
 					if (word_cnt == 2)
@@ -811,11 +813,11 @@ rfc15211522_encode (
 
 		/* added for CJK charsets like EUC-KR/JP/CN and others */
 
-			if (!strncasecmp(mm_charset, "euc-", 4) &&
+			if (!strncasecmp(tinrc.mm_charset, "euc-", 4) &&
 				 !strcasecmp(mime_encoding, txt_7bit))
-				fprintf(f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &mm_charset[4]);
+				fprintf(f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &tinrc.mm_charset[4]);
 			else
-				fprintf(f, "Content-Type: text/plain; charset=%s\n", mm_charset);
+				fprintf(f, "Content-Type: text/plain; charset=%s\n", tinrc.mm_charset);
 			fprintf(f, "Content-Transfer-Encoding: %s\n", mime_encoding);
 		} else {
 			fputs("Content-Type: text/plain; charset=US-ASCII\n", f);
@@ -841,21 +843,21 @@ rfc15211522_encode (
 
 /* For EUC-KR, 7bit means conversion to ISO-2022-KR specified in RFC 1557 */
 
-		if (!strcasecmp(mm_charset, "euc-kr"))
+		if (!strcasecmp(tinrc.mm_charset, "euc-kr"))
 			body_encode = rfc1557_encode;
 
 /*
  * Not only EUC-JP but also other Japanese charsets such as
  * SJIS  might need RFC 1468 encoding. To be confirmed.
  */
-		else if (!strcasecmp(mm_charset, "euc-jp"))
+		else if (!strcasecmp(tinrc.mm_charset, "euc-jp"))
 			body_encode = rfc1468_encode;
 
 /*
  * Not only  EUC-CN but also other Chinese charsets such as
  * BIG5 and EUC-TW might need RFC 1922 encoding. To be confirmed.
  */
-		else if (!strcasecmp(mm_charset, "euc-cn"))
+		else if (!strcasecmp(tinrc.mm_charset, "euc-cn"))
 			body_encode = rfc1922_encode;
 		else {
 			body_encode = rfc1521_encode;

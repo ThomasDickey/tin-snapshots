@@ -480,7 +480,8 @@ eat_tab (
 #define SH_META   "\\\'\"`$*%?()[]{}|<>^&;#~"
 
 int
-sh_format (char *dst,
+sh_format (
+	char *dst,
 	size_t len,
 	const char *fmt,
 	...)

@@ -396,6 +396,9 @@ update_posted_info_file (
 	struct tm *pitm;
 	time_t epoch;
 
+	if (no_write)
+		return;
+
 	if ((fp = fopen (posted_info_file, "a+")) != NULL) {
 		(void) time (&epoch);
 		pitm = localtime (&epoch);
@@ -555,7 +558,7 @@ check_article_to_be_posted (
 		}
 #endif /* !FORGERY */
 		if (cp - line == 8 && !strncasecmp (line, "Approved", 8)) {
-			if (beginner_level) {
+			if (tinrc.beginner_level) {
 				StartInverse();
 				my_fprintf (stderr, txt_error_approved, i);
 				my_fflush (stderr);
@@ -797,10 +800,10 @@ check_article_to_be_posted (
 	/* check for MIME Content-Type and Content-Transfer-Encoding */
 	get_mm_charset ();
 
-	if (strcasecmp (mm_charset, "US-ASCII"))
+	if (strcasecmp (tinrc.mm_charset, "US-ASCII"))
 		mime_usascii = FALSE;
 
-	if (strcasecmp (txt_mime_encodings[post_mime_encoding], "7bit"))
+	if (strcasecmp (txt_mime_encodings[tinrc.post_mime_encoding], "7bit"))
 		mime_7bit = FALSE;
 
 	if (contains_8bit && mime_usascii) {
@@ -865,7 +868,7 @@ check_article_to_be_posted (
 		}
 
 #ifndef NO_ETIQUETTE
-		if (beginner_level)
+		if (tinrc.beginner_level)
 			my_fprintf (stderr, txt_warn_posting_etiquette);
 #endif /* !NO_ETIQUETTE */
 		my_fflush (stderr);
@@ -939,17 +942,17 @@ quick_post_article (
 	 * Get groupname & subject for posting article.
 	 * If multiple newsgroups test all to see if any are moderated.
 	 */
-	sprintf (buf, txt_post_newsgroups, default_post_newsgroups);
+	sprintf (buf, txt_post_newsgroups, tinrc.default_post_newsgroups);
 
 	if (!prompt_string (buf, group, HIST_POST_NEWSGROUPS)) {
 		my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 		return;
 	}
 	if (strlen (group))
-		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+		my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
 	else {
-		if (*default_post_newsgroups)
-			my_strncpy (group, default_post_newsgroups, sizeof (group));
+		if (*tinrc.default_post_newsgroups)
+			my_strncpy (group, tinrc.default_post_newsgroups, sizeof (group));
 		else {
 			my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
 			return;
@@ -1004,12 +1007,12 @@ quick_post_article (
 	PRINT_LF();
 
 	/* Only display leading characters of subject */
-	if (strlen(default_post_subject) > DISPLAY_SUBJECT_LEN) {
-		strncpy(tmp, default_post_subject, DISPLAY_SUBJECT_LEN);
+	if (strlen(tinrc.default_post_subject) > DISPLAY_SUBJECT_LEN) {
+		strncpy(tmp, tinrc.default_post_subject, DISPLAY_SUBJECT_LEN);
 		tmp[DISPLAY_SUBJECT_LEN] = '\0';
 		strcat(tmp, " ...");
 	} else
-		strncpy(tmp, default_post_subject, sizeof(tmp));
+		strncpy(tmp, tinrc.default_post_subject, sizeof(tmp));
 
 	sprintf (buf, txt_post_subject, tmp);
 
@@ -1019,10 +1022,10 @@ quick_post_article (
 		return;
 	}
 	if (strlen (subj))
-		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+		my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
 	else {
-		if (*default_post_subject)
-			my_strncpy (subj, default_post_subject, sizeof (subj));
+		if (*tinrc.default_post_subject)
+			my_strncpy (subj, tinrc.default_post_subject, sizeof (subj));
 		else {
 			Raw (FALSE);
 			my_fprintf (stderr, "%s\n", txt_no_quick_subject);
@@ -1061,7 +1064,7 @@ quick_post_article (
 	if (psGrp && psGrp->attribute->followup_to != (char *) 0)
 		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 	else {
-		if (prompt_followupto)
+		if (tinrc.prompt_followupto)
 			msg_add_header("Followup-To", "");
 	}
 	if (*reply_to)
@@ -1094,17 +1097,21 @@ quick_post_article (
 	forever {
 quick_post_article_loop:
 		switch (ch) {
+			long artsize;
 			case iKeyPostEdit:
+				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
-					;
-				if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-					break;
+				if ((artsize != file_size(article)) && (artsize > 0)) {
+					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+						;
+					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+						break;
+				}
 
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (article);
 				clear_message ();
 				return;
@@ -1141,7 +1148,7 @@ quick_post_article_loop:
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
-						if (keep_dead_articles)
+						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
 						Raw (FALSE);
 						error_message (txt_art_rejected, dead_article);
@@ -1164,7 +1171,7 @@ post_article_done:
 		update_active_after_posting (group);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-			if (add_posted_to_filter)
+			if (tinrc.add_posted_to_filter)
 				quick_filter_select_posted_art (psGrp, subj);
 
 			update_posted_info_file (group, 'w', subj);
@@ -1173,19 +1180,19 @@ post_article_done:
 	} else
 		group[0] = '\0';
 
-	if (keep_posted_articles)
+	if (tinrc.keep_posted_articles)
 		update_posted_msgs_file (article, userid);
 
 	if (!*group)
-		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+		my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
 
 	if (!*subj)
-		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+		my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
 
 	write_config_file (local_config_file);
 
 post_article_postponed:
-	if (unlink_article)
+	if (tinrc.unlink_article)
 		unlink (article);
 
 	return;
@@ -1227,7 +1234,7 @@ post_existing_article_loop:
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (article);
 				clear_message ();
 				return;
@@ -1267,7 +1274,7 @@ post_existing_article_loop:
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
-						if (keep_dead_articles)
+						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
 						Raw (FALSE);
 						error_message (txt_art_rejected, dead_article);
@@ -1291,12 +1298,12 @@ post_article_done:
 
 		/* Hmmm? What's the difference between subject and subj? */
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-		   /*
-		    * we currently do not add autoselect for
-		    * crossposted postponed articles, since we don't
-		    * know in which group the article was actually in
-		    */
-			if (add_posted_to_filter && !strchr(group, ',') && (psGrp = psGrpFind(group)))
+			/*
+			 * we currently do not add autoselect for
+			 * crossposted postponed articles, since we don't
+			 * know in which group the article was actually in
+			 */
+			if (tinrc.add_posted_to_filter && !strchr(group, ',') && (psGrp = psGrpFind(group)))
 				quick_filter_select_posted_art (psGrp, subj);
 
 			update_posted_info_file (group, strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
@@ -1305,19 +1312,19 @@ post_article_done:
 	} else
 		group[0] = '\0';
 
-	if (keep_posted_articles)
+	if (tinrc.keep_posted_articles)
 		update_posted_msgs_file (article, userid);
 
 	if (!*group)
-		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+		my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
 
 	if (!*subj)
-		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+		my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
 
 	write_config_file (local_config_file);
 
 post_article_postponed:
-	if (unlink_article)
+	if (tinrc.unlink_article)
 		unlink (article);
 
 	return;
@@ -1588,12 +1595,12 @@ post_article (
 	}
 
 	/* Only display leading characters of subject */
-	if (strlen(default_post_subject) > DISPLAY_SUBJECT_LEN) {
-		strncpy(tmp, default_post_subject, DISPLAY_SUBJECT_LEN);
+	if (strlen(tinrc.default_post_subject) > DISPLAY_SUBJECT_LEN) {
+		strncpy(tmp, tinrc.default_post_subject, DISPLAY_SUBJECT_LEN);
 		tmp[DISPLAY_SUBJECT_LEN] = '\0';
 		strcat(tmp, " ...");
 	} else
-		strncpy(tmp, default_post_subject, sizeof(tmp));
+		strncpy(tmp, tinrc.default_post_subject, sizeof(tmp));
 	sprintf (mesg, txt_post_subject, tmp);
 
 	if (!prompt_string (mesg, subj, HIST_POST_SUBJECT)) {
@@ -1602,10 +1609,10 @@ post_article (
 	}
 
 	if (strlen (subj))
-		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+		my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
 	else {
-		if (*default_post_subject)
-			my_strncpy (subj, default_post_subject, sizeof (subj));
+		if (*tinrc.default_post_subject)
+			my_strncpy (subj, tinrc.default_post_subject, sizeof (subj));
 		else {
 			info_message (txt_no_subject);
 			return redraw_screen;
@@ -1638,7 +1645,7 @@ post_article (
 	if (psGrp->attribute->followup_to != (char *) 0 && art_type == GROUP_TYPE_NEWS)
 		msg_add_header ("Followup-To", psGrp->attribute->followup_to);
 	else {
-		if (prompt_followupto)
+		if (tinrc.prompt_followupto)
 			msg_add_header("Followup-To", "");
 	}
 
@@ -1669,18 +1676,22 @@ post_article (
 	forever {
 post_article_loop:
 		switch (ch) {
+			long artsize;
 			case iKeyPostEdit:
+				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
-					;
 				redraw_screen = TRUE;
-				if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-					break;
+				if ((artsize != file_size(article)) && (artsize > 0)) {
+					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+						;
+					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+						break;
+				}
 
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (article);
 				clear_message ();
 				return redraw_screen;
@@ -1724,7 +1735,7 @@ post_article_loop:
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
-						if (keep_dead_articles)
+						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
 						info_message (txt_art_rejected, dead_article);
 						ReadCh ();
@@ -1748,19 +1759,19 @@ post_article_done:
 		}
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
 
-			if (add_posted_to_filter)
+			if (tinrc.add_posted_to_filter)
 				quick_filter_select_posted_art (psGrp, subj);
 
 			update_posted_info_file (group, 'w', subj);
 		}
-		if (keep_posted_articles)
+		if (tinrc.keep_posted_articles)
 			update_posted_msgs_file (article, userid);
 	}
-	my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
-	my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+	my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
+	my_strncpy (tinrc.default_post_subject, subj, sizeof (tinrc.default_post_subject));
 
 post_article_postponed:
-	if (unlink_article)
+	if (tinrc.unlink_article)
 		unlink (article);
 
 	return redraw_screen;
@@ -2088,7 +2099,7 @@ post_response (
 		msg_add_header ("X-Comment-To", note_h.from);
 	if (*note_h.followup && strcmp (note_h.followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h.followup);
-		if (prompt_followupto)
+		if (tinrc.prompt_followupto)
 			msg_add_header("Followup-To", (strchr(note_h.followup, ',') != (char *) 0) ? note_h.followup : "");
 	} else {
 		if (psGrp && psGrp->attribute->mailing_list) {
@@ -2096,7 +2107,7 @@ post_response (
 			art_type = GROUP_TYPE_MAIL;
 		} else {
 			msg_add_header ("Newsgroups", note_h.newsgroups);
-			if (prompt_followupto)
+			if (tinrc.prompt_followupto)
 				msg_add_header("Followup-To",
 				(strchr(note_h.newsgroups, ',') != (char *) 0) ? note_h.newsgroups : "");
 			if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
@@ -2149,14 +2160,14 @@ post_response (
 
 	if (copy_text) {
 		if (arts[respnum].xref && is_crosspost(arts[respnum].xref)) {
-			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), xpost_quote_format))
+			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), tinrc.xpost_quote_format))
 				fprintf (fp, "%s\n", buf);
-		} else if (strfquote (group, respnum, buf, sizeof (buf), (psGrp && psGrp->attribute->news_quote_format != (char *) 0) ? psGrp->attribute->news_quote_format : news_quote_format))
+		} else if (strfquote (group, respnum, buf, sizeof (buf), (psGrp && psGrp->attribute->news_quote_format != (char *) 0) ? psGrp->attribute->news_quote_format : tinrc.news_quote_format))
 			fprintf (fp, "%s\n", buf);
 		start_line_offset++;
 
 		/*
-		 * check if xpost_quote_format or news_quote_format
+		 * check if tinrc.xpost_quote_format or tinrc.news_quote_format
 		 * is longer than 1 line and correct start_line_offset
 		 */
 		{
@@ -2172,8 +2183,8 @@ post_response (
 
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
-			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
-			   initials, with_headers ? TRUE : quote_signatures);
+			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : tinrc.quote_chars,
+			   initials, with_headers ? TRUE : tinrc.quote_signatures);
 	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 
@@ -2184,17 +2195,22 @@ post_response (
 	forever {
 post_response_loop:
 		switch (ch) {
+			long artsize;
 			case iKeyPostEdit:
+				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
-					;
 				ret_code = POSTED_REDRAW;
-				if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-					break;
+				if ((artsize != file_size(article)) && (artsize > 0)) {
+					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+						;
+					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+						break;
+				}
+
 			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (article);
 				clear_message ();
 				return ret_code;
@@ -2238,7 +2254,7 @@ post_response_loop:
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
-						if (keep_dead_articles)
+						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
 						info_message (txt_art_rejected, dead_article);
 						ReadCh ();
@@ -2266,15 +2282,15 @@ post_response_done:
 				update_posted_info_file (note_h.followup, 'f', buf);
 		} else if (pcCopyArtHeader (HEADER_SUBJECT, article, buf)) {
 			update_posted_info_file (note_h.newsgroups, 'f', buf);
-			my_strncpy (default_post_newsgroups, note_h.newsgroups, sizeof (default_post_newsgroups));
+			my_strncpy (tinrc.default_post_newsgroups, note_h.newsgroups, sizeof (tinrc.default_post_newsgroups));
 		}
-		if (keep_posted_articles)
+		if (tinrc.keep_posted_articles)
 			update_posted_msgs_file (article, userid);
 	}
-	my_strncpy (default_post_subject, buf, sizeof (default_post_subject));
+	my_strncpy (tinrc.default_post_subject, buf, sizeof (tinrc.default_post_subject));
 
 post_response_postponed:
-	if (unlink_article)
+	if (tinrc.unlink_article)
 		unlink (article);
 
 	return ret_code;
@@ -2287,7 +2303,7 @@ mail_to_someone (
 	char *address,
 	t_bool mail_to_poster,
 	t_bool confirm_to_mail,
-	int *mailed_ok)
+	t_bool *mailed_ok)
 {
 	FILE *fp;
 	char ch = iKeyPostSend;
@@ -2318,7 +2334,10 @@ mail_to_someone (
 
 	sprintf (subject, "(fwd) %s\n", note_h.subj);
 
-	if (!use_mailreader_i) {	/* tin should start editor */
+	if (!tinrc.use_mailreader_i) {	/* tin should start editor */
+
+		if (*tinrc.mail_address)
+			msg_add_header ("From", tinrc.mail_address);
 
 		msg_add_header ("To", mail_to);
 
@@ -2327,10 +2346,10 @@ mail_to_someone (
 
 		msg_add_header ("Subject", subject);
 
-		if (auto_cc)
+		if (tinrc.auto_cc)
 			msg_add_header ("Cc", userid);
 
-		if (auto_bcc)
+		if (tinrc.auto_bcc)
 			msg_add_header ("Bcc", userid);
 
 		if (*default_organization)
@@ -2346,7 +2365,7 @@ mail_to_someone (
 
 	if (mail_to_poster) {
 		ch = iKeyPostEdit;
-		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), mail_quote_format)) {
+		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf), tinrc.mail_quote_format)) {
 			fprintf (fp, "%s\n", buf);
 			start_line_offset++;
 			{
@@ -2360,7 +2379,7 @@ mail_to_someone (
 		}
 		fseek (note_fp, mark_body, SEEK_SET);
 		get_initials (respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials, quote_signatures);
+		copy_body (note_fp, fp, tinrc.quote_chars, initials, tinrc.quote_signatures);
 	} else {
 		fseek (note_fp, 0L, SEEK_SET);
 		fprintf (fp, "-- forwarded message --\n");
@@ -2368,7 +2387,7 @@ mail_to_someone (
 		fprintf (fp, "-- end of forwarded message --\n");
 	}
 
-	if (!use_mailreader_i)
+	if (!tinrc.use_mailreader_i)
 		msg_write_signature (fp, TRUE, &CURR_GROUP);
 
 #ifdef WIN32
@@ -2376,16 +2395,16 @@ mail_to_someone (
 #endif /* WIN32 */
 	fclose (fp);
 
-	if (use_mailreader_i) {	/* user wants to use his own mailreader */
+	if (tinrc.use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
 		sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
-		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), tinrc.default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
 	}
 	forever {
-		if (confirm_to_mail && (!use_mailreader_i))
+		if (confirm_to_mail && (!tinrc.use_mailreader_i))
 			ch = prompt_to_send(subject);
 
 		switch (ch) {
@@ -2410,7 +2429,7 @@ mail_to_someone (
 
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (nam);
 				clear_message ();
 				*mailed_ok = FALSE;
@@ -2436,7 +2455,7 @@ mail_to_someone (
 	}
 
 mail_to_someone_done:
-	if (unlink_article)
+	if (tinrc.unlink_article)
 		unlink (nam);
 
 	return redraw_screen;
@@ -2469,17 +2488,21 @@ mail_bug_report (
 	}
 	chmod (nam, (mode_t)(S_IRUSR|S_IWUSR));
 
-	if (!use_mailreader_i) {	/* tin should start editor */
+	if (!tinrc.use_mailreader_i) {	/* tin should start editor */
+
+		if (*tinrc.mail_address)
+			msg_add_header ("From", tinrc.mail_address);
+
 		sprintf (buf, "%s", bug_addr);
 		msg_add_header ("To", buf);
 
 		sprintf (subject, "BUG REPORT %s\n", page_header);
 		msg_add_header ("Subject", subject);
 
-		if (auto_cc)
+		if (tinrc.auto_cc)
 			msg_add_header ("Cc", userid);
 
-		if (auto_bcc)
+		if (tinrc.auto_bcc)
 			msg_add_header ("Bcc", userid);
 
 		if (*default_organization)
@@ -2531,7 +2554,7 @@ mail_bug_report (
 	fprintf (fp, "\nCFG1: active=%d  arts=%d  reread=%d  longfilenames=%d  setuid=%d\n",
 		 DEFAULT_ACTIVE_NUM,
 		 DEFAULT_ARTICLE_NUM,
-		 reread_active_file_secs,
+		 tinrc.reread_active_file_secs,
 		 is_longfiles,
 		 (tin_uid == real_uid ? 0 : 1));
 	fprintf (fp, "CFG2: nntp=%d  nntp_only=%d  nntp_xover=%d\n",
@@ -2541,7 +2564,7 @@ mail_bug_report (
 	fprintf (fp, "CFG3: debug=%d domain=[%s]\n",
 		is_debug,
 		*domain ? domain : "");
-	fprintf (fp, "CFG4: threading=%d\n", default_thread_arts);
+	fprintf (fp, "CFG4: threading=%d\n", tinrc.thread_articles);
 	start_line_offset++;
 
 	if (*bug_nntpserver1) {
@@ -2557,7 +2580,7 @@ mail_bug_report (
 
 	start_line_offset += 6;
 
-	if (!use_mailreader_i)
+	if (!tinrc.use_mailreader_i)
 		msg_write_signature (fp, TRUE, (cur_groupnum == -1) ? NULL : &CURR_GROUP);
 
 #ifdef WIN32
@@ -2565,11 +2588,11 @@ mail_bug_report (
 #endif /* WIN32 */
 	fclose (fp);
 
-	if (use_mailreader_i) {	/* user wants to use his own mailreader */
+	if (tinrc.use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		sprintf (subject, "BUG REPORT %s", page_header);
 		sprintf (mail_to, "%s", bug_addr);
-		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), tinrc.default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
 	} else
@@ -2577,11 +2600,19 @@ mail_bug_report (
 
 	forever {
 		switch (ch) {
+			long artsize;
 			case iKeyPostEdit:
+				artsize = file_size(nam);
 				invoke_editor (nam, start_line_offset);
-				if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
-					subject[0] = '\0';
-				break;
+				if ((artsize != file_size(nam)) && (artsize > 0)) {
+					if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+						subject[0] = '\0';
+					break;
+				} else { /* empty bugreport */
+					unlink (nam);
+					clear_message ();
+					return TRUE;
+				}
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
@@ -2607,8 +2638,8 @@ mail_bug_report (
 				if (prompt_yn (cLINES, mesg, FALSE) == 1) {
 					if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						wait_message (0, txt_mailing_to, mail_to);
-						rfc15211522_encode (nam, txt_mime_encodings[mail_mime_encoding], mail_8bit_header, TRUE);
-						strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+						rfc15211522_encode (nam, txt_mime_encodings[tinrc.mail_mime_encoding], tinrc.mail_8bit_header, TRUE);
+						strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), tinrc.default_mailer_format);
 						if (invoke_cmd (buf)) {
 							info_message (txt_mailed, 1, IS_PLURAL(1));
 							goto mail_bug_report_done;
@@ -2670,17 +2701,21 @@ mail_to_author (
 
 	sprintf (subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
 
-	if (!use_mailreader_i) {	/* tin should start editor */
+	if (!tinrc.use_mailreader_i) {	/* tin should start editor */
+
+		if (*tinrc.mail_address)
+			msg_add_header ("From", tinrc.mail_address);
+
 		find_reply_to_addr (/*respnum,*/ from_addr, FALSE);
 
 		msg_add_header ("To", from_addr);
 		spamtrap_found = check_for_spamtrap(from_addr);
 		msg_add_header ("Subject", subject);
 
-		if (auto_cc)
+		if (tinrc.auto_cc)
 			msg_add_header ("Cc", userid);
 
-		if (auto_bcc)
+		if (tinrc.auto_bcc)
 			msg_add_header ("Bcc", userid);
 
 		/*
@@ -2714,7 +2749,7 @@ mail_to_author (
 	msg_free_headers ();
 
 	if (copy_text) {
-		if (strfquote (group, respnum, buf, sizeof (buf), mail_quote_format)) {
+		if (strfquote (group, respnum, buf, sizeof (buf), tinrc.mail_quote_format)) {
 			fprintf (fp, "%s\n", buf);
 			start_line_offset++;
 			{
@@ -2730,11 +2765,11 @@ mail_to_author (
 		fseek (note_fp, (with_headers ? 0L : mark_body), SEEK_SET);
 
 		get_initials (respnum, initials, sizeof (initials));
-		copy_body (note_fp, fp, quote_chars, initials, with_headers ? TRUE : quote_signatures);
+		copy_body (note_fp, fp, tinrc.quote_chars, initials, with_headers ? TRUE : tinrc.quote_signatures);
 	} else
 		fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
 
-	if (!use_mailreader_i)
+	if (!tinrc.use_mailreader_i)
 		msg_write_signature (fp, TRUE, &CURR_GROUP);
 
 #ifdef WIN32
@@ -2759,11 +2794,11 @@ mail_to_author (
 		}
 	}
 
-	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
+	if (tinrc.use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
 		sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
 		find_reply_to_addr (/* respnum, */ mail_to, TRUE);
-		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), tinrc.default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
 	} else
@@ -2805,8 +2840,8 @@ mail_to_author (
 					t_bool ismail = TRUE;
 					wait_message (0, txt_mailing_to, mail_to);
 					checknadd_headers (nam);
-					rfc15211522_encode (nam, txt_mime_encodings[mail_mime_encoding], mail_8bit_header, ismail);
-					strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+					rfc15211522_encode (nam, txt_mime_encodings[tinrc.mail_mime_encoding], tinrc.mail_8bit_header, ismail);
+					strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), tinrc.default_mailer_format);
 					if (invoke_cmd (buf)) {
 						info_message (txt_mailed, 1, IS_PLURAL(1));
 						goto mail_to_author_done;
@@ -2849,7 +2884,7 @@ check_for_spamtrap (
 				env++;
 		}
 	}
-	if ((env = my_strdup(spamtrap_warning_addresses)) != (char *) 0) {
+	if ((env = my_strdup(tinrc.spamtrap_warning_addresses)) != (char *) 0) {
 		char *tmp = env;
 		while (strlen(tmp)) {
 			ptr = strchr(tmp, ',');
@@ -3084,7 +3119,7 @@ cancel_article (
 	strip_double_ngs (note_h.newsgroups);
 
 	msg_add_header ("Newsgroups", note_h.newsgroups);
-	if (prompt_followupto)
+	if (tinrc.prompt_followupto)
 		msg_add_header("Followup-To", "");
 	sprintf (buf, "cancel %s", note_h.messageid);
 	msg_add_header ("Control", buf);
@@ -3248,7 +3283,7 @@ repost_article (
 		}
 	}
 
-	if (!tmpGrp) {
+	if (!tmpGrp || tmpGrp->bogus) {
 		error_message (txt_not_in_active_file, group);
 		return POSTED_NONE;
 	}
@@ -3351,7 +3386,7 @@ repost_article (
 	copy_fp (note_fp, fp);
 
 /* only append signature when NOT superseeding own articles */
-	if (NotSuperseding && signature_repost)
+	if (NotSuperseding && tinrc.signature_repost)
 		msg_write_signature (fp, FALSE, psGrp);
 
 	fclose (fp);
@@ -3398,7 +3433,7 @@ repost_article_loop:
 
 			case iKeyQuit:
 			case iKeyAbort:
-				if (unlink_article)
+				if (tinrc.unlink_article)
 					unlink (article);
 				clear_message ();
 				return ret_code;
@@ -3424,7 +3459,7 @@ repost_article_loop:
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
-						if (keep_dead_articles)
+						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
 						wait_message (3, txt_art_rejected, dead_article);
 					}
@@ -3446,7 +3481,7 @@ repost_done:
 				update_posted_info_file (psGrp->name, 'x', buf);
 		}
 repost_postponed:
-		if (unlink_article)
+		if (tinrc.unlink_article)
 			unlink (article);
 
 	return ret_code;
@@ -3597,7 +3632,7 @@ checknadd_headers (
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, (int) sizeof(line), fp_in) != (char *) 0) {
 				if (!gotit && line[0] == '\n') {
-					if (advertising)
+					if (tinrc.advertising)
 #ifdef HAVE_SYS_UTSNAME_H
 #	ifdef _AIX
 						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s) (%s/%s-%s)\n\n",
@@ -3902,11 +3937,11 @@ submit_mail_file (
 			t_bool ismail=TRUE;
 			wait_message (0, txt_mailing_to, mail_to);
 
-			rfc15211522_encode (file, txt_mime_encodings[mail_mime_encoding], mail_8bit_header, ismail);
+			rfc15211522_encode (file, txt_mime_encodings[tinrc.mail_mime_encoding], tinrc.mail_8bit_header, ismail);
 
-			strfmailer (mailer, subject, mail_to, file, buf, sizeof (buf), default_mailer_format);
+			strfmailer (mailer, subject, mail_to, file, buf, sizeof (buf), tinrc.default_mailer_format);
 
-#ifdef VMS  /* quick hack! M.St. 29.01.98 */
+#ifdef VMS /* quick hack! M.St. 29.01.98 */
 			{
 				char *transport = getenv("MAIL$INTERNET_TRANSPORT");
 				if (!transport)
