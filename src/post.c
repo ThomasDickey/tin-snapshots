@@ -1151,9 +1151,7 @@ static int damaged_id(id)
 #define MAXREFSIZE 512
 
 /* TODO - if we have the art[x] that we are following up to, then
- *        get_references(art[x].msgid) will give us the new refs line
- *		  Also, parsing could be better effected with strtok()
- * CHRIS - We can't use strtok without seriously damaging old triple-spaces
+ *        get_references(art[x].refptr) will give us the new refs line
  */
 
 void

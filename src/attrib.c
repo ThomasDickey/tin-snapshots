@@ -119,7 +119,7 @@ set_default_attributes (psAttrib)
  *  attribute.delete_tmp_files = ON/OFF
  *  attribute.show_only_unread = ON/OFF
  *  attribute.thread_arts      = NUM
- *	  0=none, 1=subj, 2=refs
+ *	  0=none, 1=subj, 2=refs, 3=both
  *  attribute.show_author      = NUM
  *    0=none, 1=name, 2=addr, 3=both
  *  attribute.sort_art_type    = NUM
@@ -605,7 +605,7 @@ write_attributes_file (file)
 	fprintf (fp, "#  delete_tmp_files=ON/OFF\n");
 	fprintf (fp, "#  show_only_unread=ON/OFF\n#\n");
 	fprintf (fp, "#  thread_arts=NUM\n");
-	fprintf (fp, "#    0=none, 1=subj, 2=refs\n#\n");
+	fprintf (fp, "#    0=none, 1=subj, 2=refs, 3=both\n#\n");
 	fprintf (fp, "#  show_author=NUM\n");
 	fprintf (fp, "#    0=none, 1=name, 2=addr, 3=both\n#\n");
 	fprintf (fp, "#  sort_art_type=NUM\n");

@@ -619,7 +619,7 @@ write_config_file (file)
 	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
 	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
 	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
-	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References).\n");
+	fprintf (fp, "# Thread articles on 0=(nothing) 1=(Subject) 2=(References) 3=(Both).\n");
 	fprintf (fp, "thread_articles=%d\n\n", default_thread_arts);
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
 	fprintf (fp, "unlink_article=%s\n\n", print_boolean (unlink_article));
@@ -1163,7 +1163,7 @@ match_integer (line, pat, dst, maxlen)
 
 		if (maxlen)  {
 			if ((*dst < 0) || (*dst > maxlen)) {
-				fprintf(stderr, "\n%s%d out of range 0 - %d. Reset to 0", pat, *dst, maxlen);
+				fprintf(stderr, "\n%s%d out of range (0 - %d). Reset to 0", pat, *dst, maxlen);
 				*dst = 0;
 			}
 		}

@@ -32,6 +32,7 @@ static void thread_by_subject P_((void));
 static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
 static int subj_comp P_((t_comptype *p1, t_comptype *p2));
 static int from_comp P_((t_comptype *p1, t_comptype *p2));
+static int date_comp P_((t_comptype *p1, t_comptype *p2));
 static char *pcPrintDate P_((long lSecs));
 static char *pcPrintFrom P_((struct t_article *psArt));
 static void print_expired_arts P_((int num_expired));
@@ -135,14 +136,14 @@ index_group (group)
 		 *  If nov file does not exist then create base[] with setup_base().
 		 */
 #ifdef	PROFILE
-	BegStopWatch("setup_base");
+		BegStopWatch("setup_base");
 #endif	/* PROFILE */
 
 		artcount = setup_hard_base (group, group_path);
 
 #ifdef	PROFILE
-	EndStopWatch();
-	PrintStopWatch();
+		EndStopWatch();
+		PrintStopWatch();
 #endif	/* PROFILE */
 
 debug_print_comment ("Before iReadNovFile");
@@ -193,10 +194,15 @@ debug_print_bitmap (group, NULL);
 			}
 		}
 
-		if (expired || modified) {
+		if (expired || modified)
 			vWriteNovFile (group);
-		}
 		
+		/*
+		 * Create the reference tree. The msgid and ref ptrs will
+		 * be free()d now that the NovFile has been written.
+		 */
+		build_references(group);
+
 		if ((expired || count) && cmd_line && verbose) {
 		    my_fputc ('\n', stdout);
 		    fflush (stdout);
@@ -207,14 +213,14 @@ debug_print_bitmap (group, NULL);
 		   headers in the arts structure have already been decoded. */
 
 #ifdef	PROFILE
-	BegStopWatch("make_thread");
+		BegStopWatch("make_thread");
 #endif	/* PROFILE */
 
 		make_threads (group, FALSE);
 
 #ifdef	PROFILE
-	EndStopWatch();
-	PrintStopWatch();
+		EndStopWatch();
+		PrintStopWatch();
 #endif	/* PROFILE */
 
 		find_base (group);
@@ -417,13 +423,14 @@ thread_by_subject()
 
 /*
  *  Go through the articles in arts[] and create threads. There are
- *  3 strategies currently defined :
+ *  4 strategies currently defined :
  *
  *	THREAD_NONE		No threading
  *	THREAD_SUBJ		Threads are created using like Subject lines
- *	THREAD_REFS		The References line is used to create a thread tree
+ *	THREAD_REFS		Threads are created using the References headers
+ *	THREAD_BOTH		Threads created using References and then Subject
  *
- *  In the second two cases, .thread and .inthread are used, the
+ *  Apart from THREAD_NONE, .thread and .inthread are used, the
  *  first article in a thread should have .inthread set to FALSE, the
  *  rest TRUE.  Only do unexprired articles we haven't visited yet
  *  (arts[].thread == -1 ART_NORMAL).
@@ -487,7 +494,7 @@ make_threads (group, rethread)
 			arts[i].inthread = FALSE;
 
 #ifdef HAVE_REF_THREADING
-			arts[i].msgid->article = i;
+			arts[i].refptr->article = i;
 #endif
 		}
 	}
@@ -506,6 +513,11 @@ make_threads (group, rethread)
 #ifdef HAVE_REF_THREADING
 		case THREAD_REFS:
 			thread_by_reference();
+			return;
+
+		case THREAD_BOTH:
+			thread_by_reference();
+			collate_subjects();
 			return;
 #endif
 	}
@@ -546,7 +558,6 @@ parse_headers (buf, h)
 	char art_from_addr[HEADER_LEN];
 	char art_full_name[HEADER_LEN];
 	char *ptr, *ptrline, *s;
-	char *msgid = NULL;
 	int flag, n;
 	int lineno = 0;
 	int max_lineno = 25;
@@ -599,16 +610,11 @@ parse_headers (buf, h)
 			case 'R':	/* References: optional */
 				if (! got_refs) {
 					if (match_header (ptrline, "References", buf2, HEADER_LEN)) {
-/*
-	s = buf2;
-	while (*s && *s == ' ') {
-		s++;
-	}
- */
-						h->refs = parse_references (buf2);
+						h->refs = str_dup (buf2);
 						got_refs = TRUE;
 					}
 				}
+
 				/* Received:  If found its probably a mail article */
 				if (! got_received) {
 					if (match_header (ptrline, "Received", buf2, HEADER_LEN)) {
@@ -637,12 +643,6 @@ parse_headers (buf, h)
 			case 'X':	/* Xref:  optional */
 				if (! got_xref) {
 					if (match_header (ptrline, "Xref", buf2, HEADER_LEN)) {
-/*
-	s = buf2;
-	while (*s && *s == ' ') {
-		s++;
-	}
- */
 						h->xref = str_dup (buf2);
 						got_xref = TRUE;
 					}
@@ -651,14 +651,7 @@ parse_headers (buf, h)
 			case 'M':	/* Message-ID:  mandatory */
 				if (! got_msgid) {
 					if (match_header (ptrline, "Message-ID", buf2, HEADER_LEN)) {
-/*
-	s = buf2;
-	while (*s && *s == ' ') {
-		s++;
-	}
- */
-					/* We add the Message-id later, when we have Refs: */
-						msgid = str_dup (buf2);
+						h->msgid = str_dup (buf2);
 						got_msgid = TRUE;
 					}
 				}
@@ -714,19 +707,13 @@ parse_headers (buf, h)
 				if (! got_subject)
 					h->subject = hash_str ("<No subject>");
 
-				/*
-				 * Add the msgid to the cache, the refs are the parent
-				 */
-				h->msgid = add_msgid(MSGID_REF, msgid, h->refs);
-				free(msgid);
-				
 				debug_print_header (h);
 				return TRUE;
-			} else {
+			} else
 				return FALSE;
-			}	
 		}
 	} /* forever */
+
 	/* NOTREACHED */
 }
 
@@ -738,7 +725,7 @@ parse_headers (buf, h)
  *    2.  Subject: line  (ie. Which newsreader?)  [mandatory]
  *    3.  From: line     (ie. iain@scn.de)        [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
- *    5.  MessageID:     (ie. <123@ether.net>)     [mandatory]
+ *    5.  MessageID:     (ie. <123@ether.net>)    [mandatory]
  *    6.  References:    (ie. <message-id> ....)  [mandatory]
  *    7.  Byte count     (Skipped - not used)     [mandatory]
  *    8.  Lines: line    (ie. 23)                 [mandatory]
@@ -759,7 +746,6 @@ iReadNovFile (group, min, max, expired)
  	char	art_full_name[HEADER_LEN];
 	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
-	char	*msgid;
 	long	artnum;
 
 	top = 0;
@@ -884,15 +870,15 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		if (*p) {					/* Save a ptr until we have refs */
-			msgid = str_dup (p);
-		} else {
-			msgid = NULL;
-		}
+		if (*p)	
+			arts[top].msgid = str_dup (p);
+		else
+			arts[top].msgid = '\0';
+
 		p = q + 1;
 
 		/* 
-		 * READ article references 
+		 * READ article references
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -904,19 +890,13 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		if (*p) {
-			arts[top].refs = parse_references (p);
-		} else {
-			arts[top].refs = NULL;
-		}
+		if (*p)
+			arts[top].refs = str_dup (p);
+		else
+			arts[top].refs = '\0';
+
 		p = q + 1;
 
-		/*
-		 * We now have the Refs & Message-ID. Add it to the cache.
-		 */
-		arts[top].msgid = add_msgid(MSGID_REF, msgid, arts[top].refs);
-		free(msgid);
- 
 		/* 
 		 * SKIP article bytes 
 		 */
@@ -1055,7 +1035,6 @@ vWriteNovFile (psGrp)
 	FILE	*hFp;
 	int		iNum;
 	struct	t_article *psArt;
-	char	*refs;
 	
 	set_tin_uid_gid ();
 
@@ -1087,8 +1066,8 @@ vWriteNovFile (psGrp)
 			 		psArt->subject,
 			 		pcPrintFrom (psArt),
 			 		pcPrintDate (psArt->date),
-			 		MSGID(psArt),
-			 		REFS(psArt, refs),
+			 		(psArt->msgid ? psArt->msgid : ""),
+			 		(psArt->refs ? psArt->refs : ""),
 			 		0,	/* bytes */
 			 		psArt->lines);
 
@@ -1102,17 +1081,16 @@ vWriteNovFile (psGrp)
 				 		(psArt->part ? psArt->part : psArt->patch));
 				}
 				fprintf (hFp, "\n");
-
-				if (refs)				/* Release any assigned refs */
-					free(refs);
 			}
 		}
 
 		fclose (hFp);
 		chmod (pcNovFile, 0644);
+#if 0		/* I'm pretty sure we don't need to do this at this stage JBF */
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
 		        sort_arts (psGrp->attribute->sort_art_type);
 		}
+#endif
 	}
 	set_real_uid_gid ();
 }
@@ -1435,7 +1413,7 @@ from_comp (p1, p2)
  * If the sort order is _not_  DATE_ASCEND then the sense of the above
  * is reversed.
  */
-int
+static int
 date_comp (p1, p2)
 	t_comptype *p1;
 	t_comptype *p2;
@@ -1485,8 +1463,9 @@ set_article (art)
 	art->name	= (char *) 0;
 	art->date	= 0L;
 	art->xref	= (char *) 0;
-	art->msgid	= (struct t_msgid *) 0;
-	art->refs	= (struct t_msgid *) 0;
+	art->msgid	= (char *) 0;
+	art->refs	= (char *) 0;
+	art->refptr	= (struct t_msgid *) 0;
 	art->lines	= -1;
 	art->archive	= (char *) 0;
 	art->part	= (char *) 0;

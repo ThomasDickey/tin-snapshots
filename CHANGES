@@ -1,3 +1,23 @@
+--unoff BETA release 960716 --
+
+117) Dieter Stueken <stueken@uni-muenster.de>
+     BUG. authorization only checks the first 'few' bytes of the
+          newsservername due to using sizeof(server) instead of
+          strlen(server)
+     ADD. user argument to .newsauth
+     FIX. open.c
+
+116) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code clean up
+     FIX. extern.h, lang.c
+
+115) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. Various improvements to reference thread creation
+          Siblings now sorted correctly
+          Threading on both references and subject
+     BUG. Original References header not preserved properly in xover records
+     FIX. Several supplied patches
+
 --unoff BETA release 960715 --
 
 114) Roland Rosenfeld <roland@spinnaker.rhein.de>

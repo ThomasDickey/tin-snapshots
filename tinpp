@@ -2,8 +2,8 @@
 # $1 is the filename that has been uudecoded
 # This is just a sample script - It is very Linux oriented.
 # TODO:
-#	Use typeset(?) to eliminate case issues
-#	Code for gz composites (eg: .tar.gz) accordingly
+#	Eliminate case issues
+#	Check for gz composites (eg: .tar.gz) accordingly
 #	Option to decide to list and/or extract archives
 #	If there anyway we can grep mailcap to do all this ?
 #

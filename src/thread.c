@@ -563,35 +563,33 @@ thread_catchup:
 case 'a':	/* Very dirty temp. hack - Show threaded tree */
 {
 	char tmp[3];
+	struct t_msgid *ptr;
 	int i=0;
 
-	if (group->attribute->thread_arts >= THREAD_REFS) {
+	if (group->attribute->thread_arts < THREAD_REFS)
+		break;
 
-		struct t_msgid *ptr;
-
-		/*
-		 * The root article may not be the original root of the
-		 * thread (may have expired, for example) - so find it.
-		 * Make sure we don't run haywire if the ptrs are broken
-		 */
-		for (ptr = arts[thread_respnum].msgid; ptr->parent != NULL; ptr = ptr->parent) {
-			if (++i > 100) {
-				fprintf(stderr, "\nCan't find thread root - Infinite loop!\n");
-				break;
-			}
+	/*
+	 * The root article may not be the original root of the
+	 * thread (may have expired, for example) - so find it.
+	 * Make sure we don't run haywire if the ptrs are broken
+	 */
+	for (ptr = arts[thread_respnum].refptr; ptr->parent != NULL; ptr = ptr->parent) {
+		if (++i > 100) {
+			fprintf(stderr, "\nCan't find thread root - Infinite loop!\n");
+			break;
 		}
-
-		if (i <= 100) {
-			fprintf(stderr, "\n");
-			dump_thread(stderr, ptr, 1);
-		}
-
-		puts("Press <RETURN>");
-		fgets(tmp, 2, stdin);
-
-		show_thread_page ();
 	}
 
+	if (i <= 100) {
+		fprintf(stderr, "\n");
+		dump_thread(stderr, ptr, 1);
+	}
+
+	puts("Press <RETURN>");
+	fgets(tmp, 2, stdin);
+
+	show_thread_page ();
 	break;
 }
 #endif
