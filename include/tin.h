@@ -1083,7 +1083,7 @@ struct t_msgid
 #ifdef HAVE_REF_THREADING
 	struct t_msgid *sibling;	/* Next followup to parent */
 	struct t_msgid *child;		/* First followup to this article */
-	int article;				/* index in arts[] or ART_NORMAL */
+	int article;			/* index in arts[] or ART_NORMAL */
 #endif
 };
 
@@ -1192,22 +1192,22 @@ struct t_newsrc
 struct t_group
 {
 	char *name;				/* newsgroup / mailbox name */
-	char *description;		/* text from LIBDIR/newsgroups file */
-	char *spooldir; 		/* groups spool directory */
-	char moderated; 		/* state of group moderation */
+	char *description;			/* text from LIBDIR/newsgroups file */
+	char *spooldir; 			/* groups spool directory */
+	char moderated; 			/* state of group moderation */
 	long count;				/* article number count */
 	long xmax;				/* max. article number */
 	long xmin;				/* min. article number */
-	unsigned int type:4;	/* grouptype - newsgroup / mailbox / savebox */
-	unsigned int inrange:4; /* 1 = group selected via # range command */
+	unsigned int type:4;			/* grouptype - newsgroup / mailbox / savebox */
+	unsigned int inrange:4;			/* 1 = group selected via # range command */
 	unsigned int read_during_session:1;	/* marked TRUE if group entered during session */
 	unsigned int art_was_posted:1;		/* marked TRUE if art was posted to group */
 	int next;				/* next active entry in hash chain */
-	int subscribed; 		/*  subscribed/unsubscribed to group */
-	struct t_newsrc newsrc; /* newsrc bitmap specific info. */
-	struct t_attribute *attribute;	/* group specific attributes */
-	struct t_filters *glob_filter;	/* points to global filter array */
-	struct t_filters *grps_filter;	/* group specific filters */
+	int subscribed; 			/*  subscribed/unsubscribed to group */
+	struct t_newsrc newsrc; 		/* newsrc bitmap specific info. */
+	struct t_attribute *attribute;		/* group specific attributes */
+	struct t_filters *glob_filter;		/* points to global filter array */
+	struct t_filters *grps_filter;		/* group specific filters */
 #ifdef INDEX_DAEMON
 	time_t last_updated_time;		/* last time group dir was changed */
 #endif
@@ -1220,7 +1220,7 @@ struct t_group
 struct t_hashnode
 {
 	char *s;				/* the string we're saving */
-	struct t_hashnode *next;			/* chain for spillover */
+	struct t_hashnode *next;		/* chain for spillover */
 };
 
 /*
@@ -1319,15 +1319,15 @@ struct t_posted
 
 struct t_art_stat
 {
-	int total;	/* total article count */
-	int unread;	/* number of unread articles (does not include seen) arts */
-	int seen;	/* number of seen articles (ART_WILL_RETURN) */
-	int deleted;	/* number of articles marked for deletion (mailgroups) */
-	int inrange;	/* number of articles marked in a range */
+	int total;		/* total article count */
+	int unread;		/* number of unread articles (does not include seen) arts */
+	int seen;		/* number of seen articles (ART_WILL_RETURN) */
+	int deleted;		/* number of articles marked for deletion (mailgroups) */
+	int inrange;		/* number of articles marked in a range */
 	int selected_total;	/* total selected count */
 	int selected_unread;	/* selected and unread */
 	int selected_seen;	/* selected and seen */
-	char art_mark;	/* mark to use for this thread - not used for groups */
+	char art_mark;		/* mark to use for this thread - not used for groups */
 };
 
 /*
@@ -1495,13 +1495,13 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	NEWSGROUPS_FILE 	"newsgroups"
 #	define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
 #	define	REDIRECT_OUTPUT 	"> /dev/null 2>&1"
-#	define	REDIRECT_PGP_OUTPUT "> /dev/null"
+#	define	REDIRECT_PGP_OUTPUT	"> /dev/null"
 #	define	ENV_VAR_MAILER		"MAILER"
 #	define	ENV_VAR_SHELL		"SHELL"
 #	define	EDITOR_FORMAT_ON	"%E +%N %F"
 #	define	MAILER_FORMAT		"%M \"%T\" < %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
-#	define	TMPDIR "/tmp/"
+#	define	TMPDIR			"/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0xff
 #	endif
@@ -1511,7 +1511,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #if !defined(S_ISDIR)
 #	if defined(M_AMIGA)
 #		define st_mode st_attr
-#		define S_ISDIR(m)   (((m) & ST_DIRECT) == ST_DIRECT)
+#		define S_ISDIR(m)	(((m) & ST_DIRECT) == ST_DIRECT)
 #	endif
 #	if defined(WIN32)
 #		define S_ISDIR(m)	((m) & _S_IFDIR)
@@ -1561,6 +1561,13 @@ extern void joinpath (char *result, char *dir, char *file);
 #define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
 
 #define FreeIfNeeded(p) if (p != 0) free((char *)p)
+
+/*
+ * Cast for the (few!) places where we need to examine 8-bit characters w/o
+ * sign-extension, and a corresponding test-macro.
+ */
+#define EIGHT_BIT(ptr) (unsigned char *)ptr
+#define is_EIGHT_BIT(p) (*EIGHT_BIT(p) < 32 || *EIGHT_BIT(p) > 127)
 
 /*
  *  function prototypes & extern definitions
@@ -1653,7 +1660,6 @@ extern	void	Elapsed P_(( char * ));
 extern	void	WalkBack P_(( void ));
 extern	void	show_alloc P_(( void ));
 extern	void	no_leaks P_(( void ));
-extern	void	hist_reclaim P_(( void ));
 #endif	/* DOALLOC */
 
 #ifdef __DECC

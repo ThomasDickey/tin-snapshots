@@ -127,7 +127,6 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		}
 		fclose(fp);
 		if (found) {
-			struct	stat buf;
 			int	error=0;
 			char	dir[PATH_LEN];
 
@@ -148,13 +147,17 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			}
 			strcpy (dir, newsrc_name);
 			*strrchr (dir, '/') = (char) 0;
-			if (stat (newsrc_name, &buf)) {
+			/* FIXME - write a global permssion check routine */
+			if (access (dir, X_OK)) {
 				/* FIXME - put me in lang.c */
-				fprintf (stderr, "File %s does not exists\n",newsrc_name);
+				fprintf (stderr, "No permissions to go into %s\n", dir);
+				error=1;
+			} else if (access (newsrc_name, F_OK)) {
+				/* FIXME - put me in lang.c */
+				fprintf (stderr, "File %s does not exists\n", newsrc_name);
 				error=2;
-			} else if (! S_ISREG (buf.st_mode)) {
-				/* FIXME - put me in lang.c */
-				fprintf (stderr, "File %s is not a regular file\n", newsrc_name);
+			} else if (access (dir, R_OK)) {
+				fprintf (stderr, txt_error_no_read_permission, dir);
 				error=1;
 			} else if (access (newsrc_name, R_OK)) {
 				fprintf (stderr, txt_error_no_read_permission, newsrc_name);

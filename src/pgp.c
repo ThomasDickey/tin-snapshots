@@ -260,7 +260,7 @@ int
 pgp_check_article()
 {
 	FILE *art;
-	char the_article[PATH_LEN], buf[LEN], cmd[LEN], ch;
+	char the_article[PATH_LEN], buf[LEN], cmd[LEN];
 	int pgp_signed = 0, pgp_key = 0;
 
 	if (!pgp_available()) {
@@ -298,26 +298,18 @@ pgp_check_article()
 		Raw(TRUE);
 	}
 	if (pgp_key) {
-		strcpy(buf, "Add key(s) to public keyring?  n");
-		do {
-			wait_message(buf);
-			MoveCursor(cLINES, (int) strlen(buf) - 1);
-			if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
-			ch = 'n';
-		} while (! strchr("YyNn", ch));
-		if (tolower(ch) == 'y') {
-			Raw(FALSE);
-			printf("Yes\n\n");
-			sprintf(cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
-			system(cmd);
-			printf("\n");
-			Raw(TRUE);
-		} else {
-			printf("No\n\n");
+		strcpy (buf, "Add key(s) to public keyring? ");
+		if (prompt_yn (cLINES, buf, FALSE) == 1) {
+			Raw (FALSE);
+			sprintf (cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
+			system (cmd);
+			printf ("\n");
+			Raw (TRUE);
 		}
 	}
-	continue_prompt();
-	set_alarm_clock_on();
+
+	continue_prompt ();
+	set_alarm_clock_on ();
 	return (1);
 }
 #endif /* HAVE_PGP */

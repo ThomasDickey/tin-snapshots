@@ -314,8 +314,10 @@ extern void expand_bitmap P_((struct t_group *group, long min));
 extern void art_mark_read P_((struct t_group *group, struct t_article *art));
 extern void art_mark_unread P_((struct t_group *group, struct t_article *art));
 extern void art_mark_will_return P_((struct t_group *group, struct t_article *art));
+#ifdef HAVE_MH_MAIL_HANDLING
 extern void art_mark_deleted P_((struct t_article *art));
 extern void art_mark_undeleted P_((struct t_article *art));
+#endif
 extern void vSetDefaultBitmap P_((struct t_group *group));
 extern char *getaline P_((FILE *fp));
 /* ./nntplib.c */
@@ -433,17 +435,11 @@ extern void strcpynl P_((char *to, char *from));
 extern unsigned char bin2hex P_((unsigned int x));
 extern char *strcasestr P_((char *haystack, char *needle));
 extern FILE *rfc1521_decode P_((FILE *file));
-extern void rfc1521_encode P_((unsigned char *line, FILE *f, int e));
+extern void rfc1521_encode P_((char *line, FILE *f, int e));
 /* ./rfc1522.c */
-extern void build_base64_rank_table P_((void));
-extern unsigned char hex2bin P_((int x));
 extern int mmdecode P_((char *what, int encoding, int delimiter, char *where, char *charset));
 extern void get_mm_charset P_((void));
 extern char *rfc1522_decode P_((char *s));
-extern int contains_nonprintables P_((unsigned char *w));
-extern int sizeofnextword P_((unsigned char *w));
-extern int mystrcat P_((char **t, char *s));
-extern int rfc1522_do_encode P_((unsigned char *what, unsigned char **where));
 extern char *rfc1522_encode P_((char *s));
 extern void rfc15211522_encode P_((char *filename, char *mime_encoding));
 /* ./save.c */

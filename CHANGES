@@ -1,3 +1,15 @@
+--unoff BETA release 960804 --
+
+140) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup (removed useless casts, changed some functions
+          to static)
+     FIX. several supplied patches
+
+139) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. smarter file permission check for newsrc from newsrctable
+     ADD. minor code cleanup
+     FIX. nrctbl.c, pgp.c
+
 --unoff BETA release 960803 --
 
 138) Urs Janssen <urs@akk.uni-karlsruhe.de>

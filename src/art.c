@@ -195,7 +195,7 @@ debug_print_bitmap (group, NULL);
 		}
 
 #ifndef NNTP_ONLY
-		if ((! read_news_via_nntp) && expired || modified)
+		if (((! read_news_via_nntp) && expired) || modified)
 			vWriteNovFile (group);
 #endif
 		/*

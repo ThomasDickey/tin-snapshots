@@ -105,7 +105,7 @@ vInitVariables ()
 	
 #ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
-	if (((pcPtr = (char *) getlogin ()) != (char *) 0) && strlen (pcPtr)) {
+	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr)) {
 		psPwd = getpwnam (pcPtr);
 	}
 	if (psPwd == (struct passwd *) 0) {	

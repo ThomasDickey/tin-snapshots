@@ -35,33 +35,32 @@
 #define CTRL_R	'\022'
 #define CTRL_N	'\016'
 #define CTRL_P	'\020'
-#define TAB		'\t'
-#define DEL		'\177'
+#define TAB	'\t'
+#define DEL	'\177'
 
-char	*hist_buf[HIST_SIZE];
-int		hist_pos, hist_last;
-static char gl_buf[BUF_SIZE];       /* input buffer */
-static char *gl_prompt;				/* to save the prompt string */
-static int  gl_init_done = 0;		/* -1 is terminal, 1 is batch  */
-static int  gl_width = 0;			/* net size available for input */
-static int  gl_pos, gl_cnt = 0;     /* position and size of input */
+char *hist_buf[HIST_SIZE];
+int hist_pos, hist_last;
+static char gl_buf[BUF_SIZE];	/* input buffer */
+static char *gl_prompt;		/* to save the prompt string */
+static int gl_init_done = 0;	/* -1 is terminal, 1 is batch  */
+static int gl_width = 0;	/* net size available for input */
+static int gl_pos, gl_cnt = 0;	/* position and size of input */
 
-static int      gl_tab P_((char *, int, int *));
-static void		gl_redraw P_((void));
-static void     gl_addchar P_((int));
-static void     gl_newline P_((void));
-static void     gl_fixup P_((int, int));
-static void     gl_del P_((int));
-static void     gl_kill P_((void));
-static void     hist_add P_((void));
-static void     hist_init P_((void));
-static void     hist_next P_((void));
-static void     hist_prev P_((void));
+static int gl_tab P_ ((char *, int, int *));
+static void gl_redraw P_ ((void));
+static void gl_addchar P_ ((int));
+static void gl_newline P_ ((void));
+static void gl_fixup P_ ((int, int));
+static void gl_del P_ ((int));
+static void gl_kill P_ ((void));
+static void hist_add P_ ((void));
+static void hist_init P_ ((void));
+static void hist_next P_ ((void));
+static void hist_prev P_ ((void));
 
-int 	(*gl_in_hook) P_((char *)) = 0;
-int 	(*gl_out_hook) P_((char *)) = 0;
-int 	(*gl_tab_hook) P_((char *, int, int *)) = gl_tab;
-
+int (*gl_in_hook) P_ ((char *)) = 0;
+int (*gl_out_hook) P_ ((char *)) = 0;
+int (*gl_tab_hook) P_ ((char *, int, int *)) = gl_tab;
 
 #if __STDC__
 char *
@@ -72,17 +71,17 @@ getline (prompt, number_only, str)
 	char *prompt;
 	int number_only;
 	char *str;
+
 #endif
 {
 	int c, i, loc, tmp;
 
 	set_xclick_off ();
-	if (! gl_init_done) {
+	if (!gl_init_done) {
 		gl_init_done = 1;
 		hist_init ();
 	}
-
-	if (prompt == (char *) 0) {	
+	if (prompt == (char *) 0) {
 		prompt = "";
 	}
 	gl_buf[0] = 0;		/* used as end of input indicator */
@@ -94,33 +93,33 @@ getline (prompt, number_only, str)
 	my_fputs (prompt, stdout);
 	cursoron ();
 	fflush (stdout);
-	
+
 	if (gl_in_hook) {
 		loc = gl_in_hook (gl_buf);
 		if (loc >= 0)
-		    gl_fixup (0, BUF_SIZE);
+			gl_fixup (0, BUF_SIZE);
 	}
 	if (str != (char *) 0) {
-		for (i=0 ; str[i] ; i++) 
+		for (i = 0; str[i]; i++)
 			gl_addchar (str[i]);
 	}
 	while ((c = ReadCh ()) != EOF) {
-		c &= 0xff;	
-		if (isprint (c) || ( c>=0xa0 && c<=0xff )) {
+		c &= 0xff;
+		if (isprint (c) || (c >= 0xa0 && c <= 0xff)) {
 			if (number_only) {
 				if (isdigit (c) && gl_cnt < 6) {	/* num < 100000 */
-				    gl_addchar (c);
+					gl_addchar (c);
 				} else {
 					ring_bell ();
 				}
 			} else {
-			    gl_addchar (c);
+				gl_addchar (c);
 			}
 		} else {
 			switch (c) {
-				case ESC: 			/* abort */
+				case ESC:	/* abort */
 					return (char *) 0;
-				case '\n': 			/* newline */
+				case '\n':	/* newline */
 				case '\r':
 					gl_newline ();
 					return gl_buf;
@@ -128,11 +127,11 @@ getline (prompt, number_only, str)
 					gl_fixup (-1, 0);
 					break;
 				case CTRL_B:
-					gl_fixup (-1, gl_pos-1);
+					gl_fixup (-1, gl_pos - 1);
 					break;
 				case CTRL_D:
 					if (gl_cnt == 0) {
-					    gl_buf[0] = 0;
+						gl_buf[0] = 0;
 						my_fputc ('\n', stdout);
 						return gl_buf;
 					} else {
@@ -143,7 +142,7 @@ getline (prompt, number_only, str)
 					gl_fixup (-1, gl_cnt);
 					break;
 				case CTRL_F:
-					gl_fixup (-1, gl_pos+1);
+					gl_fixup (-1, gl_pos + 1);
 					break;
 				case CTRL_H:
 				case DEL:
@@ -173,7 +172,7 @@ getline (prompt, number_only, str)
 				default:
 					ring_bell ();
 					break;
-		    }
+			}
 		}
 	}
 	return gl_buf;
@@ -185,26 +184,26 @@ getline (prompt, number_only, str)
  */
 
 #if __STDC__
-static void 
+static void
 gl_addchar (int c)
 #else
-static void 
+static void
 gl_addchar (c)
 	int c;
+
 #endif
 {
-	int  i;
+	int i;
 
 	if (gl_cnt >= BUF_SIZE - 1) {
 		error_message ("getline: input buffer overflow", "");
 		exit (1);
 	}
-	
-	for (i=gl_cnt; i >= gl_pos; i--) {
-		gl_buf[i+1] = gl_buf[i];
+	for (i = gl_cnt; i >= gl_pos; i--) {
+		gl_buf[i + 1] = gl_buf[i];
 	}
 	gl_buf[gl_pos] = c;
-	gl_fixup (gl_pos, gl_pos+1);
+	gl_fixup (gl_pos, gl_pos + 1);
 }
 
 /*
@@ -212,7 +211,7 @@ gl_addchar (c)
  * If line longer than screen, we redraw starting at beginning
  */
 
-static void 
+static void
 gl_newline ()
 {
 	int change = gl_cnt;
@@ -223,11 +222,11 @@ gl_newline ()
 		error_message ("getline: input buffer overflow", "");
 		exit (1);
 	}
-	hist_add ();			/* only adds if nonblank */
+	hist_add ();		/* only adds if nonblank */
 	if (gl_out_hook) {
 		change = gl_out_hook (gl_buf);
 		len = strlen (gl_buf);
-	} 
+	}
 	if (loc > len)
 		loc = len;
 	gl_fixup (change, loc);	/* must do this before appending \n */
@@ -241,20 +240,21 @@ gl_newline ()
  */
 
 #if __STDC__
-static void 
+static void
 gl_del (int loc)
 #else
-static void 
+static void
 gl_del (loc)
 	int loc;
+
 #endif
 {
 	int i;
 
 	if ((loc == -1 && gl_pos > 0) || (loc == 0 && gl_pos < gl_cnt)) {
-		for (i=gl_pos+loc; i < gl_cnt; i++)
-			gl_buf[i] = gl_buf[i+1];
-		gl_fixup (gl_pos+loc, gl_pos+loc);
+		for (i = gl_pos + loc; i < gl_cnt; i++)
+			gl_buf[i] = gl_buf[i + 1];
+		gl_fixup (gl_pos + loc, gl_pos + loc);
 	} else {
 		ring_bell ();
 	}
@@ -263,8 +263,8 @@ gl_del (loc)
 /*
  * delete from current position to the end of line
  */
- 
-static void 
+
+static void
 gl_kill ()
 {
 	if (gl_pos < gl_cnt) {
@@ -279,7 +279,7 @@ gl_kill ()
  * emit a newline, reset and redraw prompt and current input line
  */
 
-static void 
+static void
 gl_redraw ()
 {
 	if (gl_init_done == -1) {
@@ -287,7 +287,7 @@ gl_redraw ()
 		my_fputs (gl_prompt, stdout);
 		gl_pos = 0;
 		gl_fixup (0, BUF_SIZE);
-    }
+	}
 }
 
 /*
@@ -301,30 +301,31 @@ gl_redraw ()
  */
 
 #if __STDC__
-static void 
+static void
 gl_fixup (int change, int cursor)
 #else
-static void 
+static void
 gl_fixup (change, cursor)
 	int change;
 	int cursor;
+
 #endif
 {
-	static int   gl_shift;	/* index of first on screen character */
-	static int   off_right;	/* true if more text right of screen */
-	static int   off_left;	/* true if more text left of screen */
-	int          left = 0, right = -1;		/* bounds for redraw */
-	int          pad;		/* how much to erase at end of line */
-	int          backup;        /* how far to backup before fixing */
-	int          new_shift;     /* value of shift based on cursor */
-	int          extra;         /* adjusts when shift (scroll) happens */
-	int          i;
+	static int gl_shift;	/* index of first on screen character */
+	static int off_right;	/* true if more text right of screen */
+	static int off_left;	/* true if more text left of screen */
+	int left = 0, right = -1;	/* bounds for redraw */
+	int pad;		/* how much to erase at end of line */
+	int backup;		/* how far to backup before fixing */
+	int new_shift;		/* value of shift based on cursor */
+	int extra;		/* adjusts when shift (scroll) happens */
+	int i;
 
-	if (change == -1 && cursor == 0 && gl_buf[0] == 0) {   /* reset */
+	if (change == -1 && cursor == 0 && gl_buf[0] == 0) {	/* reset */
 		gl_shift = off_right = off_left = 0;
 		return;
 	}
-	pad = (off_right) ? gl_width - 1 : gl_cnt - gl_shift;   /* old length */
+	pad = (off_right) ? gl_width - 1 : gl_cnt - gl_shift;	/* old length */
 	backup = gl_pos - gl_shift;
 	if (change >= 0) {
 		gl_cnt = strlen (gl_buf);
@@ -334,93 +335,94 @@ gl_fixup (change, cursor)
 	if (cursor > gl_cnt) {
 		if (cursor != BUF_SIZE)		/* BUF_SIZE means end of line */
 			ring_bell ();
-			cursor = gl_cnt;
+		cursor = gl_cnt;
 	}
 	if (cursor < 0) {
 		ring_bell ();
 		cursor = 0;
 	}
 	if (off_right || (off_left && (cursor < gl_shift + gl_width - SCROLL / 2)))
-		extra = 2;			/* shift the scrolling boundary */
-	else 
+		extra = 2;	/* shift the scrolling boundary */
+	else
 		extra = 0;
 	new_shift = cursor + extra + SCROLL - gl_width;
-    if (new_shift > 0) {
+	if (new_shift > 0) {
 		new_shift /= SCROLL;
 		new_shift *= SCROLL;
-    } else
+	} else
 		new_shift = 0;
-    if (new_shift != gl_shift) {	/* scroll occurs */
+	if (new_shift != gl_shift) {	/* scroll occurs */
 		gl_shift = new_shift;
 		off_left = (gl_shift) ? 1 : 0;
-		off_right = (gl_cnt > gl_shift + gl_width - 1)? 1 : 0;
-        left = gl_shift;
+		off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
+		left = gl_shift;
 		right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
-    } else if (change >= 0) {		/* no scroll, but text changed */
+	} else if (change >= 0) {	/* no scroll, but text changed */
 		if (change < gl_shift + off_left) {
-		    left = gl_shift;
+			left = gl_shift;
 		} else {
-		    left = change;
-		    backup = gl_pos - change;
+			left = change;
+			backup = gl_pos - change;
 		}
-		off_right = (gl_cnt > gl_shift + gl_width - 1)? 1 : 0;
+		off_right = (gl_cnt > gl_shift + gl_width - 1) ? 1 : 0;
 		right = (off_right) ? gl_shift + gl_width - 2 : gl_cnt;
 	}
 	pad -= (off_right) ? gl_width - 1 : gl_cnt - gl_shift;
-	pad = (pad < 0)? 0 : pad;
-	if (left <= right) {		/* clean up screen */
-		for (i=0; i < backup; i++)
+	pad = (pad < 0) ? 0 : pad;
+	if (left <= right) {	/* clean up screen */
+		for (i = 0; i < backup; i++)
 			my_fputc ('\b', stdout);
 		if (left == gl_shift && off_left) {
 			my_fputc ('$', stdout);
 			left++;
 		}
-		for (i=left; i < right; i++)
+		for (i = left; i < right; i++)
 			my_fputc (gl_buf[i], stdout);
 		if (off_right) {
 			my_fputc ('$', stdout);
 			gl_pos = right + 1;
-		} else { 
-			for (i=0; i < pad; i++)	/* erase remains of prev line */
+		} else {
+			for (i = 0; i < pad; i++)	/* erase remains of prev line */
 				my_fputc (' ', stdout);
 			gl_pos = right + pad;
 		}
 	}
-	i = gl_pos - cursor;		/* move to final cursor location */
+	i = gl_pos - cursor;	/* move to final cursor location */
 	if (i > 0) {
 		while (i--)
 			my_fputc ('\b', stdout);
 	} else {
-		for (i=gl_pos; i < cursor; i++)
+		for (i = gl_pos; i < cursor; i++)
 			my_fputc (gl_buf[i], stdout);
 	}
 	fflush (stdout);
 	gl_pos = cursor;
 }
-	
+
 /*
  * default tab handler, acts like tabstops every TABSIZE cols
  */
 
 #if __STDC__
-static int 
+static int
 gl_tab (char *buf, int offset, int *loc)
 #else
-static int 
+static int
 gl_tab (buf, offset, loc)
 	char *buf;
 	int offset;
 	int *loc;
+
 #endif
 {
 	int i, count, len;
-	
+
 	len = strlen (buf);
 	count = TABSIZE - (offset + *loc) % TABSIZE;
-	for (i=len; i >= *loc; i--)
-		buf[i+count] = buf[i];
-	for (i=0; i < count; i++)
-		buf[*loc+i] = ' ';
+	for (i = len; i >= *loc; i--)
+		buf[i + count] = buf[i];
+	for (i = 0; i < count; i++)
+		buf[*loc + i] = ' ';
 	i = *loc;
 	*loc = i + count;
 	return i;
@@ -430,28 +432,27 @@ gl_tab (buf, offset, loc)
  * History functions
  */
 
-static void 
+static void
 hist_init ()
 {
 	int i;
-	
-	for (i=0; i < HIST_SIZE; i++)
+
+	for (i = 0; i < HIST_SIZE; i++)
 		hist_buf[i] = (char *) 0;
 }
 
-
-static void 
+static void
 hist_add ()
 {
 	char *p = gl_buf;
 
-	while (*p == ' ' || *p == '\t')	/* only save nonblank line */
+	while (*p == ' ' || *p == '\t')		/* only save nonblank line */
 		p++;
 	if (*p) {
 		hist_buf[hist_last] = str_dup (gl_buf);
 		hist_last = (hist_last + 1) % HIST_SIZE;
 		if (hist_buf[hist_last]) {	/* erase next location */
-			free(hist_buf[hist_last]);
+			free (hist_buf[hist_last]);
 			hist_buf[hist_last] = (char *) 0;
 		}
 	}
@@ -461,11 +462,11 @@ hist_add ()
 /*
  * loads previous hist entry into input buffer, sticks on first
  */
- 
-static void 
+
+static void
 hist_prev ()
 {
-	int   next;
+	int next;
 
 	next = (hist_pos - 1 + HIST_SIZE) % HIST_SIZE;
 	if (next != hist_last) {
@@ -486,8 +487,8 @@ hist_prev ()
 /*
  * loads next hist entry into input buffer, clears on last
  */
- 
-static void 
+
+static void
 hist_next ()
 {
 	if (hist_pos != hist_last) {
@@ -500,18 +501,7 @@ hist_next ()
 	} else {
 		ring_bell ();
 	}
-	if (gl_in_hook) 
+	if (gl_in_hook)
 		gl_in_hook (gl_buf);
 	gl_fixup (0, BUF_SIZE);
 }
-
-#ifdef	DOALLOC
-void
-hist_reclaim ()
-{
-	int i;
-	
-	for (i=0; i < HIST_SIZE; i++)
-		FreeIfNeeded(hist_buf[i]);
-}
-#endif

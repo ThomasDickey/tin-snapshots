@@ -325,7 +325,7 @@ vParseGrpLine (pcLine, pcGrpName, plArtMax, plArtMin, pcModerated)
 	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
 		pcPtr++;
 	}
-	*plArtMax = (long) atol (pcPtr);
+	*plArtMax = atol (pcPtr);
 
 	/*
 	 * Art min
@@ -336,7 +336,7 @@ vParseGrpLine (pcLine, pcGrpName, plArtMax, plArtMin, pcModerated)
 	while (*pcPtr && (*pcPtr == ' ' || *pcPtr == '\t')) {
 		pcPtr++;
 	}
-	*plArtMin = (long) atol (pcPtr);
+	*plArtMin = atol (pcPtr);
 
 	/*
 	 * 4th field (Moderated/base maildir)
