@@ -447,10 +447,10 @@ strip_double_ngs (ngs_list)
 	char *ngs_list;
 {
 	
-	char	ngroup1[LEN];		/* outer newsgroup to compare       */
-	char	ngroup2[LEN];		/* inner newsgroup to compare       */
-	char	cmplist[LEN];		/* last loops output                */
-	char	newlist[LEN];		/* the newly generated list without */
+	char	ngroup1[HEADER_LEN];	/* outer newsgroup to compare       */
+	char	ngroup2[HEADER_LEN];	/* inner newsgroup to compare       */
+	char	cmplist[HEADER_LEN];	/* last loops output                */
+	char	newlist[HEADER_LEN];	/* the newly generated list without */
 					/* any duplicates of the first nwsg */
 	int	ncnt1;			/* counter for the first newsgroup  */
 	int	ncnt2;			/* counter for the second newsgroup */
@@ -1018,9 +1018,9 @@ parse_from (from_line, eaddr, fname)
 	char*	fname;
 {
 	char	*nonblank = NULL;
-	char	name[LEN];		/* User full name */
+	char	name[HEADER_LEN];	/* User full name */
 	char	*nameptr = name;
-	char	addr[LEN];		/* User e-mail address */
+	char	addr[HEADER_LEN];	/* User e-mail address */
 	char	*addrptr  = addr;
 	char	state = 'A';		/* State = skip whitespace */
 	char	newstate = 'A'; 	/* Next state to process */
@@ -1627,8 +1627,8 @@ strfquote (group, respnum, s, maxsize, format)
 	int maxsize;
 	char *format;
 {
-	extern char note_h_date[PATH_LEN];
-	extern char note_h_messageid[PATH_LEN];
+	extern char note_h_date[HEADER_LEN];
+	extern char note_h_messageid[HEADER_LEN];
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];

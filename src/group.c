@@ -1154,7 +1154,7 @@ group_list_thread:
  
  				flag = 0;
  				for (n=0; n < top_base; n++) {
- 					char sub[LEN];
+ 					char sub[HEADER_LEN];
  					str_lwr (arts[base[n]].subject, sub);
  					if (! wildmat (sub, pat)) {
  						continue;
@@ -1552,7 +1552,7 @@ bld_sline (i)
 #ifndef INDEX_DAEMON
 	int respnum;
 	int n, j;
-	char from[LEN];
+	char from[HEADER_LEN];
 	char new_resps[8];
 	char art_cnt[9];
  	struct t_art_stat sbuf;

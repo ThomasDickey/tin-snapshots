@@ -15,22 +15,22 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-char note_h_from[LEN];			/* From:         */
-char note_h_path[LEN];			/* Path:         */
-char note_h_date[PATH_LEN];		/* Date:         */
-char note_h_subj[LEN];			/* Subject:      */
-char note_h_org[PATH_LEN];		/* Organization: */
-char note_h_newsgroups[LEN];		/* Newsgroups:   */
-char note_h_messageid[PATH_LEN];	/* Message-ID:   */
-char note_h_references[LEN];		/* References:   */
-char note_h_distrib[PATH_LEN];		/* Distribution: */
-char note_h_keywords[LEN];		/* Keywords:     */
-char note_h_summary[LEN];		/* Summary:      */
-char note_h_followup[LEN];		/* Followup-To:  */
-char note_h_mimeversion[PATH_LEN];	/* Mime-Version: */
-char note_h_contenttype[LEN];		/* Content-Type: */
-char note_h_contentenc[LEN];		/* Content-Transfer-Encoding: */
-char note_h_ftnto[LEN];			/* Old X-Comment-To: (Used by FIDO) */
+char note_h_from[HEADER_LEN];		/* From:         */
+char note_h_path[HEADER_LEN];		/* Path:         */
+char note_h_date[HEADER_LEN];		/* Date:         */
+char note_h_subj[HEADER_LEN];		/* Subject:      */
+char note_h_org[HEADER_LEN];		/* Organization: */
+char note_h_newsgroups[HEADER_LEN];	/* Newsgroups:   */
+char note_h_messageid[HEADER_LEN];	/* Message-ID:   */
+char note_h_references[HEADER_LEN];	/* References:   */
+char note_h_distrib[HEADER_LEN];	/* Distribution: */
+char note_h_keywords[HEADER_LEN];	/* Keywords:     */
+char note_h_summary[HEADER_LEN];	/* Summary:      */
+char note_h_followup[HEADER_LEN];	/* Followup-To:  */
+char note_h_mimeversion[HEADER_LEN];	/* Mime-Version: */
+char note_h_contenttype[HEADER_LEN];	/* Content-Type: */
+char note_h_contentenc[HEADER_LEN];	/* Content-Transfer-Encoding: */
+char note_h_ftnto[HEADER_LEN];		/* Old X-Comment-To: (Used by FIDO) */
 
 char *glob_page_group;
 
@@ -46,7 +46,7 @@ int this_resp;
 int doing_pgdn;
 int tabwidth = 8;
 char skip_include;
-char buf2[LEN+50];
+char buf2[HEADER_LEN+50];
 char first_char;
 
 long note_mark[MAX_PAGES];		/* ftells on beginnings of pages */
@@ -745,12 +745,12 @@ show_note_page (group, respnum)
 
 	int below_sig;			/* are we in the signature? */
 
-	char buf3[2*LEN+200];
+	char buf3[2*HEADER_LEN+200];
 	int ctrl_L = FALSE;		/* form feed character detected */
 	int first  = TRUE;
 	int lines;
 	long tmp_pos;
-	static char buf[LEN];
+	static char buf[HEADER_LEN];
 
 	if (beginner_level) {
 		lines = cLINES - (MINI_HELP_LINES - 1);
@@ -922,7 +922,7 @@ show_mime_article (fp, art)
 	FILE	*fp;
 	struct	t_article *art;
 {
-	char	buf[LEN];
+	char	buf[PATH_LEN];
 	FILE	*mime_fp;
 	long	offset;
 
@@ -957,9 +957,9 @@ show_first_header (respnum, group)
 	int respnum;
 	char *group;
 {
-	char buf[LEN];
+	char buf[HEADER_LEN];
 	char tmp[LEN];
-	char ftbuf[LEN];	/* Fido-To-Line */
+	char ftbuf[HEADER_LEN];	/* Fido-To-Line */
 	int whichresp;
 	int x_resp;
 	int pos, i, n;
@@ -1082,7 +1082,7 @@ show_first_header (respnum, group)
 		strcpy (tmp, " ");
 	}
 
-	tmp[LEN-1] = '\0';
+	tmp[sizeof(tmp)-1] = '\0';
 
 	sprintf (buf, "%s  ", arts[respnum].from);
 
@@ -1241,7 +1241,7 @@ art_open (art, group_path)
 	note_h_ftnto[0] = '\0';
 
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
-		buf[8191] = '\0';
+		buf[sizeof(buf)-1] = '\0';
 
 		for (ptr = buf ; *ptr && *ptr != '\n' ; ptr++) {
 			if (((*ptr) & 0xFF) < ' ')
@@ -1252,10 +1252,10 @@ art_open (art, group_path)
 		if (*buf == '\0')
 			break;
 
-		/* Only allow continuations on headers which are of length LEN */
+		/* Only allow continuations on headers which are of length HEADER_LEN */
 		if (*buf == ' ') {
 			if (lasthead != (char *) 0) {
-				if (strlen(lasthead) + strlen(buf) + 1 < LEN) {
+				if (strlen(lasthead) + strlen(buf) + 1 < HEADER_LEN) {
 					strcat(lasthead, "\n");
 					strcat(lasthead, buf);
 				}
@@ -1264,54 +1264,54 @@ art_open (art, group_path)
 		}
 		lasthead = (char *) 0;
 
-  		if (match_header (buf, "Path", note_h_path, LEN)) {
+  		if (match_header (buf, "Path", note_h_path, HEADER_LEN)) {
   			lasthead = note_h_path;
   			continue;
 		}
-		if (match_header (buf, "From", note_h_from, LEN))
+		if (match_header (buf, "From", note_h_from, HEADER_LEN))
 			continue;
-  		if (match_header (buf, "Subject", note_h_subj, LEN))
+  		if (match_header (buf, "Subject", note_h_subj, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Organization", note_h_org, PATH_LEN))
+  		if (match_header (buf, "Organization", note_h_org, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Date", note_h_date, PATH_LEN))
+  		if (match_header (buf, "Date", note_h_date, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Newsgroups", note_h_newsgroups, LEN)) {
+  		if (match_header (buf, "Newsgroups", note_h_newsgroups, HEADER_LEN)) {
   			lasthead = note_h_newsgroups;
   			continue;
 		}
-  		if (match_header (buf, "Message-ID", note_h_messageid, PATH_LEN))
+  		if (match_header (buf, "Message-ID", note_h_messageid, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "References", note_h_references, LEN)) {
+  		if (match_header (buf, "References", note_h_references, HEADER_LEN)) {
 			lasthead = note_h_references;
   			continue;
 		}
-  		if (match_header (buf, "Distribution", note_h_distrib, PATH_LEN))
+  		if (match_header (buf, "Distribution", note_h_distrib, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Followup-To", note_h_followup, LEN)) {
+  		if (match_header (buf, "Followup-To", note_h_followup, HEADER_LEN)) {
   			lasthead = note_h_followup;
   			continue;
 		}
-  		if (match_header (buf, "Keywords", note_h_keywords, LEN)) {
+  		if (match_header (buf, "Keywords", note_h_keywords, HEADER_LEN)) {
   			lasthead = note_h_keywords;
   			continue;
 		}
-  		if (match_header (buf, "Summary", note_h_summary, LEN)) {
+  		if (match_header (buf, "Summary", note_h_summary, HEADER_LEN)) {
 			lasthead = note_h_summary;
   			continue;
 		}
-		if (match_header (buf, "Mime-Version", note_h_mimeversion, PATH_LEN)) {
+		if (match_header (buf, "Mime-Version", note_h_mimeversion, HEADER_LEN)) {
 			continue;
 		}
-		if (match_header (buf, "Content-Type", note_h_contenttype, LEN)) {
+		if (match_header (buf, "Content-Type", note_h_contenttype, HEADER_LEN)) {
 			str_lwr (note_h_contenttype, note_h_contenttype);
 			continue;
 		}
-		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, LEN)) {
+		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, HEADER_LEN)) {
 			str_lwr (note_h_contentenc, note_h_contentenc);
 			continue;
 		}
-		if (match_header (buf, "X-Comment-To", note_h_ftnto, LEN)) {
+		if (match_header (buf, "X-Comment-To", note_h_ftnto, HEADER_LEN)) {
 			continue;
 		}
 	}

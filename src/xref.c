@@ -30,7 +30,7 @@
 int
 overview_xref_support ()
 {
-	char buf[LEN];
+	char buf[HEADER_LEN];
 	char *ptr;
 	FILE *fp;
 	int supported = TRUE;

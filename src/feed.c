@@ -15,9 +15,9 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-extern char note_h_date[PATH_LEN];	/* Date:	*/
-extern char note_h_newsgroups[LEN];	/* Newsgroups:	*/
-extern char note_h_subj[LEN];		/* Subject:	*/
+extern char note_h_date[HEADER_LEN];	/* Date:	*/
+extern char note_h_newsgroups[HEADER_LEN];/* Newsgroups:	*/
+extern char note_h_subj[HEADER_LEN];	/* Subject:	*/
 extern FILE *note_fp;			/* the body of the current article */
 extern int note_end;			/* end of article ? */
 extern int note_page;			/* what page we're on */

@@ -31,7 +31,7 @@ read_newsrc (newsrc_file, allgroups)
 {
 	char *line;
 	char *seq;
-	char grp[PATH_LEN];
+	char grp[HEADER_LEN];
 	FILE *fp;
 	int sub;
 	int i;
@@ -88,7 +88,7 @@ vWriteNewsrcLine (fp,line)
 FILE *fp;
 char *line;
 {
-	char grp[PATH_LEN];
+	char grp[HEADER_LEN];
 	char *seq;
 	int sub;
 	struct t_group *psGrp;
@@ -185,7 +185,7 @@ void
 auto_subscribe_groups (newsrc_file)
 	char *newsrc_file;
 {
-	char *ptr, buf[LEN];
+	char *ptr, buf[HEADER_LEN];
 	FILE *fp_newsrc;
 	FILE *fp_subs;
 	struct t_group *psGrp;
@@ -234,7 +234,7 @@ backup_newsrc ()
 {
 #ifndef INDEX_DAEMON
 	char *line;
-	char buf[PATH_LEN];
+	char buf[HEADER_LEN];
 	FILE *fp_ip, *fp_op;
 	
 	if ((fp_ip = fopen (newsrc, "r")) != (FILE *) 0) {
@@ -276,7 +276,7 @@ subscribe (group, sub_state)
 {
 	char *line;
 	char *seq;
-	char grp[PATH_LEN];
+	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
 	int found = FALSE;
@@ -327,7 +327,7 @@ void
 reset_newsrc ()
 {
 	char *line;
-	char grp[PATH_LEN];
+	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
 	int sub;
@@ -369,7 +369,7 @@ delete_group (group)
 {
 	char *line;
 	char *seq;
-	char grp[PATH_LEN];
+	char grp[HEADER_LEN];
 	FILE *fp;
 	FILE *newfp;
 	int sub;
@@ -851,9 +851,9 @@ pos_group_in_newsrc (group, pos)
 	struct t_group *group;
 	int pos;
 {
-	char buf[PATH_LEN];
-	char sub[PATH_LEN];
-	char unsub[PATH_LEN];
+	char buf[HEADER_LEN];
+	char sub[HEADER_LEN];
+	char unsub[HEADER_LEN];
 	char *newsgroup = NULL;
 	char *line;
 	FILE *fp_in = NULL, *fp_out = NULL;
