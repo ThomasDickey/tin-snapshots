@@ -1760,27 +1760,29 @@ mail_bug_report ()
 	}
 	chmod(nam, 0600);
 
-	sprintf (buf, "%s%s", bug_addr, add_addr);
-	msg_add_header ("To", buf);
+	if( ! use_mailreader_i ) {	/* tin should start editor */
+		sprintf (buf, "%s%s", bug_addr, add_addr);
+		msg_add_header ("To", buf);
 
-	sprintf (subject, "BUG REPORT %s\n", page_header);
-	msg_add_header ("Subject", subject);
+		sprintf (subject, "BUG REPORT %s\n", page_header);
+		msg_add_header ("Subject", subject);
 
-	if (auto_cc) {
-		msg_add_header ("Cc", userid);
-	}
-	if (auto_bcc) {
-		msg_add_header ("Bcc", userid);
-	}
+		if (auto_cc) {
+			msg_add_header ("Cc", userid);
+		}
+		if (auto_bcc) {
+			msg_add_header ("Bcc", userid);
+		}
 
-	if (*default_organization) {
-		msg_add_header ("Organization", default_organization);
+		if (*default_organization) {
+			msg_add_header ("Organization", default_organization);
+		}
+		if (*reply_to) {
+			msg_add_header ("Reply-To", reply_to);
+		}
+		msg_add_x_headers (msg_headers_file);
 	}
-	if (*reply_to) {
-		msg_add_header ("Reply-To", reply_to);
-	}
-	msg_add_x_headers (msg_headers_file);
-
+	
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
 	msg_free_headers ();
@@ -1854,13 +1856,25 @@ mail_bug_report ()
 
 	fprintf (fp, "\nPlease enter bug report/gripe/comment:\n");
 
-	msg_write_signature (fp, TRUE);
+	if( ! use_mailreader_i ) {
+		msg_write_signature (fp, TRUE);
+	}
 #ifdef WIN32
 	putc('\0', fp);
 #endif
 	fclose (fp);
 
-	ch = iKeyPostEdit;
+	if( use_mailreader_i ) {	/* user wants to use his own mailreader */
+		ch = iKeyPostQuit;
+		sprintf (subject, "BUG REPORT %s", page_header);
+		sprintf (mail_to, "%s%s", bug_addr, add_addr);
+		strfmailer (mailer, subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
+		if (! invoke_cmd (buf))
+			error_message (txt_command_failed_s, buf);
+	} else {
+		ch = iKeyPostEdit;
+	}
+	
 	forever {
 		switch (ch) {
 			case iKeyPostEdit:

@@ -1,3 +1,9 @@
+--unoff BETA release 960721 --
+
+122) Daniel Naber <dnaber@pluto.teuto.de>
+     BUG. mail_bugreport() does not care about use_mailreader_i=ON
+     FIX. post.c 
+
 --unoff BETA release 960720 --
 
 121) Daniel Naber <dnaber@pluto.teuto.de>
