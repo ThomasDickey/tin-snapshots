@@ -499,10 +499,10 @@ make_threads (
 
 			/* Should never happen if tree is built properly */
 			if (arts[i].refptr == 0) {
-				fprintf(stderr, "\nError  : art->refptr is NULL\n");
-				fprintf(stderr, "Artnum : %ld\n", arts[i].artnum);
-				fprintf(stderr, "Subject: %s\n", arts[i].subject);
-				fprintf(stderr, "From   : %s\n", arts[i].from);
+				my_fprintf(stderr, "\nError  : art->refptr is NULL\n");
+				my_fprintf(stderr, "Artnum : %ld\n", arts[i].artnum);
+				my_fprintf(stderr, "Subject: %s\n", arts[i].subject);
+				my_fprintf(stderr, "From   : %s\n", arts[i].from);
 			}
 			assert(arts[i].refptr != 0);
 

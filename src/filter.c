@@ -950,7 +950,7 @@ filter_menu (
 		do {
 			sprintf (msg, "%s%c", ptr_filter_quit_edit_save, ch_default);
 			wait_message (msg);
-			MoveCursor (cLINES-1, (int) strlen (ptr_filter_quit_edit_save));
+			MoveCursor (cLINES, (int) strlen (ptr_filter_quit_edit_save));
 			if ((ch = ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (!strchr ("eqs\033", ch));

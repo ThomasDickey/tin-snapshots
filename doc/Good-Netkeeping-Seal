@@ -1,0 +1,433 @@
+
+From: Ron Newman <rnewman@cybercom.net>
+Subject: The "Good Net-Keeping Seal of Approval" for Usenet Software
+Newsgroups: news.software.readers,news.admin.misc,news.admin.policy,alt.usenet.
+offline-reader,comp.os.msdos.mail-news,alt.answers,comp.answers,news.answers
+Followup-To: news.software.readers
+Expires: Wed, 1 Feb 1995 00:00:00 GMT
+Summary: A set of guidelines for writers of Usenet reading and posting
+  programs.  If you follow these guidelines, you'll make your users
+  and the rest of the Usenet community much happier.
+
+[Until I begin posting this to news.answers, this
+ document can be found in:
+
+   http://www.cybercom.net/~rnewman/Good_Netkeeping_Seal
+]
+
+Archive-name: usenet/software/Good-Netkeeping-Seal
+Last-modified: January 9, 1995
+Version: 1.2
+Posting-Frequency: monthly
+
+The "Good Net-Keeping Seal of Approval" for Usenet Software
+by Ron Newman   <rnewman@cybercom.net>
+Revision 1.2 -- January 9, 1995
+
+There's a general perception that Usenet has become "noisier" in the
+last year, as more people have joined it.  There are more blank
+articles, more mangled headers, more "Me too" responses at the end of
+100 lines of quoted text, more followups to inappropriate newsgroups,
+more misattributed quotes, more followup postings that really should
+have been e-mail replies.
+
+This is often blamed on the new users themselves--they are called
+"clueless newbies", unqualified to participate in Usenet because they
+don't know Unix, or use a graphical user interface (GUI), or use an
+off-line news reader, or use a commercial service such as
+America Online or Delphi.
+
+I believe most of this anger is misdirected.  The new users aren't
+really that different from the old-timers.  What IS different is that
+many of the old-timers are using "rn" or its derivatives (such as
+"xrn" and "trn"), while many of the newbies are using TIN, UQWK, AOL,
+or various PC and Mac news readers.  Unfortunately, these programs
+frequently violate assumptions that come naturally to users of
+"rn"-like readers:
+
+   - The user can see all header fields, including "Newsgroups" and
+        "Followup-To".
+   - The user can edit all header fields when following up.
+   - There's a clear difference between "Followup" and "Reply".
+   - Followups preserve the Subject: and References: of the
+        original article, unless the user edits them explicitly.
+   - News software respects "Followup-To" and "Reply-To"
+        specifications.
+
+Newer software should be an improvement over an ancient program like
+"rn".  Instead, much of it instead looks crippled or broken to the
+"rn" user.
+
+The Usenet community can deal with this problem by
+establishing a "Good Net-keeping Seal of Approval" for Usenet reading
+and posting software.  This "Seal" would certify that the software
+complies with certain minimum standards, such as those that listed
+below.
+
+A group of volunteers will test all putative Usenet software to
+determine whether it deserves the "Seal".  We'll arrange to
+periodically post a list of all tested software to
+news.software.readers, alt.usenet.offline-reader,
+and other appropriate newsgroups. This periodic posting will
+list both compliant and non-compliant news programs;
+for non-compliant programs, it will include a list of all violations
+of the standards. My hope is that this will induce the authors of
+non-compliant software to bring their programs up to
+"Good Net-Keeping Seal" standards.
+
+Here are the standards I propose to use for granting the "Good
+Net-Keeping Seal" to a Usenet news program.  In the spirit of
+RFC 1123 and Henry Spencer's "son of RFC 1036" proposal, I've capitalized
+the words "MUST", "MUST NOT", and "DO NOT" to indicate absolute
+requirements, while using the word "SHOULD" for things that are
+merely a Very Good Idea.
+
+1) Display all essential header information
+
+When displaying a news article, it MUST by default show the user
+certain information that is found in the article's header.  The
+information need not be displayed as actual RFC-1036 header lines, but
+it MUST be shown to the user in some form.
+
+  a) The author of the article (its From: header line)
+
+  b) The article's Subject.  At least the first 70 characters
+ following the "Subject: " string MUST be displayed.
+
+  c) The list of newsgroups the article was posted to.  This MUST be
+displayed in full, never truncated.  This list need not be displayed
+if it has only one element, provided that the software displays the
+name of the newsgroup that the user is currently reading.
+
+  d) The article's Followup-To list, if this is different from the
+Newsgroups list.  This MUST be displayed in full, never truncated.
+
+  e) The article's Reply-To, if this is different from the From:
+specification.
+
+If the required information does not fit fully on the display,
+the software MAY display only the initial part of the information,
+provided that it offers the user a scrollbar or other device to view
+the remainder.
+
+The software MAY allow the user to re-configure it so as to turn
+off these displays, but if the user has not done this, all of the required
+information MUST be displayed.
+
+Rationale: The user should know, without having to make a special
+effort, who sent the article she is reading, how to reply to it via
+e-mail, what discussion groups it was posted to, and whether the
+author of the message wants to narrow or redirect the location of
+future discussion.
+
+
+2) Provide clear, separate commands for new posting, followup, and E-mail reply
+
+The software MUST provide separate, clearly distinguished commands to
+do each of the following:
+
+a) Post a new article, unrelated to any existing one, whose Subject is
+to be supplied by the user, and which has an empty or missing
+References: header line.
+
+b) Post a followup article, with Subject, Newsgroups, and References
+header lines derived appropriately from the original article (see #5,
+#6, and #7 below)
+
+c) Reply by e-mail, with Subject and To header lines derived
+appropriately from the original article (see #5 and #8 below)
+
+Software that uses the English language is strongly encouraged to
+include these phrases -- "Post to newsgroup", "Followup to newsgroup",
+and "Reply by e-mail" (or "Reply to sender" or "Reply to author")
+ -- in menus, on-line help, and written documentation.  It SHOULD
+ avoid using other verbs such as "Send" or "Respond" whose meaning
+is not evident to the user.  An ordinary, untrained user SHOULD be able
+to easily pick the correct command.
+
+Rationale: Users who post followups when they should send e-mail
+replies, or vice versa, seem to be an endemic problem.  They are
+almost always using software that doesn't make the difference clear,
+or doesn't even provide both commands.
+
+
+3) Cross-posting must be implemented
+
+When creating either a new article or a followup, the user MUST be
+allowed to specify multiple newsgroups, and the software MUST
+cross-post (not multi-post) to them if more than one is specified.
+
+Rationale: Cross-posting is an essential feature of Usenet.  If the
+software cannot cross-post, then its users will multi-post instead.
+
+
+4) Users must be able to change essential headers in new articles
+   and followups
+
+When creating either a new article or a followup, the software MUST
+allow the user to edit the "Subject", "Newsgroups", "Followup-To", and
+"Reply-To" specifications.  The user MUST be able to edit these at any
+time during composition of the article; she MUST NOT be limited to
+specifying them only before, or after, editing the article's text.
+
+The software MUST allow the user to specify a new Subject field of at
+least 70 characters, not including the string "Subject: " itself.  It
+is better not to impose any limit at all, other than the overall
+son-of-1036 limit of 1000 characters per header line.
+
+The software MUST allow the user to specify "Followup-To: poster",
+which tells readers of the article that the user prefers e-mail replies
+rather than followups to the newsgroup.
+
+This does not mean that the software must present raw RFC-1036 headers
+to the user, or that the headers and body must be an indivisible unit
+of editable text.  A graphical user interface that presents each of
+these as an editable field in a form will meet the requirement.
+
+Rationale: Topics drift as a discussion progresses, and users need the
+ability to change the Subject header to reflect the drift.  Similarly,
+a user may determine that the discussion no longer belongs in some of
+the places that it started, or that its continuation needs to go
+elsewhere.  The software must not impede the user's ability to make
+these judgments, possibly during the composition of her followup
+article.  It's not acceptable to have users who respond to "Please
+direct followups appropriately" with "I can't; the software won't let
+me."
+
+
+5) Followups and e-mail replies must contain correct Subject headers
+
+When creating either a followup article or an e-mail reply, the
+software MUST create an initial header which
+
+  a) Prepends the four characters "Re: " to the "Subject:"
+       if and only if "Re: " is not already present. Note that this contains
+       an upper-case "R", a lower-case "e", and a trailing space.
+       DO NOT prepend non-standard prefixes such as "Re(2): " .
+
+  b) Preserves the *entire* "Subject" line of the original article. DO NOT
+       chop it off at 20 or 25 or even 80 characters.  DO NOT append spaces or
+       any other characters to the end.  DO NOT change the case of
+       any character in the original Subject line; in particular,
+       DO NOT change the Subject line to all-upper-case or all-lower-case.
+
+(The user may later change the Subject, of course; see #4 above.)
+
+Exception: The software MAY try to compensate for other people's broken
+software by stripping off such non-standard prefixes as "Re(2): ",
+"Re:" (no space), "RE: ", "re: ", or "Re: Re: " and replacing them with "Re: ".
+
+Rationale: These things should be obvious, but many authors of news
+software don't seem to understand the relevant sections of RFC 1036.
+Truncated Subject: lines, especially when gratuitous non-ASCII
+characters are also thrown in, are a major annoyance for users and can
+make threading difficult or impossible.
+
+
+6) Followups must be directed to the correct newsgroups
+
+When creating a followup article, the software MUST create an initial
+header in which the "Newsgroups:" field is initialized to the
+original article's "Followup-To:", if one was provided, or
+"Newsgroups:", if it wasn't.  (The user may later change this field,
+of course; see #4 above.)
+
+If the original article's Followup-To header is "Followup-to: poster",
+the software MUST tell the user that the original poster requested an
+e-mail reply, and SHOULD offer the user the option to send an e-mail
+reply instead of posting a followup.
+
+Rationale: This is basic RFC 1036 compliance.  Software that fails to
+meet this requirement makes its users look at best foolish or
+incompetent, and at worst willfully unresponsive to the wishes of
+other Usenet users.
+
+
+7) Followups must contain a valid References: header
+
+When creating a followup, the software MUST create a References:
+header line that contains, as its last element, the Message-ID of the
+original article.  An individual Message-ID MUST never be truncated.
+
+The software SHOULD include at least three additional
+message-IDs from the original article's References header as well, if
+they are available.  Try to conform to the spirit of "son-of-1036",
+which states that
+
+          Followup agents SHOULD not shorten References  headers.   If
+          it  is absolutely necessary to shorten the header, as a des-
+          perate last resort, a followup agent MAY do this by deleting
+          some  of  the  message IDs.  However, it MUST not delete the
+          first message ID, the last three message IDs (including that
+          of  the immediate precursor), or any message ID mentioned in
+          the body of the followup.
+
+Rationale: Threaded news-readers depend on References: fields to do
+their magic.
+
+
+8) E-mail replies must be directed to the correct address
+
+When creating an e-mail reply, the software MUST create an initial
+header in which the "To:" line is initialized to the original
+article's "Reply-to:", if one was provided, or "From:", if it wasn't.
+(The user may later change this field, of course; see #4 above.)
+
+Rationale: See #6 above.
+
+
+9) Quotation and attribution must be possible
+
+When the users requests a followup or an e-mail reply, the software
+MUST provide some method for including quoted text from the original
+article.  This quoted text MUST be clearly set off in some way--either
+by indenting it, or by prepending each line with one or more
+identifiable characters.
+
+If this is a followup (as opposed to an e-mail reply), the quoted text
+MUST be preceded by an "attribution line" identifying the author of
+the text that is being quoted., and preferably also the Message-ID of
+the article containing that text.  (The user may decide to delete this
+attribution line or to configure it away, but it MUST be there by
+default.)
+
+Rationale: The ability to easily quote text is essential for users who
+want to provide a proper context for their followups and e-mail
+replies.  Software that provides attribution lines without quoting
+ability, or that fails to distinctively set off quoted text from
+original text, is a major cause of "I didn't say that!"
+misunderstandings.
+
+
+10) Subject header is mandatory
+
+When creating a new article, the software MUST require the user to
+provide a non-empty Subject.  It MUST NOT post an article without a
+Subject header or with an empty Subject header.  It MUST NOT silently
+add a "Subject: <None>" header because the user didn't specify a
+Subject.  It MUST allow the user to change the Subject header at any
+time while editing the main text of the article (see #8 above).
+
+Rationale: Most news readers allow users to selectively read articles
+based on the Subject header.  An article without a Subject will
+probably be ignored by most readers, and it's no service to the user
+to allow posting of such an article.
+
+
+11) Must provide valid From: header
+
+When creating either a new article or a followup, the software MUST
+initialize the "From:" header to a syntactically valid e-mail address,
+which includes a fully-qualified domain name (FQDN).
+
+This requirement must be met regardless of whether the software
+  (a) creates the "From:" header when it first creates the article to be
+        edited by the user, or
+  (b) adds the "From: " header automatically after the user finishes
+        editing the article and requests that  it be submitted.
+
+If the software allows the user to edit the "From:" header, it
+is encouraged, but not required, to check that the user supplied a
+syntactically valid address.
+
+If the software is unable to create such an address -- maybe because it
+was built with incorrect configuration parameters, or some essential
+parameter is unavailable at runtime -- then it MUST NOT
+allow posting at all, unless it can obtain a syntactically valid
+e-mail address from the user.
+
+If feasible, the software SHOULD try to guarantee that this
+address actually belongs to the person using the software, and
+actually accepts e-mail.
+
+Rationale:  Invalid e-mail addresses make e-mail replies impossible.
+TIN seems to be a primary offender here--I've seen "name@",
+"name@site", "name@.domain", and other invalid From headers from TIN users.
+The string "NoSubDomain.NoDomain" probably ought to be explicitly
+disallowed as well.
+
+
+12) Must allow users to cancel their own articles (and no others!)
+
+Any software that posts news MUST provide a command that the user can
+invoke to cancel her own articles.  This command MUST NOT allow the
+user to cancel articles written by other people.  If the software uses
+the English language, the text of the command SHOULD include the word
+"cancel", rather than non-standard verbs such as "delete".
+
+Rationale: People make mistakes and need the ability to correct them.
+Usenet provides "cancel" for a good reason.  However, software should not
+encourage users to abuse the net, either intentionally or accidentally, by
+sending unauthorized cancels.
+
+
+13) Try to respect the 80-character line-length convention
+
+Any line breaks shown to the user while she is editing her article
+SHOULD still be present when the article is actually posted to the
+Net.  The software SHOULD NOT show the user four 75-character lines
+while actually posting a single 300-character line.  Nor should it
+show the user a series of 100-character lines while actually posting
+alternating lines of 80 and 20 characters each.
+
+It's also a good idea to warn the user if the article she is
+about to post contains non-header lines longer than 80 characters.
+The software SHOULD NOT prevent the posting, but SHOULD ask
+whether the user wants to re-edit or post anyway.
+
+If the news software uses an external editor, the default
+editor SHOULD be one that conforms to the above.
+
+Rationale: Articles with long lines are unreadable to many users.
+Articles with alternating 80/20 lines aren't any better.
+
+(I've refrained from using MUST in this one, because I don't want
+ to over-specify the relationship between text editing and news
+ software.  I'd appreciate suggestions on how to tighten up this
+ requirement, but they need to take into account the diversity of
+ environments that Usenet software currently runs in.)
+
+
+14) Try to prevent obvious user errors
+
+Posting software SHOULD prevent the user from posting
+a blank article, or at least warn the user that she is trying
+to do this.
+
+Posting software SHOULD prevent the user from posting an article that
+consists entirely of quoted text, or at least warn the user that she
+is trying to do this.
+
+Rationale: Users who do either of these things almost never do them
+on purpose.   They are usually confused by unfamiliar new software.
+
+(I've refrained from using MUST here as well, mostly because I
+ don't think very much current software does either of these things,
+ and I don't want to require them in order to get the Seal.  But I'd
+ like to encourage future programmers to do them.)
+
+
+Please remember that this is a set of _minimum_ guidelines to guarantee
+that a given piece of software interacts properly with the rest of
+the Usenet world.  It is not a general "wish list" of everyone's
+favorite features.  I have deliberately avoided taking a position on
+certain controversial issues--for example, whether the user should
+be allowed to edit the "Sender" header, or whether news software should
+prohibit posting an article that has more quoted text than new text.
+
+In addition to these guidelines, anyone writing Usenet software
+should pay careful attention to these two documents:
+
+    RFC 1036, "Standard for Interchange of USENET Messages",
+      by M. Horton and R. Adams. ftp://ftp.internic.net/rfc/rfc1036.txt
+
+    The proposed "Son of 1036", "News Article Format and
+       Transmission", by Henry Spencer.
+       ftp://ftp.zoo.toronto.edu/pub/news.txt.Z (also news.ps.Z)
+
+
+My hope is that a voluntary committee can be formed, respected by most
+people on the Net, that reviews Usenet software and decides whether it
+deserves the "Good Net-Keeping Seal of Approval."  People who use
+broken software that does not have the Seal will be strongly
+encouraged to switch to software that does.

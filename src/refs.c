@@ -317,7 +317,7 @@ _get_references(
 
 #ifdef DEBUG_REFS
 		if (depth > MAX_REFS) {
-			fprintf(stderr, "Warning: Too many refs near to %s. Truncated\n", refptr->txt);
+			my_fprintf(stderr, "Warning: Too many refs near to %s. Truncated\n", refptr->txt);
 			sleep(2);
 		}
 #endif
@@ -397,19 +397,19 @@ dump_msgids(void)
 	int i;
 	struct t_msgid *ptr;
 
-	fprintf(stderr, "Dumping...\n");
+	my_fprintf(stderr, "Dumping...\n");
 
 	for (i=0; i<MSGID_HASH_SIZE; i++) {
 
 		if (msgids[i] != NULL) {
 
-			fprintf(stderr, "node %d", i);
+			my_fprintf(stderr, "node %d", i);
 
 			for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next) {
-				fprintf(stderr, " -> %s", ptr->txt);
+				my_fprintf(stderr, " -> %s", ptr->txt);
 			}
 
-			fprintf(stderr, "\n");
+			my_fprintf(stderr, "\n");
 
 		}
 	}
@@ -528,7 +528,7 @@ dump_msgid_thread(
 	struct t_msgid *ptr,
 	int level)
 {
-	fprintf(stderr, "%*s %s (%d)\n", level*3, "   ", ptr->txt, ptr->article);
+	my_fprintf(stderr, "%*s %s (%d)\n", level*3, "   ", ptr->txt, ptr->article);
 
 	if (ptr->child != NULL)
 		dump_msgid_thread(ptr->child, level+1);
@@ -545,7 +545,7 @@ dump_msgid_threads(void)
 	int i;
 	struct t_msgid *ptr;
 
-	fprintf(stderr, "Dump started.\n\n");
+	my_fprintf(stderr, "Dump started.\n\n");
 
 	for (i=0; i<MSGID_HASH_SIZE; i++) {
 		if (msgids[i] != NULL) {
@@ -554,13 +554,13 @@ dump_msgid_threads(void)
 
 				if (ptr->parent == NULL) {
 					dump_msgid_thread(ptr, 1);
-					fprintf(stderr, "\n");
+					my_fprintf(stderr, "\n");
 				}
 			}
 		}
 	}
 
-	fprintf(stderr, "Dump complete.\n\n");
+	my_fprintf(stderr, "Dump complete.\n\n");
 }
 #endif
 
@@ -703,10 +703,10 @@ thread_by_reference(void)
 	}
 
 #ifdef DEBUG_REFS
-	fprintf(stderr, "Full dump of threading info...\n");
+	my_fprintf(stderr, "Full dump of threading info...\n");
 
 	for (i=0 ; i < top ; i++) {
-		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
+		my_fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
 			(arts[i].refptr->parent)  ? arts[i].refptr->parent->article : -2,
 			(arts[i].refptr->sibling) ? arts[i].refptr->sibling->article : -2,
 			(arts[i].refptr->child)   ? arts[i].refptr->child->article : -2,

@@ -490,9 +490,6 @@ extern char *get_uaf_fullname();
  * DEFAULT_SHELL "/usr/bin/sh"
  * DEFAULT_MAILBOX "/var/mail/"
  */
-#	ifdef __hpux
-#		define DEFAULT_MAILER	"/usr/lib/sendmail"
-#	endif
 
 #	ifndef DEFAULT_SHELL
 #		define	DEFAULT_SHELL	"/bin/sh"
@@ -501,11 +498,7 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_MAILBOX "/usr/mail" 
 #	endif
 #	ifndef DEFAULT_MAILER
-/*
-** sure that we want to fall-back to /bin/mail instead of
-** /usr/lib/sendmail on SysV-style systems?
-*/
-#		define	DEFAULT_MAILER	"/bin/mail"
+#		define	DEFAULT_MAILER	"/usr/lib/sendmail"
 #	endif
 #	ifndef DEFAULT_PRINTER
 #		define	DEFAULT_PRINTER "/usr/bin/lp"

@@ -243,15 +243,15 @@ InitScreen (void)
 	char the_termname[40], *p;
 
 	if ((p = getenv ("TERM")) == (char *) 0) {
-		fprintf (stderr, txt_no_term_set, progname);
+		my_fprintf (stderr, txt_no_term_set, progname);
 		return (FALSE);
 	}
 	if (strcpy (the_termname, p) == NULL) {
-		fprintf (stderr, txt_cannot_get_term, progname);
+		my_fprintf (stderr, txt_cannot_get_term, progname);
 		return (FALSE);
 	}
 	if (tgetent (_terminal, the_termname) != 1) {
-		fprintf (stderr, txt_cannot_get_term_entry, progname);
+		my_fprintf (stderr, txt_cannot_get_term_entry, progname);
 		return (FALSE);
 	}
 
@@ -290,19 +290,19 @@ InitScreen (void)
 	InitWin ();
 
 	if (!_clearscreen) {
-		fprintf (stderr, txt_no_term_clearscreen, progname);
+		my_fprintf (stderr, txt_no_term_clearscreen, progname);
 		return (FALSE);
 	}
 	if (!_moveto) {
-		fprintf (stderr, txt_no_term_cursor_motion, progname);
+		my_fprintf (stderr, txt_no_term_cursor_motion, progname);
 		return (FALSE);
 	}
 	if (!_cleartoeoln) {
-		fprintf (stderr, txt_no_term_clear_eol, progname);
+		my_fprintf (stderr, txt_no_term_clear_eol, progname);
 		return (FALSE);
 	}
 	if (!_cleartoeos) {
-		fprintf (stderr, txt_no_term_clear_eos, progname);
+		my_fprintf (stderr, txt_no_term_clear_eos, progname);
 		return (FALSE);
 	}
 	if (_lines == -1)
@@ -996,6 +996,7 @@ ReadCh (void)
 	char ch;
 #endif /* READ_CHAR_HACK */
 
+	fflush(stdout);
 #ifdef READ_CHAR_HACK
 #undef getc
 	while ((result = getc(stdin)) == EOF) {

@@ -367,7 +367,7 @@ CF_ARG_DISABLE(piping,
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to unique tmp-files by appending .pid)
-CF_ARG_DISABLE(color,
+CF_ARG_DISABLE(append-pid,
         [  --disable-append-pid    disable appending .pid to tmp-files],,
         [AC_DEFINE(APPEND_PID)])
 AC_MSG_RESULT($enableval)

@@ -204,6 +204,7 @@ constext txt_help_ck[] = "c K\t  mark thread as read (K = don't confirm) and ret
 constext txt_help_col_back[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_from[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_head[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_col_newsheaders[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_help[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_invers_fg[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_invers_bg[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -497,6 +498,7 @@ constext txt_opt_catchup_read_groups[] = "Catchup read groups when quitting  : "
 constext txt_opt_col_back[] = "Standard background color          : ";
 constext txt_opt_col_from[] = "Color of sender (From:)            : ";
 constext txt_opt_col_head[] = "Color of article header lines      : ";
+constext txt_opt_col_newsheaders[] = "Color of actual news header fields : ";
 constext txt_opt_col_help[] = "Color of help text                 : ";
 constext txt_opt_col_invers_fg[] = "Color for inverse text (foreground): ";
 constext txt_opt_col_invers_bg[] = "Color for inverse text (background): ";
@@ -620,6 +622,7 @@ constext txt_tinrc_catchup_read_groups[] = "# if ON ask user if read groups shou
 constext txt_tinrc_col_back[] = "# Standard-Background-Color\n";
 constext txt_tinrc_col_from[] = "# Color of sender (From:)\n";
 constext txt_tinrc_col_head[] = "# Color of headerlines\n";
+constext txt_tinrc_col_newsheaders[] = "# Color of actual news header fields\n";
 constext txt_tinrc_col_help[] = "# Color of help pages\n";
 constext txt_tinrc_col_invers_bg[] = "# Color of background for inverse text\n";
 constext txt_tinrc_col_invers_fg[] = "# Color of foreground for inverse text\n";
@@ -746,6 +749,18 @@ constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups an
 # '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n";
 constext txt_tinrc_reread_active_file_secs[] = "# time interval in seconds between rereading the active file\n";
 constext txt_tinrc_save_to_mmdf_mailbox[] = "# if ON save mail to a MMDF style mailbox (default is normal mbox format)\n";
+constext txt_tinrc_news_headers_to_display[] = "# Which news headers you wish to see. If you want to see _all_ the headers,\n\
+# place an '*' as this value. This is the only way a wildcard can be used.\n\
+# If you enter 'X-' as the value, you will see all headers begining with\n\
+# 'X-' (like X-Alan or X-Pape). You can list more than one by delimiting with\n\
+# spaces. Not defining anything turns off this option.\n";
+constext txt_tinrc_news_headers_to_not_display[] = "# Same as 'news_headers_to_display' except it denotes the opposite.\n\
+# An example of using both options might be if you thought X- headers were\n\
+# A Good Thing(tm), but thought Alan and Pape were miscreants...well then you\n\
+# would do something like this:\n\
+# news_headers_to_display=X-\n\
+# news_headers_to_not_display=X-Alan X-Pape\n\
+# Not defining anything turns off this option.\n";
 constext txt_tinrc_show_author[] = "# part of from field to display 0) none 1) address 2) full name 3) both\n";
 constext txt_tinrc_show_description[] = "# if ON show group description text after newsgroup name at\n\
 # group selection level\n";

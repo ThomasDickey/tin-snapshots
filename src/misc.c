@@ -64,9 +64,9 @@ asfail (
 	int	line,
 	const char *cond)
 {
-	fprintf (stderr, "%s: assertion failure: %s (%d): %s\n",
+	my_fprintf (stderr, "%s: assertion failure: %s (%d): %s\n",
 		progname, file, line, cond);
-	fflush (stderr);
+	my_fflush (stderr);
 
 	/*
 	 * create a core dump
@@ -413,16 +413,16 @@ tin_done (
 	free_all_arrays ();
 	if (!cmd_line)
 		ClearScreen ();
-	EndWin ();
-	Raw (FALSE);
-
-	cleanup_tmp_files ();
-
 #ifdef HAVE_COLOR
 	use_color=FALSE;
 	EndInverse();
 	ClearScreen();
 #endif
+
+	EndWin ();
+	Raw (FALSE);
+
+	cleanup_tmp_files ();
 
 #ifdef DOALLOC
 	no_leaks();	/* free permanent stuff */
@@ -666,7 +666,7 @@ invoke_cmd (
 	ret = system (nam);
 	signal (SIGCHLD, suspchld);
 #else
-# if defined(SIGCHLD) && !defined(RS6000) && !defined(__DECC)
+# if defined(SIGCHLD) && !defined(RS6000) && !defined(__DECC) && !defined(OSF1)
 	system (nam);
 	ret = system_status;
 # else
@@ -710,7 +710,7 @@ draw_percent_mark (
 
 	percent = cur_num * 100 / max_num;
 	sprintf (buf, "%s(%d%%) [%ld/%ld]", txt_more, percent, cur_num, max_num);
-	MoveCursor (cLINES-1, (cCOLS - (int) strlen (buf))-(1+BLANK_PAGE_COLS));
+	MoveCursor (cLINES, (cCOLS - (int) strlen (buf))-(1+BLANK_PAGE_COLS));
 	StartInverse ();
 	my_fputs (buf, stdout);
 	my_flush ();
@@ -1253,6 +1253,61 @@ show_color_status (void)
 int
 get_arrow_key (void)
 {
+#if USE_CURSES
+#if NCURSES_MOUSE_VERSION
+	MEVENT my_event;
+#endif
+	int ch = getch();
+	int code = KEYMAP_UNKNOWN;
+
+	switch (ch) {
+		case KEY_UP:
+			code = KEYMAP_UP;
+			break;
+		case KEY_DOWN:
+			code = KEYMAP_DOWN;
+			break;
+		case KEY_LEFT:
+			code = KEYMAP_LEFT;
+			break;
+		case KEY_RIGHT:
+			code = KEYMAP_RIGHT;
+			break;
+		case KEY_NPAGE:
+			code = KEYMAP_PAGE_DOWN;
+			break;
+		case KEY_PPAGE:
+			code = KEYMAP_PAGE_UP;
+			break;
+		case KEY_HOME:
+			code = KEYMAP_HOME;
+			break;
+		case KEY_END:
+			code = KEYMAP_END;
+			break;
+#ifdef NCURSES_MOUSE_VERSION
+		case KEY_MOUSE:
+			if (getmouse(&my_event) != ERR) {
+				switch (my_event.bstate) {
+					case BUTTON1_CLICKED:
+						xmouse = MOUSE_BUTTON_1;
+						break;
+					case BUTTON2_CLICKED:
+						xmouse = MOUSE_BUTTON_2;
+						break;
+					case BUTTON3_CLICKED:
+						xmouse = MOUSE_BUTTON_3;
+						break;
+				}
+				xcol = my_event.x; 	/* column */
+				xrow = my_event.y; 	/* row */
+				code = KEYMAP_MOUSE;
+			}
+			break;
+#endif
+	}
+	return code;
+#else
 	int ch;
 	int ch1;
 
@@ -1357,6 +1412,7 @@ get_arrow_key (void)
 		default:
 			return KEYMAP_UNKNOWN;
 	}
+#endif
 }
 
 /*
@@ -2191,9 +2247,9 @@ stat_file (
 void
 vPrintBugAddress (void)
 {
-	fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s%s\n",
+	my_fprintf (stderr, "%s %s %s [%s]: send a DETAILED bug report to %s%s\n",
 		progname, VERSION, RELEASEDATE, OS, BUG_REPORT_ADDRESS, add_addr);
-	fflush (stderr);
+	my_fflush (stderr);
 }
 
 /*

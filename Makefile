@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970304
+PVER		= 970306
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -27,6 +27,7 @@ HFILES	= \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tcurses.h \
 	$(INCDIR)/tin.h \
+	$(INCDIR)/tnntp.h \
 	$(INCDIR)/version.h \
 	$(INCDIR)/win32.h \
 	$(INCDIR)/win32tcp.h
@@ -102,6 +103,7 @@ AMIGA	=\
 DOC	= \
 	$(DOCDIR)/CHANGES \
 	$(DOCDIR)/DEBUG_REFS \
+	$(DOCDIR)/Good-Netkeeping-Seal \
 	$(DOCDIR)/INSTALL \
 	$(DOCDIR)/TODO \
 	$(DOCDIR)/WHATSNEW \

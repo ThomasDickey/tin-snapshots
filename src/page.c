@@ -47,6 +47,7 @@ int rotate;				/* 0=normal, 13=rot13 decode */
 int this_resp;
 int doing_pgdn;
 int tabwidth = 8;
+int show_all_headers = 0;			/* CTRL-H with headers specified -- swp */
 char skip_include;
 char buf2[HEADER_LEN+50];
 char first_char;
@@ -119,6 +120,11 @@ restart:
 		}
 		return GRP_NOREDRAW;	/* special retcode to stop redrawing screen */
 	} else {
+		if (num_headers_to_display || num_headers_to_not_display) {
+			note_page = 0;
+			note_end = FALSE;
+			fseek(note_fp, 0L, 0);
+		}
 		show_note_page (group->name, respnum);
 	}
 
@@ -360,7 +366,9 @@ page_goto_next_unread:
 					note_page = 0;
 					note_end = FALSE;
 					fseek(note_fp, 0L, 0);
+					show_all_headers = 1;
 					show_note_page (group->name, respnum);
+					show_all_headers = 0;
 				}
 				break;
 
@@ -435,7 +443,12 @@ begin_of_article:
 				} else {
 					note_page = 0;
 					note_end = FALSE;
-					fseek (note_fp, note_mark[0], 0);
+					/* so we get any headers -- swp */
+					if (num_headers_to_display || num_headers_to_not_display) {
+						fseek (note_fp, 0L, 0);
+					} else {
+						fseek (note_fp, note_mark[0], 0);
+					}
 					show_note_page (group->name, respnum);
 				}
 				break;
@@ -475,7 +488,12 @@ page_up:
 					} else {
 						note_page -= 2;
 						note_end = FALSE;
-						fseek (note_fp, note_mark[note_page], 0);
+						/* to get any headers -- swp */
+						if (note_page <= 1 && (num_headers_to_display || num_headers_to_not_display)) {
+							fseek (note_fp, 0L, 0);
+						} else {
+							fseek (note_fp, note_mark[note_page], 0);
+						}
 						show_note_page (group->name, respnum);
 					}
 				}
@@ -757,7 +775,12 @@ redraw_page (
 		my_flush ();
 	} else if (note_page > 0) {
 		note_page--;
-		fseek (note_fp, note_mark[note_page], 0);
+		/* to get any headers -- swp */
+		if (note_page <= 1 && (num_headers_to_display || num_headers_to_not_display)) {
+			fseek (note_fp, 0L, 0);
+		} else {
+			fseek (note_fp, note_mark[note_page], 0);
+		}
 		show_note_page (group, respnum);
 	}
 }
@@ -819,6 +842,9 @@ show_note_page (
 	int lines;
 	long tmp_pos;
 	static char buf[HEADER_LEN];
+	int do_display_header, dont_display_header,
+	    wild_do_display_headers, wild_dont_display_headers,
+	    display_header, i;
 
 	if (beginner_level) {
 		lines = cLINES - (MINI_HELP_LINES - 1);
@@ -861,6 +887,31 @@ show_note_page (
 
 	below_sig = FALSE;				/* begin of article -> not in signature */
 
+	/* give 'em headers if they want headers -- swp */
+	if (!doing_pgdn && (num_headers_to_display || num_headers_to_not_display)) {
+		in_headers = 1;
+		do_display_header = 1;
+		dont_display_header = 0;
+		if (num_headers_to_display && news_headers_to_display_array[0][0]=='*') {
+			wild_do_display_headers = 1;
+		} else {
+			wild_do_display_headers = 0;
+		}
+		if (num_headers_to_not_display && news_headers_to_not_display_array[0][0]=='*') {
+			wild_dont_display_headers = 1;
+		} else {
+			wild_dont_display_headers = 0;
+		}
+		if (wild_do_display_headers && wild_dont_display_headers) {
+			/* you're dumb */
+			in_headers = 0;
+		}
+	} else if (!doing_pgdn && show_all_headers) {
+		in_headers = 1;
+	} else {
+		in_headers = 0;
+	}
+
 	while (note_line < lines) {
 		note_mark[note_page+1] = ftell (note_fp);
 		if (show_last_line_prev_page) {
@@ -873,6 +924,43 @@ show_note_page (
 			note_end = TRUE;
 			skip_include = '\0';
 			break;
+		}
+
+		if (in_headers) {
+			if (*buf == '\n') {
+				in_headers = 0;
+			} else if (!show_all_headers) {
+				do_display_header = 0;
+					if (!wild_do_display_headers) {
+						for (i = 0; i < num_headers_to_display; i++) {
+							if (!strncasecmp(buf, news_headers_to_display_array[i], strlen(news_headers_to_display_array[i]))) {
+								do_display_header = 1;
+								break;
+							}
+						}
+					}
+				dont_display_header = 0;
+				if (!wild_dont_display_headers) {
+					for (i = 0; i < num_headers_to_not_display; i++) {
+						if (!strncasecmp(buf, news_headers_to_not_display_array[i], strlen(news_headers_to_not_display_array[i]))) {
+			    			dont_display_header = 1;
+			    			break;
+			    		}
+			    	}
+			    }
+				if (wild_dont_display_headers) {
+					display_header = (do_display_header);
+				} else if (wild_do_display_headers) {
+					display_header = (!dont_display_header);
+				} else if (dont_display_header || !do_display_header) {
+					display_header = 0;
+				} else {
+					display_header = 1;
+				}
+				if (!display_header) {
+					continue;
+				}
+			}
 		}
 
 		buf[sizeof (buf)-1] = '\0';
@@ -948,7 +1036,7 @@ print_a_line:
 	fcol(col_text);
 #endif
 	if (note_end) {
-		MoveCursor (cLINES-1, MORE_POS-(5+BLANK_PAGE_COLS));
+		MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 		StartInverse ();
 		if (arts[respnum].thread != -1) {
 			my_fputs (txt_next_resp, stdout);
@@ -961,7 +1049,7 @@ print_a_line:
 		if (note_size > 0) {
 			draw_percent_mark (note_mark[note_page], note_size);
 		} else {
-			MoveCursor (cLINES-1, MORE_POS-BLANK_PAGE_COLS);
+			MoveCursor (cLINES, MORE_POS-BLANK_PAGE_COLS);
 			StartInverse ();
 			my_fputs (txt_more, stdout);
 			my_flush ();
@@ -1001,7 +1089,7 @@ show_mime_article (
 	note_end = TRUE;
 	Raw(TRUE);
 	fseek (fp, offset, 0);	/* goto old position */
-	MoveCursor (cLINES-1, MORE_POS-(5+BLANK_PAGE_COLS));
+	MoveCursor (cLINES, MORE_POS-(5+BLANK_PAGE_COLS));
 	StartInverse ();
 	if (art->thread != -1) {
 		my_fputs (txt_next_resp, stdout);
@@ -1199,6 +1287,8 @@ show_first_header (
 
 	note_line += 4;
 
+/* with the new news_headers_to_display this is 'obsolete' */
+/*
 	if (note_h_keywords[0]) {
 		my_printf ("Keywords: %s" cCRLF, note_h_keywords);
 		note_line++;
@@ -1222,13 +1312,15 @@ show_first_header (
 			note_line++;
 		}
 	}
+*/
 
+/* FIXME */
 	if (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto) {
 		my_printf ("X-Comment-To: %s" cCRLF, note_h_ftnto);
 		note_line++;
 	}
 
-	if (note_h_keywords[0] || note_h_summary[0] || (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto)) {
+	if (/*note_h_keywords[0] || note_h_summary[0] ||*/ (note_h_ftnto[0] && show_xcommentto && !highlight_xcommentto)) {
 		my_printf (cCRLF);
 		note_line++;
 	}

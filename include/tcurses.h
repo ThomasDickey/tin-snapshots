@@ -21,19 +21,24 @@
 #include <curses.h>
 
 #define cCRLF				"\n"
+#define my_flush()			my_fflush(stdout)
 #define ClearScreen()			my_erase()
 #define CleartoEOLN()			clrtoeol()
 #define CleartoEOS()			clrtobot()
-#define ReadCh()			getch()
 
 #define HpGlitch(func)			/*nothing*/
 
 extern char *screen_contents(int row, int col, char *buffer);
 extern void MoveCursor(int row,int col);
 extern void my_erase(void);
-extern void my_flush(void);
+extern void my_fflush(FILE *stream);
 extern void my_fputc(int ch, FILE *stream);
 extern void my_fputs(const char *str, FILE *stream);
+extern void my_fprintf(FILE *stream, const char *fmt, ...)
+#ifdef __GNUC__
+	__attribute__((format(printf,2,3)))
+#endif
+	;
 extern void my_printf(const char *fmt, ...)
 #ifdef __GNUC__
 	__attribute__((format(printf,1,2)))
@@ -48,8 +53,10 @@ extern void refresh_color(void);
 #define	my_fputc(ch, stream)		fputc (ch, stream)
 #define	my_fputs(str, stream)		fputs (str, stream)
 
-#define my_printf printf
+#define my_printf			printf
+#define my_fprintf			fprintf
 #define my_flush()			fflush(stdout)
+#define my_fflush(stream)		fflush(stream)
 
 #define HpGlitch(func)			if (_hp_glitch) func
 

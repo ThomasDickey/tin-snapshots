@@ -201,7 +201,7 @@ invoke_pgp_mail (
 	do {
 		sprintf(msg, "%s%c", txt_pgp_mail, ch_default);
 		wait_message(msg);
-		MoveCursor(cLINES-1, (int) strlen(txt_pgp_mail));
+		MoveCursor(cLINES, (int) strlen(txt_pgp_mail));
 		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (!strchr("beqs\033", ch));
@@ -240,7 +240,7 @@ invoke_pgp_news(
 	do {
 		sprintf(msg, "%s%c", txt_pgp_news, ch_default);
 		wait_message(msg);
-		MoveCursor(cLINES-1, (int) strlen(txt_pgp_news));
+		MoveCursor(cLINES, (int) strlen(txt_pgp_news));
 		if ((ch = (char) ReadCh()) == '\n' || ch == '\r')
 			ch = ch_default;
 	} while (!strchr("iqs\033", ch));

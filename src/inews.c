@@ -13,7 +13,9 @@
  */
 
 #include	"tin.h"
+#include	"tnntp.h"
 
+#if 0
 #ifdef VMS
 #   ifdef MULTINET
 #		define netwrite    socket_write
@@ -34,6 +36,7 @@
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+#endif	/* 0 */
 
 #define	PATHMASTER	"not-for-mail"
 
@@ -51,13 +54,16 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 #define INEWS_MAIL_DOMAIN inews_mail_domain
 #endif
 
-static char *getfqdn (char *host);
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 255
+#endif
 
-static char *getfqdn(host)
-char	*host;
+static const char *
+getfqdn (
+	const char *host)
 {
 	char	name[MAXHOSTNAMELEN+2];
-	struct hostent	*hp;
+	const struct hostent *hp;
 	struct in_addr	in;
 
 	name[MAXHOSTNAMELEN]='\0';
@@ -71,12 +77,12 @@ char	*host;
 		in.s_addr=inet_addr(name);
 		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
 			in.s_addr=(*hp->h_addr);
-		return(hp&&strchr(hp->h_name,'.')?hp->h_name:(char *)inet_ntoa(in));
+		return((hp&&strchr(hp->h_name,'.')) ? hp->h_name : inet_ntoa(in));
 	}
 	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
 		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
 			in.s_addr=(*hp->h_addr);
-	return(hp?strchr(hp->h_name,'.')?hp->h_name:(char *)inet_ntoa(in):NULL);
+	return(hp?strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in) : 0);
 }
 
 
@@ -230,7 +236,9 @@ get_host_name (
 {
 #ifndef INDEX_DAEMON
 
-	char *ptr, host[PATH_LEN];
+	const char *ptr;
+	char *s;
+	char host[PATH_LEN];
 	char nntp_inews_gateway[PATH_LEN];
 #ifdef NEWSLIBDIR
 	char sitename[PATH_LEN];
@@ -252,7 +260,7 @@ get_host_name (
 		 */
 		if (nntp_inews_gateway[0] == '$' && nntp_inews_gateway[1]) {
 			ptr = getenv (&nntp_inews_gateway[1]);
-			if (ptr != (char *) 0) {
+			if (ptr != 0) {
 				strncpy (nntp_inews_gateway, ptr, sizeof (nntp_inews_gateway));
 			}
 		}
@@ -263,18 +271,22 @@ get_host_name (
 			if ((fp = fopen (nntp_inews_gateway, "r")) != (FILE *) 0) {
 				if (fgets (host, sizeof (host), fp) != (char *) 0) {
 					strcpy (host_name, host);
-					ptr = strrchr (host_name, '\n');
-					if (ptr != (char *) 0) {
-						*ptr = '\0';
+					s = strrchr (host_name, '\n');
+					if (s != 0) {
+						*s = '\0';
 					}
 				}
 				fclose (fp);
 			}
 			if (!host_name[0]) {
-				strcpy (host_name, "PROBLEM_WITH_YOUR_MAIL_GATEWAY_FILE");
+				/* can' read specified file - try getfqdn() */
+				ptr = getfqdn (0);
+				if (ptr != 0) {
+					my_strncpy (host, ptr, sizeof (host));
+				}
+			} else {
+				strcpy (host_name, nntp_inews_gateway);
 			}
-		} else {
-			strcpy (host_name, nntp_inews_gateway);
 		}
 	} else {
 		/*
@@ -300,15 +312,15 @@ get_host_name (
 		if (sfp != (FILE *) 0) {
 			fgets (host, sizeof (host), sfp);
 			if (strlen (host) != 0) {
-				ptr = strrchr (host, '\n');
-				if (ptr != (char *) 0) {
-					*ptr = '\0';
+				s = strrchr (host, '\n');
+				if (s != 0) {
+					*s = '\0';
 				}
 			}
 			fclose (sfp);
 		} else {
-			ptr = getfqdn ((char *) 0);
-			if (ptr != (char *) 0) {
+			ptr = getfqdn (0);
+			if (ptr != 0) {
 				my_strncpy (host, ptr, sizeof (host));
 			} else {
 #					if defined(M_AMIGA) || defined(M_OS2)

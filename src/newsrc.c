@@ -48,6 +48,7 @@ read_newsrc (
 	FILE *fp;
 	int sub;
 	int i;
+	int errors = 0;
 	struct stat buf;
 
 	if (allgroups)
@@ -65,6 +66,12 @@ read_newsrc (
 		newsrc_mode = buf.st_mode;
 	}
 
+/*
+#if USE_CURSES
+	if (!cmd_line)
+	scrollok(stdscr, TRUE);
+#endif
+*/
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
 		if (SHOW_UPDATE)
 			wait_message (txt_reading_newsrc);
@@ -81,7 +88,8 @@ read_newsrc (
 					parse_bitmap_seq (&active[my_group[i]], seq);
 				} else {
 /* TODO - create dummy group and mark as Deleteable ? */
-					fprintf(stderr, "\nBogus %s in .newsrc, not in active", grp);
+					my_fprintf(stderr, "\nBogus %s in .newsrc, not in active", grp);
+					errors++;
 				}
 			}
 			free (line);
@@ -92,6 +100,17 @@ read_newsrc (
 			my_flush ();
 		}
 	}
+/*
+#if USE_CURSES
+	if (!cmd_line) {
+		if (errors) {
+			beep();
+			continue_prompt ();
+		}
+		scrollok(stdscr, FALSE);
+	}
+#endif
+*/
 }
 
 
@@ -1133,7 +1152,7 @@ expand_bitmap (
 */
 if (group->newsrc.xmax > group->xmax) {
 #ifdef DEBUG
-	fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);	
+	my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);	
 	sleep(4);
 #endif
 /*

@@ -71,6 +71,10 @@ char motd_file[PATH_LEN];		/* news motd file for newsadmin purposes */
 char motd_file_info[PATH_LEN];	/* date of last time news motd file read */
 char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char my_distribution[LEN];		/* Distribution: */
+char news_headers_to_display[LEN];		/* which headers to display -- swp */
+char news_headers_to_not_display[LEN];	/* which headers to not display -- swp */
+char **news_headers_to_display_array;	/* array of which headers to display -- swp */
+char **news_headers_to_not_display_array;	/* array of which headers to not display -- swp */
 char newnewsrc[PATH_LEN];
 char news_active_file[PATH_LEN];
 char news_quote_format[PATH_LEN];
@@ -123,12 +127,15 @@ int global_filtered_articles;		/* globally killed / auto-selected articles */
 int group_top;				/* Total # of groups in my_group[] */
 int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
+int in_headers;			/* color in headers */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
 int local_index;			/* do private indexing? */
 int mail_mime_encoding;
 int max_from = 0;
 int max_subj = 0;
+int num_headers_to_display;		/* num headers to display -- swp */
+int num_headers_to_not_display;	/* num headers to not display -- swp */
 int num_of_killed_arts;
 int num_of_selected_arts;
 int num_of_tagged_arts;
@@ -163,6 +170,7 @@ int col_help;						/* color of help pages */
 int col_message;					/* color of message lines at bottom */
 int col_quote;						/* color of quotelines */
 int col_head;						/* color of headerlines */
+int col_newsheaders;				/* color of actual news header fields */
 int col_subject;					/* color of article subject */
 int col_response;					/* color of respone counter */
 int col_from;						/* color of sender (From:) */
@@ -423,6 +431,8 @@ void init_selfinfo (void)
 	}
 	mark_saved_read = TRUE;
 	newsrc_active = FALSE;
+	num_headers_to_display = 0;
+	num_headers_to_not_display = 0;
 	num_of_selected_arts = 0;
 	num_of_killed_arts = 0;
 	num_of_tagged_arts = 0;
@@ -493,6 +503,7 @@ void init_selfinfo (void)
 	col_message = 6;
 	col_quote = 2;
 	col_head = 2;
+	col_newsheaders = 9;
 	col_subject = 6;
 	col_response = 2;
 	col_from = 2;
@@ -543,6 +554,10 @@ void init_selfinfo (void)
 	default_subject_search[0] = '\0';
 	post_proc_command[0] = '\0';
 	proc_ch_default = 'n';
+	news_headers_to_display[0] = '\0';
+	news_headers_to_not_display[0] = '\0';
+	news_headers_to_display_array = NULL;
+	news_headers_to_not_display_array = NULL;
 
 	/*
 	 * Amiga uses assigns which end in a ':' and won't work with a '/'
@@ -647,7 +662,6 @@ void init_selfinfo (void)
 	joinpath (msg_headers_file, rcdir, MSG_HEADERS_FILE);
 	joinpath (mailgroups_file, rcdir, MAILGROUPS_FILE);
 	joinpath (motd_file, libdir, MOTD_FILE);
-	joinpath (msg_headers_file, rcdir, MSG_HEADERS_FILE);
 	joinpath (news_active_file, libdir, get_val ("TIN_ACTIVEFILE", ACTIVE_FILE));
 	joinpath (newsgroups_file, libdir, NEWSGROUPS_FILE);
 #ifdef WIN32
