@@ -3,7 +3,7 @@
  *  Module    : attrib.c
  *  Author    : I. Lea
  *  Created   : 1993-12-01
- *  Updated   : 1997-12-20
+ *  Updated   : 2003-01-31
  *  Notes     : Group attribute routines
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -56,7 +56,6 @@
 #define	ATTRIB_MAILING_LIST		25
 #define	ATTRIB_X_HEADERS		26
 #define	ATTRIB_X_BODY			27
-#define	ATTRIB_AUTO_SAVE_MSG		28
 #define	ATTRIB_X_COMMENT_TO		29
 #define	ATTRIB_NEWS_QUOTE		30
 #define	ATTRIB_QUOTE_CHARS		31
@@ -412,7 +411,7 @@ set_attrib_str (
 		/*
 		 * Does scope refer to 1 or more groups (ie. regex) ?
 		 */
-		if (!strchr (scope, '*')) {
+		if (!strpbrk(scope, "*,")) {
 			psGrp = psGrpFind (scope);
 			if (psGrp != (struct t_group *) 0) {
 #ifdef DEBUG

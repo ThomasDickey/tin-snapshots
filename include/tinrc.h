@@ -153,7 +153,6 @@ struct t_config {
 	t_bool start_editor_offset;
 	t_bool strip_blanks;
 	t_bool strip_newsrc;
-	t_bool tab_after_X_selection;		/* set TRUE if you want auto TAB after X */
 	t_bool tab_goto_next_unread;
 	t_bool thread_catchup_on_exit;		/* catchup thread with left arrow key or not */
 	t_bool unlink_article;

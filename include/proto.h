@@ -256,9 +256,9 @@ extern void *my_malloc1 (const char *file, int line, size_t size);
 extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 
 /* misc.c */
-extern char *eat_re (char *s, t_bool eat_was);
 extern char *quote_wild (char *str);
 extern char *quote_wild_whitespace (char *str);
+extern const char *eat_re (char *s, t_bool eat_was);
 extern const char *get_val (const char *env, const char *def);
 extern int get_initials (int respnum, char *s, int maxsize);
 extern int gnksa_do_check_from(char *from, char *address, char *realname);

@@ -2,7 +2,7 @@
 ;   Module    : tincfg.tbl
 ;   Author    : Thomas E. Dickey <dickey@clark.net>
 ;   Created   : 1996-11-01
-;   Updated   : 1999-11-22
+;   Updated   : 2003-01-22
 ;   Notes     : #defines and structs for config.c
 ;   Copyright 1996 by Thomas E. Dickey
 ;               You may  freely  copy or  redistribute  this software,
@@ -26,7 +26,6 @@
 	space_goto_next_unread		OPT_ON_OFF
 	pgdn_goto_next			OPT_ON_OFF
 	auto_list_thread		OPT_ON_OFF
-	tab_after_X_selection		OPT_ON_OFF
 	art_marked_deleted		OPT_CHAR
 	art_marked_inrange		OPT_CHAR
 	art_marked_return		OPT_CHAR

@@ -674,7 +674,7 @@ show_selection_page (
 
 	set_first_screen_item (cur_groupnum, group_top, &first_group_on_screen, &last_group_on_screen);
 
-	blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + (show_description ? 2 : 4);
+	blank_len = (MIN(cCOLS, (int) sizeof(group_descript)) - (groupname_len + SELECT_MISC_COLS)) + (show_description ? 2 : 4);
 
 	for (j = 0, i = first_group_on_screen; i < last_group_on_screen; i++, j++) {
 #ifdef USE_CURSES
@@ -712,6 +712,7 @@ show_selection_page (
 			blank_len = 254;
 		/* copy of active[n].description fix some malloc bugs kg */
 		strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
+		Convert2Printable(group_descript);
 		group_descript[blank_len] = '\0';
 
 		if (show_description) {

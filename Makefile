@@ -7,9 +7,9 @@
 PROJECT	= tin
 LVER	= 1
 PVER	= 4
-SVER	= 6
+SVER	= 7
 VER	= $(LVER).$(PVER).$(SVER)
-DVER	= 20020816
+DVER	= 20030201
 EXE	= tin
 MANEXT	= 1
 

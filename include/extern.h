@@ -1279,7 +1279,6 @@ extern struct opttxt txt_tab_goto_next_unread;
 extern struct opttxt txt_space_goto_next_unread;
 extern struct opttxt txt_pgdn_goto_next;
 extern struct opttxt txt_auto_list_thread;
-extern struct opttxt txt_tab_after_X_selection;
 extern struct opttxt txt_art_marked_deleted;
 extern struct opttxt txt_art_marked_inrange;
 extern struct opttxt txt_art_marked_return;

@@ -39,4 +39,4 @@ CC="$CC" \
         $OPTS $* 2>&1 |tee -a $OUT
 
 # makefile.in is somewhat outdated, but Makefile is uptodate
-rm makefile
+rm -f makefile

@@ -3,7 +3,7 @@
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1999-07-17
+ *  Updated   : 2003-01-31
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
@@ -107,22 +107,22 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 		 * According to the ietf-nntp mailinglist:
 		 *  200 you may (try to) do anything
 		 *  201 you may not POST
-		 *  202 you may not IHAVE
-		 *  203 you may not do EITHER
+		 *  (202 you may not IHAVE)
+		 *  (203 you may not do EITHER)
 		 *  All unrecognised 200 series codes should be assumed as success.
 		 *  All unrecognised 300 series codes should be assumed as notice to continue.
 		 *  All unrecognised 400 series codes should be assumed as temporary error.
 		 *  All unrecognised 500 series codes should be assumed as error.
 		 */
 		case OK_CANPOST:
-		case OK_NOIHAVE:
+/*		case OK_NOIHAVE: */
 #	ifndef NO_POSTING
 			can_post = TRUE;
 #	endif /* !NO_POSTING */
 			break;
 
 		case OK_NOPOST:
-		case OK_NOPOSTIHAVE:
+/*		case OK_NOPOSTIHAVE: */
 			can_post = FALSE;
 			break;
 
@@ -162,7 +162,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	ret = get_respcode(line);
 	switch (ret) {
 		case OK_CANPOST:
-		case OK_NOIHAVE:
+/*		case OK_NOIHAVE: */
 #	ifndef NO_POSTING
 			can_post = TRUE;
 #	endif /* !NO_POSTING */
@@ -170,7 +170,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			break;
 
 		case OK_NOPOST:
-		case OK_NOPOSTIHAVE:
+/*		case OK_NOPOSTIHAVE: */
 			can_post = FALSE;
 			sec = TRUE;
 			break;
@@ -214,7 +214,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		ret = get_respcode (line);
 		switch (ret) {
 			case OK_CANPOST:
-			case OK_NOIHAVE:
+/*			case OK_NOIHAVE: */
 #	ifndef NO_POSTING
 				can_post = TRUE;
 #	endif /* !NO_POSTING */
@@ -222,7 +222,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 				break;
 
 			case OK_NOPOST:
-			case OK_NOPOSTIHAVE:
+/*			case OK_NOPOSTIHAVE: */
 				can_post = FALSE;
 				sec = TRUE;
 				break;

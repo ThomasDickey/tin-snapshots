@@ -3,9 +3,9 @@
  *  Module    : lang.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1998-10-17
+ *  Updated   : 2003-01-22
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -43,7 +43,7 @@ constext txt_art_unavailable[] = "Article unavailable";
 constext txt_art_parent_none[] = "Article has no parent";
 constext txt_art_parent_killed[] = "Parent article has been killed";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
-constext txt_article_cancelled[] = "Article cancelled by author\n";
+constext txt_article_cancelled[] = "Article cancelled by author.\n";
 constext txt_article_cannot_open[] = "get_article: can't open %s: ";
 constext txt_article_cannot_reopen[] = "get_article: can't reopen %s: ";
 constext txt_article_reposted[] = "This is a repost of the following article:";
@@ -209,7 +209,7 @@ constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %
 constext txt_filesystem_full[] = "Error writing %s file. Filesystem full? File reset to previous state.";
 constext txt_filesystem_full_backup[] = "Error making backup of %s file. Filesystem full?";
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
-constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
+constext txt_feed_pattern[] = "Enter pattern [%s]> ";
 constext txt_followup_newsgroups[] = "\nYou requested followups to your article to go to the following newsgroup%s:\n";
 constext txt_followup_poster[] = "  %s\t Answers will be directed to you by mail.\n";
 constext txt_servers_active[] = "servers active-file";
@@ -1128,12 +1128,6 @@ struct opttxt txt_auto_list_thread = {
 	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
 	"List thread using right arrow key  : ",
 	"# If ON automatically list thread when entering it using right arrow key.\n"
-};
-
-struct opttxt txt_tab_after_X_selection = {
-	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
-	"Do tab after X automatically       : ",
-	"# If ON a TAB command will be automatically done after the X command\n"
 };
 
 struct opttxt txt_art_marked_deleted = {

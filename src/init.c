@@ -3,9 +3,9 @@
  *  Module    : init.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-28
+ *  Updated   : 2003-01-22
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -360,7 +360,6 @@ struct t_config tinrc = {
 #endif /* M_UNIX */
 	TRUE,		/* strip_blanks */
 	FALSE,		/* strip_newsrc */
-	FALSE,		/* tab_after_X_selection */
 	TRUE,		/* tab_goto_next_unread */
 	TRUE,		/* thread_catchup_on_exit */
 	TRUE,		/* unlink_article */
@@ -564,6 +563,10 @@ init_selfinfo (
 	if (TMPDIR[strlen(TMPDIR)-1] != '\\')
 		strcat(TMPDIR,"\\");
 #	endif /* WIN32 */
+	if (myentry == NULL) {
+		fprintf (stderr, "Can't get user information (/etc/passwd missing?)\n");
+		giveup();
+	}
 	strcpy (userid, myentry->pw_name);
 #	ifdef VMS
 	lower (userid);

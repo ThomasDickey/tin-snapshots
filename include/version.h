@@ -16,8 +16,8 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION 	"1.4.6"
-#	define RELEASEDATE	"20020816"
+#	define VERSION 	"1.4.7"
+#	define RELEASEDATE	"20030201"
 #	define RELEASENAME	"Aerials"
 #	define TINRC_VERSION	"1.2"
 

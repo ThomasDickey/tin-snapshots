@@ -3,7 +3,7 @@
  *  Module    : save.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-31
+ *  Updated   : 2003-01-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *	             You may  freely  copy or  redistribute this  software,
@@ -30,10 +30,12 @@
 
 #undef OFF
 
-#define INITIAL		1
-#define MIDDLE		2
-#define OFF		3
-#define END		4
+#ifndef HAVE_LIBUU   
+#	define INITIAL		1
+#	define MIDDLE		2
+#	define OFF		3
+#	define END		4
+#endif /* !HAVE_LIBUU */
 
 #ifndef INDEX_DAEMON
 #	ifndef HAVE_LIBUU
