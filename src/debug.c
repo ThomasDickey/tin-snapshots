@@ -17,13 +17,12 @@
 
 int debug;
 
+#ifdef DEBUG
 /*
 ** Local prototypes
 */
-#ifdef DEBUG
 static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
 static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
-#endif
 
 /*
  *  nntp specific debug routines
@@ -32,7 +31,6 @@ static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
 void
 debug_delete_files (void)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 
 	if (debug) {
@@ -53,7 +51,6 @@ debug_delete_files (void)
 		sprintf (file, "%sFILTER", TMPDIR);
 		unlink (file);
 	}
-#endif
 }
 
 
@@ -66,7 +63,6 @@ debug_nntp (
 	const char *func,
 	const char *line)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 
@@ -80,7 +76,6 @@ debug_nntp (
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
-#endif
 }
 
 
@@ -88,9 +83,7 @@ void
 debug_nntp_respcode (
 	int respcode)
 {
-#ifdef DEBUG
 	debug_nntp ("get_respcode", nntp_respcode (respcode));
-#endif
 }
 
 /*
@@ -100,7 +93,6 @@ debug_nntp_respcode (
 void
 debug_print_arts (void)
 {
-#ifdef DEBUG
 	int i;
 
 	if (debug != 2)
@@ -109,7 +101,6 @@ debug_print_arts (void)
 	for (i = 0; i < top; i++) {	/* for each group */
 		debug_print_header (&arts[i]);
 	}
-#endif
 }
 
 
@@ -117,7 +108,6 @@ void
 debug_print_header (
 	struct t_article *s)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 
@@ -163,14 +153,12 @@ debug_print_header (
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
-#endif
 }
 
 
 void
 debug_save_comp (void)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	int i;
@@ -207,32 +195,9 @@ debug_save_comp (void)
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
-#endif
 }
 
 
-void
-debug_print_comment (
-	const char *comment)
-{
-#ifdef DEBUG_NEWSRC
-	char file[PATH_LEN];
-	FILE *fp;
-
-	if (debug < 2)
-		return;
-
-	sprintf (file, "%sBITMAP", TMPDIR);
-
-	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		fprintf (fp,"\n%s\n", comment);
-		fclose (fp);
-		chmod (file, (S_IRUGO|S_IWUGO));
-	}
-#endif
-}
-
-#ifdef DEBUG
 static void
 debug_print_base (void)
 {
@@ -254,13 +219,11 @@ debug_print_base (void)
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
 }
-#endif
 
 
 void
 debug_print_active (void)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	int i;
@@ -292,10 +255,8 @@ debug_print_active (void)
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
-#endif
 }
 
-#ifdef DEBUG
 static void
 debug_print_attributes (
 	struct t_attribute *attr,
@@ -330,79 +291,8 @@ debug_print_attributes (
 		(attr->followup_to  == (char *) 0 ? "" : attr->followup_to));
 	fflush (fp);
 }
-#endif
 
 
-void
-debug_print_bitmap (
-	struct t_group *group,
-	struct t_article *art)
-{
-#ifdef DEBUG_NEWSRC
-	char file[PATH_LEN];
-	FILE *fp;
-
-	if (debug != 3) {
-		return;
-	}
-
-	sprintf (file, "%sBITMAP", TMPDIR);
-
-	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
-		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
-			group->name, SUB_CHAR(group->subscribed),
-			group->xmin, group->xmax, group->count,
-			group->newsrc.num_unread);
-		if (art != (struct t_article *) 0) {
-			fprintf (fp, "art=[%5ld] tag=[%s] kill=[%s] selected=[%s] subj=[%s]\n",
-				art->artnum,
-				(art->tagged ? "TRUE" : "FALSE"),
-				(art->killed ? "TRUE" : "FALSE"),
-				(art->selected ? "TRUE" : "FALSE"),
-				art->subject);
-			fprintf (fp, "thread=[%s]  inthread=[%s]  status=[%s]\n",
-				(art->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"),
-				(art->inthread ? "TRUE" : "FALSE"),
-				(art->status == ART_READ ? "READ" : "UNREAD"));
-		}
-		debug_print_newsrc (&group->newsrc, fp);
-		fclose (fp);
-		chmod (file, (S_IRUGO|S_IWUGO));
-	}
-#endif
-}
-
-
-#ifdef DEBUG_NEWSRC
-void
-debug_print_newsrc (
-	struct t_newsrc *NewSrc,
-	FILE *fp)
-{
-	register int i, j;
-
-	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
-		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen,
-		NewSrc->num_unread, NewSrc->present);
-
-	fprintf (fp, "bitmap=[");
-	if (NewSrc->xbitlen && NewSrc->xbitmap) {
-		for (j=0, i=NewSrc->xmin; i <= NewSrc->xmax; i++) {
-			fprintf (fp, "%d",
-				(NTEST(NewSrc->xbitmap, i - NewSrc->xmin) == ART_READ ?
-				ART_READ : ART_UNREAD));
-			if ((j++ % 8) == 7 && i < NewSrc->xmax) {
-				fprintf (fp, " ");
-			}
-		}
-	}
-	fprintf (fp, "]\n");
-	fflush (fp);
-}
-#endif
-
-
-#ifdef DEBUG
 void
 vDbgPrintMalloc (
 	int	iIsMalloc,
@@ -431,10 +321,8 @@ vDbgPrintMalloc (
 		}
 	}
 }
-#endif
 
 
-#ifdef DEBUG
 static void
 debug_print_filter (
 	FILE *fp,
@@ -458,13 +346,11 @@ debug_print_filter (
 			(the_filter->time ? ctime (&the_filter->time) : "]\n"));
 	}
 }
-#endif
 
 
 void
 debug_print_filters (void)
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	int i, j, num;
@@ -501,11 +387,8 @@ debug_print_filters (void)
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
  	}
-#endif
 }
 
-
-#ifdef DEBUG
 
 /*
  * Prints out hash distribution of active[]
@@ -556,9 +439,7 @@ debug_print_active_hash (void)
 	}
 	my_printf ("\n");
 }
-#endif
 
-#ifdef DEBUG
 static void
 debug_print_group_hash (void)
 {
@@ -568,4 +449,90 @@ debug_print_group_hash (void)
 		my_printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
 	}
 }
-#endif
+#endif	/* DEBUG */
+
+#ifdef DEBUG_NEWSRC
+void
+debug_print_comment (
+	const char *comment)
+{
+	char file[PATH_LEN];
+	FILE *fp;
+
+	if (debug < 2)
+		return;
+
+	sprintf (file, "%sBITMAP", TMPDIR);
+
+	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
+		fprintf (fp,"\n%s\n", comment);
+		fclose (fp);
+		chmod (file, (S_IRUGO|S_IWUGO));
+	}
+}
+
+void
+debug_print_bitmap (
+	struct t_group *group,
+	struct t_article *art)
+{
+	char file[PATH_LEN];
+	FILE *fp;
+
+	if (debug != 3) {
+		return;
+	}
+
+	sprintf (file, "%sBITMAP", TMPDIR);
+
+	if ((fp = fopen (file, "a+")) != (FILE *) 0) {
+		fprintf (fp, "\nGroup=[%s] sub=[%c] min=[%ld] max=[%ld] count=[%ld] num_unread=[%ld]\n",
+			group->name, SUB_CHAR(group->subscribed),
+			group->xmin, group->xmax, group->count,
+			group->newsrc.num_unread);
+		if (art != (struct t_article *) 0) {
+			fprintf (fp, "art=[%5ld] tag=[%s] kill=[%s] selected=[%s] subj=[%s]\n",
+				art->artnum,
+				(art->tagged ? "TRUE" : "FALSE"),
+				(art->killed ? "TRUE" : "FALSE"),
+				(art->selected ? "TRUE" : "FALSE"),
+				art->subject);
+			fprintf (fp, "thread=[%s]  inthread=[%s]  status=[%s]\n",
+				(art->thread == ART_NORMAL ? "ART_NORMAL" : "ART_EXPIRED"),
+				(art->inthread ? "TRUE" : "FALSE"),
+				(art->status == ART_READ ? "READ" : "UNREAD"));
+		}
+		debug_print_newsrc (&group->newsrc, fp);
+		fclose (fp);
+		chmod (file, (S_IRUGO|S_IWUGO));
+	}
+}
+
+
+void
+debug_print_newsrc (
+	struct t_newsrc *NewSrc,
+	FILE *fp)
+{
+	register int i, j;
+
+	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
+		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen,
+		NewSrc->num_unread, NewSrc->present);
+
+	fprintf (fp, "bitmap=[");
+	if (NewSrc->xbitlen && NewSrc->xbitmap) {
+		for (j=0, i=NewSrc->xmin; i <= NewSrc->xmax; i++) {
+			fprintf (fp, "%d",
+				(NTEST(NewSrc->xbitmap, i - NewSrc->xmin) == ART_READ ?
+				ART_READ : ART_UNREAD));
+			if ((j++ % 8) == 7 && i < NewSrc->xmax) {
+				fprintf (fp, " ");
+			}
+		}
+	}
+	fprintf (fp, "]\n");
+	fflush (fp);
+}
+#endif	/* DEBUG_NEWSRC */
+

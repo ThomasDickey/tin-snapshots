@@ -483,7 +483,7 @@ select_page_up:
 
 			case iKeyOptionMenu:	/* option menu */
 				set_alarm_clock_off ();
-				change_config_file (NULL, TRUE);
+				change_config_file (NULL);
 				set_signals_select ();	/* just to be sure */
 				free_attributes_array ();
 				read_attributes_file (global_attributes_file, TRUE);

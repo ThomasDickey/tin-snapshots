@@ -815,7 +815,9 @@ void
 sort_save_list (void)
 {
 	qsort ((char *) save, (size_t)num_save, sizeof (struct t_save), save_comp);
+#ifdef DEBUG
 	debug_save_comp ();
+#endif
 }
 
 /*

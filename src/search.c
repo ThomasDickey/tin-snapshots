@@ -241,6 +241,7 @@ search_thread(
  * Search a thread for a subject. Reposition cursor & update internal
  * pointers as needed.
  */
+#ifndef INDEX_DAEMON
 void
 search_subject_thread(
 	int forward,
@@ -273,6 +274,7 @@ search_subject_thread(
 	clear_message();
   	return; 
 }
+#endif
 
 /*
  * Search the current group for a subject. Reposition the cursor if needed.

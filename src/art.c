@@ -58,7 +58,9 @@ find_base (
 
 	top_base = 0;
 
+#ifdef DEBUG
 	debug_print_arts ();
+#endif
 
 	if (group->attribute && group->attribute->show_only_unread) {
 		for (i = 0; i < top; i++) {
@@ -150,8 +152,10 @@ index_group (
 	PrintStopWatch();
 #endif	/* PROFILE */
 
+#ifdef DEBUG_NEWSRC
 	debug_print_comment ("Before iReadNovFile");
 	debug_print_bitmap (group, NULL);
+#endif
 
 	min = top_base ? base[0] : group->xmin;
 	max = top_base ? base[top_base-1] : min - 1;
@@ -193,7 +197,9 @@ index_group (
 	for (i = 0; i < top; i++) {
 		if (arts[i].thread == ART_EXPIRED) {
 			expired = 1;
+#ifdef DEBUG_NEWSRC
 			debug_print_comment ("art.c: index_group() purging...");
+#endif
 			art_mark_read (group, &arts[i]);
 			print_expired_arts (expired);
 		}
@@ -328,7 +334,9 @@ read_group (
 
 		if (!parse_headers (ptr, &arts[top])) {
 			sprintf (buf, "FAILED parse_header(%ld)", art);
+#ifdef DEBUG
 			debug_nntp ("read_group", buf);
+#endif
 			continue;
 		}
 
@@ -717,7 +725,9 @@ parse_headers (
 				if (!got_subject)
 					h->subject = hash_str ("<No subject>");
 
+#ifdef DEBUG
 				debug_print_header (h);
+#endif
 				return TRUE;
 			} else
 				return FALSE;
@@ -780,7 +790,9 @@ iReadNovFile (
 			}
 		}
 
+#ifdef DEBUG
 		debug_nntp ("iReadNovFile", buf);
+#endif
 		if (STRCMPEQ(buf, ".")) {
 			free (buf);
 			break;

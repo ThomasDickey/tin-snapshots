@@ -19,6 +19,7 @@
 
 #include <dos/dos.h>
 #include <proto/exec.h>
+#include <fcntl.h>
 #ifndef AS225
 #include <proto/usergroup.h>
 #endif

@@ -69,9 +69,10 @@ int cCOLS  = DEFAULT_COLUMNS_ON_TERMINAL;
 t_bool inverse_okay = TRUE;
 static int _inraw = FALSE;	/* are we IN rawmode?    */
 int _hp_glitch = FALSE;		/* standout not erased by overwriting on HP terms */
-static int xclicks=FALSE;	/* do we have an xterm? */
 
 #ifndef INDEX_DAEMON
+
+static int xclicks=FALSE;	/* do we have an xterm? */
 
 #define BACKSPACE        '\b'
 #define VERY_LONG_STRING 2500
@@ -1114,6 +1115,8 @@ ReadCh (void)
 	return((result <= 0) ? EOF : ch & 0xFF);
 
 #endif	/* READ_CHAR_HACK */
+#else
+	return (0);
 #endif	/* INDEX_DAEMON */
 }
 

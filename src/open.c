@@ -54,7 +54,9 @@ nntp_open (void)
 	static unsigned short nntp_tcp_port;
 
 	if (read_news_via_nntp) {
+#ifdef DEBUG
 		debug_nntp ("nntp_open", "BEGIN");
+#endif
 
 		/* do this only once at start-up */
 		if (nntp_server == (char *) 0) {
@@ -76,14 +78,18 @@ nntp_open (void)
 			wait_message (msg);
 		}
 
+#ifdef DEBUG
 		debug_nntp ("nntp_open", nntp_server);
+#endif
 
 		ret = server_init (nntp_server, NNTP_TCP_NAME, nntp_tcp_port);
 		if (update == FALSE && ret != -1 && cmd_line) {
 			my_fputc ('\n', stdout);
 		}
 
+#ifdef DEBUG
 		debug_nntp_respcode (ret);
+#endif
 
 		switch (ret) {
 		case OK_CANPOST:
@@ -110,7 +116,9 @@ nntp_open (void)
 		/*
 		 * Switch INN into NNRP mode with 'mode reader'
 		 */
+#ifdef DEBUG
 		debug_nntp ("nntp_open", "mode reader");
+#endif
 		put_server ("mode reader");
 		ret = get_respcode ();
 		switch (ret) {
@@ -127,7 +135,9 @@ nntp_open (void)
 		/*
 		 * Check if NNTP/INN supports XOVER command
 		 */
+#ifdef DEBUG
 		debug_nntp ("nntp_open", "xover");
+#endif
 		put_server ("xover");
 		if (get_respcode () != ERR_COMMAND) {
 			xover_supported = TRUE;
@@ -137,7 +147,9 @@ nntp_open (void)
 		 * Check if NNTP supports my XINDEX & XUSER commands
 		 */
 #ifdef HAVE_TIN_NNTP_EXTS
+#ifdef DEBUG
 		debug_nntp ("nntp_open", "xuser");
+#endif
 		put_server ("xuser");
 		if (get_respcode () != ERR_COMMAND) {
 			xuser_supported = TRUE;
@@ -148,7 +160,9 @@ nntp_open (void)
 		/*
 		 * Don't try to authenticate as it breaks M$ newsserver.
 		 */
+#ifdef DEBUG
 		debug_nntp ("nntp_open", "authenticate");
+#endif
 		authenticate (nntp_server, userid, TRUE);
 #endif /* 0 */
 
@@ -164,7 +178,9 @@ nntp_close (void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp) {
+#ifdef DEBUG
 		debug_nntp ("nntp_close", "END");
+#endif
 		close_server ();
 	}
 #endif
@@ -185,11 +201,15 @@ open_news_active_fp (void)
 #ifdef NNTP_ABLE
 		put_server ("list");
 		if ((respcode = get_respcode ()) != OK_GROUPS) {
+#ifdef DEBUG
 			debug_nntp ("open_news_active_fp", "NOT_OK");
+#endif
 			error_message ("%s", nntp_respcode (respcode));
 			return (FILE *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_news_active_fp", "OK");
+#endif
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
@@ -213,13 +233,19 @@ open_overview_fmt_fp (void)
 #ifdef NNTP_ABLE
 		if (xover_supported) {
 			sprintf (line, "list %s", OVERVIEW_FMT);
+#ifdef DEBUG
 			debug_nntp ("open_overview_fmt_fp", line);
+#endif
 			put_server (line);
 			if (get_respcode () != OK_GROUPS) {
+#ifdef DEBUG
 				debug_nntp ("open_overview_fmt_fp", "NOT_OK");
+#endif
 				return (FILE *) 0;
 			}
+#ifdef DEBUG
 			debug_nntp ("open_overview_fmt_fp", "OK");
+#endif
 			return nntp_to_fp ();
 		} else {
 			return (FILE *) 0;
@@ -259,14 +285,20 @@ open_newgroups_fp (
 			tm->tm_year, tm->tm_mon+1, tm->tm_mday,
 			tm->tm_hour, tm->tm_min, tm->tm_sec);
 
+#ifdef DEBUG
 		debug_nntp ("open_newgroups_fp", line);
+#endif
 		put_server (line);
 
 		if (get_respcode () != OK_NEWGROUPS) {
+#ifdef DEBUG
 			debug_nntp ("open_newgroups_fp", "NOT_OK");
+#endif
 			return (FILE *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_newgroups_fp", "OK");
+#endif
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
@@ -293,13 +325,19 @@ open_motd_fp (
 	if (read_news_via_nntp) {
 #if defined(NNTP_ABLE) && defined(HAVE_TIN_NNTP_EXTS)
 		sprintf (line, "xmotd %s", motd_file_date);
+#ifdef DEBUG
 		debug_nntp ("open_motd_fp", line);
+#endif
 		put_server (line);
 		if (get_respcode () != OK_XMOTD) {
+#ifdef DEBUG
 			debug_nntp ("open_motd_fp", "NOT_OK");
+#endif
 			return (FILE *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_motd_fp", "OK");
+#endif
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
@@ -317,10 +355,14 @@ open_subscription_fp (void)
 #ifdef NNTP_ABLE
 		put_server ("list subscriptions");
 		if (get_respcode () != OK_GROUPS) {
+#ifdef DEBUG
 			debug_nntp ("open_subscription_fp", "NOT_OK");
+#endif
 			return (FILE *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_subscription_fp", "OK");
+#endif
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
@@ -399,18 +441,26 @@ open_newsgroups_fp (void)
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		if (read_local_newsgroups_file) {
+#ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
+#endif
 			return fopen (local_newsgroups_file, "r");
 		} else if (newsrc_active && !check_for_new_newsgroups) {
+#ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using info in .newsrc");
+#endif
 			return extract_groups_from_newsrc();
 		} else {
 			put_server ("list newsgroups");
 			if (get_respcode () != OK_GROUPS) {
+#ifdef DEBUG
 				debug_nntp ("open_newsgroups_fp", "NOT_OK");
+#endif
 				return (FILE *) 0;
 			}
+#ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "OK");
+#endif
 			return nntp_to_fp ();
 		}
 #else
@@ -441,13 +491,19 @@ open_xover_fp (
 	    *pcMode == 'r' && psGrp->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (acLine, "xover %ld-%ld", lMin, lMax);
+#ifdef DEBUG
 		debug_nntp ("open_xover_fp", acLine);
+#endif
 		put_server (acLine);
 		if (get_respcode () != OK_XOVER) {
+#ifdef DEBUG
 			debug_nntp ("open_xover_fp", "NOT_OK");
+#endif
 			return (FILE *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_xover_fp", "OK");
+#endif
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
@@ -489,7 +545,9 @@ stat_article (
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "stat %ld", art);
+#ifdef DEBUG
 		debug_nntp ("stat_article", buf);
+#endif
 		put_server (buf);
 		if (get_respcode () != OK_NOTEXT) {
 			art_exists = FALSE;
@@ -532,11 +590,15 @@ open_art_header (
 		}
 		sprintf (buf, "head %ld", art);
 
+#ifdef DEBUG
 		debug_nntp ("open_art_header", buf);
+#endif
 
 		put_server (buf);
 		if (get_respcode () != OK_HEAD) {
+#ifdef DEBUG
 			debug_nntp ("open_art_header", "NOT_OK_HEAD - Find NEXT");
+#endif
 			/*
 			 *  HEAD failed, try to find NEXT
 			 */
@@ -562,7 +624,9 @@ open_art_header (
 			}
 			return (char *) 0;
 		}
+#ifdef DEBUG
 		debug_nntp ("open_art_header", "OK_HEAD");
+#endif
 
 		full = FALSE;
 		safe_nntp_strlen = NNTP_STRLEN - 2;
@@ -646,17 +710,23 @@ open_art_fp (
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "article %ld", art);
+#ifdef DEBUG
 		debug_nntp ("open_art_fp", buf);
+#endif
 		put_server (buf);
 		if ((respcode = get_respcode ()) != OK_ARTICLE) {
 			if (debug == 2) {
 				error_message ("%s", nntp_respcode (respcode));
 			}
+#ifdef DEBUG
 			debug_nntp ("open_art_fp", "NOT OK");
+#endif
 			return (FILE *) 0;
 		}
 
+#ifdef DEBUG
 		debug_nntp ("open_art_fp", "OK");
+#endif
 
 		old_fp = nntp_to_fp ();
 #else
@@ -697,15 +767,21 @@ open_xhdr_fp (
 		char buf[NNTP_STRLEN];
 		sprintf(buf, "xhdr %s %ld-%ld", header, min, max);
 
+#ifdef DEBUG
 		debug_nntp ("open_xhdr_fp", buf);
+#endif
 
 		put_server (buf);
 		if (get_respcode () != OK_HEAD) {
+#ifdef DEBUG
 			debug_nntp ("open_xhdr_fp", "NOT_OK_XHDR");
+#endif
 			return (FILE *) 0;
 		}
 
+#ifdef DEBUG
 		debug_nntp ("open_xhdr_fp", "OK_XHDR");
+#endif
 
 		return nntp_to_fp ();
 #else
@@ -815,7 +891,9 @@ setup_hard_base (
 #endif /* 0*/
 
 		sprintf (buf, "listgroup %s", group->name);
+#ifdef DEBUG
 		debug_nntp ("setup_base", buf);
+#endif
 		put_server (buf);
 
 		switch (get_server (line, NNTP_STRLEN)) {
@@ -832,7 +910,9 @@ setup_hard_base (
 		 * LISTGROUP worked
 		 */
 		if (atoi (line) == OK_GROUP) {
+#ifdef DEBUG
 			debug_nntp ("setup_base", line);
+#endif
 			forever {
 				switch (get_server (line, NNTP_STRLEN)) {
 					case -1:
@@ -844,7 +924,9 @@ setup_hard_base (
 						break;
 				}
 				if (STRCMPEQ(line, ".")) {				/* end of text */
+#ifdef DEBUG
 					debug_nntp ("setup_base", line);
+#endif
 					break;
 				}
 				if (top_base >= max_art) {
@@ -856,9 +938,13 @@ setup_hard_base (
 		 * LISTGROUP failed, try a GROUP command instead
 		 */
 		} else {
+#ifdef DEBUG
 			debug_nntp ("setup_base, listgroup", "NOT_OK");
+#endif
 			sprintf (buf, "group %s", group->name);
+#ifdef DEBUG
 			debug_nntp ("setup_base", buf);
+#endif
 
 			put_server (buf);
 			switch (get_server (line, NNTP_STRLEN)) {
@@ -872,11 +958,15 @@ setup_hard_base (
 			}
 
 			if (atoi (line) != OK_GROUP) {
+#ifdef DEBUG
 				debug_nntp ("setup_base", "NOT_OK");
+#endif
 				return (-1);
 			}
 
+#ifdef DEBUG
 			debug_nntp ("setup_base", line);
+#endif
 
 			sscanf (line,"%ld %ld %ld %ld", &dummy, &count, &start, &last);
 
@@ -953,7 +1043,9 @@ get_respcode (void)
 			break;
 	}
 
+#ifdef DEBUG
 	debug_nntp ("get_respcode", line);
+#endif
 
 	respcode = atoi (line);
 
@@ -961,7 +1053,9 @@ get_respcode (void)
 		/*
 		 * Server requires authentication.
 		 */
+#ifdef DEBUG
 		debug_nntp ("get_respcode", "authentication");
+#endif
 		strcpy (savebuf, last_put);
 		if (!authenticate (nntp_server, userid, FALSE)) {
 			sprintf (line, txt_auth_failed, ERR_ACCESS);
@@ -1062,7 +1156,9 @@ nntp_to_fp (void)
 	FILE *fp;
 
 	if ((fp = stuff_nntp (fnam)) == (FILE *) 0) {
+#ifdef DEBUG
 		debug_nntp ("nntp_to_fp", "!stuff_nntp()");
+#endif
 		return (FILE *) 0;
 	}
 
@@ -1163,7 +1259,9 @@ vGrpGetArtInfo (
 		long	lDummy;
 
 		sprintf (acBuf, "group %s", pcGrpName);
+#ifdef DEBUG
 		debug_nntp ("vGrpGetArtInfo", acBuf);
+#endif
 		put_server (acBuf);
 
 		switch (get_server (acLine, NNTP_STRLEN)) {
@@ -1174,7 +1272,9 @@ vGrpGetArtInfo (
 				tin_done (0);
 		}
 
+#ifdef DEBUG
 		debug_nntp ("vGrpGetArtInfo", acLine);
+#endif
 
 		switch (atoi(acLine)) {
 
@@ -1194,7 +1294,9 @@ vGrpGetArtInfo (
 				tin_done (EXIT_NNTP_ERROR);
 
 			default:
+#ifdef DEBUG
 				debug_nntp ("NOT_OK", acLine);
+#endif
 				return(-1);
 		}
 #else

@@ -168,7 +168,7 @@ vReadCmdLineOptions (
 {
 	int iOption;
 
-	while ((iOption = getopt (iNumArgs, pacArgs, "ahM:m:rS:s:v")) != EOF) {
+	while ((iOption = getopt (iNumArgs, pacArgs, "ahM:m:rS:s:v")) != -1) {
 		switch (iOption) {
 			case 'a':	/* all groups including empty ones */
 				iAllGrps = TRUE;

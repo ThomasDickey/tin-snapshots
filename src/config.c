@@ -564,8 +564,8 @@ read_config_file (
 			}
 #endif
 			break;
-#ifdef HAVE_REGEX_FUNCS
 		case 'w':
+#ifdef HAVE_REGEX_FUNCS
 			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) {
 				wildcard_func = (wildcard) ? match_regex : wildmat;
 				break;
@@ -920,12 +920,11 @@ write_config_file (
 	fprintf (fp, "word_highlight=%s\n\n", print_boolean (word_highlight_tinrc));
 
 	fprintf (fp, txt_tinrc_word_h_display_marks);
-	fprintf (fp, "word_h_display_marks=%d\n\n",word_h_display_marks);
+	fprintf (fp, "word_h_display_marks=%d\n\n", word_h_display_marks);
 
 	fprintf (fp, txt_tinrc_col_markstar);
 	fprintf (fp, "col_markstar=%d\n", col_markstar);
 	fprintf (fp, "col_markdash=%d\n\n", col_markdash);
-
 #endif
 
 	if (*mail_address) {
@@ -973,6 +972,7 @@ write_config_file (
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
  	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
+
 #ifdef HAVE_REGEX_FUNCS
  	fprintf (fp, txt_tinrc_wildcard);
 	fprintf (fp, "wildcard=%d\n\n", wildcard);
@@ -1147,8 +1147,7 @@ refresh_config_page (
 
 int
 change_config_file (
-	struct t_group *group,
-	int filter_at_once)	/* not used */
+	struct t_group *group)
 {
 	int ch, i;
 	int change_option = FALSE;
@@ -1418,36 +1417,53 @@ change_config_file (
 						/*
 						 * the following do not need further action (if I'm right)
 						 *
-						 * case OPT_AUTO_BCC:			case OPT_AUTO_CC:
-						 * case OPT_AUTO_LIST_THREAD:		case OPT_CATCHUP_READ_GROUPS:
-						 * case OPT_CONFIRM_ACTION:		case OPT_CONFIRM_TO_QUIT:
-						 * case OPT_DEFAULT_AUTO_SAVE:		case OPT_DEFAULT_BATCH_SAVE:
-						 * case OPT_FORCE_SCREEN_REDRAW:	case OPT_FULL_PAGE_SCROLL:
-						 * case OPT_GROUP_CATCHUP_ON_EXIT:	case OPT_HIGHLIGHT_XCOMMENTTO:
-						 * case OPT_KEEP_POSTED_ARTICLES:	case OPT_MARK_SAVED_READ:
-						 * case OPT_NO_ADVERTISING:		case OPT_POS_FIRST_UNREAD:
-						 * case OPT_PRINT_HEADER:		case OPT_PROCESS_ONLY_UNREAD:
-						 * case OPT_SAVE_TO_MMDF_MAILBOX:	case OPT_SHOW_LINES:
-						 * case OPT_SHOW_LAST_LINE_PREV_PAGE:	case OPT_SHOW_ONLY_UNREAD_GROUPS:
-						 * case OPT_SHOW_XCOMMENTTO:		case OPT_SIGDASHES:
-						 * case OPT_SPACE_GOTO_NEXT_UNREAD:	case OPT_START_EDITOR_OFFSET:
-						 * case OPT_STRIP_BLANKS:		case OPT_TAB_AFTER_X_SELECTION:
-						 * case OPT_TAB_GOTO_NEXT_UNREAD:	case OPT_THREAD_CATCHUP_ON_EXIT:
-						 * case OPT_UNLINK_ARTICLE:		case OPT_USE_BUILTIN_INEWS:
-						 * case OPT_USE_MAILREADER_I:		case OPT_USE_MOUSE:
-                                                 * case OPT_DISPLAY_MIME_HEADER_ASIS:
+						 * case OPT_AUTO_BCC:
+						 * case OPT_AUTO_CC:
+						 * case OPT_AUTO_LIST_THREAD:
+						 * case OPT_CATCHUP_READ_GROUPS:
+						 * case OPT_CONFIRM_ACTION:
+						 * case OPT_CONFIRM_TO_QUIT:
+						 * case OPT_DEFAULT_AUTO_SAVE:
+						 * case OPT_DEFAULT_BATCH_SAVE:
+						 * case OPT_FORCE_SCREEN_REDRAW:
+						 * case OPT_FULL_PAGE_SCROLL:
+						 * case OPT_GROUP_CATCHUP_ON_EXIT:
+						 * case OPT_HIGHLIGHT_XCOMMENTTO:
+						 * case OPT_KEEP_POSTED_ARTICLES:
+						 * case OPT_MARK_SAVED_READ:
+						 * case OPT_NO_ADVERTISING:
+						 * case OPT_POS_FIRST_UNREAD:
+						 * case OPT_PRINT_HEADER:
+						 * case OPT_PROCESS_ONLY_UNREAD:
+						 * case OPT_SAVE_TO_MMDF_MAILBOX:
+						 * case OPT_SHOW_LINES:
+						 * case OPT_SHOW_LAST_LINE_PREV_PAGE:
+						 * case OPT_SHOW_ONLY_UNREAD_GROUPS:
+						 * case OPT_SHOW_XCOMMENTTO:
+						 * case OPT_SIGDASHES:
+						 * case OPT_SPACE_GOTO_NEXT_UNREAD:
+						 * case OPT_START_EDITOR_OFFSET:
+						 * case OPT_STRIP_BLANKS:
+						 * case OPT_TAB_AFTER_X_SELECTION:
+						 * case OPT_TAB_GOTO_NEXT_UNREAD:
+						 * case OPT_THREAD_CATCHUP_ON_EXIT:
+						 * case OPT_UNLINK_ARTICLE:
+						 * case OPT_USE_BUILTIN_INEWS:
+						 * case OPT_USE_MAILREADER_I:
+						 * case OPT_USE_MOUSE:
+						 * case OPT_DISPLAY_MIME_HEADER_ASIS:
 #ifdef HAVE_KEYPAD
 						 * case OPT_USE_KEYPAD:
 #endif
 #ifdef HAVE_METAMAIL
-						 * case OPT_ASK_FOR_METAMAIL:	case OPT_USE_METAMAIL:
+						 * case OPT_ASK_FOR_METAMAIL:
+						 * case OPT_USE_METAMAIL:
 #endif
 #ifdef M_UNIX
 						 * case OPT_KEEP_DEAD_ARTICLES:
 #endif
 #ifdef HAVE_COLOR
 						 * case OPT_WORD_HIGHLIGHT_TINRC:
-						 * case OPT_WORD_H_DISPLAY_MARKS:
 #endif
 						 * 	break;
 						 */
@@ -1505,15 +1521,23 @@ change_config_file (
 						 * the following don't need any further action
 #ifdef HAVE_COLOR
 						 *
-						 * case OPT_COL_BACK:		case OPT_COL_FROM:
-						 * case OPT_COL_HEAD:		case OPT_COL_HELP:
-						 * case OPT_COL_INVERS:		case OPT_COL_MESSAGE:
-						 * case OPT_COL_MINIHELP:	case OPT_COL_NORMAL:
-						 * case OPT_COL_QUOTE:		case OPT_COL_RESPONSE:
-						 * case OPT_COL_SIGNATURE:	case OPT_COL_SUBJECT:
-						 * case OPT_COL_TEXT:		case OPT_COL_TITLE:
+						 * case OPT_COL_BACK:
+						 * case OPT_COL_FROM:
+						 * case OPT_COL_HEAD:
+						 * case OPT_COL_HELP:
+						 * case OPT_COL_INVERS:
+						 * case OPT_COL_MESSAGE:
+						 * case OPT_COL_MINIHELP:
+						 * case OPT_COL_NORMAL:
+						 * case OPT_COL_QUOTE:
+						 * case OPT_COL_RESPONSE:
+						 * case OPT_COL_SIGNATURE:
+						 * case OPT_COL_SUBJECT:
+						 * case OPT_COL_TEXT:
+						 * case OPT_COL_TITLE:
 						 * case OPT_COL_MARKSTAR:
 						 * case OPT_COL_MARKDASH:
+						 * case OPT_WORD_H_DISPLAY_MARKS:
 						 *
 #endif
 						 *

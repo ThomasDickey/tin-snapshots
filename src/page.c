@@ -651,7 +651,7 @@ return_to_index:
 				break;
 
 			case iKeyOptionMenu:	/* option menu */
-				if (change_config_file (group, FALSE) == FILTERING) {
+				if (change_config_file (group) == FILTERING) {
 					filter_state = FILTERING;
 				}
 				set_signals_page ();		/* Just to be sure */
