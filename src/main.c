@@ -144,7 +144,7 @@ main (
 
 #ifdef DEBUG_NEWSRC
 	unlink ("/tmp/BITMAP");
-	vNewsrcTestHarness ();
+/*	vNewsrcTestHarness ();*/
 #endif
 
 	/*
@@ -337,9 +337,9 @@ main (
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCdD:f:g:hHI:m:M:nNoqQrRs:SuUvVwzZ"
+#		define OPTIONS "acCdD:f:g:hHI:m:M:nNop:qQrRs:SuUvVwzZ"
 #	else /* M_AMIGA */ /* may need some work */
-#		define OPTIONS "BcCdD:f:hHI:m:M:nNoqQrRs:SuUvVwzZ"
+#		define OPTIONS "BcCdD:f:hHI:m:M:nNop:qQrRs:SuUvVwzZ"
 #	endif
 #else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"
@@ -483,6 +483,13 @@ read_cmd_line_options (
 				purge_index_files = TRUE;
 				break;
 #endif /* !INDEX_DAEMON */
+
+#ifdef	NNTP_ABLE
+			case 'p':
+				if (atoi(optarg) != 0)
+					nntp_tcp_port = (unsigned short) atoi(optarg);
+				break;
+#endif
 
 #ifndef INDEX_DAEMON
 			case 'q':
@@ -686,6 +693,9 @@ usage (
 
 	error_message ("  -N       mail new news to your posts");
 	error_message ("  -o       post all postponed articles and exit");
+#	ifdef NNTP_ABLE
+	error_message ("  -p       use special NNTP port (instead of %d)", nntp_tcp_port);
+#	endif /* NNTP_ABLE */
 	error_message ("  -q       don't check for new newsgroups");
 	error_message ("  -Q       quick start. Same as -nqd");
 

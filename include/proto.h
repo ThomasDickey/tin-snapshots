@@ -425,7 +425,7 @@ extern void continue_prompt (void);
 extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 
 /* read.c */
-extern char *fgets_hdr (char *s, int size, FILE *f);
+extern char *fgets_hdr (char *s, size_t size, FILE *f);
 extern char *tin_fgets (char *buffer, size_t len, FILE *fp);
 extern void drain_buffer (FILE *fp);
 

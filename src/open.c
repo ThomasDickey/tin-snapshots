@@ -48,7 +48,6 @@ nntp_open (void)
 	int ret;
 	t_bool sec = FALSE;
 	static t_bool is_reconnect = FALSE;
-	static unsigned short nntp_tcp_port;
 
 	if (!read_news_via_nntp)
 		return 0;
@@ -60,7 +59,6 @@ nntp_open (void)
 	/* do this only once at start-up */
 	if (!is_reconnect) {
 		nntp_server = getserverbyfile (NNTP_SERVER_FILE);
-		nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 	}
 
 	if (nntp_server == (char *) 0) {
@@ -645,10 +643,10 @@ get_article (
 	 * It is impossible to delete an open file on the Amiga or Win32. So we keep a
 	 * copy of the file name and delete it when finished instead.
 	 */
+error:
 #if defined(M_AMIGA) || defined(WIN32)
 	log_unlink(fp, tempfile);
 #else
-error:
 	unlink (tempfile);
 #endif
 

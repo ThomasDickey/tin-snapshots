@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 17.08.97
+dnl Updated   : 24.11.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -40,6 +40,7 @@ AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_PROG_RANLIB
 AC_PROG_YACC
 AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
 CF_ANSI_CC_REQD
@@ -505,11 +506,13 @@ CF_SYS_ERRLIST
 AC_CHECK_FUNCS(\
 	atoi \
 	atol \
+	bcopy \
 	ftime \
 	getcwd \
 	is_xterm \
 	memcmp \
 	memcpy \
+	memmove \
 	memset \
 	mkdir \
 	poll \
@@ -543,6 +546,7 @@ AC_CHECK_FUNCS(\
 )
 
 CF_FUNC_FORK
+CF_FUNC_MEMMOVE
 
 dnl These return non-int values, and can be troublesome if not declared
 CF_CHECK_DECL(\
@@ -685,6 +689,14 @@ DMALLOC)
 	;;
 esac
 
+### The 'pcre' library uses non-standard #define's
+test ".$ac_cv_func_strerror" != ".yes" && \
+test ".$cf_cv_have_sys_errlist" = ".yes" && \
+	PCRE_DEFINES="$PCRE_DEFINES -DSTRERROR_FROM_ERRLIST"
+test ".$cf_cv_good_bcopy = ".yes &&
+	PCRE_DEFINES="$PCRE_DEFINES -DUSE_BCOPY"
+AC_SUBST(PCRE_DEFINES)
+
 ### Finally, build autoconf.h and the makefiles
 CFLAGS="$CFLAGS $EXTRA_CFLAGS"
-AC_OUTPUT(makefile src/Makefile)
+AC_OUTPUT(makefile pcre/Makefile src/Makefile)

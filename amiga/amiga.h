@@ -57,6 +57,7 @@ extern void closedir (DIR *di);
 
 extern FILE *popen (char *command, char *mode);
 extern int pclose (FILE *pipe);
+extern void *alloca (size_t size);
 
 extern unsigned int sleep(unsigned int secs);
 extern int tputs (char *cp, int count, void (*outc)(int));

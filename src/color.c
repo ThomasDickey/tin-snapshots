@@ -9,7 +9,7 @@
  *  Created   : 02-06-95
  *  Updated   : 06-03-95, 30-03-96, 22-04-96, 15-12-96
  *  Notes     : This are the basic function for ansi-color
- *              and word highlightning
+ *              and word highlighting
  *  Copyright : (c) 1995 by Olaf Kalzuga and Roland Rosenfeld
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -52,6 +52,12 @@ set_colors (
 	} *list;
 	static int nextpair;
 
+#ifndef HAVE_USE_DEFAULT_COLORS
+	if (fcolor < 0)
+		fcolor = default_fcol;
+	if (bcolor < 0)
+		bcolor = default_bcol;
+#endif
 	if (cmd_line || !use_color || !has_colors()) {
 		current_fcol = default_fcol;
 		current_bcol = default_bcol;
@@ -106,7 +112,7 @@ void refresh_color(void)
 }
 #endif /* USE_CURSES */
 
-/* setting foregroundcolor */
+/* setting foreground-color */
 void
 fcol (
 	int color)
@@ -133,7 +139,7 @@ fcol (
 #endif /* USE_CURSES */
 }
 
-/* setting backgroundcolor */
+/* setting background-color */
 void
 bcol (
 	int color)
@@ -185,7 +191,7 @@ isalp (
 /*		case '/': */
 		case '?':
 #ifdef NO_LOCALE
-		/* if you have not installed locale and want to reed german umlauts: */
+		/* if you have not installed locale and want to read German umlauts: */
 		case 'ß':
 		case 'ä':
 		case 'ö':

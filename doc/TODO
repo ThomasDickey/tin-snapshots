@@ -232,9 +232,6 @@ o  Additions to the pager:
 	'l' (goto thread menu)
 
 o  Add to the 'M'enu:
-	'/', '?' searching
-        news_headers_to_display
-        news_headers_not_to_display
         DEFAULT_MAILER
 
 o  Add to the 'h'elp-screen:
@@ -380,6 +377,9 @@ o  forged cancelling via Supersedes:/Also-Control:/Control:-header is possible
 o  f'uping with 'F' to a article which has Followup-To: poster set an then
    use 'm' quotes the text, but it should not! (mail_to_someone has no
    copy_text switch)
+
+o  f'uping with '^w' (include headers) to an article which has Followup-To:
+   poster set does not include headers when using 'm' (mail to poster)
 
 o  if exiting tin with
    catchup_read_groups=ON

@@ -284,21 +284,25 @@ DEBUG_IO((stderr, "Drain %s\n", buf));
 char *
 fgets_hdr (
 	char *s,
-	int size,
+	size_t size,
 	FILE *f)
 {
 	char *s1 = s;
+	int c = 0;
 	int is_leading_wsp = 0;
 
-	*s1 = fgetc(f);
+	c = fgetc(f);
+	*s1 = (int) c;
 
-	while (s1-s < size-2 &&  *s1 != EOF) {
+	while ((size_t) (s1-s) < size-2 && c != EOF) {
 		if (*s1  == '\n' || *s1 == '\r') {
 			if (!is_leading_wsp) {
 				is_leading_wsp = 1;
-				*(++s1) = fgetc(f);
+				c = fgetc(f);
+				*(++s1) = (char) c;
 			} else {
-				ungetc(*s1,f);
+				c = (int) *s1;
+				ungetc(c,f);
 				s1--;
 				break;
 			}
@@ -308,20 +312,24 @@ fgets_hdr (
 				*(s1-1) = ' '; /* convert newline to space */
 				/* remove leading wsp in continuation header lines */
 				do {
-					*s1 = fgetc(f);
-				} while (*s1 != EOF && (*s1 == '\t' || *s1== ' '));
+					c = fgetc(f);
+					*s1 = (char) c;
+				} while (c != EOF && (*s1 == '\t' || *s1== ' '));
 				is_leading_wsp = 0;
 				continue;
 			} else {
-				ungetc(*s1,f);
+				c = (int) *s1;
+				ungetc(c,f);
 				s1--;
 				break;
 			}
-		} else
-			*(++s1) = fgetc(f);
+		} else {
+			c = fgetc(f);
+			*(++s1) = (char) c;
+		}
 	}
 
-	if (*s1 == EOF)
+	if (c == EOF)
 		s1--;
 
 	*(++s1) = '\0';

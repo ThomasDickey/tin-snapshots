@@ -3,6 +3,7 @@
 SHELL		= /bin/sh
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
+top_srcdir	= @top_srcdir@
 srcdir		= @srcdir@
 VPATH		= $(srcdir)
 @SET_MAKE@
@@ -13,7 +14,7 @@ CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 DAEMON	= # -DINDEX_DAEMON # -DACTIVE_DAEMON
-CPPOPTS	= @DEFS@ -I. -I../include -I../pcre -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
+CPPOPTS	= @DEFS@ -I. -I../include -I$(top_srcdir)/pcre -I$(INCDIR) $(DEBUG) $(DAEMON) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
 LD	= $(CC)
@@ -38,7 +39,7 @@ MANEXT	= 1
 
 # directory structure
 DOCDIR	= $(srcdir)/../doc
-INCDIR	= $(srcdir)/../include
+INCDIR	= $(top_srcdir)/include
 BINDIR	= .
 OBJDIR	= .
 SRCDIR	= $(srcdir)
@@ -313,7 +314,10 @@ clean:
 	@-$(RM) -f core *~
 	@-$(RM) -f $(EXE) $(EXED)
 	@$(ECHO) "Cleaning Philip Hazel's Perl regular expressions library..."
-	@$(CD) ../pcre ; $(MAKE) clean ; $(CD) ../src
+	@$(CD) ../pcre && $(MAKE) clean
+
+dirty:
+	@$(ECHO) "I'm sorry, this is not supported yet ..."
 
 distclean \
 clobber: clean
@@ -338,7 +342,7 @@ TIN_DEP	= \
 
 ../pcre/libpcre.a:
 	@$(ECHO) "Building Philip Hazel's Perl regular expressions library..."
-	@$(CD) ../pcre ; $(MAKE) libpcre.a; $(CD) ../src
+	@$(CD) ../pcre && $(MAKE) libpcre.a
 
 tincfg.h:			$(SRCDIR)/tincfg.tbl \
 				makecfg

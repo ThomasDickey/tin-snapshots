@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971123
+PVER		= 971127
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -142,7 +142,8 @@ TOP	= \
 
 PCRE	= \
 	$(PCREDIR)/ChangeLog \
-	$(PCREDIR)/Makefile \
+	$(PCREDIR)/Makefile.in \
+	$(PCREDIR)/Makefile.orig \
 	$(PCREDIR)/Performance \
 	$(PCREDIR)/README \
 	$(PCREDIR)/Tech.Notes \
@@ -288,6 +289,7 @@ distclean:
 	@-$(RM) -f config.cache config.log config.status
 	@-$(RM) -f $(INCDIR)/autoconf.h
 	@-$(RM) -f $(PCREDIR)/maketables $(PCREDIR)/chartables.c
+	@-$(RM) -f $(PCREDIR)/Makefile
 	@-$(RM) -f $(SRCDIR)/Makefile
 	@-$(RM) -f td-conf.out
 	@-$(RM) -f makefile

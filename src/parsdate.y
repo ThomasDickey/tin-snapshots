@@ -489,9 +489,11 @@ ToSeconds(
     }
     else {
 	if (Hours < 1 || Hours > 12)
-	    return -1;
+		return -1;
+	if (Hours == 12)
+		Hours = 0;
 	if (Meridian == MERpm)
-	    Hours += 12;
+		Hours += 12;
     }
     return (Hours * 60L + Minutes) * 60L + Seconds;
 }

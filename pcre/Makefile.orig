@@ -12,8 +12,8 @@
 # lacks the strerror() function, but can provide the equivalent by indexing
 # into errlist.
 
-#CC = gcc -O
-#CFLAGS =
+CC = gcc -O
+CFLAGS =
 RANLIB = @true
 
 ##########################################################################
@@ -28,7 +28,7 @@ pgrep:          libpcre.a pgrep.o
 pcretest:       libpcre.a libpcreposix.a pcretest.o
 		$(CC) $(CFLAGS) -o pcretest pcretest.o libpcre.a libpcreposix.a
 
-libpcre.a:	$(OBJ)
+libpcre.a:      $(OBJ)
 		/bin/rm -f libpcre.a
 		ar cq libpcre.a $(OBJ)
 		$(RANLIB) libpcre.a

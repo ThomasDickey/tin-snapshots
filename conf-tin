@@ -22,19 +22,25 @@ CC="${CC-cc}"
 
 # a few things missing in configure
 
-if test -z "$CFLAGS" ; then
-	case `uname -s` in
+case `uname -s` in
 	HP-UX)
 		# The basic K&R compiler on HP/UX doesn't
 		# support -O/-g options, but the commercial one does
 		# -> trust $CFLAGS
-		test "$CC" != "cc" && test -z "$CFLAGS" && CFLAGS="-O"
+		case "$CC" in
+			cc)
+				test -z "$YACC" && YACC="yacc"
+				export YACC
+				;;
+			*)
+				test -z "$CFLAGS" && CFLAGS="-O"
+				;;
+		esac
 		;;
 	*)
-		CFLAGS="-O"
+		test -z "$CFLAGS" && CFLAGS="-O"
 		;;
-	esac
-fi
+esac
 
 # set --with-domain-name and
 #     --with-nntp-default-server to your local needs

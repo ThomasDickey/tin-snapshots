@@ -33,6 +33,7 @@ constext txt_art_saved_to[] = "Article saved to %s";
 constext txt_art_thread_regex_tag[] = " a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: ";
 constext txt_art_unavailable[] = "Article unavailable";
 constext txt_art_parent_none[] = "Article has no parent";
+constext txt_art_parent_killed[] = "Parent article has been killed";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
 constext txt_article_cancelled[] = "Article cancelled by author\n";
 constext txt_article_cannot_open[] = "get_article: can't open %s: ";
@@ -721,7 +722,8 @@ constext txt_tinrc_display_mime_allheader_asis[] = "# similar to display_mime_he
 # instead of news_headers_to_display\n";
 constext txt_tinrc_draw_arrow[] = "# if ON use -> otherwise highlighted bar for selection\n";
 constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selection filters\n\
-# header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: 5=Lines:\n\
+# header=NUM  0,1=Subject: 2,3=From: 4=Message-Id: & References:\n\
+#             5=Message-Id: & last References: entry only 6=Lines:\n\
 # global=ON/OFF  ON=apply to all groups OFF=apply to current group\n\
 # case=ON/OFF    ON=filter case sensitive OFF=ignore case\n\
 # expire=ON/OFF  ON=limit to default_filter_days OFF=don't ever expire\n";
@@ -1153,7 +1155,7 @@ constext txt_help_select_scope[] = "Apply select to current group or all groups.
 constext txt_kill_from[] = "Kill From:     [%-*.*s] (y/n): ";
 constext txt_kill_lines[] = "Kill Lines: (</>num): ";
 constext txt_kill_menu[] = "Kill Article Menu";
-constext txt_kill_msgid[] = "Kill Msg-Id:   [%-*.*s] (y/n): ";
+constext txt_kill_msgid[] = "Kill Msg-Id:   [%-*.*s] (f/l/n): ";
 constext txt_kill_scope[] = "Kill pattern scope  : ";
 constext txt_kill_subj[] = "Kill Subject:  [%-*.*s] (y/n): ";
 constext txt_kill_text[] = "Kill text pattern   : ";
@@ -1164,7 +1166,7 @@ constext txt_quit_edit_save_select[] = "q)uit e)dit s)ave select description: ";
 constext txt_select_from[] = "Select From    [%-*.*s] (y/n): ";
 constext txt_select_lines[] = "Select Lines: (</>num): ";
 constext txt_select_menu[] = "Auto-select Article Menu";
-constext txt_select_msgid[] = "Select Msg-Id  [%-*.*s] (y/n): ";
+constext txt_select_msgid[] = "Select Msg-Id  [%-*.*s] (f/l/n): ";
 constext txt_select_scope[] = "Select pattern scope: ";
 constext txt_select_subj[] = "Select Subject [%-*.*s] (y/n): ";
 constext txt_select_text[] = "Select text pattern : ";
@@ -1173,6 +1175,29 @@ constext txt_subj_line_only[] = "Subject: line (ignore case)     ";
 constext txt_subj_line_only_case[] = "Subject: line (case sensitive)  ";
 constext txt_time_default_days[] = "%d days";
 constext txt_unlimited_time[] = "Unlimited";
+constext txt_full[] = "Full";
+constext txt_last[] = "Last";
+constext txt_filter_file[] = "# Global & local filter file for the TIN newsreader\n#\n\
+# Global format:\n\
+#   group=STRING      Newsgroups list (e.g. comp.*,!*sources*)    [mandatory]\n\
+#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n\
+#   case=NUM          Compare=0 / ignore=1 case when filtering\n\
+#   score=NUM         Score to give (e.g. 70)\n\
+#   subj=STRING       Subject: line (e.g. How to be a wizard)\n\
+#   from=STRING       From: line (e.g. *Craig Shergold*)\n\
+#   msgid=STRING      Message-ID: line (e.g. <123@ether.net>) with full references\n\
+#   msgid_last=STRING Message-ID: line (e.g. <123@ether.net>) with last reference only\n\
+#   lines=NUM         Lines: line\n\
+#   either:\n\
+#   xref_max=NUM      Maximum score (e.g. 5)\n\
+#   xref_score=NUM,PATTERN score for pattern (e.g 0,*.answers)\n\
+#   ...\n\
+#   or:\n\
+#   xref=PATTERN      Kill pattern (e.g. alt.flame*)\n\
+#   \n\
+#   time=NUM          Filter period in days (default %d)\n#\n";
+constext txt_filter_score[] = "Enter score for rule (default=100): ";
+constext txt_filter_score_help[] = "Enter the score weight (range 0 < score <= 10000)";
 
 #ifdef INDEX_DAEMON
 	constext txt_cannot_stat_group[] = "Can't stat group %s";

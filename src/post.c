@@ -346,6 +346,7 @@ user_posted_messages (void)
 			posted[i].subj[k] = '\0';
 			i++;
 		}
+		posted[i].date[0] = '\0';	/* end-marker for display */
 		fclose (fp);
 
 		show_info_page (POST_INFO, 0, txt_post_history_menu);

@@ -855,12 +855,12 @@ group_list_thread:
 				goto group_done;
 
 			case iKeyGroupToggleReadDisplay:
-	 			/*
-	 			 * If in show_only_unread mode or there  are
-	 			 * unread articles we know this thread  will
-	 			 * exist after toggle. Otherwise we find the
-	 			 * next closest
-	 			 */
+				/*
+				 * If in show_only_unread mode or there  are
+				 * unread articles we know this thread  will
+				 * exist after toggle. Otherwise we find the
+				 * next closest
+				 */
 				wait_message (0, txt_reading_arts, (CURR_GROUP.attribute->show_only_unread) ? "all " : "unread ");
 
 				i = -1;
@@ -1732,14 +1732,14 @@ show_group_title (
 		}
 	}
 
-#if 0 /* turn on the warned about missing articles - !FIXME! */
+#if 0 /* turn on the warning about missing articles - !FIXME! */
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c) %ldU %s",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated),
-		active[num].newsrc.num_unread, 
+		active[num].newsrc.num_unread,
 		(art_cnt==active[num].newsrc.num_unread) ? "okay" : "articles missing!");
 #else
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
