@@ -115,6 +115,8 @@ check_start_save_any_news (check_start_save)
 				*ich='\0';
 			fprintf (fp_log, "%s\n\n", subject);
 			break;
+		default:
+			break;
 	}
 
 	for (i = 0; i < group_top; i++) {
@@ -157,7 +159,7 @@ check_start_save_any_news (check_start_save)
 							/* saved_groups++; */
 							if (check_start_save == SAVE_ANY_NEWS) {
 #ifdef VMS
-				sprintf (buf, "[.%s]dummy", group_path);
+								sprintf (buf, "[.%s]dummy", group_path);
 #else
 								sprintf (buf, "%s/dummy", group_path);
 #endif
@@ -224,6 +226,8 @@ check_start_save_any_news (check_start_save)
 							art_mark_read (group, &arts[j]);
 						}
 						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -276,6 +280,8 @@ check_start_save_any_news (check_start_save)
 					error_message (txt_command_failed_s, buf);
 				}
 			}
+			break;
+		default:
 			break;
 	}
 
@@ -337,6 +343,8 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 					info_message (txt_art_not_saved);
 					sleep (1);
 					return ret_code;
+				default:
+					break;
 			}
 			default_save_mode = ch;
 		}
@@ -1054,6 +1062,8 @@ post_process_files (proc_type_ch, auto_delete)
 				break;
 			case iKeyPProcExtractZip:
 				post_process_uud (POST_PROC_UUD_EXT_ZIP, auto_delete);
+				break;
+			default:
 				break;
 		}
 

@@ -1491,6 +1491,8 @@ get_author (thread, art, str)
 				strcpy (str, art->from);
 			}
 			break;
+		default:
+			break;
 	}
 }
 

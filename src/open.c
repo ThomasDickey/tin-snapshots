@@ -535,6 +535,8 @@ open_art_header (art)
 				tin_done (EXIT_NNTP_ERROR);
 			case -2:
 				tin_done (0);
+			default:
+				break;
 			}
 			if (atoi (buf) == OK_NOTEXT) {
 				ptr = buf;
@@ -566,6 +568,8 @@ open_art_header (art)
 				tin_done (EXIT_NNTP_ERROR);
 			case -2:
 				tin_done (0);
+			default:
+				break;
 			}
 			if (STRCMPEQ(ptr, ".")) {	/* end of text */
 				break;
@@ -778,10 +782,12 @@ setup_hard_base (group, group_path)
 
 			switch (get_server (line, NNTP_STRLEN)) {
 			case -1:
-			error_message (txt_connection_to_server_broken, "");
-			tin_done (EXIT_NNTP_ERROR);
+				error_message (txt_connection_to_server_broken, "");
+				tin_done (EXIT_NNTP_ERROR);
 			case -2:
 				tin_done (0);
+			default:
+				break;
 		}
 
 		if (atoi (line) != OK_GROUP) {
@@ -800,20 +806,24 @@ setup_hard_base (group, group_path)
 		put_server (buf);
 			switch (get_server (line, NNTP_STRLEN)) {
 			case -1:
-			error_message (txt_connection_to_server_broken, "");
-			tin_done (EXIT_NNTP_ERROR);
+				error_message (txt_connection_to_server_broken, "");
+				tin_done (EXIT_NNTP_ERROR);
 			case -2:
 				tin_done (0);
+			default:
+				break;
 		}
 		if (atoi (line) == OK_GROUP) {
 			debug_nntp ("setup_base", line);
 			forever {
 					switch (get_server (line, NNTP_STRLEN)) {
 					case -1:
-					error_message (txt_connection_to_server_broken, "");
-					tin_done (EXIT_NNTP_ERROR);
+						error_message (txt_connection_to_server_broken, "");
+						tin_done (EXIT_NNTP_ERROR);
 					case -2:
 						tin_done (0);
+					default:
+						break;
 				}
 				if (STRCMPEQ(line, ".")) {
 					debug_nntp ("setup_base", line);
@@ -965,6 +975,8 @@ get_respcode ()
 			tin_done (EXIT_NNTP_ERROR);
 		case -2:
 			tin_done (0);
+		default:
+			break;
 	}
 
 	debug_nntp ("get_respcode", line);
@@ -1002,6 +1014,8 @@ get_respcode ()
 			respcode = atoi (line);
 			break;
 #endif
+		default:
+			break;
 	}
 	return respcode;
 #else
@@ -1036,6 +1050,8 @@ stuff_nntp (fnam)
 			tin_done (EXIT_NNTP_ERROR);
 		case -2:
 			tin_done (0);
+		default:
+			break;
 		}
 
 
@@ -1350,6 +1366,8 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 			tin_done (EXIT_NNTP_ERROR);
 		case -2:
 			tin_done (0);
+		default:
+			break;
 		}
 
 		if (atoi (acLine) != OK_GROUP) {

@@ -365,6 +365,9 @@ show_info_page (type, help, title)
 
 					case KEYMAP_END:
 						goto help_end;
+
+					default:
+						break;
 				}
 				break;
 

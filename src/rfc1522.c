@@ -389,6 +389,7 @@ rfc1522_do_encode (what, where)
 
 #ifdef MIME_BREAK_LONG_LINES
 	int column = 0;		/* current column */
+	int word_cnt = 0;
 
 #endif
 	int ewsize = 0;		/* size of current encoded-word */
@@ -396,11 +397,12 @@ rfc1522_do_encode (what, where)
 	char buf2[64];		/* buffer for this and that */
 	char *c;
 	char *t;
-	int word_cnt = 0;
 
 	t = buf;
 	while (*what) {
+#ifdef MIME_BREAK_LONG_LINES
 		word_cnt++;
+#endif
 		if ((encoding = contains_nonprintables (what))) {
 			if (!quoting) {
 				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);

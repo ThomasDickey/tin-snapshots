@@ -171,9 +171,13 @@ prompt_yn (line, prompt, default_answer)
 						ch = prompt_ch;
 						break;
 #ifndef WIN32
+					default:
+						break;
 				}
 				break;
 #endif
+			default:
+				break;
 		}
 	}
 

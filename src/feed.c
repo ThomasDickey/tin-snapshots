@@ -112,6 +112,7 @@ feed_articles (function, level, group, respnum)
 			break;
 		default:
 			prompt = "";
+			break;
 	}
 
 	make_group_path (group->name, group_path);
@@ -160,6 +161,10 @@ feed_articles (function, level, group, respnum)
 					return;
 				}
 			}
+			break;
+			
+		default:
+			break;
 	}
 
 	switch (function) {
@@ -317,11 +322,6 @@ feed_articles (function, level, group, respnum)
 					case iKeyFeedSupersede:
 						sprintf (msg, txt_supersede_group, default_repost_group);
 						supersede = TRUE;
-						/*
-						 * FIXME!
-						 * don't ask q)uit, e)dit, p)ost [subject]:
-						 * but open editor emediately
-						 */
 						break;
 					case iKeyFeedRepost:
 						sprintf (msg, txt_repost_group, default_repost_group);
@@ -356,6 +356,8 @@ feed_articles (function, level, group, respnum)
 				}
 			}
 			break;
+		default:
+			break;
 	} /* switch (function) */
 
 	switch (ch) {
@@ -386,6 +388,8 @@ feed_articles (function, level, group, respnum)
 					break;
 				case FEED_REPOST:
 					redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
+					break;
+				default:
 					break;
 			}
 			if (processed_ok) {
@@ -439,6 +443,8 @@ feed_articles (function, level, group, respnum)
 					case FEED_REPOST:
 						redraw_screen = repost_article (group_name, &arts[i], i, supersede);
 						break;
+					default:
+						break;
 				}
 				if (processed_ok) {
 					processed++;
@@ -491,6 +497,8 @@ feed_articles (function, level, group, respnum)
 								break;
 							case FEED_REPOST:
 								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+								break;
+							default:
 								break;
 						}
 						if (processed_ok) {
@@ -558,6 +566,8 @@ feed_articles (function, level, group, respnum)
 							case FEED_REPOST:
 								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
 								break;
+							default:
+								break;
 						}
 						if (processed_ok) {
 							processed++;
@@ -578,6 +588,8 @@ feed_articles (function, level, group, respnum)
 			if (function == FEED_SAVE) {
 				(void) save_regex_arts (is_mailbox, group_path);
 			}
+			break;
+		default:
 			break;
 	} /* switch (ch) */
 
@@ -615,6 +627,8 @@ got_sig_pipe_while_piping:
 			}
 			free_save_array ();
 			break;
+		default:
+			break;
 	}
 
 	if (level == GROUP_LEVEL || level == THREAD_LEVEL)
@@ -651,6 +665,8 @@ got_sig_pipe_while_piping:
 					break;
 				case THREAD_LEVEL:
 					show_thread_page ();
+					break;
+				default:
 					break;
 			}
 		}

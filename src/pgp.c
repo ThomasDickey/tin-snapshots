@@ -226,6 +226,9 @@ invoke_pgp_mail (nam, mail_to)
 		case 's':
 			do_pgp(SIGN, nam, NULL);
 			break;
+
+		default:
+			break;
 	}
 }
 
@@ -258,6 +261,9 @@ invoke_pgp_news(the_article)
 		case 'i':
 			do_pgp(SIGN, the_article, NULL);
 			pgp_append_public_key(the_article);
+			break;
+			
+		default:
 			break;
 	}
 }

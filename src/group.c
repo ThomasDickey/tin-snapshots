@@ -233,8 +233,13 @@ debug_print_bitmap (group, NULL);
 							} else {
 								goto group_done;
 							}
-							/* break; */
+							
+						default:
+							break;
 					}
+
+				default:
+					break;
 				}
 				break;
 #endif /* WIN32 */
@@ -1627,7 +1632,7 @@ bld_sline (i)
 	_from[len_from+1] = '\0';
 	arts_sub[len_subj-5+1] = '\0';
 
-	sprintf (buffer = screen[j].col, "  %s%s %s%-*.*s%s%-*.*s",
+	sprintf (buffer = screen[j].col, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, _from);
 	

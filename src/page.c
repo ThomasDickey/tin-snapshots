@@ -175,7 +175,11 @@ restart:
 									mouse_click_on = TRUE;
 								}
 								break;
+							default:
+								break;
 						}
+						break;
+					default:
 						break;
 				}
 				break;

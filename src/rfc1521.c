@@ -184,8 +184,8 @@ rfc1521_decode (file)
 #endif
 }
 
-#define HI4BITS(c) (unsigned)(*EIGHT_BIT(c) >> 4)
-#define LO4BITS(c) (unsigned)(*c & 0xf)
+#define HI4BITS(c) (unsigned char)(*EIGHT_BIT(c) >> 4)
+#define LO4BITS(c) (unsigned char)(*c & 0xf)
 
 /* A MIME replacement for fputs.  e can be 'b' for base64, 'q' for
  * quoted-printable, or 8 (default) for 8bit.  Long lines get broken in

@@ -209,8 +209,6 @@ o  move architecture dependent files to subdirectories, clean up architecture
 
 o  split tin.h/proto.h for better dependencies in make
 
-o  check all switch()s for missing defaults (this can be done by some compilers)
-
 o  check where int should be replaced by size_t/uid_t/mode_t/...
 
 o  join Makefile and makefile (not entirely possible)

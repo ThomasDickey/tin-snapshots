@@ -16,13 +16,6 @@
 
 #define BITS_TO_BYTES(n)	(size_t)((n+NBITS-1)/NBITS)
 
-/*
- * safe_fgets does (nearly) the same as getaline
- * -> use it instead
- * urs 12/12/96
- */
-#define getaline(fp)	safe_fgets(fp)
-
 static int newsrc_mode = 0;
 
 static void vWriteNewsrcLine P_((FILE *fp, char *line));
@@ -1316,6 +1309,18 @@ vSetDefaultBitmap (group)
 }
 
 /* we use safe_fgets instead - it's more efficient */
+
+char *
+getaline(fp)
+	FILE *fp;
+{
+	char *res=safe_fgets(fp);
+
+	if(res && strlen(res) && res[strlen(res)-1]=='\n')
+		res[strlen(res)-1]='\0';
+	return res;
+}
+
 #if 0
 char *
 getaline (fp)

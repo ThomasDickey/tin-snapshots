@@ -421,6 +421,8 @@ if (debug) {
 				break;
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	fclose (fp);
@@ -594,6 +596,8 @@ fflush (stdout);
 						break;
 					case FILTER_LINES_GT:
 						fprintf (fp, "lines=>%d\n", ptr->filter[i].lines_num);
+						break;
+					default:
 						break;
 				}
 			}
@@ -979,6 +983,9 @@ filter_done:
 			}
 #endif
 			return (filtered);
+
+		default:
+			break;
 		}
 	}
 	/* NOTREACHED */
@@ -1223,7 +1230,9 @@ iAddFilterRule (psGrp, psArt, psRule)
 		case 3:
 			psPtr[*plNum].time = lCurTime + (default_filter_days * 86400*4);
 			break;
-		default: psPtr[*plNum].time = 0L;
+		default:
+			psPtr[*plNum].time = 0L;
+			break;
 	}
 
 	if (psRule->text[0]) {
@@ -1250,6 +1259,8 @@ iAddFilterRule (psGrp, psArt, psRule)
 				break;
 			case FILTER_MSGID:
 				psPtr[*plNum].msgid = my_strdup (acBuf);
+				break;
+			default:
 				break;
 		}
 		iFiltered = TRUE;
@@ -1487,6 +1498,8 @@ sleep (1);
 */
 								SET_FILTER(group, i, j);
 							}
+							break;
+						default:
 							break;
 					}
 				}

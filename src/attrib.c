@@ -237,6 +237,7 @@ read_attributes_file (file, global_file)
 					set_attrib_str (ATTRIB_NEWS_QUOTE, scope, buf);
 					break;
 				}
+				break;
 			case 'o':
 				if (match_string (line, "organization=", buf, sizeof (buf))) {
 					set_attrib_str (ATTRIB_ORGANIZATION, scope, buf);

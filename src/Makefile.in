@@ -211,13 +211,18 @@ all: $(BINDIR)/$(EXE)
 @SHOW_CC@
 	@ECHO_CC@$(CPP) -C $(CPPOPTS) $*.c >$@
 
-# explicit rule to allow running lint, and to accommodate older 'make' programs
+# explicit rules to allow running lint, and to accommodate older 'make' programs
+$(OBJDIR)/parsdate.o: $(SRCDIR)/parsdate.y
+	@ echo expect 6 shift/reduce conflicts...
+	$(YACC) $(SRCDIR)/parsdate.y
+	$(MV) y.tab.c $(OBJDIR)/parsdate.c
+@SHOW_CC@
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(OBJDIR)/parsdate.c
+
 $(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
 	@ echo expect 6 shift/reduce conflicts...
 	$(YACC) $(SRCDIR)/parsdate.y
-	$(MV) y.tab.c $@
-@SHOW_CC@
-	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(OBJDIR)/parsdate.c
+	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 
 actived: $(SRCDIR)/actived.c $(SRCDIR)/mail.c
 	@$(ECHO) "Compiling actived..."
