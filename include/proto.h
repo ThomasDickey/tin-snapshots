@@ -47,6 +47,7 @@ extern void write_attributes_file (char *file);
 /* charset.c */
 extern int iIsArtTexEncoded (long art, char *group_path);
 extern void Convert2Printable (unsigned char* buf);
+extern void ConvertBody2Printable (unsigned char* buf);
 extern void ConvertIso2Asc (char *iso, char *asc, int t);
 extern void ConvertTeX2Iso (char *from, char *to);
 
@@ -183,6 +184,9 @@ extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* W
 extern void init_selfinfo (void);
 #ifdef HAVE_COLOR
 	extern void postinit_colors (void);
+#endif
+#ifndef INDEX_DAEMON
+	extern void set_up_private_index_cache (void);
 #endif
 
 /* joinpath.c */

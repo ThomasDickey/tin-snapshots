@@ -444,14 +444,19 @@ extract_groups_from_newsrc(void)
 FILE *
 open_newsgroups_fp (void)
 {
+	FILE    *fp ;
+
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		if (read_local_newsgroups_file) {
 #	ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
 #	endif /* DEBUG */
-			return fopen (local_newsgroups_file, "r");
-		} else if (newsrc_active && !check_for_new_newsgroups) {
+			if ((fp = fopen (local_newsgroups_file, "r")) != (FILE *) 0)
+				return fp ;
+			read_local_newsgroups_file = FALSE ;
+		}
+		if (newsrc_active && !check_for_new_newsgroups) {
 #	ifdef DEBUG
 			debug_nntp ("open_newsgroups_fp", "Using info in .newsrc");
 #	endif /* DEBUG */

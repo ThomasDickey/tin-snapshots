@@ -198,6 +198,7 @@ t_bool auto_bcc;		/* add your name to bcc automatically */
 t_bool auto_cc;			/* add your name to cc automatically */
 t_bool auto_list_thread;	/* list thread when entering it using right arrow */
 t_bool beginner_level;		/* beginner level (shows mini help a la elm) */
+t_bool cache_overview_files = FALSE;	/* create local index files for NNTP overview files */
 t_bool catchup = FALSE;		/* mark all arts read in all subscribed groups */
 t_bool catchup_read_groups;	/* ask if read groups are to be marked read */
 t_bool check_any_unread = FALSE;
@@ -356,7 +357,8 @@ void postinit_colors(void)
  * Get users home directory, userid, and a bunch of other stuff!
  */
 
-void init_selfinfo (void)
+void
+init_selfinfo (void)
 {
 	char nam[LEN];
 	char *ptr;
@@ -945,6 +947,50 @@ got_active:
 		joinpath (pgp_data, homedir, ".pgp");
 #endif
 }
+
+/*
+ * If we're caching overview files (currently supported for non-setuid
+ * Tin only; we don't handle updating of shared cache files!) and the
+ * user specified an NNTP server with the '-g' option, make the directory
+ * name specific to the NNTP server and make sure the directory exists.
+ */
+#ifndef INDEX_DAEMON
+void
+set_up_private_index_cache (void)
+{
+	int	c;
+	char	*from;
+	struct stat sb;
+	char	*to;
+
+	if (! cache_overview_files)
+		return;
+	if (! local_index) {
+		error_message (txt_caching_disabled, "");
+		cache_overview_files = 0;
+		return;
+	}
+	if (cmdline_nntpserver[0] == 0)
+		return;
+	to = index_newsdir + strlen (index_newsdir);
+	*(to++) = '-';
+	for (from = cmdline_nntpserver; (c = *from) != 0; ++ from) {
+		if ('A' <= c && c <= 'Z')
+			c += 'a' - 'A';
+		*(to++) = c;
+	}
+	*to = 0;
+	if (stat (index_newsdir, &sb) == -1) {
+		my_mkdir (index_newsdir, S_IRWXUGO);
+	}
+#	ifdef DEBUG
+	debug_nntp ("set_up_private_index_cache", index_newsdir);
+#	endif
+	joinpath (local_newsgroups_file, index_newsdir, NEWSGROUPS_FILE);
+	return;
+}
+
+#endif /* !INDEX_DAEMON */
 
 /*
  * Create default mail & save directories if they do not exist

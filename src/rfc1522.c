@@ -192,7 +192,7 @@ rfc1522_decode(
 	const char *c, *d;
 	char *t;
 	static char buffer[2048];
-	char charset[256];
+	char charset[1024]; /* just in case */
 	char encoding;
 	char adjacentflag = 0;
 

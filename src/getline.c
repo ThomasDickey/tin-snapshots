@@ -105,7 +105,7 @@ getline (
 	}
 	while ((c = ReadCh ()) != EOF) {
 		c &= 0xff;
-		if ((gl_cnt < gl_max) && (isprint (c) || (c>=0xa0 && c<=0xff))) {
+		if ((gl_cnt < gl_max) && my_isprint(c)) {
 			if (number_only) {
 				if (isdigit (c)) {
 					gl_addchar (c);

@@ -505,6 +505,10 @@ select_done:
 					write_config_file (local_config_file);
 					tin_done (EXIT_OK);	/* Tin END */
 				}
+				if (prompt_yn (cLINES, txt_save_config, TRUE) == 1) {
+					write_config_file (local_config_file);
+					vWriteNewsrc ();
+				}
 				show_selection_page ();
 				break;
 

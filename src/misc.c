@@ -155,15 +155,17 @@ copy_body (
 		}
 	}
 
+	/* this is done to avoid snprintf() which some systems don't have */
+	if (strlen(prefix) > 240) /* truncate and terminate */
+		prefix[240] = '\0';
 	if (strstr(prefix, "%s"))
 		sprintf(prefixbuf, prefix, initl);
 	else {
+		strcpy(prefixbuf, prefix);
 		/* strip tailing space from quote-char for quoting quoted lines */
-		strcpy(prefixbuf,prefix);
 		if (prefixbuf[strlen(prefixbuf)-1] == ' ')
 			prefixbuf[strlen(prefixbuf)-1] = '\0';
 	}
-
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
 		if (!with_sig && !strcmp(buf, "-- \n"))
 			break;
@@ -1123,12 +1125,11 @@ int
 my_isprint (
 	int c)
 {
-	/* See son-of-1036 4.4 for more information about printable characters */
 #ifndef NO_LOCALE
-	return (isprint(c) || c==8 || c==9 || c==12);
+	return isprint(c);
 #else
 	/* dirty hack for iso-8859-1, if locale isn't installed correct */
-	return (isprint(c) || c==8 || c==9 || c==12 || c>=160);
+	return (isprint(c) || (c>=0xa0 && c<=0xff));
 #endif
 }
 
@@ -2352,7 +2353,8 @@ cleanup_tmp_files (void)
 		sprintf (acFile, "%s%d.idx", TMPDIR, process_id);
 		unlink (acFile);
 	}
-	unlink (local_newsgroups_file);
+	if (! cache_overview_files)
+		unlink (local_newsgroups_file);
 	unlink (lock_file);
 }
 

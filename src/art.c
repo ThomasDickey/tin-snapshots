@@ -207,7 +207,7 @@ index_group (
 		}
 	}
 
-	if (expired || modified)
+	if (expired || modified || cache_overview_files)
 		vWriteNovFile (group);
 
 	/*
@@ -787,7 +787,25 @@ char	buf2[HEADER_LEN];
 	top = 0;
 	last_read_article = 0L;
 	*expired = 0;
-
+/*
+ *  Call ourself recursively to read the cached overview file, if we are
+ *  supposed to be doing NNTP caching and we aren't already the recursive
+ *  instance.  (Turn off read_news_via_nntp while we're recursing so we
+ *  will know we're recursing while we're doing it.)  If there aren't
+ *  any new articles, just return, without going on to read the NNTP
+ *  overview file.  If we're going to read from NNTP, adjust min to the
+ *  next article past last_read_article; there's no reason to read them
+ *  from NNTP if they're cached locally.
+ */
+	if (cache_overview_files && read_news_via_nntp && xover_supported) {
+		read_news_via_nntp = FALSE ;
+		iReadNovFile (group, min, max, expired) ;
+		read_news_via_nntp = TRUE ;
+		if (last_read_article >= max)
+			return top ;
+		if (last_read_article >= min)
+			min = last_read_article + 1 ;
+	}
 	/*
 	 * open the overview file (whether it be local or via nntp)
 	 */
@@ -1088,7 +1106,11 @@ vWriteNovFile (
 	struct	t_article *psArt;
 	char	tmp[PATH_LEN];
 
-	if (xover_supported)		/* Don't write local index if we have XOVER */
+	/*
+	 * Don't write local index if we have XOVER, unless the user has
+	 * asked for caching.
+	 */
+	if (xover_supported && ! cache_overview_files)
 		return;
 
 	set_tin_uid_gid ();
@@ -1238,7 +1260,7 @@ pcFindNovFile (
 			iHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_NEWS:
-			if (read_news_via_nntp && xover_supported) {
+			if (read_news_via_nntp && xover_supported && ! cache_overview_files) {
 				sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
 			} else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);

@@ -122,3 +122,5 @@
 #ifdef	HAVE_REGEX_FUNCS
 	wildcard			txt_wildcard	2
 #endif
+	cache_overview_files		OPT_ON_OFF
+
