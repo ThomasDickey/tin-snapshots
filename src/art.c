@@ -1385,7 +1385,8 @@ do_update ()
 		time (&end_epoch);
 		sprintf (msg, txt_catchup_update_info,
 			(catchup ? "Caughtup" : "Updated"),
-			group_top, (int)(end_epoch - beg_epoch));
+			group_top, IS_PLURAL(group_top),
+			(int)(end_epoch - beg_epoch));
 		wait_message (msg);
 	}
 }

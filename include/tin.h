@@ -902,15 +902,15 @@ extern char *get_uaf_fullname();
 
 #if !defined(M_OS2) && !defined(WIN32)
 #	ifdef HAVE_ANSI_ASSERT
-#		if defined (__hpux) && !defined(__GNUC__)
-#			define  assert(p)       if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
-#		else
+#		if !defined (__hpux)|| defined(__STDC__) || defined (__GNUC__)
 #			define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
+#		else
+#			define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
 #		endif
 #	else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else (void)0;
-#	endif
-#endif
+#	endif /* HAVE_ANSI_ASSERT */
+#endif /*!M_OS2 && !WIN32*/
 
 
 #define	ESC		27
@@ -1743,3 +1743,5 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #		define EndWin		EndWind
 #	endif
 #endif
+
+#define IS_PLURAL(x) (x != 1 ? txt_plural : "")

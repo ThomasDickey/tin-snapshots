@@ -1,3 +1,9 @@
+--unoff BETA release 970104 --
+
+270) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code clean-up
+     FIX. tin.h, art.c, feed.c, post.c, nntplib.c
+
 --unoff BETA release 970103 --
 
 269) Thomas Quinot <operator@cuivre.fdn.fr>

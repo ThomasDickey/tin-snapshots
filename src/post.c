@@ -1915,7 +1915,7 @@ mail_bug_report ()
 						strfmailer (mailer, subject, mail_to, nam,
 							    buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
-							sprintf (msg, txt_mailed, 1);
+							sprintf (msg, txt_mailed, 1, IS_PLURAL(1));
 							info_message (msg);
 							goto mail_bug_report_done;
 						} else {
@@ -2094,7 +2094,7 @@ mail_to_author (group, respnum, copy_text)
 					strfmailer (mailer, subject, mail_to, nam,
 						    buf, sizeof (buf), default_mailer_format);
 					if (invoke_cmd (buf)) {
-						sprintf (msg, txt_mailed, 1);
+						sprintf (msg, txt_mailed, 1, IS_PLURAL(1));
 						info_message (msg);
 						goto mail_to_author_done;
 					} else {
