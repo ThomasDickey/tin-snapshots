@@ -1238,6 +1238,9 @@ extern t_bool display_mime_header_asis;
 extern t_bool display_mime_allheader_asis;
 extern t_bool do_rfc1521_decoding;
 extern t_bool draw_arrow_mark;
+#ifdef NNTP_ABLE
+extern t_bool force_auth_on_conn_open;
+#endif
 extern t_bool force_reread_active_file;
 extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;

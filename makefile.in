@@ -7,9 +7,9 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 980818
+PVER		= 981002
 VER		= pre-$(LVER)-$(PVER)
-MAIL_ADDR 	= "urs@tin.org"
+MAIL_ADDR	= "urs@tin.org"
 
 @SET_MAKE@
 
@@ -142,7 +142,7 @@ TOP	= \
 MISC	= \
 	$(SRCDIR)/Makefile \
 	$(SRCDIR)/descrip.mms \
-  	$(MISCDIR)/scroll.dif
+	$(MISCDIR)/scroll.dif
 
 AMIGA	= \
 	$(AMGDIR)/README \

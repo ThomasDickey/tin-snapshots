@@ -338,7 +338,7 @@ shell_escape (void)
 	sprintf (mesg, txt_shell_escape, default_shell_command);
 
 	if (!prompt_string (mesg, shell, HIST_SHELL_COMMAND))
-		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof(shell));
+		return;
 
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
 		continue;
@@ -1162,11 +1162,17 @@ my_isprint (
 	int c)
 {
 #ifndef NO_LOCALE
+	/* use locale */
 	return isprint(c);
 #else
-	/* dirty hack for iso-8859-1, if locale isn't installed correct */
-	return (isprint(c) || (c>=0xa0 && c<=0xff));
-#endif
+#	ifdef LOCAL_CHARSET
+		/* use some conversation table */
+		return (isprint(c) || (c>=0x80 && c<=0xff));
+#	else
+		/* assume iso-8859-1 */
+		return (isprint(c) || (c>=0xa0 && c<=0xff));
+#	endif /* LOCAL_CHARSET */
+#endif /* !NO_LOCALE */
 }
 
 
@@ -2668,18 +2674,30 @@ strip_address (
  * convert between local and network charset (e.g. NeXT and latin1)
  */
 
-#	define CHARNUM 256
-#	define BAD (-1)
+#define CHARNUM 256
+#define BAD (-1)
 
+/* use the appropriate conversion tables */
+#if LOCAL_CHARSET == 437
+#	warning "using local charset ibm437"
+#	include "l1_ibm437.tab"
+#	include "ibm437_l1.tab"
+#elif LOCAL_CHARSET == 850
+#	warning "using local charset ibm850"
+#	include "l1_ibm850.tab"
+#	include "ibm850_l1.tab"
+#else
+#	warning "using local charset next"
 #	include "l1_next.tab"
 #	include "next_l1.tab"
+#endif
 
 static int
 to_local (
 	int c)
 {
 	if (use_local_charset) {
-		c = c_l1_next[(unsigned char)c];
+		c = c_network_local[(unsigned char)c];
 		if (c == BAD)
 			return '?';
 		else
@@ -2701,7 +2719,7 @@ to_network (
 	int c)
 {
 	if (use_local_charset) {
-		c = c_next_l1[(unsigned char) c];
+		c = c_local_network[(unsigned char) c];
 		if (c==BAD)
 			return '?';
 		else

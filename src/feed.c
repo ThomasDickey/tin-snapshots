@@ -678,19 +678,24 @@ got_sig_pipe_while_piping:
 		}
 	}
 
-	if (function == FEED_MAIL) {
-		if (use_mailreader_i)
-			info_message (txt_external_mail_done);
-		else
-			info_message (txt_mailed, processed, IS_PLURAL(processed));
-
-	} else if (function == FEED_PRINT) {
-		info_message (txt_printed, processed, IS_PLURAL(processed));
-	} else if (function == FEED_SAVE || function == FEED_AUTOSAVE_TAGGED) {
-		if (ch == iKeyFeedArt)
-			info_message (txt_saved, processed, IS_PLURAL(processed));
+	switch (function) {
+		case FEED_MAIL:
+			if (use_mailreader_i)
+				info_message (txt_external_mail_done);
+			else
+				info_message (txt_mailed, processed, IS_PLURAL(processed));
+			break;
+		case FEED_PRINT:
+			info_message (txt_printed, processed, IS_PLURAL(processed));
+			break;
+		case FEED_SAVE:
+		case FEED_AUTOSAVE_TAGGED:
+			if (ch == iKeyFeedArt)
+				info_message (txt_saved, processed, IS_PLURAL(processed));
+			break;
+		default:
+			break;
 	}
-
 }
 
 

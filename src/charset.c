@@ -225,8 +225,8 @@ ConvertTeX2Iso (
 	*to = '\0';
 	len = strlen (from);
 	col = 0;
-
 	spaces = 0;
+
 	while (col < len) {
 		subst_len = 0;
 		i = ex = 0;
@@ -273,20 +273,22 @@ iIsArtTexEncoded (
 		return FALSE;
 
 	while (fgets (line, (int) sizeof(line), fp) != (char *) 0) {
-		if (line[0] == '\n') {
+		if (line[0] == '\n' && !body) {
 			body = TRUE;
-		}
-		if (!body) {
-			continue;
+		} else {
+			if (!body)
+				continue;
 		}
 
 		i = 0;
+
 		while (line[i++] == ' ')
 			;  /* search for first non blank */
+
 		i--;
-		if (!isalnum((unsigned char)line[i])) {
-			continue;  /*quoting char */
-		}
+
+		if (!isalnum((unsigned char)line[i]))
+			continue;  /* quoting char */
 
 		len = strlen (line) - 1;
 		for (i = 1; i < len; i++) {
@@ -311,6 +313,7 @@ Convert2Printable (
 	char *buf)
 {
 	unsigned char *c;
+
 	for (c= (unsigned char *)buf; *c; c++) {
 		if (!my_isprint(*c))
 			*c = '?';
@@ -326,6 +329,7 @@ ConvertBody2Printable (
 	char *buf)
 {
 	unsigned char *c;
+
 	for (c = (unsigned char *)buf; *c; c++) {
 		if (!(my_isprint(*c) || *c==8 || *c==9 || *c==12))
 			*c = '?';

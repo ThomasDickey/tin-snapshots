@@ -227,6 +227,9 @@ t_bool delete_index_file;	/* delete index file before indexing (tind only) */
 t_bool display_mime_header_asis=FALSE;	/* rfc 1522/2047 news_headers_to_display will be decoded by default */
 t_bool display_mime_allheader_asis=TRUE;	/* rfc 1522/2047 all heades (^H) will not be decoded by default */
 t_bool draw_arrow_mark;		/* draw -> or highlighted bar */
+#ifdef NNTP_ABLE
+t_bool force_auth_on_conn_open = FALSE;	/* authenticate on connection startup */
+#endif
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool global_filtered_articles;	/* globally killed / auto-selected articles */

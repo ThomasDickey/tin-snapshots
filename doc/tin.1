@@ -18,8 +18,8 @@ tin, rtin, tind \- A Usenet newsreader
 .B tin
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
-.RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-rzX \|]\|]
+.RB [\| \-dlnq \||\| -Q \|]
+.RB [\| \-ArzX \|]\|]
 .RB [\|[\| \-R \||\| -S \|]
 .RB -s
 .IR News-dir \|]
@@ -44,8 +44,8 @@ tin, rtin, tind \- A Usenet newsreader
 .B rtin
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
-.RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-zX \|]\|]
+.RB [\| \-dlnq \||\| -Q \|]
+.RB [\| \-AzX \|]\|]
 .RB [\| \-cvZ \|]
 .RB [\|[\| -S \|]
 .RB -s
@@ -104,6 +104,9 @@ it.
 .B -a
 Toggle ANSI color (default is off).
 .TP
+.B -A
+Force authenticaion on initial connect.
+.TP
 .B -c
 Create/update index files for every group in \fI$HOME/.newsrc\fP or file
 specified by the ``\fB-f\fR'' option and mark all articles as read.
@@ -135,6 +138,12 @@ started.
 Directory in which to store newsgroup index files. Default is
 \fI$HOME/.tin/.news\fP. This option is disabled if \fBtin\fR is compiled
 as reading news via NNTP only.
+.TP
+.BI -l
+Get number of articles per group from the \fIactive\fP file - this might
+result in incorrect counts but usualy is faster as the default
+which is to read the active file and then check the article count via a
+GROUP command ``\fB-ln\fR''.
 .TP
 .BI -m " dir"
 Mailbox directory to use. Default is \fI$HOME/Mail\fP.

@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 980818
+PVER	= 981002
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -167,7 +167,7 @@ PCRE	= \
 	$(PCREDIR)/ChangeLog \
 	$(PCREDIR)/Makefile.in \
 	$(PCREDIR)/Makefile.orig \
-	$(PCREDIR)/Performance \
+	$(PCREDIR)/RunTest \
 	$(PCREDIR)/README \
 	$(PCREDIR)/Tech.Notes \
 	$(PCREDIR)/pgrep.1 \
@@ -203,6 +203,10 @@ OLD	= \
 MISC	= \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
+	$(SRCDIR)/ibm437_l1.tab \
+	$(SRCDIR)/ibm850_l1.tab \
+	$(SRCDIR)/l1_ibm437.tab \
+	$(SRCDIR)/l1_ibm850.tab \
 	$(SRCDIR)/l1_next.tab \
 	$(SRCDIR)/next_l1.tab \
 	$(SRCDIR)/tincfg.tbl \
@@ -296,7 +300,7 @@ tar:
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
 	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
- 	| $(TR) "[\012]" " "`
+	| $(TR) "[\012]" " "`
 	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
 	@$(LS) $(PROJECT)$(VER).tgz
 
@@ -307,7 +311,7 @@ bzip2:
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
 	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
- 	| $(TR) "[\012]" " "`
+	| $(TR) "[\012]" " "`
 	@$(BZIP2) $(PROJECT)$(VER).tar
 	@$(CHMOD) 644 $(PROJECT)$(VER).tar.bz2
 	@$(LS) $(PROJECT)$(VER).tar.bz2
