@@ -377,8 +377,8 @@ extern void rfc1922_encode (char *line, FILE *f, int e);
 extern int mmdecode (const char *what, int encoding, int delimiter, char *where, const char *charset);
 extern void get_mm_charset (void);
 extern char *rfc1522_decode (const char *s);
-extern char *rfc1522_encode (char *s);
-extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool allow_8bit_header);
+extern char *rfc1522_encode (char *s,t_bool ismail);
+extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool allow_8bit_header,t_bool ismail);
 
 /* save.c */
 extern int check_start_save_any_news (int check_start_save);

@@ -1428,7 +1428,7 @@ vNewsrcTestHarness (void)
 		my_printf ("\n%d. PARSE Seq=[%s]\n", i+1, seq);
 
 		parse_bitmap_seq (&group, seq);
-debug_print_newsrc (&group.newsrc, stdout);
+		debug_print_newsrc (&group.newsrc, stdout);
 		print_bitmap_seq (fp, &group);
 
 		my_printf("   PRINT Seq=[");

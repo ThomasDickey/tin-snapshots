@@ -107,6 +107,7 @@ submit_inews (
 	char	*ptr;
 	FILE	*fp;
 	int	respcode;
+        int     ismail=FALSE;
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		return ret_code;
@@ -161,7 +162,9 @@ submit_inews (
 #if defined(INEWS_MAIL_GATEWAY) || defined(INEWS_MAIL_DOMAIN)
 	if (*(INEWS_MAIL_GATEWAY)) {
 		sprintf (line, "Path: %s", PATHMASTER);
-	} else if (*(INEWS_MAIL_DOMAIN)) {
+	}
+#if defined(INEWS_MAIL_DOMAIN)
+	else if (*(INEWS_MAIL_DOMAIN)) {
 		strcpy (buf, INEWS_MAIL_DOMAIN);
 		get_domain_name (buf, domain_name);
 		if (*domain_name == '.') {
@@ -175,12 +178,13 @@ submit_inews (
 	} else {
 		sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
 	}
+#endif /* INEWS_MAIL_DOMAIN */
 #else
 	sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
 #endif
 	put_server (line);
 
-	sprintf (line, "From: %s", rfc1522_encode(from_name));
+	sprintf (line, "From: %s", rfc1522_encode(from_name,ismail));
 	put_server (line);
 #endif /* !FORGERY */
 
@@ -278,12 +282,8 @@ get_host_name (
 				}
 				fclose (fp);
 			}
-			if (!host_name[0]) {
-				/* can' read specified file - try getfqdn() */
-				ptr = getfqdn (0);
-				if (ptr != 0) {
-					my_strncpy (host, ptr, sizeof (host));
-				}
+			if (! host_name[0]) {
+				strcpy (host_name, "PROBLEM_WITH_YOUR_MAIL_GATEWAY_FILE");
 			} 
 		} else {
 			strcpy (host_name, nntp_inews_gateway);
@@ -319,10 +319,24 @@ get_host_name (
 			}
 			fclose (sfp);
 		} else {
-			ptr = getfqdn (0);
-			if (ptr != 0) {
-				my_strncpy (host, ptr, sizeof (host));
-			} else {
+/*
+** we should do do a getfqdn() somewhere here if
+** !(strlen(INEWS_MAIL_DOMIAN))
+**
+** ----
+**
+** this whole thing should be rewritten:
+** at startup do:
+** domainname=INEWS_MAIL_GATEWAY, if !domainname
+** domainname=INEWS_MAIL_DOMAIN, if !domainname
+** domainname=NEWSLIBDIR/sitename, if !domainname
+** domainname=NEWSLIBDIR/mailname, if !domainname
+** domainname=getfqdn(), if !domainname
+** domainname=/etc/HOSTNAME, if !domainname
+** domainname=uname(&uts_name)
+** in one function, use it for Path/From generation.
+*/
+
 #					if defined(M_AMIGA) || defined(M_OS2)
 						my_strncpy (host, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (host));
 #					else
@@ -341,7 +355,6 @@ get_host_name (
 					}
 #						endif
 #					endif
-			}
 		}
 		strcpy (host_name, host);
 	}
@@ -538,6 +551,7 @@ submit_news_file (
 	char buf[LEN];
 	char *cp = buf;
 	int ret_code;
+        t_bool ismail=FALSE;
 
 	checknadd_headers (name, lines);
 
@@ -546,7 +560,7 @@ submit_news_file (
 	 || strcasecmp(txt_mime_types[post_mime_encoding], txt_7bit)))
              post_mime_encoding = 0;	/* FIXME: txt_8bit */
 
-	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header);
+	rfc15211522_encode(name, txt_mime_types[post_mime_encoding], post_8bit_header,ismail);
 
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG

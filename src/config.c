@@ -15,7 +15,7 @@
 #include	"version.h"
 #include	"tin.h"
 #include	"tincfg.h"
-#include 	"tcurses.h"
+#include	"tcurses.h"
 #include	"menukeys.h"
 
 #define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)

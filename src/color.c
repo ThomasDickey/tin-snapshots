@@ -50,7 +50,7 @@ static void set_colors(int fcolor, int bcolor)
 			FIXME[pair] = TRUE;
 		}
 
-		bkgdset(attribute | COLOR_PAIR(pair));
+		bkgdset(attribute | COLOR_PAIR(pair) | ' ');
 	}
 }
 

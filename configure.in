@@ -21,10 +21,6 @@ AC_PREFIX_DEFAULT(/usr/local)
 CF_SYS_NAME
 echo "Configuring `make version` for $SYS_NAME"
 
-case "$SYS_NAME" in
-OSF1*)   AC_DEFINE(OSF1);;
-esac
-
 ###	Checks for programs.
 save_CFLAGS="$CFLAGS"
 AC_PROG_CC
@@ -252,11 +248,13 @@ CF_WITH_VALUE(mail-gateway,
 	INEWS_MAIL_GATEWAY)
 AC_MSG_RESULT($INEWS_MAIL_GATEWAY)
 
-AC_MSG_CHECKING(for mail-domain)
-CF_WITH_VALUE(mail-domain,
-	[  --with-mail-domain      sets \$INEWS_MAIL_DOMAIN],
-	INEWS_MAIL_DOMAIN)
-AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
+if test -z "$INEWS_MAIL_GATEWAY" ; then
+	AC_MSG_CHECKING(for mail-domain)
+	CF_WITH_VALUE(mail-domain,
+		[  --with-mail-domain      sets \$INEWS_MAIL_DOMAIN],
+		INEWS_MAIL_DOMAIN)
+	AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
+fi
 
 AC_MSG_CHECKING(for INEWS domain)
 if test -z "$INEWS_DOMAIN" ; then
@@ -662,6 +660,15 @@ CF_TM_GMTOFF
 
 AC_SYS_LONG_FILE_NAMES
 CF_SIG_ARGS
+
+
+AC_MSG_CHECKING(wether to use system_status)
+AC_TRY_COMPILE([], [int i = system_status;],
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(USE_SYSTEM_STATUS),
+	AC_MSG_RESULT(no)
+)
+
 
 # GCC and Apollo compilers are quite noisy about signal constants (quiet them).
 if test -n "$GCC"; then

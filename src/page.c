@@ -337,6 +337,7 @@ page_goto_next_unread:
 				skip_include = '\0';
 				if (note_page != ART_UNAVAILABLE) {
 					if (!(tab_goto_next_unread || note_end)) {
+						doing_pgdn = TRUE;
 						show_note_page (group->name, respnum);
 						break;
 					}
@@ -842,9 +843,10 @@ show_note_page (
 	int lines;
 	long tmp_pos;
 	static char buf[HEADER_LEN];
-	int do_display_header, dont_display_header,
-	    wild_do_display_headers, wild_dont_display_headers,
-	    display_header, i;
+	int do_display_header, dont_display_header;
+	t_bool wild_do_display_headers = FALSE;
+	t_bool wild_dont_display_headers = FALSE;
+	int display_header, i;
 
 	if (beginner_level) {
 		lines = cLINES - (MINI_HELP_LINES - 1);
@@ -894,14 +896,10 @@ show_note_page (
 		do_display_header = 1;
 		dont_display_header = 0;
 		if (num_headers_to_display && news_headers_to_display_array[0][0]=='*') {
-			wild_do_display_headers = 1;
-		} else {
-			wild_do_display_headers = 0;
+			wild_do_display_headers = TRUE;
 		}
 		if (num_headers_to_not_display && news_headers_to_not_display_array[0][0]=='*') {
-			wild_dont_display_headers = 1;
-		} else {
-			wild_dont_display_headers = 0;
+			wild_dont_display_headers = TRUE;
 		}
 		if (wild_do_display_headers && wild_dont_display_headers) {
 			/* you're dumb */

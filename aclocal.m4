@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 02.02.97
+dnl Updated   : 12.03.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -323,11 +323,9 @@ dnl ---------------------------------------------------------------------------
 dnl Check if the compiler supports useful warning options.  There's a few that
 dnl we don't use, simply because they're too noisy:
 dnl
-dnl	-Wcast-qual (a little too noisy -- later)
 dnl	-Wconversion (useful in older versions of gcc, but not in gcc 2.7.x)
 dnl	-Wredundant-decls (system headers make this too noisy)
 dnl	-Wtraditional (combines too many unrelated messages, only a few useful)
-dnl	-Wshadow
 dnl	-pedantic
 dnl
 AC_DEFUN([CF_GCC_WARNINGS],
