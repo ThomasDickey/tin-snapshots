@@ -821,7 +821,7 @@ show_note_page (group, respnum)
 			}
 		}
 		first = FALSE;
-		if (fgets (buf, sizeof (buf), note_fp) == NULL) {
+		if (fgets (buf, sizeof (buf), note_fp) == 0) {
 			note_end = TRUE;
 			skip_include = '\0';
 			break;
@@ -954,7 +954,7 @@ show_mime_article (fp, art)
 	printf ("mime article\n");
 	sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 	mime_fp = popen (buf, "w");
-	while (fgets (buf, sizeof (buf), fp) != NULL) {
+	while (fgets (buf, sizeof (buf), fp) != 0) {
 		my_fputs (buf, mime_fp);
 	}
 	fflush (mime_fp);
@@ -1261,7 +1261,7 @@ art_open (art, group_path)
 	note_h_contentenc[0] = '\0';
 	note_h_ftnto[0] = '\0';
 
-	while (fgets(buf, sizeof buf, note_fp) != NULL) {
+	while (fgets(buf, sizeof buf, note_fp) != 0) {
 		buf[sizeof(buf)-1] = '\0';
 
 		if (*buf == '\n')
@@ -1289,41 +1289,41 @@ art_open (art, group_path)
 		}
 		*ptr = '\0';
 
-  		if (match_header (buf, "Path", note_h_path, NULL, HEADER_LEN))
+  		if (match_header (buf, "Path", note_h_path, (char*)0, HEADER_LEN))
   			continue;
-		if (match_header (buf, "From", note_h_from, NULL, HEADER_LEN))
+		if (match_header (buf, "From", note_h_from, (char*)0, HEADER_LEN))
 			continue;
-  		if (match_header (buf, "Subject", note_h_subj, NULL, HEADER_LEN))
+  		if (match_header (buf, "Subject", note_h_subj, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Organization", note_h_org, NULL, HEADER_LEN))
+  		if (match_header (buf, "Organization", note_h_org, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Date", note_h_date, NULL, HEADER_LEN))
+  		if (match_header (buf, "Date", note_h_date, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Newsgroups", note_h_newsgroups, NULL, HEADER_LEN))
+  		if (match_header (buf, "Newsgroups", note_h_newsgroups, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Message-ID", note_h_messageid, NULL, HEADER_LEN))
+  		if (match_header (buf, "Message-ID", note_h_messageid, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "References", note_h_references, NULL, HEADER_LEN))
+  		if (match_header (buf, "References", note_h_references, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Distribution", note_h_distrib, NULL, HEADER_LEN))
+  		if (match_header (buf, "Distribution", note_h_distrib, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Followup-To", note_h_followup, NULL, HEADER_LEN))
+  		if (match_header (buf, "Followup-To", note_h_followup, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Keywords", note_h_keywords, NULL, HEADER_LEN))
+  		if (match_header (buf, "Keywords", note_h_keywords, (char*)0, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Summary", note_h_summary, NULL, HEADER_LEN))
+  		if (match_header (buf, "Summary", note_h_summary, (char*)0, HEADER_LEN))
   			continue;
-		if (match_header (buf, "Mime-Version", note_h_mimeversion, NULL, HEADER_LEN))
+		if (match_header (buf, "Mime-Version", note_h_mimeversion, (char*)0, HEADER_LEN))
 			continue;
-		if (match_header (buf, "Content-Type", note_h_contenttype, NULL, HEADER_LEN)) {
+		if (match_header (buf, "Content-Type", note_h_contenttype, (char*)0, HEADER_LEN)) {
 			str_lwr (note_h_contenttype, note_h_contenttype);
 			continue;
 		}
-		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, NULL, HEADER_LEN)) {
+		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, (char*)0, HEADER_LEN)) {
 			str_lwr (note_h_contentenc, note_h_contentenc);
 			continue;
 		}
-		if (match_header (buf, "X-Comment-To", note_h_ftnto, NULL, HEADER_LEN))
+		if (match_header (buf, "X-Comment-To", note_h_ftnto, (char*)0, HEADER_LEN))
 			continue;
 	}
 
@@ -1441,7 +1441,7 @@ show_last_page ()
 			note_line += 2;
 		}
 		while (note_line < cLINES) {
-			if (fgets (buf, sizeof buf, note_fp) == NULL) {
+			if (fgets (buf, sizeof buf, note_fp) == 0) {
 				note_end = TRUE;
 				break;
 			}

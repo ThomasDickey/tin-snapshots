@@ -311,6 +311,14 @@
 #undef	DONT_HAVE_SIGWINCH
 
 /*
+ * Definitions for debugging-malloc libraries
+ */
+#ifndef __BUILD__
+#undef	USE_DBMALLOC	/* use Conor Cahill's dbmalloc library */
+#undef	USE_DMALLOC	/* use Gray Watson's dmalloc library */
+#endif
+
+/*
  * Define if the system doesn't support pipes, or if it is not a desired
  * feature.
  */

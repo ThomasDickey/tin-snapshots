@@ -1,4 +1,23 @@
+--unoff BETA release 970108 --
+
+276) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. options-menu: on the last-1 page <page-down> does not always work
+          the way it should
+     FIX. config.c
+
+275) Thomas E. Dickey <dickey@clark.net>
+     ADD. code-cleanup (mainly lint and dbmalloc stuff)
+     FIX. several supplied patches
+
+274) Thomas Quinot <operator@cuivre.fdn.fr>
+     BUG. parse_from() can't handle "login"@host.doma.in (luser)
+     FIX. misc.c
+
 --unoff BETA release 970106 --
+
+273) Nickolay Saukh <nms@nns.ru>
+     ADD. dbmalloc support
+     FIX. tin.h
 
 272) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
      ADD. rewrote parse_from() macros to K&R-C

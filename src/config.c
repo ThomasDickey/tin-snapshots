@@ -17,10 +17,12 @@
 #include	"tincfg.h"
 #include	"menukeys.h"
 
+#define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)
+
 static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, int *dst));
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
 static void highlight_option P_((int option));
-static void print_option P_((int act_option));
+static void print_option P_((enum option_enum the_option));
 static void show_config_page P_((int page_no));
 static void unhighlight_option P_((int option));
 
@@ -1013,9 +1015,11 @@ int actual_option_page = 0;
  */
 
 static void
-print_option (act_option)
-	int act_option;
+print_option (the_option)
+	enum option_enum the_option;
 {
+	int act_option = (int)the_option;
+
 	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
@@ -1232,8 +1236,13 @@ change_config_file (group, filter_at_once)
 			case iKeyPageDown3:
 				unhighlight_option (option);
 				option += option_lines_per_page;
-				if (option > LAST_OPT)
-					option = 1;
+				if (option > LAST_OPT) {
+					if (LAST_OPTION_PAGE == actual_option_page) {
+						option = 1;
+					} else {
+						option = LAST_OPT;
+					}
+				}
 				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
@@ -1305,7 +1314,8 @@ change_config_file (group, filter_at_once)
 							unhighlight_option (option);
 							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
 								inverse_okay = TRUE;
-								if (OPT_INVERSE_OKAY > first_option_on_screen && OPT_INVERSE_OKAY < first_option_on_screen + option_lines_per_page) {
+								if ((int)OPT_INVERSE_OKAY > first_option_on_screen
+								 && (int)OPT_INVERSE_OKAY < first_option_on_screen + option_lines_per_page) {
 									MoveCursor (INDEX_TOP + (OPT_INVERSE_OKAY - 1) % option_lines_per_page, 3);
 									print_option (OPT_INVERSE_OKAY);
 								}
@@ -1318,7 +1328,8 @@ change_config_file (group, filter_at_once)
 							unhighlight_option (option);
 							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
 								draw_arrow_mark = TRUE;	/* we don't want to navigate blindly */
-								if (OPT_DRAW_ARROW_MARK > first_option_on_screen && OPT_DRAW_ARROW_MARK <= first_option_on_screen + option_lines_per_page + 1) {
+								if ((int)OPT_DRAW_ARROW_MARK > first_option_on_screen
+								 && (int)OPT_DRAW_ARROW_MARK <= first_option_on_screen + option_lines_per_page + 1) {
 									MoveCursor (INDEX_TOP + (OPT_DRAW_ARROW_MARK - 1) % option_lines_per_page, 3);
 									print_option (OPT_DRAW_ARROW_MARK);
 								}
@@ -1498,17 +1509,17 @@ change_config_file (group, filter_at_once)
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
 							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
-								if (option == OPT_POST_MIME_ENCODING) {
+								if (option == (int)OPT_POST_MIME_ENCODING) {
 									post_8bit_header = FALSE;
-									if ((OPT_POST_8BIT_HEADER > first_option_on_screen) &&
-											(OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
+									if (((int)OPT_POST_8BIT_HEADER > first_option_on_screen)
+									 && ((int)OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
 										MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
 										print_option (OPT_POST_8BIT_HEADER);
 									}
 								} else {
 									mail_8bit_header = FALSE;
-									if ((OPT_MAIL_8BIT_HEADER > first_option_on_screen) &&
-											(OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
+									if (((int)OPT_MAIL_8BIT_HEADER > first_option_on_screen)
+									 && ((int)OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
 										MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
 										print_option (OPT_MAIL_8BIT_HEADER);
 									}
