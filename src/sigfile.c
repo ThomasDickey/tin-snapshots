@@ -47,6 +47,18 @@ msg_write_signature (fp, flag)
 #endif
 
 	i = my_group[cur_groupnum];
+
+	if (! strcmp(active[i].attribute->sigfile, "---none")) {
+		return;
+	}
+	if (active[i].attribute->sigfile[0] == '!') {
+		char cmd[PATH_LEN];
+		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
+		sprintf (cmd, "%s 1>&%d", active[i].attribute->sigfile+1, fp->_fileno);
+		fflush(fp);
+		system (cmd);
+		return;
+	}
 	get_cwd (cwd);
 	
 	if (! strfpath (active[i].attribute->sigfile, path, sizeof (path), 

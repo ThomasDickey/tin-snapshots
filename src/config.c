@@ -663,6 +663,9 @@ write_config_file (file)
 	fprintf (fp, "# print program with parameters used to print articles/threads\n");
 	fprintf (fp, "default_printer=%s\n\n", default_printer);
 	fprintf (fp, "# Signature path (random sigs)/file to be used when posting/replying to messages\n");
+	fprintf (fp, "# default_sigfile=file       appends file as signature\n");
+	fprintf (fp, "# default_sigfile=! command  executes external command to generate a signature\n");
+	fprintf (fp, "# default_sigfile=--none     don't append a signature\n");
 	fprintf (fp, "default_sigfile=%s\n\n", default_sigfile);
 	fprintf (fp, "# if ON prepend the signature with dashes '\\n-- \\n'\n");
 	fprintf (fp, "sigdashes=%s\n\n", print_boolean (sigdashes));

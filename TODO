@@ -102,7 +102,6 @@ o  add
        --disable-piping               (default off)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
-   add ifdef NNTP_ONLY undef SPOOLDIR etc...
 
 o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
@@ -200,6 +199,9 @@ o  what is with NEW_HASH_METHOD in misc.c?
 o  what is with HAVE_GENERIC_AUTHINFO in open.c?
 
 o  check all switch()s for missing defaults 
+
+o  repost ('x') ignores ~/.tin/headers & ~/.tin/attributes - bug or
+   feature?!
 
 o  kill-file may get messed up if using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and

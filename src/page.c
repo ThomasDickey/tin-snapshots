@@ -1205,7 +1205,7 @@ art_open (art, group_path)
 {
 	char buf[8192];
 	char *ptr;
-	char *lasthead = (char *) 0;
+	int c;
 
 	note_page = 0;
 
@@ -1244,6 +1244,15 @@ art_open (art, group_path)
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
 		buf[sizeof(buf)-1] = '\0';
 
+		/* check for continued header line */
+		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
+		      && strlen(buf)<sizeof(buf)-1) {
+		  if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+		    buf[strlen(buf)-1]='\0';
+		  }
+		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
+		}
+
 		for (ptr = buf ; *ptr && *ptr != '\n' ; ptr++) {
 			if (((*ptr) & 0xFF) < ' ')
 				*ptr = ' ';
@@ -1253,22 +1262,8 @@ art_open (art, group_path)
 		if (*buf == '\0')
 			break;
 
-		/* Only allow continuations on headers which are of length HEADER_LEN */
-		if (*buf == ' ') {
-			if (lasthead != (char *) 0) {
-				if (strlen(lasthead) + strlen(buf) + 1 < HEADER_LEN) {
-					strcat(lasthead, "\n");
-					strcat(lasthead, buf);
-				}
-			}
-			continue;
-		}
-		lasthead = (char *) 0;
-
-  		if (match_header (buf, "Path", note_h_path, HEADER_LEN)) {
-  			lasthead = note_h_path;
+  		if (match_header (buf, "Path", note_h_path, HEADER_LEN))
   			continue;
-		}
 		if (match_header (buf, "From", note_h_from, HEADER_LEN))
 			continue;
   		if (match_header (buf, "Subject", note_h_subj, HEADER_LEN))
@@ -1277,33 +1272,22 @@ art_open (art, group_path)
   			continue;
   		if (match_header (buf, "Date", note_h_date, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Newsgroups", note_h_newsgroups, HEADER_LEN)) {
-  			lasthead = note_h_newsgroups;
+  		if (match_header (buf, "Newsgroups", note_h_newsgroups, HEADER_LEN))
   			continue;
-		}
   		if (match_header (buf, "Message-ID", note_h_messageid, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "References", note_h_references, HEADER_LEN)) {
-			lasthead = note_h_references;
+  		if (match_header (buf, "References", note_h_references, HEADER_LEN))
   			continue;
-		}
   		if (match_header (buf, "Distribution", note_h_distrib, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Followup-To", note_h_followup, HEADER_LEN)) {
-  			lasthead = note_h_followup;
+  		if (match_header (buf, "Followup-To", note_h_followup, HEADER_LEN))
   			continue;
-		}
-  		if (match_header (buf, "Keywords", note_h_keywords, HEADER_LEN)) {
-  			lasthead = note_h_keywords;
+  		if (match_header (buf, "Keywords", note_h_keywords, HEADER_LEN))
   			continue;
-		}
-  		if (match_header (buf, "Summary", note_h_summary, HEADER_LEN)) {
-			lasthead = note_h_summary;
+  		if (match_header (buf, "Summary", note_h_summary, HEADER_LEN))
   			continue;
-		}
-		if (match_header (buf, "Mime-Version", note_h_mimeversion, HEADER_LEN)) {
+		if (match_header (buf, "Mime-Version", note_h_mimeversion, HEADER_LEN))
 			continue;
-		}
 		if (match_header (buf, "Content-Type", note_h_contenttype, HEADER_LEN)) {
 			str_lwr (note_h_contenttype, note_h_contenttype);
 			continue;
@@ -1312,9 +1296,8 @@ art_open (art, group_path)
 			str_lwr (note_h_contentenc, note_h_contentenc);
 			continue;
 		}
-		if (match_header (buf, "X-Comment-To", note_h_ftnto, HEADER_LEN)) {
+		if (match_header (buf, "X-Comment-To", note_h_ftnto, HEADER_LEN))
 			continue;
-		}
 	}
 
 	/* TODO - Would be better to retrieve the Refs: back from the msgid cache */

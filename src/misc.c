@@ -2370,3 +2370,18 @@ iCopyFile (pcSrcFile, pcDstFile)
 
 	return iRetCode;
 }
+
+
+/*
+ * take a peek at the next char in file
+ */
+ 
+int
+peek_char (fp)
+	FILE *fp;
+{
+	int c=fgetc(fp);
+	if(c!=EOF)
+		ungetc(c, fp);
+	return c;
+}

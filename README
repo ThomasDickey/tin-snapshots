@@ -12,6 +12,9 @@ configure to your local setup (have a look at):
 compile with:
 	cd src; make
 
+install with:
+	make install
+
 Install at your own risk.
 
 Please do NOT mail any bug-reports concerning THIS version to Iain Lea but

@@ -119,39 +119,51 @@ CF_ARG_ENABLE(warnings,
 AC_MSG_RESULT($enableval)
 fi
 
-## options for directories
-AC_MSG_CHECKING(for news-library path)
-CF_WITH_PATH(libdir,
-	[  --with-libdir=PATH      news-library],
-	LIBDIR,/usr/lib/news)
-AC_MSG_RESULT($LIBDIR)
+## !NNTP_ONLY
+if test "$USE_SPOOLDIR" = "yes"; then
+	## options for directories
+	AC_MSG_CHECKING(for news-library path)
+	CF_WITH_PATH(libdir,
+		[  --with-libdir=PATH      news-library],
+		LIBDIR,/usr/lib/news)
+	AC_MSG_RESULT($LIBDIR)
 
-AC_MSG_CHECKING(for news spool-directory path)
-CF_WITH_PATH(spooldir,
-	[  --with-spooldir=PATH    news spool-directory],
-	SPOOLDIR,/usr/spool/news)
-AC_MSG_RESULT($SPOOLDIR)
+	AC_MSG_CHECKING(for news spool-directory path)
+	CF_WITH_PATH(spooldir,
+		[  --with-spooldir=PATH    news spool-directory],
+		SPOOLDIR,/usr/spool/news)
+	AC_MSG_RESULT($SPOOLDIR)
 
-AC_MSG_CHECKING(for news overview-directory path)
-CF_WITH_PATH(nov-dir,
-	[  --with-nov-dir=PATH     news overview-directory],
-	NOVROOTDIR,$SPOOLDIR)
-AC_MSG_RESULT($NOVROOTDIR)
+	AC_MSG_CHECKING(for news overview-directory path)
+	CF_WITH_PATH(nov-dir,
+		[  --with-nov-dir=PATH     news overview-directory],
+		NOVROOTDIR,$SPOOLDIR)
+	AC_MSG_RESULT($NOVROOTDIR)
 
-AC_MSG_CHECKING(for directory containing \"inews\")
-CF_WITH_PATH(inews-dir,
-	[  --with-inews-dir=PATH   directory containing \"inews\"],
-	INEWSDIR,$LIBDIR)
-AC_MSG_RESULT($INEWSDIR)
-test ".$INEWSDIR" != ".$LIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
+	AC_MSG_CHECKING(for directory containing \"inews\")
+	CF_WITH_PATH(inews-dir,
+		[  --with-inews-dir=PATH   directory containing \"inews\"],
+		INEWSDIR,$LIBDIR)
+	AC_MSG_RESULT($INEWSDIR)
+	test ".$INEWSDIR" != ".$LIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
 
-## options for libraries
-AC_MSG_CHECKING(for optional INN-NNTP library)
-CF_WITH_VALUE(inn-nntplib,
-	[  --with-inn-nntplib=PATH specify INN-NNTP library],
-	INN_NNTPLIB)
-AC_MSG_RESULT($INN_NNTPLIB)
-test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
+	## options for libraries
+	AC_MSG_CHECKING(for optional INN-NNTP library)
+	CF_WITH_VALUE(inn-nntplib,
+		[  --with-inn-nntplib=PATH specify INN-NNTP library],
+		INN_NNTPLIB)
+	AC_MSG_RESULT($INN_NNTPLIB)
+	test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
+else
+	LIBDIR=""
+	SPOOLDIR=""
+	NOVROOTDIR=""
+	AC_MSG_CHECKING(for directory containing \"inews\")
+	CF_WITH_PATH(inews-dir,
+		[  --with-inews-dir=PATH   directory containing \"inews\"],
+		INEWSDIR,/usr/lib/news)
+	AC_MSG_RESULT($INEWSDIR)
+fi
 
 ### Look for ncurses in the usual places, accommodating compilers that don't
 ### search /usr/local by default.
