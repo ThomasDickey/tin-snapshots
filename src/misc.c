@@ -404,9 +404,7 @@ tin_done (ret)
 	if (ret != EXIT_NNTP_ERROR) {
 		nntp_close ();			/* disconnect from NNTP server */
 	}
-	if (debug) {
-		free_all_arrays ();		/* deallocate all arrays */
-	}
+	free_all_arrays ();
 	if (!cmd_line)
 		ClearScreen ();
 	EndWin ();

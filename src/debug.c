@@ -459,7 +459,7 @@ debug_print_filters ()
 	char file[PATH_LEN];
 	FILE *fp;
 	int i, j, num;
-	struct t_filter *filter;
+	struct t_filter *the_filter;
 
 	if (debug < 2)
 		return;
@@ -471,10 +471,10 @@ debug_print_filters ()
 		 * print global filter
 		 */
 		num = glob_filter.num;
-		filter = glob_filter.filter;
+		the_filter = glob_filter.filter;
 		fprintf (fp, "*** BEG GLOBAL FILTER=[%3d] ***\n", num);
 		for (i=0 ; i < num ; i++) {
-			debug_print_filter (fp, i, &filter[i]);
+			debug_print_filter (fp, i, &the_filter[i]);
 			fprintf (fp, "\n");
  		}
 		fprintf (fp, "*** END GLOBAL FILTER ***\n");
@@ -482,10 +482,10 @@ debug_print_filters ()
 		for (j=0 ; j < num_active ; j++) {
 			if (active[j].grps_filter) {
 				num = active[j].grps_filter->num;
-				filter = active[j].grps_filter->filter;
+				the_filter = active[j].grps_filter->filter;
 				fprintf (fp, "\n*** group=[%3d] [%s]\n", num, active[j].name);
 				for (i=0 ; i < num ; i++) {
-					debug_print_filter (fp, i, &filter[i]);
+					debug_print_filter (fp, i, &the_filter[i]);
  				}
  			}
  		}

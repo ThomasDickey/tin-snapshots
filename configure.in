@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 24.08.96
+dnl Updated   : 29.09.96
 dnl Notes     : 
 dnl
 dnl Copyright 1996 by Thomas Dickey
@@ -19,6 +19,7 @@ AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
 AC_PREFIX_DEFAULT(/usr/local)
 
 CF_SYS_NAME
+echo "Configuring `make version` for $SYS_NAME"
 
 ###	Checks for programs.
 save_CFLAGS="$CFLAGS"
@@ -145,7 +146,7 @@ else
 	NEWSLIBDIR=""
 	SPOOLDIR=""
 	NOVROOTDIR=""
-	INEWSPATH="/usr/lib/news/"
+	INEWSPATH="/usr/lib/news"
 fi
 
 AC_MSG_CHECKING(for directory containing \"inews\")

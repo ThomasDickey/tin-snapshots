@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 24.08.96
+dnl Updated   : 29.09.96
 dnl Notes     : 
 dnl
 dnl Copyright 1996 by Thomas Dickey
@@ -464,12 +464,18 @@ AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
 test $cf_cv_dcl_sys_errlist = no && AC_DEFINE(DECL_SYS_ERRLIST)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Derive the system name, as a check for reusing the autoconf cache
 AC_DEFUN([CF_SYS_NAME],[
-SYS_NAME=`(uname -a || hostname) 2>/dev/null | sed 1q`
+SYS_NAME=`(uname -s -r || uname -a || hostname) 2>/dev/null | sed 1q`
 test -z "$SYS_NAME" && SYS_NAME=unknown
 AC_DEFINE_UNQUOTED(SYS_NAME,"$SYS_NAME")
-echo "Configuring `make version` for $SYS_NAME"
-])dnl
+
+AC_CACHE_VAL(cf_cv_system_name,[cf_cv_system_name="$SYS_NAME"])
+
+if test ".$SYS_NAME" != ".$cf_cv_system_name" ; then
+	AC_MSG_RESULT("Cached system name does not agree with actual")
+	AC_ERROR("Please remove config.cache and try again.")
+fi])
 dnl ---------------------------------------------------------------------------
 dnl See if we can link with the termios functions tcsetattr/tcgetattr
 AC_DEFUN([CF_TERMIOS],
