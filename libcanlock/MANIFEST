@@ -1,0 +1,25 @@
+MANIFEST	You're lookin' at me.
+README		Read this.  These are your installation instructions.
+base64.c	Borrowed from ISC BIND, creates and decodes Base64 strings.
+base64.h
+build*		This is my lame excuse for a makefile.
+canlock.c	The cancel lock functions live in here.
+canlock.h
+canlocktest.c	A program to check that the library compiled correctly.
+hmac_sha1.c	This implements HMAC using SHA-1 hashes.
+hmac_sha1.h
+hmactest.c	Test the HMAC functions.
+sha1.c		A public domain SHA-1 implementation.
+sha1.h
+
+doc/
+HOWTO		A short walk through the library to explain how it is
+		used.
+
+draft-ietf-usefor-cancel-lock-00.txt
+		The draft that explains the cancel lock system.
+
+rfc2104.txt	A description of HMAC.
+
+rfc2202.txt	Sample results so you can verify that HMAC/SHA-1 is
+		operating correctly.

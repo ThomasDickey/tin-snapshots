@@ -110,7 +110,6 @@ int num_headers_to_not_display;		/* num headers to not display -- swp */
 int num_of_killed_arts;
 int num_of_selected_arts;		/* num articles marked 'hot' */
 int num_of_tagged_arts;
-int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int system_status;
 int top = 0;
 int top_base;				/* Highest numbered thread */
@@ -136,8 +135,8 @@ t_bool cmd_line;			/* batch / interactive mode */
 t_bool created_rcdir;			/* checks if first time tin is started */
 t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command when dangerous signal exit */
 #ifdef INDEX_DAEMON
-t_bool delete_index_file;		/* delete index file before indexing (tind only) */
-#endif
+	t_bool delete_index_file;		/* delete index file before indexing (tind only) */
+#endif /* INDEX_DAEMON */
 t_bool disable_gnksa_domain_check;	/* disable checking TLD in From: etc. */
 t_bool disable_sender;			/* disable generation of Sender: header */
 t_bool global_filtered_articles;	/* globally killed / auto-selected articles */
@@ -184,12 +183,14 @@ char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 	static struct passwd pwdentry;
 #endif /* !M_AMIGA */
 
+	struct regex_cache strip_re_regex, strip_was_regex
 #ifdef HAVE_COLOR
-	struct regex_cache quote_regex = {
+		, quote_regex, quote_regex2, quote_regex3
+#endif /* HAVE_COLOR */
+	= {
 		NULL,
 		NULL
 	};
-#endif /* HAVE_COLOR */
 
 struct t_config tinrc = {
 	ART_MARK_DELETED,		/* art_marked_deleted */
@@ -197,17 +198,17 @@ struct t_config tinrc = {
 	ART_MARK_RETURN,		/* art_marked_return */
 	ART_MARK_SELECTED,		/* art_marked_selected */
 	ART_MARK_UNREAD,		/* art_marked_unread */
-	"",		/* default_editor_format */
+	"",		/* editor_format */
 	"",		/* default_goto_group */
 	"",		/* default_mail_address */
-	"",		/* default_mailer_format */
+	"",		/* mailer_format */
 #ifndef DONT_HAVE_PIPING
 	"",		/* default_pipe_command */
 #endif /* !DONT_HAVE_PIPING */
 	"",		/* default_post_newsgroups */
 	"",		/* default_post_subject */
 #ifndef DISABLE_PRINTING
-	"",		/* default_printer */
+	"",		/* printer */
 #endif /* !DISABLE_PRINTING */
 	"1-.",	/* default_range_group */
 	"1-.",	/* default_range_select */
@@ -222,7 +223,7 @@ struct t_config tinrc = {
 	"",		/* default_search_subject */
 	"",		/* default_select_pattern */
 	"",		/* default_shell_command */
-	"",		/* default_sigfile */
+	"",		/* sigfile */
 	"In article %M you wrote:",		/* mail_quote_format */
 	"",		/* maildir */
 	"",		/* mail_address */
@@ -234,11 +235,15 @@ struct t_config tinrc = {
 	DEFAULT_COMMENT,	/* quote_chars */
 #ifdef HAVE_COLOR
 	"",		/* quote_regex */
+	"",		/* quote_regex 2nd level*/
+	"",		/* quote_regex >= 3rd level */
 #endif /* HAVE_COLOR */
+	"",		/* strip_re_regex */
+	"",		/* strip_was_regex */
 	"",		/* savedir */
 	"",		/* spamtrap_warning_addresses */
 	"In %G %F wrote:",				/* xpost_quote_format */
-	DEFAULT_FILTER_DAYS,			/* default_filter_days */
+	DEFAULT_FILTER_DAYS,			/* filter_days */
 	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_kill_header */
 	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_select_header */
 	0,		/* default_move_group */
@@ -247,7 +252,7 @@ struct t_config tinrc = {
 	32,		/* groupname_max_length */
 	MIME_ENCODING_7BIT,		/* mail_mime_encoding */
 	MIME_ENCODING_7BIT,		/* post_mime_encoding */
-	POST_PROC_NONE,			/* post_process_type */
+	POST_PROC_NONE,			/* post_process */
 	REREAD_ACTIVE_FILE_SECS,	/* reread_active_file_secs */
 	SHOW_FROM_NAME,				/* show_author */
 	SORT_BY_DATE_ASCEND,		/* sort_article_type */
@@ -268,6 +273,8 @@ struct t_config tinrc = {
 	0,		/* col_message (initialised later) */
 	0,		/* col_newsheaders (initialised later) */
 	0,		/* col_quote (initialised later) */
+	0,		/* col_quote2 (initialised later) */
+	0,		/* col_quote3 (initialised later) */
 	0,		/* col_response (initialised later) */
 	0,		/* col_signature (initialised later) */
 	0,		/* col_subject (initialised later) */
@@ -294,9 +301,9 @@ struct t_config tinrc = {
 	TRUE,		/* display_mime_allheader_asis */
 	FALSE,		/* display_mime_header_asis */
 #ifdef USE_INVERSE_HACK
-	TRUE,		/* draw_arrow_mark */
+	TRUE,		/* draw_arrow */
 #else
-	FALSE,	/* draw_arrow_mark */
+	FALSE,		/* draw_arrow */
 #endif /* USE_INVERSE_HACK */
 	FALSE,		/* force_screen_redraw */
 	TRUE,		/* full_page_scroll */
@@ -317,7 +324,7 @@ struct t_config tinrc = {
 #ifndef DISABLE_PRINTING
 	FALSE,		/* print_header */
 #endif /* !DISABLE_PRINTING */
-	TRUE,		/* process_only_unread */
+	FALSE,		/* process_only_unread */
 	FALSE,		/* prompt_followupto */
 	FALSE,		/* quote_empty_lines */
 	TRUE,		/* quote_signatures */
@@ -390,6 +397,8 @@ static const struct {
 	{ &tinrc.col_newsheaders, 9 },
 	{ &tinrc.col_normal,     DFT_FORE },
 	{ &tinrc.col_quote,       2 },
+	{ &tinrc.col_quote2,      3 },
+	{ &tinrc.col_quote3,      4 },
 	{ &tinrc.col_response,    2 },
 	{ &tinrc.col_signature,   4 },
 	{ &tinrc.col_subject,     6 },
@@ -527,7 +536,7 @@ init_selfinfo (
 #	if defined(M_OS2) || defined(WIN32)
 	if (myentry == (struct passwd *) 0) {
 		fprintf (stderr, "Environment variable USER not set.\n");
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 #	else
 #		ifdef VMS
@@ -578,7 +587,7 @@ init_selfinfo (
 	dangerous_signal_exit = FALSE;
 #ifdef INDEX_DAEMON
 	delete_index_file = FALSE;
-#endif
+#endif /* INDEX_DAEMON */
 	disable_gnksa_domain_check = FALSE;
 	disable_sender = FALSE;
 	global_filtered_articles = FALSE;
@@ -745,15 +754,15 @@ init_selfinfo (
 		my_mkdir (rcdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 #if defined(M_UNIX) || defined (M_AMIGA) || defined(VMS)
-	strcpy (tinrc.default_mailer_format, MAILER_FORMAT);
+	strcpy (tinrc.mailer_format, MAILER_FORMAT);
 #else /* M_UNIX ... */
-	strcpy (tinrc.default_mailer_format, mailer);
+	strcpy (tinrc.mailer_format, mailer);
 #endif /* M_UNIX ... */
 #ifndef DISABLE_PRINTING
-	strcpy (tinrc.default_printer, DEFAULT_PRINTER);
+	strcpy (tinrc.printer, DEFAULT_PRINTER);
 #	ifdef M_AMIGA
 	if (tin_bbs_mode)
-		strcpy(tinrc.default_printer, DEFAULT_BBS_PRINTER);
+		strcpy(tinrc.printer, DEFAULT_BBS_PRINTER);
 #	endif /* M_AMIGA */
 #endif /* !DISABLE_PRINTING */
 	strcpy (mailer, get_val (ENV_VAR_MAILER, DEFAULT_MAILER));
@@ -774,7 +783,7 @@ init_selfinfo (
 	joinpath (tinrc.maildir, homedir, DEFAULT_MAILDIR);
 	joinpath (tinrc.savedir, homedir, DEFAULT_SAVEDIR);
 #endif /* VMS */
-	joinpath (tinrc.default_sigfile, homedir, ".Sig");
+	joinpath (tinrc.sigfile, homedir, ".Sig");
 	joinpath (default_signature, homedir, ".signature");
 
 	if (!index_newsdir[0])

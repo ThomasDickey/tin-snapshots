@@ -79,7 +79,7 @@ wait_for_input (void /*FILE *fd*/)
 		if ((nfds = select(STDIN_FILENO+1, &readfds, NULL, NULL, &tv)) == -1) {
 			if (errno != EINTR) {
 				perror_message("select() failed");
-				exit(EXIT_FAILURE);
+				giveup();
 			} else
 				return FALSE;
 		}

@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990805"
-#	define RELEASENAME	"Sumerland"
+#	define RELEASEDATE	"19990927"
+#	define RELEASENAME	"Nine While Nine"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

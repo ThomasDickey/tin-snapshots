@@ -438,9 +438,9 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i586 & Linux 2.2.6 with fcc 1.0
-	i586 & Linux 2.2.10-ac9 with gcc 2.7.2.3
-	i586 & Linux 2.3.9 with egcs-egcs-2.91.66
+	i586 & Linux 2.2.12 with fcc 1.0
+	i586 & Linux 2.2.12 with gcc 2.95.1
+	i586 & Linux 2.3.9 with egcs-2.91.66
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1

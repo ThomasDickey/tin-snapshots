@@ -418,6 +418,72 @@ write_line(
 		clrtoeol();
 }
 
+
+int
+get_arrow_key (
+	int prech)
+{
+#	ifdef NCURSES_MOUSE_VERSION
+	MEVENT my_event;
+#	endif /* NCURSES_MOUSE_VERSION */
+	int ch = getch();
+	int code = KEYMAP_UNKNOWN;
+
+	switch (ch) {
+		case KEY_DC:
+			code = KEYMAP_DEL;
+			break;
+		case KEY_IC:
+			code = KEYMAP_INS;
+			break;
+		case KEY_UP:
+			code = KEYMAP_UP;
+			break;
+		case KEY_DOWN:
+			code = KEYMAP_DOWN;
+			break;
+		case KEY_LEFT:
+			code = KEYMAP_LEFT;
+			break;
+		case KEY_RIGHT:
+			code = KEYMAP_RIGHT;
+			break;
+		case KEY_NPAGE:
+			code = KEYMAP_PAGE_DOWN;
+			break;
+		case KEY_PPAGE:
+			code = KEYMAP_PAGE_UP;
+			break;
+		case KEY_HOME:
+			code = KEYMAP_HOME;
+			break;
+		case KEY_END:
+			code = KEYMAP_END;
+			break;
+#	ifdef NCURSES_MOUSE_VERSION
+		case KEY_MOUSE:
+			if (getmouse(&my_event) != ERR) {
+				switch ((int) my_event.bstate) {
+					case BUTTON1_CLICKED:
+						xmouse = MOUSE_BUTTON_1;
+						break;
+					case BUTTON2_CLICKED:
+						xmouse = MOUSE_BUTTON_2;
+						break;
+					case BUTTON3_CLICKED:
+						xmouse = MOUSE_BUTTON_3;
+						break;
+				}
+				xcol = my_event.x;	/* column */
+				xrow = my_event.y;	/* row */
+				code = KEYMAP_MOUSE;
+			}
+			break;
+#	endif /* NCURSES_MOUSE_VERSION */
+	}
+	return code;
+}
+
 #else
 void my_tcurses(void); /* proto-type */
 void my_tcurses(void) { }	/* ANSI C requires non-empty file */

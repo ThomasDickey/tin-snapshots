@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1999-06-23
+dnl Updated   : 1999-09-08
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997,1998,1999 by Thomas Dickey
@@ -173,7 +173,19 @@ extern struct zowie *$1();
 ],
 [
 ],
+[if test -n "$CHECK_DECL_HDRS" ; then
+# try to workaround system headers which are infested with non-standard syntax
+CF_UPPER(cf_1_up,$1)
+AC_TRY_COMPILE([
+#define DECL_${cf_1_up}
+$CHECK_DECL_HDRS
+],[long x = 0],
 [eval 'cf_cv_func_'$1'=yes'],
+[eval 'cf_cv_func_'$1'=no'])
+else
+eval 'cf_cv_func_'$1'=yes'
+fi
+],
 [eval 'cf_cv_func_'$1'=no'])
 CFLAGS="$cf_save_CFLAGS"
 ])
@@ -881,9 +893,11 @@ dnl $1 = variable to set
 AC_DEFUN([CF_LIB_PREFIX],
 [
 	case $cf_cv_system_name in
-	os2)	$1=''     ;;
-	*)	$1='lib'  ;;
+		os2)	$1=''     ;;
+		*)	$1='lib'  ;;
 	esac
+	LIB_PREFIX=[$]$1
+	AC_SUBST(LIB_PREFIX)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
@@ -1321,7 +1335,11 @@ case $cf_cv_system_name in
 os2*)
     # We make sure -Zexe is not used -- it would interfere with @PROG_EXT@
     CFLAGS="$CFLAGS -Zmt -D__ST_MT_ERRNO__"
+    CXXFLAGS="$CXXFLAGS -Zmt -D__ST_MT_ERRNO__"
     LDFLAGS=`echo "$LDFLAGS -Zmt -Zcrtdll" | sed "s/-Zexe//g"`
+    PROG_EXT=".exe"
+    ;;
+cygwin*)
     PROG_EXT=".exe"
     ;;
 esac

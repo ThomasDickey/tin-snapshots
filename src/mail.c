@@ -462,7 +462,10 @@ iArtEdit (
 		sprintf (acArtFile, "%s/%ld", acTmpFile, psArt->artnum);
 		sprintf (acTmpFile, "%s%d.art", TMPDIR, (int) process_id);
 		if (copy_file (acArtFile, acTmpFile)) {
-			invoke_editor (acTmpFile, 1);
+			if (!invoke_editor (acTmpFile, 1)) {
+				unlink (acTmpFile);
+				return FALSE;
+			}
 			rename_file (acTmpFile, acArtFile);
 			return TRUE;
 		}

@@ -27,6 +27,11 @@
 #	endif /* !HAVE_CONFDEFS_H */
 #endif /* HAVE_CONFIG_H */
 
+/* IPv6 support */
+#if defined(HAVE_GETADDRINFO) && defined(HAVE_GAI_STRERROR)
+#	define INET6
+#endif /* HAVE_GETADDRINFO && HAVE_GAI_STRERROR */
+
 /*
  * Non-autoconf'able definitions for Amiga Developer Environment (gcc 2.7.2,
  * etc).
@@ -613,6 +618,19 @@ enum resizer { cNo, cYes, cRedraw };
 #define CONFIG_FILE	"tinrc"
 #define DEFAULT_MAILDIR	"Mail"
 #define DEFAULT_SAVEDIR	"News"
+
+#ifdef HAVE_COLOR
+/* case insensitive */
+#	define DEFAULT_QUOTE_REGEX "^\\s{0,3}([\\]{}>|:)]|\\w{1,3}[>|])(?!-)"
+#	define DEFAULT_QUOTE_REGEX2 "^\\s{0,3}(([\\]{}>|:)]|\\w{1,3}[>|])\\s*){2}(?!-[})>])"
+#	define DEFAULT_QUOTE_REGEX3 "^\\s{0,3}(([\\]{}>|:)]|\\w{1,3}[>|])\\s*){3}"
+#endif /* HAVE_COLOR */
+
+/* case sensitive && anchored */
+#define DEFAULT_STRIP_RE_REGEX "(R[eE](\\^\\d+|\\[\\d\\])?|A[wW]|Odp):\\s"
+/* case sensitive */
+#define DEFAULT_STRIP_WAS_REGEX ".\\(([Ww]a[rs]|[Bb]y[l³]o):.*\\)\\s*$"
+
 #define FILTER_FILE	"filter"
 #define GROUP_TIMES_FILE	"group.times"
 #define INPUT_HISTORY_FILE	".inputhistory"
@@ -682,19 +700,12 @@ enum resizer { cNo, cYes, cRedraw };
 #endif /* WIN32 */
 
 #define NEWSRC_LINE	8192
-#define MAXLINELEN	1024
 
-#ifdef HAVE_MAIL_HANDLER	/* what is that? */
-#	define HEADER_LEN	2048
-#else
-#	define HEADER_LEN	1024
-#endif /* HAVE_MAIL_HANDLER */
+#define HEADER_LEN	1024
 
 #define MODULO_COUNT_NUM	50
 #define TABLE_SIZE	1409
 #define MAX_PAGES	2000	/* maximum article pages */
-/* when prompting for subject, display no more than 20 characters */
-#define DISPLAY_SUBJECT_LEN	20
 
 #define ctrl(c)	((c) & 0x1F)
 
@@ -774,7 +785,7 @@ enum resizer { cNo, cYes, cRedraw };
 /*
  * Maximal permissible word mark type
  */
-#define MAX_MARK		2
+#define MAX_MARK		3
 
 #define INDEX_TOP	2
 
@@ -968,9 +979,9 @@ enum resizer { cNo, cYes, cRedraw };
 #define HEADER_SUBJECT		1
 #define HEADER_NEWSGROUPS	2
 
-#define POSTED_NONE		0
-#define POSTED_REDRAW		1
-#define POSTED_OK		2
+#define POSTED_NONE		0			/* Article wasn't posted */
+#define POSTED_REDRAW		1			/* redraw needed in any case */
+#define POSTED_OK		2			/* posted normally */
 
 
 /*
@@ -1524,6 +1535,15 @@ struct t_newnews
 #endif /* M_AMIGA */
 
 /*
+ * Defines text strings used by a tinrc variable
+ */
+struct opttxt {
+	constext *help;					/* Helptext on Option Menu */
+	constext *opt;					/* Text on body of Option Menu screen */
+	constext *tinrc;				/* (optional) Text written with variable to tinrc file */
+};
+
+/*
  * Used for building option menu
  */
 struct t_option {
@@ -1532,8 +1552,7 @@ struct t_option {
 	int *variable;		/* ptr to variable to change */
 	constext **opt_list;	/* ptr to list entries if OPT_LIST */
 	int opt_count;		/* no. of list entries if OPT_LIST */
-	constext *option_text;	/* text to print as information on option */
-	constext *help_text;	/* text to print as help text when option selected */
+	struct opttxt *txt;	/* ptr to information / help on option */
 };
 
 /*
@@ -1780,6 +1799,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define F_OK	0	/* Test for existence of File */
 #endif /* !F_OK */
 
+/* Various function redefinitions */
 #ifdef USE_DBMALLOC
 #	define my_malloc(size)	malloc(size)
 #	define my_realloc(ptr, size)	realloc((ptr), (size))
@@ -1979,5 +1999,22 @@ extern struct tm *localtime(time_t *);
 #else
 #	define CLOSEDIR(DIR)	if (closedir(DIR)) error_message("closedir() failed: %s %s", __FILE__, __LINE__)
 #endif /* CLOSEDIR_VOID */
+
+/* libmss */
+#ifdef MSS
+#	ifdef strdup
+#		undef strdup
+#	endif /* strdup */
+#	include <mss.h>
+#	undef my_malloc
+#	undef my_realloc
+#	define my_malloc(size)	malloc(size)
+#	define my_realloc(ptr, size)	realloc((ptr), (size))
+#endif /* MSS */
+
+/* libcanlock */
+#if defined(USE_CANLOCK) && !defined(INDEX_DAEMON)
+#  include "../libcanlock/canlock.h"
+#endif /* USE_CANLOCK && !INDEX_DAEMON */
 
 #endif /* !TIN_H */

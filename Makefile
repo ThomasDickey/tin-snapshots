@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 19990805
+PVER	= 19990927
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -20,6 +20,7 @@ SRCDIR	= ./src
 AMGDIR	= ./amiga
 VMSDIR	= ./vms
 PCREDIR	= ./pcre
+CANDIR	= ./libcanlock
 TOLDIR	= ./tools
 OLDDIR	= ./old
 
@@ -38,7 +39,7 @@ HFILES	= \
 	$(INCDIR)/tinrc.h \
 	$(INCDIR)/tnntp.h \
 	$(INCDIR)/trace.h \
-	$(INCDIR)/version.h \
+	$(INCDIR)/version.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
@@ -206,7 +207,38 @@ PCRE	= \
 	$(PCREDIR)/testoutput1 \
 	$(PCREDIR)/testoutput2 \
 	$(PCREDIR)/testoutput3 \
-	$(PCREDIR)/testoutput4
+	$(PCREDIR)/testoutput4 \
+	$(PCREDIR)/dll.mk \
+	$(PCREDIR)/pcre.def
+
+CAN	= \
+	$(CANDIR)/Build \
+	$(CANDIR)/CHANGES \
+	$(CANDIR)/MANIFEST \
+	$(CANDIR)/README \
+	$(CANDIR)/base64.c \
+	$(CANDIR)/base64.h \
+	$(CANDIR)/canlock.h \
+	$(CANDIR)/canlock_md5.c \
+	$(CANDIR)/canlock_misc.c \
+	$(CANDIR)/canlock_sha1.c \
+	$(CANDIR)/canlocktest.c \
+	$(CANDIR)/endian.c \
+	$(CANDIR)/hmac_md5.c \
+	$(CANDIR)/hmac_md5.h \
+	$(CANDIR)/hmac_sha1.c \
+	$(CANDIR)/hmac_sha1.h \
+	$(CANDIR)/hmactest.c \
+	$(CANDIR)/main.c \
+	$(CANDIR)/md5.c \
+	$(CANDIR)/md5.h \
+	$(CANDIR)/sha1.c \
+	$(CANDIR)/sha1.h \
+	$(CANDIR)/doc/HOWTO \
+	$(CANDIR)/doc/draft-ietf-usefor-cancel-lock-01.txt \
+	$(CANDIR)/doc/rfc2104.txt \
+	$(CANDIR)/doc/rfc2202.txt \
+	$(CANDIR)/doc/rfc2286.txt
 
 OLD	= \
 	$(OLDDIR)/msmail.c \
@@ -233,9 +265,9 @@ MISC	= \
 	$(SRCDIR)/descrip.mms \
 	$(PCREDIR)/pcre.mms
 
-ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(VMS) $(PCRE) $(MISC) $(OLD)
+ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(VMS) $(PCRE) $(MISC) $(CAN) $(OLD)
 
-ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(VMSDIR) $(PCREDIR) $(OLDDIR)
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(VMSDIR) $(PCREDIR) $(CANDIR) $(CANDIR)/doc $(OLDDIR)
 
 # standard commands
 CD	= cd
@@ -289,13 +321,14 @@ install_sysdefs:
 	@$(CD) $(SRCDIR) && $(MAKE) install_sysdefs
 
 clean:
-	@-$(RM) -f *~
-	@-$(RM) -f $(DOCDIR)/*~
-	@-$(RM) -f $(INCDIR)/*~
-	@-$(RM) -f $(SRCDIR)/*~
-	@-$(RM) -f $(PCREDIR)/*~
-	@-test -e $(SRCDIR)/Makefile && $(CD) $(SRCDIR) && $(MAKE) clean
-	@-test -e $(PCREDIR)/Makefile && $(CD) $(PCREDIR) && $(MAKE) clean
+	@-$(RM) -f \
+	*~ \
+	$(DOCDIR)/*~ \
+	$(INCDIR)/*~ \
+	$(SRCDIR)/*~ \
+	$(PCREDIR)/*~
+	@-if test -f $(SRCDIR)/Makefile ; then $(CD) $(SRCDIR) && $(MAKE) clean ; fi
+	@-if test -f $(PCREDIR)/Makefile ; then $(CD) $(PCREDIR) && $(MAKE) clean ; fi
 
 man:
 	@$(MAKE) manpage
@@ -319,9 +352,18 @@ manifest:
 chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
-	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./conf-tin ./config.guess ./config.sub ./configure ./install.sh ./mkdirs.sh
-	@$(CHMOD) 755 $(TOLDIR)/tinpp $(TOLDIR)/metamutt $(PCREDIR)/perltest
+	@$(CHMOD) 755 \
+	$(ALL_DIRS) \
+	./conf-tin \
+	./config.guess \
+	./config.sub \
+	./configure \
+	./install.sh \
+	./mkdirs.sh \
+	$(TOLDIR)/tinpp \
+	$(TOLDIR)/metamutt \
+	$(PCREDIR)/perltest \
+	$(CANDIR)/Build
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
@@ -336,7 +378,7 @@ tar:
 
 bzip2:
 	@$(ECHO) "Generating bzipped tar file..."
-	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1
+	@-$(RM) $(PROJECT)$(VER).tar.bz2 > /dev/null 2>&1
 	@$(TAR) cvf $(PROJECT)$(VER).tar -C ../ \
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
@@ -372,13 +414,22 @@ version :
 
 distclean:
 	@-$(MAKE) clean
-	@-$(RM) -f config.cache config.log config.status
-	@-$(RM) -f $(INCDIR)/autoconf.h
-	@-$(RM) -f $(PCREDIR)/chartables.c $(PCREDIR)/dftables
-	@-$(RM) -f $(PCREDIR)/Makefile
-	@-$(RM) -f $(SRCDIR)/Makefile
-	@-$(RM) -f td-conf.out
-	@-$(RM) -f makefile
+	@-$(RM) -f \
+	makefile \
+	config.cache \
+	config.log \
+	config.status \
+	td-conf.out \
+	$(INCDIR)/autoconf.h \
+	$(PCREDIR)/chartables.c \
+	$(PCREDIR)/dftables \
+	$(PCREDIR)/Makefile \
+	$(SRCDIR)/Makefile \
+	$(CANDIR)/*.[oa] \
+	$(CANDIR)/endian.h \
+	$(CANDIR)/canlocktest \
+	$(CANDIR)/endian \
+	$(CANDIR)/hmactest
 
 configure: configure.in aclocal.m4
 	autoconf

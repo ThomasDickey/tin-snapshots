@@ -303,6 +303,7 @@
 #endif /* HAVE_ISPELL */
 #define iKeyPostContinue 'c'
 #define iKeyPostAbort 'a'
+#define iKeyPostIgnore 'i'
 #define iKeyPostPost 'p'
 #define iKeyPostPost2 'y'
 #define iKeyPostSend 's'
@@ -389,8 +390,10 @@
 #define iKeyThreadCatchup 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'
+#define iKeyThreadMail 'm'
 #define iKeyThreadSave 's'
 #define iKeyThreadTag 't'
+#define iKeyThreadPost 'w'
 #define iKeyThreadMarkArtUnread 'z'
 #define iKeyThreadUndoSel '~'
 

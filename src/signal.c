@@ -393,7 +393,7 @@ signal_handler (
 	/* do this so we can get a traceback (doesn't dump core) */
 	abort();
 #else
-	exit (EXIT_FAILURE);
+	giveup();
 #endif /* 1 */ /* apollo || HAVE_COREFILE */
 }
 

@@ -92,7 +92,7 @@ main (
 			read_news_via_nntp = TRUE;
 #		else
 			error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-			exit (EXIT_FAILURE);
+			giveup();
 #		endif /* NNTP_ABLE */
 	}
 #endif /* NNTP_ONLY */
@@ -126,7 +126,7 @@ main (
 	if (INTERACTIVE) {
 		if (!get_termcaps ()) {
 			error_message (txt_screen_init_failed, tin_progname);
-			exit (EXIT_FAILURE);
+			giveup();
 		}
 /*		EndInverse ();*/
 	}
@@ -138,7 +138,7 @@ main (
 	 */
 	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, tin_progname);
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 
 	EndInverse ();
@@ -160,7 +160,7 @@ main (
 	 */
 	if (read_news_via_nntp && !read_saved_news)
 		if (nntp_open () != 0)
-			exit (EXIT_FAILURE);
+			giveup();
 
 	/*
 	 * Check if overview indexes contain Xref: lines
@@ -236,6 +236,7 @@ main (
 #ifndef INDEX_DAEMON
 	if (post_article_and_exit || post_postponed_and_exit) {
 		quick_post_article (post_postponed_and_exit);
+		wait_message (2, txt_exiting);
 		tin_done (EXIT_SUCCESS);
 	}
 #endif /* !INDEX_DAEMON */
@@ -356,7 +357,7 @@ read_cmd_line_options (
 				use_color = !use_color;
 #		else
 				error_message (txt_option_not_enabled, "-DHAVE_COLOR");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* HAVE_COLOR */
@@ -367,7 +368,7 @@ read_cmd_line_options (
 				force_auth_on_conn_open = TRUE;
 #		else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* NNTP_ABLE */
@@ -397,7 +398,7 @@ read_cmd_line_options (
 				debug_delete_files ();
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #endif /* DEBUG */
@@ -414,7 +415,7 @@ read_cmd_line_options (
 
 			case 'G':
 				tinrc.getart_limit = atoi(optarg);
-				if (tinrc.getart_limit > 0)
+				if (tinrc.getart_limit != 0)
 					tinrc.use_getart_limit = TRUE;
 				else
 					tinrc.use_getart_limit = FALSE;
@@ -428,7 +429,7 @@ read_cmd_line_options (
 				read_news_via_nntp = TRUE;
 #		else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* NNTP_ABLE */
@@ -448,7 +449,7 @@ read_cmd_line_options (
 				my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #endif /* !NNTP_ONLY */
@@ -512,7 +513,7 @@ read_cmd_line_options (
 				read_news_via_nntp = TRUE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* NNTP_ABLE */
@@ -541,7 +542,7 @@ read_cmd_line_options (
 				show_description = FALSE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* !NNTP_ONLY */
@@ -553,7 +554,7 @@ read_cmd_line_options (
 				batch_mode = TRUE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_FAILURE);
+				giveup();
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* !NNTP_ONLY */
@@ -960,4 +961,17 @@ read_cmd_line_groups (
 	}
 
 	return matched;
+}
+
+void
+giveup(void)
+{
+	static int nested;
+
+	if (!cmd_line && !nested++) {
+		cursoron();
+		EndWin ();
+		Raw (FALSE);
+	}
+	exit (EXIT_FAILURE);
 }

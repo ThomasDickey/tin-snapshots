@@ -119,6 +119,7 @@ static const char *domain_name_hack = DOMAIN_NAME;
 
 
 #ifdef HAVE_GETHOSTBYNAME
+#	define MAXLINELEN   1024
 /* find FQDN - gethostbyaddr() */
 const char *
 get_fqdn (

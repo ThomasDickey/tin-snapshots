@@ -123,6 +123,7 @@ error_message (
 	} else {
 		stow_cursor();
 		(void) sleep (2);
+		clear_message();
 	}
 
 	va_end(ap);
@@ -222,12 +223,12 @@ center_line (
 
 
 void
-draw_arrow (
+draw_arrow_mark (
 	int line)
 {
 	MoveCursor (line, 0);
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		my_fputs ("->", stdout);
 	else {
 #ifdef USE_CURSES
@@ -250,7 +251,7 @@ erase_arrow (
 {
 	MoveCursor (line, 0);
 
-	if (tinrc.draw_arrow_mark)
+	if (tinrc.draw_arrow)
 		my_fputs ("  ", stdout);
 	else {
 #ifdef USE_CURSES

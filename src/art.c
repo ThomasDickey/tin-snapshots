@@ -33,13 +33,14 @@ static int artnum_comp (t_comptype *p1, t_comptype *p2);
 static int date_comp (t_comptype *p1, t_comptype *p2);
 static int from_comp (t_comptype *p1, t_comptype *p2);
 static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
+static int read_group (struct t_group *group, char *group_path, int *pcount);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
+static long find_first_unread (struct t_group *group);
 static t_bool parse_headers (FILE *fp, struct t_article *h);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
-static int read_group (struct t_group *group, char *group_path, int *pcount);
 #ifdef INDEX_DAEMON
 	static void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
@@ -186,9 +187,15 @@ index_group (
 	min = top_base ? base[0] : group->xmin;
 	max = top_base ? base[top_base-1] : min - 1;
 
-	if (tinrc.use_getart_limit && (tinrc.getart_limit > 0)) {
-		if (top_base && (top_base > tinrc.getart_limit))
-			min = base[top_base-tinrc.getart_limit];
+	if (tinrc.use_getart_limit) {
+		if (tinrc.getart_limit > 0) {
+			if (top_base && (top_base > tinrc.getart_limit))
+				min = base[top_base-tinrc.getart_limit];
+		} else if (tinrc.getart_limit < 0) {
+			long first_unread = find_first_unread(group);
+			if (min - first_unread < tinrc.getart_limit)
+				min = first_unread + tinrc.getart_limit;
+		}
 	}
 
 	/*
@@ -278,6 +285,25 @@ index_group (
 		clear_message ();
 
 	return TRUE;
+}
+
+
+/*
+ * Returns number of first unread article
+ */
+static long
+find_first_unread (
+		struct t_group *group)
+{
+	unsigned char *p;
+	unsigned char *end = group->newsrc.xbitmap;
+	long first = group->newsrc.xmin; /* initial value */
+
+	end += group->newsrc.xbitlen / 8;
+
+	for (p = group->newsrc.xbitmap; *p == '\0' && p < end ; p++, first += 8);
+
+	return first;
 }
 
 

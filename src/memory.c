@@ -184,7 +184,15 @@ free_all_arrays (
 #ifdef HAVE_COLOR
 	FreeIfNeeded(quote_regex.re);
 	FreeIfNeeded(quote_regex.extra);
+	FreeIfNeeded(quote_regex2.re);
+	FreeIfNeeded(quote_regex2.extra);
+	FreeIfNeeded(quote_regex3.re);
+	FreeIfNeeded(quote_regex3.extra);
 #endif /* HAVE_COLOR */
+	FreeIfNeeded(strip_re_regex.re);
+	FreeIfNeeded(strip_re_regex.extra);
+	FreeIfNeeded(strip_was_regex.re);
+	FreeIfNeeded(strip_was_regex.extra);
 
 	if (base != (long *) 0) {
 		free ((char *) base);
@@ -257,35 +265,42 @@ free_attributes_array (
 				free ((char *) psGrp->attribute->savedir);
 				psGrp->attribute->savedir = (char *) 0;
 			}
+
+			FreeAndNull(psGrp->attribute->savefile);
+
+			if (psGrp->attribute->sigfile != (char *) 0 &&
+			    psGrp->attribute->sigfile != tinrc.sigfile) {
+				free ((char *) psGrp->attribute->sigfile);
+				psGrp->attribute->sigfile = (char *) 0;
+			}
+
 			if (psGrp->attribute->organization != (char *) 0 &&
 			    psGrp->attribute->organization != default_organization) {
 				free ((char *) psGrp->attribute->organization);
 				psGrp->attribute->organization = (char *) 0;
 			}
-			if (psGrp->attribute->sigfile != (char *) 0 &&
-			    psGrp->attribute->sigfile != tinrc.default_sigfile) {
-				free ((char *) psGrp->attribute->sigfile);
-				psGrp->attribute->sigfile = (char *) 0;
-			}
+
+			FreeAndNull(psGrp->attribute->from);
+			FreeAndNull(psGrp->attribute->followup_to);
 
 #ifndef DISABLE_PRINTING
 			if (psGrp->attribute->printer != (char *) 0 &&
-			    psGrp->attribute->printer != tinrc.default_printer) {
+			    psGrp->attribute->printer != tinrc.printer) {
 				free ((char *) psGrp->attribute->printer);
 				psGrp->attribute->printer = (char *) 0;
 			}
 #endif /* !DISABLE_PRINTING */
 
-#ifdef HAVE_ISPELL
-			if (psGrp->attribute->ispell != (char *) 0) {
-				free ((char *) psGrp->attribute->ispell);
-				psGrp->attribute->ispell = (char *) 0;
-			}
-#endif /* HAVE_ISPELL */
-
-			FreeAndNull(psGrp->attribute->followup_to);
 			FreeAndNull(psGrp->attribute->quick_kill_scope);
 			FreeAndNull(psGrp->attribute->quick_select_scope);
+
+			FreeAndNull(psGrp->attribute->mailing_list);
+			FreeAndNull(psGrp->attribute->x_headers);
+			FreeAndNull(psGrp->attribute->x_body);
+
+#ifdef HAVE_ISPELL
+			FreeAndNull(psGrp->attribute->ispell);
+#endif /* HAVE_ISPELL */
 
 			free ((char *) psGrp->attribute);
 		}
@@ -383,7 +398,7 @@ my_malloc1 (
 
 	if ((p = (char *) malloc (size)) == (char *) 0) {
 		error_message (txt_out_of_memory, tin_progname, size, file, line);
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 	return (void *) p;
 }
@@ -405,7 +420,7 @@ my_realloc1 (
 
 	if (p == (char *) 0) {
 		error_message (txt_out_of_memory, tin_progname, size, file, line);
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 	return (void *) p;
 }

@@ -4,8 +4,6 @@ o  --with-ncurses --enable-curses has several display problems:
     - if use_color is set:
       - '^G' (pgp-check article output is grabbled)
       - warning/error messges upon posting are not displayed
-    - line which are exactly cCOLS wide cause a LF in the pager (ugly)
-      and the LF is not counted note.lines
 
 o  searching in the pager is broken; it doesn't actually search the first
    page.
@@ -40,10 +38,8 @@ o  strfmailer() calls rfc1522_encode() for Subject/To even with
    subject (with inner encoding 'broken' due to escape_shell_meta() call
    in strfmailer())
 
-o  external inews, ~/.signature and base64 encoding MUST 'fail'
-   (article will be encoded, signature will be not!)
-   -> issue a warning in that case (base64 + external inews)
-   [Sven Paulus <sven@karlsruhe.org>]
+o  Defaults values etc. changed during quick_post_article() aren't saved
+   due to the no_write logic in main.c
 
 o  a problem concerning .tin/posted: when I post a postponed followup,
    a 'w' is written to the file instead of a 'f'. If there's a
@@ -93,8 +89,6 @@ o  In cases where a tinrc variable is stored in group->attributes
    to fix the problem properly in config.c by flashing changes to all
    groups using default attributes.
 
-o  reposting of a thread does not work
-
 o  with --enable-forgery reposting of an thread reposts only the first
    article ('x' 't' 'r' <group> 'p')
 
@@ -104,9 +98,6 @@ o  if no INEWSDIR is given INEWSDIR is set to NEWSLIBDIR which is not always
 o  if external inews could not be found posting fails but no dead.article
    is saved :(
    fall-back to build_in_inews would be good if running NNTP_ONLY
-
-o  Followup-To: line is not examined whether the mentioned group(s) are
-   valid on this server.
 
 o  sort Followup-To:/Newsgroups: after stripping doubled newsgroups and
    before checking if they are identical, if so, strip Followup-To: and
@@ -156,6 +147,10 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 New features
 ------------
+o  add IPv6 support
+   (add portocoll independent wrappers which use IPv6 (functions)
+    whenever possible).
+
 o  add shortcut(s) to repeat last command (i.e. search again)
 
 o  add unicode/UTF-8 support
@@ -163,9 +158,9 @@ o  add unicode/UTF-8 support
 o  add Message-ID param to quick_filter_select_posted_art() and
    update_posted_info_file() so we could log the Message-ID in the
    filter and posting history file if we know it (see inews.c.
-   submit_inews()).
+   submit_inews(), and post.c).
 
-o  lock news/tinrc via flock, lockf, fcntl or dotfile-locking (depending
+o  lock news/tinrc via flock, lockf, fcntl and dotfile-locking (depending
    on which mechanism is available)
 
 o  add cmd-line/tinrc-switch to fetch only headers of unread articles;
@@ -247,7 +242,6 @@ o  Additions to the thread menu :
      'B' (body search)
      'D' (cancel article)
      'M' (option menu)
-     'w' (post an article)
      'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
      ''  r ought to be toggle show all/show only unread
      'f' (post a followup)
@@ -349,7 +343,7 @@ o  change all system()/popen() calls to fork() and exec() calls
 o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
-    own postings)
+    own postings) (see post.c)
 
 o  add
    to autoconf; determine which network libraries are needed; eradicate
@@ -385,6 +379,8 @@ o  check where tin_done() should be called instead of using exit()
 o  check where STRCPY() should be used
 
 o  check code with lclint (http://www.sds.lcs.mit.edu/lclint/)
+   ccmalloc (http://iseran.ira.uka.de/~armin/ccmalloc/) and MSS
+   (http://hem1.passagen.se/blizzar/mss/)
 
 Docs/online help
 ----------------
@@ -431,7 +427,7 @@ o  f'uping with 'F' to a article which has Followup-To: poster set an then
    use 'm' quotes the text, but it should not! (mail_to_someone has no
    copy_text switch)
 
-o  f'uping with '^w' (include headers) to an article which has Followup-To:
+o  f'uping with '^W' (include headers) to an article which has Followup-To:
    poster set does not include headers when using 'm' (mail to poster)
 
 o  when last articles in a newsgroup were cancelled, it shows that there are

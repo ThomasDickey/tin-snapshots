@@ -199,6 +199,7 @@ static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 #ifndef INDEX_DAEMON
 	static void ScreenSize (int *num_lines, int *num_columns);
 #endif /* !INDEX_DAEMON */
+static int input_pending (int delay);
 
 
 /*
@@ -324,7 +325,7 @@ get_termcaps (void)
 		_setinverse = _setunderline;
 		_clearinverse = _clearunderline;
 		if (!_setinverse)
-			tinrc.draw_arrow_mark = 1;
+			tinrc.draw_arrow = 1;
 	}
 	return (TRUE);
 }
@@ -1071,6 +1072,248 @@ cursoroff (void)
 #endif /* !INDEX_DAEMON */
 }
 
+
+/*
+ * input_pending() waits for input during time given
+ * by delay in msec. The original behaviour of input_pending()
+ * (in art.c's threading code) is delay=0
+ */
+static int
+input_pending (
+	int delay)
+{
+#if 0
+	int ch;
+	nodelay(stdscr, TRUE);
+	if ((ch = getch()) != ERR)
+		ungetch(ch);
+	nodelay(stdscr, FALSE);
+	return (ch != ERR);
+
+#else
+
+#	ifdef WIN32
+	return kbhit() ? TRUE : FALSE;
+#	endif /* WIN32 */
+#	ifdef M_AMIGA
+	return (WaitForChar(Input(), 1000 * delay) == DOSTRUE) ? TRUE : FALSE;
+#	endif /* M_AMIGA */
+
+#	ifdef HAVE_SELECT
+	int fd = STDIN_FILENO;
+	fd_set fdread;
+	struct timeval tvptr;
+
+	FD_ZERO(&fdread);
+
+	tvptr.tv_sec = 0;
+	tvptr.tv_usec = delay * 100;
+
+	FD_SET(fd, &fdread);
+
+#		ifdef HAVE_SELECT_INTP
+	if (select (1, (int *)&fdread, NULL, NULL, &tvptr))
+#		else
+	if (select (1, &fdread, NULL, NULL, &tvptr))
+#		endif /* HAVE_SELECT_INTP */
+	{
+		if (FD_ISSET(fd, &fdread))
+			return TRUE;
+	}
+#	endif /* HAVE_SELECT */
+
+#	if defined(HAVE_POLL) && !defined(HAVE_SELECT)
+	static int Timeout;
+	static long nfds = 1;
+	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
+
+	Timeout = delay;
+	if (poll (fds, nfds, Timeout) < 0) /* Error on poll */
+		return FALSE;
+
+	switch (fds[0].revents) {
+		case POLLIN:
+			return TRUE;
+		/*
+		 * Other conditions on the stream
+		 */
+		case POLLHUP:
+		case POLLERR:
+		default:
+			return FALSE;
+	}
+#	endif /* HAVE_POLL && !HAVE_SELECT */
+
+#endif /* 0 */
+
+	return FALSE;
+}
+
+
+int
+get_arrow_key (
+	int prech)
+{
+	int ch;
+	int ch1;
+
+#define wait_a_while(i) \
+	while (!input_pending(0) \
+		&& i < ((VT_ESCAPE_TIMEOUT * 1000) / SECOND_CHARACTER_DELAY))
+
+#	ifndef VMS
+#		ifdef M_AMIGA
+	if (WaitForChar(Input(), 1000) == DOSTRUE)
+		return prech;
+#		else	/* !M_AMIGA */
+	if (!input_pending(0)) {
+#			ifdef HAVE_USLEEP
+		int i=0;
+
+		wait_a_while(i) {
+			usleep((unsigned long) (SECOND_CHARACTER_DELAY * 1000));
+			i++;
+		}
+#			else	/* !HAVE_USLEEP */
+#				ifdef HAVE_SELECT
+		struct timeval tvptr;
+		int i=0;
+
+		wait_a_while(i) {
+			tvptr.tv_sec = 0;
+			tvptr.tv_usec = SECOND_CHARACTER_DELAY * 1000;
+			select (0, NULL, NULL, NULL, &tvptr);
+			i++;
+		}
+#				else /* !HAVE_SELECT */
+#					ifdef HAVE_POLL
+		struct pollfd fds[1];
+		int i=0;
+
+		wait_a_while(i) {
+			poll(fds, 0, SECOND_CHARACTER_DELAY);
+			i++;
+		}
+#					else /* !HAVE_POLL */
+		(void) sleep(1);
+#					endif /* HAVE_POLL */
+#				endif /* HAVE_SELECT */
+#			endif /* HAVE_USLEEP */
+		if (!input_pending(0))
+			return prech;
+	}
+#		endif /* M_AMIGA */
+#	endif /* !VMS */
+	ch = ReadCh ();
+	if (ch == '[' || ch == 'O')
+		ch = ReadCh ();
+
+	switch (ch) {
+		case 'A':
+		case 'i':
+#	ifdef QNX42
+		case 0xA1:
+#	endif /* QNX42 */
+			return KEYMAP_UP;
+
+		case 'B':
+#	ifdef QNX42
+		case 0xA9:
+#	endif /* QNX42 */
+			return KEYMAP_DOWN;
+
+		case 'D':
+#	ifdef QNX42
+		case 0xA4:
+#	endif /* QNX42 */
+			return KEYMAP_LEFT;
+
+		case 'C':
+#	ifdef QNX42
+		case 0xA6:
+#	endif /* QNX42 */
+			return KEYMAP_RIGHT;
+
+		case 'I':		/* ansi  PgUp */
+		case 'V':		/* at386 PgUp */
+		case 'S':		/* 97801 PgUp */
+		case 'v':		/* emacs style */
+#	ifdef QNX42
+		case 0xA2:
+#	endif /* QNX42 */
+#	ifdef M_AMIGA
+			return KEYMAP_PAGE_DOWN;
+#	else
+			return KEYMAP_PAGE_UP;
+#	endif /* M_AMIGA */
+
+		case 'G':		/* ansi  PgDn */
+		case 'U':		/* at386 PgDn */
+		case 'T':		/* 97801 PgDn */
+#	ifdef QNX42
+		case 0xAA:
+#	endif /* QNX42 */
+#	ifdef M_AMIGA
+			return KEYMAP_PAGE_UP;
+#	else
+			return KEYMAP_PAGE_DOWN;
+#	endif /* M_AMIGA */
+
+		case 'H':		/* at386 Home */
+#	ifdef QNX42
+		case 0xA0:
+#	endif /* QNX42 */
+			return KEYMAP_HOME;
+
+		case 'F':		/* ansi  End */
+		case 'Y':		/* at386 End */
+#	ifdef QNX42
+		case 0xA8:
+#	endif /* QNX42 */
+			return KEYMAP_END;
+
+		case '2':		/* vt200 Ins */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_INS;
+
+		case '3':		/* vt200 Del */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_DEL;
+
+		case '5':		/* vt200 PgUp */
+			(void) ReadCh ();	/* eat the ~ (interesting use of words :) */
+			return KEYMAP_PAGE_UP;
+
+		case '6':		/* vt200 PgUp */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_PAGE_DOWN;
+
+		case '1':		/* vt200 PgUp */
+			ch = ReadCh (); /* eat the ~ */
+			if (ch == '5') {	/* RS/6000 PgUp is 150g, PgDn is 154g */
+				ch1 = ReadCh ();
+				(void) ReadCh ();
+				if (ch1 == '0')
+					return KEYMAP_PAGE_UP;
+				if (ch1 == '4')
+					return KEYMAP_PAGE_DOWN;
+			}
+			return KEYMAP_HOME;
+
+		case '4':		/* vt200 PgUp */
+			(void) ReadCh ();	/* eat the ~ */
+			return KEYMAP_END;
+
+		case 'M':		/* xterminal button press */
+			xmouse = ReadCh () - ' ';	/* button */
+			xcol = ReadCh () - '!';		/* column */
+			xrow = ReadCh () - '!';		/* row */
+			return KEYMAP_MOUSE;
+
+		default:
+			return KEYMAP_UNKNOWN;
+	}
+}
 #endif /* !USE_CURSES */
 
 

@@ -229,7 +229,7 @@ generate_tbl (
 			int is_opt = !strncmp (p->type, "OPT_", 4);
 			int is_int = type_is_int(p);
 			char *dft_name = p->name;
-
+			/* TODO is this still necessary ? */
 			/* shorten message-variable names */
 			if (!strncmp (dft_name, "default_", 8))
 				dft_name += 8;
@@ -248,8 +248,7 @@ generate_tbl (
 				fprintf (ofp, "NULL, 0, ");
 			else
 				fprintf (ofp, "%s, %s, ", p->type, p->size);
-			fprintf (ofp, "txt_opt_%s, ", dft_name);
-			fprintf (ofp, "txt_help_%s ", dft_name);
+			fprintf (ofp, "&txt_%s ", dft_name);
 			fprintf (ofp, "%s\n", suffix);
 		}
 	}

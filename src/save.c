@@ -59,12 +59,12 @@
  */
 static int save_comp (t_comptype *p1, t_comptype *p2);
 static t_bool any_saved_files (void);
-static t_bool create_sub_dir (int i);
 #ifndef INDEX_DAEMON
 	static char *get_first_savefile (void);
 	static char *get_save_filename (int i);
 	static char *save_filename (int i);
 	static char *get_last_savefile (void);
+	static t_bool create_sub_dir (int i);
 	static void delete_processed_files (t_bool auto_delete);
 	static void post_process_sh (t_bool auto_delete);
 	static void post_process_uud (
@@ -222,16 +222,16 @@ check_start_save_any_news (
 					if (verbose)
 						wait_message (0, buf);
 
-					fseek (note_fp, 0L, SEEK_SET);
+					rewind (note_fp);
 					copy_fp (note_fp, fp);
 					art_close ();
 					fclose (fp);
 					saved_arts++;
 
 					if (check_start_save == MAIL_ANY_NEWS) {
-						strfmailer (mailer, arts[j].subject, mail_news_user, savefile, buf, sizeof (buf), tinrc.default_mailer_format);
+						strfmailer (mailer, arts[j].subject, mail_news_user, savefile, buf, sizeof (buf), tinrc.mailer_format);
 						if (!invoke_cmd (buf))
-							error_message (txt_command_failed_s, buf);
+							error_message (txt_command_failed, buf);		/* TODO - not needed */
 						unlink (savefile);
 					}
 					if (catchup)
@@ -273,9 +273,9 @@ check_start_save_any_news (
 				fclose (fp_log);
 				if (verbose)
 					wait_message (0, "Mailing log to %s\n", (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid)); /* FIXME: -> lang.c */
-				strfmailer (mailer, subject, (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid), logfile, buf, sizeof (buf), tinrc.default_mailer_format);
+				strfmailer (mailer, subject, (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid), logfile, buf, sizeof (buf), tinrc.mailer_format);
 				if (!invoke_cmd (buf))
-					error_message (txt_command_failed_s, buf);
+					error_message (txt_command_failed, buf);		/* TODO - not needed */
 			}
 			break;
 		default:
@@ -288,6 +288,7 @@ check_start_save_any_news (
 }
 
 
+#ifndef INDEX_DAEMON
 /*
  * Save the article indexed via i to file.
  * A non-blank 'filename' seems to force a mailbox save
@@ -301,7 +302,6 @@ save_art_to_file (
 	t_bool the_mailbox,
 	const char *filename)
 {
-#ifndef INDEX_DAEMON
 	FILE *fp;
 	char *file;
 	char mode[3];
@@ -349,10 +349,10 @@ save_art_to_file (
 			tinrc.default_save_mode = ch;
 		}
 	}
-#ifdef DEBUG
+#	ifdef DEBUG
 	if (debug == 2)
 		error_message("Save index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]", indexnum, the_mailbox, filename, file, mode);
-#endif /* DEBUG */
+#	endif /* DEBUG */
 	if ((fp = fopen (file, mode)) == (FILE *) 0) {
 		save[i].saved = FALSE;
 		info_message (txt_art_not_saved);
@@ -377,7 +377,7 @@ save_art_to_file (
 
 	copy_fp (note_fp, fp);
 
-	/* write tailing newline or MDF-mailbix seperator */
+	/* write tailing newline or MDF-mailbox seperator */
 	print_art_seperator_line (fp, the_mailbox);
 
 	fclose (fp);
@@ -392,14 +392,10 @@ save_art_to_file (
 		FreeIfNeeded(first_savefile);
 		info_message (save_art_info);
 	}
-
-#endif /* !INDEX_DAEMON */
-
 	return TRUE;
 }
 
 
-#ifndef INDEX_DAEMON
 /*
  * We return TRUE if any of the articles saved successfully
  */
@@ -420,7 +416,7 @@ save_arts (
 		if (is_mailbox)
 			file[0] = 0;
 		else {
-#ifdef HAVE_LONG_FILE_NAMES
+#	ifdef HAVE_LONG_FILE_NAMES
 			char tbuf[31]; /* big enought to hold 2^64 + fmt + \0 */
 			size_t mlen;
 
@@ -428,9 +424,9 @@ save_arts (
 			mlen = strlen(tbuf);
 			sprintf(tbuf, "%%s.%%0%dd", mlen);
 			sprintf(file, tbuf, save[i].file, i+1);
-#else
+#	else
 			sprintf (file, "%s.%03d", save[i].file, i+1);
-#endif /* HAVE_LONG_FILE_NAMES */
+#	endif /* HAVE_LONG_FILE_NAMES */
 		}
 
 		switch (art_open (&arts[save[i].index], group_path, do_rfc1521_decoding)) {
@@ -520,7 +516,6 @@ save_regex_arts_to_file (
 	}
 	return ret_code;
 }
-#endif /* !INDEX_DAEMON */
 
 
 /*
@@ -533,7 +528,6 @@ create_path (
 	char *path)
 {
 	t_bool mbox_format = FALSE;
-#ifndef INDEX_DAEMON
 	char tmp[PATH_LEN];
 	char buf[PATH_LEN];
 	int i, j, len;
@@ -559,26 +553,26 @@ create_path (
 		strcpy (tmp, path);
 		if (!strfpath (active[i].attribute->maildir, buf, sizeof (buf),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
-#ifdef VMS
+#	ifdef VMS
 			joindir (buf, homedir, DEFAULT_MAILDIR);
-#else
+#	else
 			joinpath (buf, homedir, DEFAULT_MAILDIR);
-#endif /* VMS */
+#	endif /* VMS */
 		}
-#ifdef VMS
+#	ifdef VMS
 		joinpath (path, buf, "dummy");
-#else
+#	else
 		sprintf (path, "%s/dummy", buf);
-#endif /* VMS */
+#	endif /* VMS */
 	} else {
 		if (!strchr ("~$=+/.", path[0])) {
 			if (!strfpath (active[i].attribute->savedir, buf, sizeof (buf),
 			    homedir, (char *) 0, (char *) 0, active[i].name)) {
-#ifdef VMS
+#	ifdef VMS
 				joindir (buf, homedir, DEFAULT_SAVEDIR);
-#else
+#	else
 				joinpath (buf, homedir, DEFAULT_SAVEDIR);
-#endif /* VMS */
+#	endif /* VMS */
 			}
 			joinpath (tmp, buf, path);
 			my_strncpy (path, tmp, PATH_LEN);
@@ -587,7 +581,7 @@ create_path (
 			my_strncpy (path, buf, PATH_LEN);
 	}
 
-#ifndef VMS			/* no good answer to this yet XXX */
+#	ifndef VMS			/* no good answer to this yet XXX */
 	/*
 	 *  create any directories, otherwise check
 	 *  errno and give appropiate error message
@@ -608,30 +602,28 @@ create_path (
 			}
 		}
 	}
-#else
+#	else
 	if (my_mkdir (buf, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 		if (errno != EEXIST) {
 			perror_message (txt_cannot_create, buf);
 			return FALSE;
 		}
 	}
-#endif /* !VMS */
+#	endif /* !VMS */
 
 	if (mbox_format)
 		strcpy (path, tmp);
 
-#endif /* !INDEX_DAEMON */
-
 	return mbox_format;
 }
+#endif /* !INDEX_DAEMON */
 
 
+#ifndef INDEX_DAEMON
 static t_bool
 create_sub_dir (
 	int i)
 {
-#ifndef INDEX_DAEMON
-
 	char dir[LEN];
 	struct stat st;
 
@@ -641,14 +633,11 @@ create_sub_dir (
 			my_mkdir (dir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 			return TRUE;
 		}
-
 		return ((S_ISDIR(st.st_mode)) ? TRUE : FALSE);
 	}
-
-#endif /* !INDEX_DAEMON */
-
 	return FALSE;
 }
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -1289,10 +1278,8 @@ uudecode_file (
 	chdir (file_out_dir);
 
 	sh_format (buf, sizeof(buf), "uudecode %s", file_out);
-	if (!invoke_cmd (buf)) {
-		error_message (txt_command_failed_s, buf);
+	if (!invoke_cmd (buf))
 		return;
-	}
 
 	if (uudname[0] == '\0')					/* Unable to determine the file that was uudecoded */
 		return;
@@ -1322,7 +1309,7 @@ uudecode_file (
 	if (*tinrc.post_process_command) {
 		sh_format (buf, sizeof(buf), "%s '%s'", tinrc.post_process_command, uudname);
 		if (!invoke_cmd (buf))
-			error_message (txt_command_failed_s, buf);
+			error_message (txt_command_failed, buf);		/* TODO not needed */
 		(void) sleep (1);
 	}
 
@@ -1456,7 +1443,8 @@ post_process_sh (
 			my_fputs (cCRLF, stdout);
 			my_flush ();
 			Raw (FALSE);
-			invoke_cmd (buf);
+			if (!invoke_cmd (buf))
+				error_message (txt_command_failed, buf);		/* TODO not needed */
 			Raw (TRUE);
 #	endif /* M_UNIX */
 			unlink (file_out);

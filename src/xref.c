@@ -46,7 +46,7 @@ overview_xref_support (
 	if ((fp = open_overview_fmt_fp ()) != (FILE *) 0) {
 		while ((ptr = tin_fgets (fp, FALSE)) != (char *) 0) {
 
-			if (!strcasecmp(ptr, "Xref:full")) {
+			if (STRNCASECMPEQ(ptr, "Xref:full", 9)) {
 				supported = TRUE;
 #ifdef NNTP_ABLE
 				drain_buffer(fp);

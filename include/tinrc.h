@@ -15,17 +15,17 @@ struct t_config {
 	char art_marked_return;
 	char art_marked_selected;
 	char art_marked_unread;
-	char default_editor_format[PATH_LEN];	/* editor + parameters  %E +%N %F */
+	char editor_format[PATH_LEN];		/* editor + parameters  %E +%N %F */
 	char default_goto_group[LEN];		/* default for the 'g' command */
 	char default_mail_address[LEN];
-	char default_mailer_format[PATH_LEN];	/* mailer + parameters  %M %S %T %F */
+	char mailer_format[PATH_LEN];		/* mailer + parameters  %M %S %T %F */
 #ifndef DONT_HAVE_PIPING
 	char default_pipe_command[LEN];
 #endif /* DONT_HAVE_PIPING */
 	char default_post_newsgroups[PATH_LEN];	/* default newsgroups to post to */
 	char default_post_subject[PATH_LEN];	/* default subject when posting */
 #ifndef DISABLE_PRINTING
-	char default_printer[LEN];			/* printer program specified from tinrc */
+	char printer[LEN];					/* printer program specified from tinrc */
 #endif /* !DISABLE_PRINTING */
 	char default_range_group[PATH_LEN];
 	char default_range_select[PATH_LEN];
@@ -40,7 +40,7 @@ struct t_config {
 	char default_search_subject[LEN];	/* default when searching by subject */
 	char default_select_pattern[LEN];
 	char default_shell_command[LEN];
-	char default_sigfile[PATH_LEN];
+	char sigfile[PATH_LEN];
 	char mail_quote_format[PATH_LEN];
 	char maildir[PATH_LEN];				/* mailbox dir where = saves are stored */
 	char mail_address[LEN];				/* user's mail address */
@@ -48,15 +48,19 @@ struct t_config {
 	char news_headers_to_display[LEN];	/* which headers to display */
 	char news_headers_to_not_display[LEN];	/* which headers to not display */
 	char news_quote_format[PATH_LEN];
-	char post_process_command[PATH_LEN];/* Post processing command */
+	char post_process_command[PATH_LEN];		/* Post processing command */
 	char quote_chars[PATH_LEN];			/* quote chars for posting/mails ": " */
 #ifdef HAVE_COLOR
 	char quote_regex[LEN];				/* regex used to determine quoted lines */
+	char quote_regex2[LEN];				/* regex used to determine twice quoted lines */
+	char quote_regex3[LEN];				/* regex used to determine >=3 times quoted lines */
 #endif /* HAVE_COLOR */
+	char strip_re_regex[LEN];			/* regex used to find and remove 'Re:'-like strings */
+	char strip_was_regex[LEN];			/* regex used to find and remove '(was:.*'-like strings */
 	char savedir[PATH_LEN];				/* directory to save articles to */
 	char spamtrap_warning_addresses[LEN];
 	char xpost_quote_format[PATH_LEN];
-	int default_filter_days;			/* num of days an article filter can be active */
+	int filter_days;					/* num of days an article filter can be active */
 	int default_filter_kill_header;
 	int default_filter_select_header;
 	int default_move_group;
@@ -65,7 +69,7 @@ struct t_config {
 	int groupname_max_length;			/* max len of group names to display on screen */
 	int mail_mime_encoding;
 	int post_mime_encoding;
-	int post_process_type;				/* type of post processing to be performed */
+	int post_process;					/* type of post processing to be performed */
 	int reread_active_file_secs;		/* reread active file interval in seconds */
 	int show_author;					/* show_author value from 'M' menu in tinrc */
 	int sort_article_type;				/* method used to sort arts[] */
@@ -86,6 +90,8 @@ struct t_config {
 	int col_message;					/* color of message lines at bottom */
 	int col_newsheaders;				/* color of actual news header fields */
 	int col_quote;						/* color of quotelines */
+	int col_quote2;						/* color of twice quoted lines */
+	int col_quote3;						/* color of >=3 times quoted lines */
 	int col_response;					/* color of respone counter */
 	int col_signature;					/* color of signature */
 	int col_subject;					/* color of article subject */
@@ -111,7 +117,7 @@ struct t_config {
 	t_bool confirm_to_quit;
 	t_bool display_mime_allheader_asis;	/* rfc 1522/2047 all heades (^H) will not be decoded by default */
 	t_bool display_mime_header_asis;	/* rfc 1522/2047 news_headers_to_display will be decoded by default */
-	t_bool draw_arrow_mark;				/* draw -> or highlighted bar */
+	t_bool draw_arrow;					/* draw -> or highlighted bar */
 	t_bool force_screen_redraw;			/* force screen redraw after external (shell) commands */
 	t_bool full_page_scroll;			/* page half/full screen of articles/groups */
 	t_bool group_catchup_on_exit;		/* catchup group with left arrow key or not */

@@ -345,7 +345,7 @@ pgp_check_article (
 	sprintf (the_article+strlen(the_article), ".%d", (int) process_id);
 #	endif /* APPEND_PID */
 
-	if ((art = fopen(article, "w")) == (FILE *) 0) {
+	if ((art = fopen(the_article, "w")) == (FILE *) 0) {
 		info_message(txt_cannot_open, the_article);
 		return 0;
 	}

@@ -105,10 +105,8 @@ selection_page (
 #ifndef INDEX_DAEMON
 
 	char buf[LEN];
-	char post_group[LEN];
 	int i, n, ch, ch1 = 0;
 	int INDEX_BOTTOM;
-	int posted_flag;
 	t_bool yank_in_active_file = TRUE;
 
 	cur_groupnum = start_groupnum;
@@ -536,23 +534,23 @@ select_quit:
 				break;
 
 			case iKeySelectPost:	/* post a basenote */
-				if (can_post) {
-					if (!group_top) {
-						if (!prompt_string (txt_post_newsgroup, buf, HIST_POST_NEWSGROUPS))
-							break;
-						if (buf[0] == '\0')
-							break;
-						strcpy (post_group, buf);
-						if (find_group_index (post_group) == -1) {
-							error_message (txt_not_in_active_file, post_group);
-							break;
-						}
-					} else
-						strcpy (post_group, CURR_GROUP.name);
-					if (post_article (post_group, &posted_flag))
-						show_selection_page ();
-				} else
+				if (!can_post) {
 					info_message(txt_cannot_post);
+					break;
+				}
+				if (!group_top) {
+					sprintf (buf, txt_post_newsgroups, tinrc.default_post_newsgroups);
+					if (!(prompt_string_default (buf, tinrc.default_post_newsgroups, txt_no_newsgroups, HIST_POST_NEWSGROUPS)))
+						break;
+
+					if (find_group_index (buf) == -1) {
+						error_message (txt_not_in_active_file, buf);
+						break;
+					}
+				} else
+					strcpy (buf, CURR_GROUP.name);
+				if (post_article (buf))
+					show_selection_page ();
 				break;
 
 			case iKeyPostponed:
@@ -715,12 +713,12 @@ show_selection_page (
 			subs = ((active[n].newgroup) ? 'N' : 'u'); /* New (but unsubscribed) group or unsubscribed group */
 
 		strncpy(active_name, active[n].name, groupname_len);
-		active_name[groupname_len+1] = '\0';
+		active_name[groupname_len] = '\0';
 		if (blank_len > 254)
 			blank_len = 254;
 		/* copy of active[n].description fix some malloc bugs kg */
 		strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
-		group_descript[blank_len+1] = '\0';
+		group_descript[blank_len] = '\0';
 
 		if (show_description) {
 			if (active[n].description)
@@ -734,7 +732,7 @@ show_selection_page (
 				         (groupname_len+blank_len),
 				         (groupname_len+blank_len), active[n].name);
 		} else {
-			if (tinrc.draw_arrow_mark)
+			if (tinrc.draw_arrow)
 				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF, subs, tin_ltoa(i+1, 4), tmp, groupname_len, groupname_len, active_name);
 			else
 				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF, subs, tin_ltoa(i+1, 4), tmp, groupname_len, groupname_len, active_name, blank_len, " ");
@@ -804,7 +802,7 @@ draw_group_arrow (
 	if (!group_top)
 		info_message (txt_no_groups);
 	else {
-		draw_arrow (INDEX_TOP + cur_groupnum - first_group_on_screen);
+		draw_arrow_mark (INDEX_TOP + cur_groupnum - first_group_on_screen);
 		if (tinrc.info_in_last_line)
 			info_message ("%s", CURR_GROUP.description ? CURR_GROUP.description : txt_no_description);
 	}
@@ -887,7 +885,7 @@ skip_newgroups (
  */
 int
 add_my_group (
-	char *group,
+	const char *group,
 	t_bool add)
 {
 	int i, j;

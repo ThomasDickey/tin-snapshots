@@ -1,0 +1,65 @@
+Here are some sort-of plain language descriptions of how to use the
+library.
+
+First, your news posting program needs to generate its own Message-ID
+headers.  If this isn't already the case, fix that first.
+
+You will also need to add a facility for storing a user password; see
+the included RFCs about recommended lengths.  This can be user-generated
+or built automatically from random cruft, but however you generate the
+password you do have to save it.  This password is the only thing that
+will allow you to cancel articles later.
+
+An alternative approach is to generate a unique password for each
+article, but then you would need to build a whole little database
+monster.
+
+
+POSTING:
+
+Generate a Message-ID.  Now, pass the pointers and lengths of the password
+and message id to sha_lock().  It will return a pointer to your cancel lock.
+For example:
+
+	fprintf(art, "Message-ID: %s\n", msgid);
+	fprintf(art, "Cancel-Lock: 1:%s\n",
+		sha_lock(password, strlen(password), msgid, strlen(msgid));
+
+
+
+CANCELING:
+
+This time, you use the Message-ID of the article to be canceled.  We
+use sha_key this time to complete the cycle.
+
+	fprintf(art, "Control: cancel %s\n", msg_can);
+	fprintf(art, "Cancel-Key: 1:%s\n",
+		sha_key(password, strlen(password), msgid, strlen(msgid));
+
+
+
+VERIFYING:
+
+This is purely optional at the newsreader level; only servers should
+really need to bother.
+
+Extract the Cancel-Key: header from the cancel message.  Fetch the
+original article from the server and extract its Cancel-Lock: header. 
+Chop off the keywords; we are only interested in the Base-64 thingies.
+
+- If the original article has no lock (or is missing), you can ignore
+  the cancel key and use traditional verification, or abort the cancel
+  operation if you don't want to trust unauthenticated cancels.
+
+- If the original article has a lock and the cancel has no key, abort
+  the cancel operation.
+
+- If both a key and lock are present, strip off the type numbers and
+  make sure they're both type 1 (the only kind we know how to handle
+  yet).  You can use the lock_strip() function to make this a bit
+  easier.
+
+- Finally, you can send pointers to each stripped lock on to
+  sha_verify().  If it returns zero, your may delete the article.
+  Remember that there may be more than one lock in the header.  Be sure
+  to check all locks against the key before giving up.

@@ -36,7 +36,11 @@ static TCP *nntp_wr_fp = NULL;
  * local prototypes
  */
 #ifdef NNTP_ABLE
+#ifdef INET6
+	static int get_tcp6_socket (char *machine, unsigned short port);
+#else
 	static int get_tcp_socket (char *machine, char *service, unsigned short port);
+#endif /* INET6 */
 #endif /* NNTP_ABLE */
 
 /* Close the NNTP connection with prejudice */
@@ -149,7 +153,7 @@ getserverbyfile (
 
 #	ifdef NNTP_DEFAULT_SERVER
 	if (*(NNTP_DEFAULT_SERVER))
-		return NNTP_DEFAULT_SERVER;
+		return strcpy(buf, NNTP_DEFAULT_SERVER);
 #	endif /* NNTP_DEFAULT_SERVER */
 
 #endif /* NNTP_ABLE */
@@ -180,7 +184,10 @@ server_init (
 	int port,
 	char *text)
 {
-	char *service = (char *)cservice; /* TODO but calls non-const funcs */
+#ifndef INET6
+	char temp[256];
+	char *service = strncpy(temp, cservice, 255); /* ...calls non-const funcs */
+#endif /* !INET6 */
 #	ifndef VMS
 	int sockt_rd, sockt_wr;
 #	endif /* !VMS */
@@ -201,7 +208,11 @@ server_init (
 	} else
 		sockt_rd = get_tcp_socket (machine, service, port);
 #	else
+#		ifdef INET6
+	sockt_rd = get_tcp6_socket (machine, (unsigned short)port);
+#		else
 	sockt_rd = get_tcp_socket (machine, service, (unsigned short)port);
+#		endif /* INET6 */
 #	endif /* DECNET */
 
 	if (sockt_rd < 0)
@@ -268,7 +279,7 @@ server_init (
  *
  *	Errors:		Returned & printed via perror.
  */
-#ifdef NNTP_ABLE
+#if defined(NNTP_ABLE) && !defined(INET6)
 static int
 get_tcp_socket (
 	char *machine,		/* remote host */
@@ -534,7 +545,67 @@ get_tcp_socket (
 #	endif /* !TLI */
 	return (s);
 }
-#endif /* NNTP_ABLE */
+#endif /* NNTP_ABLE && !INET6 */
+
+#if defined(NNTP_ABLE) && defined(INET6)
+/*
+ * get_tcp6_socket -- get us a socket connected to the server.
+ *
+ * Parameters:   "machine" is the machine the server is running on.
+ *                "port" is the portnumber to connect to.
+ *
+ * Returns:      Socket connected to the news server if
+ *               all is ok, else -1 on error.
+ *
+ * Side effects: Connects to server via IPv4 or IPv6.
+ *
+ * Errors:       Printed via my_fprintf.
+ */
+static int
+get_tcp6_socket (
+	char *machine,
+	unsigned short port)
+{
+	char mymachine[MAXHOSTNAMELEN+1];
+	char myport[12];
+	int s = -1, err = -1;
+	struct addrinfo hints, *res, *res0;
+
+# if 0 /* currently we don't know if we have snprintf */
+	snprintf(mymachine, sizeof(mymachine), "%s", machine);
+	snprintf(myport, sizeof(myport), "%d", port);
+# else
+	my_strncpy(mymachine, machine, sizeof(mymachine));
+	sprintf(myport, "%d", port);
+# endif /* 0 */
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family   = PF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	err = getaddrinfo(mymachine, myport, &hints, &res0);
+	if (err < 0) {
+		my_fprintf (stderr, "\ngetaddrinfo: %s\n", gai_strerror(err));
+		return (-1);
+	}
+	err = -1;
+	for (res = res0; res; res = res->ai_next) {
+		if ((s = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
+			continue;
+		if (connect(s, res->ai_addr, res->ai_addrlen) < 0)
+			close(s);
+		else {
+			err = 0;
+			break;
+		}
+	}
+	if (err < 0) {
+		my_fprintf (stderr, "\nsocket or connect problem\n");
+		return (-1);
+	}
+
+	return(s);
+}
+#endif /* NNTP_ABLE && INET6 */
 
 
 #ifdef DECNET

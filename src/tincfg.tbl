@@ -13,8 +13,8 @@
 ; display options
 	beginner_level			OPT_ON_OFF
 	show_description		OPT_ON_OFF
-	show_author				txt_show_from	SHOW_FROM_BOTH+1
-	draw_arrow_mark			OPT_ON_OFF
+	show_author			txt_show_from	SHOW_FROM_BOTH+1
+	draw_arrow			OPT_ON_OFF
 	inverse_okay			OPT_ON_OFF
 	thread_articles			txt_thread	THREAD_MAX+1
 	sort_article_type		txt_sort_type	SORT_BY_SCORE_ASCEND+1
@@ -45,7 +45,11 @@
 	alternative_handling		OPT_ON_OFF
 #ifdef HAVE_COLOR
 	quote_regex			OPT_STRING
+	quote_regex2			OPT_STRING
+	quote_regex3			OPT_STRING
 #endif
+	strip_re_regex			OPT_STRING
+	strip_was_regex			OPT_STRING
 
 #ifdef	HAVE_METAMAIL
 	use_metamail			OPT_ON_OFF
@@ -77,6 +81,8 @@
 	col_help			txt_colors	MAX_COLOR+1
 	col_message			txt_colors	MAX_COLOR+1
 	col_quote			txt_colors	MAX_COLOR+1
+	col_quote2			txt_colors	MAX_COLOR+1
+	col_quote3			txt_colors	MAX_COLOR+1
 	col_head			txt_colors	MAX_COLOR+1
 	col_newsheaders			txt_colors	MAX_COLOR+1
 	col_subject			txt_colors	MAX_COLOR+1
@@ -93,7 +99,7 @@
 ; posting/mailing options
 	mail_address			OPT_STRING
 	prompt_followupto		OPT_ON_OFF
-	default_sigfile			OPT_STRING
+	sigfile			OPT_STRING
 	sigdashes			OPT_ON_OFF
 	signature_repost		OPT_ON_OFF
 	quote_chars			OPT_STRING
@@ -112,7 +118,7 @@
 	auto_cc				OPT_ON_OFF
 	auto_bcc			OPT_ON_OFF
 	spamtrap_warning_addresses	OPT_STRING
-	default_filter_days		OPT_NUM
+	filter_days		OPT_NUM
 	add_posted_to_filter		OPT_ON_OFF
 
 ; saving/printing options
@@ -122,22 +128,22 @@
 	savedir				OPT_STRING
 	auto_save			OPT_ON_OFF
 	mark_saved_read			OPT_ON_OFF
-	post_process_type		txt_post_process POST_PROC_UUD_EXT_ZIP+1
+	post_process		txt_post_process_type POST_PROC_UUD_EXT_ZIP+1
 	process_only_unread		OPT_ON_OFF
 #ifndef DISABLE_PRINTING
 	print_header			OPT_ON_OFF
-	default_printer			OPT_STRING
+	printer			OPT_STRING
 #endif
 
 ; expert options
-	wildcard			txt_wildcard	2
+	wildcard			txt_wildcard_type	2
 	force_screen_redraw		OPT_ON_OFF
 	start_editor_offset		OPT_ON_OFF
-	default_editor_format		OPT_STRING
+	editor_format		OPT_STRING
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 	use_builtin_inews		OPT_ON_OFF
 #endif
-	default_mailer_format		OPT_STRING
+	mailer_format		OPT_STRING
 	use_mailreader_i		OPT_ON_OFF
 	unlink_article			OPT_ON_OFF
 	keep_posted_articles		OPT_ON_OFF
@@ -145,7 +151,7 @@
 	keep_dead_articles		OPT_ON_OFF
 #endif
 	strip_newsrc			OPT_ON_OFF
-	strip_bogus			txt_strip_bogus BOGUS_ASK+1
+	strip_bogus			txt_strip_bogus_type BOGUS_ASK+1
 	reread_active_file_secs		OPT_NUM
 	auto_reconnect			OPT_ON_OFF
 	cache_overview_files		OPT_ON_OFF

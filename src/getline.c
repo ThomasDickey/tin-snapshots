@@ -67,7 +67,7 @@ static int (*gl_tab_hook) (char *, int, int *) = gl_tab;
 char *
 tin_getline (
 	const char *prompt,
-	int number_only,
+	int number_only,	/* 1=positive numbers only, 2=negative too */
 	char *str,
 	int max_chars,
 	t_bool passwd,
@@ -115,6 +115,9 @@ tin_getline (
 		if ((gl_cnt < gl_max) && my_isprint(c)) {
 			if (number_only) {
 				if (isdigit (c)) {
+					gl_addchar (c);
+				/* Minus */
+				} else if (number_only == 2 && gl_pos == 0 && c == '-') {
 					gl_addchar (c);
 				} else {
 					ring_bell ();
@@ -237,7 +240,7 @@ gl_addchar (
 
 	if (gl_cnt >= BUF_SIZE - 1) {
 		error_message ("tin_getline: input buffer overflow");
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 
 	for (i = gl_cnt; i >= gl_pos; i--) {
@@ -262,7 +265,7 @@ gl_newline (
 
 	if (gl_cnt >= BUF_SIZE - 1) {
 		error_message ("tin_getline: input buffer overflow");
-		exit (EXIT_FAILURE);
+		giveup();
 	}
 	hist_add (w);		/* only adds if nonblank */
 	if (gl_out_hook) {

@@ -88,7 +88,6 @@ show_page (
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
 	int old_sort_art_type = tinrc.sort_article_type;
-	int posted_flag;
 	long art;
 	struct stat note_stat;
 	t_bool mouse_click_on = TRUE;
@@ -288,6 +287,33 @@ end_of_article:
 
 			case iKeyPagePipe:	/* pipe article/thread/tagged arts to command */
 				feed_articles (FEED_PIPE, PAGE_LEVEL, group, respnum);
+				break;
+
+			case iKeyPageMail:	/* mail article/thread/tagged articles to somebody */
+				feed_articles (FEED_MAIL, PAGE_LEVEL, group, respnum);
+				break;
+
+#ifndef DISABLE_PRINTING
+			case iKeyPagePrint:	/* output art/thread/tagged arts to printer */
+				feed_articles (FEED_PRINT, PAGE_LEVEL, group, respnum);
+				break;
+#endif /* !DISABLE_PRINTING */
+
+			case iKeyPageRepost:	/* repost current article */
+				feed_articles (FEED_REPOST, PAGE_LEVEL, group, respnum);
+				break;
+
+			case iKeyPageSave:	/* save article/thread/tagged articles */
+				feed_articles (FEED_SAVE, PAGE_LEVEL, group, respnum);
+				break;
+
+			case iKeyPageAutoSaveTagged:	/* Auto-save tagged articles without prompting */
+				if (index_point >= 0) {
+					if (num_of_tagged_arts)
+						feed_articles (FEED_AUTOSAVE_TAGGED, PAGE_LEVEL, &CURR_GROUP, (int) base[index_point]);
+					else
+						info_message (txt_no_tagged_arts_to_save);
+					}
 				break;
 
 			case iKeySearchSubjF:	/* search forwards in article */
@@ -615,10 +641,6 @@ return_to_index:
 				fixup_thread (respnum, FALSE);
 				return GRP_GOTOTHREAD;
 
-			case iKeyPageMail:	/* mail article/thread/tagged articles to somebody */
-				feed_articles (FEED_MAIL, PAGE_LEVEL, group, respnum);
-				break;
-
 			case iKeyOptionMenu:	/* option menu */
 				if (change_config_file (group) == FILTERING)
 					filter_state = FILTERING;
@@ -643,12 +665,6 @@ return_to_index:
 					goto restart;
 				}
 				break;
-
-#ifndef DISABLE_PRINTING
-			case iKeyPagePrint:	/* output art/thread/tagged arts to printer */
-				feed_articles (FEED_PRINT, PAGE_LEVEL, group, respnum);
-				break;
-#endif /* !DISABLE_PRINTING */
 
 			case iKeyPagePrevArt:	/* previous article */
 				art_close ();
@@ -678,19 +694,6 @@ return_to_index:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPageSave:	/* save article/thread/tagged articles */
-				feed_articles (FEED_SAVE, PAGE_LEVEL, group, respnum);
-				break;
-
-			case iKeyPageAutoSaveTagged:	/* Auto-save tagged articles without prompting */
-				if (index_point >= 0) {
-					if (num_of_tagged_arts)
-						feed_articles (FEED_AUTOSAVE_TAGGED, PAGE_LEVEL, &CURR_GROUP, (int) base[index_point]);
-					else
-						info_message (txt_no_tagged_arts_to_save);
-					}
-				break;
-
 			case iKeyPageTag:	/* tag/untag article for saving */
 				if (arts[respnum].tagged) {
 					arts[respnum].tagged = 0;
@@ -714,7 +717,7 @@ return_to_index:
 				break;
 
 			case iKeyPagePost:	/* post a basenote */
-				if (post_article (group->name, &posted_flag))
+				if (post_article (group->name))
 					redraw_page (group->name, respnum);
 				break;
 
@@ -730,10 +733,6 @@ return_to_index:
 			case iKeyDisplayPostHist:	/* display messages posted by user */
 				if (user_posted_messages ())
 					redraw_page (group->name, respnum);
-				break;
-
-			case iKeyPageRepost:	/* repost current article */
-				feed_articles (FEED_REPOST, PAGE_LEVEL, group, respnum);
 				break;
 
 			case iKeyPageMarkArtUnread:	/* mark article as unread (to return) */
@@ -767,6 +766,7 @@ return_to_index:
 	return GRP_ARTFAIL; /* default-value - I don't think we should get here */
 }
 #endif /* !INDEX_DAEMON */
+
 
 void
 redraw_page (
@@ -829,6 +829,7 @@ expand_ctrl_chars (
 	return ctrl_L;
 }
 #endif /* !INDEX_DAEMON */
+
 
 /*
  * This is the core routine that actually gets a chunk of article onto the
@@ -985,22 +986,22 @@ print_a_line:
 		first_char = buf2[0] ? buf2[0] : first_char;
 
 		if (!below_sig || tinrc.show_signatures) {
-			if (skip_include) {
-				if (first_char != skip_include) {
+			if (!skip_include  || (first_char != skip_include)) {
+				if (skip_include) {
 					skip_include = '\0';
-#	ifdef HAVE_COLOR
-					print_color (buf2, below_sig);
-#	else
-					my_printf ("%s" cCRLF, buf2);
-#	endif /* HAVE_COLOR */
-					note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 					note_page++;
 				}
-			} else {
 #	ifdef HAVE_COLOR
+#		ifdef USE_CURSES
+				move(note_line - 1, 0);
+#		endif /* USE_CURSES */
 				print_color (buf2, below_sig);
 #	else
+#		ifdef USE_CURSES
+				WriteLine(note_line - 1, buf2);
+#		else
 				my_printf ("%s" cCRLF, buf2);
+#		endif /* USE_CURSES */
 #	endif /* HAVE_COLOR */
 				note_line += ((int) (strlen (buf2) - 1) / cCOLS) + 1;
 			}
@@ -1176,8 +1177,7 @@ show_first_header (
 		my_fputs (ftbuf, stdout);
 		EndInverse ();
 		my_fputs (cCRLF, stdout);
-	}
-	else {
+	} else {
 		char x[5];
 
 		/* Can't eval tin_ltoa() more than once in a statement due to statics */
@@ -1292,10 +1292,10 @@ static void
 show_cont_header (
 	int respnum)
 {
+	char *buf;
 	int maxresp;
 	int whichresp;
 	int whichbase;
-	char *buf;
 
 	whichresp = which_response (respnum);
 	whichbase = which_thread (respnum);
@@ -1303,9 +1303,11 @@ show_cont_header (
 
 	assert (whichbase < top_base);
 
-	/* the last term in the length of the buffer is mainly to shut
-	   checker up although we still depend on txt_thread_resp_page
-	   not being too long */
+	/*
+	 * the last term in the length of the buffer is mainly to shut
+	 * checker up although we still depend on txt_thread_resp_page
+	 * not being too long
+	 */
 	buf = (char *) my_malloc (strlen((arts[respnum].name ? arts[respnum].name : arts[respnum].from)) + strlen(note_h.subj) + cCOLS + 5*3*sizeof(int));
 
 	if (whichresp) {
@@ -1345,6 +1347,7 @@ show_cont_header (
 	note_line += 2;
 }
 #endif /* !INDEX_DAEMON */
+
 
 #ifndef INDEX_DAEMON
 /*
@@ -1407,7 +1410,7 @@ art_open (
 			break;
 
 		/* do not remove \n in Summary lines */
-/* FIXME */
+		/* FIXME */
 		is_summary = (strncasecmp (buf, "Summary: ", 9) == 0);
 
 		/* check for continued header line */
@@ -1479,7 +1482,7 @@ art_open (
 
 	mark_body = ftell (note_fp);
 	note_mark[0] = 0L;
-	fseek (note_fp, 0L, SEEK_SET);
+	rewind (note_fp);
 	note_end = FALSE;
 
 	/*
@@ -1661,21 +1664,18 @@ add_persist (
 	struct t_header_list *pptr;
 
 	if (note_h.persist != NULL) {
-		for (pptr = note_h.persist; pptr->next != NULL; pptr = pptr->next);
-		pptr->next = (struct t_header_list *) malloc(sizeof(struct t_header_list));
-		if (pptr->next != NULL) {
-			pptr = pptr->next;
-			strcpy(pptr->header, p_header);
-			strcpy(pptr->content, p_content);
-			pptr->next = NULL;
-		}
+		for (pptr = note_h.persist; pptr->next != NULL; pptr = pptr->next)
+			;
+		pptr->next = (struct t_header_list *) my_malloc(sizeof(struct t_header_list));
+		pptr = pptr->next;
+		strcpy(pptr->header, p_header);
+		strcpy(pptr->content, p_content);
+		pptr->next = NULL;
 	} else {
-		note_h.persist = (struct t_header_list *) malloc(sizeof(struct t_header_list));
-		if (note_h.persist != NULL) {
-			strcpy(note_h.persist->header, p_header);
-			strcpy(note_h.persist->content, p_content);
-			note_h.persist->next = NULL;
-		}
+		note_h.persist = (struct t_header_list *) my_malloc(sizeof(struct t_header_list));
+		strcpy(note_h.persist->header, p_header);
+		strcpy(note_h.persist->content, p_content);
+		note_h.persist->next = NULL;
 	}
 }
 #endif /* !INDEX_DAEMON */
