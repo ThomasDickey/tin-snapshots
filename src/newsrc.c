@@ -1397,9 +1397,8 @@ art_mark_unread (
 
 
 /*
- * make a funktion art_mark(group, art, FLAG)
- * could be uses for art_mark_will_return(),
- * art_mark_unread(),...
+ * TODO: Make a function art_mark(group, art, FLAG)
+ * use instead of art_mark_will_return(), art_mark_unread(),...
  */
 void
 art_mark_will_return (

@@ -1,3 +1,17 @@
+Y2K Information
+
+The authors of tin believes that it is Y2K-compliant, as long as the
+underlying operating system and C library are. Internally, it makes some use
+of binary timestamps in Unix format (number of seconds since 1-Jan-1970) and
+uses C library services to convert these to printing forms. Some
+NNTP-commands still use two-digit year-portions, tin tries it's best to
+convert them to a useful four-digit year format wherever needed and
+possible.
+
+It should be noted that tin does not come with any form of warranty. If you
+need a full Y2K audit performing, then the source is available for this to
+be done.
+
 Quick Install:
 
 configure to your local setup (have a look at):

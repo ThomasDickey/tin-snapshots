@@ -499,6 +499,9 @@ hist_add (
 {
 	char *p = gl_buf;
 
+	if (w == HIST_NONE)
+		return;
+
 	while (*p == ' ' || *p == '\t')		/* only save nonblank line */
 		p++;
 	if (*p) {
@@ -521,6 +524,9 @@ hist_prev (
 	int w)
 {
 	int next;
+
+	if (w == HIST_NONE)
+		return;
 
 	next = (hist_pos[w] - 1 + HIST_SIZE) % HIST_SIZE;
 	if (next != hist_last[w]) {
@@ -546,6 +552,10 @@ static void
 hist_next (
 	int w)
 {
+
+	if (w == HIST_NONE)
+		return;
+
 	if (hist_pos[w] != hist_last[w]) {
 		hist_pos[w] = (hist_pos[w] + 1) % HIST_SIZE;
 		if (input_history[w][hist_pos[w]]) {

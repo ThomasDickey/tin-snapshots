@@ -1,105 +1,106 @@
-MANIFEST for tin-1.4-19991113 (Sat Nov 13 19:14:35 CET 1999)
+MANIFEST for tin-1.4.1 (Wed Dec  1 13:51:36 CET 1999)
 ----------------------------------------------------
-  10067 ./Makefile
-   5394 ./MANIFEST
-   1073 ./README
+  10365 ./Makefile
+   5413 ./MANIFEST
+   1690 ./README
    2209 ./README.VMS
    1543 ./README.WIN
-  60203 ./aclocal.m4
-    727 ./conf-tin
+  62001 ./aclocal.m4
+    801 ./conf-tin
   27469 ./config.guess
   20192 ./config.sub
- 248596 ./configure
-  21586 ./configure.in
+ 246084 ./configure
+  20904 ./configure.in
    4765 ./install.sh
-  11883 ./makefile.in
+  11873 ./makefile.in
     661 ./mkdirs.sh
- 153402 ./doc/CHANGES
+   1633 ./doc/CHANGES
+ 153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
-  22352 ./doc/INSTALL
-  19303 ./doc/TODO
-   2876 ./doc/WHATSNEW
-  12688 ./doc/auth.txt
+  22468 ./doc/INSTALL
+  19854 ./doc/TODO
+   5198 ./doc/WHATSNEW
+  12856 ./doc/auth.txt
    8427 ./doc/filtering
    3661 ./doc/internals.txt
   23621 ./doc/iso2asc.txt
   35180 ./doc/good-netkeeping-seal
-    800 ./doc/pgp.txt
+   1844 ./doc/pgp.txt
    1181 ./doc/rcvars.txt
    1227 ./doc/reading-mail.txt
    1615 ./doc/umlaute.txt
    1914 ./doc/umlauts.txt
-   4682 ./doc/tin.defaults
-  96947 ./doc/tin.1
+   4643 ./doc/tin.defaults
+  97164 ./doc/tin.1
    3703 ./tools/metamutt
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
     564 ./include/bool.h
     972 ./include/bugrep.h
    8374 ./include/config.h
-  47045 ./include/extern.h
+  47187 ./include/extern.h
   13176 ./include/menukeys.h
-   5053 ./include/nntplib.h
+   5379 ./include/nntplib.h
    3083 ./include/policy.h
-  25426 ./include/proto.h
+  25513 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
-  57541 ./include/tin.h
+  57743 ./include/tin.h
    9336 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1097 ./include/version.h
-  25764 ./src/active.c
+   1128 ./include/version.h
+  25906 ./src/active.c
   39525 ./src/art.c
   23771 ./src/attrib.c
-  10827 ./src/auth.c
+  11619 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
   63207 ./src/config.c
   27000 ./src/curses.c
   11967 ./src/debug.c
    2335 ./src/envarg.c
-  19876 ./src/feed.c
+  19955 ./src/feed.c
   42876 ./src/filter.c
-  12498 ./src/getline.c
-  47831 ./src/group.c
+  12595 ./src/getline.c
+  47296 ./src/group.c
    3112 ./src/hashstr.c
    8030 ./src/header.c
   12130 ./src/help.c
-   9804 ./src/inews.c
-  35052 ./src/init.c
+   9875 ./src/inews.c
+  35060 ./src/init.c
    1447 ./src/joinpath.c
-  90522 ./src/lang.c
+  90515 ./src/lang.c
    3011 ./src/list.c
   10492 ./src/mail.c
   23835 ./src/main.c
-   8767 ./src/makecfg.c
+   8911 ./src/makecfg.c
    9347 ./src/memory.c
-  75800 ./src/misc.c
+  76583 ./src/misc.c
   37785 ./src/newsrc.c
-  26501 ./src/nntplib.c
+  26957 ./src/nntplib.c
    5942 ./src/nrctbl.c
-  27192 ./src/open.c
+  27263 ./src/open.c
   42380 ./src/page.c
   24159 ./src/parsdate.y
-   8448 ./src/pgp.c
-  96914 ./src/post.c
-  12513 ./src/prompt.c
+   8493 ./src/pgp.c
+  97228 ./src/post.c
+  12519 ./src/prompt.c
    8874 ./src/read.c
   23620 ./src/refs.c
    2431 ./src/regex.c
-  13425 ./src/rfc1521.c
+  13486 ./src/rfc1521.c
   22744 ./src/rfc1522.c
   35799 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
-  34716 ./src/select.c
+  35110 ./src/select.c
    6655 ./src/sigfile.c
   11003 ./src/signal.c
    5800 ./src/strftime.c
   10477 ./src/string.c
    8278 ./src/tcurses.c
-  32729 ./src/thread.c
+  32731 ./src/thread.c
    1179 ./src/trace.c
    4380 ./src/wildmat.c
    6367 ./src/xref.c
@@ -171,7 +172,7 @@ MANIFEST for tin-1.4-19991113 (Sat Nov 13 19:14:35 CET 1999)
    1476 ./pcre/testoutput4
    1975 ./pcre/dll.mk
     212 ./pcre/pcre.def
-  10526 ./include/autoconf.hin
+  10496 ./include/autoconf.hin
   12300 ./src/Makefile.in
    2124 ./src/ibm437_l1.tab
    2124 ./src/ibm850_l1.tab
@@ -179,7 +180,7 @@ MANIFEST for tin-1.4-19991113 (Sat Nov 13 19:14:35 CET 1999)
    2124 ./src/l1_ibm850.tab
    4284 ./src/l1_next.tab
    4284 ./src/next_l1.tab
-   4777 ./src/tincfg.tbl
+   4789 ./src/tincfg.tbl
    8747 ./src/descrip.mms
    5779 ./pcre/pcre.mms
     954 ./libcanlock/Build
@@ -209,4 +210,4 @@ MANIFEST for tin-1.4-19991113 (Sat Nov 13 19:14:35 CET 1999)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3241086 total
+3250535 total

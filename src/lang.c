@@ -87,7 +87,7 @@ constext txt_return_key[] = "Press <RETURN> to continue...";
 constext txt_color_off[] = "ANSI color disabled";
 constext txt_color_on[] = "ANSI color enabled";
 constext txt_command_failed[] = "Command failed: %s";
-constext txt_connecting[] = "Connecting to %s...\n";
+constext txt_connecting[] = "Connecting to %s...";
 constext txt_connecting_port[] = "Connecting to %s:%d...";
 constext txt_continue[] = "Continue? (y/n): ";
 
@@ -449,34 +449,34 @@ constext txt_mark_arts_read[] = "Mark all articles as read%s? (y/n): ";
 constext txt_mark_group_read[] = "Mark group %.*s as read? (y/n): ";
 constext txt_mark_thread_read[] = "Mark thread as read%s? (y/n): ";
 constext txt_matching_cmd_line_groups[] = "Matching %s groups...";
-constext txt_mini_group_1[] = "<n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,";
-constext txt_mini_group_2[] = "a)uthor search, c)atchup, j=line down, k=line up, K=mark read, l)ist thread,";
-constext txt_mini_page_1[] = "<n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,";
-constext txt_mini_page_2[] = "a)uthor search, B)ody search, c)atchup, f)ollowup, K=mark read,";
+constext txt_mini_group_1[] = "<n>=set current to n; TAB=next unread; /=search pattern; ^K)ill/select;";
+constext txt_mini_group_2[] = "a)uthor search; c)atchup; j=line down; k=line up; K=mark read; l)ist thread;";
+constext txt_mini_page_1[] = "<n>=set current to n; TAB=next unread; /=search pattern; ^K)ill/select;";
+constext txt_mini_page_2[] = "a)uthor search; B)ody search; c)atchup; f)ollowup; K=mark read;";
 
 #ifndef DISABLE_PRINTING
 #	ifndef DONT_HAVE_PIPING
-		constext txt_mini_group_3[] = "|=pipe, m)ail, o=print, q)uit, r=toggle all/unread, s)ave, t)ag, w=post";
-		constext txt_mini_page_3[] = "|=pipe, m)ail, o=print, q)uit, r)eply mail, s)ave, t)ag, w=post";
+		constext txt_mini_group_3[] = "|=pipe; m)ail; o=print; q)uit; r=toggle all/unread; s)ave; t)ag; w=post";
+		constext txt_mini_page_3[] = "|=pipe; m)ail; o=print; q)uit; r)eply mail; s)ave; t)ag; w=post";
 #	else
-		constext txt_mini_group_3[] = "m)ail, o=print, q)uit, r=toggle all/unread, s)ave, t)ag, w=post";
-		constext txt_mini_page_3[] = "m)ail, o=print, q)uit, r)eply mail, s)ave, t)ag, w=post";
+		constext txt_mini_group_3[] = "m)ail; o=print; q)uit; r=toggle all/unread; s)ave; t)ag; w=post";
+		constext txt_mini_page_3[] = "m)ail; o=print; q)uit; r)eply mail; s)ave; t)ag; w=post";
 #	endif /* DONT_HAVE_PIPING */
 #else
 #	ifndef DONT_HAVE_PIPING
-		constext txt_mini_group_3[] = "|=pipe, m)ail, q)uit, r=toggle all/unread, s)ave, t)ag, w=post";
-		constext txt_mini_page_3[] = "|=pipe, m)ail, q)uit, r)eply mail, s)ave, t)ag, w=post";
+		constext txt_mini_group_3[] = "|=pipe; m)ail; q)uit; r=toggle all/unread; s)ave; t)ag; w=post";
+		constext txt_mini_page_3[] = "|=pipe; m)ail; q)uit; r)eply mail; s)ave; t)ag; w=post";
 #	else
-		constext txt_mini_group_3[] = "m)ail, q)uit, r=toggle all/unread, s)ave, t)ag, w=post";
-		constext txt_mini_page_3[] = "m)ail, q)uit, r)eply mail, s)ave, t)ag, w=post";
+		constext txt_mini_group_3[] = "m)ail; q)uit; r=toggle all/unread; s)ave; t)ag; w=post";
+		constext txt_mini_page_3[] = "m)ail; q)uit; r)eply mail; s)ave; t)ag; w=post";
 #	endif /* DONT_HAVE_PIPING */
 #endif /* DISABLE_PRINTING */
 
-constext txt_mini_select_1[] = "<n>=set current to n, TAB=next unread, /=search pattern, c)atchup,";
-constext txt_mini_select_2[] = "g)oto, j=line down, k=line up, h)elp, m)ove, q)uit, r=toggle all/unread,";
-constext txt_mini_select_3[] = "s)ubscribe, S)ub pattern, u)nsubscribe, U)nsub pattern, y)ank in/out";
-constext txt_mini_thread_1[] = "<n>=set current to n, TAB=next unread, c)atchup, d)isplay toggle,";
-constext txt_mini_thread_2[] = "h)elp, j=line down, k=line up, q)uit, t)ag, z=mark unread";
+constext txt_mini_select_1[] = "<n>=set current to n; TAB=next unread; g,/=search pattern; c)atchup;";
+constext txt_mini_select_2[] = "j=line down; k=line up; h)elp; m)ove; q)uit; r=toggle all/unread;";
+constext txt_mini_select_3[] = "s)ubscribe; S)ub pattern; u)nsubscribe; U)nsub pattern; y)ank in/out";
+constext txt_mini_thread_1[] = "<n>=set current to n; TAB=next unread; c)atchup; d)isplay toggle;";
+constext txt_mini_thread_2[] = "h)elp; j=line down; k=line up; q)uit; t)ag; z=mark unread";
 constext txt_more[] = "--More--";
 constext txt_moving[] = "Moving %s...";
 constext txt_msg_headers_file[] = "# Add extra header lines to mail/news messages.\n# ie.  Organization: Bits & Bobs Inc.\n\n";

@@ -56,7 +56,6 @@ static int len_subj;
 /*
  * Local prototypes
  */
-static int choose_new_group (void);
 static void draw_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
@@ -634,7 +633,7 @@ group_page_down:
 					move_to_thread (page_down (index_point, top_base));
 				break;
 
-			case iKeyGroupAutosel:		/* auto-select article menu */
+			case iKeyGroupAutoSel:		/* auto-select article menu */
 			case iKeyGroupKill:		/* kill article menu */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
@@ -652,7 +651,7 @@ group_page_down:
 				show_group_page ();
 				break;
 
-			case iKeyGroupQuickAutosel:		/* quickly auto-select article */
+			case iKeyGroupQuickAutoSel:		/* quickly auto-select article */
 			case iKeyGroupQuickKill:		/* quickly kill article */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
@@ -1091,7 +1090,7 @@ enter_pager:
 					}
 
 					/*
-					 * If the whole thread is tagged, untag it. Otheriwise, tag
+					 * If the whole thread is tagged, untag it. Otherwise, tag
 					 * any untagged articles
 					 */
 					if (tagged) {
@@ -1583,36 +1582,6 @@ toggle_read_unread (
 #endif /* !INDEX_DAEMON */
 
 
-static int
-choose_new_group (
-	void)
-{
-	char *p;
-	int idx;
-
-	sprintf (mesg, txt_newsgroup, tinrc.default_goto_group);
-
-	if (!(prompt_string_default (mesg, tinrc.default_goto_group, "", HIST_GOTO_GROUP)))
-		return -1;
-
-	/*
-	 * Skip leading whitespace, ignore blank strings
-	 */
-	for (p = tinrc.default_goto_group; *p && (*p == ' ' || *p == '\t'); p++)
-		continue;
-
-	if (*p == '\0')
-		return -1;
-
-	clear_message ();
-
-	if ((idx = my_group_add (p)) == -1)
-		info_message (txt_not_in_active_file, p);
-
-	return idx;
-}
-
-
 /*
  * Find new index position after a kill or unkill. Because
  * kill can work on author it is impossible to know which,
@@ -1785,7 +1754,7 @@ bld_sline (
 	 */
 	n = ((CURR_GROUP.attribute->show_only_unread) ? (sbuf.unread + sbuf.seen) : sbuf.total);
 	/*
-	 * if you like to see the number of responses excluding the fist
+	 * if you like to see the number of responses excluding the first
 	 *	art in thread - add the following:
 	 *	n--;
 	 */
@@ -1925,21 +1894,21 @@ show_group_title (
 		}
 	}
 
-if (tinrc.use_getart_limit)
-	sprintf (buf, "%s (%dT(%c) %dA %dK %dH [%dL]%s%c)",
-		active[num].name, top_base,
-		*txt_thread[active[num].attribute->thread_arts],
-		art_cnt, num_of_killed_arts, num_of_selected_arts,
-		tinrc.getart_limit,
-		(active[num].attribute->show_only_unread ? " R" : ""),
-		group_flag(active[num].moderated));
-else
-	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
-		active[num].name, top_base,
-		*txt_thread[active[num].attribute->thread_arts],
-		art_cnt, num_of_killed_arts, num_of_selected_arts,
-		(active[num].attribute->show_only_unread ? " R" : ""),
-		group_flag(active[num].moderated));
+	if (tinrc.use_getart_limit)
+		sprintf (buf, "%s (%dT(%c) %dA %dK %dH [%dL]%s%c)",
+			active[num].name, top_base,
+			*txt_thread[active[num].attribute->thread_arts],
+			art_cnt, num_of_killed_arts, num_of_selected_arts,
+			tinrc.getart_limit,
+			(active[num].attribute->show_only_unread ? " R" : ""),
+			group_flag(active[num].moderated));
+	else
+		sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
+			active[num].name, top_base,
+			*txt_thread[active[num].attribute->thread_arts],
+			art_cnt, num_of_killed_arts, num_of_selected_arts,
+			(active[num].attribute->show_only_unread ? " R" : ""),
+			group_flag(active[num].moderated));
 
 	if (clear_title) {
 		MoveCursor (0, 0);

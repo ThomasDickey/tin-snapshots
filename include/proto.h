@@ -37,7 +37,7 @@ extern void vWriteNovFile (struct t_group *psGrp);
 
 /* auth.c */
 #if !defined (INDEX_DAEMON) && defined (NNTP_ABLE)
-	extern t_bool authenticate (char *server, char *user, t_bool startup);
+	extern t_bool authenticate (char *server, int respcode, char *user, t_bool startup);
 #endif /* !INDEX_DAEMON && NNTP_ABLE */
 
 /* charset.c */
@@ -263,6 +263,7 @@ extern int peek_char (FILE *fp);
 extern int strfmailer (char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format);
 extern int strfpath (char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group);
 extern int strfquote (char *group, int respnum, char *s, size_t maxsize, char *format);
+extern long file_mtime (char *file);
 extern long file_size (char *file);
 extern t_bool copy_file (char *pcSrcFile, char *pcDstFile);
 extern t_bool copy_fp (FILE *fp_ip, FILE *fp_op);
@@ -521,6 +522,7 @@ extern t_bool search_article (int forward);
 
 /* select.c */
 extern int add_my_group (const char *group, t_bool add);
+extern int choose_new_group (void);
 extern int skip_newgroups (void);
 extern t_bool bSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern void draw_group_arrow (void);

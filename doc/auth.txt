@@ -8,10 +8,12 @@ AUTHINFO GENERIC methods. In addition to answers to authentication requests
 as described in the "Common NNTP Extensions", tin also provides
 authentication at connection startup.
 
-Authentication is always done in the same manner: First, tin tries an
-AUTHINFO GENERIC authorization. If this fails, Original AUTHINFO is used.
-Authentication requests will be handled whenever they occur; the command
-that caused the request will be sent again.
+The authentication method is chosen based on the respcode of the
+server's request.  An ERR_NOAUTH code implies original AUTHINFO, while
+a NEED_AUTHINFO code implies AUTHINFO GENERIC with a fallback to
+original if it fails.  Authentication requests will be handled
+whenever they occur; the command that caused the request will be sent
+again.
 
 For an authentication with the Original AUTHINFO method, tin needs a
 user-name and a password for the current news server. This information is
@@ -53,9 +55,11 @@ If NNTPAUTH is empty or not available, tin sends an "authinfo generic any
 <user-id>" command to the server and expects the result as an NNTP response
 code.
 
-The AUTHINFO SIMPLE authentication method is not supported by tin. If you
-need this, drop me a message or see the source code in auth.c. With the
-specification below, the implementation should not be difficult.
+The AUTHINFO SIMPLE authentication method is not supported by tin;
+currently, attempts to use this method emit an error and fallback to
+original AUTHINFO. If you need this, drop me a message or see the
+source code in auth.c. With the specification below, the
+implementation should not be difficult.
 
 Dirk Nimmich (97-04-05)
 <nimmich@uni-muenster.de>

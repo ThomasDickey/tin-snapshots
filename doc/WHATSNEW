@@ -2,9 +2,10 @@ This document summarises new and significantly changed features
 in tin-1.4
 
 [ Changes are relative to the last original tin beta, 950824 ]
-[ Changes are included for releases up to pre-1.4-980105 ]
+[ Changes are included for releases up to 1.4.0 ]
 
-Full details of all the tinrc flags can be found on the man page.
+Full details of all the tinrc flags and valid keys on each menu screen can
+be found on the man page.
 
 Major additions
 ===============
@@ -15,7 +16,7 @@ Major additions
     Many new associated tinrc variables
 
 . Full Colour support
-    & to toggle while online, many new variables in tinrc
+    '&' to toggle while online, many new variables in tinrc
     Word highlighting, can be toggled with '_'
 
 . True References based threading
@@ -31,11 +32,18 @@ Major additions
 . Now auto-configures and builds out of the box
      Much improved configurability. No more messy Makefiles to edit.
 
-. Configuration menu completely rewritten ('M')
-  Most tinrc values can now be set in here.
-  Searchable with '/' and '?'
+. Many enhancements to article filtering: true article
+  scoring and new filter types, such as filtering on crossposts and
+  last-reference only etc..
 
-. Many speed-up improvements
+. Full regular expression support using libpcre (Perl-compatible
+  regular expression Library)
+
+. Configuration menu completely rewritten ('M')
+  Most tinrc values can now be set in here. The screen is searchable
+  using '/' and '?'
+
+. Many speed-up improvements. See -Q and -l in particular.
 
 . Article Superseding
 
@@ -43,86 +51,143 @@ Major additions
 
 . Support for multiple news servers
 
-. Newsserver authorisation fully supported
-
-. Many enhancements to article filtering: true article
-  scoring and new filter types, such as filtering on crossposts
-
-. Full regular expression support using libpcre (Perl-compatible
-  regular expression Library)
+. All methods of newsserver authorisation fully supported
+  See doc/auth.txt
 
 . Seperate history is now kept for most input types (eg searching)
   Cursor keys can be used to scroll back/forwards/left/right through
   the input.
 
-Other enhancements
-==================
+. Optional support to link with libuu for enhanced article post-processing
+
+Key enhancements
+================
 
    Global keys
    -----------
 
-   'i' shows group description in main menu or article subject at all other levels
+   'i' toggles group description in main menu or article subject at all other
+       levels
+   '^' go to top of current display
 
-   '^' goes to top of current display
+   Group Selection menu
+   --------------------
+   'L' Find an article by Message-ID
+   'Z' mark group unread
 
    Group menu
    ----------
    'K', 'z', 'Z' now understand ranges
+   'T' Tag all the parts of a multipart message in order
 
    Thread menu
    -----------
-   '/'
-   'S'
+   '-' re-enter last viewed article
+   '/' forward search
+   '?' backwards search
+   'A' author search backwards
+   'a' author search forwards
+   'B' search all article bodies
+   'L' Find an article by Message-ID
+   'm' mail article
+   'S' auto-save tagged articles
    'U' same functionality as in the group menu
+   'W' view posted history
+   'w' post article
 
    Pager
    -----
    ':' skips past quoted text in articles
-
    'L' lookup article by message-id
-
+   'l' return to the thread menu
+   'S' auto-save tagged articles
    'u' goto the parent of this article
+   'Z' mark thread unread
 
 
    Help Screens / Configuration Screen
    -----------------------------------
+   'j', 'k'  Up and down
    '/'
    '?' Searching now works
 
+   Also
+   'q', 'z' and ESCAPE can be used to abort most read operations.
+   '^U' and 'W' now work when entering data at prompts
+ 
+   Command line additions
+   ----------------------
+   -A  forces authentication at startup
+   -C  has been removed. It's functionality is present in -n and -l
+   -d  Don't read newsgroup descriptions
+   -G  limits the number of article headers to read in a group
+   -l  Read group information faster at the expense of accuracy
+   -N
+   -p <port>
+   -Q  Quick start. Same as -nqd
+   -X  No write mode.
 
-Article length in lines shown in group and thread menu, can be
-turned off
+   See the man page for full details of the above.
 
-new_quote_format in attributes
+Other changes
+=============
 
-mark forwarded text ??? 0713
+Ability to show article length in lines in the group and thread menus
+
+Ability to show article scores in the group and thread menus
+
+news_quote_format in attributes
+
+mark forwarded text (mail_to_someone) ??? 0713
 
 locale support
 
-article postponement / reposting with ^O
+Article postponement and later reposting using O or ^O
 
 New newsgroup handling completely rewritten
 
-handling for bogus groups in newsrc
+Can be built with piping, printing and shell escpaping selectively
+disabled.
 
--N flag
+Display of quoted sections in articles is fully customisable.
+Each level of quoting is now shown in a different colour
 
--p <port> flag
+Query before posting unmodified or empty articles.
 
--d flag
+Support for compilation under win32 using cygwin
+(See README.WIN for more information)
 
--Q flag
+Handling for bogus groups in newsrc
+
+The catchup keys, 'C' and 'c' work consistently across all menus
 
 user configurable header display in pager
 
+Reintroduction of tin-1.2 feature 'kill_level' to allow killed articles
+to be marked with a 'K' or simply never shown again.
+
+Reading MH mail folders (mailgroups) now fully supported
+
 local overview caching for speed on slow links
+
+Workaround for newsservers that don't support Xref in their overview records
+
+Ability to customise stripping of Re: and was: type expressions
+in articles.
 
 $SPAMTRAP
 
-Can be built with curses, to give gpm support and scrolling option
-and help screens.
+$METAMAIL
 
-Plus of course, countless bug fixes and doubtless some new ones.
+tin.defaults system wide config file. Aids binary distributions.
+
+Can be built with curses, to give gpm support and smoother scrolling
+on configuaration (M) and help (h) screens.
+
+Persistant header support
+
+Countless bug fixes and doubtless some new ones.
+
 
 New flags in tinrc
 ------------------

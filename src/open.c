@@ -3,7 +3,7 @@
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1999-07-17
+ *  Updated   : 1999-11-29
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
@@ -212,7 +212,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 #	ifdef DEBUG
 		debug_nntp ("nntp_open", "authenticate");
 #	endif /* DEBUG */
-		authenticate (nntp_server, userid, TRUE);
+		authenticate (nntp_server, ERR_NOAUTH, userid, TRUE);
 		put_server ("MODE READER");
 		ret = get_respcode (line);
 		switch (ret) {
@@ -411,7 +411,9 @@ get_respcode (
 	int respcode;
 
 	respcode = get_only_respcode (message);
-	if ((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) {
+	if ((respcode == ERR_NOAUTH)       ||
+	    (respcode == ERR_NOAUTHSIMPLE) ||
+	    (respcode == NEED_AUTHINFO)) {
 		/*
 		 * Server requires authentication.
 		 */
@@ -420,7 +422,7 @@ get_respcode (
 #	endif /* DEBUG */
 		strncpy (savebuf, last_put, NNTP_STRLEN);		/* Take copy, as authenticate() will clobber this */
 
-		if (authenticate (nntp_server, userid, FALSE)) {
+		if (authenticate (nntp_server, respcode, userid, FALSE)) {
 			strcpy (last_put, savebuf);
 
 			put_server (last_put);
@@ -780,7 +782,6 @@ get_article (
 		 * Use the default message if one hasn't been supplied
 		 * Body search is currently the only function that has a different message
 		 */
-
 		if (lines && ++count % MODULO_COUNT_NUM == 0)
 			show_progress((*mesg=='\0') ? txt_reading_article : mesg, count, lines);
 

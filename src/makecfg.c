@@ -3,7 +3,7 @@
  *  Module    : makecfg.c
  *  Author    : Thomas E. Dickey <dickey@clark.net>
  *  Created   : 1997-08-23
- *  Updated   :
+ *  Updated   : 1999-11-22
  *  Notes     : #defines and structs for config.c
  *  Copyright : (c) Copyright 1997-99 by Thomas E. Dickey
  *              You may  freely  copy or  redistribute  this software,
@@ -21,6 +21,7 @@
 #define R_CURL '}'
 
 #define MAXNAME 27 /* maximum name-length (just for readability formatting) */
+#define MAXTYPE 5  /* limits opt_type to keep names unique within 31 chars */
 
 #define MYDATA struct mydata
 MYDATA {
@@ -310,15 +311,15 @@ generate_ptr(
 					p->name);
 				break;
 			case 1:
-				fprintf(ofp, "\tOVAL(oinx_%s, %s__)\n",
-					opt_type,
+				fprintf(ofp, "\tOVAL(oinx_%.*s, %s__)\n",
+					MAXTYPE, opt_type,
 					p->name);
 				break;
 			case 2:
-				fprintf(ofp, "#define OINX_%-*.*s OINX(oinx_%s, %s__)\n",
+				fprintf(ofp, "#define OINX_%-*.*s OINX(oinx_%.*s, %s__)\n",
 					MAXNAME, MAXNAME,
 					p->name,
-					opt_type,
+					MAXTYPE, opt_type,
 					p->name);
 				break;
 			}
@@ -330,9 +331,9 @@ generate_ptr(
 		fprintf(ofp, "%c;\n", R_CURL);
 		break;
 	case 1:
-		fprintf(ofp, "\tOVAL(oinx_%s, s_MAX)\n", opt_type);
-		fprintf(ofp, "\tOEND(oinx_%s, Q1)\n", opt_type);
-		fprintf(ofp, "%c oinx_%s;\n", R_CURL, opt_type);
+		fprintf(ofp, "\tOVAL(oinx_%.*s, s_MAX)\n", MAXTYPE, opt_type);
+		fprintf(ofp, "\tOEND(oinx_%.*s, Q1)\n", MAXTYPE, opt_type);
+		fprintf(ofp, "%c oinx_%.*s;\n", R_CURL, MAXTYPE, opt_type);
 		break;
 	case 2:
 		break;

@@ -1,15 +1,17 @@
 # Top level Makefile for tin
 # - for configuration options read the doc/INSTALL file.
 #
-# Updated: 1998-02-15
+# Updated: 1999-11-13
 #
 
 PROJECT	= tin
+LVER	= 1
+PVER	= 4
+SVER	= 1
+VER	= $(LVER).$(PVER).$(SVER)
+DVER	= 19991201
 EXE	= tin
 MANEXT	= 1
-LVER	= 1.4
-PVER	= 19991113
-VER	= $(LVER)-$(PVER)
 
 # directory structure
 TOPDIR	= .
@@ -132,6 +134,7 @@ VMS	= \
 
 DOC	= \
 	$(DOCDIR)/CHANGES \
+	$(DOCDIR)/CHANGES.old \
 	$(DOCDIR)/DEBUG_REFS \
 	$(DOCDIR)/INSTALL \
 	$(DOCDIR)/TODO \
@@ -268,28 +271,30 @@ NROFF	= groff -Tascii
 RM	= rm
 SHELL	= /bin/sh
 TAR	= tar
+GZIP	= gzip
 BZIP2	= bzip2
 WC	= wc
 SED	= sed
 TR	= tr
 
 all:
-	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
+	@$(ECHO) "Top level Makefile for the $(PROJECT) v$(VER) Usenet newsreader."
 	@$(ECHO) " "
 	@$(ECHO) "To compile the source code type 'make build' or change to the"
 	@$(ECHO) "source directory by typing 'cd src' and then type 'make'."
 	@$(ECHO) " "
 	@$(ECHO) "This Makefile offers the following general purpose options:"
 	@$(ECHO) " "
-	@$(ECHO) "    make build           [ Compile tin ]"
-	@$(ECHO) "    make clean           [ Delete all object files & backup files ]"
-	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
+	@$(ECHO) "    make build           [ Compile $(PROJECT) ]"
+	@$(ECHO) "    make clean           [ Delete all object and backup files ]"
+	@$(ECHO) "    make dist            [ Create a gziped distribution tar file ]"
+	@$(ECHO) "    make distclean       [ Delete all config, object and backup files ]"
+	@$(ECHO) "    make install         [ Install the binary and the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
 	@$(ECHO) "    make install_sysdefs [ Install the system-wide-defaults file ]"
 	@$(ECHO) "    make manpage         [ Create nroff version of manual page ]"
 	@$(ECHO) "    make manifest        [ Create MANIFEST ]"
-	@$(ECHO) "    make dist            [ Create a gziped distribution tar file ]"
 	@$(ECHO) " "
 
 build:
@@ -321,7 +326,7 @@ man:
 	@$(MAKE) manpage
 
 manpage:
-	@$(ECHO) "Creating $(NROFF) man page for $(EXE)$(VER)..."
+	@$(ECHO) "Creating $(NROFF) man page for $(EXE)-$(VER)..."
 	@$(NROFF) -man $(DOCDIR)/$(EXE).1 > $(DOCDIR)/$(EXE).nrf
 
 # Use 2 passes for creating MANIFEST because its size changes (it's not likely
@@ -354,40 +359,42 @@ chmod:
 
 tar:
 	@$(ECHO) "Generating gzipped tar file..."
-	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1
-	@$(TAR) cvzf $(PROJECT)$(VER).tgz -C ../ \
+	@-$(RM) $(PROJECT)-$(VER).tgz > /dev/null 2>&1
+	@$(TAR) cvf $(PROJECT)-$(VER).tar -C ../ \
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
-	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
+	| $(SED) 's,^\./,$(PROJECT)-$(VER)/,' \
 	| $(TR) "[\012]" " "`
-	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
-	@$(LS) $(PROJECT)$(VER).tgz
+	@$(GZIP) -9 $(PROJECT)-$(VER).tar
+	@$(CHMOD) 644 $(PROJECT)-$(VER).tar.gz
+	@$(LS) $(PROJECT)-$(VER).tar.gz
 
 bzip2:
 	@$(ECHO) "Generating bzipped tar file..."
-	@-$(RM) $(PROJECT)$(VER).tar.bz2 > /dev/null 2>&1
-	@$(TAR) cvf $(PROJECT)$(VER).tar -C ../ \
+	@-$(RM) $(PROJECT)-$(VER).tar.bz2 > /dev/null 2>&1
+	@$(TAR) cvf $(PROJECT)-$(VER).tar -C ../ \
 	`$(ECHO) $(ALL_FILES) \
 	| $(TR) -s '[[:space:]]' "[\012*]" \
-	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
+	| $(SED) 's,^\./,$(PROJECT)-$(VER)/,' \
 	| $(TR) "[\012]" " "`
-	@$(BZIP2) $(PROJECT)$(VER).tar
-	@$(CHMOD) 644 $(PROJECT)$(VER).tar.bz2
-	@$(LS) $(PROJECT)$(VER).tar.bz2
+	@$(BZIP2) -9 $(PROJECT)-$(VER).tar
+	@$(CHMOD) 644 $(PROJECT)-$(VER).tar.bz2
+	@$(LS) $(PROJECT)-$(VER).tar.bz2
 
 #
 # I know it's ugly, but it works
 #
 name:
-	@DATE=`date +%Y%m%d`; if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
-	$(MV) ../`basename \`pwd\`` ../tin-$$DATE ; \
-	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER	= $$DATE," ./Makefile > ./Makefile.tmp \
-	&& $(MV) ./Makefile.tmp ./Makefile ; \
-	$(SED) "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp \
-	&& $(MV) $(INCDIR)/version.h.tmp $(INCDIR)/version.h ; \
-	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./makefile.in > ./makefile.in.tmp \
-	&& $(MV) ./makefile.in.tmp ./makefile.in ; \
-	fi
+	@DATE=`date +%Y%m%d` ; NAME=`basename \`pwd\`` ;\
+	if test $$NAME != "$(PROJECT)-$(VER)" ; then \
+		$(MV) ../$$NAME ../$(PROJECT)-$(VER) ;\
+	fi ;\
+	$(SED) "s,^DVER[[:space:]]*=[[:print:]]*,DVER	= $$DATE," ./Makefile > ./Makefile.tmp && \
+	$(MV) ./Makefile.tmp ./Makefile ;\
+	$(SED) "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp && \
+	$(SED) "s, VERSION[[:space:]]*\"[[:print:]]*\", VERSION 	\"$(VER)\"," $(INCDIR)/version.h.tmp > $(INCDIR)/version.h ;\
+	$(SED) "s,^DVER[[:space:]]*=[[:print:]]*,DVER		= $$DATE," ./makefile.in > ./makefile.in.tmp && \
+	$(MV) ./makefile.in.tmp ./makefile.in
 
 dist:
 	@$(MAKE) name
@@ -397,7 +404,7 @@ dist:
 	@$(MAKE) tar
 
 version :
-	@$(ECHO) "TIN $(VER)"
+	@$(ECHO) "$(PROJECT)-$(VER)"
 
 distclean:
 	@-$(MAKE) clean

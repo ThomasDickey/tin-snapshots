@@ -171,12 +171,17 @@ feed_articles (
 				return;
 
 			got_sig_pipe = FALSE;
-			if ((fp = popen (tinrc.default_pipe_command, "w")) == (FILE *) 0) {
-				perror_message (txt_command_failed, tinrc.default_pipe_command);
-				return;
-			}
+
 			wait_message (0, txt_piping);
 			EndWin();
+			Raw(FALSE);
+			fflush(stdout);
+			if ((fp = popen (tinrc.default_pipe_command, "w")) == (FILE *) 0) {
+				perror_message (txt_command_failed, tinrc.default_pipe_command);
+				Raw(TRUE);
+				InitWin();
+				return;
+			}
 			break;
 #	endif /* !DONT_HAVE_PIPING */
 
@@ -593,6 +598,7 @@ got_sig_pipe_while_piping:
 			got_sig_pipe = FALSE;
 			(void) pclose (fp);
 			Raw (TRUE);
+			InitWin();
 			continue_prompt ();
 			redraw_screen = TRUE;
 			break;
@@ -617,10 +623,8 @@ got_sig_pipe_while_piping:
 	 * If we were in the pager, we have to put back the article we were in, and goto the correct page
 	 */
 	if (level == PAGE_LEVEL) {
-#if 0
-		if (art_open (&arts[respnum], group_path, TRUE) != 0)
+		if (ch != iKeyFeedArt && art_open (&arts[respnum], group_path, TRUE) != 0)
 			return;			/* This is bad */
-#endif /* 0 */
 		if (tinrc.force_screen_redraw)
 			redraw_screen = TRUE;
 		note_end = orig_note_end;

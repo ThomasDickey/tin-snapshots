@@ -1,8 +1,8 @@
 ;   Project   : tin - a Usenet reader
 ;   Module    : tincfg.tbl
 ;   Author    : Thomas E. Dickey <dickey@clark.net>
-;   Created   : 01.11.96
-;   Updated   :
+;   Created   : 1996-11-01
+;   Updated   : 1999-11-22
 ;   Notes     : #defines and structs for config.c
 ;   Copyright 1996 by Thomas E. Dickey
 ;               You may  freely  copy or  redistribute  this software,
@@ -21,7 +21,7 @@
 	pos_first_unread		OPT_ON_OFF
 	show_only_unread_arts		OPT_ON_OFF
 	show_only_unread_groups		OPT_ON_OFF
-	kill_level				txt_kill_level_type	KILL_NOTHREAD+1
+	kill_level			txt_kill_level_type	KILL_NOTHREAD+1
 	tab_goto_next_unread		OPT_ON_OFF
 	space_goto_next_unread		OPT_ON_OFF
 	pgdn_goto_next			OPT_ON_OFF

@@ -8,8 +8,6 @@ Otherwise it looks for 'pgp' on the path
 If this is found, then PGP2 support is assumed
 If neither is found, then no pgp support is compiled in
 If configure is called with --disable-pgp, then no pgp support is compiled in
-[ The actual program run is always 'pgp', pgpk appears to be simply a test
-  for PGP5 support ]
 
 When you try to use PGP
 -----------------------
@@ -22,3 +20,52 @@ $HOME/.pgp/pubring.*
 Or you can override this with $PGPPATH/pubring.*
 
 If an environment var PGPOPTS is defined, then tin will use it.
+ 
+Internal usage of PGP
+---------------------
+There are 3 places where pgp is invoked:
+
+1) Checking articles (^G in the pager)
+
+   If the article is pgp signed (-----BEGIN PGP SIGNED MESSAGE-----)
+
+   PGP2:  pgp -f $PGPOPTS <article >/dev/null
+   PGP5:  pgpv -f $PGPOPTS <article >/dev/null
+
+   If the article has (-----BEGIN PGP PUBLIC KEY BLOCK-----)
+
+   pgp $PGPOPTS -ka article
+   pgpk $PGPOPTS -a article
+
+2) When posting news or mail
+   
+   -at are always used
+
+   PGP2:
+
+   -e  appended for encrypt
+   -s  appended for signing
+
+   pgp $PGPOPTS options plaintextfile to_address
+
+   If tinrc.mail_address is defined then
+
+   pgp $PGPOPTS options plaintextfile to_address -u tinrc.mail_address
+
+   PGP5:
+
+   If encrypting _and_ signing, -s is appended to the basic -at options
+
+   pgpe is used if encrypting and pgps in all other cases. The command line
+   used is:
+
+   pgp_command $PGPOPTS options plaintextfile to_address
+
+3) Appending public key
+
+   PGP2: pgp $PGPOPTS -kxa from_address keyfile
+   PGP5: pgpk $PGPOPTS -xa from_address -o keyfile
+
+   Where address is the posting/mailing address
+
+This file is correct as of tin-1.4.0

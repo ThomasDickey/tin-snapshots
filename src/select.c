@@ -70,7 +70,7 @@ continual_key (
 #ifndef NO_SHELL_ESCAPE
 		case iKeyShellEscape:
 #endif /* !NO_SHELL_ESCAPE */
-/*		case iKeyLookupMessage:*/
+		/* case iKeyLookupMessage: */
 		case iKeyOptionMenu:
 		case iKeyQuit:
 		case iKeyQuitTin:
@@ -243,13 +243,11 @@ end_of_list:
 					show_selection_page ();
 				break;
 
-			case iKeySelectGoto:	/* prompt for a new group name */
 			case iKeySearchSubjF:	/* search forward */
 			case iKeySearchSubjB:	/* search backward */
-				i = (ch == iKeySearchSubjF || ch == iKeySelectGoto);
+				i = (ch == iKeySearchSubjF);
 
 				if ((i = search_active (i)) != -1) {
-					set_groupname_len (FALSE);
 					move_to_group (i);
 					clear_message ();
 				}
@@ -349,6 +347,13 @@ select_page_up:
 					read_newsgroups_file ();
 				set_groupname_len (FALSE);
 				show_selection_page ();
+				break;
+
+			case iKeySelectGoto:	/* prompt for a new group name */
+				if ((n = choose_new_group ()) >= 0) {
+					set_groupname_len (FALSE);
+					move_to_group (n);
+				}
 				break;
 
 			case iKeySelectHelp:	/* help */
@@ -809,6 +814,36 @@ yank_active_file (
 #endif /* !INDEX_DAEMON */
 
 
+int
+choose_new_group (
+	void)
+{
+	char *p;
+	int idx;
+
+	sprintf (mesg, txt_newsgroup, tinrc.default_goto_group);
+
+	if (!(prompt_string_default (mesg, tinrc.default_goto_group, "", HIST_GOTO_GROUP)))
+		return -1;
+
+	/*
+	 * Skip leading whitespace, ignore blank strings
+	 */
+	for (p = tinrc.default_goto_group; *p && (*p == ' ' || *p == '\t'); p++)
+		continue;
+
+	if (*p == '\0')
+		return -1;
+
+	clear_message ();
+
+	if ((idx = my_group_add (p)) == -1)
+		info_message (txt_not_in_active_file, p);
+
+	return idx;
+}
+
+
 /*
  * Return new value for group_top, skipping any new newsgroups that have been
  * found
@@ -829,10 +864,12 @@ skip_newgroups (
 
 
 /*
- *  Find a group in the users selection list, my_group[]
- *  If 'add' is TRUE, then add the supplied group
- *  Return the index into my_group[] if group is added or was already
- *  there.  Return -1 if group is not in active[]
+ * Find a group in the users selection list, my_group[].
+ * If 'add' is TRUE, then add the supplied group return the index into
+ * my_group[] if group is added or was already there. Return -1 if group
+ * is not in active[]
+ *
+ * NOTE: can't be static due to my_group_add() marco
  */
 int
 add_my_group (
@@ -1003,15 +1040,8 @@ read_groups (
 
 	clear_message ();
 
-	forever {
-
-		/*
-		 * normal exit ||
-		 * protection against (uninitialized) newgroups during the session
-		 *
-		 * FIXME: the xmin == xmax == 1 hack breaks leafnode
-		 */
-		if (done || (active[my_group[cur_groupnum]].xmin > active[my_group[cur_groupnum]].xmax || (active[my_group[cur_groupnum]].xmin == active[my_group[cur_groupnum]].xmax && active[my_group[cur_groupnum]].xmax == 1)))
+	forever { /* if xmin > xmax the newsservers active is broken */
+		if (done /* || active[my_group[cur_groupnum]].xmin > active[my_group[cur_groupnum]].xmax */)
 			break;
 
 		switch (group_page (&CURR_GROUP)) {

@@ -451,7 +451,7 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyThreadQuickAutosel:		/* quickly auto-select article */
+			case iKeyThreadQuickAutoSel:		/* quickly auto-select article */
 			case iKeyThreadQuickKill:		/* quickly kill article */
 				if ((local_filtered_articles = quick_filter (
 						(ch == iKeyThreadQuickKill) ? FILTER_KILL : FILTER_SELECT,

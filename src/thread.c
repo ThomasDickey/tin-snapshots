@@ -446,7 +446,7 @@ end_of_thread:
 					move_to_response(top_thread - 1);
 				break;
 
-			case iKeyPageLastViewed:	/* show last viewed article */
+			case iKeyThreadLastViewed:	/* show last viewed article */
 				if (this_resp < 0 || (which_thread(this_resp) == -1)) {
 					info_message (txt_no_last_message);
 					break;

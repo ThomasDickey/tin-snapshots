@@ -161,7 +161,7 @@
 
 /* group.c */
 
-#define iKeyGroupAutosel ctrl('A')
+#define iKeyGroupAutoSel ctrl('A')
 #define iKeyGroupNextUnreadArtOrGrp '\t'
 #define iKeyGroupReadBasenote '\n'
 #define iKeyGroupKill ctrl('K')
@@ -183,12 +183,12 @@
 #define iKeyGroupPrevUnreadArt 'P'
 #define iKeyGroupBugReport 'R'
 #define iKeyGroupAutoSaveTagged 'S'
+#define iKeyGroupTagParts 'T'
 #define iKeyGroupUntag 'U'
 #define iKeyGroupMarkUnselArtRead 'X'
 #define iKeyGroupMarkThdUnread 'Z'
-#define iKeyGroupQuickAutosel '['
+#define iKeyGroupQuickAutoSel '['
 #define iKeyGroupQuickKill ']'
-#define iKeyGroupTagParts 'T'
 #define iKeyGroupCatchup 'c'
 #define iKeyGroupToggleSubjDisplay 'd'
 #define iKeyGroupGoto 'g'
@@ -373,7 +373,7 @@
 #define iKeyThreadAutoSaveTagged 'S'
 #define iKeyThreadUntag 'U'
 #define iKeyThreadMarkThdUnread 'Z'
-#define iKeyThreadQuickAutosel '['		/* Merge with same keys in Group ? */
+#define iKeyThreadQuickAutoSel '['		/* Merge with same keys in Group ? */
 #define iKeyThreadQuickKill ']'
 #define iKeyThreadCatchup 'c'
 #define iKeyThreadToggleSubjDisplay 'd'

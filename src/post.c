@@ -1071,7 +1071,7 @@ post_loop(
 	char group[HEADER_LEN];
 	char subj[HEADER_LEN];
 	int ret_code = POSTED_NONE;
-	long artsize;		/* artsize work was not done in post_postponed_article */
+	long artchanged = 0L;		/* artchanged work was not done in post_postponed_article */
 
 	forever {
 post_article_loop:
@@ -1081,14 +1081,14 @@ post_article_loop:
 				 * Code existed to recheck subject and restart editor, but
 				 * is not enabled
 				 */
-				artsize = file_size(article);
+				artchanged = file_changed(article);
 				if (!invoke_editor (article, offset))
 					goto post_article_postponed;
 				ret_code = POSTED_REDRAW;
 
 				/* This might be erroneous with posting postponed */
-				if (artsize > 0L) {
-					if ((artsize == file_size(article)) && (prompt_yn (cLINES, txt_prompt_unchanged_art, TRUE) > 0 )) {
+				if (file_size(article) > 0L) {
+					if ((artchanged == file_changed(article)) && (prompt_yn (cLINES, txt_prompt_unchanged_art, TRUE) > 0 )) {
 						;
 					} else {
 						while (!check_article_to_be_posted (article, art_type) && repair_article(&ch))
@@ -1269,14 +1269,14 @@ check_moderated (
 			psretGrp = psGrp;
 
 		/*
-		 * I'm not sure why we test for !attribute here - I'm mostly sure
-		 * that only bogus groups have no attributes
+		 * Testing for !attribute here is a useful check for other brokenness
+		 * Generally only bogus groups should have no attributes
 		 */
 		if (!psGrp->attribute || psGrp->bogus) {
-			if (!psGrp->attribute)
-				error_message("No attributes for %s", group);
 			if (psGrp->bogus)
 				error_message("%s is bogus", group);
+			if (!psGrp->attribute)
+				error_message("No attributes for %s", group);
 			return NULL;
 		}
 
@@ -2207,18 +2207,18 @@ mail_loop(
 	)
 {
 	int ret = POSTED_NONE;
-	long artsize;
+	long artchanged = 0L;
 
 	forever {
 		switch (ch) {
 			case iKeyPostEdit:
-				artsize = file_size(nam);
+				artchanged = file_changed(filename);
 
 				if (!(invoke_editor (filename, start_line_offset)))
 					return ret;
 
 				ret = POSTED_REDRAW;
-				if (((artsize == file_size(nam)) && (prompt_yn (cLINES, txt_prompt_unchanged_bug, TRUE) > 0 )) || (artsize <= 0L)) {
+				if (((artchanged == file_changed(filename)) && (prompt_yn (cLINES, txt_prompt_unchanged_bug, TRUE) > 0 )) || (file_size(filename) <= 0L)) {
 					clear_message();
 					return ret;
 				}
@@ -2336,9 +2336,9 @@ mail_to_someone (
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
 		if (mail_to_poster)
-			sprintf (mailreader_subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
+			sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
 		else
-			sprintf (mailreader_subject, "(fwd) %s\n", note_h.subj);
+			sprintf (mailreader_subject, "(fwd) %s", note_h.subj);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), tinrc.mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed, buf);		/* TODO - not needed */
@@ -2397,6 +2397,7 @@ mail_to_someone_done:
 	return redraw_screen;
 }
 
+
 t_bool
 mail_bug_report (
 	void) /* FIXME: return value is always ignored */
@@ -2408,6 +2409,7 @@ mail_bug_report (
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
 	int ret_code = FALSE;
+	long artchanged = 0L;
 	t_bool is_nntp = FALSE, is_nntp_only;
 
 	wait_message (1, txt_mail_bug_report);
@@ -2499,13 +2501,12 @@ mail_bug_report (
 
 	forever {
 		switch (ch) {
-			long artsize;
 			case iKeyPostEdit:
-				artsize = file_size(nam);
+				artchanged = file_changed(nam);
 				if (!(invoke_editor (nam, start_line_offset)))
 					goto mail_bug_report_done;
 
-				if (((artsize == file_size(nam)) && (prompt_yn (cLINES, txt_prompt_unchanged_bug, TRUE) > 0 )) || (artsize <= 0)) {
+				if (((artchanged == file_changed(nam)) && (prompt_yn (cLINES, txt_prompt_unchanged_bug, TRUE) > 0 )) || (file_size(nam) <= 0L)) {
 					unlink (nam);
 					clear_message ();
 					return TRUE;
@@ -3022,6 +3023,10 @@ cancel_article (
 	else if (*my_distribution)
 		msg_add_header ("Distribution", my_distribution);
 
+	/* some ppl. like X-Headers: in cancels */
+	msg_add_x_headers (msg_headers_file);
+	msg_add_x_headers (group->attribute->x_headers);
+
 	msg_write_headers (fp);
 	msg_free_headers ();
 
@@ -3218,11 +3223,12 @@ repost_article (
 
 	}
 
-	if (Superseding) {
+/* some ppl. like X-Headers: in reposts */
+/*	if (Superseding) { */
 		/* X-Headers got lost on supersede, readd */
 		msg_add_x_headers (msg_headers_file);
 		msg_add_x_headers (psGrp->attribute->x_headers);
-	}
+/*	} */
 
 	start_line_offset = msg_write_headers (fp) + 1;
 	msg_free_headers ();
@@ -3422,16 +3428,16 @@ checknadd_headers (
 #ifdef HAVE_SYS_UTSNAME_H
 #	ifdef _AIX
 						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s) (%s/%s-%s)\n\n",
-							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS,
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OSNAME,
 							system_info.sysname, system_info.version, system_info.release);
 #	else /* AIX */
 						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s) (%s/%s (%s))\n\n",
-							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS,
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OSNAME,
 							system_info.sysname, system_info.release, system_info.machine);
 #	endif /* AIX */
 #else
 						fprintf (fp_out, "User-Agent: %s/%s-%s (\"%s\") (%s)\n\n",
-							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OS);
+							PRODUCT, VERSION, RELEASEDATE, RELEASENAME, OSNAME);
 #endif /* HAVE_SYS_UTSNAME_H */
 					else
 						fprintf (fp_out, "\n");
