@@ -1061,7 +1061,137 @@ mail_check ()
  *
  * Written by ahd 15 July 1989
  * Borrowed from UUPC/extended with some mods by nms
+ * Rewritten from scratch by Th. Quinot, 1997-01-03
  */
+
+#if 1
+# define APPEND_TO(dest) do { *bp = '\0'; \
+                              dest += sprintf (dest, "%s", bp = buf); \
+			 } while (0)
+# define RTRIM(what) do { what ## p --; \
+                          while (what ## p >= what ## buf && \
+                                 isspace (*what ## p)) \
+			    *(what ## p --) = '\0'; } while (0)
+# define LTRIM(what) for (what ## p = what ## buf ; \
+                          what ## p && isspace (*(what ## p)) ; \
+                          what ## p ++)
+# define TRIM(what) do { RTRIM (what); LTRIM (what); } while (0)
+
+void
+parse_from (addr, addrspec, comment)
+  char *addr;
+  char *addrspec;
+  char *comment;
+{
+  char buf[HEADER_LEN];
+  char asbuf[HEADER_LEN];
+  char cmtbuf[HEADER_LEN];
+
+  char *ap = addr,
+       *bp = buf,
+       *asp = asbuf,
+       *cmtp = cmtbuf;
+  unsigned int state = 0;
+  unsigned int plevel = 0;
+  /* 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
+     3 = in angle brackets, 4 = in parentheses (nesting level is plevel) */
+
+  *bp = *asp = *cmtp = '\0';
+  for (; *ap ; ap++) {
+    switch (state) {
+    case 0 :
+      switch (*ap) {
+      case '\"' :
+	APPEND_TO (asp);
+	bp = cmtp;
+	state = 1;
+	break;
+      case '<' :
+	APPEND_TO (cmtp);
+	bp = asbuf;
+	state = 3;
+	break;
+      case '(' :
+	APPEND_TO (asp);
+	bp = cmtp;
+	plevel++;
+	state = 4;
+	break;
+      default :
+	*(bp++) = *ap;
+      break;
+      }
+      break;
+    case 1 :
+      if (*ap == '\"') {
+	*(cmtp = bp++) = '\0';
+	bp = asp;
+	state = 0;
+	break;
+      } else if (*ap == '\\')
+	state = 2;
+      *(bp++) = *ap;
+      break;
+    case 2 :
+      *(bp++) = *ap;
+      state = 1;
+      break;
+    case 3 :
+      if (*ap == '>') {
+	*(asp = bp++) = '\0';
+	bp = cmtp;
+	state = 0;
+      } else
+	*(bp++) = *ap;
+      break;
+    case 4 :
+      switch (*ap) {
+      case ')' :
+	if (!--plevel) {
+	  *(cmtp = bp++) = '\0';
+	  bp = asp;
+	  state = 0;
+	} else
+	  *(bp++) = *ap;
+	break;
+      case '(' :
+	plevel++;
+      default :
+	*(bp++) = *ap;
+        break;
+      }
+      break;
+    default :
+      goto FATAL;
+    }
+  }
+
+  *bp = '\0';
+
+  if (*cmtbuf == '\0' && *asbuf == '\0') {
+    for (asp = asbuf, bp = buf ; *bp ; asp++, bp++)
+      *asp = *bp;
+    *asp = '\0';
+  }
+
+  /* Address specifier */
+  TRIM (as);
+  /* Comment */
+  TRIM (cmt);
+
+  strcpy (addrspec, asp);
+  strcpy (comment, cmtp);
+  return;
+FATAL:
+  addrspec = "error@hell";
+  *comment = '\0';
+}
+# undef APPEND_TO
+# undef RTRIM
+# undef LTRIM
+# undef TRIM
+
+#else
 
 void
 parse_from (from_line, eaddr, fname)
@@ -1218,7 +1348,7 @@ parse_from (from_line, eaddr, fname)
 		strcpy(fname, nameptr);
 	}
 }
-
+#endif
 
 /*
  *  Convert a string to a long, only look at first n characters

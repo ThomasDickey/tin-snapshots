@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-970101 (Wed Jan  1 18:12:18 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970103 (Sat Jan  4 07:15:21 MET 1997)
 ----------------------------------------------------
-  57667 ./CHANGES
-  13902 ./TODO
+  58026 ./CHANGES
+  13750 ./TODO
    5341 ./Makefile
   17216 ./INSTALL
    2260 ./MANIFEST
@@ -54,16 +54,16 @@ MANIFEST for tin-1.3-unoff-BETA-970101 (Wed Jan  1 18:12:18 MET 1997)
   56667 ./src/lang.c
    1739 ./src/list.c
   11984 ./src/mail.c
-  19259 ./src/main.c
+  19256 ./src/main.c
    8108 ./src/makecfg.c
    9471 ./src/memory.c
-  49765 ./src/misc.c
+  52280 ./src/misc.c
    7228 ./src/msmail.c
   33605 ./src/newsrc.c
-  26550 ./src/nntplib.c
+  26625 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6176 ./src/nrctbl.c
-  28884 ./src/open.c
+  28773 ./src/open.c
    6242 ./src/os_2.c
   35769 ./src/page.c
   24090 ./src/parsdate.y
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-970101 (Wed Jan  1 18:12:18 MET 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3706 ./src/tincfg.tbl
-1615838 insgesamt
+1618521 insgesamt

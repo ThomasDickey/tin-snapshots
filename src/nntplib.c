@@ -814,6 +814,9 @@ static int reconnecting = 0;
 		}
 	}
 
+	/* save the server response */
+	my_strncpy(error_response, string, size);
+
 	/*
 	 * some broken newsposters/newsservers have \r's in the middle
 	 * of .overview records...
@@ -953,7 +956,7 @@ nntp_respcode (respcode)
 	**
 	** (does this ever happen?)
 	*/
-	
+
 	switch (respcode) {
 		case 0:
 			text = "";
