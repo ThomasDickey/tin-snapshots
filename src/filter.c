@@ -227,8 +227,7 @@ free_all_filter_arrays (void) /* FIXME: use free_filter_array() instead */
 #ifndef INDEX_DAEMON
 t_bool
 read_filter_file (
-	char *file,
-	t_bool global_file)
+	char *file)
 {
 	FILE *fp;
 	char *s;
@@ -259,15 +258,14 @@ read_filter_file (
 		return FALSE;
 
 	if (INTERACTIVE)
-		wait_message (0, txt_reading_filter_file, (global ? "global " : ""));
+		wait_message (0, txt_reading_filter_file);
 
 	(void) time (&current_secs);
 
 	/*
 	 * Reset all filter arrays if doing a reread of the active file
 	 */
-	if (global_file)
-		free_all_filter_arrays ();
+	free_all_filter_arrays ();
 
 	psGrp = (struct t_group *) 0;
 	arr_ptr = (struct t_filter *) 0;
@@ -543,6 +541,9 @@ if (debug) {
 
 	if (cmd_line)
 		printf ("\r\n");
+
+	if (INTERACTIVE)
+		clear_message();
 
 	return TRUE;
 }
@@ -1063,11 +1064,11 @@ filter_menu (
 
 		case iKeyFilterEdit:
 			bAddFilterRule (group, art, &rule); /* save the rule */
-			if (!invoke_editor (local_filter_file, 22)) /* FIXME: is 22 correct offset ? */
+			if (!invoke_editor (filter_file, 25)) /* FIXME: is 25 correct offset? */
 				return FALSE;
 			unfilter_articles ();
 #ifndef INDEX_DAEMON
-			(void) read_filter_file (local_filter_file, FALSE);
+			(void) read_filter_file (filter_file);
 #endif /* !INDEX_DAEMON */
 			return TRUE;
 			/* keep lint quiet: */
@@ -1245,6 +1246,8 @@ bAddFilterRule (
 	psPtr[*plNum].msgid = (char *) 0;
 	psPtr[*plNum].lines_cmp = psRule->lines_cmp;
 	psPtr[*plNum].lines_num = psRule->lines_num;
+	psPtr[*plNum].gnksa_cmp = FILTER_LINES_NO;
+	psPtr[*plNum].gnksa_num = 0;
 	psPtr[*plNum].score = psRule->score;
 	psPtr[*plNum].xref = (char *) 0;
 	psPtr[*plNum].xref_max = 0;
@@ -1349,7 +1352,7 @@ bAddFilterRule (
 #endif /* DEBUG */
 
 #ifndef INDEX_DAEMON
-		vWriteFilterFile (local_filter_file);
+		vWriteFilterFile (filter_file);
 #endif /* !INDEX_DAEMON */
 	}
 
@@ -1420,7 +1423,7 @@ filter_articles (
 	 * ie. group=comp.os.linux.help  scope=comp.os.linux.*
 	 */
 	inscope = set_filter_scope (group);
-	if (!cmd_line)
+	if (!batch_mode /* !cmd_line */)
 		wait_message (0, txt_filter_global_rules, inscope, group->glob_filter->num);
 	num = group->glob_filter->num;
 	ptr = group->glob_filter->filter;

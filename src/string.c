@@ -188,12 +188,13 @@ modifiedstrncpy (
 
 void
 str_lwr (
-	char *dst,
-	const char *src)
+	char *str)
 {
-	while (*src) {
-		*dst++ = (char)tolower((unsigned char)*src);
-		src++;
+	char *dst = str;
+
+	while (*str) {
+		*dst++ = (char)tolower((unsigned char)*str);
+		str++;
 	}
 	*dst = '\0';
 }

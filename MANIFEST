@@ -1,7 +1,7 @@
-MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
+MANIFEST for tin-1.4.3 (Tue May  2 18:16:01 CEST 2000)
 ----------------------------------------------------
   10365 ./Makefile
-   5413 ./MANIFEST
+   5414 ./MANIFEST
    1690 ./README
    2209 ./README.VMS
    1543 ./README.WIN
@@ -14,11 +14,11 @@ MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
    4765 ./install.sh
   11873 ./makefile.in
     661 ./mkdirs.sh
-   2927 ./doc/CHANGES
+   4754 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
   29760 ./doc/INSTALL
-  19853 ./doc/TODO
+  19434 ./doc/TODO
    5197 ./doc/WHATSNEW
    3882 ./doc/auth.txt
    8426 ./doc/filtering
@@ -31,27 +31,27 @@ MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
    1615 ./doc/umlaute.txt
    1914 ./doc/umlauts.txt
    4643 ./doc/tin.defaults
-  97847 ./doc/tin.1
+  97881 ./doc/tin.1
    3703 ./tools/metamutt
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
     564 ./include/bool.h
     972 ./include/bugrep.h
    8374 ./include/config.h
-  47267 ./include/extern.h
+  47173 ./include/extern.h
   13172 ./include/menukeys.h
    5053 ./include/nntplib.h
    3083 ./include/policy.h
-  25499 ./include/proto.h
+  25462 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
   57743 ./include/tin.h
    9336 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1132 ./include/version.h
+   1128 ./include/version.h
   25927 ./src/active.c
-  39525 ./src/art.c
+  39543 ./src/art.c
   23669 ./src/attrib.c
   11074 ./src/auth.c
    8974 ./src/charset.c
@@ -61,30 +61,30 @@ MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
   11967 ./src/debug.c
    2335 ./src/envarg.c
   19955 ./src/feed.c
-  42876 ./src/filter.c
+  42913 ./src/filter.c
   12595 ./src/getline.c
   47290 ./src/group.c
    3112 ./src/hashstr.c
-   8030 ./src/header.c
+   8046 ./src/header.c
   12130 ./src/help.c
-   9804 ./src/inews.c
-  35060 ./src/init.c
+   9955 ./src/inews.c
+  34710 ./src/init.c
    1447 ./src/joinpath.c
-  90615 ./src/lang.c
+  90614 ./src/lang.c
    3011 ./src/list.c
   10492 ./src/mail.c
-  23974 ./src/main.c
+  23871 ./src/main.c
    8911 ./src/makecfg.c
    9347 ./src/memory.c
-  76583 ./src/misc.c
+  76886 ./src/misc.c
   37785 ./src/newsrc.c
-  27071 ./src/nntplib.c
+  27202 ./src/nntplib.c
    5942 ./src/nrctbl.c
   27192 ./src/open.c
-  42441 ./src/page.c
+  42378 ./src/page.c
   24159 ./src/parsdate.y
    8496 ./src/pgp.c
-  97231 ./src/post.c
+  97284 ./src/post.c
   12519 ./src/prompt.c
    8874 ./src/read.c
   23620 ./src/refs.c
@@ -98,11 +98,11 @@ MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
    6655 ./src/sigfile.c
   11003 ./src/signal.c
    5800 ./src/strftime.c
-  10477 ./src/string.c
+  10478 ./src/string.c
    8278 ./src/tcurses.c
-  32731 ./src/thread.c
+  32725 ./src/thread.c
    1179 ./src/trace.c
-   4380 ./src/wildmat.c
+   4418 ./src/wildmat.c
    6367 ./src/xref.c
    4987 ./amiga/README
    5520 ./amiga/tin.readme
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3250559 total
+3252092 total

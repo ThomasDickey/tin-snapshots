@@ -536,7 +536,7 @@ enter_pager:
 						goto thread_tab_pressed;
 
 					default:
-						if (local_filtered_articles) {
+						if (filtered_articles) {
 							ret_code = GRP_KILLED; /* ?? */
 							goto thread_done;
 						}

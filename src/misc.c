@@ -898,7 +898,7 @@ base_name (
 		}
 	}
 #ifdef M_OS2
-	str_lwr (program, program);
+	str_lwr (program);
 #endif /* M_OS2 */
 #ifdef VMS
 	if (cp = strrchr(program, '.'))
@@ -1969,7 +1969,7 @@ strfmailer (
 					strcpy (tbuf, "\n");
 					break;
 				default:
-					tbuf[0] = '%';
+					tbuf[0] = '\\';
 					tbuf[1] = *format;
 					tbuf[2] = '\0';
 					break;
@@ -1992,21 +1992,33 @@ strfmailer (
 					*s++ = '%';
 					continue;
 				case 'F':	/* Filename */
-					strcpy (tbuf, filename);
+					STRCPY(tbuf, filename);
 					break;
 				case 'M':	/* Mailer */
-					strcpy (tbuf, the_mailer);
+					STRCPY(tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject, ismail) , quote_area));
+					if (tinrc.use_mailreader_i) {
+						STRCPY(tbuf, escape_shell_meta (subject, quote_area));
+					} else {
+						STRCPY(tbuf, escape_shell_meta (rfc1522_encode (subject, ismail) , quote_area));
+					}
 					escaped = TRUE;
 					break;
 				case 'T':	/* To */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to, ismail), quote_area));
+					if (tinrc.use_mailreader_i) {
+						STRCPY(tbuf, escape_shell_meta (to, quote_area));
+					} else {
+						STRCPY(tbuf, escape_shell_meta (rfc1522_encode (to, ismail), quote_area));
+					}
 					escaped = TRUE;
 					break;
 				case 'U':	/* User */
-					strcpy (tbuf, rfc1522_encode (userid, ismail));
+					if (tinrc.use_mailreader_i) {
+						STRCPY(tbuf, userid);
+					} else {
+						STRCPY(tbuf, rfc1522_encode (userid, ismail));
+					}
 					break;
 				default:
 					tbuf[0] = '%';

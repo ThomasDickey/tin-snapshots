@@ -545,7 +545,7 @@ make_threads (
 {
 	int i;
 
-	if (!cmd_line)
+	if (!batch_mode /* !cmd_line */)
 		info_message (((group->attribute && group->attribute->thread_arts == THREAD_NONE) ? txt_unthreading_arts : txt_threading_arts));
 
 #ifdef DEBUG

@@ -110,7 +110,7 @@
 #	endif /* HAVE_ISPELL */
 #endif /* HAVE_PGP */
 #define TIN_EDIT_KEYS	"\033eoq"
-#define TIN_EDIT_KEYS_EXT	"\033eoqM"
+#define TIN_EDIT_KEYS_EXT	"\033eqM"
 #define TIN_CONT_KEYS	"\033ac"
 
 /* tmpname for responses by mail */
@@ -2977,20 +2977,18 @@ cancel_article (
 	if (!author) {
 		sprintf (line2, "cyberspam!%s", line);
 		msg_add_header ("Path", line2);
-	} else
-		msg_add_header ("Path", line);
-
-	if (art->name)
-		sprintf (line, "%s <%s>", art->name, art->from);
-	else
-		sprintf (line, "<%s>", art->from);
-
-	msg_add_header ("From", line);
-	if (!author) {
+		msg_add_header ("From", note_h.from);
 		sprintf (line, "<cancel.%s", note_h.messageid + 1);
 		msg_add_header ("Message-ID", line);
 		msg_add_header ("X-Cancelled-By", from_name);
+/*		msg_add_header ("X-Orig-Subject", note_h.subj); */
 	} else {
+		msg_add_header ("Path", line);
+		if (art->name)
+			sprintf (line, "%s <%s>", art->name, art->from);
+		else
+			sprintf (line, "<%s>", art->from);
+		msg_add_header ("From", line);
 		ADD_CAN_KEY(note_h.messageid);
 	}
 #else
@@ -3034,7 +3032,6 @@ cancel_article (
 	if (author)
 		fprintf (fp, txt_article_cancelled);
 	else {
-		fputc ('\n', fp);
 		rewind (note_fp);
 		copy_fp (note_fp, fp);
 	}

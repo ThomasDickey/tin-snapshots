@@ -67,8 +67,8 @@ submit_inews (
 {
 	FILE *fp;
 	char *ptr;
-	char from_name[PATH_LEN];
-	char message_id[PATH_LEN];
+	char from_name[HEADER_LEN];
+	char message_id[HEADER_LEN];
 	char line[NNTP_STRLEN];
 	int auth_error = 0;
 	int respcode;
@@ -76,6 +76,7 @@ submit_inews (
 	t_bool id_in_article = FALSE;
 	t_bool ret_code = FALSE;
 #	ifndef FORGERY
+	char sender_hdr[HEADER_LEN];
 	int sender = 0;
 	t_bool ismail = FALSE;
 #	endif /* !FORGERY */
@@ -117,18 +118,50 @@ submit_inews (
 	 *
 	 * this will be done once again in sender_needed!?!
 	 */
+#ifndef FORGERY
 	if (GNKSA_OK != gnksa_check_from(rfc1522_encode(from_name, FALSE))) { /* error in address */
 		error_message (txt_invalid_from, from_name);
 		fclose (fp);
 		return ret_code;
 	}
-
-	/*
-	 * Send POST command to NNTP server
-	 * Receive CONT_POST or ERROR response code from NNTP server
-	 */
+#endif /* !FORGERY */
 	do {
 		rewind(fp);
+
+
+#	ifndef FORGERY
+		if ((ptr = build_sender()) && (!disable_sender)) {
+			sender = sender_needed(rfc1522_decode(from_name), ptr);
+			switch (sender) {
+				case -2: /* can't build Sender: */
+					error_message (txt_invalid_sender, ptr);
+					fclose (fp);
+					return ret_code;
+					/* NOTREACHED */
+					break;
+
+				case -1: /* illegal From: (can't happen as check is done above allready) */
+					error_message (txt_invalid_from, from_name);
+					fclose (fp);
+					return ret_code;
+					/* NOTREACHED */
+					break;
+
+				case 1:	/* insert Sender */
+					sprintf (sender_hdr, "Sender: %s", rfc1522_encode(ptr, ismail));
+					break;
+
+				case 0: /* no sender needed */
+				default:
+					break;
+			}
+		}
+#	endif /* !FORGERY */
+
+		/*
+		 * Send POST command to NNTP server
+		 * Receive CONT_POST or ERROR response code from NNTP server
+		 */
 		if (nntp_command("POST", CONT_POST, line) == NULL) {
 			error_message ("%s", line);
 			fclose (fp);
@@ -157,40 +190,15 @@ submit_inews (
 			}
 		}
 
-		/*
-		 * Send Path: and From: article headers
-		 */
 #	ifndef FORGERY
+		/*
+		 * Send Path: (and Sender: if needed) headers
+		 */
 		sprintf (line, "Path: %s", PATHMASTER);
 		put_server (line);
 
-		if ((ptr = build_sender()) && (!disable_sender)) {
-			sender = sender_needed(rfc1522_decode(from_name), ptr);
-			switch (sender) {
-				case -2: /* can't build Sender: */
-					error_message (txt_invalid_sender, ptr);
-					fclose (fp);
-					return ret_code;
-					/* NOTREACHED */
-					break;
-
-				case -1: /* illegal From: (can't happen as check is done above allready) */
-					error_message (txt_invalid_from, from_name);
-					fclose (fp);
-					return ret_code;
-					/* NOTREACHED */
-					break;
-
-				case 1:	/* insert Sender */
-					sprintf (line, "Sender: %s", rfc1522_encode(ptr, ismail));
-					put_server (line);
-					break;
-
-				case 0: /* no sender needed */
-				default:
-					break;
-			}
-		}
+		if (sender == 1)
+			put_server (sender_hdr);
 #	endif /* !FORGERY */
 
 		/*
@@ -202,7 +210,7 @@ submit_inews (
 				put_server (line);
 			}
 #	ifdef USE_CANLOCK
-				/* create a Cancel-Lock: */
+			/* create a Cancel-Lock: */
 			{
 				char lock[1024];
 				const char *lptr = (const char *) 0;
@@ -378,8 +386,7 @@ static int sender_needed (
 	if (strncasecmp(from_addr, sender_addr, (from_at_pos - from_addr)))
 		return 1; /* login differs */
 
-	if (strcasecmp(from_at_pos, sender_at_pos)
-	    && (strcasecmp (from_at_pos+1, sender_dot_pos+1)))
+	if (strcasecmp(from_at_pos, sender_at_pos) && (strcasecmp (from_at_pos + 1, sender_dot_pos + 1)))
 		return 1; /* domainname differs */
 
 	return 0;

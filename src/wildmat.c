@@ -133,25 +133,30 @@ wildmat (
 	char *p,
 	t_bool icase)
 {
-	char tbuff[LEN];
-	char pbuff[LEN];
+	t_bool ret;
+	char *txt;
 
 	/*
 	 * Make sure the pattern is not NULL
 	 */
-	if (p == (char *) 0 || text == (char *)0)
+	if (p == (char *) 0 || text == (char *) 0)
 		return FALSE;
 #ifdef OPTIMIZE_JUST_STAR
 	if (p[0] == '*' && p[1] == '\0')
 		return TRUE;
 #endif /* OPTIMIZE_JUST_STAR */
 
-	if (icase) {
-		str_lwr(tbuff, text);
-		str_lwr(pbuff, p);
-	}
-
 	mesg[0] = '\0';
 
-	return DoMatch((icase) ? tbuff : text, (icase) ? pbuff : p) == TRUE;
+	if (icase) {
+		txt = my_strdup(text);
+		str_lwr(txt);
+		str_lwr(p);
+		ret = (DoMatch(txt, p) == TRUE);
+		free (txt);
+	} else {
+		ret = (DoMatch(text, p) == TRUE);
+	}
+
+	return ret;
 }

@@ -578,12 +578,14 @@ get_tcp6_socket (
 	struct addrinfo hints, *res, *res0;
 
 #	if 0 /* currently we don't know if we have snprintf */
-	snprintf(mymachine, sizeof(mymachine), "%s", machine);
-	snprintf(myport, sizeof(myport), "%d", port);
+	snprintf(mymachine, sizeof(mymachine)-1, "%s", machine);
+	snprintf(myport, sizeof(myport)-1, "%d", port);
 #	else
-	my_strncpy(mymachine, machine, sizeof(mymachine));
+	my_strncpy(mymachine, machine, sizeof(mymachine)-1);
 	sprintf(myport, "%d", port);
 #	endif /* 0 */
+	mymachine[sizeof(mymachine)-1] = '\0';
+	myport[sizeof(myport)-1] = '\0';
 
 /* just in case */
 #	ifdef AF_UNSPEC
@@ -599,6 +601,7 @@ get_tcp6_socket (
 /*	hints.ai_flags    = AI_CANONNAME; */
 	hints.ai_family   = ADDRFAM;
 	hints.ai_socktype = SOCK_STREAM;
+	res = res0 = NULL;
 	err = getaddrinfo(mymachine, myport, &hints, &res0);
 	if (err != 0) {
 		my_fprintf (stderr, "\ngetaddrinfo: %s\n", gai_strerror(err)); /* FIXME: -> lang.c */
@@ -615,6 +618,7 @@ get_tcp6_socket (
 			break;
 		}
 	}
+	if (res0) freeaddrinfo(res0);
 	if (err < 0) {
 		my_fprintf (stderr, "\nsocket or connect problem\n"); /* FIXME: -> lang.c */
 		return (-1);

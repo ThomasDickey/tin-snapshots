@@ -129,7 +129,7 @@ extern t_bool quick_filter (int type, struct t_group *group, struct t_article *a
 extern t_bool quick_filter_select_posted_art (struct t_group *group, char *subj);
 extern void free_all_filter_arrays (void);
 #ifndef INDEX_DAEMON
-	extern t_bool read_filter_file (char *file, t_bool global_file);
+	extern t_bool read_filter_file (char *file);
 #endif /* !INDEX_DAEMON */
 
 /* getline.c */
@@ -563,7 +563,7 @@ extern int sh_format (char *dst, size_t len, const char *fmt, ...);
 extern size_t mystrcat (char **t, const char *s);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
 extern void my_strncpy (char *p, const char *q, size_t n);
-extern void str_lwr (char *dst, const char *src);
+extern void str_lwr (char *str);
 extern void strcpynl (char *to, const char *from);
 #ifndef HAVE_STRPBRK
 	extern char *strpbrk (char *str1, char *str2);

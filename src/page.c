@@ -98,7 +98,7 @@ show_page (
 	struct stat note_stat;
 	t_bool mouse_click_on = TRUE;
 
-	local_filtered_articles = FALSE;	/* used in thread level */
+	filtered_articles = FALSE;	/* used in thread level */
 
 	make_group_path (group->name, group_path);
 
@@ -453,7 +453,7 @@ page_goto_next_unread:
 
 			case iKeyPageQuickAutoSel:		/* quickly auto-select article */
 			case iKeyPageQuickKill:		/* quickly kill article */
-				if ((local_filtered_articles = quick_filter (
+				if ((filtered_articles = quick_filter (
 						(ch == iKeyPageQuickKill) ? FILTER_KILL : FILTER_SELECT,
 						group, &arts[respnum])))
 					goto return_to_index;
@@ -464,7 +464,7 @@ page_goto_next_unread:
 			case iKeyPageAutoSel:		/* auto-select article menu */
 			case iKeyPageAutoKill:		/* kill article menu */
 				if (filter_menu ((ch == iKeyPageAutoKill) ? FILTER_KILL : FILTER_SELECT, group, &arts[respnum])) {
-					if ((local_filtered_articles = filter_articles (group)))
+					if ((filtered_articles = filter_articles (group)))
 						goto return_to_index;
 				}
 				redraw_page (group->name, respnum);
@@ -595,7 +595,7 @@ return_to_index:
 				if (threadnum)
 					*threadnum = which_response (respnum);
 
-				if (filter_state == FILTERING || local_filtered_articles) {
+				if (filter_state == FILTERING || filtered_articles) {
 					int old_top = top;
 					long old_artnum = arts[respnum].artnum;
 					filter_articles (group);
@@ -1467,11 +1467,11 @@ art_open (
 		if (match_header (buf, "Mime-Version", note_h.mimeversion, (char*)0, HEADER_LEN))
 			continue;
 		if (match_header (buf, "Content-Type", note_h.contenttype, (char*)0, HEADER_LEN)) {
-			str_lwr (note_h.contenttype, note_h.contenttype);
+			str_lwr (note_h.contenttype);
 			continue;
 		}
 		if (match_header (buf, "Content-Transfer-Encoding", note_h.contentenc, (char*)0, HEADER_LEN)) {
-			str_lwr (note_h.contentenc, note_h.contentenc);
+			str_lwr (note_h.contentenc);
 			continue;
 		}
 		if (match_header (buf, "X-Comment-To", note_h.ftnto, (char*)0, HEADER_LEN))
