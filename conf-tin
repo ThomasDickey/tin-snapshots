@@ -42,10 +42,8 @@ CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
 	--disable-echo \
-	--enable-warnings \
-	--with-ncurses \
+	--enable-nntp-only \
 	--disable-mime-strict-charset \
 	--with-mail-gateway=/etc/NNTP_INEWS_DOMAIN \
 	--with-nntp-default-server=news.rz.uni-karlsruhe.de \
         $OPTS $* 2>&1 |tee -a $OUT
-#	--enable-nntp-only \

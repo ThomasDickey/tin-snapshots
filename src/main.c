@@ -183,11 +183,11 @@ main (
 	/*
 	 *  Quick post an article & exit if -w specified
 	 */
-	if (post_article_and_exit) {
+	if (post_article_and_exit || post_postponed_and_exit) {
 		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
 		debug_print_filters ();
-		quick_post_article ();
+		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_OK);
 	}
 
@@ -302,9 +302,9 @@ main (
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCD:f:g:hHI:m:M:nN:qrRs:SuUvVwzZ"
+#		define OPTIONS "acCD:f:g:hHI:m:M:nN:oqrRs:SuUvVwzZ"
 #	else /* M_AMIGA */ /* may need some work */
-#		define OPTIONS "BcCD:f:hHI:m:M:nN:qrRs:SuUvVwzZ"
+#		define OPTIONS "BcCD:f:hHI:m:M:nN:oqrRs:SuUvVwzZ"
 #	endif
 #else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"
@@ -499,6 +499,10 @@ read_cmd_line_options (
 				post_article_and_exit = TRUE;
 				break;
 
+			case 'o':	/* post postponed articles & exit */
+				post_postponed_and_exit = TRUE;
+				break;
+
 			case 'z':
 				start_any_unread = TRUE;
 				update = TRUE;
@@ -595,6 +599,7 @@ usage (
 #	endif /* NNTP_ABLE */
 
 	error_message ("  -N       mail new news to your posts", "");
+	error_message ("  -o       post all postponed articles and exit", "");
 	error_message ("  -q       quick start by not checking for new newsgroups", "");
 
 #	ifdef NNTP_ABLE

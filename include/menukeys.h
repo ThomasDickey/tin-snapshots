@@ -300,6 +300,11 @@
 #define iKeyPostSupersede 's'
 #define iKeyPostPostpone 'o'
 
+#define iKeyPostponeYes 'y'
+#define iKeyPostponeYesOverride 'Y'
+#define iKeyPostponeYesAll 'A'
+#define iKeyPostponeNo 'n'
+
 /* prompt.c */
 
 #define iKeyPromptYes 'y'

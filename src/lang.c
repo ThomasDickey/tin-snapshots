@@ -668,7 +668,7 @@ constext txt_tinrc_force_screen_redraw[] = "# if ON a screen redraw will always 
 constext txt_tinrc_full_page_scroll[] = "# if ON scroll full page of groups/articles otherwise half a page\n";
 constext txt_tinrc_group_catchup_on_exit[] = "# if ON catchup group/thread when leaving with the left arrow key.\n";
 constext txt_tinrc_groupname_max_length[] = "# Maximum length of the names of newsgroups displayed\n";
-constext txt_tinrc_header[] = "# This file was automatically saved by tin\n#\n\
+constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file was automatically saved by %s %s %s\n#\n\
 # Do not edit while tin is running, since all your changes to this file\n\
 # would be overwritten when you leave tin.\n#\n\
 ############################################################################\n\n";
@@ -877,6 +877,7 @@ constext txt_post_processing_failed[] = "Post processing failed";
 constext txt_post_processing_finished[] = "-- post processing completed --";
 constext txt_post_subject[] = "Post subject [%s]> ";
 constext txt_posting[] = "Posting article...";
+constext txt_postpone_repost[] = "Repost [%.*s]? (y/Y/A/n/q): %c";
 constext txt_printed[] = "%d Article%s printed";
 constext txt_printing[] = "Printing...";
 constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";

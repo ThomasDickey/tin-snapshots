@@ -214,6 +214,7 @@ t_bool no_advertising = FALSE;
 t_bool pos_first_unread;		/* position cursor at first/last unread article */
 t_bool post_8bit_header=FALSE;	/* allow 8bit chars. in header when posting to newsgroup */
 t_bool post_article_and_exit;	/* quick post of an article then exit (elm like) */
+t_bool post_postponed_and_exit;	/* post postponed articles and exit */
 t_bool print_header;				/* print all of mail header or just Subject: & From lines */
 t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
 t_bool prompt_followupto;    /* display empty Followup-To header in editor */
@@ -424,6 +425,7 @@ void init_selfinfo (void)
 	num_of_tagged_arts = 0;
 	pos_first_unread = TRUE;
 	post_article_and_exit = FALSE;
+	post_postponed_and_exit = FALSE;
 	post_8bit_header = FALSE;
 	print_header = FALSE;
 	process_only_unread = TRUE;

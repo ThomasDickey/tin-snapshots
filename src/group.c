@@ -1056,7 +1056,7 @@ group_list_thread:
 				break;
 
 			case iKeyGroupPostponed:	/* post postponed article */
-				if(pickup_postponed_articles(FALSE)) {
+				if(pickup_postponed_articles(FALSE, FALSE)) {
 					show_group_page ();
 				}
 				break;

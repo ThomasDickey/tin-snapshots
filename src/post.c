@@ -749,7 +749,8 @@ setup_check_article_screen (
  */
 
 void
-quick_post_article (void)
+quick_post_article (
+	int postponed_only)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -772,13 +773,21 @@ quick_post_article (void)
 		info_message (txt_cannot_post);
 		return;
 	}
+
 	setup_screen ();
 	InitScreen ();
 	ClearScreen ();
 
-	/* check for postponed articles first */
+	/*
+	 * check for postponed articles first
+	 * first param is whether to ask the user if they want to do it or not.
+	 *    it's opposite to the command line switch.
+	 * second param is whether to assume yes to all which is the same as 
+	 *    the command line switch.
+	 */
 
-	if(pickup_postponed_articles(TRUE))
+	if(pickup_postponed_articles(!postponed_only, postponed_only)
+		|| postponed_only)
 	  return;
 
 	/*
@@ -1021,11 +1030,14 @@ post_article_postponed:
  */
 
 static void
-post_existing_article (void)
+post_existing_article (
+	int ask,
+	char* subject)
 {
 	char ch;
 	char group[HEADER_LEN];
 	char subj[HEADER_LEN];
+	char prompt[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	struct t_group *psGrp;
@@ -1035,7 +1047,10 @@ post_existing_article (void)
 		return;
 	}
 
-	ch = iKeyPostEdit;
+	if (ask)
+		ch = iKeyPostEdit;
+	else
+		ch = iKeyPostPost;
 	forever {
 		switch (ch) {
 			case iKeyPostEdit:
@@ -1066,7 +1081,11 @@ post_existing_article (void)
 #endif
 
 			case iKeyPostPost:
-				wait_message (txt_posting);
+				sprintf(prompt, "Posting: %s", subject);
+				if (strlen(prompt) > cCOLS-5)
+					prompt[cCOLS-5] = 0;
+				strcat(prompt, " ...");
+				wait_message (prompt);
 				backup_article(article);
 				if(!strchr(group, ',')) {
 				  psGrp=psGrpFind(group);
@@ -1281,14 +1300,16 @@ fetch_postponed_article(
 
 int
 pickup_postponed_articles(
-	int ask)
+	int ask,
+	int all)
 {
   char newsgroups[HEADER_LEN];
   char subject[HEADER_LEN];
   char question[HEADER_LEN];
+  char ch;
+  char def = iKeyPostponeYes;
   int count=count_postponed_articles();
   int i;
-  int ret;
 
   if(count==0) {
     if(!ask)
@@ -1302,21 +1323,40 @@ pickup_postponed_articles(
     return FALSE;
   }
 
-  for(i=0;i<count;i++) {
-    if(!fetch_postponed_article(article, subject, newsgroups))
-      return TRUE;
-    sprintf(question, "use article \"%s\" in %s ? ", subject, newsgroups);
-    if((ret=prompt_yn(cLINES, question, TRUE))==1) {
-      post_existing_article();
-    } else {
-      append_postponed_file(article, userid);
-      unlink(article);
-      if(ret==-1) 
+	for(i=0;i<count;i++) {
+		if(!fetch_postponed_article(article, subject, newsgroups))
+			return TRUE;
+		if (!all) {
+			def = iKeyPostponeYes;
+			do {
+				do_prompt2 (txt_postpone_repost, subject, def);
+				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+					ch = def;
+			} while (!strchr ("\033qyYnA", ch));
+			if (ch == iKeyPostponeYesAll) {
+				all = 1;
+			}
+		}
+		/* No else here since all changes in previous if */
+		if (all) {
+			ch = iKeyPostponeYesOverride;
+		}
+		switch (ch)
+		{
+			case iKeyPostponeYes:
+			case iKeyPostponeYesOverride:
+				post_existing_article(ch == iKeyPostponeYes, subject);
+				break;
+			case iKeyPostponeNo:
+			case iKeyQuit:
+			case iKeyAbort:
+				append_postponed_file(article, userid);
+				unlink(article);
+				if (ch != iKeyPostponeNo)
+					return TRUE;
+		}
+	}
 	return TRUE;
-    }
-  }
-
-  return TRUE;
 }
 
 
@@ -2809,8 +2849,11 @@ cancel_article (
 		msg_add_header ("Path", line2);
 	} else
 		msg_add_header ("Path", line);
-
-	sprintf (line, "%s <%s>", art->name, art->from);
+	if (art->name) {
+		sprintf (line, "%s <%s>", art->name, art->from);
+	} else {
+		sprintf (line, "<%s>", art->from);
+	}
 	msg_add_header ("From", line);
 
 	if (!author) {
@@ -3025,7 +3068,11 @@ repost_article (
 #else
 		make_path_header (line, from_name);
 		msg_add_header ("Path", line);
-		sprintf (line, "%s <%s>", art->name, arts[respnum].from);
+		if (art->name) {
+			sprintf (line, "%s <%s>", art->name, arts[respnum].from);
+		} else {
+			sprintf (line, "<%s>", arts[respnum].from);
+		}
 		msg_add_header ("From", line);
 		msg_add_header ("X-Superseded-By", from_name);
 		if (note_h_org[0])
