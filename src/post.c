@@ -27,10 +27,9 @@ extern char note_h_references[LEN];			/* References:	*/
 extern char note_h_newsgroups[LEN];			/* Newsgroups:	*/
 extern char note_h_subj[LEN];				/* Subject:	*/
 extern char note_h_date[PATH_LEN];			/* Date:	*/
-extern char note_h_xcommentto[LEN];			/* X-Comment-To: (Used by FIDO)	*/
+extern char note_h_from[LEN];				/* From: */
 
 #ifdef FORGERY
-extern char note_h_from[LEN];				/* From: */
 extern char note_h_org[PATH_LEN];			/* Organization: */
 extern char note_h_keywords[LEN];			/* Keywords: */
 extern char note_h_summary[LEN];			/* Summary: */
@@ -1208,8 +1207,8 @@ ignore_followup_to_poster:
 	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj));
 	msg_add_header ("Subject", bigbuf);
 
-	if (psGrp && psGrp->attribute-> x_comment_to && *note_h_xcommentto) {
-		msg_add_header ("X-Comment-To", note_h_xcommentto);
+	if (psGrp && psGrp->attribute-> x_comment_to && *note_h_from) {
+		msg_add_header ("X-Comment-To", note_h_from);
 	}
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h_followup);

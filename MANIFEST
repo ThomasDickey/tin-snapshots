@@ -1,11 +1,11 @@
-MANIFEST for tin-1.3-unoff-BETA-960613 (Thu Jun 13 11:44:46 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960616 (Mon Jun 17 01:10:00 MET DST 1996)
 ----------------------------------------------------
-  19872 ./CHANGES
+  20026 ./CHANGES
    8975 ./TODO
    4984 ./Makefile
   17138 ./INSTALL
    2110 ./MANIFEST
-   1495 ./README
+   1493 ./README
     913 ./tinpp
   17994 ./aclocal.m4
  114466 ./configure
@@ -62,10 +62,10 @@ MANIFEST for tin-1.3-unoff-BETA-960613 (Thu Jun 13 11:44:46 MET DST 1996)
    3792 ./src/nrctbl.c
   26315 ./src/open.c
    6305 ./src/os_2.c
-  34639 ./src/page.c
+  34463 ./src/page.c
   24128 ./src/parsdate.y
    7249 ./src/pgp.c
-  64217 ./src/post.c
+  64132 ./src/post.c
    4378 ./src/prompt.c
      53 ./src/proto.sed
   10075 ./src/refs.c
@@ -86,4 +86,4 @@ MANIFEST for tin-1.3-unoff-BETA-960613 (Thu Jun 13 11:44:46 MET DST 1996)
    5549 ./src/vms.c
    5619 ./include/autoconf.hin
   10377 ./src/Makefile.in
-1380772 total
+1380663 total
