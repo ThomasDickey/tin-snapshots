@@ -442,7 +442,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 				}
 				if (ngcnt < NGLIMIT) {
 					nglens[ngcnt] = strlen (cp);
-					ngptrs[ngcnt] = my_malloc (nglens[ngcnt]+1);
+					ngptrs[ngcnt] = (char *) my_malloc (nglens[ngcnt]+1);
 					if (! ngptrs[ngcnt]) {
 						for (i = 0; i < ngcnt; i++) {
 							if (ngptrs[i]) {
@@ -1305,7 +1305,13 @@ post_response (group, respnum, copy_text)
 			strcpy(note_h_followup, save_followup);
 			return ret_code;
 		}
-	} else if (*note_h_followup && strcmp (note_h_followup, group) != 0) {
+	} else if (*note_h_followup && strcmp (note_h_followup, group) != 0
+		   && strcmp(note_h_followup, note_h_newsgroups)!=0 ) {
+	  /* note that comparing newsgroups and followup-to isn't
+	     really correct, since the order of the newsgroups may be
+	     different, but testing that also isn't really worth
+	     it. The main culprit for this problem is tin <=1.22, BTW.
+	     */
 		MoveCursor (cLINES/2, 0);
 		CleartoEOS ();
 		center_line ((cLINES/2)+2, TRUE, txt_resp_redirect);
@@ -1851,10 +1857,13 @@ mail_bug_report ()
 		is_debug,
 		(gateway ? gateway : ""),
 		(domain ? domain : ""));
-
-	start_line_offset += 5;
-
+#ifdef HAVE_REF_THREADING
+	fprintf (fp, "CFG4: threading=%d", default_thread_arts);
+	start_line_offset++;
+#endif
 	fprintf (fp, "\nPlease enter bug report/gripe/comment:\n");
+
+	start_line_offset +=5;
 
 	if( ! use_mailreader_i ) {
 		msg_write_signature (fp, TRUE);
@@ -1906,7 +1915,7 @@ mail_bug_report ()
 					 && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						sprintf (msg, txt_mailing_to, mail_to);
 						wait_message (msg);
-						rfc15211522_encode(nam);
+						rfc15211522_encode(nam, mail_mime_encoding);
 						strfmailer (mailer, subject, mail_to, nam,
 							buf, sizeof (buf), default_mailer_format);
 						if (invoke_cmd (buf)) {
@@ -2076,7 +2085,7 @@ mail_to_author (group, respnum, copy_text)
 				sprintf (msg, txt_mailing_to, mail_to);
 				wait_message (msg);
 				checknadd_headers (nam, lines);
-				rfc15211522_encode(nam);
+				rfc15211522_encode(nam, mail_mime_encoding);
 				strfmailer (mailer, subject, mail_to, nam,
 					buf, sizeof (buf), default_mailer_format);
 				if (invoke_cmd (buf)) {
@@ -3102,7 +3111,7 @@ submit_mail_file (file)
 			sprintf (buf, txt_mailing_to, mail_to);
 			wait_message (buf);
 
-			rfc15211522_encode(file);
+			rfc15211522_encode(file, mail_mime_encoding);
 
 			strfmailer (mailer, subject, mail_to, file,
 				buf, sizeof (buf), default_mailer_format);

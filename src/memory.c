@@ -433,7 +433,7 @@ free_newnews_array ()
 }
 
 
-char *
+void *
 my_malloc1 (file, line, size)
 	char *file;
 	int line;
@@ -452,11 +452,11 @@ my_malloc1 (file, line, size)
 /*		tin_done (1); */
 		exit (1);
 	}
-	return p;
+	return (void *) p;
 }
 
 
-char *
+void *
 my_realloc1 (file, line, p, size)
 	char *file;
 	int line;
@@ -481,5 +481,5 @@ my_realloc1 (file, line, p, size)
 /*		tin_done (1); */
 		exit (1);
 	}
-	return p;
+	return (void *) p;
 }

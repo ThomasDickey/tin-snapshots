@@ -260,16 +260,16 @@ int
 pgp_check_article()
 {
 	FILE *art;
-	char article[PATH_LEN], buf[LEN], cmd[LEN], ch;
+	char the_article[PATH_LEN], buf[LEN], cmd[LEN], ch;
 	int pgp_signed = 0, pgp_key = 0;
 
 	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return (0);
 	}
-	joinpath(article, homedir, ".article");
+	joinpath(the_article, homedir, ".article");
 	if ((art = fopen(article, "w")) == NULL) {
-		sprintf(buf, txt_cannot_open, article);
+		sprintf(buf, txt_cannot_open, the_article);
 		info_message(buf);
 		return (0);
 	}
@@ -292,7 +292,7 @@ pgp_check_article()
 	ClearScreen();
 	if (pgp_signed) {
 		Raw(FALSE);
-		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, article, REDIRECT_PGP_OUTPUT, pgpopts);
+		sprintf(cmd, "%s <%s %s %s -f", PGPNAME, the_article, REDIRECT_PGP_OUTPUT, pgpopts);
 		system(cmd);
 		printf("\n");
 		Raw(TRUE);
@@ -308,7 +308,7 @@ pgp_check_article()
 		if (tolower(ch) == 'y') {
 			Raw(FALSE);
 			printf("Yes\n\n");
-			sprintf(cmd, "%s %s -ka %s", PGPNAME, pgpopts, article);
+			sprintf(cmd, "%s %s -ka %s", PGPNAME, pgpopts, the_article);
 			system(cmd);
 			printf("\n");
 			Raw(TRUE);

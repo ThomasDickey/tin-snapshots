@@ -300,11 +300,11 @@ read_config_file (file, global_file)
 			}
 			break;				
 		case 'm':
-			if (match_string (buf, "mime_encoding=", mime_encoding, sizeof (mime_encoding))) {
-				if (strcasecmp(mime_encoding, "8bit") &&
-					strcasecmp(mime_encoding, "base64") &&
-					strcasecmp(mime_encoding, "quoted-printable")) {
-					strcpy(mime_encoding,"8bit");
+			if (match_string (buf, "mail_mime_encoding=", mail_mime_encoding, sizeof (mail_mime_encoding))) {
+				if (strcasecmp(mail_mime_encoding, "8bit") &&
+					strcasecmp(mail_mime_encoding, "base64") &&
+					strcasecmp(mail_mime_encoding, "quoted-printable")) {
+					strcpy(mail_mime_encoding,"8bit");
 				}
 				break;
 			}
@@ -336,6 +336,14 @@ read_config_file (file, global_file)
 			}
 			break;
 		case 'p':
+			if (match_string (buf, "post_mime_encoding=", post_mime_encoding, sizeof (post_mime_encoding))) {
+				if (strcasecmp(post_mime_encoding, "8bit") &&
+					strcasecmp(post_mime_encoding, "base64") &&
+					strcasecmp(post_mime_encoding, "quoted-printable")) {
+					strcpy(post_mime_encoding,"8bit");
+				}
+				break;
+			}
 			if (match_boolean (buf, "print_header=", &print_header)) {
 				break;
 			}
@@ -601,8 +609,10 @@ write_config_file (file)
  	fprintf (fp, "# this only occurs, if use_metamail is also switched ON\n");
  	fprintf (fp, "ask_for_metamail=%s\n\n", print_boolean (ask_for_metamail));
 #endif
-	fprintf (fp, "# MIME encoding of the body, if necessary. (8bit, base64, quoted-printable)\n");
-	fprintf (fp, "mime_encoding=%s\n\n", mime_encoding);
+	fprintf (fp, "# MIME encoding of the body for mails and posts, if necessary.\n");
+	fprintf (fp, "# (8bit, base64, quoted-printable), but you don't want to choose base64.\n");
+	fprintf (fp, "post_mime_encoding=%s\n", post_mime_encoding);
+	fprintf (fp, "mail_mime_encoding=%s\n\n", mail_mime_encoding);
 	fprintf (fp, "# if ON ask user if read groups should all be marked read\n");
 	fprintf (fp, "catchup_read_groups=%s\n\n", print_boolean (catchup_read_groups));
 	fprintf (fp, "# if ON confirm certain commands with y/n before executing\n");

@@ -1331,7 +1331,7 @@ getaline (fp)
 
 	len = 0;
 	size = thres;
-	buf = my_malloc (size);
+	buf = (char *) my_malloc (size);
 	if (buf == (char *) 0) {
 		return (char *) 0;
 	}
@@ -1342,7 +1342,7 @@ getaline (fp)
 			break;		/* the whole line has been read */
 		}
 		for (inc = size, p = NULL; p == NULL && inc != 0; inc /= 2) {
-			p = my_realloc (buf, size + inc);
+			p = (char *) my_realloc (buf, size + inc);
 		}
 
 		if (inc == 0 || p == NULL) {
@@ -1366,7 +1366,7 @@ getaline (fp)
 	buf[len] = '\0';
 
 	if (size - len > mucho) { /* a plenitude of unused memory? */
-		p = my_realloc (buf, len+1);
+		p = (char *) my_realloc (buf, len+1);
 		if (p != (char *) 0) {
 			buf = p;
 		}

@@ -55,15 +55,15 @@ char local_config_file[PATH_LEN];
 char local_filter_file[PATH_LEN];
 char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
 char local_newsrctable_file[PATH_LEN];
-char mail_news_user[LEN];		/* mail new news to this user address */
-char mail_quote_format[PATH_LEN];
 char mail_active_file[PATH_LEN];
 #ifdef FORGERY
 char mail_address[LEN];			/* user's mail address */
 #endif
+char mail_mime_encoding[LEN]="8bit";
+char mail_news_user[LEN];		/* mail new news to this user address */
+char mail_quote_format[PATH_LEN];
 char mailbox[PATH_LEN];			/* system mailbox for each user */
 char mailer[PATH_LEN];			/* mail program */
-char mime_encoding[LEN]="8bit";
 char motd_file[PATH_LEN];		/* news motd file for newsadmin purposes */
 char motd_file_info[PATH_LEN];		/* date of last time news motd file read */
 char my_distribution[LEN];		/* Distribution: */
@@ -76,6 +76,7 @@ char newnewsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
+char post_mime_encoding[LEN]="8bit";
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char progname[PATH_LEN];		/* program name */
@@ -599,7 +600,14 @@ void init_selfinfo ()
 	joinpath (newnewsrc, rcdir, NEWNEWSRC_FILE);
 #else
 	joinpath (newsrc, homedir, NEWSRC_FILE);
+#ifdef SINGLETASK
+	/* we don't expect to run two tins at once or we don't have
+           getpid */
 	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
+#else
+	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
+	sprintf(newnewsrc+strlen(newnewsrc), "%lu", (unsigned long)getpid());
+#endif
 #endif
 	joinpath (posted_info_file, rcdir, POSTED_FILE);
 	joinpath (posted_msgs_file, default_maildir, POSTED_FILE);

@@ -39,6 +39,7 @@ constext txt_article_reposted2b[] = "\n[ Author was %s ]";
 constext txt_article_reposted3[] = "\n[ Posted on %s ]\n\n";
 constext txt_author_search_backwards[] = "Author search backwards [%s]> ";
 constext txt_author_search_forwards[] = "Author search forwards [%s]> ";
+constext txt_authorization_ok[] = "Authorized for user: %s\n";
 constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";

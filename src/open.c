@@ -1223,8 +1223,8 @@ authorization (server, authuser)
 		return;
 	}
 
-	/* this is indeed no error ... */
-	error_message ("Authorized for user: %s\n", authuser);
+	sprintf (line, txt_authorization_ok, authuser);
+	wait_message (line);
 	return;
 }
 

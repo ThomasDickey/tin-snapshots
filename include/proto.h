@@ -113,7 +113,7 @@ extern void debug_print_attributes P_((struct t_attribute *attr, FILE *fp));
 extern void debug_print_bitmap P_((struct t_group *group, struct t_article *art));
 extern void debug_print_newsrc P_((struct t_newsrc *NewSrc, FILE *fp));
 extern void vDbgPrintMalloc P_((int iIsMalloc, char *pcFile, int iLine, size_t iSize));
-extern void debug_print_filter P_((FILE *fp, int num, struct t_filter *filter));
+extern void debug_print_filter P_((FILE *fp, int num, struct t_filter *the_filter));
 extern void debug_print_filters P_((void));
 extern void debug_print_active_hash P_((void));
 extern void debug_print_group_hash P_((void));
@@ -232,8 +232,8 @@ extern void free_active_arrays P_((void));
 extern void free_save_array P_((void));
 extern void free_spooldirs_array P_((void));
 extern void free_newnews_array P_((void));
-extern char *my_malloc1 P_((char *file, int line, size_t size));
-extern char *my_realloc1 P_((char *file, int line, char *p, size_t size));
+extern void *my_malloc1 P_((char *file, int line, size_t size));
+extern void *my_realloc1 P_((char *file, int line, char *p, size_t size));
 /* ./misc.c */
 extern void append_file P_((char *old_filename, char *new_filename));
 extern void asfail P_((char *file, int line, char *cond));
@@ -442,7 +442,7 @@ extern int sizeofnextword P_((unsigned char *w));
 extern int mystrcat P_((char **t, char *s));
 extern int rfc1522_do_encode P_((unsigned char *what, unsigned char **where));
 extern char *rfc1522_encode P_((char *s));
-extern void rfc15211522_encode P_((char *filename));
+extern void rfc15211522_encode P_((char *filename, char *mime_encoding));
 /* ./save.c */
 extern int check_start_save_any_news P_((int check_start_save));
 extern int save_art_to_file P_((int respnum, int indexnum, int the_mailbox, char *filename));

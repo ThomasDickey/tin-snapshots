@@ -539,7 +539,7 @@ AC_CHECK_FUNC(socket,[],[
 			[AC_DEFINE(HAVE_SOCKET)
 			NETLIBS="-lbsd $NETLIBS"]),
 		[$NETLIBS])])
-AC_CHECK_FUNC(gethostbyname,[],[
+AC_CHECK_FUNC(gethostbyname,[AC_DEFINE(HAVE_GETHOSTBYNAME)],[
 	AC_CHECK_LIB(nsl,gethostbyname,
 		[AC_DEFINE(HAVE_GETHOSTBYNAME)
 		NETLIBS="-lnsl $NETLIBS"],,

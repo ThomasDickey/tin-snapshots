@@ -437,8 +437,9 @@ rfc1522_encode(s)
 }
 
 void
-rfc15211522_encode(filename)
+rfc15211522_encode(filename, mime_encoding)
 	char *filename;
+	char *mime_encoding;
 {
 	FILE *f;
 	FILE *g;

@@ -1,3 +1,18 @@
+--unoff BETA release 960725 --
+
+125) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. split mime_encodeig to mail_mime_encoding/post_mime_encoding
+     ADD. pid to .newnewsrc name to avoid confusions when running multiple
+          tins
+     ADD. minor code cleanup
+     BUG. tin included identical Newsgroups:/Followup-To: lines
+     BUG. HAVE_GETHOSTBYNAME was not set if gethostbyname() is in libc
+     FIX. several supplied patches
+
+124) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup (removed variable-shadowing)
+     FIX. several patches
+
 --unoff BETA release 960722 --
 
 123) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -15,7 +30,7 @@
 
 121) Daniel Naber <dnaber@pluto.teuto.de>
      ADD. interactive call of user defined mailer
-     FIX. several suppiled patches
+     FIX. several supplied patches
 
 120) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. moved some newsgroup specific defaults from feed.c to attrib.c
