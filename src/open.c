@@ -583,6 +583,7 @@ open_art_fp (group_path, art)
 #ifdef NNTP_ABLE
 	int respcode;
 #endif
+	FILE *fp, *old_fp;
 
 	i = my_group[cur_groupnum];
 
@@ -618,7 +619,10 @@ open_art_fp (group_path, art)
 		} else {
 			note_size = sb.st_size;
 		}
-		return rfc1521_decode(fopen (buf, "r"));
+		fp=rfc1521_decode(old_fp=fopen (buf, "r"));
+		if(fp!=old_fp)
+		  note_size=0;
+		return fp;
 	}
 }
 
@@ -1015,16 +1019,19 @@ nntp_to_fp ()
 #ifdef NNTP_ABLE
 	char fnam[PATH_LEN];
 	FILE *fp;
+	FILE *old_fp;
 
 	if (! stuff_nntp (fnam)) {
 		debug_nntp ("nntp_to_fp", "! stuff_nntp()");
 		return (FILE *) 0;
 	}
 
-	if ((fp = rfc1521_decode(fopen (fnam, "r"))) == (FILE *) 0) {
+	if ((fp = rfc1521_decode(old_fp=fopen (fnam, "r"))) == (FILE *) 0) {
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}
+	if(old_fp!=fp)
+	  note_size=0;
 
 /*
  * It is impossible to delete an open file on the Amiga or Win32. So we keep a

@@ -16,6 +16,7 @@
  */
 
 #include 	"patchlev.h"
+#include	"menukeys.h"
 #include	"tin.h"
 
 
@@ -91,7 +92,6 @@ get_nntpserver (nntpserver_name, nick_name)
 	}
 }
 
-
 /* get_newsrcname()
  * get name of newsrc file with given name of nntp server
  * returns TRUE if name was found, FALSE if the search failed
@@ -102,7 +102,6 @@ get_newsrcname (newsrc_name, nntpserver_name)
 	char *newsrc_name;
 	char *nntpserver_name;
 {
-
 	FILE 	*fp;
 	char	line[LEN];
 	char	*line_entry;
@@ -128,10 +127,88 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		}
 		fclose(fp);
 		if (found) {
-			if (!strchr(name_found, '/'))
-				joinpath(newsrc_name, homedir, name_found);
-			else
-				strcpy(newsrc_name, name_found);
+			struct	stat buf;
+			int	error=0;
+			char	dir[PATH_LEN];
+
+			switch (name_found[0]) {
+			case '/' :
+				strcpy (newsrc_name, name_found);
+				break;
+			case '~' :
+				if (name_found[1] == '/')
+                           		joinpath (newsrc_name, homedir, name_found+2);
+                                else
+					/* FIXME - who says that users home is in /home */
+					joinpath (newsrc_name, "/home/" , name_found+1);
+				break;
+			default :
+				joinpath (newsrc_name, homedir, name_found);
+				break;
+			}
+			strcpy (dir, newsrc_name);
+			*strrchr (dir, '/') = (char) 0;
+			if (stat (newsrc_name, &buf)) {
+				/* FIXME - put me in lang.c */
+				fprintf (stderr, "File %s does not exists\n",newsrc_name);
+				error=2;
+			} else if (! S_ISREG (buf.st_mode)) {
+				/* FIXME - put me in lang.c */
+				fprintf (stderr, "File %s is not a regular file\n", newsrc_name);
+				error=1;
+			} else if (access (newsrc_name, R_OK)) {
+				fprintf (stderr, txt_error_no_read_permission, newsrc_name);
+				error=1;
+			} else if (access (dir, W_OK)) {
+				fprintf (stderr, txt_error_no_write_permission, dir);
+				error=1;
+			} else if (access (newsrc_name, W_OK)) {
+				fprintf (stderr, txt_error_no_write_permission, newsrc_name);
+				error=1;
+			}
+			if (error) {
+				char ch;
+				char default_ch = iKeyNrctblIgnore;
+
+				do {
+					if (error >= 2) {
+						default_ch = iKeyNrctblCreate;
+						/* FIXME - put me in lang.c */
+						sprintf (msg, "%s%c", "c)reate it i)gnore q)uit tin: ",default_ch);
+					} else {
+						/* FIXME - put me in lang.c */
+						sprintf (msg, "%s%c", "use d)efault .newsrc i)gnore q)uit tin: ",default_ch);
+					}
+					wait_message (msg);
+					
+					/*
+					 * FIXME - cursor possition is wrong &
+					 * <return> is needed at the end
+					 */
+					 
+					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+						ch = default_ch;
+				} while (! strchr ("\033cdiq", ch));
+				
+				switch(ch) {
+					case iKeyNrctblCreate:
+						/* FIXME this doesn't check if we could create the file */
+						return TRUE;
+					case iKeyNrctblDefault:
+						joinpath(newsrc_name, homedir, ".newsrc");
+						return TRUE;
+					case iKeyNrctblIgnore:
+						/* FIXME - put me in lang.c */
+						sprintf(msg, "%s", "Okay, but you may run into difficulties later\n");
+						wait_message (msg);
+						return TRUE;
+					case iKeyNrctblQuit:
+						exit(0);
+					case ESC:
+					default:
+						break;
+				}
+			}
 			return TRUE;
 		}	
 	}

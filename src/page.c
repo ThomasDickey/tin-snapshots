@@ -1244,6 +1244,9 @@ art_open (art, group_path)
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
 		buf[sizeof(buf)-1] = '\0';
 
+		if(*buf == '\n')
+			break;
+
 		/* check for continued header line */
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
 		      && strlen(buf)<sizeof(buf)-1) {
@@ -1258,9 +1261,6 @@ art_open (art, group_path)
 				*ptr = ' ';
 		}
 		*ptr = '\0';
-
-		if (*buf == '\0')
-			break;
 
   		if (match_header (buf, "Path", note_h_path, HEADER_LEN))
   			continue;

@@ -130,6 +130,13 @@
 #define iKeyHelpPageUp4 'k'
 /* all other keys exit help */
 
+/* nrctbl.c */
+
+#define iKeyNrctblCreate 'c'
+#define iKeyNrctblDefault 'd'
+#define iKeyNrctblIgnore 'i'
+#define iKeyNrctblQuit 'q'
+
 /* page.c */
 
 #define iKeyPageAutoSel ctrl('A')

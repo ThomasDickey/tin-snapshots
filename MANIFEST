@@ -1,25 +1,25 @@
-MANIFEST for tin-1.3-unoff-BETA-960730 (Tue Jul 30 19:40:54 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960801 (Fri Aug  2 02:34:59 MET DST 1996)
 ----------------------------------------------------
-  30200 ./CHANGES
-  11850 ./TODO
-   5181 ./Makefile
+  31426 ./CHANGES
+  11854 ./TODO
+   5184 ./Makefile
   17031 ./INSTALL
    2108 ./MANIFEST
    1272 ./README
     896 ./tinpp
   19318 ./aclocal.m4
- 131364 ./configure
-  14977 ./configure.in
+ 130893 ./configure
+  14907 ./configure.in
    4771 ./install.sh
-  11493 ./makefile.in
+  11527 ./makefile.in
     945 ./conf-tin
   69407 ./doc/tin.1
    1822 ./doc/hashing.doc
    2513 ./include/amiga.h
    2131 ./include/amigatcp.h
    8483 ./include/config.h
-  34206 ./include/extern.h
-   9596 ./include/menukeys.h
+  34303 ./include/extern.h
+   9728 ./include/menukeys.h
     718 ./include/msmail.h
    4765 ./include/nntplib.h
    2305 ./include/os_2.h
@@ -48,34 +48,34 @@ MANIFEST for tin-1.3-unoff-BETA-960730 (Tue Jul 30 19:40:54 MET DST 1996)
    3211 ./src/hashstr.c
    8979 ./src/help.c
   11841 ./src/inews.c
-  28665 ./src/init.c
-  41288 ./src/lang.c
+  28851 ./src/init.c
+  41438 ./src/lang.c
    2791 ./src/list.c
   12041 ./src/mail.c
-  17629 ./src/main.c
+  17762 ./src/main.c
   10966 ./src/memory.c
   45348 ./src/misc.c
    7234 ./src/msmail.c
   33037 ./src/newsrc.c
   26295 ./src/nntplib.c
   31340 ./src/nntpw32.c
-   3814 ./src/nrctbl.c
-  27539 ./src/open.c
+   6103 ./src/nrctbl.c
+  27663 ./src/open.c
    6300 ./src/os_2.c
-  34646 ./src/page.c
+  34645 ./src/page.c
   24098 ./src/parsdate.y
    6575 ./src/pgp.c
   74617 ./src/post.c
    4873 ./src/prompt.c
      53 ./src/proto.sed
   23382 ./src/refs.c
-   5718 ./src/rfc1521.c
-  15425 ./src/rfc1522.c
+   5951 ./src/rfc1521.c
+  15445 ./src/rfc1522.c
   33938 ./src/save.c
    4386 ./src/screen.c
    9644 ./src/search.c
   34764 ./src/select.c
-   5580 ./src/sigfile.c
+   5836 ./src/sigfile.c
   10912 ./src/signal.c
    5882 ./src/strftime.c
   26074 ./src/thread.c
@@ -85,5 +85,5 @@ MANIFEST for tin-1.3-unoff-BETA-960730 (Tue Jul 30 19:40:54 MET DST 1996)
    6295 ./src/xref.c
    5522 ./src/vms.c
    6837 ./include/autoconf.hin
-  11054 ./src/Makefile.in
-1454541 total
+  11081 ./src/Makefile.in
+1458917 total

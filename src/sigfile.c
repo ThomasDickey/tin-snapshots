@@ -54,8 +54,9 @@ msg_write_signature (fp, flag)
 	if (active[i].attribute->sigfile[0] == '!') {
 		char cmd[PATH_LEN];
 		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
-		sprintf (cmd, "%s 1>&%d", active[i].attribute->sigfile+1, fp->_fileno);
-		fflush(fp);
+		/* FIXME - use popen() rather than system() */
+		sprintf (cmd, "%s 1>&%d", active[i].attribute->sigfile+1, fileno (fp));
+		fflush (fp);
 		system (cmd);
 		return;
 	}
