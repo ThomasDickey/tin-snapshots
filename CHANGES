@@ -1,3 +1,9 @@
+--unoff BETA release 961126 --
+
+223) Rainer Scholz <jrs@startrek.franken.de>
+     BUG. typo (wrong dependency)
+     FIX. Makefile[.in]
+
 --unoff BETA release 961125 --
 
 222) Urs Janssen <urs@akk.uni-karlsruhe.de>
