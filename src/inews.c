@@ -3,7 +3,7 @@
  *  Module    : inews.c
  *  Author    : I. Lea
  *  Created   : 1992-03-17
- *  Updated   : 1999-11-29
+ *  Updated   : 1997-12-31
  *  Notes     : NNTP builtin version of inews
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -265,10 +265,7 @@ submit_inews (
 		 * authentication request was received. Leave loop on any other
 		 * response or any further authentication requests.
 		 */
-		if (((respcode == ERR_NOAUTH)       || 
-		     (respcode == ERR_NOAUTHSIMPLE) ||
-		     (respcode == NEED_AUTHINFO)) &&
-		    (auth_error++ < 1) && (authenticate (nntp_server, respcode, userid, FALSE)))
+		if (((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) && (auth_error++ < 1) && (authenticate (nntp_server, userid, FALSE)))
 			leave_loop = FALSE;
 	} while (!leave_loop);
 

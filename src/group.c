@@ -1189,17 +1189,17 @@ enter_pager:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(mesg, "Base article range"); /* FIXME: -> lang.c */
+					strcpy(buf, "Base article range"); /* FIXME: -> lang.c */
 				} else {
 					art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
-					strcpy(mesg, "Base article"); /* FIXME: -> lang.c */
+					strcpy(buf, "Base article"); /* FIXME: -> lang.c */
 				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_marked_as_unread, mesg);
+				info_message (txt_marked_as_unread, buf);
 				break;
 
 			case iKeyGroupMarkThdUnread:	/* mark whole thread as unread */
@@ -1223,17 +1223,17 @@ enter_pager:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(mesg, "Thread range"); /* FIXME: -> lang.c */
+					strcpy(buf, "Thread range"); /* FIXME: -> lang.c */
 				} else {
 					thd_mark_unread (&CURR_GROUP, base[index_point]);
-					strcpy(mesg, "Thread");
+					strcpy(buf, "Thread");
 				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_marked_as_unread, mesg);
+				info_message (txt_marked_as_unread, buf);
 				break;
 
 			case iKeyGroupSelThd:	/* mark thread as selected */

@@ -218,9 +218,6 @@ read_attributes_file (
 	}
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
-		if (INTERACTIVE)
-			wait_message (0, txt_reading_attributes_file, (global_file) ? "global " : "");
-
 		scope[0] = '\0';
 		while (fgets (line, (int) sizeof (line), fp) != (char *) 0) {
 			if (line[0] == '#' || line[0] == '\n')

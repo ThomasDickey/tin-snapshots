@@ -16,9 +16,9 @@
 #	define VERSION_H	1
 
 #	define PRODUCT		"tin"
-#	define VERSION 	"1.4.1"
-#	define RELEASEDATE	"19991201"
-#	define RELEASENAME	"Polish"
+#	define VERSION 	"1.4.2"
+#	define RELEASEDATE	"20000205"
+#	define RELEASENAME	"Possession"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA

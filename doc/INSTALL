@@ -1,5 +1,5 @@
 
-Compilation and installation notes for tin - 1998-12-27 (still incomplete!)
+Compilation and installation notes for tin - 2000-01-22 (still incomplete!)
 -------------------------------------------------------
 
 Note: The section 'News machine names' is now at the beginning as it
@@ -7,34 +7,42 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
-  --enable-8bit-keys	     --enable-posting      --with-metamail
-  --enable-color	     --enable-piping       --with-ncurses
-  --enable-curses	     --enable-shell-escape --with-nntp-default-server
-  --enable-debug	     --enable-xhdr-xref    --with-nov-dir
-  --enable-etiquette	     --with-defaults-dir   --with-pgp
-  --enable-fascist-newsadmin --with-domain-name    --with-spooldir
-  --enable-inverse-video     --with-inews-dir      FORGERY
-  --enable-locale	     --with-inn-nntplib    HAVE_LIBUU
-  --enable-mh-mail-handling  --with-iso-to-ascii   INDEX_DAEMON
-  --enable-mmdf-mailer       --with-ispell         NNTP_INEWS
-  --enable-nntp		     --with-libdir         NNTP_SERVER_FILE
-  --enable-nntp-only	     --with-local-charset  (SMALL_MEMORY_MACHINE)
-  --enable-broken-listgroup-fix                    KILL_READ
-  --enable-printing
+
+  --enable-8bit-keys               --enable-shell-escape
+  --enable-append-pid              --enable-warnings
+  --enable-break-long-lines        --enable-xhdr-xref
+  --enable-broken-listgroup-fix    --with-defaults-dir
+  --enable-color                   --with-domain-name
+  --enable-curses                  --with-editor
+  --enable-debug                   --with-inews-dir
+  --enable-echo                    --with-inn-nntplib
+  --enable-etiquette               --with-iso-to-ascii
+  --enable-fascist-newsadmin       --with-ispell
+  --enable-inverse-video           --with-libdir
+  --enable-locale                  --with-local-charset
+  --enable-mh-mail-handling        --with-mailbox
+  --enable-mime-strict-charset     --with-mailer
+  --enable-mmdf-mailer             --with-metamail
+  --enable-nntp                    --with-mime-default-charset
+  --enable-nntp-only               --with-ncurses
+  --enable-pgp                     --with-nntp-default-server
+  --enable-piping                  --with-nov-dir
+  --enable-posting                 --with-nov-fname
+  --enable-printing                --with-spooldir
+  --enable-prototypes
+
+  FORGERY                          NETLIBS
+  HAVE_LIBUU                       NNTP_INEWS
+  HAVE_UUDEVIEW_H                  NNTP_SERVER_FILE
+  INDEX_DAEMON                     SMALL_MEMORY_MACHINE
 
 Not yet documented configure options and defines:
 -------------------------------------------------
 
 TIN related:
-  --enable-append-pid              --with-editor
-  --enable-break-long-lines        --with-mailbox
-  --enable-echo                    --with-mailer
-  --enable-mime-strict-charset     --with-mime-default-charset
-  --enable-pgp                     --with-nov-fname
-  --enable-prototypes              --with-socks
-  --enable-warnings                --with-socks5
-  --with-dbmalloc                  --with-sum
-  --with-dmalloc                   --with-trace
+  --with-dbmalloc                  --with-socks5
+  --with-dmalloc                   --with-sum
+  --with-socks                     --with-trace
 
   DEBUG                            MATCH_TAR_PATTERN
   DEBUG_NEWSRC                     NEW_HASH_METHOD
@@ -44,7 +52,6 @@ TIN related:
   JUST_TESTING                     TINC_DNS
   EVIL_INSIDE                      USE_CANLOCK
   REREAD_ACTIVE_FILE_SECS
-
 
 System related:
   --bindir              --libexecdir          --program-transform-name
@@ -59,14 +66,14 @@ System related:
 News machine names
 ------------------
 
---with-domain-name
+--with-domain-name (default: unset)
 Defines the name of your news gateway machine. Useful if you don't want
 your internal network visible to the outside world, or if your inews script
 or NNTP server rewrites your address for you.
 If the first letter of the string is a '/' the gateway name will be read from
 the specified file.
 
-Example 1: If you are on machine 'tragic' at network domain 'confusion.com',
+Example: If you are on machine 'tragic' at network domain 'confusion.com',
 Tin will assume your From: line should read "user@tragic.confusion.com".  If
 your inews script instead rewrites your address as "user@confusion.com", you
 will be unable to cancel your own postings.  To make your posts and cancels
@@ -81,20 +88,21 @@ A list of these machines can be found at the end of this file.
 
 This file is long (so was the yellow brick road) but please read it all
 as it could save you problems later and we don't want an unhappy ending
-do we ? :-)
+do we? :-)
 
 Tin can be compiled to read news in any of the following ways:
 
-  o  locally from your machines news spool dir (default /var/spool/news).
+  o  locally from your machines news spool dir (default /var/spool/news,
+     can be set via --with-spool-dir).
 
   o  locally and remotely via NNTP (rtin or tin -r option) (--enable-nntp).
 
   o  remotely via NNTP (--enable-nntp-only).
 
 If the remote server supports NOV overview indexing, then tin will retrieve
-overview data on the fly using the NNTP XOVER extension.
-Otherwise tin will create its own NOV style index files on the local machine
-for each user in $HOME/.tin/.index
+overview data on the fly using the NNTP XOVER extension. Otherwise tin will
+create its own NOV style index files on the local machine for each user in
+$HOME/.tin/.index
 
 Many machines require the name of the news gateway machine or the news
 domain to be set via the --with-domain-name configure options. This is
@@ -110,10 +118,15 @@ Building the Normal version:
 2)  Change conf-tin for your needs or run ./configure with all needed
     options.
 
-3)  type 'make build' to build tin in the src/ directory.
-    Alternatively goto the src subdirectory and type 'make'
+3)  Type 'make build' to build tin in the src/ directory.
+    Alternatively goto the src subdirectory and type 'make'.
 
 4)  Type 'make install' to install.
+
+5)  Have a look at doc/tin.defaults and set options as you need them (if
+    they differ from your compile time options). If you make any changes,
+    type 'make install_sysdefs' afterwards.
+
 
 Building the Index daemon version:
 ----------------------------------
@@ -176,6 +189,7 @@ Note2: tind must be run as user 'news' and the normal tin must have
 
 Note3: tind can also be used to update a copy of all index files
 
+
 Testing Tin
 -----------
 
@@ -195,12 +209,12 @@ Things to test:
    If reading news works fine, then:
 
 2) Check that you can post a test message to a local distribution group,
-   preferably a test-only group.  (Remember, the world does not care to
-   know whether you are testing Tin.)  If it fails, check that the
-   INEWSDIR define is correctly set, that NNTP_INEWS is correctly set, and
-   that the News machine name define directives are correctly set.  If
-   possible, check whether you can post via some other mechanism, such as
-   Pnews.  This should help you isolate and fix the most common problems.
+   preferably a test-only group. (Remember, the world does not care to know
+   whether you are testing Tin.) If it fails, check that the
+   --with-inews-dir option is correctly set, that NNTP_INEWS is correctly
+   set, and that the News machine name define directives are correctly set.
+   If possible, check whether you can post via some other mechanism, such
+   as Pnews. This should help you isolate and fix the most common problems.
 
    If posting news works fine, then:
 
@@ -213,27 +227,65 @@ Further testing is desirable, but left to your individual conscience and
 ingenuity.
 
 
-
 Detailed list of configure options (beginning with '--') and compiler flags
 (-D<name> directives)
+
+Compiler and machine options
+----------------------------
+
+--enable-warnings (default: off)
+Enable if you want to see all GCC compiler warnings during compilation.
+
+--enable-echo (default: off)
+Enable if you want to see full display compiling commands during compilation.
+
+--enable-prototypes (default: off)
+Enable if you want configure to check for various fallback prototype
+declarations.
+
+SMALL_MEMORY_MACHINE (default: not set, except on Amiga)
+Define if you are running a machine with little memory (<4MB). Tin will
+run slightly slower but be more efficient in how memory is allocated and
+reclaimed.
+
 
 News directory structure
 ------------------------
 
---with-libdir=PATH
-Define if news software is not in /usr/lib/news.
-(only needed if not running --enable-nntp-only)
+--with-libdir=PATH (default: /usr/lib/news or not set)
+Define if news software is not in /usr/lib/news. (Only needed if not
+running --enable-nntp-only.) Compiled-in value can be overridden by setting
+the newslibdir entry in doc/tin.defaults (don't forget to 'make
+install_sysdefs' to install the tin.defaults file at a location where tin
+can find it!).
 
---with-spooldir=PATH
-Define if news articles are not in /var/spool/news.
-(only needed if not running --enable-nntp-only)
+--with-spooldir=PATH (default: /var/spool/news or not set)
+Define if news articles are not in /var/spool/news. (Only needed if not
+running --enable-nntp-only.) Compiled-in value can be overridden by setting
+the spooldir entry in tin.defaults (don't forget to 'make install_sysdefs'
+to install the tin.defaults file at a location where tin can find it!).
 
---with-nov-dir=PATH
-Define if news overview (NOV) files are not stored in SPOOLDIR.
-(only needed if not running --enable-nntp-only)
+--with-nov-dir=PATH (default: same as --with-spooldir)
+Define if news overview (NOV) files are not stored in SPOOLDIR. (only
+needed if not running --enable-nntp-only) Compiled-in value can be
+overridden by setting the overviewdir entry in tin.defaults (don't forget
+to 'make install_sysdefs' to install the tin.defaults file at a location
+where tin can find it!).
 
---with-inews-dir=PATH
-Define if 'inews' program is not in NEWSLIBDIR.
+--with-nov-fname=NAME (default: .overview or not set)
+Define if your news overview files are not named .overview. (Only needed if
+not running --enable-nntp-only.) Compiled-in value can be overridden by
+setting the overviewfile entry in tin.defaults (don't forget to 'make
+install_sysdefs' to install the tin.defaults file at a location where tin
+can find it!).
+
+--with-inews-dir=PATH (default: same as --with-libdir or /usr/lib/news)
+Define if the 'inews' program is not in the directory specified with
+--with-libdir (if not running --enable-nntp-only) or /usr/lib/news (if
+running --enable-nntp-only). Compiled-in value can be overridden by setting
+the inewsdir entry in tin.defaults (don't forget to 'make install_sysdefs'
+to install the tin.defaults file at a location where tin can find it!).
+
 
 NNTP - Reading & posting news
 -----------------------------
@@ -251,101 +303,116 @@ Defines the name of the default NNTP server that tin should connect to.
 Can be overridden by setting the environment variable NNTPSERVER.
 
 --enable-broken-listgroup-fix (default: off)
-Bypass a bug in some broken NNTPservers which need an extra
-GROUP command before accepting a LISTGROUP command.
+Bypass a bug in some broken NNTPservers which need an extra GROUP command
+before accepting a LISTGROUP command.
 
-NNTP_INEWS
-Define if you want to use my built-in NNTP POST routine so that you no
-longer have to rely on the mini-inews from NNTP to be installed on each
-client machine. Also check that DOMAIN_NAME is correctly set to produce a
-correct From: headers for your site. If defined then the ~/.tin/tinrc
-variable "use_builtin_inews" default will be set to OFF rather than ON. The
-tinrc file is created automatically for each user the first time they use
-tin.
-
-NNTP_SERVER_FILE
-Only define if your NNTP-server file is other than /etc/nntpserver.
-
-NETLIBS
-Contains the networking libraries needed to link with nntplib.o file.
-
-Daemon options
---------------
-
-INDEX_DAEMON
-!!! Using this define is deprecated and unsupported.
-Define to make an index file updating daemon version of tin. Note that
-no -lcurses or screen libraries need to be linked with tin when this
-#define is specified. If defined this will automatically undefine all
-NNTP_* defines as the daemon has to be installed on the NNTP server.
-
-
-Miscellaneous options
----------------------
-
---enable-debug
-Define if you want tin to log debug info. to files in /tmp. Activated
-by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for
-logging all debug info. Debug files written to /tmp are ARTS, ACTIVE,
-BASE and NNTP.
-
---enable-8bit-keys
-Define if your terminal generates 8-bit controls.  For Unix systems we
-assume this may imply your arrow keys begin either with CSI (0x9b) or SS3
-(0x8f).  Most ANSI terminals generate 7-bit controls (e.g., CSI is
-"<esc>["), but some such as VT220 can be configured more efficiently to
-generate 8-bit prefix codes, saving a byte per control sequence.  This
-applies to cursor movement at the same time.  The actual codes are read
-from termcap (this does not affect the curses configuration).
-
---enable-color
-Define if you want to have ANSI-color support.  This works on most
-color displays and the color xterm.  The color mode can be switched
-on/off in ~/.tin/tinrc (use_color) and can be toggled with option -a
-or key '&'.
-
---with-defaults-dir=PATH
-
---with-ispell=PATH
-Define if you have ispell (interactive spell-checker) installed and want the
-option of checking your articles, mails before posting/mailing them.
-If found in search path, this is used automatically.
-
---with-metamail=PATH
-Define if you want metamail display your MIME messages.
-If found in search path, this is used automatically.
-
---enable-mh-mail-handling
-Enable if you want to use the MH style mail handling & reading code in
-mail.c. It should be noted that mail handling is not well tested and not
-yet fully implemented. You can expect errors if you use this option so
-let me know the problems by sending me a bug report ('R' bug command
-from within tin).
-
---with-pgp=PATH
-Define if you have PGP (Pretty Good Privacy encryption system)
-installed and want the option of checking signatures, extract keys,
-sign messages and add public key to messages.  This is bound to the
-key 'g' or '^G'.
-If found in search path, this is used automatically (pgp-5 (HAVE_PGP_5 set)
-is prefered over pgp-2 (HAVE_PGP_2 set)).
-
---with-inn-nntplib=PATH
+--with-inn-nntplib=PATH (default: not set)
 Define if you want to use the INN library functions GetConfigValue()
 & GetFQDN(). PATH must be the correct path to the INN library.
 
---with-iso-to-ascii
-Define if you want tin to do ISO-8859-1 Charset to ASCII conversions
-by default for all groups. You must specify a value of "0-6" to get tin
-to use one of the 7 conversion tables for different languages.
-i.e., Adding -DUSE_ISO2ASC=\"2\" to the CPPOPTS line in the Makefile would
-be useful in the german language newsgroups. For more detailed info
-read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
+--enable-xhdr-xref (default: on)
+If disabled, don't allow using XHDR XREF if XOVER doesn't work to mark
+crossposted articles as read in all groups.
 
---with-local-charset
-LOCAL_CHARSET
-Define LOCAL_CHARSET if you like charset conversions.
-set LOCAL_CHARSET to one of the following values:
+NNTP_INEWS (default: set if using VMS, --enable-nntp, or enable-nntp-only;
+                     unset if building an INDEX_DAEMON or not using NNTP)
+Define if you want to use the built-in NNTP POST routine so that you no
+longer have to rely on the mini-inews from NNTP to be installed on each
+client machine. Also check that --with-domain-name is correctly set to
+produce a correct From: headers for your site. If defined then the
+~/.tin/tinrc variable "use_builtin_inews" default will be set to ON rather
+than OFF. The tinrc file is created automatically for each user the first
+time they use tin.
+
+NNTP_SERVER_FILE (default: /etc/nntpserver, on Amiga: uulib:nntpserver)
+Only define if your NNTP-server file is other than /etc/nntpserver.
+
+NETLIBS (default: empty)
+Contains the networking libraries needed to link with nntplib.o file.
+
+
+Options to set some default values
+----------------------------------
+
+--with-defaults-dir=PATH (default: /etc/tin)
+Define the directory for the tin.defaults file. With the entries in the
+tin.defaults you can set some machine specific options and override some
+compile time defaults. See the tin.defaults file in the doc directory for
+more information.
+
+--with-editor=PROG (default: empty)
+Define if the standard editor should be anything other than the value of
+your EDITOR or VISUAL environment variable or, at as the last resort, vi.
+You can also add some default command line options to the editor. Users
+can overwrite this value by setting default_editor_format in their tinrc
+file.
+
+--with-mailer=PROG (default: empty)
+Define the default mailer program.
+
+--with-mailbox=PATH (default: empty)
+Define the directory for incoming mailboxes. If none is given,
+/var/spool/mail, /usr/spool/mail, /var/mail, /usr/mail, and /mail are
+checked automatically.
+
+--enable-etiquette (default: on)
+If enabled, prints netiquette before posting by default. Users can turn
+this off by setting beginner_level to OFF in their tinrc. If disabled,
+netiquette is never displayed (cannot be turned on without recompiling).
+
+
+Input and screen output options
+-------------------------------
+
+--enable-locale (default: on)
+If enabled, tin uses multi language support, as described in locale(7). If
+you don't have locale support installed on your system, try
+--disable-locale, otherwise you won't see any 8-bit-characters. See
+doc/umlauts.txt (english text) or doc/umlaute.txt (german text) for further
+information.
+
+--with-mime-default-charset=charset (default: US-ASCII)
+Define if your users usually post messages in another charset than
+US-ASCII. Europeans should use one of the ISO-8859-X series here.
+Compiled-in default value can be overridden by setting the mm_charset entry
+in tin.defaults (don't forget to 'make install_sysdefs' to install the
+tin.defaults file at a location where tin can find it!). Users can override
+this value by setting MM_CHARSET in the options menu or using the
+MM_CHARSET environment variable.
+
+--enable-mime-strict-charset (default: on)
+If this option is turned on, any characters of charsets other than that
+defined in MM_CHARSET will be considered non-displayable. If your standard
+encoding is ISO-8859-X then you probably want to disable this option.
+
+--with-iso-to-ascii=value (default: -1)
+Define if you want tin to do ISO-8859-1 to ASCII charset conversions by
+default for all groups. You must specify a value of "0-6" to get tin to use
+one of the following 7 conversion tables for different languages
+
+	0  replace 8-bit letters by 7-bit counterpart without diacritics
+	   (Ä -> A) and other characters by similar 7-bit ones (» -> >>)
+	1  same as 0, but use only one character (preserves layout)
+	2  convert 8-bit letters to 7-bit replacements (Ä -> Ae)
+	   (useful for Danish, Dutch, German, Norwegian and Swedish)
+	3  replace 8-bit letters by 7-bit ISO 646 characters
+	   (mostly for Danish, Finnish, Norwegian and Swedish)
+	4  convert 8-bit characters according to RFC 1345
+	5  build 8-bit characters by combining serveral 7-bit chars and
+	   using backspace (useful for printers)
+	6  ???
+
+E.g., adding --with-iso-to-ascii=2 to the configure options would be useful
+in german language newsgroups. For more detailed info read the file
+./doc/iso2asc.txt. Default value for --with-iso-to-ascii is "-1", which
+means no conversion at all. Users can override this value by setting an
+environment variable ISO2ASC.
+
+--with-local-charset=identifier
+Define if you want charset conversions. You only need this if you compile
+tin for a Microsoft or NeXT operating system. Set identifier to one of the
+following values:
+
 	437	ibm437<->iso-8859-1 conversion
 	850	ibm850<->iso-8859-1 conversion
 	1	next<->iso-8859-1 conversion
@@ -354,21 +421,74 @@ set LOCAL_CHARSET to one of the following values:
 --with-ncurses
 Define this if you want to link with ncurses instead of termcap.
 
---enable-curses
-Define this if you wish to use the curses screen optimizing rather than
+--enable-curses (default: off)
+Enable this if you wish to use the curses screen optimizing rather than
 termcap.  This has been tested well only with ncurses 4.1; it should work
 (except for mouse support and screen resizing) with SVr4 curses (Solaris
 2.5 is known to have a bug in libc which prevents use of curses, ncurses
 works well on that platform).  To build with ncurses screen optimizing,
 you must give both the --with-ncurses and --enable-curses options.
 
---enable-etiquette (default: on)
-If enabled, prints netiquette before posting.
+--enable-inverse-video (default: on)
+Disable if you want inverse video and highlighted bar disabled by default.
+Can be toggled in tin by the 'I' command. Users can also set draw_arrow and
+inverse_ok variables in their tinrc to override this default.
 
---enable-locale (default: on)
-If enabled, tin uses multi language support, as described in
-locale(7).  If you don't have locale support installed on your system,
-try --disable-locale, otherwise you won't see any 8-bit-characters.
+--enable-8bit-keys (default: on)
+Enable if your terminal generates 8-bit controls.  For Unix systems we
+assume this may imply your arrow keys begin either with CSI (0x9b) or SS3
+(0x8f).  Most ANSI terminals generate 7-bit controls (e.g., CSI is
+"<esc>["), but some such as VT220 can be configured more efficiently to
+generate 8-bit prefix codes, saving a byte per control sequence.  This
+applies to cursor movement at the same time.  The actual codes are read
+from termcap (this does not affect the curses configuration).
+
+
+Feature options
+---------------
+
+--enable-color (default: on)
+Enable if you want to have ANSI-color support.  This works on most color
+displays and the color xterm. The color mode can be switched on/off in
+~/.tin/tinrc (use_color) and can be toggled with option -a or key '&'.
+
+--enable-pgp (default: set automatically)
+Disable if you don't want a PGP (Pretty Good Privacy encryption and digital
+signature system) enabled tin. Otherwise, configure will enable pgp if it
+finds it in the paths so that users have the option of checking signatures,
+extract keys, sign messages and add public key to messages. This is bound
+to the key 'g' or '^G'. (Pgp-5 (HAVE_PGP_5 set) is prefered over pgp-2
+(HAVE_PGP set)). See doc/pgp.txt for further information.
+
+--with-ispell=PATH (default: set automatically)
+Define if you have ispell (interactive spell-checker) installed and want
+the option of checking your articles, mails before posting/mailing them. If
+found in search path, this is used automatically.
+
+--with-metamail=PATH (default: set automatically)
+Define if you want metamail display your MIME messages. If found in search
+path, this is used automatically.
+
+--enable-posting (default: on)
+If disabled, TIN does not allow posting/followup of articles.
+
+--enable-fascist-newsadmin (default: off)
+Enable if you want to restrict articles posted with your tin a bit to
+enforce some formal rules. This will change the following warnings to an
+error in the article checking routine therefore causing the user to reenter
+the editor and change the article or to abort posting:
+ - Group(s) in Newsgroups: or Followup-To: header were not found in
+   the sites' active file
+ - Approved: header was found when user was in beginner level
+ - Signature has more than MAX_SIG_LINES (see include/tin.h) lines
+ - Crossposting without Followup-To: header
+ - Followup-To: header with more than one newsgroup
+
+--enable-shell-escape (default: on)
+If disabled, do not allow shell escapes. Note: There may still be
+possibilities for users to start a shell (e.g. from within an editor or
+using a shell as the "editor"), even if you disable this feature here.
+They are just not able to use the '!' key to do so.
 
 --enable-piping (default: on)
 Disable if your system does not support piping of articles to shell commands
@@ -382,14 +502,12 @@ users to have such support. Note: There may still be possibilities for users
 to print an article, even if you disable this feature. They are just not
 able to use the 'o' key to do so.
 
---enable-fascist-newsadmin (default: off)
-Enable if you want users articles to be posted to groups that your site
-receives.  This will change the warning that a group that the user is
-posting to was not found in the sites active file to an error in the
-article checking routine therefore causing the user to remove the group
-from his/her posting or to abort the posting of the article.
-
-[FIXME: Find another name for this option.		-dn, 1998-12-27]
+--enable-mh-mail-handling (default: off)
+Enable if you want to use the MH style mail handling & reading code in
+mail.c. It should be noted that mail handling is not well tested and not
+yet fully implemented. You can expect errors if you use this option so let
+me know the problems by sending me a bug report ('R' bug command from
+within tin). See doc/reading-mail.txt for further information.
 
 --enable-mmdf-mailer (default: off, except on SCO Unix)
 If enabled, MMDF type mail handling is used as the default (instead of
@@ -400,34 +518,58 @@ save_to_mmdf_mailbox to ON or OFF, respectively.
 [NOTE: To change the default behaviour on SCO Unix, have a look to
  include/tin.h and search for HAVE_MMDF_MAILER.]
 
---enable-posting (default: on)
-If disabled, TIN does not allow posting/followup of articles.
+HAVE_LIBUU (default: set automatically)
+HAVE_UUDEVIEW_H (default: set automatically)
+Define *both* if you want to use libuu for uudecoding and collecting
+multipart binary articles (libuu is part of uudeview, which can be found at
+<http://zeus.informatik.uni-frankfurt.de/~fp/uudeview/>). libuu must be
+somewhere in the library paths, uudeview.h somewhere in the include paths
+when compiling. If they are found there by configure, these defines are set
+automatically.
 
---enable-shell-escape (default: on)
-If disabled, do not allow shell escapes. Note: There may still be
-possibilities for users to start a shell (e.g. from within an editor or
-using a shell as the "editor"), even if you disable this feature here.
-They are just not able to use the '!' key to do so.
 
---enable-inverse-video (default: on)
-Disable if you want inverse video and highlighted bar disabled. Can be
-toggled in tin by the 'I' command.
+Miscellaneous options
+---------------------
 
---enable-xhdr-xref (default: on)
-If disabled, don't allow using XHDR XREF if XOVER doesn't work to mark
-crossposted articles as read in all groups.
+--enable-append-pid (default: on)
+Enable if you want tin to append its process id to any file that a user
+edits (.article, .cancel, .letter etc.). Highly recommended if a user wants
+to start several instances of tin at a time; otherwise files might be
+overwritten.
 
-FORGERY
+--enable-break-long-lines (default: off)
+Enable if you want tin to break long MIME encoded header lines in
+accordance with RFC 2047 (i.e. after 76 characters) in postings as well as
+in e-mail. Default is to not break ("fold") such lines in news postings
+because some news servers and clients can't handle them very well (doing
+folding right seems to be a major problem). This option only affects
+headers in postings; e-mail headers are always folded if they have MIME
+encoded words and are longer than 76 characters.
+
+--enable-debug (default: off)
+Define if you want tin to log debug information to files in /tmp. Activated
+by tin -Dn where n is 1 for NNTP only debug logging and n is 2 for logging
+all debug info. Debug files written to /tmp are ARTS, ACTIVE, BASE and
+NNTP.
+
+FORGERY (default: not set)
 Define if you want to be able to cancel postings you did not write
 yourself.  The !cyberspam and cancel conventions are supported.  Be
 careful with this feature, it should not be used in an free accessible
 tin.  This feature does not work with INN using the INN-inews (when
 using without NNTP), because INN-inews rejects these cancels.
 
-SMALL_MEMORY_MACHINE (not supported anymore)
-Define if you are running a machine with little memory (<4MB). Tin will
-run slightly slower but be more efficient in how memory is allocated and
-reclaimed.
+
+Daemon options
+--------------
+
+INDEX_DAEMON
+!!! Using this define is deprecated and unsupported. This documentation of
+!!! INDEX_DAEMON is probably wrong.
+Define to make an index file updating daemon version of tin. Note that
+no -lcurses or screen libraries need to be linked with tin when this
+#define is specified. If defined this will automatically undefine all
+NNTP_* defines as the daemon has to be installed on the NNTP server.
 
 
 Compiled & installed on the following machines:
@@ -436,7 +578,7 @@ i486-pc-linux-gnulibc1   (libc 5.4.33) gcc 2.7.2.1  (1.4.0 release 19991113)    
 i586-pc-linux-gnu        (glibc 2.0.7) egcs 2.91.60 (1.4.0 release 19991113)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.0.7) fcc 1.0      (1.4.0 release 19991113)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.0.7) tcc 4.1.2    (1.4.0 release 19991113)   [3]    <urs@tin.org>
-i586-pc-linux-gnu        (glibc 2.1.1) gcc 2.95.2   (1.4.0 release 19991113)          <urs@tin.org>
+i586-pc-linux-gnu        (glibc 2.1.1) gcc 2.95.2   (1.4.2 release 20000205)          <urs@tin.org>
 i586-pc-linux-gnu        (glibc 2.1.1) lcc 4.27     (1.4.0 release 19991113)   [3][4] <urs@tin.org>
 mipsel-unknown-linux-gnu (glibc 2.0.7) gcc 2.7.2    (1.4.0 release 19991113)          <urs@tin.org>
 sparc-unknown-linux-gnu  (glibc 2.0.1) gcc 2.7.2.3  (1.4.0 release 19991113)          <urs@tin.org>

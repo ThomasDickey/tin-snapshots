@@ -1459,7 +1459,7 @@ static void
 move_to_group (
 	int n)
 {
-	if (cur_groupnum == n)
+	if (cur_groupnum && cur_groupnum == n)
 		return;
 
 	HpGlitch(erase_group_arrow ());

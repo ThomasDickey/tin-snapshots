@@ -222,7 +222,11 @@ main (
 	 * Load the local & global group specific attribute files
 	 */
 #ifndef INDEX_DAEMON
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_attributes_file, "global ");
 	read_attributes_file (global_attributes_file, TRUE);
+	if (INTERACTIVE)
+		wait_message (0, txt_reading_attributes_file, "");
 	read_attributes_file (local_attributes_file, FALSE);
 #endif /* !INDEX_DAEMON */
 
@@ -808,7 +812,7 @@ check_for_any_new_news (
 	if (StartAnyUnread) {
 		batch_mode = TRUE;			/* Suppress some unwanted on-screen garbage */
 		if ((i = check_start_save_any_news (START_ANY_NEWS)) == -1)
-			exit (EXIT_SUCCESS);			/* No new/unread news so exit */
+			giveup();				/* No new/unread news so exit */
 		batch_mode = FALSE;
 	}
 

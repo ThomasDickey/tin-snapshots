@@ -1,19 +1,25 @@
                   Authentication to a NNTP server with tin
 
 Tin is able to do authentication to news servers according to the "Common
-NNTP Extensions" (see below). There are several ways of authentication
-described in that text which are referred to as Original AUTHINFO, AUTHINFO
-GENERIC, and AUTHINFO SIMPLE. Tin supports the Original AUTHINFO and the
-AUTHINFO GENERIC methods. In addition to answers to authentication requests
-as described in the "Common NNTP Extensions", tin also provides
-authentication at connection startup.
+NNTP Extensions" (this document is available at [1]). There are several
+ways of authentication described in that text which are referred to as
+Original AUTHINFO, AUTHINFO GENERIC, and AUTHINFO SIMPLE. Tin supports the
+Original AUTHINFO and the AUTHINFO GENERIC methods. In addition to answers
+to authentication requests as described in the "Common NNTP Extensions",
+tin also provides authentication at connection startup.
 
-The authentication method is chosen based on the respcode of the
-server's request.  An ERR_NOAUTH code implies original AUTHINFO, while
-a NEED_AUTHINFO code implies AUTHINFO GENERIC with a fallback to
-original if it fails.  Authentication requests will be handled
-whenever they occur; the command that caused the request will be sent
-again.
+Unfortunately, you cannot rely on the response codes of authentication
+requests as described in the "Common NNTP Extensions"; today's news servers
+mostly send NNTP codes 480, regardless of the type of authentication they
+expect. Therefore, authentication is always done in the same manner: First,
+tin tries an AUTHINFO GENERIC authorization. If this fails, Original
+AUTHINFO is used. If this does not work for you (which it should), please
+contact me to track this problem down. There are known problems with the
+reference nntp server available at ftp.academ.com -- this is a server bug
+and not tin's fault; if you need a patch or workaround, drop me a mail.
+
+Authentication requests will be handled whenever they occur; the command
+that caused the request will be sent again.
 
 For an authentication with the Original AUTHINFO method, tin needs a
 user-name and a password for the current news server. This information is
@@ -30,14 +36,16 @@ you have to surround the whole password by double quotes. If no user-name is
 given for the current news server, the user-id of the user who started tin
 is assumed.
 
-Security consideration: tin does not prove if the .newsauth file could be
-read by others. The user is responsible for accurate permissions.
+Security consideration: Make sure that the .newsauth file cannot be read by
+others. Tin checks the permissions of the file and complains if they are
+insecure (i.e., if they are not -rw-------) but continues.
 
 If you do not have a .newsauth file in your $HOME directory, tin prompts
-you for a user-name and a password. This is NOT done at connection startup,
-because there is no way for tin to find out if an authentication at this
-time is needed. If you need to authenticate at the beginning of your news
-session, you MUST provide a .newsauth file.
+you for a user-name and a password. This is not done automatically at
+connection startup, because there is no way for tin to find out if an
+authentication at this time is needed. If you need to authenticate at the
+beginning of your news session, use the -A option when invoking tin or just
+provide a .newsauth file.
 
 The AUTHINFO GENERIC authentication was implemented by someone else and has
 not been tested by me since I do not know a server that supports this.
@@ -55,227 +63,14 @@ If NNTPAUTH is empty or not available, tin sends an "authinfo generic any
 <user-id>" command to the server and expects the result as an NNTP response
 code.
 
-The AUTHINFO SIMPLE authentication method is not supported by tin;
-currently, attempts to use this method emit an error and fallback to
-original AUTHINFO. If you need this, drop me a message or see the
-source code in auth.c. With the specification below, the
-implementation should not be difficult.
+The AUTHINFO SIMPLE authentication method is not supported by tin (and
+possibly won't be since nobody seems to use it and there are some problems
+with the protocol). If you need this, drop me a message or see the source
+code in auth.c. With the specification at [1], the implementation should not
+be difficult.
 
-Dirk Nimmich (97-04-05)
+Dirk Nimmich (2000-01-22)
 <nimmich@uni-muenster.de>
 
- ---- cut here ---- Barber: Common NNTP Extensions ----
-[Complete document at
- <URL:http://src.doc.ic.ac.uk/computing/internet/internet-drafts/draft-barber-nntp-imp-05.txt.Z]
-
-INTERNET-DRAFT                                               S. Barber
-Expires: December 1, 1996                   Academ Consulting Services
-                                                             July 1996
-                         Common NNTP Extensions
-                      draft-barber-nntp-imp-05.txt
-
-Status of this Document
-
-     This document is an Internet-Draft.  Internet-Drafts are working
-     documents of the Internet Engineering Task Force (IETF), its
-     areas, and its working groups.  Note that other groups may also
-     distribute working documents as Internet-Drafts.
-
-     Internet-Drafts are draft documents valid for a maximum of six
-     months and may be updated, replaced, or obsoleted by other
-     documents at any time.  It is inappropriate to use Internet-
-     Drafts as reference material or to cite them other than as
-     ``work in progress.''
-
-[...]
-3. Other Extensions
-
-3.1 AUTHINFO
-
-    AUTHINFO is used to inform a server about the identity of
-    a user of the server. In all cases, clients must provide
-    this information when requested by the server. Servers are
-    not required to accept authentication information that is
-    volunteered by the client. Clients must accommodate servers that
-    reject any authentication information volunteered by the client.
-
-    There are three forms of AUTHINFO in use. The original version,
-    an NNTP v2 revision called AUTHINFO SIMPLE and a more recent
-    version which is called AUTHINFO GENERIC.
-
-3.1.1 Original AUTHINFO
-
-    AUTHINFO USER username
-    AUTHINFO PASS password
-
-    The original AUTHINFO is used to identify a specific entity
-    to the server using a simple username/password combination.
-    It first appeared in the UNIX reference implementation.
-
-    When authorization is required, the server will send a 480
-    response requesting authorization from the client. The
-    client must enter AUTHINFO USER followed by the username.
-    Once sent, the server will cache the username and may send
-    a 381 response requesting the password associated with that
-    username. Should the server request a password using the 381
-    response, the client must enter AUTHINFO PASS followed by
-    a password and the server will then check the authentication
-    database to see if the username/password combination is valid.
-    If the combination is valid or if no password is required,
-    the server will return a 281 response. The client should then
-    retry the original command to which the server responded with
-    the 480 response. The command should then be processed by
-    the server normally. If the combination is not valid, the server
-    will return a 502 response.
-
-    Clients must provide authentication when requested by the server.
-    It is possible that some implementations will accept authentication
-    information at the beginning of a session, but this was not the
-    original intent of the specification. If a client attempts to
-    reauthenticate, the server may return 482 response indicating
-    that the new authentication data is rejected by the server.
-    The 482 code will also be returned when the AUTHINFO commands
-    are not entered in the correct sequence (like two AUTHINFO
-    USERs in a row, or AUTHINFO PASS preceding AUTHINFO USER).
-
-    All information is passed in cleartext.
-
-    When authentication succeeds, the server will create an email
-    address for the client from the user name supplied in the
-    AUTHINFO USER command and the hostname generated by a reverse
-    lookup on the IP address of the client. If the reverse lookup
-    fails, the IP address, represented in dotted-quad format, will
-    be used. Once authenticated, the server shall generate a Sender:
-    line using the email address provided by authentication if it
-    does not match the client-supplied From: line. Additionally,
-    the server should log the  event, including the email address
-    This will provide a means by which subsequent statistics generation
-    can associate newsgroup references with unique entities - not
-    necessarily by name.
-
-3.1.1.1 Responses
-
-        281 Authentication accepted
-        381 More authentication information required
-        480 Authentication required
-        482 Authentication rejected
-        502 No permission
-
-3.1.2 AUTHINFO SIMPLE
-
-    AUTHINFO SIMPLE
-    user password
-
-    This version of AUTHINFO was part of a proposed NNTP V2
-    specification, which was started in 1991 but never completed,
-    and is implemented in some servers and clients. It is a
-    refinement of the original AUTHINFO and provides the same
-    basic functionality, but the sequence of commands is much
-    simpler.
-
-    When authorization is required, the server sends a 450 response
-    requesting authorization from the client. The client must enter
-    AUTHINFO SIMPLE. If the server will accept this form of
-    authentication, the server responds with a 350 response. The
-    client must then send the username followed by one or more
-    space characters followed by the password. If accepted, the
-    server returns a 250 response and the client should then
-    retry the original command to which the server responded
-    with the 450 response. The command should then be processed
-    by the server normally. If the combination is not valid,
-    the server will return a 452 response.
-
-    Note that the response codes used here were part of the
-    proposed NNTP V2 specification and are violations of RFC 977.
-    It is recommended that this command not be implemented, but
-    use either or both of the other forms of AUTHINFO if such
-    functionality if required.
-
-3.1.2.1 Responses
-
-        250 Authorization accepted
-        350 Continue with authorization sequence
-        450 Authorization required for this command
-        452 Authorization rejected
-
-3.1.3 AUTHINFO GENERIC
-
-    AUTHINFO GENERIC authenticator arguments...
-
-    AUTHINFO GENERIC is used to identify a specific entity to the
-    server using arbitrary authentication  or identification
-    protocols. The desired protocol is indicated by the
-    authenticator parameter, and any number of parameters can
-    be passed to the authenticator.
-
-    When authorization is required, the server will send a 380
-    response requesting authorization from the client. The
-    client should enter AUTHINFO GENERIC followed by the
-    authenticator name, and the arguments if any.  The authenticator
-    and arguments must not contain the sequence "..".
-
-    The server will attempt to engage the server end authenticator,
-    similarly, the client should engage the client end authenticator.
-    The server end authenticator will then initiate authentication
-    using the NNTP sockets (if appropriate for that authentication
-    protocol), using the protocol specified by the authenticator name.
-    These authentication protocols are not included in this document,
-    but are similar in structure to those referenced in RFC 1731[8]
-    for the IMAP-4 protocol.
-
-    If the server returns 501, this means that the authenticator
-    invocation was syntactically incorrect, or that AUTHINFO
-    GENERIC is not supported.  The client should retry using the
-    AUTHINFO USER command.
-
-    If the requested authenticator capability is not found or
-    there is some other unspecified server program error, the
-    server returns the 503 response code.
-
-    The authenticators converse using their protocol until complete.
-    If the authentication succeeds, the server authenticator will
-    terminate with a 281, and the client can continue by reissuing
-    the command that prompted the 380.  If the authentication fails,
-    the server will respond with a 502.
-
-    The client must provide authentication when requested by the
-    server.  The server may request authentication at any
-    time.  Servers may request authentication more than once
-    during a single session.
-
-    When the server authenticator completes, it provides to the
-    server (by a mechanism herein undefined) the email address
-    of the user, and potentially what the user is allowed to
-    access. Once authenticated, the server shall generate a Sender:
-    line using the email address provided by the authenticator
-    if it does not match the user-supplied From: line. Additionally,
-    the server should log the event, including the user's
-    authenticated email address (if available). This will provide
-    a means by which subsequent statistics generation can
-    associate newsgroup references with unique entities - not
-    necessarily by name.
-
-3.1.3.1 Responses
-
-        281 Authentication succeeded
-        380 Authentication required
-        501 Command not supported or Command syntax error
-        502 No permission
-        503 Program error, function not performed
-        nnn  authenticator-specific protocol.
-
-[...]
-5.0 Security Considerations
-
-    The use of the AUTHINFO is optional. This command as documented
-    has a number of security implications. In the original and simple
-    forms, all passwords are passed in plaintext and could be
-    discovered by various forms of network or system surveillance.
-    The AUTHINFO GENERIC command has the potential for the same
-    problems if a mechanism is used that also passes cleartext
-    passwords. RFC 1731[8] discusses these issues in greater detail.
-
-[...]
-This document expires December 1, 1996.
-
- ---- cut here ---- End of Barber: Common NNTP Extensions ----
+References:
+[1] <http://www.karlsruhe.org/rfc/draft-ietf-nntp-ext-03.txt>
