@@ -2036,7 +2036,7 @@ mail_to_author (group, respnum, copy_text)
 	if(use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
 		sprintf(mailreader_subject, "Re: %s", eat_re (note_h_subj));
-		my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
+		find_reply_to_addr (respnum, mail_to);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (! invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
