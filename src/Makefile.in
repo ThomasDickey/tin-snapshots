@@ -156,6 +156,7 @@ OFILES	= @ALLOCA@ \
 	$(OBJDIR)/help.o \
 	$(OBJDIR)/inews.o \
 	$(OBJDIR)/init.o \
+	$(OBJDIR)/joinpath.o \
 	$(OBJDIR)/lang.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/mail.o \
@@ -224,10 +225,15 @@ $(OBJDIR)/parsdate.c: $(SRCDIR)/parsdate.y
 	$(YACC) $(SRCDIR)/parsdate.y
 	$(MV) y.tab.c $(OBJDIR)/parsdate.c
 
-actived: $(SRCDIR)/actived.c $(SRCDIR)/mail.c
+actived:	$(OBJDIR)/lang.o \
+		$(OBJDIR)/joinpath.o \
+		$(SRCDIR)/actived.c \
+		$(SRCDIR)/mail.c
 	@$(ECHO) "Compiling actived..."
-	$(CC) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON $(SRCDIR)/actived.c $(SRCDIR)/mail.c
-	$(LD) $(LDFLAGS) actived.o mail.o -o actived $(LIBS)
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON -c $(SRCDIR)/actived.c
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -DACTIVE_DAEMON -DINDEX_DAEMON -c $(SRCDIR)/mail.c
+	$(LD) $(LDFLAGS) actived.o mail.o $(OBJDIR)/joinpath.o $(OBJDIR)/lang.o -o actived $(LIBS)
+	@-$(RM) actived.o mail.o
 	@$(LS) actived
 
 $(BINDIR)/$(EXE): $(OFILES)
@@ -356,6 +362,7 @@ $(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(TIN_DEP)
 $(OBJDIR)/init.o:		$(SRCDIR)/init.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h \
 				$(INCDIR)/version.h
+$(OBJDIR)/joinpath.o:		$(SRCDIR)/joinpath.c $(TIN_DEP)
 $(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(TIN_DEP)
 $(OBJDIR)/list.o:		$(SRCDIR)/list.c $(TIN_DEP)
 $(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(TIN_DEP)

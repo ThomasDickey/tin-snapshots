@@ -1,12 +1,9 @@
 /* active.c */
-extern void init_group_hash P_((void));
 extern int cmp_group_p P_((t_comptype *group1, t_comptype *group2));
 extern int cmp_notify_p P_((t_comptype *notify1, t_comptype *notify2));
 extern int get_active_num P_((void));
 extern int resync_active_file P_((void));
-extern int find_group_index P_((char *group));
 extern int parse_active_line P_((char *line, long *max, long *min, char *moderated));
-extern int parse_newsrc_active_line P_((FILE *fp, char *group, long *count, long *max, long *min, char *moderated));
 extern void read_news_active_file P_((void));
 extern void backup_active P_((int create));
 extern void check_for_any_new_groups P_((void));
@@ -69,11 +66,11 @@ extern void write_config_file P_((char *file));
 extern void refresh_config_page P_((int act_option, int force_redraw));
 extern int change_config_file P_((struct t_group *group, int filter_at_once));
 extern void show_menu_help P_((char *help_message));
-extern int match_boolean P_((char *line, char *pat, int *dst));
+extern int match_boolean P_((char *line, char *pat, t_bool *dst));
 extern int match_integer P_((char *line, char *pat, int *dst, int maxlen));
 extern int match_long P_((char *line, char *pat, long *dst));
 extern int match_string P_((char *line, char *pat, char *dst, size_t dstlen));
-extern char *print_boolean P_((int value));
+extern char *print_boolean P_((t_bool value));
 extern void quote_dash_to_space P_((char *str));
 extern char *quote_space_to_dash P_((char *str));
 
@@ -194,12 +191,21 @@ extern int create_mail_save_dirs P_((void));
 extern char *GetFQDN P_((void));
 extern char *GetConfigValue P_((char *name));
 
+/* joinpath.c */
+extern void joinpath P_((char *result, char *dir, char *file));
+
 /* list.c */
+extern void init_group_hash P_((void));
+extern unsigned long hash_groupname P_((char *group));
+extern int find_group_index P_((char *group));
 extern struct t_group *psGrpFind P_((char *pcGrpName));
+extern int psGrpAdd P_((char *group));
+#if 0
 extern struct t_group *psGrpFirst P_((void));
 extern struct t_group *psGrpLast P_((void));
 extern struct t_group *psGrpNext P_((void));
 extern struct t_group *psGrpPrev P_((void));
+#endif
 
 /* mail.c */
 extern void read_newsgroups_file P_((void));
@@ -243,7 +249,6 @@ extern void *my_realloc1 P_((char *file, int line, char *p, size_t size));
 
 /* misc.c */
 extern void append_file P_((char *old_filename, char *new_filename));
-extern void joinpath P_((char *result, char *dir, char *file));
 extern void asfail P_((char *file, int line, char *cond));
 extern void copy_fp P_((FILE *fp_ip, FILE *fp_op, char *prefix));
 extern void copy_body P_((FILE *fp_ip, FILE *fp_op, char *prefix, char *initl));
@@ -257,7 +262,6 @@ extern void strip_double_ngs P_((char *ngs_list));
 extern long my_strtol P_((/* const */ char *str, char **ptr, int use_base));
 extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
-extern unsigned long hash_groupname P_((char *group));
 extern void rename_file P_((char *old_filename, char *new_filename));
 extern char *my_strdup P_((char *str));
 extern int invoke_cmd P_((char *nam));
@@ -281,7 +285,7 @@ extern int untag_all_articles P_((void));
 extern char *my_strstr P_((char *text, char *pattern));
 #endif
 extern int my_isprint P_((int c));
-extern void get_author P_((int thread, struct t_article *art, char *str));
+extern void get_author P_((int thread, struct t_article *art, char *str, int len));
 extern void toggle_inverse_video P_((void));
 extern void show_inverse_video_status P_((void));
 extern int get_arrow_key P_((void));
@@ -374,7 +378,7 @@ extern int get_respcode P_((void));
 extern int stuff_nntp P_((char *fnam));
 extern FILE *nntp_to_fp P_((void));
 extern void vGrpGetSubArtInfo P_((void));
-extern void vGrpGetArtInfo P_((char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin));
+extern int vGrpGetArtInfo P_((char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin));
 
 /* page.c */
 extern int show_page P_((struct t_group *group, char *group_path, int respnum, int *threadnum));
@@ -388,7 +392,7 @@ extern void art_close P_((void));
 extern int prompt_response P_((int ch, int respnum));
 extern void yank_to_addr P_((char *orig, char *addr));
 extern int show_last_page P_((void));
-extern void modifiedstrncpy P_((char *target, char *source, int size, int decode));
+extern void modifiedstrncpy P_((char *target, char *source, size_t size, int decode));
 extern int match_header P_((char *buf, char *pat, char *body, char *nodec_body, size_t len));
 
 /* parsdate.y */
@@ -437,7 +441,7 @@ extern int prompt_menu_string P_((int line, int col, char *var));
 extern int prompt_yn P_((int line, char *prompt, int default_answer));
 extern int prompt_yn2 P_((int line, char *prompt, int default_answer));
 extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char *list[], int size));
-extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
+extern void prompt_on_off P_((int row, int col, t_bool *var, char *help_text, char *prompt_text));
 extern int prompt_option_string P_((int option));
 extern int prompt_option_num P_((int option));
 extern int prompt_option_char P_((int option));
@@ -468,7 +472,7 @@ extern int mmdecode P_((char *what, int encoding, int delimiter, char *where, ch
 extern void get_mm_charset P_((void));
 extern char *rfc1522_decode P_((char *s));
 extern char *rfc1522_encode P_((char *s));
-extern void rfc15211522_encode P_((char *filename, char *mime_encoding, int allow_8bit_header));
+extern void rfc15211522_encode P_((char *filename, char *mime_encoding, t_bool allow_8bit_header));
 
 /* save.c */
 extern int check_start_save_any_news P_((int check_start_save));
@@ -483,12 +487,12 @@ extern int save_comp P_((t_comptype *p1, t_comptype *p2));
 extern char *save_filename P_((int i));
 extern char *get_first_savefile P_((void));
 extern char *get_last_savefile P_((void));
-extern int post_process_files P_((int proc_type_ch, int auto_delete));
-extern void post_process_uud P_((int pp, int auto_delete));
+extern int post_process_files P_((int proc_type_ch, t_bool auto_delete));
+extern void post_process_uud P_((int pp, t_bool auto_delete));
 extern void uudecode_file P_((int pp, char *file_out_dir, char *file_out));
-extern void post_process_sh P_((int auto_delete));
+extern void post_process_sh P_((t_bool auto_delete));
 extern char *get_archive_file P_((char *dir));
-extern void delete_processed_files P_((int auto_delete));
+extern void delete_processed_files P_((t_bool auto_delete));
 extern void print_art_seperator_line P_((FILE *fp, int the_mailbox));
 
 /* screen.c */
@@ -527,7 +531,7 @@ extern int reposition_group P_((struct t_group *group, int default_num));
 extern void catchup_group P_((struct t_group *group, int goto_next_unread_group));
 extern int next_unread_group P_((int enter_group));
 extern void set_groupname_len P_((int all_groups));
-extern void toggle_my_groups P_((int only_unread_groups, char *group));
+extern void toggle_my_groups P_((t_bool only_unread_groups, char *group));
 extern void goto_next_group_on_screen P_((void));
 extern void strip_line P_((char *line, size_t len));
 extern int iSetRange P_((int iLevel, int iNumMin, int iNumMax, int iNumCur));

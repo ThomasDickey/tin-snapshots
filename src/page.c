@@ -1471,7 +1471,7 @@ show_last_page ()
 void modifiedstrncpy(target, source, size, decode)
 char *target;
 char *source;
-int size;
+size_t size;
 int decode;
 {
         char buf[2048];

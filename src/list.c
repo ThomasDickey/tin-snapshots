@@ -3,8 +3,8 @@
  *  Module    : list.c
  *  Author    : I.Lea
  *  Created   : 18-12-93
- *  Updated   : 18-12-93
- *  Notes     : Functions used in transition to using linked list
+ *  Updated   : 07-01-97
+ *  Notes     : Low level functions handling the active[] list and its group_hash index
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -14,38 +14,151 @@
 
 #include	"tin.h"
 
+#if 0
 static int iGrpCurNum = -1;
 static int iGrpMaxNum = -1;
+#endif
+
+int group_hash[TABLE_SIZE];			/* group name --> active[] */
+
+void
+init_group_hash ()
+{
+	int i;
+
+	if (num_active == -1) {
+		num_active = 0;
+		for (i = 0; i < TABLE_SIZE; i++) {
+			group_hash[i] = -1;
+		}
+	}
+}
 
 /*
- *  Find group name in active[] array and return pointer to element
+ * hash group name for fast lookup later
  */
-
-struct t_group *
-psGrpFind (pcGrpName)
-	char *pcGrpName;
+unsigned long
+hash_groupname (group)
+	char *group;
 {
-	int iNum;
-	long lHash;
+#ifdef NEW_HASH_METHOD	/* still testing */
+	unsigned long hash = 0L, g, val;
+	/* prime == smallest prime number greater than size of string table */
+	int prime = 1423;
+	char *p;
 
-	lHash = hash_groupname (pcGrpName);
+	for (p = group; *p; p++) {
+		hash = (hash << 4) + *p;
+		if (g = hash & 0xf0000000) {
+			hash ^= g >> 24;
+			hash ^= g;
+		}
+	}
+	val = hash % prime;
+/*
+printf ("hash=[%s] [%ld]\n", group, val);
+*/
+	return val;
+#else
+	unsigned long hash_value = 0L;
+	unsigned int len = 0;
+	unsigned char *ptr = (unsigned char *) group;
 
-	iNum = group_hash[lHash];
+	while (*ptr) {
+		hash_value = (hash_value << 1) ^ *ptr++;
+		if (++len & 7) continue;
+		hash_value %= TABLE_SIZE;
+	}
+	hash_value %= TABLE_SIZE;
+
+	return (hash_value);
+#endif
+}
+
+/*
+ *  Find group name in active[] array and return index otherwise -1
+ */
+int
+find_group_index (group)
+	char *group;
+{
+	int i;
+	long h;
+
+	h = hash_groupname (group);
+	i = group_hash[h];
 
 	/*
 	 * hash linked list chaining
 	 */
-	while (iNum >= 0) {
-		if (STRCMPEQ(pcGrpName, active[iNum].name)) {
-			iGrpCurNum = iNum;
-			return &active[iNum];
+	while (i >= 0) {
+		if (STRCMPEQ(group, active[i].name)) {
+			return i;
 		}
-		iNum = active[iNum].next;
+		i = active[i].next;
+	}
+
+	return -1;
+}
+
+/*
+ *  Find group name in active[] array and return pointer to element
+ */
+struct t_group *
+psGrpFind (pcGrpName)
+	char *pcGrpName;
+{
+	int i;
+
+	if ((i = find_group_index(pcGrpName)) != -1) {
+#if 0
+		iGrpCurNum = i;
+#endif
+		return &active[i];
 	}
 
 	return (struct t_group *) 0;
 }
 
+/*
+ * Add group to the group_hash of active groups
+ * utilises the num_active and max_active global variables
+ */
+int
+psGrpAdd (group)
+	char *group;
+{
+	long h;
+	int i;
+
+	if (num_active >= max_active)		/* Grow memory area if needed */
+		expand_active ();
+
+	h = hash_groupname (group);
+
+	if (group_hash[h] == -1) {
+		group_hash[h] = num_active;
+
+	} else {	/* hash linked list chaining */
+
+		for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
+			if (STRCMPEQ(active[i].name, group))
+				return(-1);				/* kill dups */
+		}
+
+		if (STRCMPEQ(active[i].name, group))
+			return(-1);
+
+		active[i].next = num_active;
+	}
+
+	return(0);
+}
+
+/*
+ * What is all the rest of this for ???
+ */
+#if 0
 struct t_group *
 psGrpFirst ()
 {
@@ -93,3 +206,4 @@ psGrpPrev ()
 	}
 	return (struct t_group *) 0;
 }
+#endif

@@ -1,5 +1,7 @@
 Bugs
 ----
+o  tin crashes if started with too small a screen size
+
 o  show_arts_from was not 'updated' correctly if changig in the options menu
    (it's written to the tinrc - but is ignored in the current session)
 
@@ -77,6 +79,8 @@ o  full_page_scroll=OFF is not implemented in page.c (article viewer)
 o  rereading the active file is buggy, it causes crashes on some machines and
    sometimes it takes 50 times longer than the first read at startup...
 
+o  (Y)ank in after resync-time ends up in a double re-read of the active file
+
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
    is missing for SCO
 
@@ -93,7 +97,7 @@ o  killing articles with Lines: 0 on lines=0 does not work
 
 New features
 ------------
-o  add abillity to strip bougous newsgroups from newsrc
+o  add abillity to strip bogus newsgroups from newsrc
 
 o  add command: mark all articles older than <date> as read
    (usefull when subscribing to a new group with high-traffic...)
@@ -143,6 +147,7 @@ o  Additions to the thread menu :
 	'M' (option menu)
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
+	''  r ought to be toggle show all/show only unread
 	'f' (post a followup)
 	keys to goto previous/next thread
 
@@ -326,8 +331,6 @@ o  if answering (c)atchup with (n) you are leaving the group... not useful
 
 o  numbering of Hot articles is wrong after (post)processing them
    (6T 0A 0K -5H R)
-
-o  (Y)ank in after resync-time ends up in a double re-read of the active file
 
 o  with show_only_unread_groups=ON and (y)ank in all groups, (y)ank out all
    groups show_only_unread_groups-status get lost :(

@@ -176,13 +176,13 @@ read_attributes_file (file, global_file)
 	}
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
-		if ((update && update_fork) || !update) {
+		if (SHOW_UPDATE) {
 			if (global_file) {
 				wait_message (txt_reading_global_attributes_file);
 			} else {
 				wait_message (txt_reading_attributes_file);
 			}
-	}
+		}
 
 		scope[0] = '\0';
 		while (fgets (line, sizeof (line), fp) != (char *) 0) {
@@ -191,27 +191,27 @@ read_attributes_file (file, global_file)
 			}
 			switch(tolower(line[0])) {
 			case 'a':
-				if (match_boolean (line, "auto_select=", &num)) {
-					set_attrib_num (ATTRIB_AUTO_SELECT, scope, num);
-					break;
-				}
-				if (match_boolean (line, "auto_save=", &num)) {
+				if (match_boolean (line, "auto_save=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_AUTO_SAVE, scope, num);
 					break;
 				}
-				if (match_boolean (line, "auto_save_msg=", &num)) {
+				if (match_boolean (line, "auto_save_msg=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_AUTO_SAVE_MSG, scope, num);
+					break;
+				}
+				if (match_boolean (line, "auto_select=", (t_bool *)&num)) {
+					set_attrib_num (ATTRIB_AUTO_SELECT, scope, num);
 					break;
 				}
 				break;
 			case 'b':
-				if (match_boolean (line, "batch_save=", &num)) {
+				if (match_boolean (line, "batch_save=", (t_bool*)&num)) {
 					set_attrib_num (ATTRIB_BATCH_SAVE, scope, num);
 					break;
 				}
 				break;
 			case 'd':
-				if (match_boolean (line, "delete_tmp_files=", &num)) {
+				if (match_boolean (line, "delete_tmp_files=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_DELETE_TMP_FILES, scope, num);
 					break;
 				}
@@ -263,11 +263,11 @@ read_attributes_file (file, global_file)
 					set_attrib_str (ATTRIB_QUICK_KILL_SCOPE, scope, buf);
 					break;
 				}
-				if (match_boolean (line, "quick_kill_case=", &num)) {
+				if (match_boolean (line, "quick_kill_case=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_QUICK_KILL_CASE, scope, num);
 					break;
 				}
-				if (match_boolean (line, "quick_kill_expire=", &num)) {
+				if (match_boolean (line, "quick_kill_expire=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_QUICK_KILL_EXPIRE, scope, num);
 					break;
 				}
@@ -279,11 +279,11 @@ read_attributes_file (file, global_file)
 					set_attrib_str (ATTRIB_QUICK_SELECT_SCOPE, scope, buf);
 					break;
 				}
-				if (match_boolean (line, "quick_select_case=", &num)) {
+				if (match_boolean (line, "quick_select_case=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_QUICK_SELECT_CASE, scope, num);
 					break;
 				}
-				if (match_boolean (line, "quick_select_expire=", &num)) {
+				if (match_boolean (line, "quick_select_expire=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_QUICK_SELECT_EXPIRE, scope, num);
 					break;
 				}
@@ -309,7 +309,7 @@ read_attributes_file (file, global_file)
 				if (match_string (line, "scope=", scope, sizeof (scope))) {
 					break;
 				}
-				if (match_boolean (line, "show_only_unread=", &num)) {
+				if (match_boolean (line, "show_only_unread=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_SHOW_ONLY_UNREAD, scope, num);
 					break;
 				}
@@ -337,7 +337,7 @@ read_attributes_file (file, global_file)
 					set_attrib_str (ATTRIB_X_BODY, scope, buf);
 					break;
 				}
-				if (match_boolean (line, "x_comment_to=", &num)) {
+				if (match_boolean (line, "x_comment_to=", (t_bool *)&num)) {
 					set_attrib_num (ATTRIB_X_COMMENT_TO, scope, num);
 					break;
 				}
@@ -599,11 +599,8 @@ write_attributes_file (file)
 		return;
 	}
 
-	if (!cmd_line) {
-		if ((update && update_fork) || !update) {
-			wait_message (txt_writing_attributes_file);
-		}
-	}
+	if (!cmd_line && SHOW_UPDATE)
+		wait_message (txt_writing_attributes_file);
 
 	fprintf (fp, "# Group attributes file for the TIN newsreader\n#\n");
 	fprintf (fp, "#  scope=STRING (ie. alt.sources or *sources*) [mandatory]\n#\n");

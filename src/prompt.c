@@ -315,14 +315,14 @@ void
 prompt_on_off (row, col, var, help_text, prompt_text)
 	int row;
 	int col;
-	int *var;
+	t_bool *var;
 	char *help_text;
 	char *prompt_text;
 {
-	int ret;
+	t_bool ret;
 
-	ret = prompt_list (row, col, *var, help_text, prompt_text, txt_onoff, 2);
-	*var = ret;
+	ret = prompt_list (row, col, (int)*var, help_text, prompt_text, txt_onoff, 2);
+	*var = (ret != 0);
 }
 
 /*

@@ -92,23 +92,6 @@ append_file (old_filename, new_filename)
 	fclose (fp_old);
  	fclose (fp_new);
 }
-
-/*
- * Concatenate dir+file, ensuring that we don't introduce extra '/', since some
- * systems (e.g., Apollo) use "//" for special purposes.
- */
-void
-joinpath(result, dir, file)
-	char	*result;
-	char	*dir;
-	char	*file;
-{
-	(void) strcpy(result, dir);
-	if (result[0] == '\0'
-	 || result[strlen(result)-1] != '/')
-		(void) strcat(result, "/");
-	(void) strcat(result, file != 0 ? file : "");
-}
 #endif  /* M_UNIX */
 
 void
@@ -680,49 +663,6 @@ my_chdir (path)
 
 	return retcode;
 }
-
-/*
- * hash group name for fast lookup later
- */
-
-unsigned long
-hash_groupname (group)
-	char *group;
-{
-#ifdef NEW_HASH_METHOD	/* still testing */
-	unsigned long hash = 0L, g, val;
-	/* prime == smallest prime number greater than size of string table */
-	int prime = 1423;
-	char *p;
-
-	for (p = group; *p; p++) {
-		hash = (hash << 4) + *p;
-		if (g = hash & 0xf0000000) {
-			hash ^= g >> 24;
-			hash ^= g;
-		}
-	}
-	val = hash % prime;
-/*
-printf ("hash=[%s] [%ld]\n", group, val);
-*/
-	return val;
-#else
-	unsigned long hash_value = 0L;
-	unsigned int len = 0;
-	unsigned char *ptr = (unsigned char *) group;
-
-	while (*ptr) {
-		hash_value = (hash_value << 1) ^ *ptr++;
-		if (++len & 7) continue;
-		hash_value %= TABLE_SIZE;
-	}
-	hash_value %= TABLE_SIZE;
-
-	return (hash_value);
-#endif
-}
-
 
 #ifdef M_UNIX
 void
@@ -1634,20 +1574,27 @@ my_isprint (c)
 }
 
 
+/*
+ * Returns author information
+ * thread	if true, assume we're on thread menu and show all author info if
+ *			subject not shown
+ * art		ptr to article
+ * str		ptr in which to return the author. Must be a valid data area
+ * len		max length of data to return
+ *
+ * The data will be null terminated
+ */
 void
-get_author (thread, art, str)
-	int thread;
+get_author (thread, art, str, len)
+	int thread, len;
 	struct t_article *art;
 	char *str;
 {
 	int author;
 
-	if (thread) {
-		if (show_subject)
-			author = show_author;
-		else
-			author = SHOW_FROM_BOTH;
-	} else
+	if (thread && !show_subject)
+		author = SHOW_FROM_BOTH;
+	else
 		author = show_author;
 
 	switch (author) {
@@ -1655,25 +1602,28 @@ get_author (thread, art, str)
 			str[0] = '\0';
 			break;
 		case SHOW_FROM_ADDR:
-			strcpy (str, art->from);
+			strncpy (str, art->from, len);
 			break;
 		case SHOW_FROM_NAME:
-			if (art->name) {
-				strcpy (str, art->name);
-			} else {
-				strcpy (str, art->from);
-			}
+			if (art->name)
+				strncpy (str, art->name, len);
+			else
+				strncpy (str, art->from, len);
 			break;
 		case SHOW_FROM_BOTH:
 			if (art->name) {
-				sprintf (str, "%s <%s>", art->name, art->from);
-			} else {
-				strcpy (str, art->from);
-			}
+				char buff[LEN];			/* TODO eliminate this ? */
+
+				sprintf (buff, "%s <%s>", art->name, art->from);
+				strncpy (str, buff, len);
+			} else
+				strncpy (str, art->from, len);
 			break;
 		default:
 			break;
 	}
+
+	*(str + len) = '\0';				/* NULL terminate */
 }
 
 void

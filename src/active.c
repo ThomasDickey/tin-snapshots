@@ -15,25 +15,12 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
+static int parse_newsrc_active_line P_((char *group, long *count, long *max, long *min, char *moderated));
+
 char new_newnews_host[PATH_LEN];
-int group_hash[TABLE_SIZE];			/* group name --> active[] */
 int reread_active_file = FALSE;
 int newnews_index = -1;
 time_t new_newnews_time;			/* FIXME: never set */
-
-
-void
-init_group_hash ()
-{
-	int i;
-
-	if (num_active == -1) {
-		num_active = 0;
-		for (i = 0; i < TABLE_SIZE; i++) {
-			group_hash[i] = -1;
-		}
-	}
-}
 
 /*
  *  Compare two pointers to "group_t" structures - used in qsort.
@@ -131,37 +118,12 @@ resync_active_file ()
 	return reread;
 }
 
-/*
- *  Find group name in active[] array and return index otherwise -1
- */
-
-int
-find_group_index (group)
-	char *group;
-{
-	int i;
-	long h;
-
-	h = hash_groupname (group);
-	i = group_hash[h];
-
-	/*
-	 * hash linked list chaining
-	 */
-	while (i >= 0) {
-		if (STRCMPEQ(group, active[i].name)) {
-			return i;
-		}
-		i = active[i].next;
-	}
-
-	return -1;
-}
+/* List of allowed seperator chars in active file */
+#define ACTIVE_SEP				" \n"
 
 /*
- * parse line from news or mail active files
+ * Parse line from news or mail active files
  */
-
 int
 parse_active_line (line, max, min, moderated)
 	char *line;
@@ -171,84 +133,67 @@ parse_active_line (line, max, min, moderated)
 {
 	char *p, *q, *r;
 
-	if (line[0] == '#' || line[0] == '\n') {
-		return FALSE;
-	}
+	if (line[0] == '#' || line[0] == '\n')
+		return(FALSE);
 
-	for (p = line; *p && *p != ' ' && *p != '\n'; p++) {
-		continue;
-	}
-	if (*p != ' ') {
+	strtok(line, ACTIVE_SEP);			/* skip group name */
+	p = strtok(NULL, ACTIVE_SEP);		/* group max count */
+	q = strtok(NULL, ACTIVE_SEP);		/* group min count */
+	r = strtok(NULL, ACTIVE_SEP);		/* mod status or path to mailgroup */
+
+	if (!p || !q || !r) {
 		error_message (txt_bad_active_file, line);
-		return FALSE;
-	}
-	*p++ = '\0';
-
-	for (q = p; *q && *q != ' '; q++) {
-		continue;
-	}
-	if (*q != ' ') {
-		error_message (txt_bad_active_file, line);
-		return FALSE;
-	}
-	*q++ = '\0';
-
-	for (r = q; *r && *r != ' '; r++) {
-		continue;
-	}
-	if (*r != ' ') {
-		error_message (txt_bad_active_file, line);
-		return FALSE;
-	}
-	*r++ = '\0';
-
-	if (*r) {
-		strcpy (moderated, r);
-		r = strchr (moderated, '\n');
-		if (*r) {
-			*r = '\0';
-		}
+		return(FALSE);
 	}
 
 	*max = atol (p);
 	*min = atol (q);
+	strcpy(moderated, r);
 
-	return TRUE;
+	/* TODO - if local, test if spooldir exists so we bounce bad groups ? */
+	/* Currently done in vGGAI() */
+	return(TRUE);
 }
 
 
-int
-parse_newsrc_active_line (fp, group, count, max, min, moderated)
-	FILE *fp;
-	char *group;
+/*
+ * Parse a line from the .newsrc file
+ * Returns TRUE or FALSE accordingly
+ * Use vGrpGetArtInfo() to obtain min/max/count for the group
+ * We can't know the 'moderator' status and always return 'n'
+ */
+static int
+parse_newsrc_active_line (buf, count, max, min, moderated)
+	char *buf;
 	long *count;
 	long *max;
 	long *min;
 	char *moderated;
 {
-	char	*ptr, buf[HEADER_LEN];
+	char	*ptr;
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		ptr = my_strpbrk (buf, ":!");
-		if (!ptr || *ptr != ':') {
-			continue;
-		}
-		*ptr = '\0';
+	ptr = my_strpbrk (buf, ":!");
 
-		vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min);
+	if (!ptr || *ptr != ':')		/* Invalid line or unsubscribed */
+		return(FALSE);
 
-		strcpy (group, buf);
-		strcpy (moderated, "n");
+	*ptr = '\0';					/* Now buf is the group name */
 
-		return TRUE;
-	}
+	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min) != 0)
+		return(FALSE);
 
-	return FALSE;
+#if 0
+fprintf(stderr, "vGGAI OUT, cnt=%ld, min=%ld, max=%ld\n", *count, *max, *min);
+#endif
+
+	strcpy (moderated, "n");
+
+	return(TRUE);
 }
 
 /*
- *  Load the news active file into active[] and create copy
- *  of active ~/.tin/active
+ *  Load the news active file into active[]
+ *  [ No longer done: used to create copy of active ~/.tin/active ]
  */
 
 void
@@ -257,49 +202,45 @@ read_news_active_file ()
 	FILE *fp = NULL;
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
-	int i;
-	long h, count = -1L, min = 1, max = 0;
+	long count = -1L, min = 1, max = 0;
 
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 
-	if ((update && update_fork) || !update) {
+	if (SHOW_UPDATE) {
 		wait_message (newsrc_active ? txt_reading_news_newsrc_file :
 						txt_reading_news_active_file);
 	}
 
 	if (!newsrc_active) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
+
+			if (cmd_line)
+				my_fputc ('\n', stderr);
+
 			if (compiled_with_nntp) {
-				if (cmd_line) {
-					my_fputc ('\n', stderr);
-				}
 				sprintf (msg, txt_cannot_open_active_file, news_active_file, progname);
 				error_message (msg, "");
 			} else {
-				if (cmd_line) {
-					my_fputc ('\n', stderr);
-				}
 				error_message (txt_cannot_open, news_active_file);
 			}
+
 			tin_done (EXIT_ERROR);
 		}
 	}
 
-	strcpy (moderated, "y");
+	strcpy (moderated, "y");			/* Assume moderated as default */
 
 	forever {
+		if (fgets (buf, sizeof(buf), fp) == (char *)0)
+			break;
+
 		if (newsrc_active) {
-			if (!parse_newsrc_active_line (fp, buf, &count, &max, &min, moderated)) {
-				break;
-			}
-		} else {
-			if (fgets (buf, sizeof (buf), fp) == (char *) 0) {
-				break;
-			}
-			if (!parse_active_line (buf, &max, &min, moderated)) {
+			if (!parse_newsrc_active_line (buf, &count, &max, &min, moderated))
 				continue;
-			}
+		} else {
+			if (!parse_active_line (buf, &max, &min, moderated))
+				continue;
 		}
 
 		/*
@@ -307,74 +248,56 @@ read_news_active_file ()
 		 * 'x'  junked group
 		 * '='  aliased group
 		 */
-		if (moderated[0] != 'x' && moderated[0] != '=') {
-			/*
-			 * Load group into group hash table
-			 */
-			if (num_active >= max_active) {
-				expand_active ();
-			}
+		if (moderated[0] == 'x' || moderated[0] == '=')
+			continue;
 
-			/*
-			 * Insert group into group_hash[]
-			 * TODO This code is replicated elsewhere - split it out
-			 */
-			h = hash_groupname (buf);
+		/*
+		 * Load group into group hash table
+		 * Error => duplicate group
+		 */
+		if (psGrpAdd(buf) != 0)
+			goto read_news_active_continue;
 
-			if (group_hash[h] == -1) {
-				group_hash[h] = num_active;
-			} else {	/* hash linked list chaining */
-				for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
-					if (STRCMPEQ(active[i].name, buf)) {
-						goto read_news_active_continue;	/* kill dups */
-					}
-				}
-				if (STRCMPEQ(active[i].name, buf))
-					goto read_news_active_continue;
-				active[i].next = num_active;
-			}
-
-			/*
-			 * Load group info.
-			 */
+		/*
+		 * Load group info.
+		 */
 #ifdef WIN32
-			/*
-			 * Paths are in form - x:\a\b\c
-			 */
-			if (strchr(moderated, '\\')) {
+		/*
+		 * Paths are in form - x:\a\b\c
+		 */
+		if (strchr(moderated, '\\')) {
 #else
-			if (moderated[0] == '/') {
+		if (moderated[0] == '/') {
 #endif
-				active[num_active].type = GROUP_TYPE_SAVE;
-				active[num_active].spooldir = my_strdup(moderated);
-			} else {
-				active[num_active].type = GROUP_TYPE_NEWS;
-				active[num_active].spooldir = spooldir;
-			}
-			active[num_active].name = my_strdup (buf);
-			active[num_active].description = (char *) 0;
-			active[num_active].count = count;
-			active[num_active].xmax = max;
-			active[num_active].xmin = min;
-			active[num_active].moderated = moderated[0];
-			active[num_active].next = -1;			/* hash chaining */
-			active[num_active].inrange = FALSE;
-			active[num_active].read_during_session = FALSE;
-			active[num_active].art_was_posted = FALSE;
-			active[num_active].subscribed = UNSUBSCRIBED;	/* not in my_group[] yet */
-			active[num_active].newsrc.xbitmap = (t_bitmap *) 0;
-			active[num_active].attribute = (struct t_attribute *) 0;
-			active[num_active].glob_filter = &glob_filter;
-			active[num_active].grps_filter = (struct t_filters *) 0;
-			vSetDefaultBitmap (&active[num_active]);
-#ifdef INDEX_DAEMON
-			active[num_active].last_updated_time = (time_t) 0;
-#endif
-			if (num_active % 100 == 0 && !update) {
-				spin_cursor ();
-			}
-			num_active++;
+			active[num_active].type = GROUP_TYPE_SAVE;
+			active[num_active].spooldir = my_strdup(moderated);
+		} else {
+			active[num_active].type = GROUP_TYPE_NEWS;
+			active[num_active].spooldir = spooldir;
 		}
+		active[num_active].name = my_strdup (buf);
+		active[num_active].description = (char *) 0;
+		active[num_active].count = count;
+		active[num_active].xmax = max;
+		active[num_active].xmin = min;
+		active[num_active].moderated = moderated[0];
+		active[num_active].next = -1;			/* hash chaining */
+		active[num_active].inrange = FALSE;
+		active[num_active].read_during_session = FALSE;
+		active[num_active].art_was_posted = FALSE;
+		active[num_active].subscribed = UNSUBSCRIBED;	/* not in my_group[] yet */
+		active[num_active].newsrc.xbitmap = (t_bitmap *) 0;
+		active[num_active].attribute = (struct t_attribute *) 0;
+		active[num_active].glob_filter = &glob_filter;
+		active[num_active].grps_filter = (struct t_filters *) 0;
+		vSetDefaultBitmap (&active[num_active]);
+#ifdef INDEX_DAEMON
+		active[num_active].last_updated_time = (time_t) 0;
+#endif
+		if (num_active % 100 == 0 && !update)
+			spin_cursor ();
+
+		num_active++;
 read_news_active_continue:;
 	}
 	fclose (fp);
@@ -398,7 +321,6 @@ read_news_active_continue:;
 /*
  *  create ~/.tin/active if it does not exist (local news only)
  */
-
 void
 backup_active (create)
 	int create;

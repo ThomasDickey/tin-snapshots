@@ -120,6 +120,10 @@ extern char *get_uaf_fullname();
 #	include <stdlib.h>
 #endif
 
+#ifdef HAVE_GETOPT_H
+#	include <getopt.h>
+#endif
+
 /* prefer string.h because it's Posix */
 #ifdef HAVE_STRING_H
 #	include <string.h>
@@ -627,6 +631,8 @@ extern char *get_uaf_fullname();
 #	define	FALSE	0
 #endif
 
+typedef unsigned t_bool;	/* don't make this a char or short! */
+
 #ifndef MAX
 #	define	MAX(a,b)	((a > b) ? a : b)
 #endif
@@ -697,7 +703,8 @@ extern char *get_uaf_fullname();
  * position of the unread/will_return/hot-mark
  * (used in group.c/thread.c)
  */
-#define	MARK_OFFSET	9
+#define	GROUP_MARK_OFFSET		9
+#define	THREAD_MARK_OFFSET		9
 
 #define			SELECT_MISC_COLS	21
 #ifdef USE_INVERSE_HACK
@@ -738,6 +745,12 @@ extern char *get_uaf_fullname();
  * Often used macro to point to the group we are currenty in
  */
 #define	CURR_GROUP	(active[my_group[cur_groupnum]])
+
+/*
+ * Some informational message are only shown if this is true
+ * otherwise suppressed when we're backgrounded or in batch mode
+ */
+#define SHOW_UPDATE	(!update || update_fork)
 
 /*
  *  News/Mail group types
@@ -1152,22 +1165,22 @@ struct t_attribute
 	char *mailing_list;			/* mail list email address */
 	char *x_headers;			/* extra headers for message header */
 	char *x_body;				/* bolierplate text for message body */
-	unsigned int global:1;			/* global/group specific */
-	unsigned int quick_kill_header:3;	/* quick filter kill header */
-	unsigned int quick_kill_expire:1;	/* quick filter kill limited/unlimited time */
-	unsigned int quick_kill_case:1; 	/* quick filter kill case sensitive? */
-	unsigned int quick_select_header:3;	/* quick filter select header */
-	unsigned int quick_select_expire:1;	/* quick filter select limited/unlimited time */
-	unsigned int quick_select_case:1;	/* quick filter select case sensitive? */
-	unsigned int auto_save_msg:1;		/* 0=none, 1=save copy of posted article */
-	unsigned int auto_select:1;		/* 0=show all unread, 1='X' just hot arts */
-	unsigned int auto_save:1;		/* 0=none, 1=save */
-	unsigned int batch_save:1;		/* 0=none, 1=save -S/mail -M  */
-	unsigned int delete_tmp_files:1;	/* 0=leave, 1=delete */
-	unsigned int show_only_unread:1;	/* 0=all, 1=only unread */
-	unsigned int thread_arts:2;		/* 0=unthread, 1=subject, 2=refs */
-	unsigned int show_author:4;		/* 0=none, 1=name, 2=addr, 3=both */
-	unsigned int sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
+	unsigned global:1;			/* global/group specific */
+	unsigned quick_kill_header:3;		/* quick filter kill header */
+	unsigned quick_kill_expire:1;		/* quick filter kill limited/unlimited time */
+	unsigned quick_kill_case:1; 		/* quick filter kill case sensitive? */
+	unsigned quick_select_header:3;		/* quick filter select header */
+	unsigned quick_select_expire:1;		/* quick filter select limited/unlimited time */
+	unsigned quick_select_case:1;		/* quick filter select case sensitive? */
+	unsigned auto_save_msg:1;		/* 0=none, 1=save copy of posted article */
+	unsigned auto_select:1;			/* 0=show all unread, 1='X' just hot arts */
+	unsigned auto_save:1;			/* 0=none, 1=save */
+	unsigned batch_save:1;			/* 0=none, 1=save -S/mail -M  */
+	unsigned delete_tmp_files:1;		/* 0=leave, 1=delete */
+	unsigned show_only_unread:1;		/* 0=all, 1=only unread */
+	unsigned thread_arts:2;			/* 0=unthread, 1=subject, 2=refs */
+	unsigned show_author:4;			/* 0=none, 1=name, 2=addr, 3=both */
+	unsigned sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
 						   3=from descend, 4=from ascend,
 						   5=date descend, 6=date ascend */
 	unsigned int post_proc_type:4;		/* 0=none, 1=shar, 2=uudecode,

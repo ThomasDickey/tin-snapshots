@@ -29,9 +29,8 @@ read_mail_active_file ()
 	long	count = -1L, h;
 	long	min, max;
 
-	if ((update && update_fork) || !update) {
+	if (SHOW_UPDATE)
 		wait_message (txt_reading_mail_active_file);
-	}
 
 	/*
 	 * Open the mail active file
@@ -60,24 +59,8 @@ fflush(stdout);
 		/*
 		 * Load mailgroup into group hash table
 		 */
-		if (num_active >= max_active) {
-			expand_active ();
-		}
-
-		h = hash_groupname (buf);
-
-		if (group_hash[h] == -1) {
-			group_hash[h] = num_active;
-		} else {	/* hash linked list chaining */
-			for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
-				if (STRCMPEQ(active[i].name, buf)) {
-					goto read_mail_active_continue;	/* kill dups */
-				}
-			}
-			if (STRCMPEQ(active[i].name, buf))
-				goto read_mail_active_continue;
-			active[i].next = num_active;
-		}
+		if (psGrpAdd (buf) != 0)
+			goto read_mail_active_continue;
 
 		/*
 		 * Load group info.

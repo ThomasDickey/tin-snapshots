@@ -1,3 +1,25 @@
+--unoff BETA release 970112 --
+
+281) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. some small fixes (mainly for 279/280)
+     FIX. attrib.c, config.c, newsrc.c, open.c, thread.c
+
+280) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. default threading method is now to use the best available
+     ADD. warning if attempt to use -n on local spool
+     BUG. incorrect article count with -n on empty groups
+     ADD. ignore bogus groups in .newsrc when reading -n
+     ADD. references based indentation of thread menu
+     ADD. major internal code clean-up/rewrite for above
+          move all group_hash[] code to list.c
+     FIX. active.c, init.c, list.c, misc.c, open.c, thread.c
+
+279) Thomas E. Dickey <dickey@clark.net>
+     ADD. fixes for getopt & isascii (we shouldn't _use_ the latter).
+     ADD. another round of lint, introducing t_bool type.
+     FIX. several supplied patches
+
 --unoff BETA release 970109 --
 
 278) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
@@ -69,7 +91,7 @@
 
 265) Thomas Quinot <operator@cuivre.fdn.fr>
      ADD. 'K'ill article now cycles throught the list (group.c)
-     ADD. inervers_bg/fg-color
+     ADD. invers_bg/fg-color
      FIX. several supplied patches
 
 --unoff BETA release 961231 --

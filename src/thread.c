@@ -19,6 +19,9 @@
 #define TNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(TNUM2LNUM(INDEX2TNUM(i)))
 
+/* String of spaces to use to show depth of threading */
+#define THREAD_SPACER		"  "
+
 int thread_basenote = 0;
 int show_subject;
 
@@ -31,51 +34,39 @@ static int last_thread_on_screen = 0;
 static int draw_tline P_((int i, int full));
 static int bld_tline P_((int l, struct t_article *art));
 
-
-static int
+/*
+ * Build one line of the thread page display. Looks long winded, but
+ * there are a lot of variables in the format for the output
+ */
+static int		/* TODO why return int ? what can go wrong ? */
 bld_tline (l, art)
 	int l;
 	struct t_article *art;
 {
 #ifndef INDEX_DAEMON
-	char mark;
-	char from[LEN];
-	char new_resps[8];
-	char lines[8];
-	char *spaces;
-	int j;
+	int i, j;
 	int len_from;
-	int len_subj = 0;
-	int off_subj = 0;
-	int off_both = 0;
+	char mark;
+	char *buff;
+#ifdef HAVE_REF_THREADING
+	struct t_msgid *ptr;
+#endif
 
-	if (!draw_arrow_mark) {
-		off_subj = 2;
-		off_both = 5;
-	}
+	j = INDEX2TNUM(l);			/* j is position on screen of this line */
+	buff = screen[j].col;
 
-	if (show_subject) {
-		if (show_author != SHOW_FROM_NONE) {
-			len_from = max_from - 3;
-			len_from += 8 * (1 - show_lines);
-			len_subj = (max_subj+off_subj) - 5;
-			spaces = "  ";
-		} else {
-			len_from = 0;
-			len_subj = (max_from+max_subj+off_subj) - 5;
-			len_subj += 8 * (1 - show_lines);
-			spaces = "";
-		}
-	} else {
-		len_from = (max_subj+max_from+off_both) - 8;
-		len_from += 8 * (1 - show_lines);
-		spaces = "";
-	}
+	/*
+	 * Start with index number of the message and whitespace (2+4+1 chars)
+	 */
+	strcpy(buff, "  ");
+	strcat(buff, tin_itoa(l, 4));
+	strcat(buff, " ");
 
-	j = INDEX2TNUM(l);
-
+	/*
+	 * Add the article flags, tag number, or whatever (3 chars)
+	 */
 	if (art->tagged) {
-		strcpy (new_resps, tin_itoa(art->tagged, 3));
+		strcat (buff, tin_itoa(art->tagged, 3));
 	} else {
 		if (art->inrange) {
 			mark = art_marked_inrange;
@@ -86,32 +77,98 @@ bld_tline (l, art)
 		} else {
 			mark = ART_MARK_READ;
 		}
-		sprintf (new_resps, "  %c", mark);
+
+		strcat(buff, "   "); /* tagged/mark filed is 3 chars wide */
+		*(buff+strlen(buff)-1) = mark; /* go back one char and isert mark */
 	}
 
-	from[0] = '\0';
-	if (!show_subject || show_author != SHOW_FROM_NONE) {
-		get_author (TRUE, art, from);
-	}
+	strcat(buff, "  ");					/* 2 more spaces */
 
-	if (art->lines != -1) {
-		strcpy (lines, tin_itoa(art->lines, 4));
-	} else {
-		strcpy (lines, "   ?");
-	}
-
+	/*
+	 * Add the number of lines if enabled (inside [], 8 chars total)
+	 */
 	if (show_lines) {
-		sprintf (screen[j].col, "  %s %s  [%s]  %-*.*s%s%-*.*s",
-			 tin_itoa(l, 4), new_resps, lines, len_subj, len_subj, art->subject,
-			 spaces, len_from, len_from, from);
-	} else {
-		sprintf (screen[j].col, "  %s %s  %-*.*s%s%-*.*s",
-			 tin_itoa(l, 4), new_resps, len_subj, len_subj, art->subject,
-			 spaces, len_from, len_from, from);
+		strcat (buff, "[");
+
+		if (art->lines != -1)
+			strcat (buff, tin_itoa(art->lines, 4));
+		else
+			strcat (buff, "   ?");
+
+		strcat (buff, "]  ");
 	}
 
+	/*
+	 * There are two formats for the rest of the line:
+	 * 1) subject + optional author info
+	 * 2) mandatory author info (eg, if subject threading)
+	 *
+	 * Add the subject and author information if required
+	 */
+	if (show_subject) {
+		/*
+		 * Work out in advance the length of the author field if needed
+		 * TODO why the -3 ???
+		 * show_lines takes up 8 chars if enabled
+		 */
+		if (show_author != SHOW_FROM_NONE)
+			len_from = (max_from - 3) + 8 * (1 - show_lines);
+		else
+			len_from = 0;
+
+#ifdef HAVE_REF_THREADING
+
+		/*
+		 * Indent the subject according to the current depth of threading
+		 */
+		for (ptr = art->refptr; ptr->parent != NULL; ptr = ptr->parent) {
+			strcat(buff, THREAD_SPACER);
+
+			if (strlen(buff) >= cCOLS)		/* If extremely nested */
+				return(0);
+		}
 #endif
+
+		/*
+		 * copy in the subject, allow space for author or at end
+		 */
+		i = cCOLS - strlen(buff) - len_from - 1;
+		if (i>0) {
+			strncat(buff, art->subject, i);
+			*(buff + strlen(buff)) = '\0';		/* Just in case */
+		}
+
+		/*
+		 * Pad out to start of author, including space
+		 */
+		for (i=strlen(buff); i < (cCOLS - len_from); i++)
+			*(buff + i) = ' ';
+
+		/*
+		 * Now add the author info at the end. This will NULL terminate
+		 */
+		get_author (TRUE, art, buff + cCOLS - len_from, len_from);
+
+	} else {
+		/*
+		 * Add the author info. This is always shown if subject is not
+		 */
+		get_author (TRUE, art, buff+strlen(buff), cCOLS-strlen(buff));
+	}
+
+	if (strip_blanks)					/* No fancy padding needed */
+		return(0);
+
+	/*
+	 * Pad to end of line so that inverse bar looks 'good'
+	 */
+	for (i=strlen(buff); i<cCOLS; i++)
+		*(buff + i) = ' ';
+
+	*(buff + i) = '\0';
+
 	return(0);
+#endif
 }
 
 
@@ -123,7 +180,7 @@ draw_tline (i, full)
 #ifndef INDEX_DAEMON
 	size_t tlen;
 	int j, x;
-	int k = MARK_OFFSET;
+	int k = THREAD_MARK_OFFSET;
 	char *s;
 
 	j = INDEX2TNUM(i);
@@ -138,9 +195,9 @@ draw_tline (i, full)
 			CleartoEOLN ();
 		}
 	} else {
-		tlen  = 3;
-		s = &screen[j].col[7];
-		x = 7;
+		tlen = 3; /* tagged/mark is 3 chars wide */
+		s = &screen[j].col[THREAD_MARK_OFFSET-2];
+		x = THREAD_MARK_OFFSET-2;
 	}
 
 	MoveCursor(INDEX2LNUM(i), x);

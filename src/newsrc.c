@@ -55,9 +55,9 @@ read_newsrc (newsrc_file, allgroups)
 	}
 
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
-		if ((update && update_fork) || !update) {
+		if (SHOW_UPDATE)
 			wait_message (txt_reading_newsrc);
-		}
+
 		while ((line = getaline (fp)) != (char *) 0) {
 			seq = pcParseNewsrcLine (line, grp, &sub);
 /*
@@ -65,10 +65,11 @@ printf("line=[%s] grp=[%s] sub=[%c] seq=[%s]\n", line, grp, sub, seq);
 fflush(stdout);
 */
 			if (sub == SUBSCRIBED) {
-				i = add_my_group (grp, allgroups);
-				if (i >= 0) {
+				if ((i = add_my_group (grp, allgroups)) >= 0) {
 					active[my_group[i]].subscribed = sub;
 					parse_bitmap_seq (&active[my_group[i]], seq);
+				} else {
+/*fprintf(stderr, "Bogus %s in .newsrc, not in active\n", grp);*/
 				}
 			}
 			free (line);
@@ -93,7 +94,7 @@ char *line;
 	struct t_group *psGrp;
 
 	seq = pcParseNewsrcLine (line, grp, &sub);
-	if (grp[0] == 0 || sub == 0) { /* Insurance against blank line */
+	if (grp[0] == 0 || sub == 0) {		/* Insurance against blank line */
 		return;
 	}
 	psGrp = psGrpFind (grp);
@@ -102,6 +103,8 @@ char *line;
 		fprintf (fp, "%s%c ", psGrp->name, psGrp->subscribed);
 		print_bitmap_seq (fp, psGrp);
 	} else {
+/*TODO
+fprintf(stderr, "%s not found in active. Unchanged\n", grp); */
 		fprintf (fp, "%s%c %s\n", grp, sub, seq);
 	}
 }
@@ -422,6 +425,7 @@ grp_mark_read (group, psArt)
 		free ((char *) group->newsrc.xbitmap);
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 	}
+
 	group->newsrc.xbitlen = 0;
 	group->newsrc.xmax = group->xmax;
 	group->newsrc.xmin = group->xmax+1;
@@ -440,6 +444,7 @@ grp_mark_unread (group)
 	debug_print_comment ("Z command");
 #endif
 
+/* TODO - this is bogus - test return code */
 	vGrpGetArtInfo (
 		group->spooldir,
 		group->name,
@@ -1098,18 +1103,17 @@ expand_bitmap (group, min)
 	long first;
 	long new;
 
-
-/* check if the newsserver database is broken */
-
 /*
-	assert(group->xmax>=group->newsrc.xmax);
+** that shouldn' happen - looks like the newsservers database is broken
 */
-
 if (group->newsrc.xmax > group->xmax) {
 #ifdef DEBUG
 	fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);	
 	sleep(4);
 #endif
+/*
+** (silently) fix it - we trust our newsrc
+*/
 	group->xmax = group->newsrc.xmax;
 } 
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
