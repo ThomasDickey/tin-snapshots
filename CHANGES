@@ -1,3 +1,19 @@
+--unoff BETA release 970217 --
+
+319) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. check_upgrade failes on binaries whose name isn't "tin"
+     FIX. config.c, lang.c, version.h
+
+318) Tan Kwee Chuan <tankweec@iscs.nus.sg>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. If the realname part of the From:-line is missing, in crashes
+          on a froged-cancel.
+     FIX. post.c
+
+317) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. improved postpone_article (add -o, 'A','Y')
+     FIX. several supplied patches
+
 --unoff BETA release 970214 --
 
 316 ) T.E.Dicky  <dickey@clark.net>

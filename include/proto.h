@@ -340,9 +340,9 @@ extern int repost_article (char *group, struct t_article *art, int respnum, int 
 extern int reread_active_after_posting (void);
 extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile, int lines);
-extern void quick_post_article (void);
+extern void quick_post_article (int postponed_only);
 extern int count_postponed_articles (void);
-extern int pickup_postponed_articles (int ask);
+extern int pickup_postponed_articles (int ask, int all);
 
 /* prompt.c */
 extern int prompt_num (int ch, const char *prompt);

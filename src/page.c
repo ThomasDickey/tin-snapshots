@@ -683,7 +683,7 @@ return_to_index:
 				break;
 
 			case iKeyPagePostponed:	/* post postponed article */
-				if (pickup_postponed_articles (FALSE)) {
+				if (pickup_postponed_articles (FALSE, FALSE)) {
 					redraw_page (group->name, respnum);
 				}
 				break;

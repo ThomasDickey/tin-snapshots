@@ -34,12 +34,12 @@ enum state { IGNORE, CHECK, UPGRADE };
  */
 static int
 check_upgrade(
-	char *buf )
+	char *buf)
 {
-	if (strncmp(buf, "# tin 1.3 unoff", 15) == 0)
+	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
 		return(IGNORE);
 	else {
-		fprintf(stderr, "\n\nYou are upgrading to tin 1.3 unoff from an earlier version.\n");
+		fprintf(stderr, "\n\nYou are upgrading to tin %s from an earlier version.\n", VERSION);
 		fprintf(stderr, "Some values in your configuration file have changed\n");
 		fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
 		fprintf(stderr, txt_cmdline_hit_any_key);
@@ -59,7 +59,7 @@ read_config_file (
 {
 	char	newnews_info[PATH_LEN];
 	char	buf[LEN];
-	int		upgrade = CHECK;
+	int	upgrade = CHECK;
 	FILE	*fp;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
@@ -619,8 +619,7 @@ write_config_file (
 	if (!default_editor_format[0]) {
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
 	}
-	fprintf (fp, "# %s %s %s configuration file\n#\n", progname, VERSION, RELEASEDATE);
-	fprintf (fp, txt_tinrc_header);
+	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE);
 
 	fprintf (fp, txt_tinrc_default_savedir);
 	fprintf (fp, "default_savedir=%s\n\n", default_savedir);
