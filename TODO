@@ -361,9 +361,6 @@ o  mailers other than sendmail (f.e. elm) and use_mailreader_i=OFF may lead
 o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
    ignores start_line_offset
 
-o  marking latest article with 'K' does not jump to top of newsgroup if
-   there are still articles to read (group.c:740)
-
 o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
    when the user is actually in an editor spawned by tin.
 

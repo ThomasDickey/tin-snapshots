@@ -67,12 +67,12 @@ isalp (c)
 		return (1);
 	}
 	switch (c) {
-		case '.':
+/*		case '.': */
 		case ':':
 		case '!':
 		case '\"':		/* for emacs: " */
 		case '\'':
-		case ',':
+/*		case ',': */
 		case '(':
 		case ')':
 		case '{':
@@ -81,11 +81,11 @@ isalp (c)
 		case ']':
 		case '=':
 		case '<':
-		case '>':
+/*		case '>': */
 		case '$':
 		case '%':
 		case '&':
-		case '/':
+/*		case '/': */
 		case '?':
 #ifdef NOLOCALE
 		/* if you have not installed locale and want to reed german umlauts: */
@@ -117,7 +117,7 @@ check_valid_mark (s, c)
 {
 	const char *p;
 
-	for (p=s+1; p < (s+strlen(s)); p++) {
+	for (p=s+2; p < (s+strlen(s)); p++) {
 		if (!isalp(*p) && *(p + 1) == c) {
 			return (0);
 		} else {

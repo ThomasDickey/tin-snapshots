@@ -742,20 +742,12 @@ group_catchup:
 					error_message ("Internal error: K which_thread < 0", "");
 					break;
 				}
-				if (/* n < first_subj_on_screen || */ n >= last_subj_on_screen) {
-				/*  ^^                             ^^
-				 * remove comments if you like that shift-k
-				 * warps back to the top of the group when
-				 * no more unread articles are below the
-				 * current one.
-				 * WARNING - this will only work if there are
-				 * more than 1 screen full of articles!
-				 */
+				if (n < first_subj_on_screen || n >= last_subj_on_screen) {
 					if (_hp_glitch)
 						erase_subject_arrow ();
 					index_point = n;
 					show_group_page ();
-				} else if (n > index_point) {
+				} else {
 					erase_subject_arrow ();
 					index_point = n;
 					draw_subject_arrow ();

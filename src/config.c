@@ -117,7 +117,10 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "col_back=", &col_back, MAX_COLOR)) {
 				break;
 			}
-			if (match_integer (buf, "col_invers=", &col_invers, MAX_COLOR)) {
+			if (match_integer (buf, "col_invers_bg=", &col_invers_bg, MAX_COLOR)) {
+				break;
+			}
+			if (match_integer (buf, "col_invers_fg=", &col_invers_fg, MAX_COLOR)) {
 				break;
 			}
 			if (match_integer (buf, "col_text=", &col_text, MAX_COLOR)) {
@@ -812,8 +815,11 @@ write_config_file (file)
 	fprintf (fp, "# Standard-Background-Color\n");
 	fprintf (fp, "col_back=%d\n\n", col_back);
 
-	fprintf (fp, "# Color for inverse text\n");
-	fprintf (fp, "col_invers=%d\n\n", col_invers);
+	fprintf (fp, "# Color of background for inverse text\n");
+	fprintf (fp, "col_invers_bg=%d\n\n", col_invers_bg);
+
+	fprintf (fp, "# Color of foreground for inverse text\n");
+	fprintf (fp, "col_invers_fg=%d\n\n", col_invers_fg);
 
 	fprintf (fp, "# Color of textlines\n");
 	fprintf (fp, "col_text=%d\n\n", col_text);
