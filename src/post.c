@@ -771,8 +771,10 @@ quick_post_article ()
 				goto post_article_done;
 			} else {
 				rename_file (article, dead_article);
+#ifdef M_UNIX
 				if (keep_dead_articles)	
 					append_file (dead_articles, dead_article);
+#endif
 				Raw (FALSE);
 				error_message (txt_art_rejected, dead_article);
 				ReadCh();
@@ -993,8 +995,10 @@ post_article (group, posted)
 				goto post_article_done;
 			} else {
 				rename_file (article, dead_article);
+#ifdef M_UNIX
 				if (keep_dead_articles)
 					append_file (dead_articles, dead_article);
+#endif
 				sprintf (buf, txt_art_rejected, dead_article);
 				info_message (buf);
 				ReadCh();
@@ -1313,8 +1317,10 @@ ignore_followup_to_poster:
 				goto post_response_done;
 			} else {
 				rename_file (article, dead_article);
+#ifdef M_UNIX
 				if (keep_dead_articles)
 					append_file (dead_articles, dead_article);
+#endif
 				sprintf (buf, txt_art_rejected, dead_article);
 				info_message (buf);
 				ReadCh();
@@ -1404,6 +1410,13 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	} else {
 		sprintf (subject, "(fwd) %s\n", note_h_subj);
 		msg_add_header ("Subject", subject);
+	}
+
+	if (auto_cc) {
+		msg_add_header ("Cc", userid);
+	}
+	if (auto_bcc) {
+		msg_add_header ("Bcc", userid);
 	}
 	
 	if (*note_h_followup) {
@@ -1546,6 +1559,13 @@ mail_bug_report ()
 
 	sprintf (subject, "BUG REPORT %s\n", page_header);
 	msg_add_header ("Subject", subject);
+
+	if (auto_cc) {
+		msg_add_header ("Cc", userid);
+	}
+	if (auto_bcc) {
+		msg_add_header ("Bcc", userid);
+	}
 
 	if (*default_organization) {
 		msg_add_header ("Organization", default_organization);
@@ -1729,6 +1749,9 @@ mail_to_author (group, respnum, copy_text)
 	if (auto_cc) {
 		msg_add_header ("Cc", userid);
 	}
+	if (auto_bcc) {
+		msg_add_header ("Bcc", userid);
+	}
 	msg_add_header ("Newsgroups", note_h_newsgroups);
 	if (*default_organization) {
 		msg_add_header ("Organization", default_organization);
@@ -1866,6 +1889,11 @@ pcCopyArtHeader (iHeader, pcArt, result)
 			case HEADER_TO:
 				if (STRNCMPEQ(buf, "To: ", 4) || STRNCMPEQ(buf, "Cc: ", 4)) {
 					my_strncpy (buf2, &buf[4], sizeof (buf2));
+					yank_to_addr (buf2, header);
+					was_to = TRUE;
+					found = TRUE;
+				} else if (STRNCMPEQ(buf, "Bcc: ", 5)) {
+					my_strncpy (buf2, &buf[5], sizeof (buf2));
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
 					found = TRUE;
@@ -2214,8 +2242,10 @@ repost_article (group, art, respnum)
 				goto repost_done;
 			} else {
 				rename_file (article, dead_article);
+#ifdef M_UNIX
 				if (keep_dead_articles)
 					append_file (dead_articles, dead_article);
+#endif
 				sprintf (buf, txt_art_rejected, dead_article);
 				info_message (buf);
 				sleep (3);
@@ -2656,6 +2686,9 @@ make_path_header (line, from_name)
 			 */
 			sprintf (line, "%s!%s", host_name, user_name);
 		}
+	} else {
+		sprintf (line, "%s!%s", host_name, user_name);
+/*		} */
 	}
 #else
 	sprintf (line, "%s!%s", host_name, user_name);

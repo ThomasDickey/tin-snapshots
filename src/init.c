@@ -68,6 +68,7 @@ char newsrc[PATH_LEN];
 char newnewsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
+char post_proc_command[PATH_LEN];	/* Post processing command */
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char progname[PATH_LEN];		/* program name */
@@ -165,12 +166,10 @@ int col_response;			/* color of respone counter */
 int col_from;				/* color of sender (From:) */
 int col_normal;				/* standard foreground color */
 int col_title;				/* color of Help/Mail-Sign */
-int col_highlight1;			/* first kind of word-highlighting */
-int col_highlight2;			/* second kind of word-highlighting */
-int col_highlight3;			/* third kind of word-highlighting */
 #endif
 int use_mouse;				/* enables/disables mouse support under xterm */
 int auto_cc;				/* add your name to cc automatically */
+int auto_bcc;				/* add your name to bcc automatically */
 int global_filtered_articles;		/* globally killed / auto-selected articles */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
@@ -333,6 +332,7 @@ void init_selfinfo ()
 	art_marked_selected = ART_MARK_SELECTED;
 	art_marked_unread = ART_MARK_UNREAD;
 	auto_cc = FALSE;
+	auto_bcc = FALSE;
 	auto_list_thread = TRUE;
 	beginner_level = TRUE;
 	catchup_read_groups = FALSE;
@@ -365,7 +365,7 @@ void init_selfinfo ()
 	default_show_author = SHOW_FROM_NAME;
 	default_show_only_unread = TRUE;
 	default_sort_art_type = SORT_BY_DATE_ASCEND;
-	default_thread_arts = TRUE;
+	default_thread_arts = THREAD_SUBJ;
 	delete_index_file = FALSE;
 	force_screen_redraw = FALSE;
 	full_page_scroll = TRUE;
@@ -442,9 +442,6 @@ void init_selfinfo ()
 	col_from = 2;
 	col_normal = 7;
 	col_title = 4;
-	col_highlight1 = 5;
-	col_highlight2 = 1;
-	col_highlight3 = 3;
 #endif
 	index_maildir[0] = '\0';
 	index_newsdir[0] = '\0';
@@ -482,6 +479,7 @@ void init_selfinfo ()
 	default_select_pattern[0] = '\0';
 	default_shell_command[0] = '\0';
 	default_subject_search[0] = '\0';
+	post_proc_command[0] = '\0';
 	proc_ch_default = 'n';
 
 	/* 

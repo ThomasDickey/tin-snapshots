@@ -6,6 +6,7 @@ CC	= gcc
 
 COPTS	= -c \
 	-O2 \
+	-Wall \
 	-m486 \
 	-I$(INCDIR) \
 	-DNNTP_ONLY \
@@ -13,9 +14,9 @@ COPTS	= -c \
 	-DDONT_LOG_USER \
 	-DHAVE_ISPELL \
 	-DUSE_ISO2ASC=\"2\" \
-	-DNO_ETIQUETTE
+	-DNO_ETIQUETTE \
+	-DHAVE_COLOR
 
-#	-DHAVE_COLOR
 #	-DHAVE_PGP
 #	-DMIME_BREAK_LONG_LINES
 #	-DFORGERY
@@ -101,7 +102,7 @@ HFILES	= \
 	$(INCDIR)/rfc1521.h \
 	$(INCDIR)/rfc1522.h \
 	$(INCDIR)/stpwatch.h \
-	$(INCDIR)/tin.h \
+	$(INCDIR)/tin.h
 #	$(INCDIR)/amiga.h
 #	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/gst.h

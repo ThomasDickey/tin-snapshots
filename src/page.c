@@ -782,12 +782,10 @@ show_note_page (group, respnum)
 	}
 	
 #ifdef HAVE_METAMAIL
-	if (note_page == 0 && *note_h_mimeversion &&
-		*note_h_contenttype && *note_h_contentenc &&
-		(!STRNCMPEQ("text/plain", note_h_contenttype, 10) 
-		/* || !STRCMPEQ("bit", note_h_contentenc + 1) */ )) {
+	if (note_page == 0 && *note_h_mimeversion && *note_h_contenttype &&
+		(!STRNCMPEQ("text/plain", note_h_contenttype, 10))) {
 		if (use_metamail && (!ask_for_metamail ||
-				prompt_yn (cLINES, txt_use_mime, TRUE) == 1)) {
+			prompt_yn (cLINES, txt_use_mime, TRUE) == 1)) {
 			show_mime_article (note_fp, &arts[respnum]);
 			return;
 		}
@@ -1483,7 +1481,17 @@ int size;
 	*target=0;
 }
 
-
+/*
+ * buf:  Article header
+ * pat:  Text to match in header
+ * body: Return buffer
+ * len:  sizeof(body)
+ *
+ * Returns:
+ *	FALSE	Header was not matched.
+ *	TRUE	Header was matched. body contains NULL terminated content
+ * 			portion of buf (ie with pat: and leading space removed)
+ */
 int 
 match_header (buf, pat, body, len)
 	char *buf;

@@ -82,6 +82,9 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "auto_cc=", &auto_cc)) {
 				break;
 			}
+			if (match_boolean (buf, "auto_bcc=", &auto_bcc)) {
+				break;
+			}
 			if (match_boolean (buf, "auto_list_thread=", &auto_list_thread)) {
 				break;
 			}
@@ -136,15 +139,6 @@ read_config_file (file, global_file)
 				break;
 			}
 			if (match_integer (buf, "col_title=", &col_title)) {
-				break;
-			}
-			if (match_integer (buf, "col_highlight1=", &col_highlight1)) {
-				break;
-			}
-			if (match_integer (buf, "col_highlight2=", &col_highlight2)) {
-				break;
-			}
-			if (match_integer (buf, "col_highlight3=", &col_highlight3)) {
 				break;
 			}
 #endif
@@ -334,7 +328,13 @@ read_config_file (file, global_file)
 				break;
 			}	
 			if (match_integer (buf, "post_process_type=", &default_post_proc_type)) {
+				if (default_post_proc_type < POST_PROC_NONE || default_post_proc_type > POST_PROC_UUD_EXT_ZIP)
+					default_post_proc_type = 0;
+
 				proc_ch_default = get_post_proc_type (default_post_proc_type);
+				break;
+			}
+			if (match_string (buf, "post_process_command=", post_proc_command, sizeof(post_proc_command))) {
 				break;
 			}	
 			if (match_boolean (buf, "process_only_unread=", &process_only_unread)) {
@@ -458,9 +458,20 @@ write_config_file (file)
 	char	*file;
 {
 	FILE *fp;
+	char *file_tmp;
 	int i;
 	
-	if ((fp = fopen (file, "w")) == (FILE *) 0) {
+	/* alloc memory for tmp-filename */
+	if((file_tmp=malloc(strlen(file)+5)) == NULL) {
+		wait_message ("Out of memory!");
+		return;
+	}	
+	/* generate tmp-filename */
+	strcpy(file_tmp,file);	
+	strcat(file_tmp,".tmp");
+	
+	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
+		wait_message (txt_filesystem_full_config_backup);
 		return;
 	}	
 	
@@ -498,8 +509,11 @@ write_config_file (file)
 	fprintf (fp, "# if ON using ansi-color\n");
 	fprintf (fp, "use_color=%s\n\n", (use_color_tinrc ? "ON" : "OFF"));
 	fprintf (fp, "# For coloradjust use the following numbers\n");
-	fprintf (fp, "# 0-black   1-red     2-green      3-brown\n");
-	fprintf (fp, "# 4-blue    5-pink    6-turquoise  7-white\n\n");
+	fprintf (fp, "# 0-black        1-red         2-green        3-brown\n");
+	fprintf (fp, "# 4-blue         5-pink        6-cyan         7-white\n");
+	fprintf (fp, "# These are *only* for foreground:\n");
+	fprintf (fp, "#  8-gray        9-lightred   10-lightgreen  11-yellow\n");
+	fprintf (fp, "# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n");
 	fprintf (fp, "#Standard-Background-Color\n");
 	fprintf (fp, "col_back=%d\n\n", col_back);
 	fprintf (fp, "#Color for inverse text\n");
@@ -522,12 +536,6 @@ write_config_file (file)
 	fprintf (fp, "col_normal=%d\n\n", col_normal);
 	fprintf (fp, "#Color of Help/Mail-Sign\n");
 	fprintf (fp, "col_title=%d\n\n", col_title);
-	fprintf (fp, "#First kind of word-high-lightning\n");
-	fprintf (fp, "col_highlight1=%d\n\n", col_highlight1);
-	fprintf (fp, "#Second kind of word-high-lightning\n");
-	fprintf (fp, "col_highlight2=%d\n\n", col_highlight2);
-	fprintf (fp, "#Third kind of word-high-lightning\n");
-	fprintf (fp, "col_highlight3=%d\n\n", col_highlight3);
 #endif
 	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
 	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));
@@ -564,6 +572,8 @@ write_config_file (file)
 	fprintf (fp, "# 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip)\n");
 #endif
 	fprintf (fp, "post_process_type=%d\n\n", default_post_proc_type);
+	fprintf (fp, "# if set, command to be run after a successful uudecode\n");
+	fprintf (fp, "post_process_command=%s\n\n", post_proc_command);
 	fprintf (fp, "# if ON all group will be threaded as default.\n");
 	fprintf (fp, "thread_articles=%s\n\n", print_boolean (default_thread_arts));
 	fprintf (fp, "# if ON remove ~/.article after posting.\n");
@@ -624,6 +634,8 @@ write_config_file (file)
 	fprintf (fp, "xpost_quote_format=%s\n\n", xpost_quote_format);
 	fprintf (fp, "# if ON automatically put your name in the Cc: field when mailing an article\n");
 	fprintf (fp, "auto_cc=%s\n\n", print_boolean (auto_cc));
+	fprintf (fp, "# if ON automatically put your name in the Bcc: field when mailing an article\n");
+	fprintf (fp, "auto_bcc=%s\n\n", print_boolean (auto_bcc));
 	fprintf (fp, "# if ON catchup group/thread when leaving with the left arrow key.\n");
 	fprintf (fp, "group_catchup_on_exit=%s\n", print_boolean (group_catchup_on_exit));
 	fprintf (fp, "thread_catchup_on_exit=%s\n\n", print_boolean (thread_catchup_on_exit));
@@ -693,8 +705,13 @@ write_config_file (file)
 			fprintf (fp, "newnews=%s %ld\n", newnews[i].host, newnews[i].time);
 		}
 	}
-	fclose (fp);
-	chmod (file, 0600);
+	if (ferror (fp) | fclose (fp)){
+		wait_message (txt_filesystem_full_config);
+		return;
+	} else {
+		rename_file(file_tmp, file);
+		chmod (file, 0600);
+	}
 }
 
 /*
@@ -706,14 +723,12 @@ change_config_file (group, filter_at_once)
 	struct t_group *group;
 	int filter_at_once;
 {
-	char *str = (char *) 0;
 	int ch, i;
 	int filter_changed = FALSE;
 	int orig_show_only_unread;
 	int orig_thread_arts;
 	int option;
 	int ret_code = NO_FILTERING;
-	int var_orig;
 	
 #ifdef SIGTSTP
 	RETSIGTYPE (*susp)(SIG_ARGS);
@@ -837,8 +852,19 @@ change_config_file (group, filter_at_once)
 
 			case 10:	/* thread/unthread all groups except those in ~/.tin/unthreaded */
 				orig_thread_arts = default_thread_arts;	
-				prompt_on_off (INDEX_TOP+6, COL1, &default_thread_arts, 
-					txt_help_thread_arts, txt_opt_thread_arts);
+
+				default_thread_arts = prompt_list (INDEX_TOP+6, COL1,
+							default_thread_arts,
+							txt_help_thread_arts,
+							txt_opt_thread_arts,
+							txt_thread,
+#ifdef REF_THREADING
+							THREAD_REFS + 1
+#else
+							THREAD_REFS
+#endif
+							);
+
 				if (default_thread_arts != orig_thread_arts && 
 				    group != (struct t_group *) 0) {
 					make_threads (group, TRUE);
@@ -884,55 +910,15 @@ change_config_file (group, filter_at_once)
 				break;
 
 			case 13:		/* show subject & author / subject only */
-				var_orig = default_show_author;
-				show_menu_help (txt_help_show_author);
-				do {
-					MoveCursor (INDEX_TOP+8, COL1 + (int) strlen (txt_opt_show_author));
-					if ((ch	= ReadCh()) == ' ') {
-						if (default_show_author + 1 > SHOW_FROM_BOTH) {
-							default_show_author = SHOW_FROM_NONE;
-						} else {
-							default_show_author++;
-						}
-						switch (default_show_author) {
-							case SHOW_FROM_NONE:
-								str = txt_show_from_none;
-								break;
-							case SHOW_FROM_ADDR:
-								str = txt_show_from_addr;
-								break;
-							case SHOW_FROM_NAME:
-								str = txt_show_from_name;
-								break;
-							case SHOW_FROM_BOTH:
-								str = txt_show_from_both;
-								break;
-						}
-						my_fputs (str, stdout);
-						fflush (stdout);
-					}
-				} while (ch != CR && ch != ESC);
-
-				if (ch == ESC) {	/* restore original value */
-					default_show_author = var_orig;
-					switch (default_show_author) {
-						case SHOW_FROM_NONE:
-							str = txt_show_from_none;
-							break;
-						case SHOW_FROM_ADDR:
-							str = txt_show_from_addr;
-							break;
-						case SHOW_FROM_NAME:
-							str = txt_show_from_name;
-							break;
-						case SHOW_FROM_BOTH:
-							str = txt_show_from_both;
-							break;
-					}
-					my_fputs (str, stdout);
-					fflush (stdout);
-				}
+				default_show_author = prompt_list (INDEX_TOP+8, COL1,
+							default_show_author,
+							txt_help_show_author,
+							txt_opt_show_author,
+							txt_show_from,
+							SHOW_FROM_BOTH + 1
+							);
 #if 0
+				/* If not changed ... */
 				 else {
 					set_subj_from_size (cCOLS);
 				}
@@ -940,153 +926,24 @@ change_config_file (group, filter_at_once)
 				break;
 
 			case 14:
-				var_orig = default_post_proc_type;
-				show_menu_help (txt_help_post_proc_type);
-				do {
-					MoveCursor (INDEX_TOP+8, COL2 + (int) strlen (txt_opt_process_type));
-					if ((ch	= ReadCh()) == ' ') {
-						if (default_post_proc_type + 1 > POST_PROC_UUD_EXT_ZIP) {
-							default_post_proc_type = POST_PROC_NONE;
-						} else {
-							default_post_proc_type++;
-						}
-						proc_ch_default = get_post_proc_type (default_post_proc_type);
-						switch (default_post_proc_type) {
-							case POST_PROC_NONE:
-								str = txt_post_process_none;
-								break;
-							case POST_PROC_SHAR:
-								str = txt_post_process_sh;
-								break;
-							case POST_PROC_UUDECODE:
-								str = txt_post_process_uudecode;
-								break;
-							case POST_PROC_UUD_LST_ZOO:
-								str = txt_post_process_uud_lst_zoo;
-								break;
-							case POST_PROC_UUD_EXT_ZOO:
-								str = txt_post_process_uud_ext_zoo;
-								break;
-							case POST_PROC_UUD_LST_ZIP:
-								str = txt_post_process_uud_lst_zip;
-								break;
-							case POST_PROC_UUD_EXT_ZIP:
-								str = txt_post_process_uud_ext_zip;
-								break;
-						}
-						CleartoEOLN (); 
-						my_fputs (str, stdout);
-						fflush (stdout);
-					}
-				} while (ch != CR && ch != ESC);
-
-				if (ch == ESC) {	/* restore original value */
-					default_post_proc_type = var_orig;
-					switch (default_post_proc_type) {
-						case POST_PROC_NONE:
-							str = txt_post_process_none;
-							proc_ch_default = 'n';
-							break;
-						case POST_PROC_SHAR:
-							str = txt_post_process_sh;
-							proc_ch_default = 's';
-							break;
-						case POST_PROC_UUDECODE:
-							str = txt_post_process_uudecode;
-							proc_ch_default = 'u';
-							break;
-						case POST_PROC_UUD_LST_ZOO:
-							str = txt_post_process_uud_lst_zoo;
-							proc_ch_default = '1';
-							break;
-						case POST_PROC_UUD_EXT_ZOO:
-							str = txt_post_process_uud_ext_zoo;
-							proc_ch_default = '2';
-							break;
-						case POST_PROC_UUD_LST_ZIP:
-							str = txt_post_process_uud_lst_zip;
-							proc_ch_default = '3';
-							break;
-						case POST_PROC_UUD_EXT_ZIP:
-							str = txt_post_process_uud_ext_zip;
-							proc_ch_default = '4';
-							break;
-					}
-					CleartoEOLN (); 
-					my_fputs (str, stdout);
-					fflush (stdout);
-				}
+				default_post_proc_type = prompt_list (INDEX_TOP+8, COL2,
+							default_post_proc_type,
+							txt_help_post_proc_type,
+							txt_opt_process_type,
+							txt_post_process,
+							POST_PROC_UUD_EXT_ZIP + 1
+							);
+				proc_ch_default = get_post_proc_type (default_post_proc_type);
 				break;
 
 			case 15:
-				var_orig = default_sort_art_type;
-				show_menu_help (txt_help_sort_type);
-				do {
-					MoveCursor (INDEX_TOP+10, COL1 + (int) strlen (txt_opt_sort_type));
-					if ((ch	= ReadCh()) == ' ') {
-						if (default_sort_art_type + 1 > SORT_BY_DATE_ASCEND) {
-							default_sort_art_type = SORT_BY_NOTHING;
-						} else {
-							default_sort_art_type++;
-						}
-						switch (default_sort_art_type) {
-							case SORT_BY_NOTHING:
-								str = txt_sort_by_nothing;
-								break;
-							case SORT_BY_SUBJ_DESCEND:
-								str = txt_sort_by_subj_descend;
-								break;
-							case SORT_BY_SUBJ_ASCEND:
-								str = txt_sort_by_subj_ascend;
-								break;
-							case SORT_BY_FROM_DESCEND:
-								str = txt_sort_by_from_descend;
-								break;
-							case SORT_BY_FROM_ASCEND:
-								str = txt_sort_by_from_ascend;
-								break;
-							case SORT_BY_DATE_DESCEND:
-								str = txt_sort_by_date_descend;
-								break;
-							case SORT_BY_DATE_ASCEND:
-								str = txt_sort_by_date_ascend;
-								break;
-						}
-						CleartoEOLN (); 
-						my_fputs (str, stdout);
-						fflush (stdout);
-					}
-				} while (ch != CR && ch != ESC);
-
-				if (ch == ESC) {	/* restore original value */
-					default_sort_art_type = var_orig;
-					switch (default_sort_art_type) {
-						case SORT_BY_NOTHING:
-							str = txt_sort_by_nothing;
-							break;
-						case SORT_BY_SUBJ_DESCEND:
-							str = txt_sort_by_subj_descend;
-							break;
-						case SORT_BY_SUBJ_ASCEND:
-							str = txt_sort_by_subj_ascend;
-							break;
-						case SORT_BY_FROM_DESCEND:
-							str = txt_sort_by_from_descend;
-							break;
-						case SORT_BY_FROM_ASCEND:
-							str = txt_sort_by_from_ascend;
-							break;
-						case SORT_BY_DATE_DESCEND:
-							str = txt_sort_by_date_descend;
-							break;
-						case SORT_BY_DATE_ASCEND:
-							str = txt_sort_by_date_ascend;
-							break;
-					}
-					CleartoEOLN (); 
-					my_fputs (str, stdout);
-					fflush (stdout);
-				}
+				default_sort_art_type = prompt_list (INDEX_TOP+10, COL1,
+							default_sort_art_type,
+							txt_help_sort_type,
+							txt_opt_sort_type,
+							txt_sort_type,
+							SORT_BY_DATE_ASCEND + 1
+							);
 				break;
 
 			case 16:
@@ -1130,8 +987,6 @@ change_config_file (group, filter_at_once)
 void 
 show_config_menu ()
 {
-	char *str = (char *) 0;
-
 	ClearScreen ();
 
 	center_line (0, TRUE, txt_options_menu);
@@ -1140,7 +995,7 @@ show_config_menu ()
 	printf ("%s%s\r\n\r\n", txt_opt_autosave, print_boolean (default_auto_save));
 	printf ("%s%s\r\n\r\n", txt_opt_confirm_action, print_boolean (confirm_action));
 	printf ("%s%s\r\n\r\n", txt_opt_pos_first_unread, print_boolean (pos_first_unread));
-	printf ("%s%s", txt_opt_thread_arts, print_boolean (default_thread_arts));
+	printf ("%s%s", txt_opt_thread_arts, txt_thread[default_thread_arts]);
 
 	MoveCursor(INDEX_TOP, COL2);
 	printf ("%s%s", txt_opt_start_editor_offset, print_boolean (start_editor_offset));
@@ -1161,73 +1016,12 @@ show_config_menu ()
 	printf ("%s%s", txt_opt_show_description, print_boolean (show_description));
 
 	MoveCursor(INDEX_TOP+8, COL1);
-	switch (default_show_author) {
-		case SHOW_FROM_NONE:
-			str = txt_show_from_none;
-			break;
-		case SHOW_FROM_ADDR:
-			str = txt_show_from_addr;
-			break;
-		case SHOW_FROM_NAME:
-			str = txt_show_from_name;
-			break;
-		case SHOW_FROM_BOTH:
-			str = txt_show_from_both;
-			break;
-	}
-	printf ("%s%s", txt_opt_show_author, str);
+	printf ("%s%s", txt_opt_show_author, txt_show_from[default_show_author]);
 	MoveCursor(INDEX_TOP+8, COL2);
-	switch (default_post_proc_type) {
-		case POST_PROC_NONE:
-			str = txt_post_process_none;
-			break;
-		case POST_PROC_SHAR:
-			str = txt_post_process_sh;
-			break;
-		case POST_PROC_UUDECODE:
-			str = txt_post_process_uudecode;
-			break;
-		case POST_PROC_UUD_LST_ZOO:
-			str = txt_post_process_uud_lst_zoo;
-			break;
-		case POST_PROC_UUD_EXT_ZOO:
-			str = txt_post_process_uud_ext_zoo;
-			break;
-		case POST_PROC_UUD_LST_ZIP:
-			str = txt_post_process_uud_lst_zip;
-			break;
-		case POST_PROC_UUD_EXT_ZIP:
-			str = txt_post_process_uud_ext_zip;
-			break;
-	}
-
-	printf ("%s%s\r\n\r\n", txt_opt_process_type, str);
+	printf ("%s%s\r\n\r\n", txt_opt_process_type, txt_post_process[default_post_proc_type]);
 	
 	MoveCursor(INDEX_TOP+10, COL1);
-	switch (default_sort_art_type) {
-		case SORT_BY_NOTHING:
-			str = txt_sort_by_nothing;
-			break;
-		case SORT_BY_SUBJ_DESCEND:
-			str = txt_sort_by_subj_descend;
-			break;
-		case SORT_BY_SUBJ_ASCEND:
-			str = txt_sort_by_subj_ascend;
-			break;
-		case SORT_BY_FROM_DESCEND:
-			str = txt_sort_by_from_descend;
-			break;
-		case SORT_BY_FROM_ASCEND:
-			str = txt_sort_by_from_ascend;
-			break;
-		case SORT_BY_DATE_DESCEND:
-			str = txt_sort_by_date_descend;
-			break;
-		case SORT_BY_DATE_ASCEND:
-			str = txt_sort_by_date_ascend;
-			break;
-	}
-	printf ("%s%s\r\n\r\n", txt_opt_sort_type, str);
+	printf ("%s%s\r\n\r\n", txt_opt_sort_type, txt_sort_type[default_sort_art_type]);
 
 #ifdef M_AMIGA
 	{	extern int tin_bbs_mode;
@@ -1360,10 +1154,7 @@ char *
 print_boolean (value)
 	int value;
 {
-	static char *on = "ON";
-	static char *off = "OFF";
-
-	return (value ? on : off);
+	return (value ? txt_onoff[TRUE] : txt_onoff[FALSE]);
 }
 
 /*

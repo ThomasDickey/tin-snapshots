@@ -107,6 +107,8 @@ constext txt_extracting_shar[] ="\r\nExtracting %s...\r\n";
 constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %s. Exiting...";
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
 constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
+constext txt_filesystem_full_config[] = "Error writing tinrc file. Filesystem full?. Resetting to previous state.";
+constext txt_filesystem_full_config_backup[] = "Error creating tinrc backup. Filesystem full?.";
 constext txt_filesystem_full[] = "Error writing newsrc file. Filesystem full?. Resetting to previous state.";
 constext txt_filesystem_full_backup[] = "Error making backup of newsrc file. Filesystem full?.";
 #ifdef NO_REGEX
@@ -385,25 +387,65 @@ constext txt_pipe_to_command[] = "Pipe to command [%.*s]> ";
 constext txt_piping[] = "Piping...";
 constext txt_piping_not_enabled[] = "Piping not enabled. Recompile without -DNO_PIPING.";
 constext txt_plural[] = "s";
+
+/*
+ * OFF ~ FALSE, ON ~ TRUE
+ */
+constext *txt_onoff[] = { "OFF", "ON" };
+
+/*
+ * NB: All the following arrays must match corresponding ordering in tin.h
+ * Threading types
+ */
+constext *txt_thread[] = { "None", "Subj", "Refs" };
+
+/*
+ * How the From: line is displayed.
+ */
+constext *txt_show_from[] = { "None", "Addr", "Name", "Both" };
+
+/*
+ * Array of possible post processing descriptions and shortkeys
+ * This must match the ordering of the defines in tin.h
+ */
+constext *txt_post_process[] = {
+		"None",
+		"Shell archive",
+		"Uudecode",
+#ifdef M_AMIGA
+		"Uudecode & list lharc archive",
+		"Uudecode & extract lharc archive",
+#else
+		"Uudecode & list zoo archive",
+		"Uudecode & extract zoo archive",
+#endif
+		"Uudecode & list zip archive",
+		"Uudecode & extract zip archive"
+};
+
+char ch_post_process[] = { 'n', 's', 'u', 'l', 'e', 'L', 'E' };
+
+constext *txt_sort_type[] = {
+		"Nothing",
+		"Subject: field (descending)",
+		"Subject: field (ascending)",
+		"From: field (descending)",
+		"From: field (ascending)",
+		"Date: field (descending)",
+		"Date: field (ascending)"
+};
+
 #ifdef M_AMIGA
 constext txt_post_process_type[] = "Process n)one, s)har, u)ud, q)uit: ";
-constext txt_post_process_uud_lst_zoo[] = "Uudecode & list lharc archive";
-constext txt_post_process_uud_ext_zoo[] = "Uudecode & extract lharc archive";
 #else
 constext txt_post_process_type[] = "Process n)one, s)har, u)ud, l)ist zoo, e)xt zoo, L)ist zip, E)xt zip, q)uit: ";
-constext txt_post_process_uud_lst_zoo[] = "Uudecode & list zoo archive";
-constext txt_post_process_uud_ext_zoo[] = "Uudecode & extract zoo archive";
 #endif
+
 constext txt_post_a_followup[] = "Post a followup...";
 constext txt_post_an_article[] = "Post an article...";
 constext txt_post_history_menu[] = "Posted articles history (page %d of %d)";
 constext txt_post_newsgroup[] = "Post newsgroup> ";
 constext txt_post_newsgroups[] = "Post to newsgroup(s) [%s]> ";
-constext txt_post_process_none[] = "None";
-constext txt_post_process_sh[] = "Shell archive";
-constext txt_post_process_uud_ext_zip[] = "Uudecode & extract zip archive";
-constext txt_post_process_uud_lst_zip[] = "Uudecode & list zip archive";
-constext txt_post_process_uudecode[] = "Uudecode";
 constext txt_post_processing[] = "Post processing...";
 constext txt_post_processing_failed[] = "Post processing failed";
 constext txt_post_processing_finished[] = "-- post processing completed --";
@@ -411,7 +453,9 @@ constext txt_post_subject[] = "Post subject [%s]> ";
 constext txt_posting[] = "Posting article...";
 constext txt_printed[] = "%d Article(s) printed";
 constext txt_printing[] = "Printing...";
+#if 0
 constext txt_processing_xrefs[] = "Processing Xref's...";
+#endif
 constext txt_purge[] = "Purging %s...";
 constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";
 constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
@@ -492,17 +536,6 @@ constext txt_select_pattern[] = "Enter selection pattern [%s]> ";
 constext txt_select_spooldir[] = "Select spooldir> ";
 constext txt_server_name_in_file_env_var[] = "Put the server name in the file %s,\nor set the environment variable NNTPSERVER";
 constext txt_shell_escape[] = "Enter shell command [%s]> ";
-constext txt_show_from_addr[] = "Addr";
-constext txt_show_from_both[] = "Both";
-constext txt_show_from_name[] = "Name";
-constext txt_show_from_none[] = "None";
-constext txt_sort_by_date_ascend[] = "Date: field (ascending)";
-constext txt_sort_by_date_descend[] = "Date: field (descending)";
-constext txt_sort_by_from_ascend[] = "From: field (ascending)";
-constext txt_sort_by_from_descend[] = "From: field (descending)";
-constext txt_sort_by_nothing[] = "Nothing";
-constext txt_sort_by_subj_ascend[] = "Subject: field (ascending)";
-constext txt_sort_by_subj_descend[] = "Subject: field (descending)";
 constext txt_spooldir_com[] = "Spooldir Selection Commands (page %d of %d)";
 constext txt_spooldir_selection[] = "Spooldir Selection (%d)";
 constext txt_spooldir_server_error_1[] = "Server does not appear to support the spooldir command\n"; 

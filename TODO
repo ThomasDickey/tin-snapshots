@@ -1,3 +1,13 @@
+o  tin sometimes freezes while saving a thread
+
+o  full_page_scroll=OFF seems not to work
+
+o  marking latest article with 'K' does not jump to top of newsgroup if
+   there are still articles to read
+
+o  marking hot-articles read with 'K' and then postprocess the newsgroup
+   also processes the read articles
+
 o  killing articles with Lines: 0 does not work
 
 o  if -DNNTP_ONLY and ~/.newsrc could not be read because you are not the
@@ -5,7 +15,7 @@ o  if -DNNTP_ONLY and ~/.newsrc could not be read because you are not the
    active file - argh!
 
 o  canceling via Supersedes:/Also-Control:/Control:-header is possible if it
-   is supplied by hand
+   is supplied by hand (buildin_inews)
 
 o  f'uping with 'F' to a article which has Followup-To: poster set an then
    use 'm' quotes the text, but it should not! (mail_to_someone has no
@@ -42,8 +52,6 @@ o  when last articles in a newsgroup were canceled, it shows that there are
    new articles in that group, even if entered that group in a session before
 
 o  article save with Archive-name: doesn't not work correctly
-
-o  when file-system is full, tin trashes the ~.tin/tinrc (and maybe more)
 
 o  shows up cross-postings multiple times even if read once before getting
    a resync/reread active/newsrc-file

@@ -14,7 +14,7 @@
 
 #include	"tin.h"
 #include	"stpwatch.h"
-#include        "rfc1522.h"
+#include	"rfc1522.h"
 
 #define SortBy(func) qsort ((char *) arts, (size_t)top, sizeof (struct t_article), func);
 #define CorruptIndex(n)  error = n; goto corrupt_index;
@@ -246,8 +246,10 @@ sprintf (msg, "Group %s range=[%ld-%ld]", group->name, min, max);
 		    fflush (stdout);
 		}
 
-		rfc1522_decode_all_headers();
-
+		/* rfc1522_decode_all_headers(); */
+		/* nothing to be done here, because all possibly encoded
+		   headers in the arts structure have already been decoded. */
+		   
 BegStopWatch("make_thread");
 		make_threads (group, FALSE);
 EndStopWatch();
@@ -571,10 +573,10 @@ parse_headers (buf, h)
 					}
 				}
 				break;
-			case 'R':	/* Received:  If found its probably a mail article */
+			case 'R':	/* References: optional */
 				if (! got_refs) {
 					if (match_header (ptrline, "References", buf2, HEADER_LEN)) {
-						s = buf2;
+						s = buf2;	/* Skip space - already done ?? */
 						while (*s && *s == ' ') {
 							s++;
 						}
@@ -582,6 +584,7 @@ parse_headers (buf, h)
 						got_refs = TRUE;
 					}
 				}
+				/* Received:  If found its probably a mail article */
 				if (! got_received) {
 					if (match_header (ptrline, "Received", buf2, HEADER_LEN)) {
 						max_lineno = 50;
@@ -694,7 +697,7 @@ parse_headers (buf, h)
  *    3.  From: line     (ie. iain@scn.de)        [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
  *    5.  MessageID:     (Skipped - not used)     [mandatory]
- *    6.  References:    (Skipped - not used)     [mandatory]
+ *    6.  References:    (ie. <message-id> ....)  [mandatory]
  *    7.  Byte count     (Skipped - not used)     [mandatory]
  *    8.  Lines: line    (ie. 23)                 [mandatory]
  *    9.  Xref: line     (ie. alt.test:389)       [optional]
@@ -782,7 +785,7 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		arts[top].subject = hash_str (eat_re (p));
+		arts[top].subject = hash_str (eat_re(rfc1522_decode(p)));
 		p = q + 1;
  
 		/* 
@@ -799,7 +802,7 @@ sleep(1);
 		parse_from (p, art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
 		if (art_full_name[0]) {
-			arts[top].name = hash_str (art_full_name);
+			arts[top].name = hash_str (rfc1522_decode(art_full_name));
 		}
 		p = q + 1;
  

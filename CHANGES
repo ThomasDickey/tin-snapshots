@@ -1,3 +1,77 @@
+--950824BETA  PLMC.960515 --
+
+034) Chris Blum <chris@phil.uni-sb.de>
+     BUG. non printable chars were displayed
+     FIX. group.c
+
+--950824BETA  PLMC.960512 --
+
+033) Chris Blum <chris@phil.uni-sb.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. typo in post.c
+     ADD. little code clean up
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960511 --
+
+032) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. When changing Process type in Options Menu, <ESC> resets 
+          the single character prompt to bogus values.
+          Rewrote option toggle interface to use a generic, more
+          extensible system.
+     ADD. post_process_command
+          If defined, command to be run after a successful article decode.
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960510 --
+
+031) Chris Blum <chris@phil.uni-sb.de>
+     BUG. threading problem with mimedecoded subjects
+     FIX. art.c
+
+--950824BETA  PLMC.960507 --
+
+030) Chris Blum <chris@phil.uni-sb.de>
+     BUG. threading problem with mimedecoded subjects
+     FIX. art.c
+
+--950824BETA  PLMC.960506 --
+
+029) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Giuseppe De Marco <gdemarco@freenet.hut.fi>
+     ADD. light-color support
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960428 --
+
+028) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. -DFORGERY without INEWS_MAIL_DOMAIN or INEWS_MAIL_GATEWAY
+          did not work
+     BUG. mail_to_someone did not use auto_cc
+     ADD. auto_bcc switch
+     FIX. several supplied patches
+
+--950824BETA  PLMC.960427 --
+
+027) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. Did not recognize multipart mime articles
+     FIX. page.c
+
+--950824BETA  PLMC.960421 --
+026) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. on a full filesystem tinrc was trashed
+     FIX. config.c, lang.c, extern.h
+          This should also be done for
+               write_attributes_file(), write_mail_active_file()
+               write_group_times_file(), ...
+
+--950824BETA  PLMC.960407 --
+
+025) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. #ifndef M_UNIX append_file() is not defined (misc.c) but
+          used in post.c
+     FIX. post.c
+
 --950824BETA  PLMC.960405 --
 
 024) Urs Janssen <urs@akk.uni-karlsruhe.de>

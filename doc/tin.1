@@ -1203,6 +1203,51 @@ Type of post processing to perform after saving articles.
 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip).
 Default is 0.
 .TP 4
+\fBpost_process_command\fP
+Full pathname of a command to be run after successfully uudecoding an
+article / thread. This option should be used in conjunction with
+post processing type 2=(uudecode) (see above)
+
+A sample script (for Linux) demonstrates a possible use for this :
+
+.RS
+.nf
+#!/bin/bash
+# Sample Tin newsreader postprocessor.
+# $1 is the filename that has been uudecoded.
+#
+
+[ ! -f "$1" ] && exit 1
+
+case ${1##*.} in
+
+    # View pictures in console mode or X
+    #
+    gif|jpg|GIF|JPG)
+        [ -z "$DISPLAY" ] && zgv $1 || xv $1
+        ;;
+
+    # List zip archives
+    #
+    zip)
+        unzip -l $1
+        ;;
+
+    *)
+        echo "Unsupported or missing suffix: ${1##*.}"
+        file $1
+        ;;
+esac
+
+echo ""
+echo "Press <RETURN> to exit."
+read ans
+
+# end of sample script
+.fi
+.RE
+
+.TP 4
 \fBprint_header\fP
 If ON print all of mail header otherwise Subject: & From: lines.
 Default is OFF.

@@ -1,4 +1,4 @@
-Compilation and installation notes for tin - 95-07-25
+Compilation and installation notes for tin - 96-04-28
 -----------------------------------------------------
 
 Note: The section 'News machine names' is now at the beginning as it 
@@ -272,6 +272,19 @@ Define if you do not want the active file to be reread periodically.
 The reread period can be set in seconds by setting the tinrc variable
 'reread_active_file_secs='
 
+FORGERY
+Define if you want to be able to cancel postings you did not write
+yourself.  The !cyberspam and cancel conventions are supported.  Be
+careful with this feature, it should not be used in an free accessable
+tin.  This feature does not work with INN using the INN-inews (when
+using without NNTP), because INN-inews rejects these cancels.
+
+HAVE_COLOR
+Define if you want to have ANSI-color support.  This works on most
+color displays and the color xterm.  The color mode can be switched
+on/off in ~/.tin/tinrc (use_color) and can be toggled with option -a
+or key 'a'.
+
 HAVE_FASCIST_NEWSADMIN
 Define if you want users articles to be posted to groups that your site 
 receives.  This will change the warning that a group that the user is 
@@ -298,18 +311,24 @@ Define if your machine uses a MMDF type mailer instead of sendmail.
 It is defined as default on SCO Unix machines. It can be dynamically 
 changed by setting the tinrc variable save_to_mmdf_mailbox to ON. 
 
+HAVE_PGP
+Define if you have PGP (Pretty Good Privacy encryption system)
+installed and want the option of checking signatures, extract keys,
+sign messages and add public key to messages.  This is bound to the
+key 'g' or '^G'.
+
 HAVE_POLL
 Define if you have the poll() system call that is required to abort 
 the indexing of a group in the function input_pending(). Don't define
 if HAVE_SELECT is already defined.
 
+HAVE_POSIX_JC
+Define if your machine uses Posix style sigaction() signal handling.
+
 HAVE_SELECT
 Define if you have the select() system call that is required to abort 
 the indexing of a group in the function input_pending(). Don't define
 if HAVE_POLL is already defined.
-
-HAVE_POSIX_JC
-Define if your machine uses Posix style sigaction() signal handling.
 
 HAVE_SETREUID
 Define if problems occur when running tin as setuid news. Only define if
