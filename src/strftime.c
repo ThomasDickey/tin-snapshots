@@ -22,7 +22,7 @@
 
 #ifdef SYSV
 extern int daylight;
-#endif
+#endif /* SYSV */
 
 #define SYSV_EXT	1	/* stuff in System V ascftime routine */
 
@@ -76,10 +76,10 @@ my_strftime (
 #ifdef HAVE_TZSET
 	tzset ();
 #else
-#ifdef HAVE_SETTZ
+#	ifdef HAVE_SETTZ
 	settz ();
-#endif
-#endif
+#	endif /* HAVE_SETTZ */
+#endif /* HAVE_TZSET */
 
 	for (; *format && s < endp - 1; format++) {
 		tbuf[0] = '\0';
@@ -106,7 +106,7 @@ my_strftime (
 
 #ifdef SYSV_EXT
 		case 'h':	/* abbreviated month name */
-#endif
+#endif /* SYSV_EXT */
 		case 'b':	/* abbreviated month name */
 			strcpy(tbuf, months_a[timeptr->tm_mon]);
 			break;
@@ -221,7 +221,7 @@ my_strftime (
 		case 'T':	/* time as %H:%M:%S */
 			my_strftime(tbuf, sizeof tbuf, "%H:%M:%S", timeptr);
 			break;
-#endif
+#endif /* SYSV_EXT */
 
 		default:
 			tbuf[0] = '%';

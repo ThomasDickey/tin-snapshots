@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"981114"
-#	define RELEASENAME	"The Watchman"
+#	define RELEASEDATE	"981225"
+#	define RELEASENAME	"Volcane"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

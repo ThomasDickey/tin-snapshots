@@ -115,15 +115,15 @@ char xpost_quote_format[PATH_LEN];
 
 #ifdef INDEX_DAEMON
 	char group_times_file[PATH_LEN];
-#endif
+#endif /* INDEX_DAEMON */
 
 #ifdef VMS
 	char rcdir_asfile[PATH_LEN];	/* rcdir expressed as dev:[dir]tin.dir, for stat() */
-#endif
+#endif /* VMS */
 
 #ifdef M_OS2
 	char TMPDIR[PATH_LEN];
-#endif
+#endif /* M_OS2 */
 
 /*  check for the bools -> change to t_bool */
 int MORE_POS;				/* set in set_win_size () */
@@ -155,10 +155,10 @@ int post_mime_encoding = MIME_ENCODING_7BIT;
 pid_t process_id;
 gid_t real_gid;
 uid_t real_uid;
-int reread_active_file_secs;		/* reread active file interval in seconds */
+int reread_active_file_secs;	/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
-int strip_bogus = BOGUS_KEEP;
-int wildcard = FALSE;			/* Use wildmat, not regex */
+int strip_bogus = BOGUS_ASK;
+int wildcard = 0;			/* Use wildmat, not regex */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
 gid_t tin_gid;
@@ -193,7 +193,7 @@ int getart_limit = 0;	/* number of article to get */
 	t_bool use_color_tinrc;		/* like use_color but stored in tinrc */
 	t_bool word_highlight;		/* word highlighting on/off */
 	t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
-#endif
+#endif /* HAVE_COLOR */
 
 mode_t real_umask;
 
@@ -228,9 +228,6 @@ t_bool delete_index_file;	/* delete index file before indexing (tind only) */
 t_bool display_mime_header_asis=FALSE;	/* rfc 1522/2047 news_headers_to_display will be decoded by default */
 t_bool display_mime_allheader_asis=TRUE;	/* rfc 1522/2047 all heades (^H) will not be decoded by default */
 t_bool draw_arrow_mark;		/* draw -> or highlighted bar */
-#ifdef NNTP_ABLE
-t_bool force_auth_on_conn_open = FALSE;	/* authenticate on connection startup */
-#endif
 t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool global_filtered_articles;	/* globally killed / auto-selected articles */
@@ -297,6 +294,9 @@ t_bool xref_supported = TRUE;
 #ifdef LOCAL_CHARSET
 	t_bool use_local_charset = TRUE;
 #endif /* LOCAL_CHARSET */
+#ifdef NNTP_ABLE
+	t_bool force_auth_on_conn_open = FALSE;	/* authenticate on connection startup */
+#endif /* NNTP_ABLE */
 
 /* History entries */
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
@@ -538,7 +538,7 @@ void init_selfinfo (void)
 #else
 	inverse_okay = TRUE;
 	draw_arrow_mark = FALSE;
-#endif
+#endif /* USE_INVERSE_HACK */
 	dangerous_signal_exit = FALSE;
 	default_auto_save = FALSE;
 	default_batch_save = FALSE;
@@ -600,7 +600,7 @@ void init_selfinfo (void)
 	save_to_mmdf_mailbox = TRUE;
 #else
 	save_to_mmdf_mailbox = FALSE;
-#endif
+#endif /* HAVE_MMDF_MAILER */
 	show_last_line_prev_page = FALSE;
 	show_lines = TRUE;
 	show_score = FALSE;
@@ -615,7 +615,7 @@ void init_selfinfo (void)
 	start_editor_offset = TRUE;
 #else
 	start_editor_offset = FALSE;
-#endif
+#endif /* M_UNIX */
 	tab_after_X_selection = FALSE;
 	tab_goto_next_unread = TRUE;
 	space_goto_next_unread = FALSE;
@@ -626,7 +626,7 @@ void init_selfinfo (void)
 	batch_mode = TRUE;
 #else
 	batch_mode = FALSE;
-#endif
+#endif /* INDEX_DAEMON */
 	check_for_new_newsgroups = !batch_mode;
 	unlink_article = TRUE;
 	use_builtin_inews = TRUE;
@@ -640,9 +640,9 @@ void init_selfinfo (void)
 		use_metamail = (getenv ("NoMetaMail") != NULL) ? TRUE : FALSE;
 #	else
 		use_metamail = TRUE;
-#	endif
+#	endif /* M_AMIGA */
 	ask_for_metamail = TRUE;
-#endif
+#endif /* HAVE_METAMAIL */
 #ifdef HAVE_COLOR
 	preinit_colors();
 	use_color = FALSE;
@@ -650,7 +650,7 @@ void init_selfinfo (void)
 	word_highlight = TRUE;
 	word_highlight_tinrc = TRUE;
 	word_h_display_marks = 2; /* display space instead of marks */
-#endif
+#endif /* HAVE_COLOR */
 	index_maildir[0] = '\0';
 	index_newsdir[0] = '\0';
 	index_savedir[0] = '\0';
@@ -1017,14 +1017,11 @@ set_up_private_index_cache (void)
 		return;
 	to = index_newsdir + strlen (index_newsdir);
 	*(to++) = '-';
-	for (from = cmdline_nntpserver; (c = *from) != 0; ++from) {
-		if ('A' <= c && c <= 'Z')
-			c += 'a' - 'A';
-		*(to++) = c;
-	}
+	for (from = cmdline_nntpserver; (c = *from) != 0; ++from)
+		*(to++) = tolower(c);
 	*to = 0;
 	if (stat (index_newsdir, &sb) == -1)
-		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
+		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO); /* why not S_IRWXU ? */
 #	ifdef DEBUG
 	debug_nntp ("set_up_private_index_cache", index_newsdir);
 #	endif /* DEBUG */

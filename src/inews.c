@@ -36,19 +36,19 @@
 #		else
 #			define netwrite	write
 #			include <netdb.h>
-#		endif
+#		endif /* MULTINET */
 #	else
 #		ifdef HAVE_NETDB_H
 #			include	<netdb.h>
-#		endif
+#		endif /* HAVE_NETDB_H */
 #	endif /* VMS */
 
 #	ifdef HAVE_SYS_SOCKET_H
 #		include <sys/socket.h>
-#	endif
+#	endif /* HAVE_SYS_SOCKET_H */
 #	ifdef HAVE_NETINET_IN_H
 #		include <netinet/in.h>
-#	endif
+#	endif /* HAVE_NETINET_IN_H */
 #endif /* 0 */
 
 #define	PATHMASTER	"not-for-mail"
@@ -61,20 +61,19 @@ static int
 submit_inews (
 	char *name)
 {
-	t_bool ret_code = FALSE;
-
-	char	from_name[PATH_LEN];
-	char	message_id[PATH_LEN];
-	char	line[NNTP_STRLEN];
-	char	*ptr;
-	FILE	*fp;
+	FILE *fp;
+	char *ptr;
+	char from_name[PATH_LEN];
+	char message_id[PATH_LEN];
+	char line[NNTP_STRLEN];
 	int auth_error = 0;
 	int respcode;
 	t_bool leave_loop = FALSE;
 	t_bool id_in_article = FALSE;
-#		ifndef FORGERY
+	t_bool ret_code = FALSE;
+#	ifndef FORGERY
 	t_bool ismail = FALSE;
-#		endif /* FORGERY */
+#	endif /* FORGERY */
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, name);
@@ -162,7 +161,7 @@ submit_inews (
 		/*
 		 * Send Path: and From: article headers
 		 */
-#		ifndef FORGERY
+#	ifndef FORGERY
 		sprintf (line, "Path: %s", PATHMASTER);
 		put_server (line);
 
@@ -172,7 +171,7 @@ submit_inews (
 				put_server (line);
 			}
 		}
-#		endif /* !FORGERY */
+#	endif /* !FORGERY */
 
 		/*
 		 * check if Message-ID comes from the server
@@ -276,10 +275,10 @@ submit_news_file (
 
 #ifdef NNTP_INEWS
 	if (read_news_via_nntp && !read_saved_news && use_builtin_inews) {
-#ifdef DEBUG
+#	ifdef DEBUG
 		if (debug == 2)
 			error_message ("Using BUILTIN inews");
-#endif /* DEBUG */
+#	endif /* DEBUG */
 		ret_code = submit_inews (name);
 	} else
 #endif /* NNTP_INEWS */
@@ -298,7 +297,7 @@ submit_news_file (
 		sh_format (cp, sizeof(buf) - (cp - buf), "inews -h < %s", name);
 #else
 		make_post_cmd (cp, name);
-#endif	/* M_UNIX */
+#endif /* M_UNIX */
 
 		ret_code = invoke_cmd (buf);
 	}

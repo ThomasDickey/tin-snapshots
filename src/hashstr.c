@@ -28,13 +28,13 @@
  *  Arbitrary table size, but make sure it's prime!
  */
 
-#define		HASHNODE_TABLE_SIZE	2411
+#define HASHNODE_TABLE_SIZE	2411
 
 #ifdef M_AMIGA
 	static struct t_hashnode **table=0;
 #else
 	static struct t_hashnode *table[HASHNODE_TABLE_SIZE];
-#endif
+#endif /* M_AMIGA */
 
 static struct t_hashnode *add_string (const char *s);
 
@@ -112,7 +112,7 @@ hash_init (void)
 #ifdef M_AMIGA
 	if (!table)
 		table = (struct t_hashnode **) my_malloc (HASHNODE_TABLE_SIZE * sizeof (void *));
-#endif
+#endif /* M_AMIGA */
 
 	for (i = 0; i < HASHNODE_TABLE_SIZE; i++)
 		table[i] = (struct t_hashnode *) 0;
@@ -128,7 +128,7 @@ hash_reclaim (void)
 #ifdef M_AMIGA
 	if (!table)
 		return;
-#endif
+#endif /* M_AMIGA */
 
 	for (i = 0; i < HASHNODE_TABLE_SIZE; i++)
 		if (table[i] != (struct t_hashnode *) 0) {

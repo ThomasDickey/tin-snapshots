@@ -146,7 +146,9 @@ do_pgp (
 	char *mail_to)
 {
 	char cmd[LEN], options[10];
+#ifndef HAVE_PGP_5
 	char address[LEN];
+#endif /* !HAVE_PGP_5 */
 
 	split_file(file);
 	strcpy (options, "-at");

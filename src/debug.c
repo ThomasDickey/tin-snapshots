@@ -25,9 +25,9 @@ static void debug_print_group_hash (void);
 static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
 static void debug_print_base (void);
 static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
-#if 0
+#	if 0
 	static void debug_print_active_hash (void);
-#endif /* 0 */
+#	endif /* 0 */
 /*
  *  nntp specific debug routines
  */
@@ -228,9 +228,9 @@ debug_print_active (void)
 				group->count, group->xmax, group->xmin, group->moderated);
 			fprintf (fp, " nxt=[%4d] hash=[%ld]  description=[%s]\n", group->next,
 				hash_groupname (group->name), (group->description ? group->description : ""));
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 			debug_print_newsrc (&group->newsrc, fp);
-#endif
+#	endif /* DEBUG_NEWSRC */
 			debug_print_attributes (group->attribute, fp);
 		}
 		fclose (fp);

@@ -24,22 +24,22 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 
 #ifdef M_AMIGA
 #	undef BSD
-#endif
+#endif /* M_AMIGA */
 
 #ifndef ns32000
 #	undef	sinix
-#endif
+#endif /* !ns32000 */
 
 #ifdef VMS
-#include <descrip.h>
-#include <iodef.h>
-#include <ssdef.h>
-#include <dvidef.h>
-#ifdef __GNUC__ /* M.St. 22.01.98 */
-#include <vms/sys$routines.h>
-#include <vms/lib$routines.h>
-#endif
-#endif
+#	include <descrip.h>
+#	include <iodef.h>
+#	include <ssdef.h>
+#	include <dvidef.h>
+#	ifdef __GNUC__ /* M.St. 22.01.98 */
+#		include <vms/sys$routines.h>
+#		include <vms/lib$routines.h>
+#	endif /* __GNUC__ */
+#endif /* VMS */
 
 #define DEFAULT_LINES_ON_TERMINAL	24
 #define DEFAULT_COLUMNS_ON_TERMINAL	80
@@ -60,99 +60,99 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 
 #ifdef HAVE_CONFIG_H
 
-#if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR) && defined(HAVE_TCSETATTR)
-#	ifdef HAVE_IOCTL_H
-#		include <ioctl.h>
-#	else
-#		ifdef HAVE_SYS_IOCTL_H
-#			include <sys/ioctl.h>
-#		endif
-#	endif
-#	if !defined(sun) || !defined(NL0)
-#		include <termios.h>
-#	endif
-#	define USE_POSIX_TERMIOS 1
-#	define TTY struct termios
-#else
-#	ifdef HAVE_TERMIO_H
-#		include <termio.h>
-#		define USE_TERMIO 1
-#		define TTY struct termio
-#	else
-#		ifdef HAVE_SGTTY_H
-#			include <sgtty.h>
-#			define USE_SGTTY 1
-#			define TTY struct sgttyb
+#	if defined(HAVE_TERMIOS_H) && defined(HAVE_TCGETATTR) && defined(HAVE_TCSETATTR)
+#		ifdef HAVE_IOCTL_H
+#			include <ioctl.h>
 #		else
-			please-fix-me(thanks)
-#		endif
-#	endif
-#endif
-static	TTY _raw_tty, _original_tty;
+#			ifdef HAVE_SYS_IOCTL_H
+#				include <sys/ioctl.h>
+#			endif /* HAVE_SYS_IOCTL_H */
+#		endif /* HAVE_IOCTL_H */
+#		if !defined(sun) || !defined(NL0)
+#			include <termios.h>
+#		endif /* !sun || !NL0 */
+#		define USE_POSIX_TERMIOS 1
+#		define TTY struct termios
+#	else
+#		ifdef HAVE_TERMIO_H
+#			include <termio.h>
+#			define USE_TERMIO 1
+#			define TTY struct termio
+#		else
+#			ifdef HAVE_SGTTY_H
+#				include <sgtty.h>
+#				define USE_SGTTY 1
+#				define TTY struct sgttyb
+#			else
+				please-fix-me(thanks)
+#			endif /* HAVE_SGTTY_H */
+#		endif /* HAVE_TERMIO_H */
+#	endif /* HAVE_TERMIOS_H && HAVE_TCGETATTR && HAVE_TCSETATTR */
+
+static TTY _raw_tty, _original_tty;
 
 #else	/* FIXME: prune the non-autoconf'd stuff */
 
-#if (defined(M_AMIGA) && !defined(__SASC)) || defined(COHERENT) || defined(BSD)
-#	ifdef BSD4_1
-#		include <termio.h>
-#		define USE_TERMIO 1
-#	else
-#		include <sgtty.h>
-#		define USE_SGTTY 1
-#	endif
-#else
-#	if !defined(SYSV) && !defined(M_AMIGA)
-#		ifdef MINIX
+#	if (defined(M_AMIGA) && !defined(__SASC)) || defined(COHERENT) || defined(BSD)
+#		ifdef BSD4_1
+#			include <termio.h>
+#			define USE_TERMIO 1
+#		else
 #			include <sgtty.h>
 #			define USE_SGTTY 1
-#		else
-#			ifndef QNX42
-#				ifdef sinix
-#					include <termios.h>
-#					define USE_POSIX_TERMIOS 1
-#				else
-#					ifdef VMS
-#						include <curses.h>
+#		endif /* BSD4_1 */
+#	else
+#		if !defined(SYSV) && !defined(M_AMIGA)
+#			ifdef MINIX
+#				include <sgtty.h>
+#				define USE_SGTTY 1
+#			else
+#				ifndef QNX42
+#					ifdef sinix
+#						include <termios.h>
+#						define USE_POSIX_TERMIOS 1
 #					else
-#						include <termio.h>
-#						define USE_TERMIO 1
-#					endif
-#				endif
-#			endif
-#		endif
-#	endif
-#endif
+#						ifdef VMS
+#							include <curses.h>
+#						else
+#							include <termio.h>
+#							define USE_TERMIO 1
+#						endif /* VMS */
+#					endif /* sinix */
+#				endif /* !QNX42 */
+#			endif /* MINIX */
+#		endif /* !SYSV && !M_AMIGA */
+#	endif /* (M_AMIGA && !__SASC) || COHERENT || BSD */
 
-#ifndef VMS
-#if (defined(M_AMIGA) && !defined(__SASC)) || defined(BSD) || defined(MINIX)
-#	define USE_SGTTY 1
+#	ifndef VMS
+#		if (defined(M_AMIGA) && !defined(__SASC)) || defined(BSD) || defined(MINIX)
+#			define USE_SGTTY 1
 struct sgttyb _raw_tty, _original_tty;
-#else
-#	if !defined(M_AMIGA) && !defined(M_OS2)
-#		if defined(HAVE_TERMIOS_H) || defined(sinix)
-#			define USE_POSIX_TERMIOS 1
-struct termios _raw_tty, _original_tty;
 #		else
-#			define USE_TERMIO 1
+#			if !defined(M_AMIGA) && !defined(M_OS2)
+#				if defined(HAVE_TERMIOS_H) || defined(sinix)
+#					define USE_POSIX_TERMIOS 1
+struct termios _raw_tty, _original_tty;
+#				else
+#					define USE_TERMIO 1
 struct termio _raw_tty, _original_tty;
-#		endif
-#	endif
-#endif
-#endif /* VMS */
-
+#				endif /* HAVE_TERMIOS_H || sinix */
+#			endif /* !M_AMIGA && ! M_OS2 */
+#		endif /* (M_AMIGA && !__SASC) || BSD || MINIX */
+#	endif /* !VMS */
 #endif /* HAVE_CONFIG_H */
 
 #ifndef USE_SGTTY
-#define USE_SGTTY 0
-#endif
+#	define USE_SGTTY 0
+#endif /* !USE_SGTTY */
 
 #ifndef USE_TERMIO
-#define USE_TERMIO 0
-#endif
+#	define USE_TERMIO 0
+#endif /* !USE_TERMIO */
 
 #ifndef USE_POSIX_TERMIOS
-#define USE_POSIX_TERMIOS 0
-#endif
+#	define USE_POSIX_TERMIOS 0
+#endif /* !USE_POSIX_TERMIOS */
 
 static char *_clearscreen, *_moveto, *_cleartoeoln, *_cleartoeos,
 			*_setinverse, *_clearinverse, *_setunderline, *_clearunderline,
@@ -161,45 +161,45 @@ static char *_clearscreen, *_moveto, *_cleartoeoln, *_cleartoeos,
 
 #ifdef M_AMIGA
 static char *_getwinsize;
-#endif
+#endif /* M_AMIGA */
 
 static int _columns, _line, _lines;
 
 #ifdef M_UNIX
 
-#if USE_POSIX_TERMIOS
-#	define SET_TTY(arg) tcsetattr (TTYIN, TCSANOW, arg)
-#	define GET_TTY(arg) tcgetattr (TTYIN, arg)
-#else
-#	if USE_TERMIO
-#		define SET_TTY(arg) ioctl (TTYIN, TCSETAW, arg)
-#		define GET_TTY(arg) ioctl (TTYIN, TCGETA, arg)
+#	if USE_POSIX_TERMIOS
+#		define SET_TTY(arg) tcsetattr (TTYIN, TCSANOW, arg)
+#		define GET_TTY(arg) tcgetattr (TTYIN, arg)
 #	else
-#		if USE_SGTTY
-#			define SET_TTY(arg) stty(TTYIN, arg)
-#			define GET_TTY(arg) gtty(TTYIN, arg)
+#		if USE_TERMIO
+#			define SET_TTY(arg) ioctl (TTYIN, TCSETAW, arg)
+#			define GET_TTY(arg) ioctl (TTYIN, TCGETA, arg)
 #		else
-			please-fix-me(thanks)
-#		endif
-#	endif
-#endif
+#			if USE_SGTTY
+#				define SET_TTY(arg) stty(TTYIN, arg)
+#				define GET_TTY(arg) gtty(TTYIN, arg)
+#			else
+				please-fix-me(thanks)
+#			endif /* USE_SGTTY */
+#		endif /* USE_TERMIO */
+#	endif /* USE_POSIX_TERMIOS */
 
 static char _terminal[1024];		/* Storage for terminal entry */
 static char _capabilities[1024];	/* String for cursor motion */
 static char *ptr = _capabilities;	/* for buffering */
 
-#endif	/* M_UNIX */
+#endif /* M_UNIX */
 
 static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
 	static void ScreenSize (int *num_lines, int *num_columns);
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 void
@@ -215,7 +215,7 @@ setup_screen (void)
 	Raw (TRUE);
 	set_win_size (&cLINES, &cCOLS);
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 #ifdef M_UNIX
@@ -261,7 +261,7 @@ SetupScreen (void)
 	_terminalend    = tgetstr ("te", &ptr);
 	_keypadlocal    = tgetstr ("ke", &ptr);
 	_keypadxmit     = tgetstr ("ks", &ptr);
-#endif
+#endif /* HAVE_BROKEN_TGETSTR */
 	_cursoron = NULL;
 	_cursoroff = NULL;
 
@@ -309,10 +309,10 @@ SetupScreen (void)
 	}
 #ifdef HAVE_COLOR
 	postinit_colors();
-#endif
+#endif /* HAVE_COLOR */
 	return (TRUE);
 }
-#endif
+#endif /* !INDEX_DAEMON */
 
 int
 InitScreen (void)
@@ -322,7 +322,7 @@ InitScreen (void)
 	return (TRUE);
 #else
 	return (FALSE);
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 #else	/* !M_UNIX */
@@ -330,8 +330,7 @@ InitScreen (void)
 int
 InitScreen (void)
 {
-#ifndef	INDEX_DAEMON
-
+#ifndef INDEX_DAEMON
 	char *ptr;
 
 	/*
@@ -354,7 +353,7 @@ InitScreen (void)
 	_cursoroff	= "\033[0 p";
 	_cleartoeos	= "\033[J";
 	_getwinsize	= "\2330 q";
-#endif
+#endif /* M_AMIGA */
 #if defined(M_OS2)
 	_cleartoeos	= NULL;
 	_terminalinit	= NULL;
@@ -365,7 +364,7 @@ InitScreen (void)
 	_cleartoeos	= "\033[J";
 	_terminalinit	= NULL;
 	_terminalend	= "";
-#endif
+#endif /* VMS */
 
 	_lines = _columns = -1;
 
@@ -395,13 +394,13 @@ InitScreen (void)
 		_cursoron = NULL;
 		_getwinsize = NULL;
 	}
-#endif	/* M_AMIGA */
+#endif /* M_AMIGA */
 #ifdef M_OS2
 	if (_lines == -1 || _columns == -1) {
 		_lines = LINES;
 		_columns = COLS;
 	}
-#endif	/* M_OS2 */
+#endif /* M_OS2 */
 #ifdef VMS  /* moved from below InitWin () M.St. 22.01.98 */
 	{
 		int input_chan, status;
@@ -493,7 +492,7 @@ InitScreen (void)
 #endif /* INDEX_DAEMON */
 }
 
-#endif	/* M_UNIX */
+#endif /* M_UNIX */
 
 
 /*
@@ -513,7 +512,7 @@ ScreenSize (
 	*num_lines = _lines - 1;		/* assume index from zero*/
 	*num_columns = _columns;		/* assume index from one */
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 void
@@ -528,7 +527,7 @@ InitWin (void)
 	set_keypad_on ();
 	set_xclick_on ();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -545,7 +544,7 @@ EndWin (void)
 	set_xclick_off ();
 
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -558,8 +557,8 @@ set_keypad_on (void)
 		tputs (_keypadxmit, 1, outchar);
 		my_flush();
 	}
-#	endif
-#endif /* INDEX_DAEMON */
+#	endif /* HAVE_KEYPAD */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -572,8 +571,8 @@ set_keypad_off (void)
 		tputs (_keypadlocal, 1, outchar);
 		my_flush();
 	}
-#	endif
-#endif /* INDEX_DAEMON */
+#	endif /* HAVE_KEYPAD */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -589,7 +588,7 @@ ClearScreen (void)
 	my_flush ();      /* clear the output buffer */
 	_line = 1;
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -613,7 +612,7 @@ MoveCursor (
 	my_flush ();
 	_line = row + 1;
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 #else	/* !M_UNIX */
@@ -634,10 +633,10 @@ MoveCursor (
 		_line = row + 1;
 	}
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
-#endif	/* M_UNIX */
+#endif /* M_UNIX */
 
 /*
  *  clear to end of line
@@ -650,7 +649,7 @@ CleartoEOLN (void)
 	tputs (_cleartoeoln, 1, outchar);
 	my_flush ();  /* clear the output buffer */
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -673,7 +672,7 @@ CleartoEOS (void)
 	}
 	my_flush ();  /* clear the output buffer */
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -687,20 +686,20 @@ StartInverse (void)
 
 	in_inverse = 1;
 	if (_setinverse && inverse_okay) {
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 		if (use_color) {
 			bcol(col_invers_bg);
 			fcol(col_invers_fg);
 		} else {
 			tputs (_setinverse, 1, outchar);
 		}
-#else
+#	else
 		tputs (_setinverse, 1, outchar);
-#endif
+#	endif /* HAVE_COLOR */
 	}
 	my_flush ();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -714,20 +713,20 @@ EndInverse (void)
 
 	in_inverse = 0;
 	if (_clearinverse && inverse_okay) {
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 		if (use_color) {
 			fcol(col_normal);
 			bcol(col_back);
 		} else {
 			tputs (_clearinverse, 1, outchar);
 		}
-#else
+#	else
 		tputs (_clearinverse, 1, outchar);
-#endif
+#	endif /* HAVE_COLOR */
 	}
 	my_flush ();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -744,7 +743,7 @@ ToggleInverse (void)
 	else
 		EndInverse();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -774,40 +773,40 @@ Raw (
 		_inraw = 1;
 	}
 #else
-#if !defined(INDEX_DAEMON) && !defined(M_OS2)
+#	if !defined(INDEX_DAEMON) && !defined(M_OS2)
 
-#if defined(M_AMIGA) && defined(__SASC)
+#		if defined(M_AMIGA) && defined(__SASC)
 	_inraw = state;
 	rawcon (state);
-#else
+#		else
 	if (!state && _inraw) {
 		SET_TTY (&_original_tty);
 		_inraw = 0;
 	} else if (state && !_inraw) {
 		GET_TTY (&_original_tty);
 		GET_TTY (&_raw_tty);
-#if USE_SGTTY
+#			if USE_SGTTY
 		_raw_tty.sg_flags &= ~(ECHO | CRMOD);	/* echo off */
 		_raw_tty.sg_flags |= CBREAK;		/* raw on */
-#ifdef M_AMIGA
+#				ifdef M_AMIGA
 		_raw_tty.sg_flags |= RAW; /* Manx-C 5.2 does not support CBREAK */
-#endif
-#else
-#ifdef __FreeBSD__
+#				endif /* M_AMIGA */
+#			else
+#				ifdef __FreeBSD__
 		cfmakeraw(&_raw_tty);
 		_raw_tty.c_lflag |= ISIG;       /* for ^Z */
-#else
+#				else
 		_raw_tty.c_lflag &= ~(ICANON | ECHO);	/* noecho raw mode */
 		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue */
 		_raw_tty.c_cc[VTIME] = '\0';	/* minimum time to wait for input */
-#endif
-#endif
+#				endif /* __FreeBSD__ */
+#			endif /* USE_SGTTY */
 		SET_TTY (&_raw_tty);
 		_inraw = 1;
 	}
-#endif	/* M_AMIGA */
+#		endif	/* M_AMIGA && __SASC */
 
-#endif /* INDEX_DAEMON */
+#	endif /* !INDEX_DAEMON && !M_OS2 */
 #endif /* !VMS */
 }
 
@@ -816,12 +815,12 @@ Raw (
  */
 
 #ifndef VMS
-#ifdef M_OS2
+#	ifdef M_OS2
 
 int
 ReadCh (void)
 {
-#ifndef INDEX_DAEMON
+#		ifndef INDEX_DAEMON
 
 	char ch;
 	KBDKEYINFO os2key;
@@ -872,13 +871,13 @@ ReadCh (void)
 	}
 	return ((result == EOF) ? EOF : result & 0xFF);
 
-#endif /* INDEX_DAEMON */
+#		endif /* !INDEX_DAEMON */
 }
 
-#endif /* M_OS2 */
+#	endif /* M_OS2 */
 
-#ifdef M_AMIGA
-#include <sprof.h>
+#	ifdef M_AMIGA
+#		include <sprof.h>
 
 static int new_lines, new_columns;
 
@@ -886,7 +885,7 @@ static int
 AmiReadCh (
 	int getscrsize)
 {
-#ifndef INDEX_DAEMON
+#		ifndef INDEX_DAEMON
 
 static unsigned char buf[128];
 static int buflen = 0, bufp = 0;
@@ -934,7 +933,7 @@ PROFILE_ON();
 							buflen = bufp; /* Must do this before raise() */
 							raise(SIGWINCH);
 							break;
-#ifdef notdef
+#			ifdef notdef
 						case 2:	/* Mouse event */
 					/*
 					 * At this point we know what button was pressed
@@ -948,7 +947,7 @@ PROFILE_ON();
 					 */
 							buflen = bufp;
 							break;
-#endif
+#			endif /* notdef */
 						default:
 							buflen = bufp;
 							break;
@@ -964,9 +963,9 @@ PROFILE_ON();
 	ch = buf[bufp++];
 	if (bufp >= buflen) buflen = bufp = 0;
 	return ch;
-#else
+#		else
 	return -1;
-#endif /* INDEX_DAEMON */
+#		endif /* !INDEX_DAEMON */
 }
 
 int
@@ -980,7 +979,7 @@ AmiGetWinSize(
 	int *lines,
 	int *columns)
 {
-#ifndef INDEX_DAEMON
+#		ifndef INDEX_DAEMON
 	if (_getwinsize) {
 		tputs (_getwinsize, 1, outchar);	/* identify yourself */
 		my_flush ();
@@ -988,12 +987,11 @@ AmiGetWinSize(
 		*lines = new_lines;
 		*columns = new_columns;
 	}
-#endif /* INDEX_DAEMON */
+#		endif /* !INDEX_DAEMON */
 }
 
-#endif /* M_AMIGA */
-
-#endif	/* !VMS */
+#	endif /* M_AMIGA */
+#endif /* !VMS */
 
 /*
  *  output a character. From tputs... (Note: this CANNOT be a macro!)
@@ -1005,7 +1003,7 @@ OUTC_FUNCTION(
 	return fputc (c, stdout);
 #else
 	(void) fputc (c, stdout);
-#endif
+#endif /* OUTC_RETURN */
 }
 
 /*
@@ -1028,7 +1026,7 @@ xclick (
 		my_flush ();
 		prev_state = state;
 	}
-#endif	/* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -1057,7 +1055,7 @@ cursoron (void)
 #ifndef INDEX_DAEMON
 	if (_cursoron)
 		tputs (_cursoron, 1, outchar);
-#endif
+#endif /* !INDEX_DAEMON */
 }
 
 void
@@ -1066,7 +1064,7 @@ cursoroff (void)
 #ifndef INDEX_DAEMON
 	if (_cursoroff)
 		tputs (_cursoroff, 1, outchar);
-#endif
+#endif /* !INDEX_DAEMON */
 }
 
 #endif /* !USE_CURSES */
@@ -1075,28 +1073,27 @@ cursoroff (void)
  * The UNIX version of ReadCh is used both in termcap and curses configurations.
  */
 #ifdef M_UNIX
-
 int
 ReadCh (void)
 {
-#ifndef INDEX_DAEMON
+#	ifndef INDEX_DAEMON
 	register int result;
-#ifndef READ_CHAR_HACK
+#		ifndef READ_CHAR_HACK
 	char ch;
-#endif /* READ_CHAR_HACK */
+#		endif /* READ_CHAR_HACK */
 
 	fflush(stdout);
-#ifdef READ_CHAR_HACK
-#undef getc
+#		ifdef READ_CHAR_HACK
+#			undef getc
 	while ((result = getc(stdin)) == EOF) {
 		if (feof(stdin))
 			break;
 
-#ifdef EINTR
+#			ifdef EINTR
 		if (ferror(stdin) && errno != EINTR)
-#else
+#			else
 		if (ferror(stdin))
-#endif /* EINTR */
+#			endif /* EINTR */
 			break;
 
 		clearerr(stdin);
@@ -1104,20 +1101,19 @@ ReadCh (void)
 
 	return ((result == EOF) ? EOF : result & 0xFF);
 
-#else
-#ifdef EINTR
+#		else
+#			ifdef EINTR
 	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR)
 		;	/* spin on signal interrupts */
-#else
+#			else
 	result = read (0, &ch, 1);
-#endif	/* EINTR */
+#			endif	/* EINTR */
 
 	return ((result <= 0) ? EOF : ch & 0xFF);
 
-#endif	/* READ_CHAR_HACK */
-#else
+#		endif	/* READ_CHAR_HACK */
+#	else
 	return 0;
-#endif	/* INDEX_DAEMON */
+#	endif	/* !INDEX_DAEMON */
 }
-
-#endif	/* M_UNIX */
+#endif /* M_UNIX */

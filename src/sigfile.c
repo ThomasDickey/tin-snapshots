@@ -20,7 +20,7 @@
 #	define CURRENTDIR "."
 #else
 #	define CURRENTDIR ""
-#endif
+#endif /* !M_AMIGA */
 
 #define SIGDASHES "-- \n"
 

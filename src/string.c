@@ -109,6 +109,9 @@ strcpynl (
 }
 
 
+/*
+ * case-insensitive version of strstr()
+ */
 char *
 strcasestr (
 	char *haystack,
@@ -132,6 +135,7 @@ strcasestr (
 	}
 	return NULL;
 }
+
 
 size_t
 mystrcat (
@@ -215,7 +219,7 @@ strpbrk (
 	}
 	return (char *) 0;
 }
-#endif
+#endif /* !HAVE_STRPBRK */
 
 #ifndef HAVE_STRSTR
 /*
@@ -273,7 +277,7 @@ strstr (
 	}
 	return (NULL);
 }
-#endif
+#endif /* !HAVE_STRSTR */
 
 #ifndef HAVE_ATOL
 /*
@@ -371,7 +375,7 @@ strcasecmp (
 
 	return r;
 }
-#endif
+#endif /* !HAVE_STRCASECMP */
 
 #ifndef HAVE_STRNCASECMP
 int
@@ -387,7 +391,7 @@ strncasecmp(
 	}
 	return n ? r : 0;
 }
-#endif
+#endif /* !HAVE_STRNCASECMP */
 
 
 /*

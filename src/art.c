@@ -116,11 +116,11 @@ index_group (
 	char group_path[PATH_LEN];
 	int count;
 	int expired;
-	int filtered;
 	int modified;
 	long min;
 	long max;
 	register int i;
+	t_bool filtered;
 
 	if (group == (struct t_group *) 0)
 		return TRUE;
@@ -188,8 +188,8 @@ index_group (
 	 * Read in the existing index via XOVER or the index file
 	 */
 	if (iReadNovFile (group, min, max, &expired) == -1)
-		/* user aborted indexing */
-		return FALSE;
+		return FALSE;	/* user aborted indexing */
+
 
 	/*
 	 * Prints 'P' for each expired article if verbose
@@ -271,9 +271,9 @@ index_group (
 /*
  * Index a group.  Assumes any existing NOV index has already been loaded.
  * Return values are:
- *    TRUE   loaded index and modified it
- *    FALSE  loaded index but not modified
- *    -1     user aborted indexing operation
+ *    1   loaded index and modified it
+ *    0   loaded index but not modified
+ *   -1   user aborted indexing operation
  */
 static int
 read_group (
@@ -285,10 +285,10 @@ read_group (
 	char buf[PATH_LEN];
 	int count = 0;
 	int respnum, total = 0;
+	int modified = 0;
 	long art;
 	register int i;
 	t_bool res;
-	t_bool modified = FALSE;
 	static char dir[PATH_LEN] = "";
 
 	/*
@@ -347,7 +347,7 @@ read_group (
 		/*
 		 * we've modified the index so it will need to be re-written
 		 */
-		modified = TRUE;
+		modified = 1;
 
 		/*
 		 *  Add article to arts[]
@@ -497,7 +497,7 @@ thread_by_subject(void)
 void
 make_threads (
 	struct t_group *group,
-	int rethread)
+	t_bool rethread)
 {
 	int i;
 
@@ -1175,9 +1175,9 @@ pcFindNovFile (
 	const char *pcDir;
 	char acBuf[PATH_LEN];
 	FILE *hFp;
-	int iHashFileName;
 	int iNum;
 	static char acNovFile[PATH_LEN];
+	t_bool bHashFileName;
 	unsigned long lHash;
 
 	if (psGrp == (struct t_group *) 0)
@@ -1185,17 +1185,17 @@ pcFindNovFile (
 
 	overview_index_filename = FALSE;	/* Write groupname in nov file ? */
 
-	iHashFileName = FALSE;
+	bHashFileName = FALSE;
 	pcDir = "";
 
 	switch (psGrp->type) {
 		case GROUP_TYPE_MAIL:
 			pcDir = index_maildir;
-			iHashFileName = TRUE;
+			bHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_SAVE:
 			pcDir = index_savedir;
-			iHashFileName = TRUE;
+			bHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_NEWS:
 			if (read_news_via_nntp && xover_supported && ! cache_overview_files)
@@ -1209,7 +1209,7 @@ pcFindNovFile (
 				}
 				if (!overview_index_filename) {
 					pcDir = index_newsdir;
-					iHashFileName = TRUE;
+					bHashFileName = TRUE;
 				}
 			}
 			break;
@@ -1217,7 +1217,7 @@ pcFindNovFile (
 			break;
 	}
 
-	if (iHashFileName) {
+	if (bHashFileName) {
 		lHash = hash_groupname (psGrp->name);
 
 		for (iNum = 1; ; iNum++) {

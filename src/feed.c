@@ -29,8 +29,8 @@ t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
 /*
  * Local prototypes
  */
-static int does_article_exist (int function, struct t_article *art, char *path);
 static int print_file (char *command, int respnum, int count);
+static t_bool does_article_exist (int function, struct t_article *art, char *path);
 
 void
 feed_articles (
@@ -53,17 +53,17 @@ feed_articles (
 	constext *prompt;
 	int ch, ch_default;
 	int b, i, j;
-	int processed_ok = TRUE;
-	int is_mailbox = FALSE;
 	int orig_note_page = 0;
 	int processed = 0;
-	int redraw_screen = FALSE;
-	int ret1 = FALSE;
-	int ret2 = FALSE;
-	int supersede = FALSE;
+	int processed_ok = TRUE;
+	int is_mailbox = FALSE;
+	t_bool redraw_screen = FALSE;
 	t_bool confirm;
 	t_bool orig_note_end = FALSE;
 	t_bool proceed;
+	t_bool ret1 = FALSE;
+	t_bool ret2 = FALSE;
+	t_bool supersede = FALSE;
 #	ifndef DONT_HAVE_PIPING
 	FILE *fp = (FILE *) 0;
 #	endif /* !DONT_HAVE_PIPING */
@@ -225,6 +225,7 @@ feed_articles (
 						clear_message ();
 						return;
 					}
+					strip_line (filename);
 				}
 				if (*filename) {
 					if (group->attribute->savefile != (char *) 0) {
@@ -366,7 +367,9 @@ feed_articles (
 
 				case FEED_SAVE:
 					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) == 0) {
-						add_to_save_list (0, &arts[respnum], is_mailbox, TRUE, filename);
+/*						add_to_save_list (0, &arts[respnum], is_mailbox, TRUE, filename);	*/
+/*   TODO - if this hack works, we can remove the 2nd param from add_to_save_list()			*/
+						add_to_save_list (respnum, &arts[respnum], is_mailbox, TRUE, filename);
 						processed_ok = save_art_to_file (respnum, 0, FALSE, "");
 					}
 					break;
@@ -764,13 +767,13 @@ print_file (
  * it the first time which saves a lot and almost
  * gets us the elusive free lunch!
  */
-static int
+static t_bool
 does_article_exist (
 	int function,
 	struct t_article *art,
 	char *path)
 {
-	int retcode = FALSE;
+	t_bool retcode = FALSE;
 
 	if (function == FEED_SAVE || function == FEED_PIPE) {
 		if (stat_article (art->artnum, path))

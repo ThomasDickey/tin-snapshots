@@ -228,7 +228,7 @@ nntp_close (void)
 #	endif /* DEBUG */
 		close_server ();
 	}
-#endif
+#endif /* NNTP_ABLE */
 }
 
 /*
@@ -264,9 +264,9 @@ DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
 		 * Maybe server timed out.
 		 * If so, retrying will force a reconnect.
 		 */
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("get_only_respcode", "timeout");
-#endif
+#	endif /* DEBUG */
 		put_server (last_put);
 		ptr = tin_fgets (FAKE_NNTP_FP, FALSE);
 
@@ -282,7 +282,7 @@ DEBUG_IO((stderr, "get_only_respcode(%d)\n", respcode));
 	return respcode;
 #else
 	return 0;
-#endif
+#endif /* NNTP_ABLE */
 }
 
 /*
@@ -310,9 +310,9 @@ get_respcode (
 		/*
 		 * Server requires authentication.
 		 */
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("get_respcode", "authentication");
-#endif
+#	endif /* DEBUG */
 		strncpy (savebuf, last_put, NNTP_STRLEN);		/* Take copy, as authenticate() will clobber this */
 
 		if (authenticate (nntp_server, userid, FALSE)) {
@@ -337,7 +337,7 @@ get_respcode (
 	return respcode;
 #else
 	return 0;
-#endif
+#endif /* NNTP_ABLE */
 }
 
 #ifdef NNTP_ABLE
@@ -355,26 +355,26 @@ nntp_command (
 	char *message)
 {
 DEBUG_IO((stderr, "nntp_command (%s)\n", command));
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("nntp command", command);
-#endif
+#	endif /* DEBUG */
 	put_server (command);
 
 	if (!bool_equal(dangerous_signal_exit, TRUE))
 		if ((/* respcode = */ get_respcode (message)) != success) {
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp (command, "NOT_OK");
-#endif
+#	endif /* DEBUG */
 			/* error_message ("%s", message); */
 			return (FILE *) 0;
 		}
 
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp (command, "OK");
-#endif
+#	endif /* DEBUG */
 	return FAKE_NNTP_FP;
 }
-#endif
+#endif /* NNTP_ABLE */
 
 /*
  * Open the news active file locally or send the LIST command
@@ -387,7 +387,7 @@ open_news_active_fp (void)
 	if (read_news_via_nntp && !read_saved_news)
 		return (nntp_command ("LIST", OK_GROUPS, NULL));
 	else
-#endif
+#endif /* NNTP_ABLE */
 		return (fopen (news_active_file, "r"));
 }
 
@@ -408,12 +408,12 @@ open_overview_fmt_fp (void)
 		sprintf (line, "LIST %s", OVERVIEW_FMT);
 		return (nntp_command (line, OK_GROUPS, NULL));
 	} else {
-#endif
+#endif /* NNTP_ABLE */
 		joinpath (line, libdir, OVERVIEW_FMT);
 		return (fopen (line, "r"));
 #ifdef NNTP_ABLE
 	}
-#endif
+#endif /* NNTP_ABLE */
 }
 
 /*
@@ -435,19 +435,19 @@ open_newgroups_fp (
 			return (FILE *) 0;
 
 		ngtm = localtime (&newnews[idx].time);
-/*
- * in the current draft NEWGROUPS is allowed to take a 4 digit year
- * componennt - but even with a 2 digit year componennt it is y2k
- * compilant... we should switch over to ngtm->tm_year + 1900
- * after most of the server could handle the new format
- */
+	/*
+	 * in the current draft NEWGROUPS is allowed to take a 4 digit year
+	 * componennt - but even with a 2 digit year componennt it is y2k
+	 * compilant... we should switch over to ngtm->tm_year + 1900
+	 * after most of the server could handle the new format
+	 */
 		sprintf (line, "NEWGROUPS %02d%02d%02d %02d%02d%02d",
 			ngtm->tm_year % 100, ngtm->tm_mon + 1, ngtm->tm_mday,
 			ngtm->tm_hour, ngtm->tm_min, ngtm->tm_sec);
 
 		return (nntp_command (line, OK_NEWGROUPS, NULL));
 	} else
-#endif
+#endif /* NNTP_ABLE */
 		return (fopen (active_times_file, "r"));
 }
 
@@ -462,7 +462,7 @@ open_subscription_fp (void)
 	if (read_news_via_nntp && !read_saved_news)
 		return (nntp_command ("LIST SUBSCRIPTIONS", OK_GROUPS, NULL));
 	else
-#endif
+#endif /* NNTP_ABLE */
 		return (fopen (subscriptions_file, "r"));
 }
 
@@ -501,14 +501,14 @@ open_newsgroups_fp (void)
 		if (read_local_newsgroups_file) {
 			result = fopen (local_newsgroups_file, "r");
 			if (result != NULL) {
-# ifdef DEBUG
+#	ifdef DEBUG
 				debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
-# endif /* DEBUG */
+#	endif /* DEBUG */
 				return result;
 			}
 			read_local_newsgroups_file = FALSE;
 		}
-#if 0 /* TODO */
+#	if 0 /* TODO */
 		if (xgtitle_supported && newsrc_active
 		    && !list_active
 		    && num_active < some_usefull_limit) {
@@ -516,7 +516,7 @@ open_newsgroups_fp (void)
 				sprintf(buff, "XGTITLE %s", active[i].name);
 				nntp_command(buff, OK_LIST, NULL));
 		} else
-#endif /* 0 */
+#	endif /* 0 */
 		return (nntp_command ("LIST NEWSGROUPS", OK_GROUPS, NULL));
 	} else
 #endif /* NNTP_ABLE */
@@ -548,7 +548,7 @@ open_xover_fp (
 #ifdef DEBUG
 		if (debug)
 			error_message ("READ file=[%s]", pcNovFile);
-#endif
+#endif /* DEBUG  */
 		if (pcNovFile != (char *) 0)
 			return fopen (pcNovFile, pcMode);
 
@@ -562,7 +562,7 @@ open_xover_fp (
 /*
  * Stat a mail/news article to see if it still exists
  */
-int
+t_bool
 stat_article (
 	long art,
 	char *group_path)
@@ -723,14 +723,11 @@ open_art_fp (
 	t_bool rfc1521decode)
 {
 	char buf[NNTP_STRLEN];
-	int i;
 	struct stat sb;
 	FILE *fp, *art_fp;
 
-	i = my_group[cur_groupnum];
-
 #ifdef NNTP_ABLE
-	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
+	if (read_news_via_nntp && CURR_GROUP.type == GROUP_TYPE_NEWS) {
 		FILE *nntp_fp;
 
 		sprintf (buf, "ARTICLE %ld", art);
@@ -740,7 +737,7 @@ open_art_fp (
 		art_fp = get_article (nntp_fp, lines);
 	} else {
 #endif /* NNTP_ABLE */
-		joinpath (buf, active[i].spooldir, group_path);
+		joinpath (buf, CURR_GROUP.spooldir, group_path);
 		sprintf (&buf[strlen (buf)], "/%ld", art);
 		/*
 		 * Get the correct file size. This is done in get_article() for
@@ -751,7 +748,7 @@ open_art_fp (
 		art_fp = fopen (buf, "r");
 #ifdef NNTP_ABLE
 	}
-#endif
+#endif /* NNTP_ABLE */
 
 	/*
 	 * Do a bit of 1521 decoding, if appropriate.
@@ -824,7 +821,7 @@ setup_hard_base (
 	if (read_news_via_nntp && group->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 
-#if 0
+#	if 0
 		/*
 		 * Some nntp servers are broken and need an extra GROUP command
 		 * (reported by reorx@irc.pl). This affects (old?) versions of
@@ -833,7 +830,7 @@ setup_hard_base (
 		sprintf (buf, "GROUP %s", group->name);
 		if (nntp_command(buf, OK_GROUP, NULL) == NULL)
 			return(-1);
-#endif /* 0*/
+#	endif /* 0*/
 
 		/*
 		 * See if LISTGROUP works
@@ -842,9 +839,9 @@ setup_hard_base (
 		if (nntp_command(buf, OK_GROUP, NULL) != NULL) {
 			char *ptr;
 
-#ifdef DEBUG
+#	ifdef DEBUG
 			debug_nntp ("setup_base", buf);
-#endif
+#	endif /* DEBUG */
 
 			while ((ptr = tin_fgets(FAKE_NNTP_FP, FALSE)) != NULL) {
 				if (top_base >= max_art)
@@ -888,7 +885,7 @@ setup_hard_base (
 				base[top_base++] = start++;
 			}
 		}
-#endif
+#endif /* NNTP_ABLE */
 	/*
 	 * Reading off local spool, read the directory files
 	 */

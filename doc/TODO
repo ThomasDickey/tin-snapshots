@@ -239,6 +239,10 @@ o  add feature goto using the 'G' key
    uuencode header lines
    etc...
 
+o  Additions to the pager:
+    check for urlview during configure and if found add
+     'U' feed page to urlview <ftp://ftp.tin.org/pub/misc/>
+
 o  Additions to the group menu :
      'L' (lookup message-id)
 

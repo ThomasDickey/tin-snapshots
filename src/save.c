@@ -28,7 +28,7 @@
 #define END		4
 
 #ifndef INDEX_DAEMON
-	static t_bool create_subdir = TRUE;  /* FIXME: is it still needed? it's alawys true */
+	static t_bool create_subdir = TRUE;  /* TODO still needed? always true */
 
 #	ifndef HAVE_LIBUU
 	/*
@@ -74,6 +74,7 @@ static t_bool create_sub_dir (int i);
 #	endif /* !HAVE_LIBUU */
 #endif /* !INDEX_DAEMON */
 
+
 /*
  *  Check for articles and say how many new/unread in each group.
  *  or
@@ -85,7 +86,6 @@ static t_bool create_sub_dir (int i);
  *  Mail any new articles to specified user and mark arts read and mail
  *  user and inform how many arts in which groups were mailed.
  */
-
 int
 check_start_save_any_news (
 	int check_start_save)
@@ -285,7 +285,7 @@ check_start_save_any_news (
 }
 
 
-int
+t_bool
 save_art_to_file (
 	int respnum,
 	int indexnum,
@@ -299,9 +299,10 @@ save_art_to_file (
 	char save_art_info[LEN];
 	FILE *fp;
 	int ch;
-	int is_mailbox = FALSE;
-	int i = 0, ret_code = FALSE;
+	int is_mailbox = 0;
+	int i = 0;
 	struct stat st;
+	t_bool ret_code = FALSE;
 
 	if (strlen (filename)) {
 		is_mailbox = the_mailbox;
@@ -317,6 +318,7 @@ save_art_to_file (
 				wait_message (2, txt_cannot_write_to_directory, file);
 				return FALSE;
 			}
+
 			ch = prompt_slk_response(default_save_mode, "aoq\033", txt_append_overwrite_quit, file);
 			switch (ch) {
 				case iKeySaveAppendFile:
@@ -339,7 +341,7 @@ save_art_to_file (
 #ifdef DEBUG
 	if (debug == 2)
 		error_message("Save respnum=[%d] index=[%d] mbox=[%d] filename=[%s] file=[%s] mode=[%s]", respnum, indexnum, the_mailbox, filename, file, mode);
-#endif
+#endif /* DEBUG */
 	if ((fp = fopen (file, mode)) == (FILE *) 0) {
 		save[i].saved = FALSE;
 		info_message (txt_art_not_saved);
@@ -445,14 +447,15 @@ save_thread_to_file (
 
 
 #ifndef INDEX_DAEMON
-int
+t_bool
 save_regex_arts (
 	int is_mailbox,
 	char *group_path)
 {
 
 	char buf[PATH_LEN];
-	int i, ret_code = FALSE;
+	int i;
+	t_bool ret_code = FALSE;
 
 	for (i = 0; i < num_save; i++) {
 		wait_message (0, "%s%d  ", txt_saving, i+1);
@@ -487,7 +490,15 @@ save_regex_arts (
 }
 #endif /* !INDEX_DAEMON */
 
-int
+
+/*
+ * Parse and expand the supplied path name. Attempt to create
+ * the generated path. It does't look as though we're meant to
+ * use the generated path, in the case of mailboxes, it isn't
+ * even expanded.
+ * Return TRUE if it corresponds to a mailbox
+ */
+t_bool
 create_path (
 	char *path)
 {
@@ -522,13 +533,13 @@ create_path (
 			joindir (buf, homedir, DEFAULT_MAILDIR);
 #else
 			joinpath (buf, homedir, DEFAULT_MAILDIR);
-#endif
+#endif /* VMS */
 		}
 #ifdef VMS
 		joinpath (path, buf, "dummy");
 #else
 		sprintf (path, "%s/dummy", buf);
-#endif
+#endif /* VMS */
 	} else {
 		if (!strchr ("~$=+/.", path[0])) {
 			if (!strfpath (active[i].attribute->savedir, buf, sizeof (buf),
@@ -537,7 +548,7 @@ create_path (
 				joindir (buf, homedir, DEFAULT_SAVEDIR);
 #else
 				joinpath (buf, homedir, DEFAULT_SAVEDIR);
-#endif
+#endif /* VMS */
 			}
 			joinpath (tmp, buf, path);
 			my_strncpy (path, tmp, PATH_LEN);
@@ -574,7 +585,7 @@ create_path (
 			return FALSE;
 		}
 	}
-#endif
+#endif /* !VMS */
 
 	if (mbox_format)
 		strcpy (path, tmp);
@@ -609,9 +620,11 @@ create_sub_dir (
 	return FALSE;
 }
 
+
 #ifndef INDEX_DAEMON
 /*
- *  add files to be saved to save array
+ * Add files to be saved to save array
+ * TODO - is the_article == arts[the_index] ????
  */
 void
 add_to_save_list (
@@ -632,14 +645,14 @@ add_to_save_list (
 	if (num_save == max_save-1)
 		expand_save ();
 
-	save[num_save].index = the_index;
-	save[num_save].saved = FALSE;
-	save[num_save].is_mailbox = is_mailbox;
 	save[num_save].dir = 0;
 	save[num_save].file = 0;
 	save[num_save].archive = 0;
 	save[num_save].part = 0;
 	save[num_save].patch = 0;
+	save[num_save].index = the_index;
+	save[num_save].saved = FALSE;
+	save[num_save].is_mailbox = is_mailbox;
 
 	save[num_save].subject = my_strdup (the_article->subject);
 	if (archive_save && the_article->archive) {
@@ -743,7 +756,7 @@ add_to_save_list (
 
 
 /*
- *  print save array of files to be saved
+ *  Print save array of files to be saved
  */
 void
 sort_save_list (void)
@@ -751,14 +764,14 @@ sort_save_list (void)
 	qsort ((char *) save, (size_t)num_save, sizeof (struct t_save), save_comp);
 #ifdef DEBUG
 	debug_save_comp ();
-#endif
+#endif /* DEBUG */
 }
+
 
 /*
  *  string comparison routine for the qsort()
  *  ie. qsort(array, 5, 32, save_comp);
  */
-
 int
 save_comp (
 	t_comptype *p1,
@@ -816,7 +829,7 @@ save_filename (
 
 	if (save[i].is_mailbox) {
 		joinpath (filename, save[i].dir, save[i].file);
-		return (filename);
+		return filename;
 	}
 
 	if (!default_auto_save || (!(save[i].part || save[i].patch))) {
@@ -827,13 +840,12 @@ save_filename (
 #	else
 			sprintf (&filename[strlen(filename)], ".%03d", i+1);
 #	endif /* VMS */
-
 		}
 	} else if ((p = save[i].part) || (p = save[i].patch)) {
 		joinpath (filename, save[i].dir, save[i].archive);
 		if (create_sub_dir (i)) {
 #	ifdef VMS
-			sprintf(&filename[strlen(filename)], "%s.%s%s", save[i].archive, LONG_PATH_PART, p);
+			sprintf (&filename[strlen(filename)], "%s.%s%s", save[i].archive, LONG_PATH_PART, p);
 #	else
 			sprintf (&filename[strlen(filename)], "/%s.%s%s", save[i].archive, LONG_PATH_PART, p);
 #	endif /* VMS */
@@ -863,34 +875,34 @@ get_first_savefile (void)
 		if (save[i].saved) {
 			file = (char *) my_malloc(PATH_LEN);
 			if (save[i].is_mailbox) {
-#ifdef VMS
+#	ifdef VMS
 				joinpath (file, save[i].dir, save[i].file);
-#else
+#	else
 				sprintf (file, "%s/%s", save[i].dir, save[i].file);
-#endif
+#	endif /* VMS */
 				return file;
 			} else {
 				if (save[i].archive && default_auto_save) {
 					if (save[i].part) {
 						if (create_subdir) {
-#ifdef VMS
+#	ifdef VMS
 							char fbuf[256], dbuf[256];
 							sprintf(fbuf, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
 							joinpath(file, save[i].archive, fbuf);
-#else
+#	else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PART, save[i].part);
-#endif
+#	endif /* VMS */
 						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
 					} else {
 						if (create_subdir) {
-#ifdef VMS
+#	ifdef VMS
 							char fbuf[256];
 							sprintf(fbuf, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
 							joinpath(file, save[i].archive, fbuf);
-#else
+#	else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PATCH, save[i].patch);
-#endif
+#	endif /* VMS */
 						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
 					}
@@ -898,11 +910,11 @@ get_first_savefile (void)
 					if (num_save == 1)
 						sprintf (file, "%s", save[i].file);
 					else
-#ifdef VMS
+#	ifdef VMS
 						sprintf (file, "%s-%03d", save[i].file, i+1);
-#else
+#	else
 						sprintf (file, "%s.%03d", save[i].file, i+1);
-#endif
+#	endif /* VMS */
 				}
 				return file;
 			}
@@ -924,34 +936,34 @@ get_last_savefile (void)
 		if (save[i].saved) {
 			file = (char *) my_malloc(PATH_LEN);
 			if (save[i].is_mailbox) {
-#ifdef VMS
+#	ifdef VMS
 				joinpath (file, save[i].dir, save[i].file);
-#else
+#	else
 				sprintf (file, "%s/%s", save[i].dir, save[i].file);
-#endif
+#	endif /* VMS */
 				return file;
 			} else {
 				if (save[i].archive && default_auto_save) {
 					if (save[i].part) {
 						if (create_subdir) {
-#ifdef VMS
+#	ifdef VMS
 							char fbuf[256];
 							sprintf(fbuf, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
 							joinpath(file, save[i].archive, fbuf);
-#else
+#	else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PART, save[i].part);
-#endif
+#	endif /* VMS */
 						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PART, save[i].part);
 					} else {
 						if (create_subdir) {
-#ifdef VMS
+#	ifdef VMS
 							char fbuf[256];
 							sprintf(fbuf, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
 							joinpath(file, save[i].archive, fbuf);
-#else
+#	else
 							sprintf (file, "%s/%s.%s%s", save[i].archive, save[i].archive, LONG_PATH_PATCH, save[i].patch);
-#endif
+#	endif /* VMS */
 						} else
 							sprintf (file, "%s.%s%s", save[i].archive, LONG_PATH_PATCH, save[i].patch);
 					}
@@ -959,11 +971,11 @@ get_last_savefile (void)
 					if (num_save == 1)
 						sprintf (file, "%s", save[i].file);
 					else
-#ifdef VMS
+#	ifdef VMS
 						sprintf (file, "%s-%03d", save[i].file, i+1);
-#else
+#	else
 						sprintf (file, "%s.%03d", save[i].file, i+1);
-#endif
+#	endif /* VMS */
 				}
 				return file;
 			}
@@ -974,7 +986,7 @@ get_last_savefile (void)
 #endif /* !INDEX_DAEMON */
 
 #ifndef INDEX_DAEMON
-int
+t_bool
 post_process_files (
 	int proc_type_ch,
 	t_bool auto_delete)
@@ -1011,6 +1023,7 @@ post_process_files (
 	return FALSE;
 }
 #endif /* !INDEX_DAEMON */
+
 
 #ifndef INDEX_DAEMON
 static void
@@ -1049,7 +1062,6 @@ post_process_uud (
 		}
 	}
 
-
 #	ifdef HAVE_LIBUU
 	UUInitialize();
 
@@ -1069,11 +1081,11 @@ post_process_uud (
 		}
 	}
 
-#if 0 /* uudeview's "intelligent" multi-part detection */
+#	if 0 /* uudeview's "intelligent" multi-part detection */
 	UUSmerge (0);
 	UUSmerge (1);
 	UUSmerge (99);
-#endif /* 0 */
+#	endif /* 0 */
 
 	i = open_out_file = 0;
 	item = UUGetFileListItem(i);
@@ -1190,6 +1202,7 @@ post_process_uud (
 				}
 				strcpy (u, t);
 				strcpy (t, s);
+
 				/*
 				 *  read next line & if error goto next file in save array
 				 */
@@ -1233,7 +1246,6 @@ uudecode_file (
 #		if !defined(M_UNIX)
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #		else
-
 	chdir (file_out_dir); /* FIXME: remove useles cds below and in loopcalls */
 	sh_format (buf, sizeof(buf), "uudecode %s", file_out);
 	if (invoke_cmd (buf)) {
@@ -1254,6 +1266,7 @@ uudecode_file (
 				my_printf ("%s  %10ld bytes" cCRLF cCRLF, buf, file_size (file));
 			} else
 				my_printf ("Cannot execute %s" cCRLF, buf);
+
 			my_flush ();
 
 			/* If defined, invoke post processor command */
@@ -1506,21 +1519,22 @@ any_saved_files (void)
 	return saved;
 }
 
+
 /*
  * write tailing (MDF)-mailbox seperator
  */
 void
 print_art_seperator_line (
 	FILE *fp,
-	int the_mailbox)
+	t_bool is_mailbox)
 {
 	char sep = '\1';	/* Ctrl-A */
 #ifdef DEBUG
 	if (debug == 2)
-		error_message ("Mailbox=[%d]  MMDF=[%d]", the_mailbox, save_to_mmdf_mailbox);
-#endif
+		error_message ("Mailbox=[%d]  MMDF=[%d]", is_mailbox, save_to_mmdf_mailbox);
+#endif /* DEBUG */
 
-	if (the_mailbox && save_to_mmdf_mailbox)
+	if (is_mailbox && save_to_mmdf_mailbox)
 		fprintf (fp, "%c%c%c%c\n", sep, sep, sep, sep);
 	else
 		my_fputc ('\n', fp);

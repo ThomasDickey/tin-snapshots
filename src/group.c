@@ -172,10 +172,10 @@ group_page (
 
 	show_group_page ();
 
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 	debug_print_comment ("group.c: before forever loop...");
 	debug_print_bitmap (group, NULL);
-#endif
+#	endif /* DEBUG_NEWSRC */
 
 	forever {
 		set_xclick_on ();
@@ -187,13 +187,13 @@ group_page (
 			continue;
 		}
 		switch (ch) {
-#ifndef WIN32
+#	ifndef WIN32
 			case ESC:	/* common arrow keys */
-#ifdef HAVE_KEY_PREFIX
+#		ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#endif
+#		endif /* HAVE_KEY_PREFIX */
 				switch (get_arrow_key (ch)) {
-#endif /* WIN32 */
+#	endif /* !WIN32 */
 				case KEYMAP_UP:
 					goto group_up;
 
@@ -224,7 +224,7 @@ group_page (
 
 				case KEYMAP_END:
 					goto end_of_list;
-#ifndef WIN32
+#	ifndef WIN32
 				case KEYMAP_MOUSE:
 					switch (xmouse) {
 						case MOUSE_BUTTON_1:
@@ -260,14 +260,14 @@ group_page (
 					break;
 				}
 				break;
-#endif /* WIN32 */
+#	endif /* WIN32 */
 
-#ifndef NO_SHELL_ESCAPE
+#	ifndef NO_SHELL_ESCAPE
 			case iKeyShellEscape:
 				shell_escape ();
 				show_group_page ();
 				break;
-#endif
+#	endif /* NO_SHELL_ESCAPE */
 
 			case iKeyFirstPage: /* show first page of threads */
 top_of_list:
@@ -287,6 +287,8 @@ end_of_list:
 					break;
 				}
 				n = this_resp;
+				if (arts[n].status == ART_READ)		/* Make article appear in a thread */
+					toggle_read_unread(TRUE);
 				goto enter_pager;
 
 			case iKeyGroupPipe:	/* pipe article/thread/tagged arts to command */
@@ -332,7 +334,7 @@ do_search:		/* Search for type 'n' in direction 'i' */
 				}
 				break;
 
-			case iKeyGroupFSearchBody:	/* search article body */
+			case iKeySearchBody:	/* search article body */
 				if (index_point < 0) {
 					info_message (txt_no_arts);
 					break;
@@ -521,14 +523,14 @@ group_catchup:									/* came here on group exit via left arrow */
 				show_inverse_video_status ();
 				break;
 
-#ifdef HAVE_COLOR
+#	ifdef HAVE_COLOR
 			case iKeyGroupToggleColor:
 				if (toggle_color ()) {
 					show_group_page ();
 					show_color_status ();
 				}
 				break;
-#endif
+#	endif /* HAVE_COLOR */
 
 			case iKeyGroupMarkThdRead:	/* mark thread as read */
 
@@ -788,6 +790,7 @@ enter_pager:
 				index_point = GRP_NEXTUNREAD;
 				space_mode = pos_first_unread;
 				goto group_done;
+				/* NOTREACHED */
 				break;
 
 			case iKeyGroupBugReport:	/* bug/gripe/comment mailed to author */
@@ -1081,9 +1084,9 @@ do_auto_select_arts:
 
 				for (i=0; i < top; ++i) {
 					if (arts[i].status == ART_UNREAD && arts[i].selected != 1) {
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 						debug_print_comment ("group.c: X command");
-#endif
+#	endif /* DEBUG_NEWSRC */
 						art_mark_read (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = TRUE;
 					}
@@ -1102,9 +1105,9 @@ do_auto_select_arts:
 undo_auto_select_arts:
 				for (i=0; i<top; ++i) {
 					if (arts[i].status == ART_READ && arts[i].zombie) {
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 						debug_print_comment ("group.c: + command");
-#endif
+#	endif /* DEBUG_NEWSRC */
 						art_mark_unread (&CURR_GROUP, &arts[i]);
 						arts[i].zombie = FALSE;
 					}

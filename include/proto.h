@@ -23,7 +23,7 @@ extern char *pcFindNovFile (struct t_group *psGrp, int iMode);
 extern t_bool index_group (struct t_group *group);
 extern void do_update (void);
 extern void find_base (struct t_group *group);
-extern void make_threads (struct t_group *group, int rethread);
+extern void make_threads (struct t_group *group, t_bool rethread);
 extern void set_article (struct t_article *art);
 extern void sort_arts (unsigned int sort_art_type);
 extern void vWriteNovFile (struct t_group *psGrp);
@@ -235,7 +235,7 @@ extern void expand_newnews (void);
 extern void expand_save (void);
 extern void init_alloc (void);
 #ifndef USE_CURSES
-	extern void init_screen_array (int allocate);
+	extern void init_screen_array (t_bool allocate);
 #endif
 extern void free_all_arrays (void);
 extern void free_art_array (void);
@@ -274,7 +274,7 @@ extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl, t_bo
 extern void copy_fp (FILE *fp_ip, FILE *fp_op);
 extern void create_index_lock_file (char *the_lock_file);
 extern void draw_percent_mark (long cur_num, long max_num);
-extern void get_author (int thread, struct t_article *art, char *str, size_t len);
+extern void get_author (t_bool thread, struct t_article *art, char *str, size_t len);
 extern void get_cwd (char *buf);
 extern void make_group_path (char *name, char *path);
 #if 0
@@ -377,9 +377,9 @@ extern FILE *open_art_header (long art);
 extern int get_respcode (char *);
 extern int get_only_respcode (char *);
 extern int nntp_open (void);
-extern int stat_article (long art, char *group_path);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
 extern long setup_hard_base (struct t_group *group, char *group_path);
+extern t_bool stat_article (long art, char *group_path);
 extern void nntp_close (void);
 extern void vGet1GrpArtInfo(struct t_group *grp);
 #ifdef HAVE_MH_MAIL_HANDLING
@@ -409,13 +409,13 @@ extern time_t parsedate (char *p, TIMEINFO *now);
 
 /* post.c */
 extern int count_postponed_articles (void);
-extern int mail_bug_report (void);
-extern int mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
-extern int mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
-extern int post_article (char *group, int *posted_flag);
 extern int post_response (char *group, int respnum, int copy_text, t_bool with_headers);
-extern int repost_article (const char *group, int respnum, int supersede);
+extern int repost_article (const char *group, int respnum, t_bool supersede);
+extern t_bool mail_bug_report (void);
+extern t_bool mail_to_author (char *group, int respnum, int copy_text, t_bool with_headers);
+extern t_bool mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
+extern t_bool post_article (char *group, int *posted_flag);
 extern t_bool reread_active_after_posting (void);
 extern t_bool user_posted_messages (void);
 extern void checknadd_headers (char *infile);
@@ -474,20 +474,20 @@ extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool 
 
 /* save.c */
 extern int check_start_save_any_news (int check_start_save);
-extern int create_path (char *path);
-extern int post_process_files (int proc_type_ch, t_bool auto_delete);
-extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
 extern int save_comp (t_comptype *p1, t_comptype *p2);
-extern void print_art_seperator_line (FILE *fp, int the_mailbox);
+extern t_bool create_path (char *path);
+extern t_bool post_process_files (int proc_type_ch, t_bool auto_delete);
+extern t_bool save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
+extern void print_art_seperator_line (FILE *fp, t_bool is_mailbox);
 extern void sort_save_list (void);
 #ifndef INDEX_DAEMON
-	extern int save_regex_arts (int is_mailbox, char *group_path);
+	extern t_bool save_regex_arts (int is_mailbox, char *group_path);
 	extern t_bool save_thread_to_file (int is_mailbox, char *group_path);
 	extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
 #endif /* !INDEX_DAEMON */
 
 /* screen.c */
-extern void center_line (int line, int inverse, const char *str);
+extern void center_line (int line, t_bool inverse, const char *str);
 extern void clear_message (void);
 extern void draw_arrow (int line);
 extern void erase_arrow (int line);
@@ -504,9 +504,9 @@ extern void wait_message (int delay, const char *fmt, ...);
 /* search.c */
 extern int search (int key, int current_art, int forward);
 extern int search_active (int forward);
-extern int search_article (int forward);
 extern int search_config (int forward, int current, int last);
 extern int search_help (int forward, int current, int last);
+extern t_bool search_article (int forward);
 #ifndef INDEX_DAEMON
 	extern int search_body (int current_art);
 #endif /* !INDEX_DAEMON */
@@ -596,7 +596,7 @@ extern int which_response (int n);
 extern int which_thread (int n);
 extern void show_thread_page (void);
 #ifndef INDEX_DAEMON
-	extern int thread_page (struct t_group *group, int respnum, int thread_depth);
+	extern int thread_page (struct t_group *group, int respnum, int the_thread_depth);
 #endif /* !INDEX_DAEMON */
 
 /* wildmat.c */

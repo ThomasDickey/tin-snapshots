@@ -82,8 +82,8 @@ set_colors (
 
 		/* curses assumes white/black */
 		if (fcolor != COLOR_WHITE || bcolor != COLOR_BLACK) {
-			int found = FALSE;
 			struct LIST *p;
+			t_bool found = FALSE;
 
 			for (p = list; p != 0; p = p->link) {
 				if (p->fg == fcolor && p->bg == bcolor) {
@@ -278,4 +278,4 @@ print_color (
 
 	my_fputs(cCRLF, stdout);
 }
-#endif
+#endif /* HAVE_COLOR */

@@ -463,7 +463,7 @@ grp_mark_read (
 
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("c/C command");
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	if (psArt != (struct t_article *) 0) {
 		for (i = 0; i < top; i++)
@@ -491,7 +491,7 @@ grp_mark_unread (
 
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Z command");
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	vGrpGetArtInfo (
 		group->spooldir,
@@ -526,7 +526,7 @@ grp_mark_unread (
 
 #ifdef DEBUG_NEWSRC
 	debug_print_bitmap (group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 }
 
 
@@ -539,7 +539,7 @@ thd_mark_read (
 
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Mark thread read K command");
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	for (i = (int) thread; i >= 0; i = arts[i].thread)
 		art_mark_read (group, &arts[i]);
@@ -555,7 +555,7 @@ thd_mark_unread (
 
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("Mark thread unread Z command");
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	for (i = (int) thread; i >= 0; i = arts[i].thread)
 		art_mark_will_return (group, &arts[i]); /* art_mark_unread (group, &arts[i]); */
@@ -591,7 +591,7 @@ parse_bitmap_seq (
 		debug_print_comment(buf);
 		debug_print_bitmap(group, NULL);
 	}
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	if (ptr) {
 		gotseq = TRUE;
@@ -669,7 +669,7 @@ wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
 	group->newsrc.num_unread = sum;
 #ifdef DEBUG_NEWSRC
 	debug_print_bitmap(group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 }
 
 
@@ -692,12 +692,6 @@ pcParseSubSeq (
 	long	lBitMin;
 	long	lBitMax;
 	long	lLastHigh;
-
-/*
-#ifdef DEBUG_NEWSRC
-	my_printf ("Seq=[%s]\n", pcSeq);
-#endif
-*/
 
 	lLastHigh = *plHigh;
 	pcSeq = pcParseGetSeq(pcSeq, plLow, plHigh);
@@ -794,11 +788,6 @@ pcParseGetSeq(
 	while (*pcSeq && (*pcSeq < '0' || *pcSeq > '9'))
 		pcSeq++;
 
-/*
-#ifdef DEBUG_NEWSRC
-	my_printf ("Min=[%ld] Max=[%ld] Seq=[%s]\n", *plLow, *plHigh, pcSeq);
-#endif
-*/
 	return pcSeq;
 }
 
@@ -864,7 +853,7 @@ print_bitmap_seq (
 #ifdef DEBUG_NEWSRC
 	debug_print_comment ("print_bitmap_seq()");
 	debug_print_bitmap (group, NULL);
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	if (group->count == 0 || group->xmin > group->xmax) {
 		if (group->newsrc.xmax > 1)
@@ -874,7 +863,7 @@ print_bitmap_seq (
 		fflush (fp);
 #ifdef DEBUG_NEWSRC
 		debug_print_comment ("print_bitmap_seq(): group->count == 0");
-#endif
+#endif /* DEBUG_NEWSRC */
 		return;
 	}
 
@@ -918,7 +907,7 @@ print_bitmap_seq (
 
 #ifdef DEBUG_NEWSRC
 		debug_print_comment ("print_bitmap_seq(): !flag && group->newsrc.xmin > 1");
-#endif
+#endif /* DEBUG_NEWSRC */
 	}
 
 	fprintf (fp, "\n");
@@ -942,12 +931,12 @@ pos_group_in_newsrc (
 	FILE *fp_in = NULL, *fp_out = NULL;
 	FILE *fp_sub = NULL, *fp_unsub = NULL;
 	int subscribed_pos = 1;
-	int ret_code = FALSE;
 	size_t group_len;
 	t_bool found = FALSE;
 	t_bool newnewsrc_created = FALSE;
 	t_bool option_line = FALSE;
 	t_bool repositioned = FALSE;
+	t_bool ret_code = FALSE;
 	t_bool sub_created = FALSE;
 	t_bool unsub_created = FALSE;
 
@@ -1070,7 +1059,6 @@ pos_group_in_newsrc (
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 	else {
 		if (repositioned) {
-			cur_groupnum = pos;
 			rename_file (newnewsrc, newsrc);
 			ret_code = TRUE;
 		}
@@ -1218,7 +1206,7 @@ expand_bitmap (
 		group->newsrc.xbitmap = (t_bitmap *) 0;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen == 0");
-#endif
+#endif /* DEBUG_NEWSRC */
 	} else if (group->newsrc.xbitmap == (t_bitmap *) 0) {
 		group->newsrc.xbitmap = (t_bitmap *)my_malloc (BITS_TO_BYTES(bitlen));
 		if (group->newsrc.xmin > first)
@@ -1227,7 +1215,7 @@ expand_bitmap (
 			NSETRNG1 (group->newsrc.xbitmap, group->newsrc.xmin - first, bitlen - 1);
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.xbitmap == NULL");
-#endif
+#endif /* DEBUG_NEWSRC */
 	} else if (need_full_copy) {
 		t_bitmap *newbitmap;
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(bitlen));
@@ -1269,7 +1257,7 @@ expand_bitmap (
 		group->newsrc.xbitmap = newbitmap;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen != (group->max-group->min)+1 and need full copy");
-#endif
+#endif /* DEBUG_NEWSRC */
 	} else if (max != group->newsrc.xmax || first != group->newsrc.xmin) {
 		t_bitmap *newbitmap;
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(bitlen));
@@ -1308,7 +1296,7 @@ expand_bitmap (
 		group->newsrc.xbitmap = newbitmap;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen != (group->max-group->min)+1");
-#endif
+#endif /* DEBUG_NEWSRC */
 	}
 	group->newsrc.xmin = first;
 	if (group->newsrc.xmax < max)
@@ -1330,7 +1318,7 @@ art_mark_read (
 				NSET0(group->newsrc.xbitmap, art->artnum - group->newsrc.xmin);
 #ifdef DEBUG_NEWSRC
 			debug_print_bitmap (group, art);
-#endif
+#endif /* DEBUG_NEWSRC */
 		}
 		if ((art->status == ART_UNREAD) || (art->status == ART_WILL_RETURN)) {
 			art_mark_xref_read (art);
@@ -1373,7 +1361,7 @@ art_mark_unread (
 				NSET1(group->newsrc.xbitmap, art->artnum - group->newsrc.xmin);
 #ifdef DEBUG_NEWSRC
 				debug_print_bitmap (group, art);
-#endif
+#endif /* DEBUG_NEWSRC */
 			}
 		}
 	}
@@ -1405,7 +1393,7 @@ art_mark_will_return (
 			NSET1(group->newsrc.xbitmap, art->artnum - group->newsrc.xmin);
 #ifdef DEBUG_NEWSRC
 			debug_print_bitmap (group, art);
-#endif
+#endif /* DEBUG_NEWSRC */
 		}
 	}
 }
@@ -1533,7 +1521,7 @@ vNewsrcTestHarness (void)
 			fclose (fp);
 		}
 	}
-#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
+#	ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 	set_bitmap_range_read (&group.newsrc, rng_min, rng_max);
 	debug_print_newsrc (&group.newsrc, stdout);
 
@@ -1546,12 +1534,12 @@ vNewsrcTestHarness (void)
 
 	NSETBLK1(group.newsrc.xbitmap, group.newsrc.xbitlen);
 	debug_print_newsrc (&group.newsrc, stdout);
-#endif
+#	endif /* DEBUG_NEWSRC_FIXME */
 	my_printf ("\n");
 }
 
 
-#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
+#	ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 static void
 set_bitmap_range_read (
 	struct	t_newsrc *newsrc,
@@ -1598,6 +1586,6 @@ newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 		}
 	}
 }
-#endif /* DEBUG_NEWSRC_FIXME */
+#	endif /* DEBUG_NEWSRC_FIXME */
 
 #endif /* DEBUG_NEWSRC */

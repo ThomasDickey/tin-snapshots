@@ -652,7 +652,7 @@ read_cmd_line_options (
 	 */
 	if (read_news_via_nntp)
 		read_local_newsgroups_file = !check_for_new_newsgroups;
-#endif
+#endif /* NNTP_ABLE */
 	/*
 	 *  If we use neither list_active nor newsrc_active,
 	 *  we use both of them.
@@ -689,10 +689,10 @@ usage (
 
 #	ifdef DEBUG
 		error_message ("  -D       debug mode 1=NNTP 2=ALL");
-#	endif
+#	endif /* DEBUG */
 
 	error_message ("  -f file  subscribed to newsgroups file [default=%s]", newsrc);
-	error_message ("  -G flag  turn on|off that limit the number of article to get (flag=on|off)");
+	error_message ("  -G limit get only limit articles/group");
 
 #	ifndef M_AMIGA
 #		ifdef NNTP_ABLE
@@ -763,7 +763,7 @@ usage (
 
 #	ifdef DEBUG
 	error_message ("  -D       debug mode 1=NNTP 2=ALL");
-#	endif
+#	endif /* DEBUG */
 
 	error_message ("  -f file  active newsgroups file [default=%s]", newsrc);
 	error_message ("  -h       this help message");

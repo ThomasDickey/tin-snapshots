@@ -16,6 +16,7 @@ VPATH		= $(srcdir)
 
 CC	= @CC@
 CFLAGS	= @CFLAGS@ @PCRE_DEFINES@
+CPPOPTS = -I.
 RANLIB	= @RANLIB@
 RM	= rm
 x	= @PROG_EXT@
@@ -59,7 +60,7 @@ pcreposix.o:    pcreposix.c pcreposix.h pcre.h internal.h
 
 maketables.o:	maketables.c pcre.h internal.h
 @SHOW_CC@
-	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c maketables.c
+	@ECHO_CC@$(CC) $(CPPOPTS) $(CFLAGS) -c $(srcdir)/maketables.c
 
 study.o:        study.c pcre.h internal.h
 
@@ -74,7 +75,7 @@ chartables.c:	deftables$x
 
 deftables$x:	deftables.c maketables.c pcre.h internal.h
 @SHOW_CC@
-		@ECHO_CC@$(CC) -o $@ $(CFLAGS) deftables.c
+		@ECHO_CC@$(CC) -o $@ $(CFLAGS) $(srcdir)/deftables.c
 
 # We deliberately omit deftables and chartables.c from 'make clean'; once made
 # chartables.c shouldn't change, and if people have edited the tables by hand,

@@ -52,8 +52,8 @@ float d_time;
 				 (void) gettimeofday (&beg_tb, NULL);}
 
 #			define EndStopWatch()		{(void) gettimeofday (&end_tb, NULL); \
-				 if ((end_tb.tv_usec -= beg_tb.tv_usec) < 0) { \
-			       		end_tb.tv_sec--; \
+				if ((end_tb.tv_usec -= beg_tb.tv_usec) < 0) { \
+					end_tb.tv_sec--; \
 					end_tb.tv_usec += 1000000; \
 				 } \
 				 end_tb.tv_sec -= beg_tb.tv_sec; \

@@ -16,31 +16,31 @@
 #	define BUGREP_H	1
 
 #	ifdef M_UNIX
-#		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
+#		define BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
 #	endif /* M_UNIX */
 
 #	ifdef M_AMIGA
-#		define	BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
+#		define BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
 #	endif /* M_AMIGA */
 
 #	ifdef VMS
-#		define	BUG_REPORT_ADDRESS	"stenns@vw.tci.uni-hannover.de"
+#		define BUG_REPORT_ADDRESS	"stenns@vw.tci.uni-hannover.de"
 #	endif /* VMS */
 
 /* OS2 and WIN32 are currently not supported */
 #if 0
 #	ifdef M_OS2
-#		define	BUG_REPORT_ADDRESS	"andreas@scilink.org"
+#		define BUG_REPORT_ADDRESS	"andreas@scilink.org"
 #	endif /* M_OS2 */
 
 #	ifdef WIN32
-#		define	BUG_REPORT_ADDRESS	"nigele@microsoft.com"
+#		define BUG_REPORT_ADDRESS	"nigele@microsoft.com"
 #	endif /* WIN32 */
 #endif /* 0*/
 
 /* fallback */
 #	ifndef BUG_REPORT_ADDRESS
-#		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
+#		define BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
 #	endif /* BUG_REPORT_ADDRESS */
 
 #endif /* !BUGREP_H */

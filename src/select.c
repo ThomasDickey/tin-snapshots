@@ -18,7 +18,7 @@
 
 char default_goto_group[LEN];
 int default_move_group;
-int cur_groupnum = 0;
+int cur_groupnum = 0;        /* always >= 0 */
 int first_group_on_screen;
 int last_group_on_screen;
 /*
@@ -32,8 +32,8 @@ t_bool space_mode;
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
-	static int continual_key (int ch, int ch1);
 	static int reposition_group (struct t_group *group, int default_num);
+	static t_bool continual_key (int ch, int ch1);
 	static t_bool pos_next_unread_group (t_bool redraw);
 	static t_bool read_groups (void);
 	static void catchup_group (struct t_group *group, t_bool goto_next_unread_group);
@@ -52,7 +52,7 @@ static void erase_group_arrow (void);
  *  TRUE, if we should check whether it's time to reread the active file
  *  after this keypress.
  */
-static int
+static t_bool
 continual_key (
 	int ch,
 	int ch1)
@@ -60,7 +60,7 @@ continual_key (
 	switch(ch) {
 #ifndef NO_SHELL_ESCAPE
 		case iKeyShellEscape:
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 		case iKeyLookupMessage:
 		case iKeyOptionMenu:
 		case iKeyQuit:
@@ -77,17 +77,17 @@ continual_key (
 
 #ifndef WIN32
 		case ESC:
-#ifdef HAVE_KEY_PREFIX
+#	ifdef HAVE_KEY_PREFIX
 		case KEY_PREFIX:
-#endif
+#	endif /* HAVE_KEY_PREFIX */
 			switch(ch1) {
-#endif /* WIN32 */
+#endif /* !WIN32 */
 				case KEYMAP_LEFT:
 					return FALSE;
 #ifndef WIN32
 			}
 			/* FALLTHROUGH */
-#endif /* WIN32 */
+#endif /* !WIN32 */
 
 		default:
 			return TRUE;
@@ -112,7 +112,7 @@ selection_page (
 
 #ifdef READ_CHAR_HACK
 	setbuf (stdin, 0);
-#endif
+#endif /* READ_CHAR_HACK */
 
 	ClearScreen();
 	set_groupname_len (FALSE);	/* find longest subscribed to groupname */
@@ -134,12 +134,12 @@ selection_page (
 #ifndef WIN32
 		switch(ch) {
 			case ESC:	/* (ESC) common arrow keys */
-#ifdef HAVE_KEY_PREFIX
+#	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#endif
+#	endif /* HAVE_KEY_PREFIX */
 				ch1 = get_arrow_key (ch);
 		}
-#endif /* WIN32 */
+#endif /* !WIN32 */
 
 		if (continual_key (ch, ch1))
 			(void) resync_active_file ();
@@ -151,11 +151,11 @@ selection_page (
 		switch (ch) {
 #ifndef WIN32
 			case ESC:	/* (ESC) common arrow keys */
-#ifdef HAVE_KEY_PREFIX
+#	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#endif
+#	endif /* HAVE_KEY_PREFIX */
 				switch (ch1) {
-#endif /* WIN32 */
+#endif /* !WIN32 */
 					case KEYMAP_UP:
 						goto select_up;
 
@@ -217,7 +217,7 @@ selection_page (
 				shell_escape ();
 				show_selection_page ();
 				break;
-#endif
+#endif /* !NO_SHELL_ESCAPE */
 
 			case iKeyFirstPage:	/* show first page of groups */
 top_of_list:
@@ -379,7 +379,7 @@ select_page_up:
 					show_color_status ();
 				}
 				break;
-#endif
+#endif /* HAVE_COLOR */
 
 			case iKeyToggleInfoLastLine:	/* display group description */
 				info_in_last_line = !info_in_last_line;
@@ -585,8 +585,12 @@ select_done:
 					cur_groupnum = -1;
 					if (n)  /* Keep us positioned on the group we were before */
 						cur_groupnum = add_my_group (buf, FALSE);
-					if (cur_groupnum == -1)
-						cur_groupnum = group_top - 1;
+					if (cur_groupnum == -1) {
+						if (group_top > 0)
+							cur_groupnum = group_top - 1;
+						else
+							cur_groupnum = 0;
+					}
 
 					set_groupname_len (yank_in_active_file);
 					show_selection_page ();
@@ -647,11 +651,11 @@ show_selection_page (void)
 	CleartoEOLN ();
 	MoveCursor (INDEX_TOP, 0);
 
-	if (cur_groupnum < 0)
-		cur_groupnum = 0;
-
 	if (cur_groupnum >= group_top)
 		cur_groupnum = group_top - 1;
+
+	if (cur_groupnum < 0)
+		cur_groupnum = 0;
 
 	set_first_screen_item (cur_groupnum, group_top, &first_group_on_screen, &last_group_on_screen);
 
@@ -662,7 +666,7 @@ show_selection_page (void)
 		char sptr[BUFSIZ];
 #else
 		char *sptr = screen[j].col;
-#endif
+#endif /* USE_CURSES */
 		if (active[my_group[i]].inrange)
 			strcpy (tmp, "    #");
 		else if (active[my_group[i]].newsrc.num_unread) {
@@ -968,6 +972,9 @@ pos_next_unread_group (
 	int i;
 	t_bool all_groups_read = TRUE;
 
+	if (!group_top)
+		return FALSE;
+
 	for (i = cur_groupnum; i < group_top; i++) {
 		if (UNREAD_GROUP (i)) {
 			all_groups_read = FALSE;
@@ -1004,7 +1011,7 @@ pos_next_unread_group (
  * (return TRUE) or quit (return FALSE)
  */
 static t_bool
-read_groups()
+read_groups (void)
 {
 	t_bool done = FALSE;
 
@@ -1106,7 +1113,7 @@ toggle_my_groups (
 	char old_curr_group[PATH_LEN];
 	char *ptr;
 	int active_idx = 0;
-	int group_num = cur_groupnum;
+	int group_num = (cur_groupnum == -1) ? 0 : cur_groupnum;
 	register int i;
 
 	if ((fp = fopen (newsrc, "r")) == (FILE *) 0)
@@ -1123,8 +1130,11 @@ toggle_my_groups (
 			if (group[0] != '\0') {
 				if ((i = find_group_index (group)) >= 0)
 					active_idx = i;
-			} else
+			} else if (group_num >= 0) {
 				active_idx = my_group[group_num];
+			} else {
+				active_idx = 0;
+			}
 
 			my_strncpy (old_curr_group, active[active_idx].name, sizeof (old_curr_group));
 		} else {
@@ -1191,7 +1201,6 @@ subscribe_pattern (
 	wait_message (0, message);
 
 	/* TODO - so why precisely do we need these 2 separate passes ? */
-
 	for (subscribe_num = 0, i = 0; i < group_top; i++) {
 		if (match_group_list (active[my_group[i]].name, buf)) {
 			if (active[my_group[i]].subscribed != (state != FALSE)) {
@@ -1240,7 +1249,7 @@ strip_line (
 {
 	char *ptr = line + strlen(line) - 1;
 
-	while ((ptr >= line) && (*ptr == ' ' || *ptr == '\r' || *ptr == '\n'))
+	while ((ptr >= line) && (*ptr == ' ' || *ptr == '\t' || *ptr == '\r' || *ptr == '\n'))
 		ptr--;
 
 	*++ptr = '\0';
@@ -1453,6 +1462,8 @@ move_to_group(
 	HpGlitch(erase_group_arrow ());
 	erase_group_arrow ();
 	cur_groupnum = n;
+	if (cur_groupnum < 0)
+		cur_groupnum = 0;
 	clear_message ();
 
 	if (n >= first_group_on_screen && n < last_group_on_screen)

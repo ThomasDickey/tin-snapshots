@@ -210,7 +210,7 @@ read_filter_file (
 	t_bool expired = FALSE;
 	t_bool expired_time = FALSE;
 	t_bool global = TRUE;
-	time_t secs = (time_t) 0;
+	long secs = 0L;
 	time_t current_secs = (time_t) 0;
 	struct t_group *psGrp;
 
@@ -280,7 +280,7 @@ if (debug) {
 				lines[0] = '\0';
 				xref[0] = '\0';
 				icase = 0;
-				secs = (time_t) 0;
+				secs = 0L;
 				psGrp = (struct t_group *) 0;   /* fudge for out of order rules */
 				break;
 			}
@@ -368,7 +368,7 @@ if (debug) {
 				lines[0] = '\0';
 				xref[0] = '\0';
 				icase = 0;
-				secs = (time_t) 0;
+				secs = 0L;
 				psGrp = (struct t_group *) 0;	/* fudge for out of order rules */
 				break;
 			}
@@ -431,10 +431,10 @@ if (debug) {
 				}
 				break;
 			}
-			if (match_long (buf+1, "ime=", (long *) &secs)) {
+			if (match_long (buf+1, "ime=", &secs)) {
 				if (arr_ptr && !expired_time) {
-					arr_ptr[i].time = secs;
-					if (secs && current_secs > secs) {
+					arr_ptr[i].time = (time_t) secs;
+					if (secs && current_secs > (time_t) secs) {
 #ifdef DEBUG
 if (debug) {
 	my_printf ("EXPIRED  secs=[%lu]  current_secs=[%lu]\n", (unsigned long int) secs, (unsigned long int) current_secs);

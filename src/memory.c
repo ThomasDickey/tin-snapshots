@@ -79,7 +79,7 @@ init_alloc (void)
 
 #ifndef USE_CURSES
 	screen = (struct t_screen *) 0;
-#endif
+#endif /* !USE_CURSES */
 }
 
 
@@ -131,7 +131,7 @@ expand_newnews (void)
 #ifndef USE_CURSES
 void
 init_screen_array (
-	int allocate)
+	t_bool allocate)
 {
 	int i;
 
@@ -152,7 +152,7 @@ init_screen_array (
 		}
 	}
 }
-#endif
+#endif /* !USE_CURSES */
 
 
 void
@@ -353,7 +353,7 @@ my_malloc1 (
 
 #ifdef DEBUG
 	vDbgPrintMalloc (TRUE, file, line, size);
-#endif
+#endif /* DEBUG */
 
 	if ((p = (char *) malloc (size)) == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);
@@ -373,7 +373,7 @@ my_realloc1 (
 
 #ifdef DEBUG
 	vDbgPrintMalloc (FALSE, file, line, size);
-#endif
+#endif /* DEBUG */
 
 	p = (char *) ((!p) ? (calloc (1, size)) : realloc (p, size));
 

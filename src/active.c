@@ -912,10 +912,10 @@ vMakeGrpList (
 	char *pcPtr;
 	char acFile[PATH_LEN];
 	char acPath[PATH_LEN];
-	int iIsDir;
 	long lArtMax;
 	long lArtMin;
 	struct stat sStatInfo;
+	t_bool bIsDir;
 
 	if (access (pcGrpPath, R_OK))
 		return;
@@ -923,7 +923,7 @@ vMakeGrpList (
 	tDirFile = opendir (pcGrpPath);
 
 	if (tDirFile != (DIR *) 0) {
-		iIsDir = FALSE;
+		bIsDir = FALSE;
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
 			STRCPY(acFile, tFile->d_name);
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
@@ -932,11 +932,11 @@ vMakeGrpList (
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
 				if (stat (acPath, &sStatInfo) != -1) {
 					if (S_ISDIR(sStatInfo.st_mode))
-						iIsDir = TRUE;
+						bIsDir = TRUE;
 				}
 			}
-			if (iIsDir) {
-				iIsDir = FALSE;
+			if (bIsDir) {
+				bIsDir = FALSE;
 				strcpy (pcGrpPath, acPath);
 
 				vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath);

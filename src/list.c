@@ -67,7 +67,7 @@ my_printf ("hash=[%s] [%ld]\n", group, val);
 	hash_value %= TABLE_SIZE;
 
 	return (hash_value);
-#endif
+#endif /* NEW_HASH_METHOD */
 }
 
 /*

@@ -30,8 +30,8 @@ char last_put[NNTP_STRLEN];
 /* Flag to show whether tin did reconnect in last get_server process */
 t_bool reconnected_in_last_get_server = FALSE;
 
-TCP *nntp_rd_fp = NULL;
-TCP *nntp_wr_fp = NULL;
+static TCP *nntp_rd_fp = NULL;
+static TCP *nntp_wr_fp = NULL;
 
 /*
  * local prototypes

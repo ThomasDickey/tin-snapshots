@@ -32,7 +32,7 @@ static int offset = 0;
  */
 static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
 #ifdef NNTP_ABLE
-	static t_bool wait_for_input (void/*FILE *fd*/);
+	static t_bool wait_for_input (void /*FILE *fd*/);
 #endif /* NNTP_ABLE */
 
 
@@ -43,7 +43,7 @@ static char * tin_read (char *buffer, size_t len, FILE *fp, t_bool header);
  *         FALSE otherwise
  */
 static t_bool
-wait_for_input (/*FILE *fd*/)
+wait_for_input (void /*FILE *fd*/)
 {
 #	ifndef HAVE_SELECT
 #		ifdef VMS

@@ -26,10 +26,10 @@ match_regex(
 	t_bool icase)
 {
 	const char *errmsg;
-	int ret = FALSE;
 	int flags = PCRE_EXTENDED;
 	int error;
 	pcre *re;
+	t_bool ret = FALSE;
 
 	mesg[0] = '\0';
 

@@ -23,30 +23,30 @@
 #	include <in.h>
 #	include <inet.h>
 #	include <socket.h>
-#	define	s_printf	si_fprintf
-#	define	s_fdopen	si_fdopen
-#	define	s_flush	si_fflush
-#	define	s_fclose	si_fclose
-#	define	s_gets	si_fgets
-#	define	s_close	si_close
-#	define	s_puts	si_fputs
-#	define	s_dup
-#	define	s_init()	(1)
-#	define	s_end()
+#	define s_printf	si_fprintf
+#	define s_fdopen	si_fdopen
+#	define s_flush	si_fflush
+#	define s_fclose	si_fclose
+#	define s_gets	si_fgets
+#	define s_close	si_close
+#	define s_puts	si_fputs
+#	define s_dup
+#	define s_init()	(1)
+#	define s_end()
 #else
 #	ifdef M_AMIGA
 #		include "amigatcp.h"
 #	else
-#		define	s_printf	fprintf
-#		define	s_fdopen	fdopen
-#		define	s_flush	fflush
-#		define	s_fclose	fclose
-#		define	s_gets	fgets
-#		define	s_close	close
-#		define	s_puts	fputs
-#		define	s_dup		dup
-#		define	s_init()	(1)
-#		define	s_end()
+#		define s_printf	fprintf
+#		define s_fdopen	fdopen
+#		define s_flush	fflush
+#		define s_fclose	fclose
+#		define s_gets	fgets
+#		define s_close	close
+#		define s_puts	fputs
+#		define s_dup		dup
+#		define s_init()	(1)
+#		define s_end()
 #	endif /* M_AMIGA */
 #endif /* VMS && SOCKETSHR_TCP */
 
@@ -63,7 +63,7 @@
 #		include	<stropts.h>
 #		include	<sys/socket.h>
 #		include	<netinet/in.h>
-#		define	IPPORT_NNTP	((unsigned short) 119)
+#		define IPPORT_NNTP	((unsigned short) 119)
 #	else
 #		ifdef VMS
 #			ifdef MULTINET
@@ -82,11 +82,11 @@
 #					include <iodef.h>
 #					include <in.h>
 #					include <socket.h>
-#					define 	netopen	open
-#					define 	netread	read
-#					define 	netwrite	write
-#					define 	netclose	close
-#					define	IPPORT_NNTP	((unsigned short) 119)
+#					define netopen	open
+#					define netread	read
+#					define netwrite	write
+#					define netclose	close
+#					define IPPORT_NNTP	((unsigned short) 119)
 #				endif /* UCX */
 #			endif /* MULTINET */
 #		else
@@ -120,9 +120,12 @@
 #	define MAXHOSTNAMELEN 255
 #endif
 
+#ifndef SOCKS
 #ifdef DECL_CONNECT
 	extern int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);
 #endif /* DECL_CONNECT */
+#endif
+
 #ifdef DECL_INET_NTOA
 	extern char *inet_ntoa (struct in_addr);
 #endif

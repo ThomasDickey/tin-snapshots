@@ -163,9 +163,9 @@ prompt_yn (
 			case ESC:	/* (ESC) common arrow keys */
 #	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
-#	endif
+#	endif /* HAVE_KEY_PREFIX */
 				switch (get_arrow_key (ch)) {
-#endif /* WIN32 */
+#endif /* !WIN32 */
 					case KEYMAP_UP:
 					case KEYMAP_DOWN:
 						default_answer = !default_answer;
@@ -184,7 +184,7 @@ prompt_yn (
 						break;
 				}
 				break;
-#endif
+#endif /* !WIN32 */
 			default:
 				break;
 		}
@@ -493,16 +493,16 @@ continue_prompt (void)
 
 #ifdef USE_CURSES
 	cmd_line = TRUE;
-#endif
+#endif /* USE_CURSES */
 	info_message (txt_return_key);
 	ch = ReadCh ();
 
 #ifndef WIN32
 	switch (ch) {
 		case ESC:
-#ifdef HAVE_KEY_PREFIX
+#	ifdef HAVE_KEY_PREFIX
 		case KEY_PREFIX:
-#endif
+#	endif /* HAVE_KEY_PREFIX */
 			(void) get_arrow_key(ch);
 		/* FALLTHROUGH */
 		default:
