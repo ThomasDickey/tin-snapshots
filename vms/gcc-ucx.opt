@@ -1,0 +1,6 @@
+gnu_cc:[000000]gcclib.olb/libr
+sys$library:ucx$ipc/library
+sys$library:decw$dwtlibshr/share
+sys$library:decw$xlibshr/share
+sys$library:vaxccurse/libr
+sys$share:vaxcrtl/share

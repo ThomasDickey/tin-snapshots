@@ -1,0 +1,865 @@
+diff -rusNP ../nntp-t5/Makefile ./Makefile
+--- ../nntp-t5/Makefile	Fri Aug 13 02:27:44 1993
++++ ./Makefile	Mon Nov 29 14:19:27 1993
+@@ -4,11 +4,12 @@
+ # The program that knows how to deal with makefiles. [Uncomment if needed.]
+ # MAKE=make
+ # set CFLAGS to be -Ipath/to/special/includes if needed
+-CFLAGS= -O 
++CC= gcc
++CFLAGS= -O -DISC -I/usr/local/src/localsrc/dbz
+ # set LIBS to be -lneededlibrary if needed
+ #LIBS	= -ldbz
+-#LIBS	= /usr/local/lib/dbz.o
+-LIBS	= -ldbm
++LIBS	= /usr/local/src/localsrc/cnews-911222/dbz/dbz.o -linet -lnsl_s
++#LIBS	= -ldbm
+ 
+ DISTFILES = Makefile README CHANGES
+ 
+@@ -23,11 +24,11 @@
+ all: make_$(TYPE)
+ 
+ make_server: /nowhere
+-	cd server; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CFLAGS=${CFLAGS}"
+-	cd support; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CFLAGS=${CFLAGS}"
+-	cd doc; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CFLAGS=${CFLAGS}"
+-	cd xmit; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CFLAGS=${CFLAGS}"
+-	cd xfer; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CFLAGS=${CFLAGS}"
++	cd server; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CC=${CC}" "CFLAGS=${CFLAGS}"
++	cd support; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CC=${CC}" "CFLAGS=${CFLAGS}"
++	cd doc; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CC=${CC}" "CFLAGS=${CFLAGS}"
++	cd xmit; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CC=${CC}" "CFLAGS=${CFLAGS}"
++	cd xfer; $(MAKE) $(MFLAGS) "LIBS=${LIBS}" "CC=${CC}" "CFLAGS=${CFLAGS}"
+ 
+ server: make_server
+ 
+diff -rusNP ../nntp-t5/conf.h ./conf.h
+--- ../nntp-t5/conf.h
++++ ./conf.h	Tue Nov 30 10:41:03 1993
+@@ -0,0 +1,422 @@
++/* $Header: /var/tmp/kPtxIHh6vU/nntp/RCS/patch.srv,v 1.9 1991/02/08 18:31:01 sob Exp $
++ * Configuration information for use by NNTP server and support
++ * programs.  Change these as appropriate for your system.
++ */
++
++/*
++ * Compile time options.
++ */
++  
++
++#undef	ALONE		/* True if we're running without inetd */
++
++#ifdef ALONE
++#undef	FASTFORK        /* True if we don't want to read active file on start*/
++#endif
++
++#define LOAD 5	        /* Loadav above which server refuses connections */
++/*
++ * If you want to experiment with the dynamic allocation of the article
++ * array, define DYNAMIC_ART_ARRAY.
++ * This code came to beta too late for through testing, but it is a problem
++ * at some sites, so it is an option. Please report problems to "nntp@tmc.edu"
++ */
++#undef DYNAMIC_ART_ARRAY
++
++#undef	BSD_42		/* 4.2 compatability code -- if this is defined, */
++			/* DBM probably wants to be defined as well. */
++
++#undef BSD_43		/* Define if you are running on BSD 4.3 */
++
++#undef CMU_MACH		/* Use CMU's MACH ioctl(FIOCFSPARAM) for dfree(). */
++
++#define	USG		/* System V support */
++
++#undef TLI		/* Define this if you want to use TLI instead of */
++			/* sockets */
++
++#undef NDBM		/* Use new-style (4.3) ndbm(3x) libraries */
++
++#undef	DBM		/* True if we want to use the old dbm(3x) libraries */
++			/* IF YOU DEFINE THIS, change CFLAGS in makefile to */
++			/* be -ldbm */
++
++#define	DBZ		/* True if we want to use dbz libraries */
++			/* IF YOU DEFINE THIS, change CFLAGS in makefile to */
++			/* be /usr/lib/dbz.o and install dbz.h */
++
++#undef	USGHIST		/* Use USG style history file (no DBM) */
++			/* IF YOU DO NOT DEFINE NDBM or DBM, this is DEFAULT!*/
++
++#define CNEWS		/* define this if you are running C News */
++#undef CNEWS_CLEARTEXT	/* define this if you have a modern C News that handles
++				input files ending in ".t" as cleartext */
++#define BATCHED_INPUT	/* define if you want to support C News style 
++				batched input (not supported by B-NEWS)  */
++#undef MSGID		/* define this if you want to run msgidd to keep
++				track of recent msgids via daemon */
++
++/* Vendor specific implementations */
++#undef LAI_TCP		/* Lachman Streams TCP/IP support (Xenix) */
++#undef EXCELAN		/* Excelan EXOS 205 support */
++#undef WIN_TCP		/* WIN/TCP support [does not work yet] */
++
++/* Things that vary in Unix variations */
++#undef U_LONG		/* Define this if your <sys/types.h> is missing */
++			/* typedefs for u_long */
++#define VOIDSIG		/* Newfangled signal() returns void, old returns int */
++
++#define	GHNAME		/* Define if you have gethostname() */
++#undef	UUNAME		/* Define to use /etc/uucpname */
++			/* If neither of these are defined, */
++			/* inews will use the contents of */
++			/* /usr/include/whoami.h */
++
++#undef MMAP		/* if your OS supports mmap() */
++
++/*
++ * If you DON'T have vfork, make this "#define vfork fork"
++ * vfork will speed up article transfer nntpds by about 2.5 times.
++ */
++
++#define		vfork fork
++
++/* Controlling disk and inode consumption */
++#define MINFREE 4000	/* NNTP will not allow an XFER if there is less */
++			/* than this much diskspace (in blocks or kbytes) */
++#define POSTBUFFER 1000 /* NNTP will allow local posting until */
++			/* MINFREE-POSTBUFFER blocks or kbytes are left */
++#undef MINFILES  MINFREE/4
++			/* NNTP will not allow an XFER if there is less */
++			/* than this many inodes on the SPOOLDIR filesystem */
++#undef SETPROCTITLE	/* if you want status visable via ps */
++
++#undef	IHAVE_DEBUG	/* Copious debugging output from ihave */
++
++#define LISTGROUP	/* Optional LISTGROUP command to list article nums */
++
++/* Things that vary in network implementations */
++#undef	SUBNET		/* If you have 4.3 subnetting */
++#undef	DAMAGED_NETMASK	/* If your subnet mask is not a multiple of */
++			/* four bits (e.g., UCSD) */
++
++#undef	NETMASK		/* If you don't have subnet ioctls, define */
++			/* this to be a hex constant of your subnet */
++			/* mask, e.g., #define NETMASK 0xffffff00 */
++			/* Of course, you must define SUBNET above, too. */
++#undef	DECNET		/* If you want decnet support */
++
++/*
++ * If you want C News batch files created that are not world writable,
++ * remove the comments from the UMASK line below. This does not apply
++ * if you are running BNEWS. At least, not yet. :-)
++ */
++
++#define UMASK 022
++
++/*
++ * If you have the syslog library routine, define SYSLOG to
++ * be the syslog facility name under which stats should be
++ * logged.  Newer 4.3 systems might choose LOG_NEWS;
++ * LOG_LOCAL7 is an acceptable substitute.
++ *
++ * If you don't have support for syslog, but want a facsimile,
++ * define FAKESYSLOG to be the name of a file to which to log stuff,
++ * then define SYSLOG and LOG, too.  e.g.,
++ *
++ *	#define	FAKESYSLOG	"/usr/lib/news/nntplog"
++ *
++ * If your host supports the BSD fdopen() function and the O_APPEND flag
++ * to open(), you should define FAKEAPPEND with FAKESYSLOG so that
++ * multiple copies of nntpd don't trash the log with buffered fprintf's.
++ *
++ * If you don't want any syslog-type activity, #undef SYSLOG.
++ * Obviously, this means that you can't define LOG, either.
++ */
++
++#define	FAKESYSLOG	"/usr/lib/news/nntp/nntplog"
++#define	FAKEAPPEND
++
++#define	SYSLOG	LOG_NEWS
++
++#ifdef SYSLOG		/* Define LOG if you want copious logging info */
++#define	 LOG		/* undef it if you don't */
++#endif			/* but you can only have LOG if you have SYSLOG */
++
++/*
++ * How long you want nntp servers to hang out without receiving
++ * commands before they close the connection with an error message.
++ *
++ * If you don't want any timeout, #undef it, i.e.,
++ *
++ *	#undef	TIMEOUT
++ *
++ * TIMEOUT should be at least two hours, which allows users some time
++ * away from their terminal (e.g., at lunch) while reading news.
++ */
++
++#define	TIMEOUT	(2 * 3600)
++
++
++/*
++ * How long you want nntp servers to wait without receiving data
++ * during article transfers.  You CANNOT have XFER_TIMEOUT while
++ * running in standalone (ALONE) mode.
++ *
++ * If you don't want any transfer timeouts, #undef it, as above.
++ */
++
++#ifndef ALONE
++#   define	XFER_TIMEOUT	(30 * 60)
++#endif
++
++/*
++ * Your domain.  This is for the inews generated From: line,
++ * assuming that it doesn't find one in the article's head.
++ * Suggestions are .UUCP if you don't belong to the Internet.
++ * If your hostname returns the fully-qualified domain name
++ * as some 4.3 BSD systems do, simply undefine DOMAIN.
++ * If you want your network to appear to be one host, define
++ * HIDDENNET.
++ *
++ * e.g.  #define	DOMAIN		"berkeley.edu"
++ */
++
++#define	DOMAIN	"uucp"
++#undef HIDDENNET
++
++/*
++ * Means do a gethostbyname() to get the canonical host name. 
++ * Define this and HIDDENNET will have no effect.
++ */
++
++#undef REALDOMAIN
++
++/*
++ * Define DO_DOTDIR if you want the mini-inews to look for 
++ * this directory if defined in the environment.  This is like rn.
++ * Undefine it and it will only look in the user's home directory. 
++ */
++#define DO_DOTDIR
++
++/* Things that relate to authentication and access */
++/* Define AUTH to use the proposed NNTP Version 2 authentication protocol. */
++#undef	AUTH	
++
++/* Various protocol extensions */
++#define	XHDR		/* Optional XHDR command.  Defining this will */
++			/* speed up '=' command in rn, but will load */
++			/* the server more.  If your server is heavily */
++			/* loaded already, defining this may be a bad idea */
++
++#define XOVER		/* xover -- Return .overview data */
++#define OVER_XREFS	/* overview files have xref data in them */
++#define OVER_XREF_PREFIX /* the xref field (if present) includes xref: */
++
++#define XINDEX		/* Optional support for tin's index files */
++#define XINDEX_DIR	"/usr/spool/news/.index"
++
++#define XMOTD		/* Optional XMOTD command.  News message of the day */
++#define XMOTD_FILE	"/usr/lib/news/motd"
++
++#define XUSER		/* Optional XUSER command.  Log user to logfile */
++
++/* XTHREAD defines:  if XTHREAD is defined, THREAD_DIR controls where the
++ * thread files will be read from.
++ */
++#undef XTHREAD		/* Optional XTHREAD command.  This allows trn to
++			 * keep all data on the server. */
++
++/* Leave this undefined to indicate that thread files go in the spool
++ * directory.  However, if you want a separate hierarchy of thread files,
++ * define it here.
++ */
++/*#define THREAD_DIR	"/usr/spool/threads"		/* base directory */
++
++/* if LONG_THREAD_NAMES & THREAD_DIR are defined, create threads in one dir */
++#undef LONG_THREAD_NAMES		/* not for short-name systems */
++
++/*
++ * A file containing the name of the host which is running
++ * the news server.  This will have to match what rrn thinks,
++ * too.
++ */
++
++#define	SERVER_FILE	"/etc/nntpserver"
++
++/*
++ * Person (user name) to post news as.
++ */
++
++#define	POSTER		"news"
++
++/*
++ * Define DOMAINMATCH if you want to use domain specifications in the 
++ * access list instead of just hostnames. See README for more information 
++ */
++#undef DOMAINMATCH
++
++#ifdef AUTH
++/* 
++ * the file where the nntpxmit site/userid/passwords are kept
++ * think (and PROTECT!) this file like L.sys, i.e., mode 600
++ */
++# define	PASSFILE	"/usr/lib/news/nntp/nntp.sys"
++#endif
++/*
++ * This file is where access information is stored
++ */
++#define ACCESS_FILE	"/usr/lib/news/nntp/nntp_access"
++
++/*
++ * But if you don't have C News or INN, you can run acttimes (see the support
++ * directory) to maintain an active.times file.
++ */
++#define ACTIVE_TIMES_FILE	"/usr/lib/news/active.times"
++
++/*
++ * Some commonly used programs and files.
++ */
++
++#define	ACTIVE_FILE	"/usr/lib/news/active"
++#define DISTRIBUTIONS_FILE	"/usr/lib/news/distributions"
++#define SUBSCRIPTIONS_FILE	"/usr/lib/news/subscriptions"
++#define NEWSGROUPS_FILE	"/usr/lib/news/newsgroups"
++#define HISTORY_FILE	"/usr/lib/news/history"
++#define	SPOOLDIR	"/usr/spool/news"
++#define INEWS		"/usr/lib/news/inews"
++#define RNEWS		"/bin/rnews"			/* Link to inews? */
++
++/*
++ * Support for C News style batching 
++ */
++#undef  NONEWSRUN		/* define this if you are using the daemon */
++				/* version of relaynews */
++#ifdef NONEWSRUN
++#define TOOBIG 1L		
++#define TOOMANY 1
++#else
++#define TOOBIG 300000L		/* batch > TOOBIG bytes, kick rnews */
++#define TOOMANY 1024		/* batch > TOOMANY articles, kick rnews */
++#define NEWSRUN			"/usr/lib/newsbin/input/newsrun"
++#endif
++#define TOOOLD (5*60)		/* batch > TOOOLD seconds old, kick rnews */
++#define COPYSIZE 8192		/* bytes to copy at one time */
++#define MAXDIGITS 25		/* lg(maxlongint) + epsilon */
++#define MAXSTR 1024
++#define INDIR			"/usr/spool/news/in.coming"
++/* You may wish to delete the pathname from the front of BATCH_FILE */
++#define BATCH_FILE		"/usr/spool/news/in.coming/nntp.XXXXXX"
++
++/************************************************************************/
++/* We don't recommend that you make changes in anything after this line */
++/************************************************************************/
++
++#ifdef DBZ		/* If you use DBZ, then you need DBM as well. */
++#ifndef DBM
++#define DBM
++#endif /* DBM */
++#endif /* DBZ */
++
++#ifdef BSD_42		/* This is a logical, warranted assumption */
++#   ifndef DBM		/* which will probably get me in trouble. */
++#	define DBM	/* Kill it if you have 4.2 *and* ndbm.  */
++#   endif
++#   ifndef sun		/* not a sun */
++#       ifndef ultrix   /* not ultrix */
++#           ifndef CMU_MACH /* not CMU's Mach */
++#		ifndef NeXT /* not a NeXT */
++#                  ifndef READ_SUPER
++#	                define READ_SUPER /* read super block for space() */
++#		    endif
++#               endif
++#           endif
++#       endif
++#   endif
++#endif /* BSD_42 */
++
++#ifndef USG
++#    ifndef BSD_42
++#        ifndef CMU_MACH
++#            ifndef BSD_43
++#                define BSD_43
++#            endif
++#        endif
++#    endif
++#endif
++
++#ifdef BSD_43		/* And now more assumptions! */
++#   ifndef sun
++#	ifndef ultrix	/* Ultrix 4.0 or greater */
++#	    ifndef mips	/* MIPS RISC/os */
++#		ifndef __osf__	/* DEC Alpha OSF1 */
++#		    ifndef READ_SUPER
++#			define READ_SUPER
++#		    endif
++#		endif
++#	    endif
++#	endif
++#   endif
++#	ifndef DBZ
++#		ifndef DBM
++#			ifndef NDBM
++#				define NDBM
++#			endif
++#		endif
++#	endif
++#endif
++
++#ifdef XTHREAD
++# ifdef THREAD_DIR
++#   ifdef LONG_THREAD_NAMES
++#	undef SUFFIX
++#   else
++#     ifndef SUFFIX
++#	define SUFFIX ".th"
++#     endif
++#   endif
++# else
++#   define THREAD_DIR	SPOOLDIR
++#   ifndef SUFFIX
++#     define SUFFIX	"/.thread"
++#   endif
++#   undef LONG_THREAD_NAMES
++# endif
++#endif
++
++/*
++ * System V compatability
++ */
++
++#ifdef USG
++# define	FCNTL			/* If O_etc is defined in <fcntl.h> */
++#ifdef dgux
++#define		FTRUNCATE
++#else
++# undef		NDIR			/* If you  need ndir library support */
++#ifdef hpux
++#define		DIRSIZ_MACRO
++#endif
++#endif
++# define	index	strchr
++# define	rindex	strrchr
++# ifdef U_LONG
++   typedef	unsigned long	u_long;
++   typedef	unsigned short	u_short;
++# endif
++# define	IPPORT_NNTP	119
++#endif /* USG */
++
++
++/*
++ * Some miscellaneous stuff you probably don't want to change.
++ */
++
++#define	MAX_ARTICLES	8192		/* Maximum number of articles/group */
++#define READINTVL	60 * 10		/* 10 minutes b/n chking active file */
++
++#ifdef VOIDSIG
++#   define SIGRET void
++#else
++#   define SIGRET int
++#endif
+diff -rusNP ../nntp-t5/server/Makefile ./server/Makefile
+--- ../nntp-t5/server/Makefile	Sat Oct  9 20:21:24 1993
++++ ./server/Makefile	Tue Nov 30 10:42:04 1993
+@@ -6,13 +6,15 @@
+ 	ahbs.o globals.o group.o help.o ihave.o list.o misc.o netaux.o \
+ 	newgroups.o newnews.o nextlast.o ngmatch.o post.o parsit.o scandir.o \
+ 	slave.o spawn.o strcasecmp.o subnet.o date.o xhdr.o fakesyslog.o \
+-	batch.o auth.o timer.o msgid.o xover.o xthread.o xindex.o version.o
++	batch.o auth.o timer.o msgid.o xover.o xthread.o xindex.o version.o \
++	xmotd.o xuser.o
+ 
+ SRVRSRC = main.c serve.c access.c access_inet.c access_dnet.c active.c \
+ 	ahbs.c globals.c group.c help.c ihave.c list.c misc.c netaux.c \
+ 	newgroups.c newnews.c nextlast.c ngmatch.c post.c parsit.c scandir.c \
+ 	slave.c spawn.c strcasecmp.c subnet.c date.c xhdr.c fakesyslog.c \
+-	batch.c auth.c timer.c msgid.c xover.c xthread.c xindex.c version.c
++	batch.c auth.c timer.c msgid.c xover.c xthread.c xindex.c version.c \
++	xmotd.c xuser.c
+ 
+ SRVRINC = common.h ../conf.h nntp.h timer.h
+ 
+diff -rusNP ../nntp-t5/server/common.h ./server/common.h
+--- ../nntp-t5/server/common.h	Tue Aug  3 01:38:56 1993
++++ ./server/common.h	Mon Nov 29 11:53:08 1993
+@@ -80,13 +80,18 @@
+ #endif /* DBM */
+ 
+ #ifdef TIMEOUT
+-#ifdef	USG
+-#include <sys/time.h>
++# ifdef	USG
++#  include <sys/time.h>
++#  ifdef ISC
++#   define TIMERS
++#  else
+ typedef	struct { int fds_bits[1]; }	fd_set;
+-#endif
+-#ifndef TIMERS
+-#define TIMERS
+-#endif
++#  endif
++# endif
++#else
++# ifndef TIMERS
++#  define TIMERS
++# endif
+ #endif
+ 
+ #ifdef LOGINCHECK
+diff -rusNP ../nntp-t5/server/help.c ./server/help.c
+--- ../nntp-t5/server/help.c	Tue Aug  3 00:38:57 1993
++++ ./server/help.c	Tue Nov 30 10:30:46 1993
+@@ -24,7 +24,7 @@
+ 	printf("IHAVE       NEWNEWS      SLAVE\r\n");
+ 	printf("DATE\r\n");
+ #if defined(XHDR)  || defined(XTHREAD) || defined(LISTGROUP) \
+- || defined(XOVER) || defined(XINDEX)
++ || defined(XOVER) || defined(XINDEX) || defined(XMOTD) || defined(XUSER)
+ 	printf("\r\nAdditionally, the following extension(s) are supported:\r\n\r\n");
+ # ifdef LISTGROUP
+ 	printf("LISTGROUP   Retrieve a list of valid article-numbers.\r\n");
+@@ -41,6 +41,12 @@
+ # ifdef	XTHREAD
+ 	printf("XTHREAD     Retrieve trn thread file for the current group.\r\n");
+ # endif
++# ifdef XMOTD
++	printf("XMOTD       Display the news message of the day file.\r\n");
++# endif	
++# ifdef XUSER
++	printf("XUSER       Log a clients username to nntp logfile.\r\n");
++# endif	
+ #endif
+ 	printf("\r\n");
+ 	printf("Bugs to Wayne Davison (Internet: davison@borland.com)\r\n");
+diff -rusNP ../nntp-t5/server/msgid.c ./server/msgid.c
+--- ../nntp-t5/server/msgid.c	Sat Oct  9 20:21:26 1993
++++ ./server/msgid.c	Mon Nov 29 14:14:08 1993
+@@ -16,7 +16,9 @@
+ #include <libBSD.h>
+ #endif
+ #include <sys/socket.h>
++#ifndef ISC
+ #include <sys/un.h>
++#endif
+ #include <syslog.h>
+ #define NEEDMSGS
+ #include "msgid.h"
+diff -rusNP ../nntp-t5/server/msgidd.c ./server/msgidd.c
+--- ../nntp-t5/server/msgidd.c	Sat Oct  9 20:21:27 1993
++++ ./server/msgidd.c	Mon Nov 29 14:26:53 1993
+@@ -80,7 +80,7 @@
+ 
+ static char *
+ strdup(x)
+-char *x;
++const char *x;
+ {
+ 	register char *y = malloc(strlen(x) + 1);
+ 
+diff -rusNP ../nntp-t5/server/nntp.h ./server/nntp.h
+--- ../nntp-t5/server/nntp.h	Tue Aug  3 00:57:45 1993
++++ ./server/nntp.h	Tue Nov 30 10:21:26 1993
+@@ -40,6 +40,7 @@
+ #define	OK_GOODBYE	205	/* Closing connection */
+ #define	OK_GROUP	211	/* Group selected */
+ #define	OK_GROUPS	215	/* Newsgroups follow */
++#define	OK_XMOTD	217	/* Motd (message of the day) file follows */
+ #define	OK_XINDEX	218	/* Tin style group index file follows */
+ #define	OK_ARTICLE	220	/* Article (head & body) follows */
+ #define	OK_HEAD		221	/* Head follows */
+@@ -62,6 +63,7 @@
+ #define	ERR_GOODBYE	400	/* Have to hang up for some reason */
+ #define	ERR_NOGROUP	411	/* No such newsgroup */
+ #define	ERR_NCING	412	/* Not currently in newsgroup */
++#define	ERR_XMOTD	417	/* No motd (message of the day) file */
+ #define	ERR_XINDEX	418	/* No tin style index file for newsgroup */
+ #define	ERR_NOCRNT	420	/* No current article selected */
+ #define	ERR_NONEXT	421	/* No next article in this group */
+diff -rusNP ../nntp-t5/server/scandir.c ./server/scandir.c
+--- ../nntp-t5/server/scandir.c	Mon Aug  2 23:34:49 1993
++++ ./server/scandir.c	Mon Nov 29 11:27:52 1993
+@@ -4,6 +4,10 @@
+ 
+ #include "common.h"
+ 
++#ifdef ISC
++# include <dirent.h>
++#endif
++
+ /*
+  * scan_dir -- scan the current directory for news articles,
+  *	loading the article numbers into art_array.  Return
+@@ -27,7 +31,11 @@
+ scan_dir(low_msg, high_msg)
+ int	low_msg, high_msg;
+ {
++#ifdef ISC
++	register struct dirent	*dirent;
++#else
+ 	register struct direct	*dirent;
++#endif
+ 	register DIR		*dirp;
+ 	int			artnum;
+ 
+diff -rusNP ../nntp-t5/server/serve.c ./server/serve.c
+--- ../nntp-t5/server/serve.c	Sat Oct  9 20:21:27 1993
++++ ./server/serve.c	Tue Nov 30 10:38:16 1993
+@@ -33,6 +33,12 @@
+ #ifdef AUTH
+ extern	void	doauth();
+ #endif
++#ifdef XMOTD
++extern	void	xmotd();
++#endif
++#ifdef XUSER
++extern	void	xuser();
++#endif
+ 
+ static struct cmdent {
+ 	char	*cmd_name;
+@@ -74,6 +80,12 @@
+ #endif
+ #ifdef XTHREAD
+ 	"xthread",	0,	xthread,
++#endif
++#ifdef XMOTD
++	"xmotd",	0,	xmotd,
++#endif
++#ifdef XUSER
++	"xuser",	0,	xuser,
+ #endif
+ };
+ #define NUMCMDS (sizeof(cmdtbl) / sizeof(struct cmdent))
+diff -rusNP ../nntp-t5/server/timer.c ./server/timer.c
+--- ../nntp-t5/server/timer.c	Fri Aug 13 01:57:16 1993
++++ ./server/timer.c	Mon Nov 29 14:13:15 1993
+@@ -3,6 +3,11 @@
+  */
+ #include "common.h"
+ 
++#ifdef ISC
++# include <sys/bsdtypes.h>
++# include <sys/time.h>
++#endif
++
+ #ifdef TIMERS
+ #ifndef lint
+ static char rcsid[] =
+@@ -77,7 +82,7 @@
+ 	register int i, n;
+ 	register struct timer *tp;
+ 	register long secs;
+-#if defined(USG) && !defined(WIN_TCP)
++#if defined(USG) && !defined(WIN_TCP) && !defined(ISC)
+ 	long timeout;
+ 	long readfds;
+ #else
+@@ -91,7 +96,7 @@
+ 		return(1);
+ 
+ 	/* Length of next timeout is minimum of all "timers" */
+-#ifdef USG
++#if defined(USG) && !defined(ISC)
+ 	timeout = -1;
+ 	for (i = ntimer, tp = timers; i > 0; --i, ++tp)
+ 		if (tp->left >= 0 &&
+diff -rusNP ../nntp-t5/server/xmotd.c ./server/xmotd.c
+--- ../nntp-t5/server/xmotd.c
++++ ./server/xmotd.c	Tue Nov 30 10:13:40 1993
+@@ -0,0 +1,132 @@
++/*
++ *  Project   : NNTP (RFC 977) extension
++ *  Module    : xmotd.c
++ *  Author    : I.Lea
++ *  Created   : 26-09-92
++ *  Updated   : 27-09-92
++ *  Notes     : Add a command to display a motd (message of the day) file
++ *              Ideas borrowed from NEWGROUPS nntp command
++ *              posted by Tim Iverson to alt.sources in mid'91.
++ *  Copyright : (c) Copyright 1992 by Iain Lea
++ *              You may  freely  copy or  redistribute  this software,
++ *              so  long as there is no profit made from its use, sale
++ *              trade or  reproduction.  You may not change this copy-
++ *              right notice, and it must be included in any copy made
++ */
++
++#include "common.h"
++
++#ifdef XMOTD
++
++#include "time.h"
++
++#undef	DEBUG_XMOTD		/* set to define to turn on more debug info */
++
++#ifdef __STDC__
++void xmotd (int argc, char *argv[]);
++#else
++void xmotd ();
++#endif
++
++/*
++ * Usage: XMOTD date time ["GMT"]
++ *
++ * Display a motd file if newer than given date and time
++ *
++ *  This command is NOT documented in RFC977.
++ */
++
++void xmotd(argc, argv)
++	int		argc;
++	char		*argv[];
++{
++	char		line[NNTP_STRLEN];
++	register char	*cp;
++	int		i;
++	FILE		*fp;
++	long		old_date = 0L;
++	long		new_date = 0L;
++	struct stat	sb;
++	
++	if (argc < 3) {
++printf("%d Usage: XMOTD yymmdd hhmmss [\"GMT\"].\r\n",
++			ERR_CMDSYN);
++		(void) fflush(stdout);
++		return;
++	}
++
++#if defined(SYSLOG) && defined(DEBUG_XMOTD)
++		syslog(LOG_INFO, "%s xmotd %s %s", hostname, argv[1], argv[2]);
++#endif
++
++	fp = fopen(XMOTD_FILE, "r");
++	if (fp == NULL) {
++#ifdef SYSLOG
++		syslog(LOG_ERR, "xmotd: fopen %s: %m", XMOTD_FILE);
++#endif
++		printf("%d XMOTD Cannot open %s\r\n", ERR_XMOTD, XMOTD_FILE);
++		(void) fflush(stdout);
++		return;
++	}
++
++	/*	    YYMMDD		    HHMMSS	*/
++	if (strlen(argv[1]) != 6 || strlen(argv[2]) != 6) {
++		printf("%d Date/time must be in form YYMMDD HHMMSS.\r\n",
++			ERR_CMDSYN);
++		(void) fflush(stdout);
++		(void) fclose(fp);
++		return;
++	}
++
++	(void) strcpy(line, argv[1]);			/* yymmdd */
++	(void) strcat(line, argv[2]);			/* hhmmss */
++
++	new_date = dtol(line);
++	if (new_date < 0) {
++		printf("%d Invalid date specification.\r\n", ERR_CMDSYN);
++		(void) fflush(stdout);
++		(void) fclose(fp);
++		return;
++	}
++
++	argc -= 3;
++	argv += 3;
++
++	if (argc > 0 && !strcasecmp(*argv, "GMT")) { /* We store stuff in GMT */
++			++argv;			/* anyway, so this is */
++			--argc;			/* a "noop" */
++	} else 					/* But that means not GMT */
++		new_date = local_to_gmt(new_date);	/* is a definite "op" */
++
++	/*
++	 *  stat() motd file and find mtime for comparison
++	 */
++	if (stat (XMOTD_FILE, &sb) != -1) {
++		old_date = sb.st_mtime;
++	}
++	
++#if defined(SYSLOG) && defined(DEBUG_XMOTD)
++		syslog(LOG_INFO, "Motd file time=[%ld] request=[%ld]\r\n", 
++			old_date, new_date);
++#endif
++
++	printf("%d Motd file since %s follows.\r\n", OK_XMOTD, line);
++
++#if defined(SYSLOG) && defined(DEBUG_XMOTD)
++		syslog(LOG_INFO, "Motd file since %s %s follows.\r\n", line);
++#endif
++	if (new_date < old_date) {
++		while (fgets(line, sizeof(line), fp) != NULL) {
++			if ((cp = index(line, '\n')) != NULL)
++				*cp = '\0';
++			putline(line);
++		}
++	}
++	putchar('.');
++	putchar('\r');
++	putchar('\n');
++	(void) fflush(stdout);
++	(void) fclose(fp);
++}
++
++#endif	/* XMOTD */
+diff -rusNP ../nntp-t5/server/xuser.c ./server/xuser.c
+--- ../nntp-t5/server/xuser.c
++++ ./server/xuser.c	Tue Nov 30 10:13:40 1993
+@@ -0,0 +1,57 @@
++/*
++ *  Project   : NNTP (RFC 977) extension
++ *  Module    : xuser.c
++ *  Author    : I.Lea / T.Iverson (iverson@xstor.com)
++ *  Created   : 07-03-92
++ *  Updated   : 07-03-92
++ *  Notes     : Add a command to log nntp clients username.
++ *              Ideas borrowed from XTHREAD nntp extension code
++ *              posted by Tim Iverson to alt.sources in mid'91.
++ *  Copyright : (c) Copyright 1991-92 by Iain Lea
++ *              You may  freely  copy or  redistribute  this software,
++ *              so  long as there is no profit made from its use, sale
++ *              trade or  reproduction.  You may not change this copy-
++ *              right notice, and it must be included in any copy made
++ */
++
++#include "common.h"
++
++#ifdef XUSER
++
++/*
++ *  Usage: XUSER USER
++ *
++ *  USER    log clients username to nntp logfile
++ *
++ *  This command is NOT documented in RFC977.
++ */
++
++void xuser (argc, argv)
++	int	argc;
++	char	*argv[];
++{
++	char	userinfo[NNTP_STRLEN];
++	int	i;
++	
++	/*
++	 * "parse" the argument list
++	 */
++	if (argc == 1) {
++		printf("%d Usage: XUSER user\r\n", ERR_CMDSYN);
++		(void) fflush(stdout);
++		return;
++	} else {
++		sprintf (userinfo, "user %s", argv[1]);
++		for (i = 2 ; i < argc ; i++) {
++			strcat (userinfo,  " ");
++			strcat (userinfo,  argv[i]);
++		}
++	}
++
++#ifdef SYSLOG
++		syslog(LOG_INFO, "%s %s", hostname, userinfo);
++#endif
++}
++
++#endif /* XUSER */
++

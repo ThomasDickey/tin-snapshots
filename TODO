@@ -1,0 +1,380 @@
+TODO - lots of stuff
+--------------------
+
+o  ADD MARk.01 fixes 950130
+
+o  FIX mail to list that onlyhas iain instead of iain@scn.de as From: line
+
+o  FIX m that causes groupto be marked as unread again. Do a write_newsrc(0
+   before doing move?
+
+!!! o Check if term stuff now eorks ok wity subscribe as InitTerm() has moved in
+!!! main.c
+
+o send mailing list filters to c.o.l.a
+
+o  FINISH documenting TINRC variables
+
+FIX
+---
+o  Add S save with defaults for tagging and then do full save automatically
+   Document in man page. Also ADD TO PAGE LEVEL   (Bill Frolik).
+
+o  Rename NO_SHELL etc to DISABLE_SHELL etc. look at INSTALL doc for more
+
+o  CHANGE Copyright to include all book credits + cdrom 1 off for me
+
+o  Newsgroups line == FollowupTo line then dont include followupto line
+ 
+o  SIGSEGV Menu options 10 & 11 (Dave Sch)
+ 
+o  Add start message saying what domain/gateway is and where I got it from
+   Also add check for invalid from address AND IF so inform user to read
+   INSTALL doc or speak to person who compiled tin.
+
+o  FIX 'c' at art viewer level that will skip over the next group to the 
+   next but 1 group. Used tab to get to article.
+
+o  Do a listgroup and mark regions as setup_base is read and then do a
+   find first unread in bitmap and then do read_nov_file()
+
+o  FIX newsgroup as cmdline parameter. Its ignored and does all.
+
+o  Add code to also say NO ARTICLES if count == 0 ie. comp.xemacs 1-60 no arts
+
+o  also check if CR and TAB to group work for quit
+
+o  'w' 'f' post should be settable to email address for mail groups
+
+o  TEST U unthread and check mail from (dcs)
+
+o  TEST d toggle at thread level (Bruce Hague)
+
+o  Check man page to match attributes
+
+attributes
+----------
+mailing_list=STRING
+x_headers=STRING
+attrib->x_body
+auto_save=ON (default) scope=* = OFF
+
+
+--------------------------------------------------------------------------
+o  EDIT cmdref.2,3,4 for correctness
+
+o  Add FAQ user doc from Geoff Ellis
+
+o  Add and test AUTOCONF code 
+     keep config.h and old Makefile as well for OS2 & Amiga?
+
+o  Add lynx pipe command for www articles
+
+o  FIX art level to work with new xterm button system and document man page
+   page controlled via a tinrc variable.
+   Clicking on header or footer  button 1  pagedown  button 2  pageup
+   clicking on article  button 1  next unread article  button 2  quit to upper level
+
+o  fix when only 20 artciles on screen and it does scrren redraw
+   when it should just move the arrow
+
+o  TEST Add code to 'g' command to show all unread arts in display.
+
+o  Add add-mail-header tinrc to stop headers in maesage sent from elm
+   Has elm a use headers inn body switch?
+
+o  '[' command at art level causes return to group index (OK). If art was
+   marked as will-treturn (z) it will not be in list when it is rethreaded
+
+o  Fix 'm' mail t)hread because it does not redraw the screen.
+
+o  Fix 'C' do that it wraps around group list (like TAB).
+
+o  TEST When posted article reread does not display 1 unread?
+   open.c 1029 vGrpGetSubArtInfo()
+
+o  Add attribute for auto-X'ing group upon entry tell user you are doing it
+   and say that 'X' will get the list of new arts back.
+     'Auto-selecting articles (use 'X' to list all unread articles)...'
+   - Update man page to include group scoping description
+   Why is X_undo: goto belong to '+' and not X command?
+
+o  -R recursive group create paths in tind or just mkdir -p in  start () == -1
+   FIX so save newsrc is automatically used and -r recursive finds
+   alt.sources.d (ie. other than one name in dir apart from numbered files.
+   If .ddd on end then it works. Name too short?
+
+o  ADD support for ISO printed chars.  ISO2ASC routine as filter.
+o  add attribute var for scoping append/overwrite of existing file.
+
+o  FIX Date in correct 822 format with timezone for overview files
+
+o  FIX Searching body to just look at unread if in R mode
+
+o  FIX WillReturn so that 'c' will not mark them read when leaving group.
+   1. mark bitmap all read.
+   2. loop thru arts and unmark read only will return arts
+
+o  Fix -u/U cmd line options. -U with local indexes (foreground process freezes)
+
+
+ADD
+---
+o Add S save command (1 key) to save using preset defaults
+
+o  kill/select filter routines.
+   Add BODY selection to free text entry (WARN how slow it'll be)
+   Add "cmd for scoring
+
+o When headers then switch into iso2asc mode automatcally
+  Content-Type: text/plain; charset=ISO-8859-1
+  Content-Transfer-Encoding: quoted-printable
+
+o  Add auto-aliasing of peoples mail addresses to mail aliases file
+   ie. use .mailrc.
+
+o  HiLite group.c 1587 art_marked_selected || art_marked_inrange
+
+o  Add '=' modified to handle select articles on datetime maybe use
+   9412311200 or just 1200 for all articles that are newer than today at
+   noon. Also store string to tinrc. If not any string give 0000 for 
+   all arts news since midnight.
+
+o  Add # for range commands (c K z [ ] Quick-filter feed.c commands etc.)
+   Mark all elements in array that match with a '#' before command is
+   done. Have a vDelRange() at top of loop if any range active if() etc.
+   Document help screens.
+
+o  Add LIST MOTD support (Rich Salz)
+
+o  Test psFindGrp ()
+o  Add psAddGrpMyGrp() to partner iFindGroupIndex() etc.
+o  Add psArtFirst() Next() etc. to list.c
+
+o  For tind just add all the groups in active[] to my_group[] and not newsrc.c
+   or active file.
+
+o  FIX -R option to use ~/.tin/active.save ~/.tin/.save 
+   also change to use ~/.tin/.mail & ~/.tin/.news for index dirs
+   Have NEWS  MAIL  SAVE (-R) type groups
+o  Fix -S option to create an active file when new articles are
+   saved to <savedir>. Also fix -R option to read ACTIVE file created
+   by -S command. Use actived in -R cmd line option.
+   Use an active.news file in ~/.tin. Auto check at startup time
+
+o  Allow compression to be used on local nov index files to help offset the
+   increase in size. Allow user specified compresser to be used gzip lha etc
+
+o  MAYBE also check if min / max article was deleted.  If so then update
+   the active[] entry for the group and rewrite the mail.active file
+
+o  Rewrite toggle_my_group() to not use newsrc file directly
+
+o  In attributes make Maildir & Savedir the same and save directly to 
+   groups maildir after checking new max artnum.
+
+o  Change 'w' command in MAIL group to mail a msg not post it.
+   Use logic code for mailing lists.
+
+o  Add DETAILED bug report msg to tin_done(1) and use it in signal_handler()
+  
+o  Look at the list of commands that don't work(?) + . * etc. (Mike Holmes)
+
+o  PROBLEM!  bitmap is set initially to all arts unread and seq
+   is parsed to mark arts as read.  Problem is that expired arts
+   are never marked unread so num_unread arts is in error.
+
+o  Test D elete command at page level for mailgroup articles.
+   Fix Delete_article() to get sitename/mailname before uname().
+   Check if using external inews. If so then use sitename file before
+   any NNTP_* define values.
+   If MAIL grp then write list of fullpaths to .tin/.delete.mail
+   and delete the list when exiting tin so that undelete exists ala elm.
+   Also mark screen so that Article is shown as 'D' deleted instead of '+'
+
+o  In Xref: optimize art_mark_xref() do that article in present group is
+   not marked read ?
+
+o  Make a procmail filter to auto create ~/Mail/mail/$USER so that when
+   procmail filter is installed you see group mail.iain in groups screen
+
+o  Add code to sub/unsub & get num_unread arts after add_my_group() called.
+
+o  Add TIN_INEWSDIR shell var to inews.c
+
+o  Add strfline() routine for user specified format in screen layouts.
+   Can be used later for making mailgroups look like elm.
+   Add Lines: to 'U'nthread mode at group index (subjects) level.
+
+o  Add -C cmd line switch to update newsrc but not index files.
+
+o  In positioning of groups don't do all the BS in newsrc.c. Just change 
+   (ie. swap) the 2 values in my_group[] and do a write_newsrc().
+
+o  TEST code to enter group if only one group is matched on cmd line.
+    ie.,  tin alt.sources
+
+o  Fix bug in -cv that causes my_group[cur_groupnum] to point at
+   the wrong group because cur_groupnum is never incremented.
+
+o  Add t_time & t_hash typedefs for 32/64 bit machines.
+
+o  Fix read_xover_file() to read from socket and not from file.
+
+o  Add following default headers to ~/.tin/tinrc & ~/.tin/attributes:
+     Reply-To:		mailgroups
+     Organisation:
+     Distribution:
+     Cc:            mailgroups
+   Also add as group attributes so single groups can have different headers. 
+   IMPORTANT for full benefits in mailgroups.
+
+o  Add global attributes file for site. LIST ATTRIBUTES / LIBDIR/attributes
+
+o  Fix pattern/hot save so that archive-name is not used but explicit 
+   entered path (Hakan).
+
+o  Fix mailing so that if editor is never entered the screen will not be 
+   redrawn.
+
+o  Fix thread & hot saves so that arts are in correct order.
+
+o  Fix 'z' command mark all unread when in R mode at group select level.
+   It is not recognizing current group but group when all groups are been
+   read. Is my_group[] or index_point been used as index?
+
+o  Add ROT13 as option on cmd line post menu. Encode from End of Header
+   to -- before sig. Put [Rot13 encoded text follows] as note for reader.
+
+o  Fix 'm' mail thread and then q)uit still mails the thread.
+
+o  Fix 'm'ove group when all groups are shown (R off).
+
+o  Fix -R (read saved news) to use mail_active code to save to active.save
+   mail should use active.mail.
+   All other groups should be not allowed to be read. 
+   The saved groups are written to active.save if attr.batch_save=ON
+   What should happen if -f Newsrc-file is specified on command line?
+   When 'tin -R' is used don't reread the active file ever.
+
+o  Fix 'm' 'g' & 'R' is in force and group has no unread reset 'R' mode 
+   to show all and then goto it.
+
+o  smtp_open() smtp_close() in smtplib.[ch] (plus #defines for SMTP responses.
+   burp_open() burp_close() in burplib.[ch] (plus #defines for BURP responses.
+   All will use the nntplib C routines from nntplib.c 
+
+o  Fix(?) after save the '+' is not updated as art read.
+
+o  If -f .newsrc -S/-M specified then don't use attribute.batch_save to
+   determine if group should be saved just save the groups that are
+   specified in -f .newsrc-file. 
+
+o  Fix threading arts so global can be set but local (group level) can
+   override it. At moment once set global unthreaded cannot toggle
+   threading within group.
+
+o  Fix set show only unread in 'M' menu at article viewer level that causes
+   'cannot find basenote articles' (Thomas Omerzu).
+   Save respnum before so that it can be found after with which_thread() ?
+
+o  Change write_attributes_file () to write active attributes that are 
+   different than global settings. Also a menu 'M' interface to set all 
+   the options PL8.
+
+o  Add options to 'M' menu to allow setting all the variables that are now in 
+   the tinrc file.
+
+o  Fix Save in feed.c routines. 
+   Also fix so SAVING routines just use save_art_to_file() and print
+   *** X Articles saved *** & none of the BS done at the moment
+
+FIX FEATURES V2.0
+-----------------
+
+o  If saving in mailbox format and mailbox does not exist query the user?
+
+o  Add Ctrl-/ Ctrl-? to search the whole of an article (Subj,From & Body)
+   at Group & Page level. Also add Ctrl-/ to group selection level so that all
+   groups/wildcard pattern are searched from top level. Inform user via
+   'Searching alt.sources 100...'   'Searching alt.sources 150...'
+
+o  Add ^G command to skip to next Subject: in digests.
+
+o  Try compiling with -D_POSIX_SOURCE
+
+o  Add filename & groupname completion (editline).
+
+o  Fix code to sort arts. At page level funny things happen.
+
+ADD FEATURES
+------------
+
+o  Add -P <pattern> or -P <file> to search for in new news and to
+   notify user by mail. Should understand 'subject=text' 'from=text'
+   'body=text' and .AND. && .OR. || for filtering purposes.
+
+o  Sort .newsrc according to preference. 
+
+o  Sort active file as it is read.
+
+o  Add support for nc newsclip support from clarinet .
+
+
+OTHER STUFF
+-----------
+o  Add rebindable keymaps and provide different terminal keymaps
+   (ie. keymap.ansi, keymap.wy50 etc.)
+
+o  Add threading on References like gnus.
+
+o  Add full curses support..
+
+o  Sub all not empty groups by looking at min max values in active array
+   and Unsub all empty groups by looking at min max values in active 
+   array. have a command to do this in a toggle effect.
+
+o  Add clumping (Andreas Klemm) to have [scsi] as subject with all arts
+   that have scsi in header under this pseudo subject. useful in *linux*
+
+o  Each group could have a field to say which NNTP/local connection to use so
+   as to be able to plug into different NNTP servers for different newsgroups
+
+o Add t_virtual struct for virtgroups.
+  Read in before active file - read_virtgrp_file()
+  +  add group to virtual group and write to ~/.tin/virtual
+     if not at virt then prompt for name:
+  -  delete group from virtual group and write ~/.tin/virtual 
+  =  lists groups that are in virtual group (spooldir type screen)
+  virt_create (name)  virt_delete (grp)
+  virt_add_group (grp, regex-name)  virt_del_group (grp, regex-name)
+
+#!/bin/csh
+
+#setenv TIN_RNG_MIN "1090"
+#setenv TIN_RNG_MAX "1090"
+
+setenv TIN_MIN 1081
+setenv TIN_MAX 1099
+setenv TIN_COUNT 19
+setenv TIN_SEQ 
+
+#setenv TIN_SEQ "1082,1084,1086,1088,1090,1092,1094,1096,1098"
+#setenv TIN_SEQ "1082-1084,1086-1088,1090-1092,1094-1096,1098-1099"
+#setenv TIN_SEQ "1082,1084-1086,1088,1090-1092"
+#setenv TIN_SEQ "1082,1084-1090,1092"
+#setenv TIN_SEQ "1082,1092"
+#setenv TIN_SEQ "1082"
+#setenv TIN_SEQ "1098"
+
+setenv TIN_SEQ "1081,1083,1085,1087,1089,1091,1093,1095,1097,1099"
+#setenv TIN_SEQ "1081-1083,1085-1087,1089-1091,1093-1095,1097-1099"
+#setenv TIN_SEQ "1081,1083-1085,1087-1089,1091-1093,1095-1097,1099"
+#setenv TIN_SEQ "1081,1083-1097,1099"
+#setenv TIN_SEQ "1081,1099"
+#setenv TIN_SEQ "1081"
+#setenv TIN_SEQ "1099"
+
+
+./tin
+

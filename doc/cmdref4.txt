@@ -1,0 +1,73 @@
+Helpsheet:    Back Page (Right two columns)
+
+'Article level': screen layout            'Article level': replying to an
+     A screen layout for the              author
+     'Article level' has three                 The article that you read has
+     elements:                                 an author and you may write
+  Header:           Reports the                directly to this person.
+                    article's             
+                    attributes.            1.  Press the <r> key.
+  Article body:     Shows the text of      2.  Wait for the program to start
+                    the article.               the text editor for you
+  Command menu:     Reports the            3.  Write your reply.
+                    commands that may          Note:  Don't write in the
+                    be used at this                   header.
+                    level.                 4.  When finished, quit the editor.
+                                               Note:  If the text editor is
+'Article level': reading                              'edt', <CONTROL> Z and
+     The following keystrokes help                    then 'exit'.
+     you flip the article's pages.         5.  Look for a prompt.
+                                           6.  Press the <s> key.
+    g     Show the first page of the      
+          article.                        'Article level': saving an article as
+    G     Show the last page of the       a file
+          article.                             You may save the article that
+    b     Show the previous page.              you are currently reading into a
+ <SPACE>  Show the next page.                  file on your account.
+    -     Reread the previous             
+          article.                         1.  Press the <s> key.
+ <RETURN> Read the next article.           2.  Look for a prompt.
+    q     Quit reading.                    3.  Press the <a> key.
+                                           4.  Look for a prompt.
+'Article level': searching                 5.  Enter the filename.
+     While reading, you may flip           6.  Press the <n> key.
+     pages by searching for text on            Note:  For this last prompt,
+     other pages of the article.                      you may ask that a
+                                                      certain kind of
+ 1.  Press a slash / .                                extraction be performed.
+ 2.  Look for the prompt.                 
+ 3.  Enter a word or string of                     Additional Topics
+     characters.                          
+                                          To read UPI news:
+'Article level': mailing articles              There are about 150 or so
+     You may mail the article that             newsgroups that contain articles
+     you are currently reading to              from UPI.  These newsgroups all
+     another person.                           have the word "clari" in their
+                                               name.
+ 1.  Press the <m> key.                   
+ 2.  Look for a prompt.                   To read USA-Today:
+ 3.  Press the <a> key.                        There are about 20 or so
+ 4.  Look for a prompt.                        newsgroups that contain articles
+ 5.  Enter the e-mail address.                 from USA-Today.  These
+ 6.  Look for a prompt.                        newsgroups all have the word
+ 7.  Press the <s> key.                        "usa-today" in their name.
+                                          
+'Article level': printing articles        To read the Washington Post:
+     You may print the article that            There is newsgroup with
+     you are currently reading.                articles from the Washington
+                                               Post.  The name of this
+ 1.  Press the <o> key.                        newsgroup is 'americast.wpost'.
+ 2.  Look for a prompt.                   
+ 3.  Press the <a> key.                   Other top-level newsgroups
+     Note:  Where the article is          destinations:
+            printed depends on what          comp.  Computer-related technical
+            printer is set under                    groups.
+            O)ptions.                        rec.   Recreational-related
+                                                    newsgroups.
+                                             sci.   Science-related newsgroups.
+                                             soc.   Newsgroups about societies,
+                                                    cultures, and related
+                                                    issues.
+                                             talk.  Newsgroups about current
+                                                    issues.
+                                             unl.   Newsgroups about UNL.

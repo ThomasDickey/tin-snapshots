@@ -1,0 +1,241 @@
+#=============================================================
+#
+#       TIN.MAK - Makefile for project C:\tin\tin.prj
+#               Created on 05/30/93 at 20:25
+#
+#=============================================================
+
+.AUTODEPEND
+
+#=============================================================
+#               Translator Definitions
+#=============================================================
+CC = bcc +TIN.CFG
+TASM = tasm.exe
+TLIB = tlib.exe
+TLINK = tlink
+LINK  = link386
+RC = brcc.exe
+RB = rc.exe
+LIBPATH = C:\BCOS2\LIB
+INCLUDEPATH = C:\BCOS2\INCLUDE;c:\curses;c:\tcpip\include;c:\tin
+
+
+#=============================================================
+#               Implicit Rules
+#=============================================================
+.c.obj:
+  $(CC) -c {$< }
+
+.cpp.obj:
+  $(CC) -c {$< }
+
+.asm.obj:
+  $(TASM) -Mx $*.asm,$*.obj
+
+.rc.res:
+  $(RC) -r $*.rc
+
+#=============================================================
+#               List Macros
+#=============================================================
+
+
+EXE_DEPENDENCIES =  \
+ \curses\curseso.lib \
+ parsdate.obj \
+ curses.obj \
+ xref.obj \
+ win32.obj \
+ wildmat.obj \
+ thread.obj \
+ strftime.obj \
+ spooldir.obj \
+ signal.obj \
+ sigfile.obj \
+ select.obj \
+ search.obj \
+ screen.obj \
+ save.obj \
+ rcfile.obj \
+ prompt.obj \
+ post.obj \
+ page.obj \
+ os_2.obj \
+ open.obj \
+ nntplib.obj \
+ newsrc.obj \
+ misc.obj \
+ memory.obj \
+ main.obj \
+ mail.obj \
+ lang.obj \
+ kill.obj \
+ init.obj \
+ inews.obj \
+ help.obj \
+ hashstr.obj \
+ group.obj \
+ getline.obj \
+ feed.obj \
+ envarg.obj \
+ debug.obj \
+ art.obj \
+ active.obj
+
+#=============================================================
+#               Explicit Rules
+#=============================================================
+tin.exe: tin.cfg $(EXE_DEPENDENCIES)
+  $(TLINK) /s /c /Toe /ap /L$(LIBPATH) @&&|
+C:\BCOS2\LIB\C02.OBJ+
+parsdate.obj+
+curses.obj+
+ xref.obj+
+win32.obj+
+wildmat.obj+
+thread.obj+
+strftime.obj+
+spooldir.obj+
+signal.obj+
+sigfile.obj+
+select.obj+
+search.obj+
+screen.obj+
+save.obj+
+rcfile.obj+
+prompt.obj+
+post.obj+
+page.obj+
+os_2.obj+
+open.obj+
+nntplib.obj+
+newsrc.obj+
+misc.obj+
+memory.obj+
+main.obj+
+mail.obj+
+lang.obj+
+kill.obj+
+init.obj+
+inews.obj+
+help.obj+
+hashstr.obj+
+group.obj+
+getline.obj+
+feed.obj+
+envarg.obj+
+debug.obj+
+art.obj+
+active.obj
+tin,tin
+C:\BCOS2\LIB\C2.LIB+
+C:\BCOS2\LIB\OS2.LIB+
+c:\curses\curseso.lib+
+C:\TCPIP\LIB\TCPIPDLL.LIB
+
+|
+
+
+#=============================================================
+#               Individual File Dependencies
+#=============================================================
+parsdate.obj: tin.cfg parsdate.c 
+
+curses.obj: tin.cfg curses.c 
+
+xref.obj: tin.cfg xref.c 
+
+win32.obj: tin.cfg win32.c 
+
+wildmat.obj: tin.cfg wildmat.c 
+
+thread.obj: tin.cfg thread.c 
+
+strftime.obj: tin.cfg strftime.c 
+
+spooldir.obj: tin.cfg spooldir.c 
+
+signal.obj: tin.cfg signal.c 
+
+sigfile.obj: tin.cfg sigfile.c 
+
+select.obj: tin.cfg select.c 
+
+search.obj: tin.cfg search.c 
+
+screen.obj: tin.cfg screen.c 
+
+save.obj: tin.cfg save.c 
+
+rcfile.obj: tin.cfg rcfile.c 
+
+prompt.obj: tin.cfg prompt.c 
+
+post.obj: tin.cfg post.c 
+
+page.obj: tin.cfg page.c 
+
+os_2.obj: tin.cfg os_2.c 
+
+open.obj: tin.cfg open.c 
+
+nntplib.obj: tin.cfg nntplib.c 
+
+newsrc.obj: tin.cfg newsrc.c 
+
+misc.obj: tin.cfg misc.c 
+
+memory.obj: tin.cfg memory.c 
+
+main.obj: tin.cfg main.c 
+
+mail.obj: tin.cfg mail.c 
+
+lang.obj: tin.cfg lang.c 
+
+kill.obj: tin.cfg kill.c 
+
+init.obj: tin.cfg init.c 
+
+inews.obj: tin.cfg inews.c 
+
+help.obj: tin.cfg help.c 
+
+hashstr.obj: tin.cfg hashstr.c 
+
+group.obj: tin.cfg group.c 
+
+getline.obj: tin.cfg getline.c 
+
+feed.obj: tin.cfg feed.c 
+
+envarg.obj: tin.cfg envarg.c 
+
+debug.obj: tin.cfg debug.c 
+
+art.obj: tin.cfg art.c 
+
+active.obj: tin.cfg active.c
+
+pwd.obj: tin.cfg pwd.c
+
+#=============================================================
+#               Compiler Configuration File
+#=============================================================
+tin.cfg: 
+  copy &&|
+-L$(LIBPATH)
+-I$(INCLUDEPATH)
+-vi-
+-DM_OS2
+-DNNTP_ABLE
+-DDONT_REREAD_ACTIVE_FILE
+-DDEBUG
+-w-par
+-w-pro
+-w-pia
+-w-aus
+-w-rvl
+-w-rch
+| tin.cfg

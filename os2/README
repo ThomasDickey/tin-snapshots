@@ -1,0 +1,256 @@
+This is version 1.2 PL2 of the OS/2 port of TIN.
+
+An executable version can be obtained from ftp.cdrom.com.  
+
+TIN is a newsreader for Usenet news. It can read articles either from a
+local article data base (newsspool) or via TCP/IP from a news server using
+the Network News Transport Protocol (NNTP).
+
+To run TIN you need
+  - set environment variables 
+  To read news via NNTP
+  - TCP/IP access to an nntp server,
+  - some free space on a HPFS or NFS partition (FAT will not work, due to 8.3
+    file name restriction)
+
+optional:  
+  - uudecode and uushar utilities 
+    Note:  uudecode is posted regularly to comp.binaries.os2 in the "OS/2 
+           Binaries Starter's Kit" by mykek@miller.cs.uwm.edu (OS/2 
+           binaries moderator)
+
+
+Using TIN under OS/2 
+
+To run the local newsspool version, start TIN.  To run the NNTP version, 
+start TIN -r, or rename TIN.EXE to RTIN.EXE and run RTIN.  
+
+TIN runs in an OS/2 windowed session.  It is not a PM application.  TIN 
+needs to know who you are, in order to create headers for posts and mail 
+correctly. This user information can be supplied to TIN either via 
+environment variables or through a Unix-style passwd file.
+
+Directories
+
+All directories used by TIN must be on a HPFS or NFS partition. FAT will
+not work due to the 8.3 filename limitation.
+
+Environment Variables 
+
+USER      
+    userid or short name, no space or punctuation, required.
+
+REALNAME  
+    Your Full Name, required unless passwd file is used.
+
+HOME
+    \your\home\directory, required unless passwd file is used.
+
+TMP
+    Temporary directory - must be on a HPFS partition, required.
+
+NNTPSERVER 
+    either the fully qualified domain name of the nntp server or
+    the dotted internet address of the nntp server, required for 
+    NNTP version.
+
+HOSTNAME 
+    specifies the name of your machine.  It is used to identify your 
+    machine to the nntp server, required for NNTP version.
+
+TIN_SPOOLDIR
+    path to the root of the news spool, required for local newsspool 
+    version.
+
+TIN_LIBDIR
+    path to news control:  active file, newsgroups file etc., required 
+    for local newsspool version.
+
+TIN_NOVROOTDIR 
+    path to overview files, required for local newsspool version.
+
+LINES
+    specify how many lines you display window has.  If LINES is not set,
+    TIN will use the actual height of the display window. You might need
+    to set this if you run TIN from a telnet session. Setting this variable
+    does not change the height of the window. It only tells TIN how many
+    lines to use.
+
+COLS
+    specify how many columns you display window has.  If COLS is not set,
+    TIN will use the actual width of the display window. You might need
+    to set this if you run TIN from a telnet session. Setting this variable
+    does not change the width of the window. It only tells TIN how many
+    columns to use.
+
+EDITOR 
+VISUAL
+    specify the editor to use for composing articles and replies. Defaults
+    to 'epm'.
+
+SHELL
+    specify command shell to use for shell escapes - defaults to whatever
+    is set by COMSPEC or the shell field in the passwd file record.
+
+Note that none of the environment variables that refer to directories should 
+have a trailing backslash '\'.
+
+For other environment variables, see ENVIRONMENT VARIABLES in tin.man.  
+
+
+Unix-style passwd file
+
+If only one person is using TIN to post articles, you can set all required
+environment variables in your config.sys file.
+
+If a number of users use TIN to post articles, for example via telnet to
+the OS/2 machine, it might be easier to use the Unix-style passwd file.
+The passwd file is located in the directory set by the environment
+variable ETC, usually c:\tcpip\etc.  The same passwd file is used by ftp
+and telnet (via loginunx.exe).  See your TCP/IP User's Guide for more
+information.
+
+TIN does not use the password field, but the full user name, the home
+directory and the shell are taken from the passwd file entry.  The
+environment variable USER is used to locate the correct entry in the
+passwd file.  If it is not set, an error message is issued by TIN.  Two
+sample passwd entries follow:
+
+andreas:x:1:1:Andreas Wrede:c:/home/andreas:c:/os2/cmd.exe
+guest:x:2:2:Guest User:c:/home/guest:d:/ksh/ksh
+
+
+
+Setting up TIN to work with UUPC.
+
+UUPC v1.11z has the ability to receive batches of news articles and file
+them in a news spool directory hierarchy. See the section on RNEWS in
+COMMANDS.PRN in the UUPC documentation. Don't set set snews mode: TIN
+expects to find a regular news spool.
+
+In the following I assume that you have installed UUPC in the directory 
+c:\uupc and that your HOME directory is c:\home\name.
+
+Unless you have INN style .overview files (which you don't have if you are
+using UUPC), both TIN_SPOOLDIR and TIN_NOVROOTDIR should point to the same
+directory.  In the UUPC.RC file, this directory is specified by 
+NewsDir= . It is the root of the news tree, ie. it should contain a
+directory for every top-level newsgroup, such as ALT, COMP, NEWS, BIZ, 
+REC, SOC etc.  Each newsgroup in your active file should have a
+corresponding directory path, ie. for alt.sources it should be
+c:\uupc\news\alt\sources, for comp.os.os2.misc it should be
+c:\uupc\news\comp\os\os2\misc.  The articles in each newsgroup should sit
+in files with numeric names in the corresponding directories.
+
+TIN_LIBDIR should point to the directory that contains the file ACTIVE
+which lists all the newsgroups you have in your newsspool. In the UUPC.RC 
+file, this directory is specified by the ConfDir= line.  Records (=lines)
+in the active file should look similar to this:
+
+alt.sources 655 652 y
+comp.os.os2.apps 3480 3309 y
+comp.os.os2.misc 14565 14513 y
+comp.os.os2.programmer 2298 2176 y
+
+The first time you run TIN, it will create the directory .tin in the 
+directory you specify as HOME, in our example that would be 
+c:\home\name\.tin. In that directory, tin will create a number of files and 
+subdirectories. In HOME itself, TIN will create the file .newsrc, in our 
+case that would be c:\home\name\.newsrc. The .newsrc file lists the
+newsgroups you have subscribed to and the article numbers of the articles
+you have read. Sample .newsrc lines read like this:
+
+alt.sources:  1-652
+comp.os.os2.apps:  1-3309
+comp.os.os2.misc:  1-14513
+comp.os.os2.programmer:  1-2176
+
+On my system, I have the following variables set:
+
+USER=andreas
+REALNAME=Andreas Wrede
+HOME=c:\home\andreas
+TIN_LIBDIR=c:\uupc
+TIN_SPOOLDIR=c:\uupc\news
+TIN_NOVROOTDIR=c:\uupc\news
+
+Note: The executable version of TIN as compiled requires IBM's TCP/IP 
+package. If you do not have the package installed on your system unzip 
+the file TCPIPDLL.ZIP. It contains a dummy TCPIPDLL.DLL which satisfies
+the the load-time references to TCP/IP functions in TIN. Place the DLL
+in a directory listed in your LIBPATH.
+
+
+Building TIN for OS/2
+
+To build TIN, you need the following:
+
+  - Borland C++ for OS/2 or IBM C Set/2
+  - PDCurses 2.0 build for the compiler of your choice
+
+  For the NNTP version of TIN:
+
+  - IBM TCP/IP 1.2.1 CSD UN37938 or higher,
+  - IBM TCP/IP 1.2.1 Programmers's Kit CSD UN37942 of higher, with
+    modifications as outlined below.
+
+
+1. Make sure that all source files (*.c and *.h) have <CR><LF> as their
+   line-ends.  If not, use 'unix2os2 < original >newfile' to correct this.
+
+2. Select the makefile appropriate for your compiler:  Makefile.bcc for
+   Borland C++ for OS/2 Makefile.icc for IBM's C Set/2 Compiler
+   Note: Borland C is preferred.  You may have to make some adjustments
+         when you use IBM's C.
+
+3. Edit the makefile, changing location of include and library files to
+   match your installation
+
+4. Correct bugs in \tcpip\include\netdb.h
+   find all occurrences of 'char *' that are not followed by '_Seg16'
+   and add '_Seg16'. For example change
+     SERVENT * _Seg16 _Far16 _Cdecl getservbyname( char *, char * );
+    to
+     SERVENT * _Seg16 _Far16 _Cdecl getservbyname( char * _Seg16, char * _Seg16 );
+   You will also correct the prototype for getservbyport and getprotobyname.
+
+5. If you are using Borland C++, edit the TCP/IP header files:  in
+   netdb.h, netlib.h sys/socket.h do the following:
+
+      - find the #ifndef __32BIT__ near the top of each file
+
+      - change the conditional section as follows:
+        #ifndef __32BIT__
+        #ifdef __TURBOC__
+        #define _Packed
+        #define _Seg16 _far16
+        #define _Far16 _far16
+        #define _Cdecl _cdecl
+        #define __32BIT__
+        #else
+        #define _Packed
+        #define _Seg16
+        #define _Far16
+        #define _Cdecl
+        #endif
+        #endif
+
+      - add the following below the second #endif
+        #ifdef __TURBOC__
+        #define FAR16P _far16 *
+        #else
+        #define FAR16P * _Seg16
+        #endif
+
+     - throughout the files change '* _Seg16' and '* _Seg16' to 'FAR16P'
+       After these changes, the TCP/IP package can be used with the Borland
+       C compiler.
+
+6. If you are using Borland C++ type 'make -f makefile.bcc' If you are
+   using IBM's C Set/2 type 'nmake -f makefile.icc' Ignore warnings,
+   especially re _Cdecl and _Seg16 re-definition.
+
+
+Enjoy!  
+
+Andreas Wrede (andreas@scilink.org) 

@@ -1,0 +1,1328 @@
+
+                   Introduction to the Tin newsreader
+                              Paul H Kramer
+                         pkramer@unlinfo.unl.edu
+                       University Nebraska Lincoln
+
+                               Abstract
+    A gentle introduction to the basic command set of the tin newsreader.
+
+1.0 Contents
+------------
+    1.1  Introduction
+    1.2  To start Tin
+    1.3  To quit Tin
+    1.4  To work in Tin
+    1.5  'Group selection level': screen layout
+         1.5.1 'Group selection level' screen: title
+         1.5.2 'Group selection level' screen: selection bar
+         1.5.3 'Group selection level' screen: newsgroup lines
+         1.5.4 'Group selection level' screen: command menu
+    1.6  'Group selection level': moving the selection bar
+    1.7  'Group selection level': searching for a newsgroup
+    1.8  'Group selection level': display all known newsgroups
+    1.9  'Group selection level': add (subscribe) newsgroups
+    1.10 'Group selection level': drop (unsubscribe) newsgroups
+    1.11 'Group selection level': reorder the newsgroups
+    1.12 'Group selection level': selecting a newsgroup
+    1.13 'Group level': screen layout
+         1.13.1  'Group level' screen: title
+         1.13.2  'Group level' screen: selection bar
+         1.13.3  'Group level' screen: article lines
+         1.13.4  'Group level' screen: command menu
+    1.14 'Group level': moving the selection bar
+    1.15 'Group level': selecting an article
+    1.16 'Article level': screen layout
+         1.16.1  'Article level' screen: header
+         1.16.2  'Article level' screen: body of article
+         1.16.3  'Group level' screen: command menu
+    1.17 'Article level': reading the selected article
+    1.18 'Article level': mail the article to someone
+    1.19 'Article level': print the article
+    1.20 'Article level': reply to the author of the article directly
+    1.21 'Article level': save the article as a file on your account
+    1.22 'Article level': write and post a reply to the article
+    1.23 'Article level': write and post your own article
+ 
+1.1 Introduction
+----------------
+    Electronic News provides you the means to read articles found
+    in the USENET newsgroups, a specific kind of bulletin board
+    service available on the Internet.  Each newsgroup contains
+    articles written about a particular topic. The number of groups
+    now number over 4000 when a site takes all available groups.
+               
+    In using tin, it is important to note how the newsgroups are 
+    organized and named.  The newsgroups are organized in a 
+    hierarchical fashion by topic; some are designed for very 
+    specific readership and others for much broader appeal.
+    This hierarchy is then reflected in the naming scheme for the
+    newsgroups.  For example, newsgroups beginning with the word
+    'rec.' are about recreational topics.  Other top-level words
+    that you will find in newsgroups names are (this list is not
+    complete):
+               
+        bit.listserv.    conferences originating as BITNET mailing
+                         lists (e.g. bit.listserv.pacs-l).
+                 
+        clari.           newsgroups from UPI (e.g.
+                         clari.sports.baseball).
+                 
+        comp.            Computer-related technical groups (e.g.
+                         comp.sys.mac.digest).
+                 
+        sci.             Scientific discussions (e.g.
+                         sci.meterology).
+                 
+        soc.             Discussions about societies, cultures,
+                         related issues (e.g. soc.culture.indian).
+                 
+1.2 To start Tin
+----------------               
+
+              +-------+  +-------+  +-------+              +----------+
+              |       |  |       |  |       |              |          |
+        Press |       |  |       |  |       | and then the |          | key
+              | t     |  | i     |  | n     |              |  Return  |
+              +-------+  +-------+  +-------+              +----------+
+
+    Press this key sequence to start the newsreader from the command line.
+    Note: The <Return> key may be called <Enter> on some keyboards.
+               
+1.3 To quit Tin
+---------------               
+
+        +-------+
+        |       |
+        |       |  Press the <q> key.
+        | q     |
+        +-------+
+               
+    This keystroke exits you from the program when the current
+    operation level is 'Group selection level'.
+               
+        +-------+
+        |       |
+        |       |  Press the <Q> key.
+        | Q     |
+        +-------+
+               
+    This keystroke exits you from the program at any operation level.
+               
+1.4 To work in Tin
+------------------
+    When you work in E)lectronic News, you are using a computer
+    program called 'tin'.  This program responds to commands
+    initiated with keystrokes.  For example, the <h> key is assigned
+    to the help function in 'tin'.  By pressing this key, the
+    program writes a list of commands on the screen.
+               
+    The key to working in this program efficiently is recognizing
+    the three separate hierarchical levels of operation:
+               
+        Group selection level
+        |
+        +------- Group level
+                 |
+                 +------- Article level
+               
+    At the 'Group selection level', the program shows a list of
+    newsgroups.  From this list, you select a newsgroup that has
+    articles that you would like to read.  Other actions that you
+    might take at this level are:
+               
+        *    add (subscribe) newsgroups to the list,
+                    
+        *    display (yank) all known newsgroups into the list,
+
+        *    drop (unsubscribe) newsgroups from the list,
+                    
+        *    reorder (move) the newsgroups' positons in the list, or
+                    
+        *    write and post your own article to a newsgroup.
+               
+    At the 'Group level', the program shows a list of unread
+    articles in the chosen newsgroup.  From this list, you choose an
+    article that you would like to read.  Other actions that you
+    might take at this level are:
+               
+        *    mail an article to someone,
+                    
+        *    print an article to a printer,
+                    
+        *    save an article into a file on your account, or
+                    
+        *    write and post your own article.
+               
+    At the 'Article level', the program displays the text of the
+    article that you selected.  Other actions that you might take at
+    this level are:
+               
+        *    mail the article to someone,
+                    
+        *    print the article to a printer,
+                    
+        *    reply to the author of the article directly,
+                    
+        *    save the article into a file on your account,
+                    
+        *    write and post a reply to the article, or
+                    
+        *    write and post your own article.
+                    
+1.5 'Group selection level': screen layout
+------------------------------------------
+    When you enter the `tin 'program, you should view a screen like
+    the following:
+               
+                             Group Selection (2067)                      h=help
+
+       1        ads.config
+       2   175  alt.artcom                                Artistic Community, a
+       3   153  alt.bbs                                   Computer BBS systems
+       4    71  alt.bbs.ads                               Ads for various compu
+       5  1416  alt.bbs.internet                          BBS systems accessibl
+       6   359  alt.bbs.lists                             Postings of regional
+       7    21  alt.bbs.lists.d                           Discussion about regi
+       8    44  alt.bbs.waffle                            The Waffle UUCP BBS.
+       9  2206  alt.cd-rom                                Discussions of optica
+      10  1549  alt.censorship                            Discussion about rest
+      11    41  alt.cobol                                 Relationship between
+      12  1922  alt.config                                Alternative subnet di
+      13   378  alt.cosuard                               Council of Sysops & U
+      14  3993  alt.folklore.computers                    Stories & anecdotes a
+      15     2  alt.fractals                              Fractals in math, gra
+      16   232  alt.graphics.pixutils                     Discussion of pixmap
+
+         <n>=set current to n, TAB=next unread, /=search pattern, c)atchup,
+      g)oto, j=line down, k=line up, h)elp, m)ove, q)uit, r=toggle all/unread,
+        s)ubscribe, S)ub pattern, u)nsubscribe, U)nsub pattern, y)ank in/out
+
+
+               
+1.5.1 'Group selection level' screen: title
+...........................................
+                             Group Selection (2067)                      h=help
+               
+    This line shows the number of newsgroups available.
+               
+1.5.2 'Group selection level' screen: selection bar
+...................................................
+       1        ads.config
+       2   175  alt.artcom                                Artistic Community, a
+               
+    The highlighted line is called a selection bar and it is used to
+    indicate the current newsgroup.
+     
+1.5.3 'Group selection level' screen: newsgroup lines
+.....................................................
+       2   175  alt.artcom                                Artistic Community, a
+       3   153  alt.bbs                                   Computer BBS systems
+       4    71  alt.bbs.ads                               Ads for various compu
+               
+    This is the main feature of the 'Group selection level'.  There
+    are four fields per line:
+               
+        Selection number           (e.g. 3)
+               
+        Number of unread articles  (e.g. 153)
+               
+        Newsgroup name             (e.g. alt.bbs)
+               
+        Description                (e.g. Computer BBS systems)
+               
+    The selection number gives each newsgroup in the list a unique
+    identifier.  You may input this identifer to move the selection
+    bar.  The number of unread articles refers to the number of
+    articles that you have not read in the particular newsgroup.  If
+    you find no number in this field, the newsgroup has no articles
+    for you to read.  Each newsgroup name is composed of words that
+    reflect the topic covered or the provider of the articles.  For
+    example, you can find articles from the Washington Post in a
+    newsgroup named 'americast.wpost'.  The last field provides a
+    description of what you might find discussed in the newsgroup.
+               
+1.5.4 'Group selection level' screen: command menu
+..................................................
+       <n>=set current to n, TAB=next unread, /=search pattern, c)atchup,
+    g)oto, j=line down, k=line up, h)elp, m)ove, q)uit, r=toggle all/unread,
+      s)ubscribe, S)ub pattern, u)nsubscribe, U)nsub pattern, y)ank in/out
+             
+    This three-line menu shows the commands available to you at this
+    level.  Each command label in the menu has two parts: the key
+    that you press and a one- or two-word description of the action
+    the program takes.  The label sets the key off with either a
+    parenthesis or an equal sign.  Examples on how to read the
+    labels follow:
+               
+    Example 1:
+                                       +-------+
+                                       |       |
+        the s)ubscribe means press the |       | key
+                                       | s     |
+                                       +-------+
+               
+    Example 2:
+                               +-------+      +-------+
+                               |       |      |       |
+        the S)ub pattern means |       | and  |       | to make an S
+                               | Shift |      | s     |
+                               +-------+      +-------+
+               
+    Example 3:
+                                             +-------+
+                                             |       |
+        the /=search pattern means press the |       | key
+                                             | /     |
+                                             +-------+
+               
+    Example 4:
+                                             +-------+
+                                             |       |
+        the <n>=set current to n means input |       |
+        a number such as 1, 2, 3 ...         | 1     |
+                                             +-------+
+               
+    Remember that if the label in the menu shows the key as
+    capitalized, you must make the keystroke in upper-case.
+               
+    Note:     This menu does not show all of the commands understood
+              by 'tin' at this level.  To see the the full list, use
+              the h=help command.
+               
+                  +-------+
+                  |       |
+        Press the |       | key.
+                  | h     |
+                  +-------+
+               
+    Note:     If you know enough of the commands at this level, make
+              a capital <H> to drop the menu from the display.  A
+              second capital <H> restores it.
+               
+        +-------+      +-------+
+        |       |      |       |
+        |       | and  |       | to make an H
+        | Shift |      | h     |
+        +-------+      +-------+
+
+1.6 'Group selection level': moving the selection bar
+-----------------------------------------------------
+       1        ads.config
+       2   175  alt.artcom                                Artistic Community, a
+               
+    Moving the selection bar lets you scan the list of newsgroups
+    found on the 'Group selection level' screen.  With the following
+    keystrokes you can move the selection bar to the:
+               
+        Beginning of list:
+                      +-------+
+                      |       |
+            Press the |       | key
+                      | 1     |
+                      +-------+
+               
+        End of list:
+                  +-------+      +-------+
+                  |       |      |       |
+            Press |       | and  |       | together to make an $
+                  | Shift |      | 4     |
+                  +-------+      +-------+
+               
+        Page Up:
+                      +-------+
+                      |       |
+            Press the |       | key or
+                      | b     |
+                      +-------+
+               
+                  +---------+      +-------+
+                  |         |      |       |
+            Press |         | and  |       | together
+                  | Control |      | u     |
+                  +---------+      +-------+
+               
+        Page Down:
+                      +--------------------------------+
+                      |                                |
+            Press the |                                | bar or
+                      |             space              |
+                      +--------------------------------+
+               
+                  +---------+      +-------+
+                  |         |      |       |
+            Press |         | and  |       | together
+                  | Control |      | d     |
+                  +---------+      +-------+
+               
+        Line Up:
+                      +-------+
+                      |   ^   |
+            Press the |   |   | key (up arrow)
+                      |   |   |
+                      +-------+
+               
+        Line Down:
+                      +-------+
+                      |   |   |
+            Press the |   |   | key (down arrow)
+                      |   V   |
+                      +-------+
+               
+1.7 'Group selection level': searching for a newsgroup
+------------------------------------------------------
+    A second way to scan the newsgroup list is to initiate a search
+    based on a word or string of characters in the newsgroup name.
+               
+    Forward search:
+        1.   Press the slash key:
+
+            +-------+
+            |       |
+            |       |
+            | /     |
+            +-------+
+
+        2.   Look for the prompt it produces at the bottom of the screen:
+               
+            Search forwards [previous-string]>
+
+               
+        3.   Enter a word or a string of characters that you think will
+             be found in the name of the newsgroup:
+                 
+            Search forwards [previous-string]> clari.ne
+
+               
+        Once you press the <RETURN> key, the search preceeds in a
+        forward direction toward the end of the list.
+               
+        Note:     To repeat the search with the same input, make
+                  two keystrokes: the slash key and then the
+                  <RETURN> key-no input is required.
+               
+    Backward search:
+        1.   Press the question-mark key:
+               
+            +-------+      +-------+
+            |       |      | ?     |
+            |       | and  |       |
+            | Shift |      | /     |
+            +-------+      +-------+
+               
+        2.   Look for the prompt it produces at the bottom of the screen:
+               
+            Search backwords [previous-string]>
+
+        3.   Enter a word or a string of characters that you think will
+             be found in the name of the newsgroup.
+                
+            Search backwords [previous-string]> wpost
+
+               
+        Once you press the <RETURN> key, the search preceeds in a
+        backward direction toward the top of the list.
+               
+        Note:     To repeat the search with the same input, make
+                  two keystrokes: the question-mark key and then
+                  the <RETURN> key-no input is required.
+               
+1.8 'Group selection level': display all known newsgroups
+---------------------------------------------------------
+    It is possible that you may not have all of the newsgroups in
+    your list.  The first time you select E)electronic News, the
+    program yanks in all of the newsgroups found in the CRC
+    subscriptions file ( a subset of all of the newsgroups).  If you
+    want all of the newsgroups from the CRC 'active' file, follow
+    these steps:
+               
+    1.   Note the number of newsgroups listed in the title:
+
+                             Group Selection (????)                     h=help
+               
+    2.   Press the <y> key.
+
+        +-------+
+        |       |
+        |       |
+        | y     |
+        +-------+
+               
+    Note:     Subsequent <y> keystrokes toggle the source file
+              for this list: the '.tinrc' file on your account
+              or the CRC 'active' file.
+               
+1.9 'Group selection level': add (subscribe) newsgroups
+-------------------------------------------------------
+    Initially, the program subscribes you to a subset of all known
+    newsgroups.  To add more newsgroups to your list, follow these
+    steps:
+               
+    1.   Note the number of newsgroups listed in the title:
+               
+                             Group Selection (????)                      h=help
+
+               
+    2.   Press the <y> key.
+
+        +-------+
+        |       |
+        |       |
+        | y     |
+        +-------+
+               
+    3.   Read the expanded list of newsgroups.
+               
+    4.   Move the selection bar onto a newsgroup that you want added
+         to your list (it should be marked as unsubscribed):
+               
+     345        comp.binaries.os2                         Binaries for use unde
+  u  346     -  bionet.agroforestry                       Discussion of Agrofor
+  u  347     -  bionet.general                            General BIOSCI discus
+               
+    5.   Press the <s> key:
+
+        +-------+
+        |       |
+        |       |
+        | s     |
+        +-------+
+               
+    Note:     The keystroke removes 'u' from in front of the
+              selection number.  Thus, a space in that field
+              indicates a subscribed newsgroup.  A record of
+              what newsgroups you are subscribed to is kept in
+              a file called '.tinrc'.
+               
+1.10 'Group selection level': drop (unsubscribe) newsgroups
+-----------------------------------------------------------
+    Each time you select E)lectronic News, the program displays the
+    newsgroups that you are subscribed to.  To drop newsgroups from
+    this list, you must set the 'unsubscribe' attribute for each
+    newsgroup you do not want.  The steps are as follows:
+               
+    1.   Move the selection bar onto the newsgroup that you want
+         dropped from your list (it should be marked as subscribed):
+               
+     345        comp.binaries.os2                         Binaries for use unde
+     346     -  bionet.agroforestry                       Discussion of Agrofor
+     347     -  bionet.general                            General BIOSCI discus
+               
+    2.   Make sure it is maked as subscribed:
+               
+     347     -  bionet.general                            General BIOSCI discus
+               
+    3.   Press the <u> key.
+
+        +-------+
+        |       |
+        |       |
+        | u     |
+        +-------+
+               
+    Note:     The keystroke adds a 'u' to in front of the
+              selection number.  This change is actually made
+              when you quit the program and is recoded in your
+              '.tinrc' file.  The <y> keystroke yanks the
+              unsubscribed newsgroups back into your list.
+
+1.11 'Group selection level': reorder the newsgroups
+----------------------------------------------------
+    The program for E)lectronic News alows you to define the order
+    of newsgroups appear in your list.  The steps are as follows:
+               
+    1.   Move the selection bar onto the newsgroup that you want
+         reordered:
+               
+     346     -  bionet.agroforestry                       Discussion of Agrofor
+     347     -  bionet.general                            General BIOSCI discus
+               
+    2.   Press the <m> key.
+               
+        +-------+
+        |       |
+        |       |
+        | m     |
+        +-------+
+               
+    3.   Look for the prompt it produces at the bottom of the screen:
+               
+        Position bionet.general in group list (1,2,..,$) [347]>
+               
+    4.   Input the newsgroup's new position in the list:
+               
+        Position bionet.general in group list (1,2,..,$) [347]>
+               
+    Note:     After input, the program moves the newsgroup to
+              its new position and drops all unsubscribed
+              newsgroups from the list.  The <y> keystroke
+              yanks the unsubscribed newsgroups back into your
+              list.
+               
+1.12 'Group selection level': selecting a newsgroup
+---------------------------------------------------
+    Selecting a newsgroup is the main task that you carry out at
+    this level.  The steps to do this are straightforward:
+               
+    1.   Move the selection bar to newsgroup you want to read
+         (ie, clari.feature.mike_royko):
+               
+    1153     -  comp.databases.theory
+    1154     -  rec.music.marketplace
+    1155     -  rec.music.info
+    1156     -  comp.sys.next.advocacy
+    1157     -  comp.sys.next.hardware
+    1158     -  comp.sys.next.software
+    1159     -  comp.sys.next.marketplace
+    1160     -  comp.society.privacy
+    1161     -  rec.sport.paintball
+    1162     -  clari.feature.dave_barry
+    1163     -  clari.feature.mike_royko
+               
+                    like this:
+               
+    1153     -  comp.databases.theory
+    1154     -  rec.music.marketplace
+    1155     -  rec.music.info
+    1156     -  comp.sys.next.advocacy
+    1157     -  comp.sys.next.hardware
+    1158     -  comp.sys.next.software
+    1159     -  comp.sys.next.marketplace
+    1160     -  comp.society.privacy
+    1161     -  rec.sport.paintball
+    1162     -  clari.feature.dave_barry
+    1163     -  clari.feature.mike_royko
+               
+    2.   Press the <RETURN> key.
+               
+        +-----------+
+        |           |
+        |           |
+        |  Return   |
+        +-----------+
+               
+    Note:     This action places you in the next operational
+              level: 'Group level'.
+     
+    Another way to select a newsgroup and display its articles is to
+    input the newsgroup's numeric identifer:
+               
+    1.   Type the identifer of the newsgroup (e.g. 67):
+               
+        Select group> 67
+
+               
+    2.   Press the <RETURN> key.
+
+        +-----------+
+        |           |
+        |           |
+        |  Return   |
+        +-----------+
+               
+    Note:     This action places you in the next operational
+              level: 'Group level'.
+    
+1.13 'Group level': screen layout
+---------------------------------
+    After you select a newsgroup, you should view a screen like the
+    following:
+               
+                   clari.feature.mike_royko (10T 10A 0K 0H R)            h=help
+
+     1  +    This fast-food diet may cost $7 millio   Mike Royko (clarinews@cla
+     2  +    Americans deserve lawyer in every pot    Mike Royko (clarinews@cla
+     3  +    Holiday music ban is a classic lesson    Mike Royko (clarinews@cla
+     4  +    Aspin defenseless against whisperers     Mike Royko (clarinews@cla
+     5  +    Columnist, friend, card-carrying celeb   Mike Royko (clarinews@cla
+     6  +    What do we have a right to know?         Mike Royko (clarinews@cla
+     7  +    Humiliated Jackson can join the crowd    Mike Royko (clarinews@cla
+     8  +    Mary and Joe, Chicago style              Mike Royko (clarinews@cla
+     9  +    How to ease that hangover                Mike Royko (clarinews@cla
+    10  +    A stiff lesson                           Mike Royko (clarinews@cla
+
+
+
+
+
+
+
+    <n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,
+  a)uthor search, c)atchup, j=line down, k=line up, K=mark read, l)ist thread,
+    |=pipe, m)ail, o=print, q)uit, r=toggle all/unread, s)ave, t)ag, w=post
+
+                            *** End of Articles ***
+               
+1.13.1 'Group level' screen: title
+..................................
+                   clari.feature.mike_royko (10T 10A 0K 0H R)            h=help
+
+               
+    The line for the title shows the following:
+               
+        Newsgroup name    (e.g. clari.feature.mike_royko)
+               
+        Number of articles per thread (e.g. 10T)
+               
+        Number of articles overall (e.g. 10A)
+               
+        Number of killed articles  (e.g. 0K)
+               
+        Number of auto selected articles (e.g. 0H)
+               
+        Show only unread article   (e.g. R)
+               
+    Note:     A 'thread' refers to a particular conversation.  The
+              number of threads refer to the number of different
+              conversations taking place in the newsgroup.  Usually,
+              there is one article per thread.  If the number of
+              articles is greater than the number of threads, it
+              means there is one or more people writing about a
+              particular line of conversation.  In other words, a
+              person wrote about something and others are replying
+              to it.
+               
+1.13.2 'Group level' screen: selection bar
+..........................................
+     1  +    This fast-food diet may cost $7 millio   Mike Royko (clarinews@cla
+     2  +    Americans deserve lawyer in every pot    Mike Royko (clarinews@cla
+               
+    The highlighted line is called a selection bar and it is used to
+    indicate the current article.
+               
+1.13.3 'Group level' screen: article lines
+..........................................
+     8  +    Mary and Joe, Chicago style              Mike Royko (clarinews@cla
+     9  +    How to ease that hangover                Mike Royko (clarinews@cla
+    10  +    A stiff lesson                           Mike Royko (clarinews@cla
+               
+    The article lines are the main component of the 'Group level'
+    screen.  In each line you should at most, find four fields:
+               
+        Selection number           (e.g. 8)
+               
+        Unread/Read attribute      (e.g. '+' or space)
+               
+        Article's subject          (e.g. Mary and Joe, Chi ...)
+               
+        Author's e-mail address    (e.g. Mike Royko (clarinews@cla))
+               
+    The selection number gives each article in the list a unique
+    identifier.  You may input this identifer to move the selection
+    bar.  The unread/read attribute indicates whether you have yet
+    read the article.  Once you have selected an article to read,
+    the '+' is replaced with a space in that field upon return.  The
+    third field displays the subject of the article.  This subject
+    is supplied by the person who wrote the article.  The last field
+    is the e-mail address of the person who posted the article.
+               
+    Note:     If the article-line reports a number between the
+              second and third fields, it means there is a number of
+              articles on that thread of conversation-not just one.
+
+1.13.4 'Group level' screen: command menu
+.........................................
+    <n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,
+  a)uthor search, c)atchup, j=line down, k=line up, K=mark read, l)ist thread,
+    |=pipe, m)ail, o=print, q)uit, r=toggle all/unread, s)ave, t)ag, w=post
+
+               
+    This three-line menu shows the commands available to you at this
+    level.  Each command label in the menu has two parts: the key
+    that you press and a one- or two-word description of the action
+    the program takes.  The label sets the key off with either a
+    parenthesis or an equal sign.  Remember that if the label in the
+    menu shows the key as capitalized, you must make the keystroke
+    in upper-case.
+               
+    Note:     This menu does not show all of the commands understood
+              by 'tin' at this level.  To see the the full list, use
+              the h=help command.
+               
+                  +-------+
+                  |       |
+        Press the |       | key.
+                  | h     |
+                  +-------+
+               
+    Note:     If you know enough of the commands at this level, make
+              a capital <H> to drop the menu from the display.  A
+              second capital <H> restores it.
+               
+        +-------+      +-------+
+        |       |      |       |
+        |       | and  |       | to make an H
+        | Shift |      | h     |
+        +-------+      +-------+
+               
+1.14 'Group level': moving the selection bar
+--------------------------------------------
+     1  +    This fast-food diet may cost $7 millio   Mike Royko (clarinews@cla
+     2  +    Americans deserve lawyer in every pot    Mike Royko (clarinews@cla
+               
+    Moving the selection bar lets you scan the list of articles
+    found for the selected newsgroup.  With the following keystrokes
+    you can move the selection bar to the:
+               
+    Beginning of list:
+                  +-------+
+                  |       |
+        Press the |       | key
+                  | 1     |
+                  +-------+
+               
+    End of list:
+              +-------+      +-------+
+              |       |      |       |
+        Press |       | and  |       | together to make an $
+              | Shift |      | 4     |
+              +-------+      +-------+
+               
+    Page Up:
+                  +-------+
+                  |       |
+        Press the |       | key or
+                  | b     |
+                  +-------+
+               
+              +---------+      +-------+
+              |         |      |       |
+        Press |         | and  |       | together
+              | Control |      | u     |
+              +---------+      +-------+
+               
+    Page Down:
+                  +--------------------------------+
+                  |                                |
+        Press the |                                | bar or
+                  |             space              |
+                  +--------------------------------+
+               
+              +---------+      +-------+
+              |         |      |       |
+        Press |         | and  |       | together
+              | Control |      | d     |
+              +---------+      +-------+
+               
+    Line Up:
+                  +-------+
+                  |   ^   |
+        Press the |   |   | key (up arrow)
+                  |   |   |
+                  +-------+
+               
+    Line Down:
+                  +-------+
+                  |   |   |
+        Press the |   |   | key (down arrow)
+                  |   V   |
+                  +-------+
+               
+1.15 'Group level': selecting an article
+----------------------------------------
+    Selecting an article is the main action taken at this level.
+    The steps to do this are straightforward:
+               
+    1.   Move the selection bar to the article you want to read
+         (eg. Mary and Joe, Chicago style):
+               
+     1  +    This fast-food diet may cost $7 millio   Mike Royko (clarinews@cla
+     2  +    Americans deserve lawyer in every pot    Mike Royko (clarinews@cla
+     3  +    Holiday music ban is a classic lesson    Mike Royko (clarinews@cla
+     4  +    Aspin defenseless against whisperers     Mike Royko (clarinews@cla
+     5  +    Columnist, friend, card-carrying celeb   Mike Royko (clarinews@cla
+     6  +    What do we have a right to know?         Mike Royko (clarinews@cla
+     7  +    Humiliated Jackson can join the crowd    Mike Royko (clarinews@cla
+     8  +    Mary and Joe, Chicago style              Mike Royko (clarinews@cla
+     9  +    How to ease that hangover                Mike Royko (clarinews@cla
+    10  +    A stiff lesson                           Mike Royko (clarinews@cla
+               
+        like this:
+               
+     1  +    This fast-food diet may cost $7 millio   Mike Royko (clarinews@cla
+     2  +    Americans deserve lawyer in every pot    Mike Royko (clarinews@cla
+     3  +    Holiday music ban is a classic lesson    Mike Royko (clarinews@cla
+     4  +    Aspin defenseless against whisperers     Mike Royko (clarinews@cla
+     5  +    Columnist, friend, card-carrying celeb   Mike Royko (clarinews@cla
+     6  +    What do we have a right to know?         Mike Royko (clarinews@cla
+     7  +    Humiliated Jackson can join the crowd    Mike Royko (clarinews@cla
+     8  +    Mary and Joe, Chicago style              Mike Royko (clarinews@cla
+     9  +    How to ease that hangover                Mike Royko (clarinews@cla
+    10  +    A stiff lesson                           Mike Royko (clarinews@cla
+               
+    2.   Press the <RETURN> key.
+
+        +-----------+
+        |           |
+        |           |
+        |  Return   |
+        +-----------+
+               
+    Note:     This action places you in the next operational 
+              level: 'Article level'.
+               
+    Another way to select an article is to type the article's
+    numeric identifer:
+               
+    1.   Type the identifer of the article (eg. 6):
+
+        Select group> 6
+
+               
+    Note:     You do not have to press a key to show this
+              prompt the digits that you type produce it.
+               
+    2.   Press the <RETURN> key.
+
+        +-----------+
+        |           |
+        |           |
+        |  Return   |
+        +-----------+
+               
+    Note:     This action places you in the next operational
+              level: 'Article level'.
+               
+1.16 'Article level': screen layout
+-----------------------------------
+    After you select an article, you should view a screen like the
+    following:
+               
+Thu, 30 Dec 1993 15:16:34   clari.feature.mike_royko        Thread    8 of   10
+Lines 105               Mary and Joe, Chicago style         No responses
+clarinews@clarinet.com                            Mike Royko at A Happy Company
+
+    (This Christmas column originally appeared in 1967 and has
+    been reprinted many times since.)
+    Mary and Joe were flat broke when they got off the bus in
+    Chicago. They didn't know anybody and she was expecting a baby.
+    They went to a cheap hotel. But the clerk jerked his thumb
+    at the door when they couldn't show a day's rent in advance.
+    They walked the streets until they saw a police station.
+    The desk sergeant said they couldn't sleep in a cell, but he told
+    them how to get to a welfare office.
+    A man there said they couldn't get regular assistance
+    because they hadn't been Illinois residents long enough. But he
+    gave them the address of the emergency welfare office on the West
+    Side.
+    It was a two-mile walk up Madison Street. Someone gave
+
+    <n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,
+        a)uthor search, B)ody search, c)atchup, f)ollowup, K=mark read,
+        |=pipe, m)ail, o=print, q)uit, r)eply mail, s)ave, t)ag, w=post
+
+                                                      --More--(20%) [1190/5859]
+               
+1.16.1 'Article level' screen: header
+.....................................
+Thu, 30 Dec 1993 15:16:34   clari.feature.mike_royko        Thread    8 of   10
+Lines 105               Mary and Joe, Chicago style         No responses
+clarinews@clarinet.com                                               Mike Royko
+               
+    On the first three lines of the article is the header which
+    reports the following attributes about the article:
+               
+        Date posted                (e.g. Thu, 30 Dec 1993 15:16:34)
+               
+        Newsgroup name             (e.g. clari.feature.mike_royko)
+               
+        Article number             (e.g. 8 of 10)
+               
+        Number of lines            (e.g. 105)
+               
+        Subject                    (e.g. Mary and Joe, Chicago style)
+               
+        Number of respones in thread    (e.g. No responses)
+               
+        Author                     (e.g. clarinews@clarinet.com)
+               
+        Organization               (e.g. A Happy Company)
+               
+    If the article's length is two or more pages, the header at the
+    top of each screen shows:
+               
+Thread 8 of 10 (page 2):  Mary and Joe, Chicago style
+
+               
+        Article number    (e.g. 8 of 10)
+               
+        Page number  (e.g. 2)
+               
+        Subject (e.g. Mary and Joe, Chicago style)
+               
+1.16.2 'Article level' screen: body of article
+..............................................
+    (This Christmas column originally appeared in 1967 and has
+    been reprinted many times since.)
+    Mary and Joe were flat broke when they got off the bus in
+    Chicago. They didn't know anybody and she was expecting a baby.
+    They went to a cheap hotel. But the clerk jerked his thumb
+    at the door when they couldn't show a day's rent in advance.
+    They walked the streets until they saw a police station.
+    The desk sergeant said they couldn't sleep in a cell, but he told
+    them how to get to a welfare office.
+    A man there said they couldn't get regular assistance
+    because they hadn't been Illinois residents long enough. But he
+    gave them the address of the emergency welfare office on the West
+    Side.
+    It was a two-mile walk up Madison Street. Someone gave
+               
+        This is simply the text of the article.
+               
+1.16.3 'Group level' screen: command menu
+.........................................
+    <n>=set current to n, TAB=next unread, /=search pattern, ^K)ill/select,
+        a)uthor search, B)ody search, c)atchup, f)ollowup, K=mark read,
+        |=pipe, m)ail, o=print, q)uit, r)eply mail, s)ave, t)ag, w=post
+
+               
+    This three-line menu shows the commands available to you at this
+    level.  Each command label in the menu has two parts: the key
+    that you press and a one- or two-word description of the action
+    the program takes.  The label sets the key off with either a
+    parenthesis or an equal sign.  Examples on how to read the
+    labels follow:
+               
+    Example 1:
+                                    +-------+
+                                    |       |
+        the o=print means press the |       | key
+                                    | o     |
+                                    +-------+
+               
+    Example 2:
+                               +-------+      +-------+
+                               |       |      |       |
+        the B)ody search means |       | and  |   b   | to make an B
+                               | Shift |      |       |
+                               +-------+      +-------+
+               
+    Remember that if the label in the menu shows the key as
+    capitalized, you must make the keystroke in upper-case.
+               
+    Note:     This menu does not show all of the commands understood
+              by 'tin' at this level.  To see the the full list, use
+              the h=help command.
+               
+                  +-------+
+                  |       |
+        Press the |       | key.
+                  | h     |
+                  +-------+
+               
+    Note:     If you know enough of the commands at this level, make
+              a capital <H> to drop the menu from the display.  A
+              second capital <H> restores it.
+               
+        +-------+      +-------+
+        |       |      |       |
+        |       | and  |       | to make an H
+        | Shift |      | h     |
+        +-------+      +-------+
+               
+1.17 'Article level': reading the selected article
+--------------------------------------------------
+    To read a selected article, use the following keystrokes:
+               
+    Next Page:
+                  +--------------------------------+
+                  |                                |
+        Press the |                                | bar
+                  |             space              |
+                  +--------------------------------+
+               
+    Previous Page:
+                  +-------+
+                  |       |
+        Press the |       | key
+                  | b     |
+                  +-------+
+               
+    First Page:
+                  +-------+
+                  |       |
+        Press the |       | key
+                  | g     |
+                  +-------+
+
+    Last Page:
+              +-------+      +-------+
+              |       |      |       |
+        Press |       | and  |       | together to make an G
+              | Shift |      | g     |
+              +-------+      +-------+
+               
+    Text searching:
+        1.   Press the slash key:
+
+            +-------+
+            |       |
+            |       |
+            | /     |
+            +-------+
+               
+        2.   Look for the prompt it produces at the bottom of the screen:
+
+            Search forwards [previous-string]>
+
+               
+        3.   Type the word or the string of characters that you are
+             searching for:
+               
+            Search forwards [previous-string]> kramer
+
+               
+        Press the <RETURN> key.  If there is a match, the article
+        is turned to that page.  Otherwise, a message indicating no
+        match is reported.
+               
+    Quit:
+                  +-------+
+                  |       |
+        Press the |       | key
+                  | q     |
+                  +-------+
+               
+    This keystroke returns you to the previous operation level.
+                    
+1.18 'Article level': mail the article to someone
+-------------------------------------------------
+    If you would like someone to receive the article that you are
+    currently reading via e-mail, you need to follow these steps:
+               
+    1.   Press the <m> key.
+               
+        +-------+
+        |       |
+        |       |
+        | m     |
+        +-------+
+               
+    2.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Mail a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: t
+
+               
+    3.   Press the <a> key.
+               
+        +-------+
+        |       |
+        |       |
+        | a     |
+        +-------+
+               
+    This indicates that an article is to be mailed.
+               
+    4.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Mail article(s) to [previous-address>
+
+               
+    5.   Enter the e-mail address of the person to receive the
+         article:
+               
+        Mail article(s) to [previous-address> pkramer@unl.edu
+
+               
+        Note:     You may mail the article to one person at a time.
+               
+    6.   Look for the prompt it produces at the bottom of the
+         screen:
+
+        q)uit, e)dit, s)end [subject]: s
+
+               
+    7.   Press the <s> key.
+               
+        +-------+
+        |       |
+        |       |
+        | s     |
+        +-------+
+               
+    This confirms your intention to mail the current article.
+    The other keystrokes allow you to change your mind about
+    mailing it or allow you to make changes to the article.
+                    
+1.19 'Article level': print the article
+---------------------------------------
+    If you would like to print the article that you are currently
+    reading, you need to follow these steps:
+               
+    1.   Press the <o> key.
+               
+        +-------+
+        |       |
+        |       |
+        | o     |
+        +-------+
+               
+    2.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Print a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: a
+               
+    3.   Press the <a> key.
+               
+        +-------+
+        |       |
+        |       |
+        | a     |
+        +-------+
+               
+1.20 'Article level': reply to the author of the article directly
+-----------------------------------------------------------------
+    If you would like to write to the author of the article that you
+    are reading,  you need to follow these steps:
+               
+    1.   Press the <r> key.
+               
+        +-------+
+        |       |
+        |       |
+        | r     |
+        +-------+
+               
+    2.   Using the text editor invoked for you, write your reply.
+         When finished, make the keystroke or enter the command that
+         closes the editor.
+               
+    3.   Look for the prompt it produces at the bottom of the screen:
+               
+        q)uit, e)dit, s)end: s
+               
+    4.   Press the <s> key.
+               
+        +-------+
+        |       |
+        |       |
+        | s     |
+        +-------+
+               
+    This confirms your intention to mail your reply.  The other
+    keystrokes allow you to change your mind about mailing it
+    or allow you to make further changes to the reply.
+
+1.21 'Article level': save the article as a file on your account
+----------------------------------------------------------------
+    If you would like to save the article that you are currently
+    reading, you need to follow these steps:
+               
+    1.   Press the <s> key.
+               
+        +-------+
+        |       |
+        |       |
+        | s     |
+        +-------+
+               
+    2.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Save a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: a
+               
+    3.   Press the <a> key.
+               
+        +-------+
+        |       |
+        |       |
+        | a     |
+        +-------+
+               
+    4.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Save filename []>
+               
+    5.   Enter the name that you want used as the filename:
+               
+        Save filename []> file.pkramer
+               
+    6.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        Process n)one, s)har, u)ud, l)ist zoo, e)xt zoo, L)ist zip, E)xt zip, q)uit: n
+               
+    7.   Press the <n> key.
+               
+        +-------+
+        |       |
+        |       |
+        | n     |
+        +-------+
+               
+    This keystroke selects a null extraction process for the
+    saving of the file.  The other choices, if selected, apply
+    the following extraction processes:
+                    
+        s  s)har     unsharing
+        u  u)ud      uudecoding
+        l  l)ist zoo list files within 'zoo' archive
+        e  e)xt zoo  extract files within 'zoo' archive
+        L  l)ist zip list files within 'zip' archive
+        E  E)xt zip  extract files within 'zip' archive
+                    
+1.22 'Article level': write and post a reply to the article
+-----------------------------------------------------------
+    If you would like to write and post a reply to the article that
+    you are currently reading, you need to follow these steps:
+               
+    1.   Press the <f> key.
+               
+        +-------+
+        |       |
+        |       |
+        | f     |
+        +-------+
+               
+    2.   Using the text editor invoked for you, write your reply.
+         When finished, make the keystroke or enter the command that
+         closes the editor.
+
+         Look for the prompt it produces at the bottom of the screen:
+               
+        q)uit, e)dit, p)ost: p
+               
+    3.   Press the <p> key.
+               
+        +-------+
+        |       |
+        |       |
+        | p     |
+        +-------+
+               
+    This confirms your intention to post your followup.
+               
+1.23 'Article level': write and post your own article
+-----------------------------------------------------
+    If you would like to write and post your own article to the
+    current newsgroup,  you need to follow these steps:
+               
+    1.   Press the <w> key.
+               
+        +-------+
+        |       |
+        |       |
+        | w     |
+        +-------+
+               
+    2.   Using the text editor invoked for you, write your article.
+         When finished, make the keystroke or enter the command that
+         closes the editor.
+               
+    3.   Look for the prompt it produces at the bottom of the
+         screen:
+               
+        q)uit, e)dit, p)ost: p
+               
+    4.   Press the <p> key.
+               
+        +-------+
+        |       |
+        |       |
+        | p     |
+        +-------+
+               
+    This confirms your intention to your post.

@@ -1,0 +1,380 @@
+Archive-name: tin-faq
+
+Frequently Asked Questions about the TIN newsreader - 95-04-26
+--------------------------------------------------------------
+
+Note: This is an evolving document that hopes to answer often asked questions 
+      that are emailed to me or posted to the newsgroup news.software.readers
+      concerning the tin newsreader.
+      Feel free to email me (iain@scn.de) any suggestions for inclusion in a 
+      future release of this document.
+
+Note: This document is based on the upcoming v1.3 PL0 release. 
+
+Table Of Contents
+-----------------
+1 General
+  1.1  What is tin and what can it do for me?
+  1.2  Where can I get it from?
+  1.3  Where should I report a bug, problem or suggestion?
+  1.4  What is the copyright on tin?
+  1.5  Can I resell tin?
+  1.6  Can I make changes to the source code?
+2 Compilation
+  2.1  Tin will not compile?
+  2.2  Tin will not link?
+3 Configuration
+  3.1  My articles Email address is wrong?
+  3.2  I want to use an editor other than vi?
+  3.3  I want to use my mail aliases from elm / pine?
+  3.4  When I use the pico editor the posted article is empty?
+  3.5  What is the filename +6 I edit when composing an article?
+  3.6  I cannot print any articles?
+  3.7  New newsgroups are not being detected?
+  3.8  There are no articles in any newsgroups?
+  3.9  I keep seeing the message 'article XXXX unavailable'?
+  3.10 I no longer see the message 'Indexing XXXX/XXXX...' entering a group?
+  3.11 How can I kill/auto-select articles?
+  3.12 How do I add a Distribution, Followup-To: etc. header to an article?
+  3.13 How can I post an article to multiple newsgroups?
+  3.14 Can I use the SPACE key to read all my news like in rn?
+  3.15 What are the unrecognized nntp commands in my syslog file?
+  3.16 When connecting via nntp I get the message 'nntp/tcp: Unknown service'?
+  3.17 How can I turn off the 3 line help mini-menu?
+  3.18 Can the confirmation prompts be turned off?
+  3.19 Can I save news for later reading while I'm on vacation?
+  3.20 What do the T A H K R letters mean at the top of the group index screen?
+  3.21 Is there any documentation available apart from the manual page?
+  3.22 Can I change the organization header for posting articles?
+  3.23 How can I see more of the newsgroups description text?
+  3.24 Why do some people claim tin doesn't thread?
+4 Known Bugs
+  4.1  I have to press the Enter key after every command? 
+  4.2  thread.c (677): first_thread_on_screen != 0 
+5 Acknowledgements
+
+
+1  General
+==========
+
+1.1  What is tin and what can it do for me?
+-------------------------------------------
+Tin is a netnews (also referred to as Usenet or just the news) newsreader
+that provides a full screen  easy to use text based interface with online 
+help at all levels for the Unix, AmigaDOS, OS/2 and Win32 operating systems.
+
+It can read news locally from your systems news spool directory as well as
+from a remote news server via NNTP (Network News Transport Protocol). News
+overview (NOV) index files are used if available to speedup newsreading. 
+
+Easy to remember commands to mail, pipe, print and save as well as auto-
+unpacking of multi-part shell archives and uuencoded articles.
+
+A full screen interface to kill uninteresting and auto-select interesting
+articles allows easy tailoring to your specific interests. The concept of 
+group attributes is supported for even finer control of ones newsreading. 
+
+Batch mode mailing and saving of new articles is supported (i.e., vacation).
+
+A builtin NNTP inews client allows a single binary (i.e., no Pnews) to be
+installed in a distributed environment.
+
+1.2  Where can I get it from?
+-----------------------------
+i)  Unix Reference site:  
+      ftp://ftp.scn.de/pub/news/tin
+      ftp://ftp.Germany.EU.net/pub/news/newsreader/unix/tin
+      ftp://src.doc.ic.ac.uk/computing/usenet/software/readers/tin
+      ftp://ftp.uwp.edu/pub/tin
+      ftp://yoyo.cc.monash.edu.au/pub/tin
+ii) AmigaDOS Reference sites:  
+      ftp://litaamiga.epfl.ch/pub/amiga/aminet/local/uucp
+iii) OS/2 Reference sites:
+      ftp://ftp-os2.nmsu.edu/os2/2_x/network
+      ftp://ftp-os2.cdrom.com/os2/2_x/network
+iv) Win32 Reference sites:
+      ftp://ftp.wa.com/pub/local/ntnews/tin
+
+1.3  Where should I report a bug, problem or suggestion?
+--------------------------------------------------------
+Email: iain@scn.de
+Snail: Iain Lea, Bruecken Str. 12, 90419 Nuernburg, Germany
+
+Please provide as much infomation as possible when sending me a report.
+Of use would be the machine type and operating system, what options tin 
+was compiled with and a detailed description of what you were doing 
+leading upto the problem. A stacktrace from a debugger would be best.
+
+A detailed report has got a lot better chance of being fixed than a 
+message that says 'Tin crashed and told me to send you a message' (sic).
+
+1.4  What is the copyright on tin?
+----------------------------------
+Copyright (c) 1991-9? by Iain Lea
+You may  freely  copy or  redistribute  this software, so  long as there 
+is no profit made from its use, sale trade or  reproduction. You may not 
+change this copyright notice, and it must be included in any copy made.
+
+1.5  Can I resell tin?
+----------------------
+No (well maybe). A commercial licence will be granted if the author is
+in agreement with the intended use of the commercial venture. 
+Please send email or snail mail to above address to workout any details.
+
+1.6  Can I make changes to the source code?
+-------------------------------------------
+Yes. All changes must be submitted to the author for inclusion in the base
+distribution.  The author reserves the right to include submitted changes. 
+Also read the file ./doc/HACKERS that describes tin's internal structures.
+
+2  Compilation
+==============
+
+2.1  Tin will not compile?
+--------------------------
+Most problems that arise seem to center around the file ./src/curses.c
+or the include files that it tries to use. Check the ./include/config.h
+file for certain HAVE_XXX defines that control which include files to
+include for a certain operating system. Also read the file ./INSTALL.
+
+2.2  Tin will not link?
+-----------------------
+Most problems center around operating systems that do not have the 
+network socket routines in the system library libc.a. If you look at
+the ./src/Makefile you will see for some targets a commented out line
+(i.e., a # at the start of the line) that will contain the text NETLIBS. 
+Add this line to the make rule below the LIBS line and remove the # at 
+the beginning of the moved line. Try compiling again and cross your
+fingers.
+
+3  Configuration
+================
+
+3.1  My articles Email address is wrong?
+----------------------------------------
+The articles email address is something like  joe@luser  instead of the
+correct address  joe@luser.confusion.com  or maybe  joe@confusion.com
+
+You should read the ./INSTALL document which documents the following two 
+./src/Makefile variables INEWS_MAIL_GATEWAY and INEWS_MAIL_DOMAIN. Both
+are documented in an abbreviated form below.  Note that only one of the 
+two variables should be defined.
+
+INEWS_MAIL_GATEWAY  defines the name of your news gateway machine. Useful if 
+you don't want your internal network visible to the outside world, or if your
+inews script or NNTP server rewrites your address for you. 
+For the above example you would set  INEWS_MAIL_GATEWAY=\"confusion.com\" 
+to get the address  joe@confusion.com
+
+INEWS_MAIL_DOMAIN  defines the name of your network domain (i.e, the bit to
+tag onto the end of the host and machine name). 
+For the above example you would set  INEWS_MAIL_DOMAIN=\"confusion.com\" 
+to get the address  joe@luser.confusion.com
+
+If your email address ends with the string ".subdomain.domain" then your
+mail/news system has not been setup correctly. Speak to your system 
+administrator.
+
+3.2  I want to use an editor other than vi?
+-------------------------------------------
+i)  Edit the ./include/tin.h file to reflect the editor you want to use.
+ii) Set the shell variable VISUAL to the editor you wish to use i.e.,:
+      $ setenv VISUAL emacs
+    or if you are not a C-shell (csh) fan and use the bourne shell (sh)
+      # VISUAL=emacs
+     
+3.3  I want to use my mail aliases from elm / pine?
+---------------------------------------------------
+Edit the ~/.tin/tinrc file default mailer variable 'default_mailer_format=' 
+to make use of elm/pine. To use elm (as I do) you would set the line to:
+default_mailer_format=elm -s "%S" "%T" < "%F"
+which would be transformed in my case to 'elm -s "subject" "iain" < .article' 
+
+3.4  When I use the pico editor the posted article is empty?
+------------------------------------------------------------
+When setting the VISUAL shell variable (see above) make sure to use  pico -t
+
+3.5  What is the filename +6 I edit when composing an article?
+--------------------------------------------------------------
+i)  Set option 2 in the options menu (M command) to OFF.
+ii) Edit the ~/.tin/tinrc file default editor variable 'default_editor_format=' 
+    to make use of your own editor. To use pico you would set the line to:
+      default_editor_format=pico -t %F
+    which would be transformed to 'pico -t .article'
+
+3.6  I cannot print any articles?
+---------------------------------
+i)  Check what option 18 in the options menu (M command) thinks will print
+    an article (usually 'lpr'). Set to the required command (I use the 
+    following 'a2ps -nn | lpr -h').
+ii) Make sure the printer that you specify is online and ready to print.
+iii) Speak to your onsite printer guru.
+
+3.7  New newsgroups are not being detected?
+-------------------------------------------
+Make sure that the file LIBDIR/active.times exists if reading news locally.
+LIBDIR will be set to the value that you specified in the ./src/Makefile
+(default is /usr/lib/news). If you still have no luck or read news via 
+nntp (i.e., remotely) consult your onsite news guru.
+
+3.8  There are no articles in any newsgroups?
+---------------------------------------------
+i)  Are you trying to read news on a local machine when the news is actually
+    on a remote news server. Try using 'tin -r' or compiling with -DNNTP_ONLY.
+ii) Recheck your news setup (ie., Are LIBDIR and SPOOLDIR actually where you
+    specified them to be in the Makefile) and speak to your news guru again. 
+
+3.9  I keep seeing the message 'article XXXX unavailable'?
+----------------------------------------------------------
+i)  If running Cnews check that the upact shell script is run daily from cron.
+ii) Run tin with the -P (purge index files) to update the expired articles
+    from all the index files in the directory ~/.tin/.news
+
+3.10 I no longer see the message 'Indexing XXXX/XXXX...' entering a group?
+--------------------------------------------------------------------------
+Your news server is creating NOV style overview files that tin can read so
+there is no need for tin to index the new articles.
+
+3.11 How can I kill/auto-select articles?
+-----------------------------------------
+Tin supports killing articles as well as auto-selecting articles that are
+of interest to you.  To kill articles via a menu use the Ctrl-K command.
+A single command quick-kill is possible using the ']' command.  Note that
+the quick-kill is not as configurable as the menu based kill. Its default
+kill behaviour can be set via the group attributes file (~/.tin/attributes).
+To auto-select articles of interest to you via a menu use the Ctrl-A command
+and to quick-select articles use the '[' command.
+
+3.12 How do I add a Distribution:, Followup-To: etc. header to an article?
+--------------------------------------------------------------------------
+Extra headers can be added when editing your article to post. Simply add
+the header (ie. Followup-To:) to the beginning of the article. Don't forget
+that the keyword must be at the beginning of the line and a space must come
+after the colon ':'. For example to add the Followup-To: line to an article:
+
+--
+Newsgroups: comp.os.linux.misc,comp.os.research
+Subject: Buffer cache idea...
+Followup-To: comp.os.research
+
+text of article
+--
+
+3.13 How can I post an article to multiple newsgroups?
+-----------------------------------------------------
+The 'Newsgroups' header allows an article to be posted to multiple groups.
+Don't forget that the a space ' ' must come after the 'Newsgroups:' text
+and that each newgroup name must be separated by a comma ',' and no space.
+
+--
+Newsgroups: comp.os.linux.misc,comp.unix.misc,comp.os.mach,alt.folklore
+Subject: Posting to multiple newsgroups
+
+text of article
+--
+
+3.14 Can I use the SPACE key to read all my news like in rn?
+------------------------------------------------------------
+Use the TAB key to read all unread articles in all subscribed to newsgroups.
+
+3.15 What are the unrecognized nntp commands in my syslog file?
+---------------------------------------------------------------
+The messages are printed in the syslog file because your nntp server does
+not support some of tin's nntp extensions.  If it really bugs you and you 
+don't want the extensions you can add -DDONT_HAVE_NNTP_EXTS to the COPTS 
+line in the Makefile and recompile.
+
+3.16 When connecting via nntp I get the message 'nntp/tcp: Unknown service'?
+----------------------------------------------------------------------------
+Make sure you have the following line in your /etc/services file (or the
+'services' map if using NIS):
+
+nntp  119/tcp  usenet    # Network News Transfer                                   
+
+3.17 How can I turn off the 3 line help mini-menu?
+--------------------------------------------------
+The 'H' command at any level will toggle the mini-menu on and off.
+
+3.18 Can the confirmation prompts be turned off?
+------------------------------------------------
+Enter the options menu (M command) and select option 4 (press 4). Using
+the space key toggle the ON to OFF.
+
+3.19 Can I save news for later reading while I'm on vacation?
+-------------------------------------------------------------
+You can save news in batch mode from cron using a script as follows:
+--
+#!/bin/sh
+tin -c -S -f newsrc-savegroups
+--
+The -c command forces tin to mark saved articles as read in the newsrc.
+The -S command forces tin to go thru all the groups in the newsrc and
+save any unread articles to ~/News/group.name/number.
+The -f command (optional) forces user groups to be read from specified
+file instead of the default ~/.newsrc file. You should only save news
+that you really do want to read later as a couple of hundred newsgroups
+that you occasionaly browse will quickly fill up your disk/user quota.
+Therefore create another newsrc file that contains just the groups that
+you really want to save for later.
+
+You can also mail unread news to someone by using the following command:
+
+tin -c -M user@somewhere -f newsrc-mailgroups
+
+3.20 What do the T A H K R letters mean at the top of the group index screen?
+---------------------------------------------------------------------------
+T is the number of threads in the group.
+A is the number of articles in the group.
+H is the number of hot (auto-selected) articles in the group ('*' marked).
+K is the number of killed in the group.
+R means that only unread articles will be displayed.
+
+3.21 Is there any documentation available apart from the manual page?
+---------------------------------------------------------------------
+There is an 'Introduction to tin' document written by Paul Kramer that is
+included with v1.3 PL0 onwards.
+
+3.22 Can I change the organization header for posting articles?
+---------------------------------------------------------------
+To set the organization field use the shell environment variable ORGANIZATION 
+(i.e., setenv ORGANIZATION text).  By using the group attributes file 
+($HOME/.tin/attributes) you can setup an organziation on a per group basis.
+
+3.23 How can I see more of the newsgroups description text?
+-----------------------------------------------------------
+You need to set the maximum length of the newsgroup to be displayed. This
+can be accomplished by setting the groupname_max_length variable in tin's
+config file $HOME/.tin/tinrc to a smaller value (i.e., 25).
+
+3.24 Why do some people claim tin doesn't thread?
+-------------------------------------------------
+Because not everyone defines threading in the same way. Those who  assert tin 
+doesn't thread consider threading to be building up a tree data structure out
+of  references lines and message-ids, allowing one to deal with  followups by
+subthread in logical response order and irrespective of subject changes. What
+tin calls threading is actually what some other newsreaders call subject/date 
+sorting. A future release of tin will support reference threading.
+
+4  Known Bugs
+=============
+
+4.1  I have to press the Enter key after every command?
+-------------------------------------------------------
+You probably compiled tin on Unixware or Solaris 2.X (am I right?).
+Both OS's seem to have pretty screwy terminal drivers that not setting
+the terminal to raw mode. Read the INSTALL file and look at the termio
+or termios code in the files ./include/config.h and ./src/curses.c
+
+4.2  thread.c (677): first_thread_on_screen != 0 
+------------------------------------------------
+You tried to kill or auto-select an article at the article viewer level.
+It is one of the best known bugs that I have been meaning to fix for a 
+long time. To fix it will require rewriting a large part of the lower
+levels of tin so don't expect it anytime soon.
+
+Note: Fixed in v1.3 PL0
+
+5 Acknowledgements
+==================
+I would like to thank the following people for contributing to this FAQ:
+

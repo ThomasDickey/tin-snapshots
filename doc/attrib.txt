@@ -1,0 +1,117 @@
+# Example of group attributes file. Copy to $HOME/.tin/attributes
+#
+# Group attributes file for the TIN newsreader
+#
+#  scope=STRING (ie. alt.sources or *sources*) [mandatory]
+#
+#  maildir=STRING (ie. ~/Mail)
+#  savedir=STRING (ie. ~user/News)
+#  savefile=STRING (ie. =linux)
+#  organization=STRING
+#  sigfile=STRING (ie. $var/sig)
+#  followup_to=STRING
+#  printer=STRING
+#  auto_select=ON/OFF
+#  auto_save=ON/OFF
+#  batch_save=ON/OFF
+#  delete_tmp_files=ON/OFF
+#  show_only_unread=ON/OFF
+#  thread_arts=ON/OFF
+#
+#  show_author=NUM
+#    0=none, 1=name, 2=addr, 3=both
+#
+#  sort_art_type=NUM
+#    0=none, 1=subj descend, 2=subj ascend,
+#    3=from descend, 4=from ascend,
+#    5=date descend, 6=date ascend
+#
+#  post_proc_type=NUM
+#    0=none, 1=unshar, 2=uudecode,
+#    3=uudecode & list zoo archive,
+#    4=uudecode & extract zoo archive
+#    5=uudecode & list zip archive,
+#    6=uudecode & extract zip archive
+#
+#  mailing_list=STRING (ie. majordomo@list.org)
+#  x_headers=STRING (ie. ~/.tin/extra-headers)
+#  quick_kill_scope  = STRING (ie. talk.*)
+#  quick_kill_expire = ON/OFF
+#  quick_kill_case   = ON/OFF
+#  quick_kill_header = NUM
+#    0=subj (case sensitive) 1=subj (ignore case)
+#    2=from (case sensitive) 3=from (ignore case)
+#    4=msgid 5=lines
+#
+#  quick_select_scope  = STRING
+#  quick_select_expire = ON/OFF
+#  quick_select_case   = ON/OFF
+#  quick_select_header = NUM
+#    0=subj (case sensitive) 1=subj (ignore case)
+#    2=from (case sensitive) 3=from (ignore case)
+#    4=msgid 5=lines
+#
+#  x_comment_to=ON/OFF
+#
+# Note that it is best to put general (global scoping)
+# entries first followed by group specific entries.
+
+# All replys to my posted article should be mailed to me instead of posted
+scope=*
+followup_to=poster
+
+# Mailing lists
+scope=list.linux.*
+mailing_list=linux-activists@niksula.hut.fi
+
+# Extra headers to add to posted articles
+scope=list.linux.kernel
+x_headers=X-Mn-Key: KERNEL
+
+scope=list.linux.net
+x_headers=X-Mn-Key: NET
+
+scope=list.linux.ppp
+x_headers=X-Mn-Key: PPP
+
+scope=list.linux.doc
+x_headers=X-Mn-Key: DOC
+
+# Save articles matched by scope to mailbox $HOME/Mail/nsr
+scope=news.*
+savefile==nsr
+
+# Delete temp files and do not show author name in socped group
+scope=comp.sources.*
+followup_to=comp.sources.d
+delete_tmp_files=ON
+show_author=0
+
+# Automatically post-process files and then uudecode and delete temp files
+scope=*pictures*
+delete_tmp_files=ON
+post_proc_type=2
+show_author=0
+savefile=/tmp/part
+
+# Specify how single key [ (kill) and ] (select) should be applied
+scope=*linux*
+savefile==linux
+quick_kill_header=0
+quick_kill_scope=*linux*
+quick_kill_expire=OFF
+quick_select_header=0
+quick_select_scope=*linux*
+quick_select_expire=OFF
+
+# Base directory for saving files in scoped group
+scope=comp.sources.x
+savedir=$NEWSDIR/src/x11
+
+# Apply X toggle to show only auto-selected articles when entering group
+scope=comp.dcom.modems
+auto_select=ON
+
+# Add X-Comment-To:-Header to Follow-Ups in Fido-Newsgroups
+scope=fido.*
+x_comment_to=ON

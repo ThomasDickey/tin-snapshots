@@ -1,0 +1,73 @@
+Helpsheet:    Front Page (Left two columns)
+
+To start TIN                             'Group selection level': display all
+ 1.  Enter tin and press the             newsgroups
+     <Enter> key.                              This task uses the command
+                                               'yank' to display all known
+To quit TIN                                     newsgroups.
+ 1.  Press the <q> key.                 
+                                           1.  Press the <y> key.
+To get help:                                   Note:  The new newsgroups in
+ 1.  Press the <h> key.                               the list are
+ 2.  Press the <SPACE> bar to go                      'unsubscribed'.
+     forward a page.                      
+     Press the <b> key to go              'Group selection level': subscribing
+     backward a page.                          After you 'yank' in newsgroups,
+ 3.  Press the <q> key to close the            the new ones are marked as
+     help screen.                              'unsubscribed'.  The following
+                                               shows you how to keep them in
+'Group selection level': screen                your personal list.
+layout                                    
+     A screen layout for the 'Group        1.  Press the <y> key.
+     selection level' has four             2.  Mark the unsubscribed newsgroup
+     elements:                                 with the selection bar.
+  Title:            Reports the                Note:  The u in front of the
+                    number of                         name indicates the
+                    newsgroups                        unsubscribed attribute.
+                    available for          3.  Press the <s> key.
+                    reading.              
+  Selection bar:    Marks the current     'Group selection level':
+                    newsgroup.            unsubscribing
+  Newsgroup lines:  Lists the                  A second press of the <y> key
+                    different                  restores the original list of
+                    newsgroups.                newsgroups with the news ones
+  Command menu:     Reports the                subscribed to added in.  This
+                    commands that may          task shows you how to drop
+                    be used at this            unwanted ones from your personal
+                    level.                     list.
+                                          
+'Group selection level': selection         1.  Press the <y> key.
+bar                                        2.  Mark the subscribed newsgroup
+     The selection bar marks the               with the selection bar.
+     current newsgroup.  To move it,           Note:  A blank in front of the
+     press one of the following keys:                 name indicates the
+                                                      subscribed attribute.
+    1     Move it to the beginning of      3.  Press the <u> key.
+          the list.                       
+    $     Move it to the end of the       'Group selection level': reordering
+          list..                          the list
+    b     Move it to the previous              The newsgroups in your personal
+          page.                                list are arranged in a certain
+ <SPACE>  Move it to the next page.            order.  This task shows you how
+    j     Move it up one line.                 to rearrange the newsgroups in
+    k     Move it down one line.               the list.
+                                          
+'Group selection level': searching         1.  Mark the newsgroup to be moved
+     Another way to move the                   with the selection bar.
+     selection bar is to search for a      2.  Press the <m> key.
+     newsgroup.                            3.  Look for the prompt.
+                                           4.  Enter the position this
+ Proc. 1 (Enter a partial name):               newsgroup is suppose to take.
+ 1.  Press a slash /  or                  
+     press a question-mark ? .
+ 2.  Look for the prompt.
+ 3.  Enter a word or string of
+     characters.
+     Note:     Use the 'yank' command
+     before step 1.
+
+ Proc. 2 (Enter a full name):
+ 1.  Press the <g> key.
+ 2.  Look for the prompt.
+ 3.  Enter the full name of the
+     newsgroup.
