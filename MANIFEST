@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-960822 (Thu Aug 22 03:10:08 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960823 (Fri Aug 23 21:06:14 MET DST 1996)
 ----------------------------------------------------
-  36323 ./CHANGES
+  36492 ./CHANGES
   13242 ./TODO
    5217 ./Makefile
   17299 ./INSTALL
@@ -11,7 +11,7 @@ MANIFEST for tin-1.3-unoff-BETA-960822 (Thu Aug 22 03:10:08 MET DST 1996)
  131399 ./configure
   15073 ./configure.in
    4771 ./install.sh
-  11522 ./makefile.in
+  11610 ./makefile.in
    1014 ./conf-tin
   71372 ./doc/tin.1
    1822 ./doc/hashing.doc
@@ -87,4 +87,4 @@ MANIFEST for tin-1.3-unoff-BETA-960822 (Thu Aug 22 03:10:08 MET DST 1996)
    5511 ./src/vms.c
    6861 ./include/autoconf.hin
   11360 ./src/Makefile.in
-1519877 total
+1520134 total

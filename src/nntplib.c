@@ -68,7 +68,6 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		include	<sys/socket.h>
 #		include	<netinet/in.h>
 #		define	IPPORT_NNTP	((unsigned short) 119)
-#		include 	<netdb.h>	/* All TLI implementations may not have this */
 #	else
 #	ifdef VMS
 #	    ifdef MULTINET
@@ -85,7 +84,6 @@ int	sockt_rd = -1, sockt_wr = -1;
 #	    ifdef UCX
 #		include <errno.h>
 #		include <iodef.h>
-#		include <netdb.h>
 #		include <in.h>
 #		include <socket.h>
 #		define netopen	open
@@ -100,9 +98,6 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		include <netinet/in.h>
 #		ifdef HAVE_NETLIB_H
 #			include <netlib.h>
-#		endif
-#		ifndef EXCELAN
-#			include <netdb.h>
 #		endif
 #		if defined(__GNUC__) && defined(sun)
 			extern int connect (int s, struct sockaddr *name, int namelen);

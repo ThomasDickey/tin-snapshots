@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960822
+PVER		= 960824
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -242,6 +242,7 @@ all:
 	@$(ECHO) "    make clobber         [ Delete all object files, backup files & binaries ]"
 	@$(ECHO) "    make diff            [ Generate context diffs against old version ]"
 	@$(ECHO) "    make ftptar          [ Create compressed tar archive for ftp sites ]"
+	@$(ECHO) "    make build           [ Compile tin ]"
 	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
@@ -254,6 +255,9 @@ all:
 	@$(ECHO) "    make uuencode        [ Create uuencoded compressed tar distribution ]"
 	@$(ECHO) "    make zip             [ Create zip archive of the distribution ]"
 	@$(ECHO) "    make ztar            [ Create compressed tar archive of the distribution ]"
+
+build:
+	@$(CD) $(SRCDIR); $(MAKE)
 
 install:
 	@$(CD) $(SRCDIR); $(MAKE) install

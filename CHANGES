@@ -1,3 +1,14 @@
+--unoff BETA release 960823 --
+
+159) Andreas Ley <ley@rz.uni-karlsruhe.de>
+     Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. netdb.h was included multiple times (on VAX/Ultrix4.0)
+     FIX. nntplib.c
+
+158) David E. O'Brien <obrien@cs.ucdavis.edu>
+     ADD. make build to toplevel makefile for FreeBSD compatibilyty
+     FIX. makefile.in
+
 --unoff BETA release 960822 --
 
 157) Jarkko Jormanainen <jarkko@utu.fi>
