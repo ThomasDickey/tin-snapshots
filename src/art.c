@@ -811,8 +811,10 @@ sleep(1);
 		arts[top].artnum = last_read_article = artnum;
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (Artnum) '%s'", buf);
 			debug_nntp ("iReadNovFile", "Bad overview record (Artnum)");
+#endif
 			continue;
 		} else {
 			p = q + 1;
@@ -823,8 +825,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (Subject) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Subject)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -837,8 +841,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (From) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (From)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -855,8 +861,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (Date) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Date)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -869,8 +877,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -887,8 +897,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (References) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (References)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -911,8 +923,10 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
+#ifdef DEBUG
 			error_message ("Bad overview record (Bytes) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Bytes)");
+#endif
 			continue;
 		} else {
 			*q = '\0';
@@ -925,8 +939,10 @@ sleep(1);
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
 			if (!*p || (*p < '0' && *p > '9')) {
+#ifdef DEBUG
 				error_message ("Bad overview record (Lines) [%s]", p);
 				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");
+#endif
 				continue;
 			}
 		} else {

@@ -64,6 +64,11 @@ o  tin sometimes crashes (thread.c) 710/892
 
 New features
 ------------
+o  compiletime option: generate own MSGIDs on host with a propper FQDN
+   (to add a _-_ to the local part of the MSGID on a subject-change; keep
+    MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
+    own postings)
+
 o  add expansion of $HOME and/or ~ to newsrctable
 
 o  add
@@ -73,6 +78,9 @@ o  add
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY undef SPOOLDIR etc...
+
+o  some linux 2.0.0 don't have -ltermlib -ltermcap -lcurses, only terminfo
+   and ncurses - fix configure to detect the right libraries for those.
 
 o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
@@ -155,6 +163,8 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
+
 o  what is with NEW_HASH_METHOD in misc.c?
 
 o  kill-file may get messed up if using multiple news servers with feeds

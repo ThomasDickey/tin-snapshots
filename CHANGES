@@ -1,3 +1,17 @@
+--unoff BETA release 960705 --
+
+107) Chris Blum <chris@phil.uni-sb.de
+     BUG. When posting a new article after successfully posting a new
+          article with umlauts in the Subject header, Subject default
+          is RFC1522 encoded.
+     FIX. post.c, pcCopyArtHeader()
+
+106) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. "Bad overview"-error-messages guarded by #ifdef DEBUG so the
+          normal user won't see them; fixed a few prototypes; renamed
+          RFCDEBUG
+     FIX. art.c, post.c, rfc1522.c, Makefile.in
+
 --unoff BETA release 960704 --
 
 105) Urs Janssen <urs@akk.uni-karlsruhe.de>
