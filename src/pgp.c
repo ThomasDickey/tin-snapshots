@@ -49,16 +49,16 @@ join_files (file)
 	char buf[LEN];
 	FILE *art, *header, *text;
 
-	if ((art = fopen(file, "w")) == NULL) {
-		return;
-	}
 	if ((header = fopen(hdr, "r")) == NULL) {
-		fclose(art);
 		return;
 	}
 	if ((text = fopen(ct, "r")) == NULL) {
-		fclose(art);
 		fclose(header);
+		return;
+	}
+	if ((art = fopen(file, "w")) == NULL) {
+		fclose(art);
+		fclose(text);
 		return;
 	}
 	fgets(buf, LEN, header);
@@ -74,8 +74,6 @@ join_files (file)
 	}
 	fclose(text);
 	fclose(art);
-	unlink(hdr);
-	unlink(ct);
 }
 
 static void 
@@ -131,15 +129,16 @@ do_pgp (what, file, mail_to)
 	split_file(file);
 	strcpy(options, "-at");
 	if (what & ENCRYPT)
-		strcat(options, "we");
+		strcat(options, "e");
 	if (what & SIGN)
 		strcat(options, "s");
 	sprintf(cmd, "%s %s %s %s %s", PGPNAME, pgpopts, options, pt,
 		mail_to ? mail_to : "");
 	invoke_cmd(cmd);
 	join_files(file);
-	if (!(what & ENCRYPT))
-		unlink(pt);
+	unlink(pt);
+	unlink(hdr);
+	unlink(ct);
 }
 
 static void 

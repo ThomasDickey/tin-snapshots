@@ -1,4 +1,4 @@
-/*  $Revision: 1.9.1.1 $
+/*  @Revision: 1.9 @
 **
 **  Do shell-style pattern matching for ?, \, [], and * characters.
 **  Might not be robust in face of malformed patterns; e.g., "foo[a-"
@@ -147,7 +147,7 @@ wildmat(text, p)
     return DoMatch(text, p) == TRUE;
 }
 
-
+
 
 #if	defined(TEST)
 int

@@ -1,3 +1,27 @@
+--unoff BETA release 960715 --
+
+114) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. tin returns an empty file (article) wheny you try to encryt a pgp
+          signed message without knowing the public key.
+     FIX. pgp.c
+
+113) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. resign an article with pgp after (delete/)supersede did not work
+     BUG. supersede (via 'x'repost) on the first article of a thread did
+          not work.
+     FIX. post.c
+
+--unoff BETA release 960714 --
+
+112) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup; fixed a missing #if
+     FIX. wildmat.c, refs.c
+
+111) Sven Paulus <sven@oops.sub.de>
+     ADD. cursor selection ability for y/n-prompts
+     FIX. prompt.c
+
 --unoff BETA release 960713 --
 
 110) Thomas E. Dickey <dickey@clark.net>

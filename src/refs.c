@@ -6,7 +6,7 @@
  *  Notes     : Cacheing of message ids
  *				References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
- * 				Hashing function
+ *				Hashing function
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -44,7 +44,7 @@ static void build_thread P_((struct t_msgid *ptr));
 /*========================================================================
  * This part of the code deals with the cacheing and retrieval
  * of Message-id and References headers
- * 
+ *
  * Rationale:
  *    Even though the Message-id is unique to an article, the References
  *    field contains msgids from elsewhere in the group. As the expiry
@@ -140,7 +140,7 @@ add_to_parent(ptr)
 				fprintf(stderr, "Before\n");
 #endif
 		}
-	
+
 		/*
 		 * Stick at the end for now, this is most common case by far
 		 */
@@ -206,7 +206,7 @@ add_msgid(key, msgid, newparent)
 #endif
 				return(i);
 			}
-				
+
 			/*
 			 * CASE2
 			 * A parent has been given where there was none before.
@@ -234,12 +234,14 @@ add_msgid(key, msgid, newparent)
 				/*
 				 * If the update is because we have the message
 				 * proper rather than just a ref to it, we create
-			 	 * a ptr to the article for use in date searching etc...
+				 * a ptr to the article for use in date searching etc...
 				 */
+#if HAVE_REF_THREADING
 				if (i->article == ART_NORMAL && key == MSGID_REF) {
 /*fprintf(stderr, "updating with MSGID_REF, art %d\n", top);*/
 					i->article = top;
 				}
+#endif
 
 				add_to_parent(i);
 #ifdef DEBUG_REFS
@@ -306,7 +308,7 @@ add_msgid(key, msgid, newparent)
  * Following the parent ptrs leads us back to the start of the thread.
  *
  * We iterate through the refs, adding each to the msgid cache, with
- * the previous ref as the parent. 
+ * the previous ref as the parent.
  * The space saving vs. storing the refs as a single string is large
  */
 struct t_msgid *
@@ -380,7 +382,7 @@ _get_references(refptr, depth)
 }
 
 /*
- * A wrapper to the above, null terminate the string and shrink it 
+ * A wrapper to the above, null terminate the string and shrink it
  * to correct size
  */
 char *
@@ -502,7 +504,7 @@ dump_msgids()
  *
  * . When a new thread is started, the root message will have no
  *   References: field
- * 
+ *
  * . When a followup is posted, the message-id that was referred to
  *   will be appended to the References: field. If no References:
  *   field exists, a new one will be created, containing the single
@@ -513,14 +515,14 @@ dump_msgids()
  *
  * This is simplistic, so check out RFC1036 & son of RFC1036 for full
  * details from the posting point of view.
- * 
+ *
  * We attempt to maintain 3 pointers in each message-id to handle threading
  * on References:
  *
  * 1) parent  - the article that the current one was in reply to
  *              An article with no References: has no parent, therefore
  *              it is the root of a thread.
- * 
+ *
  * 2) sibling - the next reply in sequence to parent.
  *
  * 3) child   - the first reply to the current article.
@@ -531,12 +533,12 @@ dump_msgids()
  * It remains for us to:
  * i)  Create pointers back from message-ids to the articles themselves
  * ii) Run the thread pointer through the articles that form threads.
- * 
+ *
  * TODO:
- * 
+ *
  * . Add threading on both references & subject.
  *  (reuse the current thread on subject code ?)
- * 
+ *
  * . When inserting sibling messages, we currently insert at the head of
  *   the list. This should be sorted by date.
  *
@@ -546,7 +548,7 @@ dump_msgids()
  */
 
 /*-------------------------------------------------------------------------
- * Clear out all the article fields from the msgid hash prior to a 
+ * Clear out all the article fields from the msgid hash prior to a
  * rethread.
  */
 void
@@ -582,7 +584,7 @@ dump_thread(fp, msgid, level)
 	 * Dump the current article
 	 */
 	sprintf(buff, "%3d %*s %-.18s", msgid->article, 2*level, "  ",
-					(msgid->article >= 0) ? 
+					(msgid->article >= 0) ?
 						((arts[msgid->article].name) ?
 							arts[msgid->article].name :
 							arts[msgid->article].from) :
@@ -792,7 +794,7 @@ thread_by_reference()
 	fprintf(stderr, "Full dump of threading info...\n");
 
 	for (i=0 ; i < top ; i++) {
-		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i, 
+		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
 			(arts[i].msgid->parent) ? arts[i].msgid->parent->article : -2,
 			(arts[i].msgid->sibling) ? arts[i].msgid->sibling->article : -2,
 			(arts[i].msgid->child) ? arts[i].msgid->child->article : -2,

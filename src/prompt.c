@@ -119,6 +119,8 @@ prompt_yn (line, prompt, default_answer)
 	char ch, prompt_ch;
 
 	set_alarm_clock_off ();
+
+prompt_yn_loop:
 	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
 
 	MoveCursor (line, 0);
@@ -131,6 +133,33 @@ prompt_yn (line, prompt, default_answer)
 	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
 		ch = prompt_ch;
 	}	
+
+	switch (ch) {
+#ifndef WIN32
+		case ESC:	/* (ESC) common arrow keys */
+#ifdef HAVE_KEY_PREFIX
+		case KEY_PREFIX:
+#endif
+			switch (get_arrow_key ()) {
+#endif /* WIN32 */
+				case KEYMAP_UP:
+				case KEYMAP_DOWN:
+					default_answer = 1 - default_answer;
+					goto prompt_yn_loop;
+					break;
+				
+				case KEYMAP_LEFT:
+					ch = ESC;
+					break;
+					
+				case KEYMAP_RIGHT:
+					ch = prompt_ch;
+					break;
+ #ifndef WIN32
+			}
+			break;
+ #endif
+	}
 
 	if (line == cLINES) {
 		clear_message ();
