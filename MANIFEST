@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-970104 (Sun Jan  5 07:52:55 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970106 (Mon Jan  6 19:05:12 MET 1997)
 ----------------------------------------------------
-  58183 ./CHANGES
+  58461 ./CHANGES
   13750 ./TODO
    5341 ./Makefile
   17216 ./INSTALL
@@ -27,7 +27,7 @@ MANIFEST for tin-1.3-unoff-BETA-970104 (Sun Jan  5 07:52:55 MET 1997)
    2233 ./include/os_2.h
   29619 ./include/proto.h
    1376 ./include/stpwatch.h
-  44464 ./include/tin.h
+  44578 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
@@ -57,18 +57,18 @@ MANIFEST for tin-1.3-unoff-BETA-970104 (Sun Jan  5 07:52:55 MET 1997)
   19256 ./src/main.c
    8108 ./src/makecfg.c
    9471 ./src/memory.c
-  52280 ./src/misc.c
+  52118 ./src/misc.c
    7228 ./src/msmail.c
   33605 ./src/newsrc.c
   26632 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6176 ./src/nrctbl.c
-  28773 ./src/open.c
+  28699 ./src/open.c
    6242 ./src/os_2.c
   35769 ./src/page.c
   24090 ./src/parsdate.y
    6631 ./src/pgp.c
-  75726 ./src/post.c
+  76064 ./src/post.c
    9919 ./src/prompt.c
     160 ./src/proto.sed
   22480 ./src/refs.c
@@ -92,4 +92,4 @@ MANIFEST for tin-1.3-unoff-BETA-970104 (Sun Jan  5 07:52:55 MET 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3706 ./src/tincfg.tbl
-1618908 insgesamt
+1619402 insgesamt

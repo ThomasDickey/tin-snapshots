@@ -116,12 +116,11 @@ extern char *get_uaf_fullname();
 
 #include	<ctype.h>
 
+#ifdef HAVE_STDLIB_H
+#	include <stdlib.h>
+#endif
 #ifdef HAVE_DBMALLOC
 #	include "dbmalloc.h"
-#else
-#	ifdef HAVE_STDLIB_H
-#		include <stdlib.h>
-#	endif
 #endif
 
 /* prefer string.h because it's Posix */
@@ -1605,9 +1604,13 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	F_OK	0	/* Test for existence of File */
 #endif
 
-
+#ifdef HAVE_DBMALLOC
+#define my_malloc(size) malloc(size)
+#define my_realloc(ptr, size)	realloc((ptr), (size))
+#else
 #define my_malloc(size) my_malloc1(__FILE__, __LINE__, (size))
 #define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
+#endif
 
 #define FreeIfNeeded(p) if (p != (char *)0) free((char *)p)
 #define FreeAndNull(p)  if (p != (char *)0) { free((char *)p); p = (char *)0; }

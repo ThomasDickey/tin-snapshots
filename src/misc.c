@@ -1065,17 +1065,16 @@ mail_check ()
  */
 
 #if 1
-# define APPEND_TO(dest) do { *bp = '\0'; \
-                              dest += sprintf (dest, "%s", bp = buf); \
-			 } while (0)
-# define RTRIM(what) do { what ## p --; \
-                          while (what ## p >= what ## buf && \
-                                 isspace (*what ## p)) \
-			    *(what ## p --) = '\0'; } while (0)
-# define LTRIM(what) for (what ## p = what ## buf ; \
-                          what ## p && isspace (*(what ## p)) ; \
-                          what ## p ++)
-# define TRIM(what) do { RTRIM (what); LTRIM (what); } while (0)
+#	define APPEND_TO(dest) do { *bp = '\0'; \
+										dest += sprintf (dest, "%s", bp = buf); \
+									} while (0)
+#	define RTRIM(p,buf) do { p--; \
+									while (p >= buf && isspace (*p)) \
+									*(p--) = '\0'; } while (0)
+#	define LTRIM(p,buf) for (p = buf ; \
+									p && isspace (*(p)) ; \
+									p++)
+#	define TRIM(p,buf) do { RTRIM (p,buf); LTRIM (p,buf); } while (0)
 
 void
 parse_from (addr, addrspec, comment)
@@ -1175,9 +1174,9 @@ parse_from (addr, addrspec, comment)
   }
 
   /* Address specifier */
-  TRIM (as);
+  TRIM (asp,asbuf);
   /* Comment */
-  TRIM (cmt);
+  TRIM (cmtp,cmtbuf);
 
   strcpy (addrspec, asp);
   strcpy (comment, cmtp);

@@ -1,3 +1,13 @@
+--unoff BETA release 970106 --
+
+272) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     ADD. rewrote parse_from() macros to K&R-C
+     FIX. misc.c
+
+271) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. newcheck for x-posts to handle inn1.5 Xref: headers
+     FIX. post.c
+
 --unoff BETA release 970104 --
 
 270) Urs Janssen <urs@akk.uni-karlsruhe.de>

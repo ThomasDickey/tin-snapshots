@@ -1238,10 +1238,9 @@ authorization (server, authuser)
 	get_server (line2, PATH_LEN);
 	ret = atoi (line2);
 	if (ret != NEED_AUTHDATA) {
-		if (ret == OK_AUTH)
+		if (ret == OK_AUTH) {
 			return TRUE;
-		else {
-/*			strcpy (error_response, line2); */
+		} else {
 			return FALSE;
 		}
 	}
@@ -1251,7 +1250,6 @@ authorization (server, authuser)
 	get_server (line, PATH_LEN);
 	ret = atoi (line);
 	if (ret != OK_AUTH) {
-/*		strcpy (error_response, line); */
 		return FALSE;
 	}
 
