@@ -29,8 +29,12 @@ o  art_mark_deleted in 'M'enu (50.) shows up as 'i' but it is 'D'
 
 o  tin crashes if started with too small a screen size
 
-o  show_arts_from was not 'updated' correctly if changig in the options menu
-   (it's written to the tinrc - but is ignored in the current session)
+o  In cases where a tinrc variable is stored in group->attributes
+   (ie on a per-group basis) then changes in the config menu won't always
+   have an effect.  This is because the OptionMenu in {group,page}.c
+   doesn't reread the attributes, whereas select.c does. It might be better
+   to fix the problem properly in config.c by flashing changes to all
+   groups using default attributes.
 
 o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
    szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag

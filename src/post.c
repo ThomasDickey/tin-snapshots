@@ -73,7 +73,7 @@ static void make_path_header (char *line, char *from_name);
 
 
 static void do_prompt1 (
-	char *format,
+	const char *format,
 	int ch_default)
 {
 	sprintf (msg, "%s%c", format, ch_default);
@@ -83,8 +83,8 @@ static void do_prompt1 (
 
 static void
 do_prompt2(
-	char *format,
-	char *subject,
+	const char *format,
+	const char *subject,
 	int ch_default)
 {
 	int have = cCOLS - strlen (format) + 4;
@@ -116,7 +116,7 @@ prompt_to_edit(void)
 
 static int
 prompt_to_send(
-	char *subject)
+	const char *subject)
 {
 	int ch;
 	char ch_default = iKeyPostSend;
@@ -229,9 +229,10 @@ msg_free_headers (void)
 
 static void
 msg_add_header (
-	char *name,
-	char *text)
+	const char *name,
+	const char *text)
 {
+	const char *p;
 	char *ptr;
 	char *new_name = (char *) 0;
 	char *new_text = (char *) 0;
@@ -254,10 +255,10 @@ msg_add_header (
 			if (STRCMPEQ(msg_headers[i].name, new_name)) {
 				FreeAndNull (msg_headers[i].text);
 				if (text) {
-					for (ptr = text; *ptr && (*ptr == ' ' || *ptr == '\t'); ptr++) {
+					for (p = text; *p && (*p == ' ' || *p == '\t'); p++) {
 						;
 					}
-					new_text = my_strdup (ptr);
+					new_text = my_strdup (p);
 					ptr = strchr (new_text, '\n');
 					if (ptr) {
 						*ptr = '\0';
@@ -274,10 +275,10 @@ msg_add_header (
 		if (!(done || msg_headers[i].name)) {
 			msg_headers[i].name = my_strdup (new_name);
 			if (text) {
-				for (ptr = text; *ptr && (*ptr == ' ' || *ptr == '\t'); ptr++) {
+				for (p = text; *p && (*p == ' ' || *p == '\t'); p++) {
 					;
 				}
-				new_text = my_strdup (ptr);
+				new_text = my_strdup (p);
 				ptr = strchr (new_text, '\n');
 				if (ptr) {
 					*ptr = '\0';
@@ -377,7 +378,7 @@ user_posted_messages (void)
 		}
 		fclose (fp);
 
-		show_info_page (POST_INFO, (char **) 0, txt_post_history_menu);
+		show_info_page (POST_INFO, 0, txt_post_history_menu);
 
 		if (posted != (struct t_posted *)0) {
 			free((char *)posted);
@@ -899,12 +900,12 @@ quick_post_article (void)
 	if (*my_distribution) {
 		msg_add_header ("Distribution", my_distribution);
 	}
+	msg_add_header ("Summary", "");
+	msg_add_header ("Keywords", "");
 	msg_add_x_headers (msg_headers_file);
 	if (psGrp) {
 		msg_add_x_headers (psGrp->attribute->x_headers);
 	}
-	msg_add_header ("Summary", "");
-	msg_add_header ("Keywords", "");
 
 	start_line_offset = msg_write_headers (fp);
 	fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
@@ -1420,11 +1421,11 @@ post_article (
 	if (*my_distribution && art_type == GROUP_TYPE_NEWS) {
 		msg_add_header ("Distribution", my_distribution);
 	}
-	msg_add_x_headers (msg_headers_file);
-	msg_add_x_headers (psGrp->attribute->x_headers);
-
 	msg_add_header ("Summary", "");
 	msg_add_header ("Keywords", "");
+
+	msg_add_x_headers (msg_headers_file);
+	msg_add_x_headers (psGrp->attribute->x_headers);
 
 	start_line_offset = msg_write_headers (fp);
 	fprintf (fp, "\n");	/* add a newline to keep vi from bitching */
@@ -1539,7 +1540,7 @@ post_article_postponed:
 static void
 appendid (
 	char **where,
-	char **what)
+	const char **what)
 {
 	char *oldpos;
 
@@ -1578,21 +1579,23 @@ must_include (
 	return FALSE;
 }
 
-static void
+static size_t
 skip_id (
-	char **id)
+	const char *id)
 {
-	while (**id && isspace ((unsigned char)**id))
-		(*id)++;
-	if (**id) {
-		while (**id && !isspace ((unsigned char)**id))
-			(*id)++;
+	size_t skipped = 0;
+	while (id[skipped] && isspace ((unsigned char)id[skipped]))
+		skipped++;
+	if (id[skipped]) {
+		while (id[skipped] && !isspace ((unsigned char)id[skipped]))
+			skipped++;
 	}
+	return skipped;
 }
 
 static t_bool
 damaged_id (
-	char *id)
+	const char *id)
 {
 	while (*id && isspace ((unsigned char)*id))
 		id++;
@@ -1634,7 +1637,7 @@ static void
 join_references (
 	char *buffer,
 	char *oldrefs,
-	char *newref)
+	const char *newref)
 {
 	/* First of all: shortening references is a VERY BAD IDEA.
 	   Nevertheless, current software usually has restrictions in
@@ -1649,23 +1652,24 @@ join_references (
 	   it's not very likely that MAXREFSIZE chars can't hold at least
 	   4 refs */
 	char *b, *c, *d;
+	const char *e;
 	int space;
 
 	b = (char *) malloc (strlen (oldrefs) + strlen (newref) + 64);
 	c = b;
-	d = oldrefs;
+	e = oldrefs;
 	space = 0;
-	while (*d) {
-		if (*d == ' ') {
-			space++, *c++ = ' ', d++;	/* keep existing spaces */
+	while (*e) {
+		if (*e == ' ') {
+			space++, *c++ = ' ', e++;	/* keep existing spaces */
 			continue;
-		} else if (*d != '<') {		/* strip everything besides spaces and */
-			d++;	/* message-ids */
+		} else if (*e != '<') {		/* strip everything besides spaces and */
+			e++;	/* message-ids */
 			continue;
 		}
-		if (damaged_id (d)) {	/* remove damaged message ids and mark
+		if (damaged_id (e)) {	/* remove damaged message ids and mark
 					   the gap if that's not already done */
-			skip_id (&d);
+			e += skip_id (e);
 			while (space < 3) {
 				space++, *c++ = ' ';
 			}
@@ -1675,7 +1679,7 @@ join_references (
 			*c++ = ' ';
 		else
 			space = 0;
-		appendid (&c, &d);
+		appendid (&c, &e);
 	}
 	while (space)
 		c--, space--;	/* remove superfluous space at the end */
@@ -1686,11 +1690,11 @@ join_references (
 	/* now see if we need to remove ids */
 	while (strlen (b) > MAXREFSIZE - 14) {	/* 14 = strlen("References: ")+2 */
 		c = b;
-		skip_id (&c);	/* keep the first one */
+		c += skip_id (c);	/* keep the first one */
 		while (*c && must_include (c))
-			skip_id (&c);	/* skip those marked with _-_ */
+			c += skip_id (c); /* skip those marked with _-_ */
 		d = c;
-		skip_id (&c);	/* ditch one */
+		c += skip_id (c);	/* ditch one */
 		*d++ = ' ';
 		*d++ = ' ';
 		*d++ = ' ';	/* and mark this appropriately */
@@ -2198,8 +2202,8 @@ int
 mail_bug_report (void)
 {
 	char buf[LEN], nam[100];
-	char *gateway;
-	char *domain;
+	const char *gateway;
+	const char *domain;
 	char ch;
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
@@ -2294,12 +2298,12 @@ mail_bug_report (void)
 #ifdef INEWS_MAIL_GATEWAY
 	gateway = INEWS_MAIL_GATEWAY;
 #else
-	gateway = (char *) 0;
+	gateway = 0;
 #endif
 #ifdef INEWS_MAIL_DOMAIN
 	domain = INEWS_MAIL_DOMAIN;
 #else
-	domain = (char *) 0;
+	domain = 0;
 #endif
 	fprintf (fp, "\nCFG1: active=%d  arts=%d  reread=%d  longfilenames=%d  setuid=%d\n",
 		 DEFAULT_ACTIVE_NUM,
@@ -2596,7 +2600,8 @@ pcCopyArtHeader (
 {
 	char buf[HEADER_LEN];
 	char buf2[HEADER_LEN];
-	char *p;
+	const char *p;
+	char *q;
 	FILE *fp;
 	int found = FALSE;
 	int was_to = FALSE;
@@ -2610,9 +2615,9 @@ pcCopyArtHeader (
 		return FALSE;
 	}
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		p = strrchr (buf, '\n');
-		if (p != (char *) 0) {
-			*p = '\0';
+		q = strrchr (buf, '\n');
+		if (q != 0) {
+			*q = '\0';
 		}
 		if (*buf == '\0')
 			break;
@@ -3522,7 +3527,7 @@ reread_active_after_posting (void)
 
 		for (i = 0; i < num_active; i++) {
 			psGrp = &active[i];
-			if (psGrp->subscribed == SUBSCRIBED && psGrp->art_was_posted) {
+			if (psGrp->subscribed && psGrp->art_was_posted) {
 				psGrp->art_was_posted = FALSE;
 
 				if (psGrp != (struct t_group *) 0) {
@@ -3600,7 +3605,7 @@ update_active_after_posting (
 		if (*dst == ',' || *dst == '\n') {
 			*dst = '\0';
 			psGrp = psGrpFind (group);
-			if (psGrp != (struct t_group *) 0 && psGrp->subscribed == SUBSCRIBED) {
+			if (psGrp != (struct t_group *) 0 && psGrp->subscribed) {
 				reread_active_for_posted_arts = TRUE;
 				psGrp->art_was_posted = TRUE;
 			}

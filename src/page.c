@@ -55,9 +55,11 @@ long note_size;				/* stat size in bytes of article */
 static int tex2iso_article;
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
+#ifdef HAVE_METAMAIL
 static void show_mime_article (FILE *fp, struct t_article *art);
+#endif
 static void show_first_header (int respnum, char *group);
 static void show_cont_header (int respnum);
 static int prompt_response (int ch, int respnum);
@@ -851,7 +853,7 @@ print_a_line:
 		if (!strcmp (buf2, "-- "))
 			below_sig = TRUE;			/* begin of signature */
 
-		strip_line (buf2, strlen (buf2));
+		strip_line (buf2);
 
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);
@@ -941,6 +943,7 @@ print_a_line:
 }
 
 
+#ifdef HAVE_METAMAIL
 static void
 show_mime_article (
 	FILE	*fp,
@@ -974,6 +977,7 @@ show_mime_article (
 	fflush (stdout);
 	EndInverse ();
 }
+#endif
 
 
 static void
@@ -1120,7 +1124,7 @@ show_first_header (
 		buf[i] = '\0';
 		strcat (buf, tmp);
 	}
-	strip_line (buf, strlen (buf));
+	strip_line (buf);
 
 #ifdef HAVE_COLOR
 	fcol(col_from);
@@ -1200,7 +1204,7 @@ show_cont_header (
 			note_page + 1,
 			arts[respnum].name?arts[respnum].name:arts[respnum].from,note_h_subj);
 	}
-	strip_line (buf, strlen (buf));
+	strip_line (buf);
 	if (cCOLS) {
 		buf[cCOLS-1] = '\0';
 	}
@@ -1484,7 +1488,7 @@ show_last_page (void)
 int
 match_header (
 	char *buf,
-	char *pat,
+	const char *pat,
 	char *body,
 	char *nodec_body,
 	size_t len)

@@ -53,7 +53,7 @@
 /*
 ** Local prototypes
 */
-static void set_attrib (struct t_group *psGrp, int type, char *str, int num);
+static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
 static void set_attrib_num (int type, char *scope, int num);
 static void set_attrib_str (int type, char *scope, char *str);
 
@@ -448,7 +448,7 @@ static void
 set_attrib (
 	struct	t_group	*psGrp,
 	int	type,
-	char	*str,
+	const char *str,
 	int	num)
 {
 #ifndef INDEX_DAEMON

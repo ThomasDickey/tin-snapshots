@@ -46,7 +46,7 @@ main (
 	int argc,
 	char *argv[])
 {
-	int num_cmd_line_groups = 0;
+	int num_cmd_line_groups;
 	int start_groupnum = 0;
 	int count;
 
@@ -96,7 +96,7 @@ main (
 	init_group_hash ();
 
 	if (update_fork || (update && verbose) || !update) {
-		error_message (cvers, "");
+		error_message (cvers, "");		/* Why to stderr ?? */
 	}
 
 	/*
@@ -216,10 +216,11 @@ main (
 	vMakeActiveMyGroup ();
 #else
 	backup_newsrc ();
-	read_newsrc (newsrc, num_cmd_line_groups ? 0 : 1);
-	if (!num_cmd_line_groups) {
+/*	read_newsrc (newsrc, num_cmd_line_groups ? 0 : 1);*/
+	/* As a one-off, we append groups here so that New newsgroup are kept */
+	read_newsrc (newsrc, 0);
+	if (!num_cmd_line_groups)
 		toggle_my_groups (show_only_unread_groups, "");
-	}
 #endif
 
 	if (count_articles && !newsrc_active) {
@@ -813,7 +814,7 @@ read_cmd_line_groups (void)
 			for (i = 0 ; i < num_active ; i++) {
 				if (wildmat (active[i].name, cmdargs[num])) {
 					if (add_my_group (active[i].name, 1) != -1) {
-						active[i].subscribed = SUBSCRIBED;
+						active[i].subscribed = TRUE;
 						matched++;
 					}
 				}

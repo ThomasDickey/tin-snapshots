@@ -39,12 +39,12 @@ void
 envargs (
 	int *Pargc,
 	char ***Pargv,
-	char *envstr)
+	const char *envstr)
 {
 	char *envptr;			/* value returned by getenv */
 	char *bufptr;			/* copy of env info */
-	int argc;				/* internal arg count */
-	int ch;					/* spare temp value */
+	int argc;			/* internal arg count */
+	int ch;				/* spare temp value */
 	char **argv;			/* internal arg vector */
 	char **argvect;			/* copy of vector address */
 

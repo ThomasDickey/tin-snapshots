@@ -36,11 +36,11 @@ struct t_hashnode **table=0;
 struct t_hashnode *table[HASHNODE_TABLE_SIZE];
 #endif
 
-static struct t_hashnode *add_string (char *s);
+static struct t_hashnode *add_string (const char *s);
 
 char *
 hash_str (
-	char *s)
+	const char *s)
 {
 	long h;				/* result of hash:  index into hash table */
 	struct t_hashnode **p;	/* used to descend the spillover structs */
@@ -50,7 +50,7 @@ hash_str (
 	}
 
 	{
-		unsigned char *t = (unsigned char *) s;
+		const unsigned char *t = (const unsigned char *) s;
 		int len = 0;
 
 		h = 0;
@@ -92,7 +92,7 @@ hash_str (
  */
 static struct t_hashnode *
 add_string (
-	char *s)
+	const char *s)
 {
 	int *iptr;
 	struct t_hashnode *p;

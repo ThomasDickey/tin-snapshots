@@ -20,7 +20,7 @@ struct t_screen *screen;
 
 void
 info_message (
-	char *str)
+	const char *str)
 {
 	clear_message ();				/* Clear any old messages hanging around */
 #ifdef HAVE_COLOR
@@ -38,7 +38,7 @@ info_message (
 
 void
 wait_message (
-	char *str)
+	const char *str)
 {
 	clear_message ();	  /* Clear any old messages hanging around */
 #ifdef HAVE_COLOR
@@ -55,8 +55,8 @@ wait_message (
 
 void
 error_message (
-	char *template,
-	char *str)
+	const char *template,
+	const char *str)
 {
 	errno = 0;
 
@@ -77,8 +77,8 @@ error_message (
 
 void
 perror_message (
-	char *template,
-	char *str)
+	const char *template,
+	const char *str)
 {
 #ifndef HAVE_STRERROR
 #   ifdef HAVE_SYSERRLIST
@@ -139,7 +139,7 @@ void
 center_line (
 	int line,
 	int inverse,
-	char *str)
+	const char *str)
 {
 	int pos;
 
@@ -243,7 +243,7 @@ ring_bell (void)
 void
 spin_cursor (void)
 {
-	static char *buf = "|/-\\|/-\\";
+	static const char *buf = "|/-\\|/-\\";
 	static int i = 0;
 
 	if (i > 7) {
@@ -263,11 +263,11 @@ spin_cursor (void)
 void
 show_progress (
 	char *dst,
-	char *txt,
+	const char *txt,
 	int count,
 	int total)
 {
-	register char *s;
+	register const char *s;
 
 	if (count == 0) {
 		s = txt;
@@ -276,7 +276,8 @@ show_progress (
 		for (s = dst; *s != '\0'; s++) {
 			putchar ('\b');
 		}
-		sprintf (s = dst, "%4d/%-4d", count, total);
+		sprintf (dst, "%4d/%-4d", count, total);
+		s = dst;
 	}
 	my_fputs (s, stdout);
 	fflush (stdout);

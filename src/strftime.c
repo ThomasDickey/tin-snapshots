@@ -35,7 +35,7 @@ size_t
 my_strftime (
 	char *s,
 	size_t maxsize,
-	char *format,
+	const char *format,
 	struct tm *timeptr)
 {
 #ifdef HAVE_STRFTIME

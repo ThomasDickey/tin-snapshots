@@ -546,6 +546,16 @@ extern char *get_uaf_fullname();
 #	define	PATH_UNAME	"uname"
 #endif
 
+/*
+ * Fix up the 'sum' path and parameter for './configure'd systems
+ */
+#ifdef PATH_SUM
+#	ifdef DEFAULT_SUM
+#		undef DEFAULT_SUM
+#	endif
+#	define DEFAULT_SUM PATH_SUM_R
+#endif
+
 #ifdef HAVE_LONG_FILE_NAMES
 #	define		LONG_PATH_PART	"part"
 #	define		LONG_PATH_PATCH "patch"
@@ -809,7 +819,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 /*
  * Threading strategies available
- * NB: The ordering is important in that threading forms that don't use
+ * NB: The ordering is important in that threading methods that don't use
  *     references should be < THREAD_REFS
  */
 #define	THREAD_NONE		0
@@ -956,6 +966,13 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	UNSUBSCRIBED	'!'
 #define	SUBSCRIBED	':'
+
+/* Converts subscription status to char for .newsrc */
+#define SUB_CHAR(x)	(x ? SUBSCRIBED : UNSUBSCRIBED)
+/* Converts .newsrc subscription char to boolean */
+#define SUB_BOOL(x)	(x == SUBSCRIBED)
+/* Only write newsrc line if subscribed and not stripping */
+#define WRITE_NEWSRC(x)	(!(x != SUBSCRIBED && strip_newsrc))
 
 /*
  * filter_type used in struct t_filter
@@ -1178,7 +1195,7 @@ struct t_attribute
 	unsigned batch_save:1;			/* 0=none, 1=save -S/mail -M  */
 	unsigned delete_tmp_files:1;		/* 0=leave, 1=delete */
 	unsigned show_only_unread:1;		/* 0=all, 1=only unread */
-	unsigned thread_arts:2;			/* 0=unthread, 1=subject, 2=refs */
+	unsigned thread_arts:2;			/* 0=unthread, 1=subject, 2=refs, 3=both */
 	unsigned show_author:4;			/* 0=none, 1=name, 2=addr, 3=both */
 	unsigned sort_art_type:4;		/* 0=none, 1=subj descend, 2=subj ascend,
 						   3=from descend, 4=from ascend,
@@ -1219,15 +1236,11 @@ struct t_group
 	long xmin;				/* min. article number */
 	unsigned int type:4;			/* grouptype - newsgroup / mailbox / savebox */
 	unsigned int inrange:4;			/* 1 = group selected via # range command */
-	unsigned int read_during_session:1;	/* marked TRUE if group entered during session */
-	unsigned int art_was_posted:1;		/* marked TRUE if art was posted to group */
+	t_bool read_during_session:1;		/* TRUE if group entered during session */
+	t_bool art_was_posted:1;		/* TRUE if art was posted to group */
+	t_bool subscribed:1;			/* TRUE if subscribed to group */
+	t_bool newgroup:1;				/* TRUE is group was new this session */
 	int next;				/* next active entry in hash chain */
-	int subscribed;		/*  subscribed/unsubscribed to group */
-	/*
-	** wasting sizeof (int) * 8 - 1 bits per group here
-	** unsigned int subscribe:1;
-	** should do the job -> newsrc.c needs some (more) work
-	*/
 	struct t_newsrc newsrc; 		/* newsrc bitmap specific info. */
 	struct t_attribute *attribute;		/* group specific attributes */
 	struct t_filters *glob_filter;		/* points to global filter array */
@@ -1380,6 +1393,12 @@ struct t_newnews
 	time_t time;
 };
 
+#ifdef M_AMIGA
+	typedef const char /*__far*/ constext;
+#else
+	typedef const char constext;
+#endif
+
 /*
  * Used for building option menu
  */
@@ -1388,10 +1407,10 @@ struct t_option {
 	int var_type;		/* type of variable (see tincfg.h) */
 	int var_index;		/* index in corresponding table */
 	int *variable;		/* ptr to variable to change */
-	char **opt_list;	/* ptr to list entries if OPT_LIST */
+	constext **opt_list;	/* ptr to list entries if OPT_LIST */
 	int opt_count;		/* no. of list entries if OPT_LIST */
-	char *option_text;	/* text to print as information on option */
-	char *help_text;	/* text to print as help text when option selected */
+	constext *option_text;	/* text to print as information on option */
+	constext *help_text;	/* text to print as help text when option selected */
 };
 
 /*
@@ -1661,12 +1680,6 @@ extern void joinpath (char *result, char *dir, char *file);
 # undef  SIG_ERR
 # define SIG_ERR	(void (*)(SIG_ARGS))-1
 #endif	/* DECL_SIG_CONST */
-
-#ifdef M_AMIGA
-	typedef const char /*__far*/ constext;
-#else
-	typedef /* FIXME: const */ char constext;
-#endif
 
 /*
  * tputs() function-param

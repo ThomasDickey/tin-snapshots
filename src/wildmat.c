@@ -56,7 +56,7 @@
 
 static int
 DoMatch(
-	register char *text,
+	register const char *text,
 	register char *p)
 {
 #ifndef INDEX_DAEMON
@@ -123,7 +123,7 @@ DoMatch(
 
 int
 wildmat(
-	char *text,
+	const char *text,
 	char *p)
 {
 	/*

@@ -440,9 +440,6 @@ thread_by_subject(void)
  *  The rethread parameter is a misnomer. Its only effect (if set) is
  *  to delete all threading information, not to rethread
  *
- *  This function used to rely on default_threads_arts - surely
- *  changing a global default should alter all groups using global default
- *  attributes ?
  */
 
 void
@@ -1178,7 +1175,7 @@ pcFindNovFile (
 	int iMode)
 {
 	char *pcPtr;
-	char *pcDir;
+	const char *pcDir;
 	char acBuf[PATH_LEN];
 	FILE *hFp;
 	int iHashFileName;
@@ -1379,8 +1376,8 @@ artnum_comp (
 	t_comptype *p1,
 	t_comptype *p2)
 {
-	struct t_article *s1 = (struct t_article *) p1;
-	struct t_article *s2 = (struct t_article *) p2;
+	const struct t_article *s1 = (const struct t_article *) p1;
+	const struct t_article *s2 = (const struct t_article *) p2;
 
 	/*
 	 * s1->artnum less than s2->artnum
@@ -1405,8 +1402,8 @@ subj_comp (
 	t_comptype *p2)
 {
 	int retval;
-	struct t_article *s1 = (struct t_article *) p1;
-	struct t_article *s2 = (struct t_article *) p2;
+	const struct t_article *s1 = (const struct t_article *) p1;
+	const struct t_article *s2 = (const struct t_article *) p2;
 
 	/*
 	 * return result of strcmp (reversed for descending)
@@ -1425,8 +1422,8 @@ from_comp (
 	t_comptype *p2)
 {
 	int retval;
-	struct t_article *s1 = (struct t_article *) p1;
-	struct t_article *s2 = (struct t_article *) p2;
+	const struct t_article *s1 = (const struct t_article *) p1;
+	const struct t_article *s2 = (const struct t_article *) p2;
 
 	/*
 	 * return result of strcmp (reversed for descending)
@@ -1453,8 +1450,8 @@ date_comp (
 	t_comptype *p1,
 	t_comptype *p2)
 {
-	struct t_article *s1 = (struct t_article *) p1;
-	struct t_article *s2 = (struct t_article *) p2;
+	const struct t_article *s1 = (const struct t_article *) p1;
+	const struct t_article *s2 = (const struct t_article *) p2;
 
 	if (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) {
 		/*
@@ -1682,7 +1679,7 @@ pcPrintDate (
 	static	char acDate[25];
 	struct	tm *psTm;
 
-	static char *months_a[] = {
+	static const char *const months_a[] = {
 		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 	};

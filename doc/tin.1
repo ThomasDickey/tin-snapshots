@@ -582,8 +582,8 @@ Tag current article / thread for mailing ('m') / piping ('|') /
 printing ('o') / saving ('s') / reposting ('x').
 .TP
 \fBu\fP
-Cycle the threading mode through no threading, threading by subject
-and threading by references.
+Cycle the threading mode through no threading, threading by subject,
+threading by references, threading on both subject and references.
 .TP
 \fBU\fP
 Untag all articles that were tagged.
@@ -957,11 +957,13 @@ current session should be marked read.
 .TP
 \fBThread articles\fP
 If set to NONE, articles will be shown unthreaded.
-If set to SUBJ (default), articles will be threaded on the Subject line.
-If set to REFS (experimental), articles will be threaded using
-References information.  Threading/unthreading is possible on
-a per group basis by setting the group attribute variable 'thread_arts'
-to 0, 1 or 2 in the file \fI$HOME/.tin/attributes\fP.
+If set to SUBJ, articles will be threaded on the Subject line.
+If set to REFS, articles will be threaded using the References header.
+If set to BOTH(default), articles will be threaded using References and
+then by Subject.
+Threading type is possible on a per group basis by setting the group
+attribute variable 'thread_arts' to 0 - 3 in the file
+\fI$HOME/.tin/attributes\fP.
 .TP
 \fBShow only unread\fP
 If set ON show only new/unread articles, otherwise show all articles.
@@ -1361,8 +1363,8 @@ unread article immediately instead of first paging through the current
 one. Default is ON.
 .TP 4
 \fBthread_articles\fP
-Thread articles by 0=(nothing) 1=(Subject) 2=(References)
-Default is 1, thread by subject.
+Thread articles by 0=(nothing) 1=(Subject) 2=(References) 3=(Both)
+Default is 3, thread by references and subject.
 .TP 4
 \fBthread_catchup_on_exit\fP
 If ON catchup group/thread when leaving with the left arrow key.

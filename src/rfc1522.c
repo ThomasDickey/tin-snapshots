@@ -78,11 +78,11 @@ hex2bin (
 
 int
 mmdecode (
-	char *what,
+	const char *what,
 	int encoding,
 	int delimiter,
 	char *where,
-	char *charset)
+	const char *charset)
 {
 	char *t;
 	int decode_gt128 = 0;
@@ -177,9 +177,10 @@ get_mm_charset (void)
 
 char *
 rfc1522_decode (
-	char *s)
+	const char *s)
 {
-	char *c, *d, *t;
+	const char *c, *d;
+	char *t;
 	static char buffer[2048];
 	char charset[256];
 	char encoding;
@@ -191,7 +192,7 @@ rfc1522_decode (
 	while (*c && t - buffer < 2048) {
 		if (*c != '=') {
 			if (adjacentflag && isspace ((unsigned char)*c)) {
-				char *dd;
+				const char *dd;
 
 				dd = c + 1;
 				while (isspace ((unsigned char)*dd))
@@ -512,7 +513,7 @@ rfc1522_encode (
 void
 rfc15211522_encode (
 	char *filename,
-	char *mime_encoding,
+	constext *mime_encoding,
         t_bool  allow_8bit_header)
 {
 	FILE *f;

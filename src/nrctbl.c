@@ -102,7 +102,7 @@ get_nntpserver (
 int
 get_newsrcname (
 	char *newsrc_name,
-	char *nntpserver_name)
+	const char *nntpserver_name)
 {
 	FILE	*fp;
 	char	line[LEN];

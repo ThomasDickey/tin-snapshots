@@ -70,6 +70,7 @@
 #undef	HAVE_METAMAIL
 #undef	HAVE_UNAME
 #undef	HAVE_PGP
+#undef	HAVE_SUM
 
 /*
  * Compiler characteristics
@@ -138,6 +139,7 @@
  * The following are defined by the configure script if the corresponding
  * function is found in a library.
  */
+#undef	HAVE_ATOI
 #undef	HAVE_ATOL
 #undef	HAVE_FORK
 #undef	HAVE_FTIME
@@ -195,15 +197,20 @@
  * The following are functions that we'll optionally prototype (to stifle
  * warnings, etc., for development/testing).
  */
+#undef	DECL_ATOI
+#undef	DECL_ATOL
 #undef	DECL_BCOPY
 #undef	DECL_BZERO
+#undef	DECL_CALLOC
 #undef	DECL_FCLOSE
 #undef	DECL_FDOPEN
 #undef	DECL_FFLUSH
+#undef	DECL_FILENO
 #undef	DECL_FPRINTF
 #undef	DECL_FPUTC
 #undef	DECL_FPUTS
 #undef	DECL_FREAD
+#undef	DECL_FREE
 #undef	DECL_FSEEK
 #undef	DECL_FWRITE
 #undef	DECL_GETCWD
@@ -212,11 +219,15 @@
 #undef	DECL_INET_ADDR
 #undef	DECL_INET_NTOA
 #undef	DECL_IOCTL
+#undef	DECL_MALLOC
 #undef	DECL_MEMSET
 #undef	DECL_MKTEMP
 #undef	DECL_PCLOSE
 #undef	DECL_PERROR
 #undef	DECL_PRINTF
+#undef	DECL_PUTENV
+#undef	DECL_QSORT
+#undef	DECL_REALLOC
 #undef	DECL_REWIND
 #undef	DECL_SELECT
 #undef	DECL_SETEGID
@@ -269,6 +280,13 @@
 #undef	PATH_METAMAIL
 #undef	PATH_HOSTNAME
 #undef	PATH_UNAME
+#undef	PATH_SUM
+/*
+ * Configure also checks whether sum takes -r
+ * And defines PATH_SUM_R appropriately
+ */
+#undef	SUM_TAKES_DASH_R
+#undef	PATH_SUM_R
 
 #if 0 /* FIXME */
 #if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \

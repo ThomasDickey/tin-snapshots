@@ -66,7 +66,7 @@ tin_itoa (
  * also, strdup is not mandatory in ANSI-C
  */
 char *my_strdup (
-	char *str)
+	const char *str)
 {
 	char *duplicate = (char *) 0;
 
@@ -87,7 +87,7 @@ char *my_strdup (
 void
 my_strncpy (
 	char *p,
-	/* const */ char *q,
+	const char *q,
 	int n)		/* we should use size_t instead of int */
 {
 	while (n--) {
@@ -103,7 +103,7 @@ my_strncpy (
 void
 strcpynl (
 	char *to,
-	char *from)
+	const char *from)
 {
 	while (*from && *from != '\r' && *from != '\n') {
 		if (*from == '"')
@@ -117,9 +117,10 @@ strcpynl (
 char *
 strcasestr (
 	char *haystack,
-	char *needle)
+	const char *needle)
 {
-	char *h, *n;
+	char *h;
+	const char *n;
 
 	h = haystack;
 	n = needle;
@@ -140,7 +141,7 @@ strcasestr (
 int
 mystrcat (
 	char **t,
-	char *s)
+	const char *s)
 {
 	int len = 0;
 
@@ -154,7 +155,7 @@ mystrcat (
 
 void modifiedstrncpy(
 	char *target,
-	char *source,
+	const char *source,
 	size_t size,
 	int decode)
 {
@@ -186,7 +187,7 @@ void modifiedstrncpy(
 
 void
 str_lwr (
-	char *src,
+	const char *src,
 	char *dst)
 {
 	while (*src) {

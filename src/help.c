@@ -24,9 +24,9 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-static char txt_help_empty_line[] = "\r\n";
+static constext txt_help_empty_line[] = "\r\n";
 
-char *help_select[] = {
+constext *help_select[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
 	txt_help_b,
@@ -77,10 +77,10 @@ char *help_select[] = {
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
-	(char *) 0
+	0
 };
 
-char *help_group[] = {
+constext *help_group[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
 	txt_help_b,
@@ -159,10 +159,10 @@ char *help_group[] = {
 		txt_help_empty_line,
 	txt_help_v,
 	txt_help_bug_report,
-	(char *) 0
+	0
 };
 
-char *help_thread[] = {
+constext *help_thread[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
 	txt_help_b,
@@ -193,10 +193,10 @@ char *help_thread[] = {
 */
 	txt_help_v,
 	txt_help_bug_report,
-	(char *) 0
+	0
 };
 
-char *help_page[] = {
+constext *help_page[] = {
 	txt_help_ctrl_d,
 	txt_help_ctrl_f,
 	txt_help_b,
@@ -272,11 +272,11 @@ char *help_page[] = {
 	txt_help_colon,
 		txt_help_empty_line,
 	txt_help_g_t_p_i,
-	(char *) 0
+	0
 };
 
-static char *info_title;
-static char **info_help;
+static const char *info_title;
+static const char **info_help;
 static int cur_page;
 static int group_len = 0;
 static int info_type;
@@ -286,8 +286,8 @@ static int pos_help;
 void
 show_info_page (
 	int type,
-	char *help[],
-	char *title)
+	const char *help[],
+	const char *title)
 {
 	int ch;
 	int i, len;

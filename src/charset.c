@@ -116,11 +116,11 @@ static constext *iso2asc[ISO_TABLES][256-ISO_EXTRA] =
 #define	TEX_SUBST	15
 #define	SPACES		"                                                                                                         "
 
-static char *tex_from[TEX_SUBST] =
+static const char *tex_from[TEX_SUBST] =
 {
 	"\"a","\\\"a","\"o","\\\"o","\"u","\\\"u","\"A","\\\"A","\"O","\\\"O","\"U","\\\"U","\"s","\\\"s","\\3"
 };
-static char *tex_to[TEX_SUBST] =
+static const char *tex_to[TEX_SUBST] =
 {
 	"ä", "ä", "ö", "ö", "ü", "ü", "Ä", "Ä", "Ö", "Ö", "Ü", "Ü", "ß", "ß", "ß"
 };
@@ -135,7 +135,7 @@ ConvertIso2Asc (
 	char *asc,
 	int t)
 {
-	char *p;
+	constext *p;
 	constext **tab;
 	int first;   /* flag for first SPACE/TAB after other characters */
 	int i, a;    /* column counters in iso and asc */

@@ -30,7 +30,7 @@
 int
 prompt_num (
 	int ch,
-	char *prompt)
+	const char *prompt)
 {
 	char *p;
 	int num;
@@ -63,7 +63,7 @@ prompt_num (
 
 int
 prompt_string (
-	char *prompt,
+	const char *prompt,
 	char *buf)
 {
 	char *p;
@@ -126,7 +126,7 @@ prompt_menu_string (
 int
 prompt_yn (
 	int line,
-	char *prompt,
+	const char *prompt,
 	int default_answer)
 {
 	char ch, prompt_ch;
@@ -208,7 +208,7 @@ prompt_yn (
 int 
 prompt_yn2 (
 	int line,
-	char *prompt,
+	const char *prompt,
 	int default_answer)
 {
 	char ch, prompt_ch;
@@ -258,9 +258,9 @@ prompt_list (
 	int row,
 	int col,
 	int var,
-	char *help_text,
-	char *prompt_text,
-	char *list[],
+	constext *help_text,
+	constext *prompt_text,
+	constext *list[],
 	int size)
 {
 	int ch, var_orig;
@@ -316,8 +316,8 @@ prompt_on_off (
 	int row,
 	int col,
 	t_bool *var,
-	char *help_text,
-	char *prompt_text)
+	constext *help_text,
+	constext *prompt_text)
 {
 	t_bool ret;
 

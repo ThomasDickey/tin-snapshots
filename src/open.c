@@ -425,7 +425,7 @@ open_newsgroups_fp (void)
 FILE *
 open_xover_fp (
 	struct t_group *psGrp,
-	char *pcMode,
+	const char *pcMode,
 	long lMin,
 	long lMax)
 {
@@ -721,8 +721,8 @@ base_comp (
 	t_comptype *p1,
 	t_comptype *p2)
 {
-	long *a = (long *) p1;
-	long *b = (long *) p2;
+	const long *a = (const long *) p1;
+	const long *b = (const long *) p2;
 
 	if (*a < *b)
 		return -1;
@@ -937,8 +937,8 @@ authenticate (void)
 		cookiefd = fileno (fp);
 	}
 
-	sprintf (tmpbuf, "authinfo generic ");
-	sprintf (authval, getenv ("NNTPAUTH"));
+	strcpy (tmpbuf, "authinfo generic ");
+	strcpy (authval, get_val("NNTPAUTH", ""));
 	if (strlen(authval)) {
 		strcat (tmpbuf, authval);
 	} else {
@@ -1284,9 +1284,10 @@ vGrpGetSubArtInfo (void)
 
 	for (iNum = 0 ; iNum < num_active ; iNum++) {
 		psGrp = &active[iNum];
-		if (psGrp->subscribed == SUBSCRIBED) {
+		if (psGrp->subscribed) {
 			lMinOld = psGrp->xmin;
 			lMaxOld = psGrp->xmax;
+
 			vGrpGetArtInfo (
 				psGrp->spooldir,
 				psGrp->name,
@@ -1296,9 +1297,9 @@ vGrpGetSubArtInfo (void)
 				&psGrp->xmin);
 			if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
-	printf ("\r\nUnread WRONG [%d]=%s unread=[%ld] count=[%ld]",
-		iNum, psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-	fflush(stdout);
+				printf ("\r\nUnread WRONG [%d]=%s unread=[%ld] count=[%ld]",
+					iNum, psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
+				fflush(stdout);
 #endif
 				psGrp->newsrc.num_unread = psGrp->count;
 			}
@@ -1342,11 +1343,6 @@ vGrpGetArtInfo (
 	long	lArtMin;
 	long	lArtMax;
 	long	lArtNum;
-
-#if 0
-fprintf(stderr, "IN vGGAI %s cnt=%ld, min=%ld max %ld\n",
-								pcGrpName, *plArtCount, *plArtMin, *plArtMax);
-#endif
 
 	lArtMin = *plArtMin;
 	lArtMax = *plArtMax;
@@ -1434,16 +1430,6 @@ fprintf(stderr, "IN vGGAI %s cnt=%ld, min=%ld max %ld\n",
 		}
 #endif	/* #ifdef M_AMIGA */
 	}
-
-#if 0
-	/*
-	 * If the group has 0 articles available, retain the old min/max values
-	 */
-	if (*plArtCount == 0) {
-		*plArtMin = lArtMin;
-		*plArtMax = lArtMax;
-	}
-#endif
 
 	return(0);
 }

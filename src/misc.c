@@ -59,9 +59,9 @@ append_file (
 
 void
 asfail (
-	char	*file,
+	const char *file,
 	int	line,
-	char	*cond)
+	const char *cond)
 {
 	fprintf (stderr, "%s: assertion failure: %s (%d): %s\n",
 		progname, file, line, cond);
@@ -95,7 +95,7 @@ void
 copy_fp (
 	FILE *fp_ip,
 	FILE *fp_op,
-	char *prefix)
+	const char *prefix)
 {
 	char buf[8192];
 	int retcode;
@@ -216,12 +216,12 @@ copy_body (
 	}
 }
 
-char *
+const char *
 get_val (
-	char *env,		/* Environment variable we're looking for	*/
-	char *def)		/* Default value if no environ value found	*/
+	const char *env,	/* Environment variable we're looking for	*/
+	const char *def)	/* Default value if no environ value found	*/
 {
-	char *ptr;
+	const char *ptr;
 
 	ptr = getenv(env);
 
@@ -836,7 +836,7 @@ int
 mail_check (void)
 {
 #ifndef WIN32 /* No unified mail transport on WIN32 */
-	char *mailbox_name;
+	const char *mailbox_name;
 	struct stat buf;
 #ifdef M_AMIGA
 	static long mbox_size = 0;
@@ -855,7 +855,7 @@ mail_check (void)
 
 	/* this is only a first try, but it seems to work :) */
 
-	if (mailbox_name != (char *) 0) {
+	if (mailbox_name != 0) {
 		if (stat (mailbox_name, &buf) >= 0) {
 			if (buf.st_size > 0) {
 				if (buf.st_size >= mbox_size) {
@@ -881,7 +881,7 @@ mail_check (void)
 		}
 	}
 #else
-	if (mailbox_name != (char *) 0 && stat (mailbox_name, &buf) >= 0 &&
+	if (mailbox_name != 0 && stat (mailbox_name, &buf) >= 0 &&
 		buf.st_atime < buf.st_mtime && buf.st_size > 0) {
 		return TRUE;
 	}
@@ -1050,7 +1050,7 @@ parse_from (
 	strcpy (comment, cmtp);
 	return;
 FATAL:
-	addrspec = "error@hell";
+	strcpy(addrspec, "error@hell");
 	*comment = '\0';
 }
 # undef APPEND_TO
@@ -1175,7 +1175,7 @@ get_author (
 	if (thread && !show_subject)
 		author = SHOW_FROM_BOTH;
 	else
-		author = show_author;
+		author = CURR_GROUP.attribute->show_author;
 
 	switch (author) {
 		case SHOW_FROM_NONE:

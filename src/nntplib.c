@@ -138,7 +138,7 @@ char	last_put[NNTP_STRLEN];
 
 char *
 getserverbyfile (
-	char	*file)
+	const char *file)
 {
 #ifdef NNTP_ABLE
 	register FILE	*fp;
@@ -211,7 +211,7 @@ getserverbyfile (
 int
 server_init (
 	char	*machine,
-	char	*service,
+	const char *service,
 	int	port)
 {
 #ifdef NNTP_ABLE
@@ -298,8 +298,8 @@ server_init (
 
 int
 get_tcp_socket (
-	char	*machine,	/* remote host */
-	char	*service,	/* nttp/smtp etc. */
+	const char *machine,	/* remote host */
+	const char *service,	/* nttp/smtp etc. */
 	unsigned port)		/* tcp port number */
 {
 #ifdef NNTP_ABLE
@@ -613,7 +613,7 @@ get_dnet_socket (
 
 void
 u_put_server (
-	char *string)
+	const char *string)
 {
 #ifdef NNTP_ABLE
 #ifdef VMS
@@ -645,7 +645,7 @@ u_put_server (
 
 void
 put_server (
-	char *string)
+	const char *string)
 {
 #ifdef NNTP_ABLE
 	int respno;
@@ -893,12 +893,12 @@ close_server (void)
  * NNTP strings for get_respcode()
  */
 
-char *
+const char *
 nntp_respcode (
 	int respcode)
 {
 #ifdef NNTP_ABLE
-	static char *text;
+	static const char *text;
 
 	if (strlen (error_response) > 4) {
 	/*

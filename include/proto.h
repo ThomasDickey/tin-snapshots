@@ -10,7 +10,9 @@ extern void read_group_times_file (void);
 extern void write_group_times_file (void);
 extern void load_newnews_info (char *info);
 extern void read_motd_file (void);
+#ifdef INDEX_DAEMON
 extern void vMakeActiveMyGroup (void);
+#endif
 
 /* actived.c */
 extern void create_save_active_file (void);
@@ -50,12 +52,12 @@ extern int read_config_file (char *file, int global_file);
 extern void write_config_file (char *file);
 extern void refresh_config_page (int act_option, int force_redraw);
 extern int change_config_file (struct t_group *group, int filter_at_once);
-extern void show_menu_help (char *help_message);
-extern int match_boolean (char *line, char *pat, t_bool *dst);
-extern int match_integer (char *line, char *pat, int *dst, int maxlen);
-extern int match_long (char *line, char *pat, long *dst);
-extern int match_string (char *line, char *pat, char *dst, size_t dstlen);
-extern char *print_boolean (t_bool value);
+extern void show_menu_help (const char *help_message);
+extern int match_boolean (char *line, const char *pat, t_bool *dst);
+extern int match_integer (char *line, const char *pat, int *dst, int maxlen);
+extern int match_long (char *line, const char *pat, long *dst);
+extern int match_string (char *line, const char *pat, char *dst, size_t dstlen);
+extern const char *print_boolean (t_bool value);
 extern void quote_dash_to_space (char *str);
 extern char *quote_space_to_dash (char *str);
 
@@ -85,21 +87,21 @@ extern void cursoroff (void);
 
 /* debug.c */
 extern void debug_delete_files (void);
-extern void debug_nntp (char *func, char *line);
+extern void debug_nntp (const char *func, const char *line);
 extern void debug_nntp_respcode (int respcode);
 extern void debug_print_arts (void);
 extern void debug_print_header (struct t_article *s);
 extern void debug_save_comp (void);
-extern void debug_print_comment (char *comment);
+extern void debug_print_comment (const char *comment);
 extern void debug_print_active (void);
 extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
 extern void debug_print_newsrc (struct t_newsrc *NewSrc, FILE *fp);
-extern void vDbgPrintMalloc (int iIsMalloc, char *pcFile, int iLine, size_t iSize);
+extern void vDbgPrintMalloc (int iIsMalloc, const char *pcFile, int iLine, size_t iSize);
 extern void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
 extern void debug_print_filters (void);
 
 /* envarg.c */
-extern void envargs (int *Pargc, char ***Pargv, char *envstr);
+extern void envargs (int *Pargc, char ***Pargv, const char *envstr);
 
 /* feed.c */
 extern void feed_articles (int function, int level, struct t_group *group, int respnum);
@@ -117,7 +119,7 @@ extern int filter_articles (struct t_group *group);
 extern int auto_select_articles (struct t_group *group);
 
 /* getline.c */
-extern char *getline (char *prompt, int number_only, char *str, int max_chars, int passwd);
+extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int passwd);
 
 /* group.c */
 extern void group_page (struct t_group *group);
@@ -126,17 +128,17 @@ extern void draw_subject_arrow (void);
 extern void erase_subject_arrow (void);
 extern void clear_note_area (void);
 extern int find_new_pos (int old_top, long old_artnum, int cur_pos);
-extern void mark_screen (int level, int screen_row, int screen_col, char *value);
+extern void mark_screen (int level, int screen_row, int screen_col, const char *value);
 extern void set_subj_from_size (int num_cols);
 extern void toggle_subject_from (void);
 
 /* hashstr.c */
-extern char *hash_str (char *s);
+extern char *hash_str (const char *s);
 extern void hash_init (void);
 extern void hash_reclaim (void);
 
 /* help.c */
-extern void show_info_page (int type, char *help[], char *title);
+extern void show_info_page (int type, const char *help[], const char *title);
 extern void display_info_page (void);
 extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
@@ -152,15 +154,15 @@ extern int submit_news_file (char *name, int lines);
 extern void init_selfinfo (void);
 extern int create_mail_save_dirs (void);
 extern char *GetFQDN (void);
-extern char *GetConfigValue (char *name);
+extern char *GetConfigValue (const char *name);
 
 /* joinpath.c */
-extern void joinpath (char *result, char *dir, char *file);
+extern void joinpath (char *result, const char *dir, const char *file);
 
 /* list.c */
 extern void init_group_hash (void);
-extern unsigned long hash_groupname (char *group);
-extern int find_group_index (char *group);
+extern unsigned long hash_groupname (const char *group);
+extern int find_group_index (const char *group);
 extern struct t_group *psGrpFind (char *pcGrpName);
 extern int psGrpAdd (char *group);
 #if 0
@@ -197,15 +199,15 @@ extern void free_art_array (void);
 extern void free_attributes_array (void);
 extern void free_active_arrays (void);
 extern void free_save_array (void);
-extern void *my_malloc1 (char *file, int line, size_t size);
-extern void *my_realloc1 (char *file, int line, char *p, size_t size);
+extern void *my_malloc1 (const char *file, int line, size_t size);
+extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 
 /* misc.c */
-extern void asfail (char *file, int line, char *cond);
+extern void asfail (const char *file, int line, const char *cond);
 extern void append_file (char *old_filename, char *new_filename);
-extern void copy_fp (FILE *fp_ip, FILE *fp_op, char *prefix);
+extern void copy_fp (FILE *fp_ip, FILE *fp_op, const char *prefix);
 extern void copy_body (FILE *fp_ip, FILE *fp_op, char *prefix, char *initl);
-extern char *get_val (char *env, char *def);
+extern const char *get_val (const char *env, const char *def);
 extern int invoke_editor (char *filename, int lineno);
 extern int invoke_ispell (char *nam);
 extern void shell_escape (void);
@@ -269,20 +271,20 @@ extern void vNewsrcTestHarness (void);
 #endif
 
 /* nntplib.c */
-extern char *getserverbyfile (char *file);
-extern int server_init (char *machine, char *service, int port);
-extern int get_tcp_socket (char *machine, char *service, unsigned port);
+extern char *getserverbyfile (const char *file);
+extern int server_init (char *machine, const char *service, int port);
+extern int get_tcp_socket (const char *machine, const char *service, unsigned port);
 /*extern int handle_server_response (int response, char *nntpserver);*/ /* not used */
-extern void u_put_server (char *string);
-extern void put_server (char *string);
+extern void u_put_server (const char *string);
+extern void put_server (const char *string);
 extern int get_server (char *string, int size);
 extern void close_server (void);
-extern char *nntp_respcode (int respcode);
+extern const char *nntp_respcode (int respcode);
 extern int nntp_message (int respcode);
 
 /* nrctbl.c */
 extern void get_nntpserver (char *nntpserver_name, char *nick_name);
-extern int get_newsrcname (char *newsrc_name, char *nntpserver_name);
+extern int get_newsrcname (char *newsrc_name, const char *nntpserver_name);
 
 /* open.c */
 extern int nntp_open (void);
@@ -295,7 +297,7 @@ extern FILE *open_motd_fp (char *motd_file_date);
 extern FILE *open_subscription_fp (void);
 extern FILE *open_mailgroups_fp (void);
 extern FILE *open_newsgroups_fp (void);
-extern FILE *open_xover_fp (struct t_group *psGrp, char *pcMode, long lMin, long lMax);
+extern FILE *open_xover_fp (struct t_group *psGrp, const char *pcMode, long lMin, long lMax);
 extern int stat_article (long art, char *group_path);
 extern char *open_art_header (long art);
 extern FILE *open_art_fp (char *group_path, long art);
@@ -313,7 +315,7 @@ extern void show_note_page (char *group, int respnum);
 extern int art_open (long art, char *group_path);
 extern void art_close (void);
 extern void yank_to_addr (char *orig, char *addr);
-extern int match_header (char *buf, char *pat, char *body, char *nodec_body, size_t len);
+extern int match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
 
 /* parsdate.y */
 extern int GetTimeInfo (TIMEINFO *Now);
@@ -340,13 +342,13 @@ extern int count_postponed_articles (void);
 extern int pickup_postponed_articles (int ask);
 
 /* prompt.c */
-extern int prompt_num (int ch, char *prompt);
-extern int prompt_string (char *prompt, char *buf);
+extern int prompt_num (int ch, const char *prompt);
+extern int prompt_string (const char *prompt, char *buf);
 extern int prompt_menu_string (int line, int col, char *var);
-extern int prompt_yn (int line, char *prompt, int default_answer);
-extern int prompt_yn2 (int line, char *prompt, int default_answer);
-extern int prompt_list (int row, int col, int var, char *help_text, char *prompt_text, char *list[], int size);
-extern void prompt_on_off (int row, int col, t_bool *var, char *help_text, char *prompt_text);
+extern int prompt_yn (int line, const char *prompt, int default_answer);
+extern int prompt_yn2 (int line, const char *prompt, int default_answer);
+extern int prompt_list (int row, int col, int var, constext *help_text, constext *prompt_text, constext *list[], int size);
+extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, constext *prompt_text);
 extern int prompt_option_string (int option);
 extern int prompt_option_num (int option);
 extern int prompt_option_char (int option);
@@ -370,15 +372,15 @@ extern void rfc1468_encode (char *line, FILE *f, int e);
 extern void rfc1922_encode (char *line, FILE *f, int e);
 
 /* rfc1522.c */
-extern int mmdecode (char *what, int encoding, int delimiter, char *where, char *charset);
+extern int mmdecode (const char *what, int encoding, int delimiter, char *where, const char *charset);
 extern void get_mm_charset (void);
-extern char *rfc1522_decode (char *s);
+extern char *rfc1522_decode (const char *s);
 extern char *rfc1522_encode (char *s);
-extern void rfc15211522_encode (char *filename, char *mime_encoding, t_bool allow_8bit_header);
+extern void rfc15211522_encode (char *filename, constext *mime_encoding, t_bool allow_8bit_header);
 
 /* save.c */
 extern int check_start_save_any_news (int check_start_save);
-extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, char *filename);
+extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
 extern int save_thread_to_file (int is_mailbox, char *group_path);
 extern int save_regex_arts (int is_mailbox, char *group_path);
 extern int create_path (char *path);
@@ -391,18 +393,18 @@ extern void delete_processed_files (t_bool auto_delete);
 extern void print_art_seperator_line (FILE *fp, int the_mailbox);
 
 /* screen.c */
-extern void info_message (char *str);
-extern void wait_message (char *str);
-extern void error_message (char *template, char *str);
-extern void perror_message (char *template, char *str);
+extern void info_message (const char *str);
+extern void wait_message (const char *str);
+extern void error_message (const char *template, const char *str);
+extern void perror_message (const char *template, const char *str);
 extern void clear_message (void);
-extern void center_line (int line, int inverse, char *str);
+extern void center_line (int line, int inverse, const char *str);
 extern void draw_arrow (int line);
 extern void erase_arrow (int line);
 extern void show_title (char *title);
 extern void ring_bell (void);
 extern void spin_cursor (void);
-extern void show_progress (char *dst, char *txt, int count, int total);
+extern void show_progress (char *dst, const char *txt, int count, int total);
 
 /* search.c */
 extern int search_author (int the_index, int current_art, int forward);
@@ -413,14 +415,14 @@ extern int search_body (struct t_group *group, int current_art);
 
 /* select.c */
 extern void selection_index (int start_groupnum, int num_cmd_line_groups);
-extern void group_selection_page (void);
+extern void show_selection_page (void);
 extern void erase_group_arrow (void);
 extern void draw_group_arrow (void);
 extern int choose_new_group (void);
 extern int add_my_group (char *group, int add);
 extern void set_groupname_len (int all_groups);
-extern void toggle_my_groups (t_bool only_unread_groups, char *group);
-extern void strip_line (char *line, size_t len);
+extern void toggle_my_groups (t_bool only_unread_groups, const char *group);
+extern void strip_line (char *line);
 extern int iSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 
 /* sigfile.c */
@@ -459,26 +461,29 @@ extern void page_resize (SIG_ARGS);
 extern void thread_resize (SIG_ARGS);
 
 /* strftime.c */
-extern size_t my_strftime (char *s, size_t maxsize, char *format, struct tm *timeptr);
+extern size_t my_strftime (char *s, size_t maxsize, const char *format, struct tm *timeptr);
 
 /* string.c */
 extern char *tin_itoa (int value, int digits);
-extern char *my_strdup (char *str);
-extern char *strcasestr (char *haystack, char *needle);
-extern int mystrcat (char **t, char *s);
-extern void my_strncpy (char *p, /* const */ char *q, int n);
-extern void modifiedstrncpy (char *target, char *source, size_t size, int decode);
-extern void strcpynl (char *to, char *from);
-extern void str_lwr (char *src, char *dst);
+extern char *my_strdup (const char *str);
+extern char *strcasestr (char *haystack, const char *needle);
+extern int mystrcat (char **t, const char *s);
+extern void my_strncpy (char *p, const char *q, int n);
+extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
+extern void strcpynl (char *to, const char *from);
+extern void str_lwr (const char *src, char *dst);
 
 #ifndef HAVE_STRCASECMP
-extern int strcasecmp (/* const */ char *p, /* const */ char *q);
+extern int strcasecmp (const char *p, const char *q);
 #endif
 #ifndef HAVE_STRNCASECMP
-extern int strncasecmp (/* const */ char *p, /* const */ char *q, size_t n);
+extern int strncasecmp (const char *p, const char *q, size_t n);
+#endif
+#ifndef HAVE_ATOI
+extern long atoi (const char *s);
 #endif
 #ifndef HAVE_ATOL
-extern long atol (/* const */ char *s);
+extern long atol (const char *s);
 #endif
 #ifndef HAVE_STRPBRK
 extern char *strpbrk (char *str1, char *str2);
@@ -487,7 +492,7 @@ extern char *strpbrk (char *str1, char *str2);
 extern char *strstr (char *text, char *pattern);
 #endif
 #ifndef HAVE_STRTOL
-extern long strtol (/* const */ char *str, char **ptr, int use_base);
+extern long strtol (const char *str, char **ptr, int use_base);
 #endif
 
 /* thread.c */
@@ -506,7 +511,7 @@ extern int next_unread (int n);
 extern int prev_unread (int n);
 
 /* wildmat.c */
-extern int wildmat (char *text, char *p);
+extern int wildmat (const char *text, char *p);
 
 /* xref.c */
 extern int overview_xref_support (void);

@@ -138,7 +138,6 @@ int real_gid;
 int real_uid;
 int real_umask;
 int reread_active_file_secs;	/* reread active file interval in seconds */
-int show_author;
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
@@ -862,7 +861,7 @@ GetFQDN (void)
 
 char *
 GetConfigValue (
-	char *name)
+	const char *name)
 {
 	char *ptr;
 	char path[PATH_LEN];

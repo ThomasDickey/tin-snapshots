@@ -61,7 +61,7 @@ typedef char	*STRING;
 **  An entry in the lexical lookup table.
 */
 typedef struct _TABLE {
-    STRING	name;
+    const char *name;
     int		type;
     time_t	value;
 } TABLE;
@@ -102,20 +102,13 @@ static MERIDIAN	yyMeridian;
 static time_t	yyRelMonth;
 static time_t	yyRelSeconds;
 
-
-#if __STDC__
-static void	date_error(char *);
+static void	date_error(const char *);
 static time_t	ToSeconds(time_t, time_t, time_t, MERIDIAN);
 static time_t	Convert(time_t, time_t, time_t, time_t, time_t, time_t, MERIDIAN, DSTMODE);
 static time_t	DSTcorrect(time_t, time_t);
 static time_t	RelativeMonth(time_t, time_t);
 static int	LookupWord(char	*, int);
 static int	date_lex(void);
-#else
-extern struct tm	*localtime();
-static void	date_error();
-static int	date_lex();
-#endif
 
 %}
 
@@ -312,7 +305,7 @@ o_merid	: /* NULL */ {
 %%
 
 /* Month and day table. */
-static TABLE	MonthDayTable[] = {
+static const TABLE MonthDayTable[] = {
     { "january",	tMONTH,  1 },
     { "february",	tMONTH,  2 },
     { "march",		tMONTH,  3 },
@@ -475,7 +468,7 @@ static TABLE	TimezoneTable[] = {
 /* ARGSUSED */
 static void
 date_error(
-    char	*s)
+    const char	*s)
 {
     /* NOTREACHED */
 }
@@ -606,8 +599,8 @@ LookupWord(
     register int	length)
 {
     register char	*p;
-    register STRING	q;
-    register TABLE	*tp;
+    register const char *q;
+    register const TABLE *tp;
     register int	c;
 
     p = buff;

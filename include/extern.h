@@ -24,11 +24,20 @@
  * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
  * are enabled.  (Not all of the functions are ANSI or POSIX).
  */
+#ifdef DECL_ATOI
+extern int atoi (char *);
+#endif
+#ifdef DECL_ATOL
+extern int atol (char *);
+#endif
 #ifdef DECL_BCOPY
 extern int bcopy (char *, char *, int);
 #endif
 #ifdef DECL_BZERO
 extern void bzero (char *, int);
+#endif
+#ifdef DECL_CALLOC
+extern void * calloc (size_t, size_t);
 #endif
 #ifdef DECL_FCLOSE
 extern int fclose (FILE *);
@@ -38,6 +47,9 @@ extern FILE *fdopen (int, const char *);
 #endif
 #ifdef DECL_FFLUSH
 extern int fflush (FILE *);
+#endif
+#ifdef DECL_FILENO
+extern int fileno (FILE *);
 #endif
 #ifdef DECL_FPRINTF
 extern int fprintf (FILE *, const char *, ...);
@@ -50,6 +62,9 @@ extern int fputs (const char *, FILE *);
 #endif
 #ifdef DECL_FREAD
 extern size_t fread (void *, size_t, size_t, FILE *);
+#endif
+#ifdef DECL_FREE
+extern void free (void *);
 #endif
 #ifdef DECL_FSEEK
 extern int fseek (FILE *, long, int);
@@ -67,7 +82,7 @@ extern int gethostname (char *, int);
 extern char *getlogin (void);
 #endif
 #ifdef DECL_GETOPT
-extern int getopt (int, char **, char *);
+extern int getopt (int, char * const*, const char *);
 #endif
 #ifdef DECL_GETHOSTBYNAME
 extern struct hostent *gethostbyname (const char *);
@@ -87,6 +102,9 @@ extern char *inet_ntoa (struct in_addr);
 #ifdef DECL_IOCTL
 extern int ioctl (int, unsigned long, void *);
 #endif
+#ifdef DECL_MALLOC
+extern void * malloc (size_t);
+#endif
 #ifdef DECL_MEMSET
 extern void * memset (void *, int, size_t);
 #endif
@@ -104,6 +122,15 @@ extern FILE * popen (const char *, const char *);
 #endif
 #ifdef DECL_PRINTF
 extern int printf (const char *, ...);
+#endif
+#ifdef DECL_PUTENV
+extern int putenv (const char *);
+#endif
+#ifdef DECL_QSORT
+extern void qsort (void *, size_t, size_t, int (*)(t_comptype*, t_comptype*));
+#endif
+#ifdef DECL_REALLOC
+extern void * realloc (void *, size_t);
 #endif
 #ifdef DECL_REWIND
 extern void rewind (FILE *);
@@ -186,8 +213,8 @@ extern int tputs (char *, int, OutcPtr);
 extern int _flsbuf (int, FILE *);
 #endif
 
-#if !__STDC__ || defined(DECL_GETENV)
-extern char *getenv (char *);
+#ifdef DECL_GETENV
+extern char *getenv (const char *);
 #endif
 
 #ifdef DECL_ERRNO
@@ -208,10 +235,6 @@ extern char *OPT_STRING_list[];
 extern char *glob_art_group;
 extern char *glob_group;
 extern char *glob_page_group;
-extern char *help_group[];
-extern char *help_page[];
-extern char *help_select[];
-extern char *help_thread[];
 extern char *nntp_server;
 extern char *pgpopts;
 extern char active_times_file[PATH_LEN];
@@ -323,6 +346,10 @@ extern char txt_help_bug_report[LEN];
 extern char userid[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
 extern const char base64_alphabet[64];
+extern constext *help_group[];
+extern constext *help_page[];
+extern constext *help_select[];
+extern constext *help_thread[];
 extern constext *txt_colors[];
 extern constext *txt_marks[];
 extern constext *txt_mime_types[NUM_MIME_TYPES];
@@ -384,7 +411,7 @@ extern constext txt_catchup_all_read_groups[];
 extern constext txt_catchup_despite_tags[];
 extern constext txt_catchup_update_info[];
 extern constext txt_check_article[];
-extern constext txt_checking_active_file[];
+extern constext txt_checking_new_groups[];
 extern constext txt_checking_for_news[];
 extern constext txt_checksum_of_file[];
 extern constext txt_cmdline_hit_any_key[];
@@ -906,6 +933,125 @@ extern constext txt_thread_saved_to_many[];
 extern constext txt_thread_x_of_n[];
 extern constext txt_threading_arts[];
 extern constext txt_time_default_days[];
+extern constext txt_tinrc_alternative_handling[];
+extern constext txt_tinrc_art_marked_deleted[];
+extern constext txt_tinrc_art_marked_inrange[];
+extern constext txt_tinrc_art_marked_return[];
+extern constext txt_tinrc_art_marked_selected[];
+extern constext txt_tinrc_art_marked_unread[];
+#ifdef HAVE_METAMAIL
+extern constext txt_tinrc_ask_for_metamail[];
+#endif /* HAVE_METAMAIL */
+extern constext txt_tinrc_auto_bcc[];
+extern constext txt_tinrc_auto_cc[];
+extern constext txt_tinrc_auto_list_thread[];
+extern constext txt_tinrc_auto_save[];
+extern constext txt_tinrc_batch_save[];
+extern constext txt_tinrc_beginner_level[];
+extern constext txt_tinrc_catchup_read_groups[];
+#ifdef HAVE_COLOR
+extern constext txt_tinrc_col_back[];
+extern constext txt_tinrc_col_from[];
+extern constext txt_tinrc_col_head[];
+extern constext txt_tinrc_col_help[];
+extern constext txt_tinrc_col_invers_bg[];
+extern constext txt_tinrc_col_invers_fg[];
+extern constext txt_tinrc_col_markdash[];
+extern constext txt_tinrc_col_markstar[];
+extern constext txt_tinrc_col_message[];
+extern constext txt_tinrc_col_minihelp[];
+extern constext txt_tinrc_col_normal[];
+extern constext txt_tinrc_col_response[];
+extern constext txt_tinrc_col_quote[];
+extern constext txt_tinrc_col_signature[];
+extern constext txt_tinrc_col_subject[];
+extern constext txt_tinrc_col_text[];
+extern constext txt_tinrc_col_title[];
+extern constext txt_tinrc_colors[];
+#endif /* HAVE_COLOR */
+extern constext txt_tinrc_confirm_action[];
+extern constext txt_tinrc_confirm_to_quit[];
+extern constext txt_tinrc_default_editor_format[];
+extern constext txt_tinrc_default_filter_days[];
+extern constext txt_tinrc_default_maildir[];
+extern constext txt_tinrc_default_mailer_format[];
+extern constext txt_tinrc_default_printer[];
+extern constext txt_tinrc_default_savedir[];
+extern constext txt_tinrc_default_sigfile[];
+extern constext txt_tinrc_defaults[];
+extern constext txt_tinrc_draw_arrow[];
+extern constext txt_tinrc_filter[];
+extern constext txt_tinrc_force_screen_redraw[];
+extern constext txt_tinrc_full_page_scroll[];
+extern constext txt_tinrc_group_catchup_on_exit[];
+extern constext txt_tinrc_groupname_max_length[];
+extern constext txt_tinrc_header[];
+extern constext txt_tinrc_highlight_xcommentto[];
+extern constext txt_tinrc_inverse_okay[];
+#ifdef M_UNIX
+extern constext txt_tinrc_keep_dead_articles[];
+#endif /* M_UNIX */
+extern constext txt_tinrc_keep_posted_articles[];
+#ifdef LOCAL_CHARSET
+extern constext txt_tinrc_local_charset[];
+#endif /* LOCAL_CHARSET */
+extern constext txt_tinrc_mail_8bit_header[];
+#ifdef FORGERY
+extern constext txt_tinrc_mail_address[];
+#endif /* FORGERY */
+extern constext txt_tinrc_mail_mime_encoding[];
+extern constext txt_tinrc_mail_quote_format[];
+extern constext txt_tinrc_mark_saved_read[];
+extern constext txt_tinrc_mm_charset[];
+extern constext txt_tinrc_motd_file_info[];
+extern constext txt_tinrc_newnews[];
+extern constext txt_tinrc_news_quote_format[];
+extern constext txt_tinrc_no_advertising[];
+extern constext txt_tinrc_pos_first_unread[];
+extern constext txt_tinrc_post_8bit_header[];
+extern constext txt_tinrc_post_mime_encoding[];
+extern constext txt_tinrc_post_process_command[];
+extern constext txt_tinrc_post_process_type[];
+extern constext txt_tinrc_print_header[];
+extern constext txt_tinrc_process_only_unread[];
+extern constext txt_tinrc_quote_chars[];
+extern constext txt_tinrc_reread_active_file_secs[];
+extern constext txt_tinrc_save_to_mmdf_mailbox[];
+extern constext txt_tinrc_show_author[];
+extern constext txt_tinrc_show_description[];
+extern constext txt_tinrc_show_last_line_prev_page[];
+extern constext txt_tinrc_show_lines[];
+extern constext txt_tinrc_show_only_unread[];
+extern constext txt_tinrc_show_only_unread_groups[];
+extern constext txt_tinrc_show_xcommentto[];
+extern constext txt_tinrc_sigdashes[];
+extern constext txt_tinrc_sort_article_type[];
+extern constext txt_tinrc_space_goto_next_unread[];
+extern constext txt_tinrc_start_editor_offset[];
+extern constext txt_tinrc_strip_blanks[];
+extern constext txt_tinrc_strip_newsrc[];
+extern constext txt_tinrc_tab_after_X_selection[];
+extern constext txt_tinrc_tab_goto_next_unread[];
+extern constext txt_tinrc_thread_articles[];
+extern constext txt_tinrc_thread_catchup_on_exit[];
+extern constext txt_tinrc_unlink_article[];
+extern constext txt_tinrc_use_builtin_inews[];
+#ifdef HAVE_COLOR
+extern constext txt_tinrc_use_color[];
+#endif /* HAVE_COLOR */
+#ifdef HAVE_KEYPAD
+extern constext txt_tinrc_use_keypad[];
+#endif /* HAVE_KEYPAD */
+extern constext txt_tinrc_use_mailreader_i[];
+#ifdef HAVE_METAMAIL
+extern constext txt_tinrc_use_metamail[];
+#endif /* HAVE_METAMAIL */
+extern constext txt_tinrc_use_mouse[];
+#ifdef HAVE_COLOR
+extern constext txt_tinrc_word_h_display_marks[];
+extern constext txt_tinrc_word_highlight[];
+#endif /* HAVE_COLOR */
+extern constext txt_tinrc_xpost_quote_format[];
 extern constext txt_toggled_rot13[];
 extern constext txt_toggled_tex2iso_off[];
 extern constext txt_toggled_tex2iso_on[];
@@ -1009,7 +1155,6 @@ extern int real_umask;
 extern int reread_active_file;
 extern int reread_active_file_secs;
 extern int reread_active_for_posted_arts;
-extern int show_author;
 extern int show_subject;
 extern int space_mode;
 extern int start_line_offset;

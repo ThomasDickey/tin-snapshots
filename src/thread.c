@@ -32,8 +32,8 @@ static int first_thread_on_screen = 0;
 static int last_thread_on_screen = 0;
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static int prompt_thread_num (int ch);
 static void draw_thread_arrow (void);
 static void erase_thread_arrow (void);
@@ -44,7 +44,7 @@ static void update_thread_page (void);
  * Build one line of the thread page display. Looks long winded, but
  * there are a lot of variables in the format for the output
  */
-static int		/* TODO why return int ? what can go wrong ? */
+static void
 bld_tline (
 	int l,
 	struct t_article *art)
@@ -62,7 +62,8 @@ bld_tline (
 	buff = screen[j].col;
 
 	/*
-	 * Start with index number of the message and whitespace (2+4+1 chars)
+	 * Start with space for ->
+	 * then index number of the message and whitespace (2+4+1 chars)
 	 */
 	strcpy(buff, "  ");
 	strcat(buff, tin_itoa(l, 4));
@@ -84,8 +85,8 @@ bld_tline (
 			mark = ART_MARK_READ;
 		}
 
-		strcat(buff, "   "); /* tagged/mark filed is 3 chars wide */
-		*(buff+strlen(buff)-1) = mark; /* go back one char and isert mark */
+		strcat(buff, "   ");
+		*(buff+MARK_OFFSET) = mark;			/* insert mark */
 	}
 
 	strcat(buff, "  ");					/* 2 more spaces */
@@ -117,13 +118,12 @@ bld_tline (
 		 * TODO why the -3 ???
 		 * show_lines takes up 8 chars if enabled
 		 */
-		if (show_author != SHOW_FROM_NONE)
+		if (CURR_GROUP.attribute->show_author != SHOW_FROM_NONE)
 			len_from = (max_from - 3) + 8 * (1 - show_lines);
 		else
 			len_from = 0;
 
 #ifdef HAVE_REF_THREADING
-
 		/*
 		 * Indent the subject according to the current depth of threading
 		 */
@@ -131,29 +131,35 @@ bld_tline (
 			strcat(buff, THREAD_SPACER);
 
 			if (strlen(buff) >= cCOLS)		/* If extremely nested */
-				return(0);
+				return;
 		}
 #endif
 
 		/*
-		 * copy in the subject, allow space for author or at end
+		 * Copy in the subject up to where the author (if any) starts
 		 */
-		i = cCOLS - strlen(buff) - len_from - 1;
-		if (i>0) {
+		i = cCOLS - strlen(buff) - len_from;
+		if (i > 0) {
 			strncat(buff, art->subject, i);
 			*(buff + strlen(buff)) = '\0';		/* Just in case */
 		}
 
 		/*
-		 * Pad out to start of author, including space
+		 * If we need to show the author, pad out to the start of the author field,
 		 */
-		for (i=strlen(buff); i < (cCOLS - len_from); i++)
-			*(buff + i) = ' ';
+		if (len_from) {
+/* TODO tidy up this mess fix i--, above ?? */
+			for (i=strlen(buff); i < (cCOLS - len_from); i++)
+				*(buff + i) = ' ';
 
-		/*
-		 * Now add the author info at the end. This will NULL terminate
-		 */
-		get_author (TRUE, art, buff + cCOLS - len_from, len_from);
+		 	/* leaving at least one mandatory space after the subject */
+			*(buff + cCOLS - len_from - 1) = ' ';
+
+			/*
+			 * Now add the author info at the end. This will NULL terminate
+			 */
+			get_author (TRUE, art, buff + cCOLS - len_from, len_from);
+		}
 
 	} else {
 		/*
@@ -163,7 +169,7 @@ bld_tline (
 	}
 
 	if (strip_blanks)					/* No fancy padding needed */
-		return(0);
+		return;
 
 	/*
 	 * Pad to end of line so that inverse bar looks 'good'
@@ -173,12 +179,12 @@ bld_tline (
 
 	*(buff + i) = '\0';
 
-	return(0);
+	return;
 #endif
 }
 
 
-static int
+static void
 draw_tline (
 	int i,
 	int full)
@@ -193,13 +199,12 @@ draw_tline (
 
 	if (full) {
 		s = screen[j].col;
-		tlen = strlen (s);
 		x = 0;
 		if (strip_blanks) {
-			strip_line (s, tlen);
-			tlen = strlen (s);	/* note new line length */
+			strip_line (s);
 			CleartoEOLN ();
 		}
+		tlen = strlen (s);	/* note new line length */
 	} else {
 		tlen = 3; /* tagged/mark is 3 chars wide */
 		s = &screen[j].col[MARK_OFFSET-2];
@@ -221,7 +226,7 @@ draw_tline (
 
 	MoveCursor(INDEX2LNUM(i)+1, 0);
 #endif
-	return(0);
+	return;
 }
 
 /*
