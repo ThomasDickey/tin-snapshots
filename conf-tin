@@ -45,5 +45,5 @@ CC="$CC" \
 	--enable-nntp-only \
 	--disable-mime-strict-charset \
 	--with-mail-gateway=/etc/NNTP_INEWS_DOMAIN \
-	--with-nntp-default-server=news.akk.uni-karlsruhe.de \
+	--with-nntp-default-server=news.rz.uni-karlsruhe.de \
         $OPTS $* 2>&1 |tee -a $OUT

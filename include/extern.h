@@ -16,12 +16,6 @@
  * Library prototypes
  */
 
-#if __STDC__ || defined(__cplusplus)
-#define P_(s) s
-#else
-#define P_(s) ()
-#endif
-
 /*
  * The prototypes bracketed by DECL_xxxx ifdef's are used to get moderately
  * clean compiles on systems with pre-ANSI/POSIX headers when compiler warnings
@@ -1203,5 +1197,3 @@ extern constext txt_help_shell[];
 #ifdef SIGTSTP
 extern int do_sigtstp;
 #endif
-
-#undef P_

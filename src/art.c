@@ -1419,9 +1419,9 @@ subj_comp (p1, p2)
 	 * return result of strcmp (reversed for descending)
 	 */
 	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_SUBJ_ASCEND
-			? (retval = my_stricmp (s1->subject, s2->subject))
+			? (retval = strcasecmp (s1->subject, s2->subject))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
-			: (retval = my_stricmp (s2->subject, s1->subject))
+			: (retval = strcasecmp (s2->subject, s1->subject))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1);
 }
 
@@ -1439,9 +1439,9 @@ from_comp (p1, p2)
 	 * return result of strcmp (reversed for descending)
 	 */
 	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_FROM_ASCEND
-			? (retval = my_stricmp (s1->from, s2->from))
+			? (retval = strcasecmp (s1->from, s2->from))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
-			: (retval = my_stricmp (s2->from, s1->from))
+			: (retval = strcasecmp (s2->from, s1->from))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1);
 }
 

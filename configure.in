@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 29.09.96
+dnl Updated   : 07.12.96
 dnl Notes     : 
 dnl
 dnl Copyright 1996 by Thomas Dickey
@@ -51,7 +51,7 @@ CF_WITH_PROGRAM(pgp,
 ### check for this early, since it'll override several options
 AC_MSG_CHECKING(if NNTP-support will be used)
 CF_ARG_DISABLE(nntp,
-	[  --enable-nntp           reading via NNTP],
+	[  --disable-nntp          disable reading via NNTP],
 	[USE_NNTP=no],
 	[USE_NNTP=yes])
 AC_MSG_RESULT($enableval)
@@ -60,7 +60,7 @@ USE_SPOOLDIR=yes
 if test "$USE_NNTP" = "yes" ; then
 AC_MSG_CHECKING(whether to be NNTP_ONLY)
 CF_ARG_ENABLE(nntp-only,
-	[  --enable-nntp-only      reading via NNTP only],
+	[  --enable-nntp-only      enable reading via NNTP only],
 	[AC_DEFINE(NNTP_ONLY)
 	 USE_SPOOLDIR=no],
 	[AC_DEFINE(NNTP_ABLE)])
@@ -82,7 +82,7 @@ AC_SUBST(ENABLE_DEBUG)
 ###	use option --disable-echo to suppress full display compiling commands
 AC_MSG_CHECKING(if you want to see long compiling messages)
 CF_ARG_DISABLE(echo,
-	[  --enable-echo           display \"compiling\" commands],
+	[  --disable-echo          display \"compiling\" commands],
 	[SHOW_CC='	@echo compiling $@'
     ECHO_CC='@'],
 	[SHOW_CC='# compiling'
@@ -144,6 +144,12 @@ if test "$USE_SPOOLDIR" = "yes"; then
 		[  --with-nov-dir=PATH     news overview-directory],
 		NOVROOTDIR,$SPOOLDIR)
 	AC_MSG_RESULT($NOVROOTDIR)
+
+	AC_MSG_CHECKING(for overview filename)
+	CF_WITH_VALUE(nov-fname,
+		[  --with-nov-fname        specify names of overview files],
+		OVERVIEW_FILE,.overview)
+	AC_MSG_RESULT($OVERVIEW_FILE)
 
 	INEWSPATH="$NEWSLIBDIR"
 else
@@ -283,19 +289,20 @@ AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable ANSI-color)
 CF_ARG_DISABLE(color,
-	[  --enable-color          ANSI-color support],,
+	[  --disable-color         disable ANSI-color support],,
 	[AC_DEFINE(HAVE_COLOR)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable reference-based threading)
 CF_ARG_DISABLE(ref-threading,
-	[  --enable-ref-threading  reference-based threading],,
+	[  --disable-ref-threading
+                          disable reference-based threading],,
 	[AC_DEFINE(HAVE_REF_THREADING)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable posting-etiquette)
 CF_ARG_DISABLE(etiquette,
-	[  --enable-etiquette      print posting-etiquette],
+	[  --disable-etiquette     disable printing of posting-etiquette],
 	[AC_DEFINE(NO_ETIQUETTE)])
 AC_MSG_RESULT($enableval)
 
@@ -315,7 +322,7 @@ AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to force MM_CHARSET obeyance when decoding mime)
 CF_ARG_DISABLE(mime-strict-charset,
-	[  --enable-mime-strict-charset
+	[  --disable-mime-strict-charset
                           force MM_CHARSET obeyance],,
 	[AC_DEFINE(MIME_STRICT_CHARSET)])
 AC_MSG_RESULT($enableval)
@@ -335,14 +342,20 @@ AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
 AC_MSG_CHECKING(whether to enable forged cancels)
 CF_ARG_ENABLE(forgery,
-	[  --enable-forgery        forged cancel support],
+	[  --enable-forgery        enable forged cancel support],
 	[AC_DEFINE(FORGERY)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable locale support)
 CF_ARG_DISABLE(locale,
-	[  --enable-locale         enable locale support],
+	[  --disable-locale        disable locale support],
 	[AC_DEFINE(NO_LOCALE)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to enable piping support)
+CF_ARG_DISABLE(piping,
+	[  --disable-piping        disable piping support],
+	[AC_DEFINE(DONT_HAVE_PIPING)])
 AC_MSG_RESULT($enableval)
 
 ###	checks for operator characteristics (should be the last option)
@@ -463,8 +476,6 @@ CF_SYS_ERRLIST
 
 ###	Checks for library functions.
 AC_CHECK_FUNCS(\
-	bcopy \
-	bzero \
 	ftime \
 	getcwd \
 	is_xterm \
@@ -605,6 +616,7 @@ AC_CHECK_FUNCS(\
 	getservbyname \
 	inet_addr \
 	inet_ntoa \
+	strncasecmp \
 )
 
 if test $ac_cv_func_sigaction = yes; then

@@ -747,8 +747,7 @@ select_done:
 				}
 				grp_mark_unread (&CURR_GROUP);
 				if (CURR_GROUP.newsrc.num_unread) {
-					char smal_buffer[7];
-					sprintf (msg, "%5s", tin_itoa(smal_buffer, CURR_GROUP.newsrc.num_unread, 5));
+					strcpy (msg, tin_itoa(CURR_GROUP.newsrc.num_unread, 5));
 				} else {
 					strcpy (msg, "     ");
 				}
@@ -771,7 +770,6 @@ group_selection_page ()
 
 	char buf[LEN];
 	char new[10];
-	char smal_buffer[7];
 	char subs;
 	int i, j, n;
 	int blank_len;
@@ -843,7 +841,7 @@ group_selection_page ()
 		if (active[my_group[i]].inrange) {
 			strcpy (new, "    #");
 		} else if (active[my_group[i]].newsrc.num_unread) {
-			sprintf (new, "%5s", tin_itoa(smal_buffer, active[my_group[i]].newsrc.num_unread, 5));
+			strcpy (new, tin_itoa(active[my_group[i]].newsrc.num_unread, 5));
  		} else {
  			strcpy (new, "     ");
  		}
@@ -865,23 +863,23 @@ group_selection_page ()
 
 		if (show_description) {
 			if (active[n].description) {
-				sprintf (screen[j].col, "  %c %4s %5s  %-*.*s  %-*.*s\r\n",
-				         subs, tin_itoa(smal_buffer, i+1, 4), new,
+				sprintf (screen[j].col, "  %c %s %s  %-*.*s  %-*.*s\r\n",
+				         subs, tin_itoa(i+1, 4), new,
 				         groupname_len, groupname_len, active_name,
 				         blank_len, blank_len, group_descript);
 			} else {
-				sprintf (screen[j].col, "  %c %4s %5s  %-*.*s  \r\n",
-				         subs, tin_itoa(smal_buffer, i+1, 4), new,
+				sprintf (screen[j].col, "  %c %s %s  %-*.*s  \r\n",
+				         subs, tin_itoa(i+1, 4), new,
 				         (groupname_len+blank_len),
 				         (groupname_len+blank_len), active[n].name);
 			}
 		} else {
 			if (draw_arrow_mark) {
- 				sprintf (screen[j].col, "  %c %4s %5s  %-*.*s\r\n",
-				         subs, tin_itoa(smal_buffer, i+1, 4), new, groupname_len, groupname_len, active_name);
+ 				sprintf (screen[j].col, "  %c %s %s  %-*.*s\r\n",
+				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name);
 			} else {
- 				sprintf (screen[j].col, "  %c %4s %5s  %-*.*s%*s\r\n",
-				         subs, tin_itoa(smal_buffer, i+1, 4), new, groupname_len, groupname_len, active_name,
+ 				sprintf (screen[j].col, "  %c %s %s  %-*.*s%*s\r\n",
+				         subs, tin_itoa(i+1, 4), new, groupname_len, groupname_len, active_name,
  					 blank_len, " ");
 			}
  		}

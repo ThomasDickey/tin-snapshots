@@ -1561,8 +1561,6 @@ bld_sline (i)
 	char art_cnt[9];
 	struct t_art_stat sbuf;
 	register char *buffer;
-	char smal_buffer[6];
-	char smal_buffer2[6];
 	char arts_sub[255];
 	char _from[255];
 
@@ -1580,7 +1578,7 @@ bld_sline (i)
 		n = sbuf.total;
 
 	if ((j = line_is_tagged(respnum)) != 0) {
-		sprintf (new_resps, "%3s", tin_itoa(smal_buffer, j, 3));
+		strcpy (new_resps, tin_itoa(j, 3));
 	} else {
 		sprintf (new_resps, "  %c", sbuf.art_mark);
 	}
@@ -1593,20 +1591,22 @@ bld_sline (i)
 	if (show_lines) {
 		if (n > 1) {
 			if (arts[j].lines != -1) {
-				sprintf (art_cnt, "%3s %4s ", tin_itoa(smal_buffer, n, 3), tin_itoa(smal_buffer2, arts[j].lines, 4));
+				char tmp_buffer[4];
+				strcpy (tmp_buffer, tin_itoa(n, 3));
+				sprintf (art_cnt, "%s %s ", tmp_buffer, tin_itoa(arts[j].lines, 4));
 			} else {
-				sprintf (art_cnt, "%3s    ? ", tin_itoa(smal_buffer, n, 3));
+				sprintf (art_cnt, "%s    ? ", tin_itoa(n, 3));
 			}
 		} else {
 			if (arts[j].lines != -1) {
-				sprintf (art_cnt, "    %4s ", tin_itoa(smal_buffer2, arts[j].lines, 4));
+				sprintf (art_cnt, "    %s ", tin_itoa(arts[j].lines, 4));
 			} else {
 				strcpy (art_cnt, "       ? ");
 			}
 		}
 	} else {
 		if (n > 1) {
-			sprintf (art_cnt, "%3s ", tin_itoa(smal_buffer, n, 3));
+			sprintf (art_cnt, "%s ", tin_itoa(n, 3));
 		} else {
 			strcpy (art_cnt, "    ");
 		}
@@ -1622,8 +1622,8 @@ bld_sline (i)
 	_from[len_from+1] = '\0';
 	arts_sub[len_subj-5+1] = '\0';
 
-	sprintf (buffer = screen[j].col, "  %4s%3s %s%-*.*s%s%-*.*s",
-		 tin_itoa(smal_buffer, i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
+	sprintf (buffer = screen[j].col, "  %s%s %s%-*.*s%s%-*.*s",
+		 tin_itoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, _from);
 	
 	/* protect display from non-displayable characters (e.g., form-feed) */

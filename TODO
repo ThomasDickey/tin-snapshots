@@ -196,14 +196,6 @@ o  compile-time option: generate own MSGIDs on host with a proper FQDN
     own postings)
 
 o  add
-       --with-overview-names
-         (tin assumes that overview-files are named ".overview" 
-          that's not always true)
-
-       --disable-piping               (default off)
-       check for str[n]casecmp() and if necesarry define it to
-       my_str[n]icmp()
-
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 
@@ -245,7 +237,7 @@ o  what is with NEW_HASH_METHOD in misc.c?
 o  what is with HAVE_GENERIC_AUTHINFO in open.c?
 
 o  what is with setup_soft_base - anyone remembering where it was used and
-   the the code was not stripped after it was considered as no longer needed?
+   why the code was not stripped after it was considered as no longer needed?
 
 o  repost ('x') ignores ~/.tin/headers & ~/.tin/attributes - bug or
    feature?!
@@ -333,3 +325,6 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 
 o  marking latest article with 'K' does not jump to top of newsgroup if
    there are still articles to read (group.c:740)
+
+o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
+   when the user is actually in an editor spawned by tin.

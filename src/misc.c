@@ -17,26 +17,23 @@
 
 /*
  * special itoa()
- * converts value into buffer with a max width of digits
- * last char my be one of the following
+ * converts value into a string with a len of digits
+ * last char may be one of the following
  * Kilo, Mega, Giga, Terra
- *
- * warning: NO! range check is done
- * be sure buffer is at least digits+1 chars wide
- * and digits is >=3
  */
 
 char *
-tin_itoa (buffer, value, digits)
-	char *buffer;
-	int value;	/* change value to long int if needed */
+tin_itoa (value, digits)
+	int value;	/* change to long int if needed */
 	int digits;
 {
+	static char buffer[256];
+	char test[256];
+	char power[5];
 	int len;
 	int i=0;
-	char test[256];	/* that should be enought */
-	char power[5]=" KMGT";
 	
+	strcpy (power, " KMGT");
 	sprintf (test, "%d", value);
 	len = strlen (test);
 	while (len > digits) {
@@ -44,14 +41,16 @@ tin_itoa (buffer, value, digits)
 		len-=3;
 		i++;
 	}
-	sprintf(buffer, "%d", value);
+	sprintf(buffer, "%*d", digits, value);
 	if (i) {
-		buffer[len] = power[i];
-		buffer[len+1] = '\0';
+		while (len < (digits-1)) {
+			buffer[len++]=' ';
+		}
+		buffer[digits-1] = power[i];
+		buffer[digits] = '\0';
 	}
 	return (buffer);
 }
-
 
 #ifdef M_UNIX
 /*
@@ -1248,6 +1247,7 @@ my_atol (s, n)
 
 #define FOLD_TO_UPPER(a)	(toupper ((int) (a)))
 
+#ifndef HAVE_STRCASECMP
 int
 my_stricmp (p, q)
 	/* const */ char *p;
@@ -1262,7 +1262,9 @@ my_stricmp (p, q)
 
 	return r;
 }
+#endif
 
+#ifndef HAVE_STRNCASECMP
 int
 my_strnicmp(p, q, n)
 	/* const */ char *p;
@@ -1278,6 +1280,7 @@ my_strnicmp(p, q, n)
 	}
 	return n ? r : 0;
 }
+#endif
 
 /*
  *  Return a pointer into s eliminating any leading Re:'s.  Example:
