@@ -451,14 +451,14 @@ read_cmd_line_options (argc, argv)
 		if (read_news_via_nntp)
 			get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
 		else {
-#if defined(NeXT)
-			char nodenamebuf[32];
-			(int) gethostname(&nodenamebuf, 32);
-			get_newsrcname(newsrc,nodenamebuf);
-#else
+#if defined(HAVE_SYS_UTSNAME_H) && defined(HAVE_UNAME)
 			struct utsname uts;
 			(int) uname(&uts);			
 			get_newsrcname(newsrc,uts.nodename);
+#else	/* NeXT, Apollo */
+			char nodenamebuf[32];
+			(int) gethostname(nodenamebuf, sizeof(nodenamebuf));
+			get_newsrcname(newsrc,nodenamebuf);
 #endif
 		}
 	}

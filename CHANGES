@@ -1,3 +1,24 @@
+--unoff BETA release 961012 --
+
+187) Branden Robinson <branden@purdue.edu>
+     ADD. minor code cleanup
+     ADD. online help updated
+     FIX. several supplied patches
+
+186) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. better debug ability for threading bugs
+     FIX. several supplied patches
+
+185) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. tin stripped tabs out of ALL headers, but that's not usefull for
+          Summary:
+     FIX. page.c
+
+184) Thomas E. Dickey <dickey@clark.net>
+     Nickolai Zeldovich <kolya@zepa.net>
+     ADD. apollo porting (still in progress)
+     FIX. several supplied patches
+
 --unoff BETA release 961006 --
 
 183) Urs Janssen <urs@akk.uni-karlsruhe.de>

@@ -1,0 +1,41 @@
+Using the DEBUG_REFS toggle to get threading information
+--------------------------------------------------------
+
+This file is of use to people wishing to submit bug reports related to
+threading within Tin.
+If you are unable to compile/link Tin yourself, this information will be
+of no use to you.
+
+If Tin crashes whilst trying to thread, or you think it has incorrectly
+threaded a group, then the following instructions will create dump
+files which may help identify the problem.
+
+Warning: The output may be large. A big (~2000 article) group can produce
+in the order of .5Mb of output. It is much more useful if problems
+can be reproduced in groups with as few articles as possible.
+
+1) Recompile Tin with DEBUG_REFS enabled.
+   If you have a build tree already, simply editing refs.c to make 
+
+   #undef DEBUG_REFS
+	read
+   #define DEBUG_REFS	1
+
+   and rebuilding will do it.
+
+2) Start Tin, directing error output to a file, eg:
+
+   ./tin 2>Refs.dump
+
+3) If the problem only occurs when entering a group, enter the group in
+   question. Only the first group you enter will be logged to file.
+
+4) Quit Tin
+
+You should now have two files, Refs.info and whatever file you directed
+error output into.
+
+Submit these two files with information on what you think the problem is
+(if it isn't already obvious)
+
+J. Faultless (08/10/96)

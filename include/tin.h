@@ -80,9 +80,8 @@ extern char *get_uaf_fullname();
 
 #ifdef HAVE_STDDEF_H
 #	include <stddef.h>
-#else
-#	include <sys/types.h>
 #endif
+#include <sys/types.h>
 #include <sys/stat.h>
 
 #ifdef TIME_WITH_SYS_TIME
@@ -184,7 +183,9 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_TERMIOS_H
-#	include <termios.h>
+#	if !defined(apollo) || !defined(NL0)
+#		include <termios.h>
+#	endif
 #endif
 
 #if SYSTEM_LOOKS_LIKE_SCO
@@ -1527,7 +1528,6 @@ extern void joinpath (char *result, char *dir, char *file);
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX		0xff
 #	endif
-#	define joinpath(result,dir,file)	sprintf (result,"%s/%s", dir, (file) ? file : "")
 #endif
 
 #if !defined(S_ISDIR)

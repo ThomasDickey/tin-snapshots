@@ -970,7 +970,6 @@ which_response (n)
  *  Given an index into base[], find the number of responses for
  *  that basenote
  */
-
 int
 num_of_responses (n)
 	int n;
@@ -982,7 +981,7 @@ num_of_responses (n)
 	assert (n < top_base);
 
 	for (i = (int) base[n]; i != -1; i = arts[i].thread) {
-		assert (i != -2);
+		assert (i != ART_EXPIRED);
 		assert (i != oldi);
 		oldi = i;
 		sum++;

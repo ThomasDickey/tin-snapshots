@@ -302,7 +302,7 @@ int
 get_tcp_socket (machine, service, port)
 	char	*machine;	/* remote host */
 	char	*service;	/* nttp/smtp etc. */
-	unsigned short port;	/* tcp port number */
+	unsigned port;		/* tcp port number */
 {
 #ifdef NNTP_ABLE
 	int	s = -1;

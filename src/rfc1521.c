@@ -162,7 +162,7 @@ void
 rfc1521_encode (line, f, e)
 	char *line;
 	FILE *f;
-	char e;
+	int e;
 {
 	static char buffer[80];	/* they must be static for base64 */
 	static char *b = NULL;
@@ -303,7 +303,7 @@ void
 rfc1557_encode (line, f, e)
 	char *line;
 	FILE *f;
-	char e;       /* dummy argument : not used */
+	int e;       /* dummy argument : not used */
 {
 	int i = 0;
         int mode = ASCII;
@@ -366,7 +366,7 @@ void
 rfc1468_encode (line, f, e)
 	char *line;
 	FILE *f;
-	char e;       /* dummy argument : not used */
+	int e;       /* dummy argument : not used */
 {
 	if (line)
 		fputs(line, f);
@@ -377,7 +377,7 @@ void
 rfc1922_encode (line, f, e)
 	char *line;
 	FILE *f;
-	char e;       /* dummy argument : not used */
+	int e;       /* dummy argument : not used */
 {
 	if (line)
 		fputs(line, f);

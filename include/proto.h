@@ -247,6 +247,7 @@ extern void *my_realloc1 P_((char *file, int line, char *p, size_t size));
 
 /* misc.c */
 extern void append_file P_((char *old_filename, char *new_filename));
+extern void joinpath P_((char *result, char *dir, char *file));
 extern void asfail P_((char *file, int line, char *cond));
 extern void copy_fp P_((FILE *fp_ip, FILE *fp_op, char *prefix));
 extern void copy_body P_((FILE *fp_ip, FILE *fp_op, char *prefix, char *initl));
@@ -281,10 +282,10 @@ extern void toggle_inverse_video P_((void));
 extern void show_inverse_video_status P_((void));
 extern int get_arrow_key P_((void));
 extern void create_index_lock_file P_((char *the_lock_file));
-extern int strfquote P_((char *group, int respnum, char *s, int maxsize, char *format));
-extern int strfeditor P_((char *editor, int linenum, char *filename, char *s, int maxsize, char *format));
-extern int strfpath P_((char *format, char *str, int maxsize, char *the_homedir, char *maildir, char *savedir, char *group));
-extern int strfmailer P_((char *the_mailer, char *subject, char *to, char *filename, char *s, int maxsize, char *format));
+extern int strfquote P_((char *group, int respnum, char *s, size_t maxsize, char *format));
+extern int strfeditor P_((char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format));
+extern int strfpath P_((char *format, char *str, size_t maxsize, char *the_homedir, char *maildir, char *savedir, char *group));
+extern int strfmailer P_((char *the_mailer, char *subject, char *to, char *filename, char *s, size_t maxsize, char *format));
 extern int get_initials P_((int respnum, char *s, int maxsize));
 extern void get_cwd P_((char *buf));
 extern void make_group_path P_((char *name, char *path));
@@ -329,7 +330,7 @@ extern void vNewsrcTestHarness P_((void));
 /* nntplib.c */
 extern char *getserverbyfile P_((char *file));
 extern int server_init P_((char *machine, char *service, int port));
-extern int get_tcp_socket P_((char *machine, char *service, int port));
+extern int get_tcp_socket P_((char *machine, char *service, unsigned port));
 extern int handle_server_response P_((int response, char *nntpserver));
 extern void u_put_server P_((char *string));
 extern void put_server P_((char *string));

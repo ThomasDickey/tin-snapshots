@@ -50,6 +50,23 @@ append_file (old_filename, new_filename)
 	fclose (fp_old);
  	fclose (fp_new);
 }
+
+/*
+ * Concatenate dir+file, ensuring that we don't introduce extra '/', since some
+ * systems (e.g., Apollo) use "//" for special purposes.
+ */
+void
+joinpath(result, dir, file)
+	char	*result;
+	char	*dir;
+	char	*file;
+{
+	(void) strcpy(result, dir);
+	if (result[0] == '\0'
+	 || result[strlen(result)-1] != '/')
+		(void) strcat(result, "/");
+	(void) strcat(result, file != 0 ? file : "");
+}
 #endif  /* M_UNIX */
 
 void
@@ -1621,7 +1638,7 @@ strfquote (group, respnum, s, maxsize, format)
 	char *group;
 	int respnum;
 	char *s;
-	int maxsize;
+	size_t maxsize;
 	char *format;
 {
 	char *endp = s + maxsize;
@@ -1776,7 +1793,7 @@ strfeditor (editor, linenum, filename, s, maxsize, format)
 	int linenum;
 	char *filename;
 	char *s;
-	int maxsize;
+	size_t maxsize;
 	char *format;
 {
 	char *endp = s + maxsize;
@@ -1885,7 +1902,7 @@ int
 strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 	char *format;
 	char *str;
-	int maxsize;
+	size_t maxsize;
 	char *the_homedir;
 	char *maildir;
 	char *savedir;
@@ -2126,7 +2143,7 @@ strfmailer (the_mailer, subject, to, filename, s, maxsize, format)
 	char *to;
 	char *filename;
 	char *s;
-	int maxsize;
+	size_t maxsize;
 	char *format;
 {
 	char *endp = s + maxsize;
