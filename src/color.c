@@ -23,11 +23,7 @@
 
 #ifdef HAVE_COLOR
 
-#ifdef HAVE_USE_DEFAULT_COLORS
-#define MIN_COLOR -1
-#else
-#define MIN_COLOR 0
-#endif
+#define MIN_COLOR -1	/* -1 is default, otherwise 0-7 or 0-15 */
 
 int default_fcol = 7;
 int default_bcol = 0;
@@ -118,12 +114,16 @@ void
 fcol (
 	int color)
 {
+	TRACE(("fcol(%d) %s", color, txt_colors[color-MIN_COLOR]))
 	if (use_color) {
 		if (color >= MIN_COLOR && color <= MAX_COLOR) {
 #if USE_CURSES
 			set_colors(color, current_bcol);
 #else
-			int bold = (color >> 3);
+			int bold;
+			if (color < 0)
+				color = default_fcol;
+			bold = (color >> 3);
 			my_printf("\033[%d;%dm", bold, ((color & 7) + 30));
 			if (!bold)
 				bcol(current_bcol);
@@ -141,11 +141,14 @@ void
 bcol (
 	int color)
 {
+	TRACE(("bcol(%d) %s", color, txt_colors[color-MIN_COLOR]))
 	if (use_color) {
 		if (color >= MIN_COLOR && color <= MAX_BACKCOLOR) {
 #if USE_CURSES
 			set_colors(current_fcol, color);
 #else
+			if (color < 0)
+				color = default_bcol;
 			my_printf("\033[%dm", (color + 40));
 #endif
 			current_bcol = color;

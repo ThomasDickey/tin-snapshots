@@ -154,7 +154,7 @@ center_line (
 	int inverse,
 	const char *str)
 {
-	int pos, n;
+	int pos;
 	char buffer[256];
 
 	strncpy(buffer, str, 255);
@@ -174,10 +174,7 @@ center_line (
 	}
 
 	/* protect terminal... */
-	for (n = 0; buffer[n] != '\0'; n++) {
-		if (!(my_isprint((unsigned char) buffer[n])))
-			buffer[n] = '?';
-	}
+	Convert2Printable (buffer);
 
 	if ((int) strlen (buffer) >= cCOLS) {
 		char buf[256];

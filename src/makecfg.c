@@ -172,7 +172,6 @@ generate_tbl (
 	{
 		 ""
 		,"enum option_enum {"
-		,"\tOPT_VERY_FIRST = 0,"
 		,0
 	};
 	static const char *const table_2[] =

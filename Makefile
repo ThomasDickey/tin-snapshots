@@ -4,9 +4,8 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970923
+PVER		= 970930
 VER		= $(LVER)-unoff-BETA-$(PVER)
-MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
 # directory structure
 TOPDIR	= .
@@ -76,7 +75,6 @@ CFILES	= \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
 	$(SRCDIR)/prompt.c \
-	$(SRCDIR)/proto.sed \
 	$(SRCDIR)/refs.c \
 	$(SRCDIR)/regex.c \
 	$(SRCDIR)/rfc1521.c \
@@ -111,12 +109,13 @@ AMIGA	=\
 DOC	= \
 	$(DOCDIR)/CHANGES \
 	$(DOCDIR)/DEBUG_REFS \
-	$(DOCDIR)/minimal-netkeeping \
 	$(DOCDIR)/INSTALL \
 	$(DOCDIR)/TODO \
 	$(DOCDIR)/WHATSNEW \
 	$(DOCDIR)/auth.txt \
+	$(DOCDIR)/minimal-netkeeping \
 	$(DOCDIR)/internals.txt \
+	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
 TOL	= \

@@ -340,14 +340,14 @@ run slightly slower but be more efficient in how memory is allocated and
 reclaimed.
 
 
-
 Compiled & installed on the following machines:
 -----------------------------------------------
 
 1)	i486 & Linux 1.2.13 with gcc 2.7.0
-	i486 & Linux 2.0.30 with gcc 2.7.2.1
+	i486 & Linux 2.0.30 with gcc 2.7.2.2
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
+	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 
 2)	HP 9000/825 & HP-UX 8.00 with cc
 	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2
@@ -383,8 +383,8 @@ Compiled & installed on the following machines:
 
 9)	i486 & NetBSD 1.1 with gcc 2.4.5
 	i486 & NetBSD 1.2 with gcc 2.7.2
-        Amiga 4000 & NetBSD 1.2 with gcc 2.7.2
-	Sun 3/60 & NetBSD 1.2 with gcc 2.7.2
+	Amiga 4000 & NetBSD 1.2 with gcc 2.7.2
+	Sun 3/60 & NetBSD 1.2G with gcc 2.7.2.2
 
 10)	i386 & FreeBSD 2.1.0 with 2.7.2
 

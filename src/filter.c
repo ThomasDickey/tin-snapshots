@@ -17,17 +17,17 @@
 #include	"menukeys.h"
 
 #define IS_READ(i)		(arts[i].status == ART_READ)
-#define IS_KILLED(i)		(arts[i].killed == TRUE)
-#define IS_SELECTED(i)	(arts[i].selected == TRUE)
+#define IS_KILLED(i)		(arts[i].killed)
+#define IS_SELECTED(i)	(arts[i].selected)
 
 #define	SET_FILTER(grp,i,j)	\
 	if (ptr[j].type == FILTER_KILL) { \
-		if (arts[i].killed == FALSE && arts[i].selected == FALSE) { \
+		if (!IS_KILLED(i) && !IS_SELECTED(i)) { \
 			arts[i].killed = TRUE; \
 			art_mark_read (grp, &arts[i]); \
 		} \
 	} else { \
-		if (arts[i].selected == FALSE) { \
+		if (!IS_SELECTED(i)) { \
 			arts[i].selected = TRUE; \
 			arts[i].killed = FALSE; \
 			num_of_selected_arts++; \
@@ -185,8 +185,8 @@ read_filter_file (
 	int i = 0;
 	int icase = 0, type = -1;
 	int xref_max = 0;
-	int xref_score_cnt=0;
-	int xref_score_value=0;
+	int xref_score_cnt = 0;
+	int xref_score_value = 0;
 	time_t current_secs = 0L;
 	long secs = 0L;
 	struct t_group *psGrp;
@@ -246,8 +246,7 @@ if (debug) {
 	my_printf ("Allocating grp_filter for group=[%s]\n", psGrp->name);
 	my_flush ();
 }
-						psGrp->grps_filter =
-							(struct t_filters *) my_malloc (sizeof (struct t_filters));
+						psGrp->grps_filter = (struct t_filters *) my_malloc (sizeof (struct t_filters));
 						psGrp->grps_filter->num = 0;
 						psGrp->grps_filter->max = 0;
 						psGrp->grps_filter->filter = (struct t_filter *) 0;
@@ -808,7 +807,7 @@ filter_menu (
 			return FALSE;
 		} else {
 			if (rule.subj_ok) {
-				rule.from_ok = (i ? TRUE : FALSE);
+				rule.from_ok = (i ? TRUE : FALSE); /* aua! */
 			} else {
 				rule.from_ok = (i ? FALSE : TRUE);
 			}
@@ -829,7 +828,7 @@ filter_menu (
 			return FALSE;
 		} else {
 			if (rule.subj_ok || rule.from_ok) {
-				rule.msgid_ok = (i ? TRUE : FALSE);
+				rule.msgid_ok = (i ? TRUE : FALSE); /* argh! */
 			} else {
 				rule.msgid_ok = (i ? FALSE : TRUE);
 			}
@@ -1007,8 +1006,8 @@ quick_filter_kill (
 	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE);
 	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
-	rule.lines_ok = (header == FILTER_LINES ? TRUE : FALSE);
-	rule.msgid_ok = (header == FILTER_MSGID ? TRUE : FALSE);
+	rule.lines_ok = ((header == FILTER_LINES) ? TRUE : FALSE);
+	rule.msgid_ok = ((header == FILTER_MSGID) ? TRUE : FALSE);
 	if (header == FILTER_FROM_CASE_SENSITIVE ||
 	    header == FILTER_FROM_CASE_IGNORE) {
 		rule.from_ok = TRUE;
@@ -1068,8 +1067,8 @@ quick_filter_select (
 	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE);
 	rule.lines_cmp = FILTER_LINES_NO;
 	rule.lines_num = 0;
-	rule.lines_ok = (header == FILTER_LINES ? TRUE : FALSE);
-	rule.msgid_ok = (header == FILTER_MSGID ? TRUE : FALSE);
+	rule.lines_ok = ((header == FILTER_LINES) ? TRUE : FALSE);
+	rule.msgid_ok = ((header == FILTER_MSGID) ? TRUE : FALSE);
 	if (header == FILTER_FROM_CASE_SENSITIVE ||
 	    header == FILTER_FROM_CASE_IGNORE) {
 		rule.from_ok = TRUE;

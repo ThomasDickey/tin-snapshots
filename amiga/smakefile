@@ -1,10 +1,11 @@
 #
-# $VER: tin_makefile 1.3 (17.7.95)
+# $VER: tin_makefile 2.1 (24.09.97)
 #
 # This is especially for use with the SAS/C developing system
-# version 6.50 and above
+# version 6.55 and above
 #
 # (w) 1994 by Reinhard Luebke (rel)
+# expanded by Volker Barthelmann (vb) and Oliver Warzecha (obw)
 #
 
 AMIDIR   = /amiga
@@ -12,8 +13,9 @@ SRCDIR   = /src
 INCDIR   = /include
 OBJDIR   = /obj
 
-# Timezone stuff for faster spool access
-TZSET = _tzset.o
+# Timezone stuff for faster spool access (obw)
+TZSET    = _tzset.o
+TZSOURCE = sc:source/_tzset.c
 
 # Include the next two lines to enable an NNTP version of TIN.
 # To use AS225 rather than AmiTCP, also include "def AS225".
@@ -35,6 +37,7 @@ GSTFILE  = $(AMIDIR)/tin.gst
 # compile & link flags
 #
 
+# set parameters here, e.g. CPU and additional includes for your TCP/IP stack
 /*vb*/
 #SCOPTIONS = strmer data=near parms=register nover errrexx ignore=85,93,104,105 \
 #                    idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) cpu=$(CPU)
@@ -110,8 +113,7 @@ HEADERS = \
         $(INCDIR)/version.h \
         $(INCDIR)/win32.h \
         $(INCDIR)/win32tcp.h
-#/*vb*/
-#        $(INCDIR)/conf.h \
+#/*vb*/  $(INCDIR)/conf.h \
 
 #
 # list object files
@@ -176,7 +178,7 @@ OBJECTS = \
         $(OBJDIR)/win32.o \
         $(OBJDIR)/win32tcp.o \
         $(OBJDIR)/xref.o \
-#        $(OBJDIR)/_tzset.o \
+# (obw)  $(OBJDIR)/_tzset.o \
 #        $(OBJDIR)/parsdate.c \
 
 
@@ -198,7 +200,7 @@ $(PROJECT):     $(OBJDIR) $(OBJECTS)
         $(OBJECTS) $(OBJDIR)/$(TZSET)
         <
 
-$(TZSET): sc:source/_tzset.c
+$(TZSET): $(TZSOURCE) $(OBJDIR) # /*obw*/
         $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
 
 $(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)

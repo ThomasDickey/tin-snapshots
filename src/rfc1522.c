@@ -20,7 +20,7 @@
    NOT to be treated differently than other characters
    in unstructured headers like Subject, Keyword and Summary
    c.f. RFC 2047 */
-#define isbetween(c,s) (isspace((unsigned char)c) ||   ( (s) == TRUE && ((c) == '(' || (c) == ')') ) || (c) == '"')
+#define isbetween(c,s) (isspace((unsigned char)c) || ((s) && ((c) == '(' || (c) == ')')) || (c) == '"')
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.
@@ -493,7 +493,7 @@ rfc1522_do_encode(
 	ew_taken_len = strlen(mm_charset) + 7;		/* the minimum encoded word length without any encoded text */
 
 	while (*what) {
-		if (break_long_line == TRUE) {
+		if (break_long_line) {
 			word_cnt++;
 		}
 /* if a word with 8bit chars is broken in the middle, whatever follows
@@ -504,7 +504,7 @@ rfc1522_do_encode(
 				if (quoting == FALSE) {
 					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
 					ewsize = mystrcat(&t, buf2);
-					if (break_long_line == TRUE) {
+					if (break_long_line) {
 						if (word_cnt == 2) {
 							/* Make sure we fit the first encoded
 							 * word in with the header keyword,
@@ -593,7 +593,7 @@ rfc1522_do_encode(
 					*t++ = '=';
 					*t++ = ' ';
 					ewsize += 3;
-					if (break_long_line == TRUE) {
+					if (break_long_line) {
 						word_cnt++;
 					}
 					rightafter_ew = FALSE;
@@ -619,7 +619,7 @@ rfc1522_do_encode(
 	*t = 0;
 	/* Pass 2: break long lines if there are MIME-sequences in the result */
 	c = buf;
-	if (break_long_line == TRUE) {
+	if (break_long_line) {
 		column = 0;
 		if (any_quoting_done) {
 			word_cnt = 1;			  /* note, if the user has typed a
@@ -691,7 +691,7 @@ rfc1522_encode(
    long headers in mail messages should be broken up in
    accordance with RFC 2047(1522) */
 #ifndef MIME_BREAK_LONG_LINES
-	if (ismail == TRUE) {
+	if (ismail) {
 		break_long_line = TRUE;
 	}
 #endif

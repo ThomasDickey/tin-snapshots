@@ -925,13 +925,13 @@ quick_post_article (
 	if (ptr) {
 		*ptr = '\0';
 	}
-	psGrp = psGrpFind (group);
 
+	psGrp = psGrpFind (group);
+	get_from_name(from_name, psGrp);
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
 #endif
-	get_from_name(from_name, psGrp);
 	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
 	msg_add_header ("Newsgroups", group);
@@ -1506,11 +1506,11 @@ post_article (
 	}
 	chmod (article, (S_IRUSR|S_IWUSR));
 
+	get_from_name(from_name, psGrp);
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
 #endif
-	get_from_name(from_name, psGrp);
 	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
 	if (art_type == GROUP_TYPE_MAIL) {
@@ -1947,14 +1947,12 @@ ignore_followup_to_poster:
 	}
 	chmod (article, (S_IRUSR|S_IWUSR));
 
+	psGrp = psGrpFind (group);
+	get_from_name(from_name, psGrp);
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
 #endif
-
-	psGrp = psGrpFind (group);
-
-	get_from_name(from_name, psGrp);
 	msg_add_header ("From", from_name);
 
 	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj, TRUE));
@@ -2236,7 +2234,7 @@ mail_to_someone (
 		strip_double_ngs (note_h_newsgroups);
 
 		msg_add_header ("Newsgroups", note_h_newsgroups);
-		
+
 		if (*default_organization) {
 			msg_add_header ("Organization", random_organization(default_organization));
 		}
@@ -2915,11 +2913,11 @@ cancel_article (
 		return FALSE;
 	}
 
+	get_from_name (from_name, group);
 #ifdef FORGERY
 	make_path_header (line, from_name);
 #else
 	get_user_info (user_name, full_name);
-	get_from_name (from_name, group);
 #endif
 
 	if (debug == 2) {

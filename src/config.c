@@ -18,18 +18,10 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-#define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)
-
 static char **ulBuildArgv(char *cmd, int *new_argc);
-static int check_upgrade (char *buf);
 static int match_list ( char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
-static void highlight_option (int option);
-static void print_any_option (int the_option);
-static void print_option (enum option_enum the_option);
-static void show_config_page (int page_no);
-static void unhighlight_option (int option);
-
+static void show_config_page (void);
 
 enum state { IGNORE, CHECK, UPGRADE };
 
@@ -1054,21 +1046,44 @@ write_config_file (
 	}
 }
 
-int first_option_on_screen;
-/*
- * FIXME put in tin.h (or find a better solution). See also: prompt.c
- */
 #define option_lines_per_page (cLINES - INDEX_TOP - 3)
 
-int actual_option_page = 0;
+static int first_option_on_screen;
+static int actual_top_option = 0;
 
-/*
- * Display option in a line containing option number, explaining text,
- * and option value. Note that "act_option" needs to be the option number
- * displayed on the screen, which is different from the option number
- * in the option_table array (the former one is one greater since counting
- * starts with one instead of zero).
- */
+static void
+print_any_option (
+	int act_option)
+{
+	int adjust;
+	constext **list;
+
+	my_printf("%3d. %s ", act_option+1, option_table[act_option].option_text);
+	switch (option_table[act_option].var_type) {
+		case OPT_ON_OFF:
+			my_printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option].var_index]));
+			break;
+		case OPT_LIST:
+			list = option_table[act_option].opt_list;
+			adjust = (strcasecmp(list[0], txt_default) == 0);
+			my_printf("%s", list[*(option_table[act_option].variable) + adjust]);
+			break;
+		case OPT_STRING:
+			my_printf("%-.*s", cCOLS - (int) strlen(option_table[act_option].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option].var_index]);
+			break;
+		case OPT_NUM:
+			my_printf("%d", *(option_table[act_option].variable));
+			break;
+		case OPT_CHAR:
+			my_printf("%c", *OPT_CHAR_list[option_table[act_option].var_index]);
+			break;
+		default:
+			break;
+	}
+#if USE_CURSES
+	clrtoeol();
+#endif
+}
 
 static void
 print_option (
@@ -1077,41 +1092,70 @@ print_option (
 	print_any_option((int)the_option);
 }
 
-static void
-print_any_option (
-	int act_option)
+static t_bool
+OptionOnPage(int option)
 {
-	my_printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
-	switch (option_table[act_option - 1].var_type) {
-		case OPT_ON_OFF:
-			my_printf("%s ", print_boolean(*OPT_ON_OFF_list[option_table[act_option - 1].var_index]));
-			break;
-		case OPT_LIST:
-			if (*(option_table[act_option - 1].variable) < 0) {
-				my_printf("%s", txt_default);
-				break;
-			}
-			my_printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
-			break;
-		case OPT_STRING:
-			my_printf("%-.*s", cCOLS - (int) strlen(option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option - 1].var_index]);
-			break;
-		case OPT_NUM:
-			my_printf("%d", *(option_table[act_option - 1].variable));
-			break;
-		case OPT_CHAR:
-			my_printf("%c", *OPT_CHAR_list[option_table[act_option - 1].var_index]);
-			break;
-		default:
-			break;
+	if ((option >= first_option_on_screen)
+	 && (option <  first_option_on_screen + option_lines_per_page))
+		return TRUE;
+	return FALSE;
+}
+
+#define TopOfPage(option) option_lines_per_page \
+			* ((option) / option_lines_per_page)
+
+#define OptionInPage(option) ((option) - first_option_on_screen)
+#define OptionIndex(option)  (OptionInPage(option) % option_lines_per_page)
+
+int
+option_row(int option)
+{
+	return (INDEX_TOP + OptionIndex(option));
+}
+
+static void
+RepaintOption(int option)
+{
+	if (OptionOnPage(option)) {
+		MoveCursor (option_row(option), 3);
+		print_option (option);
 	}
 }
+
+#if USE_CURSES
+static void DoScroll(int jump)
+{
+	int y, x;
+	getyx(stdscr, y, x);
+	move(INDEX_TOP, 0);
+	setscrreg(INDEX_TOP, INDEX_TOP + option_lines_per_page - 1);
+	scrl(jump);
+	setscrreg(0, LINES-1);
+}
+#endif
 
 static void
 highlight_option (
 	int option)
 {
-	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	if (!OptionOnPage(option)) {
+#if USE_CURSES
+		if (option > 0 && OptionOnPage(option-1)) {
+			DoScroll(1);
+			first_option_on_screen++;
+		} else if (option < LAST_OPT && OptionOnPage(option+1)) {
+			DoScroll(-1);
+			first_option_on_screen--;
+		} else
+#endif
+		{
+			first_option_on_screen = TopOfPage(option);
+			ClearScreen();
+		}
+	}
+
+	refresh_config_page (option);
+	MoveCursor (option_row(option), 0);
 	my_fputs ("->", stdout);
 	my_flush();
 	stow_cursor();
@@ -1121,7 +1165,7 @@ static void
 unhighlight_option (
 	int option)
 {
-	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
+	MoveCursor (option_row(option), 0);
 	my_fputs ("  ", stdout);
 	my_flush();
 }
@@ -1134,34 +1178,26 @@ unhighlight_option (
  * one smaller). Set force_redraw to TRUE if you want to enforce a refresh,
  * and to FALSE if you want to refresh the screen only when necessary
  * (needed by signal.c: config_resize(); the resizing could result in
- * desired_page == actual_option_page even if there are now more/less
+ * first_option_on_page == actual_top_option even if there are now more/less
  * options on the screen than before).
  */
 
 void
-refresh_config_page (
-	int act_option,
-	int force_redraw)
+refresh_config_page (int act_option)
 {
 	static int last_option = 0;
-	int desired_page;
+	int force_redraw = FALSE;
 
-	if (act_option == 0) {	/* Yes, could be done shorter. */
-		if (last_option != 0) {
-			act_option = last_option;
-		}
-		else {
-			act_option = 1;
-		}
+	if (act_option < 0) {
+		force_redraw = TRUE;
+		act_option = last_option;
+		ClearScreen ();
 	}
 
-	/* determine on which page act_option would be */
-	desired_page = (int) (act_option - 1) / option_lines_per_page;
-
-	if ((desired_page != actual_option_page) || force_redraw)
+	if ((first_option_on_screen != actual_top_option) || force_redraw)
 	{
-		show_config_page (desired_page);
-		actual_option_page = desired_page;
+		show_config_page ();
+		actual_top_option = first_option_on_screen;
 	}
 	last_option = act_option;
 }
@@ -1184,13 +1220,13 @@ change_config_file (
 
 	set_signals_config ();
 
-	actual_option_page = -1;
-	option = 1;
+	actual_top_option = -1;
+	option = 0;
 
+	ClearScreen ();
 	set_xclick_off ();
 	forever {
 
-	 	refresh_config_page (option, FALSE);
 	 	highlight_option (option);
 
 		stow_cursor();
@@ -1252,28 +1288,23 @@ change_config_file (
 			case iKeyUp:
 			case iKeyUp2:
 				unhighlight_option (option);
-				option--;
-				if (option < 1)
+				if (--option < 0)
 					option = LAST_OPT;
-				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
 			case iKeyDown:
 			case iKeyDown2:
 				unhighlight_option (option);
-				option++;
-				if (option > LAST_OPT)
-					option = 1;
-				refresh_config_page (option, FALSE);
+				if (++option > LAST_OPT)
+					option = 0;
 				highlight_option (option);
 				break;
 
 			case iKeyFirstPage:
 			case iKeyConfigFirstPage:
 				unhighlight_option (option);
-				option = 1;
-				refresh_config_page (option, FALSE);
+				option = 0;
 				highlight_option (option);
 				break;
 
@@ -1281,7 +1312,6 @@ change_config_file (
 			case iKeyConfigLastPage:
 				unhighlight_option (option);
 				option = LAST_OPT;
-				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
@@ -1289,10 +1319,17 @@ change_config_file (
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 				unhighlight_option (option);
-				option -= option_lines_per_page;
-				if (option < 1)
+				if (OptionInPage(option)) {
+					option = first_option_on_screen;
+				} else if (first_option_on_screen == 0) {
 					option = LAST_OPT;
-				refresh_config_page (option, FALSE);
+					first_option_on_screen = TopOfPage(option);
+				} else if ((option -= option_lines_per_page) < 0) {
+					option = 0;
+					first_option_on_screen = 0;
+				} else {
+					first_option_on_screen -= option_lines_per_page;
+				}
 				highlight_option (option);
 				break;
 
@@ -1300,15 +1337,11 @@ change_config_file (
 			case iKeyPageDown2:
 			case iKeyPageDown3:
 				unhighlight_option (option);
-				option += option_lines_per_page;
-				if (option > LAST_OPT) {
-					if (LAST_OPTION_PAGE == actual_option_page) {
-						option = 1;
-					} else {
-						option = LAST_OPT;
-					}
+				first_option_on_screen += option_lines_per_page;
+				if (first_option_on_screen > LAST_OPT) {
+					first_option_on_screen = 0;
 				}
-				refresh_config_page (option, FALSE);
+				option = first_option_on_screen;
 				highlight_option (option);
 				break;
 
@@ -1316,13 +1349,13 @@ change_config_file (
 			case '6': case '7': case '8': case '9':
 				unhighlight_option (option);
 				old_option = option;
-				option = prompt_num (ch, txt_enter_option_num);
-				if (option < 1 || option > LAST_OPT) {
+				option = prompt_num (ch, txt_enter_option_num) - 1;
+				if (option < 0 || option > LAST_OPT) {
 					option = old_option;
 					break;
 				}
-				refresh_config_page (option, FALSE);
-				/* FALLTHROUGH */
+				highlight_option (option);
+				break;
 
 			case iKeyConfigSelect:
 			case iKeyConfigSelect2:
@@ -1332,7 +1365,7 @@ change_config_file (
 			case iKeyConfigRedrawScr:	/* redraw screen */
 				my_retouch ();
 				set_xclick_off ();
-				refresh_config_page (option, FALSE);
+				highlight_option (option);
 				break;
 
 			default:
@@ -1340,14 +1373,14 @@ change_config_file (
 		} /* switch (ch) */
 
 		if (change_option) {
-			switch (option_table[option - 1].var_type) {
+			switch (option_table[option].var_type) {
 				case OPT_ON_OFF:
-					original_on_off_value = *OPT_ON_OFF_list[option_table[option - 1].var_index];
-					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page,
+					original_on_off_value = *OPT_ON_OFF_list[option_table[option].var_index];
+					prompt_on_off (option_row(option),
 						OPT_ARG_COLUMN,
-						OPT_ON_OFF_list[option_table[option - 1].var_index],
-						option_table[option - 1].help_text,
-						option_table[option - 1].option_text
+						OPT_ON_OFF_list[option_table[option].var_index],
+						option_table[option].help_text,
+						option_table[option].option_text
 						);
 					/*
 					 * some options need further action to take effect
@@ -1386,11 +1419,7 @@ change_config_file (
 							unhighlight_option (option);
 							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
 								inverse_okay = TRUE;
-								if ((int)OPT_INVERSE_OKAY > first_option_on_screen
-								 && (int)OPT_INVERSE_OKAY < first_option_on_screen + option_lines_per_page) {
-									MoveCursor (INDEX_TOP + (OPT_INVERSE_OKAY - 1) % option_lines_per_page, 3);
-									print_option (OPT_INVERSE_OKAY);
-								}
+								RepaintOption(OPT_INVERSE_OKAY);
 							}
 							break;
 
@@ -1400,18 +1429,14 @@ change_config_file (
 							unhighlight_option (option);
 							if (draw_arrow_mark == FALSE && inverse_okay == FALSE) {
 								draw_arrow_mark = TRUE;	/* we don't want to navigate blindly */
-								if ((int)OPT_DRAW_ARROW_MARK > first_option_on_screen
-								 && (int)OPT_DRAW_ARROW_MARK <= first_option_on_screen + option_lines_per_page + 1) {
-									MoveCursor (INDEX_TOP + (OPT_DRAW_ARROW_MARK - 1) % option_lines_per_page, 3);
-									print_option (OPT_DRAW_ARROW_MARK);
-								}
+								RepaintOption(OPT_DRAW_ARROW_MARK);
 							}
 							break;
 
 						case OPT_MAIL_8BIT_HEADER:
 							if (strcasecmp(txt_mime_types[mail_mime_encoding], txt_8bit)) {
 								mail_8bit_header = FALSE;
-								MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
+								MoveCursor (option_row(OPT_MAIL_8BIT_HEADER), 3);
 								print_option (OPT_MAIL_8BIT_HEADER);
 							}
 							break;
@@ -1419,7 +1444,7 @@ change_config_file (
 						case OPT_POST_8BIT_HEADER:
 							if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit)) {
 								post_8bit_header = FALSE;
-								MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
+								MoveCursor (option_row(OPT_POST_8BIT_HEADER), 3);
 								print_option (OPT_POST_8BIT_HEADER);
 							}
 							break;
@@ -1498,14 +1523,14 @@ change_config_file (
 					break;
 
 				case OPT_LIST:
-					original_list_value = *(option_table[option - 1].variable);
-					*(option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
+					original_list_value = *(option_table[option].variable);
+					*(option_table[option].variable) = prompt_list (option_row(option),
 								OPT_ARG_COLUMN,
-								*(option_table[option - 1].variable), /*default_post_proc_type,*/
-								option_table[option - 1].help_text,
-								option_table[option - 1].option_text,
-								option_table[option - 1].opt_list,
-								option_table[option - 1].opt_count
+								*(option_table[option].variable), /*default_post_proc_type,*/
+								option_table[option].help_text,
+								option_table[option].option_text,
+								option_table[option].opt_list,
+								option_table[option].opt_count
 								);
 
 					/*
@@ -1596,41 +1621,33 @@ change_config_file (
 							if (tin_bbs_mode) break;
 #endif
 							prompt_option_string (option);
-							expand_rel_abs_pathname (INDEX_TOP + (option - 1) % option_lines_per_page,
-								OPT_ARG_COLUMN + (int) strlen (option_table[option - 1].option_text),
-								OPT_STRING_list[option_table[option - 1].var_index]
+							expand_rel_abs_pathname (option_row(option),
+								OPT_ARG_COLUMN + (int) strlen (option_table[option].option_text),
+								OPT_STRING_list[option_table[option].var_index]
 								);
 							break;
 
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
-							mime_type = *(option_table[option - 1].variable);
-							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
+							mime_type = *(option_table[option].variable);
+							mime_type = prompt_list (option_row(option),
 										OPT_ARG_COLUMN,
 										mime_type,
-										option_table[option - 1].help_text,
-										option_table[option - 1].option_text,
-										option_table[option - 1].opt_list,
-										option_table[option - 1].opt_count
+										option_table[option].help_text,
+										option_table[option].option_text,
+										option_table[option].opt_list,
+										option_table[option].opt_count
 										);
-							*(option_table[option - 1].variable) = mime_type;
+							*(option_table[option].variable) = mime_type;
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
 							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
 								if (option == (int)OPT_POST_MIME_ENCODING) {
 									post_8bit_header = FALSE;
-									if (((int)OPT_POST_8BIT_HEADER > first_option_on_screen)
-									 && ((int)OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
-										MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
-										print_option (OPT_POST_8BIT_HEADER);
-									}
+									RepaintOption(OPT_POST_8BIT_HEADER);
 								} else {
 									mail_8bit_header = FALSE;
-									if (((int)OPT_MAIL_8BIT_HEADER > first_option_on_screen)
-									 && ((int)OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
-										MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
-										print_option (OPT_MAIL_8BIT_HEADER);
-									}
+									RepaintOption(OPT_MAIL_8BIT_HEADER);
 								}
 							}
 							break;
@@ -1670,7 +1687,7 @@ change_config_file (
 
 				default:
 					break;
-			} /* switch (option_table[option - 1].var_type) */
+			} /* switch (option_table[option].var_type) */
 			change_option = FALSE;
 			show_menu_help (txt_select_config_file_option);
 		} /* if (change_option) */
@@ -1764,11 +1781,6 @@ match_color (
 				*dst = 0;
 			}
 		}
-#ifndef HAVE_USE_DEFAULT_COLORS
-		if (*dst < 0)
-			*dst = 0;
-#endif
-
 		return TRUE;
 	}
 	return FALSE;
@@ -1920,30 +1932,30 @@ quote_space_to_dash (
 
 /*
  * display current configuration page
- * page numbering starts with zero; argument page_no is expected to be valid
  */
 
 static void
-show_config_page (
-	int page_no)
+show_config_page (void)
 {
 	int i, lines_to_print = option_lines_per_page;
 
+#if !USE_CURSES
 	ClearScreen ();
+#endif
 	center_line (0, TRUE, txt_options_menu);
 
-	first_option_on_screen = page_no * option_lines_per_page;
 	/*
 	 * on last page, there need not be option_lines_per_page options
 	 */
 	if (first_option_on_screen + option_lines_per_page > LAST_OPT)
-		lines_to_print = LAST_OPT - first_option_on_screen;
+		lines_to_print = LAST_OPT + 1 - first_option_on_screen;
 
-	for (i = 0;i < lines_to_print;i++)
+	for (i = 0; i < lines_to_print;i++)
 	{
 		MoveCursor (INDEX_TOP + i, 3);
-		print_option (first_option_on_screen + i + 1);
+		print_option (first_option_on_screen + i);
 	}
+	CleartoEOS ();
 
 	show_menu_help (txt_select_config_file_option);
 	my_flush();

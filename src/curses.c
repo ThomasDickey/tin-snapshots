@@ -35,8 +35,12 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 #		undef	HZ /* looks like a bug in M_XENIX includefiles */
 #	endif
 /* it doesn't do any harm, and <curses.h> may have conflicting defs */
-#	undef TRUE
-#	undef FALSE
+#	ifdef TRUE
+#		undef TRUE
+#	endif
+#	ifdef FALSE
+#		undef FALSE
+#	endif
 #	include <curses.h>
 #endif
 
@@ -785,10 +789,10 @@ Raw (
 	int state)
 {
 #ifdef VMS
-	if (state == FALSE && _inraw) {
+	if (!state && _inraw) {
 /*	  vmsnoraw();*/
 	  _inraw = 0;
-	} else if (state == TRUE && !_inraw) {
+	} else if (state && !_inraw) {
 /*	  vmsraw();*/
 	  _inraw = 1;
 	}
@@ -799,10 +803,10 @@ Raw (
 	_inraw = state;
 	rawcon (state);
 #else
-	if (state == FALSE && _inraw) {
+	if (!state && _inraw) {
 		SET_TTY (&_original_tty);
 		_inraw = 0;
-	} else if (state == TRUE && !_inraw) {
+	} else if (state && !_inraw) {
 		GET_TTY (&_original_tty);
 		GET_TTY (&_raw_tty);
 #if USE_SGTTY
@@ -1027,7 +1031,7 @@ OUTC_FUNCTION(outchar)
  *  setup to monitor mouse buttons if running in a xterm
  */
 
-void
+static void
 xclick (
 	int state)
 {
@@ -1035,7 +1039,7 @@ xclick (
 	static int prev_state = 999;
 
 	if (xclicks && prev_state != state) {
-		if (state == TRUE) {
+		if (state) {
 			tputs (_xclickinit, 1, outchar);
 		} else {
 			tputs (_xclickend, 1, outchar);

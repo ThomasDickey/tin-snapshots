@@ -1,3 +1,44 @@
+--unoff BETA release 970930 --
+
+453) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. cosmetic patch
+     FIX. art.c, init.c, main.c, misc.c, signal.c
+
+452) Urs Janssen <urs@tin.org>
+     ADD. replaced explicit 'TRUE' comparisons
+     BUG. adjusted prototype for OUTC_ARGS (needed for HP-UX)
+     FIX. aclocal.m4, curses.c, feed.c, filter.c, page.c, rfc1522.c
+
+451) Branden Robinson <branden@purdue.edu>
+     BUG. newline missing after txt_info_postponed
+     FIX. lang.c
+
+450) Sven Paulus <sven@tin.org>
+     BUG. forgery was broken (introduced in 440)
+     FIX. post.c
+
+449) Thomas E. Dickey <dickey@clark.net>
+     BUG. conflict in config file between termcap and curses
+          version's handling of default color values
+     BUG. 'M' config menu isn't scrollable in curses.
+     BUG. call on get_arrow_key() that requires an extra
+          <return> after a shell command.
+     ADD. call to reset keypad mode in curses after a shell command
+     ADD. modify tcurses.c version of my_printf, etc., to turn off raw mode
+          if they're called when the program is in command-line (or batch)
+          mode.
+     FIX. Makefile, aclocal.m4, configure[.in], extern.h, proto.h, tin.h,
+          makefile[.in], charset.c, color.c, config.c, curses.c, init.c,
+          lang.c, makecfg.c, page.c, prompt.c, signal.c, tcurses.c, thread.c
+
+448) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. minor code cleanup (check for nonprintable chars)
+     FIX. group.c, page.c, screen.c, thread.c
+
+447) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. minor makefile-tuning
+     FIX. smakefile
+
 --unoff BETA release 970923 --
 
 446) Ralf Doeblitz <r.doeblitz@tu-bs.de>

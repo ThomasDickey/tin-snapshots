@@ -42,7 +42,7 @@ done
 dnl ---------------------------------------------------------------------------
 dnl This is adapted from the macros 'fp_PROG_CC_STDC' and 'fp_C_PROTOTYPES'
 dnl in the sharutils 4.2 distribution.
-AC_DEFUN([CF_ANSI_CC],
+AC_DEFUN([CF_ANSI_CC_CHECK],
 [
 AC_MSG_CHECKING(for ${CC-cc} option to accept ANSI C)
 AC_CACHE_VAL(cf_cv_ansi_cc,[
@@ -74,12 +74,29 @@ done
 CFLAGS="$cf_save_CFLAGS"
 ])
 AC_MSG_RESULT($cf_cv_ansi_cc)
+
 if test "$cf_cv_ansi_cc" != "no"; then
 if test ".$cf_cv_ansi_cc" != ".-DCC_HAS_PROTOS"; then
 	CFLAGS="$CFLAGS $cf_cv_ansi_cc"
-fi
 else
-	AC_ERROR(This program requires an ANSI compiler)
+	AC_DEFINE(CC_HAS_PROTOS)
+fi
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl For programs that must use an ANSI compiler, obtain compiler options that
+dnl will make it recognize prototypes.  We'll do preprocessor checks in other
+dnl macros, since tools such as unproto can fake prototypes, but only part of
+dnl the preprocessor.
+AC_DEFUN([CF_ANSI_CC_REQD],
+[AC_REQUIRE([CF_ANSI_CC_CHECK])
+if test "$cf_cv_ansi_cc" = "no"; then
+	AC_ERROR(
+[Your compiler does not appear to recognize prototypes.
+You have the following choices:
+	a. adjust your compiler options
+	b. get an up-to-date compiler
+	c. use a wrapper such as unproto])
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
@@ -383,7 +400,7 @@ AC_MSG_RESULT($cf_cv_cpp_expands)
 test $cf_cv_cpp_expands = yes && AC_DEFINE(CPP_DOES_EXPAND)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl
+dnl Check if 'errno' is declared in <errno.h>
 AC_DEFUN([CF_ERRNO],
 [
 AC_MSG_CHECKING([for errno external decl])
@@ -404,9 +421,13 @@ dnl	$1 = library name
 dnl	$2 = includes
 dnl	$3 = code fragment to compile/link
 dnl	$4 = corresponding function-name
+dnl
+dnl Sets the variable "$cf_libdir" as a side-effect, so we can see if we had
+dnl to use a -L option.
 AC_DEFUN([CF_FIND_LIBRARY],
 [
 	cf_cv_have_lib_$1=no
+	cf_libdir=""
 	AC_CHECK_FUNC($4,cf_cv_have_lib_$1=yes,[
 		cf_save_LIBS="$LIBS"
 		AC_MSG_CHECKING(for $4 in -l$1)
@@ -508,10 +529,11 @@ dnl
 dnl	-Wconversion (useful in older versions of gcc, but not in gcc 2.7.x)
 dnl	-Wredundant-decls (system headers make this too noisy)
 dnl	-Wtraditional (combines too many unrelated messages, only a few useful)
+dnl	-Wwrite-strings (too noisy, but should review occasionally)
 dnl	-pedantic
 dnl
 AC_DEFUN([CF_GCC_WARNINGS],
-[EXTRA_CFLAGS=""
+[
 if test -n "$GCC"
 then
 	changequote(,)dnl
@@ -523,6 +545,8 @@ EOF
 	AC_CHECKING([for gcc warning options])
 	cf_save_CFLAGS="$CFLAGS"
 	EXTRA_CFLAGS="-W -Wall"
+	cf_warn_CONST=""
+	test "$with_ext_const" = yes && cf_warn_CONST="Wwrite-strings"
 	for cf_opt in \
 		Wbad-function-cast \
 		Wcast-align \
@@ -532,19 +556,20 @@ EOF
 		Wmissing-prototypes \
 		Wnested-externs \
 		Wpointer-arith \
-		Wwrite-strings \
 		Wshadow \
-		Wstrict-prototypes
+		Wstrict-prototypes $cf_warn_CONST
 	do
 		CFLAGS="$cf_save_CFLAGS $EXTRA_CFLAGS -$cf_opt"
 		if AC_TRY_EVAL(ac_compile); then
 			test -n "$verbose" && AC_MSG_RESULT(... -$cf_opt)
 			EXTRA_CFLAGS="$EXTRA_CFLAGS -$cf_opt"
+			test "$cf_opt" = Wcast-qual && EXTRA_CFLAGS="$EXTRA_CFLAGS -DXTSTRINGDEFINES"
 		fi
 	done
 	rm -f conftest*
 	CFLAGS="$cf_save_CFLAGS"
 fi
+AC_SUBST(EXTRA_CFLAGS)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Construct a search-list for a nonstandard header-file
@@ -606,9 +631,11 @@ AC_MSG_RESULT($cf_cv_makeflags)
 AC_SUBST(cf_cv_makeflags)
 ])dnl
 dnl ---------------------------------------------------------------------------
-AC_DEFUN([CF_MSG_LOG],
-echo "(line __oline__) testing $* ..." 1>&5
-)dnl
+dnl Write a debug message to config.log, along with the line number in the
+dnl configure script.
+AC_DEFUN([CF_MSG_LOG],[
+echo "(line __oline__) testing $* ..." 1>&AC_FD_CC
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Look for the SVr4 curses clone 'ncurses' in the standard places, adjusting
 dnl the CPPFLAGS variable.
@@ -628,8 +655,17 @@ AC_DEFUN([CF_NCURSES_CPPFLAGS],
 [
 AC_MSG_CHECKING(for ncurses header file)
 AC_CACHE_VAL(cf_cv_ncurses_header,[
-	AC_TRY_COMPILE([#include <curses.h>],
-	[printf("%s\n", NCURSES_VERSION)],
+	AC_TRY_COMPILE([#include <curses.h>],[
+#ifdef NCURSES_VERSION
+printf("%s\n", NCURSES_VERSION);
+#else
+#ifdef __NCURSES_H
+printf("pre-1.8.7\n");
+#else
+make an error
+#endif
+#endif
+	],
 	[cf_cv_ncurses_header=predefined],[
 	CF_HEADER_PATH(cf_search,ncurses)
 	test -n "$verbose" && echo
@@ -753,28 +789,34 @@ dnl	-lnsl -lsocket
 dnl	-lsocket
 dnl	-lbsd
 AC_DEFUN([CF_NETLIBS],[
-NETLIBS=""
-#
+cf_test_netlibs=no
+AC_MSG_CHECKING(for network libraries)
+AC_CACHE_VAL(cf_cv_netlibs,[
+AC_MSG_RESULT(working...)
+cf_cv_netlibs=""
+cf_test_netlibs=yes
 AC_CHECK_FUNCS(gethostname,,[
-	CF_RECHECK_FUNC(gethostname,nsl,NETLIBS,[
-		CF_RECHECK_FUNC(gethostname,socket,NETLIBS)])])
+	CF_RECHECK_FUNC(gethostname,nsl,cf_cv_netlibs,[
+		CF_RECHECK_FUNC(gethostname,socket,cf_cv_netlibs)])])
 #
 # FIXME:  sequent needs this library (i.e., -lsocket -linet -lnsl), but
 # I don't know the entrypoints - 97/7/22 TD
-AC_HAVE_LIBRARY(inet,NETLIBS="-linet $NETLIBS")
+AC_HAVE_LIBRARY(inet,cf_cv_netlibs="-linet $cf_cv_netlibs")
 #
 if test "$ac_cv_func_lsocket" != no ; then
 AC_CHECK_FUNCS(socket,,[
-	CF_RECHECK_FUNC(socket,socket,NETLIBS,[
-		CF_RECHECK_FUNC(socket,bsd,NETLIBS)])])
+	CF_RECHECK_FUNC(socket,socket,cf_cv_netlibs,[
+		CF_RECHECK_FUNC(socket,bsd,cf_cv_netlibs)])])
 fi
 #
 AC_CHECK_FUNCS(gethostbyname,,[
-	CF_RECHECK_FUNC(gethostbyname,nsl,NETLIBS)])
+	CF_RECHECK_FUNC(gethostbyname,nsl,cf_cv_netlibs)])
 #
 AC_CHECK_FUNCS(strcasecmp,,[
-	CF_RECHECK_FUNC(strcasecmp,resolv,NETLIBS)])
-LIBS="$LIBS $NETLIBS"
+	CF_RECHECK_FUNC(strcasecmp,resolv,cf_cv_netlibs)])
+])
+LIBS="$LIBS $cf_cv_netlibs"
+test $cf_test_netlibs = no && echo "$cf_cv_netlibs" >&AC_FD_MSG
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl See if sum can take -r
@@ -975,7 +1017,18 @@ AC_CACHE_VAL(cf_cv_dcl_sys_errlist,[
     [cf_cv_dcl_sys_errlist=yes],
     [cf_cv_dcl_sys_errlist=no])])
 AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
-test $cf_cv_dcl_sys_errlist = no && AC_DEFINE(DECL_SYS_ERRLIST)
+
+# It's possible (for near-UNIX clones) that sys_errlist doesn't exist
+if test $cf_cv_dcl_sys_errlist = no ; then
+    AC_DEFINE(DECL_SYS_ERRLIST)
+    AC_MSG_CHECKING([existence of sys_errlist])
+    AC_CACHE_VAL(cf_cv_have_sys_errlist,[
+        AC_TRY_LINK([#include <errno.h>],
+            [char *c = (char *) *sys_errlist],
+            [cf_cv_have_sys_errlist=yes],
+            [cf_cv_have_sys_errlist=no])])
+    AC_MSG_RESULT($cf_cv_have_sys_errlist)
+fi
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Derive the system name, as a check for reusing the autoconf cache
@@ -1099,7 +1152,7 @@ AC_MSG_RESULT($cf_cv_tm_gmtoff)
 test $cf_cv_tm_gmtoff = no && AC_DEFINE(DONT_HAVE_TM_GMTOFF)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl	Check for return and param type of 3rd -- OutChar() -- param of tputs().
+dnl Check for return and param type of 3rd -- OutChar() -- param of tputs().
 AC_DEFUN([CF_TYPE_OUTCHAR],
 [AC_MSG_CHECKING([declaration of tputs 3rd param])
 AC_CACHE_VAL(cf_cv_type_outchar,[
@@ -1112,7 +1165,9 @@ for S in "" const; do
 	AC_TRY_COMPILE([
 #ifdef USE_TERMINFO
 #include <curses.h>
+#if HAVE_TERM_H
 #include <term.h>
+#endif
 #else
 #if HAVE_CURSES_H
 #include <curses.h>	/* FIXME: this should be included only for terminfo */
@@ -1208,18 +1263,32 @@ AC_DEFINE_UNQUOTED($3,"[$]$3")dnl
 dnl ---------------------------------------------------------------------------
 dnl Wrapper for AC_ARG_WITH to ensure that user supplies a pathname, not just
 dnl defaulting to yes/no.
+dnl
+dnl $1 = option name
+dnl $2 = help-text
+dnl $3 = environment variable to set
+dnl $4 = default value, shown in the help-message, must be a constant
+dnl $5 = default value, if it's an expression & cannot be in the help-message
+dnl
 AC_DEFUN([CF_WITH_PATH],
 [AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
-ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
+ifelse($4,,[withval="${$3}"],[withval="${$3-ifelse($5,,$4,$5)}"]))dnl
 case ".$withval" in #(vi
-./*)
+./*) #(vi
+  ;;
+.\${*) #(vi
+  eval withval="$withval"
+  case ".$withval" in #(vi
+  .NONE/*)
+    withval=`echo $withval | sed -e s@NONE@$ac_default_prefix@`
+    ;;
+  esac
   ;; #(vi
 *)
-  echo 'configure: error: expected a pathname for $3' 1>&2
-  exit 1
+  AC_ERROR(expected a pathname for $1)
   ;;
 esac
-$3="$withval"
+eval $3="$withval"
 AC_SUBST($3)dnl
 ])dnl
 dnl ---------------------------------------------------------------------------

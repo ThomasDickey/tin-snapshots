@@ -42,7 +42,7 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_YACC
 AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
-CF_ANSI_CC
+CF_ANSI_CC_REQD
 
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
@@ -120,6 +120,7 @@ CF_ARG_ENABLE(warnings,
 AC_MSG_RESULT($with_warnings)
 if test "$with_warnings" = "yes"
 then
+	with_ext_const=yes
 	CF_GCC_WARNINGS
 fi
 fi

@@ -46,8 +46,8 @@ extern void write_attributes_file (char *file);
 
 /* charset.c */
 extern int iIsArtTexEncoded (long art, char *group_path);
-extern void Convert2Printable (unsigned char* buf);
-extern void ConvertBody2Printable (unsigned char* buf);
+extern void Convert2Printable (char* buf);
+extern void ConvertBody2Printable (char* buf);
 extern void ConvertIso2Asc (char *iso, char *asc, int t);
 extern void ConvertTeX2Iso (char *from, char *to);
 
@@ -64,9 +64,10 @@ extern int match_boolean (char *line, const char *pat, t_bool *dst);
 extern int match_integer (char *line, const char *pat, int *dst, int maxlen);
 extern int match_long (char *line, const char *pat, long *dst);
 extern int match_string (char *line, const char *pat, char *dst, size_t dstlen);
+extern int option_row(int option);
 extern int read_config_file (char *file, int global_file);
 extern void quote_dash_to_space (char *str);
-extern void refresh_config_page (int act_option, int force_redraw);
+extern void refresh_config_page (int act_option);
 extern void show_menu_help (const char *help_message);
 extern void write_config_file (char *file);
 #ifdef HAVE_COLOR
@@ -96,7 +97,6 @@ extern void set_keypad_on (void);
 extern void set_xclick_off (void);
 extern void set_xclick_on (void);
 extern void setup_screen (void);
-extern void xclick (int state);
 
 /* debug.c */
 #ifdef DEBUG

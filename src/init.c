@@ -14,6 +14,7 @@
 
 #include	"tin.h"
 #include	"tnntp.h"
+#include	"trace.h"
 #include	"menukeys.h"
 #include	"version.h"
 #include	"bugrep.h"
@@ -349,6 +350,7 @@ void postinit_colors(void)
 				break;
 			}
 		}
+		TRACE(("postinit_colors [%d] = %d", n, *(our_colors[n].colorp)))
 	}
 }
 #endif
@@ -958,23 +960,23 @@ got_active:
 void
 set_up_private_index_cache (void)
 {
-	int	c;
-	char	*from;
+	int c;
+	char *from;
 	struct stat sb;
-	char	*to;
+	char *to;
 
 	if (! cache_overview_files)
 		return;
 	if (! local_index) {
 		error_message (txt_caching_disabled, "");
-		cache_overview_files = 0;
+		cache_overview_files = FALSE;
 		return;
 	}
 	if (cmdline_nntpserver[0] == 0)
 		return;
 	to = index_newsdir + strlen (index_newsdir);
 	*(to++) = '-';
-	for (from = cmdline_nntpserver; (c = *from) != 0; ++ from) {
+	for (from = cmdline_nntpserver; (c = *from) != 0; ++from) {
 		if ('A' <= c && c <= 'Z')
 			c += 'a' - 'A';
 		*(to++) = c;

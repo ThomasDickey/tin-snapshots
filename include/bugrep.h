@@ -20,7 +20,7 @@
 #	endif
 
 #	ifdef M_UNIX
-#		define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
+#		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
 #	endif
 
 #	ifdef M_OS2
@@ -36,7 +36,7 @@
 #	endif
 
 #	ifndef BUG_REPORT_ADDRESS
-#		define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
+#		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
 #	endif
 
 #endif /* !BUGREP_H */

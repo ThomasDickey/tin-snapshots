@@ -212,7 +212,7 @@ handle_resize (int repaint)
 			wait_message (buf);
 			break;
 		case cConfig:
-			refresh_config_page (0, TRUE);
+			refresh_config_page (-1);
 			break;
 		case cHelp:
 			display_info_page (TRUE);
@@ -327,7 +327,7 @@ void _CDECL signal_handler (int sig)
 		progname, signal_name(sig), sig);
 #if defined(SIGUSR1)
 	if (sig == SIGUSR1)
-		tin_done (- SIGUSR1) ;
+		tin_done (- SIGUSR1);
 #endif
 #if defined(SIGBUS) || defined(SIGSEGV)
 	if (

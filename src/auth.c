@@ -367,6 +367,6 @@ authenticate (
 	return (authinfo_generic () || authinfo_original (server, user, startup));
 }
 #else
-void no_authenticate (void) { }
+static void no_authenticate (void) { }
 
 #endif /* !INDEX_DAEMON || NNTP_ABLE */

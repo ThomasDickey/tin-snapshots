@@ -798,13 +798,13 @@ char	buf2[HEADER_LEN];
  *  from NNTP if they're cached locally.
  */
 	if (cache_overview_files && read_news_via_nntp && xover_supported) {
-		read_news_via_nntp = FALSE ;
-		iReadNovFile (group, min, max, expired) ;
-		read_news_via_nntp = TRUE ;
+		read_news_via_nntp = FALSE;
+		iReadNovFile (group, min, max, expired);
+		read_news_via_nntp = TRUE;
 		if (last_read_article >= max)
-			return top ;
+			return top;
 		if (last_read_article >= min)
-			min = last_read_article + 1 ;
+			min = last_read_article + 1;
 	}
 	/*
 	 * open the overview file (whether it be local or via nntp)
