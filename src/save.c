@@ -1327,7 +1327,6 @@ post_process_sh (auto_delete)
 	FILE *fp_in, *fp_out;
 	int found_header;
 	int i, j;
-	size_t patlen1, patlen2, patlen3;
 
 	strcpy (sh_pattern_1, "#! /bin/sh");
 	strcpy (sh_pattern_2, "#!/bin/sh");
@@ -1372,18 +1371,16 @@ post_process_sh (auto_delete)
 				ptr1 = sh_pattern_1;
 				ptr2 = sh_pattern_2;
 				ptr3 = sh_pattern_3;
-				patlen1 = strlen (sh_pattern_1);
-				patlen2 = strlen (sh_pattern_2);
-				patlen3 = strlen (sh_pattern_3);
+
 				while (! feof (fp_in)) {
 					if (fgets (buf, sizeof buf, fp_in)) {
 						/*
 						 *  find #!/bin/sh or #! /bin/sh pattern
 						 */
 						if (! found_header) {
-							if (str_str (buf, ptr1, patlen1) != 0 ||
-								str_str (buf, ptr2, patlen2) != 0 ||
-								str_str (buf, ptr3, patlen3) != 0) {
+							if (strstr (buf, ptr1) != 0 ||
+								strstr (buf, ptr2) != 0 ||
+								strstr (buf, ptr3) != 0) {
 								found_header = TRUE;
 							}
 						}

@@ -87,6 +87,9 @@ rfc1521_decode (file)
 
 	/* pass article header unchanged */
 	while (fgets (buf, sizeof (buf), file)) {
+#ifdef LOCAL_CHARSET
+		buffer_to_local(buf);
+#endif
 		fputs (buf, f);
 		/* NOTE:  I know it is a bug not to merge header lines starting
 		 * with whitespace to the preceding one, but I guess we can
@@ -100,18 +103,31 @@ rfc1521_decode (file)
 		if (*buf == '\r' || *buf == '\n')
 			break;
 	}
+#ifndef LOCAL_CHARSET
+	/*
+	 * if we have a different local charset, we also convert articles
+	 * that do not have MIME headers, since e.g. quoted text may contain
+	 * accented chars on non-MIME newsreaders.
+	 */
+
 	/* no MIME headers, no decoding */
-	if (! *content_type || !*content_transfer_encoding) {
+	if (!*content_transfer_encoding) {
 		fclose (f);
 		rewind (file);
 		return file;
 	}
-	/* see if type text/plain */
-	if (strncasecmp (content_type, "text/plain", 10)) {
+	
+	/*
+	 * see if type text/plain. if content-type is empty,
+	 *	"text/plain; charset=us-ascii" is implicit.
+	 */
+	if (*content_type && strncasecmp(content_type, "text/plain", 10)!=0) {
 		fclose (f);
 		rewind (file);
 		return file;
 	}
+#endif
+
 	/*
 	 * see if charset matches (we do not attempt to convert charsets at
 	 * this point of time - maybe in the future)
@@ -140,15 +156,32 @@ rfc1521_decode (file)
 				buf2[i] = '\0';
 			else
 				strcpy (buf2, buf);
+#ifdef LOCAL_CHARSET
+			buffer_to_local(buf2);
+#endif
 			fputs (buf2, f);
 		}
 		fclose (file);
 		rewind (f);
 		return f;
 	}
+#ifdef LOCAL_CHARSET
+	/* if we have a different local charset, we also have to convert
+	   8bit articles (and we also convert 7bit articles thay may contain
+	   accented characters due to incorrectly configured newsreaders */
+	while (fgets(buf, 2048, file)) {
+		buffer_to_local(buf);
+		fputs(buf, f);
+	}
+	
+	fclose(file);
+	rewind(f);
+	return f;
+#else
 	fclose (f);
 	rewind (file);
 	return file;
+#endif
 }
 
 #define HI4BITS(c) (unsigned)(*EIGHT_BIT(c) >> 4)

@@ -90,7 +90,7 @@ submit_inews (name)
 	/*
 	 * Check that domain is not of type  host.subdomain.domain
 	 */
-	ptr = str_str (from_name, "subdomain.domain", 16);
+	ptr = strstr (from_name, "subdomain.domain");
 	if (ptr != (char *) 0) {
 		error_message ("Invalid  From: %s line. Reconfigure your domainname.", from_name);
 		fclose (fp);

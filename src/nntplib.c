@@ -99,6 +99,10 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		ifdef HAVE_NETLIB_H
 #			include <netlib.h>
 #		endif
+#		ifndef EXCELAN
+/* this was included above already */
+/*#			include <netdb.h>*/
+#		endif
 #		if defined(__GNUC__) && defined(sun)
 			extern int connect (int s, struct sockaddr *name, int namelen);
 			extern char *inet_ntoa (struct in_addr in);

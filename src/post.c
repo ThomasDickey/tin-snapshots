@@ -14,7 +14,7 @@
 
 #include	"tin.h"
 #include	"menukeys.h"
-#include	"patchlev.h"
+#include	"version.h"
 
 #define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); fflush (stdout); Raw (TRUE);}
 
@@ -2275,7 +2275,7 @@ delete_article (group, art, respnum)
 		error_message (msg, "");
 	}
 
-	if (! str_str (from_name, art->from, strlen (art->from))) {
+	if (! strstr (from_name, art->from)) {
 #ifdef FORGERY
 		author = FALSE;
 #else
@@ -2521,7 +2521,7 @@ repost_article (group, art, respnum, supersede)
 		get_user_info (user_name, full_name);
 		get_from_name (user_name, host_name, full_name, from_name);
 
-		if (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))) {
+		if (strstr (from_name, arts[respnum].from)) {
 #else
 		make_path_header (line, from_name);
 		msg_add_header ("Path", line);
@@ -2560,16 +2560,12 @@ repost_article (group, art, respnum, supersede)
 		 * adding the msgid of the original article to the
 		 * References header - is this needed?
 		 */
-#if 0
-		msg_add_header ("References", note_h_references);
-#else
 		join_references (buf, note_h_references, "");
 		msg_add_header ("References", buf);
-#endif
 		}
 
 #ifndef FORGERY
-	if (! supersede || (supersede && (! (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+	if (! supersede || (supersede && (! (strstr (from_name, arts[respnum].from))))) {
 #else
 	if (! supersede) {
 #endif
@@ -2591,7 +2587,7 @@ repost_article (group, art, respnum, supersede)
 	msg_free_headers ();
 
 #ifndef FORGERY
-	if (! supersede || (supersede && (! (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+	if (! supersede || (supersede && (! (strstr (from_name, arts[respnum].from))))) {
 #else
 	if (! supersede) {
 #endif
@@ -2620,7 +2616,7 @@ repost_article (group, art, respnum, supersede)
 
 	/* on supersede change default-key */
 #ifndef FORGERY
-	if (supersede && (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))))
+	if (supersede && (strstr (from_name, arts[respnum].from)))
 #else
 	if (supersede)
 #endif
@@ -2664,7 +2660,7 @@ repost_article (group, art, respnum, supersede)
 
  		case iKeyPostPost:
 #ifndef FORGERY
-		if (supersede && (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))) {
+		if (supersede && (strstr (from_name, arts[respnum].from))) {
 #else
 		if (supersede) {
 #endif
@@ -2918,7 +2914,7 @@ insert_from_header (infile)
 			/*
 			 * Check that domain is not of type  host.subdomain.domain
 			 */
-			ptr = str_str (from_name, "subdomain.domain", 16);
+			ptr = strstr (from_name, "subdomain.domain");
 			if (ptr != (char *) 0) {
 				error_message (txt_invalid_from2, from_name);
 				return FALSE;

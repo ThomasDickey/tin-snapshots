@@ -13,7 +13,7 @@
  */
 
 #include	"tin.h"
-#include	"patchlev.h"
+#include	"version.h"
 
 #if defined(M_AMIGA)
 
@@ -42,7 +42,7 @@ extern struct DosLibrary *DOSBase;
 
 /*
 ** something for the AmigaDOS Version command
-** AMIVER is defined in ../include/patchlev.h
+** AMIVER is defined in ../include/version.h
 ** __AMIGADATE__ is defined by the SC 6.55 preprocessor
 */
 static const char verstag[] = "$VER: tin " AMIVER " " __AMIGADATE__ "\0";

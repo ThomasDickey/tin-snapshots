@@ -38,7 +38,6 @@ search_author (the_index, current_art, forward)
 	char buf2[LEN];
 	char group_path[PATH_LEN];
 	int i;
-	size_t patlen;
 
 	clear_message ();
 
@@ -69,8 +68,6 @@ search_author (the_index, current_art, forward)
 
 	str_lwr (default_author_search, buf);
 
-	patlen = strlen (default_author_search);
-
 	i = current_art;
 
 	do {
@@ -97,7 +94,7 @@ search_author (the_index, current_art, forward)
 			str_lwr (msg, buf2);
 		}
 
-		if (str_str (buf2, buf, patlen) != 0) {
+		if (strstr (buf2, buf) != 0) {
 			/*
 			 * check if article still exists
 			 */
@@ -123,7 +120,6 @@ search_group (forward)
 	char buf[LEN];
 	char buf2[LEN];
 	int i;
-	size_t patlen;
 
 	if (! group_top) {
 		info_message (txt_no_groups);
@@ -157,8 +153,6 @@ search_group (forward)
 
 	str_lwr (default_group_search, buf);
 
-	patlen = strlen (default_group_search);
-
 	i = cur_groupnum;
 
 	do {
@@ -180,7 +174,7 @@ search_group (forward)
 		}
 		str_lwr (buf2, buf2);
 
-		if (str_str (buf2, buf, patlen) != 0) {
+		if (strstr (buf2, buf) != 0) {
 			if (_hp_glitch) {
 				erase_group_arrow ();
 			}
@@ -203,8 +197,8 @@ search_group (forward)
 
 /*
  * group.c
+ * Search for a Subject line in the current group
  */
-
 void
 search_subject (forward)
 	int forward;
@@ -212,7 +206,7 @@ search_subject (forward)
 	char buf[LEN];
 	char buf2[LEN];
 	int i, j;
-	size_t patlen;
+	int found = FALSE;
 
 	if (index_point < 0) {
 		info_message (txt_no_arts);
@@ -221,17 +215,15 @@ search_subject (forward)
 
 	clear_message ();
 
-	if (forward) {
+	if (forward)
 		sprintf (buf2, txt_search_forwards, default_subject_search);
-	} else {
+	else
 		sprintf (buf2, txt_search_backwards, default_subject_search);
-	}
 
-	if (! prompt_string (buf2, buf)) {
+	if (! prompt_string (buf2, buf))		/* Get search string from user */
 		return;
-	}
 
-	if (strlen (buf)) {
+	if (strlen (buf)) {						/* See if to use the default */
 		strcpy (default_subject_search, buf);
 	} else {
 		if (default_subject_search[0]) {
@@ -243,47 +235,71 @@ search_subject (forward)
 	}
 
 	wait_message (txt_searching);
-
 	str_lwr (default_subject_search, buf);
 
-	patlen = strlen (default_subject_search);
-
-	i = index_point;
+	i = index_point;						/* Search from current position */
 
 	do {
-		if (forward)
-			i++;
-		else
-			i--;
+		(forward) ? i++ : i--;
 
 		if (i >= top_base)
 			i = 0;
+
 		if (i < 0)
 			i = top_base - 1;
 
-		j = (int) base[i];
+		j = (int) base[i];				/* Get index in arts[] of thread root */
 
-		str_lwr (arts[j].subject, buf2);
+		/*
+		 * With threading on References, Subject lines can change mid thread.
+		 * We must descend the rest of the thread in these cases
+		 * TODO - optimise when subject is constant (use ptr into hash ?)
+		 */
+#ifdef HAVE_REF_THREADING
+		if (CURR_GROUP.attribute->thread_arts < THREAD_REFS) {
+			str_lwr (arts[j].subject, buf2);
+			if (strstr(buf2, buf) != 0) {
+				found = TRUE;
+				break;
+			}
+		} else {
+			int art;
 
-		if (str_str (buf2, buf, patlen) != 0) {
-			if (_hp_glitch) {
-				erase_subject_arrow ();
+			for (art = j ; art >= 0 ; art = arts[art].thread) {
+
+				str_lwr (arts[art].subject, buf2);
+				if (strstr(buf2, buf) != 0) {
+					found = TRUE;
+					goto found;		/* I know... I know !! */
+				}
 			}
-			if (i >= first_subj_on_screen
-			    &&  i < last_subj_on_screen) {
-				clear_message ();
-				erase_subject_arrow ();
-				index_point = i;
-				draw_subject_arrow ();
-			} else {
-				index_point = i;
-				show_group_page ();
-			}
-			return;
 		}
+#else
+		str_lwr (arts[j].subject, buf2);
+		if (strstr(buf2, buf) != 0) {
+			found = TRUE;
+			break;
+		}
+#endif
+
 	} while (i != index_point);
 
-	info_message (txt_no_match);
+found:
+	if (found) {
+		if (_hp_glitch)
+			erase_subject_arrow ();
+
+		if (i >= first_subj_on_screen && i < last_subj_on_screen) {
+			clear_message ();
+			erase_subject_arrow ();
+			index_point = i;
+			draw_subject_arrow ();
+		} else {
+			index_point = i;
+			show_group_page ();
+		}
+	} else
+		info_message (txt_no_match);
 }
 
 /*
@@ -301,7 +317,6 @@ search_article (forward)
 	char *p, *q;
 	int ctrl_L;
 	int i, j;
-	size_t patlen;
 	int orig_note_end;
 	int orig_note_page;
 
@@ -331,8 +346,6 @@ search_article (forward)
 	wait_message (txt_searching);
 
 	str_lwr (default_art_search, pattern);
-
-	patlen = strlen (default_art_search);
 
 	/*
 	 *  save current position in article
@@ -380,7 +393,7 @@ search_article (forward)
 
 			str_lwr (buf2, string);
 
-			if (str_str (string, pattern, patlen) != 0) {
+			if (strstr (string, pattern) != 0) {
 				fseek (note_fp, note_mark[note_page], 0);
 				return TRUE;
 			}
@@ -415,7 +428,6 @@ search_body (group, current_art)
 	char temp[20];
 	int aborted = FALSE;
 	int art_cnt = 0, i;
-	size_t len;
 	int count = 0;
 
 	clear_message ();
@@ -439,7 +451,6 @@ search_body (group, current_art)
 
 	make_group_path (group->name, group_path);
 	str_lwr (default_art_search, pat);
-	len = strlen (pat);
 
 	if (group->attribute->show_only_unread) {
 		for (i = 0 ; i < top_base ; i++) {
@@ -465,7 +476,7 @@ search_body (group, current_art)
 			continue;
 		}
 
-		if (search_art_body (group_path, &arts[i], pat, len)) {
+		if (search_art_body (group_path, &arts[i], pat)) {
 			return i;
 		}
 
@@ -496,11 +507,10 @@ search_body (group, current_art)
 
 
 int
-search_art_body (group_path, art, pat, len)
+search_art_body (group_path, art, pat)
 	char *group_path;
 	struct t_article *art;
 	char *pat;
-	size_t len;
 {
 	char buf[LEN];
 	FILE *fp;
@@ -519,7 +529,7 @@ search_art_body (group_path, art, pat, len)
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		str_lwr (buf, buf);
-		if (str_str (buf, pat, len)) {
+		if (strstr (buf, pat)) {
 			fclose (fp);
 			return TRUE;
 		}

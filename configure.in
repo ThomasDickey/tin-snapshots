@@ -379,6 +379,7 @@ AC_CHECK_HEADERS(\
 	errno.h \
 	fcntl.h \
 	ioctl.h \
+	libc.h \
 	locale.h \
 	malloc.h \
 	netdb.h \

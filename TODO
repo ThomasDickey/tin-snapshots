@@ -1,5 +1,14 @@
 Bugs
 ----
+o  ispell checks all headers
+
+o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
+
+o  reposting of a thread does not work
+
+o  with --enable-forgery reposting of an article fails
+   'x' 'a' 'r' <group> 'p' -> 441 missing From:
+
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
 
@@ -83,6 +92,8 @@ o  when changing the window size while in options menu, the article/group/
 
 New features
 ------------
+o  add support for ispell language change
+
 o  add rfc1468/1922 support
 
 o  add a weed-out list like in elm so the user could specify which headers
@@ -150,6 +161,11 @@ o  add feature goto using the 'G' key
    Quoted text
    uuencode header lines
    etc...
+
+o  Add '/' (search subject) to the thread menu
+   Add 'S' (autosave tagged) to the thread menu
+
+o  Add 'l' (goto thread menu) to the article pager
 
 o  if Newsgroups:-line has groups in it which are not present in the users
    active file ask the user if he wants to strip these groups from the

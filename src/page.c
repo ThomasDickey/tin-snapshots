@@ -181,7 +181,7 @@ restart:
 				break;
 
 #ifndef NO_SHELL_ESCAPE
-			case iKeyPageShell:
+			case iKeyShellEscape:
 				shell_escape ();
 				redraw_page (group->name, respnum);
 				break;
@@ -208,7 +208,7 @@ end_of_article:
 				feed_articles (FEED_PIPE, PAGE_LEVEL, group, respnum);
 				break;
 
-			case iKeyPageFSearchSubj:	/* search forwards in article */
+			case iKeySearchSubjF:	/* search forwards in article */
 				if (search_article (TRUE)) {
 					show_note_page (group->name, respnum);
 				}
@@ -382,7 +382,7 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPageFirstPage:		/* goto beginning of article */
+			case iKeyFirstPage:		/* goto beginning of article */
 			case iKeyPageFirstPage2:
 			case iKeyPageFirstPage3:
 begin_of_article:
@@ -1255,14 +1255,12 @@ art_open (art, group_path)
 		/* check for continued header line */
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
 		      && strlen(buf)<sizeof(buf)-1) {
-		  if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
-			  if (is_summary) {
-				  buf[strlen(buf)]='\0';
-			  } else {
+			if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+				if (! is_summary) {
 				  buf[strlen(buf)-1]='\0';
-			  }
-		  }
-		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
+				}
+			}
+		fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
 		}
 
 		for (ptr = buf ; *ptr && ((*ptr!='\n') || (ptr[1]!='\0')); ptr++) {
@@ -1273,41 +1271,41 @@ art_open (art, group_path)
 		}
 		*ptr = '\0';
 
-  		if (match_header (buf, "Path", note_h_path, HEADER_LEN))
+  		if (match_header (buf, "Path", note_h_path, NULL, HEADER_LEN))
   			continue;
-		if (match_header (buf, "From", note_h_from, HEADER_LEN))
+		if (match_header (buf, "From", note_h_from, NULL, HEADER_LEN))
 			continue;
-  		if (match_header (buf, "Subject", note_h_subj, HEADER_LEN))
+  		if (match_header (buf, "Subject", note_h_subj, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Organization", note_h_org, HEADER_LEN))
+  		if (match_header (buf, "Organization", note_h_org, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Date", note_h_date, HEADER_LEN))
+  		if (match_header (buf, "Date", note_h_date, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Newsgroups", note_h_newsgroups, HEADER_LEN))
+  		if (match_header (buf, "Newsgroups", note_h_newsgroups, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Message-ID", note_h_messageid, HEADER_LEN))
+  		if (match_header (buf, "Message-ID", note_h_messageid, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "References", note_h_references, HEADER_LEN))
+  		if (match_header (buf, "References", note_h_references, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Distribution", note_h_distrib, HEADER_LEN))
+  		if (match_header (buf, "Distribution", note_h_distrib, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Followup-To", note_h_followup, HEADER_LEN))
+  		if (match_header (buf, "Followup-To", note_h_followup, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Keywords", note_h_keywords, HEADER_LEN))
+  		if (match_header (buf, "Keywords", note_h_keywords, NULL, HEADER_LEN))
   			continue;
-  		if (match_header (buf, "Summary", note_h_summary, HEADER_LEN))
+  		if (match_header (buf, "Summary", note_h_summary, NULL, HEADER_LEN))
   			continue;
-		if (match_header (buf, "Mime-Version", note_h_mimeversion, HEADER_LEN))
+		if (match_header (buf, "Mime-Version", note_h_mimeversion, NULL, HEADER_LEN))
 			continue;
-		if (match_header (buf, "Content-Type", note_h_contenttype, HEADER_LEN)) {
+		if (match_header (buf, "Content-Type", note_h_contenttype, NULL, HEADER_LEN)) {
 			str_lwr (note_h_contenttype, note_h_contenttype);
 			continue;
 		}
-		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, HEADER_LEN)) {
+		if (match_header (buf, "Content-Transfer-Encoding", note_h_contentenc, NULL, HEADER_LEN)) {
 			str_lwr (note_h_contentenc, note_h_contentenc);
 			continue;
 		}
-		if (match_header (buf, "X-Comment-To", note_h_ftnto, HEADER_LEN))
+		if (match_header (buf, "X-Comment-To", note_h_ftnto, NULL, HEADER_LEN))
 			continue;
 	}
 
@@ -1461,10 +1459,11 @@ show_last_page ()
 }
 
 
-void modifiedstrncpy(target, source, size)
+void modifiedstrncpy(target, source, size, decode)
 char *target;
 char *source;
 int size;
+int decode;
 {
         char buf[2048];
 	int count;
@@ -1480,7 +1479,11 @@ int size;
 		else source++;
 	}
 	*c = 0;
-	c = rfc1522_decode(buf);
+	if(decode)
+		c = rfc1522_decode(buf);
+	else
+		c=buf;
+
 	while (--size) {
 	        *target++ = *c++;
 	}
@@ -1499,10 +1502,11 @@ int size;
  * 			portion of buf (ie with pat: and leading space removed)
  */
 int
-match_header (buf, pat, body, len)
+match_header (buf, pat, body, nodec_body, len)
 	char *buf;
 	char *pat;
 	char *body;
+	char *nodec_body;
 	size_t len;
 {
 	size_t	plen = strlen (pat);
@@ -1529,8 +1533,27 @@ match_header (buf, pat, body, len)
 		/*
 		 * Copy the 'body' of the header into return string
 		 */
-		modifiedstrncpy (body, &buf[plen], len);
+
+#ifdef LOCAL_CHARSET
+		/* 
+		 * we have a bit of a problem here, if the header
+		 * contains 8 bit character, they were already
+		 * converted to local charset in rfc1521_decode, they
+		 * will be decoded again by rfc1522_decode in modified
+		 * strncpy. We just convert the chars back to network
+		 * charset for now, but this should be done
+		 * differently, I would guess.
+		 */
+		buffer_to_network(buf+plen);
+#endif
+
+		modifiedstrncpy (body, &buf[plen], len, TRUE);
 		body[len - 1] = '\0';
+
+		if(nodec_body) {
+			modifiedstrncpy (nodec_body, &buf[plen], len, FALSE);
+			nodec_body[len - 1] = '\0';
+		}
 
 		return TRUE;
 	}

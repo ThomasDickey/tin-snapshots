@@ -110,7 +110,7 @@ constext txt_error_no_write_permission[] = "No write permissions for %s\n";
 constext txt_error_no_enter_permission[] = "No permissions to go into %s\n";
 constext txt_error_no_such_file[] = "File %s does not exists\n";
 constext txt_warn_difficulties[] = "Okay, but you may run into difficulties later\n";
-constext txt_external_mail_done[] = "leaving external mailreader";
+constext txt_external_mail_done[] = "leaving external mail-reader";
 constext txt_extracting_archive[] = "\r\n\r\nExtracting %s archive...\r\n";
 constext txt_extracting_shar[] ="\r\nExtracting %s...\r\n";
 constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %s. Exiting...";
@@ -182,7 +182,7 @@ constext txt_help_beginner_level[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.
 constext txt_help_bug[] = "R\t  report bug or comment via mail to %s\r\n";
 constext txt_help_cC[] = "C\t  mark all articles as read and display next group with unread articles\r\n";
 constext txt_help_c[] = "c\t  mark all articles as read and exit to group choices menu\r\n";
-constext txt_help_catchup_groups[] = "Ask to mark groups read when quiting. <SPACE> toggles & <CR> sets.";
+constext txt_help_catchup_groups[] = "Ask to mark groups read when quitting. <SPACE> toggles & <CR> sets.";
 constext txt_help_ck[] = "c K\t  mark thread as read (K = don't confirm) and return to previous level\r\n";
 #ifdef HAVE_COLOR
 constext txt_help_col_back[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -221,15 +221,15 @@ constext txt_help_ctrl_l[] = "^L\t  redraw page\r\n";
 constext txt_help_d[] = "d\t  toggle display of subject or subject plus author\r\n";
 constext txt_help_dash[] = "-\t  display last article viewed\r\n";
 constext txt_help_draw_arrow[] = "Draw -> or highlighted bar for selection. <SPACE> toggles & <CR> sets.";
-constext txt_help_e[] =  "e\t  edit article (mailgroups only)\r\n";
-constext txt_help_editor_format[] = "Enter %E for editor, %F for filename, %N for linenumber, <CR> to set.";
+constext txt_help_e[] =  "e\t  edit article (mail-groups only)\r\n";
+constext txt_help_editor_format[] = "Enter %E for editor, %F for filename, %N for line-number, <CR> to set.";
 constext txt_help_esc[] = "<ESC>\t  escape from command prompt\r\n";
 constext txt_help_equal[] = "=\t  select threads that match user specified pattern\r\n";
 constext txt_help_filter_days[] = "Enter default number of days a filter entry will be valid. <CR> sets.";
 constext txt_help_force_screen_redraw[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_g[] = "g\t  choose group by name\r\n";
-constext txt_help_g_c[] = "c\t  Mark group as all read\r\n";
-constext txt_help_g_caret_dollar[] = "^ $\t  Choose first ($ = last) group in list\r\n";
+constext txt_help_g_c[] = "c\t  mark group as all read\r\n";
+constext txt_help_g_caret_dollar[] = "^ $\t  choose first ($ = last) group in list\r\n";
 constext txt_help_g_cr[] = "<CR>\t  read chosen group\r\n";
 constext txt_help_g_ctrl_r[] = "^R\t  reset .newsrc (all available articles in groups marked unread\r\n";
 constext txt_help_g_d[] = "d\t  toggle display of group name only or group name plus description\r\n";
@@ -239,6 +239,7 @@ constext txt_help_g_q[] = "q Q\t  quit\r\n";
 constext txt_help_g_r[] = "r\t  toggle display to show all/unread subscribed groups\r\n";
 constext txt_help_g_search[] = "/ ?\t  choose group by group name string forward (? = backward) search\r\n\t  (all searches are case-insensitive and wrap around group list)\r\n";
 constext txt_help_g_tab[] = "n <TAB>\t  enter next group with unread news\r\n";
+constext txt_help_g_x[] = "X\t  quit without saving (changed) configuration\r\n";
 constext txt_help_g_y[] = "y\t  toggle display to show all/subscribed groups\r\n";
 constext txt_help_g_z[] = "z\t  mark all articles in chosen group unread\r\n";
 constext txt_help_group_catchup_on_exit[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -265,20 +266,20 @@ constext txt_help_j[] = "j k\t  down (k = up) one line\r\n";
 constext txt_help_keep_dead_articles[] = "Keep all failed articles in ~/dead.articles. <SPACE> toggles & <CR> sets.";
 #endif
 constext txt_help_keep_posted_articles[] = "Keep all posted articles in ~/Mail/posted. <SPACE> toggles & <CR> sets.";
-constext txt_help_l[] = "l\t  list articles within current thread (bring up Thread submenu)\r\n";
+constext txt_help_l[] = "l\t  list articles within current thread (bring up Thread sub-menu)\r\n";
 constext txt_help_m[] = "m\t  move chosen group within list\r\n";
 constext txt_help_mail_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_mail_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #ifdef FORGERY
 constext txt_help_mail_address[] = "Enter default mail address. <CR> sets.";
 #endif
-constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M MessageId %N Name %C First Name";
+constext txt_help_mail_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-Id %N Name %C First Name";
 constext txt_help_maildir[] = "The directory where articles/threads are to be saved in mailbox format.";
 constext txt_help_mailer_format[] = "Enter %M for mailer, %S for subject, %T for to, %F for filename, <CR> to set.";
 constext txt_help_mark_saved_read[] = "Mark saved articles/threads as read. <SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_mm_charset[] = "Enter charset name for MIME (e.g. US-ASCII, ISO-8859-1, EUC-KR), <CR> to set.";
 constext txt_help_n[] = "N\t  choose next group with unread news\r\n";
-constext txt_help_news_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M MessageId %N Name %C First Name";
+constext txt_help_news_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-Id %N Name %C First Name";
 constext txt_help_no_advertising[] = "If ON, do not include X-Newsreader: header. <SPACE> toggles & <CR> sets.";
 constext txt_help_o[] = "o\t  output article/thread/hot/pattern/tagged articles to printer\r\n";
 constext txt_help_p_caret_dollar[] = "^ $\t  display first ($ = last) page of article\r\n";
@@ -371,7 +372,7 @@ constext txt_help_use_mouse[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_v[] = "v\t  show version information\r\n";
 constext txt_help_w[] = "w\t  post (write) article to current group\r\n";
 constext txt_help_x[] = "x\t  repost chosen article to another group\r\n";
-constext txt_help_xpost_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M MessageID %N Name %C First Name";
+constext txt_help_xpost_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-ID %N Name %C First Name";
 constext txt_help_y[] = "Y\t  yank in active file to see any new news\r\n";
 constext txt_help_s_i[] ="i\t  show description of chosen newsgroup\r\n";
 constext txt_help_g_t_p_i[] ="i\t  show subject of selected article\r\n";
@@ -379,7 +380,7 @@ constext txt_hit_any_key[] = "-- Press any key to continue --";
 constext txt_hit_space_for_more[] = "PgDn,End,<SPACE>,^D - page down. PgUp,Home,b,^U - page up. <CR>,q - quit";
 constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
 constext txt_invalid_from1[] = "Invalid  From: %s  line. Read the INSTALL file again.";
-constext txt_invalid_from2[] = "Invalid  From: %s line. Reconfigure your domainname.";
+constext txt_invalid_from2[] = "Invalid  From: %s line. Reconfigure your domain-name.";
 constext txt_inverse_off[] = "Inverse video disabled";
 constext txt_inverse_on[] = "Inverse video enabled";
 constext txt_last_resp[] = "-- Last response --";
@@ -477,7 +478,7 @@ constext txt_opt_col_title[] = 			"Color of help/mail sign            : ";
 constext txt_opt_confirm_action[] = 		"Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = 		"Confirm before quitting            : ";
 constext txt_opt_draw_arrow[] = 		"Draw -> instead of highlighted bar : ";
-constext txt_opt_editor_format[] = 		"Invokation of your editor          : ";
+constext txt_opt_editor_format[] = 		"Invocation of your editor          : ";
 constext txt_opt_filter_days[] = 		"No. of days a filter entry is valid: ";
 constext txt_opt_force_screen_redraw[] = 	"Force redraw after certain commands: ";
 constext txt_opt_group_catchup_on_exit[] = 	"Catchup group using left key       : ";
@@ -495,7 +496,7 @@ constext txt_opt_mail_address[] =		"Forged mail address                : ";
 constext txt_opt_mail_mime_encoding[] = 	"MIME encoding in mail messages     : ";
 constext txt_opt_mail_quote_format[] = 		"Quote line when mailing            : ";
 constext txt_opt_maildir[] = 			"Mail directory                     : ";
-constext txt_opt_mailer_format[] = 		"Invokation of your mail command    : ";
+constext txt_opt_mailer_format[] = 		"Invocation of your mail command    : ";
 constext txt_opt_mark_saved_read[] = 		"Mark saved articles/threads as read: ";
 constext txt_opt_mm_charset[] = 		"MM_CHARSET                         : ";
 constext txt_opt_news_quote_format[] = 		"Quote line when following up       : ";
@@ -508,7 +509,7 @@ constext txt_opt_print_header[] = 		"Print all header when printing     : ";
 constext txt_opt_printer[] = 			"Printer program with options       : ";
 constext txt_opt_process_type[] = 		"Post process saved art/thread with : ";
 constext txt_opt_process_unread[] = 		"Process only unread articles       : ";
-constext txt_opt_quote_chars[] = 		"Characters used as quotemarks      : ";
+constext txt_opt_quote_chars[] = 		"Characters used as quote-marks      : ";
 constext txt_opt_reread_active_file_secs[] = 	"Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = 	"Save mail in MMDF style            : ";
 constext txt_opt_savedir[] = 			"Directory to save arts/threads in  : ";
@@ -542,7 +543,7 @@ constext txt_opt_use_mailreader[] = 		"Use interactive mail reader        : ";
 constext txt_opt_use_metamail[] =		"Use metamail upon MIME articles    : ";
 #endif
 constext txt_opt_use_mouse[] = 			"Use mouse in xterm                 : ";
-constext txt_opt_xpost_quote_format[] = 	"Quote line when crossposting       : ";
+constext txt_opt_xpost_quote_format[] = 	"Quote line when cross-posting       : ";
 constext txt_option_not_enabled[] = "Option not enabled. Recompile with %s.";
 constext txt_options_menu[] = "Options Menu";
 constext txt_out_of_memory[] = "%s: memory exhausted trying to allocate %d bytes in file %s line %d";
@@ -587,7 +588,7 @@ constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
 constext *txt_mime_types[] = { "8bit", "base64", "Quoted-Printable", "7bit" };
 
 /*
- * Array of possible post processing descriptions and shortkeys
+ * Array of possible post processing descriptions and short-keys
  * This must match the ordering of the defines in tin.h
  */
 constext *txt_post_process[] = {
@@ -751,8 +752,8 @@ constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
 constext txt_uudecoding[] = "Uudecoding %s...";
 constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n\n";
-constext txt_warn_missing_followup_to[] = "Warning: crossposting to %d newsgroups and no Followup-To line!\n\n";
-constext txt_error_missing_followup_to[] = "Error: crossposting to %d newsgroups and no Followup-To line!\n\n";
+constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";
+constext txt_error_missing_followup_to[] = "Error: cross-posting to %d newsgroups and no Followup-To line!\n\n";
 constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";
 constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to more than one newsgroup!\n\n";
 constext txt_warn_posting_etiquette[] = "\n\

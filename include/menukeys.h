@@ -96,7 +96,13 @@
 /* general keys */
 
 #define iKeyAbort ESC
+#ifndef NO_SHELL_ESCAPE
+#  define iKeyShellEscape '!'
+#endif
+#define iKeySearchSubjF '/'
+#define iKeySearchSubjB '?'
 #define iKeyQuitTin 'Q'
+#define iKeyFirstPage '^'
 #define iKeyQuit 'q'
 
 /* active.c */
@@ -148,9 +154,6 @@
 #define iKeyGroupUp ctrl('P')
 #define iKeyGroupPageUp2 ctrl('U')
 #define iKeyGroupPageDown3 ' '
-#ifndef NO_SHELL_ESCAPE
-#	define iKeyGroupShell '!'
-#endif
 #define iKeyGroupSetRange '#'
 #define iKeyGroupLastPage '$'
 #define iKeyGroupToggleColor '&'
@@ -158,11 +161,9 @@
 #define iKeyGroupDoAutoSel '+'
 #define iKeyGroupLastViewed '-'
 #define iKeyGroupToggleThdSel '.'
-#define iKeyGroupFSearchSubj '/'
 /* digits 0-9 in use */
 #define iKeyGroupSelThdIfUnreadSelected ';'
 #define iKeyGroupSelPattern '='
-#define iKeyGroupBSearchSubj '?'
 #define iKeyGroupReverseSel '@'
 #define iKeyGroupBSearchAuth 'A'
 #define iKeyGroupFSearchBody 'B'
@@ -181,7 +182,6 @@
 #define iKeyGroupMarkThdUnread 'Z'
 #define iKeyGroupQuickAutosel '['
 #define iKeyGroupQuickKill ']'
-#define iKeyGroupFirstPage '^'
 #define iKeyGroupFSearchAuth 'a'
 #define iKeyGroupPageUp3 'b'
 #define iKeyGroupCatchup 'c'
@@ -216,7 +216,6 @@
 #define iKeyHelpEnd '$'
 #define iKeyHelpPageDown3 ' '
 #define iKeyHelpEnd2 'G'
-#define iKeyHelpHome '^'
 #define iKeyHelpPageUp3 'b'
 #define iKeyHelpHome2 'g'
 #define iKeyHelpPageDown4 'j'
@@ -249,15 +248,11 @@
 #define iKeyPagePageUp2 ctrl('U')
 #define iKeyPageToggleRot ctrl('X')
 #define iKeyPagePageDown3 ' '
-#ifndef NO_SHELL_ESCAPE
-#	define iKeyPageShell '!'
-#endif
 #define iKeyPageToggleTex2iso '\"'
 #define iKeyPageLastPage '$'
 #define iKeyPageToggleRot2 '%'
 #define iKeyPageToggleColor '&'
 #define iKeyPageLastViewed '-'
-#define iKeyPageFSearchSubj '/'
 /* digits 0-9 in use */
 #define iKeyPageSkipIncludedText ':'
 #define iKeyPageTopThd '<'
@@ -277,7 +272,6 @@
 #define iKeyPageReply 'R'
 #define iKeyPageGroupSel 'T'
 #define iKeyPagePostHist 'W'
-#define iKeyPageFirstPage '^'
 #define iKeyPageFsearchAuth 'a'
 #define iKeyPagePageUp3 'b'
 #define iKeyPageCatchup 'c'
@@ -347,14 +341,9 @@
 #define iKeySelectResetNewsrc ctrl('R')
 #define iKeySelectPageUp2 ctrl('U')
 #define iKeySelectPageDown3 ' '
-#ifndef NO_SHELL_ESCAPE
-#	define iKeySelectShell '!'
-#endif
 #define iKeySelectSetRange '#'
 #define iKeySelectLastPage '$'
 #define iKeySelectToggleColor '&'
-#define iKeySelectFSearchSubj '/'
-#define iKeySelectBSearchSubj '?'
 #define iKeySelectCatchupGotoNext 'C'
 #define iKeySelectToggleHelpDisplay 'H'
 #define iKeySelectToggleInverseVideo 'I'
@@ -367,7 +356,6 @@
 #define iKeySelectPostHist 'W'
 #define iKeySelectQuitNoWrite 'X'
 #define iKeySelectSyncWithActive 'Y'
-#define iKeySelectFirstPage '^'
 #define iKeySelectPageUp3 'b'
 #define iKeySelectCatchup 'c'
 #define iKeySelectToggleSubjDisplay 'd'
@@ -399,9 +387,6 @@
 #define iKeyThreadUp ctrl('P')
 #define iKeyThreadPageUp2 ctrl('U')
 #define iKeyThreadPageDown3 ' '
-#ifndef NO_SHELL_ESCAPE
-#	define iKeyThreadShell '!'
-#endif
 #define iKeyThreadSetRange '#'
 #define iKeyThreadLastPage '$'
 #define iKeyThreadToggleColor '&'
@@ -415,7 +400,6 @@
 #define iKeyThreadMarkArtRead 'K'
 #define iKeyThreadBugReport 'R'
 #define iKeyThreadMarkThdUnread 'Z'
-#define iKeyThreadFirstPage '^'
 #define iKeyThreadPageUp3 'b'
 #define iKeyThreadCatchupConditional 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
@@ -423,6 +407,7 @@
 #define iKeyThreadDisplaySubject 'i'
 #define iKeyThreadDown2 'j'
 #define iKeyThreadUp2 'k'
+#define iKeyThreadSave 's'
 #define iKeyThreadTag 't'
 #define iKeyThreadVersion 'v'
 #define iKeyThreadMarkArtUnread 'z'

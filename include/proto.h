@@ -276,7 +276,9 @@ extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
 extern char *eat_re P_((char *s));
 extern void my_strncpy P_((char *p, const char *q, int n));
 extern int untag_all_articles P_((void));
-extern char *str_str P_((char *text, char *pattern, size_t patlen));
+#ifndef HAVE_STRSTR
+extern char *my_strstr P_((char *text, char *pattern));
+#endif
 extern void get_author P_((int thread, struct t_article *art, char *str));
 extern void toggle_inverse_video P_((void));
 extern void show_inverse_video_status P_((void));
@@ -295,6 +297,10 @@ extern int stat_file P_((char *file));
 extern void vPrintBugAddress P_((void));
 extern int iCopyFile P_((char *pcSrcFile, char *pcDstFile));
 extern int peek_char P_((FILE *));
+#ifdef LOCAL_CHARSET
+extern void buffer_to_local P_((char *b));
+extern void buffer_to_network P_((char *b));
+#endif
 
 /* newsrc.c */
 extern void read_newsrc P_((char *newsrc_file, int allgroups));
@@ -381,8 +387,8 @@ extern void art_close P_((void));
 extern int prompt_response P_((int ch, int respnum));
 extern void yank_to_addr P_((char *orig, char *addr));
 extern int show_last_page P_((void));
-extern void modifiedstrncpy P_((char *target, char *source, int size));
-extern int match_header P_((char *buf, char *pat, char *body, size_t len));
+extern void modifiedstrncpy P_((char *target, char *source, int size, int decode));
+extern int match_header P_((char *buf, char *pat, char *body, char *nodec_body, size_t len));
 
 /* parsdate.y */
 extern int GetTimeInfo P_((TIMEINFO *Now));
@@ -504,7 +510,7 @@ extern void search_group P_((int forward));
 extern void search_subject P_((int forward));
 extern int search_article P_((int forward));
 extern int search_body P_((struct t_group *group, int current_art));
-extern int search_art_body P_((char *group_path, struct t_article *art, char *pat, size_t len));
+extern int search_art_body P_((char *group_path, struct t_article *art, char *pat));
 extern void str_lwr P_((char *src, char *dst));
 
 /* select.c */

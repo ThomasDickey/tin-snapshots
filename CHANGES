@@ -1,3 +1,28 @@
+--unoff BETA release 961014 --
+
+192) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. NeXT porting (mainly chartset-stuff)
+     BUG. in some cases tin creates local index-files when nov-overview
+          files are available
+     FIX. several supplied patches
+
+191) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. in some cases tin creates local index-files when nov-overview
+          files are available
+     FIX. art.c
+
+190) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. on group menu, '/' (search for subject) now handles changes of
+          subject within threads, when using reference threading.
+     ADD. 's' (save) now works on thread menu
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+189) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. renamed patchlev.h to version.h
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
 --unoff BETA release 961012 --
 
 187) Branden Robinson <branden@purdue.edu>
@@ -1147,7 +1172,7 @@ L05) Chris Blum <chris@phil.uni-sb.de>
      ADD. e)dit cancel_msg
      FIX. post.c - applied supplied patch
 
-NOP) ADD. local version number in patchlev.h to MIME/no_MIME.patchdate
+NOP) ADD. local version number in version.h to MIME/no_MIME.patchdate
 
 --950824BETA  PL0.960211 eb/uj/sts/gb/cb --
 
@@ -1221,7 +1246,7 @@ L03) Greg Berigan <gberigan@cse.unl.edu>
      BUG. tin -w destroys ~/.tin/filter
      FIX. main.c read attributes/filter in right order
 
-NOP) FIX. local version number in patchlev.h to patchdate 
+NOP) FIX. local version number in version.h to patchdate 
 
 003) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      BUG. use_mouse switch was ignored
@@ -1249,7 +1274,7 @@ L01) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. can't mail under Linux
      FIX. changed tin.h to local setup
 
-NOP) ADD. Added local version number in patchlev.h
+NOP) ADD. Added local version number in version.h
 
 001) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      BUG. 'm' mail thread and then q)uit still mailed the thread.

@@ -15,7 +15,7 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include 	"patchlev.h"
+#include 	"version.h"
 #include	"menukeys.h"
 #include	"tin.h"
 
