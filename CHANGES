@@ -1,3 +1,15 @@
+--unoff BETA release 970109 --
+
+278) Andreas Ley <andreas.ley@rz.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. rewrote APPEND_TO() macro
+     ADD. rangecheck for group->xmax/group->newsrx.xmax
+     FIX. misc.c, newsrc.c
+
+277) Thomas Quinot <operator@cuivre.fdn.fr>
+     BUG. parse_from() returns login@host.doma.in in the wrong field
+     FIX. misc.c
+
 --unoff BETA release 970108 --
 
 276) Dirk Nimmich <nimmich@uni-muenster.de>

@@ -1098,6 +1098,20 @@ expand_bitmap (group, min)
 	long first;
 	long new;
 
+
+/* check if the newsserver database is broken */
+
+/*
+	assert(group->xmax>=group->newsrc.xmax);
+*/
+
+if (group->newsrc.xmax > group->xmax) {
+#ifdef DEBUG
+	fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);	
+	sleep(4);
+#endif
+	group->xmax = group->newsrc.xmax;
+} 
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
 		group->newsrc.xmin = group->newsrc.xmax + 1;
 
@@ -1128,6 +1142,8 @@ expand_bitmap (group, min)
 		newbitmap = (t_bitmap *)my_malloc(BITS_TO_BYTES(bitlen));
 
 		/* Copy over old bitmap */
+
+		assert((group->newsrc.xmin - first) / NBITS + BITS_TO_BYTES(group->newsrc.xbitlen) <= BITS_TO_BYTES(bitlen));
 
 		memcpy(newbitmap + (group->newsrc.xmin - first) / NBITS,
 			group->newsrc.xbitmap,
