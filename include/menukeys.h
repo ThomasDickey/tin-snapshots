@@ -47,11 +47,7 @@
 #define iKeyGroupReadBasenote2 '\r'
 #define iKeyGroupDown ctrl('N')
 #define iKeyGroupUp ctrl('P')
-/* itchy trigger finger on next line */
-#define iKeyGroupRedrawScr2 ctrl('R')
 #define iKeyGroupPageUp2 ctrl('U')
-/* itchy trigger finger on next line */
-#define iKeyGroupRedrawScr3 ctrl('W')
 #define iKeyGroupPageDown3 ' '
 #define iKeyGroupShell '!'
 #define iKeyGroupSetRange '#'
@@ -118,14 +114,12 @@
 #define iKeyHelpPageDown ctrl('D')
 #define iKeyHelpPageDown2 ctrl('F')
 #define iKeyHelpPageUp2 ctrl('U')
-/* itchy trigger finger on next line */
-#define iKeyHelpHome ctrl('R')
 #define iKeyHelpEnd '$'
 #define iKeyHelpPageDown3 ' '
 #define iKeyHelpEnd2 'G'
-#define iKeyHelpHome2 '^'
+#define iKeyHelpHome '^'
 #define iKeyHelpPageUp3 'b'
-#define iKeyHelpHome3 'g'
+#define iKeyHelpHome2 'g'
 #define iKeyHelpPageDown4 'j'
 #define iKeyHelpPageUp4 'k'
 /* all other keys exit help */
@@ -143,8 +137,6 @@
 #define iKeyPageAutoKill ctrl('K')
 #define iKeyPageRedrawScr ctrl('L')
 #define iKeyPageNextThd2 '\r'
-/* itchy trigger finger on next line */
-#define iKeyPageFirstPage ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
 #define iKeyPagePageUp2 ctrl('U')
 #define iKeyPageToggleRot ctrl('X')
@@ -176,14 +168,14 @@
 #define iKeyPageReply 'R'
 #define iKeyPageGroupSel 'T'
 #define iKeyPagePostHist 'W'
-#define iKeyPageFirstPage2 '^'
+#define iKeyPageFirstPage '^'
 #define iKeyPageFsearchAuth 'a'
 #define iKeyPagePageUp3 'b'
 #define iKeyPageCatchup 'c'
 #define iKeyPageToggleRot3 'd'
 #define iKeyPageEdit 'e'
 #define iKeyPageFollowupQuote 'f'
-#define iKeyPageFirstPage3 'g'
+#define iKeyPageFirstPage2 'g'
 #define iKeyPageHelp 'h'
 #define iKeyPageDisplaySubject 'i'
 #define iKeyPageKillArt 'k'
@@ -261,6 +253,7 @@
 #define iKeySelectSubscribePat 'S'
 #define iKeySelectUnsubscribePat 'U'
 #define iKeySelectPostHist 'W'
+#define iKeySelectQuitNoWrite 'X'
 #define iKeySelectSyncWithActive 'Y'
 #define iKeySelectFirstPage '^'
 #define iKeySelectPageUp3 'b'
@@ -293,11 +286,7 @@
 #define iKeyThreadReadArt2 '\r'
 #define iKeyThreadDown ctrl('N')
 #define iKeyThreadUp ctrl('P')
-/* itchy trigger finger on next line */
-#define iKeyThreadRedrawScr2 ctrl('R')
 #define iKeyThreadPageUp2 ctrl('U')
-/* itchy trigger finger on next line */
-#define iKeyThreadRedrawScr3 ctrl('W')
 #define iKeyThreadPageDown3 ' '
 #define iKeyThreadShell '!'
 #define iKeyThreadSetRange '#'

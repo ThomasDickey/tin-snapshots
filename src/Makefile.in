@@ -25,7 +25,7 @@ NOVROOTDIR= @NOVROOTDIR@
 # Compiler, linker & parser commands
 CC	= @CC@
 
-DEBUG	= # -DDEBUG -DDEBUG_NEWSRC -DPROFILE
+DEBUG	= @ENABLE_DEBUG@ -g -DDEBUG -DDEBUG_NEWSRC -DPROFILE
 CPPOPTS	= @DEFS@ -I$(INCDIR) $(DEBUG)
 CFLAGS	= @CFLAGS@ $(CPPOPTS) -c \
 	-DINEWS_MAIL_GATEWAY=\"$(INEWS_MAIL_GATEWAY)\" \
@@ -310,6 +310,7 @@ clean:
 	@-$(RM) -f $(SRCDIR)/parsdate.c
 	@-$(RM) -f LINT *.ln
 	@-$(RM) -f *~
+	@-$(RM) -f $(EXE) $(EXED)
 
 distclean \
 clobber: clean

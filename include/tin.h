@@ -854,12 +854,6 @@ extern char *get_uaf_fullname();
 
 #define ESC	27
 
-#ifdef HAVE_CR_AS_CHAR
-#	define		CR		'\r'
-#else
-#	define		CR		10
-#endif
-
 /*
  * return codes for change_config_file ()
  */

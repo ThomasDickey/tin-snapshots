@@ -252,5 +252,5 @@ rfc1521_encode(line, f, e)
 		*b=0;
 		if (b!=buffer) fputs(buffer,f);
 	}
-	else fputs(line,f);
+	else fputs((char *)line,f);
 }

@@ -387,7 +387,6 @@ page_goto_next_unread:
 
 			case iKeyPageFirstPage:		/* goto beginning of article */
 			case iKeyPageFirstPage2:
-			case iKeyPageFirstPage3:
 begin_of_article:			
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();

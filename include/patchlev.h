@@ -3,7 +3,7 @@
  *  Module    : patchlev.h
  *  Author    : I.Lea
  *  Created   : 01-04-91
- *  Updated   : 27-09-93
+ *  Updated   : 12-06-96
  *  Notes     :
  *  Copyright : (c) Copyright 1991-94 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -12,8 +12,7 @@
  *              right notice, and it must be included in any copy made
  */
 
-/* Beta versions are 	"1.n releasedateBETA" */
-#define VERSION		"1.3 950824BETA"
+#define VERSION		"1.3 unoff BETA"
 
 /* This is NO official release, but a patched version.
  * Including patches from:
@@ -36,7 +35,7 @@
  * 	Stefan Scholl		<stesch@sks.inka.de>
  *
  */
-#define PATCHLEVEL	"MC.960611"
+#define RELEASEDATE	"960613"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

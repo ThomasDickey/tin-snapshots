@@ -1,3 +1,25 @@
+--unoff BETA release 960613 --
+
+082) Thomas E. Dickey <dickey@clark.net>
+     ADD. even more autoconf stuff; code cleanup
+     FIX. several supplied patches
+
+081) Branden Robinson <branden@ecn.purdue.edu>
+     REM. multiple screen redraw keys
+     FIX. several supplied patches
+
+080) Chris Blum <chris@phil.uni-sb.de>
+     ADD. cleaner compilation under !linux
+     FIX. rfc1521.c, rfc1522.c
+
+079) Sven Paulus <sven@oops.sub.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. HAVE_CR_AS_CHAR was never defined but used, prevented BSD-systems
+          to recognize CR 
+     ADD. 'X' in select.c to quit without saving configuration
+     CHG. changed to unoff version :) 
+     FIX. several patches
+
 --950824BETA  PLMC.960611 --
 
 078) Sven Paulus <sven@oops.sub.de>
@@ -140,20 +162,20 @@
 050) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. --enable-break-long-lines --disable-mime-strict-charset
           --enable-forgery; code cleanup
-     FIX. several supplied patches
+     FIX. several patches
 
 --950824BETA  PLMC.960526 --
 
 049) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. --enable-mail-handling --enable-etiquette --enable-forgery
      BUG. --enable-ref-threading did not work
-     FIX. several supplied patches
+     FIX. several patches
      
 --950824BETA  PLMC.960525 --
 
 048) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. little code cleanup; --with-ref-threading
-     FIX. several supplied patches
+     FIX. several patches
 
 --950824BETA  PLMC.960524 --
 

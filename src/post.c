@@ -760,7 +760,7 @@ quick_post_article ()
 					sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
 					wait_message (msg);
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
-					if ((ch = (char) ReadCh ()) == CR)
+					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
 				} while (! strchr ("eq\033", ch));
 				if (ch == iKeyPostEdit) {
@@ -811,7 +811,7 @@ quick_post_article ()
 			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("egipq\033", ch));
 	}
@@ -975,7 +975,7 @@ post_article (group, posted)
 					sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
 					wait_message (msg);
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
-					if ((ch = (char) ReadCh ()) == CR)
+					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
 				} while (! strchr ("eq\033", ch));
 				if (ch == iKeyPostEdit) {
@@ -1036,7 +1036,7 @@ post_article (group, posted)
 			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("egipq\033", ch));
 	}
@@ -1147,7 +1147,7 @@ post_response (group, respnum, copy_text)
 		wait_message (msg);
 		MoveCursor (cLINES, (int) strlen (txt_resp_to_poster));
 		do {
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = iKeyPageMail;
 		} while (! strchr ("mpq\033", ch));
 		switch (ch) {
@@ -1303,7 +1303,7 @@ ignore_followup_to_poster:
 					sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
 					wait_message (msg);
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
-					if ((ch = (char) ReadCh ()) == CR)
+					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
 				} while (! strchr ("eq\033", ch));
 				if (ch == iKeyPostEdit) {
@@ -1364,7 +1364,7 @@ ignore_followup_to_poster:
 			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
 			wait_message (msg);
 			MoveCursor(cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh()) == CR)
+			if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("egipq\033", ch));
 	}
@@ -1499,7 +1499,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 					cCOLS-36, note_h_subj, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg)-1));
-				if ((ch = (char) ReadCh ()) == CR)
+				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
 			} while (! strchr ("egiqs\033", ch));
 		}
@@ -1542,7 +1542,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 					cCOLS-36, eat_re (note_h_subj), ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg)-1));
-				if ((ch = (char) ReadCh ()) == CR)
+				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
 			} while (! strchr ("egqs\033", ch));
 		}	
@@ -1728,7 +1728,7 @@ mail_bug_report ()
 			sprintf (msg, "%s: %c", txt_quit_edit_ispell_send, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("egiqs\033", ch));
 	}
@@ -1869,7 +1869,7 @@ mail_to_author (group, respnum, copy_text)
 			sprintf (msg, "%s: %c", txt_quit_edit_ispell_send, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("egiqs\033", ch));
 	}
@@ -2087,8 +2087,8 @@ delete_article (group, art)
 	msg_write_headers (fp);
 	msg_free_headers ();
 	
-	fprintf (fp, "Article cancelled from within tin [v%s PL%s]\n",
-		VERSION, PATCHLEVEL);
+	fprintf (fp, "Article cancelled from within tin [v%s release %s]\n",
+		VERSION, RELEASEDATE);
 #ifdef FORGERY
 	if (! author) {
 		fputc ('\n', fp);
@@ -2128,7 +2128,7 @@ delete_article (group, art)
 				cCOLS-30, note_h_subj, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("edq\033", ch));
 
@@ -2270,7 +2270,7 @@ repost_article (group, art, respnum)
 				note_h_subj, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = (char) ReadCh ()) == CR)
+			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("epq\033", ch));
 		switch (ch) {
@@ -2439,11 +2439,11 @@ insert_x_headers (infile, lines)
 					}
 					if (!no_advertising) {
 						if (active[my_group[cur_groupnum]].type == GROUP_TYPE_MAIL) {
-							fprintf (fp_out, "X-Mailer: TIN [%s %s PL%s]\n\n",
-								OS, VERSION, PATCHLEVEL);
+							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
+								OS, VERSION, RELEASEDATE);
 						} else {
-							fprintf (fp_out, "X-Newsreader: TIN [%s %s PL%s]\n\n",
-								OS, VERSION, PATCHLEVEL);
+							fprintf (fp_out, "X-Newsreader: TIN [%s %s release %s]\n\n",
+								OS, VERSION, RELEASEDATE);
 						}
 					}
 					else {

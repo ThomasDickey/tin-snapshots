@@ -68,7 +68,6 @@ CC="$CC" \
 	--disable-debug \
 	--enable-prototypes \
 	--enable-warnings \
-	--with-mail-gateway=akk.uni-karlsruhe.de \
 	--with-mail-domain=akk.uni-karlsruhe.de \
 	--enable-nntp-only \
         $OPTS $* 2>&1 |tee -a $OUT

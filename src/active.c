@@ -618,7 +618,7 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 		printf (txt_subscribe_to_new_group, group, ch_default);
 		fflush (stdout);
 		ch = ReadCh ();
-		if (ch == CR) {
+		if (ch == '\n' || ch == '\r') {
 			ch = ch_default;
 		}
 	} while (! strchr ("NnYy", ch));

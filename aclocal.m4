@@ -61,11 +61,13 @@ dnl $5 = default option value (either 'yes' or 'no')
 AC_DEFUN([CF_ARG_OPTION],
 [AC_ARG_ENABLE($1,[$2],[test "$enableval" != ifelse($5,no,yes,no) && enableval=ifelse($5,no,no,yes)
   if test "$enableval" != "$5" ; then
-ifelse($3,,[    :]
-,[    $3])ifelse($4,,,[  else
-    $4])dnl
+ifelse($3,,[    :]dnl
+,[    $3]) ifelse($4,,,[
+  else
+    $4])
   fi],[enableval=$5 ifelse($4,,,[
-  $4])dnl
+  $4
+])dnl
   ])])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check for missing declarations in the system headers (adapted from vile).
@@ -568,8 +570,8 @@ dnl defaulting to yes/no.
 AC_DEFUN([CF_WITH_PATH],
 [AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
 ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
-case "$withval" in #(vi
-/*)
+case ".$withval" in #(vi
+./*)
   ;; #(vi
 *)
   echo 'configure: error: expected a pathname for $3' 1>&2
@@ -623,7 +625,8 @@ AC_DEFUN([CF_WITH_VALUE],
 [AC_ARG_WITH($1,[$2 ](default: ifelse($4,,empty,$4)),,
 ifelse($4,,[withval="${$3}"],[withval="${$3-$4}"]))dnl
 ifelse($4,,[test -n "$withval" && \
-],[test -z "$withval" && withval=no])dnl
+],[test -z "$withval" && withval=no
+])dnl
 case "$withval" in #(vi
 yes|no)	echo 'configure: error: expected a value for $3' 1>&2
   exit 1

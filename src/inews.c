@@ -182,7 +182,7 @@ submit_inews (name)
   	
 	ret_code = TRUE;
 
-#endif /* NNTP_ABLE */
+#endif /* NNTP_INEWS */
 
 #endif /* INDEX_DAEMON */
 

@@ -339,14 +339,14 @@ rfc1522_do_encode(what, where)
 	while (*what) {
 		if ((encoding=contains_nonprintables(what))) {
 			if (!quoting) {
-				sprintf(buf2,"=?%s?%c?",mm_charset,encoding);
+				sprintf((char *)buf2,"=?%s?%c?",mm_charset,encoding);
 				ewsize=mystrcat((char **)&t,buf2);
 				quoting=1;
 				any_quoting_done=1;
 			}
 			while (*what && !isspace(*what)&&*what!='('&&*what!=')') {
 				if (*what<32||*what>127||*what=='='||*what=='?') {
-					sprintf(buf2,"=%2.2X",*what);
+					sprintf((char *)buf2,"=%2.2X",*what);
 					*t++=buf2[0];
 					*t++=buf2[1];
 					*t++=buf2[2];
@@ -425,7 +425,7 @@ rfc1522_encode(s)
 	int x;
 
 	get_mm_charset();
-	b=buf;
+	b=(unsigned char *)buf;
 	x=rfc1522_do_encode(s,&b);
 	quoteflag=quoteflag || x;
 	return buf;
@@ -473,7 +473,7 @@ rfc15211522_encode(filename)
 	header[0]=0;
 	d=header;
 	quoteflag=0;
-	while (fgets(buffer,2048,f)) {
+	while (fgets((char *)buffer,2048,f)) {
 		if (header[0]&&(!isspace(buffer[0])||buffer[0]=='\r'||buffer[0]=='\n')) {
 			fputs(rfc1522_encode(header),g);
  			fputc('\n',g);
@@ -486,8 +486,8 @@ rfc15211522_encode(filename)
 		*d=0;
 	}
 	fputc('\n',g);
-	while (fgets(buffer,2048,f)) {
-		fputs(buffer,g);
+	while (fgets((char *)buffer,2048,f)) {
+		fputs((char *)buffer,g);
 		/* see if there are any umlauts in the body... */
 		for (c=buffer; *c&&!*c!='\r'&&*c!='\n'; c++) 
 		if (*c<32||*c>127) {
@@ -503,9 +503,9 @@ rfc15211522_encode(filename)
 		fclose(g);
 		return;
 	}
-	while (fgets(buffer,2048,g)) {
+	while (fgets((char *)buffer,2048,g)) {
 		if (buffer[0]=='\r'||buffer[0]=='\n') break;
-		fputs(buffer,f);
+		fputs((char *)buffer,f);
 	}
 
 	/* now add MIME headers as necessary */
@@ -532,7 +532,7 @@ rfc15211522_encode(filename)
 
 	if (!body_encoding_needed) encoding='8';
 
-	while (fgets(buffer,2048,g)) {
+	while (fgets((char *)buffer,2048,g)) {
 		rfc1521_encode(buffer,f,encoding);
 	}
 	if (encoding=='b') rfc1521_encode(NULL,f,encoding); /* flush */

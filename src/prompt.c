@@ -127,7 +127,7 @@ prompt_yn (line, prompt, default_answer)
 	fflush (stdout);
 	MoveCursor (line, (int) strlen (prompt));
 
-	if ((ch = (char) ReadCh()) == CR) {
+	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
 		ch = prompt_ch;
 	}	
 
@@ -196,7 +196,7 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 			printf("%-*s", width, list[var]);
 			fflush (stdout);
 		}
-	} while (ch != CR && ch != ESC);
+	} while (ch != '\r' && ch != '\n' && ch != ESC);
 
 	if (ch == ESC) {
 		var = var_orig;

@@ -422,8 +422,6 @@ thread_page_down:
 				break;
 
 			case iKeyThreadRedrawScr:		/* redraw screen */
-			case iKeyThreadRedrawScr2:
-			case iKeyThreadRedrawScr3:
 				ClearScreen ();
 				set_xclick_off ();
 				show_thread_page ();

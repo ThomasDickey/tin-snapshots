@@ -123,7 +123,7 @@ feed_articles (function, level, group, respnum)
 			sprintf (msg, "%s%s%c", prompt, txt_art_thread_regex_tag, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = ReadCh ()) == CR) {
+			if ((ch = ReadCh ()) == '\r' || ch == '\n') {
 				ch = ch_default;
 			}
 		} while (! strchr ("ahpqtT\033", ch));
@@ -295,7 +295,7 @@ feed_articles (function, level, group, respnum)
 							sprintf (msg, "%s%c", txt_post_process_type, proc_ch_default);
 							wait_message (msg);
 							MoveCursor (cLINES, (int) strlen (msg)-1);
-							if ((proc_ch = ReadCh ()) == CR)
+							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
 						} while (! strchr ("eElLnqsu\033", proc_ch));
 						if (proc_ch == 'q' || proc_ch == ESC) {	/* exit */

@@ -462,6 +462,7 @@ constext txt_purge[] = "Purging %s...";
 constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";
 constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
 constext txt_quit[] = "Do you really want to quit? (y/n): ";
+constext txt_quit_no_write[] = "Do you really want to quit without saving your configuration? (y/n): ";
 constext txt_quit_delete[] = "e)dit cancel message, q)uit, d)elete";
 constext txt_quit_edit_save_killfile[] = "q)uit e)dit s)ave kill/hot description: ";
 #ifdef HAVE_PGP

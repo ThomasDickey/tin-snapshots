@@ -328,7 +328,7 @@ save_art_to_file (respnum, indexnum, mailbox, filename)
 				sprintf (msg, "%s%c", buf, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) strlen (buf));
-				if ((ch = (char) ReadCh ()) == CR)
+				if ((ch = (char) ReadCh ()) == '\n' || ch == '\r')
 					ch = ch_default;
 			} while (! strchr ("aoq\033", ch));
 			switch (ch) {

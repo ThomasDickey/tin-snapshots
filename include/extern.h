@@ -629,6 +629,7 @@ extern constext txt_printing[];
 extern constext txt_quick_filter_kill[];
 extern constext txt_quick_filter_select[];
 extern constext txt_quit[];
+extern constext txt_quit_no_write[];
 extern constext txt_quit_delete[];
 extern constext txt_quit_edit_post[];
 extern constext txt_quit_edit_xpost[];
