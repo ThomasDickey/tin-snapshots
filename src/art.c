@@ -459,7 +459,7 @@ make_threads (group, rethread)
 
 		for (i=0 ; i < top ; i++) {
 
-#ifdef REF_THREADING
+#ifdef HAVE_REF_THREADING
 			arts[i].sibling = arts[i].child = NO_THREAD;
 #endif
 
@@ -482,7 +482,7 @@ make_threads (group, rethread)
 		case THREAD_NONE:
 			return;
 
-#ifdef REF_THREADING
+#ifdef HAVE_REF_THREADING
 		case THREAD_REFS:
 			thread_by_reference(group);
 			return;

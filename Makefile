@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960524
+PVER		= 960525
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -104,13 +104,12 @@ TOP	= \
 	$(TOPDIR)/README \
 	$(TOPDIR)/tinpp \
 	$(TOPDIR)/aclocal.m4 \
-	$(TOPDIR)/configure \
 	$(TOPDIR)/configure.in \
 	$(TOPDIR)/install.sh \
 	$(TOPDIR)/makefile.in \
-	$(TOPDIR)/cfg-tin
+	$(TOPDIR)/conf-tin
 
-ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) $(SRCDIR)/Makefile
+ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES)
 
 ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
 
@@ -143,9 +142,9 @@ all:
 	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
-	@$(ECHO) "    make manpage         [ Generate nroff version of manual page ]"
-	@$(ECHO) "    make manifest        [ Generate MANIFEST ]"
-	@$(ECHO) "    make gtar            [ Generate gziped tar archive ]"
+	@$(ECHO) "    make manpage         [ Create nroff version of manual page ]"
+	@$(ECHO) "    make manifest        [ Create MANIFEST ]"
+	@$(ECHO) "    make dist            [ Create a gziped distribution tar file ]"
 
 install:
 	@$(CD) $(SRCDIR); $(MAKE) install
@@ -180,14 +179,9 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
-	@$(CHMOD) 755 ./cfg-tin ./configure ./tinpp
-gtar:
-	@$(MAKE) tar
+	@$(CHMOD) 755 ./conf-tin ./tinpp
 
 tar:
-	@$(MAKE) clean
-	@$(MAKE) chmod
-	@$(MAKE) manifest
 	@$(ECHO) "Generating gzipped tar file..."
 	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1  
 	@$(TAR) cvzf $(PROJECT)$(VER).tgz -C ../ \
@@ -197,3 +191,9 @@ tar:
  	| $(TR) "[\012]" " "`
 	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
 	@$(LS) $(PROJECT)$(VER).tgz
+
+dist:
+#	@$(MAKE) clean
+	@$(MAKE) chmod
+	@$(MAKE) manifest
+	@$(MAKE) tar

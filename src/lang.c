@@ -171,7 +171,7 @@ constext txt_help_catchup_groups[] = "Ask to mark groups read when quiting. <SPA
 constext txt_help_ck[] = "c K\t  mark thread as read (K = don't confirm) and return to previous level\r\n";
 constext txt_help_colon[] = ":\t  skip next block of included text\r\n";
 #ifdef HAVE_COLOR
-constext txt_help_color[] = "a\t  toggle color\r\n";
+constext txt_help_color[] = "&\t  toggle color\r\n";
 #endif
 constext txt_help_confirm_action[] = "Ask for command confirmation. <SPACE> toggles & <CR> sets.";
 constext txt_help_cr[] = "<CR>\t  Read news from selected spooldir\r\n";

@@ -11,7 +11,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#ifdef REF_THREADING
+#include "tin.h"
+#ifdef HAVE_REF_THREADING
+
+static int find_by_msgid P_((char *msgid));
+static int collapse_thread P_((int i, int level));
+
 /*
  * Legend:
  *
@@ -87,7 +92,6 @@
  *   and messages whose parent has expired.
  */
 
-#include "tin.h"
 
 FILE *dumpfd;
 

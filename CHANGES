@@ -1,3 +1,9 @@
+--950824BETA  PLMC.960525 --
+
+048) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. little code cleanup; --with-ref-threading
+     FIX. several supplied patches
+
 --950824BETA  PLMC.960524 --
 
 047) Branden Robinson <branden@purdue.edu>

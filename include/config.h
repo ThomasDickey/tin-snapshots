@@ -41,7 +41,7 @@
 #endif
 
 #ifdef VMS
-#   define  HAS_IS_XTERM
+#   define  HAVE_IS_XTERM
 #endif
 
 /*

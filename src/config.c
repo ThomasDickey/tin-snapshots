@@ -863,7 +863,7 @@ change_config_file (group, filter_at_once)
 							txt_help_thread_arts,
 							txt_opt_thread_arts,
 							txt_thread,
-#ifdef REF_THREADING
+#ifdef HAVE_REF_THREADING
 							THREAD_REFS + 1
 #else
 							THREAD_REFS

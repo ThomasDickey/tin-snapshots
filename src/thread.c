@@ -549,7 +549,7 @@ thread_catchup:
 				}
 				break;
 
-#ifdef REF_THREADING				
+#ifdef HAVE_REF_THREADING				
 case 'a':	/* Very dirty temp. hack - Show threaded tree */
 	if (group->attribute->thread_arts == THREAD_REFS) {
 		char ch[10];

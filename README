@@ -3,11 +3,11 @@ several additions/bug-fixes over the latest 'official' beta release (for
 more information have a look at the CHANGES file).
 Due to work is still in progress it might not compile on all machines.
 
-configure to your local setup with:
-	cfg-tin
+configure to your local setup (have a look at):
+	conf-tin
 
 compile with:
-	cd src; make -f makefile
+	cd src; make
 
 Install at your own risk.
 
