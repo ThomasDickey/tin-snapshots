@@ -23,6 +23,9 @@ char *help_select[] = {
 #ifdef HAVE_COLOR
 	txt_help_color,
 #endif
+#ifdef HAVE_PGP
+	txt_help_ctrl_g,
+#endif
 	txt_help_j,
 txt_help_empty_line,
 	txt_help_g_4,

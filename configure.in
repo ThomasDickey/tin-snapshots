@@ -188,6 +188,9 @@ AC_C_CONST
 AC_C_INLINE
 CF_ANSI_ASSERT
 
+### check for alloca
+AC_FUNC_ALLOCA
+
 ###	Checks for header files.
 AC_STDC_HEADERS
 AC_HEADER_DIRENT

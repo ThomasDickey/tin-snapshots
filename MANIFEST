@@ -1,18 +1,18 @@
-MANIFEST for tin-1.3_950824BETA_PLMC.960608 (Fri Jun  7 21:50:05 MET DST 1996)
+MANIFEST for tin-1.3_950824BETA_PLMC.960609 (Sun Jun  9 14:31:33 MET DST 1996)
 ----------------------------------------------------
-  17529 ./CHANGES
-   9136 ./TODO
+  17970 ./CHANGES
+   9218 ./TODO
    5012 ./Makefile
   17174 ./INSTALL
-   2092 ./MANIFEST
-   1320 ./README
+   2088 ./MANIFEST
+   1388 ./README
     913 ./tinpp
   16448 ./aclocal.m4
- 100543 ./configure
-   9268 ./configure.in
+ 105482 ./configure
+   9305 ./configure.in
    4771 ./install.sh
   11438 ./makefile.in
-   1241 ./conf-tin
+   1161 ./conf-tin
   69402 ./doc/tin.1
    2514 ./include/amiga.h
    2131 ./include/amigatcp.h
@@ -46,7 +46,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960608 (Fri Jun  7 21:50:05 MET DST 1996)
   11250 ./src/getline.c
   41720 ./src/group.c
    2671 ./src/hashstr.c
-   9650 ./src/help.c
+   9691 ./src/help.c
   11827 ./src/inews.c
   28052 ./src/init.c
   41508 ./src/lang.c
@@ -70,7 +70,7 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960608 (Fri Jun  7 21:50:05 MET DST 1996)
   10088 ./src/refs.c
    5411 ./src/rfc1521.c
   12651 ./src/rfc1522.c
-  34142 ./src/save.c
+  34250 ./src/save.c
    4116 ./src/screen.c
    9895 ./src/search.c
   34879 ./src/select.c
@@ -83,6 +83,6 @@ MANIFEST for tin-1.3_950824BETA_PLMC.960608 (Fri Jun  7 21:50:05 MET DST 1996)
    2130 ./src/win32tcp.c
    7143 ./src/xref.c
    5549 ./src/vms.c
-   5536 ./include/autoconf.hin
+   5557 ./include/autoconf.hin
   10116 ./src/Makefile.in
-1354352 total
+1360005 total

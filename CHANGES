@@ -1,3 +1,18 @@
+--950824BETA  PLMC.960609 --
+
+069) Sven Paulus <sven@oops.sub.de>
+     BUG. tin sometimes freezes while saving a thread
+     FIX. save.c
+
+068) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. AC_FUNC_ALLOCA (so it compiles under __hpux without byacc)
+     FIX. configure[.in], autoconf.hin
+
+067) Torsten Gesang <toge@stud.uni-sb.de>
+     BUG. txt_help_ctrl_g (pgp) was defined but not included in the
+          online-help
+     FIX. help.c
+
 --950824BETA  PLMC.960608 --
 
 066) Urs Janssen <urs@akk.uni-karlsruhe.de>

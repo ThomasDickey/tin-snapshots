@@ -141,8 +141,6 @@ o  kill-file may get messed up if  using multiple news servers with feeds
 
 o  sometimes kill-file entries are duplicated
 
-o  tin sometimes freezes while saving a thread
-
 o  tin sometimes crashes (thread.c) 710/892/959
 
 o  marking hot-articles read with 'K' and then post-process the newsgroup

@@ -57,6 +57,7 @@
  * defined or commented-out, according to whether the corresponding header
  * file was detected during configuration.
  */
+#undef	HAVE_ALLOCA_H
 #undef	HAVE_CURSES_H
 #undef	HAVE_DIRENT_H
 #undef	HAVE_ERRNO_H
