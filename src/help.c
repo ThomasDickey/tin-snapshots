@@ -477,7 +477,10 @@ display_info_page ()
 {
 	char buf[LEN];
 	int i, help_lines;
-	
+
+#ifdef HAVE_COLOR
+	fcol(col_help);
+#endif
 	ClearScreen ();
 	sprintf (buf, info_title, cur_page, max_page);
 	center_line (0, TRUE, buf);
@@ -504,6 +507,9 @@ display_info_page ()
 	}
 
 	center_line (cLINES, FALSE, txt_hit_space_for_more);
+#ifdef HAVE_COLOR
+	fcol(col_normal);
+#endif
 }
 
 

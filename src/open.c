@@ -1046,7 +1046,7 @@ log_user ()
 	char dummy[PATH_LEN];
 	char buf[32], *ptr;
 	char line[NNTP_STRLEN];
-#ifndef DONT_LOG_USER
+#ifdef	LOG_USER
 	char log_file[PATH_LEN];
 	FILE *fp;
 	long epoch;
@@ -1067,7 +1067,7 @@ log_user ()
 	} else
 #endif	/* M_AMIGA */
 	{
-#ifndef DONT_LOG_USER
+#ifdef	LOG_USER
 		joinpath (log_file, TMPDIR, LOG_USER_FILE);
 
 		if ((fp = fopen (log_file, "a+")) != (FILE *) 0) {
@@ -1085,7 +1085,7 @@ log_user ()
 			fclose (fp);
 			chmod (log_file, 0666);
 		}	
-#endif	/* DONT_LOG_USER */
+#endif	/* LOG_USER */
 	}
 }
 

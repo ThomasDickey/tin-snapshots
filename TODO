@@ -1,5 +1,16 @@
 Bugs
 ----
+o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
+   true...
+
+o  if external inews could not be found posting failes but no dead.article
+   is saved :(
+   fallback to build_in_inews would be good...
+
+o  if postings fails tin reareads the article numbers for the group you
+   tried to post in to sync with your new article which does not exist,
+   useless!
+
 o  mailing an article with editing the subject in the editor shows you the
    old subject after leaving the editor :-( , but uses the new one :)
 
@@ -41,9 +52,10 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  fix nntplib.c line 388++ (no prototyping #if !defined(linux))
-       init.c    line 233++ (no prototyping #if !defined(linux))
-       misc.c    line 666   (no prototyping #if !defined(linux))
+o  fix parsdate.y line 827   (no prototyping) *uhhh?*
+       nntplib.c  line 388++ (no prototyping #if !defined(linux))
+       init.c     line 233++ (no prototyping #if !defined(linux))
+       misc.c     line 666   (no prototyping #if !defined(linux))
 
 o  tin sometimes crashes (thread.c) 710/892
 
@@ -51,7 +63,6 @@ New features
 ------------
 o  add
        --enable-mime-base64           (default off)
-       --enable-log-user              (default off)
        --disable-piping               (default on)
        --with-iso-to-ascii            (default -1)
    to autoconf; determine which network libraries are needed; eradicate

@@ -21,6 +21,7 @@
  * 	Enrik Berkhan		<enrik@akk.uni-karlsruhe.de>
  *	Juergen Bernau		<pas@freitag.muc.de>
  * 	Chris Blum		<chris@phil.uni-sb.de>
+ *	Lars Dannenberg		<lars@vendetta.han.de>
  *	Giuseppe De Marco	<gdemarco@freenet.hut.fi>
  *	T.E. Dickey		<dickey@clark.net>
  *	Bernd Eckenfels		<ecki@lina.inka.de>
@@ -35,7 +36,7 @@
  * 	Stefan Scholl		<stesch@sks.inka.de>
  *
  */
-#define RELEASEDATE	"960622"
+#define RELEASEDATE	"960623"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

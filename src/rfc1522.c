@@ -340,7 +340,7 @@ rfc1522_do_encode(what, where)
 		if ((encoding=contains_nonprintables(what))) {
 			if (!quoting) {
 				sprintf((char *)buf2,"=?%s?%c?",mm_charset,encoding);
-				ewsize=mystrcat((char **)&t,buf2);
+				ewsize=mystrcat((char **)&t,(char *)buf2);
 				quoting=1;
 				any_quoting_done=1;
 			}
@@ -370,7 +370,7 @@ rfc1522_do_encode(what, where)
 						*t++='_';
 						ewsize++;
 					} else {
-						sprintf(buf2,"=%2.2X",*what);
+						sprintf((char *)buf2,"=%2.2X",*what);
 						*t++=buf2[0];
 						*t++=buf2[1];
 						*t++=buf2[2];
@@ -426,7 +426,7 @@ rfc1522_encode(s)
 
 	get_mm_charset();
 	b=(unsigned char *)buf;
-	x=rfc1522_do_encode(s,&b);
+	x=rfc1522_do_encode((unsigned char *)s,&b);
 	quoteflag=quoteflag || x;
 	return buf;
 }
@@ -456,7 +456,7 @@ rfc15211522_encode(filename)
 	quoteflag=0;
 	while (fgets((char *)buffer,2048,f)) {
 		if (header[0]&&(!isspace(buffer[0])||buffer[0]=='\r'||buffer[0]=='\n')) {
-			fputs(rfc1522_encode(header),g);
+			fputs(rfc1522_encode((char *)header),g);
  			fputc('\n',g);
 			header[0]=0;
 			d=header;

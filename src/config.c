@@ -120,6 +120,9 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "col_minihelp=", &col_minihelp, MAX_COLOR)) {
 				break;
 			}
+			if (match_integer (buf, "col_help=", &col_help, MAX_COLOR)) {
+				break;
+			}
 			if (match_integer (buf, "col_message=", &col_message, MAX_COLOR)) {
 				break;
 			}
@@ -310,6 +313,11 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "mark_saved_read=", &mark_saved_read)) {
 				break;
 			}
+#ifdef FORGERY
+			if (match_string (buf, "mail_address=", mail_address, sizeof (mail_address))) {
+				break;
+			}
+#endif
 			if (match_string (buf, "mail_quote_format=", mail_quote_format, sizeof (mail_quote_format))) {
 				break;
 			}
@@ -478,7 +486,7 @@ write_config_file (file)
 	int i;
 	
 	/* alloc memory for tmp-filename */
-	if((file_tmp=malloc(strlen(file)+5)) == NULL) {
+	if((file_tmp=(char *)malloc(strlen(file)+5)) == NULL) {
 		wait_message ("Out of memory!");
 		return;
 	}	
@@ -520,6 +528,12 @@ write_config_file (file)
 	fprintf (fp, "# %%M Mailer  %%S Subject  %%T To  %%F Filename  %%U User (AmigaDOS)\n");
 	fprintf (fp, "# ie. to use elm as your mailer:    elm -s \"%%S\" \"%%T\" < %%F\n");
 	fprintf (fp, "default_mailer_format=%s\n\n", default_mailer_format);
+#ifdef FORGERY
+	if (*mail_address) {
+		fprintf (fp, "# user's mail address, if not username@host\n");
+		fprintf (fp, "mail_address=%s\n\n",mail_address);
+	}
+#endif
 	fprintf (fp, "# if ON mark articles that are saved as read\n");
 	fprintf (fp, "mark_saved_read=%s\n\n", print_boolean (mark_saved_read));
 	fprintf (fp, "# if ON use inverse video for page headers at different levels\n");
@@ -543,6 +557,8 @@ write_config_file (file)
 	fprintf (fp, "col_text=%d\n\n", col_text);
 	fprintf (fp, "# Color of mini help menu\n");
 	fprintf (fp, "col_minihelp=%d\n\n", col_minihelp);
+	fprintf (fp, "# Color of help pages\n");
+	fprintf (fp, "col_help=%d\n\n", col_help);
 	fprintf (fp, "# Color of messages in last line\n");
 	fprintf (fp, "col_message=%d\n\n", col_message);
 	fprintf (fp, "# Color of quotelines\n");

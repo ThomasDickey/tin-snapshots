@@ -31,6 +31,7 @@ struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
 static void add_to_parent P_((struct t_msgid *ptr));
 static char *_get_references P_((struct t_msgid *refptr, int depth));
 static void _free_list P_((struct t_msgid *ptr));
+static unsigned int hash_msgid P_((char *key));
 #ifdef DEBUG_REFS
 static void dump_msgid_threads P_((void));
 #endif

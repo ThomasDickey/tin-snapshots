@@ -264,7 +264,7 @@ iIsArtTexEncoded (art, group_path)
 	int body = FALSE;
 	int i, len;
 
-	fp = open_art_fp (group_path, art);
+	fp = open_art_fp ((char *)group_path, art);
 
 	while (fgets (line, sizeof line, fp) != (char *) 0) {
 		if (line[0] == '\n') {

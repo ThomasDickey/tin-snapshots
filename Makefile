@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960622
+PVER		= 960623
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -91,6 +91,7 @@ CFILES	= \
 
 DOC	= \
 	$(DOCDIR)/$(EXE).$(MANEXT) \
+	$(DOCDIR)/hashing.doc
 
 TOP	= \
 	$(TOPDIR)/CHANGES \
@@ -125,7 +126,6 @@ NROFF		= groff -Tascii
 RM		= rm
 SHELL		= /bin/sh
 TAR		= gtar
-TROFF		= groff
 WC		= wc
 SED		= sed
 TR		= tr

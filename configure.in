@@ -8,6 +8,7 @@ dnl Copyright :
 dnl
 dnl
 dnl Process this file with autoconf to produce a configure script.
+
 AC_PREREQ(2.0)
 AC_INIT(include/tin.h)
 AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
@@ -102,6 +103,8 @@ CF_ARG_ENABLE(warnings,
 	#
 	# We should also use
 	# -Wshadow
+	# -pedantic
+	#
 	if test -n "$with_warnings"
 	then
 		CFLAGS="$CFLAGS -Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
@@ -237,6 +240,12 @@ CF_ARG_ENABLE(forgery,
 	[AC_DEFINE(FORGERY)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(whether to enable user-statistic logfile)
+CF_ARG_ENABLE(log-user,
+	[  --enable-log-user       log statistic],
+	[AC_DEFINE(LOG_USER)])
+AC_MSG_RESULT($enableval)
+
 ###	checks for operator characteristics
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,
@@ -275,37 +284,37 @@ AC_STDC_HEADERS
 AC_HEADER_DIRENT
 AC_HEADER_TIME
 AC_CHECK_HEADERS(\
-curses.h \
-errno.h \
-fcntl.h \
-ioctl.h \
-locale.h \
-malloc.h \
-netdb.h \
-netlib.h \
-poll.h \
-prototypes.h \
-pwd.h \
-sgtty.h \
-stddef.h \
-stdlib.h \
-string.h \
-strings.h \
-stropts.h \
-sys/bsdtypes.h \
-sys/ioctl.h \
-sys/param.h \
-sys/ptem.h \
-sys/pty.h \
-sys/select.h \
-sys/stream.h \
-sys/time.h \
-sys/times.h \
-sys/utsname.h \
-sys/wait.h \
-termio.h \
-time.h \
-unistd.h \
+	curses.h \
+	errno.h \
+	fcntl.h \
+	ioctl.h \
+	locale.h \
+	malloc.h \
+	netdb.h \
+	netlib.h \
+	poll.h \
+	prototypes.h \
+	pwd.h \
+	sgtty.h \
+	stddef.h \
+	stdlib.h \
+	string.h \
+	strings.h \
+	stropts.h \
+	sys/bsdtypes.h \
+	sys/ioctl.h \
+	sys/param.h \
+	sys/ptem.h \
+	sys/pty.h \
+	sys/select.h \
+	sys/stream.h \
+	sys/time.h \
+	sys/times.h \
+	sys/utsname.h \
+	sys/wait.h \
+	termio.h \
+	time.h \
+	unistd.h \
 )
 
 # check for SCO.  this is a hack, and should be split into individual
@@ -342,80 +351,80 @@ CF_SYS_ERRLIST
 
 ###	Checks for library functions.
 AC_CHECK_FUNCS(\
-bcopy \
-bfill \
-bzero \
-getcwd \
-gethostbyname \
-is_xterm \
-memcmp \
-memcpy \
-memset \
-mkdir \
-poll \
-rewinddir \
-select \
-setegid \
-seteuid \
-setgid \
-setlocale \
-setpgrp \
-setregid \
-setreuid \
-setuid \
-sigaction \
-strchr \
-strerror \
-strftime \
-strtol \
-tzset \
-unlink \
+	bcopy \
+	bfill \
+	bzero \
+	getcwd \
+	gethostbyname \
+	is_xterm \
+	memcmp \
+	memcpy \
+	memset \
+	mkdir \
+	poll \
+	rewinddir \
+	select \
+	setegid \
+	seteuid \
+	setgid \
+	setlocale \
+	setpgrp \
+	setregid \
+	setreuid \
+	setuid \
+	sigaction \
+	strchr \
+	strerror \
+	strftime \
+	strtol \
+	tzset \
+	unlink \
 )
 
 CF_FUNC_FORK
 
 CF_CHECK_DECL(\
-getenv \
-tgetstr \
+	getenv \
+	tgetstr \
 )
 
 if test $with_decl_check = yes; then
 CF_CHECK_DECL(\
-bcopy \
-bzero \
-fclose \
-fflush \
-fprintf \
-fputc \
-fputs \
-fread \
-fseek \
-fwrite \
-getcwd \
-gethostname \
-getlogin \
-getopt \
-ioctl \
-memset \
-mktemp \
-pclose \
-perror \
-printf \
-rewind \
-select \
-setegid \
-seteuid \
-setpgrp \
-socket \
-sscanf \
-strftime \
-strtol \
-system \
-time \
-tolower \
-toupper \
-tputs \
-_flsbuf \
+	bcopy \
+	bzero \
+	fclose \
+	fflush \
+	fprintf \
+	fputc \
+	fputs \
+	fread \
+	fseek \
+	fwrite \
+	getcwd \
+	gethostname \
+	getlogin \
+	getopt \
+	ioctl \
+	memset \
+	mktemp \
+	pclose \
+	perror \
+	printf \
+	rewind \
+	select \
+	setegid \
+	seteuid \
+	setpgrp \
+	socket \
+	sscanf \
+	strftime \
+	strtol \
+	system \
+	time \
+	tolower \
+	toupper \
+	tputs \
+	_flsbuf \
 )
 fi
 

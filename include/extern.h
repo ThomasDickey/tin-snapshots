@@ -203,6 +203,9 @@ extern char local_newsgroups_file[PATH_LEN];
 extern char local_newsrctable_file[PATH_LEN];
 extern char mail_active_file[PATH_LEN];
 extern char mail_quote_format[PATH_LEN];
+#ifdef FORGERY
+extern char mail_address[LEN];
+#endif
 extern char news_active_file[PATH_LEN];
 extern char news_quote_format[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
@@ -244,7 +247,6 @@ extern char TMPDIR[PATH_LEN];
 #endif
 
 extern const char base64_alphabet[64];
-
 
 extern constext txt_1_resp[];
 extern constext txt_abort_indexing[];
@@ -929,6 +931,7 @@ extern int col_back;
 extern int col_invers;
 extern int col_text;
 extern int col_minihelp;
+extern int col_help;
 extern int col_message;
 extern int col_quote;
 extern int col_head;
@@ -946,9 +949,6 @@ extern int xref_supported;
 extern int xover_supported;
 extern int xuser_supported;
 extern int xmouse;
-/*
-extern int xcut_and_paste;
-*/
 extern int xcol;
 extern int xrow;
 extern int reread_active_file_secs;

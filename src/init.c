@@ -56,6 +56,9 @@ char local_newsrctable_file[PATH_LEN];
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mail_active_file[PATH_LEN];
+#ifdef FORGERY
+char mail_address[LEN];			/* user's mail address */
+#endif
 char mailbox[PATH_LEN];			/* system mailbox for each user */
 char mailer[PATH_LEN];			/* mail program */
 char mime_encoding[LEN]="8bit";
@@ -160,7 +163,8 @@ int use_color_tinrc;			/* like use_color but stored in tinrc */
 int col_back;				/* standard bacground color */
 int col_invers;				/* color of inverse text */
 int col_text;				/* color of textlines*/
-int col_minihelp;			/* color of mini help */
+int col_minihelp;			/* color of mini help menu*/
+int col_help;				/* color of help pages */
 int col_message;			/* color of message lines at bottom */
 int col_quote;				/* color of quotelines */
 int col_head;				/* color of headerlines */
@@ -443,6 +447,7 @@ void init_selfinfo ()
 	col_invers = 4;
 	col_text = 7;
 	col_minihelp = 3;
+	col_help = 7;
 	col_message = 6;
 	col_quote = 2;
 	col_head = 2;
