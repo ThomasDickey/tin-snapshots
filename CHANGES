@@ -1,8 +1,20 @@
+--unoff BETA release 961231 --
+
+264) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. newnews_times is broken (since 254)
+          -> new newsgroups are not recogniced
+     ADD. prompt_yn2() without crsr-key support
+     FIX. proto.h, active.c, prompt.c, nntplib.c
+
+263) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. color.c doesn't display any _ or * (introduced in 262)
+     FIX. color.c
+
 --unoff BETA release 961229 --
 
 262) Roland Rosenfeld <roland@spinnaker.rhein.de>
      ADD. word_h_marks_display now is a tristate (Nothing, Mark, Space).
-     FIX. serveral supplied patches
+     FIX. serveral patches
 
 261) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minor code clean-up
@@ -57,7 +69,7 @@
      FIX. tin.h
 
 254) Helmrich Streitmatter <helmrich@helix.franken.de>
-     BUG. newnew_info could return 2 large (not null terminated)
+     BUG. newnews_info could return 2 large (not null terminated)
           string
      FIX. active.c
 

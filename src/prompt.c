@@ -199,6 +199,51 @@ prompt_yn (line, prompt, default_answer)
 	return (tolower (ch) == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
 
+/*
+** same as above but without cursor-key support
+** needed in nntplib.c where accidently hitting the cursor key
+** could cause a disconnect from the newsserver
+*/
+
+int 
+prompt_yn2 (line, prompt, default_answer)
+	int line;
+	char *prompt;
+	int default_answer;
+{
+	char ch, prompt_ch;
+
+	set_alarm_clock_off ();
+	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
+
+	MoveCursor (line, 0);
+	CleartoEOLN ();
+	printf ("%s%c", prompt, prompt_ch);
+	cursoron ();
+	fflush (stdout);
+	MoveCursor (line, (int) strlen (prompt));
+
+	if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
+		ch = prompt_ch;
+	}	
+
+	if (line == cLINES) {
+		clear_message ();
+	} else {
+		MoveCursor (line, (int) strlen (prompt));
+		if (ch == ESC) {
+			my_fputc (prompt_ch, stdout);
+		} else {
+			my_fputc (ch, stdout);
+		}
+	}
+	cursoroff ();
+	fflush (stdout);
+
+	set_alarm_clock_on ();
+
+	return (tolower (ch) == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
+}
 
 /*
  * help_text is displayed near the bottom of the screen.

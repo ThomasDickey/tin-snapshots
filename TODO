@@ -4,11 +4,6 @@ o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
    szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag
              number 2 - *bingo!*
 
-o  if the connections times out while you are in a newsgoup and you answer
-   the recconect question (accedently by using crsr-keys) with no - the
-   newsrc entry of this group is reset to the low-mark in the active file
-   -> all articles are marked as unread
-
 o  subscribe to newgroups does not work if tin is started with the -n flag
    (introduced in 961125)
 

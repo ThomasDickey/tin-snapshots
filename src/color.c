@@ -174,6 +174,8 @@ color_fputs (s, stream, color)
 							break;
 						}
 						fcol(color);
+					} else {
+						my_fputc(*p, stream);
 					}
 				}
 				break;
@@ -212,7 +214,9 @@ color_fputs (s, stream, color)
 							break;
 						}
 						fcol(color);
-					} 
+					} else {
+						my_fputc(*p, stream);
+					}
 				}
 				break;
 
