@@ -376,10 +376,19 @@ tin_done (
 		}
 	}
 
-	vWriteNewsrc ();
+	/*
+	 * Save the newsrc file. If it fails for some reason, give the user a
+	 * chance to try again
+	 */
+	forever {
+		if (vWriteNewsrc ()) {
+			info_message(txt_newsrc_saved);
+			break;
+		}
 
-/* TODO - can we do anything if saving the newsrc failed ? */
-	info_message(txt_newsrc_saved);
+		if (!prompt_yn (cLINES, txt_newsrc_again, TRUE))
+			break;
+	}
 
 	write_input_history_file ();
 #if 0 /* FIXME */
@@ -390,7 +399,7 @@ tin_done (
 	write_mail_active_file ();
 #endif
 
-	/* Do this after we save the newsrc in case this hangs up for any reason */
+	/* Do this sometime after we save the newsrc in case this hangs up for any reason */
 	if (ret != EXIT_NNTP_ERROR)
 		nntp_close ();			/* disconnect from NNTP server */
 
@@ -461,7 +470,7 @@ strip_double_ngs (
 										/* any duplicates of the first nwsg */
 	int	ncnt1;			/* counter for the first newsgroup  */
 	int	ncnt2;			/* counter for the second newsgroup */
-	int 	over1;			/* TRUE when the outer loop is over */
+	int	over1;			/* TRUE when the outer loop is over */
 	int	over2;			/* TRUE when the inner loop is over */
 	char	*ptr;				/* start of next (outer) newsgroup  */
 	char	*ptr2;			/* temporary pointer                */
@@ -1054,7 +1063,7 @@ eat_re (
 			else if (*(s+2) == ' ' && *(s+3) == ':')
 				s += 4;
 			else if (*(s+2) == '^' && isdigit((unsigned char)*(s+3)) && *(s+4) == ':')
-				s += 5; 		/* hurray nn */
+				s += 5;	/* hurray nn */
 			else
 				break;
 		} else
@@ -1354,8 +1363,8 @@ get_arrow_key (int prech)
 						xmouse = MOUSE_BUTTON_3;
 						break;
 				}
-				xcol = my_event.x; 	/* column */
-				xrow = my_event.y; 	/* row */
+				xcol = my_event.x;	/* column */
+				xrow = my_event.y;	/* row */
 				code = KEYMAP_MOUSE;
 			}
 			break;
@@ -1516,8 +1525,8 @@ get_arrow_key (int prech)
 
 		case 'M':		/* xterminal button press */
 			xmouse = ReadCh () - ' ';	/* button */
-			xcol = ReadCh () - '!'; 	/* column */
-			xrow = ReadCh () - '!'; 	/* row */
+			xcol = ReadCh () - '!';		/* column */
+			xrow = ReadCh () - '!';		/* row */
 			return KEYMAP_MOUSE;
 
 		default:
@@ -2660,4 +2669,32 @@ quote_wild_whitespace(
 	}
 	*target = '\0';
 	return (buff);
+}
+
+/*
+ * strip_address () removes the realname part from a given e-mail address
+ */
+void
+strip_address (
+	char *the_address,
+	char *stripped_address)
+{
+	char *start_pos;
+	char *end_pos;
+
+	/* skip realname in address */
+	if ((start_pos = strchr (the_address, '<')) == (char *) 0) {
+		/* address in user@domain (realname) syntax or realname is missing */
+		strcpy (stripped_address, the_address);
+		start_pos = stripped_address;
+		if ((end_pos = strchr (start_pos, ' ')) == (char *) 0)
+			end_pos = start_pos+strlen(start_pos);
+	} else {
+		start_pos++; /* skip '<' */
+		strcpy (stripped_address, start_pos);
+		start_pos=stripped_address;
+		if ((end_pos = strchr (start_pos, '>')) == (char *) 0)
+		end_pos = start_pos+strlen(start_pos); /* skip '>' */
+	}
+	*(end_pos) = '\0';
 }

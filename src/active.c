@@ -23,20 +23,15 @@
  */
 #define ACTIVE_SEP		" \n"
 
-char new_newnews_host[PATH_LEN];
 int reread_active_file = FALSE;
-time_t new_newnews_time;			/* FIXME: never set */
 
 /* FIXME: make local */
 char	acHomeDir[PATH_LEN];
-char	acMailActiveFile[PATH_LEN];
 char	acSaveActiveFile[PATH_LEN];
-char	acTempActiveFile[PATH_LEN];
-char	acMailDir[PATH_LEN];
 char	acSaveDir[PATH_LEN];
-int	iAllGrps;
-int	iRecursive;
-int	iVerbose;
+int	iAllGrps;		/* Always FALSE */
+int	iRecursive;		/* Does nothing */
+int	iVerbose;		/* Test only ? Always FALSE */
 #ifndef M_AMIGA
 	struct	passwd *psPwd;
 	struct	passwd sPwd;
@@ -348,7 +343,7 @@ read_news_active_file (void)
 		TIN_FCLOSE (fp);
 
 	/*
-	 *  Exit if active file wasn't read or is empty
+	 *  Exit if active file wasn't read correctly or is empty
 	 */
 	if (tin_errno != 0 || !num_active) {
 		error_message (txt_active_file_is_empty, news_active_file);
@@ -377,17 +372,18 @@ check_for_any_new_groups (void)
 	char *autosubscribe, *autounsubscribe;
 	char *ptr, buf[NNTP_STRLEN];
 	char old_newnews_host[PATH_LEN];
-	int newnews_index = -1;
-	FILE *fp = (FILE *) 0;
-	time_t the_newnews_time = (time_t) 0;
+	char new_newnews_host[PATH_LEN];
+	int newnews_index;
+	FILE *fp;
 	time_t old_newnews_time;
+	time_t new_newnews_time;
 
 	if (!check_for_new_newsgroups || !INTERACTIVE)
 		return;
 
 	wait_message (0, txt_checking_new_groups);
 
-	time (&the_newnews_time);
+	time (&new_newnews_time);
 
 	if (read_news_via_nntp)
 		strcpy (new_newnews_host, nntp_server);
@@ -397,9 +393,7 @@ check_for_any_new_groups (void)
 	/*
 	 * find out if we have read news from here before otherwise -1
 	 */
-	newnews_index = find_newnews_index (new_newnews_host);
-
-	if (newnews_index >= 0) {
+	if ((newnews_index = find_newnews_index (new_newnews_host)) >= 0) {
 		strcpy (old_newnews_host, newnews[newnews_index].host);
 		old_newnews_time = newnews[newnews_index].time;
 	} else {
@@ -409,7 +403,7 @@ check_for_any_new_groups (void)
 
 #ifdef DEBUG
 	if (debug == 2) {
-		error_message("Newnews old=[%ld]  new=[%ld]", old_newnews_time, the_newnews_time);
+		error_message("Newnews old=[%ld]  new=[%ld]", old_newnews_time, new_newnews_time);
 		sleep (2);
 	}
 #endif
@@ -446,12 +440,14 @@ check_for_any_new_groups (void)
 	}
 
 	/*
-	 * Update or create the in-memory 'last time newgroups checked' array
+	 * Update (if already existing) or create (if new) the in-memory
+	 * 'last time newgroups checked' slot for this server. It will be written
+	 * out as part of tinrc.
 	 */
 	if (newnews_index >= 0)
-		newnews[newnews_index].time = the_newnews_time;
+		newnews[newnews_index].time = new_newnews_time;
 	else {
-		sprintf (buf, "%s %ld", new_newnews_host, the_newnews_time);
+		sprintf (buf, "%s %ld", new_newnews_host, new_newnews_time);
 		load_newnews_info (buf);
 	}
 }
@@ -483,11 +479,14 @@ subscribe_new_group (
 	/*
 	 * Try to add the group to our selection list. If this fails, we're
 	 * probably using -n, so we fake an entry with no counts. The count will
-	 * be properly updated when we enter the group
+	 * be properly updated when we enter the group. Otherwise there is some
+	 * mismatch in the active.times data and we ignore the newgroup.
 	 */
 	if ((idx = my_group_add(group)) < 0) {
-		if (!newsrc_active)
-			my_fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
+		if (!newsrc_active) {
+/*			my_fprintf(stderr, "subscribe_new_group: %s not in active[] && !newsrc_active\n", group); */
+			return;
+		}
 
 		if ((ptr = psGrpAdd(group)) != NULL)
 			active_add(ptr, 0L, 1L, 0L, "y");
@@ -502,7 +501,8 @@ subscribe_new_group (
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
 		/*
 		 * Bad kluge to stop group later appearing in New newsgroups. This
-		 * effectively loses the group, and it will be reread by read_newsrc()
+		 * effectively loses the group, and it has now been subscribed to and
+		 * so will be reread later by read_newsrc()
 		 */
 		group_top--;
 	} else
@@ -572,94 +572,20 @@ match_group_list (
 }
 
 /*
- *  Load the last updated time for each group in the active file so that
- *  tind is more efficient and only has to stat the group dir and compare
- *  the last changed time with the time read from the ~/.tin/group.times
- *  file to determine if the group needs updating.
- *
- *  alt.sources 71234589
- *  comp.archives 71234890
- */
-
-#ifdef INDEX_DAEMON
-void
-read_group_times_file (void)
-{
-	char *p, *q;
-	char buf[HEADER_LEN];
-	char group[HEADER_LEN];
-	FILE *fp;
-	time_t updated_time;
-	struct t_group *psGrp;
-
-	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0)
-		return;
-
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		/*
-		 * read the group name
-		 */
-		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
-			*q = *p;
-
-		*q = '\0';
-
-		/*
-		 * read the last updated time
-		 */
-		updated_time = (time_t) atol (p);
-
-		/*
-		 * find the group in active[] and set updated time
-		 */
-		psGrp = psGrpFind (group);
-
-		if (psGrp)
-			psGrp->last_updated_time = updated_time;
-
-#ifdef DEBUG
-if (debug == 2)
-	my_printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
-#endif
-
-	}
-	fclose (fp);
-}
-
-/*
- *  Save the last updated time for each group to ~/.tin/group.times
- */
-
-void
-write_group_times_file (void)
-{
-	FILE *fp;
-	register int i;
-
-	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0)
-		return;
-
-	for (i = 0 ; i < num_active ; i++)
-		fprintf (fp, "%s %ld\n", active[i].name, active[i].last_updated_time);
-
-	fclose (fp);
-}
-#endif	/* INDEX_DAEMON */
-
-/*
- * Add an entry to the in-memory newnews[] array (The times newgroups were last
- * checked for on each news server)
+ * Add or update an entry to the in-memory newnews[] array (The times newgroups
+ * were last checked for a particular news server)
  * If this is first time we've been called, zero out the array.
- * Growing the array if needed
+ *
+ * Side effects:
+ *   'info' is modified. Caller should not depend on it.
  */
 void
 load_newnews_info (
 	char *info)
 {
 	char *ptr;
-	char buf[NNTP_STRLEN];
 	int i;
-	time_t the_time;
+	time_t new_time;
 
 	/*
 	 * initialize newnews[] if no entries
@@ -671,23 +597,32 @@ load_newnews_info (
 		}
 	}
 
-	/* TODO: Surely this is a waste of time, we strdup() this 10 lines lower down */
-	my_strncpy (buf, info, sizeof (buf));
+	/*
+	 * Split 'info' into hostname and time
+	 */
+	if ((ptr = strchr (info, ' ')) == (char *) 0)
+		return;
 
-	if ((ptr = strchr (buf, ' ')) != (char *) 0) {
-		the_time = (time_t) atol (ptr);
-		*ptr = '\0';
-		if (num_newnews >= max_newnews)
+	new_time = (time_t) atol (ptr);
+	*ptr = '\0';
+
+	/*
+	 * If this is a new host entry, set it up
+	 */
+	if ((i = find_newnews_index (info)) == -1) {
+		i = num_newnews++;
+
+		if (i >= max_newnews)
 			expand_newnews ();
-
-		newnews[num_newnews].host = my_strdup (buf);
-		newnews[num_newnews].time = the_time;
-#ifdef DEBUG
-		if (debug == 2)
-			error_message("ACTIVE host=[%s] time=[%ld]", newnews[num_newnews].host, newnews[num_newnews].time);
-#endif
-		num_newnews++;
+		newnews[i].host = my_strdup (info);
 	}
+
+	newnews[i].time = new_time;
+
+#ifdef DEBUG
+	if (debug == 2)
+		error_message("ACTIVE host=[%s] time=[%ld]", newnews[i].host, newnews[i].time);
+#endif
 }
 
 /*
@@ -704,7 +639,7 @@ find_newnews_index (
 			return(i);
 	}
 
-	return (-1);
+	return -1;
 }
 
 /*
@@ -739,7 +674,7 @@ create_save_active_file (void)
 
 	vInitVariables ();
 
-	iRecursive = TRUE;
+	iRecursive = TRUE;	/* FIXME: vInitVariables() just set this to FALSE */
 
 	vPrintActiveHead (acSaveActiveFile);
 	strcpy (acGrpPath, acSaveDir);
@@ -751,6 +686,9 @@ static void
 vInitVariables (void)
 {
 	char	*pcPtr;
+	char	acTempActiveFile[PATH_LEN];
+	char	acMailActiveFile[PATH_LEN];
+	char	acMailDir[PATH_LEN];
 
 #ifndef M_AMIGA
 	psPwd = (struct passwd *) 0;
@@ -895,4 +833,75 @@ vMakeActiveMyGroup (void)
 	for (iNum = 0; iNum < num_active; iNum++)
 		my_group[group_top++] = iNum;
 }
+
+/*
+ *  Load the last updated time for each group in the active file so that
+ *  tind is more efficient and only has to stat the group dir and compare
+ *  the last changed time with the time read from the ~/.tin/group.times
+ *  file to determine if the group needs updating.
+ *
+ *  alt.sources 71234589
+ *  comp.archives 71234890
+ */
+void
+read_group_times_file (void)
+{
+	char *p, *q;
+	char buf[HEADER_LEN];
+	char group[HEADER_LEN];
+	FILE *fp;
+	time_t updated_time;
+	struct t_group *psGrp;
+
+	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0)
+		return;
+
+	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+		/*
+		 * read the group name
+		 */
+		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
+			*q = *p;
+
+		*q = '\0';
+
+		/*
+		 * read the last updated time
+		 */
+		updated_time = (time_t) atol (p);
+
+		/*
+		 * find the group in active[] and set updated time
+		 */
+		psGrp = psGrpFind (group);
+
+		if (psGrp)
+			psGrp->last_updated_time = updated_time;
+
+#ifdef DEBUG
+if (debug == 2)
+	my_printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
 #endif
+
+	}
+	fclose (fp);
+}
+
+/*
+ *  Save the last updated time for each group to ~/.tin/group.times
+ */
+void
+write_group_times_file (void)
+{
+	FILE *fp;
+	register int i;
+
+	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0)
+		return;
+
+	for (i = 0 ; i < num_active ; i++)
+		fprintf (fp, "%s %ld\n", active[i].name, active[i].last_updated_time);
+
+	fclose (fp);
+}
+#endif	/* INDEX_DAEMON */

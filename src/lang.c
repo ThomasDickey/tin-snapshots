@@ -138,7 +138,7 @@ constext txt_external_mail_done[] = "leaving external mail-reader";
 constext txt_extracting_archive[] = cCRLF cCRLF "Extracting %s archive..." cCRLF;
 constext txt_extracting_shar[] =cCRLF "Extracting %s..." cCRLF;
 constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %s. Exiting...";
-constext txt_filesystem_full[] = "Error writing %s file. Filesystem full? Resetting to previous state.";
+constext txt_filesystem_full[] = "Error writing %s file. Filesystem full? File reset to previous state.";
 constext txt_filesystem_full_backup[] = "Error making backup of %s file. Filesystem full?";
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
 constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
@@ -422,7 +422,7 @@ constext txt_help_use_mailreader_i[] = "<SPACE> toggles, <CR> sets, <ESC> cancel
 	constext txt_help_use_metamail[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif
 
-constext txt_help_g_t_p_i[] ="i\t  show subject of selected article" cCRLF;
+constext txt_help_g_t_p_i[] ="i\t  toggle info message in last line (subject/description)" cCRLF;
 constext txt_help_s_i[] ="i\t  show description of chosen newsgroup" cCRLF;
 constext txt_help_use_mouse[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_v[] = "v\t  show version information" cCRLF;
@@ -499,7 +499,9 @@ constext txt_msg_headers_file[] = "# Add extra header lines to mail/news message
 constext txt_news_quote[] = "%F wrote:";
 constext txt_newsgroup[] = "Goto newsgroup [%s]> ";
 constext txt_newsgroup_position[] = "Position %s in group list (1,2,..,$) [%d]> ";
-constext txt_newsrc_saved[] = "newsrc file saved successfully.\n";
+constext txt_newsrc_again[] = "Try and save newsrc file again? (y/n): ";
+constext txt_newsrc_nogroups[] = "Warning: No newsgroups were written to your newsrc file. Save aborted.";
+constext txt_newsrc_saved[] = "newsrc file saved successfully.";
 constext txt_next_resp[] = "-- Next response --";
 constext txt_nntp_authorization_failed[] = "NNTP authorization password not found for %s";
 constext txt_nntp_to_fp_cannot_reopen[] = "nntp_to_fp: can't reopen %s: ";
@@ -560,7 +562,7 @@ constext txt_opt_art_marked_unread[] = "Character to show unread articles  : ";
 
 constext txt_opt_auto_bcc[] = "Send you a blind cc automatically  : ";
 constext txt_opt_auto_cc[] = "Send you a cc automatically        : ";
-constext txt_opt_auto_list_thread[] = "List thread using right key        : ";
+constext txt_opt_auto_list_thread[] = "List thread using right arrow key  : ";
 constext txt_opt_auto_reconnect[] = "Reconnect to server automatically  : ";
 constext txt_opt_auto_save[] = "Use Archive-name: header for save  : ";
 constext txt_opt_batch_save[] = "Save articles in batch mode (-S)   : ";
@@ -625,7 +627,7 @@ constext txt_opt_pos_first_unread[] = "Goto first unread article in group : ";
 constext txt_opt_post_8bit_header[] = "Use 8bit characters in news headers: ";
 constext txt_opt_post_mime_encoding[] = "MIME encoding in news messages     : ";
 constext txt_opt_post_proc_type[] = "Post process saved art/thread with : ";
-constext txt_opt_print_header[] = "Print all header when printing     : ";
+constext txt_opt_print_header[] = "Print all headers when printing    : ";
 constext txt_opt_printer[] = "Printer program with options       : ";
 constext txt_opt_process_only_unread[] = "Process only unread articles       : ";
 constext txt_opt_prompt_followupto[] = "Show empty Followup-To in editor   : ";
@@ -797,6 +799,7 @@ constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n# This file w
 # Do not edit while tin is running, since all your changes to this file\n\
 # will be overwritten when you leave tin.\n#\n\
 ############################################################################\n\n";
+constext txt_tinrc_info_in_last_line[] = "# if ON use print current subject or newsgroup description in the last line\n";
 constext txt_tinrc_inverse_okay[] = "# if ON use inverse video for page headers at different levels\n";
 #ifdef M_UNIX
 	constext txt_tinrc_keep_dead_articles[] = "# if ON keep all failed postings in ~/dead.articles\n";

@@ -51,7 +51,7 @@ selection_index (
 
 	char buf[LEN];
 	char post_group[LEN];
-	int ch, i, n;
+	int i, n, ch, ch1 = 0;
 	int INDEX_BOTTOM;
 	int posted_flag;
 	int scroll_lines;
@@ -82,6 +82,15 @@ selection_index (
 		}
 		set_xclick_on ();
 		ch = ReadCh ();
+#ifndef WIN32
+		switch(ch) {
+			case ESC:	/* (ESC) common arrow keys */
+#ifdef HAVE_KEY_PREFIX
+			case KEY_PREFIX:
+#endif
+				ch1 = get_arrow_key (ch);
+		}
+#endif /* WIN32 */
 		if (ch != iKeyQuit && ch != iKeySelectQuit2) {
 			(void) resync_active_file ();
 		}
@@ -96,7 +105,7 @@ selection_index (
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #endif
-				switch (get_arrow_key (ch)) {
+				switch (ch1) {
 #endif /* WIN32 */
 					case KEYMAP_UP:
 						goto select_up;
@@ -370,13 +379,9 @@ select_page_up:
 				break;
 #endif
 
-			case iKeySelectDisplayGroupInfo:	/* display group description */
-				if (!group_top)
-					info_message (txt_no_groups);
-				else {
-					clear_message ();
-					center_line (cLINES, FALSE, CURR_GROUP.description ?  CURR_GROUP.description : txt_no_description);
-				}
+			case iKeyToggleInfoLastLine:	/* display group description */
+				info_in_last_line = !info_in_last_line;
+				show_selection_page ();
 				break;
 
 			case iKeySelectMoveGrp:	/* reposition group within group list */
@@ -443,11 +448,11 @@ select_done:
 				break;
 
 			case iKeySelectToggleReadDisplay:
-	 			/*
-	 			 * If in show_only_unread_groups mode toggle
-	 			 * all subscribed to groups and only groups
-	 			 * that contain unread articles
-	 			 */
+				/*
+				 * If in show_only_unread_groups mode toggle
+				 * all subscribed to groups and only groups
+				 * that contain unread articles
+				 */
 				show_only_unread_groups = !show_only_unread_groups;
 				wait_message (0, txt_reading_groups, (show_only_unread_groups) ? "unread" : "all");
 
@@ -490,9 +495,11 @@ select_done:
 				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
-					delete_group(CURR_GROUP.name);
-					read_newsrc(newsrc, 1);
-					show_selection_page();
+					vWriteNewsrc();	/* save current newsrc */
+					delete_group(CURR_GROUP.name); /* remove bogus group */
+					read_newsrc(newsrc, 1);	/* reload newsrc*/
+					toggle_my_groups (show_only_unread_groups, ""); /* keep current display-state */
+					show_selection_page(); /* reddraw screen */
 					info_message (buf);
 				}
 
@@ -709,7 +716,7 @@ show_selection_page (void)
 		n = my_group[i];
 
 		/*
-	 	 * Display a flag for this group if needed
+		 * Display a flag for this group if needed
 		 * . Bogus groups are dumped immediately
 		 * . Normal subscribed groups may be
 		 *   ' ' normal, 'X' not postable, 'M' moderated, '=' renamed
@@ -723,7 +730,7 @@ show_selection_page (void)
 		else if (active[n].newgroup)
 			subs = 'N';		/* New (but unsubscribed) group */
 		else
-	 		subs = 'u';		/* unsubscribed group */
+			subs = 'u';		/* unsubscribed group */
 
 		strncpy(active_name, active[n].name, groupname_len);
 		active_name[groupname_len+1] = '\0';
@@ -825,6 +832,12 @@ void
 draw_group_arrow (void)
 {
 	draw_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
+	if (!group_top)
+		info_message (txt_no_groups);
+	else if (info_in_last_line) {
+		clear_message ();
+		center_line (cLINES, FALSE, CURR_GROUP.description ?  CURR_GROUP.description : txt_no_description);
+	}
 }
 
 
@@ -909,19 +922,19 @@ add_my_group (
 {
 	int i,j;
 
-	i = find_group_index (group);
+	if ((i = find_group_index (group)) < 0)
+		return -1;
 
-	if (i >= 0) {
-		for (j = 0; j < group_top; j++) {
-			if (my_group[j] == i) {
-				return j;
-			}
-		}
-		if (add) {
-			my_group[group_top++] = i;
-			return (group_top - 1);
-		}
+	for (j = 0; j < group_top; j++) {
+		if (my_group[j] == i)
+			return j;
 	}
+
+	if (add) {
+		my_group[group_top++] = i;
+		return (group_top - 1);
+	}
+
 	return -1;
 }
 
@@ -990,10 +1003,8 @@ reposition_group (
 		return (default_num);
 	}
 }
-#endif /* INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static void
 catchup_group (
 	struct t_group *group,
@@ -1013,10 +1024,8 @@ catchup_group (
 		}
 	}
 }
-#endif /* INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static int
 next_unread_group (
 	int enter_group)
@@ -1049,8 +1058,7 @@ next_unread_group (
 		erase_group_arrow ();
 	}
 	cur_groupnum = i;
-	if (cur_groupnum < first_group_on_screen ||
-	    cur_groupnum >= last_group_on_screen) {
+	if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen) {
 		show_selection_page ();
 	} else {
 		draw_group_arrow ();
@@ -1071,7 +1079,7 @@ next_unread_group (
 
 	return GRP_CONTINUE;
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
  *  Calculate max length of groupname field for group selection level.
@@ -1149,20 +1157,18 @@ toggle_my_groups (
 
 	if (group_top) {
 		if (!only_unread_groups || reread_active_file) {
-			if (strlen (group)) {
-				if ((i = find_group_index (group)) >= 0) {
+
+			if (group[0] != '\0') {
+				if ((i = find_group_index (group)) >= 0)
 					active_idx = i;
-				}
-			} else {
+			} else
 				active_idx = my_group[group_num];
-			}
-			my_strncpy (old_curr_group, active[active_idx].name,
-				sizeof (old_curr_group));
+
+			my_strncpy (old_curr_group, active[active_idx].name, sizeof (old_curr_group));
 		} else {
 			for (i = group_num ; i < group_top ; i++) {
 				if (active[my_group[i]].newsrc.num_unread) {
-					my_strncpy (old_curr_group, active[my_group[i]].name,
-						sizeof (old_curr_group));
+					my_strncpy (old_curr_group, active[my_group[i]].name, sizeof (old_curr_group));
 					break;
 				}
 			}
@@ -1172,20 +1178,17 @@ toggle_my_groups (
 	group_top = skip_newgroups();			/* Reposition after any newgroups */
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		ptr = strchr (buf, SUBSCRIBED);
-		if (ptr != (char *) 0) {
+		if ((ptr = strchr (buf, SUBSCRIBED)) != (char *) 0) {
 			*ptr = '\0';
-			if ((i = find_group_index (buf)) >= 0) {
-				if (only_unread_groups) {
-/* TODO - no attempt is made here to prevent duplicates */
-					if (active[i].newsrc.num_unread || (active[i].bogus && strip_bogus == BOGUS_ASK)) {
-						my_group[group_top] = i;
-						group_top++;
-					}
-				} else {
-					my_group[group_top] = i;
-					group_top++;
-				}
+
+			if ((i = find_group_index (buf)) < 0)
+				continue;
+
+			if (only_unread_groups) {
+				if (active[i].newsrc.num_unread || (active[i].bogus && strip_bogus == BOGUS_ASK))
+					my_group_add (buf);
+			} else {
+				my_group_add (buf);
 			}
 		}
 	}

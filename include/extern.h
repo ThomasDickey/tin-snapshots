@@ -51,7 +51,7 @@ extern FILE *fdopen (int, const char *);
 #ifdef DECL_FFLUSH
 extern int fflush (FILE *);
 #endif
-#ifdef DECL_FGETC 
+#ifdef DECL_FGETC
 extern int fgetc (FILE * stream);
 #endif
 #if defined(DECL_FILENO) && !defined(fileno)
@@ -325,7 +325,6 @@ extern char mm_charset[LEN];
 extern char msg[LEN];
 extern char msg_headers_file[PATH_LEN];
 extern char my_distribution[LEN];
-extern char new_newnews_host[PATH_LEN];
 extern char newnewsrc[PATH_LEN];
 extern char news_active_file[PATH_LEN];
 extern char news_quote_format[PATH_LEN];
@@ -738,6 +737,8 @@ extern constext txt_msgid_line_only[];
 extern constext txt_news_quote[];
 extern constext txt_newsgroup[];
 extern constext txt_newsgroup_position[];
+extern constext txt_newsrc_again[];
+extern constext txt_newsrc_nogroups[];
 extern constext txt_newsrc_saved[];
 extern constext txt_next_resp[];
 extern constext txt_nntp_authorization_failed[];
@@ -1014,6 +1015,7 @@ extern constext txt_tinrc_full_page_scroll[];
 extern constext txt_tinrc_group_catchup_on_exit[];
 extern constext txt_tinrc_groupname_max_length[];
 extern constext txt_tinrc_header[];
+extern constext txt_tinrc_info_in_last_line[];
 extern constext txt_tinrc_inverse_okay[];
 extern constext txt_tinrc_keep_posted_articles[];
 extern constext txt_tinrc_mail_8bit_header[];
@@ -1227,6 +1229,7 @@ extern t_bool full_page_scroll;
 extern t_bool got_sig_pipe;
 extern t_bool group_catchup_on_exit;
 extern t_bool inverse_okay;
+extern t_bool info_in_last_line;
 extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
 extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
 extern t_bool mail_8bit_header;
@@ -1278,8 +1281,6 @@ extern t_bool verbose;
 extern t_bool xover_supported;
 extern t_bool xref_supported;
 
-extern time_t new_newnews_time;
-
 #define HIST_SIZE		15
 #define HIST_OTHER		 0
 #define HIST_ART_SEARCH		 1
@@ -1312,19 +1313,19 @@ extern constext txt_opt_mail_address[];
 
 /* This fixes ambiguities on platforms that don't distinguish extern case */
 #ifdef CASE_PROBLEM
-#define txt_help_B   txt_help_BIGB
-#define txt_help_D   txt_help_BIGD
-#define txt_help_I   txt_help_BIGI
-#define txt_help_K   txt_help_BIGK
-#define txt_help_L   txt_help_BIGL
-#define txt_help_M   txt_help_BIGM
-#define txt_help_S   txt_help_BIGS
-#define txt_help_T   txt_help_BIGT
-#define txt_help_U   txt_help_BIGU
-#define txt_help_W   txt_help_BIGW
-#define txt_help_X   txt_help_BIGX
-#define txt_help_p_S txt_help_p_BIGS
-#define txt_help_t_K txt_help_t_BIGK
+#define txt_help_B	txt_help_BIGB
+#define txt_help_D	txt_help_BIGD
+#define txt_help_I	txt_help_BIGI
+#define txt_help_K	txt_help_BIGK
+#define txt_help_L	txt_help_BIGL
+#define txt_help_M	txt_help_BIGM
+#define txt_help_S	txt_help_BIGS
+#define txt_help_T	txt_help_BIGT
+#define txt_help_U	txt_help_BIGU
+#define txt_help_W	txt_help_BIGW
+#define txt_help_X	txt_help_BIGX
+#define txt_help_p_S	txt_help_p_BIGS
+#define txt_help_t_K	txt_help_t_BIGK
 #endif
 
 #ifndef DONT_HAVE_PIPING

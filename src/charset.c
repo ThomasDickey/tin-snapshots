@@ -20,15 +20,15 @@
  *  included by  (root@aspic.han.de) on 11/04/93
  */
 
-#define SUB         "?"
-#define ISO_EXTRA   0xa0 /* beginning of second range of printable chars */
+#define SUB	"?"
+#define ISO_EXTRA	0xa0 /* beginning of second range of printable chars */
 
 /*
  * TABSTOP(x) is the column of the character after the TAB
  * at column x. First column is 0, of course.
  */
 
-#define TABSTOP(x)  (((x) - ((x)&7)) + 8)
+#define TABSTOP(x)	(((x) - ((x)&7)) + 8)
 
 static constext *const iso2asc[NUM_ISO_TABLES][256-ISO_EXTRA] =
 {
@@ -136,8 +136,8 @@ ConvertIso2Asc (
 {
 	constext *p;
 	constext *const *tab;
-	int first;   /* flag for first SPACE/TAB after other characters */
-	int i, a;    /* column counters in iso and asc */
+	int first;	/* flag for first SPACE/TAB after other characters */
+	int i, a;	/* column counters in iso and asc */
 
 	if (iso == 0 || asc == 0)
 		return;
@@ -183,8 +183,8 @@ ConvertIso2Asc (
 						/*
 						 * TAB will correct the column difference
 						 */
-						*(asc++) = '\t';   /* = *iso */
-						a = TABSTOP(a);    /* = TABSTOP(i), because i < a < TABSTOP(i) */
+						*(asc++) = '\t';	/* = *iso */
+						a = TABSTOP(a);	/* = TABSTOP(i), because i < a < TABSTOP(i) */
 					}
 					i = TABSTOP(i);
 				}

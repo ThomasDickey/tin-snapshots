@@ -220,8 +220,6 @@ debug_print_active (void)
 	if ((fp = fopen (file, "w")) != (FILE *) 0) {
 		for (i = 0; i < num_active; i++) {	/* for each group */
 			group = &active[i];
-/* 			fprintf (fp, "[%4d]=[%-28s] type=[%s] spooldir=[%s]\n",
-*/
 			fprintf (fp, "[%4d]=[%s] type=[%s] spooldir=[%s]\n",
 				i, group->name,
 				(group->type == GROUP_TYPE_NEWS ? "NEWS" : "MAIL"),

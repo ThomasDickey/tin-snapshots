@@ -243,6 +243,23 @@ subj=[\$\*\!]{3,}
 lines=<3
 xref_max=10
 
+#####    
+### mark own articles and direct replies based on message-id
+### use 2*hot as score to unkill otherwise killed articles
+group=*  
+type=1         
+case=1
+score=200              
+msgid_last=doeblitz\.ts\.rz\.tu-bs\.de                                          
+#####
+### unmark own articles based on message-id
+### -> only f'ups to own articles keep marked hot
+group=*
+type=0
+case=1
+score=-200
+msgid_only=doeblitz\.ts\.rz\.tu-bs\.de
+
 
 7. TODO
 

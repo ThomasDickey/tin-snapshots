@@ -147,7 +147,7 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 
 	}
 
-   if (!is_reconnect) {
+	if (!is_reconnect) {
 		if (!can_post)
 			wait_message(0, "%s\n", txt_cannot_post);
 
@@ -157,10 +157,30 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		strncpy(bug_nntpserver2, linep, sizeof(bug_nntpserver2)-1);
 		bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
 
-		if (sec)
-			wait_message(0, "%s\n", bug_nntpserver2);
-		else
-			wait_message(0, "%s\n", bug_nntpserver1);
+		{
+			char *chr1, *chr2;
+			int j;
+
+			j = atoi(get_val("COLUMNS", "80"));
+
+			if (sec)
+				chr1 = my_strdup(bug_nntpserver2);
+			else
+				chr1 = my_strdup(bug_nntpserver1);
+
+			if (((int)strlen(chr1))>=j) {
+				chr2 = chr1+strlen(chr1)-1;
+				while(chr2-chr1>=j)
+					chr2--;
+				while(chr2>chr1 && *chr2!=' ')
+					chr2--;
+				if (chr2!=chr1)
+					*chr2 = '\n';
+			}
+
+			wait_message(0, "%s\n", chr1);
+			free(chr1);
+		}
 
 		is_reconnect = TRUE;
 	}
@@ -210,11 +230,11 @@ nntp_close (void)
 
 /*
  *  Get a response code from the server.
- * 	Returns:
- *		+ve NNTP return code
- * 		-1  on an error
+ *  Returns:
+ *    +ve NNTP return code
+ *    -1  on an error
  *  If 'message' is not NULL, then any trailing text after the response
- *	code is copied into it.
+ *	 code is copied into it.
  *  Performs authentication if required and repeats the last command if
  *  necessary after a timeout.
  */
@@ -438,14 +458,19 @@ FILE *
 open_newsgroups_fp (void)
 {
 #ifdef NNTP_ABLE
+	FILE *result;
 	if (read_news_via_nntp) {
 		if (read_local_newsgroups_file) {
+			result = fopen (local_newsgroups_file, "r");
+			if (result != NULL) {
 # ifdef DEBUG
-			debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
+				debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
 # endif /* DEBUG */
-			return fopen (local_newsgroups_file, "r");
-		} else
-			return (nntp_command ("LIST NEWSGROUPS", OK_GROUPS, NULL));
+				return result;
+			}
+			read_local_newsgroups_file = FALSE ;
+		}
+		return (nntp_command ("LIST NEWSGROUPS", OK_GROUPS, NULL));
 	} else
 #endif /* NNTP_ABLE */
 		return fopen (newsgroups_file, "r");

@@ -108,9 +108,9 @@ split_file (
 	sprintf(pt, PLAINTEXT, TMPDIR, pid);
 	sprintf(ct, CIPHERTEXT, TMPDIR, pid);
 	mask = umask(077);
-	if ((art = fopen(file, "r")) == (FILE *) 0) {
+	if ((art = fopen(file, "r")) == (FILE *) 0)
 		return;
-	}
+
 	if ((header = fopen(hdr, "w")) == (FILE *) 0) {
 		fclose(art);
 		return;
@@ -144,19 +144,25 @@ do_pgp (
 	char *mail_to)
 {
 	char cmd[LEN], options[10];
+	char address[LEN];
 
 	split_file(file);
-	strcpy(options, "-at");
+	strcpy (options, "-at");
 
 #	ifdef HAVE_PGP_2
 	if (what & ENCRYPT)
 		strcat(options, "e");
 	if (what & SIGN)
 		strcat(options, "s");
-	sh_format (cmd, sizeof(cmd), "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
-#	else
-#		ifdef HAVE_PGP_5
 
+	if (*mail_address) {
+		strip_address (mail_address, address);
+		sh_format (cmd, sizeof(cmd), "%s %s %s %s %s -u %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "", address);
+	} else
+		sh_format (cmd, sizeof(cmd), "%s %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
+
+#	else /* FIXME - check mail_address */
+#		ifdef HAVE_PGP_5
 	if (what & ENCRYPT && what & SIGN) {
 		strcat (options, "s");
 		sh_format (cmd, sizeof(cmd), "%se %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
@@ -177,16 +183,20 @@ pgp_append_public_key (
 	char *file)
 {
 	FILE *f, *key;
-	char keyfile[PATH_LEN], cmd[LEN], user[50], buf[LEN];
+	char keyfile[PATH_LEN], cmd[LEN], buf[LEN];
 
-	sprintf(user, "%s@%s", userid, host_name);
+	if (*mail_address)
+		strip_address (mail_address, buf);
+	else
+		sprintf(buf, "%s@%s", userid, host_name);
+
 	sprintf(keyfile, KEYFILE, TMPDIR, (char)getpid());
 
 #	ifdef HAVE_PGP_2
-	sh_format (cmd, sizeof(cmd), "%s %s -kxa %s %s", PGPNAME, pgpopts, user, keyfile);
+	sh_format (cmd, sizeof(cmd), "%s %s -kxa %s %s", PGPNAME, pgpopts, buf, keyfile);
 #	else
 #		ifdef HAVE_PGP_5
-	sh_format (cmd, sizeof(cmd), "%sk %s -xa %s %s", PGPNAME, pgpopts, user, keyfile);
+	sh_format (cmd, sizeof(cmd), "%sk %s -xa %s %s", PGPNAME, pgpopts, buf, keyfile);
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 

@@ -42,16 +42,6 @@
  * at the end of filter_articles()
  */
 
-#if 0
-/* 
- * format for From: in filter
- * should be "%s1 (%s2)" or "%s2 <%s1>" depending on the format
- * used in the header.
- * disabled because of problems with From:-Lines in name <address> format
- */
-#define iAFR_FORMAT2 ((wildcard) ? "%s\\s\\(%s\\)" : "*%s (%s)*")
-#endif
-
 /*
  * global filter array
  */
@@ -223,7 +213,7 @@ read_filter_file (
 		return FALSE;
 
 	if (INTERACTIVE)
-			wait_message (0, txt_reading_filter_file, (global ? "global ": "" ));
+		wait_message (0, txt_reading_filter_file, (global ? "global ": "" ));
 
 	time (&current_secs);
 
@@ -308,6 +298,7 @@ if (debug) {
 				break;
 			}
 			break;
+
 		case 'm':
 			if (match_string (buf+1, "sgid=", msgid, sizeof (msgid))) {
 				if (arr_ptr) {
@@ -331,6 +322,7 @@ if (debug) {
 				break;
 			}
 			break;
+
 		case 's':
 			if (match_string (buf+1, "cope=", scope, sizeof (scope))) {
 #ifdef DEBUG
@@ -344,7 +336,6 @@ if (debug) {
 				arr_max = &glob_filter.max;
 				if (*arr_num >= (*arr_max - 1))
 					glob_filter.filter = psExpandFilterArray (glob_filter.filter, arr_max);
-
 				arr_ptr = glob_filter.filter;
 				i = *arr_num;
 				(*arr_num)++;
@@ -407,6 +398,7 @@ if (debug) {
 				break;
 			}
 			break;
+
 		case 't':
 			if (match_integer (buf+1, "ype=", &type, 1)) {
 #ifdef DEBUG
@@ -439,6 +431,7 @@ if (debug) {
 				break;
 			}
 			break;
+
 		case 'x':
 			if (match_string (buf+1, "ref=", xref, sizeof (xref))) {
 				if (arr_ptr && ! expired_time)
@@ -469,6 +462,7 @@ if (debug) {
 				break;
 			}
 			break;
+
 		default:
 			break;
 		}
@@ -493,9 +487,7 @@ vWriteFilterFile (
 	char *pcFile)
 {
 	FILE *hFp;
-/*	int i; */
 	time_t lCurTime;
-/*	struct t_filters *psFilter; */
 
 	if ((hFp = fopen (pcFile, "w")) == (FILE *) 0)
 		return;
@@ -516,7 +508,6 @@ vWriteFilterFile (
 	fclose (hFp);
 	chmod (pcFile, (S_IRUSR|S_IWUSR));
 }
-
 #endif/* !INDEX_DAEMON */
 
 #ifndef INDEX_DAEMON
@@ -752,18 +743,7 @@ filter_menu (
 	sprintf (text_time, txt_time_default_days, default_filter_days);
 	sprintf (text_subj, ptr_filter_subj, len, len, art->subject);
 
-#if 0
-	/*
-	 * There are two possible formats: from (name) and name <from>
-	 * This segment of code should be disabled as it converts all
-	 * addresses to the first format, even when they are in the second
-	 * format in the header.
-	 */
-	if (art->name != (char *) 0)
-		sprintf (buf, "%s (%s)", art->from, art->name);
-	else
-#endif
-		strcpy (buf, art->from);
+	strcpy (buf, art->from);
 
 	sprintf (text_from, ptr_filter_from, len, len, buf);
 	sprintf (text_msgid, ptr_filter_msgid, len-4, len-4, MSGID(art));
@@ -1251,18 +1231,7 @@ iAddFilterRule (
 	}
 
 	if (psRule->text[0]) {
-#if 0
-		/*
-		 * quoting metacharacters and/or wildcards should not be necessary for
-		 * manually entered strings
-		 * we should assume that the users does know what he is doing and allow
-		 * him to enter regular expressions or wilmat patterns
-		 */
-		if (psRule->check_string)
-			sprintf (acBuf, REGEX_FMT, quote_wild(psRule->text));
-		else
-#endif
-			sprintf (acBuf, REGEX_FMT, psRule->text);
+		sprintf (acBuf, REGEX_FMT, quote_wild_whitespace(psRule->text));
 
 		switch (psRule->counter) {
 			case FILTER_SUBJ_CASE_IGNORE:
@@ -1270,21 +1239,22 @@ iAddFilterRule (
 				psPtr[*plNum].subj = my_strdup (acBuf);
 				if (psRule->counter == FILTER_SUBJ_CASE_IGNORE)
 					psPtr[*plNum].icase = TRUE;
-
 				break;
+
 			case FILTER_FROM_CASE_IGNORE:
 			case FILTER_FROM_CASE_SENSITIVE:
 				psPtr[*plNum].from = my_strdup (acBuf);
 				if (psRule->counter == FILTER_FROM_CASE_IGNORE)
 					psPtr[*plNum].icase = TRUE;
-
 				break;
+
 			case FILTER_MSGID:
 			case FILTER_MSGID_LAST:
 			case FILTER_MSGID_ONLY:
 				psPtr[*plNum].msgid = my_strdup (acBuf);
 				psPtr[*plNum].fullref = psRule->counter;
 				break;
+
 			default: /* should not happen */
 				assert(0 != 0);
 				break;
@@ -1301,19 +1271,7 @@ iAddFilterRule (
 			psPtr[*plNum].subj = my_strdup (acBuf);
 		}
 		if (psRule->from_ok) {
-#if 0
-			/*
-			 * There are two possible formats: from (name) and name <from>
-			 * This segment of code should be disabled as it converts all
-			 * addresses to the first format, even when they are in the second
-			 * format in the header.
-			 */
-			if (psArt->name != (char *) 0)
-				sprintf (acBuf, iAFR_FORMAT2, psArt->from, psArt->name);
-			else
-#endif
-				sprintf (acBuf, REGEX_FMT, quote_wild (psArt->from));
-
+			sprintf (acBuf, REGEX_FMT, quote_wild (psArt->from));
 			psPtr[*plNum].from = my_strdup (acBuf);
 		}
 		/*

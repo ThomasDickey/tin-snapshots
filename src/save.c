@@ -285,7 +285,7 @@ save_art_to_file (
 #ifndef INDEX_DAEMON
 
 	char *file;
-	char mode[8];
+	char mode[3];
 	char save_art_info[LEN];
 	FILE *fp;
 	int ch;
@@ -342,25 +342,12 @@ save_art_to_file (
 		 * on top of each article
 		 */
 		char from[HEADER_LEN];
-		char * from_login_pos;
-		char * from_end_pos;
 		time_t epoch;
-	
-		strcpy (from, note_h.from); /* make a working copy */
-	
-		/* skip realname in from */
-		if ((from_login_pos = strchr (from, '<')) == (char *) 0) {
-			/* address in user@domain (realname) syntax or realname is missing */
-			from_login_pos = from;
-			if ((from_end_pos = strchr (from_login_pos, ' ')) == (char *) 0)
-				from_end_pos = from_login_pos+strlen(from_login_pos);
-		} else {
-			from_login_pos++; /* skip '<' */
-			from_end_pos = from_login_pos+strlen(from_login_pos)-1; /* skip '>' */
-		}
-		*(from_end_pos) = '\0';
+
+		strip_address (note_h.from, from);
+
 		time (&epoch);
-		fprintf (fp, "From %s %s", from_login_pos, ctime (&epoch));
+		fprintf (fp, "From %s %s", from, ctime (&epoch));
 	}
 
 	if (fseek (note_fp, 0L, SEEK_SET) == -1)

@@ -2,56 +2,96 @@ This document summarises new and significantly changed features
 in tin-1.4
 
 [ Changes are relative to the last original tin beta, 950824 ]
+[ Changes are included for releases up to pre-1.4-980105 ]
 
-Full details of all the tinrc flags can be found on the man page. (eventually)
+Full details of all the tinrc flags can be found on the man page.
 
 Major additions
----------------
+===============
 
-. Full MIME support
-	New foreign charset support
-	Many new associated tinrc variables
+. Better MIME support
+    New foreign charset support
+    Integrated with metamail
+    Many new associated tinrc variables
 
-. Colour support
-	& to toggle while online, many variables in tinrc
-	Word highlighting
+. Full Colour support
+    & to toggle while online, many new variables in tinrc
+    Word highlighting, can be toggled with '_'
 
-. References based threading
-	'u' to toggle online, settable in tinrc and in attributes
-	Various thread menu additions & enhancements
+. True References based threading
+    'u' to toggle threading in the group menu, settable in tinrc and
+    as a per-group attribute. Various thread menu additions & enhancements
+    to support this:
+
+    'u' in pager to goto parent
+    'L' in pager to search for a Message-Id
+
+    Graphical threading tree in the Thread menu.
 
 . Now auto-configures and builds out of the box
-	Much improved configurability
-
+     Much improved configurability. No more messy Makefiles to edit.
+    
 . Configuration menu completely rewritten ('M')
+  Most tinrc values can now be set in here.
+  Searchable with '/' and '?'
+
+. Many speed-up improvements
 
 . Article Superseding
 
-. Full PGP support
+. Full PGP and PGP-5 support
 
 . Support for multiple news servers
 
 . Newsserver authorisation fully supported
 
-. Scoring
+. Many enhancements to article filtering: true article
+  scoring and new filter types, such as filtering on crossposts
 
-. Uses libpcre (Perl-compatible regular expression Librarie) for
-  regex-patterns
+. Full regular expression support using libpcre (Perl-compatible
+  regular expression Library)
 
-Plus of course, countless bug fixes and doubtless some new ones.
+. Seperate history is now kept for most input types (eg searching)
+  Cursor keys can be used to scroll back/forwards/left/right through
+  the input.
 
 Other enhancements
-------------------
+==================
 
-: skips quoted text in articles
+   Global keys
+   -----------
 
-i shows group description in main menu or article subject in group menu
+   'i' shows group description in main menu or article subject at all other levels
 
-^ goes to top of current display
+   '^' goes to top of current display
 
-L lookup article by message-id
+   Group menu
+   ----------
+   'K', 'z', 'Z' now understand ranges
+ 
+   Thread menu
+   -----------
+   '/'
+   'S'
+   'U' same functionality as in the group menu
 
-article length shown in group menu, can be turned off
+   Pager
+   -----
+   ':' skips past quoted text in articles
+
+   'L' lookup article by message-id
+
+   'u' goto the parent of this article
+
+
+   Help Screens / Configuration Screen
+   -----------------------------------
+   '/'
+   '?' Searching now works
+
+
+Article length in lines shown in group and thead menu, can be
+turned off
 
 new_quote_format in attributes
 
@@ -59,27 +99,31 @@ mark forwarded text ??? 0713
 
 locale support
 
-filtering on number of Xposts
-
-article postponement
+article postponement / reposting with ^O
 
 New newsgroup handling completely rewritten
 
+handling for bogus groups in newsrc
+
 -N flag
+
+-p <port> flag
+
+-d flag
+
+-Q flag
+
+user configurable header display in pager
+
+local overview cacheing for speed on slow links
+
+$SPAMTRAP
+
+Can be built with curses, to give gpm support and scrolling option
+and help screens.
+
+Plus of course, countless bug fixes and doubtless some new ones.
 
 New flags in tinrc
 ------------------
-keep_dead_articles
-keep_posted_articles
-no-advertising
-show_xcommentto
-highlight_xcommentto
-xpost_quote_format
-auto_bcc
-post_process_command
-space_goto_next_unread
-news_quote_format enhancements (%C)
-show_lines
-lots for colour/highlighting
-
-loads more...
+Lots....

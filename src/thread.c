@@ -156,8 +156,8 @@ bld_tline (
 		make_prefix(art->refptr, buff+strlen(buff));
 
 		if ((int)strlen(buff) >= cCOLS) { /* If extremely nested */
-		    WriteLine(INDEX2LNUM(l), buff);
-		    return;
+			WriteLine(INDEX2LNUM(l), buff);
+			return;
 		}
 
 #if 0 /* see #if 0 above */
@@ -178,7 +178,7 @@ bld_tline (
 
 		if (i > 0) {
 			if (!(art->refptr->parent &&
-			  art->refptr->parent->article != ART_NORMAL &&
+			  art->refptr->parent->article != ART_UNAVAILABLE &&
 			  arts[art->refptr->parent->article].subject ==
 			  art->subject))
 				strncat(buff, art->subject, i);
@@ -668,7 +668,7 @@ thread_catchup:
 				show_thread_page ();
 				break;
 
-			case iKeyThreadUntag:  			 /* untag all articles */
+			case iKeyThreadUntag:			/* untag all articles */
 				if (index_point >= 0) {
 					if (untag_all_articles())
 						update_thread_page();
@@ -730,6 +730,11 @@ thread_catchup:
 						show_thread_page();
 				} else
 					info_message(txt_cannot_post);
+				break;
+
+			case iKeyToggleInfoLastLine:  /* display subject in last line */
+				info_in_last_line = !info_in_last_line;
+				show_thread_page();
 				break;
 
 			default:
@@ -863,13 +868,11 @@ draw_thread_arrow (void)
 	}
 	stow_cursor();
 
-/*
- * show current subject in the last line - this is done a bit to often
- * and could slow down things, but I like it
- */
-	clear_message();
-	/* We do it this way in case there are formatting chars in the subject */
-	center_line (cLINES, FALSE, arts[find_response (thread_basenote, thread_index_point)].subject);
+	if (info_in_last_line) {
+		clear_message();
+		/* We do it this way in case there are formatting chars in the subject */
+		center_line (cLINES, FALSE, arts[find_response (thread_basenote, thread_index_point)].subject);
+	}
 }
 #endif /* INDEX_DAEMON */
 
@@ -1236,7 +1239,7 @@ move_to_response (
 
 /*
  * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
- */  
+ */
 static void
 make_prefix (
 	struct t_msgid *art,

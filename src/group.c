@@ -1222,18 +1222,9 @@ undo_auto_select_arts:
 				show_group_page ();
 				break;
 
-			case iKeyGroupDisplaySubject:
-				if (index_point < 0) {
-					info_message (txt_no_arts);
-				} else {
-					struct t_art_stat statbuf;
-					int j;
-
-					stat_thread(index_point, &statbuf);
-					j = (statbuf.unread) ? next_unread(base[index_point]) : base[index_point];
-					clear_message();
-					center_line (cLINES, FALSE, arts[j].subject);
-				}
+			case iKeyToggleInfoLastLine:
+				info_in_last_line = !info_in_last_line;
+				show_group_page();
 				break;
 
 			default:
@@ -1319,11 +1310,10 @@ show_group_page (void)
 	show_mini_help (GROUP_LEVEL);
 
 	if (top_base <= 0) {
-		info_message(txt_no_arts);
+		info_message (txt_no_arts);
 		return;
-	} else if (last_subj_on_screen == top_base) {
+	} else if (last_subj_on_screen == top_base)
 		info_message(txt_end_of_arts);
-	}
 
 	draw_subject_arrow();
 
@@ -1361,6 +1351,18 @@ draw_subject_arrow (void)
 		StartInverse();
 		draw_sline(index_point, TRUE);
 		EndInverse();
+	}
+	if (info_in_last_line) {
+		struct t_art_stat statbuf;
+		int j;
+
+		stat_thread(index_point, &statbuf);
+		j = (statbuf.unread) ? next_unread(base[index_point]) : base[index_point];
+		clear_message();
+		center_line (cLINES, FALSE, arts[j].subject);
+	} else {
+		if (last_subj_on_screen == top_base)
+			info_message(txt_end_of_arts);
 	}
 	stow_cursor();
 }

@@ -102,15 +102,15 @@ main (
 	}
 
 	/*
-	 *  Process envargs & command line options
-	 */
-	read_cmd_line_options (argc, argv);
-
-	/*
 	 *  Read user local & global config files
 	 */
 	read_config_file (global_config_file, TRUE);
 	read_config_file (local_config_file, FALSE);
+
+	/*
+	 *  Process envargs & command line options
+	 */
+	read_cmd_line_options (argc, argv);
 
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
@@ -123,6 +123,7 @@ main (
 			error_message (txt_screen_init_failed, progname);
 			exit (EXIT_ERROR);
 		}
+		EndInverse ();
 	}
 #	endif
 #endif
@@ -301,9 +302,10 @@ main (
 #endif
 
 	/*
-	 *  Set up screen and switch to raw mode
+	 *  Set up screen and switch to raw mode, set default attributes
 	 */
 	setup_screen ();
+	EndInverse ();
 
 	/*
 	 *  If first time print welcome screen and auto-subscribe
@@ -620,6 +622,12 @@ read_cmd_line_options (
 		wait_message(1, "Assuming -r in order to use -n\n");
 		read_news_via_nntp = TRUE;	/* We won't get here without NNTP support */
 	}
+	/*
+	 *  If we're reading from an NNTP server and we've been asked not to look
+	 *  for new newsgroups, trust our cached copy of the newsgroups file.
+	 */
+	if (read_news_via_nntp)
+		read_local_newsgroups_file = ! check_for_new_newsgroups;
 #endif
 }
 

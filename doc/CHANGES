@@ -1,3 +1,60 @@
+-- pre-1.4 release 980117 --
+
+540) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. 'Try again (y/n)' loop if writing newsrc fails due to full disk
+     ADD. Abort save of newsrc file if 0 groups written
+     BUG. Couple of very obscure problems related to new newsgroup
+          handling
+     BUG. Groups mistakenly reported as new by the server could
+          appear more than once in selection list
+     FIX. tin.1, extern.h, proto.h, active.c, config.c, lang.c, misc.c
+          newsrc.c, select.c
+
+539) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. the rest of the keycodes of an arrow key which triggers
+          rereading of the active file at group selection level disappear
+          by the time get_arrow_key is called
+     FIX. select.c
+
+538) Darrell Tangman <darrelltman@mindspring.com>
+     BUG. local caching of newsgroups file didn't try to read newsgroups
+          via nntp if no local copy exists and -q falg was used
+     FIX. main.c, open.c
+
+537) Sven Paulus <sven@tin.org>
+     ADD. cosmetic-patch for start-up message
+     ADD. rearranged order of options 'M'enu items
+     FIX. open.c, tincfg.tbl
+
+536) Christian Haul <haul@informatik.tu-darmstadt.de>
+     Urs Janssen <urs@tin.org>
+     ADD. use mail_address for pgp-key if set
+     FIX. pgp.c, misc.c, proto.h
+
+535) Urs Janssen <urs@tin.org>
+     BUG. 'u'nsubscribing from bogus groups ('D') resets the .newsrc
+     BUG. 'u'nsubscribing and falls in show_only_unread=OFF mode
+     ADD. joined GLOBAL OPTIONS MENU and TINRC CONFIGURABLE VARIABLES
+          in the man page
+     ADD. info_in_last_line ('i')
+     FIX. extern.h, menukeys.h, config.c, group.c, init.c, select.c
+          thread.c, tin.1
+
+534) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. missing set_signals_page() call added
+     ADD. check against active-file if using AUTOSUBSCRIBE and reading from
+          local spool.
+     ADD. documentation updated
+     FIX. several supplied patches
+
+533) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. commandline flags overridden by tinrc values
+     BUG. screen not initialized to default attributes when using color
+     BUG. documentation for default_filter_kill_header and
+          default_filter_select_header outdated in man page
+     ADD. whitespace quoting and cleanup
+     FIX. filter.c, main.c, tin.1
+
 -- pre-1.4 release 980105 --
 
 532) Jason Faultless <jason@radar.demon.co.uk>

@@ -292,10 +292,9 @@ SetupScreen (void)
 	if (_columns == -1)
 		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
 
-	if (_lines < MIN_LINES_ON_TERMINAL ||
-	    _columns < MIN_COLUMNS_ON_TERMINAL) {
-	    	my_fprintf(stderr, txt_screen_too_small, progname);
-	    	return (FALSE);
+	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
+		my_fprintf(stderr, txt_screen_too_small, progname);
+		return (FALSE);
 	}
 	/*
 	 * kludge to workaround no inverse
@@ -402,93 +401,86 @@ InitScreen (void)
 	}
 #endif	/* M_OS2 */
 
-	if (_lines < MIN_LINES_ON_TERMINAL ||
-	    _columns < MIN_COLUMNS_ON_TERMINAL) {
-	    	my_fprintf(stderr, txt_screen_too_small, progname);
-	    	return (FALSE);
+	if (_lines < MIN_LINES_ON_TERMINAL || _columns < MIN_COLUMNS_ON_TERMINAL) {
+		my_fprintf(stderr, txt_screen_too_small, progname);
+		return (FALSE);
 	}
 
 	InitWin ();
 
 #ifdef VMS
 	{
-	  int input_chan, status;
-	  int item_code, eightbit;
-	  struct sensemode {
-	    short status;
-	    unsigned char xmit_baud;
-	    unsigned char rcv_baud;
-	    unsigned char crfill;
-	    unsigned char lffill;
-	    unsigned char parity;
-	    unsigned char unused;
-	    char class;
-	    char type;
-	    short scr_wid;
-	    unsigned long tt_char : 24, scr_len : 8;
-	    unsigned long tt2_char;
-	  } tty;
-	  $DESCRIPTOR (input_dsc, "TT");
+		int input_chan, status;
+		int item_code, eightbit;
+		struct sensemode {
+			short status;
+			unsigned char xmit_baud;
+			unsigned char rcv_baud;
+			unsigned char crfill;
+			unsigned char lffill;
+			unsigned char parity;
+			unsigned char unused;
+			char class;
+			char type;
+			short scr_wid;
+			unsigned long tt_char : 24, scr_len : 8;
+			unsigned long tt2_char;
+		} tty;
+		$DESCRIPTOR (input_dsc, "TT");
 
-	  status = SYS$ASSIGN (&input_dsc, &input_chan, 0, 0);
-	  if (!(status & 1))
-	      LIB$STOP (status);
-	  SYS$QIOW (0, input_chan, IO$_SENSEMODE, &tty, 0, 0,
-		    &tty.class, 12, 0, 0, 0, 0);
-	  item_code = DVI$_TT_EIGHTBIT;
-	  status = LIB$GETDVI(&item_code, &input_chan, 0, &eightbit, 0, 0);
-	  _columns = tty.scr_wid;
-	  _lines = tty.scr_len;
+		status = SYS$ASSIGN (&input_dsc, &input_chan, 0, 0);
+		if (!(status & 1))
+			LIB$STOP (status);
+		SYS$QIOW (0, input_chan, IO$_SENSEMODE, &tty, 0, 0, &tty.class, 12, 0, 0, 0, 0);
+		item_code = DVI$_TT_EIGHTBIT;
+		status = LIB$GETDVI(&item_code, &input_chan, 0, &eightbit, 0, 0);
+		_columns = tty.scr_wid;
+		_lines = tty.scr_len;
 
-	if (eightbit)
-	 { /* if using eightbit then use CSI (octal 233) rather than ESC "[" */
-	  _clearscreen	= "\2331;1H\233J";
-	  _moveto	= "\233%d;%dH"; /* not a termcap string !*/
-	  _cleartoeoln	= "\233K";
-	  _cleartoeos	= "\233J";
-	  _setinverse	= "\2337m";
-	  _clearinverse = "\2330m";
-	  _setunderline = "\2334m";
-	  _clearunderline	= "\2330m";
-	  _keypadlocal	= "";
-	  _keypadxmit	= "";
-	 }
-	else
-	 {
-	  _clearscreen	= "\033[1;1H\033[J";
-	  _moveto	= "\033[%d;%dH";	/* not a termcap string! */
-	  _cleartoeoln	= "\033[K";
-	  _cleartoeos	= "\033[J";
-	  _setinverse	= "\033[7m";
-	  _clearinverse = "\033[0m";
-	  _setunderline = "\033[4m";
-	  _clearunderline	= "\033[0m";
-	  _keypadlocal	= "";
-	  _keypadxmit	= "";
-	 }
+		if (eightbit) { /* if using eightbit then use CSI (octal 233) rather than ESC "[" */
+			_clearscreen = "\2331;1H\233J";
+			_moveto = "\233%d;%dH"; /* not a termcap string !*/
+			_cleartoeoln = "\233K";
+			_cleartoeos = "\233J";
+			_setinverse = "\2337m";
+			_clearinverse = "\2330m";
+			_setunderline = "\2334m";
+			_clearunderline = "\2330m";
+			_keypadlocal = "";
+			_keypadxmit = "";
+		} else {
+			_clearscreen = "\033[1;1H\033[J";
+			_moveto = "\033[%d;%dH";	/* not a termcap string! */
+			_cleartoeoln = "\033[K";
+			_cleartoeos = "\033[J";
+			_setinverse = "\033[7m";
+			_clearinverse = "\033[0m";
+			_setunderline = "\033[4m";
+			_clearunderline = "\033[0m";
+			_keypadlocal = "";
+			_keypadxmit = "";
+		}
 #ifdef HAVE_IS_XTERM
-	if (is_xterm())
-	 {
-	  xclicks = TRUE;
-	  if (eightbit)
-	   { /* These are the settings for a DECterm but the reply can't easily be parsed */
-	     /* Reply is of the form - CSI Pe ; Pb ; Pr ; Pc & w
-		    Where Pe is the event, Pb the button, Pr and Pc the row and column */
-/**
-	     _xclickinit = "\2331;2'z";
-	     _xclickend = "\2330;0'z";
-**/
-	    }
-	   else
-	    {
-	     _xclickinit = "\033[?9h";
-	     _xclickend  = "\033[?9l";
-	    }
-	 }
-#endif
-
+		if (is_xterm()) {
+			xclicks = TRUE;
+			if (!eightbit) {
+				_xclickinit = "\033[?9h";
+				_xclickend  = "\033[?9l";
+			}
+#if 0
+			else {
+				/* These are the settings for a DECterm but the reply can't easily be parsed
+				 * Reply is of the form - CSI Pe ; Pb ; Pr ; Pc & w
+				 * Where Pe is the event, Pb the button, Pr and Pc the row and column
+				 */
+				_xclickinit = "\2331;2'z";
+				_xclickend = "\2330;0'z";
+			}
+#endif /* 0 */
+		}
+#endif /* HAVE_IS_XTERM */
 	}
-#endif
+#endif /* VMS */
 	Raw (FALSE);
 
 	return (TRUE);
@@ -766,11 +758,11 @@ Raw (
 {
 #ifdef VMS
 	if (!state && _inraw) {
-/*	  vmsnoraw();*/
-	  _inraw = 0;
+/*		vmsnoraw(); */
+		_inraw = 0;
 	} else if (state && !_inraw) {
-/*	  vmsraw();*/
-	  _inraw = 1;
+/*		vmsraw(); */
+		_inraw = 1;
 	}
 #else
 #if !defined(INDEX_DAEMON) && !defined(M_OS2)

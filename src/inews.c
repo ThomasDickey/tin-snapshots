@@ -101,8 +101,8 @@ submit_inews (
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line
 	 */
-	 if ((ptr = strchr (from_name, '@')) != (char *) 0) {
-	 	if ((ptr = strchr (ptr, '.')) == (char *) 0) {
+	if ((ptr = strchr (from_name, '@')) != (char *) 0) {
+		if ((ptr = strchr (ptr, '.')) == (char *) 0) {
 			error_message ("Invalid  From: %s line. Read the INSTALL file again.", from_name);
 			fclose (fp);
 			return ret_code;
@@ -141,8 +141,8 @@ submit_inews (
 		/*
 		 * Remove linefeed from line
 		 */
-		 if ((ptr = strrchr (line, '\n')) != (char *) 0)
-		 	*ptr = '\0';
+		if ((ptr = strrchr (line, '\n')) != (char *) 0)
+			*ptr = '\0';
 
 		/*
 		 * If line starts with a '.' add another '.' to stop truncation

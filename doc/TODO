@@ -1,10 +1,5 @@
 Bugs
 ----
-o  $AUTO[UN]SUBSCRIBE are broken
-   - autosubscribe & autounsubscribe works for all but the last matching
-     pattern
-   [Urs Janssen <urs@tin.org>]
-
 o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
    [Urs Janssen <urs@tin.org>]
 
@@ -151,7 +146,7 @@ o  fix check_upgrade() (config.c)
    - check if TINRC_VERSION is 'newer' (allreday done) and give a warning
 
 o  if using mailreader_i add In-Reply-To: header and rename Newsgroups:
-   to X-Newsgroups (RFC 822 dosen't define a Newsgroups:-header)
+   to X-Newsgroups (RFC 822 doesn't define a Newsgroups:-header)
 
 o  if using "-n" commandline switch you can't subscribe to newsgroups not
    present in your newsrc - a simple check against the server
@@ -324,12 +319,14 @@ o  check where tin_done() should be called instead of using exit()
 
 Docs/online help
 ----------------
-o  man page is well out of date and is buggy. update
+o  man page is still out dated and buggy
 
 o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  tin in batchmode dumps core if getting a SIGINT, usefull?
+
 o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
    's' subscribes you to the curent group and does _not_ skip to the next
        group (annoying wehen subscribing to multiple groups, but usefull
@@ -393,7 +390,7 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 Filtering enhancements
 ----------------------
 o  add command: mark all articles older than <date> as read
-   (useful when subscribing to a new group with high-traffic...)
+   (usefull when subscribing to a new group with high-traffic...)
 
 o  fix kill/hot mechanism so that it is possible to match articles on
    arbitrary headers
