@@ -27,7 +27,7 @@ and the final score of the article decides if it is regular, marked hot
 or killed.
 
 The standard "kill" and standard "select" already in your filter-file have
-the score SCORE_KILL and SCORE_SELECT respectively (See section 4). 
+the score SCORE_KILL and SCORE_SELECT respectively (See section 4).
 
 
 2. Changes to the filter-file format

@@ -3,7 +3,7 @@
  *  Module    : nntplib.h
  *  Author    : I.Lea
  *  Created   : 1991-04-01
- *  Updated   : 1999-11-29
+ *  Updated   : 1998-07-31
  *  Notes     : nntp.h 1.5.11/1.6 with extensions for tin
  *  Copyright : You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -86,7 +86,6 @@
 #define	OK_NEWGROUPS		231	/* New newsgroups follow */
 #define	OK_XFERED		235	/* Article transferred successfully */
 #define	OK_POSTED		240	/* Article posted successfully */
-#define OK_AUTHSIMPLE           250     /* (Simple) Authorization accepted */
 #define	OK_AUTHSYS		280	/* Authorization system ok */
 #define	OK_AUTH			281	/* Authorization (user/pass) ok */
 #define	OK_BIN			282	/* binary data follows */
@@ -100,7 +99,6 @@
 
 #define	CONT_XFER		335	/* Continue to send article */
 #define	CONT_POST		340	/* Continue to post article */
-#define CONT_AUTHSIMPLE         350     /* Continue with (simple) authorization sequence */
 #define	NEED_AUTHINFO		380	/* authorization is required */
 #define	NEED_AUTHDATA		381	/* <type> authorization data required */
 
@@ -121,9 +119,7 @@
 #define	ERR_XFERRJCT		437	/* Article rejected, don't resend */
 #define	ERR_NOPOST		440	/* Posting not allowed */
 #define	ERR_POSTFAIL		441	/* Posting failed */
-#define ERR_NOAUTHSIMPLE        450     /* (Simple) Authorization required */
-#define ERR_AUTHREJSIMPLE       452     /* (Simple) Authorization rejected */
-#define	ERR_NOAUTH		480	/* Authorization required for command */
+#define	ERR_NOAUTH		480	/* authorization required for command */
 #define	ERR_AUTHSYS		481	/* Authorization system invalid */
 #define	ERR_AUTHREJ		482	/* Authorization data rejected */
 #define	ERR_INVALIAS		483	/* Invalid alias on spooldir cmd */

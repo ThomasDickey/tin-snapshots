@@ -37,7 +37,7 @@ extern void vWriteNovFile (struct t_group *psGrp);
 
 /* auth.c */
 #if !defined (INDEX_DAEMON) && defined (NNTP_ABLE)
-	extern t_bool authenticate (char *server, int respcode, char *user, t_bool startup);
+	extern t_bool authenticate (char *server, char *user, t_bool startup);
 #endif /* !INDEX_DAEMON && NNTP_ABLE */
 
 /* charset.c */

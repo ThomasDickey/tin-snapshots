@@ -1,3 +1,37 @@
+-- 1.4.2 release 20000205 "Possession" --
+
+011) Urs Janssen <urs@tin.org>
+     ADD. number of hot arts/group to verbose -Z output
+     FIX. save.c
+
+010) Dirk Nimmich <nimmich@uni-muenster.de>
+     REM. patch 006
+     BUG. typo fixed
+     BUG. reconnect on QUIT is not necessary
+     ADD. allow interactive authentication on startup if invoked with -A
+     ADD. doc/auth.txt revised
+     ADD. doc/INSTALL revised
+     FIX. INSTALL, auth.txt, extern.h, nntplib.h, proto.h, auth.c, inews.c,
+          lang.c, nntplib.c, open.c
+
+009) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. -z did not restore terminal modes
+     BUG. manpage had '[' and ']' in thread section instead of pager
+     FIX. tin.1, menukeys.h, main.c, page.c
+
+008) Jason Faultless <jason@radar.tele2.co.uk>
+     Urs Janssen <urs@tin.org>
+     BUG. removed annyoing "Reading attributes file ..."-messages
+          for each new group
+     ADD. speed-up start when there are several new groups on the server
+     FIX. active.c, attrib.c, lang.c, main.c
+
+007) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Counter not correct when un't'agging in pager
+     BUG. PGP not available message over-written too quickly
+     BUG. Broken behaviour of 'g' when no groups on group selection page
+     FIX. page.c, pgp.c, select.c
+
 -- 1.4.1 release 19991201 "Polish" --
 
 006) Jeremy Buhler <jbuhler@cs.washington.edu>

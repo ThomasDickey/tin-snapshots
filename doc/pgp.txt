@@ -20,7 +20,7 @@ $HOME/.pgp/pubring.*
 Or you can override this with $PGPPATH/pubring.*
 
 If an environment var PGPOPTS is defined, then tin will use it.
- 
+
 Internal usage of PGP
 ---------------------
 There are 3 places where pgp is invoked:
@@ -38,7 +38,7 @@ There are 3 places where pgp is invoked:
    pgpk $PGPOPTS -a article
 
 2) When posting news or mail
-   
+
    -at are always used
 
    PGP2:

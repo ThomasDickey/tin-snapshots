@@ -244,7 +244,7 @@ pgp_available (
 
 	joinpath(keyring, pgp_data, PGP_PUBRING);
 	if ((f = fopen(keyring, "r")) == (FILE *) 0) {
-		info_message(txt_pgp_not_avail);
+		wait_message(2, txt_pgp_not_avail);
 		return FALSE;
 	}
 

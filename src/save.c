@@ -96,6 +96,11 @@ static t_bool any_saved_files (void);
  *  or
  *  Mail any new articles to specified user and mark arts read and mail
  *  user and inform how many arts in which groups were mailed.
+ *  Return codes:
+ *  CHECK_ANY_NEWS	- code to pass to exit() - see manpage for list
+ *  START_ANY_NEWS	- index in my_group of first group with unread news or -1
+ *  MAIL_ANY_NEWS	- not checked
+ *  SAVE_ANY_NEWS	- not checked
  */
 int
 check_start_save_any_news (
@@ -110,7 +115,7 @@ check_start_save_any_news (
 	char path[PATH_LEN];
 	char savefile[PATH_LEN];
 	char subject[HEADER_LEN];
-	int check_arts;
+	int check_arts, check_hot;
 	int i, j;
 	int saved_arts = 0;
 	struct t_group *group;
@@ -158,6 +163,7 @@ check_start_save_any_news (
 			continue;
 		print_group = TRUE;
 		check_arts = 0;
+		check_hot = 0;
 
 		for (j = 0; j < top; j++) {
 			if (arts[j].status != ART_UNREAD)
@@ -170,6 +176,8 @@ check_start_save_any_news (
 						print_first = FALSE;
 					}
 					check_arts++;
+					if (arts[j].score >= SCORE_SELECT)
+						check_hot++;
 					break;
 				case START_ANY_NEWS:
 					return i;	/* return first group with unread news */
@@ -252,7 +260,7 @@ check_start_save_any_news (
 
 		if (check_arts) {
 			if (verbose) /* FIXME: -> lang.c */
-				wait_message (0, "%4d unread articles in %s\n", check_arts, group->name);
+				wait_message (0, "%4d unread (%4d hot) articles in %s\n", check_arts, check_hot, group->name);
 			unread_news = TRUE;
 		}
 	}

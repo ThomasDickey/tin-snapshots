@@ -728,6 +728,9 @@ extern constext txt_newsrc_nogroups[];
 extern constext txt_newsrc_saved[];
 extern constext txt_next_resp[];
 extern constext txt_nntp_authorization_failed[];
+#ifdef NNTP_ABLE
+	extern constext txt_nntp_ok_goodbye[];
+#endif /* NNTP_ABLE */
 extern constext txt_no[];
 extern constext txt_no_arts[];
 extern constext txt_no_arts_posted[];

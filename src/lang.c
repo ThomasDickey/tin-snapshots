@@ -80,7 +80,7 @@ constext txt_cannot_write_to_directory[] = "%s is a directory";
 constext txt_catchup_all_read_groups[] = "Catchup all groups entered during this session? (y/n): ";
 constext txt_catchup_update_info[] = "%s %d group%s in %lu seconds\n";
 constext txt_check_article[] = "Check Prepared Article";
-constext txt_checking_new_groups[] = "Checking for new groups...\n";
+constext txt_checking_new_groups[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
 constext txt_checksum_of_file[] = cCRLF "Checksum of %s" cCRLF;
 constext txt_return_key[] = "Press <RETURN> to continue...";
@@ -487,6 +487,9 @@ constext txt_newsrc_nogroups[] = "Warning: No newsgroups were written to your ne
 constext txt_newsrc_saved[] = "newsrc file saved successfully.\n";
 constext txt_next_resp[] = "-- Next response --";
 constext txt_nntp_authorization_failed[] = "NNTP authorization password not found for %s";
+#ifdef NNTP_ABLE
+	constext txt_nntp_ok_goodbye[] = "205  Closing connection";
+#endif /* NNTP_ABLE */
 constext txt_no[] = "No ";
 constext txt_no_arts[] = "*** No articles ***";
 constext txt_no_arts_posted[] = "No articles have been posted";
@@ -1030,7 +1033,7 @@ struct opttxt txt_beginner_level = {
 	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
 	"Show mini menu & posting etiquette : ",
 	"# If ON show a mini menu of useful commands at each level\n\
-# and posting etiquette after composing a article\n"
+# and posting etiquette after composing an article\n"
 };
 
 struct opttxt txt_show_description = {

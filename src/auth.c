@@ -3,10 +3,10 @@
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
  *  Created   : 1997-04-05
- *  Updated   : 1999-11-29
+ *  Updated   : 1998-04-18, 2000-01-22
  *  Notes     : Routines to authenticate to a news server via NNTP.
  *              DON'T USE get_respcode() THROUGHOUT THIS CODE.
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Dirk Nimmich
+ *  Copyright : (c) Copyright 1991-2000 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -318,16 +318,16 @@ authinfo_original (
 	 * At this point, either authentication with username/password pair from
 	 * .newsauth has failed or there's no .newsauth file respectively no
 	 * matching username/password for the current server. If we are not at
-	 * startup we ask the user to enter such a pair by hand. Don't ask him
-	 * at startup because if he doesn't need to authenticate (we don't know),
-	 * the "Server expects authentication" messages are annoying (and even
-	 * wrong).
+	 * startup we ask the user to enter such a pair by hand. Don't ask him at
+	 * startup except if requested by -A option because if he doesn't need to
+	 * authenticate (we don't know), the "Server expects authentication"
+	 * messages are annoying (and even wrong).
 	 * UNSURE: Maybe we want to make this decision configurable in the
-	 * options menu so that the user doesn't need to create a .newsauth file.
+	 * options menu, too, so that the user doesn't need -A.
 	 * TODO: Put questions into do_authinfo_original because it is possible
 	 * that the server doesn't want a password; so only ask for it if needed.
 	 */
-	if (!startup) {
+	if (force_auth_on_conn_open || !startup) {
 #ifdef USE_CURSES
 		int state = RawState();
 #endif /* USE_CURSES */
@@ -354,7 +354,7 @@ authinfo_original (
 		/*
 		 * on some systems (i.e. Solaris) getpass(3) is limited to 8 chars ->
 		 * we use tin_getline() till we have a config check
-		 * for getpass() or our won getpass()
+		 * for getpass() or our own getpass()
 		 */
 		authpass = strncpy (authpassword, getpass (txt_auth_pass), PATH_LEN);
 #	else
@@ -378,36 +378,16 @@ authinfo_original (
  * Do authentication stuff. Return TRUE if authentication was successful,
  * FALSE otherwise.
  *
- * Based on the authentication type requested by the server's respcode,
- * decide which method to use.  Generic authentication should always
- * fall back to original.  Simple authentication is not implemented
- * and hence falls back to original.
+ * First try AUTHINFO GENERIC method, then, if that failed, ORIGINAL
+ * AUTHINFO method. Other authentication methods can easily be added.
  */
 t_bool
 authenticate (
 	char *server,
-	int respcode,
 	char *user,
 	t_bool startup)
 {
-  switch(respcode)
-    {
-    case ERR_NOAUTH:        /* original */
-      return authinfo_original(server, user, startup);
-      
-    case NEED_AUTHINFO:     /* generic */
 	return (authinfo_generic () || authinfo_original (server, user, startup));
-      
-    case ERR_NOAUTHSIMPLE:  /* simple */
-      error_message("Error: simple authentication not yet supported.");
-      return authinfo_original(server, user, startup);
-      
-    default:
-      error_message("Unknown authentication request type %d.", respcode);
-      break;
-    }
-  
-  return FALSE;
 }
 
 #else

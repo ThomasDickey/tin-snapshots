@@ -3593,13 +3593,13 @@ find_reply_to_addr (
 	/* We do this to save a redundant strcpy when we don't want to parse */
 
 	if (parse) {
-#if 1
+#	if 1
 		parse_from ((found_replyto ? replyto : from), from_addr, fullname);
-#else
+#	else
 		/* Or should we decode full_addr? */
 		parse_from ((found_replyto ? replyto : from), temp, fullname);
 		strcpy (full_addr, rfc1522_decode(tmp));
-#endif /* 1 */
+#	endif /* 1 */
 	} else
 		strcpy (from_addr, rfc1522_decode((found_replyto ? replyto : from)));
 

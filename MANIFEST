@@ -1,4 +1,4 @@
-MANIFEST for tin-1.4.1 (Wed Dec  1 13:51:36 CET 1999)
+MANIFEST for tin-1.4.2 (Sat Feb  5 18:10:02 CET 2000)
 ----------------------------------------------------
   10365 ./Makefile
    5413 ./MANIFEST
@@ -14,46 +14,46 @@ MANIFEST for tin-1.4.1 (Wed Dec  1 13:51:36 CET 1999)
    4765 ./install.sh
   11873 ./makefile.in
     661 ./mkdirs.sh
-   1633 ./doc/CHANGES
+   2927 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
-  22468 ./doc/INSTALL
-  19854 ./doc/TODO
-   5198 ./doc/WHATSNEW
-  12856 ./doc/auth.txt
-   8427 ./doc/filtering
+  29760 ./doc/INSTALL
+  19853 ./doc/TODO
+   5197 ./doc/WHATSNEW
+   3882 ./doc/auth.txt
+   8426 ./doc/filtering
    3661 ./doc/internals.txt
   23621 ./doc/iso2asc.txt
   35180 ./doc/good-netkeeping-seal
-   1844 ./doc/pgp.txt
+   1840 ./doc/pgp.txt
    1181 ./doc/rcvars.txt
    1227 ./doc/reading-mail.txt
    1615 ./doc/umlaute.txt
    1914 ./doc/umlauts.txt
    4643 ./doc/tin.defaults
-  97164 ./doc/tin.1
+  97847 ./doc/tin.1
    3703 ./tools/metamutt
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
     564 ./include/bool.h
     972 ./include/bugrep.h
    8374 ./include/config.h
-  47187 ./include/extern.h
-  13176 ./include/menukeys.h
-   5379 ./include/nntplib.h
+  47267 ./include/extern.h
+  13172 ./include/menukeys.h
+   5053 ./include/nntplib.h
    3083 ./include/policy.h
-  25513 ./include/proto.h
+  25499 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
   57743 ./include/tin.h
    9336 ./include/tinrc.h
    3601 ./include/tnntp.h
    1046 ./include/trace.h
-   1128 ./include/version.h
-  25906 ./src/active.c
+   1132 ./include/version.h
+  25927 ./src/active.c
   39525 ./src/art.c
-  23771 ./src/attrib.c
-  11619 ./src/auth.c
+  23669 ./src/attrib.c
+  11074 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
   63207 ./src/config.c
@@ -63,38 +63,38 @@ MANIFEST for tin-1.4.1 (Wed Dec  1 13:51:36 CET 1999)
   19955 ./src/feed.c
   42876 ./src/filter.c
   12595 ./src/getline.c
-  47296 ./src/group.c
+  47290 ./src/group.c
    3112 ./src/hashstr.c
    8030 ./src/header.c
   12130 ./src/help.c
-   9875 ./src/inews.c
+   9804 ./src/inews.c
   35060 ./src/init.c
    1447 ./src/joinpath.c
-  90515 ./src/lang.c
+  90615 ./src/lang.c
    3011 ./src/list.c
   10492 ./src/mail.c
-  23835 ./src/main.c
+  23974 ./src/main.c
    8911 ./src/makecfg.c
    9347 ./src/memory.c
   76583 ./src/misc.c
   37785 ./src/newsrc.c
-  26957 ./src/nntplib.c
+  27071 ./src/nntplib.c
    5942 ./src/nrctbl.c
-  27263 ./src/open.c
-  42380 ./src/page.c
+  27192 ./src/open.c
+  42441 ./src/page.c
   24159 ./src/parsdate.y
-   8493 ./src/pgp.c
-  97228 ./src/post.c
+   8496 ./src/pgp.c
+  97231 ./src/post.c
   12519 ./src/prompt.c
    8874 ./src/read.c
   23620 ./src/refs.c
    2431 ./src/regex.c
   13486 ./src/rfc1521.c
   22744 ./src/rfc1522.c
-  35799 ./src/save.c
+  36133 ./src/save.c
    5564 ./src/screen.c
   10329 ./src/search.c
-  35110 ./src/select.c
+  35126 ./src/select.c
    6655 ./src/sigfile.c
   11003 ./src/signal.c
    5800 ./src/strftime.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.1 (Wed Dec  1 13:51:36 CET 1999)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3250535 total
+3250559 total

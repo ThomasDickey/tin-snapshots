@@ -114,7 +114,7 @@ Key enhancements
    Also
    'q', 'z' and ESCAPE can be used to abort most read operations.
    '^U' and 'W' now work when entering data at prompts
- 
+
    Command line additions
    ----------------------
    -A  forces authentication at startup

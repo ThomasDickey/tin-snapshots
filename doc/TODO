@@ -478,7 +478,7 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 Filtering enhancements
 ----------------------
 o  add used filter-type to filter-file or filter-rule or use different
-   filter files for wildmat/regexp 
+   filter files for wildmat/regexp
 
 o  add command: mark all articles older/newer than <date> as read
    (useful when subscribing to a new group with high-traffic...)

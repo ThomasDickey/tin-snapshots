@@ -451,10 +451,10 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyThreadQuickAutoSel:		/* quickly auto-select article */
-			case iKeyThreadQuickKill:		/* quickly kill article */
+			case iKeyPageQuickAutoSel:		/* quickly auto-select article */
+			case iKeyPageQuickKill:		/* quickly kill article */
 				if ((local_filtered_articles = quick_filter (
-						(ch == iKeyThreadQuickKill) ? FILTER_KILL : FILTER_SELECT,
+						(ch == iKeyPageQuickKill) ? FILTER_KILL : FILTER_SELECT,
 						group, &arts[respnum])))
 					goto return_to_index;
 
@@ -701,7 +701,9 @@ return_to_index:
 
 			case iKeyPageTag:	/* tag/untag article for saving */
 				if (arts[respnum].tagged) {
+					decr_tagged(arts[respnum].tagged);
 					arts[respnum].tagged = 0;
+					--num_of_tagged_arts;
 					info_message (txt_untagged_art);
 				} else {
 					arts[respnum].tagged = ++num_of_tagged_arts;

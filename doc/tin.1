@@ -390,18 +390,20 @@ article-body
 .\"
 .\"
 .SH "COMMON MOVING KEYS"
-This table shows the common keys used for moving around at all four levels
+This table shows the common keys used for moving around all levels
 within \fBtin\fR.
 .RS
 .nf
 .ta \w'Beg. of list/article  'u +\w'ANSI/vt100  'u
 	ANSI/vt100	Other Terminals
-Beg. of list/article	\fBHome\fR	\fB^\fR (also \fBg\fR at article level)
-End of list/article	\fBEnd\fR	\fB$\fR (also \fBG\fR at article level)
+Beg. of list/article	\fBHome\fR	\fB^\fR (1)
+End of list/article	\fBEnd\fR	\fB$\fR (2)
 Page Up	\fBPgUp\fR	\fB^U\fR or \fB^B\fR or \fBb\fR
 Page Down	\fBPgDn\fR	\fB^D\fR or \fB^F\fR or \fB<SPACE>\fR
 Line Up	\fBUp arrow\fR	\fBk\fR or \fB^P\fR (not at article level)
 Line Down	\fBDown arrow\fR	\fBj\fR or \fB^N\fR (not at article level)
+(1) also \fBg\fR in the article, config and help menus
+(2) also \fBG\fR in the article, config and help menus
 .fi
 .RE
 .\"
@@ -881,36 +883,6 @@ Reverse article selections.
 .B ~
 Undo all selections on current thread.
 .TP
-.B [
-Auto select article(s) with a single key. The defaults used for selection
-are set based upon the following four tinrc config variables:
-.in +.3i
-.nf
-default_filter_select_case
-default_filter_select_expire
-default_filter_select_global
-default_filter_select_header
-.fi
-.in -.3i
-Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
-a full explanation of these variables and FILTERING ARTICLES for more
-information on filtering.
-.TP
-.B ]
-Kill article(s) with a single key. The defaults used for killing
-are based upon the following four tinrc config variables:
-.in +.3i
-.nf
-default_filter_kill_case
-default_filter_kill_expire
-default_filter_kill_global
-default_filter_kill_header
-.fi
-.in -.3i
-Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
-a full explanation of these variables and FILTERING ARTICLES for more
-information on filtering.
-.TP
 .B <CR>
 Read current article within thread.
 .TP
@@ -1074,6 +1046,36 @@ articles matching pattern / tagged articles into command.
 See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
 more information.
 .TP
+.B [
+Auto select article(s) with a single key. The defaults used for selection
+are set based upon the following four tinrc config variables:
+.in +.3i
+.nf
+default_filter_select_case
+default_filter_select_expire
+default_filter_select_global
+default_filter_select_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
+.TP
+.B ]
+Kill article(s) with a single key. The defaults used for killing
+are based upon the following four tinrc config variables:
+.in +.3i
+.nf
+default_filter_kill_case
+default_filter_kill_expire
+default_filter_kill_global
+default_filter_kill_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
+.TP
 .B <CR>
 Goto next base article.
 .TP
@@ -1236,22 +1238,32 @@ After that, the users own configuration file is read from
 \fI$HOME/.tin/tinrc\fP. The global file is useful for distributing
 system-wide defaults to new users who have no private tinrc yet.
 .PP
-The following variables are user configurable by editing
-\fI$HOME/.tin/tinrc\fP directly. Most of them can be set in the
-GLOBAL OPTIONS MENU which is could be accessed by pressing `M' at all
+The variables are user configurable by editing
+\fI$HOME/.tin/tinrc\fP directly. Most of them can also be set in the
+GLOBAL OPTIONS MENU which is accessed by pressing `M' at all
 levels. It allows the user to customize the behaviour of \fBtin\fR. The
-options are saved to the file \fI$HOME/.tin/tinrc\fP. Use <SPACE> to toggle
-the required option and <CR> to set. Use `\fB/\fR' and `\fB?\fR' to search
-for a specific option. The name in braces is the name of the corresponding
-setting in \fI$HOME/.tin/tinrc\fP.
+options are saved to the file \fI$HOME/.tin/tinrc\fP when you exit tin
+so don't edit the file directly whilst \fBtin\fR is running.
+.PP
+In the OPTIONS menu use the cursor keys in the usual way to move around.
+Use <CR> to 'open' the option you wish to change. You will need to enter
+a new value or use <SPACE> to toggle the available options. <CR> will save
+the new value, <ESCAPE> will abort without saving changes.
+.PP
+As with the other menus, `\fB^L\fR' will redraw the screen.
+You can use `\fB/\fR' and `\fB?\fR' to search for a specific option.
+Use '\fBq\fR' to exit the OPTIONS menu and keep your changes.
+Use '\fBQ\fR' to exit without keeping your changes.
+.PP
+Here is a full list of all the available variables. The name in braces is
+the name of the corresponding setting in \fI$HOME/.tin/tinrc\fP.
 .TP 4
 .B Add posted articles to filter (add_posted_to_filter)
 If ON add posted articles to filter for highlighting follow-ups.
 Default is ON.
 .TP
 .B Insert 'User-Agent:'-header (advertising)
-Turn ON advertising in header (``User-Agent:'').
-Default is ON.
+Turn ON advertising in header (``User-Agent:'').  Default is ON.
 .TP
 .B Skip multipart/alternative parts (alternative_handling)
 If ON strip multipart/alternative messages automatically.
@@ -1278,8 +1290,8 @@ The character used to show that an article has not been read.
 Default is '+'.
 .TP
 .B Ask before using metamail (ask_for_metamail)
-If ON \fBtin\fR will ask before using metamail to display MIME messages. This only
-occurs, if 'use_metamail' is also switched ON.
+If ON \fBtin\fR will ask before using metamail to display MIME messages.
+This only occurs if 'use_metamail' is also switched ON.
 Default is ON.
 .TP
 .B Send you a blind cc automatically (auto_bcc)
@@ -1575,7 +1587,8 @@ to 8bit. Leaving it OFF is safe for most users and compliant to Internet
 Mail Standard (STD 11/RFC 822 and RFC 2047).
 .TP
 .B Mail address (mail_address)
-User's mail address (and fullname), if not username@host.
+User's mail address (and fullname), if not username@host. This is used when
+creating articles and sending mail.
 .TP
 .B MIME encoding in mail messages (mail_mime_encoding)
 MIME encoding of the body in mail message, if necessary (8bit, base64,
@@ -1971,6 +1984,7 @@ Identical to the tinrc variable default_savedir
 .B organization
 .TP
 .B from
+Identical to the tinrc variable mail_address
 .TP
 .B sigfile
 .TP
@@ -2003,7 +2017,7 @@ Identical to the tinrc variable post_process_type
 .TP
 .B mailing_list
 Used when a group is a mailing list. All responses to the group will be
-directed to this email address.
+directed to this email address instead
 .TP
 .B x_headers
 A list of headers that will be automatically added when posting

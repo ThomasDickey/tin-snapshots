@@ -260,6 +260,8 @@
 #define iKeyPageAutoSaveTagged 'S'
 #define iKeyPageGroupSel 'T'
 #define iKeyPageMarkThdUnread 'Z'
+#define iKeyPageQuickAutoSel '['		/* Merge with same keys in Group ? */
+#define iKeyPageQuickKill ']'
 #define iKeyPageCatchup 'c'
 #define iKeyPageToggleRot2 'd'
 #define iKeyPageEdit 'e'
@@ -373,8 +375,6 @@
 #define iKeyThreadAutoSaveTagged 'S'
 #define iKeyThreadUntag 'U'
 #define iKeyThreadMarkThdUnread 'Z'
-#define iKeyThreadQuickAutoSel '['		/* Merge with same keys in Group ? */
-#define iKeyThreadQuickKill ']'
 #define iKeyThreadCatchup 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'

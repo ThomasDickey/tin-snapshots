@@ -634,14 +634,14 @@ check_for_any_new_groups (
 				*ptr = '\0';
 			}
 
-			free_attributes_array ();
-			read_attributes_file (global_attributes_file, TRUE);
-			read_attributes_file (local_attributes_file, FALSE);
-
 			subscribe_new_group (line, autosubscribe, autounsubscribe);
 		}
 
 		TIN_FCLOSE (fp);
+
+		free_attributes_array ();
+		read_attributes_file (global_attributes_file, TRUE);
+		read_attributes_file (local_attributes_file, FALSE);
 
 		if (tin_errno)
 			return;				/* Don't update the time if we quit */
@@ -658,6 +658,7 @@ check_for_any_new_groups (
 		sprintf (buf, "%s %lu", new_newnews_host, (unsigned long int) new_newnews_time);
 		load_newnews_info (buf);
 	}
+	my_fputc('\n',stdout);
 }
 
 
