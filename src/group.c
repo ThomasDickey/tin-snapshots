@@ -28,10 +28,17 @@ static int len_from;
 static int len_subj;
 static char *spaces = "XXXX";
 
+/*
+** Locla prototypes
+*/
 static int line_is_tagged P_((int n));
 static void show_tagged_lines P_((void));
 static int bld_sline P_((int i));
 static int draw_sline P_((int i, int full));
+static int prompt_subject_num P_((int ch));
+static void decr_tagged P_((int tag));
+static void update_group_page P_((void));
+static void show_group_title P_((int clear_title));
 
 
 static int
@@ -63,7 +70,7 @@ show_tagged_lines ()
 	}
 }
 
-void
+static void
 decr_tagged (tag)
 	int tag;
 {
@@ -1325,7 +1332,7 @@ show_group_page ()
 #endif /* INDEX_DAEMON */
 }
 
-void
+static void
 update_group_page ()
 {
 #ifndef INDEX_DAEMON
@@ -1377,7 +1384,7 @@ erase_subject_arrow ()
 }
 
 
-int
+static int
 prompt_subject_num (ch)
 	int ch;
 {
@@ -1700,7 +1707,7 @@ draw_sline (i, full)
 }
 
 
-void
+static void
 show_group_title (clear_title)
 	int clear_title;
 {

@@ -33,15 +33,26 @@ int compiled_with_nntp = FALSE;
 #endif
 
 #ifdef NO_POSTING
-int	can_post = FALSE;
+int can_post = FALSE;
 #else
-int	can_post = TRUE;
+int can_post = TRUE;
 #endif
 
 char *nntp_server = (char *)0;
 
 #ifdef NNTP_ABLE
 int get_server_nolf=0; /* this will only be set by our own nntplib.c */
+#endif
+
+/*
+** Local prototypes
+*/
+static int base_comp P_((t_comptype *p1, t_comptype *p2));
+
+#if 0
+#ifdef NNTP_ABLE
+static FILE *open_xhdr_fp P_((char *header, long min, long max));
+#endif
 #endif
 
 int
@@ -672,8 +683,8 @@ open_art_fp (group_path, art)
 	}
 }
 
-
-FILE *
+#if 0
+static FILE *
 open_xhdr_fp (header, min, max)
 	char *header;
 	long min;
@@ -702,12 +713,14 @@ open_xhdr_fp (header, min, max)
 		return (FILE *) 0;
 	}
 }
+#endif /* 0 */
+
 
 /*
  *  Longword comparison routine for the qsort()
  */
 
-int
+static int
 base_comp (p1, p2)
 	t_comptype *p1;
 	t_comptype *p2;
@@ -1408,7 +1421,7 @@ fprintf(stderr, "IN vGGAI %s cnt=%ld, min=%ld max %ld\n",
 
 		if ((tDirFile = opendir (acBuf)) != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-				lArtNum = lAtol (tFile->d_name, (int) D_NAMLEN(tFile));
+				lArtNum = my_atol (tFile->d_name, (int) D_NAMLEN(tFile));
 				if (lArtNum >= 1) {
 					if (lArtNum > *plArtMax) {
 						*plArtMax = lArtNum;

@@ -21,8 +21,8 @@
 #define	MAX_MSG_HEADERS	20
 
 /* which keys are allowed for posting/sending? */
-#ifdef	HAVE_PGP
-#	ifdef	HAVE_ISPELL
+#ifdef HAVE_PGP
+#	ifdef HAVE_ISPELL
 #		define POST_KEYS	"\033egipq"
 #		define SEND_KEYS	"\033egiqs"
 #	else
@@ -30,7 +30,7 @@
 #		define SEND_KEYS	"\033egqs"
 #	endif
 #else
-#	ifdef   HAVE_ISPELL
+#	ifdef HAVE_ISPELL
 #		define POST_KEYS	"\033eipq"
 #		define SEND_KEYS	"\033eiqs"
 #	else
@@ -42,10 +42,12 @@
 
 char found_newsgroups[HEADER_LEN];
 
+int reread_active_for_posted_arts = FALSE;
+
 t_bool unlink_article = TRUE;
 t_bool keep_dead_articles = TRUE;
 t_bool keep_posted_articles = TRUE;
-int reread_active_for_posted_arts = FALSE;
+
 struct t_posted *posted;
 
 struct msg_header {
@@ -53,11 +55,41 @@ struct msg_header {
 	char *text;
 } msg_headers[MAX_MSG_HEADERS];
 
+/*
+** Local prototypes
+*/
+static int msg_add_x_body P_((FILE *fp_out, char *body));
+static int msg_write_headers P_((FILE *fp));
+static int pcCopyArtHeader P_((int iHeader, char *pcArt, char *result));
 static int prompt_to_edit P_((void));
 static int prompt_to_send P_((char *subject));
-static int repair_article P_((char *result));
+static int submit_mail_file P_((char *file));
+static t_bool check_article_to_be_posted P_((char *the_article, int art_type, int *lines));
+static t_bool damaged_id P_((char *id));
+static t_bool insert_from_header P_((char *infile));
+static t_bool is_crosspost P_((char *xref));
+static t_bool must_include P_((char *id));
+static t_bool repair_article P_((char *result));
+static void appendid P_((char **where, char **what));
 static void do_prompt1 P_(( char *format, int ch_default));
 static void do_prompt2 P_(( char *format, char *subject, int ch_default));
+static void find_reply_to_addr P_((int respnum, char *from_addr));
+static void join_references P_((char *buffer, char *oldrefs, char *newref));
+static void modify_headers P_((char *line));
+static void msg_add_header P_((char *name, char *text));
+static void msg_add_x_headers P_((char *headers));
+static void msg_free_headers P_((void));
+static void msg_init_headers P_((void));
+static void setup_check_article_screen P_((int *init));
+static void skip_id P_((char **id));
+static void update_active_after_posting P_((char *newsgroups));
+static void update_posted_info_file P_((char *group, int action, char *subj));
+static void update_posted_msgs_file P_((char *file, char *addr));
+
+#ifdef FORGERY
+static void make_path_header P_((char *line, char *from_name));
+#endif /* FORGERY */
+
 
 static void do_prompt1 (format, ch_default)
 	char *format;
@@ -76,6 +108,7 @@ do_prompt2(format, subject, ch_default)
 {
 	int have = cCOLS - strlen (format) + 4;
 	int want = strlen(subject);
+
 	if (want > 0 && subject[want-1] == '\n')
 		want--;
 	if (have > want)
@@ -106,6 +139,7 @@ prompt_to_send(subject)
 {
 	int ch;
 	char ch_default = iKeyPostSend;
+
 	do {
 		do_prompt2 (txt_quit_edit_send, subject, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
@@ -114,7 +148,7 @@ prompt_to_send(subject)
 	return ch;
 }
 
-static int
+static t_bool
 repair_article(result)
 	char *result;
 {
@@ -134,7 +168,7 @@ repair_article(result)
 	return FALSE;
 }
 
-void
+static void
 msg_init_headers ()
 {
 	int i;
@@ -145,7 +179,7 @@ msg_init_headers ()
 	}
 }
 
-void
+static void
 msg_free_headers ()
 {
 	int i;
@@ -156,7 +190,7 @@ msg_free_headers ()
 	}
 }
 
-void
+static void
 msg_add_header (name, text)
 	char *name;
 	char *text;
@@ -219,7 +253,7 @@ msg_add_header (name, text)
 	}
 }
 
-int
+static int
 msg_write_headers (fp)
 	FILE *fp;
 {
@@ -239,7 +273,7 @@ msg_write_headers (fp)
 	return wrote;
 }
 
-int
+t_bool
 user_posted_messages ()
 {
 	char buf[LEN];
@@ -316,7 +350,7 @@ user_posted_messages ()
 	}
 }
 
-void
+static void
 update_posted_info_file (group, action, subj)
 	char *group;
 	int action;
@@ -355,7 +389,7 @@ update_posted_info_file (group, action, subj)
 	}
 }
 
-void
+static void
 update_posted_msgs_file (file, addr)
 	char *file;
 	char *addr;
@@ -401,28 +435,28 @@ update_posted_msgs_file (file, addr)
  * 10  Display an 'are you sure' message before posting article
  */
 
-int
+static t_bool
 check_article_to_be_posted (the_article, art_type, lines)
 	char *the_article;
 	int art_type;
 	int *lines;
 {
+	FILE *fp;
 	char *ngptrs[NGLIMIT];
 	char line[HEADER_LEN], *cp, *cp2;
-	FILE *fp;
 	int cnt = 0;
 	int col, len, i;
-	int end_of_header = FALSE;
 	int errors = 0;
-	int found_newsgroups_line = FALSE;
-	int found_subject_line = FALSE;
-	int found_followup_to = FALSE;
-	int found_followup_to_several_groups = FALSE;
-	int got_long_line = FALSE;
 	int init = TRUE;
 	int ngcnt = 0;
-	size_t nglens[NGLIMIT];
 	int oldraw;		/* save previous raw state */
+	size_t nglens[NGLIMIT];
+	t_bool end_of_header = FALSE;
+	t_bool found_newsgroups_line = FALSE;
+	t_bool found_subject_line = FALSE;
+	t_bool found_followup_to = FALSE;
+	t_bool found_followup_to_several_groups = FALSE;
+	t_bool got_long_line = FALSE;
 	struct t_group *psGrp;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
@@ -525,9 +559,9 @@ check_article_to_be_posted (the_article, art_type, lines)
 			}
 		}
 		if (cp - line == 11 && !strncasecmp (line, "Followup-To", 11)) {
-			found_followup_to = 1;
+			found_followup_to = TRUE;
 			if (strchr (cp, ','))
-				found_followup_to_several_groups = 1;
+				found_followup_to_several_groups = TRUE;
 		}
 	}
 
@@ -628,7 +662,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 	return (errors ? FALSE : TRUE);
 }
 
-void
+static void
 setup_check_article_screen (init)
 	int *init;
 {
@@ -654,14 +688,13 @@ quick_post_article ()
 	char subj[HEADER_LEN];
 	char buf[HEADER_LEN], tmp[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
-	int done = FALSE;
 	int lines;
+	t_bool done = FALSE;
 	struct t_group *psGrp;
 
 #ifdef FORGERY
 	char from_name[HEADER_LEN];
 	char line[HEADER_LEN];
-
 #endif
 
 	msg_init_headers ();
@@ -915,7 +948,6 @@ post_article (group, posted_flag)
 #ifdef FORGERY
 	char from_name[HEADER_LEN];
 	char line[HEADER_LEN];
-
 #endif
 
 	msg_init_headers ();
@@ -1091,12 +1123,6 @@ post_article (group, posted_flag)
 	return redraw_screen;
 }
 
-/* local prototypes */
-static void appendid P_((char **where, char **what));
-static int must_include P_((char *id));
-static void skip_id P_((char **id));
-static int damaged_id P_((char *id));
-static int is_crosspost P_((char *xref));
 
 /* yeah, right, that's from the same Chris who is telling Jason he's
    doing obfuscated C :-) */
@@ -1123,7 +1149,7 @@ appendid (where, what)
 	}
 }
 
-static int
+static t_bool
 must_include (id)
 	char *id;
 {
@@ -1137,9 +1163,9 @@ must_include (id)
 		if (*++id != '_')
 			continue;
 		if (*++id == '@')
-			return 1;
+			return TRUE;
 	}
-	return 0;
+	return FALSE;
 }
 
 static void
@@ -1154,7 +1180,7 @@ skip_id (id)
 	}
 }
 
-static int
+static t_bool
 damaged_id (id)
 	char *id;
 {
@@ -1165,15 +1191,15 @@ damaged_id (id)
 	while (*id && *id != '>')
 		id++;
 	if (*id != '>')
-		return 1;
-	return 0;
+		return TRUE;
+	return FALSE;
 }
 
 /* 
  * A real crossposting test had to run on Newsgroups but we only have Xref in
  * t_article, so we use this.
  */
-static int 
+static t_bool
 is_crosspost (xref)
 	char *xref;
 {
@@ -1181,7 +1207,7 @@ is_crosspost (xref)
 	for (;*xref;xref++) 
 		if (*xref==':')
 			count++;
-	return (count>=2) ? 1 : 0;
+	return (count>=2) ? TRUE : FALSE;
 }
 
 /* Widespread news software like INN's nnrpd restricts the size of several
@@ -1194,7 +1220,7 @@ is_crosspost (xref)
  *        get_references(art[x].refptr) will give us the new refs line
  */
 
-void
+static void
 join_references (buffer, oldrefs, newref)
 	char *buffer;
 	char *oldrefs;
@@ -1292,7 +1318,7 @@ join_references (buffer, oldrefs, newref)
 	 */
 }
 
-int
+int /* return code is currently ignored! */
 post_response (group, respnum, copy_text)
 	char *group;
 	int respnum;
@@ -2140,7 +2166,7 @@ mail_to_author (group, respnum, copy_text)
  *  Read a file grabbing the value of the specified mail header line
  */
 
-int
+static int
 pcCopyArtHeader (iHeader, pcArt, result)
 	int iHeader;
 	char *pcArt;
@@ -2245,7 +2271,7 @@ pcCopyArtHeader (iHeader, pcArt, result)
 	return FALSE;
 }
 
-int
+t_bool
 cancel_article (group, art, respnum)
 	struct t_group *group;
 	struct t_article *art;
@@ -2260,19 +2286,17 @@ cancel_article (group, art, respnum)
 	char line[HEADER_LEN];
 	char line2[HEADER_LEN];
 	char author = TRUE;
-
 #else
 	char host_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
-
 #endif
 	FILE *fp;
-	int redraw_screen = FALSE;
-	int init = TRUE;
-	int oldraw;
 	char option = iKeyPostCancel;
 	char option_default = iKeyPostCancel;
+	int init = TRUE;
+	int oldraw;
+	t_bool redraw_screen = FALSE;
 
 	msg_init_headers ();
 
@@ -2316,9 +2340,9 @@ cancel_article (group, art, respnum)
 				break;
 			case iKeyPostSupersede:
 				repost_article (note_h_newsgroups, art, respnum, TRUE);
-				return (0);
+				return redraw_screen;
 			default:
-				return (0);
+				return redraw_screen;
 		}
 	}
 
@@ -2725,7 +2749,7 @@ repost_article (group, art, respnum, supersede)
 	return ret_code;
 }
 
-void
+static void
 msg_add_x_headers (headers)
 	char *headers;
 {
@@ -2767,7 +2791,7 @@ msg_add_x_headers (headers)
 	}
 }
 
-int
+static int
 msg_add_x_body (fp_out, body)
 	FILE *fp_out;
 	char *body;
@@ -2808,7 +2832,7 @@ msg_add_x_body (fp_out, body)
 	return wrote;
 }
 
-void
+static void
 modify_headers (line)
 	char *line;
 {
@@ -2896,7 +2920,7 @@ checknadd_headers (infile, lines)
 }
 
 #ifndef M_AMIGA
-int
+static t_bool
 insert_from_header (infile)
 	char *infile;
 {
@@ -2955,7 +2979,7 @@ insert_from_header (infile)
 }
 #endif
 
-void
+static void
 find_reply_to_addr (respnum, from_addr)
 	int respnum;	/* we don't need that in the #else part */
 	char *from_addr;
@@ -3117,7 +3141,7 @@ reread_active_after_posting ()
  * posted to newsgroups for later processing to update num of unread articles
  */
 
-void
+static void
 update_active_after_posting (newsgroups)
 	char *newsgroups;
 {
@@ -3159,7 +3183,7 @@ update_active_after_posting (newsgroups)
 	}
 }
 
-int
+static int
 submit_mail_file (file)
 	char *file;
 {
@@ -3196,7 +3220,7 @@ submit_mail_file (file)
 }
 
 #ifdef FORGERY
-void
+static void
 make_path_header (line, from_name)
 	char *line, *from_name;
 {

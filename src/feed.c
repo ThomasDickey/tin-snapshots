@@ -23,6 +23,13 @@ char default_repost_group[LEN];
 char proc_ch_default;			/* set in change_config_file () */
 
 
+/*
+** Local prototypes
+*/
+static int does_article_exist P_((int function, long artnum, char *path));
+static int print_file P_((char *command, int respnum, int count));
+
+
 void
 feed_articles (function, level, group, respnum)
 	int function;
@@ -695,7 +702,7 @@ got_sig_pipe_while_piping:
 }
 
 
-int
+static int
 print_file (command, respnum, count)
 	char *command;
 	int respnum;
@@ -771,7 +778,7 @@ get_post_proc_type (proc_type)
  * gets us the elusive free lunch!
  */
 
-int
+static int
 does_article_exist (function, artnum, path)
 	int function;
 	long artnum;

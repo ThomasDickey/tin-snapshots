@@ -48,7 +48,18 @@ struct archiver_t {
 	{ (char *) 0,	(char *) 0,	(char *) 0,	(char *) 0,	(char *) 0 }
 };
 
+/*
+** Local prototypes
+*/
 static int any_saved_files P_((void));
+static int create_sub_dir P_((int i));
+static char *get_first_savefile P_((void));
+static char *get_last_savefile P_((void));
+static void post_process_uud P_((int pp, t_bool auto_delete));
+static void uudecode_file P_((int pp, char *file_out_dir, char *file_out));
+static void post_process_sh P_((t_bool auto_delete));
+static char *get_archive_file P_((char *dir));
+
 
 /*
  *  Check for articles and say how many new/unread in each group.
@@ -609,7 +620,7 @@ create_path (path)
 }
 
 
-int
+static int
 create_sub_dir (i)
 	int i;
 {
@@ -912,7 +923,7 @@ save_filename (i)
 }
 
 
-char *
+static char *
 get_first_savefile ()
 {
 	char *file;
@@ -974,7 +985,7 @@ get_first_savefile ()
 }
 
 
-char *
+static char *
 get_last_savefile ()
 {
 	char *file;
@@ -1075,7 +1086,7 @@ post_process_files (proc_type_ch, auto_delete)
 }
 
 
-void
+static void
 post_process_uud (pp, auto_delete)
 	int pp;
 	t_bool auto_delete;
@@ -1216,7 +1227,7 @@ post_process_uud (pp, auto_delete)
  *  uudecode a single file
  */
 
-void
+static void
 uudecode_file (pp, file_out_dir, file_out)
 	int	pp;
 	char	*file_out_dir;
@@ -1324,7 +1335,7 @@ uudecode_file (pp, file_out_dir, file_out)
  *  Unpack /bin/sh archives
  */
 
-void
+static void
 post_process_sh (auto_delete)
 	t_bool auto_delete;
 {
@@ -1433,7 +1444,7 @@ post_process_sh (auto_delete)
  * Returns the most recently modified file in the specified drectory
  */
 
-char *
+static char *
 get_archive_file (dir)
 	char *dir;
 {

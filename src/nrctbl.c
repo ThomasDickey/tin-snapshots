@@ -19,12 +19,17 @@
 #include	"menukeys.h"
 #include	"tin.h"
 
+/*
+** Local prototyps
+*/
+static void write_newsrctable_file P_((void));
+
 
 /* write_newsrctable_file()
  * create newsrctable file in local rc directory
  */
 
-void
+static void
 write_newsrctable_file()
 {
 	FILE	*fp;
@@ -46,7 +51,7 @@ write_newsrctable_file()
 }
 
 
-/* get_nnpserver ()
+/* get_nntpserver ()
  * returns the FQDN of NNTP server by looking up a given
  * nickname or alias in the newsrctable
  * ---> extend to allow nameserver-lookups, if search in table

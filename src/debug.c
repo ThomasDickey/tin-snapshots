@@ -17,6 +17,16 @@
 int debug;
 
 /*
+** Local prototypes
+*/
+#ifdef DEBUG
+static void debug_print_active_hash P_((void));
+static void debug_print_attributes P_((struct t_attribute *attr, FILE *fp));
+static void debug_print_base P_((void));
+static void debug_print_group_hash P_((void));
+#endif
+
+/*
  *  nntp specific debug routines
  */
 
@@ -223,11 +233,10 @@ debug_print_comment (comment)
 #endif
 }
 
-
-void
+#ifdef DEBUG
+static void
 debug_print_base ()
 {
-#ifdef DEBUG
 	char file[PATH_LEN];
 	FILE *fp;
 	int i;
@@ -245,8 +254,8 @@ debug_print_base ()
 		fclose (fp);
 		chmod (file, (S_IRUGO|S_IWUGO));
 	}
-#endif
 }
+#endif
 
 
 void
@@ -285,13 +294,12 @@ debug_print_active ()
 #endif
 }
 
-
-void
+#ifdef DEBUG
+static void
 debug_print_attributes (attr, fp)
 	struct t_attribute *attr;
 	FILE *fp;
 {
-#ifdef DEBUG
 	if (attr == 0)
 		return;
 	fprintf (fp, "global=[%d] show=[%d] thread=[%d] sort=[%d] author=[%d] auto_select=[%d] auto_save=[%d] batch_save=[%d] process=[%d]\n",
@@ -320,8 +328,8 @@ debug_print_attributes (attr, fp)
 		(attr->sigfile == (char *) 0 ? "" : attr->sigfile),
 		(attr->followup_to  == (char *) 0 ? "" : attr->followup_to));
 	fflush (fp);
-#endif
 }
+#endif
 
 
 void
@@ -496,15 +504,15 @@ debug_print_filters ()
 }
 
 
+#ifdef DEBUG
 
 /*
  * Prints out hash distribution of active[]
  */
 
-void
+static void
 debug_print_active_hash ()
 {
-#ifdef DEBUG
 	int empty = 0, number;
 	int collisions[32];
 	register i, j;
@@ -546,18 +554,17 @@ debug_print_active_hash ()
 		}
 	}
 	printf ("\n");
-#endif
 }
+#endif
 
-
-void
+#ifdef DEBUG
+static void
 debug_print_group_hash ()
 {
-#ifdef DEBUG
 	int i;
 
 	for (i = 0; i < TABLE_SIZE; i++) {
 		printf ("group_hash[%4d]=[%4d]\n", i, group_hash[i]);
 	}
-#endif
 }
+#endif

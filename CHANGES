@@ -1,3 +1,9 @@
+--unoff BETA release 970120 --
+
+289) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. code-cleanup (int -> t_bool, extern -> static)
+     FIX. several patches
+
 --unoff BETA release 970118 --
 
 288) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -12,7 +18,7 @@
 
 286) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minor code-cleanup
-     FIX. several supplied patches
+     FIX. several patches
 
 285) Alexander Lehmann <alex@hal.rhein-main.de>
      ADD. abillity to strip non txt/plain parts from multipart mime-postings
@@ -22,7 +28,7 @@
 
 284) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minor code-cleanup
-     FIX. several supplied patches
+     FIX. several patches
 
 283) Kevin Lentin <kevinl@cs.monash.edu.au>
      BUG. tin does not remember tcp_port (introduced in 281)

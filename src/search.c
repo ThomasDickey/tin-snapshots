@@ -23,10 +23,15 @@ char default_group_search[LEN];
 char default_subject_search[LEN];
 char default_art_search[LEN];
 
+/*
+** Local prototypes
+*/
+static int search_art_body P_((char *group_path, struct t_article *art, char *pat));
+
 
 /*
- *  group.c & page.c
- */
+**  group.c & page.c
+*/
 
 int
 search_author (the_index, current_art, forward)

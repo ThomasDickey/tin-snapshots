@@ -125,6 +125,7 @@ CFILES	= \
 	$(SRCDIR)/sigfile.c \
 	$(SRCDIR)/signal.c \
 	$(SRCDIR)/strftime.c \
+	$(SRCDIR)/string.c \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/xref.c
@@ -182,6 +183,7 @@ OFILES	= @ALLOCA@ \
 	$(OBJDIR)/sigfile.o \
 	$(OBJDIR)/signal.o \
 	$(OBJDIR)/strftime.o \
+	$(OBJDIR)/string.o \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/wildmat.o \
 	$(OBJDIR)/xref.o
@@ -400,6 +402,7 @@ $(OBJDIR)/select.o:		$(SRCDIR)/select.c $(TIN_DEP) \
 $(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(TIN_DEP)
 $(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(TIN_DEP)
 $(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(TIN_DEP)
+$(OBJDIR)/string.o:		$(SRCDIR)/string.c $(TIN_DEP)
 $(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(TIN_DEP)

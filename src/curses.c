@@ -200,6 +200,11 @@ static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 
 #endif /* INDEX_DAEMON */
 
+/*
+** Local prototypes
+*/
+static void ScreenSize P_((int *num_lines, int *num_columns));
+
 
 void
 setup_screen ()
@@ -485,7 +490,7 @@ InitScreen ()
  *  returns the number of lines and columns on the display.
  */
 
-void
+static void
 ScreenSize (num_lines, num_columns)
 	int *num_lines, *num_columns;
 {

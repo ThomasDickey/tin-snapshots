@@ -25,9 +25,9 @@ static int current_bcol = 0;
 /*
  * Local prototypes
  */
-static int isalp P_((int c));
-static int check_valid_mark P_((const char *s, int c));
-static int color_fputs P_((const char *s, FILE *stream, int color));
+static t_bool isalp P_((int c));
+static t_bool check_valid_mark P_((const char *s, int c));
+static void color_fputs P_((const char *s, FILE *stream, int color));
 
 
 /* setting foregroundcolor */
@@ -59,12 +59,12 @@ bcol (color)
 	}
 }
 
-static int
+static t_bool
 isalp (c)
 	int c;
 {
 	if (isalnum(c)) {
-		return (1);
+		return TRUE;
 	}
 	switch (c) {
 /*		case '.': */
@@ -103,14 +103,14 @@ isalp (c)
 		case ';':
 		case '@':
 		case '\\':
-			return (1);
+			return TRUE;
 
 		default:
-			return (0);
+			return FALSE;
 	}
 }
 
-static int
+static t_bool
 check_valid_mark (s, c)
 	const char *s;
 	int c;
@@ -119,17 +119,17 @@ check_valid_mark (s, c)
 
 	for (p=s+2; p < (s+strlen(s)); p++) {
 		if (!isalp(*p) && *(p + 1) == c) {
-			return (0);
+			return FALSE;
 		} else {
 			if (!isalp(*(p + 1)) && *p == c) {
-				return (1);
+				return TRUE;
 			}
 		}
 	}
-	return (0);
+	return FALSE;
 }
 
-static int
+static void
 color_fputs (s, stream, color)
 	const char *s;
 	FILE *stream;
@@ -225,7 +225,6 @@ color_fputs (s, stream, color)
 				break;
 		}
 	}
-	return (1);
 }
 
 void

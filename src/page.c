@@ -54,8 +54,15 @@ long note_size;				/* stat size in bytes of article */
 
 static int tex2iso_article;
 
+/*
+** Lolcal prototypes
+*/
 static int expand_ctrl_chars P_((char *tobuf, char *frombuf, int length, int do_rotate));
-
+static void show_mime_article P_((FILE *fp, struct t_article *art));
+static void show_first_header P_((int respnum, char *group));
+static void show_cont_header P_((int respnum));
+static int prompt_response P_((int ch, int respnum));
+static int show_last_page P_((void));
 
 int
 show_page (group, group_path, respnum, threadnum)
@@ -929,7 +936,7 @@ print_a_line:
 }
 
 
-void
+static void
 show_mime_article (fp, art)
 	FILE	*fp;
 	struct	t_article *art;
@@ -964,7 +971,7 @@ show_mime_article (fp, art)
 }
 
 
-void
+static void
 show_first_header (respnum, group)
 	int respnum;
 	char *group;
@@ -1158,7 +1165,7 @@ show_first_header (respnum, group)
 }
 
 
-void
+static void
 show_cont_header (respnum)
 	int respnum;
 {
@@ -1344,7 +1351,7 @@ art_close ()
 }
 
 
-int
+static int
 prompt_response (ch, respnum)
 	int ch;
 	int respnum;
@@ -1403,7 +1410,7 @@ yank_to_addr (orig, addr)
 }
 
 
-int
+static int
 show_last_page ()
 {
 	char buf[LEN];
@@ -1457,37 +1464,6 @@ show_last_page ()
 	return TRUE;
 }
 
-
-void modifiedstrncpy(target, source, size, decode)
-char *target;
-char *source;
-size_t size;
-int decode;
-{
-        char buf[2048];
-	int count;
-	char *c;
-
-	count = sizeof(buf)-1;
-	c = buf;
-	while (*source) {
-		if (*source!= 1) {
-			*c++ = *source++;
-			if (!--count) break;
-		}
-		else source++;
-	}
-	*c = 0;
-	if(decode)
-		c = rfc1522_decode(buf);
-	else
-		c=buf;
-
-	while (--size) {
-	        *target++ = *c++;
-	}
-	*target = 0;
-}
 
 /*
  * buf:  Article header

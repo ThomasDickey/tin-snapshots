@@ -50,7 +50,6 @@ static int base64_rank_table_built;
 static int quoteflag;
 
 static int contains_nonprintables P_((char *w));
-static int mystrcat P_((char **t, char *s));
 static int rfc1522_do_encode P_((char *what, char **where));
 static unsigned hex2bin P_((int x));
 static void build_base64_rank_table P_((void));
@@ -314,20 +313,6 @@ sizeofnextword (w)
 }
 #endif
 
-static int
-mystrcat (t, s)
-	char **t;
-	char *s;
-{
-	int len = 0;
-
-	while (*s) {
-		*((*t)++) = *s++;
-		len++;
-	}
-	**t = 0;
-	return len;
-}
 
 static int
 rfc1522_do_encode (what, where)

@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970118
+PVER		= 970120
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -83,6 +83,7 @@ CFILES	= \
 	$(SRCDIR)/sigfile.c \
 	$(SRCDIR)/signal.c \
 	$(SRCDIR)/strftime.c \
+	$(SRCDIR)/string.c \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/win32.c \

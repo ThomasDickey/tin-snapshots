@@ -43,6 +43,15 @@ struct t_spooldir *spooldirs;		/* spooldirs on NNTP server (cdrom) */
 
 
 /*
+** Local prototypes
+*/
+static void free_newnews_array P_((void));
+static void free_spooldirs_array P_((void));
+#if 0
+static void expand_spooldirs P_((void));
+#endif
+
+/*
  *  Dynamic table management
  *  These settings are memory conservative:  small initial allocations
  *  and a 50% expansion on table overflow.  A fast vm system with
@@ -124,8 +133,8 @@ expand_save ()
 		sizeof (struct t_save) * max_save);
 }
 
-
-void
+#if 0 /*never used */
+static void
 expand_spooldirs ()
 {
 	max_spooldir += max_spooldir / 2;	/* increase by 50% */
@@ -133,7 +142,7 @@ expand_spooldirs ()
 	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs,
 		sizeof (struct t_spooldir) * max_spooldir);
 }
-
+#endif /* 0 */
 
 void
 expand_newnews ()
@@ -358,7 +367,7 @@ free_save_array ()
 }
 
 
-void
+static void
 free_spooldirs_array ()
 {
 	int i;
@@ -375,7 +384,7 @@ free_spooldirs_array ()
 }
 
 
-void
+static void
 free_newnews_array ()
 {
 	int i;

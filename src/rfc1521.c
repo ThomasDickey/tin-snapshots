@@ -19,20 +19,6 @@
 */
 static int boundary_cmp P_((char *line, char *boundary));
 
-/* this strcpy variant removes \n and "" */
-void
-strcpynl (to, from)
-	char *to;
-	char *from;
-{
-	while (*from && *from != '\r' && *from != '\n') {
-		if (*from == '"')
-			from++;	/* this is just plain silly */
-		else
-			*to++ = *from++;
-	}
-	*to = 0;
-}
 
 unsigned char
 bin2hex (x)
@@ -43,28 +29,6 @@ bin2hex (x)
 	return x - 10 + 'A';
 }
 
-char *
-strcasestr (haystack, needle)
-	char *haystack;
-	char *needle;
-{
-	char *h, *n;
-
-	h = haystack;
-	n = needle;
-	while (*haystack) {
-		if (tolower (*h) == tolower (*n)) {
-			h++;
-			n++;
-			if (!*n)
-				return haystack;
-		} else {
-			h = ++haystack;
-			n = needle;
-		}
-	}
-	return NULL;
-}
 
 /* check if a line is a MIME boundary, returns 0 if false, 1 if normal
    boundary and 2 if closing boundary */
