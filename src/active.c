@@ -24,9 +24,10 @@
 #define ACTIVE_SEP		" \n"
 
 
-char acSaveActiveFile[PATH_LEN];
-char acSaveDir[PATH_LEN];
 t_bool force_reread_active_file = FALSE;
+
+static char acSaveActiveFile[PATH_LEN];
+static char acSaveDir[PATH_LEN];
 static time_t active_timestamp;  /* time active file read (local) */
 
 
@@ -65,12 +66,12 @@ get_active_num (void)
 static void
 set_active_timestamp (void)
 {
-	time (&active_timestamp);
+	(void) time (&active_timestamp);
 	force_reread_active_file = FALSE;
 }
 
 
-int
+t_bool
 reread_active_file (void)
 {
 	return (force_reread_active_file || (reread_active_file_secs != 0 &&
@@ -82,7 +83,7 @@ reread_active_file (void)
  * Resync active file when reread_active_file_secs have passed or
  * force_reread_actve_file is set.
  */
-int
+t_bool
 resync_active_file (void)
 {
 	char old_group[HEADER_LEN];
@@ -212,7 +213,7 @@ parse_active_line (
 	if (line[0] == '#' || line[0] == '\0')
 		return FALSE;
 
-	strtok(line, ACTIVE_SEP);		/* skip group name */
+	(void) strtok(line, ACTIVE_SEP);		/* skip group name */
 	p = strtok((char *)0, ACTIVE_SEP);	/* group max count */
 	q = strtok((char *)0, ACTIVE_SEP);	/* group min count */
 	r = strtok((char *)0, ACTIVE_SEP);	/* mod status or path to mailgroup */
@@ -274,8 +275,10 @@ read_news_active_file (void)
 	char moderated[PATH_LEN];
 	char *ptr;
 	struct t_group *grpptr;
-	long processed = 0L;
 	long count = -1L, min = 1L, max = 0L;
+#ifdef SHOW_PROGRESS
+	long processed = 0L;
+#endif /* SHOW_PROGRESS */
 
 	/*
 	 * Ignore -n if no .newsrc can be found or .newsrc is empty
@@ -321,7 +324,7 @@ read_news_active_file (void)
 #ifdef SHOW_PROGRESS		/* Spin the arrow as we read the active file */
 		if (++processed % ((newsrc_active) ? 5 : MODULO_COUNT_NUM) == 0)
 			spin_cursor ();
-#endif
+#endif /* SHOW_PROGRESS */
 		/*
 		 * Load group into group hash table
 		 * NULL means group already present, so we just fixup the counters
@@ -393,7 +396,7 @@ check_for_any_new_groups (void)
 		return;
 
 	wait_message (0, txt_checking_new_groups);
-	time (&new_newnews_time);
+	(void) time (&new_newnews_time);
 	strcpy (new_newnews_host, (read_news_via_nntp ? nntp_server : "local")); /* What if nntp server called local ? */
 
 	/*
@@ -409,8 +412,8 @@ check_for_any_new_groups (void)
 
 #ifdef DEBUG
 	if (debug == 2) {
-		error_message("Newnews old=[%ld]  new=[%ld]", old_newnews_time, new_newnews_time);
-		sleep (2);
+		error_message("Newnews old=[%lu]  new=[%lu]", (unsigned long int) old_newnews_time, (unsigned long int) new_newnews_time);
+		(void) sleep (2);
 	}
 #endif
 
@@ -430,7 +433,6 @@ check_for_any_new_groups (void)
 			 * we must check the creation date manually
 			 */
 			if ((ptr = strchr (buf, ' ')) != (char *) 0) {
-
 				if (!read_news_via_nntp && ((time_t) atol (ptr) < old_newnews_time || old_newnews_time == (time_t) 0))
 					continue;
 
@@ -453,7 +455,7 @@ check_for_any_new_groups (void)
 	if (newnews_index >= 0)
 		newnews[newnews_index].time = new_newnews_time;
 	else {
-		sprintf (buf, "%s %ld", new_newnews_host, new_newnews_time);
+		sprintf (buf, "%s %lu", new_newnews_host, (unsigned long int) new_newnews_time);
 		load_newnews_info (buf);
 	}
 }
@@ -542,7 +544,7 @@ match_group_list (
 		 * find end/length of this entry
 		 */
 		separator = strchr (group_list, ',');
-		group_len = ((separator == (char *) 0) ? list_len : (separator - group_list));
+		group_len = ((separator == (char *) 0) ? list_len : (size_t)(separator - group_list));
 
 		if ((negate = ('!' == *group_list))) {
 			/*
@@ -596,7 +598,7 @@ load_newnews_info (
 	 * initialize newnews[] if no entries
 	 */
 	if (!num_newnews) {
-		for (i = 0 ; i < max_newnews ; i++) {
+		for (i = 0; i < max_newnews; i++) {
 			newnews[i].host = (char *) 0;
 			newnews[i].time = (time_t) 0;
 		}
@@ -626,7 +628,7 @@ load_newnews_info (
 
 #ifdef DEBUG
 	if (debug == 2)
-		error_message("ACTIVE host=[%s] time=[%ld]", newnews[i].host, newnews[i].time);
+		error_message("ACTIVE host=[%s] time=[%lu]", newnews[i].host, (unsigned long int) newnews[i].time);
 #endif
 }
 
@@ -640,7 +642,7 @@ find_newnews_index (
 {
 	int i;
 
-	for (i = 0 ; i < num_newnews ; i++) {
+	for (i = 0; i < num_newnews; i++) {
 		if (STRCMPEQ(cur_newnews_host, newnews[i].host))
 			return(i);
 	}
@@ -653,7 +655,7 @@ find_newnews_index (
  * Get a single status char from the moderated field. Used on selection screen
  * and in header of group screen
  */
-int
+char
 group_flag (
 	int ch)
 {
@@ -859,11 +861,11 @@ read_group_times_file (void)
 	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0)
 		return;
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
 		/*
 		 * read the group name
 		 */
-		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
+		for (p = buf, q = group; *p && *p != ' ' && *p != '\t'; p++, q++)
 			*q = *p;
 
 		*q = '\0';
@@ -881,10 +883,10 @@ read_group_times_file (void)
 		if (psGrp)
 			psGrp->last_updated_time = updated_time;
 
-#ifdef DEBUG
+#	ifdef DEBUG
 if (debug == 2)
-	my_printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
-#endif
+	my_printf ("group=[%-40.40s]  [%lu]\n", psGrp->name, (unsigned long int) psGrp->last_updated_time);
+#	endif /* DEBUG */
 
 	}
 	fclose (fp);
@@ -903,9 +905,9 @@ write_group_times_file (void)
 	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0)
 		return;
 
-	for (i = 0 ; i < num_active ; i++)
-		fprintf (fp, "%s %ld\n", active[i].name, active[i].last_updated_time);
+	for (i = 0; i < num_active; i++)
+		fprintf (fp, "%s %lu\n", active[i].name, (unsigned long int) active[i].last_updated_time);
 
 	fclose (fp);
 }
-#endif	/* INDEX_DAEMON */
+#endif /* INDEX_DAEMON */

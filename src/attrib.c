@@ -15,6 +15,8 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
+#ifndef INDEX_DAEMON
+
 /*
  * Defines used in setting attributes switch
  */
@@ -55,12 +57,10 @@
 /*
  * Local prototypes
  */
-#ifndef INDEX_DAEMON
-	static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
-	static void set_attrib_num (int type, char *scope, int num);
-	static void set_attrib_str (int type, char *scope, char *str);
-	static void set_default_attributes (struct t_attribute *psAttrib);
-#endif /* !INDEX_DAEMON */
+static void set_attrib (struct t_group *psGrp, int type, const char *str, int num);
+static void set_attrib_num (int type, char *scope, int num);
+static void set_attrib_str (int type, char *scope, char *str);
+static void set_default_attributes (struct t_attribute *psAttrib);
 
 /*
  * global attributes
@@ -72,7 +72,6 @@ struct t_attribute glob_attributes;
  * Per group attributes
  */
 
-#ifndef INDEX_DAEMON
 static void
 set_default_attributes (
 	struct t_attribute *psAttrib)
@@ -111,7 +110,6 @@ set_default_attributes (
 	psAttrib->news_quote_format = news_quote_format;
 	psAttrib->quote_chars = quote_chars;
 }
-#endif	/* INDEX_DAEMON */
 
 /*
  *  Load global & local attributes into active[].attribute
@@ -187,7 +185,6 @@ read_attributes_file (
 	char	*file,
 	int	global_file)
 {
-#ifndef INDEX_DAEMON
 	char buf[LEN];
 	char line[LEN];
 	char scope[LEN];
@@ -209,7 +206,7 @@ read_attributes_file (
 			wait_message (0, txt_reading_attributes_file, (global_file) ? "global " : "");
 
 		scope[0] = '\0';
-		while (fgets (line, sizeof (line), fp) != (char *) 0) {
+		while (fgets (line, (int) sizeof (line), fp) != (char *) 0) {
 			if (line[0] == '#' || line[0] == '\n')
 				continue;
 
@@ -356,7 +353,7 @@ read_attributes_file (
 	 * Now setup the rest of the groups to use the default attributes
 	 */
 	if (!global_file) {
-		for (i = 0; i < num_active ; i++) {
+		for (i = 0; i < num_active; i++) {
 			if (active[i].attribute == (struct t_attribute *) 0)
 				active[i].attribute = &glob_attributes;
 		}
@@ -366,11 +363,9 @@ read_attributes_file (
 	if (INTERACTIVE2)
 		wait_message (0, "\n");
 
-#endif	/* INDEX_DAEMON */
 }
 
 
-#ifndef INDEX_DAEMON
 static void
 set_attrib_str (
 	int type,
@@ -408,10 +403,8 @@ if (debug)
 		}
 	}
 }
-#endif	/* INDEX_DAEMON */
 
 
-#ifndef INDEX_DAEMON
 static void
 set_attrib_num (
 	int type,
@@ -449,9 +442,8 @@ if (debug)
 		}
 	}
 }
-#endif	/* INDEX_DAEMON */
 
-#ifndef INDEX_DAEMON
+
 static void
 set_attrib (
 	struct	t_group	*psGrp,
@@ -573,23 +565,21 @@ set_attrib (
 	}
 
 }
-#endif /* INDEX_DAEMON */
+
 
 /*
  *  Save the group attributes from active[].attribute to ~/.tin/attributes
  */
-
 void
 write_attributes_file (
 	char	*file)
 {
-#ifndef INDEX_DAEMON
 	FILE *fp;
 	char *file_tmp;
-#if 0
+#	if 0
 	register int i;
 	struct t_group *psGrp;
-#endif
+#	endif /* 0 */
 
 	/* alloc memory for tmp-filename */
 	if ((file_tmp = (char *) my_malloc (strlen (file)+5)) == NULL) {
@@ -636,13 +626,13 @@ write_attributes_file (
 	fprintf (fp, "#    7=score descend, 8=score ascend\n#\n");
 	fprintf (fp, "#  post_proc_type=NUM\n");
 	fprintf (fp, "#    0=none, 1=unshar, 2=uudecode,\n");
-#ifdef M_AMIGA
-	fprintf (fp, "#    3=uudecode & list lha archive,\n");
-	fprintf (fp, "#    4=uudecode & extract lha archive\n");
-#else
-	fprintf (fp, "#    3=uudecode & list zoo archive,\n");
-	fprintf (fp, "#    4=uudecode & extract zoo archive\n");
-#endif
+#	ifdef M_AMIGA
+		fprintf (fp, "#    3=uudecode & list lha archive,\n");
+		fprintf (fp, "#    4=uudecode & extract lha archive\n");
+#	else
+		fprintf (fp, "#    3=uudecode & list zoo archive,\n");
+		fprintf (fp, "#    4=uudecode & extract zoo archive\n");
+#	endif /* M_AMIGA */
 	fprintf (fp, "#    5=uudecode & list zip archive,\n");
 	fprintf (fp, "#    6=uudecode & extract zip archive\n#\n");
 	fprintf (fp, "#  mailing_list=STRING (ie. majordomo@list.org)\n");
@@ -683,8 +673,8 @@ write_attributes_file (
 	fprintf (fp, "delete_tmp_files=ON\n");
 	fprintf (fp, "followup_to=poster\n\n");
 
-#if 0 /* FIXME */
-	for (i = 0 ; i < num_active ; i++) {
+#	if 0 /* FIXME */
+	for (i = 0; i < num_active; i++) {
 		psGrp = &active[i];
 		fprintf (fp, "scope=%s\n", psGrp->name);
 		fprintf (fp, "maildir=%s\n", psGrp->attribute->maildir);
@@ -735,30 +725,28 @@ write_attributes_file (
 		fprintf (fp, "quote_chars=%s\n",
 			quote_space_to_dash (psGrp->attribute->quote_chars));
 	}
-#endif /* 0 */
+#	endif /* 0 */
 
 	if (ferror (fp) | fclose (fp))
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
 	else {
 		rename_file (file_tmp, file);
-		chmod (file, (S_IRUSR|S_IWUSR));
+		chmod (file, (mode_t)(S_IRUSR|S_IWUSR));
 	}
 	free (file_tmp);	/* free memory for tmp-filename */
-
-#endif	/* INDEX_DAEMON */
 }
 
-#if 0
+
+#	if 0
 void
 debug_print_filter_attributes (void)
 {
-#ifndef INDEX_DAEMON
 	register int i;
 	struct t_group *psGrp;
 
 	my_printf("\nBEG ***\n");
 
-	for (i = 0; i < num_active ; i++) {
+	for (i = 0; i < num_active; i++) {
 		psGrp = &active[i];
 		my_printf ("Grp=[%s] KILL   header=[%d] scope=[%s] case=[%s] expire=[%s]\n",
 			psGrp->name, psGrp->attribute->quick_kill_header,
@@ -775,6 +763,7 @@ debug_print_filter_attributes (void)
 	}
 
 	my_printf("END ***\n");
-#endif	/* INDEX_DAEMON */
 }
-#endif /* 0 */
+#	endif /* 0 */
+
+#endif /* !INDEX_DAEMON */

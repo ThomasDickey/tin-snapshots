@@ -24,8 +24,8 @@
 #else
 #	ifndef HAVE_CONFDEFS_H
 #		include	"config.h"
-#	endif
-#endif
+#	endif /* !HAVE_CONFDEFS_H */
+#endif /* HAVE_CONFIG_H */
 
 /*
  * We force this include-ordering since socks.h contains redefinitions of
@@ -36,7 +36,7 @@
 #ifdef USE_SOCKS5
 #	define SOCKS
 #	include	<socks.h>
-#endif
+#endif /* USE_SOCKS5 */
 
 /*
  * Non-autoconf'able definitions for Amiga Developer Environment (gcc 2.7.2,
@@ -49,8 +49,8 @@
 #		define M_AMIGA
 #		define SIG_ARGS /*nothing, since compiler doesn't handle it*/
 #		undef DECL_SIG_CONST
-#	endif
-#endif
+#	endif /* !__GNUC__ */
+#endif /* __amiga__ || __amiga */
 
 #include	<signal.h>
 
@@ -61,19 +61,19 @@
 #		ifndef __VMS_VER  /* assume old types.h */
 			typedef unsigned short mode_t;
 #			undef HAVE_STRFTIME
-#		endif
+#		endif /* __VMS_VER */
 #		include <stdio.h>
-#	endif
+#	endif /* __DECC */
 #	ifdef SOCKETSHR_TCP
 #		include <socketshr.h>
 #		include <unistd.h>
 #		ifndef SOCKETSHR_HAVE_DUP
 #			define dup
-#		endif
+#		endif /* SOCKETSHR_HAVE_DUP */
 #		ifndef SOCKETSHR_HAVE_FERROR
 #			define ferror(a) (0)
-#		endif
-#	endif
+#		endif /* SOCKETSHR_HAVE_FERROR */
+#	endif /* SOCKETSHR_TCP */
 #	include <curses.h>
 #	include <stat.h>
 #	undef	HAVE_SELECT
@@ -86,7 +86,7 @@
 #	define USE_CLEARSCREEN
 #	ifndef MM_CHARSET
 #		define MM_CHARSET "ISO-8859-1"
-#	endif
+#	endif /* MM_CHARSET */
 	/* Apparently this means fileops=create if not already there - no idea
 	 * why this should be needed. Standard fopen() implies this in arg 2
 	 */
@@ -111,23 +111,23 @@
 #	include	<errno.h>
 #else
 #	include	<sys/errno.h>
-#endif
+#endif /* HAVE_ERRNO_H */
 #if !defined(errno)
 #	ifdef DECL_ERRNO
 		extern int errno;
-#	endif
-#endif
+#	endif /* DECL_ERRNO */
+#endif /* !errno */
 
 #ifdef HAVE_STDDEF_H
 #	include <stddef.h>
-#endif
+#endif /* HAVE_STDDEF_H */
 #include <sys/types.h>
 
 #ifdef M_AMIGA
 #	include "include:stat.h"	/* FIXME: Problem with AmiTCP-includes, AmiTCP's fstat() needs */
 #else									/* a running TCP-Stack. OTOH fstat() ist used with local spool */
 #	include <sys/stat.h>
-#endif
+#endif /* M_AMIGA */
 
 #ifdef TIME_WITH_SYS_TIME
 #	include <sys/time.h>
@@ -137,38 +137,40 @@
 #		include <sys/time.h>
 #	else
 #		include <time.h>
-#	endif
-#endif
+#	endif /* HAVE_SYS_TIME_H */
+#endif /* TIME_WITH_SYS_TIME */
 
 #ifdef HAVE_SYS_TIMES_H
 #	include <sys/times.h>
-#endif
+#endif /* HAVE_SYS_TIMES_H */
 
 #ifdef HAVE_LIBC_H
 #	include <libc.h>
-#endif
+#endif /* HAVE_LIBC_H */
 
 #ifdef HAVE_UNISTD_H
 #	include <unistd.h>
-#endif
+#endif /* HAVE_UNISTD_H */
+
 #ifdef HAVE_PWD_H
 #	include <pwd.h>
-#endif
+#endif /* HAVE_PWD_H */
+
 #ifdef HAVE_SYS_PARAM_H
 #	include <sys/param.h>
-#endif
+#endif /* HAVE_SYS_PARAM_H */
 
 #include	<ctype.h>
 
 #ifdef HAVE_STDLIB_H
 #	include <stdlib.h>
-#endif
+#endif /* HAVE_STDLIB_H */
 
 #include <stdarg.h>
 
 #ifdef HAVE_GETOPT_H
 #	include <getopt.h>
-#endif
+#endif /* HAVE_GETOPT_H */
 
 /* prefer string.h because it's Posix */
 #ifdef HAVE_STRING_H
@@ -176,12 +178,12 @@
 #else
 #	ifdef HAVE_STRINGS_H
 #		include <strings.h>
-#	endif
-#endif
+#	endif /* HAVE_STRINGS_H */
+#endif /* HAVE_STRING_H */
 
 #ifdef HAVE_FCNTL_H
 #	include <fcntl.h>
-#endif
+#endif /* HAVE_FCNTL_H */
 
 #ifdef HAVE_SYS_IOCTL_H
 #	include <sys/ioctl.h>
@@ -208,33 +210,31 @@
 #		undef TOSTOP
 #		undef FLUSHO
 #		undef PENDIN
-#	endif
-#endif
+#	endif /* sun && !__svr4 */
+#endif /* HAVE_SYS_IOCTL_H */
 
 #ifdef HAVE_PROTOTYPES_H
 #	include <prototypes.h>
-#endif
+#endif /* HAVE_PROTOTYPES_H */
 
 #if defined(HAVE_LOCALE_H) && !defined(NO_LOCALE)
 #	include <locale.h>
-#endif
+#endif /* HAVE_LOCALE_H && !NO_LOCALE */
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>
-#endif
+#endif /* HAVE_SYS_UTSNAME_H */
 
 /*
  * Needed for catching child processes
  */
-
 #ifdef HAVE_SYS_WAIT_H
 #	include <sys/wait.h>
-#endif
+#endif /* HAVE_SYS_WAIT_H */
 
 /*
  * Needed for timeout in user abort of indexing a group (BSD & SYSV variaties)
  */
-
 #ifdef HAVE_SYS_SELECT_H
 #	ifdef NEED_TIMEVAL_FIX
 #		define timeval fake_timeval
@@ -242,21 +242,20 @@
 #		undef timeval
 #	else
 #		include <sys/select.h>
-#	endif
-#endif
+#	endif /* NEED_TIMEVAL_FIX */
+#endif /* HAVE_SYS_SELECT_H */
 
 #ifdef HAVE_STROPTS_H
 #	include <stropts.h>
-#endif
+#endif /* HAVE_STROPTS_H */
 
 #ifdef HAVE_POLL_H
 #	include <poll.h>
-#endif
+#endif /* HAVE_POLL_H */
 
 /*
  * Directory handling code
  */
-
 #ifdef HAVE_CONFIG_H
 #	ifdef HAVE_DIRENT_H
 #		include <dirent.h>
@@ -305,7 +304,6 @@
 /*
  * If native OS has'nt defined STDIN_FILENO be a smartass and do it
  */
-
 #if !defined(STDIN_FILENO)
 #	define	STDIN_FILENO	0
 #endif
@@ -315,12 +313,11 @@
  */
 #ifndef HAVE_ISASCII
 #	define isascii(c) (!((c) & ~0177))
-#endif /* HAVE_ISASCII */
+#endif /* !HAVE_ISASCII */
 
 /*
  * Setup support for reading from NNTP
  */
-
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 #	ifndef NNTP_ABLE
 #		define	NNTP_ABLE
@@ -333,7 +330,6 @@
 /*
  *  Time idle after which to check (via STAT) if nntp connection is still ok
  */
-
 #define NNTP_IDLE_RETRY_SECS	300
 
 /*
@@ -354,7 +350,6 @@
  * of all the index files in one place. In this case the normal tin must have
  * access to the index directory (-I dir option) or be setuid news.
  */
-
 #ifdef INDEX_DAEMON
 #	define	LOCK_FILE "tind.LCK"
 #	undef	HAVE_POLL
@@ -368,7 +363,6 @@
  * Specify News spool & control directories if not running NNTP_ONLY
  * (on machines who can run configure this is not needed)
  */
-
 #ifndef HAVE_CONFIG_H
 #	ifndef NNTP_ONLY
 #		ifndef SPOOLDIR
@@ -584,7 +578,6 @@
 /*
  * How often should the active file be reread for new news
  */
-
 #ifndef REREAD_ACTIVE_FILE_SECS
 #	define	REREAD_ACTIVE_FILE_SECS 1200	/* seconds (20 mins) */
 #endif
@@ -592,7 +585,6 @@
 /*
  * Initial sizes of internal arrays for small (<4MB) & large memory machines
  */
-
 #ifdef SMALL_MEMORY_MACHINE
 #	define	DEFAULT_ARTICLE_NUM	600
 #	define	DEFAULT_SAVE_NUM	10
@@ -645,15 +637,19 @@
 #define	_CONF_ORGANIZATION	"organization"
 #define	_CONF_SERVER	"server"
 
-#ifndef TRUE
-#	define	TRUE	1
-#endif
-
 #ifndef FALSE
 #	define	FALSE	0
 #endif
 
+#ifndef TRUE
+#	define	TRUE	(!FALSE)
+#endif
+
 typedef unsigned t_bool;	/* don't make this a char or short! */
+
+#define bool_equal(a,b) ((a) ? (b) : !(b))
+#define bool_not(b) ((b) ? FALSE : TRUE)
+#define bool_unparse(b) ((b) ? "true" : "false")
 
 #ifndef MAX
 #	define	MAX(a,b)	((a > b) ? a : b)
@@ -818,7 +814,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * News/Mail group types
  */
-
 #define	GROUP_TYPE_MAIL	0
 #define	GROUP_TYPE_NEWS	1
 #define	GROUP_TYPE_SAVE	2		/* What on earth is this ? */
@@ -826,7 +821,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used by get_arrow_key()
  */
-
 #ifdef WIN32
 #	define	KEYMAP_UNKNOWN		0
 #	define	KEYMAP_UP		0xA6
@@ -868,7 +862,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used by feed_articles() & show_mini_help()
  */
-
 #define	SELECT_LEVEL	1
 #define	GROUP_LEVEL	2
 #define	THREAD_LEVEL	3
@@ -912,7 +905,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used in feed.c & save.c
  */
-
 #define	POST_PROC_NONE		0
 #define	POST_PROC_SHAR		1
 #define	POST_PROC_UUDECODE	2
@@ -926,7 +918,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  * used in art.c
  * sort types on arts[] array
  */
-
 #define	SORT_BY_NOTHING		0
 #define	SORT_BY_SUBJ_DESCEND	1
 #define	SORT_BY_SUBJ_ASCEND	2
@@ -948,7 +939,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used in help.c
  */
-
 #define	HELP_INFO		0
 #define	POST_INFO		1
 
@@ -956,7 +946,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used in save.c/main.c
  */
-
 #define	CHECK_ANY_NEWS		0
 #define	START_ANY_NEWS		1
 #define	MAIL_ANY_NEWS		2
@@ -966,7 +955,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used in post.c
  */
-
 #define	HEADER_TO		0
 #define	HEADER_SUBJECT		1
 #define	HEADER_NEWSGROUPS	2
@@ -979,7 +967,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * index_point variable values used throughout many modules
  */
-
 #define	GRP_UNINDEXED		-1		/* Stop reading group */
 #define	GRP_QUIT		-2		/* Set by 'Q' */
 #define	GRP_GOTONEXT		-3		/* Goto another group */
@@ -1004,7 +991,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #	endif /* CPP_DOES_EXPAND */
 #endif /*!M_OS2 && !WIN32*/
 
-
 #define	ESC	27
 
 /* Turn on nice progress indicators */
@@ -1013,7 +999,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * return codes for change_config_file ()
  */
-
 #define	NO_FILTERING		0
 #define	FILTERING		1
 #define	DEFAULT_FILTER_DAYS		28
@@ -1022,14 +1007,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * art.thread (Can't ART_NORMAL be better named ?)
  */
-
 #define	ART_NORMAL		-1
 #define	ART_EXPIRED		-2
 
 /*
  * art.status
  */
-
 #define	ART_READ		0
 #define	ART_UNREAD		1
 #define	ART_WILL_RETURN		2
@@ -1043,7 +1026,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * used by t_group & my_group[]
  */
-
 #define	UNSUBSCRIBED	'!'
 #define	SUBSCRIBED	':'
 
@@ -1055,20 +1037,18 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /*
  * filter_type used in struct t_filter
  */
-
 #define	FILTER_KILL		0
 #define	FILTER_SELECT		1
 
-#define SCORE_MAX		10000L
+#define SCORE_MAX		10000
 
-#define SCORE_DEFAULT		100L
+#define SCORE_DEFAULT		100
 #define SCORE_KILL		-(SCORE_DEFAULT)
 #define SCORE_SELECT		SCORE_DEFAULT
 
 /* TODO: the next two should be configurable at runtime */
-
-#define SCORE_LIM_KILL		-50L
-#define SCORE_LIM_SEL		50L
+#define SCORE_LIM_KILL		-50
+#define SCORE_LIM_SEL		50
 
 #define	FILTER_SUBJ_CASE_SENSITIVE		0
 #define	FILTER_SUBJ_CASE_IGNORE		1
@@ -1160,7 +1140,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  * loop for each bit inside a loop for each individual byte.
  *
  */
-
 #define NBITS		8
 #define NMAXBIT 	7
 #define NBITPOS 	3
@@ -1226,13 +1205,11 @@ struct t_msgid
  *	following articles in thread
  *
  */
-
 struct t_article
 {
 	long artnum;			/* Article number in spool directory for group */
 	char *subject;			/* Subject: line from mail header */
 /* t_article.subject is casted to (int *) in art.c :-( */
-
 	char *from;			/* From: line from mail header (address) */
 	char *name;			/* From: line from mail header (full name) */
 	time_t date;			/* Date: line from header in seconds */
@@ -1253,14 +1230,13 @@ struct t_article
 	unsigned int killed:1;		/* 0 = not killed, 1 = killed */
 	unsigned int selected:1;	/* 0 = not selected, 1 = selected */
 	unsigned int zombie:1;		/* 1 = was alive (unread) before 'X' command */
-	unsigned int delete:1;		/* 1 = delete art when leaving group [mail group] */
+	unsigned int delete_it:1;	/* 1 = delete art when leaving group [mail group] */
 	unsigned int inrange:1; 	/* 1 = article selected via # range command */
 };
 
 /*
  * struct t_attribute - configurable attributes on a per group basis
  */
-
 struct t_attribute
 {
 	char *maildir;				/* mail dir if other than ~/Mail */
@@ -1305,7 +1281,6 @@ struct t_attribute
 /*
  * struct t_newsrc - newsrc related info.
  */
-
 struct t_newsrc
 {
 	int	present;			/* update newsrc ? */
@@ -1319,7 +1294,6 @@ struct t_newsrc
 /*
  * struct t_group - newsgroup info from active file
  */
-
 struct t_group
 {
 	char *name;				/* newsgroup / mailbox name */
@@ -1349,7 +1323,6 @@ struct t_group
 /*
  * used in hashstr.c
  */
-
 struct t_hashnode
 {
 	struct t_hashnode *next;		/* chain for spillover */
@@ -1375,7 +1348,6 @@ struct t_hashnode
  *
  *  Also seperate kill/select screen to allow ^K=kill ^A=auto-select
  */
-
 struct t_filters
 {
 	int max;
@@ -1386,7 +1358,6 @@ struct t_filters
 /*
  * struct t_filter - local & global filtering (ie. kill & auto-selection)
  */
-
 struct t_filter
 {
 	char *scope;		/* NULL='*' (all groups) or 'comp.os.*' */
@@ -1412,7 +1383,6 @@ struct t_filter
 /*
  * struct t_filter_rule - provides parameters to build filter rule from
  */
-
 struct t_filter_rule
 {
 	char text[PATH_LEN];
@@ -1495,7 +1465,6 @@ struct t_art_stat
 /*
  * Used for detecting changes in active file size on different news servers
  */
-
 struct t_newnews
 {
 	char *host;
@@ -1511,7 +1480,6 @@ struct t_newnews
 /*
  * Used for building option menu
  */
-
 struct t_option {
 	int var_type;		/* type of variable (see tincfg.h) */
 	int var_index;		/* index in corresponding table */
@@ -1525,7 +1493,6 @@ struct t_option {
 /*
  * Time functions.
  */
-
 typedef struct _TIMEINFO
 {
 	time_t	time;
@@ -1539,7 +1506,6 @@ typedef struct _TIMEINFO
  * confused by arrays of pointers to pointers, so typedef's are used for the
  * first level pointers to keep it clearer.
  */
-
 struct t_notify
 {
 	char *name;
@@ -1553,7 +1519,6 @@ typedef struct t_notify *notify_p;
 /*
  * Determine signal return type
  */
-
 #ifndef RETSIGTYPE
 #	define RETSIGTYPE void
 #endif
@@ -1561,7 +1526,6 @@ typedef struct t_notify *notify_p;
 /*
  * Determine qsort compare type
  */
-
 #ifdef HAVE_COMPTYPE_VOID
 #	ifdef __STDC__
 		typedef const void t_comptype;
@@ -1587,7 +1551,6 @@ typedef struct t_notify *notify_p;
 /*
  * mouse buttons for use in xterm
  */
-
 #define	MOUSE_BUTTON_1		0
 #define	MOUSE_BUTTON_2		1
 #define	MOUSE_BUTTON_3		2
@@ -1789,7 +1752,6 @@ extern void joinpath (char *result, char *dir, char *file);
 /*
  * function prototypes & extern definitions
  */
-
 /* #include	"filebug.h" */
 
 #ifndef SIG_ARGS

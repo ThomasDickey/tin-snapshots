@@ -188,7 +188,7 @@ my_strftime (
 			break;
 
 		case 'Y':	/* year with century */
-			sprintf(tbuf, "%d", 1900 + timeptr->tm_year);
+			sprintf(tbuf, "%d", timeptr->tm_year + 1900);
 			break;
 
 #ifdef SYSV_EXT

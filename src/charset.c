@@ -207,7 +207,7 @@ ConvertIso2Asc (
 			}
 		}
 	}
-	*asc = 0;
+	*asc = '\0';
 
 	return;
 }
@@ -228,7 +228,8 @@ ConvertTeX2Iso (
 
 	spaces = 0;
 	while (col < len) {
-		i = subst_len = ex = 0;
+		subst_len = 0;
+		i = ex = 0;
 		while ((i < TEX_SUBST) && !ex) {
 			subst_len = strlen (tex_from[i]);
 			if (!strncmp (from + col, tex_from[i], subst_len)) {
@@ -271,7 +272,7 @@ iIsArtTexEncoded (
 	if ((fp = open_art_fp ((char *)group_path, art, 0, TRUE)) == (FILE *) 0)
 		return FALSE;
 
-	while (fgets (line, sizeof line, fp) != (char *) 0) {
+	while (fgets (line, (int) sizeof(line), fp) != (char *) 0) {
 		if (line[0] == '\n') {
 			body = TRUE;
 		}

@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1998-04-01
+dnl Updated   : 1998-04-20
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997,1998 by Thomas Dickey
@@ -53,7 +53,13 @@ cf_save_CFLAGS="$CFLAGS"
 # HP-UX			-Aa -D_HPUX_SOURCE
 # SVR4			-Xc
 # UnixWare 1.2		(cannot use -Xc, since ANSI/POSIX clashes)
-for cf_arg in "-DCC_HAS_PROTOS" "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" -Xc
+for cf_arg in "-DCC_HAS_PROTOS" \
+	"" \
+	-qlanglvl=ansi \
+	-std1 \
+	"-Aa -D_HPUX_SOURCE +e" \
+	"-Aa -D_HPUX_SOURCE" \
+	-Xc
 do
 	CFLAGS="$cf_save_CFLAGS $cf_arg"
 	AC_TRY_COMPILE(
@@ -176,6 +182,34 @@ AC_MSG_RESULT($cf_result)
 test $cf_result = yes && AC_DEFINE_UNQUOTED(DECL_$2)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Check if we're accidentally using a cache from a different machine.
+dnl Derive the system name, as a check for reusing the autoconf cache.
+dnl
+dnl If we've packaged config.guess and config.sub, run that (since it does a
+dnl better job than uname). 
+AC_DEFUN([CF_CHECK_CACHE],
+[
+if test -f $srcdir/config.guess ; then
+	AC_CANONICAL_HOST
+	system_name="$host_os"
+else
+	system_name="`(uname -s -r) 2>/dev/null`"
+	if test -z "$system_name" ; then
+		system_name="`(hostname) 2>/dev/null`"
+	fi
+fi
+test -n "$system_name" && AC_DEFINE_UNQUOTED(SYSTEM_NAME,"$system_name")
+AC_CACHE_VAL(cf_cv_system_name,[cf_cv_system_name="$system_name"])
+
+test -z "$system_name" && system_name="$cf_cv_system_name"
+test -n "$cf_cv_system_name" && AC_MSG_RESULT("Configuring for $cf_cv_system_name")
+
+if test ".$system_name" != ".$cf_cv_system_name" ; then
+	AC_MSG_RESULT(Cached system name ($system_name) does not agree with actual ($cf_cv_system_name))
+	AC_ERROR("Please remove config.cache and try again.")
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 AC_DEFUN([CF_CHECK_DECL],
 [for ac_func in $1
 do
@@ -242,30 +276,6 @@ AC_MSG_RESULT($cf_cv_nested_params)
 test $cf_cv_nested_params = yes && AC_DEFINE(HAVE_NESTED_PARAMS)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check if the compiler uses 'void *' for qsort's compare function parameters
-dnl (i.e., it's an ANSI prototype).
-AC_DEFUN([CF_COMPTYPE],
-[
-AC_MSG_CHECKING([for ANSI qsort])
-AC_CACHE_VAL(cf_cv_comptype,[
-	AC_TRY_COMPILE([
-#ifdef HAVE_STDLIB_H
-#include <stdlib.h>
-#endif],
-	[extern int compare(const void *, const void *);
-	 char *foo = "string";
-	 qsort(foo, sizeof(foo)/sizeof(*foo), sizeof(*foo), compare)],
-	[cf_cv_comptype=yes],
-	[cf_cv_comptype=no])
-])
-AC_MSG_RESULT($cf_cv_comptype)
-if test $cf_cv_comptype = yes; then
-	AC_DEFINE(HAVE_COMPTYPE_VOID)
-else
-	AC_DEFINE(HAVE_COMPTYPE_CHAR)
-fi
-])dnl
-dnl ---------------------------------------------------------------------------
 dnl Check if curses supports color.  (Note that while SVr3 curses supports
 dnl color, it does this differently from SVr4 curses; more work would be needed
 dnl to accommodate SVr3).
@@ -293,6 +303,30 @@ if test $cf_cv_color_curses = yes ; then
 	test ".$cf_cv_ncurses_broken" != .yes && AC_DEFINE(HAVE_GETBKGD)
 fi
 ])
+dnl ---------------------------------------------------------------------------
+dnl Check if the compiler uses 'void *' for qsort's compare function parameters
+dnl (i.e., it's an ANSI prototype).
+AC_DEFUN([CF_COMPTYPE],
+[
+AC_MSG_CHECKING([for ANSI qsort])
+AC_CACHE_VAL(cf_cv_comptype,[
+	AC_TRY_COMPILE([
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif],
+	[extern int compare(const void *, const void *);
+	 char *foo = "string";
+	 qsort(foo, sizeof(foo)/sizeof(*foo), sizeof(*foo), compare)],
+	[cf_cv_comptype=yes],
+	[cf_cv_comptype=no])
+])
+AC_MSG_RESULT($cf_cv_comptype)
+if test $cf_cv_comptype = yes; then
+	AC_DEFINE(HAVE_COMPTYPE_VOID)
+else
+	AC_DEFINE(HAVE_COMPTYPE_CHAR)
+fi
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the application can dump core (for debugging).
 AC_DEFUN([CF_COREFILE],
@@ -382,16 +416,16 @@ case $host_os in #(vi
 freebsd*) #(vi
 	AC_CHECK_LIB(mytinfo,tgoto,[LIBS="-lmytinfo $LIBS"])
 	;;
-*hp-hpux10.*)
+hpux10.*)
+	AC_CHECK_LIB(cur_colr,initscr,[
+		LIBS="-lcur_colr $LIBS"
+		CFLAGS="-I/usr/include/curses_colr $CFLAGS"
+		ac_cv_func_initscr=yes
+		],[
 	AC_CHECK_LIB(Hcurses,initscr,[
 		# HP's header uses __HP_CURSES, but user claims _HP_CURSES.
 		LIBS="-lHcurses $LIBS"
 		CFLAGS="-D__HP_CURSES -D_HP_CURSES $CFLAGS"
-		ac_cv_func_initscr=yes
-		],[
-	AC_CHECK_LIB(cur_color,initscr,[
-		LIBS="-lcur_color $LIBS"
-		CFLAGS="-I/usr/include/curses_colr $CFLAGS"
 		ac_cv_func_initscr=yes
 		])])
 	;;
@@ -421,7 +455,7 @@ if test ".$ac_cv_func_initscr" != .yes ; then
 
 	# Check for library containing initscr
 	test "$cf_term_lib" != predefined && test "$cf_term_lib" != unknown && LIBS="-l$cf_term_lib $cf_save_LIBS"
-	for cf_curs_lib in curses ncurses xcurses cursesX jcurses unknown
+	for cf_curs_lib in cursesX curses ncurses xcurses jcurses unknown
 	do
 		AC_CHECK_LIB($cf_curs_lib,initscr,[break])
 	done
@@ -791,6 +825,16 @@ test "$prefix" != /usr/local     && $1="[$]$1 /usr/local/lib /usr/local/lib/$2"
 test "$prefix" != /usr           && $1="[$]$1 /usr/lib /usr/lib/$2"
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Compute the library-prefix for the given host system
+dnl $1 = variable to set
+AC_DEFUN([CF_LIB_PREFIX],
+[
+	case $cf_cv_system_name in
+	os2)	$1=''     ;;
+	*)	$1='lib'  ;;
+	esac
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
 dnl options to lower-levels.  It's very useful for "make -n" -- if we have it.
 dnl (GNU 'make' does both :-)
@@ -832,7 +876,7 @@ if test "$cf_cv_ncurses_version" != no ; then
 AC_MSG_CHECKING(for obsolete/broken version of ncurses)
 AC_CACHE_VAL(cf_cv_ncurses_broken,[
 AC_TRY_COMPILE([
-#include <$cf_cv_ncurses_header>],[
+#include <${cf_cv_ncurses_header-curses.h}>],[
 #if defined(NCURSES_VERSION) && defined(wgetbkgd)
 	make an error
 #else
@@ -1143,6 +1187,22 @@ fi
 AC_MSG_RESULT($DEFAULT_MAILER)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Compute $PROG_EXT, used for non-Unix ports, such as OS/2 EMX.
+AC_DEFUN([CF_PROG_EXT],
+[
+AC_REQUIRE([CF_CHECK_CACHE])
+PROG_EXT=
+case $cf_cv_system_name in
+os2*)
+    # We make sure -Zexe is not used -- it would interfere with @PROG_EXT@
+    CFLAGS="$CFLAGS -Zmt -D__ST_MT_ERRNO__"
+    LDFLAGS=`echo "$LDFLAGS -Zmt -Zcrtdll" | sed "s/-Zexe//g"`
+    PROG_EXT=".exe"
+    ;;
+esac
+AC_SUBST(PROG_EXT)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl See if sum can take -r
 AC_DEFUN([CF_PROG_SUM_R],
 [
@@ -1419,20 +1479,6 @@ do
     CF_CHECK_ERRNO($cf_name)
 done
 ])dnl
-dnl ---------------------------------------------------------------------------
-dnl Derive the system name, as a check for reusing the autoconf cache
-AC_DEFUN([CF_SYS_NAME],
-[
-SYS_NAME=`(uname -s -r || uname -a || hostname) 2>/dev/null | sed 1q`
-test -z "$SYS_NAME" && SYS_NAME=unknown
-AC_DEFINE_UNQUOTED(SYS_NAME,"$SYS_NAME")
-
-AC_CACHE_VAL(cf_cv_system_name,[cf_cv_system_name="$SYS_NAME"])
-
-if test ".$SYS_NAME" != ".$cf_cv_system_name" ; then
-	AC_MSG_RESULT("Cached system name does not agree with actual")
-	AC_ERROR("Please remove config.cache and try again.")
-fi])
 dnl ---------------------------------------------------------------------------
 dnl Check if there is a conflict between <sys/select.h> and <sys/time.h>.
 dnl This is known to be a problem with SCO.

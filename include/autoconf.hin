@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : autoconf.hin
  *  Author    : Thomas Dickey <dickey@clark.net>
- *  Created   : 24.08.1995
- *  Updated   : 10.02.1998
+ *  Created   : 1995-08-24
+ *  Updated   : 1998-04-21
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1996-98 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
@@ -13,7 +13,7 @@
  */
 
 
-#undef SYS_NAME
+#undef SYSTEM_NAME
 
 /*
  * If we're able to run the 'configure' script, it's close enough to UNIX for
@@ -153,6 +153,7 @@
 #undef	HAVE_GETSERVBYNAME
 #undef	HAVE_IS_XTERM
 #undef	HAVE_ISASCII
+#undef	HAVE_LINK
 #undef	HAVE_MEMCMP
 #undef	HAVE_MEMCPY
 #undef	HAVE_MEMSET
@@ -166,6 +167,7 @@
 #undef	HAVE_SETEUID
 #undef	HAVE_SETGID
 #undef	HAVE_SETLOCALE
+#undef	HAVE_SETPGRP
 #undef	HAVE_SETREGID
 #undef	HAVE_SETREUID
 #undef	HAVE_SETTZ
@@ -299,6 +301,11 @@
 #undef	SIG_ARGS
 
 /*
+ * define if setpgrp() takes no arguments
+ */
+#undef SETPGRP_VOID
+
+/*
  * Define this if it's safe to redefine the signal constants with prototypes.
  */
 #undef	DECL_SIG_CONST
@@ -419,6 +426,11 @@
  * Use this if you want pid attached to the end of .article filename
  */
 #undef APPEND_PID
+
+/*
+ * allow fallback to XHDR XREF if XOVER isn't supported?
+ */
+#undef XHDR_XREF
 
 /*
  * The directory, where tin looks first for its tin.defaults file

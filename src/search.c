@@ -284,7 +284,7 @@ search_thread(
 	int art, depth = 0;
 	char *old_subject = 0;
 
-	for (art = i; art >= 0 ; art = arts[art].thread, ++depth) {
+	for (art = i; art >= 0; art = arts[art].thread, ++depth) {
 
 		/*
 		 * Speed hack, if the subject remains constant, skip the check
@@ -365,7 +365,7 @@ search_subject_group (
 	i = index_point;						/* Search from current position */
 
 	do {
-		(forward) ? i++ : i--;
+		forward ? i++ : i--;
 
 		if (i >= top_base)
 			i = 0;
@@ -408,7 +408,7 @@ search_subject_group (
 	clear_message();
 	return(-1);				/* No furthur action needed in group.c */
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
  * page.c (search current article body)
@@ -440,7 +440,7 @@ search_article (
 		note_line = (local_note_page < 1) ? 5 : 3;
 
 		while (note_line < cLINES) {
-			if (fgets (buf, sizeof buf, note_fp) == NULL) {
+			if (fgets (buf, (int) sizeof(buf), note_fp) == NULL) {
 				local_note_end = TRUE;
 				break;
 			}
@@ -570,10 +570,10 @@ search_body (
 	 * Count up the articles to be processed for the progress meter
 	 */
 	if (group->attribute->show_only_unread) {
-		for (i = 0 ; i < top_base ; i++)
+		for (i = 0; i < top_base; i++)
 			art_cnt += new_responses (i);
 	} else {
-		for (i = 0 ; i < top ; i++) {
+		for (i = 0; i < top; i++) {
 			if (!IGNORE_ART(i))
 				art_cnt++;
 		}

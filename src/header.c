@@ -92,7 +92,7 @@ static const char *domain_name_hack = DOMAIN_NAME;
 #	endif /* M_AMIGA */
 		/* If 1st letter is '/' read domainname from specified file */
 		if ((fp = fopen (domain, "r")) != (FILE *) 0) {
-			while (fgets (buff, sizeof (buff), fp) != (char *) 0) {
+			while (fgets (buff, (int) sizeof (buff), fp) != (char *) 0) {
 				if (buff[0] == '#' || buff[0] == '\n')
 					continue;
 
@@ -127,8 +127,8 @@ get_fqdn(
 	struct in_addr	in;
 	FILE	*inf;
 
-	*fqdn=0;
-	domain=NULL;
+	*fqdn = '\0';
+	domain = NULL;
 
 	name[MAXHOSTNAMELEN] = '\0';
 	if (host) {
@@ -149,14 +149,18 @@ get_fqdn(
 		if ((hp = gethostbyaddr(hp->h_addr, hp->h_length, hp->h_addrtype)))
 			in.s_addr = (*hp->h_addr);
 
-	sprintf(fqdn,"%s", hp ? strchr(hp->h_name, '.') ? hp->h_name : inet_ntoa(in) : NULL);
+	sprintf(fqdn,"%s", hp
+		? strchr(hp->h_name, '.')
+			? hp->h_name
+			: inet_ntoa(in)
+		: "");
 	if (!*fqdn || (fqdn[strlen(fqdn)-1] <= '9')) {
-		*fqdn = 0;
+		*fqdn = '\0';
 		inf = fopen("/etc/resolv.conf", "r");
 		if (inf) {
 			while(fgets(line, MAXLINELEN, inf)) {
-				line[MAXLINELEN] = 0;
-				str_trim(line);
+				line[MAXLINELEN] = '\0';
+				(void) str_trim(line);
 				if (strncmp(line,"domain ", 7) == 0) {
 					domain = line + 7;
 					break;
@@ -165,19 +169,19 @@ get_fqdn(
 					domain = line + 7;
 					cp = strchr(domain, ' ');
 					if (cp)
-						*cp = 0;
+						*cp = '\0';
 					break;
 				}
 			}
 			if (domain)
 				sprintf(fqdn, "%s.%s", name, domain);
+			fclose(inf);
 		}
-		fclose(inf);
 	}
 
 	return(fqdn);
 }
-#endif
+#endif /* HAVE_GETHOSTBYNAME */
 
 
 /*
@@ -198,7 +202,7 @@ get_user_info (
 		strcpy(full_name, ptr);
 	if ((ptr = get_user_name()))
 		strcpy(user_name, ptr);
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 static const char *
@@ -207,7 +211,7 @@ get_user_name(
 {
 #if defined (M_AMIGA) || (defined VMS)
 	char *p;
-#endif
+#endif /* M_AMIGA || VMS */
 	static char username[128];
 	struct passwd *pw;
 
@@ -280,11 +284,11 @@ get_from_name (
 	struct t_group *thisgrp)
 {
 #ifndef INDEX_DAEMON
-#ifdef USE_INN_NNTPLIB
+#	ifdef USE_INN_NNTPLIB
 	char *fromhost = GetConfigValue (_CONF_FROMHOST);
-#else /* USE_INN_NNTPLIB */
+#	else
 	char *fromhost = NULL;
-#endif /* USE_INN_NNTPLIB */
+#	endif /* USE_INN_NNTPLIB */
 
 	if (!(fromhost && *fromhost))
 		fromhost = domain_name;
@@ -300,12 +304,12 @@ get_from_name (
 	}
 
 	sprintf (from_name, ((strchr(get_full_name(), '.')) ? "\"%s\" <%s@%s>" : "%s <%s@%s>"), get_full_name(), get_user_name(), fromhost);
-#ifdef DEBUG
+#	ifdef DEBUG
 	if (debug == 2)
 		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());
-#endif
+#	endif /* DEBUG */
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -329,11 +333,11 @@ build_sender (void)
 		strcat(sender, ptr);
 		strcat(sender, "@");
 
-#ifdef HAVE_GETHOSTBYNAME
+#	ifdef HAVE_GETHOSTBYNAME
 		if ((ptr = get_fqdn(get_host_name())))
-#else
+#	else
 		if ((ptr = get_host_name()))
-#endif /* HAVE_GETHOSTBYNAME */
+#	endif /* HAVE_GETHOSTBYNAME */
 		{
 			strcat(sender, ptr);
 			strcat(sender, ">");
@@ -343,4 +347,4 @@ build_sender (void)
 		return 0;
 	return (sender);
 }
-#endif
+#endif /* !FORGERY */

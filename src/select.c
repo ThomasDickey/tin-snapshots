@@ -22,23 +22,22 @@ int cur_groupnum = 0;
 int first_group_on_screen;
 int last_group_on_screen;
 int space_mode;
-int yank_in_active_file = TRUE;
 
 
 /*
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
-static int continual_key (int ch, int ch1);
-static int next_unread_group (int enter_group);
-static void prompt_group_num (int ch);
-static int reposition_group (struct t_group *group, int default_num);
-static void catchup_group (struct t_group *group, int goto_next_unread_group);
-static void yank_active_file (void);
-static void subscribe_pattern (const char *prompt, const char *message, const char *result, t_bool state);
-#endif
+	static int continual_key (int ch, int ch1);
+	static int next_unread_group (int enter_group);
+	static void prompt_group_num (int ch);
+	static int reposition_group (struct t_group *group, int default_num);
+	static void catchup_group (struct t_group *group, int goto_next_unread_group);
+	static void yank_active_file (void);
+	static void subscribe_pattern (const char *prompt, const char *message, const char *result, t_bool state);
+#endif /* !INDEX_DAEMON */
 
-static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
+static t_bool iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax);
 static void vDelRange (int iLevel, int iNumMax);
 static void erase_group_arrow (void);
 
@@ -100,6 +99,7 @@ selection_index (
 	int INDEX_BOTTOM;
 	int posted_flag;
 	int scroll_lines;
+	int yank_in_active_file = TRUE;
 
 	cur_groupnum = start_groupnum;
 
@@ -640,7 +640,7 @@ select_done:
 		}
 	}
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -650,7 +650,7 @@ show_selection_page (void)
 #ifndef INDEX_DAEMON
 
 	char buf[LEN];
-	char new[10];
+	char tmp[10];
 	char subs;
 	int i, j, n;
 	int blank_len;
@@ -701,28 +701,23 @@ show_selection_page (void)
 		}
 	}
 
-	if (!group_top) {
-		first_group_on_screen = 0;
-		last_group_on_screen = 0;
-	}
+	if (!group_top)
+		first_group_on_screen = last_group_on_screen = 0;
 
-	if (show_description)
-		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 2;
-	else
-		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 4;
+	blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + (show_description ? 2 : 4);
 
-	for (j=0, i=first_group_on_screen; i < last_group_on_screen; i++, j++) {
+	for (j = 0, i = first_group_on_screen; i < last_group_on_screen; i++, j++) {
 #ifdef USE_CURSES
 		char sptr[BUFSIZ];
 #else
 		char *sptr = screen[j].col;
 #endif
 		if (active[my_group[i]].inrange) {
-			strcpy (new, "    #");
+			strcpy (tmp, "    #");
 		} else if (active[my_group[i]].newsrc.num_unread) {
-			strcpy (new, tin_ltoa(active[my_group[i]].newsrc.num_unread, 5));
+			strcpy (tmp, tin_ltoa(active[my_group[i]].newsrc.num_unread, 5));
 		} else
-			strcpy (new, "     ");
+			strcpy (tmp, "     ");
 
 		n = my_group[i];
 
@@ -752,19 +747,19 @@ show_selection_page (void)
 		if (show_description) {
 			if (active[n].description)
 				sprintf (sptr, "  %c %s %s  %-*.*s  %-*.*s" cCRLF,
-				         subs, tin_ltoa(i+1, 4), new,
+				         subs, tin_ltoa(i+1, 4), tmp,
 				         groupname_len, groupname_len, active_name,
 				         blank_len, blank_len, group_descript);
 			else
 				sprintf (sptr, "  %c %s %s  %-*.*s  " cCRLF,
-				         subs, tin_ltoa(i+1, 4), new,
+				         subs, tin_ltoa(i+1, 4), tmp,
 				         (groupname_len+blank_len),
 				         (groupname_len+blank_len), active[n].name);
 		} else {
 			if (draw_arrow_mark)
-				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF, subs, tin_ltoa(i+1, 4), new, groupname_len, groupname_len, active_name);
+				sprintf (sptr, "  %c %s %s  %-*.*s" cCRLF, subs, tin_ltoa(i+1, 4), tmp, groupname_len, groupname_len, active_name);
 			else
-				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF, subs, tin_ltoa(i+1, 4), new, groupname_len, groupname_len, active_name, blank_len, " ");
+				sprintf (sptr, "  %c %s %s  %-*.*s%*s" cCRLF, subs, tin_ltoa(i+1, 4), tmp, groupname_len, groupname_len, active_name, blank_len, " ");
 		}
 		if (strip_blanks) {
 			strip_line (sptr);
@@ -785,7 +780,7 @@ show_selection_page (void)
 
 	draw_group_arrow ();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -812,7 +807,7 @@ prompt_group_num (
 
 	move_to_group (num);
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 static void
@@ -840,7 +835,7 @@ yank_active_file (void)
 	force_reread_active_file = TRUE;
 	resync_active_file ();
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 int
@@ -1012,7 +1007,7 @@ next_unread_group (
 {
 	int i, all_groups_read = TRUE;
 
-	for (i = cur_groupnum ; i < group_top ; i++) {
+	for (i = cur_groupnum; i < group_top; i++) {
 		if (active[my_group[i]].newsrc.num_unread != 0) {
 			all_groups_read = FALSE;
 			erase_group_arrow ();
@@ -1021,7 +1016,7 @@ next_unread_group (
 	}
 
 	if (all_groups_read) {
-		for (i = 0 ; i < cur_groupnum ; i++) {
+		for (i = 0; i < cur_groupnum; i++) {
 			if (active[my_group[i]].newsrc.num_unread != 0) {
 				all_groups_read = FALSE;
 				break;
@@ -1078,12 +1073,12 @@ set_groupname_len (
 	groupname_len = 0;
 
 	if (all_groups) {
-		for (i = 0 ; i < num_active ; i++) {
+		for (i = 0; i < num_active; i++) {
 			if ((len = strlen (active[i].name)) > groupname_len)
 				groupname_len = len;
 		}
 	} else {
-		for (i = 0 ; i < group_top ; i++) {
+		for (i = 0; i < group_top; i++) {
 			if ((len = strlen (active[my_group[i]].name)) > groupname_len)
 				groupname_len = len;
 		}
@@ -1141,7 +1136,7 @@ toggle_my_groups (
 
 			my_strncpy (old_curr_group, active[active_idx].name, sizeof (old_curr_group));
 		} else {
-			for (i = group_num ; i < group_top ; i++) {
+			for (i = group_num; i < group_top; i++) {
 				if (active[my_group[i]].newsrc.num_unread) {
 					my_strncpy (old_curr_group, active[my_group[i]].name, sizeof (old_curr_group));
 					break;
@@ -1152,7 +1147,7 @@ toggle_my_groups (
 
 	group_top = skip_newgroups();			/* Reposition after any newgroups */
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while (fgets (buf, (int) sizeof(buf), fp) != (char *) 0) {
 		if ((ptr = strchr (buf, SUBSCRIBED)) != (char *) 0) {
 			*ptr = '\0';
 
@@ -1174,10 +1169,10 @@ toggle_my_groups (
 	if ((cur_groupnum = my_group_find(old_curr_group)) == -1)
 		cur_groupnum = 0;
 
-#endif	/* INDEX_DAEMON */
+#endif	/* !INDEX_DAEMON */
 }
 
-
+#ifndef INDEX_DAEMON
 /*
  * Subscribe or unsubscribe from a list of groups. List can be full list as supported
  * by match_group_list()
@@ -1204,7 +1199,7 @@ subscribe_pattern (
 
 	/* TODO - so why precisely do we have these 2 separate passes ? */
 
-	for (subscribe_num=0, i=0 ; i < group_top ; i++) {
+	for (subscribe_num = 0, i = 0; i < group_top; i++) {
 		if (match_group_list (active[my_group[i]].name, buf)) {
 			if (active[my_group[i]].subscribed != (state != FALSE)) {
 				spin_cursor ();
@@ -1215,7 +1210,7 @@ subscribe_pattern (
 	}
 
 	if (num_active > group_top) {
-		for (i=0 ; i < num_active ; i++) {
+		for (i = 0; i < num_active; i++) {
 			if (match_group_list (active[i].name, buf)) {
 				if (active[i].subscribed != (state != FALSE)) {
 					spin_cursor ();
@@ -1240,6 +1235,7 @@ subscribe_pattern (
 	} else
 		info_message (txt_no_match);
 }
+#endif /* !INDEX_DAEMON */
 
 
 /*
@@ -1337,13 +1333,13 @@ iSetRange (
 			case GROUP_LEVEL:
 				vDelRange (iLevel, iNumMax);
 				for (iIndex = iRngMin-1; iIndex < iRngMax; iIndex++) {
-					for (iNum = (int) base[iIndex] ; iNum != -1 ; iNum = arts[iNum].thread)
+					for (iNum = (int) base[iIndex]; iNum != -1; iNum = arts[iNum].thread)
 						arts[iNum].inrange = TRUE;
 				}
 				break;
 			case THREAD_LEVEL:
 				vDelRange (iLevel, group_top);
-				for (iNum = 0, iIndex = base[thread_basenote]; iIndex >= 0 ; iIndex = arts[iIndex].thread, iNum++) {
+				for (iNum = 0, iIndex = base[thread_basenote]; iIndex >= 0; iIndex = arts[iIndex].thread, iNum++) {
 					if (iNum >= iRngMin && iNum <= iRngMax)
 						arts[iIndex].inrange = TRUE;
 				}
@@ -1357,7 +1353,7 @@ iSetRange (
 	return iRetCode;
 }
 
-static int
+static t_bool
 iParseRange (
 	char *pcRange,
 	int iNumMin,
@@ -1367,9 +1363,9 @@ iParseRange (
 	int *piRngMax)
 {
 	char *pcPtr;
-	int iDone = FALSE;
-	int iRetCode = FALSE;
-	int iSetMax = FALSE;
+	t_bool iRetCode = FALSE;
+	t_bool iSetMax = FALSE;
+	t_bool iDone = FALSE;
 
 	pcPtr = pcRange;
 	*piRngMin = -1;
@@ -1433,7 +1429,7 @@ vDelRange (
 			for (iIndex = 0; iIndex < iNumMax-1; iIndex++) {
 				int iNum;
 
-				for (iNum = (int) base[iIndex] ; iNum != -1 ; iNum = arts[iNum].thread)
+				for (iNum = (int) base[iIndex]; iNum != -1; iNum = arts[iNum].thread)
 					arts[iNum].inrange = FALSE;
 			}
 			break;
@@ -1441,7 +1437,7 @@ vDelRange (
 			for (iIndex = 0; iIndex < iNumMax-1; iIndex++)
 				arts[iIndex].inrange = FALSE;
 /*
-			for (iIndex = base[thread_basenote]; iIndex >= 0 ; iIndex = arts[iIndex].thread) {
+			for (iIndex = base[thread_basenote]; iIndex >= 0; iIndex = arts[iIndex].thread) {
 				arts[iIndex].inrange = FALSE;
 				}
 */
@@ -1476,5 +1472,4 @@ move_to_group(
 	if (CURR_GROUP.aliasedto) /* FIXME -> lang.c */
 		info_message ("please use %.100s instead", CURR_GROUP.aliasedto);
 }
-
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */

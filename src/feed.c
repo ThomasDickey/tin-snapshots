@@ -33,6 +33,7 @@ t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
 #endif
 
 
+#ifndef INDEX_DAEMON
 void
 feed_articles (
 	int function,
@@ -40,7 +41,6 @@ feed_articles (
 	struct t_group *group,
 	int respnum)
 {
-#ifndef INDEX_DAEMON
 	char address[LEN];
 	char command[LEN];
 	char filename[PATH_LEN], *p;
@@ -53,12 +53,8 @@ feed_articles (
 	char option = iKeyFeedSupersede;
 	char option_default = iKeyFeedSupersede;
 	constext *prompt;
-#ifndef DONT_HAVE_PIPING
-	FILE *fp = (FILE *) 0;
-#endif
 	int ch, ch_default;
 	int b, i, j;
-	int confirm;
 	int proceed;
 	int processed_ok = TRUE;
 	int is_mailbox = FALSE;
@@ -68,20 +64,24 @@ feed_articles (
 	int ret1 = FALSE;
 	int ret2 = FALSE;
 	int supersede = FALSE;
+	t_bool confirm;
 	t_bool orig_note_end = FALSE;
-#ifndef FORGERY
+#	ifndef DONT_HAVE_PIPING
+	FILE *fp = (FILE *) 0;
+#	endif /* !DONT_HAVE_PIPING */
+#	ifndef FORGERY
 	char from_name[PATH_LEN];
 	char user_name[128];
 	char full_name[128];
-#endif
+#	endif /* !FORGERY */
 
-#ifdef DONT_HAVE_PIPING
+#	ifdef DONT_HAVE_PIPING
 	if (function == FEED_PIPE) {
 		error_message (txt_piping_not_enabled);
 		clear_message ();
 		return;
 	}
-#endif /* DONT_HAVE_PIPING */
+#	endif /* DONT_HAVE_PIPING */
 
 	set_xclick_off ();
 
@@ -103,11 +103,11 @@ feed_articles (
 		case FEED_MAIL:
 			prompt = txt_mail;
 			break;
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 			prompt = txt_pipe;
 			break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 		case FEED_PRINT:
 			prompt = txt_print;
 			break;
@@ -182,7 +182,7 @@ feed_articles (
 			}
 			break;
 
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 			sprintf (msg, txt_pipe_to_command,
 				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
@@ -209,7 +209,7 @@ feed_articles (
 			wait_message (0, txt_piping);
 			EndWin();
 			break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 		case FEED_PRINT:
 			sprintf (command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
@@ -266,7 +266,7 @@ feed_articles (
 						}
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
-						proc_ch = prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_post_process_type);
+						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
@@ -286,15 +286,14 @@ feed_articles (
 			if (!can_post)
 				info_message(txt_cannot_post);
 			else {
-#ifndef FORGERY
+#	ifndef FORGERY
 				get_user_info (user_name, full_name);
 				get_from_name (from_name, (struct t_group *) 0);
 
 				if (strstr (from_name, arts[respnum].from)) {
-#endif
+#	endif /* !FORGERY */
 					/* repost or supersede ? */
-			        option = prompt_slk_response (option_default, "\033qrs",
-								sized_message(txt_supersede_article, arts[respnum].subject));
+					option = (char) prompt_slk_response (option_default, "\033qrs", sized_message(txt_supersede_article, arts[respnum].subject));
 
 					switch (option) {
 						case iKeyFeedSupersede:
@@ -309,12 +308,12 @@ feed_articles (
 							clear_message ();
 							return;
 					}
-#ifndef FORGERY
+#	ifndef FORGERY
 				} else {
 					sprintf (msg, txt_repost_group, default_repost_group);
 					supersede = FALSE;
 				}
-#endif
+#	endif /* !FORGERY */
 				if (!prompt_string (msg, group_name, HIST_REPOST_GROUP)) {
 					clear_message ();
 					return;
@@ -350,7 +349,7 @@ feed_articles (
 					redraw_screen = mail_to_someone (respnum, address, FALSE, TRUE, &processed_ok);
 					break;
 
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 				case FEED_PIPE:
 					if (art_open (&arts[respnum], group_path, FALSE) == 0) {
 						fseek (note_fp, 0L, SEEK_SET);
@@ -359,7 +358,7 @@ feed_articles (
 						copy_fp (note_fp, fp);
 					}
 					break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 				case FEED_PRINT:
 					processed_ok = print_file (command, respnum, 1);
@@ -415,7 +414,7 @@ feed_articles (
 						confirm = (processed_ok ? FALSE : TRUE);
 						break;
 
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 					case FEED_PIPE:
 						if (art_open (&arts[i], group_path, FALSE))
 							break;
@@ -424,7 +423,7 @@ feed_articles (
 						fseek (note_fp, 0L, SEEK_SET);
 						copy_fp (note_fp, fp);
 						break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 					case FEED_PRINT:
 						processed_ok = print_file (command, i, processed+1);
@@ -460,8 +459,8 @@ feed_articles (
 
 		case iKeyFeedTag:		/* tagged articles */
 			confirm = TRUE;
-			for (i=1 ; i <= num_of_tagged_arts ; i++) {
-				for (j=0 ; j < top ; j++) {
+			for (i = 1; i <= num_of_tagged_arts; i++) {
+				for (j = 0; j < top; j++) {
 					if (arts[j].tagged && arts[j].tagged == i) {
 						if (level == PAGE_LEVEL)
 							art_close ();
@@ -476,8 +475,9 @@ feed_articles (
 								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 							case FEED_PIPE:
+								wait_message (0, "%s%4d/%-4d ", txt_piping, i, num_of_tagged_arts);
 								if (art_open (&arts[j], group_path, FALSE))
 									break;
 								if (got_sig_pipe)
@@ -485,7 +485,7 @@ feed_articles (
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
@@ -525,7 +525,7 @@ feed_articles (
 		case iKeyFeedHot:		/* hot (auto-selected) articles */
 		case iKeyFeedPat:		/* regex pattern matched articles */
 			confirm = TRUE;
-			for (i = 0 ; i < top_base ; i++) {
+			for (i = 0; i < top_base; i++) {
 				for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 					proceed = FALSE;
 					if (ch == iKeyFeedPat) {
@@ -551,7 +551,7 @@ feed_articles (
 								confirm = (processed_ok ? FALSE : TRUE);
 								break;
 
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 							case FEED_PIPE:
 								if (art_open (&arts[j], group_path, FALSE))
 									break;
@@ -560,7 +560,7 @@ feed_articles (
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp);
 								break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
@@ -604,24 +604,24 @@ feed_articles (
 	/*
 	 * Now work out what (if anything) needs to be redrawn
 	 */
-#ifdef DEBUG
+#	ifdef DEBUG
 	if (debug == 2) {
 		my_printf ("REDRAW=[%d]  ", redraw_screen);
 		my_flush ();
 	}
-#endif
+#	endif /* DEBUG */
 	if (!use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
-#ifdef DEBUG
+#	ifdef DEBUG
 	if (debug == 2) {
 		my_printf ("REDRAW=[%d]", redraw_screen);
 		my_flush ();
-		sleep (2);
+		(void) sleep (2);
 	}
-#endif
+#	endif /* DEBUG */
 
 	switch (function) {
-#ifndef DONT_HAVE_PIPING
+#	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 got_sig_pipe_while_piping:
 			got_sig_pipe = FALSE;
@@ -630,7 +630,7 @@ got_sig_pipe_while_piping:
 			continue_prompt ();
 			redraw_screen = TRUE;
 			break;
-#endif /* !DONT_HAVE_PIPING */
+#	endif /* !DONT_HAVE_PIPING */
 
 		case FEED_SAVE:
 		case FEED_SAVE_TAGGED:
@@ -693,8 +693,8 @@ got_sig_pipe_while_piping:
 			info_message (txt_saved, processed, IS_PLURAL(processed));
 	}
 
-#endif /* INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -705,20 +705,20 @@ print_file (
 	int count)
 {
 	FILE *fp;
-#ifdef DONT_HAVE_PIPING
+#	ifdef DONT_HAVE_PIPING
 	char cmd[255], file[255];
 
 	strcpy(cmd, command);
-#endif
+#	endif /* DONT_HAVE_PIPING */
 
 	wait_message (1, "%s%d", txt_printing, count);
 
-#ifdef DONT_HAVE_PIPING
+#	ifdef DONT_HAVE_PIPING
 	sprintf(file, TIN_PRINTFILE, respnum);
 	if ((fp = fopen(file,"w")) == (FILE *) 0)
-#else
+#	else
 	if ((fp = popen (command, "w")) == (FILE *) 0)
-#endif
+#	endif /* DONT_HAVE_PIPING */
 	{
 		perror_message (txt_command_failed_s, command);
 		return FALSE;
@@ -738,19 +738,19 @@ print_file (
 	}
 	copy_fp (note_fp, fp);
 
-#ifdef DONT_HAVE_PIPING
+#	ifdef DONT_HAVE_PIPING
 	fclose(fp);
 	strcat(cmd, " ");
 	strcat(cmd, file);
 	system(cmd);
 	unlink(file);
-#else
+#	else
 	pclose (fp);
-#endif
+#	endif /* DONT_HAVE_PIPING */
 
 	return (TRUE);	/* a hack that will check if file was really checked later */
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
  * Return the single char hotkey corresponding to the post process type
@@ -782,7 +782,7 @@ does_article_exist (
 {
 	int retcode = FALSE;
 
-	if (function == FEED_SAVE) {
+	if (function == FEED_SAVE || function == FEED_PIPE) {
 		if (stat_article (art->artnum, path))
 			retcode = TRUE;
 	} else {
@@ -792,4 +792,4 @@ does_article_exist (
 
 	return retcode;
 }
-#endif	/* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */

@@ -32,14 +32,15 @@ static const char *spaces = "XXXX";
 /*
  * Local prototypes
  */
-static void draw_sline (int i, t_bool full);
+
 static void draw_subject_arrow (void);
-static void erase_subject_arrow (void);
 
 #ifndef INDEX_DAEMON
 	static int line_is_tagged (int n);
-	static void prompt_subject_num (int ch);
 	static void bld_sline (int i);
+	static void draw_sline (int i, t_bool full);
+	static void erase_subject_arrow (void);
+	static void prompt_subject_num (int ch);
 	static void update_group_page (void);
 	static void show_group_title (int clear_title);
 	static void show_tagged_lines (void);
@@ -64,7 +65,7 @@ line_is_tagged (
 
 	return code;
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -80,7 +81,7 @@ show_tagged_lines (void)
 		}
 	}
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
  * Remove the current tag from the tag 'chain'
@@ -94,7 +95,7 @@ decr_tagged (
 	int i, j;
 
 	for (i = 0; i < top_base; ++i) {
-		for (j = (int) base[i] ; j != -1 ; j = arts[j].thread)
+		for (j = (int) base[i]; j != -1; j = arts[j].thread)
 			if (arts[j].tagged > tag)
 				--arts[j].tagged;
 	}
@@ -112,8 +113,7 @@ group_page (
 	char pat[128];
 	int ch;
 	int dummy = 0;
-	int flag, i;
-	int n;
+	int i, n;
 	int filter_state;
 	int old_selected_arts;
 	int old_top = 0;
@@ -122,6 +122,7 @@ group_page (
 	int xflag = 0;
 	int old_group_top;
 	int thread_depth;					/* Depth into thread we start at */
+	unsigned int flag;
 	long old_artnum = 0L;
 	struct t_art_stat sbuf;
 	t_bool range_active = FALSE;		/* Set if a range is defined */
@@ -350,7 +351,7 @@ group_read_basenote:
 					space_mode = (index_point == GRP_CONTINUE);
 /*
 my_printf ("point=[%d] filtered_art=[%d]", index_point, filtered_articles);
-sleep(3);
+(void) sleep(3);
 */
 					if (index_point == GRP_CONTINUE)
 						goto group_tab_pressed;
@@ -366,7 +367,7 @@ group_tab_pressed:
 				space_mode = TRUE;
 				n = ((index_point < 0) ? -1 : next_unread ((int) base[index_point]));
 				if (index_point < 0 || n < 0) {
-					for (i = cur_groupnum+1 ; i < group_top ; i++) {
+					for (i = cur_groupnum+1; i < group_top; i++) {
 						if (active[my_group[i]].newsrc.num_unread > 0)
 							break;
 					}
@@ -993,7 +994,7 @@ group_list_thread:
 						if (arts[base[ii]].inrange) {
 							arts[base[ii]].inrange = FALSE;
 							art_mark_will_return (&CURR_GROUP, &arts[base[ii]]);
-							for (i = arts[base[ii]].thread ; i != -1 ; i = arts[i].thread) {
+							for (i = arts[base[ii]].thread; i != -1; i = arts[i].thread) {
 								arts[i].inrange = FALSE;
 							}
 						}
@@ -1061,7 +1062,7 @@ group_list_thread:
 						flag = 0;
 				}
 				n = 0;
-				for (i = (int) base[index_point] ; i != -1 ; i = arts[i].thread) {
+				for (i = (int) base[index_point]; i != -1; i = arts[i].thread) {
 					arts[i].selected = flag;
 					++n;
 				}
@@ -1118,7 +1119,7 @@ group_list_thread:
 					if (!REGEX_MATCH (arts[base[n]].subject, pat, TRUE)) {
 						continue;
 					}
-					for (i = (int) base[n] ; i != -1 ; i = arts[i].thread) {
+					for (i = (int) base[n]; i != -1; i = arts[i].thread) {
 						arts[i].selected = TRUE;
 					}
 					bld_sline(n);
@@ -1135,7 +1136,7 @@ group_list_thread:
 					if (!sbuf.selected_unread || sbuf.selected_unread == sbuf.unread) {
 						continue;
 					}
-					for (i = (int) base[n] ; i != -1 ; i = arts[i].thread) {
+					for (i = (int) base[n]; i != -1; i = arts[i].thread) {
 						arts[i].selected = 1;
 					}
 				}
@@ -1203,10 +1204,10 @@ group_done:
 		tin_done (EXIT_OK);
 	}
 	clear_note_area ();
-#ifdef	HAVE_MH_MAIL_HANDLING
+#	ifdef HAVE_MH_MAIL_HANDLING
 	vGrpDelMailArts (&CURR_GROUP);
-#endif	/* HAVE_MH_MAIL_HANDLING */
-#endif	/* INDEX_DAEMON */
+#	endif /* HAVE_MH_MAIL_HANDLING */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -1278,8 +1279,9 @@ show_group_page (void)
 
 	draw_subject_arrow();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
+
 
 #ifndef INDEX_DAEMON
 static void
@@ -1297,12 +1299,12 @@ update_group_page (void)
 
 	draw_subject_arrow ();
 }
-#endif /* INDEX_DAEMON */
-
+#endif /* !INDEX_DAEMON */
 
 static void
 draw_subject_arrow (void)
 {
+#ifndef INDEX_DAEMON
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
 	if (draw_arrow_mark) {
@@ -1323,8 +1325,11 @@ draw_subject_arrow (void)
 			info_message(txt_end_of_arts);
 	}
 	stow_cursor();
+#endif /* !INDEX_DAEMON */
 }
 
+
+#ifndef INDEX_DAEMON
 static void
 erase_subject_arrow (void)
 {
@@ -1338,6 +1343,7 @@ erase_subject_arrow (void)
 	}
 	my_flush ();
 }
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -1364,7 +1370,7 @@ prompt_subject_num (
 
 	move_to_thread (num);
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 void
@@ -1374,6 +1380,7 @@ clear_note_area (void)
 	CleartoEOS ();
 }
 
+#ifndef INDEX_DAEMON
 /*
  * If in show_only_unread mode or there are unread articles we know this thread
  * will exist after toggle. Otherwise we find the next closest to return to.
@@ -1409,6 +1416,8 @@ toggle_read_unread (
 	else if (top_base > 0)
 		index_point = top_base - 1;
 }
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * Find new index position after a kill or unkill. Because
@@ -1416,7 +1425,6 @@ toggle_read_unread (
  * if any, articles will be left afterwards. So we make a
  * "best attempt" to find a new index point.
  */
-
 int
 find_new_pos (
 	int old_top,
@@ -1428,7 +1436,7 @@ find_new_pos (
 	if (top == old_top)
 		return cur_pos;
 
-	for (i = 0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		if (arts[i].artnum == old_artnum) {
 			pos = which_thread (arts[i].artnum);
 			if (pos >= 0)
@@ -1460,9 +1468,9 @@ mark_screen (
 		move(y, x);
 #else
 		int i;
-		for (i=0 ; value[i] != '\0'; i++)
+		for (i = 0; value[i] != '\0'; i++)
 			screen[screen_row].col[screen_col+i] = value[i];
-#endif
+#endif /* USE_CURSES */
 		if (level == SELECT_LEVEL)
 			draw_group_arrow();
 		else
@@ -1516,6 +1524,8 @@ toggle_subject_from (void)
 }
 
 
+#ifndef INDEX_DAEMON
+
 /*
  * Build subject line given an index into base[].
  *
@@ -1527,7 +1537,6 @@ toggle_subject_from (void)
  * that the value of MARK_OFFSET (tin.h) is still correct.
  * Yes, this is somewhat kludgy.
  */
-#ifndef INDEX_DAEMON
 static void
 bld_sline (
 	int i)
@@ -1536,7 +1545,7 @@ bld_sline (
 	char buffer[BUFSIZ];	/* FIXME: allocate? */
 #else
 	char *buffer;
-#endif
+#endif /* USE_CURSES */
 	char from[HEADER_LEN];
 	char new_resps[8];
 	char art_cnt[10];
@@ -1600,7 +1609,7 @@ bld_sline (
 
 #ifndef USE_CURSES
 	buffer = screen[j].col;
-#endif
+#endif /* !USE_CURSES */
 	sprintf (buffer, "  %s %s %s%-*.*s%s%-*.*s",
 		 tin_ltoa(i+1, 4), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, from);
@@ -1610,7 +1619,7 @@ bld_sline (
 
 	WriteLine(INDEX2LNUM(i), buffer);
 }
-#endif /* INDEX_DAEMON */
+
 
 /*
  * Draw subject line given an index into base[].
@@ -1624,22 +1633,20 @@ bld_sline (
  * in a slightly more efficient update, though at the price of increased
  * code complexity and readability.
  */
-
 static void
 draw_sline (
 	int i,
 	t_bool full)
 {
-#ifndef INDEX_DAEMON
 	int tlen;
 	int x = full ? 0 : 6;
 	int k = MARK_OFFSET;
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 	char buffer[BUFSIZ];
 	char *s = screen_contents(INDEX2LNUM(i), x, buffer);
-#else
+#	else
 	char *s = &(screen[INDEX2SNUM(i)].col[x]);
-#endif
+#	endif /* USE_CURSES */
 
 	if (full) {
 		if (strip_blanks) {
@@ -1666,17 +1673,13 @@ draw_sline (
 	}
 
 	MoveCursor(INDEX2LNUM(i)+1, 0);
-
-#endif /* INDEX_DAEMON */
 }
 
 
-#ifndef INDEX_DAEMON
 static void
 show_group_title (
 	int clear_title)
 {
-
 	char buf[PATH_LEN];
 	int num;
 	register int i, art_cnt = 0;
@@ -1684,16 +1687,17 @@ show_group_title (
 	num = my_group[cur_groupnum];
 
 	if (active[num].attribute->show_only_unread) {
-		for (i = 0 ; i < top_base ; i++)
+		for (i = 0; i < top_base; i++)
 			art_cnt += new_responses (i);
 	} else {
-		for (i = 0 ; i < top ; i++) {
+		for (i = 0; i < top; i++) {
 			if (!IGNORE_ART(i))
 				++art_cnt;
 		}
 	}
 
-#if 0 /* turn on the warning about missing articles - !FIXME! */
+
+#	if 0 /* turn on the warning about missing articles - !FIXME! */
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c) %ldU %s",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
@@ -1701,15 +1705,15 @@ show_group_title (
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated),
 		active[num].newsrc.num_unread,
-		(art_cnt==active[num].newsrc.num_unread) ? "okay" : "articles missing!");
-#else
+		(art_cnt == active[num].newsrc.num_unread) ? "okay" : "articles missing!");
+#	else
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c)",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
 		art_cnt, num_of_killed_arts, num_of_selected_arts,
 		(active[num].attribute->show_only_unread ? " R" : ""),
 		group_flag(active[num].moderated));
-#endif
+#	endif /* 0 */
 
 	if (clear_title) {
 		MoveCursor (0, 0);
@@ -1740,4 +1744,4 @@ move_to_thread(
 		show_group_page ();
 }
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */

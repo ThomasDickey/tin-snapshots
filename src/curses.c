@@ -195,9 +195,11 @@ static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 #endif /* INDEX_DAEMON */
 
 /*
-** Local prototypes
-*/
-static void ScreenSize (int *num_lines, int *num_columns);
+ * Local prototypes
+ */
+#ifndef INDEX_DAEMON
+	static void ScreenSize (int *num_lines, int *num_columns);
+#endif /* INDEX_DAEMON */
 
 
 void
@@ -492,15 +494,14 @@ InitScreen (void)
 
 #endif	/* M_UNIX */
 
+
 /*
  *  returns the number of lines and columns on the display.
  */
-
+#ifndef INDEX_DAEMON
 static void
 ScreenSize (int *num_lines, int *num_columns)
 {
-#ifndef INDEX_DAEMON
-
 	if (!_lines)
 		_lines = DEFAULT_LINES_ON_TERMINAL;
 	if (!_columns)
@@ -508,9 +509,8 @@ ScreenSize (int *num_lines, int *num_columns)
 
 	*num_lines = _lines - 1;		/* assume index from zero*/
 	*num_columns = _columns;		/* assume index from one */
-
-#endif /* INDEX_DAEMON */
 }
+#endif /* INDEX_DAEMON */
 
 
 void

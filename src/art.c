@@ -38,10 +38,13 @@ static int parse_headers (FILE *fp, struct t_article *h);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
-static int read_group (struct t_group *group, char *group_path, int *pcount);
 static void print_expired_arts (int num_expired);
 static void thread_by_subject (void);
-
+#ifndef NNTP_ONLY
+	static int read_group (struct t_group *group, char *group_path, int *pcount);
+#else
+	static int read_group (int *pcount);
+#endif /* !NNTP_ONLY */
 #ifdef INDEX_DAEMON
 	static void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
@@ -121,13 +124,29 @@ index_group (
 	int modified;
 	long min;
 	long max;
-	register int i;
+	register int i = 0;
 
 	if (group == (struct t_group *) 0)
 		return TRUE;
 
+/* FIXME: ugly code */
+/* calculate maxlen of groupname to display */
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+	i += 24; /* len of "Group %s ('q' to quit)... " */
+#else
+	i += 10; /* len of "Group %s ... " */
+#endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
+
+#ifdef SHOW_PROGRESS
+	i += 21; /* low+'/'+high */
+#endif /* ifdef SHOW_PROGRESS */
+
+	/* very small screen */
+	if (cCOLS < i)
+		i = 0;
+
 	if (INTERACTIVE)
-		wait_message (0, txt_group, group->name);
+		wait_message (0, txt_group, cCOLS - i, group->name);
 
 	make_group_path (group->name, group_path);
 	glob_art_group = group->name;
@@ -185,9 +204,12 @@ index_group (
 	/*
 	 * Add any articles to arts[] that are new or were killed
 	 */
+#ifndef NNTP_ONLY
 	if ((modified = read_group (group, group_path, &count)) == -1)
-		/* user aborted indexing */
-		return FALSE;
+#else
+	if ((modified = read_group (&count)) == -1)
+#endif /* NNTP_ONLY */
+		return FALSE;	/* user aborted indexing */
 
 	/*
 	 * Do this before calling art_mark_read if you want
@@ -265,8 +287,10 @@ index_group (
  */
 static int
 read_group (
+#ifndef NNTP_ONLY
 	struct t_group *group,
 	char *group_path,
+#endif /* NNTP_ONLY*/
 	int *pcount)
 {
 	FILE *fp;
@@ -453,7 +477,7 @@ thread_by_subject(void)
 #if 0
 	fprintf(stderr, "Subj dump\n");
 	fprintf(stderr, "%3s %3s %3s %3s : %3s %3s\n", "#", "Par", "Sib", "Chd", "In", "Thd");
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		fprintf(stderr, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
 			(arts[i].refptr->parent)  ? arts[i].refptr->parent->article : -2,
 			(arts[i].refptr->sibling) ? arts[i].refptr->sibling->article : -2,
@@ -519,7 +543,7 @@ make_threads (
 	 */
 	if (rethread || (group->attribute && group->attribute->thread_arts)) {
 
-		for (i=0 ; i < top ; i++) {
+		for (i = 0; i < top; i++) {
 
 			if (arts[i].thread != ART_EXPIRED)
 				arts[i].thread = ART_NORMAL;
@@ -568,7 +592,7 @@ make_threads (
 
 void
 sort_arts (
-	int sort_art_type)
+	unsigned int sort_art_type)
 {
 	switch (sort_art_type) {
 		case SORT_BY_NOTHING:		/* don't sort at all */
@@ -664,7 +688,7 @@ parse_headers (
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (*art_full_name)
-							h->name = hash_str (rfc1522_decode(art_full_name));
+							h->name = hash_str (eat_tab(rfc1522_decode(art_full_name)));
 						got_from = TRUE;
 					}
 				}
@@ -688,7 +712,7 @@ parse_headers (
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
 					if (match_header (ptrline+1, "ubject", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						s = eat_re (rfc1522_decode(buf2), FALSE);
+						s = eat_re (eat_tab(rfc1522_decode(buf2)), FALSE);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
 					}
@@ -729,8 +753,7 @@ parse_headers (
 			case 'A':	/* Archive-name:  optional */
 				if (match_header (ptrline+1, "rchive-name", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
 					if ((s = strchr (buf2, '/')) != (char *) 0) {
-						if (STRNCMPEQ(s+1, "part", 4) ||
-						    STRNCMPEQ(s+1, "Part", 4)) {
+						if (STRNCMPEQ(s+1, "part", 4) || STRNCMPEQ(s+1, "Part", 4)) {
 							h->part = my_strdup (s+5);
 							s = strrchr (h->part, '\n');
 							if (s != (char *) 0)
@@ -843,6 +866,11 @@ iReadNovFile (
 	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0)
 		return top;
 
+#if 1 /* see missing arts comment in group.c */
+	if (group->xmax > max)
+		group->xmax = max;
+#endif /* 1 */
+
 	while ((buf = tin_fgets (buf2, sizeof(buf2), fp)) != (char *) 0) {
 
 #ifdef DEBUG
@@ -869,7 +897,7 @@ iReadNovFile (
 #if 0
 my_printf ("artnum=[%ld] xmin=[%ld] xmax=[%ld]\n", artnum, group->xmin, group->xmax);
 my_flush();
-sleep(1);
+(void) sleep(1);
 #endif
 		if (artnum < group->xmin) {
 			(*expired)++;
@@ -899,7 +927,7 @@ sleep(1);
 		} else
 			*q = '\0';
 
-		arts[top].subject = hash_str (eat_re(rfc1522_decode(p), FALSE));
+		arts[top].subject = hash_str (eat_re(eat_tab(rfc1522_decode(p)), FALSE));
 		p = q + 1;
 
 		/*
@@ -918,7 +946,7 @@ sleep(1);
 		arts[top].from = hash_str (art_from_addr);
 
 		if (*art_full_name)
-			arts[top].name = hash_str (rfc1522_decode(art_full_name));
+			arts[top].name = hash_str (eat_tab(rfc1522_decode(art_full_name)));
 
 		p = q + 1;
 		/*
@@ -949,10 +977,8 @@ sleep(1);
 		} else
 			*q = '\0';
 
-		if (*p)
-			arts[top].msgid = my_strdup (p);
-		else		/* TODO is no msg-id allowed in rfc ? */
-			arts[top].msgid = '\0';
+		/* TODO is no msg-id allowed in rfc ? */
+		arts[top].msgid = ((*p) ? (my_strdup (p)) : ((char *) '\0'));
 
 		p = q + 1;
 
@@ -968,7 +994,7 @@ sleep(1);
 		} else
 			*q = '\0';
 
-		arts[top].refs = ((*p) ? (my_strdup (p)) : ('\0'));
+		arts[top].refs = ((*p) ? (my_strdup (p)) : ((char *) '\0'));
 
 		p = q + 1;
 
@@ -1135,7 +1161,7 @@ vWriteNovFile (
 		}
 
 		fclose (hFp);
-		chmod (pcNovFile, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
+		chmod (pcNovFile, (mode_t)(S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
 
 	}
 	set_real_uid_gid ();
@@ -1236,7 +1262,7 @@ pcFindNovFile (
 	if (iHashFileName) {
 		lHash = hash_groupname (psGrp->name);
 
-		for (iNum = 1;;iNum++) {
+		for (iNum = 1; ; iNum++) {
 
 			sprintf (acNovFile, "%s/%lu.%d", pcDir, lHash, iNum);
 
@@ -1247,7 +1273,7 @@ pcFindNovFile (
 			 * Don't follow, why should a zero length index file
 			 * cause the write to fail ?
 			 */
-			if (fgets (acBuf, sizeof (acBuf), hFp) == (char *) 0) {
+			if (fgets (acBuf, (int) sizeof (acBuf), hFp) == (char *) 0) {
 				fclose (hFp);
 				return acNovFile;
 			}
@@ -1286,7 +1312,7 @@ do_update (void)
 #endif
 
 	if (verbose)
-		time (&beg_epoch);
+		(void) time (&beg_epoch);
 
 	/*
 	 * load last updated times for each group (tind daemon only)
@@ -1336,9 +1362,9 @@ do_update (void)
 		}
 #ifdef DEBUG
 		if (debug == 2)
-			my_printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n",
-				pcNovFile, index_time,
-				psGrp->last_updated_time, group_time);
+			my_printf ("[%s] idxtime=[%lu]  old=[%lu]  new=[%lu]\n",
+				pcNovFile, (unsigned long int) index_time,
+				(unsigned long int) psGrp->last_updated_time, (unsigned long int) group_time);
 #endif
 		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 ||
 		    (psGrp->last_updated_time > index_time) ||
@@ -1370,9 +1396,9 @@ do_update (void)
 #endif /* INDEX_DAEMON */
 
 	if (verbose) {
-		time (&end_epoch);
+		(void) time (&end_epoch);
 		wait_message (0, txt_catchup_update_info,
-			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (int)(end_epoch - beg_epoch));
+			(catchup ? "Caughtup" : "Updated"), group_top, IS_PLURAL(group_top), (unsigned long int) (end_epoch - beg_epoch));
 	}
 }
 
@@ -1538,7 +1564,7 @@ set_article (
 	art->tagged	= FALSE;
 	art->selected	= FALSE;
 	art->zombie	= FALSE;
-	art->delete	= FALSE;
+	art->delete_it	= FALSE;
 	art->inrange	= FALSE;
 }
 
@@ -1555,7 +1581,7 @@ valid_artnum (
 	register int dctop = top;
 	register int cur = 1;
 
-	while (dctop /= 2)
+	while ((dctop /= 2))
 		cur = cur << 1;
 
 	range = cur / 2;
@@ -1573,7 +1599,7 @@ valid_artnum (
 		if (cur >= top)
 			cur = top - 1;
 
-		range = range / 2;
+		range /= 2;
 	}
 }
 
@@ -1598,10 +1624,10 @@ print_expired_arts (
 
 static char *
 pcPrintDate (
-	time_t	lSecs)
+	time_t lSecs)
 {
-	static	char acDate[25];
-	struct	tm *psTm;
+	static char acDate[25];
+	struct tm *psTm;
 
 	static const char *const months_a[] = {
 		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -1612,7 +1638,7 @@ pcPrintDate (
 	sprintf(acDate, "%02d %s %04d %02d:%02d:%02d",
 			psTm->tm_mday,
 			months_a[psTm->tm_mon],
-			1900+psTm->tm_year,
+			psTm->tm_year + 1900,
 			psTm->tm_hour, psTm->tm_min, psTm->tm_sec);
 
 	return acDate;
@@ -1622,7 +1648,7 @@ static char *
 pcPrintFrom (
 	struct t_article *psArt)
 {
-	static	char acFrom[PATH_LEN];
+	static char acFrom[PATH_LEN];
 
 	*acFrom = '\0';
 

@@ -18,7 +18,10 @@
 /*
  * local prototypes
  */
-static int submit_inews (char *name);
+#ifdef NNTP_INEWS
+	static int submit_inews (char *name);
+#endif /* NNTP_INEWS */
+
 #if defined (NNTP_INEWS) && !defined(FORGERY)
 	static int sender_needed (char * from, char * sender);
 #endif /* NNTP_INEWS && !FORGERY */
@@ -51,25 +54,23 @@ static int submit_inews (char *name);
 /*
  * Submit an article using the NNTP POST command
  */
+#ifdef NNTP_INEWS
 static int
 submit_inews (
 	char *name)
 {
 	t_bool ret_code = FALSE;
 
-#if !defined(INDEX_DAEMON)
-
-#	ifdef NNTP_INEWS
 	char	from_name[PATH_LEN];
 	char	line[NNTP_STRLEN];
 	char	*ptr;
 	FILE	*fp;
 	int auth_error = 0;
-#		ifndef FORGERY
-	int	ismail=FALSE;
-#		endif /* FORGERY */
 	int respcode;
 	t_bool leave_loop = FALSE;
+#		ifndef FORGERY
+	t_bool ismail = FALSE;
+#		endif /* FORGERY */
 
 	if ((fp = fopen (name, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, name);
@@ -78,7 +79,7 @@ submit_inews (
 
 	from_name[0]='\0';
 
-	while (fgets (line, sizeof (line), fp) != NULL) {
+	while (fgets (line, (int) sizeof (line), fp) != NULL) {
 		if (line[0] != '\n') {
 			ptr = strchr (line, ':');
 			if (ptr - line == 4 && !strncasecmp (line, "From", 4)) {
@@ -146,7 +147,7 @@ submit_inews (
 		/*
 		 * Send article 1 line at a time ending with "."
 		 */
-		while (fgets (line, sizeof (line), fp) != (char *) 0) {
+		while (fgets (line, (int) sizeof (line), fp) != (char *) 0) {
 			/*
 			 * Remove linefeed from line
 			 */
@@ -203,12 +204,9 @@ submit_inews (
 
 	ret_code = TRUE;
 
-#	endif /* NNTP_INEWS */
-
-#endif /* INDEX_DAEMON */
-
 	return ret_code;
 }
+#endif /* NNTP_INEWS */
 
 /*
  * Call submit_inews() if using builtin inews, else invoke external inews prog
@@ -230,13 +228,16 @@ submit_news_file (
 
 	rfc15211522_encode(name, txt_mime_encodings[post_mime_encoding], post_8bit_header, ismail);
 
+#ifdef NNTP_INEWS
 	if (read_news_via_nntp && use_builtin_inews) {
 #ifdef DEBUG
 		if (debug == 2)
 			error_message ("Using BUILTIN inews");
 #endif /* DEBUG */
 		ret_code = submit_inews (name);
-	} else {
+	} else
+#endif /* NNTP_INEWS */
+		{
 #ifdef DEBUG
 		if (debug == 2)
 			error_message ("Using EXTERNAL inews");

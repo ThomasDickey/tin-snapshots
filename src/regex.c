@@ -25,11 +25,11 @@ match_regex(
 	char *pattern,
 	t_bool icase)
 {
+	const char *errmsg;
 	int ret = FALSE;
 	int flags = PCRE_EXTENDED;
 	int error;
 	pcre *re;
-	const char *errmsg;
 
 	msg[0] = '\0';
 

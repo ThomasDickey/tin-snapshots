@@ -1,4 +1,60 @@
--- 1.4.0 release 980514 --
+-- pre-1.4 release 9806xx --
+
+592) Urs Janssen <urs@tin.org>
+     BUG. defines for HAVE_SETPGRP and SETPGRP_VOID were missing
+     ADD. --disable-xhdr-xref switch to configure in case it slows down
+          your readingprocess too much.
+     ADD. check for empty domain_name is now done after site_config-file
+          is read (simplyfies binarie dist.)
+     ADD. changed msg_add_x_headers() that "x_headers=foo" without
+          a ':' in it is no longer treated as filename in the current
+          dir, you could still use '/' or '~' to indicate that's a
+          filename
+     ADD. rewrote my_strdup() (little speedup)
+     ADD. minor code cleanup
+     FIX. configure[.in], autoconf.h[in], extern.h, init.c, lang.c, post.c
+          string.c
+
+591) Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. y2k compliance
+     FIX. post.c,open.c
+
+590) Cameron Perkins <erasmus@cc.gatech.edu>
+     BUG. when entering a group while the server is receiving a new article
+          this article could be marked as read without having a chance to
+          read it.
+     FIX. art.c
+
+589) Bernhard Oemer <oemer@tph.tuwien.ac.at>
+     ADD. on catchup_read_groups=ON mark the whole group as read
+          instead of each article
+     FIX. misc.c
+
+588) Kyle Rhorer <rhorer@clarc.org>
+     ADD. just stat article before piping it instead of reading
+          it to check if it still exists.
+     FIX. feed.c, screen.c
+
+587) Kazushi Marukawa <jam@pobox.com>
+     ADD. allow ^U and ^W in string-prompts
+     FIX. getline.c
+
+586) Thomas E. Dickey <dickey@clark.net>
+     BUG. use of null pointer in sprintf
+     BUG. misplaced fclose
+     BUG. correct conflicting definitions of isascii
+     BUG. duplicate switch cases
+     ADD. case to the configure test for compiler options (HP-UX 10.*)
+     ADD. improve check for HP curses, check for cursesX before curses
+     ADD. code cleanup (fix misuses of const, removed NULL as a synonym for
+          (char*)0, ...)
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], extern.h, nntplib.h
+          tin.h, Makefile[.in], art.c, filter.c, header.c, init.c, mail.c
+          makecfg.c, misc.c, newsrc.c, nntplib.c, nrctbl.c, post.c, read.c
+          save.c, select.c, sigfile.c, tcurses.c, thread.c
+
+-- pre-1.4 release 980514 --
 
 585) Stanislav Latishko <sl@sl.spb.su>
      BUG. possible NULL-pointer reference in tind

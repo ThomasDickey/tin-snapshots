@@ -80,7 +80,7 @@ getserverbyfile (
 		get_nntpserver (buf, cmdline_nntpserver);
 #	ifdef HAVE_PUTENV
 		sprintf (tmpbuf, "NNTPSERVER=%s", buf);
-		new_env = my_malloc (strlen (tmpbuf) + 1);
+		new_env = (char *) my_malloc (strlen (tmpbuf) + 1);
 		strcpy (new_env, tmpbuf);
 		putenv (new_env);
 		FreeIfNeeded (old_env);
@@ -101,7 +101,7 @@ getserverbyfile (
 
 	if ((fp = fopen (file, "r")) != (FILE *) 0) {
 
-		while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+		while (fgets (buf, (int) sizeof(buf), fp) != (char *) 0) {
 			if (*buf == '\n' || *buf == '#')
 				continue;
 
@@ -619,7 +619,7 @@ DEBUG_IO((stderr, "put_server(%s)\n", string));
 	/*
 	 *  Check how idle we have been, if too idle send a STAT to check
 	 */
-	time (&time_now);
+	(void) time (&time_now);
 
 
 	if (nntp_wr_fp == NULL || (time_last != 0 && time_last+NNTP_IDLE_RETRY_SECS-299 < time_now)) {
@@ -823,7 +823,7 @@ nntp_respcode (
 		case OK_GROUP:
 			text = "211  Group selected";
 			break;
-		case OK_MOTD:
+		/* case OK_MOTD: */
 		case OK_GROUPS:
 			text = "215  Newsgroups follow";
 			break;
@@ -959,7 +959,7 @@ nntp_respcode (
 		case ERR_ACCESS:
 			text = "502  Access to server denied";
 			break;
-		case ERR_MOTD:
+		/* case ERR_MOTD: */
 		case ERR_FAULT:
 			text = "503  Program fault, command not performed";
 			break;

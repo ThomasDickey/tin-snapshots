@@ -55,7 +55,7 @@ static char *
 string_dup (
 	const char *string)
 {
-	return strcpy (malloc (strlen (string) + 1), string);
+	return strcpy ((char *)malloc (strlen (string) + 1), string);
 }
 
 static void

@@ -126,7 +126,7 @@ fcol (
 			int bold;
 			if (color < 0)
 				color = default_fcol;
-			bold = (color >> 3);
+			bold = (color >> 3); /* bitwise operation on signed value? ouch */
 			my_printf("\033[%d;%dm", bold, ((color & 7) + 30));
 			if (!bold)
 				bcol(current_bcol);

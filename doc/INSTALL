@@ -8,7 +8,7 @@ This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
   --enable-8bit-keys	     --with-inn-nntplib		HAVE_FASCIST_NEWSADMIN
   --enable-color	     --with-iso-to-ascii	HAVE_MMDF_MAILER
-  --enable-curses	     --with-ispell		HAVE_PGP_5
+  --enable-curses	     --with-ispell              HAVE_LIBUU
   --enable-debug	     --with-libdir		INDEX_DAEMON
   --enable-etiquette	     --with-metamail		NNTP_INEWS
   --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
@@ -17,7 +17,7 @@ This following configure options and defines are documented in detail:
   --enable-nntp		     --with-pgp
   --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
   --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
-  --with-inews-dir	     --with-defaults-dir
+  --with-inews-dir	     --with-defaults-dir	--disable-xhdr-xref
 
 
 News machine names
@@ -266,7 +266,8 @@ Define if you have PGP (Pretty Good Privacy encryption system)
 installed and want the option of checking signatures, extract keys,
 sign messages and add public key to messages.  This is bound to the
 key 'g' or '^G'.
-If found in search path, this is used automatically.
+If found in search path, this is used automatically (pgp-5 is prefered
+over pgp-2).
 
 --with-inn-nntplib=PATH
 Define if you want to use the INN library functions GetConfigValue()
@@ -315,9 +316,6 @@ Define if your machine uses a MMDF type mailer instead of sendmail.
 It is defined as default on SCO Unix machines. It can be dynamically
 changed by setting the tinrc variable save_to_mmdf_mailbox to ON.
 
-HAVE_PGP_5
-Define if you use pgp-5 instead of pgp-2.
-
 NO_POSTING
 Do not allow posting/followup of articles.
 
@@ -333,6 +331,9 @@ Define if you are running a machine with little memory (<4MB). Tin will
 run slightly slower but be more efficient in how memory is allocated and
 reclaimed.
 
+--disable-xhdr-xref
+don't allow using XHDR XREF if XOVER dosn't work to mark crossposted
+articles as read in all groups.
 
 
 Compiled & installed on the following machines:
@@ -340,7 +341,7 @@ Compiled & installed on the following machines:
 
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
-	i486 & Linux 2.0.33 with gcc 2.7.2.2
+	i486 & Linux 2.0.34 with gcc 2.7.2.2
 	i486 & Linux 2.0.33 with gcc 2.7.2.3 (glibc 2.0.6)
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
@@ -353,10 +354,11 @@ Compiled & installed on the following machines:
 	HP 9000/720 & HP-UX 9.05 with gcc 2.7.2
 	HP 9000/715 & HP-UX 9.07 with cc
 	HP 9000/715 & HP-UX 9.07 with gcc 2.7.2
+	HP 9000/375 & HP-UX 9.10 with gcc 2.7.2.3
 	HP 9000/819 & HP-UX 10.10 with cc
 	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
 	HP 9000/829 & HP-UX 10.20 with cc
-	HP 9000/829 & HP-UX 10.20 with gcc 2.7.2.2
+	HP 9000/829 & HP-UX 10.20 with gcc 2.7.2.3
 
 3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
 	VAX 8350 & Ultrix 4.0 with gcc 2.7.2
@@ -407,3 +409,5 @@ Compiled & installed on the following machines:
 
 18)	OpenVMS/Alpha 6.2, DEC C V5.0-003,                  SOCKETSHR_TCP
 	OpenVMS/Vax   5.3, GCC 2.7.2 (Pat Ranking edition), SOCKETSHR_TCP
+
+19)	i586 & Windows95 with Cygwin32 gcc 2.7-B19

@@ -199,7 +199,7 @@ vWriteNewsrc (void)
 		rename_file (newnewsrc, newsrc);
 
 	return write_ok;
-#endif	/* INDEX_DAEMON */
+#endif	/* !INDEX_DAEMON */
 }
 
 
@@ -216,7 +216,7 @@ create_newsrc (
 	if ((fp = fopen (newsrc_file, "w")) != (FILE *) 0) {
 		wait_message (0, txt_creating_newsrc);
 
-		for (i=0 ; i < num_active ; i++)
+		for (i = 0; i < num_active; i++)
 			fprintf (fp, "%s!\n", active[i].name);
 
 		if (ferror (fp) | fclose (fp))
@@ -282,11 +282,11 @@ backup_newsrc (void)
 	char buf[HEADER_LEN];
 
 	if ((fp_ip = fopen (newsrc, "r")) != (FILE *) 0) {
-#if defined(WIN32)
+#	if defined(WIN32)
 		joinpath (buf, rcdir, OLDNEWSRC_FILE);
-#else
+#	else
 		joinpath (buf, homedir, OLDNEWSRC_FILE);
-#endif
+#	endif /* WIN32 */
 		unlink (buf);	/* because rn makes a link of .newsrc -> .oldnewsrc */
 
 		if ((fp_op = fopen (buf, "w" FOPEN_OPTS)) != (FILE *) 0) {
@@ -302,7 +302,7 @@ backup_newsrc (void)
 		}
 		fclose (fp_ip);
 	}
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -832,7 +832,7 @@ print_bitmap_seq (
 		return;
 	}
 
-	for (i = group->newsrc.xmin ; i <= group->newsrc.xmax ; i++) {
+	for (i = group->newsrc.xmin; i <= group->newsrc.xmax; i++) {
 		if (NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ) {
 			if (flag) {
 				artnum = i;
@@ -1071,7 +1071,7 @@ catchup_newsrc_file (void)
 	if (!catchup)
 		return;
 
-	for (i = 0 ; i < group_top ; i++) {
+	for (i = 0; i < group_top; i++) {
 		group = &active[my_group[i]];
 		group->newsrc.present = TRUE;
 		if (group->newsrc.xbitmap != (t_bitmap *) 0) {
@@ -1106,7 +1106,7 @@ pcParseNewsrcLine (
 		return(NULL);
 
 	*sub = *ptr;						/* Save the subscription status */
-	tmp=ptr;							/* Keep this blank for later */
+	tmp = ptr;							/* Keep this blank for later */
 	*(ptr++) = '\0';					/* Terminate the group name */
 
 #if 0
@@ -1158,7 +1158,7 @@ expand_bitmap (
 {
 	long bitlen;
 	long first;
-	long new;
+	long tmp;
 
 /*
  * that shouldn' happen - looks like the newsservers database is broken
@@ -1166,13 +1166,14 @@ expand_bitmap (
 	if (group->newsrc.xmax > group->xmax) {
 #ifdef DEBUG
 		my_fprintf(stderr, "\ngroup: %s - newsrc.max %ld > read.max %ld\n", group->name, group->newsrc.xmax, group->xmax);
-		sleep(4);
+		(void) sleep(3);
 #endif
 	/*
-	* (silently) fix it - we trust our newsrc
-	*/
+	 * (silently) fix it - we trust our newsrc
+	 */
 		group->xmax = group->newsrc.xmax;
 	}
+
 	if (group->newsrc.xmin > group->newsrc.xmax + 1)
 		group->newsrc.xmin = group->newsrc.xmax + 1;
 
@@ -1225,11 +1226,11 @@ expand_bitmap (
 		/* Mark high numbered articles as unread */
 
 		if (group->newsrc.xmin - first + group->newsrc.xbitlen < bitlen) {
-			new = group->newsrc.xmin - first + group->newsrc.xbitlen;
-			NSETRNG1(newbitmap, new, bitlen - 1);
+			tmp = group->newsrc.xmin - first + group->newsrc.xbitlen;
+			NSETRNG1(newbitmap, tmp, bitlen - 1);
 /*
 error_message("EXPAND BY=[%ld] grp->newsrc.xmin(%ld) - first(%ld) + + grp->newsrc.xbitlen(%ld) < bitlen(%ld)",
-	new, group->newsrc.xmin, first, group->newsrc.xbitlen, bitlen);
+	tmp, group->newsrc.xmin, first, group->newsrc.xbitlen, bitlen);
 */
 		}
 
@@ -1351,7 +1352,7 @@ art_mark_deleted (
 	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
-		art->delete = TRUE;
+		art->delete_it = TRUE;
 wait_message(2, "FIXME  article marked for deletion");
 	}
 }
@@ -1362,7 +1363,7 @@ art_mark_undeleted (
 	struct t_article *art)
 {
 	if (art != (struct t_article *) 0) {
-		art->delete = FALSE;
+		art->delete_it = FALSE;
 wait_message(2, "FIXME  article marked for undeletion");
 	}
 }
@@ -1425,7 +1426,7 @@ vNewsrcTestHarness (void)
 	my_printf ("\nENV Min=[%ld] Max=[%ld] Rng=[%ld-%ld] Count=[%ld] Seq=[%s]\n",
 		group.xmin, group.xmax, rng_min, rng_max, group.count, seq);
 
-	for (i=0; i < 3 ; i++) {
+	for (i = 0; i < 3; i++) {
 		if (group.newsrc.xbitmap != (t_bitmap *) 0) {
 			free ((char *) group.newsrc.xbitmap);
 			group.newsrc.xbitmap = (t_bitmap *) 0;
@@ -1463,7 +1464,7 @@ vNewsrcTestHarness (void)
 			error_message (txt_cannot_create_uniq_name);
 		else {
 			fp = fopen (temp_file, "r");
-			fgets (seq, sizeof(seq), fp);
+			fgets (seq, (int) sizeof(seq), fp);
 			seq[strlen(seq)-1] = '\0';
 			fclose (fp);
 		}

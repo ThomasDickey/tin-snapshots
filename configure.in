@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1998-04-01
+dnl Updated   : 1998-04-20
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997,1998 by Thomas Dickey
@@ -18,10 +18,7 @@ AC_INIT(include/tin.h)
 AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
 AC_PREFIX_DEFAULT(/usr/local)
 
-AC_CANONICAL_HOST
-
-CF_SYS_NAME
-echo "Configuring `make -f ${srcdir}/Makefile version` for $SYS_NAME"
+CF_CHECK_CACHE
 
 CF_WITH_PATH(install-prefix,
 	[  --install-prefix        prefixes actual install location],
@@ -59,6 +56,9 @@ AC_PROG_RANLIB
 CF_PROG_YACC
 AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
 CF_ANSI_CC_REQD
+CF_PROG_EXT
+CF_LIB_PREFIX(LIB_PREFIX)
+AC_SUBST(LIB_PREFIX)
 
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
@@ -75,6 +75,7 @@ CF_PATH_MAILER
 CF_PATH_MAILBOX
 
 ## PGP Support
+AC_MSG_CHECKING(if you want PGP-Support )
 CF_ARG_DISABLE(pgp,
 	[  --disable-pgp           disable PGP Support],
 	[USE_PGP=no],
@@ -82,7 +83,6 @@ CF_ARG_DISABLE(pgp,
 AC_MSG_RESULT($enableval)
 
 if test "$USE_PGP" = "yes" ; then
-AC_MSG_CHECKING(if you want PGP-Support )
 AC_PATH_PROG(PGPK, pgpk, no)
 if test $PGPK != no ; then
         AC_DEFINE(HAVE_PGP)
@@ -406,6 +406,13 @@ CF_ARG_DISABLE(append-pid,
         [AC_DEFINE(APPEND_PID)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(whether to fallback to XHDR XREF if XOVER isn't supported)
+CF_ARG_DISABLE(xhdr-xref,
+        [  --disable-xhdr-xref     disable XHDR XREF fallback],,
+        [AC_DEFINE(XHDR_XREF)])
+AC_MSG_RESULT($enableval)
+
+
 ### checks for the location of the system-wide default setting file
 AC_MSG_CHECKING(for directory containing tin.defaults file)
 CF_WITH_PATH(defaults-dir,
@@ -573,6 +580,7 @@ AC_CHECK_FUNCS(\
 	getcwd \
 	is_xterm \
 	isascii \
+	link \
 	memcmp \
 	memcpy \
 	memmove \
@@ -702,6 +710,7 @@ CF_CHECK_DECL(\
 	gethostbyname \
 	getservbyname \
 	inet_ntoa \
+	socket \
 )
 
 if test $use_curses = no ; then
@@ -758,7 +767,6 @@ CF_CHECK_DECL(\
 	setpgrp \
 	setregid \
 	setreuid \
-	socket \
 	sscanf \
 	strcasecmp \
 	strftime \

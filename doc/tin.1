@@ -434,8 +434,15 @@ Select group 4.
 Redraw page.
 .TP
 .B ^O
-Reload postponed article. If your system blocks CTRL-O you must quote it
-by pressing CTRL-V first. See also ``\fB-o\fR'' command-line switch.
+Reload postponed article. If your system blocks CTRL-O you must quote it by
+pressing CTRL-V first. The postpone-menu offers the following actions: `y' =
+reload and spawn editor; `Y' = post article (without spawning editor); `A' =
+post all postponed articles (without spawning editor); `n' = skip this
+article; `q' = quit postponed menu. Currently there is no 'simple' way to
+delete a posponed article from the posponed-file, you have to use the
+following commandsequence instead: reload it with '^O', enter editor with
+'y', quit editor, discard posting with 'q'. See also ``\fB-o\fR''
+command-line switch.
 .TP
 .B ^R
 Reset \fI$HOME/.newsrc\fP file.
@@ -2630,20 +2637,20 @@ Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael
 O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker,
 Tom Parry, Jim Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins,
 Colin Perkins, Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers,
-Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Ted Richards, Steve Robbins,
-Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman, Roland
-Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders,
-Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif, Volker
-Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz,
-Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug
-Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark
-Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
-Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
-Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
-Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
-Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
-Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
-Nickolai Zeldovich, Zbigniew Zych
+Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Kyle Rhorer, Ted Richards,
+Steve Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Stephen
+Roseman, Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz,
+Gary Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger
+Schif, Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl,
+Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav
+Serrander, Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda,
+Andreas Siegert, Mark Smith, Steve Spearman, Cliff Stanford, Steve Starck,
+Jason Steiner, Ralf Stephan, Michael Stenns, Helmrich Streitmatter, Hans
+Werner Strube, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman,
+Derek Terveer, Carsten Theis, Julian Thompson, David Tiller, Andry Timonin,
+Mark Tomlin, Michael Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha,
+Jason Wessel, Cary Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens
+Wuepper, Billy Y., Nickolai Zeldovich, Zbigniew Zych
 .\"
 .\"
 .SH AUTHOR

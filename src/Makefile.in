@@ -15,6 +15,8 @@ VPATH		= $(srcdir)
 # Compiler, linker & parser commands
 CC	= @CC@
 CPP	= @CPP@
+x	= @PROG_EXT@
+PRELIB	= @LIB_PREFIX@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 DAEMON	= # -DINDEX_DAEMON
@@ -37,7 +39,7 @@ INS_MANUAL_EXT	= 1
 
 # Project
 PROJECT	= tin
-EXE	= tin
+EXE	= tin$x
 EXED	= tind
 VER	= 1.4
 MANEXT	= 1
@@ -132,7 +134,7 @@ CFILES	= \
 
 EXTRAOBJS = @EXTRAOBJS@
 
-EXTRALIBS = ../pcre/libpcre.a
+EXTRALIBS = ../pcre/$(PRELIB)pcre.a
 
 OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/active.o \
@@ -191,7 +193,7 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 
 ALL_FILES = $(HFILES) $(CFILES) $(NNTP)
 
-LINTFLAGS=-a -c -h -n -x $(CPPOPTS) \
+LINTFLAGS = -a -c -h -n -x $(CPPOPTS) \
 	-DUSE_ISO2ASC=\"2\" \
 	-DHAVE_ISPELL \
 	-DHAVE_COLOR
@@ -292,7 +294,7 @@ clean:
 	@-$(RM) -f $(OFILES)
 	@-$(RM) -f $(OBJDIR)/parsdate.c
 	@-$(RM) -f LINT *.ln *.out
-	@-$(RM) -f makecfg makecfg.o tincfg.h
+	@-$(RM) -f makecfg$x makecfg.o tincfg.h
 	@-$(RM) -f core *~
 	@-$(RM) -f $(EXE) $(EXED)
 	@$(ECHO) "Cleaning Philip Hazel's Perl regular expressions library..."
@@ -323,16 +325,16 @@ TIN_DEP	= \
 	$(INCDIR)/nntplib.h \
 	$(INCDIR)/proto.h
 
-../pcre/libpcre.a:
+../pcre/$(PRELIB)pcre.a:
 	@$(ECHO) "Building Philip Hazel's Perl regular expressions library..."
-	@$(CD) ../pcre && $(MAKE) @cf_cv_makeflags@ libpcre.a
+	@$(CD) ../pcre && $(MAKE) @cf_cv_makeflags@ $(PRELIB)pcre.a
 
 tincfg.h:			$(SRCDIR)/tincfg.tbl \
-				makecfg
+				makecfg$x
 	./makecfg $(SRCDIR)/tincfg.tbl tincfg.h
 
-makecfg:			$(OBJDIR)/makecfg.o
-	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o makecfg @LIBS@
+makecfg$x:			$(OBJDIR)/makecfg.o
+	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o $@ @LIBS@
 
 $(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h

@@ -58,7 +58,7 @@ authinfo_generic (void)
 	 * exists, pull out the cookiefd. Just in case we've nested.
 	 */
 	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS")))
-		sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
+		(void) sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
 
 	if (cookiefd == -1) {
 		char tempfile[BUFSIZ];
@@ -71,14 +71,15 @@ authinfo_generic (void)
 #endif
 			return FALSE;
 		} else {
-			fp = fopen (tempfile, "w+");
-			if (!fp) {
+			if ((fp = fopen (tempfile, "w+")) != (FILE *) 0) {
+				cookiefd = fileno (fp);
+				(void) unlink (tempfile);
+			} else {
 				error_message (txt_cannot_open, tempfile);
+				(void) unlink (tempfile);
 				return FALSE;
 			}
 		}
-		(void) unlink (tempfile);
-		cookiefd = fileno (fp);
 	}
 
 	strcpy (tmpbuf, "AUTHINFO GENERIC ");
@@ -96,7 +97,7 @@ authinfo_generic (void)
 	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d", fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
 	new_env = (char *) my_malloc (strlen (tmpbuf) + 1);
 	strcpy (new_env, tmpbuf);
-	putenv (new_env);
+	(void) putenv (new_env);
 	FreeIfNeeded (old_env);
 	old_env = new_env;
 #else
@@ -287,7 +288,7 @@ authinfo_original (
 	 * and restart tin or change to another server and back in order to get
 	 * it read again.
 	 */
-	if ((changed = strcmp (server, last_server)) || ((!changed) && (!already_failed))) {
+	if ((changed = strcmp (server, last_server)) || (!changed && !already_failed)) {
 		already_failed = FALSE;
 		if (read_newsauth_file (server, authuser, authpass)) {
 			ret = do_authinfo_original (server, authuser, authpass);

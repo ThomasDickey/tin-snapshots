@@ -82,10 +82,10 @@ msg_write_signature (
 		 *  append the random sig part onto the end.
 		 */
 		if ((sigfp = open_random_sig (path)) != (FILE *) 0) {
-	#ifdef DEBUG
+#ifdef DEBUG
 			if (debug == 2)
 				error_message ("USING random sig=[%s]", sigfile);
-	#endif
+#endif
 			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 			joinpath (path, homedir, ".sigfixed");
 			if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
@@ -128,7 +128,7 @@ open_random_sig (
 
 	if (stat (sigdir, &st) != -1) {
 		if (S_ISDIR(st.st_mode)) {
-			time (&epoch);
+			(void) time (&epoch);
 			srand ((unsigned int) epoch);
 			my_chdir (sigdir);
 
@@ -160,7 +160,7 @@ thrashdir (
 	int safeguard, recurse;
 	register DIR *dirp;
 	register DIR_BUF *dp;
-	register int c, numentries, pick;
+	register int c = 0, numentries, pick;
 	struct stat st;
 
 	sigfile[0] = '\0';

@@ -47,6 +47,7 @@ info_message (const char *fmt, ...)
 #endif
 
 	vsprintf (msg, fmt, ap);
+
 	center_line (cLINES, FALSE, msg);	/* center the message at screen bottom */
 
 #ifdef HAVE_COLOR
@@ -82,7 +83,7 @@ wait_message (int delay, const char *fmt, ...)
 	cursoron ();
 	my_flush();
 
-	sleep(delay);
+	(void) sleep(delay);
 /*	clear_message(); would be nice, but tin doesn't expect this yet */
 	va_end(ap);
 }
@@ -104,6 +105,7 @@ error_message (const char *fmt, ...)
 	clear_message ();
 
 	vsprintf (msg, fmt, ap);
+
 	my_fprintf (stderr, msg);
 	my_fflush (stderr);
 
@@ -112,7 +114,7 @@ error_message (const char *fmt, ...)
 		fflush (stderr);
 	} else {
 		stow_cursor();
-		sleep (2);
+		(void) sleep (2);
 	}
 
 	va_end(ap);
@@ -144,7 +146,7 @@ perror_message (const char *fmt, ...)
 		fflush (stderr);
 	} else {
 		stow_cursor();
-		sleep (3);
+		(void) sleep (3);
 	}
 
 	va_end(ap);
@@ -330,6 +332,6 @@ show_progress (
 		my_printf ("%s", txt);
 	else
 #endif
-		my_printf ("%s%4d/%-4d", txt, count, total);
+		my_printf ("%s%6d/%-6d", txt, count, total);
 	my_flush();
 }

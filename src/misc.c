@@ -160,7 +160,7 @@ copy_body (
 			prefixbuf[strlen(prefixbuf)-1] = '\0';
 	}
 
-	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
+	while (fgets (buf, (int) sizeof(buf), fp_ip) != (char *) 0) {
 		if (!with_sig && !strcmp(buf, "-- \n"))
 			break;
 		if (strstr(prefix, "%s")) { /* initials wanted */
@@ -232,7 +232,7 @@ invoke_editor (
 
 	strcpy (editor_format, (start_editor_offset ? (*default_editor_format ? default_editor_format : EDITOR_FORMAT_ON) : EDITOR_FORMAT_OFF));
 
-	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
+	retcode = strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format);
 
 	if (!retcode)
 		sh_format (buf, sizeof(buf), "%s %s", editor, filename);
@@ -299,7 +299,7 @@ invoke_ispell (
 		return FALSE;
 	}
 
-	while (fgets (buf, sizeof(buf), fp_all) != NULL) {
+	while (fgets (buf, (int) sizeof(buf), fp_all) != NULL) {
 		fputs (buf, fp_head);
 		if (buf[0] == '\n' || buf[0] == '\r') {
 			fclose (fp_head);
@@ -307,7 +307,7 @@ invoke_ispell (
 		}
 	}
 
-	while (fgets(buf, sizeof(buf), fp_all) != NULL)
+	while (fgets(buf, (int) sizeof(buf), fp_all) != NULL)
 		fputs(buf, fp_body);
 
 	fclose (fp_body);
@@ -335,15 +335,15 @@ shell_escape (void)
 	sprintf (msg, txt_shell_escape, default_shell_command);
 
 	if (!prompt_string (msg, shell, HIST_SHELL_COMMAND))
-		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
+		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof(shell));
 
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
 		continue;
 
 	if (*p)
-		my_strncpy (default_shell_command, p, sizeof (default_shell_command));
+		my_strncpy (default_shell_command, p, sizeof(default_shell_command));
 	else {
-		my_strncpy (shell, (*default_shell_command ? default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof (shell));
+		my_strncpy (shell, (*default_shell_command ? default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof(shell));
 		p = shell;
 	}
 
@@ -366,7 +366,7 @@ void
 tin_done (
 	int ret)
 {
-	register int i, j;
+	register int i;
 	t_bool ask = TRUE;
 	struct t_group *group;
 
@@ -374,7 +374,7 @@ tin_done (
 	 * check if any groups were read & ask if they should marked read
 	 */
 	if (catchup_read_groups && !cmd_line && !no_write) {
-		for (i = 0 ; i < group_top ; i++) {
+		for (i = 0; i < group_top; i++) {
 			group = &active[my_group[i]];
 			if (group->read_during_session) {
 				if (ask) {
@@ -385,10 +385,7 @@ tin_done (
 						break;
 				}
 				wait_message (0, "Catchup %s...", group->name);
-				if (index_group (group)) {
-					for (j = 0; j < top; j++)
-						art_mark_read (group, &arts[j]);
-				}
+				grp_mark_read (group, NULL);
 			}
 		}
 	}
@@ -409,13 +406,15 @@ tin_done (
 		}
 
 		write_input_history_file ();
-#if 0 /* FIXME */
+#ifndef INDEX_DAEMON
+#	if 0 /* FIXME */
 		write_attributes_file (local_attributes_file);
-#endif
+#	endif /* 0 */
+#endif /* !INDEX_DAEMON */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		write_mail_active_file ();
-#endif
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 	}
 
 	/* Do this sometime after we save the newsrc in case this hangs up for any reason */
@@ -425,13 +424,13 @@ tin_done (
 	free_all_arrays ();
 #ifdef SIGUSR1
 	if (ret != -SIGUSR1) {
-#endif
+#endif /* SIGUSR1 */
 #ifdef HAVE_COLOR
-		use_color=FALSE;
+		use_color = FALSE;
 		EndInverse();
 #else
 		if (!cmd_line)
-#endif
+#endif /* HAVE_COLOR */
 		{
 			if (!ret)
 				ClearScreen ();
@@ -442,13 +441,13 @@ tin_done (
 	} else {
 		ret = SIGUSR1;
 	}
-#endif
+#endif /* SIGUSR1 */
 	cleanup_tmp_files ();
 
 #ifdef DOALLOC
 	no_leaks();	/* free permanent stuff */
 	show_alloc();	/* memory-leak testing */
-#endif
+#endif /* DOALLOC */
 
 #ifdef USE_DBMALLOC
 	/* force a dump, circumvents a bug in Linux libc */
@@ -456,13 +455,13 @@ tin_done (
 	extern int malloc_errfd;	/* FIXME */
 	malloc_dump(malloc_errfd);
 	}
-#endif
+#endif /* USE_DBMALLOC */
 
 #ifdef VMS
 	if (!ret)
 		ret = 1;
 	vms_close_stdin (); /* free resources used by ReadCh */
-#endif
+#endif /* VMS */
 
 	exit (ret);
 }
@@ -532,8 +531,7 @@ strip_double_ngs (
 				} else
 					over2 = TRUE;
 
-				if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
-					&& (strlen(ngroup2) != 0)) {
+				if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2)) && (strlen(ngroup2) != 0)) {
 					strcat(newlist, ",");
 					strcat(newlist, ngroup2);
 				}
@@ -563,8 +561,8 @@ my_mkdir (
 		return mkdir (path);
 #	else
 		return mkdir (path, mode);
-#	endif
-#endif
+#	endif /* M_OS2 || WIN32 */
+#endif /* HAVE_MKDIR */
 }
 
 int
@@ -579,7 +577,7 @@ my_chdir (
 	if (*path && path[1] == ':') {
 		_chdrive (toupper((unsigned char)path[0]) - 'A' + 1);
 	}
-#endif
+#endif /* M_OS2 */
 
 	return retcode;
 }
@@ -594,7 +592,12 @@ rename_file (
 
 	unlink (new_filename);
 
-	if (link (old_filename, new_filename) == -1) {
+#	ifdef HAVE_LINK
+	if (link (old_filename, new_filename) == -1)
+#	else
+	if (rename (old_filename, new_filename) < 0)
+#	endif /* HAVE_LINK */
+	{
 		if (errno == EXDEV) {	/* create & copy file across filesystem */
 			if ((fp_old = fopen (old_filename, "r")) == (FILE *) 0) {
 				perror_message (txt_cannot_open, old_filename);
@@ -614,10 +617,12 @@ rename_file (
 			return;
 		}
 	}
+#	ifdef HAVE_LINK
 	if (unlink (old_filename) == -1) {
 		perror_message (txt_rename_error, old_filename, new_filename);
 		return;
 	}
+#	endif /* HAVE_LINK */
 }
 #endif /* M_UNIX */
 
@@ -631,7 +636,7 @@ rename_file (
 
 	if (!strchr(strchr(new_filename, ']') ? strchr(new_filename, ']') : new_filename, '.')) {
 		/* without final dot the new filename is not as tin expects */
-		if (strlen(new_filename) >= sizeof new_filename_vms) {
+		if (strlen(new_filename) >= sizeof(new_filename_vms)) {
 			perror_message ("length of %s is too large", new_filename);
 			return;
 		}
@@ -666,7 +671,6 @@ rename_file (
 #endif /* M_AMIGA */
 
 
-
 int
 invoke_cmd (
 	char *nam)
@@ -678,12 +682,12 @@ invoke_cmd (
 	set_signal_catcher (FALSE);
 
 	TRACE(("called system(%s)", _nc_visbuf(nam)))
-#	ifdef USE_SYSTEM_STATUS
+#ifdef USE_SYSTEM_STATUS
 		system(nam);
 		ret = system_status;
-#	else
+#else
 		ret = system (nam);
-#	endif
+#endif /* USE_SYSTEM_STATUS */
 	TRACE(("return %d", ret))
 
 	set_signal_catcher (TRUE);
@@ -694,14 +698,14 @@ invoke_cmd (
 #	if defined(SIGWINCH)
 		handle_resize(FALSE);
 		/* seems to be troublesome on RedHat5.0 Linux2.0.33/glibc2.0.6/libncurses1.9.9 */
-#	endif
+#	endif /* SIGWINCH */
 #endif /* 1 */
 
 #ifdef VMS
 	return ret != 0;
 #else
 	return ret == 0;
-#endif
+#endif /* VMS */
 }
 
 
@@ -814,27 +818,27 @@ base_name (
 	int i;
 #ifdef VMS
 	char *cp;
-#endif
+#endif /* VMS */
 
 	strcpy (program, dirname);
 
-	for (i=(int) strlen (dirname)-1 ; i ; i--) {
+	for (i = (int) strlen (dirname)-1; i; i--) {
 #ifndef VMS
 		if (dirname[i] == SEPDIR) {
 #else
 		if (dirname[i] == ']') {
-#endif
+#endif /* VMS */
 			strcpy (program, dirname+(i+1));
 			break;
 		}
 	}
 #ifdef M_OS2
 	str_lwr (program, program);
-#endif
+#endif /* M_OS2 */
 #ifdef VMS
 	if (cp = strrchr(program, '.'))
 		*cp = '\0';
-#endif
+#endif /* VMS */
 }
 
 
@@ -847,13 +851,13 @@ mail_check (void)
 #ifndef WIN32 /* No unified mail transport on WIN32 */
 	const char *mailbox_name;
 	struct stat buf;
-#ifdef M_AMIGA
+#	ifdef M_AMIGA
 	static long mbox_size = 0;
-#endif
+#	endif /* M_AMIGA */
 
 	mailbox_name = get_val ("MAIL", mailbox);
 
-#ifdef M_AMIGA
+#	ifdef M_AMIGA
 	/*
 	 * Since AmigaDOS does not distinguish between atime and mtime
 	 * we have to find some other way to figure out if the mailbox
@@ -890,10 +894,10 @@ mail_check (void)
 				mbox_size = 0;
 		}
 	}
-#else
+#	else
 	if (mailbox_name != 0 && stat (mailbox_name, &buf) >= 0 && buf.st_atime < buf.st_mtime && buf.st_size > 0)
 		return TRUE;
-#endif
+#	endif /* M_AMIGA */
 #endif /* !WIN32 */
 	return FALSE;
 }
@@ -911,15 +915,15 @@ static int once;
 #	define ONCE while(once)
 #else
 #	define ONCE while(0)
-#endif
+#endif /* lint */
 
 #define APPEND_TO(dest, src) do { \
 	(void) sprintf ((dest), "%s", (src)); \
-	(dest)=strchr((dest), '\0'); \
+	(dest) = strchr((dest), '\0'); \
 	} ONCE
 #define RTRIM(whatbuf, whatp) do { (whatp)--; \
 	while ((whatp) >= (whatbuf) && \
-	(*(whatp)==' ')) \
+	(*(whatp) == ' ')) \
 	*((whatp)--) = '\0'; } ONCE
 #define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
 	(whatp) && (*(whatp) == ' '); \
@@ -959,7 +963,7 @@ parse_from (
 	/* 0 = unknown, 1 = address */
 
 	*asp = *cmtp = '\0';
-	for (; *ap ; ap++) {
+	for (; *ap; ap++) {
 		switch (state) {
 			case 0 :
 				switch (*ap) {
@@ -1135,7 +1139,7 @@ untag_all_articles (void)
 	int untagged = FALSE;
 	register int i;
 
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		if (arts[i].tagged) {
 			arts[i].tagged = FALSE;
 			untagged = TRUE;
@@ -1234,7 +1238,7 @@ toggle_color (void)
 {
 #	ifdef USE_CURSES
 	if (!has_colors()) {
-		use_color = 0;
+		use_color = FALSE;
 		info_message (txt_no_colorterm);
 		return FALSE;
 	} else
@@ -1417,7 +1421,7 @@ get_arrow_key (int prech)
 		int i=0;
 
 		wait_a_while(i) {
-			usleep(SECOND_CHARACTER_DELAY * 1000);
+			usleep((unsigned long) (SECOND_CHARACTER_DELAY * 1000));
 			i++;
 		}
 #			else	/* !HAVE_USLEEP */
@@ -1441,7 +1445,7 @@ get_arrow_key (int prech)
 			i++;
 		}
 #					else /* !HAVE_POLL */
-		sleep(1);
+		(void) sleep(1);
 #					endif	/* HAVE_POLL */
 #				endif	/* HAVE_SELECT */
 #			endif	/* HAVE_USLEEP */
@@ -1578,7 +1582,7 @@ create_index_lock_file (
 
 	if (stat (the_lock_file, &sb) == 0) {
 		if ((fp = fopen (the_lock_file, "r")) != (FILE *) 0) {
-			fgets (buf, sizeof (buf), fp);
+			fgets (buf, (int) sizeof(buf), fp);
 			fclose (fp);
 #ifdef INDEX_DAEMON
 			error_message ("%s: Already started pid=[%d] on %s",
@@ -1590,10 +1594,10 @@ create_index_lock_file (
 			exit (1);
 		}
 	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
-		time (&epoch);
+		(void) time (&epoch);
 		fprintf (fp, "%6d  %s\n", process_id, ctime (&epoch));
 		fclose (fp);
-		chmod (the_lock_file, (S_IRUSR|S_IWUSR));
+		chmod (the_lock_file, (mode_t)(S_IRUSR|S_IWUSR));
 	}
 }
 
@@ -1963,9 +1967,9 @@ strfpath (
 				 */
 				envptr = getenv (tbuf);
 				if (envptr == (char *) 0 || (*envptr == '\0'))
-					strncpy (tbuf, defbuf, sizeof (tbuf)-1);
+					strncpy (tbuf, defbuf, sizeof(tbuf)-1);
 				else
-					strncpy (tbuf, envptr, sizeof (tbuf)-1);
+					strncpy (tbuf, envptr, sizeof(tbuf)-1);
 				i = strlen (tbuf);
 				if (i) {
 					if (str + i < endp - 1) {
@@ -2007,11 +2011,11 @@ strfpath (
 				 * Only convert if 1st char in format
 				 */
 				if (startp == format && savedir != (char *) 0) {
-					if (strfpath (savedir, buf, sizeof (buf), the_homedir,
+					if (strfpath (savedir, buf, sizeof(buf), the_homedir,
 					    (char *) 0, (char *) 0, (char *) 0)) {
 
 #ifdef HAVE_LONG_FILE_NAMES
-						my_strncpy (tmp, group, sizeof (tmp));
+						my_strncpy (tmp, group, sizeof(tmp));
 #else
 						my_strncpy (tmp, group, 14);
 #endif
@@ -2202,7 +2206,7 @@ strfmailer (
 					strcpy (tbuf, the_mailer);
 					break;
 				case 'S':	/* Subject */
-					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject, ismail), quote_area));
+					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject, ismail) , quote_area));
 					break;
 				case 'T':	/* To */
 					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to, ismail), quote_area));
@@ -2398,12 +2402,12 @@ iCopyFile (
 	{
 		if ((hFpDst = fopen (pcDstFile, "w")) != (FILE *) 0)
 		{
-			while (!feof (hFpSrc) && (iReadOk = fread (acBuffer, sizeof (acBuffer), 1, hFpSrc)) != -1)
+			while (!feof (hFpSrc) && (iReadOk = (int) fread (acBuffer, sizeof(acBuffer), 1, hFpSrc)) != -1)
 			{
 				lCurFilePos = ftell (hFpSrc);
 				iWriteSize = (size_t) (lCurFilePos - lSrcFilePos);
 				lSrcFilePos = lCurFilePos;
-				if ((iWriteOk = fwrite (acBuffer, iWriteSize, 1, hFpDst)) == -1)
+				if ((iWriteOk = (int) fwrite (acBuffer, iWriteSize, 1, hFpDst)) == -1)
 					break;
 			}
 			if (iReadOk != -1 && iWriteOk != -1)
@@ -2446,20 +2450,20 @@ random_organization(
 	if (*in_org != '/')
 		return in_org;
 
-	time (&epoch);
+	(void) time (&epoch);
 	srand ((unsigned int) epoch);
 
 	if ((orgfp = fopen(in_org, "r")) == NULL)
 		return selorg;
 
 	/* count lines */
-	while (fgets(selorg, sizeof(selorg), orgfp))
+	while (fgets(selorg, (int) sizeof(selorg), orgfp))
 		nool++;
 
 	fseek(orgfp, 0L, SEEK_SET);
 	sol = rand () % nool + 1;
 	nool = 0;
-	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))
+	while ((nool != sol) && (fgets(selorg, (int) sizeof(selorg), orgfp)))
 		nool++;
 
 	fclose(orgfp);
@@ -2489,9 +2493,9 @@ read_input_history_file (void) {
 	memset((void *) hist_pos, 0, sizeof(hist_pos));
 
 
-	while (fgets(buf, sizeof(buf), fp)) {
+	while (fgets(buf, (int) sizeof(buf), fp)) {
 
-		if ((chr = my_malloc(strlen(buf)+1)) != NULL) {
+		if ((chr = (char *) my_malloc(strlen(buf)+1)) != NULL) {
 			strcpy(chr, buf);
 			if ((chr1 = strpbrk(chr, "\n\r")) != NULL)
 				*chr1 = '\0';
@@ -2639,7 +2643,7 @@ strip_address (
 	} else {
 		start_pos++; /* skip '<' */
 		strcpy (stripped_address, start_pos);
-		start_pos=stripped_address;
+		start_pos = stripped_address;
 		if ((end_pos = strchr (start_pos, '>')) == (char *) 0)
 		end_pos = start_pos+strlen(start_pos); /* skip '>' */
 	}
