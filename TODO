@@ -142,7 +142,7 @@ o  at top-level 'Q' ask you if you really want to quit, useful?
 
 o  tin sometimes freezes while saving a thread
 
-o  tin sometimes crashes (thread.c) 710/892
+o  tin sometimes crashes (thread.c) 710/892/959
 
 o  marking hot-articles read with 'K' and then post-process the newsgroup
    also processes the read articles

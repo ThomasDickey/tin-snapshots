@@ -611,7 +611,7 @@ write_config_file (file)
 	fprintf (fp, "# time interval in seconds between rereading the active file\n");
 	fprintf (fp, "reread_active_file_secs=%d\n\n", reread_active_file_secs);
 	fprintf (fp, "# characters used in quoting to followups and replys.\n");
-	fprintf (fp, "# '_' is replaced by ' ', %%s is replaced by initials.\n");
+	fprintf (fp, "# '_' is replaced by ' ', %%s, %%S are replaced by author's initials.\n");
 	fprintf (fp, "quote_chars=%s\n\n", quote_space_to_dash (quote_chars));
 	fprintf (fp, "# character used to show that an art was deleted (default 'D')\n");
 	fprintf (fp, "art_marked_deleted=%c\n\n", art_marked_deleted);

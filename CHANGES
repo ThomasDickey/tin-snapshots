@@ -1,3 +1,7 @@
+062) Chris Blum <chris@phil.uni-sb.de>
+     ADD. mm_charset default if env is not set
+     FIX. rfc1522.c
+
 --950824BETA  PLMC.960606 --
 
 061) Daniel Naber <dnaber@pluto.teuto.de>
