@@ -128,7 +128,7 @@ int
 prompt_yn (
 	int line,
 	const char *prompt,
-	int default_answer)
+	t_bool default_answer)
 {
 	char ch, prompt_ch;
 	int yn_loop = TRUE;
@@ -160,7 +160,7 @@ prompt_yn (
 #endif /* WIN32 */
 					case KEYMAP_UP:
 					case KEYMAP_DOWN:
-						default_answer = 1 - default_answer;
+						default_answer = !default_answer;
 						yn_loop = TRUE; /* don't leave loop */
 						break;
 
@@ -200,57 +200,6 @@ prompt_yn (
 	return (tolower ((unsigned char)ch) == tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
 
-/*
-** same as above but without cursor-key support
-** needed in nntplib.c where accidently hitting the cursor key
-** could cause a disconnect from the newsserver
-*/
-
-int 
-prompt_yn2 (
-	int line,
-	const char *prompt,
-	int default_answer)
-{
-	char ch, prompt_ch;
-	char cvalid[10];
-
-	set_alarm_clock_off ();
-	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
-
-	sprintf(cvalid, "%c%c%c", tolower((unsigned char)iKeyPromptYes), tolower((unsigned char)iKeyPromptNo), ESC);
-
-	MoveCursor (line, 0);
-	CleartoEOLN ();
-	my_printf ("%s%c", prompt, prompt_ch);
-	cursoron ();
-	my_flush ();
-	MoveCursor (line, (int) strlen (prompt));
-
-	do {
-		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
-			ch = prompt_ch;
-		}	
-		ch = tolower((unsigned char)ch);
-	} while (!strchr(cvalid, ch));
-
-	if (line == cLINES) {
-		clear_message ();
-	} else {
-		MoveCursor (line, (int) strlen (prompt));
-		if (ch == ESC) {
-			my_fputc (prompt_ch, stdout);
-		} else {
-			my_fputc (ch, stdout);
-		}
-	}
-	cursoroff ();
-	my_flush ();
-
-	set_alarm_clock_on ();
-
-	return (ch == (char)tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
-}
 
 /*
  * help_text is displayed near the bottom of the screen.

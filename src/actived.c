@@ -284,18 +284,22 @@ my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 	}
 
 	tDirFile = opendir (pcGrpPath);
-/*
-my_printf ("opendir(%s)\n", pcGrpPath);
-*/
+
+#if 0
+	my_printf ("opendir(%s)\n", pcGrpPath);
+#endif
+
 	if (tDirFile != (DIR *) 0) {
 		iIsDir = FALSE;
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
 			strncpy (acFile, tFile->d_name, (size_t) D_NAMLEN(tFile));
 			acFile[D_NAMLEN(tFile)] = '\0';
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
-/*
+
+#if 0
 my_printf ("STAT=[%s]\n", acPath);
-*/
+#endif
+
 			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
 				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
 				if (stat (acPath, &sStatInfo) != -1) {

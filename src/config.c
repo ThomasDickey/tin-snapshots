@@ -561,10 +561,7 @@ read_config_file (
 #ifdef HAVE_POSIX_REGEX
 		case 'w':
 			if (match_integer (buf, "wildcard=", &wildcard, TRUE+1)) {
-				if (wildcard == 0)
-					wildcard_func = wildmat;
-				else
-					wildcard_func = match_regex;
+				wildcard_func = (wildcard) ? match_regex : wildmat;
 				break;
 			}
 #endif
@@ -1481,10 +1478,7 @@ change_config_file (
 
 #ifdef HAVE_POSIX_REGEX
 						case OPT_WILDCARD:
-							if (wildcard == 0)
-								wildcard_func = wildmat;
-							else
-								wildcard_func = match_regex;
+							wildcard_func = (wildcard) ? match_regex : wildmat;
 							break;
 #endif
 

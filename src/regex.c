@@ -18,6 +18,25 @@
 #include <regex.h>
 
 /*
+ * regexec error routine to return an error message in the 'msg' global
+ */
+static void
+regex_error(
+	int error,
+	regex_t preg)
+{
+	char errmsg[LEN];
+	size_t size;
+
+	if ((size = regerror(error, &preg, errmsg, sizeof(errmsg))) > sizeof(errmsg))
+		sprintf(msg, "Start of regex error: %s", errmsg);
+	else
+		sprintf(msg, "Error in regex: %s", errmsg);
+
+	return;
+}
+
+/*
  * See if pattern is matched in string. Return TRUE or FALSE
  * if icase=TRUE then ignore case in the compare
  */
@@ -27,12 +46,12 @@ match_regex(
 	char *pattern,
 	t_bool icase)
 {
-	char errmsg[LEN];
 	int flags = REG_NOSUB | REG_EXTENDED;
 	int error, ret = FALSE;
-	size_t size;
 	regex_t preg;
 	
+	msg[0] = '\0';
+
 	if (icase)
 		flags |= REG_ICASE;
 
@@ -40,12 +59,7 @@ match_regex(
 	 * Compile the expression internally.
 	 */
 	if ((error = regcomp(&preg, pattern, flags)) != 0) {
-/* TODO find way to keep this on screen, else it will be overwritten by 'no match' */
-		if ((size = regerror(error, &preg, errmsg, sizeof(errmsg))) > sizeof(errmsg))
-			error_message("Start of regex error: %s", errmsg);
-		else
-			error_message("Error in regex: %s", errmsg);
-
+		regex_error(error, preg);
 		return(FALSE);
 	}
 
@@ -60,10 +74,7 @@ match_regex(
 			break;
 
 		default:								/* Something wrong... */
-			if ((size = regerror(error, &preg, errmsg, sizeof(errmsg))) > sizeof(errmsg))
-				error_message("Start of regex error: %s", errmsg);
-			else
-				error_message("Error in regex: %s", errmsg);
+			regex_error(error, preg);
 	}
 
 	regfree(&preg);

@@ -134,7 +134,7 @@ bld_tline (
 		for (ptr = art->refptr; ptr->parent != NULL; ptr = ptr->parent) {
 			strcat(buff, THREAD_SPACER);
 
-			if (strlen(buff) >= cCOLS)		/* If extremely nested */
+			if ((int)strlen(buff) >= cCOLS)		/* If extremely nested */
 				return;
 		}
 
@@ -772,11 +772,7 @@ thread_catchup:
 				}
 				update_thread_page ();
 				break;
-#if 0
-			case iKeyThreadDisplaySubject:
-				info_message (arts[(choose_response (thread_basenote, thread_index_point))].subject);
-				break;
-#endif
+
 			default:
 				info_message (txt_bad_command);
 		}

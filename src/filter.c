@@ -165,6 +165,7 @@ read_filter_file (
 	int	global_file)
 {
 #ifndef INDEX_DAEMON
+	FILE *fp;
 	char buf[HEADER_LEN];
 	char group[HEADER_LEN];
 	char scope[HEADER_LEN];
@@ -173,7 +174,8 @@ read_filter_file (
 	char msgid[HEADER_LEN];
 	char lines[HEADER_LEN];
 	char xref[HEADER_LEN];
-	FILE *fp;
+	char xref_score[HEADER_LEN];
+	char *s;
 	int expired = FALSE;
 	int expired_time = FALSE;
 	int global = TRUE;
@@ -182,11 +184,9 @@ read_filter_file (
 	int xref_max = 0;
 	int xref_score_cnt=0;
 	int xref_score_value=0;
-	char xref_score[HEADER_LEN];
 	time_t current_secs = 0L;
 	long secs = 0L;
 	struct t_group *psGrp;
-	char *s;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0) {
 		return FALSE;
@@ -1205,7 +1205,7 @@ iAddFilterRule (
 	}
 
 	if (psRule->text[0]) {
-		sprintf (acBuf, "*%s*", psRule->text);		/* TODO - why the '*'s ? */
+		sprintf (acBuf, "*%s*", psRule->text);
 		if (psRule->check_string) {
 			strcpy (acBuf, pcChkRegexStr (acBuf));
 		}

@@ -48,6 +48,7 @@ constext txt_author_search_backwards[] = "Author search backwards [%s]> ";
 constext txt_author_search_forwards[] = "Author search forwards [%s]> ";
 constext txt_authorization_ok[] = "Authorized for user: %s\n";
 constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
+constext txt_autoselecting_articles[] = "Autoselecting articles (use 'X' to see all unread) ...";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";
 constext txt_bad_command[] = "Bad command.  Type 'h' for help.";

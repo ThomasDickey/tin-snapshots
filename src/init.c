@@ -137,7 +137,7 @@ int max_subj = 0;
 int num_headers_to_display;		/* num headers to display -- swp */
 int num_headers_to_not_display;	/* num headers to not display -- swp */
 int num_of_killed_arts;
-int num_of_selected_arts;
+int num_of_selected_arts;		/* num articles marked 'hot' */
 int num_of_tagged_arts;
 int post_mime_encoding;
 int process_id;		/* FIXME: use pid_t instead of int */
@@ -162,8 +162,7 @@ int use_local_charset=TRUE;
 
 #ifdef HAVE_COLOR
 int use_color;						/* enables/disables ansi-color support under linux-console and color-xterm */
-t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
-int col_back;						/* standard bacground color */
+int col_back;						/* standard background color */
 int col_invers_fg;				/* color of inverse text (foreground) */
 int col_invers_bg;				/* color of inverse text (background) */
 int col_text;						/* color of textlines*/
@@ -180,10 +179,11 @@ int col_normal;					/* standard foreground color */
 int col_title;						/* color of Help/Mail-Sign */
 int col_signature;				/* color of signature */
 int word_highlight;				/* word highlighting on/off */
-t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 int word_h_display_marks;		/* display * or _ when highlighting or space or nothing*/
 int col_markstar;					/* text highlighting with *stars* */
 int col_markdash;					/* text highlighting with _underdashes_ */
+t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
+t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 #endif
 
 t_bool alternative_handling=TRUE;
@@ -261,13 +261,13 @@ t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
 t_bool xuser_supported = FALSE;
 
-#ifdef HAVE_SYS_UTSNAME_H
-struct utsname system_info;
-#endif
-
 #ifdef HAVE_METAMAIL
 t_bool use_metamail;				/* enables/disables metamail on MIME messages */
 t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
+#endif
+
+#ifdef HAVE_SYS_UTSNAME_H
+struct utsname system_info;
 #endif
 
 #ifndef M_AMIGA

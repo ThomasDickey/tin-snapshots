@@ -438,17 +438,5 @@ Filtering enhancements
 o  add command: mark all articles older than <date> as read
    (useful when subscribing to a new group with high-traffic...)
 
-o  fix kill/hot mechanism that you could kill/mark hot everything which
-   contains abc OR def... like "tin *|* tin|* tin *" -even better would be
-   a routine which recognizes word-delimiters so that "tin:" or "'tin'"
-   would be also matched in an expression like "^tin^" and which would not
-   match "posting"
-
 o  fix kill/hot mechanism so that it is possible do kill articles with
-   "X-*" headers (X-Mailer: Bazilla 47.11 etc.)
-
-o  add kill mechanism on Newsgroups:-line (f.e.: in junk I only want to see
-   all those articles which are not! posted to junk)
-   group=junk
-   type=0
-   newsgroups=junk
+   arbitrary headers

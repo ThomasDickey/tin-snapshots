@@ -231,12 +231,14 @@ get_val (
 }
 
 
+#define EDITOR_BACKUP_FILE_EXT ".b"
+
 int
 invoke_editor (
 	char *filename,
 	int lineno)
 {
-	char buf[PATH_LEN];
+	char buf[PATH_LEN],fnameb[PATH_LEN];
 	char editor_format[PATH_LEN];
 	char *my_editor;
 	int retcode;
@@ -268,7 +270,13 @@ invoke_editor (
 
 	wait_message (buf);
 
-	return invoke_cmd (buf);
+	retcode = invoke_cmd (buf);
+#ifdef EDITOR_BACKUP_FILE_EXT
+	strcpy (fnameb, filename);
+	strcat (fnameb, EDITOR_BACKUP_FILE_EXT);
+	unlink (fnameb);
+#endif
+	return retcode;
 }
 
 #ifdef HAVE_ISPELL
@@ -885,9 +893,10 @@ parse_from (
 		 *asp = asbuf,
 		*cmtp = cmtbuf;
 	unsigned int state = 0;
-/* 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
-** 3 = in angle brackets, 4 = in parentheses
-*/
+/*
+ * 0 = fundamental, 1 = in quotes, 2 = escaped in quotes,
+ * 3 = in angle brackets, 4 = in parentheses
+ */
 
 	unsigned int plevel = 0;
 	/* Parentheses nesting level */
@@ -2137,11 +2146,23 @@ make_group_path (
 	char *name,
 	char *path)
 {
+#if 0
 	char *ptr;
+#endif
 
 #ifdef VMS
 	sprintf(path, "[%s]", name);
 #else
+	while (*name) {
+		if (*name == '.')
+			*path = '/';
+		else
+			*path = *name;
+		name++;
+		path++;
+	} 
+	*path = '\0';
+#if 0	/* TODO */
 	strcpy (path, name);
 
 	ptr = path;
@@ -2152,6 +2173,7 @@ make_group_path (
 		}
 		ptr++;
 	}
+#endif
 #endif
 }
 
