@@ -143,7 +143,7 @@ repair_article(
 }
 
 /* make a backup copy of ~/.article, this is necessary since
- * submit_news_file adds headers, does q-p conversion etc 
+ * submit_news_file adds headers, does q-p conversion etc
  */
 
 static char *
@@ -1130,7 +1130,7 @@ post_article_done:
 		    * crossposted postponed articles, since we don't
 		    * know in which group the article was actually in
 		    */
-			if (add_posted_to_filter && !strchr(group, ',') && 
+			if (add_posted_to_filter && !strchr(group, ',') &&
 			  (psGrp=psGrpFind(group)))
 				quick_filter_select_posted_art (psGrp, subj);
 			update_posted_info_file (group, strncmp(subj, "Re: ", 4) ? 'w' : 'f', subj);
@@ -1227,7 +1227,7 @@ fetch_postponed_article(
 	in = fopen(postponed_articles_file, "r");
 	out = fopen(tmp_file, "w");
 	tmp = fopen(postponed_tmp, "w");
-	
+
 	if (in==NULL || out==NULL || tmp==NULL) {
 		if (in)
 			fclose(in);
@@ -1256,14 +1256,14 @@ fetch_postponed_article(
 	 * but we don't know we are on the last line until we read the next
 	 * line containing "From "
 	 */
-	
+
 	while(fgets(line, sizeof(line), in)!=NULL) {
 		if(strncmp(line, "From ", 5)==0)
 			first_article=FALSE;
 		if(first_article) {
 			match_string(line, "Newsgroups: ", newsgroups, HEADER_LEN);
 			match_string(line, "Subject: ", subject, HEADER_LEN);
-			
+
 			if(prev_line_nl)
 				fputc('\n', out);
 
@@ -1577,7 +1577,7 @@ post_article_done:
 		}
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
 
-			if (add_posted_to_filter) 
+			if (add_posted_to_filter)
 				quick_filter_select_posted_art (psGrp, subj);
 
 			update_posted_info_file (group, 'w', subj);

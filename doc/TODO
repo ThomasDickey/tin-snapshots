@@ -29,10 +29,6 @@ o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    [Jason C Lin <jlin@hawaii.edu>]
    [I can't reproduce this - jason@radar.demon.co.uk]
 
-o  word_h_display_marks, word_highlighting and wildcard (tinrc) are
-   sometimes reset to their default value.
-   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
 o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
    ~/.signature ~/.signature is used instead of ~/.tin/sig
    (does not happen if a sigfile is specified via attributes i.e.
@@ -63,8 +59,6 @@ o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
    compile at all... - use -O2 for debug.c!!
 
 o  - fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
-
-o  - crsr/page-up/down does not work in large articles.
 
 o  --enable-curses has several bugs
    (screen redraw is broken, tty-settings get messed up, color might not
@@ -157,6 +151,8 @@ o  when enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
+o  add In-Reply-To: header if using mailreader_i
+
 o  add a mutt-like threading tree
 
 o  if using "-n" commandline switch you can't subscribe to newsgroups not
@@ -285,11 +281,6 @@ o  when posting to a group containing uppercase-letters: bring up a
 	case letters, since no widespread  newsgroup  name
 	uses  them  anyway; this avoids any possibility of
 	confusion.
-
-o  when server responses with:
-   "441 The newsgroup "foo.bar" has been renamed to "bar.foo"."
-   ask the user if he wants to post to "bar.foo" instead of "foo.bar"
-   (Y/n)
 
 o  when From: only contains "First-name Last-name" tin strips the space
    misc.c:parse_from() ??

@@ -8,7 +8,7 @@ This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
   --enable-8bit-keys	     --with-inn-nntplib		HAVE_FASCIST_NEWSADMIN
   --enable-color	     --with-iso-to-ascii	HAVE_MMDF_MAILER
-  --enable-curses	     --with-ispell		HAVE_TIN_NNTP_EXTS
+  --enable-curses	     --with-ispell
   --enable-debug	     --with-libdir		INDEX_DAEMON
   --enable-etiquette	     --with-metamail		NNTP_INEWS
   --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
@@ -202,9 +202,6 @@ Only define if your NNTP-server file is other than /etc/nntpserver.
 
 NETLIBS
 Contains the networking libraries needed to link with nntplib.o file.
-
-HAVE_TIN_NNTP_EXTS
-Define if you have a NNTP server that supports my XMOTD & XUSER patches.
 
 Daemon options
 --------------

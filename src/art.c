@@ -454,7 +454,6 @@ thread_by_subject(void)
 	}
 #endif
 
-
 }
 
 /*
@@ -613,6 +612,8 @@ parse_headers (
 
 #if 1 /* join continuation headers */
 	while ((ptr = fgets_hdr(buf, sizeof(buf), fp)) != NULL) {
+		if (*buf != '\0' && buf[strlen(buf)-1] == '\n')
+			buf[strlen(buf)-1] = '\0';
 #else
 	while ((ptr = tin_fgets(buf, sizeof(buf), fp)) != NULL) {
 #endif

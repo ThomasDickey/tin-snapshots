@@ -23,7 +23,7 @@
 #define IS_SELECTED(i)	(arts[i].selected)
 
 /* SET_FILTER in group grp, current article arts[i], with rule ptr[j] */
-/* 
+/*
  * filtering is now done this way:
  * a. set score for all articles and rules
  * b. check each article if the score is above or below the limit
@@ -75,10 +75,10 @@ static void free_filter_item (struct t_filter *ptr);
 	static void vWriteFilterFile (char *pcFile);
 #endif
 
-/* 
-** Filter cache structure using Philip Hazel's Perl regular expression
-** library (see pcre/pcre.[ch] for details)
-*/
+/*
+ * Filter cache structure using Philip Hazel's Perl regular expression
+ * library (see pcre/pcre.[ch] for details)
+ */
 struct regex_cache {
 	pcre		*re;
 	pcre_extra	*extra;
@@ -104,9 +104,9 @@ psExpandFilterArray (
 	return new;
 }
 
-/* 
+/*
  * vSetFilter() initialises a struct t_filter with default values
- */ 
+ */
 
 
 #ifndef INDEX_DAEMON
@@ -289,7 +289,7 @@ if (debug) {
 				break;
 			}
 		break;
-				                                                
+
 		case 'l':
 			if (match_string (buf+1, "ines=", lines, sizeof (lines))) {
 				if (arr_ptr && !expired_time) {
@@ -808,7 +808,7 @@ filter_menu (
 		 */
 		if (rule.subj_ok || rule.from_ok)
 			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_no, txt_full, txt_last, (char *)0, (char *)0);
-		else 
+		else
 			i = get_choice (INDEX_TOP+5, txt_help_filter_msgid, text_msgid, txt_full, txt_last, txt_no, (char *)0, (char *)0);
 
 		if (i == -1)
@@ -938,7 +938,7 @@ filter_menu (
 		if (i == -1)
 			return FALSE;
 
-		strcpy (rule.scope, ((i != FALSE) ? "*" : argv[i]));
+		strcpy (rule.scope, ((i == 1) ? "*" : argv[i]));
 	} else
 		return FALSE;
 
@@ -1362,7 +1362,7 @@ filter_articles (
 
 	num_of_killed_arts = 0;
 	num_of_selected_arts = 0;
-	
+
 	/*
 	 * check if there are any global filter rules
 	 */
@@ -1388,7 +1388,7 @@ filter_articles (
 	 */
 	if (wildcard) {
 		int msiz;
-		
+
 		msiz = sizeof(struct regex_cache) * num;
 		regex_cache_subj = (struct regex_cache *) my_malloc(msiz);
 		regex_cache_from = (struct regex_cache *) my_malloc(msiz);
@@ -1431,7 +1431,7 @@ filter_articles (
 								sprintf(msg, "Error in regex: %s at pos. %d",
 								   regex_errmsg, regex_errpos);
 							if (regex_cache_subj[j].re) {
-								regex_cache_subj[j].extra = 
+								regex_cache_subj[j].extra =
 								  pcre_study(regex_cache_subj[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL) {
 									sprintf(msg, "Error in regex: study - pcre internal error %s",
@@ -1440,7 +1440,7 @@ filter_articles (
 							}
 						}
 						if (regex_cache_subj[j].re) {
-							regex_errpos = 
+							regex_errpos =
 							  pcre_exec(regex_cache_subj[j].re,
 							    regex_cache_subj[j].extra,
 							    arts[i].subject,
@@ -1451,9 +1451,9 @@ filter_articles (
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
 								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 						}
-					}		                                                
+					}
 				}
-				
+
 				/*
 				 * Filter on From: line
 				 */
@@ -1473,7 +1473,7 @@ filter_articles (
 								sprintf(msg, "Error in regex: %s at pos. %d",
 								   regex_errmsg, regex_errpos);
 							if (regex_cache_from[j].re) {
-								regex_cache_from[j].extra = 
+								regex_cache_from[j].extra =
 								  pcre_study(regex_cache_from[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL) {
 									sprintf(msg, "Error in regex: study - pcre internal error %s",
@@ -1492,7 +1492,7 @@ filter_articles (
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
 								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 						}
-					}		                                                
+					}
 				}
 
 				/*
@@ -1531,7 +1531,7 @@ filter_articles (
 								sprintf(msg, "Error in regex: %s at pos. %d",
 								   regex_errmsg, regex_errpos);
 							if (regex_cache_msgid[j].re) {
-								regex_cache_msgid[j].extra = 
+								regex_cache_msgid[j].extra =
 								  pcre_study(regex_cache_msgid[j].re, 0, &regex_errmsg);
 								if (regex_errmsg != NULL) {
 									sprintf(msg, "Error in regex: study - pcre internal error %s",
@@ -1540,7 +1540,7 @@ filter_articles (
 							}
 						}
 						if (regex_cache_msgid[j].re) {
-							regex_errpos = 
+							regex_errpos =
 								pcre_exec(regex_cache_msgid[j].re,
 								regex_cache_msgid[j].extra,
 								myrefs,
@@ -1551,7 +1551,7 @@ filter_articles (
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
 								 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 							else  { /* No match, try Message-ID */
-								regex_errpos = 
+								regex_errpos =
 								  pcre_exec(regex_cache_msgid[j].re,
 								    regex_cache_msgid[j].extra,
 								    MSGID(art),
@@ -1563,7 +1563,7 @@ filter_articles (
 									sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 							}
 						}
-					}		                                                
+					}
 					FreeIfNeeded(refs);
 				}
 				/*
@@ -1651,7 +1651,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 												sprintf(msg, "Error in regex: %s at pos. %d",
 												  regex_errmsg, regex_errpos);
 											if (regex_cache_xref[j].re) {
-												regex_cache_xref[j].extra = 
+												regex_cache_xref[j].extra =
 												  pcre_study(regex_cache_xref[j].re, 0, &regex_errmsg);
 												if (regex_errmsg != NULL) {
 													sprintf(msg, "Error in regex: study - pcre internal error %s",
@@ -1671,7 +1671,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											else if (regex_errpos != PCRE_ERROR_NOMATCH)
 												 sprintf(msg, "Error in regex: pcre internal error %d", regex_errpos);
 										}
-									}		                                                
+									}
 								}
 							}
 							s=e;
@@ -1689,7 +1689,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	}
 
 	/*
-	 * throw away the contents of all regex_caches 
+	 * throw away the contents of all regex_caches
 	 *
 	 */
 	if (wildcard) {
@@ -1740,7 +1740,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
  * arguments.
  */
 
-/* 
+/*
  * If filter_articles() is really score_articles() now then this
  * function is unnecessary anyway
  * TODO: replace calls to this routine by calls to filter_articles()

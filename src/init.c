@@ -72,8 +72,6 @@ char mailbox[PATH_LEN];			/* system mailbox for each user */
 char mailer[PATH_LEN];			/* mail program */
 char mailgroups_file[PATH_LEN];
 char mm_charset[LEN]="";		/* MIME charset: moved from rfc1522.c */
-char motd_file[PATH_LEN];		/* news motd file for newsadmin purposes */
-char motd_file_info[PATH_LEN];	/* date of last time news motd file read */
 char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char my_distribution[LEN];		/* Distribution: */
 char news_headers_to_display[LEN];		/* which headers to display */
@@ -279,13 +277,9 @@ t_bool use_keypad;		/* enables/disables scroll keys on supported terminals */
 t_bool use_mailreader_i;	/* invoke user's mailreader earlier to use more of its features (i = interactive) */
 t_bool use_mouse;		/* enables/disables mouse support under xterm */
 t_bool verbose = FALSE;		/* update index files only mode */
-t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
+t_bool (*wildcard_func) (const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
-
-#ifdef HAVE_TIN_NNTP_EXTS
-	t_bool xuser_supported = FALSE;
-#endif
 
 /* History entries */
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
@@ -680,7 +674,7 @@ void init_selfinfo (void)
 	post_proc_command[0] = '\0';
 	proc_ch_default = 'n';
 	strcpy (news_headers_to_display, "Newsgroups Followup-To Summary Keywords");
-	news_headers_to_display_array = ulBuildArgv(news_headers_to_display, 
+	news_headers_to_display_array = ulBuildArgv(news_headers_to_display,
 															  &num_headers_to_display);
 	news_headers_to_not_display[0] = '\0';
 	news_headers_to_not_display_array = NULL;
@@ -786,7 +780,6 @@ void init_selfinfo (void)
 #endif
 	joinpath (msg_headers_file, rcdir, MSG_HEADERS_FILE);
 	joinpath (mailgroups_file, rcdir, MAILGROUPS_FILE);
-	joinpath (motd_file, libdir, MOTD_FILE);
 	joinpath (news_active_file, libdir, get_val ("TIN_ACTIVEFILE", ACTIVE_FILE));
 	joinpath (newsgroups_file, libdir, NEWSGROUPS_FILE);
 #ifdef WIN32

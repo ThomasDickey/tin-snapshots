@@ -639,7 +639,6 @@ extern char *get_uaf_fullname();
 #define 	INPUT_HISTORY_FILE	".inputhistory"
 #define 	MAILGROUPS_FILE 	"mailgroups"
 #define 	MSG_HEADERS_FILE	"headers"
-#define 	MOTD_FILE		"motd"
 #define 	NEWSRC_FILE		".newsrc"
 #define 	NEWSRCTABLE_FILE	"newsrctable"
 /* ifdef APPEND_PID (default) NEWNEWSRC_FILE will be .newnewsrc<pid> */
@@ -804,7 +803,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #ifdef NNTP_ABLE
 #	define TIN_FCLOSE(x)	if (!read_news_via_nntp) fclose(x)
 #else
-#	define TIN_FCLOSE		fclose(x)
+#	define TIN_FCLOSE(x)	fclose(x)
 #endif /* NNTP_ABLE */
 
 /*

@@ -24,13 +24,22 @@
 int tin_errno;
 
 /*
+ * local prototypes
+ */
+static char * tin_read (char *buffer, size_t len, FILE *fp);
+#ifdef NNTP_ABLE
+	static t_bool wait_for_input (FILE *fd);
+#endif
+
+#ifdef NNTP_ABLE
+/*
  * Used by the I/O read routine to look for keyboard input
  * Returns TRUE if user aborted with 'q'
  *         FALSE otherwise
  * Exits via tin_done() on irrecoverable errors
  */
 static t_bool
-wait_for_input(
+wait_for_input (
 	FILE *fd)
 {
 	int nfds, ch;
@@ -105,6 +114,7 @@ DEBUG_IO((stderr, "file ready\n"));
 	/* NOTREACHED */
 	return(FALSE);
 }
+#endif /* NNTP_ABLE */
 
 /*
  * Support routine to read a fixed size buffer. This does most of the
@@ -113,7 +123,7 @@ DEBUG_IO((stderr, "file ready\n"));
 int partial_read = FALSE;
 
 static char *
-tin_read(
+tin_read (
 	char *buffer,
 	size_t len,
 	FILE *fp)
@@ -121,7 +131,7 @@ tin_read(
 	int i;
 	char *ptr;
 
-
+#ifdef NNTP_ABLE
 	if (fp == nntp_rd_fp)
 		if (wait_for_input(fp)) {			/* Check if okay to read */
 			info_message("Aborting read, please wait...");
@@ -138,6 +148,7 @@ tin_read(
 	if (fp == nntp_rd_fp)
 		ptr = get_server(buffer, len);
 	else
+#endif /* NNTP_ABLE */
 		ptr = fgets (buffer, len, fp);
 
 /* TODO check system errno here ?  */
@@ -163,7 +174,9 @@ tin_read(
 	/*
 	 * Do processing of leading . for NNTP case here and here _only_
 	 */
+#ifdef NNTP_ABLE
 	if (fp != nntp_rd_fp)
+#endif /* NNTP_ABLE */
 		return(buffer);
 
 	if (STRCMPEQ(buffer, "."))		/* end of text */
@@ -254,7 +267,7 @@ DEBUG_IO((stderr, "Oversized read !%s!\n", dynbuf));
  * pending data on the NNTP port
  */
 void
-drain_buffer(
+drain_buffer (
 	FILE *fp)
 {
 #ifdef NNTP_ABLE
@@ -275,7 +288,7 @@ DEBUG_IO((stderr, "Drain %s\n", buf));
 }
 
 /* It works the same way as fgets except that it converts
-   new line character into ' ' if the first character following it 
+   new line character into ' ' if the first character following it
    is white space(' ' or '\t'). It's used by rfc1521.c
    to concatenate multiple line header field into a single line.
    It also removes leading white spaces in continuation header lines
@@ -336,7 +349,7 @@ fgets_hdr (
 
 	if (s1 == s)
 		return NULL;
-	else 
+	else
 		return s;
 }
 

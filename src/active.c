@@ -271,7 +271,6 @@ read_news_active_file (void)
 
 			if (cmd_line)
 				my_fputc ('\n', stderr);
-
 			if (read_news_via_nntp)
 				error_message (txt_cannot_open, news_active_file);
 			else
@@ -682,81 +681,6 @@ find_newnews_index (
 	}
 
 	return (-1);
-}
-
-/*
- * check for message of the day (motd) file
- *
- * If reading news locally stat() the active file to get its
- * mtime otherwise do a XMOTD command to the NNTP server
- */
-
-void
-read_motd_file (void)
-{
-#ifndef INDEX_DAEMON
-	char motd_file_date[32];
-	time_t new_motd_date = (time_t) 0;
-	time_t old_motd_date = (time_t) 0;
-	struct stat sb;
-	struct tm *tm;
-#ifdef HAVE_TIN_NNTP_EXTS
-	char buf[NNTP_STRLEN];
-	char *line;
-	FILE *fp;
-	int lineno = 0;
-#endif /* HAVE_TIN_NNTP_EXTS */
-
-	if (!INTERACTIVE)
-		return;
-
-	old_motd_date = (time_t) atol (motd_file_info);
-
-	/*
-	 * reading news locally (local) or via NNTP (server name)
-	 */
-	if (read_news_via_nntp) {
-		if (!old_motd_date)
-			strcpy (motd_file_date, "920101 000000");
-		else {
-			tm = localtime (&old_motd_date);
-			sprintf (motd_file_date, "%02d%02d%02d %02d%02d%02d",
-				tm->tm_year, tm->tm_mon+1, tm->tm_mday,
-				tm->tm_hour, tm->tm_min, tm->tm_sec);
-		}
-		time (&new_motd_date);
-	} else {
-		if (stat (motd_file, &sb) >=0)
-			new_motd_date = sb.st_mtime;
-	}
-
-	if (old_motd_date && new_motd_date > old_motd_date) {
-#ifdef HAVE_TIN_NNTP_EXTS
-		if ((fp = open_motd_fp (motd_file_date)) != (FILE *) 0) {
-			while ((line = tin_fgets (buf, sizeof (buf), fp)) != 0) {
-				my_printf ("%s", line);
-				lineno++;
-			}
-			TIN_FCLOSE (fp);
-
-/* TODO probably needs testing */
-			if (lineno) {
-				wait_message (0, txt_return_key);
-				Raw (TRUE);
-				ReadCh ();
-				Raw (FALSE);
-				wait_message (0, "\n");
-			}
-		}
-#endif
-	}
-
-	/*
-	 * update motd tinrc entry with new date
-	 */
-	sprintf (motd_file_info, "%ld", new_motd_date);
-
-#endif	/* INDEX_DAEMON */
 }
 
 /*

@@ -39,6 +39,7 @@ struct t_save *save;			/* sorts articles before saving them */
  * Local prototypes
  */
 static void free_newnews_array (void);
+static void free_active_arrays (void);
 
 /*
  *  Dynamic table management
@@ -269,7 +270,7 @@ free_attributes_array (void)
 }
 
 
-void
+static void
 free_active_arrays (void)
 {
 	register int i;

@@ -1,3 +1,31 @@
+-- pre-1.4 release 971204 --
+
+508) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. 's'ave article in thread-level always saved base article
+     FIX. thread.c
+
+507) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. group=hierarchie.* in filter-editor was always changed to
+          group=*
+     FIX. filter.c
+
+506) Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup (removed obsolete XMOTD/XUSER-code,
+          manpage-updated, ...)
+     FIX. several patches
+
+505) Holger Schif <rastaman@eikon.e-technik.tu-muenchen.de>
+     BUG. doesn't compie if configured with --disable-nntp
+     FIX. open.c, read.c, tin.h
+
+504) Jungshik Shin <jshin@pantheon.yale.edu>
+     BUG. $NNTPSERVER overrides -g if using external inews
+     FIX. nntplib.c
+
+503) Andreas Kies <andi@muenchen.roses.de>
+     BUG. generated corrupted index files
+     FIX. art.c
+
 -- pre-1.4 release 971127 --
 
 502) Sven Paulus <sven@tin.org>

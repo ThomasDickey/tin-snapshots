@@ -412,12 +412,12 @@ end_of_thread:
 				break;
 
 			case iKeyThreadSave: /* save articles with prompting */
-				if (index_point >= 0)
-					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
+				if (thread_basenote >= 0)
+					feed_articles (FEED_SAVE, THREAD_LEVEL, &CURR_GROUP, find_response (thread_basenote, thread_index_point));
 				break;
 
 			case iKeyThreadSaveTagged:   /* save tagged articles without prompting */
-				if (index_point >= 0) {
+				if (thread_basenote >= 0) {
 					if (num_of_tagged_arts)
 						feed_articles (FEED_SAVE_TAGGED, THREAD_LEVEL, &CURR_GROUP, (int) base[index_point]);
 					else
