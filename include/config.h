@@ -93,8 +93,8 @@
 #endif
 
 #if !defined(gould) && !defined(MACH) && \
-    !defined(mips) && !defined(__NeXT__) && !defined(M_OS2) && \
-	!defined(WIN32)
+	!defined(mips) && !defined(__NeXT__) && !defined(M_OS2) && \
+	!defined(WIN32) && !defined(M_AMIGA)
 #	define	HAVE_UNISTD_H
 #endif
 
@@ -104,8 +104,9 @@
 #endif
 
 #if !defined(BSD) && \
-    !defined(M_OS2) && !defined(sinix) && \
-	!defined(WIN32) && !defined(VMS)
+	!defined(M_OS2) && !defined(sinix) && \
+	!defined(WIN32) && !defined(VMS) && \
+	!defined(M_AMIGA)
 #	define	HAVE_SYS_UTSNAME_H
 #endif
 
@@ -150,7 +151,7 @@
 #if defined(__386BSD__) || defined(BSD) || \
     defined(__hpux) || defined(M_OS2) || \
     defined(__osf__) || defined(sinix) || \
-    defined(UMAXV)
+    defined(UMAXV) || defined(M_AMIGA)
 #	define	HAVE_NETDB_H
 #endif
 
@@ -259,7 +260,8 @@
 #	define	HAVE_UNAME
 #endif
 
-#if defined(MACH) || defined(__NeXT__) || defined(M_OS2)
+#if defined(MACH) || defined(__NeXT__) || \
+	defined(M_OS2) || defined(M_AMIGA)
 #	define	DONT_HAVE_SIGWINCH
 #endif
 
@@ -352,7 +354,7 @@
 #	define	HAVE_TCSETATTR
 #endif
 
-#if defined(QNX42) || defined(VMS)
+#if defined(QNX42) || defined(VMS) || defibed(M_AMIGA)
 #	define HAVE_KEY_PREFIX
 #endif
 

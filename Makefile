@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970122
+PVER		= 970123
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -14,6 +14,7 @@ DOCDIR	= ./doc
 INCDIR	= ./include
 OBJDIR	= ./src
 SRCDIR	= ./src
+AMGDIR	= ./amiga
 
 HFILES	= \
 	$(INCDIR)/amiga.h \
@@ -91,6 +92,11 @@ CFILES	= \
 	$(SRCDIR)/xref.c \
 	$(SRCDIR)/vms.c
 
+AMIGA	=\
+	$(AMGDIR)/README \
+	$(AMGDIR)/smakefile \
+	$(AMGDIR)/actived.c \
+
 DOC	= \
 	$(DOCDIR)/DEBUG_REFS \
 	$(DOCDIR)/auth.txt \
@@ -112,14 +118,14 @@ TOP	= \
 	$(TOPDIR)/makefile.in \
 	$(TOPDIR)/conf-tin
 
-ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) \
+ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) $(AMIGA) \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
 	$(SRCDIR)/l1_next.tab \
 	$(SRCDIR)/next_l1.tab \
 	$(SRCDIR)/tincfg.tbl
 
-ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR)
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR)
 
 # standard commands
 CD		= cd

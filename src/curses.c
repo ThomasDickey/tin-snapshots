@@ -13,6 +13,10 @@
 
 #include "tin.h"
 
+#ifdef M_AMIGA
+#	undef BSD
+#endif
+
 #ifndef ns32000
 #	undef	sinix
 #endif

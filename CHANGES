@@ -1,3 +1,17 @@
+--unoff BETA release 970123 --
+
+295) Volker Berthelmann <volker@vb.franken.de>
+     ADD. start of AMIGA port
+     FIX. several supplied patches
+
+294) Kevin Lentin <kevinl@cs.monash.edu.au>
+     ADD. stripping of unsubscribed newsgroups
+     FIX. several supplied patches
+
+293) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. 292 as it opens up a lot of problems
+     FIX. several patches
+
 --unoff BETA release 970122 --
 
 292) Arnold Hendriks <arnold@poboxes.com>

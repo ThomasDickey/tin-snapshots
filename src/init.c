@@ -89,7 +89,6 @@ char save_active_file[PATH_LEN];
 char spooldir[PATH_LEN];		/* directory where news is */
 char subscriptions_file[PATH_LEN];
 char txt_help_bug_report[LEN];	/* address to add send bug reports to */
-char tagline_file[PATH_LEN];
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
 
@@ -233,6 +232,7 @@ t_bool space_goto_next_unread;
 t_bool start_any_unread = FALSE;
 t_bool start_editor_offset;
 t_bool strip_blanks;
+t_bool strip_newsrc=FALSE;
 t_bool tab_after_X_selection;	/* set TRUE if you want auto TAB after X */
 t_bool tab_goto_next_unread;
 t_bool thread_catchup_on_exit;	/* catchup thread with left arrow key or not */

@@ -506,7 +506,11 @@ read_cmd_line_options (argc, argv)
 			get_newsrcname(newsrc,uts.nodename);
 #else	/* NeXT, Apollo */
 			char nodenamebuf[32];
+#	if defined(M_AMIGA)
+			my_strncpy (nodenamebuf, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (nodenamebuf));
+#	else
 			(int) gethostname(nodenamebuf, sizeof(nodenamebuf));
+#	endif
 			get_newsrcname(newsrc,nodenamebuf);
 #endif
 		}

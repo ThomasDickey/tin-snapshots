@@ -1,0 +1,279 @@
+#
+# $VER: tin_makefile 1.3 (17.7.95)
+#
+# This is especially for use with the SAS/C developing system
+# version 6.50 and above
+#
+# (w) 1994 by Reinhard Luebke (rel)
+#
+
+AMIDIR   = /amiga
+SRCDIR   = /src
+INCDIR   = /include
+OBJDIR   = /obj
+
+# Include the next two lines to enable an NNTP version of TIN.
+# To use AS225 rather than AmiTCP, also include "def AS225".
+
+# /*vb*/
+NNTPDEF  = def NNTP_ABLE def INEWS_MAIL_DOMAIN="$$DOMAIN" \
+ def INEWS_MAIL_GATEWAY="" def UNISTD_H def CLIB_NETLIB_PROTOS_H
+
+# Next line enables tind to be created
+# NB: change PROJECT and GSTFILE to tind also!
+
+# TINDDEF = def INDEX_DAEMON
+
+PROJECT  = $(AMIDIR)/tin.exe
+ACTIVED  = $(AMIDIR)/actived
+GSTFILE  = $(AMIDIR)/tin.gst
+
+#
+# compile & link flags
+#
+
+/*vb*/
+#SCOPTIONS = strmer data=near parms=register nover errrexx ignore=93,104,105 \
+#                    idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) cpu=$(CPU)
+SCOPTIONS = strmer nover ignore=93,104,105 \
+ idir=netinclude: idir=$(INCDIR) gst=$(GSTFILE) data=far
+
+# comment the next two lines, for the final release
+
+#DEBUG     = debug=line stkchk def MEM_DEBUG def DEBUG
+#LDEBUG    = debug=sym
+
+# optimization should always be disabled while debugging
+# uncomment the following only for the final version
+
+# OPTIMIZE  = opt optpeep optglobal optinlocal optinline optloop opttime
+
+# special defines for generating the gst file
+
+GSTDEFS    = def __USE_SYSBASE
+
+# read the docs (/INSTALL & /doc/HACKERS) for compiler defines
+
+DEFINES   = def M_AMIGA def SYSV def NO_SHELL_ESCAPE def NO_PIPING \
+ def LIBDIR="uulib:" def DONT_LOG_USER def SPOOLDIR="uunews:" \
+ def DONT_REREAD_ACTIVE_FILE $(GSTDEFS) $(NNTPDEF) $(TINDDEF)
+
+# build the final compile and link flags
+
+CFLAGS    = $(SCOPTIONS) $(OPTIMIZE) $(DEFINES) $(DEBUG)
+LDFLAGS   = link $(SCOPTIONS) $(LDEBUG)
+
+#
+# there is no internal rule in smake for yacc files
+# so, here it comes
+#
+YACC = bison --yacc
+
+# /*vb*/ eeek! ugly!
+
+.y.c:
+        $(YACC) ..$<
+        @rename y.tab.c $@
+
+#
+# rule for all C sources
+#
+# We need to redefine the internal rule because we are using
+# smakes local input file facility. In fact, we must use it
+# because the v6.51 SC command was linked with the wrong startup
+# which caused the number of commandline arguments to be limited
+# to 30 entries.
+#
+.c.o:
+        $(CC) $(CFLAGS) $*.c objname=$@
+
+#
+# list of header files
+#
+# /*vb*/
+HEADERS = \
+        $(INCDIR)/amiga.h \
+        $(INCDIR)/amigatcp.h \
+        $(INCDIR)/config.h \
+        $(INCDIR)/extern.h \
+        $(INCDIR)/menukeys.h \
+        $(INCDIR)/msmail.h \
+        $(INCDIR)/nntplib.h \
+        $(INCDIR)/os_2.h \
+        $(INCDIR)/proto.h \
+        $(INCDIR)/stpwatch.h \
+        $(INCDIR)/tin.h \
+        $(INCDIR)/version.h \
+        $(INCDIR)/win32.h \
+        $(INCDIR)/win32tcp.h
+#/*vb*/
+#        $(INCDIR)/conf.h \
+
+#
+# list object files
+#
+# /*vb*/
+OBJECTS = \
+        $(OBJDIR)/active.o \
+        $(OBJDIR)/actived.o \
+        $(OBJDIR)/amiga.o \
+        $(OBJDIR)/amigatcp.o \
+        $(OBJDIR)/art.o \
+        $(OBJDIR)/attrib.o \
+        $(OBJDIR)/charset.o \
+        $(OBJDIR)/color.o \
+        $(OBJDIR)/config.o \
+        $(OBJDIR)/curses.o \
+        $(OBJDIR)/debug.o\
+        $(OBJDIR)/envarg.o \
+        $(OBJDIR)/feed.o \
+        $(OBJDIR)/filter.o \
+        $(OBJDIR)/getline.o \
+        $(OBJDIR)/group.o \
+        $(OBJDIR)/hashstr.o \
+        $(OBJDIR)/help.o\
+        $(OBJDIR)/inews.o \
+        $(OBJDIR)/init.o \
+        $(OBJDIR)/joinpath.o \
+        $(OBJDIR)/lang.o \
+        $(OBJDIR)/list.o \
+        $(OBJDIR)/mail.o \
+        $(OBJDIR)/main.o \
+        $(OBJDIR)/memory.o \
+        $(OBJDIR)/misc.o \
+        $(OBJDIR)/msmail.o \
+        $(OBJDIR)/newsrc.o\
+        $(OBJDIR)/nntplib.o \
+        $(OBJDIR)/nntpw32.o \
+        $(OBJDIR)/nrctbl.o \
+        $(OBJDIR)/open.o \
+        $(OBJDIR)/os_2.o \
+        $(OBJDIR)/page.o \
+        $(OBJDIR)/parsdate.o \
+        $(OBJDIR)/pgp.o \
+        $(OBJDIR)/post.o \
+        $(OBJDIR)/prompt.o\
+        $(OBJDIR)/refs.o\
+        $(OBJDIR)/rfc1521.o\
+        $(OBJDIR)/rfc1522.o\
+        $(OBJDIR)/save.o \
+        $(OBJDIR)/screen.o \
+        $(OBJDIR)/search.o \
+        $(OBJDIR)/select.o \
+        $(OBJDIR)/sigfile.o \
+        $(OBJDIR)/signal.o \
+        $(OBJDIR)/strftime.o \
+        $(OBJDIR)/string.o \
+        $(OBJDIR)/thread.o \
+        $(OBJDIR)/vms.o \
+        $(OBJDIR)/wildmat.o \
+        $(OBJDIR)/win32.o \
+        $(OBJDIR)/win32tcp.o \
+        $(OBJDIR)/xref.o \
+#        $(OBJDIR)/parsdate.y \
+
+
+#
+# actions to be performed when something went wrong during build
+#
+.ONERROR:
+#        -@delete #?.lnk $(PROJECT) ram:temp_smk.tmp
+        -@gst $(GSTFILE) unload
+
+#
+# targets
+#
+
+all: $(PROJECT) $(ACTIVED) $(GSTFILE)
+
+$(PROJECT):     $(OBJDIR) $(OBJECTS)
+        $(CC) $(LDFLAGS) pname=$@ <with <(ram:tmp)
+        $(OBJECTS)
+        <
+
+$(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)
+        $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/activeda.o
+
+$(GSTFILE): $(HEADERS)
+        -gst $(GSTFILE) unload
+        $(CC) $(CFLAGS) noobjname makegst=$@ $(SRCDIR)/amiga.c
+
+$(OBJDIR):
+        -@makedir $(OBJDIR)
+
+#/*vb*/
+makecfg: $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o $(GSTFILE)
+        $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/makecfg.o $(OBJDIR)/amiga.o
+/*vb*/
+$(INCDIR)/tincfg.h: $(SRCDIR)/tincfg.tbl makecfg
+        makecfg $(SRCDIR)/tincfg.tbl $(INCDIR)/tincfg.h
+
+clean:
+        -gst $(GSTFILE) unload
+        -delete $(OBJDIR)/\#?.o #?.lnk
+        -delete $(GSTFILE)(%|.info) $(ACTIVED)(%|.info) $(PROJECT)(%|.info)
+
+#
+# dependencies
+#
+
+$(OBJDIR)/activeda.o:           $(AMIDIR)/actived.c $(GSTFILE)
+$(OBJDIR)/active.o:             $(SRCDIR)/active.c $(GSTFILE)
+$(OBJDIR)/actived.o:            $(SRCDIR)/actived.c $(GSTFILE)
+$(OBJDIR)/amiga.o:              $(SRCDIR)/amiga.c $(GSTFILE)
+$(OBJDIR)/amigatcp.o:           $(SRCDIR)/amigatcp.c $(GSTFILE)
+$(OBJDIR)/art.o:                $(SRCDIR)/art.c $(GSTFILE)
+$(OBJDIR)/attrib.o:             $(SRCDIR)/attrib.c $(GSTFILE)
+$(OBJDIR)/charset.o:            $(SRCDIR)/charset.c $(GSTFILE)
+$(OBJDIR)/color.o:              $(SRCDIR)/color.c $(GSTFILE)
+$(OBJDIR)/config.o:             $(SRCDIR)/config.c $(GSTFILE) $(INCDIR)/tincfg.h
+$(OBJDIR)/curses.o:             $(SRCDIR)/curses.c $(GSTFILE)
+$(OBJDIR)/debug.o:              $(SRCDIR)/debug.c $(GSTFILE)
+$(OBJDIR)/envarg.o:             $(SRCDIR)/envarg.c $(GSTFILE)
+$(OBJDIR)/feed.o:               $(SRCDIR)/feed.c $(GSTFILE)
+$(OBJDIR)/filter.o:             $(SRCDIR)/filter.c $(GSTFILE)
+$(OBJDIR)/getline.o:            $(SRCDIR)/getline.c $(GSTFILE)
+$(OBJDIR)/group.o:              $(SRCDIR)/group.c $(GSTFILE)
+$(OBJDIR)/hashstr.o:            $(SRCDIR)/hashstr.c $(GSTFILE)
+$(OBJDIR)/help.o:               $(SRCDIR)/help.c $(GSTFILE)
+$(OBJDIR)/inews.o:              $(SRCDIR)/inews.c $(GSTFILE)
+$(OBJDIR)/init.o:               $(SRCDIR)/init.c $(GSTFILE)
+$(OBJDIR)/joinpath.o:           $(SRCDIR)/joinpath.c $(GSTFILE)
+$(OBJDIR)/lang.o:               $(SRCDIR)/lang.c $(GSTFILE)
+$(OBJDIR)/list.o:               $(SRCDIR)/list.c $(GSTFILE)
+$(OBJDIR)/mail.o:               $(SRCDIR)/mail.c $(GSTFILE)
+$(OBJDIR)/main.o:               $(SRCDIR)/main.c $(GSTFILE)
+$(OBJDIR)/makecfg.o:            $(SRCDIR)/makecfg.c $(GSTFILE)
+$(OBJDIR)/memory.o:             $(SRCDIR)/memory.c $(GSTFILE)
+$(OBJDIR)/misc.o:               $(SRCDIR)/misc.c $(GSTFILE)
+$(OBJDIR)/msmail.o:             $(SRCDIR)/msmail.c $(GSTFILE)
+$(OBJDIR)/newsrc.o:             $(SRCDIR)/newsrc.c $(GSTFILE)
+$(OBJDIR)/nntplib.o:            $(SRCDIR)/nntplib.c $(GSTFILE)
+$(OBJDIR)/nntpw32.o:            $(SRCDIR)/nntpw32.c $(GSTFILE)
+$(OBJDIR)/nrctbl.o:             $(SRCDIR)/nrctbl.c $(GSTFILE)
+$(OBJDIR)/open.o:               $(SRCDIR)/open.c $(GSTFILE)
+$(OBJDIR)/os_2.o:               $(SRCDIR)/os_2.c $(GSTFILE)
+$(OBJDIR)/page.o:               $(SRCDIR)/page.c $(GSTFILE)
+#$(OBJDIR)/parsdate.o:           $(AMIDIR)/parsdate.c $(GSTFILE)
+$(OBJDIR)/parsdate.o:           $(SRCDIR)/parsdate.c $(GSTFILE)
+$(SRCDIR)/parsdate.c:           $(SRCDIR)/parsdate.y $(GSTFILE)
+$(OBJDIR)/pgp.o:                $(SRCDIR)/pgp.c $(GSTFILE)
+$(OBJDIR)/post.o:               $(SRCDIR)/post.c $(GSTFILE)
+$(OBJDIR)/prompt.o:             $(SRCDIR)/prompt.c $(GSTFILE)
+$(OBJDIR)/refs.o:               $(SRCDIR)/refs.c $(GSTFILE)
+$(OBJDIR)/rfc1521.o:            $(SRCDIR)/rfc1521.c $(GSTFILE)
+$(OBJDIR)/rfc1522.o:            $(SRCDIR)/rfc1522.c $(GSTFILE)
+$(OBJDIR)/save.o:               $(SRCDIR)/save.c $(GSTFILE)
+$(OBJDIR)/screen.o:             $(SRCDIR)/screen.c $(GSTFILE)
+$(OBJDIR)/search.o:             $(SRCDIR)/search.c $(GSTFILE)
+$(OBJDIR)/select.o:             $(SRCDIR)/select.c $(GSTFILE)
+$(OBJDIR)/sigfile.o:            $(SRCDIR)/sigfile.c $(GSTFILE)
+$(OBJDIR)/signal.o:             $(SRCDIR)/signal.c $(GSTFILE)
+$(OBJDIR)/strftime.o:           $(SRCDIR)/strftime.c $(GSTFILE)
+$(OBJDIR)/string.o:             $(SRCDIR)/string.c $(GSTFILE)
+$(OBJDIR)/thread.o:             $(SRCDIR)/thread.c $(GSTFILE)
+$(OBJDIR)/vms.o:                $(SRCDIR)/vms.c $(GSTFILE)
+$(OBJDIR)/wildmat.o:            $(SRCDIR)/wildmat.c $(GSTFILE)
+$(OBJDIR)/win32.o:              $(SRCDIR)/win32.c $(GSTFILE)
+$(OBJDIR)/win32tcp.o:           $(SRCDIR)/win32tcp.c $(GSTFILE)
+$(OBJDIR)/xref.o:               $(SRCDIR)/xref.c $(GSTFILE)

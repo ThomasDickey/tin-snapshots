@@ -25,14 +25,16 @@ extern int mkdir(char *path);
 
 /* Replace Aztec's stat function with one that gives ST_DIRECT info */
 
-struct stat {
+struct mystat {
 	char st_attr;
 	long st_mtime;
 	long st_size;
 };
+#undef stat
+#define stat mystat
 
 #define	ST_DELETE	0x01
-#define ST_EXECUTE	0x02
+#define	ST_EXECUTE	0x02
 #define	ST_WRITE	0x04
 #define	ST_READ		0x08
 #define ST_DIRECT	0x10   /* Aztec's stat() doesn't give this information */
