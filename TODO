@@ -2,7 +2,7 @@ Bugs
 ----
 o  tins killfile editor does not quote brackets, stars and questionmarks
    in the subject - this leads to unexpected results cause they are
-   treadted as wildcards
+   treated as wildcards
 
 o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())

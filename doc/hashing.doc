@@ -34,7 +34,7 @@ list.c:		psGrpFind() Fine a group in active. The code for this
 mail.c:		read_mail_active_file() again uses very similar code
 			for adding to active[]
 
-main.c:		Just the initialisers for hashing
+main.c:		Just the initializers for hashing
 
 memory.c:	Dynamic array management.
 			hash_reclaim() - free up table[] which holds the 

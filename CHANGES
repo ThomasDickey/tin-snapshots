@@ -1,3 +1,9 @@
+--unoff BETA release 960718 --
+
+119) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. tin crashed on filtering on a msg-id
+     FIX. art.c 
+
 --unoff BETA release 960717 --
 
 118) Dean Takemori <dean@uhheph.phys.hawaii.edu>
@@ -25,7 +31,7 @@
 --unoff BETA release 960715 --
 
 114) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     BUG. tin returns an empty file (article) wheny you try to encryt a pgp
+     BUG. tin returns an empty file (article) when you try to encrypt a pgp
           signed message without knowing the public key.
      FIX. pgp.c
 

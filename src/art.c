@@ -180,8 +180,6 @@ debug_print_bitmap (group, NULL);
 
 		parse_unread_arts (group);
 
-		filtered = filter_articles (group);
-
 		/*
 		 * Stat all articles to see if any have expired
 		 */
@@ -202,6 +200,11 @@ debug_print_bitmap (group, NULL);
 		 * be free()d now that the NovFile has been written.
 		 */
 		build_references(group);
+
+		/*
+		 * Needs access to the reference tree
+		 */
+		filtered = filter_articles (group);
 
 		if ((expired || count) && cmd_line && verbose) {
 		    my_fputc ('\n', stdout);
