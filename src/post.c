@@ -2607,7 +2607,15 @@ repost_article (group, art, respnum, supersede)
 	fseek (note_fp, note_mark[0], 0);
 	copy_fp (note_fp, fp, "");
 
+
+/* only append signature when NOT superseeding own articles */
+#ifndef FORGERY
+	if (! supersede) {
+		msg_write_signature (fp, FALSE);
+	}
+#else
 	msg_write_signature (fp, FALSE);
+#endif
 	fclose (fp);
 
 	/* on supersede change default-key */

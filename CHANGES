@@ -1,3 +1,10 @@
+--unoff BETA release 960917 --
+
+171) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. a few type-corrections (long -> time_t where needed)
+     ADD. don't add signature when superseeding own articles
+     FIX. filter.c, post.c, sigfile.c
+
 --unoff BETA release 960916 --
 
 170) Urs Janssen <urs@akk.uni-karlsruhe.de>

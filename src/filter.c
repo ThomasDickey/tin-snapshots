@@ -172,7 +172,7 @@ read_filter_file (file, global_file)
 	int global = TRUE;
 	int i = 0;
 	int icase = 0, type = -1;
-	long current_secs = 0L;
+	time_t current_secs = 0L;
 	long secs = 0L;
 	struct t_group *psGrp;
 
@@ -402,7 +402,7 @@ vWriteFilterFile (pcFile)
 #ifndef	INDEX_DAEMON
 	FILE *hFp;
 	int i;
-	long lCurTime;
+	time_t lCurTime;
 	struct t_filters *psFilter;
 
 	if ((hFp = fopen (pcFile, "w")) == (FILE *) 0) {
@@ -1099,7 +1099,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 	char acBuf[PATH_LEN];
 	int iFiltered = FALSE;
 	int *plNum, *plMax;
-	long lCurTime;
+	time_t lCurTime;
 	struct t_filter *psPtr;
 
 	if (psRule->global) {

@@ -1,9 +1,9 @@
-MANIFEST for tin-1.3-unoff-BETA-960916 (Mon Sep 16 22:13:11 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960917 (Tue Sep 17 19:21:27 MET DST 1996)
 ----------------------------------------------------
-  38785 ./CHANGES
+  39024 ./CHANGES
   13209 ./TODO
    5217 ./Makefile
-  17383 ./INSTALL
+  17527 ./INSTALL
    2137 ./MANIFEST
    1580 ./README
     896 ./tinpp
@@ -43,7 +43,7 @@ MANIFEST for tin-1.3-unoff-BETA-960916 (Mon Sep 16 22:13:11 MET DST 1996)
   12264 ./src/debug.c
    2800 ./src/envarg.c
   19172 ./src/feed.c
-  35979 ./src/filter.c
+  35985 ./src/filter.c
   10801 ./src/getline.c
   41128 ./src/group.c
    3204 ./src/hashstr.c
@@ -66,7 +66,7 @@ MANIFEST for tin-1.3-unoff-BETA-960916 (Mon Sep 16 22:13:11 MET DST 1996)
   34712 ./src/page.c
   24090 ./src/parsdate.y
    6525 ./src/pgp.c
-  74384 ./src/post.c
+  74535 ./src/post.c
    9002 ./src/prompt.c
      53 ./src/proto.sed
   22257 ./src/refs.c
@@ -76,7 +76,7 @@ MANIFEST for tin-1.3-unoff-BETA-960916 (Mon Sep 16 22:13:11 MET DST 1996)
    4369 ./src/screen.c
    9613 ./src/search.c
   35105 ./src/select.c
-   5735 ./src/sigfile.c
+   5737 ./src/sigfile.c
   11177 ./src/signal.c
    5772 ./src/strftime.c
   26001 ./src/thread.c
@@ -87,4 +87,4 @@ MANIFEST for tin-1.3-unoff-BETA-960916 (Mon Sep 16 22:13:11 MET DST 1996)
    5511 ./src/vms.c
    7010 ./include/autoconf.hin
   10395 ./src/Makefile.in
-1519141 total
+1519683 total
