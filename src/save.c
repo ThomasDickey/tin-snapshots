@@ -216,7 +216,7 @@ check_start_save_any_news (
 						if (verbose) {
 							wait_message (buf);
 						}
-						fseek (note_fp, 0L, 0);
+						fseek (note_fp, 0L, SEEK_SET);
 						copy_fp (note_fp, fp, "");
 						art_close ();
 						fclose (fp);
@@ -373,7 +373,7 @@ save_art_to_file (
  	time (&epoch);
  	fprintf (fp, "From %s %s", note_h_path, ctime (&epoch));
 
-	if (fseek (note_fp, 0L, 0) == -1) {
+	if (fseek (note_fp, 0L, SEEK_SET) == -1) {
 		perror_message ("fseek() error on [%s]", arts[respnum].subject);
 	}
 	copy_fp (note_fp, fp, "");
@@ -381,7 +381,7 @@ save_art_to_file (
 	print_art_seperator_line (fp, the_mailbox);
 
 	fclose (fp);
-	fseek (note_fp, note_mark[note_page], 0);
+	fseek (note_fp, note_mark[note_page], SEEK_SET);
 
 	save[i].saved = TRUE;
 
@@ -590,7 +590,7 @@ create_path (
 		if (i+1 < len && path[i+1] == '/') {
 			buf[j+1] = '\0';
 			if (stat (buf, &st) == -1) {
-				if (my_mkdir (buf, 0755) == -1) {
+				if (my_mkdir (buf, (S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 					if (errno != EEXIST) {
 						perror_message ("Cannot create %s", buf);
 						return FALSE;
@@ -600,7 +600,7 @@ create_path (
 		}
 	}
 #else
-	if (my_mkdir (buf, 0755) == -1) {
+	if (my_mkdir (buf, (S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 		if (errno != EEXIST) {
 			perror_message ("Cannot create %s", buf);
 			return FALSE;
@@ -630,7 +630,7 @@ create_sub_dir (
 	if (!save[i].is_mailbox && save[i].archive) {
 		joinpath (dir, save[i].dir, save[i].archive);
 		if (stat (dir, &st) == -1) {
-			my_mkdir (dir, 0755);
+			my_mkdir (dir, (S_IRWXU|S_IRUGO|S_IXUGO));
 			return TRUE;
 		}
 #ifdef M_AMIGA

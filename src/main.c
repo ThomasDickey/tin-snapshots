@@ -33,12 +33,14 @@ static int max_cmdargs;
 */
 static int check_for_any_new_news (t_bool CheckAnyUnread, t_bool StartAnyUnread);
 static void save_or_mail_new_news (void);
-static void show_intro_page (void);
 #ifndef ACTIVE_DAEMON
-static void update_index_files (void);
-static void usage (char *theProgname);
-static void read_cmd_line_options (int argc, char *argv[]);
-#endif /* ACTIVE_DAEMON */
+	static void read_cmd_line_options (int argc, char *argv[]);
+	static void update_index_files (void);
+	static void usage (char *theProgname);
+#	ifndef INDEX_DAEMON
+	static void show_intro_page (void);
+#	endif /* !INDEX_DAEMON */
+#endif /* !ACTIVE_DAEMON */
 
 /*
 **  OK lets start the ball rolling...
@@ -102,15 +104,6 @@ main (
 		error_message (cvers, "");		/* Why to stderr ?? */
 	}
 
-#if defined(M_UNIX) && !defined(INDEX_DAEMON)
-#	if !USE_CURSES
-		if (!SetupScreen ()) {
-			error_message (txt_screen_init_failed, progname);
-			exit (EXIT_ERROR);
-		}
-#	endif
-#endif
-
 	/*
 	 *  Read user local & global config files
 	 */
@@ -121,6 +114,18 @@ main (
 	 *  Process envargs & command line options
 	 */
 	read_cmd_line_options (argc, argv);
+
+#if defined(M_UNIX) && !defined(INDEX_DAEMON)
+#	if !USE_CURSES
+	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
+		if (!SetupScreen ()) {
+			error_message (txt_screen_init_failed, progname);
+			exit (EXIT_ERROR);
+		}
+	}
+#	endif
+#endif
+
 
 	if (newsrc_active && !read_news_via_nntp) {
 #ifdef NNTP_ABLE
@@ -197,8 +202,13 @@ main (
 	 *  This has to be done before quick post
 	 *  because the filters will be updated!!![eb]
 	 */
+#ifndef INDEX_DAEMON
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+#else
+	global_filtered_articles = TRUE;
+	local_filtered_articles = TRUE;
+#endif /* !INDEX_DAEMON */
 #ifdef DEBUG
 	debug_print_filters ();
 #endif
@@ -206,15 +216,17 @@ main (
 	/*
 	 *  Quick post an article & exit if -w specified
 	 */
+#ifndef INDEX_DAEMON
 	if (post_article_and_exit || post_postponed_and_exit) {
 		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-#ifdef DEBUG
+	#ifdef DEBUG
 		debug_print_filters ();
-#endif
+	#endif
 		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_OK);
 	}
+#endif /* INDEX_DAEMON */
 
 	if((count=count_postponed_articles())) {
 		if(count==1) {
@@ -314,10 +326,11 @@ main (
 	 *  to groups specified in /usr/lib/news/subscribe locally
 	 *  or via NNTP if reading news remotely (LIST SUBSCRIBE)
 	 */
+#ifndef INDEX_DAEMON
 	if (created_rcdir && !update) {
 		show_intro_page ();
 	}
-
+#endif /* !INDEX_DAEMON */
 	/*
 	 *  Work loop
 	 */
@@ -431,7 +444,7 @@ read_cmd_line_options (
 			case 'I':
 #ifndef NNTP_ONLY
 				my_strncpy (index_newsdir, optarg, sizeof (index_newsdir));
-				my_mkdir (index_newsdir, 0777);
+				my_mkdir (index_newsdir, S_IRWXUGO);
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
@@ -820,7 +833,7 @@ update_index_files (void)
 /*
  *  display page of general info. for first time user.
  */
-
+#ifndef INDEX_DAEMON
 static void
 show_intro_page (void)
 {
@@ -832,26 +845,7 @@ show_intro_page (void)
 		Raw (FALSE);
 	}
 
-	my_printf ("\n\nWelcome to tin, a full screen threaded Netnews reader. It can read news locally\n");
-	my_printf ("(ie. <spool>/news) or remotely (-r option) from a NNTP  (Network News Transport\n");
-	my_printf ("Protocol) server. tin -h lists the available command line options.\n\n");
-
-	my_printf ("Tin has five  newsreading levels,  the newsgroup  selection page,  the spooldir\n");
-	my_printf ("selection page,  the group index page,  the thread listing page and the article\n");
-	my_printf ("viewer. Help is available at each level by pressing the 'h' command.\n\n");
-
-	my_printf ("Move up/down by using the terminal arrow keys or 'j' and 'k'.  Use PgUp/PgDn or\n");
-	my_printf ("Ctrl-U and Ctrl-D to page up/down. Enter a newsgroup by pressing RETURN/TAB.\n\n");
-
-	my_printf ("Articles, threads, tagged articles or articles matching a pattern can be mailed\n");
-	my_printf ("('m' command), printed ('o' command), saved ('s' command), piped ('|' command).\n");
-	my_printf ("Use the 'w' command  to post  a news  article,  the 'f'/'F' commands to  post a\n");
-	my_printf ("follow-up  to  an existing  news article and the 'r'/'R' commands to  reply via\n");
-	my_printf ("mail to an existing news articles author.  The 'M' command allows the operation\n");
-	my_printf ("of tin to be configured via a menu.\n\n");
-
-	my_printf ("For more information read the manual page, README, INSTALL, TODO and FTP files.\n");
-	my_printf ("Please send bug reports/comments to the programs author with the 'R' command.\n");
+	my_printf (txt_intro_page);
 	my_flush();
 
 	if (!cmd_line) {
@@ -859,6 +853,7 @@ show_intro_page (void)
 		continue_prompt ();
 	}
 }
+#endif /* INDEX_DAEMON */
 
 /*
  * Wildcard match any newsgroups on the command line. Sort of like a limited

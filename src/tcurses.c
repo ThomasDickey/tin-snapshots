@@ -19,6 +19,10 @@
 
 #if USE_CURSES
 
+#ifndef KEY_MIN
+#define KEY_MIN KEY_BREAK	/* SVr3 curses */
+#endif
+
 #include <stdarg.h>
 
 #include "trace.h"

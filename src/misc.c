@@ -22,6 +22,10 @@
 ** Local prototypes
 */
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
+static void write_input_history_file (void);
+#ifdef LOCAL_CHARSET
+	static unt to_local (int c);
+#endif /* LOCAL_CHARSET */
 
 #if 0
 static void dump_input_history(void);
@@ -407,17 +411,22 @@ tin_done (
 		nntp_close ();			/* disconnect from NNTP server */
 	}
 	free_all_arrays ();
-	if (!cmd_line)
-		ClearScreen ();
-#ifdef HAVE_COLOR
-	use_color=FALSE;
-	EndInverse();
-	ClearScreen();
+#ifdef SIGUSR1
+	if (ret != - SIGUSR1) {
 #endif
-
-	EndWin ();
-	Raw (FALSE);
-
+		if (!cmd_line)
+			ClearScreen ();
+#ifdef HAVE_COLOR
+		use_color=FALSE;
+		EndInverse();
+		ClearScreen();
+#endif
+		EndWin ();
+		Raw (FALSE);
+#ifdef SIGUSR1
+		ret = SIGUSR1 ;
+	}
+#endif
 	cleanup_tmp_files ();
 
 #ifdef DOALLOC
@@ -489,8 +498,6 @@ strip_double_ngs (
 				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
 			}
 
-/*			my_printf("1[%d]: %s\n", ncnt1, ngroup1); */ /* debug */
-
 			over2 = FALSE;
 			ncnt2 = 0;
 			
@@ -503,7 +510,6 @@ strip_double_ngs (
 			while (!over2) {
 				ncnt2++;
 				strcpy(ngroup2, cmplist);
-/*				my_printf("2[%d]: %s\n", ncnt2, ngroup2); */
 				ptr2 = strchr(ngroup2, ',');
 				if (ptr2 != (char *) 0) {
 					strcpy(cmplist, ptr2+1);
@@ -527,7 +533,7 @@ strip_double_ngs (
 int
 my_mkdir (
 	char *path,
-	int mode)
+	mode_t mode)
 {
 #ifndef HAVE_MKDIR
 	char buf[LEN];
@@ -1372,7 +1378,7 @@ get_arrow_key (int prech)
 #ifdef NCURSES_MOUSE_VERSION
 		case KEY_MOUSE:
 			if (getmouse(&my_event) != ERR) {
-				switch (my_event.bstate) {
+				switch ((int) my_event.bstate) {
 					case BUTTON1_CLICKED:
 						xmouse = MOUSE_BUTTON_1;
 						break;
@@ -2634,7 +2640,7 @@ read_input_history_file (void) {
 	
 }
 
-void
+static void
 write_input_history_file(void) {
 	FILE *fp;
 	int his_w, his_e;

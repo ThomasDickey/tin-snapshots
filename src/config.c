@@ -20,11 +20,16 @@
 
 #define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)
 
+static char **ulBuildArgv(char *cmd, int *new_argc);
+static int check_upgrade (char *buf);
 static int match_list ( char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
+static void highlight_option (int option);   
 static void print_any_option (int the_option);
+static void print_option (enum option_enum the_option);   
 static void show_config_page (int page_no);
-static char **ulBuildArgv(char *cmd, int *new_argc);
+static void unhighlight_option (int option);
+   
 
 enum state { IGNORE, CHECK, UPGRADE };
 

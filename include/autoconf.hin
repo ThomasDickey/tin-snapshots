@@ -323,7 +323,12 @@
  * Define this if the compiler performs ANSI-style token substitution (used in
  * our 'assert' macro).
  */
-#undef	HAVE_ANSI_ASSERT
+#undef	CPP_DOES_EXPAND
+/*
+ * Define this if the compiler performs ANSI-style token concatenation (used in
+ * our 'tincfg.h' macros).
+ */
+#undef	CPP_DOES_CONCAT
 
 /*
  * One of the following two is defined, according to whether qsort's compare

@@ -19,18 +19,14 @@ o  a problem concerning .tin/posted: when I post a postponed followup,
    "References:" header, the article should be regarded as a followup.
    [Vincent Lefevre <vlefevre@ens-lyon.fr>]
 
-o  after resubscribing to a newgroup which is still in the .newsrc, tin
-   ignores the old related .newsrc entry and marks all articles as
-   unread.
-   [Sven Manias <sven.manias@stud.uni-karlsruhe.de>]
+o  the cursor postion gets 'lost' after 'y'ank in 'y'ank out - it'll
+   be placed to the first(last?) group in your list, not to the one it
+   pointed to before the yanks.
 
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.
    [Jason C Lin <jlin@hawaii.edu>]
-
-o  If show_author=0 is set in tinrc, the 'd' command doesn't work for the
-   1st newsgroup.
-   [Jason C Lin <jlin@hawaii.edu>]
+   [I can't reproduce this - jason@radar.demon.co.uk]
 
 o  When an article is piped and the message "Press <RETURN> to continue..." 
    appears, if an arrow key is pressed, arbitrary commands are executed.
@@ -50,13 +46,6 @@ o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
     scope=*.test sigfile=--none [urs])
    [Stan Brooks <stabro@almatel.net>]
 
-o  When trying to renumber my newsgroups (using the 'M' command), I find
-   that if there are any new newsgroups listed at the top of the screen,
-   they offset my choice for location. ie:  With 3 new newsgroups, I hit
-   'M' to move the position, and then entered 17, to put the listing in
-   #17.  It was moved to position 20.
-   [Theo Van Dinter <felicity@kluge.net>]
-
 o  tin does not care about resizing the xterm it's running in.
    [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
 
@@ -70,17 +59,6 @@ o  tin (sometimes?) overwrites the newsgroup-number and number of unread
 o  sometimes tin truncates newsgroup-names after turning off newsgroup
    descriptions.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
-
-o  new subscribed groups won't show up in the same session if:
-     show_only_unread_groups=ON
-     'y'ank in all groups
-     's'ubscribe
-     'y'ank out
-   as tin does not check if the group contains any articles [we should send
-   a GROUP or LISTGROUP to the server after 's'ubscribe]
-   also the cursor postion gets 'lost' after 'y'ank in 'y'ank out - it'll
-   be placed to the first group in your list, not to the one it has pointed
-   to before the yanks.
 
 o  supersedes does not work if one of the Newsgroups is not present in the
    active file.

@@ -1200,12 +1200,41 @@ nntp_to_fp (void)
 #endif	/* NNTP_ABLE */
 
 void
+vGet1GrpArtInfo(struct t_group *grp)
+{
+	long	lMinOld = grp->xmin;
+	long	lMaxOld = grp->xmax;
+
+	vGrpGetArtInfo (
+		grp->spooldir,
+		grp->name,
+		grp->type,
+		&grp->count,
+		&grp->xmax,
+		&grp->xmin);
+
+	if (grp->newsrc.num_unread > grp->count) {
+#ifdef DEBUG
+		my_printf (cCRLF "Unread WRONG [%d]=%s unread=[%ld] count=[%ld]", iNum, grp->name, grp->newsrc.num_unread, grp->count);
+		my_flush ();
+#endif
+		grp->newsrc.num_unread = grp->count;
+	}
+
+	if (grp->xmin != lMinOld || grp->xmax != lMaxOld) {
+		expand_bitmap(grp, grp->xmin);
+#ifdef DEBUG
+		my_printf (cCRLF "Min/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]", iNum, grp->name, lMinOld, lMaxOld, grp->xmin, grp->xmax);
+		my_flush ();
+#endif
+	}
+}
+
+void
 vGrpGetSubArtInfo (void)
 {
 #ifndef INDEX_DAEMON
 	int	iNum;
-	long	lMinOld;
-	long	lMaxOld;
 	struct	t_group *psGrp;
 
 	if (SHOW_UPDATE)
@@ -1213,36 +1242,12 @@ vGrpGetSubArtInfo (void)
 
 	for (iNum = 0 ; iNum < num_active ; iNum++) {
 		psGrp = &active[iNum];
-		if (psGrp->subscribed) {
-			lMinOld = psGrp->xmin;
-			lMaxOld = psGrp->xmax;
 
-			vGrpGetArtInfo (
-				psGrp->spooldir,
-				psGrp->name,
-				psGrp->type,
-				&psGrp->count,
-				&psGrp->xmax,
-				&psGrp->xmin);
-			if (psGrp->newsrc.num_unread > psGrp->count) {
-#ifdef DEBUG
-				my_printf (cCRLF "Unread WRONG [%d]=%s unread=[%ld] count=[%ld]",
-					iNum, psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-				my_flush ();
-#endif
-				psGrp->newsrc.num_unread = psGrp->count;
-			}
-			if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
-				expand_bitmap(psGrp, psGrp->xmin);
-#ifdef DEBUG
-	my_printf (cCRLF "Min/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]",
-		iNum, psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-	my_flush ();
-#endif
-			}
-			if (iNum % 5 == 0) {
+		if (psGrp->subscribed) {
+			vGet1GrpArtInfo(psGrp);
+
+			if (iNum % 5 == 0)
 				spin_cursor ();
-			}
 		}
 	}
 	if (cmd_line) {

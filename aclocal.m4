@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 17.08.97
+dnl Updated   : 23.08.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -38,21 +38,6 @@ do
 		cf_add_incdir="$cf_top_incdir"
 	done
 done
-])dnl
-dnl ---------------------------------------------------------------------------
-dnl Test for ANSI token substitution (used in 'assert').
-AC_DEFUN([CF_ANSI_ASSERT],
-[
-AC_MSG_CHECKING([for ansi token substitution])
-AC_CACHE_VAL(cf_cv_ansi_assert,[
-	AC_TRY_COMPILE([
-#define string(n) #n],
-	[char *s = string(token)],
-	[cf_cv_ansi_assert=yes],
-	[cf_cv_ansi_assert=no])
-])
-AC_MSG_RESULT($cf_cv_ansi_assert)
-test $cf_cv_ansi_assert = yes && AC_DEFINE(HAVE_ANSI_ASSERT)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Allow user to disable a normally-on option.
@@ -325,6 +310,36 @@ AC_MSG_RESULT($cf_cv_corefile)
 test $cf_cv_corefile = yes && AC_DEFINE(HAVE_COREFILE)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Test for ANSI token expansion (used in 'assert').
+AC_DEFUN([CF_CPP_CONCATS],
+[
+AC_MSG_CHECKING([for ansi token concatenation])
+AC_CACHE_VAL(cf_cv_cpp_concats,[
+	AC_TRY_COMPILE([
+#define concat(a,b) a ## b],
+	[char *firstlast = "y", *s = concat(first,last)],
+	[cf_cv_cpp_concats=yes],
+	[cf_cv_cpp_concats=no])
+])
+AC_MSG_RESULT($cf_cv_cpp_concats)
+test $cf_cv_cpp_concats = yes && AC_DEFINE(CPP_DOES_CONCAT)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Test for ANSI token expansion (used in 'assert').
+AC_DEFUN([CF_CPP_EXPANDS],
+[
+AC_MSG_CHECKING([for ansi token expansion/substitution])
+AC_CACHE_VAL(cf_cv_cpp_expands,[
+	AC_TRY_COMPILE([
+#define string(n) #n],
+	[char *s = string(token)],
+	[cf_cv_cpp_expands=yes],
+	[cf_cv_cpp_expands=no])
+])
+AC_MSG_RESULT($cf_cv_cpp_expands)
+test $cf_cv_cpp_expands = yes && AC_DEFINE(CPP_DOES_EXPAND)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl
 AC_DEFUN([CF_ERRNO],
 [
@@ -349,7 +364,8 @@ dnl	$4 = corresponding function-name
 AC_DEFUN([CF_FIND_LIBRARY],
 [
 	cf_cv_have_lib_$1=no
-	AC_CHECK_FUNC($4,cf_cv_have_lib_$1=no,[
+	AC_CHECK_FUNC($4,cf_cv_have_lib_$1=yes,[
+		ac_cv_func_$4=
 		cf_save_LIBS="$LIBS"
 		AC_MSG_CHECKING(for $4 in -l$1)
 		LIBS="-l$1 $LIBS"
@@ -696,44 +712,26 @@ dnl	-lsocket
 dnl	-lbsd
 AC_DEFUN([CF_NETLIBS],[
 NETLIBS=""
-cf_have_lsocket=no
 #
-AC_CHECK_FUNC(gethostname,[AC_DEFINE(HAVE_GETHOSTNAME)],[
-	AC_CHECK_LIB(nsl,gethostname,
-		[AC_DEFINE(HAVE_GETHOSTNAME)
-		NETLIBS="-lnsl $NETLIBS"],
-		AC_CHECK_LIB(socket,gethostname,
-		[AC_DEFINE(HAVE_GETHOSTNAME)
-		NETLIBS="-lsocket $NETLIBS"
-		cf_have_lsocket=yes]),
-		[$NETLIBS])])
+AC_CHECK_FUNCS(gethostname,,[
+	CF_RECHECK_FUNC(gethostname,nsl,NETLIBS,[
+		CF_RECHECK_FUNC(gethostname,socket,NETLIBS)])])
 #
 # FIXME:  sequent needs this library (i.e., -lsocket -linet -lnsl), but
 # I don't know the entrypoints - 97/7/22 TD
 AC_HAVE_LIBRARY(inet,NETLIBS="-linet $NETLIBS")
 #
-if test $cf_have_lsocket = no ; then
-AC_CHECK_FUNC(socket,[AC_DEFINE(HAVE_SOCKET)],[
-	AC_CHECK_LIB(socket,socket,
-		[AC_DEFINE(HAVE_SOCKET)
-		NETLIBS="-lsocket $NETLIBS"],
-		AC_CHECK_LIB(bsd,socket,
-			[AC_DEFINE(HAVE_SOCKET)
-			NETLIBS="-lbsd $NETLIBS"]),
-		[$NETLIBS])])
+if test "$ac_cv_func_lsocket" != no ; then
+AC_CHECK_FUNCS(socket,,[
+	CF_RECHECK_FUNC(socket,socket,NETLIBS,[
+		CF_RECHECK_FUNC(socket,bsd,NETLIBS)])])
 fi
 #
-AC_CHECK_FUNC(gethostbyname,[AC_DEFINE(HAVE_GETHOSTBYNAME)],[
-	AC_CHECK_LIB(nsl,gethostbyname,
-		[AC_DEFINE(HAVE_GETHOSTBYNAME)
-		NETLIBS="-lnsl $NETLIBS"],,
-		[$NETLIBS])])
+AC_CHECK_FUNCS(gethostbyname,,[
+	CF_RECHECK_FUNC(gethostbyname,nsl,NETLIBS)])
 #
-AC_CHECK_FUNC(strcasecmp,[AC_DEFINE(HAVE_STRCASECMP)],[
-	AC_CHECK_LIB(resolv,strcasecmp,
-		[AC_DEFINE(HAVE_STRCASECMP)
-		NETLIBS="-lresolv $NETLIBS"],,
-		[$NETLIBS])])
+AC_CHECK_FUNCS(strcasecmp,,[
+	CF_RECHECK_FUNC(strcasecmp,resolv,NETLIBS)])
 LIBS="$LIBS $NETLIBS"
 ])dnl
 dnl ---------------------------------------------------------------------------
@@ -759,6 +757,30 @@ else
 fi
 AC_MSG_RESULT($ac_cv_prog_sum_r)
 fi
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Re-check on a function to see if we can pick it up by adding a library.
+dnl	$1 = function to check
+dnl	$2 = library to check in
+dnl	$3 = environment to update (e.g., $LIBS)
+dnl	$4 = what to do if this fails
+dnl
+dnl This uses 'unset' if the shell happens to support it, but leaves the
+dnl configuration variable set to 'unknown' if not.  This is a little better
+dnl than the normal autoconf test, which gives misleading results if a test
+dnl for the function is made (e.g., with AC_CHECK_FUNC) after this macro is
+dnl used (autoconf does not distinguish between a null token and one that is
+dnl set to 'no').
+AC_DEFUN([CF_RECHECK_FUNC],[
+AC_CHECK_LIB($2,$1,[
+	CF_UPPER(cf_tr_func,$1)
+	AC_DEFINE(HAVE_$cf_tr_func)
+	ac_cv_func_$1=yes
+	$3="-l$2 [$]$3"],
+	ac_cv_func_$1=unknown
+	unset ac_cv_func_$1 2>/dev/null
+	$4,
+	[[$]$3])
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Attempt to determine if we've got one of the flavors of regular-expression

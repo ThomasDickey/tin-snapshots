@@ -251,12 +251,6 @@
  * Used in tin.h
  */
 
-#if __STDC__ || defined(SVR4)
-#	if !defined(__hpux) && !defined(sun)
-#		define	HAVE_ANSI_ASSERT
-#	endif
-#endif
-
 #if defined(M_UNIX)
 #	define	HAVE_COREFILE
 #endif

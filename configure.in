@@ -177,6 +177,23 @@ else
 fi
 AC_SUBST(INN_NNTPLIB)
 
+### Look for network libraries first, since some functions (such as gethostname)
+### are used in a lot of places.
+AC_MSG_CHECKING(if you want socks5 library)
+AC_CACHE_VAL(cf_cv_use_libsocks5,[
+AC_ARG_WITH(socks5,
+	[  --with-socks5           link with socks5 if available],
+	[cf_cv_use_libsocks5=yes],
+	[cf_cv_use_libsocks5=no])
+])
+AC_MSG_RESULT($cf_use_libsocks5)
+
+if test $cf_cv_use_libsocks5 = yes ; then
+	CF_SOCKS5
+else
+	CF_NETLIBS
+fi
+
 ### Look for ncurses in the usual places, accommodating compilers that don't
 ### search /usr/local by default.
 AC_MSG_CHECKING(if you want ncurses library)
@@ -365,7 +382,8 @@ CF_MAKEFLAGS
 AC_LANG_C
 AC_C_CONST
 AC_C_INLINE
-CF_ANSI_ASSERT
+CF_CPP_EXPANDS
+CF_CPP_CONCATS
 CF_CHECK_NESTED_PARAMS
 
 ### check for alloca (only required for bison)
@@ -504,6 +522,7 @@ AC_CHECK_FUNCS(\
 	setuid \
 	sigaction \
 	strchr \
+	strcasecmp \
 	strerror \
 	strftime \
 	strpbrk \
@@ -592,21 +611,6 @@ AC_MSG_CHECKING(if select expects int * arguments)
 AC_EGREP_HEADER([select\(.*, *int *\*,],time.h,AC_DEFINE(HAVE_SELECT_INTP) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 AC_FUNC_SETPGRP
-
-AC_MSG_CHECKING(if you want socks5 library)
-AC_CACHE_VAL(cf_cv_use_libsocks5,[
-AC_ARG_WITH(socks5,
-	[  --with-socks5           link with socks5 if available],
-	[cf_cv_use_libsocks5=yes],
-	[cf_cv_use_libsocks5=no])
-])
-AC_MSG_RESULT($cf_use_libsocks5)
-
-if test $cf_cv_use_libsocks5 = yes ; then
-	CF_SOCKS5
-else
-	CF_NETLIBS
-fi
 
 ###	Checks for network library functions.
 AC_CHECK_FUNCS(\

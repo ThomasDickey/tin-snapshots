@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970820
+PVER		= 970826
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -263,22 +263,22 @@ all:
 	@$(ECHO) "    make ztar            [ Create compressed tar archive of the distribution ]"
 
 build:
-	@$(CD) $(SRCDIR); $(MAKE)
+	@$(CD) $(SRCDIR) && $(MAKE)
 
 install:
-	@$(CD) $(SRCDIR); $(MAKE) install
+	@$(CD) $(SRCDIR) && $(MAKE) install
 
 install_setuid:
-	@$(CD) $(SRCDIR); $(MAKE) install_setuid
+	@$(CD) $(SRCDIR) && $(MAKE) install_setuid
 
 install_daemon:
-	@$(CD) $(SRCDIR); $(MAKE) install_daemon
+	@$(CD) $(SRCDIR) && $(MAKE) install_daemon
 
 version:
 	@$(ECHO) "TIN v$(VER)"
 
 clean:
-	@$(CD) $(SRCDIR); $(MAKE) clean
+	@$(CD) $(SRCDIR) && $(MAKE) clean
 	@$(RM) -f *~
 	@$(RM) -f $(AMGDIR)/*~
 	@$(RM) -f $(DOCDIR)/*~
@@ -290,7 +290,7 @@ clean:
 	@$(RM) -f $(SRCDIR)/*~
 
 clobber:
-	@$(CD) $(SRCDIR); $(MAKE) clobber
+	@$(CD) $(SRCDIR) && $(MAKE) clobber
 	@$(RM) -f *~
 	@$(RM) -f $(AMGDIR)/*~
 	@$(RM) -f $(DOCDIR)/*~
@@ -435,7 +435,6 @@ print:
 	a2ps $$FILE | $(LP); \
 	done
 
-# This isn't the final form; it's just used for developing the autoconf script
 distclean:
 	$(CD) src && $(MAKE) clobber
 	$(RM) -f config.cache config.log config.status makefile */Makefile include/autoconf.h

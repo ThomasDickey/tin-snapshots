@@ -51,7 +51,7 @@ constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
 constext txt_autoselecting_articles[] = "Autoselecting articles (use 'X' to see all unread) ...";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";
-constext txt_bad_command[] = "Bad command.  Type 'h' for help.";
+constext txt_bad_command[] = "Bad command. Type 'h' for help.";
 constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
 constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
@@ -395,6 +395,25 @@ constext txt_help__[] = "_\t  toggle word highlighting on/off" cCRLF;
 #endif
 constext txt_hit_space_for_more[] = "PgDn,End,<SPACE>,^D - page down. PgUp,Home,b,^U - page up. <CR>,q - quit";
 constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
+
+#if !defined(INDEX_DAEMON) && !defined(ACTIVE_DAEMON)
+constext txt_intro_page[] = "\n\nWelcome to tin, a full screen threaded Netnews reader. It can read news locally\n\
+(ie. <spool>/news) or remotely (-r option)  from a NNTP (Network News Transport\n\
+Protocol) server. tin -h lists the available command line options.\n\n\
+Tin  has five  newsreading levels,  the newsgroup selection page,  the spooldir\n\
+selection page,  the group index page,  the thread listing page and the article\n\
+viewer. Help is available at each level by pressing the 'h' command.\n\n\
+or Ctrl-U and Ctrl-D to page up/down. Enter a newsgroup by pressing RETURN/TAB.\n\n\
+Articles, threads, tagged articles or articles matching a pattern can be mailed\n\
+('m' command), printed ('o' command), saved ('s' command), piped ('|' command).\n\
+Use  the 'w' command  to post a  news article,  the 'f'/'F' commands  to post a\n\
+follow-up to  an existing  news article  and the 'r'/'R' commands  to reply via\n\
+mail to an existing news articles author.  The 'M' command allows the operation\n\
+of tin to be configured via a menu.\n\n\
+For more information read the manual page, README, INSTALL, TODO and FTP files.\n\
+Please send bug-reports/comments  to the programs author  with the 'R' command.\n";
+#endif /* !INDEX_DAEMON && !ACTIVE_DAEMON*/
+
 constext txt_invalid_from[] = "Invalid  From: %s  line. Read the INSTALL file again.";
 constext txt_inverse_off[] = "Inverse video disabled";
 constext txt_inverse_on[] = "Inverse video enabled";
@@ -613,7 +632,7 @@ constext txt_tinrc_catchup_read_groups[] = "# if ON ask user if read groups shou
 #ifdef HAVE_COLOR
 constext txt_tinrc_col_back[] = "# Standard-Background-Color\n";
 constext txt_tinrc_col_from[] = "# Color of sender (From:)\n";
-constext txt_tinrc_col_head[] = "# Color of headerlines\n";
+constext txt_tinrc_col_head[] = "# Color of header-lines\n";
 constext txt_tinrc_col_newsheaders[] = "# Color of actual news header fields\n";
 constext txt_tinrc_col_help[] = "# Color of help pages\n";
 constext txt_tinrc_col_invers_bg[] = "# Color of background for inverse text\n";
@@ -624,10 +643,10 @@ constext txt_tinrc_col_message[] = "# Color of messages in last line\n";
 constext txt_tinrc_col_minihelp[] = "# Color of mini help menu\n";
 constext txt_tinrc_col_normal[] = "# Standard foreground color\n";
 constext txt_tinrc_col_response[] = "# Color of response counter\n";
-constext txt_tinrc_col_quote[] = "# Color of quotelines\n";
+constext txt_tinrc_col_quote[] = "# Color of quote-lines\n";
 constext txt_tinrc_col_signature[] = "# Color of signature\n";
 constext txt_tinrc_col_subject[] = "# Color of article subject\n";
-constext txt_tinrc_col_text[] = "# Color of textlines\n";
+constext txt_tinrc_col_text[] = "# Color of text-lines\n";
 constext txt_tinrc_col_title[] = "# Color of Help/Mail-Sign\n";
 constext txt_tinrc_colors[] = "# For color-adjust use the following numbers\n\
 #  0-black       1-red         2-green        3-brown\n\
@@ -694,7 +713,7 @@ constext txt_tinrc_mail_8bit_header[] = "# if ON, 8bit characters in mail messag
 # Korean users with localized sendmail.\n";
 constext txt_tinrc_mail_address[] = "# user's mail address, if not username@host\n";
 constext txt_tinrc_mark_saved_read[] = "# if ON mark articles that are saved as read\n";
-constext txt_tinrc_mm_charset[] = "# charset supported locally  which is also used for MIME header and\n\
+constext txt_tinrc_mm_charset[] = "# charset supported locally which is also used for MIME header and\n\
 # Content-Type header unless news and mail need to be encoded in other\n\
 # charsets as in ISO-2022-KR encoding of EUC-KR in mail message.\n\
 # If not set, the value of the environment variable MM_CHARSET is used.\n\
@@ -703,7 +722,7 @@ constext txt_tinrc_mm_charset[] = "# charset supported locally  which is also us
 # mm_charset is considered not displayable and represented as '?'.\n";
 constext txt_tinrc_motd_file_info[] = "# news motd file dates from server used for detecting new motd info\n";
 constext txt_tinrc_newnews[] = "# host & time info used for detecting new groups (don't touch)\n";
-constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/followingup an article\n\
+constext txt_tinrc_news_quote_format[] = "# Format of quote line when mailing/posting/following-up an article\n\
 # %%A Address    %%D Date   %%F Addr+Name   %%G Groupname   %%M MessageId\n\
 # %%N Full Name  %%C First Name\n";
 constext txt_tinrc_no_advertising[] = "# turn off advertising in header (X-Newsreader/X-Mailer)\n";
@@ -780,7 +799,7 @@ constext txt_tinrc_thread_articles[] = "# Thread articles on 0=(nothing) 1=(Subj
 constext txt_tinrc_unlink_article[] = "# if ON remove ~/.article after posting.\n";
 constext txt_tinrc_use_builtin_inews[] = "# if ON use the builtin mini inews otherwise use an external inews program\n";
 #ifdef HAVE_COLOR
-constext txt_tinrc_use_color[] = "# if ON using ansi-color\n";
+constext txt_tinrc_use_color[] = "# if ON using ANSI-color\n";
 #endif /* HAVE_COLOR */
 #ifdef HAVE_KEYPAD
 constext txt_tinrc_use_keypad[] = "# If ON enable scroll keys on terminals that support it\n";
@@ -826,9 +845,9 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
  * Which colors can be used.
  */
 constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
-                           "Cyan", "White", "Gray", "Light Red",
-                           "Light Green", "Yellow", "Light Blue",
-                           "Light Pink", "Light Cyan", "Light White" };
+									"Cyan", "White", "Gray", "Light Red",
+									"Light Green", "Yellow", "Light Blue",
+									"Light Pink", "Light Cyan", "Light White" };
 
 /*
  * Which mark types can be used.
@@ -987,6 +1006,7 @@ constext txt_select_pattern[] = "Enter selection pattern [%s]> ";
 constext txt_select_thread[] = "Select thread > ";
 constext txt_server_name_in_file_env_var[] = "Put the server name in the file %s,\nor set the environment variable NNTPSERVER";
 constext txt_shell_escape[] = "Enter shell command [%s]> ";
+constext txt_skipping_newgroups[] = "Cannot move into new newgroups. Subscribe first...";
 constext txt_stuff_nntp_cannot_open[] = "stuff_nntp: can't open %s: ";
 constext txt_subscribed_num_groups[] = "subscribed to %d groups";
 constext txt_subscribed_to[] = "Subscribed to %s";
@@ -1027,7 +1047,7 @@ constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
 #endif /* HAVE_METAMAIL */
 constext txt_uudecoding[] = "Uudecoding %s";
 constext txt_value_out_of_range[] = "\n%s%d out of range (0 - %d). Reset to 0";
-constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
+constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns. Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";
 constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";
 constext txt_warn_not_in_newsrc[] = "Warning: \"%s\" is not in your newsrc, it may be invalid at this site!\n";
@@ -1133,7 +1153,6 @@ constext txt_help_t_tab[] = "<TAB>\t  read next unread article" cCRLF;
 constext txt_help_space_toggles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_mini_spooldir_1[] = "<n>=set current to n, CR=selects spooldir, h)elp, j=line down, k=line up, q)uit";
 constext txt_opt_col_newsheaders[] = "Color of actual news header fields : ";
-constext txt_skipping_newsgroups[] = "Skipping new newsgroups...";
 constext txt_subscribe_to_new_group[] = "Subscribe to new group %s (Yy/Nn) [%c]: ";
 constext txt_subscribing_to[] = "Subscribing to %s";
 constext txt_tinrc_col_markdash[] = "";

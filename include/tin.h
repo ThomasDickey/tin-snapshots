@@ -727,7 +727,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define 	MODULO_COUNT_NUM	10
 #define 	TABLE_SIZE		1409
-#define 	MAX_PAGES		1000
+#define 	MAX_PAGES		2000	/* maximum article pages */
 /* when prompting for subject, display no more than 20 characters */
 #define 	DISPLAY_SUBJECT_LEN	20
 
@@ -974,7 +974,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	GRP_NOREDRAW		-5		/* Unclear meaning ? */
 #define	GRP_KILLED		-6		/* thread was killed at art level */
 
-#define	EXIT_OK		0
+#define	EXIT_OK			0
 #define	EXIT_ERROR		1
 #define	EXIT_NNTP_ERROR		2
 
@@ -984,15 +984,12 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
  */
 
 #if !defined(M_OS2) && !defined(WIN32)
-#	ifdef HAVE_ANSI_ASSERT
-#		if !defined (__hpux)|| defined(__STDC__) || defined (__GNUC__)
-#			define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
-#		else
-#			define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
-#		endif
+#	undef assert
+#	ifdef CPP_DOES_EXPAND
+#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
 #	else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else (void)0;
-#	endif /* HAVE_ANSI_ASSERT */
+#	endif /* CPP_DOES_EXPAND */
 #endif /*!M_OS2 && !WIN32*/
 
 
