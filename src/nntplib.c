@@ -1029,7 +1029,7 @@ nntp_respcode (
 
 void
 nntp_message (
-	int respcode) 
+	int respcode)
 {
 	error_message ("%s", nntp_respcode (respcode));
 }

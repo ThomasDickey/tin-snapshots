@@ -858,7 +858,7 @@ setup_soft_base (group)
  *   If the LISTGROUP failed, issue a GROUP command. Use the results to
  *   create a less accurate version of base[]
  *	 This data will already be sorted
- *   
+ *
  * on local spool:
  *   Read the spool dir to populate base[] as above. Sort it.
  *

@@ -266,7 +266,7 @@ invoke_pgp_news(
 			do_pgp(SIGN, the_article, NULL);
 			pgp_append_public_key(the_article);
 			break;
-			
+
 		default:
 			break;
 	}

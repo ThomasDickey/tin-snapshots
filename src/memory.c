@@ -236,7 +236,7 @@ free_art_array (void)
 		arts[i].tagged = FALSE;
 		arts[i].selected = FALSE;
 		arts[i].date = 0L;
-		
+
 		FreeAndNull(arts[i].part);
 		FreeAndNull(arts[i].patch);
 		FreeAndNull(arts[i].xref);
@@ -283,7 +283,7 @@ free_attributes_array (void)
 				psGrp->attribute->printer = (char *) 0;
 			}
 
-			FreeAndNull(psGrp->attribute->followup_to);			
+			FreeAndNull(psGrp->attribute->followup_to);
 			FreeAndNull(psGrp->attribute->quick_kill_scope);
 			FreeAndNull(psGrp->attribute->quick_select_scope);
 
@@ -307,9 +307,9 @@ free_active_arrays (void)
 	if (active != (struct t_group *) 0) {		/* active[] */
 		for (i=0 ; i < num_active ; i++) {
 
-			FreeAndNull(active[i].name);			
+			FreeAndNull(active[i].name);
 			FreeAndNull(active[i].description);
-			
+
 			if (active[i].type == GROUP_TYPE_MAIL &&
 			    active[i].spooldir != (char *) 0) {
 				free ((char *) active[i].spooldir);
@@ -342,14 +342,14 @@ free_save_array (void)
 	int i;
 
 	for (i=0 ; i < num_save ; i++) {
-	
+
 		FreeAndNull(save[i].subject);
 		FreeAndNull(save[i].archive);
 		FreeAndNull(save[i].dir);
 		FreeAndNull(save[i].file);
 		FreeAndNull(save[i].part);
 		FreeAndNull(save[i].patch);
-		
+
 		save[i].index = -1;
 		save[i].saved = FALSE;
 		save[i].is_mailbox = FALSE;
@@ -381,7 +381,7 @@ free_newnews_array (void)
 {
 	int i;
 
-	for (i=0 ; i < num_newnews ; i++) {	
+	for (i=0 ; i < num_newnews ; i++) {
 		FreeAndNull(newnews[i].host);
 	}
 

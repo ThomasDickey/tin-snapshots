@@ -143,7 +143,7 @@ rfc1521_decode(
 			}
 
 			/*
-			 * now search for the start of each part 
+			 * now search for the start of each part
 			 */
 
 			strcpynl(boundary, strcasestr(content_type, "boundary=") + 9);

@@ -104,7 +104,7 @@
  * 'M',
  * '^',
  * 'b','j','k','q','v'
- * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('P'),ctrl('U')
+ * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
  */
 
 #define iKeyAbort ESC
@@ -129,6 +129,7 @@
 #define iKeyPageDown ctrl('D')
 #define iKeyPageDown2 ctrl('F')
 #define iKeyDown ctrl('N')
+#define iKeyPostponed ctrl('O')
 #define iKeyUp ctrl('P')
 #define iKeyPageUp2 ctrl('U')
 
@@ -163,7 +164,6 @@
 #define iKeyGroupReadBasenote '\n'
 #define iKeyGroupKill ctrl('K')
 #define iKeyGroupRedrawScr ctrl('L')
-#define iKeyGroupPostponed ctrl('O')
 #define iKeyGroupReadBasenote2 '\r'
 #define iKeyGroupToggleColor '&'
 #define iKeyGroupSelThd '*'
@@ -235,7 +235,6 @@
 #define iKeyPageNextThd '\n'
 #define iKeyPageAutoKill ctrl('K')
 #define iKeyPageRedrawScr ctrl('L')
-#define iKeyPagePostponed ctrl('O')
 #define iKeyPageNextThd2 '\r'
 #define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
@@ -332,7 +331,6 @@
 #define iKeySelectEnterNextUnreadGrp '\t'
 #define iKeySelectReadGrp '\n'
 #define iKeySelectRedrawScr ctrl('L')
-#define iKeySelectPostponed ctrl('O')
 #define iKeySelectReadGrp2 '\r'
 #define iKeySelectResetNewsrc ctrl('R')
 #define iKeySelectToggleColor '&'

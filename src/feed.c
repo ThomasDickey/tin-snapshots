@@ -171,7 +171,7 @@ feed_articles (
 				}
 			}
 			break;
-			
+
 		default:
 			break;
 	}
@@ -311,57 +311,61 @@ feed_articles (
 			wait_message (txt_saving);
 			break;
 		case FEED_REPOST:	/* repost article */
-#ifndef FORGERY
-			get_user_info (user_name, full_name);
-			get_from_name (from_name);
-
-			if (strstr (from_name, arts[respnum].from)) {
-#endif
-				/* repost or supersede ? */
-				do {
-					prompt_2 (txt_supersede_article, arts[respnum].subject, option_default);
-					if ((option = (char) ReadCh ()) == '\r' || option == '\n')
-						option = option_default;
-				} while (!strchr ("qrs\033", option));
-
-				switch (option) {
-					case iKeyFeedSupersede:
-						sprintf (msg, txt_supersede_group, default_repost_group);
-						supersede = TRUE;
-						break;
-					case iKeyFeedRepost:
-						sprintf (msg, txt_repost_group, default_repost_group);
-						supersede = FALSE;
-						break;
-					default:
-						clear_message ();
-						return;
-				}
-#ifndef FORGERY
+			if (!can_post) {
+				info_message(txt_cannot_post);
 			} else {
-				sprintf (msg, txt_repost_group, default_repost_group);
-				supersede = FALSE;
-			}
+#ifndef FORGERY
+				get_user_info (user_name, full_name);
+				get_from_name (from_name);
+
+				if (strstr (from_name, arts[respnum].from)) {
 #endif
+					/* repost or supersede ? */
+					do {
+						prompt_2 (txt_supersede_article, arts[respnum].subject, option_default);
+						if ((option = (char) ReadCh ()) == '\r' || option == '\n')
+							option = option_default;
+					} while (!strchr ("qrs\033", option));
 
-			if (!prompt_string (msg, group_name, HIST_REPOST_GROUP)) {
-				clear_message ();
-				return;
-			}
-
-			if (strlen (group_name)) {
-				my_strncpy (default_repost_group, group_name,
-					sizeof (default_repost_group));
-			} else {
-				if (default_repost_group[0]) {
-					my_strncpy (group_name, default_repost_group,
-						sizeof (group_name));
+					switch (option) {
+						case iKeyFeedSupersede:
+							sprintf (msg, txt_supersede_group, default_repost_group);
+							supersede = TRUE;
+							break;
+						case iKeyFeedRepost:
+							sprintf (msg, txt_repost_group, default_repost_group);
+							supersede = FALSE;
+							break;
+						default:
+							clear_message ();
+							return;
+					}
+#ifndef FORGERY
 				} else {
-					info_message (txt_no_group);
+					sprintf (msg, txt_repost_group, default_repost_group);
+					supersede = FALSE;
+				}
+#endif
+				if (!prompt_string (msg, group_name, HIST_REPOST_GROUP)) {
+					clear_message ();
 					return;
+				}
+
+				if (strlen (group_name)) {
+					my_strncpy (default_repost_group, group_name,
+						sizeof (default_repost_group));
+				} else {
+					if (default_repost_group[0]) {
+						my_strncpy (group_name, default_repost_group,
+							sizeof (group_name));
+					} else {
+						info_message (txt_no_group);
+						return;
+					}
 				}
 			}
 			break;
+
 		default:
 			break;
 	} /* switch (function) */
@@ -377,14 +381,17 @@ feed_articles (
 				case FEED_MAIL:
 					redraw_screen = mail_to_someone (respnum, address, FALSE, TRUE, &processed_ok);
 					break;
+
 				case FEED_PIPE:
 					fseek (note_fp, 0L, SEEK_SET);
 					if (got_sig_pipe) goto got_sig_pipe_while_piping;
 					copy_fp (note_fp, fp, "");
 					break;
+
 				case FEED_PRINT:
 					processed_ok = print_file (command, respnum, 1);
 					break;
+
 				case FEED_SAVE:
 					note_page = art_open (arts[respnum].artnum, group_path);
 					if (note_page != ART_UNAVAILABLE) {
@@ -392,9 +399,15 @@ feed_articles (
 						processed_ok = save_art_to_file (respnum, 0, FALSE, "");
 					}
 					break;
+
 				case FEED_REPOST:
-					redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
+					if (can_post) {
+						redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
+					} else {
+						info_message(txt_cannot_post);
+					}
 					break;
+
 				default:
 					break;
 			}
@@ -435,21 +448,30 @@ feed_articles (
 							confirm = TRUE;
 						}
 						break;
+
 					case FEED_PIPE:
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
 						fseek (note_fp, 0L, SEEK_SET);
 						copy_fp (note_fp, fp, "");
 						break;
+
 					case FEED_PRINT:
 						processed_ok = print_file (command, i, processed+1);
 						break;
+
 					case FEED_SAVE:
 						add_to_save_list (i, &arts[i], is_mailbox, TRUE, filename);
 						break;
+
 					case FEED_REPOST:
-						redraw_screen = repost_article (group_name, &arts[i], i, supersede);
+						if (can_post) {
+							redraw_screen = repost_article (group_name, &arts[i], i, supersede);
+						} else {
+							info_message(txt_cannot_post);
+						}
 						break;
+
 					default:
 						break;
 				}
@@ -490,21 +512,30 @@ feed_articles (
 									confirm = TRUE;
 								}
 								break;
+
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp, "");
 								break;
+
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
 								break;
+
 							case FEED_SAVE:
 							case FEED_SAVE_TAGGED:
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
+
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+								if (can_post) {
+									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+								} else {
+									info_message(txt_cannot_post);
+								}
 								break;
+
 							default:
 								break;
 						}
@@ -559,20 +590,29 @@ feed_articles (
 									confirm = TRUE;
 								}
 								break;
+
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
 								copy_fp (note_fp, fp, "");
 								break;
+
 							case FEED_PRINT:
 								processed_ok = print_file (command, j, processed+1);
 								break;
+
 							case FEED_SAVE:
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
+
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+								if (can_post) {
+									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
+								} else {
+									info_message(txt_cannot_post);
+								}
 								break;
+
 							default:
 								break;
 						}

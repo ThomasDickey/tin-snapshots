@@ -74,7 +74,7 @@ get_search_pattern(
 
 	if (wildcard)			/* ie, not wildmat() */
 		return(def);
-		
+
 	/*
 	 * A gross hack to simulate substrings with wildmat()
 	 */
@@ -280,7 +280,7 @@ search_subject_thread(
 
 	move_to_response(depth+offset);
 	clear_message();
-  	return; 
+  	return;
 }
 #endif
 
@@ -392,7 +392,7 @@ search_article (
 				default_art_search,
 				HIST_ART_SEARCH
 	))) return FALSE;
-	
+
 	/*
 	 *  save current position in article
 	 */

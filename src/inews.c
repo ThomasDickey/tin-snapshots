@@ -82,14 +82,14 @@ submit_inews (
 		}
 	}
 	rewind(fp);
-	
+
 	if (from_name[0]=='\0') {
 		/* we could silently add a From: line here if we want to... */
 		error_message ("From: line missing.", "");
 		fclose (fp);
 		return ret_code;
 	}
-	
+
 
 	/*
 	 * Check that at least one '.' comes after the '@' in the From: line

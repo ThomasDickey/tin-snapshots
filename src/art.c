@@ -169,7 +169,7 @@ index_group (
 		/* user aborted indexing */
 		set_alarm_clock_on ();
 		return (FALSE);
-	}	
+	}
 
 	/*
 	 * Prints 'P' for each expired article if verbose
@@ -517,7 +517,7 @@ make_threads (
 	/*
 	 * Do the right thing according to the threading strategy
 	 */
-	if (group->attribute) 
+	if (group->attribute)
 	switch (group->attribute->thread_arts) {
 		case THREAD_NONE:
 			return;
@@ -597,12 +597,21 @@ parse_headers (
 	ptr = buf;
 
 	forever {
-		for (ptrline = ptr; *ptr && *ptr != '\n'; ptr++) {
-			if (((*ptr) & 0xFF) < ' ') {
-				if (*ptr == '\n' && *(ptr+1) != '\n')
-					*ptr = 1;
-				else
+		for (ptrline = ptr; *ptr; ptr++) {
+			if (*ptr == '\n') {
+				/* Join continuation lines */
+				if (*(ptr + 1) == ' ' || *(ptr + 1) == '\t') {
 					*ptr = ' ';
+					continue;
+				}
+				/* End of header? */
+				if (*(ptr + 1) == '\n') {
+					*ptr = '\0';
+				}
+				break;
+			}
+			if ((*(unsigned char *)ptr) < ' ') {
+				*ptr = ' ';
 			}
 		}
 		flag = *ptr;

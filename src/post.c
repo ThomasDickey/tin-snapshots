@@ -812,9 +812,9 @@ quick_post_article (
 	/*
 	 * check for postponed articles first
 	 * first param is whether to ask the user if they want to do it or not.
-	 *    it's opposite to the command line switch.
-	 * second param is whether to assume yes to all which is the same as 
-	 *    the command line switch.
+	 * it's opposite to the command line switch.
+	 * second param is whether to assume yes to all which is the same as
+	 * the command line switch.
 	 */
 
 	if (pickup_postponed_articles(!postponed_only, postponed_only) || postponed_only)
@@ -1355,28 +1355,27 @@ pickup_postponed_articles(
 	t_bool ask,
 	t_bool all)
 {
-  char newsgroups[HEADER_LEN];
-  char subject[HEADER_LEN];
-  char question[HEADER_LEN];
-  char ch = 0;
-  char def = iKeyPostponeYes;
-  int count=count_postponed_articles();
-  int i;
+	char newsgroups[HEADER_LEN];
+	char subject[HEADER_LEN];
+	char question[HEADER_LEN];
+	char ch = 0;
+	char def = iKeyPostponeYes;
+	int count=count_postponed_articles();
+	int i;
 
-  if(count==0) {
-    if(!ask)
-      wait_message("no postponed articles");
-    return FALSE;
-  }
+	if (count==0) {
+		if (!ask)
+			info_message(txt_info_nopostponed);
+		return FALSE;
+	}
 
-  sprintf(question, "do you want to see postponed articles (%d)? ", count);
+	sprintf (question, "do you want to see postponed articles (%d)? ", count);
 
-  if(ask && prompt_yn(cLINES, question, TRUE) != 1) {
-    return FALSE;
-  }
+	if (ask && prompt_yn(cLINES, question, TRUE) != 1)
+		return FALSE;
 
-	for(i = 0; i < count; i++) {
-		if(!fetch_postponed_article(article, subject, newsgroups))
+	for (i = 0; i < count; i++) {
+		if (!fetch_postponed_article(article, subject, newsgroups))
 			return TRUE;
 		if (!all) {
 			def = iKeyPostponeYes;
@@ -1417,7 +1416,10 @@ static void
 postpone_article(
 	char *the_article)
 {
-  wait_message("storing article for later posting");
+  wait_message(txt_info_do_postpone);
+  /* FIXME - message is overwritten immediately */
+  /* this is a bug in wait_message which dosn't wait anymore */
+  /* see also main.c: txt_info_postponed */
   append_postponed_file(the_article, userid);
 }
 
@@ -1721,7 +1723,7 @@ damaged_id (
 	return FALSE;
 }
 
-/* 
+/*
  * A real crossposting test had to run on Newsgroups but we only have Xref in
  * t_article, so we use this.
  */
@@ -1730,7 +1732,7 @@ is_crosspost (
 	char *xref)
 {
 	int count=0;
-	for (;*xref;xref++) 
+	for (;*xref;xref++)
 		if (*xref==':')
 			count++;
 	return (count>=2) ? TRUE : FALSE;
@@ -2747,7 +2749,7 @@ check_for_spamtrap(char *addr)
 			if (strcasestr(addr, env) != NULL)
 				return TRUE;
 			env += strlen(env);
-			if (ptr != NULL) 
+			if (ptr != NULL)
 				env++;
 		}
 	}
@@ -2981,7 +2983,7 @@ cancel_article (
 
 	msg_add_header ("Newsgroups", note_h_newsgroups);
 	if (prompt_followupto)
-		msg_add_header("Followup-To", "");	
+		msg_add_header("Followup-To", "");
 	sprintf (buf, "cancel %s", note_h_messageid);
 	msg_add_header ("Control", buf);
 	if (group->moderated == 'm') {
@@ -3286,7 +3288,7 @@ repost_article_loop:
 					 * To enforce re-entering the editor immediately when no
 					 * subject is given, uncomment the following line
 					 */
-					 /* force_command = TRUE	*/ 
+					 /* force_command = TRUE */
 				} else {
 					ret_code = POSTED_REDRAW;
 					ch_default = iKeyPostPost;
@@ -3512,11 +3514,11 @@ checknadd_headers (
 #ifdef HAVE_SYS_UTSNAME_H
 #ifdef _AIX
 							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s.%s]\n\n",
-								 OS, VERSION, RELEASEDATE, 
+								 OS, VERSION, RELEASEDATE,
 								 system_info.sysname, system_info.version, system_info.release);
 #else /* AIX */
 							fprintf (fp_out, "X-Mailer: TIN [%s %s %s; %s %s %s]\n\n",
-								 OS, VERSION, RELEASEDATE, 
+								 OS, VERSION, RELEASEDATE,
 								 system_info.machine, system_info.sysname, system_info.release);
 #endif /* AIX */
 #else
@@ -3527,11 +3529,11 @@ checknadd_headers (
 #ifdef HAVE_SYS_UTSNAME_H
 #ifdef _AIX
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s.%s]\n\n",
-								 OS, VERSION, RELEASEDATE, 
+								 OS, VERSION, RELEASEDATE,
 								 system_info.sysname, system_info.version, system_info.release);
 #else /* AIX */
 							fprintf (fp_out, "X-Newsreader: TIN [%s %s %s; %s %s %s]\n\n",
-								 OS, VERSION, RELEASEDATE, 
+								 OS, VERSION, RELEASEDATE,
 								 system_info.machine, system_info.sysname, system_info.release);
 #endif /* AIX */
 #else
@@ -3630,7 +3632,7 @@ find_reply_to_addr (
 	 * This works fine, but since parse_from() has bugs, it seems to be better
 	 * to use the other routine...
 	 */
-	 
+
 	char *ptr, buf[HEADER_LEN];
 	char from_both[HEADER_LEN];
 	char from_name[HEADER_LEN];

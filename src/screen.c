@@ -187,7 +187,7 @@ center_line (
 	} else {
 		my_fputs (buffer, stdout);
 	}
-	
+
 	if (cmd_line) {
 		my_flush();
 	} else {

@@ -182,7 +182,7 @@ add_msgid(
  		error_message("add_msgid: NULL msgid\n", "");
  		exit(1);
  	}
-  
+
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
 	DEBUG_PRINT((dbgfd, "---------------- Add %s %s with parent %s\n", (key==MSGID_REF)?"MSG":"REF", msgid, (newparent == NULL)?"unchanged":newparent->txt));
@@ -296,7 +296,7 @@ find_msgid(
 	 * Broken software will sometimes damage the case of a message-id.
 	 */
 	for (i = msgids[h]; i != NULL; i = i->next) {
-		if (strcasecmp(i->txt, msgid) == 0)				/* Found it */	
+		if (strcasecmp(i->txt, msgid) == 0)				/* Found it */
 			return(i);
 	}
 

@@ -26,11 +26,11 @@ void)
 	static char hostname[MAXHOSTNAMELEN+1]; /* need space for '\0' */
 
 	hostname[0]='\0';
-	
+
 #ifdef HAVE_GETHOSTBYNAME
 	gethostname(hostname, sizeof(hostname));
 #else
-#	if defined(M_AMIGA) || defined(M_OS2)	
+#	if defined(M_AMIGA) || defined(M_OS2)
 	if ((ptr = getenv("NodeName")) != (char *) 0) {
 		strncpy(hostname, ptr, MAXHOSTNAMELEN);
 	}
@@ -91,8 +91,8 @@ static const char *domain_name_hack = DOMAIN_NAME;
 	}
 
 #	if defined(M_AMIGA)
-	if (strchr(domain, ':')) { /* absolute AmigaOS paths contain one, RFC-hostnames don't */ 
-#else	
+	if (strchr(domain, ':')) { /* absolute AmigaOS paths contain one, RFC-hostnames don't */
+#else
 	if (domain[0] == '/' && domain[1]) {
 #	endif /* M_AMIGA */
 		/* If 1st letter is '/' read domianname from specified file */
@@ -109,7 +109,7 @@ static const char *domain_name_hack = DOMAIN_NAME;
 			if (domain[0] == '/') {
 				/* file was empty */
 				domain[0]='\0';
-			} 
+			}
 			fclose (fp);
 		} else {
 			domain[0]='\0';
@@ -133,9 +133,9 @@ get_fqdn(
 	struct hostent	*hp;
 	struct in_addr	in;
 	FILE	*inf;
-  
+
 	*fqdn=0;
-	domain=NULL; 
+	domain=NULL;
 
 	name[MAXHOSTNAMELEN]='\0';
 	if (host) {
@@ -166,7 +166,7 @@ get_fqdn(
 	      if (strncmp(line,"domain ",7)==0) {
 		domain=line+7;
 		break;
-	      } 
+	      }
 	      if (strncmp(line,"search ",7)==0) {
 		domain=line+7;
 	        cp=strchr(domain,' ');
@@ -178,7 +178,7 @@ get_fqdn(
 	  }
 	  fclose(inf);
 	}
-  
+
 	return(fqdn);
 }
 #endif
@@ -197,7 +197,7 @@ get_user_info (
 
 	user_name[0]='\0';
 	full_name[0]='\0';
-	
+
 	if ((ptr=get_full_name())) {
 		strcpy(full_name,ptr);
 	}
@@ -216,7 +216,7 @@ get_user_name(
 #endif
 	static char username[128];
 	struct passwd *pw;
-	
+
 	username[0]='\0';
 #ifndef M_AMIGA
 	pw = getpwuid (getuid ());
@@ -292,7 +292,7 @@ get_from_name (
 	}
 
 	if (strchr(get_full_name(), '.'))
-	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);		
+	    sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);
 	else
 	    sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
 
@@ -315,7 +315,7 @@ build_sender (void)
 {
 	const char *ptr;
 	static char sender[8192];
-	
+
 	sender[0]='\0';
 
 	if ((ptr = get_full_name())) {
@@ -334,7 +334,7 @@ build_sender (void)
 		{
 			strcat(sender, ptr);
 			strcat(sender, ">");
-		} else { 
+		} else {
 			return 0;
 		}
 	} else {

@@ -422,7 +422,7 @@ save_thread_to_file (
 
 	for (i=0 ; i < num_save ; i++) {
 		/* the tailing spaces are needed for SHOW_PROGRESS */
-		sprintf (msg, "%s%d  ", txt_saving, ++count); 
+		sprintf (msg, "%s%d  ", txt_saving, ++count);
 		wait_message (msg);
 
 		if (is_mailbox) {

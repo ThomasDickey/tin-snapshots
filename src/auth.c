@@ -63,7 +63,7 @@ authinfo_generic (void)
 	if (cookiefd == -1) {
 		char tempfile[BUFSIZ];
 
-		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);		
+		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);
 		if (!mktemp (tempfile)) {
 			error_message (txt_cannot_create_uniq_name, "");
 #ifdef DEBUG
@@ -138,7 +138,7 @@ read_newsauth_file (
 	/*
 	 * TODO: check file permissions of .newsauth file and warn user if the
 	 * file could be read by others.
-	 */	
+	 */
 	if ((fp = fopen (line, "r"))) {
 
 		/*
@@ -222,7 +222,7 @@ do_authinfo_original (
 {
 	char line[PATH_LEN];
 	int ret;
-	
+
 	sprintf (line, "authinfo user %s", authuser);
 	put_server (line);
 	get_server (line, PATH_LEN);
@@ -311,7 +311,7 @@ authinfo_original (
 			}
 		}
 	}
-	
+
 	/*
 	 * At this point, either authentication with username/password pair from
 	 * .newsauth has failed or there's no .newsauth file respectively no

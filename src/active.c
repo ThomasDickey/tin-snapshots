@@ -547,7 +547,7 @@ subscribe_new_group (
 		if ((ptr = psGrpAdd(group)) != NULL)
 			active_add(ptr, 0L, 1L, 0L, "n");
 
-		if ((idx = my_group_add(group)) < 0) 
+		if ((idx = my_group_add(group)) < 0)
 			return;
 	}
 

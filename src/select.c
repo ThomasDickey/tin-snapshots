@@ -691,10 +691,11 @@ select_done:
 				}
 				break;
 
-			case iKeySelectPostponed:	/* post postponed article */
+			case iKeyPostponed:	/* post postponed article */
 				if (can_post) {
-					pickup_postponed_articles(FALSE, FALSE);
-					show_selection_page ();
+					if (pickup_postponed_articles(FALSE, FALSE)) {
+						show_selection_page ();
+					}
 				} else {
 					info_message(txt_cannot_post);
 				}
@@ -846,7 +847,7 @@ show_selection_page (void)
 		first_group_on_screen = 0;
 		last_group_on_screen = 0;
 	}
-	
+
 	if (show_description) {
 		blank_len = (cCOLS - (groupname_len + SELECT_MISC_COLS)) + 2;
  	} else {

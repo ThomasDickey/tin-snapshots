@@ -530,6 +530,8 @@ AC_CHECK_FUNCS(\
 	strpbrk \
 	strstr \
 	strtol \
+	tempnam \
+	tmpnam \
 	tzset \
 	uname \
 	unlink \
@@ -605,6 +607,7 @@ CF_CHECK_DECL(\
 	tgetflag \
 	tgetnum \
 	time \
+	tempnam \
 	tolower \
 	toupper \
 	tputs \
