@@ -187,7 +187,7 @@ free_all_filter_arrays (void) /* FIXME: use free_filter_array() instead */
 #ifndef INDEX_DAEMON
 t_bool
 read_filter_file (
-	char	*file,
+	char *file,
 	t_bool global_file)
 {
 	FILE *fp;
@@ -208,12 +208,12 @@ read_filter_file (
 	int xref_max = 0;
 	int xref_score_cnt = 0;
 	int xref_score_value = 0;
+	long secs = 0L;
+	struct t_group *psGrp;
 	t_bool expired = FALSE;
 	t_bool expired_time = FALSE;
 	t_bool global = TRUE;
-	long secs = 0L;
 	time_t current_secs = (time_t) 0;
-	struct t_group *psGrp;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
 		return FALSE;
@@ -1415,10 +1415,10 @@ filter_articles (
 	 */
 	for (i = 0; i < top; i++) {
 		arts[i].score = 0;
-#ifdef KILL_READ
+#ifndef KILL_READ
 		if (IS_READ(i)) /* skip only when the article is read */
 			continue;
-#endif /* KILL_READ */
+#endif /* !KILL_READ */
 
 		for (j = 0; j < num; j++) {
 			if (ptr[j].inscope) {
@@ -1448,7 +1448,7 @@ filter_articles (
 							    regex_cache_subj[j].extra,
 							    arts[i].subject,
 							    strlen(arts[i].subject),
-							    0, NULL, 0);
+							    0, 0, NULL, 0);
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
@@ -1486,7 +1486,7 @@ filter_articles (
 							    regex_cache_from[j].extra,
 							    buf,
 							    strlen(buf),
-							    0, NULL, 0);
+							    0, 0, NULL, 0);
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
@@ -1561,7 +1561,7 @@ filter_articles (
 								regex_cache_msgid[j].extra,
 								myrefs,
 								strlen(myrefs),
-								0, NULL, 0);
+								0, 0, NULL, 0);
 							if (regex_errpos >= 0) {
 								SET_FILTER(group, i, j);
 							} else if (regex_errpos != PCRE_ERROR_NOMATCH)
@@ -1572,7 +1572,7 @@ filter_articles (
 								    regex_cache_msgid[j].extra,
 								    mymsgid,
 								    strlen(mymsgid),
-								    0, NULL, 0);
+								    0, 0, NULL, 0);
 								if (regex_errpos >= 0) {
 									SET_FILTER(group, i, j);
 								} else if (regex_errpos != PCRE_ERROR_NOMATCH)
@@ -1703,7 +1703,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 											    regex_cache_xref[j].extra,
 											    buf,
 											    strlen(buf),
-											    0, NULL, 0);
+											    0, 0, NULL, 0);
 											if (regex_errpos >= 0)
 												group_count = -1;
 											else if (regex_errpos != PCRE_ERROR_NOMATCH)

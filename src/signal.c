@@ -84,7 +84,7 @@ int signal_context = cMain;
 int need_resize = cNo;
 
 static const struct {
-	int	code;
+	int code;
 	const char *name;
 } signal_list[] = {
 #ifdef SIGINT

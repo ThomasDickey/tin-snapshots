@@ -23,7 +23,6 @@
 /*
  * Defines used in setting attributes switch
  */
-
 #define	ATTRIB_MAILDIR			0
 #define	ATTRIB_SAVEDIR			1
 #define	ATTRIB_SAVEFILE			2
@@ -31,7 +30,9 @@
 #define	ATTRIB_FROM			4
 #define	ATTRIB_SIGFILE			5
 #define	ATTRIB_FOLLOWUP_TO		6
-#define	ATTRIB_PRINTER			7
+#ifndef DISABLE_PRINTING
+#	define	ATTRIB_PRINTER			7
+#endif /* !DISABLE_PRINTING */
 #define	ATTRIB_AUTO_SELECT		8
 #define	ATTRIB_AUTO_SAVE		9
 #define	ATTRIB_BATCH_SAVE		10
@@ -56,6 +57,9 @@
 #define	ATTRIB_X_COMMENT_TO		29
 #define	ATTRIB_NEWS_QUOTE		30
 #define	ATTRIB_QUOTE_CHARS		31
+#ifdef HAVE_ISPELL
+#	define	ATTRIB_ISPELL	32
+#endif /* HAVE_ISPELL */
 
 /*
  * Local prototypes
@@ -87,7 +91,9 @@ set_default_attributes (
 	psAttrib->organization = (default_organization ? default_organization : (char *) 0);
 	psAttrib->from = (char *) 0;
 	psAttrib->followup_to = (char *) 0;
+#ifndef DISABLE_PRINTING
 	psAttrib->printer = tinrc.default_printer;
+#endif /* !DISABLE_PRINTING */
 	psAttrib->quick_kill_scope = (tinrc.default_filter_kill_global ? my_strdup("*") : (char *) 0);
 	psAttrib->quick_kill_header = tinrc.default_filter_kill_header;
 	psAttrib->quick_kill_case = tinrc.default_filter_kill_case;
@@ -111,7 +117,11 @@ set_default_attributes (
 	psAttrib->x_comment_to = FALSE;
 	psAttrib->news_quote_format = tinrc.news_quote_format;
 	psAttrib->quote_chars = tinrc.quote_chars;
+#ifdef HAVE_ISPELL
+	psAttrib->ispell = (char *) 0;
+#endif /* HAVE_ISPELL */
 }
+
 
 /*
  *  Load global & local attributes into active[].attribute
@@ -163,6 +173,7 @@ set_default_attributes (
  *  attribute.x_comment_to = ON/OFF
  *  attribute.news_quote_format = STRING
  *  attribute.quote_chars = STRING
+ *  attribute.ispell = STRING
  */
 
 #define MATCH_BOOLEAN(pattern, type) \
@@ -184,16 +195,16 @@ set_default_attributes (
 
 void
 read_attributes_file (
-	char	*file,
+	char *file,
 	t_bool global_file)
 {
+	FILE *fp;
 	char buf[LEN];
 	char line[LEN];
 	char scope[LEN];
-	FILE *fp;
-	t_bool flag;
 	int num;
 	register int i;
+	t_bool flag;
 
 	/*
 	 * Initialize global attributes (default unless overridden)
@@ -213,6 +224,7 @@ read_attributes_file (
 				continue;
 
 			switch(tolower((unsigned char)line[0])) {
+
 			case 'a':
 				MATCH_BOOLEAN (
 					"auto_save=",
@@ -221,16 +233,19 @@ read_attributes_file (
 					"auto_select=",
 					ATTRIB_AUTO_SELECT);
 				break;
+
 			case 'b':
 				MATCH_BOOLEAN (
 					"batch_save=",
 					ATTRIB_BATCH_SAVE);
 				break;
+
 			case 'd':
 				MATCH_BOOLEAN (
 					"delete_tmp_files=",
 					ATTRIB_DELETE_TMP_FILES);
 				break;
+
 			case 'f':
 				MATCH_STRING (
 					"followup_to=",
@@ -239,6 +254,15 @@ read_attributes_file (
 					"from=",
 					ATTRIB_FROM);
 				break;
+
+			case 'i':
+#ifdef HAVE_ISPELL
+				MATCH_STRING (
+					"ispell=",
+					ATTRIB_ISPELL);
+#endif /* HAVE_ISPELL */
+				break;
+
 			case 'm':
 				MATCH_STRING (
 					"maildir=",
@@ -247,25 +271,31 @@ read_attributes_file (
 					"mailing_list=",
 					ATTRIB_MAILING_LIST);
 				break;
+
 			case 'n':
 				MATCH_STRING (
 					"news_quote_format=",
 					ATTRIB_NEWS_QUOTE);
 				break;
+
 			case 'o':
 				MATCH_STRING (
 					"organization=",
 					ATTRIB_ORGANIZATION);
 				break;
+
 			case 'p':
+#ifndef DISABLE_PRINTING
 				MATCH_STRING (
 					"printer=",
 					ATTRIB_PRINTER);
+#endif /* !DISABLE_PRINTING */
 				MATCH_INTEGER (
 					"post_proc_type=",
 					ATTRIB_POST_PROC_TYPE,
 					POST_PROC_UUD_EXT_ZIP);
 				break;
+
 			case 'q':
 				MATCH_INTEGER (
 					"quick_kill_header=",
@@ -299,6 +329,7 @@ read_attributes_file (
 					break;
 				}
 				break;
+
 			case 's':
 				MATCH_STRING (
 					"savedir=",
@@ -311,7 +342,6 @@ read_attributes_file (
 					ATTRIB_SIGFILE);
 				if (match_string (line, "scope=", scope, sizeof (scope)))
 					break;
-
 				MATCH_BOOLEAN (
 					"show_only_unread=",
 					ATTRIB_SHOW_ONLY_UNREAD);
@@ -324,12 +354,14 @@ read_attributes_file (
 					ATTRIB_SHOW_AUTHOR,
 					SHOW_FROM_BOTH);
 				break;
+
 			case 't':
 				MATCH_INTEGER (
 					"thread_arts=",
 					ATTRIB_THREAD_ARTS,
 					THREAD_MAX);
 				break;
+
 			case 'x':
 				MATCH_STRING (
 					"x_headers=",
@@ -341,6 +373,7 @@ read_attributes_file (
 					"x_comment_to=",
 					ATTRIB_X_COMMENT_TO);
 				break;
+
 			default:
 				break;
 			}
@@ -362,7 +395,7 @@ read_attributes_file (
 #if 0
 	if (INTERACTIVE)
 		wait_message (0, "\n");
-#endif
+#endif /* 0 */
 }
 
 
@@ -446,10 +479,10 @@ set_attrib_num (
 
 static void
 set_attrib (
-	struct	t_group	*psGrp,
-	int	type,
+	struct t_group *psGrp,
+	int type,
 	const char *str,
-	int	num)
+	int num)
 {
 
 	/*
@@ -485,9 +518,11 @@ set_attrib (
 		case ATTRIB_FOLLOWUP_TO:
 			psGrp->attribute->followup_to = my_strdup (str);
 			break;
+#ifndef DISABLE_PRINTING
 		case ATTRIB_PRINTER:
 			psGrp->attribute->printer = my_strdup (str);
 			break;
+#endif /* !DISABLE_PRINTING */
 		case ATTRIB_AUTO_SELECT:
 			psGrp->attribute->auto_select = num;
 			break;
@@ -557,6 +592,11 @@ set_attrib (
 		case ATTRIB_QUOTE_CHARS:
 			psGrp->attribute->quote_chars = my_strdup (str);
 			break;
+#ifdef HAVE_ISPELL
+		case ATTRIB_ISPELL:
+			psGrp->attribute->ispell = my_strdup (str);
+			break;
+#endif /* HAVE_ISPELL */
 		default:
 			break;
 	}
@@ -569,7 +609,7 @@ set_attrib (
  */
 void
 write_attributes_file (
-	char	*file)
+	char *file)
 {
 	FILE *fp;
 	char *file_tmp;
@@ -598,7 +638,7 @@ write_attributes_file (
 
 	/* FIXME - move strings to lang.c */
 	fprintf (fp, "# Group attributes file for the TIN newsreader\n#\n");
-	fprintf (fp, "#  scope=STRING (ie. alt.sources or *sources*) [mandatory]\n#\n");
+	fprintf (fp, "#  scope=STRING (ie. alt.sources or *sources*) [mandatory]\n");
 	fprintf (fp, "#  maildir=STRING (ie. ~/Mail)\n");
 	fprintf (fp, "#  savedir=STRING (ie. ~user/News)\n");
 	fprintf (fp, "#  savefile=STRING (ie. =linux)\n");
@@ -606,21 +646,23 @@ write_attributes_file (
 	fprintf (fp, "#  from=STRING (just append wanted From:-line, don't use quotes)\n");
 	fprintf (fp, "#  sigfile=STRING (ie. $var/sig)\n");
 	fprintf (fp, "#  followup_to=STRING\n");
+#ifndef DISABLE_PRINTING
 	fprintf (fp, "#  printer=STRING\n");
+#endif /* !DISABLE_PRINTING */
 	fprintf (fp, "#  auto_select=ON/OFF\n");
 	fprintf (fp, "#  auto_save=ON/OFF\n");
 	fprintf (fp, "#  batch_save=ON/OFF\n");
 	fprintf (fp, "#  delete_tmp_files=ON/OFF\n");
-	fprintf (fp, "#  show_only_unread=ON/OFF\n#\n");
+	fprintf (fp, "#  show_only_unread=ON/OFF\n");
 	fprintf (fp, "#  thread_arts=NUM\n");
-	fprintf (fp, "#    0=none, 1=subj, 2=refs, 3=both\n#\n");
+	fprintf (fp, "#    0=none, 1=subj, 2=refs, 3=both\n");
 	fprintf (fp, "#  show_author=NUM\n");
-	fprintf (fp, "#    0=none, 1=name, 2=addr, 3=both\n#\n");
+	fprintf (fp, "#    0=none, 1=name, 2=addr, 3=both\n");
 	fprintf (fp, "#  sort_art_type=NUM\n");
 	fprintf (fp, "#    0=none, 1=subj descend, 2=subj ascend,\n");
 	fprintf (fp, "#    3=from descend, 4=from ascend,\n");
-	fprintf (fp, "#    5=date descend, 6=date ascend\n#\n");
-	fprintf (fp, "#    7=score descend, 8=score ascend\n#\n");
+	fprintf (fp, "#    5=date descend, 6=date ascend\n");
+	fprintf (fp, "#    7=score descend, 8=score ascend\n");
 	fprintf (fp, "#  post_proc_type=NUM\n");
 	fprintf (fp, "#    0=none, 1=unshar, 2=uudecode,\n");
 #	ifdef M_AMIGA
@@ -631,28 +673,31 @@ write_attributes_file (
 		fprintf (fp, "#    4=uudecode & extract zoo archive\n");
 #	endif /* M_AMIGA */
 	fprintf (fp, "#    5=uudecode & list zip archive,\n");
-	fprintf (fp, "#    6=uudecode & extract zip archive\n#\n");
+	fprintf (fp, "#    6=uudecode & extract zip archive\n");
 	fprintf (fp, "#  mailing_list=STRING (ie. majordomo@list.org)\n");
 	fprintf (fp, "#  x_headers=STRING (ie. ~/.tin/extra-headers)\n");
 	fprintf (fp, "#  x_body=STRING (ie. ~/.tin/extra-body-text)\n");
-	fprintf (fp, "#  quick_kill_scope  = STRING (ie. talk.*)\n");
-	fprintf (fp, "#  quick_kill_expire = ON/OFF\n");
-	fprintf (fp, "#  quick_kill_case   = ON/OFF\n");
-	fprintf (fp, "#  quick_kill_header = NUM\n");
+	fprintf (fp, "#  quick_kill_scope=STRING (ie. talk.*)\n");
+	fprintf (fp, "#  quick_kill_expire=ON/OFF\n");
+	fprintf (fp, "#  quick_kill_case=ON/OFF\n");
+	fprintf (fp, "#  quick_kill_header=NUM\n");
 	fprintf (fp, "#    0=subj (case sensitive) 1=subj (ignore case)\n");
 	fprintf (fp, "#    2=from (case sensitive) 3=from (ignore case)\n");
-	fprintf (fp, "#    4=msgid 5=lines\n#\n");
-	fprintf (fp, "#  quick_select_scope  = STRING\n");
-	fprintf (fp, "#  quick_select_expire = ON/OFF\n");
-	fprintf (fp, "#  quick_select_case   = ON/OFF\n");
-	fprintf (fp, "#  quick_select_header = NUM\n");
+	fprintf (fp, "#    4=msgid 5=lines\n");
+	fprintf (fp, "#  quick_select_scope=STRING\n");
+	fprintf (fp, "#  quick_select_expire=ON/OFF\n");
+	fprintf (fp, "#  quick_select_case=ON/OFF\n");
+	fprintf (fp, "#  quick_select_header=NUM\n");
 	fprintf (fp, "#    0=subj (case sensitive) 1=subj (ignore case)\n");
 	fprintf (fp, "#    2=from (case sensitive) 3=from (ignore case)\n");
-	fprintf (fp, "#    4=msgid 5=lines\n#\n");
+	fprintf (fp, "#    4=msgid 5=lines\n");
 	fprintf (fp, "#  x_comment_to=ON/OFF\n");
-	fprintf (fp, "#  news_quote_format=STRING\n#\n");
-	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n#\n");
-	fprintf (fp, "# Note that it is best to put general (global scoping)\n");
+	fprintf (fp, "#  news_quote_format=STRING\n");
+	fprintf (fp, "#  quote_chars=STRING (%%s, %%S for initials)\n");
+#ifdef HAVE_ISPELL
+	fprintf (fp, "#  ispell = STRING\n");
+#endif /* HAVE_ISPELL */
+	fprintf (fp, "#\n# Note that it is best to put general (global scoping)\n");
 	fprintf (fp, "# entries first followed by group specific entries.\n#\n");
 	fprintf (fp, "############################################################################\n\n");
 
@@ -722,7 +767,7 @@ write_attributes_file (
 	}
 #	endif /* 0 */
 
-	if (ferror (fp) | fclose (fp))
+	if (ferror (fp) || fclose (fp))
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
 	else {
 		rename_file (file_tmp, file);

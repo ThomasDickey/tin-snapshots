@@ -57,10 +57,10 @@ read_config_file (
 	char *file,
 	t_bool global_file) /* return value is always ignored */
 {
-	FILE	*fp;
-	char	newnews_info[PATH_LEN];
-	char	buf[LEN];
-	int	upgrade = CHECK;
+	FILE *fp;
+	char newnews_info[PATH_LEN];
+	char buf[LEN];
+	int upgrade = CHECK;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
 		return FALSE;
@@ -233,8 +233,10 @@ read_config_file (
 				break;
 			}
 
+#ifndef DISABLE_PRINTING
 			if (match_string (buf, "default_printer=", tinrc.default_printer, sizeof (tinrc.default_printer)))
 				break;
+#endif /* !DISABLE_PRINTING */
 
 			if (match_string (buf, "default_sigfile=", tinrc.default_sigfile, sizeof (tinrc.default_sigfile)))
 				break;
@@ -453,8 +455,10 @@ read_config_file (
 				break;
 			}
 
+#ifndef DISABLE_PRINTING
 			if (match_boolean (buf, "print_header=", &tinrc.print_header))
 				break;
+#endif /* !DISABLE_PRINTING */
 
 			if (match_boolean (buf, "pos_first_unread=", &tinrc.pos_first_unread))
 				break;
@@ -661,7 +665,7 @@ read_config_file (
 #if 0
 	if (INTERACTIVE)
 		wait_message (0, "\n");
-#endif
+#endif /* 0 */
 
 	return TRUE;
 }
@@ -672,7 +676,7 @@ read_config_file (
  */
 void
 write_config_file (
-	char	*file)
+	char *file)
 {
 	FILE *fp;
 	char *file_tmp;
@@ -808,11 +812,13 @@ write_config_file (
 	fprintf (fp, txt_tinrc_show_xcommentto);
 	fprintf (fp, "show_xcommentto=%s\n\n", print_boolean(tinrc.show_xcommentto));
 
+#ifndef DISABLE_PRINTING
 	fprintf (fp, txt_tinrc_print_header);
 	fprintf (fp, "print_header=%s\n\n", print_boolean (tinrc.print_header));
 
 	fprintf (fp, txt_tinrc_default_printer);
 	fprintf (fp, "default_printer=%s\n\n", tinrc.default_printer);
+#endif /* !DISABLE_PRINTING */
 
 	fprintf (fp, txt_tinrc_batch_save);
 	fprintf (fp, "batch_save=%s\n\n", print_boolean (tinrc.batch_save));
@@ -1095,7 +1101,7 @@ write_config_file (
 	for (i = 0; i < num_newnews; i++)
 		fprintf (fp, "newnews=%s %lu\n", newnews[i].host, (unsigned long int) newnews[i].time);
 
-	if (ferror (fp) | fclose (fp))
+	if (ferror (fp) || fclose (fp))
 		error_message (txt_filesystem_full, CONFIG_FILE);
 	else {
 		rename_file (file_tmp, file);
@@ -1708,8 +1714,10 @@ change_config_file (
 							news_headers_to_not_display_array = ulBuildArgv(tinrc.news_headers_to_not_display, &num_headers_to_not_display);
 							break;
 
-						case OPT_MAILDIR:
+#ifndef DISABLE_PRINTING
 						case OPT_DEFAULT_PRINTER:
+#endif /* !DISABLE_PRINTING */
+						case OPT_MAILDIR:
 						case OPT_SAVEDIR:
 						case OPT_DEFAULT_SIGFILE:
 #ifdef M_AMIGA
@@ -1839,7 +1847,7 @@ match_boolean (
 	const char *pat,
 	t_bool *dst)
 {
-	size_t	patlen = strlen (pat);
+	size_t patlen = strlen (pat);
 
 	if (STRNCASECMPEQ(line, pat, patlen)) {
 		*dst = (t_bool) (STRNCASECMPEQ(&line[patlen], "ON", 2) ? TRUE : FALSE);
@@ -1858,7 +1866,7 @@ match_color (
 	int maxlen)
 {
 	int n;
-	size_t	patlen = strlen (pat);
+	size_t patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		t_bool found = FALSE;
@@ -1967,8 +1975,8 @@ match_string (
 	char *dst,
 	size_t dstlen)
 {
-	char	*ptr;
-	size_t	patlen = strlen (pat);
+	char *ptr;
+	size_t patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		strncpy (dst, &line[patlen], dstlen);

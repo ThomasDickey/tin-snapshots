@@ -29,7 +29,9 @@ t_bool do_rfc1521_decoding = FALSE; /* needed for postprocessing saved arts */
  * Local prototypes
  */
 static t_bool does_article_exist (int function, struct t_article *art, char *path);
-static t_bool print_file (char *command, int respnum, int count);
+#ifndef DISABLE_PRINTING
+	static t_bool print_file (char *command, int respnum, int count);
+#endif /* !DISABLE_PRINTING */
 
 void
 feed_articles (
@@ -38,7 +40,6 @@ feed_articles (
 	struct t_group *group,
 	int respnum)
 {
-	char print_command[LEN];
 	char filename[PATH_LEN], *p;
 	char group_path[PATH_LEN];
 	char my_mailbox[PATH_LEN];
@@ -60,6 +61,9 @@ feed_articles (
 	t_bool ret1 = FALSE;
 	t_bool ret2 = FALSE;
 	t_bool supersede = FALSE;
+#	ifndef DISABLE_PRINTING
+	char print_command[LEN];
+#	endif /* !DISABLE_PRINTING */
 #	ifndef DONT_HAVE_PIPING
 	FILE *fp = (FILE *) 0;
 #	endif /* !DONT_HAVE_PIPING */
@@ -102,9 +106,11 @@ feed_articles (
 			prompt = txt_pipe;
 			break;
 #	endif /* !DONT_HAVE_PIPING */
+#	ifndef DISABLE_PRINTING
 		case FEED_PRINT:
 			prompt = txt_print;
 			break;
+#	endif /* !DISABLE_PRINTING */
 		case FEED_SAVE:
 			prompt = txt_save;
 			break;
@@ -174,9 +180,12 @@ feed_articles (
 			break;
 #	endif /* !DONT_HAVE_PIPING */
 
+#	ifndef DISABLE_PRINTING
 		case FEED_PRINT:
-			sprintf (print_command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
+			sprintf (print_command, "%s %s", group->attribute->printer, REDIRECT_OUTPUT);
 			break;
+#	endif /* !DISABLE_PRINTING */
+
 		case FEED_SAVE:		/* ask user for filename to save to */
 		case FEED_AUTOSAVE_TAGGED:
 			free_save_array ();
@@ -306,9 +315,11 @@ feed_articles (
 					break;
 #	endif /* !DONT_HAVE_PIPING */
 
+#	ifndef DISABLE_PRINTING
 				case FEED_PRINT:
 					processed_ok = print_file (print_command, respnum, 1);
 					break;
+#	endif /* !DISABLE_PRINTING */
 
 				case FEED_SAVE:
 					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) == 0) {
@@ -371,9 +382,11 @@ feed_articles (
 						break;
 #	endif /* !DONT_HAVE_PIPING */
 
+#	ifndef DISABLE_PRINTING
 					case FEED_PRINT:
 						processed_ok = print_file (print_command, i, processed+1);
 						break;
+#	endif /* !DISABLE_PRINTING */
 
 					case FEED_SAVE:
 						add_to_save_list (i, is_mailbox, TRUE, filename);
@@ -433,9 +446,11 @@ feed_articles (
 								break;
 #	endif /* !DONT_HAVE_PIPING */
 
+#	ifndef DISABLE_PRINTING
 							case FEED_PRINT:
 								processed_ok = print_file (print_command, j, processed+1);
 								break;
+#	endif /* !DISABLE_PRINTING */
 
 							case FEED_SAVE:
 							case FEED_AUTOSAVE_TAGGED:
@@ -508,9 +523,11 @@ feed_articles (
 								break;
 #	endif /* !DONT_HAVE_PIPING */
 
+#  ifndef DISABLE_PRINTING
 							case FEED_PRINT:
 								processed_ok = print_file (print_command, j, processed+1);
 								break;
+#	endif /* !DISABLE_PRINTING */
 
 							case FEED_SAVE:
 								add_to_save_list (j, is_mailbox, TRUE, filename);
@@ -633,9 +650,13 @@ got_sig_pipe_while_piping:
 			else
 				info_message (txt_mailed, processed, IS_PLURAL(processed));
 			break;
+
+#	ifndef DISABLE_PRINTING
 		case FEED_PRINT:
 			info_message (txt_printed, processed, IS_PLURAL(processed));
 			break;
+#	endif /* !DISABLE_PRINTING */
+
 		case FEED_SAVE:
 		case FEED_AUTOSAVE_TAGGED:
 			if (ch == iKeyFeedArt)
@@ -646,7 +667,7 @@ got_sig_pipe_while_piping:
 	}
 }
 
-
+#	ifndef DISABLE_PRINTING
 static t_bool
 print_file (
 	char *command,
@@ -654,20 +675,20 @@ print_file (
 	int count)
 {
 	FILE *fp;
-#	ifdef DONT_HAVE_PIPING
+#		ifdef DONT_HAVE_PIPING
 	char cmd[255], file[255];
 
 	strcpy(cmd, command);
-#	endif /* DONT_HAVE_PIPING */
+#		endif /* DONT_HAVE_PIPING */
 
 	wait_message (1, "%s%d", txt_printing, count);
 
-#	ifdef DONT_HAVE_PIPING
+#		ifdef DONT_HAVE_PIPING
 	sprintf(file, TIN_PRINTFILE, respnum);
 	if ((fp = fopen(file,"w")) == (FILE *) 0)
-#	else
+#		else
 	if ((fp = popen (command, "w")) == (FILE *) 0)
-#	endif /* DONT_HAVE_PIPING */
+#		endif /* DONT_HAVE_PIPING */
 	{
 		perror_message (txt_command_failed_s, command);
 		return FALSE;
@@ -687,18 +708,19 @@ print_file (
 	}
 	copy_fp (note_fp, fp);
 
-#	ifdef DONT_HAVE_PIPING
+#		ifdef DONT_HAVE_PIPING
 	fclose(fp);
 	strcat(cmd, " ");
 	strcat(cmd, file);
 	system(cmd);
 	unlink(file);
-#	else
+#		else
 	pclose (fp);
-#	endif /* DONT_HAVE_PIPING */
+#		endif /* DONT_HAVE_PIPING */
 
 	return TRUE;	/* a hack that will check if file was really checked later */
 }
+#	endif /* !DISABLE_PRINTING */
 
 
 /*

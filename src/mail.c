@@ -32,12 +32,12 @@ void
 read_mail_active_file (
 	void)
 {
-	char	buf[LEN];
-	char	my_spooldir[PATH_LEN];
-	FILE	*fp;
-	long	count = -1L;
-	long	min, max;
-	struct	t_group *ptr;
+	FILE *fp;
+	char buf[LEN];
+	char my_spooldir[PATH_LEN];
+	long count = -1L;
+	long min, max;
+	struct t_group *ptr;
 
 	if (INTERACTIVE)
 		wait_message (0, txt_reading_mail_active_file);
@@ -105,8 +105,8 @@ void
 write_mail_active_file (
 	void)
 {
-	char acGrpPath[PATH_LEN];
 	FILE *fp;
+	char acGrpPath[PATH_LEN];
 	register int i;
 	struct t_group *psGrp;
 
@@ -210,8 +210,8 @@ read_groups_descriptions (
 	FILE *fp_save)
 {
 	char *ptr;
-	char group[PATH_LEN];
 	char *p, *q;
+	char group[PATH_LEN];
 	int count = 0;
 	struct t_group *psGrp;
 
@@ -264,14 +264,15 @@ read_groups_descriptions (
 
 void
 vPrintActiveHead (
-	char	*pcActiveFile)
+	char *pcActiveFile)
 {
-	FILE	*hFp;
+	FILE *hFp;
 
 	if (no_write && file_size (pcActiveFile) != -1)
 		return;
 
 	if ((hFp = fopen (pcActiveFile, "w")) != (FILE *) 0) {
+		/* FIXME: -> lang.c */
 		fprintf (hFp, "# [Mail/Save] active file. Format is like news active file:\n");
 		fprintf (hFp, "#   groupname  max.artnum  min.artnum  /dir\n");
 		fprintf (hFp, "# The 4th field is the basedir (ie. ~/Mail or ~/News)\n#\n");
@@ -282,13 +283,13 @@ vPrintActiveHead (
 
 void
 vFindArtMaxMin (
-	char	*pcGrpPath,
-	long	*plArtMax,
-	long	*plArtMin)
+	char *pcGrpPath,
+	long *plArtMax,
+	long *plArtMin)
 {
-	DIR	*tDirFile;
-	DIR_BUF	*tFile;
-	long	lArtNum;
+	DIR *tDirFile;
+	DIR_BUF *tFile;
+	long lArtNum;
 
 	*plArtMin = *plArtMax = 0L;
 
@@ -316,13 +317,14 @@ vFindArtMaxMin (
 		*plArtMin = 1;
 }
 
+
 void
 vPrintGrpLine (
-	FILE	*hFp,
-	char	*pcGrpName,
-	long	lArtMax,
-	long	lArtMin,
-	char	*pcBaseDir)
+	FILE *hFp,
+	char *pcGrpName,
+	long lArtMax,
+	long lArtMin,
+	char *pcBaseDir)
 {
 	fprintf (hFp, "%s %05ld %05ld %s\n",
 		pcGrpName, lArtMax, lArtMin, pcBaseDir);
@@ -335,14 +337,13 @@ vPrintGrpLine (
  * newsgroup = alt.sources
  * absolute path = /usr/spool/news/alt/sources
  */
-
 void
 vMakeGrpPath (
-	char	*pcBaseDir,
-	char	*pcGrpName,
-	char	*pcGrpPath)
+	char *pcBaseDir,
+	char *pcGrpName,
+	char *pcGrpPath)
 {
-	char	*pcPtr;
+	char *pcPtr;
 
 	joinpath (pcGrpPath, pcBaseDir, pcGrpName);
 
@@ -351,22 +352,22 @@ vMakeGrpPath (
 		*pcPtr = '/';
 }
 
+
 /*
  * Given an absolute pathname & a base pathname build a newsgroup name
  * base = /usr/spool/news
  * absolute path = /usr/spool/news/alt/sources
  * newsgroup = alt.sources
  */
-
 void
 vMakeGrpName (
-	char	*pcBaseDir,
-	char	*pcGrpName,
-	char	*pcGrpPath)
+	char *pcBaseDir,
+	char *pcGrpName,
+	char *pcGrpPath)
 {
-	char	*pcPtrBase;
-	char	*pcPtrName;
-	char	*pcPtrPath;
+	char *pcPtrBase;
+	char *pcPtrName;
+	char *pcPtrPath;
 
 	pcPtrBase = pcBaseDir;
 	pcPtrPath = pcGrpPath;
@@ -397,6 +398,7 @@ vGrpDelMailArt (
 		info_message (txt_art_deleted);
 	}
 }
+
 
 void
 vGrpDelMailArts (
@@ -449,8 +451,8 @@ iArtEdit (
 	struct t_group *psGrp,
 	struct t_article *psArt)
 {
-	char	acArtFile[PATH_LEN];
-	char	acTmpFile[PATH_LEN];
+	char acArtFile[PATH_LEN];
+	char acTmpFile[PATH_LEN];
 
 	/*
 	 * Check if news / mail group

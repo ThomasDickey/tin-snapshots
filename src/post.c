@@ -340,7 +340,7 @@ user_posted_messages (
 				posted[i].date[j] = buf[j];	/* posted date */
 
 			if (buf[j] == '\n') {
-				error_message ("Corrupted file %s", posted_info_file); /* FIXME: -> lang.c */
+				error_message (txt_error_corrupted_file, posted_info_file);
 				(void) sleep (1);
 				fclose (fp);
 				clear_message ();
@@ -982,8 +982,7 @@ quick_post_article (
 			sprintf (mesg, txt_group_is_moderated, buf);
 			if (prompt_yn (cLINES, mesg, TRUE) != 1) {
 				Raw (FALSE);
-				/* FIXME: -> lang.c */
-				error_message("Exiting...");
+				error_message(txt_error_exiting);
 				return;
 			}
 		}
@@ -1072,11 +1071,16 @@ quick_post_article_loop:
 			case iKeyPostEdit:
 				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
-				if ((artsize != file_size(article)) && (artsize > 0)) {
-					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+
+				if (artsize > 0) {
+					if ((artsize == file_size(article)) && (prompt_yn (cLINES, txt_prompt_unchanged_art, TRUE) > 0 )) {
 						;
-					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-						break;
+					} else {
+						while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+							;
+						if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+							break;
+					}
 				}
 
 			/* FALLTHROUGH */
@@ -1089,7 +1093,7 @@ quick_post_article_loop:
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (article);
+				invoke_ispell (article, psGrp);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -1212,7 +1216,7 @@ post_existing_article_loop:
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (article);
+				invoke_ispell (article, psGrp);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -1465,8 +1469,7 @@ pickup_postponed_articles (
 		return FALSE;
 	}
 
-	/* FIXME - move to lang.c */
-	sprintf(question, "Do you want to see postponed articles (%d)? ", count);
+	sprintf(question, txt_prompt_see_postponed, count);
 
 	if (ask && prompt_yn(cLINES, question, TRUE) != 1)
 		return FALSE;
@@ -1652,11 +1655,16 @@ post_article_loop:
 				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
 				redraw_screen = TRUE;
-				if ((artsize != file_size(article)) && (artsize > 0)) {
-					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+
+				if (artsize > 0) {
+					if ((artsize == file_size(article)) && (prompt_yn (cLINES, txt_prompt_unchanged_art, TRUE) > 0 )) {
 						;
-					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-						break;
+					} else {
+						while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+							;
+						if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+							break;
+					}
 				}
 
 			/* FALLTHROUGH */
@@ -1669,7 +1677,7 @@ post_article_loop:
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (article);
+				invoke_ispell (article, psGrp);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -2171,11 +2179,16 @@ post_response_loop:
 				artsize = file_size(article);
 				invoke_editor (article, start_line_offset);
 				ret_code = POSTED_REDRAW;
-				if ((artsize != file_size(article)) && (artsize > 0)) {
-					while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+
+				if (artsize > 0) {
+					if ((artsize == file_size(article)) && (prompt_yn (cLINES, txt_prompt_unchanged_art, TRUE) > 0 )) {
 						;
-					if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
-						break;
+					} else {
+						while (!check_article_to_be_posted (article, art_type, &lines) && repair_article(&ch))
+							;
+						if (ch == iKeyPostEdit || ch == iKeyOptionMenu)
+							break;
+					}
 				}
 
 			/* FALLTHROUGH */
@@ -2188,7 +2201,7 @@ post_response_loop:
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (article);
+				invoke_ispell (article, psGrp);
 				ret_code = POSTED_REDRAW;
 				break;
 #endif /* HAVE_ISPELL */
@@ -2388,7 +2401,7 @@ mail_to_someone (
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (nam);
+				invoke_ispell (nam, 0);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -2575,19 +2588,20 @@ mail_bug_report (
 			case iKeyPostEdit:
 				artsize = file_size(nam);
 				invoke_editor (nam, start_line_offset);
-				if ((artsize != file_size(nam)) && (artsize > 0)) {
-					if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
-						subject[0] = '\0';
-					break;
-				} else { /* empty bugreport */
+
+				if (((artsize == file_size(nam)) && (prompt_yn (cLINES, txt_prompt_unchanged_bug, TRUE) > 0 )) || (artsize <= 0)) {
 					unlink (nam);
 					clear_message ();
 					return TRUE;
+				} else {
+					if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+						subject[0] = '\0';
 				}
+				break;
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (nam);
+				invoke_ispell (nam, 0);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -2648,7 +2662,9 @@ mail_to_author (
 	char nam[100];
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
+#if 0
 	char bigbuf[HEADER_LEN];
+#endif /* 0 */
 	char mailreader_subject[PATH_LEN];	/* for calling external mailreader */
 	char initials[64];
 	t_bool redraw_screen = FALSE;
@@ -2702,10 +2718,12 @@ mail_to_author (
 		/*
 		 * Write References and Message-Id as In-Reply-To to the mail
 		 */
+#if 0 /* AFAIK only the last References (in this case note_h.messageid) should be named in In-Reply-To */
 		if (*note_h.references) {
 			join_references (bigbuf, note_h.references, note_h.messageid);
 			msg_add_header ("In-Reply-To", bigbuf);
 		} else
+#endif /* 0 */
 			msg_add_header ("In-Reply-To", note_h.messageid);
 
 		if (*default_organization)
@@ -2786,7 +2804,7 @@ mail_to_author (
 
 #ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (nam);
+				invoke_ispell (nam, 0);
 				break;
 #endif /* HAVE_ISPELL */
 
@@ -3392,7 +3410,7 @@ repost_article_loop:
 
 #	ifdef HAVE_ISPELL
 			case iKeyPostIspell:
-				invoke_ispell (article);
+				invoke_ispell (article, psGrp);
 				break;
 #	endif /* HAVE_ISPELL */
 

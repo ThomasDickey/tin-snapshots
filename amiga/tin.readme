@@ -18,13 +18,13 @@ check the docs in the main directory. It may be, that this file is not
 really up-to-date. Query the document version string for the last
 change:
 
-$VER: tin.readme 0.3 (08.10.97)
+$VER: tin.readme 0.4 (14.06.99)
 
 1. Building tin.
 
 tin is tested to build on the following compilers:
 SAS/C 6.57
-gcc 2.7.2.1 (ADE/Geek Gadgets)
+egcs-2.90.27 980315 (egcs-1.0.2 release) (ADE/Geek Gadgets)
 
 If you have SAS/C <6.55 then you have to put some work in it, but then
 you may consider to use the gcc instead if you can't update because your
@@ -74,14 +74,14 @@ b) ADE-gcc
 You may have guessed it if you compiled some packages before:
 This is going to be a piece of cake. :)
 
-Have a look at the available options with
+Start the pdksh first. Then have a look at the available options with
 
-    sh Configure --help
+    Configure --help
 
 Don't forget --with-libdir and --with-spooldir if you are reading
 locally. Select those you want additionally and start off with
 
-    sh Configure <insert your options here>
+    Configure <insert your options here>
 
 Have a nice cup of hot Earl Grey (On my 040/40 the script takes quite
 some 10 minutes) or two (--with-coffee is also recommended). Then check
@@ -106,7 +106,7 @@ in hand either.
 
 You might need a wrapper script like the one described in the README.
 
-b) ADE-gcc
+b) ADE-egcs
 Put tin where appropriate. Don't forget to set the NNTPSERVER variable
 if you didn't set a default server at compile-time, this might cause
 problems (see doc/TODO)
@@ -121,6 +121,13 @@ the other combinations it just does nothing, so the piping of MIME
 articles doesn't work. I tried some workarounds, but no avail. The
 problem is clearly not within tin, it is the problem of metamail.
 Volunteers searched for porting a new version.
+
+b) When compiling with egcs, the window resize does not work properly.
+This is also a problem with some of the standard GG programs (ncftp, but
+interestingly *not* jove). Also reading from local spool is very slow at
+startup, because every directory is opendir()ed and read completely.
+Perhaps one of the various startup switches can speed this up. Read the
+man page for more info.
 
 3. Credits
 

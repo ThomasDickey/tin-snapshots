@@ -36,7 +36,6 @@ char article[PATH_LEN];			/* ~/.article file */
 char bug_addr[LEN];			/* address to add send bug reports to */
 char bug_nntpserver1[PATH_LEN];		/* welcome message of NNTP server used */
 char bug_nntpserver2[PATH_LEN];		/* welcome message of NNTP server used */
-char cmd_line_printer[PATH_LEN];	/* printer program specified on cmd line */
 char cmdline_nntpserver[PATH_LEN];
 char cvers[LEN];
 char dead_article[PATH_LEN];		/* ~/dead.article file */
@@ -189,156 +188,176 @@ char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 #endif /* !M_AMIGA */
 
 struct t_config tinrc = {
-	ART_MARK_DELETED,
-	MARK_INRANGE,
-	ART_MARK_RETURN,
-	ART_MARK_SELECTED,
-	ART_MARK_UNREAD,
-	"",			/* default_editor_format */
-	"",			/* default_goto_group */
-	"",			/* default_mail_address */
-	"",
+	ART_MARK_DELETED,		/* art_marked_deleted */
+	MARK_INRANGE,		/* art_marked_inrange */
+	ART_MARK_RETURN,		/* art_marked_return */
+	ART_MARK_SELECTED,		/* art_marked_selected */
+	ART_MARK_UNREAD,		/* art_marked_unread */
+	"",		/* default_editor_format */
+	"",		/* default_goto_group */
+	"",		/* default_mail_address */
+	"",		/* default_mailer_format */
 #ifndef DONT_HAVE_PIPING
-	"",
-#endif
-	"",			/* default_post_newsgroups */
-	"",			/* default_post_subject */
-	"",			/* default_printer */
-	"1-.",			/* default_range_group */
-	"1-.",
-	"0-.",
-	"",			/* default_regex_pattern */
-	"",
-	"savefile.tin",
-	"",			/* default_search_art */
-	"",
-	"",
-	"",
-	"",
-	"",			/* default_select_pattern */
-	"",
-	"",			/* default_sigfile */
-	"In article %M you wrote:",	/* mail_quote_format */
-	"",
-	"",
-	"",			/* mm_charset */
-	"Newsgroups Followup-To Summary Keywords",
-	"",
+	"",		/* default_pipe_command */
+#endif /* !DONT_HAVE_PIPING */
+	"",		/* default_post_newsgroups */
+	"",		/* default_post_subject */
+#ifndef DISABLE_PRINTING
+	"",		/* default_printer */
+#endif /* !DISABLE_PRINTING */
+	"1-.",		/* default_range_group */
+	"1-.",		/* default_range_select */
+	"0-.",		/* default_range_thread */
+	"",		/* default_regex_pattern */
+	"",		/* default_repost_group */
+	"savefile.tin",		/* default_save_file */
+	"",		/* default_search_art */
+	"",		/* default_search_author */
+	"",		/* default_search_config */
+	"",		/* default_search_group */
+	"",		/* default_search_subject */
+	"",		/* default_select_pattern */
+	"",		/* default_shell_command */
+	"",		/* default_sigfile */
+	"In article %M you wrote:",		/* mail_quote_format */
+	"",		/* maildir */
+	"",		/* mail_address */
+	"",		/* mm_charset */
+	"Newsgroups Followup-To Summary Keywords",		/* news_headers_to_display */
+	"",		/* news_headers_to_not_display */
 	"%F wrote:",		/* news_quote_format */
-	"",			/* post_process_command */
-	DEFAULT_COMMENT,	/* quote_chars */
-	"",
-	"",			/* spamtrap_warning_addresses */
-	"In %G %F wrote:",	/* xpost_quote_format */
-	DEFAULT_FILTER_DAYS,
-	FILTER_SUBJ_CASE_SENSITIVE,
-	FILTER_SUBJ_CASE_SENSITIVE,	/* default_filter_select_header */
-	0,
-	iKeySaveAppendFile,	/* default_save_mode */
-	0,			/* getart_limit */
-	32,
-	MIME_ENCODING_7BIT,	/* mail_mime_encoding */
-	MIME_ENCODING_7BIT,
-	POST_PROC_NONE,
-	REREAD_ACTIVE_FILE_SECS,
-	SHOW_FROM_NAME,
-	SORT_BY_DATE_ASCEND,
-	BOGUS_ASK,
-	THREAD_MAX,
-	0,			/* Default to wildmat, not regex */
+	"",		/* post_process_command */
+	DEFAULT_COMMENT,		/* quote_chars */
+	"",		/* savedir */
+	"",		/* spamtrap_warning_addresses */
+	"In %G %F wrote:",		/* xpost_quote_format */
+	DEFAULT_FILTER_DAYS,		/* default_filter_days */
+	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_kill_header */
+	FILTER_SUBJ_CASE_SENSITIVE,		/* default_filter_select_header */
+	0,		/* default_move_group */
+	iKeySaveAppendFile,		/* default_save_mode */
+	0,		/* getart_limit */
+	32,		/* groupname_max_length */
+	MIME_ENCODING_7BIT,		/* mail_mime_encoding */
+	MIME_ENCODING_7BIT,		/* post_mime_encoding */
+	POST_PROC_NONE,		/* post_process_type */
+	REREAD_ACTIVE_FILE_SECS,		/* reread_active_file_secs */
+	SHOW_FROM_NAME,		/* show_author */
+	SORT_BY_DATE_ASCEND,		/* sort_article_type */
+	BOGUS_ASK,		/* strip_bogus */
+	THREAD_MAX,		/* thread_articles */
+	0,		/* Default to wildmat, not regex */
 #ifdef HAVE_COLOR
-	0, 0, 0, 0, 0, 0, 0, 0, 0,/* Initialised later */
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	2,			/* display space instead of marks */
-	TRUE,			/* word_highlight */
-	FALSE,			/* use_color */
-#endif
-	TRUE,			/* add_posted_to_filter */
-	TRUE,			/* advertising */
-	TRUE,
-	FALSE,			/* auto_bcc */
-	FALSE,
-	TRUE,			/* auto_list_thread */
-	FALSE,
-	FALSE,			/* auto_save */
-	FALSE,
-	TRUE,			/* beginner_level */
-	FALSE,
-	FALSE,			/* catchup_read_groups */
-	TRUE,			/* confirm_action */
-	TRUE,			/* confirm_to_quit */
-	TRUE,			/* display_mime_allheader_asis */
-	FALSE,			/* display_mime_header_asis */
-#ifdef USE_INVERSE_HACK		/* draw_arrow_mark */
-	TRUE,
+	0,		/* col_back (initialised later) */
+	0,		/* col_from (initialised later) */
+	0,		/* col_head (initialised later) */
+	0,		/* col_help (initialised later) */
+	0,		/* col_invers_bg (initialised later) */
+	0,		/* col_invers_fg (initialised later) */
+	0,		/* col_minihelp (initialised later) */
+	0,		/* col_normal (initialised later) */
+	0,		/* col_markdash (initialised later) */
+	0,		/* col_markstar (initialised later) */
+	0,		/* col_message (initialised later) */
+	0,		/* col_newsheaders (initialised later) */
+	0,		/* col_quote (initialised later) */
+	0,		/* col_response (initialised later) */
+	0,		/* col_signature (initialised later) */
+	0,		/* col_subject (initialised later) */
+	0,		/* col_text (initialised later) */
+	0,		/* col_title (initialised later) */
+	2,		/* word_h_display_marks */
+	TRUE,		/* word_highlight */
+	FALSE,		/* use_color */
+#endif /* HAVE_COLOR */
+	TRUE,		/* add_posted_to_filter */
+	TRUE,		/* advertising */
+	TRUE,		/* alternative_handling */
+	FALSE,		/* auto_bcc */
+	FALSE,		/* auto_cc */
+	TRUE,		/* auto_list_thread */
+	FALSE,		/* auto_reconnect */
+	FALSE,		/* auto_save */
+	FALSE,		/* batch_save */
+	TRUE,		/* beginner_level */
+	FALSE,		/* cache_overview_files */
+	FALSE,		/* catchup_read_groups */
+	TRUE,		/* confirm_action */
+	TRUE,		/* confirm_to_quit */
+	TRUE,		/* display_mime_allheader_asis */
+	FALSE,		/* display_mime_header_asis */
+#ifdef USE_INVERSE_HACK
+	TRUE,		/* draw_arrow_mark */
 #else
-	FALSE,
+	FALSE,	/* draw_arrow_mark */
 #endif /* USE_INVERSE_HACK */
-	FALSE,			/* force_screen_redraw */
-	TRUE,			/* full_page_scroll */
-	TRUE,			/* group_catchup_on_exit */
-	FALSE,			/* info_in_last_line */
-#ifdef USE_INVERSE_HACK		/* inverse_okay */
-	FALSE,
+	FALSE,		/* force_screen_redraw */
+	TRUE,		/* full_page_scroll */
+	TRUE,		/* group_catchup_on_exit */
+	FALSE,		/* info_in_last_line */
+#ifdef USE_INVERSE_HACK
+	FALSE,		/* inverse_okay */
 #else
-	TRUE,
+	TRUE,		/* inverse_okay */
 #endif /* USE_INVERSE_HACK */
-	TRUE,			/* keep_dead_articles */
-	TRUE,
-	FALSE,			/* mail_8bit_header */
-	TRUE,
-	TRUE,			/* pgdn_goto_next */
-	TRUE,
-	FALSE,			/* post_8bit_header */
-	FALSE,
-	TRUE,			/* process_only_unread */
-	FALSE,
-	FALSE,			/* quote_empty_lines */
-	TRUE,
-#ifdef HAVE_MMDF_MAILER		/* save_to_mmdf_mailbox */
-	TRUE,
+	TRUE,		/* keep_dead_articles */
+	TRUE,		/* keep_posted_articles */
+	FALSE,		/* mail_8bit_header */
+	TRUE,		/* mark_saved_read */
+	TRUE,		/* pgdn_goto_next */
+	TRUE,		/* pos_first_unread */
+	FALSE,		/* post_8bit_header */
+#ifndef DISABLE_PRINTING
+	FALSE,		/* print_header */
+#endif /* !DISABLE_PRINTING */
+	TRUE,		/* process_only_unread */
+	FALSE,		/* prompt_followupto */
+	FALSE,		/* quote_empty_lines */
+	TRUE,		/* quote_signatures */
+#ifdef HAVE_MMDF_MAILER
+	TRUE,		/* save_to_mmdf_mailbox */
 #else
-	FALSE,
+	FALSE,		/* save_to_mmdf_mailbox */
 #endif /* HAVE_MMDF_MAILER */
-	TRUE,			/* show_description */
-	FALSE,
-	TRUE,			/* show_lines */
-	TRUE,
-	FALSE,			/* show_only_unread_groups */
-	FALSE,
-	TRUE,			/* show_signatures */
-	FALSE,
-	TRUE,			/* sigdashes */
-	TRUE,
-	FALSE,			/* space_goto_next_unread */
-#ifdef M_UNIX			/* start_editor_offset */
-	TRUE,
+	TRUE,		/* show_description */
+	FALSE,		/* show_last_line_prev_page */
+	TRUE,		/* show_lines */
+	TRUE,		/* show_only_unread_arts */
+	FALSE,		/* show_only_unread_groups */
+	FALSE,		/* show_score */
+	TRUE,		/* show_signatures */
+	FALSE,		/* show_xcommentto */
+	TRUE,		/* sigdashes */
+	TRUE,		/* signature_repost */
+	FALSE,		/* space_goto_next_unread */
+#ifdef M_UNIX
+	TRUE,		/* start_editor_offset */
 #else
-	FALSE,
+	FALSE,		/* start_editor_offset */
 #endif /* M_UNIX */
-	TRUE,			/* strip_blanks */
-	FALSE,
-	FALSE,			/* tab_after_X_selection */
-	TRUE,
-	TRUE,			/* thread_catchup_on_exit */
-	TRUE,
-	TRUE,			/* use_builtin_inews */
-	FALSE,
-	FALSE,			/* use_mailreader_i */
-	FALSE,			/* use_mouse */
+	TRUE,		/* strip_blanks */
+	FALSE,		/* strip_newsrc */
+	FALSE,		/* tab_after_X_selection */
+	TRUE,		/* tab_goto_next_unread */
+	TRUE,		/* thread_catchup_on_exit */
+	TRUE,		/* unlink_article */
+	TRUE,		/* use_builtin_inews */
+	FALSE,		/* use_getart_limit */
+	FALSE,		/* use_mailreader_i */
+	FALSE,		/* use_mouse */
 #ifdef HAVE_KEYPAD
-	FALSE,			/* use_keypad */
+	FALSE,		/* use_keypad */
 #endif /* HAVE_KEYPAD */
 #ifdef HAVE_METAMAIL
-	TRUE,			/* ask_for_metamail */
-	TRUE,			/* use_metamail */
-#endif
-	FALSE,			/* default_filter_kill_case */
-	FALSE,
-	TRUE,
-	FALSE,			/* default_filter_select_case */
-	FALSE,
-	TRUE
+	TRUE,		/* ask_for_metamail */
+	TRUE,		/* use_metamail */
+#endif /* HAVE_METAMAIL */
+	FALSE,		/* default_filter_kill_case */
+	FALSE,		/* default_filter_kill_expire */
+	TRUE,		/* default_filter_kill_global */
+	FALSE,		/* default_filter_select_case */
+	FALSE,		/* default_filter_select_expire */
+	TRUE		/* default_filter_select_global */
 };
 
 #ifdef HAVE_COLOR
@@ -348,8 +367,8 @@ struct t_config tinrc = {
 #	define DFT_INIT -3
 
 static const struct {
-	int	*colorp;
-	int	color_dft;	/* -2 back, -1 fore, >=0 normal */
+	int *colorp;
+	int color_dft;	/* -2 back, -1 fore, >=0 normal */
 } our_colors[] = {
 	{ &tinrc.col_back,       DFT_BACK },
 	{ &tinrc.col_from,        2 },
@@ -604,7 +623,6 @@ init_selfinfo (
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
 	sprintf (cvers, txt_copyright_notice, page_header);
 
-	cmd_line_printer[0] = '\0';
 	default_organization[0] = '\0';
 	proc_ch_default = 'n';
 	news_headers_to_display_array = ulBuildArgv(tinrc.news_headers_to_display, &num_headers_to_display);
@@ -722,11 +740,13 @@ init_selfinfo (
 #else /* M_UNIX ... */
 	strcpy (tinrc.default_mailer_format, mailer);
 #endif /* M_UNIX ... */
+#ifndef DISABLE_PRINTING
 	strcpy (tinrc.default_printer, DEFAULT_PRINTER);
-#ifdef M_AMIGA
+#	ifdef M_AMIGA
 	if (tin_bbs_mode)
 		strcpy(tinrc.default_printer, DEFAULT_BBS_PRINTER);
-#endif /* M_AMIGA */
+#	endif /* M_AMIGA */
+#endif /* !DISABLE_PRINTING */
 	strcpy (mailer, get_val (ENV_VAR_MAILER, DEFAULT_MAILER));
 #ifdef VMS
 	joinpath (article, homedir, "article.");
@@ -867,6 +887,7 @@ init_selfinfo (
 	 * I think we should delete this whole section. Who sets a
 	 * bug report in environment anyway? XXXXXXXXXXXXXXXXXX
 	 */
+	/* I agree (obw) */
 	if ((ptr = getenv ("BUG_ADDRESS")) != (char *) 0) {
 		my_strncpy (bug_addr, ptr, sizeof (bug_addr));
 	} else {

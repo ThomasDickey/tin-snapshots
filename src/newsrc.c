@@ -27,20 +27,24 @@ static char *pcParseSubSeq (struct t_group *psGrp, char *pcSeq, long *plLow, lon
 static char *pcParseGetSeq (char *pcSeq, long *plLow, long *plHigh);
 static int iWriteNewsrcLine (FILE *fp, char *line);
 static void auto_subscribe_groups (char *newsrc_file);
-static void create_newsrc (char *newsrc_file);
+static t_bool create_newsrc (char *newsrc_file);
 static void parse_bitmap_seq (struct t_group *group, char *seq);
 static void print_bitmap_seq (FILE *fp, struct t_group *group);
 
 
 /*
- *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
- *  active[] entries.
- *  If allgroups is set, then my_group[] is completely overwritten,
- *  otherwise, groups are appended
- *  Any bogus groups will be handled accordingly. Bogus groups will _not_
- *  be subscribed to as a design principle.
+ * Read $HOME/.newsrc into my_group[]. my_group[] ints point to
+ * active[] entries.
+ * If allgroups is set, then my_group[] is completely overwritten,
+ * otherwise, groups are appended
+ * Any bogus groups will be handled accordingly. Bogus groups will _not_
+ * be subscribed to as a design principle.
+ *
+ * Returns the numer of lines read (usefull for a check newsrc >= oldnewsrc)
+ *    < 0 error
+ *    >=0 number of lines read
  */
-void
+signed long int
 read_newsrc (
 	char *newsrc_file,
 	t_bool allgroups)
@@ -48,6 +52,7 @@ read_newsrc (
 	FILE *fp;
 	char *grp, *seq;
 	int sub, i;
+	signed long lines = 0;
 	struct stat statbuf;
 
 	if (allgroups)
@@ -57,7 +62,8 @@ read_newsrc (
 	 * make a .newsrc if one doesn't exist & auto subscribe to set groups
 	 */
 	if (stat (newsrc_file, &statbuf) == -1) {
-		create_newsrc (newsrc_file);
+		if (!create_newsrc (newsrc_file))
+			return -1L; /* ouch */
 		auto_subscribe_groups (newsrc_file);
 	} else
 		newsrc_mode = (mode_t) statbuf.st_mode;
@@ -68,6 +74,7 @@ read_newsrc (
 
 		while ((grp = tin_fgets (fp, FALSE)) != (char *) 0) {
 			seq = pcParseNewsrcLine (grp, &sub);
+			lines++;
 
 			if (sub == SUBSCRIBED) {
 				if ((i = my_group_add (grp)) >= 0) {
@@ -87,6 +94,7 @@ read_newsrc (
 			my_flush ();
 		}
 	}
+	return lines;
 }
 
 
@@ -131,12 +139,15 @@ iWriteNewsrcLine (
 	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !tinrc.strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
+		return 1;
 	} else {
-		if (sub == SUBSCRIBED || !tinrc.strip_newsrc)
+		if (sub == SUBSCRIBED || !tinrc.strip_newsrc) {
 			fprintf (fp, "%s%c %s\n", line, sub, seq);
+			return 1;
+		}
 	}
 
-	return 1;
+	return 0;
 }
 
 
@@ -144,9 +155,10 @@ iWriteNewsrcLine (
  * Read in the users newsrc file and write a new file with all the changes
  * changes from the current session. If this works, replace the original
  * newsrc file.
- * Return TRUE if this succeeds, FALSE otherwise.
+ * Returns < 0 on error
+ *         >=0 number of lines written
  */
-t_bool
+signed long int
 vWriteNewsrc (
 	void)
 {
@@ -154,22 +166,22 @@ vWriteNewsrc (
 	FILE *fp_ip;
 	FILE *fp_op;
 	char *line;
-	int tot = 0;
+	signed long int tot = 0L;
 	struct stat note_stat_newsrc;
 	t_bool write_ok = FALSE;
 
 	if (no_write)
-		return TRUE;
+		return 0L;
 
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
-		return FALSE; /* can't open newsrc */
+		return -1L; /* can't open newsrc */
 
 	/* get size of original newsrc */
 	fstat (fileno(fp_ip), &note_stat_newsrc);
 
 	if (!note_stat_newsrc.st_size) {
 		fclose (fp_ip);
-		return TRUE; /* newsrc is empty */
+		return 0L; /* newsrc is empty */
 	}
 
 	if ((fp_op = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
@@ -182,7 +194,7 @@ vWriteNewsrc (
 		/*
 		 * Don't rename if either fclose() fails or ferror() is set
 		 */
-		if (ferror (fp_op) | fclose (fp_op)) {
+		if (ferror (fp_op) || fclose (fp_op)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
 		} else
@@ -191,25 +203,25 @@ vWriteNewsrc (
 
 	fclose (fp_ip);
 
-	if (!tot) {
+	if (tot < 1) {
 		error_message (txt_newsrc_nogroups);
-		return TRUE;		/* So we don't get prompted to try again */
+		return 0L;		/* So we don't get prompted to try again */
 	}
 
 	if (write_ok)
 		rename_file (newnewsrc, newsrc);
 
-	return write_ok;
+	return tot;
 #else
-	return TRUE;
+	return 1L;
 #endif /* !INDEX_DAEMON */
 }
 
 
 /*
- *  Create a newsrc from active[] groups. Subscribe to all groups.
+ * Create a newsrc from active[] groups. Subscribe to all groups.
  */
-static void
+static t_bool
 create_newsrc (
 	char *newsrc_file)
 {
@@ -222,9 +234,13 @@ create_newsrc (
 		for (i = 0; i < num_active; i++)
 			fprintf (fp, "%s!\n", active[i].name);
 
-		if (ferror (fp) | fclose (fp))
+		if (ferror (fp) || fclose (fp)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
+			return FALSE;
+		}
+		return TRUE; /* newsrc created */
 	}
+	return FALSE;
 }
 
 
@@ -266,7 +282,7 @@ auto_subscribe_groups (
 
 	/* We ignore user 'q'uits here. They will get them next time in any case */
 
-	if (ferror (fp_newsrc) | fclose (fp_newsrc))
+	if (ferror (fp_newsrc) || fclose (fp_newsrc))
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 
 	TIN_FCLOSE (fp_subs);
@@ -300,7 +316,7 @@ backup_newsrc (
 			while ((line = tin_fgets (fp_ip, FALSE)) != (char *) 0)
 				fprintf (fp_op, "%s\n", line);
 
-			if (ferror (fp_op) | fclose (fp_op))
+			if (ferror (fp_op) || fclose (fp_op))
 				error_message (txt_filesystem_full_backup, NEWSRC_FILE);
 
 		}
@@ -377,7 +393,7 @@ subscribe (
 		}
 	}
 
-	if (ferror (newfp) | fclose (newfp)) {
+	if (ferror (newfp) || fclose (newfp)) {
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 		unlink (newnewsrc);
 	} else
@@ -407,7 +423,7 @@ reset_newsrc (
 			}
 			fclose (fp);
 		}
-		if (ferror (newfp) | fclose (newfp)) {
+		if (ferror (newfp) || fclose (newfp)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
 		} else
@@ -451,7 +467,7 @@ delete_group (
 			fclose (fp);
 		}
 
-		if (ferror (newfp) | fclose (newfp)) {
+		if (ferror (newfp) || fclose (newfp)) {
 			error_message (txt_filesystem_full, NEWSRC_FILE);
 			unlink (newnewsrc);
 		} else
@@ -695,15 +711,15 @@ wait_message(2, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
  */
 static char *
 pcParseSubSeq (
-	struct	t_group *psGrp,
-	char	*pcSeq,
-	long	*plLow,
-	long	*plHigh,
-	int	*piSum)
+	struct t_group *psGrp,
+	char *pcSeq,
+	long *plLow,
+	long *plHigh,
+	int *piSum)
 {
-	long	lBitMin;
-	long	lBitMax;
-	long	lLastHigh;
+	long lBitMin;
+	long lBitMax;
+	long lLastHigh;
 
 	lLastHigh = *plHigh;
 	pcSeq = pcParseGetSeq(pcSeq, plLow, plHigh);
@@ -811,8 +827,8 @@ void
 parse_unread_arts (
 	struct t_group *group)
 {
-	long	unread = 0;
-	long	bitmin, bitmax;
+	long unread = 0;
+	long bitmin, bitmax;
 	register int i;
 	t_bitmap *newbitmap = (t_bitmap *)0;
 
@@ -935,13 +951,13 @@ pos_group_in_newsrc (
 	struct t_group *group,
 	int pos)
 {
+	FILE *fp_in = NULL, *fp_out = NULL;
+	FILE *fp_sub = NULL, *fp_unsub = NULL;
+	char *newsgroup = NULL;
+	char *line;
 	char buf[HEADER_LEN];
 	char sub[HEADER_LEN];
 	char unsub[HEADER_LEN];
-	char *newsgroup = NULL;
-	char *line;
-	FILE *fp_in = NULL, *fp_out = NULL;
-	FILE *fp_sub = NULL, *fp_unsub = NULL;
 	int subscribed_pos = 1;
 	size_t group_len;
 	t_bool found = FALSE;
@@ -1012,7 +1028,7 @@ pos_group_in_newsrc (
 		}
 	}
 
-	if (ferror (fp_sub) | fclose (fp_sub) | ferror (fp_unsub) | fclose (fp_unsub)) {
+	if (ferror (fp_sub) || fclose (fp_sub) || ferror (fp_unsub) || fclose (fp_unsub)) {
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 		fp_sub = fp_unsub = NULL;
 		goto rewrite_group_done;
@@ -1070,7 +1086,7 @@ pos_group_in_newsrc (
 	/*
 	 * Try and cleanly close out the newnewsrc file
 	 */
-	if (ferror (fp_out) | fclose (fp_out))
+	if (ferror (fp_out) || fclose (fp_out))
 		error_message (txt_filesystem_full, NEWSRC_FILE);
 	else {
 		if (repositioned) {
@@ -1556,11 +1572,11 @@ vNewsrcTestHarness (
 #	ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 static void
 set_bitmap_range_read (
-	struct	t_newsrc *newsrc,
-	long	beg,
-	long	end)
+	struct t_newsrc *newsrc,
+	long beg,
+	long end)
 {
-	long	length, offset;
+	long length, offset;
 
 	if (beg >= newsrc->xmin && end <= newsrc->xmax) {
 		offset = beg - newsrc->xmin;
@@ -1580,11 +1596,11 @@ newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 
 static void
 set_bitmap_range_unread (
-	struct	t_newsrc *newsrc,
-	long	beg,
-	long	end)
+	struct t_newsrc *newsrc,
+	long beg,
+	long end)
 {
-	long	length, offset;
+	long length, offset;
 
 	if (beg >= newsrc->xmin && end <= newsrc->xmax) {
 		offset = beg - newsrc->xmin;

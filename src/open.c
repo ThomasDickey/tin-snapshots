@@ -937,8 +937,8 @@ void
 vGet1GrpArtInfo (
 	struct t_group *grp)
 {
-	long	lMinOld = grp->xmin;
-	long	lMaxOld = grp->xmax;
+	long lMinOld = grp->xmin;
+	long lMaxOld = grp->xmax;
 
 	vGrpGetArtInfo (grp->spooldir, grp->name, grp->type, &grp->count, &grp->xmax, &grp->xmin);
 
@@ -967,12 +967,12 @@ vGet1GrpArtInfo (
  */
 int
 vGrpGetArtInfo (
-	char	*pcSpoolDir,
-	char	*pcGrpName,
-	int	iGrpType,
-	long	*plArtCount,
-	long	*plArtMax,
-	long	*plArtMin)
+	char *pcSpoolDir,
+	char *pcGrpName,
+	int iGrpType,
+	long *plArtCount,
+	long *plArtMax,
+	long *plArtMin)
 {
 	DIR *tDirFile;
 	DIR_BUF *tFile;

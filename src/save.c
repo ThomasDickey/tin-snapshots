@@ -135,7 +135,7 @@ check_start_save_any_news (
 			fprintf (fp_log, "To: %s\n", userid);
 			(void) time (&epoch);
 			sprintf (subject, "Subject: NEWS LOG %s", ctime (&epoch));
-			/** Remove trailing \n introduced by ctime() **/
+			/* Remove trailing \n introduced by ctime() */
 			if ((ich = strrchr(subject, '\n')) != 0)
 				*ich = '\0';
 			fprintf (fp_log, "%s\n\n", subject);
@@ -170,7 +170,7 @@ check_start_save_any_news (
 				case MAIL_ANY_NEWS:
 				case SAVE_ANY_NEWS:
 					if (print_group) {
-						sprintf (buf, "Saved %s...\n", group->name);
+						sprintf (buf, "Saved %s...\n", group->name); /* FIXME: -> lang.c */
 						fprintf (fp_log, buf);
 						if (verbose)
 							wait_message (0, buf);
@@ -244,7 +244,7 @@ check_start_save_any_news (
 		}
 
 		if (check_arts) {
-			if (verbose)
+			if (verbose) /* FIXME: -> lang.c */
 				wait_message (0, "%4d unread articles in %s\n", check_arts, group->name);
 			unread_news = TRUE;
 		}
@@ -266,14 +266,14 @@ check_start_save_any_news (
 			/* NOTREACHED */
 		case MAIL_ANY_NEWS:
 		case SAVE_ANY_NEWS:
-			sprintf (buf, "\n%s %d article(s) from %d group(s)\n", (check_start_save == MAIL_ANY_NEWS ? "Mailed" : "Saved"), saved_arts, group_top); /*saved_groups); */
+			sprintf (buf, "\n%s %d article(s) from %d group(s)\n", (check_start_save == MAIL_ANY_NEWS ? "Mailed" : "Saved"), saved_arts, group_top); /*saved_groups); */ /* FIXME: -> lang.c */
 			fprintf (fp_log, "%s", buf);
 			if (verbose)
 				wait_message (0, buf);
 			if (log_opened) {
 				fclose (fp_log);
 				if (verbose)
-					wait_message (0, "Mailing log to %s\n", (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid));
+					wait_message (0, "Mailing log to %s\n", (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid)); /* FIXME: -> lang.c */
 				strfmailer (mailer, subject, (check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid), logfile, buf, sizeof (buf), tinrc.default_mailer_format);
 				if (!invoke_cmd (buf))
 					error_message (txt_command_failed_s, buf);
@@ -373,7 +373,7 @@ save_art_to_file (
 		fprintf (fp, "From %s %s", from, ctime (&epoch));
 	}
 
-	if (fseek (note_fp, 0L, SEEK_SET) == -1)
+	if (fseek (note_fp, 0L, SEEK_SET) == -1) /* FIXME: -> lang.c */
 		perror_message ("fseek() error on [%s]", save[i].subject);
 
 	copy_fp (note_fp, fp);
@@ -420,8 +420,19 @@ save_arts (
 /* see the TODO file, this bit decides to write to seperate files or not - make it configurable */
 		if (is_mailbox)
 			file[0] = 0;
-		else
+		else {
+#ifdef HAVE_LONG_FILE_NAMES
+			char tbuf[31]; /* big enought to hold 2^64 + fmt + \0 */
+			size_t mlen;
+
+			sprintf(tbuf, "%d", num_save);
+			mlen = strlen(tbuf);
+			sprintf(tbuf, "%%s.%%0%dd", mlen);
+			sprintf(file, tbuf, save[i].file, i+1);
+#else
 			sprintf (file, "%s.%03d", save[i].file, i+1);
+#endif /* HAVE_LONG_FILE_NAMES */
+		}
 
 		switch (art_open (&arts[save[i].index], group_path, do_rfc1521_decoding)) {
 
@@ -505,6 +516,7 @@ save_regex_arts_to_file (
 			FreeIfNeeded(last_savefile);
 		}
 
+		/* FIXME: quote % in buf first */
 		wait_message (2, buf);
 		FreeIfNeeded(first_savefile);
 	}
@@ -591,7 +603,7 @@ create_path (
 			if (stat (buf, &st) == -1) {
 				if (my_mkdir (buf, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO)) == -1) {
 					if (errno != EEXIST) {
-						perror_message ("Cannot create %s", buf);
+						perror_message ("Cannot create %s", buf); /* FIXME: -> lang.c */
 						return FALSE;
 					}
 				}
@@ -861,7 +873,17 @@ save_filename (
 #	ifdef VMS
 			sprintf (&filename[strlen(filename)], "-%03d", i+1);
 #	else
+#		ifdef HAVE_LONG_FILE_NAMES
+			char tbuf[31]; /* big enought to hold 2^64 + fmt + \0 */
+			size_t mlen;
+
+			sprintf(tbuf, "%d", num_save);
+			mlen = strlen(tbuf);
+			sprintf(tbuf, ".%%0%dd", mlen);
+			sprintf(&filename[strlen(filename)], tbuf, i+1);
+#		else
 			sprintf (&filename[strlen(filename)], ".%03d", i+1);
+#		endif /* HAVE_LONG_FILE_NAMES */
 #	endif /* VMS */
 		}
 	} else if ((p = save[i].part) || (p = save[i].patch)) {
@@ -927,12 +949,23 @@ get_save_filename (
 	} else {
 		if (num_save == 1)
 			sprintf (file, "%s", save[i].file);
-		else
+		else {
 #	ifdef VMS
 			sprintf (file, "%s-%03d", save[i].file, i+1);
 #	else
+#		ifdef HAVE_LONG_FILE_NAMES
+			char tbuf[31]; /* big enought to hold 2^64 + fmt + \0 */
+			size_t mlen;
+
+			sprintf(tbuf, "%d", num_save);
+			mlen = strlen(tbuf);
+			sprintf(tbuf, "%%s.%%0%dd", mlen);
+			sprintf(file, tbuf, save[i].file, i+1);
+#		else
 			sprintf (file, "%s.%03d", save[i].file, i+1);
+#		endif /* HAVE_LONG_FILE_NAMES */
 #	endif /* VMS */
+		}
 	}
 	return file;
 }
@@ -1101,31 +1134,30 @@ post_process_uud (
 		if (state == UURET_OK) {
 			/* open_out_file already declared, might as well use it */
 			open_out_file++;
-			my_printf("%s successfuly decoded." cCRLF, item->filename);
+			my_printf(txt_libuu_success, item->filename);
 		} else {
 			errors++;
 			if (item->filename == NULL)
-				my_printf("Error decoding %s : ", item->subfname);
+				my_printf(txt_libuu_error_decode, item->subfname);
 			else
-				my_printf("Error decoding %s : ", item->filename);
+				my_printf(txt_libuu_error_decode, item->filename);
 
 			if (item->state & UUFILE_MISPART) {
-				my_printf("Missing parts." cCRLF);
+				my_printf(txt_libuu_error_missing);
 			} else if (item->state & UUFILE_NOBEGIN) {
-				my_printf("No beginning." cCRLF);
+				my_printf(txt_libuu_error_no_begin);
 			} else if (item->state & UUFILE_NOEND) {
-				my_printf("No end." cCRLF);
+				my_printf(txt_libuu_error_no_end);
 			} else if (item->state & UUFILE_NODATA) {
-				my_printf("No data." cCRLF);
+				my_printf(txt_libuu_error_no_data);
 			} else
-				my_printf("Unknown error." cCRLF);
+				my_printf(txt_libuu_error_unknown);
 		}
 		i++;
 		item = UUGetFileListItem(i);
 		my_flush();
 	}
-	/* FIXME -> lang.c */
-	my_printf("%d files successfully written from %d articles. %d error%s occured." cCRLF, open_out_file, num_save, errors, IS_PLURAL(errors));
+	my_printf(txt_libuu_saved, open_out_file, num_save, errors, IS_PLURAL(errors));
 	UUCleanUp();
 	delete_processed_files (auto_delete); /* TRUE = auto-delete files */
 	return;
@@ -1200,7 +1232,7 @@ post_process_uud (
 						break;
 
 					default:
-						my_fprintf (stderr, cCRLF "Error: ASSERT - default state\n");
+						my_fprintf (stderr, cCRLF "Error: ASSERT - default state\n"); /* FIXME: -> lang.c */
 						fclose (fp_in);
 						fclose (fp_out);
 						unlink (file_out);
@@ -1239,9 +1271,9 @@ post_process_uud (
 #	ifndef HAVE_LIBUU
 static void
 uudecode_file (
-	int	pp,
-	char	*file_out_dir,
-	char	*file_out)
+	int pp,
+	char *file_out_dir,
+	char *file_out)
 {
 	char *file;
 	char buf[LEN];
@@ -1272,7 +1304,7 @@ uudecode_file (
 				my_flush ();
 				my_printf ("%s  %10ld bytes" cCRLF cCRLF, buf, file_size (file));
 			} else
-				my_printf ("Cannot execute %s" cCRLF, buf);
+				my_printf ("Cannot execute %s" cCRLF, buf); /* FIXME: -> lang.c */
 
 			my_flush ();
 

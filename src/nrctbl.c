@@ -34,7 +34,7 @@ static void
 write_newsrctable_file (
 	void)
 {
-	FILE	*fp;
+	FILE *fp;
 
 	if ((fp = fopen(local_newsrctable_file, "w")) == (FILE *) 0)
 		return;
@@ -56,11 +56,11 @@ get_nntpserver (
 	char *nntpserver_name,
 	char *nick_name)
 {
-	FILE	*fp;
-	char	*line_entry;
-	char	line[LEN];
-	char	name_found[PATH_LEN];
-	int	line_entry_counter;
+	FILE *fp;
+	char *line_entry;
+	char line[LEN];
+	char name_found[PATH_LEN];
+	int line_entry_counter;
 	t_bool found = FALSE;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
@@ -98,12 +98,12 @@ get_newsrcname (
 	char *newsrc_name,
 	const char *nntpserver_name) /* return value is always ignored */
 {
-	FILE	*fp;
-	char	*line_entry;
-	char	line[LEN];
-	char	name_found[PATH_LEN];
-	int	line_entry_counter;
-	int	found = 0;
+	FILE *fp;
+	char *line_entry;
+	char line[LEN];
+	char name_found[PATH_LEN];
+	int line_entry_counter;
+	int found = 0;
 	t_bool do_cpy = FALSE;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
@@ -132,9 +132,9 @@ get_newsrcname (
 		}
 		fclose(fp);
 		if (found) {
-			char	dir[PATH_LEN];
-			char	tmp_newsrc[PATH_LEN];
-			int	error = 0;
+			char dir[PATH_LEN];
+			char tmp_newsrc[PATH_LEN];
+			int error = 0;
 
 			if (!strfpath (name_found, tmp_newsrc, sizeof (tmp_newsrc),
 				homedir, (char *) 0, (char *) 0, (char *) 0)) {

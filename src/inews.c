@@ -164,7 +164,7 @@ submit_inews (
 			sender = sender_needed(rfc1522_decode(from_name), ptr);
 			switch (sender) {
 				case -2: /* can't build Sender: */
-					 error_message ("invalid Sender: %s", ptr); /* FIXME -> lang.c */
+					 error_message (txt_invalid_sender, ptr);
 					 fclose (fp);
 					 return ret_code;
 					 /* NOTREACHED */

@@ -37,7 +37,9 @@ int cCOLS;
 void setup_screen (void)
 {
 	cmd_line = FALSE;
+#ifdef HAVE_COLOR
 	bcol(tinrc.col_back);
+#endif /* HAVE_COLOR */
 	scrollok(stdscr, TRUE);
 	set_win_size (&cLINES, &cCOLS);
 }
@@ -64,19 +66,21 @@ int InitScreen (void)
 	cmd_line = FALSE;	/* ...so fcol/bcol will succeed */
 
 	set_keypad_on();
+#	ifdef HAVE_COLOR
 	if (has_colors()) {
 		start_color();
-#	ifdef HAVE_USE_DEFAULT_COLORS
+#		ifdef HAVE_USE_DEFAULT_COLORS
 		if (use_default_colors() != ERR) {
 			fcol(default_fcol = -1);
 			bcol(default_bcol = -1);
 		}
-#	endif /* HAVE_USE_DEFAULT_COLORS */
+#		endif /* HAVE_USE_DEFAULT_COLORS */
 	} else {
 		use_color = FALSE;
 	}
 
 	postinit_colors();
+#	endif /* HAVE_COLOR */
 	set_xclick_on();
 	return (TRUE);
 }
@@ -135,10 +139,13 @@ int RawState(void)
 void StartInverse(void)
 {
 	if (tinrc.inverse_okay) {
+#ifdef HAVE_COLOR
 		if (use_color) {
 			bcol(tinrc.col_invers_bg);
 			fcol(tinrc.col_invers_fg);
-		} else {
+		} else
+#endif /* HAVE_COLOR */
+		{
 			attrset(A_REVERSE);
 		}
 	}
@@ -146,12 +153,14 @@ void StartInverse(void)
 
 static int isInverse(void)
 {
+#ifdef HAVE_COLOR
 	if (use_color) {
 		short pair = PAIR_NUMBER(getattrs(stdscr));
 		short fg, bg;
 		pair_content(pair, &fg, &bg);
 		return (fg == tinrc.col_invers_fg) && (bg == tinrc.col_invers_bg);
 	}
+#endif /* HAVE_COLOR */
 
 	return (getattrs(stdscr) & A_REVERSE);
 }
@@ -171,8 +180,10 @@ void ToggleInverse(void)
 void EndInverse(void)
 {
 	if (tinrc.inverse_okay && !cmd_line) {
+#ifdef HAVE_COLOR
 		fcol(tinrc.col_normal);
 		bcol(tinrc.col_back);
+#endif /* HAVE_COLOR */
 		attroff(A_REVERSE);
 	}
 }
@@ -345,7 +356,9 @@ void my_erase(void)
 		 * the same background colors is to reset them here.
 		 */
 		refresh();
+#ifdef HAVE_COLOR
 		refresh_color();
+#endif /* HAVE_COLOR */
 	}
 }
 

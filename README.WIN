@@ -16,7 +16,7 @@
 
      - configure
        - export CC=gcc
-       - export CFLAGS="-DLOCAL_CHARSET=850"  (or 477 depends on "mode con")
+       - export CFLAGS="-DLOCAL_CHARSET=850"  (or 437 depends on "mode con")
        - ./configure --with-ncurses --libdir=/usr/local/lib --disable-locale
 
      - make
@@ -39,9 +39,7 @@
               set USER=username
        - tested with
 	   tin pre-1.4 release 981225 ("Volcane")
-           tin pre-1.4 release 19990413 ("Endemoniada")
-              remove line 177 from /tin-19990413/src/signal.c
-              /tin-19990413/PCRE > make -f Makefile.orig
+	   tin pre-1.4 release 19990517 ("Psychonaut")
 
      - lates version of this file
        - on http://www.uni-karlsruhe.de/~uafr/windows/

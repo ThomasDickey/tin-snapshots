@@ -182,7 +182,7 @@ server_init (
 {
 	char *service = (char *)cservice; /* TODO but calls non-const funcs */
 #	ifndef VMS
-	int	sockt_rd, sockt_wr;
+	int sockt_rd, sockt_wr;
 #	endif /* !VMS */
 
 #	if defined (M_AMIGA) || defined(WIN32)
@@ -191,7 +191,7 @@ server_init (
 #	endif /* M_AMIGA || WIN32 */
 
 #	ifdef DECNET
-	char	*cp;
+	char *cp;
 
 	cp = strchr (machine, ':');
 
@@ -377,7 +377,7 @@ get_tcp_socket (
 	struct servent *sp;
 	struct hostent *hp;
 #			ifdef h_addr
-	int	x = 0;
+	int x = 0;
 	register char **cp;
 	static char *alist[2] = {0,0};
 #			endif /* h_addr */
@@ -553,13 +553,13 @@ get_tcp_socket (
  */
 int
 get_dnet_socket (
-	char	*machine,
-	char	*service)
+	char *machine,
+	char *service)
 {
 #	ifdef NNTP_ABLE
-	int	s, area, node;
-	struct	sockaddr_dn sdn;
-	struct	nodeent *getnodebyname(), *np;
+	int s, area, node;
+	struct sockaddr_dn sdn;
+	struct nodeent *getnodebyname(), *np;
 
 	memset((char *) &sdn, '\0', sizeof (sdn));
 
@@ -730,7 +730,7 @@ reconnect (
 char *
 get_server (
 	char *string,
-	int	size)
+	int size)
 {
 	int retry = NNTP_TRY_RECONNECT;
 

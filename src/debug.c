@@ -284,13 +284,13 @@ debug_print_attributes (
 
 void
 vDbgPrintMalloc (
-	int	iIsMalloc,
+	int iIsMalloc,
 	const char *pcFile,
-	int	iLine,
-	size_t	iSize)
+	int iLine,
+	size_t iSize)
 {
-	char file[PATH_LEN];
 	FILE *fp;
+	char file[PATH_LEN];
 	static int iTotal = 0;
 
 	if (debug == 4) {

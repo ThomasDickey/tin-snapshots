@@ -120,8 +120,10 @@
 	mark_saved_read			OPT_ON_OFF
 	post_process_type		txt_post_process POST_PROC_UUD_EXT_ZIP+1
 	process_only_unread		OPT_ON_OFF
+#ifndef DISABLE_PRINTING
 	print_header			OPT_ON_OFF
 	default_printer			OPT_STRING
+#endif
 
 ; expert options
 	wildcard			txt_wildcard	2

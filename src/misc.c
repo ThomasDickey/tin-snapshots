@@ -6,7 +6,7 @@
  *  Updated   : 1997-12-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
- *              You may  freely  copy or  redistribute	this software,
+ *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
@@ -19,6 +19,7 @@
 #include	"trace.h"
 #include	"policy.h"
 
+
 /*
  * defines to control GNKSA-checks behaviour:
  * - ENFORCE_RFC1034
@@ -28,6 +29,7 @@
  *   require domain literals to be enclosed in square brackets
  */
 
+signed long int wrote_newsrc_lines = -1;
 
 /*
  * Local prototypes
@@ -38,15 +40,15 @@ static int gnksa_check_domain_literal (char *domain);
 static int gnksa_check_localpart (char *localpart);
 static int gnksa_dequote_plainphrase (char *realname, char *decoded, int addrtype);
 static int gnksa_split_from (char *from, char *address, char *realname, int *addrtype);
-#ifndef USE_CURSES
-static int input_pending (int delay);
-#endif
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
 	static int to_local (int c);
 	static int to_network (int c);
 #endif /* LOCAL_CHARSET */
+#ifndef USE_CURSES
+	static int input_pending (int delay);
+#endif /* USE_CURSES */
 
 
 /*
@@ -120,7 +122,7 @@ copy_fp (
 	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
 		if (n != fwrite (buf, 1, n, fp_op)) {
 			if (!got_sig_pipe)
-				perror_message ("copy_fp() failed"); /* FIXME: -> lang.c */
+				perror_message (txt_error_copy_fp);
 
 			return;
 		}
@@ -146,10 +148,10 @@ copy_body (
 	char buf[8192];
 	char buf2[8192];
 	char prefixbuf[256];
-	int retcode;
 	int i;
-	t_bool status_space;
+	int retcode;
 	t_bool status_char;
+	t_bool status_space;
 
 	/* This is a shortcut for speed reasons: if no prefix (= quote_chars) is given just copy */
 	if (!prefix || !*prefix) {
@@ -234,8 +236,9 @@ get_val (
 
 
 /*
- * IMHO it's not tin job to take care about dumb editor backupfiles
+ * IMHO it's not tins job to take care about dumb editor backupfiles
  * otherwise BACKUP_FILE_EXT should be configurable via configure
+ * or 'M'enu
  */
 #define BACKUP_FILE_EXT ".b"
 
@@ -274,28 +277,33 @@ invoke_editor (
 	return retcode;
 }
 
+
 #ifdef HAVE_ISPELL
 int
 invoke_ispell (
-	char *nam) /* return value is always ignored */
+	char *nam,
+	struct t_group *psGrp) /* return value is always ignored */
 {
 	FILE *fp_all, *fp_body, *fp_head;
-	char *my_ispell;
 	char buf[PATH_LEN], nam_body[100], nam_head[100];
 	int retcode;
-	static char ispell[PATH_LEN];
-	static t_bool first = TRUE;
+	char ispell[PATH_LEN];
 
-	if (first) {
+/*
+ * IMHO we don't need an exception for VMS as PATH_ISPELL
+ * defaults to ispell (uj 19990617)
+ */
+/*
 #	ifdef VMS
-		*my_ispell = '\0';
-		strcpy (ispell, "ispell");
+	strcpy (ispell, "ispell");
 #	else
-		my_ispell = getenv ("ISPELL");
-		strcpy (ispell, my_ispell != NULL ? my_ispell : PATH_ISPELL);
-#	endif /* VMS */
-		first = FALSE;
-	}
+*/
+	if (psGrp && psGrp->attribute->ispell != (char *) 0)
+		strcpy (ispell, psGrp->attribute->ispell);
+	else
+		strcpy (ispell, get_val("ISPELL", PATH_ISPELL));
+/*
+#	endif *//* VMS */
 
 	/*
 	 * Now seperating the header and body in two different files so that
@@ -427,8 +435,14 @@ tin_done (
 	 */
 	if (!no_write) {
 		forever {
-			if (vWriteNewsrc ()) {
+			if (((wrote_newsrc_lines = vWriteNewsrc ()) > 0) && (wrote_newsrc_lines >= read_newsrc_lines)) {
 				my_fputs(txt_newsrc_saved, stdout);
+				break;
+			}
+
+			if (wrote_newsrc_lines < read_newsrc_lines) {
+				/* FIXME: prompt for retry? (i.e. remove break) */
+				wait_message(3, txt_warn_newsrc, newsrc, (read_newsrc_lines - wrote_newsrc_lines), (read_newsrc_lines - wrote_newsrc_lines) == 1 ? "" : txt_plural, OLDNEWSRC_FILE);
 				break;
 			}
 
@@ -483,8 +497,8 @@ tin_done (
 #ifdef USE_DBMALLOC
 	/* force a dump, circumvents a bug in Linux libc */
 	{
-	extern int malloc_errfd;	/* FIXME */
-	malloc_dump(malloc_errfd);
+		extern int malloc_errfd;	/* FIXME */
+		malloc_dump(malloc_errfd);
 	}
 #endif /* USE_DBMALLOC */
 
@@ -1209,11 +1223,11 @@ my_isprint (
 
 /*
  * Returns author information
- * thread	if true, assume we're on thread menu and show all author info if
- *			subject not shown
- * art		ptr to article
- * str		ptr in which to return the author. Must be a valid data area
- * len		max length of data to return
+ * thread   if true, assume we're on thread menu and show all author info if
+ *          subject not shown
+ * art      ptr to article
+ * str      ptr in which to return the author. Must be a valid data area
+ * len      max length of data to return
  *
  * The data will be null terminated
  */
@@ -1644,11 +1658,13 @@ create_index_lock_file (
 #endif /* INDEX_DAEMON */
 			exit (EXIT_FAILURE);
 		}
-	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
-		(void) time (&epoch);
-		fprintf (fp, "%6d  %s\n", (int) process_id, ctime (&epoch));
-		fclose (fp);
-		chmod (the_lock_file, (mode_t)(S_IRUSR|S_IWUSR));
+	} else {
+		if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
+			(void) time (&epoch);
+			fprintf (fp, "%6d  %s\n", (int) process_id, ctime (&epoch));
+			fclose (fp);
+			chmod (the_lock_file, (mode_t)(S_IRUSR|S_IWUSR));
+		}
 	}
 }
 
@@ -2446,8 +2462,8 @@ vPrintBugAddress (
  */
 t_bool
 copy_file (
-	char	*pcSrcFile,
-	char	*pcDstFile)
+	char *pcSrcFile,
+	char *pcDstFile)
 {
 	FILE *hFpDst;
 	FILE *hFpSrc;

@@ -232,6 +232,7 @@ free_art_array (
 }
 
 
+/* FIXME: checks which entrys are missing and should be freed */
 void
 free_attributes_array (
 	void)
@@ -262,11 +263,21 @@ free_attributes_array (
 				free ((char *) psGrp->attribute->sigfile);
 				psGrp->attribute->sigfile = (char *) 0;
 			}
+
+#ifndef DISABLE_PRINTING
 			if (psGrp->attribute->printer != (char *) 0 &&
 			    psGrp->attribute->printer != tinrc.default_printer) {
 				free ((char *) psGrp->attribute->printer);
 				psGrp->attribute->printer = (char *) 0;
 			}
+#endif /* !DISABLE_PRINTING */
+
+#ifdef HAVE_ISPELL
+			if (psGrp->attribute->ispell != (char *) 0) {
+				free ((char *) psGrp->attribute->ispell);
+				psGrp->attribute->ispell = (char *) 0;
+			}
+#endif /* HAVE_ISPELL */
 
 			FreeAndNull(psGrp->attribute->followup_to);
 			FreeAndNull(psGrp->attribute->quick_kill_scope);
@@ -360,7 +371,7 @@ my_malloc1 (
 	int line,
 	size_t size)
 {
-	char	*p;
+	char *p;
 
 #ifdef DEBUG
 	vDbgPrintMalloc (TRUE, file, line, size);

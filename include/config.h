@@ -392,3 +392,10 @@
 #if defined(VMS) && defined(UCX)
 #	undef HAVE_GETSERVBYNAME
 #endif
+
+/*
+ * closedir() on Amiga is of return type void
+ */
+#ifdef M_AMIGA
+#	define CLOSEDIR_VOID
+#endif /* M_AMIGA */

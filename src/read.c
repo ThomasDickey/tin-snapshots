@@ -125,7 +125,9 @@ wait_for_input (void /*FILE *fd*/)
 	}
 #	endif /* !HAVE_SELECT */
 #	ifdef M_AMIGA
-	return (WaitForChar(Input(), 0) == DOSTRUE) ? TRUE : FALSE;
+	return FALSE;
+/* work in progress */
+/*	return (WaitForChar(Input(), 0) == DOSTRUE) ? TRUE : FALSE; */
 #	endif /* M_AMIGA */
 /*
  * FIXME, insert !HAVE_SELECT code here - NB: we already have VMS specific code

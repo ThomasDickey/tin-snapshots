@@ -2,10 +2,10 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 1995-08-24
-dnl Updated   : 1998-04-20
+dnl Updated   : 1999-06-23
 dnl Notes     :
 dnl
-dnl Copyright 1996,1997,1998 by Thomas Dickey
+dnl Copyright 1996,1997,1998,1999 by Thomas Dickey
 dnl             You may  freely  copy or  redistribute  this software,
 dnl             so  long as there is no profit made from its use, sale
 dnl             trade or  reproduction.  You may not change this copy-
@@ -65,7 +65,7 @@ do
 	AC_TRY_COMPILE(
 [
 #ifndef CC_HAS_PROTOS
-#if !defined(__STDC__) || __STDC__ != 1
+#if !defined(__STDC__) || (__STDC__ != 1)
 choke me
 #endif
 #endif
@@ -106,11 +106,11 @@ fi
 dnl ---------------------------------------------------------------------------
 dnl Allow user to disable a normally-on option.
 AC_DEFUN([CF_ARG_DISABLE],
-[CF_ARG_OPTION($1,[$2 (default: on)],[$3],[$4],yes)])dnl
+[CF_ARG_OPTION($1,[$2],[$3],[$4],yes)])dnl
 dnl ---------------------------------------------------------------------------
 dnl Allow user to enable a normally-off option.
 AC_DEFUN([CF_ARG_ENABLE],
-[CF_ARG_OPTION($1,[$2 (default: off)],[$3],[$4],no)])dnl
+[CF_ARG_OPTION($1,[$2],[$3],[$4],no)])dnl
 dnl ---------------------------------------------------------------------------
 dnl Restricted form of AC_ARG_ENABLE that ensures user doesn't give bogus
 dnl values.
@@ -218,11 +218,17 @@ CF_CHECK_1_DECL(${ac_func}, ${ac_tr_func})dnl
 done
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl Check for data that is usually declared in <stdio.h> or <errno.h>
+dnl Check for data that is usually declared in <stdio.h> or <errno.h>, e.g.,
+dnl the 'errno' variable.  Define a DECL_xxx symbol if we must declare it
+dnl ourselves.
+dnl
+dnl (I would use AC_CACHE_CHECK here, but it will not work when called in a
+dnl loop from CF_SYS_ERRLIST).
+dnl
 dnl $1 = the name to check
 AC_DEFUN([CF_CHECK_ERRNO],
 [
-AC_MSG_CHECKING([declaration of $1])
+AC_MSG_CHECKING(if external $1 is declared)
 AC_CACHE_VAL(cf_cv_dcl_$1,[
     AC_TRY_COMPILE([
 #if HAVE_STDLIB_H
@@ -233,33 +239,47 @@ AC_CACHE_VAL(cf_cv_dcl_$1,[
 #include <errno.h> ],
     [long x = (long) $1],
     [eval 'cf_cv_dcl_'$1'=yes'],
-    [eval 'cf_cv_dcl_'$1'=no]')])
+    [eval 'cf_cv_dcl_'$1'=no]')
+])
+
 eval 'cf_result=$cf_cv_dcl_'$1
 AC_MSG_RESULT($cf_result)
 
-# It's possible (for near-UNIX clones) that the data doesn't exist
-AC_CACHE_VAL(cf_cv_have_$1,[
-if test $cf_result = no ; then
+if test "$cf_result" = no ; then
     eval 'cf_result=DECL_'$1
     CF_UPPER(cf_result,$cf_result)
     AC_DEFINE_UNQUOTED($cf_result)
-    AC_MSG_CHECKING([existence of $1])
-        AC_TRY_LINK([
-#undef $1
-extern long $1;
-],
-            [$1 = 2],
-            [eval 'cf_cv_have_'$1'=yes'],
-            [eval 'cf_cv_have_'$1'=no'])
-        eval 'cf_result=$cf_cv_have_'$1
-        AC_MSG_RESULT($cf_result)
-else
-    eval 'cf_cv_have_'$1'=yes'
 fi
-])
-eval 'cf_result=HAVE_'$1
-CF_UPPER(cf_result,$cf_result)
-eval 'test $cf_cv_have_'$1' = yes && AC_DEFINE_UNQUOTED($cf_result)'
+
+# It's possible (for near-UNIX clones) that the data doesn't exist
+CF_CHECK_EXTERN_DATA($1,int)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check for existence of external data in the current set of libraries.  If
+dnl we can modify it, it's real enough.
+dnl $1 = the name to check
+dnl $2 = its type
+AC_DEFUN([CF_CHECK_EXTERN_DATA],
+[
+AC_MSG_CHECKING(if external $1 exists)
+AC_CACHE_VAL(cf_cv_have_$1,[
+    AC_TRY_LINK([
+#undef $1
+extern $2 $1;
+],
+    [$1 = 2],
+    [eval 'cf_cv_have_'$1'=yes'],
+    [eval 'cf_cv_have_'$1'=no'])])
+
+eval 'cf_result=$cf_cv_have_'$1
+AC_MSG_RESULT($cf_result)
+
+if test "$cf_result" = yes ; then
+    eval 'cf_result=HAVE_'$1
+    CF_UPPER(cf_result,$cf_result)
+    AC_DEFINE_UNQUOTED($cf_result)
+fi
+
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the compiler allows nested parameter lists (some don't)
@@ -430,7 +450,7 @@ hpux10.*)
 		])])
 	;;
 linux*) # Suse Linux does not follow /usr/lib convention
-	$1="[$]$1 /lib"
+	LIBS="$LIBS -L/lib"
 	;;
 esac
 
@@ -591,6 +611,37 @@ AC_MSG_RESULT($cf_cv_have_term_h)
 test $cf_cv_have_term_h = yes && AC_DEFINE(HAVE_TERM_H)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl You can always use "make -n" to see the actual options, but it's hard to
+dnl pick out/analyze warning messages when the compile-line is long.
+dnl
+dnl Sets:
+dnl	ECHO_LD - symbol to prefix "cc -o" lines
+dnl	RULE_CC - symbol to put before implicit "cc -c" lines (e.g., .c.o)
+dnl	SHOW_CC - symbol to put before explicit "cc -c" lines
+dnl	ECHO_CC - symbol to put before any "cc" line
+dnl
+AC_DEFUN([CF_DISABLE_ECHO],[
+AC_MSG_CHECKING(if you want to see long compiling messages)
+CF_ARG_DISABLE(echo,
+	[  --disable-echo          display "compiling" commands],
+	[
+    ECHO_LD='@echo linking [$]@;'
+    RULE_CC='	@echo compiling [$]<'
+    SHOW_CC='	@echo compiling [$]@'
+    ECHO_CC='@'
+],[
+    ECHO_LD=''
+    RULE_CC='# compiling'
+    SHOW_CC='# compiling'
+    ECHO_CC=''
+])
+AC_MSG_RESULT($enableval)
+AC_SUBST(ECHO_LD)
+AC_SUBST(RULE_CC)
+AC_SUBST(SHOW_CC)
+AC_SUBST(ECHO_CC)
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check if 'errno' is declared in <errno.h>
 AC_DEFUN([CF_ERRNO],
 [
@@ -639,7 +690,7 @@ if test $cf_cv_have_lib_$1 = no ; then
 fi
 case $host_os in #(vi
 linux*) # Suse Linux does not follow /usr/lib convention
-	$1="[$]$1 /lib"
+	LIBS="$LIBS -L/lib"
 	;;
 esac
 ])dnl
@@ -757,7 +808,7 @@ then
 	changequote(,)dnl
 	cat > conftest.$ac_ext <<EOF
 #line __oline__ "configure"
-int main(int argc, char *argv[]) { return argv[argc-1] == 0; }
+int main(int argc, char *argv[]) { return (argv[argc-1] == 0) ; }
 EOF
 	changequote([,])dnl
 	AC_CHECKING([for gcc warning options])
@@ -804,6 +855,7 @@ test "$prefix" != NONE           && $1="[$]$1 $prefix/include $prefix/include/$2
 fi
 test "$prefix" != /usr/local     && $1="[$]$1 /usr/local/include /usr/local/include/$2"
 test "$prefix" != /usr           && $1="[$]$1 /usr/include /usr/include/$2"
+test "$prefix" != /opt           && $1="[$]$1 /opt/include /opt/include/$2"
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Construct a search-list for a nonstandard library-file
@@ -821,6 +873,7 @@ test "$prefix" != "$exec_prefix" && $1="[$]$1 $prefix/lib $prefix/lib/$2"
 fi
 test "$prefix" != /usr/local     && $1="[$]$1 /usr/local/lib /usr/local/lib/$2"
 test "$prefix" != /usr           && $1="[$]$1 /usr/lib /usr/lib/$2"
+test "$prefix" != /opt           && $1="[$]$1 /opt/lib /opt/lib/$2"
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Compute the library-prefix for the given host system
@@ -835,24 +888,34 @@ AC_DEFUN([CF_LIB_PREFIX],
 dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
 dnl options to lower-levels.  It's very useful for "make -n" -- if we have it.
-dnl (GNU 'make' does both :-)
+dnl (GNU 'make' does both, something POSIX 'make', which happens to make the
+dnl $(MAKEFLAGS) variable incompatible because it adds the assignments :-)
 AC_DEFUN([CF_MAKEFLAGS],
 [
 AC_MSG_CHECKING([for makeflags variable])
 AC_CACHE_VAL(cf_cv_makeflags,[
 	cf_cv_makeflags=''
-	for cf_option in '$(MFLAGS)' '-$(MAKEFLAGS)'
+	for cf_option in '-$(MAKEFLAGS)' '$(MFLAGS)' 
 	do
 		cat >cf_makeflags.tmp <<CF_EOF
 all :
-	echo '.$cf_option'
+	@ echo '.$cf_option'
 CF_EOF
-		set cf_result=`${MAKE-make} -f cf_makeflags.tmp 2>/dev/null`
-		if test "$cf_result" != "."
-		then
-			cf_cv_makeflags=$cf_option
+		cf_result=`${MAKE-make} -k -f cf_makeflags.tmp 2>/dev/null`
+		case "$cf_result" in
+		.*k)
+			cf_result=`${MAKE-make} -k -f cf_makeflags.tmp CC=cc 2>/dev/null`
+			case "$cf_result" in
+			.*CC=*)	cf_cv_makeflags=
+				;;
+			*)	cf_cv_makeflags=$cf_option
+				;;
+			esac
 			break
-		fi
+			;;
+		*)	echo no match "$cf_result"
+			;;
+		esac
 	done
 	rm -f cf_makeflags.tmp])
 AC_MSG_RESULT($cf_cv_makeflags)

@@ -19,6 +19,7 @@ This following configure options and defines are documented in detail:
   --enable-nntp		     --with-libdir         NNTP_SERVER_FILE
   --enable-nntp-only	     --with-local-charset  (SMALL_MEMORY_MACHINE)
   --enable-broken-listgroup-fix                    KILL_READ
+  --enable-printing
 
 Not yet documented configure options and defines:
 -------------------------------------------------
@@ -42,7 +43,7 @@ TIN related:
   JUST_TESTING                     TINC_DNS
   KILL_READ
 
-  
+
 System related:
   --bindir              --libexecdir          --program-transform-name
   --datadir             --localstatedir       --sbindir
@@ -371,6 +372,12 @@ or if you don't want your users to have such support. Note: There may still
 be possibilities for users to "pipe" an article to a command, even if you
 disable this feature. They are just not able to use the '|' key to do so.
 
+--enable-printing (default: on)
+Disable if your system does not support printing or if you don't want your
+users to have such support. Note: There may still be possibilities for users
+to print an article, even if you disable this feature. They are just not
+able to use the 'o' key to do so.
+
 --enable-fascist-newsadmin (default: off)
 Enable if you want users articles to be posted to groups that your site
 receives.  This will change the warning that a group that the user is
@@ -382,16 +389,12 @@ from his/her posting or to abort the posting of the article.
 
 --enable-mmdf-mailer (default: off, except on SCO Unix)
 If enabled, MMDF type mail handling is used as the default (instead of
-sendmail). On SCO Unix this is always the case, no matter what you use
+mbox format). On SCO Unix this is always the case, no matter what you use
 here. It can be dynamically changed by setting the tinrc variable
 save_to_mmdf_mailbox to ON or OFF, respectively.
 
 [NOTE: To change the default behaviour on SCO Unix, have a look to
  include/tin.h and search for HAVE_MMDF_MAILER.]
-
-[FIXME: If I interpret the code and the description correctly, then
- "instead of sendmail" should be "instead of mbox format handling".
-							-dn, 1998-12-27]
 
 --enable-posting (default: on)
 If disabled, TIN does not allow posting/followup of articles.
@@ -433,12 +436,13 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i586 & Linux 2.2.9 with gcc 2.7.2.3
-	i586 & Linux 2.3.3 with egcs-egcs-2.91.66
-	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
+	i586 & Linux 2.2.10-ac2 with gcc 2.7.2.3
+	i586 & Linux 2.3.5 with egcs-egcs-2.91.66
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
+	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Cobalt Microserver 27 (MIPS Nevada V10.0) & Linux 2.0.34 with gcc 2.7.2
+	DEC Station 5000/xx (MIPS R3000A V3.0) & Linux 2.2.1 with egcs 2.90.27
 
 2)	HP 9000/835 & HP-UX 8.00 with cc
 	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2

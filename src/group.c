@@ -763,12 +763,14 @@ enter_pager:
 
 				break;
 
+#ifndef DISABLE_PRINTING
 			case iKeyGroupPrint:	/* output art/thread/tagged arts to printer */
 				if (index_point >= 0) {
 					feed_articles (FEED_PRINT, GROUP_LEVEL,
 						&CURR_GROUP, (int) base[index_point]);
 				}
 				break;
+#endif /* !DISABLE_PRINTING */
 
 			case iKeyGroupPrevGroup:	/* previous group */
 				clear_message();
