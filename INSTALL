@@ -392,6 +392,7 @@ Compiled & installed on the following machines:
 
 3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
 	VAX 8350 & Ultrix 4.0 with gcc 2.7.2 *1)
+	DEC Station ??? & Ultrix 4.3 with gcc 2.6.3
 
 4)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
 	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
@@ -421,6 +422,9 @@ Compiled & installed on the following machines:
 13)     i386 & XENIX 2.3.3 with gcc 1.37.1
 
 14)	NeXT Computer & NeXTSTEP 3.3 with gcc 2.5.8
+
+15)	SGI SC900 Power Challenge & IRIX 6.2 with gcc 2.7.2
+	SGI Indigo ??? & IRIX 5.3 with gcc 2.7.2
 
 *1)     (If anyone knows about a FreeBSD for the VAX, please contact
          urs@akk.uni-karlsruhe.de - Ultrix 4.0 is horrible)

@@ -120,7 +120,7 @@ static FILE *
 open_random_sig (sigdir)
 	char *sigdir;
 {
-	long epoch;
+	time_t epoch;
 	struct stat st;
 
 	if (stat (sigdir, &st) != -1) {
