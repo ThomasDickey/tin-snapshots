@@ -16,15 +16,20 @@
 #undef SYSTEM_LOOKS_LIKE_SCO
 
 /*
- * These are set as configure options, and must be guarded by ifdefs because
+ * These are set as configure options, some must be guarded by ifdefs because
  * they're also used in makefile rules (e.g., lint, proto).
  */
+#undef	HAVE_MAIL_HANDLING
+#undef	NNTP_ABLE
+#undef	NNTP_ONLY
 #ifndef	HAVE_COLOR
 #undef	HAVE_COLOR
 #endif
 #ifndef	HAVE_REF_THREADING
 #undef	HAVE_REF_THREADING
 #endif
+#undef	NO_ETIQUETTE
+#undef	FORGERY
 
 /*
  * These are defined if the corresponding program is found during configuration
@@ -268,5 +273,3 @@
 #endif
 #endif /* FIXME */
 
-#undef NNTP_ABLE
-#undef NNTP_ONLY

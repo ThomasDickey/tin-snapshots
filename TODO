@@ -22,14 +22,12 @@ o  Colours are not reset when tin is suspended with ^Z (signal.c)
 
 New features
 ------------
-o  add --with[out]-etiquette             (default on)
-       --with[out]-forgery               (default off)
+o  add
        --with[out]-mime-strict-charset   (default on)
        --with[out]-mime-break-long-lines (default off)
        --with[out]-mime-base64           (default off)
        --with[out]-log-user              (default off)
        --with[out]-piping                (default on)
-       --with[out]-advertising           (default off)
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
 

@@ -377,9 +377,9 @@ dumpfd = fopen ("1thread", "w");
 	}
 
 fclose(dumpfd);
-#endif
+#endif /* 0 */
 
 	return;
 
 }
-#endif
+#endif /* HAVE_REF_THREADING */
