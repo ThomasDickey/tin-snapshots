@@ -1,11 +1,11 @@
-MANIFEST for tin-1.3-unoff-BETA-960713 (Sat Jul 13 23:03:00 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960715 (Mon Jul 15 18:07:28 MET DST 1996)
 ----------------------------------------------------
-   25800 ./CHANGES
-   10205 ./TODO
+   26246 ./CHANGES
+   10462 ./TODO
     5170 ./Makefile
    17237 ./INSTALL
     2112 ./MANIFEST
-    1576 ./README
+    1784 ./README
      913 ./tinpp
    19318 ./aclocal.m4
   120966 ./configure
@@ -18,7 +18,7 @@ MANIFEST for tin-1.3-unoff-BETA-960713 (Sat Jul 13 23:03:00 MET DST 1996)
     2513 ./include/amiga.h
     2131 ./include/amigatcp.h
     8483 ./include/config.h
-   34752 ./include/extern.h
+   34707 ./include/extern.h
     9545 ./include/menukeys.h
      718 ./include/msmail.h
     4765 ./include/nntplib.h
@@ -49,7 +49,7 @@ MANIFEST for tin-1.3-unoff-BETA-960713 (Sat Jul 13 23:03:00 MET DST 1996)
     8979 ./src/help.c
    11857 ./src/inews.c
    28255 ./src/init.c
-   42530 ./src/lang.c
+   42569 ./src/lang.c
     2791 ./src/list.c
    12050 ./src/mail.c
    17623 ./src/main.c
@@ -65,10 +65,10 @@ MANIFEST for tin-1.3-unoff-BETA-960713 (Sat Jul 13 23:03:00 MET DST 1996)
    35005 ./src/page.c
    24098 ./src/parsdate.y
     6580 ./src/pgp.c
-   72112 ./src/post.c
-    4418 ./src/prompt.c
+   72269 ./src/post.c
+    4885 ./src/prompt.c
       53 ./src/proto.sed
-   20367 ./src/refs.c
+   20378 ./src/refs.c
     5718 ./src/rfc1521.c
    12449 ./src/rfc1522.c
    33926 ./src/save.c
@@ -79,11 +79,11 @@ MANIFEST for tin-1.3-unoff-BETA-960713 (Sat Jul 13 23:03:00 MET DST 1996)
    10912 ./src/signal.c
     5882 ./src/strftime.c
    26040 ./src/thread.c
-    4928 ./src/wildmat.c
+    4927 ./src/wildmat.c
    12569 ./src/win32.c
     2130 ./src/win32tcp.c
     6295 ./src/xref.c
     5522 ./src/vms.c
     6764 ./include/autoconf.hin
    11054 ./src/Makefile.in
- 1426538 total
+1428077 total

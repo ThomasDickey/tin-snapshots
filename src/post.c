@@ -20,23 +20,25 @@
 
 #define	MAX_MSG_HEADERS	20
 
-/* which keys are allowed for posting? */
+/* which keys are allowed for posting/sending? */
 #ifdef	HAVE_PGP
 #	ifdef	HAVE_ISPELL
-#		define POST_KEYS	"egiqs\033"
+#		define POST_KEYS	"\033egipq"
+#		define SEND_KEYS	"\033egiqs"
 #	else
-#		define POST_KEYS	"egqs\033"
+#		define POST_KEYS	"\033egpq"
+#		define SEND_KEYS	"\033egqs"
 #	endif
 #else
 #	ifdef   HAVE_ISPELL
-#		define POST_KEYS	"eiqs\033"
+#		define POST_KEYS	"\033eipq"
+#		define SEND_KEYS	"\033eiqs"
 #	else
-#		define POST_KEYS	"eqs\033"
+#		define POST_KEYS	"\033epq"
+#		define SEND_KEYS	"\033eqs"
 #	endif
 #endif
-
-
-
+#define EDIT_KEYS	"\033eq"
 
 char found_newsgroups[HEADER_LEN];
 
@@ -765,7 +767,7 @@ quick_post_article ()
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
-				} while (! strchr ("eq\033", ch));
+				} while (! strchr (EDIT_KEYS, ch));
 				if (ch == iKeyPostEdit) {
 					invoke_editor (article, start_line_offset);
 				} else {
@@ -820,7 +822,7 @@ quick_post_article ()
 			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("egipq\033", ch));
+		} while (! strchr (POST_KEYS, ch));
 	}
 
 post_article_done:
@@ -984,7 +986,7 @@ post_article (group, posted_flag)
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
-				} while (! strchr ("eq\033", ch));
+				} while (! strchr (EDIT_KEYS, ch));
 				if (ch == iKeyPostEdit) {
 					invoke_editor (article, start_line_offset);
 				} else {
@@ -1049,7 +1051,7 @@ post_article (group, posted_flag)
 			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("egipq\033", ch));
+		} while (! strchr (POST_KEYS, ch));
 	}
 
 post_article_done:
@@ -1288,7 +1290,7 @@ post_response (group, respnum, copy_text)
 		do {
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = iKeyPageMail;
-		} while (! strchr ("mpq\033", ch));
+		} while (! strchr ("\033mpq", ch));
 		switch (ch) {
 		case iKeyPostPost:
 			goto ignore_followup_to_poster;
@@ -1447,7 +1449,7 @@ ignore_followup_to_poster:
 					MoveCursor (cLINES, (int) strlen (txt_bad_article));
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = iKeyPostEdit;
-				} while (! strchr ("eq\033", ch));
+				} while (! strchr (EDIT_KEYS, ch));
 				if (ch == iKeyPostEdit) {
 					invoke_editor (article, start_line_offset);
 				} else {
@@ -1512,7 +1514,7 @@ ignore_followup_to_poster:
 			MoveCursor(cLINES, (int) strlen (txt_quit_edit_post));
 			if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("egipq\033", ch));
+		} while (! strchr (POST_KEYS, ch));
 	}
 
 post_response_done:
@@ -1648,13 +1650,13 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	forever {
 		if (confirm_to_mail) {
 			do {
-				sprintf (msg, "%s [%.*s]: %c", txt_quit_edit_ispell_send,
+				sprintf (msg, "%s [%.*s]: %c", txt_quit_edit_send,
 					cCOLS-36, note_h_subj, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg)-1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
-			} while (! strchr (POST_KEYS, ch));
+			} while (! strchr (SEND_KEYS, ch));
 		}
 		switch (ch) {
 			case iKeyPostEdit:
@@ -1668,18 +1670,18 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				break;
 #endif
 
+#ifdef HAVE_PGP
+		        case iKeyPostPGP:
+			        invoke_pgp_mail (nam, mail_to);
+				break;
+#endif
+
 			case iKeyPostQuit:
 			case iKeyPostQuit2:
 				unlink (nam);
 				clear_message ();
 				*mailed_ok = FALSE;
 				return redraw_screen;
-
-#ifdef HAVE_PGP
-		        case iKeyPostPGP:
-			        invoke_pgp_mail (nam, mail_to);
-				break;
-#endif
 
 			case iKeyPostSend:
 				/*
@@ -1701,7 +1703,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				MoveCursor (cLINES, (int) (strlen (msg)-1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
-			} while (! strchr ("egqs\033", ch));
+			} while (! strchr (SEND_KEYS, ch));
 		}
 	}
 
@@ -1855,17 +1857,17 @@ mail_bug_report ()
 				break;
 #endif
 
-			case iKeyPostQuit:
-			case iKeyPostQuit2:
-				unlink (nam);
-				clear_message ();
-				return TRUE;
-
 #ifdef HAVE_PGP
 		        case iKeyPostPGP:
 			        invoke_pgp_mail (nam, mail_to);
 				break;
 #endif
+
+			case iKeyPostQuit:
+			case iKeyPostQuit2:
+				unlink (nam);
+				clear_message ();
+				return TRUE;
 
 			case iKeyPostSend:
 				sprintf (msg, txt_mail_bug_report_confirm, bug_addr, add_addr);
@@ -1891,12 +1893,12 @@ mail_bug_report ()
 				}
 		}
 		do {
-			sprintf (msg, "%s: %c", txt_quit_edit_ispell_send, ch_default);
+			sprintf (msg, "%s: %c", txt_quit_edit_send, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-			} while (! strchr (POST_KEYS, ch));
+			} while (! strchr (SEND_KEYS, ch));
 	}
 
 mail_bug_report_done:
@@ -2005,12 +2007,6 @@ mail_to_author (group, respnum, copy_text)
 			break;
 #endif
 
-		case iKeyPostQuit:
-		case iKeyPostQuit2:
-			unlink (nam);
-			clear_message ();
-			return redraw_screen;
-
 #ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
@@ -2019,6 +2015,12 @@ mail_to_author (group, respnum, copy_text)
 			        invoke_pgp_mail (nam, mail_to);
 			break;
 #endif
+
+		case iKeyPostQuit:
+		case iKeyPostQuit2:
+			unlink (nam);
+			clear_message ();
+			return redraw_screen;
 
 		case iKeyPostSend:
 			my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
@@ -2042,12 +2044,12 @@ mail_to_author (group, respnum, copy_text)
 		}
 
 		do {
-			sprintf (msg, "%s: %c", txt_quit_edit_ispell_send, ch_default);
+			sprintf (msg, "%s: %c", txt_quit_edit_send, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-			} while (! strchr (POST_KEYS, ch));
+			} while (! strchr (SEND_KEYS, ch));
 	}
 
 mail_to_author_done:
@@ -2228,7 +2230,7 @@ delete_article (group, art, respnum)
 			MoveCursor (cLINES, (int) (strlen (msg)-1));
 			if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 			option = option_default;
-		} while (! strchr ("dqs\033", option));
+		} while (! strchr ("\033dqs", option));
 
 		switch (option) {
 			case iKeyPostDelete:
@@ -2334,7 +2336,7 @@ delete_article (group, art, respnum)
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("edq\033", ch));
+		} while (! strchr ("\033deq", ch));
 
 		switch (ch) {
 			case iKeyPostEdit:
@@ -2491,19 +2493,21 @@ repost_article (group, art, respnum, supersede)
 	msg_add_header ("Subject", note_h_subj);
 	msg_add_header ("Newsgroups", group);
 
-	if (note_h_references[0])
+	if (note_h_references[0]) {
 		/*
 		 * calling join_references prevents repost_article
-		 * to fail if REferences: contains a double space
+		 * to fail if References: contains a double space
 		 * between 2 msgids - what it does not do is
 		 * adding the msgid of the original article to the
 		 * References header - is this needed?
 		 */
-/*
+#if 0
 		msg_add_header ("References", note_h_references);
-*/
+#else
 		join_references (buf, note_h_references, "");
 		msg_add_header ("References", buf);
+#endif
+		}
 
 #ifndef FORGERY
 	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
@@ -2561,9 +2565,10 @@ repost_article (group, art, respnum, supersede)
 				note_h_subj, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg)-1);
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+                        if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("epq\033", ch));
+		} while (! strchr(POST_KEYS, ch));
+
 		switch (ch) {
 		case iKeyPostEdit:
 			invoke_editor (article, start_line_offset);
@@ -2577,18 +2582,18 @@ repost_article (group, art, respnum, supersede)
 			break;
 #endif
 
+#ifdef HAVE_PGP
+		case iKeyPostPGP:
+		        invoke_pgp_news (article);
+			break;
+#endif
+
  		case iKeyPostQuit:
  		case iKeyPostQuit2:
 			if (unlink_article)
 				unlink (article);
 			clear_message ();
 			return ret_code;
-
-#ifdef HAVE_PGP
-		case iKeyPostPGP:
-		        invoke_pgp_news (article);
-			break;
-#endif
 
  		case iKeyPostPost:
 #ifndef FORGERY

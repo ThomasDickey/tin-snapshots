@@ -1,5 +1,9 @@
 Bugs
 ----
+o  tins killfile editor does not quote brackets, stars and questionmarks
+   in the subject - this leads to unexpected results cause they are
+   treadted as wildcards
+
 o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())
 
@@ -94,6 +98,9 @@ o  add feature save selected/tagged files sequentially to the same file
 
 o  rewrite NGLIMIT handling (post.c)
 
+o  use several functions from libcurses/<curses.h> if it's present in
+   curses.c 
+
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
 
@@ -124,8 +131,8 @@ o  general purpose routine for locating regex's in articles
    message-id's
    etc...
 
-o  if newsgroups lines has groups in it which are not present in the users
-   active file then ask user if he wants to strip these groups from the
+o  if Newsgroups:-line has groups in it which are not present in the users
+   active file ask the user if he wants to strip these groups from the
    newsgroups-line (N/y)
 
 o  Make the options menu multi-page more dynamically add more
@@ -253,9 +260,10 @@ o  'g'oto group does not work when starting up tin with:
    but having no articles to read
 
 o  fix kill/hot mechanism that you could kill/mark hot everything which
-   contains abc OR def... like "tin *|* tin|* tin *" -even better would be a
-   routine which recognizes word-delimiters so that "tin:" or "'tin'" would be
-   also matched in an expression like ^tin^ and which would not match posting
+   contains abc OR def... like "tin *|* tin|* tin *" -even better would be
+   a routine which recognizes word-delimiters so that "tin:" or "'tin'"
+   would be also matched in an expression like "^tin^" and which would not
+   match "posting"
 
 o  fix kill/hot mechanism so that it is possible do kill massive-cross-posts
    (Velveeta-kill)

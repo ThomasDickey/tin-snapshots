@@ -686,7 +686,6 @@ extern constext txt_quick_filter_select[];
 extern constext txt_quit[];
 extern constext txt_quit_delete[];
 extern constext txt_quit_despite_tags[];
-extern constext txt_quit_edit_ispell_send[];
 extern constext txt_quit_edit_post[];
 extern constext txt_quit_edit_save_kill[];
 extern constext txt_quit_edit_save_killfile[];

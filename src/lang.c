@@ -474,30 +474,29 @@ constext txt_quit[] = "Do you really want to quit? (y/n): ";
 constext txt_quit_no_write[] = "Do you really want to quit without saving your configuration? (y/n): ";
 constext txt_quit_delete[] = "e)dit cancel message, q)uit, d)elete";
 constext txt_quit_edit_save_killfile[] = "q)uit e)dit s)ave kill/hot description: ";
-#ifdef HAVE_PGP
-constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost [%.*s]: %c";
-#else
-constext txt_quit_edit_send[] = "q)uit, e)dit, s)end";
-constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
-#endif
+
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, g) pgp, p)ost: ";
-constext txt_quit_edit_ispell_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, g) pgp, s)end";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, g) pgp, p)ost [%.*s]: %c";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, g) pgp, p)ost: ";
-constext txt_quit_edit_ispell_send[] = "q)uit, e)dit, g) pgp, s)end";
-#endif
+constext txt_quit_edit_send[] = "q)uit, e)dit, g) pgp, s)end";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, g) pgp, p)ost [%.*s]: %c";
+#endif /* HAVE_ISPELL */
 #else
 #ifdef HAVE_ISPELL
 constext txt_quit_edit_post[] = "q)uit, e)dit, i)spell, p)ost: ";
-constext txt_quit_edit_ispell_send[] = "q)uit, e)dit, i)spell, s)end";
+constext txt_quit_edit_send[] = "q)uit, e)dit, i)spell, s)end";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, i)spell, p)ost [%.*s]: %c";
 #else
 constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost: ";
-constext txt_quit_edit_ispell_send[] = "q)uit, e)dit, s)end";
-#endif
-#endif
+constext txt_quit_edit_send[] = "q)uit, e)dit, s)end";
+constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
+#endif /* HAVE_ISPELL */
+#endif /* HAVE_PGP */ 
+
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
 constext txt_read_resp[] = "Read response> ";
