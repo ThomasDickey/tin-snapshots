@@ -723,7 +723,12 @@ extern char *get_uaf_fullname();
 #define		MAX_COLOR	15
 #define		MAX_BACKCOLOR	7
 
-#define 	INDEX_TOP	2
+/*
+ * Maximal permissible word mark type
+ */
+#define		MAX_MARK		2
+
+#define		INDEX_TOP	2
 
 #ifdef NO_REGEX
 #	define	STR_MATCH(s1,s2)	(strstr (s1, s2) != 0)

@@ -504,7 +504,7 @@ read_config_file (file, global_file)
 				word_highlight=word_highlight_tinrc;
 				break;
 			}
-			if (match_boolean (buf, "word_h_display_marks=", &word_h_display_marks)) {
+			if (match_integer (buf, "word_h_display_marks=", &word_h_display_marks, MAX_MARK)) {
 				 break;
 			}
 #endif
@@ -534,13 +534,6 @@ read_config_file (file, global_file)
 	if (!draw_arrow_mark && strip_blanks) {
 		strip_blanks = FALSE;
 	}
-#ifdef HAVE_COLOR
-	/* without word_highlighting mark stripping is a fault */
-	if (!word_highlight) {
-		word_h_display_marks = TRUE;
-	}
-	/* other color related conflicts are handeled in color.c */
-#endif
 	
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
@@ -860,7 +853,8 @@ write_config_file (file)
 
 	fprintf (fp, "# Should the leading and ending stars and dashes also be displayed,\n");
 	fprintf (fp, "# even when they are highlighting marks?\n");
-	fprintf (fp, "word_h_display_marks=%s\n\n",print_boolean (word_h_display_marks));
+	fprintf (fp, "# 0 - no    1 - yes, display mark    2 - print a space instead\n");
+	fprintf (fp, "word_h_display_marks=%d\n\n",word_h_display_marks);
 
 	fprintf (fp, "# Color of word highlighting. There are two posibilities for\n");
 	fprintf (fp, "# in Articles: *stars* and _underdashes_\n");

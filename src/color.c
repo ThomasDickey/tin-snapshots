@@ -145,18 +145,34 @@ color_fputs (s, stream, color)
 					my_fputc(*p, stream);
 					break;
 				} else if ((p == s) || !isalp(*(p - 1))) {
-						if (check_valid_mark(p, '*')) {
-							col1=1;
-							fcol(col_markstar);
-						}
-						if (word_h_display_marks) {
+					if (check_valid_mark(p, '*')) {
+						col1=1;
+						fcol(col_markstar);
+						switch (word_h_display_marks) {
+						case 1: /* print mark */
 							my_fputc(*p, stream);
+							break;
+						case 2: /* print space */
+							my_fputc(' ', stream);
+							break;
+						default: /* print nothing */
+							break;
 						}
-				} else {
-					if (word_h_display_marks) {
+					} else { /* print normal character */
 						my_fputc(*p, stream);
 					}
+				} else {
 					if (!isalp(*(p + 1)) && col1) {
+						switch (word_h_display_marks) {
+						case 1: /* print mark */
+							my_fputc(*p, stream);
+							break;
+						case 2: /* print space */
+							my_fputc(' ', stream);
+							break;
+						default: /* print nothing */
+							break;
+						}
 						fcol(color);
 					}
 				}
@@ -170,21 +186,37 @@ color_fputs (s, stream, color)
 					if (check_valid_mark(p, '_')) {
 						col2=1;
 						fcol(col_markdash);
-					}
-					if (word_h_display_marks) {
+						switch (word_h_display_marks) {
+						case 1: /* print mark */
+							my_fputc(*p, stream);
+							break;
+						case 2: /* print space */
+							my_fputc(' ', stream);
+							break;
+						default: /* print nothing */
+							break;
+						}
+					} else { /* print normal character */
 						my_fputc(*p, stream);
 					}
 				} else {
-					if (word_h_display_marks) {
-						my_fputc(*p, stream);
-					}
 					if (!isalp(*( p + 1)) && col2) {
+						switch (word_h_display_marks) {
+						case 1: /* print mark */
+							my_fputc(*p, stream);
+							break;
+						case 2: /* print space */
+							my_fputc(' ', stream);
+							break;
+						default: /* print nothing */
+							break;
+						}
 						fcol(color);
 					} 
 				}
 				break;
 
-			default:
+			default: /* p is no mark char */
 				my_fputc(*p, stream);
 				break;
 		}

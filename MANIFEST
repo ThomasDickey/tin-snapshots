@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961229 (Sun Dec 29 23:16:04 MET 1996)
 ----------------------------------------------------
-  56438 ./CHANGES
-  13528 ./TODO
+  56804 ./CHANGES
+  14287 ./TODO
    5341 ./Makefile
   17216 ./INSTALL
    2260 ./MANIFEST
@@ -20,14 +20,14 @@ MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
    8277 ./include/config.h
-  41665 ./include/extern.h
+  41695 ./include/extern.h
   12877 ./include/menukeys.h
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
   29547 ./include/proto.h
    1376 ./include/stpwatch.h
-  44290 ./include/tin.h
+  44357 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
@@ -38,8 +38,8 @@ MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
   37829 ./src/art.c
   23873 ./src/attrib.c
    8460 ./src/charset.c
-   4314 ./src/color.c
-  57985 ./src/config.c
+   5181 ./src/color.c
+  57859 ./src/config.c
   20325 ./src/curses.c
   12401 ./src/debug.c
    2278 ./src/envarg.c
@@ -50,11 +50,11 @@ MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
    3202 ./src/hashstr.c
    9523 ./src/help.c
   12146 ./src/inews.c
-  29895 ./src/init.c
-  56402 ./src/lang.c
+  29940 ./src/init.c
+  56501 ./src/lang.c
    1739 ./src/list.c
   11984 ./src/mail.c
-  19517 ./src/main.c
+  19259 ./src/main.c
    8108 ./src/makecfg.c
    9471 ./src/memory.c
   48344 ./src/misc.c
@@ -68,7 +68,7 @@ MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
   35769 ./src/page.c
   24090 ./src/parsdate.y
    6631 ./src/pgp.c
-  75667 ./src/post.c
+  75698 ./src/post.c
    8982 ./src/prompt.c
     160 ./src/proto.sed
   22480 ./src/refs.c
@@ -91,5 +91,5 @@ MANIFEST for tin-1.3-unoff-BETA-961227 (Sat Dec 28 04:37:15 MET 1996)
   11142 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   3653 ./src/tincfg.tbl
-1610697 insgesamt
+   3663 ./src/tincfg.tbl
+1612587 insgesamt

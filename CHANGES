@@ -1,4 +1,15 @@
---unoff BETA release 961226 --
+--unoff BETA release 961229 --
+
+262) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. word_h_marks_display now is a tristate (Nothing, Mark, Space).
+     FIX. serveral supplied patches
+
+261) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code clean-up
+     BUG. txt_cancel_article has wrong number of format arguments
+     FIX. lang.c, main.c, post.c
+
+--unoff BETA release 961227 --
 
 260) Thomas E. Dickey <dickey@clark.net>
      ADD. extends 'makecfg' to generate type-specific tables for string and

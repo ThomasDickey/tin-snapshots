@@ -182,7 +182,7 @@ int col_title;				/* color of Help/Mail-Sign */
 int col_signature;			/* color of signature */
 int word_highlight;			/* word highlighting on/off */
 int word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
-int word_h_display_marks;	/* display * or _ when highlighting on/off */
+int word_h_display_marks;	/* display * or _ when highlighting or space or nothing*/
 int col_markstar;			/* text highlighting with *stars* */
 int col_markdash;			/* text highlighting with _underdashes_ */
 #endif
@@ -474,7 +474,7 @@ void init_selfinfo ()
 	col_markdash = 13;
 	word_highlight = TRUE;
 	word_highlight_tinrc = TRUE;
-	word_h_display_marks = FALSE;
+	word_h_display_marks = 2; /* display space instead of marks */
 #endif
 	index_maildir[0] = '\0';
 	index_newsdir[0] = '\0';

@@ -2394,7 +2394,7 @@ cancel_article (group, art, respnum)
 	forever {
 		do {
 			sprintf (msg, "%s [%.*s]: %c", txt_quit_cancel,
-				 cCOLS - 30, note_h_subj, ch_default);
+				 cCOLS - ((int) strlen(txt_quit_cancel)+7), note_h_subj, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg) - 1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
