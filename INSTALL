@@ -396,7 +396,7 @@ Compiled & installed on the following machines:
 	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
 
 3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0
-	VAX 8350 & Ultrix 4.0 with gcc 2.7.2
+	VAX 8350 & Ultrix 4.0 with gcc 2.7.2 *1)
 
 4)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
 	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
@@ -420,3 +420,7 @@ Compiled & installed on the following machines:
 
 11)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
 	with SCO OpenServer Development System (ver 5.0.0a)
+
+
+*1)     (If anyone knows about a FreeBSD for the VAX, please contact
+         urs@akk.uni-karlsruhe.de - Ultrix 4.0 is horrible)
