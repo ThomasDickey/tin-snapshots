@@ -3,9 +3,9 @@
  *  Module    : feed.c
  *  Author    : I. Lea
  *  Created   : 1991-08-31
- *  Updated   : 1994-12-22
+ *  Updated   : 2003-03-13
  *  Notes     : provides same interface to mail,pipe,print,save & repost commands
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -211,10 +211,10 @@ feed_articles (
 						free (group->attribute->savefile);
 						group->attribute->savefile = my_strdup (filename);
 					}
-					my_strncpy (tinrc.default_save_file, filename, sizeof (tinrc.default_save_file));
+					my_strncpy(tinrc.default_save_file, filename, sizeof(tinrc.default_save_file) - 1);
 				} else {
 					if (*save_file)
-						my_strncpy (filename, save_file, sizeof (filename));
+						my_strncpy(filename, save_file, sizeof(filename) - 1);
 					else {
 						info_message (txt_no_filename);
 						return;
@@ -235,10 +235,10 @@ feed_articles (
 					is_mailbox = create_path (filename);
 					if (is_mailbox) {
 						if ((int) strlen (filename) > 1)
-							my_strncpy (my_mailbox, filename+1, sizeof (my_mailbox));
+							my_strncpy(my_mailbox, filename+1, sizeof(my_mailbox) - 1);
 						else
-							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
-						my_strncpy (filename, my_mailbox, sizeof (filename));
+							my_strncpy(my_mailbox, group->name, sizeof(my_mailbox) - 1);
+						my_strncpy(filename, my_mailbox, sizeof(filename) - 1);
 					} else {		/* ask for post processing type */
 						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", "%s", txt_choose_post_process_type);
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */

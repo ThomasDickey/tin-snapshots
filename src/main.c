@@ -3,9 +3,9 @@
  *  Module    : main.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-28
+ *  Updated   : 2003-03-13
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -421,9 +421,9 @@ read_cmd_line_options (
 
 			case 'f':	/* active (tind) / newsrc (tin) file */
 #ifdef INDEX_DAEMON
-				my_strncpy (news_active_file, optarg, sizeof (news_active_file));
+				my_strncpy(news_active_file, optarg, sizeof(news_active_file) - 1);
 #else
-				my_strncpy (newsrc, optarg, sizeof (newsrc));
+				my_strncpy(newsrc, optarg, sizeof(newsrc) - 1);
 				newsrc_set = TRUE;
 #endif /* INDEX_DAEMON */
 				break;
@@ -440,7 +440,7 @@ read_cmd_line_options (
 #	ifndef M_AMIGA
 			case 'g':	/* select alternative NNTP-server, implies -r */
 #		ifdef NNTP_ABLE
-				my_strncpy(cmdline_nntpserver, optarg, sizeof(cmdline_nntpserver));
+				my_strncpy(cmdline_nntpserver, optarg, sizeof(cmdline_nntpserver) - 1);
 				read_news_via_nntp = TRUE;
 #		else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
@@ -460,7 +460,7 @@ read_cmd_line_options (
 
 			case 'I':
 #ifndef NNTP_ONLY
-				my_strncpy (index_newsdir, optarg, sizeof (index_newsdir));
+				my_strncpy(index_newsdir, optarg, sizeof(index_newsdir) - 1);
 				my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
@@ -476,11 +476,11 @@ read_cmd_line_options (
 				break;
 
 			case 'm':
-				my_strncpy (tinrc.maildir, optarg, sizeof (tinrc.maildir));
+				my_strncpy(tinrc.maildir, optarg, sizeof(tinrc.maildir) - 1);
 				break;
 
 			case 'M':	/* mail new news to specified user */
-				my_strncpy (mail_news_user, optarg, sizeof (mail_news_user));
+				my_strncpy(mail_news_user, optarg, sizeof(mail_news_user) - 1);
 				mail_news = TRUE;
 				batch_mode = TRUE;
 				break;
@@ -539,11 +539,11 @@ read_cmd_line_options (
 				list_active = TRUE;
 				newsrc_active = FALSE;
 				check_for_new_newsgroups = FALSE;
-				my_strncpy (news_active_file, save_active_file, sizeof (news_active_file));
+				my_strncpy(news_active_file, save_active_file, sizeof(news_active_file) - 1);
 				break;
 
 			case 's':
-				my_strncpy (tinrc.savedir, optarg, sizeof (tinrc.savedir));
+				my_strncpy(tinrc.savedir, optarg, sizeof(tinrc.savedir) - 1);
 				break;
 
 			case 'S':	/* save new news to dir structure */
@@ -635,7 +635,7 @@ read_cmd_line_options (
 #else
 			char nodenamebuf[32];
 #	if defined(M_AMIGA)
-			my_strncpy (nodenamebuf, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (nodenamebuf));
+			my_strncpy(nodenamebuf, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof(nodenamebuf) - 1);
 #	else /* NeXT, Apollo */
 			(void) gethostname(nodenamebuf, sizeof(nodenamebuf));
 #	endif /* M_AMIGA */

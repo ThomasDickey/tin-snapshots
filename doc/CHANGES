@@ -1,4 +1,13 @@
--- 1.4.7 release 20030311 "" --
+-- 1.4.7 release 20030322 "Suggestions" --
+
+049) Darrell Tangman <dgtangman@acm.org>
+     BUG. filename wasn't shown in txt_append_overwrite_quit query due to
+          spurious parameter
+     FIX. save.c
+
+048) Darrell Tangman <dgtangman@acm.org>
+     BUG. malloc() mem. could be free()ed twice
+     FIX. art.c
 
 047) Urs Janssen <urs@tin.org>
      REM. handling for 202/203 return codes (see 028)
@@ -12,8 +21,10 @@
      BUG. "." might be resend as last command after a reconnect
      BUG. part of the threading code aussumed that References are always
           space separated
+     BUG. fixed some possible bufferoverflows
      ADD. allow .pro-TLD
-     FIX. policy.h, attrib.c, inews.c, nntplib.c, refs.c
+     FIX. policy.h, attrib.c, config.c, feed.c, header.c, inews.c, init.c
+          main.c, misc.c, nntplib.c, post.c, refs.c, save.c, select.c
 
 045) Urs Janssen <urs@tin.org>
      ADD. remove Message-IDs with illegal chars (i.e. 8bit chars) from

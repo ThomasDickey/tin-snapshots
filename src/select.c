@@ -3,9 +3,9 @@
  *  Module    : select.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1994-12-21
+ *  Updated   : 2003-03-13
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -1159,12 +1159,12 @@ toggle_my_groups (
 		if (only_unread_groups) {
 			for (i = old_curr_group_idx; i < group_top; i++) {
 				if (active[my_group[i]].newsrc.num_unread || active[my_group[i]].newgroup) {
-					my_strncpy (old_curr_group, active[my_group[i]].name, sizeof (old_curr_group));
+					my_strncpy(old_curr_group, active[my_group[i]].name, sizeof(old_curr_group) - 1);
 					break;
 				}
 			}
 		} else
-			my_strncpy (old_curr_group, active[my_group[old_curr_group_idx]].name, sizeof (old_curr_group));
+			my_strncpy(old_curr_group, active[my_group[old_curr_group_idx]].name, sizeof(old_curr_group) - 1);
 	}
 
 	group_top = skip_newgroups();			/* Reposition after any newgroups */

@@ -3,9 +3,9 @@
  *  Module    : misc.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 2003-02-15
+ *  Updated   : 2003-03-13
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -388,9 +388,9 @@ shell_escape (
 		continue;
 
 	if (*p)
-		my_strncpy (tinrc.default_shell_command, p, sizeof(tinrc.default_shell_command));
+		my_strncpy(tinrc.default_shell_command, p, sizeof(tinrc.default_shell_command) - 1);
 	else {
-		my_strncpy (shell, (*tinrc.default_shell_command ? tinrc.default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof(shell));
+		my_strncpy(shell, (*tinrc.default_shell_command ? tinrc.default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof(shell) - 1);
 		p = shell;
 	}
 
@@ -1794,7 +1794,7 @@ strfpath (
 					    (char *) 0, (char *) 0, (char *) 0)) {
 
 #ifdef HAVE_LONG_FILE_NAMES
-						my_strncpy (tmp, group, sizeof(tmp));
+						my_strncpy(tmp, group, sizeof(tmp) - 1);
 #else
 						my_strncpy (tmp, group, 14);
 #endif /* HAVE_LONG_FILE_NAMES */

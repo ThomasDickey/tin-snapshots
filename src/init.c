@@ -3,7 +3,7 @@
  *  Module    : init.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 2003-01-22
+ *  Updated   : 2003-03-13
  *  Notes     :
  *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -517,13 +517,13 @@ init_selfinfo (
 /* FIXME: move to get_user_name() [header.c] */
 #ifdef M_AMIGA
 	if ((ptr = getenv ("USERNAME")) != (char *) 0) {
-		my_strncpy (userid, ptr, sizeof (userid));
+		my_strncpy(userid, ptr, sizeof(userid) - 1);
 	} else {
 		error_message (txt_env_var_not_found, "USERNAME");
 		tin_done (EXIT_FAILURE);
 	}
 	if ((ptr = getenv ("HOME")) != (char *) 0) {
-		my_strncpy (homedir, ptr, sizeof (homedir));
+		my_strncpy(homedir, ptr, sizeof(homedir) - 1);
 	} else {
 		error_message (txt_env_var_not_found, "HOME");
 		tin_done (EXIT_FAILURE);
@@ -573,13 +573,13 @@ init_selfinfo (
 #	endif /* VMS */
 
 	if ((ptr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
-		my_strncpy (homedir, ptr, sizeof (homedir));
+		my_strncpy(homedir, ptr, sizeof(homedir) - 1);
 	} else if ((ptr = getenv ("HOME")) != (char *) 0) {
-		my_strncpy (homedir, ptr, sizeof (homedir));
+		my_strncpy(homedir, ptr, sizeof(homedir) - 1);
 	} else if (!myentry) {
 		strcpy (homedir, "/tmp");
 	} else
-		my_strncpy (homedir, myentry->pw_dir, sizeof (homedir));
+		my_strncpy(homedir, myentry->pw_dir, sizeof (homedir) - 1);
 #endif /* M_AMIGA */
 
 	/*
@@ -684,7 +684,7 @@ init_selfinfo (
 #ifdef USE_INN_NNTPLIB
 	ptr = GetConfigValue (_CONF_ORGANIZATION);
 	if (ptr != (char *) 0)
-		my_strncpy (default_organization, ptr, sizeof (default_organization));
+		my_strncpy(default_organization, ptr, sizeof(default_organization) - 1);
 #endif /* USE_INN_NNTPLIB */
 
 #ifndef NNTP_ONLY
@@ -737,7 +737,7 @@ init_selfinfo (
 					*ptr = '\0';
 			}
 			fclose (fp);
-			my_strncpy (default_organization, buf, sizeof (default_organization));
+			my_strncpy(default_organization, buf, sizeof(default_organization) - 1);
 		}
 	}
 
@@ -894,14 +894,14 @@ init_selfinfo (
 	 */
 	reply_to[0] = '\0';
 	if ((ptr = getenv ("REPLYTO")) != (char *) 0)
-		my_strncpy (reply_to, ptr, sizeof (reply_to));
+		my_strncpy(reply_to, ptr, sizeof(reply_to) - 1);
 
 	/*
 	 *  check enviroment for DISTRIBUTION
 	 */
 	my_distribution[0] = '\0';
 	if ((ptr = getenv ("DISTRIBUTION")) != (char *) 0)
-		my_strncpy (my_distribution, ptr, sizeof (my_distribution));
+		my_strncpy(my_distribution, ptr, sizeof(my_distribution) - 1);
 
 	/*
 	 * check enviroment for BUG_ADDRESS
@@ -913,7 +913,7 @@ init_selfinfo (
 	 */
 	/* I agree (obw) */
 	if ((ptr = getenv ("BUG_ADDRESS")) != (char *) 0) {
-		my_strncpy (bug_addr, ptr, sizeof (bug_addr));
+		my_strncpy(bug_addr, ptr, sizeof(bug_addr) - 1);
 	} else {
 		joinpath (nam, rcdir, "bug_address");
 		if ((fp = fopen (nam, "r")) != (FILE *) 0) {
@@ -930,7 +930,7 @@ init_selfinfo (
 #ifdef HAVE_PGP
 	pgpopts = get_val("PGPOPTS", "");
 	if ((ptr = getenv("PGPPATH")) != (char *) 0)
-		my_strncpy (pgp_data, ptr, sizeof(pgp_data));
+		my_strncpy(pgp_data, ptr, sizeof(pgp_data) - 1);
 	else
 		joinpath (pgp_data, homedir, ".pgp");
 #endif /* HAVE_PGP */

@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION 	"1.4.7"
-#	define RELEASEDATE	"20030312"
-#	define RELEASENAME	"Aerials"
+#	define RELEASEDATE	"20030322"
+#	define RELEASENAME	"Suggestions"
 #	define TINRC_VERSION	"1.2"
 
 #	ifdef M_AMIGA
