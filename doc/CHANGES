@@ -1,3 +1,43 @@
+-- 1.4.7 release 20030201 "" --
+
+047) Urs Janssen <urs@tin.org>
+     REM. handling for 202/203 return codes (see 028)
+     REM. some unused macros
+     FIX. nntplib.h, proto.h, attrib.c, curses.c, filter.c, misc.c, open.c
+          pgp.c, save.c, strftime.c, string.c
+
+046) Urs Janssen <urs@tin.org>
+     BUG. comma separate group list in attribute scope didn't work
+     FIX. attrib.c
+
+045) Urs Janssen <urs@tin.org>
+     ADD. remove Message-IDs with illegal chars (i.e. 8bit chars) from
+          References
+     BUG. tabs weren't removed from (folded) References lines when creating
+          local overviews
+     REM. tinrc.tab_after_X_selection as it didn't work for years now
+          and nobody complained about it
+     FIX. art.c, config.c, init.c, lang.c, post.c, extern.h, tinrc.h, tin.1
+
+044) Urs Janssen <urs@tin.org>
+     BUG. misleading feed pattern description
+     ADD. check result of getpwuid(getuid()) befor using it
+     FIX. header.c, lang.c, init.c
+
+043) Urs Janssen <urs@tin.org>
+     BUG. article numbers in the (broken) overview data which were higher
+          than groups high water mark caused a crash
+     FIX. art.c
+
+042) Urs Janssen <urs@tin.org>
+     BUG. didn't disallow unprintable chars in group descriptions
+     FIX. select.c
+
+041) Urs Janssen <urs@tin.org>
+     BUG. used snprintf() without knowing if it's available
+     ADD. config.guess, config.sub update
+     FIX. config.guess, config.sub, config.c
+
 -- 1.4.6 release 20020816 "Aerials" --
 
 040) Urs Janssen <urs@tin.org>
@@ -39,7 +79,7 @@
 
 032) Herbert Martin Dietze <herbert@spamcop.net>
      Urs Janssen <urs@tin.org>
-     BUG. empty random organization file coulkd crash tin
+     BUG. empty random organization file could crash tin
      FIX. misc.c
 
 -- 1.4.5 release 20010409 "One More Nightmare" --

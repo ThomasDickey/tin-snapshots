@@ -3,7 +3,7 @@
  *  Module    : pgp.c
  *  Author    : Steven J. Madsen
  *  Created   : 1995-05-12
- *  Updated   : 1997-12-31
+ *  Updated   : 2003-01-31
  *  Notes     : PGP support for article posting and mailing
  *  Copyright : (c) 1995-99 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,
@@ -35,7 +35,6 @@
  * name of environment variable of options to pass to PGP
  */
 #	define PGPNAME "pgp"
-#	define PGPOPTS "PGPOPTS"
 
 #	define HEADERS	"%stin-%d.h"
 #	ifdef HAVE_LONG_FILE_NAMES

@@ -3,7 +3,7 @@
  *  Module    : string.c
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 1997-01-20
- *  Updated   : 1997-12-31
+ *  Updated   : 2003-01-31
  *  Notes     :
  *  Copyright : (c) Copyright 1997-99 by Urs Janssen
  *              You may  freely  copy or  redistribute  this software,
@@ -368,8 +368,10 @@ OUT:
  *  strcmp that ignores case
  */
 
-/*fix me - put me in tin.h */
-#define	FOLD_TO_UPPER(a)	(toupper ((unsigned char)(a)))
+#if !defined(HAVE_STRCASECMP) || !defined(HAVE_STRNCASECMP)
+	/* fix me - put me in tin.h */
+#	define FOLD_TO_UPPER(a)	(toupper ((unsigned char)(a)))
+#endif /* !HAVE_STRCASECMP || !HAVE_STRNCASECMP */
 
 #ifndef HAVE_STRCASECMP
 int

@@ -3,9 +3,9 @@
  *  Module    : config.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1999-11-04
+ *  Updated   : 2003-01-22
  *  Notes     : Configuration file routines
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -54,7 +54,7 @@ check_upgrade (
 	char bar[120]; /* should be enought; snprintf() would be handy */
 
 	my_strncpy(foo, txt_tinrc_header, sizeof(foo) - 1);
-	snprintf(bar, sizeof(bar)-1, foo, PRODUCT, TINRC_VERSION);
+	sprintf(bar, foo, PRODUCT, TINRC_VERSION);
 
 	if (strncmp(buf, bar, MIN(strlen(bar), strlen(buf))) == 0)
 		return(IGNORE);
@@ -617,9 +617,6 @@ read_config_file (
 				break;
 			}
 
-			if (match_boolean (buf, "tab_after_X_selection=", &tinrc.tab_after_X_selection))
-				break;
-
 			if (match_boolean (buf, "tab_goto_next_unread=", &tinrc.tab_goto_next_unread))
 				break;
 
@@ -803,9 +800,6 @@ write_config_file (
 
 	fprintf (fp, txt_pgdn_goto_next.tinrc);
 	fprintf (fp, "pgdn_goto_next=%s\n\n", print_boolean (tinrc.pgdn_goto_next));
-
-	fprintf (fp, txt_tab_after_X_selection.tinrc);
-	fprintf (fp, "tab_after_X_selection=%s\n\n", print_boolean (tinrc.tab_after_X_selection));
 
 	fprintf (fp, txt_full_page_scroll.tinrc);
 	fprintf (fp, "full_page_scroll=%s\n\n", print_boolean (tinrc.full_page_scroll));
@@ -1655,7 +1649,6 @@ change_config_file (
 						 * case OPT_SPACE_GOTO_NEXT_UNREAD:
 						 * case OPT_START_EDITOR_OFFSET:
 						 * case OPT_STRIP_BLANKS:
-						 * case OPT_TAB_AFTER_X_SELECTION:
 						 * case OPT_TAB_GOTO_NEXT_UNREAD:
 						 * case OPT_THREAD_CATCHUP_ON_EXIT:
 						 * case OPT_UNLINK_ARTICLE:

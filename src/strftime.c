@@ -3,7 +3,7 @@
  *  Module    : strftime.c
  *  Author    : A. Robbins & I. Lea
  *  Created   : 1991-02-01
- *  Updated   : 1993-08-15
+ *  Updated   : 2003-01-31
  *  Notes     : Relatively quick-and-dirty implemenation of ANSI library
  *              routine for System V Unix systems.
  *              If target system already has strftime() call the #define
@@ -26,12 +26,13 @@
 extern int daylight;
 #endif /* SYSV */
 
-#define SYSV_EXT	1	/* stuff in System V ascftime routine */
+#ifndef HAVE_STRFTIME
+#	define SYSV_EXT	1	/* stuff in System V ascftime routine */
+#endif /* !HAVE_STRFTIME */
 
 /*
  * strftime --- produce formatted time
  */
-
 size_t
 my_strftime (
 	char *s,

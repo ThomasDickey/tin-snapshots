@@ -3,7 +3,7 @@
  *  Module    : filter.c
  *  Author    : I. Lea
  *  Created   : 1992-12-28
- *  Updated   : 1998-02-04
+ *  Updated   : 2003-01-31
  *  Notes     : Filter articles. Kill & auto selection are supported.
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -26,7 +26,6 @@
 
 #define IS_READ(i)	(arts[i].status == ART_READ)
 #define IS_KILLED(i)	(arts[i].killed)
-#define IS_SELECTED(i)	(arts[i].selected)
 
 /*
  * SET_FILTER in group grp, current article arts[i], with rule ptr[j]

@@ -3,9 +3,9 @@
  *  Module    : post.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-25
+ *  Updated   : 2003-01-19
  *  Notes     : mail/post/replyto/followup/repost & cancel articles
- *  Copyright : (c) Copyright 1991-99 by Iain Lea
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -1789,7 +1789,7 @@ damaged_id (
 		id++;
 	if (*id != '<')
 		return 1;
-	while (*id && *id != '>')
+	while (isascii((unsigned char) *id) && isgraph((unsigned char) *id) && !iscntrl((unsigned char) *id) && *id != '>')
 		id++;
 	if (*id != '>')
 		return TRUE;

@@ -3,7 +3,7 @@
  *  Module    : misc.c
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-31
+ *  Updated   : 2003-01-31
  *  Notes     :
  *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -1157,7 +1157,7 @@ FATAL:
  *
  *  now also strips trailing (was: ...) (obw)
  */
-char *
+const char *
 eat_re (
 	char *s,
 	t_bool eat_was)

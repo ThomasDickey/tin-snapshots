@@ -3,7 +3,7 @@
  *  Module    : curses.c
  *  Author    : D. Taylor & I. Lea
  *  Created   : 1986-01-01
- *  Updated   : 1994-05-17
+ *  Updated   : 2003-01-31
  *  Notes     : This is a screen management library borrowed with permission
  *              from the Elm mail system. This library was hacked to provide
  *              what tin needs.
@@ -57,8 +57,6 @@ int _hp_glitch = FALSE;		/* standout not erased by overwriting on HP terms */
 
 static int xclicks=FALSE;	/* do we have an xterm? */
 
-#define BACKSPACE        '\b'
-#define VERY_LONG_STRING 2500
 #define TTYIN            0
 
 #ifdef HAVE_CONFIG_H

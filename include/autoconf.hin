@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : autoconf.hin
- *  Author    : Thomas Dickey <dickey@clark.net>
+ *  Author    : Thomas Dickey <dickey@herndon4.his.com>
  *  Created   : 1995-08-24
  *  Updated   : 1998-04-21
  *  Notes     : #include files, #defines & struct's
- *  Copyright : (c) Copyright 1996-99 by Thomas Dickey
+ *  Copyright : (c) Copyright 1996-2003 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

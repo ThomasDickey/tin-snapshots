@@ -3,9 +3,9 @@
  *  Module    : art.c
  *  Author    : I.Lea & R.Skrenta
  *  Created   : 1991-04-01
- *  Updated   : 1995-04-19
+ *  Updated   : 2003-01-21
  *  Notes     :
- *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-2003 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -924,6 +924,11 @@ iReadNovFile (
 			(*expired)++;
 			continue;
 		}
+
+		/* artnum in overview data higher than groups high mark */
+		if (artnum > group->xmax)
+			continue;
+
 		set_article (&arts[top]);
 		arts[top].artnum = last_read_article = artnum;
 
@@ -1156,6 +1161,8 @@ vWriteNovFile (
 	if (hFp == (FILE *) 0)
 		error_message (txt_cannot_write_index, pcNovFile);
 	else {
+		char *q = NULL, *ref = NULL;
+
 		if (psGrp->attribute && psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
 			SortBy(artnum_comp);
 
@@ -1166,13 +1173,21 @@ vWriteNovFile (
 			psArt = &arts[iNum];
 
 			if (psArt->thread != ART_EXPIRED && psArt->artnum >= psGrp->xmin) {
+				if (psArt->refs) {
+					ref = q = my_strdup(psArt->refs);
+					while (*q) {
+						if (*q == '\t')
+							*q = ' ';
+						q++;
+					}
+				}
 				fprintf (hFp, "%ld\t%s\t%s\t%s\t%s\t%s\t%d\t%d",
 					psArt->artnum,
 					psArt->subject,
 					pcPrintFrom (psArt),
 					pcPrintDate (psArt->date),
 					(psArt->msgid ? psArt->msgid : ""),
-					(psArt->refs ? psArt->refs : ""),
+					(ref ? ref : ""),
 					0,	/* bytes */
 					psArt->lines);
 
@@ -1180,6 +1195,9 @@ vWriteNovFile (
 					fprintf (hFp, "\tXref: %s", psArt->xref);
 
 				fprintf (hFp, "\n");
+
+				if (q != ref)
+					free(ref);
 			}
 		}
 

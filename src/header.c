@@ -236,8 +236,8 @@ get_user_name (
 #		endif /* VMS */
 	}
 #	else
-	pw = getpwuid (getuid ());
-	strcpy (username, pw->pw_name);
+	if ((pw = getpwuid(getuid())) != (struct passwd *) 0)
+		strcpy (username, pw->pw_name);
 #	endif /* M_AMIGA || VMS */
 	return(username);
 }
@@ -269,19 +269,20 @@ get_full_name (
 #	ifdef VMS
 	strncpy (fullname, fix_fullname(get_uaf_fullname()), sizeof (fullname));
 #	else
-	pw = getpwuid (getuid ());
-	strncpy (buf, pw->pw_gecos, sizeof (fullname));
-	if ((p = strchr (buf, ',')))
-		*p = '\0';
-	if ((p = strchr (buf, '&'))) {
-		*p++ = '\0';
-		strcpy (tmp, pw->pw_name);
-		/* strcpy(tmp, get_user_name()); */
-		if (*tmp && *tmp >= 'a' && *tmp <= 'z')
-			*tmp = *tmp - 32;
-		sprintf (fullname, "%s%s%s", buf, tmp, p);
-	} else
-		strcpy (fullname, buf);
+	if ((pw = getpwuid(getuid())) != (struct passwd *) 0) {
+		strncpy (buf, pw->pw_gecos, sizeof (fullname));
+		if ((p = strchr (buf, ',')))
+			*p = '\0';
+		if ((p = strchr (buf, '&'))) {
+			*p++ = '\0';
+			strcpy (tmp, pw->pw_name);
+			/* strcpy(tmp, get_user_name()); */
+			if (*tmp && *tmp >= 'a' && *tmp <= 'z')
+				*tmp = *tmp - 32;
+			sprintf (fullname, "%s%s%s", buf, tmp, p);
+		} else
+			strcpy (fullname, buf);
+	}
 #	endif /* VMS */
 	return (fullname);
 }
