@@ -14,10 +14,6 @@
 
 #include	"tin.h"
 
-#ifndef S_ISDIR
-#define S_ISDIR(m)  ((m & S_IFMT) == S_IFDIR)
-#endif
-
 #define MAXLOOPS 1000
 
 #ifndef M_AMIGA
@@ -57,7 +53,7 @@ msg_write_signature (fp, flag)
 		char cmd[PATH_LEN];
 		FILE *pipe_fp;
 		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
-		if ((pipe_fp = popen (active[i].attribute->sigfile+1, "r")) != NULL) {
+		if ((pipe_fp = popen (active[i].attribute->sigfile+1, "r")) != (FILE *) 0) {
 			while (fgets (cmd, PATH_LEN, pipe_fp))
 				fputs (cmd, fp);
 			fclose (pipe_fp);

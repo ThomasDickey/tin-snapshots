@@ -163,7 +163,7 @@ free_all_filter_arrays ()
 int
 read_filter_file (file, global_file)
 	char	*file;
-	int		global_file;
+	int	global_file;
 {
 #ifndef INDEX_DAEMON
 	char buf[HEADER_LEN];
@@ -515,13 +515,13 @@ fflush (stdout);
 	}
 
 	fclose (hFp);
-	chmod (pcFile, 0600);
+	chmod (pcFile, (S_IRUSR|S_IWUSR));
 #endif	/* INDEX_DAEMON */
 }
 
 /* do NOT sort the filterfile, cause sorting should be left to the user,
    so he could do a kill and then a mark hot (usefull in binaries groups
-   to eleminate all postings smaler than f.e. 10-lines)
+   to eleminate all postings smaller than f.e. 10-lines)
 
 scope=*binar*
 type=0

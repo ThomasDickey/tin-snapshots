@@ -676,7 +676,7 @@ quick_post_article ()
 		perror_message (txt_cannot_open, article);
 		return;
 	}
-	chmod (article, 0600);
+	chmod (article, (S_IRUSR|S_IWUSR));
 
 /* FIXME so that group only contains 1 group when finding an index number */
 /* Does this count? */
@@ -895,7 +895,7 @@ post_article (group, posted_flag)
 		perror_message (txt_cannot_open, article);
 		return redraw_screen;
 	}
-	chmod (article, 0600);
+	chmod (article, (S_IRUSR|S_IWUSR));
 
 #ifdef FORGERY
 	make_path_header (line, from_name);
@@ -1315,7 +1315,7 @@ post_response (group, respnum, copy_text)
 		perror_message (txt_cannot_open, article);
 		return ret_code;
 	}
-	chmod (article, 0600);
+	chmod (article, (S_IRUSR|S_IWUSR));
 
 #ifdef FORGERY
 	make_path_header (line, from_name);
@@ -1557,7 +1557,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
 	}
-	chmod (nam, 0600);
+	chmod (nam, (S_IRUSR|S_IWUSR));
 
 	sprintf (subject, "(fwd) %s\n", note_h_subj);
 
@@ -1736,7 +1736,7 @@ mail_bug_report ()
 		perror_message (txt_cannot_open, nam);
 		return FALSE;
 	}
-	chmod (nam, 0600);
+	chmod (nam, (S_IRUSR|S_IWUSR));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
 		sprintf (buf, "%s%s", bug_addr, add_addr);
@@ -1769,7 +1769,7 @@ mail_bug_report ()
 #else
 	(void) strcpy (buf, PATH_HOSTNAME);
 #endif
-	if ((fp_uname = popen (buf, "r")) != NULL) {
+	if ((fp_uname = popen (buf, "r")) != (FILE *) 0) {
 		while (fgets (buf, sizeof (buf), fp_uname) != NULL) {
 			fprintf (fp, "BOX1: %s", buf);
 			start_line_offset += 2;
@@ -1951,7 +1951,7 @@ mail_to_author (group, respnum, copy_text)
 		perror_message (txt_cannot_open, nam);
 		return redraw_screen;
 	}
-	chmod (nam, 0600);
+	chmod (nam, (S_IRUSR|S_IWUSR));
 
 	sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
 
@@ -2300,7 +2300,7 @@ cancel_article (group, art, respnum)
 		perror_message (txt_cannot_open, cancel);
 		return redraw_screen;
 	}
-	chmod (cancel, 0600);
+	chmod (cancel, (S_IRUSR|S_IWUSR));
 
 #ifdef FORGERY
 	if (!author) {
@@ -2508,7 +2508,7 @@ repost_article (group, art, respnum, supersede)
 		perror_message (txt_cannot_open, article);
 		return ret_code;
 	}
-	chmod (article, 0600);
+	chmod (article, (S_IRUSR|S_IWUSR));
 
 	if (supersede) {
 #ifndef FORGERY

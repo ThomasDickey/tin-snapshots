@@ -1119,7 +1119,8 @@ vWriteNovFile (psGrp)
 		}
 
 		fclose (hFp);
-		chmod (pcNovFile, 0644);
+		chmod (pcNovFile, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
+		
 #if 0		/* I'm pretty sure we don't need to do this at this stage JBF */
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING) {
 		        sort_arts (psGrp->attribute->sort_art_type);
