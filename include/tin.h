@@ -218,6 +218,11 @@ extern char *get_uaf_fullname();
 #endif
 
 #ifdef HAVE_CURSES_H
+#	if defined(M_XENIX)
+#		ifdef	HZ
+#			undef	HZ
+#		endif
+#	endif
 #	include <curses.h>
 #endif
 

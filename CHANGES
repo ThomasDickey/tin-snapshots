@@ -1,3 +1,10 @@
+--unoff BETA release 960827 --
+
+162) Andrey Blochintsev <bag@wood.cs.kiev.ua>
+     BUG. M_XENIX complains about double definition of HZ
+     BUG. ifndef HAVE_LONG_FILE_NAMES pgp-module generates wrong filenames
+     FIX. tin.h, pgp.c
+
 --unoff BETA release 960826 --
 
 161) Andrey Blochintsev <bag@wood.cs.kiev.ua>

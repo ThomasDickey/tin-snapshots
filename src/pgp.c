@@ -23,9 +23,15 @@
 #define PGPOPTS "PGPOPTS"
 
 #define HEADERS	"%stin-%d.h"
-#define PLAINTEXT  "%stin-%d.pt"
-#define CIPHERTEXT "%stin-%d.pt.asc"
-#define KEYFILE	"%stin-%d.k.asc"
+#ifdef HAVE_LONG_FILE_NAMES
+#	define PLAINTEXT	"%stin-%d.pt"
+#	define CIPHERTEXT	"%stin-%d.pt.asc"
+#	define KEYFILE	"%stin-%d.k.asc"
+#else
+#	define PLAINTEXT	"%stn-%d.p"
+#	define CIPHERTEXT	"%stn-%d.p.asc"
+#	define KEYFILE	"%stn-%d.k.asc"
+#endif /* HAVE_LONG_FILE_NAMES */
 
 #define PGP_SIG_TAG "-----BEGIN PGP SIGNED MESSAGE-----\n"
 #define PGP_KEY_TAG "-----BEGIN PGP PUBLIC KEY BLOCK-----\n"
