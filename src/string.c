@@ -125,7 +125,7 @@ strcasestr (
 	h = haystack;
 	n = needle;
 	while (*haystack) {
-		if (tolower (*h) == tolower (*n)) {
+		if (tolower ((unsigned char)*h) == tolower ((unsigned char)*n)) {
 			h++;
 			n++;
 			if (!*n)
@@ -191,13 +191,7 @@ str_lwr (
 	char *dst)
 {
 	while (*src) {
-#if 0
-		if (*src && *src & 0x80) {
-			*dst++ = *src++;
-			*dst++ = *src;
-		} else
-#endif
-		*dst++ = (char)tolower((int)*src);
+		*dst++ = (char)tolower((unsigned char)*src);
 		src++;
 	}
 	*dst = '\0';
@@ -312,7 +306,7 @@ atol (
 
 #ifndef HAVE_STRTOL
 /* fix me - put me in tin.h */
-#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
+#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower((unsigned char)x)-'a'))
 #define MBASE 36
 long
 strtol (
@@ -374,7 +368,7 @@ OUT:
  */
 
 /*fix me - put me in tin.h */
-#define FOLD_TO_UPPER(a)	(toupper ((int) (a)))
+#define FOLD_TO_UPPER(a)        (toupper ((unsigned char)(a)))
 
 #ifndef HAVE_STRCASECMP
 int

@@ -197,7 +197,7 @@ prompt_yn (
 
 	set_alarm_clock_on ();
 
-	return (tolower (ch) == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
+	return (tolower ((unsigned char)ch) == tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
 
 /*
@@ -218,7 +218,7 @@ prompt_yn2 (
 	set_alarm_clock_off ();
 	prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);
 
-	sprintf(cvalid, "%c%c%c", tolower(iKeyPromptYes), tolower(iKeyPromptNo), ESC);
+	sprintf(cvalid, "%c%c%c", tolower((unsigned char)iKeyPromptYes), tolower((unsigned char)iKeyPromptNo), ESC);
 
 	MoveCursor (line, 0);
 	CleartoEOLN ();
@@ -231,7 +231,7 @@ prompt_yn2 (
 		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
 			ch = prompt_ch;
 		}	
-		ch = tolower(ch);
+		ch = tolower((unsigned char)ch);
 	} while (!strchr(cvalid, ch));
 
 	if (line == cLINES) {
@@ -249,7 +249,7 @@ prompt_yn2 (
 
 	set_alarm_clock_on ();
 
-	return (ch == tolower (iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
+	return (ch == (char)tolower ((unsigned char)iKeyPromptYes)) ? 1 : (ch == ESC) ? -1 : 0;
 }
 
 /*

@@ -216,7 +216,7 @@ read_attributes_file (
 			if (line[0] == '#' || line[0] == '\n') {
 				continue;
 			}
-			switch(tolower(line[0])) {
+			switch(tolower((unsigned char)line[0])) {
 			case 'a':
 				MATCH_BOOLEAN (
 					"auto_save=",

@@ -81,7 +81,7 @@ read_config_file (
 			continue;
 		}
 
-		switch(tolower(buf[0])) {
+		switch(tolower((unsigned char)buf[0])) {
 		case 'a':
 			if (match_boolean (buf, "auto_save=", &default_auto_save)) {
 				break;
@@ -591,10 +591,12 @@ read_config_file (
 	if (!(draw_arrow_mark || inverse_okay)) {
 		draw_arrow_mark = TRUE;
 	}
+#if 0
 	/* with invers video bar strip tailing blanks looks ugly */
 	if (!draw_arrow_mark && strip_blanks) {
 		strip_blanks = FALSE;
 	}
+#endif
 	
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");

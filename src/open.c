@@ -144,11 +144,13 @@ nntp_open (void)
 		}
 #endif	/* HAVE_TIN_NNTP_EXTS */
 
+#if 0
 		/*
-		 * Try to authenticate
+		 * Don't try to authenticate as it breaks M$ newsserver.
 		 */
 		debug_nntp ("nntp_open", "authenticate");
 		authenticate (nntp_server, userid, TRUE);
+#endif /* 0 */
 
 	}
 #endif	/* NNTP_ABLE */

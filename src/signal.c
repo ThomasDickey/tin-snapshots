@@ -14,6 +14,7 @@
 
 #include	"tin.h"
 #include	"tcurses.h"
+#include	"trace.h"
 
 /*
  * Needed for resizing under an xterm
@@ -50,6 +51,10 @@
 #	endif
 #endif
 
+#ifdef MINIX
+#undef SIGTSTP
+#endif
+
 static unsigned int time_remaining;
 
 #ifndef WEXITSTATUS
@@ -60,8 +65,52 @@ static unsigned int time_remaining;
 #endif
 
 #ifdef SIGTSTP
-int do_sigtstp = 0;
+static t_bool do_sigtstp = FALSE;
 #endif
+
+enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
+enum context my_context;
+
+static const struct {
+	int	code;
+	const char *name;
+} signal_list[] = {
+#ifdef SIGINT
+	{ SIGINT,	"SIGINT" },	/* ctrl-C */
+#endif
+#ifdef SIGQUIT
+	{ SIGQUIT,	"SIGQUIT " },	/* ctrl-\ */
+#endif
+#ifndef WIN32
+#ifdef SIGILL
+	{ SIGILL,	"SIGILL" },	/* illegal instruction */
+#endif
+#ifdef SIGFPE
+	{ SIGFPE,	"SIGFPE" },	/* floating point exception */
+#endif
+#ifdef SIGBUS
+	{ SIGBUS,	"SIGBUS" },	/* bus error */
+#endif
+#ifdef SIGSEGV
+	{ SIGSEGV,	"SIGSEGV" },	/* segmentation violation */
+#endif
+#endif /* WIN32 */
+#ifdef SIGPIPE
+	{ SIGPIPE,	"SIGPIPE" },	/* broken pipe */
+#endif
+#ifdef SIGCHLD
+	{ SIGCHLD,	"SIGCHLD" },	/* death of a child process */
+#endif
+#ifdef SIGPWR
+	{ SIGPWR,	"SIGPWR" },	/* powerfail */
+#endif
+#ifdef SIGTSTP
+	{ SIGTSTP,	"SIGTSTP" },	/* terminal-stop */
+#endif
+#ifdef SIGWINCH
+	{ SIGWINCH,	"SIGWINCH" },	/* window-size change */
+#endif
+};
 
 #ifdef HAVE_POSIX_JC
 
@@ -101,65 +150,223 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 
 #endif /* HAVE_POSIX_JC */
 
-void set_signal_handlers (void)
+static const char *
+signal_name(int code)
 {
-#ifdef SIGINT
-	signal (SIGINT, signal_handler);	/* ctrl-C */
-#endif
-#ifdef SIGQUIT
-	signal (SIGQUIT, signal_handler);	/* ctrl-\ */
-#endif
-#ifndef WIN32
-#ifdef SIGILL
-	signal (SIGILL, signal_handler);	/* illegal instruction */
-#endif
-#ifdef SIGFPE
-	signal (SIGFPE, signal_handler);	/* floating point exception */
-#endif
-#ifdef SIGBUS
-	signal (SIGBUS, signal_handler);	/* bus error */
-#endif
-#ifdef SIGSEGV
-	signal (SIGSEGV, signal_handler);	/* segmentation violation */
-#endif
-#endif /* WIN32 */
-#ifdef SIGPIPE
-	signal (SIGPIPE, signal_handler);	/* broken pipe */
-#endif
-#ifdef SIGCHLD
-	signal (SIGCHLD, signal_handler);	/* death of a child process */
-#endif
-#ifdef SIGPWR
-	signal (SIGPWR, signal_handler);	/* powerfail */
-#endif
-/*
-#ifdef SIGHUP
-	signal (SIGHUP, signal_handler);
-#endif
-*/
-#ifdef SIGWINCH
-	if (debug == 2) {
-		wait_message ("SIGWINCH setting signal...");
-		sleep (2);
-	}
-	signal (SIGWINCH, main_resize);
-#endif
-
-#if defined(SIGTSTP) && !defined(MINIX)
-	{
-		RETSIGTYPE (*ptr)(SIG_ARGS);
-		ptr = signal (SIGTSTP, SIG_DFL);
-		signal (SIGTSTP, ptr);
-		if (ptr != SIG_IGN) {
-			/*
-			 *  SIGTSTP is ignored when starting from shells
-			 *  without job-control
-			 */
-			do_sigtstp = 1;
-			signal (SIGTSTP, main_suspend);
+	size_t n;
+	const char *name = "unknown";
+	for (n = 0; n < SIZEOF(signal_list)/sizeof(signal_list[0]); n++) {
+		if (signal_list[n].code == code) {
+			name = signal_list[n].name;
+			break;
 		}
 	}
+	return name;
+}
+
+#if defined(SIGWINCH) || defined(SIGTSTP)
+void
+handle_resize (int repaint)
+{
+	char buf[LEN];
+
+#ifdef SIGWINCH
+	repaint |= set_win_size (&cLINES, &cCOLS);
+	signal (SIGWINCH, signal_handler);
 #endif
+
+	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
+
+	if (repaint) {
+#if USE_CURSES
+#ifdef NCURSES_VERSION
+		resizeterm(cLINES+1, cCOLS+1);
+#else
+		my_retouch();
+#endif
+#endif
+		switch (my_context) {
+		case cArt:
+			ClearScreen ();
+			sprintf (buf, txt_group, glob_art_group);
+			wait_message (buf);
+			break;
+		case cConfig:
+			refresh_config_page (0, TRUE);
+			break;
+		case cHelp:
+			display_info_page ();
+			break;
+		case cGroup:
+			ClearScreen ();
+			show_group_page ();
+			break;
+		case cMain:
+			break;
+		case cPage:
+			ClearScreen ();
+			redraw_page (glob_page_group, glob_respnum);
+			break;
+		case cSelect:
+			ClearScreen ();
+			show_selection_page ();
+			break;
+		case cThread:
+			ClearScreen ();
+			show_thread_page ();
+			break;
+		}
+		my_fflush(stdout);
+	}
+}
+#endif /* defined(SIGWINCH) || defined(SIGTSTP) */
+
+#ifdef SIGTSTP
+static void
+handle_suspend (void)
+{
+	TRACE(("handle_suspend(%d)", (int)my_context))
+
+	set_keypad_off ();
+	set_xclick_off ();
+	Raw (FALSE);
+	wait_message (txt_suspended_message);
+
+	kill (0, SIGSTOP);
+
+	sigdisp (SIGTSTP, signal_handler);
+
+	if (!update) {
+		Raw (TRUE);
+		handle_resize (TRUE);
+	}
+	set_keypad_on ();
+	set_xclick_on ();
+}
+#endif
+
+void _CDECL signal_handler (int sig)
+{
+#ifdef SIGCHLD
+#if HAVE_TYPE_UNIONWAIT
+	union wait wait_status;
+#else
+	int wait_status = 1;
+#endif
+#endif
+
+	/* In this case statement, we handle only the non-fatal signals */
+	switch (sig) {
+#ifdef SIGINT
+		case SIGINT:
+#	if !defined(M_AMIGA) && !defined(__SASC)
+			if (!update) {
+				signal (sig, signal_handler);
+				return;
+			}
+#	endif
+			break;
+#endif
+
+#ifdef SIGCHLD
+		case SIGCHLD:
+			wait (&wait_status);
+			signal (sig, signal_handler);	/* death of a child */
+			system_status = WEXITSTATUS(wait_status);
+			return;
+#endif
+
+#if defined(SIGALRM) && !defined(DONT_REREAD_ACTIVE_FILE)
+		case SIGALRM:
+			set_alarm_signal ();
+			reread_active_file = TRUE;
+			return;
+#endif
+#ifdef SIGPIPE
+		case SIGPIPE:
+			got_sig_pipe = TRUE;
+			signal(sig, signal_handler);
+			return;
+#endif
+#ifdef SIGTSTP
+		case SIGTSTP:
+			handle_suspend();
+			return;
+#endif
+#ifdef SIGWINCH
+		case SIGWINCH:
+			handle_resize(FALSE);
+			return;
+#endif
+		default:
+			break;
+	}
+	Raw (FALSE);
+	EndWin ();
+	fprintf (stderr, "\n%s: signal handler caught %s signal (%d).\n",
+		progname, signal_name(sig), sig);
+#if defined(SIGBUS) || defined(SIGSEGV)
+	if (
+#	ifdef SIGBUS
+		sig == SIGBUS
+#	endif
+#	if defined(SIGBUS) && defined(SIGSEGV)
+		||
+#	endif
+#	ifdef SIGSEGV
+		sig == SIGSEGV
+#	endif
+		) {
+		vPrintBugAddress ();
+	}
+#endif
+	cleanup_tmp_files ();
+
+#if defined(apollo) || defined(HAVE_COREFILE)
+	/* do this so we can get a traceback (doesn't dump core) */
+	abort();
+#else
+	exit (EXIT_ERROR);
+#endif
+}
+
+void set_signal_catcher (int flag)
+{
+#ifdef SIGTSTP
+	if (do_sigtstp)
+		signal(SIGTSTP, flag ? signal_handler : SIG_DFL);
+#endif
+#ifdef SIGWINCH
+	signal(SIGWINCH, flag ? signal_handler : SIG_DFL);
+#endif
+}
+
+void set_signal_handlers (void)
+{
+	size_t n;
+	int code;
+	RETSIGTYPE (*ptr)(SIG_ARGS);
+
+	my_context = cMain;
+	for (n = 0; n < SIZEOF(signal_list); n++) {
+		switch ((code = signal_list[n].code)) {
+#ifdef SIGTSTP
+		case SIGTSTP:
+			ptr = signal (code, SIG_DFL);
+			signal (code, ptr);
+			if (ptr == SIG_IGN)
+				break;
+			/*
+			 * SIGTSTP is ignored when starting from shells
+			 * without job-control
+			 */
+			do_sigtstp = TRUE;
+			/* FALLTHRU */
+#endif
+		default:
+			signal (code, signal_handler);
+		}
+	}
 }
 
 
@@ -188,117 +395,6 @@ void set_alarm_clock_off (void)
 {
 #ifndef DONT_REREAD_ACTIVE_FILE
 	time_remaining = alarm (0);
-#endif
-}
-
-
-void _CDECL signal_handler (
-	int sig)
-{
-	const char *sigtext;
-#ifdef SIGCHLD
-#if HAVE_TYPE_UNIONWAIT
-	union wait wait_status;
-#else
-	int wait_status = 1;
-#endif
-#endif
-
-	switch (sig) {
-#ifdef SIGINT
-		case SIGINT:
-			sigtext = "SIGINT ";
-#	if !defined(M_AMIGA) && !defined(__SASC)
-			if (!update) {
-				signal (SIGINT, signal_handler);
-				return;
-			}
-#	endif
-			break;
-#endif
-#ifdef SIGQUIT
-		case SIGQUIT:
-			sigtext = "SIGQUIT ";
-			break;
-#endif
-#ifdef SIGHUP
-		case SIGHUP:
-			sigtext = "SIGHUP ";
-			break;
-#endif
-
-
-
-#ifdef SIGCHLD
-		case SIGCHLD:
-			wait (&wait_status);
-			signal (SIGCHLD, signal_handler);	/* death of a child */
-			system_status = WEXITSTATUS(wait_status);
-			return;
-#endif
-
-#ifdef SIGPWR
-		case SIGPWR:
-			sigtext = "SIGPWR ";
-			break;
-#endif
-#ifdef SIGFPE
-		case SIGFPE:
-			sigtext = "SIGFPE ";
-			break;
-#endif
-#ifdef SIGBUS
-		case SIGBUS:
-			sigtext = "SIGBUS ";
-			break;
-#endif
-#ifdef SIGSEGV
-		case SIGSEGV:
-			sigtext = "SIGSEGV ";
-			break;
-#endif
-#if defined(SIGALRM) && !defined(DONT_REREAD_ACTIVE_FILE)
-		case SIGALRM:
-			set_alarm_signal ();
-			reread_active_file = TRUE;
-			return;
-#endif
-#ifdef SIGPIPE
-		case SIGPIPE:
-			got_sig_pipe = TRUE;
-			signal(SIGPIPE, signal_handler);
-			return;
-#endif
-		default:
-			sigtext = "";
-			break;
-	}
-	Raw (FALSE);
-	EndWin ();
-	fprintf (stderr, "\n%s: signal handler caught signal %s(%d).\n",
-		progname, sigtext, sig);
-#if defined(SIGBUS) || defined(SIGSEGV)
-	if (
-#	ifdef SIGBUS
-		sig == SIGBUS
-#	endif
-#	if defined(SIGBUS) && defined(SIGSEGV)
-		||
-#	endif
-#	ifdef SIGSEGV
-		sig == SIGSEGV
-#	endif
-		) {
-		vPrintBugAddress ();
-	}
-#endif
-	cleanup_tmp_files ();
-
-#if defined(apollo) || defined(HAVE_COREFILE)
-	/* do this so we can get a traceback (doesn't dump core) */
-	abort();
-#else
-	exit (1);
 #endif
 }
 
@@ -372,408 +468,10 @@ set_win_size (
 	}
 }
 
-
-
-void set_signals_art (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, art_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, art_resize);
-#endif
-}
-
-
-void set_signals_config (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, config_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, config_resize);
-#endif
-}
-
-
-void set_signals_group (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, group_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, group_resize);
-#endif
-}
-
-
-void set_signals_help (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, help_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, help_resize);
-#endif
-}
-
-
-void set_signals_page (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, page_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, page_resize);
-#endif
-}
-
-
-void set_signals_select (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, select_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, select_resize);
-#endif
-}
-
-
-void set_signals_thread (void)
-{
-#ifdef SIGTSTP
-	if (do_sigtstp) {
-		sigdisp (SIGTSTP, thread_suspend);
-	}
-#endif
-
-#ifdef SIGWINCH
-	signal (SIGWINCH, thread_resize);
-#endif
-}
-
-
-#ifdef SIGTSTP
-
-/* ARGSUSED0 */
-void art_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, art_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		art_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void main_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, main_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		main_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void select_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, select_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		select_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void group_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, group_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		group_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void help_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, help_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		help_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void page_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, page_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		page_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void thread_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, thread_suspend);
-
-	if (!update) {
-		Raw (TRUE);
-		thread_resize (0);
-	}
-	set_keypad_on ();
-	set_xclick_on ();
-}
-
-
-/* ARGSUSED0 */
-void config_suspend (
-	int sig)
-{
-	set_keypad_off ();
-	set_xclick_off ();
-	Raw (FALSE);
-	wait_message (txt_suspended_message);
-
-	kill (0, SIGSTOP);
-
-	sigdisp (SIGTSTP, config_suspend);
-
-	Raw (TRUE);
-	set_keypad_on ();
-	set_xclick_on ();
-	refresh_config_page (0, TRUE);
-}
-
-#endif /* SIGTSTP */
-
-
-/* ARGSUSED0 */
-void art_resize (
-	int sig)
-{
-	char buf[LEN];
-
-#ifdef SIGWINCH
-	(void) set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, art_resize);
-#endif
-	ClearScreen ();
-	sprintf (buf, txt_group, glob_art_group);
-	wait_message (buf);
-}
-
-
-void config_resize (
-	int sig)
-{
-	int resized = TRUE;
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, config_resize);
-#endif
-	if (resized || sig == 0) {
-		refresh_config_page (0, TRUE);	/* force rebuild of option page */
-	}
-}
-
-
-/* ARGSUSED0 */
-void main_resize (
-	int sig)
-{
-#ifdef SIGWINCH
-	(void) set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, main_resize);
-#endif
-}
-
-
-/* ARGSUSED0 */
-void select_resize (
-	int sig)
-{
-	int resized = TRUE;
-
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, select_resize);
-#endif
-
-	if (resized || sig == 0) {
-		ClearScreen ();
-		show_selection_page ();
-	}
-}
-
-
-/* ARGSUSED0 */
-void group_resize (
-	int sig)
-{
-	int resized = TRUE;
-
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, group_resize);
-#endif
-
-	if (resized || sig == 0) {
-		ClearScreen ();
-		show_group_page ();
-	}
-}
-
-
-/* ARGSUSED0 */
-void help_resize (
-	int sig)
-{
-	int resized = TRUE;
-
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, help_resize);
-#endif
-
-	if (resized || sig == 0) {
-		display_info_page ();
-	}
-}
-
-/* ARGSUSED0 */
-void page_resize (
-	int sig)
-{
-	int resized = TRUE;
-
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, page_resize);
-#endif
-
-	if (resized || sig == 0) {
-		ClearScreen ();
-		redraw_page (glob_page_group, glob_respnum);
-	}
-}
-
-
-/* ARGSUSED0 */
-void thread_resize (
-	int sig)
-{
-	int resized = TRUE;
-
-#ifdef SIGWINCH
-	resized = set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, thread_resize);
-#endif
-
-	if (resized || sig == 0) {
-		ClearScreen ();
-		show_thread_page ();
-	}
-}
+void set_signals_art    (void) { my_context = cArt; }
+void set_signals_config (void) { my_context = cConfig; }
+void set_signals_group  (void) { my_context = cGroup; }
+void set_signals_help   (void) { my_context = cHelp; }
+void set_signals_page   (void) { my_context = cPage; }
+void set_signals_select (void) { my_context = cSelect; }
+void set_signals_thread (void) { my_context = cThread; }

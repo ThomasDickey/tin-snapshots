@@ -1,3 +1,23 @@
+--unoff BETA release 970527 --
+
+386) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote signalhandler
+     FIX. several supplied patches
+
+385) Andrey A. Chernov <ache@null.net>
+     ADD. Various CTYPE fixes, mostly for toupper/tolower
+     FIX. several supplied patches
+
+384) Bruce Momjian <root@candle.pha.pa.us>
+     ADD. check for correct number of articles in group
+     REM. conflict check for strip_blanks and invers_video_bar
+     FIX. active.c, config.c
+
+383) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. initial check for authentication - now only done upon
+          server-request
+     FIX. open.c
+
 --unoff BETA release 970516 --
 
 382) Karsten Keil <keil@temic-ech.spacenet.de>
@@ -960,7 +980,7 @@
 
 --unoff BETA release 961109 --
 
-213) Andrey A. Chernov <ache@nagual.ru>
+213) Andrey A. Chernov <ache@null.net>
      BUG. called ctype-family macros with 8bit characters, which is illegal
           in POSIX/ANSI-C
      FIX. several supplied patches
@@ -1053,7 +1073,7 @@
      ADD. core test for FreeBSD
      FIX. several supplied patches
 
-201) Andrey A. Chernov <ache@nagual.ru>
+201) Andrey A. Chernov <ache@null.net>
      ADD. full path to cksum
      FIX. tin.h
 
@@ -1068,7 +1088,7 @@
      ADD. FreeBSD porting
      FIX. tin.h
 
-198) Andrey A. Chernov <ache@nagual.ru>
+198) Andrey A. Chernov <ache@null.net>
      ADD. FreeBSD porting
      FIX. curses.c, init.c, main.c
 

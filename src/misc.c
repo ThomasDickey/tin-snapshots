@@ -537,7 +537,7 @@ my_chdir (
 
 #ifdef M_OS2
 	if (*path && path[1] == ':') {
-		_chdrive (toupper(path[0]) - 'A' + 1);
+		_chdrive (toupper((unsigned char)path[0]) - 'A' + 1);
 	}
 #endif
 
@@ -613,19 +613,11 @@ invoke_cmd (
 {
 	int ret;
 
-#ifdef SIGTSTP
-	RETSIGTYPE (*susp)(SIG_ARGS);
-	susp = (RETSIGTYPE (*)(SIG_ARGS)) 0;
-#endif
 	set_alarm_clock_off ();
 
 	EndWin ();
 	Raw (FALSE);
-
-#ifdef SIGTSTP
-	if (do_sigtstp)
-		susp = signal(SIGTSTP, SIG_DFL);
-#endif
+	set_signal_catcher (FALSE);
 
 	TRACE(("called system(%s)", _nc_visbuf(nam)))
 #	if USE_SYSTEM_STATUS
@@ -636,13 +628,12 @@ invoke_cmd (
 #	endif
 	TRACE(("return %d", ret))
 
-#ifdef SIGTSTP
-	if (do_sigtstp)
-		signal (SIGTSTP, susp);
-#endif
-
+	set_signal_catcher (TRUE);
 	Raw (TRUE);
 	InitWin ();
+#if defined(SIGWINCH)
+	handle_resize(FALSE);
+#endif
 
 	set_alarm_clock_on ();
 

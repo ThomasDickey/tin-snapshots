@@ -285,7 +285,7 @@ select_page_down:
 				break;
 
 			case iKeySelectRedrawScr:		/* redraw */
-				ClearScreen ();
+				my_retouch ();
 				set_xclick_off ();
 				show_selection_page ();
 				break;

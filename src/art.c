@@ -599,7 +599,7 @@ parse_headers (
 		*ptr++ = '\0';
 		lineno++;
 
-		switch (toupper(*ptrline)) {
+		switch (toupper((unsigned char)*ptrline)) {
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
 				if (!got_from) {
