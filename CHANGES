@@ -1,3 +1,10 @@
+--unoff BETA release 970206 --
+
+310) Sven Paulus <sven@oops.sub.de>
+     ADD. inclusion of empty Followup-To: line (option)
+     ADD. keys for sendding followups/replys with all headers quoted (^W,^Ê)
+     FIX. several supplied patches
+
 --unoff BETA release 970202 --
 
 309) Jason Faultless <jason@radar.demon.co.uk>

@@ -401,6 +401,9 @@ read_config_file (
 			if (match_boolean (buf, "process_only_unread=", &process_only_unread)) {
 				break;
 			}
+			if (match_boolean (buf, "prompt_followupto=", &prompt_followupto)) {
+				break;
+			}
 			break;
 
 		case 'q':
@@ -607,6 +610,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_process_only_unread);
 	fprintf (fp, "process_only_unread=%s\n\n", print_boolean (process_only_unread));
+
+	fprintf (fp, txt_tinrc_prompt_followupto);
+	fprintf (fp, "prompt_followupto=%s\n\n", print_boolean (prompt_followupto));
 
 	fprintf (fp, txt_tinrc_confirm_action);
 	fprintf (fp, "confirm_action=%s\n\n", print_boolean (confirm_action));
