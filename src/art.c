@@ -206,8 +206,8 @@ debug_print_bitmap (group, NULL);
 		filtered = filter_articles (group);
 
 		if ((expired || count) && cmd_line && verbose) {
-		    my_fputc ('\n', stdout);
-		    fflush (stdout);
+			my_fputc ('\n', stdout);
+			fflush (stdout);
 		}
 
 #ifdef	PROFILE

@@ -16,8 +16,8 @@
  * This is NO official release, but a patched version.
  */
 
-#define VERSION		"1.3 X-Mas BETA"
-#define RELEASEDATE	"961224"
+#define VERSION		"1.3 unoff BETA"
+#define RELEASEDATE	"961225"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

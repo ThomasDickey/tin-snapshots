@@ -94,17 +94,36 @@
  * [make emacs happy: "]
  */
 
-/* general keys */
+/* general keys
+ * ESC,
+ * ' ','!','$','/','?',
+ * 'M',
+ * '^',
+ * 'b','j','k','q',
+ * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('P'),ctrl('U')
+ */
 
 #define iKeyAbort ESC
+#define iKeyPageDown3 ' '
 #ifndef NO_SHELL_ESCAPE
 #  define iKeyShellEscape '!'
 #endif
+#define iKeyLastPage '$'
 #define iKeySearchSubjF '/'
 #define iKeySearchSubjB '?'
+#define iKeyOptionMenu 'M'
 #define iKeyQuitTin 'Q'
 #define iKeyFirstPage '^'
+#define iKeyPageUp3 'b'
+#define iKeyDown2 'j'
+#define iKeyUp2 'k'
 #define iKeyQuit 'q'
+#define iKeyPageUp ctrl('B')
+#define iKeyPageDown ctrl('D')
+#define iKeyPageDown2 ctrl('F')
+#define iKeyDown ctrl('N')
+#define iKeyUp ctrl('P')
+#define iKeyPageUp2 ctrl('U')
 
 /* active.c */
 
@@ -117,13 +136,9 @@
 
 #define iKeyConfigSelect '\n'
 #define iKeyConfigSelect2 '\r'
-#define iKeyConfigPageDown ' '
-#define iKeyConfigEnd 'G'
+#define iKeyConfigLastPage 'G'
 #define iKeyConfigNoSave 'Q'
-#define iKeyConfigPageUp 'b'
-#define iKeyConfigHome 'g'
-#define iKeyConfigDown 'j'
-#define iKeyConfigUp 'k'
+#define iKeyConfigFirstPage 'g'
 
 /* feed.c */
 
@@ -143,20 +158,12 @@
 /* group.c */
 
 #define iKeyGroupAutosel ctrl('A')
-#define iKeyGroupPageUp ctrl('B')
-#define iKeyGroupPageDown ctrl('D')
-#define iKeyGroupPageDown2 ctrl('F')
 #define iKeyGroupNextUnreadArtOrGrp '\t'
 #define iKeyGroupReadBasenote '\n'
 #define iKeyGroupKill ctrl('K')
 #define iKeyGroupRedrawScr ctrl('L')
 #define iKeyGroupReadBasenote2 '\r'
-#define iKeyGroupDown ctrl('N')
-#define iKeyGroupUp ctrl('P')
-#define iKeyGroupPageUp2 ctrl('U')
-#define iKeyGroupPageDown3 ' '
 #define iKeyGroupSetRange '#'
-#define iKeyGroupLastPage '$'
 #define iKeyGroupToggleColor '&'
 #define iKeyGroupSelThd '*'
 #define iKeyGroupDoAutoSel '+'
@@ -172,7 +179,6 @@
 #define iKeyGroupToggleHelpDisplay 'H'
 #define iKeyGroupToggleInverseVideo 'I'
 #define iKeyGroupMarkThdRead 'K'
-#define iKeyGroupOptionMenu 'M'
 #define iKeyGroupNextUnreadArt 'N'
 #define iKeyGroupPrevUnreadArt 'P'
 #define iKeyGroupBugReport 'R'
@@ -184,14 +190,11 @@
 #define iKeyGroupQuickAutosel '['
 #define iKeyGroupQuickKill ']'
 #define iKeyGroupFSearchAuth 'a'
-#define iKeyGroupPageUp3 'b'
 #define iKeyGroupCatchup 'c'
 #define iKeyGroupToggleSubjDisplay 'd'
 #define iKeyGroupGoto 'g'
 #define iKeyGroupHelp 'h'
 #define iKeyGroupDisplaySubject 'i'
-#define iKeyGroupDown2 'j'
-#define iKeyGroupUp2 'k'
 #define iKeyGroupListThd 'l'
 #define iKeyGroupMail 'm'
 #define iKeyGroupNextGroup 'n'
@@ -210,17 +213,8 @@
 
 /* help.c */
 
-#define iKeyHelpPageUp ctrl('B')
-#define iKeyHelpPageDown ctrl('D')
-#define iKeyHelpPageDown2 ctrl('F')
-#define iKeyHelpPageUp2 ctrl('U')
-#define iKeyHelpEnd '$'
-#define iKeyHelpPageDown3 ' '
-#define iKeyHelpEnd2 'G'
-#define iKeyHelpPageUp3 'b'
-#define iKeyHelpHome2 'g'
-#define iKeyHelpPageDown4 'j'
-#define iKeyHelpPageUp4 'k'
+#define iKeyHelpLastPage 'G'
+#define iKeyHelpFirstPage 'g'
 /* all other keys exit help */
 
 /* nrctbl.c */
@@ -232,9 +226,6 @@
 /* page.c */
 
 #define iKeyPageAutoSel ctrl('A')
-#define iKeyPagePageUp ctrl('B')
-#define iKeyPagePageDown ctrl('D')
-#define iKeyPagePageDown2 ctrl('F')
 #ifdef HAVE_PGP
 #	define iKeyPagePGPCheckArticle ctrl('G')
 #endif
@@ -246,11 +237,8 @@
 #define iKeyPageNextThd2 '\r'
 #define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
-#define iKeyPagePageUp2 ctrl('U')
 #define iKeyPageToggleRot ctrl('X')
-#define iKeyPagePageDown3 ' '
 #define iKeyPageToggleTex2iso '\"'
-#define iKeyPageLastPage '$'
 #define iKeyPageToggleRot2 '%'
 #ifdef HAVE_COLOR
 #  define iKeyPageToggleColor '&'
@@ -270,14 +258,12 @@
 #define iKeyPageToggleHelpDisplay 'H'
 #define iKeyPageToggleInverseVideo 'I'
 #define iKeyPageKillThd 'K'
-#define iKeyPageOptionMenu 'M'
 #define iKeyPageNextUnreadArt 'N'
 #define iKeyPagePrevUnreadArt 'P'
 #define iKeyPageReply 'R'
 #define iKeyPageGroupSel 'T'
 #define iKeyPagePostHist 'W'
 #define iKeyPageFsearchAuth 'a'
-#define iKeyPagePageUp3 'b'
 #define iKeyPageCatchup 'c'
 #define iKeyPageToggleRot3 'd'
 #define iKeyPageEdit 'e'
@@ -285,7 +271,7 @@
 #define iKeyPageFirstPage2 'g'
 #define iKeyPageHelp 'h'
 #define iKeyPageDisplaySubject 'i'
-#define iKeyPageKillArt 'k'
+#define iKeyPageKillArt 'k' /* overrides iKeyUp3 */
 #define iKeyPageMail 'm'
 #define iKeyPageNextArt 'n'
 #define iKeyPagePrint 'o'
@@ -333,25 +319,16 @@
 
 /* select.c */
 
-#define iKeySelectPageUp ctrl('B')
-#define iKeySelectPageDown ctrl('D')
-#define iKeySelectPageDown2 ctrl('F')
 #define iKeySelectEnterNextUnreadGrp '\t'
 #define iKeySelectReadGrp '\n'
 #define iKeySelectRedrawScr ctrl('L')
 #define iKeySelectReadGrp2 '\r'
-#define iKeySelectDown ctrl('N')
-#define iKeySelectUp ctrl('P')
 #define iKeySelectResetNewsrc ctrl('R')
-#define iKeySelectPageUp2 ctrl('U')
-#define iKeySelectPageDown3 ' '
 #define iKeySelectSetRange '#'
-#define iKeySelectLastPage '$'
 #define iKeySelectToggleColor '&'
 #define iKeySelectCatchupGotoNext 'C'
 #define iKeySelectToggleHelpDisplay 'H'
 #define iKeySelectToggleInverseVideo 'I'
-#define iKeySelectOptionsMenu 'M'
 #define iKeySelectNextUnreadGrp 'N'
 #define iKeySelectQuit2 'Q'
 #define iKeySelectBugReport 'R'
@@ -360,14 +337,11 @@
 #define iKeySelectPostHist 'W'
 #define iKeySelectQuitNoWrite 'X'
 #define iKeySelectSyncWithActive 'Y'
-#define iKeySelectPageUp3 'b'
 #define iKeySelectCatchup 'c'
 #define iKeySelectToggleSubjDisplay 'd'
 #define iKeySelectGoto 'g'
 #define iKeySelectHelp 'h'
 #define iKeySelectDisplayGroupInfo 'i'
-#define iKeySelectDown2 'j'
-#define iKeySelectUp2 'k'
 #define iKeySelectMoveGrp 'm'
 #define iKeySelectEnterNextUnreadGrp2 'n'
 #define iKeySelectToggleReadDisplay 'r'
@@ -380,19 +354,11 @@
 
 /* thread.c */
 
-#define iKeyThreadPageUp ctrl('B')
-#define iKeyThreadPageDown ctrl('D')
-#define iKeyThreadPageDown2 ctrl('F')
 #define iKeyThreadReadNextArtOrThread '\t'
 #define iKeyThreadReadArt '\n'
 #define iKeyThreadRedrawScr ctrl('L')
 #define iKeyThreadReadArt2 '\r'
-#define iKeyThreadDown ctrl('N')
-#define iKeyThreadUp ctrl('P')
-#define iKeyThreadPageUp2 ctrl('U')
-#define iKeyThreadPageDown3 ' '
 #define iKeyThreadSetRange '#'
-#define iKeyThreadLastPage '$'
 #define iKeyThreadToggleColor '&'
 #define iKeyThreadMarkArtSel '*'
 #define iKeyThreadToggleArtSel '.'
@@ -404,13 +370,10 @@
 #define iKeyThreadMarkArtRead 'K'
 #define iKeyThreadBugReport 'R'
 #define iKeyThreadMarkThdUnread 'Z'
-#define iKeyThreadPageUp3 'b'
 #define iKeyThreadCatchupConditional 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'
 #define iKeyThreadDisplaySubject 'i'
-#define iKeyThreadDown2 'j'
-#define iKeyThreadUp2 'k'
 #define iKeyThreadSave 's'
 #define iKeyThreadTag 't'
 #define iKeyThreadVersion 'v'

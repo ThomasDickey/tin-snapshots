@@ -329,7 +329,7 @@ top_of_thread:
 				}
 				break;
 
-			case iKeyThreadLastPage:	/* show last page of articles */
+			case iKeyLastPage:	/* show last page of articles */
 end_of_thread:
 				if (thread_index_point < top_thread - 1) {
 					if (top_thread > last_thread_on_screen) {
@@ -405,9 +405,9 @@ thread_tab_pressed:
 				}
 				break;
 
-			case iKeyThreadPageDown:		/* page down */
-			case iKeyThreadPageDown2:
-			case iKeyThreadPageDown3:
+			case iKeyPageDown:		/* page down */
+			case iKeyPageDown2:
+			case iKeyPageDown3:
 thread_page_down:
 				if (thread_index_point + 1 == top_thread) {
 					if (0 < first_thread_on_screen) {
@@ -445,8 +445,8 @@ thread_page_down:
 				show_thread_page ();
 				break;
 
-			case iKeyThreadDown:
-			case iKeyThreadDown2:		/* line down */
+			case iKeyDown:		/* line down */
+			case iKeyDown2:
 thread_down:
 				if (thread_index_point + 1 >= top_thread) {
 					if (_hp_glitch) {
@@ -473,8 +473,8 @@ thread_down:
 				}
 				break;
 
-			case iKeyThreadUp:
-			case iKeyThreadUp2:		/* line up */
+			case iKeyUp:
+			case iKeyUp2:		/* line up */
 thread_up:
 				if (thread_index_point == 0) {
 					if (_hp_glitch) {
@@ -503,9 +503,9 @@ thread_up:
 				}
 				break;
 
-			case iKeyThreadPageUp:		/* page up */
-			case iKeyThreadPageUp2:
-			case iKeyThreadPageUp3:
+			case iKeyPageUp:		/* page up */
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 thread_page_up:
 				if (thread_index_point == 0) {
 					if (_hp_glitch) {

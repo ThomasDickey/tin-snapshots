@@ -191,7 +191,7 @@ restart:
 				break;
 #endif
 
-			case iKeyPageLastPage:	/* goto end of article */
+			case iKeyLastPage:	/* goto end of article */
 			case iKeyPageLastPage2:
 end_of_article:
 				if (show_last_page ()) {
@@ -250,9 +250,9 @@ end_of_article:
 				}
 				break;
 
-			case iKeyPagePageDown:		/* page down or next response */
-			case iKeyPagePageDown2:
-			case iKeyPagePageDown3:
+			case iKeyPageDown:		/* page down or next response */
+			case iKeyPageDown2:
+			case iKeyPageDown3:
 page_down:
 				if (!space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
@@ -420,9 +420,9 @@ begin_of_article:
 				goto restart;
 				/* NOTREACHED */
 
-			case iKeyPagePageUp:		/* page up */
-			case iKeyPagePageUp2:
-			case iKeyPagePageUp3:
+			case iKeyPageUp:		/* page up */
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 page_up:
 				if (note_page == ART_UNAVAILABLE) {
 					art_close ();
@@ -559,11 +559,11 @@ return_to_index:
 				feed_articles (FEED_MAIL, PAGE_LEVEL, group, respnum);
 				break;
 
-			case iKeyPageOptionMenu:	/* options menu */
+			case iKeyOptionMenu:	/* option menu */
 				if (change_config_file (group, FALSE) == FILTERING) {
 					filter_state = FILTERING;
 				}
-				set_signals_page ();	/* Just to be sure */
+				set_signals_page ();		/* Just to be sure */
 				set_subj_from_size (cCOLS);
 				redraw_page (group->name, respnum);
 				break;
@@ -1190,15 +1190,13 @@ show_cont_header (respnum)
 			whichresp,
 			maxresp,
 			note_page + 1,
-                        arts[respnum].name?arts[respnum].name:arts[respnum].from,
-                        note_h_subj);
+			arts[respnum].name?arts[respnum].name:arts[respnum].from,note_h_subj);
 	} else {
 		sprintf(buf, txt_thread_page,
 			whichbase + 1,
 			top_base,
 			note_page + 1,
-                        arts[respnum].name?arts[respnum].name:arts[respnum].from,
-                        note_h_subj);
+			arts[respnum].name?arts[respnum].name:arts[respnum].from,note_h_subj);
 	}
 	strip_line (buf, strlen (buf));
 	if (cCOLS) {

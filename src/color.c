@@ -205,8 +205,8 @@ print_color (str)
 		}
 	}
 
-	if (word_highlight) {
-		color_fputs(str, stdout,color);
+	if (word_highlight && use_color) {
+		color_fputs(str, stdout, color);
 	} else {
 		my_fputs(str, stdout);
 	}

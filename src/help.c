@@ -371,10 +371,9 @@ show_info_page (type, help, title)
 				}
 				break;
 
-			case iKeyHelpPageDown:			/* page down */
-			case iKeyHelpPageDown2:
-			case iKeyHelpPageDown3:
-			case iKeyHelpPageDown4:
+			case iKeyPageDown:			/* page down */
+			case iKeyPageDown2:
+			case iKeyPageDown3:
 help_page_down:
 				if (cur_page < max_page) {
 					pos_help = cur_page * help_lines;
@@ -385,10 +384,9 @@ help_page_down:
 				}
 				break;
 
-			case iKeyHelpPageUp:			/* page up */
-			case iKeyHelpPageUp2:
-			case iKeyHelpPageUp3:
-			case iKeyHelpPageUp4:
+			case iKeyPageUp:			/* page up */
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 help_page_up:
 				if (cur_page > 1) {
 					cur_page--;
@@ -400,7 +398,7 @@ help_page_up:
 				break;
 
 			case iKeyFirstPage:			/* Home */
-			case iKeyHelpHome2:
+			case iKeyHelpFirstPage:
 help_home:
 				if (cur_page != 1) {
 					cur_page = 1;
@@ -408,8 +406,8 @@ help_home:
 				}
 				break;
 
-			case iKeyHelpEnd:			/* End */
-			case iKeyHelpEnd2:
+			case iKeyLastPage:			/* End */
+			case iKeyHelpLastPage:
 help_end:
 				if (cur_page != max_page) {
 					cur_page = max_page;

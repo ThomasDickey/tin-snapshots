@@ -1,3 +1,14 @@
+--unoff BETA release 961225 --
+
+258) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. with 258) word_h_marks_display could be off with color disabled
+     BUG. automatically turning off word_highlighting_tinrc if color is
+          disabled via 'M'enu is not intuitive
+     BUG. with no groups on screen <Home>/<End>-key draws arrow
+     ADD. changed several key-names (global keys)
+     FIX. several patches
+
 --unoff BETA release 961224 --
 
 257) Alexander Lehmann <alex@hal.rhein-main.de>
