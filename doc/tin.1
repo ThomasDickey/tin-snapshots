@@ -32,33 +32,33 @@ tin, rtin, tind \- A Netnews reader
 ]
 .SH DESCRIPTION
 .I Tin
-is a full-screen easy to use Netnews reader. It can read news locally
-(i.e., \fI/var/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
-via a NNTP (Network News Transport Protocol) server. It will automatically 
-utilize NOV (News OVerview) style index files if available locally or via the 
-NNTP XOVER command.
+is a full-screen easy to use Netnews reader. It can read news locally (i.e.,
+\fI/var/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) via a
+NNTP (Network News Transport Protocol) server. It will automatically utilize
+NOV (News OVerview) style index files if available locally or via the NNTP
+XOVER command.
 .PP
 .I
-Tin
-has four separate levels of operation: Group selection level, Group level, 
-Thread level and Article level. Use the 'h' (help) command to view a list of 
-the commands available at a particular level.
+Tin has four separate levels of operation: Group selection level, Group
+level, Thread level and Article level. Use the 'h' (help) command to view a
+list of the commands available at a particular level.
 .PP
-On startup \fItin\fP will show a list of the newsgroups found in 
-\fI$HOME/.newsrc\fP. An arrow '->' or highlighted bar will point to the first 
-newsgroup. Move to a group by using the terminal arrow keys (terminal dependent)
-or 'j' and 'k'.  Use PgUp/PgDn (terminal dependent) or Ctrl-U and Ctrl-D to
-page up/down.  Enter a newsgroup by pressing RETURN.
+On startup \fItin\fP will show a list of the newsgroups found in
+\fI$HOME/.newsrc\fP. An arrow '->' or highlighted bar will point to the
+first newsgroup. Move to a group by using the terminal arrow keys (terminal
+dependent) or 'j' and 'k'.  Use PgUp/PgDn (terminal dependent) or Ctrl-U and
+Ctrl-D to page up/down.  Enter a newsgroup by pressing RETURN.
 .PP
-The TAB key advances to the next newsgroup with unread articles and enters it.
+The TAB key advances to the next newsgroup with unread articles and enters
+it.
 .SH OPTIONS
 .TP 12
 .B -a
 use ansi color.
 .TP
 .B -c
-create/update index files for every group in \fI$HOME/.newsrc\fP or
-file specified by the \fB-f\fR option and mark all articles as read.
+create/update index files for every group in \fI$HOME/.newsrc\fP or file
+specified by the \fB-f\fR option and mark all articles as read.
 .TP
 .B -C
 count articles for each subscribed group at startup. With a large number of
@@ -68,8 +68,8 @@ group will be accurate.
 .B -d
 don't load newsgroup descriptions (interactive mode).
 .sp
-delete index files for each group before indexing article (\fItind\fP index daemon
-only).
+delete index files for each group before indexing article (\fItind\fP index
+daemon only).
 .TP
 .BI -f " file"
 use the specified file of subscribed to newsgroups in place of
@@ -82,10 +82,11 @@ use the in \fI$HOME/.tin/newsrctable\fP specified server and newsrc.
 help listing all command line options.
 .TP
 .B -H
-brief introduction to \fItin\fP that is also shown the first time it is started.
+brief introduction to \fItin\fP that is also shown the first time it is
+started.
 .TP
 .BI -I " dir"
-directory in which to store newsgroup index files.  Default is 
+directory in which to store newsgroup index files.  Default is
 \fI$HOME/.tin/.news\fP.
 .TP
 .BI -m " dir"
@@ -93,30 +94,29 @@ mailbox directory to use.  Default is \fI$HOME/Mail\fP.
 .TP
 .BI -M " user"
 mail unread articles to specified user for later reading.  For more
-information read section Automatic Mailing and Saving New News. 
+information read section Automatic Mailing and Saving New News.
 .TP
 .BI -n
-Only load groups from the active file that are subscribed to in the
-user's \fI.newsrc\fP.  This allows a noticeable speedup when connecting
-via a slow line, but \fItin\fP cannot tell which groups are moderated.
+Only load groups from the active file that are subscribed to in the user's
+\fI.newsrc\fP.  This allows a noticeable speedup when connecting via a slow
+line, but \fItin\fP cannot tell which groups are moderated.
 .TP
 .BI -P
-purge group index files of articles that no longer exist.
-Care should be taken when using this command as it checks each and
-every article in each group that is accessed.
-On a low speed connection this can have an undesirable effect and it also
-knocks the hell out of your filesystem.
+purge group index files of articles that no longer exist. Care should be
+taken when using this command as it checks each and every article in each
+group that is accessed. On a low speed connection this can have an
+undesirable effect and it also knocks the hell out of your filesystem.
 .TP
 .BI -q
 Don't check for new newsgroups.
 .TP
 .B -Q
-Quick start. Start tin as quickly as possible. Currently this is 
-equivalent to \fB-nqd\fR
+Quick start. Start tin as quickly as possible. Currently this is equivalent
+to \fB-nqd\fR
 .TP
 .B -r
-read news remotely from the default NNTP server specified in the
-environment variable NNTPSERVER or contained in the file
+read news remotely from the default NNTP server specified in the environment
+variable NNTPSERVER or contained in the file
 \fI/etc/nntpserver\fP.
 .TP
 .B -R
@@ -130,12 +130,12 @@ save unread articles for later reading by the \fB-R\fR option.  For more
 information read section Automatic Mailing and Saving New News.
 .TP
 .B -u
-create/update index files for every group in \fI$HOME/.newsrc\fP or
-file specified by the \fB-f\fR option.  This option is disabled if \fItin\fP 
-retrieves its index files via a NNTP server. 
+create/update index files for every group in \fI$HOME/.newsrc\fP or file
+specified by the \fB-f\fR option.  This option is disabled if \fItin\fP
+retrieves its index files via a NNTP server.
 .TP
 .B -U
-start \fItin\fP in the background to update index files while reading news 
+start \fItin\fP in the background to update index files while reading news
 in the foreground.  This option is disabled if \fItin\fP retrieves its index
 files via a NNTP server.
 .TP
@@ -146,60 +146,58 @@ verbose mode for -c -M -S -u and -Z options.
 quick mode to post an article and then exit.
 .TP
 .B -z
-only start \fItin\fP if there is any new/unread news.  If there is news 
-\fItin\fP will position cursor at first group with unread news. Useful 
-for putting in login file.
+only start \fItin\fP if there is any new/unread news.  If there is news
+\fItin\fP will position cursor at first group with unread news. Useful for
+putting in login file.
 .TP
 .B -Z
-check if there is any new/unread news and exit with appropriate status.
-If -v option is specified the number of unread articles in each group
-is printed.  An exit code 0 indicates no news, 1 that an error occurred,
-2 that a nntp error occurred and 3 that new/unread news exists.  Useful for 
-writing scripts.
+check if there is any new/unread news and exit with appropriate status. If
+-v option is specified the number of unread articles in each group is
+printed.  An exit code 0 indicates no news, 1 that an error occurred, 2 that
+a nntp error occurred and 3 that new/unread news exists.  Useful for writing
+scripts.
 .PP
 \fITin\fP can also dynamically change its options by the 'M' menu command.
 Any changes are written to \fI$HOME/.tin/tinrc\fP.
 .PP
-The index daemon version, \fItind\fP, supports the -f, -h, -I and -v 
+The index daemon version, \fItind\fP, supports the -f, -h, -I and -v
 options.
 .PP
-A list of groups can be specified after the other command line options.
-This can be useful if you wish to yank in or subscribe to a handpicked
-subset of the active newsgroups.
-The list may include the usual newsgroup wildcard characters.
-It can be comma or space separated, eg:
+A list of groups can be specified after the other command line options. This
+can be useful if you wish to yank in or subscribe to a handpicked subset of
+the active newsgroups. The list may include the usual newsgroup wildcard
+characters. It can be comma or space separated, eg:
 .PP
 alt.config news.*,!news.test
 .PP
 If you specify a single groupname, or a wildcard that matches a single
-group, then you will automatically enter that group.
-Otherwise the normal group selection screen will appear, but with
-all the matching groups present too, as though you had yanked just
-those groups in.
+group, then you will automatically enter that group. Otherwise the normal
+group selection screen will appear, but with all the matching groups present
+too, as though you had yanked just those groups in.
 .PP
 Once you use 'y' to yank in all active groups, or 'r' to toggle the
-read/unread status, then the command line groups will be gone. You
-can use 'Y' to reread the active file and get them back.
+read/unread status, then the command line groups will be gone. You can use
+'Y' to reread the active file and get them back.
 .PP
-NB: With the \fB-n\fR flag, only unsubscribed groups in the \fI.newsrc\fP file
-can be matched.
+NB: With the \fB-n\fR flag, only unsubscribed groups in the \fI.newsrc\fP
+file can be matched.
 .PP
 .SH "INDEX FILES"
-If your news server supports NOV index files (most modern installations will),
-then this section can be ignored.
+If your news server supports NOV index files (most modern installations
+will), then this section can be ignored.
 .PP
 If your news server doesn't support NOV index files, \fItin\fP will maintain
 an index for each newsgroup. There are a number of methods in which index
 files can be created and updated.
 .PP
-The simplest method is that each user creates/updates his/her own index files
-that are stored in \fI$HOME/.tin/.news\fP. This has the advantage that any 
-user can compile and install \fItin\fP, but the disadvantage is that each user 
-is going to be creating duplicate files and using precious disk space.  A good 
-way to keep index files updated is by doing a \fItin -U\fP that will update 
-index files in the background while you are reading news in the foreground. 
-You can also update index files via the system batcher cron with the -u
-option:
+The simplest method is that each user creates/updates his/her own index
+files that are stored in \fI$HOME/.tin/.news\fP. This has the advantage that
+any user can compile and install \fItin\fP, but the disadvantage is that
+each user is going to be creating duplicate files and using precious disk
+space.  A good way to keep index files updated is by doing a \fItin -U\fP
+that will update index files in the background while you are reading news in
+the foreground.  You can also update index files via the system batcher cron
+with the -u option:
 .RS
 .nf
 .ft CW
@@ -208,38 +206,37 @@ option:
 .fi
 .RE
 .PP
-A slightly better method is to set \fItin\fP setuid news and have all index 
-files created and updated in the news spool directory 
-(i.e., \fI/var/spool/news/.news\fP). This has the advantage that there will 
-only be one copy of the index files on each machine on your network, but the 
+A slightly better method is to set \fItin\fP setuid news and have all index
+files created and updated in the news spool directory (i.e.,
+\fI/var/spool/news/.news\fP). This has the advantage that there will only be
+one copy of the index files on each machine on your network, but the
 disadvantage is that you will have \fItin\fP running setuid news.
 .PP
-A better method is to install the \fItind\fP index file updating daemon and 
+A better method is to install the \fItind\fP index file updating daemon and
 have it create and update index files for all groups in your active file at
-regular intervals in the news spool directory 
-(i.e., \fI/var/spool/news/.news\fP). This has the advantage that there will 
-only be one copy of the index files on each machine on your network and 
-\fItin\fP must not be setuid news, but the disadvantage is that you will have 
-to have news permissions to install \fItind\fP and root permissions to install
-an entry in the cron batcher system to have \fItind\fP regularly update index 
-files.
+regular intervals in the news spool directory (i.e.,
+\fI/var/spool/news/.news\fP). This has the advantage that there will only be
+one copy of the index files on each machine on your network and
+\fItin\fP must not be setuid news, but the disadvantage is that you will
+have to have news permissions to install \fItind\fP and root permissions to
+install an entry in the cron batcher system to have \fItind\fP regularly
+update index files.
 .PP
-The best method is to install the \fItind\fP index file updating daemon on your
-NNTP server and have it create and update index files for all groups in your
-active file at regular intervals in the news spool directory 
-(i.e., \fI/var/spool/news/.news\fP).
-This has the advantage that there will only be one copy of the index files on
-the NNTP server for the whole of your network, but the disadvantage is that you
-will have to install my NNTP server patches to allow \fItin\fP to retrieve 
-index file from your NNTP server and and you must install an entry in the cron 
-batcher system to have \fItind\fP regularly update index files (note that this
-is the method we use on our network of 40-50 machines and have not had any 
-problems).
+The best method is to install the \fItind\fP index file updating daemon on
+your NNTP server and have it create and update index files for all groups in
+your active file at regular intervals in the news spool directory (i.e.,
+\fI/var/spool/news/.news\fP). This has the advantage that there will only be
+one copy of the index files on the NNTP server for the whole of your
+network, but the disadvantage is that you will have to install my NNTP
+server patches to allow \fItin\fP to retrieve index file from your NNTP
+server and and you must install an entry in the cron batcher system to have
+\fItind\fP regularly update index files (note that this is the method we use
+on our network of 40-50 machines and have not had any problems).
 .PP
 Entering a group the first time tends to be slow because the index file must
-be built from scratch unless the \fItind\fP update daemon is being used. To 
-alleviate the slowness start \fItin\fP to create all index files for the 
-groups you subscribe to with \fItin -u -v\fP and go for a coffee. Subsequent 
+be built from scratch unless the \fItind\fP update daemon is being used. To
+alleviate the slowness start \fItin\fP to create all index files for the
+groups you subscribe to with \fItin -u -v\fP and go for a coffee. Subsequent
 readings of a group will cause incremental updating of the index file.
 .PP
 If reading news remotely and updating index files locally, operation will be
@@ -250,12 +247,13 @@ consuming job as I discovered when I was given the job of maintaining our
 news system and news users.
 .PP
 A user starting \fItin\fP for the first time can be automatically subscribed
-to a list of newsgroups that are deemed appropriate by the news administrator.
-The subscriptions file should be created in your news lib directory (i.e.,
-\fI$NEWSLIBDIR/subscriptions\fP) and should have file permissions
-set to 0644. If you read news via NNTP, then your news server must support
-the LIST SUBSCRIPTIONS command. It is part of the Common NNTP Extensions and
-all modern servers should understand it.
+to a list of newsgroups that are deemed appropriate by the news
+administrator. The subscriptions file should be created in your news lib
+directory (i.e.,
+\fI$NEWSLIBDIR/subscriptions\fP) and should have file permissions set to
+0644. If you read news via NNTP, then your news server must support the LIST
+SUBSCRIPTIONS command. It is part of the Common NNTP Extensions and all
+modern servers should understand it.
 .PP
 .SH "SCREEN FORMAT"
 \fITin\fP has four separate levels of operation: Group selection level, 
@@ -287,10 +285,11 @@ group administrator before it will be made public. \fItin\fP will ask for
 confirmation before you post to a moderated group.
 .TP
 \fBN\fP
-This is a new newsgroup which has been created since you last used \fItin\fP.
-New newsgroups are not subscribed to by default. Subscribe to it in the normal
-way if you wish the group to continue to appear in your Selection Menu. 
-Simply ignore new newsgroups and they will be gone the next time you start
+This is a new newsgroup which has been created since you last used
+\fItin\fP. New newsgroups are not subscribed to by default. Subscribe to it
+in the normal way if you wish the group to continue to appear in your
+Selection Menu.  Simply ignore new newsgroups and they will be gone the next
+time you start
 \fItin\fP. You will have to yank in all the groups to find them in a later
 session.
 .TP
@@ -2087,55 +2086,51 @@ for \fIpcre\fP (Perl-compatible regular expressions).
 .PP
 I wish to thank the following people for supplying patches:
 .PP
-David Abbott, Earle Ake, Orbby S. Arka, Joachim Astel, Anton Aylward,
-Jens Chr. Bachem, George Baltz, Volker Barthelmann, Paul Bauwens,
-Dieter Becker, Greg Berigan, Enrik Berkhan, Juergen Bernau, Dan
-Berry, David Binderman, Andrey Blochintsev, Chris Blum, Fokke de
-Boer, Andreas Borchert, Mark Boucher, Bill Brolik, Herman ten Brugge,
-Martin Buck, Leila Burrell-Davis, Sean Casey, Peter Castro, Troy
-Cauble, Andrey A. Chernov, Tan Kwee Chuan, Boleslaw Ciesielski,
-Robert Claeson, Steven Cogswell, Don Costello, Bryan Curnutt, Ned
-Danieley, Lars Dannenberg, Chris Davies, John Davis, Thomas E.
-Dickey, Theo Van Dinter, Ralf Doeblitz, Bryan Dongray, Michael
-Douglass, Craig Durland, Bernd Eckenfels, Phil Edge, Kirk Edson,
-Stefan Elf, Rob Engle, Olle Eriksson, Brent Ermlick, Bernd Ernesti,
-Jason Faultless, Michael Faurot, Werner Fleck, John M. Flinchbaugh,
-Andy Gabor, Torsten Gesang, Callum Gibson, Mike Glendinning, Philippe
-Goujard, Dan Greenspan, Karlos Gross, Carl Hage, Paul Halsema, Ed
-Hanway, Scott Hauck, Per Headland, Arnold Hendriks, Daniel Hermans,
-Jose Herrero, Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher,
-Keith Howell, Tommy Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt,
-Pieter Immelman, Jarkko Isokungas, Urs Janssen, Patrick St. Jean, Hal
-Jespersen, Robbin Johnson, Jarkko Jormanainen, Nelson Kading,
-Geoffrey Keating, Karsten Keil, Fritz Kleeman, Andreas Kies, Tomasz
-Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig Koenigsson,
-Martin Kraemer, Thomas Kroener, Kris Kugel, Yuri Kuzmenko, Olivier
-Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Hannu Laurila,
-Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner,
-Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas
-Ley, David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff,
-Reinhard Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh
-Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen
-Medd, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
-Klaus Mueller, Mike Muise, Udo Munk, Daniel Naber, Torsten Neumann,
-Dirk Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg
-Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom
-Parry, Jim Patterson, Sven Paulus, Walter Pelissero, Colin Perkins,
-Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang
-Prediger, Thomas Quinot, Stefan Rapp, Ted Richards, Steve Robbins,
-Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman,
+David Abbott, Earle Ake, Orbby S. Arka, Joachim Astel, Anton Aylward, Jens
+Chr. Bachem, George Baltz, Volker Barthelmann, Paul Bauwens, Dieter Becker,
+Greg Berigan, Enrik Berkhan, Juergen Bernau, Dan Berry, David Binderman,
+Andrey Blochintsev, Chris Blum, Fokke de Boer, Andreas Borchert, Mark
+Boucher, Bill Brolik, Herman ten Brugge, Martin Buck, Leila Burrell-Davis,
+Sean Casey, Peter Castro, Troy Cauble, Andrey A. Chernov, Tan Kwee Chuan,
+Boleslaw Ciesielski, Robert Claeson, Steven Cogswell, Don Costello, Bryan
+Curnutt, Ned Danieley, Lars Dannenberg, Chris Davies, John Davis, Borislav
+Deianov, Thomas E. Dickey, Theo Van Dinter, Ralf Doeblitz, Bryan Dongray,
+Michael Douglass, Craig Durland, Bernd Eckenfels, Phil Edge, Kirk Edson,
+Stefan Elf, Rob Engle, Olle Eriksson, Brent Ermlick, Bernd Ernesti, Ragnar
+Hojland Espinosa, Jason Faultless, Michael Faurot, Werner Fleck, John M.
+Flinchbaugh, Andy Gabor, Torsten Gesang, Callum Gibson, Mike Glendinning,
+Philippe Goujard, Dan Greenspan, Karlos Gross, Carl Hage, Paul Halsema, Ed
+Hanway, Scott Hauck, Per Headland, Arnold Hendriks, Daniel Hermans, Jose
+Herrero, Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell,
+Tommy Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Pieter Immelman,
+Jarkko Isokungas, Urs Janssen, Patrick St. Jean, Hal Jespersen, Robbin
+Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten Keil,
+Fritz Kleeman, Andreas Kies, Tomasz Kloczko, Dwarven Knight, Thomas Koenig,
+Karl-Koenig Koenigsson, Martin Kraemer, Thomas Kroener, Kris Kugel, Yuri
+Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Hannu
+Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner, Thomas Leitner,
+Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris Lewis, Andreas Ley,
+David-Michael Lincke, Otto Lind, Richard Lloyd, Florian Lohoff, Reinhard
+Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh Mahon, Giuseppe
+De Marco, Dmitri A. Martynoff, Kazushi Marukawa, Owen Medd, Soren Moller,
+Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike Muise,
+Udo Munk, Daniel Naber, Torsten Neumann, Dirk Nimmich, James Nugen, David E.
+O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr, Julien Oster, Jeb
+Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven Paulus, Walter
+Pelissero, Colin Perkins, Eric Peterson, Tim Pierce, Bill Poitras, Scott W.
+Powers, Wolfgang Prediger, Thomas Quinot, Stefan Rapp, Ted Richards, Steve
+Robbins, Ollivier Robert, Branden Robinson, Jim Robinson, Stephen Roseman,
 Roland Rosenfeld, Peter Van Rossem, Clifton Royston, Rich Salz, Gary
-Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger
-Schif, Volker Schmidt, John Schmitz, Torsten Schneider, Stefan
-Scholl, Rainer Scholz, Juergen Schroeder, Larry Schwimmer, Bart
-Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer, Jungshik
-Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman,
-Cliff Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Helmrich
-Streitmatter, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell
-Tangman, Derek Terveer, Carsten Theis, Julian Thompson, David Tiller,
-Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
-Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist,
-Greg Woods, Lloyd Wright, Billy Y., Nickolai Zeldovich
+Sanders, Nickolay Saukh, John Sauter, Christopher Sawtell, Holger Schif,
+Volker Schmidt, John Schmitz, Torsten Schneider, Stefan Scholl, Rainer
+Scholz, Juergen Schroeder, Larry Schwimmer, Bart Sears, Karl-Olav Serrander,
+Doug Sewell, Philip Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert,
+Mark Smith, Steve Spearman, Cliff Stanford, Steve Starck, Jason Steiner,
+Ralf Stephan, Helmrich Streitmatter, Dieter Stueken, Ed Sznyter, Dean
+Takemori, Darrell Tangman, Derek Terveer, Carsten Theis, Julian Thompson,
+David Tiller, Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
+Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist, Greg
+Woods, Lloyd Wright, Billy Y., Nickolai Zeldovich
 .PP
 .SH AUTHOR
 .TP 1i

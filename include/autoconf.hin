@@ -3,10 +3,10 @@
  *  Module    : autoconf.hin
  *  Author    : Thomas Dickey
  *  Created   : 24.08.95
- *  Updated   : 07.12.96
+ *  Updated   : 04.12.97
  *  Notes     : #include files, #defines & struct's
  *
- *  Copyright 1996 by Thomas Dickey
+ *  Copyright 1996,1997 by Thomas Dickey
  *		You may  freely  copy or  redistribute	this software,
  *		so  long as there is no profit made from its use, sale
  *		trade or  reproduction.  You may not change this copy-
@@ -26,7 +26,8 @@
 /*
  * SCO requires special handling
  */
-#undef SYSTEM_LOOKS_LIKE_SCO
+#undef NEED_TIMEVAL_FIX
+#undef NEED_PTEM_H
 
 /*
  * These are set as configure options, some must be guarded by ifdefs because
@@ -164,6 +165,7 @@
 #undef	HAVE_SETLOCALE
 #undef	HAVE_SETREGID
 #undef	HAVE_SETREUID
+#undef	HAVE_SETTZ
 #undef	HAVE_SETUID
 #undef	HAVE_SIGACTION
 #undef	HAVE_STRCASECMP
@@ -209,9 +211,11 @@
 #undef	DECL_BCOPY
 #undef	DECL_BZERO
 #undef	DECL_CALLOC
+#undef	DECL_CONNECT
 #undef	DECL_FCLOSE
 #undef	DECL_FDOPEN
 #undef	DECL_FFLUSH
+#undef	DECL_FGETC
 #undef	DECL_FILENO
 #undef	DECL_FPRINTF
 #undef	DECL_FPUTC
@@ -236,6 +240,7 @@
 #undef	DECL_PUTENV
 #undef	DECL_QSORT
 #undef	DECL_REALLOC
+#undef	DECL_RENAME
 #undef	DECL_REWIND
 #undef	DECL_SELECT
 #undef	DECL_SETEGID
@@ -259,23 +264,14 @@
 #undef	DECL_TOLOWER
 #undef	DECL_TOUPPER
 #undef	DECL_TPUTS
-#undef	DECL_USLEEP
-#undef	DECL__FLSBUF
-
-#undef	DECL_FGETC
-#undef	DECL_RENAME
 #undef	DECL_UNGETC
+#undef	DECL_USLEEP
+#undef	DECL_VSPRINTF
+#undef	DECL__FLSBUF
 
 #undef HAVE_SELECT_INTP
 #undef HAVE_TYPE_SIGACTION
 #undef HAVE_TYPE_UNIONWAIT
-
-/*
- * Define a symbol to control which, if any, regular expression package we use.
- */
-#undef HAVE_REGEX_H_FUNCS
-#undef HAVE_REGEXP_H_FUNCS
-#undef HAVE_REGEXPR_H_FUNCS
 
 /*
  * Define a symbol to control whether we use curses, or the termcap/terminfo
@@ -283,6 +279,7 @@
  */
 #undef	USE_CURSES
 #undef	USE_TRACE
+#undef	NEED_CURSES_H
 
 /*
  * Define symbols to prototype the function 'outchar()'
@@ -396,15 +393,12 @@
 #	define	HAVE_KEYPAD
 #endif
 
+/*
+ * Not all platforms have either strerror or sys_errlist[].
+ */
+#undef HAVE_SYS_ERRLIST
+
 #if 0 /* FIXME: test-not-impl */
-
-#if defined(COHERENT)
-#	define	HAVE_SETTZ
-#endif
-
-#if !defined(M_OS2)
-#	define	HAVE_SYSERRLIST
-#endif
 
 #if defined(supermax)
 #	define	HAVE_BROKEN_TGETSTR

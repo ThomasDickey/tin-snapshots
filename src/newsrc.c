@@ -760,11 +760,10 @@ parse_unread_arts (
 			arts[i].status = ART_READ;
 		else if (arts[i].artnum > bitmax)
 			arts[i].status = ART_UNREAD;
-		else if (NTEST(group->newsrc.xbitmap, arts[i].artnum - bitmin) == ART_READ) {
+		else if (NTEST(group->newsrc.xbitmap, arts[i].artnum - bitmin) == ART_READ)
 			arts[i].status = ART_READ;
-		} else {
+		else
 			arts[i].status = ART_UNREAD;
-		}
 
 		if (arts[i].status == ART_UNREAD && arts[i].artnum >= bitmin) {
 			NSET1(newbitmap, arts[i].artnum - bitmin);

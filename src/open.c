@@ -229,13 +229,32 @@ get_respcode (
 	char *ptr, *end;
 	int respcode;
 
-	ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
+	ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
 
 	if (tin_errno != 0 || ptr == NULL)
 		return(-1);
 
 	respcode = (int) strtol(ptr, &end, 10);
 DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
+
+	if ((respcode == ERR_FAULT)  /* || (respcode == ERR_GOODBYE) ??? */) {
+		/*
+		 * Maybe server timed out.
+		 * If so, retrying will force a reconnect.
+		 */
+#ifdef DEBUG
+		debug_nntp ("get_respcode", "timeout");
+#endif
+		put_server (last_put);
+		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
+
+		if (tin_errno != 0)
+		        return(-1);
+
+		respcode = (int) strtol(ptr, &end, 10);
+DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
+	}
+
 	if ((respcode == ERR_NOAUTH) || (respcode == NEED_AUTHINFO)) {
 		/*
 		 * Server requires authentication.
@@ -249,7 +268,7 @@ DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 			strcpy (last_put, savebuf);
 
 			put_server (last_put);
-			ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
+			ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
 
 			if (tin_errno != 0)
 				return(-1);
@@ -395,7 +414,7 @@ open_subscription_fp (void)
  */
 FILE *
 open_mail_active_fp (
-	char *mode)
+	const char *mode)
 {
 	return fopen (mail_active_file, mode);
 }
@@ -562,7 +581,7 @@ get_article (
 		return ((FILE *) 0);
 	}
 
-	while ((ptr = tin_fgets(line, sizeof(line), nntp_rd_fp)) != NULL) {
+	while ((ptr = tin_fgets(line, sizeof(line), (FILE*)nntp_rd_fp)) != NULL) {
 		fputs (ptr, fp);
 		fputs ("\n", fp);		/* The one case where we do need the \n */
 								/* as rfc1521_decode() still expects this */
@@ -778,7 +797,7 @@ setup_hard_base (
 			debug_nntp ("setup_base", buf);
 #endif
 
-			while ((ptr = tin_fgets(buf, sizeof(buf), nntp_rd_fp)) != NULL)  {
+			while ((ptr = tin_fgets(buf, sizeof(buf), (FILE*)nntp_rd_fp)) != NULL)  {
 				if (top_base >= max_art)
 					expand_art ();
 

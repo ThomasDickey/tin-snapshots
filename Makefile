@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971204
+PVER		= 971215
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -101,7 +101,7 @@ CFILES	= \
 
 AMIGA	= \
 	$(AMGDIR)/README \
-	$(AMGDIR)/tin-unoff.readme \
+	$(AMGDIR)/tin.readme \
 	$(AMGDIR)/smakefile \
 	$(AMGDIR)/actived.c \
 	$(AMGDIR)/amiga.c \

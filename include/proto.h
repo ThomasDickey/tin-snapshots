@@ -326,7 +326,7 @@ extern char *get_server (char *string, int size);
 #ifdef DEBUG
 extern const char *nntp_respcode (int respcode);
 #endif
-extern int get_tcp_socket (const char *machine, const char *service, unsigned port);
+extern int get_tcp_socket (char *machine, char *service, unsigned port);
 extern int server_init (char *machine, const char *service, int port, char *text);
 extern void close_server (void);
 extern void put_server (const char *string);
@@ -355,7 +355,7 @@ extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long
 extern void nntp_close (void);
 extern void vGrpGetSubArtInfo (void);
 #ifdef HAVE_MH_MAIL_HANDLING
-	extern FILE *open_mail_active_fp (char *mode);
+	extern FILE *open_mail_active_fp (const char *mode);
 	extern FILE *open_mailgroups_fp (void);
 #endif /* HAVE_MH_MAIL_HANDLING */
 

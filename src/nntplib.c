@@ -24,15 +24,17 @@ char	last_put[NNTP_STRLEN];
 #ifdef NNTP_ABLE
 	TCP *nntp_rd_fp = NULL;
 	TCP *nntp_wr_fp = NULL;
+	TCP *nntp_rd_fp_real = NULL;
+	TCP *nntp_wr_fp_real = NULL;
 #endif
 
 /* Close the NNTP connection with prejudice */
 #define NNTP_HARD_CLOSE					\
-	if (nntp_wr_fp)						\
-		s_fclose (nntp_wr_fp);			\
-	if (nntp_rd_fp)						\
-		s_fclose (nntp_rd_fp);			\
-	nntp_rd_fp = nntp_wr_fp = NULL;
+	if (nntp_wr_fp_real)						\
+		s_fclose (nntp_wr_fp_real);			\
+	if (nntp_rd_fp_real)						\
+		s_fclose (nntp_rd_fp_real);			\
+	nntp_rd_fp_real = nntp_wr_fp_real = nntp_rd_fp = nntp_wr_fp = NULL;
 
 /*
  * getserverbyfile(file)
@@ -175,7 +177,10 @@ server_init (
 	 * open a fp for reading and writing -- we have to open
 	 * up two separate fp's, one for reading, one for writing.
 	 */
-	if ((nntp_rd_fp = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
+
+	nntp_rd_fp = nntp_wr_fp = NULL;
+
+	if ((nntp_rd_fp_real = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
 		perror ("server_init: fdopen #1");
 		return (-errno);
 	}
@@ -188,16 +193,17 @@ server_init (
 #ifdef TLI
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
 		t_error ("server_init: t_sync");
-		nntp_rd_fp = NULL;		/* from above */
 		return (-EPROTO);
 	}
 #endif
 
-	if ((nntp_wr_fp = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
+	if ((nntp_wr_fp_real = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
 		perror ("server_init: fdopen #2");
-		nntp_rd_fp = NULL;		/* from above */
 		return (-errno);
 	}
+
+	nntp_rd_fp = stdin;      /* we shouldn't ever use those */
+	nntp_wr_fp = stdout;     /* and it will be obvious if we try */
 #else /* VMS */
 	sockt_wr = sockt_rd;
 #endif
@@ -229,8 +235,8 @@ server_init (
 #ifdef NNTP_ABLE
 int
 get_tcp_socket (
-	const char *machine,	/* remote host */
-	const char *service,	/* nttp/smtp etc. */
+	char *machine,		/* remote host */
+	char *service,		/* nttp/smtp etc. */
 	unsigned port)		/* tcp port number */
 {
 	int	s = -1;
@@ -555,7 +561,7 @@ void
 u_put_server (
 	const char *string)
 {
-	s_puts(string, nntp_wr_fp);
+	s_puts(string, nntp_wr_fp_real);
 }
 #endif
 
@@ -610,8 +616,8 @@ DEBUG_IO((stderr, "put_server(%s)\n", string));
 			 * Don't use nntp_command() here - this is a lower level
 			 */
 fprintf(stderr, "Timeout - sending STAT\n");
-			s_printf (nntp_wr_fp, "STAT\r\n");
-			s_flush (nntp_wr_fp);
+			s_printf (nntp_wr_fp_real, "STAT\r\n");
+			s_flush (nntp_wr_fp_real);
 			respcode = get_respcode (NULL);
 
 			if (respcode == -1) {
@@ -631,8 +637,8 @@ fprintf(stderr, "Timeout - sending STAT\n");
 
 #endif /* 0 */
 
-	s_printf (nntp_wr_fp, "%s\r\n", string);
-	(void) s_flush (nntp_wr_fp);
+	s_printf (nntp_wr_fp_real, "%s\r\n", string);
+	(void) s_flush (nntp_wr_fp_real);
 
 	return;
 }
@@ -654,11 +660,12 @@ reconnect(
 	 * Tear down current connection
 	 */
 	NNTP_HARD_CLOSE;
-	ring_bell ();
+	if(!auto_reconnect)
+		ring_bell ();
 
 DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 
-	if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
+	if (!auto_reconnect && prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
 		tin_done(EXIT_OK);		/* user said no to reconnect */
 
 	clear_message ();
@@ -674,7 +681,7 @@ DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 DEBUG_IO((stderr, "Rejoin current group\n"));
 			sprintf (last_put, "GROUP %s", glob_group);
 			put_server (last_put);
-			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
+			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp_real);
 DEBUG_IO((stderr, "Read (%s)\n", last_put));
 		}
 DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
@@ -713,13 +720,12 @@ get_server (
 	/*
 	 * NULL socket reads indicates socket has closed. Try a few times more
 	 */
-	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
+	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp_real) == (char *) 0) {
 
 #ifdef DEBUG
 		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
 			perror_message("get_server()");
 #endif
-
 		retry = reconnect(retry);			/* Will abort when out of tries */
 	}
 
@@ -750,10 +756,10 @@ close_server (void)
 	info_message("Disconnecting from server...");
 	nntp_command("QUIT", OK_GOODBYE, NULL);
 
-	(void) s_fclose (nntp_wr_fp);
-	(void) s_fclose (nntp_rd_fp);
+	(void) s_fclose (nntp_wr_fp_real);
+	(void) s_fclose (nntp_rd_fp_real);
 	s_end();
-	nntp_wr_fp = nntp_rd_fp = NULL;
+	nntp_wr_fp_real = nntp_rd_fp_real = nntp_wr_fp = nntp_rd_fp = NULL;
 }
 #endif /* NNTP_ABLE */
 #endif /* VMS */

@@ -1,3 +1,53 @@
+-- pre-1.4 release 971215 --
+
+516) Janne Kiviluoto <jajoki@utu.fi>
+     ADD. some code was missing for compilation on Amiga gcc.
+     FIX. tnntp.h, version.h, joinpath.c
+
+515) Oliver B. Warzecha <obw@amarok.ping.de>
+     BUG. score for articles was only reset when article was unread.
+     ADD. some minor AmigaOS fixes
+     ADD. unnecessary calls to auto_select_articles() removed, function
+          itself was only a dummy - removed.
+     FIX. filter.c, misc.c, group.c, read.c, open.c, smakefile
+
+514) Thomas E. Dickey <dickey@clark.net>
+     ADD. better configure-script test for yacc vs bison.
+     ADD. moved the compiler-options out of conf-tin into configure.in
+     ADD. split up one of the CF_CHECK_DECL chunks in configure.in
+     BUG. modify pcre to get rid of the places where it removes 'const' from
+          variables.
+     BUG. fix the signed/unsigned warnings in pcre.
+     BUG. fix the uninitialized-variables warnings in pcre.
+     FIX. conf-tin, aclocal.m4, configure[.in], proto.h, tin.h, config.c
+          filter.c, nntplib.c, regex.c, pcre.c, pcre.h, pcreposix.c
+          pcretest.c, pgrep.c, study.c
+
+513) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. ESC didn't abort backward search
+     FIX. search.c
+
+512) Ragnar Hojland Espinosa <ragnar@redestb.es>
+     ADD. pgp-5 support
+     FIX. pgp.c
+
+511) Borislav Deianov <borislav@CS.Cornell.EDU>
+     BUG. tin failed to discard "503 Timeout.." and resend last command
+          again upon reconnection.
+     BUG. nntp_rd_fp is invalid after reconnection
+     ADD. auto_reconnect option in tinrc
+     FIX. extern.h, config.c, init.c, lang.c, nntplib.c, open.c
+          tincfg.tbl
+
+510) Thomas E. Dickey <dickey@clark.net>
+     ADD. rewrote some configure checks
+     FIX. several supplied patches
+
+509) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. random filter type (msgid or msgid_last) was created when 
+          creating new filter entries with message-id filtering.
+     FIX. filter.c
+
 -- pre-1.4 release 971204 --
 
 508) Jason Faultless <jason@radar.demon.co.uk>
@@ -11,11 +61,11 @@
 
 506) Urs Janssen <urs@tin.org>
      ADD. minor code cleanup (removed obsolete XMOTD/XUSER-code,
-          manpage-updated, ...)
+          man-page-updated, ...)
      FIX. several patches
 
 505) Holger Schif <rastaman@eikon.e-technik.tu-muenchen.de>
-     BUG. doesn't compie if configured with --disable-nntp
+     BUG. doesn't compile if configured with --disable-nntp
      FIX. open.c, read.c, tin.h
 
 504) Jungshik Shin <jshin@pantheon.yale.edu>
@@ -29,14 +79,14 @@
 -- pre-1.4 release 971127 --
 
 502) Sven Paulus <sven@tin.org>
-     ADD. -p cmd-line falg
+     ADD. -p cmd-line flag
      FIX. Makefile, extern.h, Makefile[.in], init.c, main.c, nrctbl.c
           open.c
 
 501) Ralf Doeblitz <doeblitz@gmx.de>
      ADD. moved some strings to lang.c
      ADD. filtering on Message-ID and last References: entry only
-     ADD. missing metachars to quote_wild()
+     ADD. missing meta-chars to quote_wild()
      FIX. extern.h, tin.h, filter.c, misc.c
 
 500) Thomas E. Dickey <dickey@clark.net>
@@ -72,7 +122,7 @@
 496) Enrik Berkhan <enrik@tin.org>
      Sven Paulus <sven@tin.org>
      Urs Janssen <urs@tin.org>
-     ADD. minor manpage update
+     ADD. minor man-page update
      BUG. fixed wrong type in fgets_hdr()
      BUG. fixed 12pm bug in parsedate.y
      ADD. check for $YACC on HP-UX/cc

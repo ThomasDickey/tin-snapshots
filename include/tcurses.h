@@ -16,19 +16,36 @@
 #ifndef TCURSES_H
 #define TCURSES_H 1
 
-#if USE_CURSES
 
-#ifdef HAVE_NCURSES_H
-#include <ncurses.h>
-#else
-#include <curses.h>
+#if defined(USE_CURSES) || defined(NEED_CURSES_H)
+#	ifdef HAVE_NCURSES_H
+#		include <ncurses.h>
+#	else
+#		undef TRUE
+#		undef FALSE
+#		include <curses.h>
+#		ifndef TRUE
+#			define	TRUE	1
+#		endif
+#		ifndef FALSE
+#			define	FALSE	0
+#		endif
+#	endif
 #endif
+
+#if USE_CURSES
 
 #if USE_TRACE
 #if HAVE_NOMACROS_H
 #include <nomacros.h>
 #endif
 #endif
+
+#if 0	/* FIXME: this has prototypes, but opens up new problems! */
+#ifdef HAVE_TERM_H
+#	include <term.h>
+#endif
+#endif /* 0 */
 
 #define cCRLF				"\n"
 #define my_flush()			my_fflush(stdout)
@@ -60,6 +77,10 @@ extern void my_retouch(void);
 extern void refresh_color(void);
 
 #else	/* !USE_CURSES */
+
+#ifdef HAVE_TERMCAP_H
+#	include <termcap.h>
+#endif
 
 #define cCRLF				"\r\n"
 

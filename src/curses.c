@@ -30,30 +30,6 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 #	undef	sinix
 #endif
 
-#ifdef HAVE_CURSES_H
-#	if defined(M_XENIX)
-#		undef	HZ /* looks like a bug in M_XENIX includefiles */
-#	endif
-/* it doesn't do any harm, and <curses.h> may have conflicting defs */
-#	ifdef TRUE
-#		undef TRUE
-#	endif
-#	ifdef FALSE
-#		undef FALSE
-#	endif
-#	include <curses.h>
-#endif
-
-#if 0	/* FIXME: this has prototypes, but opens up new problems! */
-#ifdef HAVE_TERM_H
-#	include <term.h>
-#endif
-#endif /* 0 */
-
-#ifdef HAVE_TERMCAP_H
-#	include <termcap.h>
-#endif
-
 #ifdef VMS
 #include <descrip.h>
 #include <iodef.h>

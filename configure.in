@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 24.11.97
+dnl Updated   : 04.12.97
 dnl Notes     :
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -34,6 +34,21 @@ case ".$INSTALL_PREFIX" in # (vi
 	;;
 esac
 
+###	Compiler/options that autoconf doesn't get right
+case "$host_os" in
+	aix*)	#(vi
+		if test "$CC" = ""; then
+			AC_PATH_PROG(XLC, xlc)
+			if test "$ac_cv_path_XLC" != ""; then
+				CC="$ac_cv_path_XLC"
+			fi
+		fi
+		;;
+	hpux*)	#(vi
+		test "$CC" != "cc" && test -z "$CFLAGS" && CFLAGS="-O"
+		;;
+esac
+
 ###	Checks for programs.
 save_CFLAGS="$CFLAGS"
 AC_PROG_CC
@@ -41,7 +56,7 @@ AC_PROG_GCC_TRADITIONAL
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_RANLIB
-AC_PROG_YACC
+CF_PROG_YACC
 AC_CHECK_PROGS(LINT, lint alint lclint tdlint, [])
 CF_ANSI_CC_REQD
 
@@ -443,22 +458,15 @@ AC_CHECK_HEADERS(\
 	sys/times.h \
 	sys/utsname.h \
 	term.h \
-	termcap.h \
 	termio.h \
 	time.h \
 	unistd.h \
 	waitstatus.h \
 )
 
-# check for SCO.  this is a hack, and should be split into individual
-# features -- the sys/time.h and select.h conflict, and the need for
-# ptem.h due to winsize struct.
-AC_CHECKING([for SCO by checking on /usr/bin/scosh])
-AC_PROGRAM_CHECK(COULD_BE_SCO, [scosh], maybe, maybenot)
-if test "$COULD_BE_SCO" = "maybe"
-then
-	AC_DEFINE(SYSTEM_LOOKS_LIKE_SCO)
-fi
+###	Checks that depend on existence-checks for headers
+CF_SIZECHANGE
+CF_SYS_SELECT_TIMEVAL
 
 ###	Checks for Datatypes.
 AC_TYPE_MODE_T
@@ -469,32 +477,52 @@ AC_CHECK_TYPE(time_t, long)
 AC_TYPE_SIGNAL
 
 ###	Checks for libraries.
-found_tcap=no
-if test $found_ncurses = yes ; then
-	AC_CHECK_LIB(ncurses, tgoto, [found_tcap=yes])
-fi
-if test $found_tcap != yes ; then
-case $host_os in #(vi
-freebsd*)
-	# This is only necessary if you are linking against an obsolete
-	# version of ncurses (but it should do no harm, since it's static).
-	AC_CHECK_LIB(mytinfo,tgoto,[LIBS="-lmytinfo $LIBS" found_tcap=yes])
-	;;
-esac
-fi
-if test $found_tcap != yes ; then
-	AC_CHECK_LIB(termlib, tgoto, [LIBS="$LIBS -ltermlib" found_tcap=yes])
-fi
-if test "$found_tcap" != yes; then
-	# allow curses library for broken AIX system.
-	AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" found_tcap=yes])
-	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
-fi
-if test "$found_tcap" != yes; then
-	AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
-fi
-if test "$found_tcap" != yes; then
-	AC_WARN([Can't find -ltermlib, -lcurses, or -ltermcap])
+if test $use_curses = yes ; then
+	if test $found_ncurses != yes ; then
+		CF_CURSES_LIBS
+	fi
+else
+	found_tcap=no
+	if test $found_ncurses = yes ; then
+		AC_CHECK_LIB(ncurses, tgoto, [found_tcap=yes])
+	fi
+	if test $found_tcap != yes ; then
+		case $host_os in #(vi
+		freebsd*)
+			# This is only necessary if you are linking against an
+			# obsolete version of ncurses (but it should do no
+			# harm, since it's static).
+			AC_CHECK_LIB(mytinfo,tgoto,[LIBS="-lmytinfo $LIBS" found_tcap=yes])
+			;;
+		esac
+	fi
+	if test $found_tcap != yes ; then
+		AC_CHECK_LIB(termlib, tgoto, [LIBS="$LIBS -ltermlib" found_tcap=yes])
+	fi
+	if test "$found_tcap" != yes; then
+		# allow curses library for broken AIX system.
+		AC_CHECK_LIB(curses, initscr, [LIBS="$LIBS -lcurses" found_tcap=yes])
+		AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
+	fi
+	if test "$found_tcap" != yes; then
+		AC_CHECK_LIB(termcap, tgoto, [LIBS="$LIBS -ltermcap" found_tcap=yes])
+	fi
+	if test "$found_tcap" != yes; then
+		AC_WARN([Can't find -ltermlib, -lcurses, or -ltermcap])
+	fi
+	# terminfo-based termcap interfaces may be prototyped in <curses.h>,
+	# which may/may not be compatible with <termcap.h>
+	AC_MSG_CHECKING(if we should include termcap.h)
+	cf_save_CFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -I$srcdir/include"
+	AC_TRY_COMPILE([
+#define HAVE_TERMCAP_H 1
+#include <tcurses.h>],[],
+		[cf_result=yes],
+		[cf_result=no])
+	AC_MSG_RESULT($cf_result)
+	CFLAGS="$cf_save_CFLAGS"
+	test $cf_result = yes && AC_DEFINE(HAVE_TERMCAP_H)
 fi
 CF_TYPE_OUTCHAR
 
@@ -548,83 +576,6 @@ AC_CHECK_FUNCS(\
 CF_FUNC_FORK
 CF_FUNC_MEMMOVE
 
-dnl These return non-int values, and can be troublesome if not declared
-CF_CHECK_DECL(\
-	errno \
-	getenv \
-	gethostbyname \
-	getlogin \
-	getpwnam \
-	getservbyname \
-	inet_ntoa \
-	popen \
-	strchr \
-	tgetstr \
-	tgoto \
-)
-
-if test $with_decl_check = yes; then
-CF_CHECK_DECL(\
-	_flsbuf \
-	atoi \
-	atol \
-	bcopy \
-	bzero \
-	calloc \
-	fclose \
-	fdopen \
-	fileno \
-	fflush \
-	fprintf \
-	fputc \
-	fputs \
-	fread \
-	free \
-	fseek \
-	fwrite \
-	getcwd \
-	gethostname \
-	getopt \
-	getpass \
-	ioctl \
-	malloc \
-	memset \
-	mktemp \
-	pclose \
-	perror \
-	printf \
-	putenv \
-	qsort \
-	realloc \
-	rewind \
-	select \
-	setegid \
-	seteuid \
-	setpgrp \
-	setregid \
-	setreuid \
-	socket \
-	sscanf \
-	strcasecmp \
-	strftime \
-	strncasecmp \
-	strtol \
-	system \
-	tgetent \
-	tgetflag \
-	tgetnum \
-	time \
-	tempnam \
-	tolower \
-	toupper \
-	tputs \
-	usleep \
-	fgetc \
-	rename \
-	ungetc \
-)
-fi
-
 AC_MSG_CHECKING(if select expects int * arguments)
 AC_EGREP_HEADER([select\(.*, *int *\*,],time.h,AC_DEFINE(HAVE_SELECT_INTP) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
@@ -675,6 +626,121 @@ CF_COMPTYPE
 CF_COREFILE
 
 ### test this last, since it uses a partly-built autoconf.h
+# Setup includes for test-program to verify declarations
+CHECK_DECL_FLAG="-I$srcdir/include -I$srcdir/pcre"
+CHECK_DECL_HDRS='
+#define M_UNIX
+#define __CPROTO__
+#define HAVE_CONFDEFS_H
+#include <tin.h>'
+TIN_DECL_HDRS="$CHECK_DECL_HDRS"
+
+dnl These return non-int values, and can be troublesome if not declared
+CF_CHECK_DECL(\
+	errno \
+	getenv \
+	getlogin \
+	getpwnam \
+	popen \
+	strchr \
+)
+
+dnl Check network stuff separately, to limit the effect of inconsistent headers
+CHECK_DECL_HDRS="$TIN_DECL_HDRS
+#include <tnntp.h>"
+CF_CHECK_DECL(\
+	gethostbyname \
+	getservbyname \
+	inet_ntoa \
+)
+
+if test $use_curses = no ; then
+CHECK_DECL_HDRS="$TIN_DECL_HDRS
+#include <tcurses.h>"
+CF_CHECK_DECL(\
+	tgetstr \
+	tgoto \
+)
+fi
+
+if test $with_decl_check = yes; then
+CHECK_DECL_HDRS="$TIN_DECL_HDRS"
+CF_CHECK_DECL(\
+	_flsbuf \
+	atoi \
+	atol \
+	bcopy \
+	bzero \
+	calloc \
+	fclose \
+	fdopen \
+	fflush \
+	fgetc \
+	fileno \
+	fprintf \
+	fputc \
+	fputs \
+	fread \
+	free \
+	fseek \
+	fwrite \
+	getcwd \
+	gethostname \
+	getopt \
+	getpass \
+	ioctl \
+	malloc \
+	memset \
+	mktemp \
+	pclose \
+	perror \
+	printf \
+	putenv \
+	qsort \
+	realloc \
+	rename \
+	rewind \
+	select \
+	setegid \
+	seteuid \
+	setpgrp \
+	setregid \
+	setreuid \
+	socket \
+	sscanf \
+	strcasecmp \
+	strftime \
+	strncasecmp \
+	strtol \
+	system \
+	tempnam \
+	time \
+	tolower \
+	toupper \
+	ungetc \
+	usleep \
+	vsprintf \
+)
+
+if test $use_curses = no ; then
+CHECK_DECL_HDRS="$TIN_DECL_HDRS
+#include <tcurses.h>"
+CF_CHECK_DECL(\
+	tgetent \
+	tgetflag \
+	tgetnum \
+	tputs \
+)
+fi
+
+CHECK_DECL_HDRS="$TIN_DECL_HDRS
+#include <tnntp.h>"
+CF_CHECK_DECL(\
+	connect \
+)
+
+fi
+
 CF_TIOCGWINSZ
 
 ### append special libraries that get in the way of testing

@@ -1,5 +1,5 @@
 #
-# $VER: tin_makefile 2.2 (25.11.97)
+# $VER: tin_makefile 2.2a (14.12.97)
 #
 # This is especially for use with the SAS/C developing system
 # version 6.55 and above
@@ -15,7 +15,7 @@ OBJDIR   = /obj
 REDIR    = /pcre
 
 # Timezone stuff for faster spool access (obw)
-TZSET    = _tzset.o
+TZSET    = $(OBJDIR)/_tzset.o
 TZSOURCE = sc:source/_tzset.c
 
 # Include the next two lines to enable an NNTP version of TIN.
@@ -200,15 +200,15 @@ OBJECTS = \
 # targets
 #
 
-all: $(TZSET) $(PROJECT) $(ACTIVED) $(GSTFILE)
+all: $(PROJECT) $(ACTIVED) $(GSTFILE)
 
-$(PROJECT):     $(OBJDIR) $(OBJECTS)
+$(PROJECT):     $(OBJDIR) $(OBJECTS) $(TZSET)
         $(CC) $(LDFLAGS) pname=$@ <with <(ram:tmp)
-        $(OBJECTS) $(OBJDIR)/$(TZSET)
+        $(OBJECTS) $(TZSET)
         <
 
-$(TZSET): sc:source/_tzset.c $(OBJDIR)
-        $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $*.c objname=$(OBJDIR)/$@
+$(TZSET): $(TZSOURCE) $(OBJDIR)
+        $(CC) $(SCOPTIONS) $(DEBUG) $(OPTIMIZE) def LESS_GETENV PARMS=BOTH $(TZSOURCE) objname=$@
 
 $(ACTIVED): $(OBJDIR)/activeda.o $(GSTFILE)
         $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/activeda.o
@@ -220,10 +220,10 @@ $(GSTFILE): $(HEADERS)
 $(OBJDIR):
         -@makedir $(OBJDIR)
 
-chartables.c: maketables
-        maketables >$(SRCDIR)/chartables.c
+$(REDIR)/chartables.c: maketables
+        maketables >$(REDIR)/chartables.c
 
-maketables: maketables.o
+maketables: $(OBJDIR)/maketables.o $(GSTFILE)
         $(CC) $(LDFLAGS) pname=$@ $(OBJDIR)/maketables.o
 
 #/*vb*/
@@ -238,6 +238,7 @@ clean:
         -delete $(OBJDIR)/\#?.o #?.lnk
         -delete $(GSTFILE)(%|.info) $(ACTIVED)(%|.info) $(PROJECT)(%|.info)
         -delete $(SRCDIR)/parsdate.c
+        -delete maketables
 
 #
 # dependencies

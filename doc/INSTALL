@@ -8,7 +8,7 @@ This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
   --enable-8bit-keys	     --with-inn-nntplib		HAVE_FASCIST_NEWSADMIN
   --enable-color	     --with-iso-to-ascii	HAVE_MMDF_MAILER
-  --enable-curses	     --with-ispell
+  --enable-curses	     --with-ispell		HAVE_PGP_5
   --enable-debug	     --with-libdir		INDEX_DAEMON
   --enable-etiquette	     --with-metamail		NNTP_INEWS
   --enable-forgery	     --with-ncurses		NNTP_SERVER_FILE
@@ -318,6 +318,9 @@ Define if your machine uses a MMDF type mailer instead of sendmail.
 It is defined as default on SCO Unix machines. It can be dynamically
 changed by setting the tinrc variable save_to_mmdf_mailbox to ON.
 
+HAVE_PGP_5
+Define if you use pgp-5 instead of pgp-2.
+
 NO_POSTING
 Do not allow posting/followup of articles.
 
@@ -373,6 +376,7 @@ Compiled & installed on the following machines:
 	Sun UltraSPARC Enterprise 2 & SunOS 5.5.1 with gcc 2.7.2
 	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0
 	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
+	Sun 3/60 & 4.1.1_U1 with gcc 2.7.2.2
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
 

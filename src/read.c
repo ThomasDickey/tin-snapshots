@@ -132,7 +132,7 @@ tin_read (
 	char *ptr;
 
 #ifdef NNTP_ABLE
-	if (fp == nntp_rd_fp)
+	if (fp == (FILE*)nntp_rd_fp)
 		if (wait_for_input(fp)) {			/* Check if okay to read */
 			info_message("Aborting read, please wait...");
 			drain_buffer(fp);
@@ -145,7 +145,7 @@ tin_read (
 	/*
 	 * Initially try and fit into supplied buffer
 	 */
-	if (fp == nntp_rd_fp)
+	if (fp == (FILE*)nntp_rd_fp)
 		ptr = get_server(buffer, len);
 	else
 #endif /* NNTP_ABLE */
@@ -175,7 +175,7 @@ tin_read (
 	 * Do processing of leading . for NNTP case here and here _only_
 	 */
 #ifdef NNTP_ABLE
-	if (fp != nntp_rd_fp)
+	if (fp != (FILE*)nntp_rd_fp)
 #endif /* NNTP_ABLE */
 		return(buffer);
 

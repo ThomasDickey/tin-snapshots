@@ -26,7 +26,7 @@ void
 read_mail_active_file (void)
 {
 	char	buf[LEN];
-	char	spooldir[PATH_LEN];
+	char	my_spooldir[PATH_LEN];
 	struct	t_group *ptr;
 	FILE	*fp;
 	long	count = -1L;
@@ -55,7 +55,7 @@ read_mail_active_file (void)
 my_printf ("Line=[%s", buf);
 my_flush();
 */
-		if (!parse_active_line (buf, &max, &min, spooldir) || *buf == '\0')
+		if (!parse_active_line (buf, &max, &min, my_spooldir) || *buf == '\0')
 			continue;
 
 		/*
@@ -68,7 +68,7 @@ my_flush();
 		 * Load group info. TODO - integrate with active_add()
 		 */
 		ptr->type = GROUP_TYPE_MAIL;
-		ptr->spooldir = my_strdup (spooldir);
+		ptr->spooldir = my_strdup (my_spooldir);
 		ptr->description = (char *) 0;
 		ptr->count = count;
 		ptr->xmax = max;
@@ -83,7 +83,6 @@ my_flush();
 		ptr->newsrc.xbitmap = (t_bitmap *) 0;
 		ptr->attribute = (struct t_attribute *) 0;
 		ptr->glob_filter = &glob_filter;
-		ptr->grps_filter = (struct t_filters *) 0;
 		vSetDefaultBitmap (ptr);
 	}
 	fclose (fp);
@@ -141,7 +140,7 @@ read_mailgroups_file (void)
 
 		fclose (fp);
 
-/*PLOK2*/		if (cmd_line && !(update || verbose))
+/*PLOK2*/	if (cmd_line && !verbose)
 			wait_message (0, "\n");
 	}
 }

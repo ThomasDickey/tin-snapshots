@@ -3,7 +3,7 @@
  *  Module    : tnntp.h
  *  Author    : Thomas Dickey
  *  Created   : 05.03.97
- *  Updated   : 05.03.97
+ *  Updated   : 01.12.97
  *  Notes     : #include files, #defines & struct's
  *
  *  Copyright 1997 by Thomas Dickey
@@ -39,7 +39,9 @@
 #	ifdef HAVE_NETDB_H
 #		include <netdb.h>
 #	endif
-
+#if defined( __amigaos__ ) /* JK 101097 */
+#	define IPPORT_NNTP ((unsigned short) 119)
+#endif /* !__amigaos__ */
 #	ifdef TLI
 #		include	<fcntl.h>
 #		include	<tiuser.h>
@@ -81,10 +83,6 @@
 #		endif
 #		ifndef EXCELAN
 #		endif
-#		if defined(__GNUC__) && defined(sun)
-			extern int connect (int s, struct sockaddr *name, int namelen);
-			extern char *inet_ntoa (struct in_addr in);
-#		endif
 #		ifdef HAVE_ARPA_INET_H
 #			include <arpa/inet.h>
 #		endif
@@ -108,6 +106,13 @@
 
 #ifndef MAXHOSTNAMELEN
 #	define MAXHOSTNAMELEN 255
+#endif
+
+#ifdef DECL_CONNECT
+extern int  connect(int  sockfd, struct sockaddr *serv_addr, int addrlen);
+#endif
+#ifdef DECL_INET_NTOA
+extern char *inet_ntoa (struct in_addr);
 #endif
 
 #endif /* TNNTP_H */
