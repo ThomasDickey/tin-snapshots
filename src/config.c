@@ -141,6 +141,9 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "col_title=", &col_title, MAX_COLOR)) {
 				break;
 			}
+			if (match_integer (buf, "col_signature=", &col_signature, MAX_COLOR)) {
+				break;
+			}
 #endif
 			break;
 		case 'd':
@@ -516,8 +519,8 @@ write_config_file (file)
 	fprintf (fp, "# if ON using ansi-color\n");
 	fprintf (fp, "use_color=%s\n\n", (use_color_tinrc ? "ON" : "OFF"));
 	fprintf (fp, "# For coloradjust use the following numbers\n");
-	fprintf (fp, "# 0-black        1-red         2-green        3-brown\n");
-	fprintf (fp, "# 4-blue         5-pink        6-cyan         7-white\n");
+	fprintf (fp, "#  0-black       1-red         2-green        3-brown\n");
+	fprintf (fp, "#  4-blue        5-pink        6-cyan         7-white\n");
 	fprintf (fp, "# These are *only* for foreground:\n");
 	fprintf (fp, "#  8-gray        9-lightred   10-lightgreen  11-yellow\n");
 	fprintf (fp, "# 12-lightblue  13-lightpink  14-lightcyan   15-lightwhite\n\n");
@@ -543,6 +546,8 @@ write_config_file (file)
 	fprintf (fp, "col_normal=%d\n\n", col_normal);
 	fprintf (fp, "#Color of Help/Mail-Sign\n");
 	fprintf (fp, "col_title=%d\n\n", col_title);
+	fprintf (fp, "#Color of signature\n");
+	fprintf (fp, "col_signature=%d\n\n", col_signature);
 #endif
 	fprintf (fp, "# if ON print all of mail header otherwise Subject: & From: lines\n");
 	fprintf (fp, "print_header=%s\n\n", print_boolean (print_header));

@@ -735,6 +735,8 @@ extern constext txt_yanking_all_groups[];
 extern constext txt_yanking_sub_groups[];
 extern constext txt_yes[];
 extern constext txt_you_have_mail[];
+extern constext txt_warn_cancel_forgery[];
+extern constext txt_warn_cancel[];
 extern constext txt_filter_text_type[];
 extern constext txt_help_filter_subj[];
 extern constext txt_help_filter_from[];
@@ -920,6 +922,7 @@ extern int col_response;
 extern int col_from;
 extern int col_normal;
 extern int col_title;
+extern int col_signature;
 #endif
 extern int use_mouse;
 extern int check_any_unread;

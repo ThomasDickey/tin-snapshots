@@ -166,6 +166,7 @@ int col_response;			/* color of respone counter */
 int col_from;				/* color of sender (From:) */
 int col_normal;				/* standard foreground color */
 int col_title;				/* color of Help/Mail-Sign */
+int col_signature;			/* color of signature */
 #endif
 int use_mouse;				/* enables/disables mouse support under xterm */
 int auto_cc;				/* add your name to cc automatically */
@@ -443,6 +444,7 @@ void init_selfinfo ()
 	col_from = 2;
 	col_normal = 7;
 	col_title = 4;
+	col_signature = 4;
 #endif
 	index_maildir[0] = '\0';
 	index_newsdir[0] = '\0';

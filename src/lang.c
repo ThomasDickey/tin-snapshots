@@ -603,6 +603,16 @@ constext txt_yanking_all_groups[] = "Yanking in all groups...";
 constext txt_yanking_sub_groups[] = "Yanking in subscribed to groups...";
 constext txt_yes[] = "Yes";
 constext txt_you_have_mail[] = "    You have mail\n";
+constext txt_warn_cancel_forgery[] = "Read carefully!\n\n\
+  You are about to cancel an article seemingly not written by you.  This\n\
+  will wipe the article from lots of news servers throughout the world;\n\
+  Usenet's majority considers this rather inappropriate, to say the least.\n\
+  Only press 'd' if you are absolutely positive that you are ready to take\n\
+  the rap.\n\nThis is the article you are about to cancel:\n\n";
+constext txt_warn_cancel[] = "Read carefully!\n\n\
+  You are about to cancel an article seemingly written by you.  This will\n\
+  wipe the article from most news servers throughout the world, but there is\n\
+  no guarantee that it will work.\n\nThis is the article you are about to cancel:\n\n";
 
 constext txt_filter_text_type[] = "Apply pattern to    : ";
 constext txt_help_filter_subj[] = "Subject: line to add to filter file. <SPACE> toggles & <CR> sets.";

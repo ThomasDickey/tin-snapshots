@@ -1,5 +1,7 @@
 Bugs
 ----
+o  if a colored signature wraps over a page-break, the coloring gets lost
+
 o  if marking read article with 'z' as will return and than reread it, the
    '-' article_will_return flag is not removed.
    when leaving that group, the unread_articles counter still contains that
@@ -24,11 +26,13 @@ o  screen.c:center_line() no range check for cCOLS. Excessively long
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
 
-o  Colours are not reset when tin is suspended with ^Z (signal.c)
+o  Colors are not reset when tin is suspended with ^Z (signal.c)
 
 o  full_page_scroll=OFF seems not to work
 
-o  fix nntplib.c line 387++ (no prototyping #if !defined(linux))
+o  fix nntplib.c line 388++ (no prototyping #if !defined(linux))
+       init.c    line 233++ (no prototyping #if !defined(linux))
+       misc.c    line 666   (no prototyping #if !defined(linux))
 
 New features
 ------------
@@ -40,7 +44,7 @@ o  add
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY unfdef SPOOLDIR etc...
-   rem INEWS_MAIL_DOMAIN default or set it to 'hostname -d'
+   rem. INEWS_MAIL_DOMAIN default or set it to 'hostname -d'
 
 o  move architecture depending files in subdirectorys, clean up architecture
    independend files, rename several defines, remove useless doubled defines
@@ -59,8 +63,7 @@ o  rewrite NGLIMIT handling (post.c)
 o  uniq newsgroups before posting
    (Newsgroups: alt.test,alt.test -> Newsgroups: alt.test)
 
-o  make look in group.c/thread.c for show-lines patch (group.c/thread.c)
-   configurable via switch in tinrc
+o  make show-lines patch (group.c/thread.c) configurable via switch in tinrc
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
@@ -137,8 +140,6 @@ o  kill-file may get messed up if  using multiple news servers with feeds
    losing all references to the moved groups)
 
 o  sometimes kill-file entries are duplicated
-
-o  at top-level 'Q' ask you if you really want to quit, useful?
 
 o  tin sometimes freezes while saving a thread
 
