@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-961025 (Fri Oct 25 23:22:28 MET DST 1996)
 ----------------------------------------------------
-  44586 ./CHANGES
+  44724 ./CHANGES
   12831 ./TODO
    5314 ./Makefile
   17527 ./INSTALL
@@ -26,7 +26,7 @@ MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
-  29508 ./include/proto.h
+  29511 ./include/proto.h
    1376 ./include/stpwatch.h
   42991 ./include/tin.h
     810 ./include/version.h
@@ -40,7 +40,7 @@ MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
   23805 ./src/attrib.c
    8220 ./src/charset.c
    1560 ./src/color.c
-  56977 ./src/config.c
+  56985 ./src/config.c
   19730 ./src/curses.c
   12284 ./src/debug.c
    2800 ./src/envarg.c
@@ -59,18 +59,18 @@ MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
   10991 ./src/memory.c
   47075 ./src/misc.c
    7228 ./src/msmail.c
-  33288 ./src/newsrc.c
+  33315 ./src/newsrc.c
   26382 ./src/nntplib.c
   31334 ./src/nntpw32.c
    6143 ./src/nrctbl.c
-  27513 ./src/open.c
+  27530 ./src/open.c
    6246 ./src/os_2.c
   35696 ./src/page.c
   24090 ./src/parsdate.y
    6531 ./src/pgp.c
   74795 ./src/post.c
    9044 ./src/prompt.c
-     53 ./src/proto.sed
+    160 ./src/proto.sed
   22368 ./src/refs.c
    8715 ./src/rfc1521.c
   17355 ./src/rfc1522.c
@@ -88,7 +88,7 @@ MANIFEST for tin-1.3-unoff-BETA-961024 (Thu Oct 24 19:20:52 MET DST 1996)
    6283 ./src/xref.c
    5511 ./src/vms.c
    7092 ./include/autoconf.hin
-  10462 ./src/Makefile.in
+  10545 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-1568797 total
+1569180 total

@@ -7,12 +7,19 @@ srcdir		= @srcdir@
 
 # Compiler, linker & parser commands
 CC	= @CC@
+CPP	= @CPP@
 
 DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_MIME -DDEBUG_REFS
 CPPOPTS	= @DEFS@ -I$(INCDIR) $(DEBUG) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
-CPROTO_OPTS = -e -m $(CPPOPTS) -DFORGERY -DHAVE_COLOR -DHAVE_REF_THREADING
+CPROTO_OPTS = -e -m $(CPPOPTS) \
+	-DDEBUG_NEWSRC \
+	-DFORGERY \
+	-DHAVE_COLOR \
+	-DHAVE_MH_MAIL_HANDLING \
+	-DHAVE_REF_THREADING \
+	-DLOCAL_CHARSET
 
 LD	= $(CC)
 LDFLAGS	= @LDFLAGS@
@@ -202,7 +209,7 @@ all: $(BINDIR)/$(EXE)
 
 .c.i:
 @SHOW_CC@
-	@ECHO_CC@$(CC) -E -C $(CPPOPTS) $*.c >$@
+	@ECHO_CC@$(CPP) -C $(CPPOPTS) $*.c >$@
 
 # explicit rule to allow running lint
 $(SRCDIR)/parsdate.c: $(SRCDIR)/parsdate.y
