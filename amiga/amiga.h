@@ -19,6 +19,9 @@
 
 #include <dos/dos.h>
 #include <proto/exec.h>
+#ifndef AS225
+#include <proto/usergroup.h>
+#endif
 
 /* SAS-C and Aztec don't take the mode for mkdir() */
 extern int mkdir(char *path);
@@ -27,39 +30,39 @@ extern int mkdir(char *path);
 /* Replace Aztec's stat function with one that gives ST_DIRECT info */
 
 struct mystat {
-	char st_attr;
-	long st_mtime;
-	long st_size;
+        char st_attr;
+        long st_mtime;
+        long st_size;
 };
 #undef stat
 #define stat mystat
 
-#define	ST_DELETE	0x01
-#define	ST_EXECUTE	0x02
-#define	ST_WRITE	0x04
-#define	ST_READ		0x08
-#define ST_DIRECT	0x10   /* Aztec's stat() doesn't give this information */
+#define ST_DELETE       0x01
+#define ST_EXECUTE      0x02
+#define ST_WRITE        0x04
+#define ST_READ         0x08
+#define ST_DIRECT       0x10   /* Aztec's stat() doesn't give this information */
 
 /* For opendir(), and readdir() */
 
 struct dirent {
-	char *d_name;
-	long d_reclen;
+        char *d_name;
+        long d_reclen;
 };
 
 typedef struct
 {
-	BPTR	Lock;
-	int	more;
-	struct	ExAllData *buffer;
-	struct	ExAllData *bufp;
-	struct	ExAllControl *eac;
-	struct  FileInfoBlock fib;
+        BPTR    Lock;
+        int     more;
+        struct  ExAllData *buffer;
+        struct  ExAllData *bufp;
+        struct  ExAllControl *eac;
+        struct  FileInfoBlock fib;
 } DIR;
 
 /* We create our own SIGWINCH handling. */
 /* There are two currently unused signals we can define */
-#define SIGWINCH	_SIG_MAX
+#define SIGWINCH        _SIG_MAX
 
 #define localtime gmtime
 
@@ -98,6 +101,6 @@ extern int tmp_close(FILE *fp);
 #define fclose(fp) tmp_close(fp)
 #endif
 
-#endif	/* AMIGA_H */
+#endif  /* AMIGA_H */
 
-#endif	/* M_AMIGA */
+#endif  /* M_AMIGA */

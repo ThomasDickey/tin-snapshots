@@ -250,7 +250,8 @@ int
 show_thread (
 	struct t_group *group,
 	char *group_path,
-	int respnum)
+	int respnum,
+	int thread_depth)
 {
 	int ret_code = TRUE;
 #ifndef INDEX_DAEMON
@@ -296,6 +297,12 @@ show_thread (
 	if (thread_index_point < 0) {
 		thread_index_point = 0;
 	}
+
+	/*
+	 * If we explicitly want to enter part way down a thread, do so 
+	 */
+	if (thread_depth)
+		thread_index_point = thread_depth;
 
 	show_thread_page ();
 
@@ -392,35 +399,19 @@ show_thread (
 
 			case iKeyFirstPage:	/* show first page of articles */
 top_of_thread:
-				if (thread_index_point != 0) {
-					if (0 < first_thread_on_screen) {
-						erase_thread_arrow ();
-						thread_index_point = 0;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = 0;
-						draw_thread_arrow ();
-					}
-				}
+				if (thread_index_point != 0)
+					move_to_response(0);
+
 				break;
 
 			case iKeyLastPage:	/* show last page of articles */
 end_of_thread:
-				if (thread_index_point < top_thread - 1) {
-					if (top_thread > last_thread_on_screen) {
-						erase_thread_arrow ();
-						thread_index_point = top_thread - 1;
-						show_thread_page ();
-					} else {
-						erase_thread_arrow ();
-						thread_index_point = top_thread - 1;
-						draw_thread_arrow ();
-					}
-				}
+				if (thread_index_point < top_thread - 1)
+					move_to_response(top_thread - 1);
+
 				break;
 
-			case iKeyThreadSetRange:	/* set range */
+			case iKeySetRange:	/* set range */
 				if (iSetRange (THREAD_LEVEL, 0, top_thread, thread_index_point)) {
 					show_thread_page ();
 				}
@@ -497,6 +488,8 @@ thread_tab_pressed:
 			case iKeyPageDown3:
 thread_page_down:
 				if (thread_index_point + 1 == top_thread) {
+					move_to_response(0);
+#if 0
 					if (0 < first_thread_on_screen) {
 						erase_thread_arrow ();
 						thread_index_point = 0;
@@ -506,6 +499,7 @@ thread_page_down:
 						thread_index_point = 0;
 						draw_thread_arrow ();
 					}
+#endif
 					break;
 				}
 				erase_thread_arrow ();
@@ -536,6 +530,8 @@ thread_page_down:
 			case iKeyDown2:
 thread_down:
 				if (thread_index_point + 1 >= top_thread) {
+					move_to_response(0);
+#if 0
 					HpGlitch(erase_thread_arrow ());
 					if (0 < first_thread_on_screen) {
 						thread_index_point = 0;
@@ -545,8 +541,11 @@ thread_down:
 						thread_index_point = 0;
 						draw_thread_arrow ();
 					}
+#endif
 					break;
 				}
+				move_to_response(thread_index_point + 1);
+#if 0
 				if (thread_index_point + 1 >= last_thread_on_screen) {
 					erase_thread_arrow ();
 					thread_index_point++;
@@ -556,12 +555,15 @@ thread_down:
 					thread_index_point++;
 					draw_thread_arrow ();
 				}
+#endif
 				break;
 
 			case iKeyUp:
 			case iKeyUp2:		/* line up */
 thread_up:
 				if (thread_index_point == 0) {
+					move_to_response(top_thread - 1);
+#if 0
 					HpGlitch(erase_thread_arrow ());
 					if (top_thread > last_thread_on_screen) {
 						thread_index_point = top_thread - 1;
@@ -571,8 +573,11 @@ thread_up:
 						thread_index_point = top_thread - 1;
 						draw_thread_arrow ();
 					}
+#endif
 					break;
 				}
+				move_to_response(thread_index_point - 1);
+#if 0
 				HpGlitch(erase_thread_arrow ());
 				if (thread_index_point <= first_thread_on_screen) {
 					thread_index_point--;
@@ -582,6 +587,7 @@ thread_up:
 					thread_index_point--;
 					draw_thread_arrow ();
 				}
+#endif
 				break;
 
 			case iKeyPageUp:		/* page up */
@@ -589,6 +595,8 @@ thread_up:
 			case iKeyPageUp3:
 thread_page_up:
 				if (thread_index_point == 0) {
+					move_to_response (top_thread - 1);
+#if 0
 					HpGlitch(erase_thread_arrow ());
 					if (top_thread > last_thread_on_screen) {
 						thread_index_point = top_thread - 1;
@@ -598,6 +606,7 @@ thread_page_up:
 						thread_index_point = top_thread - 1;
 						draw_thread_arrow ();
 					}
+#endif
 					break;
 				}
 				clear_message ();
@@ -649,6 +658,16 @@ thread_catchup:
 			case iKeyThreadHelp:			/* help */
 				show_info_page (HELP_INFO, help_thread, txt_thread_com);
 				show_thread_page ();
+				break;
+
+			case iKeySearchSubjF:	/* forward/backward search */
+/*			case iKeySearchSubjB: we don't have backwards pointers to do this easily */
+				/* Subject won't change within thread if not ref threading */
+				if (CURR_GROUP.attribute->thread_arts < THREAD_REFS)
+					break;
+
+				search_subject_thread (ch == iKeySearchSubjF, thread_respnum, thread_index_point);
+
 				break;
 
 			case iKeyThreadToggleHelpDisplay:	/* toggle mini help menu */
@@ -949,8 +968,10 @@ prompt_thread_num (
 	if (num >= top_thread)
 		num = top_thread - 1;
 
-	if (num >= first_thread_on_screen
-	&&  num < last_thread_on_screen) {
+	move_to_response (num);
+
+#if 0
+	if (num >= first_thread_on_screen && num < last_thread_on_screen) {
 		erase_thread_arrow ();
 		thread_index_point = num;
 		draw_thread_arrow ();
@@ -959,6 +980,7 @@ prompt_thread_num (
 		thread_index_point = num;
 		show_thread_page ();
 	}
+#endif
 	return TRUE;
 }
 #endif /* INDEX_DAEMON */
@@ -1269,3 +1291,22 @@ prev_unread (
 
 	return -1;
 }
+
+/*
+ * Move the on-screen pointer & internal variable to the given thread number
+ */
+void
+move_to_response(
+	int n)
+{
+/*	HpGlitch(erase_thread_arrow ());*/
+    if (n >= first_thread_on_screen && n < last_thread_on_screen) {
+        erase_thread_arrow ();
+        thread_index_point = n;
+        draw_thread_arrow ();
+    } else {
+        erase_thread_arrow ();
+        thread_index_point = n;
+        show_thread_page ();
+    }
+}  

@@ -819,7 +819,7 @@ mail_check (void)
 	if (mailbox_name != 0) {
 		if (stat (mailbox_name, &buf) >= 0) {
 			if (buf.st_size > 0) {
-				if (buf.st_size >= mbox_size) {
+				if (buf.st_size > mbox_size) {
 					mbox_size = buf.st_size;
 					return TRUE;
 				} else {
@@ -833,8 +833,11 @@ mail_check (void)
 					 * for me for some time now (I use AmigaELM).
 					 * Probably there is a better method, if you know one
 					 * you are welcome... :-)
+					 * I think a constant offset is more accurate today,
+					 * 1k is the average size of mail-headers alone in each
+					 * message I receive. (obw)
 					 */
-					mbox_size = buf.st_size + (((buf.st_size / 512) * 32) + 32);
+					mbox_size = buf.st_size + 1024;
 				}
 			} else {
 				mbox_size = 0;
@@ -1028,11 +1031,14 @@ FATAL:
  *	  Re: Reorganization of misc.jobs
  *	  ^   ^
  *    Re^2: Reorganization of misc.jobs
+ *
+ *  now also strips trailing (was: ...) (obw) 
  */
 
 char *
 eat_re (
-	char *s)
+	char *s,
+	t_bool eat_was)
 {
 	char *e;
 
@@ -1052,12 +1058,17 @@ eat_re (
 		while (*s == ' ')		/* And skip leading whitespace */
 			s++;
 
-		for (e = s; *e; e++)	/* NULL out trailing whitespace */
-			;
-
-		while (e-- > s && isspace((unsigned char)*e)) {
+	}
+ 	if (eat_was) { /* kill "(was: ...)" ? */
+		if ((e = strstr(s, "(was:"))) /* should we take more spaces into consideration? */
 			*e = '\0';
-		}
+	}
+
+	for (e = s; *e; e++)	/* NULL out trailing whitespace */
+		;		/* moved here from the loop */
+
+	while (e-- > s && isspace((unsigned char)*e)) {
+		*e = '\0';
 	}
 
 	return s;

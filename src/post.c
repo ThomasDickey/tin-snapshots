@@ -1938,11 +1938,13 @@ ignore_followup_to_poster:
 
 	psGrp = psGrpFind (group);
 
-	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj));
+	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj,TRUE));
 	msg_add_header ("Subject", bigbuf);
 
 	if (psGrp && psGrp->attribute->x_comment_to && *note_h_from) {
-		msg_add_header ("X-Comment-To", note_h_from);
+		parse_from(note_h_from, bigbuf, buf);
+		sprintf(bigbuf, "(%s)", buf);
+		msg_add_header ("X-Comment-To", bigbuf);
 	}
 	if (*note_h_followup && strcmp (note_h_followup, "poster") != 0) {
 		msg_add_header ("Newsgroups", note_h_followup);
@@ -2194,7 +2196,7 @@ mail_to_someone (
 		msg_add_header ("To", mail_to);
 
 		if (mail_to_poster) {
-			sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
+			sprintf (subject, "Re: %s\n", eat_re (note_h_subj,TRUE));
 			msg_add_header ("Subject", subject);
 		} else {
 			msg_add_header ("Subject", subject);
@@ -2260,7 +2262,7 @@ mail_to_someone (
 	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj,TRUE));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -2547,7 +2549,7 @@ mail_to_author (
 	}
 	chmod (nam, (S_IRUSR|S_IWUSR));
 
-	sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
+	sprintf (subject, "Re: %s\n", eat_re (note_h_subj,TRUE));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
 		find_reply_to_addr (respnum, from_addr, FALSE);
@@ -2623,7 +2625,7 @@ mail_to_author (
 
 	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj,TRUE));
 		find_reply_to_addr (respnum, mail_to, TRUE);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))

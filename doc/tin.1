@@ -33,7 +33,7 @@ tin, rtin, tind \- A Netnews reader
 .SH DESCRIPTION
 .I Tin
 is a full-screen easy to use Netnews reader. It can read news locally
-(i.e., \fI/usr/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
+(i.e., \fI/var/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
 via a NNTP (Network News Transport Protocol) server. It will automatically 
 utilize NOV (News OVerview) style index files if available locally or via the 
 NNTP XOVER command.
@@ -206,14 +206,14 @@ option:
 .PP
 A slightly better method is to set \fItin\fP setuid news and have all index 
 files created and updated in the news spool directory 
-(i.e., \fI/usr/spool/news/.news\fP). This has the advantage that there will 
+(i.e., \fI/var/spool/news/.news\fP). This has the advantage that there will 
 only be one copy of the index files on each machine on your network, but the 
 disadvantage is that you will have \fItin\fP running setuid news.
 .PP
 A better method is to install the \fItind\fP index file updating daemon and 
 have it create and update index files for all groups in your active file at
 regular intervals in the news spool directory 
-(i.e., \fI/usr/spool/news/.news\fP). This has the advantage that there will 
+(i.e., \fI/var/spool/news/.news\fP). This has the advantage that there will 
 only be one copy of the index files on each machine on your network and 
 \fItin\fP must not be setuid news, but the disadvantage is that you will have 
 to have news permissions to install \fItind\fP and root permissions to install
@@ -223,7 +223,7 @@ files.
 The best method is to install the \fItind\fP index file updating daemon on your
 NNTP server and have it create and update index files for all groups in your
 active file at regular intervals in the news spool directory 
-(i.e., \fI/usr/spool/news/.news\fP).
+(i.e., \fI/var/spool/news/.news\fP).
 This has the advantage that there will only be one copy of the index files on
 the NNTP server for the whole of your network, but the disadvantage is that you
 will have to install my NNTP server patches to allow \fItin\fP to retrieve 

@@ -319,6 +319,7 @@ pgp_check_article(void)
 	}
 
 	continue_prompt ();
+	unlink(the_article);
 	set_alarm_clock_on ();
 	return (1);
 }

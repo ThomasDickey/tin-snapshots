@@ -115,6 +115,7 @@ group_page (
 	int scroll_lines;
 	int xflag = 0;
 	int old_group_top;
+	int thread_depth;					/* Depth into thread we start at */
 	long old_artnum = 0L;
  	struct t_art_stat sbuf;
 	t_bool range_active = FALSE;		/* Set if a range is defined */
@@ -201,6 +202,8 @@ debug_print_bitmap (group, NULL);
 				case KEYMAP_RIGHT:
 					if (auto_list_thread && index_point >= 0 &&
 					    num_of_responses (index_point)) {
+/* TODO the above line is a waste, why not 'arts[base[index_point]].thread != -1 or a HAS_FOLLOWUP() macro */
+						thread_depth = 0;
 						goto group_list_thread;
 					} else {
 						goto group_read_basenote;
@@ -231,8 +234,9 @@ debug_print_bitmap (group, NULL);
 							index_point = xrow-INDEX2LNUM(first_subj_on_screen)+first_subj_on_screen;
 							draw_subject_arrow ();
 							if (xmouse == MOUSE_BUTTON_1) {
-								if (auto_list_thread &&
-								    num_of_responses (index_point)) {
+								if (auto_list_thread && num_of_responses (index_point)) {
+/* TODO see above re: waste */
+									thread_depth = 0;
 									goto group_list_thread;
 								} else {
 									goto group_tab_pressed;
@@ -327,7 +331,7 @@ end_of_list:
 				}
 				break;
 
-			case iKeyGroupSetRange:	/* set range */
+			case iKeySetRange:	/* set range */
 				if (iSetRange (GROUP_LEVEL, 1, top_base, index_point+1)) {
 					range_active = TRUE;
 					show_group_page ();
@@ -336,7 +340,12 @@ end_of_list:
 
 			case iKeySearchSubjF:	/* forward/backward search */
 			case iKeySearchSubjB:
-				search_subject ((ch == iKeySearchSubjF));
+				/*
+				 * If the search found something deeper in a thread (not the base art)
+				 * (ie search_subject_group () != -1) then enter the thread
+				 */
+				if ((thread_depth = search_subject_group (ch == iKeySearchSubjF)) != -1)
+					goto group_list_thread;
 				break;
 
 			case iKeyGroupFSearchBody:	/* search article body */
@@ -795,13 +804,14 @@ group_catchup:
 				break;
 
 			case iKeyGroupListThd:	/* list articles within current thread */
+				thread_depth = 0;			/* Enter thread at the top */
 group_list_thread:
 				if (index_point < 0) {
 					info_message (txt_no_arts);
 					break;
 				}
  				space_mode = TRUE;
-				n = show_thread (group, group_path, (int) base[index_point]);
+				n = show_thread (group, group_path, (int) base[index_point], thread_depth);
 				if (n == GRP_QUIT) {
 					index_point = n;
 					space_mode = FALSE;

@@ -194,7 +194,7 @@ end_of_list:
 				}
 				break;
 
-			case iKeySelectSetRange:	/* set range */
+			case iKeySetRange:	/* set range */
 				if (iSetRange (SELECT_LEVEL, 1, group_top, cur_groupnum+1)) {
 						show_selection_page ();
 				}

@@ -61,6 +61,7 @@ get_search_pattern(
 	}
 
 	wait_message (txt_searching);
+	MoveCursor(cLINES, 0);
 
 	if (wildcard)			/* ie, not wildmat() */
 		return(def);
@@ -94,7 +95,7 @@ search_author (
 				default_author_search
 	))) return -1;
 
-    if (read_news_via_nntp && active[the_index].type == GROUP_TYPE_NEWS)
+	if (!read_news_via_nntp || active[the_index].type != GROUP_TYPE_NEWS)
 		make_group_path (active[the_index].name, group_path);
 
 	i = current_art;
@@ -203,21 +204,48 @@ search_group (
 }
 
 /*
- * Called by group.c
- * Search for a Subject line in the current group
+ * Internal function - traverse a thread looking for a subject match
+ * Return -1 if not found, or the depth in the thread of the match
+ * Performance note: we can compare hashed subjects directly as they
+ * point to the same address. This is much cheaper than a REGEX_MATCH()
+ */
+static int
+search_thread(
+	int i,
+	char *pattern)
+{
+	int art, depth = 0;
+	char *old_subject = 0;
+
+	for (art = i; art >= 0 ; art = arts[art].thread, ++depth) {
+
+		/*
+		 * Speed hack, if the subject remains constant, skip the check
+		 */
+		if (arts[art].subject == old_subject)
+			continue;
+
+		old_subject = arts[art].subject;
+
+		if (REGEX_MATCH(old_subject, pattern, TRUE))
+			return(depth);
+	}
+
+	return(-1);
+}
+
+/*
+ * Search a thread for a subject. Reposition cursor & update internal
+ * pointers as needed.
  */
 void
-search_subject (
-	int forward)
+search_subject_thread(
+	int forward,
+	int baseart,
+	int offset)
 {
 	char *buf;
-	int i, j;
-	int found = FALSE;
-
-	if (index_point < 0) {
-		info_message (txt_no_arts);
-		return;
-	}
+	int i, depth;
 
 	if (!(buf = get_search_pattern(
 				forward,
@@ -225,6 +253,47 @@ search_subject (
 				txt_search_backwards,
 				default_subject_search
 	))) return;
+
+	/*
+	 * Advance to our current position in the thread
+	 */
+	for (i = 0; i < offset; i++)
+		baseart = arts[baseart].thread;
+
+	if ((depth = search_thread(baseart, buf)) == -1) {
+		info_message ((msg[0] == '\0') ? txt_no_match : msg);
+		return;
+	}
+
+	move_to_response(depth+offset);
+	clear_message();
+  	return; 
+}
+
+/*
+ * Search the current group for a subject. Reposition the cursor if needed.
+ * If the match happened inside a thread (ie after a subject change within a thread)
+ * return the depth in the thread of the matching article. Otherwise -1.
+ */
+int
+search_subject_group (
+	int forward)
+{
+	char *buf;
+	int i, j, depth=0;
+	int found = FALSE;
+
+	if (index_point < 0) {
+		info_message (txt_no_arts);
+		return 0;
+	}
+
+	if (!(buf = get_search_pattern(
+				forward,
+				txt_search_forwards,
+				txt_search_backwards,
+				default_subject_search
+	))) return 0;
 
 	i = index_point;						/* Search from current position */
 
@@ -247,36 +316,40 @@ search_subject (
 		} else {
 			/*
 			 * With threading on References, Subject lines can change mid thread.
-			 * We must descend the rest of the thread in these cases
-			 * TODO - optimise when subject is constant (use ptr into hash ?)
+			 * We must descend the thread in these cases
 			 */
-			int art;
-
-			for (art = j ; art >= 0 ; art = arts[art].thread) {
-
-				if (REGEX_MATCH(arts[art].subject, buf, TRUE)) {
-					found = TRUE;
-					break;
-				}
+			if ((depth = search_thread (j, buf)) != -1) {
+				found = TRUE;
+				break;
 			}
 		}
 
 	} while (i != index_point && !found);
 
-	if (found) {
-		HpGlitch(erase_subject_arrow());
-
-		if (i >= first_subj_on_screen && i < last_subj_on_screen) {
-			clear_message ();
-			erase_subject_arrow ();
-			index_point = i;
-			draw_subject_arrow ();
-		} else {
-			index_point = i;
-			show_group_page ();
-		}
-	} else
+	if (!found) {
 		info_message ((msg[0] == '\0') ? txt_no_match : msg);
+		return(-1);
+	}
+
+	if (depth != 0) {
+		index_point = i;
+		return(depth);		/* group.c needs to enter this thread */
+	}
+
+	/* Otherwise update the on-screen pointer */
+	HpGlitch(erase_subject_arrow());
+
+	if (i >= first_subj_on_screen && i < last_subj_on_screen) {
+		clear_message ();
+		erase_subject_arrow ();
+		index_point = i;
+		draw_subject_arrow ();
+	} else {
+		index_point = i;
+		show_group_page ();
+	}
+
+	return(-1);				/* No furthur action needed in group.c */
 }
 
 /*
@@ -422,16 +495,15 @@ search_body (
 	struct t_group *group,
 	int current_art)
 {
-	char *buf;
 	char buf2[LEN];
 	char group_path[PATH_LEN];
-	char pat[LEN];
+	char *pat;
 	char temp[20];
 	int aborted = FALSE;
 	int art_cnt = 0, i;
 	int count = 0;
 
-	if (!(buf = get_search_pattern(
+	if (!(pat = get_search_pattern(
 				1,
 				txt_search_body,
 				txt_search_body,
@@ -440,6 +512,9 @@ search_body (
 
 	make_group_path (group->name, group_path);
 
+	/*
+	 * Count up the articles to be processed for the progress meter
+	 */
 	if (group->attribute->show_only_unread) {
 		for (i = 0 ; i < top_base ; i++) {
 			art_cnt += new_responses (i);

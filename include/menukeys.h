@@ -112,9 +112,11 @@
 #ifndef NO_SHELL_ESCAPE
 #  define iKeyShellEscape '!'
 #endif
+#define iKeySetRange '#'
 #define iKeyLastPage '$'
 #define iKeySearchSubjF '/'
 #define iKeySearchSubjB '?'
+#define iKeyLookupMessage 'L'
 #define iKeyOptionMenu 'M'
 #define iKeyQuitTin 'Q'
 #define iKeyFirstPage '^'
@@ -162,7 +164,6 @@
 #define iKeyGroupRedrawScr ctrl('L')
 #define iKeyGroupPostponed ctrl('O')
 #define iKeyGroupReadBasenote2 '\r'
-#define iKeyGroupSetRange '#'
 #define iKeyGroupToggleColor '&'
 #define iKeyGroupSelThd '*'
 #define iKeyGroupDoAutoSel '+'
@@ -331,7 +332,6 @@
 #define iKeySelectPostponed ctrl('O')
 #define iKeySelectReadGrp2 '\r'
 #define iKeySelectResetNewsrc ctrl('R')
-#define iKeySelectSetRange '#'
 #define iKeySelectToggleColor '&'
 #define iKeySelectCatchupGotoNext 'C'
 #define iKeySelectToggleHelpDisplay 'H'
@@ -364,7 +364,6 @@
 #define iKeyThreadReadArt '\n'
 #define iKeyThreadRedrawScr ctrl('L')
 #define iKeyThreadReadArt2 '\r'
-#define iKeyThreadSetRange '#'
 #define iKeyThreadToggleColor '&'
 #define iKeyThreadMarkArtSel '*'
 #define iKeyThreadToggleArtSel '.'

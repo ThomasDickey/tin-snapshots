@@ -78,7 +78,7 @@ show_page (
 	int respnum,		/* index into arts[] */
 	int *threadnum)		/* to allow movement in thread mode */
 {
-
+	char buf[LEN];
 	int ch, i, n = 0;
 	int filter_state = NO_FILTERING;
 	int mouse_click_on = TRUE;
@@ -112,12 +112,7 @@ restart:
 	art_mark_read (group, &arts[respnum]);
 
 	if ((note_page = art_open (art, group_path)) == ART_UNAVAILABLE) {
-		sprintf (msg, txt_art_unavailable, art);
-		if (debug) {
-			error_message (msg, "");
-		} else {
-			wait_message (msg);
-		}
+		wait_message (txt_art_unavailable);
 		return GRP_NOREDRAW;	/* special retcode to stop redrawing screen */
 	} else {
 		if (num_headers_to_display || num_headers_to_not_display) {
@@ -224,6 +219,43 @@ end_of_article:
 				art_close ();
 				respnum = last_resp;
 				goto restart;
+
+			case iKeyLookupMessage:			/* Goto article by Message-ID */
+
+				if (prompt_string(txt_enter_message_id, buf+1) && buf[1]) {
+					char *ptr = buf+1;
+					struct t_msgid *msgid;
+
+					/*
+					 * If the user failed to supply Message-ID in <>, add them
+					 */
+					if (buf[1] != '<') {
+						buf[0] = '<';
+						strcat(buf, ">");
+						ptr = buf;
+					}
+
+					if ((msgid = find_msgid(ptr)) == NULL) {
+						info_message(txt_art_unavailable);
+						break;
+					}
+
+					/*
+					 * Is it expired or otherwise not on the spool ?
+					 */
+					if (msgid->article == ART_NORMAL) {
+						info_message(txt_art_unavailable);
+						break;
+					}
+
+					/*
+					 * Goto this article 
+					 */
+					art_close ();
+					respnum = msgid->article;
+					goto restart;
+				}
+				break;
 
 			case iKeyPageGotoParent:		/* Goto parent of this article */
 
@@ -1189,17 +1221,13 @@ show_first_header (
 #endif
 
 	/* What's this for ? */
+	/* Oh, this question is easy: It's for displaying the value
+	   of a X-Comment-To header in the upper right corner! */
 	if (note_h_ftnto[0] && show_xcommentto && highlight_xcommentto) {
-		char ftbuf[HEADER_LEN];	/* Fido-To-Line */
+		char ftbuf[HEADER_LEN];	/* FTN-To aka X-Comment-To */
 
 		my_fputs (buf, stdout);
-		if (strchr(note_h_ftnto, '('))
-			strcpy(ftbuf, strchr(note_h_ftnto, '(') + 1);
-		else
-			strcpy(ftbuf, note_h_ftnto);
-
-		if (strrchr(ftbuf, ')'))
-			strrchr(ftbuf, ')')[0] = '\0';
+		parse_from(note_h_ftnto, buf, ftbuf);
 		if (strlen(ftbuf) > 19)
 			ftbuf[19] = '\0';
 		StartInverse ();
