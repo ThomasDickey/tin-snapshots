@@ -21,7 +21,7 @@
 /*
  * Local prototypes
  */
-static char * escape_shell_meta (char *source, int quote_area);
+static char *escape_shell_meta (char *source, int quote_area);
 static int input_pending (int delay);
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
@@ -51,7 +51,7 @@ append_file (
 		fclose (fp_new);
 		return;
 	}
-	copy_fp(fp_old, fp_new);
+	copy_fp (fp_old, fp_new);
 	fclose (fp_old);
 	fclose (fp_new);
 }
@@ -60,11 +60,10 @@ append_file (
 void
 asfail (
 	const char *file,
-	int	line,
+	int line,
 	const char *cond)
 {
-	my_fprintf (stderr, "%s: assertion failure: %s (%d): %s\n",
-		progname, file, line, cond);
+	my_fprintf (stderr, "%s: assertion failure: %s (%d): %s\n", progname, file, line, cond);
 	my_fflush (stderr);
 
 	/*
@@ -112,7 +111,8 @@ copy_fp (
 }
 
 
-/* copy the body of articles with given file pointers,
+/*
+ * copy the body of articles with given file pointers,
  * prefix (= quote_chars), initials of the articles author
  * and a flag, if the signature should be quoted
  */
@@ -127,15 +127,15 @@ copy_body (
 {
 	char buf[8192];
 	char buf2[8192];
-	int retcode;
 	char prefixbuf[256];
+	int retcode;
+	int i;
 	t_bool status_space;
 	t_bool status_char;
-	int i;
 
 	/* This is a shortcut for speed reasons: if no prefix (= quote_chars) is given just copy */
-	if (!prefix || !prefix[0]) {
-		copy_fp(fp_ip, fp_op);
+	if (!prefix || !*prefix) {
+		copy_fp (fp_ip, fp_op);
 		return;
 	}
 
@@ -145,10 +145,7 @@ copy_body (
 		for (i=0; prefix[i]; i++) {
 			if ((status_char) && (prefix[i] == 'S'))
 				prefix[i] = 's';
-			if (prefix[i] == '%')
-				status_char = TRUE;
-			else
-				status_char = FALSE;
+			status_char = (prefix[i] == '%');
 		}
 	}
 
@@ -175,8 +172,7 @@ copy_body (
 						buf2[i] = buf[i];
 						if (buf[i] != ' ')
 							status_space = TRUE;
-						if ((status_space) &&
-						  !(isalpha(buf[i]) || buf[i] == '>'))
+						if ((status_space) && !(isalpha(buf[i]) || buf[i] == '>'))
 							status_char = FALSE;
 					}
 					buf2[i] = '\0';
@@ -186,24 +182,14 @@ copy_body (
 						retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
 				} else    /* line was not already quoted (no >) */
 					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-			} else {  /* line is empty */
-				if (quote_empty_lines)
-					retcode = fprintf (fp_op, "%s\n", prefixbuf);
-				else
-					retcode = fprintf (fp_op, "\n");
-			}
+			} else /* line is empty */
+					retcode = fprintf (fp_op, "%s\n", (quote_empty_lines ? prefixbuf : ""));
 		} else {    /* no initials in quote_string, just copy */
 			if ((buf[0] != '\n') || quote_empty_lines) {
-
 				/* use blank-stripped quote string if line is already quoted */
-				if (buf[0]=='>')
-					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-				else
-					retcode = fprintf (fp_op, "%s%s", prefix, buf);
-
+					retcode = fprintf (fp_op, "%s%s", ((buf[0]=='>') ? prefixbuf : prefix), buf);
 			} else
 				retcode = fprintf (fp_op, "\n");
-
 		}
 		if (retcode == EOF) {
 			perror_message ("copy_body() failed");
@@ -214,14 +200,12 @@ copy_body (
 
 const char *
 get_val (
-	const char *env,	/* Environment variable we're looking for	*/
-	const char *def)	/* Default value if no environ value found	*/
+	const char *env,	/* Environment variable we're looking for */
+	const char *def)	/* Default value if no environ value found */
 {
 	const char *ptr;
 
-	ptr = getenv(env);
-
-	return (ptr != (char *) 0 ? ptr : def);
+	return ((ptr = getenv(env)) != (char *) 0 ? ptr : def);
 }
 
 
@@ -232,12 +216,12 @@ invoke_editor (
 	char *filename,
 	int lineno) /* return value is always ignored */
 {
-	char buf[PATH_LEN],fnameb[PATH_LEN];
-	char editor_format[PATH_LEN];
 	char *my_editor;
+	char buf[PATH_LEN], fnameb[PATH_LEN];
+	char editor_format[PATH_LEN];
 	int retcode;
 	static char editor[PATH_LEN];
-	static int first = TRUE;
+	static t_bool first = TRUE;
 
 	if (first) {
 		my_editor = getenv ("EDITOR");
@@ -246,15 +230,7 @@ invoke_editor (
 		first = FALSE;
 	}
 
-	if (start_editor_offset) {
-		if (default_editor_format[0])
-			strcpy (editor_format, default_editor_format);
-		else
-			strcpy (editor_format, EDITOR_FORMAT_ON);
-
-	} else {
-		strcpy (editor_format, EDITOR_FORMAT_OFF);
-	}
+	strcpy (editor_format, (start_editor_offset ? (*default_editor_format ? default_editor_format : EDITOR_FORMAT_ON) : EDITOR_FORMAT_OFF));
 
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
 
@@ -275,10 +251,10 @@ int
 invoke_ispell (
 	char *nam) /* return value is always ignored */
 {
-	char buf[PATH_LEN];
 	char *my_ispell;
+	char buf[PATH_LEN];
 	static char ispell[PATH_LEN];
-	static int first = TRUE;
+	static t_bool first = TRUE;
 
 	if (first) {
 #ifdef VMS
@@ -306,8 +282,8 @@ invoke_ispell (
 void
 shell_escape (void)
 {
-	char shell[LEN];
 	char *p;
+	char shell[LEN];
 
 	sprintf (msg, txt_shell_escape, default_shell_command);
 
@@ -317,14 +293,10 @@ shell_escape (void)
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
 		continue;
 
-	if (*p) {
+	if (*p)
 		my_strncpy (default_shell_command, p, sizeof (default_shell_command));
-	} else {
-		if (default_shell_command[0])
-			my_strncpy (shell, default_shell_command, sizeof (shell));
-		else
-			my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
-
+	else {
+		my_strncpy (shell, (*default_shell_command ? default_shell_command : (get_val (ENV_VAR_SHELL, DEFAULT_SHELL))), sizeof (shell));
 		p = shell;
 	}
 
@@ -347,8 +319,8 @@ void
 tin_done (
 	int ret)
 {
-	int ask = TRUE;
 	register int i, j;
+	t_bool ask = TRUE;
 	struct t_group *group;
 
 	/*
@@ -362,15 +334,13 @@ tin_done (
 					if (prompt_yn (cLINES, txt_catchup_all_read_groups, FALSE) == 1) {
 						ask = FALSE;
 						default_thread_arts = THREAD_NONE;	/* speeds up index loading */
-					} else {
+					} else
 						break;
-					}
 				}
 				wait_message (0, "Catchup %s...", group->name);
 				if (index_group (group)) {
-					for (j = 0; j < top; j++) {
+					for (j = 0; j < top; j++)
 						art_mark_read (group, &arts[j]);
-					}
 				}
 			}
 		}
@@ -440,8 +410,9 @@ tin_done (
 #endif
 
 #ifdef VMS
-	if (ret == 0)
+	if (!ret)
 		ret = 1;
+	vms_close_stdin (); /* free resources used by ReadCh */
 #endif
 
 	exit (ret);
@@ -462,7 +433,8 @@ void
 strip_double_ngs (
 	char *ngs_list)
 {
-
+	char	*ptr;				/* start of next (outer) newsgroup  */
+	char	*ptr2;			/* temporary pointer                */
 	char	ngroup1[HEADER_LEN];	/* outer newsgroup to compare       */
 	char	ngroup2[HEADER_LEN];	/* inner newsgroup to compare       */
 	char	cmplist[HEADER_LEN];	/* last loops output                */
@@ -470,30 +442,28 @@ strip_double_ngs (
 										/* any duplicates of the first nwsg */
 	int	ncnt1;			/* counter for the first newsgroup  */
 	int	ncnt2;			/* counter for the second newsgroup */
-	int	over1;			/* TRUE when the outer loop is over */
-	int	over2;			/* TRUE when the inner loop is over */
-	char	*ptr;				/* start of next (outer) newsgroup  */
-	char	*ptr2;			/* temporary pointer                */
+	t_bool over1;			/* TRUE when the outer loop is over */
+	t_bool over2;			/* TRUE when the inner loop is over */
 
 	/* shortcut, if the is only 1 group */
 	if (strchr(ngs_list, ',') != (char *) 0) {
 
 		over1 = FALSE;
 		ncnt1 = 0;
-		strcpy(newlist, ngs_list);	/* make a "working copy"            */
+		strcpy(newlist, ngs_list);	/* make a "working copy" */
 		ptr = newlist;			/* the next outer newsg. is the 1st */
 
 		while (!over1) {
 			ncnt1++;			/* inc. outer counter */
 			strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
-			ptr2 = strchr(ptr, ',');	/* search "," ...                  */
-			if (ptr2 != (char *) 0) {       /* if found ...                    */
+			ptr2 = strchr(ptr, ',');	/* search "," ... */
+			if (ptr2 != (char *) 0) {       /* if found ... */
 				*ptr2 = '\0';
-				strcpy(ngroup1, ptr);   /* chop off first outer newsgroup  */
-				ptr = ptr2 + 1;		/* pointer points to next newsgr.  */
-			} else {			/* ... if not: last group          */
+				strcpy(ngroup1, ptr);   /* chop off first outer newsgroup */
+				ptr = ptr2 + 1;		/* pointer points to next newsgr. */
+			} else {			/* ... if not: last group */
 				over1 = TRUE;		/* wow, everything is done after . */
-				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
+				strcpy(ngroup1, ptr);   /* ... this last outer newsgroup */
 			}
 
 			over2 = FALSE;
@@ -602,11 +572,37 @@ rename_file (
 		return;
 	}
 }
-#else
+#endif /* M_UNIX */
+
+#ifdef VMS
+void
+rename_file (
+	char *old_filename,
+	char *new_filename)
+{
+	char new_filename_vms[1024];
+
+	if (!strchr(strchr(new_filename, ']') ? strchr(new_filename, ']') : new_filename, '.')) {
+		/* without final dot the new filename is not as tin expects */
+		if (strlen(new_filename) >= sizeof new_filename_vms) {
+			perror_message ("length of %s is too large", new_filename);
+			return;
+		}
+		strcpy(new_filename_vms, new_filename);
+		strcat(new_filename_vms, ".");
+		new_filename = &new_filename_vms[0];
+	}
+
+	if (rename(old_filename,new_filename))
+		perror_message (txt_rename_error, old_filename, new_filename);
+}
+#endif /* VMS */
+
+
+#ifdef M_AMIGA
 /*
  * AmigaOS now has links. Better not to use them as not everybody has new ROMS
  */
-
 void
 rename_file (
 	char *old_filename,
@@ -620,7 +616,7 @@ rename_file (
 
 	return;
 }
-#endif	/* M_UNIX */
+#endif /* M_AMIGA */
 
 
 
@@ -630,14 +626,12 @@ invoke_cmd (
 {
 	int ret;
 
-	set_alarm_clock_off ();
-
 	EndWin ();
 	Raw (FALSE);
 	set_signal_catcher (FALSE);
 
 	TRACE(("called system(%s)", _nc_visbuf(nam)))
-#	if USE_SYSTEM_STATUS
+#	ifdef USE_SYSTEM_STATUS
 		system(nam);
 		ret = system_status;
 #	else
@@ -651,8 +645,6 @@ invoke_cmd (
 #if defined(SIGWINCH)
 	handle_resize(FALSE);
 #endif
-
-	set_alarm_clock_on ();
 
 #ifdef VMS
 	return ret != 0;
@@ -699,7 +691,7 @@ set_real_uid_gid (void)
 
 	umask (real_umask);
 
-#	if HAVE_SETEUID && HAVE_SETEGID
+#	if defined(HAVE_SETEUID) && defined(HAVE_SETEGID)
 	if (seteuid (real_uid) == -1)
 		perror_message ("Error seteuid(real) failed");
 
@@ -707,7 +699,7 @@ set_real_uid_gid (void)
 		perror_message ("Error setegid(real) failed");
 
 #	else
-#		if HAVE_SETREUID && HAVE_SETREGID
+#		if defined(HAVE_SETREUID) && defined(HAVE_SETREGID)
 	if (setreuid (-1, real_uid) == -1)
 		perror_message ("Error setreuid(real) failed");
 
@@ -735,7 +727,7 @@ set_tin_uid_gid (void)
 
 	umask (0);
 
-#	if HAVE_SETEUID && HAVE_SETEGID
+#	if defined(HAVE_SETEUID) && defined(HAVE_SETEGID)
 	if (seteuid (tin_uid) == -1)
 		perror_message ("Error seteuid(real) failed");
 
@@ -743,7 +735,7 @@ set_tin_uid_gid (void)
 		perror_message ("Error setegid(real) failed");
 
 #	else
-#		if HAVE_SETREUID && HAVE_SETREGID
+#		if defined(HAVE_SETREUID) && defined(HAVE_SETREGID)
 	if (setreuid (-1, tin_uid) == -1)
 		perror_message ("Error setreuid(tin) failed");
 
@@ -799,7 +791,7 @@ base_name (
  *  Return TRUE if new mail has arrived
  */
 
-int
+t_bool
 mail_check (void)
 {
 #ifndef WIN32 /* No unified mail transport on WIN32 */
@@ -813,12 +805,12 @@ mail_check (void)
 
 #ifdef M_AMIGA
 	/*
-	** Since AmigaDOS does not distinguish between atime and mtime
-	** we have to find some other way to figure out if the mailbox
-	** was modified (to bad that Iain removed the mail_setup() and
-	** mail_check() scheme used prior to 1.30 260694 which worked also
-	** on AmigaDOS). (R. Luebke 10.7.1994)
-	*/
+	 * Since AmigaDOS does not distinguish between atime and mtime
+	 * we have to find some other way to figure out if the mailbox
+	 * was modified (to bad that Iain removed the mail_setup() and
+	 * mail_check() scheme used prior to 1.30 260694 which worked also
+	 * on AmigaDOS). (R. Luebke 10.7.1994)
+	 */
 
 	/* this is only a first try, but it seems to work :) */
 
@@ -828,7 +820,7 @@ mail_check (void)
 				if (buf.st_size > mbox_size) {
 					mbox_size = buf.st_size;
 					return TRUE;
-				} else {
+				} else
 					/*
 					 * at this point we have to calculate how much the
 					 * mailbox has to grow until we say "new mail"
@@ -844,17 +836,13 @@ mail_check (void)
 					 * message I receive. (obw)
 					 */
 					mbox_size = buf.st_size + 1024;
-				}
-			} else {
+			} else
 				mbox_size = 0;
-			}
 		}
 	}
 #else
-	if (mailbox_name != 0 && stat (mailbox_name, &buf) >= 0 &&
-		buf.st_atime < buf.st_mtime && buf.st_size > 0) {
+	if (mailbox_name != 0 && stat (mailbox_name, &buf) >= 0 && buf.st_atime < buf.st_mtime && buf.st_size > 0)
 		return TRUE;
-	}
 #endif
 #endif /* !WIN32 */
 	return FALSE;
@@ -1016,11 +1004,13 @@ parse_from (
 		}
 	}
 	*cmtp = *asp = *atom_p = '\0';
-	if (state == 0)
-		if ((atom_type == 1) || !asbuf[0])
+	if (!state) {
+		if ((atom_type == 1) || !*asbuf) {
 			APPEND_TO (asp, atom_buf);
-		else
+		} else {
 			APPEND_TO (cmtp, atom_buf);
+		}
+	}
 	/* Address specifier */
 	TRIM (asbuf, asp);
 	/* Comment */
@@ -1139,10 +1129,7 @@ get_author (
 {
 	int author;
 
-	if (thread && !show_subject)
-		author = SHOW_FROM_BOTH;
-	else
-		author = CURR_GROUP.attribute->show_author;
+	author = ((thread && !show_subject) ? SHOW_FROM_BOTH : CURR_GROUP.attribute->show_author);
 
 	switch (author) {
 		case SHOW_FROM_NONE:
@@ -1152,10 +1139,7 @@ get_author (
 			strncpy (str, art->from, len);
 			break;
 		case SHOW_FROM_NAME:
-			if (art->name)
-				strncpy (str, art->name, len);
-			else
-				strncpy (str, art->from, len);
+			strncpy (str, (art->name ? art->name : art->from), len);
 			break;
 		case SHOW_FROM_BOTH:
 			if (art->name) {
@@ -1189,17 +1173,14 @@ toggle_inverse_video (void)
 void
 show_inverse_video_status (void)
 {
-	if (inverse_okay)
-		info_message (txt_inverse_on);
-	else
-		info_message (txt_inverse_off);
+		info_message ((inverse_okay ? txt_inverse_on : txt_inverse_off));
 }
 
 #ifdef HAVE_COLOR
 t_bool
 toggle_color (void)
 {
-#if USE_CURSES
+#ifdef USE_CURSES
 	if (!has_colors()) {
 		use_color = 0;
 		info_message (txt_no_colorterm);
@@ -1214,10 +1195,7 @@ toggle_color (void)
 void
 show_color_status (void)
 {
-	if (use_color)
-		info_message (txt_color_on);
-	else
-		info_message (txt_color_off);
+	info_message ((use_color ? txt_color_on : txt_color_off));
 }
 #endif /* HAVE_COLOR */
 
@@ -1240,7 +1218,7 @@ int kbhit(void);
 static int
 input_pending (int delay)
 {
-#if USE_CURSES
+#ifdef USE_CURSES
 	int ch;
 	nodelay(stdscr, TRUE);
 	if ((ch = getch()) != ERR)
@@ -1311,10 +1289,10 @@ input_pending (int delay)
 int
 get_arrow_key (int prech)
 {
-#if USE_CURSES
-#if NCURSES_MOUSE_VERSION
+#ifdef USE_CURSES
+#	ifdef NCURSES_MOUSE_VERSION
 	MEVENT my_event;
-#endif
+#endif /* NCURSES_MOUSE_VERSION */
 	int ch = getch();
 	int code = KEYMAP_UNKNOWN;
 
@@ -1382,7 +1360,9 @@ get_arrow_key (int prech)
 	if (WaitForChar(Input(),1000) == DOSTRUE)
 		return prech;
 #else	/* !M_AMIGA */
-
+#	ifdef VMS
+	;
+#	endif /* VMS */
 	if (!input_pending(0)) {
 #ifdef HAVE_USLEEP
 		int i=0;
@@ -1420,7 +1400,7 @@ get_arrow_key (int prech)
 #endif	/* HAVE_USLEEP */
 
 		if (!input_pending(0))
-			return prech;
+				return prech;
 	}
 #endif	/* M_AMIGA */
 	ch = ReadCh ();
@@ -1628,9 +1608,8 @@ strfquote (
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);
 					s += i;
-				} else {
+				} else
 					return 0;
-				}
 			}
 		}
 		if (*format == '%') {
@@ -1652,19 +1631,14 @@ strfquote (
 						sprintf (tbuf, "%s <%s>",
 							arts[respnum].name,
 							arts[respnum].from);
-					} else {
+					} else
 						strcpy (tbuf, arts[respnum].from);
-					}
 					break;
 				case 'G':	/* Groupname of Article */
 					strcpy (tbuf, group);
 					break;
 				case 'I':	/* Initials of author */
-					if (arts[respnum].name != (char *) 0) {
-						strcpy (tbuf, arts[respnum].name);
-					} else {
-						strcpy (tbuf, arts[respnum].from);
-					}
+					strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 					j = 0;
 					iflag = 1;
 					for (i=0; tbuf[i]; i++) {
@@ -1680,21 +1654,15 @@ strfquote (
 					strcpy (tbuf, note_h.messageid);
 					break;
 				case 'N':	/* Articles Name of author */
-					if (arts[respnum].name != (char *) 0) {
-						strcpy (tbuf, arts[respnum].name);
-					} else {
-						strcpy (tbuf, arts[respnum].from);
-					}
+					strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 					break;
 				case 'C':   /* First Name of author */
 					if (arts[respnum].name != (char *) 0) {
 						strcpy (tbuf, arts[respnum].name);
-						if (strrchr (arts[respnum].name, ' ')) {
+						if (strrchr (arts[respnum].name, ' '))
 							*(strrchr (tbuf, ' ')) = '\0';
-						}
-					} else {
+					} else
 						strcpy (tbuf, arts[respnum].from);
-					}
 					break;
 				default:
 					tbuf[0] = '%';
@@ -1707,9 +1675,8 @@ strfquote (
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);
 					s += i;
-				} else {
+				} else
 					return 0;
-				}
 			}
 		}
 	}
@@ -1781,9 +1748,8 @@ strfeditor (
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);
 					s += i;
-				} else {
+				} else
 					return 0;
-				}
 			}
 		}
 		if (*format == '%') {
@@ -1814,9 +1780,8 @@ strfeditor (
 				if (s + i < endp - 1) {
 					strcpy (s, tbuf);
 					s += i;
-				} else {
+				} else
 					return 0;
-				}
 			}
 		}
 	}
@@ -1892,9 +1857,8 @@ strfpath (
 					default:	/* some other users homedir */
 #ifndef M_AMIGA
 						i = 0;
-						while (*format && *format != '/') {
+						while (*format && *format != '/')
 							tbuf[i++] = *format++;
-						}
 						tbuf[i] = '\0';
 						/*
 						 * OK lookup the username in/etc/passwd
@@ -1903,9 +1867,8 @@ strfpath (
 						if (pwd == (struct passwd *) 0) {
 							str[0] = '\0';
 							return 0;
-						} else {
+						} else
 							sprintf (tbuf, "%s/", pwd->pw_dir);
-						}
 #else
 						/* Amiga has no ther users */
 						return 0;
@@ -1929,22 +1892,19 @@ strfpath (
 				format++;
 				if (*format && *format == '{') {
 					format++;
-					while (*format && !(strchr("}-", *format))) {
+					while (*format && !(strchr("}-", *format)))
 						tbuf[i++] = *format++;
-					}
 					tbuf[i] = '\0';
 					i = 0;
 					if (*format && *format == '-') {
 						format++;
-						while (*format && *format != '}') {
+						while (*format && *format != '}')
 							defbuf[i++] = *format++;
-						}
 					}
 					defbuf[i] = '\0';
 				} else {
-					while (*format && *format != '/') {
+					while (*format && *format != '/')
 						tbuf[i++] = *format++;
-					}
 					tbuf[i] = '\0';
 					format--;
 					defbuf[0] = '\0';
@@ -1953,11 +1913,10 @@ strfpath (
 				 * OK lookup the variable in the shells environment
 				 */
 				envptr = getenv (tbuf);
-				if (envptr == (char *) 0 || (*envptr == '\0')) {
+				if (envptr == (char *) 0 || (*envptr == '\0'))
 					strncpy(tbuf, defbuf, sizeof (tbuf)-1);
-				} else {
+				else
 					strncpy (tbuf, envptr, sizeof (tbuf)-1);
-				}
 				i = strlen (tbuf);
 				if (i) {
 					if (str + i < endp - 1) {
@@ -1990,9 +1949,8 @@ strfpath (
 							return 0;
 						}
 					}
-				} else {
+				} else
 					*str++ = *format;
-				}
 				break;
 			case '+':
 				/*
@@ -2011,9 +1969,8 @@ strfpath (
 						/*
 						 *  convert 1st letter to uppercase
 						 */
-						if (tmp[0] >= 'a' && tmp[0] <= 'z') {
+						if (tmp[0] >= 'a' && tmp[0] <= 'z')
 							tmp[0] = tmp[0] - 32;
-						}
 #ifndef VMS
 						joinpath (tbuf, buf, tmp);
 #ifdef WIN32
@@ -2038,9 +1995,8 @@ strfpath (
 						str[0] = '\0';
 						return 0;
 					}
-				} else {
+				} else
 					*str++ = *format;
-				}
 				break;
 			case '%':	/* Different forms of parsing cmds */
 				*str++ = *format;
@@ -2173,11 +2129,10 @@ strfmailer (
 					break;
 			}
 			if (*tbuf) {
-				if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
+				if (sh_format (s, endp - s, "%s", tbuf) >= 0)
 					s += strlen(s);
-				} else {
+				else
 					return 0;
-				}
 			}
 		}
 		if (*format == '%') {
@@ -2211,11 +2166,10 @@ strfmailer (
 					break;
 			}
 			if (*tbuf) {
-				if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
+				if (sh_format (s, endp - s, "%s", tbuf) >= 0)
 					s += strlen(s);
-				} else {
+				else
 					return 0;
-				}
 			}
 		}
 	}
@@ -2244,10 +2198,7 @@ get_initials (
 	if (s == (char *) 0 || maxsize == 0)
 		return 0;
 
-	if (arts[respnum].name != (char *) 0)
-		strcpy (tbuf, arts[respnum].name);
-	else
-		strcpy (tbuf, arts[respnum].from);
+	strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 
 	iflag = 0;
 	j = 0;
@@ -2289,10 +2240,7 @@ make_group_path (
 	sprintf(path, "[%s]", name);
 #else
 	while (*name) {
-		if (*name == '.')
-			*path = '/';
-		else
-			*path = *name;
+		*path = ((*name == '.') ? '/' : *name);
 		name++;
 		path++;
 	}
@@ -2447,9 +2395,8 @@ to_local (
 		c = c_l1_next[(unsigned char)c];
 		if (c == BAD) return '?';
 		else return c;
-	} else {
+	} else
 		return c;
-	}
 }
 
 void
@@ -2468,9 +2415,8 @@ to_network (
 		c = c_next_l1[(unsigned char) c];
 		if (c==BAD) return '?';
 		else return c;
-	} else {
+	} else
 		return c;
-	}
 }
 
 void
@@ -2626,10 +2572,7 @@ quote_wild(
 			    || *str == '*' || *str == '+' || *str == '?' || *str == '.'
 			    || *str == ' ' || *str == '\t' ) {
 				*target++ = '\\';
-				if (*str == ' ' || *str == '\t')
-					*target++ = 's';
-				else
-					*target++ = *str;
+				*target++ = ((*str == ' ' || *str == '\t')? 's' : *str);
 			} else
 				*target++ = *str;
 		} else {	/* wildmat */
@@ -2663,9 +2606,8 @@ quote_wild_whitespace(
 				*target++ = 's';
 			} else
 				*target++ = *str;
-		} else {	/* wildmat */
+		} else	/* wildmat */
 			*target++ = *str;
-		}
 	}
 	*target = '\0';
 	return (buff);

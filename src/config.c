@@ -35,7 +35,7 @@ enum state { IGNORE, CHECK, UPGRADE };
  * 1st line, then switch to UPGRADE or IGNORE accordingly.
  */
 static int
-check_upgrade(
+check_upgrade (
 	char *buf)
 {
 	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
@@ -57,10 +57,10 @@ read_config_file (
 	char	*file,
 	int	global_file) /* return value is always ignored */
 {
+	FILE	*fp;
 	char	newnews_info[PATH_LEN];
 	char	buf[LEN];
 	int	upgrade = CHECK;
-	FILE	*fp;
 
 	if ((fp = fopen (file, "r")) == (FILE *) 0)
 		return FALSE;
@@ -90,26 +90,32 @@ read_config_file (
 				art_marked_deleted = buf[0];
 				break;
 			}
+
 			if (match_string (buf, "art_marked_inrange=", buf, sizeof (buf))) {
 				art_marked_inrange = buf[0];
 				break;
 			}
+
 			if (match_string (buf, "art_marked_return=", buf, sizeof (buf))) {
 				art_marked_return = buf[0];
 				break;
 			}
+
 			if (match_string (buf, "art_marked_selected=", buf, sizeof (buf))) {
 				art_marked_selected = buf[0];
 				break;
 			}
+
 			if (match_string (buf, "art_marked_unread=", buf, sizeof (buf))) {
 				art_marked_unread = buf[0];
 				break;
 			}
+
 #ifdef HAVE_METAMAIL
 			if (match_boolean (buf, "ask_for_metamail=", &ask_for_metamail))
 				break;
 #endif
+
 			if (match_boolean (buf, "auto_cc=", &auto_cc))
 				break;
 
@@ -203,8 +209,8 @@ read_config_file (
 
 			if (match_color (buf, "col_markdash=", &col_markdash, MAX_COLOR))
 				break;
-
 #endif
+
 			break;
 
 		case 'd':
@@ -221,10 +227,12 @@ read_config_file (
 				}
 				break;
 			}
+
 			if (match_string (buf, "default_maildir=", default_maildir, sizeof (default_maildir))) {
 				joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
 				break;
 			}
+
 			if (match_string (buf, "default_printer=", default_printer, sizeof (default_printer)))
 				break;
 
@@ -240,8 +248,11 @@ read_config_file (
 			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global))
 				break;
 
-			if (match_boolean (buf, "default_filter_kill_case=", &default_filter_kill_case))
+			if (match_boolean (buf, "default_filter_kill_case=", &default_filter_kill_case)) {
+				/* ON=false, OFF=true */
+				default_filter_kill_case = !default_filter_kill_case;
 				break;
+			}
 
 			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire))
 				break;
@@ -252,8 +263,11 @@ read_config_file (
 			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global))
 				break;
 
-			if (match_boolean (buf, "default_filter_select_case=", &default_filter_select_case))
+			if (match_boolean (buf, "default_filter_select_case=", &default_filter_select_case)) {
+				/* ON=false, OFF=true */
+				default_filter_select_case = !default_filter_select_case;
 				break;
+			}
 
 			if (match_boolean (buf, "default_filter_select_expire=", &default_filter_select_expire))
 				break;
@@ -262,6 +276,7 @@ read_config_file (
 				default_save_mode = buf[0];
 				break;
 			}
+
 			if (match_string (buf, "default_author_search=", default_author_search, sizeof (default_author_search)))
 				break;
 
@@ -406,11 +421,13 @@ read_config_file (
 				load_newnews_info (newnews_info);
 				break;
 			}
+
 			/* pick which news headers to display */
 			if (match_string(buf, "news_headers_to_display=", news_headers_to_display, sizeof (news_headers_to_display))) {
 				news_headers_to_display_array = ulBuildArgv(news_headers_to_display, &num_headers_to_display);
 				break;
 			}
+
 			/* pick which news headers to NOT display */
 			if (match_string(buf, "news_headers_to_not_display=", news_headers_to_not_display, sizeof (news_headers_to_not_display))) {
 				news_headers_to_not_display_array = ulBuildArgv(news_headers_to_not_display, &num_headers_to_not_display);
@@ -582,7 +599,9 @@ read_config_file (
 				break;
 			}
 #endif
+
 			break;
+
 		case 'w':
 			if (match_integer (buf, "wildcard=", &wildcard, 2)) {
 				wildcard_func = (wildcard) ? match_regex : wildmat;
@@ -664,7 +683,7 @@ write_config_file (
 	if (!cmd_line)
 		wait_message (0, txt_saving);
 
-	if (!default_editor_format[0])
+	if (!*default_editor_format)
 		strcpy (default_editor_format, EDITOR_FORMAT_ON);
 
 	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE);
@@ -962,7 +981,7 @@ write_config_file (
 
 	if (*mail_address) {
 		fprintf (fp, txt_tinrc_mail_address);
-		fprintf (fp, "mail_address=%s\n\n",mail_address);
+		fprintf (fp, "mail_address=%s\n\n", mail_address);
 	}
 
 	fprintf (fp, txt_tinrc_mm_charset);
@@ -1004,8 +1023,10 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_alternative_handling);
 	fprintf (fp, "alternative_handling=%s\n\n", print_boolean (alternative_handling));
+
 	fprintf (fp, txt_tinrc_strip_newsrc);
 	fprintf (fp, "strip_newsrc=%s\n\n", print_boolean (strip_newsrc));
+
 	fprintf (fp, txt_tinrc_strip_bogus);
 	fprintf (fp, "strip_bogus=%d\n\n", strip_bogus);
 
@@ -1015,11 +1036,13 @@ write_config_file (
 	fprintf (fp, txt_tinrc_filter);
 	fprintf (fp, "default_filter_kill_header=%d\n", default_filter_kill_header);
 	fprintf (fp, "default_filter_kill_global=%s\n", print_boolean (default_filter_kill_global));
-	fprintf (fp, "default_filter_kill_case=%s\n", print_boolean (default_filter_kill_case));
+	/* ON=false, OFF=true */
+	fprintf (fp, "default_filter_kill_case=%s\n", print_boolean (!default_filter_kill_case));
 	fprintf (fp, "default_filter_kill_expire=%s\n", print_boolean (default_filter_kill_expire));
 	fprintf (fp, "default_filter_select_header=%d\n", default_filter_select_header);
 	fprintf (fp, "default_filter_select_global=%s\n", print_boolean (default_filter_select_global));
-	fprintf (fp, "default_filter_select_case=%s\n", print_boolean (default_filter_select_case));
+	/* ON=false, OFF=true */
+	fprintf (fp, "default_filter_select_case=%s\n", print_boolean (!default_filter_select_case));
 	fprintf (fp, "default_filter_select_expire=%s\n\n", print_boolean (default_filter_select_expire));
 
 	fprintf (fp, txt_tinrc_defaults);
@@ -1092,7 +1115,7 @@ print_any_option (
 		default:
 			break;
 	}
-#if USE_CURSES
+#ifdef USE_CURSES
 	clrtoeol();
 #endif
 }
@@ -1108,7 +1131,7 @@ static t_bool
 OptionOnPage (
 	int option)
 {
-	if ((option >= first_option_on_screen) && (option <  first_option_on_screen + option_lines_per_page))
+	if ((option >= first_option_on_screen) && (option < first_option_on_screen + option_lines_per_page))
 		return TRUE;
 	return FALSE;
 }
@@ -1136,7 +1159,7 @@ RepaintOption (
 	}
 }
 
-#if USE_CURSES
+#ifdef USE_CURSES
 static void DoScroll (
 	int jump)
 {
@@ -1154,7 +1177,7 @@ highlight_option (
 	int option)
 {
 	if (!OptionOnPage(option)) {
-#if USE_CURSES
+#ifdef USE_CURSES
 		if (option > 0 && OptionOnPage(option-1)) {
 			DoScroll(1);
 			first_option_on_screen++;
@@ -1201,7 +1224,7 @@ void
 refresh_config_page (int act_option)
 {
 	static int last_option = 0;
-	int force_redraw = FALSE;
+	t_bool force_redraw = FALSE;
 
 	if (act_option < 0) {
 		force_redraw = TRUE;
@@ -1226,12 +1249,12 @@ change_config_file (
 	struct t_group *group)
 {
 	int ch, i;
-	int change_option = FALSE;
-	t_bool original_on_off_value;
 	int original_list_value;
 	int option, old_option;
 	int ret_code = NO_FILTERING;
 	int mime_type = 0;
+	t_bool change_option = FALSE;
+	t_bool original_on_off_value;
 
 	set_signals_config ();
 
@@ -1336,7 +1359,7 @@ change_config_file (
 				unhighlight_option (option);
 				if (OptionInPage(option)) {
 					option = first_option_on_screen;
-				} else if (first_option_on_screen == 0) {
+				} else if (!first_option_on_screen) {
 					option = LAST_OPT;
 					first_option_on_screen = TopOfPage(option);
 				} else if ((option -= option_lines_per_page) < 0) {
@@ -1427,13 +1450,9 @@ change_config_file (
 										if (new_responses (i))
 											break;
 									}
-									if (i < top_base)
-										index_point = i;
-									else
-										index_point = top_base - 1;
-								} else {
+									index_point = ((i < top_base) ? i: top_base - 1);
+								} else
 									index_point = top_base - 1;
-								}
 							}
 							break;
 
@@ -1485,7 +1504,7 @@ change_config_file (
 #ifdef HAVE_COLOR
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
-#if USE_CURSES
+#ifdef USE_CURSES
 							if (!has_colors())
 								use_color = 0;
 							else
@@ -1818,7 +1837,7 @@ match_color (
 		if (!found)
 			*dst = atoi (&line[patlen]);
 
-		if (maxlen)  {
+		if (maxlen) {
 			if ((*dst < -1) || (*dst > maxlen)) {
 				my_fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
 				*dst = 0;
@@ -1842,18 +1861,17 @@ match_integer (
 	int *dst,
 	int maxlen)
 {
-	size_t	patlen = strlen (pat);
+	size_t patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
 		*dst = atoi (&line[patlen]);
 
-		if (maxlen)  {
+		if (maxlen) {
 			if ((*dst < 0) || (*dst > maxlen)) {
 				my_fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
 				*dst = 0;
 			}
 		}
-
 		return TRUE;
 	}
 	return FALSE;
@@ -1931,10 +1949,10 @@ print_boolean (
 	return txt_onoff[value != FALSE];
 }
 
+
 /*
  *  convert underlines to spaces in a string
  */
-
 void
 quote_dash_to_space (
 	char *str)
@@ -1947,10 +1965,10 @@ quote_dash_to_space (
 	}
 }
 
+
 /*
  *  convert spaces to underlines in a string
  */
-
 char *
 quote_space_to_dash (
 	char *str)
@@ -1980,7 +1998,7 @@ show_config_page (void)
 {
 	int i, lines_to_print = option_lines_per_page;
 
-#if !USE_CURSES
+#ifdef USE_CURSES
 	ClearScreen ();
 #endif
 	center_line (0, TRUE, txt_options_menu);
@@ -1991,8 +2009,7 @@ show_config_page (void)
 	if (first_option_on_screen + option_lines_per_page > LAST_OPT)
 		lines_to_print = LAST_OPT + 1 - first_option_on_screen;
 
-	for (i = 0; i < lines_to_print;i++)
-	{
+	for (i = 0; i < lines_to_print;i++) {
 		MoveCursor (INDEX_TOP + i, 3);
 		print_any_option (first_option_on_screen + i);
 	}

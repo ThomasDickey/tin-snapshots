@@ -94,7 +94,7 @@ constext txt_continue[] = "Continue? (y/n): ";
 #endif
 
 #ifdef VMS
-	char txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Tod McQuillin.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Tod McQuillin & other.";
 #endif
 
 #ifdef WIN32
@@ -134,6 +134,7 @@ constext txt_error_no_enter_permission[] = "No permissions to go into %s\n";
 constext txt_error_no_read_permission[] = "No read permissions for %s\n";
 constext txt_error_no_such_file[] = "File %s does not exist\n";
 constext txt_error_no_write_permission[] = "No write permissions for %s\n";
+constext txt_error_metamail_failed[] = "metamail failed: %s";
 constext txt_external_mail_done[] = "leaving external mail-reader";
 constext txt_extracting_archive[] = cCRLF cCRLF "Extracting %s archive..." cCRLF;
 constext txt_extracting_shar[] =cCRLF "Extracting %s..." cCRLF;
@@ -702,6 +703,10 @@ constext txt_pcre_error_text[] = "Error in regex: study - pcre internal error %s
 	constext txt_pipe_to_command[] = "Pipe to command [%.*s]> ";
 	constext txt_piping[] = "Piping...";
 #else
+#	ifdef VMS
+		constext txt_pipe_to_command[] = "";
+		constext txt_piping[] = "";
+#	endif /* VMS */
 	constext txt_piping_not_enabled[] = "Piping not enabled. Recompile without -DNO_PIPING.";
 #endif /* DONT_HAVE_PIPING */
 
@@ -815,13 +820,13 @@ constext txt_tinrc_mail_8bit_header[] = "# if ON, 8bit characters in mail messag
 # 8bit chars in header is encoded regardless of the value of this parameter\n\
 # unless mail_mime_encoding is 8bit as well. Note that RFC 1552/1651/1652\n\
 # prohibit 8bit characters in mail header so that you are advised NOT to\n\
-# turn it ON unless you have some compelling reason as is the case of\n\
-# Korean users with localized sendmail.\n";
+# turn it ON unless you have some compelling reason.\n";
 constext txt_tinrc_mail_address[] = "# user's mail address, if not username@host\n";
 constext txt_tinrc_mark_saved_read[] = "# if ON mark articles that are saved as read\n";
 constext txt_tinrc_mm_charset[] = "# charset supported locally which is also used for MIME header and\n\
 # Content-Type header unless news and mail need to be encoded in other\n\
-# charsets as in ISO-2022-KR encoding of EUC-KR in mail message.\n\
+# charsets as in case of  EUC-KR for Korean which needs to be converted to\n\
+# ISO-2022-KR in mail message.\n\
 # If not set, the value of the environment variable MM_CHARSET is used.\n\
 # Set to US-ASCII or compile time default if neither of them is defined.\n\
 # If MIME_STRICT_CHARSET is defined at compile-time, charset other than\n\
@@ -839,16 +844,22 @@ constext txt_tinrc_post_8bit_header[] = "# if ON, 8bit characters in news postin
 constext txt_tinrc_post_mime_encoding[] = "# MIME encoding (8bit, base64, quoted-printable, 7bit) of the body\n\
 # for mails and posts, if necessary. QP is efficient for most European\n\
 # character sets (ISO-8859-X) with small fraction of non-US-ASCII chars,\n\
-# while Base64 is more efficient for most 8bit East Asian charsets.\n\
+# while Base64 is more efficient for most 8bit East Asian,Greek,and Russian\n\
+# charsets with a lot of 8bit characters.\n\
 # For EUC-KR, 7bit encoding specifies that EUC charsets be converted\n\
 # to corresponding ISO-2022-KR. The same may be true of EUC-JP/CN.\n\
-# For other charsets used in Japan and China, it seems more complicated.\n\
 # Korean users should set post_mime_encoding to 8bit and mail_mime_encoding\n\
 # to 7bit. With mm_charset to EUC-KR, post_mime_encoding set to 7bit does\n\
-# NOT lead to encoding of EUC-KR into ISO-2022-KR in news-postings since\n\
-# it's never meant to be used for Usenet news. Perhaps, it's not the case\n\
-# for EUC-JP and EUC-CN.\n\
-# Handling of Chinese and Japanese characters is not yet implemented.\n";
+# NOT lead to conversion of EUC-KR into ISO-2022-KR in news-postings since\n\
+# it's never meant to be used for Usenet news. Japanese always use\n\
+# ISO-2022-JP for both news and mail. Automatic conversion of EUC-JP and\n\
+# other 8bit Japanese encodings into ISO-2022-JP(even if 7bit is chosen)\n\
+# is NOT yet implemented.(it may not be necessary at all as Japanese\n\
+# terminal emulators and editors appear to have native support of\n\
+# ISO-2022-JP). In case of Chinese, the situation seems to be more\n\
+# complicated(different newsgroups and hierarchies for Chinese use different\n\
+# MIME charsets and encodings) and no special handling is  yet implemented.\n\
+# Summing up 7bit does NOT have any effect on MIME charset other than EUC-KR\n";
 constext txt_tinrc_post_process_command[] = "# if set, command to be run after a successful uudecode\n";
 #ifdef M_AMIGA
 	constext txt_tinrc_post_process_type[] = "# type of post processing to perform after saving articles.\n\

@@ -19,6 +19,12 @@
 #include	"version.h"
 #include	"bugrep.h"
 
+/*
+ * local prototypes
+ */
+static int read_site_config(void);
+static void preinit_colors(void);
+
 char active_times_file[PATH_LEN];
 char art_marked_deleted;
 char art_marked_inrange;
@@ -56,6 +62,7 @@ char homedir[PATH_LEN];
 char index_maildir[PATH_LEN];
 char index_newsdir[PATH_LEN];
 char index_savedir[PATH_LEN];
+char inewsdir[PATH_LEN];
 char libdir[PATH_LEN];			/* directory where news config files are (ie. active) */
 char local_attributes_file[PATH_LEN];
 char local_config_file[PATH_LEN];
@@ -83,6 +90,7 @@ char news_quote_format[PATH_LEN];
 char newsgroups_file[PATH_LEN];
 char newsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
+char novfilename[PATH_LEN];		/* file name of a single nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
 char posted_info_file[PATH_LEN];
@@ -399,11 +407,7 @@ void init_selfinfo (void)
 
 #ifdef HAVE_GETHOSTBYNAME
 	if (domain_name[0]=='\0') {
-		if (host_name[0]=='\0')
-			cptr = get_fqdn((char *)NULL);
-		else
-			cptr = get_fqdn(host_name);
-
+		cptr = ((host_name[0]=='\0') ? get_fqdn((char *) 0) : get_fqdn(host_name));
 		if (cptr != (char *)NULL)
 			strcpy (domain_name, cptr);
 	}
@@ -464,19 +468,27 @@ void init_selfinfo (void)
 		fprintf (stderr, "Environment variable USER not set.\n");
 		exit (1);
 	}
-#endif
+#else
+#	ifdef VMS
+	if (((ptr = getlogin ()) != (char *) 0) && strlen (ptr))
+		myentry = getpwnam (ptr);
+#	endif /* VMS */
+#endif /* M_OS2 || WIN32 */
 
 #ifdef M_OS2
 	strcpy (TMPDIR, get_val ("TMP", "/tmp/"));
 	if ((TMPDIR[strlen(TMPDIR)-1] != '/') && (TMPDIR[strlen(TMPDIR)-1] != '\\'))
 		strcat(TMPDIR,"/");
-#endif
+#endif /* M_OS2 */
 #ifdef WIN32
 	strcpy (TMPDIR, get_val ("TMP", "\\tmp\\"));
 	if (TMPDIR[strlen(TMPDIR)-1] != '\\')
 		strcat(TMPDIR,"\\");
-#endif
+#endif /* WIN32 */
 	strcpy (userid, myentry->pw_name);
+#ifdef VMS
+	lower (userid);
+#endif /* VMS */
 
 	if ((ptr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
@@ -579,7 +591,7 @@ void init_selfinfo (void)
 	quote_empty_lines = FALSE;
 	quote_signatures = TRUE;
 	read_local_newsgroups_file = FALSE;
-	reread_active_file = TRUE;
+	force_reread_active_file = TRUE;
 	reread_active_file_secs = REREAD_ACTIVE_FILE_SECS;
 	reread_active_for_posted_arts = TRUE;
 	save_news = FALSE;
@@ -681,6 +693,10 @@ void init_selfinfo (void)
 	news_headers_to_not_display[0] = '\0';
 	news_headers_to_not_display_array = NULL;
 
+	strcpy (bug_addr, BUG_REPORT_ADDRESS);
+	bug_nntpserver1[0] = '\0';
+	bug_nntpserver2[0] = '\0';
+
 	/*
 	 * Amiga uses assigns which end in a ':' and won't work with a '/'
 	 * tacked on after them: e.g. we want UULIB:active, and not
@@ -689,83 +705,137 @@ void init_selfinfo (void)
 	 * on all UNIX systems.
 	 */
 
+#ifdef INEWSDIR
+	strcpy(inewsdir, INEWSDIR);
+#else /* INEWSDIR */
+	inewsdir[0] = '\0';
+#endif /* INEWSDIR */
+
+#ifdef apollo
+	strcpy(default_organization, get_val("NEWSORG", ""));
+#else /* apollo */
+	strcpy(default_organization, get_val("ORGANIZATION", ""));
+#endif /* apollo */
+
+#ifdef USE_INN_NNTPLIB
+	ptr = GetConfigValue (_CONF_ORGANIZATION);
+	if (ptr != (char *) 0)
+		my_strncpy (default_organization, ptr, sizeof (default_organization));
+#endif /* USE_INN_NNTPLIB */
+
+	/* getval sucks - it doesn't check buffer overflows! */
+	strcpy(libdir, get_val("TIN_LIBDIR", NEWSLIBDIR));
 #ifndef NNTP_ONLY
-	strcpy (libdir, get_val ("TIN_LIBDIR", NEWSLIBDIR));
 	strcpy (novrootdir, get_val ("TIN_NOVROOTDIR", NOVROOTDIR));
+	strcpy (novfilename, get_val ("TIN_NOVFILENAME", OVERVIEW_FILE));
 	strcpy (spooldir, get_val ("TIN_SPOOLDIR", SPOOLDIR));
-#endif
+#endif /* NNTP_ONLY */
+	/* clear news_active_file, active_time_file, newsgroups_file */
+	news_active_file[0] = '\0';
+	active_times_file[0] = '\0';
+	newsgroups_file[0] = '\0';
+	subscriptions_file[0] = '\0';
+
+	/*
+	 * read the global site config file to override some default
+	 * values given at compile time
+	 */
+	(void) read_site_config();
+
+	/*
+	 * only set the following variables, if they weren't set from
+	 * within read_site_config()
+	 */
+	if (!*news_active_file)
+		joinpath (news_active_file, libdir, get_val ("TIN_ACTIVEFILE", ACTIVE_FILE));
+	if (!*active_times_file)
+		joinpath (active_times_file, libdir, ACTIVE_TIMES_FILE);
+	if (!*newsgroups_file)
+		joinpath (newsgroups_file, libdir, NEWSGROUPS_FILE);
+	if (!*subscriptions_file)
+		joinpath (subscriptions_file, libdir, SUBSCRIPTIONS_FILE);
+	if (!*default_organization) {
+		char buf[LEN];
+
+		joinpath (buf, libdir, "organization");
+		if ((fp = fopen(buf, "r")) != NULL) {
+			if (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+				ptr = strrchr (buf, '\n');
+				if (ptr != (char *) 0)
+					*ptr = '\0';
+			}
+			fclose (fp);
+			my_strncpy (default_organization, buf, sizeof (default_organization));
+		}
+	}
+
+	/* read_site_config() might have changed the value of libdir */
+	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
+	joinpath (global_config_file, libdir, CONFIG_FILE);
+	joinpath (global_filter_file, libdir, FILTER_FILE);
 
 #ifdef VMS
 	joindir (rcdir, homedir, RCDIR); /* we're naming a directory here */
 	joinpath (rcdir_asfile, homedir, RCDIR);	/* for stat() */
 	strcat(rcdir_asfile, ".DIR");
 	if (stat (rcdir_asfile, &sb) == -1)
-#else
+#else /* VMS */
 	joinpath (rcdir, homedir, RCDIR);
 	if (stat (rcdir, &sb) == -1)
-#endif
+#endif /* VMS */
 	{
 		created_rcdir = TRUE;
 		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
 	}
-
-	strcpy (bug_addr, BUG_REPORT_ADDRESS);
-	bug_nntpserver1[0] = '\0';
-	bug_nntpserver2[0] = '\0';
 #if defined(M_UNIX) || defined (M_AMIGA) || defined(VMS)
 	strcpy (default_mailer_format, MAILER_FORMAT);
-#else
+#else /* M_UNIX ... */
 	strcpy (default_mailer_format, mailer);
-#endif
+#endif /* M_UNIX ... */
 	strcpy (default_printer, DEFAULT_PRINTER);
 #ifdef M_AMIGA
 	if (tin_bbs_mode)
 		strcpy(default_printer, DEFAULT_BBS_PRINTER);
-#endif
+#endif /* M_AMIGA */
 	strcpy (mailer, get_val (ENV_VAR_MAILER, DEFAULT_MAILER));
 	strcpy (quote_chars, DEFAULT_COMMENT);
-
-	joinpath (active_times_file, libdir, ACTIVE_TIMES_FILE);
 #ifdef VMS
 	joinpath (article, homedir, "article.");
-#else
+#else /* VMS */
 	joinpath (article, homedir, ".article");
-#endif
+#endif /* VMS */
 #ifdef APPEND_PID
 	sprintf (article+strlen(article), ".%d", process_id);
-#endif
+#endif /* APPEND_PID */
 	joinpath (dead_article, homedir, "dead.article");
 	joinpath (dead_articles, homedir, "dead.articles");
-
 #ifdef VMS
 	joindir (default_maildir, homedir, DEFAULT_MAILDIR);
 	joindir (default_savedir, homedir, DEFAULT_SAVEDIR);
-#else
+#else /* VMS */
 	joinpath (default_maildir, homedir, DEFAULT_MAILDIR);
 	joinpath (default_savedir, homedir, DEFAULT_SAVEDIR);
-#endif
+#endif /* VMS */
 	joinpath (default_sigfile, homedir, ".Sig");
 	joinpath (default_signature, homedir, ".signature");
-	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
-	joinpath (global_config_file, libdir, CONFIG_FILE);
-	joinpath (global_filter_file, libdir, FILTER_FILE);
 	if (!index_newsdir[0]) {
 #ifdef VMS
-		joindir (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
-#else
+	joindir (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
+#else /* VMS */
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
-#endif
+#endif /* VMS */
 	}
 	if (stat (index_newsdir, &sb) == -1)
 		my_mkdir (index_newsdir, S_IRWXUGO);
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
-#else
+#else /* VMS */
 	joinpath (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
-#endif
+#endif /* VMS */
 	if (stat (index_maildir, &sb) == -1)
 		my_mkdir (index_maildir, S_IRWXUGO);
 	joinpath (index_savedir, get_val ("TIN_INDEX_SAVEDIR", rcdir), INDEX_SAVEDIR);
+
 	if (stat (index_savedir, &sb) == -1)
 		my_mkdir (index_savedir, S_IRWXUGO);
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
@@ -777,28 +847,25 @@ void init_selfinfo (void)
 	joinpath (mail_active_file, rcdir, ACTIVE_MAIL_FILE);
 #ifdef VMS
 	joinpath (mailbox, DEFAULT_MAILBOX, "MAIL.TXT");
-#else
+#else /* VMS */
 	joinpath (mailbox, DEFAULT_MAILBOX, userid);
-#endif
+#endif /* VMS */
 	joinpath (msg_headers_file, rcdir, MSG_HEADERS_FILE);
 	joinpath (mailgroups_file, rcdir, MAILGROUPS_FILE);
-	joinpath (news_active_file, libdir, get_val ("TIN_ACTIVEFILE", ACTIVE_FILE));
-	joinpath (newsgroups_file, libdir, NEWSGROUPS_FILE);
 #ifdef WIN32
 	joinpath (newsrc, rcdir, NEWSRC_FILE);
 	joinpath (newnewsrc, rcdir, NEWNEWSRC_FILE);
-#else
+#else /* WIN32 */
 	joinpath (newsrc, homedir, NEWSRC_FILE);
 	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
 #ifdef APPEND_PID
 	sprintf(newnewsrc+strlen(newnewsrc), "%d", process_id);
-#endif
-#endif
+#endif /* APPEND_PID */
+#endif /* WIN32 */
 	joinpath (posted_info_file, rcdir, POSTED_FILE);
 	joinpath (posted_msgs_file, default_maildir, POSTED_FILE);
 	joinpath (postponed_articles_file, rcdir, POSTPONED_FILE);
 	joinpath (save_active_file, rcdir, ACTIVE_SAVE_FILE);
-	joinpath (subscriptions_file, libdir, SUBSCRIPTIONS_FILE);
 
 #ifdef INDEX_DAEMON
 	joinpath (lock_file, TMPDIR, LOCK_FILE);
@@ -808,22 +875,22 @@ void init_selfinfo (void)
 
 	if (stat (index_newsdir, &sb) == -1)
 		my_mkdir (index_newsdir, (S_IRWXU|S_IRUGO|S_IXUGO));
-#else
+#else /* INDEX_DAEMON */
 #	ifdef HAVE_LONG_FILE_NAMES
 		sprintf (lock_file, "%stin.%s.LCK", TMPDIR, userid);
-#	else
+#	else /* HAVE_LONG_FILE_NAMES */
 		sprintf (lock_file, "%s%s.LCK", TMPDIR, userid);
-#endif
+#	endif /* HAVE_LONG_FILE_NAMES */
 
 #ifdef NNTP_ABLE
 	nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
-#endif
+#endif /* NNTP_ABLE */
 
 #ifdef VMS
 	if (stat (rcdir_asfile, &sb) == -1)
-#else
+#else /* VMS */
 	if (stat (rcdir, &sb) == -1)
-#endif
+#endif /* VMS */
 	{
 		created_rcdir = TRUE;
 		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
@@ -855,48 +922,6 @@ void init_selfinfo (void)
 
 #endif /* INDEX_DAEMON */
 
-#ifndef NNTP_ONLY
-/*
- * checking for an local active if running NNTP_ONLY is stupid
- * I'm sure that there are more 'funny' things like this in Iains code
- * This whole block of code sucks, as we can't even check for 'via_nntp' yet
- */
-	if (stat (news_active_file, &sb) >= 0)
-		goto got_active;
-
-	/*
-	 *  I hate forgetting to define NEWSLIBDIR correctly.  Guess a couple
-	 *  of the likely places if it's not where NEWSLIBDIR says it is.
-	 */
-	strcpy (news_active_file, "/usr/lib/news/active");
-	if (stat (news_active_file, &sb) >= 0)
-		goto got_active;
-
-	strcpy (news_active_file, "/usr/local/lib/news/active");
-	if (stat (news_active_file, &sb) >= 0)
-		goto got_active;
-
-	strcpy (news_active_file, "/usr/public/lib/news/active");
-	if (stat (news_active_file, &sb) >= 0)
-		goto got_active;
-
-	/*
-	 *  Oh well. Revert to what NEWSLIBDIR says it is to produce a useful
-	 *  error message when read_news_active_file () fails later.
-	 */
-	joinpath (news_active_file, libdir, ACTIVE_FILE);
-
-got_active:
-
-#endif /* !NNTP_ONLY */
-
-	/*
-	 *  Get organization name
-	 */
-	ptr = GetConfigValue (_CONF_ORGANIZATION);
-	if (ptr != (char *) 0)
-		my_strncpy (default_organization, ptr, sizeof (default_organization));
-
 	/*
 	 *  check enviroment for REPLYTO
 	 */
@@ -912,7 +937,12 @@ got_active:
 		my_strncpy (my_distribution, ptr, sizeof (my_distribution));
 
 	/*
-	 *  check enviroment for BUG_ADDRESS
+	 * check enviroment for BUG_ADDRESS
+	 *
+	 * Argh! I think it's complete nonsense to have a _per_user_
+	 * configurable bug report address in $HOME/.tin/bug_address!
+	 * I think we should delete this whole section. Who sets a
+	 * bug report in environment anyway? XXXXXXXXXXXXXXXXXX
 	 */
 	if ((ptr = getenv ("BUG_ADDRESS")) != (char *) 0) {
 		my_strncpy (bug_addr, ptr, sizeof (bug_addr));
@@ -935,7 +965,7 @@ got_active:
 		strcpy (pgp_data, ptr);
 	else
 		joinpath (pgp_data, homedir, ".pgp");
-#endif
+#endif /* HAVE_PGP */
 }
 
 /*
@@ -1015,90 +1045,72 @@ int create_mail_save_dirs (void)
 	return (created);
 }
 
-
-#ifndef USE_INN_NNTPLIB
-char *
-GetConfigValue (
-	const char *name)
+/*
+ * read_site_config()
+ *
+ * This function permits the local administrator to override a few compile
+ * time defined parameters, especially the concerning the place of a local
+ * news spool. This has especially binary distributions of TIN in mind.
+ *
+ * Sven Paulus <sven@tin.org>, 26-Jan-'98
+ */
+static int read_site_config (void)
 {
-	char *conf_value = (char *) 0;
-	char *ptr;
-	char path[PATH_LEN];
 	FILE *fp;
-	static char conf_fromhost[PATH_LEN];
-	static char conf_org[PATH_LEN];
-	static char conf_server[PATH_LEN];
+	char buf[LEN];
+	const char *tin_defaults[] = { TIN_DEFAULTS };
+	int i = 0;
+	struct stat sb;
 
-	if (STRCMPEQ(_CONF_FROMHOST, name)) {
-		conf_fromhost[0] = '\0';
-	} else if (STRCMPEQ(_CONF_SERVER, name)) {
-		conf_server[0] = '\0';
-#ifdef NNTP_DEFAULT_SERVER
-		if (*(NNTP_DEFAULT_SERVER)) {
-			strcpy (conf_server, NNTP_DEFAULT_SERVER);
-			conf_value = conf_server;
-		}
-#endif	/* NNTP_DEFAULT_SERVER */
-	} else if (STRCMPEQ(_CONF_ORGANIZATION, name)) {
-		conf_org[0] = '\0';
-		/*
-		 *  check enviroment for ORGANIZATION / NEWSORG
-		 */
-#ifdef apollo
-		if ((ptr = getenv ("NEWSORG")) != (char *) 0)
-#else
-		if ((ptr = getenv ("ORGANIZATION")) != (char *) 0)
-#endif
-		{
-			my_strncpy (conf_org, ptr, sizeof (conf_org));
-			goto got_org;
-		}
-
-		/*
-		 *  check NEWSLIBDIR/organization for system wide organization
-		 */
-		joinpath (path, libdir, "organization");
-		fp = fopen (path, "r");
-
-#ifndef M_AMIGA
-		if (fp == (FILE *) 0) {
-			sprintf (path, "/usr/lib/news/organization");
-			fp = fopen (path, "r");
-		}
-
-		if (fp == (FILE *) 0) {
-			sprintf (path, "/usr/local/lib/news/organization");
-			fp = fopen (path, "r");
-		}
-
-		if (fp == (FILE *) 0) {
-			sprintf (path, "/usr/public/lib/news/organization");
-			fp = fopen (path, "r");
-		}
-
-		if (fp == (FILE *) 0) {
-			sprintf (path, "/usr/local/etc/organization");
-			fp = fopen (path, "r");
-		}
-
-		if (fp == (FILE *) 0) {
-			sprintf (path, "/etc/organization");
-			fp = fopen (path, "r");
-		}
-#endif	/* M_AMIGA */
-
-		if (fp != (FILE *) 0) {
-			if (fgets (conf_org, sizeof (conf_org), fp) != (char *) 0) {
-				ptr = strrchr (conf_org, '\n');
-				if (ptr != (char *) 0)
-					*ptr = '\0';
-			}
-			fclose (fp);
-		}
-got_org:	/* goto */
-		conf_value = conf_org;
+	/*
+	 * try to find tin.defaults in some different locations
+	 */
+	while (tin_defaults[i] != NULL && i >= 0) {
+		sprintf(buf, "%s/tin.defaults", tin_defaults[i]);
+		if (stat(buf, &sb) < 0)
+			i++;	/* no, skip to next one */
+		else
+			i = -1;	/* we found it */
 	}
 
-	return conf_value;
+	if (i != -1)
+		return -1;
+	if ((fp = fopen(buf, "r")) == NULL)
+		return -1;
+
+	while (fgets(buf, sizeof(buf), fp)) {
+		/* ignore comments */
+		if (*buf == '#' || *buf == ';' || *buf == ' ')
+			continue;
+#ifndef NNTP_ONLY
+		if (match_string (buf, "spooldir=", spooldir, sizeof (spooldir)))
+			continue;
+		if (match_string (buf, "overviewdir=", novrootdir, sizeof (novrootdir)))
+			continue;
+		if (match_string (buf, "overviewfile=", novfilename, sizeof (novfilename)))
+			continue;
+#endif	/* NNTP_ONLY */
+		if (match_string (buf, "activefile=", news_active_file, sizeof (news_active_file)))
+			continue;
+		if (match_string (buf, "activetimesfile=", active_times_file, sizeof (active_times_file)))
+			continue;
+		if (match_string (buf, "newsgroupsfile=", newsgroups_file, sizeof (newsgroups_file)))
+			continue;
+		if (match_string (buf, "newslibdir=", libdir, sizeof (libdir)))
+			continue;
+		if (match_string (buf, "subscriptionsfile=", subscriptions_file, sizeof (subscriptions_file)))
+			continue;
+		if (match_string (buf, "domainname=", domain_name, sizeof (domain_name)))
+			continue;
+		if (match_string (buf, "inewsdir=", inewsdir, sizeof (inewsdir)))
+			continue;
+		if (match_string (buf, "bugaddress=", bug_addr, sizeof (bug_addr)))
+			continue;
+		if (match_string (buf, "organization=", default_organization, sizeof (default_organization)))
+			continue;
+	}
+
+	fclose(fp);
+
+	return 0;
 }
-#endif	/* USE_INN_NNTPLIB */

@@ -77,7 +77,7 @@ init_alloc (void)
 
 	save = (struct t_save *) my_malloc (sizeof(*save) * max_save);
 
-#if !USE_CURSES
+#ifndef USE_CURSES
 	screen = (struct t_screen *) 0;
 #endif
 }
@@ -129,11 +129,11 @@ expand_newnews (void)
 }
 
 
+#ifndef USE_CURSES
 void
 init_screen_array (
 	int allocate)
 {
-#if !USE_CURSES
 	int i;
 
 	if (allocate) {
@@ -152,8 +152,8 @@ init_screen_array (
 			screen = (struct t_screen *) 0;
 		}
 	}
-#endif
 }
+#endif
 
 
 void
@@ -161,7 +161,9 @@ free_all_arrays (void)
 {
 	hash_reclaim ();
 
+#ifndef USE_CURSES
 	init_screen_array (FALSE);
+#endif /* USE_CURSES */
 
 	free_art_array ();
 
@@ -377,10 +379,8 @@ my_realloc1 (
 #ifdef DEBUG
 	vDbgPrintMalloc (FALSE, file, line, size);
 #endif
-	if (!p)
-		p = (char *) calloc (1, size);
-	else
-		p = (char *) realloc (p, size);
+
+	p = (char *) ((!p) ? (calloc (1, size)) : realloc (p, size));
 
 	if (p == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);

@@ -76,7 +76,7 @@ get_domain_name (
  * which is illegal on a 68000
  */
 static const char *domain_name_hack = DOMAIN_NAME;
-#		undef   DOMAIN_NAME
+#		undef	DOMAIN_NAME
 #		define DOMAIN_NAME domain_name_hack
 #	endif /* M_AMIGA */
 
@@ -90,7 +90,7 @@ static const char *domain_name_hack = DOMAIN_NAME;
 #else
 	if (domain[0] == '/' && domain[1]) {
 #	endif /* M_AMIGA */
-		/* If 1st letter is '/' read domianname from specified file */
+		/* If 1st letter is '/' read domainname from specified file */
 		if ((fp = fopen (domain, "r")) != (FILE *) 0) {
 			while (fgets (buff, sizeof (buff), fp) != (char *) 0) {
 				if (buff[0] == '#' || buff[0] == '\n')
@@ -143,13 +143,13 @@ get_fqdn(
 		in.s_addr=inet_addr(name);
 		if ((hp=gethostbyaddr((char *)&in.s_addr,4,AF_INET)))
 			in.s_addr=(*hp->h_addr);
-		return(hp&&strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in));
+		return(hp&&strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in));
 	}
 	if ((hp=gethostbyname(name))&&!strchr(hp->h_name,'.'))
 		if ((hp=gethostbyaddr(hp->h_addr,hp->h_length,hp->h_addrtype)))
 			in.s_addr=(*hp->h_addr);
 
-	sprintf(fqdn,"%s",hp?strchr(hp->h_name,'.')?hp->h_name:inet_ntoa(in):NULL);
+	sprintf(fqdn,"%s",hp ? strchr(hp->h_name,'.') ? hp->h_name : inet_ntoa(in) : NULL);
 	if (!*fqdn || (fqdn[strlen(fqdn)-1] <= '9')) {
 		*fqdn = 0;
 		inf = fopen("/etc/resolv.conf", "r");
@@ -205,20 +205,24 @@ static const char *
 get_user_name(
 	void)
 {
-#ifdef M_AMIGA
+#if defined (M_AMIGA) || (defined VMS)
 	char *p;
 #endif
 	static char username[128];
 	struct passwd *pw;
 
 	username[0] = '\0';
-#ifndef M_AMIGA
+#if defined (M_AMIGA) || defined (VMS)
+	if ((p = getenv ("USER"))) {
+		STRCPY (username, p);
+#	ifdef VMS
+		lower (username);
+#	endif /* VMS */
+	}
+#else
 	pw = getpwuid (getuid ());
 	strcpy (username, pw->pw_name);
-#else
-	if ((p = getenv ("USER")))
-		strncpy (username, p, 128);
-#endif
+#endif /* M_AMIGA || VMS */
 	return(username);
 }
 
@@ -243,6 +247,9 @@ get_full_name(
 		return (fullname);
 	}
 
+#ifdef VMS
+	strncpy (fullname, fix_fullname(get_uaf_fullname()),sizeof (fullname));
+#else  /* !VMS */
 	pw = getpwuid (getuid ());
 	strncpy (buf, pw->pw_gecos, sizeof (fullname));
 	if ((p = strchr (buf, ',')))
@@ -256,6 +263,7 @@ get_full_name(
 		sprintf (fullname, "%s%s%s", buf, tmp, p);
 	} else
 		strcpy (fullname, buf);
+#endif /* !VMS */
 	return (fullname);
 }
 
@@ -272,7 +280,11 @@ get_from_name (
 	struct t_group *thisgrp)
 {
 #ifndef INDEX_DAEMON
+#ifdef USE_INN_NNTPLIB
 	char *fromhost = GetConfigValue (_CONF_FROMHOST);
+#else /* USE_INN_NNTPLIB */
+	char *fromhost = NULL;
+#endif /* USE_INN_NNTPLIB */
 
 	if (!(fromhost && *fromhost))
 		fromhost = domain_name;
@@ -287,10 +299,7 @@ get_from_name (
 		return;
 	}
 
-	if (strchr(get_full_name(), '.'))
-		sprintf (from_name, "\"%s\" <%s@%s>", get_full_name(), get_user_name(), fromhost);
-	else
-		sprintf (from_name, "%s <%s@%s>", get_full_name(), get_user_name(), fromhost);
+	sprintf (from_name,((strchr(get_full_name(), '.')) ? "\"%s\" <%s@%s>" : "%s <%s@%s>"), get_full_name(), get_user_name(), fromhost);
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", from_name, get_user_name(), domain_name, get_full_name());

@@ -95,15 +95,7 @@ feed_articles (
 	 * try and work out what default the user wants
 	 * This is dumb. If you have _any_ selected arts, then it picks 'h'
 	 */
-	if (num_of_tagged_arts) {
-		ch_default = iKeyFeedTag;
-	} else if (num_of_selected_arts) {
-		ch_default = iKeyFeedHot;
-	} else if (num_of_responses (b)) {
-		ch_default = iKeyFeedThd;
-	} else {
-		ch_default = iKeyFeedArt;
-	}
+	ch_default = (num_of_tagged_arts ? iKeyFeedTag : (num_of_selected_arts ? iKeyFeedHot : ((num_of_responses (b)) ? iKeyFeedThd : iKeyFeedArt)));
 
 	switch (function) {
 		case FEED_MAIL:
@@ -154,7 +146,7 @@ feed_articles (
 			if (strlen (pattern))
 				my_strncpy (default_regex_pattern, pattern, sizeof (default_regex_pattern));
 			else {
-				if (default_regex_pattern[0])
+				if (*default_regex_pattern)
 					my_strncpy (pattern, default_regex_pattern, sizeof (default_regex_pattern));
 				else {
 					info_message (txt_no_match);
@@ -177,7 +169,7 @@ feed_articles (
 			if (strlen (address))
 				strcpy (default_mail_address, address);
 			else {
-				if (default_mail_address[0])
+				if (*default_mail_address)
 					strcpy (address, default_mail_address);
 				else {
 					info_message (txt_no_mail_address);
@@ -195,7 +187,7 @@ feed_articles (
 			if (strlen (command))
 				strcpy (default_pipe_command, command);
 			else {
-				if (default_pipe_command[0])
+				if (*default_pipe_command)
 					strcpy (command, default_pipe_command);
 				else {
 					info_message (txt_no_command);
@@ -209,23 +201,16 @@ feed_articles (
 				return;
 			}
 			wait_message (0, txt_piping);
-			Raw (FALSE);
+			EndWin();
 			break;
 		case FEED_PRINT:
-			if (cmd_line_printer[0])
-				sprintf (command, "%s %s", cmd_line_printer, REDIRECT_OUTPUT);
-			else
-				sprintf (command, "%s %s", group->attribute->printer, REDIRECT_OUTPUT);
+			sprintf (command, "%s %s", (*cmd_line_printer ? cmd_line_printer : group->attribute->printer), REDIRECT_OUTPUT);
 			break;
 		case FEED_SAVE:		/* ask user for filename to save to */
 		case FEED_SAVE_TAGGED:
 			free_save_array ();
 			if ((!default_auto_save || arts[respnum].archive == (char *) 0)) {
-
-				if (group->attribute->savefile != (char *) 0)
-					strcpy (save_file, group->attribute->savefile);
-				else
-					strcpy (save_file, default_save_file);
+				strcpy (save_file, ((group->attribute->savefile != (char *) 0) ? group->attribute->savefile : default_save_file));
 
 				if (function != FEED_SAVE_TAGGED) {
 					sprintf (msg, txt_save_filename, save_file);
@@ -235,17 +220,14 @@ feed_articles (
 						return;
 					}
 				}
-				if (strlen (filename)) {
+				if (*filename) {
 					if (group->attribute->savefile != (char *) 0) {
 						free (group->attribute->savefile);
 						group->attribute->savefile = my_strdup (filename);
-					} else
-						strcpy (default_save_file, filename);
-
-					my_strncpy (default_save_file, filename,
-						sizeof (default_save_file));
+					}
+					my_strncpy (default_save_file, filename, sizeof (default_save_file));
 				} else {
-					if (save_file[0])
+					if (*save_file)
 						my_strncpy (filename, save_file, sizeof (filename));
 					else {
 						info_message (txt_no_filename);
@@ -331,7 +313,7 @@ feed_articles (
 					my_strncpy (default_repost_group, group_name,
 						sizeof (default_repost_group));
 				} else {
-					if (default_repost_group[0]) {
+					if (*default_repost_group) {
 						my_strncpy (group_name, default_repost_group,
 							sizeof (group_name));
 					} else {
@@ -379,7 +361,7 @@ feed_articles (
 					if (can_post)
 						redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
 					else
-						info_message(txt_cannot_post);
+						info_message (txt_cannot_post);
 					break;
 
 				default:
@@ -437,7 +419,7 @@ feed_articles (
 						if (can_post)
 							redraw_screen = repost_article (group_name, &arts[i], i, supersede);
 						else
-							info_message(txt_cannot_post);
+							info_message (txt_cannot_post);
 						break;
 
 					default:
@@ -495,7 +477,7 @@ feed_articles (
 								if (can_post)
 									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
 								else
-									info_message(txt_cannot_post);
+									info_message (txt_cannot_post);
 								break;
 
 							default:
@@ -531,15 +513,13 @@ feed_articles (
 							proceed = TRUE;
 
 					if (proceed) {
-						if (level == PAGE_LEVEL) {
+						if (level == PAGE_LEVEL)
 							art_close ();
-						}
-						if (!does_article_exist (function, &arts[j], group_path)) {
+						if (!does_article_exist (function, &arts[j], group_path))
 							continue;
-						}
-						if (process_only_unread && arts[j].status == ART_READ) {
+						if (process_only_unread && arts[j].status == ART_READ)
 							continue;
-						}
+
 						switch (function) {
 
 							case FEED_MAIL:
@@ -567,7 +547,7 @@ feed_articles (
 								if (can_post)
 									redraw_screen = repost_article (group_name, &arts[j], j, supersede);
 								else
-									info_message(txt_cannot_post);
+									info_message (txt_cannot_post);
 								break;
 
 							default:

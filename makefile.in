@@ -7,7 +7,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 980117
+PVER		= 980202
 VER		= pre-$(LVER)-$(PVER)
 MAIL_ADDR 	= "urs@tin.org"
 
@@ -20,6 +20,7 @@ DOCDIR = ./doc
 INCDIR = ./include
 OBJDIR = ./src
 SRCDIR = ./src
+OLDDIR = ./old
 
 # OS2DIR    = ./os2
 # MISCDIR   = ./misc
@@ -30,28 +31,23 @@ SRCDIR = ./src
 # WIN32DIR  = ./win32
 
 HFILES	= \
-	$(INCDIR)/amiga.h \
-	$(INCDIR)/amigatcp.h \
-	$(INCDIR)/conf.h \
 	$(INCDIR)/bugrep.h \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
-	$(INCDIR)/msmail.h \
 	$(INCDIR)/nntplib.h \
-	$(INCDIR)/os_2.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
-	$(INCDIR)/version.h \
-	$(INCDIR)/win32.h \
-	$(INCDIR)/win32tcp.h
+	$(INCDIR)/version.h
+#	$(OLDDIR)/msmail.h
+#	$(OLDDIR)/os_2.h
+#	$(OLDDIR)/win32.h
+#	$(OLDDIR)/win32tcp.h
+#	$(INCDIR)/conf.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
-	$(SRCDIR)/actived.c \
-	$(SRCDIR)/amiga.c \
-	$(SRCDIR)/amigatcp.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/auth.c \
@@ -75,13 +71,9 @@ CFILES	= \
 	$(SRCDIR)/main.c \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
-	$(SRCDIR)/msmail.c \
 	$(SRCDIR)/newsrc.c\
 	$(SRCDIR)/nntplib.c \
-	$(SRCDIR)/nntpw32.c \
-	$(SRCDIR)/nntpvms.c \
 	$(SRCDIR)/open.c \
-	$(SRCDIR)/os_2.c \
 	$(SRCDIR)/page.c \
 	$(SRCDIR)/parsdate.y \
 	$(SRCDIR)/pgp.c \
@@ -100,10 +92,14 @@ CFILES	= \
 	$(SRCDIR)/string.c \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
-	$(SRCDIR)/win32.c \
-	$(SRCDIR)/win32tcp.c \
 	$(SRCDIR)/xref.c \
 	$(SRCDIR)/vms.c
+#	$(OLDDIR)/msmail.c
+#	$(OLDDIR)/nntpw32.c
+#	$(OLDDIR)/nntpvms.c
+#	$(OLDDIR)/os_2.c
+#	$(OLDDIR)/win32.c
+#	$(OLDDIR)/win32tcp.c
 
 DOC	= \
 	$(DOCDIR)/HACKERS \
@@ -150,7 +146,11 @@ MISC	= \
 AMIGA	= \
 	$(AMGDIR)/README \
 	$(AMGDIR)/smakefile \
+	$(AMGDIR)/amiga.h \
+	$(AMGDIR)/amigatcp.h \
 	$(AMGDIR)/actived.c \
+	$(AMGDIR)/amiga.c \
+	$(AMGDIR)/amigatcp.c \
 	$(AMGDIR)/parsdate.c
 
 NNTP	= \
@@ -442,7 +442,7 @@ print:
 distclean:
 	$(CD) pcre && $(MAKE) @cf_cv_makeflags@ $@
 	$(CD) src && $(MAKE) @cf_cv_makeflags@ $@
-	$(RM) -f config.cache config.log config.status makefile */Makefile include/autoconf.h
+	$(RM) -f config.cache config.log config.status makefile */Makefile include/autoconf.h td-conf.out
 
 configure: configure.in aclocal.m4
 	autoconf

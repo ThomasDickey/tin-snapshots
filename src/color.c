@@ -38,7 +38,7 @@ static t_bool check_valid_mark (const char *s, int c);
 static t_bool isalp (int c);
 static void color_fputs (const char *s, FILE *stream, int color);
 
-#if USE_CURSES
+#ifdef USE_CURSES
 static void
 set_colors (
 	int fcolor,
@@ -120,7 +120,7 @@ fcol (
 	TRACE(("fcol(%d) %s", color, txt_colors[color-MIN_COLOR]))
 	if (use_color) {
 		if (color >= MIN_COLOR && color <= MAX_COLOR) {
-#if USE_CURSES
+#ifdef USE_CURSES
 			set_colors(color, current_bcol);
 #else
 			int bold;
@@ -134,8 +134,9 @@ fcol (
 			current_fcol = color;
 		}
 	}
-#if USE_CURSES
-	else set_colors(default_fcol, default_bcol);
+#ifdef USE_CURSES
+	else
+		set_colors(default_fcol, default_bcol);
 #endif /* USE_CURSES */
 }
 
@@ -147,7 +148,7 @@ bcol (
 	TRACE(("bcol(%d) %s", color, txt_colors[color-MIN_COLOR]))
 	if (use_color) {
 		if (color >= MIN_COLOR && color <= MAX_BACKCOLOR) {
-#if USE_CURSES
+#ifdef USE_CURSES
 			set_colors(current_fcol, color);
 #else
 			if (color < 0)
@@ -157,8 +158,9 @@ bcol (
 			current_bcol = color;
 		}
 	}
-#if USE_CURSES
-	else set_colors(default_fcol, default_bcol);
+#ifdef USE_CURSES
+	else
+		set_colors(default_fcol, default_bcol);
 #endif
 }
 
@@ -360,9 +362,8 @@ print_color (
 			} else if (in_headers) {
 				color = col_newsheaders;
 				fcol (col_newsheaders);
-			} else {
+			} else
 				fcol (col_text);
-			}
 		}
 	}
 

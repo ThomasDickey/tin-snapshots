@@ -173,10 +173,7 @@ void modifiedstrncpy(
 		else source++;
 	}
 	*c = 0;
-	if(decode)
-		c = rfc1522_decode(buf);
-	else
-		c = buf;
+	c = (decode ? (rfc1522_decode(buf)) : buf);
 
 	while (--size)
 		*target++ = *c++;
@@ -367,7 +364,7 @@ OUT:
  */
 
 /*fix me - put me in tin.h */
-#define FOLD_TO_UPPER(a)        (toupper ((unsigned char)(a)))
+#define	FOLD_TO_UPPER(a)	(toupper ((unsigned char)(a)))
 
 #ifndef HAVE_STRCASECMP
 int

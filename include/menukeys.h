@@ -13,7 +13,7 @@
  */
 
 #ifndef MENUKEYS_H
-#define MENUKEYS_H 1
+#	define MENUKEYS_H 1
 
 
 /* Revised 9 October 1996 by Branden Robinson in ASCII order
@@ -90,19 +90,19 @@
  * When adding key functionality, be aware of key functions in the "big five"
  * levels of tin operation: top (group selection), group, thread, article
  * (pager), and help.  If possible, when adding a key to any of these levels,
- * the others to make sure that the key doesn't do something non-analogous
- * elsewhere.  For instance, having "^R" map to "redraw screen" at article
- * level and "reset .newsrc" (a drastic and unreversible action) is a bad
- * idea.
+ * check the others to make sure that the key doesn't do something
+ * non-analogous elsewhere.  For instance, having "^R" map to "redraw screen"
+ * at article level and "reset .newsrc" (a drastic and unreversible action)
+ * at top level is a bad idea.
  *
  * [make emacs happy: "]
  */
 
 /* general keys
- * ESC,
- * ' ','!','$','/','?',
- * 'M',
- * '^',
+ * ESC
+ * ' ','!','$','/','?'
+ * 'L','M','O','Q'
+ * '^'
  * 'b','i','j','k','q','v'
  * ctrl('B'),ctrl('D'),ctrl('F'),ctrl('N'),ctrl('O'),ctrl('P'),ctrl('U')
  */
@@ -110,7 +110,7 @@
 #define iKeyAbort ESC
 #define iKeyPageDown3 ' '
 #ifndef NO_SHELL_ESCAPE
-#  define iKeyShellEscape '!'
+#	define iKeyShellEscape '!'
 #endif
 #define iKeySetRange '#'
 #define iKeyLastPage '$'
@@ -118,6 +118,7 @@
 #define iKeySearchSubjB '?'
 #define iKeyLookupMessage 'L'
 #define iKeyOptionMenu 'M'
+#define iKeyPostponed2 'O'
 #define iKeyQuitTin 'Q'
 #define iKeyFirstPage '^'
 #define iKeyPageUp3 'b'
@@ -243,8 +244,8 @@
 #define iKeyPageToggleTex2iso '\"'
 #define iKeyPageToggleRot '%'
 #ifdef HAVE_COLOR
-#  define iKeyPageToggleColor '&'
-#  define iKeyPageToggleHighlight '_'
+#	define iKeyPageToggleColor '&'
+#	define iKeyPageToggleHighlight '_'
 #endif
 #define iKeyPageLastViewed '-'
 /* digits 0-9 in use */

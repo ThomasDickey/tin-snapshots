@@ -44,8 +44,7 @@
  */
 #if defined(__amiga__) || defined(__amiga)
 #	define SMALL_MEMORY_MACHINE
-#	define DONT_REREAD_ACTIVE_FILE
-#	ifndef __GNUC__
+#	if !defined(__GNUC__)
 #		undef M_UNIX
 #		define M_AMIGA
 #		define SIG_ARGS /*nothing, since compiler doesn't handle it*/
@@ -57,21 +56,41 @@
 
 #ifdef VMS
 #	ifdef __DECC
-#		include	<unixio.h>
+#		include <unixio.h>
 #	else
-#		include	<stdio.h>
+#		ifndef __VMS_VER  /* assume old types.h */
+			typedef unsigned short mode_t;
+#			undef HAVE_STRFTIME
+#		endif
+#		include <stdio.h>
 #	endif
+#	ifdef SOCKETSHR_TCP
+#		include <socketshr.h>
+#		include <unistd.h>
+#		ifndef SOCKETSHR_HAVE_DUP
+#			define dup
+#		endif
+#		ifndef SOCKETSHR_HAVE_FERROR
+#			define ferror(a) (0)
+#		endif
+#	endif
+#	include <curses.h>
+#	include <stat.h>
+#	undef	HAVE_SELECT
+#	define CASE_PROBLEM
+#	define HAVE_ERRNO_H
 #	define NNTP_ONLY
 #	define NNTP_INEWS
 #	define DONT_HAVE_PIPING
 #	define NO_SHELL_ESCAPE
 #	define USE_CLEARSCREEN
+#	ifndef MM_CHARSET
+#		define MM_CHARSET "ISO-8859-1"
+#	endif
 	/* Apparently this means fileops=create if not already there - no idea
 	 * why this should be needed. Standard fopen() implies this in arg 2
 	 */
-#	define FOPEN_OPTS	, "fop=cif"
-extern char *get_uaf_fullname();
-
+	extern char *get_uaf_fullname();
 #	ifdef MULTINET
 #		include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TYPES.H"
 #		include "MULTINET_ROOT:[MULTINET.INCLUDE.SYS]TIME.H"
@@ -82,22 +101,21 @@ extern char *get_uaf_fullname();
 #		endif /* VAXC */
 #		include <types.h>
 #	endif /* !MULTINET */
-#	include <stat.h>
+#	define FOPEN_OPTS       , "fop=cif"
+#else
+#	define FOPEN_OPTS
 #endif /* VMS */
 
-#ifndef VMS
-#	include	<stdio.h>
-#	ifdef HAVE_ERRNO_H
-#		include	<errno.h>
-#	else
-#		include	<sys/errno.h>
+#include <stdio.h>
+#ifdef HAVE_ERRNO_H
+#	include	<errno.h>
+#else
+#	include	<sys/errno.h>
+#endif
+#if !defined(errno)
+#	ifdef DECL_ERRNO
+		extern int errno;
 #	endif
-#	if !defined(errno)
-#		ifdef DECL_ERRNO
-			extern int errno;
-#		endif
-#	endif
-#	define FOPEN_OPTS
 #endif
 
 #ifdef HAVE_STDDEF_H
@@ -194,7 +212,7 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_SYS_SELECT_H
-#	if NEED_TIMEVAL_FIX
+#	ifdef NEED_TIMEVAL_FIX
 #		define timeval fake_timeval
 #		include <sys/select.h>
 #		undef timeval
@@ -216,15 +234,15 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_CONFIG_H
-#	if HAVE_DIRENT_H
+#	ifdef HAVE_DIRENT_H
 #		include <dirent.h>
 #		define	DIR_BUF struct dirent
 #		define	D_NAMLEN(p)	(p)->d_reclen
 #	else
-#		if HAVE_SYS_DIR_H
+#		ifdef HAVE_SYS_DIR_H
 #			include <sys/dir.h>
 #		endif
-#		if HAVE_SYS_NDIR_H
+#		ifdef HAVE_SYS_NDIR_H
 #			include <sys/ndir.h>
 #		endif
 #		define	DIR_BUF struct direct
@@ -334,7 +352,7 @@ extern char *get_uaf_fullname();
 #			ifdef VMS
 #				define	SPOOLDIR	"NEWSSPOOL:[000000]"
 #			else
-#				define	SPOOLDIR	"/usr/spool/news"
+#				define	SPOOLDIR	"/var/spool/news"
 #			endif /* VMS */
 #		endif /* !SPOOLDIR */
 #		ifndef NEWSLIBDIR
@@ -437,11 +455,11 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_EDITOR	"EDIT/TPU"
 #		define	DEFAULT_MAILBOX	"SYS$LOGIN:"
 #		define	DEFAULT_MAILER	"MAIL"
-#		define	MAILER_FORMAT	"MAIL /SUBJECT=\"%S\" %F \"IN%%\"\"%T\"\""
-#		define	DEFAULT_POSTER	"inews %s"
+#		define	MAILER_FORMAT	"MAIL /SUBJECT=\"%S\" %F MX%%\"%T\""
+#		define	DEFAULT_POSTER	"inews %s."
 #		define	DEFAULT_PRINTER	"PRINT/DELETE"
-#		define	DEFAULT_UUDECODE	"uudecode %s"
-#		define	DEFAULT_UNSHAR	"unshar %s"
+#		define	DEFAULT_UUDECODE	"uudecode %s."
+#		define	DEFAULT_UNSHAR	"unshar %s."
 #	endif
 #	ifdef M_OS2
 #		ifndef DEFAULT_EDITOR
@@ -566,15 +584,11 @@ extern char *get_uaf_fullname();
 #endif
 
 /*
- * Should active file be reread for new news & if so how often
+ * How often should the active file be reread for new news
  */
 
-#ifdef DONT_REREAD_ACTIVE_FILE
-#	define	REREAD_ACTIVE_FILE_SECS 0
-#else
-#	ifndef REREAD_ACTIVE_FILE_SECS
-#		define	REREAD_ACTIVE_FILE_SECS 1200	/* seconds (20 mins) */
-#	endif
+#ifndef REREAD_ACTIVE_FILE_SECS
+#	define	REREAD_ACTIVE_FILE_SECS 1200	/* seconds (20 mins) */
 #endif
 
 /*
@@ -1605,8 +1619,8 @@ extern void joinpath (char *result, const char *dir, const char *file);
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX	0x9b
 #	endif
-extern void joinpath (char *result, char *dir, char *file);
-extern void joindir (char *result, char *dir, char *file);
+extern void joinpath (char *result, const char *dir, const char *file);
+extern void joindir (char *result, const char *dir, const char *file);
 #endif /* VMS */
 
 #ifdef M_OS2
@@ -1899,7 +1913,15 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #else
 #	ifdef HAVE_TMPNAM
 #		define	my_tempnam(a,b)	tmpnam((char *)0)
-#  endif
+#	endif
+#endif
+
+/* define some standard places to look for a tin.defaults file */
+#define TIN_DEFAULTS_BUILTIN "/etc/opt/tin","/etc/tin","/etc","/usr/local/lib/tin","/usr/local/lib","/usr/local/etc/tin","/usr/local/etc","/usr/lib/tin","/usr/lib",NULL
+#ifdef	TIN_DEFAULTS_PATH
+#	define TIN_DEFAULTS TIN_DEFAULTS_PATH,TIN_DEFAULTS_BUILTIN
+#else
+#	define TIN_DEFAULTS TIN_DEFAULTS_BUILTIN
 #endif
 
 #endif /* !TIN_H */

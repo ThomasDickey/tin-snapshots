@@ -70,7 +70,7 @@ debug_nntp (
 	char file[PATH_LEN];
 	FILE *fp;
 
-	if (debug == 0)
+	if (!debug)
 		return;
 
 	sprintf (file, "%sNNTP", TMPDIR);

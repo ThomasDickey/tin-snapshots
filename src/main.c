@@ -22,7 +22,11 @@
 	extern char	**_WBArgv;
 	char __stdiowin[] = "con:0/12/640/200/TIN " VERSION;
 	char __stdiov37[] = "/AUTO/NOCLOSE";
-#endif
+#else
+#	ifdef VMS
+	int debug;
+#	endif /* VMS */
+#endif /* M_AMIGA && __SASC_650 */
 
 static char **cmdargs;
 static int num_cmdargs;
@@ -117,7 +121,7 @@ main (
 #endif
 
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
-#	if !USE_CURSES
+#	ifndef USE_CURSES
 	if (INTERACTIVE2) {
 		if (!SetupScreen ()) {
 			error_message (txt_screen_init_failed, progname);
@@ -248,7 +252,7 @@ main (
 	 * Load my_groups[] from the .newsrc file. We append these groups to any
 	 * new newsgroups and command line newsgroups already loaded
 	 */
-	read_newsrc (newsrc, 0);
+	read_newsrc (newsrc, FALSE);
 
 	/*
 	 * We have to show all groups with command line groups
@@ -775,10 +779,7 @@ save_or_mail_new_news (void)
 		catchup = FALSE;
 		do_update ();
 		catchup = i;			/* set catchup to previous value */
-		if (mail_news)
-			check_start_save_any_news (MAIL_ANY_NEWS);
-		else
-			check_start_save_any_news (SAVE_ANY_NEWS);
+		check_start_save_any_news (mail_news ? MAIL_ANY_NEWS : SAVE_ANY_NEWS);
 		tin_done (EXIT_OK);
 	}
 }
@@ -834,7 +835,6 @@ update_index_files (void)
 #			endif /* HAVE_SETPGRP */
 #		endif /* BSD */
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */
-					signal (SIGALRM, SIG_IGN);	/* stop indexing resyning active file */
 
 					if (nntp_open () != 0)				/* connect server if we are using nntp */
 						tin_done (EXIT_ERROR);

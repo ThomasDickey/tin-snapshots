@@ -55,16 +55,14 @@ boundary_cmp(
 		return 0;
 
 	if (line[strlen(boundary) + 2] != '-') {
-		if (nl ? line[strlen(boundary) + 2] == '\n'
-			 : line[strlen(boundary) + 2] == '\0')
+		if (nl ? line[strlen(boundary) + 2] == '\n' : line[strlen(boundary) + 2] == '\0')
 			return 1;
 		else
 			return 0;
 	}
 	if (line[strlen(boundary) + 3] != '-')
 		return 0;
-	if (nl ? line[strlen(boundary) + 4] == '\n'
-		 : line[strlen(boundary) + 4] == '\0')
+	if (nl ? line[strlen(boundary) + 4] == '\n' : line[strlen(boundary) + 4] == '\0')
 		return 2;
 	else
 		return 0;
@@ -423,7 +421,7 @@ rfc1521_encode(
 }
 
 /*
- * KS C 5601 -> ISO 2022-KR encoding for Korean mail exchange
+ * EUC-KR -> ISO 2022-KR conversion for Korean mail exchange
  * NOT to be used for News posting, which is made certain
  * by setting post_mime_encoding to 8bit
  */

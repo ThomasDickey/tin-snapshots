@@ -5,7 +5,7 @@
  *  Created   : 24.08.1995
  *  Updated   : 04.12.1997
  *  Notes     : #include files, #defines & struct's
- *  Copyright : (c) Copyright 1996-98 by Thomas Dickey 
+ *  Copyright : (c) Copyright 1996-98 by Thomas Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -78,6 +78,7 @@
  * Data types
  */
 #undef	mode_t
+#undef	off_t
 #undef	pid_t
 #undef	size_t
 #undef	time_t
@@ -244,6 +245,7 @@
 #undef	DECL_REWIND
 #undef	DECL_SELECT
 #undef	DECL_SETEGID
+#undef	DECL_SETENV
 #undef	DECL_SETEUID
 #undef	DECL_SETPGRP
 #undef	DECL_SETREGID
@@ -411,5 +413,12 @@
  * Use this if you want pid attached to the end of .article filename
  */
 #undef APPEND_PID
+
+/*
+ * The directory, where tin looks first for its tin.defaults file
+ * can be left empty, tin searches for some standard places
+ * XXXXX please define surrounded with double quotes! XXXXX
+ */
+#undef TIN_DEFAULTS_PATH
 
 #undef HAVE_COFFEE

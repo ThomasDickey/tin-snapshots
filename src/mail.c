@@ -241,7 +241,7 @@ read_groups_descriptions (
 				*q = ' ';
 
 			psGrp->description = my_strdup (p);
-#if 0 /* not usefull for cache_overview_files */
+#if 0 /* not useful for cache_overview_files */
 			if (psGrp->type == GROUP_TYPE_NEWS) {
 				if (fp_save != (FILE *) 0 &&
 						read_news_via_nntp &&

@@ -3,7 +3,7 @@
  *  Module    : bugrep.h
  *  Author    : Urs Janssen <urs@tin.org>
  *  Created   : 30.07.1997
- *  Updated   : 24.12.1997
+ *  Updated   : 01.02.1998
  *  Notes     :
  *  Copyright : (c) Copyright 1997-98 by Urs Janssen
  *              You may  freely  copy or  redistribute this  software,
@@ -15,28 +15,30 @@
 #ifndef BUGREP_H
 #	define BUGREP_H	1
 
-#	ifdef M_AMIGA
-#		define	BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
-#	endif
-
 #	ifdef M_UNIX
 #		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
-#	endif
+#	endif /* M_UNIX */
 
-#	ifdef M_OS2
-#		define	BUG_REPORT_ADDRESS	"andreas@scilink.org"
-#	endif
+#	ifdef M_AMIGA
+#		define	BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
+#	endif /* M_AMIGA */
 
 #	ifdef VMS
-#		define	BUG_REPORT_ADDRESS	"mcquill@next.duq.edu"
+#		define	BUG_REPORT_ADDRESS	"stenns@vw.tci.uni-hannover.de"
 #	endif /* VMS */
+
+/* OS2 and WIN32 are currently not supported */
+#	ifdef M_OS2
+#		define	BUG_REPORT_ADDRESS	"andreas@scilink.org"
+#	endif /* M_OS2 */
 
 #	ifdef WIN32
 #		define	BUG_REPORT_ADDRESS	"nigele@microsoft.com"
-#	endif
+#	endif /* WIN32 */
 
+/* fallback */
 #	ifndef BUG_REPORT_ADDRESS
 #		define	BUG_REPORT_ADDRESS	"tin-bugs@tin.org"
-#	endif
+#	endif /* BUG_REPORT_ADDRESS */
 
 #endif /* !BUGREP_H */

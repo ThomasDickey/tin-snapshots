@@ -29,6 +29,7 @@ int yank_in_active_file = TRUE;
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
+static int continual_key (int ch, int ch1);
 static int next_unread_group (int enter_group);
 static int prompt_group_num (int ch);
 static int reposition_group (struct t_group *group, int default_num);
@@ -41,6 +42,48 @@ static int iParseRange (char *pcRange, int iNumMin, int iNumMax, int iNumCur, in
 static void vDelRange (int iLevel, int iNumMax);
 static void erase_group_arrow (void);
 
+/*
+ *  TRUE, if we should check whether it's time to reread the active file
+ *  after this keypress.
+ */
+
+static int
+continual_key (int ch, int ch1)
+{
+	switch(ch) {
+		case iKeyShellEscape:
+		case iKeyLookupMessage:
+		case iKeyOptionMenu:
+		case iKeyQuit:
+		case iKeyPostponed:
+		case iKeySelectResetNewsrc:
+		case iKeySelectQuit2:
+		case iKeySelectBugReport:
+		case iKeySelectPostHist:
+		case iKeySelectQuitNoWrite:
+		case iKeySelectSyncWithActive:
+		case iKeySelectHelp:
+		case iKeySelectPost:
+			return FALSE;
+
+#ifndef WIN32
+		case ESC:
+#ifdef HAVE_KEY_PREFIX
+		case KEY_PREFIX:
+#endif
+			switch(ch1) {
+#endif /* WIN32 */
+				case KEYMAP_LEFT:
+					return FALSE;
+#ifndef WIN32
+			}
+			/* FALLTHROUGH */
+#endif /* WIN32 */
+
+		default:
+			return TRUE;
+	}
+}
 
 void
 selection_index (
@@ -72,10 +115,9 @@ selection_index (
 	ClearScreen();
 	set_groupname_len (FALSE);	/* find longest subscribed to groupname */
 	show_selection_page ();	/* display group selection page */
-	set_alarm_signal ();		/* set alarm signal for resync_active_file () */
 
 	forever {
-		if (!resync_active_file ()) {	/* reread active file if alarm set */
+		if (!resync_active_file ()) {	/* reread active file if necessary */
 			if (reread_active_after_posting ()) {
 				show_selection_page ();
 			}
@@ -91,9 +133,9 @@ selection_index (
 				ch1 = get_arrow_key (ch);
 		}
 #endif /* WIN32 */
-		if (ch != iKeyQuit && ch != iKeySelectQuit2) {
+
+		if (continual_key (ch, ch1))
 			(void) resync_active_file ();
-		}
 
 		if (ch > '0' && ch <= '9') {
 			(void) prompt_group_num (ch);
@@ -217,9 +259,8 @@ select_read_group:
 
 					if (index_point == GRP_QUIT)
 						goto select_done;
-#ifndef DONT_REREAD_ACTIVE_FILE
-					if (!reread_active_file)
-#endif
+
+					if (!reread_active_file ())
 						show_selection_page ();
 				} else
 					info_message (txt_no_arts);
@@ -270,11 +311,7 @@ select_page_down:
 select_down:
 				if (!group_top)
 					break;
-
-				if (cur_groupnum + 1 >= group_top)
-					move_to_group(0);
-				else
-					move_to_group(cur_groupnum + 1);
+				move_to_group((cur_groupnum + 1 >= group_top) ? 0 : (cur_groupnum + 1));
 				break;
 
 			case iKeyUp:		/* line up */
@@ -282,11 +319,7 @@ select_down:
 select_up:
 				if (!group_top)
 					break;
-
-				if (cur_groupnum == 0)
-					move_to_group (group_top - 1);
-				else
-					move_to_group (cur_groupnum - 1);
+				move_to_group ((cur_groupnum == 0) ? (group_top - 1) : (cur_groupnum - 1));
 				break;
 
 			case iKeySelectResetNewsrc:	/* reset .newsrc */
@@ -316,7 +349,7 @@ select_page_up:
 					cur_groupnum = ((cur_groupnum - scroll_lines) / scroll_lines) * scroll_lines;
 				if (cur_groupnum < 0)
 					cur_groupnum = 0;
-				if (cur_groupnum < first_group_on_screen ||  cur_groupnum >= last_group_on_screen)
+				if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen)
 					show_selection_page ();
 				else
 					draw_group_arrow ();
@@ -408,14 +441,12 @@ select_page_up:
 				break;
 
 			case iKeyOptionMenu:	/* option menu */
-				set_alarm_clock_off ();
 				(void) change_config_file(NULL);
 				set_signals_select ();	/* just to be sure */
 				free_attributes_array ();
 				read_attributes_file (global_attributes_file, TRUE);
 				read_attributes_file (local_attributes_file, FALSE);
 				show_selection_page ();
-				set_alarm_clock_on ();
 				break;
 
 			case iKeySelectNextUnreadGrp:	/* goto next unread group */
@@ -497,7 +528,7 @@ select_done:
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
 					vWriteNewsrc();	/* save current newsrc */
 					delete_group(CURR_GROUP.name); /* remove bogus group */
-					read_newsrc(newsrc, 1);	/* reload newsrc*/
+					read_newsrc(newsrc, TRUE);	/* reload newsrc*/
 					toggle_my_groups (show_only_unread_groups, ""); /* keep current display-state */
 					show_selection_page(); /* reddraw screen */
 					info_message (buf);
@@ -537,7 +568,8 @@ select_done:
 				}
 				break;
 
-			case iKeyPostponed:	/* post postponed article */
+			case iKeyPostponed:
+			case iKeyPostponed2:	/* post postponed article */
 				if (can_post) {
 					if (pickup_postponed_articles(FALSE, FALSE)) {
 						show_selection_page ();
@@ -556,7 +588,6 @@ select_done:
 			case iKeySelectYankActive:	/* pull in rest of groups from active */
 				if (yank_in_active_file) {
 					wait_message (0, txt_yanking_all_groups);
-					set_alarm_clock_off ();
 					n = group_top;
 					if (group_top) {
 						strcpy (buf, CURR_GROUP.name);
@@ -596,7 +627,6 @@ select_done:
 					set_groupname_len (yank_in_active_file);
 					show_selection_page ();
 					yank_in_active_file = TRUE;
-					set_alarm_clock_on ();
 				}
 				break;
 
@@ -700,7 +730,7 @@ show_selection_page (void)
 	}
 
 	for (j=0, i=first_group_on_screen; i < last_group_on_screen; i++, j++) {
-#if USE_CURSES
+#ifdef USE_CURSES
 		char sptr[BUFSIZ];
 #else
 		char *sptr = screen[j].col;
@@ -727,16 +757,13 @@ show_selection_page (void)
 			subs = 'D';
 		else if (active[n].subscribed)			/* Important that this preceeds Newgroup */
 			subs = group_flag (active[n].moderated);
-		else if (active[n].newgroup)
-			subs = 'N';		/* New (but unsubscribed) group */
 		else
-			subs = 'u';		/* unsubscribed group */
+			subs = ((active[n].newgroup) ? 'N' : 'u'); /* New (but unsubscribed) group or unsubscribed group */
 
 		strncpy(active_name, active[n].name, groupname_len);
 		active_name[groupname_len+1] = '\0';
-		if (blank_len > 254) {
+		if (blank_len > 254)
 			blank_len = 254;
-		}
 		/* copy of active[n].description fix some malloc bugs kg */
 		strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
 		group_descript[blank_len+1] = '\0';
@@ -836,7 +863,7 @@ draw_group_arrow (void)
 		info_message (txt_no_groups);
 	else if (info_in_last_line) {
 		clear_message ();
-		center_line (cLINES, FALSE, CURR_GROUP.description ?  CURR_GROUP.description : txt_no_description);
+		center_line (cLINES, FALSE, CURR_GROUP.description ? CURR_GROUP.description : txt_no_description);
 	}
 }
 
@@ -845,7 +872,7 @@ draw_group_arrow (void)
 static void
 yank_active_file (void)
 {
-	reread_active_file = TRUE;
+	force_reread_active_file = TRUE;
 	resync_active_file ();
 }
 #endif /* INDEX_DAEMON */
@@ -867,7 +894,7 @@ choose_new_group (void)
 	if (strlen (buf)) {
 		strcpy (default_goto_group, buf);
 	} else {
-		if (default_goto_group[0]) {
+		if (*default_goto_group) {
 			strcpy (buf, default_goto_group);
 		} else {
 			return -1;
@@ -955,12 +982,9 @@ reposition_group (
 		return default_num;
 	}
 
-	if (strlen (pos)) {
-		if (pos[0] == '$')
-			pos_num = group_top;
-		else
-			pos_num = atoi (pos);
-	} else {
+	if (strlen (pos))
+		pos_num = ((pos[0] == '$') ? group_top: atoi (pos));
+	else {
 		if (default_move_group)
 			pos_num = default_move_group;
 		else
@@ -995,7 +1019,7 @@ reposition_group (
 	 * get the right position
 	 */
 	if (pos_group_in_newsrc (group, pos_num - newgroups)) {
-		read_newsrc (newsrc, 1);
+		read_newsrc (newsrc, TRUE);
 		default_move_group = pos_num;
 		return (pos_num-1);
 	} else {
@@ -1010,18 +1034,12 @@ catchup_group (
 	struct t_group *group,
 	int goto_next_unread_group)
 {
-	if (!confirm_action || prompt_yn (cLINES,
-					sized_message(txt_mark_group_read, group->name), TRUE) == 1) {
+	if (!confirm_action || prompt_yn (cLINES, sized_message(txt_mark_group_read, group->name), TRUE) == 1) {
 		grp_mark_read (group, NULL);
-
-		mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
-			9, "     ");
-
+		mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen, 9, "     ");
 		move_to_group(cur_groupnum + 1);
-
-		if (goto_next_unread_group) {
+		if (goto_next_unread_group)
 			next_unread_group (FALSE);
-		}
 	}
 }
 
@@ -1054,15 +1072,16 @@ next_unread_group (
 		return GRP_UNINDEXED;
 	}
 
-	if (i != cur_groupnum) {
+	if (i != cur_groupnum)
 		erase_group_arrow ();
-	}
+
 	cur_groupnum = i;
-	if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen) {
+
+	if (cur_groupnum < first_group_on_screen || cur_groupnum >= last_group_on_screen)
 		show_selection_page ();
-	} else {
+	else
 		draw_group_arrow ();
-	}
+
 	space_mode = pos_first_unread;
 
 	if (enter_group) {
@@ -1071,9 +1090,10 @@ next_unread_group (
 			index_point = GRP_UNINDEXED;
 			group_page (&CURR_GROUP);
 		} while (index_point == GRP_GOTONEXT || index_point == GRP_CONTINUE);
-		if (index_point == GRP_QUIT) {
+
+		if (index_point == GRP_QUIT)
 			return GRP_QUIT;
-		}
+
 		show_selection_page ();
 	}
 
@@ -1099,33 +1119,29 @@ set_groupname_len (
 	if (all_groups) {
 		for (i = 0 ; i < num_active ; i++) {
 			len = strlen (active[i].name);
-			if (len > groupname_len) {
+			if (len > groupname_len)
 				groupname_len = len;
-			}
 		}
 	} else {
 		for (i = 0 ; i < group_top ; i++) {
 			len = strlen (active[my_group[i]].name);
-			if (len > groupname_len) {
+			if (len > groupname_len)
 				groupname_len = len;
-			}
 		}
 	}
 
 	if (groupname_len >= (cCOLS - SELECT_MISC_COLS)) {
 		groupname_len = cCOLS - SELECT_MISC_COLS - 1;
-		if (groupname_len < 0) {
+		if (groupname_len < 0)
 			groupname_len = 0;
-		}
 	}
 
 	/*
 	 * If newsgroups descriptions are ON then cut off groupnames
 	 * to specified max. length otherwise display full length
 	 */
-	if (show_description && groupname_len > groupname_max_length) {
+	if (show_description && groupname_len > groupname_max_length)
 		groupname_len = groupname_max_length;
-	}
 }
 
 /*
@@ -1156,7 +1172,7 @@ toggle_my_groups (
 	old_curr_group[0] = '\0';
 
 	if (group_top) {
-		if (!only_unread_groups || reread_active_file) {
+		if (!only_unread_groups || reread_active_file ()) {
 
 			if (group[0] != '\0') {
 				if ((i = find_group_index (group)) >= 0)
@@ -1187,9 +1203,8 @@ toggle_my_groups (
 			if (only_unread_groups) {
 				if (active[i].newsrc.num_unread || (active[i].bogus && strip_bogus == BOGUS_ASK))
 					my_group_add (buf);
-			} else {
+			} else
 				my_group_add (buf);
-			}
 		}
 	}
 	fclose (fp);
@@ -1221,7 +1236,7 @@ subscribe_pattern (
 	if (!num_active)
 		return;
 
-	if (!prompt_string (prompt, buf, HIST_OTHER) || !buf[0]) {
+	if (!prompt_string (prompt, buf, HIST_OTHER) || !*buf) {
 		clear_message ();
 		return;
 	}
@@ -1345,9 +1360,9 @@ iSetRange (
 	/*
 	 * Parse range string
 	 */
-	if (!iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax)) {
+	if (!iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
 		info_message ("Invalid range - valid are '0-9.$' eg. 1-$");
-	} else {
+	else {
 /*
 		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]",
 			pcPtr, acRng, iRngMin, iRngMax);
@@ -1406,12 +1421,10 @@ iParseRange (
 			if (iSetMax) {
 				*piRngMax = atoi (pcPtr);
 				iDone = TRUE;
-			} else {
+			} else
 				*piRngMin = atoi (pcPtr);
-			}
-			while (*pcPtr >= '0' && *pcPtr <= '9') {
+			while (*pcPtr >= '0' && *pcPtr <= '9')
 				pcPtr++;
-			}
 		} else {
 			switch (*pcPtr) {
 				case '-':
@@ -1421,9 +1434,8 @@ iParseRange (
 					if (iSetMax) {
 						*piRngMax = iNumCur;
 						iDone = TRUE;
-					} else {
+					} else
 						*piRngMin = iNumCur;
-					}
 					break;
 				case '$':
 					if (iSetMax) {
@@ -1438,9 +1450,8 @@ iParseRange (
 		}
 	}
 
-	if (*piRngMin >= iNumMin && *piRngMax > iNumMin && *piRngMax <= iNumMax) {
+	if (*piRngMin >= iNumMin && *piRngMax > iNumMin && *piRngMax <= iNumMax)
 		iRetCode = TRUE;
-	}
 
 	return iRetCode;
 }
@@ -1456,9 +1467,8 @@ vDelRange (
 	switch (iLevel)
 	{
 		case SELECT_LEVEL:
-			for (iIndex = 0; iIndex < iNumMax-1; iIndex++) {
+			for (iIndex = 0; iIndex < iNumMax-1; iIndex++)
 				active[iIndex].inrange = FALSE;
-			}
 			break;
 		case GROUP_LEVEL:
 			for (iIndex = 0; iIndex < iNumMax-1; iIndex++) {
@@ -1469,9 +1479,8 @@ vDelRange (
 			}
 			break;
 		case THREAD_LEVEL:
-			for (iIndex = 0; iIndex < iNumMax-1; iIndex++) {
+			for (iIndex = 0; iIndex < iNumMax-1; iIndex++)
 				arts[iIndex].inrange = FALSE;
-			}
 /*
 			for (iIndex = base[thread_basenote]; iIndex >= 0 ; iIndex = arts[iIndex].thread) {
 				arts[iIndex].inrange = FALSE;

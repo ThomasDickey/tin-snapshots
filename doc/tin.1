@@ -488,6 +488,9 @@ entering `$' the group will be the last group displayed.
 User configurable options menu (for more information see section
 GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES).
 .TP
+.B O
+Reload postponed article. See also ``\fB-o\fR'' command-line switch.
+.TP
 .B q
 Quit \fBtin\fR - ask the user to confirm if 'confirm_to_quit' is on.
 .TP
@@ -500,7 +503,7 @@ containing unread articles. Command has no effect if groups were read from
 the command line when \fBtin\fR was started.
 .TP
 .B R
-Mail a bug report or comment to $\fBBUG_ADDRESS\fR. This is the best way of
+Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way of
 getting bugs fixed and features added/changed.
 .TP
 .B s
@@ -684,6 +687,9 @@ Go to next unread article.
 Output current article / thread / auto selected (hot) articles /
 articles matching pattern / tagged articles to printer.
 .TP
+.B O
+Reload postponed article. See also ``fB-o\fR'' command-line switch.
+.TP
 .B p
 Go to previous group.
 .TP
@@ -847,6 +853,9 @@ Toggle inverse video.
 .B K
 Mark thread as read.
 .TP
+.B O
+Reload postponed article. See also ``fB-o\fR'' command-line switch.
+.TP
 .B q
 Return to previous level.
 .TP
@@ -857,8 +866,8 @@ Quit \fBtin\fR.
 Toggle display to show all articles or only unread articles.
 .TP
 .B R
-Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way of
-getting bugs fixed and features added/changed.
+Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way
+of getting bugs fixed and features added/changed.
 .TP
 .B s
 Save article/thread/hot/pattern/tagged articles to file
@@ -919,6 +928,9 @@ default_filter_select_expire
 ON = expire after specified time, OFF = always apply the filter
 .in -.6i
 Read the section FILTERING ARTICLES for more information.
+.TP
+.B ^G
+Perform PGP operations on article.
 .TP
 .B ^H
 Toggle display of all the articles mail header.
@@ -1042,6 +1054,9 @@ Go to the next unread article.
 Output current article / thread / auto selected (hot) articles /
 articles matching pattern / tagged articles to printer.
 .TP
+.B O
+Reload postponed article. See also ``\fB-o\fR'' command-line switch.
+.TP
 .B p
 Go to the previous article.
 .TP
@@ -1151,7 +1166,7 @@ Toggle $\fBTEX2ISO\fR decoding for current article.
 .\"
 .SH "GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES"
 .\" FIXME - add missing descriptions
-.\" FIXME - bring into a usefull order
+.\" FIXME - bring into a useful order
 At startup, \fBtin\fR reads in the configuration file. This contains a list
 of variables that can be used to configure the way \fBtin\fR works. If it
 exists, the global configuration file, \fI/usr/lib/news/tinrc\fP is read.
@@ -1368,7 +1383,8 @@ The format string used to create the mailer command with parameters that is
 used for mailing articles to other people.
 Default is '%M "%T" < %F' (i.e., /bin/mail "iain" < .article). The flexible
 format allows other mailers with different command line parameters to be used
-such as 'elm -s "%S" "%T" < "%F"' (i.e., elm -s "subject" "iain" < .article).
+such as 'elm -s "%S" "%T" < "%F"' (i.e., elm -s "subject" "iain" < .article)
+or 'sendmail  -oem -t  < %F' (i.e. sendmail -oem -t < .article).
 .TP
 .B default_move_group
 .TP
@@ -1458,18 +1474,22 @@ If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
 .TP
 .B Use 8bit characters in mail headers (mail_8bit_header)
 Allows 8bit characters unencoded in the header of mail message.
-Default is OFF. Turning it ON is effective only if 'mail_mime_encoding' is
-also set to 8bit. Leaving it OFF is safe for most users except for Korean
-users with localized \fBsendmail\fR(8).
+Default is OFF. Turning it ON is effective only if \fBmail_mime_encoding\fR is
+also set to 8bit. Leaving it OFF is safe for most users and compliant
+to Internet Mail Standard(STD 11/RFC 822 and RFC 2047).
 .TP
 .B Mail address (mail_address)
 User's mail address, if not username@host.
 .TP
 .B MIME encoding in mail messages (mail_mime_encoding)
 MIME encoding of the body in mail message, if necessary (8bit, base64, quoted-printable, 7bit)
-Default is 8bit. If set to 7bit, CJK text is encoded into ISO-2022-KR/JP/CN.
-Currently, only ISO-2022-KR is implemented. No encoding (or charset conversion)
-is done (i.e., local charset is used as it is) if set to 8bit.
+Default is 8bit and no encoding(or charset conversion) is performed
+(i.e., local charset is used as it is). 
+If set to 7bit, CJK text in 8bit encoding(EUC-CN,EUC-TW,
+EUC-JP,EUC-KR,Big5,Shift_JIS) is supposed to be converted into 
+ISO-2022-KR/JP/CN. Only EUC-KR to ISO-2022-KR conversion
+has been implemented, however.  Accordingly, setting it to 7bit has 
+no effect on MIME charsets/encodings other than EUC-KR(Korean).  
 .TP
 .B Quote line when mailing (mail_quote_format)
 Default is "In article %M you wrote:"
@@ -1480,11 +1500,11 @@ If ON mark articles that are saved as read. Default is ON.
 .B MM_CHARSET (mm_charset)
 Charset supported locally, which is also used for MIME header (charset
 parameter and charset name in header encoding)
-in mail and news posting unless local charset needs to be encoded into
-other charset as in case of ISO-2022-KR encoding of EUC-KR in mail message.
+in mail and news posting unless local charset/encoding needs to be 
+converted into other charset/encoding as in case of EUC-KR which
+is converted to ISO-2022-KR if \fBmail_mime_encoding\fR is set to 7bit.
 Possible values include ISO-8859-X (where X is 1 to 10), EUC-JP, EUC-CN,
-EUC-KR, and perhaps names for various Chinese and Japanese charsets (GB, Big5,
-SJIS, Shift JIS, and so forth).
+EUC-KR, EUC-TW,Big5, Shift_JIS, and so forth.
 If \fBMIME_STRICT_CHARSET\fR is defined at the compile time, text in
 charset other than the value of this parameter is considered
 not displayable and represented as '?'. Otherwise, all character
@@ -1527,14 +1547,21 @@ Default is ON.
 .TP
 .B Use 8bit characters in news headers (post_8bit_header)
 Allows 8bit characters unencoded in the header of news article.
-Default is OFF. Only enacted if 'post_mime_encoding' is also set to 8bit.
+Default is OFF. Only enacted if \fBpost_mime_encoding\fR is also set to 8bit.
+In a number of local hiearchies where 8bit characters are used,
+using unencoded(raw) 8bit characters in header is acceptable and sometimes
+even recommended so that you need to check the convention adopted in
+the local hierarchy of your interest to determine what to do with this and
+\fBpost_mime_encoding\fR.
 .TP
 .B MIME encoding in news messages (post_mime_encoding)
 MIME encoding of the body in news message, if necessary. (8bit, base64, quoted-printable, 7bit)
 Default is 8bit, which leads to no encoding (or charset conversion, i.e.,
 local charset is posted as it is). If set to 7bit, Chinese and Japanese
-text is encoded into ISO-2022-CN/JP (not yet implemented). 7bit is
-equivalent to 8bit for Korean news messages.
+text(in 8bit encodings such as EUC-CN,EUC-TW,EUC-JP,Shift_JIS,Big5) 
+is supposed to be  converted into ISO-2022-CN/JP, but it's NOT 
+yet implemented. Therefore,  currently  7bit has NO effect(i.e. equivalent to
+8bit) whatever MIME charset/encoding is chosen.
 .TP
 .B post_process_command
 Full pathname of a command to be run after successfully uudecoding an
@@ -2333,21 +2360,14 @@ an articles text. Values can range from 0 to 6.
 .B ORGANIZATION
 Set the article header field ``Organization:'' to the contents of the
 variable instead of the system default. If reading news on an Apollo
-DomainOS machine the environment variable $\fBNEWSORG\fR has to be used instead
-of $\fBORGANIZATION\fR.
+DomainOS machine the environment variable $\fBNEWSORG\fR has to be used
+instead of $\fBORGANIZATION\fR.
 .TP
 .B REPLYTO
 Set the article header field ``Reply-To:'' to the return address specified
 by the variable.
 This is useful if the machine is not registered in the UUCP mail maps
 or if you wish to receive replies at a different machine.
-.TP
-.B BUG_ADDRESS
-If the `R' command bug report mail address is not correct this variable should
-be set to the correct mail address. This variable has precedence over the file
-\fI$HOME/.tin/bug_address\fP that may also contain a mail address. If
-$\fBBUG_ADDRESS\fR is unset and \fI$HOME/.tin/bug_address\fP is empty or
-does not exist it will default to <tin-bugs@tin.org>.
 .TP
 .B MAILER
 This variable has precedence over the default mailer that is used in all
@@ -2394,6 +2414,10 @@ are replying to an article by mail where the e-mail address contains one of
 these strings. The matching is case-insensitive. Example:
 .sp
 \fISPAMTRAP=spam,delete,remove\fP
+.TP
+.B METAMAIL
+Set this variable to point to \fBmetamail\fR(1) or a replacement
+(i.e. metamutt).
 .\"
 .\"
 .SH FILES
@@ -2425,9 +2449,6 @@ active file of user's mailgroups.
 .TP
 \fI$HOME/.tin/active.save\fP
 active file of user's saved newsgroups.
-.TP
-\fI$HOME/.tin/bug_address\fP
-address to send bug reports to. See also $\fBBUG_ADDRESS\fR.
 .TP
 \fI$HOME/.tin/filter\fP
 filtering file for article killing and auto-selection.
@@ -2607,11 +2628,11 @@ Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder, Larry
 Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer,
 Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman,
 Cliff Stanford, Steve Starck, Jason Steiner, Ralf Stephan, Helmrich
-Streitmatter, Dieter Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman,
-Derek Terveer, Carsten Theis, Julian Thompson, David Tiller, Andry Timonin,
-Mark Tomlin, Michael Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha,
-Jason Wessel, Cary Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Billy Y.,
-Nickolai Zeldovich
+Streitmatter, Michael Stenns, Dieter Stueken, Ed Sznyter, Dean Takemori,
+Darrell Tangman, Derek Terveer, Carsten Theis, Julian Thompson, David
+Tiller, Andry Timonin, Mark Tomlin, Michael Traub, Adri Verhoef, Paul
+Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney, Henrik Wist, Greg
+Woods, Lloyd Wright, Billy Y., Nickolai Zeldovich
 .\"
 .\"
 .SH AUTHOR

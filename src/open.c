@@ -161,25 +161,21 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			char *chr1, *chr2;
 			int j;
 
-			j = atoi(get_val("COLUMNS", "80"));
+			j = atoi (get_val ("COLUMNS", "80"));
+			chr1 = my_strdup ((sec ? bug_nntpserver2 : bug_nntpserver1));
 
-			if (sec)
-				chr1 = my_strdup(bug_nntpserver2);
-			else
-				chr1 = my_strdup(bug_nntpserver1);
-
-			if (((int)strlen(chr1))>=j) {
-				chr2 = chr1+strlen(chr1)-1;
-				while(chr2-chr1>=j)
+			if (((int)strlen (chr1)) >= j) {
+				chr2 = chr1 + strlen (chr1) - 1;
+				while (chr2 - chr1 >= j)
 					chr2--;
-				while(chr2>chr1 && *chr2!=' ')
+				while (chr2 > chr1 && *chr2 != ' ')
 					chr2--;
-				if (chr2!=chr1)
+				if (chr2 != chr1)
 					*chr2 = '\n';
 			}
 
-			wait_message(0, "%s\n", chr1);
-			free(chr1);
+			wait_message (0, "%s\n", chr1);
+			free (chr1);
 		}
 
 		is_reconnect = TRUE;
@@ -251,7 +247,7 @@ get_respcode (
 
 	ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
 
-	if (tin_errno != 0 || ptr == NULL)
+	if (tin_errno || ptr == NULL)
 		return(-1);
 
 	respcode = (int) strtol(ptr, &end, 10);
@@ -268,7 +264,7 @@ DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 		put_server (last_put);
 		ptr = tin_fgets (line, NNTP_STRLEN, nntp_rd_fp);
 
-		if (tin_errno != 0)
+		if (tin_errno)
 			return(-1);
 
 		respcode = (int) strtol(ptr, &end, 10);
@@ -290,7 +286,7 @@ DEBUG_IO((stderr, "get_respcode(%d)\n", respcode));
 			put_server (last_put);
 			ptr = tin_fgets (line, NNTP_STRLEN, (FILE*)nntp_rd_fp);
 
-			if (tin_errno != 0)
+			if (tin_errno)
 				return(-1);
 
 		} else {
@@ -620,7 +616,7 @@ get_article (
 #endif
 	}
 
-	if (tin_errno != 0) {
+	if (tin_errno) {
 		fclose(fp);
 		goto error;
 	}
@@ -637,10 +633,7 @@ get_article (
 	/*
 	 * Grab the correct filesize now that it's been closed
 	 */
-	if (stat (tempfile, &sb) < 0)
-		note_size = 0;
-	else
-		note_size = sb.st_size;
+	note_size = ((stat (tempfile, &sb) < 0) ? 0 : sb.st_size);
 
 	if ((fp = fopen (tempfile, "r")) == (FILE *) 0) {	/* Reopen for just reading */
 		perror_message (txt_nntp_to_fp_cannot_reopen, tempfile);
@@ -659,10 +652,7 @@ error:
 	unlink (tempfile);
 #endif
 
-	if (tin_errno == 0)
-		return (fp);
-	else
-		return ((FILE *) 0);
+	return ((tin_errno == 0) ? fp : (FILE *) 0);
 }
 #endif /* NNTP_ABLE */
 
@@ -704,10 +694,7 @@ open_art_fp (
 		/* Get the correct file size. This is done in get_article() for
 		 * the NNTP case. TODO - fix this
 		 */
-		if (stat (buf, &sb) == -1)
-			note_size = 0;
-		else
-			note_size = sb.st_size;
+		note_size = ((stat (buf, &sb) == -1) ? 0 : sb.st_size);
 
 		art_fp = fopen (buf, "r");
 #ifdef NNTP_ABLE
@@ -822,14 +809,14 @@ setup_hard_base (
 			debug_nntp ("setup_base", buf);
 #endif
 
-			while ((ptr = tin_fgets(buf, sizeof(buf), (FILE*)nntp_rd_fp)) != NULL)  {
+			while ((ptr = tin_fgets(buf, sizeof(buf), (FILE*)nntp_rd_fp)) != NULL) {
 				if (top_base >= max_art)
 					expand_art ();
 
 				base[top_base++] = atoi (ptr);
 			}
 
-			if (tin_errno != 0)
+			if (tin_errno)
 				return(-1);
 
 		} else {
@@ -840,7 +827,7 @@ setup_hard_base (
 			 * Handle the obscure case that the user aborted before the LISTGROUP
 			 * had a chance to respond
 			 */
-			if (tin_errno != 0)
+			if (tin_errno)
 				return(-1);
 
 			/*

@@ -14,12 +14,7 @@
 
 #include	"tin.h"
 
-#if 0
-	static int iGrpCurNum = -1;
-	static int iGrpMaxNum = -1;
-#endif
-
-int group_hash[TABLE_SIZE];			/* group name --> active[] */
+int group_hash[TABLE_SIZE];	/* group name --> active[] */
 
 void
 init_group_hash (void)
@@ -111,9 +106,6 @@ psGrpFind (
 	int i;
 
 	if ((i = find_group_index(pcGrpName)) != -1) {
-#if 0
-		iGrpCurNum = i;
-#endif
 		return &active[i];
 	}
 
@@ -156,54 +148,3 @@ psGrpAdd (
 
 	return(&active[num_active++]);
 }
-
-/*
- * What is all the rest of this for ???
- */
-#if 0
-struct t_group *
-psGrpFirst (void)
-{
-	iGrpMaxNum = num_active;
-
-	if (iGrpMaxNum) {
-		iGrpCurNum = 0;
-		return &active[iGrpCurNum];
-	} else
-		return (struct t_group *) 0;
-}
-
-struct t_group *
-psGrpLast (void)
-{
-	if (iGrpMaxNum) {
-		iGrpCurNum = iGrpMaxNum - 1;
-		return &active[iGrpCurNum];
-	} else
-		return (struct t_group *) 0;
-}
-
-struct t_group *
-psGrpNext (void)
-{
-	if (iGrpMaxNum) {
-		if (iGrpCurNum < (iGrpMaxNum - 1)) {
-			iGrpCurNum++;
-			return &active[iGrpCurNum];
-		}
-	}
-	return (struct t_group *) 0;
-}
-
-struct t_group *
-psGrpPrev (void)
-{
-	if (iGrpMaxNum) {
-		if (iGrpCurNum > 1) {
-			iGrpCurNum--;
-			return &active[iGrpCurNum];
-		}
-	}
-	return (struct t_group *) 0;
-}
-#endif

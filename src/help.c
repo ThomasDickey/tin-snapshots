@@ -312,7 +312,7 @@ static int
 					break;
 
 				case KEYMAP_UP:
-#if USE_CURSES
+#ifdef USE_CURSES
 					ch = iKeyUp;
 					break;
 #endif
@@ -322,7 +322,7 @@ static int
 					break;
 
 				case KEYMAP_DOWN:
-#if USE_CURSES
+#ifdef USE_CURSES
 					ch = iKeyDown;
 					break;
 #endif
@@ -364,10 +364,7 @@ show_info_page (
 	if (NOTESLINES <= 0)
 		return;
 
-	if (beginner_level)
-		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
-	else
-		help_lines = NOTESLINES;
+	help_lines = (beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
 
 	set_signals_help ();
 
@@ -398,7 +395,7 @@ show_info_page (
 		max_page++;
 
 	set_xclick_off ();
-#if USE_CURSES
+#ifdef USE_CURSES
 	ClearScreen();
 #endif
 	forever {
@@ -411,7 +408,7 @@ show_info_page (
 			case ESC:	/* common arrow keys */
 				break;
 
-#if USE_CURSES
+#ifdef USE_CURSES
 			case iKeyUp:				/* line up */
 				if (--pos_help < 0)
 					pos_help = (max_page-1) * help_lines;
@@ -486,7 +483,7 @@ display_info_page (t_bool first)
 #ifdef HAVE_COLOR
 	fcol(col_help);
 #endif
-#if USE_CURSES
+#ifdef USE_CURSES
 	if (first)
 #endif
 		ClearScreen ();
@@ -494,10 +491,7 @@ display_info_page (t_bool first)
 	center_line (0, TRUE, buf);
 	MoveCursor (INDEX_TOP, 0);
 
-	if (beginner_level)
-		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
-	else
-		help_lines = NOTESLINES;
+	help_lines = (beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
 
 	if (info_type == HELP_INFO) {
 		for (i=pos_help ; i < (pos_help + help_lines) && info_help[i] ; i++)

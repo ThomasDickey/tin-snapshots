@@ -254,15 +254,15 @@ ConvertTeX2Iso (
  * Check for german TeX encoding
  */
 
-int
+t_bool
 iIsArtTexEncoded (
 	long art,
 	char *group_path)
 {
 	char line[LEN];
 	FILE *fp;
-	int body = FALSE;
 	int i, len;
+	t_bool body = FALSE;
 
 	/*
 	 * TODO: This is a farce. Reread the whole art !!

@@ -126,7 +126,7 @@ open_random_sig (
 			srand ((unsigned int) epoch);
 			my_chdir (sigdir);
 
-			if (thrashdir (sigdir) || !sigfile[0]) {
+			if (thrashdir (sigdir) || !*sigfile) {
 #ifdef DEBUG
 				if (debug == 2)
 					error_message ("NO sigfile=[%s]", sigfile);

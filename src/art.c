@@ -35,7 +35,7 @@ static int date_comp (t_comptype *p1, t_comptype *p2);
 static int from_comp (t_comptype *p1, t_comptype *p2);
 static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
 static int parse_headers (FILE *fp, struct t_article *h);
-static int read_group (struct t_group *group, char *group_path, int *pcount);
+static t_bool read_group (struct t_group *group, char *group_path, int *pcount);
 static int score_comp (t_comptype *p1, t_comptype *p2);
 static int subj_comp (t_comptype *p1, t_comptype *p2);
 static int valid_artnum (long art);
@@ -133,7 +133,6 @@ index_group (
 	make_group_path (group->name, group_path);
 	glob_art_group = group->name;
 
-	set_alarm_clock_off ();
 	set_signals_art ();
 
 	hash_reclaim ();
@@ -174,11 +173,9 @@ index_group (
 	/*
 	 * Read in the existing index via XOVER or the index file
 	 */
-	if (iReadNovFile (group, min, max, &expired) == -1) {
+	if (iReadNovFile (group, min, max, &expired) == -1)
 		/* user aborted indexing */
-		set_alarm_clock_on ();
 		return FALSE;
-	}
 
 	/*
 	 * Prints 'P' for each expired article if verbose
@@ -189,11 +186,9 @@ index_group (
 	/*
 	 * Add any articles to arts[] that are new or were killed
 	 */
-	if ((modified = read_group (group, group_path, &count)) == -1) {
+	if ((modified = read_group (group, group_path, &count)) == -1)
 		/* user aborted indexing */
-		set_alarm_clock_on ();
 		return FALSE;
-	}
 
 	/*
 	 * Do this before calling art_mark_read if you want
@@ -258,7 +253,6 @@ index_group (
 	if ((modified || filtered) && !batch_mode)
 		clear_message ();
 
-	set_alarm_clock_on ();
 	return (TRUE);
 }
 
@@ -270,7 +264,7 @@ index_group (
  *    -1     user aborted indexing operation
  */
 
-static int
+static t_bool
 read_group (
 	struct t_group *group,
 	char *group_path,
@@ -279,7 +273,7 @@ read_group (
 	FILE *fp;
 	char buf[PATH_LEN];
 	int count = 0, res;
-	int modified = FALSE;
+	t_bool modified = FALSE;
 	int respnum, total = 0;
 	long art;
 	register int i;
@@ -353,7 +347,7 @@ read_group (
 		res = parse_headers (fp, &arts[top]);
 
 		TIN_FCLOSE(fp);
-		if (tin_errno != 0) {
+		if (tin_errno) {
 			chdir (dir);
 			return(-1);
 		}
@@ -486,12 +480,8 @@ make_threads (
 {
 	int i;
 
-	if (!cmd_line) {
-		if (group->attribute && group->attribute->thread_arts == THREAD_NONE)
-			info_message (txt_unthreading_arts);
-		else
-			info_message (txt_threading_arts);
-	}
+	if (!cmd_line)
+		info_message (((group->attribute && group->attribute->thread_arts == THREAD_NONE) ? txt_unthreading_arts : txt_threading_arts));
 
 #ifdef DEBUG
 	if (debug == 2)
@@ -662,7 +652,7 @@ parse_headers (
 					    *buf2 != '\0') {
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
-						if (art_full_name[0])
+						if (*art_full_name)
 							h->name = hash_str (art_full_name);
 						got_from = TRUE;
 					}
@@ -758,7 +748,7 @@ parse_headers (
 
 	} /* while */
 
-	if (tin_errno != 0)
+	if (tin_errno)
 		return FALSE;
 
 	/* TODO its possible some of these tests must go back to break; the main loop */
@@ -917,7 +907,7 @@ sleep(1);
 		parse_from (rfc1522_decode (p), art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
 
-		if (art_full_name[0])
+		if (*art_full_name)
 			arts[top].name = hash_str (art_full_name);
 
 		p = q + 1;
@@ -968,10 +958,7 @@ sleep(1);
 		} else
 			*q = '\0';
 
-		if (*p)
-			arts[top].refs = my_strdup (p);
-		else
-			arts[top].refs = '\0';
+		arts[top].refs = ((*p) ? (my_strdup (p)) : ('\0'));
 
 		p = q + 1;
 
@@ -1045,7 +1032,7 @@ sleep(1);
 
 	TIN_FCLOSE (fp);
 
-	if (tin_errno != 0)
+	if (tin_errno)
 		return(-1);
 
 	return top;
@@ -1095,11 +1082,7 @@ vWriteNovFile (
 	 * than W_OK, since we won't read it anyway.
 	 */
 
-	if((pcNovFile = pcFindNovFile (psGrp, R_OK))!=0)
-		strcpy(tmp, pcNovFile);
-	else
-		strcpy(tmp, "");
-
+	strcpy(tmp, ((((pcNovFile = pcFindNovFile (psGrp, R_OK)) != 0)) ? pcNovFile : ""));
 	pcNovFile = pcFindNovFile (psGrp, W_OK);
 
 	if(strcmp(tmp, pcNovFile)!=0) {
@@ -1234,9 +1217,9 @@ pcFindNovFile (
 				sprintf (acNovFile, "%s%d.idx", TMPDIR, process_id);
 			else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);
-				sprintf (acNovFile, "%s/%s", acBuf, OVERVIEW_FILE);
-				if (iMode == R_OK || iMode == W_OK /*vb*/) {
-					if (access (acNovFile, iMode) == 0)
+				sprintf (acNovFile, "%s/%s", acBuf, novfilename);
+				if (iMode == R_OK || iMode == W_OK) {
+					if (!access (acNovFile, iMode))
 						overview_index_filename = TRUE;
 				}
 				if (!overview_index_filename) {
@@ -1582,11 +1565,7 @@ valid_artnum (
 			return cur;
 
 		prev = cur;
-		if (arts[cur].artnum < art)
-			cur = cur + range;
-		else
-			cur = cur - range;
-
+		cur += (arts[cur].artnum < art) ? range : -range;
 		if (prev == cur)
 			return -1;
 

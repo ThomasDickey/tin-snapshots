@@ -1,7 +1,7 @@
 # Source Makefile for tin 
 # - for configuration options read the ../doc/INSTALL file.
 #
-# Updated   : 31.12.1997
+# Updated   : 31.01.1998
 #
 
 SHELL		= /bin/sh
@@ -32,6 +32,7 @@ INSTALL_PREFIX	= @INSTALL_PREFIX@
 INS_BINARY_DIR	= @bindir@
 INS_DAEMON_DIR	= @NEWSLIBDIR@
 INS_MANUAL_DIR	= @mandir@/man
+INS_SYSDEF_DIR	= @TIN_DEFAULTS_DIR@
 INS_MANUAL_EXT	= 1
 
 # Project
@@ -76,10 +77,6 @@ HFILES	= \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/version.h
 #	$(INCDIR)/config.h
-#	$(INCDIR)/msmail.h
-#	$(INCDIR)/os_2.h
-#	$(INCDIR)/win32.h
-#	$(INCDIR)/win32tcp.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
@@ -132,13 +129,6 @@ CFILES	= \
 	$(SRCDIR)/thread.c \
 	$(SRCDIR)/wildmat.c \
 	$(SRCDIR)/xref.c
-#	$(SRCDIR)/msmail.c
-#	$(SRCDIR)/nntpw32.c
-#	$(SRCDIR)/nntpvms.c
-#	$(SRCDIR)/win32.c
-#	$(SRCDIR)/win32tcp.c
-#	$(SRCDIR)/os_2.c
-#	$(SRCDIR)/vms.c
 
 EXTRAOBJS = @EXTRAOBJS@
 
@@ -197,11 +187,6 @@ OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/thread.o \
 	$(OBJDIR)/wildmat.o \
 	$(OBJDIR)/xref.o
-#	$(OBJDIR)/win32.o
-#	$(OBJDIR)/vms.o
-#	$(OBJDIR)/os_2.o
-#	$(OBJDIR)/nntpw32.o
-#	$(OBJDIR)/nntpvms.o
 
 
 ALL_FILES = $(HFILES) $(CFILES) $(NNTP)
@@ -250,17 +235,23 @@ help:
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
 	@$(ECHO) "    make install_manpage [ Install the manual page ]"
+	@$(ECHO) "    make install_sysdefs [ Install the system-wide-defaults file ]"
 	@$(ECHO) "    make help            [ Show this text ]"
 	@$(ECHO) " "
 
 $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT) \
 $(INSTALL_PREFIX)$(INS_BINARY_DIR) \
-$(INSTALL_PREFIX)$(INS_DAEMON_DIR) :
+$(INSTALL_PREFIX)$(INS_DAEMON_DIR) \
+$(INS_SYSDEF_DIR) :
 	$(srcdir)/../mkdirs.sh $@
 
 install_manpage: $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)
 	@$(ECHO) "Installing $(EXE) manual page to $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
 	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
+
+install_sysdefs: $(INS_SYSDEF_DIR)
+	@$(ECHO) "Installing system-wide defaults file to $(INS_SYSDEF_DIR)..."
+	@$(INSTALL) -m 644 $(DOCDIR)/tin.defaults $(INS_SYSDEF_DIR)/tin.defaults
 
 install: $(INSTALL_PREFIX)$(INS_BINARY_DIR)
 	@$(MAKE) all
@@ -421,7 +412,3 @@ $(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(TIN_DEP) \
 				$(INCDIR)/menukeys.h
 $(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(TIN_DEP)
 $(OBJDIR)/xref.o:		$(SRCDIR)/xref.c $(TIN_DEP)
-
-# $(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(TIN_DEP)
-# $(OBJDIR)/win32.o:		$(SRCDIR)/win32.c $(TIN_DEP)
-# $(OBJDIR)/vms.o:		$(SRCDIR)/vms.c $(TIN_DEP)

@@ -17,7 +17,7 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"980117"
+#	define RELEASEDATE	"980202"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA
@@ -31,9 +31,9 @@
 
 #	ifdef M_UNIX
 #		if !defined( __amiga )
-#			define  OS	"UNIX"
+#			define	OS	"UNIX"
 #		else
-#			define  OS	"AMIGA"
+#			define	OS	"AMIGA"
 #		endif
 #	endif
 

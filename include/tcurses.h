@@ -32,13 +32,13 @@
 #	endif
 #endif
 
-#if USE_CURSES
+#ifdef USE_CURSES
 
-#if USE_TRACE
-#if HAVE_NOMACROS_H
-#include <nomacros.h>
-#endif
-#endif
+#ifdef USE_TRACE
+#	ifdef HAVE_NOMACROS_H
+#		include <nomacros.h>
+#	endif
+#endif /* USE_TRACE */
 
 #if 0	/* FIXME: this has prototypes, but opens up new problems! */
 #ifdef HAVE_TERM_H

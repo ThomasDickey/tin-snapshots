@@ -42,6 +42,18 @@ static t_bool
 wait_for_input (
 	FILE *fd)
 {
+#ifdef VMS
+	int ch = ReadChNowait ();
+
+	if (ch == 'q' || ch == ESC) {
+		if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
+			return (TRUE);
+	}
+	if (ch == 'Q') {
+		if (prompt_yn (cLINES, "Do you want to exit tin immediately ? (y/n): ", FALSE) == 1)
+			tin_done (EXIT_ERROR);
+	}
+#else
 	int nfds, ch;
 	fd_set readfds;
 	struct timeval tv;
@@ -111,6 +123,7 @@ DEBUG_IO((stderr, "file ready\n"));
 		}
 
 	}
+#endif
 	/* NOTREACHED */
 	return(FALSE);
 }
@@ -182,10 +195,8 @@ tin_read (
 	if (STRCMPEQ(buffer, "."))		/* end of text */
 		return(NULL);
 
-	if (buffer[0] == '.')			/* reduce leading .'s */
-		return (buffer+1);
-	else
-		return(buffer);
+	/* reduce leading .'s */
+	return ((buffer[0] == '.') ? (buffer+1) : buffer);
 }
 
 /*
@@ -347,10 +358,7 @@ fgets_hdr (
 
 	*(++s1) = '\0';
 
-	if (s1 == s)
-		return NULL;
-	else
-		return s;
+	return ((s1 == s) ? NULL : s);
 }
 
 /* end of read.c */

@@ -23,7 +23,8 @@
  */
 #define ACTIVE_SEP		" \n"
 
-int reread_active_file = FALSE;
+t_bool force_reread_active_file = FALSE;
+static time_t active_timestamp;  /* time active file read (local) */
 
 /* FIXME: make local */
 char	acHomeDir[PATH_LEN];
@@ -40,6 +41,7 @@ int	iVerbose;		/* Test only ? Always FALSE */
 /*
  * Local prototypes
  */
+static void set_active_timestamp (void);
 static int find_newnews_index (char *cur_newnews_host);
 static int parse_newsrc_active_line (char *buf, long *count, long *max, long *min, char *moderated);
 static void check_for_any_new_groups (void);
@@ -58,7 +60,7 @@ static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
 int
 get_active_num (void)
 {
-#ifdef ENV_VAR_GROUPS
+#ifdef ENV_VAR_GROUPS /* M_AMIGA && M_OS2 && WIN32 only */
 	char *ptr;
 	int num;
 
@@ -68,18 +70,33 @@ get_active_num (void)
 	return DEFAULT_ACTIVE_NUM;
 }
 
-/*
- *  Resync active file when SIGALRM signal received that
- *  is triggered by alarm (reread_active_file_secs) call.
- */
+static void
+set_active_timestamp (void)
+{
+	time (&active_timestamp);
+	force_reread_active_file = FALSE;
+}
 
+
+int
+reread_active_file (void)
+{
+	return (force_reread_active_file || (reread_active_file_secs != 0 &&
+		(int)(time(NULL) - active_timestamp) >= reread_active_file_secs));
+}
+
+
+/*
+ * Resync active file when reread_active_file_secs have passed or
+ * force_reread_actve_file is set.
+ */
 int
 resync_active_file (void)
 {
 	char old_group[HEADER_LEN];
 	int command_line;
 
-	if (!reread_active_file)
+	if (!reread_active_file ())
 		return FALSE;
 
 	reread_active_for_posted_arts = FALSE;
@@ -94,7 +111,7 @@ resync_active_file (void)
 
 	command_line = read_cmd_line_groups ();
 
-	read_newsrc (newsrc, command_line ? 0 : 1);
+	read_newsrc (newsrc, command_line ? FALSE : TRUE);
 
 	if (command_line)		/* Can't show only unread groups with cmd line groups */
 		show_only_unread_groups = FALSE;
@@ -102,7 +119,6 @@ resync_active_file (void)
 		toggle_my_groups (show_only_unread_groups, old_group);
 
 	set_groupname_len (FALSE);
-	set_alarm_signal ();
 	show_selection_page ();
 
 	return TRUE;
@@ -126,10 +142,7 @@ active_add(
 	ptr->description = (char *) 0;
 	/* spool - see below */
 	ptr->moderated = moderated[0];
-	if (moderated[0] == '=')
-		ptr->aliasedto = my_strdup(moderated+1);
-	else
-		ptr->aliasedto = (char *) 0;
+	ptr->aliasedto = ((moderated[0] == '=') ? my_strdup(moderated+1) : (char *) 0);
 	ptr->count = count;
 	ptr->xmax = max;
 	ptr->xmin = min;
@@ -246,7 +259,7 @@ parse_newsrc_active_line (
 
 	*ptr = '\0';					/* Now buf is the group name */
 
-	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min) != 0)
+	if (vGrpGetArtInfo (spooldir, buf, GROUP_TYPE_NEWS, count, max, min))
 		return(FALSE);
 
 	strcpy (moderated, "y");
@@ -345,10 +358,12 @@ read_news_active_file (void)
 	/*
 	 *  Exit if active file wasn't read correctly or is empty
 	 */
-	if (tin_errno != 0 || !num_active) {
+	if (tin_errno || !num_active) {
 		error_message (txt_active_file_is_empty, news_active_file);
 		tin_done (EXIT_ERROR);
 	}
+
+	set_active_timestamp ();
 
 	if (INTERACTIVE2)
 		wait_message (0, "\n");
@@ -369,12 +384,12 @@ read_news_active_file (void)
 static void
 check_for_any_new_groups (void)
 {
+	FILE *fp;
 	char *autosubscribe, *autounsubscribe;
 	char *ptr, buf[NNTP_STRLEN];
 	char old_newnews_host[PATH_LEN];
 	char new_newnews_host[PATH_LEN];
 	int newnews_index;
-	FILE *fp;
 	time_t old_newnews_time;
 	time_t new_newnews_time;
 
@@ -382,13 +397,8 @@ check_for_any_new_groups (void)
 		return;
 
 	wait_message (0, txt_checking_new_groups);
-
 	time (&new_newnews_time);
-
-	if (read_news_via_nntp)
-		strcpy (new_newnews_host, nntp_server);
-	else
-		strcpy (new_newnews_host, "local");	/* What if nntp server called local ? */
+	strcpy (new_newnews_host, (read_news_via_nntp ? nntp_server : "local")); /* What if nntp server called local ? */
 
 	/*
 	 * find out if we have read news from here before otherwise -1
@@ -435,7 +445,7 @@ check_for_any_new_groups (void)
 		}
 
 		TIN_FCLOSE (fp);
-		if (tin_errno != 0)
+		if (tin_errno)
 			return;				/* Don't update the time if we quit */
 	}
 
@@ -514,15 +524,15 @@ subscribe_new_group (
  * group_list is a comma separated list of newsgroups, ! implies NOT
  * The same degree of wildcarding as used elsewhere in tin is allowed
  */
-int
+t_bool
 match_group_list (
 	char *group,
 	char *group_list)
 {
 	char *separator;
 	char pattern[HEADER_LEN];
-	int accept, negate, list_len;
-	size_t group_len;
+	size_t group_len, list_len;
+	t_bool accept, negate;
 
 	accept = FALSE;
 	list_len = strlen (group_list);
@@ -534,11 +544,7 @@ match_group_list (
 		 * find end/length of this entry
 		 */
 		separator = strchr (group_list, ',');
-
-		if (separator != (char *) 0)
-			group_len = separator-group_list;
-		else
-			group_len = list_len;
+		group_len = ((separator == (char *) 0) ? list_len : (separator - group_list));
 
 		if ((negate = ('!' == *group_list))) {
 			/*
@@ -753,7 +759,7 @@ vMakeGrpList (
 	if (iVerbose)
 		my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
 
-	if (access (pcGrpPath, R_OK) != 0)
+	if (access (pcGrpPath, R_OK))
 		return;
 
 	tDirFile = opendir (pcGrpPath);

@@ -334,7 +334,6 @@ pgp_check_article(void)
 		info_message(txt_pgp_nothing);
 		return (0);
 	}
-	set_alarm_clock_off();
 	ClearScreen();
 	if (pgp_signed) {
 		Raw(FALSE);
@@ -372,7 +371,6 @@ pgp_check_article(void)
 
 	continue_prompt ();
 	unlink(the_article);
-	set_alarm_clock_on ();
 	return (1);
 }
 #endif /* HAVE_PGP */

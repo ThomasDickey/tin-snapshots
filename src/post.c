@@ -656,7 +656,7 @@ check_article_to_be_posted (
 		my_fflush (stderr);
 		errors++;
 	}
-	if (ngcnt && errors == 0) {
+	if (ngcnt && !errors) {
 		/*
 		 * Print a note about each newsgroup
 		 */
@@ -777,7 +777,7 @@ quick_post_article (
 	if (strlen (group))
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
 	else {
-		if (default_post_newsgroups[0])
+		if (*default_post_newsgroups)
 			my_strncpy (group, default_post_newsgroups, sizeof (group));
 		else {
 			my_fprintf (stderr, "%s\n", txt_no_quick_newsgroups);
@@ -847,7 +847,7 @@ quick_post_article (
 	if (strlen (subj))
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 	else {
-		if (default_post_subject[0])
+		if (*default_post_subject)
 			my_strncpy (subj, default_post_subject, sizeof (subj));
 		else {
 			Raw (FALSE);
@@ -1002,10 +1002,10 @@ post_article_done:
 	if (keep_posted_articles)
 		update_posted_msgs_file (article, userid);
 
-	if (group[0] != '\0')
+	if (!*group)
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
 
-	if (subj[0] != '\0')
+	if (!*subj)
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 	write_config_file (local_config_file);
@@ -1039,10 +1039,7 @@ post_existing_article (
 		return;
 	}
 
-	if (ask)
-		ch = iKeyPostEdit;
-	else
-		ch = iKeyPostPost;
+	ch = (ask ? iKeyPostEdit : iKeyPostPost);
 	forever {
 post_existing_article_loop:
 		switch (ch) {
@@ -1142,10 +1139,10 @@ post_article_done:
 	if (keep_posted_articles)
 		update_posted_msgs_file (article, userid);
 
-	if (group[0] != '\0')
+	if (!*group)
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
 
-	if (subj[0] != '\0')
+	if (!*subj)
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 	write_config_file (local_config_file);
@@ -1286,7 +1283,7 @@ fetch_postponed_article(
 
 	unlink(postponed_articles_file);
 
-	if(anything_left)
+	if (anything_left)
 		rename(postponed_tmp, postponed_articles_file);
 	else
 		unlink(postponed_tmp);
@@ -1432,7 +1429,7 @@ post_article (
 	if (strlen (subj))
 		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 	else {
-		if (default_post_subject[0])
+		if (*default_post_subject)
 			my_strncpy (subj, default_post_subject, sizeof (subj));
 		else {
 			info_message (txt_no_subject);
@@ -1867,7 +1864,6 @@ post_response (
 				my_fputc (*ptr, stdout);
 			else
 				my_fputs (cCRLF "    ", stdout);
-
 			ptr++;
 		}
 		my_flush ();
@@ -1923,7 +1919,7 @@ ignore_followup_to_poster:
 	/*
 	 * Append to References: line if its already there
 	 */
-	if (note_h.references[0]) {
+	if (*note_h.references) {
 		join_references (bigbuf, note_h.references, note_h.messageid);
 		msg_add_header ("References", bigbuf);
 	} else
@@ -1971,10 +1967,8 @@ ignore_followup_to_poster:
 			}
 		}
 
-		if (with_headers)
-			fseek (note_fp, 0L, SEEK_SET);
-		else
-			fseek (note_fp, mark_body, SEEK_SET);
+		fseek (note_fp, (with_headers ? 0L : mark_body), SEEK_SET);
+
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp,
 			   (psGrp && psGrp->attribute->quote_chars != (char *) 0) ? psGrp->attribute->quote_chars : quote_chars,
@@ -2509,7 +2503,7 @@ mail_to_author (
 		/*
 		 * Write References and Message-Id as In-Reply-To to the mail
 		 */
-		if (note_h.references[0]) {
+		if (*note_h.references) {
 			join_references (bigbuf, note_h.references, note_h.messageid);
 			msg_add_header ("In-Reply-To", bigbuf);
 		} else
@@ -2540,10 +2534,9 @@ mail_to_author (
 				}
 			}
 		}
-		if (with_headers)
-			fseek (note_fp, 0L, SEEK_SET);
-		else
-			fseek (note_fp, mark_body, SEEK_SET);
+
+		fseek (note_fp, (with_headers ? 0L : mark_body), SEEK_SET);
+
 		get_initials (respnum, initials, sizeof (initials));
 		copy_body (note_fp, fp, quote_chars, initials, with_headers ? TRUE : quote_signatures);
 	} else
@@ -2749,11 +2742,7 @@ pcCopyArtHeader (
 	fclose (fp);
 
 	if (found) {
-		if (header[0] == ' ')
-			p = &header[1];
-		else
-			p = header;
-
+		p = ((header[0] == ' ') ? &header[1] : header);
 		(void) strcpy (result, rfc1522_decode (p));
 		return TRUE;
 	}
@@ -2982,11 +2971,11 @@ cancel_article (
 #define FromSameUser ((strstr (from_name, arts[respnum].from)) != 0)
 
 #ifndef FORGERY
-#	define NotSuperseding (!supersede || (supersede && (!FromSameUser)))
-#	define Superseding    (supersede && FromSameUser)
+#	define NotSuperseding	(!supersede || (supersede && (!FromSameUser)))
+#	define Superseding	(supersede && FromSameUser)
 #else
-#	define NotSuperseding (!supersede)
-#	define Superseding    (supersede)
+#	define NotSuperseding	(!supersede)
+#	define Superseding	(supersede)
 #endif
 
 int
@@ -3089,7 +3078,7 @@ repost_article (
 			msg_add_header ("Reply-To", line);
 			msg_add_header ("X-Superseded-By", from_name);
 
-			if (note_h.org[0])
+			if (*note_h.org)
 				msg_add_header ("Organization", note_h.org);
 
 			sprintf (line, "<supersede.%s", note_h.messageid + 1);
@@ -3097,13 +3086,13 @@ repost_article (
 #endif
 			msg_add_header ("Supersedes", note_h.messageid);
 
-			if (note_h.followup[0])
+			if (*note_h.followup)
 				msg_add_header ("Followup-To", note_h.followup);
 
-			if (note_h.keywords[0])
+			if (*note_h.keywords)
 				msg_add_header ("Keywords", note_h.keywords);
 
-			if (note_h.summary[0])
+			if (*note_h.summary)
 				msg_add_header ("Summary", note_h.summary);
 
 			if (*note_h.distrib)
@@ -3119,7 +3108,7 @@ repost_article (
 	msg_add_header ("Subject", note_h.subj);
 	msg_add_header ("Newsgroups", group);
 
-	if (note_h.references[0]) {
+	if (*note_h.references) {
 		/*
 		 * calling join_references prevents repost_article
 		 * to fail if References: contains a double space
@@ -3175,10 +3164,7 @@ repost_article (
 	}
 	forever {
 repost_article_loop:
-		if (!force_command)
-			ch = prompt_slk_response (ch_default, POST_KEYS, sized_message(txt_quit_edit_xpost, note_h.subj));
-		else
-			ch = ch_default;
+			ch = (force_command ? ch_default : prompt_slk_response (ch_default, POST_KEYS, sized_message(txt_quit_edit_xpost, note_h.subj)));
 
 		switch (ch) {
 			case iKeyPostEdit:
@@ -3219,11 +3205,7 @@ repost_article_loop:
 
 			case iKeyPostPost:
 			case iKeyPostPost2:
-				if (Superseding)
-					wait_message (0, txt_superseding_art);
-				else
-					wait_message (0, txt_repost_an_article);
-
+				wait_message (0, (Superseding ? txt_superseding_art : txt_repost_an_article));
 				backup_article(article);
 
 				if (submit_news_file (article)) {
@@ -3531,7 +3513,7 @@ find_reply_to_addr (
 				*ptr = '\0';
 			}
 			parse_from (from_both, from_addr, from_name);
-			if (from_name[0])
+			if (*from_name)
 				sprintf (buf, "%s (%s)", from_addr, from_name);
 			found = TRUE;
 		}
@@ -3579,15 +3561,8 @@ find_reply_to_addr (
 
 	/* We do this to save a redundant strcpy when we don't want to parse */
 
-	if (parse)
-		dest = temp;
-	else
-		dest = from_addr;
-
-	if (found_replyto)
-		strcpy (dest, rfc1522_decode(replyto));
-	else
-		strcpy (dest, rfc1522_decode(from));
+	dest = (parse ? temp : from_addr);
+	strcpy (dest, rfc1522_decode((found_replyto ? replyto : from)));
 
 	if (parse)
 		parse_from (temp, from_addr, fullname);
@@ -3717,6 +3692,14 @@ submit_mail_file (
 			strfmailer (mailer, subject, mail_to, file,
 				  buf, sizeof (buf), default_mailer_format);
 
+#ifdef VMS  /* quick hack! M.St. 29.01.98 */
+			{
+				char *transport = getenv("MAIL$INTERNET_TRANSPORT");
+				if (!transport)
+					transport = "smtp";
+				sprintf (buf,"mail/subject=\"%s\" %s %s%%\"%s\"", subject,file,transport,mail_to);
+			}
+#endif /* VMS */
 			if (invoke_cmd (buf))
 				mailed = TRUE;
 			else

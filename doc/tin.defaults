@@ -1,0 +1,105 @@
+#
+# TIN 1.4 - a threaded newsreader
+#
+# tin.defaults - set some machine specified options
+#                and override compile time defaults
+#
+# Only do changes in this file, if your actual configurations
+# differs from the configuration compiled in. All values have
+# defaults at compile time, so usually editing this file is not
+# needed. An exception are distributed binaries which run on
+# different machines, here some configuration might be necessary.
+# 
+
+############# global options ####################################
+
+
+# domainname - this sets a global domain name used in From lines
+# 
+# set your full domain name without a trailing dot
+# 
+#domainname=domain.com
+
+# organization - defines the name of your organization
+#
+#organization=TIN unltd.
+
+# newslibdir - defines the default place for some configuration
+#              files
+# common values are /usr/lib/news, /var/lib/news, /usr/local/lib/news
+#
+#newslibdir=/usr/lib/news
+
+# bugaddress - defines the email address to which users can send
+#              bugreports using tin's builtin function
+#
+# The default points to a developers mailing list located at tin.org.
+# You might want to change this address to one of your local
+# administration if you want to deal with your lusers problems on
+# your own.
+#
+#bugaddress=tin-bugs@tin.org 
+
+# inewsdir - defines the directory containing of the inews executable
+#
+# Usually tin uses its own builtin inews routines. you might want
+# to use an external inews, so you can define the directoy where tin
+# expects the executable. The program's name is set to inews, don't
+# include it
+#
+#inewsdir=/usr/lib/news
+
+############# reading from a local spool #########################
+#
+# If you are using tin only via NNTP connections, this section
+# has no meaning for you.
+#
+
+# spooldir - the base of your newsspool (INN, Bnews, Cnews style)
+# common values are /var/spool/news, /usr/spool/news, /news/spool
+#
+#spooldir=/var/spool/news
+
+# overviewdir - the base of your NOV database
+#
+# the overview files are either included within your spooldir or
+# in a separate direcory tree
+# common values are /var/spool/overview, /usr/spool/overview, /news/overview
+#
+#overviewdir=/var/spool/overview
+
+# overviewfile - the name of a single overview file
+#
+# the name of a single file within the overview spool
+# common values are .overview, over.view
+#
+#overviewfile=.overview
+
+# activefile - the full pathname of your newssystem's active file
+#
+# usually the active file is newslibdir, so you only have
+# to change this setting if your configuration differs
+#
+#activefile=/usr/lib/news/active
+
+# activetimesfile - the full pathname of your newssystem's active.times file
+#
+# usually the active file is newslibdir, so you only have
+# to change this setting if your configuration differs
+#
+#activetimesfile=/usr/lib/news/active.times
+
+# newsgroupsfile - the full pathname of your newssystem's newsgroups file
+#
+# usually the newsgroups file is newslibdir, so you only have
+# to change this setting if your configuration differs
+#
+#newsgroupsfile=/usr/lib/news/newsgroups
+
+# subscriptionsfile - the full pathname of your newssystem's 
+#                     subscriptions file
+#
+# usually the newsgroups file is newslibdir, so you only have
+# to change this setting if your configuration differs
+#
+#subscriptionsfile=/usr/lib/news/subscriptions

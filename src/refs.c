@@ -371,7 +371,7 @@ _get_references(
 			error_message("Warning: Too many refs near to %s. Truncated\n", refptr->txt);
 #endif
 		refs = (char *) my_malloc(HEADER_LEN);
-		len  = 0;
+		len = 0;
 	} else
 		refs = _get_references(refptr->parent, depth+1);
 
@@ -452,9 +452,8 @@ dump_msgids(void)
 
 			my_fprintf(stderr, "node %d", i);
 
-			for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next) {
+			for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next)
 				my_fprintf(stderr, " -> %s", ptr->txt);
-			}
 
 			my_fprintf(stderr, "\n");
 
@@ -749,9 +748,9 @@ thread_by_reference(void)
 
 	for (i=0 ; i < top ; i++) {
 		fprintf(dbgfd, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
-			(arts[i].refptr->parent)  ? arts[i].refptr->parent->article : -2,
+			(arts[i].refptr->parent) ? arts[i].refptr->parent->article : -2,
 			(arts[i].refptr->sibling) ? arts[i].refptr->sibling->article : -2,
-			(arts[i].refptr->child)   ? arts[i].refptr->child->article : -2,
+			(arts[i].refptr->child) ? arts[i].refptr->child->article : -2,
 			arts[i].inthread, arts[i].thread, arts[i].refptr->txt, arts[i].subject);
 	}
 

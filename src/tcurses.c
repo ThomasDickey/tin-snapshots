@@ -16,10 +16,10 @@
 #include "tin.h"
 #include "tcurses.h"
 
-#if USE_CURSES
+#ifdef USE_CURSES
 
 #ifndef KEY_MIN
-#define KEY_MIN KEY_BREAK	/* SVr3 curses */
+#	define KEY_MIN KEY_BREAK	/* SVr3 curses */
 #endif
 
 #include "trace.h"

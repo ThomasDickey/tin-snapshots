@@ -51,10 +51,7 @@ get_search_pattern(
 
 	clear_message ();
 
-	if (forward)
-		sprintf (tmpbuf, fwd_msg, def);
-	else
-		sprintf (tmpbuf, bwd_msg, def);
+	sprintf (tmpbuf, (forward ? fwd_msg : bwd_msg), def);
 
 	if (!prompt_string (tmpbuf, pattern, which_hist))
 		return NULL;
@@ -62,7 +59,7 @@ get_search_pattern(
 	if (pattern[0] != '\0')
 		strcpy (def, pattern);
 	else {
-		if (def[0])
+		if (*def)
 			strcpy (pattern, def);
 		else {
 			info_message (txt_no_search_string);
@@ -431,14 +428,8 @@ search_article (
 	))) return FALSE;
 
 	while (!local_note_end) {
-		note_line = 1;
 		ctrl_L = FALSE;
-
-		if (local_note_page < 1)
-			note_line += 4;
-			/* FIXME: offset is wrong with news_headers_to_display */
-		else
-			note_line += 2;
+		note_line = (local_note_page < 1) ? 5 : 3;
 
 		while (note_line < cLINES) {
 			if (fgets (buf, sizeof buf, note_fp) == NULL) {
@@ -513,15 +504,11 @@ search_art_body (
 	FILE *fp;
 
 #if 1 /* see also screen.c show_progress ()*/
-	if ((fp = open_art_fp (group_path, art->artnum, -art->lines)) == (FILE *) 0) {
+	if ((fp = open_art_fp (group_path, art->artnum, -art->lines)) == (FILE *) 0)
 #else
-	if ((fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0) {
+	if ((fp = open_art_fp (group_path, art->artnum, art->lines)) == (FILE *) 0)
 #endif
-		if (tin_errno != 0)
-			return -1;
-		else
-			return FALSE;
-	}
+		return ((tin_errno != 0) ? -1 : FALSE);
 
 	/*
 	 * Skip the header
