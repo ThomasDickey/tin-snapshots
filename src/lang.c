@@ -207,6 +207,10 @@ constext txt_help_col_signature[] = "<SPACE> toggles, <CR> sets, <ESC> cancels."
 constext txt_help_col_subject[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_text[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_col_title[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_col_markstar[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_col_markdash[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_word_highlight_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_word_h_display_marks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif
 constext txt_help_colon[] = ":\t  skip next block of included text\r\n";
 #ifdef HAVE_COLOR
@@ -384,6 +388,9 @@ constext txt_help_w[] = "w\t  post (write) article to current group\r\n";
 constext txt_help_x[] = "x\t  repost chosen article to another group\r\n";
 constext txt_help_xpost_quote_format[] = "%A Addr %D Date %F Addr+Name %G Groupname %M Message-ID %N Name %C First Name";
 constext txt_help_y[] = "Y\t  yank in active file to see any new news\r\n";
+#ifdef HAVE_COLOR
+constext txt_help__[] = "_\t  toggle word highlighting on/off\r\n";
+#endif
 constext txt_hit_any_key[] = "-- Press any key to continue --";
 constext txt_hit_space_for_more[] = "PgDn,End,<SPACE>,^D - page down. PgUp,Home,b,^U - page up. <CR>,q - quit";
 constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
@@ -487,6 +494,10 @@ constext txt_opt_col_signature[] = 		"Color of signatures                : ";
 constext txt_opt_col_subject[] = 		"Color of article subject lines     : ";
 constext txt_opt_col_text[] = 			"Color of text lines                : ";
 constext txt_opt_col_title[] = 			"Color of help/mail sign            : ";
+constext txt_opt_word_highlight_tinrc[] =	"Word highlighting in message body  : ";
+constext txt_opt_word_h_display_marks[] =	"Display _ or * when highlighting   : ";
+constext txt_opt_col_markstar[] =		"Color of highlighting with *stars* : ";
+constext txt_opt_col_markdash[] =		"Color of highlighting with _dash_  : ";
 #endif
 constext txt_opt_confirm_action[] = 		"Confirm commands before executing  : ";
 constext txt_opt_confirm_to_quit[] = 		"Confirm before quitting            : ";
@@ -756,6 +767,10 @@ constext txt_thread_resp_page[] = "T %d of %d, R %d/%d (p %d), %s:  %s";
 constext txt_thread_saved_to_many[] = "Thread saved to %s - %s";
 constext txt_thread_x_of_n[] = "%sThread %4d of %4d\r\n";
 constext txt_threading_arts[] = "Threading articles...";
+#ifdef HAVE_COLOR
+constext txt_toggled_high_off[] = "Toggled word highlighting off";
+constext txt_toggled_high_on[] = "Toggled word highlighting on";
+#endif
 constext txt_toggled_rot13[] = "Toggled rot13 encoding";
 constext txt_toggled_tex2iso_off[] = "Toggled german TeX encoding off";
 constext txt_toggled_tex2iso_on[] = "Toggled german TeX encoding on";

@@ -151,6 +151,9 @@ char *help_group[] = {
 	txt_help_M,
 	txt_help_d,
 	txt_help_I,
+#ifdef HAVE_COLOR
+	txt_help__,
+#endif
 		txt_help_empty_line,
 	txt_help_g_t_p_i,
 		txt_help_empty_line,
@@ -252,6 +255,9 @@ char *help_page[] = {
 		txt_help_empty_line,
 	txt_help_M,
 	txt_help_I,
+#ifdef HAVE_COLOR
+	txt_help__,
+#endif
 		txt_help_empty_line,
 	txt_help_p_star,
 	txt_help_p_dot,

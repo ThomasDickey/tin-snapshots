@@ -93,6 +93,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'b':
 			if (match_boolean (buf, "batch_save=", &default_batch_save)) {
 				break;
@@ -101,6 +102,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'c':
 			if (match_boolean (buf, "catchup_read_groups=", &catchup_read_groups)) {
 				break;
@@ -154,8 +156,15 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "col_signature=", &col_signature, MAX_COLOR)) {
 				break;
 			}
+			if (match_integer (buf, "col_markstar=", &col_markstar, MAX_COLOR)) {
+				break;
+			}
+			if (match_integer (buf, "col_markdash=", &col_markdash, MAX_COLOR)) {
+				break;
+			}
 #endif
 			break;
+
 		case 'd':
 			if (match_string (buf, "default_editor_format=", default_editor_format, sizeof (default_editor_format))) {
 				break;
@@ -268,6 +277,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'f':
 			if (match_boolean (buf, "full_page_scroll=", &full_page_scroll)) {
 				break;
@@ -276,6 +286,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'g':
 			if (match_integer (buf, "groupname_max_length=", &groupname_max_length, 132)) {
 				break;
@@ -284,16 +295,19 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'h':
 			if (match_boolean (buf, "highlight_xcommentto=", &highlight_xcommentto)) {
 				break;
 			}
 			break;
+
 		case 'i':
 			if (match_boolean (buf, "inverse_okay=", &inverse_okay)) {
 				break;
 			}
 			break;
+
 		case 'k':
 #ifdef M_UNIX
 			if (match_boolean (buf, "keep_dead_articles=", &keep_dead_articles)) {
@@ -304,6 +318,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'l':
 #ifdef LOCAL_CHARSET
 			if (match_boolean (buf, "local_charset=", &use_local_charset)) {
@@ -311,6 +326,7 @@ read_config_file (file, global_file)
 			}
 #endif
 			break;
+
 		case 'm':
 			if (match_list (buf, "mail_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &mail_mime_encoding)) {
 				break;
@@ -339,6 +355,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'n':
 			if (match_string (buf, "newnews=", newnews_info, sizeof (newnews_info))) {
 				load_newnews_info (newnews_info);
@@ -351,6 +368,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'p':
 			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding)) {
 				break;
@@ -378,17 +396,20 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'q':
 			if (match_string (buf, "quote_chars=", quote_chars, sizeof (quote_chars))) {
 				quote_dash_to_space (quote_chars);
 				break;
 			}
 			break;
+
 		case 'r':
 			if (match_integer (buf, "reread_active_file_secs=", &reread_active_file_secs, 10000)) {
 				break;
 			}
 			break;
+
 		case 's':
 			if (match_boolean (buf, "sigdashes=", &sigdashes)) {
 				break;
@@ -430,6 +451,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 't':
 			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_MAX)) {
 				break;
@@ -444,6 +466,7 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+
 		case 'u':
 			if (match_boolean (buf, "unlink_article=", &unlink_article)) {
 				break;
@@ -474,11 +497,25 @@ read_config_file (file, global_file)
 			}
 #endif
 			break;
+
+		case 'w':
+#ifdef HAVE_COLOR
+			if (match_boolean (buf, "word_highlight=", &word_highlight_tinrc)) {
+				word_highlight=word_highlight_tinrc;
+				break;
+			}
+			if (match_boolean (buf, "word_h_display_marks=", &word_h_display_marks)) {
+				 break;
+			}
+#endif
+			break;
+
 		case 'x':
 			if (match_string (buf, "xpost_quote_format=", xpost_quote_format, sizeof (xpost_quote_format))) {
 				break;
 			}
 			break;
+
 		default:
 			break;
 		}
@@ -807,6 +844,19 @@ write_config_file (file)
 
 	fprintf (fp, "# Color of signature\n");
 	fprintf (fp, "col_signature=%d\n\n", col_signature);
+
+	fprintf (fp, "# Enable word highlighting?\n");
+	fprintf (fp, "word_highlight=%s\n\n", print_boolean (word_highlight_tinrc));
+
+	fprintf (fp, "# Should the leading and ending stars and dashes also be displayed,\n");
+	fprintf (fp, "# even when they are highlighting marks?\n");
+	fprintf (fp, "word_h_display_marks=%s\n\n",print_boolean (word_h_display_marks));
+
+	fprintf (fp, "# Color of word highlighting. There are two posibilities for\n");
+	fprintf (fp, "# in Articles: *stars* and _underdashes_\n");
+	fprintf (fp, "col_markstar=%d\n", col_markstar);
+	fprintf (fp, "col_markdash=%d\n\n", col_markdash);
+
 #endif
 
 #ifdef FORGERY
@@ -1382,6 +1432,8 @@ change_config_file (group, filter_at_once)
 						 * case OPT_COL_QUOTE:		case OPT_COL_RESPONSE:
 						 * case OPT_COL_SIGNATURE:	case OPT_COL_SUBJECT:
 						 * case OPT_COL_TEXT:		case OPT_COL_TITLE:
+						 * case OPT_COL_MARKSTAR:	case OPT_WORD_HIGHLIGHT:
+						 * case OPT_COL_MARKDASH:
 #endif
 						 * case OPT_DEFAULT_SHOW_AUTHOR:	case OPT_DEFAULT_SORT_ART_TYPE:
 						 *	break;

@@ -90,7 +90,8 @@
  * elsewhere.  For instance, having "^R" map to "redraw screen" at article
  * level and "reset .newsrc" (a drastic and unreversible action) is a bad
  * idea.
- * 
+ *
+ * [make emacs happy: "]
  */
 
 /* general keys */
@@ -251,7 +252,10 @@
 #define iKeyPageToggleTex2iso '\"'
 #define iKeyPageLastPage '$'
 #define iKeyPageToggleRot2 '%'
-#define iKeyPageToggleColor '&'
+#ifdef HAVE_COLOR
+#  define iKeyPageToggleColor '&'
+#  define iKeyPageToggleHighlight '_'
+#endif
 #define iKeyPageLastViewed '-'
 /* digits 0-9 in use */
 #define iKeyPageSkipIncludedText ':'

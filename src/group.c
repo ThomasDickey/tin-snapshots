@@ -1594,7 +1594,7 @@ bld_sline (i)
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
 	if (show_lines) {
-		if (n > 1) {
+		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
 			if (arts[j].lines != -1) {
 				char tmp_buffer[4];
 				strcpy (tmp_buffer, tin_itoa(n, 3));
@@ -1610,7 +1610,7 @@ bld_sline (i)
 			}
 		}
 	} else {
-		if (n > 1) {
+		if (n > 1) { /* change this to (n > 0) if you do a n-- above */
 			sprintf (art_cnt, "%s ", tin_itoa(n, 3));
 		} else {
 			strcpy (art_cnt, "    ");
