@@ -31,7 +31,7 @@
 
 #define TABSTOP(x)  (((x) - ((x)&7)) + 8)
 
-static constext *iso2asc[ISO_TABLES][256-ISO_EXTRA] =
+static constext *const iso2asc[ISO_TABLES][256-ISO_EXTRA] =
 {
 	{
 	" ","!","c",SUB,SUB,"Y","|",SUB,"\"","(c)","a","<<","-","-","(R)","-",
@@ -116,11 +116,11 @@ static constext *iso2asc[ISO_TABLES][256-ISO_EXTRA] =
 #define	TEX_SUBST	15
 #define	SPACES		"                                                                                                         "
 
-static const char *tex_from[TEX_SUBST] =
+static const char *const tex_from[TEX_SUBST] =
 {
 	"\"a","\\\"a","\"o","\\\"o","\"u","\\\"u","\"A","\\\"A","\"O","\\\"O","\"U","\\\"U","\"s","\\\"s","\\3"
 };
-static const char *tex_to[TEX_SUBST] =
+static const char *const tex_to[TEX_SUBST] =
 {
 	"ä", "ä", "ö", "ö", "ü", "ü", "Ä", "Ä", "Ö", "Ö", "Ü", "Ü", "ß", "ß", "ß"
 };
@@ -136,7 +136,7 @@ ConvertIso2Asc (
 	int t)
 {
 	constext *p;
-	constext **tab;
+	constext *const *tab;
 	int first;   /* flag for first SPACE/TAB after other characters */
 	int i, a;    /* column counters in iso and asc */
 

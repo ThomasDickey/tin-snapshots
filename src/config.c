@@ -24,6 +24,30 @@ static void expand_rel_abs_pathname (int line, int col, char *str);
 static void print_any_option (int the_option);
 static void show_config_page (int page_no);
 
+enum state { IGNORE, CHECK, UPGRADE };
+
+/*
+ * If we don't find a tin-1.3 unoff tag line at the top of the rc file,
+ * give the user some upgrade guidance and silently update variables where
+ * necessary. We use a simple state mechanism, starting with CHECK for the
+ * 1st line, then switch to UPGRADE or IGNORE accordingly.
+ */
+static int
+check_upgrade(
+	char *buf )
+{
+	if (strncmp(buf, "# tin 1.3 unoff", 15) == 0)
+		return(IGNORE);
+	else {
+		fprintf(stderr, "\n\nYou are upgrading to tin 1.3 unoff from an earlier version.\n");
+		fprintf(stderr, "Some values in your configuration file have changed\n");
+		fprintf(stderr, "Read WHATSNEW, etc.....\n\n");
+		fprintf(stderr, txt_cmdline_hit_any_key);
+		ReadCh();
+		return(UPGRADE);
+	}
+}
+
 /*
  *  read local & global configuration defaults
  */
@@ -35,24 +59,26 @@ read_config_file (
 {
 	char	newnews_info[PATH_LEN];
 	char	buf[LEN];
+	int		upgrade = CHECK;
 	FILE	*fp;
 
-	if ((fp = fopen (file, "r")) == (FILE *) 0) {
+	if ((fp = fopen (file, "r")) == (FILE *) 0)
 		return FALSE;
-	}
 
 	if (SHOW_UPDATE) {
-		if (global_file) {
+		if (global_file)
 			wait_message (txt_reading_global_config_file);
-		} else {
+		else
 			wait_message (txt_reading_config_file);
-		}
 	}
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '#' || buf[0] == '\n') {
+			if (upgrade == CHECK)
+				upgrade = check_upgrade(buf);
 			continue;
 		}
+
 		switch(tolower(buf[0])) {
 		case 'a':
 			if (match_boolean (buf, "auto_save=", &default_auto_save)) {
@@ -466,6 +492,9 @@ read_config_file (
 
 		case 't':
 			if (match_integer (buf, "thread_articles=", &default_thread_arts, THREAD_MAX)) {
+				/* Upgrade changes YES/NO to integer, fix it ! */
+				if (upgrade == UPGRADE)
+					default_thread_arts = THREAD_MAX;
 				break;
 			}
 			if (match_boolean (buf, "tab_after_X_selection=", &tab_after_X_selection)) {

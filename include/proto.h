@@ -125,6 +125,7 @@ extern int auto_select_articles (struct t_group *group);
 extern char *getline (const char *prompt, int number_only, char *str, int max_chars, int passwd);
 
 /* group.c */
+extern void decr_tagged (int tag);
 extern void group_page (struct t_group *group);
 extern void show_group_page (void);
 extern void draw_subject_arrow (void);

@@ -379,6 +379,8 @@ extern constext txt_art_rejected[];
 extern constext txt_art_saved_to[];
 extern constext txt_art_thread_regex_tag[];
 extern constext txt_art_unavailable[];
+extern constext txt_art_parent_none[];
+extern constext txt_art_parent_unavail[];
 extern constext txt_article_cancelled[];
 extern constext txt_article_reposted1[];
 extern constext txt_article_reposted2a[];
@@ -596,6 +598,7 @@ extern constext txt_help_p_search[];
 extern constext txt_help_p_star[];
 extern constext txt_help_p_tab[];
 extern constext txt_help_p_tilda[];
+extern constext txt_help_p_u[];
 extern constext txt_help_p_z[];
 extern constext txt_help_pipe[];
 extern constext txt_help_plus[];
@@ -661,7 +664,6 @@ extern constext txt_help_y[];
 #ifdef HAVE_COLOR
 extern constext txt_help__[];
 #endif
-extern constext txt_hit_any_key[];
 extern constext txt_hit_space_for_more[];
 extern constext txt_index_page_com[];
 extern constext txt_invalid_from1[];

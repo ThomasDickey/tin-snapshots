@@ -67,7 +67,12 @@ show_tagged_lines (void)
 	}
 }
 
-static void
+/*
+ * Remove the current tag from the tag 'chain'
+ * Work through all the threads and decrement the tag counter on all arts
+ * greater than 'tag'
+ */
+void
 decr_tagged (
 	int tag)
 {
@@ -962,9 +967,12 @@ group_list_thread:
 						 * article in the thread that isn't already tagged.
 						 */
 						for (ii = n; ii != -1 && tagged; ii = arts[ii].thread) {
-							if (!arts[ii].tagged)
+							if (!arts[ii].tagged) {
 								tagged = FALSE;
+								break;
+							}
 						}
+
 						if (tagged) {
 							/*
 							 * Here we repeat the tagged test in both blocks
@@ -1032,12 +1040,12 @@ group_list_thread:
 
 			case iKeyGroupUntag:	/* untag all articles */
  				if (index_point >= 0) {
-					untag_all_articles ();
-					update_group_page ();
+					if (untag_all_articles())
+						update_group_page();
 				}
 				break;
 
-			case iKeyGroupVersion:
+			case iKeyVersion:
 				info_message (cvers);
 				break;
 

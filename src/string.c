@@ -33,7 +33,7 @@ tin_itoa (
 	int digits)
 {
 	static char buffer[256];
-	static char power[]=" KMGT";
+	static const char power[]=" KMGT";
 	int len;
 	int i=0;
 

@@ -1121,7 +1121,9 @@ hash_s (
 }
 #endif
 
-
+/*
+ * Clear tag status of all articles. If articles were untagged, return TRUE
+ */
 int
 untag_all_articles (void)
 {
@@ -1511,15 +1513,13 @@ strfquote (
 					}
 					break;
 				case 'C':   /* First Name of author */
-					if (strrchr (arts[respnum].name, ' ')) {
+					if (arts[respnum].name != (char *) 0) {
 						strcpy (tbuf, arts[respnum].name);
-						*(strrchr (tbuf, ' ')) = '\0';
-					} else {
-						if (arts[respnum].name != (char *) 0) {
-							strcpy (tbuf, arts[respnum].name);
-						} else {
-							strcpy (tbuf, arts[respnum].from);
+						if (strrchr (arts[respnum].name, ' ')) {
+							*(strrchr (tbuf, ' ')) = '\0';
 						}
+					} else {
+						strcpy (tbuf, arts[respnum].from);
 					}
 					break;
 				default:

@@ -69,7 +69,7 @@ int
 show_page (
 	struct t_group *group,
 	char *group_path,
-	int respnum,
+	int respnum,		/* index into arts[] */
 	int *threadnum)		/* to allow movement in thread mode */
 {
 #ifndef INDEX_DAEMON
@@ -87,17 +87,17 @@ show_page (
 	local_filtered_articles = FALSE;	/* used in thread level */
 
 restart:
-	if (read_news_via_nntp) {
+	if (read_news_via_nntp)
 		wait_message (txt_reading_article);
-	}
 
 	glob_respnum = respnum;
 	glob_page_group = group->name;
 
 	set_signals_page ();
 
-	if (respnum != this_resp) {	   /* remember current & previous */
-		last_resp = this_resp;	   /* articles for - command */
+	/* Remember current & previous articles for '-' command */
+	if (respnum != this_resp) {
+		last_resp = this_resp;
 		this_resp = respnum;
 	}
 
@@ -214,6 +214,24 @@ end_of_article:
 				art_close ();
 				respnum = last_resp;
 				goto restart;
+
+#ifdef HAVE_REF_THREADING
+			case iKeyPageGotoParent:		/* Goto parent of this article */
+
+				if (arts[respnum].refptr->parent == NULL) {
+					info_message(txt_art_parent_none);
+					break;
+				}
+
+				if (arts[respnum].refptr->parent->article == ART_NORMAL) {
+					info_message(txt_art_parent_unavail);
+					break;
+				}
+
+				art_close ();
+				respnum = arts[respnum].refptr->parent->article;
+				goto restart;
+#endif
 
 			case iKeyPagePipe:	/* pipe article/thread/tagged arts to command */
 				feed_articles (FEED_PIPE, PAGE_LEVEL, group, respnum);
@@ -353,7 +371,7 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case '[':		/* quickly auto-select article */
+			case iKeyThreadQuickAutosel:		/* quickly auto-select article */
 				local_filtered_articles = quick_filter_select (group, &arts[respnum]);
 				if (local_filtered_articles) {
 					goto return_to_index;
@@ -361,7 +379,7 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case ']':		/* quickly kill article */
+			case iKeyThreadQuickKill:		/* quickly kill article */
 				local_filtered_articles = quick_filter_kill (group, &arts[respnum]);
 				if (local_filtered_articles) {
 					goto return_to_index;
@@ -654,7 +672,7 @@ return_to_index:
 				}
 				return -1;
 
-			case iKeyPageVersion:
+			case iKeyVersion:
 				info_message (cvers);
 				break;
 
@@ -711,7 +729,6 @@ return_to_index:
 			    info_message(txt_bad_command);
 		}
 	}
-
 #endif /* INDEX_DAEMON */
 }
 

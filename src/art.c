@@ -96,6 +96,8 @@ find_base (
  *  Will read any existing index, create or incrementally update
  *  the index by looking at the articles in the spool directory,
  *  and attempt to write a new index if necessary.
+ *
+ *  Returns FALSE if the user aborted the indexing, otherwise TRUE
  */
 
 int
@@ -149,26 +151,27 @@ index_group (
 
 		min = top_base ? base[0] : group->xmin;
 		max = top_base ? base[top_base-1] : min - 1;
+
 		/*
 		 * Read in the existing index via XOVER or the index file
 		 */
-		(void) iReadNovFile (group, min, max, &expired);
+		if (iReadNovFile (group, min, max, &expired) == -1) {
+			/* user aborted indexing */
+			set_alarm_clock_on ();
+			return(FALSE);
+		}	
 
-		if (expired) {
+		if (expired)
 			print_expired_arts (expired);
-		}
 
 		/*
-		 *  add any articles to arts[] that are new or were killed
+		 * Add any articles to arts[] that are new or were killed
 		 */
 
-		modified = read_group (group, group_path, &count);
-		if (modified == -1) {
-			/*
-			 *  user aborted indexing
-			 */
+		if ((modified = read_group (group, group_path, &count)) == -1) {
+			/* user aborted indexing */
 			set_alarm_clock_on ();
-			return FALSE;
+			return(FALSE);
 		}
 
 		/*
@@ -734,6 +737,7 @@ parse_headers (
 
 /*
  *  Read in an Nov/Xover index file. Fields are separated by TAB.
+ *  return the new value of 'top' or -1 if user quit partway.
  *
  *  Format:
  *    1.  article number (ie. 183)                [mandatory]
@@ -776,6 +780,15 @@ iReadNovFile (
 	}
 
 	while ((buf = safe_fgets (fp)) != (char *) 0) {
+
+		if (input_pending ()) {
+			buf[0] = ReadCh();
+			if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
+				if (prompt_yn (cLINES, txt_abort_indexing, TRUE) == 1)
+					return(-1);
+			}
+		}
+
 		debug_nntp ("iReadNovFile", buf);
 		if (STRCMPEQ(buf, ".")) {
 			free (buf);

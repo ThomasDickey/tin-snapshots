@@ -329,7 +329,7 @@ static const TABLE MonthDayTable[] = {
 };
 
 /* Time units table. */
-static TABLE	UnitsTable[] = {
+static const TABLE	UnitsTable[] = {
     { "year",		tMONTH_UNIT,	12 },
     { "month",		tMONTH_UNIT,	1 },
     { "week",		tSEC_UNIT,	7 * 24 * 60 * 60 },
@@ -342,7 +342,7 @@ static TABLE	UnitsTable[] = {
 };
 
 /* Timezone table. */
-static TABLE	TimezoneTable[] = {
+static const TABLE	TimezoneTable[] = {
     { "gmt",	tZONE,     HOUR( 0) },	/* Greenwich Mean */
     { "ut",	tZONE,     HOUR( 0) },	/* Universal */
     { "utc",	tZONE,     HOUR( 0) },	/* Universal Coordinated */
@@ -508,18 +508,18 @@ Convert(
     MERIDIAN	Meridian,
     DSTMODE	dst)
 {
-    static int	DaysNormal[13] = {
+    static const int	DaysNormal[13] = {
 	0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
     };
-    static int	DaysLeap[13] = {
+    static const int	DaysLeap[13] = {
 	0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
     };
-    static int	LeapYears[] = {
+    static const int	LeapYears[] = {
 	1972, 1976, 1980, 1984, 1988, 1992, 1996,
 	2000, 2004, 2008, 2012, 2016, 2020, 2024, 2028, 2032, 2036
     };
-    register int	*yp;
-    register int	*mp;
+    register const int	*yp;
+    register const int	*mp;
     register time_t	Julian;
     register int	i;
     time_t		tod;

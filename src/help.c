@@ -12,7 +12,7 @@
  *              right notice, and it must be included in any copy made
  */
 
-/* To do -- use txt_help_empty_line to organize listed commands, possibly
+/* TODO -- use txt_help_empty_line to organize listed commands, possibly
  * like this:
  *
  * navigation within the level
@@ -177,6 +177,10 @@ constext *help_thread[] = {
 	txt_help_p_z,
 	txt_help_ck,
 	txt_help_t,
+	txt_help_U,
+		txt_help_empty_line,
+	txt_help_p_s,
+	txt_help_p_S,
 		txt_help_empty_line,
 	txt_help_i,
 	txt_help_q,
@@ -210,6 +214,7 @@ constext *help_page[] = {
 	txt_help_p_p,
 	txt_help_thread,
 	txt_help_dash,
+	txt_help_p_u,
 		txt_help_empty_line,
 	txt_help_a,
 	txt_help_B,
