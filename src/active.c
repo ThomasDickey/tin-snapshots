@@ -349,7 +349,7 @@ read_news_active_file ()
 				active[num_active].spooldir = spooldir;
 			}
 			active[num_active].name = str_dup (buf);
-			active[num_active].name[strlen(buf)+1]= '\0';
+/*			active[num_active].name[strlen(buf)+1]= '\0'; */
 			active[num_active].description = (char *) 0;
 			active[num_active].count = count;
 			active[num_active].xmax = max;

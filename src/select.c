@@ -856,25 +856,19 @@ group_selection_page ()
 			blank_len = 254;
 		}
 		/* copy of active[n].description fix some malloc bugs kg */
-		strncpy(group_descript,active[n].description ? active[n].description : " ", blank_len);
+		strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
 		group_descript[blank_len+1] = '\0';
 
 		if (show_description) {
-			if (draw_arrow_mark) {
-				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
-				         subs, i+1, new, groupname_len,
-				         active[n].name, blank_len, blank_len, group_descript);
-			} else {
-				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
-				         subs, i+1, new,groupname_len,
-				         active[n].name, blank_len, blank_len, group_descript);
-			}
+				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s  %-*.*s\r\n",
+				         subs, i+1, new, groupname_len, groupname_len,
+				         active_name, blank_len, blank_len, group_descript);
 		} else {
 			if (draw_arrow_mark) {
- 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s\r\n",
+ 				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s\r\n",
 				         subs, i+1, new, groupname_len, groupname_len, active_name);
 			} else {
- 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s%*s\r\n",
+ 				sprintf (screen[j].col, "  %c %4d %-5.5s  %-*.*s%*s\r\n",
 				         subs, i+1, new, groupname_len, groupname_len, active_name,
  					 blank_len, " ");
 			}
@@ -1210,7 +1204,6 @@ set_groupname_len (all_groups)
 		groupname_len = groupname_max_length;
 	}
 }
-
 
 void
 toggle_my_groups (only_unread_groups, group)

@@ -729,7 +729,8 @@ char *str_dup (str)
 	char *duplicate = (char *) 0;
 
 	if (str != (char *) 0) {
-		duplicate = (char *) my_malloc (strlen (str)+1);
+		duplicate = (char *) my_malloc (strlen (str)+2);
+		duplicate[strlen(str)+1]= '\0';
 		strcpy (duplicate, str);
 	}
 	return duplicate;

@@ -1,3 +1,18 @@
+--unoff BETA release 961005 --
+
+182) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. active_name is not truncated to groupname_len
+     BUG. number of unread articles is not truncated to 5 digits
+     FIX. select.c
+
+181) Jens Chr. Bachem <bachem@rrz.uni-koeln.de>
+     BUG. (introduced in 178)
+     FIX. active.c
+
+180) Karlos Gross <kg@orion.ddorf.rhein-ruhr.de>
+     ADD. trailing '\0' to duplicated string in str_dup()
+     FIX. misc.c
+
 --unoff BETA release 961004 --
 
 179) Urs Janssen <urs@akk.uni-karlsruhe.de>
