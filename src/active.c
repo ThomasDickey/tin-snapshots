@@ -471,15 +471,15 @@ check_for_any_new_groups ()
 		old_newnews_time = 0L;
 	}
 
-	if (! read_news_via_nntp && newnews_index >= 0) {
 /*
+	if (! read_news_via_nntp && newnews_index >= 0) {
 		new_active_size = the_newnews_time;
 		old_active_size = new_newnews_size[active_index].attribute;
 		if (the_newnews_time <= old_active_size) {
 			goto notify_groups_done;
 		}
-*/
 	}
+*/
 
 	if (debug == 2) {
 		sprintf (msg, "Newnews old=[%ld]  new=[%ld]",
@@ -816,7 +816,7 @@ load_newnews_info (info)
 	if (! num_newnews) {
 		for (i = 0 ; i < max_newnews ; i++) {
 			newnews[i].host = (char *) 0;
-			newnews[i].time = (time_t)0;
+			newnews[i].time = (time_t) 0;
 		}
 	}
 

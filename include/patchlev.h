@@ -13,37 +13,10 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"960825"
+#define RELEASEDATE	"960826"
 
-/* This is NO official release, but a patched version.
- * Including patches from:
- *
- * 	Greg Berigan		<gberigan@cse.unl.edu>
- * 	Enrik Berkhan		<enrik@akk.uni-karlsruhe.de>
- *	Juergen Bernau		<pas@freitag.muc.de>
- * 	Chris Blum		<chris@phil.uni-sb.de>
- *	Lars Dannenberg		<lars@vendetta.han.de>
- *	Giuseppe De Marco	<gdemarco@freenet.hut.fi>
- *	T.E. Dickey		<dickey@clark.net>
- *	Bernd Eckenfels		<ecki@lina.inka.de>
- *	Jason Faultless		<jason@radar.demon.co.uk>
- *	Ulli Horlacher		<framstag@moep.bb.bawue.de>
- * 	Urs Janssen		<urs@akk.uni-karlsruhe.de>
- *	Olaf Kaluza		<olaf@criseis.ruhr.de>
- *	Tomasz Kloczko		<kloczek@rudy.mif.pg.gda.pl>
- *	Alexander Lehmann	<alex@hal.rhein-main.de>
- *	Daniel Naber		<dnaber@pluto.teuto.de>
- *	Torsten Neumann		<torsten@imke.infodrom.north.de>
- *	Dirk Nimmich		<nimmich@uni-muenster.de>
- *	Seven Paulus		<sven@oops.sub.de>
- *	Branden Robinson	<branden@purdue.edu>
- *	Roland Rosenfeld	<roland@spinnaker.rhein.de>
- *	Volker Schmidt		<volker@illuminatus.mz.rhein-main.de>
- * 	Stefan Scholl		<stesch@sks.inka.de>
- *	Jungshik Shin		<jshin@pantheon.yale.edu>
- *	Dieter Stueken		<stueken@uni-muenster.de>
- *	Dean Takemori		<dean@uhheph.phys.hawaii.edu>
- *
+/*
+ * This is NO official release, but a patched version.
  */
 
 #ifdef M_AMIGA

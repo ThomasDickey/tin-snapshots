@@ -1,9 +1,9 @@
-MANIFEST for tin-1.3-unoff-BETA-960825 (Sun Aug 25 11:16:57 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960826 (Mon Aug 26 22:35:43 MET DST 1996)
 ----------------------------------------------------
-  36955 ./CHANGES
+  37161 ./CHANGES
   13123 ./TODO
    5217 ./Makefile
-  17442 ./INSTALL
+  17478 ./INSTALL
    2137 ./MANIFEST
    1526 ./README
     896 ./tinpp
@@ -24,17 +24,17 @@ MANIFEST for tin-1.3-unoff-BETA-960825 (Sun Aug 25 11:16:57 MET DST 1996)
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
-   1940 ./include/patchlev.h
+    811 ./include/patchlev.h
   29214 ./include/proto.h
    1376 ./include/stpwatch.h
   42721 ./include/tin.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
-  19295 ./src/active.c
+  19296 ./src/active.c
    8145 ./src/actived.c
   13001 ./src/amiga.c
    4424 ./src/amigatcp.c
-  36058 ./src/art.c
+  36254 ./src/art.c
   23169 ./src/attrib.c
    8220 ./src/charset.c
    1558 ./src/color.c
@@ -87,4 +87,4 @@ MANIFEST for tin-1.3-unoff-BETA-960825 (Sun Aug 25 11:16:57 MET DST 1996)
    5511 ./src/vms.c
    7026 ./include/autoconf.hin
   10414 ./src/Makefile.in
-1520446 total
+1519756 total
