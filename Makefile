@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970306
+PVER		= 970307
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -241,7 +241,7 @@ version :
 	@$(ECHO) "TIN v$(VER)"
 
 distclean:
-	- @$(MAKE) clean
+	-@$(MAKE) clean
 	@$(RM) -f config.*
 	@$(RM) -f $(INCDIR)/autoconf.h
 	@$(RM) -f $(SRCDIR)/Makefile

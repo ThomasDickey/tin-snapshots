@@ -1,16 +1,16 @@
-MANIFEST for tin-1.3-unoff-BETA-970306 (Thu Mar  6 18:16:57 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970307 (Fri Mar  7 00:27:47 MET 1997)
 ----------------------------------------------------
-   6247 ./Makefile
+   6246 ./Makefile
    2527 ./MANIFEST
    1714 ./README
     896 ./tinpp
   23758 ./aclocal.m4
- 154875 ./configure
-  17048 ./configure.in
+ 154872 ./configure
+  17045 ./configure.in
    4771 ./install.sh
   11655 ./makefile.in
    1013 ./conf-tin
-  70041 ./doc/CHANGES
+  70195 ./doc/CHANGES
    1534 ./doc/DEBUG_REFS
   19310 ./doc/Good-Netkeeping-Seal
   16995 ./doc/INSTALL
@@ -49,7 +49,7 @@ MANIFEST for tin-1.3-unoff-BETA-970306 (Thu Mar  6 18:16:57 MET 1997)
   41660 ./src/group.c
    3232 ./src/hashstr.c
    9697 ./src/help.c
-  12742 ./src/inews.c
+  12741 ./src/inews.c
   31761 ./src/init.c
     962 ./src/joinpath.c
   74304 ./src/lang.c
@@ -102,4 +102,4 @@ MANIFEST for tin-1.3-unoff-BETA-970306 (Thu Mar  6 18:16:57 MET 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3799 ./src/tincfg.tbl
-1732534 total
+1732680 total

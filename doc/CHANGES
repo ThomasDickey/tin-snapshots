@@ -1,3 +1,9 @@
+--unoff BETA release 970307 --
+
+338) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. typos, misplaced brace
+     FIX. inews.c, configure[.in], Makefile
+
 --unoff BETA release 970306 --
 
 337) T.E.Dickey <dickey@clark.net>

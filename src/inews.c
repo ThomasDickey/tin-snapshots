@@ -284,9 +284,9 @@ get_host_name (
 				if (ptr != 0) {
 					my_strncpy (host, ptr, sizeof (host));
 				}
-			} else {
-				strcpy (host_name, nntp_inews_gateway);
-			}
+			} 
+		} else {
+			strcpy (host_name, nntp_inews_gateway);
 		}
 	} else {
 		/*
