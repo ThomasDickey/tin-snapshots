@@ -89,8 +89,8 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		define netread	read
 #		define netwrite write
 #		define netclose close
-#			define	IPPORT_NNTP	((unsigned short) 119)
-#	    endif
+#		define	IPPORT_NNTP	((unsigned short) 119)
+#		endif
 #	    endif
 #	else /* !VMS */
 #		include <sys/socket.h>

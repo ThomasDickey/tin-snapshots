@@ -14,7 +14,6 @@
  */
 
 #include	"tin.h"
-#include        "rfc1521.h"
 
 int nntp_codeno = 0;
 long head_next;
@@ -793,11 +792,7 @@ setup_hard_base (group, group_path)
 		d = opendir (buf);
 		if (d != NULL) {
 			while ((e = readdir (d)) != NULL) {
-#if defined(M_OS2) || defined(QNX42)
-				art = my_atol (e->d_name, strlen (e->d_name));
-#else
-				art = my_atol (e->d_name, (int) e->D_LENGTH);
-#endif
+				art = my_atol (e->d_name, D_NAMLEN(e));
 				if (art >= 1) {
 					total++;
 					if (top_base >= max_art)
@@ -1309,11 +1304,7 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 		tDirFile = opendir (acBuf);
 		if (tDirFile != (DIR *) 0) {
 			while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-#if defined(M_OS2) || defined(QNX42)
-				lArtNum = lAtol (tFile->d_name, strlen (tFile->d_name));
-#else
-				lArtNum = lAtol (tFile->d_name, (int) tFile->D_LENGTH);
-#endif
+				lArtNum = lAtol (tFile->d_name, (int) D_NAMLEN(tFile));
 				if (lArtNum >= 1) {
 					if (lArtNum > *plArtMax) {
 						*plArtMax = lArtNum;

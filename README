@@ -3,7 +3,11 @@ several additions/bug-fixes over the latest 'official' beta release (for
 more information have a look at the CHANGES file).
 Due to work is still in progress it might not compile on all machines.
 
-Be sure to configure the Makefile in src/ to your local setup!
+configure to your local setup with:
+	cfg-tin
+
+compile with:
+	cd src; make -f makefile
 
 Install at your own risk.
 

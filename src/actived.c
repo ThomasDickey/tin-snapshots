@@ -277,8 +277,8 @@ printf ("opendir(%s)\n", pcGrpPath);
 	if (tDirFile != (DIR *) 0) {
 		iIsDir = FALSE;
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-			strncpy (acFile, tFile->d_name, (size_t) tFile->D_LENGTH);
-			acFile[tFile->D_LENGTH] = '\0';
+			strncpy (acFile, tFile->d_name, (size_t) D_NAMLEN(tFile));
+			acFile[D_NAMLEN(tFile)] = '\0';
 			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
 /*
 printf ("STAT=[%s]\n", acPath);

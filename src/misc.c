@@ -13,7 +13,6 @@
  */
 
 #include	"tin.h"
-#include        "rfc1522.h"
 
 #ifdef M_UNIX
 /*
@@ -424,7 +423,7 @@ my_strtol (str, ptr, base)
 	char	**ptr;
 	int		base;
 {
-#ifdef DONT_HAVE_STRTOL
+#ifndef HAVE_STRTOL
 #define DIGIT(x) (isdigit(x)? ((x)-'0'): (10+tolower(x)-'a'))
 #define MBASE 36
 
@@ -1340,7 +1339,6 @@ get_author (thread, art, str)
 	}
 }
 
-
 void
 toggle_inverse_video ()
 {
@@ -1349,13 +1347,39 @@ toggle_inverse_video ()
 #ifndef USE_INVERSE_HACK
 		draw_arrow_mark = FALSE;
 #endif
-		info_message (txt_inverse_on);
 	} else {
 		draw_arrow_mark = TRUE;
+	}
+}
+
+void
+show_inverse_video_status ()
+{
+	if (inverse_okay) {
+		info_message (txt_inverse_on);
+	} else {
 		info_message (txt_inverse_off);
 	}
 }
 
+#ifdef HAVE_COLOR
+void
+toggle_color ()
+{
+	use_color = !use_color;
+	use_color_tinrc = use_color;
+}
+
+void
+show_color_status ()
+{
+	if (use_color) {
+		info_message (txt_color_on);
+	} else {
+		info_message (txt_color_off);
+	}
+}
+#endif /* HAVE_COLOR */
 
 int
 get_arrow_key ()

@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960522
+PVER		= 960524
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -20,6 +20,7 @@ SRCDIR	= ./src
 HFILES	= \
 	$(INCDIR)/amiga.h \
 	$(INCDIR)/amigatcp.h \
+	$(INCDIR)/autoconf.hin \
 	$(INCDIR)/config.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/gst.h \
@@ -29,8 +30,6 @@ HFILES	= \
 	$(INCDIR)/os_2.h \
 	$(INCDIR)/patchlev.h \
 	$(INCDIR)/proto.h \
-	$(INCDIR)/rfc1521.h \
-	$(INCDIR)/rfc1522.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
 	$(INCDIR)/win32.h \
@@ -61,6 +60,7 @@ CFILES	= \
 	$(SRCDIR)/list.c \
 	$(SRCDIR)/mail.c \
 	$(SRCDIR)/main.c \
+	$(SRCDIR)/makefile.in \
 	$(SRCDIR)/memory.c \
 	$(SRCDIR)/misc.c \
 	$(SRCDIR)/msmail.c \
@@ -73,8 +73,9 @@ CFILES	= \
 	$(SRCDIR)/parsdate.y \
 	$(SRCDIR)/pgp.c \
 	$(SRCDIR)/post.c \
-	$(SRCDIR)/prompt.c\
-	$(SRCDIR)/refs.c\
+	$(SRCDIR)/prompt.c \
+	$(SRCDIR)/proto.sed \
+	$(SRCDIR)/refs.c \
 	$(SRCDIR)/rfc1521.c \
 	$(SRCDIR)/rfc1522.c \
 	$(SRCDIR)/save.c \
@@ -101,7 +102,13 @@ TOP	= \
 	$(TOPDIR)/INSTALL \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
-	$(TOPDIR)/tinpp
+	$(TOPDIR)/tinpp \
+	$(TOPDIR)/aclocal.m4 \
+	$(TOPDIR)/configure \
+	$(TOPDIR)/configure.in \
+	$(TOPDIR)/install.sh \
+	$(TOPDIR)/makefile.in \
+	$(TOPDIR)/cfg-tin
 
 ALL_FILES = $(TOP) $(DOC) $(HFILES) $(CFILES) $(SRCDIR)/Makefile
 
@@ -173,6 +180,7 @@ chmod:
 	@$(ECHO) "Setting the file permissions..."
 	@$(CHMOD) 644 $(ALL_FILES)
 	@$(CHMOD) 755 $(ALL_DIRS)
+	@$(CHMOD) 755 ./cfg-tin ./configure ./tinpp
 gtar:
 	@$(MAKE) tar
 

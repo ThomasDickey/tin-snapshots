@@ -12,6 +12,15 @@
  *		right notice, and it must be included in any copy made
  */
 
+/* functions that we'll assume we have unless there's a special reason */
+#define HAVE_GETCWD
+#define HAVE_MKDIR
+#define HAVE_TZSET
+#define HAVE_MEMCMP
+#define HAVE_MEMCPY
+#define HAVE_MEMSET
+#define HAVE_STRCHR
+#define HAVE_STRTOL
 
 /* VAXC cant tell the difference between 'varA' and 'vara' */
 /*	and, what a surprise, suffers from a limit of 31 chars for vars */
@@ -27,9 +36,11 @@
 #	define	M_UNIX
 #endif
 
-#ifdef VMS
-#	define unlink(file) remove(file)
+#ifndef VMS
+#	define HAVE_UNLINK
+#endif
 
+#ifdef VMS
 #   define  HAS_IS_XTERM
 #endif
 
@@ -37,12 +48,11 @@
  * HP/Apollo CC 6.8 is reasonably close to ANSI
  */
 
-#undef apollo_ansi
+#undef DECL_GETENV		/* assume 'getenv()' is declared */
 #undef pre_CC_6_8
 #if defined(apollo)
-#	if defined(__STDCPP__) || defined(__GNUC__)
-#		define apollo_ansi
-#	else
+#	if !defined(__STDCPP__) && !defined(__GNUC__)
+#		define  DECL_GETENV
 #		define pre_CC_6_8
 #	endif
 #endif
@@ -118,6 +128,7 @@
  * prefer <string.h> if we can get it, because it's ANSI
  */
 #if defined(BSD) && !defined(__STDC__)
+#	undef	HAVE_STRCHR
 #	define	HAVE_STRINGS_H
 #else
 #	define	HAVE_STRING_H
@@ -169,6 +180,8 @@
 #	define	HAVE_SYS_TIMES_H
 #endif
 
+#define TIME_WITH_SYS_TIME
+
 #if defined(PTX) || defined(QNX42) || defined(RS6000) || defined(SCO_UNIX)
 #	define	HAVE_SYS_SELECT_H
 #endif
@@ -179,21 +192,25 @@
 #endif
 
 #if defined(__GNUC__) || defined(HAVE_POSIX_JC)
-#	define	HAVE_SIGTYPE_VOID
+#	define	RETSIGTYPE void
 #else
 #	if defined(sony)
-#		define	HAVE_SIGTYPE_INT
+#		define	RETSIGTYPE int
 #	else
 #		if __STDC__ || defined(atthcx) || defined(__hpux) || \
 		   defined(__osf__) || defined(M_OS2) || defined(PTX) || \
 		   defined(RS6000) || defined(sgi) || defined(sinix) || \
 		   defined(sysV68) || defined(sun) || defined(SVR4) || \
 		   defined(u3b2) || defined(ultrix)	|| defined(WIN32)
-#			define	HAVE_SIGTYPE_VOID
+#			define	RETSIGTYPE void
 #		else
-#			define	HAVE_SIGTYPE_INT
+#			define	RETSIGTYPE int
 #		endif
 #	endif
+#endif
+
+#if defined(__STDC__) && (defined(apollo) || defined(sun))
+#	define DECL_SIG_CONST
 #endif
 
 #if defined(M_OS2) || defined(apollo) || defined(linux) || defined(SVR4) || \
@@ -207,11 +224,11 @@
 #	endif
 #endif
 
-#define HAVE_GETCWD
-#define HAVE_MKDIR
-#define HAVE_TZSET
+#if !defined(__GNUC__)
+#	define DECL_TGETSTR
+#endif
 
-#undef	HAVE_TM_GMTOFF
+#undef	DONT_HAVE_TM_GMTOFF
 
 #if defined(apollo) || defined(AUX) || defined(BSD) || defined(linux) || \
     defined(__hpux) || defined(__osf__) || defined(PTX) || defined(QNX42) || \
@@ -224,11 +241,6 @@
     defined(__osf__) || defined(M_OS2) || defined(RS6000) || defined(sinix) || \
     defined(UMAXV) || defined(VMS)
 #	define	HAVE_GETHOSTBYNAME
-#endif
-
-#if defined(M_AMIGA) || defined(apollo) || defined(BSD) || defined(MINIX) || \
-	defined(WIN32) || defined(VMS)
-#	define	HAVE_CR_AS_CHAR
 #endif
 
 /*
@@ -264,24 +276,19 @@
 #endif
 
 #if defined(pyr) || defined(sequent)
-#	define	DONT_HAVE_MEMCMP
+#	undef	HAVE_MEMCMP
 #endif
 
 #if defined(pyr)
-#	define	DONT_HAVE_MEMCPY
+#	undef	HAVE_MEMCPY
 #endif
 
 #if defined(pyr)
-#	define	DONT_HAVE_MEMSET
-#endif
-
-
-#if defined(BSD) && !defined(__386BSD__)
-#	define	DONT_HAVE_STRCHR
+#	undef	HAVE_MEMSET
 #endif
 
 #if (defined(BSD) && defined(sequent))
-#	define	DONT_HAVE_STRTOL
+#	undef	HAVE_STRTOL
 #endif
 
 #if defined(__arm) || defined(COHERENT) || defined(pyr) || \
@@ -295,7 +302,7 @@
 
 #if defined(apollo) || defined(__arm) || defined(__convex__) || \
     defined(DGUX) || defined(pyr) || defined(sequent) || !defined(BSD)
-#	define	HAVE_TM_GMTOFF
+#	define	DONT_HAVE_TM_GMTOFF
 #endif
 
 /*
@@ -325,6 +332,11 @@
 #endif
 
 #if defined(M_AMIGA)
+#	define	SIG_ARGS /*nothing, since compiler doesn't handle it*/
+#	undef   DECL_SIG_CONST
+#endif
+
+#if defined(M_AMIGA)
 #	define	DONT_REREAD_ACTIVE_FILE
 #endif
 
@@ -349,8 +361,6 @@
 #endif
 
 #if defined(__hpux)
-#	define	DONT_PROTOTYPE_PTR_TO_FUNC
-#	define	DONT_HAVE_SYS_BSDTYPES_H
 #	define	HAVE_KEYPAD
 #endif
 

@@ -8,8 +8,6 @@
                                  IS NOT YET IMPLEMENTED, so leave this off */
 
 #ifndef RFCDEBUG
-#include "rfc1522.h"
-#include "rfc1521.h"
 #include "tin.h"
 #include "extern.h"
 #endif
@@ -43,7 +41,7 @@ build_base64_rank_table()
 
 	if (base64_rank_table_built) return;
 	for (i=0; i<256; i++) base64_rank[i]=255;
-	for (i=0; i<64; i++) base64_rank[base64_alphabet[i]]=i;
+	for (i=0; i<64; i++) base64_rank[(int)base64_alphabet[i]]=i;
 	base64_rank_table_built=1;
 }
 
@@ -113,7 +111,7 @@ mmdecode(what, encoding, delimiter, where, charset)
 			return 0;
 		}
 		while (*what!=delimiter) {
-			x=base64_rank[*what++];
+			x=base64_rank[(int)(*what++)];
 			if (x==255) continue; /* ignore everything not in the alphabet, including '=' */
 			pattern<<=6;
 			pattern|=x;

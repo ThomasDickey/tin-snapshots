@@ -74,6 +74,7 @@
 #define iKeyGroupHelp 'h'
 #define iKeyGroupToggleHelpDisplay 'H'
 #define iKeyGroupToggleInverseVideo 'I'
+#define iKeyGroupToggleColor '&'
 #define iKeyGroupKillThd 'K'
 #define iKeyGroupListThd 'l'
 #define iKeyGroupMail 'm'
@@ -170,6 +171,7 @@
 #define iKeyPageToggleHelpDisplay 'H'
 #define iKeyPageQuit 'q'
 #define iKeyPageToggleInverseVideo 'I'
+#define iKeyPageToggleColor '&'
 #define iKeyPageKillArt 'k'
 #define iKeyPageKillThd 'K'
 #define iKeyPageMail 'm'
@@ -244,7 +246,6 @@
 #define iKeySelectUp ctrl('P')
 #define iKeySelectUp2 'k'
 #define iKeySelectResetNewsrc ctrl('R')
-#define iKeySelectColor 'a'
 #define iKeySelectPageUp 'b'
 #define iKeySelectPageUp2 ctrl('U')
 #define iKeySelectPageUp3 ctrl('B')
@@ -256,6 +257,7 @@
 #define iKeySelectToggleHelpDisplay 'H'
 #define iKeySelectDisplayGroupInfo 'i'
 #define iKeySelectToggleInverseVideo 'I'
+#define iKeySelectToggleColor '&'
 #define iKeySelectMoveGrp 'm'
 #define iKeySelectOptionsMenu 'M'
 #define iKeySelectNextUnreadGrp 'N'
@@ -302,6 +304,7 @@
 #define iKeyThreadHelp 'h'
 #define iKeyThreadToggleHelpDisplay 'H'
 #define iKeyThreadToggleInverseVideo 'I'
+#define iKeyThreadToggleColor '&'
 #define iKeyThreadQuit 'q'
 #define iKeyThreadQuitTin 'Q'
 #define iKeyThreadTag 't'

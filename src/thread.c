@@ -577,7 +577,16 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 			case iKeyThreadToggleInverseVideo:	/* toggle inverse video */
 				toggle_inverse_video ();
 				show_thread_page ();
+				show_inverse_video_status ();
 				break;
+
+#ifdef HAVE_COLOR
+			case iKeyThreadToggleColor:		/* toggle color */
+				toggle_color ();
+				show_thread_page ();
+				show_color_status ();
+				break;
+#endif
 
 			case iKeyThreadQuit:	/* return to previous level */
 				goto thread_done;

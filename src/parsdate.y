@@ -768,10 +768,10 @@ GetTimeInfo(Now)
 #if	defined(HAVE_GETTIMEOFDAY)
     struct timeval	tv;
 #endif	/* defined(HAVE_GETTIMEOFDAY) */
-#if	defined(HAVE_TM_GMTOFF)
+#if	defined(DONT_HAVE_TM_GMTOFF)
     struct tm		local;
     struct tm		gmt;
-#endif	/* !defined(HAVE_TM_GMTOFF) */
+#endif	/* !defined(DONT_HAVE_TM_GMTOFF) */
 
     /* Get the basic time. */
 #if	defined(HAVE_GETTIMEOFDAY)
@@ -790,7 +790,7 @@ GetTimeInfo(Now)
 	LastTime = Now->time;
 	if ((tm = localtime(&Now->time)) == NULL)
 	    return -1;
-#if	defined(HAVE_TM_GMTOFF)
+#if	defined(DONT_HAVE_TM_GMTOFF)
 	/* To get the timezone, compare localtime with GMT. */
 	local = *tm;
 	if ((tm = gmtime(&Now->time)) == NULL)
@@ -812,7 +812,7 @@ GetTimeInfo(Now)
 	LastTzone += gmt.tm_min - local.tm_min;
 #else
 	LastTzone =  (0 - tm->tm_gmtoff) / 60;
-#endif	/* defined(HAVE_TM_GMTOFF) */
+#endif	/* defined(DONT_HAVE_TM_GMTOFF) */
     }
     Now->tzone = LastTzone;
     return 0;

@@ -719,7 +719,16 @@ group_catchup:
 			case iKeyGroupToggleInverseVideo:	/* toggle inverse video */
 				toggle_inverse_video ();
 				show_group_page ();
+				show_inverse_video_status ();
 				break;
+
+#ifdef HAVE_COLOR
+			case iKeyGroupToggleColor:
+				toggle_color ();
+				show_group_page ();
+				show_color_status ();
+				break;
+#endif
 
 			case iKeyGroupKillThd:	/* mark rest of thread as read */
 				if (index_point < 0) {

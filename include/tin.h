@@ -16,7 +16,11 @@
  * OS specific doda's
  */
 
+#ifdef HAVE_CONFIG_H
+#include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
+#else
 #include	"config.h"
+#endif
 
 #ifdef __DECC
 #include	<unixio.h>
@@ -53,17 +57,24 @@ extern char *get_uaf_fullname();
 #	include <stddef.h>
 #else
 #	include <sys/types.h>
-#	include <sys/stat.h>
 #endif
-#ifdef HAVE_SYS_TIME_H
+#include <sys/stat.h>
+
+#ifdef TIME_WITH_SYS_TIME
 #	include <sys/time.h>
+#	include <time.h>
+#else
+#	ifdef HAVE_SYS_TIME_H
+#		include <sys/time.h>
+#	else
+#		include <time.h>
+#	endif
 #endif
+
 #ifdef HAVE_SYS_TIMES_H
 #	include <sys/times.h>
 #endif
-#ifdef HAVE_TIME_H
-#	include <time.h>
-#endif
+
 #ifdef HAVE_UNISTD_H
 #	include <unistd.h>
 #endif
@@ -84,10 +95,13 @@ extern char *get_uaf_fullname();
 #	endif
 #endif
 
-#ifdef HAVE_STRINGS_H
-#	include <strings.h>
-#else
+	/* prefer string.h because it's Posix */
+#ifdef HAVE_STRING_H
 #	include <string.h>
+#else
+#	ifdef HAVE_STRINGS_H
+#		include <strings.h>
+#	endif
 #endif
 
 #ifdef HAVE_FCNTL_H
@@ -123,7 +137,13 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef HAVE_SYS_SELECT_H
+#	if SYSTEM_LOOKS_LIKE_SCO
+#		define timeval fake_timeval
+#	endif
 #	include <sys/select.h>
+#	if SYSTEM_LOOKS_LIKE_SCO
+#		undef timeval
+#	endif
 #endif
 
 #ifdef HAVE_STROPTS_H
@@ -142,6 +162,11 @@ extern char *get_uaf_fullname();
 #	include <termios.h>
 #endif
 
+#if SYSTEM_LOOKS_LIKE_SCO
+#	include <sys/stream.h>
+#	include <sys/ptem.h>
+#endif
+
 #if defined(SIGWINCH) && !defined(DONT_HAVE_SIGWINCH)
 #	if !defined(TIOCGWINSZ) && !defined(TIOCGSIZE)
 #		ifdef HAVE_SYS_STREAM_H
@@ -155,7 +180,7 @@ extern char *get_uaf_fullname();
 #				include <sys/tty.h>
 #			endif
 #			ifdef HAVE_SYS_PTY_H
-#				if !defined(_h_BSDTYPES) && !defined(DONT_HAVE_SYS_BSDTYPES_H)
+#				if !defined(_h_BSDTYPES) && defined(HAVE_SYS_BSDTYPES_H)
 #					include <sys/bsdtypes.h>
 #				endif
 #				include <sys/pty.h>
@@ -172,6 +197,24 @@ extern char *get_uaf_fullname();
  * Directory handling code
  */
 
+#ifdef HAVE_CONFIG_H
+#if HAVE_DIRENT_H
+#	include <dirent.h>
+#	define	DIR_BUF struct dirent
+#	define	D_NAMLEN(p)	(p)->d_reclen
+#else
+#	if HAVE_SYS_DIR_H
+#		include <sys/dir.h>
+#	endif
+#	if HAVE_SYS_NDIR_H
+#		include <sys/ndir.h>
+#	endif
+#	define	DIR_BUF struct direct
+#	define	D_NAMLEN(p)	(p)->d_namlen
+#endif
+
+#else	/* FIXME: most of the rest of this isn't necessary with autoconf */
+
 #if defined(BSD) && !defined(__386BSD__) && !defined(M_OS2)
 #	ifdef sinix
 #		include <dir.h>
@@ -186,37 +229,43 @@ extern char *get_uaf_fullname();
 #	ifndef DIR_BUF
 #		define	DIR_BUF 	struct direct
 #	endif
-#	define		D_LENGTH	d_namlen
+#	define		D_NAMLEN(p)	(p)->d_namlen
 #endif
 #ifdef M_AMIGA
 #	include "amiga.h"
 #	define		DIR_BUF 	struct dirent
-#	define		D_LENGTH	d_reclen
+#	define		D_NAMLEN(p)	(p)->d_reclen
 #endif
 #ifdef M_OS2
 #	include "os_2.h"
 #	define		DIR_BUF 	struct dirent
-#	define		D_LENGTH	d_reclen
+#	define		D_NAMLEN(p)	(p)->d_reclen
 #endif
 #ifdef WIN32
 #	include "win32.h"
 #	define		DIR_BUF 	struct direct
-#	define		D_LENGTH	d_namlen
+#	define		D_NAMLEN(p)	(p)->d_namlen
 #endif
 #ifdef M_XENIX
 #	include <sys/ndir.h>
 #	define		DIR_BUF 	struct direct
-#	define		D_LENGTH	d_namlen
+#	define		D_NAMLEN(p)	(p)->d_namlen
 #endif
 #ifdef VMS
 #include "ndir.h"
 #define 	DIR_BUF 	struct direct
-#define 	D_LENGTH	d_namlen
+#define 	D_NAMLEN(p)	(p)->d_namlen
 #endif
+#endif	/* !HAVE_CONFIG_H */
+
 #ifndef DIR_BUF
 #	include <dirent.h>
 #	define		DIR_BUF 	struct dirent
-#	define		D_LENGTH	d_reclen
+#	define		D_NAMLEN(p)	(p)->d_reclen
+#endif
+
+#ifndef HAVE_UNLINK
+#	define unlink(file) remove(file)
 #endif
 
 /*
@@ -293,24 +342,28 @@ extern char *get_uaf_fullname();
  */
 
 #ifndef BSD
-#	ifndef bcopy
+#	ifndef HAVE_BCOPY
 #		define	bcopy(a,b,c)	memcpy(b,a,c)
+#	endif
+#	ifndef HAVE_BZERO
 #		define	bzero(a,b)		memset(a,'\0',b)
+#	endif
+#	ifndef HAVE_BFILL
 #		define	bfill(a,b,c)	memset(a,c,b)
 #	endif
 #endif
 
 #ifdef BSD
-#	ifdef DONT_HAVE_MEMCMP
+#	ifndef HAVE_MEMCMP
 #		define		memcmp(s1, s2, n)	bcmp(s2, s1, n)
 #	endif
-#	ifdef DONT_HAVE_MEMCPY
+#	ifndef HAVE_MEMCPY
 #		define		memcpy(s1, s2, n)	bcopy(s2, s1, n)
 #	endif
-#	ifdef DONT_HAVE_MEMSET
+#	ifndef HAVE_MEMSET
 #		define		memset(s1, s2, n)	bfill(s1, n, s2)
 #	endif
-#	ifndef __STDC__
+#	ifndef HAVE_STRCHR
 #		define		strchr(str, ch) 	index(str, ch)
 #		define		strrchr(str, ch)	rindex(str, ch)
 #	endif
@@ -1246,12 +1299,8 @@ typedef struct t_notify *notify_p;
  * Determine signal return type
  */
 
-#ifdef HAVE_SIGTYPE_VOID
-typedef void RETSIGTYPE;
-#endif
-
-#ifdef HAVE_SIGTYPE_INT
-typedef int RETSIGTYPE;
+#ifndef RETSIGTYPE
+#define RETSIGTYPE void
 #endif
 
 /*
@@ -1271,12 +1320,10 @@ typedef char t_comptype;
 #endif
 
 #ifdef M_OS2
-#	define	SIGTYPE int
 #	define	_CDECL	_cdecl
 #	define	_FAR_	_far16
 #	define	SEPDIR	'\\'
 #else
-#	define	SIGTYPE
 #	define	_CDECL
 #	define	_FAR_
 #	define	SEPDIR	'/'
@@ -1387,7 +1434,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #		define st_mode st_attr
 #		define S_ISDIR(m)   (((m) & ST_DIRECT) == ST_DIRECT)
 #	endif
-#   if defined(WIN32)
+#	if defined(WIN32)
 #		define S_ISDIR(m)	((m) & _S_IFDIR)
 #	else
 #		if defined(M_OS2)
@@ -1442,32 +1489,21 @@ extern void joinpath (char *result, char *dir, char *file);
 
 /* #include	"filebug.h" */
 
-#define SIG_ARGS	int sig
-
-#if defined(apollo)
-#	if defined(__GNUC__) || defined(apollo_ansi)
-#		undef	SIG_ARGS
-#		define	SIG_ARGS	int sig, ...
-#		undef	SIGTYPE
-#		define	SIGTYPE 	SIG_ARGS
-#	endif
-#else
-#	if __STDC__
-#		undef	SIGTYPE
-#		define	SIGTYPE 	SIG_ARGS
-#	else
-#		undef	SIG_ARGS
-#		define	SIG_ARGS
+#ifndef SIG_ARGS
+#	if defined(__STDC__)
+#		define SIG_ARGS	int sig
 #	endif
 #endif
 
-/* stifle complaints about not-a-prototype */
-#if defined(__STDC__) && (defined(apollo) || defined(sun))
+/* stifle complaints about not-a-prototype from gcc */
+#ifdef DECL_SIG_CONST
 # undef  SIG_DFL
 # define SIG_DFL	(void (*)(SIG_ARGS))0
 # undef  SIG_IGN
 # define SIG_IGN	(void (*)(SIG_ARGS))1
-#endif
+# undef  SIG_ERR
+# define SIG_ERR	(void (*)(SIG_ARGS))-1
+#endif	/* DECL_SIG_CONST */
 
 #ifdef M_AMIGA
 typedef const char __far constext;

@@ -18,6 +18,9 @@
 /* This is NO official release, but a patched version.
  * Including patches from:
  *
+ *	T.E. Dickey <dickey@clark.net>
+ *		autoconf
+ *
  * 	Chris Blum <chris@phil.uni-sb.de>
  *		MIME support & minor bugfixes/customasations
  *
@@ -55,7 +58,7 @@
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960522"
+#define PATCHLEVEL	"MC.960524"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

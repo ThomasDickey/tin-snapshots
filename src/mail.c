@@ -372,11 +372,7 @@ vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
 	tDirFile = opendir (pcGrpPath);
 	if (tDirFile != (DIR *) 0) {
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-#if defined(M_OS2) || defined(QNX42)
-			lArtNum = lAtol (tFile->d_name, strlen (tFile->d_name));
-#else
-			lArtNum = lAtol (tFile->d_name, (int) tFile->D_LENGTH);
-#endif
+			lArtNum = lAtol (tFile->d_name, (int) D_NAMLEN(tFile));
 			if (lArtNum >= 1) {
 				if (lArtNum > *plArtMax) {
 					*plArtMax = lArtNum;

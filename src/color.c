@@ -15,8 +15,8 @@
  *              right notice, and it must be included in any copy made
  */
 
-#ifdef HAVE_COLOR
 #include "tin.h"
+#ifdef HAVE_COLOR
 
 /* setting foregroundcolor */
 void

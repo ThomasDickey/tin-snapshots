@@ -8,7 +8,7 @@
  *              from the Elm mail system. This library was hacked to provide 
  *              what tin needs.
  *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
- *              The Elm Mail System  -  $Revision: 2.1.1.1 $   $State: Exp $
+ *              The Elm Mail System  -  $Revision: 2.1.1.2 $   $State: Exp $
  */
 
 #include "tin.h"
@@ -62,11 +62,11 @@ static int xclicks=FALSE;	/* do we have an xterm? */
 #				ifdef sinix
 #					include <termios.h>
 #				else
-#		    ifdef VMS
-#			include <curses.h>
-#		    else
-#					    include <termio.h>
-#				    endif
+#					ifdef VMS
+#						include <curses.h>
+#					else
+#						include <termio.h>
+#					endif
 #				endif
 #			endif
 #		else
@@ -137,10 +137,11 @@ static char _capabilities[1024];	/* String for cursor motion */
 
 static char *ptr = _capabilities;	/* for buffering         */
 
-/* Linux already prototypes the termcap stuff -- and there's more than
- * one variation -- so we don't prototype them in that case.
+/*
+ * Prototypes for the termcap functions, if we cannot find them in a standard
+ * header file (e.g., curses.h).
  */
-#if !defined(__GNUC__) && !defined(__hpux)
+#if defined(DECL_TGETSTR)
 extern int	tgetent P_((char *, char *));	/* get termcap entry */
 extern char	*tgetstr P_((char *, char **));	/* Get termcap capability (string) */
 extern int	tgetflag P_((char *));			/* Get termcap capability (boolean) */
