@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970916
+PVER		= 970922
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -111,7 +111,7 @@ AMIGA	=\
 DOC	= \
 	$(DOCDIR)/CHANGES \
 	$(DOCDIR)/DEBUG_REFS \
-	$(DOCDIR)/Good-Netkeeping-Seal \
+	$(DOCDIR)/minimal-netkeeping \
 	$(DOCDIR)/INSTALL \
 	$(DOCDIR)/TODO \
 	$(DOCDIR)/WHATSNEW \

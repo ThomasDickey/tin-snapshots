@@ -183,26 +183,25 @@ get_newsrcname (
 			}
 			if (error) {
 				char ch;
-				char default_ch = iKeyNrctblIgnore;
+				char default_ch = iKeyNrctblAlternative;
 
+				Raw(TRUE);
 				do {
+					/* XXXX - very ugly code, but curses
+					   are not initialized yet */
 					if (error >= 2) {
 						default_ch = iKeyNrctblCreate;
-						sprintf (msg, "%s%c", txt_nrctbl_create, default_ch);
+						printf("%s%c\b", txt_nrctbl_create, default_ch);
 					} else {
-						sprintf (msg, "%s%c", txt_nrctbl_default, default_ch);
+						printf("%s%c\b", txt_nrctbl_default, default_ch);
 					}
-					wait_message (msg);
-
-					/*
-					 * FIXME - cursor possition is wrong &
-					 * <return> is needed at the end
-					 */
 
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = default_ch;
-				} while (!strchr ("\033cdiq", ch));
-
+				} while (!strchr ("\033acdq", ch));
+				printf("%c\n", ch);
+				Raw(FALSE);
+				
 				switch(ch) {
 					case iKeyNrctblCreate:
 						/* FIXME this doesn't check if we could create the file */
@@ -210,17 +209,17 @@ get_newsrcname (
 					case iKeyNrctblDefault:
 						joinpath(newsrc_name, homedir, ".newsrc");
 						return TRUE;
-					case iKeyNrctblIgnore:
-						sprintf(msg, "%s", txt_warn_difficulties);
-						wait_message (msg);
+					case iKeyNrctblAlternative:
+						sprintf(name_found, ".newsrc-%s", nntpserver_name);
+						joinpath(newsrc_name, homedir, name_found);
 						return TRUE;
-					case iKeyQuit:
+					case iKeyNrctblQuit:
 						exit(0);
 						/* keep lint quiet: */
 						/* FALLTHROUGH */
 					case ESC:
 					default:
-						break;
+						return TRUE;
 				}
 			}
 			return TRUE;

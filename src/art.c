@@ -772,13 +772,17 @@ iReadNovFile (
 	long max,
 	int *expired)
 {
- 	char	*p, *q, *s;
+ 	char	*p, *q;
 	char	*buf;
-	char	buf2[HEADER_LEN];
  	char	art_full_name[HEADER_LEN];
 	char	art_from_addr[HEADER_LEN];
 	FILE	*fp;
 	long	artnum;
+#if 0
+char *s; /* needed for Archive-Name: */
+char	buf2[HEADER_LEN];
+#endif /* 0 */
+
 
 	top = 0;
 	last_read_article = 0L;
@@ -1001,6 +1005,7 @@ sleep(1);
 			}
 		}
 
+#if 0 /* nobody has archive-name: in his overview-format! really! */
 		/*
 		 * READ article archive-name
 		 */
@@ -1041,6 +1046,7 @@ sleep(1);
 				}
 			}
 		}
+#endif /* 0 */
 
 		/*
 		 * end of overview line processing

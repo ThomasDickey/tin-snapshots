@@ -840,6 +840,16 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	KEYMAP_MOUSE		11
 #endif
 
+
+/*
+ * used in curses.c and signal.c
+ *     it's useless trying to run tin below these sizes
+ *     (values acquired by testing ;-) )
+ */
+#define MIN_LINES_ON_TERMINAL		 8
+#define MIN_COLUMNS_ON_TERMINAL		50
+ 
+
 /*
  *  used by feed_articles() & show_mini_help()
  */
@@ -1223,6 +1233,7 @@ struct t_attribute
 	char *mailing_list;			/* mail list email address */
 	char *x_headers;			/* extra headers for message header */
 	char *x_body;				/* bolierplate text for message body */
+	char *from;				/* from line */
 	unsigned global:1;			/* global/group specific */
 	unsigned quick_kill_header:3;		/* quick filter kill header */
 	unsigned quick_kill_expire:1;		/* quick filter kill limited/unlimited time */

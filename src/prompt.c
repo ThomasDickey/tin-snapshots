@@ -450,13 +450,29 @@ prompt_2(
 void
 continue_prompt (void)
 {
+	int ch;
+
 	set_alarm_clock_off ();
 
 #if USE_CURSES
 	cmd_line = TRUE;
 #endif
 	info_message (txt_return_key);
-	(void) ReadCh ();
+	ch = ReadCh ();
+	
+#ifndef WIN32
+	switch (ch) {
+		case ESC:
+#ifdef HAVE_KEY_PREFIX
+		case KEY_PREFIX:
+#endif
+			(void) get_arrow_key(ch);
+		default:
+			break;
+	}
+#endif /* WIN32 */
+                                                                                
+	get_arrow_key(' ');
 #if USE_CURSES
 	cmd_line = FALSE;
 	my_retouch();

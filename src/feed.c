@@ -316,7 +316,7 @@ feed_articles (
 			} else {
 #ifndef FORGERY
 				get_user_info (user_name, full_name);
-				get_from_name (from_name);
+				get_from_name (from_name, (struct t_group *) 0);
 
 				if (strstr (from_name, arts[respnum].from)) {
 #endif
@@ -385,7 +385,7 @@ feed_articles (
 				case FEED_PIPE:
 					fseek (note_fp, 0L, SEEK_SET);
 					if (got_sig_pipe) goto got_sig_pipe_while_piping;
-					copy_fp (note_fp, fp, "");
+					copy_fp (note_fp, fp);
 					break;
 
 				case FEED_PRINT:
@@ -453,7 +453,7 @@ feed_articles (
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
 						fseek (note_fp, 0L, SEEK_SET);
-						copy_fp (note_fp, fp, "");
+						copy_fp (note_fp, fp);
 						break;
 
 					case FEED_PRINT:
@@ -516,7 +516,7 @@ feed_articles (
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
-								copy_fp (note_fp, fp, "");
+								copy_fp (note_fp, fp);
 								break;
 
 							case FEED_PRINT:
@@ -594,7 +594,7 @@ feed_articles (
 							case FEED_PIPE:
 								if (got_sig_pipe) goto got_sig_pipe_while_piping;
 								fseek (note_fp, 0L, SEEK_SET);
-								copy_fp (note_fp, fp, "");
+								copy_fp (note_fp, fp);
 								break;
 
 							case FEED_PRINT:
@@ -784,7 +784,7 @@ print_file (
 		fprintf (fp, "Date: %s\n\n", note_h_date);
 		fseek (note_fp, note_mark[0], SEEK_SET);
 	}
-	copy_fp (note_fp, fp, "");
+	copy_fp (note_fp, fp);
 
 #ifdef DONT_HAVE_PIPING
 	fclose(fp);

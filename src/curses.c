@@ -311,6 +311,12 @@ SetupScreen (void)
 		_lines = DEFAULT_LINES_ON_TERMINAL;
 	if (_columns == -1)
 		_columns = DEFAULT_COLUMNS_ON_TERMINAL;
+
+	if (_lines < MIN_LINES_ON_TERMINAL ||
+	    _columns < MIN_COLUMNS_ON_TERMINAL) {
+	    	my_fprintf(stderr, txt_screen_too_small, progname);
+	    	return (FALSE);
+	}
 	/*
 	 * kludge to workaround no inverse
 	 */
@@ -415,6 +421,12 @@ InitScreen (void)
 		_columns = COLS;
 	}
 #endif	/* M_OS2 */
+
+	if (_lines < MIN_LINES_ON_TERMINAL ||
+	    _columns < MIN_COLUMNS_ON_TERMINAL) {
+	    	my_fprintf(stderr, txt_screen_too_small, progname);
+	    	return (FALSE);
+	}
 
 	InitWin ();
 

@@ -23,33 +23,34 @@
 #define	ATTRIB_SAVEDIR			1
 #define	ATTRIB_SAVEFILE			2
 #define	ATTRIB_ORGANIZATION		3
-#define	ATTRIB_SIGFILE			4
-#define	ATTRIB_FOLLOWUP_TO		5
-#define	ATTRIB_PRINTER			6
-#define	ATTRIB_AUTO_SELECT		7
-#define	ATTRIB_AUTO_SAVE		8
-#define	ATTRIB_BATCH_SAVE		9
-#define	ATTRIB_DELETE_TMP_FILES		10
-#define	ATTRIB_SHOW_ONLY_UNREAD		11
-#define	ATTRIB_THREAD_ARTS		12
-#define	ATTRIB_SHOW_AUTHOR		13
-#define	ATTRIB_SORT_ART_TYPE		14
-#define	ATTRIB_POST_PROC_TYPE		15
-#define	ATTRIB_QUICK_KILL_HEADER	16
-#define	ATTRIB_QUICK_KILL_SCOPE		17
-#define	ATTRIB_QUICK_KILL_EXPIRE	18
-#define	ATTRIB_QUICK_KILL_CASE  	19
-#define	ATTRIB_QUICK_SELECT_HEADER	20
-#define	ATTRIB_QUICK_SELECT_SCOPE	21
-#define	ATTRIB_QUICK_SELECT_EXPIRE	22
-#define	ATTRIB_QUICK_SELECT_CASE  	23
-#define	ATTRIB_MAILING_LIST		24
-#define	ATTRIB_X_HEADERS		25
-#define	ATTRIB_X_BODY			26
-#define	ATTRIB_AUTO_SAVE_MSG		27
-#define	ATTRIB_X_COMMENT_TO		28
-#define	ATTRIB_NEWS_QUOTE		29
-#define	ATTRIB_QUOTE_CHARS		30
+#define	ATTRIB_FROM			4
+#define	ATTRIB_SIGFILE			5
+#define	ATTRIB_FOLLOWUP_TO		6
+#define	ATTRIB_PRINTER			7
+#define	ATTRIB_AUTO_SELECT		8
+#define	ATTRIB_AUTO_SAVE		9
+#define	ATTRIB_BATCH_SAVE		10
+#define	ATTRIB_DELETE_TMP_FILES		11
+#define	ATTRIB_SHOW_ONLY_UNREAD		12
+#define	ATTRIB_THREAD_ARTS		13
+#define	ATTRIB_SHOW_AUTHOR		14
+#define	ATTRIB_SORT_ART_TYPE		15
+#define	ATTRIB_POST_PROC_TYPE		16
+#define	ATTRIB_QUICK_KILL_HEADER	17
+#define	ATTRIB_QUICK_KILL_SCOPE		18
+#define	ATTRIB_QUICK_KILL_EXPIRE	19
+#define	ATTRIB_QUICK_KILL_CASE  	20
+#define	ATTRIB_QUICK_SELECT_HEADER	21
+#define	ATTRIB_QUICK_SELECT_SCOPE	22
+#define	ATTRIB_QUICK_SELECT_EXPIRE	23
+#define	ATTRIB_QUICK_SELECT_CASE  	24
+#define	ATTRIB_MAILING_LIST		25
+#define	ATTRIB_X_HEADERS		26
+#define	ATTRIB_X_BODY			27
+#define	ATTRIB_AUTO_SAVE_MSG		28
+#define	ATTRIB_X_COMMENT_TO		29
+#define	ATTRIB_NEWS_QUOTE		30
+#define	ATTRIB_QUOTE_CHARS		31
 
 /*
 ** Local prototypes
@@ -84,6 +85,7 @@ set_default_attributes (
 	psAttrib->sigfile = default_sigfile;
 	psAttrib->organization =
 		(default_organization ? default_organization : (char *) 0);
+	psAttrib->from = (char *) 0;
 	psAttrib->followup_to = (char *) 0;
 	psAttrib->printer = default_printer;
 	psAttrib->quick_kill_scope =
@@ -123,6 +125,7 @@ set_default_attributes (
  *  attribute.savedir          = STRING
  *  attribute.savefile	       = STRING
  *  attribute.organization     = STRING
+ *  attribute.from             = STRING
  *  attribute.sigfile          = STRING
  *  attribute.followup_to      = STRING
  *  attribute.printer          = STRING
@@ -245,6 +248,9 @@ read_attributes_file (
 				MATCH_STRING (
 					"followup_to=",
 					ATTRIB_FOLLOWUP_TO);
+				MATCH_STRING (
+					"from=",
+					ATTRIB_FROM);
 				break;
 			case 'm':
 				MATCH_STRING (
@@ -486,6 +492,9 @@ set_attrib (
 		case ATTRIB_ORGANIZATION:
 			psGrp->attribute->organization = my_strdup (str);
 			break;
+		case ATTRIB_FROM:
+			psGrp->attribute->from = my_strdup (str);
+			break;
 		case ATTRIB_SIGFILE:
 			psGrp->attribute->sigfile = my_strdup (str);
 			break;
@@ -585,8 +594,10 @@ write_attributes_file (
 #ifndef INDEX_DAEMON
 	FILE *fp;
 	char *file_tmp;
+#if 0
 	register int i;
 	struct t_group *psGrp;
+#endif
 
 	/* alloc memory for tmp-filename */
 	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
@@ -613,6 +624,7 @@ write_attributes_file (
 	fprintf (fp, "#  savedir=STRING (ie. ~user/News)\n");
 	fprintf (fp, "#  savefile=STRING (ie. =linux)\n");
 	fprintf (fp, "#  organization=STRING (if beginning with '/' read from file)\n");
+	fprintf (fp, "#  from=STRING (just append wanted From:-line, don't use quotes)\n");
 	fprintf (fp, "#  sigfile=STRING (ie. $var/sig)\n");
 	fprintf (fp, "#  followup_to=STRING\n");
 	fprintf (fp, "#  printer=STRING\n");
@@ -679,7 +691,7 @@ write_attributes_file (
 	fprintf (fp, "delete_tmp_files=ON\n");
 	fprintf (fp, "followup_to=poster\n\n");
 
-
+#if 0 /* FIXME */
 	for (i = 0 ; i < num_active ; i++) {
 		psGrp = &active[i];
 		fprintf (fp, "scope=%s\n", psGrp->name);
@@ -687,6 +699,7 @@ write_attributes_file (
 		fprintf (fp, "savedir=%s\n", psGrp->attribute->savedir);
 		fprintf (fp, "savefile=%s\n", psGrp->attribute->savefile);
 		fprintf (fp, "organization=%s\n", psGrp->attribute->organization);
+		fprintf (fp, "from=%s\n", psGrp->attribute->from);
 		fprintf (fp, "sigfile=%s\n", psGrp->attribute->sigfile);
 		fprintf (fp, "followup_to=%s\n", psGrp->attribute->followup_to);
 		fprintf (fp, "printer=%s\n", psGrp->attribute->printer);
@@ -730,7 +743,7 @@ write_attributes_file (
 		fprintf (fp, "quote_chars=%s\n",
 			quote_space_to_dash (psGrp->attribute->quote_chars));
 	}
-
+#endif /* 0 */
 	if (ferror (fp) | fclose (fp)){
 		error_message (txt_filesystem_full, ATTRIBUTES_FILE);
 		/* free memory for tmp-filename */

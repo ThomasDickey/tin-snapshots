@@ -46,6 +46,9 @@ msg_write_signature (
 	}
 #endif
 
+	if (!thisgroup)
+		goto default_sig;
+
 	if (!strcmp(thisgroup->attribute->sigfile, "--none")) {
 		return;
 	}
@@ -83,22 +86,23 @@ msg_write_signature (
 		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 		joinpath (path, homedir, ".sigfixed");
 		if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
-			copy_fp (fixfp, fp, "");
+			copy_fp (fixfp, fp);
 			fclose (fixfp);
 		}
-		copy_fp (sigfp, fp, "");
+		copy_fp (sigfp, fp);
 		fclose (sigfp);
 		my_chdir (cwd);
 		return;
 	}
 
+default_sig:
 	/*
 	 *  Use ~/.signature or ~/.Sig or custom .Sig files
 	 */
 	if ((sigfp = fopen (default_signature, "r")) != (FILE *) 0) {
 		if (flag) {
 			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-			copy_fp (sigfp, fp, "");
+			copy_fp (sigfp, fp);
 		}
 		fclose (sigfp);
 		return;
@@ -106,7 +110,7 @@ msg_write_signature (
 
 	if ((sigfp = fopen (path, "r")) != (FILE *) 0) {
 		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
-		copy_fp (sigfp, fp, "");
+		copy_fp (sigfp, fp);
 		fclose (sigfp);
 	}
 }

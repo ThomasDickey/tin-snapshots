@@ -187,6 +187,14 @@ handle_resize (int repaint)
 	signal (SIGWINCH, signal_handler);
 #endif
 
+	if (cLINES < MIN_LINES_ON_TERMINAL ||
+	    cCOLS < MIN_COLUMNS_ON_TERMINAL) {
+	    	wait_message(txt_screen_too_small_exiting);
+	    	ring_bell ();
+	    	sleep(3); /* FIXME */
+	    	tin_done (EXIT_ERROR);
+	}
+
 	TRACE(("handle_resize(%d:%d)", (int)my_context, repaint))
 
 	if (repaint) {

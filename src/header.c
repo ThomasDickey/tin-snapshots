@@ -139,7 +139,8 @@ get_fqdn(
 
 	name[MAXHOSTNAMELEN]='\0';
 	if (host) {
-                if (strchr(host,'.')) return host;
+		if (strchr(host,'.'))
+			return host;
 		(void)strncpy(name,host,MAXHOSTNAMELEN);
 	} else
 		if (gethostname(name,MAXHOSTNAMELEN))
@@ -278,13 +279,19 @@ return (fullname);
  */
 void
 get_from_name (
-	char *from_name)
+	char *from_name,
+	struct t_group *thisgrp)
 {
 #ifndef INDEX_DAEMON
 	char *fromhost = GetConfigValue (_CONF_FROMHOST);
 
 	if (!(fromhost && *fromhost))
           fromhost = domain_name;
+
+	if (thisgrp && (thisgrp->attribute->from != (char *) 0)) {
+		strcpy(from_name, thisgrp->attribute->from);
+		return;
+	}
 
 	if (*mail_address) {
 		strcpy(from_name, mail_address);

@@ -29,10 +29,6 @@ static void write_input_history_file (void);
 	static int to_network (int c);
 #endif /* LOCAL_CHARSET */
 
-#if 0
-static void dump_input_history(void);
-#endif
-
 #ifdef M_UNIX
 /*
  * append_file instead of rename_file
@@ -44,7 +40,6 @@ append_file (
 	char *new_filename)
 {
 	char buf[1024];
-	size_t n;
 	FILE *fp_old, *fp_new;
 
 	if ((fp_new = fopen (new_filename, "r")) == (FILE *) 0) {
@@ -58,13 +53,7 @@ append_file (
 		fclose (fp_new);
 		return;
 	}
-	while ((n = fread (buf, 1, sizeof (buf), fp_new)) != 0) {
-		if (n != fwrite (buf, 1, n, fp_old)) {
-			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-			perror_message (msg, "");
-			return;
-		}
-	}
+   copy_fp(fp_old, fp_new);
 	fclose (fp_old);
  	fclose (fp_new);
 }
@@ -104,45 +93,31 @@ asfail (
 }
 
 
+/* quick copying of files */
 void
 copy_fp (
 	FILE *fp_ip,
-	FILE *fp_op,
-	const char *prefix)
+	FILE *fp_op)
 {
 	char buf[8192];
-	int retcode;
+	size_t n;
 
-	if (!prefix || !prefix[0]) {
-		size_t n;
-		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
-			if (n != fwrite (buf, 1, n, fp_op)) {
-				if (!got_sig_pipe) {
-					sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-					perror_message (msg, "");
-				}
-				return;
+	while ((n = fread (buf, 1, sizeof(buf), fp_ip)) != 0) {
+		if (n != fwrite (buf, 1, n, fp_op)) {
+			if (!got_sig_pipe) {
+				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+				perror_message (msg, "");
 			}
-		}
-		return;
-	}
-
-	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
-		retcode = fprintf (fp_op, "%s%s", prefix, buf);
-/*
-		if (buf[0] != '\n') {
-			retcode = fprintf (fp_op, "%s%s", prefix, buf);
-		} else {
-			retcode = fprintf (fp_op, "%s", buf);
-		}
-*/
-		if (retcode == EOF) {
-			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-			perror_message (msg, "");
 			return;
 		}
 	}
+	return;
 }
+
+
+/* copy the body of articles with given file pointers,
+   prefix (= quote_chars), initials of the articles author
+   and a flag, if the signature should be quoted */
 
 void
 copy_body (
@@ -155,81 +130,84 @@ copy_body (
 	char buf[8192];
 	char buf2[8192];
 	int retcode;
-	char zprefix[256];
 	char prefixbuf[256];
-	int status_space;
-	int status_char;
-	int double_quote;
+	t_bool status_space;
+	t_bool status_char;
 	int i;
 
+   /* This is a shortcut for speed reasons: if no prefix (= quote_chars)
+      is given just copy */
 	if (!prefix || !prefix[0]) {
-		size_t n;
-		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
-			if (n != fwrite (buf, 1, n, fp_op)) {
-				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
-				perror_message (msg, "");
-				return;
-			}
-		}
+		copy_fp(fp_ip, fp_op);
 		return;
 	}
 
-	strcpy(zprefix, prefix);
-
+	/* convert %S to %s, for compability reasons only */
 	if (strstr(prefix, "%S")) {
-		double_quote = 1;
-		status_char = 0;
+		status_char = FALSE;
 		for (i=0; prefix[i]; i++) {
 			if ((status_char) && (prefix[i] == 'S'))
-				zprefix[i] = 's';
-			if (prefix[i] == '%') status_char = 1;
-			else status_char = 0;
+				prefix[i] = 's';
+			if (prefix[i] == '%')
+				status_char = TRUE;
+			else
+				status_char = FALSE;
 		}
 	}
-	else double_quote = 0;
 
-	if (strstr(zprefix, "%s")) sprintf(prefixbuf, zprefix, initl);
+	if (strstr(prefix, "%s"))
+		sprintf(prefixbuf, prefix, initl);
+	else {
+		/* strip tailing space from quote-char for quoting quoted lines */
+		strcpy(prefixbuf,prefix);
+		if (prefixbuf[strlen(prefixbuf)-1] == ' ')
+			prefixbuf[strlen(prefixbuf)-1] = '\0';
+	}
 
 	while (fgets (buf, sizeof (buf), fp_ip) != (char *) 0) {
 		if (!with_sig && !strcmp(buf, "-- \n"))
 			break;
-		if (strstr(zprefix, "%s")) { /* initials wanted */
-			if (buf[0] != '\n') {
+		if (strstr(prefix, "%s")) { /* initials wanted */
+			if (buf[0] != '\n') { /* line is not empty */
 				if (strchr(buf, '>')) {
-					status_space = 0;
-					status_char = 1;
+					status_space = FALSE;
+					status_char = TRUE;
 					for (i=0; buf[i] && (buf[i] != '>'); i++) {
 						buf2[i] = buf[i];
-						if (buf[i] != ' ') status_space = 1;
+						if (buf[i] != ' ')
+							status_space = TRUE;
 						if ((status_space) &&
-						  !((buf[i] >= 'A' && buf[i] <= 'Z') ||
-						    (buf[i] >= 'a' && buf[i] <= 'z') ||
-						    (buf[i] == '>'))) status_char = 0;
+						  !(isalpha(buf[i]) || buf[i] == '>'))
+							status_char = FALSE;
 					}
 					buf2[i] = '\0';
-					if (status_char) {  /* already quoted */
-						if (double_quote) {
-							retcode = fprintf (fp_op, "%s>%s", buf2, strchr(buf, '>'));
-						}
-						else retcode = fprintf (fp_op, "%s", buf);
-					} else {   /* ... to be quoted ... */
+					if (status_char)  /* already quoted */
+						retcode = fprintf (fp_op, "%s>%s", buf2, strchr(buf, '>'));
+					else   /* ... to be quoted ... */
 						retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-					}
-				} else {   /* line was not already quoted (no >) */
+				} else    /* line was not already quoted (no >) */
 					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
-				}
-			} else {
-				retcode = fprintf (fp_op, "%s", buf);
+			} else {  /* line is empty */
+				if (quote_empty_lines)
+					retcode = fprintf (fp_op, "%s\n", prefixbuf);
+				else
+					retcode = fprintf (fp_op, "\n");
 			}
 		} else {    /* no initials in quote_string, just copy */
 			if ((buf[0] != '\n') || quote_empty_lines) {
-				retcode = fprintf (fp_op, "%s%s", prefix, buf);
-			} else {
-				retcode = fprintf (fp_op, "%s", buf);
-			}
+
+				/* use blank-stripped quote string if line is already quoted */
+				if (buf[0]=='>')
+					retcode = fprintf (fp_op, "%s%s", prefixbuf, buf);
+				else
+					retcode = fprintf (fp_op, "%s%s", prefix, buf);
+
+			} else 
+				retcode = fprintf (fp_op, "\n");
+			
 		}
 		if (retcode == EOF) {
-			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
+			sprintf (msg, "Failed copy_body(). errno=%d", errno);
 			perror_message (msg, "");
 			return;
 		}
@@ -408,6 +386,10 @@ tin_done (
 	vWriteNewsrc ();
 
 	write_input_history_file ();
+
+#if 0 /* FIXME */
+   write_attributes_file (local_attributes_file);
+#endif
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	write_mail_active_file ();
@@ -599,7 +581,7 @@ rename_file (
 				fclose (fp_old);
 				return;
 			}
-			copy_fp (fp_old, fp_new, "");
+			copy_fp (fp_old, fp_new);
 			fclose (fp_new);
 			fclose (fp_old);
 			errno = 0;
@@ -2566,22 +2548,6 @@ random_organization(
 	return selorg;
 }
 
-#if 0
-static void
-dump_input_history (void) {
-	int his_w, his_e;
-
-	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
-		fprintf(stderr, "Abschnitt %d: last=%d\n", his_w, hist_last[his_w]);
-		for (his_e = 0; his_e < HIST_SIZE; his_e++) {
-			fprintf(stderr, "  %2d = '%s'\n", his_e,
-				input_history[his_w][his_e]);
-		}
-	}
-
-}
-#endif
-
 void
 read_input_history_file (void) {
 	FILE *fp;
@@ -2637,8 +2603,6 @@ read_input_history_file (void) {
 
 	fclose(fp);
 
-/*	dump_input_history(); */
-
         if (cmd_line) {
 		printf ("\r\n");
 	}
@@ -2649,8 +2613,6 @@ write_input_history_file(void) {
 	FILE *fp;
 	int his_w, his_e;
 	char *chr;
-
-/*	dump_input_history(); */
 
 	if ((fp = fopen(local_input_history_file, "w")) == NULL)
 		return;

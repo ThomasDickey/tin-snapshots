@@ -721,13 +721,13 @@ void init_selfinfo (void)
 	joinpath (dead_articles, homedir, "dead.articles");
 
 #ifdef VMS
-	joindir (default_maildir, "~", DEFAULT_MAILDIR);
-	joindir (default_savedir, "~", DEFAULT_SAVEDIR);
+	joindir (default_maildir, homedir, DEFAULT_MAILDIR);
+	joindir (default_savedir, homedir, DEFAULT_SAVEDIR);
 #else
-	joinpath (default_maildir, "~", DEFAULT_MAILDIR);
-	joinpath (default_savedir, "~", DEFAULT_SAVEDIR);
+	joinpath (default_maildir, homedir, DEFAULT_MAILDIR);
+	joinpath (default_savedir, homedir, DEFAULT_SAVEDIR);
 #endif
-	joinpath (default_sigfile, "~", ".Sig");
+	joinpath (default_sigfile, homedir, ".Sig");
 	joinpath (default_signature, homedir, ".signature");
 	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
 	joinpath (global_config_file, libdir, CONFIG_FILE);

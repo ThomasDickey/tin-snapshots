@@ -1,3 +1,35 @@
+--unoff BETA release 970922 --
+
+442) Sven Paulus <sven@karlsruhe.org>
+     Urs Janssen <urs@karlsruhe.org>
+     BUG. quoting of quoted lines didn't strip tailing space from
+          quote_chars
+     BUG. minor code cleanup (moved missplaced label, commented out
+          buggy code)
+     FIX. attrib.c, misc.c, post.c
+
+441) Vincent Lefevre <vlefevre@ens-lyon.fr>
+     BUG. typo
+     FIX. lang.c
+
+440) Sven Paulus <sven@karlsruhe.org>
+     BUG. superseding/cancelling didn't work when one the groups
+          was not contained in active file
+     BUG. typo in lang.c
+     BUG. garbled display when asking if .newsrc should be created
+     BUG. removed where "~" was used instead of homedir
+     BUG. When an article was piped and the message "Press <RETURN>
+          to continue..."  appeared, if an arrow key was pressed,
+          arbitrary commands were executed.
+     BUG. tin did not warn you if you tried to save into a directory
+          and not into a file.
+     ADD. when window was or got too small, tin SIGSEGVd, now tin
+          exits properly 
+     ADD. set From:-address on per-group basis in attributes file
+     ADD. 'y' as an alternative to 'p' for mutt-users :-)
+     ADD. checking on startup, if window is large enough to run tin
+     FIX. tin.h, proto.h, attributes.c, post.c, lang.c
+
 --unoff BETA release 970916 --
 
 439) Martin Buck <martin-2.buck@student.uni-ulm.de>
