@@ -48,6 +48,7 @@ static void dump_msgid_threads P_((void));
 #endif
 static struct t_msgid *find_next P_((struct t_msgid *ptr));
 static void build_thread P_((struct t_msgid *ptr));
+static void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
 #endif
 
 /*
@@ -503,7 +504,7 @@ clear_art_ptrs()
  * Function to dump an ASCII tree map of a thread rooted at msgid.
  * Output goes to fp, level is the current depth of the tree.
  */
-void
+static void
 dump_thread(fp, msgid, level)
 	FILE *fp;
 	struct t_msgid *msgid;

@@ -16,8 +16,8 @@
 #include	"menukeys.h"
 
 #define IS_READ(i)		(arts[i].status == ART_READ)
-#define IS_KILLED(i)		(arts[i].killed == 1)
-#define IS_SELECTED(i)	(arts[i].selected == 1)
+#define IS_KILLED(i)		(arts[i].killed == TRUE)
+#define IS_SELECTED(i)	(arts[i].selected == TRUE)
 
 #define	SET_FILTER(grp,i,j)	\
 	if (ptr[j].type == FILTER_KILL) { \
@@ -42,7 +42,19 @@ int *arr_num;
 struct t_filter *arr_ptr;
 struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 
+/*
+** Local prototypes
+*/
+static char *pcChkRegexStr P_((char *pcStr));
 static int get_choice P_((int x, char *help, char *prompt, char *opt1, char *opt2, char *opt3, char *opt4, char *opt5));
+static int iAddFilterRule P_((struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule));
+static int unfilter_articles P_((void));
+static int set_filter_scope P_((struct t_group *group));
+static void vSetFilter P_((struct t_filter *psFilter));
+static void free_filter_item P_((struct t_filter *ptr));
+static void free_filter_array P_((struct t_filters *ptr));
+static void vWriteFilterFile P_((char *pcFile));
+static void vWriteFilterArray P_((FILE *fp, int global, struct t_filters *ptr, long theTime));
 
 
 struct t_filter *
@@ -67,7 +79,7 @@ psExpandFilterArray (ptr, num)
 }
 
 
-void
+static void
 vSetFilter (psFilter)
 	struct t_filter *psFilter;
 {
@@ -90,7 +102,7 @@ vSetFilter (psFilter)
 }
 
 
-void
+static void
 free_filter_item (ptr)
 	struct t_filter *ptr;
 {
@@ -101,7 +113,7 @@ free_filter_item (ptr)
 	FreeAndNull(ptr->xref);
 }
 
-void
+static void
 free_filter_array (ptr)
 	struct t_filters *ptr;
 {
@@ -429,7 +441,7 @@ if (debug) {
  *  write filter strings to ~/.tin/filter
  */
 
-void
+static void
 vWriteFilterFile (pcFile)
 	char *pcFile;
 {
@@ -522,7 +534,7 @@ subj=*xv*
 should work - but didn't with changing order of filterfile
 */
 
-void
+static void
 vWriteFilterArray (fp, global, ptr, theTime)
 	FILE *fp;
 	int global;
@@ -1151,7 +1163,7 @@ quick_filter_select_posted_art (group, subj)
  * API to add filter rule to the local or global filter array
  */
 
-int
+static int
 iAddFilterRule (psGrp, psArt, psRule)
 	struct t_group *psGrp;
 	struct t_article *psArt;
@@ -1304,7 +1316,7 @@ iAddFilterRule (psGrp, psArt, psRule)
  * them as being unread.
  */
 
-int
+static int
 unfilter_articles ()
 {
 	int unkilled = 0;
@@ -1606,7 +1618,7 @@ auto_select_articles (group)
 }
 
 
-int
+static int
 set_filter_scope (group)
 	struct t_group *group;
 {
@@ -1630,7 +1642,7 @@ set_filter_scope (group)
 	return inscope;
 }
 
-char *
+static char *
 pcChkRegexStr (pcStr)
 	char *pcStr;
 {

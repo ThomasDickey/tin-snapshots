@@ -15,13 +15,28 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-static int parse_newsrc_active_line P_((char *group, long *count, long *max, long *min, char *moderated));
-
 char new_newnews_host[PATH_LEN];
 int reread_active_file = FALSE;
 int newnews_index = -1;
 time_t new_newnews_time;			/* FIXME: never set */
 
+/*
+** Local prototypes
+*/
+static int find_newnews_index P_((char *cur_newnews_host));
+static int match_group_list P_((char *group, char *group_list));
+static int parse_newsrc_active_line P_((char *group, long *count, long *max, long *min, char *moderated));
+static void check_for_any_new_groups P_((void));
+static void prompt_subscribe_group P_((char *group, char *autosubscribe, char *autounsubscribe));
+
+#if 0
+static int cmp_group_p P_((t_comptype *group1, t_comptype *group2));
+static int cmp_notify_p P_((t_comptype *notify1, t_comptype *notify2));
+static void backup_active P_((int create));
+#endif /* 0 */
+
+
+#if 0 /* never used */
 /*
  *  Compare two pointers to "group_t" structures - used in qsort.
  */
@@ -45,6 +60,7 @@ cmp_notify_p (notify1, notify2)
 {
 	return (strcmp ((*(notify_p *) notify1)->name, (*(notify_p *) notify2)->name));
 }
+#endif /* 0 */
 
 /*
  *  Get default array size for active[] from environment (AmigaDOS)
@@ -172,7 +188,7 @@ parse_newsrc_active_line (buf, count, max, min, moderated)
 {
 	char	*ptr;
 
-	ptr = my_strpbrk (buf, ":!");
+	ptr = tin_strpbrk (buf, ":!");
 
 	if (!ptr || *ptr != ':')		/* Invalid line or unsubscribed */
 		return(FALSE);
@@ -350,7 +366,7 @@ backup_active (create)
 		chmod (buf, (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH));
 	}
 }
-#endif
+#endif /* 0 */
 
 /*
  * Check for any newly created newsgroups.
@@ -361,7 +377,7 @@ backup_active (create)
  * If reading news via NNTP issue a NEWGROUPS command.
  */
 
-void
+static void
 check_for_any_new_groups ()
 {
 	char *autosubscribe, *autounsubscribe;
@@ -488,7 +504,7 @@ notify_groups_done:
  * prompt user if new group should be subscribed to
  */
 
-void
+static void
 prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 	char *group;
 	char *autosubscribe;
@@ -588,7 +604,7 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 }
 
 
-int
+static int
 match_group_list (group, group_list)
 	char *group;
 	char *group_list;
@@ -770,7 +786,7 @@ load_newnews_info (info)
 }
 
 
-int
+static int
 find_newnews_index (cur_newnews_host)
 	char *cur_newnews_host;
 {
@@ -863,28 +879,6 @@ read_motd_done:
 	sprintf (motd_file_info, "%ld", new_motd_date);
 
 #endif	/* INDEX_DAEMON */
-}
-
-/*
- *  find first occurrence of any char from str2 in str1
- */
-
-char *
-my_strpbrk (str1, str2)
-	char *str1;
-	char *str2;
-{
-	register char *ptr1;
-	register char *ptr2;
-
-	for (ptr1 = str1; *ptr1 != '\0'; ptr1++) {
-		for (ptr2 = str2; *ptr2 != '\0';) {
-			if (*ptr1 == *ptr2++) {
-				return (ptr1);
-			}
-		}
-	}
-	return (char *) 0;
 }
 
 void

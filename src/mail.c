@@ -353,7 +353,7 @@ vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
 	tDirFile = opendir (pcGrpPath);
 	if (tDirFile != (DIR *) 0) {
 		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
-			lArtNum = lAtol (tFile->d_name, (int) D_NAMLEN(tFile));
+			lArtNum = my_atol (tFile->d_name, (int) D_NAMLEN(tFile));
 			if (lArtNum >= 1) {
 				if (lArtNum > *plArtMax) {
 					*plArtMax = lArtNum;
@@ -384,28 +384,6 @@ vPrintGrpLine (hFp, pcGrpName, lArtMax, lArtMin, pcBaseDir)
 		pcGrpName, lArtMax, lArtMin, pcBaseDir);
 }
 
-long
-lAtol (pcStr, iNum)
-	char	*pcStr;
-	int	iNum;
-{
-	long	lValue = 0L;
-
-#ifdef QNX4
-	lValue = atol (pcStr);
-#else
-	while (*pcStr && iNum--) {
-		if (*pcStr >= '0' && *pcStr <= '9') {
-			lValue = lValue * 10 + (*pcStr - '0');
-		} else {
-			return -1;
-		}
-		pcStr++;
-	}
-#endif
-
-	return lValue;
-}
 
 /*
  * Given a base pathname & a newsgroup name build an absolute pathname.

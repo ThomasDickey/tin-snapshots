@@ -27,8 +27,19 @@ static int num_cmdargs;
 static int max_cmdargs;
 
 /*
- *  OK lets start the ball rolling...
- */
+** Local prototypes
+*/
+static void read_cmd_line_options P_((int argc, char *argv[]));
+static void usage P_((char *theProgname));
+static int check_for_any_new_news P_((t_bool CheckAnyUnread, t_bool StartAnyUnread));
+static void save_or_mail_new_news P_((void));
+static void update_index_files P_((void));
+static void show_intro_page P_((void));
+
+
+/*
+**  OK lets start the ball rolling...
+*/
 
 int
 main (argc, argv)
@@ -275,7 +286,7 @@ main (argc, argv)
 #	define OPTIONS "dD:f:hI:PvV"
 #endif
 
-void
+static void
 read_cmd_line_options (argc, argv)
 	int argc;
 	char *argv[];
@@ -507,7 +518,7 @@ read_cmd_line_options (argc, argv)
  * usage
  */
 
-void
+static void
 usage (theProgname)
 	char *theProgname;
 {
@@ -603,7 +614,7 @@ usage (theProgname)
  *  check/start if any new/unread articles
  */
 
-int
+static int
 check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
 	t_bool CheckAnyUnread;
 	t_bool StartAnyUnread;
@@ -632,7 +643,7 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
  *  save any new articles to savedir structure for later reading
  */
 
-void
+static void
 save_or_mail_new_news ()
 {
 	t_bool i;
@@ -655,7 +666,7 @@ save_or_mail_new_news ()
  *  update index files
  */
 
-void
+static void
 update_index_files ()
 {
 	if (update || update_fork) {
@@ -729,7 +740,7 @@ update_index_files ()
  *  display page of general info. for first time user.
  */
 
-void
+static void
 show_intro_page ()
 {
 	if (cmd_line) {

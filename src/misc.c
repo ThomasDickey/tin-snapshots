@@ -15,47 +15,12 @@
 #include	"tin.h"
 #include	"version.h"
 
-/* local prototypes */
+/*
+** Local prototypes
+*/
 
 static char * escape_shell_meta P_((char *source, int quote_area));
-
-/*
- * special itoa()
- * converts value into a string with a len of digits
- * last char may be one of the following
- * Kilo, Mega, Giga, Terra
- */
-
-char *
-tin_itoa (value, digits)
-	int value;	/* change to long int if needed */
-	int digits;
-{
-	static char buffer[256];
-	static char power[]=" KMGT";
-	int len;
-	int i=0;
-
-	sprintf (buffer, "%d", value);
-	len = (int) strlen (buffer);
-
-	while (len > digits) {
-		len-=3;
-		i++;
-	}
-
-	if (i) {
-		while (len < (digits-1)) {
-			buffer[len++]=' ';
-		}
-		buffer[digits-1] = power[i];
-		buffer[digits] = '\0';
-	} else {
-		sprintf(buffer, "%*d", digits, value);
-	}
-
-	return (buffer);
-}
+static int strfeditor P_((char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format));
 
 #ifdef M_UNIX
 /*
@@ -501,12 +466,12 @@ strip_double_ngs (ngs_list)
 	char	ngroup2[HEADER_LEN];	/* inner newsgroup to compare       */
 	char	cmplist[HEADER_LEN];	/* last loops output                */
 	char	newlist[HEADER_LEN];	/* the newly generated list without */
-					/* any duplicates of the first nwsg */
+										/* any duplicates of the first nwsg */
 	int	ncnt1;			/* counter for the first newsgroup  */
 	int	ncnt2;			/* counter for the second newsgroup */
 	int 	over1;			/* TRUE when the outer loop is over */
 	int	over2;			/* TRUE when the inner loop is over */
-	char	*ptr;			/* start of next (outer) newsgroup  */
+	char	*ptr;				/* start of next (outer) newsgroup  */
 	char	*ptr2;			/* temporary pointer                */
 
 	/* shortcut, if the is only 1 group */
@@ -563,64 +528,6 @@ strip_double_ngs (ngs_list)
 
  	   	strcpy(ngs_list, newlist);	/* move string to its real location */
 	}
-}
-
-
-long
-my_strtol (str, ptr, use_base)
-	/* const */ char *str;
-	char **ptr;
-	int use_base;
-{
-#ifndef HAVE_STRTOL
-#define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
-#define MBASE 36
-
-	long	val;
-	int	xx, sign;
-
-	val = 0L;
-	sign = 1;
-
-	if (use_base < 0 || use_base > MBASE)
-		goto OUT;
-	while (isspace ((unsigned char)*str))
-		++str;
-	if (*str == '-') {
-		++str;
-		sign = -1;
-	} else if (*str == '+')
-		++str;
-	if (use_base == 0) {
-		if (*str == '0') {
-			++str;
-			if (*str == 'x' || *str == 'X') {
-				++str;
-				use_base = 16;
-			} else
-				use_base = 8;
-		} else
-			use_base = 10;
-	} else if (use_base == 16)
-		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
-			str += 2;
-		/*
-		 * for any base > 10, the digits incrementally following
-		 * 9 are assumed to be "abc...z" or "ABC...Z"
-		 */
-		while (isalnum ((unsigned char)*str) && (xx = DIGIT (*str)) < use_base) {
-			/* accumulate neg avoids surprises near maxint */
-			val = use_base * val - xx;
-			++str;
-		}
-OUT:
-	if (ptr != (char **) 0)
-		*ptr = str;
-
-	return (sign * (-val));
-#else
-	return strtol (str, ptr, use_base);
-#endif
 }
 
 
@@ -725,25 +632,6 @@ rename_file (old_filename, new_filename)
 }
 #endif	/* M_UNIX */
 
-
-/*
- * Handrolled version of strdup(), presumably to take advantage of
- * the enhanced error detection in my_malloc
- *
- * also, strdup is not mandatory in ANSI-C
- */
-char *my_strdup (str)
-	char *str;
-{
-	char *duplicate = (char *) 0;
-
-	if (str != (char *) 0) {
-		duplicate = (char *) my_malloc (strlen (str)+2);
-		duplicate[strlen(str)+1]= '\0';
-		strcpy (duplicate, str);
-	}
-	return duplicate;
-}
 
 
 int
@@ -1012,7 +900,6 @@ mail_check ()
  * Rewritten from scratch by Th. Quinot, 1997-01-03
  */
 
-#if 1
 # define APPEND_TO(dest, src) do { \
                                      (void) sprintf ((dest), "%s", (src)); \
                                      (dest)=strchr((dest), '\0'); \
@@ -1063,10 +950,6 @@ parse_from (addr, addrspec, comment)
 			case 0 :
 				switch (*ap) {
 					case '\"' :
-						/*
-							APPEND_TO (asp);
-							bp = cmtp;
-						*/
 						*atom_p = '\0';
 						quoted_p = quoted_buf;
 						*(quoted_p++) = '\"';
@@ -1177,231 +1060,7 @@ FATAL:
 # undef LTRIM
 # undef TRIM
 
-#else
 
-void
-parse_from (from_line, eaddr, fname)
-	char*	from_line;
-	char*	eaddr;
-	char*	fname;
-{
-	char	*nonblank = NULL;
-	char	name[HEADER_LEN];	/* User full name */
-	char	*nameptr = name;
-	char	addr[HEADER_LEN];	/* User e-mail address */
-	char	*addrptr  = addr;
-	char	state = 'A';		/* State = skip whitespace */
-	char	newstate = 'A'; 	/* Next state to process */
-	int	bananas = 0;		/* No () being processed now */
-
-	/*
-	 *   Begin loop to copy the input field into the address and the
-	 *   user name.  We will begin by copying both (ignoring whitespace
-	 *   for addresses) because we won't know if the input field is an
-	 *   address or a name until we hit either a special character of
-	 *   some sort.
-	 */
-
-	while ((*from_line != '\0') && (state != ',')) {
-
-		switch (state) {
-
-		case 'A':
-			if (isspace((unsigned char)*from_line)) /* Found first non-blank? */
-				break;		 /* No --> keep looking */
-
-			nonblank = from_line;
-			state = 'B';
-			/* ... and fall through */
-
-		case 'B':
-		case ')':
-			newstate = *from_line;
-			switch (*from_line) {
-
-			case '(':
-				bananas++;
-				break;
-
-/*
- *			case '"':
- *				break;
- */
-
-			case '<':
-				addrptr = addr;   /* Start address over */
-				nameptr = name;   /* Start name over again */
-				from_line  = nonblank - 1;
-
-				/* Re-scan in new state */
-
-				newstate = '>';   /* Proc all-non <> as name */
-				break;		  /* Begin addr over again */
-
-			case ',':
-				break;		  /* Terminates address */
-
-			case '>':
-			case ')':
-				strcpy(eaddr, "error@hell");
-				*fname = '\0';
-				return;
-
-			default:
-				newstate = state; /* stay in this state */
-				if (!isspace((unsigned char)*from_line))
-					*addrptr++ = *from_line;
-			}  /* switch(*from_line) */
-			break;
-
-		case '<':
-			if (*from_line == '>')
-				newstate = '>';
-			else if (isspace((unsigned char)*from_line))
-				*nameptr++ = *from_line;
-			else
-				*addrptr++ = *from_line;
-			break;
-
-		case '>':
-			if (*from_line == '<')
-				newstate = '<';
-			else
-				*nameptr++ = *from_line;
-			break;
-
-		case '(':
-			if (*from_line == '(')
-				++bananas;
-			else if (*from_line == ')')
-				if (--bananas == 0) {
-					newstate = ')';
-					break;
-				}
-			*nameptr++ = *from_line;
-			break;
-
-/*
- *		case '"':
- *			if (*from_line == '"')
- *				newstate = ')';
- *			else
- *				*nameptr++ = *from_line;
- *			break;
- */
-
-		default:
-
-			/* Logic error, bad state */
-
-			strcpy(eaddr, "error@nowhere");
-			*fname = '\0';
-			return;
-		}  /* switch (state) */
-		state = newstate;
-		from_line++;
-	} /* while */
-
-	*addrptr = '\0';
-	*nameptr = '\0';
-
-	if (state == 'A') {
-		strcpy(eaddr, "nobody@nowhere");
-		*fname = '\0';
-		return;
-	}
-
-	strcpy(eaddr, addr);	     /* Return the full address */
-	if (state == 'B')
-		strcpy(fname, "");
-	else {
-		while (--nameptr >= name) {
-			if (isspace((unsigned char)*nameptr) /* || (*nameptr == '"') */ )
-				*nameptr = '\0';
-			else
-				break;
-		}
-
-		/* Strip leading blanks from the address */
-
-		nameptr = name;
-		while (*(nameptr) != '\0') {
-			if (!(isspace((unsigned char)*nameptr) /* || (*nameptr == '"') */ ))
-				break;
-			else
-				nameptr++;
-		}
-		strcpy(fname, nameptr);
-	}
-}
-#endif
-
-/*
- *  Convert a string to a long, only look at first n characters
- */
-
-long
-my_atol (s, n)
-	char *s;
-	int n;
-{
-	long ret = 0;
-
-#ifdef QNX42
-	ret = atol (s);
-#else
-	while (*s && n--) {
-		if (*s >= '0' && *s <= '9')
-			ret = ret * 10 + (*s - '0');
-		else
-			return -1;
-		s++;
-	}
-#endif
-
-	return ret;
-}
-
-/*
- *  strcmp that ignores case
- */
-
-#define FOLD_TO_UPPER(a)	(toupper ((int) (a)))
-
-#ifndef HAVE_STRCASECMP
-int
-my_stricmp (p, q)
-	/* const */ char *p;
-	/* const */ char *q;
-{
-	int r;
-	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
-		if (*p == '\0') {
-			return (0);
-		}
-	}
-
-	return r;
-}
-#endif
-
-#ifndef HAVE_STRNCASECMP
-int
-my_strnicmp(p, q, n)
-	/* const */ char *p;
-	/* const */ char *q;
-	size_t n;
-{
-	int r=0;
-	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;
-			++p, ++q, --n) {
-		if (*p == '\0') {
-			return (0);
-		}
-	}
-	return n ? r : 0;
-}
-#endif
 
 /*
  *  Return a pointer into s eliminating any leading Re:'s.  Example:
@@ -1464,24 +1123,6 @@ hash_s (s)
 }
 #endif
 
-/*
- *  strncpy that stops at a newline and null terminates
- */
-
-void
-my_strncpy (p, q, n)
-	char *p;
-	/* const */ char *q;
-	int n;		/* we should use size_t instead of int */
-{
-	while (n--) {
-		if (!*q || *q == '\n')
-			break;
-		*p++ = *q++;
-	}
-	*p = '\0';
-}
-
 
 int
 untag_all_articles ()
@@ -1499,65 +1140,6 @@ untag_all_articles ()
 
 	return (untagged);
 }
-
-
-#ifndef HAVE_STRSTR
-/*
- * ANSI C strstr () - Uses Boyer-Moore algorithm.
- */
-char *
-my_strstr (text, pattern)
-	char *text;
-	char *pattern;
-{
-	register unsigned char *p, *t;
-	register int i, j, *delta;
-	register size_t p1;
-	int deltaspace[256];
-	size_t textlen;
-	size_t patlen;
-
-	textlen = strlen (text);
-	patlen = strlen (pattern);
-
-	/* algorithm fails if pattern is empty */
-	if ((p1 = patlen) == 0)
-		return (text);
-
-	/* code below fails (whenever i is unsigned) if pattern too long */
-	if (p1 > textlen)
-		return (NULL);
-
-	/* set up deltas */
-	delta = deltaspace;
-	for (i = 0; i <= 255; i++)
-		delta[i] = p1;
-	for (p = (unsigned char *) pattern, i = p1; --i > 0;)
-		delta[*p++] = i;
-
-	/*
-	 * From now on, we want patlen - 1.
-	 * In the loop below, p points to the end of the pattern,
-	 * t points to the end of the text to be tested against the
-	 * pattern, and i counts the amount of text remaining, not
-	 * including the part to be tested.
-	 */
-	p1--;
-	p = (unsigned char *) pattern + p1;
-	t = (unsigned char *) text + p1;
-	i = textlen - patlen;
-	forever {
-		if (*p == *t && memcmp ((p - p1), (t - p1), p1) == 0)
-			return ((char *)t - p1);
-		j = delta[*t];
-		if (i < j)
-			break;
-		i -= j;
-		t += j;
-	}
-	return (NULL);
-}
-#endif
 
 
 int
@@ -1978,7 +1560,7 @@ out:
  *   %N  Linenumber
  */
 
-int
+static int
 strfeditor (editor, linenum, filename, s, maxsize, format)
 	char *editor;
 	int linenum;
@@ -2733,4 +2315,4 @@ buffer_to_network (b)
 		*b = to_network(*b);
 }
 
-#endif
+#endif /* LOCAL_CHARSET */

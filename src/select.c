@@ -24,6 +24,19 @@ int space_mode;
 int yank_in_active_file = TRUE;
 
 
+/*
+** Local prototypes
+*/
+static int prompt_group_num P_((int ch));
+static void yank_active_file P_((void));
+static int reposition_group P_((struct t_group *group, int default_num));
+static void catchup_group P_((struct t_group *group, int goto_next_unread_group));
+static int next_unread_group P_((int enter_group));
+static void goto_next_group_on_screen P_((void));
+static int iParseRange P_((char *pcRange, int iNumMin, int iNumMax, int iNumCur, int *piRngMin, int *piRngMax));
+static void vDelRange P_((int iLevel, int iNumMax));
+
+
 void
 selection_index (start_groupnum, num_cmd_line_groups)
 	int start_groupnum;
@@ -918,7 +931,7 @@ group_selection_page ()
 }
 
 
-int
+static int
 prompt_group_num (ch)
 	int ch;
 {
@@ -968,7 +981,7 @@ draw_group_arrow ()
 }
 
 
-void
+static void
 yank_active_file ()
 {
 	reread_active_file = TRUE;
@@ -1045,7 +1058,7 @@ add_my_group (group, add)
 	return -1;
 }
 
-int
+static int
 reposition_group (group, default_num)
 	struct t_group *group;
 	int default_num;
@@ -1098,7 +1111,7 @@ reposition_group (group, default_num)
 }
 
 
-void
+static void
 catchup_group (group, goto_next_unread_group)
 	struct t_group *group;
 	int goto_next_unread_group;
@@ -1120,7 +1133,7 @@ catchup_group (group, goto_next_unread_group)
 }
 
 
-int
+static int
 next_unread_group (enter_group)
 	int enter_group;
 {
@@ -1303,7 +1316,7 @@ toggle_my_groups (only_unread_groups, group)
 }
 
 
-void
+static void
 goto_next_group_on_screen ()
 {
 	if (_hp_glitch) {
@@ -1443,7 +1456,7 @@ iSetRange (iLevel, iNumMin, iNumMax, iNumCur)
 	return iRetCode;
 }
 
-int
+static int
 iParseRange (pcRange, iNumMin, iNumMax, iNumCur, piRngMin, piRngMax)
 	char *pcRange;
 	int iNumMin;
@@ -1505,7 +1518,8 @@ iParseRange (pcRange, iNumMin, iNumMax, iNumCur, piRngMin, piRngMax)
 	return iRetCode;
 }
 
-void
+
+static void
 vDelRange (iLevel, iNumMax)
 	int iLevel;
 	int iNumMax;

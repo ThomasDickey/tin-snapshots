@@ -31,8 +31,16 @@ static int thread_respnum = 0;
 static int first_thread_on_screen = 0;
 static int last_thread_on_screen = 0;
 
+/*
+** Local prototypes
+*/
 static int draw_tline P_((int i, int full));
 static int bld_tline P_((int l, struct t_article *art));
+static int prompt_thread_num P_((int ch));
+static void draw_thread_arrow P_((void));
+static void erase_thread_arrow P_((void));
+static void update_thread_page P_((void));
+
 
 /*
  * Build one line of the thread page display. Looks long winded, but
@@ -836,7 +844,7 @@ show_thread_page ()
 }
 
 
-void
+static void
 update_thread_page ()
 {
 #ifndef INDEX_DAEMON
@@ -858,7 +866,7 @@ update_thread_page ()
 }
 
 
-void
+static void
 draw_thread_arrow ()
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
@@ -881,7 +889,7 @@ draw_thread_arrow ()
 }
 
 
-void
+static void
 erase_thread_arrow ()
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
@@ -898,7 +906,7 @@ erase_thread_arrow ()
 }
 
 
-int
+static int
 prompt_thread_num (ch)
 	int ch;
 {

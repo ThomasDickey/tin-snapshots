@@ -27,18 +27,18 @@ static int overview_index_filename = FALSE;
 /*
  * Local prototypes
  */
-static int read_group P_((struct t_group *group, char *group_path, int *pcount));
-static void thread_by_subject P_((void));
-static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
-static int subj_comp P_((t_comptype *p1, t_comptype *p2));
-static int from_comp P_((t_comptype *p1, t_comptype *p2));
-static int date_comp P_((t_comptype *p1, t_comptype *p2));
 static char *pcPrintDate P_((long lSecs));
 static char *pcPrintFrom P_((struct t_article *psArt));
+static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
+static int date_comp P_((t_comptype *p1, t_comptype *p2));
+static int from_comp P_((t_comptype *p1, t_comptype *p2));
+static int iReadNovFile P_((struct t_group *group, long min, long max, int *expired));
+static int parse_headers P_((char *buf, struct t_article *h));
+static int read_group P_((struct t_group *group, char *group_path, int *pcount));
+static int subj_comp P_((t_comptype *p1, t_comptype *p2));
+static int valid_artnum P_((long art));
 static void print_expired_arts P_((int num_expired));
-#ifdef INDEX_DAEMON
-static void vCreatePath P_((char *pcPath));
-#endif
+static void thread_by_subject P_((void));
 
 /*
  *  Construct the pointers to the basenotes of each thread
@@ -369,7 +369,7 @@ read_group (group, group_path, pcount)
  * The algorithm is elegant, using the fact that identical Subject lines
  * are hashed to the same node in table[] (see hashstr.c)
  *
- * Mark i as being in j's thread list iff
+ * Mark i as being in j's thread list if
  * . The article is _not_ being ignored
  * . The article is not already threaded
  * . One of the following is true:
@@ -563,7 +563,7 @@ sort_arts (sort_art_type)
 	}
 }
 
-int
+static int
 parse_headers (buf, h)
 	char *buf;
 	struct t_article *h;
@@ -750,7 +750,7 @@ parse_headers (buf, h)
  *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
 
-int
+static int
 iReadNovFile (group, min, max, expired)
 	struct t_group *group;
 	long min;
@@ -1596,7 +1596,7 @@ input_pending ()
 }
 
 
-int
+static int
 valid_artnum (art)
 	long art;
 {
@@ -1730,17 +1730,3 @@ pcPrintFrom (psArt)
 
 	return acFrom;
 }
-
-#ifdef INDEX_DAEMON
-static void
-vCreatePath (pcPath)
-	char *pcPath;
-{
-	char	acCmd[LEN];
-
-	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
-	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
-	printf ("CREATE Path=[%s]\n", acCmd);
-	system (acCmd);
-}
-#endif

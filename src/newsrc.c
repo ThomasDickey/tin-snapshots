@@ -18,7 +18,21 @@
 
 static int newsrc_mode = 0;
 
+/*
+** Local prototypes
+*/
 static void vWriteNewsrcLine P_((FILE *fp, char *line));
+static char *getaline P_((FILE *fp));
+static char *pcParseNewsrcLine P_((char *line, char *grp, int *sub));
+static void print_bitmap_seq P_((FILE *fp, struct t_group *group));
+static char *pcParseSubSeq P_((struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum));
+static char *pcParseGetSeq P_((char *pcSeq, long *plLow, long *plHigh));
+static void parse_bitmap_seq P_((struct t_group *group, char *seq));
+static void create_newsrc P_((char *newsrc_file));
+static void auto_subscribe_groups P_((char *newsrc_file));
+#if 0
+static void delete_group P_((char *group));
+#endif
 
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
@@ -157,7 +171,7 @@ vWriteNewsrc ()
  *  Create a newsrc from active[] groups. Subscribe to all groups.
  */
 
-void
+static void
 create_newsrc (newsrc_file)
 	char *newsrc_file;
 {
@@ -183,7 +197,7 @@ create_newsrc (newsrc_file)
  * server (LIST AUTOSUBSCRIBE) and create .newsrc
  */
 
-void
+static void
 auto_subscribe_groups (newsrc_file)
 	char *newsrc_file;
 {
@@ -364,8 +378,8 @@ reset_newsrc ()
 	}
 }
 
-
-void
+#if 0 /* never used */
+static void
 delete_group (group)
 	char *group;
 {
@@ -403,7 +417,7 @@ delete_group (group)
 		}
 	}
 }
-
+#endif /* 0 */
 
 void
 grp_mark_read (group, psArt)
@@ -512,7 +526,7 @@ thd_mark_unread (group, thread)
  * Parse the newsrc sequence for the specified group
  */
 
-void
+static void
 parse_bitmap_seq (group, seq)
 	struct t_group *group;
 	char *seq;
@@ -642,7 +656,7 @@ wait_message (msg);
  *   4th call would parse 97-99 and return NULL
  */
 
-char *
+static char *
 pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 	struct	t_group *psGrp;
 	char	*pcSeq;
@@ -704,7 +718,7 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 }
 
 
-char *
+static char *
 pcParseGetSeq(pcSeq, plLow, plHigh)
 	char *pcSeq;
 	long *plLow;
@@ -778,7 +792,7 @@ parse_unread_arts (group)
 	group->newsrc.num_unread = unread;
 }
 
-void
+static void
 print_bitmap_seq (fp, group)
 	FILE *fp;
 	struct t_group *group;
@@ -1066,7 +1080,7 @@ catchup_newsrc_file (newsrc_file)
 }
 
 
-char *
+static char *
 pcParseNewsrcLine (line, grp, sub)
 	char *line;
 	char *grp;
@@ -1330,9 +1344,7 @@ vSetDefaultBitmap (group)
 	}
 }
 
-/* we use safe_fgets instead - it's more efficient */
-
-char *
+static char *
 getaline(fp)
 	FILE *fp;
 {
@@ -1342,72 +1354,6 @@ getaline(fp)
 		res[strlen(res)-1]='\0';
 	return res;
 }
-
-#if 0
-char *
-getaline (fp)
-	FILE	*fp;
-{
-	char *p;
-	char *buf;				/* buffer for line */
-	size_t inc;				/* how much to enlarge buffer */
-	size_t len;				/* # of chars stored into buf before '\0' */
-	size_t size = 512;	/* size of buffer ; initial buffer size
-								 * (most lines should fit into this size
-								 */
-	size_t mucho = 128;	/* if there is at least this much wasted
-								 * space when the whole buffer has been
-								 * read, try to reclaim it.  Don't make
-								 * this too small, else there is too much
-								 * time wasted trying to reclaim a couple
-								 * of bytes.
-								 */
-
-	len = 0;
-	buf = (char *) my_malloc (size);
-	if (buf == (char *) 0) {
-		return (char *) 0;
-	}
-
-	while (fgets ((char *) buf+len, size-len, fp) != (char *) 0) {
-		len += strlen (buf+len);
-		if (len > 0 && buf[len-1] == '\n') {
-			break;		/* the whole line has been read */
-		}
-		for (inc = size, p = NULL; p == NULL && inc != 0; inc /= 2) {
-			p = (char *) my_realloc (buf, size + inc);
-		}
-
-		if (inc == 0 || p == NULL) {
-			free (buf);
-			return (char *) 0;	/* couldn't get more memory */
-		}
-
-		size += inc;
-		buf = p;
-	}
-
-	if (len == 0) {
-		free (buf);
-		return (char *) 0;	/* nothing read (eof or error) */
-	}
-
-	if (buf[len-1] == '\n')	{	/* go back on top of the newline */
-		--len;
-	}
-	/* unconditionally terminate string, possibly overwriting newline */
-	buf[len] = '\0';
-
-	if (size - len > mucho) { /* a plenitude of unused memory? */
-		p = (char *) my_realloc (buf, len+1);
-		if (p != (char *) 0) {
-			buf = p;
-		}
-	}
-
-	return buf;
-}
-#endif
 
 /* TEST harness */
 #ifdef DEBUG_NEWSRC

@@ -37,6 +37,19 @@ int	iAllGrps;
 int	iRecursive;
 int	iVerbose;
 
+/*
+** Local prototypes
+*/
+static void vAppendGrpLine P_((char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir));
+static void vInitVariables P_((void));
+static void vMakeGrpList P_((char *pcActiveFile, char *pcBaseDir, char *pcGrpPath));
+
+#ifdef ACTIVE_DAEMON
+static void vReadCmdLineOptions P_((int iNumArgs, char *pacArgs[]));
+static void vPrintUsage P_((char *pcProgName));
+static void vUpdateActiveFile P_((char *pcActiveFile, char *pcDir));
+#endif /* ACTIVE_DAEMON */
+
 #ifndef M_AMIGA
 struct	passwd *psPwd;
 struct	passwd sPwd;
@@ -95,7 +108,7 @@ create_save_active_file ()
 }
 
 
-void
+static void
 vInitVariables ()
 {
 	char	*pcPtr;
@@ -145,7 +158,8 @@ vInitVariables ()
 	iVerbose = FALSE;
 }
 
-void
+#ifdef ACTIVE_DAEMON
+static void
 vReadCmdLineOptions (iNumArgs, pacArgs)
 	int	iNumArgs;
 	char	*pacArgs[];
@@ -191,7 +205,7 @@ vReadCmdLineOptions (iNumArgs, pacArgs)
 	}
 }
 
-void
+static void
 vUpdateActiveFile (pcActiveFile, pcDir)
 	char	*pcActiveFile;
 	char	*pcDir;
@@ -227,7 +241,7 @@ vUpdateActiveFile (pcActiveFile, pcDir)
 	}
 }
 
-void
+static void
 vPrintUsage (pcProgName)
 	char	*pcProgName;
 {
@@ -243,8 +257,9 @@ vPrintUsage (pcProgName)
 	printf ("  -v       verbose output\n");
 	printf ("\nMail bug reports/comments to %s\n", BUG_REPORT_ADDRESS);
 }
+#endif
 
-void
+static void
 vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath)
 	char	*pcActiveFile;
 	char	*pcBaseDir;
@@ -309,7 +324,7 @@ printf ("STAT=[%s]\n", acPath);
 	}
 }
 
-void
+static void
 vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
 	char	*pcActiveFile;
 	char	*pcGrpPath;
@@ -332,3 +347,16 @@ vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
 	}
 }
 
+#ifdef INDEX_DAEMON
+void
+vCreatePath (pcPath)
+	char *pcPath;
+{
+	char	acCmd[LEN];
+
+	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
+	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
+	printf ("CREATE Path=[%s]\n", acCmd);
+	system (acCmd);
+}
+#endif

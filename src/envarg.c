@@ -14,7 +14,13 @@
 
 #include "tin.h"
 
-int
+/*
+** Local prototyes
+*/
+static int count_args P_((char *s));
+
+
+static int
 count_args (s)
 	char *s;
 {

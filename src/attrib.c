@@ -46,9 +46,18 @@
 #define	ATTRIB_X_HEADERS		25
 #define	ATTRIB_X_BODY			26
 #define	ATTRIB_AUTO_SAVE_MSG		27
-#define ATTRIB_X_COMMENT_TO		28
-#define ATTRIB_NEWS_QUOTE		29
-#define ATTRIB_QUOTE_CHARS		30
+#define	ATTRIB_X_COMMENT_TO		28
+#define	ATTRIB_NEWS_QUOTE		29
+#define	ATTRIB_QUOTE_CHARS		30
+
+/*
+** Local prototypes
+*/
+static void set_attrib P_((struct t_group *psGrp, int type, char *str, int num));
+static void set_attrib_num P_((int type, char *scope, int num));
+static void set_attrib_str P_((int type, char *scope, char *str));
+static void set_default_attributes P_((struct t_attribute *psAttrib));
+
 
 /*
  * global attributes
@@ -60,7 +69,7 @@ struct t_attribute glob_attributes;
  * Per group attributes
  */
 
-void
+static void
 set_default_attributes (psAttrib)
 	struct t_attribute *psAttrib;
 {
@@ -362,7 +371,7 @@ read_attributes_file (file, global_file)
 }
 
 
-void
+static void
 set_attrib_str (type, scope, str)
 	int type;
 	char *scope;
@@ -400,7 +409,7 @@ if (debug) {
 }
 
 
-void
+static void
 set_attrib_num (type, scope, num)
 	int type;
 	char *scope;
@@ -437,7 +446,7 @@ if (debug) {
 #endif	/* INDEX_DAEMON */
 }
 
-void
+static void
 set_attrib (psGrp, type, str, num)
 	struct	t_group	*psGrp;
 	int	type;
