@@ -1065,8 +1065,10 @@ parse_from (from_line, eaddr, fname)
 				bananas++;
 				break;
 
-			case '"':
-				break;
+/*
+ *			case '"':
+ *				break;
+ */
 
 			case '<':
 				addrptr = addr;   /* Start address over */
@@ -1121,12 +1123,14 @@ parse_from (from_line, eaddr, fname)
 			*nameptr++ = *from_line;
 			break;
 
-		case '"':
-			if (*from_line == '"')
-				newstate = ')';
-			else
-				*nameptr++ = *from_line;
-			break;
+/*
+ *		case '"':
+ *			if (*from_line == '"')
+ *				newstate = ')';
+ *			else
+ *				*nameptr++ = *from_line;
+ *			break;
+ */
 
 		default:
 
@@ -1154,7 +1158,7 @@ parse_from (from_line, eaddr, fname)
 		strcpy(fname, "");
 	else {
 		while (--nameptr >= name) {
-			if (isspace((unsigned char)*nameptr) || (*nameptr == '"'))
+			if (isspace((unsigned char)*nameptr) /* || (*nameptr == '"') */ )
 				*nameptr = '\0';
 			else
 				break;
@@ -1164,7 +1168,7 @@ parse_from (from_line, eaddr, fname)
 
 		nameptr = name;
 		while (*(nameptr) != '\0') {
-			if (!(isspace((unsigned char)*nameptr) || (*nameptr == '"')))
+			if (!(isspace((unsigned char)*nameptr) /* || (*nameptr == '"') */ ))
 				break;
 			else
 				nameptr++;

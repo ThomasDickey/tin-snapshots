@@ -1,5 +1,8 @@
 Bugs
 ----
+o  range check for artl-counter/num-lines etc. is missing -> output may look
+   ugly (f.e. if there are more than 9999 threads/arts in a group group.c)
+
 o  dupilcated parent msg-ids(*) could cause infinite loops
    (* onyl happens if the news spool is corrupt)
 
@@ -100,7 +103,8 @@ o  add feature save selected/tagged files sequentially to the same file
 o  rewrite NGLIMIT handling (post.c)
 
 o  use several functions from libcurses/<curses.h> if it's present in
-   curses.c 
+   curses.c (terminfo rather than termcap can provide correct color
+   capabilities, curses itself could simplify some logic).
 
 o  Reorganize tinrc into related sections for easier editing
    e.g., Display, Posting etc.
@@ -229,10 +233,6 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
-o  on some AIX mail (f.e. /usr/bin/mail) prints out an error (but the mail
-   is sent)
-   (add -DRS6000 in the Makefile to fix this)
-
 o  looks like, that while being connected to a server, new newsgroups are
    not recognized and that tin writes a timestamp of the last time it read
    the active-file (not connection time?), so it is possible that you never

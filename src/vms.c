@@ -122,7 +122,7 @@ char *fix_fullname(char *p)
 int tputs (str, zzz, func)
 	register char *str;
 	int zzz;
-	int (*func)(int);
+	OutcPtr func;
 {
 	if (! str) {
 		return(0);

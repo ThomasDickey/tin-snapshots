@@ -104,7 +104,7 @@
 #endif
 
 #if !defined(BSD) && \
-    !defined(M_OS2) && !defined(sinix) && !defined(RS6000) && \
+    !defined(M_OS2) && !defined(sinix) && \
 	!defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_UTSNAME_H
 #endif
@@ -149,7 +149,7 @@
 
 #if defined(__386BSD__) || defined(BSD) || \
     defined(__hpux) || defined(M_OS2) || \
-    defined(__osf__) || defined(RS6000) || defined(sinix) || \
+    defined(__osf__) || defined(sinix) || \
     defined(UMAXV)
 #	define	HAVE_NETDB_H
 #endif
@@ -173,7 +173,7 @@
 
 #define TIME_WITH_SYS_TIME
 
-#if defined(PTX) || defined(QNX42) || defined(RS6000) || defined(SCO_UNIX)
+#if defined(PTX) || defined(QNX42) || defined(SCO_UNIX)
 #	define	HAVE_SYS_SELECT_H
 #endif
 
@@ -194,7 +194,7 @@
 #	else
 #		if __STDC__ || defined(atthcx) || defined(__hpux) || \
 		   defined(__osf__) || defined(M_OS2) || defined(PTX) || \
-		   defined(RS6000) || defined(sinix) || \
+		   defined(sinix) || \
 		   defined(sun) || defined(SVR4) || \
 		   defined(u3b2) || defined(ultrix)	|| defined(WIN32)
 #			define	RETSIGTYPE void
@@ -227,12 +227,12 @@
 
 #if defined(AUX) || defined(BSD) || \
     defined(PTX) || defined(QNX42) || \
-    defined(RS6000) || defined(sinix) || defined(UMAXV) || \
+    defined(sinix) || defined(UMAXV) || \
     defined(WIN32)
 #	define	HAVE_LONG_FILE_NAMES
 #endif
 
-#if defined(M_OS2) || defined(RS6000) || defined(sinix) || \
+#if defined(M_OS2) || defined(sinix) || \
     defined(UMAXV) || defined(VMS)
 #	define	HAVE_GETHOSTBYNAME
 #endif
@@ -326,7 +326,7 @@
 #	define	HAVE_FORK
 #endif
 
-#if defined(M_OS2) || defined(RS6000) || defined(SVR4)
+#if defined(M_OS2) || defined(SVR4)
 #	define	HAVE_STRFTIME
 #endif
 
@@ -336,10 +336,6 @@
 
 #if defined(__hpux)
 #	define	HAVE_KEYPAD
-#endif
-
-#if defined(RS6000)
-#	define	READ_CHAR_HACK
 #endif
 
 #if defined(sinix)
@@ -389,7 +385,7 @@
  * for machines where the netlibs are in the libc library
  */
 
-#if defined(BSD) || defined(RS6000)
+#if defined(BSD)
 #	if !defined(NNTP_ABLE)
 #		define	NNTP_ABLE
 #	endif

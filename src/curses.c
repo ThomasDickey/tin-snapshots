@@ -17,6 +17,26 @@
 #	undef	sinix
 #endif
 
+#ifdef HAVE_CURSES_H
+#	if defined(M_XENIX)
+#		undef	HZ /* looks like a bug in M_XENIX includefiles */
+#	endif
+/* it doesn't do any harm, and <curses.h> may have conflicting defs */
+#	undef TRUE
+#	undef FALSE
+#	include <curses.h>
+#endif
+
+#if 0	/* FIXME: this has prototypes, but opens up new problems! */
+#ifdef HAVE_TERM_H
+#	include <term.h>
+#endif
+#endif /* 0 */
+
+#ifdef HAVE_TERMCAP_H
+#	include <termcap.h>
+#endif
+
 #ifdef VMS
 #include <descrip.h>
 #include <iodef.h>
@@ -952,8 +972,10 @@ int
 ReadCh ()
 {
 #ifndef INDEX_DAEMON
-	char ch;
 	register int result;
+#ifndef READ_CHAR_HACK
+	char ch;
+#endif /* READ_CHAR_HACK */
 
 #ifdef READ_CHAR_HACK
 #undef getc
@@ -965,25 +987,26 @@ ReadCh ()
 		if (ferror(stdin) && errno != EINTR)
 #else
 		if (ferror(stdin))
-#endif
+#endif /* EINTR */
 			break;
 
 		clearerr(stdin);
 	}
 
 	return ((result == EOF) ? EOF : result & 0xFF);
+
 #else
-#  ifdef EINTR
+#ifdef EINTR
 	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR)
 		;	/* spin on signal interrupts */
-#  else
-
+#else
 	result = read (0, &ch, 1);
-#  endif
-	return((result <= 0) ? EOF : ch & 0xFF);
-#endif
+#endif	/* EINTR */
 
-#endif /* INDEX_DAEMON */
+	return((result <= 0) ? EOF : ch & 0xFF);
+
+#endif	/* READ_CHAR_HACK */
+#endif	/* INDEX_DAEMON */
 }
 
 #endif	/* M_UNIX */
@@ -993,11 +1016,13 @@ ReadCh ()
  *  output a character. From tputs... (Note: this CANNOT be a macro!)
  */
 
-int
-outchar (c)
-	int c;
+OUTC_FUNCTION(outchar)
 {
+#ifdef OUTC_RETURN
 	return fputc (c, stdout);
+#else
+	(void) fputc (c, stdout);
+#endif
 }
 
 /*

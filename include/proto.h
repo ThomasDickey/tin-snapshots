@@ -101,7 +101,7 @@ extern void ToggleInverse P_((void));
 extern int RawState P_((void));
 extern void Raw P_((int state));
 extern int ReadCh P_((void));
-extern int outchar P_((int c));
+extern OUTC_RETTYPE outchar P_((OUTC_ARGS));
 extern void xclick P_((int state));
 extern void set_xclick_on P_((void));
 extern void set_xclick_off P_((void));
