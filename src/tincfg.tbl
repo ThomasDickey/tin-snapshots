@@ -111,3 +111,6 @@
 #ifdef	HAVE_KEYPAD
 	use_keypad			OPT_ON_OFF
 #endif
+
+	alternative_handling		OPT_ON_OFF
+

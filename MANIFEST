@@ -1,14 +1,14 @@
-MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970115 (Wed Jan 15 21:54:08 MET 1997)
 ----------------------------------------------------
-  60699 ./CHANGES
-  13869 ./TODO
+  61001 ./CHANGES
+  14229 ./TODO
    5365 ./Makefile
-  17217 ./INSTALL
+  17323 ./INSTALL
    2285 ./MANIFEST
    1659 ./README
     896 ./tinpp
-  21854 ./aclocal.m4
- 149911 ./configure
+  21852 ./aclocal.m4
+ 149909 ./configure
   16931 ./configure.in
    4771 ./install.sh
   11633 ./makefile.in
@@ -20,7 +20,7 @@ MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
    8277 ./include/config.h
-  42030 ./include/extern.h
+  42189 ./include/extern.h
   12952 ./include/menukeys.h
     718 ./include/msmail.h
    4828 ./include/nntplib.h
@@ -39,7 +39,7 @@ MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
   22433 ./src/attrib.c
    8460 ./src/charset.c
    5284 ./src/color.c
-  58542 ./src/config.c
+  58811 ./src/config.c
   20376 ./src/curses.c
   12401 ./src/debug.c
    2278 ./src/envarg.c
@@ -50,12 +50,12 @@ MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
    3202 ./src/hashstr.c
    9529 ./src/help.c
   12146 ./src/inews.c
-  30147 ./src/init.c
+  30302 ./src/init.c
     945 ./src/joinpath.c
-  56658 ./src/lang.c
+  56699 ./src/lang.c
    3629 ./src/list.c
   11545 ./src/mail.c
-  19324 ./src/main.c
+  19327 ./src/main.c
    8323 ./src/makecfg.c
    9471 ./src/memory.c
   52818 ./src/misc.c
@@ -73,7 +73,7 @@ MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
    9937 ./src/prompt.c
     160 ./src/proto.sed
   22481 ./src/refs.c
-   8741 ./src/rfc1521.c
+  11769 ./src/rfc1521.c
   16609 ./src/rfc1522.c
   33862 ./src/save.c
    4573 ./src/screen.c
@@ -92,5 +92,5 @@ MANIFEST for tin-1.3-unoff-BETA-970114 (Tue Jan 14 08:58:41 MET 1997)
   11416 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
-   3706 ./src/tincfg.tbl
-1632247 insgesamt
+   3742 ./src/tincfg.tbl
+1636702 insgesamt

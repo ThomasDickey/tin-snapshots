@@ -96,6 +96,10 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+			if (match_boolean (buf, "alternative_handling=", &alternative_handling)) {
+				break;
+			}
+			break;
 
 		case 'b':
 			if (match_boolean (buf, "batch_save=", &default_batch_save)) {
@@ -939,6 +943,9 @@ write_config_file (file)
 	fprintf (fp, "# If ON enable scroll keys on terminals that support it\n");
 	fprintf (fp, "use_keypad=%s\n\n", print_boolean (use_keypad));
 #endif
+
+ 	fprintf (fp, "# If ON strip multipart/alternative messages automatically\n");
+	fprintf (fp, "alternative_handling=%s\n\n", print_boolean (alternative_handling));
 
 	fprintf (fp, "# Defaults for quick (1 key) kill & auto-selection filters\n");
 	fprintf (fp, "# header=NUM  0=Subject: 1=From: 2=Message-Id:\n");
