@@ -1,3 +1,10 @@
+--unoff BETA release 960822 --
+
+157) Jarkko Jormanainen <jarkko@utu.fi>
+     Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     BUG. a curly-brace was missing and one parenthesis was to much
+     FIX. open.c
+
 --unoff BETA release 960821 --
 
 156) Alexander Lehmann <alex@hal.rhein-main.de>
@@ -10,11 +17,11 @@
 
 154) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. SIGPIPE handlig for feed_artile
+     ADD. SIGPIPE handlig for feed_article
      BUG. TeX2ISO did not work without rereading article
      BUG. article with selfrefereces caused endless loop
      BUG. when threading Both, wrong flag was showing up
-     BUG. ~Mail/posted was not stored - braindead dependency removed
+     BUG. ~Mail/posted was not stored - brain-dead dependency removed
      ADD. minor code cleanup (added a few casts, striped tailing blanks,
           sorted tinrc according to options 'M'enu, ...)
      FIX. several patches
@@ -121,8 +128,7 @@
 
 138) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. removed useless (void) get_nntpserver casts
-     ADD. removed vWriteNovFile calls if running NNTP_ONLY (hope this will
-          not break anything)
+     ADD. removed vWriteNovFile calls if running NNTP_ONLY
      ADD. changed default quote char to "> "
      BUG. tin -n crashed when trying to read articles from a not existing
           newsgroup

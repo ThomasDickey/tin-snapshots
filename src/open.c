@@ -1100,10 +1100,10 @@ log_user ()
 				buf,
 				myentry->pw_name,
 #endif
-				ctime (&epoch));
+				ctime (&epoch);
 			fclose (fp);
 			chmod (log_file, 0666);
-
+		}
 #endif	/* LOG_USER */
 	}
 }

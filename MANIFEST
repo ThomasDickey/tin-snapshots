@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-960821 (Wed Aug 21 06:02:49 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960822 (Thu Aug 22 03:10:08 MET DST 1996)
 ----------------------------------------------------
-  36161 ./CHANGES
+  36323 ./CHANGES
   13242 ./TODO
    5217 ./Makefile
   17299 ./INSTALL
@@ -42,7 +42,7 @@ MANIFEST for tin-1.3-unoff-BETA-960821 (Wed Aug 21 06:02:49 MET DST 1996)
   19811 ./src/curses.c
   12264 ./src/debug.c
    2800 ./src/envarg.c
-  19175 ./src/feed.c
+  19172 ./src/feed.c
   35624 ./src/filter.c
   10801 ./src/getline.c
   41128 ./src/group.c
@@ -61,7 +61,7 @@ MANIFEST for tin-1.3-unoff-BETA-960821 (Wed Aug 21 06:02:49 MET DST 1996)
   26432 ./src/nntplib.c
   31305 ./src/nntpw32.c
    6142 ./src/nrctbl.c
-  27805 ./src/open.c
+  27807 ./src/open.c
    6247 ./src/os_2.c
   34712 ./src/page.c
   24090 ./src/parsdate.y
@@ -87,4 +87,4 @@ MANIFEST for tin-1.3-unoff-BETA-960821 (Wed Aug 21 06:02:49 MET DST 1996)
    5511 ./src/vms.c
    6861 ./include/autoconf.hin
   11360 ./src/Makefile.in
-1519716 total
+1519877 total

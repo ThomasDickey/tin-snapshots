@@ -196,7 +196,7 @@ feed_articles (function, level, group, respnum)
 					return;
 				}
 			}
-			
+
 			got_sig_pipe = FALSE;
 			if ((fp = popen (command, "w")) == NULL) {
 				perror_message (txt_command_failed_s, command);
