@@ -1,3 +1,16 @@
+dnl Project   : tin - a Usenet reader
+dnl Module    : aclocal.m4
+dnl Author    : Thomas E. Dickey <dickey@clark.net>
+dnl Created   : 24.08.95
+dnl Updated   : 09.07.96
+dnl Notes     : 
+dnl
+dnl Copyright 1996 by Thomas Dickey
+dnl             You may  freely  copy or  redistribute  this software,
+dnl             so  long as there is no profit made from its use, sale
+dnl             trade or  reproduction.  You may not change this copy-
+dnl             right notice, and it must be included in any copy made
+dnl
 dnl Macros used in TIN auto-configuration script.
 dnl
 dnl ---------------------------------------------------------------------------
@@ -180,6 +193,16 @@ AC_TRY_LINK([
 #	include <curses.h>
 #endif
 
+#if 0	/* FIXME: this has prototypes, but creates new problems */
+#ifdef HAVE_TERM_H
+#	include <term.h>
+#endif
+#endif
+
+#ifdef HAVE_TERMCAP_H
+#	include <termcap.h>
+#endif
+
 #ifdef HAVE_IOCTL_H
 #	include <ioctl.h>
 #else
@@ -291,7 +314,7 @@ AC_CACHE_VAL(cf_cv_extern_errno,[
 		[cf_cv_extern_errno=yes],
 		[cf_cv_extern_errno=no])])
 AC_MSG_RESULT($cf_cv_extern_errno)
-test $cf_cv_extern_errno = yes && AC_DEFINE(HAVE_EXTERN_ERRNO)
+test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
@@ -438,12 +461,14 @@ AC_CACHE_VAL(cf_cv_dcl_sys_errlist,[
 	[cf_cv_dcl_sys_errlist=yes],
 	[cf_cv_dcl_sys_errlist=no])])
 AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
-test $cf_cv_dcl_sys_errlist = yes && AC_DEFINE(HAVE_EXTERN_SYS_ERRLIST)
+test $cf_cv_dcl_sys_errlist = no && AC_DEFINE(DECL_SYS_ERRLIST)
 ])dnl
 dnl ---------------------------------------------------------------------------
 AC_DEFUN([CF_SYS_NAME],[
-AC_DEFINE(SYS_NAME,unknown)
-AC_SUBST(SYS_NAME)
+SYS_NAME=`(uname -a || hostname) 2>/dev/null | sed 1q`
+test -z "$SYS_NAME" && SYS_NAME=unknown
+AC_DEFINE_UNQUOTED(SYS_NAME,"$SYS_NAME")
+echo "Configuring `make version` for $SYS_NAME"
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl See if we can link with the termios functions tcsetattr/tcgetattr
@@ -489,30 +514,42 @@ AC_DEFUN([CF_TIOCGWINSZ],
 [
 AC_MSG_CHECKING([for working TIOCGWINSZ])
 AC_CACHE_VAL(cf_cv_use_tiocgwinsz,[
+	cf_save="$CFLAGS"
+	CFLAGS="-I. -I$srcdir/include -DHAVE_CONFIG_H -D__CPROTO__ $CFLAGS"
+	rm -f autoconf.h
+	echo > autoconf.h
 	AC_TRY_RUN([
-#if HAVE_TERMIOS_H
-#include <termios.h>
+#ifndef M_UNIX
+#define M_UNIX
 #endif
-#if !defined(sun) || !defined(HAVE_TERMIOS_H)
-#include <sys/ioctl.h>
-#endif
+#include <tin.h>
 int main()
 {
-	static	struct winsize size;
 	int fd;
 	for (fd = 0; fd <= 2; fd++) {	/* try in/out/err in case redirected */
+#ifdef TIOCGSIZE
+		struct ttysize size;
+		if (ioctl (0, TIOCGSIZE, &size) == 0
+		 && size.ts_lines > 0
+		 && size.ts_cols > 0)
+			exit(0);
+#else
+		struct winsize size;
 		if (ioctl(0, TIOCGWINSZ, &size) == 0
 		 && size.ws_row > 0
 		 && size.ws_col > 0)
 			exit(0);
+#endif
 	}
 	exit(0);	/* we cannot guarantee this is run interactively */
 }],
 		[cf_cv_use_tiocgwinsz=yes],
 		[cf_cv_use_tiocgwinsz=no],
-		[cf_cv_use_tiocgwinsz=unknown])])
+		[cf_cv_use_tiocgwinsz=unknown])
+		rm -f autoconf.h
+		CFLAGS="$cf_save"])
 AC_MSG_RESULT($cf_cv_use_tiocgwinsz)
-test $cf_cv_use_tiocgwinsz != yes && AC_DEFINE(BROKEN_TIOCGETWINSZ)
+test $cf_cv_use_tiocgwinsz != yes && AC_DEFINE(DONT_HAVE_SIGWINCH)
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl Check if the tm-struct defines the '.tm_gmtoff' member (useful in decoding
@@ -626,6 +663,7 @@ AC_ARG_WITH($1,[$2],ifelse($3,,
   # user did not specify "--with-$1"; do automatic check
   AC_PATH_PROG(cf_path_name,$1)
   if test -n "$cf_path_name"; then
+    AC_DEFINE_UNQUOTED(cf_path_name,"$cf_path_name")dnl
     AC_DEFINE(cf_have_name)dnl
   fi
 ])dnl

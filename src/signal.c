@@ -14,11 +14,6 @@
 
 #include	"tin.h"
 
-extern char *glob_art_group;
-extern char *glob_group;
-extern char *glob_page_group;
-extern int glob_respnum;
-
 static unsigned int time_remaining;
 
 #ifdef SIGTSTP
@@ -242,7 +237,7 @@ void _CDECL signal_handler (sig)
 #endif
 	cleanup_tmp_files (); 
 
-#if defined(apollo) || defined(HAVE_COREDUMP)
+#if defined(apollo) || defined(HAVE_COREFILE)
 	/* do this so we can get a traceback (doesn't dump core) */
 	abort();
 #else

@@ -245,7 +245,6 @@ read_group (group, group_path, pcount)
 	char *ptr, buf[PATH_LEN];
 	char progress[PATH_LEN];
 	char temp[16];
-	extern long head_next;
 	int count = 0;
 	int modified = FALSE;
 	int respnum, total = 0;

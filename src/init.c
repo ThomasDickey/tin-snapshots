@@ -525,10 +525,8 @@ void init_selfinfo ()
 #endif
 	strcpy (default_printer, DEFAULT_PRINTER);
 #ifdef M_AMIGA
-	{	extern int tin_bbs_mode;
-		if (tin_bbs_mode) {
-			strcpy(default_printer, DEFAULT_BBS_PRINTER);
-		}
+	if (tin_bbs_mode) {
+		strcpy(default_printer, DEFAULT_BBS_PRINTER);
 	}
 #endif
 	strcpy (mailer, get_val (ENV_VAR_MAILER, DEFAULT_MAILER));

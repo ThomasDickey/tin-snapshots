@@ -19,7 +19,7 @@
 int nntp_codeno = 0;
 long head_next;
 
-/* error message vom server */
+/* error message from server */
 char error_response[NNTP_STRLEN];
 
 #ifdef NNTP_ABLE
@@ -577,7 +577,6 @@ open_art_fp (group_path, art)
 	char buf[NNTP_STRLEN];
 	int i;
 	struct stat sb;
-	extern long note_size;
 #ifdef NNTP_ABLE
 	int respcode;
 #endif
@@ -923,7 +922,6 @@ get_respcode ()
 
 #ifdef USE_GENAUTH
 	if (respcode == ERR_NOAUTH) {
-		extern char last_put[];
 		char savebuf[NNTP_STRLEN];
 
 		strcpy (savebuf, last_put);
@@ -950,7 +948,6 @@ stuff_nntp (fnam)
 	char *fnam;
 {
 #ifdef NNTP_ABLE
-	extern long note_size;
 	char line[HEADER_LEN];
 	FILE *fp;
 /*	int count = 0; */

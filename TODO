@@ -1,11 +1,11 @@
 Bugs
 ----
-o  only create_index_lock_file() if it is realy needed (tind/tin -U) and only
-   try to remove the lock file if it is realy created (cleanup_tmp_files())
+o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
+   try to remove the lock file if it is really created (cleanup_tmp_files())
 
 o  fix article superseding that it enters the editor emediately
 
-o  strip hardcoded values (binaries/sources) from feed.c
+o  strip hard-coded values (binaries/sources) from feed.c
    add default to attributes... 
 
 o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
@@ -13,7 +13,7 @@ o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
 
 o  if external inews could not be found posting fails but no dead.article
    is saved :(
-   fallback to build_in_inews would be good...
+   fall-back to build_in_inews would be good...
 
 o  if postings fails tin rereads the article numbers for the group you
    tried to post in to sync with your new article which does not exist,
@@ -64,7 +64,7 @@ o  tin sometimes crashes (thread.c) 710/892
 
 New features
 ------------
-o  compiletime option: generate own MSGIDs on host with a propper FQDN
+o  compile-time option: generate own MSGIDs on host with a proper FQDN
    (to add a _-_ to the local part of the MSGID on a subject-change; keep
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
     own postings)
@@ -78,9 +78,6 @@ o  add
    to autoconf; determine which network libraries are needed; eradicate
    platform/compiler ifdefs
    add ifdef NNTP_ONLY undef SPOOLDIR etc...
-
-o  some linux 2.0.0 don't have -ltermlib -ltermcap -lcurses, only terminfo
-   and ncurses - fix configure to detect the right libraries for those.
 
 o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines

@@ -89,7 +89,6 @@ get_active_num ()
 int
 resync_active_file ()
 {
-	extern int reread_active_for_posted_arts;
 	char old_group[HEADER_LEN];
 	int reread = FALSE;
 	int command_line;
@@ -266,9 +265,8 @@ read_news_active_file ()
 		newsrc_active = FALSE;
 
 	if ((update && update_fork) || ! update) {
-		wait_message (newsrc_active?txt_reading_news_newsrc_file:
-									txt_reading_news_active_file
-		);
+		wait_message (newsrc_active ? txt_reading_news_newsrc_file :
+						txt_reading_news_active_file);
 	}
 
 	if (!newsrc_active) {

@@ -51,7 +51,9 @@
 #define iKeyGroupUp ctrl('P')
 #define iKeyGroupPageUp2 ctrl('U')
 #define iKeyGroupPageDown3 ' '
-#define iKeyGroupShell '!'
+#ifndef NO_SHELL_ESCAPE
+#	define iKeyGroupShell '!'
+#endif
 #define iKeyGroupSetRange '#'
 #define iKeyGroupLastPage '$'
 #define iKeyGroupToggleColor '&'
@@ -132,18 +134,23 @@
 #define iKeyPagePageUp ctrl('B')
 #define iKeyPagePageDown ctrl('D')
 #define iKeyPagePageDown2 ctrl('F')
-#define iKeyPagePGPCheckArticle ctrl('G')
+#ifdef HAVE_PGP
+#	define iKeyPagePGPCheckArticle ctrl('G')
+#endif
 #define iKeyPageDisplayHeaders ctrl('H')
 #define iKeyPageNextUnread '\t'
 #define iKeyPageNextThd '\n'
 #define iKeyPageAutoKill ctrl('K')
 #define iKeyPageRedrawScr ctrl('L')
 #define iKeyPageNextThd2 '\r'
+#define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
 #define iKeyPagePageUp2 ctrl('U')
 #define iKeyPageToggleRot ctrl('X')
 #define iKeyPagePageDown3 ' '
-#define iKeyPageShell '!'
+#ifndef NO_SHELL_ESCAPE
+#	define iKeyPageShell '!'
+#endif
 #define iKeyPageToggleTex2iso '\"'
 #define iKeyPageLastPage '$'
 #define iKeyPageToggleRot2 '%'
@@ -200,8 +207,12 @@
 #define iKeyPostQuit ESC
 #define iKeyPostDelete 'd'
 #define iKeyPostEdit 'e'
-#define iKeyPostPGP 'g'
-#define iKeyPostIspell 'i'
+#ifdef HAVE_PGP
+#	define iKeyPostPGP 'g'
+#endif
+#ifdef HAVE_ISPELL
+#	define iKeyPostIspell 'i'
+#endif
 #define iKeyPostPost 'p'
 #define iKeyPostQuit2 'q'
 #define iKeyPostSend 's'
@@ -240,7 +251,9 @@
 #define iKeySelectResetNewsrc ctrl('R')
 #define iKeySelectPageUp2 ctrl('U')
 #define iKeySelectPageDown3 ' '
-#define iKeySelectShell '!'
+#ifndef NO_SHELL_ESCAPE
+#	define iKeySelectShell '!'
+#endif
 #define iKeySelectSetRange '#'
 #define iKeySelectLastPage '$'
 #define iKeySelectToggleColor '&'
@@ -291,7 +304,9 @@
 #define iKeyThreadUp ctrl('P')
 #define iKeyThreadPageUp2 ctrl('U')
 #define iKeyThreadPageDown3 ' '
-#define iKeyThreadShell '!'
+#ifndef NO_SHELL_ESCAPE
+#	define iKeyThreadShell '!'
+#endif
 #define iKeyThreadSetRange '#'
 #define iKeyThreadLastPage '$'
 #define iKeyThreadToggleColor '&'

@@ -14,17 +14,6 @@
 
 #include	"tin.h"
 
-extern FILE *note_fp;
-extern int first_group_on_screen;
-extern int last_group_on_screen;
-extern int first_subj_on_screen;
-extern int last_subj_on_screen;
-extern int index_point;
-extern int note_line;
-extern int note_page;
-extern int note_end;
-extern long note_mark[MAX_PAGES];
-
 /*
  * last search patterns
  */

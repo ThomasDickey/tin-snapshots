@@ -46,17 +46,9 @@ txt_help_empty_line,
 	txt_help_y,
 	txt_help_g_r,
 	txt_help_s,
-#ifdef CASE_PROBLEM
-	txt_help_BIGS,
-#else
 	txt_help_S,
-#endif
 	txt_help_m,
-#ifdef CASE_PROBLEM
-	txt_help_BIGI,
-#else
 	txt_help_W,
-#endif
 txt_help_empty_line,
 	txt_help_g_q,
 	txt_help_esc,
@@ -66,17 +58,9 @@ txt_help_empty_line,
 	txt_help_shell,
 #endif
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGM,
-#else
 	txt_help_M,
-#endif
 	txt_help_g_d,
-#ifdef CASE_PROBLEM
-	txt_help_BIGI,
-#else
 	txt_help_I,
-#endif
 txt_help_empty_line,
 	txt_help_s_i,
 txt_help_empty_line,
@@ -95,11 +79,7 @@ txt_help_empty_line,
 	txt_help_i_search,
 	txt_help_hash,
 	txt_help_a,
-#ifdef CASE_PROBLEM
-	txt_help_BIGB,
-#else
 	txt_help_B,
-#endif
 txt_help_empty_line,
 	txt_help_i_cr,
 	txt_help_i_tab,
@@ -112,11 +92,7 @@ txt_help_empty_line,
 txt_help_empty_line,
 	txt_help_p_m,
 	txt_help_p_s,
-#ifdef CASE_PROBLEM
-	txt_help_p_BIGS,
-#else
 	txt_help_p_S,
-#endif
 #ifndef DONT_HAVE_PIPING
 	txt_help_pipe,
 #endif
@@ -124,11 +100,7 @@ txt_help_empty_line,
 	txt_help_t,
 txt_help_empty_line,
 	txt_help_p_z,
-#ifdef CASE_PROBLEM
-	txt_help_BIGK,
-#else
 	txt_help_K,
-#endif
 	txt_help_c,
 	txt_help_cC,
 txt_help_empty_line,
@@ -140,21 +112,12 @@ txt_help_empty_line,
 	txt_help_i_coma,
 	txt_help_i_tilda,
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGU,
-#else
 	txt_help_U,
-#endif
 txt_help_empty_line,
 	txt_help_u,
 	txt_help_r,
-#ifdef CASE_PROBLEM
-	txt_help_BIGX,
-	txt_help_BIGW,
-#else
 	txt_help_X,
 	txt_help_W,
-#endif
 txt_help_empty_line,
 	txt_help_i,
 	txt_help_q,
@@ -171,17 +134,9 @@ txt_help_empty_line,
 	txt_help_quick_select,
 	txt_help_quick_kill,
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGM,
-#else
 	txt_help_M,
-#endif
 	txt_help_d,
-#ifdef CASE_PROBLEM
-	txt_help_BIGI,
-#else
 	txt_help_I,
-#endif
 txt_help_empty_line,
 	txt_help_g_t_p_i,
 txt_help_empty_line,
@@ -212,11 +167,7 @@ txt_help_empty_line,
 	txt_help_ctrl_l,
 txt_help_empty_line,
 	txt_help_d,
-#ifdef CASE_PROBLEM
-	txt_help_BIGI,
-#else
 	txt_help_I,
-#endif
 txt_help_empty_line,
 	txt_help_g_t_p_i,
 txt_help_empty_line,
@@ -242,11 +193,7 @@ txt_help_empty_line,
 	txt_help_dash,
 txt_help_empty_line,
 	txt_help_a,
-#ifdef CASE_PROBLEM
-	txt_help_BIGB,
-#else
 	txt_help_B,
-#endif
 	txt_help_p_search,
 txt_help_empty_line,
 	txt_help_w,
@@ -267,11 +214,7 @@ txt_help_empty_line,
 	txt_help_ctrl_k,
 	txt_help_quick_select,
 	txt_help_quick_kill,
-#ifdef CASE_PROBLEM
-	txt_help_BIGD,
-#else
 	txt_help_D,
-#endif
 txt_help_empty_line,
 	txt_help_p_z,
 	txt_help_p_k,
@@ -281,17 +224,9 @@ txt_help_empty_line,
 	txt_help_ctrl_h,
 	txt_help_p_d,
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGW,
-#else
 	txt_help_W,
-#endif
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGT,
-#else
 	txt_help_T,
-#endif
 	txt_help_i,
 	txt_help_q,
 	txt_help_esc,
@@ -301,13 +236,8 @@ txt_help_empty_line,
 	txt_help_shell,
 #endif
 txt_help_empty_line,
-#ifdef CASE_PROBLEM
-	txt_help_BIGM,
-	txt_help_BIGI,
-#else
 	txt_help_M,
 	txt_help_I,
-#endif
 txt_help_empty_line,
 	txt_help_p_star,
 	txt_help_p_dot,

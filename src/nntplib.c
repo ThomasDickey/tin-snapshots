@@ -785,7 +785,6 @@ get_server (string, size)
 {
 #ifdef NNTP_ABLE
 	char buf[NNTP_STRLEN];
-	extern char *glob_group;
 	register char *cp;
 
 static int reconnecting = 0;
@@ -837,7 +836,6 @@ int get_server (char *string, int size)
 {
 #ifdef NNTP_ABLE
 	char buf[NNTP_STRLEN];
-	extern char *glob_group;
 	register char *cp;
 
 #ifdef USE_SFGETS
@@ -936,7 +934,6 @@ nntp_respcode (respcode)
 	int respcode;
 {
 #ifdef NNTP_ABLE
-	extern char error_response[NNTP_STRLEN];
 	static char *text;
 
 	if (strlen (error_response) > 4) {

@@ -22,6 +22,13 @@
 #define HAVE_STRCHR
 #define HAVE_STRTOL
 
+/*
+ * Undef this only for specific platforms
+ */
+#if !defined(__STDC__)
+#define const /*nothing*/
+#endif
+
 /* VAXC cant tell the difference between 'varA' and 'vara' */
 /*	and, what a surprise, suffers from a limit of 31 chars for vars */
 
@@ -29,6 +36,7 @@
 #   if defined(VAXC) || defined(__DECC)
 #	define CASE_PROBLEM
 #	define VAR_LENGTH_PROBLEM
+#	undef  const
 #   endif
 #endif
 

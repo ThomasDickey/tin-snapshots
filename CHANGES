@@ -1,3 +1,19 @@
+--unoff BETA release 960713 --
+
+110) Thomas E. Dickey <dickey@clark.net>
+     ADD. code cleanup, ncurses support
+     FIX. several supplied patches
+
+109) Stefan Scholl <stesch@sks.inka.de>
+     ADD. mark forwarded text (mail to someone)
+     BUG. ctrl('R') did not work anymore in page-level, but still was
+          mentioned in the online help
+     FIX. post.c, page.c, menukeys.h
+
+108) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. inserted a few ifdefs to avoid useless definitions
+     FIX. menukeys.h
+
 --unoff BETA release 960705 --
 
 107) Chris Blum <chris@phil.uni-sb.de
@@ -71,7 +87,7 @@
      FIX. several supplied patches
 
 096) Thomas E. Dickey <dickey@clark.net>
-     ADD. config.h celanup, removed variable-shadowing
+     ADD. config.h cleanup, removed variable-shadowing
      FIX. several supplied patches
 
 095) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -124,7 +140,7 @@
 --unoff BETA release 960618 --
 
 088) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. distclean target to toplevel Makefile
+     ADD. distclean target to top-level Makefile
      FIX. Makefile
 
 087) Roland Rosenfeld <roland@spinnaker.rhein.de>

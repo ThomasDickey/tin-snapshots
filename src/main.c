@@ -298,10 +298,8 @@ read_cmd_line_options (argc, argv)
 #endif
 #ifdef M_AMIGA
 			case 'B':
-			{	extern int tin_bbs_mode;
 				tin_bbs_mode = TRUE;
 				break;
-			}
 #endif
 			case 'c':
 				catchup = TRUE;

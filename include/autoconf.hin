@@ -1,6 +1,19 @@
 /*
- * @SYS_NAME@
+ *  Project   : tin - a Usenet reader
+ *  Module    : autoconf.hin
+ *  Author    : Thomas Dickey
+ *  Created   : 24.08.95
+ *  Updated   : 09.07.96
+ *  Notes     : #include files, #defines & struct's
+ *
+ *  Copyright 1996 by Thomas Dickey
+ *		You may  freely  copy or  redistribute	this software,
+ *		so  long as there is no profit made from its use, sale
+ *		trade or  reproduction.  You may not change this copy-
+ *		right notice, and it must be included in any copy made
  */
+
+#undef SYS_NAME
 
 /*
  * If we're able to run the 'configure' script, it's close enough to UNIX for
@@ -66,12 +79,15 @@
 #undef	HAVE_DIRENT_H
 #undef	HAVE_ERRNO_H
 #undef	HAVE_FCNTL_H
+#undef	HAVE_IOCTL_H
 #undef	HAVE_LOCALE_H
+#undef	HAVE_MALLOC_H
 #undef	HAVE_NETDB_H
 #undef	HAVE_NETLIB_H
 #undef	HAVE_POLL_H
 #undef	HAVE_PROTOTYPES_H
 #undef	HAVE_PWD_H
+#undef	HAVE_SGTTY_H
 #undef	HAVE_STDDEF_H
 #undef	HAVE_STDLIB_H
 #undef	HAVE_STRINGS_H
@@ -86,10 +102,13 @@
 #undef	HAVE_SYS_PTY_H
 #undef	HAVE_SYS_SELECT_H
 #undef	HAVE_SYS_STREAM_H
+#undef	HAVE_SYS_TIMEB_H
 #undef	HAVE_SYS_TIMES_H
 #undef	HAVE_SYS_TIME_H
 #undef	HAVE_SYS_UTSNAME_H
 #undef	HAVE_SYS_WAIT_H
+#undef	HAVE_TERM_H
+#undef	HAVE_TERMCAP_H
 #undef	HAVE_TERMIOS_H
 #undef	HAVE_TERMIO_H
 #undef	HAVE_TIME_H
@@ -104,6 +123,7 @@
 #undef	HAVE_BCOPY
 #undef	HAVE_BZERO
 #undef	HAVE_FORK
+#undef	HAVE_FTIME
 #undef	HAVE_GETCWD
 #undef	HAVE_GETHOSTBYNAME
 #undef	HAVE_GETSERVBYNAME
@@ -144,7 +164,9 @@
 #undef	DECL_GETPWNAM
 #undef	DECL_GETSERVBYNAME
 #undef	DECL_POPEN
+#undef	DECL_SYS_ERRLIST
 #undef	DECL_TGETSTR
+#undef	DECL_TGOTO
 
 /*
  * The following are functions that we'll optionally prototype (to stifle
@@ -186,6 +208,9 @@
 #undef	DECL_STRNCASECMP
 #undef	DECL_STRTOL
 #undef	DECL_SYSTEM
+#undef	DECL_TGETENT
+#undef	DECL_TGETFLAG
+#undef	DECL_TGETNUM
 #undef	DECL_TIME
 #undef	DECL_TOLOWER
 #undef	DECL_TOUPPER
@@ -201,6 +226,14 @@
  * Define this if it's safe to redefine the signal constants with prototypes.
  */
 #undef	DECL_SIG_CONST
+
+/*
+ * Program-paths (i.e., the invocation-path)
+ */
+#undef	PATH_ISPELL
+#undef	PATH_METAMAIL
+#undef	PATH_HOSTNAME
+#undef	PATH_UNAME
 
 #if 0 /* FIXME */
 #if defined(_POSIX_SOURCE) || defined(__386BSD__) || defined(DGUX) || \
@@ -244,7 +277,6 @@
 /*
  * Define if the system doesn't define SIGWINCH, or the associated structs
  * to determine the window's size.
- * FIXME: test-not-impl
  */
 #undef DONT_HAVE_SIGWINCH
 

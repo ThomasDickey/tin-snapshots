@@ -14,8 +14,6 @@
 
 #include	"tin.h"
 
-extern int index_point;
-
 static int COL1;
 static int COL2;
 static int COL3;
@@ -1007,9 +1005,7 @@ change_config_file (group, filter_at_once)
 
 			case 16:
 #ifdef M_AMIGA
-				{	extern int tin_bbs_mode;
-					if (tin_bbs_mode) break;
-				}
+				if (tin_bbs_mode) break;
 #endif
 				show_menu_help (txt_help_savedir);
 				prompt_menu_string (INDEX_TOP+12, COL1 + (int) strlen (txt_opt_savedir), default_savedir);
@@ -1018,9 +1014,7 @@ change_config_file (group, filter_at_once)
 
 			case 17:
 #ifdef M_AMIGA
-				{	extern int tin_bbs_mode;
-					if (tin_bbs_mode) break;
-				}
+				if (tin_bbs_mode) break;
 #endif
 				show_menu_help (txt_help_maildir);
 				prompt_menu_string (INDEX_TOP+14, COL1 + (int) strlen (txt_opt_maildir), default_maildir);
@@ -1029,9 +1023,7 @@ change_config_file (group, filter_at_once)
 
 			case 18:
 #ifdef M_AMIGA
-				{	extern int tin_bbs_mode;
-					if (tin_bbs_mode) break;
-				}
+				if (tin_bbs_mode) break;
 #endif
 				show_menu_help (txt_help_printer);
 				prompt_menu_string (INDEX_TOP+16, COL1 + (int) strlen (txt_opt_printer), default_printer);
@@ -1083,14 +1075,12 @@ show_config_menu ()
 	printf ("%s%s\r\n\r\n", txt_opt_sort_type, txt_sort_type[default_sort_art_type]);
 
 #ifdef M_AMIGA
-	{	extern int tin_bbs_mode;
-		if (!tin_bbs_mode) {
+	if (!tin_bbs_mode) {
 #endif
 	printf ("%s%s\r\n\r\n", txt_opt_savedir, default_savedir);
 	printf ("%s%s\r\n\r\n", txt_opt_maildir, default_maildir);
 	printf ("%s%s\r\n\r\n", txt_opt_printer, default_printer);
 #ifdef M_AMIGA
-		}
 	}
 #endif
 	fflush(stdout);

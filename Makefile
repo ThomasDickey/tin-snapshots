@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960705
+PVER		= 960713
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -201,6 +201,9 @@ dist:
 	@$(MAKE) manifest
 	@$(MAKE) chmod
 	@$(MAKE) tar
+
+version :
+	@echo "TIN v$(VER)"
 
 distclean:
 	- @$(MAKE) clean
