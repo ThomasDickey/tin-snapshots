@@ -494,7 +494,7 @@ constext txt_opt_editor_format[] = 		"Invocation of your editor          : ";
 constext txt_opt_filter_days[] = 		"No. of days a filter entry is valid: ";
 constext txt_opt_force_screen_redraw[] = 	"Force redraw after certain commands: ";
 constext txt_opt_group_catchup_on_exit[] = 	"Catchup group using left key       : ";
-constext txt_opt_groupname_length[] = 		"Max. length of group names shown    : ";
+constext txt_opt_groupname_length[] = 		"Max. length of group names shown   : ";
 constext txt_opt_highlight_xcommentto[] = 	"Highlight X-Comment-To: header     : ";
 constext txt_opt_inverse_okay[] = 		"Use inverse video for page headers : ";
 #ifdef M_UNIX
@@ -521,7 +521,7 @@ constext txt_opt_print_header[] = 		"Print all header when printing     : ";
 constext txt_opt_printer[] = 			"Printer program with options       : ";
 constext txt_opt_process_type[] = 		"Post process saved art/thread with : ";
 constext txt_opt_process_unread[] = 		"Process only unread articles       : ";
-constext txt_opt_quote_chars[] = 		"Characters used as quote-marks      : ";
+constext txt_opt_quote_chars[] =				"Characters used as quote-marks     : ";
 constext txt_opt_reread_active_file_secs[] = 	"Interval in secs to reread active  : ";
 constext txt_opt_save_to_mmdf_mailbox[] = 	"Save mail in MMDF style            : ";
 constext txt_opt_savedir[] = 			"Directory to save arts/threads in  : ";
@@ -555,7 +555,7 @@ constext txt_opt_use_mailreader[] = 		"Use interactive mail reader        : ";
 constext txt_opt_use_metamail[] =		"Use metamail upon MIME articles    : ";
 #endif
 constext txt_opt_use_mouse[] = 			"Use mouse in xterm                 : ";
-constext txt_opt_xpost_quote_format[] = 	"Quote line when cross-posting       : ";
+constext txt_opt_xpost_quote_format[] = 	"Quote line when cross-posting      : ";
 constext txt_option_not_enabled[] = "Option not enabled. Recompile with %s.";
 constext txt_options_menu[] = "Options Menu";
 constext txt_out_of_memory[] = "%s: memory exhausted trying to allocate %d bytes in file %s line %d";

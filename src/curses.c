@@ -756,9 +756,14 @@ Raw (state)
 		_raw_tty.sg_flags |= RAW; /* Manx-C 5.2 does not support CBREAK */
 #endif
 #else
+#ifdef __FreeBSD__
+		cfmakeraw(&_raw_tty);
+		_raw_tty.c_lflag |= ISIG;       /* for ^Z */
+#else
 		_raw_tty.c_lflag &= ~(ICANON | ECHO);	/* noecho raw mode        */
 		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue    */
 		_raw_tty.c_cc[VTIME] = '\0';	/* minimum time to wait for input */
+#endif
 #endif
 		SET_TTY (&_raw_tty);
 		_inraw = 1;

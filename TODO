@@ -302,11 +302,6 @@ o  fix reposition of cursor after reading active file... annoying!
 
 o  think about group numbering in "only unread" display mode
 
-o  'g'oto group does not work when starting up tin with:
-   show_only_unread_groups=ON
-   show_only_unread=ON
-   but having no articles to read
-
 o  fix kill/hot mechanism that you could kill/mark hot everything which
    contains abc OR def... like "tin *|* tin|* tin *" -even better would be
    a routine which recognizes word-delimiters so that "tin:" or "'tin'"

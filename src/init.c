@@ -894,6 +894,11 @@ GetConfigValue (name)
 		}
 
 		if (fp == (FILE *) 0) {
+			sprintf (path, "/usr/local/etc/organization");
+			fp = fopen (path, "r");
+		}
+
+		if (fp == (FILE *) 0) {
 			sprintf (path, "/etc/organization");
 			fp = fopen (path, "r");
 		}
