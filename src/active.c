@@ -103,7 +103,7 @@ resync_active_file ()
 		}
 		vWriteNewsrc ();
 		vGrpGetSubArtInfo ();
-/*
+#if 0
 		free_active_arrays ();
 		max_active = get_active_num ();
 		expand_active ();
@@ -117,7 +117,7 @@ resync_active_file ()
 		read_mailgroups_file ();
 #endif
 		read_newsgroups_file ();
-*/
+#endif /* #if 0 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
 		if (!command_line) {
@@ -315,6 +315,10 @@ read_news_active_file ()
 				expand_active ();
 			}
 
+			/*
+			 * Insert group into group_hash[]
+			 * TODO This code is replicated elsewhere - split it out
+			 */
 			h = hash_groupname (buf);
 
 			if (group_hash[h] == -1) {
@@ -390,6 +394,7 @@ read_news_active_continue:;
 	check_for_any_new_groups ();
 }
 
+#if 0
 /*
  *  create ~/.tin/active if it does not exist (local news only)
  */
@@ -423,6 +428,7 @@ backup_active (create)
 		chmod (buf, 0644);
 	}
 }
+#endif
 
 /*
  * Check for any newly created newsgroups.

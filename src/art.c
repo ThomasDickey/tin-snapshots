@@ -739,7 +739,7 @@ parse_headers (buf, h)
  *    5.  MessageID:     (ie. <123@ether.net>)    [mandatory]
  *    6.  References:    (ie. <message-id> ....)  [mandatory]
  *    7.  Byte count     (Skipped - not used)     [mandatory]
- *    8.  Lines: line    (ie. 23)                 [mandatory]
+ *    8.  Lines: line    (ie. 23)                 [optional]
  *    9.  Xref: line     (ie. alt.test:389)       [optional]
  *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
@@ -849,13 +849,12 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		parse_from (p, art_from_addr, art_full_name);
+		parse_from (rfc1522_decode (p), art_from_addr, art_full_name);
 		arts[top].from = hash_str (art_from_addr);
 		if (art_full_name[0]) {
-			arts[top].name = hash_str (rfc1522_decode(art_full_name));
+			arts[top].name = hash_str (art_full_name);
 		}
 		p = q + 1;
-
 		/*
 		 * READ article date
 		 */
@@ -929,30 +928,19 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		p = q + 1;
+		p = (q == (char *) 0 ? (char *) 0 : q + 1);
 
 		/*
-		 * READ article lines (special case - last standard nov header)
+		 * READ article lines
 		 */
-		q = strchr (p, '\t');
-		if (q == (char *) 0) {
-			if (!*p || (!isdigit((unsigned char)*p) && *p != '-')) {
-#ifdef DEBUG
-				error_message ("Bad overview record (Lines) [%s]", p);
-				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");
-#endif
-				free (buf);
-				continue;
-			}
-		} else {
-			*q = '\0';
+		if (p != (char *) 0) {
+			q = strchr (p, '\t');
+			if (q != (char *) 0)
+				*q = '\0';
+			if(isdigit((unsigned char)*p))
+				arts[top].lines = atoi (p);
+			p = (q == (char *) 0 ? (char *) 0 : q + 1);
 		}
-		if(isdigit((unsigned char)*p))
-			arts[top].lines = atoi (p);
-		else
-			arts[top].lines = -1;
-
-		p = (q == (char *) 0 ? (char *) 0 : q + 1);
 
 		/*
 		 * READ article xrefs
