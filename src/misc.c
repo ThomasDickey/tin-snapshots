@@ -13,7 +13,56 @@
  */
 
 #include	"tin.h"
-#include "version.h"
+#include	"version.h"
+
+
+/*
+ * itoa() limited to 4 chars
+ * last char my be one of the following
+ * K - kilo for values betwen 10000 and 999999
+ * M - mega for values > 9999999
+ *
+ * warning: NO! range check is done
+ * be sure buffer is at least 4 chars wide
+ */
+
+char *
+tin_itoa (buffer, value)
+	int value;
+	char *buffer;
+{
+	sprintf (buffer, "%4d", value);
+	if (value<=9999) {
+	/* do noting */
+	} else {
+		if (value<=99999) {
+			buffer[2]=' ';
+			buffer[3]='K';
+		} else {
+			if (value<=999999) {
+				buffer[3]='K';
+			} else {
+				if (value<=9999999) {
+					buffer[1]=' ';
+					buffer[2]=' ';
+					buffer[3]='M';
+				} else {
+					if (value<=99999999) {
+						buffer[2]=' ';
+						buffer[3]='M';
+					} else {
+						if (value<=999999999) {
+							buffer[3]='M';
+						}
+					}
+				}
+			}
+		}
+	}
+	buffer[4]='\0';
+	return(buffer);
+}
+
 
 #ifdef M_UNIX
 /*

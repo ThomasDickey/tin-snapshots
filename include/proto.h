@@ -257,6 +257,7 @@ extern char *get_val P_((char *env, char *def));
 extern int invoke_editor P_((char *filename, int lineno));
 extern int invoke_ispell P_((char *nam));
 extern void shell_escape P_((void));
+extern char *tin_itoa P_((char *buffer, int value));
 extern void tin_done P_((int ret));
 extern void strip_double_ngs P_((char *ngs_list));
 extern long my_strtol P_((/* const */ char *str, char **ptr, int use_base));

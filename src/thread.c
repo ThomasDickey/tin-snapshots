@@ -42,6 +42,7 @@ bld_tline (l, art)
 #ifndef INDEX_DAEMON
 	char mark;
 	char from[LEN];
+	char smal_buffer[6];
 	char new_resps[8];
 	char lines[8];
 	char *spaces;
@@ -96,19 +97,19 @@ bld_tline (l, art)
 		get_author (TRUE, art, from);
 	}
 
-	if (art->lines != -1 && art->lines <=9999) {
-		sprintf (lines, "%4d", art->lines);
+	if (art->lines != -1) {
+		sprintf (lines, "%4.4s", tin_itoa(smal_buffer, art->lines));
 	} else {
 		strcpy (lines, "   ?");
 	}
 
 	if (show_lines) {
-		sprintf (screen[j].col, "  %4d%3s  [%4.4s]  %-*.*s%s%-*.*s",
-			 l, new_resps, lines, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %4.4s%3s  [%4.4s]  %-*.*s%s%-*.*s",
+			 tin_itoa(smal_buffer, l), new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {
-		sprintf (screen[j].col, "  %4d%3s  %-*.*s%s%-*.*s",
-			 l, new_resps, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %4.4s%3s  %-*.*s%s%-*.*s",
+			 tin_itoa(smal_buffer, l), new_resps, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	}
 

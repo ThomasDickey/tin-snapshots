@@ -1,3 +1,10 @@
+--unoff BETA release 961205 --
+
+234) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. smarter range check (still not complete)
+     FIX. proto.h, misc.c, group.c, select.c, thread.c
+
 --unoff BETA release 961204 --
 
 232) Urs Janssen <urs@akk.uni-karlsruhe.de>
