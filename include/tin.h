@@ -1617,7 +1617,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
 #	define	TMPDIR		"/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
-#		define	KEY_PREFIX		0xff
+#		define	KEY_PREFIX		0x8f: case 0x9b
 #	endif
 #endif
 

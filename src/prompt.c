@@ -131,7 +131,7 @@ prompt_yn (
 	const char *prompt,
 	t_bool default_answer)
 {
-	char ch, prompt_ch;
+	int ch, prompt_ch;
 	int yn_loop = TRUE;
 
 	set_alarm_clock_off ();
@@ -164,7 +164,7 @@ prompt_yn (
 #	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #	endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 #endif /* WIN32 */
 					case KEYMAP_UP:
 					case KEYMAP_DOWN:
@@ -302,7 +302,7 @@ prompt_on_off (
 
 int
 prompt_option_string (
-	int option)
+	int option) /* return value is always ignored */
 {
 	char prompt[LEN];
 	char *p;
@@ -338,7 +338,7 @@ prompt_option_string (
 
 int
 prompt_option_num (
-	int option)
+	int option) /* return value is always ignored */
 {
 	char prompt[LEN];
 	char number[LEN];
@@ -377,7 +377,7 @@ prompt_option_num (
 
 int
 prompt_option_char (
-	int option)
+	int option) /* return value is always ignored */
 {
 	char prompt[LEN];
 	char input[2];

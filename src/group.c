@@ -186,7 +186,7 @@ debug_print_bitmap (group, NULL);
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 #endif /* WIN32 */
 				case KEYMAP_UP:
 					goto group_up;
@@ -224,8 +224,7 @@ debug_print_bitmap (group, NULL);
 					goto end_of_list;
 #ifndef WIN32
 				case KEYMAP_MOUSE:
-					switch (xmouse)
-					{
+					switch (xmouse) {
 						case MOUSE_BUTTON_1:
 						case MOUSE_BUTTON_3:
 							if (xrow < INDEX2LNUM(first_subj_on_screen) ||
@@ -255,10 +254,11 @@ debug_print_bitmap (group, NULL);
 							} else {
 								goto group_done;
 							}
-							
+
 						default:
 							break;
 					}
+					break;
 
 				default:
 					break;
@@ -1639,7 +1639,7 @@ toggle_subject_from (void)
 #ifndef INDEX_DAEMON
 static int
 bld_sline (
-	int i)
+	int i) /* return value is always ignored */
 {
 #if USE_CURSES
 	char buffer[BUFSIZ];	/* FIXME: allocate? */
@@ -1753,7 +1753,7 @@ bld_sline (
 static int
 draw_sline (
 	int i,
-	int full)
+	int full) /* return value is always ignored */
 {
 #ifndef INDEX_DAEMON
 	int tlen;

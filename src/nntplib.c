@@ -1027,12 +1027,9 @@ nntp_respcode (
 #endif
 }
 
-
-int
+void
 nntp_message (
-	int respcode)
+	int respcode) 
 {
 	error_message ("%s", nntp_respcode (respcode));
-
-	return 0;
 }

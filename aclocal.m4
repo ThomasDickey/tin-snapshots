@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : aclocal.m4
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 17.03.97
+dnl Updated   : 17.08.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -14,6 +14,31 @@ dnl
 dnl Macros used in TIN auto-configuration script.
 dnl
 dnl ---------------------------------------------------------------------------
+dnl ---------------------------------------------------------------------------
+dnl Add an include-directory to $CPPFLAGS.  Don't add /usr/include, since it's
+dnl redundant.  Also, don't add /usr/local/include if we're using gcc.
+AC_DEFUN([CF_ADD_INCDIR],
+[
+for cf_add_incdir in $1
+do
+	while true
+	do
+		case $cf_add_incdir in
+		/usr/include) # (vi
+			;;
+		/usr/local/include) # (vi
+			test -z "$GCC" && CPPFLAGS="$CPPFLAGS -I$cf_add_incdir"
+			;;
+		*) # (vi
+			CPPFLAGS="$CPPFLAGS -I$cf_add_incdir"
+			;;
+		esac
+		cf_top_incdir=`echo $cf_add_incdir | sed -e 's:/include/.*$:/include:'`
+		test "$cf_top_incdir" = "$cf_add_incdir" && break
+		cf_add_incdir="$cf_top_incdir"
+	done
+done
+])dnl
 dnl ---------------------------------------------------------------------------
 dnl Test for ANSI token substitution (used in 'assert').
 AC_DEFUN([CF_ANSI_ASSERT],
@@ -69,6 +94,7 @@ AC_TRY_LINK([
 #include <stdio.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <ctype.h>
 #ifdef HAVE_ERRNO_H
 #	include <errno.h>
 #else
@@ -104,6 +130,9 @@ AC_TRY_LINK([
 #endif
 #ifdef HAVE_ARPA_INET_H
 #	include <arpa/inet.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#	include <sys/socket.h>
 #endif
 
 #if STDC_HEADERS || HAVE_STRING_H
@@ -310,6 +339,44 @@ AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Look for a non-standard library, given parameters for AC_TRY_LINK.  We
+dnl prefer a standard location, and use -L options only if we do not find the
+dnl library in the standard library location(s).
+dnl	$1 = library name
+dnl	$2 = includes
+dnl	$3 = code fragment to compile/link
+dnl	$4 = corresponding function-name
+AC_DEFUN([CF_FIND_LIBRARY],
+[
+	cf_cv_have_lib_$1=no
+	AC_CHECK_FUNC($4,cf_cv_have_lib_$1=no,[
+		cf_save_LIBS="$LIBS"
+		AC_MSG_CHECKING(for $4 in -l$1)
+		LIBS="-l$1 $LIBS"
+		AC_TRY_LINK([$2],[$3],
+			[AC_MSG_RESULT(yes)
+			 cf_cv_have_lib_$1=yes
+			],
+			[AC_MSG_RESULT(no)
+			CF_LIBRARY_PATH(cf_search,$1)
+			for cf_libdir in $cf_search
+			do
+				AC_MSG_CHECKING(for -l$1 in $cf_libdir)
+				LIBS="-L$cf_libdir -l$1 $cf_save_LIBS"
+				AC_TRY_LINK([$2],[$3],
+					[AC_MSG_RESULT(yes)
+			 		 cf_cv_have_lib_$1=yes
+					 break],
+					[AC_MSG_RESULT(no)
+					 LIBS="$cf_save_LIBS"])
+			done
+			])
+		])
+if test $cf_cv_have_lib_$1 = no ; then
+	AC_ERROR(Cannot link $1 library)
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Check if 'fork()' is available, and working.  Amiga (and possibly other
 dnl machines) have a non-working 'fork()' entrypoint.
 AC_DEFUN([CF_FUNC_FORK],
@@ -422,6 +489,39 @@ EOF
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Construct a search-list for a nonstandard header-file
+AC_DEFUN([CF_HEADER_PATH],
+[$1=""
+if test -d "$includedir"  ; then
+test "$includedir" != NONE       && $1="[$]$1 $includedir $includedir/$2"
+fi
+if test -d "$oldincludedir"  ; then
+test "$oldincludedir" != NONE    && $1="[$]$1 $oldincludedir $oldincludedir/$2"
+fi
+if test -d "$prefix"; then
+test "$prefix" != NONE           && $1="[$]$1 $prefix/include $prefix/include/$2"
+fi
+test "$prefix" != /usr/local     && $1="[$]$1 /usr/local/include /usr/local/include/$2"
+test "$prefix" != /usr           && $1="[$]$1 /usr/include /usr/include/$2"
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Construct a search-list for a nonstandard library-file
+AC_DEFUN([CF_LIBRARY_PATH],
+[$1=""
+if test -d "$libdir"  ; then
+test "$libdir" != NONE           && $1="[$]$1 $libdir $libdir/$2"
+fi
+if test -d "$exec_prefix"; then
+test "$exec_prefix" != NONE      && $1="[$]$1 $exec_prefix/lib $exec_prefix/lib/$2"
+fi
+if test -d "$prefix"; then
+test "$prefix" != NONE           && \
+test "$prefix" != "$exec_prefix" && $1="[$]$1 $prefix/lib $prefix/lib/$2"
+fi
+test "$prefix" != /usr/local     && $1="[$]$1 /usr/local/lib /usr/local/lib/$2"
+test "$prefix" != /usr           && $1="[$]$1 /usr/lib /usr/lib/$2"
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl Some 'make' programs support $(MAKEFLAGS), some $(MFLAGS), to pass 'make'
 dnl options to lower-levels.  It's very useful for "make -n" -- if we have it.
 dnl (GNU 'make' does both :-)
@@ -451,6 +551,139 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([CF_MSG_LOG],
 echo "(line __oline__) testing $* ..." 1>&5
 )dnl
+dnl ---------------------------------------------------------------------------
+dnl Look for the SVr4 curses clone 'ncurses' in the standard places, adjusting
+dnl the CPPFLAGS variable.
+dnl
+dnl The header files may be installed as either curses.h, or ncurses.h
+dnl (obsolete).  If not installed for overwrite, the curses.h file would be
+dnl in an ncurses subdirectory (e.g., /usr/include/ncurses), but someone may
+dnl have installed overwriting the vendor's curses.  Only very old versions
+dnl (pre-1.9.2d, the first autoconf'd version) of ncurses don't define
+dnl either __NCURSES_H or NCURSES_VERSION in the header.
+dnl
+dnl If the installer has set $CFLAGS or $CPPFLAGS so that the ncurses header
+dnl is already in the include-path, don't even bother with this, since we cannot
+dnl easily determine which file it is.  In this case, it has to be <curses.h>.
+dnl
+AC_DEFUN([CF_NCURSES_CPPFLAGS],
+[
+AC_MSG_CHECKING(for ncurses header file)
+AC_CACHE_VAL(cf_cv_ncurses_header,[
+	AC_TRY_COMPILE([#include <curses.h>],
+	[printf("%s\n", NCURSES_VERSION)],
+	[cf_cv_ncurses_header=predefined],[
+	CF_HEADER_PATH(cf_search,ncurses)
+	test -n "$verbose" && echo
+	for cf_incdir in $cf_search
+	do
+		for cf_header in \
+			curses.h \
+			ncurses.h
+		do
+			if egrep "NCURSES" $cf_incdir/$cf_header 1>&5 2>&1; then
+				cf_cv_ncurses_header=$cf_incdir/$cf_header 
+				test -n "$verbose" && echo $ac_n "	... found $ac_c" 1>&6
+				break
+			fi
+			test -n "$verbose" && echo "	... tested $cf_incdir/$cf_header" 1>&6
+		done
+		test -n "$cf_cv_ncurses_header" && break
+	done
+	test -z "$cf_cv_ncurses_header" && AC_ERROR(not found)
+	])])
+AC_MSG_RESULT($cf_cv_ncurses_header)
+AC_DEFINE(NCURSES)
+
+changequote(,)dnl
+cf_incdir=`echo $cf_cv_ncurses_header | sed -e 's:/[^/]*$::'`
+changequote([,])dnl
+
+case $cf_cv_ncurses_header in # (vi
+*/ncurses.h)
+	AC_DEFINE(NCURSESHEADER)
+	;;
+esac
+
+case $cf_cv_ncurses_header in # (vi
+predefined) # (vi
+	cf_cv_ncurses_header=curses.h
+	;;
+*)
+	CF_ADD_INCDIR($cf_incdir)
+	;;
+esac
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Look for the ncurses library.  This is a little complicated on Linux,
+dnl because it may be linked with the gpm (general purpose mouse) library.
+dnl Some distributions have gpm linked with (bsd) curses, which makes it
+dnl unusable with ncurses.  However, we don't want to link with gpm unless
+dnl ncurses has a dependency, since gpm is normally set up as a shared library,
+dnl and the linker will record a dependency.
+AC_DEFUN([CF_NCURSES_LIBS],
+[AC_REQUIRE([CF_NCURSES_CPPFLAGS])
+
+cf_ncurses_LIBS=""
+AC_CHECK_LIB(gpm,Gpm_Open,[AC_CHECK_LIB(gpm,initscr,,[cf_ncurses_LIBS="-lgpm"])])
+
+case $host_os in #(vi
+freebsd*)
+	# This is only necessary if you are linking against an obsolete
+	# version of ncurses (but it should do no harm, since it's static).
+	AC_CHECK_LIB(mytinfo,tgoto,[cf_ncurses_LIBS="-lmytinfo $cf_ncurses_LIBS"])
+	;;
+esac
+
+LIBS="$cf_ncurses_LIBS $LIBS"
+CF_FIND_LIBRARY(ncurses,
+	[#include <$cf_cv_ncurses_header>],
+	[initscr()],
+	initscr)
+
+if test -n "$cf_ncurses_LIBS" ; then
+	AC_MSG_CHECKING(if we can link ncurses without $cf_ncurses_LIBS)
+	cf_ncurses_SAVE="$LIBS"
+	for p in $cf_ncurses_LIBS ; do
+		q=`echo $LIBS | sed -e 's/'$p' //' -e 's/'$p'$//'`
+		if test "$q" != "$LIBS" ; then
+			LIBS="$q"
+		fi
+	done
+	AC_TRY_LINK([#include <$cf_cv_ncurses_header>],
+		[initscr()],
+		[AC_MSG_RESULT(yes)],
+		[AC_MSG_RESULT(no)
+		 LIBS="$cf_ncurses_SAVE"])
+fi
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check for the version of ncurses, to aid in reporting bugs, etc.
+AC_DEFUN([CF_NCURSES_VERSION],
+[AC_MSG_CHECKING(for ncurses version)
+AC_CACHE_VAL(cf_cv_ncurses_version,[
+	cf_cv_ncurses_version=no
+	cat > conftest.$ac_ext <<EOF
+#include <$cf_cv_ncurses_header>
+#ifdef NCURSES_VERSION
+Autoconf NCURSES_VERSION
+#else
+#ifdef __NCURSES_H
+Autoconf "old"
+#endif
+#endif
+EOF
+	cf_try="$ac_cpp conftest.$ac_ext 2>&5 | grep '^Autoconf ' >conftest.out"
+	AC_TRY_EVAL(cf_try)
+	if test -f conftest.out ; then
+changequote(,)dnl
+		cf_out=`cat conftest.out | sed -e 's@^[^\"]*\"@@' -e 's@\".*@@'`
+changequote([,])dnl
+		test -n "$cf_out" && cf_cv_ncurses_version="$cf_out"
+	fi
+])
+AC_MSG_RESULT($cf_cv_ncurses_version)
+])
 dnl ---------------------------------------------------------------------------
 dnl After checking for functions in the default $LIBS, make a further check
 dnl for the functions that are netlib-related (these aren't always in the

@@ -337,7 +337,7 @@ _get_references(
 	int depth)
 {
 	char *refs;
-	static short len;							/* Accumulated size */
+	static size_t len;							/* Accumulated size */
 
 	if (refptr->parent == NULL || depth > MAX_REFS) {
 
@@ -597,11 +597,13 @@ dump_msgid_threads(void)
  *  It doesn't point to an article OR
  *     (it's already threaded/expired OR it has been autokilled)
  */
+
 #if 0
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || \
 		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
-#endif
+#endif /* 0 */
+
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || arts[ptr->article].thread != ART_NORMAL))
 
@@ -775,7 +777,7 @@ collate_subjects(void)
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *));
+		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *)); /* FIXME: cast increases required alignment of target type */
 
 		j = h->aptr;
 

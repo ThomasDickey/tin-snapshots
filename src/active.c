@@ -26,7 +26,7 @@ time_t new_newnews_time;			/* FIXME: never set */
 static int find_newnews_index (char *cur_newnews_host);
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
-
+static void active_add( struct t_group *ptr, long count, long max, long min, const char *moderated);
 #if 0 /* never used */
 /*
  *  Compare two pointers to "group_t" structures - used in qsort.
@@ -189,8 +189,8 @@ active_add(
  * Otherwise, bogus groups are dealt with when newsrc is written.
  */
 int
-process_bogus(name)
-	char *name;
+process_bogus(
+	char *name) /* return value is always ignored */
 {
 	struct t_group *ptr;
 
@@ -200,7 +200,7 @@ process_bogus(name)
 	if ((ptr = psGrpAdd(name)) == NULL)
 		return(0);
 
-	active_add(ptr, 0, 1, 0, "n");
+	active_add(ptr, 0L, 1L, 0L, "n");
 	ptr->bogus = TRUE;						/* Mark it bogus */
 
 	if (my_group_add(name) < 0)
@@ -544,7 +544,7 @@ subscribe_new_group (
 			my_fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
 
 		if ((ptr = psGrpAdd(group)) != NULL)
-			active_add(ptr, 0, 1, 0, "n");
+			active_add(ptr, 0L, 1L, 0L, "n");
 
 		if ((idx = my_group_add(group)) < 0) 
 			return;
@@ -635,11 +635,10 @@ match_group_list (
  *  comp.archives 71234890
  */
 
+#ifdef INDEX_DAEMON
 void
 read_group_times_file (void)
 {
-#ifdef INDEX_DAEMON
-
 	char *p, *q;
 	char buf[HEADER_LEN];
 	char group[HEADER_LEN];
@@ -679,8 +678,6 @@ if (debug == 2) {
 }
 	}
 	fclose (fp);
-
-#endif	/* INDEX_DAEMON */
 }
 
 /*
@@ -690,8 +687,6 @@ if (debug == 2) {
 void
 write_group_times_file (void)
 {
-#ifdef INDEX_DAEMON
-
 	FILE *fp;
 	register int i;
 
@@ -703,9 +698,8 @@ write_group_times_file (void)
 		fprintf (fp, "%s %ld\n", active[i].name, active[i].last_updated_time);
 	}
 	fclose (fp);
-
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 /*
  * Load the newnews[] array. (times newgroups were last checked on each server)

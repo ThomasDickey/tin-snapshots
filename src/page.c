@@ -144,7 +144,7 @@ restart:
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 					case KEYMAP_LEFT:
 						goto return_to_index;
 

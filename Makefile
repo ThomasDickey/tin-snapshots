@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970817
+PVER		= 970820
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -186,11 +186,13 @@ install_daemon:
 	@$(CD) $(SRCDIR); $(MAKE) install_daemon
 
 clean:
-	@$(CD) $(SRCDIR); $(MAKE) clean
-	@$(RM) -f *~
-	@$(RM) -f $(DOCDIR)/*~
-	@$(RM) -f $(INCDIR)/*~
-	@$(RM) -f $(SRCDIR)/*~
+	@-if test -e $(SRCDIR)/Makefile; then \
+		$(CD) $(SRCDIR); $(MAKE) clean ;\
+	fi
+	@-$(RM) -f *~
+	@-$(RM) -f $(DOCDIR)/*~
+	@-$(RM) -f $(INCDIR)/*~
+	@-$(RM) -f $(SRCDIR)/*~
 
 man:
 	@$(MAKE) manpage
@@ -233,13 +235,13 @@ tar:
 #
 name:
 	@DATE=`date +%y%m%d`;  if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
-	mv ../`basename \`pwd\`` ../tin-$$DATE ; \
-	sed "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./Makefile > ./Makefile.tmp \
-	&& mv ./Makefile.tmp ./Makefile ; \
-	sed "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp \
-	&& mv $(INCDIR)/version.h.tmp $(INCDIR)/version.h ; \
-	sed "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./makefile.in > ./makefile.in.tmp \
-	&& mv ./makefile.in.tmp ./makefile.in ; \
+	$(MV) ../`basename \`pwd\`` ../tin-$$DATE ; \
+	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./Makefile > ./Makefile.tmp \
+	&& $(MV) ./Makefile.tmp ./Makefile ; \
+	$(SED) "s,RELEASEDATE[[:space:]]*\"[[:print:]]*\",RELEASEDATE	\"$$DATE\"," $(INCDIR)/version.h > $(INCDIR)/version.h.tmp \
+	&& $(MV) $(INCDIR)/version.h.tmp $(INCDIR)/version.h ; \
+	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER		= $$DATE," ./makefile.in > ./makefile.in.tmp \
+	&& $(MV) ./makefile.in.tmp ./makefile.in ; \
 	fi
 
 dist:
@@ -253,13 +255,13 @@ version :
 	@$(ECHO) "TIN v$(VER)"
 
 distclean:
-	-@$(MAKE) clean
-	@$(RM) -f config.cache config.log config.status
-	@$(RM) -f $(INCDIR)/autoconf.h
-	@$(RM) -f $(SRCDIR)/Makefile
-	@$(RM) -f td-conf.out
-	@$(RM) -f makefile
-	
+	@-$(MAKE) clean
+	@-$(RM) -f config.cache config.log config.status
+	@-$(RM) -f $(INCDIR)/autoconf.h
+	@-$(RM) -f $(SRCDIR)/Makefile
+	@-$(RM) -f td-conf.out
+	@-$(RM) -f makefile
+
 configure: configure.in aclocal.m4
 	autoconf
 

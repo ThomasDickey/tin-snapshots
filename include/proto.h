@@ -8,12 +8,12 @@ extern int parse_active_line (char *line, long *max, long *min, char *moderated)
 extern int process_bogus(char *name);
 extern int resync_active_file (void);
 extern void load_newnews_info (char *info);
-extern void read_group_times_file (void);
 extern void read_motd_file (void);
 extern void read_news_active_file (void);
-extern void write_group_times_file (void);
 #ifdef INDEX_DAEMON
+	extern void read_group_times_file (void);
 	extern void vMakeActiveMyGroup (void);
+	extern void write_group_times_file (void);
 #endif /* INDEX_DAEMON */
 
 /* actived.c */
@@ -118,7 +118,7 @@ extern void xclick (int state);
 extern void envargs (int *Pargc, char ***Pargv, const char *envstr);
 
 /* feed.c */
-extern int get_post_proc_type (int proc_type);
+extern char get_post_proc_type (int proc_type);
 extern void feed_articles (int function, int level, struct t_group *group, int respnum);
 
 /* filter.c */
@@ -167,7 +167,7 @@ extern const char *get_host_name (void);
 #endif /* !FORGERY */
 
 /* inews.c */
-extern int submit_news_file (char *name, int lines);
+extern int submit_news_file (char *name);
 extern void get_from_name (char *from_name);
 extern void get_user_info (char *user_name, char *full_name);
 
@@ -186,13 +186,13 @@ extern struct t_group *psGrpAdd (char *group);
 extern struct t_group *psGrpFind (char *pcGrpName);
 extern unsigned long hash_groupname (const char *group);
 extern void init_group_hash (void);
+extern char *random_organization(char *in_org); 
 #if 0
 	extern struct t_group *psGrpFirst (void);
 	extern struct t_group *psGrpLast (void);
 	extern struct t_group *psGrpNext (void);
 	extern struct t_group *psGrpPrev (void);
 #endif
-extern char *random_organization(char *in_org); 
 
 /* mail.c */
 extern int iArtEdit (struct t_group *psGrp, struct t_article *psArt);
@@ -201,9 +201,15 @@ extern void read_newsgroups_file (void);
 extern void vFindArtMaxMin (char *pcGrpPath, long *plArtMax, long *plArtMin);
 extern void vMakeGrpName (char *pcBaseDir, char *pcGrpName, char *pcGrpPath);
 extern void vMakeGrpPath (char *pcBaseDir, char *pcGrpName, char *pcGrpPath);
-extern void vParseGrpLine (char *pcLine, char *pcGrpName, long *plArtMax, long *plArtMin, char *pcModerated);
 extern void vPrintActiveHead (char *pcActiveFile);
 extern void vPrintGrpLine (FILE *hFp, char *pcGrpName, long lArtMax, long lArtMin, char *pcBaseDir);
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+	extern void read_mail_active_file (void);
+	extern void read_mailgroups_file (void);
+	extern void vGrpDelMailArt (struct t_article *psArt);
+	extern void vGrpDelMailArts (struct t_group *psGrp);
+	extern void write_mail_active_file (void);
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /* main.c */
 extern int main (int argc, char *argv[]);
@@ -228,7 +234,7 @@ extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 extern char *eat_re (char *s, t_bool eat_was);
 extern char *quote_wild(char *str);
 extern const char *get_val (const char *env, const char *def);
-extern int get_arrow_key (void);
+extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
 extern int iCopyFile (char *pcSrcFile, char *pcDstFile);
 extern int input_pending (int delay);
@@ -256,7 +262,6 @@ extern void draw_percent_mark (long cur_num, long max_num);
 extern void get_author (int thread, struct t_article *art, char *str, int len);
 extern void get_cwd (char *buf);
 extern void make_group_path (char *name, char *path);
-extern void make_post_process_cmd (char *cmd, char *dir, char *file);
 extern void parse_from (char *from_line, char *eaddr, char *fname);
 extern void read_input_history_file (void);
 extern void rename_file (char *old_filename, char *new_filename);
@@ -273,6 +278,13 @@ extern void write_input_history_file (void);
 	extern void buffer_to_local (char *b);
 	extern void buffer_to_network (char *b);
 #endif /* LOCAL_CHARSET */
+#ifdef HAVE_COLOR
+	extern void toggle_color (void);
+	extern void show_color_status (void);
+#endif /* HAVE_COLOR */
+#if !defined(M_UNIX)
+	extern void make_post_process_cmd (char *cmd, char *dir, char *file);
+#endif /* !M_UNIX */
 
 /* newsrc.c */
 extern int pos_group_in_newsrc (struct t_group *group, int pos);
@@ -296,13 +308,17 @@ extern void vWriteNewsrc (void);
 #ifdef DEBUG_NEWSRC
 	extern void vNewsrcTestHarness (void);
 #endif /* DEBUG_NEWSRC */
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+	extern void art_mark_deleted (struct t_article *art);
+	extern void art_mark_undeleted (struct t_article *art);
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /* nntplib.c */
 extern char *getserverbyfile (const char *file);
 extern const char *nntp_respcode (int respcode);
 extern int get_server (char *string, int size);
 extern int get_tcp_socket (const char *machine, const char *service, unsigned port);
-extern int nntp_message (int respcode);
+extern void nntp_message (int respcode);
 extern int server_init (char *machine, const char *service, int port);
 extern void close_server (void);
 extern void put_server (const char *string);
@@ -314,8 +330,6 @@ extern void get_nntpserver (char *nntpserver_name, char *nick_name);
 
 /* open.c */
 extern FILE *open_art_fp (char *group_path, long art);
-extern FILE *open_mail_active_fp (char *mode);
-extern FILE *open_mailgroups_fp (void);
 extern FILE *open_motd_fp (char *motd_file_date);
 extern FILE *open_newgroups_fp (int the_index);
 extern FILE *open_news_active_fp (void);
@@ -331,6 +345,10 @@ extern int stat_article (long art, char *group_path);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
 extern void nntp_close (void);
 extern void vGrpGetSubArtInfo (void);
+#ifdef HAVE_MH_MAIL_HANDLING
+	extern FILE *open_mail_active_fp (char *mode);
+	extern FILE *open_mailgroups_fp (void);
+#endif /* HAVE_MH_MAIL_HANDLING */
 
 /* page.c */
 extern int art_open (long art, char *group_path);
@@ -346,9 +364,11 @@ extern int GetTimeInfo (TIMEINFO *Now);
 extern time_t parsedate (char *p, TIMEINFO *now);
 
 /* pgp.c */
-extern int pgp_check_article (void);
-extern void invoke_pgp_mail (char *nam, char *mail_to);
-extern void invoke_pgp_news (char *the_article);
+#ifdef HAVE_PGP
+	extern int pgp_check_article (void);
+	extern void invoke_pgp_mail (char *nam, char *mail_to);
+	extern void invoke_pgp_news (char *the_article);
+#endif
 
 /* post.c */
 extern int count_postponed_articles (void);
@@ -362,7 +382,7 @@ extern int repost_article (char *group, struct t_article *art, int respnum, int 
 extern int reread_active_after_posting (void);
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
 extern t_bool user_posted_messages (void);
-extern void checknadd_headers (char *infile, int lines);
+extern void checknadd_headers (char *infile);
 extern void quick_post_article (int postponed_only);
 
 /* prompt.c */
@@ -536,24 +556,5 @@ extern int overview_xref_support (void);
 extern void NSETRNG0 (t_bitmap *bitmap, long low, long high);
 extern void NSETRNG1 (t_bitmap *bitmap, long low, long high);
 extern void art_mark_xref_read (struct t_article *art);
-
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
-	/* mail.c */
-	extern void read_mail_active_file (void);
-	extern void read_mailgroups_file (void);
-	extern void vGrpDelMailArt (struct t_article *psArt);
-	extern void vGrpDelMailArts (struct t_group *psGrp);
-	extern void write_mail_active_file (void);
-
-	/* newsrc.c */
-	extern void art_mark_deleted (struct t_article *art);
-	extern void art_mark_undeleted (struct t_article *art);
-#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
-
-#ifdef HAVE_COLOR
-	/* misc.c */
-	extern void toggle_color (void);
-	extern void show_color_status (void);
-#endif /* HAVE_COLOR */
 
 #endif /* PROTO_H */

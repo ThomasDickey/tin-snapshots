@@ -331,7 +331,7 @@ show_thread (
 #ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 #endif /* WIN32 */
 					case KEYMAP_UP:
 						goto thread_up;
@@ -961,7 +961,7 @@ erase_thread_arrow (void)
 #ifndef INDEX_DAEMON
 static int
 prompt_thread_num (
-	int ch)
+	int ch) /* return value is always ignored */
 {
 	int num;
 
@@ -1100,7 +1100,7 @@ num_of_responses (
 int
 stat_thread (
 	int n,
-	struct t_art_stat *sbuf)
+	struct t_art_stat *sbuf) /* return value is always ignored */
 {
 	int i;
 

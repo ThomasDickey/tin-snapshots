@@ -57,7 +57,7 @@ check_upgrade(
 int
 read_config_file (
 	char	*file,
-	int	global_file)
+	int	global_file) /* return value is always ignored */
 {
 	char	newnews_info[PATH_LEN];
 	char	buf[LEN];
@@ -1181,7 +1181,7 @@ change_config_file (
 #	ifdef HAVE_KEY_PREFIX
 			case KEY_PREFIX:
 #	endif
-				switch (get_arrow_key ()) {
+				switch (get_arrow_key (ch)) {
 #endif
 					case KEYMAP_UP:
 						ch = iKeyUp;
@@ -1413,6 +1413,7 @@ change_config_file (
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
 							use_color = use_color_tinrc;
+							break;
 #endif
 						/*
 						 * the following do not need further action (if I'm right)
@@ -1465,7 +1466,6 @@ change_config_file (
 #ifdef HAVE_COLOR
 						 * case OPT_WORD_HIGHLIGHT_TINRC:
 #endif
-						 * 	break;
 						 */
 						default:
 							break;

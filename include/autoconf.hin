@@ -63,7 +63,6 @@
  */
 #undef	HAVE_ISPELL
 #undef	HAVE_METAMAIL
-#undef	HAVE_UNAME
 #undef	HAVE_PGP
 #undef	HAVE_SUM
 
@@ -77,7 +76,11 @@
 /*
  * Data types
  */
+#undef	mode_t
+#undef	pid_t
 #undef	size_t
+#undef	time_t
+#undef	uid_t
 #undef	RETSIGTYPE
 
 /*
@@ -328,6 +331,12 @@
  */
 #undef	HAVE_COMPTYPE_VOID
 #undef	HAVE_COMPTYPE_CHAR
+
+/*
+ * Define this to enable interpretation of 8-bit keycodes (e.g., beginning
+ * with 0x9b).
+ */
+#undef	HAVE_KEY_PREFIX
 
 /*
  * Define this if an application can dump core.  Some systems (e.g., apollo)

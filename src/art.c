@@ -28,7 +28,7 @@ static int overview_index_filename = FALSE;
 /*
  * Local prototypes
  */
-static char *pcPrintDate (long lSecs);
+static char *pcPrintDate (time_t lSecs);
 static char *pcPrintFrom (struct t_article *psArt);
 static int artnum_comp (t_comptype *p1, t_comptype *p2);
 static int date_comp (t_comptype *p1, t_comptype *p2);
@@ -405,7 +405,7 @@ thread_by_subject(void)
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *));
+		h = (struct t_hashnode *)(arts[i].subject - sizeof(int) - sizeof(void *)); /* FIXME: cast increases required alignment of target type */
 
 		j = h->aptr;
 
@@ -1302,7 +1302,9 @@ do_update (void)
 	/*
 	 * load last updated times for each group (tind daemon only)
 	 */
+#ifdef INDEX_DAEMON
 	read_group_times_file ();
+#endif /* INDEX_DAEMON */
 
 	/*
 	 * loop through groups and update any required index files
@@ -1378,7 +1380,9 @@ do_update (void)
 	/*
 	 * save last updated times for each group (tind daemon only)
 	 */
+#ifdef INDEX_DAEMON
 	write_group_times_file ();
+#endif /* INDEX_DAEMON */
 
 	if (verbose) {
 		time (&end_epoch);
@@ -1634,7 +1638,7 @@ print_expired_arts (
 
 static char *
 pcPrintDate (
-	long	lSecs)
+	time_t	lSecs)
 {
 	static	char acDate[25];
 	struct	tm *psTm;
