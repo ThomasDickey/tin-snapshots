@@ -127,7 +127,13 @@ check_start_save_any_news (check_start_save)
 		check_arts = 0;
 
 		for (j = 0; j < top; j++) {
-			if (arts[j].status == ART_UNREAD)  {
+			if (arts[j].status == ART_UNREAD) {
+				if (mail_news_to_posted && !arts[j].selected) {
+					if (catchup) {
+						art_mark_read (group, &arts[j]);
+					}
+					continue;
+				}
 				switch (check_start_save) {
 					case CHECK_ANY_NEWS:
 						if (print_first && verbose) {
@@ -1248,7 +1254,7 @@ uudecode_file (pp, file_out_dir, file_out)
 
 			/* If defined, invoke post processor command */
 			if (*post_proc_command) {
-				sprintf (buf, "cd %s; %s %s", file_out_dir, post_proc_command, file);
+				sprintf (buf, "cd %s; %s '%s'", file_out_dir, post_proc_command, file);
 
 				if (!invoke_cmd (buf))
 					error_message (txt_command_failed_s, buf);

@@ -265,12 +265,12 @@ main (argc, argv)
 #	define OPTIONS "dD:f:hI:PvV"
 #else
 #	ifdef M_AMIGA
-#		define OPTIONS "BcCD:f:hHI:m:M:nPqrRs:SuUvVwzZ"
+#		define OPTIONS "BcCD:f:hHI:m:M:nN:PqrRs:SuUvVwzZ"
 #	else
 #		ifdef HAVE_COLOR
-#			define OPTIONS "acCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
+#			define OPTIONS "acCD:f:g:hHI:m:M:nN:PqrRs:SuUvVwzZ"
 #		else
-#			define OPTIONS "cCD:f:g:hHI:m:M:nPqrRs:SuUvVwzZ"
+#			define OPTIONS "cCD:f:g:hHI:m:M:nN:PqrRs:SuUvVwzZ"
 #		endif
 #	endif
 #endif
@@ -352,6 +352,8 @@ read_cmd_line_options (argc, argv)
 				my_strncpy (default_maildir, optarg, sizeof (default_maildir));
 				break;
 
+			case 'N':	/* mail new news to your posts */
+				mail_news_to_posted = TRUE;
 			case 'M':	/* mail new news to specified user */
 				my_strncpy (mail_news_user, optarg, sizeof (mail_news_user));
 				mail_news = TRUE;

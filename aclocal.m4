@@ -608,8 +608,9 @@ AC_CACHE_VAL(cf_cv_type_outchar,[
 cf_cv_type_outchar="int OutChar(int)"
 cf_cv_found=no
 for P in int void; do
-for Q in int char; do
-for R in "" const; do
+for Q in int void; do
+for R in int char; do
+for S in "" const; do
 	AC_TRY_COMPILE([
 #ifdef USE_TERMINFO
 #include <curses.h>
@@ -622,12 +623,14 @@ for R in "" const; do
 #include <termcap.h>
 #endif
 #endif ],
-	[extern $P OutChar($Q);
-	extern int tputs ($R char *string, int nlines, $P (*_f)($Q));
+	[extern $Q OutChar($R);
+	extern $P tputs ($S char *string, int nlines, $Q (*_f)($R));
 	tputs("", 1, OutChar)],
-	[cf_cv_type_outchar="$P OutChar($Q)"
+	[cf_cv_type_outchar="$Q OutChar($R)"
 	 cf_cv_found=yes
 	 break])
+done
+	test $cf_cv_found = yes && break
 done
 	test $cf_cv_found = yes && break
 done

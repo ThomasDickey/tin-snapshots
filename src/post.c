@@ -1975,13 +1975,13 @@ mail_to_author (group, respnum, copy_text)
 		msg_add_header ("Newsgroups", note_h_newsgroups);
 
 		/*
-		 * Append to References: line if its already there
+		 * Write References and Message-Id as In-Reply-To to the mail
 		 */
 		if (note_h_references[0]) {
 			join_references (bigbuf, note_h_references, note_h_messageid);
-			msg_add_header ("References", bigbuf);
+			msg_add_header ("In-Reply-To", bigbuf);
 		} else {
-			msg_add_header ("References", note_h_messageid);
+			msg_add_header ("In-Reply-To", note_h_messageid);
 		}
 
 		if (*default_organization) {
@@ -2931,6 +2931,11 @@ find_reply_to_addr (respnum, from_addr)
 	int respnum;
 	char *from_addr;
 {
+#if 0
+	/* 
+    * This works fine, but since parse_from() has bugs, it seems to be better
+    * to use the other routine...
+    */
 	char *ptr, buf[HEADER_LEN];
 	char from_both[HEADER_LEN];
 	char from_name[HEADER_LEN];
@@ -2971,6 +2976,40 @@ find_reply_to_addr (respnum, from_addr)
 		}
 	}
 	fseek (note_fp, orig_offset, 0);
+#else
+	char *ptr, buf[HEADER_LEN];
+	char replyto[HEADER_LEN];
+	char from[HEADER_LEN];
+	int found_replyto = FALSE;
+	long orig_offset;
+
+	orig_offset = ftell (note_fp);
+	fseek (note_fp, 0L, 0);
+
+	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 && buf[0] != '\n') {
+		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
+			strcpy (replyto, &buf[10]);
+			ptr = strchr (replyto, '\n');
+			if (ptr != (char *) 0) {
+				*ptr = '\0';
+			}
+			found_replyto = TRUE;
+		} else if (STRNCMPEQ(buf, "From: ", 6)) {
+			strcpy (from, &buf[6]);
+			ptr = strchr (from, '\n');
+			if (ptr != (char *) 0) {
+				*ptr = '\0';
+			}
+		}
+	}
+
+	if (found_replyto) {
+		strcpy (from_addr, replyto);
+	} else {
+		strcpy (from_addr, from);
+	}
+	fseek (note_fp, orig_offset, 0);
+#endif
 }
 
 /*

@@ -1312,15 +1312,6 @@ art_open (art, group_path)
 			continue;
 	}
 
-	/* TODO - Would be better to retrieve the Refs: back from the msgid cache */
-	{
-		struct t_msgid *x;
-		char *y;
-		x = parse_references(note_h_references);
-		strcpy(note_h_references, (y = get_references(x)) ? y : "");
-		if (y != NULL) free(y);
-	}
-
 	note_mark[0] = ftell (note_fp);
 	note_end = FALSE;
 

@@ -88,7 +88,7 @@ submit_inews (name)
 	}
 
 	/*
-	 * Check that domain is not of type  host.subdomain.domain
+	 * Check that domain is not of type host.subdomain.domain
 	 */
 	ptr = strstr (from_name, "subdomain.domain");
 	if (ptr != (char *) 0) {

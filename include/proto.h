@@ -42,7 +42,7 @@ extern void do_update P_((void));
 extern void set_article P_((struct t_article *art));
 extern int input_pending P_((void));
 extern int valid_artnum P_((long art));
-extern char *safe_fgets P_((FILE *f));
+extern char *safe_fgets P_((FILE *fp));
 
 /* attrib.c */
 extern void set_default_attributes P_((struct t_attribute *psAttrib));
@@ -443,7 +443,6 @@ extern int prompt_option_char P_((int option));
 extern void continue_prompt P_((void));
 
 /* refs.c */
-extern struct t_msgid *parse_references P_((char *r));
 extern char *get_references P_((struct t_msgid *refptr));
 extern void free_msgids P_((void));
 extern void clear_art_ptrs P_((void));

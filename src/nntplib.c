@@ -15,19 +15,15 @@
  */
 
 #include "tin.h"
-#ifdef VMS
-#include "sio.h"
-#endif
 
-#ifdef NNTP_ONLY
-#	ifndef NNTP_ABLE
-#		define	NNTP_ABLE
-#	endif
+#ifdef VMS
+#	include "sio.h"
 #endif
 
 char	last_put[NNTP_STRLEN];
+
 #ifdef NNTP_ABLE
-static	char nntp_line[NNTP_STRLEN];
+	static	char nntp_line[NNTP_STRLEN];
 #endif
 
 #ifdef M_AMIGA
@@ -36,25 +32,24 @@ static	char nntp_line[NNTP_STRLEN];
 	typedef	FILE	TCP;
 #	define	s_printf	fprintf
 #	define	s_fdopen	fdopen
-#	define	s_flush		fflush
+#	define	s_flush	fflush
 #	define	s_fclose	fclose
-#	define	s_gets		fgets
-#	define	s_close		close
-#	define	s_puts		my_fputs
+#	define	s_gets	fgets
+#	define	s_close	close
+#	define	s_puts	my_fputs
 #	define	s_dup		dup
 #	define	s_init()	(1)
 #	define	s_end()
 #endif
 
 #ifndef VMS
-#ifdef NNTP_ABLE
-TCP *nntp_rd_fp = NULL;
-TCP *nntp_wr_fp = NULL;
-#endif
-
+#	ifdef NNTP_ABLE
+		TCP *nntp_rd_fp = NULL;
+		TCP *nntp_wr_fp = NULL;
+#	endif /* NNTP_ABLE */
 #else /* VMS */
-int	sockt_rd = -1, sockt_wr = -1;
-#endif
+	int	sockt_rd = -1, sockt_wr = -1;
+#endif /* !VMS */
 
 #ifdef NNTP_ABLE
 #	ifdef HAVE_NETDB_H
@@ -70,29 +65,29 @@ int	sockt_rd = -1, sockt_wr = -1;
 #		define	IPPORT_NNTP	((unsigned short) 119)
 #	else
 #	ifdef VMS
-#	    ifdef MULTINET
-#		include "MULTINET_ROOT:[multinet.include]errno.h"
-#		include "MULTINET_ROOT:[multinet.include]netdb.h"
-#		include "MULTINET_ROOT:[multinet.include.vms]inetiodef.h"
-#		include "MULTINET_ROOT:[multinet.include.sys]socket.h"
-#		include "MULTINET_ROOT:[multinet.include.netinet]in.h"
-#		define netopen	socket_open
-#		define netread	socket_read
-#		define netwrite socket_write
-#		define netclose socket_close
-#	    else
-#	    ifdef UCX
-#		include <errno.h>
-#		include <iodef.h>
-#		include <in.h>
-#		include <socket.h>
-#		define netopen	open
-#		define netread	read
-#		define netwrite write
-#		define netclose close
-#		define	IPPORT_NNTP	((unsigned short) 119)
-#		endif
-#	    endif
+#		ifdef MULTINET
+#			include "MULTINET_ROOT:[multinet.include]errno.h"
+#			include "MULTINET_ROOT:[multinet.include]netdb.h"
+#			include "MULTINET_ROOT:[multinet.include.vms]inetiodef.h"
+#			include "MULTINET_ROOT:[multinet.include.sys]socket.h"
+#			include "MULTINET_ROOT:[multinet.include.netinet]in.h"
+#			define netopen	socket_open
+#			define netread	socket_read
+#			define netwrite socket_write
+#			define netclose socket_close
+#		else
+#			ifdef UCX
+#				include <errno.h>
+#				include <iodef.h>
+#				include <in.h>
+#				include <socket.h>
+#				define 	netopen	open
+#				define 	netread	read
+#				define 	netwrite	write
+#				define 	netclose	close
+#				define	IPPORT_NNTP	((unsigned short) 119)
+#			endif /* UCX */
+#		endif /* MULTINET */
 #	else /* !VMS */
 #		include <sys/socket.h>
 #		include <netinet/in.h>
@@ -129,17 +124,19 @@ int	sockt_rd = -1, sockt_wr = -1;
 #endif /* NNTP_ABLE */
 
 /*
- * getserverbyfile	Get the name of a server from a named file.
- *			Handle white space and comments.
- *			Use NNTPSERVER environment variable if set.
+ * getserverbyfile(file)
  *
- *	Parameters:	"file" is the name of the file to read.
+ * Get the name of a server from a named file.
+ *	Handle white space and comments.
+ *	Use NNTPSERVER environment variable if set.
  *
- *	Returns:	Pointer to static data area containing the
- *			first non-ws/comment line in the file.
- *			NULL on error (or lack of entry in file).
+ *	Parameters: "file" is the name of the file to read.
  *
- *	Side effects:	None.
+ *	Returns: Pointer to static data area containing the
+ *	         first non-ws/comment line in the file.
+ *	         NULL on error (or lack of entry in file).
+ *
+ *	Side effects: None.
  */
 
 char *
@@ -310,18 +307,11 @@ get_tcp_socket (machine, service, port)
 {
 #ifdef NNTP_ABLE
 	int	s = -1;
-	struct	sockaddr_in sock_in;
-
-/* hp-ux 8.0, 9.05, 10.10 don't need it...
-#ifdef __hpux
-	int	socksize = 0;
-	int	socksizelen = sizeof (socksize);
-#endif
-*/
+	struct	sockaddr_in	sock_in;
 
 #ifdef TLI
 	extern struct	hostent *gethostbyname ();
-	struct	hostent *hp;
+	struct	hostent	*hp;
 	struct	t_call	*callptr;
 
 	/*
@@ -439,7 +429,7 @@ get_tcp_socket (machine, service, port)
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = hp->h_addrtype;
 	sock_in.sin_port = htons (port);
-/* 	sock_in.sin_port = sp->s_port; */
+/* sock_in.sin_port = sp->s_port; */
 #else /* EXCELAN */
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
@@ -678,11 +668,11 @@ void
 u_put_server (string)
 	char *string;
 {
-#ifdef	NNTP_ABLE
+#ifdef NNTP_ABLE
 #ifdef VMS
 	netwrite(sockt_wr, string, strlen(string));
 #else
-	s_puts(string,nntp_wr_fp);
+	s_puts(string, nntp_wr_fp);
 #endif
 #endif
 }

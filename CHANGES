@@ -1,4 +1,34 @@
---unoff BETA release 961209 --
+--unoff BETA release 961214 --
+
+244) Michael Douglass <mikedoug@texas.net>
+     ADD. -N option
+     FIX. several supplied patched
+
+243) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. self referencing threads could still be generated in certain cases
+     BUG. incorrect thread creation with some broken headers
+     ADD. various other cleanups and tweaks
+     FIX. refs.c
+     REM. old code from page.c, obseleted by 115)
+     BUG. post_proc_command didn't quote shell metacharacters
+     FIX. save.c
+
+242) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. find_reply_to_add() workarround - cause parse_from() is buggy
+          (and needs a rewrite)
+     ADD. changed References:-header in mails to In-Reply-To:
+     FIX. post.c
+
+241) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. check for returntype of tputs
+     FIX. aclocal.m4
+
+240) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     ADD. use safe_fgets() instead of getaline()
+     FIX. several supplied patches
+
+--unoff BETA release 961210 --
 
 239) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. minor code cleanup
@@ -69,7 +99,7 @@
      FIX. art.c
 
 226) Dirk Nimmich <nimmich@uni-muenster.de>
-     BUG. quoted 8-bit from-adresses aren't MIME-encoded corect 
+     BUG. quoted 8-bit from-adresses aren't MIME-encoded correctly
      FIX. art.c, rfc1522.c
 
 225) Jason Faultless <jason@radar.demon.co.uk>
