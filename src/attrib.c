@@ -572,14 +572,27 @@ write_attributes_file (file)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp;
+	char *file_tmp;
 	register int i;
 	struct t_group *psGrp;
 
+	/* alloc memory for tmp-filename */
+	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
+		wait_message (txt_out_of_memory2);
+		return;
+	}
+	/* generate tmp-filename */
+	strcpy (file_tmp, file);
+	strcat (file_tmp, ".tmp");
+
 #ifdef VMS
-	if ((fp = fopen (file, "w", "fop=cif")) == (FILE *) 0) {
+	if ((fp = fopen (file_tmp, "w", "fop=cif")) == (FILE *) 0) {
 #else
-	if ((fp = fopen (file, "w")) == (FILE *) 0) {
+	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
 #endif
+		error_message (txt_filesystem_full_backup, "attributes");
+		/* free memory for tmp-filename */
+		free (file_tmp);
 		return;
 	}
 
@@ -713,7 +726,17 @@ write_attributes_file (file)
 			quote_space_to_dash (psGrp->attribute->quote_chars));
 	}
 
-	fclose (fp);
+	if (ferror (fp) | fclose (fp)){
+		error_message (txt_filesystem_full, "attributes");
+		/* free memory for tmp-filename */
+		free (file_tmp);
+		return;
+	} else {
+		rename_file (file_tmp, file);
+		chmod (file, 0600);
+		/* free memory for tmp-filename */
+		free (file_tmp);
+	}
 
 #endif	/* INDEX_DAEMON */
 }

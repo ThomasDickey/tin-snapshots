@@ -156,7 +156,7 @@ extern int set_filter_scope P_((struct t_group *group));
 extern char *pcChkRegexStr P_((char *pcStr));
 
 /* getline.c */
-extern char *getline P_((char *prompt, int number_only, char *str, int max_chars));
+extern char *getline P_((char *prompt, int number_only, char *str, int max_chars, int passwd));
 
 /* group.c */
 extern void decr_tagged P_((int tag));
@@ -371,7 +371,6 @@ extern int setup_hard_base P_((struct t_group *group, char *group_path));
 extern int get_respcode P_((void));
 extern int stuff_nntp P_((char *fnam));
 extern FILE *nntp_to_fp P_((void));
-extern void authorization P_((char *server, char *authuser));
 extern void vGrpGetSubArtInfo P_((void));
 extern void vGrpGetArtInfo P_((char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin));
 
