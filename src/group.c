@@ -1734,9 +1734,8 @@ bld_sline (
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++) {
-		if (!(isprint(buffer[n]) || ((unsigned char) buffer[n] >= 0xa0))) {
+		if (!(my_isprint((unsigned char) buffer[n])))
 			buffer[n] = '?';
-		}
 	}
 #if USE_CURSES
 	/* FIXME: draw_sline usually does this too */

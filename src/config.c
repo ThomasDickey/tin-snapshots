@@ -138,6 +138,9 @@ read_config_file (
 			break;
 
 		case 'c':
+			if (match_boolean (buf, "cache_overview_files=", &cache_overview_files)) {
+				break;
+			}
 			if (match_boolean (buf, "catchup_read_groups=", &catchup_read_groups)) {
 				break;
 			}
@@ -876,6 +879,9 @@ write_config_file (
 
 	fprintf (fp, txt_tinrc_default_filter_days);
 	fprintf (fp, "default_filter_days=%d\n\n", default_filter_days);
+
+	fprintf (fp, txt_tinrc_cache_overview_files);
+	fprintf (fp, "cache_overview_files=%s\n\n", print_boolean (cache_overview_files));
 
 #ifdef HAVE_COLOR
 	fprintf (fp, txt_tinrc_use_color);

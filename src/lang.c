@@ -55,6 +55,7 @@ constext txt_bad_article[] = "Article to be posted has the errors/warnings noted
 constext txt_bad_command[] = "Bad command. Type 'h' for help.";
 constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
+constext txt_caching_disabled[] = "Overview caching not supported; Tin is setuid";
 constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
 constext txt_cannot_find_base_art[] = "Can't find base article %s";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
@@ -197,6 +198,7 @@ constext txt_help_beginner_level[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.
 constext txt_help_bug[] = "R\t  report bug or comment via mail to %s" cCRLF;
 constext txt_help_cC[] = "C\t  mark all articles as read and display next group with unread articles" cCRLF;
 constext txt_help_c[] = "c\t  mark all articles as read and exit to group choices menu" cCRLF;
+constext txt_help_cache_overview_files[] = "Create local copies of NNTP overview files. <SPACE> toggles & <CR> sets.";
 constext txt_help_catchup_read_groups[] = "Ask to mark groups read when quitting. <SPACE> toggles & <CR> sets.";
 constext txt_help_ck[] = "c K\t  mark thread as read (K = don't confirm) and return to previous level" cCRLF;
 #ifdef HAVE_COLOR
@@ -509,6 +511,7 @@ constext txt_opt_auto_list_thread[] = "List thread using right key        : ";
 constext txt_opt_auto_save[] = "Use Archive-name: header for save  : ";
 constext txt_opt_batch_save[] = "Save articles in batch mode (-S)   : ";
 constext txt_opt_beginner_level[] = "Show mini menu at each level       : ";
+constext txt_opt_cache_overview_files[] = "Cache NNTP overview files locally  : ";
 constext txt_opt_catchup_read_groups[] = "Catchup read groups when quitting  : ";
 #ifdef HAVE_COLOR
 constext txt_opt_col_back[] = "Standard background color          : ";
@@ -644,6 +647,7 @@ constext txt_tinrc_auto_save[] = "# if ON articles/threads with Archive-name: in
 constext txt_tinrc_batch_save[] = "# if ON articles/threads will be saved in batch mode when save -S\n\
 # or mail -M is specified on the command line\n";
 constext txt_tinrc_beginner_level[] = "# If ON show a mini menu of useful commands at each level\n";
+constext txt_tinrc_cache_overview_files[] = "# If ON, create local copies of NNTP overview files.\n";
 constext txt_tinrc_catchup_read_groups[] = "# if ON ask user if read groups should all be marked read\n";
 #ifdef HAVE_COLOR
 constext txt_tinrc_col_back[] = "# Standard-Background-Color\n";
@@ -1016,6 +1020,7 @@ constext txt_resp_redirect[] = "Responses have been directed to the following ne
 constext txt_resp_to_poster[] = "Responses have been directed to poster. Mail/Post/Quit (m/p/q): ";
 constext txt_resp_x_of_n[] = "RespNo %3d of %3d" cCRLF;
 constext txt_s_at_s[] = "%s at %s";
+constext txt_save_config[] = "Save configuration before continuing? (y/n): ";
 constext txt_save_filename[] = "Save filename [%s]> ";
 constext txt_saved[] = "-- %d Article%s saved --";
 constext txt_saved_nothing[] = "-- No unread articles: nothing saved! --";

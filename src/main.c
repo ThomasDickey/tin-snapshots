@@ -115,6 +115,10 @@ main (
 	 */
 	read_cmd_line_options (argc, argv);
 
+#ifndef INDEX_DAEMON
+	set_up_private_index_cache () ;
+#endif
+
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
 #	if !USE_CURSES
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
@@ -605,6 +609,14 @@ read_cmd_line_options (
 #endif
 		}
 	}
+/*
+ *  If we're reading from an NNTP server and we've been asked not to look
+ *  for new newsgroups, trust our cached copy of the newsgroups file.
+ */
+#ifdef NNTP_ABLE			
+	if (read_news_via_nntp)
+		read_local_newsgroups_file = ! check_for_new_newsgroups ;
+#endif
 }
 
 /*

@@ -214,6 +214,18 @@ read_groups_descriptions (
 		if (p != (char *) 0) {
 			*p = '\0';
 		}
+/*
+ *  This was moved from below and simplified.  I can't test here for the
+ *  type of group being read, because that requires having found the
+ *  group in the active file, and that truncates the local copy of the
+ *  newsgroups file to only subscribed-to groups when tin is called with
+ *  the "-q" option.
+ */
+		if (fp_save != (FILE *) 0 &&
+		    read_news_via_nntp &&
+		    ! read_local_newsgroups_file) {
+			fprintf (fp_save, "%s\n", buf);
+		}
 
 		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++) {
 			*q = *p;
@@ -232,13 +244,6 @@ read_groups_descriptions (
 				*q = ' ';
 			}
 			psGrp->description = my_strdup (p);
-			if (psGrp->type == GROUP_TYPE_NEWS) {
-				if (fp_save != (FILE *) 0 &&
-				    read_news_via_nntp &&
-				    !read_local_newsgroups_file) {
-					fprintf (fp_save, "%s\n", buf);
-				}
-			}
 		}
 		if (++count % 100 == 0) {
 			spin_cursor ();

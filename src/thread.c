@@ -180,9 +180,8 @@ bld_tline (
 
 /* protect display from non-displayable characters (e.g., form-feed) */
 	for (i = 0; buff[i] != '\0'; i++) {
-		if (!(isprint(buff[i]) || ((unsigned char) buff[i] >= 0xa0))) {
+		if (!(my_isprint((unsigned char) buff[i])))
 			buff[i] = '?';
-		}
 	}
 
 	if (!strip_blanks) {

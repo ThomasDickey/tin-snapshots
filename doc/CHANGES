@@ -1,3 +1,25 @@
+--unoff BETA release 970923 --
+
+446) Ralf Doeblitz <r.doeblitz@tu-bs.de>
+     Urs Janssen <urs@karlsruhe.org>
+     BUG. several buffer overflows possible [partial fix only]
+     FIX. screen.c, misc.c, nntplib.c, rfc1522.c
+
+445) Sergey Shkonda <serg@bcs.zp.ua>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. used isprint() instead of my_isprint()
+     FIX. proto.h, charset.c, getline.c, group.c, misc.c, page.c
+          screen.c, thread.c
+
+444) Darrell Tangman <darrelltman@mindspring.com>
+     ADD. local caching of overview-files if reading via NNTP
+     FIX. extern.h, art.c, auth.c, config.c, init.c, lang.c, mail.c
+          main.c, misc.c, open.c, select.c, tincfg.tbl
+
+443) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     ADD. removed useles call of get_from_name() in make_path_header()
+     FIX. post.c
+
 --unoff BETA release 970922 --
 
 442) Sven Paulus <sven@karlsruhe.org>

@@ -157,7 +157,8 @@ center_line (
 	int pos, n;
 	char buffer[256];
 
-	strcpy(buffer, str);
+	strncpy(buffer, str, 255);
+	buffer[255]='\0';
 
 	if (!cmd_line) {
 		if (cCOLS >= (int) strlen (str)) {
@@ -173,11 +174,9 @@ center_line (
 	}
 
 	/* protect terminal... */
-	strcpy(buffer, str);
 	for (n = 0; buffer[n] != '\0'; n++) {
-		if (!(isprint(buffer[n]) || ((unsigned char) buffer[n] >= 0xa0))) {
+		if (!(my_isprint((unsigned char) buffer[n])))
 			buffer[n] = '?';
-		}
 	}
 
 	if ((int) strlen (buffer) >= cCOLS) {

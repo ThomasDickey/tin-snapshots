@@ -3883,7 +3883,10 @@ make_path_header (
 	char user_name[128];
 
 	get_user_info (user_name, full_name);
-	get_from_name (from_name);
+
+#if 0 /* we don't need that here... */
+	get_from_name (from_name, (struct t_group *) 0);
+#endif
 
 	sprintf (line, "%s!%s", domain_name, user_name);
 	return;

@@ -1042,7 +1042,7 @@ print_a_line:
 			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
 		}
 
-		Convert2Printable ((unsigned char*) buf2);
+		ConvertBody2Printable ((unsigned char*) buf2);
 
 		first_char = buf2[0] ? buf2[0] : first_char;
 
@@ -1223,6 +1223,7 @@ show_first_header (
 		my_fputs (buf, stdout);
 		parse_from(note_h_ftnto, buf, ftbuf);
 		ftbuf[19] = '\0';
+		Convert2Printable (ftbuf);
 		StartInverse ();
 		my_fputs (ftbuf, stdout);
 		EndInverse ();
@@ -1274,8 +1275,10 @@ show_first_header (
 		MoveCursor (1, n);
 	}
 
+	Convert2Printable (buf);
+
 	StartInverse ();
-	/* ?? protect display from non-displayable characters ?? */
+
 	my_fputs (buf, stdout);
 	EndInverse ();
 
@@ -1326,6 +1329,8 @@ show_first_header (
 		strcat (buf, tmp);
 	}
 	strip_line (buf);
+
+	Convert2Printable (buf);
 
 #ifdef HAVE_COLOR
 	fcol(col_from);
@@ -1415,6 +1420,8 @@ show_cont_header (
 	if (cCOLS) {
 		buf[cCOLS-1] = '\0';
 	}
+
+	Convert2Printable (buf);
 
 #ifdef HAVE_COLOR
 	fcol(col_head);

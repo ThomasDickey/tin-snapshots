@@ -226,6 +226,9 @@ do_authinfo_original (
 	sprintf (line, "authinfo user %s", authuser);
 	put_server (line);
 	get_server (line, PATH_LEN);
+#ifdef DEBUG
+	debug_nntp ("authorization", line);
+#endif
 	ret = atoi (line);
 	if (ret != NEED_AUTHDATA) {
 		return ret;
@@ -242,6 +245,9 @@ do_authinfo_original (
 	sprintf (line, "authinfo pass %s", authpass);
 	put_server (line);
 	get_server (line, PATH_LEN);
+#ifdef DEBUG
+	debug_nntp ("authorization", line);
+#endif
 	ret = atoi (line);
 	if (ret == OK_AUTH) {
 		sprintf (line, txt_authorization_ok, authuser);

@@ -610,7 +610,7 @@ put_server (
 	(void) s_flush (nntp_wr_fp);
 #else
 	{
-	  char line[256];
+	  char line[8192]; /* FIXME */
 	  sprintf(line, "%s\r\n", string);
 	  netwrite(sockt_wr, line, strlen(line));
 	}

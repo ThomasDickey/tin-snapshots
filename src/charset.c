@@ -312,3 +312,20 @@ Convert2Printable (
 		}
 	}
 }
+
+/*
+ *  Same as Convert2Printable() but allows Backspace (ASCII 8), TAB (ASCII 9),
+ *  and LineFeed (ASCII 12) according to son-of-rfc 1036 section 4.4
+ */
+void
+ConvertBody2Printable (
+	unsigned char *buf)
+{
+	unsigned char *c;
+	for (c=buf; *c; c++) {
+		if ( !(my_isprint(*c) || *c==8 || *c==9 || *c==12)) {
+			*c = '?';
+		}
+	}
+}
+
