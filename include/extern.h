@@ -1105,6 +1105,7 @@ extern constext txt_warn_missing_followup_to[];
 extern constext txt_warn_not_in_newsrc[];
 extern constext txt_warn_not_valid_newsgroup[];
 extern constext txt_warn_posting_etiquette[];
+extern constext txt_warn_sig_too_long[];
 extern constext txt_writing_attributes_file[];
 extern constext txt_x_resp[];
 extern constext txt_xpost_quote[];

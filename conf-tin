@@ -35,7 +35,7 @@ if test -z "$CFLAGS" ; then
 	esac
 fi
 
-# set --with-mail-gateway or --with-mail-domain and
+# set --with-domain-name and
 #     --with-nntp-default-server to your local needs
 
 CFLAGS="$CFLAGS" \
@@ -43,7 +43,6 @@ CC="$CC" \
 ./configure --verbose \
 	--disable-echo \
 	--enable-nntp-only \
-	--enable-forgery \
 	--disable-mime-strict-charset \
-	--with-domain-name="/etc/NNTP_INEWS_DOMAIN" \
+	--with-domain-name=/etc/NNTP_INEWS_DOMAIN \
         $OPTS $* 2>&1 |tee -a $OUT

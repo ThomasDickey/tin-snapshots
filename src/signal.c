@@ -124,7 +124,7 @@ void set_signal_handlers (void)
 #endif
 #endif /* WIN32 */
 #ifdef SIGPIPE
-	signal (SIGPIPE, signal_handler);	/* brocken pipe */
+	signal (SIGPIPE, signal_handler);	/* broken pipe */
 #endif
 #ifdef SIGCHLD
 	signal (SIGCHLD, signal_handler);	/* death of a child process */

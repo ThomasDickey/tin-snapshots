@@ -177,77 +177,12 @@ get_fqdn(
   
 	return(fqdn);
 }
-
 #endif
 
 
 /*
  * Find username & fullname
  */
-#if 0
-/* old get_user_info() */
-void
-get_user_info (
-	char *user_name,
-	char *full_name)
-{
-#ifndef INDEX_DAEMON
-	char buf[128];
-	char tmp[128];
-	const char *ptr;
-	char *p;
-
-#if defined(M_AMIGA)
-	ptr = get_val ("REALNAME", "Unknown");
-	my_strncpy (full_name, ptr, 128);
-	strcpy (user_name, userid);
-#else
-#ifndef VMS
-		my_strncpy (buf, myentry->pw_gecos, 128);
-		p = strchr (buf, ',');
-		if (p != 0) {
-			*p = '\0';
-		}
-		/*
-		 * check if SYSV (& lastname) hack is in gecos field
-		 */
-		p = strchr (buf, '&');
-		if (p != 0) {
-			*p++ = '\0';
-			strcpy (tmp, userid);
-			if (*tmp && *tmp >= 'a' && *tmp <= 'z') {
-				*tmp = *tmp - 32;
-			}
-			sprintf (full_name, "%s%s%s", buf, tmp, p);
-		} else {
-			strcpy (full_name, buf);
-		}
-#else
-		strcpy(full_name, fix_fullname(get_uaf_fullname()));
-#endif
-
-	if ((ptr = getenv ("NAME")) != 0) {
-		my_strncpy (full_name, ptr, 128);
-	}
-
-	/*
-	 * haha, supplying a from: line is not allowed, but this!
-	 */
-
-	if (userid == 0) {
-		ptr = get_val ("USER", "please-set-USER-variable");
-	} else {
-		ptr = userid;
-	}
-	my_strncpy (user_name, ptr, 128);
-#endif
-
-#endif /* INDEX_DAEMON */
-}
-
-#else
-/* new get_user_info which uses get_full_name()/get_user_name() */
-
 void
 get_user_info (
 	char *user_name,
@@ -329,7 +264,6 @@ get_full_name(
 	}
 return (fullname);
 }
-#endif /* 0 */
 
 /*
  * FIXME to:

@@ -503,7 +503,9 @@ extern char *get_uaf_fullname();
 #	ifndef DEFAULT_PRINTER
 #		define	DEFAULT_PRINTER "/usr/bin/lp"
 #	endif
-#	define		DEFAULT_SUM		"sum -r"
+#	ifndef PATH_SUM
+#		define		DEFAULT_SUM		"sum -r"
+#	endif
 #endif /* BSD */
 
 /*
@@ -520,23 +522,16 @@ extern char *get_uaf_fullname();
 #endif
 
 
+/* FIXME: remove absolut-paths! */
 /*
  * Miscellaneous program-paths
  */
 #ifndef PATH_ISPELL
-#	define	PATH_ISPELL	"ispell"
+#	define	PATH_ISPELL		"ispell"
 #endif
 
 #ifndef PATH_METAMAIL
 #	define	PATH_METAMAIL	"metamail"
-#endif
-
-#ifndef PATH_HOSTNAME
-#	define	PATH_HOSTNAME	"hostname"
-#endif
-
-#ifndef PATH_UNAME
-#	define	PATH_UNAME	"uname"
 #endif
 
 /*
@@ -1000,6 +995,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	NGLIMIT		20	/* Max. num. of crossposted groups before warning */
 #define	MAX_COL		78	/* Max. line length before issuing a warning */
+#define	MAX_SIG_LINES	4	/* Max. num. of signature lines before warning */
 
 /*
  * The following macros are used to simplify and speed up the

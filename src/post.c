@@ -499,6 +499,8 @@ check_article_to_be_posted (
 	t_bool found_followup_to_several_groups = FALSE;
 	t_bool got_long_line = FALSE;
 	struct t_group *psGrp;
+	t_bool saw_sig_dashes = FALSE;
+	int    sig_lines = 0;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, the_article);
@@ -650,6 +652,7 @@ check_article_to_be_posted (
 	}
 	/*
 	 * Check the body of the article for long lines
+	 * check if sig is shorter then 5 lines
 	 */
 	while (fgets (line, sizeof (line), fp)) {
 		(*lines)++;
@@ -657,6 +660,12 @@ check_article_to_be_posted (
 		cp = strrchr (line, '\n');
 		if (cp != (char *) 0) {
 			*cp = '\0';
+		}
+		if ( saw_sig_dashes ) {
+			sig_lines++;
+		}
+		if ( !strcasecmp(line, "-- ") ) {
+			saw_sig_dashes = TRUE;	
 		}
 		col = 0;
 		for (cp = line; *cp; cp++) {
@@ -672,6 +681,14 @@ check_article_to_be_posted (
 			my_fflush (stderr);
 			got_long_line = TRUE;
 		}
+	}
+	if ( sig_lines > MAX_SIG_LINES ) {
+		setup_check_article_screen (&init);
+		my_fprintf (stderr, txt_warn_sig_too_long, MAX_SIG_LINES );
+		my_fflush (stderr);
+#ifdef HAVE_FASCIST_NEWSADMIN
+		errors++;
+#endif
 	}
 	if (!end_of_header) {
 		setup_check_article_screen (&init);
@@ -2275,11 +2292,6 @@ mail_bug_report (void)
 	int is_longfiles;
 	int is_nntp;
 	int is_nntp_only;
-	int uname_ok = FALSE;
-#ifdef HAVE_UNAME
-	FILE *fp_uname;
-#endif
-
 
 	msg_init_headers ();
 
@@ -2321,26 +2333,18 @@ mail_bug_report (void)
 	start_line_offset++;
 	msg_free_headers ();
 
-#if defined(HAVE_UNAME) || defined(HAVE_HOSTNAME)
-#if defined(HAVE_UNAME)
-	(void) sprintf (buf, "%s -a", PATH_UNAME);
+#ifdef HAVE_SYS_UTSNAME_H
+#	ifdef _AIX
+	fprintf (fp, "BOX1: %s %s.%s", system_info.sysname, system_info.version, system_info.release);
+#	else
+	fprintf (fp, "BOX1: %s %s %s", system_info.machine, system_info.sysname, system_info.release);
+#	endif /* AIX */
+	start_line_offset += 2;
 #else
-	(void) strcpy (buf, PATH_HOSTNAME);
-#endif
-	if ((fp_uname = popen (buf, "r")) != (FILE *) 0) {
-		while (fgets (buf, sizeof (buf), fp_uname) != NULL) {
-			fprintf (fp, "BOX1: %s", buf);
-			start_line_offset += 2;
-			uname_ok = TRUE;
-		}
-		pclose (fp_uname);
-	}
-#endif /* HAVE_UNAME */
+	fprintf (fp, "Please enter the following information:\n");
+	fprintf (fp, "BOX1: Machine+OS:\n");
+#endif /* HAVE_SYS_UTSNAME_H */
 
-	if (!uname_ok) {
-		fprintf (fp, "Please enter the following information:\n");
-		fprintf (fp, "BOX1: Machine+OS:\n");
-	}
 #ifdef HAVE_LONG_FILE_NAMES
 	is_longfiles = TRUE;
 #else
@@ -2361,7 +2365,7 @@ mail_bug_report (void)
 #else
 	is_debug = FALSE;
 #endif
-#ifdef INEWS_MAIL_GATEWAY
+#ifdef DOMAIN_NAME
 	domain = DOMAIN_NAME;
 #else
 	domain = 0;

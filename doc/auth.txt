@@ -103,7 +103,7 @@ Status of this Document
     Once sent, the server will cache the username and may send
     a 381 response requesting the password associated with that
     username. Should the server request a password using the 381
-    respose, the client must enter AUTHINFO PASS followed by
+    response, the client must enter AUTHINFO PASS followed by
     a password and the server will then check the authentication
     database to see if the username/password combination is valid.
     If the combination is valid or if no password is required,

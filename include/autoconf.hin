@@ -276,13 +276,13 @@
  */
 #undef	DECL_SIG_CONST
 
+
+/* FIXME: remove absolut-paths! */
 /*
  * Program-paths (i.e., the invocation-path)
  */
 #undef	PATH_ISPELL
 #undef	PATH_METAMAIL
-#undef	PATH_HOSTNAME
-#undef	PATH_UNAME
 #undef	PATH_SUM
 
 /*

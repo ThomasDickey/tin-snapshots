@@ -71,7 +71,7 @@ read_newsrc (
 	}
 
 /*
-#if USE_CURSES
+#ifdef USE_CURSES
 	if (!cmd_line)
 	scrollok(stdscr, TRUE);
 #endif
@@ -102,7 +102,7 @@ read_newsrc (
 		}
 	}
 /*
-#if USE_CURSES
+#ifdef USE_CURSES
 	if (!cmd_line) {
 		if (errors) {		FIXME - possibly not needed now ?
 			beep();

@@ -22,6 +22,8 @@
 #	define CURRENTDIR ""
 #endif
 
+#define SIGDASHES "-- \n"
+
 static char sigfile[PATH_LEN];
 
 static FILE *open_random_sig (char *sigdir);
@@ -52,7 +54,7 @@ msg_write_signature (
 	if (active[i].attribute->sigfile[0] == '!') {
 		char cmd[PATH_LEN];
 		FILE *pipe_fp;
-		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
+		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 		if ((pipe_fp = popen (active[i].attribute->sigfile+1, "r")) != (FILE *) 0) {
 			while (fgets (cmd, PATH_LEN, pipe_fp))
 				fputs (cmd, fp);
@@ -80,7 +82,7 @@ msg_write_signature (
 		if (debug == 2) {
 			error_message ("USING random sig=[%s]", sigfile);
 		}
-		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
+		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 		joinpath (path, homedir, ".sigfixed");
 		if ((fixfp = fopen (path, "r")) != (FILE *) 0) {
 			copy_fp (fixfp, fp, "");
@@ -97,7 +99,7 @@ msg_write_signature (
 	 */
 	if ((sigfp = fopen (default_signature, "r")) != (FILE *) 0) {
 		if (flag) {
-			fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
+			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 			copy_fp (sigfp, fp, "");
 		}
 		fclose (sigfp);
@@ -105,7 +107,7 @@ msg_write_signature (
 	}
 
 	if ((sigfp = fopen (path, "r")) != (FILE *) 0) {
-		fprintf (fp, "\n%s", sigdashes ? "-- \n" : "\n");
+		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
 		copy_fp (sigfp, fp, "");
 		fclose (sigfp);
 	}

@@ -29,12 +29,6 @@ AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_PROG_YACC
 
-CF_WITH_PROGRAM(uname,
-[  --with-uname            (default: from system path)])
-
-CF_WITH_PROGRAM(hostname,
-[  --with-hostname         (default: from system path)])
-
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
 
@@ -234,20 +228,26 @@ AC_MSG_CHECKING(if you want dbmalloc library)
 debug_malloc=none
 AC_ARG_WITH(dbmalloc,
 	[  --with-dbmalloc         use Conor Cahill's dbmalloc library],
-	[AC_CHECK_LIB(dbmalloc,debug_malloc,
-	 AC_CHECK_HEADER(dbmalloc.h,debug_malloc=DBMALLOC))])
+	[AC_MSG_RESULT(yes)
+	 AC_CHECK_LIB(dbmalloc,debug_malloc,
+	 AC_CHECK_HEADER(dbmalloc.h,debug_malloc=DBMALLOC))],
+	AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(if you want dmalloc library)
 AC_ARG_WITH(dmalloc,
 	[  --with-dmalloc          use Gray Watson's dmalloc library],
-	[AC_CHECK_LIB(dmalloc,dmalloc_debug,
-	 AC_CHECK_HEADER(dmalloc.h,debug_malloc=DMALLOC))])
+	[AC_MSG_RESULT(yes)
+	 AC_CHECK_LIB(dmalloc,dmalloc_debug,
+	 AC_CHECK_HEADER(dmalloc.h,debug_malloc=DMALLOC))],
+	AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING(if you want debugging-trace)
 AC_ARG_WITH(trace,
 	[  --with-trace            use debugging/traces],
-	[AC_DEFINE(USE_TRACE)
-	 test $found_ncurses = no && EXTRAOBJS="$EXTRAOBJS trace.o"])
+	[AC_MSG_RESULT(yes)
+	 AC_DEFINE(USE_TRACE)
+	 test $found_ncurses = no && EXTRAOBJS="$EXTRAOBJS trace.o"],
+	AC_MSG_RESULT(no))
 AC_SUBST(EXTRAOBJS)
 
 ## options for miscellaneous definitions
