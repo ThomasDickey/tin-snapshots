@@ -150,6 +150,71 @@ prompt_yn (line, prompt, default_answer)
 }
 
 
+/*
+ * help_text is displayed near the bottom of the screen.
+ * var is an index into a list containing size elements.
+ * The text from list is shown at row, col + len(prompt_text)
+ * Choice is incremented using the space bar, wrapping to 0
+ * ESC is used to abort any changes, RET saves changes.
+ * The new value is returned.
+ */
+int
+prompt_list (row, col, var, help_text, prompt_text, list, size)
+	int row;
+	int col;
+	int var;
+	char *help_text;
+	char *prompt_text;
+	char *list[];
+	int size;
+{
+	int ch, var_orig;
+	int i, width = 0;
+
+	set_alarm_clock_off ();
+
+	/*
+	 * Find the length of longest printable text
+	 */
+	for (i = 0; i < size; i++)
+		width = MAX(width, strlen(list[i]));
+
+	var_orig = var;
+
+	show_menu_help (help_text);
+	cursoron ();
+
+	do {
+		MoveCursor (row, col + (int) strlen (prompt_text));
+		if ((ch = (char) ReadCh ()) == ' ') {
+
+			/*
+			 * Increment list, looping around at the max
+			 */
+			var = ++var % size;
+
+			printf("%-*s", width, list[var]);
+			fflush (stdout);
+		}
+	} while (ch != CR && ch != ESC);
+
+	if (ch == ESC) {
+		var = var_orig;
+
+		printf("%-*s", width, list[var]);
+		fflush (stdout);
+	}
+
+	cursoroff ();
+	
+	set_alarm_clock_on ();
+
+	return(var);
+}
+
+/*
+ * Special case of prompt_list() Toggle between ON and OFF
+ */
 void 
 prompt_on_off (row, col, var, help_text, prompt_text)
 	int row;
@@ -158,36 +223,17 @@ prompt_on_off (row, col, var, help_text, prompt_text)
 	char *help_text;
 	char *prompt_text;
 {
-	int ch, var_orig;
+	int ret;
 
-	set_alarm_clock_off ();
-
-	var_orig = *var;
-
-	show_menu_help (help_text);
-	cursoron ();
-
-	do {
-		MoveCursor (row, col + (int) strlen (prompt_text));
-		if ((ch = (char) ReadCh ()) == ' ') {
-			*var = !*var;
-			printf ("%s", (*var ? "ON " : "OFF"));
-			fflush (stdout);
-		}
-	} while (ch != CR && ch != ESC);
-
-	if (ch == ESC) {
-		*var = var_orig;
-		printf ("%s", (*var ? "ON " : "OFF"));
-	}
-
-	cursoroff ();
-	fflush (stdout);
-	
-	set_alarm_clock_on ();
+	ret = prompt_list (row, col, *var, help_text, prompt_text, txt_onoff, 2);
+	*var = ret;
 }
 
-
+/*
+ * Wait until a key is pressed. Pedants will point out that:
+ * i)  There is no 'any' key on a keyboard
+ * ii) CTRL, SHIFT etc don't work
+ */
 void 
 continue_prompt ()
 {

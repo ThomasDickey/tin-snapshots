@@ -1230,7 +1230,7 @@ group_done:
 	set_xclick_off ();
 /*
 	if (index_point == GRP_QUIT) {
-		write_config_file ();
+		write_config_file (local_config_file);
 		tin_done (EXIT_OK);
 	}	
 */
@@ -1568,6 +1568,9 @@ bld_sline (i)
 	
 	stat_thread(i, &sbuf);
 
+	/*
+	 * n is number of articles in this thread
+	 */
 	if (active[my_group[cur_groupnum]].attribute->show_only_unread)
 		n = sbuf.unread + sbuf.seen;
 	else
@@ -1581,9 +1584,16 @@ bld_sline (i)
 		sprintf (new_resps, "  %c", sbuf.art_mark);
 	}
 
+	/*
+	 * Find index of first unread in this thread
+	 */
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
 /*	if (n) { T.Dickey 941027 */
+
+/*
+ * TODO: hack in a config var for this
+ */
 	if (n > 1) {
 		if (arts[j].lines != -1)
 			sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
@@ -1595,7 +1605,7 @@ bld_sline (i)
 		else
 			strcpy (art_cnt, "    ?    ");
 	}
-	
+
 	if (show_author != SHOW_FROM_NONE) {
 		get_author (FALSE, &arts[respnum], from);
 	}	
@@ -1610,7 +1620,7 @@ bld_sline (i)
 #if 0  /* CHRIS behaves badly with some environments */
 		if (!isprint(buffer[n]))
 #else
-		if (buffer[n]&127<32)
+		if (!isprint(buffer[n]) && !((unsigned char)buffer[n]>=0xa0))
 #endif
 			buffer[n] = '?';
 

@@ -12,8 +12,6 @@
  *		right notice, and it must be included in any copy made
  */
 
-#define forever for(;;)
-
 /*
  * OS specific doda's
  */
@@ -21,7 +19,7 @@
 #include	"config.h"
 
 #ifdef __DECC
-#include    <unixio.h>
+#include	<unixio.h>
 #else
 #include	<stdio.h>
 #endif
@@ -495,36 +493,36 @@ extern char *get_uaf_fullname();
 #	define		DEFAULT_NEWNEWS_NUM	5
 #endif
 
-#define 	NEWSRC_FILE			".newsrc"
+#define 	NEWSRC_FILE		".newsrc"
 #define 	NEWNEWSRC_FILE		".newnewsrc"
 #define 	OLDNEWSRC_FILE		".oldnewsrc"
 #ifdef VMS
 #define 	ATTRIBUTES_FILE 	"attributes"
 #define 	CONFIG_FILE		"tinrc"
-#define 	RCDIR		"TIN"
-#define 	INDEX_MAILDIR	"MAILIDX"
-#define 	INDEX_NEWSDIR	"INDEX"
+#define 	RCDIR			"TIN"
+#define 	INDEX_MAILDIR		"MAILIDX"
+#define 	INDEX_NEWSDIR		"INDEX"
 #define 	INDEX_SAVEDIR		"SAVE"
 #else
-#define 	RCDIR				".tin"
+#define 	RCDIR			".tin"
 #define 	ATTRIBUTES_FILE 	"attributes"
-#define 	CONFIG_FILE			"tinrc"
+#define 	CONFIG_FILE		"tinrc"
 #define 	INDEX_MAILDIR		".mail"
 #define 	INDEX_NEWSDIR		".news"
 #define 	INDEX_SAVEDIR		".save"
 #endif
-#define 	ACTIVE_FILE			"active"
+#define 	ACTIVE_FILE		"active"
 #define 	ACTIVE_MAIL_FILE	"active.mail"
 #define 	ACTIVE_SAVE_FILE	"active.save"
 #define 	ACTIVE_TIMES_FILE	"active.times"
-#define 	FILTER_FILE			"filter"
+#define 	FILTER_FILE		"filter"
 #define 	GROUP_TIMES_FILE	"group.times"
-#define 	POSTED_FILE			"posted"
+#define 	POSTED_FILE		"posted"
 #define 	DEFAULT_MAILDIR 	"Mail"
 #define 	DEFAULT_SAVEDIR 	"News"
 #define 	MAILGROUPS_FILE 	"mailgroups"
 #define 	MSG_HEADERS_FILE	"headers"
-#define 	MOTD_FILE			"motd"
+#define 	MOTD_FILE		"motd"
 #define 	OVERVIEW_FILE		".overview"
 #define 	OVERVIEW_FMT		"overview.fmt"
 #define 	SUBSCRIPTIONS_FILE	"subscriptions"
@@ -533,23 +531,29 @@ extern char *get_uaf_fullname();
 #define 	_CONF_ORGANIZATION	"organization"
 #define 	_CONF_SERVER		"server"
 
-#ifdef TRUE
-#	undef TRUE
+#ifndef TRUE
+#	define TRUE		1
 #endif
-#define 	TRUE		1
 
-#ifdef FALSE
-#	undef FALSE
+#ifndef FALSE
+#	define FALSE		0
 #endif
-#define 	FALSE		0
+
+#ifndef MAX
+#	define MAX(a,b)		((a > b) ? a : b)
+#endif
+
+#ifndef forever
+#	define forever		for(;;)
+#endif
 
 #define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
-#define STRNCMPEQ(s1, s2, n)	(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
+#define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
 #ifdef VMS
-#	define	LEN		512
-#	define	PATH_LEN	256
+#	define	LEN			512
+#	define	PATH_LEN		256
 #endif
 #ifdef M_AMIGA
 #	define	LEN			512
@@ -557,7 +561,7 @@ extern char *get_uaf_fullname();
 #endif
 #if defined(M_OS2) || defined(M_UNIX)
 #	ifndef MAXPATHLEN
-#		define MAXPATHLEN 256
+#		define MAXPATHLEN 	256
 #	endif
 #	define	PATH_LEN		MAXPATHLEN
 #	define	LEN			1024
@@ -645,19 +649,19 @@ extern char *get_uaf_fullname();
 #define 	KEYMAP_RIGHT			0xA7
 #define 	KEYMAP_PAGE_UP			0xA1
 #define 	KEYMAP_PAGE_DOWN		0xA2
-#define 	KEYMAP_HOME				0xA4
-#define 	KEYMAP_END				0xA3
+#define 	KEYMAP_HOME			0xA4
+#define 	KEYMAP_END			0xA3
 #define 	KEYMAP_MOUSE			0
 #else
 #define 	KEYMAP_UNKNOWN			0
-#define 	KEYMAP_UP				1
-#define 	KEYMAP_DOWN				2
-#define 	KEYMAP_LEFT				3
+#define 	KEYMAP_UP			1
+#define 	KEYMAP_DOWN			2
+#define 	KEYMAP_LEFT			3
 #define 	KEYMAP_RIGHT			4
 #define 	KEYMAP_PAGE_UP			5
 #define 	KEYMAP_PAGE_DOWN		6
-#define 	KEYMAP_HOME				7
-#define 	KEYMAP_END				8
+#define 	KEYMAP_HOME			7
+#define 	KEYMAP_END			8
 #define 	KEYMAP_MOUSE			9
 #endif
 
@@ -667,9 +671,9 @@ extern char *get_uaf_fullname();
 
 #define 	SELECT_LEVEL			1
 #define 	SPOOLDIR_LEVEL			2
-#define 	GROUP_LEVEL				3
+#define 	GROUP_LEVEL			3
 #define 	THREAD_LEVEL			4
-#define 	PAGE_LEVEL				5
+#define 	PAGE_LEVEL			5
 
 #define 	MINI_HELP_LINES 		5
 
@@ -677,8 +681,29 @@ extern char *get_uaf_fullname();
 #define 	FEED_PIPE			2
 #define 	FEED_PRINT			3
 #define 	FEED_SAVE			4
-#define 	FEED_SAVE_TAGGED	5
+#define 	FEED_SAVE_TAGGED		5
 #define 	FEED_REPOST			6
+
+#define		THREAD_NONE			0
+#define		THREAD_SUBJ			1
+#define		THREAD_REFS			2
+
+#define		SHOW_FROM_NONE			0
+#define		SHOW_FROM_ADDR			1
+#define		SHOW_FROM_NAME			2
+#define		SHOW_FROM_BOTH			3
+
+/*
+ * used in feed.c & save.c
+ */
+
+#define		POST_PROC_NONE			0
+#define		POST_PROC_SHAR			1
+#define		POST_PROC_UUDECODE		2
+#define		POST_PROC_UUD_LST_ZOO		3
+#define		POST_PROC_UUD_EXT_ZOO		4
+#define		POST_PROC_UUD_LST_ZIP		5
+#define		POST_PROC_UUD_EXT_ZIP		6
 
 /*
  *  used in art.c & rcfile.c
@@ -691,11 +716,6 @@ extern char *get_uaf_fullname();
 #define 	SORT_BY_FROM_ASCEND		4
 #define 	SORT_BY_DATE_DESCEND		5
 #define 	SORT_BY_DATE_ASCEND		6
-
-#define 	SHOW_FROM_NONE			0
-#define 	SHOW_FROM_ADDR			1
-#define 	SHOW_FROM_NAME			2
-#define 	SHOW_FROM_BOTH			3
 
 /*
  *  used in help.c
@@ -717,7 +737,7 @@ extern char *get_uaf_fullname();
  *  used in help.c
  */
 
-#define 	HEADER_TO				0
+#define 	HEADER_TO			0
 #define 	HEADER_SUBJECT			1
 #define 	HEADER_NEWSGROUPS		2
 
@@ -804,31 +824,19 @@ extern char *get_uaf_fullname();
  * filter_type used in struct t_filter
  */
 
-#define FILTER_KILL		0
-#define FILTER_SELECT	1
+#define FILTER_KILL				0
+#define FILTER_SELECT				1
 
-#define FILTER_SUBJ_CASE_SENSITIVE	0
-#define FILTER_SUBJ_CASE_IGNORE 	1
-#define FILTER_FROM_CASE_SENSITIVE	2
-#define FILTER_FROM_CASE_IGNORE 	3
+#define FILTER_SUBJ_CASE_SENSITIVE		0
+#define FILTER_SUBJ_CASE_IGNORE 		1
+#define FILTER_FROM_CASE_SENSITIVE		2
+#define FILTER_FROM_CASE_IGNORE 		3
 #define FILTER_MSGID				4
 #define FILTER_LINES				5
 
 #define FILTER_LINES_EQ 			0
 #define FILTER_LINES_LT 			1
 #define FILTER_LINES_GT 			2
-
-/*
- * used in feed.c & save.c
- */
-
-#define POST_PROC_NONE			0
-#define POST_PROC_SHAR			1
-#define POST_PROC_UUDECODE		2
-#define POST_PROC_UUD_LST_ZOO		3
-#define POST_PROC_UUD_EXT_ZOO		4
-#define POST_PROC_UUD_LST_ZIP		5
-#define POST_PROC_UUD_EXT_ZIP		6
 
 /*
  * used in checking article header before posting

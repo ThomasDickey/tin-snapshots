@@ -690,39 +690,15 @@ print_file (command, respnum, count)
 	return (TRUE);	/* a hack that will check if file was really checked later */
 }
 
-
+/*
+ * Return the single char hotkey corresponding to the post process type
+ * No range check here, it was constrained when the config file was read
+ */
 int
 get_post_proc_type (proc_type)
 	int proc_type;
 {
-	int type;
-		
- 	switch (proc_type) {
- 		case POST_PROC_SHAR:
- 			type = 's';
- 			break;
- 		case POST_PROC_UUDECODE:
- 			type = 'u';
- 			break;
- 		case POST_PROC_UUD_LST_ZOO:
- 			type = 'l';
- 			break;
- 		case POST_PROC_UUD_EXT_ZOO:
- 			type = 'e';
- 			break;
- 		case POST_PROC_UUD_LST_ZIP:
- 			type = 'L';
- 			break;
- 		case POST_PROC_UUD_EXT_ZIP:
- 			type = 'E';
- 			break;
- 		case POST_PROC_NONE:
- 		default:
- 			type = 'n';
- 			break;
- 	}
- 	
-	return type; 
+	return(ch_post_process[proc_type]);
 }
 
 /*

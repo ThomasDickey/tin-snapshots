@@ -3,8 +3,9 @@
  *  Module    : color.c
  *  Original  : Olaf Kaluza <olaf@criseis.ruhr.de>
  *  Author    : Roland Rosenfeld <roland@spinnaker.rhein.de>
+ *              Giuseppe De Marco <gdemarco@freenet.hut.fi> (light-colors)
  *  Created   : 02-06-95
- *  Updated   : 06-03-95, 30-03-96
+ *  Updated   : 06-03-95, 30-03-96, 22-04-96
  *  Notes     : This are the basic function for ansi-color
  *              and word highlightning
  *  Copyright : (c) 1995 by Olaf Kalzuga and Roland Rosenfeld
@@ -18,24 +19,34 @@
 #include "tin.h"
 
 /* setting foregroundcolor */
-void fcol (int color)
+void
+fcol (color)
+	int color;
 {
 	if (!use_color) return;
-	printf ("\033[%dm", (color+30));
+	printf ("\033[%d;%dm", (color>>3), ((color&7)+30));
 }
 
 /* setting backgroundcolor */
-void bcol (int color)
+void
+bcol (color)
+	int color;
 {
 	if (!use_color) return;
 	printf ("\033[%dm", (color+40));
 }
 
 
-void print_color (char* str) {
-	if ( str[0]==':' || str[0]=='>' || str[0]=='|' || str[0]==']'
-	    || str[1]=='>' || str[2]=='>' || str[3]=='>'
-	    || (str[0]==' ' && str[1]==':'))
+void
+print_color (str)
+	char *str;
+{
+	if ( str[0]=='>' || str[0]=='|' || str[0]==']'
+	    || (str[0]==':' && str[1]!='-')
+	    || (str[1]=='>' && str[0]!='-') 
+	    || (str[2]=='>' && str[1]!='-')
+	    || (str[3]=='>' && str[2]!='-')
+	    || (str[0]==' ' && str[1]==':' && str[2]!='-'))
 	{
 		fcol(col_quote);
 	} else {

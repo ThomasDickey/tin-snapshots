@@ -60,6 +60,10 @@ extern void debug_print_filter_attributes P_((void));
 extern void ConvertIso2Asc P_((unsigned char *iso, unsigned char *asc, int t));
 extern void ConvertTeX2Iso P_((unsigned char *from, unsigned char *to));
 extern int iIsArtTexEncoded P_((long art, unsigned char *group_path));
+/* ./color.c */
+extern void fcol P_((int color));
+extern void bcol P_((int color));
+extern void print_color P_((char *str));
 /* ./config.c */
 extern int read_config_file P_((char *file, int global_file));
 extern void write_config_file P_((char *file));
@@ -400,6 +404,7 @@ extern int prompt_string P_((char *prompt, char *buf));
 extern int prompt_menu_string P_((int line, int col, char *var));
 extern int prompt_yn P_((int line, char *prompt, int default_answer));
 extern void prompt_on_off P_((int row, int col, int *var, char *help_text, char *prompt_text));
+extern int prompt_list P_((int row, int col, int var, char *help_text, char *prompt_text, char **list, int));
 extern void continue_prompt P_((void));
 /* ./save.c */
 extern int check_start_save_any_news P_((int check_start_save));

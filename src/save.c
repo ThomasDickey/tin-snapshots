@@ -1255,6 +1255,14 @@ uudecode_file (pp, file_out_dir, file_out)
 				fflush (stdout);
 			}
 
+			/* If defined, invoke post processor command */
+			if (*post_proc_command) {
+				sprintf (buf, "cd %s; %s %s", file_out_dir, post_proc_command, file);
+
+				if (! invoke_cmd (buf))
+					error_message (txt_command_failed_s, buf);
+			}
+
 			if (pp > POST_PROC_UUDECODE) {
 				/*
 				 *  Test archive integrity

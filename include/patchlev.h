@@ -27,7 +27,12 @@
  *
  *	Roland Rosenfeld <roland@spinnaker.rhein.de>
  *	Olaf Kaluza <olaf@criseis.ruhr.de>
+ *	Giuseppe De Marco <gdemarco@freenet.hut.fi>
  *		color support
+ *		bugfixes
+ *
+ *	Jason Faultless <jason@radar.demon.co.uk>
+ *		post_process_command
  *		bugfixes
  *
  *	Seven Paulus <sven@oops.sub.de>
@@ -43,7 +48,7 @@
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960405"
+#define PATCHLEVEL	"MC.960515"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"
