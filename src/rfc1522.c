@@ -19,7 +19,7 @@
 				 * so leave this off
 				 */
 
-#ifndef RFCDEBUG
+#ifndef DEBUG_MIME
 #include "tin.h"
 #else
 #include "extern.h"
@@ -39,7 +39,7 @@
 				 * when decoding.  If you don't, everything
 				 * is thought to match your machine's charset
 				 */
-#endif /* RFCDEBUG */
+#endif /* DEBUG_MIME */
 
 /* NOTE: these routines expect that MM_CHARSET is set to the charset
    your system is using.  If it is not defined, US-ASCII is used.
@@ -524,7 +524,7 @@ rfc15211522_encode(filename)
 }
 
 
-#ifdef RFCDEBUG
+#ifdef DEBUG_MIME
 #define xTESTHEADER "vorher =?ISO-8859-1?Q?Kristian_K=F6hntopp?= nachher"
 #define yTESTHEADER "vorher =?ISO-8859-1?B?S3Jpc3RpYW4gS/ZobnRvcHA=?= nachher"
 #define TESTHEADER "Kristian Köhntopp 	Müller 123 (hähäsdkäfas)."
@@ -536,4 +536,4 @@ main()
   printf("%s\n",c=rfc1522_encode(TESTHEADER));
   printf("%s\n",rfc1522_decode(c));
 }
-#endif /* RFCDEBUG */
+#endif /* DEBUG_MIME */

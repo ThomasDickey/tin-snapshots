@@ -1098,16 +1098,16 @@ post_article_done:
 	return redraw_screen;
 }
 
-
-static void appendid(char **, char **);
-static int must_include(char *);
-static void skip_id(char **);
-static int damaged_id(char *);
+/* local prototyles */
+static void appendid P_((char **where, char **what));
+static int must_include P_((char *id));
+static void skip_id P_((char **id));
+static int damaged_id P_((char *id));
 
 
 /* yeah, right, that's from the same Chris who is telling Jason he's
    doing obfuscated C :-) */
-static void appendid(where,what)
+static void appendid(where, what)
 	char **where;
 	char **what;
 {
@@ -2147,7 +2147,7 @@ pcCopyArtHeader (iHeader, pcArt, result)
 		} else {
 			p = header;
 		}
-		(void)strcpy(result, p);
+		(void)strcpy(result, rfc1522_decode(p));
 		return TRUE;
 	}
 
