@@ -422,5 +422,5 @@ print:
 # This isn't the final form; it's just used for developing the autoconf script
 distclean:
 	cd src && make clobber
-	rm -f config.* makefile */makefile include/autoconf.h
+	rm -f config.* makefile */Makefile */makefile include/autoconf.h
 #	rm -f configure

@@ -6,7 +6,7 @@ MANEXT		= 1
 BASE_VER	= 950824
 LVER		= 1.3_$(BASE_VER)
 PPREFIX		= MC
-PVER		= 960526
+PVER		= 960528
 VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -170,11 +170,17 @@ manpage:
 	@$(ECHO) "Creating $(NROFF) man page for $(EXE)$(VER)..."
 	@$(NROFF) -man $(DOCDIR)/$(EXE).1 > $(DOCDIR)/$(EXE).nrf
 
+# Use 2 passes for creating MANIFEST because its size changes (it's not likely
+# that we'll need 3 passes, since that'll happen only when the grand total's
+# digits change).
 manifest:
 	@$(ECHO) "Creating MANIFEST..."
-	@$(ECHO) "MANIFEST for $(PROJECT)-$(VER) (`date`)" > MANIFEST
-	@$(ECHO) "----------------------------------------------------" >> MANIFEST
+	@$(ECHO) "MANIFEST for $(PROJECT)-$(VER) (`date`)" > MANIFEST.tmp
+	@$(ECHO) "----------------------------------------------------" >> MANIFEST.tmp
+	@$(CP) MANIFEST.tmp MANIFEST
 	@$(WC) -c $(ALL_FILES) >> MANIFEST
+	@$(WC) -c $(ALL_FILES) >> MANIFEST.tmp
+	@$(MV) MANIFEST.tmp MANIFEST
 
 chmod:
 	@$(ECHO) "Setting the file permissions..."

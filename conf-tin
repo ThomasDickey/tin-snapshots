@@ -46,21 +46,12 @@ INSTALL="$INSTALL" \
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
-        --prefix=$TOP \
-        --exec-prefix=$TOP \
-        --enable-echo \
+        --disable-echo \
         --disable-debug \
         --enable-prototypes \
         --enable-warnings \
 	--with-libdir="" \
 	--with-spooldir="" \
-	--with-mail-gateway="" \
-        --with-mail-domain=akk.uni-karlsruhe.de \
-	--with-nntp-default-server=news.akk.uni-karlsruhe.de \
-        --disable-mail-handling \
 	--enable-nntp-only \
-	--enable-color \
-	--enable-ref-threading \
-	--disable-etiquette \
-	--disable-forgery 
+	--enable-color
         $OPTS $* 2>&1 |tee -a $OUT

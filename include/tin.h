@@ -1511,13 +1511,15 @@ typedef const char __far constext;
 typedef char constext;
 #endif
 
-
 #include	"patchlev.h"
 #include	"extern.h"
 #include	"nntplib.h"
 #include	"proto.h"
 #include	"menukeys.h"
+
+#if defined(WIN32)
 #include	"msmail.h"
+#endif
 
 #if __STDC__ || defined(__cplusplus)
 #	define P_(s) s

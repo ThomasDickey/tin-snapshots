@@ -87,8 +87,10 @@ STRIP	= strip
 STRIP2	= mcs -d
 SU	= su
 TAGS	= ctags
+TOUCH	= touch
 
 HFILES	= \
+	$(INCDIR)/autoconf.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
@@ -96,15 +98,14 @@ HFILES	= \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h
-#	$(INCDIR)/autoconf.h
 #	$(INCDIR)/config.h
 #	$(INCDIR)/amiga.h
 #	$(INCDIR)/amigatcp.h
 #	$(INCDIR)/gst.h
 #	$(INCDIR)/msmail.h
+#	$(INCDIR)/os_2.h
 #	$(INCDIR)/win32.h
 #	$(INCDIR)/win32tcp.h
-#	$(INCDIR)/os_2.h
 
 CFILES	= \
 	$(SRCDIR)/active.c \
@@ -320,49 +321,58 @@ cscope:
 	@$(ECHO) "Creating cscope database $(PROJECT)..."
 	@$(CSCOPE) $(ALL_FILES)
 
-$(OBJDIR)/active.o:		$(SRCDIR)/active.c $(HFILES)
-$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(HFILES)
-$(OBJDIR)/art.o:		$(SRCDIR)/art.c $(HFILES)
-$(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(HFILES)
-$(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(HFILES)
-$(OBJDIR)/config.o:		$(SRCDIR)/config.c $(HFILES)
-$(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(HFILES)
-$(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(HFILES)
-$(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(HFILES)
-$(OBJDIR)/feed.o:		$(SRCDIR)/feed.c $(HFILES)
-$(OBJDIR)/filter.o:		$(SRCDIR)/filter.c $(HFILES)
-$(OBJDIR)/getline.o:		$(SRCDIR)/getline.c $(HFILES)
-$(OBJDIR)/group.o:		$(SRCDIR)/group.c $(HFILES)
-$(OBJDIR)/hashstr.o:		$(SRCDIR)/hashstr.c $(HFILES)
-$(OBJDIR)/help.o:		$(SRCDIR)/help.c $(HFILES)
-$(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(HFILES)
-$(OBJDIR)/init.o:		$(SRCDIR)/init.c $(HFILES)
-$(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(HFILES)
-$(OBJDIR)/list.o:		$(SRCDIR)/list.c $(HFILES)
-$(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(HFILES)
-$(OBJDIR)/main.o:		$(SRCDIR)/main.c $(HFILES)
-$(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(HFILES)
-$(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(HFILES)
-$(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(HFILES)
-$(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(HFILES)
-$(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(HFILES)
-$(OBJDIR)/open.o:		$(SRCDIR)/open.c $(HFILES)
-$(OBJDIR)/page.o:		$(SRCDIR)/page.c $(HFILES)
-$(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(HFILES)
-$(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(HFILES)
-$(OBJDIR)/post.o:		$(SRCDIR)/post.c $(HFILES)
-$(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(HFILES)
-$(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(HFILES)
-$(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(HFILES)
-$(OBJDIR)/save.o:		$(SRCDIR)/save.c $(HFILES)
-$(OBJDIR)/screen.o:		$(SRCDIR)/screen.c $(HFILES)
-$(OBJDIR)/search.o:		$(SRCDIR)/search.c $(HFILES)
-$(OBJDIR)/select.o:		$(SRCDIR)/select.c $(HFILES)
-$(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(HFILES)
-$(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(HFILES)
-$(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(HFILES)
-$(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(HFILES)
-$(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(HFILES)
-$(OBJDIR)/win32.o:		$(SRCDIR)/win32.c $(HFILES)
-$(OBJDIR)/xref.o:		$(SRCDIR)/xref.c $(HFILES)
-$(OBJDIR)/vms.o:		$(SRCDIR)/vms.c $(HFILES)
+$(INCDIR)/tin.h:		$(INCDIR)/autoconf.h \
+				$(INCDIR)/extern.h \
+				$(INCDIR)/menukeys.h \
+				$(INCDIR)/nntplib.h \
+				$(INCDIR)/patchlev.h \
+				$(INCDIR)/proto.h \
+				$(SRCDIR)/Makefile
+	@$(TOUCH) $(INCDIR)/tin.h
+$(OBJDIR)/active.o:		$(SRCDIR)/active.c $(INCDIR)/tin.h
+$(OBJDIR)/actived.o:		$(SRCDIR)/actived.c $(INCDIR)/tin.h
+$(OBJDIR)/art.o:		$(SRCDIR)/art.c $(INCDIR)/tin.h \
+				$(INCDIR)/stpwatch.h
+$(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(INCDIR)/tin.h
+$(OBJDIR)/charset.o:		$(SRCDIR)/charset.c $(INCDIR)/tin.h
+$(OBJDIR)/config.o:		$(SRCDIR)/config.c $(INCDIR)/tin.h
+$(OBJDIR)/curses.o:		$(SRCDIR)/curses.c $(INCDIR)/tin.h
+$(OBJDIR)/debug.o:		$(SRCDIR)/debug.c $(INCDIR)/tin.h
+$(OBJDIR)/envarg.o:		$(SRCDIR)/envarg.c $(INCDIR)/tin.h
+$(OBJDIR)/feed.o:		$(SRCDIR)/feed.c $(INCDIR)/tin.h
+$(OBJDIR)/filter.o:		$(SRCDIR)/filter.c $(INCDIR)/tin.h
+$(OBJDIR)/getline.o:		$(SRCDIR)/getline.c $(INCDIR)/tin.h
+$(OBJDIR)/group.o:		$(SRCDIR)/group.c $(INCDIR)/tin.h
+$(OBJDIR)/hashstr.o:		$(SRCDIR)/hashstr.c $(INCDIR)/tin.h
+$(OBJDIR)/help.o:		$(SRCDIR)/help.c $(INCDIR)/tin.h
+$(OBJDIR)/inews.o:		$(SRCDIR)/inews.c $(INCDIR)/tin.h
+$(OBJDIR)/init.o:		$(SRCDIR)/init.c $(INCDIR)/tin.h
+$(OBJDIR)/lang.o:		$(SRCDIR)/lang.c $(INCDIR)/tin.h
+$(OBJDIR)/list.o:		$(SRCDIR)/list.c $(INCDIR)/tin.h
+$(OBJDIR)/mail.o:		$(SRCDIR)/mail.c $(INCDIR)/tin.h
+$(OBJDIR)/main.o:		$(SRCDIR)/main.c $(INCDIR)/tin.h
+$(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(INCDIR)/tin.h
+$(OBJDIR)/msmail.o:		$(SRCDIR)/msmail.c $(INCDIR)/tin.h
+$(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(INCDIR)/tin.h
+$(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(INCDIR)/tin.h
+$(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(INCDIR)/tin.h
+$(OBJDIR)/open.o:		$(SRCDIR)/open.c $(INCDIR)/tin.h
+$(OBJDIR)/page.o:		$(SRCDIR)/page.c $(INCDIR)/tin.h
+$(OBJDIR)/parsdate.o:		$(SRCDIR)/parsdate.y $(INCDIR)/tin.h
+$(OBJDIR)/pgp.o:		$(SRCDIR)/pgp.c $(INCDIR)/tin.h
+$(OBJDIR)/post.o:		$(SRCDIR)/post.c $(INCDIR)/tin.h
+$(OBJDIR)/prompt.o:		$(SRCDIR)/prompt.c $(INCDIR)/tin.h
+$(OBJDIR)/rfc1521.o:		$(SRCDIR)/rfc1521.c $(INCDIR)/tin.h
+$(OBJDIR)/rfc1522.o:		$(SRCDIR)/rfc1522.c $(INCDIR)/tin.h
+$(OBJDIR)/save.o:		$(SRCDIR)/save.c $(INCDIR)/tin.h
+$(OBJDIR)/screen.o:		$(SRCDIR)/screen.c $(INCDIR)/tin.h
+$(OBJDIR)/search.o:		$(SRCDIR)/search.c $(INCDIR)/tin.h
+$(OBJDIR)/select.o:		$(SRCDIR)/select.c $(INCDIR)/tin.h
+$(OBJDIR)/sigfile.o:		$(SRCDIR)/sigfile.c $(INCDIR)/tin.h
+$(OBJDIR)/signal.o:		$(SRCDIR)/signal.c $(INCDIR)/tin.h
+$(OBJDIR)/strftime.o:		$(SRCDIR)/strftime.c $(INCDIR)/tin.h
+$(OBJDIR)/thread.o:		$(SRCDIR)/thread.c $(INCDIR)/tin.h
+$(OBJDIR)/wildmat.o:		$(SRCDIR)/wildmat.c $(INCDIR)/tin.h
+$(OBJDIR)/win32.o:		$(SRCDIR)/win32.c $(INCDIR)/tin.h
+$(OBJDIR)/xref.o:		$(SRCDIR)/xref.c $(INCDIR)/tin.h
+$(OBJDIR)/vms.o:		$(SRCDIR)/vms.c $(INCDIR)/tin.h

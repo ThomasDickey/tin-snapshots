@@ -4,6 +4,7 @@ more information have a look at the CHANGES file).
 Due to work is still in progress it might not compile on all machines.
 
 configure to your local setup (have a look at):
+	configure --help
 	conf-tin
 
 compile with:

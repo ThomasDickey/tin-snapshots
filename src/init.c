@@ -205,6 +205,7 @@ int highlight_xcommentto;		/* set TRUE to show X-Comment-To inverse in the upper
 int system_status;
 int tab_after_X_selection;		/* set TRUE if you want auto TAB after X */
 int tab_goto_next_unread;
+int space_goto_next_unread;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
 int update;				/* update index files only mode */
 int use_builtin_inews;
@@ -406,6 +407,7 @@ void init_selfinfo ()
 #endif
 	tab_after_X_selection = FALSE;
 	tab_goto_next_unread = TRUE;
+	space_goto_next_unread = FALSE;
 	tex2iso_supported = atoi (get_val ("TEX2ISO", "0"));
 	thread_catchup_on_exit = TRUE;
 #ifdef INDEX_DAEMON

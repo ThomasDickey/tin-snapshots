@@ -981,6 +981,7 @@ extern int tin_gid;
 extern int tin_uid;
 extern int tab_after_X_selection;
 extern int tab_goto_next_unread;
+extern int space_goto_next_unread;
 extern int thread_catchup_on_exit;
 extern int top;
 extern int top_base;
