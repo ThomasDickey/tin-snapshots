@@ -612,6 +612,9 @@ extern constext txt_help_w[];
 extern constext txt_help_x[];
 extern constext txt_help_xpost_quote_format[];
 extern constext txt_help_y[];
+#ifdef HAVE_COLOR
+extern constext txt_help__[];
+#endif
 extern constext txt_hit_any_key[];
 extern constext txt_hit_space_for_more[];
 extern constext txt_index_page_com[];
@@ -886,6 +889,10 @@ extern constext txt_time_default_days[];
 extern constext txt_toggled_rot13[];
 extern constext txt_toggled_tex2iso_off[];
 extern constext txt_toggled_tex2iso_on[];
+#ifdef HAVE_COLOR
+extern constext txt_toggled_high_off[];
+extern constext txt_toggled_high_on[];
+#endif
 extern constext txt_type_h_for_help[];
 extern constext txt_unlimited_time[];
 extern constext txt_unsubscribe_pattern[];
@@ -1127,6 +1134,10 @@ extern constext txt_help_col_signature[];
 extern constext txt_help_col_subject[];
 extern constext txt_help_col_text[];
 extern constext txt_help_col_title[];
+extern constext txt_help_word_highlight_tinrc[];
+extern constext txt_help_word_h_display_marks[];
+extern constext txt_help_col_markstar[];
+extern constext txt_help_col_markdash[];
 extern constext txt_help_color[];
 extern constext txt_opt_col_back[];
 extern constext txt_opt_col_from[];
@@ -1142,6 +1153,13 @@ extern constext txt_opt_col_signature[];
 extern constext txt_opt_col_subject[];
 extern constext txt_opt_col_text[];
 extern constext txt_opt_col_title[];
+extern constext txt_opt_word_highlight_tinrc[];
+extern constext txt_opt_word_h_display_marks[];
+extern constext txt_opt_col_markstar[];
+extern constext txt_opt_col_markdash[];
+extern int word_highlight;
+extern int word_highlight_tinrc;
+extern int word_h_display_marks;
 extern int col_back;
 extern int col_from;
 extern int col_head;
@@ -1156,6 +1174,8 @@ extern int col_signature;
 extern int col_subject;
 extern int col_text;
 extern int col_title;
+extern int col_markstar;
+extern int col_markdash;
 extern int use_color;
 extern int use_color_tinrc;
 #endif

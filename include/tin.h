@@ -878,7 +878,7 @@ extern char *get_uaf_fullname();
 #		if defined (__hpux) && !defined(__GNUC__)
 #			define  assert(p)       if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
 #		else
-#		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
+#			define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
 #		endif
 #	else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else (void)0;

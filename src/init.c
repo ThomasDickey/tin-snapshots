@@ -165,7 +165,7 @@ int ask_for_metamail;			/* enables/disables the metamail query if a MIME message
 #endif
 #ifdef HAVE_COLOR
 int use_color;				/* enables/disables ansi-color support under linux-console and color-xterm */
-int use_color_tinrc;			/* like use_color but stored in tinrc */
+int use_color_tinrc;		/* like use_color but stored in tinrc */
 int col_back;				/* standard bacground color */
 int col_invers;				/* color of inverse text */
 int col_text;				/* color of textlines*/
@@ -180,15 +180,20 @@ int col_from;				/* color of sender (From:) */
 int col_normal;				/* standard foreground color */
 int col_title;				/* color of Help/Mail-Sign */
 int col_signature;			/* color of signature */
+int word_highlight;			/* word highlighting on/off */
+int word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
+int word_h_display_marks;	/* display * or _ when highlighting on/off */
+int col_markstar;			/* text highlighting with *stars* */
+int col_markdash;			/* text highlighting with _underdashes_ */
 #endif
-int use_mailreader_i;			/* invoke user's mailreader earlier to use more of its features (i = interactive) */
+int use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
 int use_mouse;				/* enables/disables mouse support under xterm */
 int auto_cc;				/* add your name to cc automatically */
 int auto_bcc;				/* add your name to bcc automatically */
 int global_filtered_articles;		/* globally killed / auto-selected articles */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
-int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
-int mark_saved_read;			/* mark saved article/thread as read */
+int iso2asc_supported;		/* Convert ISO-Latin1 to Ascii */
+int mark_saved_read;		/* mark saved article/thread as read */
 int newsrc_active;
 int num_of_selected_arts;
 int num_of_killed_arts;
@@ -465,6 +470,11 @@ void init_selfinfo ()
 	col_normal = 7;
 	col_title = 4;
 	col_signature = 4;
+	col_markstar = 11;
+	col_markdash = 13;
+	word_highlight = TRUE;
+	word_highlight_tinrc = TRUE;
+	word_h_display_marks = FALSE;
 #endif
 	index_maildir[0] = '\0';
 	index_newsdir[0] = '\0';

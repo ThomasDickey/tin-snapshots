@@ -90,6 +90,10 @@
 	col_from			txt_colors	MAX_COLOR+1
 	col_title			txt_colors	MAX_COLOR+1
 	col_signature			txt_colors	MAX_COLOR+1
+	word_highlight_tinrc		OPT_ON_OFF
+	word_h_display_marks		OPT_ON_OFF
+	col_markstar			txt_colors	MAX_COLOR+1
+	col_markdash			txt_colors	MAX_COLOR+1
 #endif
 #ifdef	FORGERY
 	mail_address			OPT_STRING

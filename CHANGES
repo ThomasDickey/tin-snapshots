@@ -1,3 +1,14 @@
+--unoff BETA release 961215 --
+
+246) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. serveral supplied patches
+
+245) Julien Oster <fuzzy@cu8.cum.de>
+     Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. _word_ *highlighting* if color enabled
+     FIX. serveral supplied patches
+
 --unoff BETA release 961214 --
 
 244) Michael Douglass <mikedoug@texas.net>

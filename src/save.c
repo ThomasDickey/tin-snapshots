@@ -15,7 +15,7 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-#undef  OFF
+#undef OFF
 
 #define INITIAL		1
 #define MIDDLE		2

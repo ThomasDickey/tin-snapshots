@@ -674,6 +674,17 @@ return_to_index:
 				info_message(arts[respnum].subject);
 				break;
 
+#ifdef HAVE_COLOR
+			case iKeyPageToggleHighlight:
+				word_highlight = !word_highlight;
+				redraw_page(group->name, respnum);
+				if (word_highlight)
+					info_message(txt_toggled_high_on);
+				else
+					info_message(txt_toggled_high_off);
+				break;
+#endif				
+
 			default:
 			    info_message(txt_bad_command);
 		}
