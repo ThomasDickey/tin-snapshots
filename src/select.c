@@ -848,27 +848,36 @@ group_selection_page ()
 		} else {
 			subs = 'u';	/* u next to unsubscribed groups */
 		}
-
+		
+			/*
+			 * copy of active[n].description fix some malloc bugs
+			 */
 		if (show_description) {
+			char group_descript[256];
+			if (blank_len >= 255) { /* better be carefull here */
+				blank_len = 255;
+			}
+			strncpy(group_descript, active[n].description ? active[n].description : " ", blank_len);
+			group_descript[blank_len+1] = '\0';
+
 			if (draw_arrow_mark) {
 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s  %-*.*s\r\n",
-				       subs, i+1, new, groupname_len, groupname_len,
-				       active[n].name, blank_len, blank_len,
-				       (active[n].description ? active[n].description : " "));
+				         subs, i+1, new, groupname_len, groupname_len,
+				         active[n].name, blank_len, blank_len, group_descript);
 			} else {
-				sprintf (screen[j].col, "  %c %4d %s  %-*.*s  %-*.*s\r\n",
-					subs, i+1, new, groupname_len, groupname_len,
-					active[n].name, blank_len, blank_len,
-				       (active[n].description ? active[n].description : " "));
+				sprintf (screen[j].col, "  %c %4d %s  %-*s  %-*.*s\r\n",
+				         subs, i+1, new, groupname_len,
+				         active[n].name, blank_len, blank_len, group_descript);
 			}
 		} else {
 			if (draw_arrow_mark) {
 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s\r\n",
-					subs, i+1, new, groupname_len, groupname_len, active[n].name);
+				         subs, i+1, new, groupname_len, groupname_len,
+				         active[n].name);
 			} else {
 				sprintf (screen[j].col, "  %c %4d %s  %-*.*s%*s\r\n",
-					subs, i+1, new, groupname_len, groupname_len, active[n].name,
-					blank_len, " ");
+				         subs, i+1, new, groupname_len, groupname_len,
+				         active[n].name, blank_len, " ");
 			}
 		}
 		if (strip_blanks) {
