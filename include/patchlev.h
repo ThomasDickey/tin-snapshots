@@ -36,7 +36,7 @@
  * 	Stefan Scholl		<stesch@sks.inka.de>
  *
  */
-#define PATCHLEVEL	"MC.960608"
+#define PATCHLEVEL	"MC.960609"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

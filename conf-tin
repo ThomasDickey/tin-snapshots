@@ -37,10 +37,8 @@ case `uname -s` in
 #	INSTALL=install
 #	;;
 HP-UX)
-	# The K&R compiler on HP/UX doesn't support -O/-g options.  It also
-	# doesn't have 'alloca()', needed by bison.
+	# The K&R compiler on HP/UX doesn't support -O/-g options.
 	if test "$CC" = "cc" ; then
-		YACC=byacc; export YACC
 		CFLAGS=""
 	fi
 	;;

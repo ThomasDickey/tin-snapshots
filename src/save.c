@@ -404,6 +404,12 @@ save_thread_to_file (is_mailbox, group_path)
 	int count = 0;
 	int i;
 
+	if (num_save == 0) {
+		info_message("No unread articles: nothing saved!");
+		sleep(2);
+		return FALSE;
+	}
+
 	for (i=0 ; i < num_save ; i++) {
 		sprintf (msg, "%s%d", txt_saving, ++count);
 		wait_message (msg);
