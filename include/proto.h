@@ -3,11 +3,12 @@
 
 /* active.c */
 extern int get_active_num (void);
-extern int group_flag (int ch);
-extern int resync_active_file (void);
+extern char group_flag (int ch);
 extern t_bool match_group_list (char *group, char *group_list);
 extern t_bool parse_active_line (char *line, long *max, long *min, char *moderated);
 extern t_bool process_bogus (char *name);
+extern t_bool reread_active_file (void);
+extern t_bool resync_active_file (void);
 extern void create_save_active_file (void);
 extern void load_newnews_info (char *info);
 extern void read_news_active_file (void);
@@ -24,12 +25,14 @@ extern void do_update (void);
 extern void find_base (struct t_group *group);
 extern void make_threads (struct t_group *group, int rethread);
 extern void set_article (struct t_article *art);
-extern void sort_arts (int sort_art_type);
+extern void sort_arts (unsigned int sort_art_type);
 extern void vWriteNovFile (struct t_group *psGrp);
 
 /* attrib.c */
-extern void read_attributes_file (char *file, int global_file);
-extern void write_attributes_file (char *file);
+#ifndef INDEX_DAEMON
+	extern void read_attributes_file (char *file, int global_file);
+	extern void write_attributes_file (char *file);
+#endif /* !INDEX_DAEMON */
 
 /* auth.c */
 #if !defined (INDEX_DAEMON) && defined (NNTP_ABLE)
@@ -54,11 +57,11 @@ extern char *quote_space_to_dash (char *str);
 extern const char *print_boolean (t_bool value);
 extern int change_config_file (struct t_group *group);
 extern int option_row(int option);
-extern int read_config_file (char *file, int global_file);
 extern t_bool match_boolean (char *line, const char *pat, t_bool *dst);
 extern t_bool match_integer (char *line, const char *pat, int *dst, int maxlen);
 extern t_bool match_long (char *line, const char *pat, long *dst);
 extern t_bool match_string (char *line, const char *pat, char *dst, size_t dstlen);
+extern t_bool read_config_file (char *file, t_bool global_file);
 extern void quote_dash_to_space (char *str);
 extern void refresh_config_page (int act_option);
 extern void show_menu_help (const char *help_message);
@@ -105,27 +108,28 @@ extern void setup_screen (void);
 #if defined(DEBUG) || defined (DEBUG_NEWSRC)
 	extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
 	extern void debug_print_comment (const char *comment);
-#endif
+#endif /* DEBUG || DEBUG_NEWSRC */
 
 /* envarg.c */
 extern void envargs (int *Pargc, char ***Pargv, const char *envstr);
 
 /* feed.c */
 extern char get_post_proc_type (int proc_type);
-extern void feed_articles (int function, int level, struct t_group *group, int respnum);
+#ifndef INDEX_DAEMON
+	extern void feed_articles (int function, int level, struct t_group *group, int respnum);
+#endif /* !INDEX_DAEMON */
 
 /* filter.c */
-extern int auto_select_articles (struct t_group *group);
 extern int filter_articles (struct t_group *group);
 extern int filter_menu (int type, struct t_group *group, struct t_article *art);
 extern int quick_filter_kill (struct t_group *group, struct t_article *art);
 extern int quick_filter_select (struct t_group *group, struct t_article *art);
+extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
 extern struct t_filter *psExpandFilterArray (struct t_filter *ptr, int *num);
 extern void free_all_filter_arrays (void);
 #ifndef INDEX_DAEMON
 	extern int read_filter_file (char *file, t_bool global_file);
-#endif /* INDEX_DAEMON */
-extern int quick_filter_select_posted_art (struct t_group *group, char *subj);
+#endif /* !INDEX_DAEMON */
 
 /* getline.c */
 extern char *tin_getline (const char *prompt, int number_only, char *str, int max_chars, int which_hist);
@@ -142,7 +146,7 @@ extern void toggle_subject_from (void);
 #ifndef INDEX_DAEMON
 	extern void toggle_read_unread(t_bool force);
 	extern void move_to_thread (int n);
-#endif
+#endif /* !INDEX_DAEMON */
 
 /* hashstr.c */
 extern char *hash_str (const char *s);
@@ -150,10 +154,14 @@ extern void hash_init (void);
 extern void hash_reclaim (void);
 
 /* help.c */
-extern void display_info_page (t_bool first);
 extern void show_info_page (int type, const char *help[], const char *title);
 extern void show_mini_help (int level);
 extern void toggle_mini_help (int level);
+#ifdef USE_CURSES
+	extern void display_info_page (t_bool first);
+#else
+	extern void display_info_page (void);
+#endif /* USE_CURSES */
 
 /* header.c */
 extern const char *get_domain_name (void);
@@ -169,9 +177,6 @@ extern void get_from_name (char *from_name, struct t_group *thisgrp);
 extern void get_user_info (char *user_name, char *full_name);
 
 /* init.c */
-#ifdef USE_INN_NNTPLIB
-extern char *GetConfigValue (const char *name);
-#endif
 extern int create_mail_save_dirs (void);
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 extern void init_selfinfo (void);
@@ -180,7 +185,10 @@ extern void init_selfinfo (void);
 #endif /* HAVE_COLOR */
 #ifndef INDEX_DAEMON
 	void set_up_private_index_cache (void);
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
+#ifdef USE_INN_NNTPLIB
+	extern char *GetConfigValue (const char *name);
+#endif /* USE_INN_NNTPLIB */
 
 /* joinpath.c */
 extern void joinpath (char *result, const char *dir, const char *file);
@@ -197,16 +205,18 @@ extern char *random_organization(char *in_org);
 	extern struct t_group *psGrpLast (void);
 	extern struct t_group *psGrpNext (void);
 	extern struct t_group *psGrpPrev (void);
-#endif
+#endif /* 0 */
 
 /* mail.c */
-extern int iArtEdit (struct t_group *psGrp, struct t_article *psArt);
 extern void read_newsgroups_file (void);
 extern void vFindArtMaxMin (char *pcGrpPath, long *plArtMax, long *plArtMin);
 extern void vMakeGrpName (char *pcBaseDir, char *pcGrpName, char *pcGrpPath);
 extern void vMakeGrpPath (char *pcBaseDir, char *pcGrpName, char *pcGrpPath);
 extern void vPrintActiveHead (char *pcActiveFile);
 extern void vPrintGrpLine (FILE *hFp, char *pcGrpName, long lArtMax, long lArtMin, char *pcBaseDir);
+#ifndef INDEX_DAEMON
+	extern int iArtEdit (struct t_group *psGrp, struct t_article *psArt);
+#endif /* !INDEX_DAEMON */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	extern void read_mail_active_file (void);
 	extern void read_mailgroups_file (void);
@@ -291,7 +301,7 @@ extern void vPrintBugAddress (void);
 #endif /* !M_UNIX */
 #ifndef	NO_SHELL_ESCAPE
 	extern void shell_escape (void);
-#endif /* NO_SHELL_ESCAPE */
+#endif /* !NO_SHELL_ESCAPE */
 
 /* newsrc.c */
 extern int pos_group_in_newsrc (struct t_group *group, int pos);
@@ -348,9 +358,9 @@ extern FILE *open_art_header (long art);
 extern int get_respcode (char *);
 extern int get_only_respcode (char *);
 extern int nntp_open (void);
-extern int setup_hard_base (struct t_group *group, char *group_path);
 extern int stat_article (long art, char *group_path);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
+extern long setup_hard_base (struct t_group *group, char *group_path);
 extern void nntp_close (void);
 extern void vGet1GrpArtInfo(struct t_group *grp);
 extern void vGrpGetSubArtInfo (void);
@@ -361,14 +371,13 @@ extern void vGrpGetSubArtInfo (void);
 
 /* page.c */
 extern int art_open (struct t_article *art, char *group_path, t_bool rfc1521decode);
-extern int match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
+extern t_bool match_header (char *buf, const char *pat, char *body, char *nodec_body, size_t len);
 extern void art_close (void);
 extern void redraw_page (char *group, int respnum);
-extern void show_note_page (char *group, int respnum);
-extern void yank_to_addr (char *orig, char *addr);
 #ifndef INDEX_DAEMON
 	extern int show_page (struct t_group *group, char *group_path, int respnum, int *threadnum);
-#endif /* INDEX_DAEMON */
+	extern void show_note_page (char *group, int respnum);
+#endif /* !INDEX_DAEMON */
 
 /* parsdate.y */
 extern time_t parsedate (char *p, TIMEINFO *now);
@@ -378,17 +387,16 @@ extern time_t parsedate (char *p, TIMEINFO *now);
 	extern int pgp_check_article (void);
 	extern void invoke_pgp_mail (char *nam, char *mail_to);
 	extern void invoke_pgp_news (char *the_article);
-#endif
+#endif /* HAVE_PGP */
 
 /* post.c */
 extern int count_postponed_articles (void);
 extern int mail_bug_report (void);
 extern int mail_to_author (char *group, int respnum, int copy_text, int with_headers);
-extern int mail_to_someone (int respnum, char *address, int mail_to_poster, int confirm_to_mail, int *mailed_ok);
+extern int mail_to_someone (int respnum, char *address, t_bool mail_to_poster, t_bool confirm_to_mail, int *mailed_ok);
 extern int post_article (char *group, int *posted_flag);
 extern int post_response (char *group, int respnum, int copy_text, int with_headers);
 extern int repost_article (char *group, int respnum, int supersede);
-extern int reread_active_file (void);
 extern int reread_active_after_posting (void);
 extern t_bool cancel_article (struct t_group *group, struct t_article *art, int respnum);
 extern t_bool pickup_postponed_articles (t_bool ask, t_bool all);
@@ -452,13 +460,12 @@ extern int post_process_files (int proc_type_ch, t_bool auto_delete);
 extern int save_art_to_file (int respnum, int indexnum, int the_mailbox, const char *filename);
 extern int save_comp (t_comptype *p1, t_comptype *p2);
 extern void add_to_save_list (int the_index, struct t_article *the_article, int is_mailbox, int archive_save, char *path);
-extern void delete_processed_files (t_bool auto_delete);
 extern void print_art_seperator_line (FILE *fp, int the_mailbox);
 extern void sort_save_list (void);
 #ifndef INDEX_DAEMON
 	extern int save_regex_arts (int is_mailbox, char *group_path);
 	extern t_bool save_thread_to_file (int is_mailbox, char *group_path);
-#endif
+#endif /* !INDEX_DAEMON */
 
 /* screen.c */
 extern void center_line (int line, int inverse, const char *str);
@@ -520,6 +527,7 @@ extern void set_signals_thread (void);
 extern size_t my_strftime (char *s, size_t maxsize, const char *format, struct tm *timeptr);
 
 /* string.c */
+extern char *eat_tab (char *s);
 extern char *my_strdup (const char *str);
 extern char *str_trim (char *string);
 extern char *strcasestr (char *haystack, const char *needle);
@@ -532,29 +540,29 @@ extern void str_lwr (char *dst, const char *src);
 extern void strcpynl (char *to, const char *from);
 #ifndef HAVE_STRPBRK
 	extern char *strpbrk (char *str1, char *str2);
-#endif /* HAVE_STRPBRK */
+#endif /* !HAVE_STRPBRK */
 #ifndef HAVE_STRSTR
 	extern char *strstr (char *text, char *pattern);
-#endif /* HAVE_STRSTR */
+#endif /* !HAVE_STRSTR */
 #ifndef HAVE_STRCASECMP
 	extern int strcasecmp (const char *p, const char *q);
-#endif /* HAVE STRCASECMP */
+#endif /* !HAVE STRCASECMP */
 #ifndef HAVE_STRNCASECMP
 	extern int strncasecmp (const char *p, const char *q, size_t n);
-#endif /* HAVE_STRNCASECMP */
+#endif /* !HAVE_STRNCASECMP */
 #ifndef HAVE_ATOI
 	extern int atoi (const char *s);
-#endif /* HAVE_ATOI */
+#endif /* !HAVE_ATOI */
 #ifndef HAVE_ATOL
 	extern long atol (const char *s);
-#endif /* HAVE_ATOL */
+#endif /* !HAVE_ATOL */
 #ifndef HAVE_STRTOL
 	extern long strtol (const char *str, char **ptr, int use_base);
-#endif /* HAVE STRTOL */
+#endif /* !HAVE STRTOL */
 #ifndef HAVE_STRERROR
-	extern char * my_strerror(int n);
+	extern char *my_strerror(int n);
 #	define strerror(n) my_strerror(n)
-#endif
+#endif /* !HAVE_STRERROR */
 
 /* thread.c */
 extern int find_response (int i, int n);
@@ -565,20 +573,22 @@ extern int next_unread (int n);
 extern int num_of_responses (int n);
 extern int prev_response (int n);
 extern int prev_unread (int n);
-extern int show_thread (struct t_group *group, char *group_path, int respnum, int thread_depth);
 extern int stat_thread (int n, struct t_art_stat *sbuf);
 extern int which_response (int n);
 extern int which_thread (int n);
 extern void move_to_response (int n);
 extern void show_thread_page (void);
+#ifndef INDEX_DAEMON
+	extern int show_thread (struct t_group *group, char *group_path, int respnum, int thread_depth);
+#endif /* !INDEX_DAEMON */
 
 /* wildmat.c */
 extern t_bool wildmat (const char *text, char *p, t_bool icase);
 
 /* xref.c */
-extern int overview_xref_support (void);
+extern t_bool overview_xref_support (void);
 extern void NSETRNG0 (t_bitmap *bitmap, long low, long high);
 extern void NSETRNG1 (t_bitmap *bitmap, long low, long high);
 extern void art_mark_xref_read (struct t_article *art);
 
-#endif /* PROTO_H */
+#endif /* !PROTO_H */

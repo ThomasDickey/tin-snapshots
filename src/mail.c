@@ -15,7 +15,9 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
-static void read_groups_descriptions (FILE *fp, FILE *fp_save);
+#ifndef INDEX_DAEMON
+	static void read_groups_descriptions (FILE *fp, FILE *fp_save);
+#endif /* !INDEX_DAMON*/
 
 /*
  *  Load the mail active file into active[]
@@ -50,7 +52,7 @@ read_mail_active_file (void)
 		return;
 	}
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
 /*
 my_printf ("Line=[%s", buf);
 my_flush();
@@ -107,7 +109,7 @@ write_mail_active_file (void)
 	vPrintActiveHead (mail_active_file);
 
 	if ((fp = open_mail_active_fp ("a+")) != (FILE *) 0) {
-		for (i = 0 ; i < num_active ; i++) {
+		for (i = 0; i < num_active; i++) {
 			psGrp = &active[i];
 			if (psGrp->type == GROUP_TYPE_MAIL) {
 				vMakeGrpPath (psGrp->spooldir, psGrp->name, acGrpPath);
@@ -181,9 +183,11 @@ read_newsgroups_file (void)
 /*PLOK2*/	if (cmd_line && !(batch_mode || verbose))
 		wait_message (0, "\n");
 
-#endif	/* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
+
+#ifndef INDEX_DAEMON
 /*
  *  Read groups descriptions from opened file & make local backup copy
  *  of all groups that don't have a 'x' in the active file moderated
@@ -191,30 +195,28 @@ read_newsgroups_file (void)
  *  Aborting this early won't have any adverse affects, just some missing
  *  descriptions.
  */
-
 static void
 read_groups_descriptions (
 	FILE *fp,
 	FILE *fp_save)
 {
-#ifndef INDEX_DAEMON
 	char buf[LEN];
 	char group[PATH_LEN];
 	char *p, *q;
-#ifdef SHOW_PROGRESS
-	int count = 0;
-#endif
 	struct t_group *psGrp;
+#	ifdef SHOW_PROGRESS
+	int count = 0;
+#	endif /* SHOW_PROGRESS */
 
 	while (tin_fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '#' || buf[0] == '\0')
 			continue;
 
-#if 0 /* tin_fgets() strips \n for us */
+#	if 0 /* tin_fgets() strips \n for us */
 		p = strrchr (buf, '\n');
 		if (p != (char *) 0)
 			*p = '\0';
-#endif
+#	endif /* 0 */
 /*
  *  This was moved from below and simplified.  I can't test here for the
  *  type of group being read, because that requires having found the
@@ -225,7 +227,7 @@ read_groups_descriptions (
 		if ((fp_save != (FILE *) 0) && read_news_via_nntp && !read_local_newsgroups_file)
 			fprintf (fp_save, "%s\n", buf);
 
-		for (p = buf, q = group ; *p && *p != ' ' && *p != '\t' ; p++, q++)
+		for (p = buf, q = group; *p && *p != ' ' && *p != '\t'; p++, q++)
 			*q = *p;
 
 		*q = '\0';
@@ -241,20 +243,21 @@ read_groups_descriptions (
 				*q = ' ';
 
 			psGrp->description = my_strdup (p);
-#if 0 /* not useful for cache_overview_files */
+#	if 0 /* not useful for cache_overview_files */
 			if (psGrp->type == GROUP_TYPE_NEWS)
 				if (fp_save != (FILE *) 0 && read_news_via_nntp && !read_local_newsgroups_file) {
 					fprintf (fp_save, "%s\n", buf);
 			}
-#endif /* 0 */
+#	endif /* 0 */
 		}
-#ifdef SHOW_PROGRESS
+#	ifdef SHOW_PROGRESS
 		if (++count % 100 == 0)
 			spin_cursor ();
-#endif
+#	endif /* SHOW_PROGRESS */
 	}
-#endif	/* INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
+
 
 void
 vPrintActiveHead (
@@ -381,7 +384,7 @@ vGrpDelMailArt (
 	struct t_article *psArt)
 {
 
-	if (psArt->delete) {
+	if (psArt->delete_it) {
 		art_mark_undeleted (psArt);
 		info_message ("Article undeleted"); /* FIXME: -> lang.c */
 	} else {
@@ -407,7 +410,7 @@ vGrpDelMailArts (
 
 		for (iNum = 0; iNum < top; iNum++) {
 			psArt = &arts[iNum];
-			if (psArt->delete) {
+			if (psArt->delete_it) {
 				sprintf (acArtFile, "%s/%ld", acGrpPath, psArt->artnum);
 				unlink (acArtFile);
 				psArt->thread = ART_EXPIRED;
@@ -425,12 +428,12 @@ vGrpDelMailArts (
 #endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING*/
 
 
+#ifndef INDEX_DAEMON
 int
 iArtEdit (
 	struct t_group *psGrp,
 	struct t_article *psArt)
 {
-#ifndef INDEX_DAEMON
 	char	acArtFile[PATH_LEN];
 	char	acTmpFile[PATH_LEN];
 
@@ -447,7 +450,6 @@ iArtEdit (
 			return TRUE;
 		}
 	}
-#endif	/* INDEX_DAEMON */
-
 	return FALSE;
 }
+#endif /* !INDEX_DAEMON */

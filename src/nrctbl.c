@@ -69,7 +69,7 @@ get_nntpserver (
 			line_entry_counter = 0;
 
 			if (!strchr("# ;", line[0])) {
-				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
+				while ((line_entry = strtok(line_entry_counter ? 0 : line, " \t\n")) != 0) {
 					line_entry_counter++;
 
 					if (line_entry_counter == 1)
@@ -107,11 +107,11 @@ get_newsrcname (
 	t_bool do_cpy = FALSE;
 
 	if ((fp = fopen(local_newsrctable_file, "r")) != (FILE *) 0) {
-		while ((fgets(line, sizeof(line), fp) != NULL) && (found != 1)) {
+		while ((fgets(line, (int) sizeof(line), fp) != NULL) && (found != 1)) {
 			line_entry_counter = 0;
 
 			if (!strchr("# ;", line[0])) {
-				while ((line_entry = strtok(line_entry_counter ? NULL :line, " \t\n")) != NULL) {
+				while ((line_entry = strtok(line_entry_counter ? 0 : line, " \t\n")) != 0) {
 					line_entry_counter++;
 
 					if ((line_entry_counter == 1) && (!strcasecmp(line_entry, nntpserver_name))) {

@@ -31,9 +31,9 @@
 #define		HASHNODE_TABLE_SIZE	2411
 
 #ifdef M_AMIGA
-	struct t_hashnode **table=0;
+	static struct t_hashnode **table=0;
 #else
-	struct t_hashnode *table[HASHNODE_TABLE_SIZE];
+	static struct t_hashnode *table[HASHNODE_TABLE_SIZE];
 #endif
 
 static struct t_hashnode *add_string (const char *s);

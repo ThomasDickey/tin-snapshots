@@ -166,13 +166,13 @@ rfc1521_decode(
 			hdr_pos = ftell(f);
 
 			while (!feof(file)) {
-				while (fgets(buf, sizeof (buf), file)) {
+				while (fgets(buf, (int) sizeof(buf), file)) {
 					if (boundary_cmp(buf, boundary)) {
 						if (boundary_cmp(buf, boundary) == 2) {
 							break;
 						}
 						fseek(f, hdr_pos, SEEK_SET);
-						while (fgets(buf, sizeof (buf), file)) {
+						while (fgets(buf, (int) sizeof(buf), file)) {
 							if (strncasecmp(buf, "Content-Type: ", 14) == 0 &&
 							strncasecmp(buf, "Content-Type: text/plain", 24) != 0) {
 								/* different type, ignore it */
@@ -185,7 +185,7 @@ rfc1521_decode(
 
 						/* now copy the part body */
 
-						while (fgets(buf, sizeof (buf), file)) {
+						while (fgets(buf, (int) sizeof(buf), file)) {
 							if (boundary_cmp(buf, boundary))
 								break;
 							fputs(buf, f);
@@ -252,8 +252,8 @@ rfc1521_decode(
 		int i;
 
 		if (encoding == 'b')
-			mmdecode(NULL, 'b', 0, NULL, NULL);		/* flush */
-		while (fgets(buf, sizeof (buf), file)) {
+			(void) mmdecode(NULL, 'b', 0, NULL, NULL);		/* flush */
+		while (fgets(buf, (int) sizeof(buf), file)) {
 			i = mmdecode(buf, encoding, '\0', buf2, charset);
 			if (i >= 0)
 				buf2[i] = '\0';

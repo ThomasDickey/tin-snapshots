@@ -52,10 +52,10 @@ check_upgrade (
  *  read local & global configuration defaults
  */
 
-int
+t_bool
 read_config_file (
-	char	*file,
-	int	global_file) /* return value is always ignored */
+	char *file,
+	t_bool global_file) /* return value is always ignored */
 {
 	FILE	*fp;
 	char	newnews_info[PATH_LEN];
@@ -68,7 +68,7 @@ read_config_file (
 	if (INTERACTIVE)
 		wait_message (0, txt_reading_config_file, (global_file) ? "global " : "");
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '#' || buf[0] == '\n') {
 			if (upgrade == CHECK)
 				upgrade = check_upgrade(buf);
@@ -596,7 +596,7 @@ read_config_file (
 
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "use_color=", &use_color_tinrc)) {
-				use_color=use_color_tinrc;
+				use_color = use_color_tinrc;
 				break;
 			}
 #endif
@@ -611,7 +611,7 @@ read_config_file (
 
 #ifdef HAVE_COLOR
 			if (match_boolean (buf, "word_highlight=", &word_highlight_tinrc)) {
-				word_highlight=word_highlight_tinrc;
+				word_highlight = word_highlight_tinrc;
 				break;
 			}
 
@@ -1067,14 +1067,14 @@ write_config_file (
 	fprintf (fp, "default_shell_command=%s\n\n", default_shell_command);
 
 	fprintf (fp, txt_tinrc_newnews);
-	for (i = 0 ; i < num_newnews ; i++)
-		fprintf (fp, "newnews=%s %ld\n", newnews[i].host, newnews[i].time);
+	for (i = 0; i < num_newnews; i++)
+		fprintf (fp, "newnews=%s %lu\n", newnews[i].host, (unsigned long int) newnews[i].time);
 
 	if (ferror (fp) | fclose (fp))
 		error_message (txt_filesystem_full, CONFIG_FILE);
 	else {
 		rename_file (file_tmp, file);
-		chmod (file, (S_IRUSR|S_IWUSR));
+		chmod (file, (mode_t)(S_IRUSR|S_IWUSR));
 	}
 	/* free memory for tmp-filename */
 	free (file_tmp);
@@ -1443,13 +1443,13 @@ change_config_file (
 					switch (option) {
 						/* show mini help menu */
 						case OPT_BEGINNER_LEVEL:
-							if (beginner_level != original_on_off_value)
+							if (!bool_equal(beginner_level, original_on_off_value))
 								(void) set_win_size (&cLINES, &cCOLS);
 							break;
 
 						/* show all arts or just new/unread arts */
 						case OPT_DEFAULT_SHOW_ONLY_UNREAD:
-							if (default_show_only_unread != original_on_off_value && group != (struct t_group *) 0) {
+							if (!bool_equal(default_show_only_unread, original_on_off_value) && group != (struct t_group *) 0) {
 								make_threads (group, TRUE);
 								find_base (group);
 								if (space_mode) {
@@ -1513,7 +1513,7 @@ change_config_file (
 						case OPT_USE_COLOR_TINRC:
 #ifdef USE_CURSES
 							if (!has_colors())
-								use_color = 0;
+								use_color = FALSE;
 							else
 #endif
 								use_color = use_color_tinrc;
@@ -1826,7 +1826,7 @@ match_color (
 	int *dst,
 	int maxlen)
 {
-	size_t	n;
+	int n;
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
@@ -1834,7 +1834,7 @@ match_color (
 		for (n = 0; n < MAX_COLOR+1; n++) {
 			if (!strcasecmp(&line[patlen], txt_colors[n])) {
 				found = TRUE;
-				*dst = (int) n;
+				*dst = n;
 				if (*dst > maxlen)
 					*dst = -1;
 			}
@@ -2039,16 +2039,16 @@ ulBuildArgv(
 	char *cmd,
 	int *new_argc)
 {
-	char **new_argv=NULL;
-	char *buf=NULL, *tmp=NULL;
-	int i=0;
+	char **new_argv = NULL;
+	char *buf = NULL, *tmp = NULL;
+	int i = 0;
 
 	if (!cmd && !*cmd) {
 		*new_argc = 0;
 		return (NULL);
 	}
 
-	for(tmp=cmd; isspace (*tmp); tmp++)
+	for (tmp = cmd; isspace (*tmp); tmp++)
 		;
 	buf = my_strdup(tmp);
 	if (!buf) {
@@ -2056,7 +2056,7 @@ ulBuildArgv(
 		return (NULL);
 	}
 
-	tmp=buf;
+	tmp = buf;
 
 	new_argv = (char **) calloc (1, sizeof (char *));
 	if (!new_argv) {
@@ -2065,10 +2065,10 @@ ulBuildArgv(
 		return (NULL);
 	}
 
-	new_argv[0]=NULL;
+	new_argv[0] = NULL;
 	while (*tmp) {
 		if (!isspace(*tmp)) { /*found the begining of a word*/
-			new_argv[i]=tmp;
+			new_argv[i] = tmp;
 				for (; *tmp && !isspace(*tmp); tmp++);
 				if (*tmp) {
 					*tmp = '\0';

@@ -40,7 +40,7 @@ extern int bcopy (char *, char *, int);
 extern void bzero (char *, int);
 #endif
 #ifdef DECL_CALLOC
-extern void * calloc (size_t, size_t);
+extern void *calloc (size_t, size_t);
 #endif
 #ifdef DECL_FCLOSE
 extern int fclose (FILE *);
@@ -52,7 +52,7 @@ extern FILE *fdopen (int, const char *);
 extern int fflush (FILE *);
 #endif
 #ifdef DECL_FGETC
-extern int fgetc (FILE * stream);
+extern int fgetc (FILE *);
 #endif
 #if defined(DECL_FILENO) && !defined(fileno)
 extern int fileno (FILE *);
@@ -97,7 +97,7 @@ extern char *getlogin (void);
 extern int getopt (int, char * const*, const char *);
 #endif
 #ifdef DECL_GETPASS
-char *getpass(const char *);
+extern char *getpass(const char *);
 #endif
 #ifdef DECL_GETPWNAM
 extern struct passwd *getpwnam (const char *);
@@ -111,17 +111,17 @@ extern unsigned long inet_addr (const char *);
 #ifdef DECL_IOCTL
 extern int ioctl (int, unsigned long, void *);
 #endif
-#ifdef DECL_ISASCII
-extern int isascii (int c);
+#if defined(DECL_ISASCII) && !defined(isascii)
+extern int isascii (int);
 #endif
 #ifdef DECL_MALLOC
-extern void * malloc (size_t);
+extern void *malloc (size_t);
 #endif
 #ifdef DECL_MEMSET
-extern void * memset (void *, int, size_t);
+extern void *memset (void *, int, size_t);
 #endif
 #ifdef DECL_MKTEMP
-extern char * mktemp (char *);
+extern char *mktemp (char *);
 #endif
 #ifdef DECL_PCLOSE
 extern int pclose (FILE *);
@@ -130,7 +130,7 @@ extern int pclose (FILE *);
 extern void perror (const char *);
 #endif
 #ifdef DECL_POPEN
-extern FILE * popen (const char *, const char *);
+extern FILE *popen (const char *, const char *);
 #endif
 #ifdef DECL_PRINTF
 extern int printf (const char *, ...);
@@ -142,10 +142,10 @@ extern int putenv (const char *);
 extern void qsort (void *, size_t, size_t, int (*)(t_comptype*, t_comptype*));
 #endif
 #ifdef DECL_REALLOC
-extern void * realloc (void *, size_t);
+extern void *realloc (void *, size_t);
 #endif
 #ifdef DECL_RENAME
-extern int rename (const char *oldpath, const char *newpath);
+extern int rename (const char *, const char *);
 #endif
 #ifdef DECL_REWIND
 extern void rewind (FILE *);
@@ -163,11 +163,11 @@ extern int setenv (const char *, const char *, int);
 extern int seteuid (uid_t);
 #endif
 #ifdef DECL_SETPGRP
-#if SETPGRP_VOID
+#	ifdef SETPGRP_VOID
 extern pid_t setpgrp (void);
-#else
+#	else
 extern int setpgrp (int, int);
-#endif /* SETPGRP_VOID */
+#	endif /* SETPGRP_VOID */
 #endif /* DECL_SETPGRP */
 #ifdef DECL_SETREGID
 extern int setregid (gid_t, gid_t);
@@ -231,17 +231,13 @@ extern int toupper (int);
 extern int tputs (char *, int, OutcPtr);
 #endif
 #ifdef DECL_UNGETC
-extern int ungetc (int c, FILE *stream);
+extern int ungetc (int, FILE *);
 #endif
 #ifdef DECL_USLEEP
-void usleep(unsigned long);
+extern void usleep(unsigned long);
 #endif
 #ifdef DECL_VSPRINTF
-extern int vsprintf(char *str, char *format, va_list ap);
-#endif
-
-#ifdef DECL_ERRNO
-extern int errno;
+extern int vsprintf(char *, char *, va_list);
 #endif
 
 extern int optind;
@@ -253,6 +249,8 @@ extern char *optarg;
 
 extern FILE *note_fp;				/* body of current article */
 extern TCP *nntp_rd_fp, *nntp_wr_fp;
+extern char **news_headers_to_display_array;
+extern char **news_headers_to_not_display_array;
 extern char *OPT_CHAR_list[];
 extern char *OPT_STRING_list[];
 extern char *glob_art_group;
@@ -284,10 +282,6 @@ extern char default_group_search[LEN];
 extern char default_mail_address[LEN];
 extern char default_maildir[PATH_LEN];
 extern char default_mailer_format[PATH_LEN];
-extern char news_headers_to_display[LEN];
-extern char news_headers_to_not_display[LEN];
-extern char **news_headers_to_display_array;
-extern char **news_headers_to_not_display_array;
 extern char default_organization[PATH_LEN];
 extern char default_pipe_command[LEN];
 extern char default_post_newsgroups[PATH_LEN];
@@ -334,6 +328,8 @@ extern char msg_headers_file[PATH_LEN];
 extern char my_distribution[LEN];
 extern char newnewsrc[PATH_LEN];
 extern char news_active_file[PATH_LEN];
+extern char news_headers_to_display[LEN];
+extern char news_headers_to_not_display[LEN];
 extern char news_quote_format[PATH_LEN];
 extern char newsgroups_file[PATH_LEN];
 extern char newsrc[PATH_LEN];
@@ -410,7 +406,6 @@ extern constext txt_author_search_backwards[];
 extern constext txt_author_search_forwards[];
 extern constext txt_authorization_fail[];
 extern constext txt_authorization_ok[];
-extern constext txt_auto_reconnect[];
 extern constext txt_autoselecting_articles[];
 extern constext txt_autosubscribed[];
 extern constext txt_autosubscribing_groups[];
@@ -473,6 +468,7 @@ extern constext txt_error_header_line_missing_newsgroups[];
 extern constext txt_error_header_line_missing_subject[];
 extern constext txt_error_header_line_missing_target[];
 extern constext txt_error_header_line_space[];
+extern constext txt_error_no_domain_name[];
 extern constext txt_error_no_enter_permission[];
 extern constext txt_error_no_read_permission[];
 extern constext txt_error_no_such_file[];
@@ -488,7 +484,6 @@ extern constext txt_filesystem_full[];
 extern constext txt_filesystem_full_backup[];
 extern constext txt_filter_file[];
 extern constext txt_filter_global_rules[];
-extern constext txt_filter_local_rules[];
 extern constext txt_filter_score[];
 extern constext txt_filter_score_help[];
 extern constext txt_filter_text_type[];
@@ -763,7 +758,6 @@ extern constext txt_nntp_to_fp_cannot_reopen[];
 extern constext txt_no[];
 extern constext txt_no_arts[];
 extern constext txt_no_arts_posted[];
-extern constext txt_no_colorterm[];
 extern constext txt_no_command[];
 extern constext txt_no_description[];
 extern constext txt_no_filename[];
@@ -1104,7 +1098,6 @@ extern constext txt_value_out_of_range[];
 extern constext txt_warn_art_line_too_long[];
 extern constext txt_warn_blank_subject[];
 extern constext txt_warn_cancel[];
-extern constext txt_warn_difficulties[];
 extern constext txt_warn_followup_to_several_groups[];
 extern constext txt_warn_missing_followup_to[];
 extern constext txt_warn_multiple_sigs[];
@@ -1130,8 +1123,6 @@ extern int RIGHT_POS;
 extern int _hp_glitch;
 extern int cCOLS;
 extern int cLINES;
-extern int can_post;
-extern int cmd_line;
 extern int cur_groupnum;
 extern int debug;
 extern int default_auto_save_msg;
@@ -1152,14 +1143,12 @@ extern int group_hash[TABLE_SIZE];
 extern int group_top;
 extern int groupname_len;
 extern int groupname_max_length;
-extern int in_headers; /* colorful headers */
 extern int index_point;
 extern int iso2asc_supported;
 extern int last_group_on_screen;
 extern int last_resp;
 extern int last_subj_on_screen;
 extern int local_filtered_articles;
-extern int local_index;
 extern int mail_mime_encoding;
 extern int max_active;
 extern int max_art;
@@ -1181,7 +1170,6 @@ extern int post_mime_encoding;
 extern int process_id;
 extern int real_gid;
 extern int real_uid;
-extern int real_umask;
 extern int reread_active_file_secs;
 extern int show_subject;
 extern int space_mode;
@@ -1207,6 +1195,8 @@ extern long note_mark[MAX_PAGES];	/* ftells on beginnings of pages */
 extern long mark_body;					/* ftell on beginning of body */
 extern long note_size;
 
+extern mode_t real_umask;
+
 extern struct passwd *myentry;
 extern struct t_article *arts;
 extern struct t_attribute glob_attributes;
@@ -1226,10 +1216,12 @@ extern t_bool auto_list_thread;
 extern t_bool auto_reconnect;
 extern t_bool beginner_level;
 extern t_bool cache_overview_files;
+extern t_bool can_post;
 extern t_bool catchup;
 extern t_bool catchup_read_groups;
 extern t_bool check_any_unread;
 extern t_bool check_for_new_newsgroups;
+extern t_bool cmd_line;
 extern t_bool confirm_action;
 extern t_bool confirm_to_quit;
 extern t_bool count_articles;
@@ -1254,8 +1246,10 @@ extern t_bool force_screen_redraw;
 extern t_bool full_page_scroll;
 extern t_bool got_sig_pipe;
 extern t_bool group_catchup_on_exit;
+extern t_bool in_headers; /* colorful headers */
 extern t_bool inverse_okay;
 extern t_bool info_in_last_line;
+extern t_bool local_index;
 extern t_bool keep_dead_articles;	/* keep all dead articles in dead.articles */
 extern t_bool keep_posted_articles;	/* keep all posted articles in ~/Mail/posted */
 extern t_bool mail_8bit_header;
@@ -1472,14 +1466,14 @@ extern constext txt_opt_mail_address[];
 	extern int col_title;
 	extern int default_bcol;
 	extern int default_fcol;
-	extern int use_color;
 	extern int word_h_display_marks;
-	extern int word_highlight;
+	extern t_bool use_color;
 	extern t_bool use_color_tinrc;
+	extern t_bool word_highlight;
 	extern t_bool word_highlight_tinrc;
-#	if 0 /* unused */
-	extern constext txt_tinrc_col_markdash[];
-#	endif /* 0 */
+#	ifdef USE_CURSES
+		extern constext txt_no_colorterm[];
+#	endif /* USE_CURSES */
 #endif /* HAVE_COLOR */
 
 #ifdef HAVE_FASCIST_NEWSADMIN

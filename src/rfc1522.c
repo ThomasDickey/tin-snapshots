@@ -98,16 +98,14 @@ mmdecode(
 	int delimiter,
 	char *where,
 	const char *charset)
-{
+{ 
 	char *t;
 	int decode_gt128 = 0;
 
 #ifdef MIME_STRICT_CHARSET
 	if (charset && !strcasecmp(charset, mm_charset))
-		decode_gt128 = TRUE;
-#else
-	decode_gt128 = TRUE;
 #endif
+		decode_gt128 = TRUE;
 	t = where;
 	encoding = tolower((unsigned char)encoding);
 	if (encoding == 'q') {		  /* quoted-printable */
@@ -235,7 +233,7 @@ rfc1522_decode(
 				c++;
 				encoding = tolower((unsigned char)*c);
 				if (encoding == 'b')
-					mmdecode((char *) 0, 'b', 0, (char *) 0, (char *) 0);		/* flush */
+					(void) mmdecode((char *) 0, 'b', 0, (char *) 0, (char *) 0);		/* flush */
 				c++;
 				if (*c == '?') {
 					c++;
@@ -780,8 +778,7 @@ rfc15211522_encode(
 		fclose(g);
 		return;
 	}
-	while (fgets(buffer, 2048, g)
-			 && !isreturn(buffer[0]))
+	while (fgets(buffer, 2048, g) && !isreturn(buffer[0]))
 		fputs(buffer, f);
 
 	/* now add MIME headers as necessary */
@@ -849,9 +846,9 @@ rfc15211522_encode(
 	} else
 		body_encode = rfc1521_encode;
 
-	while (fgets(buffer, 2048, g)) {
+	while (fgets(buffer, 2048, g))
 		body_encode(buffer, f, encoding);
-	}
+
 	if (encoding == 'b' || encoding == 'q' || encoding == '7')
 		body_encode(NULL, f, encoding);	/* flush */
 

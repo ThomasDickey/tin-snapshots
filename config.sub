@@ -85,6 +85,9 @@ esac
 ### recognize some manufacturers as not being operating systems, so we
 ### can provide default operating systems below.
 case $os in
+	-os2)
+		basic_machine=`echo $1 | sed -e 's/86-.*/86/'`
+		;;
 	-sun*os*)
 		# Prevent following clause from handling this invalid input.
 		;;
@@ -751,6 +754,8 @@ case $os in
 		os=-xenix
 		;;
 	-none)
+		;;
+	-os2)
 		;;
 	*)
 		# Get rid of the `-' at the beginning of $os.

@@ -46,11 +46,13 @@
 /*
  * global filter array
  */
-
-int *arr_max;
-int *arr_num;
-struct t_filter *arr_ptr;
 struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
+
+#ifndef INDEX_DAEMON
+	static int *arr_max;
+	static int *arr_num;
+	static struct t_filter *arr_ptr;
+#endif /* !INDEX_DAEMON */
 
 /*
  * Local prototypes
@@ -63,7 +65,7 @@ static void free_filter_array (struct t_filters *ptr);
 static void free_filter_item (struct t_filter *ptr);
 #ifndef INDEX_DAEMON
 	static void vSetFilter (struct t_filter *psFilter);
-	static void vWriteFilterArray (FILE *fp, struct t_filters *ptr, long theTime);
+	static void vWriteFilterArray (FILE *fp, struct t_filters *ptr, time_t theTime);
 	static void vWriteFilterFile (char *pcFile);
 #endif
 
@@ -82,18 +84,18 @@ psExpandFilterArray (
 	int *num)
 {
 	size_t block;
-	struct t_filter *new;
+	struct t_filter *result;
 
 	(*num)++;
 
 	block = *num * sizeof (struct t_filter);
 
 	if (*num == 1)	/* allocate */
-		new = (struct t_filter *) my_malloc (block);
+		result = (struct t_filter *) my_malloc (block);
 	else	/* reallocate */
-		new = (struct t_filter *) my_realloc ((char *) ptr, block);
+		result = (struct t_filter *) my_realloc ((char *) ptr, block);
 
-	return new;
+	return result;
 }
 
 
@@ -124,7 +126,7 @@ vSetFilter (
 		psFilter->next = (struct t_filter *) 0;
 	}
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 /*
@@ -152,7 +154,7 @@ free_filter_array (
 	register int i;
 
 	if (ptr != (struct t_filters *) 0) {
-		for (i = 0 ; i < ptr->num ; i++)
+		for (i = 0; i < ptr->num; i++)
 			free_filter_item(ptr->filter + i);
 
 		if (ptr->filter != (struct t_filter *) 0) {
@@ -205,7 +207,7 @@ read_filter_file (
 	int xref_max = 0;
 	int xref_score_cnt = 0;
 	int xref_score_value = 0;
-	long secs = 0L;
+	time_t secs = 0L;
 	time_t current_secs = 0L;
 	struct t_group *psGrp;
 
@@ -215,7 +217,7 @@ read_filter_file (
 	if (INTERACTIVE)
 		wait_message (0, txt_reading_filter_file, (global ? "global " : ""));
 
-	time (&current_secs);
+	(void) time (&current_secs);
 
 	/*
 	 * Reset all filter arrays if doing a reread of the active file
@@ -226,7 +228,7 @@ read_filter_file (
 	psGrp = (struct t_group *) 0;
 	arr_ptr = (struct t_filter *) 0;
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
 		if (*buf == '#' || *buf == '\n')
 			continue;
 
@@ -234,7 +236,7 @@ read_filter_file (
 		case 'c':
 			if (match_integer (buf+1, "ase=", &icase, 1)) {
 				if (arr_ptr && !expired_time)
-					arr_ptr[i].icase = icase;
+					arr_ptr[i].icase = (unsigned) icase;
 
 				break;
 			}
@@ -275,7 +277,7 @@ if (debug) {
 				lines[0] = '\0';
 				xref[0] = '\0';
 				icase = 0;
-				secs = 0L;
+				secs = (time_t) 0;
 				psGrp = (struct t_group *) 0;   /* fudge for out of order rules */
 				break;
 			}
@@ -348,7 +350,7 @@ if (debug) {
 				lines[0] = '\0';
 				xref[0] = '\0';
 				icase = 0;
-				secs = 0L;
+				secs = (time_t) 0;
 				psGrp = (struct t_group *) 0;	/* fudge for out of order rules */
 				break;
 			}
@@ -406,18 +408,18 @@ if (debug) {
 }
 #endif
 				if (arr_ptr) {
-					arr_ptr[i].type = type;
+					arr_ptr[i].type = (unsigned) type;
 					arr_ptr[i].score = (!type ? SCORE_KILL : SCORE_SELECT);
 				}
 				break;
 			}
-			if (match_long (buf+1, "ime=", &secs)) {
+			if (match_long (buf+1, "ime=", (long *) &secs)) {
 				if (arr_ptr && !expired_time) {
 					arr_ptr[i].time = secs;
 					if (secs && current_secs > secs) {
 #ifdef DEBUG
 if (debug) {
-	my_printf ("EXPIRED  secs=[%ld]  current_secs=[%ld]\n", secs, current_secs);
+	my_printf ("EXPIRED  secs=[%lu]  current_secs=[%lu]\n", (unsigned long int) secs, (unsigned long int) current_secs);
 	my_flush ();
 }
 #endif
@@ -451,7 +453,7 @@ if (debug) {
 							if ((s = strchr(xref_score, ',')))
 								s++;
 							arr_ptr[i].xref_scores[xref_score_cnt] = xref_score_value;
-							arr_ptr[i].xref_score_strings[xref_score_cnt] = (s != NULL ? my_strdup(s) : NULL);
+							arr_ptr[i].xref_score_strings[xref_score_cnt] = (s != 0 ? my_strdup(s) : 0);
 							arr_ptr[i].xref_score_cnt++;
 							xref_score_cnt++;
 						}
@@ -493,7 +495,7 @@ vWriteFilterFile (
 	/*
 	 * Get current time for checking rules against expire times
 	 */
-	time (&lCurTime);
+	(void) time (&lCurTime);
 
 	fprintf (hFp, txt_filter_file, default_filter_days);
 	fflush (hFp);
@@ -504,7 +506,7 @@ vWriteFilterFile (
 	vWriteFilterArray (hFp, &glob_filter, lCurTime);
 
 	fclose (hFp);
-	chmod (pcFile, (S_IRUSR|S_IWUSR));
+	chmod (pcFile, (mode_t)(S_IRUSR|S_IWUSR));
 }
 #endif/* !INDEX_DAEMON */
 
@@ -513,7 +515,7 @@ static void
 vWriteFilterArray (
 	FILE *fp,
 	struct t_filters *ptr,
-	long theTime)
+	time_t theTime)
 {
 	register int i;
 	int j;
@@ -521,7 +523,7 @@ vWriteFilterArray (
 	if (ptr == (struct t_filters *) 0)
 		return;
 
-	for (i = 0 ; i < ptr->num ; i++) {
+	for (i = 0; i < ptr->num; i++) {
 
 /* my_printf ("WRITE i=[%d] subj=[%s] from=[%s]\n", i, (ptr->filter[i].subj ? ptr->filter[i].subj : ""), (ptr->filter[i].from ? ptr->filter[i].from : "")); */
 
@@ -539,8 +541,8 @@ my_flush ();
 my_printf ("PtrType=[%d] FilType=[%d]" cCRLF, ptr->filter[i].type, write_filter_type);
 my_flush ();
 */
-		fprintf (fp, "type=%d\n", ptr->filter[i].type);
-		fprintf (fp, "case=%d\n", ptr->filter[i].icase);
+		fprintf (fp, "type=%ud\n", ptr->filter[i].type);
+		fprintf (fp, "case=%ud\n", ptr->filter[i].icase);
 		switch (ptr->filter[i].score) {
 			case SCORE_KILL:
 				fprintf (fp, "score=kill\n");
@@ -599,14 +601,14 @@ my_flush ();
 				fprintf (fp, "xref_score=%d%s%s\n", ptr->filter[i].xref_scores[j], ptr->filter[i].xref_score_strings[j] ? "," : "", ptr->filter[i].xref_score_strings[j]);
 		}
 		if (ptr->filter[i].time)
-			fprintf (fp, "time=%ld\n", ptr->filter[i].time);
+			fprintf (fp, "time=%lu\n", (unsigned long int) ptr->filter[i].time);
 
 		fprintf (fp, "#####\n"); /* makes filter file more readable */
 	}
 
 	fflush (fp);
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 static int
@@ -809,7 +811,7 @@ filter_menu (
 		if (i == -1)
 			return FALSE;
 		else
-			rule.subj_ok = (i == FALSE);
+			rule.subj_ok = (i == 0);
 
 		/*
 		 * From:
@@ -819,7 +821,7 @@ filter_menu (
 		if (i == -1)
 			return FALSE;
 		else
-			rule.from_ok = (rule.subj_ok) ? (i != FALSE) : (i == FALSE);
+			rule.from_ok = rule.subj_ok ? (i != 0) : (i == 0);
 
 		/*
 		 * Message-Id:
@@ -978,7 +980,7 @@ filter_menu (
 			unfilter_articles ();
 #ifndef INDEX_DAEMON
 			(void) read_filter_file (local_filter_file, FALSE);
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 			return TRUE;
 			/* keep lint quiet: */
 			/* FALLTHROUGH */
@@ -1198,7 +1200,7 @@ iAddFilterRule (
 			psPtr[*plNum].scope = my_strdup (psRule->scope);
 	}
 
-	time (&lCurTime);
+	(void) time (&lCurTime);
 	switch(psRule->expire_time)
 	{
 		case 1:
@@ -1269,7 +1271,7 @@ iAddFilterRule (
 	if (iFiltered) {
 #ifdef DEBUG
 		if (debug)
-			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%d] line=[%d %d] time=[%ld]",
+			wait_message (2, "inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] fullref=[%d] line=[%d %d] time=[%lu]",
 				(psPtr[*plNum-1].inscope ? "TRUE" : "FALSE"),
 				(psRule->scope ? psRule->scope : ""),
 				psPtr[*plNum-1].type, psPtr[*plNum-1].icase,
@@ -1277,7 +1279,7 @@ iAddFilterRule (
 				(psPtr[*plNum-1].from ? psPtr[*plNum-1].from : ""),
 				(psPtr[*plNum-1].msgid ? psPtr[*plNum-1].msgid : ""),
 				psPtr[*plNum-1].fullref, psPtr[*plNum-1].lines_cmp,
-				psPtr[*plNum-1].lines_num, psPtr[*plNum-1].time);
+				psPtr[*plNum-1].lines_num, (unsigned long int) psPtr[*plNum-1].time);
 #endif
 
 #ifndef INDEX_DAEMON
@@ -1300,7 +1302,7 @@ unfilter_articles (void) /* return value is always ignored */
 	int unkilled = 0;
 	register int i;
 
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		if (arts[i].killed) {
 			arts[i].killed = FALSE;
 			arts[i].status = ART_UNREAD;
@@ -1364,14 +1366,14 @@ filter_articles (
 	 * (only for regexp matching)
 	 */
 	if (wildcard) {
-		int msiz;
+		size_t msiz;
 
 		msiz = sizeof(struct regex_cache) * num;
 		regex_cache_subj = (struct regex_cache *) my_malloc(msiz);
 		regex_cache_from = (struct regex_cache *) my_malloc(msiz);
 		regex_cache_msgid = (struct regex_cache *) my_malloc(msiz);
 		regex_cache_xref = (struct regex_cache *) my_malloc(msiz);
-		for (j=0 ; j < num ; j++) {
+		for (j = 0; j < num; j++) {
 			regex_cache_subj[j].re = NULL;
 			regex_cache_subj[j].extra = NULL;
 			regex_cache_from[j].re = NULL;
@@ -1386,12 +1388,12 @@ filter_articles (
 	/*
 	 * loop thru all arts applying global & local filtering rules
 	 */
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		arts[i].score = 0;
 		if (IS_READ(i)) /* skip only when the article is read */
 			continue;
 
-		for (j=0 ; j < num ; j++) {
+		for (j = 0; j < num; j++) {
 			if (ptr[j].inscope) {
 				/*
 				 * Filter on Subject: line
@@ -1585,7 +1587,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 						char *s, *e;
 						int group_count;
 
-						s=arts[i].xref;
+						s = arts[i].xref;
 
 						while(*s && !isspace(*s))
 							s++;
@@ -1595,28 +1597,28 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 						group_count=0;
 
 						while(*s) {
-							e=s;
-							while (*e && *e!=':' && !isspace(*e))
+							e = s;
+							while (*e && *e != ':' && !isspace(*e))
 								e++;
 
 							if(ptr[j].xref_max > 0) {
 								strncpy(buf, s, e-s);
-								buf[e-s]='\0';
-								for(k=0;k<ptr[j].xref_score_cnt;k++) {
+								buf[e-s] = '\0';
+								for(k = 0; k < ptr[j].xref_score_cnt; k++) {
 									if(GROUP_MATCH(buf, ptr[j].xref_score_strings[k], TRUE)) {
-										group_count+=ptr[j].xref_scores[k];
+										group_count += ptr[j].xref_scores[k];
 										break;
 									}
 								}
-								if(k==ptr[j].xref_score_cnt)
+								if(k == ptr[j].xref_score_cnt)
 									group_count++;
 							}
 							if(ptr[j].xref != (char*)0) {
 								strncpy(buf, s, e-s);
-								buf[e-s]='\0';
+								buf[e-s] = '\0';
 								/* don't filter when we are actually in that group */
 								/* Group names shouldn't be case sensitive in any case. Whatever */
-								if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf)!=0) {
+								if(ptr[j].type != FILTER_KILL || strcmp(group->name, buf) != 0) {
 									if (!wildcard) {
 										if (wildmat(buf, ptr[j].xref, ptr[j].icase))
 											group_count = -1;
@@ -1667,7 +1669,7 @@ wait_message (1, "FILTERED Lines arts[%d] > [%d]", arts[i].lines, ptr[j].lines_n
 	 * throw away the contents of all regex_caches
 	 */
 	if (wildcard) {
-		for (j=0 ; j < num ; j++) {
+		for (j = 0; j < num; j++) {
 			FreeIfNeeded(regex_cache_subj[j].re);
 			FreeIfNeeded(regex_cache_subj[j].extra);
 			FreeIfNeeded(regex_cache_from[j].re);

@@ -81,7 +81,7 @@ static const char * signal_name(int code);
 #endif /* SIGTSTP */
 
 enum context { cMain, cArt, cConfig, cGroup, cHelp, cPage, cSelect, cThread };
-enum context my_context;
+static enum context my_context;
 
 static const struct {
 	int	code;
@@ -212,14 +212,32 @@ handle_resize (int repaint)
 #endif /* USE_CURSES */
 		switch (my_context) {
 		case cArt:
-			ClearScreen ();
-			wait_message (0, txt_group, glob_art_group);
-			break;
+			{
+				int i = 0;
+				ClearScreen ();
+
+/* FIXME: ugly code */
+/* calculate maxlen of groupname to display */
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+				i += 24; /* len of "Group %s ('q' to quit)... " */
+#else
+				i += 10; /* len of "Group %s ... " */
+#endif /* defined(HAVE_POLL) || defined(HAVE_SELECT) */
+#ifdef SHOW_PROGRESS
+				i += 21; /* low+'/'+high */
+#endif /* ifdef SHOW_PROGRESS */
+				wait_message (0, txt_group, cCOLS - i, glob_art_group);
+				break;
+		}
 		case cConfig:
 			refresh_config_page (-1);
 			break;
 		case cHelp:
+#ifdef USE_CURSES
 			display_info_page (TRUE);
+#else
+			display_info_page();
+#endif /* USE_CURSES*/
 			break;
 		case cGroup:
 			ClearScreen ();

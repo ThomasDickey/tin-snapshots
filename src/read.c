@@ -47,7 +47,7 @@ wait_for_input (
 
 	if (ch == 'q' || ch == 'z' || ch == ESC) {
 		if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
-			return (TRUE);
+			return TRUE;
 	}
 	if (ch == 'Q') {
 		if (prompt_yn (cLINES, "Do you want to exit tin immediately ? (y/n): ", FALSE) == 1)
@@ -82,7 +82,7 @@ wait_for_input (
 		if (nfds == 0) {
 /*			fprintf(stderr, "Timeout...Treating as user initiated abort ? \n");*/
 /* TODO What do we do here ? Drain ? don't drain ? */
-			return(FALSE);
+			return FALSE;
 		}
 
 		/*
@@ -101,7 +101,7 @@ DEBUG_IO((stderr, "keybd ready\n"));
 				if (ch == 'q' || ch == 'z' || ch == ESC) {
 					if (prompt_yn (cLINES, "Do you want to abort this operation? (y/n): ", FALSE) == 1)
 /* TODO if(cmd_line) this is all cacked when not in curses mode */
-						return (TRUE);
+						return TRUE;
 				}
 
 				if (ch == 'Q') {
@@ -117,7 +117,7 @@ DEBUG_IO((stderr, "keybd ready\n"));
 			 */
 			if (FD_ISSET(fileno(fd), &readfds)) {
 DEBUG_IO((stderr, "file ready\n"));
-				return(TRUE);
+				return TRUE;
 			}
 #endif
 		}
@@ -125,7 +125,7 @@ DEBUG_IO((stderr, "file ready\n"));
 	}
 #endif
 	/* NOTREACHED */
-	return(FALSE);
+	return FALSE;
 }
 #endif /* NNTP_ABLE */
 
@@ -133,7 +133,7 @@ DEBUG_IO((stderr, "file ready\n"));
  * Support routine to read a fixed size buffer. This does most of the
  * hard work for tin_fgets()
  */
-int partial_read;
+static int partial_read;
 
 static char *
 tin_read (
@@ -357,7 +357,7 @@ fgets_hdr (
 
 	*(++s1) = '\0';
 
-	return ((s1 == s) ? NULL : s);
+	return ((s1 == s) ? 0 : s);
 }
 
 /* end of read.c */

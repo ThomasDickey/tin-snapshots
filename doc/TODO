@@ -1,5 +1,16 @@
 Bugs
 ----
+o  multiple calls of '/' are 'corrupting' the previus_page-pionter
+   page-up jumps 'near' the last page before the search (should we remeber
+   the previus page here (if so, we must hit the exact position again, IMHO
+   this is usefull) or just go up one page?
+
+o  strfmailer() calls rfc1522_encode() for Subject/To even with
+   use_mailreader_i=ON (not very usefull as modern mailreaders
+   also try to mime-encode these line which would lead to a double encoded
+   subject (with inner encoding 'broken' due to escape_shell_meta() call
+   in strfmailer())
+
 o  ctrl-h doesn't turn off "Skip multipart/alternative parts"
    [Urs Janssen <urs@tin.org>]
 
@@ -353,6 +364,8 @@ o  check where tin_done() should be called instead of using exit()
 
 o  check where STRCPY() should be used
 
+o  check code with lclint (http://www.sds.lcs.mit.edu/lclint/)
+
 Docs/online help
 ----------------
 o  man page is still out dated and buggy
@@ -363,6 +376,10 @@ o  tin.defaults is not mentioned in manpage/INSTALL
 
 Not yet classified
 ------------------
+o  'B'ody search doesn't jump to the match in the article
+   (IMHO this is confusing inside the pager (at least if the hit
+    is in the current article), but ok at any other level).
+
 o  strip Xref:-header if saving news in batch mode (-S)
 
 o  tin in batchmode dumps core if getting a SIGINT, useful?
@@ -398,13 +415,6 @@ o  f'uping with 'F' to a article which has Followup-To: poster set an then
 
 o  f'uping with '^w' (include headers) to an article which has Followup-To:
    poster set does not include headers when using 'm' (mail to poster)
-
-o  if exiting tin with
-   catchup_read_groups=ON
-   thread_articles=ON
-   tin first threads the group and than catches
-   it up and than exits - but threading is not necessary for a catch-up!
-   and it does a filter before exiting - stupid!
 
 o  when last articles in a newsgroup were cancelled, it shows that there are
    new articles in that group, even if entered that group in a session before

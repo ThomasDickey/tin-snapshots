@@ -42,15 +42,15 @@ static int last_thread_on_screen = 0;
  * Local prototypes
  */
 #ifndef INDEX_DAEMON
-static int find_unexpired (struct t_msgid *ptr);
-static int has_sibling (struct t_msgid *ptr);
-static void prompt_thread_num (int ch);
-static void bld_tline (int l, struct t_article *art);
-static void draw_tline (int i, int full);
-static void draw_thread_arrow (void);
-static void erase_thread_arrow (void);
-static void make_prefix (struct t_msgid *art, char *prefix);
-static void update_thread_page (void);
+	static int find_unexpired (struct t_msgid *ptr);
+	static int has_sibling (struct t_msgid *ptr);
+	static void prompt_thread_num (int ch);
+	static void bld_tline (int l, struct t_article *art);
+	static void draw_tline (int i, int full);
+	static void draw_thread_arrow (void);
+	static void erase_thread_arrow (void);
+	static void make_prefix (struct t_msgid *art, char *prefix);
+	static void update_thread_page (void);
 #endif /* !INDEX_DAEMON */
 
 /*
@@ -199,7 +199,7 @@ bld_tline (
 		/*
 		 * Pad to end of line so that inverse bar looks 'good'
 		 */
-		for (i=strlen(buff); i<cCOLS; i++)
+		for (i = strlen(buff); i < cCOLS; i++)
 			*(buff + i) = ' ';
 
 		*(buff + i) = '\0';
@@ -254,13 +254,13 @@ draw_tline (
 }
 #endif
 
+#ifndef INDEX_DAEMON
 /*
  * show current thread. If threaded on Subject: show
  *   <respnum> <name>
  * If threaded on References: or Archive-name: show
  *   <respnum> <subject> <name>
  */
-
 int
 show_thread (
 	struct t_group *group,
@@ -269,7 +269,6 @@ show_thread (
 	int thread_depth)
 {
 	int ret_code = TRUE;
-#ifndef INDEX_DAEMON
 	int ch;
 	int i, n;
 	int scroll_lines;
@@ -292,7 +291,7 @@ show_thread (
 	thread_index_point = top_thread;
 	if (space_mode) {
 		if ((i = new_responses (thread_basenote))) {
-			for (n = 0, i = base[thread_basenote]; i >= 0 ; i = arts[i].thread, n++) {
+			for (n = 0, i = base[thread_basenote]; i >= 0; i = arts[i].thread, n++) {
 				if (arts[i].status == ART_UNREAD) {
 					if (arts[i].thread == ART_EXPIRED)
 						art_mark_read (group, &arts[i]);
@@ -375,6 +374,7 @@ show_thread (
 								if (xmouse == MOUSE_BUTTON_1)
 									goto thread_read_article;
 								break;
+
 							case MOUSE_BUTTON_2:
 								if (xrow < INDEX2LNUM(first_thread_on_screen) || xrow > INDEX2LNUM(last_thread_on_screen-1))
 									goto thread_page_up;
@@ -382,10 +382,12 @@ show_thread (
 									goto thread_catchup;
 								else
 									goto thread_done;
+
 							default:
 								break;
 						}
 						break;
+
 					default:
 						break;
 				}
@@ -453,7 +455,7 @@ thread_tab_pressed:
 				space_mode = TRUE;
 				n = ((thread_index_point == 0) ? thread_respnum : find_response (thread_basenote, thread_index_point));
 
-				for (i = n ; i != -1 ; i = arts[i].thread) {
+				for (i = n; i != -1; i = arts[i].thread) {
 					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN)) {
 						n = show_page (group, group_path, i, &thread_index_point);
 						break;
@@ -547,10 +549,8 @@ thread_page_up:
 
 			case iKeyThreadCatchupConditional:	/* catchup thread but ask for confirmation */
 thread_catchup:
-				if (ch == iKeyThreadCatchupConditional) {
-					if (confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1)
-						break;
-				}
+				if (ch == iKeyThreadCatchupConditional && confirm_action && prompt_yn (cLINES, txt_mark_thread_read, TRUE) != 1)
+					break;
 				thd_mark_read (group, base[thread_basenote]);
 				goto thread_done;
 
@@ -646,10 +646,8 @@ thread_catchup:
 				break;
 
 			case iKeyThreadUntag:			/* untag all articles */
-				if (index_point >= 0) {
-					if (untag_all_articles())
-						update_thread_page();
-				}
+				if (index_point >= 0 && untag_all_articles())
+					update_thread_page();
 				break;
 
 			case iKeyVersion:			/* version */
@@ -687,13 +685,13 @@ thread_catchup:
 				break;
 
 			case iKeyThreadReverseSel:		/* reverse selections */
-				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread)
+				for (i = (int) base[thread_basenote]; i != -1; i = arts[i].thread)
 					arts[i].selected = (arts[i].selected ? 0 : 1);
 				update_thread_page ();
 				break;
 
 			case iKeyThreadUndoSel:			/* undo selections */
-				for (i = (int) base[thread_basenote] ; i != -1 ; i = arts[i].thread)
+				for (i = (int) base[thread_basenote]; i != -1; i = arts[i].thread)
 					arts[i].selected = 0;
 				update_thread_page ();
 				break;
@@ -721,10 +719,9 @@ thread_done:
 	set_xclick_off ();
 	clear_note_area ();
 
-#endif /* INDEX_DAEMON */
-
 	return ret_code;
 }
+#endif /* !INDEX_DAEMON */
 
 
 void
@@ -798,7 +795,7 @@ show_thread_page (void)
 
 	draw_thread_arrow ();
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -820,7 +817,7 @@ update_thread_page (void)
 
 	draw_thread_arrow();
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -842,7 +839,7 @@ draw_thread_arrow (void)
 	if (info_in_last_line)
 		info_message ("%s", arts[find_response (thread_basenote, thread_index_point)].subject);
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -859,7 +856,7 @@ erase_thread_arrow (void)
 	}
 	my_flush ();
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -881,7 +878,7 @@ prompt_thread_num (
 
 	move_to_response (num);
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 /*
@@ -923,7 +920,7 @@ which_thread (
 	register int i, j;
 
 	for (i = 0; i < top_base; i++) {
-		for (j = (int) base[i] ; j >= 0 ; j = arts[j].thread) {
+		for (j = (int) base[i]; j >= 0; j = arts[j].thread) {
 			if (j == n)
 				return i;
 		}
@@ -948,11 +945,12 @@ which_response (
 	i = which_thread (n);
 	assert(i >= 0);
 
-	for (j = (int) base[i]; j != -1; j = arts[j].thread)
+	for (j = (int) base[i]; j != -1; j = arts[j].thread) {
 		if (j == n)
 			break;
 		else
 			num++;
+	}
 
 	return num;
 }
@@ -1007,7 +1005,7 @@ stat_thread (
 		if (arts[i].inrange)
 			++sbuf->inrange;
 
-		if (arts[i].delete)
+		if (arts[i].delete_it)
 			++sbuf->deleted;
 
 		if (arts[i].status == ART_UNREAD)
@@ -1184,7 +1182,7 @@ move_to_response (
 	else
 		show_thread_page ();
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 
 static int
@@ -1207,6 +1205,7 @@ has_sibling (
 }
 
 
+#ifndef INDEX_DAEMON  
 /*
  * mutt-like subject according. by sjpark@sparcs.kaist.ac.kr
  */
@@ -1220,7 +1219,7 @@ make_prefix (
 	int depth = 0;
 
 	for (ptr = art->parent; ptr; ptr = ptr->parent)
-		depth += !EXPIRED (ptr);
+		depth += (!EXPIRED (ptr) ? 1 : 0);
 
 	if (depth == 0) {
 		prefix[0] = '\0';
@@ -1229,16 +1228,14 @@ make_prefix (
 
 	prefix_ptr = depth * 2 - 1;
 	strcpy (&prefix[prefix_ptr], "->");
-	prefix_ptr--;
-	prefix[prefix_ptr] = (has_sibling (art) ? '+' : '`');
+	prefix[--prefix_ptr] = (has_sibling (art) ? '+' : '`');
 
 	for (ptr = art->parent; prefix_ptr != 0; ptr = ptr->parent) {
 		if (EXPIRED (ptr))
 			continue;
-		prefix_ptr--;
-		prefix[prefix_ptr] = ' ';
-		prefix_ptr--;
-		prefix[prefix_ptr] = (has_sibling (ptr) ? '|' : ' ');
+		prefix[--prefix_ptr] = ' ';
+		prefix[--prefix_ptr] = (has_sibling (ptr) ? '|' : ' ');
 	}
 	return;
 }
+#endif /* !INDEX_DAEMON */

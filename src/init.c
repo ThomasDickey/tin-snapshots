@@ -127,7 +127,6 @@ char xpost_quote_format[PATH_LEN];
 int MORE_POS;				/* set in set_win_size () */
 int NOTESLINES;				/* set in set_win_size () */
 int RIGHT_POS;				/* set in set_win_size () */
-int cmd_line;				/* batch / interactive mode */
 int default_auto_save_msg;		/* save posted message to ~/Mail/posted */
 int default_filter_days;		/* num of days an article  filter can be active */
 int default_filter_kill_header;
@@ -143,10 +142,8 @@ int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
 int hist_last[HIST_MAXNUM+1];
 int hist_pos[HIST_MAXNUM+1];
-int in_headers;			/* color in headers */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
 int local_filtered_articles;		/* locally killed / auto-selected articles */
-int local_index;			/* do private indexing? */
 int mail_mime_encoding = MIME_ENCODING_7BIT;
 int max_from = 0;
 int max_subj = 0;
@@ -159,10 +156,9 @@ int post_mime_encoding = MIME_ENCODING_7BIT;
 int process_id;		/* FIXME: use pid_t instead of int */
 int real_gid;
 int real_uid;
-int real_umask;
 int reread_active_file_secs;		/* reread active file interval in seconds */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
-int strip_bogus=BOGUS_KEEP;
+int strip_bogus = BOGUS_KEEP;
 int wildcard = FALSE;			/* Use wildmat, not regex */
 int system_status;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
@@ -173,7 +169,6 @@ int top_base;
 int xmouse, xrow, xcol;			/* xterm button pressing information */
 
 #ifdef HAVE_COLOR
-	int use_color;			/* enables/disables ansi-color support under linux-console and color-xterm */
 	int col_back;			/* standard background color */
 	int col_invers_fg;		/* color of inverse text (foreground) */
 	int col_invers_bg;		/* color of inverse text (background) */
@@ -190,16 +185,18 @@ int xmouse, xrow, xcol;			/* xterm button pressing information */
 	int col_normal;			/* standard foreground color */
 	int col_title;			/* color of Help/Mail-Sign */
 	int col_signature;		/* color of signature */
-	int word_highlight;		/* word highlighting on/off */
 	int word_h_display_marks;	/* display * or _ when highlighting or space or nothing*/
 	int col_markstar;		/* text highlighting with *stars* */
 	int col_markdash;		/* text highlighting with _underdashes_ */
+	t_bool use_color;			/* enables/disables ansi-color support under linux-console and color-xterm */
 	t_bool use_color_tinrc;		/* like use_color but stored in tinrc */
+	t_bool word_highlight;		/* word highlighting on/off */
 	t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
 #endif
 
+mode_t real_umask;
+
 t_bool no_write = FALSE; /* do not write newsrc on quit (-X cmd-line flag) */
-t_bool reread_active_for_posted_arts;
 t_bool add_posted_to_filter;
 t_bool alternative_handling;
 t_bool auto_bcc;		/* add your name to bcc automatically */
@@ -212,6 +209,7 @@ t_bool catchup = FALSE;		/* mark all arts read in all subscribed groups */
 t_bool catchup_read_groups;	/* ask if read groups are to be marked read */
 t_bool check_any_unread = FALSE;
 t_bool check_for_new_newsgroups;	/* don't check for new newsgroups */
+t_bool cmd_line;				/* batch / interactive mode */
 t_bool confirm_action;
 t_bool confirm_to_quit;
 t_bool count_articles;			/* count articles on spooldir or via GROUP cmd */
@@ -234,16 +232,18 @@ t_bool force_screen_redraw;	/* force screen redraw after external (shell) comman
 t_bool full_page_scroll;	/* page half/full screen of articles/groups */
 t_bool got_sig_pipe = FALSE;
 t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
+t_bool in_headers;			/* color in headers */
 t_bool info_in_last_line;
 t_bool keep_dead_articles;
 t_bool keep_posted_articles;
+t_bool local_index;			/* do private indexing? */
 t_bool mail_8bit_header = FALSE;	/* allow 8bit chars. in header of mail message */
 t_bool mail_news;		/* mail all arts to specified user */
 t_bool mark_saved_read;		/* mark saved article/thread as read */
 t_bool newsrc_active;
 t_bool advertising = TRUE;
 t_bool pos_first_unread;	/* position cursor at first/last unread article */
-t_bool post_8bit_header=FALSE;	/* allow 8bit chars. in header when posting to newsgroup */
+t_bool post_8bit_header = FALSE;	/* allow 8bit chars. in header when posting to newsgroup */
 t_bool post_article_and_exit;	/* quick post of an article then exit (elm like) */
 t_bool post_postponed_and_exit;	/* post postponed articles and exit */
 t_bool print_header;		/* print all of mail header or just Subject: & From lines */
@@ -271,7 +271,7 @@ t_bool pgdn_goto_next;
 t_bool start_any_unread = FALSE;
 t_bool start_editor_offset;
 t_bool strip_blanks;
-t_bool strip_newsrc=FALSE;
+t_bool strip_newsrc = FALSE;
 t_bool tab_after_X_selection;	/* set TRUE if you want auto TAB after X */
 t_bool tab_goto_next_unread;
 t_bool thread_catchup_on_exit;	/* catchup thread with left arrow key or not */
@@ -288,30 +288,30 @@ t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
 #ifdef LOCAL_CHARSET
 	t_bool use_local_charset = TRUE;
-#endif
+#endif /* LOCAL_CHARSET */
 
 /* History entries */
 char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 
 #ifdef HAVE_METAMAIL
-t_bool use_metamail;		/* enables/disables metamail on MIME messages */
-t_bool ask_for_metamail;	/* enables/disables the metamail query if a MIME message is going to be displayed */
-#endif
+	t_bool use_metamail;		/* enables/disables metamail on MIME messages */
+	t_bool ask_for_metamail;	/* enables/disables the metamail query if a MIME message is going to be displayed */
+#endif /* HAVE_METAMAIL */
 
 #ifdef HAVE_SYS_UTSNAME_H
-struct utsname system_info;
-#endif
+	struct utsname system_info;
+#endif /* HAVE_SYS_UTSNAME_H */
 
 #ifndef M_AMIGA
-struct passwd *myentry;
-struct passwd pwdentry;
-#endif
+	struct passwd *myentry;
+	static struct passwd pwdentry;
+#endif /* !M_AMIGA */
 
 #ifdef HAVE_COLOR
 
-#define DFT_FORE -1
-#define DFT_BACK -2
-#define DFT_INIT -3
+#	define DFT_FORE -1
+#	define DFT_BACK -2
+#	define DFT_INIT -3
 
 static const struct {
 	int	*colorp;
@@ -366,7 +366,7 @@ void postinit_colors(void)
 		TRACE(("postinit_colors [%d] = %d", n, *(our_colors[n].colorp)))
 	}
 }
-#endif
+#endif /* HAVE_COLOR */
 
 #ifdef NNTP_ABLE
 	unsigned short nntp_tcp_port;
@@ -376,7 +376,6 @@ void postinit_colors(void)
 /*
  * Get users home directory, userid, and a bunch of other stuff!
  */
-
 void init_selfinfo (void)
 {
 	char nam[LEN];
@@ -414,11 +413,6 @@ void init_selfinfo (void)
 	}
 #endif /* HAVE_GETHOSTBYNAME */
 
-	if (domain_name[0]=='\0') { /* FIXME: -> lang.c */
-		error_message ("Can't get a (fully-qualified) domain-name!\n");
-		tin_done(EXIT_ERROR);
-	}
-
 	process_id = getpid ();
 
 #if defined(M_AMIGA) || defined(M_OS2)
@@ -430,12 +424,12 @@ void init_selfinfo (void)
 	real_uid = getuid ();
 	real_gid = getgid ();
 	real_umask = umask (0);
-	umask (real_umask);
-#endif	/* M_AMIGA */
+	(void) umask (real_umask);
+#endif /* M_AMIGA */
 
 #if defined(HAVE_SETLOCALE) && defined(LC_ALL) && !defined(NO_LOCALE)
 	setlocale (LC_ALL, "");
-#endif
+#endif /* HAVE_SETLOCALE && LC_ALL && !NO_LOCALE */
 
 /* FIXME: move to get_user_name() [header.c] */
 #ifdef M_AMIGA
@@ -464,32 +458,32 @@ void init_selfinfo (void)
 
 /* we might add a check for $LOGNAME here */
 
-#if defined(M_OS2) || defined(WIN32)
+#	if defined(M_OS2) || defined(WIN32)
 	if (myentry == (struct passwd *) 0) {
 		fprintf (stderr, "Environment variable USER not set.\n");
 		exit (1);
 	}
-#else
-#	ifdef VMS
+#	else
+#		ifdef VMS
 	if (((ptr = getlogin ()) != (char *) 0) && strlen (ptr))
 		myentry = getpwnam (ptr);
-#	endif /* VMS */
-#endif /* M_OS2 || WIN32 */
+#		endif /* VMS */
+#	endif /* M_OS2 || WIN32 */
 
-#ifdef M_OS2
+#	ifdef M_OS2
 	strcpy (TMPDIR, get_val ("TMP", "/tmp/"));
 	if ((TMPDIR[strlen(TMPDIR)-1] != '/') && (TMPDIR[strlen(TMPDIR)-1] != '\\'))
 		strcat(TMPDIR,"/");
-#endif /* M_OS2 */
-#ifdef WIN32
+#	endif /* M_OS2 */
+#	ifdef WIN32
 	strcpy (TMPDIR, get_val ("TMP", "\\tmp\\"));
 	if (TMPDIR[strlen(TMPDIR)-1] != '\\')
 		strcat(TMPDIR,"\\");
-#endif /* WIN32 */
+#	endif /* WIN32 */
 	strcpy (userid, myentry->pw_name);
-#ifdef VMS
+#	ifdef VMS
 	lower (userid);
-#endif /* VMS */
+#	endif /* VMS */
 
 	if ((ptr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
@@ -513,7 +507,6 @@ void init_selfinfo (void)
 	} else {	/* index in users home directory ~/.tin/.news */
 		local_index = TRUE;
 	}
-
 
 	add_posted_to_filter = TRUE;
 	alternative_handling = TRUE;
@@ -746,6 +739,15 @@ void init_selfinfo (void)
 	(void) read_site_config();
 
 	/*
+	 * the site_confog-file was the last chance to set the domainname
+	 *  if it's still unset exit tin.
+	 */
+	if (domain_name[0]=='\0') {
+		error_message (txt_error_no_domain_name);
+		tin_done(EXIT_ERROR);
+	}
+
+	/*
 	 * only set the following variables, if they weren't set from
 	 * within read_site_config()
 	 */
@@ -762,7 +764,7 @@ void init_selfinfo (void)
 
 		joinpath (buf, libdir, "organization");
 		if ((fp = fopen(buf, "r")) != NULL) {
-			if (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+			if (fgets (buf, (int) sizeof (buf), fp) != (char *) 0) {
 				ptr = strrchr (buf, '\n');
 				if (ptr != (char *) 0)
 					*ptr = '\0';
@@ -793,7 +795,7 @@ void init_selfinfo (void)
 #endif /* VMS */
 	{
 		created_rcdir = TRUE;
-		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
+		my_mkdir (rcdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 #if defined(M_UNIX) || defined (M_AMIGA) || defined(VMS)
 	strcpy (default_mailer_format, MAILER_FORMAT);
@@ -835,7 +837,7 @@ void init_selfinfo (void)
 #endif /* VMS */
 
 	if (stat (index_newsdir, &sb) == -1)
-		my_mkdir (index_newsdir, S_IRWXUGO);
+		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 
 #ifdef VMS
 	joindir (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
@@ -843,11 +845,11 @@ void init_selfinfo (void)
 	joinpath (index_maildir, get_val ("TIN_INDEX_MAILDIR", rcdir), INDEX_MAILDIR);
 #endif /* VMS */
 	if (stat (index_maildir, &sb) == -1)
-		my_mkdir (index_maildir, S_IRWXUGO);
+		my_mkdir (index_maildir, (mode_t)S_IRWXUGO);
 	joinpath (index_savedir, get_val ("TIN_INDEX_SAVEDIR", rcdir), INDEX_SAVEDIR);
 
 	if (stat (index_savedir, &sb) == -1)
-		my_mkdir (index_savedir, S_IRWXUGO);
+		my_mkdir (index_savedir, (mode_t)S_IRWXUGO);
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
 	joinpath (local_config_file, rcdir, CONFIG_FILE);
 	joinpath (local_filter_file, rcdir, FILTER_FILE);
@@ -884,36 +886,36 @@ void init_selfinfo (void)
 	joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", novrootdir), INDEX_NEWSDIR);
 
 	if (stat (index_newsdir, &sb) == -1)
-		my_mkdir (index_newsdir, (S_IRWXU|S_IRUGO|S_IXUGO));
-#else /* INDEX_DAEMON */
+		my_mkdir (index_newsdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
+#else
 #	ifdef HAVE_LONG_FILE_NAMES
 		sprintf (lock_file, "%stin.%s.LCK", TMPDIR, userid);
-#	else /* HAVE_LONG_FILE_NAMES */
+#	else
 		sprintf (lock_file, "%s%s.LCK", TMPDIR, userid);
 #	endif /* HAVE_LONG_FILE_NAMES */
 
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 	nntp_tcp_port = (unsigned short) atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
-#endif /* NNTP_ABLE */
+#	endif /* NNTP_ABLE */
 
-#ifdef VMS
+#	ifdef VMS
 	if (stat (rcdir_asfile, &sb) == -1)
-#else /* VMS */
+#	else
 	if (stat (rcdir, &sb) == -1)
-#endif /* VMS */
+#	endif /* VMS */
 	{
 		created_rcdir = TRUE;
-		my_mkdir (rcdir, (S_IRWXU|S_IRUGO|S_IXUGO));
+		my_mkdir (rcdir, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 	}
 	if (tin_uid != real_uid) {
 		joinpath (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", spooldir), INDEX_NEWSDIR);
 		set_tin_uid_gid ();
 		if (stat (index_newsdir, &sb) == -1)
-			my_mkdir (index_newsdir, S_IRWXUGO);
+			my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 
 		set_real_uid_gid ();
 	} else if (stat (index_newsdir, &sb) == -1) {
-		my_mkdir (index_newsdir, S_IRWXUGO);
+		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 	}
 	if (stat (posted_info_file, &sb) == -1) {
 		if ((fp = fopen (posted_info_file, "w")) != (FILE *) 0) {
@@ -959,7 +961,7 @@ void init_selfinfo (void)
 	} else {
 		joinpath (nam, rcdir, "bug_address");
 		if ((fp = fopen (nam, "r")) != (FILE *) 0) {
-			if (fgets (bug_addr, sizeof (bug_addr), fp) != (char *) 0) {
+			if (fgets (bug_addr, (int) sizeof (bug_addr), fp) != (char *) 0) {
 				ptr = strrchr (bug_addr, '\n');
 				if (ptr != (char *) 0)
 					*ptr = '\0';
@@ -1011,7 +1013,7 @@ set_up_private_index_cache (void)
 	}
 	*to = 0;
 	if (stat (index_newsdir, &sb) == -1)
-		my_mkdir (index_newsdir, S_IRWXUGO);
+		my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 #ifdef DEBUG
 	debug_nntp ("set_up_private_index_cache", index_newsdir);
 #endif
@@ -1037,7 +1039,7 @@ int create_mail_save_dirs (void)
 		joinpath (path, homedir, DEFAULT_MAILDIR);
 	}
 	if (stat (path, &sb) == -1) {
-		my_mkdir (path, (S_IRWXU|S_IRUGO|S_IXUGO));
+		my_mkdir (path, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;
 	}
 
@@ -1046,11 +1048,11 @@ int create_mail_save_dirs (void)
 		joinpath (path, homedir, DEFAULT_SAVEDIR);
 	}
 	if (stat (path, &sb) == -1) {
-		my_mkdir (path, (S_IRWXU|S_IRUGO|S_IXUGO));
+		my_mkdir (path, (mode_t)(S_IRWXU|S_IRUGO|S_IXUGO));
 		created = TRUE;
 	}
 
-#endif	/* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 	return (created);
 }
@@ -1066,29 +1068,24 @@ int create_mail_save_dirs (void)
  */
 static int read_site_config (void)
 {
-	FILE *fp;
+	FILE *fp = (FILE *)0;
 	char buf[LEN];
 	static const char *tin_defaults[] = { TIN_DEFAULTS };
 	int i = 0;
-	struct stat sb;
 
 	/*
 	 * try to find tin.defaults in some different locations
 	 */
-	while (tin_defaults[i] != NULL && i >= 0) {
-		sprintf(buf, "%s/tin.defaults", tin_defaults[i]);
-		if (stat(buf, &sb) < 0)
-			i++;	/* no, skip to next one */
-		else
-			i = -1;	/* we found it */
+	while (tin_defaults[i] != NULL) {
+		sprintf(buf, "%s/tin.defaults", tin_defaults[i++]);
+		if ((fp = fopen(buf, "r")) != NULL)
+			break;
 	}
-
-	if (i != -1)
-		return -1;
-	if ((fp = fopen(buf, "r")) == NULL)
+		
+	if (!fp)
 		return -1;
 
-	while (fgets(buf, sizeof(buf), fp)) {
+	while (fgets(buf, (int) sizeof(buf), fp)) {
 		/* ignore comments */
 		if (*buf == '#' || *buf == ';' || *buf == ' ')
 			continue;

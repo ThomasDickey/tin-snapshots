@@ -78,7 +78,7 @@ find_group_index (
 	const char *group)
 {
 	int i;
-	long h;
+	unsigned long h;
 
 	h = hash_groupname (group);
 	i = group_hash[h];
@@ -120,7 +120,7 @@ struct t_group *
 psGrpAdd (
 	char *group)
 {
-	long h;
+	unsigned long h;
 	int i;
 
 	if (num_active >= max_active)		/* Grow memory area if needed */
@@ -131,8 +131,7 @@ psGrpAdd (
 	if (group_hash[h] == -1)
 		group_hash[h] = num_active;
 	else {	/* hash linked list chaining */
-
-		for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
+		for (i = group_hash[h]; active[i].next >= 0; i = active[i].next) {
 			if (STRCMPEQ(active[i].name, group))
 				return(NULL);			/* kill dups */
 		}

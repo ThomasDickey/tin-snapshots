@@ -33,6 +33,8 @@
 #define CTRL_R	'\022'
 #define CTRL_N	'\016'
 #define CTRL_P	'\020'
+#define CTRL_U	'\025'
+#define CTRL_W	'\027'
 #define TAB	'\t'
 #define DEL	'\177'
 
@@ -52,13 +54,14 @@ static int gl_tab (char *buf, int offset, int *loc);
 static void gl_redraw (void);
 static void gl_newline (int w);
 static void gl_kill (void);
+static void gl_kill_back_word (void);
 static void hist_add (int w);
 static void hist_next (int w);
 static void hist_prev (int w);
 
-int (*gl_in_hook) (char *) = 0;
-int (*gl_out_hook) (char *) = 0;
-int (*gl_tab_hook) (char *, int, int *) = gl_tab;
+static int (*gl_in_hook) (char *) = 0;
+static int (*gl_out_hook) (char *) = 0;
+static int (*gl_tab_hook) (char *, int, int *) = gl_tab;
 
 char *
 tin_getline (
@@ -189,6 +192,12 @@ tin_getline (
 							gl_fixup (loc, tmp);
 					}
 					break;
+				case CTRL_W:
+					gl_kill_back_word ();
+					break;
+				case CTRL_U:
+					gl_fixup (-1, 0);
+					/* FALLTHROUGH */
 				case CTRL_K:
 					gl_kill ();
 					break;
@@ -292,6 +301,35 @@ gl_kill (void)
 	if (gl_pos < gl_cnt) {
 		gl_buf[gl_pos] = '\0';
 		gl_fixup (gl_pos, gl_pos);
+	} else {
+		ring_bell ();
+	}
+}
+
+/*
+ * delete from the start of current or last word to current position
+ */
+
+static void
+gl_kill_back_word ()
+{
+	int i, cur;
+
+	/* delete spaces */
+	for (i = gl_pos - 1; i >= 0 && isspace(gl_buf[i]); --i)
+		;
+	/* delete not alnum characters but graph characters */
+	for (; i >= 0 && isgraph(gl_buf[i]) && !isalnum(gl_buf[i]); --i)
+		;
+	/* delete all graph characters except '/' */
+	for (; i >= 0 && gl_buf[i] != '/' && isgraph(gl_buf[i]); --i)
+		;
+	i++;
+	if (i != gl_pos) {
+		cur = gl_pos;
+		gl_fixup (-1, i);
+		strcpy (&gl_buf[i], &gl_buf[cur]);
+		gl_fixup (i, i);
 	} else {
 		ring_bell ();
 	}

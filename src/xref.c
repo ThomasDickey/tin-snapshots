@@ -23,21 +23,22 @@
 #	define BIT_AND(n, b, mask)	n[NOFFSET(b)] &= mask
 #endif /* USE_DBMALLOC */
 
-static void read_xref_header (struct t_article *art);
+#ifdef NNTP_ABLE
+#	ifdef XHDR_XREF
+		static void read_xref_header (struct t_article *art);
+#	endif /* XHDR_XREF */
+#endif /* NNTP_ABLE */
+
 
 /*
  *  Read NEWSLIBDIR/overview.fmt file to check if Xref:full is enabled/disabled
- *  Note: if the file cannot be found set the default Xref supported to TRUE
  */
-
-int
+t_bool
 overview_xref_support (void)
 {
-	char buf[HEADER_LEN];
 	FILE *fp;
-	int supported;
-
-	supported = FALSE;
+	char buf[HEADER_LEN];
+	t_bool supported = FALSE;
 
 	if ((fp = open_overview_fmt_fp ()) != (FILE *) 0) {
 		while ((tin_fgets (buf, sizeof (buf), fp)) != (char *) 0) {
@@ -50,7 +51,8 @@ overview_xref_support (void)
 			}
 		}
 		TIN_FCLOSE (fp);
-		/* If user aborted with 'q', then we continue regardless. If Xref was
+		/*
+		 * If user aborted with 'q', then we continue regardless. If Xref was
 		 * found, then fair enough. If not, tough. No real harm done
 		 */
 	}
@@ -66,21 +68,23 @@ overview_xref_support (void)
  * This enables crosspost marking even if the xref records are not
  * part of the xover record.
  */
-static void
-read_xref_header (struct t_article *art)
-{
 #ifdef NNTP_ABLE
+#	ifdef XHDR_XREF
+static void
+read_xref_header (
+	struct t_article *art)
+{
 	/* xref_supported means already supported in xover record */
 	if (!xref_supported && read_news_via_nntp && art && !art->xref) {
-		char buf[HEADER_LEN];
 		char *ptr, *q;
+		char buf[HEADER_LEN];
 		long artnum = 0;
 
-		sprintf(buf, "xhdr xref %ld", art->artnum);
+		sprintf(buf, "XHDR XREF %ld", art->artnum);
 		put_server (buf);
 		if (get_respcode (NULL) != OK_HEAD)
 			return;
-		while (tin_fgets (buf, sizeof (buf)-1, (FILE*)nntp_rd_fp)) {
+		while (tin_fgets (buf, sizeof (buf) -1, (FILE *) nntp_rd_fp)) {
 			ptr = buf;
 			while (*ptr && isspace(*ptr))
 				ptr++;
@@ -105,15 +109,16 @@ read_xref_header (struct t_article *art)
 		}
 
 	}
-#endif
 	return;
 }
+#	endif /* XHDR_XREF */
+#endif /* NNTP_ABLE */
+
 
 /*
  *  mark all other Xref: crossposted articles as read when one article read
  *  Xref: sitename newsgroup:artnum newsgroup:artnum [newsgroup:artnum ...]
  */
-
 void
 art_mark_xref_read (
 	struct t_article *art)
@@ -125,10 +130,15 @@ art_mark_xref_read (
 	long artnum;
 	struct t_group *psGrp;
 
+#ifdef NNTP_ABLE
+#	ifdef XHDR_XREF
 	read_xref_header (art);
+#	endif /* XHDR_XREF */
+#endif /* NNTP_ABLE */
 
-	if (art->xref == '\0')
+	if (art->xref == (char *) 0)
 		return;
+
 	xref_ptr = art->xref;
 
 	/*
@@ -153,14 +163,14 @@ art_mark_xref_read (
 
 		ptr = xref_ptr++;
 		artnum = atol (xref_ptr);
-		while (*xref_ptr >= '0' && *xref_ptr <= '9')
+		while (isdigit(*xref_ptr))
 			xref_ptr++;
 
 		if (&ptr[1] == xref_ptr)
 			break;
 
 		c = *ptr;
-		*ptr = 0;
+		*ptr = '\0';
 
 		psGrp = psGrpFind (group);
 
@@ -170,10 +180,10 @@ art_mark_xref_read (
 				group, artnum,
 				(psGrp ? psGrp->name : ""),
 				(psGrp ? psGrp->newsrc.num_unread : 0));
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 			debug_print_comment (msg);
 			debug_print_bitmap (psGrp, NULL);
-#endif
+#	endif /* DEBUG_NEWSRC */
 			error_message (msg);
 		}
 #endif /* DEBUG */
@@ -189,10 +199,10 @@ art_mark_xref_read (
 					if (debug == 3) {
 						sprintf (msg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
 							group, artnum, psGrp->newsrc.num_unread);
-#ifdef DEBUG_NEWSRC
+#	ifdef DEBUG_NEWSRC
 						debug_print_comment (msg);
 						debug_print_bitmap (psGrp, NULL);
-#endif
+#	endif /* DEBUG_NEWSRC */
 						wait_message (2, msg);
 					}
 #endif /* DEBUG */
@@ -202,6 +212,7 @@ art_mark_xref_read (
 		*ptr = c;
 	}
 }
+
 
 /*
  * Set bits [low..high] of 'bitmap' to 1's
@@ -221,14 +232,14 @@ NSETRNG1 (
 
 	if (high >= low) {
 		if (NOFFSET(high) == NOFFSET(low)) {
-			for (i=low; i <= high; i++) {
+			for (i = low; i <= high; i++) {
 				NSET1(bitmap, i);
 			}
 		} else {
 			BIT_OR(bitmap, low, (NBITSON << NBITIDX(low)));
 			if (NOFFSET(high) > NOFFSET(low) + 1) {
 				memset (&bitmap[NOFFSET(low) + 1], NBITSON,
-					(size_t) (NOFFSET(high)-NOFFSET(low)-1));
+					(size_t) (NOFFSET(high) - NOFFSET(low) - 1));
 			}
 			BIT_OR(bitmap, high, ~ (NBITNEG1 << NBITIDX(high)));
 		}
@@ -253,7 +264,7 @@ NSETRNG0 (
 
 	if (high >= low) {
 		if (NOFFSET(high) == NOFFSET(low)) {
-			for (i=low; i <= high; i++) {
+			for (i = low; i <= high; i++) {
 				NSET0(bitmap, i);
 			}
 		} else {
@@ -261,7 +272,7 @@ NSETRNG0 (
 
 			if (NOFFSET(high) > NOFFSET(low) + 1) {
 				memset (&bitmap[NOFFSET(low) + 1], 0,
-					(size_t) (NOFFSET(high)-NOFFSET(low)-1));
+					(size_t) (NOFFSET(high) - NOFFSET(low) - 1));
 			}
 			BIT_AND(bitmap, high, NBITNEG1 << NBITIDX(high));
 		}

@@ -146,7 +146,7 @@ main (
 #ifdef DEBUG_NEWSRC
 	unlink ("/tmp/BITMAP");
 /*	vNewsrcTestHarness ();*/
-#endif
+#endif /* DEBUG_NEWSRC */
 
 	/*
 	 *  Read input history
@@ -154,7 +154,7 @@ main (
 #ifndef INDEX_DAEMON
 	if (!batch_mode)
 		read_input_history_file ();
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 #ifdef WIN32
 	/*
@@ -164,7 +164,7 @@ main (
 		error_message (txt_screen_init_failed, progname);
 		exit (EXIT_ERROR);
 	}
-#endif
+#endif /* WIN32 */
 
 	/*
 	 *  Load the mail & news active files into active[]
@@ -174,7 +174,7 @@ main (
 	}
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mail_active_file ();
-#endif
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 	/*
 	 * Initialise active[] and add new newsgroups to start of my_group[]
@@ -183,14 +183,15 @@ main (
 	read_news_active_file ();
 #ifdef DEBUG
 	debug_print_active();
-#endif
+#endif /* DEBUG */
 
 	/*
 	 *  Load the local & global group specific attribute files
 	 */
+#ifndef INDEX_DAEMON
 	read_attributes_file (global_attributes_file, TRUE);
 	read_attributes_file (local_attributes_file, FALSE);
-
+#endif /* !INDEX_DAEMON */
 	/*
 	 *  Read in users filter preferences file
 	 *  This has to be done before quick post
@@ -205,7 +206,7 @@ main (
 #endif /* !INDEX_DAEMON */
 #ifdef DEBUG
 	debug_print_filters ();
-#endif
+#endif /* DEBUG */
 
 	/*
 	 *  Quick post an article & exit if -w specified
@@ -214,15 +215,15 @@ main (
 	if (post_article_and_exit || post_postponed_and_exit) {
 		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_print_filters ();
-#endif
+#	endif /* DEBUG */
 		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_OK);
 	}
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
-	if((count=count_postponed_articles()))
+	if((count = count_postponed_articles()))
 		wait_message(3, txt_info_postponed, count, IS_PLURAL(count));
 
 	/*
@@ -230,7 +231,7 @@ main (
 	 */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
-#endif
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 	read_newsgroups_file ();
 
 	if (create_mail_save_dirs ())
@@ -302,7 +303,7 @@ main (
 		error_message (txt_screen_init_failed, progname);
 		exit (EXIT_ERROR);
 	}
-#endif
+#endif /* !WIN32 */
 
 	/*
 	 *  Set up screen and switch to raw mode, set default attributes
@@ -334,12 +335,12 @@ main (
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
 #		define OPTIONS "acCdD:f:g:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
-#	else /* M_AMIGA */ /* may need some work */
+#	else
 #		define OPTIONS "BcCdD:f:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
-#	endif
-#else /* INDEX_DAEMON */
+#	endif /* M_AMIGA */
+#else
 #	define OPTIONS "dD:f:hI:PvV"
-#endif
+#endif /* !INDEX_DAEMON */
 
 static void
 read_cmd_line_options (
@@ -363,7 +364,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#		endif
+#		endif /* HAVE_COLOR */
 				break;
 #	else
 			case 'B':
@@ -398,7 +399,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#endif
+#endif /* DEBUG */
 				break;
 
 			case 'f':	/* active (tind) / newsrc (tin) file */
@@ -407,7 +408,7 @@ read_cmd_line_options (
 #else
 				my_strncpy (newsrc, optarg, sizeof (newsrc));
 				newsrc_set = 1;
-#endif
+#endif /* INDEX_DAEMON */
 				break;
 
 #ifndef INDEX_DAEMON
@@ -421,7 +422,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#		endif
+#		endif /* NNTP_ABLE */
 				break;
 #	endif /* !M_AMIGA */
 
@@ -435,13 +436,13 @@ read_cmd_line_options (
 			case 'I':
 #ifndef NNTP_ONLY
 				my_strncpy (index_newsdir, optarg, sizeof (index_newsdir));
-				my_mkdir (index_newsdir, S_IRWXUGO);
+				my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#endif
+#endif /* !NNTP_ONLY */
 				break;
 
 #ifndef INDEX_DAEMON
@@ -455,15 +456,16 @@ read_cmd_line_options (
 				batch_mode = TRUE;
 				break;
 
-			case 'n':
+			case 'n': /* implies -r */
 #	ifdef NNTP_ABLE
 				newsrc_active = TRUE;
+				read_news_via_nntp = TRUE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#	endif
+#	endif /* NNTP_ABLE */
 				break;
 
 			case 'N':	/* mail new news to your posts */
@@ -481,12 +483,13 @@ read_cmd_line_options (
 				break;
 #endif /* !INDEX_DAEMON */
 
-#ifdef	NNTP_ABLE
-			case 'p':
+#ifdef NNTP_ABLE
+			case 'p': /* implies -r */
+				read_news_via_nntp = TRUE;
 				if (atoi(optarg) != 0)
 					nntp_tcp_port = (unsigned short) atoi(optarg);
 				break;
-#endif
+#endif /* NNTP_ABLE */
 
 #ifndef INDEX_DAEMON
 			case 'q':
@@ -496,7 +499,7 @@ read_cmd_line_options (
 			case 'Q':
 #	ifdef NNTP_ABLE
 				newsrc_active = TRUE;
-#	endif
+#	endif /* NNTP_ABLE */
 				check_for_new_newsgroups = FALSE;
 				show_description = FALSE;
 				break;
@@ -509,7 +512,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#	endif
+#	endif /* NNTP_ABLE */
 				break;
 
 			case 'R':	/* read news saved by -S option */
@@ -535,7 +538,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#	endif
+#	endif /* !NNTP_ONLY */
 				break;
 
 			case 'U':	/* update index files in background */
@@ -547,7 +550,7 @@ read_cmd_line_options (
 				exit (EXIT_ERROR);
 				/* keep lint quiet: */
 				/* NOTREACHED */
-#	endif
+#	endif /* !NNTP_ONLY */
 				break;
 
 #endif /* !INDEX_DAEMON */
@@ -563,7 +566,7 @@ read_cmd_line_options (
 #else
 				error_message ("Version: %s release %s",
 					VERSION, RELEASEDATE);
-#endif
+#endif /* __DATE__  && __TIME__ */
 				exit (EXIT_OK);
 				/* keep lint quiet: */
 				/* FALLTHROUGH */
@@ -602,17 +605,17 @@ read_cmd_line_options (
 		else {
 #if defined(HAVE_SYS_UTSNAME_H) && defined(HAVE_UNAME)
 			struct utsname uts;
-			(int) uname(&uts);
+			(void) uname(&uts);
 			get_newsrcname(newsrc, uts.nodename);
-#else	/* NeXT, Apollo */
+#else
 			char nodenamebuf[32];
 #	if defined(M_AMIGA)
 			my_strncpy (nodenamebuf, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (nodenamebuf));
-#	else
-			(int) gethostname(nodenamebuf, sizeof(nodenamebuf));
-#	endif
+#	else /* NeXT, Apollo */
+			(void) gethostname(nodenamebuf, sizeof(nodenamebuf));
+#	endif /* M_AMIGA */
 			get_newsrcname(newsrc, nodenamebuf);
-#endif
+#endif /* HAVE_SYS_UTSNAME_H && HAVE_UNAME */
 		}
 	}
 
@@ -793,6 +796,7 @@ save_or_mail_new_news (void)
 	}
 }
 
+
 /*
  *  update index files
  */
@@ -801,6 +805,7 @@ update_index_files (void)
 {
 	if (batch_mode || update_fork) {
 		if (!catchup && (read_news_via_nntp && xover_supported)) {
+			/* FIXME: -> lang.c */
 			error_message ("%s: Updating of index files not supported", progname);
 			tin_done (EXIT_ERROR);
 		}
@@ -812,12 +817,13 @@ update_index_files (void)
 			verbose = FALSE;
 			switch ((int) fork ()) {		/* fork child to update indexes in background */
 				case -1:			/* error forking */
+					/* FIXME: -> lang.c */
 					perror_message ("Failed to start background indexing process");
 					break;
 				case 0:				/* child process */
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
-#		ifdef BSD
+#		if defined(BSD) /* FIXME: check for setsid/setpgid/... and remove OS depending ifdefs */
 #			if defined(__FreeBSD__) || defined(__NetBSD__)
 					setsid();
 #			else
@@ -838,8 +844,12 @@ update_index_files (void)
 #				endif /* TIOCNOTTY */
 #			endif /* __FreeBSD__ || __NetBSD__ */
 #		else
-#			ifdef HAVE_SETPGRP /* who defines this? */
-					setpgrp ();
+#			ifdef HAVE_SETPGRP
+#					ifdef SETPGRP_VOID
+						setpgrp ();
+#					else
+						setpgrp (0, process_id);
+#					endif /* SETPGRP_VOID */
 					signal (SIGHUP, SIG_IGN);	/* make immune from process group leader death */
 #			endif /* HAVE_SETPGRP */
 #		endif /* BSD */
@@ -905,10 +915,10 @@ read_cmd_line_groups (void)
 	if (num_cmdargs < max_cmdargs) {
 		group_top = skip_newgroups();		/* Reposition after any newgroups */
 
-		for (num = num_cmdargs ; num < max_cmdargs ; num++) {
+		for (num = num_cmdargs; num < max_cmdargs; num++) {
 			wait_message (0, txt_matching_cmd_line_groups, cmdargs[num]);
 
-			for (i = 0 ; i < num_active ; i++) {
+			for (i = 0; i < num_active; i++) {
 				if (match_group_list (active[i].name, cmdargs[num])) {
 					if (my_group_add (active[i].name) != -1)
 						matched++;

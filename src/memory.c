@@ -139,12 +139,12 @@ init_screen_array (
 		screen = (struct t_screen *) my_malloc (
 			sizeof (struct t_screen) * cLINES+1);
 
-		for (i=0 ; i < cLINES ; i++)
-			screen[i].col = (char *) my_malloc (cCOLS+2);
+		for (i = 0; i < cLINES; i++)
+			screen[i].col = (char *) my_malloc ((size_t)(cCOLS+2));
 
 	} else {
 		if (screen != (struct t_screen *) 0) {
-			for (i=0 ; i < cLINES ; i++)
+			for (i = 0; i < cLINES; i++)
 				FreeAndNull(screen[i].col);
 
 			free ((char *) screen);
@@ -204,7 +204,7 @@ free_art_array (void)
 {
 	register int i;
 
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		arts[i].artnum = 0L;
 		arts[i].thread = ART_EXPIRED;
 		arts[i].inthread = FALSE;
@@ -219,8 +219,8 @@ free_art_array (void)
 		FreeAndNull(arts[i].xref);
 
 		/* .refs & .msgid are cleared in build_references() */
-		arts[i].refs = '\0';
-		arts[i].msgid = '\0';
+		arts[i].refs = (char *) '\0';
+		arts[i].msgid = (char *) '\0';
 	}
 }
 
@@ -231,7 +231,7 @@ free_attributes_array (void)
 	register int i;
 	struct t_group *psGrp;
 
-	for (i = 0 ; i < num_active ; i++) {
+	for (i = 0; i < num_active; i++) {
 		psGrp = &active[i];
 		if (psGrp->attribute && !psGrp->attribute->global) {
 			if (psGrp->attribute->maildir != (char *) 0 &&
@@ -282,7 +282,7 @@ free_active_arrays (void)
 	}
 
 	if (active != (struct t_group *) 0) {		/* active[] */
-		for (i=0 ; i < num_active ; i++) {
+		for (i = 0; i < num_active; i++) {
 
 			FreeAndNull(active[i].name);
 			FreeAndNull(active[i].description);
@@ -314,7 +314,7 @@ free_save_array (void)
 {
 	int i;
 
-	for (i=0 ; i < num_save ; i++) {
+	for (i = 0; i < num_save; i++) {
 
 		FreeAndNull(save[i].subject);
 		FreeAndNull(save[i].archive);
@@ -336,7 +336,7 @@ free_newnews_array (void)
 {
 	int i;
 
-	for (i=0 ; i < num_newnews ; i++)
+	for (i = 0; i < num_newnews; i++)
 		FreeAndNull(newnews[i].host);
 
 	num_newnews = 0;
@@ -355,12 +355,8 @@ my_malloc1 (
 	vDbgPrintMalloc (TRUE, file, line, size);
 #endif
 
-	if ((p = (char *) malloc (size)) == NULL) {
-
+	if ((p = (char *) malloc (size)) == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);
-
-/*		vPrintBugAddress (); */
-/*		tin_done (1); */
 		exit (1);
 	}
 	return (void *) p;
@@ -383,8 +379,6 @@ my_realloc1 (
 
 	if (p == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);
-/*		vPrintBugAddress (); */
-/*		tin_done (1); */
 		exit (1);
 	}
 	return (void *) p;

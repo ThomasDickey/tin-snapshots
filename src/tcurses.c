@@ -3,7 +3,7 @@
  *  Module    : tcurses.c
  *  Author    : Thomas Dickey <dickey@clark.net>
  *  Created   : 1997-03-02
- *  Updated   : 1997-12-31
+ *  Updated   : 1998-04-21
  *  Notes     : This is a set of wrapper functions adapting the termcap
  *	             interface of tin to use SVr4 curses (e.g., ncurses).
  * Copyright :  (c) Copyright 1997-98 by Thomas Dickey
@@ -72,7 +72,7 @@ int InitScreen (void)
 		}
 #endif
 	} else {
-		use_color = 0;
+		use_color = FALSE;
 	}
 
 	postinit_colors();
@@ -145,13 +145,13 @@ void StartInverse(void)
 static int isInverse(void)
 {
 	if (use_color) {
-		short pair = PAIR_NUMBER(attr_get());
+		short pair = PAIR_NUMBER(getattrs(stdscr));
 		short fg, bg;
 		pair_content(pair, &fg, &bg);
 		return (fg == col_invers_fg) && (bg == col_invers_bg);
 	}
 
-	return (attr_get() & A_REVERSE);
+	return (getattrs(stdscr) & A_REVERSE);
 }
 
 /*
@@ -259,7 +259,7 @@ my_printf(const char *fmt, ...)
 		if (flag)
 			Raw(TRUE);
 	} else {
-		vwprintw(stdscr, fmt, ap);
+		vwprintw(stdscr, (char *)fmt, ap);
 	}
 	va_end(ap);
 }
@@ -278,7 +278,7 @@ my_fprintf(FILE *stream, const char *fmt, ...)
 		if (flag)
 			Raw(TRUE);
 	} else {
-		vwprintw(stdscr, fmt, ap);
+		vwprintw(stdscr, (char *)fmt, ap);
 	}
 	va_end(ap);
 }

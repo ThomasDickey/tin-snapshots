@@ -298,7 +298,7 @@ constext *help_page[] = {
 
 
 static int
-	ReadHelpCh (void)
+ReadHelpCh (void)
 {
 	int ch = ReadCh ();
 
@@ -380,10 +380,10 @@ show_info_page (
 	 *  find how many elements in array
 	 */
 	if (type == HELP_INFO) {
-		for (max_line=0 ; help[max_line] ; max_line++)
+		for (max_line = 0; help[max_line]; max_line++)
 			continue;
 	} else {
-		for (max_line=0 ; posted[max_line].date[0] ; max_line++) {
+		for (max_line = 0; posted[max_line].date[0]; max_line++) {
 			len = strlen (posted[max_line].group);
 			if (len > group_len)
 				group_len = len;
@@ -400,7 +400,11 @@ show_info_page (
 #endif
 	forever {
 		if (cur_page != old_page)
+#ifdef USE_CURSES
 			display_info_page (FALSE);
+#else
+			display_info_page();
+#endif /* USE_CURSES */
 
 		old_page = cur_page;
 
@@ -478,7 +482,13 @@ show_info_page (
 
 
 void
-display_info_page (t_bool first)
+display_info_page (
+#ifdef USE_CURSES
+	t_bool first
+#else
+	void
+#endif /* USE_CURSES */
+)
 {
 	char buf[LEN];
 	int i, help_lines;
@@ -497,10 +507,10 @@ display_info_page (t_bool first)
 	help_lines = (beginner_level ? (NOTESLINES + MINI_HELP_LINES - 1) : NOTESLINES);
 
 	if (info_type == HELP_INFO) {
-		for (i=pos_help ; i < (pos_help + help_lines) && info_help[i] ; i++)
+		for (i = pos_help; i < (pos_help + help_lines) && info_help[i]; i++)
 			my_fputs (info_help[i], stdout);
 	} else {
-		for (i=pos_help ; i < (pos_help + help_lines) && posted[i].date[0] ; i++) {
+		for (i = pos_help; i < (pos_help + help_lines) && posted[i].date[0]; i++) {
 			sprintf (buf, "%8s  %c  %-*s  %s",
 				posted[i].date, posted[i].action,
 				group_len, posted[i].group, posted[i].subj);

@@ -12,8 +12,8 @@ X-Note: This is an updated and revised descendant of Ron Newman's GNKSA 1.2
 
 Archive-name: usenet/software/good-netkeeping-seal
 Posting-Frequency: monthly (first Sunday)
-Last-modified: 1998/03/12
-Version: 2.02
+Last-modified: 1998/06/01
+Version: 2.04
 URL: <http://www.xs4all.nl/%7Ejs/gnksa/>
 Maintainer: Jeroen Scheerder <js@xs4all.nl>
 
@@ -227,7 +227,7 @@ Rationale: Topics drift as a discussion progresses, and users need the
 ability to change the Subject header to reflect the drift. Similarly, a
 user may determine that the discussion no longer belongs in some of the
 places that it started, or that its continuation needs to go elsewhere.
- The software must not impede the user's ability to make these
+The software must not impede the user's ability to make these
 judgments, possibly during the composition of her followup article.
 It's not acceptable to have users who respond to "Please direct
 followups appropriately" with "I can't; the software won't let me."
@@ -335,8 +335,8 @@ Rationale: See #6 above.
 
 9) Allow the user to change her mind about whether to post or mail
 
-With any followup or reply message, the software MUST offer the user the
-option to change her mind about whether to post or to mail, and may
+With any followup or reply message, the software SHOULD offer the user
+the option to change her mind about whether to post or to mail, and may
 allow doing both.
 
 If the software has the option to post as well as mail a single
@@ -357,7 +357,7 @@ requested them).
 
 10) Provide adequate quotation and attribution facilities
 
-When the users requests a followup or an e-mail reply, the software MUST
+When the user requests a followup or an e-mail reply, the software MUST
 provide some method for including quoted text from the original article.
 This quoted text MUST be clearly set off in some way -- either by
 indenting it, or by prepending each line with one or more identifiable
@@ -384,8 +384,7 @@ signature.)
 
 If it concerns a followup (as opposed to an e-mail reply), the quoted
 text MUST be preceded by an "attribution line" identifying the author of
-the text that is being quoted, and preferably also the Message-ID of the
-article containing that text.  (The user may decide to delete this
+the text that is being quoted.  (The user may decide to delete this
 attribution line or to configure it away, but it MUST be there by
 default.)
 
@@ -633,11 +632,10 @@ engage in flame warfare, all of which is harmful to other users.
 19) Be kind to servers, leave room for others
 
 Reading or posting software MUST NOT put excessive demands on news
-server unnecessarily.  Spurious connects and unnecessary traffic MUST be
-avoided; the software MUST use as few as possible, and never more than
-four, simultaneous connections.  Also, it MUST NOT open consecutive
-connections unnecessarily: once open, existing connections should be
-reused whenever possible.
+servers unnecessarily.  The sofware MUST limit itself to 4 simultaneous
+connections to a given server.  Spurious connects and unnecessary
+traffic MUST be avoided; the software MUST use as few as possible
+connections, reusing existing connections whenever possible.
 
 Rationale: News systems are big, resources are scarce, and every
 resource claimed is provided at the expense of other users.
@@ -759,10 +757,10 @@ good net keeping in the form of well-designed usenet reading programs.
 Version: 2.6.3i
 Charset: noconv
 
-iQCVAwUBNQfOnihIY6bIQPMpAQHmxwP/VEHg4gD5cyhxtSxlBkEkmx46ozTyLci0
-D2ql1zInDKYQ9Jp5UG/7a6FwpOPXpIKwv+2jISZhjBaczsUjgsXDDRR/9r5XG1bZ
-3ppBl2gV3P7MqRODDdxLcdgGHZf5kejpjhIhofHVcTgkZ6wkrDyeL0+QGTEYIAuM
-Kf5JV0dFq/Q=
-=xSTP
+iQCVAwUBNXKejChIY6bIQPMpAQGOcwP+JtSmGhld/4wkVxucYgHLE24bdw5liclp
+vaOmUvkLHMjYaAXrkbfMELx9CWlJLSh1VhhdjuTx9ghUTAvx3FMrSRy4frdq8DaG
+te0zHdgUMuUSgwuB8IPinlDreG66WhNctZNUUbXE1i9+S5x8/xZLyF2nh3fwXVTG
+QZCoNsMLJ+Y=
+=w4CF
 -----END PGP SIGNATURE-----
 

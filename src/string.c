@@ -65,22 +65,19 @@ tin_ltoa (
 char *my_strdup (
 	const char *str)
 {
-	char *duplicate = (char *) 0;
+	size_t len = strlen (str) + 1;
+	void *new = my_malloc (len);
 
-	if (str != (char *) 0) {
-		duplicate = (char *) my_malloc (strlen (str)+1);
-/*		duplicate[strlen(str)+1]= '\0';*/
-		strcpy (duplicate, str);
-	}
-	return duplicate;
+	if (new == NULL)
+		return NULL;
+
+	return (char *) memcpy (new, str, len);
 }
-
 
 
 /*
  *  strncpy that stops at a newline and null terminates
  */
-
 void
 my_strncpy (
 	char *p,
@@ -388,14 +385,15 @@ strncasecmp(
 	const char *q,
 	size_t n)
 {
-	int r=0;
+	int r = 0;
 	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0; ++p, ++q, --n) {
 		if (*p == '\0')
-			return (0);
+			return 0;
 	}
 	return n ? r : 0;
 }
 #endif
+
 
 /*
  * str_trim - substitute multiple white spaces with one space
@@ -416,14 +414,13 @@ str_trim(
 	int	ws = 1;	/* white space flag */
 
 	/* loop over string */
-	for (wp=rp=string; *rp; rp++) {
+	for (wp = rp = string; *rp; rp++) {
 
 	/* is it a white space? */
-		if (*rp==' ' || *rp=='\t' || *rp=='\n' || *rp=='\r') {
+		if (*rp == ' ' || *rp == '\t' || *rp == '\n' || *rp == '\r') {
 
 			/* was the last character not a white space? */
-			if (ws==0) {
-
+			if (ws == 0) {
 				/* store a blank */
 				*wp++ = ' ';
 				ws = 1;
@@ -438,10 +435,38 @@ str_trim(
 	if (ws)
 		wp--;
 
-	*wp = 0;
+	*wp = '\0';
 
-	return(string);
+	return (string);
 }
+
+
+/*
+ *  Return a pointer into s eliminating any TAB, CR and LF.
+ */
+char *
+eat_tab (
+	char *s)
+{
+	char *p1 = s;
+	char *p2 = s;
+
+	while (*p1) {
+		if (*p1 == '\t' || *p1 == '\r' || *p1 == '\n') {
+			p1++;
+		} else if (p1 != p2) {
+			*p2++ = *p1++;
+		} else {
+			p1++;
+			p2++;
+		}
+	}
+	if (p1 != p2)
+		*p2 = '\0';
+
+	return s;
+}
+
 
 /*
  * Format a shell command, escaping blanks and other awkward characters that
@@ -555,23 +580,23 @@ sh_format (char *dst,
 #			ifndef sys_errlist
 				extern char *__sys_errlist[];
 #				define sys_errlist	__sys_errlist
-#			endif
+#			endif /* !sys_errlist */
 #		else
-#			ifdef DECL_SYS_ERRLIST
+#			ifndef DECL_SYS_ERRLIST
 				extern char *sys_errlist[];
-#			endif
-#		endif
+#			endif /* !DECL_SYS_ERRLIST */
+#		endif /* M_AMIGA */
 		extern int sys_nerr;
-#	endif
+#	endif /* HAVE_SYS_ERRLIST */
 
 char *
 my_strerror(int n)
 {
-	static char temp[20];
-#ifdef HAVE_SYS_ERRLIST
+	static char temp[32];
+#	ifdef HAVE_SYS_ERRLIST
 	if (n >= 0 && n < sys_nerr)
 		return sys_errlist[n];
-#endif
+#	endif /* HAVE_SYS_ERRLIST */
 	sprintf(temp, "Errno: %i", n);
 	return temp;
 }

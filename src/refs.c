@@ -51,12 +51,12 @@ static void build_thread (struct t_msgid *ptr);
 /*
  * Set if the the sorting algorithm goes 'upwards'
  */
-t_bool sort_ascend;
+static t_bool sort_ascend;
 
 /*
  * The msgids are all hashed into a big array, with overspill
  */
-struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
+static struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
 
 /*
  * This part of the code deals with the cacheing and retrieval
@@ -190,7 +190,7 @@ add_msgid(
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
 
-	DEBUG_PRINT((dbgfd, "---------------- Add %s %s with parent %s\n", (key==MSGID_REF)?"MSG":"REF", msgid, (newparent == NULL)?"unchanged":newparent->txt));
+	DEBUG_PRINT((dbgfd, "---------------- Add %s %s with parent %s\n", (key==MSGID_REF)?"MSG":"REF", msgid, (newparent == NULL) ? "unchanged" : newparent->txt));
 
 	/*
 	 * Look for this message id in the cache.
@@ -213,7 +213,7 @@ add_msgid(
 		 * CASE 1b - Parent not changed, do nothing
 		 */
 		if (newparent == i->parent) {
-			DEBUG_PRINT((dbgfd, "dup: %s -> %s (no change)\n", i->txt, (i->parent)?i->parent->txt:"NULL"));
+			DEBUG_PRINT((dbgfd, "dup: %s -> %s (no change)\n", i->txt, i->parent ? i->parent->txt : "NULL"));
 			return(i);
 		}
 
@@ -229,7 +229,7 @@ add_msgid(
 			 */
 			for (ptr = newparent; ptr != NULL; ptr = ptr->parent) {
 				if (ptr == i) {
-					DEBUG_PRINT((dbgfd, "Avoiding circular reference! (%s)\n", (key==MSGID_REF)?"MSG":"REF"));
+					DEBUG_PRINT((dbgfd, "Avoiding circular reference! (%s)\n", (key==MSGID_REF) ? "MSG" : "REF"));
 					return(i);
 				}
 			}
@@ -237,7 +237,7 @@ add_msgid(
 			i->parent = newparent;
 			add_to_parent(i);
 
-			DEBUG_PRINT((dbgfd, "set: %s -> %s\n", i->txt, (newparent)?newparent->txt:"None"));
+			DEBUG_PRINT((dbgfd, "set: %s -> %s\n", i->txt, newparent ? newparent->txt : "None"));
 			return(i);
 		}
 
@@ -250,8 +250,8 @@ add_msgid(
 		 */
 		if (i->parent != newparent) {
 			DEBUG_PRINT((dbgfd, "Warning: (%s) Ignoring %s -> %s (already %s)\n",
-				(key==MSGID_REF)?"MSG":"REF", i->txt,
-				(newparent)?newparent->txt:"None", i->parent->txt));
+				(key==MSGID_REF) ? "MSG" : "REF", i->txt,
+				newparent ? newparent->txt : "None", i->parent->txt));
 
 			return(i);
 		}
@@ -423,7 +423,7 @@ free_msgids(void)
 
 	msgptr = msgids;				/* first list */
 
-	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {	/* count down is faster */
+	for (i = MSGID_HASH_SIZE-1; i >= 0; i--) {	/* count down is faster */
 		ptr = *msgptr;
 		*msgptr++ = NULL;			/* declare list empty */
 
@@ -515,7 +515,7 @@ clear_art_ptrs(void)
 	int i;
 	struct t_msgid *ptr;
 
-	for (i = MSGID_HASH_SIZE-1; i >= 0 ; i--) {
+	for (i = MSGID_HASH_SIZE-1; i >= 0; i--) {
 		for (ptr = msgids[i]; ptr != NULL; ptr = ptr->next)
 			ptr->article = ART_UNAVAILABLE;
 	}
@@ -746,7 +746,7 @@ thread_by_reference(void)
 	fprintf(dbgfd, "Full dump of threading info...\n");
 	fprintf(dbgfd, "%3s %3s %3s %3s : %3s %3s\n", "#", "Par", "Sib", "Chd", "In", "Thd");
 
-	for (i=0 ; i < top ; i++) {
+	for (i = 0; i < top; i++) {
 		fprintf(dbgfd, "%3d %3d %3d %3d : %3d %3d : %.50s %s\n", i,
 			(arts[i].refptr->parent) ? arts[i].refptr->parent->article : -2,
 			(arts[i].refptr->sibling) ? arts[i].refptr->sibling->article : -2,

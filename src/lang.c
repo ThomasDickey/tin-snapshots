@@ -69,7 +69,7 @@ constext txt_cannot_post_group[] = "Posting is not allowed to %s";
 constext txt_cannot_write_index[] = "Can't write index %s";
 constext txt_cannot_write_to_directory[] = "%s is a directory";
 constext txt_catchup_all_read_groups[] = "Catchup all groups entered during this session? (y/n): ";
-constext txt_catchup_update_info[] = "%s %d group%s in %ld seconds\n";
+constext txt_catchup_update_info[] = "%s %d group%s in %lu seconds\n";
 constext txt_check_article[] = "Check Prepared Article";
 constext txt_checking_new_groups[] = "Checking for new groups...";
 constext txt_checking_for_news[] = "Checking for news...";
@@ -114,7 +114,6 @@ constext txt_end_of_thread[] = "*** End of thread ***";
 constext txt_enter_message_id[] = "Enter Message-ID to goto> ";
 constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
-constext txt_error_sender_in_header_not_allowed[] = "\nError on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
 constext txt_error_header_and_body_not_separate[] = "\nError: No blank line found after header.\n";
 constext txt_error_header_line_bad_charset[] = "\n\
 Error: Posting contains non-ASCII characters but MM_CHARSET is set to\n\
@@ -144,11 +143,15 @@ constext txt_error_header_line_missing_newsgroups[] = "\nError: the \"Newsgroups
 constext txt_error_header_line_missing_subject[] = "\nError: the \"Subject:\" line is missing from the articles header.\n";
 constext txt_error_header_line_missing_target[] = "\nError: the \"To:\" line is missing from the articles header.\n";
 constext txt_error_header_line_space[] = "\nError: Header on line %d does not have a space after the colon:\n%s\n";
+constext txt_error_no_domain_name[] ="Can't get a (fully-qualified) domain-name!\n";
 constext txt_error_no_enter_permission[] = "No permissions to go into %s\n";
 constext txt_error_no_read_permission[] = "No read permissions for %s\n";
 constext txt_error_no_such_file[] = "File %s does not exist\n";
 constext txt_error_no_write_permission[] = "No write permissions for %s\n";
-constext txt_error_metamail_failed[] = "metamail failed: %s";
+constext txt_error_sender_in_header_not_allowed[] = "\nError on line %d: \"Sender:\" header not allowed (it will be added for you)\n";
+#if defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON)
+	constext txt_error_metamail_failed[] = "metamail failed: %s";
+#endif /* defined(HAVE_METAMAIL) && !defined(INDEX_DAEMON) */
 constext txt_external_mail_done[] = "leaving external mail-reader";
 constext txt_extracting_archive[] = cCRLF cCRLF "Extracting %s archive..." cCRLF;
 constext txt_extracting_shar[] =cCRLF "Extracting %s..." cCRLF;
@@ -156,8 +159,6 @@ constext txt_failed_to_connect_to_server[] = "Failed to connect to NNTP server %
 constext txt_filesystem_full[] = "Error writing %s file. Filesystem full? File reset to previous state.";
 constext txt_filesystem_full_backup[] = "Error making backup of %s file. Filesystem full?";
 constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
-constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
-constext txt_warn_difficulties[] = "Okay, but you may run into difficulties later\n";
 constext txt_warn_update[] = "\n\nYou are upgrading to tin %s from an earlier version.\n\
 Some values in your configuration file have changed\nRead WHATSNEW, etc...\n";
 constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
@@ -166,9 +167,9 @@ constext txt_superseding_art[] = "Superseding article...";
 constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
 
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
-	constext txt_group[] = "Group %s ('q' to quit)... ";
+	constext txt_group[] = "Group %.*s ('q' to quit)... ";
 #else
-	constext txt_group[] = "Group %s... ";
+	constext txt_group[] = "Group %*s... ";
 #endif
 
 constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
@@ -435,8 +436,8 @@ constext txt_help_use_mailreader_i[] = "<SPACE> toggles, <CR> sets, <ESC> cancel
 	constext txt_help_use_metamail[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif
 
-constext txt_help_g_t_p_i[] ="i\t  toggle info message in last line (subject/description)" cCRLF;
-constext txt_help_s_i[] ="i\t  show description of chosen newsgroup" cCRLF;
+constext txt_help_g_t_p_i[] = "i\t  toggle info message in last line (subject/description)" cCRLF;
+constext txt_help_s_i[] = "i\t  show description of chosen newsgroup" cCRLF;
 constext txt_help_use_mouse[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_v[] = "v\t  show version information" cCRLF;
 constext txt_help_w[] = "w\t  post (write) article to current group" cCRLF;
@@ -523,7 +524,11 @@ constext txt_no[] = "No ";
 constext txt_no_arts[] = "*** No articles ***";
 constext txt_no_arts_posted[] = "No articles have been posted";
 constext txt_no_command[] = "No command";
-constext txt_no_colorterm[] = "Terminal does not support color";
+#ifdef HAVE_COLOR
+#	ifdef USE_CURSES
+		constext txt_no_colorterm[] = "Terminal does not support color";
+#	endif /* USE_CURSES */
+#endif /* HAVE_COLOR */
 constext txt_no_description[] = "*** No description ***";
 constext txt_no_filename[] = "No filename";
 constext txt_no_group[] = "No group";

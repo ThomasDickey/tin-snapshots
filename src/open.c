@@ -25,10 +25,10 @@ static int base_comp (t_comptype *p1, t_comptype *p2);
 long head_next;
 
 #ifdef NO_POSTING
-	int can_post = FALSE;
+	t_bool can_post = FALSE;
 #else
-	int can_post = TRUE;
-#endif
+	t_bool can_post = TRUE;
+#endif /* NO_POSTING */
 
 char *nntp_server = (char *)0;
 
@@ -52,9 +52,9 @@ nntp_open (void)
 	if (!read_news_via_nntp)
 		return 0;
 
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("nntp_open", "BEGIN");
-#endif
+#	endif /* DEBUG */
 
 	/* do this only once at start-up */
 	if (!is_reconnect)
@@ -73,9 +73,9 @@ nntp_open (void)
 			wait_message (0, txt_connecting, nntp_server);
 	}
 
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("nntp_open", nntp_server);
-#endif
+#	endif /* DEBUG */
 
 	ret = server_init (nntp_server, NNTP_TCP_NAME, nntp_tcp_port, line);
 DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
@@ -83,17 +83,17 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 	if (!batch_mode && ret >= 0 && cmd_line)
 		my_fputc ('\n', stdout);
 
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("nntp_open", line);
-#endif
+#	endif /* DEBUG */
 
 	/* Latest NNTP draft says 205 Authentication required could be returned here */
 	switch (ret) {
 
 		case OK_CANPOST:
-#ifndef NO_POSTING
+#	ifndef NO_POSTING
 			can_post = TRUE;
-#endif
+#	endif /* !NO_POSTING */
 			break;
 
 		case OK_NOPOST:
@@ -113,17 +113,17 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 		linep = line;
 		while (isspace(*linep))
 			linep++;
-		strncpy(bug_nntpserver1, linep, sizeof(bug_nntpserver1)-1);
-		bug_nntpserver1[sizeof(bug_nntpserver1)-1] = '\0';
+
+		STRCPY(bug_nntpserver1, linep);
 	}
 
 	/*
 	 * Switch INN into NNRP mode with 'mode reader'
 	 */
 
-#ifdef DEBUG
+#	ifdef DEBUG
 	debug_nntp ("nntp_open", "mode reader");
-#endif
+#	endif /* DEBUG */
 DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 	put_server ("MODE READER");
 	switch (get_respcode(line)) {
@@ -153,8 +153,8 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		linep = line;
 		while (isspace(*linep))
 			linep++;
-		strncpy(bug_nntpserver2, linep, sizeof(bug_nntpserver2)-1);
-		bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
+
+		STRCPY(bug_nntpserver2, linep);
 
 		{
 			char *chr1, *chr2;
@@ -191,16 +191,16 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		if (!is_reconnect)
 			wait_message(2, "Your server does not support the NNTP XOVER command.\nTin will use local index files instead.\n");
 
-#if 0	/* It seems this breaks the M$ newsserver */
+#	if 0	/* It seems this breaks the M$ newsserver */
 		/*
 		 * Try to authenticate. If XOVER exists, then authentication will already
 		 * have been forced by XOVER
 		 */
-#ifdef DEBUG
+#		ifdef DEBUG
 		debug_nntp ("nntp_open", "authenticate");
-#endif /* DEBUG */
+#	endif /* DEBUG */
 		authenticate (nntp_server, userid, TRUE);
-#endif /* 0 */
+#	endif /* 0 */
 	}
 
 #endif	/* NNTP_ABLE */
@@ -215,9 +215,9 @@ nntp_close (void)
 {
 #ifdef NNTP_ABLE
 	if (read_news_via_nntp) {
-#ifdef DEBUG
+#	ifdef DEBUG
 		debug_nntp ("nntp_close", "END");
-#endif
+#	endif /* DEBUG */
 		close_server ();
 	}
 #endif
@@ -355,14 +355,14 @@ DEBUG_IO((stderr, "nntp_command (%s)\n", command));
 #endif
 	put_server (command);
 
-	if (dangerous_signal_exit != TRUE)
-	if ((/* respcode = */ get_respcode (message)) != success) {
+	if (!bool_equal(dangerous_signal_exit, TRUE))
+		if ((/* respcode = */ get_respcode (message)) != success) {
 #ifdef DEBUG
-		debug_nntp (command, "NOT_OK");
+			debug_nntp (command, "NOT_OK");
 #endif
-/*		error_message ("%s", message);*/
-		return (FILE *) 0;
-	}
+			/* error_message ("%s", message); */
+			return (FILE *) 0;
+		}
 
 #ifdef DEBUG
 	debug_nntp (command, "OK");
@@ -430,8 +430,14 @@ open_newgroups_fp (
 			return (FILE *) 0;
 
 		tm = localtime (&newnews[idx].time);
+/*
+ * in the current draft NEWGROUPS is allowed to take a 4 digit year
+ * componennt - but even with a 2 digit year componennt it is y2k
+ * compilant... we should switch over to tm->tm_year + 1900
+ * after most of the server could handle the new format
+ */
 		sprintf (line, "NEWGROUPS %02d%02d%02d %02d%02d%02d",
-			tm->tm_year, tm->tm_mon+1, tm->tm_mday,
+			tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
 			tm->tm_hour, tm->tm_min, tm->tm_sec);
 
 		return (nntp_command (line, OK_NEWGROUPS, NULL));
@@ -806,7 +812,7 @@ base_comp (
  * Returns total number of articles in group, or -1 on error
  */
 
-int
+long
 setup_hard_base (
 	struct t_group *group,
 	char *group_path)
@@ -969,7 +975,7 @@ vGrpGetSubArtInfo (void)
 	if (INTERACTIVE)
 		wait_message (0, txt_rereading_active_file);
 
-	for (iNum = 0 ; iNum < num_active ; iNum++) {
+	for (iNum = 0; iNum < num_active; iNum++) {
 		psGrp = &active[iNum];
 
 		if (psGrp->subscribed) {

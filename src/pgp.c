@@ -46,8 +46,8 @@
 #	endif /* HAVE_LONG_FILE_NAMES */
 
 
-#	define SIGN 0x01
-#	define ENCRYPT 0x02
+#	define PGP_SIGN 0x01
+#	define PGP_ENCRYPT 0x02
 
 /*
  * local prototypes
@@ -100,7 +100,8 @@ static void
 split_file (
 	char *file)
 {
-	int pid, mask;
+	int pid;
+	mode_t mask;
 	char buf[LEN];
 	FILE *art, *header, *text;
 
@@ -108,7 +109,7 @@ split_file (
 	sprintf(hdr, HEADERS, TMPDIR, pid);
 	sprintf(pt, PLAINTEXT, TMPDIR, pid);
 	sprintf(ct, CIPHERTEXT, TMPDIR, pid);
-	mask = umask(077);
+	mask = umask((mode_t) (S_IRWXO|S_IRWXG));
 	if ((art = fopen(file, "r")) == (FILE *) 0)
 		return;
 
@@ -151,9 +152,9 @@ do_pgp (
 	strcpy (options, "-at");
 
 #	ifdef HAVE_PGP_2
-	if (what & ENCRYPT)
+	if (what & PGP_ENCRYPT)
 		strcat(options, "e");
-	if (what & SIGN)
+	if (what & PGP_SIGN)
 		strcat(options, "s");
 
 	if (*mail_address) {
@@ -164,11 +165,11 @@ do_pgp (
 
 #	else /* FIXME - check mail_address */
 #		ifdef HAVE_PGP_5
-	if (what & ENCRYPT && what & SIGN) {
+	if (what & PGP_ENCRYPT && what & PGP_SIGN) {
 		strcat (options, "s");
 		sh_format (cmd, sizeof(cmd), "%se %s %s %s %s", PGPNAME, pgpopts, options, pt, mail_to ? mail_to : "");
 	} else
-		sh_format (cmd, sizeof(cmd), "%s%s %s %s %s %s", PGPNAME, (what & ENCRYPT ? "e" : "s"), pgpopts, options, pt, mail_to ? mail_to : "");
+		sh_format (cmd, sizeof(cmd), "%s%s %s %s %s %s", PGPNAME, (what & PGP_ENCRYPT ? "e" : "s"), pgpopts, options, pt, mail_to ? mail_to : "");
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 
@@ -257,7 +258,7 @@ invoke_pgp_mail (
 			ClearScreen();
 			MoveCursor (cLINES - 7, 0);
 #endif /* HAVE_PGP_5 */
-			do_pgp(SIGN, nam, NULL);
+			do_pgp(PGP_SIGN, nam, NULL);
 			break;
 
 		case 'b':
@@ -265,11 +266,11 @@ invoke_pgp_mail (
 			ClearScreen();
 			MoveCursor (cLINES - 7, 0);
 #endif /* HAVE_PGP_5 */
-			do_pgp(SIGN | ENCRYPT, nam, mail_to);
+			do_pgp(PGP_SIGN | PGP_ENCRYPT, nam, mail_to);
 			break;
 
 		case 'e':
-			do_pgp(ENCRYPT, nam, mail_to);
+			do_pgp(PGP_ENCRYPT, nam, mail_to);
 			break;
 
 		default:
@@ -299,7 +300,7 @@ invoke_pgp_news(
 			MoveCursor (cLINES - 7, 0);
 			my_printf("\n");
 #endif /* HAVE_PGP_5 */
-			do_pgp(SIGN, the_article, NULL);
+			do_pgp(PGP_SIGN, the_article, NULL);
 			break;
 
 		case 'i':
@@ -308,7 +309,7 @@ invoke_pgp_news(
 			MoveCursor (cLINES - 7, 0);
 			my_printf("\n");
 #endif /* HAVE_PGP_5 */
-			do_pgp(SIGN, the_article, NULL);
+			do_pgp(PGP_SIGN, the_article, NULL);
 			pgp_append_public_key(the_article);
 			break;
 

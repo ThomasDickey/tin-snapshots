@@ -112,11 +112,11 @@ DoMatch(
 				continue;
 			}
 		}
-#ifdef MATCH_TAR_PATTERN
+#	ifdef MATCH_TAR_PATTERN
 		if (*text == '/')
 			return TRUE;
-#endif /* MATCH_TAR_ATTERN */
-#endif /* INDEX_DAEMON */
+#	endif /* MATCH_TAR_ATTERN */
+#endif /* !INDEX_DAEMON */
 	return *text == '\0';
 }
 
@@ -151,5 +151,5 @@ wildmat(
 
 	msg[0] = '\0';
 
-	return DoMatch((icase)?tbuff:text, (icase)?pbuff:p) == TRUE;
+	return DoMatch((icase) ? tbuff : text, (icase) ? pbuff : p) == TRUE;
 }
