@@ -21,7 +21,6 @@
  */
 
 #define SUB         "?"
-#define ISO_TABLES  7
 #define ISO_EXTRA   0xa0 /* beginning of second range of printable chars */
 
 /*
@@ -31,7 +30,7 @@
 
 #define TABSTOP(x)  (((x) - ((x)&7)) + 8)
 
-static constext *const iso2asc[ISO_TABLES][256-ISO_EXTRA] =
+static constext *const iso2asc[NUM_ISO_TABLES][256-ISO_EXTRA] =
 {
 	{
 	" ","!","c",SUB,SUB,"Y","|",SUB,"\"","(c)","a","<<","-","-","(R)","-",

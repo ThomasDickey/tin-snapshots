@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
+MANIFEST for tin-1.3-unoff-BETA-970225 (Tue Feb 25 02:29:02 MET 1997)
 ----------------------------------------------------
-  67524 ./CHANGES
-  14420 ./TODO
+  67794 ./CHANGES
+  14347 ./TODO
    5532 ./Makefile
   16995 ./INSTALL
    2398 ./MANIFEST
@@ -28,7 +28,7 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
    2233 ./include/os_2.h
   22275 ./include/proto.h
    1443 ./include/stpwatch.h
-  45636 ./include/tin.h
+  45720 ./include/tin.h
     918 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
@@ -38,9 +38,9 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
    4617 ./src/amigatcp.c
   37663 ./src/art.c
   22618 ./src/attrib.c
-   8459 ./src/charset.c
+   8441 ./src/charset.c
    5169 ./src/color.c
-  50982 ./src/config.c
+  51036 ./src/config.c
   20553 ./src/curses.c
   12578 ./src/debug.c
    2266 ./src/envarg.c
@@ -51,7 +51,7 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
    3232 ./src/hashstr.c
    9672 ./src/help.c
   11989 ./src/inews.c
-  30959 ./src/init.c
+  31030 ./src/init.c
     962 ./src/joinpath.c
   72840 ./src/lang.c
    3740 ./src/list.c
@@ -73,7 +73,7 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
   88201 ./src/post.c
    9788 ./src/prompt.c
     160 ./src/proto.sed
-  21247 ./src/refs.c
+  21272 ./src/refs.c
   11090 ./src/rfc1521.c
   16096 ./src/rfc1522.c
   34044 ./src/save.c
@@ -83,7 +83,7 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
    5638 ./src/sigfile.c
   12424 ./src/signal.c
    5750 ./src/strftime.c
-   6559 ./src/string.c
+   6547 ./src/string.c
   27932 ./src/thread.c
    4080 ./src/wildmat.c
   12575 ./src/win32.c
@@ -98,4 +98,4 @@ MANIFEST for tin-1.3-unoff-BETA-970222 (Sat Feb 22 05:49:55 MET 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3799 ./src/tincfg.tbl
-1686210 total
+1686611 total
