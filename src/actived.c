@@ -87,7 +87,7 @@ create_save_active_file ()
 {
 	char	acGrpPath[PATH_LEN];
 
-	printf ("Creating active file for saved groups...\n");
+	printf (txt_creating_active);
 
 	vInitVariables ();
 

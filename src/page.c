@@ -559,6 +559,7 @@ return_to_index:
 				if (change_config_file (group, FALSE) == FILTERING) {
 					filter_state = FILTERING;
 				}
+				set_signals_page ();	/* Just to be sure */
 				set_subj_from_size (cCOLS);
 				redraw_page (group->name, respnum);
 				break;

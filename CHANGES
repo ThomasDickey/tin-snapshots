@@ -1,4 +1,19 @@
---unoff BETA release 961014 --
+--unoff BETA release 961018 --
+
+195) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. cleand up neXT charset stuff
+     FIX. several supplied patches
+
+194) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. Window resizing did not work correctly when in options menu
+     ADD. moved some more strings to lang.c
+     FIX. several supplied patches
+
+193) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. variable/label name conflict
+     FIX. search.c
+     
+--unoff BETA release 961015 --
 
 192) Alexander Lehmann <alex@hal.rhein-main.de>
      ADD. NeXT porting (mainly chartset-stuff)

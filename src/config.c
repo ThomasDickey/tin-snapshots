@@ -20,7 +20,7 @@
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
 static void highlight_option P_((int option));
 static void print_option P_((int act_option));
-static void refresh_config_page P_((int act_option));
+static void show_config_page P_((int page_no));
 static void unhighlight_option P_((int option));
 
 /*
@@ -303,19 +303,26 @@ read_config_file (file, global_file)
 				break;
 			}
 			break;
+		case 'l':
+#ifdef LOCAL_CHARSET
+			if (match_boolean (buf, "local_charset=", &use_local_charset)) {
+				break;
+			}
+#endif
+			break;
 		case 'm':
 			if (match_string (buf, "mail_mime_encoding=", mail_mime_encoding, sizeof (mail_mime_encoding))) {
-				if (strcasecmp(mail_mime_encoding, "8bit") &&
-					strcasecmp(mail_mime_encoding, "base64") &&
-					strcasecmp(mail_mime_encoding, "7bit") &&  /* For CJK charsets(EUC-CN/JP/KR and others */
-					strcasecmp(mail_mime_encoding, "quoted-printable")) {
-					strcpy(mail_mime_encoding,"8bit");
+				if (strcasecmp(mail_mime_encoding, txt_8bit) &&
+					strcasecmp(mail_mime_encoding, txt_base64) &&
+					strcasecmp(mail_mime_encoding, txt_7bit) &&  /* For CJK charsets(EUC-CN/JP/KR and others */
+					strcasecmp(mail_mime_encoding, txt_quoted_printable)) {
+					strcpy(mail_mime_encoding, txt_8bit);
 				}
 				break;
 			}
 			/* option to toggle 8bit char. in header of mail message */
 			if (match_boolean (buf, "mail_8bit_header=", &mail_8bit_header)) {
-				if (strcasecmp(mail_mime_encoding, "8bit"))
+				if (strcasecmp(mail_mime_encoding, txt_8bit))
 					mail_8bit_header=FALSE;
 				break;
 			}
@@ -351,17 +358,17 @@ read_config_file (file, global_file)
 			break;
 		case 'p':
 			if (match_string (buf, "post_mime_encoding=", post_mime_encoding, sizeof (post_mime_encoding))) {
-				if (strcasecmp(post_mime_encoding, "8bit") &&
-					strcasecmp(post_mime_encoding, "base64") &&
-					strcasecmp(post_mime_encoding, "7bit") && /* perhaps necessary for EUC-JP/CN */
-					strcasecmp(post_mime_encoding, "quoted-printable")) {
-					strcpy(post_mime_encoding,"8bit");
+				if (strcasecmp(post_mime_encoding, txt_8bit) &&
+					strcasecmp(post_mime_encoding, txt_base64) &&
+					strcasecmp(post_mime_encoding, txt_7bit) && /* perhaps necessary for EUC-JP/CN */
+					strcasecmp(post_mime_encoding, txt_quoted_printable)) {
+					strcpy(post_mime_encoding, txt_8bit);
 				}
 				break;
 			}
 /* option to toggle 8bit char. in header of news message */
 			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
-				if (strcasecmp(post_mime_encoding, "8bit"))
+				if (strcasecmp(post_mime_encoding, txt_8bit))
 					post_8bit_header=FALSE;
 				break;
 			}
@@ -521,7 +528,7 @@ write_config_file (file)
 
 	/* alloc memory for tmp-filename */
 	if ((file_tmp = (char *) malloc (strlen (file)+5)) == NULL) {
-		wait_message ("Out of memory!");
+		wait_message (txt_out_of_memory2);
 		return;
 	}
 	/* generate tmp-filename */
@@ -829,6 +836,13 @@ write_config_file (file)
 	fprintf (fp, "# mm_charset is considered not displayable and represented as '?'.\n");
 	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
 
+#ifdef LOCAL_CHARSET
+	fprintf (fp, "# whether or not to automatically convert to a local charset that is\n");
+	fprintf (fp, "# different from the one defined in mm_charset. Currently only NeXTstep is\n");
+	fprintf (fp, "# supported. Set to OFF when logged in from a iso-8859-1 environment.\n");
+	fprintf (fp, "local_charset=%s\n\n", print_boolean(use_local_charset));
+#endif
+
 	fprintf (fp, "# MIME encoding (8bit, base64, quoted-printable, 7bit) of the body\n");
 	fprintf (fp, "# for mails and posts, if necessary. QP is efficient for most European\n");
 	fprintf (fp, "# character sets (ISO-8859-X) with small fraction of non-US-ASCII chars,\n");
@@ -944,34 +958,32 @@ int actual_option_page = 0;
 /*
  * Display option in a line containing option number, explaining text,
  * and option value. Note that "act_option" needs to be the option number
- * in the option_table array, which is different from the option number
- * displayed to the user (the latter one is one greater since counting
+ * displayed on the screen, which is different from the option number
+ * in the option_table array (the former one is one greater since counting
  * starts with one instead of zero).
- * FIXME make consistent with other functions using the option number
- *       shown on the screen.
  */
 
 static void
 print_option (act_option)
 	int act_option;
 {
-	printf("%3d. %s ", act_option + 1, option_table[act_option].option_text);
-	switch (option_table[act_option].var_type) {
+	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
+	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
-			printf("%s ", print_boolean(*((int *)option_table[act_option].variable)));
+			printf("%s ", print_boolean(*((int *)option_table[act_option - 1].variable)));
 			break;
 		case OPT_LIST:
-			printf("%s", option_table[act_option].opt_list[*((int *)option_table[act_option].variable)]);
+			printf("%s", option_table[act_option - 1].opt_list[*((int *)option_table[act_option - 1].variable)]);
 			break;
 		case OPT_STRING:
-			printf("%-.*s", cCOLS - (int) strlen((char *) option_table[act_option].option_text) - OPT_ARG_COLUMN - 3, (char *) option_table[act_option].variable);
+			printf("%-.*s", cCOLS - (int) strlen((char *) option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, (char *) option_table[act_option - 1].variable);
 			break;
 		case OPT_NUM:
-			printf("%d", *((int *) option_table[act_option].variable));
+			printf("%d", *((int *) option_table[act_option - 1].variable));
 			break;
 		case OPT_CHAR:
 			/* grrr... who the heck defined art_marked_* as int? */
-			printf("%c", *((int *) option_table[act_option].variable));
+			printf("%c", *((int *) option_table[act_option - 1].variable));
 		break;
 	}
 }
@@ -995,20 +1007,44 @@ unhighlight_option (option)
 	fflush (stdout);
 }
 
-static void
-refresh_config_page (act_option)
+/*
+ * Refresh the config page which holds the actual option. If act_option is
+ * zero fall back on the last given option; if even that is not present,
+ * use 1 (first option) as fall back value. Note that act_option is the
+ * number shown on the screen, not the index in option_table (which is
+ * one smaller). Set force_redraw to TRUE if you want to enforce a refresh,
+ * and to FALSE if you want to refresh the screen only when necessary
+ * (needed by signal.c: config_resize(); the resizing could result in
+ * desired_page == actual_option_page even if there are now more/less
+ * options on the screen than before).
+ */
+
+void
+refresh_config_page (act_option, force_redraw)
 	int act_option;
+	int force_redraw;
 {
+	static int last_option = 0;
 	int desired_page;
 
+	if (act_option == 0) {	/* Yes, could be done shorter. */
+		if (last_option != 0) {
+			act_option = last_option;
+		}
+		else {
+			act_option = 1;
+		}
+	}
+	
 	/* determine on which page act_option would be */
 	desired_page = (int) (act_option - 1) / option_lines_per_page;
 
-	if (desired_page != actual_option_page)
+	if ((desired_page != actual_option_page) || force_redraw)
 	{
 		show_config_page (desired_page);
 		actual_option_page = desired_page;
 	}
+	last_option = act_option;
 }
 
 /*
@@ -1028,28 +1064,15 @@ change_config_file (group, filter_at_once)
 	int ret_code = NO_FILTERING;
 	int mime_type = 0;
 
-#ifdef SIGTSTP
-	RETSIGTYPE (*susp)(SIG_ARGS);
-
-	susp = (RETSIGTYPE (*)(SIG_ARGS)) 0;
-
-	if (do_sigtstp) {
-		susp = sigdisp (SIGTSTP, SIG_DFL);
-	}
-#endif
-
+	set_signals_config ();
+	
 	actual_option_page = -1;
 	option = 1;
 
 	set_xclick_off ();
 	forever {
 
-#ifdef SIGTSTP
-		if (do_sigtstp) {
-			sigdisp (SIGTSTP, config_suspend);
-		}
-#endif
-	 	refresh_config_page (option);
+	 	refresh_config_page (option, FALSE);
 	 	highlight_option (option);
 
 		MoveCursor (cLINES, 0);
@@ -1123,11 +1146,6 @@ change_config_file (group, filter_at_once)
 				}
 */
 				clear_note_area ();
-#ifdef SIGTSTP
-				if (do_sigtstp) {
-					sigdisp (SIGTSTP, susp);
-				}
-#endif
 				return ret_code;
 
 			case iKeyConfigUp:
@@ -1135,7 +1153,7 @@ change_config_file (group, filter_at_once)
 				option--;
 				if (option < 1)
 					option = LAST_OPT;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
@@ -1144,21 +1162,21 @@ change_config_file (group, filter_at_once)
 				option++;
 				if (option > LAST_OPT)
 					option = 1;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
 			case iKeyConfigHome:
 				unhighlight_option (option);
 				option = 1;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
 			case iKeyConfigEnd:
 				unhighlight_option (option);
 				option = LAST_OPT;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
@@ -1167,7 +1185,7 @@ change_config_file (group, filter_at_once)
 				option -= option_lines_per_page;
 				if (option < 1)
 					option = LAST_OPT;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
@@ -1176,7 +1194,7 @@ change_config_file (group, filter_at_once)
 				option += option_lines_per_page;
 				if (option > LAST_OPT)
 					option = 1;
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
@@ -1184,12 +1202,12 @@ change_config_file (group, filter_at_once)
 			case '6': case '7': case '8': case '9':
 				unhighlight_option (option);
 				old_option = option;
-				option = prompt_num (ch, "Enter option number> ");
+				option = prompt_num (ch, txt_enter_option_num);
 				if (option < 1 || option > LAST_OPT) {
 					option = old_option;
 					break;
 				}
-				refresh_config_page (option);
+				refresh_config_page (option, FALSE);
 				/* FALLTHROUGH */
 
 			case iKeyConfigSelect:
@@ -1246,7 +1264,7 @@ change_config_file (group, filter_at_once)
 								inverse_okay = TRUE;
 								if (OPT_INVERSE_OKAY > first_option_on_screen && OPT_INVERSE_OKAY < first_option_on_screen + option_lines_per_page) {
 									MoveCursor (INDEX_TOP + (OPT_INVERSE_OKAY - 1) % option_lines_per_page, 3);
-									print_option (OPT_INVERSE_OKAY - 1);
+									print_option (OPT_INVERSE_OKAY);
 								}
 							}
 							break;
@@ -1259,24 +1277,24 @@ change_config_file (group, filter_at_once)
 								draw_arrow_mark = TRUE;	/* we don't want to navigate blindly */
 								if (OPT_DRAW_ARROW_MARK > first_option_on_screen && OPT_DRAW_ARROW_MARK <= first_option_on_screen + option_lines_per_page + 1) {
 									MoveCursor (INDEX_TOP + (OPT_DRAW_ARROW_MARK - 1) % option_lines_per_page, 3);
-									print_option (OPT_DRAW_ARROW_MARK - 1);
+									print_option (OPT_DRAW_ARROW_MARK);
 								}
 							}
 							break;
 
 						case OPT_MAIL_8BIT_HEADER:
-							if (strcasecmp(mail_mime_encoding, "8bit")) {
+							if (strcasecmp(mail_mime_encoding, txt_8bit)) {
 								mail_8bit_header = FALSE;
 								MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
-								print_option (OPT_MAIL_8BIT_HEADER - 1);
+								print_option (OPT_MAIL_8BIT_HEADER);
 							}
 							break;
 
 						case OPT_POST_8BIT_HEADER:
-							if (strcasecmp(post_mime_encoding, "8bit")) {
+							if (strcasecmp(post_mime_encoding, txt_8bit)) {
 								post_8bit_header = FALSE;
 								MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
-								print_option (OPT_POST_8BIT_HEADER - 1);
+								print_option (OPT_POST_8BIT_HEADER);
 							}
 							break;
 
@@ -1435,20 +1453,20 @@ change_config_file (group, filter_at_once)
 							strcpy (option_table[option - 1].variable, txt_mime_types[mime_type]);
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
-							if (strcasecmp(txt_mime_types[mime_type], "8bit")) {
+							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
 								if (option == OPT_POST_MIME_ENCODING) {
 									post_8bit_header = FALSE;
 									if ((OPT_POST_8BIT_HEADER > first_option_on_screen) &&
 											(OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
 										MoveCursor (INDEX_TOP + (OPT_POST_8BIT_HEADER - 1) % option_lines_per_page, 3);
-										print_option (OPT_POST_8BIT_HEADER - 1);
+										print_option (OPT_POST_8BIT_HEADER);
 									}
 								} else {
 									mail_8bit_header = FALSE;
 									if ((OPT_MAIL_8BIT_HEADER > first_option_on_screen) &&
 											(OPT_POST_8BIT_HEADER <= first_option_on_screen + option_lines_per_page + 1)) {
 										MoveCursor (INDEX_TOP + (OPT_MAIL_8BIT_HEADER - 1) % option_lines_per_page, 3);
-										print_option (OPT_MAIL_8BIT_HEADER - 1);
+										print_option (OPT_MAIL_8BIT_HEADER);
 									}
 								}
 							}
@@ -1561,7 +1579,7 @@ match_integer (line, pat, dst, maxlen)
 
 		if (maxlen)  {
 			if ((*dst < 0) || (*dst > maxlen)) {
-				fprintf(stderr, "\n%s%d out of range (0 - %d). Reset to 0", pat, *dst, maxlen);
+				fprintf(stderr, txt_value_out_of_range, pat, *dst, maxlen);
 				*dst = 0;
 			}
 		}
@@ -1664,7 +1682,7 @@ quote_space_to_dash (str)
  * page numbering starts with zero; argument page_no is expected to be valid
  */
 
-void
+static void
 show_config_page (page_no)
 	int page_no;
 {
@@ -1683,10 +1701,10 @@ show_config_page (page_no)
 	for (i = 0;i < lines_to_print;i++)
 	{
 		MoveCursor (INDEX_TOP + i, 3);
-		print_option (first_option_on_screen + i);
+		print_option (first_option_on_screen + i + 1);
 	}
-	fflush (stdout);
 
 	show_menu_help (txt_select_config_file_option);
+	fflush (stdout);
 	MoveCursor (cLINES, 0);
 }

@@ -796,6 +796,7 @@ group_list_thread:
 				}
 				n = default_sort_art_type;
 				filter_state = change_config_file (group, TRUE);
+				set_signals_group ();	/* Just to be sure */
 				if (filter_state == NO_FILTERING && n != default_sort_art_type) {
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);

@@ -645,8 +645,8 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-                        if ( !strncasecmp(mm_charset,"euc-",4) &&
-                             !strcasecmp(mime_encoding,"7bit") )
+                        if (! strncasecmp(mm_charset, "euc-", 4) &&
+                            ! strcasecmp(mime_encoding, txt_7bit) )
 
 			   fprintf (f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &mm_charset[4]);
                         else
@@ -660,9 +660,9 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	}
 	fputc ('\n', f);
 
-	if (! strcasecmp (mime_encoding, "base64"))
+	if (! strcasecmp (mime_encoding, txt_base64))
 		encoding = 'b';
-	else if (! strcasecmp (mime_encoding, "quoted-printable"))
+	else if (! strcasecmp (mime_encoding, txt_quoted_printable))
 		encoding = 'q';
 	else
 		encoding = '8';
@@ -672,7 +672,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-	if (! strcasecmp (mime_encoding, "7bit")) {
+	if (! strcasecmp (mime_encoding, txt_7bit)) {
 		encoding = '7';
 
 /* For EUC-KR, 7bit means ISO-2022-KR encoding specified in RFC 1557 */
