@@ -1,5 +1,36 @@
 Bugs
 ----
+o  tin does not assure that you are in nnrpd after a reconnect -> issue a
+   mode reader after a reconnect.
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
+o  with use_builtin_inews=ON && default_sigfile=~/.tin/sig && a existing
+   ~/.signature ~/.signature is used instead of ~/.tin/sig
+   (does not happen if a sigfile is specified via attributes i.e.
+    scope=*.test sigfile=--none [urs])
+   [Stan Brooks <stabro@almatel.net>]
+
+o  When trying to renumber my newsgroups (using the 'M' command), I find
+   that if there are any new newsgroups listed at the top of the screen,
+   they offset my choice for location. ie:  With 3 new newsgroups, I hit
+   'M' to move the position, and then entered 17, to put the listing in
+   #17.  It was moved to position 20.
+   [Theo Van Dinter <felicity@kluge.net>]
+
+o  tin does not care about resizing the xterm it's running in.
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
+
+o  tin (sometimes?) overwrites the newsgroupnumber and number of unread
+   articles with spaces when turning on newsgroup descriptions with
+   strip_blanks=OFF - the bugs seems to be realted to the screen-width and
+   does not show up on small screens, but in large xterms...
+   (sounds like a calculation error with float -> int values [urs])
+   [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
+
+o  sometimes tin truncates newsgroupnames after turning off newsgroup
+   descriptions.
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
 o  new subscribed groups won't show up in the same session if:
      show_only_unread_groups=ON
      'y'ank in all groups
@@ -260,6 +291,11 @@ o  when From: only contains "First-name Last-name" tin strips the space
 
 Internal Changes
 ----------------
+o  check where "~" is used instead of homedir
+
+o  change all system()/popen() calls to fork() and exec() calls
+   [close security holes]
+
 o  use "XPAT header range wildmat" for searches (if newsserver supports xpat)
    i.e.
    GROUP alt.test
@@ -310,6 +346,16 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  currently the Sender: header includes the hostname ->
+   if you configure with --with-domian-name=foo.bar
+   and post from junk.foo.bar a Sender: header is included even if you don't
+   touch From: - is this needed?
+   what about inserting a X-[NNTP-]Posting-Host: instead?
+
+o  what is with the conflicting settings? should we disallow those, or leave
+   it to the user to realise that i.e. strip_blanks=ON && inverse_okay=ON
+   looks ugly?
+
 o  what is with $ADD_ADDRESS?!
 
 o  what is tin -C (count articles)? - if running in batch-mode (-Z)

@@ -3417,10 +3417,15 @@ checknadd_headers (
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				if (!gotit && line[0] == '\n') {
-					/* isn't it the newsservers job to insert a Lines:-header? */
+/*
+ * IMHO it's the newsservers job to create a Lines:-header
+ * (tin creates a wrong Lines:-header for pgp-signed articles...)
+ */
+#if 0
 					if (lines) {
 						fprintf (fp_out, "Lines: %d\n", lines);
 					}
+#endif
 					if (!no_advertising) {
 						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
 #ifdef HAVE_SYS_UTSNAME_H

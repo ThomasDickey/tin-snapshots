@@ -113,10 +113,10 @@ group_page (
 	int old_selected_arts;
 	int posted_flag;
 	int scroll_lines;
-	long old_artnum = 0L;
 	int xflag = 0;
- 	struct t_art_stat sbuf;
 	int old_group_top;
+	long old_artnum = 0L;
+ 	struct t_art_stat sbuf;
 
 	/*
 	 * Set the group attributes

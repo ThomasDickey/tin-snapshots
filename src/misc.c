@@ -15,6 +15,7 @@
 #include	"tin.h"
 #include	"tcurses.h"
 #include	"version.h"
+#include	"trace.h"
 
 /*
 ** Local prototypes
@@ -309,11 +310,6 @@ shell_escape (void)
 	char shell[LEN];
 	char *p;
 
-#ifdef SIGTSTP
-	RETSIGTYPE (*susp)(SIG_ARGS);
-	susp = (RETSIGTYPE (*)(SIG_ARGS)) 0;
-#endif
-
 	sprintf (msg, txt_shell_escape, default_shell_command);
 
 	if (!prompt_string (msg, shell))
@@ -338,27 +334,7 @@ shell_escape (void)
 	center_line (0, TRUE, msg);
 	MoveCursor (INDEX_TOP, 0);
 
-	set_alarm_clock_off ();
-
-	EndWin ();
-	Raw (FALSE);
-
-#ifdef SIGTSTP
-	if (do_sigtstp)
-		susp = signal (SIGTSTP, SIG_DFL);
-#endif
-
-	system (p);
-
-#ifdef SIGTSTP
-	if (do_sigtstp)
-		signal (SIGTSTP, susp);
-#endif
-
-	Raw (TRUE);
-	InitWin ();
-
-	set_alarm_clock_on ();
+	(void)invoke_cmd(p);
 
 	continue_prompt ();
 
@@ -651,12 +627,14 @@ invoke_cmd (
 		susp = signal(SIGTSTP, SIG_DFL);
 #endif
 
+	TRACE(("called system(%s)", _nc_visbuf(nam)))
 #	if USE_SYSTEM_STATUS
 		system(nam);
 		ret = system_status;
 #	else
 		ret = system (nam);
 #	endif
+	TRACE(("return %d", ret))
 
 #ifdef SIGTSTP
 	if (do_sigtstp)

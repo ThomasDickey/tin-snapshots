@@ -111,8 +111,8 @@ add_to_parent(
 	 *     else
 	 *        add_to_end
 	 */
-	if ((CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) &&
-												 (ptr->article == ART_NORMAL)) {
+	if ((CURR_GROUP.attribute && (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND)) &&
+		(ptr->article == ART_NORMAL)) {
 		/* Add to start */
 		ptr->sibling = ptr->parent->child;
 		ptr->parent->child = ptr;
@@ -802,7 +802,7 @@ build_references(
 	char *s;
 
 /* TODO - do we need this test, we may _want_ to sort on artnum for some reason */
-	if (group->attribute->sort_art_type != SORT_BY_NOTHING)
+	if (group->attribute && group->attribute->sort_art_type != SORT_BY_NOTHING)
 		sort_arts (group->attribute->sort_art_type);
 
 #ifdef DEBUG_REFS

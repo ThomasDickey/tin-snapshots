@@ -46,7 +46,7 @@ int InitScreen (void)
 {
 #ifdef NCURSES_VERSION
 #ifdef USE_TRACE
-	trace(TRACE_CALLS);
+	trace(TRACE_CALLS|TRACE_CCALLS);
 #endif
 #endif
 	TRACE(("InitScreen"))

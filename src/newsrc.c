@@ -51,9 +51,6 @@ read_newsrc (
 	int sub;
 	int i;
 	struct stat buf;
-#ifdef USE_CURSES
-	int errors = 0;
-#endif
 
 	if (allgroups)
 		group_top = skip_newgroups();
@@ -101,17 +98,6 @@ read_newsrc (
 			my_flush ();
 		}
 	}
-/*
-#ifdef USE_CURSES
-	if (!cmd_line) {
-		if (errors) {		FIXME - possibly not needed now ?
-			beep();
-			continue_prompt ();
-		}
-		scrollok(stdscr, FALSE);
-	}
-#endif
-*/
 }
 
 

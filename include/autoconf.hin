@@ -98,6 +98,7 @@
 #undef	HAVE_NETDB_H
 #undef	HAVE_NETLIB_H
 #undef	HAVE_NETINET_IN_H
+#undef	HAVE_NOMACROS_H		/* ncurses 4.1 */
 #undef	HAVE_POLL_H
 #undef	HAVE_PROTOTYPES_H
 #undef	HAVE_PWD_H
@@ -356,6 +357,10 @@
  */
 #undef	DONT_HAVE_TM_GMTOFF
 
+#if defined(__hpux)
+#	define	HAVE_KEYPAD
+#endif
+
 #if 0 /* FIXME: test-not-impl */
 
 #if defined(COHERENT)
@@ -364,10 +369,6 @@
 
 #if !defined(M_OS2)
 #	define	HAVE_SYSERRLIST
-#endif
-
-#if defined(__hpux)
-#	define	HAVE_KEYPAD
 #endif
 
 #if defined(supermax)

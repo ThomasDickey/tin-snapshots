@@ -60,7 +60,7 @@ find_base (
 
 	debug_print_arts ();
 
-	if (group->attribute->show_only_unread) {
+	if (group->attribute && group->attribute->show_only_unread) {
 		for (i = 0; i < top; i++) {
 			if (IGNORE_ART(i) || arts[i].inthread != FALSE) {
 				continue;
@@ -450,7 +450,7 @@ make_threads (
 	int i;
 
 	if (!cmd_line) {
-		if (group->attribute->thread_arts == THREAD_NONE)
+		if (group->attribute && group->attribute->thread_arts == THREAD_NONE)
 			wait_message (txt_unthreading_arts);
 		else
 			wait_message (txt_threading_arts);
@@ -470,7 +470,8 @@ make_threads (
 	 * on arts[] and so the base messages under all threading systems
 	 * will be date sorted.
 	 */
-	sort_arts (group->attribute->sort_art_type);
+	if (group->attribute)
+		sort_arts (group->attribute->sort_art_type);
 
 	/*
 	 * Reset all the ptrs to articles following the above sort
@@ -481,7 +482,7 @@ make_threads (
 	 *  The threading pointers need to be reset if re-threading
 	 *	If using ref threading, revector the links back to the articles
 	 */
-	if (rethread || group->attribute->thread_arts) {
+	if (rethread || (group->attribute && group->attribute->thread_arts)) {
 
 		for (i=0 ; i < top ; i++) {
 
@@ -506,6 +507,7 @@ make_threads (
 	/*
 	 * Do the right thing according to the threading strategy
 	 */
+	if (group->attribute) 
 	switch (group->attribute->thread_arts) {
 		case THREAD_NONE:
 			return;
@@ -1092,7 +1094,7 @@ vWriteNovFile (
 	if (hFp == (FILE *) 0)
 		error_message (txt_cannot_write_index, pcNovFile);
 	else {
-		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
+		if (psGrp->attribute && psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
 			SortBy(artnum_comp);
 
 		if (!overview_index_filename)

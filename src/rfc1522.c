@@ -810,7 +810,7 @@ rfc15211522_encode(
 			body_encode = rfc1557_encode;
 
 /*
- * Not only  EUC-JP but also other Japanese charsets such as
+ * Not only EUC-JP but also other Japanese charsets such as
  * SJIS and JIS might need RFC 1468 encoding. To be confirmed.
  */
 		else if (!strcasecmp(mm_charset, "euc-jp"))
@@ -818,7 +818,7 @@ rfc15211522_encode(
 
 /*
  * Not only  EUC-CN but also other Chinese charsets such as
- * BIG5 and Traditional  might need RFC 1922 encoding. To be confirmed.
+ * BIG5 and Traditional might need RFC 1922 encoding. To be confirmed.
  */
 		else if (!strcasecmp(mm_charset, "euc-cn"))
 			body_encode = rfc1922_encode;

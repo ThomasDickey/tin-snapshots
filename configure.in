@@ -418,6 +418,7 @@ AC_CHECK_HEADERS(\
 	netdb.h \
 	netinet/in.h \
 	netlib.h \
+	nomacros.h \
 	poll.h \
 	prototypes.h \
 	pwd.h \

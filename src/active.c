@@ -285,7 +285,7 @@ read_news_active_file (void)
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	struct t_group *ptr;
-	long count = -1L, min = 1, max = 0;
+	long min, max, count = -1L;
 
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
@@ -313,6 +313,8 @@ read_news_active_file (void)
 	}
 
 	forever {
+		min = 1;
+		max = 0;
 		if (fgets (buf, sizeof(buf), fp) == (char *)0)
 			break;
 
