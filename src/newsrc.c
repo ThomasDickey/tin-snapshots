@@ -165,7 +165,7 @@ create_newsrc (newsrc_file)
 		wait_message (txt_creating_newsrc);
 
 		for (i=0 ; i < num_active ; i++) {
-			fprintf (fp, "%s:\n", active[i].name);
+			fprintf (fp, "%s!\n", active[i].name);
 		}
 
 		if (ferror (fp) | fclose (fp)) {

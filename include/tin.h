@@ -217,7 +217,7 @@ extern char *get_uaf_fullname();
 #ifdef HAVE_CURSES_H
 #	if defined(M_XENIX)
 #		ifdef	HZ
-#			undef	HZ
+#			undef	HZ /* looks like a bug in M_XENIX includefiles */
 #		endif
 #	endif
 #	include <curses.h>
@@ -227,7 +227,7 @@ extern char *get_uaf_fullname();
 #ifdef HAVE_TERM_H
 #	include <term.h>
 #endif
-#endif
+#endif /* 0 */
 
 #ifdef HAVE_TERMCAP_H
 #	include <termcap.h>
@@ -374,10 +374,10 @@ extern char *get_uaf_fullname();
 #		endif /* VMS */
 #	endif /* !NEWSLIBDIR */
 #	ifndef NOVROOTDIR
-#		define          NOVROOTDIR      SPOOLDIR
+#		define	NOVROOTDIR	SPOOLDIR
 #	endif /* !NOVROOTDIR */
 #	ifndef INEWSDIR
-#		define		INEWSDIR	NEWSLIBDIR
+#		define	INEWSDIR	NEWSLIBDIR
 #	endif /* INEWSDIR */
 #else
 #	undef	SPOOLDIR
@@ -441,9 +441,9 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_MAILER	"/usr/bin/mailx"
 #	endif
 #	ifdef linux
-#		define	DEFAULT_MAILBOX "/var/spool/mail"
+#		define	DEFAULT_MAILBOX	"/var/spool/mail"
 #		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
-#		define	DEFAULT_PRINTER "/usr/bin/lpr"
+#		define	DEFAULT_PRINTER	"/usr/bin/lpr"
 #	endif
 #	ifdef M_AMIGA
 #		ifndef DEFAULT_EDITOR
@@ -502,7 +502,6 @@ extern char *get_uaf_fullname();
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR		"/bin/vedit"
 #		endif
-#		define	DEFAULT_MAILER		"/usr/bin/sendmail"
 #	endif
 #	ifdef RS6000
 #		define	DEFAULT_PRINTER "/bin/lp"
@@ -592,16 +591,16 @@ extern char *get_uaf_fullname();
  */
 
 #ifdef SMALL_MEMORY_MACHINE
-#	define		DEFAULT_ARTICLE_NUM	600
-#	define		DEFAULT_SAVE_NUM	10
-#	define		DEFAULT_SPOOLDIR_NUM	5
+#	define	DEFAULT_ARTICLE_NUM	600
+#	define	DEFAULT_SAVE_NUM	10
+#	define	DEFAULT_SPOOLDIR_NUM	5
 #else
-#	define		DEFAULT_ARTICLE_NUM	1200
-#	define		DEFAULT_SAVE_NUM	30
-#	define		DEFAULT_SPOOLDIR_NUM	10
+#	define	DEFAULT_ARTICLE_NUM	1200
+#	define	DEFAULT_SAVE_NUM	30
+#	define	DEFAULT_SPOOLDIR_NUM	10
 #endif
-#	define		DEFAULT_ACTIVE_NUM	1800
-#	define		DEFAULT_NEWNEWS_NUM	5
+#define	DEFAULT_ACTIVE_NUM	1800
+#define	DEFAULT_NEWNEWS_NUM	5
 
 #ifdef VMS
 #define 	RCDIR			"TIN"
@@ -643,22 +642,22 @@ extern char *get_uaf_fullname();
 #define 	_CONF_SERVER		"server"
 
 #ifndef TRUE
-#	define TRUE		1
+#	define	TRUE	1
 #endif
 
 #ifndef FALSE
-#	define FALSE		0
+#	define	FALSE	0
 #endif
 
 #ifndef MAX
-#	define MAX(a,b)		((a > b) ? a : b)
+#	define	MAX(a,b)	((a > b) ? a : b)
 #endif
 
 #ifndef forever
-#	define forever		for(;;)
+#	define	forever	for(;;)
 #endif
 
-#define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
+#define STRCMPEQ(s1, s2)			(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
@@ -691,29 +690,29 @@ extern char *get_uaf_fullname();
 #define 	ctrl(c) 		((c) & 0x1F)
 
 #ifndef DEFAULT_ISO2ASC
-#	define	DEFAULT_ISO2ASC "-1 "	/* ISO -> Ascii charset conversion */
+#	define	DEFAULT_ISO2ASC	"-1 "	/* ISO -> Ascii charset conversion */
 #endif
 
 #ifndef DEFAULT_COMMENT
-#	define	DEFAULT_COMMENT		"> "	/* used when by follow-ups & replys */
+#	define	DEFAULT_COMMENT	"> "	/* used when by follow-ups & replys */
 #endif
 #ifndef ART_MARK_UNREAD
-#	define	ART_MARK_UNREAD		'+'	/* used to show that an art is unread */
+#	define	ART_MARK_UNREAD	'+'	/* used to show that an art is unread */
 #endif
 #ifndef ART_MARK_RETURN
-#	define	ART_MARK_RETURN		'-'	/* used to show that an art will return */
+#	define	ART_MARK_RETURN	'-'	/* used to show that an art will return */
 #endif
 #ifndef ART_MARK_SELECTED
 #	define	ART_MARK_SELECTED	'*'	/* used to show that an art was auto selected */
 #endif
 #ifndef ART_MARK_READ
-#	define	ART_MARK_READ		' '	/* used to show that an art was not read or seen  */
+#	define	ART_MARK_READ	' '	/* used to show that an art was not read or seen  */
 #endif
 #ifndef ART_MARK_DELETED
 #	define	ART_MARK_DELETED	'D'	/* art has been marked for deletion (mailgroup) */
 #endif
 #ifndef MARK_INRANGE
-#	define	MARK_INRANGE		'#'	/* group/art within a range (# command) */
+#	define	MARK_INRANGE	'#'	/* group/art within a range (# command) */
 #endif
 
 #define			SELECT_MISC_COLS	21
@@ -728,172 +727,175 @@ extern char *get_uaf_fullname();
 /*
  * Maximum permissible colour number
  */
-#define		MAX_COLOR			15
-#define		MAX_BACKCOLOR			7
+#define		MAX_COLOR	15
+#define		MAX_BACKCOLOR	7
 
-#define 	SCREEN_READ_UNREAD		6		/* position for "  +" / "   " */
-#define 	INDEX_TOP			2
+#define 	SCREEN_READ_UNREAD	6		/* position for "  +" / "   " */
+#define 	INDEX_TOP	2
 
 #ifdef NO_REGEX
-#	define STR_MATCH(s1,s2)		(str_str (s1, s2, strlen (s2)) != 0)
+#	define	STR_MATCH(s1,s2)	(str_str (s1, s2, strlen (s2)) != 0)
 #else
-#	define STR_MATCH(s1,pat)	(wildmat (s1, pat))
+#	define	STR_MATCH(s1,pat)	(wildmat (s1, pat))
 #endif
 
-#define IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
+#define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
 /*
  * Often used macro to point to the group we are currenty in
  */
-#define CURR_GROUP	(active[my_group[cur_groupnum]])
+#define	CURR_GROUP	(active[my_group[cur_groupnum]])
 
 /*
  *  News/Mail group types
  */
 
-#define 	GROUP_TYPE_MAIL 		0
-#define 	GROUP_TYPE_NEWS 		1
-#define 	GROUP_TYPE_SAVE 		2
+#define	GROUP_TYPE_MAIL	0
+#define	GROUP_TYPE_NEWS	1
+#define	GROUP_TYPE_SAVE	2
 
 /*
  *  used by get_arrow_key()
  */
 
 #ifdef WIN32
-#define 	KEYMAP_UNKNOWN			0
-#define 	KEYMAP_UP			0xA6
-#define 	KEYMAP_DOWN			0xA8
-#define 	KEYMAP_LEFT			0xA5
-#define 	KEYMAP_RIGHT			0xA7
-#define 	KEYMAP_PAGE_UP			0xA1
-#define 	KEYMAP_PAGE_DOWN		0xA2
-#define 	KEYMAP_HOME			0xA4
-#define 	KEYMAP_END			0xA3
-#define 	KEYMAP_MOUSE			0
+#define	KEYMAP_UNKNOWN		0
+#define	KEYMAP_UP		0xA6
+#define	KEYMAP_DOWN		0xA8
+#define	KEYMAP_LEFT		0xA5
+#define	KEYMAP_RIGHT		0xA7
+#define	KEYMAP_PAGE_UP		0xA1
+#define	KEYMAP_PAGE_DOWN		0xA2
+#define	KEYMAP_HOME		0xA4
+#define	KEYMAP_END		0xA3
+#define	KEYMAP_MOUSE		0
 #else
-#define 	KEYMAP_UNKNOWN			0
-#define 	KEYMAP_UP			1
-#define 	KEYMAP_DOWN			2
-#define 	KEYMAP_LEFT			3
-#define 	KEYMAP_RIGHT			4
-#define 	KEYMAP_PAGE_UP			5
-#define 	KEYMAP_PAGE_DOWN		6
-#define 	KEYMAP_HOME			7
-#define 	KEYMAP_END			8
-#define 	KEYMAP_MOUSE			9
+#define	KEYMAP_UNKNOWN		0
+#define	KEYMAP_UP		1
+#define	KEYMAP_DOWN		2
+#define	KEYMAP_LEFT		3
+#define	KEYMAP_RIGHT		4
+#define	KEYMAP_PAGE_UP		5
+#define	KEYMAP_PAGE_DOWN		6
+#define	KEYMAP_HOME		7
+#define	KEYMAP_END		8
+#define	KEYMAP_MOUSE		9
 #endif
 
 /*
  *  used by feed_articles() & show_mini_help()
  */
 
-#define 	SELECT_LEVEL			1
-#define 	SPOOLDIR_LEVEL			2
-#define 	GROUP_LEVEL			3
-#define 	THREAD_LEVEL			4
-#define 	PAGE_LEVEL			5
+#define	SELECT_LEVEL		1
+#define	SPOOLDIR_LEVEL		2
+#define	GROUP_LEVEL		3
+#define	THREAD_LEVEL		4
+#define	PAGE_LEVEL		5
 
-#define 	MINI_HELP_LINES 		5
+#define	MINI_HELP_LINES		5
 
-#define 	FEED_MAIL			1
-#define 	FEED_PIPE			2
-#define 	FEED_PRINT			3
-#define 	FEED_SAVE			4
-#define 	FEED_SAVE_TAGGED		5
-#define 	FEED_REPOST			6
+#define	FEED_MAIL		1
+#define	FEED_PIPE		2
+#define	FEED_PRINT		3
+#define	FEED_SAVE		4
+#define	FEED_SAVE_TAGGED		5
+#define	FEED_REPOST		6
 
 /*
  * Threading strategies available
  */
-#define		THREAD_NONE			0
-#define		THREAD_SUBJ			1
-#define		THREAD_REFS			2
-#define		THREAD_BOTH			3
+#define	THREAD_NONE		0
+#define	THREAD_SUBJ		1
+#define	THREAD_REFS		2
+#define	THREAD_BOTH		3
 
 #ifdef HAVE_REF_THREADING
-#define		THREAD_MAX			THREAD_BOTH
+#	define	THREAD_MAX		THREAD_BOTH
 #else
-#define		THREAD_MAX			THREAD_SUBJ
+#	define	THREAD_MAX		THREAD_SUBJ
 #endif
 
 /*
  * Values for show_author
  */
-#define		SHOW_FROM_NONE			0
-#define		SHOW_FROM_ADDR			1
-#define		SHOW_FROM_NAME			2
-#define		SHOW_FROM_BOTH			3
+#define	SHOW_FROM_NONE		0
+#define	SHOW_FROM_ADDR		1
+#define	SHOW_FROM_NAME		2
+#define	SHOW_FROM_BOTH		3
 
 /*
  * used in feed.c & save.c
  */
 
-#define		POST_PROC_NONE			0
-#define		POST_PROC_SHAR			1
-#define		POST_PROC_UUDECODE		2
-#define		POST_PROC_UUD_LST_ZOO		3
-#define		POST_PROC_UUD_EXT_ZOO		4
-#define		POST_PROC_UUD_LST_ZIP		5
-#define		POST_PROC_UUD_EXT_ZIP		6
+#define	POST_PROC_NONE		0
+#define	POST_PROC_SHAR		1
+#define	POST_PROC_UUDECODE		2
+#define	POST_PROC_UUD_LST_ZOO		3
+#define	POST_PROC_UUD_EXT_ZOO		4
+#define	POST_PROC_UUD_LST_ZIP		5
+#define	POST_PROC_UUD_EXT_ZIP		6
+
 
 /*
- *  used in art.c & rcfile.c
+ * used in art.c
+ * sort types on arts[] array
  */
+ 
+#define	SORT_BY_NOTHING		0
+#define	SORT_BY_SUBJ_DESCEND		1
+#define	SORT_BY_SUBJ_ASCEND		2
+#define	SORT_BY_FROM_DESCEND		3
+#define	SORT_BY_FROM_ASCEND		4
+#define	SORT_BY_DATE_DESCEND		5
+#define	SORT_BY_DATE_ASCEND		6
 
-#define 	SORT_BY_NOTHING 		0		/* sort types on arts[] array */
-#define 	SORT_BY_SUBJ_DESCEND		1
-#define 	SORT_BY_SUBJ_ASCEND		2
-#define 	SORT_BY_FROM_DESCEND		3
-#define 	SORT_BY_FROM_ASCEND		4
-#define 	SORT_BY_DATE_DESCEND		5
-#define 	SORT_BY_DATE_ASCEND		6
-
-/*
- *  used in help.c
- */
-
-#define 	HELP_INFO			0
-#define 	POST_INFO			1
-
-/*
- *  used in save.c
- */
-
-#define 	CHECK_ANY_NEWS			0
-#define 	START_ANY_NEWS			1
-#define 	MAIL_ANY_NEWS			2
-#define 	SAVE_ANY_NEWS			3
 
 /*
  *  used in help.c
  */
 
-#define 	HEADER_TO			0
-#define 	HEADER_SUBJECT			1
-#define 	HEADER_NEWSGROUPS		2
+#define	HELP_INFO		0
+#define	POST_INFO		1
+
 
 /*
- *  used in page.c & post.c
+ *  used in save.c/main.c
  */
 
-#define 	POSTED_NONE			0
-#define 	POSTED_REDRAW			1
-#define 	POSTED_OK			2
+#define	CHECK_ANY_NEWS		0
+#define	START_ANY_NEWS		1
+#define	MAIL_ANY_NEWS		2
+#define	SAVE_ANY_NEWS		3
+
+
+/*
+ *  used in post.c
+ */
+
+#define	HEADER_TO		0
+#define	HEADER_SUBJECT		1
+#define	HEADER_NEWSGROUPS		2
+
+#define	POSTED_NONE		0
+#define	POSTED_REDRAW		1
+#define	POSTED_OK		2
+
 
 /*
  * index_point variable values used throughout many modules
  */
 
-#define 	GRP_UNINDEXED		-1		/* Stop reading group */
-#define 	GRP_QUIT		-2		/* Set by 'Q' */
-#define 	GRP_GOTONEXT		-3		/* Goto another group */
-#define 	GRP_CONTINUE		-4		/* set in show_page() */
-#define 	GRP_NOREDRAW		-5		/* Unclear meaning ? */
-#define 	GRP_KILLED		-6		/* thread was killed at art level */
+#define	GRP_UNINDEXED		-1		/* Stop reading group */
+#define	GRP_QUIT		-2		/* Set by 'Q' */
+#define	GRP_GOTONEXT		-3		/* Goto another group */
+#define	GRP_CONTINUE		-4		/* set in show_page() */
+#define	GRP_NOREDRAW		-5		/* Unclear meaning ? */
+#define	GRP_KILLED		-6		/* thread was killed at art level */
 
-#define 	EXIT_OK 		0
-#define 	EXIT_ERROR		1
-#define 	EXIT_NNTP_ERROR 	2
+#define	EXIT_OK		0
+#define	EXIT_ERROR		1
+#define	EXIT_NNTP_ERROR		2
+
 
 /*
  *  Assertion verifier
@@ -911,64 +913,66 @@ extern char *get_uaf_fullname();
 #	endif
 #endif
 
-#define ESC	27
+
+#define	ESC		27
+
 
 /*
  * return codes for change_config_file ()
  */
 
-#define 	NO_FILTERING		0
-#define 	FILTERING		1
-#define 	DEFAULT_FILTER_DAYS	28
+#define	NO_FILTERING		0
+#define	FILTERING		1
+#define	DEFAULT_FILTER_DAYS		28
+
 
 /*
  *  art.thread (Can't ART_NORMAL be better named ?)
  */
 
-#define 	ART_NORMAL		-1
-#define 	ART_EXPIRED		-2
+#define	ART_NORMAL		-1
+#define	ART_EXPIRED		-2
 
 /*
  *  art.status
  */
 
-#define 	ART_READ		0
-#define 	ART_UNREAD		1
-#define 	ART_WILL_RETURN 	2
-
-#define 	ART_UNAVAILABLE 	-1
+#define	ART_READ		0
+#define	ART_UNREAD		1
+#define	ART_WILL_RETURN		2
+#define 	ART_UNAVAILABLE		-1
 
 /*
  * used by t_group & my_group[]
  */
 
-#define 	UNSUBSCRIBED		'!'
-#define 	SUBSCRIBED		':'
+#define	UNSUBSCRIBED		'!'
+#define	SUBSCRIBED		':'
 
 /*
  * filter_type used in struct t_filter
  */
 
-#define FILTER_KILL				0
-#define FILTER_SELECT				1
+#define	FILTER_KILL		0
+#define	FILTER_SELECT		1
 
-#define FILTER_SUBJ_CASE_SENSITIVE		0
-#define FILTER_SUBJ_CASE_IGNORE 		1
-#define FILTER_FROM_CASE_SENSITIVE		2
-#define FILTER_FROM_CASE_IGNORE 		3
-#define FILTER_MSGID				4
-#define FILTER_LINES				5
+#define	FILTER_SUBJ_CASE_SENSITIVE		0
+#define	FILTER_SUBJ_CASE_IGNORE		1
+#define	FILTER_FROM_CASE_SENSITIVE		2
+#define	FILTER_FROM_CASE_IGNORE		3
+#define	FILTER_MSGID		4
+#define	FILTER_LINES		5
 
-#define FILTER_LINES_EQ 			0
-#define FILTER_LINES_LT 			1
-#define FILTER_LINES_GT 			2
+#define	FILTER_LINES_EQ		0
+#define	FILTER_LINES_LT		1
+#define	FILTER_LINES_GT		2
 
 /*
  * used in checking article header before posting
  */
 
-#define NGLIMIT 20	/* Max. num. of crossposted groups before warning */
-#define MAX_COL 78	/* Max. line length before issuing a warning */
+#define	NGLIMIT		20	/* Max. num. of crossposted groups before warning */
+#define	MAX_COL		78	/* Max. line length before issuing a warning */
 
 /*
  * The following macros are used to simplify and speed up the
@@ -1400,7 +1404,7 @@ typedef struct t_notify *notify_p;
  */
 
 #ifndef RETSIGTYPE
-#define RETSIGTYPE void
+#	define RETSIGTYPE void
 #endif
 
 /*
@@ -1409,14 +1413,14 @@ typedef struct t_notify *notify_p;
 
 #ifdef HAVE_COMPTYPE_VOID
 #	ifdef __STDC__
-typedef const void t_comptype;
+		typedef const void t_comptype;
 #	else
-typedef void t_comptype;
+		typedef void t_comptype;
 #	endif
 #endif
 
 #ifdef HAVE_COMPTYPE_CHAR
-typedef char t_comptype;
+	typedef char t_comptype;
 #endif
 
 #ifdef M_OS2
@@ -1433,11 +1437,11 @@ typedef char t_comptype;
  * mouse buttons for use in xterm
  */
 
-#define		MOUSE_BUTTON_1	0
-#define		MOUSE_BUTTON_2	1
-#define		MOUSE_BUTTON_3	2
+#define	MOUSE_BUTTON_1		0
+#define	MOUSE_BUTTON_2		1
+#define	MOUSE_BUTTON_3		2
 
-#define	EDITOR_FORMAT_OFF	"%E %F"
+#define	EDITOR_FORMAT_OFF		"%E %F"
 
 #ifdef WIN32
 #	define	my_fputc(ch, stream)		cmd_line ? fputc (ch, stream) : addch (ch)
@@ -1510,18 +1514,18 @@ extern void joinpath (char *result, char *dir, char *file);
 extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef M_UNIX
-#	define	NEWSGROUPS_FILE 	"newsgroups"
-#	define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
-#	define	REDIRECT_OUTPUT 	"> /dev/null 2>&1"
-#	define	REDIRECT_PGP_OUTPUT	"> /dev/null"
+#	define	NEWSGROUPS_FILE		"newsgroups"
+#	define	BUG_REPORT_ADDRESS		"urs@akk.uni-karlsruhe.de"
+#	define	REDIRECT_OUTPUT		"> /dev/null 2>&1"
+#	define	REDIRECT_PGP_OUTPUT		"> /dev/null"
 #	define	ENV_VAR_MAILER		"MAILER"
 #	define	ENV_VAR_SHELL		"SHELL"
-#	define	EDITOR_FORMAT_ON	"%E +%N %F"
+#	define	EDITOR_FORMAT_ON		"%E +%N %F"
 #	define	MAILER_FORMAT		"%M \"%T\" < %F"
 #	define	METAMAIL_CMD		"%s -e -p -m \"tin\""
-#	define	TMPDIR			"/tmp/"
+#	define	TMPDIR		"/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
-#		define	KEY_PREFIX	0xff
+#		define	KEY_PREFIX		0xff
 #	endif
 #	define joinpath(result,dir,file)	sprintf (result,"%s/%s", dir, (file) ? file : "")
 #endif
@@ -1538,10 +1542,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #			define S_ISDIR(m)   ((m) & S_IF_DIR)
 #		endif
 #	endif
-#	if defined(M_UNIX)
-#		define S_ISDIR(m)   (((m) & S_IFMT) == S_IFDIR)
-#	endif
-#	if defined(VMS)
+#	if defined(M_UNIX) || defined(VMS)
 #		define S_ISDIR(m)   (((m) & S_IFMT) == S_IFDIR)
 #	endif
 #endif
@@ -1551,11 +1552,11 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 
 #ifdef DONT_HAVE_PIPING
-#ifdef VMS
-#define TIN_PRINTFILE "Sys$Scratch:TIN_PRINT%d.TMP"
-#else
-#define TIN_PRINTFILE "tinprint%d.tmp"
-#endif
+#	ifdef VMS
+#		define TIN_PRINTFILE "Sys$Scratch:TIN_PRINT%d.TMP"
+#	else
+#		define TIN_PRINTFILE "tinprint%d.tmp"
+#	endif
 #endif
 
 /*
@@ -1610,19 +1611,19 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif	/* DECL_SIG_CONST */
 
 #ifdef M_AMIGA
-typedef const char __far constext;
+	typedef const char __far constext;
 #else
-typedef /* FIXME: const */ char constext;
+	typedef /* FIXME: const */ char constext;
 #endif
 
 #include	"extern.h"
 #include	"nntplib.h"
 #ifndef __CPROTO__
-#include	"proto.h"
+#	include	"proto.h"
 #endif
 
 #if defined(WIN32)
-#include	"msmail.h"
+#	include	"msmail.h"
 #endif
 
 #if __STDC__ || defined(__cplusplus)
@@ -1641,8 +1642,8 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #	undef strrchr
 #	undef NSET1
 #	undef NSET0
-#	define NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] |	NTEST(n,b), 1)
-#	define NSET0(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] & ~NTEST(n,b), 1)
+#	define	NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] |	NTEST(n,b), 1)
+#	define	NSET0(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] & ~NTEST(n,b), 1)
 #	include "dbmalloc.h" /* dbmalloc 1.4 */
 #endif
 
@@ -1651,41 +1652,40 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #	undef realloc
 #	undef calloc
 #	undef free
-#	define malloc(cb)			mymalloc(cb, __LINE__, __FILE__)
-#	define realloc(pv,cb)		myrealloc(pv, cb, __LINE__, __FILE__)
-#	define calloc(cbs,cbe)	mycalloc(cbs, cbe, __LINE__, __FILE__)
-#	define free(pv) 		myfree(pv, __LINE__, __FILE__)
+#	define	malloc(cb)		mymalloc(cb, __LINE__, __FILE__)
+#	define	realloc(pv,cb)		myrealloc(pv, cb, __LINE__, __FILE__)
+#	define	calloc(cbs,cbe)		mycalloc(cbs, cbe, __LINE__, __FILE__)
+#	define	free(pv)		myfree(pv, __LINE__, __FILE__)
 #endif
 
-#ifdef	DOALLOC
-# if	__STDC__
-#  define ANSI_VARARGS 1
-#  include <stdarg.h>
-# else
-#  define ANSI_VARARGS 0
-#  include <varargs.h>
-#endif
-extern	char	*doalloc  P_((char *, size_t));
-extern	char	*docalloc P_((size_t, size_t));
-extern	void	dofree	  P_((char *));
-# undef malloc
-# undef realloc
-# undef calloc
-# undef free
-# define malloc(n)	doalloc((char *)0, n)
-# define realloc	doalloc
-# define calloc 	docalloc
-# define free		dofree
-
-extern	void	fail_alloc P_(( char *, char * ));
-extern	void	Trace P_(( char *, ... ));
-extern	void	Elapsed P_(( char * ));
-extern	void	WalkBack P_(( void ));
-extern	void	show_alloc P_(( void ));
-extern	void	no_leaks P_(( void ));
+#ifdef DOALLOC
+#	if	__STDC__
+#  	define ANSI_VARARGS 1
+#  	include <stdarg.h>
+#	else
+#  	define ANSI_VARARGS 0
+#  	include <varargs.h>
+#	endif
+	extern char *doalloc P_((char *, size_t));
+	extern char *docalloc P_((size_t, size_t));
+	extern void	dofree P_((char *));
+#	undef malloc
+#	undef realloc
+#	undef calloc
+#	undef free
+#	define	malloc(n)		doalloc((char *)0, n)
+#	define	realloc		doalloc
+#	define	calloc		docalloc
+#	define	free		dofree
+	extern void	fail_alloc P_(( char *, char * ));
+	extern void	Trace P_(( char *, ... ));
+	extern void	Elapsed P_(( char * ));
+	extern void	WalkBack P_(( void ));
+	extern void	show_alloc P_(( void ));
+	extern void	no_leaks P_(( void ));
 #endif	/* DOALLOC */
 
 #ifdef __DECC
-#define ferror(x)	(0)
-#define EndWin		EndWind
+#	define ferror(x)		(0)
+#	define EndWin		EndWind
 #endif

@@ -47,7 +47,7 @@ extern void do_update P_((void));
 extern void set_article P_((struct t_article *art));
 extern int input_pending P_((void));
 extern int valid_artnum P_((long art));
-extern char *regrettably_named_safe_fgets P_((FILE *f));
+extern char *safe_fgets P_((FILE *f));
 
 /* attrib.c */
 extern void set_default_attributes P_((struct t_attribute *psAttrib));

@@ -36,7 +36,6 @@ constext txt_article_cancelled[] = "Article cancelled from within tin [v%s relea
 constext txt_article_reposted1[] = "\n[ Article reposted from %s ]";
 constext txt_article_reposted2a[] = "\n[ Author was %s <%s> ]";
 constext txt_article_reposted2b[] = "\n[ Author was %s ]";
-constext txt_article_reposted3[] = "\n[ Posted on %s ]\n\n";
 constext txt_author_search_backwards[] = "Author search backwards [%s]> ";
 constext txt_author_search_forwards[] = "Author search forwards [%s]> ";
 constext txt_authorization_ok[] = "Authorized for user: %s\n";
@@ -49,7 +48,6 @@ constext txt_cannot_find_base_art[] = "Can't find base article %s";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
 constext txt_cannot_open[] = "Can't open %s";
 constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
-constext txt_cannot_open_art[] = "Can't open article %s: ";
 constext txt_cannot_post[] = "*** Posting not allowed ***";
 constext txt_cannot_stat_group[] = "Can't stat group %s";
 constext txt_cannot_stat_index_file[] = "Can't stat %s index %s\n";
@@ -88,7 +86,6 @@ constext txt_delete_article[] = "Delete or supersede article [%s]? (d/s/q): %c";
 constext txt_delete_processed_files[] = "Delete saved files that have been post processed? (y/n): ";
 constext txt_deleting[] = "Deleting...";
 constext txt_deleting_art[] = "Deleting article...";
-constext txt_superseding[] = "Superseding...";
 constext txt_superseding_art[] = "Superseding article...";
 constext txt_end_of_arts[] = "*** End of Articles ***";
 constext txt_end_of_groups[] = "*** End of Groups ***";
@@ -125,12 +122,10 @@ constext txt_filesystem_full[] = "Error writing newsrc file. Filesystem full?. R
 constext txt_filesystem_full_backup[] = "Error making backup of newsrc file. Filesystem full?.";
 #ifdef NO_REGEX
 constext txt_feed_pattern[] = "Enter pattern [%s]> ";
-constext txt_save_pattern[] = "Enter save pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter subscribe pattern> ";
 constext txt_unsubscribe_pattern[] = "Enter unsubscribe pattern> ";
 #else
 constext txt_feed_pattern[] = "Enter regex pattern [%s]> ";
-constext txt_save_pattern[] = "Enter regex save pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter regex subscribe pattern> ";
 constext txt_unsubscribe_pattern[] = "Enter regex unsubscribe pattern> ";
 #endif
@@ -145,7 +140,6 @@ constext txt_group_selection[] = "Group Selection";
 #ifndef NO_SHELL_ESCAPE
 constext txt_help_shell[] = "!\t  shell escape\r\n";
 #endif
-constext txt_help_4[] = "4$\t  goto spooldir 4 ($=goto last spooldir)\r\n";
 #ifdef CASE_PROBLEM
 constext txt_help_BIGB[] = "B\t  display article by body string case-insensitive search\r\n\t  (searches are case-insensitive and wrap around to all articles)\r\n";
 constext txt_help_BIGD[] = "D\t  delete (cancel) current article; must have been posted by you\r\n";
@@ -386,7 +380,6 @@ constext txt_invalid_from1[] = "Invalid  From: %s  line. Read the INSTALL file a
 constext txt_invalid_from2[] = "Invalid  From: %s line. Reconfigure your domainname.";
 constext txt_inverse_off[] = "Inverse video disabled";
 constext txt_inverse_on[] = "Inverse video enabled";
-constext txt_filtering_arts[] = "Selecting articles...";
 constext txt_last_resp[] = "-- Last response --";
 constext txt_lines[] = "Lines %s  ";
 constext txt_listing_archive[] = "\r\n\r\nListing %s archive...\r\n";
@@ -413,7 +406,6 @@ constext txt_mini_spooldir_1[] = "<n>=set current to n, CR=selects spooldir, h)e
 constext txt_mini_thread_1[] = "<n>=set current to n, TAB=next unread, c)atchup, d)isplay toggle,";
 constext txt_mini_thread_2[] = "h)elp, j=line down, k=line up, q)uit, t)ag, z=mark unread";
 constext txt_more[] = "--More--";
-constext txt_more_percent[] = "--More--(%d%%) [%ld/%ld]";
 constext txt_moving[] = "Moving %s...";
 constext txt_news_quote[] = "%F wrote:";
 constext txt_newsgroup[] = "Goto newsgroup [%s]> ";
@@ -431,12 +423,10 @@ constext txt_no_group[] = "No group";
 constext txt_no_groups[] = "*** No Groups ***";
 constext txt_no_groups_to_read[] = "No more groups to read";
 constext txt_no_groups_to_yank_in[] = "No more groups to yank in";
-constext txt_no_index_file[] = "No index file specified";
 constext txt_no_last_message[] = "No last message";
 constext txt_no_mail_address[] = "No mail address";
 constext txt_no_match[] = "No match";
 constext txt_no_more_groups[] = "No more groups";
-constext txt_no_newsgroups[] = "No newsgroups";
 constext txt_no_next_unread_art[] = "No next unread article";
 constext txt_no_prev_group[] = "No previous group";
 constext txt_no_prev_unread_art[] = "No previous unread article";
@@ -446,7 +436,6 @@ constext txt_no_resp[] = "No responses\r\n";
 constext txt_no_responses[] = "No responses";
 constext txt_no_resps_in_thread[] = "No responses to list in current thread";
 constext txt_no_search_string[] = "No search string";
-constext txt_no_spooldirs[] = "No spooldirs";
 constext txt_no_subject[] = "No subject";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_not_exist[] = "Newsgroup does not exist on this server";
@@ -649,7 +638,6 @@ constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
 constext txt_quit[] = "Do you really want to quit? (y/n): ";
 constext txt_quit_no_write[] = "Do you really want to quit without saving your configuration? (y/n): ";
 constext txt_quit_delete[] = "e)dit cancel message, q)uit, d)elete";
-constext txt_quit_edit_save_killfile[] = "q)uit e)dit s)ave kill/hot description: ";
 
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
@@ -722,7 +710,6 @@ constext txt_select_art[] = "Select article> ";
 constext txt_select_config_file_option[] = "Select option number before text or use arrow keys and <CR>. 'q' to quit.";
 constext txt_select_group[] = "Select group> ";
 constext txt_select_pattern[] = "Enter selection pattern [%s]> ";
-constext txt_select_spooldir[] = "Select spooldir> ";
 constext txt_select_thread[] = "Select thread > ";
 constext txt_server_name_in_file_env_var[] = "Put the server name in the file %s,\nor set the environment variable NNTPSERVER";
 constext txt_shell_escape[] = "Enter shell command [%s]> ";
@@ -744,7 +731,6 @@ constext txt_thread_marked_as_unread[] = "Thread marked as unread";
 constext txt_thread_not_saved[] = "Thread not saved";
 constext txt_thread_page[] = "T %d of %d (p %d), %s:  %s";
 constext txt_thread_resp_page[] = "T %d of %d, R %d/%d (p %d), %s:  %s";
-constext txt_thread_saved_to[] = "Thread saved to %s";
 constext txt_thread_saved_to_many[] = "Thread saved to %s - %s";
 constext txt_thread_x_of_n[] = "%sThread %4d of %4d\r\n";
 constext txt_threading_arts[] = "Threading articles...";
@@ -777,7 +763,6 @@ constext txt_warn_posting_etiquette[] = "\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
-constext txt_writing_index_file[] = "Writing index file...";
 constext txt_xpost_quote[] = "In %G %F wrote:";
 constext txt_x_resp[] = "%d Responses\r\n";
 constext txt_yanking_all_groups[] = "Yanking in all groups...";
@@ -824,7 +809,6 @@ constext txt_help_filter_lines[] = "Number of lines that should be filtered (-nu
 constext txt_help_filter_time[] = "Expiration time in days for the entered filter. <SPACE> toggles & <CR> sets.";
 constext txt_quit_edit_save_select[] = "q)uit e)dit s)ave select description: ";
 constext txt_all_groups[] = "All groups";
-constext txt_scope_group_only[] = "%s only";
 constext txt_time_default_days[] = "%d days";
 constext txt_unlimited_time[] = "Unlimited";
 constext txt_subj_line_only[] = "Subject: line (ignore case)     ";
