@@ -323,6 +323,5 @@ pgp_check_article()
 	continue_prompt();
 	set_alarm_clock_on();
 	return (1);
-	return 0;
 }
 #endif /* HAVE_PGP */

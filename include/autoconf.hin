@@ -61,6 +61,7 @@
  * file was detected during configuration.
  */
 #undef	HAVE_ALLOCA_H
+#undef	HAVE_ARPA_INET_H
 #undef	HAVE_CURSES_H
 #undef	HAVE_DIRENT_H
 #undef	HAVE_ERRNO_H
@@ -101,11 +102,11 @@
  * function is found in a library.
  */
 #undef	HAVE_BCOPY
-#undef	HAVE_BFILL
 #undef	HAVE_BZERO
 #undef	HAVE_FORK
 #undef	HAVE_GETCWD
 #undef	HAVE_GETHOSTBYNAME
+#undef	HAVE_GETSERVBYNAME
 #undef	HAVE_IS_XTERM
 #undef	HAVE_MEMCMP
 #undef	HAVE_MEMCPY
@@ -132,11 +133,17 @@
 #undef	HAVE_UNLINK
 
 /*
- * The following are functions that we'll have to declare if they're not
+ * The following are functions/data that we'll have to declare if they're not
  * declared in the system include files, since they return values other than
  * int.
  */
+#undef	DECL_ERRNO
 #undef	DECL_GETENV
+#undef	DECL_GETHOSTBYNAME
+#undef	DECL_GETLOGIN
+#undef	DECL_GETPWNAM
+#undef	DECL_GETSERVBYNAME
+#undef	DECL_POPEN
 #undef	DECL_TGETSTR
 
 /*
@@ -146,6 +153,7 @@
 #undef	DECL_BCOPY
 #undef	DECL_BZERO
 #undef	DECL_FCLOSE
+#undef	DECL_FDOPEN
 #undef	DECL_FFLUSH
 #undef	DECL_FPRINTF
 #undef	DECL_FPUTC
@@ -155,8 +163,9 @@
 #undef	DECL_FWRITE
 #undef	DECL_GETCWD
 #undef	DECL_GETHOSTNAME
-#undef	DECL_GETLOGIN
 #undef	DECL_GETOPT
+#undef	DECL_INET_ADDR
+#undef	DECL_INET_NTOA
 #undef	DECL_IOCTL
 #undef	DECL_MEMSET
 #undef	DECL_MKTEMP
@@ -168,9 +177,13 @@
 #undef	DECL_SETEGID
 #undef	DECL_SETEUID
 #undef	DECL_SETPGRP
+#undef	DECL_SETREGID
+#undef	DECL_SETREUID
 #undef	DECL_SOCKET
 #undef	DECL_SSCANF
+#undef	DECL_STRCASECMP
 #undef	DECL_STRFTIME
+#undef	DECL_STRNCASECMP
 #undef	DECL_STRTOL
 #undef	DECL_SYSTEM
 #undef	DECL_TIME

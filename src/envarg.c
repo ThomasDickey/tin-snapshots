@@ -53,7 +53,7 @@ envargs (Pargc, Pargv, envstr)
 	/*
 	 * see if anything in the environment 
 	 */
-	envptr = (char *) getenv (envstr);
+	envptr = getenv (envstr);
 	if (envptr == (char *) 0 || *envptr == 0) {
 		return;
 	}

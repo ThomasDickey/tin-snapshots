@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 
-dnl Updated   : 01.06.96
+dnl Updated   : 29.06.96
 dnl Notes     : 
 dnl Copyright : 
 dnl
@@ -190,8 +190,9 @@ AC_SUBST(NNTP_DEFAULT_SERVER)
 
 ## optional features
 AC_MSG_CHECKING(whether to use MH style mail handling)
-CF_ARG_ENABLE(mail-handling,
-	[  --enable-mail-handling  use MH style mail handling],
+CF_ARG_ENABLE(mh-mail-handling,
+	[  --enable-mh-mail-handling
+                          use MH style mail handling],
 	[AC_DEFINE(HAVE_MH_MAIL_HANDLING)])
 AC_MSG_RESULT($enableval)
 
@@ -284,6 +285,7 @@ AC_STDC_HEADERS
 AC_HEADER_DIRENT
 AC_HEADER_TIME
 AC_CHECK_HEADERS(\
+	arpa/inet.h \
 	curses.h \
 	errno.h \
 	fcntl.h \
@@ -309,6 +311,7 @@ AC_CHECK_HEADERS(\
 	sys/select.h \
 	sys/stream.h \
 	sys/time.h \
+	sys/timeb.h \
 	sys/times.h \
 	sys/utsname.h \
 	sys/wait.h \
@@ -352,10 +355,8 @@ CF_SYS_ERRLIST
 ###	Checks for library functions.
 AC_CHECK_FUNCS(\
 	bcopy \
-	bfill \
 	bzero \
 	getcwd \
-	gethostbyname \
 	is_xterm \
 	memcmp \
 	memcpy \
@@ -384,15 +385,24 @@ AC_CHECK_FUNCS(\
 CF_FUNC_FORK
 
 CF_CHECK_DECL(\
+	errno \
 	getenv \
+	gethostbyname \
+	getlogin \
+	getpwnam \
+	getservbyname \
+	inet_ntoa \
+	popen \
 	tgetstr \
 )
 
 if test $with_decl_check = yes; then
 CF_CHECK_DECL(\
+	_flsbuf \
 	bcopy \
 	bzero \
 	fclose \
+	fdopen \
 	fflush \
 	fprintf \
 	fputc \
@@ -402,7 +412,6 @@ CF_CHECK_DECL(\
 	fwrite \
 	getcwd \
 	gethostname \
-	getlogin \
 	getopt \
 	ioctl \
 	memset \
@@ -415,16 +424,19 @@ CF_CHECK_DECL(\
 	setegid \
 	seteuid \
 	setpgrp \
+	setregid \
+	setreuid \
 	socket \
 	sscanf \
+	strcasecmp \
 	strftime \
+	strncasecmp \
 	strtol \
 	system \
 	time \
 	tolower \
 	toupper \
 	tputs \
-	_flsbuf \
 )
 fi
 
@@ -464,6 +476,13 @@ AC_CHECK_FUNC(strcasecmp,[],[
 		NETLIBS="-lresolv $NETLIBS"],,
 		[$NETLIBS])])
 LIBS="$LIBS $NETLIBS"
+
+###	Checks for network library functions.
+AC_CHECK_FUNCS(\
+	getservbyname \
+	inet_addr \
+	inet_ntoa \
+)
 
 if test $ac_cv_func_sigaction = yes; then
 AC_MSG_CHECKING(whether sigaction needs _POSIX_SOURCE)

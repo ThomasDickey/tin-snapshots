@@ -40,7 +40,7 @@ append_file (old_filename, new_filename)
 		fclose (fp_new);
 		return;
 	}
-	while ((n = fread(buf,1,sizeof(buf),fp_new)) > 0) {
+	while ((n = fread(buf,1,sizeof(buf),fp_new)) != 0) {
 		if (n != fwrite(buf,1,n,fp_old)) {
 			sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 			perror_message (msg, "");
@@ -92,15 +92,12 @@ copy_fp (fp_ip, fp_op, prefix)
 	FILE *fp_op;
 	char *prefix;
 {
-#ifndef VMS
-	extern int errno;
-#endif
 	char buf[8192];
 	int retcode;
 
 	if (!prefix || !prefix[0]) {
-		int n;
-		while ((n = fread(buf,1,sizeof(buf),fp_ip)) > 0) {
+		size_t n;
+		while ((n = fread(buf,1,sizeof(buf),fp_ip)) != 0) {
 			if (n != fwrite(buf,1,n,fp_op)) {
 				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 				perror_message (msg, "");
@@ -134,9 +131,6 @@ copy_body (fp_ip, fp_op, prefix, initl)
 	char *prefix;
 	char *initl;
 {
-#ifndef VMS
-	extern int errno;
-#endif
 	char buf[8192];
 	char buf2[8192];
 	int retcode;
@@ -148,8 +142,8 @@ copy_body (fp_ip, fp_op, prefix, initl)
 	int i;
 
 	if (!prefix || !prefix[0]) {
-		int n;
-		while ((n = fread(buf,1,sizeof(buf),fp_ip)) > 0) {
+		size_t n;
+		while ((n = fread(buf,1,sizeof(buf),fp_ip)) != 0) {
 			if (n != fwrite(buf,1,n,fp_op)) {
 				sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 				perror_message (msg, "");
@@ -222,7 +216,7 @@ get_val (env, def)
 {
 	char *ptr;
 
-	ptr = (char *) getenv(env);
+	ptr = getenv(env);
 	
 	return (ptr != (char *) 0 ? ptr : def);
 }
@@ -241,7 +235,7 @@ invoke_editor (filename, lineno)
 	static int first = TRUE;
 
 	if (first) {
-		my_editor = (char *) getenv ("EDITOR");
+		my_editor = getenv ("EDITOR");
 
 		strcpy (editor, my_editor != NULL ? my_editor : get_val ("VISUAL", DEFAULT_EDITOR));
 		first = FALSE;
@@ -284,7 +278,7 @@ invoke_ispell (nam)
 	strcpy(ispell, "ispell");
 	first = FALSE;
 #else
-		my_ispell = (char *) getenv ("ISPELL");
+		my_ispell = getenv ("ISPELL");
 
 		strcpy (ispell, my_ispell != NULL ? my_ispell : ISPELL_CMD);
 		first = FALSE;
@@ -510,7 +504,7 @@ strip_double_ngs (ngs_list)
 	    			}
     			
 	    			if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
-    					&& (strlen(ngroup2) > 0)) {
+    					&& (strlen(ngroup2) != 0)) {
 	    					strcat(newlist, ",");
     						strcat(newlist, ngroup2);		
     				}
@@ -669,7 +663,6 @@ rename_file (old_filename, new_filename)
 	char *old_filename;
 	char *new_filename;
 {
-	extern int errno;
 	char buf[1024];
 	FILE *fp_old, *fp_new;
 
@@ -1344,7 +1337,7 @@ str_str (text, pattern, patlen)
 	register int i, j, *delta;
 	register size_t p1;
 	int deltaspace[256];
-	int textlen;
+	size_t textlen;
 
 	textlen = strlen (text);
 
@@ -1991,7 +1984,7 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 				/*
 				 * OK lookup the variable in the shells environment
 				 */
-				envptr = (char *) getenv (tbuf);
+				envptr = getenv (tbuf);
 				if (envptr == (char *) 0) {
 					str[0] = '\0';
 					return 0;

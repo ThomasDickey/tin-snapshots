@@ -28,12 +28,6 @@
 #endif
 #endif
 
-#ifdef HAVE_ERRNO_H
-#	include <errno.h>
-#else
-#	include <sys/errno.h>
-#endif
-
 #define DEFAULT_LINES_ON_TERMINAL	24
 #define DEFAULT_COLUMNS_ON_TERMINAL	80
 
@@ -232,7 +226,7 @@ InitScreen ()
 #ifndef INDEX_DAEMON
 	char termname[40], *p;
 	
-	if ((p = (char *) getenv ("TERM")) == (char *) 0) {
+	if ((p = getenv ("TERM")) == (char *) 0) {
 		fprintf (stderr, "%s: TERM variable must be set to use screen capabilities\n", progname);
 		return (FALSE);
 	}
@@ -983,7 +977,6 @@ int
 ReadCh ()
 {
 #ifndef INDEX_DAEMON
-	extern int errno;
 	char ch;
 	register int result;
 	

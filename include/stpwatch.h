@@ -14,6 +14,7 @@
 
 #ifdef PROFILE
 
+#if HAVE_SYS_TIMEB_H
 #include <sys/timeb.h>
 
 char msg_tb[1024];
@@ -24,7 +25,7 @@ struct timeb end_tb;
 #define LSECS 700000000
 
 #define BegStopWatch(msg)	{strcpy (msg_tb, msg); ftime (&beg_tb);}
-	
+
 #define EndStopWatch()		{ftime (&end_tb);}
 
 #define PrintStopWatch()	{sprintf (tmp_tb, "%s: Beg=[%ld.%d] End=[%ld.%d] Elapsed=[%ld]", \
@@ -33,4 +34,12 @@ struct timeb end_tb;
 				 (((end_tb.time - LSECS) * 1000) + end_tb.millitm) - \
 				 (((beg_tb.time - LSECS) * 1000) + beg_tb.millitm)); \
 				 error_message (tmp_tb, "");}
+#else
+				 /*FIXME: try gettimeofday*/
+#define BegStopWatch(msg)	/*nothing*/
+#define EndStopWatch()		/*nothing*/
+#define PrintStopWatch()	/*nothing*/
+
+#endif	/* HAVE_SYS_TIMEB_H */
+
 #endif	/* PROFILE */

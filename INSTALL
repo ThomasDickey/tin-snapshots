@@ -6,19 +6,19 @@ Note: The section 'News machine names' is now at the beginning as it
 
 This following Makefile & ./include/tin.h defines are documented in detail:
 ---------------------------------------------------------------------------
-  DEBUG                      HAVE_SELECT                NNTP_DEFAULT_SERVER
-  DEFAULT_ISO2ASC            HAVE_SETREUID              NNTP_INEWS
+  DEBUG                      HAVE_REF_THREADING         NNTP_ABLE
+  DEFAULT_ISO2ASC            HAVE_SELECT                NNTP_DEFAULT_SERVER
+  DONT_HAVE_PIPING           HAVE_SETREUID              NNTP_INEWS
   DONT_REREAD_ACTIVE_FILE    HAVE_STRFTIME              NNTP_ONLY
   HAVE_FASCIST_NEWSADMIN     HAVE_STRTOL                NNTP_SERVER_FILE
   HAVE_GETCWD                HAVE_TIN_NNTP_EXTS         NOVROOTDIR
-  HAVE_ISEPLL                INDEX_DAEMON               NO_PIPING
-  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_POSTING
-  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_REGEX
-  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         NO_SHELL_ESCAPE
-  HAVE_MMDF_MAILER           LIBDIR                     SMALL_MEMORY_MACHINE
-  HAVE_POLL                  LOG_USER                   SPOOLDIR
-  HAVE_POSIX_JC              NETLIBS                    USE_INN_NNTPLIB
-  HAVE_REF_THREADING         NNTP_ABLE                  USE_INVERSE_HACK
+  HAVE_ISPELL                INDEX_DAEMON               NO_POSTING
+  HAVE_LONG_FILE_NAMES       INEWSDIR                   NO_REGEX
+  HAVE_MH_MAIL_HANDLING      INEWS_MAIL_DOMAIN          NO_SHELL_ESCAPE
+  HAVE_MKDIR                 INEWS_MAIL_GATEWAY         SMALL_MEMORY_MACHINE
+  HAVE_MMDF_MAILER           LIBDIR                     SPOOLDIR
+  HAVE_POLL                  LOG_USER                   USE_INN_NNTPLIB
+  HAVE_POSIX_JC              NETLIBS                    USE_INVERSE_HACK
 
 News machine names
 ------------------
@@ -262,6 +262,9 @@ Log user-name & info to /tmp/.tin_log for usage statistics. If reading via
 NNTP the NNTP XUSER extended command will log user info to NNTP server.
 If -DNNTP_XUSER is defined it will define LOG_USER automatically.
 
+DONT_HAVE_PIPING
+Define if your system does not support piping of articles to shell commands.
+
 DONT_REREAD_ACTIVE_FILE
 Define if you do not want the active file to be reread periodically.
 The reread period can be set in seconds by setting the tinrc variable
@@ -270,7 +273,7 @@ The reread period can be set in seconds by setting the tinrc variable
 FORGERY
 Define if you want to be able to cancel postings you did not write
 yourself.  The !cyberspam and cancel conventions are supported.  Be
-careful with this feature, it should not be used in an free accessable
+careful with this feature, it should not be used in an free accessible
 tin.  This feature does not work with INN using the INN-inews (when
 using without NNTP), because INN-inews rejects these cancels.
 
@@ -341,9 +344,6 @@ Only define if your system supports the strftime() system call.
 
 HAVE_STRTOL
 Defined if your machine has the strtol() system call.
-
-NO_PIPING
-Do not allow piping of articles to shell commands.
 
 NO_POSTING
 Do not allow posting/followup of articles.

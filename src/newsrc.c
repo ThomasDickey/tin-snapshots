@@ -1341,11 +1341,11 @@ getaline (fp)
 		if (len > 0 && buf[len-1] == '\n') {
 			break;		/* the whole line has been read */
 		}
-		for (inc = size, p = NULL; p == NULL && inc > 0; inc /= 2) {
+		for (inc = size, p = NULL; p == NULL && inc != 0; inc /= 2) {
 			p = my_realloc (buf, size + inc);
 		}
 
-		if (inc <= 0 || p == NULL) {
+		if (inc == 0 || p == NULL) {
 			free (buf);
 			return (char *) 0;	/* couldn't get more memory */
 		}

@@ -498,6 +498,8 @@ write_config_file (file)
 	
 	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
 		wait_message (txt_filesystem_full_config_backup);
+		/* free memory for tmp-filename */
+		free(file_tmp);
 		return;
 	}	
 	
@@ -759,10 +761,14 @@ write_config_file (file)
 	}
 	if (ferror (fp) | fclose (fp)){
 		wait_message (txt_filesystem_full_config);
+		/* free memory for tmp-filename */
+		free(file_tmp);
 		return;
 	} else {
 		rename_file(file_tmp, file);
 		chmod (file, 0600);
+		/* free memory for tmp-filename */
+		free(file_tmp);
 	}
 }
 

@@ -734,7 +734,8 @@ filter_menu (type, group, art)
 		 * Subject:
 		 */
 		i = get_choice (INDEX_TOP+5, txt_help_filter_subj, 
-			        text_subj, txt_yes, txt_no, NULL, NULL, NULL);
+			        text_subj, txt_yes, txt_no,
+				(char *)0, (char *)0, (char *)0);
 		if (i == -1) {
 			return FALSE;
 		} else {
@@ -745,10 +746,12 @@ filter_menu (type, group, art)
 		 */
 		if (rule.subj_ok) {
 			i = get_choice (INDEX_TOP+7, txt_help_filter_from, 
-			        text_from, txt_no, txt_yes, NULL, NULL, NULL);
+			        text_from, txt_no, txt_yes,
+				(char *)0, (char *)0, (char *)0);
 		} else {
 			i = get_choice (INDEX_TOP+7, txt_help_filter_from, 
-			        text_from, txt_yes, txt_no, NULL, NULL, NULL);
+			        text_from, txt_yes, txt_no,
+				(char *)0, (char *)0, (char *)0);
 		}
 		if (i == -1) {
 			return FALSE;
@@ -764,10 +767,12 @@ filter_menu (type, group, art)
 		 */
 		if (rule.subj_ok || rule.from_ok) {
 			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid, 
-			        text_msgid, txt_no, txt_yes, NULL, NULL, NULL);
+			        text_msgid, txt_no, txt_yes,
+				(char *)0, (char *)0, (char *)0);
 		} else {
 			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid, 
-			        text_msgid, txt_yes, txt_no, NULL, NULL, NULL);
+			        text_msgid, txt_yes, txt_no,
+				(char *)0, (char *)0, (char *)0);
 		}
 		if (i == -1) {
 			return FALSE;
@@ -814,7 +819,7 @@ filter_menu (type, group, art)
 	 */
 	i = get_choice (INDEX_TOP+14, txt_help_filter_time, 
 			ptr_filter_time, txt_unlimited_time, text_time, 
-			NULL, NULL, NULL);
+			(char *)0, (char *)0, (char *)0);
 	if (i == -1) {
 		return FALSE;
 	}
@@ -848,11 +853,11 @@ filter_menu (type, group, art)
 
 		i = get_choice (INDEX_TOP+17, ptr_filter_help_scope, 
 			       ptr_filter_scope, 
-			       (argv[0][0] ? argv[0] : NULL), 
-			       (argv[1][0] ? argv[1] : NULL), 
-			       (argv[2][0] ? argv[2] : NULL), 
-			       (argv[3][0] ? argv[3] : NULL),
-			       NULL);
+			       (argv[0][0] ? argv[0] : (char *)0), 
+			       (argv[1][0] ? argv[1] : (char *)0), 
+			       (argv[2][0] ? argv[2] : (char *)0), 
+			       (argv[3][0] ? argv[3] : (char *)0),
+			       (char *)0);
 		if (i == -1) {
 			return FALSE;
 		}

@@ -27,11 +27,11 @@
  * etc).
  */
 #if defined(__amiga__) || defined(__amiga)
-#	undef  M_UNIX
-#	define M_AMIGA
 #	define SMALL_MEMORY_MACHINE
 #	define DONT_REREAD_ACTIVE_FILE
 #	ifndef __GNUC__
+#		undef  M_UNIX
+#		define M_AMIGA
 #		define  SIG_ARGS /*nothing, since compiler doesn't handle it*/
 #		undef   DECL_SIG_CONST
 #	endif
@@ -43,7 +43,6 @@
 #	include	<stdio.h>
 #endif
 #include	<signal.h>
-#include	<errno.h>
 
 #ifdef VMS
 #	define NNTP_ONLY
@@ -51,7 +50,6 @@
 #	ifdef	LOG_USER
 #		undef	LOG_USER
 #	endif /* LOG_USER */
-#	define NO_PIPING
 #	define DONT_HAVE_PIPING
 #	define NO_SHELL_ESCAPE
 #	define USE_CLEARSCREEN
@@ -69,6 +67,17 @@ extern char *get_uaf_fullname();
 #	endif /* !MULTINET */
 #	include <stat.h>
 #endif /* VMS */
+
+#ifndef VMS
+#	if HAVE_ERRNO_H
+#		include	<errno.h>
+#	else
+#		include	<sys/errno.h>
+#	endif
+#	if !defined(errno) && DECL_ERRNO
+	extern int errno;
+#	endif
+#endif
 
 #ifdef HAVE_STDDEF_H
 #	include <stddef.h>
@@ -363,10 +372,7 @@ extern char *get_uaf_fullname();
 #		define	bcopy(a,b,c)	memcpy(b,a,c)
 #	endif
 #	ifndef HAVE_BZERO
-#		define	bzero(a,b)		memset(a,'\0',b)
-#	endif
-#	ifndef HAVE_BFILL
-#		define	bfill(a,b,c)	memset(a,c,b)
+#		define	bzero(a,b)	memset(a,'\0',b)
 #	endif
 #endif
 
@@ -620,7 +626,7 @@ extern char *get_uaf_fullname();
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
-#if defined(VMS) || defined(M_AMIGA) 
+#if defined(VMS) || defined(M_AMIGA)
 #	define	LEN			512
 #	define	PATH_LEN		256
 #endif
@@ -856,7 +862,7 @@ extern char *get_uaf_fullname();
 
 #if !defined(M_OS2) && !defined(WIN32)
 #	ifdef HAVE_ANSI_ASSERT
-#		if defined (__hpux) && !defined(__GNUC__) 
+#		if defined (__hpux) && !defined(__GNUC__)
 #			define  assert(p)       if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
 #		else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
@@ -1045,7 +1051,7 @@ struct t_msgid
 	int article;				/* index in arts[] or ART_NORMAL */
 #endif
 };
-	
+
 /*
  *  struct t_article - article header
  *
@@ -1372,7 +1378,7 @@ typedef char t_comptype;
 /*
  * mouse buttons for use in xterm
  */
- 
+
 #define		MOUSE_BUTTON_1	0
 #define		MOUSE_BUTTON_2	1
 #define		MOUSE_BUTTON_3	2

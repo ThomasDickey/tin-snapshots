@@ -1053,8 +1053,6 @@ log_user ()
 	long epoch;
 #endif
 #ifndef M_AMIGA
-	extern struct passwd *myentry;
-
 	get_user_info (dummy, buf);
 
 	if (read_news_via_nntp && xuser_supported) {

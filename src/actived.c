@@ -117,9 +117,9 @@ vInitVariables ()
 	}
 #endif
 
-	if ((pcPtr = (char *) getenv ("TIN_HOMEDIR")) != (char *) 0) {
+	if ((pcPtr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
 		strcpy (acHomeDir, pcPtr);
-	} else if ((pcPtr = (char *) getenv ("HOME")) != (char *) 0) {
+	} else if ((pcPtr = getenv ("HOME")) != (char *) 0) {
 		strcpy (acHomeDir, pcPtr);
 #ifndef M_AMIGA
 	} else if (psPwd != (struct passwd *) 0) {

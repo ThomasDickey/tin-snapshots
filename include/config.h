@@ -140,7 +140,7 @@
 #endif
 
 #if defined(__386BSD__) || defined(BSD) || \
-    defined(__hpux) || defined(linux) || defined(M_OS2) || \
+    defined(__hpux) || defined(M_OS2) || \
     defined(__osf__) || defined(RS6000) || defined(sinix) || \
     defined(UMAXV)
 #	define	HAVE_NETDB_H
@@ -174,6 +174,10 @@
 #	define	HAVE_ERRNO_H
 #endif
 
+#ifndef VMS
+#define DECL_ERRNO
+#endif
+
 #if defined(__GNUC__) || defined(HAVE_POSIX_JC)
 #	define	RETSIGTYPE void
 #else
@@ -196,7 +200,7 @@
 #	define DECL_SIG_CONST
 #endif
 
-#if defined(M_OS2) || defined(linux) || defined(SVR4) || \
+#if defined(M_OS2) || defined(SVR4) || \
 	defined(WIN32)
 #	if !defined(HAVE_COMPTYPE_CHAR)
 #		define	HAVE_COMPTYPE_VOID
@@ -314,7 +318,7 @@
 #	define	HAVE_FORK
 #endif
 
-#if defined(M_OS2) || defined(linux) || defined(RS6000) || defined(SVR4)
+#if defined(M_OS2) || defined(RS6000) || defined(SVR4)
 #	define	HAVE_STRFTIME
 #endif
 
@@ -352,12 +356,6 @@
 #	define HAVE_METAMAIL
 #endif
 
-#if defined(linux)
-#	if !defined(HAVE_ISPELL)
-#		define	HAVE_ISPELL
-#	endif
-#endif
-
 /*
  * Hack used to try and get a compile on Sun i386 & old SunOS 4.0.2
  */
@@ -383,7 +381,7 @@
  * for machines where the netlibs are in the libc library
  */
 
-#if defined(BSD) || defined(linux) || defined(RS6000)
+#if defined(BSD) || defined(RS6000)
 #	if !defined(NNTP_ABLE)
 #		define	NNTP_ABLE
 #	endif
@@ -393,6 +391,7 @@
  * UCX (aka TCP/IP services for OpenVMS doesn't implement getservbyname 
  */
 
+#define HAVE_GETSERVBYNAME
 #if defined(VMS) && defined(UCX)
-#	define NO_GETSERVBYNAME
+#	undef HAVE_GETSERVBYNAME
 #endif
