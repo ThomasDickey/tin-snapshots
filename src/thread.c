@@ -42,7 +42,6 @@ bld_tline (l, art)
 #ifndef INDEX_DAEMON
 	char mark;
 	char from[LEN];
-	char smal_buffer[6];
 	char new_resps[8];
 	char lines[8];
 	char *spaces;
@@ -78,7 +77,7 @@ bld_tline (l, art)
 	j = INDEX2TNUM(l);
 
 	if (art->tagged) {
-		sprintf (new_resps, "%3s", tin_itoa(smal_buffer, art->tagged, 3));
+		strcpy (new_resps, tin_itoa(art->tagged, 3));
 	} else {
 		if (art->inrange) {
 			mark = art_marked_inrange;
@@ -98,18 +97,18 @@ bld_tline (l, art)
 	}
 
 	if (art->lines != -1) {
-		sprintf (lines, "%4s", tin_itoa(smal_buffer, art->lines, 4));
+		strcpy (lines, tin_itoa(art->lines, 4));
 	} else {
 		strcpy (lines, "   ?");
 	}
 
 	if (show_lines) {
-		sprintf (screen[j].col, "  %4s%3s  [%4s]  %-*.*s%s%-*.*s",
-			 tin_itoa(smal_buffer, l, 4), new_resps, lines, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %s%s  [%s]  %-*.*s%s%-*.*s",
+			 tin_itoa(l, 4), new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {
-		sprintf (screen[j].col, "  %4s%3s  %-*.*s%s%-*.*s",
-			 tin_itoa(smal_buffer, l, 4), new_resps, len_subj, len_subj, art->subject,
+		sprintf (screen[j].col, "  %s%s  %-*.*s%s%-*.*s",
+			 tin_itoa(l, 4), new_resps, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	}
 

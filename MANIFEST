@@ -1,18 +1,18 @@
-MANIFEST for tin-1.3-unoff-BETA-961206 (Sat Dec  7 03:50:13 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961207 (Sun Dec  8 13:36:27 MET 1996)
 ----------------------------------------------------
-  51168 ./CHANGES
-  12733 ./TODO
+  51505 ./CHANGES
+  12600 ./TODO
    5341 ./Makefile
   17122 ./INSTALL
    2260 ./MANIFEST
    1659 ./README
     896 ./tinpp
   21794 ./aclocal.m4
- 143547 ./configure
-  15817 ./configure.in
+ 144810 ./configure
+  16186 ./configure.in
    4771 ./install.sh
   11609 ./makefile.in
-   1014 ./conf-tin
+   1013 ./conf-tin
    1456 ./doc/DEBUG_REFS
   12018 ./doc/auth.txt
    1727 ./doc/hashing.doc
@@ -20,14 +20,14 @@ MANIFEST for tin-1.3-unoff-BETA-961206 (Sat Dec  7 03:50:13 MET 1996)
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
    8277 ./include/config.h
-  40967 ./include/extern.h
+  40872 ./include/extern.h
   14068 ./include/menukeys.h
     718 ./include/msmail.h
    4764 ./include/nntplib.h
    2233 ./include/os_2.h
-  29624 ./include/proto.h
+  29576 ./include/proto.h
    1376 ./include/stpwatch.h
-  42700 ./include/tin.h
+  42543 ./include/tin.h
     810 ./include/version.h
    4100 ./include/win32.h
     789 ./include/win32tcp.h
@@ -46,7 +46,7 @@ MANIFEST for tin-1.3-unoff-BETA-961206 (Sat Dec  7 03:50:13 MET 1996)
   19301 ./src/feed.c
   39895 ./src/filter.c
   10935 ./src/getline.c
-  41554 ./src/group.c
+  41462 ./src/group.c
    3202 ./src/hashstr.c
    9486 ./src/help.c
   12147 ./src/inews.c
@@ -57,7 +57,7 @@ MANIFEST for tin-1.3-unoff-BETA-961206 (Sat Dec  7 03:50:13 MET 1996)
   17820 ./src/main.c
    5124 ./src/makecfg.c
   10990 ./src/memory.c
-  48344 ./src/misc.c
+  48348 ./src/misc.c
    7228 ./src/msmail.c
   33311 ./src/newsrc.c
   26408 ./src/nntplib.c
@@ -77,19 +77,19 @@ MANIFEST for tin-1.3-unoff-BETA-961206 (Sat Dec  7 03:50:13 MET 1996)
   33655 ./src/save.c
    4573 ./src/screen.c
   10148 ./src/search.c
-  35628 ./src/select.c
+  35478 ./src/select.c
    5731 ./src/sigfile.c
   12442 ./src/signal.c
    5772 ./src/strftime.c
-  26301 ./src/thread.c
+  26206 ./src/thread.c
    4131 ./src/wildmat.c
   12575 ./src/win32.c
    2134 ./src/win32tcp.c
    6281 ./src/xref.c
    5552 ./src/vms.c
-   7094 ./include/autoconf.hin
-  10962 ./src/Makefile.in
+   7243 ./include/autoconf.hin
+  10965 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1583813 insgesamt
+1592953 insgesamt

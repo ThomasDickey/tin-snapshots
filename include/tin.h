@@ -339,20 +339,6 @@ extern char *get_uaf_fullname();
 /*
  * Determine machine configuration for external programs & directories
  */
-
-/*
- * changed all bcopy/bzero calls to memcpy/memset so this is no longer needed
- * so we could remove the next 8 lines and the autoconf check for bcopy/bzero
- */
-#ifndef BSD
-#	ifndef HAVE_BCOPY
-#		define	bcopy(a,b,c)	memcpy(b,a,c)
-#	endif
-#	ifndef HAVE_BZERO
-#		define	bzero(a,b)	memset(a,'\0',b)
-#	endif
-#endif
-
 #ifdef BSD
 
 /*
@@ -502,6 +488,14 @@ extern char *get_uaf_fullname();
 #	define		DEFAULT_SUM		"sum -r"
 #endif
 
+#ifndef HAVE_STRCASECMP
+#	define strcasecmp my_stricmp
+#endif
+
+#ifndef HAVE_STRNCASECMP
+#	define strncasecmp my_strnicmp
+#endif
+
 /*
  * fallback values
  */
@@ -602,7 +596,9 @@ extern char *get_uaf_fullname();
    defined */
 #define 	NEWNEWSRC_FILE		".newnewsrc"
 #define 	OLDNEWSRC_FILE		".oldnewsrc"
+#ifndef 	OVERVIEW_FILE
 #define 	OVERVIEW_FILE		".overview"
+#endif
 #define 	OVERVIEW_FMT		"overview.fmt"
 #define 	SUBSCRIPTIONS_FILE	"subscriptions"
 
@@ -626,7 +622,7 @@ extern char *get_uaf_fullname();
 #	define	forever	for(;;)
 #endif
 
-#define STRCMPEQ(s1, s2)			(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
+#define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
@@ -1573,6 +1569,12 @@ extern void joinpath (char *result, char *dir, char *file);
  *  function prototypes & extern definitions
  */
 
+#if __STDC__ || defined(__cplusplus)
+#	define P_(s) s
+#else
+#	define P_(s) ()
+#endif
+
 /* #include	"filebug.h" */
 
 #ifndef SIG_ARGS
@@ -1616,6 +1618,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #define OUTC_FUNCTION(func) OUTC_RETTYPE func (c) int c;
 #endif
 
+typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
+
 #include	"extern.h"
 #include	"nntplib.h"
 #ifndef __CPROTO__
@@ -1626,18 +1630,10 @@ extern void joinpath (char *result, char *dir, char *file);
 #	include	"msmail.h"
 #endif
 
-#if __STDC__ || defined(__cplusplus)
-#	define P_(s) s
-#else
-#	define P_(s) ()
-#endif
-
 /*
  * rfc1521/rfc1522 interface
  */
 typedef void (*BodyPtr) P_((char *, FILE *, int));
-
-typedef	OUTC_RETTYPE (*OutcPtr) P_((OUTC_ARGS));
 
 #ifdef DBMALLOC
 #	undef strchr

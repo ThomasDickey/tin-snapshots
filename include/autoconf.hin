@@ -3,7 +3,7 @@
  *  Module    : autoconf.hin
  *  Author    : Thomas Dickey
  *  Created   : 24.08.95
- *  Updated   : 09.07.96
+ *  Updated   : 07.12.96
  *  Notes     : #include files, #defines & struct's
  *
  *  Copyright 1996 by Thomas Dickey
@@ -58,9 +58,10 @@
 #undef	NNTP_DEFAULT_SERVER
 #undef	NOVROOTDIR
 #undef	NO_ETIQUETTE
+#undef	NO_LOCALE
+#undef	OVERVIEW_FILE
 #undef	SPOOLDIR
 #undef	USE_INN_NNTPLIB
-#undef	NO_LOCALE
 
 /*
  * These are defined if the corresponding program is found during configuration
@@ -136,8 +137,6 @@
  * The following are defined by the configure script if the corresponding
  * function is found in a library.
  */
-#undef	HAVE_BCOPY
-#undef	HAVE_BZERO
 #undef	HAVE_FORK
 #undef	HAVE_FTIME
 #undef	HAVE_GETCWD
@@ -159,9 +158,11 @@
 #undef	HAVE_SETREUID
 #undef	HAVE_SETUID
 #undef	HAVE_SIGACTION
+#undef	HAVE_STRCASECMP
 #undef	HAVE_STRCHR
 #undef	HAVE_STRERROR
 #undef	HAVE_STRFTIME
+#undef	HAVE_STRNCASECMP
 #undef	HAVE_STRTOL
 #undef	HAVE_TCGETATTR
 #undef	HAVE_TCSETATTR
@@ -307,7 +308,13 @@
  * Define if the system doesn't define SIGWINCH, or the associated structs
  * to determine the window's size.
  */
-#undef DONT_HAVE_SIGWINCH
+#undef	DONT_HAVE_SIGWINCH
+
+/*
+ * Define if the system doesn't support pipes, or if it is not a desired
+ * feature.
+ */
+#undef	DONT_HAVE_PIPING
 
 /*
  * Used in parsedate.y

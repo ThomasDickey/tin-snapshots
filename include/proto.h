@@ -1,9 +1,3 @@
-#if __STDC__ || defined(__cplusplus)
-#	define P_(s) s
-#else
-#	define P_(s) ()
-#endif
-
 /* active.c */
 extern void init_group_hash P_((void));
 extern int cmp_group_p P_((t_comptype *group1, t_comptype *group2));
@@ -257,7 +251,7 @@ extern char *get_val P_((char *env, char *def));
 extern int invoke_editor P_((char *filename, int lineno));
 extern int invoke_ispell P_((char *nam));
 extern void shell_escape P_((void));
-extern char *tin_itoa P_((char *buffer, int value, int digits));
+extern char *tin_itoa P_((int value, int digits));
 extern void tin_done P_((int ret));
 extern void strip_double_ngs P_((char *ngs_list));
 extern long my_strtol P_((/* const */ char *str, char **ptr, int use_base));
@@ -274,8 +268,12 @@ extern void base_name P_((char *dirname, char *program));
 extern int mail_check P_((void));
 extern void parse_from P_((char *from_line, char *eaddr, char *fname));
 extern long my_atol P_((char *s, int n));
+#ifndef HAVE_STRCASECMP
 extern int my_stricmp P_((/* const */ char *p, /* const */ char *q));
+#endif
+#ifndef HAVE_STRNCASECMP
 extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
+#endif
 extern char *eat_re P_((char *s));
 extern void my_strncpy P_((char *p, const char *q, int n));
 extern int untag_all_articles P_((void));
@@ -625,5 +623,3 @@ extern void NSETRNG0 P_((t_bitmap *bitmap, long low, long high));
 	/* post.c */
 	extern void make_path_header P_((char *line, char *from_name));
 #endif /* FORGERY */
-
-#undef P_

@@ -1253,7 +1253,7 @@ art_open (art, group_path)
 			break;
 
 		/* do not remove \n in Summary lines */
-		is_summary = (my_strnicmp (buf, "Summary: ", 9) == 0);
+		is_summary = (strncasecmp (buf, "Summary: ", 9) == 0);
 
 		/* check for continued header line */
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
@@ -1526,7 +1526,7 @@ match_header (buf, pat, body, nodec_body, len)
 	/*
 	 * If the header matches, skip the ': ' and any leading whitespace
 	 */
-	if (my_strnicmp(buf, pat, plen) == 0) {
+	if (strncasecmp(buf, pat, plen) == 0) {
 		plen += 2;
 
 		while (buf[plen] == ' ') {

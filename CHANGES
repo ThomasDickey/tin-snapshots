@@ -1,3 +1,14 @@
+--unoff BETA release 961207 --
+
+237) Thomas E. Dickey <dickey@clark.net>
+     BUG. typedes for OutcPtr are out-of-order
+     ADD. configuration options/logic for the .overview name, piping
+          and the strcasecmp, strncasecmp functions.
+     FIX. several supplied patches
+
+236) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     see 235)
+
 --unoff BETA release 961206 --
 
 235) Urs Janssen <urs@akk.uni-karlsruhe.de>
