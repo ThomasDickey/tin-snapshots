@@ -1,11 +1,11 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.15 1999/02/16 20:43:28 roland Exp $
+# $ Id: metamutt,v 1.15 1999/01/20 13:53:10 roland Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
 # work as a filter without any problems.
-# 
+#
 # This script was written to use it in combination with the tin news
 # reader, where you have to set the envionment variable
 # METAMAIL=metamutt, but it should work with other programs, too.

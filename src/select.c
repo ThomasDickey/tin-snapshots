@@ -1235,7 +1235,7 @@ subscribe_pattern (
 			if (match_group_list (active[i].name, buf)) {
 				if (active[i].subscribed != (state != FALSE)) {
 					spin_cursor ();
-					/* If found and group is not subscribed add it to end of my_group[]. */
+					/* If found and group is not subscribed add it to end of my_group[] */
 					subscribe (&active[i], SUB_CHAR(state));
 					if (state) {
 						my_group_add (active[i].name);

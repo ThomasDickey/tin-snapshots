@@ -254,10 +254,9 @@ get_termcaps (void)
 		my_fprintf (stderr, txt_no_term_set, tin_progname);
 		return (FALSE);
 	}
-	if (strcpy (the_termname, p) == NULL) {
-		my_fprintf (stderr, txt_cannot_get_term, tin_progname);
-		return (FALSE);
-	}
+
+	my_strncpy(the_termname, p, sizeof(the_termname) - 1);
+
 	if (tgetent (_terminal, the_termname) != 1) {
 		my_fprintf (stderr, txt_cannot_get_term_entry, tin_progname);
 		return (FALSE);

@@ -2693,7 +2693,10 @@ This file is only present on the news-server.
 .\"
 .\"
 .SH BUGS
-See the TODO-file which comes with the source.
+\fBCNews\fP NNTPd and \fBnoffle\fP can't handle simultaneous GROUP
+commands. If you run into trouble with any of the mentioned servers
+define NUM_SIMULTANEOUS_GROUP_COMMAND to 1 in active.c and recompile.
+See also the TODO-file which comes with the source.
 .\"
 .\"
 .SH HISTORY
@@ -2722,6 +2725,15 @@ November 13th 1999.
 .br
 v1.4.1 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
 December 1st 1999.
+.br
+v1.4.2 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
+February 5th 2000.
+.br
+v1.4.3 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
+May 2nd 2000.
+.br
+v1.4.4 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4/ since
+August 3rd 2000.
 .\"
 .\"
 .SH CREDITS
