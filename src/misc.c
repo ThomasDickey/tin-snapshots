@@ -637,14 +637,6 @@ invoke_cmd (
 {
 	int ret;
 
-#if defined(__hpux)
-#	if defined(__STDC__)
-		RETSIGTYPE (*suspchld)(int sig);
-#	else
-		RETSIGTYPE (*suspchld)();
-#	endif
-#endif
-
 #ifdef SIGTSTP
 	RETSIGTYPE (*susp)(SIG_ARGS);
 	susp = (RETSIGTYPE (*)(SIG_ARGS)) 0;
@@ -659,18 +651,12 @@ invoke_cmd (
 		susp = signal(SIGTSTP, SIG_DFL);
 #endif
 
-#if defined(__hpux)
-	suspchld = signal (SIGCHLD, SIG_DFL);
-	ret = system (nam);
-	signal (SIGCHLD, suspchld);
-#else
 #	if USE_SYSTEM_STATUS
 		system(nam);
 		ret = system_status;
 #	else
 		ret = system (nam);
 #	endif
-#endif
 
 #ifdef SIGTSTP
 	if (do_sigtstp)

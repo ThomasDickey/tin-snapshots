@@ -85,7 +85,7 @@ constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Mark Toml
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Andreas Wrede.";
 #endif
 #ifdef M_UNIX
-constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea.";
+constext txt_copyright_notice[] = "%s (c) Copyright 1991-97 Iain Lea.";
 #endif
 #ifdef VMS
 char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin.";

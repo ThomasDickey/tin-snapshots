@@ -63,7 +63,7 @@ static int msg_add_x_body (FILE *fp_out, char *body);
 static int pcCopyArtHeader (int iHeader, char *pcArt, char *result);
 static int submit_mail_file (char *file);
 static void postpone_article ( char *the_article);
-static void find_reply_to_addr (int respnum, char *from_addr);
+static void find_reply_to_addr (int respnum, char *from_addr, t_bool parse);
 static void msg_add_x_headers (char *headers);
 static void setup_check_article_screen (int *init);
 static void update_active_after_posting (char *newsgroups);
@@ -1870,7 +1870,7 @@ post_response (
 
 			strcpy (save_followup, note_h_followup);
 			*note_h_followup = '\0';
-			find_reply_to_addr (respnum, buf);
+			find_reply_to_addr (respnum, buf, FALSE);
 			mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);
 			strcpy (note_h_followup, save_followup);
 			return ret_code;
@@ -2525,7 +2525,7 @@ mail_to_author (
 	sprintf (subject, "Re: %s\n", eat_re (note_h_subj));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
-		find_reply_to_addr (respnum, from_addr);
+		find_reply_to_addr (respnum, from_addr, FALSE);
 
 		msg_add_header ("To", from_addr);
 		msg_add_header ("Subject", subject);
@@ -2599,7 +2599,7 @@ mail_to_author (
 	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
 		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj));
-		find_reply_to_addr (respnum, mail_to);
+		find_reply_to_addr (respnum, mail_to, TRUE);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -3107,7 +3107,7 @@ repost_article (
 			msg_add_header ("Supersedes", note_h_messageid);
 			if (note_h_followup[0])
 				msg_add_header ("Followup-To", note_h_followup);
-			find_reply_to_addr (respnum, line);
+			find_reply_to_addr (respnum, line, FALSE);
 			msg_add_header ("Reply-To", line);
 			if (note_h_keywords[0])
 				msg_add_header ("Keywords", note_h_keywords);
@@ -3532,7 +3532,8 @@ insert_from_header (
 static void
 find_reply_to_addr (
 	int respnum,	/* we don't need that in the #else part */
-	char *from_addr)
+	char *from_addr,
+	t_bool parse)
 {
 #if 0
 	/*
@@ -3584,6 +3585,9 @@ find_reply_to_addr (
 	char *ptr, buf[HEADER_LEN];
 	char replyto[HEADER_LEN];
 	char from[HEADER_LEN];
+	char temp[HEADER_LEN];
+	char fullname[HEADER_LEN];
+	char* dest;
 	int found_replyto = FALSE;
 	long orig_offset;
 
@@ -3609,11 +3613,24 @@ find_reply_to_addr (
 		}
 	}
 
-	if (found_replyto) {
-		strcpy (from_addr, rfc1522_decode(replyto));
+	/* We do this to save a redundant strcpy when we don't want to parse */
+
+	if (parse) {
+		dest = temp;
 	} else {
-		strcpy (from_addr, rfc1522_decode(from));
+		dest = from_addr;
 	}
+
+	if (found_replyto) {
+		strcpy (dest, rfc1522_decode(replyto));
+	} else {
+		strcpy (dest, rfc1522_decode(from));
+	}
+
+	if (parse) {
+		parse_from (temp, from_addr, fullname);
+	}
+
 	fseek (note_fp, orig_offset, 0);
 #endif
 }
