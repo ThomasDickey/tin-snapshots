@@ -1,3 +1,9 @@
+--unoff BETA release 961206 --
+
+235) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. even more smarter tin_itoa()
+     FIX. misc.c, group.c, select.c, thread.c
+
 --unoff BETA release 961205 --
 
 234) Urs Janssen <urs@akk.uni-karlsruhe.de>
