@@ -68,6 +68,7 @@ CC="$CC" \
 	--disable-debug \
 	--enable-prototypes \
 	--enable-warnings \
-	--with-mail-domain=akk.uni-karlsruhe.de \
+ 	--with-mail-domain=/etc/NNTP_INEWS_DOMAIN \
+  	--enable-nntp \
 	--enable-nntp-only \
         $OPTS $* 2>&1 |tee -a $OUT

@@ -202,6 +202,7 @@ int mail_news;				/* mail all arts to specified user */
 int save_news;				/* save all arts to savedir structure */
 int save_to_mmdf_mailbox;		/* save mail to MMDF/mbox format mailbox */
 int show_author;
+int show_lines;
 int show_last_line_prev_page;		/* set TRUE to see last line of prev page (ala nn) */
 int show_only_unread_groups;		/* set TRUE to see only subscribed groups with new news */
 int show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
@@ -399,6 +400,7 @@ void init_selfinfo ()
 	save_to_mmdf_mailbox = FALSE;
 #endif
 	show_last_line_prev_page = FALSE;
+	show_lines = TRUE;
 	show_description = TRUE;
 	show_only_unread_groups = FALSE;
 	show_xcommentto = FALSE;

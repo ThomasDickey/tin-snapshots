@@ -431,25 +431,6 @@ rfc1522_encode(s)
 	return buf;
 }
 
-#if 0 /* no longer needed - it was a bfi approach anyway */
-#ifndef RFCDEBUG
-void
-rfc1522_decode_all_headers()
-{
-	/* works on the global 'arts' array, which has 'top' entries */
-	int i;
-
-	/* some black magic to make things easier... */
-#define hdr(x) if (arts[i].x&&arts[i].x[0]) { strcpy(arts[i].x,rfc1522_decode(arts[i].x)); }
-
-	for (i=0; i<top; i++) {
-		hdr(subject);
-		hdr(name);
-	}
-}
-#endif /* !RFCDEBUG */
-#endif /* 0 */
-
 void
 rfc15211522_encode(filename)
 	char *filename;

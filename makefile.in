@@ -1,11 +1,12 @@
 # Top level Makefile for tin - for configuration options read the ./INSTALL file.
 # 
-PROJECT	= tin
+PROJECT		= tin
 EXE		= tin
-MANEXT	= 1
-BASE_VER= 950619
-VER		= 1.3beta-950621
-MAIL_ADDR = "iain@scn.de"
+MANEXT		= 1
+LVER		= 1.3
+PVER		= 960617
+VER		= $(LVER)-unoff-BETA-$(PVER)
+MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
 # directory structure
 TOPDIR	= .

@@ -1,7 +1,7 @@
 #if __STDC__ || defined(__cplusplus)
-#define P_(s) s
+#	define P_(s) s
 #else
-#define P_(s) ()
+#	define P_(s) ()
 #endif
 
 /* ./active.c */
@@ -242,6 +242,7 @@ extern int invoke_editor P_((char *filename, int lineno));
 extern int invoke_ispell P_((char *nam));
 extern void shell_escape P_((void));
 extern void tin_done P_((int ret));
+extern void strip_double_ngs P_((char *ngs_list));
 extern long my_strtol P_((char *str, char **ptr, int base));
 extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
@@ -267,8 +268,8 @@ extern void get_author P_((int thread, struct t_article *art, char *str));
 extern void toggle_inverse_video P_((void));
 extern void show_inverse_video_status P_((void));
 #ifdef HAVE_COLOR
-extern void toggle_color P_((void));
-extern void show_color_status P_((void));
+	extern void toggle_color P_((void));
+	extern void show_color_status P_((void));
 #endif
 extern int get_arrow_key P_((void));
 extern void create_index_lock_file P_((char *lock_file));
@@ -403,7 +404,7 @@ extern int reread_active_after_posting P_((void));
 extern void update_active_after_posting P_((char *newsgroups));
 extern int submit_mail_file P_((char *file));
 #ifdef FORGERY
-extern void make_path_header P_((char *line, char *from_name));
+	extern void make_path_header P_((char *line, char *from_name));
 #endif
 /* ./prompt.c */
 extern int prompt_num P_((int ch, char *prompt));

@@ -1,5 +1,9 @@
 Bugs
 ----
+o  'f'uping includes a Followup-To: line with the same newsgroups as in the
+    Newsgroups line - ok - but if the Followup-To: line is not edited, it is
+    included in the posting *argh*
+
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
 o  if marking read article with 'z' as will return and than reread it, the
@@ -13,9 +17,6 @@ o  The 'M' moderation flag (group selection level) is not showing up
 
 o  'D' deleted article flag (thread selection level) is not showing up.
    (is it still needed?!)
-
-o  can't 'x' (repost) to more than one group - comma is not parsed as
-   separator
 
 o  marking latest article with 'K' does not jump to top of newsgroup if
    there are still articles to read
@@ -53,16 +54,13 @@ o  splitt tin.h for better dependencies in make
 
 o  join Makefile and makefile
 
+o  unique newsgroups after editing article
+
 o  add 'U'untag all command to thread level.
 
 o  add feature save selected/tagged files sequentially to the same file
 
 o  rewrite NGLIMIT handling (post.c)
-
-o  uniq newsgroups before posting
-   (Newsgroups: alt.test,alt.test -> Newsgroups: alt.test)
-
-o  make show-lines patch (group.c/thread.c) configurable via switch in tinrc
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
@@ -132,6 +130,8 @@ o  error message when tin -uv and using xover is misleading
 
 Not yet classified
 ------------------
+o  what is with NEW_HASH_METHOD in misc.c?
+
 o  kill-file may get messed up if  using multiple news servers with feeds
    that are not identical (moving some groups entries under new groups and
    losing all references to the moved groups)

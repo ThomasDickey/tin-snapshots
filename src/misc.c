@@ -16,7 +16,7 @@
 
 #ifdef M_UNIX
 /*
- * my_append_file instead of rename_file
+ * append_file instead of rename_file
  * minimum error trapping - only unix support
  */
 void
@@ -439,11 +439,95 @@ tin_done (ret)
 }
 
 
+
+/*
+ * strip_double_ngs ()
+ * Strip duplicate newsgroups from within a given list of comma 
+ * separated groups
+ * 
+ * 14-Jun-'96 Sven Paulus <sven@oops.sub.de>
+ *
+ */
+ 
+void
+strip_double_ngs (ngs_list)
+	char *ngs_list;
+{
+	
+	char	ngroup1[LEN];		/* outer newsgroup to compare       */
+	char	ngroup2[LEN];		/* inner newsgroup to compare       */
+	char	cmplist[LEN];		/* last loops output                */
+	char	newlist[LEN];		/* the newly generated list without */
+					/* any duplicates of the first nwsg */
+	int	ncnt1;			/* counter for the first newsgroup  */
+	int	ncnt2;			/* counter for the second newsgroup */
+	int 	over1;			/* TRUE when the outer loop is over */
+	int	over2;			/* TRUE when the inner loop is over */
+	char	*ptr;			/* start of next (outer) newsgroup  */
+	char	*ptr2;			/* temporary pointer                */
+
+	/* shortcut, if the is only 1 group */
+	if (strchr(ngs_list, ',') != (char *) 0) {
+	
+	    	over1 = FALSE;
+	    	ncnt1 = 0;
+	    	strcpy(newlist, ngs_list);	/* make a "working copy"            */
+	    	ptr = newlist;			/* the next outer newsg. is the 1st */
+	    	
+	    	while (! over1) {
+	    		ncnt1++;			/* inc. outer counter */
+	    		strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
+	    		ptr2 = strchr(ptr, ',');	/* search "," ...                  */
+	    		if (ptr2 != (char *) 0) {       /* if found ...                    */
+	    			*ptr2 = '\0';
+	    			strcpy(ngroup1, ptr);   /* chop off first outer newsgroup  */
+	    			ptr = ptr2 + 1;		/* pointer points to next newsgr.  */
+	    		} else {			/* ... if not: last group          */
+	    			over1 = TRUE;		/* wow, everything is done after . */
+	    			strcpy(ngroup1, ptr);   /* ... this last outer newsgroup   */
+	    		}
+	
+/*			printf("1[%d]: %s\n", ncnt1, ngroup1); */ /* debug */
+	    		
+	    		over2 = FALSE;
+	    		ncnt2 = 0;
+	
+	    		/* now compare with each inner newsgroup on the list,
+	    	         * which is behind the momentary outer newsgroup
+	    	         * if it is different from the outer newsgroup, append
+	    	         * to list, strip double-commas
+	    	         */
+	    				
+	    		while (! over2) {
+	    			ncnt2++;
+	    			strcpy(ngroup2, cmplist);
+/*				printf("2[%d]: %s\n", ncnt2, ngroup2); */
+	    			ptr2 = strchr(ngroup2, ',');
+	    			if (ptr2 != (char *) 0) {
+	    				strcpy(cmplist, ptr2+1);
+	    				*ptr2 = '\0';
+	    			} else {
+	    				over2 = TRUE;
+	    			}
+    			
+	    			if ((ncnt2 > ncnt1) && (strcasecmp(ngroup1, ngroup2))
+    					&& (strlen(ngroup2) > 0)) {
+	    					strcat(newlist, ",");
+    						strcat(newlist, ngroup2);		
+    				}
+    			}
+    		}
+    	
+ 	   	strcpy(ngs_list, newlist);	/* move string to its real location */
+	}		
+}
+
+
 long
 my_strtol (str, ptr, base)
 	char	*str;
 	char	**ptr;
-	int		base;
+	int	base;
 {
 #ifndef HAVE_STRTOL
 #define DIGIT(x) (isdigit(x)? ((x)-'0'): (10+tolower(x)-'a'))

@@ -35,7 +35,7 @@
  * 	Stefan Scholl		<stesch@sks.inka.de>
  *
  */
-#define RELEASEDATE	"960616"
+#define RELEASEDATE	"960617"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

@@ -1523,10 +1523,12 @@ set_subj_from_size (num_cols)
 	if (show_author != SHOW_FROM_NONE) {
 		len_from = max_from - BLANK_GROUP_COLS;
 		len_subj = max_subj;
+		len_subj += 5 * (1 - show_lines);
 		spaces = "   ";
 	} else {
 		len_from = 0;
 		len_subj = (max_subj+max_from+3) - BLANK_GROUP_COLS;
+		len_subj += 5 * (1 - show_lines);
 		spaces = "";
 	}
 }
@@ -1597,8 +1599,6 @@ bld_sline (i)
 	else
 		n = sbuf.total;
 	
-/*	n = ART_ADJUST(n); T.Dickey 941027 */
-	
 	if ((j = line_is_tagged(respnum)) != 0) {
 		sprintf (new_resps, "%3d", j);
 	} else {
@@ -1610,21 +1610,24 @@ bld_sline (i)
 	 */
 	j = (sbuf.unread) ? next_unread(respnum) : respnum;
 
-/*	if (n) { T.Dickey 941027 */
-
-/*
- * TODO: hack in a config var for this
- */
-	if (n > 1) {
-		if (arts[j].lines != -1)
-			sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
-		else
-			sprintf (art_cnt, "%-3d ?    ", n);
+	if (show_lines) { 	
+		if (n > 1) {
+			if (arts[j].lines != -1)
+				sprintf (art_cnt, "%-3d %-4d ", n, arts[j].lines);
+			else
+				sprintf (art_cnt, "%-3d ?    ", n);
+		} else {
+			if (arts[j].lines != -1) 
+				sprintf (art_cnt, "    %-4d ", arts[j].lines);
+			else
+				strcpy (art_cnt, "    ?    ");
+		}
 	} else {
-		if (arts[j].lines != -1)
-			sprintf (art_cnt, "    %-4d ", arts[j].lines);
-		else
-			strcpy (art_cnt, "    ?    ");
+		if (n > 1) {
+			sprintf(art_cnt, "%-3d ", n);
+		} else {
+			sprintf(art_cnt, "    ");
+		}
 	}
 
 	if (show_author != SHOW_FROM_NONE) {
@@ -1637,13 +1640,11 @@ bld_sline (i)
 		 arts[respnum].subject, spaces, len_from, len_from, from);
 	
 	/* protect display from non-displayable characters (e.g., form-feed) */
-	for (n = 0; buffer[n] != '\0'; n++)
-#if 0  /* CHRIS behaves badly with some environments */
-		if (!isprint(buffer[n]))
-#else
-		if (!isprint(buffer[n]) && !((unsigned char)buffer[n]>=0xa0))
-#endif
+	for (n = 0; buffer[n] != '\0'; n++) {
+		if (!isprint(buffer[n]) && !((unsigned char)buffer[n]>=0xa0)) {
 			buffer[n] = '?';
+		}
+	}
 
 #endif /* INDEX_DAEMON */
 	return(0);

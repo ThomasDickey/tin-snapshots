@@ -380,6 +380,9 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "show_last_line_prev_page=", &show_last_line_prev_page)) {
 				break;
 			}
+			if (match_boolean (buf, "show_lines=" , &show_lines)) {
+				break;
+			}			
 			if (match_boolean (buf, "save_to_mmdf_mailbox=", &save_to_mmdf_mailbox)) {
 				break;
 			}
@@ -580,6 +583,8 @@ write_config_file (file)
 	fprintf (fp, "show_description=%s\n\n", print_boolean (show_description));
 	fprintf (fp, "# part of from field to display 0) none 1) address 2) full name 3) both\n");
 	fprintf (fp, "show_author=%d\n\n", default_show_author);
+	fprintf (fp, "# show number of lines of first unread article in thread listing (ON/OFF)\n");
+	fprintf (fp, "show_lines=%s\n\n", print_boolean(show_lines));
 	fprintf (fp, "# type of post processing to perform after saving articles.\n");
 #ifdef M_AMIGA
 	fprintf (fp, "# 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list lha)\n");
