@@ -638,6 +638,11 @@ quick_post_article ()
 	}
 
 	/*
+	 * Strip double newsgroups
+	 */
+	strip_double_ngs(group);
+	
+	/*
 	 * Check if any of the newsgroups are moderated.
 	 */
 	strcpy (tmp, group);
@@ -874,7 +879,7 @@ post_article (group, posted)
 #endif
 	
 	msg_init_headers ();
-		
+
 	psGrp = psGrpFind (group);
 	if (! psGrp) {
 		error_message (txt_not_in_active_file, group);
@@ -1140,6 +1145,14 @@ post_response (group, respnum, copy_text)
 	
 	wait_message (txt_post_a_followup);
 	
+	/*
+	 *  Remove duplicates in Newsgroups and Followup-To line
+	 */
+	strip_double_ngs(note_h_newsgroups);
+	if (*note_h_followup) {
+		strip_double_ngs(note_h_followup);
+	}
+
 	if (*note_h_followup && STRCMPEQ(note_h_followup, "poster")) {
 		clear_message ();
 		sprintf (msg, "%s%c", txt_resp_to_poster, iKeyPageMail);
@@ -1450,6 +1463,11 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	if (auto_bcc) {
 		msg_add_header ("Bcc", userid);
 	}
+	
+	/*
+	 * remove duplicates from Newsgroups header
+	 */
+	strip_double_ngs(note_h_newsgroups);
 	
 	msg_add_header ("Newsgroups", note_h_newsgroups);
 	
@@ -1783,6 +1801,12 @@ mail_to_author (group, respnum, copy_text)
 	if (auto_bcc) {
 		msg_add_header ("Bcc", userid);
 	}
+	
+	/*
+	 * remove duplicates from Newsgroups header
+	 */
+	strip_double_ngs(note_h_newsgroups);
+	
 	msg_add_header ("Newsgroups", note_h_newsgroups);
 	if (*default_organization) {
 		msg_add_header ("Organization", default_organization);
@@ -2069,6 +2093,12 @@ delete_article (group, art)
 
 	sprintf (buf, "cmsg cancel %s", note_h_messageid);
 	msg_add_header ("Subject", buf);
+	
+	/*
+	 * remove duplicates from Newsgroups header
+	 */
+	strip_double_ngs(note_h_newsgroups);
+
 	msg_add_header ("Newsgroups", note_h_newsgroups);
 	sprintf (buf, "cancel %s", note_h_messageid);
 	msg_add_header ("Control", buf);
@@ -2086,8 +2116,7 @@ delete_article (group, art)
 	msg_write_headers (fp);
 	msg_free_headers ();
 	
-	fprintf (fp, "Article cancelled from within tin [v%s release %s]\n",
-		VERSION, RELEASEDATE);
+	fprintf (fp, txt_article_cancelled, VERSION, RELEASEDATE);
 #ifdef FORGERY
 	if (! author) {
 		fputc ('\n', fp);
@@ -2168,22 +2197,74 @@ repost_article (group, art, respnum)
 	struct t_article *art;
 	int respnum;
 {
-	char buf[LEN];
-	char ch;
-	char ch_default = iKeyPostPost;
-	FILE *fp;
-	int ret_code = POSTED_NONE;
- 	struct t_group  *psGrp;
+	char 	buf[LEN];
+	char 	tmp[LEN];
+	int	done 		= FALSE;
+	char 	ch;
+	char 	ch_default 	= iKeyPostPost;
+	FILE 	*fp;
+	int 	ret_code 	= POSTED_NONE;
+ 	struct t_group 	*psGrp;
+ 	char 	*ptr;
 #ifdef FORGERY
 	char	from_name[PATH_LEN];
 	char	line[NNTP_STRLEN];
 #endif
 
 	msg_init_headers ();
+
+	/*
+	 * remove duplicates from Newsgroups header
+	 */
+	strip_double_ngs(note_h_newsgroups);
+
+	/*
+	 * Check if any of the newsgroups are moderated.
+	 */
+	strcpy (tmp, group);
+	while (! done) {
+		strcpy (buf, tmp);
+		ptr = strchr (buf, ',');
+		if (ptr != (char *) 0) {
+			strcpy (tmp, ptr+1);
+			*ptr = '\0';
+		} else {
+			done = TRUE;	
+		}
+		psGrp = psGrpFind (buf);
+
+		if (debug == 2) {
+			sprintf (msg, "Group=[%s]", buf);
+			wait_message (msg);
+		}
+		
+		if (! psGrp) {
+	 		error_message (txt_not_in_active_file, buf);
+			return POSTED_NONE;
+		}
+		if (psGrp->moderated == 'm') {
+			sprintf (msg, txt_group_is_moderated, buf);
+			if (prompt_yn (cLINES, msg, TRUE) != 1) {
+				info_message(txt_art_not_posted);
+				sleep(3);
+				return POSTED_NONE;
+			}
+		}
+	}
+
 	
- 	psGrp = psGrpFind (group);
+
+/* FIXME so that group only contains 1 group when finding an index number */
+/* Does this count? */
+	strcpy (buf, group);
+	ptr = strchr (buf, ',');
+	if (ptr) {
+		*ptr = '\0';
+	}
+
+ 	psGrp = psGrpFind (buf);
  	if (! psGrp) {
- 		error_message (txt_not_in_active_file, group);
+ 		error_message (txt_not_in_active_file, buf);
  		return ret_code;
  	}
 
@@ -2223,7 +2304,7 @@ repost_article (group, art, respnum)
 #endif
 	
 	msg_add_header ("Subject", note_h_subj);
-	msg_add_header ("Newsgroups", psGrp->name);
+	msg_add_header ("Newsgroups", group);
 	
 	if (note_h_references[0])
 		msg_add_header ("References", note_h_references);
@@ -2247,11 +2328,11 @@ repost_article (group, art, respnum)
 	msg_free_headers ();
 
 #ifndef FORGERY
-	fprintf (fp, "\n[ Article reposted from %s ]", note_h_newsgroups);
+	fprintf (fp, txt_article_reposted1, note_h_newsgroups);
 	if (art->name) {
-		fprintf (fp, "\n[ Author was %s <%s> ]", art->name, art->from);
+		fprintf (fp, txt_article_reposted2a, art->name, art->from);
 	} else {
-		fprintf (fp, "\n[ Author was %s ]", art->from);
+		fprintf (fp, txt_article_reposted2b, art->from);
 	}
 	fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
 #endif
@@ -2492,7 +2573,7 @@ insert_from_header (infile)
 			if (ptr != (char *) 0) {
 				ptr = strchr (ptr, '.');
 				if (ptr == (char *) 0) {
-					error_message ("Invalid  From: %s  line. Read the INSTALL file again.", from_name);
+					error_message (txt_invalid_from1, from_name);
 					return FALSE;
 				}
 			}
@@ -2502,7 +2583,7 @@ insert_from_header (infile)
 			 */
 			ptr = str_str (from_name, "subdomain.domain", 16);
 			if (ptr != (char *) 0) {
-				error_message ("Invalid  From: %s line. Reconfigure your domainname.", from_name);
+				error_message (txt_invalid_from2, from_name);
 				return FALSE;
 			}	
 
@@ -2650,6 +2731,11 @@ update_active_after_posting (newsgroups)
 	char *src, *dst;
 	char group[LEN];
 	struct t_group *psGrp;
+
+	/*
+	 * remove duplicates from Newsgroups header
+	 */
+	strip_double_ngs(note_h_newsgroups);
 		
 	strcat (newsgroups, "\n");
 	src = newsgroups;

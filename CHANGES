@@ -1,3 +1,16 @@
+--unoff BETA release 960617 --
+
+085) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. not dot in news.`cat $INEWS_DOMAIN`
+     FIX. configure[.in]
+
+084) Sven Paulus <sven@oops.sub.de>
+     BUG. reposting to multiple groups did not work;
+          some text definitions were in the code (-> lang.c)
+     ADD. strip duplicate newsgroups from Newsgroups: and Followup-To:
+     ADD. show_lines keyword in tinrc
+     FIX. several supplied patches
+
 --unoff BETA release 960616 --
 
 083) Roland Rosenfeld <roland@spinnaker.rhein.de>

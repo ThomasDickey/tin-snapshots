@@ -176,7 +176,7 @@ AC_ARG_WITH(nntp-default-server,
                           (sets \$NNTP_DEFAULT_SERVER)],
 	[NNTP_DEFAULT_SERVER=$withval],
 	[test -z "$NNTP_DEFAULT_SERVER" && case "$INEWS_DOMAIN" in #(((
-	 /*)	NNTP_DEFAULT_SERVER="news`cat $INEWS_DOMAIN`" ;;
+	 /*)	NNTP_DEFAULT_SERVER="news.`cat $INEWS_DOMAIN`" ;;
 	 .*)	NNTP_DEFAULT_SERVER="news$INEWS_DOMAIN"       ;;
 	 *)	NNTP_DEFAULT_SERVER="news.$INEWS_DOMAIN"      ;;
 	 esac])

@@ -625,6 +625,7 @@ write_attributes_file (file)
 	fprintf (fp, "#    6=uudecode & extract zip archive\n#\n");
 	fprintf (fp, "#  mailing_list=STRING (ie. majordomo@list.org)\n");
 	fprintf (fp, "#  x_headers=STRING (ie. ~/.tin/extra-headers)\n");
+	fprintf (fp, "#  x_body=STRING (ie. ~/.tin/extra-body-text)\n");
 	fprintf (fp, "#  quick_kill_scope  = STRING (ie. talk.*)\n");
 	fprintf (fp, "#  quick_kill_expire = ON/OFF\n");
 	fprintf (fp, "#  quick_kill_case   = ON/OFF\n");

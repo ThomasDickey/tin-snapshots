@@ -1,26 +1,26 @@
 # Source Makefile for tin - for configuration options read the ../INSTALL file.
 #
-SHELL	= /bin/sh
-prefix	= @prefix@
-exec_prefix = @exec_prefix@
-srcdir	= @srcdir@
+SHELL		= /bin/sh
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+srcdir		= @srcdir@
 
 # From: address in posted articles (don't use both - read the INSTALL file)
 # Put the gateway name (ie. news.foo.com) / domain name (ie. .foo.com) here
-INEWS_MAIL_GATEWAY=@INEWS_MAIL_GATEWAY@
-INEWS_MAIL_DOMAIN=@INEWS_MAIL_DOMAIN@
+INEWS_MAIL_GATEWAY	=@INEWS_MAIL_GATEWAY@
+INEWS_MAIL_DOMAIN	=@INEWS_MAIL_DOMAIN@
 #.scn.de
 #.subdomain.domain
 
 # Default nntp server (can be overridden by NNTPSERVER environment variable)
-NNTP_DEFAULT_SERVER=@NNTP_DEFAULT_SERVER@
+NNTP_DEFAULT_SERVER	=@NNTP_DEFAULT_SERVER@
 #news.scn.de
 #news-server.subdomain.domain
 
 # Where are your news libdir & spooldir?
-LIBDIR	= @LIBDIR@
-SPOOLDIR= @SPOOLDIR@
-NOVROOTDIR= @NOVROOTDIR@
+LIBDIR		= @LIBDIR@
+SPOOLDIR	= @SPOOLDIR@
+NOVROOTDIR	= @NOVROOTDIR@
 
 # Compiler, linker & parser commands
 CC	= @CC@

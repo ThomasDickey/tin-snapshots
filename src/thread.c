@@ -60,18 +60,21 @@ bld_tline (l, art)
 	if (show_subject) {
 		if (show_author != SHOW_FROM_NONE) {
 			len_from = max_from - 3;
+			len_from += 8 * (1 - show_lines);
 			len_subj = (max_subj+off_subj) - 5;
 			spaces = "   ";
 		} else {
 			len_from = 0;
 			len_subj = (max_from+max_subj+off_subj) - 5;
+			len_subj += 8 * (1 - show_lines);
 			spaces = "";
 		}
 	} else {
 		len_from = (max_subj+max_from+off_both) - 8;
+		len_from += 8 * (1 - show_lines);
 		spaces = "";
 	}	
-
+	
 	j = INDEX2TNUM(l);
 
 	if (art->tagged) {
@@ -99,10 +102,16 @@ bld_tline (l, art)
 	} else {
 		strcpy (lines, "   ?");
 	}
-	
-	sprintf (screen[j].col, "  %4d%3s  [%-4s]  %-*.*s%s%-*.*s",
-		 l, new_resps, lines, len_subj, len_subj, art->subject, 
-		 spaces, len_from, len_from, from);
+
+	if (show_lines) {
+		sprintf (screen[j].col, "  %4d%3s  [%-4s]  %-*.*s%s%-*.*s",
+			 l, new_resps, lines, len_subj, len_subj, art->subject, 
+			 spaces, len_from, len_from, from);
+	} else {
+		sprintf (screen[j].col, "  %4d%3s  %-*.*s%s%-*.*s",
+			 l, new_resps, len_subj, len_subj, art->subject, 
+			 spaces, len_from, len_from, from);
+	}
 
 #endif
 	return(0);
