@@ -427,16 +427,16 @@ get_from_name (user_name, host_name, full_name, from_name)
 			if (ptr != (char *) 0) {
 				*ptr = '\0';
 			}
-			sprintf (from_name, "%s@%s%s (%s)",
-				user_name, host_name, domain, full_name);
+			sprintf (from_name, "%s <%s@%s%s>",
+				full_name, user_name, host_name, domain);
 		} else {
-			sprintf (from_name, "%s@%s (%s)", user_name, domain, full_name);
+			sprintf (from_name, "%s <%s@%s>", full_name, user_name, domain);
 		}
 	} else {
 		if (host_name[0] == '%') {
 			sprintf (from_name, "%s%s (%s)", user_name, host_name, full_name);
 		} else {
-			sprintf (from_name, "%s@%s (%s)", user_name, host_name, full_name);
+			sprintf (from_name, "%s <%s@%s>", full_name, user_name, host_name);
 		}
 	}
 

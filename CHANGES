@@ -1,3 +1,24 @@
+--unoff BETA release 960914 --
+
+168) Jarkko Isokungas <jti@iki.fi>
+     ADD. NeXTSTEP support
+     FIX. main.c, signal.c
+
+167) Thomas Kroener <kroener@jupiter.saar.de>
+     ADD. kill times in days 2/4 times default_filter_days
+     FIX. filter.c
+
+166) Tim Pierce <twpierce@midway.uchicago.edu>
+     ADD. safe_fgets() a function that allocates a sufficiently-large buffer
+          on demand.
+     FIX. art.c
+
+165) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. changed "user@do.mai.ne (Full Name)" to "Full Name <user@do.mai.ne>"
+          (expect those in filter.c and those in mailing routines)
+     ADD. removed LOG_USER
+     FIX. several patches
+
 --unoff BETA release 960901 --
 
 164) Jungshik Shin <jshin@pantheon.yale.edu>

@@ -2318,7 +2318,7 @@ delete_article (group, art, respnum)
 	} else
 		msg_add_header ("Path", line);
 
-	sprintf (line, "%s (%s)", art->from, art->name);
+	sprintf (line, "%s <%s>", art->name, art->from);
 	msg_add_header ("From", line);
 
 	if (! author) {
@@ -2525,7 +2525,7 @@ repost_article (group, art, respnum, supersede)
 #else
 		make_path_header (line, from_name);
 		msg_add_header ("Path", line);
-		sprintf (line, "%s (%s)", arts[respnum].from, art->name);
+		sprintf (line, "%s <%s>", art->name, arts[respnum].from);
 		msg_add_header ("From", line);
 		msg_add_header ("X-Superseded-By", from_name);
 		if (note_h_org[0])
@@ -2969,8 +2969,8 @@ find_reply_to_addr (respnum, from_addr)
 		if (arts[respnum].name != (char *) 0 &&
 		    arts[respnum].name != arts[respnum].from) {
 			sprintf (buf, "%s%s (%s)",
-				 arts[respnum].from, add_addr,
-				 arts[respnum].name);
+				arts[respnum].from, add_addr,
+				arts[respnum].name);
 			strcpy (from_addr, buf);
 		} else {
 			sprintf (from_addr, "%s%s",

@@ -623,6 +623,8 @@ filter_menu (type, group, art)
 	char text_msgid[PATH_LEN];
 	char text_subj[PATH_LEN];
 	char text_time[PATH_LEN];
+	char double_time[PATH_LEN];
+	char quat_time[PATH_LEN];
 	char ch_default = iKeyFilterSave;
 	int ch, i, len;
 	int filtered = TRUE;
@@ -816,13 +818,17 @@ filter_menu (type, group, art)
 	/*
 	 * Expire time
 	 */
+	strcpy(double_time, "2x ");
+	strcat(double_time, text_time);
+	strcpy(quat_time, "4x ");
+	strcat(quat_time, text_time);
 	i = get_choice (INDEX_TOP+14, txt_help_filter_time,
 			ptr_filter_time, txt_unlimited_time, text_time,
-			(char *)0, (char *)0, (char *)0);
+			double_time, quat_time, (char *)0);
 	if (i == -1) {
 		return FALSE;
 	}
-	rule.expire_time = (i == 0 ? FALSE : TRUE);
+	rule.expire_time = i;
 
 	/*
 	 * Scope
@@ -1133,11 +1139,19 @@ iAddFilterRule (psGrp, psArt, psRule)
 		psPtr[*plNum].scope = str_dup (psRule->scope);
 	}
 
-	if (psRule->expire_time) {
-		time (&lCurTime);
-		psPtr[*plNum].time = lCurTime + (default_filter_days * 86400);
-	} else {
-		psPtr[*plNum].time = 0L;
+	time (&lCurTime);
+	switch(psRule->expire_time)
+	{
+		case 1:
+			psPtr[*plNum].time = lCurTime + (default_filter_days * 86400);
+			break;
+		case 2:
+			psPtr[*plNum].time = lCurTime + (default_filter_days * 86400*2);
+			break;
+		case 3:
+			psPtr[*plNum].time = lCurTime + (default_filter_days * 86400*4);
+			break;
+		default: psPtr[*plNum].time = 0L;
 	}
 
 	if (psRule->text[0]) {

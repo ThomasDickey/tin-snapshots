@@ -1313,23 +1313,22 @@ char *
 getaline (fp)
 	FILE	*fp;
 {
-	char *buf;		/* buffer for line */
-	size_t size;		/* size of buffer */
-	size_t inc;		/* how much to enlarge buffer */
-	size_t len;		/* # of chars stored into buf before '\0' */
 	char *p;
-	size_t thres = 512;	/* initial buffer size (most lines should
-				     fit into this size, so think of this as
-				     the "long line threshold").  */
+	char *buf;				/* buffer for line */
+	size_t inc;				/* how much to enlarge buffer */
+	size_t len;				/* # of chars stored into buf before '\0' */
+	size_t size = 512;	/* size of buffer ; initial buffer size
+								 * (most lines should fit into this size
+								 */
 	size_t mucho = 128;	/* if there is at least this much wasted
-				     space when the whole buffer has been
-				     read, try to reclaim it.  Don't make
-				     this too small, else there is too much
-				     time wasted trying to reclaim a couple
-				     of bytes.  */
+								 * space when the whole buffer has been
+								 * read, try to reclaim it.  Don't make
+								 * this too small, else there is too much
+								 * time wasted trying to reclaim a couple
+								 * of bytes.
+								 */
 
 	len = 0;
-	size = thres;
 	buf = (char *) my_malloc (size);
 	if (buf == (char *) 0) {
 		return (char *) 0;

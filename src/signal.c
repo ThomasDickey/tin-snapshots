@@ -20,7 +20,6 @@ static unsigned int time_remaining;
 int do_sigtstp = 0;
 #endif
 
-
 #ifdef HAVE_POSIX_JC
 
 /*
@@ -36,9 +35,9 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	sa.sa_handler = func;
 	sigemptyset (&sa.sa_mask);
 	sa.sa_flags = 0;
-#ifdef SA_RESTART
-	sa.sa_flags |= SA_RESTART;
-#endif
+#	ifdef SA_RESTART
+		sa.sa_flags |= SA_RESTART;
+#	endif
 	if (sigaction (sig, &sa, &osa) < 0) {
 		return SIG_ERR;
 	}
@@ -46,7 +45,6 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 }
 
 #else
-
 RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	int sig;
 	RETSIGTYPE (_CDECL *func)(SIG_ARGS);
@@ -54,7 +52,7 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 	return (signal (sig, func));
 }
 
-#endif
+#endif /* HAVE_POSIX_JC */
 
 void set_signal_handlers ()
 {
@@ -79,8 +77,7 @@ void set_signal_handlers ()
 #endif
 #endif /* WIN32 */
 #ifdef SIGPIPE
-/*	signal (SIGPIPE, SIG_IGN); */
-	signal (SIGPIPE, signal_handler);
+	signal (SIGPIPE, signal_handler);	/* brocken pipe */
 #endif
 #ifdef SIGCHLD
 	signal (SIGCHLD, signal_handler);	/* death of a child process */
@@ -156,6 +153,10 @@ void _CDECL signal_handler (sig)
 	int wait_status = 1;
 #endif
 
+#if defined(SIGCHLD) && defined(NeXT)
+	union wait statusp;
+#endif
+
 	switch (sig) {
 #ifdef SIGINT
 		case SIGINT:
@@ -178,15 +179,24 @@ void _CDECL signal_handler (sig)
 			sigtext = "SIGHUP ";
 			break;
 #endif
+
+
+
 #ifdef SIGCHLD
 		case SIGCHLD:
+#ifdef NeXT
+			wait (&statusp);
+			wait_status = statusp.w_status;
+#else
 			wait (&wait_status);
+#endif
 			signal (SIGCHLD, signal_handler);	/* death of a child */
 #	ifdef WEXITSTATUS
 			system_status = WEXITSTATUS(wait_status);
 #	endif
 			return;
 #endif
+
 #ifdef SIGPWR
 		case SIGPWR:
 			sigtext = "SIGPWR ";
@@ -217,7 +227,7 @@ void _CDECL signal_handler (sig)
 		case SIGPIPE:
 			got_sig_pipe = TRUE;
 			signal(SIGPIPE, signal_handler);
-			 return;
+			return;
 #endif
 		default:
 			sigtext = "";

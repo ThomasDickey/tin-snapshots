@@ -749,7 +749,7 @@ iReadNovFile (group, min, max, expired)
 	int *expired;
 {
  	char	*p, *q, *s;
-	char	buf[OVERVIEW_LINE];
+	char	*buf;
 	char	buf2[HEADER_LEN];
  	char	art_full_name[HEADER_LEN];
 	char	art_from_addr[HEADER_LEN];
@@ -768,9 +768,10 @@ iReadNovFile (group, min, max, expired)
 		return top;
 	}
 
-	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
+	while ((buf = regrettably_named_safe_fgets (fp)) != (char *) 0) {
 		debug_nntp ("iReadNovFile", buf);
 		if (STRCMPEQ(buf, ".")) {
+			free (buf);
 			break;
 		}
 
@@ -808,6 +809,7 @@ sleep(1);
 			error_message ("Bad overview record (Artnum) '%s'", buf);
 			debug_nntp ("iReadNovFile", "Bad overview record (Artnum)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			p = q + 1;
@@ -822,6 +824,7 @@ sleep(1);
 			error_message ("Bad overview record (Subject) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Subject)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -838,6 +841,7 @@ sleep(1);
 			error_message ("Bad overview record (From) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (From)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -858,6 +862,7 @@ sleep(1);
 			error_message ("Bad overview record (Date) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Date)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -874,6 +879,7 @@ sleep(1);
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -894,6 +900,7 @@ sleep(1);
 			error_message ("Bad overview record (References) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (References)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -914,6 +921,7 @@ sleep(1);
 			error_message ("Bad overview record (Bytes) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Bytes)");
 #endif
+			free (buf);
 			continue;
 		} else {
 			*q = '\0';
@@ -930,6 +938,7 @@ sleep(1);
 				error_message ("Bad overview record (Lines) [%s]", p);
 				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");
 #endif
+				free (buf);
 				continue;
 			}
 		} else {
@@ -1013,6 +1022,7 @@ sleep(1);
 		debug_print_header (&arts[top]);
 #endif
 		top++;
+		free (buf);
 	}
  	fclose (fp);
 
@@ -1593,6 +1603,49 @@ valid_artnum (art)
 	}
 }
 
+/*
+ * regrettably_named_safe_fgets
+ *
+ * Return the next line from a file, regardless of how long it is.
+ * Thanks to <emcmanus@gr.osf.org> for hugs, support and bug fixes.
+ */
+
+char *
+regrettably_named_safe_fgets (f)
+	FILE *f;
+{
+	char *buf   = NULL;
+	char *temp  = NULL;
+	int	next  = 0;
+	int	chunk = 256;
+
+	buf = (char *) malloc (chunk * sizeof(char));
+
+	while (1) {
+		if (fgets (buf + next, chunk, f) == NULL) {
+			if (next) {
+				return buf;
+			}
+			free (buf);
+			return NULL;
+		}
+
+		if (buf[strlen(buf)-1] == '\n') {
+			return buf;
+		}
+
+		next += chunk - 1;
+
+		temp = (char *) realloc (buf, (next+chunk) * sizeof(char));
+		if (temp == NULL) {
+			free (buf);
+			return NULL;
+		}
+		buf = temp;
+	}
+}
+
+
 static void
 print_expired_arts (num_expired)
 	int num_expired;
@@ -1635,7 +1688,7 @@ pcPrintFrom (psArt)
 	*acFrom = '\0';
 
 	if (psArt->name != (char *) 0) {
-		sprintf (acFrom, "%s (%s)", psArt->from, psArt->name);
+		sprintf (acFrom, "%s <%s>", psArt->name, psArt->from);
 	} else {
 		strcpy (acFrom, psArt->from);
 	}

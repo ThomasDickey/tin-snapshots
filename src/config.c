@@ -480,7 +480,6 @@ read_config_file (file, global_file)
 			break;
 		case 'x':
 			if (match_string (buf, "xpost_quote_format=", xpost_quote_format, sizeof (xpost_quote_format))) {
-
 				break;
 			}
 			break;

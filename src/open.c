@@ -1058,57 +1058,6 @@ nntp_to_fp ()
 }
 
 /*
- * Log user info to local file or NNTP logfile
- */
-
-void
-log_user ()
-{
-	char dummy[PATH_LEN];
-	char buf[32], *ptr;
-	char line[NNTP_STRLEN];
-#ifdef	LOG_USER
-	char log_file[PATH_LEN];
-	FILE *fp;
-	long epoch;
-#endif
-#ifndef M_AMIGA
-	get_user_info (dummy, buf);
-
-	if (read_news_via_nntp && xuser_supported) {
-		if ((ptr = strchr (buf, ','))) {
-			*ptr = '\0';
-		}
-		sprintf (line, "xuser %s (%s)", myentry->pw_name, buf);
-
-		debug_nntp ("log_user", line);
-		put_server (line);
-	} else
-#endif	/* M_AMIGA */
-	{
-#ifdef	LOG_USER
-		joinpath (log_file, TMPDIR, LOG_USER_FILE);
-
-		if ((fp = fopen (log_file, "a+")) != (FILE *) 0) {
-			time (&epoch);
-			fprintf (fp, "%s%s: %-32s (%-8s) %s",
-				VERSION, RELEASEDATE,
-#ifdef M_AMIGA
-				get_val ("REALNAME", "Unknown"),
-				get_val ("USERNAME", "Unknown"),
-#else
-				buf,
-				myentry->pw_name,
-#endif
-				ctime (&epoch);
-			fclose (fp);
-			chmod (log_file, 0666);
-		}
-#endif	/* LOG_USER */
-	}
-}
-
-/*
  * NNTP user authorization. Password read from ~/.newsauth
  * The ~/.newsauth authorization file has the format:
  *   nntpserver1 password [user]
