@@ -1,6 +1,6 @@
 /*
  *  Project   : tin - a Usenet reader
- *  Module    : menukey.h
+ *  Module    : menukeys.h
  *  Author    : S.Robbins
  *  Created   : 15-08-94
  *  Updated   : 21-12-94
@@ -11,6 +11,10 @@
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
  */
+
+#ifndef MENUKEYS_H
+#define MENUKEYS_H 1
+
 
 /* Revised 9 October 1996 by Branden Robinson in ASCII order
  * 
@@ -373,9 +377,13 @@
 #define iKeyThreadCatchupConditional 'c'
 #define iKeyThreadToggleSubjDisplay 'd'
 #define iKeyThreadHelp 'h'
+/*
 #define iKeyThreadDisplaySubject 'i'
+*/
 #define iKeyThreadSave 's'
 #define iKeyThreadTag 't'
 #define iKeyThreadVersion 'v'
 #define iKeyThreadMarkArtUnread 'z'
 #define iKeyThreadUndoSel '~'
+
+#endif /* !MENUKEYS_H */

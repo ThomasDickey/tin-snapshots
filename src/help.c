@@ -187,8 +187,10 @@ char *help_thread[] = {
 	txt_help_d,
 	txt_help_I,
 		txt_help_empty_line,
+/*
 	txt_help_g_t_p_i,
 		txt_help_empty_line,
+*/
 	txt_help_v,
 	txt_help_bug_report,
 	(char *) 0

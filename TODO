@@ -76,9 +76,6 @@ o  According to 026) in CHANGES, some of the config files can be
 o  full_page_scroll=OFF is not implemented in page.c (article viewer)
    and config.c (option 'M'enu)
 
-o  rereading the active file is buggy, it causes crashes on some machines and
-   sometimes it takes 50 times longer than the first read at startup...
-
 o  (Y)ank in after resync-time ends up in a double re-read of the active file
 
 o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
@@ -104,7 +101,7 @@ o  add command: mark all articles older than <date> as read
 
 o  add support for ispell language change
 
-o  add rfc1468/1922 support
+o  add rfc1468/1922 (rfc2045-2049) support
 
 o  add a weed-out list like in elm so the user could specify which headers
    he'd like to see and which not (attrib.c)

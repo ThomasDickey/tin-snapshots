@@ -43,7 +43,7 @@ int n;
 		register int i;
 		for (i = n; i >= 0; i = arts[i].thread) {
 			if (arts[i].tagged > code)
-				code = arts[i].tagged, code;
+				code = arts[i].tagged;
 		}
 	} else {
 		code = arts[n].tagged;

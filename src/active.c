@@ -136,10 +136,10 @@ parse_active_line (line, max, min, moderated)
 	if (line[0] == '#' || line[0] == '\n')
 		return(FALSE);
 
-	strtok(line, ACTIVE_SEP);			/* skip group name */
-	p = strtok(NULL, ACTIVE_SEP);		/* group max count */
-	q = strtok(NULL, ACTIVE_SEP);		/* group min count */
-	r = strtok(NULL, ACTIVE_SEP);		/* mod status or path to mailgroup */
+	strtok(line, ACTIVE_SEP);		/* skip group name */
+	p = strtok((char *)0, ACTIVE_SEP);	/* group max count */
+	q = strtok((char *)0, ACTIVE_SEP);	/* group min count */
+	r = strtok((char *)0, ACTIVE_SEP);	/* mod status or path to mailgroup */
 
 	if (!p || !q || !r) {
 		error_message (txt_bad_active_file, line);
@@ -199,7 +199,7 @@ fprintf(stderr, "vGGAI OUT, cnt=%ld, min=%ld, max=%ld\n", *count, *max, *min);
 void
 read_news_active_file ()
 {
-	FILE *fp = NULL;
+	FILE *fp = 0;
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	long count = -1L, min = 1, max = 0;
@@ -837,7 +837,7 @@ read_motd_file ()
 	}
 
 	if ((fp = open_motd_fp (motd_file_date)) != (FILE *) 0) {
-		while (fgets (buf, sizeof (buf), fp) != NULL) {
+		while (fgets (buf, sizeof (buf), fp) != 0) {
 			if (buf[0] == '.') {
 				break;
 			}

@@ -16,6 +16,9 @@
  * OS specific doda's
  */
 
+#ifndef TIN_H
+#define TIN_H 1
+
 #ifdef HAVE_CONFIG_H
 #	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
 #else
@@ -1768,3 +1771,5 @@ typedef void (*BodyPtr) P_((char *, FILE *, int));
 #endif
 
 #define IS_PLURAL(x) (x != 1 ? txt_plural : "")
+
+#endif /* !TIN_H */

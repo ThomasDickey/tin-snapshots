@@ -206,11 +206,11 @@ int post_article_and_exit;		/* quick post of an article then exit (elm like) */
 t_bool post_8bit_header=FALSE;		/* allow 8bit chars. in header when posting to newsgroup */
 t_bool print_header;			/* print all of mail header or just Subject: & From lines */
 int purge_index_files;			/* stat all articles to see if they still exist */
-t_bool default_filter_kill_header;
+int default_filter_kill_header;
 t_bool default_filter_kill_global;
 t_bool default_filter_kill_case;
 t_bool default_filter_kill_expire;
-t_bool default_filter_select_header;
+int default_filter_select_header;
 t_bool default_filter_select_global;
 t_bool default_filter_select_case;
 t_bool default_filter_select_expire;

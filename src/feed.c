@@ -623,7 +623,8 @@ got_sig_pipe_while_piping:
 		case FEED_SAVE_TAGGED:
 			if (proc_ch != 'n' && is_mailbox == FALSE) {
 				ret2 = post_process_files (
-					proc_ch, (function == FEED_SAVE ? FALSE : TRUE));
+					proc_ch,
+					(t_bool)(function == FEED_SAVE ? FALSE : TRUE));
 			}
 			free_save_array ();
 			break;

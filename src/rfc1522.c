@@ -22,31 +22,7 @@
  */
 #undef MIME_BASE64_ALLOWED
 
-#ifndef DEBUG_MIME
 #include "tin.h"
-#else
-#include "extern.h"
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-
-/*
- * define this to make TIN strictly observe
- * RFC1522 and break lots of other software
- */
-#undef MIME_BREAK_LONG_LINES
-
-/*
- * define this to force MM_CHARSET obeyance
- * when decoding.  If you don't, everything
- * is thought to match your machine's charset
- */
-#define MIME_STRICT_CHARSET
-#endif /* DEBUG_MIME */
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
 #define isbetween(c) (isspace((unsigned char)c) || (c) == '(' || (c) == ')' || (c) == '"')
@@ -81,7 +57,6 @@ static void build_base64_rank_table P_((void));
 
 #ifdef MIME_BREAK_LONG_LINES
 static int sizeofnextword P_((char *w));
-
 #endif
 
 static void
@@ -292,7 +267,6 @@ contains_nonprintables (w)
 #ifdef MIME_BASE64_ALLOWED
 	int chars = 0;
 	int schars = 0;
-
 #endif
 	int nonprint = 0;
 
@@ -390,7 +364,6 @@ rfc1522_do_encode (what, where)
 #ifdef MIME_BREAK_LONG_LINES
 	int column = 0;		/* current column */
 	int word_cnt = 0;
-
 #endif
 	int ewsize = 0;		/* size of current encoded-word */
 	char buf[2048];		/* buffer for encoded stuff */
@@ -710,21 +683,3 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	fclose (g);
 	fclose (f);
 }
-
-#ifdef DEBUG_MIME
-#define xTESTHEADER "vorher =?ISO-8859-1?Q?Kristian_K=F6hntopp?= nachher"
-#define yTESTHEADER "vorher =?ISO-8859-1?B?S3Jpc3RpYW4gS/ZobnRvcHA=?= nachher"
-#define TESTHEADER "Kristian Köhntopp 	Müller 123 (hähäsdkäfas)."
-
-void
-main (argc, argv)
-	int argc;
-	char *argv[];
-{
-	char *c;
-
-	printf ("%s\n", c = rfc1522_encode (TESTHEADER));
-	printf ("%s\n", rfc1522_decode (c));
-}
-
-#endif /* DEBUG_MIME */

@@ -22,6 +22,7 @@
 static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, int *dst));
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
 static void highlight_option P_((int option));
+static void print_any_option P_((int the_option));
 static void print_option P_((enum option_enum the_option));
 static void show_config_page P_((int page_no));
 static void unhighlight_option P_((int option));
@@ -196,7 +197,7 @@ read_config_file (file, global_file)
 			if (match_integer (buf, "default_filter_days=", &default_filter_days, 0)) {
 				break;
 			}
-			if (match_boolean (buf, "default_filter_kill_header=", &default_filter_kill_header)) {
+			if (match_integer (buf, "default_filter_kill_header=", &default_filter_kill_header, FILTER_LINES)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_kill_global=", &default_filter_kill_global)) {
@@ -208,7 +209,7 @@ read_config_file (file, global_file)
 			if (match_boolean (buf, "default_filter_kill_expire=", &default_filter_kill_expire)) {
 				break;
 			}
-			if (match_boolean (buf, "default_filter_select_header=", &default_filter_select_header)) {
+			if (match_integer (buf, "default_filter_select_header=", &default_filter_select_header, FILTER_LINES)) {
 				break;
 			}
 			if (match_boolean (buf, "default_filter_select_global=", &default_filter_select_global)) {
@@ -1018,8 +1019,13 @@ static void
 print_option (the_option)
 	enum option_enum the_option;
 {
-	int act_option = (int)the_option;
+	print_any_option((int)the_option);
+}
 
+static void
+print_any_option (act_option)
+	int act_option;
+{
 	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
@@ -1620,7 +1626,7 @@ match_boolean (line, pat, dst)
 	size_t	patlen = strlen (pat);
 
 	if (STRNCASECMPEQ(line, pat, patlen)) {
-		*dst = (STRNCASECMPEQ(&line[patlen], "ON", 2) ? TRUE : FALSE);
+		*dst = (t_bool) (STRNCASECMPEQ(&line[patlen], "ON", 2) ? TRUE : FALSE);
 		return TRUE;
 	}
 	return FALSE;
@@ -1641,7 +1647,7 @@ match_integer (line, pat, dst, maxlen)
 	size_t	patlen = strlen (pat);
 
 	if (STRNCMPEQ(line, pat, patlen)) {
-		*dst = (t_bool) atoi (&line[patlen]);
+		*dst = atoi (&line[patlen]);
 
 		if (maxlen)  {
 			if ((*dst < 0) || (*dst > maxlen)) {

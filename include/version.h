@@ -16,19 +16,24 @@
  * This is NO official release, but a patched version.
  */
 
-#define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"970112"
+#ifndef VERSION_H
+#define VERSION_H	1
 
-#ifdef M_AMIGA
-#	define	OS	"AMIGA"
-#	define	AMIVER	"1.3B"
-#endif
-#ifdef M_OS2
-#	define	OS	"OS/2"
-#endif
-#ifdef M_UNIX
-#	define	OS	"UNIX"
-#endif
-#ifdef WIN32
-#	define	OS	"Windows/NT"
-#endif
+#	define VERSION		"1.3 unoff BETA"
+#	define RELEASEDATE	"970114"
+
+#	ifdef M_AMIGA
+#		define	OS	"AMIGA"
+#		define	AMIVER	"1.3B"
+#	endif
+#	ifdef M_OS2
+#		define	OS	"OS/2"
+#	endif
+#	ifdef M_UNIX
+#		define	OS	"UNIX"
+#	endif
+#	ifdef WIN32
+#		define	OS	"Windows/NT"
+#	endif
+
+#endif /* !VERSION_H */
