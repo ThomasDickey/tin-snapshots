@@ -19,8 +19,6 @@
 #define TNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(TNUM2LNUM(INDEX2TNUM(i)))
 
-#define MARK_OFFSET 9
-
 int thread_basenote = 0;
 int show_subject;
 

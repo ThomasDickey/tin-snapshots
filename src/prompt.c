@@ -297,6 +297,7 @@ prompt_option_string (option)
 {
 	char prompt[LEN];
 	char *p;
+	char *variable = OPT_STRING_list[option_table[option - 1].var_index];
 
 	set_alarm_clock_off ();
 
@@ -304,11 +305,11 @@ prompt_option_string (option)
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
 
-	if ((p = getline (prompt, FALSE, option_table[option - 1].variable, 0, FALSE)) == (char *) 0) {
+	if ((p = getline (prompt, FALSE, variable, 0, FALSE)) == (char *) 0) {
 		set_alarm_clock_on ();
 		return FALSE;
 	}
-	strcpy (option_table[option - 1].variable, p);
+	strcpy (variable, p);
 
 	set_alarm_clock_on ();
 
@@ -340,14 +341,14 @@ prompt_option_num (option)
 	show_menu_help (option_table[option - 1].help_text);
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
-	sprintf (&number[0], "%d", *((int *) option_table[option - 1].variable));
+	sprintf (&number[0], "%d", *(option_table[option - 1].variable));
 
 	if ((p = getline (prompt, TRUE, number, 0, FALSE)) == (char *) 0) {
 		return FALSE;
 	}
 	strcpy (number, p);
 	num = atoi (number);
-	*((int *) option_table[option - 1].variable) = num;
+	*(option_table[option - 1].variable) = num;
 
 	clear_message ();
 	set_alarm_clock_on ();
@@ -372,9 +373,9 @@ prompt_option_char (option)
 	char prompt[LEN];
 	char input[2];
 	char *p = &input[0];
+	char *variable = OPT_CHAR_list[option_table[option - 1].var_index];
 
-	/* grrr... who the heck defined art_marked_* as int? */
-	input[0] = (char) *(int *) option_table[option - 1].variable;
+	input[0] = *variable;
 	input[1] = '\0';
 
 	set_alarm_clock_off ();
@@ -388,8 +389,7 @@ prompt_option_char (option)
 		return FALSE;
 	}
 
-	/* grrr... who the heck defined art_marked_* as int? */
-	*(int *)option_table[option - 1].variable = p[0];
+	*variable = p[0];
 
 	clear_message ();
 	set_alarm_clock_on ();

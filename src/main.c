@@ -59,7 +59,7 @@ main (argc, argv)
     argv[0] = progname;
 #endif
 
-#if defined(NNTP_ONLY)
+#ifdef NNTP_ONLY
 	read_news_via_nntp = TRUE;
 #else
 	/*
@@ -70,10 +70,10 @@ main (argc, argv)
 			read_news_via_nntp = TRUE;
 #		else
 			error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-			exit (1);
+			exit (EXIT_ERROR);
 #		endif
 	}
-#endif
+#endif /* NNTP_ONLY */
 
 	/*
 	 *  Set up initial array sizes, char *'s: homedir, newsrc, etc.
@@ -106,7 +106,7 @@ main (argc, argv)
 	 *  Connect to nntp server?
 	 */
 	if (nntp_open () == -1) {
-		exit (1);
+		exit (EXIT_ERROR);
 	}
 
 	/*
@@ -119,7 +119,6 @@ main (argc, argv)
 #ifdef DEBUG_NEWSRC
 	unlink ("/tmp/BITMAP");
 	vNewsrcTestHarness ();
-/*	exit (0); */
 #endif
 
 	/*
@@ -133,7 +132,7 @@ main (argc, argv)
 	 */
 	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
-		exit (1);
+		exit (EXIT_ERROR);
 	}
 #endif
 
@@ -232,7 +231,7 @@ main (argc, argv)
 	 */
 	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
-		exit (1);
+		exit (EXIT_ERROR);
 	}
 #endif
 
@@ -287,7 +286,7 @@ main (argc, argv)
 #	else /* M_AMIGA */ /* still needs some work */
 #		define OPTIONS "BcCD:f:hHI:m:M:nN:PqrRs:SuUvVwzZ"
 #	endif
-#else /* INDEX_DAMON */
+#else /* INDEX_DAEMON */
 #	define OPTIONS "dD:f:hI:PvV"
 #endif
 
@@ -303,16 +302,20 @@ read_cmd_line_options (argc, argv)
 
 	while ((ch = getopt (argc, argv, OPTIONS)) != EOF) {
 		switch (ch) {
-#ifdef HAVE_COLOR
+#ifndef INDEX_DAEMON
+#	ifdef HAVE_COLOR
 			case 'a':
 				use_color = !use_color;
 				break;
-#endif
-#ifdef M_AMIGA
+#	else
+				error_message (txt_option_not_enabled, "-DHAVE_COLOR");
+				exit (EXIT_ERROR);
+#	endif
+#	ifdef M_AMIGA
 			case 'B':
 				tin_bbs_mode = TRUE;
 				break;
-#endif
+#	endif
 			case 'c':
 				catchup = TRUE;
 				break;
@@ -320,12 +323,11 @@ read_cmd_line_options (argc, argv)
 			case 'C':
 				count_articles = TRUE;
 				break;
-
-#ifdef INDEX_DAEMON
+#else
 			case 'd':		/* delete index file before indexing */
 				delete_index_file = TRUE;
 				break;
-#endif
+#endif /* !INDEX_DAEMON */
 
 			case 'D':		/* debug mode 1=NNTP 2=ALL */
 #ifdef DEBUG
@@ -334,7 +336,7 @@ read_cmd_line_options (argc, argv)
 				break;
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
-				exit (1);
+				exit (EXIT_ERROR);
 #endif
 
 			case 'f':	/* active (tind) / newsrc (tin) file */
@@ -346,19 +348,22 @@ read_cmd_line_options (argc, argv)
 #endif
 				break;
 
+#ifndef INDEX_DAEMON
 			case 'g':	/* select alternative NNTP-server, implies -r */
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 				my_strncpy(cmdline_nntpserver, optarg, sizeof(cmdline_nntpserver));
 				read_news_via_nntp = TRUE;
-#else
+#	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (1);
-#endif
+				exit (EXIT_ERROR);
+#	endif
 				break;
 
 			case 'H':
 				show_intro_page ();
-				exit (1);
+				exit (EXIT_OK);
+
+#endif /*!INDEX_DAEMON */
 
 #ifndef NNTP_ONLY
 			case 'I':
@@ -366,14 +371,12 @@ read_cmd_line_options (argc, argv)
 				my_mkdir (index_newsdir, 0777);
 				break;
 #endif
+
+#ifndef INDEX_DAEMON
 			case 'm':
 				my_strncpy (default_maildir, optarg, sizeof (default_maildir));
 				break;
 
-			case 'N':	/* mail new news to your posts */
-				mail_news_to_posted = TRUE;
-				break;
-				
 			case 'M':	/* mail new news to specified user */
 				my_strncpy (mail_news_user, optarg, sizeof (mail_news_user));
 				mail_news = TRUE;
@@ -381,29 +384,35 @@ read_cmd_line_options (argc, argv)
 				break;
 
 			case 'n':
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 				newsrc_active = TRUE;
-#else
+#	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (1);
-#endif
+				exit (EXIT_ERROR);
+#	endif
 				break;
 
+			case 'N':	/* mail new news to your posts */
+				mail_news_to_posted = TRUE;
+				break;
+#endif /* !INDEX_DAEMON */
+				
 			case 'P':	/* stat every art for a through purge */
 				purge_index_files = TRUE;
 				break;
 
+#ifndef INDEX_DAEMON
 			case 'q':
 				check_for_new_newsgroups = FALSE;
 				break;
 
 			case 'r':	/* read news remotely from default NNTP server */
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 				read_news_via_nntp = TRUE;
-#else
+#	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (1);
-#endif
+				exit (EXIT_ERROR);
+#	endif
 				break;
 
 			case 'R':	/* read news saved by -S option */
@@ -421,24 +430,26 @@ read_cmd_line_options (argc, argv)
 				break;
 
 			case 'u':	/* update index files */
-#ifndef NNTP_ONLY
+#	ifndef NNTP_ONLY
 				update = TRUE;
 				show_description = FALSE;
-#else
-				error_message (txt_option_not_enabled, "-DNNTP_ONLY");
-				exit (1);
-#endif
+#	else
+				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
+				exit (EXIT_ERROR);
+#	endif
 				break;
 
 			case 'U':	/* update index files in background */
-#ifndef NNTP_ONLY
+#	ifndef NNTP_ONLY
 				update_fork = TRUE;
 				update = TRUE;
-#else
-				error_message (txt_option_not_enabled, "-DNNTP_ONLY");
-				exit (1);
-#endif
+#	else
+				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
+				exit (EXIT_ERROR);
+#	endif
 				break;
+
+#endif /* !INDEX_DAEMON */
 
 			case 'v':	/* verbose mode */
 				verbose = TRUE;
@@ -453,8 +464,9 @@ read_cmd_line_options (argc, argv)
 					VERSION, RELEASEDATE);
 #endif
 				error_message (msg, "");
-				exit (1);
+				exit (EXIT_OK);
 
+#ifndef INDEX_DAEMON
 			case 'w':	/* post article & exit */
 				post_article_and_exit = TRUE;
 				break;
@@ -468,12 +480,13 @@ read_cmd_line_options (argc, argv)
 				check_any_unread = TRUE;
 				update = TRUE;
 				break;
+#endif /* !INDEX_DAEMON */
 
 			case 'h':
 			case '?':
 			default:
 				usage (progname);
-				exit (1);
+				exit (EXIT_ERROR);
 		}
 	}
 	cmdargs = argv;
@@ -531,6 +544,7 @@ usage (theProgname)
 #	ifdef NNTP_ABLE
 		error_message ("  -n       only read subscribed .newsrc groups from NNTP server", "");
 #	endif /* NNTP_ABLE */
+	error_message ("  -N       mail new news to your posts", "");
 	error_message ("  -P       purge any expired articles from index files", "");
 	error_message ("  -q       quick start by not checking for new newsgroups", "");
 #	ifdef NNTP_ABLE
@@ -587,7 +601,7 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
 	if (StartAnyUnread) {
 		i = check_start_save_any_news (START_ANY_NEWS);
 		if (i == -1) {		/* no new/unread news so exit */
-			exit (0);
+			exit (EXIT_OK);
 		}
 		update = FALSE;
 	}

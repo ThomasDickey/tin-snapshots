@@ -53,6 +53,87 @@ struct msg_header {
 	char *text;
 } msg_headers[MAX_MSG_HEADERS];
 
+static int prompt_to_edit P_((void));
+static int prompt_to_send P_((char *subject));
+static int repair_article P_((char *result));
+static void do_prompt1 P_(( char *format, int ch_default));
+static void do_prompt2 P_(( char *format, char *subject, int ch_default));
+
+static void do_prompt1 (format, ch_default)
+	char *format;
+	int ch_default;
+{
+	sprintf (msg, "%s%c", format, ch_default);
+	wait_message (msg);
+	MoveCursor (cLINES, (int) strlen (format));
+}
+
+static void
+do_prompt2(format, subject, ch_default)
+	char *format;
+	char *subject;
+	int ch_default;
+{
+	int have = cCOLS - strlen (format) + 4;
+	int want = strlen(subject);
+	if (want > 0 && subject[want-1] == '\n')
+		want--;
+	if (have > want)
+		have = want;
+	sprintf (msg, format, have, subject, ch_default);
+
+	wait_message (msg);
+	MoveCursor (cLINES, (int) strlen (msg) - 1);
+}
+
+static int
+prompt_to_edit()
+{
+	int ch;
+	char ch_default = iKeyPostPost;
+
+	do {
+		do_prompt1 (txt_quit_edit_post, ch_default);
+		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+			ch = ch_default;
+	} while (!strchr (POST_KEYS, ch));
+	return ch;
+}
+
+static int
+prompt_to_send(subject)
+	char *subject;
+{
+	int ch;
+	char ch_default = iKeyPostSend;
+	do {
+		do_prompt2 (txt_quit_edit_send, subject, ch_default);
+		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+			ch = ch_default;
+	} while (!strchr (SEND_KEYS, ch));
+	return ch;
+}
+
+static int
+repair_article(result)
+	char *result;
+{
+	int ch;
+
+	do {
+		do_prompt1 (txt_bad_article, iKeyPostEdit);
+		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+			ch = iKeyPostEdit;
+	} while (!strchr (EDIT_KEYS, ch));
+
+	*result = ch;
+	if (ch == iKeyPostEdit) {
+		invoke_editor (article, start_line_offset);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 void
 msg_init_headers ()
 {
@@ -511,7 +592,10 @@ check_article_to_be_posted (the_article, art_type, lines)
 				fprintf (stderr, txt_error_not_valid_newsgroup, ngptrs[i]);
 				errors++;
 #else
-				fprintf (stderr, txt_warn_not_valid_newsgroup, ngptrs[i]);
+				fprintf (stderr,
+					(newsrc_active ? /* did we read the whole active file? */
+						txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup ),
+					ngptrs[i]);
 #endif
 			}
 			free (ngptrs[i]);
@@ -566,7 +650,6 @@ quick_post_article ()
 {
 	FILE *fp;
 	char ch, *ptr;
-	char ch_default = iKeyPostPost;
 	char group[HEADER_LEN];
 	char subj[HEADER_LEN];
 	char buf[HEADER_LEN], tmp[HEADER_LEN];
@@ -732,20 +815,9 @@ quick_post_article ()
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)) {
-					do {
-						sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
-						wait_message (msg);
-						MoveCursor (cLINES, (int) strlen (txt_bad_article));
-						if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-							ch = iKeyPostEdit;
-					} while (!strchr (EDIT_KEYS, ch));
-					if (ch == iKeyPostEdit) {
-						invoke_editor (article, start_line_offset);
-					} else {
-						break;
-					}
-				}
+				while (!check_article_to_be_posted (article, art_type, &lines)
+				   && repair_article(&ch))
+				   	;
 				if (ch == iKeyPostEdit) {
 					break;
 				}
@@ -788,14 +860,7 @@ quick_post_article ()
 			default:
 				break;
 		}
-
-		do {
-			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (POST_KEYS, ch));
+		ch = prompt_to_edit();
 	}
 
       post_article_done:
@@ -840,7 +905,6 @@ post_article (group, posted_flag)
 {
 	FILE *fp;
 	char ch;
-	char ch_default = iKeyPostPost;
 	char subj[HEADER_LEN];
 	char buf[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
@@ -946,20 +1010,9 @@ post_article (group, posted_flag)
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)) {
-					do {
-						sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
-						wait_message (msg);
-						MoveCursor (cLINES, (int) strlen (txt_bad_article));
-						if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-							ch = iKeyPostEdit;
-					} while (!strchr (EDIT_KEYS, ch));
-					if (ch == iKeyPostEdit) {
-						invoke_editor (article, start_line_offset);
-					} else {
-						break;
-					}
-				}
+				while (!check_article_to_be_posted (article, art_type, &lines)
+				 && repair_article(&ch))
+				 	;
 				redraw_screen = TRUE;
 				if (ch == iKeyPostEdit) {
 					break;
@@ -1012,14 +1065,7 @@ post_article (group, posted_flag)
 			default:
 				break;
 		}
-
-		do {
-			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (POST_KEYS, ch));
+		ch = prompt_to_edit();
 	}
 
       post_article_done:
@@ -1238,7 +1284,6 @@ post_response (group, respnum, copy_text)
 {
 	FILE *fp;
 	char ch, *ptr;
-	char ch_default = iKeyPostPost;
 	char bigbuf[HEADER_LEN];
 	char buf[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
@@ -1266,9 +1311,7 @@ post_response (group, respnum, copy_text)
 	}
 	if (*note_h_followup && STRCMPEQ(note_h_followup, "poster")) {
 		clear_message ();
-		sprintf (msg, "%s%c", txt_resp_to_poster, iKeyPageMail);
-		wait_message (msg);
-		MoveCursor (cLINES, (int) strlen (txt_resp_to_poster));
+		do_prompt1 (txt_resp_to_poster, iKeyPageMail);
 		do {
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = iKeyPageMail;
@@ -1434,20 +1477,9 @@ post_response (group, respnum, copy_text)
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
-				while (!check_article_to_be_posted (article, art_type, &lines)) {
-					do {
-						sprintf (msg, "%s%c", txt_bad_article, iKeyPostEdit);
-						wait_message (msg);
-						MoveCursor (cLINES, (int) strlen (txt_bad_article));
-						if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-							ch = iKeyPostEdit;
-					} while (!strchr (EDIT_KEYS, ch));
-					if (ch == iKeyPostEdit) {
-						invoke_editor (article, start_line_offset);
-					} else {
-						break;
-					}
-				}
+				while (!check_article_to_be_posted (article, art_type, &lines)
+				 && repair_article(&ch))
+				 	;
 				ret_code = POSTED_REDRAW;
 				if (ch == iKeyPostEdit) {
 					break;
@@ -1500,14 +1532,7 @@ post_response (group, respnum, copy_text)
 			default:
 				break;
 		}
-
-		do {
-			sprintf (msg, "%s%c", txt_quit_edit_post, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (txt_quit_edit_post));
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (POST_KEYS, ch));
+		ch = prompt_to_edit();
 	}
 
       post_response_done:
@@ -1548,7 +1573,6 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	char subject[HEADER_LEN];
 	char mailreader_subject[PATH_LEN];	/* for calling external mailreader */
 	char ch = iKeyPostSend;
-	char ch_default = iKeyPostSend;
 	char buf[HEADER_LEN];
 	char mail_to[HEADER_LEN];
 	char initials[64];
@@ -1652,14 +1676,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	}
 	forever {
 		if (confirm_to_mail && (!use_mailreader_i)) {
-			do {
-				sprintf (msg, txt_quit_edit_send,
-					cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
-				wait_message (msg);
-				MoveCursor (cLINES, (int) (strlen (msg) - 1));
-				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-					ch = ch_default;
-			} while (!strchr (SEND_KEYS, ch));
+			ch = prompt_to_send(subject);
 		}
 		switch (ch) {
 			case iKeyPostEdit:
@@ -1703,14 +1720,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				break;
 		}
 		if (mail_to_poster) {
-			do {
-				sprintf (msg, txt_quit_edit_send,
-					cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
-				wait_message (msg);
-				MoveCursor (cLINES, (int) (strlen (msg) - 1));
-				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-					ch = ch_default;
-			} while (!strchr (SEND_KEYS, ch));
+			ch = prompt_to_send(subject);
 		}
 	}
 
@@ -1726,7 +1736,7 @@ mail_bug_report ()
 	char buf[LEN], nam[100];
 	char *gateway;
 	char *domain;
-	char ch, ch_default = iKeyPostSend;
+	char ch;
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
 	FILE *fp;
@@ -1919,14 +1929,7 @@ mail_bug_report ()
 			default:
 				break;
 		}
-		do {
-			sprintf (msg, txt_quit_edit_send,
-				cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg) - 1);
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (SEND_KEYS, ch));
+		ch = prompt_to_send(subject);
 	}
 
       mail_bug_report_done:
@@ -1949,7 +1952,7 @@ mail_to_author (group, respnum, copy_text)
 	char bigbuf[HEADER_LEN];
 	char mailreader_subject[PATH_LEN];	/* for calling external mailreader */
 	char initials[64];
-	char ch, ch_default = iKeyPostSend;
+	char ch;
 	FILE *fp;
 	int lines = 0;
 	int redraw_screen = FALSE;
@@ -2102,15 +2105,7 @@ mail_to_author (group, respnum, copy_text)
 			default:
 				break;
 		}
-
-		do {
-			sprintf (msg, txt_quit_edit_send,
-				cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) strlen (msg) - 1);
-			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
-				ch = ch_default;
-		} while (!strchr (SEND_KEYS, ch));
+		ch = prompt_to_send(subject);
 	}
 
       mail_to_author_done:
@@ -2295,9 +2290,7 @@ cancel_article (group, art, respnum)
 #endif
 	} else {
 		do {
-			sprintf (msg, txt_cancel_article, art->subject, option_default);
-			wait_message (msg);
-			MoveCursor (cLINES, (int) (strlen (msg) - 1));
+			do_prompt2 (txt_cancel_article, art->subject, option_default);
 			if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 				option = option_default;
 		} while (!strchr ("\033dqs", option));
@@ -2633,11 +2626,7 @@ repost_article (group, art, respnum, supersede)
 	forever {
 		if (!force_command)
 			do {
-				sprintf (msg, txt_quit_edit_xpost,
-					 cCOLS - (strlen (txt_quit_edit_xpost) - 1),
-					 note_h_subj, ch_default);
-				wait_message (msg);
-				MoveCursor (cLINES, (int) strlen (msg) - 1);
+				do_prompt2 (txt_quit_edit_xpost, note_h_subj, ch_default);
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
 			} while (!strchr (POST_KEYS, ch));

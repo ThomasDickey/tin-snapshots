@@ -17,7 +17,7 @@
 #include	"tincfg.h"
 #include	"menukeys.h"
 
-static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, size_t *dst));
+static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, int *dst));
 static void expand_rel_abs_pathname P_((int line, int col, char *str));
 static void highlight_option P_((int option));
 static void print_option P_((int act_option));
@@ -535,14 +535,11 @@ read_config_file (file, global_file)
 		strip_blanks = FALSE;
 	}
 #ifdef HAVE_COLOR
-	/* without color enabled word_highlighting is useless */
-	if (!use_color_tinrc) {
-		word_highlight = FALSE;
-	}
 	/* without word_highlighting mark stripping is a fault */
 	if (!word_highlight) {
 		word_h_display_marks = TRUE;
 	}
+	/* other color related conflicts are handeled in color.c */
 #endif
 	
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
@@ -1022,20 +1019,19 @@ print_option (act_option)
 	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
 		case OPT_ON_OFF:
-			printf("%s ", print_boolean(*((int *)option_table[act_option - 1].variable)));
+			printf("%s ", print_boolean(*(option_table[act_option - 1].variable)));
 			break;
 		case OPT_LIST:
-			printf("%s", option_table[act_option - 1].opt_list[*((int *)option_table[act_option - 1].variable)]);
+			printf("%s", option_table[act_option - 1].opt_list[*(option_table[act_option - 1].variable)]);
 			break;
 		case OPT_STRING:
-			printf("%-.*s", cCOLS - (int) strlen((char *) option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, (char *) option_table[act_option - 1].variable);
+			printf("%-.*s", cCOLS - (int) strlen(option_table[act_option - 1].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option - 1].var_index]);
 			break;
 		case OPT_NUM:
-			printf("%d", *((int *) option_table[act_option - 1].variable));
+			printf("%d", *(option_table[act_option - 1].variable));
 			break;
 		case OPT_CHAR:
-			/* grrr... who the heck defined art_marked_* as int? */
-			printf("%c", *((int *) option_table[act_option - 1].variable));
+			printf("%c", *OPT_CHAR_list[option_table[act_option - 1].var_index]);
 			break;
 		default:
 			break;
@@ -1265,9 +1261,10 @@ change_config_file (group, filter_at_once)
 		if (change_option) {
 			switch (option_table[option - 1].var_type) {
 				case OPT_ON_OFF:
-					original_on_off_value = *((int *) option_table[option - 1].variable);
+					original_on_off_value = *(option_table[option - 1].variable);
 					prompt_on_off (INDEX_TOP + (option - 1) % option_lines_per_page,
-						OPT_ARG_COLUMN, option_table[option - 1].variable,
+						OPT_ARG_COLUMN,
+						option_table[option - 1].variable,
 						option_table[option - 1].help_text,
 						option_table[option - 1].option_text
 						);
@@ -1400,10 +1397,10 @@ change_config_file (group, filter_at_once)
 					break;
 
 				case OPT_LIST:
-					original_list_value = *((int *) option_table[option - 1].variable);
-					*((int *) option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
+					original_list_value = *(option_table[option - 1].variable);
+					*(option_table[option - 1].variable) = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
 								OPT_ARG_COLUMN,
-								*((int *) option_table[option - 1].variable), /*default_post_proc_type,*/
+								*(option_table[option - 1].variable), /*default_post_proc_type,*/
 								option_table[option - 1].help_text,
 								option_table[option - 1].option_text,
 								option_table[option - 1].opt_list,
@@ -1482,13 +1479,13 @@ change_config_file (group, filter_at_once)
 							prompt_option_string (option);
 							expand_rel_abs_pathname (INDEX_TOP + (option - 1) % option_lines_per_page,
 								OPT_ARG_COLUMN + (int) strlen (option_table[option - 1].option_text),
-								option_table[option - 1].variable
+								OPT_STRING_list[option_table[option - 1].var_index]
 								);
 							break;
 
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
-							mime_type = *((int *) option_table[option - 1].variable);
+							mime_type = *(option_table[option - 1].variable);
 							mime_type = prompt_list (INDEX_TOP + (option - 1) % option_lines_per_page,
 										OPT_ARG_COLUMN,
 										mime_type,
@@ -1497,7 +1494,7 @@ change_config_file (group, filter_at_once)
 										option_table[option - 1].opt_list,
 										option_table[option - 1].opt_count
 										);
-							*((int *) option_table[option - 1].variable) = mime_type;
+							*(option_table[option - 1].variable) = mime_type;
 
 							/* do not use 8 bit headers if mime encoding is not 8bit; ask J. Shin why */
 							if (strcasecmp(txt_mime_types[mime_type], txt_8bit)) {
@@ -1669,7 +1666,7 @@ match_list (line, pat, table, tablelen, dst)
 	char *pat;
 	char **table;
 	size_t tablelen;
-	size_t *dst;
+	int *dst;
 {
 	size_t	patlen = strlen (pat);
 	size_t	n;
@@ -1680,7 +1677,7 @@ match_list (line, pat, table, tablelen, dst)
 		*dst = 0;	/* default, if no match */
 		for (n = 0; n < tablelen; n++) {
 			if (match_string(line, table[n], temp, sizeof(temp))) {
-				*dst = n;
+				*dst = (int)n;
 				break;
 			}
 		}

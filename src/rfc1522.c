@@ -535,11 +535,9 @@ rfc1522_do_encode (what, where)
 					column++;
 				}
 		}
-	}
-#else
-	if (0);
+	} else
 #endif
-	else {
+	{
 		while (*c)
 			*((*where)++) = *c++;
 	}

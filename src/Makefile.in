@@ -287,7 +287,7 @@ clean:
 	@-$(RM) -f $(OBJDIR)/parsdate.c
 	@-$(RM) -f LINT *.ln
 	@-$(RM) -f makecfg makecfg.o tincfg.h
-	@-$(RM) -f *~
+	@-$(RM) -f core *~
 	@-$(RM) -f $(EXE) $(EXED)
 
 distclean \
