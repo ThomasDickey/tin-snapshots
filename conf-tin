@@ -1,0 +1,89 @@
+#!/bin/sh
+
+#rm -f config.cache config.status config.log
+
+OUT=td-conf.out
+cat >>$OUT <<EOF/
+** `date`
+** node: `uname -a`
+** from: `pwd`
+** user: `id`
+** conf: $*
+EOF/
+OPTS="$*"
+
+if test ! -f configure
+then
+        autoconf
+fi
+
+INSTALL="td-install"
+CFLAGS="-O"
+CC="${CC-cc}"
+
+NETLIBS=""
+case `uname -s` in
+api20|opera15)
+        NETLIBS="-lsocket"
+        ;;
+AIX)
+        ;;
+CLIX)
+        NETLIBS="-lbsd"
+        ;;
+Linux)
+        INSTALL=install
+        ;;
+HP-UX)
+        ;;
+SunOS)
+        case `uname -r` in
+        5.*)
+                NETLIBS="-lsocket -lnsl"
+                ;;
+        esac
+        ;;
+UNIX_SV)
+        NETLIBS="-lresolv -lsocket -lnsl"
+        ;;
+esac
+
+if test -n "$NETLIBS" ; then
+        LIBS="$LIBS $NETLIBS"
+        export LIBS
+fi
+
+case `hostname` in
+akk*)
+	OPTS="$OPTS \
+	--with-libdir="" \
+	--with-spooldir="" \
+	--with-mail-gateway="" \
+        --with-mail-domain=akk.uni-karlsruhe.de \
+	--with-nntp-default-server=news.akk.uni-karlsruhe.de \
+        --with-mail-handling \
+	--with-nntp-only \
+	--with-color \
+	--with-ref-threading "
+#	--with-advertising
+#	--without-etiquette 
+#	--without-forgery 
+#	--with-mime-strict-charset 
+#	--without-mime-break-long-lines 
+#	--without-mime-base64
+#	--without-log-user
+	;;
+
+esac
+
+INSTALL="$INSTALL" \
+CFLAGS="$CFLAGS" \
+CC="$CC" \
+./configure --verbose \
+        --prefix=$TOP \
+        --exec-prefix=$TOP \
+        --disable-echo \
+        --disable-debug \
+        --enable-prototypes \
+        --enable-warnings \
+        $OPTS $* 2>&1 |tee -a $OUT

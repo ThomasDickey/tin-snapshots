@@ -102,6 +102,10 @@ AC_ARG_WITH(color,
 	[  --with-color            ANSI color support],
 	[AC_DEFINE(HAVE_COLOR)])
 
+AC_ARG_WITH(ref-threading,
+	[  --with-ref-threading    reference-based threading],
+	[AC_DEFINE(HAVE_REF_THREADING)])
+
 AC_ARG_WITH(mail-handling,
 	[  --with-mail-handling],
 	[AC_DEFINE(HAVE_MAIL_HANDLING)])

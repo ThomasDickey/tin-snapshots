@@ -8,7 +8,7 @@
  *              from the Elm mail system. This library was hacked to provide 
  *              what tin needs.
  *  Copyright : Copyright (c) 1986-94 Dave Taylor & Iain Lea
- *              The Elm Mail System  -  $Revision: 2.1.1.2 $   $State: Exp $
+ *              The Elm Mail System  -  $Revision: 2.1.1.3 $   $State: Exp $
  */
 
 #include "tin.h"
@@ -408,7 +408,7 @@ InitScreen ()
 	  _keypadlocal	= "";
 	  _keypadxmit	= "";
 	 }
-#ifdef HAS_IS_XTERM
+#ifdef HAVE_IS_XTERM
 	if (is_xterm())
 	 {
 	  xclicks = TRUE;

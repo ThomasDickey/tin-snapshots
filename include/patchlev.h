@@ -58,7 +58,7 @@
  *	Bernd Eckenfels <ecki@lina.inka.de>
  *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960524"
+#define PATCHLEVEL	"MC.960525"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

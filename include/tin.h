@@ -1027,7 +1027,7 @@ struct t_article
 	char *patch;			/* patch no. of archive */
 	int tagged;			/* 0 = not tagged, >0 = tagged */
 	int thread;
-#ifdef REF_THREADING
+#ifdef HAVE_REF_THREADING
 	int parent;			/* Article followed up to */
 	int sibling;			/* Next followup to parent */
 	int child;			/* First followup to this article */

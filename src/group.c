@@ -1027,7 +1027,7 @@ group_list_thread:
 			case iKeyGroupToggleThreading:
  				if (index_point >= 0) {
 					CURR_GROUP.attribute->thread_arts = 
-#ifdef REF_THREADING
+#ifdef HAVE_REF_THREADING
 						++CURR_GROUP.attribute->thread_arts % (THREAD_REFS + 1);
 #else
 						!CURR_GROUP.attribute->thread_arts;

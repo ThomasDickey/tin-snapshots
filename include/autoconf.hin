@@ -22,6 +22,9 @@
 #ifndef	HAVE_COLOR
 #undef	HAVE_COLOR
 #endif
+#ifndef	HAVE_REF_THREADING
+#undef	HAVE_REF_THREADING
+#endif
 
 /*
  * These are defined if the corresponding program is found during configuration
