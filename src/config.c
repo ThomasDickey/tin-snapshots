@@ -536,8 +536,8 @@ read_config_file (file, global_file)
 	}
 #ifdef HAVE_COLOR
 	/* without color enabled word_highlighting is useless */
-	if (!use_color) {
-		word_highlight = word_highlight_tinrc = FALSE;
+	if (!use_color_tinrc) {
+		word_highlight = FALSE;
 	}
 	/* without word_highlighting mark stripping is a fault */
 	if (!word_highlight) {
@@ -1144,27 +1144,27 @@ change_config_file (group, filter_at_once)
 				switch (get_arrow_key ()) {
 #endif
 					case KEYMAP_UP:
-						ch = iKeyConfigUp;
+						ch = iKeyUp;
 						break;
 
 					case KEYMAP_DOWN:
-						ch = iKeyConfigDown;
+						ch = iKeyDown;
 						break;
 
 					case KEYMAP_HOME:
-						ch = iKeyConfigHome;
+						ch = iKeyFirstPage;
 						break;
 
 					case KEYMAP_END:
-						ch = iKeyConfigEnd;
+						ch = iKeyLastPage;
 						break;
 
 					case KEYMAP_PAGE_UP:
-						ch = iKeyConfigPageUp;
+						ch = iKeyPageUp;
 						break;
 
 					case KEYMAP_PAGE_DOWN:
-						ch = iKeyConfigPageDown;
+						ch = iKeyPageDown;
 						break;
 #ifndef WIN32
 					default:
@@ -1184,7 +1184,8 @@ change_config_file (group, filter_at_once)
 				clear_note_area ();
 				return ret_code;
 
-			case iKeyConfigUp:
+			case iKeyUp:
+			case iKeyUp2:
 				unhighlight_option (option);
 				option--;
 				if (option < 1)
@@ -1193,7 +1194,8 @@ change_config_file (group, filter_at_once)
 				highlight_option (option);
 				break;
 
-			case iKeyConfigDown:
+			case iKeyDown:
+			case iKeyDown2:
 				unhighlight_option (option);
 				option++;
 				if (option > LAST_OPT)
@@ -1202,21 +1204,25 @@ change_config_file (group, filter_at_once)
 				highlight_option (option);
 				break;
 
-			case iKeyConfigHome:
+			case iKeyFirstPage:
+			case iKeyConfigFirstPage:
 				unhighlight_option (option);
 				option = 1;
 				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
-			case iKeyConfigEnd:
+			case iKeyLastPage:
+			case iKeyConfigLastPage:
 				unhighlight_option (option);
 				option = LAST_OPT;
 				refresh_config_page (option, FALSE);
 				highlight_option (option);
 				break;
 
-			case iKeyConfigPageUp:
+			case iKeyPageUp:
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 				unhighlight_option (option);
 				option -= option_lines_per_page;
 				if (option < 1)
@@ -1225,7 +1231,9 @@ change_config_file (group, filter_at_once)
 				highlight_option (option);
 				break;
 
-			case iKeyConfigPageDown:
+			case iKeyPageDown:
+			case iKeyPageDown2:
+			case iKeyPageDown3:
 				unhighlight_option (option);
 				option += option_lines_per_page;
 				if (option > LAST_OPT)
@@ -1350,44 +1358,6 @@ change_config_file (group, filter_at_once)
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
 							use_color = use_color_tinrc;
-							/* without color turn off word_highlighting */
-							if (!use_color) {
-								word_highlight = word_highlight_tinrc = FALSE;
-								word_h_display_marks = TRUE;
-								if (OPT_WORD_HIGHLIGHT_TINRC > first_option_on_screen && OPT_WORD_HIGHLIGHT_TINRC < first_option_on_screen + option_lines_per_page) {
-									MoveCursor (INDEX_TOP + (OPT_WORD_HIGHLIGHT_TINRC - 1) % option_lines_per_page, 3);
-									print_option (OPT_WORD_HIGHLIGHT_TINRC);
-								}
-								if (OPT_WORD_H_DISPLAY_MARKS > first_option_on_screen && OPT_WORD_H_DISPLAY_MARKS < first_option_on_screen + option_lines_per_page) {
-									MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
-									print_option (OPT_WORD_H_DISPLAY_MARKS);
-								}
-							}
-							break;
-
-						case OPT_WORD_HIGHLIGHT_TINRC:
-							if (!use_color) {
-								word_highlight = word_highlight_tinrc = FALSE;
-								MoveCursor (INDEX_TOP + (OPT_WORD_HIGHLIGHT_TINRC - 1) % option_lines_per_page, 3);
-								print_option (OPT_WORD_HIGHLIGHT_TINRC);
-							}
-							/* without word_highlighting turn off highlight_mark stripping */
-							if (!word_highlight) {
-								word_h_display_marks = TRUE;
-								if (OPT_WORD_H_DISPLAY_MARKS > first_option_on_screen && OPT_WORD_H_DISPLAY_MARKS < first_option_on_screen + option_lines_per_page) {
-									MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
-									print_option (OPT_WORD_H_DISPLAY_MARKS);
-								}
-							}
-							break;
-
-						case OPT_WORD_H_DISPLAY_MARKS:
-							if (!word_highlight_tinrc) {
-								word_h_display_marks = TRUE;
-								MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
-								print_option (OPT_WORD_H_DISPLAY_MARKS);
-							}
-							break;
 #endif
 						/*
 						 * the following do not need further action (if I'm right)
@@ -1417,6 +1387,10 @@ change_config_file (group, filter_at_once)
 #endif
 #ifdef M_UNIX
 						 * case OPT_KEEP_DEAD_ARTICLES:
+#endif
+#ifdef HAVE_COLOR
+						 * case OPT_WORD_HIGHLIGHT_TINRC:
+						 * case OPT_WORD_H_DISPLAY_MARKS:
 #endif
 						 * 	break;
 						 */

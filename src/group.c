@@ -269,7 +269,7 @@ top_of_list:
 				}
 				break;
 
-			case iKeyGroupLastPage:	/* show last page of threads */
+			case iKeyLastPage:	/* show last page of threads */
 end_of_list:
 				if (!top_base) {
 					break;
@@ -403,9 +403,9 @@ group_tab_pressed:
 				}
 				break;
 
-			case iKeyGroupPageDown:		/* page down */
-			case iKeyGroupPageDown2:
-			case iKeyGroupPageDown3:
+			case iKeyPageDown:		/* page down */
+			case iKeyPageDown2:
+			case iKeyPageDown3:
 group_page_down:
 				if (!top_base) {
 					break;
@@ -522,8 +522,8 @@ group_page_down:
 				show_group_page ();
 				break;
 
-			case iKeyGroupDown:		/* line down */
-			case iKeyGroupDown2:
+			case iKeyDown:		/* line down */
+			case iKeyDown2:
 group_down:
 				if (!top_base) {
 					break;
@@ -553,8 +553,8 @@ group_down:
 				}
 				break;
 
-			case iKeyGroupUp:		/* line up */
-			case iKeyGroupUp2:
+			case iKeyUp:		/* line up */
+			case iKeyUp2:
 group_up:
 				if (!top_base) {
 					break;
@@ -586,9 +586,9 @@ group_up:
 				}
 				break;
 
-			case iKeyGroupPageUp:		/* page up */
-			case iKeyGroupPageUp2:
-			case iKeyGroupPageUp3:
+			case iKeyPageUp:		/* page up */
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 group_page_up:
 				if (!top_base) {
 					break;
@@ -793,7 +793,7 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupOptionMenu:	/* options menu */
+			case iKeyOptionMenu:	/* option menu */
 				if (top_base > 0) {
 					old_top = top;
 					n = (int) base[index_point];

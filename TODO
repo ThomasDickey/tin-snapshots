@@ -1,6 +1,7 @@
 Bugs
 ----
 o  subscribe to newgroups does not work if tin is started with the -n flag
+   (introduced in 961125)
 
 o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
@@ -141,6 +142,7 @@ o  Additions to the thread menu :
 	'/' (search subject)
 	'S' (autosave tagged)
 	'U' (untag all)
+	'M' (option menu)
 	keys to goto previous/next thread
 
 o  Add 'l' (goto thread menu) to the article pager
@@ -239,6 +241,8 @@ o  toggle behavior of 't'ag is not mentioned in the man-page
 o  print a message at startup if server doesn't grok XOVER
 
 o  error message when tin -uv and using xover is misleading
+
+o  manpage claims that -R does not work but it does
 
 Not yet classified
 ------------------

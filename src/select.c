@@ -145,6 +145,9 @@ selection_index (start_groupnum, num_cmd_line_groups)
 
 			case iKeyFirstPage:	/* show first page of groups */
 top_of_list:
+				if (!group_top) {
+					break;
+				}
 				if (cur_groupnum != 0) {
 					if (0 < first_group_on_screen) {
 						erase_group_arrow ();
@@ -158,8 +161,11 @@ top_of_list:
 				}
 				break;
 
-			case iKeySelectLastPage:	/* show last page of groups */
+			case iKeyLastPage:	/* show last page of groups */
 end_of_list:
+				if (!group_top) {
+					break;
+				}
 				if (cur_groupnum != group_top - 1) {
 					if (group_top - 1 > last_group_on_screen) {
 						erase_group_arrow();
@@ -233,7 +239,7 @@ select_read_group:
 				}
 				break;
 
-			case iKeySelectPageDown3:
+			case iKeyPageDown3:
 				if (!space_goto_next_unread) goto select_page_down;
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
@@ -242,8 +248,8 @@ select_read_group:
 				}
 				break;
 
-			case iKeySelectPageDown:		/* page down */
-			case iKeySelectPageDown2:
+			case iKeyPageDown:		/* page down */
+			case iKeyPageDown2:
 select_page_down:
 				if (!group_top) {
 					break;
@@ -283,8 +289,8 @@ select_page_down:
 				group_selection_page ();
 				break;
 
-			case iKeySelectDown:		/* line down */
-			case iKeySelectDown2:
+			case iKeyDown:		/* line down */
+			case iKeyDown2:
 select_down:
 				if (!group_top) {
 					break;
@@ -312,8 +318,8 @@ select_down:
 				}
 				break;
 
-			case iKeySelectUp:		/* line up */
-			case iKeySelectUp2:
+			case iKeyUp:		/* line up */
+			case iKeyUp2:
 select_up:
 				if (!group_top) {
 					break;
@@ -354,9 +360,9 @@ select_up:
 			    }
 			    break;
 
-			case iKeySelectPageUp:		/* page up */
-			case iKeySelectPageUp2:
-			case iKeySelectPageUp3:
+			case iKeyPageUp:		/* page up */
+			case iKeyPageUp2:
+			case iKeyPageUp3:
 select_page_up:
 				if (!group_top) {
 					break;
@@ -493,7 +499,7 @@ select_page_up:
 				}
 				break;
 
-			case iKeySelectOptionsMenu:	/* options menu */
+			case iKeyOptionMenu:	/* option menu */
 				set_alarm_clock_off ();
 				change_config_file (NULL, TRUE);
 				set_signals_select ();	/* just to be sure */
