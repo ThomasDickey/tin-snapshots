@@ -108,7 +108,7 @@ psGrpPrev ()
 	return (struct t_group *) 0;
 }
 
-#ifdef 0
+#if 0
 void
 vGrpTest ()
 {

@@ -1,5 +1,13 @@
 Bugs
 ----
+o  only create_index_lock_file() if it is realy needed (tind/tin -U) and only
+   try to remove the lock file if it is realy created (cleanup_tmp_files())
+
+o  fix repost_article that it does not thrash References: header if it
+   contains more than one space between 2 msgids
+
+o  fix article superseding that it enters the editor emediately
+
 o  strip hardcoded values (binaries/sources) from feed.c
    add default to attributes... 
 
@@ -89,11 +97,6 @@ o  Reorganize tinrc into related sections for easier editing
 
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
-
-o  add s)upersede option at the 'D' article delete mini-menu
-
-o  add s)upersede option at the 'x' article repost mini-menu
-   for own articles
 
 o  add feature Cc:
 

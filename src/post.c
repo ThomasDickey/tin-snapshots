@@ -47,14 +47,12 @@ extern char note_h_subj[LEN];				/* Subject:	*/
 extern char note_h_date[PATH_LEN];			/* Date:	*/
 extern char note_h_from[LEN];				/* From: */
 
-#ifdef FORGERY
 extern char note_h_org[PATH_LEN];			/* Organization: */
 extern char note_h_keywords[LEN];			/* Keywords: */
 extern char note_h_summary[LEN];			/* Summary: */
 extern char note_h_mimeversion[PATH_LEN];		/* Mime-Version: */
 extern char note_h_contenttype[LEN];			/* Content-Type: */
 extern char note_h_contentenc[LEN];			/* Content-Transfer-Encoding: */
-#endif /* FORGERY */
 
 extern FILE *note_fp;					/* the body of the current article */
 extern long note_mark[MAX_PAGES];			/* ftells on beginnings of pages */
@@ -2071,9 +2069,10 @@ pcCopyArtHeader (iHeader, pcArt, result)
 
 
 int
-delete_article (group, art)
+delete_article (group, art, respnum)
 	struct t_group *group;
 	struct t_article *art;
+	int respnum;
 {
 	char ch, ch_default = iKeyPostDelete;
 	char buf[LEN];
@@ -2092,6 +2091,8 @@ delete_article (group, art)
 	int redraw_screen = FALSE;
 	int init = TRUE;
 	int oldraw;
+	char option = iKeyPostDelete;
+	char option_default = iKeyPostDelete;
 
 	msg_init_headers ();
 
@@ -2125,6 +2126,24 @@ delete_article (group, art)
 		info_message (txt_art_cannot_delete);
 		return redraw_screen;
 #endif
+	} else {
+		do {
+			sprintf (msg, txt_delete_article, art->subject, option_default);
+			wait_message (msg);
+			MoveCursor (cLINES, (int) (strlen (msg)-1));
+			if ((option = (char) ReadCh ()) == '\r' || option == '\n')
+			option = option_default;
+		} while (! strchr ("dqs\033", option));
+
+		switch (option) {
+			case iKeyPostDelete:
+				break;
+			case iKeyPostSupersede:
+				repost_article (group->name, art, respnum, TRUE);
+				return(0);
+			default:
+				return(0);
+		}
 	}
 
 	clear_message ();
@@ -2253,11 +2272,19 @@ delete_article (group, art)
  * Repost an already existing article to another group (ie. local group)
  */
 
+/* FIXME!
+ * if References: <con.tains@a.double>  <space@between.two.msg.ids>
+ * it trashes them :(
+ * "441 437 No colon-space in "z.uni-karlsruhe.de>" header"
+ * and reposting/superseding fails
+ */
+
 int
-repost_article (group, art, respnum)
+repost_article (group, art, respnum, supersede)
 	char *group;
 	struct t_article *art;
 	int respnum;
+	char supersede;
 {
 	char 	buf[LEN];
 	char 	tmp[LEN];
@@ -2268,11 +2295,14 @@ repost_article (group, art, respnum)
 	int 	ret_code 	= POSTED_NONE;
  	struct t_group 	*psGrp;
  	char 	*ptr;
-#ifdef FORGERY
-	char	from_name[PATH_LEN];
 	char	line[NNTP_STRLEN];
+	char	from_name[PATH_LEN];
+#ifndef FORGERY
+	char host_name[PATH_LEN];
+	char user_name[128];
+	char full_name[128];
 #endif
-
+                                
 	msg_init_headers ();
 
 	/*
@@ -2336,34 +2366,39 @@ repost_article (group, art, respnum)
 	}
 	chmod (article, 0600);
 
-#ifdef FORGERY
-	make_path_header (line, from_name);
-	msg_add_header ("Path", line);
-	sprintf (line, "%s (%s)", art->from, art->name);
-	msg_add_header ("From", line);
-	msg_add_header ("X-Superseded-By", from_name);
-	sprintf (line, "<supersede.%s", note_h_messageid+1);
-	msg_add_header ("Message-ID", line);
-	msg_add_header ("Supersedes", note_h_messageid);
-	if (note_h_followup[0])
-		msg_add_header ("Followup-To", note_h_followup);
-	find_reply_to_addr (respnum, line);
-	msg_add_header ("Reply-To", line);
-	if (note_h_org[0])
-		msg_add_header ("Organization", note_h_org);
-	if (note_h_keywords[0])
-		msg_add_header ("Keywords", note_h_keywords);
-	if (note_h_summary[0])
-		msg_add_header ("Summary", note_h_summary);
-	if (note_h_mimeversion[0])
-		msg_add_header ("Mime-Version", note_h_mimeversion);
-	if (note_h_contenttype[0])
-		msg_add_header ("Content-Type", note_h_contenttype);
-	if (note_h_contentenc[0])
-		msg_add_header ("Content-Transfer-Encoding", note_h_contentenc);
-	if (*note_h_distrib)
-		msg_add_header ("Distribution", note_h_distrib);
+	if (supersede) {
+#ifndef FORGERY
+		get_host_name (host_name);
+		get_user_info (user_name, full_name);
+		get_from_name (user_name, host_name, full_name, from_name);
+
+		if (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))) {
+#else
+		make_path_header (line, from_name);
+		msg_add_header ("Path", line);
+		sprintf (line, "%s (%s)", arts[respnum].from, art->name);
+		msg_add_header ("From", line);
+		msg_add_header ("X-Superseded-By", from_name);
+		if (note_h_org[0])
+			msg_add_header ("Organization", note_h_org);
+		sprintf (line, "<supersede.%s", note_h_messageid+1);
+		msg_add_header ("Message-ID", line);
 #endif
+		msg_add_header ("Supersedes", note_h_messageid);
+		if (note_h_followup[0])
+			msg_add_header ("Followup-To", note_h_followup);
+		find_reply_to_addr (respnum, line);
+		msg_add_header ("Reply-To", line);
+		if (note_h_keywords[0])
+			msg_add_header ("Keywords", note_h_keywords);
+		if (note_h_summary[0])
+			msg_add_header ("Summary", note_h_summary);
+		if (*note_h_distrib)
+			msg_add_header ("Distribution", note_h_distrib);
+#ifndef FORGERY
+		}
+#endif
+	}
 
 	msg_add_header ("Subject", note_h_subj);
 	msg_add_header ("Newsgroups", group);
@@ -2372,39 +2407,54 @@ repost_article (group, art, respnum)
 		msg_add_header ("References", note_h_references);
 
 #ifndef FORGERY
-	if (psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
-	}
-	if (*reply_to) {
-		msg_add_header ("Reply-To", reply_to);
-	}
-	if (*note_h_distrib) {
-		msg_add_header ("Distribution", note_h_distrib);
-	} else {
-		msg_add_header ("Distribution", my_distribution);
-	}
+	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+#else
+	if (! supersede) {
 #endif
-
+		if (psGrp->attribute->organization != (char *) 0) {
+			msg_add_header ("Organization", psGrp->attribute->organization);
+		}
+		if (*reply_to) {
+			msg_add_header ("Reply-To", reply_to);
+		}
+		if (*note_h_distrib) {
+			msg_add_header ("Distribution", note_h_distrib);
+		} else {
+			msg_add_header ("Distribution", my_distribution);
+		}
+	}
+  	
 	start_line_offset = msg_write_headers (fp);
 	start_line_offset++;
 	msg_free_headers ();
 
 #ifndef FORGERY
-	fprintf (fp, txt_article_reposted1, note_h_newsgroups);
-	if (art->name) {
-		fprintf (fp, txt_article_reposted2a, art->name, art->from);
-	} else {
-		fprintf (fp, txt_article_reposted2b, art->from);
-	}
-	fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
+	if (!supersede || (supersede && (!(str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))))) {
+#else
+	if (! supersede) {
 #endif
+		fprintf (fp, txt_article_reposted1, note_h_newsgroups);
+		if (art->name) {
+			fprintf (fp, txt_article_reposted2a, art->name, art->from);
+		} else {
+			fprintf (fp, txt_article_reposted2b, art->from);
+		}
+		fprintf (fp, "\n[ Posted on %s ]\n\n", note_h_date);
+	}
 
 	fseek (note_fp, note_mark[0], 0);
 	copy_fp (note_fp, fp, "");
 
 	msg_write_signature (fp, FALSE);
 	fclose (fp);
-
+	
+	/* on supersede change default-key */
+#ifndef FORGERY
+	if (supersede && (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))))
+#else
+	if (supersede)
+#endif
+		ch_default=iKeyPostEdit;
 	forever {
 		do {
 			sprintf (msg, txt_quit_edit_xpost,
@@ -2419,6 +2469,7 @@ repost_article (group, art, respnum)
 		case iKeyPostEdit:
 			invoke_editor (article, start_line_offset);
 			ret_code = POSTED_REDRAW;
+			ch_default = iKeyPostPost;
 			break;
 
 #ifdef HAVE_ISPELL
@@ -2441,7 +2492,15 @@ repost_article (group, art, respnum)
 #endif
 
  		case iKeyPostPost:
-			wait_message (txt_repost_an_article);
+#ifndef FORGERY
+		if (supersede && (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from)))) {
+#else
+		if (supersede) {
+#endif
+				wait_message (txt_superseding_art);
+			} else
+				wait_message (txt_repost_an_article);
+
 			if (submit_news_file (article, 0)) {
 				info_message (txt_art_posted);
 				ret_code = POSTED_OK;

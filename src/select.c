@@ -213,6 +213,8 @@ select_read_group:
 				}
 				break;
 
+			case iKeySelectPageDown3:
+				if (! space_goto_next_unread) goto select_page_down;
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
 				if (next_unread_group (TRUE) == GRP_QUIT) {
@@ -222,7 +224,6 @@ select_read_group:
 
 			case iKeySelectPageDown:		/* page down */
 			case iKeySelectPageDown2:
-			case iKeySelectPageDown3:
 select_page_down:
 				if (! group_top) {
 					break;

@@ -50,6 +50,8 @@ feed_articles (function, level, group, respnum)
 	char save_file[PATH_LEN];
 	char *prompt;
 	char proc_ch = proc_ch_default;
+	char option = iKeyFeedSupersede;
+	char option_default = iKeyFeedSupersede;
 	FILE *fp = (FILE *) 0;
 	int ch, ch_default;
 	int b, i, j;
@@ -64,7 +66,14 @@ feed_articles (function, level, group, respnum)
 	int ret1 = FALSE;
 	int ret2 = FALSE;
 	int retcode;
-	
+	int supersede = FALSE;
+#ifndef FORGERY
+	char from_name[PATH_LEN];
+	char host_name[PATH_LEN];
+	char user_name[128];
+	char full_name[128];
+#endif
+
 #ifdef DONT_HAVE_PIPING
 	if (function == FEED_PIPE) {
 		error_message (txt_piping_not_enabled, "");
@@ -308,8 +317,47 @@ feed_articles (function, level, group, respnum)
 			}
 			wait_message (txt_saving);
 			break;
-		case FEED_REPOST:	/* ask user for newsgroups */
-			sprintf (msg, txt_repost_group, default_repost_group);
+		case FEED_REPOST:	/* repost article */
+#ifndef FORGERY
+			get_host_name (host_name);
+			get_user_info (user_name, full_name);
+			get_from_name (user_name, host_name, full_name, from_name);
+
+			if (str_str (from_name, arts[respnum].from, strlen (arts[respnum].from))) {
+#endif
+				/* repost or supersede ? */
+				do {
+					sprintf (msg,txt_supersede_article, arts[respnum].subject, option_default);
+					wait_message (msg);
+					MoveCursor (cLINES, (int) (strlen (msg)-1));
+					if ((option = (char) ReadCh ()) == '\r' || option == '\n')
+						option = option_default;
+				} while (! strchr ("qrs\033", option));
+
+				switch (option) {
+					case iKeyFeedSupersede:
+						sprintf (msg, txt_supersede_group, default_repost_group);
+						supersede = TRUE;
+						/*
+						 * FIXME!
+						 * don't ask q)uit, e)dit, p)ost [subject]:
+						 * but open editor emediately
+						 */
+						break;
+					case iKeyFeedRepost:
+						sprintf (msg, txt_repost_group, default_repost_group);
+						supersede = FALSE;
+						break;
+					default:
+						clear_message ();
+						return;
+				}
+#ifndef FORGERY
+			} else {
+				sprintf (msg, txt_repost_group, default_repost_group);
+				supersede = FALSE;
+			}
+#endif
 	
 			if (! prompt_string (msg, group_name)) {
 				clear_message ();
@@ -357,7 +405,7 @@ feed_articles (function, level, group, respnum)
 					}
 					break;
 				case FEED_REPOST:
-					redraw_screen = repost_article (group_name, &arts[respnum], respnum);
+					redraw_screen = repost_article (group_name, &arts[respnum], respnum, supersede);
 					break;
 			}
 			if (processed_ok) {
@@ -408,7 +456,7 @@ feed_articles (function, level, group, respnum)
 						add_to_save_list (i, &arts[i], is_mailbox, TRUE, filename);
 						break;
 					case FEED_REPOST:
-						redraw_screen = repost_article (group_name, &arts[i], i);
+						redraw_screen = repost_article (group_name, &arts[i], i, supersede);
 						break;
 				}
 				if (processed_ok) {
@@ -461,7 +509,7 @@ feed_articles (function, level, group, respnum)
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j], j);
+								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
 								break;
 						}
 						if (processed_ok) {
@@ -526,7 +574,7 @@ feed_articles (function, level, group, respnum)
 								add_to_save_list (j, &arts[j], is_mailbox, TRUE, filename);
 								break;
 							case FEED_REPOST:
-								redraw_screen = repost_article (group_name, &arts[j], j);
+								redraw_screen = repost_article (group_name, &arts[j], j, supersede);
 								break;
 						}
 						if (processed_ok) {

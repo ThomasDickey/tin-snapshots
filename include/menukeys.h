@@ -25,6 +25,8 @@
 #define iKeyFeedArt 'a'
 #define iKeyFeedHot 'h'
 #define iKeyFeedPat 'p'
+#define iKeyFeedRepost 'r'
+#define iKeyFeedSupersede 's'
 #define iKeyFeedThd 't'
 
 /* filter.c */
@@ -203,6 +205,7 @@
 #define iKeyPostPost 'p'
 #define iKeyPostQuit2 'q'
 #define iKeyPostSend 's'
+#define iKeyPostSupersede 's'
 
 /* prompt.c */
 

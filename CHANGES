@@ -1,7 +1,15 @@
+--unoff BETA release 960703 --
+
+103) Greg Berigan <gberigan@cse.unl.edu>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. supersede option on reposting/canceling
+     FIX. several patches
+
 --unoff BETA release 960702 --
 
 102) Chris Blum <chris@phil.uni-sb.de
-     BUG. '_' aka <space> was not decoded right
+     BUG. '_' not properly encoded inside non-MIME =?foo?bar?baz?=
+          words, which have to be encoded in order to prevent decoding
      FIX. rfc1522.c
 
 101) Jason Faultless <jason@radar.demon.co.uk>
