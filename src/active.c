@@ -1,4 +1,3 @@
-
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : active.c
@@ -27,7 +26,7 @@ void
 init_group_hash ()
 {
 	int i;
-	
+
 	if (num_active == -1) {
 		num_active = 0;
 		for (i = 0; i < TABLE_SIZE; i++) {
@@ -71,7 +70,7 @@ get_active_num ()
 #ifdef ENV_VAR_GROUPS
 	char *ptr;
 	int num;
-	
+
 	ptr = getenv (ENV_VAR_GROUPS);
 	if (ptr != (char *) 0) {
 		num = atoi (ptr);
@@ -92,11 +91,11 @@ resync_active_file ()
 	char old_group[HEADER_LEN];
 	int reread = FALSE;
 	int command_line;
-	
+
 	if (reread_active_file) {
 		reread_active_for_posted_arts = FALSE;
 		reread = TRUE;
-		
+
 		if (cur_groupnum >= 0 && group_top) {
 			strcpy (old_group, CURR_GROUP.name);
 		} else {
@@ -145,8 +144,8 @@ find_group_index (group)
 
 	h = hash_groupname (group);
 	i = group_hash[h];
-	
-	/* 
+
+	/*
 	 * hash linked list chaining
 	 */
 	while (i >= 0) {
@@ -162,7 +161,7 @@ find_group_index (group)
 /*
  * parse line from news or mail active files
  */
- 
+
 int
 parse_active_line (line, max, min, moderated)
 	char *line;
@@ -171,11 +170,11 @@ parse_active_line (line, max, min, moderated)
 	char *moderated;
 {
 	char *p, *q, *r;
-	
+
 	if (line[0] == '#' || line[0] == '\n') {
 		return FALSE;
 	}
-	
+
 	for (p = line; *p && *p != ' ' && *p != '\n'; p++) {
 		continue;
 	}
@@ -243,7 +242,7 @@ parse_newsrc_active_line (fp, group, count, max, min, moderated)
 
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -261,7 +260,7 @@ read_news_active_file ()
 	int i;
 	long count = -1L , h;
 	long min = 1, max = 0;
-		
+
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 
@@ -305,7 +304,7 @@ read_news_active_file ()
 		}
 
 		/*
-		 * Don't load group into active[] from active file if 
+		 * Don't load group into active[] from active file if
 		 * 'x'  junked group
 		 * '='  aliased group
 		 */
@@ -365,7 +364,7 @@ read_news_active_file ()
 			active[num_active].glob_filter = &glob_filter;
 			active[num_active].grps_filter = (struct t_filters *) 0;
 			vSetDefaultBitmap (&active[num_active]);
-#ifdef INDEX_DAEMON			
+#ifdef INDEX_DAEMON
 			active[num_active].last_updated_time = 0L;
 #endif
 			if (num_active % 100 == 0 && ! update) {
@@ -393,7 +392,7 @@ read_news_active_continue:;
 }
 
 /*
- *  create ~/.tin/active if it does not exist (local news only) 
+ *  create ~/.tin/active if it does not exist (local news only)
  */
 
 void
@@ -435,7 +434,7 @@ backup_active (create)
  * If reading news via NNTP issue a NEWGROUPS command.
  */
 
-void 
+void
 check_for_any_new_groups ()
 {
 	char *autosubscribe, *autounsubscribe;
@@ -449,7 +448,7 @@ check_for_any_new_groups ()
 	if ((! check_for_new_newsgroups || (update && ! update_fork))) {
 		return;
 	}
-	
+
 	wait_message (txt_checking_active_file);
 
 	time (&the_newnews_time);
@@ -464,13 +463,13 @@ check_for_any_new_groups ()
 	}
 	newnews_index = find_newnews_index (new_newnews_host);
 
-	if (newnews_index >= 0) {	
+	if (newnews_index >= 0) {
 		strcpy (old_newnews_host, newnews[newnews_index].host);
 		old_newnews_time = newnews[newnews_index].time;
 	} else {
 		strcpy (old_newnews_host, "UNKNOWN");
 		old_newnews_time = 0L;
-	}	
+	}
 
 	if (! read_news_via_nntp && newnews_index >= 0) {
 /*
@@ -483,9 +482,9 @@ check_for_any_new_groups ()
 	}
 
 	if (debug == 2) {
-		sprintf (msg, "Newnews old=[%ld]  new=[%ld]", 
+		sprintf (msg, "Newnews old=[%ld]  new=[%ld]",
 			old_newnews_time, the_newnews_time);
-		error_message (msg, "");						
+		error_message (msg, "");
 		sleep (2);
 	}
 
@@ -494,8 +493,8 @@ check_for_any_new_groups ()
 		goto notify_groups_done;
 	}
 
-	/* 
-	 * Check if there are user-set groups to be 
+	/*
+	 * Check if there are user-set groups to be
 	 * automatically subscribed or unsubscribed.
 	 */
 	autosubscribe = getenv ("AUTOSUBSCRIBE");
@@ -561,7 +560,7 @@ notify_groups_done:
 /*
  * prompt user if new group should be subscribed to
  */
- 
+
 void
 prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 	char *group;
@@ -572,7 +571,7 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 	int idx;
 	static int subscribe_rest = FALSE;
 	static int unsubscribe_rest = FALSE;
-	
+
 	/*
 	 * First automatically sub/unsub from groups specified in
 	 * the env. variables AUTOSUBSCRIBE & AUTOUNSUBSCRIBE
@@ -583,15 +582,15 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 		if (idx >= 0) {
 			subscribe (&active[my_group[idx]], SUBSCRIBED);
 		}
-		return;				   
+		return;
 	} else if ((autounsubscribe != (char *) 0) &&
 		match_group_list (group, autounsubscribe)) {
 		/* ignore this group */
-		return;				   
+		return;
 	}
 
 	/*
-	 * If Y/N (capitol Y/N) was pressed then automatically sub/unsub 
+	 * If Y/N (capitol Y/N) was pressed then automatically sub/unsub
 	 * from the rest of the new groups.
 	 */
 	if (subscribe_rest) {
@@ -607,12 +606,12 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 			}
 			printf (txt_subscribing_to, group);
 		}
-		return;				   
+		return;
 	} else if (unsubscribe_rest) {
 		/* ignore this group */
 		return;
 	}
-	
+
 	do {
 		if (cmd_line) {
 			printf ("\r\n");
@@ -628,10 +627,10 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 			ch = ch_default;
 		}
 	} while (! strchr ("NnYy", ch));
-		
+
 	my_fputc (ch, stdout);
 	fflush (stdout);
-	
+
 	switch (ch) {
 		case iKeyActiveYes:
 		case iKeyActiveAll:
@@ -642,7 +641,7 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 			if (ch == iKeyActiveAll) {
 				subscribe_rest = TRUE;
 			}
-			break;	   
+			break;
 		case iKeyActiveNone:
 			unsubscribe_rest = TRUE;
 			if (cmd_line) {
@@ -656,8 +655,8 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 			break;
 		case iKeyActiveNo:
 		default:
-			break;	   
-	}	
+			break;
+	}
 }
 
 
@@ -670,15 +669,15 @@ match_group_list (group, group_list)
 	char pattern[HEADER_LEN];
 	int accept, negate, list_len;
 	size_t group_len;
-	
+
 	accept = FALSE;
 	list_len = strlen (group_list);
-	/* 
-	 * walk through comma-separated entries in list 
+	/*
+	 * walk through comma-separated entries in list
 	 */
 	while (list_len > 0) {
-		/* 
-		 * find end/length of this entry 
+		/*
+		 * find end/length of this entry
 		 */
 		separator = strchr (group_list, ',');
 		if (separator != (char *) 0) {
@@ -687,26 +686,26 @@ match_group_list (group, group_list)
 			group_len = list_len;
 		}
 		if ((negate = ('!' == *group_list))) {
-			/* 
-			 * a '!' before the pattern inverts sense of match 
+			/*
+			 * a '!' before the pattern inverts sense of match
 			 */
 			group_list++;
 			group_len--;
 			list_len--;
 		}
-		/* 
-		 * copy out the entry and terminate it properly 
+		/*
+		 * copy out the entry and terminate it properly
 		 */
 		strncpy (pattern, group_list, group_len);
-		pattern[group_len] = (char) 0;		
-		/* 
+		pattern[group_len] = (char) 0;
+		/*
 		 * regexp match
 		 */
 		if (STR_MATCH(group, pattern)) {
 			accept = ! negate;	/* matched! */
 		}
-		/* 
-		 * now examine next entry if any 
+		/*
+		 * now examine next entry if any
 		 */
 		if ((char) 0 != group_list[group_len]) {
 			group_len++;	/* skip the separator */
@@ -715,7 +714,7 @@ match_group_list (group, group_list)
 		list_len -= group_len;
 	}
 	return (accept);
-}	
+}
 
 /*
  *  Load the last updated time for each group in the active file so that
@@ -738,7 +737,7 @@ read_group_times_file ()
 	FILE *fp;
 	time_t updated_time;
 	struct t_group *psGrp;
-		
+
 	if ((fp = fopen (group_times_file, "r")) == (FILE *) 0) {
 		return;
 	}
@@ -751,24 +750,24 @@ read_group_times_file ()
 			*q = *p;
 		}
 		*q = '\0';
-		
+
 		/*
 		 * read the last updated time
 		 */
 		updated_time = atol (p);
-		
+
 		/*
-		 * find the group in active[] and set updated time 
+		 * find the group in active[] and set updated time
 		 */
 		psGrp = psGrpFind (group);
-		 
+
 		if (psGrp) {
 			psGrp->last_updated_time = updated_time;
 		}
 
 if (debug == 2) {
 	printf ("group=[%-40.40s]  [%ld]\n", psGrp->name, psGrp->last_updated_time);
-}		
+}
 	}
 	fclose (fp);
 
@@ -788,7 +787,7 @@ write_group_times_file ()
 	char group[HEADER_LEN];
 	FILE *fp;
 	register int i;
-	
+
 	if ((fp = fopen (group_times_file, "w")) == (FILE *) 0) {
 		return;
 	}
@@ -810,7 +809,7 @@ load_newnews_info (info)
 	char buf[NNTP_STRLEN];
 	int i;
 	time_t the_time;
-		
+
 	/*
 	 * initialize newnews[] if no entries
 	 */
@@ -822,8 +821,8 @@ load_newnews_info (info)
 	}
 
 	my_strncpy (buf, info, sizeof (buf));
-	
-	ptr = strchr (buf, ' '); 
+
+	ptr = strchr (buf, ' ');
 	if (ptr != (char *) 0) {
 		the_time = atol (ptr);
 		*ptr = '\0';
@@ -833,11 +832,11 @@ load_newnews_info (info)
 		newnews[num_newnews].host = str_dup (buf);
 		newnews[num_newnews].time = the_time;
 		if (debug == 2) {
-			sprintf (buf, "ACTIVE host=[%s] time=[%ld]", 
+			sprintf (buf, "ACTIVE host=[%s] time=[%ld]",
 				newnews[num_newnews].host,
 				newnews[num_newnews].time);
 			error_message ("%s", buf);
-		}	
+		}
 		num_newnews++;
 	}
 }
@@ -848,7 +847,7 @@ find_newnews_index (cur_newnews_host)
 	char *cur_newnews_host;
 {
 	int i, found = FALSE;
-		
+
 	for (i = 0 ; i < num_newnews ; i++) {
 		if (STRCMPEQ(cur_newnews_host, newnews[i].host)) {
 			found = TRUE;
@@ -883,19 +882,19 @@ read_motd_file ()
 	if (update && ! update_fork) {
 		return;
 	}
-	
+
 	old_motd_date = atol (motd_file_info);
 
 	/*
 	 * reading news locally (local) or via NNTP (server name)
-	 */	
+	 */
 	if (read_news_via_nntp) {
 		if (! old_motd_date) {
 			strcpy (motd_file_date, "920101 000000");
 		} else {
 			tm = localtime (&old_motd_date);
 			sprintf (motd_file_date, "%02d%02d%02d %02d%02d%02d",
-				tm->tm_year, tm->tm_mon+1, tm->tm_mday, 
+				tm->tm_year, tm->tm_mon+1, tm->tm_mday,
 				tm->tm_hour, tm->tm_min, tm->tm_sec);
 		}
 		time (&new_motd_date);
@@ -904,7 +903,7 @@ read_motd_file ()
 			new_motd_date = sb.st_mtime;
 		}
 	}
-	
+
 	if (old_motd_date && new_motd_date <= old_motd_date) {
 		goto read_motd_done;
 	}
@@ -918,18 +917,18 @@ read_motd_file ()
 			lineno++;
 		}
 		fclose (fp);
-		
+
 		if (lineno) {
 			wait_message (txt_cmdline_hit_any_key);
 			Raw (TRUE);
-			ReadCh ();	
+			ReadCh ();
 			Raw (FALSE);
 			wait_message ("\n");
 		}
 	}
 
 read_motd_done:
-	
+
 	/*
 	 * update motd tinrc entry with new date
 	 */
@@ -964,11 +963,11 @@ void
 vMakeActiveMyGroup ()
 {
 	register int iNum;
-	
+
 	group_top = 0;
-	
+
 	for (iNum = 0; iNum < num_active; iNum++) {
-		my_group[group_top++] = iNum;	
-	}	
+		my_group[group_top++] = iNum;
+	}
 }
 

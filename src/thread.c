@@ -34,7 +34,7 @@ static int draw_tline P_((int i, int full));
 static int bld_tline P_((int l, struct t_article *art));
 
 
-static int 
+static int
 bld_tline (l, art)
 	int l;
 	struct t_article *art;
@@ -104,11 +104,11 @@ bld_tline (l, art)
 
 	if (show_lines) {
 		sprintf (screen[j].col, "  %4d%3s  [%-4s]  %-*.*s%s%-*.*s",
-			 l, new_resps, lines, len_subj, len_subj, art->subject, 
+			 l, new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {
 		sprintf (screen[j].col, "  %4d%3s  %-*.*s%s%-*.*s",
-			 l, new_resps, len_subj, len_subj, art->subject, 
+			 l, new_resps, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	}
 
@@ -117,7 +117,7 @@ bld_tline (l, art)
 }
 
 
-static int 
+static int
 draw_tline (i, full)
 	int i;
 	int full;
@@ -149,7 +149,7 @@ draw_tline (i, full)
 	fwrite (s, 1, tlen, stdout);
 
 	/* it is somewhat less efficient to go back and redo that art mark
-	 * if selected, but it is quite readable as to what is happening 
+	 * if selected, but it is quite readable as to what is happening
 	 */
 	if (screen[j].col[k] == art_marked_selected) {
 		MoveCursor (INDEX2LNUM(i), k);
@@ -165,12 +165,12 @@ draw_tline (i, full)
 
 /*
  * show current thread. If threaded on Subject: show
- *   <respnum> <name> 
+ *   <respnum> <name>
  * If threaded on References: or Archive-name: show
  *   <respnum> <subject> <name>
  */
- 
-int 
+
+int
 show_thread (group, group_path, respnum)
 	struct t_group *group;
 	char *group_path;
@@ -620,7 +620,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 			case iKeyQuit:				/* return to previous level */
 				goto thread_done;
 
-			case iKeyThreadQuitTin:			/* quit */
+			case iKeyQuitTin:			/* quit */
 				ret_code = GRP_QUIT;
 				goto thread_done;
 
@@ -629,7 +629,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 
  				if (n < 0)
  					break;
- 
+
  				if (arts[n].tagged) {
  					arts[n].tagged = 0;
  					--num_of_tagged_arts;
@@ -688,7 +688,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 					goto thread_down;
 				draw_thread_arrow ();
 #if 0
-				info_message (flag 
+				info_message (flag
 					      ? txt_art_marked_as_selected
 					      : txt_art_marked_as_deselected)
 #endif
@@ -727,7 +727,7 @@ thread_done:
 }
 
 
-void 
+void
 show_thread_page ()
 {
 #ifndef INDEX_DAEMON
@@ -807,7 +807,7 @@ show_thread_page ()
 }
 
 
-void 
+void
 update_thread_page ()
 {
 #ifndef INDEX_DAEMON
@@ -829,7 +829,7 @@ update_thread_page ()
 }
 
 
-void 
+void
 draw_thread_arrow ()
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
@@ -846,7 +846,7 @@ draw_thread_arrow ()
 }
 
 
-void 
+void
 erase_thread_arrow ()
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
@@ -863,7 +863,7 @@ erase_thread_arrow ()
 }
 
 
-int 
+int
 prompt_thread_num (ch)
 	int ch;
 {
@@ -896,7 +896,7 @@ prompt_thread_num (ch)
  *  Return the number of unread articles there are within a thread
  */
 
-int 
+int
 new_responses (thread)
 	int thread;
 {
@@ -925,7 +925,7 @@ new_responses (thread)
  *  the thread,  thus resulting in no base[] entry for it.
  */
 
-int 
+int
 which_thread (n)
 	int n;
 {
@@ -949,7 +949,7 @@ which_thread (n)
  *  Find how deep in a thread a response is.  Start counting at zero
  */
 
-int 
+int
 which_response (n)
 	int n;
 {
@@ -973,7 +973,7 @@ which_response (n)
  *  that basenote
  */
 
-int 
+int
 num_of_responses (n)
 	int n;
 {
@@ -997,7 +997,7 @@ num_of_responses (n)
  * Given an index into base[], return relevant statistics
  */
 
-int 
+int
 stat_thread (n, sbuf)
 	int n;
 	struct t_art_stat *sbuf;
@@ -1044,7 +1044,7 @@ stat_thread (n, sbuf)
 	}
 
 
-	if (sbuf->inrange) 
+	if (sbuf->inrange)
 		sbuf->art_mark = art_marked_inrange;
 	else if (sbuf->deleted)
 		sbuf->art_mark = art_marked_deleted;
@@ -1066,7 +1066,7 @@ stat_thread (n, sbuf)
  *  are no more responses in this thread
  */
 
-int 
+int
 next_response (n)
 	int n;
 {
@@ -1090,7 +1090,7 @@ next_response (n)
  *  next basenote
  */
 
-int 
+int
 next_thread (n)
 	int n;
 {
@@ -1108,7 +1108,7 @@ next_thread (n)
  *  thread if we go past the beginning of this thread.
  */
 
-int 
+int
 prev_response (n)
 	int n;
 {
@@ -1132,7 +1132,7 @@ prev_response (n)
  *  return response number n from thread i
  */
 
-int 
+int
 choose_response (i, n)
 	int i;
 	int n;
@@ -1153,15 +1153,15 @@ choose_response (i, n)
  *  from current point to the end restart from beginning of articles.
  */
 
-int 
+int
 next_unread (n)
 	int n;
 {
 	int cur_base_art = n;
 
 	while (n >= 0) {
-		if ((arts[n].status == ART_UNREAD 
-		     /* || arts[n].status == ART_WILL_RETURN */ ) 
+		if ((arts[n].status == ART_UNREAD
+		     /* || arts[n].status == ART_WILL_RETURN */ )
 		     && arts[n].thread != ART_EXPIRED) {
 			return n;
 		}
@@ -1170,8 +1170,8 @@ next_unread (n)
 
 	n = base[0];
 	while (n != cur_base_art) {
-		if ((arts[n].status == ART_UNREAD 
-		     /* || arts[n].status == ART_WILL_RETURN */ ) 
+		if ((arts[n].status == ART_UNREAD
+		     /* || arts[n].status == ART_WILL_RETURN */ )
 		     && arts[n].thread != ART_EXPIRED) {
 			return n;
 		}
@@ -1185,7 +1185,7 @@ next_unread (n)
  *  Find the previous unread response in this thread
  */
 
-int 
+int
 prev_unread (n)
 	int n;
 {

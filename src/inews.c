@@ -44,7 +44,7 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 #define INEWS_MAIL_DOMAIN inews_mail_domain
 #endif
 
-int 
+int
 submit_inews (name)
 	char *name;
 {
@@ -70,7 +70,7 @@ submit_inews (name)
 		return ret_code;
 	}
 
-	get_host_name (host_name);	
+	get_host_name (host_name);
 	get_user_info (user_name, full_name);
 	get_from_name (user_name, host_name, full_name, from_name);
 
@@ -86,7 +86,7 @@ submit_inews (name)
 			return ret_code;
 		}
 	}
-	 
+
 	/*
 	 * Check that domain is not of type  host.subdomain.domain
 	 */
@@ -135,7 +135,7 @@ submit_inews (name)
 	}
 #else
 	sprintf (line, "Path: %s!%s", host_name, PATHMASTER);
-#endif	
+#endif
 	put_server (line);
 
 	sprintf (line, "From: %s", rfc1522_encode(from_name));
@@ -162,10 +162,10 @@ submit_inews (name)
 		u_put_server (line);
 		u_put_server ("\r\n");
 	}
-	
+
 	put_server (".");
 	fclose (fp);
-	
+
 	/*
 	 * Receive OK_POSTED or ERROR response code from NNTP server
 	 */
@@ -174,7 +174,7 @@ submit_inews (name)
 		debug_nntp ("submit_inews", nntp_respcode (respcode));
 		return ret_code;
   	}
-  	
+
 	ret_code = TRUE;
 
 #endif /* NNTP_INEWS */
@@ -185,10 +185,10 @@ submit_inews (name)
 }
 
 /*
- * Find real hostname / substitute hostname if news gateway name 
+ * Find real hostname / substitute hostname if news gateway name
  */
- 
-void 
+
+void
 get_host_name (host_name)
 	char *host_name;
 {
@@ -203,13 +203,13 @@ get_host_name (host_name)
 
 	host_name[0] = '\0';
 	nntp_inews_gateway[0] = '\0';
-	
+
 #ifdef INEWS_MAIL_GATEWAY
 	if (*(INEWS_MAIL_GATEWAY)) {
 		strcpy (nntp_inews_gateway, INEWS_MAIL_GATEWAY);
 	}
 #endif
-	
+
 	if (nntp_inews_gateway[0]) {
 		/*
 		 * If 1st letter is '$' read gateway name from shell variable
@@ -231,7 +231,7 @@ get_host_name (host_name)
 					if (ptr != (char *) 0) {
 						*ptr = '\0';
 					}
-				}	
+				}
 				fclose (fp);
 			}
 			if (! host_name[0]) {
@@ -239,10 +239,10 @@ get_host_name (host_name)
 			}
 		} else {
 			strcpy (host_name, nntp_inews_gateway);
-		}	
+		}
 	} else {
 		/*
-		 * Get the FQDN that the article will have from 
+		 * Get the FQDN that the article will have from
 		 * 1 of 5 locations:
 		 *   /etc/HOSTNAME (linux)
 		 *   LIBDIR/sitename
@@ -278,23 +278,23 @@ get_host_name (host_name)
 		} else {
 			ptr = GetFQDN ();
 			if (ptr != (char *) 0) {
-				my_strncpy (host, ptr, sizeof (host)); 
-			} else { 
+				my_strncpy (host, ptr, sizeof (host));
+			} else {
 #				ifdef HAVE_GETHOSTBYNAME
 				{
 					struct hostent *host_entry;
 
-					gethostname (host, sizeof (host)); 
+					gethostname (host, sizeof (host));
 					host_entry = gethostbyname (host);
 					if (host_entry != NULL)
 						my_strncpy (host, host_entry->h_name, sizeof (host));
-				}	
-#				else	
+				}
+#				else
 #					if defined(M_AMIGA) || defined(M_OS2)
-						my_strncpy (host, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (host)); 
+						my_strncpy (host, get_val ("NodeName", "PROBLEM_WITH_NODE_NAME"), sizeof (host));
 #					else
 #					if defined(WIN32)
-						my_strncpy (host, get_val ("COMPUTERNAME", "PROBLEM_WITH_COMPUTERNAME"), sizeof (host)); 
+						my_strncpy (host, get_val ("COMPUTERNAME", "PROBLEM_WITH_COMPUTERNAME"), sizeof (host));
 #					else
 					{
 						struct utsname uts_name;
@@ -308,8 +308,8 @@ get_host_name (host_name)
 			}
 		}
 		strcpy (host_name, host);
-	}	
-	
+	}
+
 #endif /* INDEX_DAEMON */
 }
 
@@ -317,7 +317,7 @@ get_host_name (host_name)
  * Find username & fullname
  */
 
-void 
+void
 get_user_info (user_name, full_name)
 	char *user_name;
 	char *full_name;
@@ -326,7 +326,7 @@ get_user_info (user_name, full_name)
 	char buf[128];
 	char tmp[128];
 	char *ptr;
-	
+
 #if defined(M_AMIGA)
 	ptr = (char *) get_val ("REALNAME", "Unknown");
 	my_strncpy (full_name, ptr, 128);
@@ -336,7 +336,7 @@ get_user_info (user_name, full_name)
 		my_strncpy (buf, myentry->pw_gecos, 128);
 		ptr = strchr (buf, ',');
 		if (ptr != (char *) 0) {
-			*ptr = '\0';			
+			*ptr = '\0';
 		}
 		/*
 		 * check if SYSV (& lastname) hack is in gecos field
@@ -357,9 +357,10 @@ get_user_info (user_name, full_name)
 #endif
 
 	if ((ptr = getenv ("NAME")) != (char *) 0) {
-		my_strncpy (full_name, ptr, 128); }
-		
-	/* 
+		my_strncpy (full_name, ptr, 128);
+	}
+
+	/*
 	 * haha, supplying a from: line is not allowed, but this!
 	 */
 
@@ -378,7 +379,7 @@ get_user_info (user_name, full_name)
  * Find full From: name in 'user@host (name)' format
  */
 
-void 
+void
 get_from_name (user_name, host_name, full_name, from_name)
 	char *user_name;
 	char *host_name;
@@ -397,7 +398,7 @@ get_from_name (user_name, host_name, full_name, from_name)
 		return;
 	}
 #endif
-	
+
 	domain[0] = '\0';
 	nntp_inews_domain[0] = '\0';
 
@@ -416,7 +417,7 @@ get_from_name (user_name, host_name, full_name, from_name)
 
 	if (nntp_inews_domain[0]) {
 		get_domain_name (nntp_inews_domain, domain);
-		
+
 		if (domain[0] == '.') {
 			/*
 			 * If host_name is a FQDN just get the hostname from it
@@ -425,13 +426,13 @@ get_from_name (user_name, host_name, full_name, from_name)
 			ptr = strchr (host_name, '.');
 			if (ptr != (char *) 0) {
 				*ptr = '\0';
-			} 
+			}
 			sprintf (from_name, "%s@%s%s (%s)",
 				user_name, host_name, domain, full_name);
-		} else {	
+		} else {
 			sprintf (from_name, "%s@%s (%s)", user_name, domain, full_name);
-		}		
-	} else {	
+		}
+	} else {
 		if (host_name[0] == '%') {
 			sprintf (from_name, "%s%s (%s)", user_name, host_name, full_name);
 		} else {
@@ -440,10 +441,10 @@ get_from_name (user_name, host_name, full_name, from_name)
 	}
 
 	if (debug == 2) {
-		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]", 
+		sprintf (msg, "FROM=[%s] USER=[%s] HOST=[%s] NAME=[%s]",
 			from_name, user_name, host_name, full_name);
 		error_message (msg, "");
-	}	
+	}
 
 #endif /* INDEX_DAEMON */
 }
@@ -457,9 +458,9 @@ get_domain_name (inews_domain, domain)
 	char	*ptr;
 	char	buf[PATH_LEN];
 	FILE	*fp;
-	
+
 	*domain = '\0';
-			
+
 	/*
 	 * If 1st letter is '$' read domain name from shell variable
 	 */
@@ -492,7 +493,7 @@ get_domain_name (inews_domain, domain)
 }
 
 
-int 
+int
 submit_news_file (name, lines)
 	char *name;
 	int   lines;
@@ -514,13 +515,13 @@ submit_news_file (name, lines)
 		if (debug == 2) {
 			error_message ("Using BUILTIN inews", "");
 		}
-#endif /* DEBUG */			
+#endif /* DEBUG */
 		ret_code = submit_inews (name);
 	} else {
 #ifdef DEBUG
 		if (debug == 2) {
 			error_message ("Using EXTERNAL inews", "");
-		}	
+		}
 #endif /* DEBUG */
 
 #ifdef M_UNIX
@@ -530,12 +531,12 @@ submit_news_file (name, lines)
 		cp += strlen (cp);
 #	endif /* INEWSDIR */
 		sprintf (cp, "inews -h < %s", name);
-#else			
+#else
 		make_post_cmd (cp, name);
 #endif	/* M_UNIX */
-	
+
 		ret_code = invoke_cmd (buf);
-	} 
+	}
 
 	return ret_code;
 }

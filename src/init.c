@@ -104,7 +104,7 @@ int art_marked_inrange;
 int art_marked_return;
 int art_marked_selected;
 int art_marked_unread;
-int auto_list_thread;			/* list thread when entering it using right arrow */	
+int auto_list_thread;			/* list thread when entering it using right arrow */
 int NOTESLINES;				/* set in set_win_size () */
 int RIGHT_POS;				/* set in set_win_size () */
 int MORE_POS;				/* set in set_win_size () */
@@ -112,6 +112,7 @@ int confirm_action;
 int confirm_to_quit;
 int max_subj = 0;
 int max_from = 0;
+int got_sig_pipe = FALSE;
 int group_top;				/* one past top of my_group */
 int groupname_len = 0;			/* one past top of my_group */
 int catchup = FALSE;			/* mark all arts read in all subscribed groups */
@@ -261,11 +262,11 @@ void init_selfinfo ()
 	real_umask = umask (0);
 	umask (real_umask);
 #endif	/* M_AMIGA */
-	
+
 #ifdef HAVE_SETLOCALE
 	setlocale (LC_ALL, "");
 #endif
-		
+
 #ifdef M_AMIGA
 	if ((ptr = getenv ("USERNAME")) != (char *) 0) {
 		my_strncpy (userid, ptr, sizeof (userid));
@@ -284,10 +285,10 @@ void init_selfinfo ()
 	if (((ptr = getlogin ()) != (char *) 0) && strlen (ptr)) {
 		myentry = getpwnam (ptr);
 	}
-	if (myentry == (struct passwd *) 0) {	
+	if (myentry == (struct passwd *) 0) {
 		myentry = getpwuid (getuid ());
 	}
-	if (myentry != (struct passwd *) 0) {	
+	if (myentry != (struct passwd *) 0) {
 		memcpy (&pwdentry, myentry, sizeof (struct passwd));
 		myentry = &pwdentry;
 	}
@@ -325,7 +326,7 @@ void init_selfinfo ()
 
 	/*
 	 * we're setuid, so index in /usr/spool/news even if user root
-	 * This is quite essential if non local index files are 
+	 * This is quite essential if non local index files are
 	 * to be updated during the night from crontab by root.
 	 */
 	if (tin_uid != real_uid) {
@@ -415,7 +416,7 @@ void init_selfinfo ()
 	strip_blanks = TRUE;
 #ifdef M_UNIX
 	start_editor_offset = TRUE;
-#else	
+#else
 	start_editor_offset = FALSE;
 #endif
 	tab_after_X_selection = FALSE;
@@ -465,12 +466,12 @@ void init_selfinfo ()
 	index_newsdir[0] = '\0';
 	index_savedir[0] = '\0';
 	newsrc[0] = '\0';
-	
+
 	strncpy (mail_quote_format, txt_mail_quote, sizeof (mail_quote_format));
 	strncpy (news_quote_format, txt_news_quote, sizeof (news_quote_format));
 	strncpy (xpost_quote_format, txt_xpost_quote, sizeof (xpost_quote_format));
 
-	sprintf (page_header, "%s %s release %s [%s%s%s]", 
+	sprintf (page_header, "%s %s release %s [%s%s%s]",
 		progname, VERSION, RELEASEDATE, OS,
 		(tex2iso_supported ? " TeX2ISO" : ""),
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
@@ -500,9 +501,9 @@ void init_selfinfo ()
 	post_proc_command[0] = '\0';
 	proc_ch_default = 'n';
 
-	/* 
+	/*
 	 * Amiga uses assigns which end in a ':' and won't work with a '/'
-	 * tacked on after them: e.g. we want UULIB:active, and not 
+	 * tacked on after them: e.g. we want UULIB:active, and not
 	 * UULIB:/active. For this reason I have changed the sprintf calls
 	 * to joinpath. This is defined to sprintf(result,"%s/%s",dir,file)
 	 * on all UNIX systems.
@@ -710,12 +711,12 @@ got_active:
 
 	/*
 	 *  Get organization name
-	 */	
+	 */
 	ptr = GetConfigValue (_CONF_ORGANIZATION);
 	if (ptr != (char *) 0) {
 		my_strncpy (default_organization, ptr, sizeof (default_organization));
 	}
-	
+
 	/*
 	 *  check enviroment for REPLYTO
 	 */
@@ -788,7 +789,7 @@ got_bug_addr:;
 /*
  * Create default mail & save directories if they do not exist
  */
- 
+
 int create_mail_save_dirs ()
 {
 	int created = FALSE;
@@ -796,7 +797,7 @@ int create_mail_save_dirs ()
 	char path[PATH_LEN];
 	struct stat sb;
 
-	if (! strfpath (default_maildir, path, sizeof (path), 
+	if (! strfpath (default_maildir, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
 		joinpath (path, homedir, DEFAULT_MAILDIR);
 	}
@@ -805,7 +806,7 @@ int create_mail_save_dirs ()
 		created = TRUE;
 	}
 
-	if (! strfpath (default_savedir, path, sizeof (path), 
+	if (! strfpath (default_savedir, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
 		joinpath (path, homedir, DEFAULT_SAVEDIR);
 	}
@@ -815,7 +816,7 @@ int create_mail_save_dirs ()
 	}
 
 #endif	/* INDEX_DAEMON */
-	
+
 	return (created);
 }
 
@@ -852,7 +853,7 @@ GetConfigValue (name)
 			strcpy (conf_server, NNTP_DEFAULT_SERVER);
 			conf_value = conf_server;
 		}
-#endif	/* NNTP_DEFAULT_SERVER */		
+#endif	/* NNTP_DEFAULT_SERVER */
 	} else if (STRCMPEQ(_CONF_ORGANIZATION, name)) {
 		conf_org[0] = '\0';
 		/*
@@ -860,7 +861,7 @@ GetConfigValue (name)
 		 */
 #ifdef apollo
 		if ((ptr = getenv ("NEWSORG")) != (char *) 0) {
-#else	
+#else
 		if ((ptr = getenv ("ORGANIZATION")) != (char *) 0) {
 #endif
 			my_strncpy (conf_org, ptr, sizeof (conf_org));
@@ -904,10 +905,10 @@ GetConfigValue (name)
 			}
 			fclose (fp);
 		}
-got_org:	/* goto */				
+got_org:	/* goto */
 		conf_value = conf_org;
 	}
-	
+
 	return conf_value;
 }
 

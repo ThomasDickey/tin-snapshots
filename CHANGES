@@ -1,3 +1,24 @@
+--unoff BETA release 960821 --
+
+156) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. isbetween() called with signed char broke MIME-encoding
+     FIX. rfc1522.c
+
+155) Thomas E. Dickey <dickey@clark.net>
+     ADD. minor code cleanup
+     FIX. several patches
+
+154) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. SIGPIPE handlig for feed_artile
+     BUG. TeX2ISO did not work without rereading article
+     BUG. article with selfrefereces caused endless loop
+     BUG. when threading Both, wrong flag was showing up
+     BUG. ~Mail/posted was not stored - braindead dependency removed
+     ADD. minor code cleanup (added a few casts, striped tailing blanks,
+          sorted tinrc according to options 'M'enu, ...)
+     FIX. several patches
+
 --unoff BETA release 960817 --
 
 153) Jungshik Shin <jshin@pantheon.yale.edu>
@@ -5,10 +26,10 @@
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. Output of long lines in options menu did not stop at end of line
           when using expand_rel_abs_pathname().
-     ADD. post/mail_8bit_header and mm_charset to options menue
+     ADD. post/mail_8bit_header and mm_charset to options menu
      ADD. iKeyQuit ('q') and iKeyQuit2 (ESC) now defined and used as
           general quit keys.
-     ADD. make intsall* in toplevel makefile no compiles source if needed
+     ADD. make install* in top-level makefile no compiles source if needed
      FIX. several patches
 
 --unoff BETA release 960815 --
@@ -19,7 +40,7 @@
           If mm_charset is one of CJK charset, 7bit means the body is to be
           encoded in ISO-2022-JP/KR/CN (RFC1468/1557/1922).
           ISO-2022-JP/CN/CN-ext is not yet supported.
-     ADD. mm_charset to tinrc to override $MM_CHARSET or compiletime defualt
+     ADD. mm_charset to tinrc to override $MM_CHARSET or compile-time default
           post_8bit_header : on/off option
           mail_8bit_header : on/off option
      FIX. several supplied patches
@@ -62,7 +83,7 @@
 
 145) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
-     REM. braindead determination of default_save_option if auto_save=ON
+     REM. brain-dead determination of default_save_option if auto_save=ON
      FIX. feed.c
 
 144) Alexander Lehmann <alex@hal.rhein-main.de>
@@ -130,7 +151,7 @@
 
 134) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. configure --help shows --with-inews-dir twice (introduced in 132)
-     ADD. minor code cleanup (added ifndef NNTP_ONLY around iains fallback
+     ADD. minor code cleanup (added ifndef NNTP_ONLY around Iains fall-back
           values for the local active file; added make version to makefile)
      FIX. configure.in, makefile.in, init.c
 

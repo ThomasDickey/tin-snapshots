@@ -261,9 +261,9 @@ static int info_type;
 static int max_page;
 static int pos_help;
 
-void 
+void
 show_info_page (type, help, title)
-	int type; 
+	int type;
 	char *help[];
 	char *title;
 {
@@ -277,21 +277,21 @@ show_info_page (type, help, title)
 	}
 
 	if (beginner_level) {
-		help_lines = NOTESLINES + MINI_HELP_LINES - 1; 
+		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
 	} else {
 		help_lines = NOTESLINES;
 	}
-	
+
 	set_signals_help ();
 
 	cur_page = 1;
 	max_page = 1;
 	pos_help = 0;
-	
+
 	info_help = help;
 	info_type = type;
 	info_title = title;
-	
+
 	/*
 	 *  find how many elements in array
 	 */
@@ -307,7 +307,7 @@ show_info_page (type, help, title)
 			}
  		}
 	}
-	
+
 	max_page = i / help_lines;
 	if (i % help_lines) {
 		max_page++;
@@ -320,7 +320,7 @@ show_info_page (type, help, title)
 		}
 
 		old_page = cur_page;
-		
+
 		ch = ReadCh ();
 		switch (ch) {
 			case ESC:	/* common arrow keys */
@@ -359,9 +359,9 @@ help_page_down:
 				} else {
 					pos_help = 0;
 					cur_page = 1;
-				}				
+				}
 				break;
-			
+
 			case iKeyHelpPageUp:			/* page up */
 			case iKeyHelpPageUp2:
 			case iKeyHelpPageUp3:
@@ -373,7 +373,7 @@ help_page_up:
 				} else {
 					pos_help = (max_page-1) * help_lines;
 					cur_page = max_page;
-				}				
+				}
 				break;
 
 			case iKeyHelpHome:			/* Home */
@@ -398,12 +398,12 @@ help_end:
 help_done:
 				ClearScreen ();
 				return;
-		}	
+		}
 	}
 }
 
 
-void 
+void
 display_info_page ()
 {
 	char buf[LEN];
@@ -418,19 +418,19 @@ display_info_page ()
 	MoveCursor (INDEX_TOP, 0);
 
 	if (beginner_level) {
-		help_lines = NOTESLINES + MINI_HELP_LINES - 1; 
+		help_lines = NOTESLINES + MINI_HELP_LINES - 1;
 	} else {
 		help_lines = NOTESLINES;
 	}
 
-	if (info_type == HELP_INFO) { 
+	if (info_type == HELP_INFO) {
 		for (i=pos_help ; i < (pos_help + help_lines) && info_help[i] ; i++) {
 			my_fputs (info_help[i], stdout);
 		}
 	} else {
 		for (i=pos_help ; i < (pos_help + help_lines) && posted[i].date[0] ; i++) {
 			sprintf (buf, "%8s  %c  %-*s  %s",
-				posted[i].date, posted[i].action,  
+				posted[i].date, posted[i].action,
 				group_len, posted[i].group, posted[i].subj);
 				buf[cCOLS-2] = '\0';
 			printf ("%s\r\n", buf);
@@ -444,12 +444,12 @@ display_info_page ()
 }
 
 
-void 
+void
 show_mini_help (level)
 	int level;
 {
 	int line;
-	
+
 	if (! beginner_level) {
 		return;
 	}
@@ -493,7 +493,7 @@ show_mini_help (level)
 }
 
 
-void 
+void
 toggle_mini_help (level)
 	int level;
 {

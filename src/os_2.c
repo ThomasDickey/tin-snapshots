@@ -66,7 +66,7 @@ tputs (str, zzz, func)
 
 #endif
 
-void 
+void
 backslash (
 	char *ptr)
 {
@@ -77,16 +77,16 @@ backslash (
 		ptr++;
 	}
 }
- 
+
 /*
  * joinpath tacks a file (or sub dir) on to the end of a directory name.
  * Have to check existing / or \ to avoid doubling them.
  */
 
-void 
+void
 joinpath (
-	char *str, 
-	char *dir, 
+	char *str,
+	char *dir,
 	char *file)
 {
 	char c;
@@ -100,7 +100,7 @@ joinpath (
 		sprintf (str, "%s%s", dir, file);
 	} else {
 		sprintf (str, "%s/%s", dir, file);
-	}       
+	}
 }
 
 
@@ -108,17 +108,17 @@ joinpath (
 
 FILE *
 popen (
-	char *command, 
+	char *command,
 	char *mode)
 {
 	return (FILE *) 0;
 }
 
 
-void 
+void
 pclose (
 	FILE *pipe)
-{       
+{
 	return;
 }
 
@@ -138,7 +138,7 @@ readdir (
 }
 
 
-int 
+int
 closedir (
 	DIR *di)
 {
@@ -147,10 +147,10 @@ closedir (
 
 #endif	/* __TURBOC__ */
 
-char 
+char
 getopt (
-	int argc, 
-	char *argv[], 
+	int argc,
+	char *argv[],
 	char *options)
 {
 	char c, *z;
@@ -174,11 +174,11 @@ getopt (
 		return EOF;
 	}
 
-	/* 
-	 * get rid of funnies 
+	/*
+	 * get rid of funnies
 	 */
-	if (c == ':' || c == '?') { 
-		return '?'; 
+	if (c == ':' || c == '?') {
+		return '?';
 	}
 
 	if ((z = strchr (options, c)) == 0) {
@@ -201,9 +201,9 @@ getopt (
 }
 
 
-int 
+int
 make_post_cmd (
-	char *cmd, 
+	char *cmd,
 	char *name)
 {
 	char *p;
@@ -218,10 +218,10 @@ make_post_cmd (
 }
 
 
-int 
+int
 gethostname (
-	char *name, 
-	int namelen) 
+	char *name,
+	int namelen)
 {
 	char *p;
 
@@ -236,7 +236,7 @@ gethostname (
 
 #ifdef __TURBOC__
 
-int 
+int
 sleep (
 	int sec)
 {
@@ -272,12 +272,12 @@ struct passwd *
 			no_pw.pw_shell = "CMD.EXE";
 		}
 	}
-	
+
 	return (&no_pw);
 }
 
 struct passwd *
-getpwent (void) 
+getpwent (void)
 {
 	char pwn[512];
 
@@ -297,7 +297,7 @@ getpwent (void)
 
 struct passwd *
 getpwuid (
-	uid_t uid) 
+	uid_t uid)
 {
 	struct passwd *pw;
 
@@ -308,14 +308,14 @@ getpwuid (
 			return (pw);
 		}
 	}
-	
+
 	return NULL;
 }
 
 
 struct passwd *
 getpwnam (
-	const char *name) 
+	const char *name)
 {
 	struct passwd *pw;
 
@@ -332,8 +332,8 @@ getpwnam (
 }
 
 
-void 
-setpwent (void) 
+void
+setpwent (void)
 {
 	if (_pwf) {
 		rewind (_pwf);
@@ -341,8 +341,8 @@ setpwent (void)
 }
 
 
-void 
-endpwent (void) 
+void
+endpwent (void)
 {
 	if (_pwf) {
 		fclose (_pwf);
@@ -354,7 +354,7 @@ endpwent (void)
 
 struct passwd *
 fgetpwent (
-	FILE *f) 
+	FILE *f)
 {
 	char *line;
 	static char pwe[512];
@@ -414,7 +414,7 @@ fgetpwent (
 	}
 	*line = 0;
 	_pw.pw_dir = ++line;
-	if ((_pw.pw_dir[1] == ':') && 
+	if ((_pw.pw_dir[1] == ':') &&
 	    (tolower (_pw.pw_dir[0]) >= 'c') &&
 	    (tolower (_pw.pw_dir[0]) <= 'z')) {
 		line += 2;
@@ -427,22 +427,22 @@ fgetpwent (
 	}
 	*line = 0;
 	_pw.pw_shell = ++line;
-	
+
 	return (&_pw);
 }
 
 
-int 
+int
 putpwent (
-	const struct passwd *pwd, 
-	FILE *f) 
+	const struct passwd *pwd,
+	FILE *f)
 {
 	return(-1);
 }
 
 
 char *
-getlogin (void) 
+getlogin (void)
 {
 	char *p;
 
@@ -454,8 +454,8 @@ getlogin (void)
 }
 
 
-int 
-getuid (void) 
+int
+getuid (void)
 {
 	char *p;
 

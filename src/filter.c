@@ -16,7 +16,7 @@
 #include	"menukeys.h"
 
 #define IS_READ(i)		(arts[i].status == ART_READ)
-#define IS_KILLED(i)	(arts[i].killed == 1)
+#define IS_KILLED(i)		(arts[i].killed == 1)
 #define IS_SELECTED(i)	(arts[i].selected == 1)
 
 #define	SET_FILTER(grp,i,j)	\
@@ -38,7 +38,7 @@
  */
 
 int *arr_max;
-int *arr_num; 
+int *arr_num;
 struct t_filter *arr_ptr;
 struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 
@@ -71,7 +71,7 @@ void
 vSetFilter (psFilter)
 	struct t_filter *psFilter;
 {
-	if (psFilter != (struct t_filter *) 0) 
+	if (psFilter != (struct t_filter *) 0)
 	{
 		psFilter->type = FILTER_SELECT;
 		psFilter->scope = (char *) 0;
@@ -109,7 +109,7 @@ free_filter_item (ptr)
 	}
 }
 
-void 
+void
 free_filter_array (ptr)
 	struct t_filters *ptr;
 {
@@ -170,7 +170,7 @@ read_filter_file (file, global_file)
 	int expired = FALSE;
 	int expired_time = FALSE;
 	int global = TRUE;
-	int i = 0; 
+	int i = 0;
 	int icase = 0, type = -1;
 	long current_secs = 0L;
 	long secs = 0L;
@@ -218,7 +218,7 @@ read_filter_file (file, global_file)
 				if (arr_ptr && ! expired_time) {
 					if (arr_ptr[i].icase) {
 						str_lwr (from, from);
-					} 
+					}
 					arr_ptr[i].from = str_dup (from);
 				}
 				break;
@@ -238,7 +238,7 @@ if (debug) {
 	printf ("Allocating grp_filter for group=[%s]\n", psGrp->name);
 	fflush (stdout);
 }
-						psGrp->grps_filter = 
+						psGrp->grps_filter =
 							(struct t_filters *) my_malloc (sizeof (struct t_filters));
 						psGrp->grps_filter->num = 0;
 						psGrp->grps_filter->max = 0;
@@ -310,7 +310,7 @@ if (debug) {
 				if (arr_ptr && ! expired_time) {
 					if (arr_ptr[i].icase) {
 						str_lwr (subj, subj);
-					} 
+					}
 					arr_ptr[i].subj = str_dup (subj);
 				}
 if (debug) {
@@ -423,8 +423,7 @@ vWriteFilterFile (pcFile)
 	fprintf (hFp, "#   from=STRING       From: line (ie. *Craig Shergold*)\n");
 	fprintf (hFp, "#   msgid=STRING      Message-ID: line (ie. <123@ether.net>)\n");
 	fprintf (hFp, "#   lines=NUM         Lines: line (default 0)\n");
-	fprintf (hFp, "#   time=NUM          Filter period in days (default %d)\n#\n", 
-		default_filter_days);
+	fprintf (hFp, "#   time=NUM          Filter period in days (default %d)\n#\n", default_filter_days);
 	fprintf (hFp, "# Local format:\n");
 	fprintf (hFp, "#   group=STRING      Newsgroup (ie. alt.flame)  [mandatory]\n");
 	fprintf (hFp, "#   type=NUM          0=kill 1=auto-select (hot) [mandatory]\n");
@@ -478,7 +477,7 @@ subj=*xv*
 should work - but didn't with changing order of filterfile
 */
 
-void 
+void
 vWriteFilterArray (fp, global, ptr, theTime)
 	FILE *fp;
 	int global;
@@ -486,10 +485,10 @@ vWriteFilterArray (fp, global, ptr, theTime)
 	long theTime;
 {
 	register int i;
-	 
+
 	if (ptr == (struct t_filters *) 0) {
 		return;
-	}	 
+	}
 
 	for (i = 0 ; i < ptr->num ; i++) {
 
@@ -517,7 +516,7 @@ fflush (stdout);
 			fprintf (fp, "type=%d\n", ptr->filter[i].type);
 			fprintf (fp, "case=%d\n", ptr->filter[i].icase);
 
-			if (ptr->filter[i].subj != (char *) 0) { 
+			if (ptr->filter[i].subj != (char *) 0) {
 				fprintf (fp, "subj=%s\n", ptr->filter[i].subj);
 			}
 			if (ptr->filter[i].from != (char *) 0) {
@@ -550,10 +549,10 @@ fflush (stdout);
 }
 
 
-static int 
+static int
 get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
 	int x;
-	char *help; 
+	char *help;
 	char *prompt;
 	char *opt1;
 	char *opt2;
@@ -584,7 +583,7 @@ get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
 		MoveCursor(x, (int) strlen (prompt));
 		my_fputs (argv[i], stdout);
 		fflush (stdout);
-		CleartoEOLN (); 
+		CleartoEOLN ();
 		if ((ch = ReadCh ()) != ' ')
 			continue;
 		if (++i == n)
@@ -600,8 +599,8 @@ get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
  *  Interactive filter menu so that the user can dynamically enter parameters.
  *  Can be configured for kill or auto-selection screens.
  */
- 
-int 
+
+int
 filter_menu (type, group, art)
 	int type;
 	struct t_group *group;
@@ -716,8 +715,8 @@ filter_menu (type, group, art)
 	}
 
 	if (rule.text[0]) {
-		i = get_choice (INDEX_TOP+2, txt_help_filter_text_type, 
-			       txt_filter_text_type, 
+		i = get_choice (INDEX_TOP+2, txt_help_filter_text_type,
+			       txt_filter_text_type,
 			       txt_subj_line_only_case,
 			       txt_subj_line_only,
 			       txt_from_line_only_case,
@@ -733,7 +732,7 @@ filter_menu (type, group, art)
 		/*
 		 * Subject:
 		 */
-		i = get_choice (INDEX_TOP+5, txt_help_filter_subj, 
+		i = get_choice (INDEX_TOP+5, txt_help_filter_subj,
 			        text_subj, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		if (i == -1) {
@@ -745,11 +744,11 @@ filter_menu (type, group, art)
 		 * From:
 		 */
 		if (rule.subj_ok) {
-			i = get_choice (INDEX_TOP+7, txt_help_filter_from, 
+			i = get_choice (INDEX_TOP+7, txt_help_filter_from,
 			        text_from, txt_no, txt_yes,
 				(char *)0, (char *)0, (char *)0);
 		} else {
-			i = get_choice (INDEX_TOP+7, txt_help_filter_from, 
+			i = get_choice (INDEX_TOP+7, txt_help_filter_from,
 			        text_from, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		}
@@ -766,11 +765,11 @@ filter_menu (type, group, art)
 		 * Message-Id:
 		 */
 		if (rule.subj_ok || rule.from_ok) {
-			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid, 
+			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid,
 			        text_msgid, txt_no, txt_yes,
 				(char *)0, (char *)0, (char *)0);
 		} else {
-			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid, 
+			i = get_choice (INDEX_TOP+9, txt_help_filter_msgid,
 			        text_msgid, txt_yes, txt_no,
 				(char *)0, (char *)0, (char *)0);
 		}
@@ -817,8 +816,8 @@ filter_menu (type, group, art)
 	/*
 	 * Expire time
 	 */
-	i = get_choice (INDEX_TOP+14, txt_help_filter_time, 
-			ptr_filter_time, txt_unlimited_time, text_time, 
+	i = get_choice (INDEX_TOP+14, txt_help_filter_time,
+			ptr_filter_time, txt_unlimited_time, text_time,
 			(char *)0, (char *)0, (char *)0);
 	if (i == -1) {
 		return FALSE;
@@ -851,11 +850,11 @@ filter_menu (type, group, art)
 			argv[2][0] = '\0';
 		}
 
-		i = get_choice (INDEX_TOP+17, ptr_filter_help_scope, 
-			       ptr_filter_scope, 
-			       (argv[0][0] ? argv[0] : (char *)0), 
-			       (argv[1][0] ? argv[1] : (char *)0), 
-			       (argv[2][0] ? argv[2] : (char *)0), 
+		i = get_choice (INDEX_TOP+17, ptr_filter_help_scope,
+			       ptr_filter_scope,
+			       (argv[0][0] ? argv[0] : (char *)0),
+			       (argv[1][0] ? argv[1] : (char *)0),
+			       (argv[2][0] ? argv[2] : (char *)0),
 			       (argv[3][0] ? argv[3] : (char *)0),
 			       (char *)0);
 		if (i == -1) {
@@ -887,7 +886,7 @@ filter_menu (type, group, art)
 			goto filter_done;
 
 		case iKeyQuit:
-		case iKeyQuit2:
+		case iKeyAbort:
 			filtered = FALSE;
 			goto filter_done;
 
@@ -913,8 +912,8 @@ filter_done:
 /*
  *  Quick command to add a kill filter to specified groups filter
  */
- 
-int 
+
+int
 quick_filter_kill (group, art)
 	struct t_group *group;
 	struct t_article *art;
@@ -933,7 +932,7 @@ quick_filter_kill (group, art)
 		error_message ("%s", msg);
 	}
 
-	header = group->attribute->quick_kill_header; 
+	header = group->attribute->quick_kill_header;
 
 	/*
 	 * Setup rules
@@ -943,7 +942,7 @@ quick_filter_kill (group, art)
 	if (group->attribute->quick_kill_scope) {
 		strcpy (rule.scope, group->attribute->quick_kill_scope);
 	}
-	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE); 
+	rule.global = (strchr (rule.scope, '*') ? TRUE : FALSE);
 	rule.lines_cmp = FILTER_LINES_EQ;
 	rule.lines_num = 0;
 	rule.lines_ok = (header == FILTER_LINES ? TRUE : FALSE);
@@ -974,8 +973,8 @@ quick_filter_kill (group, art)
 /*
  *  Quick command to add an auto-select filter to specified groups filter
  */
- 
-int 
+
+int
 quick_filter_select (group, art)
 	struct t_group *group;
 	struct t_article *art;
@@ -989,12 +988,12 @@ quick_filter_select (group, art)
 			group->attribute->quick_select_header,
 			(group->attribute->quick_select_scope ?
 				group->attribute->quick_select_scope : ""),
-			(group->attribute->quick_select_expire ? "ON" : "OFF"), 
+			(group->attribute->quick_select_expire ? "ON" : "OFF"),
 			group->attribute->quick_select_case);
 		error_message ("%s", msg);
 	}
 
-	header = group->attribute->quick_select_header; 
+	header = group->attribute->quick_select_header;
 
 	/*
 	 * Setup rules
@@ -1037,8 +1036,8 @@ quick_filter_select (group, art)
  *  has just posted. Selects on Subject: line with limited expire time.
  *  Don't precess if MAILGROUP.
  */
- 
-int 
+
+int
 quick_filter_select_posted_art (group, subj)
 	struct t_group *group;
 	char *subj;
@@ -1084,14 +1083,14 @@ quick_filter_select_posted_art (group, subj)
 /*
  * API to add filter rule to the local or global filter array
  */
- 
-int 
+
+int
 iAddFilterRule (psGrp, psArt, psRule)
 	struct t_group *psGrp;
 	struct t_article *psArt;
 	struct t_filter_rule *psRule;
 {
-	char acBuf[PATH_LEN]; 
+	char acBuf[PATH_LEN];
 	int iFiltered = FALSE;
 	int *plNum, *plMax;
 	long lCurTime;
@@ -1106,7 +1105,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 		psPtr = glob_filter.filter;
 	} else {
 		if (psGrp->grps_filter == (struct t_filters *) 0) {
-			psGrp->grps_filter = 
+			psGrp->grps_filter =
 				(struct t_filters *) my_malloc (sizeof (struct t_filters));
 			psGrp->grps_filter->num = 0;
 			psGrp->grps_filter->max = 0;
@@ -1189,7 +1188,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 			sprintf (acBuf, "*%s*", MSGID(psArt));
 			psPtr[*plNum].msgid = str_dup (acBuf);
 		}
-		if (psRule->subj_ok || psRule->from_ok || 
+		if (psRule->subj_ok || psRule->from_ok ||
 		    psRule->msgid_ok || psRule->lines_ok) {
 			iFiltered = TRUE;
 			(*plNum)++;
@@ -1198,7 +1197,7 @@ iAddFilterRule (psGrp, psArt, psRule)
 
 	if (iFiltered) {
 		if (debug) {
-			sprintf (msg, "Glob=[%s] inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] line=[%d %d] time=[%ld]", 
+			sprintf (msg, "Glob=[%s] inscope=[%s] scope=[%s] typ=[%d] case=[%d] subj=[%s] from=[%s] msgid=[%s] line=[%d %d] time=[%ld]",
 				(psRule->global ? "TRUE" : "FALSE"),
 				(psPtr[*plNum-1].inscope ? "TRUE" : "FALSE"),
 				(psRule->scope ? psRule->scope : ""),
@@ -1222,7 +1221,7 @@ iAddFilterRule (psGrp, psArt, psRule)
  * tagged as being read BECAUSE they were killed. So, we retag
  * them as being unread.
  */
- 
+
 int
 unfilter_articles ()
 {
@@ -1242,12 +1241,12 @@ unfilter_articles ()
 }
 
 /*
- * Filter any articles in specified group. 
+ * Filter any articles in specified group.
  * Apply global filter rules followed by group filter rules.
  * In global rules check if scope field set to determine if
  * filter applys to current group.
  */
- 
+
 int
 filter_articles (group)
 	struct t_group *group;
@@ -1266,7 +1265,7 @@ filter_articles (group)
 	/*
 	 * check if there are any global and/or local filter rules
 	 */
-	if (group->glob_filter->num == 0 && 
+	if (group->glob_filter->num == 0 &&
 	    group->grps_filter == (struct t_filters *) 0) {
 		return filtered;
 	}
@@ -1313,7 +1312,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 				 * Filter on Subject: line
 				 */
 				if (ptr[j].subj != (char *) 0) {
-/*printf ("1. subj=[%s] filter=[%s]\n", arts[i].subject, ptr[j].subj); 
+/*printf ("1. subj=[%s] filter=[%s]\n", arts[i].subject, ptr[j].subj);
 */
 					if (ptr[j].icase) {
 						str_lwr (arts[i].subject, acStr);
@@ -1321,7 +1320,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					} else {
 						pcPtr = arts[i].subject;
 					}
-/*printf ("2. case=[%d] subj=[%s] filter=[%s]\n", ptr[j].icase, pcPtr, ptr[j].subj); 
+/*printf ("2. case=[%d] subj=[%s] filter=[%s]\n", ptr[j].icase, pcPtr, ptr[j].subj);
 */
 					if (STR_MATCH (pcPtr, ptr[j].subj)) {
 						SET_FILTER(group, i, j);
@@ -1336,7 +1335,7 @@ local_filter:	/* jumps back from end of for() loop to help speed */
 					} else {
 						strcpy (buf, arts[i].from);
 					}
-/* 	printf ("from=[%s] filter=[%s]\n", buf, ptr[j].from); 
+/* 	printf ("from=[%s] filter=[%s]\n", buf, ptr[j].from);
 */
 					if (ptr[j].icase) {
 						str_lwr (buf, acStr);
@@ -1416,7 +1415,7 @@ sleep (1);
 	/*
 	 * Apply local filter only if no global filter
 	 *
-	 * goto was used here to stop the function call 
+	 * goto was used here to stop the function call
 	 * overhead for each and every article.
 	 */
 	if (group->glob_filter->num && global_filter &&
@@ -1442,13 +1441,13 @@ sleep (1);
  * true in order to fake out the display code (cause it doesn't know
  * if any articles were actually selected)
  * The correct way to do this is to modify filter_articles() to take
- * another arg to specify whether killing, auto-selecting, or both is to be 
+ * another arg to specify whether killing, auto-selecting, or both is to be
  * done, rename it to something else, and then have a new filter_articles()
- * and auto_select_articles() call this new routine with the appropriate 
+ * and auto_select_articles() call this new routine with the appropriate
  * arguments.
  */
 
-int 
+int
 auto_select_articles (group)
 	struct t_group *group;
 {

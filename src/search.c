@@ -27,8 +27,8 @@ char default_art_search[LEN];
 /*
  *  group.c & page.c
  */
- 
-int 
+
+int
 search_author (the_index, current_art, forward)
 	int the_index;
 	int current_art;
@@ -47,18 +47,18 @@ search_author (the_index, current_art, forward)
 	} else {
 		sprintf (buf2, txt_author_search_backwards, default_author_search);
 	}
-	
+
 	if (! prompt_string (buf2, buf)) {
 		return -1;
 	}
-	
+
 	if (strlen (buf)) {
 		strcpy (default_author_search, buf);
 	} else {
 		if (default_author_search[0]) {
 			strcpy (buf, default_author_search);
 		} else {
-			info_message (txt_no_search_string);	
+			info_message (txt_no_search_string);
 			return -1;
 		}
 	}
@@ -66,7 +66,7 @@ search_author (the_index, current_art, forward)
 	wait_message (txt_searching);
 
 	make_group_path (active[the_index].name, group_path);
-	
+
 	str_lwr (default_author_search, buf);
 
 	patlen = strlen (default_author_search);
@@ -81,15 +81,15 @@ search_author (the_index, current_art, forward)
 		} else {
 			i = prev_response (i);
 			if (i < 0)
-				i = base[top_base - 1] + 
+				i = base[top_base - 1] +
 					num_of_responses (top_base - 1);
 		}
 
-		if (active[the_index].attribute->show_only_unread && 
+		if (active[the_index].attribute->show_only_unread &&
 		    arts[i].status != ART_UNREAD) {
 			continue;
 		}
-			
+
 		if (arts[i].name == (char *) 0) {
 			str_lwr (arts[i].from, buf2);
 		} else {
@@ -100,7 +100,7 @@ search_author (the_index, current_art, forward)
 		if (str_str (buf2, buf, patlen) != 0) {
 			/*
 			 * check if article still exists
-			 */			
+			 */
 			if (stat_article (arts[i].artnum, group_path)) {
 				clear_message ();
 				return i;
@@ -115,8 +115,8 @@ search_author (the_index, current_art, forward)
 /*
  * select.c
  */
- 
-void 
+
+void
 search_group (forward)
 	int forward;
 {
@@ -148,7 +148,7 @@ search_group (forward)
 		if (default_group_search[0]) {
 			strcpy (buf, default_group_search);
 		} else {
-			info_message (txt_no_search_string);	
+			info_message (txt_no_search_string);
 			return;
 		}
 	}
@@ -160,7 +160,7 @@ search_group (forward)
 	patlen = strlen (default_group_search);
 
 	i = cur_groupnum;
-	
+
 	do {
 		if (forward)
 			i++;
@@ -205,7 +205,7 @@ search_group (forward)
  * group.c
  */
 
-void 
+void
 search_subject (forward)
 	int forward;
 {
@@ -218,7 +218,7 @@ search_subject (forward)
 		info_message (txt_no_arts);
 		return;
 	}
-	
+
 	clear_message ();
 
 	if (forward) {
@@ -237,7 +237,7 @@ search_subject (forward)
 		if (default_subject_search[0]) {
 			strcpy (buf, default_subject_search);
 		} else {
-			info_message (txt_no_search_string);	
+			info_message (txt_no_search_string);
 			return;
 		}
 	}
@@ -290,7 +290,7 @@ search_subject (forward)
  *  page.c (search article body)
  */
 
-int 
+int
 search_article (forward)
 	int forward;
 {
@@ -323,13 +323,13 @@ search_article (forward)
 		if (default_art_search[0]) {
 			strcpy (buf, default_art_search);
 		} else {
-			info_message (txt_no_search_string);	
+			info_message (txt_no_search_string);
 			return FALSE;
 		}
 	}
 
 	wait_message (txt_searching);
-	
+
 	str_lwr (default_art_search, pattern);
 
 	patlen = strlen (default_art_search);
@@ -339,7 +339,7 @@ search_article (forward)
 	 */
 	orig_note_end = note_end;
 	orig_note_page = note_page;
-	
+
 	while (! note_end) {
 		note_line = 1;
 		ctrl_L = FALSE;
@@ -404,7 +404,7 @@ search_article (forward)
 }
 
 
-int 
+int
 search_body (group, current_art)
 	struct t_group *group;
 	int current_art;
@@ -432,7 +432,7 @@ search_body (group, current_art)
 		if (default_art_search[0]) {
 			strcpy (pat, default_art_search);
 		} else {
-			info_message (txt_no_search_string);	
+			info_message (txt_no_search_string);
 			return -1;
 		}
 	}
@@ -490,12 +490,12 @@ search_body (group, current_art)
 	if (! aborted) {
 		info_message (txt_no_match);
 	}
-	
+
 	return -1;
 }
 
 
-int 
+int
 search_art_body (group_path, art, pat, len)
 	char *group_path;
 	struct t_article *art;
@@ -510,7 +510,7 @@ search_art_body (group_path, art, pat, len)
 	if (fp == (FILE *) 0) {
 		return FALSE;
 	}
-	
+
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		if (buf[0] == '\n') {
 			break;
@@ -530,7 +530,7 @@ search_art_body (group_path, art, pat, len)
 }
 
 
-void 
+void
 str_lwr (src, dst)
 	char *src;
 	char *dst;

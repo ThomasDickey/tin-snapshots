@@ -167,7 +167,7 @@ debug_print_bitmap (group, NULL);
 		 */
 
 		modified = read_group (group, group_path, &count);
-		if (modified == -1) {  
+		if (modified == -1) {
 			/*
 			 *  user aborted indexing
 			 */
@@ -198,6 +198,7 @@ debug_print_bitmap (group, NULL);
 		if (((! read_news_via_nntp) && expired) || modified)
 			vWriteNovFile (group);
 #endif
+
 		/*
 		 * Create the reference tree. The msgid and ref ptrs will
 		 * be free()d now that the NovFile has been written.
@@ -275,7 +276,7 @@ read_group (group, group_path, pcount)
 	my_chdir (buf);
 
 	buf[0] = '\0';
-	 
+
 	sprintf (progress, txt_group, group->name);
 
 	/*
@@ -298,8 +299,8 @@ read_group (group, group_path, pcount)
 		art = base[i];
 
 		/*
-		 *  Do we already have this article in our index?  Change 
-		 *  thread from (ART_EXPIRED) to (ART_NORMAL) if so and 
+		 *  Do we already have this article in our index?  Change
+		 *  thread from (ART_EXPIRED) to (ART_NORMAL) if so and
 		 *  skip the header eating.
 		 */
 		if ((respnum = valid_artnum (art)) >= 0 || art <= last_read_article) {
@@ -313,8 +314,8 @@ read_group (group, group_path, pcount)
 			continue;
 		}
 
-		/* 
-		 * we've modified the index so it will need to be re-written 
+		/*
+		 * we've modified the index so it will need to be re-written
 		 */
 		modified = TRUE;
 
@@ -417,7 +418,7 @@ thread_by_subject()
 				arts[j].thread = i;
 				arts[i].inthread = TRUE;
 			}
-		} 
+		}
 
 		/*
 		 * Update the magic marker with the highest numbered msg in
@@ -465,7 +466,7 @@ make_threads (group, rethread)
 
 #if 0
 	if (debug == 2) {
-		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]", 
+		sprintf (msg, "rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]",
 				rethread, default_thread_arts, group->attribute->thread_arts);
 		error_message (msg, "");
 	}
@@ -673,14 +674,14 @@ parse_headers (buf, h)
 			case 'A':	/* Archive-name:  optional */
 				if (match_header (ptrline, "Archive-name", buf2, HEADER_LEN)) {
 					if ((s = strchr (buf2, '/')) != (char *) 0) {
-						if (STRNCMPEQ(s+1, "part", 4) || 
+						if (STRNCMPEQ(s+1, "part", 4) ||
 						    STRNCMPEQ(s+1, "Part", 4)) {
 							h->part = str_dup (s+5);
 							s = strrchr (h->part, '\n');
 							if (s != (char *) 0) {
 								*s = '\0';
 							}
-						} else if (STRNCMPEQ(s+1,"patch",5) || 
+						} else if (STRNCMPEQ(s+1,"patch",5) ||
 								   STRNCMPEQ(s+1,"Patch",5)) {
 							h->patch = str_dup (s+6);
 							s = strrchr (h->patch, '\n');
@@ -757,8 +758,8 @@ iReadNovFile (group, min, max, expired)
 	top = 0;
 	last_read_article = 0L;
 	*expired = 0;
- 
-	/* 
+
+	/*
 	 * open the overview file (whether it be local or via nntp)
 	 */
 	fp = open_xover_fp (group, "r", min, max);
@@ -771,15 +772,15 @@ iReadNovFile (group, min, max, expired)
 		if (STRCMPEQ(buf, ".")) {
 			break;
 		}
- 
+
 		if (top >= max_art) {
 			expand_art ();
 		}
- 
+
 		p = buf;
- 
-		/* 
-		 * read the article number 
+
+		/*
+		 * read the article number
 		 */
 		artnum = atol (p);
 
@@ -810,9 +811,9 @@ sleep(1);
 		} else {
 			p = q + 1;
 		}
- 
-		/* 
-		 * READ subject 
+
+		/*
+		 * READ subject
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -826,9 +827,9 @@ sleep(1);
 		}
 		arts[top].subject = hash_str (eat_re(rfc1522_decode(p)));
 		p = q + 1;
- 
-		/* 
-		 * READ author 
+
+		/*
+		 * READ author
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -846,9 +847,9 @@ sleep(1);
 			arts[top].name = hash_str (rfc1522_decode(art_full_name));
 		}
 		p = q + 1;
- 
-		/* 
-		 * READ article date 
+
+		/*
+		 * READ article date
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -862,9 +863,9 @@ sleep(1);
 		}
 		arts[top].date = parsedate (p, NULL);
 		p = q + 1;
- 
-		/* 
-		 * READ article message id 
+
+		/*
+		 * READ article message id
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -883,7 +884,7 @@ sleep(1);
 
 		p = q + 1;
 
-		/* 
+		/*
 		 * READ article references
 		 */
 		q = strchr (p, '\t');
@@ -903,8 +904,8 @@ sleep(1);
 
 		p = q + 1;
 
-		/* 
-		 * SKIP article bytes 
+		/*
+		 * SKIP article bytes
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
@@ -917,8 +918,8 @@ sleep(1);
 			*q = '\0';
 		}
 		p = q + 1;
- 
-		/* 
+
+		/*
 		 * READ article lines (special case - last standard nov header)
 		 */
 		q = strchr (p, '\t');
@@ -935,8 +936,8 @@ sleep(1);
 		}
 		arts[top].lines = atoi (p);
 		p = (q == (char *) 0 ? (char *) 0 : q + 1);
- 
-		/* 
+
+		/*
 		 * READ article xrefs
 		 */
 		if (p != (char *) 0 && xref_supported) {
@@ -963,7 +964,7 @@ sleep(1);
 			}
 		}
 
-		/* 
+		/*
 		 * READ article archive-name
 		 */
 		if (p != (char *) 0) {
@@ -984,10 +985,10 @@ sleep(1);
 					q++;
 				}
 				if ((s = strchr (q, '/')) != (char *) 0) {
-					if (STRNCMPEQ(s+1, "part", 4) || 
+					if (STRNCMPEQ(s+1, "part", 4) ||
 					    STRNCMPEQ(s+1, "Part", 4)) {
 						arts[top].part = str_dup (s+5);
-					} else if (STRNCMPEQ(s+1, "patch", 5) || 
+					} else if (STRNCMPEQ(s+1, "patch", 5) ||
 						   STRNCMPEQ(s+1, "Patch", 5)) {
 						arts[top].patch = str_dup (s+6);
 					}
@@ -1004,8 +1005,8 @@ sleep(1);
 			}
 		}
 
-		/* 
-		 * end of overview line processing 
+		/*
+		 * end of overview line processing
 		 */
 #ifdef DEBUG
 		debug_print_header (&arts[top]);
@@ -1013,7 +1014,7 @@ sleep(1);
 		top++;
 	}
  	fclose (fp);
- 
+
 	return top;
 }
 
@@ -1045,7 +1046,7 @@ vWriteNovFile (psGrp)
 
 	set_tin_uid_gid ();
 
-	/* 
+	/*
 	 * setup the overview file (local only)
 	 */
 	pcNovFile = pcFindNovFile (psGrp, W_OK);
@@ -1055,7 +1056,7 @@ vWriteNovFile (psGrp)
 
 	hFp = open_xover_fp (psGrp, "w", 0L, 0L);
 
-	if (hFp == (FILE *) 0) 
+	if (hFp == (FILE *) 0)
 		error_message (txt_cannot_write_index, pcNovFile);
 	else {
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
@@ -1082,7 +1083,7 @@ vWriteNovFile (psGrp)
 				 	fprintf (hFp, "\tXref: %s", psArt->xref);
 				}
 			 	if (psArt->archive) {
-				 	fprintf (hFp, "\tArchive-name: %s/%s%s", 
+				 	fprintf (hFp, "\tArchive-name: %s/%s%s",
 				 		psArt->archive,
 				 		(psArt->part ? "part" : "patch"),
 				 		(psArt->part ? psArt->part : psArt->patch));
@@ -1106,7 +1107,7 @@ vWriteNovFile (psGrp)
 
 
 /*
- *  A complex little function to determine where to read the index file 
+ *  A complex little function to determine where to read the index file
  *  from and where to write it.
  *
  *  GROUP_TYPE_MAIL index files are read/written in ~/.tin/.mail
@@ -1138,10 +1139,10 @@ vWriteNovFile (psGrp)
  *       path = ~/.tin/.news
  *       hash = TRUE
  *
- *  If hash = TRUE the index filename will be in format number.number.  
- *  Hashing the groupname gets a number.  See if that #.1 file exists; 
- *  if so, read first line. Is this the group we want?  If no, try #.2.  
- *  Repeat until no such file or we find an existing file that matches 
+ *  If hash = TRUE the index filename will be in format number.number.
+ *  Hashing the groupname gets a number.  See if that #.1 file exists;
+ *  if so, read first line. Is this the group we want?  If no, try #.2.
+ *  Repeat until no such file or we find an existing file that matches
  *  our group. Return pointer to path or NULL if not found.
  */
 
@@ -1175,7 +1176,7 @@ pcFindNovFile (psGrp, iMode)
 			break;
 		case GROUP_TYPE_SAVE:
 			pcDir = index_savedir;
-			iHashFileName = TRUE; 
+			iHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_NEWS:
 			if (read_news_via_nntp && xover_supported) {
@@ -1194,7 +1195,7 @@ pcFindNovFile (psGrp, iMode)
 				}
 				if (! overview_index_filename) {
 					pcDir = index_newsdir;
-					iHashFileName = TRUE; 
+					iHashFileName = TRUE;
 				}
 			}
 			break;
@@ -1306,12 +1307,12 @@ do_update ()
 		}
 
 		if (debug == 2) {
-			printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n", 
+			printf ("[%s] idxtime=[%ld]  old=[%ld]  new=[%ld]\n",
 				pcNovFile, index_time,
 				psGrp->last_updated_time, group_time);
 		}
 
-		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 || 
+		if (index_time == (time_t)0 || psGrp->last_updated_time == (time_t)0 ||
 		    (psGrp->last_updated_time > index_time) ||
 		    (group_time > psGrp->last_updated_time) ||
 		    purge_index_files) {
@@ -1343,7 +1344,7 @@ do_update ()
 	if (verbose) {
 		time (&end_epoch);
 		sprintf (msg, txt_catchup_update_info,
-			(catchup ? "Caughtup" : "Updated"), 
+			(catchup ? "Caughtup" : "Updated"),
 			group_top, (int)(end_epoch - beg_epoch));
 		wait_message (msg);
 	}
@@ -1357,15 +1358,15 @@ artnum_comp (p1, p2)
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
 
-	/* 
-	 * s1->artnum less than s2->artnum 
+	/*
+	 * s1->artnum less than s2->artnum
 	 */
 	if (s1->artnum < s2->artnum) {
 		return -1;
 	}
 
-	/* 
-	 * s1->artnum greater than s2->artnum 
+	/*
+	 * s1->artnum greater than s2->artnum
 	 */
 	if (s1->artnum > s2->artnum) {
 		return 1;
@@ -1383,10 +1384,10 @@ subj_comp (p1, p2)
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
 
-	/* 
-	 * return result of strcmp (reversed for descending) 
+	/*
+	 * return result of strcmp (reversed for descending)
 	 */
-	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_SUBJ_ASCEND 
+	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_SUBJ_ASCEND
 			? (retval = my_stricmp (s1->subject, s2->subject))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
 			: (retval = my_stricmp (s2->subject, s1->subject))
@@ -1403,10 +1404,10 @@ from_comp (p1, p2)
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
 
-	/* 
-	 * return result of strcmp (reversed for descending) 
+	/*
+	 * return result of strcmp (reversed for descending)
 	 */
-	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_FROM_ASCEND 
+	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_FROM_ASCEND
 			? (retval = my_stricmp (s1->from, s2->from))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
 			: (retval = my_stricmp (s2->from, s1->from))
@@ -1433,27 +1434,27 @@ date_comp (p1, p2)
 
 
 	if (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) {
-		/* 
-		 * s1->date less than s2->date 
+		/*
+		 * s1->date less than s2->date
 		 */
 		if (s1->date < s2->date) {
 			return -1;
 		}
-		/* 
-		 * s1->date greater than s2->date 
+		/*
+		 * s1->date greater than s2->date
 		 */
 		if (s1->date > s2->date) {
 			return 1;
 		}
 	} else {
-		/* 
-		 * s2->date less than s1->date 
+		/*
+		 * s2->date less than s1->date
 		 */
 		if (s2->date < s1->date) {
 			return -1;
 		}
-		/* 
-		 * s2->date greater than s1->date 
+		/*
+		 * s2->date greater than s1->date
 		 */
 		if (s2->date > s1->date) {
 			return 1;
@@ -1532,8 +1533,8 @@ input_pending ()
 	static struct pollfd fds[]= {{ STDIN_FILENO, POLLIN, 0 }};
 
 	if (poll (fds, nfds, Timeout) < 0) {
-		/* 
-		 * Error on poll 
+		/*
+		 * Error on poll
 		 */
 		return FALSE;
 	}
@@ -1542,8 +1543,8 @@ input_pending ()
 		case POLLIN:
 			return TRUE;
 			/* break; */
-		/* 
-		 * Other conditions on the stream 
+		/*
+		 * Other conditions on the stream
 		 */
 		case POLLHUP:
 		case POLLERR:

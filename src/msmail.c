@@ -144,7 +144,7 @@ static int FAR PASCAL InitMAPI()
 #endif // not needed here
 
 #pragma warning (default : 4113)
-  
+
   flFlag =MAPI_NEW_SESSION | MAPI_LOGON_UI;
   if ((err=(*lpfnMAPILogon)(0L, NULL, NULL, flFlag, 0L, &hMAPISession))!=0)
 	DeInitMAPI();
@@ -179,7 +179,7 @@ static int FAR PASCAL DeInitMAPI()
   return(0);
 }
 
-static int sendMail(char *To, char *Subject, char *Text, BOOL editBeforeSend) 
+static int sendMail(char *To, char *Subject, char *Text, BOOL editBeforeSend)
 {
     MapiRecipDesc MAPIRecip;
     SYSTEMTIME st;
@@ -187,8 +187,8 @@ static int sendMail(char *To, char *Subject, char *Text, BOOL editBeforeSend)
 	FLAGS flFlag;
 
 	GetLocalTime(&st);
-	sprintf(localTime, "%.2d/%.2d/%d %.2d:%.2d", 
-					st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute); 
+	sprintf(localTime, "%.2d/%.2d/%d %.2d:%.2d",
+					st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute);
 
 	MAPIRecip.ulReserved = 0L;
     MAPIRecip.ulRecipClass = MAPI_TO;
@@ -210,7 +210,7 @@ static int sendMail(char *To, char *Subject, char *Text, BOOL editBeforeSend)
 	mmMapiMessage.lpFiles = NULL;
 
     flFlag = MAPI_DIALOG;
-    return (*lpfnMAPISendMail)(hMAPISession, 0L, &mmMapiMessage, 
+    return (*lpfnMAPISendMail)(hMAPISession, 0L, &mmMapiMessage,
     		editBeforeSend ? MAPI_DIALOG : 0L, 0L);
 }
 

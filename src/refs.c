@@ -4,10 +4,9 @@
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
  *  Created   : 09-05-96
  *  Updated   : 16-07-96
- *  Notes     : Cacheing of message ids
- *				References based threading
+ *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
- *				hash_msgid, free_msgid
+ *	             hash_msgid, free_msgid
  *  Copyright : (c) 1996 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
@@ -43,7 +42,7 @@ static struct t_msgid *find_next P_((struct t_msgid *ptr));
 static void build_thread P_((struct t_msgid *ptr));
 #endif
 
-/*========================================================================
+/*
  * This part of the code deals with the cacheing and retrieval
  * of Message-id and References headers
  *
@@ -57,13 +56,13 @@ static void build_thread P_((struct t_msgid *ptr));
  *
  *    When threading on Refs, a much better view of the original thread
  *    can be built up using this data, and threading is much faster
- *	  because all the article relationships are automatically available
- *	  to us.
+ *	   because all the article relationships are automatically available
+ *	   to us.
  *
  *	  NB: We don't cache msgids from the filter file.
  */
 
-/*-------------------------------------------------------------------------
+/*
  * Hash a message id. A msgid is of the form <unique@sitename>
  * (But badly broken message id's do occur)
  * We hash on the unique portion which should have good randomness in
@@ -89,7 +88,7 @@ hash_msgid(key)
 	return(hash);
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Thread us into our parents' list of children.
  */
 static void
@@ -116,10 +115,10 @@ add_to_parent(ptr)
 	 * at the end of the chain does what we want.
 	 * Reference data goes at the start of the chain if ASCEND (because
 	 * we presume unavailable arts have expired), otherwise at the end.
-	 * ie:	if ASCEND && REF
-	 *			add_to_start
-	 *		else
-	 * 			add_to_end
+	 * ie: if ASCEND && REF
+	 *	       add_to_start
+	 *     else
+	 *        add_to_end
 	 */
 	if ((CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) &&
 												 (ptr->article == ART_NORMAL)) {
@@ -137,7 +136,7 @@ add_to_parent(ptr)
 #endif /* HAVE_REF_THREADING */
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Adds or updates a message id in the cache.
  * We return a ptr to the msgid, whether located or newly created.
  *
@@ -288,7 +287,7 @@ add_msgid(key, msgid, newparent)
 	return(ptr);
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Take a raw line of references data and return a ptr to a linked list of
  * msgids, starting with the most recent entry. (Thus the list is reversed)
  * Following the parent ptrs leads us back to the start of the thread.
@@ -331,7 +330,7 @@ parse_references(r)
 	return(current);
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Reconstruct the References: field from the parent pointers
  * NB: The original Refs: can be no longer than HEADER_LEN (see open.c)
  *     Broken headers sometimes have malformed or circular reference
@@ -392,7 +391,7 @@ get_references(refptr)
 	return(refs);
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Clear the entire msgid cache, freeing up all chains. This is
  * normally only needed when entering a new group
  */
@@ -422,7 +421,7 @@ free_msgids()
 }
 
 #else
-/*-------------------------------------------------------------------------
+/*
  * Clear the entire msgid cache, freeing up all chains. This is
  * normally only needed when entering a new group
  */
@@ -482,7 +481,7 @@ dump_msgids()
 }
 #endif
 
-/*========================================================================
+/*
  * The rest of this code deals with reference threading
  */
 #ifdef HAVE_REF_THREADING
@@ -527,7 +526,7 @@ dump_msgids()
  *	 (currently + is unread, - is marked unread and ' ' is read)
  */
 
-/*-------------------------------------------------------------------------
+/*
  * Clear out all the article fields from the msgid hash prior to a
  * rethread.
  */
@@ -543,7 +542,7 @@ clear_art_ptrs()
 	}
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Function to messily dump an ASCII tree map of a thread.
  * msgid is a ptr to the root article, level is the current depth
  * of the tree.
@@ -583,7 +582,7 @@ dump_thread(fp, msgid, level)
 }
 
 #ifdef DEBUG_REFS
-/*--------------------------------------------------------------------------
+/*
  * Dump out all the threads from the msgid point of view, show the
  * related article index in arts[] where possible
  * A thread is defined as a starting article with no parent
@@ -625,7 +624,7 @@ dump_msgid_threads()
 }
 #endif
 
-/*-------------------------------------------------------------------------
+/*
  * Find the next message in the thread.
  * We descend children before siblings, and only return articles that
  * exist in arts[] or NULL if we are truly at the end of a thread.
@@ -687,8 +686,14 @@ find_next(ptr)
 		 */
 		if (ptr->child == NULL && ptr->sibling == NULL) {
 
-			while(ptr != NULL && ptr->sibling == NULL)
-				ptr = ptr->parent;
+			while(ptr != NULL && ptr->sibling == NULL) {
+				if (ptr ==  ptr->parent) {
+				/* Jehova */
+					return (NULL);
+				} else {
+					ptr = ptr->parent;
+				}
+			}
 
 			/*
 			 * We've backtracked up to the parent with a suitable sibling
@@ -704,7 +709,7 @@ find_next(ptr)
 	return(ptr);
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Run the .thread and .inthread pointers through the members of this
  * thread.
  */
@@ -733,7 +738,7 @@ build_thread(ptr)
 
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Run a new set of threads through the base articles, using the
  * parent / child / sibling  / article pointers in the msgid hash.
  */
@@ -781,7 +786,7 @@ thread_by_reference()
 
 }
 
-/*-------------------------------------------------------------------------
+/*
  * Do the equivalent of subject threading, but only on the thread base
  * messages.
  * This should help thread together mistakenly multiply posted articles,
@@ -845,7 +850,7 @@ collate_subjects()
 
 #endif /* HAVE_REF_THREADING */
 
-/*-------------------------------------------------------------------------
+/*
  * Builds the reference tree
  * 1) Sort the article base. This will ensure that articles and their
  *    siblings are inserted in the correct order.

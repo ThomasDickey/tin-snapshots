@@ -389,7 +389,7 @@ constext txt_inverse_on[] = "Inverse video enabled";
 constext txt_filtering_arts[] = "Selecting articles...";
 constext txt_last_resp[] = "-- Last response --";
 constext txt_lines[] = "Lines %s  ";
-constext txt_listing_archive[] = "\r\n\r\nListing %s archive...\r\n"; 
+constext txt_listing_archive[] = "\r\n\r\nListing %s archive...\r\n";
 constext txt_mail_art_to[] = "Mail article(s) to [%.*s]> ";
 constext txt_mail_bug_report[] = "Mail bug report...";
 constext txt_mail_bug_report_confirm[] = "Mail BUG REPORT to %s%s? (y/n): ";
@@ -446,7 +446,7 @@ constext txt_no_resp[] = "No responses\r\n";
 constext txt_no_responses[] = "No responses";
 constext txt_no_resps_in_thread[] = "No responses to list in current thread";
 constext txt_no_search_string[] = "No search string";
-constext txt_no_spooldirs[] = "No spooldirs"; 
+constext txt_no_spooldirs[] = "No spooldirs";
 constext txt_no_subject[] = "No subject";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_not_exist[] = "Newsgroup does not exist on this server";
@@ -573,7 +573,7 @@ constext *txt_onoff[] = { "OFF", "ON" };
  * NB: All the following arrays must match corresponding ordering in tin.h
  * Threading types
  */
-constext *txt_thread[] = { "None", "Subject", "References", "Subject and References" };
+constext *txt_thread[] = { "None", "Subject", "References", "Both Subject and References" };
 
 /*
  * How the From: line is displayed.
@@ -584,9 +584,9 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
 /*
  * Which colors can be used.
  */
-constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink", 
-                           "Cyan", "White", "Gray", "Light Red", 
-                           "Light Green", "Yellow", "Light Blue", 
+constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
+                           "Cyan", "White", "Gray", "Light Red",
+                           "Light Green", "Yellow", "Light Blue",
                            "Light Pink", "Light Cyan", "Light White" };
 #endif
 
@@ -671,7 +671,7 @@ constext txt_quit_edit_post[] = "q)uit, e)dit, p)ost: ";
 constext txt_quit_edit_send[] = "q)uit, e)dit, s)end";
 constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
 #endif /* HAVE_ISPELL */
-#endif /* HAVE_PGP */ 
+#endif /* HAVE_PGP */
 
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
@@ -735,7 +735,7 @@ constext txt_subscribing[] = "Subscribing... ";
 constext txt_suspended_message[] = "\nStopped. Type 'fg' to restart TIN\n";
 constext txt_tagged_art[] = "Tagged article";
 constext txt_tagged_thread[] = "Tagged thread";
-constext txt_testing_archive[] = "\r\n\r\nTesting %s archive...\r\n"; 
+constext txt_testing_archive[] = "\r\n\r\nTesting %s archive...\r\n";
 constext txt_there_is_no_news[] = "There is no news\n";
 constext txt_thread_com[] = "Thread Commands (page %d of %d)";
 constext txt_thread_marked_as_deselected[] = "Thread deselected";

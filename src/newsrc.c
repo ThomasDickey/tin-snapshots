@@ -25,7 +25,7 @@ static void vWriteNewsrcLine P_((FILE *fp, char *line));
  *  active[] entries. Newsrc contains *only* subscribed to groups.
  */
 
-void 
+void
 read_newsrc (newsrc_file, allgroups)
 	char *newsrc_file;
 	int allgroups;
@@ -42,7 +42,7 @@ read_newsrc (newsrc_file, allgroups)
 		group_top = 0;
 	}
 
-	/* 
+	/*
 	 * make a .newsrc if one does'nt exist & auto subscribe to set groups
 	 */
 	if (! stat_file (newsrc_file)) {
@@ -55,7 +55,7 @@ read_newsrc (newsrc_file, allgroups)
 	}
 
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
-		if ((update && update_fork) || ! update) {	
+		if ((update && update_fork) || ! update) {
 			wait_message (txt_reading_newsrc);
 		}
 		while ((line = getaline (fp)) != (char *) 0) {
@@ -154,7 +154,7 @@ vWriteNewsrc ()
  *  Create a newsrc from active[] groups. Subscribe to all groups.
  */
 
-void 
+void
 create_newsrc (newsrc_file)
 	char *newsrc_file;
 {
@@ -180,7 +180,7 @@ create_newsrc (newsrc_file)
  * server (LIST AUTOSUBSCRIBE) and create .newsrc
  */
 
-void 
+void
 auto_subscribe_groups (newsrc_file)
 	char *newsrc_file;
 {
@@ -213,29 +213,29 @@ auto_subscribe_groups (newsrc_file)
 					psGrp = psGrpFind (buf);
 					if (psGrp) {
 						fprintf (fp_newsrc, "%s:\n", buf);
-					}	
-				}	
+					}
+				}
 			}
 			if (ferror (fp_newsrc) | fclose (fp_newsrc)) {
 				error_message (txt_filesystem_full, "");
 			}
-		}	
+		}
 		fclose (fp_subs);
-	}	
+	}
 }
 
 /*
  * make a backup of users .newsrc in case of the bogie man
  */
 
-void 
+void
 backup_newsrc ()
 {
 #ifndef INDEX_DAEMON
 	char *line;
 	char buf[HEADER_LEN];
 	FILE *fp_ip, *fp_op;
-	
+
 	if ((fp_ip = fopen (newsrc, "r")) != (FILE *) 0) {
 #if defined(WIN32)
 		joinpath (buf, rcdir, OLDNEWSRC_FILE);
@@ -268,7 +268,7 @@ backup_newsrc ()
  *  Subscribe/unsubscribe to a group in .newsrc.
  */
 
-void 
+void
 subscribe (group, sub_state)
 	struct t_group *group;
 	int sub_state;
@@ -295,7 +295,7 @@ subscribe (group, sub_state)
 					fprintf (newfp, "%s\n", line);
 				} else {
 					seq = pcParseNewsrcLine (line, grp, &sub);
-	
+
 					if (STRCMPEQ(grp, group->name)) {
 						fprintf (newfp, "%s%c %s\n", grp, sub_state, seq);
 						group->subscribed = sub_state;
@@ -322,7 +322,7 @@ subscribe (group, sub_state)
 }
 
 
-void 
+void
 reset_newsrc ()
 {
 	char *line;
@@ -331,7 +331,7 @@ reset_newsrc ()
 	FILE *newfp;
 	int sub;
 	long i;
-	
+
 #ifdef VMS
 	if ((newfp = fopen (newnewsrc, "w", "fop=cif")) != (FILE *) 0) {
 #else
@@ -358,11 +358,11 @@ reset_newsrc ()
 
 	for (i = 0; i < group_top; i++) {
 		vSetDefaultBitmap (&active[my_group[i]]);
-	}	
+	}
 }
 
 
-void 
+void
 delete_group (group)
 	char *group;
 {
@@ -402,7 +402,7 @@ delete_group (group)
 }
 
 
-void 
+void
 grp_mark_read (group, psArt)
 	struct t_group *group;
 	struct t_article *psArt;
@@ -429,7 +429,7 @@ grp_mark_read (group, psArt)
 }
 
 
-void 
+void
 grp_mark_unread (group)
 	struct t_group *group;
 {
@@ -441,7 +441,7 @@ grp_mark_unread (group)
 #endif
 
 	vGrpGetArtInfo (
-		group->spooldir, 
+		group->spooldir,
 		group->name,
 		group->type,
 		&group->count,
@@ -470,7 +470,7 @@ grp_mark_unread (group)
 }
 
 
-void 
+void
 thd_mark_read (group, thread)
 	struct t_group *group;
 	long thread;
@@ -487,7 +487,7 @@ thd_mark_read (group, thread)
 }
 
 
-void 
+void
 thd_mark_unread (group, thread)
 	struct t_group *group;
 	long thread;
@@ -506,8 +506,8 @@ thd_mark_unread (group, thread)
 /*
  * Parse the newsrc sequence for the specified group
  */
- 
-void 
+
+void
 parse_bitmap_seq (group, seq)
 	struct t_group *group;
 	char *seq;
@@ -519,8 +519,8 @@ parse_bitmap_seq (group, seq)
 	long high = 0;
 	long min, max;
 
-	/* 
-	 * Skip possible non-numeric prefix 
+	/*
+	 * Skip possible non-numeric prefix
 	 */
 	ptr = seq;
 	while (*ptr && (*ptr < '0' || *ptr > '9')) {
@@ -567,7 +567,7 @@ debug_print_bitmap(group,NULL);
 		group->newsrc.xmin = min;
 		group->newsrc.xbitlen = (max - min) + 1;
 		if (group->newsrc.xbitlen > 0) {
-			group->newsrc.xbitmap = 
+			group->newsrc.xbitmap =
 				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
 			NSETRNG1(group->newsrc.xbitmap, 0, group->newsrc.xbitlen - 1);
 		}
@@ -581,8 +581,8 @@ debug_print_bitmap(group,NULL);
 			NSETRNG0(group->newsrc.xbitmap, low - min, high - min);
 		}
 
-		/* 
-		 * Pick up any additional articles/ranges after the first 
+		/*
+		 * Pick up any additional articles/ranges after the first
 		 */
 		while (*ptr) {
 			ptr = pcParseSubSeq (group, ptr, &low, &high, &sum);
@@ -597,12 +597,12 @@ debug_print_bitmap(group,NULL);
 		group->newsrc.xmin = group->xmin;
 		group->newsrc.xbitlen = (group->xmax - group->xmin) + 1;
 		if (group->newsrc.xbitlen > 0) {
-			group->newsrc.xbitmap = 
+			group->newsrc.xbitmap =
 				(t_bitmap *) my_malloc (BITS_TO_BYTES(group->newsrc.xbitlen));
 			NSETRNG1(group->newsrc.xbitmap, 0, group->newsrc.xbitlen - 1);
 		}
 /*
-sprintf (msg, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n", 
+sprintf (msg, "BITMAP Grp=[%s] MinMax=[%ld-%ld] Len=[%ld]\n",
 	group->name, group->xmin, group->xmax, group->newsrc.xbitlen);
 wait_message (msg);
 */
@@ -621,7 +621,7 @@ wait_message (msg);
 			sum = (int) (group->xmax - group->xmin) + 1;
 		}
 	}
-	
+
 	group->newsrc.num_unread = sum;
 #ifdef DEBUG_NEWSRC
 	debug_print_bitmap(group, NULL);
@@ -636,7 +636,7 @@ wait_message (msg);
  *   3rd call would parse    93 and return 97-99
  *   4th call would parse 97-99 and return NULL
  */
- 
+
 char *
 pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 	struct	t_group *psGrp;
@@ -649,16 +649,16 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 	long	lBitMax;
 	long	lLastHigh;
 
-/* 
+/*
 #ifdef DEBUG_NEWSRC
 	printf ("Seq=[%s]\n", pcSeq);
-#endif 
+#endif
 */
 
 	lLastHigh = *plHigh;
 	pcSeq = pcParseGetSeq(pcSeq, plLow, plHigh);
 
-	/* 
+	/*
 	 * Bitmap index
 	 */
 	lBitMin = *plLow - psGrp->newsrc.xmin;
@@ -677,8 +677,8 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 	} else if ((*plLow < *plHigh) &&
 	           (*plLow <= psGrp->newsrc.xmax) &&
 	           (*plHigh >= psGrp->newsrc.xmin)) {
-		/* 
-		 * Restrict the range to min..max 
+		/*
+		 * Restrict the range to min..max
 		 */
 		if (lBitMin < 0) {
 			lBitMin = 0;
@@ -689,7 +689,7 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 		}
 		lBitMax = lBitMax - psGrp->newsrc.xmin;
 
-		/* 
+		/*
 		 * Fill in the whole range as read
 		 */
 		NSETRNG0(psGrp->newsrc.xbitmap, lBitMin, lBitMax);
@@ -702,7 +702,7 @@ pcParseSubSeq (psGrp, pcSeq, plLow, plHigh, piSum)
 char *
 pcParseGetSeq(pcSeq, plLow, plHigh)
 	char *pcSeq;
-	long *plLow; 
+	long *plLow;
 	long *plHigh;
 {
 	*plLow = my_strtol (pcSeq, &pcSeq, 10);
@@ -734,7 +734,7 @@ pcParseGetSeq(pcSeq, plLow, plHigh)
 /*
  * Loop thru arts[] array marking state of each article READ/UNREAD
  */
- 
+
 void
 parse_unread_arts (group)
 	struct t_group *group;
@@ -771,7 +771,7 @@ parse_unread_arts (group)
 	group->newsrc.num_unread = unread;
 }
 
-void 
+void
 print_bitmap_seq (fp, group)
 	FILE *fp;
 	struct t_group *group;
@@ -784,7 +784,7 @@ print_bitmap_seq (fp, group)
 	debug_print_comment ("print_bitmap_seq()");
 	debug_print_bitmap (group, NULL);
 #endif
-	
+
 	if (group->count == 0 || group->xmin > group->xmax) {
 /*		fprintf (fp, "1"); */
 		if (group->xmax > 1) {
@@ -794,10 +794,10 @@ print_bitmap_seq (fp, group)
 		fflush (fp);
 #ifdef DEBUG_NEWSRC
 		debug_print_comment ("print_bitmap_seq(): group->count == 0");
-#endif	
+#endif
 		return;
 	}
-	
+
 	for (i = group->newsrc.xmin ; i <= group->newsrc.xmax ; i++) {
  		if (NTEST(group->newsrc.xbitmap, i - group->newsrc.xmin) == ART_READ) {
   			if (flag) {
@@ -845,7 +845,7 @@ print_bitmap_seq (fp, group)
  *  rewrite .newsrc and position group at specifed position
  */
 
-int 
+int
 pos_group_in_newsrc (group, pos)
 	struct t_group *group;
 	int pos;
@@ -957,7 +957,7 @@ pos_group_in_newsrc (group, pos)
 	}
 	while ((line = getaline(fp_sub)) != (char *) 0) {
 		if (option_line) {
-			if (strchr (line, ':') == (char *) 0 && 
+			if (strchr (line, ':') == (char *) 0 &&
 			    strchr (line, '!') == (char *) 0) {
 				fprintf (fp_out, "%s\n", line);
 				free (line);
@@ -981,7 +981,7 @@ pos_group_in_newsrc (group, pos)
 		vWriteNewsrcLine(fp_out,newsgroup);
 		repositioned = TRUE;
 	}
-	
+
 	/*
 	 *  write unsubscribed groups to newnewsrc
 	 */
@@ -1047,7 +1047,7 @@ catchup_newsrc_file (newsrc_file)
 				chmod (newsrc_file, newsrc_mode);
 			}
 			for (i = 0 ; i < group_top ; i++) {
-				fprintf (fp, "%s%c 1-%ld\n", 
+				fprintf (fp, "%s%c 1-%ld\n",
 					active[my_group[i]].name,
 					active[my_group[i]].subscribed,
 					active[my_group[i]].xmax);
@@ -1153,7 +1153,7 @@ expand_bitmap (group, min)
 			new = group->newsrc.xmin - first + group->newsrc.xbitlen;
 			NSETRNG1(newbitmap, new, bitlen - 1);
 /*
-sprintf (msg, "EXPAND BY=[%ld] grp->newsrc.xmin(%ld) - first(%ld) + grp->newsrc.xbitlen(%ld) < bitlen(%ld)", 
+sprintf (msg, "EXPAND BY=[%ld] grp->newsrc.xmin(%ld) - first(%ld) + grp->newsrc.xbitlen(%ld) < bitlen(%ld)",
 	new, group->newsrc.xmin, first, group->newsrc.xbitlen, bitlen);
 error_message (msg, "");
 */
@@ -1163,13 +1163,13 @@ error_message (msg, "");
 		group->newsrc.xbitmap = newbitmap;
 #ifdef DEBUG_NEWSRC
 		debug_print_comment("expand_bitmap: group->newsrc.bitlen != (group->max-group->min)+1");
-#endif		
+#endif
 	}
 	group->newsrc.xmin = first;
 	if (group->newsrc.xmax < group->xmax) {
 		group->newsrc.num_unread += group->xmax - group->newsrc.xmax;
 /*
-sprintf (msg, "EXPAND MAX BY=[%ld] to unread=[%ld]", 
+sprintf (msg, "EXPAND MAX BY=[%ld] to unread=[%ld]",
 	group->xmax - group->newsrc.xmax, group->newsrc.num_unread);
 error_message (msg, "");
 */
@@ -1228,7 +1228,7 @@ art_mark_unread (group, art)
 		if (group != (struct t_group *) 0) {
 			if (art->artnum < group->newsrc.xmin) {
 				expand_bitmap (group, art->artnum);
-				
+
 			} else {
 				NSET1(group->newsrc.xbitmap, art->artnum - group->newsrc.xmin);
 #ifdef DEBUG_NEWSRC
@@ -1378,8 +1378,10 @@ getaline (fp)
 /* TEST harness */
 #ifdef DEBUG_NEWSRC
 
+#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 static void set_bitmap_range_read P_((struct t_newsrc *newsrc, long beg, long end));
 static void set_bitmap_range_unread P_((struct t_newsrc *newsrc, long beg, long end));
+#endif
 
 void
 vNewsrcTestHarness ()
@@ -1421,10 +1423,10 @@ vNewsrcTestHarness ()
 
 		parse_bitmap_seq (&group, seq);
 debug_print_newsrc (&group.newsrc, stdout);
-		print_bitmap_seq (fp, &group);	
+		print_bitmap_seq (fp, &group);
 
 		printf("   PRINT Seq=[");
-		print_bitmap_seq (stdout, &group);	
+		print_bitmap_seq (stdout, &group);
 
 		fclose (fp);
 
@@ -1453,6 +1455,7 @@ debug_print_newsrc (&group.newsrc, stdout);
 }
 
 
+#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 static void
 set_bitmap_range_read (newsrc, beg, end)
 	struct	t_newsrc *newsrc;
@@ -1499,5 +1502,6 @@ newsrc->xmin, newsrc->xmax, beg, end, offset, length);
 		}
 	}
 }
+#endif /* DEBUG_NEWSRC_FIXME */
 
 #endif	/* DEBUG_NEWSRC */

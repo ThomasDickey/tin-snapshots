@@ -50,7 +50,7 @@ struct t_spooldir *spooldirs;		/* spooldirs on NNTP server (cdrom) */
  *  and a 100% expansion on overflow, especially for the arts[] array.
  */
 
-void 
+void
 init_alloc ()
 {
 	/*
@@ -75,7 +75,7 @@ init_alloc ()
 	 * save file array
 	 */
 	max_save = DEFAULT_SAVE_NUM;
-	
+
 	save = (struct t_save *) my_malloc (sizeof(*save) * max_save);
 
 	/*
@@ -89,7 +89,7 @@ init_alloc ()
 }
 
 
-void 
+void
 expand_art ()
 {
 	max_art += max_art / 2;		/* increase by 50% */
@@ -99,7 +99,7 @@ expand_art ()
 }
 
 
-void 
+void
 expand_active ()
 {
 	max_active += max_active / 2;		/* increase by 50% */
@@ -115,37 +115,37 @@ expand_active ()
 }
 
 
-void 
+void
 expand_save ()
 {
 	max_save += max_save / 2;		/* increase by 50% */
 
-	save = (struct t_save *) my_realloc((char *) save, 
+	save = (struct t_save *) my_realloc((char *) save,
 		sizeof (struct t_save) * max_save);
 }
 
 
-void 
+void
 expand_spooldirs ()
 {
 	max_spooldir += max_spooldir / 2;	/* increase by 50% */
 
-	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs, 
+	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs,
 		sizeof (struct t_spooldir) * max_spooldir);
 }
 
 
-void 
+void
 expand_newnews ()
 {
 	max_newnews += max_newnews / 2;			/* increase by 50% */
 
-	newnews = (struct t_newnews *) my_realloc((char *) newnews, 
+	newnews = (struct t_newnews *) my_realloc((char *) newnews,
 		sizeof(struct t_newnews) * max_newnews);
 }
 
 
-void 
+void
 init_screen_array (allocate)
 	int allocate;
 {
@@ -165,7 +165,7 @@ init_screen_array (allocate)
 					free ((char *) screen[i].col);
 					screen[i].col = (char *) 0;
 				}
-			}	
+			}
 
 			free ((char *) screen);
 			screen = (struct t_screen *) 0;
@@ -174,11 +174,11 @@ init_screen_array (allocate)
 }
 
 
-void 
+void
 free_all_arrays ()
 {
 	hash_reclaim ();
-	
+
 	init_screen_array (FALSE);
 
 	free_art_array ();
@@ -224,7 +224,7 @@ free_all_arrays ()
 }
 
 
-void 
+void
 free_art_array ()
 {
 	register int i;
@@ -258,12 +258,12 @@ free_art_array ()
 }
 
 
-void 
+void
 free_attributes_array ()
 {
 	register int i;
 	struct t_group *psGrp;
-	
+
 	for (i = 0 ; i < num_active ; i++) {
 		psGrp = &active[i];
 		if (psGrp->attribute && psGrp->attribute->global == FALSE) {
@@ -311,11 +311,11 @@ free_attributes_array ()
 }
 
 
-void 
+void
 free_active_arrays ()
 {
 	register int i;
-	
+
 	if (my_group != (int *) 0) {			/* my_group[] */
 		free ((char *) my_group);
 		my_group = (int *) 0;
@@ -345,9 +345,9 @@ free_active_arrays ()
 				active[i].grps_filter = 0;
 			}
 		}
-		
+
 		free_attributes_array ();
-	
+
 		if (active != (struct t_group *) 0) {
 			free ((char *) active);
 			active = (struct t_group *) 0;
@@ -357,11 +357,11 @@ free_active_arrays ()
 }
 
 
-void 
+void
 free_save_array ()
 {
 	int i;
-	
+
 	for (i=0 ; i < num_save ; i++) {
 		if (save[i].subject != (char *) 0) {
 			free ((char *) save[i].subject);
@@ -391,16 +391,16 @@ free_save_array ()
 		save[i].saved   = FALSE;
 		save[i].is_mailbox = FALSE;
 	}
-	
+
 	num_save = 0;
 }
 
 
-void 
+void
 free_spooldirs_array ()
 {
 	int i;
-	
+
 	for (i=0 ; i < num_spooldir ; i++) {
 		if (spooldirs[i].name != (char *) 0) {
 			free ((char *) spooldirs[i].name);
@@ -412,23 +412,23 @@ free_spooldirs_array ()
 		}
 		spooldirs[i].state = 0;
 	}
-	
+
 	num_spooldir = 0;
 }
 
 
-void 
+void
 free_newnews_array ()
 {
 	int i;
-	
+
 	for (i=0 ; i < num_newnews ; i++) {
 		if (newnews[i].host != (char *) 0) {
 			free ((char *) newnews[i].host);
 			newnews[i].host = (char *) 0;
 		}
 	}
-	
+
 	num_newnews = 0;
 }
 

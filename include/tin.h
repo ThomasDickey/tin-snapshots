@@ -390,7 +390,7 @@ extern char *get_uaf_fullname();
 
 /*
  * changed all bcopy/bzero calls to memcpy/memset so this is no longer needed
- * so we could remove the next 8 lines and the autoconf check for bcopy/bzero 
+ * so we could remove the next 8 lines and the autoconf check for bcopy/bzero
  */
 #ifndef BSD
 #	ifndef HAVE_BCOPY
@@ -1368,7 +1368,7 @@ struct t_newnews
 /*
  * Used for building option menu
  */
- 
+
 struct t_option {
 	void *variable;		/* ptr to variable to change */
 	int var_type;		/* type of variable (see conf.h) */
@@ -1639,6 +1639,11 @@ typedef /* FIXME: const */ char constext;
 #else
 #	define P_(s) ()
 #endif
+
+/*
+ * rfc1521/rfc1522 interface
+ */
+typedef void (*BodyPtr) P_((char *, FILE *, int));
 
 #ifdef DBMALLOC
 #	undef strchr

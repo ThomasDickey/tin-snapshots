@@ -112,7 +112,8 @@ rfc1521_decode (file)
 		rewind (file);
 		return file;
 	}
-	/* see if charset matches (we do not attempt to convert charsets at
+	/*
+	 * see if charset matches (we do not attempt to convert charsets at
 	 * this point of time - maybe in the future)
 	 */
 	charset = strcasestr (content_type, "charset=");
@@ -226,7 +227,8 @@ rfc1521_encode (line, f, e)
 		}
 	} else if (e == 'q') {
 		if (!line) {
-			/* we don't really flush anything in qp mode, just set
+			/*
+			 * we don't really flush anything in qp mode, just set
 			 * xpos to 0 in case the last line wasn't terminated by
 			 * \n.
 			 */
@@ -284,14 +286,16 @@ rfc1521_encode (line, f, e)
 		fputs (line, f);
 }
 
-/* KS C 5601 -> ISO 2022-KR encoding for Korean mail exchane */
-/* NOT to be used for News posting, which is made certain
-   by setting post_mime_encoding to 8bit */
+/*
+ * KS C 5601 -> ISO 2022-KR encoding for Korean mail exchange
+ * NOT to be used for News posting, which is made certain
+ * by setting post_mime_encoding to 8bit
+ */
 
 #define KSC 1
 #define ASCII 0
-#define isksc(c)   ( (unsigned char) (c) > (unsigned char) '\240'   && \
-       (unsigned char)  (c) < (unsigned char) '\377' ) 
+#define isksc(c)	((unsigned char) (c) > (unsigned char) '\240' && \
+			(unsigned char) (c) < (unsigned char) '\377')
 #define SI '\017'
 #define SO '\016'
 
@@ -301,71 +305,60 @@ rfc1557_encode (line, f, e)
 	FILE *f;
 	char e;       /* dummy argument : not used */
 {
-	int i=0;
-        int mode=ASCII;
-        static int iskorean=0;
+	int i = 0;
+        int mode = ASCII;
+        static int iskorean = 0;
 
 
-        if ( ! line ) {
-           iskorean=0;
-           return;
-        }
+	if (! line) {
+		iskorean = 0;
+		return;
+	}
 
-        if ( !iskorean)
+	if (! iskorean) { /* search for KS C 5601 character(s) in line */
+		while (line[i]) {
+			if (isksc(line[i])) {
+				iskorean = 1;               /* found KS C 5601 */
+				fprintf(f, "\033$)C\n");   /* put out the designator */
+				break;
+			}
+			i++;
+		}
+		/* KS C 5601 doesn't appear, yet -  no conversion */
+		fputs(line, f);
+		return;
+	}
 
-        /* search for KS C 5601 character(s) in line */
+	i = 0;		/* back to the beginning of the line */
+	while (line[i] && line[i] != '\n') {
+		if (mode == ASCII && isksc(line[i])) {
+			fputc(SO, f);
+			fputc(0x7f & line[i], f);
+			mode = KSC;
+		}
+		else if (mode == ASCII &&! isksc(line[i])) {
+			fputc(line[i], f);
+		}
+		else if (mode == KSC && isksc(line[i])) {
+			fputc(0x7f & line[i], f);
+		} else {
+			fputc(SI, f);
+			fputc(line[i], f);
+			mode = ASCII;
+		}
+		i++;
+	}
 
-           while ( line[i] ) {
-              if ( isksc(line[i]) ) {
-                 iskorean = 1;               /* found KS C 5601 */
-                 fprintf(f,"\033$)C\n");   /* put out the designator */
-               
-                 break;                      
-              }
-              i++;
-           }
+	if (mode == KSC) {
+		fputc(SI,f);
+	}
 
-        if ( !iskorean) {     /* KS C 5601 doesn't appear, yet */
-           fputs(line,f);   /* no conversion */
-           return;
-        }
-
-
-        i = 0 ;        /* back to the beginning of the line */
-  
-        while (   line[i] &&  line[i] != '\n' ) {
-  
-          if ( mode == ASCII && isksc(line[i]))  {
-           
-            fputc(SO,f);
-            fputc(0x7f & line[i],f);
-            mode = KSC;
-          }
-          else if ( mode == ASCII && !isksc(line[i]) ) {
-            fputc(line[i],f); 
-          }
-          else if ( mode == KSC && isksc(line[i]) ) {
-            fputc(0x7f & line[i],f);
-          }
-          else {
-            fputc(SI,f);
-            fputc(line[i],f);
-            mode = ASCII;
-          }
-          i++;
-       }
-       if ( mode == KSC) {
-          fputc(SI,f);
-       }
-  
-       if ( line[i] == '\n'  ) {
-         fputc('\n',f);       
-       }
-
-       return;
-
+	if (line[i] == '\n') {
+		fputc('\n',f);
+	}
+	return;
 }
-  
+
 /* Not yet implemented */
 void
 rfc1468_encode (line, f, e)
@@ -373,8 +366,8 @@ rfc1468_encode (line, f, e)
 	FILE *f;
 	char e;       /* dummy argument : not used */
 {
-        if (  line ) 
-          fputs(line,f);
+	if (line)
+		fputs(line, f);
 }
 
 /* Not yet implemented */
@@ -384,6 +377,6 @@ rfc1922_encode (line, f, e)
 	FILE *f;
 	char e;       /* dummy argument : not used */
 {
-        if (  line ) 
-          fputs(line,f);
+	if (line)
+		fputs(line, f);
 }

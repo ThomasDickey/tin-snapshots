@@ -18,7 +18,7 @@ char msg[LEN];
 struct t_screen *screen;
 
 
-void 
+void
 info_message (str)
 	char *str;
 {
@@ -36,7 +36,7 @@ info_message (str)
 }
 
 
-void 
+void
 wait_message (str)
 	char *str;
 {
@@ -53,7 +53,7 @@ wait_message (str)
 }
 
 
-void 
+void
 error_message (template, str)
 	char *template;
 	char *str;
@@ -61,7 +61,7 @@ error_message (template, str)
 	errno = 0;
 
 	clear_message ();	  /* Clear any old messages hanging around */
-	
+
 	fprintf (stderr, template, str);
 	fflush (stderr);
 
@@ -75,7 +75,7 @@ error_message (template, str)
 }
 
 
-void 
+void
 perror_message (template, str)
 	char *template;
 	char *str;
@@ -97,7 +97,7 @@ perror_message (template, str)
 
 	char str2[512];
 	int err;
-	
+
 	clear_message ();	  /* Clear any old messages hanging around */
 
 	sprintf (str2, template, str);
@@ -123,7 +123,7 @@ perror_message (template, str)
 }
 
 
-void 
+void
 clear_message ()
 {
 	if (! cmd_line) {
@@ -135,7 +135,7 @@ clear_message ()
 }
 
 
-void 
+void
 center_line (line, inverse, str)
 	int line;
 	int inverse;
@@ -162,7 +162,7 @@ center_line (line, inverse, str)
 }
 
 
-void 
+void
 draw_arrow (line)
 	int line;
 {
@@ -181,7 +181,7 @@ draw_arrow (line)
 }
 
 
-void 
+void
 erase_arrow (line)
 	int line;
 {
@@ -197,12 +197,12 @@ erase_arrow (line)
 }
 
 
-void 
+void
 show_title (title)
 	char *title;
-{	
+{
 	int col;
-	
+
 	col = (cCOLS - (int) strlen (txt_type_h_for_help))+1;
 	if (col) {
 		MoveCursor (0, col);
@@ -222,7 +222,7 @@ show_title (title)
 }
 
 
-void 
+void
 ring_bell ()
 {
 	my_fputc ('\007', stdout);
@@ -235,12 +235,12 @@ spin_cursor ()
 {
 	static char *buf = "|/-\\|/-\\";
 	static int i = 0;
-	
+
 	if (i > 7) {
 		i = 0;
 	}
 	printf ("\b%c", buf[i++]);
-	fflush (stdout);	
+	fflush (stdout);
 }
 
 
@@ -249,7 +249,7 @@ spin_cursor ()
  *  four digits for each number, with the possibility that it will be
  *  wider.
  */
- 
+
 void
 show_progress (dst, txt, count, total)
 	char *dst;

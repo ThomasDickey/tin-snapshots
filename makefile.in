@@ -1,10 +1,10 @@
 # Top level Makefile for tin - for configuration options read the ./INSTALL file.
-# 
+#
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960817
+PVER		= 960821
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -128,7 +128,7 @@ TOP	= \
 	$(TOPDIR)/INSTALL \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
-	$(TOPDIR)/TODO 
+	$(TOPDIR)/TODO
 
 MISC	= \
 	$(SRCDIR)/Makefile \
@@ -230,7 +230,7 @@ WC	= wc
 ZIP	= zip
 GZIP	= gzip -9
 
-all: 
+all:
 	@$(ECHO) "Top level Makefile for the TIN v$(VER) Usenet newsreader."
 	@$(ECHO) " "
 	@$(ECHO) "To compile the source code change to the source directory by"
@@ -322,7 +322,7 @@ uuencode:
 	@$(ECHO) "Uuencoding $(PROJECT).t.gz..."
 	@$(UUENCODE) $(PROJECT).t.gz $(PROJECT).t.gz > $(PROJECT).t.gz.uu
 	@$(LS) $(PROJECT).t.gz.uu
- 
+
 diff:
 	@$(ECHO) "Generating diffs against $(PROJECT)-$(BASE_VER)..."
 	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
@@ -395,7 +395,7 @@ tar:
 	@$(ECHO) "Generating gzipped tar file..."
 	@-$(RM) $(PROJECT).t $(PROJECT).t.gz > /dev/null 2>&1
 	@$(MAKE) chmod
-	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)  
+	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)
 	@$(ECHO) "Gzipping $(PROJECT).t..."
 	@$(GZIP) $(PROJECT).t
 	@$(LS) $(PROJECT).t.gz
@@ -404,9 +404,9 @@ ztar:
 	@$(ECHO) "Generating compressed tar file..."
 	@-$(RM) $(PROJECT).t $(PROJECT).t.Z > /dev/null 2>&1
 	@$(MAKE) chmod
-	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)  
+	@$(TAR) cvf $(PROJECT).t $(ALL_FILES)
 	@$(ECHO) "Compressing $(PROJECT).t..."
-	@$(COMPRESS) $(PROJECT).t 
+	@$(COMPRESS) $(PROJECT).t
 	@$(LS) $(PROJECT).t.Z
 
 zip:

@@ -15,8 +15,8 @@
 #ifdef WIN32
 
 #	define	s_printf
-#	define	s_flush	
-#	define	s_puts	
+#	define	s_flush
+#	define	s_puts
 #	define	s_end()
 
 typedef struct {

@@ -324,7 +324,9 @@ page_goto_next_unread:
 				break;
 
 			case iKeyPageToggleTex2iso:	/* toggle german TeX to ISO latin1 style conversion */
-				tex2iso_supported = !tex2iso_supported;
+				if ((tex2iso_supported = !tex2iso_supported)) {
+					tex2iso_article = iIsArtTexEncoded (art, group_path);
+			   }
 				redraw_page (group->name, respnum);
 				if (tex2iso_supported) {
 					info_message (txt_toggled_tex2iso_on);
@@ -605,7 +607,7 @@ return_to_index:
 				}
 				break;
 
-			case iKeyPageQuitTin:	/* quit */
+			case iKeyQuitTin:	/* quit */
 				return GRP_QUIT;
 
 			case iKeyPageReplyQuote:	/* reply to author through mail */

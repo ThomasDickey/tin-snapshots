@@ -92,7 +92,7 @@ void __interrupt __chkabort (void)
 }
 #endif
 
-/* 
+/*
  * dummy
  */
 
@@ -200,12 +200,12 @@ int rawcon(int setraw)
 		0 : -1;
 }
 
-/* 
- * stub for tputs 
+/*
+ * stub for tputs
  */
 
 #ifndef INDEX_DAEMON
-int 
+int
 tputs (str, count, func)
 	char *str;
 	int count;
@@ -216,18 +216,18 @@ tputs (str, count, func)
 	}
 
 	while (*str) {
-		if (*str == '\n') 
-			func('\r'); 
+		if (*str == '\n')
+			func('\r');
 		func(*str++);
 	}
 	return 0;
 }
 #endif
 
-/* 
+/*
  * joinpath tacks a file (or sub dir) on to the end of a directory name.
  * Not just as simple as putting a '/' between the two, as the directory
- * name may be an assign! 
+ * name may be an assign!
  */
 
 int tin_bbs_mode = FALSE;
@@ -259,7 +259,7 @@ joinpath (str, dir, file)
 		sprintf (str, "%s%s", dir, file);
 	} else {
 		sprintf (str, "%s/%s", dir, file);
-	}	
+	}
 }
 
 
@@ -271,8 +271,8 @@ sleep (seconds)
 	return seconds;
 }
 
-/* 
- * I'm not really sure how well popen and pclose work, but they seem OK 
+/*
+ * I'm not really sure how well popen and pclose work, but they seem OK
  */
 
 FILE *
@@ -306,8 +306,8 @@ pclose (pipe)
 	return fclose (pipe);
 }
 
-/* 
- * Directory stuff 
+/*
+ * Directory stuff
  */
 
 DIR *
@@ -322,7 +322,7 @@ opendir (name)
 	}
 	di->Lock = Lock (name,ACCESS_READ);
 	if (di->Lock == 0) {
-		free (di); 
+		free (di);
 		return 0;
 	}
 	if (DOSBase->dl_lib.lib_Version >= 37) {
@@ -343,8 +343,8 @@ opendir (name)
 		di->more = 1;
 	} else {
 		if (Examine(di->Lock,&di->fib)==0) {
-			UnLock(di->Lock); 
-			free (di); 
+			UnLock(di->Lock);
+			free (di);
 			return 0;
 		}
 	}
@@ -383,7 +383,7 @@ readdir (di)
 }
 
 
-void 
+void
 closedir (di)
 	DIR *di;
 {
@@ -408,7 +408,7 @@ getopt (argc, argv, options)
 	char c, *z;
 	static int subind = 0;
 
-	for (;optind < argc ; optind++, subind = 0) {	
+	for (;optind < argc ; optind++, subind = 0) {
 		if (subind == 0) {
 			c = argv[optind][0];
 			if (c != '-') {
@@ -428,8 +428,8 @@ getopt (argc, argv, options)
 	}
 
 	/* get rid of funnies */
-	if (c == ':' || c == '?') { 
-		return '?'; 
+	if (c == ':' || c == '?') {
+		return '?';
 	}
 
 	if ((z = strchr (options,c)) == 0) {
@@ -451,7 +451,7 @@ getopt (argc, argv, options)
 }
 
 
-int 
+int
 system (str)
 	const char *str;
 {
@@ -462,10 +462,10 @@ system (str)
 	}
 }
 
-/* 
+/*
  * The stat call in Aztec C doesn't tell us if the entry is a directory
  * or not. This one does. You will have to change <stat.h> to define
- * ST_DIRECT though 
+ * ST_DIRECT though
  */
 
 int
@@ -479,25 +479,25 @@ stat (name, buf)
 	if (! (dirlock = Lock (name, ACCESS_READ))) {
 		return -1;
 	}
-	if (! (inf = malloc(sizeof(*inf)))) { 
-		UnLock (dirlock); 
+	if (! (inf = malloc(sizeof(*inf)))) {
+		UnLock (dirlock);
 		return -1;
 	}
 	Examine (dirlock,inf);
 	UnLock (dirlock);
-	buf->st_attr = ((inf->fib_EntryType>0) ? ST_DIRECT : 0) 
+	buf->st_attr = ((inf->fib_EntryType>0) ? ST_DIRECT : 0)
 			| (inf->fib_Protection & 0xf);
 	buf->st_size = inf->fib_Size;
-	buf->st_mtime = ((inf->fib_Date.ds_Days + 2922) * (24 * 60) + 
+	buf->st_mtime = ((inf->fib_Date.ds_Days + 2922) * (24 * 60) +
 			inf->fib_Date.ds_Minute) * 60
 			+ inf->fib_Date.ds_Tick / TICKS_PER_SECOND;
 	free (inf);
 	return 0;
 }
 
-/* 
+/*
  * This getenv and setenv will use the WB2.0 calls if you have the new
- * rom. If not, it resorts to looking in the ENV: directory. 
+ * rom. If not, it resorts to looking in the ENV: directory.
  */
 
 char *
@@ -524,7 +524,7 @@ getenv (name)
 			return 0;
 		}
 		for (ptr = value; (*ptr=getc(fp))!=EOF &&
-			*ptr != '\n' && 
+			*ptr != '\n' &&
 			++ptr < &value[256];);
 		fclose(fp);
 		*ptr = 0;
@@ -536,7 +536,7 @@ getenv (name)
 int
 setenv (name, value)
 	char *name;
-	char *value; 
+	char *value;
 {
 	if (DOSBase->dl_lib.lib_Version >= 36) {
 		SetVar ((char *)name,(char *)value,strlen(value)+1,GVF_LOCAL_ONLY);
@@ -576,7 +576,7 @@ make_post_cmd (cmd, name)
 	char *name;
 {
 	char *p;
-	
+
 	if ((p = getenv (ENV_VAR_POSTER)) != (char *) 0) {
 		sprintf (cmd, p, name);
 	} else {
@@ -717,7 +717,7 @@ void __interrupt _STD_250_free_all(void)
 #else
 
 /*
- * The ';' is to satisfy a really picky Ansi compiler 
+ * The ';' is to satisfy a really picky Ansi compiler
  */
 
 ;

@@ -101,7 +101,7 @@ DIR *opendirx (const char *dirname, char *pattern)
 	}
 }
 /*
- * Get next entry in a directory 
+ * Get next entry in a directory
  */
 struct direct *readdir (DIR * dirp)
 {
@@ -128,7 +128,7 @@ struct direct *readdir (DIR * dirp)
 	if (rc)
 	{
 		xdirp->dir.dirent.d_ino = -1;	/*
-									 * no inode information 
+									 * no inode information
 									 */
 		strlwr (strcpy (xdirp->dir.dirent.d_name, xdirp->dirData.cFileName));
 		xdirp->dir.dirent.d_namlen = strlen (xdirp->dirData.cFileName);
@@ -143,7 +143,7 @@ struct direct *readdir (DIR * dirp)
 	}
 }
 /*
- * Close a directory 
+ * Close a directory
  */
 void closedir (DIR * dirp)
 {
@@ -231,7 +231,7 @@ void joinpath ( char *str, char *dir, char *file)
 	{
 		if(no_pw.pw_dir == NULL)
 			pw = getpwnam(getlogin());
-		else	
+		else
 			pw = &no_pw;
 
 		strcpy(str, pw->pw_dir);
@@ -350,7 +350,7 @@ void cursoron(void)
 	if (GetConsoleCursorInfo(hConOut, &ccinfo))
 		{
 		ccinfo.bVisible = TRUE;
-		SetConsoleCursorInfo(hConOut, &ccinfo);	
+		SetConsoleCursorInfo(hConOut, &ccinfo);
 		}
 }
 
@@ -361,7 +361,7 @@ void cursoroff(void)
 	if (GetConsoleCursorInfo(hConOut, &ccinfo))
 		{
 		ccinfo.bVisible = FALSE;
-		SetConsoleCursorInfo(hConOut, &ccinfo);	
+		SetConsoleCursorInfo(hConOut, &ccinfo);
 		}
 }
 

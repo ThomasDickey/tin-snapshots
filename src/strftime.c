@@ -4,7 +4,7 @@
  *  Author    : A.Robbins & I.Lea
  *  Created   : 01-02-91
  *  Updated   : 15-08-93
- *  Notes     : Relatively quick-and-dirty implemenation of ANSI library 
+ *  Notes     : Relatively quick-and-dirty implemenation of ANSI library
  *              routine for System V Unix systems.
  *              It's written in old-style C for maximal portability.
  *              If target system already has strftime() call the #define
@@ -27,8 +27,8 @@ extern int daylight;
 
 #define SYSV_EXT	1	/* stuff in System V ascftime routine */
 
-/* 
- * strftime --- produce formatted time 
+/*
+ * strftime --- produce formatted time
  */
 
 size_t
@@ -46,8 +46,8 @@ my_strftime (s, maxsize, format, timeptr)
 	char tbuf[100];
 	int i;
 
-	/* 
-	 * various tables, useful in North America 
+	/*
+	 * various tables, useful in North America
 	 */
 	static char *days_a[] = {
 		"Sun", "Mon", "Tue", "Wed",

@@ -125,7 +125,7 @@
 #define	ERR_ACCESS		502	/* Access to server denied */
 #define ERR_FAULT		503	/* Program fault, command not performed */
 #define	ERR_AUTHBAD		580	/* Authorization Failed */
-	
+
 /*
  * RFC 977 defines this; don't change it.
  */

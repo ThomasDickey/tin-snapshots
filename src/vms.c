@@ -31,7 +31,7 @@
 #include "sio.h"
 
 char *
-getlogin (void) 
+getlogin (void)
 {
 	char *p;
 
@@ -144,16 +144,16 @@ int tputs (str, zzz, func)
 
 FILE *
 popen (
-	char *command, 
+	char *command,
 	char *mode)
 {
 	return ((FILE *) 0);
 }
 
 
-void 
+void
 pclose (FILE *pipe)
-{       
+{
 	return;
 }
 
@@ -168,7 +168,7 @@ make_post_cmd (cmd, name)
 	char *name;
 {
 	char *p;
-	
+
 	if ((p = getenv (ENV_VAR_POSTER)) != (char *) 0) {
 		sprintf (cmd, p, name);
 	} else {

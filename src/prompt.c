@@ -27,7 +27,7 @@
  *  Return -1 if missing or bad number typed
  */
 
-int 
+int
 prompt_num (ch, prompt)
 	int ch;
 	char *prompt;
@@ -36,7 +36,7 @@ prompt_num (ch, prompt)
 	int num;
 
 	set_alarm_clock_off ();
-	
+
 	clear_message ();
 
 	sprintf (msg, "%c", ch);
@@ -51,7 +51,7 @@ prompt_num (ch, prompt)
 	clear_message ();
 
 	set_alarm_clock_on ();
-		
+
 	return (num);
 }
 
@@ -61,7 +61,7 @@ prompt_num (ch, prompt)
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
 
-int 
+int
 prompt_string (prompt, buf)
 	char *prompt;
 	char *buf;
@@ -69,7 +69,7 @@ prompt_string (prompt, buf)
 	char *p;
 
 	set_alarm_clock_off ();
-	
+
 	clear_message ();
 
 	if ((p = getline (prompt, FALSE, (char *) 0, 0)) == (char *) 0) {
@@ -79,10 +79,10 @@ prompt_string (prompt, buf)
 		return FALSE;
 	}
 	strcpy (buf, p);
-	
+
 	clear_message ();
 	set_alarm_clock_on ();
-	
+
 	return TRUE;
 }
 
@@ -92,7 +92,7 @@ prompt_string (prompt, buf)
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
 
-int 
+int
 prompt_menu_string (line, col, var)
 	int line;
 	int col;
@@ -111,7 +111,7 @@ prompt_menu_string (line, col, var)
 	strcpy (var, p);
 
 	set_alarm_clock_on ();
-	
+
 	return TRUE;
 }
 
@@ -119,11 +119,11 @@ prompt_menu_string (line, col, var)
  * prompt_yn
  * prompt user for 'y'es or 'n'o decision. "prompt" will be displayed in line
  * "line" giving the default answer "default_answer".
- * The function returns 1 if the user decided "yes", -1 if the user wanted 
+ * The function returns 1 if the user decided "yes", -1 if the user wanted
  * to escape, or 0 for any other key or decision.
  */
- 
-int 
+
+int
 prompt_yn (line, prompt, default_answer)
 	int line;
 	char *prompt;
@@ -146,7 +146,7 @@ prompt_yn (line, prompt, default_answer)
 
 		if (((ch = (char) ReadCh()) == '\n') || (ch == '\r')) {
 			ch = prompt_ch;
-		}	
+		}
 		yn_loop = FALSE; /* normal case: leave loop */
 
 		switch (ch) {
@@ -162,11 +162,11 @@ prompt_yn (line, prompt, default_answer)
 						default_answer = 1 - default_answer;
 						yn_loop = TRUE; /* don't leave loop */
 						break;
-				
+
 					case KEYMAP_LEFT:
 						ch = ESC;
 						break;
-					
+
 					case KEYMAP_RIGHT:
 						ch = prompt_ch;
 						break;
@@ -253,7 +253,7 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 	}
 
 	cursoroff ();
-	
+
 	set_alarm_clock_on ();
 
 	return(var);
@@ -262,7 +262,7 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
 /*
  * Special case of prompt_list() Toggle between ON and OFF
  */
-void 
+void
 prompt_on_off (row, col, var, help_text, prompt_text)
 	int row;
 	int col;
@@ -277,17 +277,17 @@ prompt_on_off (row, col, var, help_text, prompt_text)
 }
 
 /*
- * Displays option text and actual option value for string based options in 
- * one line, help text for that option near the bottom of the screen. Allows 
- * change of the old value by normal editing; history function of getline() 
- * will be used properly so that editing won't leave the actual line. Note 
- * that "option" is the number the user will see, which is not the same as 
- * the array position for this option in option_table (since the latter 
+ * Displays option text and actual option value for string based options in
+ * one line, help text for that option near the bottom of the screen. Allows
+ * change of the old value by normal editing; history function of getline()
+ * will be used properly so that editing won't leave the actual line. Note
+ * that "option" is the number the user will see, which is not the same as
+ * the array position for this option in option_table (since the latter
  * starts counting with zero instead of one).
  * The function returns TRUE, if the value was changed, FALSE otherwise.
  */
- 
-int 
+
+int
 prompt_option_string (option)
 	int option;
 {
@@ -305,24 +305,24 @@ prompt_option_string (option)
 		return FALSE;
 	}
 	strcpy (option_table[option - 1].variable, p);
-	
+
 	set_alarm_clock_on ();
-	
+
 	return TRUE;
 }
 
 /*
- * Displays option text and actual option value for number based options in 
- * one line, help text for that option near the bottom of the screen. Allows 
- * change of the old value by normal editing; history function of getline() 
- * will be used properly so that editing won't leave the actual line. Note 
+ * Displays option text and actual option value for number based options in
+ * one line, help text for that option near the bottom of the screen. Allows
+ * change of the old value by normal editing; history function of getline()
+ * will be used properly so that editing won't leave the actual line. Note
  * that "option" is the number the user will see, which is not the same as
- * the array position for this option in option_table (since the latter 
+ * the array position for this option in option_table (since the latter
  * starts counting with zero instead of one).
  * The function returns TRUE if the value was changed, FALSE otherwise.
  */
- 
-int 
+
+int
 prompt_option_num (option)
 	int option;
 {
@@ -352,11 +352,11 @@ prompt_option_num (option)
 }
 
 /*
- * Displays option text and actual option value for character based options 
- * in one line, help text for that option near the bottom of the screen. 
- * Allows change of the old value by normal editing. Note that "option" is 
- * the number the user will see, which is not the same as the array position 
- * for this option in option_table (since the latter starts counting with 
+ * Displays option text and actual option value for character based options
+ * in one line, help text for that option near the bottom of the screen.
+ * Allows change of the old value by normal editing. Note that "option" is
+ * the number the user will see, which is not the same as the array position
+ * for this option in option_table (since the latter starts counting with
  * zero instead of one).
  * The function returns TRUE if the value was changed, FALSE otherwise.
  */
@@ -372,7 +372,7 @@ prompt_option_char (option)
 	/* grrr... who the heck defined art_marked_* as int? */
 	input[0] = (char) *(int *) option_table[option - 1].variable;
 	input[1] = '\0';
-	
+
 	set_alarm_clock_off ();
 
 	show_menu_help (option_table[option - 1].help_text);
@@ -383,13 +383,13 @@ prompt_option_char (option)
 		set_alarm_clock_on ();
 		return FALSE;
 	}
-	
+
 	/* grrr... who the heck defined art_marked_* as int? */
 	*(int *)option_table[option - 1].variable = p[0];
-	
+
 	clear_message ();
 	set_alarm_clock_on ();
-	
+
 	return TRUE;
 }
 
@@ -398,11 +398,11 @@ prompt_option_char (option)
  * i)  There is no 'any' key on a keyboard
  * ii) CTRL, SHIFT etc don't work
  */
-void 
+void
 continue_prompt ()
 {
 	set_alarm_clock_off ();
-	
+
 	info_message (txt_hit_any_key);
 	(void) ReadCh ();
 

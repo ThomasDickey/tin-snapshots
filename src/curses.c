@@ -868,26 +868,31 @@ PROFILE_ON();
 			switch (buf[buflen-1])
 			{	char *ptr;
 				long class;
-			  case 'r':		/* Window bounds report */
-				ptr = (char *)&buf[bufp+1];
-				my_strtol(ptr,&ptr,10); ptr++;
-				my_strtol(ptr,&ptr,10); ptr++;
-				new_lines = my_strtol(ptr,&ptr,10); ptr++;
-				new_columns = my_strtol(ptr,&ptr,10);
-				buflen = bufp;
-				if (getscrsize) return 0;
-				break;
-			  case '|':		/* Raw Input Events */
-				ptr = (char *)&buf[bufp+1];
-				class = my_strtol(ptr,&ptr,10); ptr++;
-				switch (class)
-				{	int x,y;
-				  case 12:	/* Window resized */
-					buflen = bufp; /* Must do this before raise() */
-					raise(SIGWINCH);
+				case 'r':		/* Window bounds report */
+					ptr = (char *)&buf[bufp+1];
+					my_strtol(ptr,&ptr,10);
+					ptr++;
+					my_strtol(ptr,&ptr,10);
+					ptr++;
+					new_lines = my_strtol(ptr,&ptr,10);
+					ptr++;
+					new_columns = my_strtol(ptr,&ptr,10);
+					buflen = bufp;
+					if (getscrsize)
+						return 0;
 					break;
+				case '|':		/* Raw Input Events */
+					ptr = (char *)&buf[bufp+1];
+					class = my_strtol(ptr,&ptr,10);
+					ptr++;
+					switch (class)
+					{	int x,y;
+						case 12:	/* Window resized */
+							buflen = bufp; /* Must do this before raise() */
+							raise(SIGWINCH);
+							break;
 #ifdef notdef
-				  case 2:	/* Mouse event */
+						case 2:	/* Mouse event */
 					/*
 					 * At this point we know what button was pressed
 					 * but we don't really know where the mouse is.
@@ -898,14 +903,14 @@ PROFILE_ON();
 					 * packet to the handler gives us this. I don't know
 					 * if there is an easier way.
 					 */
-					buflen = bufp;
-					break;
+							buflen = bufp;
+							break;
 #endif
-				  default:
-					buflen = bufp;
+						default:
+							buflen = bufp;
+							break;
+					}
 					break;
-				}
-				break;
 			}
 		}
 	}

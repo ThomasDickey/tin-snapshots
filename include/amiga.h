@@ -39,8 +39,8 @@ struct stat {
 
 /* For opendir(), and readdir() */
 
-struct dirent { 
-	char *d_name; 
+struct dirent {
+	char *d_name;
 	long d_reclen;
 };
 

@@ -125,7 +125,7 @@ extern int tmp_close(FILE *fp);
 void DebugAssertDialog(LPSTR szMessage, DWORD dwLine, LPSTR szFile);
 _inline void CheckHeap(DWORD dwLine, LPSTR szFile)
 	{
-	if (_heapchk()!=_HEAPOK) 
+	if (_heapchk()!=_HEAPOK)
 		DebugAssertDialog("Invalid Heap", dwLine, szFile);
 	};
 
