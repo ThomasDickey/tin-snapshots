@@ -19,6 +19,8 @@
 
 #ifdef NNTP_ABLE
 static int authorization (char *server, char *authuser);
+static FILE *nntp_to_fp (void);
+static FILE *stuff_nntp (char *fnam);
 #endif
 
 long head_next;
@@ -636,10 +638,10 @@ open_art_fp (
 	char buf[NNTP_STRLEN];
 	int i;
 	struct stat sb;
+	FILE *fp, *old_fp;
 #ifdef NNTP_ABLE
 	int respcode;
 #endif
-	FILE *fp, *old_fp;
 
 	i = my_group[cur_groupnum];
 
@@ -658,7 +660,7 @@ open_art_fp (
 
 		debug_nntp ("open_art_fp", "OK");
 
-		return nntp_to_fp ();
+		old_fp = nntp_to_fp ();
 #else
 		return (FILE *) 0;
 #endif
@@ -675,11 +677,13 @@ open_art_fp (
 		} else {
 			note_size = sb.st_size;
 		}
-		fp=rfc1521_decode(old_fp=fopen (buf, "r"));
-		if (fp!=old_fp)
-		  note_size=0;
-		return fp;
+		old_fp=fopen (buf, "r");
 	}
+
+	fp=rfc1521_decode(old_fp);
+	if (fp!=old_fp)
+	  note_size=0;
+	return fp;
 }
 
 /* This could well come in useful for filtering on non-overview hdr fields */
@@ -1052,93 +1056,94 @@ get_respcode (void)
 #endif
 }
 
-
-int
+#ifdef NNTP_ABLE
+/*
+ * Copies data from the nntp socket and writes it to a temp file
+ * returns open descriptor to this file and writes in 'fnam'
+ * the filename we used
+ */
+static FILE *
 stuff_nntp (
 	char *fnam)
 {
-#ifdef NNTP_ABLE
 	char line[HEADER_LEN];
 	FILE *fp;
-#ifdef SLOW_OPEN_GROUP
-	int count = 0;
-#endif
 	struct stat sb;
 	int last_line_nolf=0;
+#ifdef SHOW_PROGRESS
+	int count = 0;
+#endif
 
 	sprintf (fnam, "%stin_nntpXXXXXX", TMPDIR);
 	mktemp (fnam);
 
 	if ((fp = fopen (fnam, "w")) == (FILE *) 0) {
 		perror_message (txt_stuff_nntp_cannot_open, fnam);
-		return FALSE;
+		return ((FILE *) 0);
 	}
 
 	forever {
 		switch (get_server (line, sizeof (line)-1)) {
-		case -1:
-			error_message (txt_connection_to_server_broken, "");
-			tin_done (EXIT_NNTP_ERROR);
-		case -2:
-			tin_done (0);
-		default:
-			break;
+			case -1:
+				error_message (txt_connection_to_server_broken, "");
+				tin_done (EXIT_NNTP_ERROR);
+			case -2:
+				tin_done (0);
+			default:
+				break;
 		}
-
 
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
 #endif
-		if (!last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
+		if (!last_line_nolf && STRCMPEQ(line, "."))		/* end of text */
 			break;
-		}
+
 		if (!get_server_nolf) {
 			strcat (line, "\n");
-			if (line[0] == '.') {	/* reduce leading .'s */
+
+			if (line[0] == '.')					/* reduce leading .'s */
 				fputs (&line[1], fp);
-			} else {
+			else
 				fputs (line, fp);
-			}
+
 		} else {
 			fputs (line, fp);
 		}
-#ifdef SLOW_OPEN_GROUP
+#ifdef SHOW_PROGRESS
 		if (++count % 50 == 0)
 			spin_cursor ();
 #endif
 	}
-	fclose (fp);
 
-	if (stat (fnam, &sb) < 0) {
+	if (stat (fnam, &sb) < 0)
 		note_size = 0;
-	} else {
+	else
 		note_size = sb.st_size;
-	}
-#endif
 
-	return TRUE;
-}
-
-
-FILE *
-nntp_to_fp (void)
-{
-#ifdef NNTP_ABLE
-	char fnam[PATH_LEN];
-	FILE *fp;
-	FILE *old_fp;
-
-	if (!stuff_nntp (fnam)) {
-		debug_nntp ("nntp_to_fp", "!stuff_nntp()");
-		return (FILE *) 0;
-	}
-
-	if ((fp = rfc1521_decode(old_fp=fopen (fnam, "r"))) == (FILE *) 0) {
+	/* Reopen for writing. Possible with fcntl() but how portably ? */
+	fclose(fp);
+	if ((fp = fopen (fnam, "r")) == (FILE *) 0) {
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}
-	if (old_fp!=fp)
-	  note_size=0;
+
+	return (fp);
+}
+#endif
+
+
+#ifdef NNTP_ABLE
+static FILE *
+nntp_to_fp (void)
+{
+	char fnam[PATH_LEN];
+	FILE *fp;
+
+	if ((fp = stuff_nntp (fnam)) == (FILE *) 0) {
+		debug_nntp ("nntp_to_fp", "!stuff_nntp()");
+		return (FILE *) 0;
+	}
 
 /*
  * It is impossible to delete an open file on the Amiga or Win32. So we keep a
@@ -1151,10 +1156,8 @@ nntp_to_fp (void)
 	unlink (fnam);
 #endif
 	return fp;
-#else
-	return (FILE *) 0;
-#endif
 }
+#endif	/* NNTP_ABLE */
 
 #ifdef NNTP_ABLE
 /*
@@ -1434,6 +1437,7 @@ vGrpGetArtInfo (
 		vMakeGrpPath (pcSpoolDir, pcGrpName, acBuf);
 
 /* TODO - Surely this is spurious, the opendir will fail anyway */
+/*		  unless there is some subtle permission check if tin is suid news? */
 #if 0
 		if (access (acBuf, R_OK) != 0)
 			return(-1);

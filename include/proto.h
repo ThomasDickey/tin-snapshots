@@ -6,6 +6,7 @@ extern int get_active_num (void);
 extern int resync_active_file (void);
 extern int parse_active_line (char *line, long *max, long *min, char *moderated);
 extern void read_news_active_file (void);
+extern int match_group_list (char *group, char *group_list);
 extern void read_group_times_file (void);
 extern void write_group_times_file (void);
 extern void load_newnews_info (char *info);
@@ -306,8 +307,6 @@ extern char *open_art_header (long art);
 extern FILE *open_art_fp (char *group_path, long art);
 extern int setup_hard_base (struct t_group *group, char *group_path);
 extern int get_respcode (void);
-extern int stuff_nntp (char *fnam);
-extern FILE *nntp_to_fp (void);
 extern void vGrpGetSubArtInfo (void);
 extern int vGrpGetArtInfo (char *pcSpoolDir, char *pcGrpName, int iGrpType, long *plArtCount, long *plArtMax, long *plArtMin);
 

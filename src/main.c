@@ -218,7 +218,7 @@ main (
 	 * new newsgroups
 	 */
 	num_cmd_line_groups = read_cmd_line_groups ();
-/* TODO - do we want cmd line groups b4 or after newsrc group ? */
+/* TODO - do we want cmd line groups b4 or after our newsrc groups ? */
 #ifdef INDEX_DAEMON
 	vMakeActiveMyGroup ();
 #else
@@ -230,7 +230,12 @@ main (
 	 */
 	read_newsrc (newsrc, 0);
 
-	if (!num_cmd_line_groups)
+	/*
+	 * We have to show all groups with command line groups
+	 */
+	if (num_cmd_line_groups)
+		show_only_unread_groups = FALSE;
+	else
 		toggle_my_groups (show_only_unread_groups, "");
 #endif
 
@@ -814,10 +819,9 @@ show_intro_page (void)
 }
 
 /*
- * Wildcard match any newsgroups on the command line and autosubscribe to them
- * They are _not_ subscribed in the .newsrc file, only online
+ * Wildcard match any newsgroups on the command line. Sort of like a limited
+ * yank at startup
  */
-
 int
 read_cmd_line_groups (void)
 {
@@ -834,11 +838,9 @@ read_cmd_line_groups (void)
 			wait_message (buf);
 
 			for (i = 0 ; i < num_active ; i++) {
-				if (wildmat (active[i].name, cmdargs[num])) {
-					if (my_group_add (active[i].name) != -1) {
-						active[i].subscribed = TRUE;
+				if (match_group_list (active[i].name, cmdargs[num])) {
+					if (my_group_add (active[i].name) != -1)
 						matched++;
-					}
 				}
 			}
 		}

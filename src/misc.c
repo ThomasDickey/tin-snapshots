@@ -666,7 +666,7 @@ invoke_cmd (
 	ret = system (nam);
 	signal (SIGCHLD, suspchld);
 #else
-# if defined(SIGCHLD) && !defined(RS6000) && !defined(__DECC) && !defined(OSF1)
+# if defined(SIGCHLD) && !defined(_AIX) && !defined(__DECC) && !defined(OSF1)
 	system (nam);
 	ret = system_status;
 # else

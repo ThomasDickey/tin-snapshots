@@ -52,8 +52,8 @@ char skip_include;
 char buf2[HEADER_LEN+50];
 char first_char;
 
-long note_mark[MAX_PAGES];		/* ftells on beginnings of pages */
-long note_size;				/* stat size in bytes of article */
+long note_mark[MAX_PAGES];		/* holds ftell() on beginning of each page */
+long note_size;				/* stat() size in bytes of article */
 
 static int tex2iso_article;
 
@@ -883,7 +883,8 @@ show_note_page (
 	}
 #endif
 
-	if (skip_include) note_page--;
+	if (skip_include)
+		note_page--;
 
 	below_sig = FALSE;				/* begin of article -> not in signature */
 
@@ -1078,7 +1079,6 @@ show_mime_article (
 	Raw(FALSE);
 	offset = ftell (fp);
 	rewind (fp);
-	my_printf ("mime article\n");
 	sprintf (buf, METAMAIL_CMD, PATH_METAMAIL);
 	mime_fp = popen (buf, "w");
 	while (fgets (buf, sizeof (buf), fp) != 0) {
@@ -1430,6 +1430,7 @@ art_open (
 			break;
 
 		/* do not remove \n in Summary lines */
+/* FIXME */
 		is_summary = (strncasecmp (buf, "Summary: ", 9) == 0);
 
 		/* check for continued header line */

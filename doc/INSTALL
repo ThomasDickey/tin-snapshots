@@ -16,7 +16,7 @@ This following configure options and defines are documented in detail:
   --enable-locale
   NNTP_INEWS                 DONT_HAVE_PIPING           NNTP_SERVER_FILE
   DONT_REREAD_ACTIVE_FILE    HAVE_FASCIST_NEWSADMIN     NO_POSTING
-  HAVE_TIN_NNTP_EXTS         INDEX_DAEMON               NO_REGEX
+  HAVE_TIN_NNTP_EXTS         INDEX_DAEMON               NO_WILDMAT
   NO_SHELL_ESCAPE            SMALL_MEMORY_MACHINE       USE_INVERSE_HACK
   HAVE_MMDF_MAILER
   
@@ -335,8 +335,8 @@ changed by setting the tinrc variable save_to_mmdf_mailbox to ON.
 NO_POSTING
 Do not allow posting/followup of articles.
 
-NO_REGEX
-Define if you do not want to use regular expression pattern matching.
+NO_WILDMAT
+Define if you do not want to use wildcard pattern matching.
 
 NO_SHELL_ESCAPE
 Do not allow shell escapes.

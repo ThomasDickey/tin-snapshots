@@ -313,24 +313,6 @@ o  article save with auto_save=ON & Archive-name: doesn't not work correctly
 o  shows up cross-postings multiple times even if read once before getting
    a resync/reread active/newsrc-file
 
-o  strange behavior when starting up tin with one newsgroup in the
-   command-line: tin checks for new-groups (useful?) 
-   if there are any it ask you whether you like to subscribe or not
-   (useful?) and enters the group (ok) but
-   does not react on (r) toggle display to show all/unread subscribed-to
-   groups - but brings up a "Matching 'group-name' groups..." and does not
-   redraw the screen.
-   (y)ank in/out unsubscribed groups from .newsrc seems to work fine but a
-   (r) after yanking all groups ends up in "Matching 'group-name' groups..."
-   and showing only the group specified in the command-line - the
-   show_all_groups status gets lost, so that a second (y) leads to
-   show_all_subscribed groups, while (r) still won't work. without (r) (y)
-   toggles normal.
-   also tin automatically subscribes you to the newsgroup specified in the
-   command-line instead of just showing them to you.
-   if tin does not find the group specified in the command line it behaves
-   normal
-
 o  if answering (c)atchup with (n) you are leaving the group... not useful
 
 o  numbering of Hot articles is wrong after (post)processing them

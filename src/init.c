@@ -71,10 +71,10 @@ char motd_file[PATH_LEN];		/* news motd file for newsadmin purposes */
 char motd_file_info[PATH_LEN];	/* date of last time news motd file read */
 char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char my_distribution[LEN];		/* Distribution: */
-char news_headers_to_display[LEN];		/* which headers to display -- swp */
-char news_headers_to_not_display[LEN];	/* which headers to not display -- swp */
-char **news_headers_to_display_array;	/* array of which headers to display -- swp */
-char **news_headers_to_not_display_array;	/* array of which headers to not display -- swp */
+char news_headers_to_display[LEN];		/* which headers to display */
+char news_headers_to_not_display[LEN];	/* which headers to not display */
+char **news_headers_to_display_array;	/* array of which headers to display */
+char **news_headers_to_not_display_array;	/* array of which headers to not display */
 char newnewsrc[PATH_LEN];
 char news_active_file[PATH_LEN];
 char news_quote_format[PATH_LEN];

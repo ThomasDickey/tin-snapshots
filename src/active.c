@@ -24,7 +24,6 @@ time_t new_newnews_time;			/* FIXME: never set */
  * Local prototypes
  */
 static int find_newnews_index (char *cur_newnews_host);
-static int match_group_list (char *group, char *group_list);
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 
@@ -115,9 +114,11 @@ resync_active_file (void)
 #endif /* #if 0 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
-		if (!command_line) {
+		if (command_line)		/* Can't show all groups with cmd line groups */
+			show_only_unread_groups = FALSE;
+		else
 			toggle_my_groups (show_only_unread_groups, old_group);
-		}
+
 		set_groupname_len (FALSE);
 		set_alarm_signal ();
 		show_selection_page ();
@@ -523,7 +524,7 @@ subscribe_new_group (
 	}
 
 	if ((autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
-		my_fprintf(stderr, "\nAutosubscribed to %s", group);
+		my_printf("\nAutosubscribed to %s", group);
 
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
 		/*
@@ -541,7 +542,7 @@ subscribe_new_group (
  * group_list is a comma separated list of newsgroups, ! implies NOT
  * The same degree of wildcarding as used elsewhere in tin is allowed
  */
-static int
+int
 match_group_list (
 	char *group,
 	char *group_list)
@@ -580,7 +581,7 @@ match_group_list (
 		strncpy (pattern, group_list, group_len);
 		pattern[group_len] = (char) 0;
 		/*
-		 * regexp match
+		 * wildcard match
 		 */
 		if (STR_MATCH(group, pattern)) {
 			accept = !negate;	/* matched!*/

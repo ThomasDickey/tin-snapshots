@@ -538,22 +538,18 @@ select_done:
 			case iKeySelectToggleReadDisplay:
 	 			/*
 	 			 * If in show_only_unread_groups mode toggle
-	 			 * all subscribed to groups and only  groups
+	 			 * all subscribed to groups and only groups
 	 			 * that contain unread articles
-	 			 *
-	 			 * Disabled when started with cmdline groups
 	 			 */
-	 			if (!read_cmd_line_groups ()) {
-	 				show_only_unread_groups = !show_only_unread_groups;
-					if (show_only_unread_groups) {
-						wait_message (txt_reading_new_groups);
-					} else {
-						wait_message (txt_reading_all_groups);
-					}
-					toggle_my_groups (show_only_unread_groups, "");
-					set_groupname_len (FALSE);
-					show_selection_page ();
-				}
+ 				show_only_unread_groups = !show_only_unread_groups;
+				if (show_only_unread_groups)
+					wait_message (txt_reading_new_groups);
+				else
+					wait_message (txt_reading_all_groups);
+
+				toggle_my_groups (show_only_unread_groups, "");
+				set_groupname_len (FALSE);
+				show_selection_page ();
 				break;
 
 			case iKeySelectBugReport:	/* bug/gripe/comment mailed to author */
@@ -751,7 +747,6 @@ select_done:
 				} else {
 					wait_message (txt_yanking_sub_groups);
 					vWriteNewsrc ();
-/* TODO - remove if working okay without this		read_newsrc (newsrc, 1);*/
 					toggle_my_groups(show_only_unread_groups, "");
 					HpGlitch(erase_group_arrow ());
 					cur_groupnum = group_top - 1;
@@ -1274,7 +1269,7 @@ set_groupname_len (
 }
 
 /*
- * Toggle my_group[] to contain all/all unread groups
+ * Toggle my_group[] between all groups / only unread groups
  */
 void
 toggle_my_groups (

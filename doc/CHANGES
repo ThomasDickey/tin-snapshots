@@ -1,3 +1,23 @@
+--unoff BETA release 970309 --
+
+342) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup; replaced RS6000 define by _AIX
+     FIX. lang.c, misc.c, save.c, tin.h, autoconf.h[in], configure[.in]
+
+341) Chua Choon Leong <chuacl@iscs.nus.sg>
+     ADD. test/define for OSF1
+     FIX. configure[.in], autoconf.h[in]
+
+340) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. restrict MIME decoding to just article data
+     BUG. fix and document command line groups
+     ADD. minor tidy up
+     FIX. several supplied patches
+
+339) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. forget to append pid on pgp-commands
+     FIX. pgp.c
+
 --unoff BETA release 970307 --
 
 338) Urs Janssen <urs@akk.uni-karlsruhe.de>

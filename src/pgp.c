@@ -275,6 +275,9 @@ pgp_check_article(void)
 		return (0);
 	}
 	joinpath(the_article, homedir, ".article");
+#ifdef APPEND_PID
+	sprintf (the_article+strlen(the_article), ".%d", process_id);
+#endif /* APPEND_PID */
 	if ((art = fopen(article, "w")) == (FILE *) 0) {
 		sprintf(buf, txt_cannot_open, the_article);
 		info_message(buf);

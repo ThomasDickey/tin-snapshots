@@ -35,8 +35,8 @@ tin, rtin, tind \- A Netnews reader
 is a full-screen easy to use Netnews reader. It can read news locally
 (i.e., \fI/usr/spool/news\fP) or remotely (\fIrtin\fP or \fItin -r\fP option) 
 via a NNTP (Network News Transport Protocol) server. It will automatically 
-utilize nov (news overview) style index files if available locally or via the 
-nntp xover command.
+utilize NOV (News OVerview) style index files if available locally or via the 
+NNTP XOVER command.
 .PP
 .I
 Tin
@@ -159,6 +159,28 @@ Any changes are written to \fI$HOME/.tin/tinrc\fP.
 .PP
 The index daemon version, \fItind\fP, supports the -f, -h, -I and -v 
 options.
+.PP
+A list of groups can be specified after the other command line options.
+This can be useful if you wish to yank in or subscribe to a handpicked
+subset of the active newsgroups.
+The list may include the usual newsgroup wildcard characters.
+It can be comma or space separated, eg:
+.PP
+alt.config news.*,!news.test
+.PP
+If you specify a single groupname, or a wildcard that matches a single
+group, then you will automatically enter that group.
+Otherwise the normal group selection screen will appear, but with
+all the matching groups present too, as though you had yanked just
+those groups in.
+.PP
+Once you use 'y' to yank in all active groups, or 'r' to toggle the
+read/unread status, then the command line groups will be gone. You
+can use 'Y' to reread the active file and get them back.
+.PP
+NB: With the -n flag, only unsubscribed groups in the .newsrc file
+can be matched.
+.PP
 .SH "INDEX FILES"
 In order to keep track of threads, \fItin\fP maintains an index for each 
 newsgroup. There are a number of methods in which index files can be created 
