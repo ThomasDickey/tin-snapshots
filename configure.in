@@ -125,8 +125,8 @@ if test "$USE_SPOOLDIR" = "yes"; then
 	AC_MSG_CHECKING(for news-library path)
 	CF_WITH_PATH(libdir,
 		[  --with-libdir=PATH      news-library],
-		LIBDIR,/usr/lib/news)
-	AC_MSG_RESULT($LIBDIR)
+		NEWSLIBDIR,/usr/lib/news)
+	AC_MSG_RESULT($NEWSLIBDIR)
 
 	AC_MSG_CHECKING(for news spool-directory path)
 	CF_WITH_PATH(spooldir,
@@ -140,13 +140,23 @@ if test "$USE_SPOOLDIR" = "yes"; then
 		NOVROOTDIR,$SPOOLDIR)
 	AC_MSG_RESULT($NOVROOTDIR)
 
-	AC_MSG_CHECKING(for directory containing \"inews\")
-	CF_WITH_PATH(inews-dir,
-		[  --with-inews-dir=PATH   directory containing \"inews\"],
-		INEWSDIR,$LIBDIR)
-	AC_MSG_RESULT($INEWSDIR)
-	test ".$INEWSDIR" != ".$LIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
+	INEWSPATH="$NEWSLIBDIR"
+else
+	NEWSLIBDIR=""
+	SPOOLDIR=""
+	NOVROOTDIR=""
+	INEWSPATH="/usr/lib/news/"
+fi
 
+AC_MSG_CHECKING(for directory containing \"inews\")
+CF_WITH_PATH(inews-dir,
+	[  --with-inews-dir=PATH   directory containing \"inews\"],
+	INEWSDIR,$INEWSPATH)
+AC_MSG_RESULT($INEWSDIR)
+test ".$INEWSDIR" != ".$NEWSLIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
+
+## !NNTP_ONLY
+if test "$USE_SPOOLDIR" = "yes"; then
 	## options for libraries
 	AC_MSG_CHECKING(for optional INN-NNTP library)
 	CF_WITH_VALUE(inn-nntplib,
@@ -154,15 +164,6 @@ if test "$USE_SPOOLDIR" = "yes"; then
 		INN_NNTPLIB)
 	AC_MSG_RESULT($INN_NNTPLIB)
 	test -n "$INN_NNTPLIB" && AC_DEFINE(USE_INN_NNTPLIB)
-else
-	LIBDIR=""
-	SPOOLDIR=""
-	NOVROOTDIR=""
-	AC_MSG_CHECKING(for directory containing \"inews\")
-	CF_WITH_PATH(inews-dir,
-		[  --with-inews-dir=PATH   directory containing \"inews\"],
-		INEWSDIR,/usr/lib/news)
-	AC_MSG_RESULT($INEWSDIR)
 fi
 
 ### Look for ncurses in the usual places, accommodating compilers that don't

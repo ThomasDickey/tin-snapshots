@@ -96,7 +96,7 @@ o  compile-time option: generate own MSGIDs on host with a proper FQDN
     MSGIDs of own articles in ~/.tin/posted to be able to detect f'ups to
     own postings)
 
-o  add expansion of $HOME and/or ~ to newsrctable
+o  add expansion of $HOME and ~userid/ to newsrctable
 
 o  add
        --disable-piping               (default off)

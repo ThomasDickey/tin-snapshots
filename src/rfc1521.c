@@ -146,7 +146,7 @@ rfc1521_encode(line, f, e)
 {
 	static char buffer[80]; /* they must be static for base64 */
 	static char *b = NULL;
-	static int xpos;
+	static int xpos=0;
 	static unsigned long pattern = 0;
 	static int bits = 0;
 	int i;
@@ -207,9 +207,14 @@ rfc1521_encode(line, f, e)
 		}
 	}
 	else if (e == 'q') {
-		if (!line) return;
+		if (!line) {
+		  /* we don't really flush anything in qp mode, just
+                     set xpos to 0 in case the last line wasn't
+                     terminated by \n */
+		  xpos=0;
+		  return;
+		}
 		b = buffer;
-		xpos = 0;
 		while (*line) {
 			if (isspace(*line) && *line != '\n') {
 				unsigned char *l = line + 1;
@@ -251,6 +256,8 @@ rfc1521_encode(line, f, e)
 		}
 		*b = 0;
 		if (b != buffer) fputs(buffer, f);
+	        if (b != buffer && b[-1]=='\n')
+			xpos=0;
 	}
-	else fputs((char *)line, f);
+	else if(line) fputs((char *)line, f);
 }

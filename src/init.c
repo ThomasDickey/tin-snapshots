@@ -355,8 +355,8 @@ void init_selfinfo ()
 	inverse_okay = TRUE;
 	draw_arrow_mark = FALSE;
 #endif
-	default_auto_save = TRUE;
-	default_auto_save_msg = TRUE;
+	default_auto_save = FALSE;
+	default_auto_save_msg = FALSE;
 	default_batch_save = FALSE;
 	default_filter_days = DEFAULT_FILTER_DAYS;
 	default_filter_kill_header = FILTER_SUBJ_CASE_SENSITIVE;
@@ -667,6 +667,11 @@ void init_selfinfo ()
 
 #endif /* INDEX_DAEMON */
 
+#ifndef NNTP_ONLY
+/*
+ * checking for an local active if running NNTP_ONLY is stupid
+ * I'm sure that there are more 'funny' things like this in Iains code
+ */
 	if (stat (news_active_file, &sb) >= 0)
 		goto got_active;
 
@@ -693,6 +698,8 @@ void init_selfinfo ()
 	joinpath (news_active_file, libdir, ACTIVE_FILE);
 
 got_active:
+
+#endif /* !NNTP_ONLY */
 
 	/*
 	 *  Get organization name

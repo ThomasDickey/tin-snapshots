@@ -584,7 +584,8 @@ rfc15211522_encode(filename, mime_encoding)
 	while (fgets((char *)buffer,2048,g)) {
 		rfc1521_encode(buffer,f,encoding);
 	}
-	if (encoding=='b') rfc1521_encode(NULL,f,encoding); /* flush */
+	if (encoding=='b' || encoding=='q')
+	  rfc1521_encode(NULL,f,encoding); /* flush */
 
 	fclose(g);
 	fclose(f);

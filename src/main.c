@@ -453,8 +453,16 @@ read_cmd_line_options (argc, argv)
 	cmdargs = argv;
 	num_cmdargs = optind;
 	max_cmdargs = argc;
-	if (!newsrc_set)
-		get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
+	if (!newsrc_set) {
+		if ( read_news_via_nntp )
+			get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
+		else {
+			struct utsname uts;
+
+			(int) uname(&uts);
+			get_newsrcname(newsrc,uts.nodename);
+		}
+	}
 
 }
 

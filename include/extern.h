@@ -406,6 +406,8 @@ extern constext txt_error_header_line_missing_target[];
 extern constext txt_error_header_line_space[];
 extern constext txt_error_missing_followup_to[];
 extern constext txt_error_not_valid_newsgroup[];
+extern constext txt_error_no_read_permission[];
+extern constext txt_error_no_write_permission[];
 extern constext txt_external_mail_done[];
 extern constext txt_extracting_archive[];
 extern constext txt_extracting_shar[];

@@ -373,6 +373,7 @@ $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_DEP) \
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(TIN_DEP)
 $(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(TIN_DEP)
 $(OBJDIR)/nrctbl.o:		$(SRCDIR)/nrctbl.c $(TIN_DEP) \
+				$(INCDIR)/menukeys.h \
 				$(INCDIR)/patchlev.h
 $(OBJDIR)/open.o:		$(SRCDIR)/open.c $(TIN_DEP) \
 				$(INCDIR)/patchlev.h

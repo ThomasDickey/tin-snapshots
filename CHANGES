@@ -1,3 +1,30 @@
+--unoff BETA release 960801 --
+
+137) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. detection of continuation lines is broken in cases where the
+          first line in the body starts with whitespace (introduced in 133)
+     BUG. article size isn't corrected if it get's shorter due to 1521/1522
+          decoding (resulting in wrong (m/n) displays in the pager.)
+     BUG. encoding very large lines (>2047 chars) with quoted-printable
+          leads to lines longer than 76 chars, due to the buffer overflow.
+     FIX. several supplied patches
+
+136) Torsten Neumann <torsten@imke.infodrom.north.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. file permission check for newsrc from newsrctable
+     FIX. nrctbl.c
+
+135) Chris Blum <chris@phil.uni-sb.de>
+     BUG. compile problem for most Unices by accessing 'hidden' elements of
+          the _iobuf structure of stdio.
+     FIX. sigfile.c
+
+134) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. configure --help shows --with-inews-dir twice (introduced in 132)
+     ADD. minor code cleanup (added ifndef NNTP_ONLY around iains fallback
+          values for the local active file; added make version to makefile)
+     FIX. configure.in, makefile.in, init.c
+
 --unoff BETA release 960731 --
 
 133) Alexander Lehmann <alex@hal.rhein-main.de>
