@@ -171,7 +171,7 @@ debug_print_bitmap (group, NULL);
 		ch = ReadCh ();
 
 		if (ch > '0' && ch <= '9') {	/* 0 goes to basenote */
-			(void) prompt_subject_num (ch, group->name);
+			(void) prompt_subject_num (ch/*, group->name*/);
 			continue;
 		} 
 		switch (ch) {
@@ -1389,9 +1389,9 @@ erase_subject_arrow ()
 
 
 int
-prompt_subject_num (ch, group)
+prompt_subject_num (ch/*, group*/)
 	int ch;
-	char *group;
+/*	char *group;*/
 {
 	int num;
 

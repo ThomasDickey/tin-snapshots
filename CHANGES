@@ -1,3 +1,17 @@
+--950824BETA  PLMC.960610 --
+
+072) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. configure --mandir did not work
+     FIX. Makefile.in
+
+071) Sven Paulus <sven@oops.sub.de>
+     ADD. minimum code clean up
+     FIX. save.c, lang.c, extern.h
+
+070) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code clean up
+     FIX. group.c, inews.c, mail.c, newsrc.c, post.c, save.c, proto.h, tin.h 
+
 --950824BETA  PLMC.960609 --
 
 069) Sven Paulus <sven@oops.sub.de>

@@ -58,10 +58,10 @@ submit_inews (name)
 #if !defined(INDEX_DAEMON) && !defined(XSPOOLDIR)
 
 #ifdef NNTP_INEWS
-#ifndef FORGERY
+#if !defined(FORGERY) && defined INEWS_MAIL_DOMAIN
 	char	buf[PATH_LEN];
 	char	domain_name[PATH_LEN];
-#endif /* !FORGERY */
+#endif /* !FORGERY && INEWS_MAIL_DOMAIN */
 	char	from_name[PATH_LEN];
 	char	host_name[PATH_LEN];
 	char	full_name[128];

@@ -561,20 +561,13 @@ extern char *get_uaf_fullname();
 #	define		DEFAULT_NEWNEWS_NUM	5
 #endif
 
-#define 	NEWSRC_FILE		".newsrc"
-#define 	NEWNEWSRC_FILE		".newnewsrc"
-#define 	OLDNEWSRC_FILE		".oldnewsrc"
 #ifdef VMS
-#define 	ATTRIBUTES_FILE 	"attributes"
-#define 	CONFIG_FILE		"tinrc"
 #define 	RCDIR			"TIN"
 #define 	INDEX_MAILDIR		"MAILIDX"
 #define 	INDEX_NEWSDIR		"INDEX"
 #define 	INDEX_SAVEDIR		"SAVE"
 #else
 #define 	RCDIR			".tin"
-#define 	ATTRIBUTES_FILE 	"attributes"
-#define 	CONFIG_FILE		"tinrc"
 #define 	INDEX_MAILDIR		".mail"
 #define 	INDEX_NEWSDIR		".news"
 #define 	INDEX_SAVEDIR		".save"
@@ -583,6 +576,8 @@ extern char *get_uaf_fullname();
 #define 	ACTIVE_MAIL_FILE	"active.mail"
 #define 	ACTIVE_SAVE_FILE	"active.save"
 #define 	ACTIVE_TIMES_FILE	"active.times"
+#define 	ATTRIBUTES_FILE 	"attributes"
+#define 	CONFIG_FILE		"tinrc"
 #define 	FILTER_FILE		"filter"
 #define 	GROUP_TIMES_FILE	"group.times"
 #define 	POSTED_FILE		"posted"
@@ -591,6 +586,9 @@ extern char *get_uaf_fullname();
 #define 	MAILGROUPS_FILE 	"mailgroups"
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
+#define 	NEWSRC_FILE		".newsrc"
+#define 	NEWNEWSRC_FILE		".newnewsrc"
+#define 	OLDNEWSRC_FILE		".oldnewsrc"
 #define 	OVERVIEW_FILE		".overview"
 #define 	OVERVIEW_FMT		"overview.fmt"
 #define 	SUBSCRIPTIONS_FILE	"subscriptions"
@@ -619,11 +617,7 @@ extern char *get_uaf_fullname();
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
 
-#ifdef VMS
-#	define	LEN			512
-#	define	PATH_LEN		256
-#endif
-#ifdef M_AMIGA
+#if defined(VMS) || defined(M_AMIGA) 
 #	define	LEN			512
 #	define	PATH_LEN		256
 #endif
@@ -655,13 +649,13 @@ extern char *get_uaf_fullname();
 #endif
 
 #ifndef DEFAULT_COMMENT
-#	define	DEFAULT_COMMENT ": "	/* used when by follow-ups & replys */
+#	define	DEFAULT_COMMENT		": "	/* used when by follow-ups & replys */
 #endif
 #ifndef ART_MARK_UNREAD
-#	define	ART_MARK_UNREAD '+'		/* used to show that an art is unread */
+#	define	ART_MARK_UNREAD		'+'	/* used to show that an art is unread */
 #endif
 #ifndef ART_MARK_RETURN
-#	define	ART_MARK_RETURN '-'		/* used to show that an art will return */
+#	define	ART_MARK_RETURN		'-'	/* used to show that an art will return */
 #endif
 #ifndef ART_MARK_SELECTED
 #	define	ART_MARK_SELECTED	'*'	/* used to show that an art was auto selected */
@@ -695,7 +689,7 @@ extern char *get_uaf_fullname();
 #define 	INDEX_TOP			2
 
 #ifdef NO_REGEX
-#	define STR_MATCH(s1,s2) (str_str (s1, s2, strlen (s2)) != 0)
+#	define STR_MATCH(s1,s2)		(str_str (s1, s2, strlen (s2)) != 0)
 #else
 #	define STR_MATCH(s1,pat)	(wildmat (s1, pat))
 #endif
@@ -716,9 +710,9 @@ extern char *get_uaf_fullname();
 
 #ifdef WIN32
 #define 	KEYMAP_UNKNOWN			0
-#define 	KEYMAP_UP				0xA6
-#define 	KEYMAP_DOWN				0xA8
-#define 	KEYMAP_LEFT				0xA5
+#define 	KEYMAP_UP			0xA6
+#define 	KEYMAP_DOWN			0xA8
+#define 	KEYMAP_LEFT			0xA5
 #define 	KEYMAP_RIGHT			0xA7
 #define 	KEYMAP_PAGE_UP			0xA1
 #define 	KEYMAP_PAGE_DOWN		0xA2
@@ -827,18 +821,18 @@ extern char *get_uaf_fullname();
  */
 
 #define 	GRP_UNINDEXED		-1		/* Stop reading group */
-#define 	GRP_QUIT			-2		/* Set by 'Q' */
+#define 	GRP_QUIT		-2		/* Set by 'Q' */
 #define 	GRP_GOTONEXT		-3		/* Goto another group */
 #define 	GRP_CONTINUE		-4		/* set in show_page() */
 #define 	GRP_NOREDRAW		-5		/* Unclear meaning ? */
-#define 	GRP_KILLED			-6		/* thread was killed at art level */
+#define 	GRP_KILLED		-6		/* thread was killed at art level */
 
 /*
  *
  */
 
-#define 	EXIT_OK 			0
-#define 	EXIT_ERROR			1
+#define 	EXIT_OK 		0
+#define 	EXIT_ERROR		1
 #define 	EXIT_NNTP_ERROR 	2
 
 /*
@@ -847,7 +841,11 @@ extern char *get_uaf_fullname();
 
 #if !defined(M_OS2) && !defined(WIN32)
 #	ifdef HAVE_ANSI_ASSERT
+#		if defined (__hpux) && !defined(__GNUC__) 
+#			define  assert(p)       if(! (p)) asfail(__FILE__, __LINE__, p); else (void)0;
+#		else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, #p); else (void)0;
+#		endif
 #	else
 #		define	assert(p)	if(! (p)) asfail(__FILE__, __LINE__, "p"); else (void)0;
 #	endif
@@ -866,8 +864,8 @@ extern char *get_uaf_fullname();
  */
 
 #define 	NO_FILTERING		0
-#define 	FILTERING			1
-#define 	DEFAULT_FILTER_DAYS		28
+#define 	FILTERING		1
+#define 	DEFAULT_FILTER_DAYS	28
 
 /*
  *  art.thread
@@ -895,7 +893,7 @@ extern char *get_uaf_fullname();
  * used by t_group & my_group[]
  */
 
-#define 	UNSUBSCRIBED	'!'
+#define 	UNSUBSCRIBED		'!'
 #define 	SUBSCRIBED		':'
 
 /*
@@ -1105,7 +1103,7 @@ struct t_attribute
 
 struct t_newsrc
 {
-	int		present;			/* update newsrc ? */
+	int	present;			/* update newsrc ? */
 	long	num_unread;			/* unread articles in group */
 	long	xmax;				/* newsrc max */
 	long	xmin;				/* newsrc min */
@@ -1184,12 +1182,12 @@ struct t_filters
 struct t_filter
 {
 	char *scope;				/* NULL='*' (all groups) or 'comp.os.*'   */
-	char *subj;					/* Subject: line    */
-	char *from;					/* From: line	    */
+	char *subj;				/* Subject: line    */
+	char *from;				/* From: line	    */
 	char *msgid;				/* Message-ID: line */
 	char lines_cmp; 			/* Lines compare <> */
 	int  lines_num; 			/* Lines: line	    */
-	time_t time;					/* expire time in seconds */
+	time_t time;				/* expire time in seconds */
 #if defined(_AIX) && !defined(__GNUC__)
 	unsigned int inscope:4; /* if group matches scope ie. 'comp.os.*' */
 	unsigned int type:2;		/* kill/auto select */
@@ -1428,7 +1426,10 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef M_UNIX
 #	define	NEWSGROUPS_FILE 	"newsgroups"
+/*
 #	define	BUG_REPORT_ADDRESS	"iain@scn.de"
+*/
+#	define	BUG_REPORT_ADDRESS	"urs@akk.uni-karlsruhe.de"
 #	define	REDIRECT_OUTPUT 	"> /dev/null 2>&1"
 #	define	REDIRECT_PGP_OUTPUT "> /dev/null"
 #	define	ENV_VAR_MAILER		"MAILER"

@@ -2016,7 +2016,7 @@ delete_article (group, art)
 	 * Check if news / mail / save group
 	 */
 	if (group->type == GROUP_TYPE_MAIL || group->type == GROUP_TYPE_SAVE) {
-		vGrpDelMailArt (group, art);
+		vGrpDelMailArt (/*group,*/ art);
 		return FALSE;
 	}
 		 
