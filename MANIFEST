@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-960720 (Sat Jul 20 18:29:45 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960721 (Sun Jul 21 05:50:57 MET DST 1996)
 ----------------------------------------------------
-  27669 ./CHANGES
-  10476 ./TODO
+  27999 ./CHANGES
+  10577 ./TODO
    5181 ./Makefile
   15976 ./INSTALL
    2112 ./MANIFEST
@@ -65,7 +65,7 @@ MANIFEST for tin-1.3-unoff-BETA-960720 (Sat Jul 20 18:29:45 MET DST 1996)
   35005 ./src/page.c
   24098 ./src/parsdate.y
    6555 ./src/pgp.c
-  72148 ./src/post.c
+  73847 ./src/post.c
    4873 ./src/prompt.c
      53 ./src/proto.sed
   23363 ./src/refs.c
@@ -86,4 +86,4 @@ MANIFEST for tin-1.3-unoff-BETA-960720 (Sat Jul 20 18:29:45 MET DST 1996)
    5522 ./src/vms.c
    6764 ./include/autoconf.hin
   11054 ./src/Makefile.in
-1430750 total
+1433265 total

@@ -1,7 +1,5 @@
 Bugs
 ----
-o  mail_bugreport does not care about use_mailreader_i=ON
-
 o  using other mailers than sendmail without use_mailreader_i=ON may leed to
    multiple signatures
 
