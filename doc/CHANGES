@@ -1,3 +1,27 @@
+--unoff BETA release 970516 --
+
+382) Karsten Keil <keil@temic-ech.spacenet.de>
+     ADD. some addtional checks for NULL-pointers
+     FIX. art.c, refs.c
+
+381) Bruce Momjian <root@candle.pha.pa.us>
+     ADD. check for correct number of articles in group
+     FIX. active.c
+
+380) Thomas E. Dickey <dickey@clark.net>
+     ADD. restores 'cmd_line' setting after running a shell command, so tin
+	  re-enters screen mode
+     ADD. merges the two copies of code that run shell commands
+     ADD. more debug-traces for the curses configuration
+     ADD. test for CLIX machines
+     FIX. several supplied patches
+
+379) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     REM. insertion of Lines:-header (as it's not allways correct
+          (pgp-signed articles)) and could/should be inserted by the
+          server
+     FIX. post.c
+
 --unoff BETA release 970424 --
 
 378) Thomas E. Dickey <dickey@clark.net>

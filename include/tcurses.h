@@ -20,6 +20,12 @@
 
 #include <curses.h>
 
+#if USE_TRACE
+#if HAVE_NOMACROS_H
+#include <nomacros.h>
+#endif
+#endif
+
 #define cCRLF				"\n"
 #define my_flush()			my_fflush(stdout)
 #define ClearScreen()			my_erase()

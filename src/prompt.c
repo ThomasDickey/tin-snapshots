@@ -463,6 +463,7 @@ continue_prompt (void)
 	info_message (txt_return_key);
 	(void) ReadCh ();
 #if USE_CURSES
+	cmd_line = FALSE;
 	my_retouch();
 #endif
 

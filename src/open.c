@@ -804,12 +804,11 @@ setup_hard_base (
 #ifdef NNTP_ABLE
 
 #if 0
-/*
- * leafnode seems to need the extra group command (reported by reorx@irc.pl)
- * usually this should not be needed
+/* leafnode and nntpcache (old versions only?) need an extra GROUP
+ * before LISTGROUP works propperly - this is a bug in leafnode/nntpcache
+ * NOT in tin.
  */
 		sprintf (buf, "group %s", group->name);
-		debug_nntp ("setup_base", buf);
 		put_server (buf);
 #endif /* 0*/
 
