@@ -33,8 +33,10 @@ static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
 static int subj_comp P_((t_comptype *p1, t_comptype *p2));
 static int from_comp P_((t_comptype *p1, t_comptype *p2));
 static int date_comp P_((t_comptype *p1, t_comptype *p2));
+#ifndef NNTP_ONLY
 static char *pcPrintDate P_((long lSecs));
 static char *pcPrintFrom P_((struct t_article *psArt));
+#endif
 static void print_expired_arts P_((int num_expired));
 #ifdef INDEX_DAEMON
 static void vCreatePath P_((char *pcPath));
@@ -192,9 +194,10 @@ debug_print_bitmap (group, NULL);
 			}
 		}
 
-		if (expired || modified)
+#ifndef NNTP_ONLY
+		if ((! read_news_via_nntp) && expired || modified)
 			vWriteNovFile (group);
-		
+#endif
 		/*
 		 * Create the reference tree. The msgid and ref ptrs will
 		 * be free()d now that the NovFile has been written.
@@ -1030,6 +1033,7 @@ sleep(1);
  *   10.  Archive-name:  (ie. widget/part01)      [optional]
  */
 
+#ifndef NNTP_ONLY
 void
 vWriteNovFile (psGrp)
 	struct t_group *psGrp;
@@ -1097,6 +1101,9 @@ vWriteNovFile (psGrp)
 	}
 	set_real_uid_gid ();
 }
+#endif
+
+
 
 /*
  *  A complex little function to determine where to read the index file 
@@ -1603,6 +1610,7 @@ print_expired_arts (num_expired)
 	}
 }
 
+#ifndef NNTP_ONLY
 static char *
 pcPrintDate (lSecs)
 	long	lSecs;
@@ -1632,6 +1640,7 @@ pcPrintFrom (psArt)
 	
 	return acFrom;	
 }
+#endif
 
 #ifdef INDEX_DAEMON
 static void

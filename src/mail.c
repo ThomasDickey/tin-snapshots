@@ -526,9 +526,11 @@ vGrpDelMailArts (psGrp)
 /* MAYBE also check if min / max article was deleted.  If so then update
    the active[] entry for the group and rewrite the mail.active file
 */
-		if (iUpdateIndexFile) {
+#ifndef NNTP_ONLY
+		if ((! read_news_via_nntp) && iUpdateIndexFile) {
 			vWriteNovFile (psGrp);
 		}
+#endif
 	}
 }
 #endif	/* INDEX_DAEMON */

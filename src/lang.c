@@ -363,6 +363,7 @@ constext txt_no_search_string[] = "No search string";
 constext txt_no_spooldirs[] = "No spooldirs"; 
 constext txt_no_subject[] = "No subject";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
+constext txt_not_exist[] = "Newsgroup does not exist on this server";
 constext txt_opt_autosave[] = "1. Auto save       : ";
 constext txt_opt_catchup_groups[] = "9. Catchup on quit : ";
 constext txt_opt_confirm_action[] = "4. Confirm command : ";

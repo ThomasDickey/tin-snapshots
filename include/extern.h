@@ -639,6 +639,7 @@ extern constext txt_no_spooldirs[];
 extern constext txt_no_subject[];
 extern constext txt_no_tagged_arts_to_save[];
 extern constext txt_not_in_active_file[];
+extern constext txt_not_exist[];
 extern constext txt_opt_autosave[];
 extern constext txt_opt_catchup_groups[];
 extern constext txt_opt_confirm_action[];
