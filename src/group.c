@@ -1561,7 +1561,7 @@ bld_sline (i)
 	char art_cnt[9];
 	struct t_art_stat sbuf;
 	register char *buffer;
-	char *smal_buffer="?????";
+	char smal_buffer[6];
 	char arts_sub[255];
 	char _from[255];
 
@@ -1591,13 +1591,13 @@ bld_sline (i)
 
 	if (show_lines) {
 		if (n > 1 && n <= 999) {
-			if (arts[j].lines != -1 && arts[j].lines <=9999)
-				sprintf (art_cnt, "%3d %4d ", n, arts[j].lines);
+			if (arts[j].lines != -1)
+				sprintf (art_cnt, "%3d %4.4s ", n, tin_itoa(smal_buffer, arts[j].lines));
 			else
 				sprintf (art_cnt, "%3d    ? ", n);
 		} else {
-			if (arts[j].lines != -1 && arts[j].lines <=9999)
-				sprintf (art_cnt, "    %4d ", arts[j].lines);
+			if (arts[j].lines != -1)
+				sprintf (art_cnt, "    %4.4s ", tin_itoa(smal_buffer, arts[j].lines));
 			else
 				strcpy (art_cnt, "       ? ");
 		}
@@ -1619,14 +1619,8 @@ bld_sline (i)
 	_from[len_from+1] = '\0';
 	arts_sub[len_subj-5+1] = '\0';
 
-	/* protect display from huge threadnumbers */
-	if (i>=9999) {
-		strcpy (smal_buffer, "   ?");
-	} else {
-		sprintf (smal_buffer, "%4d", i+1);
-	}
 	sprintf (buffer = screen[j].col, "  %4.4s%3.3s %s%-*.*s%s%-*.*s",
-		 smal_buffer, new_resps, art_cnt, len_subj-5, len_subj-5,
+		 tin_itoa(smal_buffer,i+1), new_resps, art_cnt, len_subj-5, len_subj-5,
 		 arts_sub, spaces, len_from, len_from, _from);
 	
 	/* protect display from non-displayable characters (e.g., form-feed) */
