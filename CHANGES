@@ -1,3 +1,15 @@
+--unoff BETA release 961224 --
+
+257) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. in some circumstances replyto could be mime_encoded twice
+     FIX. post.c
+
+256) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. art_mark_will_return is not showing up in thread-level
+          if draw_arrow=on (introduced in 248)
+     BUG. word_highlighting is enababel with color turned off
+     FIX. thread.c, page.c, config.c
+
 --unoff BETA release 961222 --
 
 255) David-Michael Lincke <david-miachel.linke@iwi.unisg.ch>

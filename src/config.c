@@ -373,7 +373,7 @@ read_config_file (file, global_file)
 			if (match_list (buf, "post_mime_encoding=", txt_mime_types, NUM_MIME_TYPES, &post_mime_encoding)) {
 				break;
 			}
-/* option to toggle 8bit char. in header of news message */
+			/* option to toggle 8bit char. in header of news message */
 			if (match_boolean (buf, "post_8bit_header=", &post_8bit_header)) {
 				if (strcasecmp(txt_mime_types[post_mime_encoding], txt_8bit))
 					post_8bit_header=FALSE;
@@ -521,17 +521,30 @@ read_config_file (file, global_file)
 		}
 	}
 	fclose (fp);
-
+	
+	/*
+	 * sort out conflicting settings
+	 */
+	 
 	/* nobody likes to navigate blind */
 	if (!(draw_arrow_mark || inverse_okay)) {
 		draw_arrow_mark = TRUE;
 	}
-
-	/* sort out conflicting settings */
+	/* with invers video bar strip tailing blanks looks ugly */
 	if (!draw_arrow_mark && strip_blanks) {
 		strip_blanks = FALSE;
 	}
-
+#ifdef HAVE_COLOR
+	/* without color enabled word_highlighting is useless */
+	if (!use_color) {
+		word_highlight = word_highlight_tinrc = FALSE;
+	}
+	/* without word_highlighting mark stripping is a fault */
+	if (!word_highlight) {
+		word_h_display_marks = TRUE;
+	}
+#endif
+	
 	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
@@ -1098,7 +1111,6 @@ change_config_file (group, filter_at_once)
 	int filter_at_once;	/* not used */
 {
 	int ch, i;
-/*	int filter_changed = FALSE; */
 	int change_option = FALSE;
 	int original_on_off_value, original_list_value;
 	int option, old_option;
@@ -1169,27 +1181,6 @@ change_config_file (group, filter_at_once)
 				write_config_file (local_config_file);
 				/* FALLTHRU */
 			case iKeyConfigNoSave:
-/* FIXME who did this? what for? filter_changed is not changed ever */
-/*
-				if (filter_changed) {
-					if (filter_at_once) {
-						global_filtered_articles = read_filter_file (global_filter_file, TRUE);
-						local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-						if (global_filtered_articles || local_filtered_articles) {
-							if (filter_articles (group)) {
-								make_threads (group, FALSE);
-								find_base (group);
-							}
-						} else {
-							if (unfilter_articles ()) {
-								make_threads (group, FALSE);
-								find_base (group);
-							}
-						}
-					}
-					ret_code = FILTERING;
-				}
-*/
 				clear_note_area ();
 				return ret_code;
 
@@ -1359,9 +1350,45 @@ change_config_file (group, filter_at_once)
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
 							use_color = use_color_tinrc;
+							/* without color turn off word_highlighting */
+							if (!use_color) {
+								word_highlight = word_highlight_tinrc = FALSE;
+								word_h_display_marks = TRUE;
+								if (OPT_WORD_HIGHLIGHT_TINRC > first_option_on_screen && OPT_WORD_HIGHLIGHT_TINRC < first_option_on_screen + option_lines_per_page) {
+									MoveCursor (INDEX_TOP + (OPT_WORD_HIGHLIGHT_TINRC - 1) % option_lines_per_page, 3);
+									print_option (OPT_WORD_HIGHLIGHT_TINRC);
+								}
+								if (OPT_WORD_H_DISPLAY_MARKS > first_option_on_screen && OPT_WORD_H_DISPLAY_MARKS < first_option_on_screen + option_lines_per_page) {
+									MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
+									print_option (OPT_WORD_H_DISPLAY_MARKS);
+								}
+							}
+							break;
+
+						case OPT_WORD_HIGHLIGHT_TINRC:
+							if (!use_color) {
+								word_highlight = word_highlight_tinrc = FALSE;
+								MoveCursor (INDEX_TOP + (OPT_WORD_HIGHLIGHT_TINRC - 1) % option_lines_per_page, 3);
+								print_option (OPT_WORD_HIGHLIGHT_TINRC);
+							}
+							/* without word_highlighting turn off highlight_mark stripping */
+							if (!word_highlight) {
+								word_h_display_marks = TRUE;
+								if (OPT_WORD_H_DISPLAY_MARKS > first_option_on_screen && OPT_WORD_H_DISPLAY_MARKS < first_option_on_screen + option_lines_per_page) {
+									MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
+									print_option (OPT_WORD_H_DISPLAY_MARKS);
+								}
+							}
+							break;
+
+						case OPT_WORD_H_DISPLAY_MARKS:
+							if (!word_highlight_tinrc) {
+								word_h_display_marks = TRUE;
+								MoveCursor (INDEX_TOP + (OPT_WORD_H_DISPLAY_MARKS - 1) % option_lines_per_page, 3);
+								print_option (OPT_WORD_H_DISPLAY_MARKS);
+							}
 							break;
 #endif
-
 						/*
 						 * the following do not need further action (if I'm right)
 						 *
@@ -1431,10 +1458,10 @@ change_config_file (group, filter_at_once)
 							proc_ch_default = get_post_proc_type (default_post_proc_type);
 							break;
 
-			    			/*
-	    					 * the following don't need any further action (if i'm right)
-	    					 *
+						/*
+						 * the following don't need any further action
 #ifdef HAVE_COLOR
+						 *
 						 * case OPT_COL_BACK:		case OPT_COL_FROM:
 						 * case OPT_COL_HEAD:		case OPT_COL_HELP:
 						 * case OPT_COL_INVERS:		case OPT_COL_MESSAGE:
@@ -1442,9 +1469,11 @@ change_config_file (group, filter_at_once)
 						 * case OPT_COL_QUOTE:		case OPT_COL_RESPONSE:
 						 * case OPT_COL_SIGNATURE:	case OPT_COL_SUBJECT:
 						 * case OPT_COL_TEXT:		case OPT_COL_TITLE:
-						 * case OPT_COL_MARKSTAR:	case OPT_WORD_HIGHLIGHT:
+						 * case OPT_COL_MARKSTAR:
 						 * case OPT_COL_MARKDASH:
+						 *
 #endif
+						 *
 						 * case OPT_DEFAULT_SHOW_AUTHOR:	case OPT_DEFAULT_SORT_ART_TYPE:
 						 *	break;
 						 */

@@ -1297,7 +1297,7 @@ post_response (group, respnum, copy_text)
 		/* note that comparing newsgroups and followup-to isn't
 		   really correct, since the order of the newsgroups may be
 		   different, but testing that also isn't really worth
-		   it. The main culprit for this problem is tin <=1.22, BTW.
+		   it. The main culprit for the duplication is tin <=1.22, BTW.
 		 */
 		MoveCursor (cLINES / 2, 0);
 		CleartoEOS();
@@ -3012,6 +3012,8 @@ find_reply_to_addr (respnum, from_addr)
 	fseek (note_fp, 0L, 0);
 
 	while (fgets (buf, sizeof (buf), note_fp) != (char *) 0 && buf[0] != '\n') {
+		/* not quite correct, since we don't process continuation
+		   lines, but that is unlikely */
 		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (replyto, &buf[10]);
 			ptr = strchr (replyto, '\n');
@@ -3029,9 +3031,9 @@ find_reply_to_addr (respnum, from_addr)
 	}
 
 	if (found_replyto) {
-		strcpy (from_addr, replyto);
+		strcpy (from_addr, rfc1522_decode(replyto));
 	} else {
-		strcpy (from_addr, from);
+		strcpy (from_addr, rfc1522_decode(from));
 	}
 	fseek (note_fp, orig_offset, 0);
 #endif

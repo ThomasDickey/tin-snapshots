@@ -61,7 +61,7 @@ bld_tline (l, art)
 			len_from = max_from - 3;
 			len_from += 8 * (1 - show_lines);
 			len_subj = (max_subj+off_subj) - 5;
-			spaces = "   ";
+			spaces = "  ";
 		} else {
 			len_from = 0;
 			len_subj = (max_from+max_subj+off_subj) - 5;
@@ -141,8 +141,8 @@ draw_tline (i, full)
 		}
 	} else {
 		tlen  = 3;
-		s = &screen[j].col[6];
-		x = 6;
+		s = &screen[j].col[7];
+		x = 7;
 	}
 
 	MoveCursor(INDEX2LNUM(i), x);
