@@ -637,7 +637,7 @@ dump_msgid_threads()
  */
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || \
-		(arts[ptr->article].thread >= 0 || arts[ptr->article].killed)))
+		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
 
 static struct t_msgid *
 find_next(ptr)

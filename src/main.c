@@ -612,7 +612,7 @@ update_index_files ()
 					create_index_lock_file (lock_file);
 					process_id = getpid ();
 #ifdef BSD
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__NetBSD__)
 					setsid();
 #else
 #	ifdef __osf__

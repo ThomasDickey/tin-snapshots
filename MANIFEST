@@ -1,7 +1,7 @@
-MANIFEST for tin-1.3-unoff-BETA-961115 (Fri Nov 15 15:53:34 MET 1996)
+MANIFEST for tin-1.3-unoff-BETA-961125 (Mon Nov 25 22:18:21 MET 1996)
 ----------------------------------------------------
-  48312 ./CHANGES
-  12513 ./TODO
+  49056 ./CHANGES
+  12494 ./TODO
    5341 ./Makefile
   17527 ./INSTALL
    2256 ./MANIFEST
@@ -16,7 +16,7 @@ MANIFEST for tin-1.3-unoff-BETA-961115 (Fri Nov 15 15:53:34 MET 1996)
    1330 ./doc/DEBUG_REFS
   12018 ./doc/auth.txt
    1727 ./doc/hashing.doc
-  71236 ./doc/tin.1
+  71521 ./doc/tin.1
    2511 ./include/amiga.h
    2131 ./include/amigatcp.h
    8482 ./include/config.h
@@ -46,15 +46,15 @@ MANIFEST for tin-1.3-unoff-BETA-961115 (Fri Nov 15 15:53:34 MET 1996)
   19301 ./src/feed.c
   39895 ./src/filter.c
   10935 ./src/getline.c
-  41317 ./src/group.c
+  41319 ./src/group.c
    3202 ./src/hashstr.c
    9486 ./src/help.c
   12147 ./src/inews.c
-  29390 ./src/init.c
+  29388 ./src/init.c
   55384 ./src/lang.c
    1739 ./src/list.c
   11984 ./src/mail.c
-  17791 ./src/main.c
+  17820 ./src/main.c
    5124 ./src/makecfg.c
   10990 ./src/memory.c
   47598 ./src/misc.c
@@ -63,15 +63,15 @@ MANIFEST for tin-1.3-unoff-BETA-961115 (Fri Nov 15 15:53:34 MET 1996)
   26409 ./src/nntplib.c
   31349 ./src/nntpw32.c
    6134 ./src/nrctbl.c
-  27609 ./src/open.c
+  28687 ./src/open.c
    6246 ./src/os_2.c
   35728 ./src/page.c
   24090 ./src/parsdate.y
    6524 ./src/pgp.c
-  75458 ./src/post.c
+  75707 ./src/post.c
    9044 ./src/prompt.c
     160 ./src/proto.sed
-  22391 ./src/refs.c
+  22400 ./src/refs.c
    8731 ./src/rfc1521.c
   17478 ./src/rfc1522.c
   33655 ./src/save.c
@@ -88,8 +88,8 @@ MANIFEST for tin-1.3-unoff-BETA-961115 (Fri Nov 15 15:53:34 MET 1996)
    6281 ./src/xref.c
    5556 ./src/vms.c
    7163 ./include/autoconf.hin
-  10793 ./src/Makefile.in
+  10962 ./src/Makefile.in
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3507 ./src/tincfg.tbl
-1575010 total
+1577554 total

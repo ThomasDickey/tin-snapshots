@@ -17,6 +17,7 @@
 #include	"version.h"
 
 #ifdef NNTP_ABLE
+static FILE * extract_groups_from_newsrc P_((void));
 static int authorization P_((char *server, char *authuser));
 #endif
 
@@ -338,6 +339,41 @@ open_mailgroups_fp ()
 	return fopen (mailgroups_file, "r");
 }
 
+/*
+ * If reading via NNTP, allow the special case where the user's telling us to
+ * read the groups in .newsrc file, and to suppress the check for new groups.
+ * This won't detect the flag for moderated newsgroups, but will greatly speed
+ * up reading news over a slow line.
+ *
+ * see: read_groups_descriptions(), which reads this data.
+ */
+#ifdef NNTP_ABLE
+static FILE *
+extract_groups_from_newsrc()
+{
+	FILE *ifp, *ofp;
+	char buf[LEN];
+	char *p;
+
+	if ((ifp = fopen(newsrc, "r")) != 0) {
+		if ((ofp = fopen(local_newsgroups_file, "w")) != 0) {
+			while (fgets (buf, sizeof (buf), ifp) != 0) {
+				for (p = buf; *p && !isspace(*p); p++)
+					;
+				p[-1] = '\n';
+				p[0]  = '\0';
+				fputs(buf, ofp);
+			}
+			fclose(ifp);
+			fclose(ofp);
+			read_local_newsgroups_file = TRUE;
+			return fopen (local_newsgroups_file, "r");
+		}
+		fclose(ifp);
+	}
+	return 0;
+}
+#endif
 
 /*
  * If reading via NNTP the newsgroups file will be saved to ~/.tin/newsgroups
@@ -353,6 +389,9 @@ open_newsgroups_fp ()
 		if (read_local_newsgroups_file) {
 			debug_nntp ("open_newsgroups_fp", "Using local copy of newsgroups file");
 			return fopen (local_newsgroups_file, "r");
+		} else if (newsrc_active && !check_for_new_newsgroups) {
+			debug_nntp ("open_newsgroups_fp", "Using info in .newsrc");
+			return extract_groups_from_newsrc();
 		} else {
 			put_server ("list newsgroups");
 			if (get_respcode () != OK_GROUPS) {

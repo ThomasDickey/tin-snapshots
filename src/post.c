@@ -1691,7 +1691,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 		if (mail_to_poster) {
 			do {
 				sprintf (msg, txt_quit_edit_send,
-					 cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
+					cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
 				wait_message (msg);
 				MoveCursor (cLINES, (int) (strlen (msg) - 1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
@@ -1858,6 +1858,8 @@ mail_bug_report ()
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (nam, start_line_offset);
+				if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+					subject[0] = '\0';
 				break;
 
 #ifdef HAVE_ISPELL
@@ -1902,7 +1904,8 @@ mail_bug_report ()
 				}
 		}
 		do {
-			sprintf (msg, "%s: %c", txt_quit_edit_send, ch_default);
+			sprintf (msg, txt_quit_edit_send,
+				cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg) - 1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
@@ -2035,6 +2038,8 @@ mail_to_author (group, respnum, copy_text)
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (nam, start_line_offset);
+				if (!pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
+					subject[0] = '\0';
 				redraw_screen = TRUE;
 				break;
 
@@ -2081,7 +2086,8 @@ mail_to_author (group, respnum, copy_text)
 		}
 
 		do {
-			sprintf (msg, "%s: %c", txt_quit_edit_send, ch_default);
+			sprintf (msg, txt_quit_edit_send,
+				cCOLS - strlen (txt_quit_edit_send) + 4, subject, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (msg) - 1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')

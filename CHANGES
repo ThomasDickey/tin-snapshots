@@ -1,3 +1,28 @@
+--unoff BETA release 961125 --
+
+222) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. (unread)article counter was 'wrong'
+     FIX. group.c
+
+221) Bernd Ernesti <erbe0011@fh-karlsruhe.de>
+     ADD. little code-cleanup (NetBSD)
+     FIX. main.c
+
+220) Thomas E. Dickey <dickey@clark.net>
+     ADD. extend the -n/-q options so that tin doesn't ask the nntp
+          server for the newsgroups file.
+          Some cleanup (and mods that let me build on Linux using the --srcdir
+          option).
+     FIX. tin.1, Makefile[.in], init.c, open.c
+
+219) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. still some assertion faults...
+     FIX. refs.c
+
+218) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. patch 215 wasn't complete
+     FIX. post.c
+
 --unoff BETA release 961115 --
 
 217) Thomas E. Dickey <dickey@clark.net>
@@ -1221,7 +1246,7 @@ L11) Roland Rosenfeld <roland@spinnaker.rhein.de>
 L10) Greg Berigan <gberigan@cse.unl.edu>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. -DNO_ETIQUETTE to stop printing posting-etiquette
-     ADD. -DFORGERIE to allow superseding and cancelling
+     ADD. -DFORGERY to allow superseding and cancelling
           (newsadmins only!)
      ADD. 'i' at group-selection-level to show group description
      ADD. xpost_quote_format

@@ -95,11 +95,19 @@ via a slow line.
 .TP
 .BI -q
 quick start without checking for new newsgroups.
+.sp
+Combine \fB-n\fR and \fB-q\fR for best speedup when only reading (not posting).
+In this case,
+\fItin\fP will use the contents of \fI$HOME/.newsrc\fP to obtain the list of
+newsgroups rather than asking the server.
+This is fast, but \fItin\fP cannot tell which groups are moderated.
 .TP
 .BI -P
-purge group index files of articles that no longer exist. Care should
+purge group index files of articles that no longer exist.
+Care should
 be taken when using this command as it checks each and every article
-in each group that is accessed. On a low speed connection this can
+in each group that is accessed.
+On a low speed connection this can
 have an undesirable effect and it also knocks the hell out of your 
 filesystem.
 .TP

@@ -196,7 +196,7 @@ Not yet classified
 ------------------
 o  on some AIX mail (f.e. /usr/bin/mail) prints out an error (but the mail
    is sent)
-   (maybe this is related to a missing -DRS6000 in the Makefile)
+   (add -DRS6000 in the Makefile to fix this)
 
 o  move all strings to lang.c
 
