@@ -508,9 +508,16 @@ set_win_size (
 
 	RIGHT_POS = *num_cols - 20;
 	MORE_POS  = *num_cols - 15;
-	NOTESLINES = *num_lines - INDEX_TOP - (tinrc.beginner_level ? MINI_HELP_LINES : 1);
-	if (NOTESLINES <= 0)
-		NOTESLINES = 1;
+	set_noteslines (*num_lines);
 
 	return (*num_lines != old_lines || *num_cols != old_cols);
+}
+
+void
+set_noteslines (
+	int num_lines)
+{
+	NOTESLINES = num_lines - INDEX_TOP - (tinrc.beginner_level ? MINI_HELP_LINES : 1);
+	if (NOTESLINES <= 0)
+		NOTESLINES = 1;
 }

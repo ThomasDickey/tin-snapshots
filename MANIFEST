@@ -1,4 +1,4 @@
-MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
+MANIFEST for tin-1.4.5 (Mon Dec 18 16:35:49 CET 2000)
 ----------------------------------------------------
   10365 ./Makefile
    5413 ./MANIFEST
@@ -14,7 +14,7 @@ MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
    4765 ./install.sh
   11873 ./makefile.in
     777 ./mkdirs.sh
-   6296 ./doc/CHANGES
+   6703 ./doc/CHANGES
  153544 ./doc/CHANGES.old
    1469 ./doc/DEBUG_REFS
   30564 ./doc/INSTALL
@@ -42,7 +42,7 @@ MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
   13172 ./include/menukeys.h
    5170 ./include/nntplib.h
    3083 ./include/policy.h
-  25585 ./include/proto.h
+  25629 ./include/proto.h
    2212 ./include/stpwatch.h
    2736 ./include/tcurses.h
   57871 ./include/tin.h
@@ -56,7 +56,7 @@ MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
   11074 ./src/auth.c
    8974 ./src/charset.c
    6947 ./src/color.c
-  63168 ./src/config.c
+  63426 ./src/config.c
   26938 ./src/curses.c
   11967 ./src/debug.c
    2335 ./src/envarg.c
@@ -96,7 +96,7 @@ MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
   10329 ./src/search.c
   35125 ./src/select.c
    6655 ./src/sigfile.c
-  11041 ./src/signal.c
+  11113 ./src/signal.c
    5800 ./src/strftime.c
   10478 ./src/string.c
    8278 ./src/tcurses.c
@@ -210,4 +210,4 @@ MANIFEST for tin-1.4.5 (Tue Nov 21 15:23:43 CET 2000)
   22297 ./libcanlock/doc/rfc2104.txt
   11942 ./libcanlock/doc/rfc2202.txt
   11843 ./libcanlock/doc/rfc2286.txt
-3273898 total
+3274679 total

@@ -29,6 +29,7 @@
 #endif /* !MENUKEYS_H */
 
 static void expand_rel_abs_pathname (int line, int col, char *str);
+static void redraw_screen (int option);
 static void show_config_page (void);
 
 #ifdef HAVE_COLOR
@@ -1343,6 +1344,17 @@ refresh_config_page (
 	last_option = act_option;
 }
 
+static void
+redraw_screen (
+	int option)
+{
+	my_retouch ();
+	set_xclick_off ();
+	ClearScreen ();
+	show_config_page ();
+	highlight_option (option);
+}
+
 /*
  *  options menu so that the user can dynamically change parameters
  */
@@ -1519,11 +1531,7 @@ change_config_file (
 				break;
 
 			case iKeyRedrawScr:	/* redraw screen */
-				my_retouch ();
-				set_xclick_off ();
-				ClearScreen ();
-				show_config_page ();
-				highlight_option (option);
+				redraw_screen (option);
 				break;
 
 			default:
@@ -1547,7 +1555,7 @@ change_config_file (
 						/* show mini help menu */
 						case OPT_BEGINNER_LEVEL:
 							if (!bool_equal(tinrc.beginner_level, original_on_off_value))
-								(void) set_win_size (&cLINES, &cCOLS);
+								set_noteslines (cLINES);
 							break;
 
 						/* show all arts or just new/unread arts */
@@ -1598,7 +1606,7 @@ change_config_file (
 							show_description = tinrc.show_description;
 							if (show_description) {			/* force reread of newgroups file */
 								read_newsgroups_file ();
-								clear_message ();
+								redraw_screen (option);
 							} else
 								set_groupname_len (FALSE);
 
@@ -1768,15 +1776,17 @@ change_config_file (
 
 						case OPT_NEWS_HEADERS_TO_DISPLAY:
 							prompt_option_string (option);
-							free (*news_headers_to_display_array);
-							free (news_headers_to_display_array);
+							if (news_headers_to_display_array)
+								FreeIfNeeded (*news_headers_to_display_array);
+							FreeIfNeeded ((char *) news_headers_to_display_array);
 							news_headers_to_display_array = ulBuildArgv(tinrc.news_headers_to_display, &num_headers_to_display);
 							break;
 
 						case OPT_NEWS_HEADERS_TO_NOT_DISPLAY:
 							prompt_option_string (option);
-							free (*news_headers_to_not_display_array);
-							free (news_headers_to_not_display_array);
+							if (news_headers_to_not_display_array)
+								FreeIfNeeded (*news_headers_to_not_display_array);
+							FreeIfNeeded ((char *) news_headers_to_not_display_array);
 							news_headers_to_not_display_array = ulBuildArgv(tinrc.news_headers_to_not_display, &num_headers_to_not_display);
 							break;
 
@@ -1908,6 +1918,7 @@ change_config_file (
 			} /* switch (option_table[option].var_type) */
 			change_option = FALSE;
 			show_menu_help (txt_select_config_file_option);
+			RepaintOption (option);
 		} /* if (change_option) */
 	} /* forever */
 	/* NOTREACHED */
