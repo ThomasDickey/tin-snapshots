@@ -217,7 +217,7 @@ constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
 #if defined(HAVE_POLL) || defined(HAVE_SELECT)
 	constext txt_group[] = "Group %.*s ('q' to quit)... ";
 #else
-	constext txt_group[] = "Group %*s... ";
+	constext txt_group[] = "Group %.*s... ";
 #endif /* HAVE_POLL || HAVE_SELECT */
 
 constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
@@ -787,7 +787,7 @@ constext txt_reading_article[] = "Reading ('q' to quit)... ";
 constext txt_reading_arts[] = "Reading %sarticles...";
 constext txt_reading_attributes_file[] = "Reading %sattributes file...\n";
 constext txt_reading_config_file[] = "Reading %sconfig file...\n";
-constext txt_reading_filter_file[] = "Reading %sfilter file...\n";
+constext txt_reading_filter_file[] = "Reading filter file...\n";
 constext txt_reading_input_history_file[] = "Reading input history file...\n";
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)

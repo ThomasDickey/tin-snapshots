@@ -1,3 +1,58 @@
+-- 1.4.3 release 20000428 "Marian" --
+
+022) Urs Janssen <urs@tin.org>
+     BUG. patch 014 turned strings into lowercase
+     FIX. proto.h, misc.c, page.c, post.c, string.c, wildmat.c
+
+021) Urs Janssen <urs@tin.org>
+     BUG. removed unsupported o from TIN_EDIT_KEYS_EXT
+     FIX. post.c
+
+020) Ralf Doeblitz <doeblitz@gmx.de>
+     BUG. missing gnksa initialization for add_posted_to_filter
+     FIX. filter.c
+
+019) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. don't MIME encode headers when using external mail client
+          (use_mailreader_i)
+     BUG. close several potential security holes (buffer overruns) in
+          strfmailer()
+     BUG. "\x" sequences (x != '\0', 'n') in default_mailer_format got
+          replaced by "%x"
+     FIX. TODO, misc.c
+
+018) Park Chong-Dae <cdpark@jupiter.kaist.ac.kr>
+     Urs Janssen <urs@tin.org>
+     BUG. Do not GNKSA-test for FORGERY cancels
+     FIX. inews.c, post.c
+
+017) Roland Rosenfeld <roland@spinnaker.de>
+     BUG. under special conditions filter entries got duplicated
+     REM. global filter
+     FIX. extern.h, proto.h, filter.c, init.c, lang.c, main.c
+
+016) Roland Rosenfeld <roland@spinnaker.de>
+     BUG. change line offset when editing filter from 22 to 25.
+     FIX. filter.c
+
+015) Urs Janssen <urs@tin.org>
+     ADD. smater check wehen quotes around realnames are needed
+     FIX. header.c
+
+014) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. Sender: errors on posting hung NNTP socket
+     BUG. possible buffer overrun in the wildmat code
+     FIX. inews.c, wildmat.c
+
+013) Urs Janssen <urs@tin.org>
+     BUG. terminal mode wasn't restored after -Z
+     BUG. tin -v -Z was a bit too verbose
+     FIX. art.c, filter.c main.c
+
+012) Hideaki Yoshfuji <yoshfuji@ecei.tohoku.ac.jp>
+     BUG. memory-leakage (ensure do a freeanameinfo()).
+     FIX. nntplib.c
+
 -- 1.4.2 release 20000205 "Possession" --
 
 011) Urs Janssen <urs@tin.org>

@@ -39,12 +39,6 @@ o  multiple calls of '/' are 'corrupting' the previous page-pointer
    position again, IMHO this is useful) or just go up one page?
    [Dirk Nimmich <nimmich@uni-muenster.de>]
 
-o  strfmailer() calls rfc1522_encode() for Subject/To even with
-   use_mailreader_i=ON (not very useful as modern mail-readers
-   also try to mime-encode these line which would lead to a double encoded
-   subject (with inner encoding 'broken' due to escape_shell_meta() call
-   in strfmailer())
-
 o  Defaults values etc. changed during quick_post_article() aren't saved
    due to the no_write logic in main.c
 
@@ -276,9 +270,7 @@ o  A system-wide tinrc configuration file, the $HOME/.tin/tinrc need only
    Maybe a file which could be used to force settings (eg inews & mailer)
    (tin.defaults [--with-defaults-dir] is a start)
 
-o  - remove global filter file (TIN_LIBDIR/filter) as you don't know which
-     patter-matching-style the user has defined
-   - think about removing global attributes files (TIN_LIBDIR/attributes)
+o  - think about removing global attributes files (TIN_LIBDIR/attributes)
    - move global files (TIN_LIBDIR/tinrc, TIN_LIBDIR/attributes) to
      TIN_DEFAULTS_DIR
 

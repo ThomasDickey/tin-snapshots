@@ -55,7 +55,6 @@ char default_signature[PATH_LEN];
 char domain_name[MAXHOSTNAMELEN];
 char global_attributes_file[PATH_LEN];
 char global_config_file[PATH_LEN];
-char global_filter_file[PATH_LEN];
 char homedir[PATH_LEN];
 char host_name[MAXHOSTNAMELEN];
 char index_maildir[PATH_LEN];
@@ -65,7 +64,7 @@ char inewsdir[PATH_LEN];
 char libdir[PATH_LEN];			/* directory where news config files are (ie. active) */
 char local_attributes_file[PATH_LEN];
 char local_config_file[PATH_LEN];
-char local_filter_file[PATH_LEN];
+char filter_file[PATH_LEN];
 char local_input_history_file[PATH_LEN];
 char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
 char local_newsrctable_file[PATH_LEN];
@@ -149,10 +148,9 @@ t_bool dangerous_signal_exit;		/* no get_respcode() in nntp_command when dangero
 #endif /* INDEX_DAEMON */
 t_bool disable_gnksa_domain_check;	/* disable checking TLD in From: etc. */
 t_bool disable_sender;			/* disable generation of Sender: header */
-t_bool global_filtered_articles;	/* globally killed / auto-selected articles */
 t_bool got_sig_pipe = FALSE;
 t_bool in_headers;			/* color in headers */
-t_bool local_filtered_articles;		/* locally killed / auto-selected articles */
+t_bool filtered_articles;		/* locally killed / auto-selected articles */
 t_bool local_index;			/* do private indexing? */
 t_bool mail_news;			/* mail all arts to specified user */
 t_bool list_active;
@@ -601,8 +599,7 @@ init_selfinfo (
 #endif /* INDEX_DAEMON */
 	disable_gnksa_domain_check = FALSE;
 	disable_sender = FALSE;
-	global_filtered_articles = FALSE;
-	local_filtered_articles = FALSE;
+	filtered_articles = FALSE;
 	iso2asc_supported = atoi (get_val ("ISO2ASC", DEFAULT_ISO2ASC));
 	if (iso2asc_supported > NUM_ISO_TABLES)
 		iso2asc_supported = 0;
@@ -745,11 +742,6 @@ init_selfinfo (
 	/* FIXME: we'd better use TIN_DEFAULTS_DIR instead of TIN_LIBDIR here */
 	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
 	joinpath (global_config_file, libdir, CONFIG_FILE);
-	/*
-	 * FIXME: as we don't know which patternmatzching style the user
-	 * has defined a global filter file is useless
-	 */
-	joinpath (global_filter_file, libdir, FILTER_FILE);
 
 #ifdef VMS
 	joindir (rcdir, homedir, RCDIR); /* we're naming a directory here */
@@ -817,7 +809,7 @@ init_selfinfo (
 		my_mkdir (index_savedir, (mode_t)S_IRWXUGO);
 	joinpath (local_attributes_file, rcdir, ATTRIBUTES_FILE);
 	joinpath (local_config_file, rcdir, CONFIG_FILE);
-	joinpath (local_filter_file, rcdir, FILTER_FILE);
+	joinpath (filter_file, rcdir, FILTER_FILE);
 	joinpath (local_input_history_file, rcdir, INPUT_HISTORY_FILE);
 	joinpath (local_newsrctable_file, rcdir, NEWSRCTABLE_FILE);
 	joinpath (local_newsgroups_file, rcdir, NEWSGROUPS_FILE);

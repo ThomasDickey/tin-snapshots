@@ -236,11 +236,9 @@ main (
 	 * because the filters will be updated.
 	 */
 #ifndef INDEX_DAEMON
-	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
-	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
+	filtered_articles = read_filter_file (filter_file);
 #else
-	global_filtered_articles = TRUE;
-	local_filtered_articles = TRUE;
+	filtered_articles = TRUE;
 #endif /* !INDEX_DAEMON */
 
 #ifdef DEBUG
@@ -806,6 +804,8 @@ check_for_any_new_news (
 
 	if (CheckAnyUnread) {
 		i = check_start_save_any_news (CHECK_ANY_NEWS);
+		cursoron();
+		Raw (FALSE);
 		exit (i);
 	}
 
