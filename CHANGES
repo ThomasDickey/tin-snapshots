@@ -1,3 +1,25 @@
+--950824BETA  PLMC.960608 --
+
+066) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minimum code clean up (__hpux)
+     FIX. nntplib.c, pgp.c
+
+065) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. signature coloring
+     FIX. several supplied patches
+
+064) Chris Blum <chris@phil.uni-sb.de>
+     ADD. better alogorithm for mime-encoding =sequences or not
+     ADD. forged-cancel warning
+     FIX. several suppiled patches
+
+063) Sven Paulus <sven@oops.sub.de>
+     BUG. FIDO-style quoting via mail does not work
+     FIX. post.c
+
+--950824BETA  PLMC.960607 --
+
 062) Chris Blum <chris@phil.uni-sb.de>
      ADD. mm_charset default if env is not set
      FIX. rfc1522.c
@@ -5,7 +27,7 @@
 --950824BETA  PLMC.960606 --
 
 061) Daniel Naber <dnaber@pluto.teuto.de>
-     ADD. so coloring below sigdashes
+     ADD. no quote-coloring below sigdashes
      FIX. page.c
 
 060) Chris Blum <chris@phil.uni-sb.de>
@@ -105,7 +127,7 @@
 
 --950824BETA  PLMC.960521 --
 
-042) Jason Faultless (jason@radar.demon.co.uk)
+042) Jason Faultless <jason@radar.demon.co.uk>
      ADD. Initial implementation of references based threading.
           See refs.c for more information, TODO etc..
           o Can be set on Options Menu

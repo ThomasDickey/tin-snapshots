@@ -296,10 +296,14 @@ get_tcp_socket (machine, service, port)
 #ifdef NNTP_ABLE
 	int	s = -1;
 	struct	sockaddr_in sin;
+	
+/* hp-ux 8.0, 9.05, 10.10 don't need it...
 #ifdef __hpux
 	int	socksize = 0;
 	int	socksizelen = sizeof (socksize);
 #endif
+*/
+
 #ifdef TLI 
 	struct	hostent *gethostbyname (), *hp;
 	struct	t_call	*callptr;

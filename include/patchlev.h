@@ -18,50 +18,25 @@
 /* This is NO official release, but a patched version.
  * Including patches from:
  *
- *	T.E. Dickey <dickey@clark.net>
- *		autoconf
+ * 	Greg Berigan		<gberigan@cse.unl.edu>
+ * 	Enrik Berkhan		<enrik@akk.uni-karlsruhe.de>
+ *	Juergen Bernau		<pas@freitag.muc.de>
+ * 	Chris Blum		<chris@phil.uni-sb.de>
+ *	Giuseppe De Marco	<gdemarco@freenet.hut.fi>
+ *	T.E. Dickey		<dickey@clark.net>
+ *	Bernd Eckenfels		<ecki@lina.inka.de>
+ *	Jason Faultless		<jason@radar.demon.co.uk>
+ *	Ulli Horlacher		<framstag@moep.bb.bawue.de>
+ * 	Urs Janssen		<urs@akk.uni-karlsruhe.de>
+ *	Olaf Kaluza		<olaf@criseis.ruhr.de>
+ *	Daniel Naber		<dnaber@pluto.teuto.de>
+ *	Seven Paulus		<sven@oops.sub.de>
+ *	Branden Robinson	<branden@purdue.edu>
+ *	Roland Rosenfeld	<roland@spinnaker.rhein.de>
+ * 	Stefan Scholl		<stesch@sks.inka.de>
  *
- * 	Chris Blum <chris@phil.uni-sb.de>
- *		MIME support & minor bugfixes/customasations
- *
- * 	Greg Berigan <gberigan@cse.unl.edu>
- *		skip quoted text & show lines
- *		show newsgroup description 
- *
- *	Roland Rosenfeld <roland@spinnaker.rhein.de>
- *	Olaf Kaluza <olaf@criseis.ruhr.de>
- *	Giuseppe De Marco <gdemarco@freenet.hut.fi>
- *		color support
- *		bugfixes
- *
- *	Jason Faultless <jason@radar.demon.co.uk>
- *		reference-based-threading
- *		post_process_command
- *		bugfixes
- *
- *	Seven Paulus <sven@oops.sub.de>
- *		FIDO support
- *
- * 	Enrik Berkhan <enrik@akk.uni-karlsruhe.de>
- * 	Urs Janssen <urs@akk.uni-karlsruhe.de>
- *		bugfixes & customasations
- *
- *	Branden Robinson <branden@purdue.edu>
- *		bugfixes
- *
- *	Juergen Bernau <pas@freitag.muc.de>
- *		minor bugfix
- *
- *	Daniel Naber <dnaber@pluto.teuto.de>
- *		minor bugfix
- *
- * 	Stefan Scholl <stesch@sks.inka.de>
- *		minor bugfix
- *
- *	Bernd Eckenfels <ecki@lina.inka.de>
- *		minor bugfix
  */
-#define PATCHLEVEL	"MC.960607"
+#define PATCHLEVEL	"MC.960608"
 
 #ifdef M_AMIGA
 #	define	OS	"AMIGA"

@@ -30,6 +30,7 @@ extern char note_h_date[PATH_LEN];			/* Date:	*/
 extern char note_h_xcommentto[LEN];			/* X-Comment-To: (Used by FIDO)	*/
 
 #ifdef FORGERY
+extern char note_h_from[LEN];				/* From: */
 extern char note_h_org[PATH_LEN];			/* Organization: */
 extern char note_h_keywords[LEN];			/* Keywords: */
 extern char note_h_summary[LEN];			/* Summary: */
@@ -1414,6 +1415,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 	char ch_default = iKeyPostSend;
 	char buf[LEN];
 	char mail_to[LEN];
+	char initials[64];
 	FILE *fp;
 	int redraw_screen = FALSE;
 
@@ -1477,7 +1479,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 			}
 		}
 		fseek (note_fp, note_mark[0], 0);
-		copy_fp (note_fp, fp, quote_chars);
+		get_initials(respnum, initials, sizeof (initials));
+		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
 		fseek (note_fp, 0L, 0);
 		copy_fp (note_fp, fp, "");
@@ -1748,6 +1751,7 @@ mail_to_author (group, respnum, copy_text)
 	char nam[100];
 	char mail_to[LEN];
 	char subject[PATH_LEN];
+	char initials[64];
 	char ch, ch_default = iKeyPostSend;
 	FILE *fp;
 	int lines = 0;
@@ -1803,7 +1807,8 @@ mail_to_author (group, respnum, copy_text)
 			}
 		}
 		fseek (note_fp, note_mark[0], 0);
-		copy_fp (note_fp, fp, quote_chars);
+		get_initials(respnum, initials, sizeof (initials));
+		copy_body (note_fp, fp, quote_chars, initials);
 	} else {
 		fprintf(fp, "\n"); /* add a newline to keep vi from bitching */
 	}
@@ -2002,6 +2007,8 @@ delete_article (group, art)
 #endif
 	FILE *fp;
 	int redraw_screen = FALSE;
+	int init = TRUE;
+	int oldraw;
 
 	msg_init_headers ();
 
@@ -2093,7 +2100,27 @@ delete_article (group, art)
 	redraw_screen = TRUE;
 #else	
 	fclose (fp);
-#endif
+#endif /* FORGERY */
+
+	oldraw = RawState();
+	setup_check_article_screen(&init);
+
+#ifdef FORGERY
+	if (!author) {
+		fprintf(stderr,txt_warn_cancel_forgery);
+		fprintf(stderr,"From: %s\n",note_h_from);
+	} else {
+		fprintf(stderr,txt_warn_cancel);
+	}
+#else
+	fprintf(stderr,txt_warn_cancel);
+#endif /* FORGERY */
+	
+	fprintf(stderr,"Subject: %s\n",note_h_subj);
+	fprintf(stderr,"Date: %s\n",note_h_date);
+	fprintf(stderr,"Message-ID: %s\n",note_h_messageid);
+	fprintf(stderr,"Newsgroups: %s\n",note_h_newsgroups);
+	Raw(oldraw);
 	
 	forever {
 		do {

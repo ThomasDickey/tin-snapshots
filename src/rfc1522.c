@@ -3,7 +3,7 @@
  *  Module    : rfc1522.c
  *  Author    : Chris Blum <chris@phil.uni-sb.de>
  *  Created   : September '95
- *  Updated   : 27-05-96
+ *  Updated   : 08-06-96
  *  Notes     : MIME header encoding/decoding stuff
  *  Copyright : (c) Copyright 1995-96 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
@@ -18,10 +18,6 @@
 				 * encoding. THIS IS NOT YET IMPLEMENTED,
 				 * so leave this off
 				 */
-
-#define MIME_ALWAYS_ENCODE_EQUAL /* make sure such funny subjects like
-				  * =?ISO-8859-1?Q?T=E4st?= work.
-				  */
 
 #ifndef RFCDEBUG
 #include "tin.h"
@@ -58,13 +54,10 @@ const char base64_alphabet[64] = {
   'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
   'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
   'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
-  'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
-};
+  'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/' };
 static unsigned char base64_rank[256];
 static int base64_rank_table_built;
-
 static int quoteflag;
-
 
 void
 build_base64_rank_table()
@@ -246,7 +239,7 @@ contains_nonprintables(w)
 {
 #ifdef MIME_BASE64_ALLOWED	
 	int chars=0;
-	int equalsigns=0;
+	int schars=0;
 #endif
 	int nonprint=0;
 
@@ -255,19 +248,17 @@ contains_nonprintables(w)
   	
 	/* then check the next word */
 	while (*w&&!isspace(*w)&&*w!='('&&*w!=')') {
-		if (*w<32||*w>127) nonprint=1;
-#ifdef MIME_ALWAYS_ENCODE_EQUAL
-		if (*w=='=') nonprint=1;
-#endif
+		if (*w<32||*w>127) nonprint++;
+		if (!nonprint && *w=='=' && *(w+1)=='?') nonprint=1;
 #ifdef MIME_BASE64_ALLOWED
-		if (*w=='=') equalsigns++;
+		if (*w=='=' || *w=='?') schars++;
 		chars++;
 #endif		
 		w++;
   	}
 	if (nonprint) {
 #ifdef MIME_BASE64_ALLOWED
-		if (chars+2*(nonprint+equalsigns) /* QP size */ >
+		if (chars+2*(nonprint+schars) /* QP size */ >
 		   (chars*4+3)/3 /* B64 size */) return 'B';
 #endif
 		return 'Q';

@@ -14,6 +14,7 @@
 
 #include	"tin.h"
 
+char note_h_from[LEN];			/* From:         */
 char note_h_path[LEN];			/* Path:         */
 char note_h_date[PATH_LEN];		/* Date:         */
 char note_h_subj[LEN];			/* Subject:      */
@@ -747,11 +748,7 @@ show_note_page (group, respnum)
 {
 #ifndef INDEX_DAEMON
 
-	/* *** */
-	char firstchars[4];
-	char sigstart[] = "-- ";                /* + \n !!!! */
-	int below_sig = FALSE;
-	/* *** */
+	int below_sig;			/* are we in the signature? */
 	
 	char buf3[2*LEN+200];
 	int ctrl_L = FALSE;		/* form feed character detected */
@@ -798,9 +795,9 @@ show_note_page (group, respnum)
 #endif
 
 	if (skip_include) note_page--;
-	/* *** */
-	below_sig = FALSE;
-	/* *** */
+
+	below_sig = FALSE;				/* begin of article -> not in signature */
+
 	while (note_line < lines) {
 		note_mark[note_page+1] = ftell (note_fp);
 		if (show_last_line_prev_page) {
@@ -824,13 +821,9 @@ print_a_line:
 			StartInverse ();
 		}	
 
-        	/* *** */
-        	strncpy(firstchars, buf2, 4);
-        	firstchars[3] = (char) '\0';
-		if( ! strcmp(firstchars, sigstart) )
-			below_sig = TRUE;
-		/* *** */
-                                                                                                        
+		if ( ! strcmp (buf2, "-- ") )
+			below_sig = TRUE;			/* begin of signature */	
+
 		strip_line (buf2, strlen (buf2));
 		
 		if (tex2iso_supported && tex2iso_article) {
@@ -849,14 +842,12 @@ print_a_line:
 			if (first_char != skip_include) {
 				skip_include = '\0';
 #ifdef HAVE_COLOR
-				/* *** */
 				if( ! below_sig )
 					print_color(buf2);
 				else {
-					fcol(col_text);
+					fcol(col_signature);
 					printf ("%s\r\n", buf2);
 				}
-				/* *** */
 #else
 				printf ("%s\r\n", buf2);
 #endif
@@ -865,14 +856,12 @@ print_a_line:
 			}
 		} else {
 #ifdef HAVE_COLOR
-			/* *** */
 			if( ! below_sig )
 				print_color(buf2);
 			else {
-				fcol(col_text);
+				fcol(col_signature);
 				printf ("%s\r\n", buf2);
 			}
-			/* *** */
 #else
 			printf ("%s\r\n", buf2);
 #endif
@@ -1241,6 +1230,7 @@ art_open (art, group_path)
 		return (ART_UNAVAILABLE);
 	}
 
+	note_h_from[0] = '\0';
 	note_h_path[0] = '\0';
 	note_h_subj[0] = '\0';
 	note_h_org[0] = '\0';
@@ -1286,6 +1276,8 @@ art_open (art, group_path)
   			lasthead = note_h_path;
   			continue;
 		}
+		if (match_header (buf, "From", note_h_from, LEN))
+			continue;
   		if (match_header (buf, "Subject", note_h_subj, LEN))
   			continue;
   		if (match_header (buf, "Organization", note_h_org, PATH_LEN))
@@ -1297,8 +1289,6 @@ art_open (art, group_path)
   			continue;
 		}
   		if (match_header (buf, "Message-ID", note_h_messageid, PATH_LEN))
-  			continue;
-  		if (match_header (buf, "Message-Id", note_h_messageid, PATH_LEN))
   			continue;
   		if (match_header (buf, "References", note_h_references, LEN)) {
 			lasthead = note_h_references;
