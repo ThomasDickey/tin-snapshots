@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 960617
+PVER		= 960618
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -199,10 +199,18 @@ tar:
 	@$(LS) $(PROJECT)$(VER).tgz
 
 dist:
-	@$(MAKE) chmod
 	@$(MAKE) manifest
+	@$(MAKE) chmod
 	@$(MAKE) tar
 
+distclean:
+	@$(MAKE) clean
+	@$(RM) -f config.*
+	@$(RM) -f $(INCDIR)/autoconf.h
+	@$(RM) -f $(SRCDIR)/Makefile
+	@$(RM) -f td-conf.out makefile
+	@$(MAKE) configure
+	
 configure: configure.in aclocal.m4
 	autoconf
 

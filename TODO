@@ -1,8 +1,15 @@
 Bugs
 ----
-o  'f'uping includes a Followup-To: line with the same newsgroups as in the
-    Newsgroups line - ok - but if the Followup-To: line is not edited, it is
-    included in the posting *argh*
+o  mailing an article with editig the subject in the editor shows you the
+   old subject after leaving the editor :-( , but uses the new one :)
+
+o  Followup-To: line is not examined wether the mentioned group(s) are valid
+   on this server (btw. with nntp_only & tin -n this feature is useless
+   cause it may lead to wrong results (on the other hand, posting in a
+   newsgroup which one insn't subscribed to is not very usefull))
+
+o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
+   is examined wether it contains several groups...
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 

@@ -30,7 +30,7 @@ info_message (str)
 #endif
 	center_line (cLINES, FALSE, str);	/* center the message at screen bottom */
 #ifdef HAVE_COLOR
-	fcol(col_text);
+	fcol(col_normal);
 #endif
 	if (! cmd_line) {
 		MoveCursor (cLINES, 0);
@@ -48,7 +48,7 @@ wait_message (str)
 #endif
 	my_fputs (str, stdout);
 #ifdef HAVE_COLOR
-	fcol(col_text);
+	fcol(col_normal);
 #endif
 	cursoron ();
 	fflush (stdout);

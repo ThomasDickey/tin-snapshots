@@ -41,6 +41,8 @@ extern char note_h_contentenc[LEN];			/* Content-Transfer-Encoding: */
 extern FILE *note_fp;					/* the body of the current article */
 extern long note_mark[MAX_PAGES];			/* ftells on beginnings of pages */
 
+char found_newsgroups[LEN];
+
 int unlink_article = TRUE;
 int keep_dead_articles = TRUE;
 int keep_posted_articles = TRUE;
@@ -432,6 +434,7 @@ check_article_to_be_posted (article, art_type, lines)
 				errors++;
 				continue;
 			}
+			strip_double_ngs (cp);
 			while (*cp) {
 				if (! (cp2 = strchr (cp, ','))) {
 					cp2 = cp + strlen (cp);
@@ -1873,7 +1876,7 @@ mail_to_author (group, respnum, copy_text)
 			 && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 				sprintf (msg, txt_mailing_to, mail_to);
 				wait_message (msg);
-				insert_x_headers (nam, lines);
+				checknadd_headers (nam, lines);
 				rfc15211522_encode(nam);
 				strfmailer (mailer, subject, mail_to, nam, 
 					buf, sizeof (buf), default_mailer_format);
@@ -2494,9 +2497,46 @@ msg_add_x_body (fp_out, body)
 	return wrote;
 }
 
+void
+modify_headers (line)
+	char *line;
+{
+
+	char 	buf[LEN];
+	char	*chr;
+	char	*chr2;
+		
+	if (strncasecmp(line, "Newsgroups: ", 12) == 0) {
+		chr = strpbrk(line, "\t ");
+		while ((strchr("\t ", *chr)) != (char *) 0) {
+			chr++;
+		}
+		chr2 = strchr(chr, '\n');
+		*chr2 = '\0';
+		strip_double_ngs(chr);
+		strcpy(found_newsgroups, chr);
+		sprintf(line, "Newsgroups: %s\n", found_newsgroups);
+	}
+	if (strncasecmp(line, "Followup-To: ", 11) ==  0) {
+		chr = strpbrk(line, "\t ");
+		while ((strchr("\t ", *chr)) != (char *) 0) {
+			chr++;
+		}
+		chr2 = strchr(chr, '\n');
+		*chr2 = '\0';
+		strip_double_ngs(chr);
+		strcpy(buf, chr);
+		if ((*found_newsgroups == '\0') || (strcasecmp(found_newsgroups, buf))) {
+			sprintf(line, "Followup-To: %s\n", buf);
+		} else {
+			*line = '\0';
+		}
+	}
+}		
+	
 
 void
-insert_x_headers (infile, lines)
+checknadd_headers (infile, lines)
 	char *infile;
 	int   lines;
 {
@@ -2511,6 +2551,7 @@ insert_x_headers (infile, lines)
 #else
 		sprintf (outfile, "%s.%d", infile, process_id);
 #endif
+		*found_newsgroups = '\0';
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				if (! gotit && line[0] == '\n') {
@@ -2531,8 +2572,11 @@ insert_x_headers (infile, lines)
 					}
 					gotit = TRUE;
 				} else {
-					fputs (line, fp_out); 
-				}	
+					if (!gotit) {
+						modify_headers(line);
+					}
+					fputs (line, fp_out);
+				}
 			}
 			fclose (fp_out);
 			fclose (fp_in);

@@ -1,7 +1,23 @@
+--unoff BETA release 960618 --
+
+088) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. distclean target to toplevel Makefile
+     FIX. Makefile
+
+087) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. col_text was used when col_normal should be used
+     REM. '&' no longer toggles use_color in tinrc
+     FIX. several supplied patches
+
+086) Sven Paulus <sven@oops.sub.de>
+     BUG. tin generated identical Newsgroups: and Followup-To: lines
+     ADD. a little information on the top of ~/.tin/tinrc
+     FIX. post.c, inews.c, proto.h, config.c
+
 --unoff BETA release 960617 --
 
 085) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. not dot in news.`cat $INEWS_DOMAIN`
+     BUG. no dot in news.`cat $INEWS_DOMAIN`
      FIX. configure[.in]
 
 084) Sven Paulus <sven@oops.sub.de>
