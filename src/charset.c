@@ -233,7 +233,7 @@ ConvertTeX2Iso (from, to)
 		i = subst_len = ex = 0;
 		while ((i < TEX_SUBST) && !ex) {
 			subst_len = strlen (tex_from[i]);
-			if (! strncmp (from + col, tex_from[i], subst_len)) {
+			if (!strncmp (from + col, tex_from[i], subst_len)) {
 				strcat (to, tex_to[i]);
 				spaces += subst_len - 1;
 				col += subst_len - 1;
@@ -241,7 +241,7 @@ ConvertTeX2Iso (from, to)
 			}
 			i++;
 		}
-		if (! ex)
+		if (!ex)
 			strncat (to, from + col, 1);
 		if (from[col] == ' ') {
 			strncat (to, SPACES, spaces);
@@ -272,7 +272,7 @@ iIsArtTexEncoded (art, group_path)
 		if (line[0] == '\n') {
 			body = TRUE;
 		}
-		if (! body) {
+		if (!body) {
 			continue;
 		}
 
@@ -280,7 +280,7 @@ iIsArtTexEncoded (art, group_path)
 		while (line[i++] == ' ')
 			;  /* search for first non blank */
 		i--;
-		if (! isalnum(line[i])) {
+		if (!isalnum(line[i])) {
 			continue;  /*quoting char */
 		}
 

@@ -70,7 +70,7 @@ get_nntpserver (nntpserver_name, nick_name)
 		while ((fgets(line, sizeof(line), fp) != NULL) && (!found)) {
 			line_entry_counter = 0;
 
-			if (! strchr("# ;", line[0])) {
+			if (!strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL : line, " \t\n")) != NULL) {
 					line_entry_counter++;
 
@@ -114,16 +114,16 @@ get_newsrcname (newsrc_name, nntpserver_name)
 		while ((fgets(line, sizeof(line), fp) != NULL) && (found != 1)) {
 			line_entry_counter = 0;
 
-			if (! strchr("# ;", line[0])) {
+			if (!strchr("# ;", line[0])) {
 				while ((line_entry = strtok(line_entry_counter ? NULL :line, " \t\n")) != NULL) {
 					line_entry_counter++;
 
-					if ((line_entry_counter == 1) && (! strcasecmp(line_entry, nntpserver_name))) {
+					if ((line_entry_counter == 1) && (!strcasecmp(line_entry, nntpserver_name))) {
 						found = 1;
 						do_cpy = 1;
 					}
 
-					if ((line_entry_counter ==1 ) && ((! strcasecmp(line_entry, "default")) || (! strcmp(line_entry,"*")))) {
+					if ((line_entry_counter ==1) && ((!strcasecmp(line_entry, "default")) || (!strcmp(line_entry,"*")))) {
 						found = 2;
 						do_cpy =1;
 					}
@@ -140,7 +140,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			char	dir[PATH_LEN];
 			char    tmp_newsrc[PATH_LEN];
 
-			if (! strfpath (name_found, tmp_newsrc, sizeof (tmp_newsrc),
+			if (!strfpath (name_found, tmp_newsrc, sizeof (tmp_newsrc),
 				homedir, (char *) 0, (char *) 0, (char *) 0)) {
 					fprintf (stderr, "couldn't expand %s\n", name_found);
 					error=1;
@@ -153,7 +153,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			strcpy (dir, newsrc_name);
 			*strrchr (dir, '/') = (char) 0;
 
-			if (! error) {
+			if (!error) {
 			/* FIXME - write a global permssion check routine */
 				if (access (dir, X_OK)) {
 					fprintf (stderr, txt_error_no_enter_permission, dir);
@@ -195,7 +195,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 
 					if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 						ch = default_ch;
-				} while (! strchr ("\033cdiq", ch));
+				} while (!strchr ("\033cdiq", ch));
 
 				switch(ch) {
 					case iKeyNrctblCreate:

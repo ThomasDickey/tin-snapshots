@@ -116,7 +116,7 @@ restart:
 
 		if (ch >= '0' && ch <= '9') {
 			n = which_thread (respnum);
-			if (! num_of_responses (n)) {
+			if (!num_of_responses (n)) {
 				info_message (txt_no_responses);
 			} else {
 				n = prompt_response (ch, respnum);
@@ -250,7 +250,7 @@ end_of_article:
 			case iKeyPagePageDown2:
 			case iKeyPagePageDown3:
 page_down:
-				if (! space_goto_next_unread) {
+				if (!space_goto_next_unread) {
 					if (note_page != ART_UNAVAILABLE) {
 						if (note_end) {
 							art_close();
@@ -288,7 +288,7 @@ page_down:
 page_goto_next_unread:
 				skip_include = '\0';
 				if (note_page != ART_UNAVAILABLE) {
-					if (! (tab_goto_next_unread || note_end)) {
+					if (!(tab_goto_next_unread || note_end)) {
 						show_note_page (group->name, respnum);
 						break;
 					}
@@ -442,10 +442,10 @@ page_up:
 
 			case iKeyPageCatchup:	/* catchup - mark all articles as read */
 			case iKeyPageCatchupGotoNext:	/* and goto next group */
-				if (! confirm_action || prompt_yn (cLINES, txt_mark_all_read, TRUE) == 1) {
+				if (!confirm_action || prompt_yn (cLINES, txt_mark_all_read, TRUE) == 1) {
 					grp_mark_read (group, arts);
 					ret_code = (ch == iKeyPageCatchupGotoNext ? GRP_CONTINUE : GRP_UNINDEXED);
-					if (! (cur_groupnum + 1 < group_top)) {
+					if (!(cur_groupnum + 1 < group_top)) {
 						ret_code = GRP_UNINDEXED;
 					}
 					art_close ();
@@ -454,8 +454,8 @@ page_up:
 				}
 				break;
 
-			case iKeyPageDelete:	/* delete an article */
-				if (delete_article (group, &arts[respnum], respnum)) {
+			case iKeyPageCancel:	/* delete an article */
+				if (cancel_article (group, &arts[respnum], respnum)) {
 					redraw_page (group->name, respnum);
 				}
 				break;
@@ -469,7 +469,7 @@ page_up:
 
 			case iKeyPageFollowupQuote:	/* post a followup to this article */
 			case iKeyPageFollowup:
-				if (! can_post) {
+				if (!can_post) {
 					info_message (txt_cannot_post);
 					break;
 				}
@@ -819,7 +819,7 @@ print_a_line:
 			StartInverse ();
 		}
 
-		if ( ! strcmp (buf2, "-- ") )
+		if (!strcmp (buf2, "-- "))
 			below_sig = TRUE;			/* begin of signature */
 
 		strip_line (buf2, strlen (buf2));
@@ -840,7 +840,7 @@ print_a_line:
 			if (first_char != skip_include) {
 				skip_include = '\0';
 #ifdef HAVE_COLOR
-				if ( ! below_sig )
+				if (!below_sig)
 					print_color(buf2);
 				else {
 					fcol(col_signature);
@@ -854,7 +854,7 @@ print_a_line:
 			}
 		} else {
 #ifdef HAVE_COLOR
-			if ( ! below_sig )
+			if (!below_sig)
 				print_color(buf2);
 			else {
 				fcol(col_signature);
@@ -877,7 +877,7 @@ print_a_line:
 		}
 	}
 
-	if (! show_last_line_prev_page) {
+	if (!show_last_line_prev_page) {
 		note_mark[++note_page] = ftell (note_fp);
 	} else {
 		note_page++;
@@ -974,7 +974,7 @@ show_first_header (respnum, group)
 	ClearScreen ();
 
 	tm = localtime (&arts[respnum].date);
-	if (! my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S", tm)) {
+	if (!my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S", tm)) {
 		strcpy (buf, note_h_date);
 	}
 
@@ -1257,17 +1257,17 @@ art_open (art, group_path)
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
 		      && strlen(buf)<sizeof(buf)-1) {
 			if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
-				if (! is_summary) {
+				if (!is_summary) {
 				  buf[strlen(buf)-1]='\0';
 				}
 			}
 		fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
 		}
 
-		for (ptr = buf ; *ptr && ((*ptr!='\n') || (ptr[1]!='\0')); ptr++) {
+		for (ptr = buf ; *ptr && ((*ptr != '\n') || (ptr[1] != '\0')); ptr++) {
 			if ((((*ptr) & 0xFF) < ' ') 
-				&& (*ptr!='\n') 
-				&& ((*ptr!='\t') || (!is_summary)))
+				&& (*ptr != '\n') 
+				&& ((*ptr != '\t') || (!is_summary)))
 				*ptr = ' ';
 		}
 		*ptr = '\0';
@@ -1325,7 +1325,7 @@ art_open (art, group_path)
 	/*
 	 * If Newsgroups is empty its a good bet the article is a mail article
 	 */
-	if (! note_h_newsgroups[0]) {
+	if (!note_h_newsgroups[0]) {
 		strcpy (note_h_newsgroups, group_path);
 		while ((ptr = strchr (note_h_newsgroups, '/'))) {
 			*ptr = '.';
@@ -1424,7 +1424,7 @@ show_last_page ()
 		fseek (note_fp, tmp_pos, 0);	/* goto old position */
 	}
 
-	while (! note_end) {
+	while (!note_end) {
 		note_line = 1;
 
 		if (note_page == 0) {
@@ -1451,7 +1451,7 @@ show_last_page ()
 			note_end = TRUE;
 			note_page--;
 			break;
-		} else if (! note_end) {
+		} else if (!note_end) {
 			note_mark[++note_page] = ftell(note_fp);
 		}
 	}
@@ -1475,7 +1475,7 @@ int decode;
 	while (*source) {
 		if (*source!= 1) {
 			*c++ = *source++;
-			if (! --count) break;
+			if (!--count) break;
 		}
 		else source++;
 	}

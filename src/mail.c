@@ -29,7 +29,7 @@ read_mail_active_file ()
 	long	count = -1L, h;
 	long	min, max;
 
-	if ((update && update_fork) || ! update) {
+	if ((update && update_fork) || !update) {
 		wait_message (txt_reading_mail_active_file);
 	}
 
@@ -53,7 +53,7 @@ read_mail_active_file ()
 printf ("Line=[%s", buf);
 fflush(stdout);
 */
-		if (! parse_active_line (buf, &max, &min, spooldir) || *buf == '\0') {
+		if (!parse_active_line (buf, &max, &min, spooldir) || *buf == '\0') {
 			continue;
 		}
 
@@ -107,7 +107,7 @@ read_mail_active_continue:;
 	}
 	fclose (fp);
 
-	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
+	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
 }
@@ -164,7 +164,7 @@ read_mailgroups_file ()
 
 		fclose (fp);
 
-		if (cmd_line && ! update && ! verbose) {
+		if (cmd_line && !(update || verbose)) {
 			wait_message ("\n");
 		}
 	}
@@ -190,7 +190,7 @@ read_newsgroups_file ()
 	wait_message (txt_reading_newsgroups_file);
 
 	if ((fp = open_newsgroups_fp ()) != (FILE *) 0) {
-		if (read_news_via_nntp && ! read_local_newsgroups_file) {
+		if (read_news_via_nntp && !read_local_newsgroups_file) {
 #ifdef VMS
 			fp_save = fopen (local_newsgroups_file, "w", "fop=cif");
 #else
@@ -208,7 +208,7 @@ read_newsgroups_file ()
 		}
 	}
 
-	if (cmd_line && ! update && ! verbose) {
+	if (cmd_line && !(update || verbose)) {
 		wait_message ("\n");
 	}
 #endif	/* INDEX_DAEMON */
@@ -261,7 +261,7 @@ read_groups_descriptions (fp, fp_save)
 			if (psGrp->type == GROUP_TYPE_NEWS) {
 				if (fp_save != (FILE *) 0 &&
 				    read_news_via_nntp &&
-				    ! read_local_newsgroups_file) {
+				    !read_local_newsgroups_file) {
 					fprintf (fp_save, "%s\n", buf);
 				}
 			}
@@ -527,7 +527,7 @@ vGrpDelMailArts (psGrp)
    the active[] entry for the group and rewrite the mail.active file
 */
 #ifndef NNTP_ONLY
-		if ((! read_news_via_nntp) && iUpdateIndexFile) {
+		if ((!read_news_via_nntp) && iUpdateIndexFile) {
 			vWriteNovFile (psGrp);
 		}
 #endif /* !NNTP_ONLY */

@@ -120,7 +120,7 @@ check_start_save_any_news (check_start_save)
 	for (i = 0; i < group_top; i++) {
 		group = &active[my_group[i]];
 		make_group_path (group->name, group_path);
-		if (! index_group (group)) {
+		if (!index_group (group)) {
 			continue;
 		}
 		print_group = TRUE;
@@ -162,7 +162,7 @@ check_start_save_any_news (check_start_save)
 						if (check_start_save == MAIL_ANY_NEWS) {
 							sprintf (savefile, "%stin.%d", TMPDIR, process_id);
 						} else {
-							if (! strfpath (group->attribute->savedir,
+							if (!strfpath (group->attribute->savedir,
 							    path, sizeof (path), homedir, (char *) 0,
 							    (char *) 0, group->name)) {
 								joinpath (path, homedir, DEFAULT_SAVEDIR);
@@ -209,7 +209,7 @@ check_start_save_any_news (check_start_save)
 						if (check_start_save == MAIL_ANY_NEWS) {
 							strfmailer (mailer, arts[j].subject, mail_news_user,
 								savefile, buf, sizeof (buf), default_mailer_format);
-							if (! invoke_cmd (buf)) {
+							if (!invoke_cmd (buf)) {
 								error_message (txt_command_failed_s, buf);
 							}
 							unlink (savefile);
@@ -266,7 +266,7 @@ check_start_save_any_news (check_start_save)
 				strfmailer (mailer, subject,
 					(check_start_save == MAIL_ANY_NEWS ? mail_news_user : userid),
 					logfile, buf, sizeof (buf), default_mailer_format);
-				if (! invoke_cmd (buf)) {
+				if (!invoke_cmd (buf)) {
 					error_message (txt_command_failed_s, buf);
 				}
 			}
@@ -307,7 +307,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 	file = save_filename (i);
 	strcpy (mode, "a+");
 
-	if (! save[i].is_mailbox) {
+	if (!save[i].is_mailbox) {
 		if (stat (file, &st) != -1) {
 			ch_default = default_save_mode;
 			do {
@@ -317,7 +317,7 @@ save_art_to_file (respnum, indexnum, the_mailbox, filename)
 				MoveCursor (cLINES, (int) strlen (buf));
 				if ((ch = (char) ReadCh ()) == '\n' || ch == '\r')
 					ch = ch_default;
-			} while (! strchr ("aoq\033", ch));
+			} while (!strchr ("aoq\033", ch));
 			switch (ch) {
 				case iKeySaveAppendFile:
 					strcpy (mode, "a+");
@@ -469,7 +469,7 @@ save_regex_arts (is_mailbox, group_path)
 		}
 	}
 
-	if (! num_save) {
+	if (!num_save) {
 		info_message (txt_no_match);
 	} else {
 		if (is_mailbox) {
@@ -523,7 +523,7 @@ create_path (path)
 	if (path[0] == '=') {
 		mbox_format = TRUE;
 		strcpy (tmp, path);
-		if (! strfpath (active[i].attribute->maildir, buf, sizeof (buf),
+		if (!strfpath (active[i].attribute->maildir, buf, sizeof (buf),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
 #ifdef VMS
 			joindir  (buf, homedir, DEFAULT_MAILDIR);
@@ -537,8 +537,8 @@ create_path (path)
 		sprintf (path, "%s/dummy", buf);
 #endif
 	} else {
-		if (! strchr ("~$=+/.", path[0])) {
-			if (! strfpath (active[i].attribute->savedir, buf, sizeof (buf),
+		if (!strchr ("~$=+/.", path[0])) {
+			if (!strfpath (active[i].attribute->savedir, buf, sizeof (buf),
 			    homedir, (char *) 0, (char *) 0, active[i].name)) {
 #ifdef VMS
 				joindir (buf, homedir, DEFAULT_SAVEDIR);
@@ -604,7 +604,7 @@ create_sub_dir (i)
 	char dir[LEN];
 	struct stat st;
 
-	if (! save[i].is_mailbox && save[i].archive) {
+	if (!save[i].is_mailbox && save[i].archive) {
 		joinpath (dir, save[i].dir, save[i].archive);
 		if (stat (dir, &st) == -1) {
 			my_mkdir (dir, 0755);
@@ -687,7 +687,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 		}
 
 		i = my_group[cur_groupnum];
-		if (! strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
+		if (!strfpath (active[i].attribute->maildir, tmp, sizeof (tmp),
 		    homedir, (char *) 0, (char *) 0, active[i].name)) {
 #ifdef VMS
 			joindir (tmp, homedir, DEFAULT_MAILDIR);
@@ -758,7 +758,7 @@ add_to_save_list (the_index, the_article, is_mailbox, archive_save, path)
 			save[num_save].dir = str_dup (dir);
 		} else {
 			i = my_group[cur_groupnum];
-			if (! strfpath (active[i].attribute->savedir, tmp, sizeof (tmp),
+			if (!strfpath (active[i].attribute->savedir, tmp, sizeof (tmp),
 			    homedir, (char *) 0, (char *) 0, active[i].name)) {
 #ifdef VMS
 				joindir (tmp, homedir, DEFAULT_SAVEDIR);
@@ -867,7 +867,7 @@ save_filename (i)
 		return (filename);
 	}
 
-	if (! default_auto_save || (! save[i].part && ! save[i].patch)) {
+	if (!default_auto_save || (!(save[i].part || save[i].patch))) {
 		joinpath (filename, save[i].dir, save[i].file);
 		if (num_save != 1) {
 #ifdef VMS
@@ -1099,7 +1099,7 @@ post_process_uud (pp, auto_delete)
 	open_out_file = TRUE;
 
 	for (i=0 ; i < num_save ; i++) {
-		if (! save[i].saved) {
+		if (!save[i].saved) {
 			continue;
 		}
 		if (open_out_file) {
@@ -1120,7 +1120,7 @@ post_process_uud (pp, auto_delete)
 			while (state != END) {
 				switch (state) {
 					case INITIAL:
-						if (! strncmp ("begin ", s, 6)) {
+						if (!strncmp ("begin ", s, 6)) {
 							state = MIDDLE;
 							fprintf (fp_out, "%s", s);
 						}
@@ -1250,7 +1250,7 @@ uudecode_file (pp, file_out_dir, file_out)
 			if (*post_proc_command) {
 				sprintf (buf, "cd %s; %s %s", file_out_dir, post_proc_command, file);
 
-				if (! invoke_cmd (buf))
+				if (!invoke_cmd (buf))
 					error_message (txt_command_failed_s, buf);
 			}
 
@@ -1264,7 +1264,7 @@ uudecode_file (pp, file_out_dir, file_out)
 						archiver[i].name, archiver[i].test, file);
 					printf (txt_testing_archive, file);
 					fflush (stdout);
-					if (! invoke_cmd (buf)) {
+					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
 				}
@@ -1277,7 +1277,7 @@ uudecode_file (pp, file_out_dir, file_out)
 						archiver[i].name, archiver[i].list, file);
 					printf (txt_listing_archive, file);
 					fflush (stdout);
-					if (! invoke_cmd (buf)) {
+					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
 					sleep (3);
@@ -1291,7 +1291,7 @@ uudecode_file (pp, file_out_dir, file_out)
 						archiver[i].name, archiver[i].extract, file);
 					printf (txt_extracting_archive, file);
 					fflush (stdout);
-					if (! invoke_cmd (buf)) {
+					if (!invoke_cmd (buf)) {
 						error_message (txt_post_processing_failed, "");
 					}
 					sleep (3);
@@ -1328,7 +1328,7 @@ post_process_sh (auto_delete)
 	int found_header;
 	int i, j;
 
-	strcpy (sh_pattern_1, "#! /bin/sh");
+	strcpy (sh_pattern_1, "#!/bin/sh");
 	strcpy (sh_pattern_2, "#!/bin/sh");
 	strcpy (sh_pattern_3, "# This is a shell archive.");
 
@@ -1352,7 +1352,7 @@ post_process_sh (auto_delete)
 #endif
 
 	for (j=0 ; j < num_save ; j++) {
-		if (! save[j].saved) {
+		if (!save[j].saved) {
 			continue;
 		}
 		my_strncpy (file_in, save_filename (j), sizeof (file_in));
@@ -1372,12 +1372,12 @@ post_process_sh (auto_delete)
 				ptr2 = sh_pattern_2;
 				ptr3 = sh_pattern_3;
 
-				while (! feof (fp_in)) {
+				while (!feof (fp_in)) {
 					if (fgets (buf, sizeof buf, fp_in)) {
 						/*
-						 *  find #!/bin/sh or #! /bin/sh pattern
+						 *  find #!/bin/sh or #!/bin/sh pattern
 						 */
-						if (! found_header) {
+						if (!found_header) {
 							if (strstr (buf, ptr1) != 0 ||
 								strstr (buf, ptr2) != 0 ||
 								strstr (buf, ptr3) != 0) {

@@ -45,7 +45,7 @@ read_newsrc (newsrc_file, allgroups)
 	/*
 	 * make a .newsrc if one does'nt exist & auto subscribe to set groups
 	 */
-	if (! stat_file (newsrc_file)) {
+	if (!stat_file (newsrc_file)) {
 		create_newsrc (newsrc_file);
 		auto_subscribe_groups (newsrc_file);
 	}
@@ -55,7 +55,7 @@ read_newsrc (newsrc_file, allgroups)
 	}
 
 	if ((fp = fopen (newsrc_file, "r")) != (FILE *) 0) {
-		if ((update && update_fork) || ! update) {
+		if ((update && update_fork) || !update) {
 			wait_message (txt_reading_newsrc);
 		}
 		while ((line = getaline (fp)) != (char *) 0) {
@@ -307,7 +307,7 @@ subscribe (group, sub_state)
 				free (line);
 			}
 			fclose (fp);
-			if (! found) {
+			if (!found) {
 				fprintf (newfp, "%s%c\n", group->name, sub_state);
 				group->subscribed = sub_state;
 			}
@@ -385,7 +385,7 @@ delete_group (group)
 			while ((line = getaline (fp)) != (char *) 0) {
 				seq = pcParseNewsrcLine (line, grp, &sub);
 
-				if (! STRCMPEQ(grp, group)) {
+				if (!STRCMPEQ(grp, group)) {
 					fprintf (newfp, "%s%c %s\n", grp, sub, seq);
 				}
 				free (line);
@@ -944,7 +944,7 @@ pos_group_in_newsrc (group, pos)
 	fclose (fp_in);
 	fp_in = NULL;
 
-	if (! found) {
+	if (!found) {
 		goto rewrite_group_done;
 	}
 #endif /* !VMS */
@@ -977,7 +977,7 @@ pos_group_in_newsrc (group, pos)
 
 		subscribed_pos++;
 	}
-	if (! repositioned) {
+	if (!repositioned) {
 		vWriteNewsrcLine(fp_out,newsgroup);
 		repositioned = TRUE;
 	}

@@ -464,7 +464,7 @@ show_mini_help (level)
 {
 	int line;
 
-	if (! beginner_level) {
+	if (!beginner_level) {
 		return;
 	}
 

@@ -109,7 +109,7 @@ void set_signal_handlers ()
 	signal (SIGWINCH, main_resize);
 #endif
 
-#if defined(SIGTSTP) && ! defined(MINIX)
+#if defined(SIGTSTP) && !defined(MINIX)
 	{
 		RETSIGTYPE (*ptr)(SIG_ARGS);
 		ptr = signal (SIGTSTP, SIG_DFL);
@@ -173,7 +173,7 @@ void _CDECL signal_handler (sig)
 		case SIGINT:
 			sigtext = "SIGINT ";
 #	if !defined(M_AMIGA) && !defined(__SASC)
-			if (! update) {
+			if (!update) {
 				signal (SIGINT, signal_handler);
 				return;
 			}
@@ -451,7 +451,7 @@ void art_suspend (sig)
 
 	sigdisp (SIGTSTP, art_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		art_resize (0);
 	}
@@ -473,7 +473,7 @@ void main_suspend (sig)
 
 	sigdisp (SIGTSTP, main_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		main_resize (0);
 	}
@@ -495,7 +495,7 @@ void select_suspend (sig)
 
 	sigdisp (SIGTSTP, select_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		select_resize (0);
 	}
@@ -517,7 +517,7 @@ void group_suspend (sig)
 
 	sigdisp (SIGTSTP, group_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		group_resize (0);
 	}
@@ -539,7 +539,7 @@ void help_suspend (sig)
 
 	sigdisp (SIGTSTP, help_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		help_resize (0);
 	}
@@ -561,7 +561,7 @@ void page_suspend (sig)
 
 	sigdisp (SIGTSTP, page_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		page_resize (0);
 	}
@@ -583,7 +583,7 @@ void thread_suspend (sig)
 
 	sigdisp (SIGTSTP, thread_suspend);
 
-	if (! update) {
+	if (!update) {
 		Raw (TRUE);
 		thread_resize (0);
 	}

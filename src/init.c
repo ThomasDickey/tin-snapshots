@@ -320,7 +320,7 @@ void init_selfinfo ()
 		my_strncpy (homedir, ptr, sizeof (homedir));
 	} else if ((ptr = getenv ("HOME")) != (char *) 0) {
 		my_strncpy (homedir, ptr, sizeof (homedir));
-	} else if (! myentry) {
+	} else if (!myentry) {
 		strcpy (homedir, "/tmp");
 	} else {
 		my_strncpy (homedir, myentry->pw_dir, sizeof (homedir));
@@ -567,7 +567,7 @@ void init_selfinfo ()
 	joinpath (global_attributes_file, libdir, ATTRIBUTES_FILE);
 	joinpath (global_config_file, libdir, CONFIG_FILE);
 	joinpath (global_filter_file, libdir, FILTER_FILE);
-	if (! index_newsdir[0]) {
+	if (!index_newsdir[0]) {
 #ifdef VMS
 		joindir (index_newsdir, get_val ("TIN_INDEX_NEWSDIR", rcdir), INDEX_NEWSDIR);
 #else
@@ -800,7 +800,7 @@ int create_mail_save_dirs ()
 	char path[PATH_LEN];
 	struct stat sb;
 
-	if (! strfpath (default_maildir, path, sizeof (path),
+	if (!strfpath (default_maildir, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
 		joinpath (path, homedir, DEFAULT_MAILDIR);
 	}
@@ -809,7 +809,7 @@ int create_mail_save_dirs ()
 		created = TRUE;
 	}
 
-	if (! strfpath (default_savedir, path, sizeof (path),
+	if (!strfpath (default_savedir, path, sizeof (path),
 	    homedir, (char *) 0, (char *) 0, (char *) 0)) {
 		joinpath (path, homedir, DEFAULT_SAVEDIR);
 	}

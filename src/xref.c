@@ -125,13 +125,13 @@ art_mark_xref_read (art)
 /*			check_bitmap (psGrp); */
 			if (artnum >= psGrp->newsrc.xmin && artnum <= psGrp->xmax) {
 			    artread = (NTEST(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin) == ART_READ ? TRUE : FALSE);
-				if (! artread) {
+				if (!artread) {
 					NSET0(psGrp->newsrc.xbitmap, artnum - psGrp->newsrc.xmin);
 					if (psGrp->newsrc.num_unread > 0) {
 						psGrp->newsrc.num_unread--;
 					}
 					if (debug == 3) {
-						sprintf (msg, "FOUND! Xref: [%s:%ld] marked READ num_unread=[%ld]",
+						sprintf (msg, "FOUND!Xref: [%s:%ld] marked READ num_unread=[%ld]",
 							group, artnum, psGrp->newsrc.num_unread);
 						debug_print_comment (msg);
 						debug_print_bitmap (psGrp, NULL);

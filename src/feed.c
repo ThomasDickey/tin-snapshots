@@ -57,7 +57,6 @@ feed_articles (function, level, group, respnum)
 	int redraw_screen = FALSE;
 	int ret1 = FALSE;
 	int ret2 = FALSE;
-/*	int retcode; */
 	int supersede = FALSE;
 #ifndef FORGERY
 	char from_name[PATH_LEN];
@@ -131,7 +130,7 @@ feed_articles (function, level, group, respnum)
 			if ((ch = ReadCh ()) == '\r' || ch == '\n') {
 				ch = ch_default;
 			}
-		} while (! strchr ("ahpqtT\033", ch));
+		} while (!strchr ("ahpqtT\033", ch));
 	} else {
 		filename[0] = '\0';
 		ch = ch_default;
@@ -145,7 +144,7 @@ feed_articles (function, level, group, respnum)
 
 		case iKeyFeedPat:
 			sprintf (msg, txt_feed_pattern, default_regex_pattern);
-			if (! prompt_string (msg, pattern)) {
+			if (!prompt_string (msg, pattern)) {
 				clear_message ();
 				return;
 			}
@@ -167,7 +166,7 @@ feed_articles (function, level, group, respnum)
 		case FEED_MAIL:
 			sprintf (msg, txt_mail_art_to,
 				cCOLS-(strlen(txt_mail_art_to)+30), default_mail_address);
-			if (! prompt_string (msg, address)) {
+			if (!prompt_string (msg, address)) {
 				clear_message ();
 				return;
 			}
@@ -185,7 +184,7 @@ feed_articles (function, level, group, respnum)
 		case FEED_PIPE:
 			sprintf (msg, txt_pipe_to_command,
 				cCOLS-(strlen(txt_pipe_to_command)+30), default_pipe_command);
-			if (! prompt_string (msg, command)) {
+			if (!prompt_string (msg, command)) {
 				clear_message ();
 				return;
 			}
@@ -231,7 +230,7 @@ feed_articles (function, level, group, respnum)
 				if (function != FEED_SAVE_TAGGED) {
 					sprintf (msg, txt_save_filename, save_file);
 
-					if (! prompt_string (msg, filename)) {
+					if (!prompt_string (msg, filename)) {
 						clear_message ();
 						return;
 					}
@@ -257,7 +256,7 @@ feed_articles (function, level, group, respnum)
 				for (p = filename; *p && (*p == ' ' || *p == '\t'); p++) {
 					continue;
 				}
-				if (! *p) {
+				if (!*p) {
 					info_message (txt_no_filename);
 					return;
 				}
@@ -287,7 +286,7 @@ feed_articles (function, level, group, respnum)
 							MoveCursor (cLINES, (int) strlen (msg)-1);
 							if ((proc_ch = ReadCh ()) == '\n' || proc_ch == '\r')
 								proc_ch = proc_ch_default;
-						} while (! strchr ("eElLnqsu\033", proc_ch));
+						} while (!strchr ("eElLnqsu\033", proc_ch));
 						if (proc_ch == iKeyQuit || proc_ch == iKeyAbort) { /* exit */
 							clear_message ();
 							return;
@@ -312,7 +311,7 @@ feed_articles (function, level, group, respnum)
 					MoveCursor (cLINES, (int) (strlen (msg)-1));
 					if ((option = (char) ReadCh ()) == '\r' || option == '\n')
 						option = option_default;
-				} while (! strchr ("qrs\033", option));
+				} while (!strchr ("qrs\033", option));
 
 				switch (option) {
 					case iKeyFeedSupersede:
@@ -339,7 +338,7 @@ feed_articles (function, level, group, respnum)
 			}
 #endif
 
-			if (! prompt_string (msg, group_name)) {
+			if (!prompt_string (msg, group_name)) {
 				clear_message ();
 				return;
 			}
@@ -362,7 +361,7 @@ feed_articles (function, level, group, respnum)
 	switch (ch) {
 		case iKeyFeedArt:		/* article */
 			if (level == GROUP_LEVEL) {
-				if (! does_article_exist (function, arts[respnum].artnum, group_path)) {
+				if (!does_article_exist (function, arts[respnum].artnum, group_path)) {
 					break;
 				}
 			}
@@ -410,7 +409,7 @@ feed_articles (function, level, group, respnum)
 				if (level == PAGE_LEVEL) {
 					art_close ();
 				}
-				if (! does_article_exist (function, arts[i].artnum, group_path)) {
+				if (!does_article_exist (function, arts[i].artnum, group_path)) {
 					continue;
 				}
 				if (process_only_unread && arts[i].status == ART_READ) {
@@ -465,7 +464,7 @@ feed_articles (function, level, group, respnum)
 						if (level == PAGE_LEVEL) {
 							art_close ();
 						}
-						if (! does_article_exist (function, arts[j].artnum, group_path)) {
+						if (!does_article_exist (function, arts[j].artnum, group_path)) {
 							continue;
 						}
 						switch (function) {
@@ -529,7 +528,7 @@ feed_articles (function, level, group, respnum)
 						if (level == PAGE_LEVEL) {
 							art_close ();
 						}
-						if (! does_article_exist (function, arts[j].artnum, group_path)) {
+						if (!does_article_exist (function, arts[j].artnum, group_path)) {
 							continue;
 						}
 						if (process_only_unread && arts[j].status == ART_READ) {
@@ -590,7 +589,7 @@ feed_articles (function, level, group, respnum)
 		fflush (stdout);
 	}
 
-	if (! use_mailreader_i)
+	if (!use_mailreader_i)
 		redraw_screen = mail_check ();	/* in case of sending to oneself */
 
 	if (debug == 2) {
@@ -605,9 +604,9 @@ got_sig_pipe_while_piping:
 			got_sig_pipe = FALSE;
 #if defined(SIGCHLD) && !defined(RS6000)
 			pclose (fp);
-			/* retcode = */ (void) system_status;
+			(void) system_status;
 #else
-			/* retcode = */ (void) pclose (fp);
+			(void) pclose (fp);
 #endif
 			Raw (TRUE);
 			continue_prompt ();

@@ -199,7 +199,7 @@ invoke_pgp_mail (nam, mail_to)
 {
 	char ch, ch_default = 's';
 
-	if (! pgp_available()) {
+	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return;
 	}
@@ -209,7 +209,7 @@ invoke_pgp_mail (nam, mail_to)
 		MoveCursor(cLINES, (int) strlen(txt_pgp_mail));
 		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 			ch = ch_default;
-	} while (! strchr("beqs\033", ch));
+	} while (!strchr("beqs\033", ch));
 	switch (ch) {
 		case 'b':
 			do_pgp(SIGN | ENCRYPT, nam, mail_to);
@@ -235,7 +235,7 @@ invoke_pgp_news(the_article)
 {
 	char ch, ch_default = 's';
 
-	if (! pgp_available()) {
+	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return;
 	}
@@ -245,7 +245,7 @@ invoke_pgp_news(the_article)
 		MoveCursor(cLINES, (int) strlen(txt_pgp_news));
 		if ((ch = (char) ReadCh()) == '\n' || ch == '\r')
 			ch = ch_default;
-	} while (! strchr("iqs\033", ch));
+	} while (!strchr("iqs\033", ch));
 	switch (ch) {
 		case '\033':
 		case 'q':
@@ -269,7 +269,7 @@ pgp_check_article()
 	char the_article[PATH_LEN], buf[LEN], cmd[LEN];
 	int pgp_signed = 0, pgp_key = 0;
 
-	if (! pgp_available()) {
+	if (!pgp_available()) {
 		info_message(txt_pgp_not_avail);
 		return (0);
 	}
@@ -282,15 +282,15 @@ pgp_check_article()
 	fseek(note_fp, note_mark[0], 0);
 	fgets(buf, LEN, note_fp);
 	while (!feof(note_fp)) {
-		if (! strcmp(buf, PGP_SIG_TAG))
+		if (!strcmp(buf, PGP_SIG_TAG))
 			pgp_signed = 1;
-		if (! strcmp(buf, PGP_KEY_TAG))
+		if (!strcmp(buf, PGP_KEY_TAG))
 			pgp_key = 1;
 		fputs(buf, art);
 		fgets(buf, LEN, note_fp);
 	}
 	fclose(art);
-	if (! pgp_signed && !pgp_key) {
+	if (!(pgp_signed || pgp_key)) {
 		info_message(txt_pgp_nothing);
 		return (0);
 	}

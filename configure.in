@@ -618,6 +618,8 @@ if test -n "$GCC"; then
 elif test -f /sys/dm/dm ; then
   check_sig_const=yes
 elif test -f /sys/dm/spm ; then
+  check_sig_const=yes
+else
   check_sig_const=no
 fi
 

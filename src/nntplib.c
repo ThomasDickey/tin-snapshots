@@ -339,7 +339,7 @@ get_tcp_socket (machine, service, port)
 	memset((char *) &sock_in, '\0', sizeof (sock_in));
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
-	if (! isdigit(*machine) ||
+	if (!isdigit(*machine) ||
 	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
 		if ((hp = gethostbyname (machine)) == NULL) {
 			fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
@@ -415,7 +415,7 @@ get_tcp_socket (machine, service, port)
     sp->s_port = htons (IPPORT_NNTP);
 #endif
 	/* If not a raw ip address, try nameserver */
-	if (! isdigit(*machine) ||
+	if (!isdigit(*machine) ||
 	    (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
@@ -860,7 +860,7 @@ int get_server (char *string, int size)
 		if (errno != EINTR) {
 			netclose(sockt_rd);
 			ring_bell ();
-			if (! prompt_yn (cLINES, txt_reconnect_to_news_server, 'y')) {
+			if (!prompt_yn (cLINES, txt_reconnect_to_news_server, 'y')) {
 				return -1;
 			}
 			clear_message ();

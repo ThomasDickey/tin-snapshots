@@ -89,7 +89,7 @@ build_base64_rank_table ()
 {
 	int i;
 
-	if (! base64_rank_table_built) {
+	if (!base64_rank_table_built) {
 		for (i = 0; i < 256; i++)
 			base64_rank[i] = NOT_RANKED;
 		for (i = 0; i < 64; i++)
@@ -136,7 +136,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 
 		while (*what != delimiter) {
 			if (*what != '=') {
-				if (! delimiter || *what != '_')
+				if (!delimiter || *what != '_')
 					*t++ = *what++;
 				else
 					*t++ = ' ', what++;
@@ -169,7 +169,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 		unsigned char x;
 
 		build_base64_rank_table ();
-		if (! what || !where) {	/* flush */
+		if (!what || !where) {	/* flush */
 			pattern = bits = 0;
 			return 0;
 		}
@@ -199,9 +199,9 @@ get_mm_charset ()
 {
 	char *c;
 
-	if (! mm_charset[0]) {
+	if (!mm_charset[0]) {
 		c = getenv ("MM_CHARSET");
-		if (! c)
+		if (!c)
 			strcpy (mm_charset, MM_CHARSET);
 		else {
 			strncpy (mm_charset, c, 128);
@@ -304,7 +304,7 @@ contains_nonprintables (w)
 	while (*w && !isbetween(*w)) {
 		if (is_EIGHT_BIT(w))
 			nonprint++;
-		if (! nonprint && *w == '=' && *(w + 1) == '?')
+		if (!nonprint && *w == '=' && *(w + 1) == '?')
 			nonprint = TRUE;
 #ifdef MIME_BASE64_ALLOWED
 		if (*w == '=' || *w == '?' || *w == '_')
@@ -316,7 +316,7 @@ contains_nonprintables (w)
 	if (nonprint) {
 #ifdef MIME_BASE64_ALLOWED
 		if (chars + 2 * (nonprint + schars) /* QP size */ >
-		    (chars * 4 + 3) / 3 /* B64 size */ )
+		    (chars * 4 + 3) / 3 /* B64 size */)
 			return 'B';
 #endif
 		return 'Q';
@@ -402,7 +402,7 @@ rfc1522_do_encode (what, where)
 	while (*what) {
 		word_cnt++;
 		if ((encoding = contains_nonprintables (what))) {
-			if (! quoting) {
+			if (!quoting) {
 				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
 				ewsize = mystrcat (&t, buf2);
 #ifdef MIME_BREAK_LONG_LINES
@@ -444,7 +444,7 @@ rfc1522_do_encode (what, where)
 					break;
 				}
 			}
-			if (! contains_nonprintables (what) || ewsize >= 60) {
+			if (!contains_nonprintables (what) || ewsize >= 60) {
 				/* next word is 'clean', close encoding */
 				*t++ = '?';
 				*t++ = '=';
@@ -475,7 +475,7 @@ rfc1522_do_encode (what, where)
 			} else {
 				/* process whitespace in-between by quoting it properly */
 				while (*what && isspace (*what)) {
-					if (*what == 32 /* not ' ', compare chapter 4! */ ) {
+					if (*what == 32 /* not ' ', compare chapter 4!*/) {
 						*t++ = '_';
 						ewsize++;
 					} else {
@@ -577,10 +577,10 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	BodyPtr body_encode;
 
 	g = tmpfile ();
-	if (! g)
+	if (!g)
 		return;
 	f = fopen (filename, "r");
-	if (! f) {
+	if (!f) {
 		fclose (g);
 		return;
 	}
@@ -593,7 +593,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 #endif
 		if (header[0]
 		    && (!isspace (buffer[0]) || isreturn(buffer[0]))) {
-                        if ( allow_8bit_header )
+                        if (allow_8bit_header)
                            fputs(header,g);
                         else
 			   fputs (rfc1522_encode (header), g);
@@ -625,7 +625,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	fclose (f);
 	rewind (g);
 	f = fopen (filename, "w");
-	if (! f) {
+	if (!f) {
 		fclose (g);
 		return;
 	}
@@ -645,8 +645,8 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-                        if (! strncasecmp(mm_charset, "euc-", 4) &&
-                            ! strcasecmp(mime_encoding, txt_7bit) )
+                        if (!strncasecmp(mm_charset, "euc-", 4) &&
+                            !strcasecmp(mime_encoding, txt_7bit))
 
 			   fprintf (f, "Content-Type: text/plain; charset=ISO-2022-%s\n", &mm_charset[4]);
                         else
@@ -660,38 +660,38 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	}
 	fputc ('\n', f);
 
-	if (! strcasecmp (mime_encoding, txt_base64))
+	if (!strcasecmp (mime_encoding, txt_base64))
 		encoding = 'b';
-	else if (! strcasecmp (mime_encoding, txt_quoted_printable))
+	else if (!strcasecmp (mime_encoding, txt_quoted_printable))
 		encoding = 'q';
 	else
 		encoding = '8';
 
-	if (! body_encoding_needed)
+	if (!body_encoding_needed)
 		encoding = '8';
 
 /* added for CJK charsets like EUC-KR/JP/CN and others */
 
-	if (! strcasecmp (mime_encoding, txt_7bit)) {
+	if (!strcasecmp (mime_encoding, txt_7bit)) {
 		encoding = '7';
 
 /* For EUC-KR, 7bit means ISO-2022-KR encoding specified in RFC 1557 */
 
-		if (! strcasecmp(mm_charset, "euc-kr"))
+		if (!strcasecmp(mm_charset, "euc-kr"))
 			body_encode = rfc1557_encode;
 
 /*
  * Not only  EUC-JP but also other Japanese charsets such as
  * SJIS and JIS might need RFC 1468 encoding. To be confirmed.
  */
-		else if (! strcasecmp(mm_charset, "euc-jp"))
+		else if (!strcasecmp(mm_charset, "euc-jp"))
 			body_encode = rfc1468_encode;
 
 /*
  * Not only  EUC-CN but also other Chinese charsets such as
  * BIG5 and Traditional  might need RFC 1922 encoding. To be confirmed.
  */
-		else if (! strcasecmp(mm_charset, "euc-cn"))
+		else if (!strcasecmp(mm_charset, "euc-cn"))
 			body_encode = rfc1922_encode;
 		else {
 			body_encode = rfc1521_encode;
@@ -704,7 +704,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	while (fgets (buffer, 2048, g)) {
 		body_encode (buffer, f, encoding);
 	}
-	if (encoding == 'b' || encoding == 'q' || encoding == '7' )
+	if (encoding == 'b' || encoding == 'q' || encoding == '7')
 		body_encode (NULL, f, encoding);	/* flush */
 
 	fclose (g);

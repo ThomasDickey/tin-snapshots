@@ -42,7 +42,7 @@ main (argc, argv)
 	debug = 0;	/* debug OFF */
 
 #if defined(M_AMIGA) && defined(__SASC)
-	/* Call tzset() here! */
+	/* Call tzset() here!*/
 	_TZ = "GMT0";
 	tzset();
 	if (argc == 0) /* we are running from the Workbench */
@@ -65,7 +65,7 @@ main (argc, argv)
 	/*
 	 *  rtin/cdtin so read news remotely via NNTP
 	 */
-	if (progname[0] == 'r' || (progname[0] == 'c' && progname[1] == 'd' )) {
+	if (progname[0] == 'r' || (progname[0] == 'c' && progname[1] == 'd')) {
 #		ifdef NNTP_ABLE
 			read_news_via_nntp = TRUE;
 #		else
@@ -98,7 +98,7 @@ main (argc, argv)
 	 */
 	read_cmd_line_options (argc, argv);
 
-	if (! read_news_via_nntp) {
+	if (!read_news_via_nntp) {
 		newsrc_active = FALSE;
 	}
 
@@ -131,7 +131,7 @@ main (argc, argv)
 	/*
 	 * Init curses emulation
 	 */
-	if (! InitScreen ()) {
+	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
 		exit (1);
 	}
@@ -158,7 +158,7 @@ main (argc, argv)
 	/*
 	 *  Read in users filter preferences file
 	 *  This has to be done before quick post
-	 *  because the filters will be updated!!! [eb]
+	 *  because the filters will be updated!!![eb]
 	 */
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 	local_filtered_articles = read_filter_file (local_filter_file, FALSE);
@@ -195,12 +195,12 @@ main (argc, argv)
 #else
 	backup_newsrc ();
 	read_newsrc (newsrc, num_cmd_line_groups ? 0 : 1);
-	if (! num_cmd_line_groups) {
+	if (!num_cmd_line_groups) {
 		toggle_my_groups (show_only_unread_groups, "");
 	}
 #endif
 
-	if (count_articles && ! newsrc_active) {
+	if (count_articles && !newsrc_active) {
 		vGrpGetSubArtInfo ();
 	}
 
@@ -230,7 +230,7 @@ main (argc, argv)
 	/*
 	 * Init curses emulation
 	 */
-	if (! InitScreen ()) {
+	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
 		exit (1);
 	}
@@ -447,7 +447,7 @@ read_cmd_line_options (argc, argv)
 	cmdargs = argv;
 	num_cmdargs = optind;
 	max_cmdargs = argc;
-	if (! newsrc_set) {
+	if (!newsrc_set) {
 		if (read_news_via_nntp)
 			get_newsrcname(newsrc, getserverbyfile(NNTP_SERVER_FILE));
 		else {
@@ -510,7 +510,7 @@ usage (theProgname)
 	error_message ("  -P       purge any expired articles from index files", "");
 	error_message ("  -q       quick start by not checking for new newsgroups", "");
 #	if defined(NNTP_ABLE) && !defined(NNTP_ONLY)
-		if (! read_news_via_nntp) {
+		if (!read_news_via_nntp) {
 			error_message ("  -r       read news remotely from default NNTP server", "");
 		}
 #	endif /* NNTP_ABLE */
@@ -594,7 +594,7 @@ void
 update_index_files ()
 {
 	if (update || update_fork) {
-		if (! catchup && (read_news_via_nntp && xover_supported)) {
+		if (!catchup && (read_news_via_nntp && xover_supported)) {
 			error_message ("%s: Updating of index files not supported", progname);
 			tin_done (EXIT_ERROR);
 		}
@@ -697,7 +697,7 @@ show_intro_page ()
 	printf ("Please send bug reports/comments to the programs author with the 'R' command.\n");
 	fflush (stdout);
 
-	if (! cmd_line) {
+	if (!cmd_line) {
 		Raw (TRUE);
 		continue_prompt ();
 	}

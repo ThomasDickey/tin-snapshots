@@ -14,13 +14,11 @@
 
 #include "tin.h"
 
-
 int
 count_args (s)
 	char *s;
 {
-	int count = 0;
-	int ch;
+	int ch, count = 0;
 
 	do {
 		/*
@@ -110,35 +108,3 @@ envargs (Pargc, Pargv, envstr)
 	*Pargv = argvect;
 	*Pargc = argc;
 }
-
-
-#ifdef TEST
-
-void
-main (argc, argv)
-	int argc;               /* number of tokens in command line */
-	char **argv;            /* command line tokens */
-{
-	int ch;
-
-	envargs (&argc, &argv, "OPTS");
-
-	while ((ch = getopt (argc, argv, "abc")) != EOF) {
-		switch (ch) {
-			case 'a':
-				puts ("Option 'a' specified");
-				break;
-			case 'b':
-				puts ("Option 'b' specified");
-				break;
-			case 'c':
-				puts ("Option 'c' specified");
-				break;
-			default:
-				puts ("Option %c unknown");
-				break;
-		}
-	}
-}
-
-#endif

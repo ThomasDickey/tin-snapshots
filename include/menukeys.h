@@ -260,7 +260,7 @@
 #define iKeyPageBsearchAuth 'A'
 #define iKeyPageBSearchBody 'B'
 #define iKeyPageCatchupGotoNext 'C'
-#define iKeyPageDelete 'D'
+#define iKeyPageCancel 'D'
 #define iKeyPageFollowup 'F'
 #define iKeyPageLastPage2 'G'
 #define iKeyPageToggleHelpDisplay 'H'
@@ -297,7 +297,7 @@
 
 /* post.c */
 
-#define iKeyPostDelete 'd'
+#define iKeyPostCancel 'd'
 #define iKeyPostEdit 'e'
 #ifdef HAVE_PGP
 #	define iKeyPostPGP 'g'

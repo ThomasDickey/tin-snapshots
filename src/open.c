@@ -863,7 +863,7 @@ authenticate ()
 	if (cookiefd == -1) {
 		char *tempfile = mktemp ("/tmp/tinAXXXXXX");
 		fp = fopen (tempfile, "w+");
-		if (! fp) {
+		if (!fp) {
 			error_message ("Can't open %s", tempfile);
 			return 1;
 		}
@@ -897,7 +897,7 @@ authenticate ()
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
 #endif
 
-	if (! builtinauth) {
+	if (!builtinauth) {
 		return (system (authval));
 	} else {
 		get_server (tmpbuf, sizeof(tmpbuf));
@@ -949,7 +949,7 @@ get_respcode ()
 			break;
 	
 #ifdef HAVE_GENERIC_AUTHINFO
-		case NEED_AUTH:
+		case NEED_AUTHINFO:
 			strcpy (savebuf, last_put);
 
 			if (authenticate ()) {
@@ -1003,10 +1003,10 @@ stuff_nntp (fnam)
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
 #endif
-		if (! last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
+		if (!last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
 			break;
 		}
-		if (! get_server_nolf) {
+		if (!get_server_nolf) {
 			strcat (line, "\n");
 			if (line[0] == '.') {	/* reduce leading .'s */
 				fputs (&line[1], fp);
@@ -1042,8 +1042,8 @@ nntp_to_fp ()
 	FILE *fp;
 	FILE *old_fp;
 
-	if (! stuff_nntp (fnam)) {
-		debug_nntp ("nntp_to_fp", "! stuff_nntp()");
+	if (!stuff_nntp (fnam)) {
+		debug_nntp ("nntp_to_fp", "!stuff_nntp()");
 		return (FILE *) 0;
 	}
 
@@ -1217,7 +1217,7 @@ vGrpGetSubArtInfo ()
 	long	lMaxOld;
 	struct	t_group *psGrp;
 
-	if ((update && update_fork) || ! update) {
+	if ((update && update_fork) || !update) {
 		wait_message (txt_rereading_active_file);
 	}
 
@@ -1357,7 +1357,7 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 			closedir (tDirFile);
 		}
 #else
-		if (! lArtMin) *plArtMin = 1;
+		if (!lArtMin) *plArtMin = 1;
 		*plArtMax = lArtMax;
 		*plArtCount = lArtMax - *plArtMin + 1;
 #endif

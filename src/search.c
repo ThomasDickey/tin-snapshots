@@ -47,7 +47,7 @@ search_author (the_index, current_art, forward)
 		sprintf (buf2, txt_author_search_backwards, default_author_search);
 	}
 
-	if (! prompt_string (buf2, buf)) {
+	if (!prompt_string (buf2, buf)) {
 		return -1;
 	}
 
@@ -121,7 +121,7 @@ search_group (forward)
 	char buf2[LEN];
 	int i;
 
-	if (! group_top) {
+	if (!group_top) {
 		info_message (txt_no_groups);
 		return;
 	}
@@ -134,7 +134,7 @@ search_group (forward)
 		sprintf (buf2, txt_search_backwards, default_group_search);
 	}
 
-	if (! prompt_string (buf2, buf)) {
+	if (!prompt_string (buf2, buf)) {
 		return;
 	}
 
@@ -220,7 +220,7 @@ search_subject (forward)
 	else
 		sprintf (buf2, txt_search_backwards, default_subject_search);
 
-	if (! prompt_string (buf2, buf))		/* Get search string from user */
+	if (!prompt_string (buf2, buf))		/* Get search string from user */
 		return;
 
 	if (strlen (buf)) {						/* See if to use the default */
@@ -270,7 +270,7 @@ search_subject (forward)
 				str_lwr (arts[art].subject, buf2);
 				if (strstr(buf2, buf) != 0) {
 					found = TRUE;
-					goto found_something;		/* I know... I know !! */
+					goto found_something;		/* I know... I know !!*/
 				}
 			}
 		}
@@ -328,7 +328,7 @@ search_article (forward)
 		sprintf (buf2, txt_search_backwards, default_art_search);
 	}
 
-	if (! prompt_string (buf2, buf)) {
+	if (!prompt_string (buf2, buf)) {
 		return FALSE;
 	}
 
@@ -353,7 +353,7 @@ search_article (forward)
 	orig_note_end = note_end;
 	orig_note_page = note_page;
 
-	while (! note_end) {
+	while (!note_end) {
 		note_line = 1;
 		ctrl_L = FALSE;
 
@@ -404,7 +404,7 @@ search_article (forward)
 				break;
 			}
 		}
-		if (! note_end) {
+		if (!note_end) {
 			note_mark[++note_page] = ftell (note_fp);
 		}
 	}
@@ -434,7 +434,7 @@ search_body (group, current_art)
 
 	sprintf (buf2, txt_search_body, default_art_search);
 
-	if (! prompt_string (buf2, pat)) {
+	if (!prompt_string (buf2, pat)) {
 		return -1;
 	}
 
@@ -458,7 +458,7 @@ search_body (group, current_art)
 		}
 	} else {
 		for (i = 0 ; i < top ; i++) {
-			if (! IGNORE_ART(i)) {
+			if (!IGNORE_ART(i)) {
 				art_cnt++;
 			}
 		}
@@ -498,7 +498,7 @@ search_body (group, current_art)
 		count++;
 	} while (i != current_art);
 
-	if (! aborted) {
+	if (!aborted) {
 		info_message (txt_no_match);
 	}
 

@@ -66,7 +66,7 @@ DoMatch(text, p)
 	register int matched;
 	register int reverse;
 
-	for ( ; *p; text++, p++) {
+	for (; *p; text++, p++) {
 		if (*text == '\0' && *p != '*')
 			return ABORT;
 		switch (*p) {
@@ -139,37 +139,3 @@ wildmat(text, p)
 #endif /* OPTIMIZE_JUST_STAR */
 	return DoMatch(text, p) == TRUE;
 }
-
-
-
-#if defined(TEST)
-int
-main()
-{
-	char p[80];
-	char text[80];
-
-	printf("Wildmat tester.  Enter pattern, then strings to test.\n");
-	printf("A blank line gets prompts for a new pattern; a blank pattern\n");
-	printf("exits the program.\n");
-
-	forever {
-		printf("\nEnter pattern:  ");
-		(void)fflush(stdout);
-		if (gets(p) == NULL || p[0] == '\0')
-			break;
-		forever {
-			printf("Enter text:  ");
-			(void)fflush(stdout);
-			if (gets(text) == NULL)
-				exit(0);
-			if (text[0] == '\0')
-				/* Blank line; go back and get a new pattern. */
-				break;
-			printf("      %s\n", wildmat(text, p) ? "YES" : "NO");
-		}
-	}
-	exit(0);
-	/* NOTREACHED */
-}
-#endif	/* defined(TEST) */

@@ -120,7 +120,7 @@ resync_active_file ()
 */
 		command_line = read_cmd_line_groups ();
 		read_newsrc (newsrc, command_line ? 0 : 1);
-		if (! command_line) {
+		if (!command_line) {
 			toggle_my_groups (show_only_unread_groups, old_group);
 		}
 		set_groupname_len (FALSE);
@@ -230,7 +230,7 @@ parse_newsrc_active_line (fp, group, count, max, min, moderated)
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		ptr = my_strpbrk (buf, ":!");
-		if (! ptr || *ptr != ':') {
+		if (!ptr || *ptr != ':') {
 			continue;
 		}
 		*ptr = '\0';
@@ -258,18 +258,17 @@ read_news_active_file ()
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
 	int i;
-	long count = -1L , h;
-	long min = 1, max = 0;
+	long h, count = -1L, min = 1, max = 0;
 
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 
-	if ((update && update_fork) || ! update) {
+	if ((update && update_fork) || !update) {
 		wait_message (newsrc_active ? txt_reading_news_newsrc_file :
 						txt_reading_news_active_file);
 	}
 
-	if (! newsrc_active) {
+	if (!newsrc_active) {
 		if ((fp = open_news_active_fp ()) == (FILE *) 0) {
 			if (compiled_with_nntp) {
 				if (cmd_line) {
@@ -291,14 +290,14 @@ read_news_active_file ()
 
 	forever {
 		if (newsrc_active) {
-			if (! parse_newsrc_active_line (fp, buf, &count, &max, &min, moderated)) {
+			if (!parse_newsrc_active_line (fp, buf, &count, &max, &min, moderated)) {
 				break;
 			}
 		} else {
 			if (fgets (buf, sizeof (buf), fp) == (char *) 0) {
 				break;
 			}
-			if (! parse_active_line (buf, &max, &min, moderated)) {
+			if (!parse_active_line (buf, &max, &min, moderated)) {
 				continue;
 			}
 		}
@@ -349,7 +348,6 @@ read_news_active_file ()
 				active[num_active].spooldir = spooldir;
 			}
 			active[num_active].name = str_dup (buf);
-/*			active[num_active].name[strlen(buf)+1]= '\0'; */
 			active[num_active].description = (char *) 0;
 			active[num_active].count = count;
 			active[num_active].xmax = max;
@@ -366,9 +364,9 @@ read_news_active_file ()
 			active[num_active].grps_filter = (struct t_filters *) 0;
 			vSetDefaultBitmap (&active[num_active]);
 #ifdef INDEX_DAEMON
-			active[num_active].last_updated_time = 0L;
+			active[num_active].last_updated_time = (time_t) 0;
 #endif
-			if (num_active % 100 == 0 && ! update) {
+			if (num_active % 100 == 0 && !update) {
 				spin_cursor ();
 			}
 			num_active++;
@@ -380,12 +378,12 @@ read_news_active_continue:;
 	/*
 	 *  exit if active file is empty
 	 */
-	if (! num_active) {
+	if (!num_active) {
 		error_message (txt_active_file_is_empty, news_active_file);
 		tin_done (EXIT_ERROR);
 	}
 
-	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
+	if ((cmd_line && !(update || verbose)) || (update && update_fork)) {
 		wait_message ("\n");
 	}
 
@@ -442,11 +440,11 @@ check_for_any_new_groups ()
 	char *ptr, buf[NNTP_STRLEN];
 	char old_newnews_host[PATH_LEN];
 	FILE *fp = (FILE *) 0;
-	time_t the_newnews_time = (time_t)0;
+	time_t the_newnews_time = (time_t) 0;
 	time_t old_newnews_time;
-	time_t creation_time = (time_t)0;
+	time_t creation_time = (time_t) 0;
 
-	if ((! check_for_new_newsgroups || (update && ! update_fork))) {
+	if ((!check_for_new_newsgroups || (update && !update_fork))) {
 		return;
 	}
 
@@ -469,11 +467,11 @@ check_for_any_new_groups ()
 		old_newnews_time = newnews[newnews_index].time;
 	} else {
 		strcpy (old_newnews_host, "UNKNOWN");
-		old_newnews_time = 0L;
+		old_newnews_time = (time_t) 0;
 	}
 
 /*
-	if (! read_news_via_nntp && newnews_index >= 0) {
+	if (!read_news_via_nntp && newnews_index >= 0) {
 		new_active_size = the_newnews_time;
 		old_active_size = new_newnews_size[active_index].attribute;
 		if (the_newnews_time <= old_active_size) {
@@ -520,11 +518,11 @@ check_for_any_new_groups ()
 		} else {
 			ptr = strchr (buf, ' ');
 			if (ptr != (char *) 0) {
-				creation_time = atol (ptr);
+				creation_time = (time_t) atol (ptr);
 				*ptr = '\0';
 			}
 			if (creation_time < old_newnews_time ||
-			    old_newnews_time == 0L) {
+			    old_newnews_time == (time_t) 0) {
 				continue;
 			}
 		}
@@ -608,9 +606,10 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 			printf (txt_subscribing_to, group);
 		}
 		return;
-	} else if (unsubscribe_rest) {
-		/* ignore this group */
-		return;
+	} else {
+		if (unsubscribe_rest) {
+			return; /* ignore this group */
+		}
 	}
 
 	do {
@@ -627,7 +626,7 @@ prompt_subscribe_group (group, autosubscribe, autounsubscribe)
 		if (ch == '\n' || ch == '\r') {
 			ch = ch_default;
 		}
-	} while (! strchr ("NnYy", ch));
+	} while (!strchr ("NnYy", ch));
 
 	my_fputc (ch, stdout);
 	fflush (stdout);
@@ -703,7 +702,7 @@ match_group_list (group, group_list)
 		 * regexp match
 		 */
 		if (STR_MATCH(group, pattern)) {
-			accept = ! negate;	/* matched! */
+			accept = !negate;	/* matched!*/
 		}
 		/*
 		 * now examine next entry if any
@@ -755,7 +754,7 @@ read_group_times_file ()
 		/*
 		 * read the last updated time
 		 */
-		updated_time = atol (p);
+		updated_time = (time_t) atol (p);
 
 		/*
 		 * find the group in active[] and set updated time
@@ -814,7 +813,7 @@ load_newnews_info (info)
 	/*
 	 * initialize newnews[] if no entries
 	 */
-	if (! num_newnews) {
+	if (!num_newnews) {
 		for (i = 0 ; i < max_newnews ; i++) {
 			newnews[i].host = (char *) 0;
 			newnews[i].time = (time_t) 0;
@@ -825,7 +824,7 @@ load_newnews_info (info)
 
 	ptr = strchr (buf, ' ');
 	if (ptr != (char *) 0) {
-		the_time = atol (ptr);
+		the_time = (time_t) atol (ptr);
 		*ptr = '\0';
 		if (num_newnews >= max_newnews) {
 			expand_newnews ();
@@ -875,22 +874,22 @@ read_motd_file ()
 	char motd_file_date[32];
 	FILE *fp;
 	int lineno = 0;
-	time_t new_motd_date = (time_t)0;
-	time_t old_motd_date = (time_t)0;
+	time_t new_motd_date = (time_t) 0;
+	time_t old_motd_date = (time_t) 0;
 	struct stat sb;
 	struct tm *tm;
 
-	if (update && ! update_fork) {
+	if (update && !update_fork) {
 		return;
 	}
 
-	old_motd_date = atol (motd_file_info);
+	old_motd_date = (time_t) atol (motd_file_info);
 
 	/*
 	 * reading news locally (local) or via NNTP (server name)
 	 */
 	if (read_news_via_nntp) {
-		if (! old_motd_date) {
+		if (!old_motd_date) {
 			strcpy (motd_file_date, "920101 000000");
 		} else {
 			tm = localtime (&old_motd_date);
@@ -971,4 +970,3 @@ vMakeActiveMyGroup ()
 		my_group[group_top++] = iNum;
 	}
 }
-

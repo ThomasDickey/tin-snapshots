@@ -112,11 +112,11 @@ copy_fp (fp_ip, fp_op, prefix)
 	char buf[8192];
 	int retcode;
 
-	if (! prefix || !prefix[0]) {
+	if (!prefix || !prefix[0]) {
 		size_t n;
 		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
 			if (n != fwrite (buf, 1, n, fp_op)) {
-				if (! got_sig_pipe) {
+				if (!got_sig_pipe) {
 					sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 					perror_message (msg, "");
 				}
@@ -160,7 +160,7 @@ copy_body (fp_ip, fp_op, prefix, initl)
 	int double_quote;
 	int i;
 
-	if (! prefix || !prefix[0]) {
+	if (!prefix || !prefix[0]) {
 		size_t n;
 		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
 			if (n != fwrite (buf, 1, n, fp_op)) {
@@ -272,7 +272,7 @@ invoke_editor (filename, lineno)
 
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof (buf), editor_format);
 
-	if (! retcode) {
+	if (!retcode) {
 		sprintf (buf, "%s %s", editor, filename);
 	}
 
@@ -327,7 +327,7 @@ shell_escape ()
 
 	sprintf (msg, txt_shell_escape, default_shell_command);
 
-	if (! prompt_string (msg, shell))
+	if (!prompt_string (msg, shell))
 		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof (shell));
 
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
@@ -377,7 +377,7 @@ shell_escape ()
 		ClearScreen ();
 	}
 }
-#endif /* ! NO_SHELL_ESCAPE */
+#endif /* !NO_SHELL_ESCAPE */
 
 
 void
@@ -391,7 +391,7 @@ tin_done (ret)
 	/*
 	 * check if any groups were read & ask if they should marked read
 	 */
-	if (catchup_read_groups && ! cmd_line) {
+	if (catchup_read_groups && !cmd_line) {
 		for (i = 0 ; i < group_top ; i++) {
 			group = &active[my_group[i]];
 			if (group->read_during_session) {
@@ -422,7 +422,7 @@ tin_done (ret)
 		nntp_close ();			/* disconnect from NNTP server */
 	}
 	free_all_arrays ();
-	if (! cmd_line)
+	if (!cmd_line)
 		ClearScreen ();
 	EndWin ();
 	Raw (FALSE);
@@ -484,7 +484,7 @@ strip_double_ngs (ngs_list)
 		strcpy(newlist, ngs_list);	/* make a "working copy"            */
 		ptr = newlist;			/* the next outer newsg. is the 1st */
 
-		while (! over1) {
+		while (!over1) {
 			ncnt1++;			/* inc. outer counter */
 			strcpy(cmplist, newlist);	/* duplicate groups for inner loop */
 			ptr2 = strchr(ptr, ',');	/* search "," ...                  */
@@ -508,7 +508,7 @@ strip_double_ngs (ngs_list)
 	    	         * to list, strip double-commas
 	    	         */
 
-	    		while (! over2) {
+	    		while (!over2) {
 	    			ncnt2++;
 	    			strcpy(ngroup2, cmplist);
 /*				printf("2[%d]: %s\n", ncnt2, ngroup2); */
@@ -1008,7 +1008,7 @@ mail_check ()
 		return TRUE;
 	}
 #endif
-#endif /* ! WIN32 */
+#endif /* !WIN32 */
 	return FALSE;
 }
 
@@ -1087,7 +1087,7 @@ parse_from (from_line, eaddr, fname)
 
 			default:
 				newstate = state; /* stay in this state */
-				if (! isspace(*from_line))
+				if (!isspace(*from_line))
 					*addrptr++ = *from_line;
 			}  /* switch(*from_line) */
 			break;
@@ -1161,8 +1161,8 @@ parse_from (from_line, eaddr, fname)
 		/* Strip leading blanks from the address */
 
 		nameptr = name;
-		while ( *(nameptr) != '\0') {
-			if (! (isspace(*nameptr) || (*nameptr == '"')))
+		while (*(nameptr) != '\0') {
+			if (!(isspace(*nameptr) || (*nameptr == '"')))
 				break;
 			else
 				nameptr++;
@@ -1312,7 +1312,7 @@ my_strncpy (p, q, n)
 #endif /* __STDC__ */
 {
 	while (n--) {
-		if (! *q || *q == '\n')
+		if (!*q || *q == '\n')
 			break;
 		*p++ = *q++;
 	}
@@ -1938,9 +1938,9 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 		 * If just a normal part of the pathname copy it
 		 */
 #ifdef VMS
-		if (! strchr ("~=+", *format))
+		if (!strchr ("~=+", *format))
 #else
-		if (! strchr ("~$=+", *format))
+		if (!strchr ("~$=+", *format))
 #endif
 		{
 			*str++ = *format;
@@ -1991,16 +1991,16 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 			case '$':	/* Read the envvar and use its value */
 				i = 0;
 				format++;
-				if ( *format && *format == '{' ) {
+				if (*format && *format == '{') {
 					format++;
-					while ( *format && !(strchr("}-", *format)) ) {
+					while (*format && !(strchr("}-", *format))) {
 						tbuf[i++] = *format++;
 					}
 					tbuf[i] = '\0';
 					i = 0;
-					if ( *format && *format == '-' ) {
+					if (*format && *format == '-') {
 						format++;
-						while ( *format && *format != '}' ) {
+						while (*format && *format != '}') {
 							defbuf[i++] = *format++;
 						}
 					}
@@ -2118,7 +2118,7 @@ strfpath (format, str, maxsize, the_homedir, maildir, savedir, group)
 		*str = '\0';
 /*
 clear_message ();
-printf ("!!! format=[%s]  path=[%s]", startp, start);
+printf ("!!!format=[%s]  path=[%s]", startp, start);
 fflush (stdout);
 sleep (2);
 */
@@ -2394,7 +2394,7 @@ iCopyFile (pcSrcFile, pcDstFile)
 	{
 		if ((hFpDst = fopen (pcDstFile, "w")) != (FILE *) 0)
 		{
-			while (! feof (hFpSrc) && (iReadOk = fread (acBuffer, sizeof (acBuffer), 1, hFpSrc)) != -1)
+			while (!feof (hFpSrc) && (iReadOk = fread (acBuffer, sizeof (acBuffer), 1, hFpSrc)) != -1)
 			{
 				lCurFilePos = ftell (hFpSrc);
 				iWriteSize = (size_t) (lCurFilePos - lSrcFilePos);
@@ -2444,42 +2444,46 @@ peek_char (fp)
 #include "l1_next.tab"
 #include "next_l1.tab"
 
-static int to_local(c)
+static int
+to_local (c)
 	int c;
 {
-	if(use_local_charset) {
-		c=c_l1_next[(unsigned char)c];
-		if(c==BAD) return '?';
+	if (use_local_charset) {
+		c = c_l1_next[(unsigned char)c];
+		if (c == BAD) return '?';
 		else return c;
 	} else {
 		return c;
 	}
 }
 
-void buffer_to_local(b)
+void
+buffer_to_local (b)
 	char *b;
 {
-	for( ;*b;b++)
-		*b=to_local(*b);
+	for(; *b; b++)
+		*b = to_local(*b);
 }
 
-static int to_network(c)
+static int
+to_network (c)
 	int c;
 {
-	if(use_local_charset) {
-		c=c_next_l1[(unsigned char)c];
-		if(c==BAD) return '?';
+	if (use_local_charset) {
+		c = c_next_l1[(unsigned char) c];
+		if (c==BAD) return '?';
 		else return c;
 	} else {
 		return c;
 	}
 }
 
-void buffer_to_network(b)
+void
+buffer_to_network (b)
 	char *b;
 {
-	for( ;*b;b++)
-		*b=to_network(*b);
+	for(; *b; b++)
+		*b = to_network(*b);
 }
 
 #endif

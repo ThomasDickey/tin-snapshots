@@ -253,19 +253,19 @@ InitScreen ()
 
 	InitWin ();
 
-	if (! _clearscreen) {
+	if (!_clearscreen) {
 		fprintf (stderr, txt_no_term_clearscreen, progname);
 		return (FALSE);
 	}
-	if (! _moveto) {
+	if (!_moveto) {
 		fprintf (stderr, txt_no_term_cursor_motion, progname);
 		return (FALSE);
 	}
-	if (! _cleartoeoln) {
+	if (!_cleartoeoln) {
 		fprintf (stderr, txt_no_term_clear_eol, progname);
 		return (FALSE);
 	}
-	if (! _cleartoeos) {
+	if (!_cleartoeos) {
 		fprintf (stderr, txt_no_term_clear_eos, progname);
 		return (FALSE);
 	}
@@ -291,7 +291,7 @@ InitScreen ()
 #endif /* INDEX_DAEMON */
 }
 
-#else	/* ! M_UNIX  */
+#else	/* !M_UNIX  */
 
 int
 InitScreen ()
@@ -392,19 +392,19 @@ InitScreen ()
 	  $DESCRIPTOR (input_dsc, "TT");
 
 	  status = SYS$ASSIGN (&input_dsc, &input_chan, 0, 0);
-	  if (! (status & 1))
+	  if (!(status & 1))
 	      LIB$STOP (status);
 	  SYS$QIOW (0, input_chan, IO$_SENSEMODE, &tty, 0, 0,
 		    &tty.class, 12, 0, 0, 0, 0);
 	  item_code = DVI$_TT_EIGHTBIT;
-	  status = LIB$GETDVI( &item_code, &input_chan, 0, &eightbit, 0,0 );
+	  status = LIB$GETDVI(&item_code, &input_chan, 0, &eightbit, 0, 0);
 	  _columns = tty.scr_wid;
 	  _lines = tty.scr_len;
 
 	if (eightbit)
 	 { /* if using eightbit then use CSI (octal 233) rather than ESC "[" */
 	  _clearscreen	= "\2331;1H\233J";
-	  _moveto	= "\233%d;%dH"; /* not a termcap string! */
+	  _moveto	= "\233%d;%dH"; /* not a termcap string !*/
 	  _cleartoeoln	= "\233K";
 	  _cleartoeos	= "\233J";
 	  _setinverse	= "\2337m";
@@ -580,7 +580,7 @@ MoveCursor (row, col)
 #endif /* INDEX_DAEMON */
 }
 
-#else	/* ! M_UNIX */
+#else	/* !M_UNIX */
 
 void
 MoveCursor (row, col)
@@ -732,7 +732,7 @@ Raw (state)
 	if (state == FALSE && _inraw) {
 /*	  vmsnoraw();*/
 	  _inraw = 0;
-	} else if (state == TRUE && ! _inraw) {
+	} else if (state == TRUE && !_inraw) {
 /*	  vmsraw();*/
 	  _inraw = 1;
 	}
@@ -746,7 +746,7 @@ Raw (state)
 	if (state == FALSE && _inraw) {
 		SET_TTY (&_original_tty);
 		_inraw = 0;
-	} else if (state == TRUE && ! _inraw) {
+	} else if (state == TRUE && !_inraw) {
 		GET_TTY (&_original_tty);
 		GET_TTY (&_raw_tty);
 #if USE_SGTTY
@@ -980,7 +980,7 @@ ReadCh ()
 
 	result = read (0, &ch, 1);
 #  endif
-	return((result <= 0 ) ? EOF : ch & 0xFF);
+	return((result <= 0) ? EOF : ch & 0xFF);
 #endif
 
 #endif /* INDEX_DAEMON */

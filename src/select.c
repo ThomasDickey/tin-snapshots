@@ -59,7 +59,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 	}
 
 	forever {
-		if (! resync_active_file ()) {	/* reread active file if alarm set */
+		if (!resync_active_file ()) {	/* reread active file if alarm set */
 			if (reread_active_after_posting ()) {
 				group_selection_page ();
 			}
@@ -131,7 +131,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 						break;
 				}
 				break;
-#endif /* ! WIN32 */
+#endif /* !WIN32 */
 
 #ifndef NO_SHELL_ESCAPE
 			case iKeyShellEscape:
@@ -222,7 +222,7 @@ select_read_group:
 						goto select_done;
 					}
 #ifndef DONT_REREAD_ACTIVE_FILE
-					if (! reread_active_file)
+					if (!reread_active_file)
 #endif
 						group_selection_page ();
 				} else {
@@ -231,7 +231,7 @@ select_read_group:
 				break;
 
 			case iKeySelectPageDown3:
-				if (! space_goto_next_unread) goto select_page_down;
+				if (!space_goto_next_unread) goto select_page_down;
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
 				if (next_unread_group (TRUE) == GRP_QUIT) {
@@ -242,7 +242,7 @@ select_read_group:
 			case iKeySelectPageDown:		/* page down */
 			case iKeySelectPageDown2:
 select_page_down:
-				if (! group_top) {
+				if (!group_top) {
 					break;
 				}
 				if (cur_groupnum == group_top - 1) {
@@ -283,7 +283,7 @@ select_page_down:
 			case iKeySelectDown:		/* line down */
 			case iKeySelectDown2:
 select_down:
-				if (! group_top) {
+				if (!group_top) {
 					break;
 				}
 				if (cur_groupnum + 1 >= group_top) {
@@ -312,7 +312,7 @@ select_down:
 			case iKeySelectUp:		/* line up */
 			case iKeySelectUp2:
 select_up:
-				if (! group_top) {
+				if (!group_top) {
 					break;
 				}
 				if (cur_groupnum == 0) {
@@ -355,7 +355,7 @@ select_up:
 			case iKeySelectPageUp2:
 			case iKeySelectPageUp3:
 select_page_up:
-				if (! group_top) {
+				if (!group_top) {
 					break;
 				}
 				if (cur_groupnum == 0) {
@@ -413,7 +413,7 @@ select_page_up:
 					/* why differentiate between subscribed
 					   and unsubscribed groups here?
 					   auto-subscribe does not seem to be
-					   intuitive! */
+					   intuitive!*/
 /*					if (active[my_group[n]].subscribed != SUBSCRIBED) {
 						subscribe (&active[my_group[n]], SUBSCRIBED);
 						cur_groupnum = reposition_group (
@@ -509,7 +509,7 @@ select_page_up:
 
 			case iKeyQuit:	/* quit */
 select_done:
-				if (! confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
+				if (!confirm_to_quit || prompt_yn (cLINES, txt_quit, TRUE) == 1) {
 					write_config_file (local_config_file);
 					tin_done (EXIT_OK);	/* Tin END */
 				}
@@ -536,7 +536,7 @@ select_done:
 	 			 *
 	 			 * Disabled when started with cmdline groups
 	 			 */
-	 			if (! read_cmd_line_groups ()) {
+	 			if (!read_cmd_line_groups ()) {
 	 				show_only_unread_groups = !show_only_unread_groups;
 					if (show_only_unread_groups) {
 						wait_message (txt_reading_new_groups);
@@ -672,7 +672,7 @@ select_done:
 			case iKeySelectPost:	/* post a basenote */
 				if (can_post) {
 					if (group_top == 0) {
-						if (! prompt_string (txt_post_newsgroup, buf))
+						if (!prompt_string (txt_post_newsgroup, buf))
 							break;
 						if (buf[0] == '\0')
 							break;
@@ -974,7 +974,7 @@ choose_new_group ()
 
 	sprintf (msg, txt_newsgroup, default_goto_group);
 
-	if (! prompt_string (msg, buf)) {
+	if (!prompt_string (msg, buf)) {
 		return -1;
 	}
 
@@ -1046,7 +1046,7 @@ reposition_group (group, default_num)
 	sprintf (buf, txt_newsgroup_position, group->name,
 		(default_move_group ? default_move_group : default_num+1));
 
-	if (! prompt_string (buf, pos)) {
+	if (!prompt_string (buf, pos)) {
 		return default_num;
 	}
 
@@ -1094,7 +1094,7 @@ catchup_group (group, goto_next_unread_group)
 {
 	sprintf (msg, txt_mark_group_read, group->name);
 
-	if (! confirm_action || prompt_yn (cLINES, msg, TRUE) == 1) {
+	if (!confirm_action || prompt_yn (cLINES, msg, TRUE) == 1) {
 		grp_mark_read (group, NULL);
 
 		mark_screen (SELECT_LEVEL, cur_groupnum - first_group_on_screen,
@@ -1232,7 +1232,7 @@ toggle_my_groups (only_unread_groups, group)
 		old_curr_group[0] = '\0';
 
 		if (group_top) {
-			if (! only_unread_groups || reread_active_file) {
+			if (!only_unread_groups || reread_active_file) {
 				if (strlen (group)) {
 					if ((i = find_group_index (group)) >= 0) {
 						active_idx = i;
@@ -1373,7 +1373,7 @@ iSetRange (iLevel, iNumMin, iNumMax, iNumCur)
 */
 	sprintf (msg, txt_enter_range, pcPtr);
 
-	if (! prompt_string (msg, acRng)) {
+	if (!prompt_string (msg, acRng)) {
 		return iRetCode;
 	}
 
@@ -1390,7 +1390,7 @@ iSetRange (iLevel, iNumMin, iNumMax, iNumCur)
 	/*
 	 * Parse range string
 	 */
-	if (! iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax)) {
+	if (!iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax)) {
 		info_message ("Invalid range - valid are '0-9.$' ie. 1-$");
 	} else {
 /*
@@ -1450,7 +1450,7 @@ iParseRange (pcRange, iNumMin, iNumMax, iNumCur, piRngMin, piRngMax)
 	*piRngMin = -1;
 	*piRngMax = -1;
 
-	while (*pcPtr && ! iDone) {
+	while (*pcPtr && !iDone) {
 		if (*pcPtr >= '0' && *pcPtr <= '9') {
 			if (iSetMax) {
 	    			*piRngMax = atoi (pcPtr);

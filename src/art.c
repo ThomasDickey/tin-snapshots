@@ -72,7 +72,7 @@ find_base (group)
 			if (arts[i].status == ART_UNREAD) {
 				base[top_base++] = i;
 			} else {
-				for (j = i ; j >= 0 ; j = arts[j].thread) {
+				for (j = i; j >= 0; j = arts[j].thread) {
 					if (arts[j].status == ART_UNREAD) {
 						base[top_base++] = i;
 						break;
@@ -106,7 +106,6 @@ index_group (group)
 	struct t_group *group;
 {
 	char group_path[PATH_LEN];
-/*	int artcount; */
 	int count;
 	int expired;
 	int filtered;
@@ -116,7 +115,7 @@ index_group (group)
 	register int i;
 
 	if (group != (struct t_group *) 0) {
-		if (! update) {
+		if (!update) {
 			sprintf (msg, txt_group, group->name);
 			wait_message (msg);
 		}
@@ -141,7 +140,7 @@ index_group (group)
 		BegStopWatch("setup_base");
 #endif	/* PROFILE */
 
-		/* artcount = */ (void) setup_hard_base (group, group_path);
+		(void) setup_hard_base (group, group_path);
 
 #ifdef	PROFILE
 		EndStopWatch();
@@ -156,7 +155,7 @@ debug_print_bitmap (group, NULL);
 		/*
 		 * Read in the existing index via XOVER or the index file
 		 */
-		/* artcount = */ (void) iReadNovFile (group, min, max, &expired);
+		(void) iReadNovFile (group, min, max, &expired);
 
 		if (expired) {
 			print_expired_arts (expired);
@@ -195,7 +194,7 @@ debug_print_bitmap (group, NULL);
 		}
 
 #ifndef NNTP_ONLY
-		if (/*((! read_news_via_nntp) && expired) || */ modified)
+		if (/*((!read_news_via_nntp) && expired) || */ modified)
 			vWriteNovFile (group);
 #endif
 
@@ -232,7 +231,7 @@ debug_print_bitmap (group, NULL);
 
 		find_base (group);
 
-		if ((modified || filtered) && ! update) {
+		if ((modified || filtered) && !update) {
 			clear_message ();
 		}
 		set_alarm_clock_on ();
@@ -330,7 +329,7 @@ read_group (group, group_path, pcount)
 		arts[top].artnum = art;
 		arts[top].thread = ART_NORMAL;
 
-		if (! parse_headers (ptr, &arts[top])) {
+		if (!parse_headers (ptr, &arts[top])) {
 			sprintf (buf, "FAILED parse_header(%ld)", art);
 			debug_nntp ("read_group", buf);
 			continue;
@@ -339,7 +338,7 @@ read_group (group, group_path, pcount)
 		last_read_article = arts[top].artnum;	/* used if arts are killed */
 		top++;
 
-		if (++count % MODULO_COUNT_NUM == 0 && ! update) {
+		if (++count % MODULO_COUNT_NUM == 0 && !update) {
 			if (input_pending ()) {
 				buf[0] = ReadCh();
 				if (buf[0] == ESC || buf[0] == 'q' || buf[0] == 'Q') {
@@ -411,7 +410,7 @@ thread_by_subject()
 			/*
 			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
 			 */
-			if (! IGNORE_ART(i) && arts[i].inthread == FALSE &&
+			if (!IGNORE_ART(i) && arts[i].inthread == FALSE &&
 						   ((arts[i].subject == arts[j].subject) ||
 						   ((arts[i].part || arts[i].patch) &&
 							 arts[i].archive == arts[j].archive))) {
@@ -457,7 +456,7 @@ make_threads (group, rethread)
 {
 	int i;
 
-	if (! cmd_line) {
+	if (!cmd_line) {
 		if (group->attribute->thread_arts == THREAD_NONE)
 			wait_message (txt_unthreading_arts);
 		else
@@ -595,9 +594,9 @@ parse_headers (buf, h)
 	ptr = buf;
 
 	forever {
-		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace(*(ptr+1)) && *(ptr+1)!= '\n')); ptr++) {
+		for (ptrline = ptr; *ptr && (*ptr != '\n' || (isspace(*(ptr+1)) && *(ptr+1) != '\n')); ptr++) {
 			if (((*ptr) & 0xFF) < ' ') {
-				if (*ptr=='\n'&&isspace(*(ptr+1))&&*(ptr+1)!='\n')
+				if (*ptr == '\n' && isspace(*(ptr+1)) && *(ptr+1) !='\n')
 					*ptr=1;
 				else
 					*ptr = ' ';
@@ -610,10 +609,10 @@ parse_headers (buf, h)
 		switch (toupper(*ptrline)) {
 			case 'F':	/* From:  mandatory */
 			case 'T':	/* To:    mandatory (mailbox) */
-				if (! got_from) {
+				if (!got_from) {
 					if ((match_header (ptrline, "From", buf2, NULL, HEADER_LEN) ||
 					    match_header (ptrline, "To", buf2, NULL, HEADER_LEN)) &&
-					    *buf2 != '\0' ) {
+					    *buf2 != '\0') {
 						parse_from (buf2, art_from_addr, art_full_name);
 						h->from = hash_str (art_from_addr);
 						if (art_full_name[0]) {
@@ -624,7 +623,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'R':	/* References: optional */
-				if (! got_refs) {
+				if (!got_refs) {
 					if (match_header (ptrline, "References", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						h->refs = str_dup (buf2);
 						got_refs = TRUE;
@@ -632,7 +631,7 @@ parse_headers (buf, h)
 				}
 
 				/* Received:  If found its probably a mail article */
-				if (! got_received) {
+				if (!got_received) {
 					if (match_header (ptrline, "Received", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						max_lineno = 50;
 						got_received = TRUE;
@@ -640,7 +639,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'S':	/* Subject:  mandatory */
-				if (! got_subject) {
+				if (!got_subject) {
 					if (match_header (ptrline, "Subject", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						s = eat_re (buf2);
 						h->subject = hash_str (s);
@@ -649,7 +648,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'D':	/* Date:  mandatory */
-				if (! got_date) {
+				if (!got_date) {
 					if (match_header (ptrline, "Date", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						h->date = parsedate (buf2, (struct _TIMEINFO *) 0);
 						got_date = TRUE;
@@ -657,7 +656,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'X':	/* Xref:  optional */
-				if (! got_xref) {
+				if (!got_xref) {
 					if (match_header (ptrline, "Xref", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						h->xref = str_dup (buf2);
 						got_xref = TRUE;
@@ -665,7 +664,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'M':	/* Message-ID:  mandatory */
-				if (! got_msgid) {
+				if (!got_msgid) {
 					if (match_header (ptrline, "Message-ID", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						h->msgid = str_dup (buf2);
 						got_msgid = TRUE;
@@ -673,7 +672,7 @@ parse_headers (buf, h)
 				}
 				break;
 			case 'L':	/* Lines:  optional */
-				if (! got_lines) {
+				if (!got_lines) {
 					if (match_header (ptrline, "Lines", buf2, NULL, HEADER_LEN) && *buf2 != '\0') {
 						h->lines = atoi (buf2);
 						got_lines = TRUE;
@@ -712,7 +711,7 @@ parse_headers (buf, h)
 				break;
 		} /* switch */
 
-		if (! flag || lineno > max_lineno || got_archive) {
+		if (!flag || lineno > max_lineno || got_archive) {
 			/*
 			 * The sonofRFC1036 states that the following hdrs are
 			 * mandatory. It also states that Subject, Newsgroups
@@ -720,7 +719,7 @@ parse_headers (buf, h)
 			 */
 			if (got_from && got_date && got_msgid) {
 
-				if (! got_subject)
+				if (!got_subject)
 					h->subject = hash_str ("<No subject>");
 
 				debug_print_header (h);
@@ -882,7 +881,7 @@ sleep(1);
 		 * READ article message id
 		 */
 		q = strchr (p, '\t');
-		if (q == (char *) 0 || p == q ) {	/* Empty msgid's */
+		if (q == (char *) 0 || p == q) {	/* Empty msgid's */
 #ifdef DEBUG
 			error_message ("Bad overview record (Msg-id) [%s]", p);
 			debug_nntp ("iReadNovFile", "Bad overview record (Msg-id)");
@@ -941,7 +940,7 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
-			if (! *p || (*p < '0' && *p > '9')) {
+			if (!*p || (!isdigit(*p))) {
 #ifdef DEBUG
 				error_message ("Bad overview record (Lines) [%s]", p);
 				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");
@@ -952,7 +951,11 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		arts[top].lines = atoi (p);
+		if(isdigit(*p))
+		  arts[top].lines = atoi (p);
+		else
+		  arts[top].lines = -1;
+
 		p = (q == (char *) 0 ? (char *) 0 : q + 1);
 
 		/*
@@ -1100,7 +1103,7 @@ vWriteNovFile (psGrp)
 		if (psGrp->attribute->sort_art_type != SORT_BY_NOTHING)
 			SortBy(artnum_comp);
 
-		if (! overview_index_filename)
+		if (!overview_index_filename)
 			fprintf (hFp, "%s\n", psGrp->name);
 
 		for (iNum = 0; iNum < top; iNum++) {
@@ -1237,7 +1240,7 @@ pcFindNovFile (psGrp, iMode)
 					}
 */
 				}
-				if (! overview_index_filename) {
+				if (!overview_index_filename) {
 					pcDir = index_newsdir;
 					iHashFileName = TRUE;
 				}
@@ -1370,7 +1373,7 @@ do_update ()
 			printf ("%s %s\n", (catchup ? "Catchup" : "Updating"), psGrp->name);
 			fflush (stdout);
 		}
-		if (! index_group (psGrp)) {
+		if (!index_group (psGrp)) {
 			continue;
 		}
 		if (catchup) {
@@ -1737,7 +1740,7 @@ vCreatePath (pcPath)
 {
 	char	acCmd[LEN];
 
-	/* HACK HACK HACK to get nov files off my overfull news partition !!! */
+	/* HACK HACK HACK to get nov files off my overfull news partition !!!*/
 	sprintf (acCmd, "/bin/mkdir -p %s", pcPath);
 printf ("CREATE Path=[%s]\n", acCmd);
 	system (acCmd);

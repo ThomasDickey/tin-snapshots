@@ -80,7 +80,7 @@ hash_msgid(key)
 	unsigned int hash = 0;
 
 	while (*key && *key != '@') {
-		hash = (hash << 1 ) ^ *key;
+		hash = (hash << 1) ^ *key;
 		++key;
 	}
 
@@ -99,7 +99,7 @@ add_to_parent(ptr)
 #ifdef HAVE_REF_THREADING
 	struct t_msgid *p;
 
-	if (! ptr->parent)
+	if (!ptr->parent)
 		return;
 
 	/*
@@ -170,7 +170,7 @@ add_msgid(key, msgid, newparent)
 	struct t_msgid *i = NULL;
 	unsigned int h;
 
- 	if (! msgid) {
+ 	if (!msgid) {
  		error_message("add_msgid: NULL msgid\n", "");
  		exit(1);
  	}
@@ -220,7 +220,7 @@ add_msgid(key, msgid, newparent)
 				for (ptr = newparent; ptr != NULL; ptr = ptr->parent) {
 					if (strcasecmp(ptr->txt, msgid) == 0) {
 #ifdef DEBUG_REFS
-						fprintf(stderr, "Avoiding circular reference! (key=%s)\n", (key==MSGID_REF)?"MSG":"REF");
+						fprintf(stderr, "Avoiding circular reference!(key=%s)\n", (key==MSGID_REF)?"MSG":"REF");
 #endif
 						return(i);
 					}
@@ -306,7 +306,7 @@ parse_references(r)
 	char *ptr;
 	struct t_msgid *parent, *current;
 
-	if (! r)
+	if (!r)
 		return(NULL);
 
 #ifdef DEBUG_REFS
@@ -654,7 +654,7 @@ find_next(ptr)
 		/*
 		 * Children first, unless bottom is set
 		 */
-		if (! bottom && ptr->child != NULL) {
+		if (!bottom && ptr->child != NULL) {
 			ptr = ptr->child;
 
 			/*
@@ -826,7 +826,7 @@ collate_subjects()
 			 * is that we have to add later threads onto the end of the
 			 * previous thread
 			 */
-			if ( ((arts[i].subject == arts[j].subject) ||
+			if (((arts[i].subject == arts[j].subject) ||
 						   ((arts[i].part || arts[i].patch) &&
 							 arts[i].archive == arts[j].archive))) {
 /*fprintf(stderr, "RES: %d is now inthread, at end of %d\n", i, j);*/

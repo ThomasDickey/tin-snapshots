@@ -22,8 +22,8 @@ constext txt_abort_searching[] = "Do you want to abort searching? (y/n): ";
 constext txt_active_file_is_empty[] = "\n%s contains no newsgroups. Exiting.";
 constext txt_added_groups[] = "Added %d group%s";
 constext txt_append_overwrite_quit[] = "File %s exists. a)ppend, o)verwrite, q)uit: ";
-constext txt_art_cannot_delete[] = "Article cannot be deleted";
-constext txt_art_deleted[] = "Article deleted";
+constext txt_art_cancel[] = "Article canceld (deleted).";
+constext txt_art_cannot_cancel[] = "Article cannot be canceld (deleted).";
 constext txt_art_marked_as_unread[] = "Article marked as unread";
 constext txt_art_newsgroups[] = "Your article will be posted to the following newsgroup%s:\n";
 constext txt_art_not_saved[] = "Article not saved";
@@ -89,12 +89,12 @@ char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin
 #ifdef WIN32
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
 #endif
+constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%s]? (d/s/q): %c";
+constext txt_canceling_art[] = "Canceling article...";
 constext txt_creating_active[] = "Creating active file for saved groups...\n";
 constext txt_creating_newsrc[] = "Creating newsrc file...\n";
-constext txt_delete_article[] = "Delete or supersede article [%s]? (d/s/q): %c";
 constext txt_delete_processed_files[] = "Delete saved files that have been post processed? (y/n): ";
 constext txt_deleting[] = "Deleting...";
-constext txt_deleting_art[] = "Deleting article...";
 constext txt_superseding_art[] = "Superseding article...";
 constext txt_end_of_arts[] = "*** End of Articles ***";
 constext txt_end_of_groups[] = "*** End of Groups ***";
@@ -150,7 +150,7 @@ constext txt_help_shell[] = "!\t  shell escape\r\n";
 #endif
 #ifdef CASE_PROBLEM
 constext txt_help_BIGB[] = "B\t  display article by body string case-insensitive search\r\n\t  (searches are case-insensitive and wrap around to all articles)\r\n";
-constext txt_help_BIGD[] = "D\t  delete (cancel) current article; must have been posted by you\r\n";
+constext txt_help_BIGD[] = "D\t  cancel (delete) current article; must have been posted by you\r\n";
 constext txt_help_BIGI[] = "I\t  toggle inverse video\r\n";
 constext txt_help_BIGK[] = "K\t  mark thread as read and display next unread\r\n";
 constext txt_help_BIGM[] = "M\t  menu of configurable options\r\n";
@@ -161,7 +161,7 @@ constext txt_help_BIGW[] = "W\t  list articles posted by you (from posted file)\
 constext txt_help_BIGX[] = "X\t  toggle display of all/selected articles\r\n";
 #else
 constext txt_help_B[] = "B\t  display article by body string case-insensitive search\r\n\t  (searches are case-insensitive and wrap around to all articles)\r\n";
-constext txt_help_D[] = "D\t  delete (cancel) current article; must have been posted by you\r\n";
+constext txt_help_D[] = "D\t  cancel (delete) current article; must have been posted by you\r\n";
 constext txt_help_I[] = "I\t  toggle inverse video\r\n";
 constext txt_help_K[] = "K\t  mark thread as read and display next unread\r\n";
 constext txt_help_M[] = "M\t  menu of configurable options\r\n";
@@ -239,7 +239,7 @@ constext txt_help_g[] = "g\t  choose group by name\r\n";
 constext txt_help_g_c[] = "c\t  mark group as all read\r\n";
 constext txt_help_g_caret_dollar[] = "^ $\t  choose first ($ = last) group in list\r\n";
 constext txt_help_g_cr[] = "<CR>\t  read chosen group\r\n";
-constext txt_help_g_ctrl_r[] = "^R\t  reset .newsrc (all available articles in groups marked unread\r\n";
+constext txt_help_g_ctrl_r[] = "^R\t  reset .newsrc (all available articles in groups marked unread)\r\n";
 constext txt_help_g_d[] = "d\t  toggle display of group name only or group name plus description\r\n";
 constext txt_help_g_l[] = "l\t  list and select another spooldir\r\n";
 constext txt_help_g_num[] = "<0> - <9> choose group by number\r\n";
@@ -655,7 +655,7 @@ constext txt_quick_filter_kill[] = "Add quick kill filter (y/n): ";
 constext txt_quick_filter_select[] = "Add quick selection filter (y/n): ";
 constext txt_quit[] = "Do you really want to quit? (y/n): ";
 constext txt_quit_no_write[] = "Do you really want to quit without saving your configuration? (y/n): ";
-constext txt_quit_delete[] = "e)dit cancel message, q)uit, d)elete";
+constext txt_quit_cancel[] = "e)dit cancel message, q)uit, d)elete";
 
 #ifdef HAVE_PGP
 #ifdef HAVE_ISPELL
@@ -776,7 +776,7 @@ constext txt_error_followup_to_several_groups[] = "Error: Followup-To set to mor
 constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
   to just the  key points to which you are  responding, or  people will think\n\
-  you are a dweeb!  Many people have the habit of skipping any article  whose\n\
+  you are a dweeb! Many people have the habit of skipping any article  whose\n\
   first page  is largely  quoted material.  Format your  article to fit in 80\n\
   columns, since  that's the  conventional size.  If your  lines are too long\n\
   they'll wrap  around  ugly and  people won't  read what you  write.  If you\n\
