@@ -121,10 +121,11 @@ psGrpFind (
 }
 
 /*
- * Add group to the group_hash of active groups
- * utilises the num_active and max_active global variables
+ * Make sure memory available for next active slot
+ * Adds group to the group_hash of active groups
+ * Return pointer to next free active slot or NULL on duplicates
  */
-int
+struct t_group *
 psGrpAdd (
 	char *group)
 {
@@ -139,20 +140,20 @@ psGrpAdd (
 	if (group_hash[h] == -1) {
 		group_hash[h] = num_active;
 
-	} else {	/* hash linked list chaining */
+	} else { /* hash linked list chaining */
 
 		for (i=group_hash[h]; active[i].next >= 0; i=active[i].next) {
 			if (STRCMPEQ(active[i].name, group))
-				return(-1);				/* kill dups */
+				return(NULL);				/* kill dups */
 		}
 
 		if (STRCMPEQ(active[i].name, group))
-			return(-1);
+			return(NULL);
 
 		active[i].next = num_active;
 	}
 
-	return(0);
+	return(&active[num_active++]);
 }
 
 /*

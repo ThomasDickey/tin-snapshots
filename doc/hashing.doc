@@ -1,27 +1,52 @@
-Hashing in tin (updated 21/05/96)
+Hashing in tin (updated 10/02/97)
 --------------
-Group names (ie active[]) are hashed in a table called group_hash[] for
-speed. Entry of -1 denotes no group at this hashnode, >= denotes an index
-into active[]
+
+All the main arrays in tin are dynamically managed by functions in memory.c
+They are preallocated to an initial size and then grown if the high
+water mark is exceeded.
+
+The main structures are:
+
+active[]
+An array of all the groups in the active file
+
+TODO - base[] ??
+
+group_hash[]
+active[] is hashed for faster access. An entry of -1 denotes no group at
+this hashnode, >= 0 denotes an index into active[]
 Multiple groups on one node are chained via the .next field (another index
 ptr to active[])
 
+my_group[]
+List of integer pointers into active[]
+These are the groups that actually appear on the selection screen
+
+arts[]
+This is an array of the article headers for the current group. Only headers
+present in the overview (NOV) database are stored.
+
+msgids[]
+Hashed array of all the individual message-ids in arts[]
+All the Message-ID and Reference headers are broken down and stored here.
+They are linked together by parent, sibling and child pointers
+
+table[]
+Hash of the key headers from the articles, to save space and speed up 
+searches and compares.
+
+
 
 active.c:
-	init_group_hash() clears this structure
-	find_group_index() returns index of group in active[]
-	read_news_active_file() has the code for linking in
-	a new group to active[]. Maybe this should have its' own
-	function.
+	read_news_active_file() populates active[] using psGrpAdd()
 
 
 art.c:
-	Lots of calls to hash_str()
+	Many of the overview headers are stored with hash_str()
 
 
 hashstr.c:
-	hash_str() Hashes text (Reduces redundancy and memory
-	thrashing, makes text compares much faster)
+	hash_str() Hashes text strings
 
 	In the article header, the following text is hashed:
 		From: (including full name if supplied)
@@ -30,15 +55,15 @@ hashstr.c:
 
 
 list.c:
-	psGrpFind() Fine a group in active. The code for this
-	and the code in active.c to add a group are so similar
-	they should be combined.
-
-
-mail.c:
-	read_mail_active_file() again uses very similar code
-	for adding to active[]
-
+	init_group_hash() clears group_hash[]
+	find_group_index() returns index of group in active[]
+	psGrpFind() returns a pointer to a group in active[]
+	psGrpAdd() adds a group into active[] and hashes it in group_hash[]
+	hash_groupname() returns hash key for a group
+		This is also used to hash the actual filenames written
+		in ~/.tin/.news (when not using NNTP)
+		There is experimental code here for a (presumably)
+		improved hash function that was never completed.
 
 main.c:
 	Just the initializers for hashing
@@ -50,18 +75,13 @@ memory.c:
 	text cache
 
 
-misc.c:
-	hash_groupname() returns hash key for a group
-	This is also used to hash the actual filenames written
-	in ~/.tin/.news (when not using NNTP)
-	There is experimental code here for a (presumably)
-	improved hash function that was never completed.
-
-
 refs.c:
-	message-ids are hashed in a table called msgids[]
-	The Message-ID and References headers from articles are
-	hashed into this structure. When threading, each
-	msgid in the hash has a pointer back to its article
-	header in arts[] or ART_NORMAL if the article is not
+	Handling for msgids[]
+	When threading, each msgid in the hash has a pointer back to
+	its article header in arts[] or ART_NORMAL if the article is not
 	available
+
+
+select.c:
+	my_group_add() adds a group to my_group[]
+	my_group_find() returns the index of a group in my_group[]

@@ -25,7 +25,7 @@ time_t new_newnews_time;			/* FIXME: never set */
 static int find_newnews_index (char *cur_newnews_host);
 static int match_group_list (char *group, char *group_list);
 static void check_for_any_new_groups (void);
-static void do_autosubscribe (char *group, char *autosubscribe, char *autounsubscribe);
+static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 
 #if 0 /* never used */
 /*
@@ -129,6 +129,58 @@ resync_active_file (void)
 #define ACTIVE_SEP				" \n"
 
 /*
+ * Populate a slot in the active[] array
+ * TODO: 1) Have a preinitialised default slot and block assign it for speed
+ * TODO: 2) Lump count/max/min/moderat into a t_active, big patch but much cleaner throughout tin
+ * TODO: shift name to psGrpAdd
+ */
+static void
+active_add(
+	struct t_group *ptr,
+	char *name,
+	long count,
+	long max,
+	long min,
+	char *moderated)
+{
+	ptr->name = my_strdup(name);
+	ptr->description = (char *) 0;
+	/* spool - see below */
+	ptr->moderated = moderated[0];
+	ptr->count = count;
+	ptr->xmax = max;
+	ptr->xmin = min;
+	/* type - see below */
+	ptr->inrange = FALSE;
+	ptr->read_during_session = FALSE;
+	ptr->art_was_posted = FALSE;
+	ptr->subscribed = FALSE;			/* not in my_group[] yet */
+	ptr->newgroup = FALSE;
+	ptr->next = -1;						/* hash chain */
+	ptr->newsrc.xbitmap = (t_bitmap *) 0;
+	ptr->attribute = (struct t_attribute *) 0;
+	ptr->glob_filter = &glob_filter;
+	ptr->grps_filter = (struct t_filters *) 0;
+	vSetDefaultBitmap (ptr);
+#ifdef INDEX_DAEMON
+	ptr->last_updated_time = (time_t) 0;
+#endif
+
+#ifdef WIN32				/* Paths are in form - x:\a\b\c */
+	if (strchr(moderated, '\\')) {
+#else
+	if (moderated[0] == '/') {
+#endif
+		ptr->type = GROUP_TYPE_SAVE;
+		ptr->spooldir = my_strdup(moderated);
+	} else {
+		ptr->type = GROUP_TYPE_NEWS;
+		ptr->spooldir = spooldir;		/* another global - sigh */
+	}
+}
+
+
+/*
  * Parse line from news or mail active files
  */
 int
@@ -195,8 +247,8 @@ parse_newsrc_active_line (
 }
 
 /*
- *  Load the news active file into active[]
- *  [ No longer done: used to create copy of active ~/.tin/active ]
+ * Load the active file into active[]
+ * Check and preload any new newgroups into my_group[]
  */
 
 void
@@ -205,15 +257,15 @@ read_news_active_file (void)
 	FILE *fp = 0;
 	char buf[HEADER_LEN];
 	char moderated[PATH_LEN];
+	struct t_group *ptr;
 	long count = -1L, min = 1, max = 0;
 
-/* TODO - does this leak an fd ? can we fold into next section ? */
 	if (newsrc_active && ((fp = fopen (newsrc, "r")) == (FILE *) 0))
 		newsrc_active = FALSE;
 
 	if (SHOW_UPDATE) {
-		wait_message (newsrc_active ? txt_reading_news_newsrc_file :
-						txt_reading_news_active_file);
+		wait_message (newsrc_active ? txt_reading_news_newsrc_file
+					    : txt_reading_news_active_file);
 	}
 
 	if (!newsrc_active) {
@@ -232,8 +284,6 @@ read_news_active_file (void)
 			tin_done (EXIT_ERROR);
 		}
 	}
-
-	strcpy (moderated, "y");			/* Assume moderated as default */
 
 	forever {
 		if (fgets (buf, sizeof(buf), fp) == (char *)0)
@@ -259,51 +309,16 @@ read_news_active_file (void)
 		 * Load group into group hash table
 		 * Error => duplicate group
 		 */
-		if (psGrpAdd(buf) != 0)
-			goto read_news_active_continue;
+		if ((ptr = psGrpAdd(buf)) == NULL)
+			continue;
 
 		/*
-		 * Load group info.
+		 * Load the new group in active[]
 		 */
-#ifdef WIN32
-		/*
-		 * Paths are in form - x:\a\b\c
-		 */
-		if (strchr(moderated, '\\')) {
-#else
-		if (moderated[0] == '/') {
-#endif
-			active[num_active].type = GROUP_TYPE_SAVE;
-			active[num_active].spooldir = my_strdup(moderated);
-		} else {
-			active[num_active].type = GROUP_TYPE_NEWS;
-			active[num_active].spooldir = spooldir;
-		}
-		active[num_active].name = my_strdup (buf);
-		active[num_active].description = (char *) 0;
-		active[num_active].count = count;
-		active[num_active].xmax = max;
-		active[num_active].xmin = min;
-		active[num_active].moderated = moderated[0];
-		active[num_active].next = -1;			/* hash chaining */
-		active[num_active].inrange = FALSE;
-		active[num_active].read_during_session = FALSE;
-		active[num_active].art_was_posted = FALSE;
-		active[num_active].subscribed = FALSE;		/* not in my_group[] yet */
-		active[num_active].newgroup = FALSE;
-		active[num_active].newsrc.xbitmap = (t_bitmap *) 0;
-		active[num_active].attribute = (struct t_attribute *) 0;
-		active[num_active].glob_filter = &glob_filter;
-		active[num_active].grps_filter = (struct t_filters *) 0;
-		vSetDefaultBitmap (&active[num_active]);
-#ifdef INDEX_DAEMON
-		active[num_active].last_updated_time = (time_t) 0;
-#endif
+		active_add(ptr, buf, count, max, min, moderated);
+
 		if (num_active % 100 == 0 && !update)
 			spin_cursor ();
-
-		num_active++;
-read_news_active_continue:;
 	}
 	fclose (fp);
 
@@ -404,16 +419,6 @@ check_for_any_new_groups (void)
 		old_newnews_time = (time_t) 0;
 	}
 
-/* What is this doing ?
-	if (!read_news_via_nntp && newnews_index >= 0) {
-		new_active_size = the_newnews_time;
-		old_active_size = new_newnews_size[active_index].attribute;
-		if (the_newnews_time <= old_active_size) {
-			goto notify_groups_done;
-		}
-	}
-*/
-
 #if 0
 	if (debug == 2) {
 		sprintf (msg, "Newnews old=[%ld]  new=[%ld]",
@@ -460,12 +465,12 @@ check_for_any_new_groups (void)
 				continue;
 			}
 		}
-		do_autosubscribe(buf, autosubscribe, autounsubscribe);
+		subscribe_new_group(buf, autosubscribe, autounsubscribe);
 	}
 
-notify_groups_done:		/* TODO - this can be eliminated */
-	if (fp != (FILE *) 0)		/* TODO Should be moved */
+	if (fp != (FILE *) 0)
 		fclose (fp);
+notify_groups_done:		/* TODO - this can be eliminated */
 
 	/*
 	 * update attribute field / create new entry with new date
@@ -479,6 +484,7 @@ notify_groups_done:		/* TODO - this can be eliminated */
 }
 
 /*
+ * Subscribe to a new news group:
  * Handle the AUTOSUBSCRIBE/AUTOUNSUBSCRIBE env vars
  * They hold a wildcard list of groups that should be automatically
  * (un)subscribed when a new group is found
@@ -487,22 +493,42 @@ notify_groups_done:		/* TODO - this can be eliminated */
  * Otherwise, mark it as New for inclusion in selection screen
  */
 static void
-do_autosubscribe (
+subscribe_new_group (
 	char *group,
 	char *autosubscribe,
 	char *autounsubscribe)
 {
 	int idx;
+	struct t_group *ptr;
 
 	if ((autounsubscribe != (char *) 0) && match_group_list (group, autounsubscribe))
 		return;
 
-	if ((idx = add_my_group(group, 1)) < 0)			/* Add to selection list */
-		return;
-		
+	/*
+	 * Try to add the group to our selection list. If this fails, we're
+	 * probably using -n, so we fake an entry with no counts. The count will
+	 * be properly updated when we enter the group
+	 */
+	if ((idx = my_group_add(group)) < 0) {
+		if (!newsrc_active)
+			fprintf(stderr, "subscribe_new_group: group not in active[] && !newsrc_active\n");
+
+		if ((ptr = psGrpAdd(group)) != NULL)
+			active_add(ptr, group, 0, 1, 0, "n");
+
+		if ((idx = my_group_add(group)) < 0) 
+			return;
+	}
+
 	if ((autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
-fprintf(stderr, "Autosub: %s!\n", group);
+		fprintf(stderr, "\nAutosubscribed to %s", group);
+
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
+		/*
+		 * Bad kluge to stop group later appearing in New newsgroups. This
+		 * effectively loses the group, and it will be reread by read_newsrc()
+		 */
+		group_top--;
 	} else {
 		active[my_group[idx]].newgroup = TRUE;
 	}

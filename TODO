@@ -6,7 +6,7 @@ o  on some systems (my linux 2.0.26/gcc 2.7.2.1) - tin claims that the
 
 o  fix nntp_open/get_server (as reconnect often fails on the first try
    nntp_open should return differrent values for 'different' errors
-   so we can try to reconnect more then once - see open.c/nntplib.c)
+   so we can try to reconnect more then once - see open.c/nntplib.[ch])
 
 o  sender-patch
    If user ads From:-line, accept it but build a Sender:-line
@@ -40,15 +40,8 @@ o  taged_article-counter somes os not displayed correctly (group.c/thread.c)
    szenario: 4 articles in 3 threads: 1, 2, 1 ... tag all 4 and then untag
              number 2 - *bingo!*
 
-o  subscribe to newgroups does not work if tin is started with the -n flag
-   (introduced in 961125)
-
 o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
-
-o  on x*n+1 articles (n=articles on one screen) - <end> does not work
-   correctly (it jumps to the (x*n)th artilce - f.e. 22 articles, 21 per
-   page, <end> jumps to the 21st)
 
 o  ispell checks all headers
 
@@ -61,10 +54,6 @@ o  with --enable-forgery reposting of an thread reposts only the first
 
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
-
-o  kill-file editor does not quote brackets, stars and question marks
-   in the subject - this leads to unexpected results cause they are
-   treated as wildcards
 
 o  only create_index_lock_file() if it is really needed (tind/tin -U) and only
    try to remove the lock file if it is really created (cleanup_tmp_files())
@@ -123,6 +112,10 @@ o  sometimes (when using tins kill-menu) kill-file entries are
 
 o  killing articles with Lines: 0 on lines=0 does not work
 
+o  kill-file editor does not quote brackets, stars and question marks
+   in the subject - this leads to unexpected results cause they are
+   treated as wildcards
+
 New features
 ------------
 o  add abillity to strip bogus newsgroups from newsrc
@@ -143,7 +136,6 @@ o  add feature save selected/tagged files sequentially to the same file
 
 o  add feature Cc:
 
-
 o  add counter to post-processing commands (processing file x of y)
 
 o  add feature show_new_newsgroups_since
@@ -163,7 +155,7 @@ o  Additions to the thread menu :
 	'/' (search subject)
 	'S' (autosave tagged)
 	'U' (untag all)
-	'M' (option menu)
+	'M' (option menu)	- not easy if the threading changes!
 	'w' (post an article)
 	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
 	''  r ought to be toggle show all/show only unread
@@ -350,9 +342,6 @@ o  if answering (c)atchup with (n) you are leaving the group... not useful
 
 o  numbering of Hot articles is wrong after (post)processing them
    (6T 0A 0K -5H R)
-
-o  with show_only_unread_groups=ON and (y)ank in all groups, (y)ank out all
-   groups show_only_unread_groups-status get lost :(
 
 o  fix reposition of cursor after reading active file... annoying! 
 

@@ -95,9 +95,12 @@ extern void debug_save_comp (void);
 extern void debug_print_comment (const char *comment);
 extern void debug_print_active (void);
 extern void debug_print_bitmap (struct t_group *group, struct t_article *art);
+#ifdef DEBUG_NEWSRC
 extern void debug_print_newsrc (struct t_newsrc *NewSrc, FILE *fp);
+#endif
+#ifdef DEBUG
 extern void vDbgPrintMalloc (int iIsMalloc, const char *pcFile, int iLine, size_t iSize);
-extern void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
+#endif
 extern void debug_print_filters (void);
 
 /* envarg.c */
@@ -164,7 +167,7 @@ extern void init_group_hash (void);
 extern unsigned long hash_groupname (const char *group);
 extern int find_group_index (const char *group);
 extern struct t_group *psGrpFind (char *pcGrpName);
-extern int psGrpAdd (char *group);
+extern struct t_group *psGrpAdd (char *group);
 #if 0
 extern struct t_group *psGrpFirst (void);
 extern struct t_group *psGrpLast (void);
@@ -274,7 +277,6 @@ extern void vNewsrcTestHarness (void);
 extern char *getserverbyfile (const char *file);
 extern int server_init (char *machine, const char *service, int port);
 extern int get_tcp_socket (const char *machine, const char *service, unsigned port);
-/*extern int handle_server_response (int response, char *nntpserver);*/ /* not used */
 extern void u_put_server (const char *string);
 extern void put_server (const char *string);
 extern int get_server (char *string, int size);
@@ -480,7 +482,7 @@ extern int strcasecmp (const char *p, const char *q);
 extern int strncasecmp (const char *p, const char *q, size_t n);
 #endif
 #ifndef HAVE_ATOI
-extern long atoi (const char *s);
+extern int atoi (const char *s);
 #endif
 #ifndef HAVE_ATOL
 extern long atol (const char *s);

@@ -373,8 +373,8 @@ OUT:
 #ifndef HAVE_STRCASECMP
 int
 strcasecmp (
-	/* const */ char *p,
-	/* const */ char *q)
+	const char *p,
+	const char *q)
 {
 	int r;
 	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
@@ -390,8 +390,8 @@ strcasecmp (
 #ifndef HAVE_STRNCASECMP
 int
 strncasecmp(
-	/* const */ char *p,
-	/* const */ char *q,
+	const char *p,
+	const char *q,
 	size_t n)
 {
 	int r=0;

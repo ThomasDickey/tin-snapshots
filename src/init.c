@@ -248,6 +248,10 @@ t_bool xover_supported = FALSE;
 t_bool xref_supported = TRUE;
 t_bool xuser_supported = FALSE;
 
+#ifdef HAVE_SYS_UTSNAME_H
+struct utsname system_info;
+#endif
+
 #ifdef HAVE_METAMAIL
 t_bool use_metamail;				/* enables/disables metamail on MIME messages */
 t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
@@ -278,6 +282,14 @@ void init_selfinfo (void)
 	tin_gid = getegid ();
 	real_uid = getuid ();
 	real_gid = getgid ();
+
+#ifdef HAVE_SYS_UTSNAME_H
+	if (uname(&system_info) < 0) {
+		strcpy(system_info.sysname, "unknown");
+		*system_info.machine = '\0';
+		*system_info.release = '\0';
+	}
+#endif /* HAVE_SYS_UTSNAME_H */
 
 	real_umask = umask (0);
 	umask (real_umask);

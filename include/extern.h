@@ -1271,6 +1271,10 @@ extern t_bool xuser_supported;
 
 extern time_t new_newnews_time;
 
+#ifdef HAVE_SYS_UTSNAME_H
+extern struct utsname system_info;
+#endif
+
 /* This fixes ambiguities on platforms that don't distinguish extern case */
 #ifdef CASE_PROBLEM
 #define txt_help_B   txt_help_BIGB

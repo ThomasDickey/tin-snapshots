@@ -602,7 +602,7 @@ select_done:
 				   		 		if (!active[i].subscribed) {
 									spin_cursor ();
 									subscribe (&active[i], SUBSCRIBED);
-									(void) add_my_group (active[i].name, 1);
+									(void) my_group_add (active[i].name);
 									grp_mark_unread (&active[i]);
 									subscribe_num++;
 								}
@@ -733,7 +733,7 @@ select_done:
 					 */
 					group_top = 0;
 					for (i = 0; i < num_active; i++) {
-						(void) add_my_group (active[i].name, 1);
+						(void) my_group_add (active[i].name);
 					}
 
 					/*
@@ -741,7 +741,7 @@ select_done:
 					 */
 					if (n < group_top) {
 						if (n) {
-							cur_groupnum = add_my_group (buf, 1);
+							cur_groupnum = my_group_add (buf);
 						}
 						sprintf (buf, txt_added_groups, group_top - n,
 							group_top - n == 1 ? "" : txt_plural);
@@ -755,7 +755,8 @@ select_done:
 				} else {
 					wait_message (txt_yanking_sub_groups);
 					vWriteNewsrc ();
-					read_newsrc (newsrc, 1);
+/* TODO - remove if working okay without this		read_newsrc (newsrc, 1);*/
+					toggle_my_groups(show_only_unread_groups, "");
 					if (_hp_glitch) {
 						erase_group_arrow ();
 					}
@@ -1031,7 +1032,7 @@ choose_new_group (void)
 
 	clear_message ();
 
-	idx = add_my_group (p, 1);
+	idx = my_group_add (p);
 	if (idx == -1) {
 		sprintf (msg, txt_not_in_active_file, p);
 		info_message (msg);
@@ -1246,6 +1247,9 @@ set_groupname_len (
 	}
 }
 
+/*
+ * Toggle my_group[] to contain all/all unread groups
+ */
 void
 toggle_my_groups (
 	t_bool only_unread_groups,
@@ -1258,7 +1262,7 @@ toggle_my_groups (
 	FILE *fp;
 	int active_idx = 0;
 	int group_num = cur_groupnum;
-	register int i, j;
+	register int i;
 
 	if ((fp = fopen (newsrc, "r")) == (FILE *) 0)
 		return;
@@ -1290,16 +1294,15 @@ toggle_my_groups (
 		}
 	}
 
-	group_top = -1;
-/* TODO ?? */
-while (active[my_group[++group_top]].newgroup);
+	SKIP_NEWGROUPS;				/* Position group_top after any newgroups */
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
-		ptr = strchr (buf, ':');
+		ptr = strchr (buf, SUBSCRIBED);
 		if (ptr != (char *) 0) {
 			*ptr = '\0';
 			if ((i = find_group_index (buf)) >= 0) {
 				if (only_unread_groups) {
+/* TODO - no attempt is made here to prevent duplicates */
 					if (active[i].newsrc.num_unread) {
 						my_group[group_top] = i;
 						group_top++;
@@ -1316,17 +1319,9 @@ while (active[my_group[++group_top]].newgroup);
 	/*
 	 * Try and reposition on same or next group before toggling
 	 */
-	cur_groupnum = 0;
+	if ((cur_groupnum = my_group_find(old_curr_group)) == -1)
+		cur_groupnum = 0;
 
-	i = find_group_index (old_curr_group);
-	if (i >= 0) {
-		for (j = 0 ; j < group_top ; j++) {
-			if (my_group[j] == i) {
-				cur_groupnum = j;
-				break;
-			}
-		}
-	}
 #endif	/* INDEX_DAEMON */
 }
 
