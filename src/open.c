@@ -170,7 +170,7 @@ nntp_close (void)
 /*
  * Open the mail active file locally
  */
-#ifdef HAVE_MAIL_MH_HANDLING
+#ifdef HAVE_MH_MAIL_HANDLING
 FILE *
 open_mail_active_fp (
 	char *mode)
@@ -342,7 +342,7 @@ open_subscription_fp (void)
 /*
  *  Open mail groups description file.
  */
-#ifdef HAVE_MAIL_MH_HANDLING
+#ifdef HAVE_MH_MAIL_HANDLING
 FILE *
 open_mailgroups_fp (void)
 {
@@ -681,6 +681,7 @@ open_art_fp (
 	}
 }
 
+/* This could well come in useful for filtering on non-overview hdr fields */
 #if 0
 static FILE *
 open_xhdr_fp (
@@ -763,9 +764,20 @@ setup_soft_base (group)
 #endif
 
 /*
- *  Read the article numbers existing in a group's spool directory
- *  into base[] and sort them.  top_base is one past top.
- *  Returns total number of articles in group.
+ * via NNTP:
+ *   Issue a LISTGROUP command
+ *   Read the article numbers existing in the group into base[]
+ *   If the LISTGROUP failed, issue a GROUP command. Use the results to
+ *   create a less accurate version of base[]
+ *   
+ * on local spool:
+ *   Read the spool dir to populate base[] as above.
+ *
+ * Grow the arts[] and bitmaps as needed.
+ * NB: the output will be sorted on artnum
+ *
+ * top_base is one past top.
+ * Returns total number of articles in group.
  */
 
 int
@@ -785,39 +797,16 @@ setup_hard_base (
 
 	top_base = 0;
 
+	/*
+	 * If reading with NNTP, issue a LISTGROUP
+	 */
 	if (read_news_via_nntp && group->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
-		sprintf (buf, "group %s", group->name);
-
-		debug_nntp ("setup_base", buf);
-
-		put_server (buf);
-
-			switch (get_server (line, NNTP_STRLEN)) {
-			case -1:
-				error_message (txt_connection_to_server_broken, "");
-				tin_done (EXIT_NNTP_ERROR);
-			case -2:
-				tin_done (0);
-			default:
-				break;
-		}
-
-		if (atoi (line) != OK_GROUP) {
-			debug_nntp ("setup_base", "NOT_OK");
-			return total;
-		}
-
-		debug_nntp ("setup_base", line);
-
-		sscanf (line,"%ld %ld %ld %ld", &dummy, &count, &start, &last);
-
-		total = count;
-
 		sprintf (buf, "listgroup %s", group->name);
 		debug_nntp ("setup_base", buf);
 		put_server (buf);
-			switch (get_server (line, NNTP_STRLEN)) {
+
+		switch (get_server (line, NNTP_STRLEN)) {
 			case -1:
 				error_message (txt_connection_to_server_broken, "");
 				tin_done (EXIT_NNTP_ERROR);
@@ -826,10 +815,14 @@ setup_hard_base (
 			default:
 				break;
 		}
+
+		/*
+		 * LISTGROUP worked
+		 */
 		if (atoi (line) == OK_GROUP) {
 			debug_nntp ("setup_base", line);
 			forever {
-					switch (get_server (line, NNTP_STRLEN)) {
+				switch (get_server (line, NNTP_STRLEN)) {
 					case -1:
 						error_message (txt_connection_to_server_broken, "");
 						tin_done (EXIT_NNTP_ERROR);
@@ -847,20 +840,49 @@ setup_hard_base (
 				}
 				base[top_base++] = atoi (line);
 			}
+		/*
+		 * LISTGROUP failed, try a GROUP command instead
+		 */
 		} else {
 			debug_nntp ("setup_base, listgroup", "NOT_OK");
-			if (last - count > start) {
-				count = last - start;
+			sprintf (buf, "group %s", group->name);
+			debug_nntp ("setup_base", buf);
+
+			put_server (buf);
+			switch (get_server (line, NNTP_STRLEN)) {
+				case -1:
+					error_message (txt_connection_to_server_broken, "");
+					tin_done (EXIT_NNTP_ERROR);
+				case -2:
+					tin_done (0);
+				default:
+					break;
 			}
 
+			if (atoi (line) != OK_GROUP) {
+				debug_nntp ("setup_base", "NOT_OK");
+				return total;
+			}
+
+			debug_nntp ("setup_base", line);
+
+			sscanf (line,"%ld %ld %ld %ld", &dummy, &count, &start, &last);
+
+			total = count;
+
+			if (last - count > start)
+				count = last - start;
+
 			while (start <= last) {
-				if (top_base >= max_art) {
+				if (top_base >= max_art)
 					expand_art();
-				}
 				base[top_base++] = start++;
 			}
 		}
 #endif
+	/*
+	 * Reading off local spool, read the directory files
+	 */
 	} else {
 		joinpath (buf, group->spooldir, group_path);
 
@@ -883,6 +905,7 @@ setup_hard_base (
 			qsort ((char *) base, (size_t)top_base, sizeof (long), base_comp);
 		}
 	}
+
 	if (top_base) {
 		if (base[top_base-1] > group->xmax)
 			group->xmax = base[top_base-1];

@@ -1,13 +1,42 @@
+--unoff BETA release 970222 --
+
+324) Thomas Leitner <tom@finwds01.tu-graz.ac.at>
+     BUG. POSTED_FILE ignores default_maildir
+     FIX. config.c
+
+323) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. description of ^G to online help
+     REM. --disable-ref-threading form configure
+     FIX. help.c, autoconf.hin configure.in
+
+322) Chris Blum <chris@phil.uni-sb.de>
+     BUG. typo in HAVE_MH_MAIL_HANDLING
+     FIX. open.c
+
+321) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. crash on some systems with no subscribed groups
+     BUG. $ not always working on group selection page
+     BUG. workaround for annoying problem with 'u' key
+     ADD. streamlined setup_hard_base() and -n code
+     ADD. tidied up header in article pager
+     ADD. minor cleanup
+     FIX. several supplied patches
+
+320) Theo Van Dinter <felicity@kluge.net>
+     BUG. 'q'uit in the 'D'elte/supersede menu does not redraw the screen
+     ADD. minor code cleanup
+     FIX. init.c, post.c
+
 --unoff BETA release 970217 --
 
 319) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. check_upgrade failes on binaries whose name isn't "tin"
+     BUG. check_upgrade fails on binaries whose name isn't "tin"
      FIX. config.c, lang.c, version.h
 
 318) Tan Kwee Chuan <tankweec@iscs.nus.sg>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. If the realname part of the From:-line is missing, in crashes
-          on a froged-cancel.
+     BUG. If the realname part of the From:-line is missing, tin crashes
+          on a forged-cancel.
      FIX. post.c
 
 317) Kevin Lentin <kevinl@cs.monash.edu.au>
@@ -16,7 +45,7 @@
 
 --unoff BETA release 970214 --
 
-316 ) T.E.Dicky  <dickey@clark.net>
+316) T.E.Dickey <dickey@clark.net>
      ADD. several 'const'
      BUG. tabs before preprocessor symbols (introduced in 312)
      FIX. several supplied patches
@@ -58,7 +87,7 @@
 
 310) Sven Paulus <sven@oops.sub.de>
      ADD. inclusion of empty Followup-To: line (option)
-     ADD. keys for sendding followups/replys with all headers quoted (^W,^Ê)
+     ADD. keys for sending followups/replys with all headers quoted (^W,^E)
      FIX. several supplied patches
 
 --unoff BETA release 970202 --
@@ -75,9 +104,9 @@
      BUG. typo
      FIX. sigfile.c
 
-307) T.E.Dicky  <dickey@clark.net>
+307) T.E.Dickey <dickey@clark.net>
      ADD. more fallback prototypes (e.g., atoi), from warnings I got
-	  running with gcc -traditional on Linux 2.0.0
+          running with gcc -traditional on Linux 2.0.0
      ADD. makes the gcc warnings autoconfigured
      ADD. makes strings 'const' (tested with gcc -Write-strings).
      FIX. several supplied patches
@@ -100,7 +129,7 @@
      ADD. some type fixes (amiga)
      FIX. several supplied patches
 
-302) T.E.Dicky  <dickey@clark.net>
+302) T.E.Dickey <dickey@clark.net>
      ADD. even mode K&R -> ANSI
      FIX. several supplied patches
 
@@ -114,8 +143,8 @@
      BUG. several typos
      FIX. color.c, smakefile
 
-299) T.E.Dicky  <dickey@clark.net>
-     ADD. start to get ridd of K&R code
+299) T.E.Dickey <dickey@clark.net>
+     ADD. start to get rid of K&R code
      FIX. several supplied patches
 
 --unoff BETA release 970124 --

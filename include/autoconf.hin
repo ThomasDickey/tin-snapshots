@@ -40,10 +40,6 @@
 #undef	HAVE_COLOR
 #endif
 
-#ifndef	HAVE_REF_THREADING
-#undef	HAVE_REF_THREADING
-#endif
-
 #undef	DEFAULT_ISO2ASC
 #undef	FORGERY
 #undef	INEWSDIR

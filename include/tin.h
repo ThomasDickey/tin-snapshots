@@ -757,13 +757,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	CURR_GROUP	(active[my_group[cur_groupnum]])
 
 /*
- * Reset my_group[], skipping any newgroups that have been assigned
- */
-#define SKIP_NEWGROUPS \
-	group_top = -1; \
-	while (active[my_group[++group_top]].newgroup)
-
-/*
  * Some informational message are only shown if this is true
  * otherwise suppressed when we're backgrounded or in batch mode
  */
@@ -834,11 +827,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	THREAD_REFS		2
 #define	THREAD_BOTH		3
 
-#ifdef HAVE_REF_THREADING
-#	define	THREAD_MAX		THREAD_BOTH
-#else
-#	define	THREAD_MAX		THREAD_SUBJ
-#endif
+#define	THREAD_MAX		THREAD_BOTH
 
 /*
  * Values for show_author
@@ -979,7 +968,6 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 /* Converts .newsrc subscription char to boolean */
 #define SUB_BOOL(x)	(x == SUBSCRIBED)
 /* Only write newsrc line if subscribed and not stripping */
-/*TODO#define WRITE_NEWSRC(x)	(!(x != SUBSCRIBED && strip_newsrc))*/
 #define WRITE_NEWSRC(x)		(x == SUBSCRIBED || !strip_newsrc)
 
 /*
@@ -1123,11 +1111,9 @@ struct t_msgid
 	struct t_msgid *next;		/* Next in hash chain */
 	char *txt;			/* The actual msgid */
 	struct t_msgid *parent;		/* Message-id followed up to */
-#ifdef HAVE_REF_THREADING
 	struct t_msgid *sibling;	/* Next followup to parent */
 	struct t_msgid *child;		/* First followup to this article */
 	int article;			/* index in arts[] or ART_NORMAL */
-#endif
 };
 
 /*

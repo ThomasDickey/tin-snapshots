@@ -826,7 +826,7 @@ read_cmd_line_groups (void)
 	register int i;
 
 	if (num_cmdargs < max_cmdargs) {
-		SKIP_NEWGROUPS;			/* Position group_top after any newgroups */
+		group_top = skip_newgroups();		/* Reposition after any newgroups */
 
 		for (num = num_cmdargs ; num < max_cmdargs ; num++) {
 			sprintf (buf, txt_matching_cmd_line_groups, cmdargs[num]);

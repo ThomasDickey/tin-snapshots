@@ -54,9 +54,7 @@ bld_tline (
 	int len_from;
 	char mark;
 	char *buff;
-#ifdef HAVE_REF_THREADING
 	struct t_msgid *ptr;
-#endif
 
 	j = INDEX2TNUM(l);			/* j is position on screen of this line */
 	buff = screen[j].col;
@@ -124,7 +122,6 @@ bld_tline (
 		else
 			len_from = 0;
 
-#ifdef HAVE_REF_THREADING
 		/*
 		 * Indent the subject according to the current depth of threading
 		 */
@@ -134,7 +131,6 @@ bld_tline (
 			if (strlen(buff) >= cCOLS)		/* If extremely nested */
 				return;
 		}
-#endif
 
 		/*
 		 * Copy in the subject up to where the author (if any) starts

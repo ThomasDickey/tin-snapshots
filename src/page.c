@@ -35,6 +35,7 @@ char note_h_ftnto[HEADER_LEN];		/* Old X-Comment-To: (Used by FIDO) */
 char *glob_page_group;
 
 FILE *note_fp;				/* the body of the current article */
+FILE *tmp_fp;				/* TODO: hack var for broken overview */
 
 int glob_respnum;
 int last_resp;				/* current & previous article for - command */
@@ -215,7 +216,6 @@ end_of_article:
 				respnum = last_resp;
 				goto restart;
 
-#ifdef HAVE_REF_THREADING
 			case iKeyPageGotoParent:		/* Goto parent of this article */
 
 				if (arts[respnum].refptr->parent == NULL) {
@@ -228,10 +228,20 @@ end_of_article:
 					break;
 				}
 
+				/* TODO: fix this hack properly */
+				/* See if parent really exists in case overview is broken */
+				if ((tmp_fp = open_art_fp (group_path,
+						arts[arts[respnum].refptr->parent->article].artnum)) == (FILE *) 0) {
+					info_message(txt_art_parent_unavail);
+					break;
+				}
+				fclose (tmp_fp);
+				/* TODO: end of hack */
+
 				art_close ();
 				respnum = arts[respnum].refptr->parent->article;
 				goto restart;
-#endif
+
 
 			case iKeyPagePipe:	/* pipe article/thread/tagged arts to command */
 				feed_articles (FEED_PIPE, PAGE_LEVEL, group, respnum);
@@ -1006,55 +1016,81 @@ show_first_header (
 {
 	char buf[HEADER_LEN];
 	char tmp[LEN];
-	char ftbuf[HEADER_LEN];	/* Fido-To-Line */
 	int whichresp;
 	int x_resp;
 	int pos, i, n;
-	struct tm *tm;
+	int grplen, maxlen;
 
 	whichresp = which_response (respnum);
 	x_resp = num_of_responses (which_thread (respnum));
 
 	ClearScreen ();
 
-	tm = localtime (&arts[respnum].date);
-	if (!my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S", tm)) {
+	if (!my_strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S", localtime (&arts[respnum].date)))
 		strcpy (buf, note_h_date);
-	}
 
-	pos = (cCOLS - (int) strlen (group)) / 2;
-	for (i = strlen(buf); i < pos; i++) {
+	/*
+	 * Work out how much room we have for group name, allow 1 space before and
+	 * after it
+	 */
+	grplen = strlen(group);
+	maxlen = RIGHT_POS - strlen(buf) - 2;
+
+	if (grplen < maxlen)
+		maxlen = grplen;
+		
+	/*
+	 * Aesthetics - Add 3 to compensate for the fact that
+	 * the left hand margin (date) is longer than the right hand margin
+	 */
+	pos = 3 + (cCOLS - maxlen) / 2;
+
+	for (i = strlen(buf); i < pos; i++)		/* Pad out to left */
 		buf[i] = ' ';
-	}
 	buf[i] = '\0';
 
-	strcat (buf, group);
-
-	for (i = strlen(buf); i < RIGHT_POS ; i++) {
-		buf[i] = ' ';
+	if (maxlen != grplen) {					/* ie groupname was too long */
+		strncat (buf, group, maxlen-3);
+		strcat (buf, "...");
+	} else {
+		strncat (buf, group, maxlen);
 	}
+
+	for (i = strlen(buf); i < RIGHT_POS ; i++)	/* Pad out to right */
+		buf[i] = ' ';
 	buf[i] = '\0';
 
 #ifdef HAVE_COLOR
 	fcol(col_head);
 #endif
 
+	/* What's this for ? */
 	if (note_h_ftnto[0] && show_xcommentto && highlight_xcommentto) {
+		char ftbuf[HEADER_LEN];	/* Fido-To-Line */
+
 		my_fputs (buf, stdout);
 		if (strchr(note_h_ftnto, '('))
 			strcpy(ftbuf, strchr(note_h_ftnto, '(') + 1);
 		else
 			strcpy(ftbuf, note_h_ftnto);
-		if (strrchr(ftbuf, ')')) strrchr(ftbuf, ')')[0] = '\0';
-		if (strlen(ftbuf) > 19) ftbuf[19] = '\0';
+
+		if (strrchr(ftbuf, ')'))
+			strrchr(ftbuf, ')')[0] = '\0';
+		if (strlen(ftbuf) > 19)
+			ftbuf[19] = '\0';
 		StartInverse ();
 		my_fputs (ftbuf, stdout);
 		EndInverse ();
 		my_fputs ("\r\n", stdout);
 	}
 	else {
-    		sprintf (tmp, txt_thread_x_of_n, buf, which_thread (respnum) + 1, top_base);
-    		my_fputs (tmp, stdout);
+		char x[5];
+
+		/* Can't eval tin_itoa() more than once in a statement due to statics */
+		strcpy(x, tin_itoa(which_thread(respnum) + 1, 4));
+
+   		sprintf (tmp, txt_thread_x_of_n, buf, x, tin_itoa(top_base, 4));
+   		my_fputs (tmp, stdout);
 	}
 
 	if (arts[respnum].lines < 0) {

@@ -260,7 +260,6 @@ search_subject (
 		 * We must descend the rest of the thread in these cases
 		 * TODO - optimise when subject is constant (use ptr into hash ?)
 		 */
-#ifdef HAVE_REF_THREADING
 		if (CURR_GROUP.attribute->thread_arts < THREAD_REFS) {
 			str_lwr (arts[j].subject, buf2);
 			if (strstr(buf2, buf) != 0) {
@@ -279,13 +278,6 @@ search_subject (
 				}
 			}
 		}
-#else
-		str_lwr (arts[j].subject, buf2);
-		if (strstr(buf2, buf) != 0) {
-			found = TRUE;
-			break;
-		}
-#endif
 
 	} while (i != index_point);
 

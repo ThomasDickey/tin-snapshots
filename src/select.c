@@ -158,7 +158,7 @@ selection_index (
 
 			case iKeyFirstPage:	/* show first page of groups */
 top_of_list:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum != 0) {
@@ -176,19 +176,17 @@ top_of_list:
 
 			case iKeyLastPage:	/* show last page of groups */
 end_of_list:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum != group_top - 1) {
-					if (group_top - 1 > last_group_on_screen) {
-						erase_group_arrow();
-						cur_groupnum = group_top - 1;
+					erase_group_arrow();
+					cur_groupnum = group_top - 1;
+
+					if (group_top - 1 >= last_group_on_screen)
 						show_selection_page();
-					} else {
-						erase_group_arrow();
-						cur_groupnum = group_top - 1;
+					else
 						draw_group_arrow();
-					}
 				}
 			    break;
 
@@ -213,9 +211,11 @@ select_read_group:
 				}
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 				/*
-				 * veryfy if group is valid
+				 * If via NNTP, check that group exists. 
+				 * NB: With -n, no need as group command was already used to
+				 * get the min/max/count info in parse_newsrc_active_line()
 				 */
-				if (read_news_via_nntp) {
+				if (read_news_via_nntp && !newsrc_active) {
 					char    acBuf[NNTP_STRLEN];
 					char	acLine[NNTP_STRLEN];
 
@@ -223,11 +223,10 @@ select_read_group:
 					put_server (acBuf);
 					get_server (acLine, NNTP_STRLEN);
 					if (atoi (acLine) != OK_GROUP) {
-						if (strlen (acLine) > 4) {
+						if (strlen (acLine) > 4)
 							info_message (acLine);
-						} else {
+						else
 							info_message (txt_not_exist);
-						}
 						break;
 					}
 				}
@@ -253,7 +252,8 @@ select_read_group:
 				break;
 
 			case iKeyPageDown3:
-				if (!space_goto_next_unread) goto select_page_down;
+				if (!space_goto_next_unread)
+					goto select_page_down;
 			case iKeySelectEnterNextUnreadGrp:	/* enter next group containing unread articles */
 			case iKeySelectEnterNextUnreadGrp2:
 				if (next_unread_group (TRUE) == GRP_QUIT) {
@@ -264,7 +264,7 @@ select_read_group:
 			case iKeyPageDown:		/* page down */
 			case iKeyPageDown2:
 select_page_down:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum == group_top - 1) {
@@ -305,7 +305,7 @@ select_page_down:
 			case iKeyDown:		/* line down */
 			case iKeyDown2:
 select_down:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum + 1 >= group_top) {
@@ -334,7 +334,7 @@ select_down:
 			case iKeyUp:		/* line up */
 			case iKeyUp2:
 select_up:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum == 0) {
@@ -377,7 +377,7 @@ select_up:
 			case iKeyPageUp2:
 			case iKeyPageUp3:
 select_page_up:
-				if (!group_top) {
+				if (group_top == 0) {
 					break;
 				}
 				if (cur_groupnum == 0) {
@@ -1042,6 +1042,23 @@ choose_new_group (void)
 }
 
 /*
+ * Return new value for group_top, skipping any new newsgroups that have been
+ * found and tagged
+ */
+int
+skip_newgroups(void)
+{
+	int i=0;
+
+	if (group_top) {
+		while (i < group_top && active[my_group[i]].newgroup)
+			i++;
+	}
+
+	return(i);
+}
+
+/*
  *  Find a group in the users selection list, my_group[]
  *  If 'add' is TRUE, then add the supplied group
  *  Return the index into my_group[] if group is added or was already
@@ -1294,7 +1311,7 @@ toggle_my_groups (
 		}
 	}
 
-	SKIP_NEWGROUPS;				/* Position group_top after any newgroups */
+	group_top = skip_newgroups();			/* Reposition after any newgroups */
 
 	while (fgets (buf, sizeof (buf), fp) != (char *) 0) {
 		ptr = strchr (buf, SUBSCRIBED);

@@ -91,13 +91,12 @@ fflush(stdout);
 		wait_message ("\n");
 	}
 }
-#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
+
 
 /*
  *  Write out mailgroups from active[] to ~/.tin/active.mail
  */
 
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 write_mail_active_file (void)
 {
@@ -120,14 +119,13 @@ write_mail_active_file (void)
 		fclose (fp);
 	}
 }
-#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
+
 
 /*
  *  Load the text description from ~/.tin/mailgroups for each mail group into
  *  the active[] array.
  */
 
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 read_mailgroups_file (void)
 {

@@ -2376,10 +2376,9 @@ mail_bug_report (void)
 		 is_debug,
 		 (gateway ? gateway : ""),
 		 (domain ? domain : ""));
-#ifdef HAVE_REF_THREADING
 	fprintf (fp, "CFG4: threading=%d", default_thread_arts);
 	start_line_offset++;
-#endif
+
 	fprintf (fp, "\nPlease enter bug report/gripe/comment:\n");
 
 	start_line_offset += 5;
@@ -2784,7 +2783,7 @@ cancel_article (
 	char option_default = iKeyPostCancel;
 	int init = TRUE;
 	int oldraw;
-	t_bool redraw_screen = FALSE;
+	t_bool redraw_screen = TRUE;
 
 	msg_init_headers ();
 

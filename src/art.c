@@ -40,11 +40,12 @@ static int valid_artnum (long art);
 static void print_expired_arts (int num_expired);
 
 /*
- *  Construct the pointers to the basenotes of each thread
- *  arts[] contains every article in the group.  inthread is
- *  set on each article that is after the first article in the
- *  thread.  Articles which have been expired have their thread
- *  set to -2 (ART_EXPIRED).
+ *  Construct the pointers to the base article in each thread.
+ *  If we are showing only unread, then point to the first unread. I have
+ *  no idea why this should be so, it causes problems elsewhere [which_response]
+ *  .inthread is set on each article that is after the first article in the
+ *  thread.  Articles which have been expired have their .thread set to
+ *  ART_EXPIRED
  */
 
 void
@@ -113,130 +114,131 @@ index_group (
 	long max;
 	register int i;
 
-	if (group != (struct t_group *) 0) {
-		if (!update) {
-			sprintf (msg, txt_group, group->name);
-			wait_message (msg);
-		}
+	if (group == (struct t_group *) 0)
+		return (TRUE);
 
-		make_group_path (group->name, group_path);
-		glob_art_group = group->name;
-
-		set_alarm_clock_off ();
-
-		set_signals_art ();
-
-		hash_reclaim ();
-		free_art_array ();
-		free_msgids ();
-
-		/*
-		 *  Load articles within min..max from xover index file if it exists
-		 *  and then create base[] article numbers from loaded articles.
-		 *  If nov file does not exist then create base[] with setup_base().
-		 */
-#ifdef	PROFILE
-		BegStopWatch("setup_base");
-#endif	/* PROFILE */
-
-		(void) setup_hard_base (group, group_path);
-
-#ifdef	PROFILE
-		EndStopWatch();
-		PrintStopWatch();
-#endif	/* PROFILE */
-
-		debug_print_comment ("Before iReadNovFile");
-		debug_print_bitmap (group, NULL);
-
-		min = top_base ? base[0] : group->xmin;
-		max = top_base ? base[top_base-1] : min - 1;
-
-		/*
-		 * Read in the existing index via XOVER or the index file
-		 */
-		if (iReadNovFile (group, min, max, &expired) == -1) {
-			/* user aborted indexing */
-			set_alarm_clock_on ();
-			return(FALSE);
-		}	
-
-		if (expired)
-			print_expired_arts (expired);
-
-		/*
-		 * Add any articles to arts[] that are new or were killed
-		 */
-
-		if ((modified = read_group (group, group_path, &count)) == -1) {
-			/* user aborted indexing */
-			set_alarm_clock_on ();
-			return(FALSE);
-		}
-
-		/*
-		 * Do this before calling art_mark_read if you want
-		 * the unread count to be correct.
-		 */
-
-		parse_unread_arts (group);
-
-		/*
-		 * Stat all articles to see if any have expired
-		 */
-		for (i = 0; i < top; i++) {
-			if (arts[i].thread == ART_EXPIRED) {
-				expired = 1;
-				debug_print_comment ("art.c: index_group() purging...");
-				art_mark_read (group, &arts[i]);
-				print_expired_arts (expired);
-			}
-		}
-
-		if (expired || modified)
-			vWriteNovFile (group);
-
-		/*
-		 * Create the reference tree. The msgid and ref ptrs will
-		 * be free()d now that the NovFile has been written.
-		 */
-		build_references(group);
-
-		/*
-		 * Needs access to the reference tree
-		 */
-		filtered = filter_articles (group);
-
-		if ((expired || count) && cmd_line && verbose) {
-			my_fputc ('\n', stdout);
-			fflush (stdout);
-		}
-
-#ifdef	PROFILE
-		BegStopWatch("make_thread");
-#endif	/* PROFILE */
-
-		make_threads (group, FALSE);
-
-#ifdef	PROFILE
-		EndStopWatch();
-		PrintStopWatch();
-#endif	/* PROFILE */
-
-		find_base (group);
-
-		if ((modified || filtered) && !update) {
-			clear_message ();
-		}
-		set_alarm_clock_on ();
+	if (!update) {
+		sprintf (msg, txt_group, group->name);
+		wait_message (msg);
 	}
 
-	return TRUE;
+	make_group_path (group->name, group_path);
+	glob_art_group = group->name;
+
+	set_alarm_clock_off ();
+	set_signals_art ();
+
+	hash_reclaim ();
+	free_art_array ();
+	free_msgids ();
+
+	/*
+	 *  Load articles within min..max from xover index file if it exists
+	 *  and then create base[] article numbers from loaded articles.
+	 *  If nov file does not exist then create base[] with setup_base().
+	 */
+#ifdef	PROFILE
+	BegStopWatch("setup_base");
+#endif	/* PROFILE */
+
+	(void) setup_hard_base (group, group_path);
+
+#ifdef	PROFILE
+	EndStopWatch();
+	PrintStopWatch();
+#endif	/* PROFILE */
+
+	debug_print_comment ("Before iReadNovFile");
+	debug_print_bitmap (group, NULL);
+
+	min = top_base ? base[0] : group->xmin;
+	max = top_base ? base[top_base-1] : min - 1;
+
+	/*
+	 * Read in the existing index via XOVER or the index file
+	 */
+	if (iReadNovFile (group, min, max, &expired) == -1) {
+		/* user aborted indexing */
+		set_alarm_clock_on ();
+		return (FALSE);
+	}	
+
+	/*
+	 * Prints 'P' for each expired article if verbose
+	 */
+	if (expired)
+		print_expired_arts (expired);
+
+	/*
+	 * Add any articles to arts[] that are new or were killed
+	 */
+	if ((modified = read_group (group, group_path, &count)) == -1) {
+		/* user aborted indexing */
+		set_alarm_clock_on ();
+		return (FALSE);
+	}
+
+	/*
+	 * Do this before calling art_mark_read if you want
+	 * the unread count to be correct.
+	 */
+
+	parse_unread_arts (group);
+
+	/*
+	 * Stat all articles to see if any have expired
+	 */
+	for (i = 0; i < top; i++) {
+		if (arts[i].thread == ART_EXPIRED) {
+			expired = 1;
+			debug_print_comment ("art.c: index_group() purging...");
+			art_mark_read (group, &arts[i]);
+			print_expired_arts (expired);
+		}
+	}
+
+	if (expired || modified)
+		vWriteNovFile (group);
+
+	/*
+	 * Create the reference tree. The msgid and ref ptrs will
+	 * be free()d now that the NovFile has been written.
+	 */
+	build_references(group);
+
+	/*
+	 * Needs access to the reference tree
+	 */
+	filtered = filter_articles (group);
+
+	if ((expired || count) && cmd_line && verbose) {
+		my_fputc ('\n', stdout);
+		fflush (stdout);
+	}
+
+#ifdef	PROFILE
+	BegStopWatch("make_thread");
+#endif	/* PROFILE */
+
+	make_threads (group, FALSE);
+
+#ifdef	PROFILE
+	EndStopWatch();
+	PrintStopWatch();
+#endif	/* PROFILE */
+
+	find_base (group);
+
+	if ((modified || filtered) && !update)
+		clear_message ();
+
+	set_alarm_clock_on ();
+	return (TRUE);
 }
 
 /*
- *  Index a group.  Assumes any existing index has already been
- *  loaded. Return values are:
+ * Index a group.  Assumes any existing NOV index has already been loaded.
+ * Return values are:
  *    TRUE   loaded index and modified it
  *    FALSE  loaded index but not modified
  *    -1     user aborted indexing operation
@@ -264,7 +266,7 @@ read_group (
 #ifdef INDEX_DAEMON
 	if (dir[0] == 0)
 #endif
-	get_cwd (dir);
+	get_cwd (dir);						/* TODO: no point via NNTP ? */
 	joinpath (buf, group->spooldir, group_path);
 	my_chdir (buf);
 
@@ -275,7 +277,6 @@ read_group (
 	/*
 	 *  Count num of arts to index so the user has an idea of index time
 	 */
-
 	for (i = 0; i < top_base; i++) {
 		if (base[i] <= last_read_article || valid_artnum (base[i]) >= 0) {
 			continue;
@@ -293,8 +294,8 @@ read_group (
 
 		/*
 		 *  Do we already have this article in our index?  Change
-		 *  thread from (ART_EXPIRED) to (ART_NORMAL) if so and
-		 *  skip the header eating.
+		 *  arts[].thread from ART_EXPIRED to ART_NORMAL and skip
+		 *  reading the header.
 		 */
 		if ((respnum = valid_artnum (art)) >= 0 || art <= last_read_article) {
 			if (respnum >= 0) {
@@ -480,9 +481,7 @@ make_threads (
 	/*
 	 * Reset all the ptrs to articles following the above sort
 	 */
-#ifdef HAVE_REF_THREADING
 	clear_art_ptrs();
-#endif
 
 	/*
 	 *  The threading pointers need to be reset if re-threading
@@ -497,7 +496,7 @@ make_threads (
 
 			arts[i].inthread = FALSE;
 
-#ifdef HAVE_REF_THREADING
+			/* Should never happen if tree is built properly */
 			if (arts[i].refptr == 0) {
 				fprintf(stderr, "\nError  : art->refptr is NULL\n");
 				fprintf(stderr, "Artnum : %ld\n", arts[i].artnum);
@@ -507,7 +506,6 @@ make_threads (
 			assert(arts[i].refptr != 0);
 
 			arts[i].refptr->article = i;
-#endif
 		}
 	}
 
@@ -522,7 +520,6 @@ make_threads (
 			thread_by_subject();
 			return;
 
-#ifdef HAVE_REF_THREADING
 		case THREAD_REFS:
 			thread_by_reference();
 			return;
@@ -531,7 +528,6 @@ make_threads (
 			thread_by_reference();
 			collate_subjects();
 			return;
-#endif
 
 		default: /* not reached */
 			return;
@@ -774,8 +770,7 @@ iReadNovFile (
 	/*
 	 * open the overview file (whether it be local or via nntp)
 	 */
-	fp = open_xover_fp (group, "r", min, max);
-	if (fp == (FILE *) 0) {
+	if ((fp = open_xover_fp (group, "r", min, max)) == (FILE *) 0) {
 		return top;
 	}
 
@@ -807,7 +802,8 @@ iReadNovFile (
 		artnum = atol (p);
 
 		/* catches case of 1st line being groupname */
-		if (artnum <= 0) continue;
+		if (artnum <= 0)
+			continue;
 
 		/*
 		 * Check to make sure article in nov file has not expired in group
@@ -1591,6 +1587,10 @@ input_pending (void)
 }
 
 
+/*
+ * Do a binary chop to see if 'art' (an article number) exists in arts[]
+ * Return index into arts[] or -1
+ */
 static int
 valid_artnum (
 	long art)

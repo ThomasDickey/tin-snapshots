@@ -86,7 +86,6 @@ static void
 add_to_parent(
 	struct t_msgid *ptr)
 {
-#ifdef HAVE_REF_THREADING
 	struct t_msgid *p;
 
 	if (!ptr->parent)
@@ -123,8 +122,6 @@ add_to_parent(
 /*		ptr->sibling is already NULL */
 		p->sibling = ptr;
 	}
-
-#endif /* HAVE_REF_THREADING */
 }
 
 /*
@@ -247,12 +244,10 @@ add_msgid(
 
 	ptr->txt = my_strdup(msgid);
 	ptr->parent = newparent;
-
-#ifdef HAVE_REF_THREADING
 	ptr->child = ptr->sibling = NULL;
 	ptr->article = (key == MSGID_REF ? top : ART_NORMAL);
+
 	add_to_parent(ptr);
-#endif
 
 	/*
 	 * Insert at head of list for speed.
@@ -423,9 +418,7 @@ dump_msgids(void)
 
 /*
  * The rest of this code deals with reference threading
- */
-#ifdef HAVE_REF_THREADING
-/*
+ *
  * Legend:
  *
  * . When a new thread is started, the root message will have no
@@ -790,8 +783,6 @@ collate_subjects(void)
 
 	return;
 }
-
-#endif /* HAVE_REF_THREADING */
 
 /*
  * Builds the reference tree:
