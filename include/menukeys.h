@@ -166,6 +166,7 @@
 #define iKeyGroupReadBasenote '\n'
 #define iKeyGroupKill ctrl('K')
 #define iKeyGroupRedrawScr ctrl('L')
+#define iKeyGroupPostponed ctrl('O')
 #define iKeyGroupReadBasenote2 '\r'
 #define iKeyGroupSetRange '#'
 #define iKeyGroupToggleColor '&'
@@ -238,6 +239,7 @@
 #define iKeyPageNextThd '\n'
 #define iKeyPageAutoKill ctrl('K')
 #define iKeyPageRedrawScr ctrl('L')
+#define iKeyPagePostponed ctrl('O')
 #define iKeyPageNextThd2 '\r'
 #define iKeyPageFirstPage3 ctrl('R')
 #define iKeyPageToggleTabs ctrl('T')
@@ -302,6 +304,7 @@
 #define iKeyPostPost 'p'
 #define iKeyPostSend 's'
 #define iKeyPostSupersede 's'
+#define iKeyPostPostpone 'o'
 
 /* prompt.c */
 
@@ -326,6 +329,7 @@
 #define iKeySelectEnterNextUnreadGrp '\t'
 #define iKeySelectReadGrp '\n'
 #define iKeySelectRedrawScr ctrl('L')
+#define iKeySelectPostponed ctrl('O')
 #define iKeySelectReadGrp2 '\r'
 #define iKeySelectResetNewsrc ctrl('R')
 #define iKeySelectSetRange '#'

@@ -106,8 +106,7 @@ chmod (file, mode)
 	return 0;
 }
 
-unsigned short umask (mask)
-	unsigned short mask;
+unsigned short umask (unsigned short mask)
 {
 	return mask;
 }
@@ -211,7 +210,7 @@ int
 tputs (str, count, func)
 	char *str;
 	int count;
-	int (*func)(int);
+	void (*func)(int);
 {
 	if (! str) {
 		return 0;
@@ -536,9 +535,10 @@ getenv (name)
 
 
 int
-setenv (name, value)
+setenv (name, value, notused)
 	char *name;
 	char *value;
+	int notused;
 {
 	if (DOSBase->dl_lib.lib_Version >= 36) {
 		SetVar ((char *)name,(char *)value,strlen(value)+1,GVF_LOCAL_ONLY);

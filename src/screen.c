@@ -102,7 +102,7 @@ perror_message (template, str)
 
 	sprintf (str2, template, str);
 	err = errno;
-#if HAVE_STRERROR
+#ifdef HAVE_STRERROR
 	fprintf (stderr, "%s: Error: %s", str2, strerror(err));
 #else
 #  ifdef HAVE_SYSERRLIST

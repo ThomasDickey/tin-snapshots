@@ -21,6 +21,11 @@
 #define HAVE_MEMSET
 #define HAVE_STRCHR
 #define HAVE_STRTOL
+#define HAVE_STRPBRK
+#define HAVE_STRSTR
+#define HAVE_STRERROR
+#define HAVE_STRFTIME
+#define HAVE_ATOL
 
 /*
  * Undef this only for specific platforms
@@ -71,11 +76,11 @@
 #	endif
 #endif
 
-#if defined(M_OS2) || defined(SVR4)
+#if defined(M_OS2) || defined(SVR4) || defined(M_AMIGA)
 #	define	HAVE_LOCALE_H
 #endif
 
-#if defined(SVR4)
+#if defined(SVR4) || defined(M_AMIGA)
 #	define	HAVE_SETLOCALE
 #	undef	sinix		/* SNI Sinix (nsc32000) */
 #endif
@@ -316,7 +321,7 @@
 #endif
 
 #if !defined(COHERENT) && !defined(M_OS2) && !defined(supermax) && !defined(u3b2) && \
-    !defined(HAVE_POLL) && !defined(WIN32)
+    !defined(HAVE_POLL) && !defined(WIN32) && !defined(M_AMIGA)
 #	define	HAVE_SELECT
 #endif
 
@@ -354,7 +359,7 @@
 #	define	HAVE_TCSETATTR
 #endif
 
-#if defined(QNX42) || defined(VMS) || defibed(M_AMIGA)
+#if defined(QNX42) || defined(VMS) || defined(M_AMIGA)
 #	define HAVE_KEY_PREFIX
 #endif
 

@@ -201,8 +201,8 @@ extern char *optarg;
  * Local variables
  */
 
-extern FILE *nntp_rd_fp, *nntp_wr_fp;
 extern FILE *note_fp;				/* body of current article */
+extern TCP *nntp_rd_fp, *nntp_wr_fp;
 extern char *OPT_CHAR_list[];
 extern char *OPT_STRING_list[];
 extern char *glob_art_group;
@@ -310,6 +310,7 @@ extern char pgp_data[PATH_LEN];
 extern char post_proc_command[PATH_LEN];
 extern char posted_info_file[PATH_LEN];
 extern char posted_msgs_file[PATH_LEN];
+extern char postponed_articles_file[PATH_LEN];
 extern char proc_ch_default;
 extern char progname[PATH_LEN];
 extern char quote_chars[PATH_LEN];
@@ -412,6 +413,7 @@ extern constext txt_error_header_line_blank[];
 extern constext txt_error_header_line_colon[];
 extern constext txt_error_header_line_comma[];
 extern constext txt_error_header_line_empty_newsgroups[];
+extern constext txt_error_header_line_groups_contd[];
 extern constext txt_error_header_line_missing_newsgroups[];
 extern constext txt_error_header_line_missing_subject[];
 extern constext txt_error_header_line_missing_target[];
@@ -794,6 +796,7 @@ extern constext txt_piping_not_enabled[];
 extern constext txt_plural[];
 extern constext txt_post_a_followup[];
 extern constext txt_post_an_article[];
+extern constext txt_post_error_ask_postpone[];
 extern constext txt_post_history_menu[];
 extern constext txt_post_newsgroup[];
 extern constext txt_post_newsgroups[];
@@ -815,6 +818,7 @@ extern constext txt_quit_edit_save_kill[];
 extern constext txt_quit_edit_save_select[];
 extern constext txt_quit_edit_send[];
 extern constext txt_quit_edit_xpost[];
+extern constext txt_quit_postpone[];
 extern constext txt_quit_no_write[];
 extern constext txt_quoted_printable[];
 extern constext txt_read_resp[];

@@ -23,22 +23,22 @@
 /* which keys are allowed for posting/sending? */
 #ifdef HAVE_PGP
 #	ifdef HAVE_ISPELL
-#		define POST_KEYS	"\033egipq"
+#		define POST_KEYS	"\033egiopq"
 #		define SEND_KEYS	"\033egiqs"
 #	else
-#		define POST_KEYS	"\033egpq"
+#		define POST_KEYS	"\033egopq"
 #		define SEND_KEYS	"\033egqs"
 #	endif
 #else
 #	ifdef HAVE_ISPELL
-#		define POST_KEYS	"\033eipq"
+#		define POST_KEYS	"\033eiopq"
 #		define SEND_KEYS	"\033eiqs"
 #	else
-#		define POST_KEYS	"\033epq"
+#		define POST_KEYS	"\033eopq"
 #		define SEND_KEYS	"\033eqs"
 #	endif
 #endif
-#define EDIT_KEYS	"\033eq"
+#define EDIT_KEYS	"\033eoq"
 
 char found_newsgroups[HEADER_LEN];
 
@@ -73,6 +73,7 @@ static t_bool repair_article P_((char *result));
 static void appendid P_((char **where, char **what));
 static void do_prompt1 P_(( char *format, int ch_default));
 static void do_prompt2 P_(( char *format, char *subject, int ch_default));
+static void postpone_article P_(( char *the_article));
 static void find_reply_to_addr P_((int respnum, char *from_addr));
 static void join_references P_((char *buffer, char *oldrefs, char *newref));
 static void modify_headers P_((char *line));
@@ -85,6 +86,12 @@ static void skip_id P_((char **id));
 static void update_active_after_posting P_((char *newsgroups));
 static void update_posted_info_file P_((char *group, int action, char *subj));
 static void update_posted_msgs_file P_((char *file, char *addr));
+static void append_postponed_file P_((char *file, char *addr));
+static int fetch_postponed_article P_((char tmp_file[], char subject[], char newsgroups[]));
+static void post_existing_article P_((void));
+static int prompt_rejected P_((void));
+static char *backup_article_name P_((char *the_article));
+static void backup_article P_((char *the_article));
 
 #ifdef FORGERY
 static void make_path_header P_((char *line, char *from_name));
@@ -148,6 +155,25 @@ prompt_to_send(subject)
 	return ch;
 }
 
+static int
+prompt_rejected()
+{
+	int ch;
+	char ch_default = iKeyPostPostpone;
+
+	Raw(FALSE);
+	fprintf(stderr, "\n\n%s\n\n", txt_post_error_ask_postpone);
+	fflush(stderr);
+	Raw(TRUE);
+
+	do {
+		do_prompt1 (txt_quit_postpone, ch_default);
+		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
+			ch = ch_default;
+	} while (!strchr ("qo", ch));
+	return ch;
+}
+
 static t_bool
 repair_article(result)
 	char *result;
@@ -166,6 +192,43 @@ repair_article(result)
 		return TRUE;
 	}
 	return FALSE;
+}
+
+/* make a backup copy of ~/.article, this is necessary since
+   submit_news_file adds headers, does q-p conversion etc */
+
+static char *
+backup_article_name(the_article)
+char *the_article;
+{
+  static char name[PATH_LEN];
+
+  strcpy(name, article);
+  strcat(name, ".bak");
+
+  return name;
+}
+
+static void
+backup_article(the_article)
+char *the_article;
+{
+  char line[LEN];
+  FILE *in, *out;
+
+  if((in=fopen(article, "r"))==NULL)
+    return;
+
+  if((out=fopen(backup_article_name(article), "w"))==NULL) {
+    fclose(in);
+    return;
+  }
+
+  while(fgets(line, sizeof(line), in)!=NULL) {
+    fputs(line, out);
+  }
+  fclose(in);
+  fclose(out);
 }
 
 static void
@@ -450,6 +513,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 	int init = TRUE;
 	int ngcnt = 0;
 	int oldraw;		/* save previous raw state */
+	int c;
 	size_t nglens[NGLIMIT];
 	t_bool end_of_header = FALSE;
 	t_bool found_newsgroups_line = FALSE;
@@ -523,7 +587,7 @@ check_article_to_be_posted (the_article, art_type, lines)
 			}
 			if (strchr (cp, ' ')) {
 				setup_check_article_screen (&init);
-				fprintf (stderr, txt_error_header_line_comma);
+				fprintf (stderr, txt_error_header_line_comma, "Newsgroups");
 				fflush (stderr);
 				errors++;
 				continue;
@@ -557,11 +621,41 @@ check_article_to_be_posted (the_article, art_type, lines)
 				errors++;
 				continue;
 			}
+			if((c = fgetc(fp)) != EOF) {
+				ungetc(c, fp);
+				if (isspace (c) && c != '\n') {
+					setup_check_article_screen (&init);
+					fprintf (stderr, txt_error_header_line_groups_contd, "Newsgroups");
+					fflush (stderr);
+					errors++;
+					continue;
+				}
+			}
 		}
 		if (cp - line == 11 && !strncasecmp (line, "Followup-To", 11)) {
 			found_followup_to = TRUE;
+			for (cp = line + 12; *cp == ' '; cp++) {
+				;
+			}
 			if (strchr (cp, ','))
 				found_followup_to_several_groups = TRUE;
+			if (strchr (cp, ' ')) {
+				setup_check_article_screen (&init);
+				fprintf (stderr, txt_error_header_line_comma, "Followup-To");
+				fflush (stderr);
+				errors++;
+				continue;
+			}
+			if((c = fgetc(fp)) != EOF) {
+				ungetc(c, fp);
+				if (isspace(c) && c != '\n' ) {
+					setup_check_article_screen (&init);
+					fprintf (stderr, txt_error_header_line_groups_contd, "Followup-To");
+					fflush (stderr);
+					errors++;
+					continue;
+				}
+			}
 		}
 	}
 
@@ -706,6 +800,11 @@ quick_post_article ()
 	setup_screen ();
 	InitScreen ();
 	ClearScreen ();
+
+	/* check for postponed articles first */
+
+	if(pickup_postponed_articles(TRUE))
+	  return;
 
 	/*
 	 * Get groupname & subject for posting article.
@@ -873,23 +972,34 @@ quick_post_article ()
 				break;
 #endif
 
-			case iKeyPostPost:
-				wait_message (txt_posting);
+  			case iKeyPostPost:
+  				wait_message (txt_posting);
+				backup_article (article);
 				if (submit_news_file (article, lines)) {
+					unlink(backup_article_name(article));
 					Raw (FALSE);
 					info_message (txt_art_posted);
 					goto post_article_done;
 				} else {
-					rename_file (article, dead_article);
+					if (prompt_rejected()==iKeyPostPostpone) {
+						postpone_article(backup_article_name(article));
+					} else {
+						unlink(backup_article_name(article));
+						rename_file (article, dead_article);
 #ifdef M_UNIX
-					if (keep_dead_articles)
-						append_file (dead_articles, dead_article);
+						if (keep_dead_articles)
+							append_file (dead_articles, dead_article);
 #endif
-					Raw (FALSE);
-					error_message (txt_art_rejected, dead_article);
-					ReadCh ();
-					return;
+						Raw (FALSE);
+						error_message (txt_art_rejected, dead_article);
+						ReadCh ();
+					}
+				return;
 				}
+			case iKeyPostPostpone:
+			  postpone_article(article);
+			  goto post_article_postponed;
+
 			default:
 				break;
 		}
@@ -914,8 +1024,130 @@ quick_post_article ()
 	if (keep_posted_articles) {
 		update_posted_msgs_file (article, userid);
 	}
+	if (group[0] != '\0')
+		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+	if (subj[0] != '\0')
+		my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+
+	write_config_file (local_config_file);
+
+post_article_postponed:
 	if (unlink_article) {
 		unlink (article);
+	}
+
+	return;
+}
+
+/*
+ *  Post an article that is already written (for postponed articles)
+ */
+
+static void
+post_existing_article ()
+{
+	char ch;
+	char group[HEADER_LEN];
+	char subj[HEADER_LEN];
+	int art_type = GROUP_TYPE_NEWS;
+	int lines;
+	struct t_group *psGrp;
+
+	if (!can_post) {
+		info_message (txt_cannot_post);
+		return;
+	}
+
+	ch = iKeyPostEdit;
+	forever {
+		switch (ch) {
+			case iKeyPostEdit:
+				invoke_editor (article, 0);
+				while (!check_article_to_be_posted (article, art_type, &lines)
+				   && repair_article(&ch))
+				   	;
+				if (ch == iKeyPostEdit) {
+					break;
+				}
+			case iKeyQuit:
+			case iKeyAbort:
+				if (unlink_article)
+					unlink (article);
+				clear_message ();
+				return;
+
+#ifdef HAVE_ISPELL
+			case iKeyPostIspell:
+				invoke_ispell (article);
+				break;
+#endif
+
+#ifdef HAVE_PGP
+			case iKeyPostPGP:
+				invoke_pgp_news (article);
+				break;
+#endif
+
+			case iKeyPostPost:
+				wait_message (txt_posting);
+				backup_article(article);
+				if(!strchr(group, ',')) {
+				  psGrp=psGrpFind(group);
+				} else {
+				  psGrp=NULL;
+				}
+				if (submit_news_file (article, lines)) {
+					unlink(backup_article_name(article));
+					info_message (txt_art_posted);
+					goto post_article_done;
+				} else {
+				  if(prompt_rejected()==iKeyPostPostpone) {
+				    postpone_article(backup_article_name(article));
+				  } else {
+				    unlink(backup_article_name(article));
+				    rename_file (article, dead_article);
+#ifdef M_UNIX
+				    if (keep_dead_articles)
+				      append_file (dead_articles, dead_article);
+#endif
+				    Raw (FALSE);
+				    error_message (txt_art_rejected, dead_article);
+				    ReadCh ();
+ 				  }
+				  return;
+				}
+			case iKeyPostPostpone:
+			  postpone_article(article);
+			  goto post_article_postponed;
+
+			default:
+				break;
+		}
+		ch = prompt_to_edit();
+	}
+
+      post_article_done:
+	if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
+		update_active_after_posting (group);
+
+		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
+		  /* we currently do not add autoselect for
+                   * crossposted postponed articles, since we don't
+                   * know in which group the article was actually in
+                   * */
+		  if(!strchr(group, ',') && (psGrp=psGrpFind(group))) {
+			quick_filter_select_posted_art (psGrp, subj);
+		  }
+		  update_posted_info_file (group, 'w', subj);
+		} else {
+			subj[0] = '\0';
+		}
+	} else {
+		group[0] = '\0';
+	}
+
+	if (keep_posted_articles) {
+		update_posted_msgs_file (article, userid);
 	}
 	if (group[0] != '\0')
 		my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
@@ -924,7 +1156,199 @@ quick_post_article ()
 
 	write_config_file (local_config_file);
 
+post_article_postponed:
+	if (unlink_article) {
+		unlink (article);
+	}
+
 	return;
+}
+
+
+static void
+append_postponed_file (file, addr)
+	char *file;
+	char *addr;
+{
+	char buf[LEN];
+	FILE *fp_in, *fp_out;
+	time_t epoch;
+
+	fp_in = fopen (file, "r");
+	if (fp_in != (FILE *) 0) {
+		fp_out = fopen (postponed_articles_file, "a+");
+		if (fp_out != (FILE *) 0) {
+			time (&epoch);
+			fprintf (fp_out, "From %s %s", addr, ctime (&epoch));
+			while (fgets (buf, sizeof buf, fp_in) != (char *) 0) {
+				if(strncmp(buf, "From ", 5)==0)
+				  fputc('>', fp_out);
+				fputs (buf, fp_out);
+			}
+			print_art_seperator_line (fp_out, FALSE);
+			fclose (fp_out);
+		}
+		fclose (fp_in);
+	}
+}
+
+/* count how any articles are in postponed.articles. Essentially, we
+ * count '^From ' lines */
+
+int count_postponed_articles()
+{
+  FILE *fp=fopen(postponed_articles_file,"r");
+  int count=0;
+  char line[HEADER_LEN];
+
+  if(!fp)
+    return 0;
+
+  while(fgets(line, sizeof(line), fp)) {
+    if(strncmp(line, "From ", 5)==0)
+      count++;
+  }
+  fclose(fp);
+
+  return count;
+}
+
+/* Copy the first postponed article and remove it from the postponed
+   file */
+
+static int
+fetch_postponed_article(tmp_file, subject, newsgroups)
+char tmp_file[];
+char subject[];
+char newsgroups[];
+{
+  char postponed_tmp[PATH_LEN];
+  FILE *in;
+  FILE *out;
+  FILE *tmp;
+  char line[HEADER_LEN];
+  int first_article;
+  int prev_line_nl;
+  int anything_left;
+
+  strcpy(postponed_tmp, postponed_articles_file);
+  strcat(postponed_tmp, "_");
+
+  in=fopen(postponed_articles_file, "r");
+  out=fopen(tmp_file, "w");
+  tmp=fopen(postponed_tmp, "w");
+  if(in==NULL||out==NULL||tmp==NULL) {
+    if(in) fclose(in);
+    if(out) fclose(out);
+    if(tmp) fclose(tmp);
+    return FALSE;
+  }
+
+  fgets(line, sizeof(line), in);
+
+  if(strncmp(line, "From ", 5)!=0) {
+    fclose(in);
+    fclose(out);
+    fclose(tmp);
+    return FALSE;
+  }
+
+  first_article=TRUE;
+  prev_line_nl=FALSE;
+  anything_left=FALSE;
+
+  /* we have one minor problem with copying the article, we have added
+   * a newline at the end of the article and we have to remove that,
+   * but we don't know we are on the last line until we read the next
+   * line containing "From " */
+
+  while(fgets(line, sizeof(line), in)!=NULL) {
+    if(strncmp(line, "From ", 5)==0)
+      first_article=FALSE;
+    if(first_article) {
+      match_string(line, "Newsgroups: ", newsgroups, HEADER_LEN);
+      match_string(line, "Subject: ", subject, HEADER_LEN);
+      if(prev_line_nl) {
+	fputc('\n', out);
+      }
+
+      if(strlen(line) && line[strlen(line)-1]=='\n') {
+	prev_line_nl=TRUE;
+	line[strlen(line)-1]='\0';
+      } else {
+	prev_line_nl=FALSE;
+      }
+      fputs(line, out);
+    }else {
+      fputs(line, tmp);
+      anything_left=1;
+    }
+  }
+
+  fclose(in);
+  fclose(out);
+  fclose(tmp);
+
+  unlink(postponed_articles_file);
+  if(anything_left) {
+    rename(postponed_tmp, postponed_articles_file);
+  } else {
+    unlink(postponed_tmp);
+  }
+
+  return TRUE;
+}
+
+
+/* pick up any postponed article and ask if the user want to use it */
+
+int
+pickup_postponed_articles(ask)
+int ask;
+{
+  char newsgroups[HEADER_LEN];
+  char subject[HEADER_LEN];
+  char question[HEADER_LEN];
+  int count=count_postponed_articles();
+  int i;
+  int ret;
+
+  if(count==0) {
+    if(!ask)
+      wait_message("no postponed articles");
+    return FALSE;
+  }
+
+  sprintf(question, "do you want to see postponed articles (%d)? ", count);
+
+  if(ask && prompt_yn(cLINES, question, TRUE)!=1) {
+    return FALSE;
+  }
+
+  for(i=0;i<count;i++) {
+    if(!fetch_postponed_article(article, subject, newsgroups))
+      return TRUE;
+    sprintf(question, "use article \"%s\" in %s ? ", subject, newsgroups);
+    if((ret=prompt_yn(cLINES, question, TRUE))==1) {
+      post_existing_article();
+    } else {
+      append_postponed_file(article, userid);
+      unlink(article);
+      if(ret==-1) 
+	return TRUE;
+    }
+  }
+
+  return TRUE;
+}
+
+
+static void
+postpone_article(the_article)
+char *the_article;
+{
+  wait_message("storing article for later posting");
+  append_postponed_file(article, userid);
 }
 
 /*
@@ -1070,6 +1494,7 @@ post_article (group, posted_flag)
 
 			case iKeyPostPost:
 				wait_message (txt_posting);
+				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
 					if (submit_news_file (article, lines)) {
 						*posted_flag = TRUE;
@@ -1080,20 +1505,29 @@ post_article (group, posted_flag)
 					}
 				}
 				if (*posted_flag) {
+					unlink(backup_article_name(article));
 					info_message (txt_art_posted);
 					sleep (1);
 					goto post_article_done;
 				} else {
-					rename_file (article, dead_article);
+				  if(prompt_rejected()==iKeyPostPostpone) {
+				    postpone_article(backup_article_name(article));
+				  } else {
+				    unlink(backup_article_name(article));
+				    rename_file (article, dead_article);
 #ifdef M_UNIX
-					if (keep_dead_articles)
-						append_file (dead_articles, dead_article);
+				    if (keep_dead_articles)
+				      append_file (dead_articles, dead_article);
 #endif
-					sprintf (buf, txt_art_rejected, dead_article);
-					info_message (buf);
-					ReadCh ();
-					return redraw_screen;
+				    sprintf (buf, txt_art_rejected, dead_article);
+ 				    info_message (buf);
+				    ReadCh ();
+				  }
+				  return redraw_screen;
 				}
+			case iKeyPostPostpone:
+			  postpone_article(article);
+			  goto post_article_postponed;
 			default:
 				break;
 		}
@@ -1114,11 +1548,13 @@ post_article (group, posted_flag)
 			update_posted_msgs_file (article, userid);
 		}
 	}
+	my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
+	my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
+
+post_article_postponed:
 	if (unlink_article) {
 		unlink (article);
 	}
-	my_strncpy (default_post_newsgroups, group, sizeof (default_post_newsgroups));
-	my_strncpy (default_post_subject, subj, sizeof (default_post_subject));
 
 	return redraw_screen;
 }
@@ -1548,6 +1984,7 @@ post_response (group, respnum, copy_text)
 
 			case iKeyPostPost:
 				wait_message (txt_posting);
+				backup_article(article);
 				if (art_type == GROUP_TYPE_NEWS) {
 					if (submit_news_file (article, lines)) {
 						ret_code = POSTED_OK;
@@ -1559,18 +1996,28 @@ post_response (group, respnum, copy_text)
 				}
 				if (ret_code == POSTED_OK) {
 					info_message (txt_art_posted);
+					unlink(backup_article_name(article));
 					goto post_response_done;
 				} else {
-					rename_file (article, dead_article);
+				  if(prompt_rejected()==iKeyPostPostpone) {
+				    postpone_article(backup_article_name(article));
+				  } else {
+				    unlink(backup_article_name(article));
+				    rename_file (article, dead_article);
 #ifdef M_UNIX
-					if (keep_dead_articles)
-						append_file (dead_articles, dead_article);
+				    if (keep_dead_articles)
+				      append_file (dead_articles, dead_article);
 #endif
-					sprintf (buf, txt_art_rejected, dead_article);
-					info_message (buf);
-					ReadCh ();
-					return ret_code;
+				    sprintf (buf, txt_art_rejected, dead_article);
+				    info_message (buf);
+				    ReadCh ();
+				  }
+				  return ret_code;
 				}
+			case iKeyPostPostpone:
+			  postpone_article(article);
+			  goto post_response_postponed;
+
 			default:
 				break;
 		}
@@ -1597,6 +2044,7 @@ post_response (group, respnum, copy_text)
 	}
 	my_strncpy (default_post_subject, buf, sizeof (default_post_subject));
 
+post_response_postponed:
 	if (unlink_article) {
 		unlink (article);
 	}
@@ -2716,36 +3164,48 @@ repost_article (group, art, respnum, supersede)
 				} else
 					wait_message (txt_repost_an_article);
 
+				backup_article(article);
+
 				if (submit_news_file (article, 0)) {
 					info_message (txt_art_posted);
+					unlink(backup_article_name(article));
 					ret_code = POSTED_OK;
 					goto repost_done;
 				} else {
-					rename_file (article, dead_article);
+					if (prompt_rejected()==iKeyPostPostpone) {
+						postpone_article(backup_article_name(article));
+					} else {
+						unlink(backup_article_name(article));
+						rename_file (article, dead_article);
 #ifdef M_UNIX
-					if (keep_dead_articles)
-						append_file (dead_articles, dead_article);
+						if (keep_dead_articles)
+							append_file (dead_articles, dead_article);
 #endif
-					sprintf (buf, txt_art_rejected, dead_article);
-					info_message (buf);
-					sleep (3);
-					return ret_code;
-				}
-			default:
-				break;
+						sprintf (buf, txt_art_rejected, dead_article);
+						info_message (buf);
+						sleep (3);
+					}
+				return ret_code;
+			}
+		case iKeyPostPostpone:
+			postpone_article(article);
+			goto repost_postponed;
+		default:
+			break;
 		}
 	}
 
-      repost_done:
-	if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf)) {
-		update_active_after_posting (buf);
+	repost_done:
+		if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, buf)) {
+			update_active_after_posting (buf);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, buf))
 			update_posted_info_file (psGrp->name, 'x', buf);
-	}
-	if (unlink_article) {
-		unlink (article);
-	}
+		}
+	repost_postponed:
+		if (unlink_article) {
+			unlink (article);
+		}
 	return ret_code;
 }
 

@@ -48,6 +48,7 @@ main (argc, argv)
 {
 	int num_cmd_line_groups = 0;
 	int start_groupnum = 0;
+	int count;
 
 	cmd_line = TRUE;
 	debug = 0;	/* debug OFF */
@@ -184,6 +185,16 @@ main (argc, argv)
 		debug_print_filters ();
 		quick_post_article ();
 		tin_done (EXIT_OK);
+	}
+
+	if((count=count_postponed_articles())) {
+	  if(count==1) {
+	    printf("there is one postponed article, use '^O' to reuse it\n");
+	  } else {
+	    printf("there are %d postponed articles, use '^O' to reuse them\n",
+		   count);
+	  }
+	  sleep(2);
 	}
 
 	/*

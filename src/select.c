@@ -703,6 +703,15 @@ select_done:
 				}
 				break;
 
+			case iKeySelectPostponed:	/* post postponed article */
+				if (can_post) {
+					pickup_postponed_articles(FALSE);
+					group_selection_page ();
+				} else {
+					info_message(txt_cannot_post);
+				}
+				break;
+
 			case iKeySelectPostHist:	/* display messages posted by user */
 				if (user_posted_messages ()) {
 					group_selection_page ();
