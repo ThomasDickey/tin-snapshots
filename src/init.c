@@ -262,7 +262,7 @@ struct passwd pwdentry;
  * Get users home directory, userid, and a bunch of other stuff!
  */
 
-void init_selfinfo ()
+void init_selfinfo (void)
 {
 	char nam[LEN];
 	char *ptr;
@@ -818,7 +818,7 @@ got_bug_addr:;
  * Create default mail & save directories if they do not exist
  */
 
-int create_mail_save_dirs ()
+int create_mail_save_dirs (void)
 {
 	int created = FALSE;
 #ifndef INDEX_DAEMON
@@ -852,7 +852,7 @@ int create_mail_save_dirs ()
 #ifndef USE_INN_NNTPLIB
 
 char *
-GetFQDN ()
+GetFQDN (void)
 {
 	static char *fqdn = (char *) 0;
 
@@ -861,8 +861,8 @@ GetFQDN ()
 
 
 char *
-GetConfigValue (name)
-	char *name;
+GetConfigValue (
+	char *name)
 {
 	char *ptr;
 	char path[PATH_LEN];

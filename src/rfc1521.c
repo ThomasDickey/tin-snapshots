@@ -21,8 +21,8 @@ static int boundary_cmp P_((char *line, char *boundary));
 
 
 unsigned char
-bin2hex (x)
-	unsigned int x;
+bin2hex (
+	unsigned int x)
 {
 	if (x < 10)
 		return x + '0';
@@ -34,9 +34,9 @@ bin2hex (x)
    boundary and 2 if closing boundary */
 
 static int
-boundary_cmp(line, boundary)
-	char *line;
-	char *boundary;
+boundary_cmp(
+	char *line,
+	char *boundary)
 {
   int nl;
 
@@ -77,8 +77,8 @@ boundary_cmp(line, boundary)
    articles, so these get saved with incorrect MIME headers */
 
 FILE *
-rfc1521_decode (file)
-	FILE *file;
+rfc1521_decode (
+	FILE *file)
 {
 	FILE *f;
 	char buf[2048];
@@ -282,10 +282,10 @@ rfc1521_decode (file)
  * encoding modes.  If line is the null pointer, flush internal buffers.
  */
 void
-rfc1521_encode (line, f, e)
-	char *line;
-	FILE *f;
-	int e;
+rfc1521_encode (
+	char *line,
+	FILE *f,
+	int e)
 {
 	static char buffer[80];	/* they must be static for base64 */
 	static char *b = NULL;
@@ -423,10 +423,10 @@ rfc1521_encode (line, f, e)
 #define SO '\016'
 
 void
-rfc1557_encode (line, f, e)
-	char *line;
-	FILE *f;
-	int e;       /* dummy argument : not used */
+rfc1557_encode (
+	char *line,
+	FILE *f,
+	int e)       /* dummy argument : not used */
 {
 	int i = 0;
         int mode = ASCII;
@@ -486,10 +486,10 @@ rfc1557_encode (line, f, e)
 
 /* Not yet implemented */
 void
-rfc1468_encode (line, f, e)
-	char *line;
-	FILE *f;
-	int e;       /* dummy argument : not used */
+rfc1468_encode (
+	char *line,
+	FILE *f,
+	int e)       /* dummy argument : not used */
 {
 	if (line)
 		fputs(line, f);
@@ -497,10 +497,10 @@ rfc1468_encode (line, f, e)
 
 /* Not yet implemented */
 void
-rfc1922_encode (line, f, e)
-	char *line;
-	FILE *f;
-	int e;       /* dummy argument : not used */
+rfc1922_encode (
+	char *line,
+	FILE *f,
+	int e)       /* dummy argument : not used */
 {
 	if (line)
 		fputs(line, f);

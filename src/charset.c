@@ -130,10 +130,10 @@ static char *tex_to[TEX_SUBST] =
  */
 
 void
-ConvertIso2Asc (iso, asc, t)
-	char *iso;
-	char *asc;
-	int t;
+ConvertIso2Asc (
+	char *iso,
+	char *asc,
+	int t)
 {
 	char *p;
 	constext **tab;
@@ -216,9 +216,9 @@ ConvertIso2Asc (iso, asc, t)
 
 
 void
-ConvertTeX2Iso (from, to)
-	char *from;
-	char *to;
+ConvertTeX2Iso (
+	char *from,
+	char *to)
 {
 	size_t len, col, spaces;  /* length of from, col counter, spaces to add */
 	size_t subst_len;
@@ -257,9 +257,9 @@ ConvertTeX2Iso (from, to)
  */
 
 int
-iIsArtTexEncoded (art, group_path)
-	long art;
-	char *group_path;
+iIsArtTexEncoded (
+	long art,
+	char *group_path)
 {
 	char line[LEN];
 	FILE *fp;
@@ -303,8 +303,8 @@ iIsArtTexEncoded (art, group_path)
  *  Replace all non printable characters by '?'
  */
 void
-Convert2Printable (buf)
-	unsigned char *buf;
+Convert2Printable (
+	unsigned char *buf)
 {
 	unsigned char *c;
 	for (c=buf; *c; c++) {

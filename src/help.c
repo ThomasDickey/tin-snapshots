@@ -284,10 +284,10 @@ static int max_page;
 static int pos_help;
 
 void
-show_info_page (type, help, title)
-	int type;
-	char *help[];
-	char *title;
+show_info_page (
+	int type,
+	char *help[],
+	char *title)
 {
 	int ch;
 	int i, len;
@@ -427,7 +427,7 @@ help_done:
 
 
 void
-display_info_page ()
+display_info_page (void)
 {
 	char buf[LEN];
 	int i, help_lines;
@@ -468,8 +468,8 @@ display_info_page ()
 
 
 void
-show_mini_help (level)
-	int level;
+show_mini_help (
+	int level)
 {
 	int line;
 
@@ -517,8 +517,8 @@ show_mini_help (level)
 
 
 void
-toggle_mini_help (level)
-	int level;
+toggle_mini_help (
+	int level)
 {
 	beginner_level = !beginner_level;
 	set_win_size (&cLINES, &cCOLS);

@@ -20,10 +20,10 @@
  */
 #ifndef M_AMIGA
 void
-joinpath(result, dir, file)
-	char	*result;
-	char	*dir;
-	char	*file;
+joinpath(
+	char	*result,
+	char	*dir,
+	char	*file)
 {
 #ifdef M_UNIX
 	(void) strcpy(result, dir);

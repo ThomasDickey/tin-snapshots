@@ -45,17 +45,17 @@ static MYDATA *all_data;
 static int line_no;
 
 static void
-failed (message)
-	char *message;
+failed (
+	char *message)
 {
 	perror (message);
 	exit (1);
 }
 
 static FILE *
-open_it (filename, mode)
-	char *filename;
-	char *mode;
+open_it (
+	char *filename,
+	char *mode)
 {
 	FILE *fp = fopen (filename, mode);
 
@@ -65,17 +65,17 @@ open_it (filename, mode)
 }
 
 static char *
-string_dup (string)
-	char *string;
+string_dup (
+	char *string)
 {
 	return strcpy (malloc (strlen (string) + 1), string);
 }
 
 static void
-store_data (name, type, size)
-	char *name;
-	char *type;
-	char *size;
+store_data (
+	char *name,
+	char *type,
+	char *size)
 {
 	MYDATA *p = (MYDATA *) malloc (sizeof (MYDATA));
 	MYDATA *q;
@@ -95,8 +95,8 @@ store_data (name, type, size)
 }
 
 static void
-parse_tbl (buffer)
-	char *buffer;
+parse_tbl (
+	char *buffer)
 {
 	char *s = buffer;
 	char *t = s + strlen (s);
@@ -131,9 +131,9 @@ parse_tbl (buffer)
 }
 
 static void
-write_it (ofp, table)
-	FILE *ofp;
-	char **table;
+write_it (
+	FILE *ofp,
+	char **table)
 {
 	int n;
 
@@ -142,8 +142,8 @@ write_it (ofp, table)
 }
 
 static int
-index_of(p)
-	MYDATA *p;
+index_of(
+	MYDATA *p)
 {
 	int result = 0;
 	MYDATA *q;
@@ -157,8 +157,8 @@ index_of(p)
 }
 
 static int
-type_is_int(p)
-	MYDATA *p;
+type_is_int(
+	MYDATA *p)
 {
 	return strcmp(p->type, "OPT_STRING")
 	  &&   strcmp(p->type, "OPT_CHAR")
@@ -166,8 +166,8 @@ type_is_int(p)
 }
 
 static char *
-typename_of(p)
-	MYDATA *p;
+typename_of(
+	MYDATA *p)
 {
 	if (!strcmp(p->type, "OPT_STRING")
 	 || !strcmp(p->type, "OPT_CHAR"))
@@ -178,8 +178,8 @@ typename_of(p)
 }
 
 static void
-generate_tbl (ofp)
-	FILE *ofp;
+generate_tbl (
+	FILE *ofp)
 {
 	static char *table_1[] =
 	{
@@ -272,11 +272,11 @@ generate_tbl (ofp)
 }
 
 static void
-generate_ptr(ofp, opt_type, ptr_type, mode)
-	FILE *ofp;
-	char *opt_type;
-	char *ptr_type;
-	int mode;
+generate_ptr(
+	FILE *ofp,
+	char *opt_type,
+	char *ptr_type,
+	int mode)
 {
 	MYDATA *p, *q;
 	int after;
@@ -349,9 +349,9 @@ generate_ptr(ofp, opt_type, ptr_type, mode)
 }
 
 static void
-makecfg (ifp, ofp)
-	FILE *ifp;
-	FILE *ofp;
+makecfg (
+	FILE *ifp,
+	FILE *ofp)
 {
 	char buffer[BUFSIZ];
 	MYDATA *p, *q;
@@ -416,9 +416,9 @@ makecfg (ifp, ofp)
 }
 
 int
-main (argc, argv)
-	int argc;
-	char *argv[];
+main (
+	int argc,
+	char *argv[])
 {
 	FILE *input = stdin;
 	FILE *output = stdout;

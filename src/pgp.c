@@ -49,8 +49,8 @@ static void pgp_append_public_key P_((char *file));
 static int pgp_available P_((void));
 
 static void
-join_files (file)
-	char *file;
+join_files (
+	char *file)
 {
 	char buf[LEN];
 	FILE *art, *header, *text;
@@ -83,8 +83,8 @@ join_files (file)
 }
 
 static void
-split_file (file)
-	char *file;
+split_file (
+	char *file)
 {
 	int pid, mask;
 	char buf[LEN];
@@ -125,10 +125,10 @@ split_file (file)
 }
 
 static void
-do_pgp (what, file, mail_to)
-	int what;
-	char *file;
-	char *mail_to;
+do_pgp (
+	int what,
+	char *file,
+	char *mail_to)
 {
 	char cmd[LEN], options[10];
 
@@ -148,8 +148,8 @@ do_pgp (what, file, mail_to)
 }
 
 static void
-pgp_append_public_key (file)
-	char *file;
+pgp_append_public_key (
+	char *file)
 {
 	FILE *f, *key;
 	char keyfile[PATH_LEN], cmd[LEN], user[50], host[50], buf[LEN];
@@ -178,7 +178,7 @@ pgp_append_public_key (file)
 }
 
 static int
-pgp_available ()
+pgp_available (void)
 {
 	FILE *f;
 	char keyring[PATH_LEN];
@@ -193,9 +193,9 @@ pgp_available ()
 }
 
 void
-invoke_pgp_mail (nam, mail_to)
-	char *nam;
-	char *mail_to;
+invoke_pgp_mail (
+	char *nam,
+	char *mail_to)
 {
 	char ch, ch_default = 's';
 
@@ -233,8 +233,8 @@ invoke_pgp_mail (nam, mail_to)
 }
 
 void
-invoke_pgp_news(the_article)
-	char *the_article;
+invoke_pgp_news(
+	char *the_article)
 {
 	char ch, ch_default = 's';
 
@@ -269,7 +269,7 @@ invoke_pgp_news(the_article)
 }
 
 int
-pgp_check_article()
+pgp_check_article(void)
 {
 	FILE *art;
 	char the_article[PATH_LEN], buf[LEN], cmd[LEN];

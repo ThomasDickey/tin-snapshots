@@ -20,13 +20,12 @@
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-read_mail_active_file ()
+read_mail_active_file (void)
 {
 	char	buf[LEN];
 	char	spooldir[PATH_LEN];
 	FILE	*fp;
-	int		i;
-	long	count = -1L, h;
+	long	count = -1L;
 	long	min, max;
 
 	if (SHOW_UPDATE)
@@ -102,7 +101,7 @@ read_mail_active_continue:;
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-write_mail_active_file ()
+write_mail_active_file (void)
 {
 	char acGrpPath[PATH_LEN];
 	FILE *fp;
@@ -132,7 +131,7 @@ write_mail_active_file ()
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-read_mailgroups_file ()
+read_mailgroups_file (void)
 {
 	FILE *fp;
 
@@ -160,7 +159,7 @@ read_mailgroups_file ()
  */
 
 void
-read_newsgroups_file ()
+read_newsgroups_file (void)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp;
@@ -204,9 +203,9 @@ read_newsgroups_file ()
  */
 
 void
-read_groups_descriptions (fp, fp_save)
-	FILE *fp;
-	FILE *fp_save;
+read_groups_descriptions (
+	FILE *fp,
+	FILE *fp_save)
 {
 #ifndef INDEX_DAEMON
 	char buf[LEN];
@@ -257,8 +256,8 @@ read_groups_descriptions (fp, fp_save)
 }
 
 void
-vPrintActiveHead (pcActiveFile)
-	char	*pcActiveFile;
+vPrintActiveHead (
+	char	*pcActiveFile)
 {
 	FILE	*hFp;
 
@@ -271,12 +270,12 @@ vPrintActiveHead (pcActiveFile)
 }
 
 void
-vParseGrpLine (pcLine, pcGrpName, plArtMax, plArtMin, pcModerated)
-	char	*pcLine;
-	char	*pcGrpName;
-	long	*plArtMax;
-	long	*plArtMin;
-	char	*pcModerated;
+vParseGrpLine (
+	char	*pcLine,
+	char	*pcGrpName,
+	long	*plArtMax,
+	long	*plArtMin,
+	char	*pcModerated)
 {
 	char	*pcPtr;
 
@@ -334,10 +333,10 @@ vParseGrpLine (pcLine, pcGrpName, plArtMax, plArtMin, pcModerated)
 }
 
 void
-vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
-	char	*pcGrpPath;
-	long	*plArtMax;
-	long	*plArtMin;
+vFindArtMaxMin (
+	char	*pcGrpPath,
+	long	*plArtMax,
+	long	*plArtMin)
 {
 	DIR	*tDirFile;
 	DIR_BUF	*tFile;
@@ -373,12 +372,12 @@ vFindArtMaxMin (pcGrpPath, plArtMax, plArtMin)
 }
 
 void
-vPrintGrpLine (hFp, pcGrpName, lArtMax, lArtMin, pcBaseDir)
-	FILE	*hFp;
-	char	*pcGrpName;
-	long	lArtMax;
-	long	lArtMin;
-	char	*pcBaseDir;
+vPrintGrpLine (
+	FILE	*hFp,
+	char	*pcGrpName,
+	long	lArtMax,
+	long	lArtMin,
+	char	*pcBaseDir)
 {
 	fprintf (hFp, "%s %05ld %05ld %s\n",
 		pcGrpName, lArtMax, lArtMin, pcBaseDir);
@@ -393,10 +392,10 @@ vPrintGrpLine (hFp, pcGrpName, lArtMax, lArtMin, pcBaseDir)
  */
 
 void
-vMakeGrpPath (pcBaseDir, pcGrpName, pcGrpPath)
-	char	*pcBaseDir;
-	char	*pcGrpName;
-	char	*pcGrpPath;
+vMakeGrpPath (
+	char	*pcBaseDir,
+	char	*pcGrpName,
+	char	*pcGrpPath)
 {
 	char	*pcPtr;
 
@@ -416,10 +415,10 @@ vMakeGrpPath (pcBaseDir, pcGrpName, pcGrpPath)
  */
 
 void
-vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
-	char	*pcBaseDir;
-	char	*pcGrpName;
-	char	*pcGrpPath;
+vMakeGrpName (
+	char	*pcBaseDir,
+	char	*pcGrpName,
+	char	*pcGrpPath)
 {
 	char	*pcPtrBase;
 	char	*pcPtrName;
@@ -443,8 +442,8 @@ vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-vGrpDelMailArt (psArt)
-	struct t_article *psArt;
+vGrpDelMailArt (
+	struct t_article *psArt)
 {
 
 	if (psArt->delete) {
@@ -460,8 +459,8 @@ vGrpDelMailArt (psArt)
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-vGrpDelMailArts (psGrp)
-	struct t_group *psGrp;
+vGrpDelMailArts (
+	struct t_group *psGrp)
 {
 	char	acArtFile[PATH_LEN];
 	char	acGrpPath[PATH_LEN];
@@ -495,9 +494,9 @@ vGrpDelMailArts (psGrp)
 
 
 int
-iArtEdit (psGrp, psArt)
-	struct t_group *psGrp;
-	struct t_article *psArt;
+iArtEdit (
+	struct t_group *psGrp,
+	struct t_article *psArt)
 {
 #ifndef INDEX_DAEMON
 	char	acArtFile[PATH_LEN];

@@ -50,8 +50,8 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 static int submit_inews P_((char *name));
 
 static int
-submit_inews (name)
-	char *name;
+submit_inews (
+	char *name)
 {
 	int	ret_code = FALSE;
 
@@ -194,8 +194,8 @@ submit_inews (name)
  */
 
 void
-get_host_name (host_name)
-	char *host_name;
+get_host_name (
+	char *host_name)
 {
 #ifndef INDEX_DAEMON
 
@@ -323,9 +323,9 @@ get_host_name (host_name)
  */
 
 void
-get_user_info (user_name, full_name)
-	char *user_name;
-	char *full_name;
+get_user_info (
+	char *user_name,
+	char *full_name)
 {
 #ifndef INDEX_DAEMON
 	char buf[128];
@@ -385,11 +385,11 @@ get_user_info (user_name, full_name)
  */
 
 void
-get_from_name (user_name, host_name, full_name, from_name)
-	char *user_name;
-	char *host_name;
-	char *full_name;
-	char *from_name;
+get_from_name (
+	char *user_name,
+	char *host_name,
+	char *full_name,
+	char *from_name)
 {
 #ifndef INDEX_DAEMON
 
@@ -456,9 +456,9 @@ get_from_name (user_name, host_name, full_name, from_name)
 
 
 void
-get_domain_name (inews_domain, domain)
-	char	*inews_domain;
-	char	*domain;
+get_domain_name (
+	char	*inews_domain,
+	char	*domain)
 {
 	char	*ptr;
 	char	buf[PATH_LEN];
@@ -499,9 +499,9 @@ get_domain_name (inews_domain, domain)
 
 
 int
-submit_news_file (name, lines)
-	char *name;
-	int   lines;
+submit_news_file (
+	char *name,
+	int   lines)
 {
 	char buf[LEN];
 	char *cp = buf;

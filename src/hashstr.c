@@ -39,8 +39,8 @@ struct t_hashnode *table[HASHNODE_TABLE_SIZE];
 static struct t_hashnode *add_string P_((char *s));
 
 char *
-hash_str (s)
-	char *s;
+hash_str (
+	char *s)
 {
 	long h;				/* result of hash:  index into hash table */
 	struct t_hashnode **p;	/* used to descend the spillover structs */
@@ -91,8 +91,8 @@ hash_str (s)
  * \0						String terminator
  */
 static struct t_hashnode *
-add_string (s)
-	char *s;
+add_string (
+	char *s)
 {
 	int *iptr;
 	struct t_hashnode *p;
@@ -115,7 +115,7 @@ add_string (s)
 
 
 void
-hash_init ()
+hash_init (void)
 {
 	int i;
 
@@ -132,7 +132,7 @@ hash_init ()
 
 
 void
-hash_reclaim ()
+hash_reclaim (void)
 {
 	int i;
 	struct t_hashnode *p, *next;

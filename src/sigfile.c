@@ -28,9 +28,9 @@ static FILE *open_random_sig P_((char *sigdir));
 static int thrashdir P_((char *sigdir));
 
 void
-msg_write_signature (fp, flag)
-	FILE *fp;
-	int flag;
+msg_write_signature (
+	FILE *fp,
+	int flag)
 {
 	char path[PATH_LEN];
 	char cwd[PATH_LEN];
@@ -113,8 +113,8 @@ msg_write_signature (fp, flag)
 
 
 static FILE *
-open_random_sig (sigdir)
-	char *sigdir;
+open_random_sig (
+	char *sigdir)
 {
 	time_t epoch;
 	struct stat st;
@@ -144,8 +144,8 @@ open_random_sig (sigdir)
 
 
 static int
-thrashdir (sigdir)
-	char *sigdir;
+thrashdir (
+	char *sigdir)
 {
 	char *cwd;
 	int safeguard, recurse;
@@ -252,9 +252,9 @@ if (debug == 2) {
 	}
 	free (cwd);
 
-if (debug == 2) {
-	error_message ("return 0: sigfile=[%s]", sigfile);
-}
+	if (debug == 2) {
+		error_message ("return 0: sigfile=[%s]", sigfile);
+	}
 	closedir (dirp);
 
 	return (0);

@@ -28,9 +28,9 @@
  */
 
 int
-prompt_num (ch, prompt)
-	int ch;
-	char *prompt;
+prompt_num (
+	int ch,
+	char *prompt)
 {
 	char *p;
 	int num;
@@ -62,9 +62,9 @@ prompt_num (ch, prompt)
  */
 
 int
-prompt_string (prompt, buf)
-	char *prompt;
-	char *buf;
+prompt_string (
+	char *prompt,
+	char *buf)
 {
 	char *p;
 
@@ -93,10 +93,10 @@ prompt_string (prompt, buf)
  */
 
 int
-prompt_menu_string (line, col, var)
-	int line;
-	int col;
-	char *var;
+prompt_menu_string (
+	int line,
+	int col,
+	char *var)
 {
 	char *p;
 
@@ -124,10 +124,10 @@ prompt_menu_string (line, col, var)
  */
 
 int
-prompt_yn (line, prompt, default_answer)
-	int line;
-	char *prompt;
-	int default_answer;
+prompt_yn (
+	int line,
+	char *prompt,
+	int default_answer)
 {
 	char ch, prompt_ch;
 	int yn_loop = TRUE;
@@ -206,10 +206,10 @@ prompt_yn (line, prompt, default_answer)
 */
 
 int 
-prompt_yn2 (line, prompt, default_answer)
-	int line;
-	char *prompt;
-	int default_answer;
+prompt_yn2 (
+	int line,
+	char *prompt,
+	int default_answer)
 {
 	char ch, prompt_ch;
 
@@ -254,14 +254,14 @@ prompt_yn2 (line, prompt, default_answer)
  * The new value is returned.
  */
 int
-prompt_list (row, col, var, help_text, prompt_text, list, size)
-	int row;
-	int col;
-	int var;
-	char *help_text;
-	char *prompt_text;
-	char *list[];
-	int size;
+prompt_list (
+	int row,
+	int col,
+	int var,
+	char *help_text,
+	char *prompt_text,
+	char *list[],
+	int size)
 {
 	int ch, var_orig;
 	int i;
@@ -312,12 +312,12 @@ prompt_list (row, col, var, help_text, prompt_text, list, size)
  * Special case of prompt_list() Toggle between ON and OFF
  */
 void
-prompt_on_off (row, col, var, help_text, prompt_text)
-	int row;
-	int col;
-	t_bool *var;
-	char *help_text;
-	char *prompt_text;
+prompt_on_off (
+	int row,
+	int col,
+	t_bool *var,
+	char *help_text,
+	char *prompt_text)
 {
 	t_bool ret;
 
@@ -337,8 +337,8 @@ prompt_on_off (row, col, var, help_text, prompt_text)
  */
 
 int
-prompt_option_string (option)
-	int option;
+prompt_option_string (
+	int option)
 {
 	char prompt[LEN];
 	char *p;
@@ -373,8 +373,8 @@ prompt_option_string (option)
  */
 
 int
-prompt_option_num (option)
-	int option;
+prompt_option_num (
+	int option)
 {
 	char prompt[LEN];
 	char number[LEN];
@@ -412,8 +412,8 @@ prompt_option_num (option)
  */
 
 int
-prompt_option_char (option)
-	int option;
+prompt_option_char (
+	int option)
 {
 	char prompt[LEN];
 	char input[2];
@@ -448,7 +448,7 @@ prompt_option_char (option)
  * ii) CTRL, SHIFT etc don't work
  */
 void
-continue_prompt ()
+continue_prompt (void)
 {
 	set_alarm_clock_off ();
 

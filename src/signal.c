@@ -69,8 +69,8 @@ int do_sigtstp = 0;
  */
 
 RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
-	int sig;
-	RETSIGTYPE (*func)(SIG_ARGS);
+	int sig,
+	RETSIGTYPE (*func)(SIG_ARGS))
 {
 	struct sigaction sa, osa;
 
@@ -100,7 +100,7 @@ RETSIGTYPE (*sigdisp(sig, func))(SIG_ARGS)
 
 #endif /* HAVE_POSIX_JC */
 
-void set_signal_handlers ()
+void set_signal_handlers (void)
 {
 #ifdef SIGINT
 	signal (SIGINT, signal_handler);	/* ctrl-C */
@@ -162,7 +162,7 @@ void set_signal_handlers ()
 }
 
 
-void set_alarm_signal ()
+void set_alarm_signal (void)
 {
 #ifndef DONT_REREAD_ACTIVE_FILE
 	(void) alarm (0);
@@ -175,7 +175,7 @@ void set_alarm_signal ()
 }
 
 
-void set_alarm_clock_on ()
+void set_alarm_clock_on (void)
 {
 #ifndef DONT_REREAD_ACTIVE_FILE
 	alarm (time_remaining);
@@ -183,7 +183,7 @@ void set_alarm_clock_on ()
 }
 
 
-void set_alarm_clock_off ()
+void set_alarm_clock_off (void)
 {
 #ifndef DONT_REREAD_ACTIVE_FILE
 	time_remaining = alarm (0);
@@ -191,8 +191,8 @@ void set_alarm_clock_off ()
 }
 
 
-void _CDECL signal_handler (sig)
-	int sig;
+void _CDECL signal_handler (
+	int sig)
 {
 	char *sigtext;
 #ifdef SIGCHLD
@@ -303,9 +303,9 @@ void _CDECL signal_handler (sig)
 
 
 int
-set_win_size (num_lines, num_cols)
-	int *num_lines;
-	int *num_cols;
+set_win_size (
+	int *num_lines,
+	int *num_cols)
 {
 	int	old_lines;
 	int	old_cols;
@@ -373,7 +373,7 @@ set_win_size (num_lines, num_cols)
 
 
 
-void set_signals_art ()
+void set_signals_art (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -387,7 +387,7 @@ void set_signals_art ()
 }
 
 
-void set_signals_config ()
+void set_signals_config (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -401,7 +401,7 @@ void set_signals_config ()
 }
 
 
-void set_signals_group ()
+void set_signals_group (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -415,7 +415,7 @@ void set_signals_group ()
 }
 
 
-void set_signals_help ()
+void set_signals_help (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -429,7 +429,7 @@ void set_signals_help ()
 }
 
 
-void set_signals_page ()
+void set_signals_page (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -443,7 +443,7 @@ void set_signals_page ()
 }
 
 
-void set_signals_select ()
+void set_signals_select (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -457,7 +457,7 @@ void set_signals_select ()
 }
 
 
-void set_signals_thread ()
+void set_signals_thread (void)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp) {
@@ -474,8 +474,8 @@ void set_signals_thread ()
 #ifdef SIGTSTP
 
 /* ARGSUSED0 */
-void art_suspend (sig)
-	int sig;
+void art_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -496,8 +496,8 @@ void art_suspend (sig)
 
 
 /* ARGSUSED0 */
-void main_suspend (sig)
-	int sig;
+void main_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -518,8 +518,8 @@ void main_suspend (sig)
 
 
 /* ARGSUSED0 */
-void select_suspend (sig)
-	int sig;
+void select_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -540,8 +540,8 @@ void select_suspend (sig)
 
 
 /* ARGSUSED0 */
-void group_suspend (sig)
-	int sig;
+void group_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -562,8 +562,8 @@ void group_suspend (sig)
 
 
 /* ARGSUSED0 */
-void help_suspend (sig)
-	int sig;
+void help_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -584,8 +584,8 @@ void help_suspend (sig)
 
 
 /* ARGSUSED0 */
-void page_suspend (sig)
-	int sig;
+void page_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -606,8 +606,8 @@ void page_suspend (sig)
 
 
 /* ARGSUSED0 */
-void thread_suspend (sig)
-	int sig;
+void thread_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -628,8 +628,8 @@ void thread_suspend (sig)
 
 
 /* ARGSUSED0 */
-void config_suspend (sig)
-	int sig;
+void config_suspend (
+	int sig)
 {
 	set_keypad_off ();
 	set_xclick_off ();
@@ -650,8 +650,8 @@ void config_suspend (sig)
 
 
 /* ARGSUSED0 */
-void art_resize (sig)
-	int sig;
+void art_resize (
+	int sig)
 {
 	char buf[LEN];
 
@@ -665,8 +665,8 @@ void art_resize (sig)
 }
 
 
-void config_resize (sig)
-	int sig;
+void config_resize (
+	int sig)
 {
 	int resized = TRUE;
 #ifdef SIGWINCH
@@ -680,8 +680,8 @@ void config_resize (sig)
 
 
 /* ARGSUSED0 */
-void main_resize (sig)
-	int sig;
+void main_resize (
+	int sig)
 {
 #ifdef SIGWINCH
 	(void) set_win_size (&cLINES, &cCOLS);
@@ -691,8 +691,8 @@ void main_resize (sig)
 
 
 /* ARGSUSED0 */
-void select_resize (sig)
-	int sig;
+void select_resize (
+	int sig)
 {
 	int resized = TRUE;
 
@@ -709,8 +709,8 @@ void select_resize (sig)
 
 
 /* ARGSUSED0 */
-void group_resize (sig)
-	int sig;
+void group_resize (
+	int sig)
 {
 	int resized = TRUE;
 
@@ -727,8 +727,8 @@ void group_resize (sig)
 
 
 /* ARGSUSED0 */
-void help_resize (sig)
-	int sig;
+void help_resize (
+	int sig)
 {
 	int resized = TRUE;
 
@@ -743,8 +743,8 @@ void help_resize (sig)
 }
 
 /* ARGSUSED0 */
-void page_resize (sig)
-	int sig;
+void page_resize (
+	int sig)
 {
 	int resized = TRUE;
 
@@ -761,8 +761,8 @@ void page_resize (sig)
 
 
 /* ARGSUSED0 */
-void thread_resize (sig)
-	int sig;
+void thread_resize (
+	int sig)
 {
 	int resized = TRUE;
 

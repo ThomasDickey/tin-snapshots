@@ -32,9 +32,9 @@ static void unhighlight_option P_((int option));
  */
 
 int
-read_config_file (file, global_file)
-	char	*file;
-	int	global_file;
+read_config_file (
+	char	*file,
+	int	global_file)
 {
 	char	newnews_info[PATH_LEN];
 	char	buf[LEN];
@@ -560,8 +560,8 @@ read_config_file (file, global_file)
  */
 
 void
-write_config_file (file)
-	char	*file;
+write_config_file (
+	char	*file)
 {
 	FILE *fp;
 	char *file_tmp;
@@ -1027,15 +1027,15 @@ int actual_option_page = 0;
  */
 
 static void
-print_option (the_option)
-	enum option_enum the_option;
+print_option (
+	enum option_enum the_option)
 {
 	print_any_option((int)the_option);
 }
 
 static void
-print_any_option (act_option)
-	int act_option;
+print_any_option (
+	int act_option)
 {
 	printf("%3d. %s ", act_option, option_table[act_option - 1].option_text);
 	switch (option_table[act_option - 1].var_type) {
@@ -1060,8 +1060,8 @@ print_any_option (act_option)
 }
 
 static void
-highlight_option (option)
-	int option;
+highlight_option (
+	int option)
 {
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	my_fputs ("->", stdout);
@@ -1070,8 +1070,8 @@ highlight_option (option)
 }
 
 static void
-unhighlight_option (option)
-	int option;
+unhighlight_option (
+	int option)
 {
 	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
 	my_fputs ("  ", stdout);
@@ -1091,9 +1091,9 @@ unhighlight_option (option)
  */
 
 void
-refresh_config_page (act_option, force_redraw)
-	int act_option;
-	int force_redraw;
+refresh_config_page (
+	int act_option,
+	int force_redraw)
 {
 	static int last_option = 0;
 	int desired_page;
@@ -1123,9 +1123,9 @@ refresh_config_page (act_option, force_redraw)
  */
 
 int
-change_config_file (group, filter_at_once)
-	struct t_group *group;
-	int filter_at_once;	/* not used */
+change_config_file (
+	struct t_group *group,
+	int filter_at_once)	/* not used */
 {
 	int ch, i;
 	int change_option = FALSE;
@@ -1592,10 +1592,10 @@ change_config_file (group, filter_at_once)
  */
 
 static void
-expand_rel_abs_pathname (line, col, str)
-	int line;
-	int col;
-	char *str;
+expand_rel_abs_pathname (
+	int line,
+	int col,
+	char *str)
 {
 	char buf[LEN];
 
@@ -1619,8 +1619,8 @@ expand_rel_abs_pathname (line, col, str)
  */
 
 void
-show_menu_help (help_message)
-	char *help_message;
+show_menu_help (
+	char *help_message)
 {
 	 MoveCursor (cLINES-2, 0);
 	 CleartoEOLN ();
@@ -1629,10 +1629,10 @@ show_menu_help (help_message)
 
 
 int
-match_boolean (line, pat, dst)
-	char *line;
-	char *pat;
-	t_bool *dst;
+match_boolean (
+	char *line,
+	char *pat,
+	t_bool *dst)
 {
 	size_t	patlen = strlen (pat);
 
@@ -1650,10 +1650,11 @@ match_boolean (line, pat, dst)
  * If no match is made, return FALSE.
  */
 int
-match_integer (line, pat, dst, maxlen)
-	char *line;
-	char *pat;
-	int *dst, maxlen;
+match_integer (
+	char *line,
+	char *pat,
+	int *dst,
+	int maxlen)
 {
 	size_t	patlen = strlen (pat);
 
@@ -1674,10 +1675,10 @@ match_integer (line, pat, dst, maxlen)
 
 
 int
-match_long (line, pat, dst)
-	char *line;
-	char *pat;
-	long *dst;
+match_long (
+	char *line,
+	char *pat,
+	long *dst)
 {
 	size_t	patlen = strlen (pat);
 
@@ -1690,12 +1691,12 @@ match_long (line, pat, dst)
 
 /* If the 'pat' keyword matches, lookup & return an index into the table */
 static int
-match_list (line, pat, table, tablelen, dst)
-	char *line;
-	char *pat;
-	char **table;
-	size_t tablelen;
-	int *dst;
+match_list (
+	char *line,
+	char *pat,
+	char **table,
+	size_t tablelen,
+	int *dst)
 {
 	size_t	patlen = strlen (pat);
 	size_t	n;
@@ -1716,11 +1717,11 @@ match_list (line, pat, table, tablelen, dst)
 }
 
 int
-match_string (line, pat, dst, dstlen)
-	char *line;
-	char *pat;
-	char *dst;
-	size_t dstlen;
+match_string (
+	char *line,
+	char *pat,
+	char *dst,
+	size_t dstlen)
 {
 	char	*ptr;
 	size_t	patlen = strlen (pat);
@@ -1738,8 +1739,8 @@ match_string (line, pat, dst, dstlen)
 
 
 char *
-print_boolean (value)
-	t_bool value;
+print_boolean (
+	t_bool value)
 {
 	return txt_onoff[value != FALSE];
 }
@@ -1749,8 +1750,8 @@ print_boolean (value)
  */
 
 void
-quote_dash_to_space (str)
-	char *str;
+quote_dash_to_space (
+	char *str)
 {
 	char *ptr;
 
@@ -1766,8 +1767,8 @@ quote_dash_to_space (str)
  */
 
 char *
-quote_space_to_dash (str)
-	char *str;
+quote_space_to_dash (
+	char *str)
 {
 	char *ptr, *dst;
 	static char buf[PATH_LEN];
@@ -1792,8 +1793,8 @@ quote_space_to_dash (str)
  */
 
 static void
-show_config_page (page_no)
-	int page_no;
+show_config_page (
+	int page_no)
 {
 	int i, lines_to_print = option_lines_per_page;
 

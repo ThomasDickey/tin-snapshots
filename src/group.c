@@ -42,8 +42,8 @@ static void show_group_title P_((int clear_title));
 
 
 static int
-line_is_tagged (n)
-int n;
+line_is_tagged (
+	int n)
 {
 	int	code = 0;
 	if (CURR_GROUP.attribute->thread_arts) {
@@ -59,7 +59,7 @@ int n;
 }
 
 static void
-show_tagged_lines ()
+show_tagged_lines (void)
 {
 	register int i;
 	for (i = first_subj_on_screen; i < last_subj_on_screen; ++i) {
@@ -71,8 +71,8 @@ show_tagged_lines ()
 }
 
 static void
-decr_tagged (tag)
-	int tag;
+decr_tagged (
+	int tag)
 {
 	int i, j;
 
@@ -85,8 +85,8 @@ decr_tagged (tag)
 
 
 void
-group_page (group)
-	struct t_group *group;
+group_page (
+	struct t_group *group)
 {
 #ifndef INDEX_DAEMON
 
@@ -1264,7 +1264,7 @@ group_done:
 
 
 void
-show_group_page ()
+show_group_page (void)
 {
 #ifndef INDEX_DAEMON
 	int i;
@@ -1339,7 +1339,7 @@ show_group_page ()
 }
 
 static void
-update_group_page ()
+update_group_page (void)
 {
 #ifndef INDEX_DAEMON
 	register int i;
@@ -1358,7 +1358,7 @@ update_group_page ()
 
 
 void
-draw_subject_arrow ()
+draw_subject_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
@@ -1374,7 +1374,7 @@ draw_subject_arrow ()
 }
 
 void
-erase_subject_arrow ()
+erase_subject_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
@@ -1391,8 +1391,8 @@ erase_subject_arrow ()
 
 
 static int
-prompt_subject_num (ch)
-	int ch;
+prompt_subject_num (
+	int ch)
 {
 	int num;
 
@@ -1431,7 +1431,7 @@ prompt_subject_num (ch)
 
 
 void
-clear_note_area ()
+clear_note_area (void)
 {
 	MoveCursor (INDEX_TOP, 0);
 	CleartoEOS ();
@@ -1445,10 +1445,10 @@ clear_note_area ()
  */
 
 int
-find_new_pos (old_top, old_artnum, cur_pos)
-	int old_top;
-	long old_artnum;
-	int cur_pos;
+find_new_pos (
+	int old_top,
+	long old_artnum,
+	int cur_pos)
 {
 	int i, pos;
 
@@ -1474,11 +1474,11 @@ find_new_pos (old_top, old_artnum, cur_pos)
 
 
 void
-mark_screen (level, screen_row, screen_col, value)
-	int level;
-	int screen_row;
-	int screen_col;
-	char *value;
+mark_screen (
+	int level,
+	int screen_row,
+	int screen_col,
+	char *value)
 {
 	int i, len;
 
@@ -1503,8 +1503,8 @@ mark_screen (level, screen_row, screen_col, value)
 
 
 void
-set_subj_from_size (num_cols)
-	int num_cols;
+set_subj_from_size (
+	int num_cols)
 {
 	int size;
 
@@ -1538,7 +1538,7 @@ set_subj_from_size (num_cols)
 
 
 void
-toggle_subject_from ()
+toggle_subject_from (void)
 {
 	if (++show_author > SHOW_FROM_BOTH) {
 		show_author = SHOW_FROM_NONE;
@@ -1559,8 +1559,8 @@ toggle_subject_from ()
  */
 
 static int
-bld_sline (i)
-	int i;
+bld_sline (
+	int i)
 {
 #ifndef INDEX_DAEMON
 	int respnum;
@@ -1662,9 +1662,9 @@ bld_sline (i)
  */
 
 static int
-draw_sline (i, full)
-	int i;
-	int full;	/* unused at moment */
+draw_sline (
+	int i,
+	int full)	/* unused at moment */
 {
 #ifndef INDEX_DAEMON
 	size_t tlen;
@@ -1714,8 +1714,8 @@ draw_sline (i, full)
 
 
 static void
-show_group_title (clear_title)
-	int clear_title;
+show_group_title (
+	int clear_title)
 {
 #ifndef INDEX_DAEMON
 

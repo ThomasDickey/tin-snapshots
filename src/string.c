@@ -28,9 +28,9 @@
  */
 
 char *
-tin_itoa (value, digits)
-	int value;	/* change to long int if needed */
-	int digits;
+tin_itoa (
+	int value,	/* change to long int if needed */
+	int digits)
 {
 	static char buffer[256];
 	static char power[]=" KMGT";
@@ -65,8 +65,8 @@ tin_itoa (value, digits)
  *
  * also, strdup is not mandatory in ANSI-C
  */
-char *my_strdup (str)
-	char *str;
+char *my_strdup (
+	char *str)
 {
 	char *duplicate = (char *) 0;
 
@@ -85,10 +85,10 @@ char *my_strdup (str)
  */
 
 void
-my_strncpy (p, q, n)
-	char *p;
-	/* const */ char *q;
-	int n;		/* we should use size_t instead of int */
+my_strncpy (
+	char *p,
+	/* const */ char *q,
+	int n)		/* we should use size_t instead of int */
 {
 	while (n--) {
 		if (!*q || *q == '\n')
@@ -101,9 +101,9 @@ my_strncpy (p, q, n)
 
 /* this strcpy variant removes \n and "" */
 void
-strcpynl (to, from)
-	char *to;
-	char *from;
+strcpynl (
+	char *to,
+	char *from)
 {
 	while (*from && *from != '\r' && *from != '\n') {
 		if (*from == '"')
@@ -115,9 +115,9 @@ strcpynl (to, from)
 }
 
 char *
-strcasestr (haystack, needle)
-	char *haystack;
-	char *needle;
+strcasestr (
+	char *haystack,
+	char *needle)
 {
 	char *h, *n;
 
@@ -138,9 +138,9 @@ strcasestr (haystack, needle)
 }
 
 int
-mystrcat (t, s)
-	char **t;
-	char *s;
+mystrcat (
+	char **t,
+	char *s)
 {
 	int len = 0;
 
@@ -152,11 +152,11 @@ mystrcat (t, s)
 	return len;
 }
 
-void modifiedstrncpy(target, source, size, decode)
-char *target;
-char *source;
-size_t size;
-int decode;
+void modifiedstrncpy(
+	char *target,
+	char *source,
+	size_t size,
+	int decode)
 {
 	char buf[2048];
 	int count;
@@ -185,9 +185,9 @@ int decode;
 
 
 void
-str_lwr (src, dst)
-	char *src;
-	char *dst;
+str_lwr (
+	char *src,
+	char *dst)
 {
 	while (*src) {
 		*dst++ = (char)tolower((int)*src);
@@ -207,9 +207,9 @@ str_lwr (src, dst)
 */
 
 char *
-strpbrk (str1, str2)
-	char *str1;
-	char *str2;
+strpbrk (
+	char *str1,
+	char *str2)
 {
 	register char *ptr1;
 	register char *ptr2;
@@ -230,9 +230,9 @@ strpbrk (str1, str2)
  * ANSI C strstr () - Uses Boyer-Moore algorithm.
  */
 char *
-strstr (text, pattern)
-	char *text;
-	char *pattern;
+strstr (
+	char *text,
+	char *pattern)
 {
 	register unsigned char *p, *t;
 	register int i, j, *delta;
@@ -288,8 +288,8 @@ strstr (text, pattern)
 ** handrolled atol
 */
 long int
-atol (s)
-	/* const */ char *s;
+atol (
+	/* const */ char *s)
 {
 	long ret = 0;
 	while (*s) {
@@ -308,10 +308,10 @@ atol (s)
 #define DIGIT(x) (isdigit((unsigned char)x)? ((x)-'0'): (10+tolower(x)-'a'))
 #define MBASE 36
 long
-strtol (str, ptr, use_base)
-	/* const */ char *str;
-	char **ptr;
-	int use_base;
+strtol (
+	/* const */ char *str,
+	char **ptr,
+	int use_base)
 {
 
 	long	val;
@@ -371,9 +371,9 @@ OUT:
 
 #ifndef HAVE_STRCASECMP
 int
-strcasecmp (p, q)
-	/* const */ char *p;
-	/* const */ char *q;
+strcasecmp (
+	/* const */ char *p,
+	/* const */ char *q)
 {
 	int r;
 	for (; (r = FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q)) == 0; ++p, ++q) {
@@ -388,10 +388,10 @@ strcasecmp (p, q)
 
 #ifndef HAVE_STRNCASECMP
 int
-strncasecmp(p, q, n)
-	/* const */ char *p;
-	/* const */ char *q;
-	size_t n;
+strncasecmp(
+	/* const */ char *p,
+	/* const */ char *q,
+	size_t n)
 {
 	int r=0;
 	for (; n && (r = (FOLD_TO_UPPER (*p) - FOLD_TO_UPPER (*q))) == 0;

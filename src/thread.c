@@ -47,9 +47,9 @@ static void update_thread_page P_((void));
  * there are a lot of variables in the format for the output
  */
 static int		/* TODO why return int ? what can go wrong ? */
-bld_tline (l, art)
-	int l;
-	struct t_article *art;
+bld_tline (
+	int l,
+	struct t_article *art)
 {
 #ifndef INDEX_DAEMON
 	int i, j;
@@ -181,9 +181,9 @@ bld_tline (l, art)
 
 
 static int
-draw_tline (i, full)
-	int i;
-	int full;
+draw_tline (
+	int i,
+	int full)
 {
 #ifndef INDEX_DAEMON
 	size_t tlen;
@@ -234,10 +234,10 @@ draw_tline (i, full)
  */
 
 int
-show_thread (group, group_path, respnum)
-	struct t_group *group;
-	char *group_path;
-	int respnum;
+show_thread (
+	struct t_group *group,
+	char *group_path,
+	int respnum)
 {
 	int ret_code = TRUE;
 #ifndef INDEX_DAEMON
@@ -765,7 +765,7 @@ thread_done:
 
 
 void
-show_thread_page ()
+show_thread_page (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -845,7 +845,7 @@ show_thread_page ()
 
 
 static void
-update_thread_page ()
+update_thread_page (void)
 {
 #ifndef INDEX_DAEMON
 	register int i, j, the_index;
@@ -867,7 +867,7 @@ update_thread_page ()
 
 
 static void
-draw_thread_arrow ()
+draw_thread_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
@@ -890,7 +890,7 @@ draw_thread_arrow ()
 
 
 static void
-erase_thread_arrow ()
+erase_thread_arrow (void)
 {
 	MoveCursor (INDEX2LNUM(thread_index_point), 0);
 
@@ -907,8 +907,8 @@ erase_thread_arrow ()
 
 
 static int
-prompt_thread_num (ch)
-	int ch;
+prompt_thread_num (
+	int ch)
 {
 	int num;
 
@@ -940,8 +940,8 @@ prompt_thread_num (ch)
  */
 
 int
-new_responses (thread)
-	int thread;
+new_responses (
+	int thread)
 {
 	int i;
 	int sum = 0;
@@ -969,8 +969,8 @@ new_responses (thread)
  */
 
 int
-which_thread (n)
-	int n;
+which_thread (
+	int n)
 {
 	register int i, j;
 
@@ -993,8 +993,8 @@ which_thread (n)
  */
 
 int
-which_response (n)
-	int n;
+which_response (
+	int n)
 {
 	int i, j;
 	int num = 0;
@@ -1016,8 +1016,8 @@ which_response (n)
  *  that basenote
  */
 int
-num_of_responses (n)
-	int n;
+num_of_responses (
+	int n)
 {
 	int i;
 	int oldi = -3;
@@ -1040,9 +1040,9 @@ num_of_responses (n)
  */
 
 int
-stat_thread (n, sbuf)
-	int n;
-	struct t_art_stat *sbuf;
+stat_thread (
+	int n,
+	struct t_art_stat *sbuf)
 {
 	int i;
 
@@ -1109,8 +1109,8 @@ stat_thread (n, sbuf)
  */
 
 int
-next_response (n)
-	int n;
+next_response (
+	int n)
 {
 	int i;
 
@@ -1133,8 +1133,8 @@ next_response (n)
  */
 
 int
-next_thread (n)
-	int n;
+next_thread (
+	int n)
 {
 	int i;
 
@@ -1151,8 +1151,8 @@ next_thread (n)
  */
 
 int
-prev_response (n)
-	int n;
+prev_response (
+	int n)
 {
 	int resp;
 	int i;
@@ -1175,9 +1175,9 @@ prev_response (n)
  */
 
 int
-choose_response (i, n)
-	int i;
-	int n;
+choose_response (
+	int i,
+	int n)
 {
 	int j;
 
@@ -1196,8 +1196,8 @@ choose_response (i, n)
  */
 
 int
-next_unread (n)
-	int n;
+next_unread (
+	int n)
 {
 	int cur_base_art = n;
 
@@ -1228,8 +1228,8 @@ next_unread (n)
  */
 
 int
-prev_unread (n)
-	int n;
+prev_unread (
+	int n)
 {
 	while (n >= 0) {
 		if (arts[n].status == ART_UNREAD && arts[n].thread != ART_EXPIRED) {

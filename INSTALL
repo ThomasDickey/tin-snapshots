@@ -398,6 +398,7 @@ Compiled & installed on the following machines:
 	i486 & BSDI 2.0 with gcc 2.6.3
 
 9)	i486 & NetBSD 1.1 with gcc 2.4.5
+	i486 & NetBSD 1.2 with gcc 2.7.2
         Amiga 4000 & NetBSD 1.2 with gcc 2.7.2
 
 10)	i386 & FreeBSD 2.1.0 with 2.7.2
@@ -417,3 +418,5 @@ Compiled & installed on the following machines:
 
 16)	m88k mc88110 & UNIX_System_V 4.0 R40V4.4
 	with Motorola Configurable C Compilation System (CCCS) 1.0
+
+17)	Amiga 4000 & AmigaOS 3.0 with SAS/C 6.57

@@ -470,23 +470,23 @@ static TABLE	TimezoneTable[] = {
 #endif	/* 0 */
 };
 
-
+
 
 /* ARGSUSED */
 static void
-date_error(s)
-    char	*s;
+date_error(
+    char	*s)
 {
     /* NOTREACHED */
 }
 
 
 static time_t
-ToSeconds(Hours, Minutes, Seconds, Meridian)
-    time_t	Hours;
-    time_t	Minutes;
-    time_t	Seconds;
-    MERIDIAN	Meridian;
+ToSeconds(
+    time_t	Hours,
+    time_t	Minutes,
+    time_t	Seconds,
+    MERIDIAN	Meridian)
 {
     if (Minutes < 0 || Minutes > 59 || Seconds < 0 || Seconds > 61)
 	return -1;
@@ -505,15 +505,15 @@ ToSeconds(Hours, Minutes, Seconds, Meridian)
 
 
 static time_t
-Convert(Month, Day, Year, Hours, Minutes, Seconds, Meridian, dst)
-    time_t	Month;
-    time_t	Day;
-    time_t	Year;
-    time_t	Hours;
-    time_t	Minutes;
-    time_t	Seconds;
-    MERIDIAN	Meridian;
-    DSTMODE	dst;
+Convert(
+    time_t	Month,
+    time_t	Day,
+    time_t	Year,
+    time_t	Hours,
+    time_t	Minutes,
+    time_t	Seconds,
+    MERIDIAN	Meridian,
+    DSTMODE	dst)
 {
     static int	DaysNormal[13] = {
 	0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
@@ -567,9 +567,9 @@ Convert(Month, Day, Year, Hours, Minutes, Seconds, Meridian, dst)
 
 
 static time_t
-DSTcorrect(Start, Future)
-    time_t	Start;
-    time_t	Future;
+DSTcorrect(
+    time_t	Start,
+    time_t	Future)
 {
     time_t	StartDay;
     time_t	FutureDay;
@@ -581,9 +581,9 @@ DSTcorrect(Start, Future)
 
 
 static time_t
-RelativeMonth(Start, RelMonth)
-    time_t	Start;
-    time_t	RelMonth;
+RelativeMonth(
+    time_t	Start,
+    time_t	RelMonth)
 {
     struct tm	*tm;
     time_t	Month;
@@ -601,9 +601,9 @@ RelativeMonth(Start, RelMonth)
 
 
 static int
-LookupWord(buff, length)
-    char		*buff;
-    register int	length;
+LookupWord(
+    char		*buff,
+    register int	length)
 {
     register char	*p;
     register STRING	q;
@@ -696,7 +696,7 @@ LookupWord(buff, length)
 
 
 static int
-date_lex()
+date_lex(void)
 {
     register char	c;
     register char	*p;
@@ -759,8 +759,8 @@ date_lex()
 
 
 int
-GetTimeInfo(Now)
-    TIMEINFO		*Now;
+GetTimeInfo(
+    TIMEINFO		*Now)
 {
     static time_t	LastTime;
     static long		LastTzone;
@@ -820,9 +820,9 @@ GetTimeInfo(Now)
 
 
 time_t
-parsedate(p, now)
-    char		*p;
-    TIMEINFO		*now;
+parsedate(
+    char		*p,
+    TIMEINFO		*now)
 {
     struct tm		*tm;
     TIMEINFO		ti;
@@ -875,5 +875,3 @@ parsedate(p, now)
      * from the error return value.  (Alternately could set errno on error.) */
     return Start == -1 ? 0 : Start;
 }
-
-

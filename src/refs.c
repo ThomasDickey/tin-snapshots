@@ -82,8 +82,8 @@ static void dump_thread P_((FILE *fp, struct t_msgid *msgid, int level));
  * MSGID_HASH_SIZE is a prime of order 2^11
  */
 static unsigned int
-hash_msgid(key)
-	char *key;
+hash_msgid(
+	char *key)
 {
 	unsigned int hash = 0;
 
@@ -101,8 +101,8 @@ hash_msgid(key)
  * Thread us into our parents' list of children.
  */
 static void
-add_to_parent(ptr)
-	struct t_msgid *ptr;
+add_to_parent(
+	struct t_msgid *ptr)
 {
 #ifdef HAVE_REF_THREADING
 	struct t_msgid *p;
@@ -170,10 +170,10 @@ add_to_parent(ptr)
  *        overview database.
  */
 static struct t_msgid *
-add_msgid(key, msgid, newparent)
-	int key;
-	char *msgid;
-	struct t_msgid *newparent;
+add_msgid(
+	int key,
+	char *msgid,
+	struct t_msgid *newparent)
 {
 	struct t_msgid *ptr;
 	struct t_msgid *i = NULL;
@@ -291,8 +291,8 @@ add_msgid(key, msgid, newparent)
  * The space saving vs. storing the refs as a single string is significant.
  */
 static struct t_msgid *
-parse_references(r)
-	char *r;
+parse_references(
+	char *r)
 {
 	char *ptr;
 	struct t_msgid *parent, *current;
@@ -329,9 +329,9 @@ parse_references(r)
  *	   lists, which we strive to work around.
  */
 static char *
-_get_references(refptr, depth)
-	struct t_msgid *refptr;
-	int depth;
+_get_references(
+	struct t_msgid *refptr,
+	int depth)
 {
 	char *refs;
 	static short len;							/* Accumulated size */
@@ -366,8 +366,8 @@ _get_references(refptr, depth)
  * to correct size
  */
 char *
-get_references(refptr)
-	struct t_msgid *refptr;
+get_references(
+	struct t_msgid *refptr)
 {
 	char *refs;
 	size_t len;
@@ -391,7 +391,7 @@ get_references(refptr)
  * normally only needed when entering a new group
  */
 void
-free_msgids()
+free_msgids(void)
 {
 	int i;
 	struct t_msgid *ptr, *next, **msgptr;
@@ -415,7 +415,7 @@ free_msgids()
 
 #if 0
 static void
-dump_msgids()
+dump_msgids(void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -489,7 +489,7 @@ dump_msgids()
  * rethread.
  */
 void
-clear_art_ptrs()
+clear_art_ptrs(void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -505,10 +505,10 @@ clear_art_ptrs()
  * Output goes to fp, level is the current depth of the tree.
  */
 static void
-dump_thread(fp, msgid, level)
-	FILE *fp;
-	struct t_msgid *msgid;
-	int level;
+dump_thread(
+	FILE *fp,
+	struct t_msgid *msgid,
+	int level)
 {
 	char buff[120];		/* This is _probably_ enough */
 	char *ptr = buff;
@@ -549,9 +549,9 @@ dump_thread(fp, msgid, level)
  * A thread is defined as a starting article with no parent
  */
 static void
-dump_msgid_thread(ptr, level)
-	struct t_msgid *ptr;
-	int level;
+dump_msgid_thread(
+	struct t_msgid *ptr,
+	int level)
 {
 	fprintf(stderr, "%*s %s (%d)\n", level*3, "   ", ptr->txt, ptr->article);
 
@@ -565,7 +565,7 @@ dump_msgid_thread(ptr, level)
 }
 
 static void
-dump_msgid_threads()
+dump_msgid_threads(void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -605,8 +605,8 @@ dump_msgid_threads()
 		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
 
 static struct t_msgid *
-find_next(ptr)
-	struct t_msgid *ptr;
+find_next(
+	struct t_msgid *ptr)
 {
 	static int bottom = FALSE;
 
@@ -685,8 +685,8 @@ find_next(ptr)
  * thread.
  */
 static void
-build_thread(ptr)
-	struct t_msgid *ptr;
+build_thread(
+	struct t_msgid *ptr)
 {
 	struct t_msgid *newptr;
 
@@ -714,7 +714,7 @@ build_thread(ptr)
  * parent / child / sibling  / article pointers in the msgid hash.
  */
 void
-thread_by_reference()
+thread_by_reference(void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -769,7 +769,7 @@ thread_by_reference()
  * TODO: merged threads don't display with 'a' - only 1st thread shows up
  */
 void
-collate_subjects()
+collate_subjects(void)
 {
 	int i, j, art;
 	int *aptr;
@@ -839,8 +839,8 @@ collate_subjects()
  * 4) Free() up the msgid and refs headers once cached
  */
 void
-build_references(group)
-	struct t_group *group;
+build_references(
+	struct t_group *group)
 {
 	int i;
 	struct t_article *art;

@@ -70,8 +70,8 @@ struct t_attribute glob_attributes;
  */
 
 static void
-set_default_attributes (psAttrib)
-	struct t_attribute *psAttrib;
+set_default_attributes (
+	struct t_attribute *psAttrib)
 {
 #ifndef INDEX_DAEMON
 
@@ -179,9 +179,9 @@ set_default_attributes (psAttrib)
 	}
 
 void
-read_attributes_file (file, global_file)
-	char	*file;
-	int	global_file;
+read_attributes_file (
+	char	*file,
+	int	global_file)
 {
 #ifndef INDEX_DAEMON
 
@@ -372,10 +372,10 @@ read_attributes_file (file, global_file)
 
 
 static void
-set_attrib_str (type, scope, str)
-	int type;
-	char *scope;
-	char *str;
+set_attrib_str (
+	int type,
+	char *scope,
+	char *str)
 {
 #ifndef INDEX_DAEMON
 	register int i;
@@ -410,10 +410,10 @@ if (debug) {
 
 
 static void
-set_attrib_num (type, scope, num)
-	int type;
-	char *scope;
-	int num;
+set_attrib_num (
+	int type,
+	char *scope,
+	int num)
 {
 #ifndef INDEX_DAEMON
 	register int i;
@@ -447,11 +447,11 @@ if (debug) {
 }
 
 static void
-set_attrib (psGrp, type, str, num)
-	struct	t_group	*psGrp;
-	int	type;
-	char	*str;
-	int	num;
+set_attrib (
+	struct	t_group	*psGrp,
+	int	type,
+	char	*str,
+	int	num)
 {
 #ifndef INDEX_DAEMON
 
@@ -572,8 +572,8 @@ set_attrib (psGrp, type, str, num)
  */
 
 void
-write_attributes_file (file)
-	char	*file;
+write_attributes_file (
+	char	*file)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp;
@@ -745,7 +745,7 @@ write_attributes_file (file)
 
 #if 0
 void
-debug_print_filter_attributes ()
+debug_print_filter_attributes (void)
 {
 #ifndef INDEX_DAEMON
 	register int i;

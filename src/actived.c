@@ -58,9 +58,9 @@ struct	passwd sPwd;
 #ifdef ACTIVE_DAEMON
 
 int
-main (iNumArgs, pacArgs)
-	int	iNumArgs;
-	char	*pacArgs[];
+main (
+	int	iNumArgs,
+	char	*pacArgs[])
 {
 	char	acGrpPath[PATH_LEN];
 
@@ -92,7 +92,7 @@ main (iNumArgs, pacArgs)
 
 
 void
-create_save_active_file ()
+create_save_active_file (void)
 {
 	char	acGrpPath[PATH_LEN];
 
@@ -109,7 +109,7 @@ create_save_active_file ()
 
 
 static void
-vInitVariables ()
+vInitVariables (void)
 {
 	char	*pcPtr;
 
@@ -160,9 +160,9 @@ vInitVariables ()
 
 #ifdef ACTIVE_DAEMON
 static void
-vReadCmdLineOptions (iNumArgs, pacArgs)
-	int	iNumArgs;
-	char	*pacArgs[];
+vReadCmdLineOptions (
+	int	iNumArgs,
+	char	*pacArgs[])
 {
 	int iOption;
 
@@ -206,9 +206,9 @@ vReadCmdLineOptions (iNumArgs, pacArgs)
 }
 
 static void
-vUpdateActiveFile (pcActiveFile, pcDir)
-	char	*pcActiveFile;
-	char	*pcDir;
+vUpdateActiveFile (
+	char	*pcActiveFile,
+	char	*pcDir)
 {
 	char	acLine[NEWSRC_LINE];
 	char	acGrpName[PATH_LEN];
@@ -242,8 +242,8 @@ vUpdateActiveFile (pcActiveFile, pcDir)
 }
 
 static void
-vPrintUsage (pcProgName)
-	char	*pcProgName;
+vPrintUsage (
+	char	*pcProgName)
 {
 	printf ("Mail & Save active file update daemon. (c) Copyright 1991-94 Iain Lea.\n\n");
 	printf ("Usage: %s [options]\n", pcProgName);
@@ -260,10 +260,10 @@ vPrintUsage (pcProgName)
 #endif
 
 static void
-vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath)
-	char	*pcActiveFile;
-	char	*pcBaseDir;
-	char	*pcGrpPath;
+vMakeGrpList (
+	char	*pcActiveFile,
+	char	*pcBaseDir,
+	char	*pcGrpPath)
 {
 	char	*pcPtr;
 	char	acFile[PATH_LEN];
@@ -325,12 +325,12 @@ printf ("STAT=[%s]\n", acPath);
 }
 
 static void
-vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
-	char	*pcActiveFile;
-	char	*pcGrpPath;
-	long	lArtMax;
-	long	lArtMin;
-	char	*pcBaseDir;
+vAppendGrpLine (
+	char	*pcActiveFile,
+	char	*pcGrpPath,
+	long	lArtMax,
+	long	lArtMin,
+	char	*pcBaseDir)
 {
 	char	acGrpName[PATH_LEN];
 	FILE	*hFp;
@@ -349,8 +349,8 @@ vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir)
 
 #ifdef INDEX_DAEMON
 void
-vCreatePath (pcPath)
-	char *pcPath;
+vCreatePath (
+	char *pcPath)
 {
 	char	acCmd[LEN];
 

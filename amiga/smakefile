@@ -56,7 +56,7 @@ GSTDEFS    = def __USE_SYSBASE
 
 DEFINES   = def M_AMIGA def NO_SHELL_ESCAPE def NO_PIPING \
  def LIBDIR="uulib:" def DONT_LOG_USER def SPOOLDIR="uunews:" \
- def HAVE_COLOR def HAVE_REF_THREEADING \
+ def HAVE_COLOR def HAVE_REF_THREADING \
  def DONT_REREAD_ACTIVE_FILE $(GSTDEFS) $(NNTPDEF) $(TINDDEF)
 
 # build the final compile and link flags

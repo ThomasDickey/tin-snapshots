@@ -22,7 +22,7 @@ static int iGrpMaxNum = -1;
 int group_hash[TABLE_SIZE];			/* group name --> active[] */
 
 void
-init_group_hash ()
+init_group_hash (void)
 {
 	int i;
 
@@ -38,8 +38,8 @@ init_group_hash ()
  * hash group name for fast lookup later
  */
 unsigned long
-hash_groupname (group)
-	char *group;
+hash_groupname (
+	char *group)
 {
 #ifdef NEW_HASH_METHOD	/* still testing */
 	unsigned long hash = 0L, g, val;
@@ -79,8 +79,8 @@ printf ("hash=[%s] [%ld]\n", group, val);
  *  Find group name in active[] array and return index otherwise -1
  */
 int
-find_group_index (group)
-	char *group;
+find_group_index (
+	char *group)
 {
 	int i;
 	long h;
@@ -105,8 +105,8 @@ find_group_index (group)
  *  Find group name in active[] array and return pointer to element
  */
 struct t_group *
-psGrpFind (pcGrpName)
-	char *pcGrpName;
+psGrpFind (
+	char *pcGrpName)
 {
 	int i;
 
@@ -125,8 +125,8 @@ psGrpFind (pcGrpName)
  * utilises the num_active and max_active global variables
  */
 int
-psGrpAdd (group)
-	char *group;
+psGrpAdd (
+	char *group)
 {
 	long h;
 	int i;
@@ -160,7 +160,7 @@ psGrpAdd (group)
  */
 #if 0
 struct t_group *
-psGrpFirst ()
+psGrpFirst (void)
 {
 	iGrpMaxNum = num_active;
 
@@ -173,7 +173,7 @@ psGrpFirst ()
 }
 
 struct t_group *
-psGrpLast ()
+psGrpLast (void)
 {
 	if (iGrpMaxNum) {
 		iGrpCurNum = iGrpMaxNum - 1;
@@ -184,7 +184,7 @@ psGrpLast ()
 }
 
 struct t_group *
-psGrpNext ()
+psGrpNext (void)
 {
 	if (iGrpMaxNum) {
 		if (iGrpCurNum < (iGrpMaxNum - 1)) {
@@ -196,7 +196,7 @@ psGrpNext ()
 }
 
 struct t_group *
-psGrpPrev ()
+psGrpPrev (void)
 {
 	if (iGrpMaxNum) {
 		if (iGrpCurNum > 1) {

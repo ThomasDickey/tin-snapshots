@@ -49,8 +49,8 @@ static void thread_by_subject P_((void));
  */
 
 void
-find_base (group)
-	struct t_group *group;
+find_base (
+	struct t_group *group)
 {
 	register int i;
 	register int j;
@@ -100,8 +100,8 @@ find_base (group)
  */
 
 int
-index_group (group)
-	struct t_group *group;
+index_group (
+	struct t_group *group)
 {
 	char group_path[PATH_LEN];
 	int count;
@@ -241,10 +241,10 @@ index_group (group)
  */
 
 static int
-read_group (group, group_path, pcount)
-	struct t_group *group;
-	char *group_path;
-	int *pcount;
+read_group (
+	struct t_group *group,
+	char *group_path,
+	int *pcount)
 {
 	char *ptr, buf[PATH_LEN];
 	char progress[PATH_LEN];
@@ -378,7 +378,7 @@ read_group (group, group_path, pcount)
  *
  */
 static void
-thread_by_subject()
+thread_by_subject(void)
 {
 	register int i;		/* gcc, at least, will ignore 'register' as */
 	register int j;		/* it can do a better job itself */
@@ -447,9 +447,9 @@ thread_by_subject()
  */
 
 void
-make_threads (group, rethread)
-	struct t_group *group;
-	int rethread;
+make_threads (
+	struct t_group *group,
+	int rethread)
 {
 	int i;
 
@@ -539,8 +539,8 @@ make_threads (group, rethread)
 
 
 void
-sort_arts (sort_art_type)
-	int sort_art_type;
+sort_arts (
+	int sort_art_type)
 {
 	switch (sort_art_type) {
 		case SORT_BY_NOTHING:		/* don't sort at all */
@@ -564,9 +564,9 @@ sort_arts (sort_art_type)
 }
 
 static int
-parse_headers (buf, h)
-	char *buf;
-	struct t_article *h;
+parse_headers (
+	char *buf,
+	struct t_article *h)
 {
 	char buf2[HEADER_LEN];
 	char art_from_addr[HEADER_LEN];
@@ -751,11 +751,11 @@ parse_headers (buf, h)
  */
 
 static int
-iReadNovFile (group, min, max, expired)
-	struct t_group *group;
-	long min;
-	long max;
-	int *expired;
+iReadNovFile (
+	struct t_group *group,
+	long min,
+	long max,
+	int *expired)
 {
  	char	*p, *q, *s;
 	char	*buf;
@@ -1047,8 +1047,8 @@ sleep(1);
  */
 
 void
-vWriteNovFile (psGrp)
-	struct t_group *psGrp;
+vWriteNovFile (
+	struct t_group *psGrp)
 {
 	char	*pcNovFile;
 	FILE	*hFp;
@@ -1174,9 +1174,9 @@ vWriteNovFile (psGrp)
  */
 
 char *
-pcFindNovFile (psGrp, iMode)
-	struct t_group *psGrp;
-	int iMode;
+pcFindNovFile (
+	struct t_group *psGrp,
+	int iMode)
 {
 	char *pcPtr;
 	char *pcDir;
@@ -1266,7 +1266,7 @@ pcFindNovFile (psGrp, iMode)
  */
 
 void
-do_update ()
+do_update (void)
 {
 	char group_path[PATH_LEN];
 	register int i, j;
@@ -1376,9 +1376,9 @@ do_update ()
 }
 
 static int
-artnum_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+artnum_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
@@ -1401,9 +1401,9 @@ artnum_comp (p1, p2)
 
 
 static int
-subj_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+subj_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	int retval;
 	struct t_article *s1 = (struct t_article *) p1;
@@ -1421,9 +1421,9 @@ subj_comp (p1, p2)
 
 
 static int
-from_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+from_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	int retval;
 	struct t_article *s1 = (struct t_article *) p1;
@@ -1450,9 +1450,9 @@ from_comp (p1, p2)
  * is reversed.
  */
 static int
-date_comp (p1, p2)
-	t_comptype *p1;
-	t_comptype *p2;
+date_comp (
+	t_comptype *p1,
+	t_comptype *p2)
 {
 	struct t_article *s1 = (struct t_article *) p1;
 	struct t_article *s2 = (struct t_article *) p2;
@@ -1490,8 +1490,8 @@ date_comp (p1, p2)
 
 
 void
-set_article (art)
-	struct t_article *art;
+set_article (
+	struct t_article *art)
 {
 	art->subject	= (char *) 0;
 	art->from	= (char *) 0;
@@ -1522,7 +1522,7 @@ int kbhit(void);
 #endif
 
 int
-input_pending ()
+input_pending (void)
 {
 #ifdef WIN32
 	return kbhit() ? TRUE : FALSE;
@@ -1581,8 +1581,8 @@ input_pending ()
 
 
 static int
-valid_artnum (art)
-	long art;
+valid_artnum (
+	long art)
 {
 	register int prev, range;
 	register int dctop = top;
@@ -1622,8 +1622,8 @@ valid_artnum (art)
  */
 
 char *
-safe_fgets (fp)
-	FILE *fp;
+safe_fgets (
+	FILE *fp)
 {
 	char *buf	= 0;
 	char *temp	= 0;
@@ -1658,8 +1658,8 @@ safe_fgets (fp)
 
 
 static void
-print_expired_arts (num_expired)
-	int num_expired;
+print_expired_arts (
+	int num_expired)
 {
 	int i;
 
@@ -1677,8 +1677,8 @@ print_expired_arts (num_expired)
 }
 
 static char *
-pcPrintDate (lSecs)
-	long	lSecs;
+pcPrintDate (
+	long	lSecs)
 {
 	static	char acDate[25];
 	struct	tm *psTm;
@@ -1699,8 +1699,8 @@ pcPrintDate (lSecs)
 }
 
 static char *
-pcPrintFrom (psArt)
-	struct t_article *psArt;
+pcPrintFrom (
+	struct t_article *psArt)
 {
 	static	char acFrom[PATH_LEN];
 

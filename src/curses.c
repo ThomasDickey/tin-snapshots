@@ -211,7 +211,7 @@ static void ScreenSize P_((int *num_lines, int *num_columns));
 
 
 void
-setup_screen ()
+setup_screen (void)
 {
 #ifndef INDEX_DAEMON
 	/*
@@ -230,7 +230,7 @@ setup_screen ()
 #ifdef M_UNIX
 
 int
-InitScreen ()
+InitScreen (void)
 {
 #ifndef INDEX_DAEMON
 	char the_termname[40], *p;
@@ -323,7 +323,7 @@ InitScreen ()
 #else	/* !M_UNIX  */
 
 int
-InitScreen ()
+InitScreen (void)
 {
 #ifndef	INDEX_DAEMON
 
@@ -495,8 +495,7 @@ InitScreen ()
  */
 
 static void
-ScreenSize (num_lines, num_columns)
-	int *num_lines, *num_columns;
+ScreenSize (int *num_lines, int *num_columns)
 {
 #ifndef INDEX_DAEMON
 
@@ -511,7 +510,7 @@ ScreenSize (num_lines, num_columns)
 
 
 void
-InitWin ()
+InitWin (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -527,7 +526,7 @@ InitWin ()
 
 
 void
-EndWin ()
+EndWin (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -544,7 +543,7 @@ EndWin ()
 
 
 void
-set_keypad_on ()
+set_keypad_on (void)
 {
 #ifndef INDEX_DAEMON
 #    ifdef HAVE_KEYPAD
@@ -558,7 +557,7 @@ set_keypad_on ()
 
 
 void
-set_keypad_off ()
+set_keypad_off (void)
 {
 #ifndef INDEX_DAEMON
 #    ifdef HAVE_KEYPAD
@@ -575,7 +574,7 @@ set_keypad_off ()
  */
 
 void
-ClearScreen ()
+ClearScreen (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -594,8 +593,7 @@ ClearScreen ()
 #ifdef M_UNIX
 
 void
-MoveCursor (row, col)
-	int row, col;
+MoveCursor (int row, int col)
 {
 #ifndef INDEX_DAEMON
 
@@ -612,8 +610,7 @@ MoveCursor (row, col)
 #else	/* !M_UNIX */
 
 void
-MoveCursor (row, col)
-	int row, col;
+MoveCursor (int row, int col)
 {
 #ifndef INDEX_DAEMON
 
@@ -636,7 +633,7 @@ MoveCursor (row, col)
  */
 
 void
-CleartoEOLN ()
+CleartoEOLN (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -651,7 +648,7 @@ CleartoEOLN ()
  */
 
 void
-CleartoEOS ()
+CleartoEOS (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -675,7 +672,7 @@ CleartoEOS ()
  */
 
 void
-StartInverse ()
+StartInverse (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -702,7 +699,7 @@ StartInverse ()
  */
 
 void
-EndInverse ()
+EndInverse (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -729,7 +726,7 @@ EndInverse ()
  */
 
 void
-ToggleInverse ()
+ToggleInverse (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -746,7 +743,7 @@ ToggleInverse ()
  */
 
 int
-RawState()
+RawState(void)
 {
 	return (_inraw);
 }
@@ -756,8 +753,8 @@ RawState()
  */
 
 void
-Raw (state)
-	int state;
+Raw (
+	int state)
 {
 #ifdef VMS
 	if (state == FALSE && _inraw) {
@@ -813,7 +810,7 @@ Raw (state)
 #ifdef M_OS2
 
 int
-ReadCh ()
+ReadCh (void)
 {
 #ifndef INDEX_DAEMON
 
@@ -962,7 +959,7 @@ PROFILE_ON();
 }
 
 int
-ReadCh()
+ReadCh(void)
 {
 	return AmiReadCh(0);
 }
@@ -986,7 +983,7 @@ AmiGetWinSize(int *lines, int *columns)
 #ifdef M_UNIX
 
 int
-ReadCh ()
+ReadCh (void)
 {
 #ifndef INDEX_DAEMON
 	register int result;
@@ -1047,8 +1044,8 @@ OUTC_FUNCTION(outchar)
  */
 
 void
-xclick (state)
-	int state;
+xclick (
+	int state)
 {
 #ifndef INDEX_DAEMON
 	static int prev_state = 999;
@@ -1070,7 +1067,7 @@ xclick (state)
  */
 
 void
-set_xclick_on ()
+set_xclick_on (void)
 {
 	if (use_mouse) xclick (TRUE);
 }
@@ -1080,13 +1077,13 @@ set_xclick_on ()
  */
 
 void
-set_xclick_off ()
+set_xclick_off (void)
 {
 	if (use_mouse) xclick (FALSE);
 }
 
 void
-cursoron ()
+cursoron (void)
 {
 #ifndef INDEX_DAEMON
 	if (_cursoron)
@@ -1095,7 +1092,7 @@ cursoron ()
 }
 
 void
-cursoroff ()
+cursoroff (void)
 {
 #ifndef INDEX_DAEMON
 	if (_cursoroff)

@@ -137,8 +137,8 @@ char	last_put[NNTP_STRLEN];
  */
 
 char *
-getserverbyfile (file)
-	char	*file;
+getserverbyfile (
+	char	*file)
 {
 #ifdef NNTP_ABLE
 	register FILE	*fp;
@@ -209,10 +209,10 @@ getserverbyfile (file)
  */
 
 int
-server_init (machine, service, port)
-	char	*machine;
-	char	*service;
-	int		port;
+server_init (
+	char	*machine,
+	char	*service,
+	int	port)
 {
 #ifdef NNTP_ABLE
 #ifndef VMS
@@ -297,10 +297,10 @@ server_init (machine, service, port)
  */
 
 int
-get_tcp_socket (machine, service, port)
-	char	*machine;	/* remote host */
-	char	*service;	/* nttp/smtp etc. */
-	unsigned port;		/* tcp port number */
+get_tcp_socket (
+	char	*machine,	/* remote host */
+	char	*service,	/* nttp/smtp etc. */
+	unsigned port)		/* tcp port number */
 {
 #ifdef NNTP_ABLE
 	int	s = -1;
@@ -548,9 +548,9 @@ get_tcp_socket (machine, service, port)
  */
 
 int
-get_dnet_socket (machine, service)
-	char	*machine;
-	char	*service;
+get_dnet_socket (
+	char	*machine,
+	char	*service)
 {
 #ifdef NNTP_ABLE
 	int	s, area, node;
@@ -612,8 +612,8 @@ get_dnet_socket (machine, service)
  */
 
 void
-u_put_server (string)
-	char *string;
+u_put_server (
+	char *string)
 {
 #ifdef NNTP_ABLE
 #ifdef VMS
@@ -644,8 +644,8 @@ u_put_server (string)
  */
 
 void
-put_server (string)
-	char *string;
+put_server (
+	char *string)
 {
 #ifdef NNTP_ABLE
 	int respno;
@@ -711,9 +711,8 @@ put_server (string)
  * get_server -- get a line of text from the server.  Strips
  * CR's and LF's.
  *
- *	Parameters:	"string" has the buffer space for the
- *			line received.
- *			"size" is the size of the buffer.
+ *	Parameters:	"string" has the buffer space for the line received.
+ *	             "size" is the size of the buffer.
  *
  *	Returns:	-1 on error, 0 otherwise, -2 if user said no to reconnection.
  *
@@ -723,15 +722,17 @@ put_server (string)
 
 #ifndef VMS
 int
-get_server (string, size)
-	char	*string;
-	int	size;
+get_server (
+	char	*string,
+	int	size)
 {
 #ifdef NNTP_ABLE
 	char buf[NNTP_STRLEN];
 	register char *cp;
 
-static int reconnecting = 0;
+	static int reconnecting = 0;
+
+int retry=2; /* uj 970124 - reconnect workaround */
 
 	errno = 0;
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
@@ -740,6 +741,12 @@ static int reconnecting = 0;
 			if (nntp_rd_fp) s_fclose (nntp_rd_fp);
 			nntp_wr_fp = nntp_rd_fp = NULL;
 			ring_bell ();
+
+/*
+** fixme - nntp_open does not make any difference why it failed
+** but a reconnect after a connection time out often fails on the first try
+** -> REconnection attempts should be done 2-3 times
+*/
 			if (reconnecting) return -1;
 			if (prompt_yn2 (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				return -2;
@@ -747,6 +754,8 @@ static int reconnecting = 0;
 			reconnecting = 1;
 			clear_message ();
 			strcpy (buf, last_put);
+
+while (retry) { /* uj 970124 - reconnect workaround */
 			if (nntp_open () == 0) {
 				if (glob_group != (char *) 0) {
 					sprintf (last_put, "group %s", glob_group);
@@ -754,7 +763,10 @@ static int reconnecting = 0;
 					s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
 				}
 				put_server (buf);
+break; /* uj 970124 - reconnect workaround */
 			}
+retry--; /* uj 970124 - reconnect workaround */
+} /* uj 970124 - reconnect workaround */
 			reconnecting = 0;
 		}
 	}
@@ -849,7 +861,7 @@ int get_server (char *string, int size)
  */
 
 void
-close_server ()
+close_server (void)
 {
 #ifdef NNTP_ABLE
 #ifndef VMS
@@ -882,8 +894,8 @@ close_server ()
  */
 
 char *
-nntp_respcode (respcode)
-	int respcode;
+nntp_respcode (
+	int respcode)
 {
 #ifdef NNTP_ABLE
 	static char *text;
@@ -1090,8 +1102,8 @@ nntp_respcode (respcode)
 
 
 int
-nntp_message (respcode)
-	int respcode;
+nntp_message (
+	int respcode)
 {
 	error_message ("%s", nntp_respcode (respcode));
 
