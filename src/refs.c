@@ -14,7 +14,9 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #define MAX_REFS	100			/* Limit recursion depth */
 #define REF_SEP	" "			/* Separator chars in ref headers */
@@ -617,16 +619,10 @@ dump_msgid_threads (
  *  It doesn't point to an article OR
  *     (it's already threaded/expired OR it has been autokilled)
  */
-
-#ifdef KILL_READ
+/* We SHOULD skip killed in the normal case */
 #	define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_UNAVAILABLE || \
-		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
-#else
-#	define SKIP_ART(ptr)	\
-	(ptr && (ptr->article == ART_UNAVAILABLE || \
-		(arts[ptr->article].thread != ART_NORMAL /*|| arts[ptr->article].killed*/)))
-#endif /* KILL_READ */
+		(arts[ptr->article].thread != ART_NORMAL || (tinrc.kill_level != KILL_THREAD && arts[ptr->article].killed))))
 
 static struct t_msgid *
 find_next (
@@ -872,7 +868,7 @@ build_references (
 
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.dump", "w");
-	SETVBUF(dbgfd, 0, NULL, _IONBF);
+	SETVBUF(dbgfd, NULL, _IONBF, 0);
 	fprintf (dbgfd, "MSGID phase\n");
 #endif /* DEBUG_REFS */
 

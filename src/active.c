@@ -12,8 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
+#ifndef TIN_H
+#	include	"tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include	"tcurses.h"
+#endif /* !TCURSES_H */
 
 /*
  * List of allowed seperator chars in active file
@@ -27,7 +31,7 @@ static char acSaveActiveFile[PATH_LEN];
 static time_t active_timestamp;	/* time active file read (local) */
 
 #ifdef NNTP_ABLE
-#  define NUM_SIMULTANEOUS_GROUP_COMMAND 50
+#	define NUM_SIMULTANEOUS_GROUP_COMMAND 50
 #endif /* NNTP_ABLE */
 
 
@@ -346,9 +350,9 @@ read_newsrc_active_file (
 							sprintf(fmt, "%%ld %%ld %%ld %%%ds", NNTP_STRLEN);
 
 							if (sscanf (acLine, fmt, &count, &min, &max, ngname) != 4)
-								error_message("Invalid response to GROUP command, %s", acLine);
+								error_message("Invalid response to GROUP command, %s", acLine); /* FIXME: -> lang.c*/
 							if (strcmp(ngname, ngnames[index_o]) != 0)
-								error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]);
+								error_message("Wrong newsgroup name in response of GROUP command, %s for %s", acLine, ngnames[index_o]); /* FIXME: -> lang.c */
 							ptr = ngname;
 							free(ngnames[index_o]);
 							index_o = (index_o + 1) % NUM_SIMULTANEOUS_GROUP_COMMAND;
@@ -395,14 +399,22 @@ read_newsrc_active_file (
 		 * This call may implicitly ++num_active
 		 */
 		if ((grpptr = psGrpAdd(ptr)) == NULL) {
+			t_bool changed = FALSE;
+
 			if ((grpptr = psGrpFind(ptr)) == NULL)
 				continue;
 
-			if (grpptr->xmin != min || grpptr->xmax != max) {
-				grpptr->xmin = min;
+			if (max > grpptr->xmax) {
 				grpptr->xmax = max;
+				changed = TRUE;
+			}
+			if (min > grpptr->xmin) {
+				grpptr->xmin = min;
+				changed = TRUE;
+			}
+			if (changed) {
 				grpptr->count = count;
-				expand_bitmap(grpptr, 0);
+				expand_bitmap(grpptr, 0); /* expand_bitmap(grpptr,grpptr->xmin) should be enought*/
 			}
 			continue;
 		}
@@ -475,15 +487,20 @@ read_active_file (
 		 * This call may implicitly ++num_active
 		 */
 		if ((grpptr = psGrpAdd(ptr)) == NULL) {
+
 			if ((grpptr = psGrpFind(ptr)) == NULL)
 				continue;
 
-			if (grpptr->xmin != min || grpptr->xmax != max) {
-				grpptr->xmin = min;
+			if (max > grpptr->xmax) {
 				grpptr->xmax = max;
 				grpptr->count = count;
-				expand_bitmap(grpptr, 0);
 			}
+
+			if (min > grpptr->xmin) {
+				grpptr->xmin = min;
+				grpptr->count = count;
+			}
+
 			continue;
 		}
 

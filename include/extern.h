@@ -126,6 +126,9 @@
 #	endif /* DECL_MEMSET */
 #endif /* 0 */
 
+#ifdef DECL_MKSTEMP
+	extern int mktemp (char *);
+#endif /* DECL_MKSTEMP */
 #ifdef DECL_MKTEMP
 	extern char *mktemp (char *);
 #endif /* DECL_MKTEMP */
@@ -331,6 +334,7 @@ extern constext *help_page[];
 extern constext *help_select[];
 extern constext *help_thread[];
 extern constext *txt_colors[];
+extern constext *txt_kill_level_type[];
 extern constext *txt_marks[];
 extern constext *txt_mime_encodings[NUM_MIME_ENCODINGS];
 extern constext *txt_onoff[];
@@ -507,12 +511,21 @@ extern constext txt_group[];
 extern constext txt_group_is_moderated[];
 extern constext txt_group_select_com[];
 extern constext txt_group_selection[];
+extern constext txt_help_disp[];
+extern constext txt_help_disp_[];
+extern constext txt_help_navi[];
+extern constext txt_help_navi_[];
+extern constext txt_help_misc[];
+extern constext txt_help_misc_[];
+extern constext txt_help_ops[];
+extern constext txt_help_ops_[];
 extern constext txt_help_B[];
 extern constext txt_help_D[];
 extern constext txt_help_I[];
 extern constext txt_help_K[];
 extern constext txt_help_L[];
 extern constext txt_help_M[];
+extern constext txt_help_Q[];
 extern constext txt_help_S[];
 extern constext txt_help_T[];
 extern constext txt_help_U[];
@@ -530,6 +543,9 @@ extern constext txt_help_ctrl_f[];
 extern constext txt_help_ctrl_h[];
 extern constext txt_help_ctrl_k[];
 extern constext txt_help_ctrl_l[];
+extern constext txt_help_ctrl_n[];
+extern constext txt_help_ctrl_o[];
+extern constext txt_help_ctrl_t[];
 extern constext txt_help_d[];
 extern constext txt_help_dash[];
 extern constext txt_help_e[];
@@ -553,7 +569,7 @@ extern constext txt_help_g_num[];
 extern constext txt_help_g_q[];
 extern constext txt_help_g_r[];
 extern constext txt_help_g_search[];
-extern constext txt_help_g_t_p_i[];
+extern constext txt_help_g_T[];
 extern constext txt_help_g_tab[];
 extern constext txt_help_g_x[];
 extern constext txt_help_g_y[];
@@ -562,7 +578,7 @@ extern constext txt_help_h[];
 extern constext txt_help_hash[];
 extern constext txt_help_i[];
 extern constext txt_help_i_caret_dollar[];
-extern constext txt_help_i_coma[];
+extern constext txt_help_i_at[];
 extern constext txt_help_i_cr[];
 extern constext txt_help_i_dot[];
 extern constext txt_help_i_n[];
@@ -584,7 +600,7 @@ extern constext txt_help_n[];
 
 extern constext txt_help_p_S[];
 extern constext txt_help_p_caret_dollar[];
-extern constext txt_help_p_coma[];
+extern constext txt_help_p_at[];
 extern constext txt_help_p_cr[];
 extern constext txt_help_p_ctrl_e[];
 extern constext txt_help_p_ctrl_w[];
@@ -645,6 +661,7 @@ extern constext txt_info_nopostponed[];
 extern constext txt_info_not_subscribed[];
 extern constext txt_info_no_write[];
 extern constext txt_info_postponed[];
+extern constext txt_info_x_conversion_note[];
 extern constext txt_invalid_from[];
 extern constext txt_invalid_sender[];
 extern constext txt_inverse_off[];
@@ -1120,6 +1137,7 @@ extern char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 #	define txt_help_K	txt_help_BIGK
 #	define txt_help_L	txt_help_BIGL
 #	define txt_help_M	txt_help_BIGM
+#	define txt_help_Q	txt_help_BIGQ
 #	define txt_help_S	txt_help_BIGS
 #	define txt_help_T	txt_help_BIGT
 #	define txt_help_U	txt_help_BIGU
@@ -1136,6 +1154,7 @@ extern char *input_history[HIST_MAXNUM+1][HIST_SIZE+1];
 	extern constext txt_help_BIGK[];
 	extern constext txt_help_BIGL[];
 	extern constext txt_help_BIGM[];
+	extern constext txt_help_BIGQ[];
 	extern constext txt_help_BIGS[];
 	extern constext txt_help_BIGT[];
 	extern constext txt_help_BIGU[];
@@ -1262,6 +1281,7 @@ extern struct opttxt txt_sort_article_type;
 extern struct opttxt txt_pos_first_unread;
 extern struct opttxt txt_show_only_unread_arts;
 extern struct opttxt txt_show_only_unread_groups;
+extern struct opttxt txt_kill_level;
 extern struct opttxt txt_tab_goto_next_unread;
 extern struct opttxt txt_space_goto_next_unread;
 extern struct opttxt txt_pgdn_goto_next;
@@ -1301,9 +1321,9 @@ extern struct opttxt txt_thread_catchup_on_exit;
 extern struct opttxt txt_confirm_action;
 extern struct opttxt txt_confirm_to_quit;
 extern struct opttxt txt_use_mouse;
-#ifdef USE_KEYPAD
+#ifdef HAVE_KEYPAD
 	extern struct opttxt txt_use_keypad;
-#endif	/* USE_KEYPAD */
+#endif	/* HAVE_KEYPAD */
 extern struct opttxt txt_use_getart_limit;
 extern struct opttxt txt_getart_limit;
 #ifdef HAVE_COLOR
@@ -1373,9 +1393,7 @@ extern struct opttxt txt_mailer_format;
 extern struct opttxt txt_use_mailreader_i;
 extern struct opttxt txt_unlink_article;
 extern struct opttxt txt_keep_posted_articles;
-#ifdef M_UNIX
-	extern struct opttxt txt_keep_dead_articles;
-#endif	/* M_UNIX */
+extern struct opttxt txt_keep_dead_articles;
 extern struct opttxt txt_strip_newsrc;
 extern struct opttxt txt_strip_bogus;
 extern struct opttxt txt_reread_active_file_secs;

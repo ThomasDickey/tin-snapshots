@@ -17,9 +17,15 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
-#include "tcurses.h"
-#include "trace.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef included_trace_h
+#	include "trace.h"
+#endif /* !included_trace_h */
 
 #ifdef HAVE_COLOR
 

@@ -11,8 +11,12 @@
  *              right notice, and it must be included in any copy made.
  */
 
-#include "tin.h"
-#include "tnntp.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TNNTP_H
+#	include "tnntp.h"
+#endif /* !TNNTP_H */
 
 #ifndef INDEX_DAEMON
 	static const char * get_full_name (void);
@@ -91,7 +95,7 @@ static const char *domain_name_hack = DOMAIN_NAME;
 
 #	if defined(M_AMIGA)
 	if (strchr(domain, ':')) { /* absolute AmigaOS paths contain one, RFC-hostnames don't */
-#else
+#	else
 	if (domain[0] == '/' && domain[1]) {
 #	endif /* M_AMIGA */
 		/* If 1st letter is '/' read domainname from specified file */

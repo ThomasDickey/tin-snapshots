@@ -12,9 +12,15 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 int cur_groupnum = 0;				/* always >= 0 */
 int group_top;				/* Total # of groups in my_group[] */
@@ -64,7 +70,7 @@ continual_key (
 #ifndef NO_SHELL_ESCAPE
 		case iKeyShellEscape:
 #endif /* !NO_SHELL_ESCAPE */
-		case iKeyLookupMessage:
+/*		case iKeyLookupMessage:*/
 		case iKeyOptionMenu:
 		case iKeyQuit:
 		case iKeyQuitTin:
@@ -89,7 +95,7 @@ continual_key (
 					return FALSE;
 #ifndef WIN32
 			}
-			/* FALLTHROUGH */
+			nobreak;	/* FALLTHROUGH */
 #endif /* !WIN32 */
 
 		default:
@@ -97,13 +103,13 @@ continual_key (
 	}
 }
 
+
 void
 selection_page (
 	int start_groupnum,
 	int num_cmd_line_groups)
 {
 #ifndef INDEX_DAEMON
-
 	char buf[LEN];
 	int i, n, ch, ch1 = 0;
 	int INDEX_BOTTOM;
@@ -237,11 +243,13 @@ end_of_list:
 					show_selection_page ();
 				break;
 
+			case iKeySelectGoto:	/* prompt for a new group name */
 			case iKeySearchSubjF:	/* search forward */
 			case iKeySearchSubjB:	/* search backward */
-				i = (ch == iKeySearchSubjF);
+				i = (ch == iKeySearchSubjF || ch == iKeySelectGoto);
 
 				if ((i = search_active (i)) != -1) {
+					set_groupname_len (FALSE);
 					move_to_group (i);
 					clear_message ();
 				}
@@ -278,7 +286,6 @@ select_read_group:
 					if (!read_groups ())
 						goto select_quit;		/* User quit */
 				}
-
 				break;							/* Nothing more to do at the moment */
 
 			case iKeyPageDown:		/* page down */
@@ -288,7 +295,7 @@ select_page_down:
 					move_to_group (page_down (cur_groupnum, group_top));
 				break;
 
-			case iKeySelectRedrawScr:		/* redraw */
+			case iKeyRedrawScr:		/* redraw */
 				my_retouch ();
 				set_xclick_off ();
 				show_selection_page ();
@@ -344,23 +351,6 @@ select_page_up:
 				show_selection_page ();
 				break;
 
-			case iKeySelectGoto:	/* prompt for a new group name */
-				n = choose_new_group ();
-				if (n >= 0) {
-					erase_group_arrow ();
-					cur_groupnum = n;
-					set_groupname_len (FALSE);
-					if (cur_groupnum < first_group_on_screen ||
-						cur_groupnum  >= last_group_on_screen ||
-						cur_groupnum != n) {
-						show_selection_page ();
-					} else {
-						clear_message ();
-						draw_group_arrow();
-					}
-				}
-				break;
-
 			case iKeySelectHelp:	/* help */
 				show_info_page (HELP_INFO, help_select, txt_group_select_com);
 				show_selection_page ();
@@ -378,7 +368,7 @@ select_page_up:
 				break;
 
 #ifdef HAVE_COLOR
-			case iKeySelectToggleColor:		/* toggle color */
+			case iKeyToggleColor:		/* toggle color */
 				if (toggle_color ()) {
 					show_selection_page ();
 					show_color_status ();
@@ -648,14 +638,13 @@ show_selection_page (
 	void)
 {
 #ifndef INDEX_DAEMON
-
 	char buf[LEN];
 	char tmp[10];
+	char active_name[255];
+	char group_descript[255];
 	char subs;
 	int i, j, n;
 	int blank_len;
-	char active_name[255];
-	char group_descript[255];
 
 	signal_context = cSelect;
 
@@ -820,45 +809,6 @@ yank_active_file (
 #endif /* !INDEX_DAEMON */
 
 
-int
-choose_new_group (
-	void)
-{
-	char buf[LEN];
-	char *p;
-	int idx;
-
-	sprintf (mesg, txt_newsgroup, tinrc.default_goto_group);
-
-	if (!prompt_string (mesg, buf, HIST_GOTO_GROUP))
-		return -1;
-
-	if (strlen (buf))
-		strcpy (tinrc.default_goto_group, buf);
-	else {
-		if (*tinrc.default_goto_group)
-			strcpy (buf, tinrc.default_goto_group);
-		else
-			return -1;
-	}
-
-	/*
-	 * Skip leading whitespace, ignore blank strings
-	 */
-	for (p = buf; *p && (*p == ' ' || *p == '\t'); p++)
-		continue;
-
-	if (*p == '\0')
-		return -1;
-
-	clear_message ();
-
-	if ((idx = my_group_add (p)) == -1)
-		info_message (txt_not_in_active_file, p);
-
-	return idx;
-}
-
 /*
  * Return new value for group_top, skipping any new newsgroups that have been
  * found
@@ -876,6 +826,7 @@ skip_newgroups (
 
 	return(i);
 }
+
 
 /*
  *  Find a group in the users selection list, my_group[]
@@ -905,6 +856,7 @@ add_my_group (
 
 	return -1;
 }
+
 
 #ifndef INDEX_DAEMON
 static int
@@ -1053,7 +1005,13 @@ read_groups (
 
 	forever {
 
-		if (done)
+		/*
+		 * normal exit ||
+		 * protection against (uninitialized) newgroups during the session
+		 *
+		 * FIXME: the xmin == xmax == 1 hack breaks leafnode
+		 */
+		if (done || (active[my_group[cur_groupnum]].xmin > active[my_group[cur_groupnum]].xmax || (active[my_group[cur_groupnum]].xmin == active[my_group[cur_groupnum]].xmax && active[my_group[cur_groupnum]].xmax == 1)))
 			break;
 
 		switch (group_page (&CURR_GROUP)) {
@@ -1064,7 +1022,6 @@ read_groups (
 			case GRP_NEXT:
 				if (cur_groupnum + 1 < group_top)
 					cur_groupnum++;
-
 				done = TRUE;
 				break;
 
@@ -1306,15 +1263,13 @@ bSetRange (
 	int iNumCur)
 {
 	char *pcPtr;
-	char acRng[PATH_LEN];
 	int iIndex;
 	int iNum;
 	int iRngMin;
 	int iRngMax;
 	t_bool bRetCode = FALSE;
 
-	switch (iLevel)
-	{
+	switch (iLevel) {
 		case SELECT_LEVEL:
 			pcPtr = tinrc.default_range_select;
 			break;
@@ -1327,36 +1282,23 @@ bSetRange (
 		default:
 			return bRetCode;
 	}
-/*
+#if 0
 	error_message ("Min=[%d] Max=[%d] Cur=[%d] DefRng=[%s]",
 		iNumMin, iNumMax, iNumCur, pcPtr);
-*/
+#endif /* 0 */
 	sprintf (mesg, txt_enter_range, pcPtr);
 
-	if (!prompt_string (mesg, acRng, HIST_OTHER))
+	if (!(prompt_string_default(mesg, pcPtr, txt_range_invalid, HIST_OTHER)))
 		return bRetCode;
-
-	if (strlen (acRng))
-		strcpy (pcPtr, acRng);
-	else {
-		if (*pcPtr)
-			strcpy (acRng, pcPtr);
-		else
-			return bRetCode;
-	}
 
 	/*
 	 * Parse range string
 	 */
-	if (!bParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
+	if (!bParseRange (pcPtr, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax))
 		info_message (txt_range_invalid);
 	else {
-/*
-		info_message ("DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]", pcPtr, acRng, iRngMin, iRngMax);
-*/
 		bRetCode = TRUE;
-		switch (iLevel)
-		{
+		switch (iLevel) {
 			case SELECT_LEVEL:
 				vDelRange (iLevel, iNumMax);
 				for (iIndex = iRngMin-1; iIndex < iRngMax; iIndex++)

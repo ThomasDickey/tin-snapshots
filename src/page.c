@@ -12,9 +12,15 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 struct t_header note_h;
 
@@ -116,7 +122,7 @@ restart:
 		case ART_UNAVAILABLE:
 			art_mark_read (group, &arts[respnum]);
 			wait_message (1, txt_art_unavailable);
-			/* FALLTHROUGH */
+			nobreak;	/* FALLTHROUGH */
 
 		case ART_ABORT:
 			return GRP_ARTFAIL;	/* special retcode to stop redrawing screen */
@@ -464,14 +470,13 @@ page_goto_next_unread:
 				redraw_page (group->name, respnum);
 				break;
 
-			case iKeyPageRedrawScr:		/* redraw current page of article */
+			case iKeyRedrawScr:		/* redraw current page of article */
 				my_retouch();
 				redraw_page (group->name, respnum);
 				break;
 
 			case iKeyFirstPage:		/* goto beginning of article */
 			case iKeyPageFirstPage2:
-			case iKeyPageFirstPage3:
 begin_of_article:
 				if (note_page == ART_UNAVAILABLE) {
 					ClearScreen ();
@@ -607,25 +612,13 @@ return_to_index:
 				break;
 
 #ifdef HAVE_COLOR
-			case iKeyPageToggleColor:		/* toggle color */
+			case iKeyToggleColor:		/* toggle color */
 				if (toggle_color ()) {
 					redraw_page (group->name, respnum);
 					show_color_status ();
 				}
 				break;
 #endif /* HAVE_COLOR */
-
-			/* TODO: consider combine this with iKeyPageNextUnreadArt */
-			case iKeyPageKillArt:
-				if (note_page != ART_UNAVAILABLE)
-					art_close ();
-
-				if ((n = next_unread (next_response(respnum))) == -1)
-					return (which_thread (respnum));
-
-				respnum = n;
-				goto restart;
-				/* NOTREACHED */
 
 			case iKeyPageKillThd:	/* mark rest of thread as read */
 				thd_mark_read (group, respnum);
@@ -652,6 +645,18 @@ return_to_index:
 				art_close ();
 				if ((n = next_response (respnum)) == -1)
 					return (which_thread(respnum));
+				respnum = n;
+				goto restart;
+				/* NOTREACHED */
+
+			/* TODO: combine this with iKeyPageNextUnreadArt */
+			case iKeyPageKillArt:
+				if (note_page != ART_UNAVAILABLE)
+					art_close ();
+
+				if ((n = next_unread (next_response(respnum))) == -1)
+					return (which_thread (respnum));
+
 				respnum = n;
 				goto restart;
 				/* NOTREACHED */
@@ -998,7 +1003,12 @@ print_a_line:
 				print_color (buf2, below_sig);
 #	else
 #		ifdef USE_CURSES
+#			if 0 /* this cut's off log header lines after cCOLS bytes */
 				WriteLine(note_line - 1, buf2);
+#			else
+				my_fputs(buf2, stdout);
+				my_fputs(cCRLF, stdout);
+#			endif /* 0 */
 #		else
 				my_printf ("%s" cCRLF, buf2);
 #		endif /* USE_CURSES */

@@ -12,8 +12,13 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
-#include "tcurses.h"	/* to define cCRLF */
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"	/* to define cCRLF */
+#endif /* !TCURSES_H */
+
 
 constext txt_1_resp[] = "1 Response" cCRLF;
 constext txt_7bit[] = "7bit";
@@ -219,6 +224,16 @@ constext txt_group_is_moderated[] = "Group %s is moderated. Continue? (y/n): ";
 constext txt_group_select_com[] = "Top Level Commands (page %d of %d)";
 constext txt_group_selection[] = "Group Selection";
 
+/* Multi-line strings won't work on help pager */
+constext txt_help_disp[]  = "Display properties" cCRLF;
+constext txt_help_disp_[] = "------------------" cCRLF;
+constext txt_help_navi[]  = "Moving around" cCRLF;
+constext txt_help_navi_[] = "-------------" cCRLF;
+constext txt_help_ops[]   = "Group/thread/article operations" cCRLF;
+constext txt_help_ops_[]  = "-------------------------------" cCRLF;
+constext txt_help_misc [] = "Miscellaneous" cCRLF;
+constext txt_help_misc_[] = "-------------" cCRLF;
+
 #ifndef NO_SHELL_ESCAPE
 	constext txt_help_shell[] = "!\t  shell escape" cCRLF;
 #endif /* !NO_SHELL_ESCAPE */
@@ -230,6 +245,7 @@ constext txt_group_selection[] = "Group Selection";
 	constext txt_help_BIGK[] = "K\t  mark current thread as read" cCRLF;
 	constext txt_help_BIGL[] = "L\t  goto article chosen by Message-ID" cCRLF;
 	constext txt_help_BIGM[] = "M\t  menu of configurable options" cCRLF;
+	constext txt_help_BIGQ[] = "Q\t  quit" cCRLF;
 	constext txt_help_BIGS[] = "S U\t  subscribe (U = unsubscribe) to groups that match pattern" cCRLF;
 	constext txt_help_BIGT[] = "T\t  return to group selection level" cCRLF;
 	constext txt_help_BIGU[] = "U\t  untag all tagged threads" cCRLF;
@@ -242,6 +258,7 @@ constext txt_group_selection[] = "Group Selection";
 	constext txt_help_K[] = "K\t  mark current thread as read" cCRLF;
 	constext txt_help_L[] = "L\t  goto article chosen by Message-ID" cCRLF;
 	constext txt_help_M[] = "M\t  menu of configurable options" cCRLF;
+	constext txt_help_Q[] = "Q\t  quit" cCRLF;
 	constext txt_help_S[] = "S U\t  subscribe (U = unsubscribe) to groups that match pattern" cCRLF;
 	constext txt_help_T[] = "T\t  return to group selection level" cCRLF;
 	constext txt_help_U[] = "U\t  untag all tagged threads" cCRLF;
@@ -276,6 +293,9 @@ constext txt_help_ctrl_f[] = "^F ^B\t  down (^B = up) one page" cCRLF;
 constext txt_help_ctrl_h[] = "^H\t  show article headers" cCRLF;
 constext txt_help_ctrl_k[] = "^K\t  kill an article via a menu" cCRLF;
 constext txt_help_ctrl_l[] = "^L\t  redraw page" cCRLF;
+constext txt_help_ctrl_n[] = "^N ^P\t  down (^P = up) one line" cCRLF;
+constext txt_help_ctrl_o[] = "O ^O\t  post postponed articles" cCRLF;
+constext txt_help_ctrl_t[] = "^T\t  toggle tabwidth 4 <-> 8" cCRLF;
 constext txt_help_d[] = "d\t  cycle the display of authors email address, real name, both or neither" cCRLF;
 constext txt_help_dash[] = "-\t  display last article viewed" cCRLF;
 constext txt_help_e[] =  "e\t  edit article (mail-groups only)" cCRLF;
@@ -291,16 +311,17 @@ constext txt_help_g_hash[] = "#\t  choose range of groups to be affected by next
 constext txt_help_g_num[] = "0 - 9\t  choose group by number" cCRLF;
 constext txt_help_g_q[] = "q Q\t  quit" cCRLF;
 constext txt_help_g_r[] = "r\t  toggle display to show all/unread subscribed groups" cCRLF;
-constext txt_help_g_search[] = "/ ?\t  choose group by group name string forward (? = backward) search" cCRLF "\t  (all searches are case-insensitive and wrap around group list)" cCRLF;
+constext txt_help_g_search[] = "/ ?\t  search forwards for a group name (? = backwards)" cCRLF "\t  (all searches are case-insensitive and wrap around)" cCRLF;
+constext txt_help_g_T[] = "T\t  tag all parts of current multipart-message in order" cCRLF;
 constext txt_help_g_tab[] = "n <TAB>\t  enter next group with unread news" cCRLF;
-constext txt_help_g_x[] = "X\t  quit without saving (changed) configuration" cCRLF;
+constext txt_help_g_x[] = "X\t  quit without saving configuration changes" cCRLF;
 constext txt_help_g_y[] = "y\t  toggle display to show all/subscribed groups" cCRLF;
-constext txt_help_g_z[] = "z\t  mark all articles in chosen group unread" cCRLF;
+constext txt_help_g_z[] = "z Z\t  mark all articles in chosen group unread" cCRLF;
 constext txt_help_h[] = "h H\t  get help (H = toggle mini help menu display)" cCRLF;
 constext txt_help_hash[] = "#\t  choose range of articles to be affected by next command" cCRLF;
-constext txt_help_i[] = "q\t  return to group index page" cCRLF;
+constext txt_help_i[] = "i\t  toggle info message in last line (subject/description)" cCRLF;
 constext txt_help_i_caret_dollar[] = "^ $\t  choose first ($ = last) thread in list" cCRLF;
-constext txt_help_i_coma[] = "@\t  toggle all selections (all articles)" cCRLF;
+constext txt_help_i_at[] = "@\t  toggle all selections (all articles)" cCRLF;
 constext txt_help_i_cr[] = "<CR>\t  read chosen article" cCRLF;
 constext txt_help_i_dot[] = ".\t  toggle selection of thread" cCRLF;
 constext txt_help_i_n[] = "n p\t  display next (p = previous) group" cCRLF;
@@ -322,11 +343,11 @@ constext txt_help_n[] = "N\t  choose next group with unread news" cCRLF;
 #endif /* !DISABLE_PRINTING */
 
 constext txt_help_p_caret_dollar[] = "^ $\t  display first ($ = last) page of article" cCRLF;
-constext txt_help_p_coma[] = "@\t  reverse article selections" cCRLF;
+constext txt_help_p_at[] = "@\t  reverse article selections" cCRLF;
 constext txt_help_p_ctrl_e[] = "^E\t  reply through mail to author quoting complete headers" cCRLF;
 constext txt_help_p_ctrl_w[] = "^W\t  post followup to current article quoting complete headers" cCRLF;
 constext txt_help_p_cr[] = "<CR>\t  display first article in next thread" cCRLF;
-constext txt_help_p_d[] = "d\t  decode article; toggle rotate-13 for current article" cCRLF;
+constext txt_help_p_d[] = "% d\t  toggle ROT-13 (basic decode) for current article" cCRLF;
 constext txt_help_p_dot[] = ".\t  toggle article selection" cCRLF;
 constext txt_help_p_f[] = "f F\t  post followup (F = don't copy text) to current article" cCRLF;
 constext txt_help_p_g[] = "g G\t  display first (G = last) page of article" cCRLF;
@@ -355,7 +376,7 @@ constext txt_help_p_z[] = "z Z\t  mark article (Z = thread) as unread" cCRLF;
 #endif /* !DONT_HAVE_PIPING */
 constext txt_help_plus[] = "+\t  select group (make \"hot\")" cCRLF;
 
-constext txt_help_q[] = "Q\t  quit" cCRLF;
+constext txt_help_q[] = "q\t  return to previous menu" cCRLF;
 
 constext txt_help_r[] = "r\t  toggle display of all/unread articles" cCRLF;
 constext txt_help_s[] = "s u\t  subscribe (u = unsubscribe) to chosen group" cCRLF;
@@ -368,12 +389,10 @@ constext txt_help_t_num[] = "0 - 9\t  choose article by number" cCRLF;
 constext txt_help_thread[] = "< >\t  display first (> = last) article in current thread" cCRLF;
 constext txt_help_u[] = "u\t  cycle through threading options available" cCRLF;
 
-constext txt_help_g_t_p_i[] = "i\t  toggle info message in last line (subject/description)" cCRLF;
-constext txt_help_s_i[] = "i\t  show description of chosen newsgroup" cCRLF;
 constext txt_help_v[] = "v\t  show version information" cCRLF;
 constext txt_help_w[] = "w\t  post (write) article to current group" cCRLF;
 constext txt_help_x[] = "x\t  repost chosen article to another group" cCRLF;
-constext txt_help_y[] = "Y\t  yank in active file to see any new news" cCRLF;
+constext txt_help_y[] = "Y\t  reread active file to check for any new news" cCRLF;
 
 #ifdef HAVE_COLOR
 	constext txt_help__[] = "_\t  toggle word highlighting on/off" cCRLF;
@@ -388,6 +407,9 @@ constext txt_info_postponed[] = "%d postponed article%s, reuse with ^O...\n";
 constext txt_info_nopostponed[] = "*** No postponed articles ***";
 constext txt_info_not_subscribed[] = "You are not subscribed to this group";
 constext txt_info_no_write[] = "Operation disabled in no-overwrite mode";
+constext txt_info_x_conversion_note[] = "\
+X-Conversion-Note: multipart/alternative contents have been removed.\n\
+\tTo get the whole article, turn tinrc.alternative_handling OFF\n";
 constext txt_is_tex_ecoded[]= "TeX2Iso encoded article";
 
 #ifndef INDEX_DAEMON
@@ -509,7 +531,7 @@ constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_nrctbl_create[] = "c)reate it, use a)lternative name, use d)efault .newsrc, q)uit tin: ";
 constext txt_nrctbl_default[] = "use a)lternative name, use d)efault .newsrc, q)uit tin: ";
 
-constext txt_nrctbl_info[] = "# NNTP-server -> newrc translation table and NNTP-server\n\
+constext txt_nrctbl_info[] = "# NNTP-server -> newsrc translation table and NNTP-server\n\
 # shortname list for %s %s\n#\n# the format of this file is\n\
 #   <FQDN of NNTP-server> <newsrc file> <shortname> ...\n#\n\
 # if <newsrc file> is given without path, $HOME is assumed as its location\n\
@@ -553,8 +575,8 @@ constext txt_prompt_see_postponed[] = "Do you want to see postponed articles (%d
 constext txt_repost[] = "Repost";
 
 #ifdef HAVE_LIBUU
-	constext txt_libuu_saved[] = "%d files successfully written from %d articles. %d error%s occured." cCRLF;
-	constext txt_libuu_success[] = "%s successfuly decoded." cCRLF;
+	constext txt_libuu_saved[] = "%d files successfully written from %d articles. %d error%s occurred." cCRLF;
+	constext txt_libuu_success[] = "%s successfully decoded." cCRLF;
 	constext txt_libuu_error_decode[] = "Error decoding %s : ";
 	constext txt_libuu_error_missing[] = "Missing parts." cCRLF;
 	constext txt_libuu_error_no_begin[] = "No beginning." cCRLF;
@@ -585,7 +607,7 @@ constext txt_tinrc_filter[] = "# Defaults for quick (1 key) kill & auto-selectio
 # global=ON/OFF  ON=apply to all groups OFF=apply to current group\n\
 # case=ON/OFF    ON=filter case sensitive OFF=ignore case\n\
 # expire=ON/OFF  ON=limit to default_filter_days OFF=don't ever expire\n";
-constext txt_tinrc_header[] = "# tin-unoff configuration file V%s\n\
+constext txt_tinrc_header[] = "# %s configuration file V%s\n\
 # This file was automatically saved by %s %s %s (\"%s\")\n#\n\
 # Do not edit while tin is running, since all your changes to this file\n\
 # will be overwritten when you leave tin.\n#\n\
@@ -687,6 +709,13 @@ constext *txt_strip_bogus_type[] = {
 		"Always Keep",
 		"Always Remove",
 		"Mark with D on selection screen"
+};
+
+/* Ways of handling killed articles */
+constext *txt_kill_level_type[] = {
+		"Kill only unread arts",
+		"Kill all arts & show with K",
+		"Kill all arts and never show"
 };
 
 #ifdef M_AMIGA
@@ -856,7 +885,7 @@ Warning: You are using a non-plain transfer encoding (such as base64 or\n\
          article.  If a signature is appended by that inews program it will\n\
          not be encoded properly.\n";
 constext txt_warn_update[] = "\n\nYou are upgrading to tin %s from an earlier version.\n\
-Some values in your configuration file have changed\nRead WHATSNEW, etc...\n";
+Some values in your configuration file have changed!\nRead WHATSNEW, etc...\n";
 
 constext txt_warn_newsrc[] = "Warning: tin wrote less groups to your %s\n\
 than it read at startup. If you didn't unsubscribe from %ld group%s during\n\
@@ -1059,6 +1088,14 @@ struct opttxt txt_show_only_unread_groups = {
 	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
 	"Show only groups with unread arts  : ",
 	"# If ON show only subscribed to groups that contain unread articles.\n"
+};
+
+struct opttxt txt_kill_level = {
+	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
+	"Filter which articles              : ",
+	"# 0=(Only kill unread articles)\n\
+# 1=(Kill all articles and show in threads marked with K)\n\
+# 2=(Kill all articles and never show them).\n"
 };
 
 struct opttxt txt_tab_goto_next_unread = {
@@ -1303,13 +1340,13 @@ struct opttxt txt_use_mouse = {
 	"# If ON enable mouse key support on xterm terminals\n"
 };
 
-#ifdef USE_KEYPAD
+#ifdef HAVE_KEYPAD
 struct opttxt txt_use_keypad = {
 	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
 	"Use scroll keys on keypad          : ",
 	"# If ON enable scroll keys on terminals that support it\n"
 };
-#endif	/* USE_KEYPAD */
+#endif	/* HAVE_KEYPAD */
 
 struct opttxt txt_use_getart_limit = {
 	"<SPACE> toggles, <CR> sets, <ESC> cancels.",
@@ -1782,13 +1819,11 @@ struct opttxt txt_keep_posted_articles = {
 	"# If ON keep all postings in ~/Mail/posted\n"
 };
 
-#ifdef M_UNIX
 struct opttxt txt_keep_dead_articles = {
 	"Keep all failed articles in ~/dead.articles. <SPACE> toggles & <CR> sets.",
 	"Keep failed arts in ~/dead.articles: ",
 	"# If ON keep all failed postings in ~/dead.articles\n"
 };
-#endif	/* M_UNIX */
 
 struct opttxt txt_strip_newsrc = {
 	"Do you want to strip unsubscribed groups from .newsrc",

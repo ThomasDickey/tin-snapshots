@@ -12,12 +12,20 @@
  *	             right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 #ifdef HAVE_UUDEVIEW_H
-#	include <uudeview.h>
+#	ifndef __UUDEVIEW_H__
+#		include <uudeview.h>
+#	endif /* !__UUDEVIEW_H__ */
 #endif /* HAVE_UUDEVIEW_H */
 
 #undef OFF
@@ -290,7 +298,7 @@ check_start_save_any_news (
 
 #ifndef INDEX_DAEMON
 /*
- * Save the article indexed via i to file.
+ * Save the article indexed via i and open on note_fp to file.
  * A non-blank 'filename' seems to force a mailbox save
  * 'indexnum' is index into save[]
  * Returns:
@@ -648,7 +656,7 @@ void
 add_to_save_list (
 	int the_index,
 	t_bool is_mailbox,
-	int archive_save, /* FIXME: always TRUE  */
+	int archive_save, /* FIXME: always TRUE */
 	char *path)
 {
 	char tmp[PATH_LEN];

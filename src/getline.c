@@ -15,8 +15,12 @@
  *              express or implied warranty.
  */
 
-#include "tin.h"
-#include "tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #define BUF_SIZE	1024
 #define SCROLL		30

@@ -8,8 +8,8 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 19990927
-VER	= pre-$(LVER)-$(PVER)
+PVER	= 19991113
+VER	= $(LVER)-$(PVER)
 
 # directory structure
 TOPDIR	= .
@@ -22,7 +22,6 @@ VMSDIR	= ./vms
 PCREDIR	= ./pcre
 CANDIR	= ./libcanlock
 TOLDIR	= ./tools
-OLDDIR	= ./old
 
 HFILES	= \
 	$(INCDIR)/bool.h \
@@ -240,18 +239,6 @@ CAN	= \
 	$(CANDIR)/doc/rfc2202.txt \
 	$(CANDIR)/doc/rfc2286.txt
 
-OLD	= \
-	$(OLDDIR)/msmail.c \
-	$(OLDDIR)/nntpvms.c \
-	$(OLDDIR)/nntpw32.c \
-	$(OLDDIR)/os_2.c \
-	$(OLDDIR)/win32.c \
-	$(OLDDIR)/win32tcp.c \
-	$(OLDDIR)/msmail.h \
-	$(OLDDIR)/os_2.h \
-	$(OLDDIR)/win32.h \
-	$(OLDDIR)/win32tcp.h
-
 MISC	= \
 	$(INCDIR)/autoconf.hin \
 	$(SRCDIR)/Makefile.in \
@@ -265,9 +252,9 @@ MISC	= \
 	$(SRCDIR)/descrip.mms \
 	$(PCREDIR)/pcre.mms
 
-ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(VMS) $(PCRE) $(MISC) $(CAN) $(OLD)
+ALL_FILES = $(TOP) $(DOC) $(TOL) $(HFILES) $(CFILES) $(AMIGA) $(VMS) $(PCRE) $(MISC) $(CAN)
 
-ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(VMSDIR) $(PCREDIR) $(CANDIR) $(CANDIR)/doc $(OLDDIR)
+ALL_DIRS = $(TOPDIR) $(DOCDIR) $(SRCDIR) $(INCDIR) $(AMGDIR) $(VMSDIR) $(PCREDIR) $(CANDIR) $(CANDIR)/doc
 
 # standard commands
 CD	= cd

@@ -12,10 +12,14 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #if defined(DEBUG) || defined(DEBUG_NEWSRC)
-#	include "tcurses.h"
+#	ifndef TCURSES_H
+#		include "tcurses.h"
+#	endif /* !TCURSES_H */
 #endif /* DEBUG || DEBUG_NEWSRC */
 
 int debug;

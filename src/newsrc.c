@@ -12,8 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #define BITS_TO_BYTES(n)	(size_t)((n+NBITS-1)/NBITS)
 
@@ -377,19 +381,14 @@ subscribe (
 		fclose (fp);
 
 		if (!found) {
-			fprintf (newfp, "%s%c\n", group->name, sub_state);
-			group->subscribed = SUB_BOOL(sub_state);
-
-			/* A new group - get min/max/unread counts etc. for it */
 			wait_message (0, txt_subscribing);
-
+			group->subscribed = SUB_BOOL(sub_state);
 			if (sub_state == SUBSCRIBED) {
-				char null_seq[2];
-				null_seq[0] = '\0';
-
 				vGet1GrpArtInfo(group);
-				parse_bitmap_seq(group, null_seq);
-			}
+				fprintf (newfp, "%s%c ", group->name, sub_state);
+				print_bitmap_seq (newfp, group);
+			} else
+				fprintf (newfp, "%s%c\n", group->name, sub_state);
 		}
 	}
 

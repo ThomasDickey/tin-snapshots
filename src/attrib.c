@@ -12,14 +12,17 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #ifdef DEBUG
-#	include	"tcurses.h"
+#	ifndef TCURSES_H
+#		include	"tcurses.h"
+#	endif /* !TCURSES_H */
 #endif /* DEBUG */
 
 #ifndef INDEX_DAEMON
-
 /*
  * Defines used in setting attributes switch
  */

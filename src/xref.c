@@ -13,8 +13,9 @@
  */
 
 
-#include	"tin.h"
-
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 /* dbmalloc checks memset() parameters, so we'll use it to check the assignments */
 #ifdef USE_DBMALLOC

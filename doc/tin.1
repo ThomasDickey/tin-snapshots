@@ -3,11 +3,11 @@
 .\" Module    : tin.1
 .\" Author    : I. Lea, U. Janssen
 .\" Created   : 1991-08-23
-.\" Updated   : 1998-08-08
-.\" Notes     : still needs some work
+.\" Updated   : 1999-11-10
+.\" Notes     : still needs some work (but getting there ;)
 .\"
 .\"
-.TH tin 1 "August 8th, 1998" "1.4" "A Usenet newsreader"
+.TH tin 1 "November 10th, 1999" "1.4" "A Usenet newsreader"
 .\"
 .\"
 .SH NAME
@@ -101,8 +101,7 @@ first newsgroup. Move to a group by using the terminal arrow keys (terminal
 dependent) or `j' and `k'. Use PgUp/PgDn (terminal dependent) or Ctrl-U and
 Ctrl-D to page up/down. Enter a newsgroup by pressing <RETURN>.
 .PP
-The <TAB> key advances to the next newsgroup with unread articles and enters
-it.
+The <TAB> key enters the next newsgroup with unread articles.
 .\"
 .\"
 .SH OPTIONS
@@ -224,7 +223,9 @@ and ``\fB-Z\fR'' options.
 Print version and date information.
 .TP
 .B -w
-Quick mode to post an article and then exit.
+Quick mode to post an article and then exit. In order for this to be quick,
+tin is started in the same way as with ``\fB-n\fR'' and so only those groups
+in the newsrc are available for posting.
 .TP
 .B -X
 No-overwrite mode. \fI$HOME/.newsrc\fP and files in \fI$HOME/.tin\fP
@@ -389,18 +390,18 @@ article-body
 .\"
 .\"
 .SH "COMMON MOVING KEYS"
-This table shows the common keys/commands for moving at all four levels
+This table shows the common keys used for moving around at all four levels
 within \fBtin\fR.
 .RS
 .nf
-.ta \w'Beg. of list/article  'u +\w'ansi/vt100  'u
-	ansi/vt100	Other Terminals
-Beg. of list/article	\fBHome\fR	\fB1\fR (\fB^R\fR or \fBg\fR at article level)
+.ta \w'Beg. of list/article  'u +\w'ANSI/vt100  'u
+	ANSI/vt100	Other Terminals
+Beg. of list/article	\fBHome\fR	\fB^\fR (also \fBg\fR at article level)
 End of list/article	\fBEnd\fR	\fB$\fR (also \fBG\fR at article level)
 Page Up	\fBPgUp\fR	\fB^U\fR or \fB^B\fR or \fBb\fR
 Page Down	\fBPgDn\fR	\fB^D\fR or \fB^F\fR or \fB<SPACE>\fR
-Line Up	\fBUp arrow\fR	\fBk\fR (not at article level)
-Line Down	\fBDown arrow\fR	\fBj\fR (not at article level)
+Line Up	\fBUp arrow\fR	\fBk\fR or \fB^P\fR (not at article level)
+Line Down	\fBDown arrow\fR	\fBj\fR or \fB^N\fR (not at article level)
 .fi
 .RE
 .\"
@@ -408,7 +409,8 @@ Line Down	\fBDown arrow\fR	\fBj\fR (not at article level)
 .SH "COMMON EDITING COMMANDS"
 An emacs style editing package allows the easy editing of input strings.
 An history list allows the easy reuse of previously entered strings.
-The following commands are available when editing a string:
+In addition to the cursor keys, the following commands are available when
+editing a string:
 .PP
 .TP 10
 .B ^A, ^E
@@ -441,13 +443,21 @@ to the caller.
 aborts the present editing operation.
 .\"
 .\"
-.SH "NEWSGROUP SELECTION COMMANDS"
+.SH "GLOBAL COMMANDS"
+The following commands are available at all 4 menu levels and always have
+the same effect.
+.PP
 .TP 10
-.B 4
-Select group 4.
+.B !
+Shell escape. \fB!\fR by itself will launch a shell, \fB!\fR <command> will
+run an external <command>
+This facility may have been disabled by the System Administrator
+.TP
+.B &
+Toggle use of ANSI color.
 .TP
 .B ^L
-Redraw page.
+Redraw the current screen.
 .TP
 .B ^O
 Reload postponed article. If your system blocks CTRL-O you must quote it by
@@ -460,18 +470,42 @@ following command sequence instead: reload it with '^O', enter editor
 with 'y', quit editor, discard posting with 'q'. See also ``\fB-o\fR''
 command-line switch.
 .TP
+.B O
+Reload postponed article. See also ``\fB-o\fR'' command-line switch.
+.TP
+.B W
+List articles posted by user. The date posted, the newsgroup and the
+subject are listed.
+.TP
+.B v
+Print \fBtin\fR version information.
+.\"--------------------------------------------------------------------
+.\"
+.SH "NEWSGROUP SELECTION COMMANDS"
+.TP 10
+.B 4
+Select group 4.
+.TP
 .B ^R
-Reset \fI$HOME/.newsrc\fP file.
+Reset \fI$HOME/.newsrc\fP file. This will destroy all records of which
+articles have been read, so use this carefully.
+.TP
+.B #
+Choose a range of articles to be affected by the next command. See the section
+RANGES for more information.
+.TP
+.B /
+Search for a group by name and description (if displayed).
+.TP
+.B ?
+Backward search through the group names and descriptions.
 .TP
 .B <CR>
 Read current group.
 .TP
 .B <TAB>
-View next group with unread news. Will wrap around to the beginning of the
+Enter next group with unread news. Will wrap around to the beginning of the
 group selection list looking for unread groups.
-.TP
-.B &
-Toggle use of ANSI color.
 .TP
 .B c
 Make current group as all read [after confirmation] and move to the next
@@ -482,24 +516,23 @@ Mark current group as all read [after confirmation] and enter the next
 unread group in the group selection list.
 .TP
 .B d
-Toggle display to show just the group name or the group name and the groups
-description.
+Toggle display to show just the group name or the group name and the group
+descriptions.
 .TP
 .B g
-Choose a new group by name. The position of the group within the group
-list will also be asked for. By entering `1' the new group will be the
-first group in the displayed list, by entering `8' the group will be
-the eighth group in the list etc. By entering `$' the group will be the
-last group displayed.
+Search for a group by name (and description if displayed).
+This is the same as using '/'
 .TP
 .B h
-Help screen of newsgroup selection commands.
+Help screen of newsgroup selection commands. You can use \fB/\fR and
+\fB?\fR to search on this screen.
 .TP
 .B H
 Toggle the display of help mini menu at the bottom of the screen.
 .TP
 .B i
-Show description of the current newsgroup at the last line.
+Toggle the display of the description of the current newsgroup in the last line.
+This will not be available if \fBtin\fR was started with the \fB-d\fR option.
 .TP
 .B I
 Toggle inverse video.
@@ -514,8 +547,11 @@ entering `$' the group will be the last group displayed.
 User configurable options menu (for more information see section
 GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES).
 .TP
-.B O
-Reload postponed article. See also ``\fB-o\fR'' command-line switch.
+.B n
+Enter next group with unread news. This key is identical to \fB<TAB>\fR
+.TP
+.B N
+Positions the cursor on the next group with unread articles in it.
 .TP
 .B q
 Quit \fBtin\fR - ask the user to confirm if 'confirm_to_quit' is on.
@@ -524,9 +560,9 @@ Quit \fBtin\fR - ask the user to confirm if 'confirm_to_quit' is on.
 Quit \fBtin\fR - don't ask the user to confirm.
 .TP
 .B r
-Toggle display of all subscribed to groups and just the subscribed to groups
-containing unread articles. Command has no effect if groups were read from
-the command line when \fBtin\fR was started.
+Toggle display of all subscribed to groups and just those groups containing
+unread articles. Command has no effect if groups were specified on the command
+line when \fBtin\fR was started.
 .TP
 .B R
 Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way of
@@ -539,32 +575,26 @@ Subscribe to current group.
 Subscribe to groups matching user specified pattern.
 .TP
 .B u
-Unsubscribe to current group.
+Unsubscribe to current group. This can be used to remove bogus groups.
+See 'strip_bogus' in the GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES
+section.
 .TP
 .B U
 Unsubscribe to groups matching user specified pattern.
-.TP
-.B v
-Print \fBtin\fR version information.
 .TP
 .B w
 Post an article to current group. If posting fails for some reason, you'll
 get the chance to edit (`e') the article again, postpone (`o') it for later
 processing (see also ``\fB-o\fR''command-line switch) or discard (`q') it.
 .TP
-.B W
-List articles posted by user. The date posted, the newsgroup and the
-subject are listed.
-.TP
 .B X
-Quit \fBtin\fR without saving (changed) configuration.
+Quit \fBtin\fR without saving any changes to the configuration.
 .TP
 .B y
-The first time this command is called it will yank in all groups from
-\fI$NEWSLIBDIR/active\fP that are not in \fI$HOME/.newsrc\fP.
-After any groups have been subscribed/unsubscribed to, this command
-if pressed again will reread \fI$HOME/.newsrc\fP and display only
-the subscribed groups.
+Yanks in all groups.
+Toggles the displayed groups between all the groups in the
+\fI$NEWSLIBDIR/active\fP file and just those that are subscribed to in
+\fI$HOME/.newsrc\fP.
 .TP
 .B Y
 Reread the active file to see if any new news has arrived since
@@ -573,81 +603,103 @@ starting \fBtin\fR.
 .B z
 Mark all articles in the current group as unread.
 .TP
-.B /
-Search the group names and descriptions (if displayed).
-.TP
-.B ?
-Backward search through the group names and descriptions.
-.\"
+.B Z
+Identical to \fBz\fR.
+.\"--------------------------------------------------------------------
 .\"
 .SH "GROUP INDEX COMMANDS"
-.\" FIXME - update and add missing keys
 .TP 10
 .B 4
 Select article 4.
 .TP
 .B ^A
-Auto select article(s) via a menu. Read the section FILTERING ARTICLES
+Auto select article(s) using a menu. Read the section FILTERING ARTICLES
 for more information.
+.TP
+.B ^K
+Kill article(s) using a menu. Read the section FILTERING ARTICLES for
+more information.
+.TP
+.B #
+Choose a range of articles to be affected by the next command. See the section
+RANGES for more information.
+.TP
+.B -
+Re-enter the last message that was viewed.
+.TP
+.B /
+Search forward for specified subject.
+.TP
+.B ?
+Search backward for specified subject.
+.TP
+.B *
+Select current thread for later processing.
+.TP
+.B +
+Perform auto-selection on current group.
+.TP
+.B \\.
+Toggle selection of current thread. If at least one unread article,
+(but not every unread article) in the current thread is selected, then all
+unread articles become selected.
+.TP
+.B ;
+For each thread in current group, if it at least one unread
+article is selected, all unread articles become selected. This is
+useful for auto-selection on author where reader wants to
+see entire thread.
+.TP
+.B =
+Prompts for a pattern with which to match on. All threads
+whose subjects match the pattern will be marked selected. A pattern
+of ``*'' will match all subjects. Entering just <CR> will re-use the
+last pattern that was entered.
+.TP
+.B @
+Reverse all selections on all articles.
+.TP
+.B ~
+Undo all selections on all articles. It clears the toggle effect
+of `X' command. Thus after first doing a `X', one can then do `~'
+to reset articles. Thus, one can iteratively whittle down
+uninteresting threads.
+.TP
+.B |
+Pipe current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles into command.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B [
 Auto select article(s) with a single key [after confirmation]. The defaults
-used for selection are set via the following four tinrc config variables:
+used for selection are based upon the following four tinrc config variables:
 .in +.3i
-default_filter_select_header
-.in +.3i
-0,1 = ``Subject:'', 2,3 = ``From:'', 4 = ``Message-Id:'' & full ``References:'' line,
-5 = ``Message-Id:'' & last ``References:'' entry only,
-6 = ``Message-Id:'' entry only, 7 = ``Lines:''
-.in -.3i
-default_filter_select_global
-.in +.3i
-ON = apply to all groups, OFF = apply to current group
-.in -.3i
+.nf
 default_filter_select_case
-.in +.3i
-ON = filter case sensitive, OFF = ignore case
-.in -.3i
 default_filter_select_expire
-.in +.3i
-ON = expire after specified time, OFF = always apply the filter
-.in -.6i
-Read the section FILTERING ARTICLES for more information.
-.TP
-.B ^K
-Kill article(s) via a menu. Read the section FILTERING ARTICLES for
-more information.
+default_filter_select_global
+default_filter_select_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
 .TP
 .B ]
 Kill article(s) with a single key [after confirmation]. The defaults used
-for killing are set via the following four tinrc config variables:
+for killing are based upon the following four tinrc config variables:
 .in +.3i
-default_filter_kill_header
-.in +.3i
-0,1 = ``Subject:'', 2,3 = ``From:'', 4 = ``Message-Id:'' & full ``References:'' line,
-5 = ``Message-Id:'' & last ``References:'' entry only,
-6 = ``Message-Id:'' entry only, 7 = ``Lines:''
-.in -.3i
-default_filter_kill_global
-.in +.3i
-ON = apply to all groups, OFF = apply to current group
-.in -.3i
+.nf
 default_filter_kill_case
-.in +.3i
-ON = filter case sensitive, OFF = ignore case
-.in -.3i
 default_filter_kill_expire
-.in +.3i
-ON = expire after specified time, OFF = always apply the filter
-.in -.6i
-Read the section FILTERING ARTICLES for more information.
-.TP
-.B ^L
-Redraw page.
-.TP
-.B ^O
-Reload postponed article. If your system blocks CTRL-O you must quote it
-by pressing CTRL-V first.
+default_filter_kill_global
+default_filter_kill_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
 .TP
 .B <CR>
 Read current article.
@@ -665,6 +717,7 @@ Otherwise, see 'a' above.
 .TP
 .B B
 Search the body of all articles in group (can be slow).
+You can abort the search using 'q'.
 .TP
 .B c
 Mark all articles as read [after confirmation] then return to the
@@ -675,7 +728,8 @@ Mark all articles as read [after confirmation] and enter the next group
 with unread news.
 .TP
 .B d
-Toggle display to show just the subject or the subject and author.
+Cycle the display of the author through all the possible options
+for the tinrc variable 'show_author'.
 .TP
 .B g
 Choose a new group by name.
@@ -684,7 +738,8 @@ Choose a new group by name.
 Toggle article/group limit.
 .TP
 .B h
-Help screen of group index commands.
+Help screen of group index commands. You can use \fB/\fR and
+\fB?\fR to search on this screen.
 .TP
 .B H
 Toggle the display of help mini menu at the bottom of the screen.
@@ -697,7 +752,7 @@ line.
 Toggle inverse video.
 .TP
 .B K
-Mark article/thread as read and advance to next unread article/thread.
+Mark article/thread as read and move onto the next unread article/thread.
 .TP
 .B l
 Open the thread under the current cursor position.
@@ -706,8 +761,10 @@ Open the thread under the current cursor position.
 Look up article by ``Message:-ID:''.
 .TP
 .B m
-Mail current article / thread / auto selected (hot) articles /
+Mail current article / thread / auto-selected (hot) articles /
 articles matching pattern / tagged articles to someone.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B M
 User configurable options menu (for more information see section
@@ -720,11 +777,10 @@ Go to next group.
 Go to next unread article.
 .TP
 .B o
-Output current article / thread / auto selected (hot) articles /
+Send current article / thread / auto-selected (hot) articles /
 articles matching pattern / tagged articles to printer.
-.TP
-.B O
-Reload postponed article. See also ``fB-o\fR'' command-line switch.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B p
 Go to previous group.
@@ -738,20 +794,28 @@ Return to previous level.
 .B Q
 Quit \fBtin\fR - don't ask the user to confirm.
 .TP
+.B r
+Toggle the display between all articles and unread articles
+.TP
+.B R
+Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way of
+getting bugs fixed and features added/changed.
+.TP
 .B s
-Save current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles to file / files /
-mailbox. To save to a mailbox enter '=' or '=mailbox' when asked
-for filename to save to. To save in <News.group.name>/<filename>
-format enter '+filename'. Environment variables are allowed within
-a filename (i.e., \fI$SOURCES/dir/filename\fP).
+Save current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B S
-Save tagged articles automatically without user prompts
+Save tagged articles automatically without further prompting.
 .TP
 .B t
 Toggle tag-status of current article / thread for mailing (`m') /
 piping (`|') / printing (`o') / saving (`s') / reposting (`x').
+.TP
+.B T
+Automatically tag in order all the parts of the current multi-part message
 .TP
 .B u
 Cycle the threading mode through no threading, threading by subject,
@@ -760,27 +824,20 @@ threading by references, threading on both subject and references.
 .B U
 Untag all articles that were tagged.
 .TP
-.B v
-Print \fBtin\fR version information.
-.TP
 .B w
 Post an article to current group. If posting fails for some reason, you'll
 get the chance to edit (`e') the article again, postpone (`o') it for later
 processing (see also ``\fB-o\fR''command-line switch) or discard (`q') it.
 .TP
-.B W
-List articles posted by user. The date posted, the newsgroup and the
-subject are listed.
-.TP
 .B x
-Repost an already posted article / thread / auto selected (hot)
+Repost an already posted article / thread / auto-selected (hot)
 articles / articles matching pattern / tagged articles to another
 newsgroup(s). Useful for reposting from global to local newsgroups.
 Do not use this to cross-post your own articles.
 .TP
 .B X
 Mark all unread articles that have not been selected as read,
-redo screen to reflect changes and put index at the first
+redraw screen to reflect changes and put index at the first
 thread to begin reading. Pressing `X' again will toggle back
 to the way it was before. See `~' command for clearing the
 toggle effect.
@@ -790,77 +847,20 @@ Mark current article as unread.
 .TP
 .B Z
 Mark current thread as unread.
-.TP
-.B /
-Search forward for specified subject.
-.TP
-.B ?
-Search backward for specified subject.
-.TP
-.B #
-Choose range of articles to be affected by next command.
-.TP
-.B -
-Show last message.
-.TP
-.B |
-Pipe current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles into command.
-.TP
-.B *
-Select current thread for later processing.
-.TP
-.B \\.
-Toggle selection of current thread. If at least one unread art,
-but not all unread arts, in thread is selected, then all unread
-arts become selected.
-.TP
-.B @
-Reverse all selections on all articles.
-.TP
-.B ~
-Undo all selections on all articles. It clears the toggle effect
-of `X' command. Thus after first doing a `X', one can then do `~'
-to reset articles. Thus, one can iteratively whittle down
-uninteresting threads.
-.TP
-.B +
-Perform auto-selection on current group.
-.TP
-.B =
-Prompts for a pattern with which to match on. All threads
-whose subjects match the pattern will be selected. A pattern
-of ``*'' will match all subjects. Entering just <CR> will cause
-the previous entered pattern to be used.
-.TP
-.B ;
-For each thread in current group, if it at least one unread
-art is selected, all unread arts become selected. This is
-useful for auto-selection on author where reader wants to
-see entire thread.
-.\"
+.\"--------------------------------------------------------------------
 .\"
 .SH "THREAD LISTING COMMANDS"
 .\" this sections should be complete
 .TP 10
-.B ^L
-Redraw page.
+.B 4
+Select article 4 within thread.
 .TP
-.B ^O
-Reload postponed article. If your system blocks CTRL-O you must quote it
-by pressing CTRL-V first.
+.B #
+Choose a range of articles to be affected by the next command. See the section
+RANGES for more information.
 .TP
-.B <CR>
-Read current article within thread.
-.TP
-.B <TAB>
-View next unread article within thread.
-.TP
-.B ^
-Choose first article in thread.
-.TP
-.B $
-Choose last article in thread.
+.B -
+Re-enter the last message that was viewed.
 .TP
 \fB/\fR
 Search forward for a specified subject.
@@ -868,14 +868,23 @@ Search forward for a specified subject.
 .B ?
 Search backwards for a specified subject.
 .TP
-.B #
-Choose range of articles to be affected by next command.
+.B *
+Select the current thread for later processing.
 .TP
-.B -
-Show last message viewed.
+.B .
+Toggle selection of current article.
 .TP
-.B 4
-Select article 4 within thread.
+.B @
+Reverse article selections.
+.TP
+.B ~
+Undo all selections on current thread.
+.TP
+.B <CR>
+Read current article within thread.
+.TP
+.B <TAB>
+View next unread article within thread.
 .TP
 .B a
 Author forward search.
@@ -886,6 +895,10 @@ wrap over into the next thread if nothing is found in the current one.
 Author backward search.
 Otherwise, see 'a' above.
 .TP
+.B B
+Search the body of all articles in group (can be slow).
+You can abort the search using 'q'.
+.TP
 .B c
 Mark thread as read [after confirmation] and return to the group index page.
 .TP
@@ -894,13 +907,18 @@ Mark thread as read [after confirmation] and enter the next thread containing
 unread news.
 .TP
 .B d
-Toggle display to show just the subject or the subject and author.
+Cycle the display of the author through all the possible options
+for the tinrc variable 'show_author'.
 .TP
 .B h
-Help screen of thread listing commands.
+Help screen of thread listing commands.  You can use \fB/\fR and
+\fB?\fR to search on this screen.
 .TP
 .B H
 Toggle the display of help mini menu at the bottom of the screen.
+.TP
+.B i
+Display the subject of the current article in the last line.
 .TP
 .B I
 Toggle inverse video.
@@ -912,12 +930,10 @@ Mark thread as read.
 Look up article by ``Message:-ID:''.
 .TP
 .B m
-Mail current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles
-to someone.
-.TP
-.B O
-Reload postponed article. See also ``fB-o\fR'' command-line switch.
+Mail current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles to someone.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B q
 Return to previous level.
@@ -933,10 +949,13 @@ Mail a bug report or comment to <tin-bugs@tin.org>. This is the best way
 of getting bugs fixed and features added/changed.
 .TP
 .B s
-Save article/thread/hot/pattern/tagged articles to file
+Save current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B S
-Save tagged articles automatically without user prompts
+Save tagged articles automatically without further prompting.
 .TP
 .B t
 Toggle tag status of current article for mailing (`m') / piping (`|')
@@ -944,9 +963,6 @@ Toggle tag status of current article for mailing (`m') / piping (`|')
 .TP
 .B U
 Untag all tagged threads
-.TP
-.B v
-Print \fBtin\fR version information.
 .TP
 .B w
 Post an article to current group. If posting fails for some reason, you'll
@@ -958,85 +974,104 @@ Mark current article in thread as unread.
 .TP
 .B Z
 Mark all articles in thread as unread.
-.\"
+.\"--------------------------------------------------------------------
 .\"
 .SH "ARTICLE VIEWER COMMANDS"
-.\" FIXME - refine descriptions, sort items.
+.\" FIXME - refine descriptions
 .TP 10
 .B 0
-Read the base article in this thread.
+Read the first (base) article in this thread.
 .TP
 .B 4
 Read response 4 in this thread.
 .TP
 .B ^A
-Auto select article(s) via a menu. Read the section FILTERING ARTICLES
+Auto select article(s) using a menu. Read the section FILTERING ARTICLES
 for more information.
 .TP
-.B [
-Auto select article(s) with a single key. The defaults used for selection
-are set via the following four tinrc config variables:
-.in +.3i
-default_filter_select_header
-.in +.3i
-0,1 = ``Subject:'', 2,3 = ``From:'', 4 = ``Message-Id:'' & full ``References:'' line,
-5 = ``Message-Id:'' & last ``References:'' entry only,
-6 = ``Message-Id:'' entry only, 7 = ``Lines:''
-.in -.3i
-default_filter_select_global
-.in +.3i
-ON = apply to all groups, OFF = apply to current group
-.in -.3i
-default_filter_select_case
-.in +.3i
-ON = filter case sensitive, OFF = ignore case
-.in -.3i
-default_filter_select_expire
-.in +.3i
-ON = expire after specified time, OFF = always apply the filter
-.in -.6i
-Read the section FILTERING ARTICLES for more information.
+.B ^E
+Reply through mail to the author of the current article with a copy of the
+article with all headers included.
 .TP
 .B ^G
 Perform PGP operations on article.
 .TP
 .B ^H
-Toggle display of all the articles mail header.
+Toggles the display of all the header fields.
 .TP
 .B ^K
-Kill article(s) via a menu. Read the section FILTERING ARTICLES for
+Kill article(s) using a menu. Read the section FILTERING ARTICLES for
 more information.
+.TP
+.B ^T
+Toggle the TAB width between 4 and 8 characters.
+.TP
+.B ^W
+Post a followup to the current article with a copy of the article with all
+headers included.
+.TP
+\fB"\fR
+Toggle $\fBTEX2ISO\fR decoding for current article.
+.TP
+.B %
+Toggle ROT-13 decoding for this article. This is the same as \fBd\fR.
+.TP
+.B -
+Re-enter the last message that was viewed.
+.TP
+.B /
+Forward search the text of this article.
+.TP
+.\".B ?         Not implemented
+.\"Backward search the text of this article.
+.\".TP
+.B :
+Skip to the end of the quoted text in this article.
+.TP
+.B <
+Goto the first article in the current thread.
+.TP
+.B >
+Goto the last article in the current thread.
+.TP
+.B [
+Auto select article(s) with a single key. The defaults used for selection
+are set based upon the following four tinrc config variables:
+.in +.3i
+.nf
+default_filter_select_case
+default_filter_select_expire
+default_filter_select_global
+default_filter_select_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
 .TP
 .B ]
 Kill article(s) with a single key. The defaults used for killing
-are set via the following four tinrc config variables:
+are based upon the following four tinrc config variables:
 .in +.3i
-default_filter_kill_header
-.in +.3i
-0,1 = ``Subject:'', 2,3 = ``From:'', 4 = ``Message-Id:'' & full ``References:'' line,
-5 = ``Message-Id:'' & last ``References:'' entry only,
-6 = ``Message-Id:'' entry only, 7 = ``Lines:''
-.in -.3i
-default_filter_kill_global
-.in +.3i
-ON = apply to all groups, OFF = apply to current group
-.in -.3i
+.nf
 default_filter_kill_case
-.in +.3i
-ON = filter case sensitive, OFF = ignore case
-.in -.3i
 default_filter_kill_expire
-.in +.3i
-ON = expire after specified time, OFF = always apply the filter
-.in -.6i
-Read the section FILTERING ARTICLES for more information.
+default_filter_kill_global
+default_filter_kill_header
+.fi
+.in -.3i
+Read the section GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES for
+a full explanation of these variables and FILTERING ARTICLES for more
+information on filtering.
 .TP
-.B ^L
-Redraw page.
+.B _
+Toggle word highlighting on/off.
 .TP
-.B ^O
-Reload postponed article. If your system blocks CTRL-O you must quote it
-by pressing CTRL-V first.
+.B |
+Pipe current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles into command.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B <CR>
 Goto next base article.
@@ -1052,6 +1087,7 @@ Author backward search.
 .TP
 .B B
 Search the body of all articles in group (can be slow).
+You can abort the search using 'q'.
 .TP
 .B c
 Mark the current thread as read [after confirmation] and return to
@@ -1063,18 +1099,14 @@ next thread with unread articles.  If no unread articles are left in this
 group, enter the next group with unread news.
 .TP
 .B d
-Toggle rot-13 decoding for this article.
+Toggle ROT-13 decoding for this article.
 .TP
 .B D
-Delete current article. It must have been posted by the same user. The
+Cancel the current article. It must have been posted by the same user. The
 cancel message can be seen in the newsgroup 'control' or 'control.cancel'.
 .TP
 .B e
 Edit the current article. Only available when in a mailgroup.
-.TP
-.B ^E
-Reply through mail to the author of the current article with a copy of the
-article with all headers included.
 .TP
 .B f
 Post a followup to the current article with a copy of the article included.
@@ -1083,11 +1115,18 @@ Post a followup to the current article with a copy of the article included.
 Post a followup to the current article without including a a copy of the
 article.
 .TP
+.B g
+Goto the start of the article
+.TP
+.B G
+Goto the end of the article
+.TP
 .B h
-Help screen of article page commands.
+Help screen of article pager commands. You can use \fB/\fR and
+\fB?\fR to search on this screen.
 .TP
 .B H
-Toggle the display of help mini menu at the bottom of the screen.
+Toggle the display of the mini help menu at the bottom of the screen.
 .TP
 .B i
 Display the subject of the current article in the last line.
@@ -1096,21 +1135,23 @@ Display the subject of the current article in the last line.
 Toggle inverse video.
 .TP
 .B k
-Mark article as read and advance to next unread article.
+Mark article as read and move on to next unread article.
+Behaves identically to \fBN\fR.
 .TP
 .B K
-Mark rest of thread as read and advance to next unread thread.
+Mark rest of thread as read and move onto the next unread thread.
 .TP
 .B l
-Show the thread that the current article is a part of
+Show the thread menu that the current article is a part of.
 .TP
 .B L
 Look up article by ``Message:-ID:''.
 .TP
 .B m
-Mail current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles
-to someone.
+Mail current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles to someone.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B M
 User configurable options menu (for more information see section
@@ -1123,11 +1164,10 @@ Go to the next article.
 Go to the next unread article.
 .TP
 .B o
-Output current article / thread / auto selected (hot) articles /
+Send current article / thread / auto-selected (hot) articles /
 articles matching pattern / tagged articles to printer.
-.TP
-.B O
-Reload postponed article. See also ``\fB-o\fR'' command-line switch.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B p
 Go to the previous article.
@@ -1136,7 +1176,7 @@ Go to the previous article.
 Go to the previous unread article.
 .TP
 .B q
-Return to previous level.
+Return to the previous level.
 .TP
 .B Q
 Quit \fBtin\fR - don't ask the user to confirm.
@@ -1150,15 +1190,13 @@ Reply through mail to the author of the current article without including
 the original article.
 .TP
 .B s
-Save current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles to file / files / mailbox.
-To save to a mailbox enter '=' or '=mailbox' when asked for filename
-to save to. To save in <newsgroup name>/<filename> format enter '+filename'.
-Environment variables are allowed within a filename
-(i.e., \fI$SOURCES/dir/filename\fP).
+Save current article / thread / auto-selected (hot) articles /
+articles matching pattern / tagged articles.
+See the section MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES for
+more information.
 .TP
 .B S
-Save tagged articles automatically without user prompts
+Save tagged articles automatically without further prompting.
 .TP
 .B t
 Toggle tag status of current article for mailing (`m') / piping (`|')
@@ -1170,24 +1208,13 @@ Return to group selection level.
 .B u
 Goto parent article.
 .TP
-.B v
-Print \fBtin\fR version information.
-.TP
 .B w
-Post an article to current group. If posting fails for some reason, you'll
+Post an article to the current group. If posting fails for some reason, you'll
 get the chance to edit (`e') the article again, postpone (`o') it for later
 processing (see also ``\fB-o\fR''command-line switch) or discard (`q') it.
 .TP
-.B W
-List articles posted by user. The date posted, the newsgroup and the
-subject are listed.
-.TP
-.B ^W
-Post a followup to the current article with a copy of the article with all
-headers included.
-.TP
 .B x
-Repost an already posted article / thread / auto selected (hot)
+Repost an already posted article / thread / auto-selected (hot)
 articles / articles matching pattern / tagged articles to another
 newsgroup(s). Useful for reposting from global to local newsgroups.
 Do not use this to crosspost your own articles.
@@ -1195,53 +1222,12 @@ Do not use this to crosspost your own articles.
 .B z
 Mark article as unread.
 .TP
-.B /
-Forward search the text of this article.
-.TP
-.\".B ?
-.\"Backward search the text of this article.
-.\".TP
-.B !
-Shell escape.
-.TP
-.B |
-Pipe current article / thread / auto selected (hot) articles /
-articles matching pattern / tagged articles into command.
-.TP
-.B <
-Goto the first article in the current thread.
-.TP
-.B >
-Goto the last article in the current thread.
-.TP
-.B *
-Select current thread for later processing.
-.TP
-.B .
-Toggle selection of current article.
-.TP
-.B @
-Reverse article selections.
-.TP
-.B ~
-Undo all selections on current thread.
-.TP
-.B :
-Skip quoted text.
-.TP
-.B -
-Display last article viewed.
-.TP
-.B _
-Toggle word highlighting on/off.
-.TP
-\fB"\fR
-Toggle $\fBTEX2ISO\fR decoding for current article.
-.\"
+.B Z
+Mark the current thread as unread.
+.\"--------------------------------------------------------------------
 .\"
 .SH "GLOBAL OPTIONS MENU AND TINRC CONFIGURABLE VARIABLES"
 .\" FIXME - add missing descriptions
-.\" FIXME - bring into a useful order
 At startup, \fBtin\fR reads in the configuration file. This contains a list
 of variables that can be used to configure the way \fBtin\fR works. If it
 exists, the global configuration file, \fI/usr/lib/news/tinrc\fP is read.
@@ -1254,9 +1240,9 @@ The following variables are user configurable by editing
 GLOBAL OPTIONS MENU which is could be accessed by pressing `M' at all
 levels. It allows the user to customize the behaviour of \fBtin\fR. The
 options are saved to the file \fI$HOME/.tin/tinrc\fP. Use <SPACE> to toggle
-the required option and <CR> to set. Use `/', `?' to search for a specific
-option. The name in braces is the name of the corresponding setting in
-\fI$HOME/.tin/tinrc\fP.
+the required option and <CR> to set. Use `\fB/\fR' and `\fB?\fR' to search
+for a specific option. The name in braces is the name of the corresponding
+setting in \fI$HOME/.tin/tinrc\fP.
 .TP 4
 .B Add posted articles to filter (add_posted_to_filter)
 If ON add posted articles to filter for highlighting follow-ups.
@@ -1277,8 +1263,9 @@ Default is 'D'.
 The character used to show that an article is in a range.
 Default is '#'.
 .TP
-.B Character to show returning arts (art_marked_return)
-The character used to show that an article will return.
+.B Character to show articles that will be marked unread (art_marked_return)
+The character used to show that an article will return as an unread article
+when the group is next entered.
 Default is '-'.
 .TP
 .B Character to show selected articles (art_marked_selected)
@@ -1351,10 +1338,10 @@ Color of background for inverse text
 Color of foreground for inverse text
 .TP
 .B col_markdash
-Color of _underdashed_ words.
+Color of words emphasised like _this_. See also word_h_display_marks
 .TP
 .B col_markstar
-Color of *starred* words
+Color of words emphasised like *this*. See also word_h_display_marks
 .TP
 .B col_minihelp
 Color of mini help menu
@@ -1366,7 +1353,7 @@ Color of actual news header fields
 Standard foreground color
 .TP
 .B col_quote
-Color of quote-lines
+Color of quoted lines
 .TP
 .B col_quote2
 Color of twice quoted lines
@@ -1375,10 +1362,11 @@ Color of twice quoted lines
 Color of >=3 times quoted lines
 .TP
 .B col_response
-Color of response counter
+Color of response counter. This is the text that says 'Response x of y' in
+the article viewer.
 .TP
 .B col_signature
-Color of signature
+Color of signatures
 .TP
 .B col_subject
 Color of article subject
@@ -1387,7 +1375,7 @@ Color of article subject
 Color of text-lines
 .TP
 .B col_title
-Color of Help/Mail-Sign
+Color of title text on all the menu screens
 .TP
 .B Confirm commands before executing (confirm_action)
 Ask for confirmation before executing certain dangerous commands
@@ -1398,13 +1386,15 @@ marked in this manual with '[after confirmation]'.
 If ON you will be asked to confirm that you wish to exit tin when you use
 the 'q' command. Default is ON.
 .\"
-.\" most of the default_* settings are not available the 'M'enu
+.\" most of these default_* settings are not available from the 'M'enu as
+they are intended for internal use only.
 .TP
 .B default_art_search
 .TP
 .B default_author_search
 .TP
 .B default_config_search
+The last article/author/config option that was searched for
 .TP
 .B default_editor_format
 The format string used to create the editor start command with parameters.
@@ -1480,7 +1470,8 @@ or 'sendmail -oem -t < %F' (i.e. sendmail -oem -t < .article).
 .TP
 .B Printer program with options (default_printer)
 The printer program with options that is to be used to print articles.
-Default is \fBlpr\fR(1) for BSD machines and \fBlp\fR(1) for SysV machines.
+The default is \fBlpr\fR(1) for BSD machines and \fBlp\fR(1) for SysV machines.
+Printing from \fBtin\fR may have been disabled by the System Administrator
 .TP
 .B default_range_group
 .TP
@@ -1496,7 +1487,7 @@ Default is \fBlpr\fR(1) for BSD machines and \fBlp\fR(1) for SysV machines.
 .TP
 .B default_save_mode
 .TP
-.B Directory to save arts/threads in (default_savedir)
+.B Directory to save articles/threads in (default_savedir)
 Directory where articles/threads are saved. Default is \fI$HOME/News\fP.
 .TP
 .B default_select_pattern
@@ -1550,18 +1541,31 @@ Maximum length of the names of newsgroups to be displayed so that more of
 the newgroup description can be displayed. Default is 32.
 .TP
 .B info_in_last_line
-If ON, show current group description or articles subject in the last line
-(not in the pager and global menu) - `i' toggles setting.
+If ON, show current group description or article subject in the last line
+(not in the pager and global menu) - `i' toggles setting. This facility is
+useful as the full width of the screen is available to display long subjects.
 .TP
 .B Use inverse video for page headers (inverse_okay)
 If ON use inverse video for page headers at different levels. Default is ON.
 .TP
-.B Keep failed arts in ~/dead.articles (keep_dead_articles)
+.B Keep failed articles in ~/dead.articles (keep_dead_articles)
 If ON keep all failed postings in \fI$HOME/dead.articles\fP besides keeping
 the last failed posting in \fI$HOME/dead.article\fP. Default is ON.
 .TP
-.B Keep posted arts in ~/Mail/posted (keep_posted_articles)
+.B Keep posted articles in ~/Mail/posted (keep_posted_articles)
 If ON keep all postings in \fI$HOME/Mail/posted\fP. Default is ON.
+.TP
+.B Handling of killed articles (kill_level)
+This option controls the processing and display of articles that are killed.
+There are 3 options:
+0 (default) is the 'traditional' behaviour of tin. Only unread articles are
+killed once only by marking them read. Options 1 and 2 will process all
+articles in the group and therefore there is a processing overhead when using
+them.
+Option 1 will thread killed articles as normal but they will be marked with
+a 'K'.
+Option 2 simply does not display killed articles.
+kill_level was first present is tin-1.2 and has been resurrected for 1.4
 .TP
 .B Use 8bit characters in mail headers (mail_8bit_header)
 Allows 8bit characters unencoded in the header of mail message. Default is
@@ -1726,8 +1730,8 @@ whose contents is extracted (AmigaOS version only).
 .in -.5i
 .TP
 .B Print all headers when printing (print_header)
-This allows the complete mail header or only the ``Subject:'' and ``From:''
-fields to be output when printing articles.
+If ON, then the full article header is sent to the printer. Otherwise only
+the ``Subject:'' and ``From:'' fields are output.
 Default is OFF.
 .TP
 .B Process only unread articles (process_only_unread)
@@ -1774,11 +1778,17 @@ Allows articles to be saved to a MMDF style mailbox instead of mbox format.
 Default is OFF unless reading news on SCO Unix which uses MMDF by default.
 .TP
 .B In group menu, show author by (show_author)
-If set 'None' (0) only the ``Subject:'' line will be displayed.
-If set 'Addr' (1) ``Subject:'' line & the address part of the ``From:'' line are displayed.
-If set 'Name' (2) ``Subject:'' line & the authors full name part of the ``From:'' line are displayed.
-If set 'Both' (3) ``Subject:'' line & all of the ``From:'' line are displayed.
-Default is 2, authors full.
+.in +.5i
+.ti -\w'\(em'u
+\(emNone (0) only the ``Subject:'' line will be displayed.
+.ti -\w'\(em'u
+\(emAddr (1) ``Subject:'' line & the address part of the ``From:'' line are displayed.
+.ti -\w'\(em'u
+\(emName (2) ``Subject:'' line & the authors full name part of the ``From:'' line are displayed.
+.ti -\w'\(em'u
+\(emBoth (3) ``Subject:'' line & all of the ``From:'' line are displayed.
+.in -.5i
+Default is 2, authors full name.
 .TP
 .B Show description of each newsgroup (show_description)
 If ON show a short group description text after newsgroup name at
@@ -1798,7 +1808,7 @@ Show number of lines of first unread article in thread listing (ON/OFF).
 If ON show only new/unread articles otherwise show all articles.
 Default is ON.
 .TP
-.B Show only groups with unread arts (show_only_unread_groups)
+.B Show only groups with unread articles (show_only_unread_groups)
 If ON show only subscribed to groups that contain unread articles.
 Default is OFF.
 .TP
@@ -1873,9 +1883,9 @@ unread article immediately instead of first paging through the current
 one. Default is ON.
 .TP
 .B Thread articles by (thread_articles)
-.\" FIXME - this looks ugly
-Thread articles by 0=(nothing) 1=(Subject) 2=(References) 3=(Both)
-Default is 3, thread by references and subject.
+Defines which threading method to use. The choices are:
+0) Don't thread, 1) Thread on Subject only 2) Thread on References only,
+3) Thread on References then Subject (default).
 It's also possible to set the threading type on a per group basis by setting
 the group attribute variable 'thread_arts' to 0 - 3 in the file
 \fI$HOME/.tin/attributes\fP. (See also GROUP ATTRIBUTES)
@@ -1950,8 +1960,10 @@ equivalents. The following group attributes are available:
 \fBscope
 .TP
 .B maildir
+Identical to the tinrc variable default_maildir
 .TP
 .B savedir
+Identical to the tinrc variable default_savedir
 .TP
 .B savefile
 .TP
@@ -1974,20 +1986,31 @@ equivalents. The following group attributes are available:
 .B delete_tmp_files
 .TP
 .B show_only_unread
+Identical to the tinrc variable of the same name
 .TP
 .B thread_arts
+Identical to the tinrc variable thread_articles
 .TP
 .B show_author
+Identical to the tinrc variable of the same name
 .TP
 .B sort_art_type
+Identical to the tinrc variable sort_article_type
 .TP
 .B post_proc_type
+Identical to the tinrc variable post_process_type
 .TP
 .B mailing_list
+Used when a group is a mailing list. All responses to the group will be
+directed to this email address.
 .TP
 .B x_headers
+A list of headers that will be automatically added when posting
 .TP
 .B x_body
+A piece of text that will be added at the start of a message body. If this
+string starts with a / or ~ then it is assumed to be the name of a file
+containing the text to insert.
 .TP
 .B quick_kill_scope
 .TP
@@ -2008,8 +2031,10 @@ equivalents. The following group attributes are available:
 .B x_comment_to
 .TP
 .B news_quote_format
+Identical to the tinrc variable of the same name
 .TP
 .B quote_chars
+Identical to the tinrc variable of the same name
 .TP
 .B ispell
 .PP
@@ -2050,25 +2075,38 @@ x_headers=Subject: test - ignore - no reply
 When there is a subject or an author which you are either very
 interested in, or find completely uninteresting, you can easily
 instruct \fBtin\fR to \fIauto-select\fP or \fIauto-kill\fP articles
-with specific subjects or from specific authors. These instructions
-are stored in a \fIkillfile\fP.
+that match \fIrules\fP that you specify. This can be anything from the name
+of the author to the number of lines in an article.
 .PP
-This menu is accessed by pressing `^K' at the group and page levels. It
-allows the user to kill or select an article that matches the current
-``Subject:'' line, ``From:'' line or a string entered by the user.
+When \fBtin\fR starts up the user's killfile \fI$HOME/.tin/filter\fP is read.
+Each time a newsgroup is entered the rules are applied and articles killed
+or selected when they meet certain criteria.
+.PP
+The degree to which rules are applied depend on the kill_level tinrc setting.
+By default killed articles will only be marked read. Adjust kill_level for
+more agressive processing. Articles that match an auto-selection rule are
+marked with a ``*''.
+.PP
+Filtering rules can be manually entered into \fI$HOME/.tin/filter\fP (but
+don't do this whilst running \fBtin\fR else you will lose your changes)
+or by using an on screen menu within \fBtin\fR.
+.PP
+The filtering capabilities of \fBtin\fR have been significantly enhanced over
+previous versions to include scoring and better pattern matching. It is
+recommended that you read the file \fIfiltering\fP in the tin documentation
+directory.
+.\" FIXME - insert URL
+.\" This file can also be read online at http://www.tin.org/FIXME
+.PP
+.\" FIXME - Next paragraph is out of date
+The on screen filtering menu is accessed by pressing `^K' at the group and
+page levels. It allows the user to kill or select an article that matches
+the current ``Subject:'' line, ``From:'' line or a string entered by the user.
 The user entered string can be applied to the ``Subject:'' or ``From:''
 lines of an article. The kill description can be limited to the current
 newsgroup or it can apply to all newsgroups. Once entered the user can
 abort the command and not save the kill description, edit the kill file
 or save the kill description.
-\fBtin\fR.
-.PP
-On starting \fBtin\fR the user's killfile \fI$HOME/.tin/filter\fP is read
-and on entering a newsgroup any kill or select descriptions are applied.
-.PP
-Articles that match a kill description are marked killed and are not
-displayed. Articles that match an auto-select description are marked
-with a ``*'' when displayed.
 .\"
 .\"
 .SH "POSTING ARTICLES"
@@ -2149,16 +2187,20 @@ space).
 .\"
 .SH "MAILING PIPING PRINTING REPOSTING AND SAVING ARTICLES"
 The command interface to mail (`m'), pipe (`|'), print (`o'),
-repost (`x') and save (`s') articles is the same for ease of use.
+repost (`x') and save (`s' and 'S') articles is the same for ease of use.
 .PP
-The initial command will ask you to select which a)rticle, t)hread,
-h)ot (auto selected) r)egex pattern, t)agged articles you wish to
+Auto-saving with 'S' is a special case and operates only on tagged articles.
+They will processed without any further prompting according to the default
+save paramters defined in tinrc or by any attributes set for the current group.
+.PP
+Otherwise, the initial prompt will ask you to select which a)rticle, t)hread,
+h)ot (auto-selected) r)egex pattern, t)agged articles you wish to
 mail, pipe etc.
 .PP
 Tagged articles must have already been tagged with the `t' command.
 All tagged articles can be untagged by the 'U' untag command.
 .PP
-If regex pattern is selected you are asked to enter a pattern
+If a regex pattern is selected you are asked to enter a pattern
 (i.e., to match all articles subject lines containing 'net News' you enter
 "net News").
 Any articles that match the entered expression will be mailed, piped etc.
@@ -2168,7 +2210,9 @@ To save articles to a mailbox with the name of the current newsgroup
 (i.e., Alt.sources) enter '=' or '=<mailbox name>' when asked for the
 save filename.
 .PP
-To save articles in <newsgroup name>/<filename> format enter '+<filename>'.
+To save in <news.group.name>/<filename> format enter '+<filename>'.
+Environment variables are allowed within a filename (i.e.,
+\fI$SOURCES/dir/filename\fP).
 .PP
 When saving articles you can specify whether the saved files should be
 post processed (i.e., \fBunshar\fR(1) shell archive, \fBuudecode\fR(1)
@@ -2209,8 +2253,13 @@ mark them as read)
 .SH RANGES
 A range is simply a group of items marked using the range ('#') key. Certain
 \fBtin\fR commands will operate on a range if one exists rather than
-just the current item. Currently the only commands that understand ranges
-are 'K', 'z' and 'Z' at the Group level.
+just the current item. 
+A range is an expression of the form <min>-<max>, eg. 10-15 will highlight items
+10 through 15 on the current screen. Other than absolute numeric positions, '.'
+can be used in place of the current cursor position and '$' can be used to mean
+the highest number available.
+Currently the only commands that understand ranges are 'K', 'z' and 'Z' at the
+Group level.
 .PP
 .\"
 .SH SIGNATURES
@@ -2609,20 +2658,23 @@ signature. Same as above, but \fBinews\fR(1) won't include it.
 \fI$HOME/.sigfixed\fP
 fixed part of a randomly generated signature.
 .TP
-\fI/usr/lib/news/active.times\fP
-Contains list of new newsgroups as they are added to the news history file.
-.TP
-\fI/usr/lib/news/newsgroups\fP
-Short description of all newsgroups.
-.TP
-\fI/usr/lib/news/subscriptions\fP
-List of newsgroups to subscribe first time user to.
-.TP
 \fI/usr/lib/news/tinrc\fP
 Global configuration file.
-.TP 2i
+.TP
 \fI/etc/tin/tin.defaults\fP
 Global configuration file.
+.TP
+\fI/var/lib/news/active.times\fP
+Contains list of new newsgroups as they are added to the news history file.
+This file is only present on the news-server.
+.TP
+\fI/var/lib/news/newsgroups\fP
+Short description of all newsgroups.
+This file is only present on the news-server.
+.TP
+\fI/var/lib/news/subscriptions\fP
+List of newsgroups to subscribe first time user to.
+This file is only present on the news-server.
 .\"
 .\"
 .SH BUGS
@@ -2650,9 +2702,8 @@ v1.3 PL0 beta has been available from ftp.scn.de:/pub/news/tin/ since April 1995
 v1.3-unoff-beta has been available from
 ftp.akk.uni-karlsruhe.de:/pub/news/clients/tin-unoff/ since March 1996.
 .br
-v1.4 has been available from
-ftp.tin.org:/pub/news/clients/tin/v1.4 since
-.\" FIXME - insert date
+v1.4 has been available from ftp.tin.org:/pub/news/clients/tin/v1.4 since
+November 13th 1999.
 .\"
 .\"
 .SH CREDITS
@@ -2735,37 +2786,37 @@ Dave Hill, Tom Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy
 Hsieh, Shih-Kun Huang, Steve Hunt, Jeff Hurwitt, Jeon Hyoung-Jo, Pieter
 Immelman, Jarkko Isokungas, Patrick St. Jean, Hal Jespersen, Park Sang Jin,
 Robbin Johnson, Jarkko Jormanainen, Nelson Kading, Geoffrey Keating, Karsten
-Keil, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz Kloczko, Dwarven
-Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin Kraemer, Thomas
-Kroener, Florian Kuehnert, Kris Kugel, Manoj Kumar, Dawid Kuroczko, Yuri
-Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre, Stanislav
-Latishko, Hannu Laurila, Vincent Lefevre, Alexander Lehmann, Marty Leisner,
-Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua Choon Leong, Chris
-Lewis, Andreas Ley, David-Michael Lincke, Otto Lind, Richard Lloyd, Florian
-Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp, David MacKenzie, Hugh
-Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi Marukawa, William
-McBrine, Owen Medd, Philipp Mergenthaler, Arkadiusz Miskiewicz, Soren
-Moller, Bruce Momjian, Sergio Morales, Michael Morrell, Klaus Mueller, Mike
-Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten Neumann, Dirk Nimmich,
-James Nugen, David E. O'Brien, Michael O'Reilly, Oleg Ohotnikov, Ronald Orr,
-Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim Patterson, Sven
-Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins, Eric Peterson, Tim
-Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger, GianPiero
-Puccioni, Thomas Quinot, Stefan Rapp, Martin Reising, Kyle Rhorer, Ted
-Richards, Steve Robbins, Ollivier Robert, Branden Robinson, Jim Robinson,
-Erik van Roode, Meelis Roos, Stephen Roseman, Roland Rosenfeld, Peter Van
-Rossem, Clifton Royston, Rich Salz, Gary Sanders, Nickolay Saukh, John
-Sauter, Christopher Sawtell, Holger Schif, Volker Schmidt, John Schmitz,
-Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder, Larry
-Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip Shearer,
-Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve Spearman,
-Helmut Springer, Cliff Stanford, Steve Starck, Jason Steiner, Ralf Stephan,
-Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter Stueken,
-Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten Theis,
-Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael Traub,
-Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary Whitney,
-Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y., Nickolai
-Zeldovich, Zbigniew Zych
+Keil, Charles S. Kerr, Fritz Kleeman, Andreas Kies, Janne Kiviluoto, Tomasz
+Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig Koenigsson, Martin
+Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel, Manoj Kumar, Dawid
+Kuroczko, Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain
+Lasserre, Stanislav Latishko, Hannu Laurila, Vincent Lefevre, Alexander
+Lehmann, Marty Leisner, Thomas Leitner, Hakan Lennestal, Kevin Lentin, Chua
+Choon Leong, Chris Lewis, Andreas Ley, David-Michael Lincke, Otto Lind,
+Richard Lloyd, Florian Lohoff, Reinhard Luebke, Clifford Luke, Michael Lupp,
+David MacKenzie, Hugh Mahon, Giuseppe De Marco, Dmitri A. Martynoff, Kazushi
+Marukawa, William McBrine, Owen Medd, Philipp Mergenthaler, Arkadiusz
+Miskiewicz, Soren Moller, Bruce Momjian, Sergio Morales, Michael Morrell,
+Klaus Mueller, Mike Muise, Udo Munk, John R. Myers, Daniel Naber, Torsten
+Neumann, Dirk Nimmich, James Nugen, David E. O'Brien, Michael O'Reilly, Oleg
+Ohotnikov, Ronald Orr, Julien Oster, Jeb Palmer, Neil Parker, Tom Parry, Jim
+Patterson, Sven Paulus, Walter Pelissero, Cameron Perkins, Colin Perkins,
+Eric Peterson, Tim Pierce, Bill Poitras, Scott W. Powers, Wolfgang Prediger,
+GianPiero Puccioni, Thomas Quinot, Stefan Rapp, Martin Reising, Kyle Rhorer,
+Ted Richards, Steve Robbins, Ollivier Robert, Branden Robinson, Jim
+Robinson, Erik van Roode, Meelis Roos, Stephen Roseman, Roland Rosenfeld,
+Peter Van Rossem, Clifton Royston, Rich Salz, Gary Sanders, Nickolay Saukh,
+John Sauter, Christopher Sawtell, Holger Schif, Volker Schmidt, John
+Schmitz, Torsten Schneider, Stefan Scholl, Rainer Scholz, Juergen Schroeder,
+Larry Schwimmer, Bart Sears, Karl-Olav Serrander, Doug Sewell, Philip
+Shearer, Jungshik Shin, Sergey Shkonda, Andreas Siegert, Mark Smith, Steve
+Spearman, Helmut Springer, Cliff Stanford, Steve Starck, Jason Steiner, Ralf
+Stephan, Michael Stenns, Helmrich Streitmatter, Hans Werner Strube, Dieter
+Stueken, Ed Sznyter, Dean Takemori, Darrell Tangman, Derek Terveer, Carsten
+Theis, Julian Thompson, David Tiller, Andry Timonin, Mark Tomlin, Michael
+Traub, Adri Verhoef, Paul Vickers, Oliver B. Warzecha, Jason Wessel, Cary
+Whitney, Henrik Wist, Greg Woods, Lloyd Wright, Jens Wuepper, Billy Y.,
+Nickolai Zeldovich, Zbigniew Zych
 .\"
 .\"
 .SH AUTHOR

@@ -15,9 +15,15 @@
  */
 
 
-#include "tin.h"
-#include "tcurses.h"
-#include "tnntp.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef TNNTP_H
+#	include "tnntp.h"
+#endif /* !TNNTP_H */
 
 #ifdef VMS /* M.St. 15.01.98 */
 #	undef VMS
@@ -227,24 +233,24 @@ server_init (
 	 */
 
 	if ((nntp_rd_fp = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
-		perror ("server_init: fdopen #1");
+		perror ("server_init: fdopen #1"); /* FIXME: -> lang.c */
 		return (-errno);
 	}
 
 	if ((sockt_wr = s_dup (sockt_rd)) < 0) {
-		perror ("server_init: dup");
+		perror ("server_init: dup"); /* FIXME: -> lang.c */
 		return (-errno);
 	}
 
 #		ifdef TLI /* Transport Level Interface */
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
-		t_error ("server_init: t_sync");
+		t_error ("server_init: t_sync"); /* FIXME: -> lang.c */
 		nntp_rd_fp = NULL;
 		return (-EPROTO);
 	}
 #		else
 	if ((nntp_wr_fp = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
-		perror ("server_init: fdopen #2");
+		perror ("server_init: fdopen #2"); /* FIXME: -> lang.c */
 		nntp_rd_fp = NULL;
 		return (-errno);
 	}
@@ -306,11 +312,11 @@ get_tcp_socket (
 		strcpy(device, "/dev/tcp");
 
 	if ((s = t_open (device, O_RDWR, (struct t_info*) 0)) < 0){
-		t_error ("t_open: can't t_open /dev/tcp");
+		t_error ("t_open: can't t_open /dev/tcp"); /* FIXME: -> lang.c */
 		return (-EPROTO);
 	}
 	if (t_bind (s, (struct t_bind *) 0, (struct t_bind *) 0) < 0) {
-		t_error ("t_bind");
+		t_error ("t_bind"); /* FIXME: -> lang.c */
 		t_close (s);
 		return (-EPROTO);
 	}
@@ -326,7 +332,7 @@ get_tcp_socket (
 #		endif /* HAVE_INET_ATON */
 	{
 		if ((hp = gethostbyname (machine)) == NULL) {
-			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
+			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine); /* FIXME: -> lang.c */
 			t_close (s);
 			return (-EHOSTUNREACH);
 		}
@@ -338,7 +344,7 @@ get_tcp_socket (
 	 * Let t_alloc() initialize the addr structure of the t_call structure.
 	 */
 	if ((callptr = (struct t_call *) t_alloc (s, T_CALL, T_ADDR)) == NULL){
-		t_error ("t_alloc");
+		t_error ("t_alloc"); /* FIXME: -> lang.c */
 		t_close (s);
 		return (-EPROTO);
 	}
@@ -355,9 +361,9 @@ get_tcp_socket (
 	if (t_connect (s, callptr, (struct t_call *) 0) < 0) {
 		save_errno = t_errno;
 		if (save_errno == TLOOK)
-			fprintf(stderr, "Server unavailable\n");
+			fprintf(stderr, "Server unavailable\n"); /* FIXME: -> lang.c */
 		else
-			t_error ("t_connect");
+			t_error ("t_connect"); /* FIXME: -> lang.c */
 		t_free((char *)callptr, T_CALL);
 		t_close (s);
 		return (-save_errno);
@@ -372,13 +378,13 @@ get_tcp_socket (
 	t_free((char *)callptr, T_CALL);
 
 	if (ioctl (s,  I_POP,  (char *) 0) < 0) {
-		perror ("I_POP(timod)");
+		perror ("I_POP(timod)"); /* FIXME: -> lang.c */
 		t_close (s);
 		return (-EPROTO);
 	}
 
 	if (ioctl (s, I_PUSH, "tirdwr") < 0) {
-		perror ("I_PUSH(tirdwr)");
+		perror ("I_PUSH(tirdwr)"); /* FIXME: -> lang.c */
 		t_close (s);
 		return (-EPROTO);
 	}
@@ -398,7 +404,7 @@ get_tcp_socket (
 
 #			ifdef HAVE_GETSERVBYNAME
 	if ((sp = (struct servent *) getservbyname (service, "tcp")) ==  NULL) {
-		my_fprintf (stderr, "%s/tcp: Unknown service.\n", service);
+		my_fprintf (stderr, "%s/tcp: Unknown service.\n", service); /* FIXME: -> lang.c */
 		return (-EHOSTUNREACH);
 	}
 #			else
@@ -430,7 +436,7 @@ get_tcp_socket (
 	}
 
 	if (hp == NULL) {
-		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
+		my_fprintf (stderr, "\n%s: Unknown host.\n", machine); /* FIXME: -> lang.c */
 		return (-EHOSTUNREACH);
 	}
 
@@ -459,14 +465,14 @@ get_tcp_socket (
 	 */
 	for (cp = hp->h_addr_list; cp && *cp; cp++) {
 		if ((s = socket (hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
-			perror ("socket");
+			perror ("socket"); /* FIXME: -> lang.c */
 			return (-errno);
 		}
 
 		memcpy((char *) &sock_in.sin_addr, *cp, hp->h_length);
 
 		if (x < 0)
-			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
+			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr)); /* FIXME: -> lang.c */
 
 #			if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
 #				define HPSOCKSIZE 0x8000
@@ -488,20 +494,20 @@ get_tcp_socket (
 			break;
 
 		save_errno = errno;									/* Keep for later */
-		my_fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr));
+		my_fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr)); /* FIXME: -> lang.c */
 		perror ("");
 		(void) s_close (s);
 	}
 
 	if (x < 0) {
-		my_fprintf (stderr, "Giving up...\n");
+		my_fprintf (stderr, "Giving up...\n"); /* FIXME: -> lang.c */
 		return (-save_errno);					/* Return the last errno we got */
 	}
 #		else	/* no name server */
 
 #			ifdef EXCELAN
 	if ((s = socket (SOCK_STREAM, (struct sockproto *)NULL, &sock_in, SO_KEEPALIVE)) < 0) {
-		perror ("socket");
+		perror ("socket"); /* FIXME: -> lang.c */
 		return (-errno);
 	}
 
@@ -511,21 +517,21 @@ get_tcp_socket (
 	sock_in.sin_port = htons (IPPORT_NNTP);
 
 	if ((sock_in.sin_addr.s_addr = rhost (&machine)) == -1) {
-		my_fprintf (stderr, "\n%s: Unknown host.\n", machine);
+		my_fprintf (stderr, "\n%s: Unknown host.\n", machine); /* FIXME: -> lang.c */
 		return (-1);
 	}
 
 	/* And connect */
 	if (connect (s, (struct sockaddr *)&sock_in) < 0) {
 		save_errno = errno;
-		perror ("connect");
+		perror ("connect"); /* FIXME: -> lang.c */
 		(void) s_close (s);
 		return (-save_errno);
 	}
 
 #			else /* not EXCELAN */
 	if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
-		perror ("socket");
+		perror ("socket"); /* FIXME: -> lang.c */
 		return (-errno);
 	}
 
@@ -535,7 +541,7 @@ get_tcp_socket (
 
 	if (connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0) {
 		save_errno = errno;
-		perror ("connect");
+		perror ("connect"); /* FIXME: -> lang.c */
 		(void) s_close (s);
 		return (-save_errno);
 	}
@@ -571,20 +577,31 @@ get_tcp6_socket (
 	int s = -1, err = -1;
 	struct addrinfo hints, *res, *res0;
 
-# if 0 /* currently we don't know if we have snprintf */
+#	if 0 /* currently we don't know if we have snprintf */
 	snprintf(mymachine, sizeof(mymachine), "%s", machine);
 	snprintf(myport, sizeof(myport), "%d", port);
-# else
+#	else
 	my_strncpy(mymachine, machine, sizeof(mymachine));
 	sprintf(myport, "%d", port);
-# endif /* 0 */
+#	endif /* 0 */
 
+/* just in case */
+#	ifdef AF_UNSPEC
+#		define ADDRFAM	AF_UNSPEC
+#	else
+#		ifdef PF_UNSPEC
+#			define ADDRFAM	PF_UNSPEC
+#		else
+#			define ADDRFAM	AF_INET
+#		endif /* PF_UNSPEC */
+#	endif /* AF_UNSPEC */
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family   = PF_UNSPEC;
+/*	hints.ai_flags    = AI_CANONNAME; */
+	hints.ai_family   = ADDRFAM;
 	hints.ai_socktype = SOCK_STREAM;
 	err = getaddrinfo(mymachine, myport, &hints, &res0);
-	if (err < 0) {
-		my_fprintf (stderr, "\ngetaddrinfo: %s\n", gai_strerror(err));
+	if (err != 0) {
+		my_fprintf (stderr, "\ngetaddrinfo: %s\n", gai_strerror(err)); /* FIXME: -> lang.c */
 		return (-1);
 	}
 	err = -1;
@@ -599,10 +616,9 @@ get_tcp6_socket (
 		}
 	}
 	if (err < 0) {
-		my_fprintf (stderr, "\nsocket or connect problem\n");
+		my_fprintf (stderr, "\nsocket or connect problem\n"); /* FIXME: -> lang.c */
 		return (-1);
 	}
-
 	return(s);
 }
 #endif /* NNTP_ABLE && INET6 */
@@ -647,7 +663,7 @@ get_dnet_socket (
 			break;
 		default:
 			if ((np = getnodebyname (machine)) == NULL) {
-				my_fprintf (stderr, "%s: Unknown host.\n", machine);
+				my_fprintf (stderr, "%s: Unknown host.\n", machine); /* FIXME: -> lang.c */
 				return (-1);
 			} else {
 				memcpy((char *) sdn.sdn_add.a_addr, np->n_addr, np->n_length);
@@ -662,14 +678,14 @@ get_dnet_socket (
 	memcpy(&sdn.sdn_objname[0], "NNTP", sdn.sdn_objnamel);
 
 	if ((s = socket (AF_DECnet, SOCK_STREAM, 0)) < 0) {
-		nerror ("socket");
+		nerror ("socket"); /* FIXME: -> lang.c */
 		return (-1);
 	}
 
 	/* And then connect */
 
 	if (connect (s, (struct sockaddr *) &sdn, sizeof (sdn)) < 0) {
-		nerror ("connect");
+		nerror ("connect"); /* FIXME: -> lang.c */
 		close (s);
 		return (-1);
 	}
@@ -846,7 +862,7 @@ close_server (
 	if (nntp_wr_fp == NULL || nntp_rd_fp == NULL)
 		return;
 
-	my_fputs("Disconnecting from server...\n", stdout);
+	my_fputs("Disconnecting from server...\n", stdout); /* FIXME: -> lang.c */
 	nntp_command("QUIT", OK_GOODBYE, NULL);
 
 	(void) s_fclose (nntp_wr_fp);

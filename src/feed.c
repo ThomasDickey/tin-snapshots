@@ -12,13 +12,19 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #ifdef DEBUG
-#	include	"tcurses.h"
+#	ifndef TCURSES_H
+#		include	"tcurses.h"
+#	endif /* !TCURSES_H */
 #endif /* DEBUG */
 
-#include	"menukeys.h"
+#ifndef MENUKEYS_H
+#	include	"menukeys.h"
+#endif /* !MENUKEYS_H */
 
 char proc_ch_default;				/* set in change_config_file () */
 
@@ -143,10 +149,8 @@ feed_articles (
 
 		case iKeyFeedPat:
 			sprintf (mesg, txt_feed_pattern, tinrc.default_regex_pattern);
-			if (!(prompt_string_default(mesg, tinrc.default_regex_pattern, txt_no_match, HIST_REGEX_PATTERN))) {
-				clear_message();
+			if (!(prompt_string_default(mesg, tinrc.default_regex_pattern, txt_no_match, HIST_REGEX_PATTERN)))
 				return;
-			}
 			break;
 
 		default:
@@ -156,19 +160,15 @@ feed_articles (
 	switch (function) {
 		case FEED_MAIL:
 			sprintf (mesg, txt_mail_art_to, cCOLS-(strlen(txt_mail_art_to)+30), tinrc.default_mail_address);
-			if (!(prompt_string_default(mesg, tinrc.default_mail_address, txt_no_mail_address, HIST_MAIL_ADDRESS))) {
-				clear_message();
+			if (!(prompt_string_default(mesg, tinrc.default_mail_address, txt_no_mail_address, HIST_MAIL_ADDRESS)))
 				return;
-			}
 			break;
 
 #	ifndef DONT_HAVE_PIPING
 		case FEED_PIPE:
 			sprintf (mesg, txt_pipe_to_command, cCOLS-(strlen(txt_pipe_to_command)+30), tinrc.default_pipe_command);
-			if (!(prompt_string_default (mesg, tinrc.default_pipe_command, txt_no_command, HIST_PIPE_COMMAND))) {
-				clear_message ();
+			if (!(prompt_string_default (mesg, tinrc.default_pipe_command, txt_no_command, HIST_PIPE_COMMAND)))
 				return;
-			}
 
 			got_sig_pipe = FALSE;
 			if ((fp = popen (tinrc.default_pipe_command, "w")) == (FILE *) 0) {
@@ -282,10 +282,8 @@ feed_articles (
 					supersede = FALSE;
 				}
 #	endif /* !FORGERY */
-				if (!(prompt_string_default (mesg, tinrc.default_repost_group, txt_no_group, HIST_REPOST_GROUP))) {
-					clear_message ();
+				if (!(prompt_string_default (mesg, tinrc.default_repost_group, txt_no_group, HIST_REPOST_GROUP)))
 					return;
-				}
 			}
 			break;
 
@@ -295,7 +293,7 @@ feed_articles (
 
 	switch (ch) {
 		case iKeyFeedArt:		/* article */
-			if (level == GROUP_LEVEL || level == THREAD_LEVEL) {
+			if (level != PAGE_LEVEL) {			/* No point if we're already in the pager */
 				if (!does_article_exist (function, &arts[respnum], group_path))
 					break;
 			}
@@ -307,7 +305,7 @@ feed_articles (
 #	ifndef DONT_HAVE_PIPING
 				case FEED_PIPE:
 					if (art_open (&arts[respnum], group_path, FALSE) == 0) {
-						fseek (note_fp, 0L, SEEK_SET);
+						rewind (note_fp);
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
 						copy_fp (note_fp, fp);
@@ -322,10 +320,7 @@ feed_articles (
 #	endif /* !DISABLE_PRINTING */
 
 				case FEED_SAVE:
-					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) == 0) {
-						add_to_save_list (respnum, is_mailbox, TRUE, filename);
-						processed_ok = save_art_to_file (0, FALSE, "");
-					}
+					add_to_save_list (respnum, is_mailbox, TRUE, filename);
 					break;
 
 				case FEED_REPOST:
@@ -339,6 +334,14 @@ feed_articles (
 					break;
 			}
 
+			if (function == FEED_SAVE) {
+				if (level != PAGE_LEVEL) {
+					if (art_open (&arts[respnum], group_path, do_rfc1521_decoding) != 0)
+						break;
+				}
+				processed_ok = save_art_to_file (0, FALSE, "");
+			}
+
 			if (processed_ok)
 				processed++;
 			else
@@ -347,7 +350,7 @@ feed_articles (
 			if (tinrc.mark_saved_read && processed_ok)
 				art_mark_read (group, &arts[respnum]);
 
-			if (level == GROUP_LEVEL || level == THREAD_LEVEL)
+			if (level != PAGE_LEVEL)
 				art_close ();
 
 			break;
@@ -377,7 +380,7 @@ feed_articles (
 							break;
 						if (got_sig_pipe)
 							goto got_sig_pipe_while_piping;
-						fseek (note_fp, 0L, SEEK_SET);
+						rewind (note_fp);
 						copy_fp (note_fp, fp);
 						break;
 #	endif /* !DONT_HAVE_PIPING */
@@ -441,7 +444,7 @@ feed_articles (
 									break;
 								if (got_sig_pipe)
 									goto got_sig_pipe_while_piping;
-								fseek (note_fp, 0L, SEEK_SET);
+								rewind (note_fp);
 								copy_fp (note_fp, fp);
 								break;
 #	endif /* !DONT_HAVE_PIPING */
@@ -518,12 +521,12 @@ feed_articles (
 									break;
 								if (got_sig_pipe)
 									goto got_sig_pipe_while_piping;
-								fseek (note_fp, 0L, SEEK_SET);
+								rewind (note_fp);
 								copy_fp (note_fp, fp);
 								break;
 #	endif /* !DONT_HAVE_PIPING */
 
-#  ifndef DISABLE_PRINTING
+#	ifndef DISABLE_PRINTING
 							case FEED_PRINT:
 								processed_ok = print_file (print_command, j, processed+1);
 								break;
@@ -610,10 +613,14 @@ got_sig_pipe_while_piping:
 
 	if (ret1 || ret2)
 		redraw_screen = TRUE;
-
+	/*
+	 * If we were in the pager, we have to put back the article we were in, and goto the correct page
+	 */
 	if (level == PAGE_LEVEL) {
+#if 0
 		if (art_open (&arts[respnum], group_path, TRUE) != 0)
 			return;			/* This is bad */
+#endif /* 0 */
 		if (tinrc.force_screen_redraw)
 			redraw_screen = TRUE;
 		note_end = orig_note_end;
@@ -695,7 +702,7 @@ print_file (
 	}
 
 	if (tinrc.print_header)
-		fseek(note_fp, 0L, SEEK_SET);
+		rewind (note_fp);
 	else {
 		fprintf (fp, "Newsgroups: %s\n", note_h.newsgroups);
 		if (arts[respnum].from == arts[respnum].name || arts[respnum].name == (char *) 0)
@@ -712,7 +719,7 @@ print_file (
 	fclose(fp);
 	strcat(cmd, " ");
 	strcat(cmd, file);
-	system(cmd);
+	invoke_cmd(cmd);
 	unlink(file);
 #		else
 	pclose (fp);
@@ -738,7 +745,7 @@ does_article_exist (
 	struct t_article *art,
 	char *path)
 {
-	if (function == FEED_SAVE || function == FEED_PIPE) {
+	if (function == FEED_SAVE || function == FEED_AUTOSAVE_TAGGED || function == FEED_PIPE) {
 		if (stat_article (art->artnum, path))
 			return TRUE;
 	} else {

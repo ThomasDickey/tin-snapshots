@@ -12,9 +12,12 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
-#include "extern.h"
-#include "tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #ifdef HAVE_PGP
 
@@ -380,7 +383,7 @@ pgp_check_article (
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 
-		system(cmd);
+		invoke_cmd(cmd);
 		my_printf("\n");
 		Raw(TRUE);
 	}
@@ -397,7 +400,7 @@ pgp_check_article (
 #		endif /* HAVE_PGP_5 */
 #	endif /* HAVE_PGP_2 */
 
-			system (cmd);
+			invoke_cmd(cmd);
 			my_printf ("\n");
 			Raw (TRUE);
 		}

@@ -12,10 +12,18 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"version.h"
-#include	"bugrep.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
+#ifndef BUGREP_H
+#	include  "bugrep.h"
+#endif /* !BUGREP_H */
 
 #if defined(M_AMIGA) && defined(__SASC_650)
 	extern int _WBArg;
@@ -88,12 +96,12 @@ main (
 	 * If called as rtin, read news remotely via NNTP
 	 */
 	if (tin_progname[0] == 'r') {
-#		ifdef NNTP_ABLE
-			read_news_via_nntp = TRUE;
-#		else
-			error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-			giveup();
-#		endif /* NNTP_ABLE */
+#	ifdef NNTP_ABLE
+		read_news_via_nntp = TRUE;
+#	else
+		error_message (txt_option_not_enabled, "-DNNTP_ABLE");
+		giveup();
+#	endif /* NNTP_ABLE */
 	}
 #endif /* NNTP_ONLY */
 
@@ -111,6 +119,11 @@ main (
 	 */
 	read_config_file (global_config_file, TRUE);
 	read_config_file (local_config_file, FALSE);
+
+	/*
+	 * avoid empty regexp
+	 */
+	postinit_regexp();
 
 	/*
 	 * Process envargs & command line options

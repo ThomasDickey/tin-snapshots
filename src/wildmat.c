@@ -36,7 +36,9 @@
 **  on.
 */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #define ABORT	-1
 

@@ -13,8 +13,12 @@
  */
 
 
-#include	"tin.h"
-#include	"tnntp.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TNNTP_H
+#	include "tnntp.h"
+#endif /* !TNNTP_H */
 
 
 /*
@@ -164,11 +168,11 @@ submit_inews (
 			sender = sender_needed(rfc1522_decode(from_name), ptr);
 			switch (sender) {
 				case -2: /* can't build Sender: */
-					 error_message (txt_invalid_sender, ptr);
-					 fclose (fp);
-					 return ret_code;
-					 /* NOTREACHED */
-					 break;
+					error_message (txt_invalid_sender, ptr);
+					fclose (fp);
+					return ret_code;
+					/* NOTREACHED */
+					break;
 
 				case -1: /* illegal From: (can't happen as check is done above allready) */
 					error_message (txt_invalid_from, from_name);
@@ -201,10 +205,10 @@ submit_inews (
 				/* create a Cancel-Lock: */
 			{
 				char lock[1024];
-				char *lptr = (char *) 0;
+				const char *lptr = (const char *) 0;
 
 				lock[0] = '\0';
-				if ((lptr = build_canlock(message_id, get_secret())) != (char *) 0) {
+				if ((lptr = build_canlock(message_id, get_secret())) != (const char *) 0) {
 					STRCPY(lock, lptr);
 					sprintf (line, "Cancel-Lock: %s", lock);
 					put_server (line);
@@ -243,16 +247,16 @@ submit_inews (
 		 * of the put_server(".") above a "." would be resent as the last
 		 * "command".
 		 */
-		 /*
-		  * here we could add a check if the server returns the
-		  * Message-ID in the response string...
-		  * if it does so, compare it with message_id (if set)
-		  * and pass it to update_posted_info_file() and
-		  * quick_filter_select_posted_art() if tinrc.add_posted_to_filter
-		  * is set
-		  * make sure, that quick_filter_select_posted_art() and
-		  * update_posted_info_file() arn't called twice!
-		  */
+		/*
+		 * here we could add a check if the server returns the
+		 * Message-ID in the response string...
+		 * if it does so, compare it with message_id (if set)
+		 * and pass it to update_posted_info_file() and
+		 * quick_filter_select_posted_art() if tinrc.add_posted_to_filter
+		 * is set
+		 * make sure, that quick_filter_select_posted_art() and
+		 * update_posted_info_file() arn't called twice!
+		 */
 		respcode = get_only_respcode (line);
 		leave_loop = TRUE;
 

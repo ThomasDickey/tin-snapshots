@@ -12,11 +12,17 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
 
 #ifdef PROFILE
-#	include	"stpwatch.h"
+#	ifndef STPWATCH_H
+#		include	"stpwatch.h"
+#	endif /* !STPWATCH_H */
 #endif /* PROFILE */
 
 #define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
@@ -1608,6 +1614,8 @@ valid_artnum (
 
 		range /= 2;
 	}
+	/* NOTREACHED */
+	return -1;
 }
 
 

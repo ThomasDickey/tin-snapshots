@@ -12,7 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 static int count_args (char *s);
 

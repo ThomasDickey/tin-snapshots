@@ -12,7 +12,9 @@
  *              right notice, and it must be included in any copy made.
  */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
 
@@ -846,6 +848,7 @@ rfc15211522_encode (
 		if (!strcasecmp(tinrc.mm_charset, "euc-kr"))
 			body_encode = rfc1557_encode;
 
+#if 0
 /*
  * Not only EUC-JP but also other Japanese charsets such as
  * SJIS  might need RFC 1468 encoding. To be confirmed.
@@ -859,6 +862,7 @@ rfc15211522_encode (
  */
 		else if (!strcasecmp(tinrc.mm_charset, "euc-cn"))
 			body_encode = rfc1922_encode;
+#endif /* 0 */
 		else {
 			body_encode = rfc1521_encode;
 			encoding = '8';

@@ -3,7 +3,7 @@
  *  Module    : config.c
  *  Author    : I. Lea
  *  Created   : 1991-04-01
- *  Updated   : 1997-12-15
+ *  Updated   : 1999-11-04
  *  Notes     : Configuration file routines
  *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
@@ -12,13 +12,22 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"version.h"
-#include	"tin.h"
-#include	"tincfg.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
+#ifndef VERSION_H
+#	include	"version.h"
+#endif /* !VERSION_H */
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TINTBL_H
+#	include	"tincfg.h"
+#endif /* !TINTBL_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include	"menukeys.h"
+#endif /* !MENUKEYS_H */
 
-static t_bool match_list (char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 static void expand_rel_abs_pathname (int line, int col, char *str);
 static void show_config_page (void);
 
@@ -28,8 +37,10 @@ static void show_config_page (void);
 
 enum state { IGNORE, CHECK, UPGRADE };
 
+
+/* FIXME: see doc/TODO and comments in the code */
 /*
- * If we don't find a tin-1.3 unoff tag line at the top of the rc file,
+ * If we don't find a matching version tag line at the top of the rc file,
  * give the user some upgrade guidance and silently update variables where
  * necessary. We use a simple state mechanism, starting with CHECK for the
  * 1st line, then switch to UPGRADE or IGNORE accordingly.
@@ -38,7 +49,13 @@ static int
 check_upgrade (
 	char *buf)
 {
-	if (strncmp(buf, "# tin-unoff configuration file V" TINRC_VERSION, 35) == 0)
+	char foo[60];
+	char bar[120]; /* should be enought; snprintf() would be handy */
+
+	my_strncpy(foo, txt_tinrc_header, strlen(foo)-1);
+	sprintf(bar, foo, PRODUCT, TINRC_VERSION);
+
+	if (strncmp(buf, bar, MIN(strlen(bar),strlen(buf))) == 0)
 		return(IGNORE);
 	else {
 		error_message (txt_warn_update, VERSION);
@@ -392,6 +409,9 @@ read_config_file (
 			if (match_boolean (buf, "keep_posted_articles=", &tinrc.keep_posted_articles))
 				break;
 
+			if (match_integer (buf, "kill_level=", &tinrc.kill_level, KILL_NOTHREAD))
+				break;
+
 			break;
 
 		case 'l':
@@ -682,33 +702,6 @@ read_config_file (
 	if (!(tinrc.draw_arrow || tinrc.inverse_okay))
 		tinrc.draw_arrow = TRUE;
 
-#if 0 /*negativ limits are ok now */
-	/* ignore negativ limits */
-	if (tinrc.use_getart_limit && (tinrc.getart_limit < 0))
-		tinrc.use_getart_limit = FALSE;
-#endif /* 0 */
-
-	/*
-	 * set defaults if needed to avoid empty regexp
-	 */
-	if (!strlen(tinrc.strip_re_regex))
-		STRCPY(tinrc.strip_re_regex, DEFAULT_STRIP_RE_REGEX);
-	compile_regex (tinrc.strip_re_regex, &strip_re_regex, PCRE_ANCHORED);
-	if (!strlen(tinrc.strip_was_regex))
-		STRCPY(tinrc.strip_was_regex, DEFAULT_STRIP_WAS_REGEX);
-	compile_regex (tinrc.strip_was_regex, &strip_was_regex, 0);
-#ifdef HAVE_COLOR
-	if (!strlen(tinrc.quote_regex))
-		STRCPY(tinrc.quote_regex, DEFAULT_QUOTE_REGEX);
-	compile_regex (tinrc.quote_regex, &quote_regex, PCRE_CASELESS);
-	if (!strlen(tinrc.quote_regex2))
-		STRCPY(tinrc.quote_regex2, DEFAULT_QUOTE_REGEX2);
-	compile_regex (tinrc.quote_regex2, &quote_regex2, PCRE_CASELESS);
-	if (!strlen(tinrc.quote_regex3))
-		STRCPY(tinrc.quote_regex3, DEFAULT_QUOTE_REGEX3);
-	compile_regex (tinrc.quote_regex3, &quote_regex3, PCRE_CASELESS);
-#endif /* HAVE_COLOR */
-
 #if 0
 	if (INTERACTIVE)
 		wait_message (0, "\n");
@@ -751,7 +744,7 @@ write_config_file (
 	if (!*tinrc.editor_format)
 		strcpy (tinrc.editor_format, TIN_EDITOR_FMT_ON);
 
-	fprintf (fp, txt_tinrc_header, TINRC_VERSION, tin_progname, VERSION, RELEASEDATE, RELEASENAME);
+	fprintf (fp, txt_tinrc_header, PRODUCT, TINRC_VERSION, tin_progname, VERSION, RELEASEDATE, RELEASENAME);
 
 	fprintf (fp, txt_savedir.tinrc);
 	fprintf (fp, "default_savedir=%s\n\n", tinrc.savedir);
@@ -797,6 +790,9 @@ write_config_file (
 
 	fprintf (fp, txt_show_only_unread_groups.tinrc);
 	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (tinrc.show_only_unread_groups));
+
+	fprintf (fp, txt_kill_level.tinrc);
+	fprintf (fp, "kill_level=%d\n\n", tinrc.kill_level);
 
 	fprintf (fp, txt_tab_goto_next_unread.tinrc);
 	fprintf (fp, "tab_goto_next_unread=%s\n\n", print_boolean (tinrc.tab_goto_next_unread));
@@ -1424,7 +1420,7 @@ change_config_file (
 		switch (ch) {
 			case iKeyQuit:
 				write_config_file (local_config_file);
-				/* FALLTHROUGH */
+				nobreak; /* FALLTHROUGH */
 			case iKeyConfigNoSave:
 				clear_note_area ();
 				return ret_code;
@@ -1522,7 +1518,7 @@ change_config_file (
 				change_option = TRUE;
 				break;
 
-			case iKeyConfigRedrawScr:	/* redraw screen */
+			case iKeyRedrawScr:	/* redraw screen */
 				my_retouch ();
 				set_xclick_off ();
 				ClearScreen ();
@@ -1914,7 +1910,9 @@ change_config_file (
 			show_menu_help (txt_select_config_file_option);
 		} /* if (change_option) */
 	} /* forever */
-} /* change_config_file */
+	/* NOTREACHED */
+	return ret_code;
+}
 
 
 /*
@@ -2057,7 +2055,7 @@ match_long (
 
 
 /* If the 'pat' keyword matches, lookup & return an index into the table */
-static t_bool
+t_bool
 match_list (
 	char *line,
 	constext *pat,

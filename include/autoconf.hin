@@ -12,6 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
+#ifndef	TIN_AUTOCONF_H
+#	define TIN_AUTOCONF_H
+#endif /* !TIN_AUTOCONF_H */
 
 #undef	SYSTEM_NAME
 
@@ -154,6 +157,7 @@
  */
 #undef	HAVE_ATOI
 #undef	HAVE_ATOL
+#undef	HAVE_FDOPEN
 #undef	HAVE_FORK
 #undef	HAVE_FTIME
 #undef	HAVE_GAI_STRERROR
@@ -169,6 +173,8 @@
 #undef	HAVE_MEMCPY
 #undef	HAVE_MEMSET
 #undef	HAVE_MKDIR
+#undef	HAVE_MKSTEMP
+#undef	HAVE_MKTEMP
 #undef	HAVE_POLL
 #undef	HAVE_PUTENV
 #undef	HAVE_RESIZETERM
@@ -249,6 +255,7 @@
 #undef	DECL_ISASCII
 #undef	DECL_MALLOC
 #undef	DECL_MEMSET
+#undef  DECL_MKSTEMP
 #undef	DECL_MKTEMP
 #undef	DECL_PCLOSE
 #undef	DECL_PERROR

@@ -12,7 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 /*
  * Concatenate dir+file, ensuring that we don't introduce extra '/', since some

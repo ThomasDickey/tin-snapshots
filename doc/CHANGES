@@ -1,3 +1,66 @@
+-- 1.4 release 19991113 "No Labels" --
+
+684) Wolfgang Becker <uafr@gmx.de>
+     ADD. updated README.WIN
+     FIX. README.WIN
+
+683) Niklas Edmundsson <nikke@ing.umu.se>
+     BUG. in some cases returnval of getaddrinfo() was interpreted wrong
+     FIX. nntplib.c
+
+682) Serge N. Pokhodyaev <snp@ru.ru>
+     ADD. %G in savefile string in group attributes
+     FIX. misc.c
+
+681) Vincent Lefevre <vlefevre@ens-lyon.fr>
+     BUG. used C-style comparsion in shell script
+     FIX. configure[.in]
+
+680) Dawid Kuroczko <dk@ssw.krakow.pl>
+     BUG. with start_editor_offset=off userdefined default_editor_format
+          was ignored
+     FIX. misc.c
+
+679) Charles S. Kerr <charles@skywalker.ecn.ou.edu>
+     ADD. 'T'ag multipart-articles in group level
+     FIX. menukeys.h, group.c
+
+678) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. unread articles in killed threads not displayed in some cases
+     BUG. allocation/expansion of bitmaps for all groups
+     BUG. current bitmap not retained when subscribing to group
+     ADD. kill_level to control processing/display of killed articles
+     ADD. stop excessive reloading of articles when feeding articles
+     ADD. reduce some tinrc vars PATH_LEN -> LEN
+     ADD. reorganisation of help screens. All keys documented.
+     ADD. big manpage update. All keys documented.
+     ADD. 'W' to thread menu
+     ADD. code cleanup
+     FIX. tin.1, extern.h, menukeys.h, tin.h, tinrc.h, active.c, config.c
+          feed.c, filter.c, init.c, lang.c, misc.c, newsrc.c, page.c, post.c
+          refs.c, save.c, select.c, thread.c, tincfg.tbl
+
+677) Dirk Nimmich <nimmich@uni-muenster.de>
+     BUG. base64 encoding didn't convert CRs <-> CRLFs when needed
+     FIX. extern.h, proto.h, lang.c, rfc1521.c
+
+676) Sven Paulus <sven@tin.org>
+     Urs Janssen <urs@tin.org>
+     ADD. minor code cleanup
+     ADD. post_mime_encoding/mail_mime_encoding to tin.defaults
+     ADD. X-Headers on supersede
+     BUG. disabled IPv6 support as it didn't work on AIX and causes
+          unwanted nameserver lookups (/etc/hosts is ignored - bug or
+          feature?) on Linux
+     BUG. several regexp weren't initialized when there was no tinrc at
+          startup
+     BUG. passed wrong argument to update_posted_info_file()
+     BUG. wrong order of initial tinrc.* values
+     FIX. aclocal.m4, configure[.in], Makefile, autoconf.h[in], extern.h
+          proto.h, tin.h, version.h, active.c, auth.c, config.c, inews.c
+          init.c, lang.c, main.c, post.c, screen.c, select.c, rfc1521.c
+          rfc1522.c, Build, canlocktest.c, old/*
+
 -- pre-1.4 release 19990927 "Nine While Nine" --
 
 675) Thomas E. Dickey <dickey@clark.net>
@@ -23,7 +86,7 @@
      ADD. correct inital cursor position when mailing bug reports
      ADD. cleanup tinrc/option menu variable naming
      BUG. mail bug report coredumps on bogus groups in selection menu
-     FIX. extern.h, proto.h, tin.h, filter.c, group.c, inews.c, init.c,
+     FIX. extern.h, proto.h, tin.h, filter.c, group.c, inews.c, init.c
           page.c, post.c, select.c, thread.c
 
 673) Dirk Nimmich <nimmich@uni-muenster.de>
@@ -59,7 +122,7 @@
      Urs Janssen <urs@tin.org>
      ADD. regexp/color for 2nd and >=3rd level quotes
      ADD. minimal code cleanup
-     FIX. tin.1, extern.h, tin.h, tinrc.h, color.c, config.c, header.c,
+     FIX. tin.1, extern.h, tin.h, tinrc.h, color.c, config.c, header.c
           init.c, lang.c, memory.c, tincfg.tbl
 
 670) Arkadiusz Miskiewicz <misiek@misiek.eu.org>
@@ -73,7 +136,7 @@
      ADD. changed algorithm of syntax highlighting
      ADD. userdefined regexp for Re: and was: subject stripping in
           followups
-     FIX. extern.h, proto.h, tin.h, tinrc.h, art.c, color.c, config.c,
+     FIX. extern.h, proto.h, tin.h, tinrc.h, art.c, color.c, config.c
           getline.c, init.c, lang.c, memory.c, misc.c, prompt.c, regex.c
           tincfg.tbl, tin.1
 
@@ -227,7 +290,7 @@
 645) Urs Janssen <urs@tin.org>
      BUG. use_keypad was missing in t_config
      ADD. --enable-broken-listgroup-fix
-     FIX. configure.[in], autoconf.h[in], extern.h, tinrc.h, config.c,
+     FIX. configure.[in], autoconf.h[in], extern.h, tinrc.h, config.c
           curses.c, init.c, open.c
 
 644) Jason Faultless <jason@radar.tele2.co.uk>
@@ -265,7 +328,7 @@
      BUG. fixup_thread() was called after show_thread_page()
      BUG. confirm_to_quit=yes 'disabled' 'Q'
      ADD. fixed '-' to work without toggling show_only_unread
-     FIX. extern.h, menukeys.h, proto.h, tin.h, art.c, config.c, curses.c,
+     FIX. extern.h, menukeys.h, proto.h, tin.h, art.c, config.c, curses.c
           group.c, help.c, misc.c, page.c, select.c, signal.c, thread.c
 
 637) Borislav Deianov <borislav@CS.Cornell.EDU>
@@ -273,8 +336,8 @@
      BUG. reposting ('x') to a 'D'eleted group dumped core
      BUG. the pager asks for metamail every time it's scrolled to the top
      BUG. after metamail quits we are left in the pager with a blank screen
-     FIX. extern.h, active.c, art.c, attrib.c, config.c, filter.c, lang.c,
-          mail.c, main.c, misc.c, newsrc.c, page.c, post.c, save.c,
+     FIX. extern.h, active.c, art.c, attrib.c, config.c, filter.c, lang.c
+          mail.c, main.c, misc.c, newsrc.c, page.c, post.c, save.c
           select.c, tin.1
 
 636) Urs Janssen <urs@tin.org>
@@ -301,8 +364,8 @@
      ADD. minor code cleanup (removed unused vars, made some
           functions static, ...)
      ADD. updated pcre (2.01 -> 2.03)
-     FIX. configure[.in], autoconf.h[in], Makefile, tin.defaults, proto.h,
-          tin.h, feed.c, group.c, misc.c, post.c, rfc1522.c, thread.c,
+     FIX. configure[.in], autoconf.h[in], Makefile, tin.defaults, proto.h
+          tin.h, feed.c, group.c, misc.c, post.c, rfc1522.c, thread.c
           pcre/*
 
 633) Ralf Doeblitz <doeblitz@gmx.de>
@@ -358,7 +421,7 @@
      ADD. j/k to up/down arrows in help.c
      ADD. new option --with-socks, --with-socks5 now can take a pathname
      ADD. minor fixes/updates to some of the configure macros
-     FIX. aclocal.m4, config.guess, config.sub, configure[.in],
+     FIX. aclocal.m4, config.guess, config.sub, configure[.in]
           autoconf.h[in], tin.h, tnntp.h, help.c, select.c, signal.c
 
 624) Jason Faultless <jason@radar.tele2.co.uk>
@@ -410,7 +473,7 @@
      ADD. minor code cleanup
      ADD. updated pcre (2.00 -> 2.01)
      BUG. possible bufferoverflow in show_cont_header() and bAddFilterRule()
-     FIX. active.c, config.c, filter.c, group.c, inews.c, main.c, misc.c,
+     FIX. active.c, config.c, filter.c, group.c, inews.c, main.c, misc.c
           page.c, regexp.c, autoconf.h[in], configure[.in], pcre/*
 
 615) Jason Faultless <jason@radar.tele2.co.uk>
@@ -433,8 +496,8 @@
      REM. unnecessary checks for error returns from my_malloc()
      REM. #ifdef SHOW_PROGESS - it is on by default
      REM. auto_save_msg, it was not used
-     FIX. tin.1, extern.h, menukeys.h, proto.h, tin.h, active.c, art.c,
-          attrib.c, config.c, filter.c, group.c, help.c, init.c, lang.c,
+     FIX. tin.1, extern.h, menukeys.h, proto.h, tin.h, active.c, art.c
+          attrib.c, config.c, filter.c, group.c, help.c, init.c, lang.c
           main.c, misc.c, newsrc.c, page.c, post.c, prompt.c, read.c
           save.c, search.c, select.c, sigfile.c, thread.c
 
@@ -448,7 +511,7 @@
      ADD. -G cmd-line switch/getart_limit,use_getart_limit
           to limit the number of articles/group being fetched from
           the server
-     FIX. extern.h, menukeys.h, art.c, config.c, group.c, help.c,
+     FIX. extern.h, menukeys.h, art.c, config.c, group.c, help.c
           init.c, lang.c, main.c, tincfg.tbl
 
 -- pre-1.4 release 981002 "Phobia" --
@@ -468,7 +531,7 @@
 
 609) Ralf Doeblitz <doeblitz@gmx.de>
      ADD. conversion tables for ibm437/ibm850 <-> iso-8859-1
-     FIX. ibm437_l1.tab, ibm850_l1.tab, l1_ibm437.tab, l1_ibm850.tab,
+     FIX. ibm437_l1.tab, ibm850_l1.tab, l1_ibm437.tab, l1_ibm850.tab
           l1_next.tab, next_l1.tab, misc.c
 
 608) Urs Janssen <urs@tin.org>
@@ -492,7 +555,7 @@
      ADD. configure check for libuu, inet_aton()
      ADD. removed -C cmd-line flag (did the same as -l -n which is default)
      BUG. default signal-handler was missing
-     FIX. configure[.in], autoconf.h[in], tin.h, init.c, mail.c, main.c,
+     FIX. configure[.in], autoconf.h[in], tin.h, init.c, mail.c, main.c
           page.c, open.c, nntplib.c, read.c, save.c, signal.c, strftime.c
 
 604) Kazushi Marukawa <jam@pobox.com>
@@ -549,8 +612,8 @@
      ADD. '-l' cmd-line switch to turn on "LIST ACTIVE" only-mode
      ADD. changed '-R' to read saved news (-S) off-line
      ADD. -s option to -R to point -R to the saved spool
-     FIX. extern.h, active.c, art.c, group.c, inews.c, init.c, mail.c,
-          main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c,
+     FIX. extern.h, active.c, art.c, group.c, inews.c, init.c, mail.c
+          main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c
           read.c, refs.c
 
 595) Jason Faultless <jason@radar.tele2.co.uk>
@@ -560,8 +623,8 @@
           Cured various related I/O & fd problems
      ADD. 'S'ave tagged in pager
      ADD. Various minor cleanups and fixes
-     FIX. extern.h, menukeys.h, proto.h, tin.h, active.c, art.c, auth.c,
-          feed.c, group.c, lang.c, mail.c, main.c, misc.c, newsrc.c,
+     FIX. extern.h, menukeys.h, proto.h, tin.h, active.c, art.c, auth.c
+          feed.c, group.c, lang.c, mail.c, main.c, misc.c, newsrc.c
           nntplib.c, open.c, page.c, post.c, prompt.c, read.c, rfc1521.c
           save.c, search.c, thread.c, xref.c
 
@@ -658,8 +721,8 @@
      ADD. updated pcre (1.07 -> 1.09)
      ADD. -X cmd-line switch
      ADD. minor code cleanup
-     FIX. extern.h, menukeys.h, proto.h, active.c, art.c, auth.c,
-          feed.c, help.c, lang.c, main.c, misc.c, newsrc.c, post.c,
+     FIX. extern.h, menukeys.h, proto.h, active.c, art.c, auth.c
+          feed.c, help.c, lang.c, main.c, misc.c, newsrc.c, post.c
           read.c, save.c, select.c, xref.c, pcre/*
 
 581) Dirk Nimmich <nimmich@uni-muenster.de>
@@ -762,7 +825,7 @@
      ADD. configure options/checks for default editor, mailer and mailpath
      ADD. configure check for curses-color support
      ADD. ifdef in tin.h to reduce the noise when compiling on SunOS 4.x
-     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h,
+     FIX. aclocal.m4, configure[.in], autoconf.h[in], proto.h, tin.h
           screen.c, string.c
 
 563) Florian Kuehnert <sutok@gmx.de>
@@ -848,8 +911,8 @@
           aimed for making binary distributions of TIN)
      BUG. GetConfigValue() was more than useless if compiled without
           INN library
-     FIX. Makefile, tin.defaults, autoconf.hin, extern.h, proto.h,
-          tin.h, makefile.in, art.c, header.c, inews.c, init.c,
+     FIX. Makefile, tin.defaults, autoconf.hin, extern.h, proto.h
+          tin.h, makefile.in, art.c, header.c, inews.c, init.c
           nntplib.c, nntpw32.c
 
 548) Jungshik Shin <jshin@pantheon.yale.edu>
@@ -1141,7 +1204,7 @@
      ADD. minor fix for ncurses vs gpm library configure-test
      ADD. remove configure-macro for regular expressions
      ADD. improved test for 'union wait' in configure-script
-     FIX. aclocal.m4, configure.[in], makefile[.in], pcre/internal.h,
+     FIX. aclocal.m4, configure.[in], makefile[.in], pcre/internal.h
           pcre/pcre.c, pcre/Makefile.in, color.c, misc.c, post.c, tcurses.c
           Makefile[.in]
 
@@ -1183,7 +1246,7 @@
 494) Sven Paulus <sven@tin.org>
      ADD. new config option "add_posted_to_filter"
      BUG. quick_filter_select_posted_art() didn't add group name to scope
-     FIX. extern.h, proto.h, config.c, filter.c, init.c, lang.c, post.c,
+     FIX. extern.h, proto.h, config.c, filter.c, init.c, lang.c, post.c
           tincfg.tbl
 
 493) Jungshik Shin <jshin@pantheon.yale.edu>
@@ -1255,7 +1318,7 @@
      ADD. moved some strings to lang.c
      ADD. moved aliased group 'warning' to select.c
      BUG. didn't notice no post if nnrpd was invoked via mode reader
-     FIX. extern.h, tin.h, init.c, lang.c, misc.c, open.c, post.c,
+     FIX. extern.h, tin.h, init.c, lang.c, misc.c, open.c, post.c
           prompt.c, select.c, active.c
 
 480) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -1449,8 +1512,8 @@
      ADD. modify tcurses.c version of my_printf, etc., to turn off raw mode
           if they're called when the program is in command-line (or batch)
           mode.
-     FIX. Makefile, aclocal.m4, configure[.in], extern.h, proto.h, tin.h,
-          makefile[.in], charset.c, color.c, config.c, curses.c, init.c,
+     FIX. Makefile, aclocal.m4, configure[.in], extern.h, proto.h, tin.h
+          makefile[.in], charset.c, color.c, config.c, curses.c, init.c
           lang.c, makecfg.c, page.c, prompt.c, signal.c, tcurses.c, thread.c
 
 448) Roland Rosenfeld <roland@spinnaker.rhein.de>
@@ -1528,7 +1591,7 @@
      ADD. check if posting is allowed before calling several posting
           routines
      FIX. configure[.in], autoconf.h[in], extern.h, menukeys.h, tin.h
-          config.c, feed.c, lang.c, main.c, newsrc.c, page.c, post.c,
+          config.c, feed.c, lang.c, main.c, newsrc.c, page.c, post.c
           select.c, thread.c
 
 437) Sven Paulus <sven@karlsruhe.org>
@@ -1675,7 +1738,7 @@
 419) Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. misplaced #ifdefs moved
      ADD. minor code cleanup
-     FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c,
+     FIX. actived.c, config.c, curses.c, misc.c, main.c, misc.c
           search.c, thread.c, proto.h, Makefile.in
 
 418) Oliver B. Warzecha <obw@amarok.ping.de>
@@ -3902,7 +3965,7 @@
 038) Branden Robinson <branden@purdue.edu>
      Urs Janssen <urs@akk.uni-karlsruhe.de>
      BUG. little code cleanup
-     FIX. extern.h, proto.h, config.c, init.c, page.c, post.c, rfc1522.c,
+     FIX. extern.h, proto.h, config.c, init.c, page.c, post.c, rfc1522.c
           save.c
 
 --950824BETA  PLMC.960518 --
@@ -4012,7 +4075,7 @@
      ADD. iKeyPageDisplaySubject 'i' to show subject at page_level
      ADD. iKeyThreadDisplaySubject 'i' to show subject at thread_level
      BUG. compiling without -DHAVE_COLOR compiles color.c
-     FIX. menukeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c,
+     FIX. menukeys.h, extern.h, group.c, page.c, thread.c, color.c, help.c
           lang.c
 
 --950824BETA  PLMC.960401 --

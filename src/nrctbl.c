@@ -15,10 +15,18 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"version.h"
-#include	"menukeys.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
 
 /*
  * local prototypes

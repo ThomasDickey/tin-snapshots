@@ -21,6 +21,7 @@
 	pos_first_unread		OPT_ON_OFF
 	show_only_unread_arts		OPT_ON_OFF
 	show_only_unread_groups		OPT_ON_OFF
+	kill_level				txt_kill_level_type	KILL_NOTHREAD+1
 	tab_goto_next_unread		OPT_ON_OFF
 	space_goto_next_unread		OPT_ON_OFF
 	pgdn_goto_next			OPT_ON_OFF
@@ -43,14 +44,6 @@
 	display_mime_header_asis	OPT_ON_OFF
 	display_mime_allheader_asis	OPT_ON_OFF
 	alternative_handling		OPT_ON_OFF
-#ifdef HAVE_COLOR
-	quote_regex			OPT_STRING
-	quote_regex2			OPT_STRING
-	quote_regex3			OPT_STRING
-#endif
-	strip_re_regex			OPT_STRING
-	strip_was_regex			OPT_STRING
-
 #ifdef	HAVE_METAMAIL
 	use_metamail			OPT_ON_OFF
 	ask_for_metamail		OPT_ON_OFF
@@ -136,6 +129,14 @@
 #endif
 
 ; expert options
+#ifdef HAVE_COLOR
+	quote_regex			OPT_STRING
+	quote_regex2			OPT_STRING
+	quote_regex3			OPT_STRING
+#endif
+	strip_re_regex			OPT_STRING
+	strip_was_regex			OPT_STRING
+
 	wildcard			txt_wildcard_type	2
 	force_screen_redraw		OPT_ON_OFF
 	start_editor_offset		OPT_ON_OFF
@@ -147,9 +148,7 @@
 	use_mailreader_i		OPT_ON_OFF
 	unlink_article			OPT_ON_OFF
 	keep_posted_articles		OPT_ON_OFF
-#ifdef	M_UNIX
 	keep_dead_articles		OPT_ON_OFF
-#endif
 	strip_newsrc			OPT_ON_OFF
 	strip_bogus			txt_strip_bogus_type BOGUS_ASK+1
 	reread_active_file_secs		OPT_NUM

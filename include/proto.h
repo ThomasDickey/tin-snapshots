@@ -61,6 +61,7 @@ extern int option_row (int option);
 extern t_bool match_boolean (char *line, const char *pat, t_bool *dst);
 extern t_bool match_integer (char *line, const char *pat, int *dst, int maxlen);
 extern t_bool match_long (char *line, const char *pat, long *dst);
+extern t_bool match_list (char *line, constext *pat, constext *const *table, size_t tablelen, int *dst);
 extern t_bool match_string (char *line, const char *pat, char *dst, size_t dstlen);
 extern t_bool read_config_file (char *file, t_bool global_file);
 extern void quote_dash_to_space (char *str);
@@ -178,6 +179,7 @@ extern void get_user_info (char *user_name, char *full_name);
 /* init.c */
 extern t_bool (*wildcard_func)(const char *str, char *patt, t_bool icase);		/* Wildcard matching function */
 extern void init_selfinfo (void);
+extern void postinit_regexp (void);
 #ifdef HAVE_COLOR
 	extern void postinit_colors (void);
 #endif /* HAVE_COLOR */
@@ -422,8 +424,8 @@ extern void checknadd_headers (char *infile);
 	extern void quick_post_article (t_bool postponed_only);
 #endif /* !INDEX_DAEMON */
 #if defined(USE_CANLOCK) && !defined(INDEX_DAEMON)
-	extern char *build_cankey(const char *messageid, const char *secret);
-	extern char *build_canlock(const char *messageid, const char *secret);
+	extern const char *build_cankey(const char *messageid, const char *secret);
+	extern const char *build_canlock(const char *messageid, const char *secret);
 	extern char *get_secret(void);
 #endif /* USE_CANLOCK && !INDEX_DAEMON */
 
@@ -464,11 +466,13 @@ extern t_bool compile_regex (char *regex, struct regex_cache *cache, int options
 extern t_bool match_regex (const char *string, char *pattern, t_bool icase);
 
 /* rfc1521.c */
-extern FILE *rfc1521_decode (FILE *file);
-extern void rfc1468_encode (char *line, FILE *f, int e);
+extern FILE *rfc1521_decode (FILE *infile);
 extern void rfc1521_encode (char *line, FILE *f, int e);
 extern void rfc1557_encode (char *line, FILE *f, int e);
+#if 0
+extern void rfc1468_encode (char *line, FILE *f, int e);
 extern void rfc1922_encode (char *line, FILE *f, int e);
+#endif /* 0 */
 
 /* rfc1522.c */
 extern char *rfc1522_decode (const char *s);
@@ -517,7 +521,6 @@ extern t_bool search_article (int forward);
 
 /* select.c */
 extern int add_my_group (const char *group, t_bool add);
-extern int choose_new_group (void);
 extern int skip_newgroups (void);
 extern t_bool bSetRange (int iLevel, int iNumMin, int iNumMax, int iNumCur);
 extern void draw_group_arrow (void);

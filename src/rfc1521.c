@@ -12,13 +12,16 @@
  *              right notice, and it must be included in any copy made.
  */
 
-#include "tin.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
 
 /*
  * local prototypes
  */
 static int boundary_cmp (char *line, char *boundary);
 static unsigned char bin2hex (unsigned int x);
+
 
 static unsigned char
 bin2hex (
@@ -70,7 +73,6 @@ boundary_cmp (
 		return 0;
 }
 
-
 /*
  * TODO: this function is also called before piping and saving
  * articles, so these get saved with incorrect MIME headers.
@@ -78,9 +80,9 @@ boundary_cmp (
  */
 FILE *
 rfc1521_decode (
-	FILE * file)
+	FILE * infile)
 {
-	FILE *f;
+	FILE *outfile;
 	char *line;
 	char buf[HEADER_LEN];
 	char buf2[HEADER_LEN];
@@ -91,26 +93,27 @@ rfc1521_decode (
 	char encoding = '\0';
 	const char *charset;
 	long hdr_pos;
+	t_bool last_char_was_cr = FALSE;
 
-	if (!file)
-		return file;
+	if (!infile)
+		return infile;
 
-	f = tmpfile();
+	outfile = tmpfile ();
 
-	if (!f)
-		return file;
+	if (!outfile)
+		return infile;
 
 	content_type[0] = '\0';
 	content_charset[0] = '\0';
 	content_transfer_encoding[0] = '\0';
 
 	/* pass article header unchanged */
-	while ((line = tin_fgets (file, TRUE)) != (char *) 0) {
+	while ((line = tin_fgets (infile, TRUE)) != (char *) 0) {
 #ifdef LOCAL_CHARSET
 		buffer_to_local(line);
 #endif /* LOCAL_CHARSET */
-		fputs(line, f);
-		fputs("\n", f);
+		fputs(line, outfile);
+		fputs("\n", outfile);
 
 		if (!strncasecmp(line, "Content-Type: ", 14)) {
 			STRCPY(content_type, line + 14);
@@ -134,16 +137,16 @@ rfc1521_decode (
 			  strcasecmp(content_transfer_encoding, "7bit") == 0)) {
 
 			/* first copy the header without the two lines */
-			rewind(file);
-			rewind(f);
+			rewind (infile);
+			rewind (outfile);
 
-			while ((line = tin_fgets(file, TRUE)) != (char *) 0) {
+			while ((line = tin_fgets(infile, TRUE)) != (char *) 0) {
 				if (strncasecmp(line, "Content-Type: ", 14) != 0 && strncasecmp(line, "Content-Transfer-Encoding: ", 27) != 0) {
 					/* don't copy the empty line, since we add header lines later */
 					if (*line == '\0')
 						break;
-					fputs(line, f);
-					fputs("\n", f);
+					fputs (line, outfile);
+					fputs ("\n", outfile);
 				}
 			}
 
@@ -152,41 +155,39 @@ rfc1521_decode (
 			 */
 			strcpynl(boundary, strcasestr(content_type, "boundary=") + 9);
 
-			/* FIXME -> lang.c */
-			fputs("X-Conversion-Note: multipart/alternative contents have been removed.\n", f);
-			fputs("\tTo get the whole article, turn tinrc.alternative_handling OFF\n", f);
+			fputs (txt_info_x_conversion_note, outfile);
 
-			hdr_pos = ftell(f);
+			hdr_pos = ftell (outfile);
 
-			while (!feof(file)) {
+			while (!feof (infile)) {
 
-				while (fgets(buf, (int) sizeof (buf), file)) {
+				while (fgets (buf, (int) sizeof (buf), infile)) {
 					if (boundary_cmp(buf, boundary)) {
 						if (boundary_cmp(buf, boundary) == 2)
 							break;
-						fseek(f, hdr_pos, SEEK_SET);
-						while (fgets(buf, (int) sizeof (buf), file)) {
+						fseek (outfile, hdr_pos, SEEK_SET);
+						while (fgets (buf, (int) sizeof (buf), infile)) {
 							if (strncasecmp(buf, "Content-Type: ", 14) == 0 &&
 							strncasecmp(buf, "Content-Type: text/plain", 24) != 0) {
 								/* different type, ignore it */
 								goto break2;
 							}
-							fputs(buf, f);
+							fputs (buf, outfile);
 							if (*buf == '\n')
 								break;
 						}
 
 						/* now copy the part body */
 
-						while (fgets(buf, (int) sizeof (buf), file)) {
+						while (fgets (buf, (int) sizeof (buf), infile)) {
 							if (boundary_cmp(buf, boundary))
 								break;
-							fputs(buf, f);
+							fputs (buf, outfile);
 						}
 						/* we just call ourselves, better than a goto, I think */
-						fclose(file);
-						rewind(f);
-						return rfc1521_decode(f);
+						fclose (infile);
+						rewind (outfile);
+						return rfc1521_decode (outfile);
 					}
 				}
 			 break2:
@@ -204,9 +205,9 @@ rfc1521_decode (
 
 	/* no MIME headers, no decoding */
 	if (!*content_transfer_encoding) {
-		fclose(f);
-		rewind(file);
-		return file;
+		fclose (outfile);
+		rewind (infile);
+		return infile;
 	}
 
 	/*
@@ -214,9 +215,9 @@ rfc1521_decode (
 	 * "text/plain; charset=us-ascii" is implicit.
 	 */
 	if (*content_type && strncasecmp(content_type, "text/plain", 10) != 0) {
-		fclose(f);
-		rewind(file);
-		return file;
+		fclose (outfile);
+		rewind (infile);
+		return infile;
 	}
 #endif /* !LOCAL_CHARSET */
 
@@ -248,20 +249,59 @@ rfc1521_decode (
 
 		if (encoding == 'b')
 			(void) mmdecode(NULL, 'b', 0, NULL, NULL);		/* flush */
-		while (fgets(buf, (int) sizeof (buf), file)) {
+
+		last_char_was_cr = FALSE;
+		while (fgets (buf, (int) sizeof (buf), infile)) {
 			i = mmdecode(buf, encoding, '\0', buf2, charset);
 			if (i >= 0)
 				buf2[i] = '\0';
 			else
 				strcpy(buf2, buf);
+
+			if (encoding == 'b') {
+				/*
+				 * base64 encoded text has CRLF line endings. Strip off
+				 * all CRs if followed by LF but keep it if not followed
+				 * by LF. (CR not followed by LF may be a part of valid
+				 * encoding for some (multibyte) character sets.)
+				 */
+				char *src = buf2;
+				char *dest = buf;
+				char ch;
+
+				if (last_char_was_cr && (buf2[0] != '\n')) {
+					*dest++ = '\r';	/* keep CR from last loop if not followed by LF */
+					last_char_was_cr = FALSE;
+				}
+
+				while ((ch = *src++)) {
+					if ((ch == '\r') && (*src == '\n'))
+						continue;	/* skip CR if followed by LF */
+					if ((ch == '\r') && (*src == '\0')) {
+						/*
+						 * End of buffer is CR; we don't know what follows
+						 * so remember this CR and leave it to next loop to
+						 * keep it out or not
+						 */
+						last_char_was_cr = TRUE;
+						break;
+					}
+					*dest++ = ch;
+				}
+				*dest = '\0';
+				strcpy (buf2, buf);
+			}
+
 #ifdef LOCAL_CHARSET
 			buffer_to_local(buf2);
 #endif /* LOCAL_CHARSET */
-			fputs(buf2, f);
+			fputs (buf2, outfile);
 		}
-		fclose(file);
-		rewind(f);
-		return f;
+		if ((encoding == 'b') && (last_char_was_cr))
+			fputs ("\r", outfile);	/* if one CR was left over, keep it */
+		fclose (infile);
+		rewind (outfile);
+		return outfile;
 	}
 #ifdef LOCAL_CHARSET
 	/*
@@ -269,20 +309,21 @@ rfc1521_decode (
 	 * 8bit articles (and we also convert 7bit articles thay may contain
 	 * accented characters due to incorrectly configured newsreaders
 	 */
-	while (fgets(buf, HEADER_LEN, file)) {
+	while (fgets (buf, HEADER_LEN, infile)) {
 		buffer_to_local(buf);
-		fputs(buf, f);
+		fputs (buf, outfile);
 	}
 
-	fclose(file);
-	rewind(f);
-	return f;
+	fclose (infile);
+	rewind (outfile);
+	return outfile;
 #else
-	fclose(f);
-	rewind(file);
-	return file;
+	fclose (outfile);
+	rewind (infile);
+	return infile;
 #endif /* LOCAL_CHARSET */
 }
+
 
 #define HI4BITS(c) (unsigned char)(*EIGHT_BIT(c) >> 4)
 #define LO4BITS(c) (unsigned char)(*c & 0xf)
@@ -291,6 +332,9 @@ rfc1521_decode (
  * A MIME replacement for fputs. e can be 'b' for base64, 'q' for
  * quoted-printable, or 8 (default) for 8bit. Long lines get broken in
  * encoding modes. If line is the null pointer, flush internal buffers.
+ * NOTE: Use only with text encodings, because line feed characters (0x0A)
+ *       will be encoded as CRLF line endings when using base64! This will
+ *       certainly break any binary format ...
  */
 void
 rfc1521_encode (
@@ -338,9 +382,26 @@ rfc1521_encode (
 			}
 			b = NULL;
 		} else {
-			while (*line) {
+			char *line_crlf = line;
+			int len = strlen(line);
+			char tmpbuf[2050]; /* FIXME: this is sizeof(buffer)+2 from rfc15211522_encode() */
+
+			/*
+			 * base64 requires CRLF line endings in text types
+			 * convert LF to CRLF if not CRLF already (Windows?)
+			 */
+			if ((len > 0) && (line[len-1] == '\n') &&
+					((len == 1) || (line[len-2] != '\r'))) {
+				STRCPY (tmpbuf, line);
+				line_crlf = tmpbuf;
+				line_crlf[len-1] = '\r';
+				line_crlf[len] = '\n';
+				line_crlf[len+1] = '\0';
+			}
+
+			while (*line_crlf) {
 				pattern <<= 8;
-				pattern |= *EIGHT_BIT(line)++;
+				pattern |= *EIGHT_BIT(line_crlf)++;
 				bits += 8;
 				if (bits >= 24) {
 					if (xpos >= 73) {
@@ -420,6 +481,7 @@ rfc1521_encode (
 		fputs(line, f);
 }
 
+
 /*
  * EUC-KR -> ISO 2022-KR conversion for Korean mail exchange
  * NOT to be used for News posting, which is made certain
@@ -433,12 +495,13 @@ rfc1521_encode (
 #define SI '\017'
 #define SO '\016'
 
+
 void
 rfc1557_encode (
 	char *line,
 	FILE * f,
-	int e)
-{										  /* dummy argument : not used */
+	int e)		/* dummy argument : not used */
+{
 	int i = 0;
 	int mode = ASCII;
 	static int iskorean = 0;
@@ -486,24 +549,27 @@ rfc1557_encode (
 	return;
 }
 
-/* Not yet implemented */
+
+#if 0 /* Not yet implemented */
 void
 rfc1468_encode (
 	char *line,
 	FILE * f,
-	int e)
-{										  /* dummy argument : not used */
+	int e)		/* dummy argument: not used */
+{
 	if (line)
 		fputs(line, f);
 }
+
 
 /* Not yet implemented */
 void
 rfc1922_encode (
 	char *line,
 	FILE * f,
-	int e)
-{										  /* dummy argument : not used */
+	int e)		/* dummy argument: not used */
+{
 	if (line)
 		fputs(line, f);
 }
+#endif /* 0 */

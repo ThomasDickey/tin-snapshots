@@ -13,18 +13,26 @@
  */
 
 
-#include	"tin.h"
-#include	"tcurses.h"
-#include	"menukeys.h"
-#include	"version.h"
+#ifndef TIN_H
+#	include "tin.h"
+#endif /* !TIN_H */
+#ifndef TCURSES_H
+#	include "tcurses.h"
+#endif /* !TCURSES_H */
+#ifndef MENUKEYS_H
+#	include  "menukeys.h"
+#endif /* !MENUKEYS_H */
+#ifndef VERSION_H
+#	include  "version.h"
+#endif /* !VERSION_H */
 
 #ifndef INDEX_DAEMON
 #	ifdef USE_CANLOCK
 #		define ADD_CAN_KEY(id) { \
 			char key[1024]; \
-			char *kptr = (char *) 0; \
+			const char *kptr = (const char *) 0; \
 			key[0] = '\0' ; \
-			if ((kptr = build_cankey(id, get_secret())) != (char *) 0) { \
+			if ((kptr = build_cankey(id, get_secret())) != (const char *) 0) { \
 				STRCPY(key, kptr); \
 				msg_add_header ("Cancel-Key", key); \
 			} \
@@ -39,9 +47,9 @@
 #		define ADD_CAN_LOCK(id) { \
 			if (!tinrc.use_builtin_inews) { \
 				char lock[1024]; \
-				char *lptr = (char *) 0; \
+				const char *lptr = (const char *) 0; \
 				lock[0] = '\0' ; \
-				if ((lptr = build_canlock(id, get_secret())) != (char *) 0) { \
+				if ((lptr = build_canlock(id, get_secret())) != (const char *) 0) { \
 					STRCPY(lock, lptr); \
 					msg_add_header ("Cancel-Lock", lock); \
 				} \
@@ -56,9 +64,9 @@
 	/* gee! ugly hack - but works */
 #		define ADD_MSG_ID_HEADER()	{ \
 			char mid[1024]; \
-			char *mptr = (char *) 0; \
+			const char *mptr = (const char *) 0; \
 			mid[0] = '\0'; \
-			if ((mptr = build_messageid()) != (char *) 0) { \
+			if ((mptr = build_messageid()) != (const char *) 0) { \
 				STRCPY(mid, mptr); \
 				msg_add_header ("Message-ID", mid); \
 				ADD_CAN_LOCK(mid); \
@@ -67,6 +75,8 @@
 #	else
 #		define ADD_MSG_ID_HEADER()
 #	endif /* EVIL_INSIDE */
+#else
+#	define ADD_MSG_ID_HEADER()
 #endif /* !INDEX_DAEMON */
 
 #define	MAX_MSG_HEADERS	20
@@ -112,7 +122,7 @@
 
 struct t_posted *posted;
 
-char article[PATH_LEN];			/* Path of the file holding temp. article */
+extern char article[PATH_LEN];			/* Path of the file holding temp. article */
 int start_line_offset = 1;		/* used by invoke_editor for line no. */
 static char found_newsgroups[HEADER_LEN];
 
@@ -930,7 +940,7 @@ check_article_to_be_posted (
 	 * signature it will not be encoded. We might additionally check if there's
 	 * a file named ~/.signature and skip the warning if it is not present.
 	 */
-   if (((tinrc.post_mime_encoding == MIME_ENCODING_QP) ||
+	if (((tinrc.post_mime_encoding == MIME_ENCODING_QP) ||
 			(tinrc.post_mime_encoding == MIME_ENCODING_BASE64)) &&
 			!tinrc.use_builtin_inews) {
 		setup_check_article_screen (&init);
@@ -1087,8 +1097,8 @@ post_article_loop:
 							break;
 					}
 				}
+				nobreak;	/* FALLTHROUGH */
 
-			/* FALLTHROUGH */
 			case iKeyQuit:
 			case iKeyAbort:
 				if (tinrc.unlink_article)
@@ -1125,9 +1135,7 @@ post_article_loop:
 
 				if (ret_code == POSTED_OK) {
 					unlink(backup_article_name(article));
-					/*Raw (FALSE);*/ /* others skip this */
 					wait_message (1, txt_art_posted);
-					/* other versions sleep(1) here */
 					goto post_article_done;
 				} else {
 					if ((ch = prompt_rejected()) == iKeyPostPostpone)
@@ -1141,10 +1149,7 @@ post_article_loop:
 						rename_file (article, dead_article);
 						if (tinrc.keep_dead_articles)
 							append_file (dead_articles, dead_article);
-						/*Raw (FALSE);*/ /* others skip this */
 						wait_message (2, txt_art_rejected, dead_article);
-						/* others used info_msg(), error_msg() here */
-						/* ReadCh (); */
 					}
 				return ret_code;
 				}
@@ -1165,16 +1170,17 @@ post_article_loop:
 post_article_done:
 	if (ret_code == POSTED_OK) {
 		if (art_type == GROUP_TYPE_NEWS) {
-			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group))
+			if (pcCopyArtHeader (HEADER_NEWSGROUPS, article, group)) {
 				update_active_after_posting (group);
-				/* In POST_RESPONSE, this was copied from note_h.newsgroups iff !followup to poster */
+				/* In POST_RESPONSE, this was copied from note_h.newsgroups if !followup to poster */
 				my_strncpy (tinrc.default_post_newsgroups, group, sizeof (tinrc.default_post_newsgroups));
+			}
 		}
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
 			char tag = 'w';
 			/*
- 			 * When crossposting postponed articles we currently do not add
+			 * When crossposting postponed articles we currently do not add
 			 * autoselect since we don't know which group the article was
 			 * actually in
 			 * FIXME: This logic is faithful to the original, but awful
@@ -1206,9 +1212,9 @@ post_article_done:
 			/* Different logic for followup_to: poster */
 			if (type == POST_RESPONSE) {
 				if (*note_h.followup && strcmp (note_h.followup, "poster") != 0)
-					update_posted_info_file (note_h.followup, tag, group);
+					update_posted_info_file (note_h.followup, tag, subj);
 				else
-					update_posted_info_file (note_h.newsgroups, tag, group);
+					update_posted_info_file (note_h.newsgroups, tag, subj);
 			} else
 				/* Repost_article() uses psGrp->name rather than group here, but this is probably better anyway */
 				update_posted_info_file (group, tag, subj);
@@ -1333,7 +1339,6 @@ create_normal_article_headers(
 		return FALSE;
 
 	if ((fp = fopen (article, "w")) == NULL) {
-/*		Raw (FALSE);*/
 		perror_message (txt_cannot_open, article);
 		return FALSE;
 	}
@@ -1969,7 +1974,7 @@ post_response (
 				strcpy (save_followup, note_h.followup);
 				*note_h.followup = '\0';
 				find_reply_to_addr (/*respnum,*/ buf, FALSE);
-				mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);	/* FIXME: arg5 is t_bool */
+				mail_to_someone (respnum, buf, TRUE, FALSE, (t_bool *) &ret_code);	/* FIXME: cast for arg5 */
 				strcpy (note_h.followup, save_followup);
 				return ret_code;
 			}
@@ -2287,7 +2292,7 @@ mail_to_someone (
 	strcpy (mail_to, address);			/* strfmailer() won't take const arg 3 */
 	clear_message ();
 
-	if (!tinrc.use_mailreader_i && mail_to_poster)
+	if (mail_to_poster)
 		sprintf (subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
 	else
 		sprintf (subject, "(fwd) %s\n", note_h.subj);
@@ -2330,7 +2335,10 @@ mail_to_someone (
 	if (tinrc.use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h.subj, TRUE));
+		if (mail_to_poster)
+			sprintf (mailreader_subject, "Re: %s\n", eat_re (note_h.subj, TRUE));
+		else
+			sprintf (mailreader_subject, "(fwd) %s\n", note_h.subj);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), tinrc.mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed, buf);		/* TODO - not needed */
@@ -3209,6 +3217,13 @@ repost_article (
 			msg_add_header ("Distribution", my_distribution);
 
 	}
+
+	if (Superseding) {
+		/* X-Headers got lost on supersede, readd */
+		msg_add_x_headers (msg_headers_file);
+		msg_add_x_headers (psGrp->attribute->x_headers);
+	}
+
 	start_line_offset = msg_write_headers (fp) + 1;
 	msg_free_headers ();
 
@@ -3237,6 +3252,10 @@ repost_article (
 	fclose (fp);
 
 	/* on supersede change default-key */
+	/*
+	 * FIXME: this is only usefull when entering the editor
+	 * after leaving the editor it should be iKeyPostPost
+	 */
 	if (Superseding) {
 		ch_default = iKeyPostEdit;
 		force_command = TRUE;
@@ -3810,9 +3829,9 @@ build_messageid (
 #	endif /* !FORGERY */
 
 	i = gnksa_check_from (buf);
-   if ((GNKSA_OK != i) && (GNKSA_LOCALPART_MISSING > i))
-   	buf[0] = '\0';
-   return buf;
+	if ((GNKSA_OK != i) && (GNKSA_LOCALPART_MISSING > i))
+		buf[0] = '\0';
+	return buf;
 }
 #endif /* EVIL_INSIDE && !INDEX_DAEMON */
 
@@ -3823,15 +3842,22 @@ build_messageid (
  * build_canlock(messageid, secret)
  * returns *(cancel-lock) or NULL
  */
-char *
+const char *
 build_canlock (
 	const char * messageid,
 	const char * secret)
 {
-	if ((messageid == (char *)0) || (secret == (char *)0))
-		return ((char *) 0);
+	if ((messageid == (const char *) 0) || (secret == (const char *) 0))
+		return ((const char *) 0);
 	else
-		return (sha_lock(secret, strlen(secret), messageid, strlen(messageid)));
+		/*
+		 * sha_lock should be
+		 * const char * sha_lock (const char *, size_t, const char *, size_t)
+		 * but unfortunately is
+		 * unsigned char * sha_lock (char *, size_t, char *, size_t)
+		 * -> cast as cast can
+		 */
+		return (const char *) (sha_lock((char *) secret, strlen(secret), (char *) messageid, strlen(messageid)));
 }
 
 
@@ -3839,15 +3865,22 @@ build_canlock (
  * build_cankey(messageid, secret)
  * returns *(cancel-key) or NULL
  */
-char *
+const char *
 build_cankey (
 	const char * messageid,
 	const char * secret)
 {
-	if ((messageid == (char *)0) || (secret == (char *)0))
-		return ((char *) 0);
+	if ((messageid == (const char *) 0) || (secret == (const char *) 0))
+		return ((const char *) 0);
 	else
-		return (sha_key(secret, strlen(secret), messageid, strlen(messageid)));
+		/*
+		 * sha_key should be
+		 * const char * sha_key (const char *, size_t, const char *, size_t)
+		 * but unfortunately is
+		 * unsigned char * sha_key (char *, size_t, char *, size_t)
+		 * -> cast as cast can
+		 */
+		return (const char *) (sha_key((char *) secret, strlen(secret), (char *) messageid, strlen(messageid)));
 }
 
 
