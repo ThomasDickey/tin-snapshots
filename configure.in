@@ -248,7 +248,7 @@ AC_ARG_WITH(dmalloc,
 ## options for miscellaneous definitions
 AC_MSG_CHECKING(for mail-gateway)
 CF_WITH_VALUE(mail-gateway,
-	[  --with-mail-gateway     override \$INEWS_MAIL_DOMAIN],
+	[  --with-mail-gateway     sets \$INEWS_MAIL_GATEWAY],
 	INEWS_MAIL_GATEWAY)
 AC_MSG_RESULT($INEWS_MAIL_GATEWAY)
 
