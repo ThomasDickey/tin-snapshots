@@ -705,6 +705,11 @@ extern char *get_uaf_fullname();
 #define IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 
 /*
+ * Often used macro to point to the group we are currenty in
+ */
+#define CURR_GROUP	(active[my_group[cur_groupnum]])
+
+/*
  *  News/Mail group types
  */
 

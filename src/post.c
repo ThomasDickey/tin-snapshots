@@ -1317,8 +1317,8 @@ ignore_followup_to_poster:
 
 	if (copy_text) {
 		if (arts[respnum].xref) {
-			if (strfquote (active[my_group[cur_groupnum]].name,
-			    respnum, buf, sizeof (buf), xpost_quote_format)) {
+			if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
+														xpost_quote_format)) {
 			    	fprintf (fp, "%s\n", buf);
 			}
 		} else if (strfquote (group, respnum, buf, sizeof (buf),
@@ -1533,8 +1533,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 
 	if (mail_to_poster) {
 		ch = iKeyPostEdit;
-		if (strfquote (active[my_group[cur_groupnum]].name,
-		    respnum, buf, sizeof (buf), mail_quote_format)) {
+		if (strfquote (CURR_GROUP.name, respnum, buf, sizeof (buf),
+														mail_quote_format)) {
 			fprintf (fp, "%s\n", buf);
 			start_line_offset++;
 			{ char *s;
@@ -2622,7 +2622,7 @@ checknadd_headers (infile, lines)
 						fprintf (fp_out, "Lines: %d\n", lines);
 					}
 					if (!no_advertising) {
-						if (active[my_group[cur_groupnum]].type == GROUP_TYPE_MAIL) {
+						if (CURR_GROUP.type == GROUP_TYPE_MAIL) {
 							fprintf (fp_out, "X-Mailer: TIN [%s %s release %s]\n\n",
 								OS, VERSION, RELEASEDATE);
 						} else {

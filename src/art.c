@@ -24,7 +24,11 @@ char *glob_art_group;
 static long last_read_article;
 static int overview_index_filename = FALSE;
 
+/*
+ * Local prototypes
+ */
 static int read_group P_((struct t_group *group, char *group_path, int *pcount));
+static void thread_by_subject P_((void));
 static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
 static int subj_comp P_((t_comptype *p1, t_comptype *p2));
 static int from_comp P_((t_comptype *p1, t_comptype *p2));
@@ -357,6 +361,61 @@ read_group (group, group_path, pcount)
 	return modified;
 }
 
+
+/*
+ * The algorithm is elegant, using the fact that identical Subject lines
+ * are hashed to the same node in table[] (see hashstr.c)
+ *
+ * Mark i as being in j's thread list iff
+ * . The article is _not_ being ignored
+ * . The article is not already threaded
+ * . One of the following is true:
+ *    1) The subject lines are the same
+ *    2) Both are part of the same archive (name's match and arch bit set)
+ *
+ */
+static void
+thread_by_subject()
+{
+	register int i;		/* gcc, at least, will ignore 'register' as */
+	register int j;		/* it can do a better job itself */
+	int *aptr; 
+
+	for (i = 0; i < top; i++) {
+
+		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i))
+			continue;
+
+		/*
+		 * Get the contents of the magic marker in the hashnode
+		 */
+		aptr = (int*)arts[i].subject;
+		aptr -=2;
+
+		j = *aptr;
+
+		if (j != -1 && j < i) {
+
+			/*
+			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
+			 */
+			if (! IGNORE_ART(i) && arts[i].inthread == FALSE &&
+						   ((arts[i].subject == arts[j].subject) ||
+						   ((arts[i].part || arts[i].patch) &&
+							 arts[i].archive == arts[j].archive))) {
+				arts[j].thread = i;
+				arts[i].inthread = TRUE;
+			}
+		} 
+
+		/*
+		 * Update the magic marker with the highest numbered msg in
+		 * arts[] that has been used in this thread so far
+		 */
+		*aptr = i;
+	}
+}
+
 /*
  *  Go through the articles in arts[] and create threads. There are
  *  3 strategies currently defined :
@@ -383,8 +442,7 @@ make_threads (group, rethread)
 	struct t_group *group;
 	int rethread;
 {
-	register int i;		/* gcc, at least, will ignore 'register' as */
-	register int j;		/* it can do a better job itself */
+	int i;
 
 	if (! cmd_line) {
 		if (group->attribute->thread_arts == THREAD_NONE)
@@ -402,10 +460,10 @@ make_threads (group, rethread)
 #endif
 
 	/*
-	 * TODO: This may have some use with ref threading.
+	 * Sort all the articles by date ascending or descending.
 	 * When find_base() is called, the bases are created ordered
-	 * on arts[]. children are threaded on references, and siblings
-	 * should be sorted on date.
+	 * on arts[] and so the base messages under all threading systems
+	 * will be date sorted.
 	 */
 	sort_arts (group->attribute->sort_art_type);
 	
@@ -442,49 +500,15 @@ make_threads (group, rethread)
 		case THREAD_NONE:
 			return;
 
+		case THREAD_SUBJ:
+			thread_by_subject();
+			return;
+
 #ifdef HAVE_REF_THREADING
 		case THREAD_REFS:
-			thread_by_reference(group);
+			thread_by_reference();
 			return;
 #endif
-		case THREAD_SUBJ:
-			/* Fall through */
-			break;
-	}
-
-
-	/* Mark i as being in j's thread list iff
-	 * . The article is _not_ being ignored
-	 * . The article is not already threaded
-	 * . One of the following is true:
-	 *    1) The subject lines are the same
-	 *    2) Both are part of the same archive (name's match and arch bit set)
-	 */
-
-	for (i = 0; i < top; i++) {
-		int *aptr; 
-		if (arts[i].thread != ART_NORMAL || IGNORE_ART(i))
-			continue;
-
-		aptr = (int*)arts[i].subject;
-		aptr -=2;
-		j = *aptr;	
-
-		if (j != -1 && j < i) {
-
-			/*
-			 * Surely the test for IGNORE_ART() was done 12 lines ago ??
-			 */
-			if (! IGNORE_ART(i) && arts[i].inthread == FALSE &&
-						   ((arts[i].subject == arts[j].subject) ||
-						   ((arts[i].part || arts[i].patch) &&
-							 arts[i].archive == arts[j].archive))) {
-				arts[j].thread = i;
-				arts[i].inthread = TRUE;
-			}
-		} 
-
-		*aptr = i; 
 	}
 }
 
@@ -1359,7 +1383,7 @@ subj_comp (p1, p2)
 	/* 
 	 * return result of strcmp (reversed for descending) 
 	 */
-	return (active[my_group[cur_groupnum]].attribute->sort_art_type == SORT_BY_SUBJ_ASCEND 
+	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_SUBJ_ASCEND 
 			? (retval = my_stricmp (s1->subject, s2->subject))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
 			: (retval = my_stricmp (s2->subject, s1->subject))
@@ -1379,7 +1403,7 @@ from_comp (p1, p2)
 	/* 
 	 * return result of strcmp (reversed for descending) 
 	 */
-	return (active[my_group[cur_groupnum]].attribute->sort_art_type == SORT_BY_FROM_ASCEND 
+	return (CURR_GROUP.attribute->sort_art_type == SORT_BY_FROM_ASCEND 
 			? (retval = my_stricmp (s1->from, s2->from))
 				? retval : ((s1->date - s2->date) > 0) ? 1 : -1
 			: (retval = my_stricmp (s2->from, s1->from))
@@ -1405,7 +1429,7 @@ date_comp (p1, p2)
 	struct t_article *s2 = (struct t_article *) p2;
 
 
-	if (active[my_group[cur_groupnum]].attribute->sort_art_type == SORT_BY_DATE_ASCEND) {
+	if (CURR_GROUP.attribute->sort_art_type == SORT_BY_DATE_ASCEND) {
 		/* 
 		 * s1->date less than s2->date 
 		 */

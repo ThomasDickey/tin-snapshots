@@ -465,7 +465,7 @@ open_art_header (art)
 	int items = 0;
 	static char mem[HEADER_LEN];
 
-	if (read_news_via_nntp && active[my_group[cur_groupnum]].type == GROUP_TYPE_NEWS) {
+	if (read_news_via_nntp && CURR_GROUP.type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		/*
 		 *  Don't bother requesting if we have not got there yet.

@@ -1490,7 +1490,7 @@ delete_processed_files (auto_delete)
 	int i;
 
 	if (any_saved_files ()) {
-		if (active[my_group[cur_groupnum]].attribute->delete_tmp_files ||
+		if (CURR_GROUP.attribute->delete_tmp_files ||
 			auto_delete) {
 			delete = TRUE;
 		} else if (prompt_yn (cLINES, txt_delete_processed_files, TRUE) == 1) {
