@@ -27,27 +27,27 @@
 #endif /* NNTP_INEWS && !FORGERY */
 
 #if 0
-#ifdef VMS
-#	ifdef MULTINET
-#		define netwrite	socket_write
-#		include "multinet_root:[multinet.include]netdb.h"
+#	ifdef VMS
+#		ifdef MULTINET
+#			define netwrite	socket_write
+#			include "multinet_root:[multinet.include]netdb.h"
+#		else
+#			define netwrite	write
+#			include <netdb.h>
+#		endif
 #	else
-#		define netwrite	write
-#		include <netdb.h>
-#	endif
-#else
-#	ifdef HAVE_NETDB_H
-#		include	<netdb.h>
-#	endif
-#endif /* VMS */
+#		ifdef HAVE_NETDB_H
+#			include	<netdb.h>
+#		endif
+#	endif /* VMS */
 
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-#endif	/* 0 */
+#	ifdef HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	endif
+#	ifdef HAVE_NETINET_IN_H
+#		include <netinet/in.h>
+#	endif
+#endif /* 0 */
 
 #define	PATHMASTER	"not-for-mail"
 
@@ -229,7 +229,7 @@ submit_news_file (
 	rfc15211522_encode(name, txt_mime_encodings[post_mime_encoding], post_8bit_header, ismail);
 
 #ifdef NNTP_INEWS
-	if (read_news_via_nntp && use_builtin_inews) {
+	if (read_news_via_nntp && !read_saved_news && use_builtin_inews) {
 #ifdef DEBUG
 		if (debug == 2)
 			error_message ("Using BUILTIN inews");

@@ -500,7 +500,9 @@ InitScreen (void)
  */
 #ifndef INDEX_DAEMON
 static void
-ScreenSize (int *num_lines, int *num_columns)
+ScreenSize (
+	int *num_lines,
+	int *num_columns)
 {
 	if (!_lines)
 		_lines = DEFAULT_LINES_ON_TERMINAL;
@@ -597,7 +599,9 @@ ClearScreen (void)
 #ifdef M_UNIX
 
 void
-MoveCursor (int row, int col)
+MoveCursor (
+	int row,
+	int col)
 {
 #ifndef INDEX_DAEMON
 
@@ -614,7 +618,9 @@ MoveCursor (int row, int col)
 #else	/* !M_UNIX */
 
 void
-MoveCursor (int row, int col)
+MoveCursor (
+	int row,
+	int col)
 {
 #ifndef INDEX_DAEMON
 
@@ -876,7 +882,8 @@ ReadCh (void)
 static int new_lines, new_columns;
 
 static int
-AmiReadCh (int getscrsize)
+AmiReadCh (
+	int getscrsize)
 {
 #ifndef INDEX_DAEMON
 
@@ -968,7 +975,9 @@ ReadCh(void)
 }
 
 void
-AmiGetWinSize(int *lines, int *columns)
+AmiGetWinSize(
+	int *lines,
+	int *columns)
 {
 #ifndef INDEX_DAEMON
 	if (_getwinsize) {
@@ -988,8 +997,8 @@ AmiGetWinSize(int *lines, int *columns)
 /*
  *  output a character. From tputs... (Note: this CANNOT be a macro!)
  */
-
-OUTC_FUNCTION(outchar)
+OUTC_FUNCTION(
+	outchar)
 {
 #ifdef OUTC_RETURN
 	return fputc (c, stdout);

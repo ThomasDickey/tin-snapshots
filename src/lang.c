@@ -37,6 +37,7 @@ constext txt_art_parent_killed[] = "Parent article has been killed";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
 constext txt_article_cancelled[] = "Article cancelled by author\n";
 constext txt_article_cannot_open[] = "get_article: can't open %s: ";
+constext txt_article_cannot_reopen[] = "get_article: can't reopen %s: ";
 constext txt_article_reposted[] = "This is a repost of the following article:";
 constext txt_auth_failed[] = "%d Authentication failed";
 constext txt_auth_needed[] = "Server expects authentication.\n";
@@ -53,6 +54,8 @@ constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted resulted in errors/warnings. q)uit, M)enu, e)dit: ";
 constext txt_bad_command[] = "Bad command. Type 'h' for help.";
 constext txt_base64[] = "base64";
+constext txt_batch_update_unavail[] = "%s: Updating of index files not supported";
+constext txt_batch_update_failed[] = "Failed to start background indexing process";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
 constext txt_caching_disabled[] = "Overview caching not supported; Tin is setuid";
 constext txt_cannot_create_uniq_name[] = "Can't create unique tempfile-name";
@@ -371,7 +374,7 @@ constext txt_help_pos_first_unread[] = "Put cursor at first/last unread art in g
 constext txt_help_post_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_post_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_post_proc_type[] = "Post process (ie. unshar) saved article/thread. <SPACE> toggles & <CR> sets.";
-constext txt_help_print_header[] = "By printing print all/part of header. <SPACE> toggles & <CR> sets.";
+constext txt_help_print_header[] = "Print all or just part of header. <SPACE> toggles & <CR> sets.";
 constext txt_help_printer[] = "The printer program with options that is to be used to print articles/threads.";
 constext txt_help_process_only_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_prompt_followupto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -476,7 +479,7 @@ follow-up to  an existing  news article  and the 'r'/'R' commands  to reply via\
 mail to an existing news articles author.  The 'M' command allows the operation\n\
 of tin to be configured via a menu.\n\n\
 For more information read the manual page, README, INSTALL, TODO and FTP files.\n\
-Please send bug-reports/comments to <tin-bugs@tin.org> with the 'R' command.\n";
+Please send bug-reports/comments to %s with the 'R' command.\n";
 #endif /* !INDEX_DAEMON */
 
 constext txt_invalid_from[] = "Invalid  From: %s  line. Read the INSTALL file again.";
@@ -516,10 +519,9 @@ constext txt_newsgroup[] = "Goto newsgroup [%s]> ";
 constext txt_newsgroup_position[] = "Position %s in group list (1,2,..,$) [%d]> ";
 constext txt_newsrc_again[] = "Try and save newsrc file again? (y/n): ";
 constext txt_newsrc_nogroups[] = "Warning: No newsgroups were written to your newsrc file. Save aborted.";
-constext txt_newsrc_saved[] = "newsrc file saved successfully.";
+constext txt_newsrc_saved[] = "newsrc file saved successfully.\n";
 constext txt_next_resp[] = "-- Next response --";
 constext txt_nntp_authorization_failed[] = "NNTP authorization password not found for %s";
-constext txt_nntp_to_fp_cannot_reopen[] = "nntp_to_fp: can't reopen %s: ";
 constext txt_no[] = "No ";
 constext txt_no_arts[] = "*** No articles ***";
 constext txt_no_arts_posted[] = "No articles have been posted";
@@ -888,7 +890,7 @@ constext txt_tinrc_post_process_command[] = "# if set, command to be run after a
 # 0=(none) 1=(unshar) 2=(uudecode) 3=(uudecode & list zoo)\n\
 # 4=(uud & extract zoo) 5=(uud & list zip) 6=(uud & extract zip)\n";
 #endif /* M_AMIGA */
-constext txt_tinrc_print_header[] = "# if ON print all of mail header otherwise Subject: & From: lines\n";
+constext txt_tinrc_print_header[] = "# if ON print all of article header otherwise just the important lines\n";
 constext txt_tinrc_process_only_unread[] = "# If ON only save/print/pipe/mail unread articles (tagged articles excepted)\n";
 constext txt_tinrc_prompt_followupto[] = "# If ON show empty Followup-To header when editing an article\n";
 constext txt_tinrc_quote_chars[] = "# characters used in quoting to followups and replys.\n\
@@ -1119,7 +1121,7 @@ constext txt_reading_input_history_file[] = "Reading input history file...";
 #endif /* !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING) */
 constext txt_reading_groups[] = "Reading %s groups...";
 constext txt_reading_news_active_file[] = "Reading groups from active file... ";
-constext txt_reading_news_newsrc_file[] = "Reading groups from newsrc file only... ";
+constext txt_reading_news_newsrc_file[] = "Reading groups from newsrc file... ";
 constext txt_reading_newsgroups_file[] = "Reading newsgroups file... ";
 constext txt_reading_newsrc[] = "Reading newsrc file...";
 constext txt_reconnect_to_news_server[] = "Connection to news server has timed out. Reconnect? (y/n): ";
@@ -1228,8 +1230,6 @@ Warning: Your signature  is longer than %d lines.  Since signatures usually do\n
          possible.\n";
 constext txt_warn_multiple_sigs[] ="\nWarning: Found %d '-- \\n' lines, this may confuse some people.\n";
 constext txt_warn_wrong_sig_format[] = "\nWarning: Signatures should start with '-- \\n' not with '--\\n'.\n";
-constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\n\
-Tin will try to use XHDR XREF instead (slows down things a bit).\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
 constext txt_xpost_quote[] = "In %G %F wrote:";
@@ -1302,12 +1302,26 @@ constext txt_filter_score_help[] = "Enter the score weight (range 0 < score <= 1
 #ifdef INDEX_DAEMON
 	constext txt_cannot_stat_group[] = "Can't stat group %s";
 	constext txt_cannot_stat_index_file[] = "Can't stat %s index %s\n";
+#else
+	constext txt_art_deleted[] = "Article deleted.";
+	constext txt_art_undeleted[] = "Article undeleted.";
+	constext txt_processing_mail_arts[] = "Processing mail messages marked for deletion.";
+	constext txt_processing_saved_arts[] = "Processing saved articles marked for deletion.";
 #endif /* INDEX_DAEMON */
+
 #ifdef M_AMIGA
 	constext txt_env_var_not_found[] = "Environment variable %s not found. Set and retry...";
 #endif /* M_AMIGA */
+
 #ifdef HAVE_FASCIST_NEWSADMIN
 	constext txt_error_followup_to_several_groups[] = "\nError: Followup-To set to more than one newsgroup!\n";
 	constext txt_error_missing_followup_to[] = "\nError: cross-posting to %d newsgroups and no Followup-To line!\n";
 	constext txt_error_not_valid_newsgroup[] = "\nError: \"%s\" is not a valid newsgroup!\n";
 #endif /* HAVE_FASCIST_NEWSADMIN */
+
+#ifdef XHDR_XREF
+	constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\n\
+Tin will try to use XHDR XREF instead (slows down things a bit).\n";
+#else
+	constext txt_warn_xref_not_supported[] = "Your server does not have Xref: in its XOVER information.\n";
+#endif /* XHDR_XREF */

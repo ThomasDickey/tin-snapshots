@@ -70,6 +70,7 @@ INSTALL	= @INSTALL@
 
 HFILES	= \
 	../include/autoconf.h \
+	$(INCDIR)/bool.h \
 	$(INCDIR)/bugrep.h \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \

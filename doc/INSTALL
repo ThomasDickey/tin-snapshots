@@ -342,10 +342,11 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i486 & Linux 2.0.34 with gcc 2.7.2.2
-	i486 & Linux 2.0.33 with gcc 2.7.2.3 (glibc 2.0.6)
+	i486 & Linux 2.0.33 with gcc 2.7.2.3 (glibc 2.0.7)
 	i586 & Linux 2.0.27 with gcc 2.7.2.1
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
+	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
 
 2)	HP 9000/835 & HP-UX 8.00 with cc
 	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2
@@ -375,6 +376,7 @@ Compiled & installed on the following machines:
 	Sun SPARCserver 1000 & SunOS 5.5 with cc 3.0
 	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
 	Sun 3/60 & SunOS 4.1.1_U1 with gcc 2.7.2.2
+	sparc-sun-solaris2.5.1 with Sun Sparcworks compiler (v 4.2)
 
 7)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
 
@@ -386,14 +388,18 @@ Compiled & installed on the following machines:
 	Amiga 4000 & NetBSD 1.2 with gcc 2.7.2
 	Sun 3/60 & NetBSD 1.2G with gcc 2.7.2.2
 
-10)	i386 & FreeBSD 2.1.0 with 2.7.2
-	i586 & FreeBSD 3.0-SNAP-971208 with 2.7.2.1
+10)	i386 & FreeBSD 2.1.0 with gcc 2.7.2
+	i586 & FreeBSD 2.2.7 with tcc 4.0 (TenDRA-4.1.2)
+	i586 & FreeBSD 3.0-SNAP-971208 with gcc 2.7.2.1
 
 11)	IBM PowerPC RS6000/40p & AIX 4.1.5.0 with gcc 2.8.1
+	IBM RS6000/990 & AIX 4.1.5 with xlc
 	IBM 7012/320H & AIX 3.2 with gcc 2.3.3
 
 12)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
 	with SCO OpenServer Development System (ver 5.0.0a)
+	i386 & SCO System V Rel 3.2v4.2 with SCO Development System and
+	International Supplement (in other words, regular system cc)
 
 13)	i386 & XENIX 2.3.3 with gcc 1.37.1
 

@@ -640,11 +640,6 @@ read_config_file (
 	/* nobody likes to navigate blind */
 	if (!(draw_arrow_mark || inverse_okay))
 		draw_arrow_mark = TRUE;
-#if 0
-	/* with invers video bar strip tailing blanks looks ugly */
-	if (!draw_arrow_mark && strip_blanks)
-		strip_blanks = FALSE;
-#endif
 
 	if (INTERACTIVE2)
 		wait_message (0, "\n");
@@ -656,7 +651,6 @@ read_config_file (
 /*
  *  write config defaults to ~/.tin/tinrc
  */
-
 void
 write_config_file (
 	char	*file)
@@ -684,7 +678,7 @@ write_config_file (
 		wait_message (0, txt_saving);
 
 	if (!*default_editor_format)
-		strcpy (default_editor_format, EDITOR_FORMAT_ON);
+		strcpy (default_editor_format, TIN_EDITOR_FMT_ON);
 
 	fprintf (fp, txt_tinrc_header, TINRC_VERSION, progname, VERSION, RELEASEDATE);
 
@@ -1085,11 +1079,11 @@ write_config_file (
 static int first_option_on_screen;
 static int actual_top_option = 0;
 
+
 static void
 print_any_option (
 	int act_option)
 {
-	int adjust;
 	constext **list;
 
 	my_printf("%3d. %s ", act_option+1, option_table[act_option].option_text);
@@ -1099,8 +1093,7 @@ print_any_option (
 			break;
 		case OPT_LIST:
 			list = option_table[act_option].opt_list;
-			adjust = (strcasecmp(list[0], txt_default) == 0);
-			my_printf("%s", list[*(option_table[act_option].variable) + adjust]);
+			my_printf("%s", list[*(option_table[act_option].variable) + ((strcasecmp(list[0], txt_default) == 0) ? 1 : 0)]);
 			break;
 		case OPT_STRING:
 			my_printf("%-.*s", cCOLS - (int) strlen(option_table[act_option].option_text) - OPT_ARG_COLUMN - 3, OPT_STRING_list[option_table[act_option].var_index]);
@@ -1119,12 +1112,14 @@ print_any_option (
 #endif
 }
 
+
 static void
 print_option (
 	enum option_enum the_option)
 {
 	print_any_option((int)the_option);
 }
+
 
 static t_bool
 OptionOnPage (
@@ -1141,12 +1136,14 @@ OptionOnPage (
 #define OptionInPage(option)	((option) - first_option_on_screen)
 #define OptionIndex(option)	(OptionInPage(option) % option_lines_per_page)
 
+
 int
 option_row (
 	int option)
 {
 	return (INDEX_TOP + OptionIndex(option));
 }
+
 
 static void
 RepaintOption (
@@ -1157,6 +1154,7 @@ RepaintOption (
 		print_any_option (option);
 	}
 }
+
 
 #ifdef USE_CURSES
 static void DoScroll (
@@ -1170,6 +1168,7 @@ static void DoScroll (
 	setscrreg(0, LINES-1);
 }
 #endif
+
 
 static void
 highlight_option (
@@ -1198,6 +1197,7 @@ highlight_option (
 	stow_cursor();
 }
 
+
 static void
 unhighlight_option (
 	int option)
@@ -1206,6 +1206,7 @@ unhighlight_option (
 	my_fputs ("  ", stdout);
 	my_flush();
 }
+
 
 /*
  * Refresh the config page which holds the actual option. If act_option is
@@ -1218,9 +1219,9 @@ unhighlight_option (
  * first_option_on_page == actual_top_option even if there are now more/less
  * options on the screen than before).
  */
-
 void
-refresh_config_page (int act_option)
+refresh_config_page (
+	int act_option)
 {
 	static int last_option = 0;
 	t_bool force_redraw = FALSE;
@@ -1511,14 +1512,15 @@ change_config_file (
 #ifdef HAVE_COLOR
 						/* use ANSI color */
 						case OPT_USE_COLOR_TINRC:
-#ifdef USE_CURSES
+#	ifdef USE_CURSES
 							if (!has_colors())
 								use_color = FALSE;
 							else
-#endif
+#	endif /* USE_CURSES */
 								use_color = use_color_tinrc;
 							break;
-#endif
+#endif /* HAVE_COLOR */
+
 						/*
 						 * the following do not need further action (if I'm right)
 						 *
@@ -1572,6 +1574,7 @@ change_config_file (
 						 * case OPT_WORD_HIGHLIGHT_TINRC:
 #endif
 						 */
+
 						default:
 							break;
 					} /* switch (option) */
@@ -1789,10 +1792,10 @@ expand_rel_abs_pathname (
 	my_flush();
 }
 
+
 /*
  *  show_menu_help
  */
-
 void
 show_menu_help (
 	const char *help_message)
@@ -1817,6 +1820,7 @@ match_boolean (
 	}
 	return FALSE;
 }
+
 
 #ifdef HAVE_COLOR
 static t_bool
@@ -1853,7 +1857,8 @@ match_color (
 	}
 	return FALSE;
 }
-#endif
+#endif /* HAVE_COLOR */
+
 
 /*
  * If pat matches the start of line, convert rest of line to an integer, dst
@@ -1954,7 +1959,7 @@ const char *
 print_boolean (
 	t_bool value)
 {
-	return txt_onoff[value != FALSE];
+	return txt_onoff[value != FALSE ? 1 : 0];
 }
 
 
@@ -1997,10 +2002,10 @@ quote_space_to_dash (
 	return buf;
 }
 
+
 /*
  * display current configuration page
  */
-
 static void
 show_config_page (void)
 {

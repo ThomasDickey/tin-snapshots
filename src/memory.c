@@ -212,7 +212,7 @@ free_art_array (void)
 		arts[i].killed = FALSE;
 		arts[i].tagged = FALSE;
 		arts[i].selected = FALSE;
-		arts[i].date = 0L;
+		arts[i].date = (time_t) 0;
 
 		FreeAndNull(arts[i].part);
 		FreeAndNull(arts[i].patch);
@@ -357,7 +357,7 @@ my_malloc1 (
 
 	if ((p = (char *) malloc (size)) == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 	return (void *) p;
 }
@@ -379,7 +379,7 @@ my_realloc1 (
 
 	if (p == (char *) 0) {
 		error_message (txt_out_of_memory, progname, size, file, line);
-		exit (1);
+		exit (EXIT_FAILURE);
 	}
 	return (void *) p;
 }

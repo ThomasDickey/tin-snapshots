@@ -55,6 +55,7 @@ main (
 	int num_cmd_line_groups;
 	int start_groupnum = 0;
 	int count;
+	t_bool tmp_no_write;
 
 	cmd_line = TRUE;
 	debug = 0;	/* debug OFF */
@@ -88,7 +89,7 @@ main (
 			read_news_via_nntp = TRUE;
 #		else
 			error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-			exit (EXIT_ERROR);
+			exit (EXIT_FAILURE);
 #		endif
 	}
 #endif /* NNTP_ONLY */
@@ -115,6 +116,9 @@ main (
 	 */
 	read_cmd_line_options (argc, argv);
 
+	tmp_no_write = no_write; /* keep no_write */
+	no_write = TRUE; /* don't allow any writing back during startup */
+
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
 #endif
@@ -124,7 +128,7 @@ main (
 	if (INTERACTIVE2) {
 		if (!SetupScreen ()) {
 			error_message (txt_screen_init_failed, progname);
-			exit (EXIT_ERROR);
+			exit (EXIT_FAILURE);
 		}
 		EndInverse ();
 	}
@@ -134,8 +138,9 @@ main (
 	/*
 	 *  Connect to nntp server?
 	 */
-	if (nntp_open () != 0)
-		exit (EXIT_ERROR);
+	if (read_news_via_nntp && !read_saved_news)
+		if (nntp_open () != 0)
+			exit (EXIT_FAILURE);
 
 	/*
 	 * Check if overview indexes contain Xref: lines
@@ -162,7 +167,7 @@ main (
 	 */
 	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
-		exit (EXIT_ERROR);
+		exit (EXIT_FAILURE);
 	}
 #endif /* WIN32 */
 
@@ -186,16 +191,17 @@ main (
 #endif /* DEBUG */
 
 	/*
-	 *  Load the local & global group specific attribute files
+	 * Load the local & global group specific attribute files
 	 */
 #ifndef INDEX_DAEMON
 	read_attributes_file (global_attributes_file, TRUE);
 	read_attributes_file (local_attributes_file, FALSE);
 #endif /* !INDEX_DAEMON */
+
 	/*
-	 *  Read in users filter preferences file
-	 *  This has to be done before quick post
-	 *  because the filters will be updated!!![eb]
+	 * Read in users filter preferences file.
+	 * This has to be done before quick post
+	 * because the filters will be updated.
 	 */
 #ifndef INDEX_DAEMON
 	global_filtered_articles = read_filter_file (global_filter_file, TRUE);
@@ -204,12 +210,13 @@ main (
 	global_filtered_articles = TRUE;
 	local_filtered_articles = TRUE;
 #endif /* !INDEX_DAEMON */
+
 #ifdef DEBUG
 	debug_print_filters ();
 #endif /* DEBUG */
 
 	/*
-	 *  Quick post an article & exit if -w specified
+	 * Quick post an article & exit if -w specified
 	 */
 #ifndef INDEX_DAEMON
 	if (post_article_and_exit || post_postponed_and_exit) {
@@ -219,7 +226,7 @@ main (
 		debug_print_filters ();
 #	endif /* DEBUG */
 		quick_post_article (post_postponed_and_exit);
-		tin_done (EXIT_OK);
+		tin_done (EXIT_SUCCESS);
 	}
 #endif /* !INDEX_DAEMON */
 
@@ -227,7 +234,7 @@ main (
 		wait_message(3, txt_info_postponed, count, IS_PLURAL(count));
 
 	/*
-	 *  Read text descriptions for mail and/or news groups
+	 * Read text descriptions for mail and/or news groups
 	 */
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
@@ -253,6 +260,8 @@ main (
 	 * new newsgroups and command line newsgroups already loaded
 	 */
 	read_newsrc (newsrc, FALSE);
+
+	no_write = tmp_no_write; /* restore old value */
 
 	/*
 	 * We have to show all groups with command line groups
@@ -301,7 +310,7 @@ main (
 	 */
 	if (!InitScreen ()) {
 		error_message (txt_screen_init_failed, progname);
-		exit (EXIT_ERROR);
+		exit (EXIT_FAILURE);
 	}
 #endif /* !WIN32 */
 
@@ -334,9 +343,9 @@ main (
 
 #ifndef INDEX_DAEMON
 #	ifndef M_AMIGA
-#		define OPTIONS "acCdD:f:g:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "acCdD:f:g:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	else
-#		define OPTIONS "BcCdD:f:hHI:m:M:nNop:qQrRs:SuUvVwXzZ"
+#		define OPTIONS "BcCdD:f:hHI:lm:M:nNop:qQrRs:SuUvVwXzZ"
 #	endif /* M_AMIGA */
 #else
 #	define OPTIONS "dD:f:hI:PvV"
@@ -348,7 +357,7 @@ read_cmd_line_options (
 	char *argv[])
 {
 	int ch;
-	int newsrc_set = 0;
+	t_bool newsrc_set = FALSE;
 
 	envargs (&argc, &argv, "TINRC");
 
@@ -361,7 +370,7 @@ read_cmd_line_options (
 				use_color = !use_color;
 #		else
 				error_message (txt_option_not_enabled, "-DHAVE_COLOR");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* HAVE_COLOR */
@@ -396,7 +405,7 @@ read_cmd_line_options (
 				debug_delete_files ();
 #else
 				error_message (txt_option_not_enabled, "-DDEBUG");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #endif /* DEBUG */
@@ -407,7 +416,7 @@ read_cmd_line_options (
 				my_strncpy (news_active_file, optarg, sizeof (news_active_file));
 #else
 				my_strncpy (newsrc, optarg, sizeof (newsrc));
-				newsrc_set = 1;
+				newsrc_set = TRUE;
 #endif /* INDEX_DAEMON */
 				break;
 
@@ -419,7 +428,7 @@ read_cmd_line_options (
 				read_news_via_nntp = TRUE;
 #		else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #		endif /* NNTP_ABLE */
@@ -428,7 +437,7 @@ read_cmd_line_options (
 
 			case 'H':
 				show_intro_page ();
-				exit (EXIT_OK);
+				exit (EXIT_SUCCESS);
 				/* keep lint quiet: */
 				/* FALLTHROUGH */
 #endif /* !INDEX_DAEMON */
@@ -439,13 +448,17 @@ read_cmd_line_options (
 				my_mkdir (index_newsdir, (mode_t)S_IRWXUGO);
 #else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #endif /* !NNTP_ONLY */
 				break;
 
 #ifndef INDEX_DAEMON
+			case 'l':
+				list_active = TRUE;
+				break;
+
 			case 'm':
 				my_strncpy (default_maildir, optarg, sizeof (default_maildir));
 				break;
@@ -456,16 +469,8 @@ read_cmd_line_options (
 				batch_mode = TRUE;
 				break;
 
-			case 'n': /* implies -r */
-#	ifdef NNTP_ABLE
+			case 'n':
 				newsrc_active = TRUE;
-				read_news_via_nntp = TRUE;
-#	else
-				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
-				/* keep lint quiet: */
-				/* NOTREACHED */
-#	endif /* NNTP_ABLE */
 				break;
 
 			case 'N':	/* mail new news to your posts */
@@ -497,9 +502,7 @@ read_cmd_line_options (
 				break;
 
 			case 'Q':
-#	ifdef NNTP_ABLE
 				newsrc_active = TRUE;
-#	endif /* NNTP_ABLE */
 				check_for_new_newsgroups = FALSE;
 				show_description = FALSE;
 				break;
@@ -509,7 +512,7 @@ read_cmd_line_options (
 				read_news_via_nntp = TRUE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* NNTP_ABLE */
@@ -517,6 +520,9 @@ read_cmd_line_options (
 
 			case 'R':	/* read news saved by -S option */
 				read_saved_news = TRUE;
+				list_active = TRUE;
+				newsrc_active = FALSE;
+				check_for_new_newsgroups = FALSE;
 				my_strncpy (news_active_file, save_active_file, sizeof (news_active_file));
 				break;
 
@@ -535,7 +541,7 @@ read_cmd_line_options (
 				show_description = FALSE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* !NNTP_ONLY */
@@ -547,7 +553,7 @@ read_cmd_line_options (
 				batch_mode = TRUE;
 #	else
 				error_message (txt_option_not_enabled, "-DNNTP_ABLE");
-				exit (EXIT_ERROR);
+				exit (EXIT_FAILURE);
 				/* keep lint quiet: */
 				/* NOTREACHED */
 #	endif /* !NNTP_ONLY */
@@ -567,12 +573,15 @@ read_cmd_line_options (
 				error_message ("Version: %s release %s",
 					VERSION, RELEASEDATE);
 #endif /* __DATE__  && __TIME__ */
-				exit (EXIT_OK);
+				exit (EXIT_SUCCESS);
 				/* keep lint quiet: */
 				/* FALLTHROUGH */
 #ifndef INDEX_DAEMON
 			case 'w':	/* post article & exit */
 				post_article_and_exit = TRUE;
+				no_write = TRUE;
+				newsrc_active = TRUE;
+				check_for_new_newsgroups = FALSE;
 				break;
 
 			case 'X':	/* don't save ~/.newsrc on exit */
@@ -593,7 +602,7 @@ read_cmd_line_options (
 			case '?':
 			default:
 				usage (progname);
-				exit (EXIT_ERROR);
+				exit (EXIT_SUCCESS);
 		}
 	}
 	cmdargs = argv;
@@ -624,21 +633,30 @@ read_cmd_line_options (
 		verbose = FALSE;
 	}
 
+	if (read_saved_news && batch_mode) {
+		wait_message(1, "-R only useful without batch mode operations\n");
+		read_saved_news = FALSE;
+	}
+
 	/*
 	 * Sort out conflicts of options....
 	 */
 #ifdef NNTP_ABLE
-	if (newsrc_active && !read_news_via_nntp) {
-		wait_message(1, "Assuming -r in order to use -n\n");
-		read_news_via_nntp = TRUE;	/* We won't get here without NNTP support */
-	}
 	/*
 	 *  If we're reading from an NNTP server and we've been asked not to look
 	 *  for new newsgroups, trust our cached copy of the newsgroups file.
 	 */
 	if (read_news_via_nntp)
-		read_local_newsgroups_file = ! check_for_new_newsgroups;
+		read_local_newsgroups_file = !check_for_new_newsgroups;
 #endif
+	/*
+	 *  If we use neither list_active nor newsrc_active,
+	 *  we use both of them.
+	 */
+	if (!list_active && !newsrc_active) {
+		list_active = TRUE;
+		newsrc_active = TRUE;
+	}
 }
 
 /*
@@ -683,6 +701,10 @@ usage (
 #	ifndef NNTP_ONLY
 		error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
 #	endif /* NNTP_ONLY */
+
+#	ifdef NNTP_ABLE
+		error_message ("  -l       use only LISTGROUP instead of GROUP (-n) command");
+#	endif /* NNTP_ABLE */
 
 	error_message ("  -m dir   mailbox directory [default=%s]", default_maildir);
 	error_message ("  -M user  mail new news to specified user (batch mode)");
@@ -768,7 +790,7 @@ check_for_any_new_news (
 	if (StartAnyUnread) {
 		batch_mode = TRUE;			/* Suppress some unwanted on-screen garbage */
 		if ((i = check_start_save_any_news (START_ANY_NEWS)) == -1)
-			exit (EXIT_OK);			/* No new/unread news so exit */
+			exit (EXIT_SUCCESS);			/* No new/unread news so exit */
 		batch_mode = FALSE;
 	}
 
@@ -792,7 +814,7 @@ save_or_mail_new_news (void)
 		do_update ();
 		catchup = i;			/* set catchup to previous value */
 		check_start_save_any_news (mail_news ? MAIL_ANY_NEWS : SAVE_ANY_NEWS);
-		tin_done (EXIT_OK);
+		tin_done (EXIT_SUCCESS);
 	}
 }
 
@@ -805,9 +827,8 @@ update_index_files (void)
 {
 	if (batch_mode || update_fork) {
 		if (!catchup && (read_news_via_nntp && xover_supported)) {
-			/* FIXME: -> lang.c */
-			error_message ("%s: Updating of index files not supported", progname);
-			tin_done (EXIT_ERROR);
+			error_message (txt_batch_update_unavail, progname);
+			tin_done (EXIT_FAILURE);
 		}
 
 		cCOLS = 132;				/* set because curses has not started */
@@ -817,8 +838,7 @@ update_index_files (void)
 			verbose = FALSE;
 			switch ((int) fork ()) {		/* fork child to update indexes in background */
 				case -1:			/* error forking */
-					/* FIXME: -> lang.c */
-					perror_message ("Failed to start background indexing process");
+					perror_message (txt_batch_update_failed);
 					break;
 				case 0:				/* child process */
 					create_index_lock_file (lock_file);
@@ -856,11 +876,11 @@ update_index_files (void)
 					signal (SIGQUIT, SIG_IGN);	/* stop indexing being interrupted */
 
 					if (nntp_open () != 0)				/* connect server if we are using nntp */
-						tin_done (EXIT_ERROR);
+						tin_done (EXIT_SUCCESS);
 
 					default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
 					do_update ();
-					tin_done (EXIT_OK);
+					tin_done (EXIT_SUCCESS);
 					break;
 				default:						/* parent process*/
 					break;
@@ -872,7 +892,7 @@ update_index_files (void)
 			create_index_lock_file (lock_file);
 			default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
 			do_update ();
-			tin_done (EXIT_OK);
+			tin_done (EXIT_SUCCESS);
 		}
 	}
 }
@@ -884,6 +904,8 @@ update_index_files (void)
 static void
 show_intro_page (void)
 {
+	char buf[4096]; /* should be enoght */
+
 	if (!cmd_line) {
 		ClearScreen ();
 		center_line (0, TRUE, cvers);
@@ -891,7 +913,9 @@ show_intro_page (void)
 		my_printf("\n");
 	}
 
-	my_fputs (txt_intro_page, stdout);
+	sprintf(buf, txt_intro_page, BUG_REPORT_ADDRESS);
+
+	my_fputs (buf, stdout);
 	my_flush();
 
 	if (!cmd_line) {

@@ -19,8 +19,11 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-rzCRX \|]\|]
-.RB [\| \-cuvSUZ \|]
+.RB [\| \-rzCX \|]\|]
+.RB [\|[\| \-R \||\| -S \|]
+.RB -s
+.IR News-dir \|]
+.RB [\| \-cuvUZ \|]
 .RB [\| \-N \||\| -M
 .IR address \|]
 .RB [\| \-o \||\| \-w \|]\|]
@@ -34,8 +37,6 @@ tin, rtin, tind \- A Usenet newsreader
 .IR Mail-dir \|]
 .RB [\| \-p
 .IR port \|]
-.RB [\| \-s
-.IR News-dir \|]
 .RB [\| \-I
 .IR index-dir \|]\ \|[ newsgroup \|[\|,.\|.\|.\|]\|]\|]
 .br
@@ -44,8 +45,11 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\|[\| \-h \||\| \-H \||\| \-V \|]\ \||
 .RB [\|[\|[\| \-a \|]
 .RB [\| \-dnq \||\| -Q \|]
-.RB [\| \-zCRX \|]\|]
-.RB [\| \-cvSZ \|]
+.RB [\| \-zCX \|]\|]
+.RB [\| \-cvZ \|]
+.RB [\|[\| -S \|]
+.RB -s
+.IR News-dir \|]
 .RB [\| \-N \||\| -M
 .IR address \|]
 .RB [\| \-o \||\| \-w \|]\|]
@@ -58,9 +62,7 @@ tin, rtin, tind \- A Usenet newsreader
 .RB [\| \-m
 .IR Mail-dir \|]
 .RB [\| \-p
-.IR port \|]
-.RB [\| \-s
-.IR News-dir \|]\ \|[ newsgroup \|[\|,.\|.\|.\|]\|]\|]
+.IR port \|]\ \|[ newsgroup \|[\|,.\|.\|.\|]\|]\|]
 .br
 .sp
 .B tind
@@ -185,7 +187,7 @@ variable $\fBNNTPSERVER\fR or contained in the file
 Read news saved by the ``\fB-S\fR'' option.
 .TP
 .BI -s " dir"
-Save articles to directory. Default is \fI$HOME/News\fP.
+Save/read articles to/in directory. Default is \fI$HOME/News\fP.
 .TP
 .B -S
 Save unread articles for later reading by the ``\fB-R\fR'' option. For more
@@ -2613,17 +2615,17 @@ Kwee Chuan, Boleslaw Ciesielski, Robert Claeson, Steven Cogswell, Don
 Costello, Bryan Curnutt, Ned Danieley, Lars Dannenberg, Chris Davies, John
 Davis, Borislav Deianov, Thomas E. Dickey, Theo Van Dinter, Ralf Doeblitz,
 Bryan Dongray, Michael Douglass, Craig Durland, Bernd Eckenfels, Phil Edge,
-Kirk Edson, Stefan Elf, Rob Engle, Olle Eriksson, Brent Ermlick, Bernd
-Ernesti, Ragnar Hojland Espinosa, Jason Faultless, Michael Faurot, Werner
-Fleck, John M. Flinchbaugh, Andy Gabor, Torsten Gesang, Callum Gibson, Mike
-Glendinning, Philippe Goujard, Dan Greenspan, Karlo Gross, Carl Hage, Paul
-Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per Headland, Arnold
-Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom Hite, Torsten
-Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun Huang, Steve
-Hunt, Jeff Hurwitt, Pieter Immelman, Jarkko Isokungas, Patrick St. Jean, Hal
-Jespersen, Park Sang Jin, Robbin Johnson, Jarkko Jormanainen, Nelson Kading,
-Geoffrey Keating, Karsten Keil, Fritz Kleeman, Andreas Kies, Janne
-Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig
+Kirk Edson, Nick Efthymiou, Stefan Elf, Rob Engle, Olle Eriksson, Brent
+Ermlick, Bernd Ernesti, Ragnar Hojland Espinosa, Jason Faultless, Michael
+Faurot, Werner Fleck, John M. Flinchbaugh, Andy Gabor, Torsten Gesang,
+Callum Gibson, Mike Glendinning, Philippe Goujard, Dan Greenspan, Karlo
+Gross, Carl Hage, Paul Halsema, Ed Hanway, Scott Hauck, Christian Haul, Per
+Headland, Arnold Hendriks, Daniel Hermans, Jose Herrero, Dave Hill, Tom
+Hite, Torsten Homeyer, Ulli Horlacher, Keith Howell, Tommy Hsieh, Shih-Kun
+Huang, Steve Hunt, Jeff Hurwitt, Pieter Immelman, Jarkko Isokungas, Patrick
+St. Jean, Hal Jespersen, Park Sang Jin, Robbin Johnson, Jarkko Jormanainen,
+Nelson Kading, Geoffrey Keating, Karsten Keil, Fritz Kleeman, Andreas Kies,
+Janne Kiviluoto, Tomasz Kloczko, Dwarven Knight, Thomas Koenig, Karl-Koenig
 Koenigsson, Martin Kraemer, Thomas Kroener, Florian Kuehnert, Kris Kugel,
 Yuri Kuzmenko, Olivier Lacroix, Geoff Lane, Alex Lange, Alain Lasserre,
 Stanislav Latishko, Hannu Laurila, Vincent Lefevre, Alexander Lehmann, Marty

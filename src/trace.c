@@ -17,7 +17,9 @@
 #include "trace.h"
 
 void
-_tracef(const char *fmt, ...)
+_tracef(
+	const char *fmt,
+	...)
 {
 	static	FILE	*fp;
 	va_list ap;
@@ -41,7 +43,8 @@ _tracef(const char *fmt, ...)
 }
 
 char *
-_tracechar(int ch)
+_tracechar(
+	int ch)
 {
 	static char result[2];
 	result[0] = ch;

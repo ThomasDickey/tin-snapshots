@@ -15,19 +15,21 @@
 #include "tin.h"
 
 #define isreturn(c) ((c) == '\r' || ((c) == '\n'))
-/* Modified to return TRUE for '(' and ')' only if
-   it's in structured header field. '(' and ')' are
-   NOT to be treated differently than other characters
-   in unstructured headers like Subject, Keyword and Summary
-   c.f. RFC 2047 */
 
+/*
+ * Modified to return TRUE for '(' and ')' only if
+ * it's in structured header field. '(' and ')' are
+ * NOT to be treated differently than other characters
+ * in unstructured headers like Subject, Keyword and Summary
+ * c.f. RFC 2047
+ */
 #define isbetween(c, s) (isspace((unsigned char)c) || ((s) && ((c) == '(' || (c) == ')' || (c) == '"')))
+
 /*
  * NOTE: these routines expect that MM_CHARSET is set to the charset
  * your system is using.  If it is not defined, US-ASCII is used.
  * Can be overridden by setting MM_CHARSET as environment variable.
  */
-
 #ifndef MM_CHARSET
 #	define MM_CHARSET "US-ASCII"
 #endif
@@ -78,6 +80,7 @@ build_base64_rank_table(
 	}
 }
 
+
 static unsigned
 hex2bin(
 	int x)
@@ -91,6 +94,7 @@ hex2bin(
 	return 255;
 }
 
+
 int
 mmdecode(
 	const char *what,
@@ -98,7 +102,7 @@ mmdecode(
 	int delimiter,
 	char *where,
 	const char *charset)
-{ 
+{
 	char *t;
 	int decode_gt128 = 0;
 
@@ -172,6 +176,7 @@ mmdecode(
 	return -1;
 }
 
+
 void
 get_mm_charset(
 	void)
@@ -182,12 +187,11 @@ get_mm_charset(
 		c = getenv("MM_CHARSET");
 		if (!c)
 			strcpy(mm_charset, MM_CHARSET);
-		else {
-			strncpy(mm_charset, c, 128);
-			mm_charset[127] = '\0';
-		}
+		else
+			STRCPY(mm_charset, c);
 	}
 }
+
 
 char *
 rfc1522_decode(
@@ -265,9 +269,11 @@ rfc1522_decode(
 	return buffer;
 }
 
-/* adopted by J. Shin(jshin@pantheon.yale.edu) from
-   Woohyung Choi's(whchoi@cosmos.kaist.ac.kr) sdn2ks and ks2sdn */
 
+/*
+ * adopted by J. Shin(jshin@pantheon.yale.edu) from
+ * Woohyung Choi's(whchoi@cosmos.kaist.ac.kr) sdn2ks and ks2sdn
+ */
 static void
 str2b64(
 	char *from,
@@ -293,6 +299,7 @@ str2b64(
 	*to = '\0';
 	return;
 }
+
 
 static int
 do_b_encode(
@@ -332,15 +339,16 @@ do_b_encode(
 	return t - tmp;
 }
 
-/* find out whether encoding is necessary and which encoding
-   to use if necessary by scanning the whole header field
-   instead of each fragment of it.
-   This will ensure that  either Q or B encoding will be used in a single
-   header(i.e. two encoding won't  be mixed in a single header line.
-   Mixing two encodings is not a violation of RFC 2047 but may break
-   some news/mail clients.
- */
 
+/*
+ * find out whether encoding is necessary and which encoding
+ * to use if necessary by scanning the whole header field
+ * instead of each fragment of it.
+ * This will ensure that  either Q or B encoding will be used in a single
+ * header (i.e. two encoding won't be mixed in a single header line).
+ * Mixing two encodings is not a violation of RFC 2047 but may break
+ * some news/mail clients.
+ */
 static int
 which_encoding(
 	char *w)
@@ -373,6 +381,7 @@ which_encoding(
 	return 0;
 }
 
+
 /* now only checks if there's any 8bit chars in a given "fragment" */
 static int
 contains_nonprintables(
@@ -399,9 +408,12 @@ contains_nonprintables(
 	return 0;
 }
 
-/* Uncommented this conditional compilation statement
-   in order to implement mandatory break-up of long lines
-   in mail messages in accordance with rfc 2047(rfc 1522) */
+
+/*
+ * Uncommented this conditional compilation statement
+ * in order to implement mandatory break-up of long lines
+ * in mail messages in accordance with rfc 2047 (rfc 1522)
+ */
 /* #ifdef MIME_BREAK_LONG_LINES */
 static int
 sizeofnextword(
@@ -418,34 +430,37 @@ sizeofnextword(
 }
 /* #endif */
 
+
 static int
 rfc1522_do_encode(
 	char *what,
 	char **where,
 	t_bool break_long_line)
 {
-	/* We need to meet several partly contradictional requirements here.
-	   First of all, a line containing MIME encodings must not be longer
-	   than 76 chars (including delimiters, charset, encoding).  Second,
-	   we should not encode more than necessary.  Third, we should not
-	   produce more overhead than absolutely necessary; this means we
-	   should extend chunks over several words if there are more
-	   characters-to-quote to come.  This means we have to rely on some
-	   heuristics.  We process whole words, checking if it contains
-	   characters to be quoted.  If not, the word is output 'as is',
-	   previous quoting being terminated before.  If two adjoining words
-	   contain non-printable characters, they are encoded together (up
-	   to 60 characters).  If a resulting encoded word would break the
-	   76 characters boundary, we 'break' the line, output a SPACE, then
-	   output the encoded word.  Note that many wide-spread news applications,
-	   notably INN's xover support, does not understand multiple-lines,
-	   so it's a compile-time feature with default off.
-
-	   To make things a bit easier, we do all processing in two stages;
-	   first we build all encoded words without any bells and whistles
-	   (just checking that they don get longer than 76 characters),
-	   then, in a second pass, we replace all SPACEs inside encoded
-	   words by '_', break long lines, etc. */
+	/*
+	 * We need to meet several partly contradictional requirements here.
+	 * First of all, a line containing MIME encodings must not be longer
+	 * than 76 chars (including delimiters, charset, encoding). Second,
+	 * we should not encode more than necessary. Third, we should not
+	 * produce more overhead than absolutely necessary; this means we
+	 * should extend chunks over several words if there are more
+	 * characters-to-quote to come. This means we have to rely on some
+	 * heuristics. We process whole words, checking if it contains
+	 * characters to be quoted. If not, the word is output 'as is',
+	 * previous quoting being terminated before. If two adjoining words
+	 * contain non-printable characters, they are encoded together (up
+	 * to 60 characters). If a resulting encoded word would break the
+	 * 76 characters boundary, we 'break' the line, output a SPACE, then
+	 * output the encoded word. Note that many wide-spread news applications,
+	 * notably INN's xover support, does not understand multiple-lines,
+	 * so it's a compile-time feature with default off.
+	 *
+	 * To make things a bit easier, we do all processing in two stages;
+	 * first we build all encoded words without any bells and whistles
+	 * (just checking that they don get longer than 76 characters),
+	 * then, in a second pass, we replace all SPACEs inside encoded
+	 * words by '_', break long lines, etc.
+	 */
 
 	t_bool quoting = FALSE;		  /* currently inside quote block? */
 	t_bool rightafter_ew = FALSE;
@@ -453,15 +468,16 @@ rfc1522_do_encode(
 	int encoding;					  /* which encoding to use ('B' or 'Q') */
 	int any_quoting_done = 0;
 
-/* Uncommented this and other conditional compilation statement
-   depending on MIME_BREAK_LONG_LINES in this function
-   in order to implement mandatory break-up of long lines
-   in mail messages in accordance with RFC 2047(RFC 1522).
-   Whether or not long lines are broken up depends on
-   boolean variable break_long_line, instead.
-   break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
-   is defined, but it's TRUE for mail messages regardless of whether or not
-   MIME_BREAK_LONG_LINES is defined
+/*
+ * Uncommented this and other conditional compilation statement
+ * depending on MIME_BREAK_LONG_LINES in this function
+ * in order to implement mandatory break-up of long lines
+ * in mail messages in accordance with RFC 2047 (RFC 1522).
+ * Whether or not long lines are broken up depends on
+ * boolean variable break_long_line, instead.
+ * break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
+ * is defined, but it's TRUE for mail messages regardless of whether or not
+ * MIME_BREAK_LONG_LINES is defined
  */
 /* #ifdef MIME_BREAK_LONG_LINES */
 	int column = 0;				/* current column */
@@ -476,8 +492,10 @@ rfc1522_do_encode(
 	t_bool isstruct_head = FALSE;		/* are we dealing with structured header? */
 	int ew_taken_len;
 
-/* the list of structured header fields where '(' and ')' are
-   treated specially in rfc 1522 encoding */
+/*
+ * the list of structured header fields where '(' and ')' are
+ * treated specially in rfc 1522 encoding
+ */
 	static const char *struct_header[] =
 	{
 		"Approved: ", "From: ", "Originator: ",
@@ -500,9 +518,11 @@ rfc1522_do_encode(
 		if (break_long_line) {
 			word_cnt++;
 		}
-/* if a word with 8bit chars is broken in the middle, whatever follows
-   after the point where it's split should be encoded (i.e. even if
-   they are made of only 7bit chars) */
+/*
+ * if a word with 8bit chars is broken in the middle, whatever follows
+ * after the point where it's split should be encoded (i.e. even if
+ * they are made of only 7bit chars)
+ */
 		if (contains_nonprintables(what, isstruct_head) || isbroken_within) {
 			if (encoding == 'Q') {
 				if (!quoting) {
@@ -555,9 +575,11 @@ rfc1522_do_encode(
 					*t++ = '?';
 					*t++ = '=';
 					ewsize += 2;
-/* if a word with 8bit chars is broken in the middle, whatever follows
-   after the point where it's split should be encoded (i.e. even if
-   they are made of only 7bit chars) */
+/*
+ * if a word with 8bit chars is broken in the middle, whatever follows
+ * after the point where it's split should be encoded (i.e. even if
+ * they are made of only 7bit chars)
+ */
 					if (ewsize >= 70 - strlen(mm_charset) && (contains_nonprintables(what, isstruct_head) || isbroken_within)) {
 						*t++ = ' ';
 						ewsize++;
@@ -580,10 +602,12 @@ rfc1522_do_encode(
 					}					  /* end of while */
 				}						  /* end of else */
 			} else {					  /* end of Q encoding and beg. of B encoding */
-				/* if what immediately precedes the current fragment with 8bit char is
-				   encoded word, the leading spaces should be encoded together with
-				   8bit chars following them. No need to worry about '(',')' and '"'
-				   as they're already excluded with contain_nonprintables used in outer if-clause */
+				/*
+				 * if what immediately precedes the current fragment with 8bit char is
+				 * encoded word, the leading spaces should be encoded together with
+				 * 8bit chars following them. No need to worry about '(',')' and '"'
+				 * as they're already excluded with contain_nonprintables used in outer if-clause
+				 */
 				while (*what && (!isbetween(*what, isstruct_head) || rightafter_ew)) {
 
 					sprintf(buf2, "=?%s?%c?", mm_charset, encoding);
@@ -606,8 +630,10 @@ rfc1522_do_encode(
 				}
 				rightafter_ew = TRUE;
 				word_cnt--;			  /* compensate double counting */
-				/* if encoded word is followed by 7bit-only fragment, we need to
-				   eliminate ' ' inserted in while-block above */
+				/*
+				 * if encoded word is followed by 7bit-only fragment, we need to
+				 * eliminate ' ' inserted in while-block above
+				 */
 				if (!contains_nonprintables(what, isstruct_head)) {
 					t--;
 					ewsize--;
@@ -627,11 +653,13 @@ rfc1522_do_encode(
 	if (break_long_line) {
 		column = 0;
 		if (any_quoting_done) {
-			word_cnt = 1;			  /* note, if the user has typed a
-										     continuation line, we will consider the
-										     initial whitespace to be delimiting
-										     word one (well, just assume an empty
-										     word). */
+			word_cnt = 1;			  /*
+											* note, if the user has typed a
+										   * continuation line, we will consider the
+										   * initial whitespace to be delimiting
+										   * word one (well, just assume an empty
+										   * word).
+										   */
 			while (*c) {
 				if (isspace((unsigned char) *c)) {
 					/* According to rfc1522, header lines
@@ -672,6 +700,7 @@ rfc1522_do_encode(
 	return any_quoting_done;
 }
 
+
 char *
 rfc1522_encode(
 	char *s,
@@ -681,9 +710,11 @@ rfc1522_encode(
 	char *b;
 	int x;
 
-/* break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
-   is defined, but it's TRUE for mail messages regardless of whether or not
-   MIME_BREAK_LONG_LINES is defined */
+/*
+ * break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
+ * is defined, but it's TRUE for mail messages regardless of whether or not
+ * MIME_BREAK_LONG_LINES is defined
+ */
 #ifdef MIME_BREAK_LONG_LINES
 	t_bool break_long_line = TRUE;
 
@@ -692,13 +723,14 @@ rfc1522_encode(
 
 #endif
 
-/* Even if MIME_BREAK_LONG_LINES is NOT defined,
-   long headers in mail messages should be broken up in
-   accordance with RFC 2047(1522) */
+/*
+ * Even if MIME_BREAK_LONG_LINES is NOT defined,
+ * long headers in mail messages should be broken up in
+ * accordance with RFC 2047(1522)
+ */
 #ifndef MIME_BREAK_LONG_LINES
-	if (ismail) {
+	if (ismail)
 		break_long_line = TRUE;
-	}
 #endif
 
 	get_mm_charset();
@@ -707,6 +739,7 @@ rfc1522_encode(
 	quoteflag = quoteflag || x;
 	return buf;
 }
+
 
 void
 rfc15211522_encode(
@@ -787,11 +820,11 @@ rfc15211522_encode(
 	if (quoteflag || umlauts) {
 #else
 	if (umlauts) {
-#endif
+#endif /* 0 */
 		fputs("MIME-Version: 1.0\n", f);
 		if (body_encoding_needed) {
 
-/* added for CJK charsets like EUC-KR/JP/CN and others */
+		/* added for CJK charsets like EUC-KR/JP/CN and others */
 
 			if (!strncasecmp(mm_charset, "euc-", 4) &&
 				 !strcasecmp(mime_encoding, txt_7bit))

@@ -15,7 +15,7 @@
 #include	"tin.h"
 #include	"tcurses.h"
 
-char msg[LEN];
+char mesg[LEN];
 
 #ifndef USE_CURSES
 	struct t_screen *screen;
@@ -35,7 +35,9 @@ stow_cursor(void)
  * Centre a formatted colour message at the bottom of the screen
  */
 void
-info_message (const char *fmt, ...)
+info_message (
+	const char *fmt,
+	...)
 {
 	va_list ap;
 
@@ -46,9 +48,9 @@ info_message (const char *fmt, ...)
 	fcol(col_message);
 #endif
 
-	vsprintf (msg, fmt, ap);
+	vsprintf (mesg, fmt, ap);
 
-	center_line (cLINES, FALSE, msg);	/* center the message at screen bottom */
+	center_line (cLINES, FALSE, mesg);	/* center the message at screen bottom */
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
@@ -63,7 +65,10 @@ info_message (const char *fmt, ...)
  * Print a formatted colour message at the bottom of the screen, wait a while
  */
 void
-wait_message (int delay, const char *fmt, ...)
+wait_message (
+	int delay,
+	const char *fmt,
+	...)
 {
 	va_list ap;
 
@@ -74,8 +79,8 @@ wait_message (int delay, const char *fmt, ...)
 	fcol(col_message);
 #endif
 
-	vsprintf (msg, fmt, ap);
-	my_fputs (msg, stdout);
+	vsprintf (mesg, fmt, ap);
+	my_fputs (mesg, stdout);
 
 #ifdef HAVE_COLOR
 	fcol(col_normal);
@@ -94,7 +99,9 @@ wait_message (int delay, const char *fmt, ...)
  * Interesting - this function implicitly clears 'errno'
  */
 void
-error_message (const char *fmt, ...)
+error_message (
+	const char *fmt,
+	...)
 {
 	va_list ap;
 
@@ -104,9 +111,9 @@ error_message (const char *fmt, ...)
 
 	clear_message ();
 
-	vsprintf (msg, fmt, ap);
+	vsprintf (mesg, fmt, ap);
 
-	my_fprintf (stderr, msg);
+	my_fprintf (stderr, mesg);
 	my_fflush (stderr);
 
 	if (cmd_line) {
@@ -126,7 +133,9 @@ error_message (const char *fmt, ...)
  * This function implicitly clears 'errno'
  */
 void
-perror_message (const char *fmt, ...)
+perror_message (
+	const char *fmt,
+	...)
 {
 	int err;
 	va_list ap;
@@ -136,9 +145,9 @@ perror_message (const char *fmt, ...)
 
 	clear_message ();
 
-	vsprintf (msg, fmt, ap);
+	vsprintf (mesg, fmt, ap);
 
-	my_fprintf (stderr, "%s: Error: %s", msg, strerror(err));
+	my_fprintf (stderr, "%s: Error: %s", mesg, strerror(err));
 	errno = 0;
 
 	if (cmd_line) {
@@ -176,8 +185,7 @@ center_line (
 	int pos;
 	char buffer[256];
 
-	strncpy(buffer, str, 255);
-	buffer[255]='\0';
+	STRCPY(buffer, str);
 
 	if (!cmd_line) {
 		if (cCOLS >= (int) strlen (str))
@@ -297,8 +305,8 @@ ring_bell (void)
 void
 spin_cursor (void)
 {
-	static const char *buf = "|/-\\|/-\\";
-	static unsigned char i = 0;
+	static const char buf[] = "|/-\\|/-\\";
+	static unsigned short int i = 0;
 
 	if (batch_mode)
 		return;

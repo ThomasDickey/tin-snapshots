@@ -1,4 +1,78 @@
--- pre-1.4 release 9806xx --
+-- pre-1.4 release 980730 --
+
+603) Thomas E. Dickey <dickey@clark.net>
+     BUG. spurious escaping of '<' and '>' in mailer commands
+     FIX. misc.c
+
+602) Urs Janssen <urs@tin.org>
+     BUG. new my_strdup() didn't work on system which come with bcopy only
+     BUG. declaration of sys_errlist didn't work on systems which need it
+     BUG. in some cases newsrcs was written out even if '-X'-flag was
+          present.
+     ADD. minor code cleanup
+     ADD. 'Z' mark group unread in top-level (select.c)
+     FIX. bool.h, extern.h, menukeys.h, proto.h, tin.h, *.c
+
+601) Nick Efthymiou <NEFT@pacbell.net>
+     ADD. SCO-port
+     BUG. possible curses calls in 'command-line-mode'
+     BUG. memory leak in the TLI-code
+     BUG. typo in the TLI interface
+     BUG. fixed a few types (int -> pid_t/uid_t/...)
+     FIX. init.c, misc.c, nntplib.c, prompt.c
+
+600) Greg Berigan <gberigan@cse.unl.edu>
+     ADD. support for persistant-headers 
+     ADD. minor code cleanup
+     FIX. tin.h, page.c, post.c
+
+599) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. random-sigs now allow different sigfixed-parts via
+          random_sigdir/.sigfixed which has a hiher precedence
+          as ~/.sigfixed
+     BUG. typo in vWriteFilterArray()
+     FIX. filter.c, sigfile.c
+
+598) Jason Faultless <jason@radar.demon.co.uk>
+     ADD. speedup 'y'ank in
+     FIX. select.c
+
+597) Sven Paulus <sven@tin.org>
+     BUG. possible bufferoverrun
+     FIX. init.c
+
+596) Kazushi Marukawa <jam@pobox.com>
+     BUG. tin now handles "LIST ACTIVE"/"GROUP" differences correct
+     BUG. tins mailgroup feature was broken
+     BUG. parse_headers() used mime-decoced data which might be toublesome
+     ADD. '-l' cmd-line switch to turn on "LIST ACTIVE" only-mode
+     ADD. changed '-R' to read saved news (-S) offline
+     ADD. -s option to -R to point -R to the saved spool
+     FIX. extern.h, active.c, art.c, group.c, inews.c, init.c, mail.c,
+          main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c,
+          read.c, refs.c
+
+595) Jason Faultless <jason@radar.demon.co.uk>
+     Kazushi Marukawa <jam@pobox.com>
+     BUG: possible buffer overflow in rfc1521_decode()
+     ADD. Made I/O code fully dynamic. Fixed header joining in all cases.
+          Cured various related I/O & fd problems
+     ADD. 'S'ave tagged in pager
+     ADD. Various minor cleanups and fixes
+     FIX. extern.h, menukeys.h, proto.h, tin.h, active.c, art.c, auth.c,
+          feed.c, group.c, lang.c, mail.c, main.c, misc.c, newsrc.c,
+          nntplib.c, open.c, page.c, post.c, prompt.c, read.c, rfc1521.c
+          save.c, search.c, thread.c, xref.c
+
+594) Phil Edge <phil@edge.demon.co.uk>
+     ADD. minor code cleanup
+     FIX. post.c
+
+593) Dean Takemori <dean@uhheph.phys.hawaii.edu>
+     ADD. better libuu support
+     FIX. save.c
+
+-- pre-1.4 release 980618 --
 
 592) Urs Janssen <urs@tin.org>
      BUG. defines for HAVE_SETPGRP and SETPGRP_VOID were missing
@@ -18,7 +92,7 @@
 591) Sven Paulus <sven@tin.org>
      Urs Janssen <urs@tin.org>
      ADD. y2k compliance
-     FIX. post.c,open.c
+     FIX. post.c, open.c
 
 590) Cameron Perkins <erasmus@cc.gatech.edu>
      BUG. when entering a group while the server is receiving a new article
@@ -78,7 +152,7 @@
      ADD. strip doubled newsgroups from Followup-To: before checking
           if it contains several groups
      ADD. searching in posted_message-file disabled
-     ADD. allow <TAB> as filedseperator in ~/.newsauth
+     ADD. allow <TAB> as fieldseperator in ~/.newsauth
      ADD. check for empty / all whitespace Subject
      ADD. updated pcre (1.07 -> 1.09)
      ADD. -X cmd-line switch
@@ -95,10 +169,10 @@
 
 580) Kazushi Marukawa <jam@pobox.com>
      BUG. writing out of final ".\r\n" could fail on some systems.
-     BUG. mail_addres was extracted after MIME-decoding From:-line
+     BUG. mail_address was extracted after MIME-decoding From:-line
           but parse_from() can't handle multiple '@'/'('
      BUG. @LIBS@ was mssing in makecfg make-rule
-     BUG. From:-line was not MIME-encodet in NOV-file entrys
+     BUG. From:-line was not MIME-encoded in NOV-file entries
           created by tin
      FIX. Makefile[.in], art.c, nntplib.c, post.c
 

@@ -25,18 +25,15 @@
 /* Copy of last NNTP command sent, so we can retry it if needed */
 char	last_put[NNTP_STRLEN];
 
-#ifdef NNTP_ABLE
-	TCP *nntp_rd_fp = NULL;
-	TCP *nntp_wr_fp = NULL;
-#endif
+TCP *nntp_rd_fp = NULL;
+TCP *nntp_wr_fp = NULL;
 
 /*
  * local prototypes
  */
 #ifdef NNTP_ABLE
-	static int get_tcp_socket (char *machine, char *service, unsigned port);
+	static int get_tcp_socket (char *machine, char *service, unsigned short port);
 #endif
-
 
 /* Close the NNTP connection with prejudice */
 #define NNTP_HARD_CLOSE					\
@@ -45,6 +42,25 @@ char	last_put[NNTP_STRLEN];
 	if (nntp_rd_fp)						\
 		s_fclose (nntp_rd_fp);			\
 	nntp_rd_fp = nntp_wr_fp = NULL;
+
+/*
+ * Return the actual fd in use for the nntp read-side socket
+ * This is a bit of a leak of internal state, but it's use is very
+ * localised
+ */
+FILE *
+get_nntp_fp (
+	FILE *fp)
+{
+	return (fp == FAKE_NNTP_FP ? nntp_rd_fp : fp);
+}
+
+FILE *
+get_nntp_wr_fp (
+	FILE *fp)
+{
+	return (fp == FAKE_NNTP_FP ? nntp_wr_fp : fp);
+}
 
 /*
  * getserverbyfile(file)
@@ -160,17 +176,17 @@ server_init (
 	int port,
 	char *text)
 {
-	char *service = (char *)cservice; /* but calls non-const funcs */
-#ifndef VMS
+	char *service = (char *)cservice; /* TODO but calls non-const funcs */
+#	ifndef VMS
 	int	sockt_rd, sockt_wr;
-#endif
+#	endif /* !VMS */
 
-#if defined (M_AMIGA) || defined(WIN32)
+#	if defined (M_AMIGA) || defined(WIN32)
 	if (!s_init())		/* some initialisation ... */
 		return -1;
-#endif
+#	endif /* M_AMIGA || WIN32 */
 
-#ifdef DECNET
+#	ifdef DECNET
 	char	*cp;
 
 	cp = strchr (machine, ':');
@@ -180,20 +196,21 @@ server_init (
 		sockt_rd = get_dnet_socket (machine, service);
 	} else
 		sockt_rd = get_tcp_socket (machine, service, port);
-#else
-	sockt_rd = get_tcp_socket (machine, service, port);
-#endif
+#	else
+	sockt_rd = get_tcp_socket (machine, service, (unsigned short)port);
+#	endif /* DECNET */
 
 	if (sockt_rd < 0)
 		return (sockt_rd);
 
-#ifndef VMS
+#	ifndef VMS
 	/*
 	 * Now we'll make file pointers (i.e., buffered I/O) out of
 	 * the socket file descriptor.  Note that we can't just
 	 * open a fp for reading and writing -- we have to open
 	 * up two separate fp's, one for reading, one for writing.
 	 */
+
 	if ((nntp_rd_fp = (TCP *) s_fdopen (sockt_rd, "r")) == NULL) {
 		perror ("server_init: fdopen #1");
 		return (-errno);
@@ -204,22 +221,23 @@ server_init (
 		return (-errno);
 	}
 
-#ifdef TLI
+#		ifdef TLI
 	if (t_sync (sockt_rd) < 0) {	/* Sync up new fd with TLI */
 		t_error ("server_init: t_sync");
-		nntp_rd_fp = NULL;		/* from above */
+		nntp_rd_fp = NULL;
 		return (-EPROTO);
 	}
-#endif
-
+#		else
 	if ((nntp_wr_fp = (TCP *) s_fdopen (sockt_wr, "w")) == NULL) {
 		perror ("server_init: fdopen #2");
-		nntp_rd_fp = NULL;		/* from above */
+		nntp_rd_fp = NULL;
 		return (-errno);
 	}
-#else /* VMS */
+#		endif /* TLI */
+
+#	else
 	sockt_wr = sockt_rd;
-#endif
+#	endif /* !VMS */
 
 	last_put[0] = '\0';		/* no retries in get_respcode */
 	/*
@@ -251,21 +269,28 @@ static int
 get_tcp_socket (
 	char *machine,		/* remote host */
 	char *service,		/* nttp/smtp etc. */
-	unsigned port)		/* tcp port number */
+	unsigned short port)	/* tcp port number */
 {
-	int	s = -1;
+	int s = -1;
 	int save_errno = 0;
-	struct	sockaddr_in	sock_in;
-
+	struct sockaddr_in sock_in;
 #ifdef TLI
-	extern struct	hostent *gethostbyname ();
-	struct	hostent	*hp;
-	struct	t_call	*callptr;
+	char device[20];
+	char *env_device;
+	extern int t_errno;
+	extern struct hostent *gethostbyname ();
+	struct hostent *hp;
+	struct t_call *callptr;
 
 	/*
 	 * Create a TCP transport endpoint.
 	 */
-	if ((s = t_open ("/dev/tcp", O_RDWR, (struct t_info*) 0)) < 0){
+	if ((env_device = getenv("DEV_TCP")) != NULL) /* SCO uses DEV_TCP, most other OS use /dev/tcp */
+		STRCPY(device, env_device);
+	else
+		strcpy(device, "/dev/tcp");
+
+	if ((s = t_open (device, O_RDWR, (struct t_info*) 0)) < 0){
 		t_error ("t_open: can't t_open /dev/tcp");
 		return (-EPROTO);
 	}
@@ -278,13 +303,13 @@ get_tcp_socket (
 	sock_in.sin_family = AF_INET;
 	sock_in.sin_port = htons (port);
 
-	if (!isdigit((unsigned char)*machine) || (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
+	if (!isdigit((unsigned char)*machine) || (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == INADDR_NONE) {
 		if ((hp = gethostbyname (machine)) == NULL) {
 			my_fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
 			return (-EHOSTUNREACH);
 		}
-		memcopy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
+		memcpy((char *) &sock_in.sin_addr, hp->h_addr, hp->h_length);
 	}
 
 	/*
@@ -308,7 +333,12 @@ get_tcp_socket (
 	 */
 	if (t_connect (s, callptr, (struct t_call *) 0) < 0) {
 		save_errno = t_errno;
-		t_error ("t_connect");
+		if(save_errno == TLOOK){
+			fprintf(stderr, "Server unavailable\n");
+		} else {
+			t_error ("t_connect");
+		}
+		t_free((char *)callptr, T_CALL);
 		t_close (s);
 		return (-save_errno);
 	}
@@ -318,6 +348,8 @@ get_tcp_socket (
 	 * standard read() and write() system calls can be used on the
 	 * descriptor.
 	 */
+
+	t_free((char *)callptr, T_CALL);
 
 	if (ioctl (s,  I_POP,  (char *) 0) < 0) {
 		perror ("I_POP(timod)");
@@ -357,7 +389,7 @@ get_tcp_socket (
 	if (!isdigit((unsigned char)*machine) || (long)(defaddr.s_addr = (long) inet_addr (machine)) == -1) {
 		hp = gethostbyname (machine);
 	} else {
-		/* Raw ip address, fake  */
+		/* Raw ip address, fake */
 		(void) strcpy (namebuf, machine);
 		def.h_name = (char *) namebuf;
 #ifdef h_addr
@@ -412,7 +444,7 @@ get_tcp_socket (
 			my_fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
 
 #if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
-#define	HPSOCKSIZE 0x8000
+#	define HPSOCKSIZE 0x8000
 		getsockopt(s, SOL_SOCKET, SO_SNDBUF, (caddr_t)&socksize, (caddr_t)&socksizelen);
 		if (socksize < HPSOCKSIZE) {
 			socksize = HPSOCKSIZE;
@@ -425,7 +457,7 @@ get_tcp_socket (
 			socksize = HPSOCKSIZE;
 			setsockopt(s, SOL_SOCKET, SO_RCVBUF, (caddr_t)&socksize, sizeof(socksize));
 		}
-#endif
+#endif /* __hpux && SVR4 */
 
 		if ((x = connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in))) == 0)
 			break;
@@ -579,6 +611,7 @@ u_put_server (
 }
 #endif
 
+
 /*
  * put_server -- send a line of text to the server, terminating it
  * with CR and LF, as per ARPA standard.
@@ -598,71 +631,25 @@ u_put_server (
  *			fflush.
  */
 #ifndef VMS
-#ifdef NNTP_ABLE
+#	ifdef NNTP_ABLE
 void
 put_server (
 	const char *string)
 {
-#if 0
-	static time_t time_last;
-	time_t time_now;
-	int respcode;
-#endif /* 0 */
-
 	/*
 	 * We remember the last thing we wrote, in case we have to do a command retry in the future
 	 */
-DEBUG_IO((stderr, "put_server(%s)\n", string));
+	DEBUG_IO((stderr, "put_server(%s)\n", string));
 	strcpy (last_put, string);
 
-#if 0
-	/*
-	 *  Check how idle we have been, if too idle send a STAT to check
-	 */
-	(void) time (&time_now);
-
-
-	if (nntp_wr_fp == NULL || (time_last != 0 && time_last+NNTP_IDLE_RETRY_SECS-299 < time_now)) {
-
-		if (nntp_wr_fp) {
-			/*
-			 * We don't care about the answer, just the fact that the connection still works
-			 * Don't use nntp_command() here - this is a lower level
-			 */
-fprintf(stderr, "Timeout - sending STAT\n");
-			s_printf (nntp_wr_fp, "STAT\r\n");
-			s_flush (nntp_wr_fp);
-			respcode = get_respcode (NULL);
-
-			if (respcode == -1) {
-				/*
-				 *  STAT was not happy, close the connection
-				 *  it will get reopened on next get_server
-				 */
-				NNTP_HARD_CLOSE;
-
-				time_last = 0;
-				return;
-			}
-		}
-	}
-
-	time_last = time_now;
-
-#endif /* 0 */
-
-#if 0
-	s_printf (nntp_wr_fp, "%s\r\n", string);
-#else
 	s_puts (string, nntp_wr_fp);
 	s_puts ("\r\n", nntp_wr_fp);
-#endif /* 0 */
 	(void) s_flush (nntp_wr_fp);
 
 	return;
 }
-#endif /* NNTP_ABLE */
-#endif /* VMS */
+#	endif /* NNTP_ABLE */
+#endif /* !VMS */
 
 /*
  * Reconnect to server after a timeout, reissue last command to
@@ -682,10 +669,10 @@ reconnect(
 	if(!auto_reconnect)
 		ring_bell ();
 
-DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
+	DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 
 	if (!auto_reconnect && prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
-		tin_done(EXIT_OK);		/* user said no to reconnect */
+		tin_done(EXIT_SUCCESS);		/* user said no to reconnect */
 
 	clear_message ();
 
@@ -697,22 +684,23 @@ DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 		 * Re-establish our current group and resend last command
 		 */
 		if (glob_group != (char *) 0) {
-DEBUG_IO((stderr, "Rejoin current group\n"));
+			DEBUG_IO((stderr, "Rejoin current group\n"));
 			sprintf (last_put, "GROUP %s", glob_group);
 			put_server (last_put);
 			s_gets (last_put, NNTP_STRLEN, nntp_rd_fp);
-DEBUG_IO((stderr, "Read (%s)\n", last_put));
+			DEBUG_IO((stderr, "Read (%s)\n", last_put));
 		}
-DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
+		DEBUG_IO((stderr, "Resend last command (%s)\n", buf));
 		put_server (buf);
 		return(0);
 	}
 
 	if (--retry == 0)					/* No more tries ? */
-		tin_done(EXIT_NNTP_ERROR);
+		tin_done(NNTP_ERROR_EXIT);
 
 	return(retry);
 }
+
 
 /*
  * Read a line of data from the NNTP socket. If something gives, do reconnect
@@ -741,17 +729,17 @@ get_server (
 	 */
 	while (nntp_rd_fp == NULL || s_gets (string, size, nntp_rd_fp) == (char *) 0) {
 
-#ifdef DEBUG
+#	ifdef DEBUG
 		if (errno != 0 && errno != EINTR)	/*	I'm sure this will only confuse end users*/
 			perror_message("get_server()");
-#endif
-
+#	endif /* DEBUG */
 		retry = reconnect(retry);			/* Will abort when out of tries */
 	}
 
 	return string;
 }
 #endif /* NNTP_ABLE */
+
 
 /*
  * close_server -- close the connection to the server, after sending
@@ -765,7 +753,6 @@ get_server (
  *			You can't use "put_server" or "get_server"
  *			after this routine is called.
  */
-
 #ifdef NNTP_ABLE
 void
 close_server (void)
@@ -773,7 +760,7 @@ close_server (void)
 	if (nntp_wr_fp == NULL || nntp_rd_fp == NULL)
 		return;
 
-	info_message("Disconnecting from server...");
+	my_fputs("Disconnecting from server...\n", stdout);
 	nntp_command("QUIT", OK_GOODBYE, NULL);
 
 	(void) s_fclose (nntp_wr_fp);

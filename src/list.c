@@ -133,11 +133,11 @@ psGrpAdd (
 	else {	/* hash linked list chaining */
 		for (i = group_hash[h]; active[i].next >= 0; i = active[i].next) {
 			if (STRCMPEQ(active[i].name, group))
-				return(NULL);			/* kill dups */
+				return NULL;			/* kill dups */
 		}
 
 		if (STRCMPEQ(active[i].name, group))
-			return(NULL);
+			return NULL;
 
 		active[i].next = num_active;
 	}

@@ -86,7 +86,7 @@ asfail (
 #	endif	/* SIGABRT */
 #endif	/* HAVE_COREFILE */
 
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 
@@ -208,8 +208,11 @@ get_val (
 	return ((ptr = getenv(env)) != (char *) 0 ? ptr : def);
 }
 
-
-#define EDITOR_BACKUP_FILE_EXT ".b"
+/*
+ * IMHO it's not tin job to take care about dumb editor backupfiles
+ * otherwise BACKUP_FILE_EXT should be configurable via configure
+ */
+#define BACKUP_FILE_EXT ".b"
 
 int
 invoke_editor (
@@ -230,7 +233,7 @@ invoke_editor (
 		first = FALSE;
 	}
 
-	strcpy (editor_format, (start_editor_offset ? (*default_editor_format ? default_editor_format : EDITOR_FORMAT_ON) : EDITOR_FORMAT_OFF));
+	strcpy (editor_format, (start_editor_offset ? (*default_editor_format ? default_editor_format : TIN_EDITOR_FMT_ON) : TIN_EDITOR_FMT_OFF));
 
 	retcode = strfeditor (editor, lineno, filename, buf, sizeof(buf), editor_format);
 
@@ -238,9 +241,9 @@ invoke_editor (
 		sh_format (buf, sizeof(buf), "%s %s", editor, filename);
 
 	retcode = invoke_cmd (buf);
-#ifdef EDITOR_BACKUP_FILE_EXT
+#ifdef BACKUP_FILE_EXT
 	strcpy (fnameb, filename);
-	strcat (fnameb, EDITOR_BACKUP_FILE_EXT);
+	strcat (fnameb, BACKUP_FILE_EXT);
 	unlink (fnameb);
 #endif
 	return retcode;
@@ -332,9 +335,9 @@ shell_escape (void)
 	char *p;
 	char shell[LEN];
 
-	sprintf (msg, txt_shell_escape, default_shell_command);
+	sprintf (mesg, txt_shell_escape, default_shell_command);
 
-	if (!prompt_string (msg, shell, HIST_SHELL_COMMAND))
+	if (!prompt_string (mesg, shell, HIST_SHELL_COMMAND))
 		my_strncpy (shell, get_val (ENV_VAR_SHELL, DEFAULT_SHELL), sizeof(shell));
 
 	for (p = shell; *p && (*p == ' ' || *p == '\t'); p++)
@@ -348,8 +351,8 @@ shell_escape (void)
 	}
 
 	ClearScreen ();
-	sprintf (msg, "Shell Command (%s)", p);
-	center_line (0, TRUE, msg);
+	sprintf (mesg, "Shell Command (%s)", p);
+	center_line (0, TRUE, mesg);
 	MoveCursor (INDEX_TOP, 0);
 
 	(void)invoke_cmd(p);
@@ -397,7 +400,7 @@ tin_done (
 	if (!no_write) {
 		forever {
 			if (vWriteNewsrc ()) {
-				info_message(txt_newsrc_saved);
+				my_fputs(txt_newsrc_saved, stdout);
 				break;
 			}
 
@@ -406,11 +409,11 @@ tin_done (
 		}
 
 		write_input_history_file ();
-#ifndef INDEX_DAEMON
-#	if 0 /* FIXME */
+#if 0 /* FIXME */
+#	ifndef INDEX_DAEMON
 		write_attributes_file (local_attributes_file);
-#	endif /* 0 */
-#endif /* !INDEX_DAEMON */
+#	endif /* !INDEX_DAEMON */
+#endif /* 0 */
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 		write_mail_active_file ();
@@ -418,7 +421,7 @@ tin_done (
 	}
 
 	/* Do this sometime after we save the newsrc in case this hangs up for any reason */
-	if (ret != EXIT_NNTP_ERROR)
+	if (ret != NNTP_ERROR_EXIT)
 		nntp_close ();			/* disconnect from NNTP server */
 
 	free_all_arrays ();
@@ -554,8 +557,9 @@ my_mkdir (
 	sprintf(buf, "mkdir %s", path); /* redirect stderr to /dev/null ? */
 	if (stat (path, &sb) == -1) {
 		system (buf);
-		chmod (path, mode);
-	}
+		return chmod (path, mode);
+	} else
+		return -1;
 #else
 #	if defined(M_OS2) || defined(WIN32)
 		return mkdir (path);
@@ -677,8 +681,11 @@ invoke_cmd (
 {
 	int ret;
 
-	EndWin ();
-	Raw (FALSE);
+	int save_cmd_line = cmd_line;
+	if (!save_cmd_line) {
+		EndWin ();
+		Raw (FALSE);
+	}
 	set_signal_catcher (FALSE);
 
 	TRACE(("called system(%s)", _nc_visbuf(nam)))
@@ -691,15 +698,14 @@ invoke_cmd (
 	TRACE(("return %d", ret))
 
 	set_signal_catcher (TRUE);
-	Raw (TRUE);
-	InitWin ();
-
-#if 1
-#	if defined(SIGWINCH)
+	if (!save_cmd_line) {
+		Raw (TRUE);
+		InitWin ();
+#if defined(SIGWINCH)
 		handle_resize(FALSE);
 		/* seems to be troublesome on RedHat5.0 Linux2.0.33/glibc2.0.6/libncurses1.9.9 */
-#	endif /* SIGWINCH */
-#endif /* 1 */
+#endif /* SIGWINCH */
+	}
 
 #ifdef VMS
 	return ret != 0;
@@ -723,7 +729,7 @@ draw_percent_mark (
 	if (cur_num <= 0 && max_num <= 0)
 		return;
 
-	percent = cur_num * 100 / max_num;
+	percent = (int) (cur_num * 100 / max_num);
 	sprintf (buf, "%s(%d%%) [%ld/%ld]", txt_more, percent, cur_num, max_num);
 	MoveCursor (cLINES, (cCOLS - (int) strlen (buf))-(1+BLANK_PAGE_COLS));
 	StartInverse ();
@@ -1133,10 +1139,10 @@ eat_re (
 /*
  * Clear tag status of all articles. If articles were untagged, return TRUE
  */
-int
+t_bool
 untag_all_articles (void)
 {
-	int untagged = FALSE;
+	t_bool untagged = FALSE;
 	register int i;
 
 	for (i = 0; i < top; i++) {
@@ -1147,7 +1153,7 @@ untag_all_articles (void)
 	}
 	num_of_tagged_arts = 0;
 
-	return (untagged);
+	return untagged;
 }
 
 
@@ -1270,7 +1276,8 @@ show_color_status (void)
  * (in art.c's threading code) is delay=0
  */
 static int
-input_pending (int delay)
+input_pending (
+	int delay)
 {
 #ifdef USE_CURSES
 	int ch;
@@ -1341,7 +1348,8 @@ input_pending (int delay)
 
 
 int
-get_arrow_key (int prech)
+get_arrow_key (
+	int prech)
 {
 #ifdef USE_CURSES
 #	ifdef NCURSES_MOUSE_VERSION
@@ -1591,7 +1599,7 @@ create_index_lock_file (
 			error_message ("\n%s: Already started pid=[%d] on %s",
 				progname, atoi(buf), buf+8);
 #endif
-			exit (1);
+			exit (EXIT_FAILURE);
 		}
 	} else	if ((fp = fopen (the_lock_file, "w")) != (FILE *) 0) {
 		(void) time (&epoch);
@@ -1624,7 +1632,8 @@ strfquote (
 	char *endp = s + maxsize;
 	char *start = s;
 	char tbuf[PATH_LEN];
-	int i, j, iflag;
+	int i, j;
+	t_bool iflag;
 
 	if (s == (char *) 0 || format == (char *) 0 || maxsize == 0)
 		return 0;
@@ -1694,13 +1703,14 @@ strfquote (
 				case 'I':	/* Initials of author */
 					strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 					j = 0;
-					iflag = 1;
+					iflag = TRUE;
 					for (i=0; tbuf[i]; i++) {
 						if (iflag) {
 							tbuf[j++] = tbuf[i];
-							iflag = 0;
+							iflag = FALSE;
 						}
-						if (strchr(" ._@", tbuf[i])) iflag = 1;
+						if (strchr(" ._@", tbuf[i]))
+							iflag = TRUE;
 					}
 					tbuf[j] = '\0';
 					break;
@@ -1855,6 +1865,15 @@ out:
  *   =file     -> /usr/iain/Mail/file
  *   +file     -> /usr/iain/News/group.name/file
  *   ~/News/%G -> /usr/iain/News/group.name
+ *
+ * Inputs:
+ *   format		The string to be converted
+ *   str		Return buffer
+ *   maxsize	Size of str
+ *   dir/group	The strings to be substituted in this case
+ * Returns:
+ *   0			on error
+ *   !0			in all other cases
  */
 int
 strfpath (
@@ -1914,7 +1933,7 @@ strfpath (
 							tbuf[i++] = *format++;
 						tbuf[i] = '\0';
 						/*
-						 * OK lookup the username in/etc/passwd
+						 * OK lookup the username in /etc/passwd
 						 */
 						pwd = getpwnam (tbuf);
 						if (pwd == (struct passwd *) 0) {
@@ -1923,7 +1942,7 @@ strfpath (
 						} else
 							sprintf (tbuf, "%s/", pwd->pw_dir);
 #else
-						/* Amiga has no ther users */
+						/* Amiga has no other users */
 						return 0;
 #endif
 						break;
@@ -2191,7 +2210,8 @@ strfmailer (
 			}
 		}
 		if (*format == '%') {
-			t_bool ismail=TRUE;
+			t_bool ismail = TRUE;
+			t_bool escaped = FALSE;
 			switch (*++format) {
 				case '\0':
 					*s++ = '%';
@@ -2207,9 +2227,11 @@ strfmailer (
 					break;
 				case 'S':	/* Subject */
 					strcpy (tbuf, escape_shell_meta (rfc1522_encode (subject, ismail) , quote_area));
+					escaped = TRUE;
 					break;
 				case 'T':	/* To */
 					strcpy (tbuf, escape_shell_meta (rfc1522_encode (to, ismail), quote_area));
+					escaped = TRUE;
 					break;
 				case 'U':	/* User */
 					strcpy (tbuf, rfc1522_encode (userid, ismail));
@@ -2221,10 +2243,16 @@ strfmailer (
 					break;
 			}
 			if (*tbuf) {
-				if (sh_format (s, endp - s, "%s", tbuf) >= 0)
+				if (escaped) {
+					if (endp - s > 0) {
+						strncpy(s, tbuf, endp - s);
+						s += strlen(s);
+					}
+				} else if (sh_format (s, endp - s, "%s", tbuf) >= 0) {
 					s += strlen(s);
-				else
+				} else {
 					return 0;
+				}
 			}
 		}
 	}
@@ -2247,23 +2275,23 @@ get_initials (
 {
 	char tbuf[PATH_LEN];
 	int i, j;
-	int iflag;
+	t_bool iflag;
 
 	if (s == (char *) 0 || maxsize == 0)
 		return 0;
 
 	strcpy (tbuf, ((arts[respnum].name != (char *) 0) ? arts[respnum].name : arts[respnum].from));
 
-	iflag = 0;
+	iflag = FALSE;
 	j = 0;
 	for (i=0; tbuf[i] && j < maxsize-1; i++) {
 		if (isalpha(tbuf[i])) {
 			if (!iflag) {
 				s[j++] = tbuf[i];
-				iflag = 1;
+				iflag = TRUE;
 			}
 		} else
-			iflag = 0;
+			iflag = FALSE;
 	}
 	s[j] = '\0';
 	return 0;
@@ -2281,15 +2309,15 @@ void get_cwd (
 }
 
 
+/*
+ * Convert a newsgroup name to a newsspool path
+ * No effect when reading via NNTP
+ */
 void
 make_group_path (
 	char *name,
 	char *path)
 {
-#if 0
-	char *ptr;
-#endif
-
 #ifdef VMS
 	sprintf(path, "[%s]", name);
 #else
@@ -2299,18 +2327,6 @@ make_group_path (
 		path++;
 	}
 	*path = '\0';
-#if 0	/* TODO */
-	strcpy (path, name);
-
-	ptr = path;
-
-	while (*ptr) {
-		if (*ptr == '.')
-			*ptr = '/';
-
-		ptr++;
-	}
-#endif
 #endif
 }
 
@@ -2383,27 +2399,24 @@ vPrintBugAddress (void)
 /*
  *  Copy file from pcSrcFile to pcDstFile
  */
-int
-iCopyFile (
+t_bool
+copy_file (
 	char	*pcSrcFile,
 	char	*pcDstFile)
 {
-	char	acBuffer[8192];
-	FILE	*hFpDst;
-	FILE	*hFpSrc;
-	int	iRetCode = FALSE;
-	int	iReadOk = -1;
-	int	iWriteOk = -1;
-	size_t	iWriteSize = 0;
-	long	lCurFilePos = 0L;
-	long	lSrcFilePos = 0L;
+	FILE *hFpDst;
+	FILE *hFpSrc;
+	char acBuffer[8192];
+	int iReadOk = -1;
+	int iWriteOk = -1;
+	long lCurFilePos = 0L;
+	long lSrcFilePos = 0L;
+	size_t iWriteSize = 0;
+	t_bool retcode = FALSE;
 
-	if ((hFpSrc = fopen (pcSrcFile, "r")) != (FILE *) 0)
-	{
-		if ((hFpDst = fopen (pcDstFile, "w")) != (FILE *) 0)
-		{
-			while (!feof (hFpSrc) && (iReadOk = (int) fread (acBuffer, sizeof(acBuffer), 1, hFpSrc)) != -1)
-			{
+	if ((hFpSrc = fopen (pcSrcFile, "r")) != (FILE *) 0) {
+		if ((hFpDst = fopen (pcDstFile, "w")) != (FILE *) 0) {
+			while (!feof (hFpSrc) && (iReadOk = (int) fread (acBuffer, sizeof(acBuffer), 1, hFpSrc)) != -1) {
 				lCurFilePos = ftell (hFpSrc);
 				iWriteSize = (size_t) (lCurFilePos - lSrcFilePos);
 				lSrcFilePos = lCurFilePos;
@@ -2411,14 +2424,13 @@ iCopyFile (
 					break;
 			}
 			if (iReadOk != -1 && iWriteOk != -1)
-				iRetCode = TRUE;
+				retcode = TRUE;
 
 			fclose (hFpDst);
 		}
 		fclose (hFpSrc);
 	}
-
-	return iRetCode;
+	return retcode;
 }
 
 
@@ -2460,7 +2472,7 @@ random_organization(
 	while (fgets(selorg, (int) sizeof(selorg), orgfp))
 		nool++;
 
-	fseek(orgfp, 0L, SEEK_SET);
+	rewind (orgfp);
 	sol = rand () % nool + 1;
 	nool = 0;
 	while ((nool != sol) && (fgets(selorg, (int) sizeof(selorg), orgfp)))

@@ -383,12 +383,12 @@ update_posted_info_file (
 {
 	FILE *fp;
 	time_t epoch;
-	struct tm *tm;
+	struct tm *pitm;
 
 	if ((fp = fopen (posted_info_file, "a+")) != NULL) {
 		(void) time (&epoch);
-		tm = localtime (&epoch);
-		fprintf (fp, "%02d-%02d-%02d|%c|%s|%s\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year % 100, action, group, subj);
+		pitm = localtime (&epoch);
+		fprintf (fp, "%02d-%02d-%02d|%c|%s|%s\n", pitm->tm_mday, pitm->tm_mon + 1, pitm->tm_year % 100, action, group, subj);
 		fclose (fp);
 	}
 }
@@ -768,7 +768,7 @@ check_article_to_be_posted (
 				errors++;
 				EndInverse();
 #else
-				my_fprintf (stderr, (newsrc_active ? /* did we read the whole active file? */ txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup), ngptrs[i]);
+				my_fprintf (stderr, (!list_active ? /* did we read the whole active file? */ txt_warn_not_in_newsrc : txt_warn_not_valid_newsgroup), ngptrs[i]);
 #endif /* HAVE_FASCIST_NEWSADMIN */
 			}
 			free (ngptrs[i]);
@@ -923,8 +923,8 @@ quick_post_article (
 		}
 
 		if (psGrp->moderated == 'm') {
-			sprintf (msg, txt_group_is_moderated, buf);
-			if (prompt_yn (cLINES, msg, TRUE) != 1) {
+			sprintf (mesg, txt_group_is_moderated, buf);
+			if (prompt_yn (cLINES, mesg, TRUE) != 1) {
 				Raw (FALSE);
 				/* FIXME: -> lang.c */
 				error_message("Exiting...");
@@ -1267,7 +1267,7 @@ append_postponed_file (
 			(void) time (&epoch);
 			fprintf (fp_out, "From %s %s", addr, ctime (&epoch));
 			while (fgets (buf, (int) sizeof(buf), fp_in) != (char *) 0) {
-				if(strncmp(buf, "From ", 5)==0)
+				if (strncmp(buf, "From ", 5) == 0)
 					fputc('>', fp_out);
 				fputs (buf, fp_out);
 			}
@@ -1313,9 +1313,9 @@ fetch_postponed_article(
 	FILE *tmp;
 	char postponed_tmp[PATH_LEN];
 	char line[HEADER_LEN];
-	int first_article;
-	int prev_line_nl;
-	int anything_left;
+	t_bool first_article;
+	t_bool prev_line_nl;
+	t_bool anything_left;
 
 	strcpy(postponed_tmp, postponed_articles_file);
 	strcat(postponed_tmp, "_");
@@ -1335,7 +1335,7 @@ fetch_postponed_article(
 
 	fgets(line, (int) sizeof(line), in);
 
-	if(strncmp(line, "From ", 5)!=0) {
+	if (strncmp(line, "From ", 5) != 0) {
 		fclose(in);
 		fclose(out);
 		fclose(tmp);
@@ -1346,32 +1346,33 @@ fetch_postponed_article(
 	prev_line_nl = FALSE;
 	anything_left = FALSE;
 
-	/* we have one minor problem with copying the article, we have added
+	/*
+	 * we have one minor problem with copying the article, we have added
 	 * a newline at the end of the article and we have to remove that,
 	 * but we don't know we are on the last line until we read the next
 	 * line containing "From "
 	 */
 
-	while(fgets(line, (int) sizeof(line), in)!=NULL) {
-		if(strncmp(line, "From ", 5)==0)
-			first_article=FALSE;
-		if(first_article) {
+	while (fgets(line, (int) sizeof(line), in) != NULL) {
+		if (strncmp(line, "From ", 5) == 0)
+			first_article = FALSE;
+		if (first_article) {
 			match_string(line, "Newsgroups: ", newsgroups, HEADER_LEN);
 			match_string(line, "Subject: ", subject, HEADER_LEN);
 
-			if(prev_line_nl)
+			if (prev_line_nl)
 				fputc('\n', out);
 
-			if(strlen(line) && line[strlen(line)-1]=='\n') {
-				prev_line_nl=TRUE;
-				line[strlen(line)-1]='\0';
+			if (strlen(line) && line[strlen(line)-1]=='\n') {
+				prev_line_nl = TRUE;
+				line[strlen(line)-1] = '\0';
 			} else
-				prev_line_nl=FALSE;
+				prev_line_nl = FALSE;
 
 			fputs(line, out);
 		} else {
 			fputs(line, tmp);
-			anything_left=1;
+			anything_left = TRUE;
 		}
 	}
 
@@ -1391,7 +1392,6 @@ fetch_postponed_article(
 
 
 /* pick up any postponed article and ask if the user want to use it */
-
 t_bool
 pickup_postponed_articles(
 	t_bool ask,
@@ -1404,14 +1404,14 @@ pickup_postponed_articles(
 	int count = count_postponed_articles();
 	int i;
 
-	if (count==0) {
+	if (!count) {
 		if (!ask)
 			info_message(txt_info_nopostponed);
 		return FALSE;
 	}
 
 	/* FIXME - move to lang.c */
-	sprintf(question, "do you want to see postponed articles (%d)? ", count);
+	sprintf(question, "Do you want to see postponed articles (%d)? ", count);
 
 	if (ask && prompt_yn(cLINES, question, TRUE) != 1)
 		return FALSE;
@@ -1424,7 +1424,7 @@ pickup_postponed_articles(
 			ch = prompt_slk_response (iKeyPostponeYes, "\033qyYnA", sized_message(txt_postpone_repost, subject));
 
 			if (ch == iKeyPostponeYesAll)
-				all = 1;
+				all = TRUE;
 		}
 
 		/* No else here since all changes in previous if */
@@ -1459,10 +1459,10 @@ postpone_article(
 	append_postponed_file(the_article, userid);
 }
 
-/*
- *  Post an original article (not a followup)
- */
 
+/*
+ * Post an original article (not a followup)
+ */
 int
 post_article (
 	char *group,
@@ -1503,8 +1503,8 @@ post_article (
 	}
 
 	if (psGrp->moderated == 'm') {
-		sprintf (msg, txt_group_is_moderated, group);
-		if (prompt_yn (cLINES, msg, TRUE) != 1) {
+		sprintf (mesg, txt_group_is_moderated, group);
+		if (prompt_yn (cLINES, mesg, TRUE) != 1) {
 			clear_message ();
 			return redraw_screen;
 		}
@@ -1517,9 +1517,9 @@ post_article (
 		strcat(tmp, " ...");
 	} else
 		strncpy(tmp, default_post_subject, sizeof(tmp));
-	sprintf (msg, txt_post_subject, tmp);
+	sprintf (mesg, txt_post_subject, tmp);
 
-	if (!prompt_string (msg, subj, HIST_POST_SUBJECT)) {
+	if (!prompt_string (mesg, subj, HIST_POST_SUBJECT)) {
 		clear_message ();
 		return redraw_screen;
 	}
@@ -1889,7 +1889,7 @@ post_response (
 	char *group,
 	int respnum,
 	int copy_text,
-	int with_headers)
+	t_bool with_headers)
 {
 	FILE *fp;
 	char ch, *ptr;
@@ -1922,22 +1922,21 @@ post_response (
 		switch (ch) {
 			case iKeyPostPost:
 			case iKeyPostPost2:
-				goto ignore_followup_to_poster;
+				break;
 			case iKeyQuit:
 			case iKeyAbort:
 				return ret_code;
 			default:
-				break;
-		}
-		{
-			char save_followup[HEADER_LEN];
+			{
+				char save_followup[HEADER_LEN];
 
-			strcpy (save_followup, note_h.followup);
-			*note_h.followup = '\0';
-			find_reply_to_addr (/*respnum,*/ buf, FALSE);
-			mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);
-			strcpy (note_h.followup, save_followup);
-			return ret_code;
+				strcpy (save_followup, note_h.followup);
+				*note_h.followup = '\0';
+				find_reply_to_addr (/*respnum,*/ buf, FALSE);
+				mail_to_someone (respnum, buf, TRUE, FALSE, &ret_code);
+				strcpy (note_h.followup, save_followup);
+				return ret_code;
+			}
 		}
 	} else if (*note_h.followup && strcmp (note_h.followup, group) != 0
 		   && strcmp (note_h.followup, note_h.newsgroups) != 0) {
@@ -1966,7 +1965,7 @@ post_response (
 		if (prompt_yn (cLINES, txt_continue, TRUE) != 1)
 			return ret_code;
 	}
-ignore_followup_to_poster:
+
 	if ((fp = fopen (article, "w")) == NULL) {
 		perror_message (txt_cannot_open, article);
 		return ret_code;
@@ -2031,9 +2030,18 @@ ignore_followup_to_poster:
 		else if (*my_distribution)
 			msg_add_header ("Distribution", my_distribution);
 	}
+
+	if (*note_h.authorids)
+		msg_add_header ("Author-IDs", note_h.authorids);
+
 	msg_add_x_headers (msg_headers_file);
 	msg_add_x_headers (psGrp->attribute->x_headers);
+	{
+		struct t_header_list *pptr;
 
+		for (pptr = note_h.persist; pptr != NULL; pptr = pptr->next)
+			msg_add_header(pptr->header, pptr->content);
+	}
 	start_line_offset = msg_write_headers (fp) + 1;
 	msg_free_headers ();
 	lines = msg_add_x_body (fp, psGrp->attribute->x_body);
@@ -2496,8 +2504,8 @@ mail_bug_report (void) /* return value is always ignored */
 
 			case iKeyPostSend:
 			case iKeyPostSend2:
-				sprintf (msg, txt_mail_bug_report_confirm, bug_addr);
-				if (prompt_yn (cLINES, msg, FALSE) == 1) {
+				sprintf (mesg, txt_mail_bug_report_confirm, bug_addr);
+				if (prompt_yn (cLINES, mesg, FALSE) == 1) {
 					if (pcCopyArtHeader (HEADER_TO, nam, mail_to) && pcCopyArtHeader (HEADER_SUBJECT, nam, subject)) {
 						wait_message (0, txt_mailing_to, mail_to);
 						rfc15211522_encode (nam, txt_mime_encodings[mail_mime_encoding], mail_8bit_header, TRUE);
@@ -2524,12 +2532,13 @@ mail_bug_report_done:
 	return TRUE;
 }
 
+
 int
 mail_to_author (
 	char *group,
 	int respnum,
 	int copy_text,
-	int with_headers) /* return value is always ignored */
+	t_bool with_headers) /* return value is always ignored */
 {
 	char buf[LEN];
 	char from_addr[HEADER_LEN];
@@ -2726,7 +2735,8 @@ mail_to_author_done:
  */
 
 static t_bool
-check_for_spamtrap(char *addr)
+check_for_spamtrap (
+	char *addr)
 {
 	char *env, *ptr;
 
@@ -2772,11 +2782,9 @@ pcCopyArtHeader (
 	char *result)
 {
 	FILE *fp;
-	char buf[HEADER_LEN];
+	char *ptr;
 	char buf2[HEADER_LEN];
-	char *q;
 	const char *p;
-	int c;
 	static char header[HEADER_LEN];
 	t_bool found = FALSE;
 	t_bool was_to = FALSE;
@@ -2787,36 +2795,26 @@ pcCopyArtHeader (
 		perror_message (txt_cannot_open, pcArt);
 		return FALSE;
 	}
-	while (fgets (buf, (int) sizeof(buf), fp) != (char *) 0) {
-		q = strrchr (buf, '\n');
-		if (q != 0)
-			*q = '\0';
 
-		if (*buf == '\0')
+	while ((ptr = tin_fgets (fp, TRUE)) != (char *) 0) {
+
+		if (*ptr == '\0')
 			break;
-
-		/* check for continued header */
-		while ((c = peek_char (fp)) != EOF && isspace (c) && c != '\n' && strlen (buf) < sizeof (buf) - 1) {
-			if (strlen (buf) > 0 && buf[strlen (buf) - 1] == '\n')
-				buf[strlen (buf) - 1] = '\0';
-
-			fgets (buf + strlen (buf), sizeof buf - strlen (buf), fp);
-		}
 
 		switch (iHeader) {
 			case HEADER_TO:
-				if (STRNCMPEQ(buf, "To: ", 4) || STRNCMPEQ(buf, "Cc: ", 4)) {
-					my_strncpy (buf2, &buf[4], sizeof (buf2));
+				if (STRNCASECMPEQ(ptr, "To: ", 4) || STRNCASECMPEQ(ptr, "Cc: ", 4)) {
+					my_strncpy (buf2, &ptr[4], sizeof (buf2));
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
 					found = TRUE;
-				} else if (STRNCMPEQ(buf, "Bcc: ", 5)) {
-					my_strncpy (buf2, &buf[5], sizeof (buf2));
+				} else if (STRNCASECMPEQ(ptr, "Bcc: ", 5)) {
+					my_strncpy (buf2, &ptr[5], sizeof (buf2));
 					yank_to_addr (buf2, header);
 					was_to = TRUE;
 					found = TRUE;
-				} else if ((*buf == ' ' || *buf == '\t') && was_to) {
-					yank_to_addr (buf, header);
+				} else if ((*ptr == ' ' || *ptr == '\t') && was_to) {
+					yank_to_addr (ptr, header);
 					found = TRUE;
 				} else
 					was_to = FALSE;
@@ -2824,14 +2822,14 @@ pcCopyArtHeader (
 				break;
 
 			case HEADER_NEWSGROUPS:
-				if (match_string (buf, "Newsgroups: ", header, sizeof (header)))
+				if (match_string (ptr, "Newsgroups: ", header, sizeof (header)))
 					found = TRUE;
 
 				break;
 
 			case HEADER_SUBJECT:
-				if (STRNCMPEQ(buf, "Subject: ", 9)) {
-					my_strncpy (header, &buf[9], sizeof (header));
+				if (STRNCASECMPEQ(ptr, "Subject: ", 9)) {
+					my_strncpy (header, &ptr[9], sizeof (header));
 					found = TRUE;
 				}
 				break;
@@ -2841,6 +2839,9 @@ pcCopyArtHeader (
 		}
 	}
 	fclose (fp);
+
+	if (tin_errno != 0)
+		return(FALSE);
 
 	if (found) {
 		p = ((header[0] == ' ') ? &header[1] : header);
@@ -2869,6 +2870,8 @@ pcCopyArtHeader (
 	return FALSE;
 }
 
+
+#ifndef INDEX_DAEMON
 t_bool
 cancel_article (
 	struct t_group *group,
@@ -2900,9 +2903,9 @@ cancel_article (
 	 * Check if news / mail / save group
 	 */
 	if (group->type == GROUP_TYPE_MAIL || group->type == GROUP_TYPE_SAVE) {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+#if !defined(INDEX_DAEMON)
 		vGrpDelMailArt (art);
-#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
+#endif /* !INDEX_DAEMON */
 		return FALSE;
 	}
 
@@ -3064,6 +3067,8 @@ cancel_article (
 		}
 	}
 }
+#endif /* !INDEX_DAEMON */
+
 
 /*
  * Repost an already existing article to another group (ie. local group)
@@ -3081,7 +3086,7 @@ cancel_article (
 
 int
 repost_article (
-	char *group,
+	const char *group,
 	int respnum,
 	int supersede)
 {
@@ -3131,8 +3136,8 @@ repost_article (
 			wait_message (1, "Group=[%s]", buf);
 #endif /* DEBUG */
 		if (psGrp && psGrp->moderated == 'm') {
-			sprintf (msg, txt_group_is_moderated, buf);
-			if (prompt_yn (cLINES, msg, TRUE) != 1) {
+			sprintf (mesg, txt_group_is_moderated, buf);
+			if (prompt_yn (cLINES, mesg, TRUE) != 1) {
 				wait_message (3, txt_art_not_posted);
 				return POSTED_NONE;
 			}
@@ -3168,7 +3173,7 @@ repost_article (
 			make_path_header (line, from_name);
 			msg_add_header ("Path", line);
 
-			msg_add_header ("From", (note_h.from ? note_h.from : from_name));
+			msg_add_header ("From", (*note_h.from ? note_h.from : from_name));
 			find_reply_to_addr (/* respnum,*/ line, FALSE);
 			msg_add_header ("Reply-To", line);
 			msg_add_header ("X-Superseded-By", from_name);
@@ -3227,13 +3232,13 @@ repost_article (
 		fprintf (fp, "[ %-72s ]\n", txt_article_reposted);
       /* all string lengths are calculated to a maximum line length
          of 76 characters, this should look ok (sven@tin.org) */
-		if (note_h.from)
+		if (*note_h.from)
 			fprintf (fp, "[ From: %-66s ]\n", note_h.from);
-		if (note_h.subj)
+		if (*note_h.subj)
 			fprintf (fp, "[ Subject: %-63s ]\n", note_h.subj);
-		if (note_h.newsgroups)
+		if (*note_h.newsgroups)
 			fprintf (fp, "[ Newsgroups: %-60s ]\n", note_h.newsgroups);
-		if (note_h.messageid)
+		if (*note_h.messageid)
 			fprintf (fp, "[ Message-ID: %-60s ]\n\n", note_h.messageid);
 	}
 	fseek (note_fp, mark_body, SEEK_SET);
@@ -3468,7 +3473,7 @@ checknadd_headers (
 	char line[HEADER_LEN];
 	char outfile[PATH_LEN];
 	FILE *fp_in, *fp_out;
-	int gotit = FALSE;
+	t_bool gotit = FALSE;
 
 	if ((fp_in = fopen (infile, "r")) != (FILE *) 0) {
 #ifdef VMS
@@ -3595,7 +3600,7 @@ find_reply_to_addr (
 	fseek (note_fp, 0L, SEEK_SET);
 
 	while (fgets (buf, (int) sizeof(buf), note_fp) != (char *) 0 && !found && buf[0] != '\n') {
-		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
+		if (STRNCASECMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (from_both, &buf[10]);
 			ptr = strchr (from_both, '\n');
 			if (ptr != (char *) 0) {
@@ -3620,26 +3625,23 @@ find_reply_to_addr (
 	char *ptr, buf[HEADER_LEN];
 	char replyto[HEADER_LEN];
 	char from[HEADER_LEN];
-/*	char temp[HEADER_LEN]; */
 	char fullname[HEADER_LEN];
-/*	char* dest; */
 	int found_replyto = FALSE;
 	long orig_offset;
 
 	orig_offset = ftell (note_fp);
 	fseek (note_fp, 0L, SEEK_SET);
 
-	while (fgets (buf, (int) sizeof(buf), note_fp) != (char *) 0 && buf[0] != '\n') {
-		/* not quite correct, since we don't process continuation
-		   lines, but that is unlikely */
-		if (STRNCMPEQ(buf, "Reply-To: ", 10)) {
+	while (fgets (buf, (int) sizeof (buf), note_fp) != (char *) 0 && buf[0] != '\n') {
+		/* FIXME we don't process continuation lines, we should use tin_fgets() here */
+		if (STRNCASECMPEQ(buf, "Reply-To: ", 10)) {
 			strcpy (replyto, &buf[10]);
 			ptr = strchr (replyto, '\n');
 			if (ptr != (char *) 0)
 				*ptr = '\0';
 
 			found_replyto = TRUE;
-		} else if (STRNCMPEQ(buf, "From: ", 6)) {
+		} else if (STRNCASECMPEQ(buf, "From: ", 6)) {
 			strcpy (from, &buf[6]);
 			ptr = strchr (from, '\n');
 			if (ptr != (char *) 0)
@@ -3671,13 +3673,14 @@ find_reply_to_addr (
  * for each group at the group selection level.
  */
 
-int
+t_bool
 reread_active_after_posting (void)
 {
-	int i, modified = FALSE;
+	int i;
 	long lMinOld;
 	long lMaxOld;
 	struct t_group *psGrp;
+	t_bool modified = FALSE;
 
 	if (reread_active_for_posted_arts) {
 		reread_active_for_posted_arts = FALSE;
@@ -3714,7 +3717,7 @@ reread_active_after_posting (void)
 						my_flush ();
 #endif /* DEBUG */
 
-						expand_bitmap (psGrp, psGrp->xmin);
+						expand_bitmap (psGrp, 0);
 						modified = TRUE;
 					}
 					clear_message ();
@@ -3763,6 +3766,7 @@ update_active_after_posting (
 			dst++;
 	}
 }
+
 
 static int
 submit_mail_file (

@@ -42,7 +42,7 @@ static void draw_subject_arrow (void);
 	static void erase_subject_arrow (void);
 	static void prompt_subject_num (int ch);
 	static void update_group_page (void);
-	static void show_group_title (int clear_title);
+	static void show_group_title (t_bool clear_title);
 	static void show_tagged_lines (void);
 #endif /* !INDEX_DAEMON */
 
@@ -102,12 +102,11 @@ decr_tagged (
 }
 
 
+#ifndef INDEX_DAEMON
 void
 group_page (
 	struct t_group *group)
 {
-#ifndef INDEX_DAEMON
-
 	char group_path[LEN];
 	char buf[128];
 	char pat[128];
@@ -119,13 +118,13 @@ group_page (
 	int old_top = 0;
 	int posted_flag;
 	int scroll_lines;
-	int xflag = 0;
 	int old_group_top;
 	int thread_depth;					/* Depth into thread we start at */
 	unsigned int flag;
 	long old_artnum = 0L;
 	struct t_art_stat sbuf;
 	t_bool range_active = FALSE;		/* Set if a range is defined */
+	t_bool xflag = FALSE;
 
 	/*
 	 * Set the group attributes
@@ -303,7 +302,7 @@ end_of_list:
 				break;
 
 			case iKeySetRange:	/* set range */
-				if (iSetRange (GROUP_LEVEL, 1, top_base, index_point+1)) {
+				if (bSetRange (GROUP_LEVEL, 1, top_base, index_point+1)) {
 					range_active = TRUE;
 					show_group_page ();
 				}
@@ -681,9 +680,6 @@ group_catchup:								/* came here on group exit via left arrow */
 					show_group_title (TRUE);
 				}
 				bld_sline (index_point);
-#if 0
-show_group_page();
-#endif
 				draw_sline (index_point, FALSE);
 
 				/*
@@ -866,10 +862,10 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupSaveTagged:	/* save tagged articles without prompting */
+			case iKeyGroupAutoSaveTagged:	/* Auto-save tagged articles without prompting */
 				if (index_point >= 0) {
 					if (num_of_tagged_arts) {
-						feed_articles (FEED_SAVE_TAGGED, GROUP_LEVEL,
+						feed_articles (FEED_AUTOSAVE_TAGGED, GROUP_LEVEL,
 							&CURR_GROUP, (int) base[index_point]);
 					} else {
 						info_message (txt_no_tagged_arts_to_save);
@@ -879,8 +875,8 @@ group_list_thread:
 
 			case iKeyGroupTag:	/* tag/untag threads for mailing/piping/printing/saving */
 				if (index_point >= 0) {
-					int tagged = TRUE;
 					int ii;
+					t_bool tagged = TRUE;
 
 					n = (int) base[index_point];
 
@@ -933,8 +929,7 @@ group_list_thread:
 
 			case iKeyGroupToggleThreading:	/* Cycle through the threading types */
 
-				CURR_GROUP.attribute->thread_arts =
-							++CURR_GROUP.attribute->thread_arts % (THREAD_MAX + 1);
+				CURR_GROUP.attribute->thread_arts = (CURR_GROUP.attribute->thread_arts + 1) % (THREAD_MAX + 1);
 				if (index_point >= 0) {
 					make_threads (&CURR_GROUP, TRUE);
 					find_base (&CURR_GROUP);
@@ -1001,17 +996,17 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(msg, "Base article range"); /* FIXME: -> lang.c */
+					strcpy(mesg, "Base article range"); /* FIXME: -> lang.c */
 				} else {
 					art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
-					strcpy(msg, "Base article"); /* FIXME: -> lang.c */
+					strcpy(mesg, "Base article"); /* FIXME: -> lang.c */
 				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_marked_as_unread, msg);
+				info_message (txt_marked_as_unread, mesg);
 				break;
 
 			case iKeyGroupMarkThdUnread:	/* mark whole thread as unread */
@@ -1035,17 +1030,17 @@ group_list_thread:
 					}
 					range_active = FALSE;
 					show_group_page();
-					strcpy(msg, "Thread range"); /* FIXME: -> lang.c */
+					strcpy(mesg, "Thread range"); /* FIXME: -> lang.c */
 				} else {
 					thd_mark_unread (&CURR_GROUP, base[index_point]);
-					strcpy(msg, "Thread");
+					strcpy(mesg, "Thread");
 				}
 
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline (index_point, FALSE);
 				draw_subject_arrow();
-				info_message (txt_marked_as_unread, msg);
+				info_message (txt_marked_as_unread, mesg);
 				break;
 
 			case iKeyGroupSelThd:	/* mark thread as selected */
@@ -1091,13 +1086,13 @@ group_list_thread:
 					arts[i].selected = FALSE;
 					arts[i].zombie = FALSE;
 				}
-				xflag = 0;
+				xflag = FALSE;
 				update_group_page ();
 				break;
 
 			case iKeyGroupSelPattern:	/* select matching patterns */
-				sprintf (msg, txt_select_pattern, default_select_pattern);
-				if (!prompt_string (msg, buf, HIST_SELECT_PATTERN)) {
+				sprintf (mesg, txt_select_pattern, default_select_pattern);
+				if (!prompt_string (mesg, buf, HIST_SELECT_PATTERN)) {
 					break;
 				}
 				if (buf[0] == '\0') {
@@ -1145,9 +1140,9 @@ group_list_thread:
 
 			case iKeyGroupMarkUnselArtRead:	/* mark read all unselected arts */
 do_auto_select_arts:
-				if (xflag) {
+				if (xflag)
 					goto undo_auto_select_arts;
-				}
+
 				for (i=0; i < top; ++i) {
 					if (arts[i].status == ART_UNREAD && arts[i].selected != 1) {
 #ifdef DEBUG_NEWSRC
@@ -1201,14 +1196,12 @@ group_done:
 	if (index_point == GRP_QUIT) {
 		if (!no_write)
 			write_config_file (local_config_file);
-		tin_done (EXIT_OK);
+		tin_done (EXIT_SUCCESS);
 	}
 	clear_note_area ();
-#	ifdef HAVE_MH_MAIL_HANDLING
 	vGrpDelMailArts (&CURR_GROUP);
-#	endif /* HAVE_MH_MAIL_HANDLING */
-#endif /* !INDEX_DAEMON */
 }
+#endif /* !INDEX_DAEMON */
 
 
 void
@@ -1678,7 +1671,7 @@ draw_sline (
 
 static void
 show_group_title (
-	int clear_title)
+	t_bool clear_title)
 {
 	char buf[PATH_LEN];
 	int num;
@@ -1697,7 +1690,11 @@ show_group_title (
 	}
 
 
-#	if 0 /* turn on the warning about missing articles - !FIXME! */
+#	if 0
+/*
+ * turn on the warning about missing articles
+ * patch 596 should finally have fixed the problem
+ */
 	sprintf (buf, "%s (%dT(%c) %dA %dK %dH%s%c) %ldU %s",
 		active[num].name, top_base,
 		*txt_thread[active[num].attribute->thread_arts],
@@ -1721,8 +1718,8 @@ show_group_title (
 	}
 
 	show_title (buf);
-
 }
+
 
 /*
  * Move the on-screen pointer & internal variable to the given thread number
