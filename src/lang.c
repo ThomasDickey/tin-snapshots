@@ -15,6 +15,8 @@
 #include "tin.h"
 
 constext txt_1_resp[] = "1 Response\r\n";
+constext txt_7bit[] = "7bit";
+constext txt_8bit[] = "8bit";
 constext txt_abort_indexing[] = "Do you want to abort indexing group? (y/n): ";
 constext txt_abort_searching[] = "Do you want to abort searching? (y/n): ";
 constext txt_active_file_is_empty[] = "\n%s contains no newsgroups. Exiting.";
@@ -43,9 +45,12 @@ constext txt_autosubscribing_groups[] = "Autosubscribing groups...\n";
 constext txt_bad_active_file[] = "Active file corrupt - %s";
 constext txt_bad_article[] = "Article to be posted has the errors/warnings noted above. q)uit, e)dit: ";
 constext txt_bad_command[] = "Bad command.  Type 'h' for help.";
+constext txt_base64[] = "base64";
 constext txt_begin_of_art[] = "*** Beginning of article ***";
 constext txt_cannot_find_base_art[] = "Can't find base article %s";
 constext txt_cannot_get_nntp_server_name[] = "Cannot find NNTP server name";
+constext txt_cannot_get_term[] = "%s: Can't get TERM variable\n";
+constext txt_cannot_get_term_entry[] = "%s: Can't get entry for TERM\n";
 constext txt_cannot_open[] = "Can't open %s";
 constext txt_cannot_open_active_file[] = "Can't open %s. Try %s -r to read news via NNTP.\n";
 constext txt_cannot_post[] = "*** Posting not allowed ***";
@@ -81,6 +86,7 @@ char txt_copyright_notice[] = "%s (c) Copyright 1991-93 Iain Lea & Tod McQuillin
 #ifdef WIN32
 constext txt_copyright_notice[] = "%s (c) Copyright 1991-94 Iain Lea & Nigel Ellis.";
 #endif
+constext txt_creating_active[] = "Creating active file for saved groups...\n";
 constext txt_creating_newsrc[] = "Creating newsrc file...\n";
 constext txt_delete_article[] = "Delete or supersede article [%s]? (d/s/q): %c";
 constext txt_delete_processed_files[] = "Delete saved files that have been post processed? (y/n): ";
@@ -90,6 +96,7 @@ constext txt_superseding_art[] = "Superseding article...";
 constext txt_end_of_arts[] = "*** End of Articles ***";
 constext txt_end_of_groups[] = "*** End of Groups ***";
 constext txt_end_of_thread[] = "*** End of Thread ***";
+constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
 constext txt_env_var_not_found[] = "Environment variable %s not found. Set and retry...";
 constext txt_error_from_in_header_not_allowed[] = "Error on line %d: \"From:\" header not allowed (it will be added for you)\n";
@@ -440,6 +447,11 @@ constext txt_no_responses[] = "No responses";
 constext txt_no_resps_in_thread[] = "No responses to list in current thread";
 constext txt_no_search_string[] = "No search string";
 constext txt_no_subject[] = "No subject";
+constext txt_no_term_clear_eol[] = "%s: Terminal must have clear to end-of-line (ce)\n";
+constext txt_no_term_clear_eos[] = "%s: Terminal must have clear to end-of-screen (cd)\n";
+constext txt_no_term_clearscreen[] = "%s: Terminal must have clearscreen (cl) capability\n";
+constext txt_no_term_cursor_motion[] = "%s: Terminal must have cursor motion (cm)\n";
+constext txt_no_term_set[] = "%s: TERM variable must be set to use screen capabilities\n";
 constext txt_not_in_active_file[] = "Group %s not found in active file";
 constext txt_not_exist[] = "Newsgroup does not exist on this server";
 constext txt_nrctbl_create[] = "c)reate it i)gnore q)uit tin: ";
@@ -547,6 +559,7 @@ constext txt_opt_xpost_quote_format[] = 	"Quote line when cross-posting       : 
 constext txt_option_not_enabled[] = "Option not enabled. Recompile with %s.";
 constext txt_options_menu[] = "Options Menu";
 constext txt_out_of_memory[] = "%s: memory exhausted trying to allocate %d bytes in file %s line %d";
+constext txt_out_of_memory2[] = "Out of memory!";
 constext txt_pgp_mail[] = "e)ncrypt, s)ign, b)oth, q)uit: ";
 constext txt_pgp_news[] = "s)ign, i) sign & include public key, q)uit: ";
 constext txt_pgp_not_avail[] = "PGP has not been set up for this account.";
@@ -585,7 +598,8 @@ constext *txt_colors[] = { "Black", "Red", "Green", "Brown", "Blue", "Pink",
 /*
  * MIME-Content-Types.
  */
-constext *txt_mime_types[] = { "8bit", "base64", "Quoted-Printable", "7bit" };
+constext *txt_mime_types[] = { txt_8bit, txt_base64, txt_quoted_printable,
+				txt_7bit };
 
 /*
  * Array of possible post processing descriptions and short-keys
@@ -666,6 +680,7 @@ constext txt_quit_edit_xpost[] = "q)uit, e)dit, p)ost [%.*s]: %c";
 
 constext txt_catchup_despite_tags[] = "You have tagged articles in this group - catchup anyway? (y/n): ";
 constext txt_quit_despite_tags[] = "You have tagged articles in this group - quit anyway? (y/n): ";
+constext txt_quoted_printable[] = "quoted-printable";
 constext txt_read_resp[] = "Read response> ";
 constext txt_reading_all_arts[] = "Reading all articles...";
 constext txt_reading_all_groups[] = "Reading all groups...";
@@ -750,6 +765,7 @@ constext txt_untagged_thread[] = "Untagged thread";
 constext txt_unthreading_arts[] = "Unthreading articles...";
 constext txt_use_mime[] = "Use MIME display program for this message? (y/n): ";
 constext txt_uudecoding[] = "Uudecoding %s...";
+constext txt_value_out_of_range[] = "\n%s%d out of range (0 - %d). Reset to 0";
 constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n\n";
 constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";

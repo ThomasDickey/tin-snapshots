@@ -207,15 +207,15 @@ InitScreen ()
 	char the_termname[40], *p;
 
 	if ((p = getenv ("TERM")) == (char *) 0) {
-		fprintf (stderr, "%s: TERM variable must be set to use screen capabilities\n", progname);
+		fprintf (stderr, txt_no_term_set, progname);
 		return (FALSE);
 	}
 	if (strcpy (the_termname, p) == NULL) {
-		fprintf (stderr,"%s: Can't get TERM variable\n", progname);
+		fprintf (stderr, txt_cannot_get_term, progname);
 		return (FALSE);
 	}
 	if (tgetent (_terminal, the_termname) != 1) {
-		fprintf (stderr,"%s: Can't get entry for TERM\n", progname);
+		fprintf (stderr, txt_cannot_get_term_entry, progname);
 		return (FALSE);
 	}
 
@@ -254,23 +254,19 @@ InitScreen ()
 	InitWin ();
 
 	if (! _clearscreen) {
-		fprintf (stderr,
-			"%s: Terminal must have clearscreen (cl) capability\n",progname);
+		fprintf (stderr, txt_no_term_clearscreen, progname);
 		return (FALSE);
 	}
 	if (! _moveto) {
-		fprintf (stderr,
-			"%s: Terminal must have cursor motion (cm)\n", progname);
+		fprintf (stderr, txt_no_term_cursor_motion, progname);
 		return (FALSE);
 	}
 	if (! _cleartoeoln) {
-		fprintf (stderr,
-			"%s: Terminal must have clear to end-of-line (ce)\n", progname);
+		fprintf (stderr, txt_no_term_clear_eol, progname);
 		return (FALSE);
 	}
 	if (! _cleartoeos) {
-		fprintf (stderr,
-			"%s: Terminal must have clear to end-of-screen (cd)\n", progname);
+		fprintf (stderr, txt_no_term_clear_eos, progname);
 		return (FALSE);
 	}
 	if (_lines == -1)

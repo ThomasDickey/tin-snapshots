@@ -355,6 +355,20 @@ void set_signals_art ()
 }
 
 
+void set_signals_config ()
+{
+#ifdef SIGTSTP
+	if (do_sigtstp) {
+		sigdisp (SIGTSTP, config_suspend);
+	}
+#endif
+
+#ifdef SIGWINCH
+	signal (SIGWINCH, config_resize);
+#endif
+}
+
+
 void set_signals_group ()
 {
 #ifdef SIGTSTP
@@ -597,7 +611,7 @@ void config_suspend (sig)
 	Raw (TRUE);
 	set_keypad_on ();
 	set_xclick_on ();
-	show_config_page (actual_option_page);
+	refresh_config_page (0, TRUE);
 }
 
 #endif /* SIGTSTP */
@@ -616,6 +630,20 @@ void art_resize (sig)
 	ClearScreen ();
 	sprintf (buf, txt_group, glob_art_group);
 	wait_message (buf);
+}
+
+
+void config_resize (sig)
+	int sig;
+{
+	int resized = TRUE;
+#ifdef SIGWINCH
+	resized = set_win_size (&cLINES, &cCOLS);
+	signal (SIGWINCH, config_resize);
+#endif
+	if (resized || sig == 0) {
+		refresh_config_page (0, TRUE);	/* force rebuild of option page */
+	}
 }
 
 

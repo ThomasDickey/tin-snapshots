@@ -2447,9 +2447,13 @@ peek_char (fp)
 static int to_local(c)
 	int c;
 {
-	c=c_l1_next[(unsigned char)c];
-	if(c==BAD) return '?';
-	else return c;
+	if(use_local_charset) {
+		c=c_l1_next[(unsigned char)c];
+		if(c==BAD) return '?';
+		else return c;
+	} else {
+		return c;
+	}
 }
 
 void buffer_to_local(b)
@@ -2462,54 +2466,13 @@ void buffer_to_local(b)
 static int to_network(c)
 	int c;
 {
-	c=c_next_l1[(unsigned char)c];
-	if(c==BAD) return '?';
-	else return c;
-}
-
-void buffer_to_network(b)
-	char *b;
-{
-	for( ;*b;b++)
-		*b=to_network(*b);
-}
-
-#endif
-
-#ifdef LOCAL_CHARSET
-
-/*
- * convert between local and network charset (e.g. NeXT and latin1)
- */
-
-
-#define CHARNUM 256
-#define BAD (-1)
-
-#include "l1_next.tab"
-#include "next_l1.tab"
-
-static int to_local(c)
-	int c;
-{
-	c=c_l1_next[(unsigned char)c];
-	if(c==BAD) return '?';
-	else return c;
-}
-
-void buffer_to_local(b)
-	char *b;
-{
-	for( ;*b;b++)
-		*b=to_local(*b);
-}
-
-static int to_network(c)
-	int c;
-{
-	c=c_next_l1[(unsigned char)c];
-	if(c==BAD) return '?';
-	else return c;
+	if(use_local_charset) {
+		c=c_next_l1[(unsigned char)c];
+		if(c==BAD) return '?';
+		else return c;
+	} else {
+		return c;
+	}
 }
 
 void buffer_to_network(b)

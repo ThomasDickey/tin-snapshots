@@ -270,7 +270,7 @@ search_subject (forward)
 				str_lwr (arts[art].subject, buf2);
 				if (strstr(buf2, buf) != 0) {
 					found = TRUE;
-					goto found;		/* I know... I know !! */
+					goto found_something;		/* I know... I know !! */
 				}
 			}
 		}
@@ -284,7 +284,7 @@ search_subject (forward)
 
 	} while (i != index_point);
 
-found:
+found_something:
 	if (found) {
 		if (_hp_glitch)
 			erase_subject_arrow ();

@@ -84,14 +84,11 @@ o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
 
 o  looks like Keywords & Summary in attributes/x_headers are ignored :(
 
-o  when changing the window size while in options menu, the article/group/
-   thread overview will be displayed (depends from where you entered the
-   options menu), but you are still in the options menu. Probably, the
-   routine for the signal for window resizing must be changed at the
-   beginning of change_config_file() and be reset at the end of it.
-
 New features
 ------------
+o  add command: mark all articles older than <date> as read
+   (usefull when subscribing to a new group with high-traffic...)
+
 o  add support for ispell language change
 
 o  add rfc1468/1922 support

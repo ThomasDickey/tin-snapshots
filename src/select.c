@@ -426,7 +426,7 @@ select_page_up:
 					if (cur_groupnum < first_group_on_screen ||
 						cur_groupnum >= last_group_on_screen ||
 						cur_groupnum != n) {
-						group_selection_page();
+						group_selection_page ();
 					} else {
 						clear_message ();
 						draw_group_arrow();
@@ -493,6 +493,7 @@ select_page_up:
 			case iKeySelectOptionsMenu:	/* options menu */
 				set_alarm_clock_off ();
 				change_config_file (NULL, TRUE);
+				set_signals_select ();	/* just to be sure */
 				free_attributes_array ();
 				read_attributes_file (global_attributes_file, TRUE);
 				read_attributes_file (local_attributes_file, FALSE);
