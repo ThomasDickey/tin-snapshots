@@ -68,7 +68,7 @@ selection_index (
 	set_alarm_signal ();		/* set alarm signal for resync_active_file () */
 
 	/*
-	 * If user specified on cmd line only 1 groupname (ie. tin alt.sources)
+	 * If user specified on cmd line only 1 groupname (eg. tin alt.sources)
 	 * then enter the group immediately.  Don't scream at the use of a goto.
 	 */
 	if (num_cmd_line_groups == 1) {
@@ -513,7 +513,7 @@ select_done:
 				break;
 
 			case iKeySelectQuitNoWrite:	/* quit, but don't save configuration */
-				if (prompt_yn (cLINES, txt_quit_no_write, TRUE)==1) {
+				if (prompt_yn (cLINES, txt_quit_no_write, TRUE) == 1) {
 					tin_done (EXIT_OK);
 				}
 				show_selection_page ();
@@ -1379,7 +1379,7 @@ strip_line (
 
 /*
  * Allows user to specify an group/article range that a followup
- * command will operate on (ie. catchup articles 1-56) # 1-56 K
+ * command will operate on (eg. catchup articles 1-56) # 1-56 K
  *
  * Allowed syntax is 0123456789-.$ (blanks are ignored):
  *   1-23    mark grp/art 1 thru 23
@@ -1442,7 +1442,7 @@ iSetRange (
 	 * Parse range string
 	 */
 	if (!iParseRange (acRng, iNumMin, iNumMax, iNumCur, &iRngMin, &iRngMax)) {
-		info_message ("Invalid range - valid are '0-9.$' ie. 1-$");
+		info_message ("Invalid range - valid are '0-9.$' eg. 1-$");
 	} else {
 /*
 		sprintf (msg, "DefRng=[%s] NewRng=[%s] Min=[%d] Max=[%d]",
@@ -1562,7 +1562,10 @@ vDelRange (
 			break;
 		case GROUP_LEVEL:
 			for (iIndex = 0; iIndex < iNumMax-1; iIndex++) {
-				arts[iIndex].inrange = FALSE;
+				int iNum;
+
+				for (iNum = (int) base[iIndex] ; iNum != -1 ; iNum = arts[iNum].thread)
+					arts[iNum].inrange = FALSE;
 			}
 			break;
 		case THREAD_LEVEL:

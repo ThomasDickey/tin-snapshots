@@ -1,3 +1,21 @@
+--unoff BETA release 970613 --
+
+391) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. wildmat searching broken in 387)
+     BUG. ranges were broken on group menu
+     ADD. 'K', 'z' & 'Z' on group menu now understand ranges
+     ADD. improvements to regex error reporting
+     ADD. code clean-up
+     FIX. several supplied patches
+
+390) Dmitri A. Martynoff <dmart@wowa.net.kiae.su>
+     ADD. unlink editor backup files
+     FIX. misc.c
+
+389) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. code clean-up
+     FIX. several supplied patches
+
 --unoff BETA release 970612 --
 
 388) Oliver B. Warzecha <obw@amarok.ping.de>

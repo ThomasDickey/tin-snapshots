@@ -813,30 +813,26 @@ read_motd_file (void)
 		}
 	}
 
-	if (old_motd_date && new_motd_date <= old_motd_date) {
-		goto read_motd_done;
-	}
-
-	if ((fp = open_motd_fp (motd_file_date)) != (FILE *) 0) {
-		while (fgets (buf, sizeof (buf), fp) != 0) {
-			if (buf[0] == '.') {
-				break;
+	if (old_motd_date && new_motd_date > old_motd_date) {
+		if ((fp = open_motd_fp (motd_file_date)) != (FILE *) 0) {
+			while (fgets (buf, sizeof (buf), fp) != 0) {
+				if (buf[0] == '.') {
+					break;
+				}
+				my_printf ("%s", buf);
+				lineno++;
 			}
-			my_printf ("%s", buf);
-			lineno++;
-		}
-		fclose (fp);
+			fclose (fp);
 
-		if (lineno) {
-			wait_message (txt_return_key);
-			Raw (TRUE);
-			ReadCh ();
-			Raw (FALSE);
-			wait_message ("\n");
+			if (lineno) {
+				wait_message (txt_return_key);
+				Raw (TRUE);
+				ReadCh ();
+				Raw (FALSE);
+				wait_message ("\n");
+			}
 		}
 	}
-
-read_motd_done:
 
 	/*
 	 * update motd tinrc entry with new date

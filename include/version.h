@@ -20,7 +20,7 @@
 #define VERSION_H	1
 
 #	define VERSION		"1.3 unoff BETA"
-#	define RELEASEDATE	"970612"
+#	define RELEASEDATE	"970613"
 #	define TINRC_VERSION	"1.0"
 
 #	ifdef M_AMIGA

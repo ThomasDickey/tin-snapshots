@@ -402,6 +402,7 @@ extern constext txt_author_search_backwards[];
 extern constext txt_author_search_forwards[];
 extern constext txt_authorization_ok[];
 extern constext txt_autosubscribing_groups[];
+extern constext txt_autoselecting_articles[];
 extern constext txt_bad_active_file[];
 extern constext txt_bad_article[];
 extern constext txt_bad_command[];

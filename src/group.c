@@ -30,8 +30,8 @@ static int len_subj;
 static const char *spaces = "XXXX";
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static int draw_sline (int i, int full);
 
 #ifndef INDEX_DAEMON
@@ -109,14 +109,15 @@ group_page (
 	int flag, i;
 	int n;
 	int filter_state;
-	int old_top = 0;
 	int old_selected_arts;
+	int old_top = 0;
 	int posted_flag;
 	int scroll_lines;
 	int xflag = 0;
 	int old_group_top;
 	long old_artnum = 0L;
  	struct t_art_stat sbuf;
+	t_bool range_active = FALSE;		/* Set if a range is defined */
 
 	/*
 	 * Set the group attributes
@@ -159,7 +160,7 @@ group_page (
 	clear_note_area ();
 
 	if (group->attribute->auto_select) {
-		error_message ("Auto selecting articles (use 'X' to see all unread)...", "");
+		error_message (txt_autoselecting_articles, "");
 		goto do_auto_select_arts;	/* 'X' command */
 	}
 
@@ -328,6 +329,7 @@ end_of_list:
 
 			case iKeyGroupSetRange:	/* set range */
 				if (iSetRange (GROUP_LEVEL, 1, top_base, index_point+1)) {
+					range_active = TRUE;
 					show_group_page ();
 				}
 				break;
@@ -658,7 +660,7 @@ group_page_up:
  			case iKeyGroupCatchupGotoNext:	/* catchup - and goto next unread group */
 group_catchup:
 				{	int yn = 1;
-					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, 'y') != 1) {
+					if (num_of_tagged_arts && prompt_yn (cLINES, txt_catchup_despite_tags, TRUE) != 1) {
 						break;
 					}
 					if (!CURR_GROUP.newsrc.num_unread ||
@@ -725,19 +727,43 @@ group_catchup:
 				break;
 #endif
 
-			case iKeyGroupMarkThdRead:	/* mark rest of thread as read */
+			case iKeyGroupMarkThdRead:	/* mark thread as read */
+
 				if (index_point < 0) {
 					info_message (txt_no_next_unread_art);
 					break;
 				}
+
 				old_selected_arts = num_of_selected_arts;
-				thd_mark_read (&CURR_GROUP, base[index_point]);
+
+				/*
+				 * If a range is active, use it.
+				 */
+				if (range_active) {
+					/*
+					 * We check all arts, in case the user did something clever like
+					 * change the threading mode on us since the range was created
+					 */
+					for (n = 0; n < top; ++n)
+						if (arts[n].inrange) {
+							arts[n].inrange = FALSE;	/* Clear the range */
+							art_mark_read(&CURR_GROUP, &arts[n]);
+						}
+				} else
+					thd_mark_read (&CURR_GROUP, base[index_point]);
+
+				/*
+				 * If # of 'hot' articles changed, update the header
+				 */
 				if (num_of_selected_arts != old_selected_arts) {
 					show_group_title (TRUE);
 				}
 				bld_sline (index_point);
 				draw_sline (index_point, FALSE);
 
+				/*
+				 * Move cursor to next unread
+				 */
 				n = next_unread (next_response ((int) base[index_point]));
 				if (n < 0) {
 					draw_subject_arrow ();
@@ -745,6 +771,14 @@ group_catchup:
 					break;
 				}
 
+				/*
+				 * If range defined, we have to redraw whole page anyway.
+				 */
+				if (range_active) {
+					range_active = FALSE;			/* Range has gone now */
+					show_group_page();
+				}
+					
 				if ((n = which_thread (n)) < 0) {
 					error_message ("Internal error: K which_thread < 0", "");
 					break;
@@ -883,13 +917,13 @@ group_list_thread:
 				break;
 
 			case iKeyQuit:	/* return to group selection page */
-				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, 'y') != 1) {
+				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1) {
 					break;
 				}
 				goto group_done;
 
 			case iKeyQuitTin:		/* quit */
-				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, 'y') != 1) {
+				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, TRUE) != 1) {
 					break;
 				}
 				index_point = GRP_QUIT;
@@ -954,56 +988,48 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupTag:	/* tag/untag art for mailing/piping/printing/saving */
+			case iKeyGroupTag:	/* tag/untag threads for mailing/piping/printing/saving */
 				if (index_point >= 0) {
 					int tagged = TRUE;
-					n = (int) base[index_point];
-					if (CURR_GROUP.attribute->thread_arts) {
-						int ii;
-						/*
-						 * Unlike 'line_is_tagged()', this loop looks for any
-						 * article in the thread that isn't already tagged.
-						 */
-						for (ii = n; ii != -1 && tagged; ii = arts[ii].thread) {
-							if (!arts[ii].tagged) {
-								tagged = FALSE;
-								break;
-							}
-						}
+					int ii;
 
-						if (tagged) {
-							/*
-							 * Here we repeat the tagged test in both blocks
-							 * to leave the choice of tagged/untagged
-							 * determination politic in the previous lines.
-							 */
-							info_message (txt_untagged_thread);
-							for (ii = n; ii != -1; ii = arts[ii].thread) {
-								if (arts[ii].tagged) {
-									tagged = TRUE;
-									decr_tagged (arts[ii].tagged);
-									arts[ii].tagged = 0;
-									--num_of_tagged_arts;
-								}
-							}
-						} else {
-							info_message (txt_tagged_thread);
-							for (ii = n; ii != -1; ii = arts[ii].thread) {
-								if (!arts[ii].tagged)
-									arts[ii].tagged = ++num_of_tagged_arts;
+					n = (int) base[index_point];
+
+					/*
+					 * This loop looks for any article in the thread that
+					 * isn't already tagged.
+					 */
+					for (ii = n; ii != -1 && tagged; ii = arts[ii].thread) {
+						if (!arts[ii].tagged) {
+							tagged = FALSE;
+							break;
+						}
+					}
+
+					/*
+					 * If the whole thread is tagged, untag it. Otheriwise, tag
+					 * any untagged articles
+					 */
+					if (tagged) {
+						/*
+						 * Here we repeat the tagged test in both blocks
+						 * to leave the choice of tagged/untagged
+						 * determination politic in the previous lines.
+						 */
+						info_message (txt_untagged_thread);
+						for (ii = n; ii != -1; ii = arts[ii].thread) {
+							if (arts[ii].tagged) {
+								tagged = TRUE;
+								decr_tagged (arts[ii].tagged);
+								arts[ii].tagged = 0;
+								--num_of_tagged_arts;
 							}
 						}
 					} else {
-						tagged = FALSE;
-						if (arts[n].tagged) {
-							info_message (txt_untagged_art);
-							tagged = TRUE;
-							decr_tagged (arts[n].tagged);
-							arts[n].tagged = 0;
-							--num_of_tagged_arts;
-						} else {
-							info_message (txt_tagged_art);
-							arts[n].tagged = ++num_of_tagged_arts;
+						info_message (txt_tagged_thread);
+						for (ii = n; ii != -1; ii = arts[ii].thread) {
+							if (!arts[ii].tagged)
+								arts[ii].tagged = ++num_of_tagged_arts;
 						}
 					}
 					bld_sline (index_point);
@@ -1064,13 +1090,32 @@ group_list_thread:
 				}
 				break;
 
-			case iKeyGroupMarkArtUnread:	/* mark article as unread */
+			case iKeyGroupMarkArtUnread:	/* mark base article of thread unread */
  				if (index_point < 0) {
  					info_message (txt_no_arts);
 					break;
 				}
- 				art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
- 				/* art_mark_unread (&CURR_GROUP, &arts[base[index_point]]); */
+				if (range_active) {
+					int ii;
+
+					/*
+					 * We are tied to following base[] here, not arts[], as we operate on
+					 * the base articles by definition.
+					 */
+					for (ii = 0; ii < top_base; ++ii) {
+						if (arts[base[ii]].inrange) {
+							arts[base[ii]].inrange = FALSE;
+							art_mark_will_return (&CURR_GROUP, &arts[base[ii]]);
+							for (i = arts[base[ii]].thread ; i != -1 ; i = arts[i].thread) {
+								arts[i].inrange = FALSE;
+							}
+						}
+					}
+					range_active = FALSE;
+					show_group_page();
+				} else
+	 				art_mark_will_return (&CURR_GROUP, &arts[base[index_point]]);
+
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
@@ -1078,12 +1123,29 @@ group_list_thread:
 				info_message (txt_art_marked_as_unread);
 				break;
 
-			case iKeyGroupMarkThdUnread:	/* mark thread as unread */
+			case iKeyGroupMarkThdUnread:	/* mark whole thread as unread */
  				if (index_point < 0) {
  					info_message (txt_no_arts);
 					break;
 				}
-				thd_mark_unread (&CURR_GROUP, base[index_point]);
+
+				/*
+				 * We process all articles in case the threading changed since
+				 * the range was created
+				 */
+				if (range_active) {
+					int ii;
+
+					for (ii = 0; ii < top; ++ii) {
+						if (arts[ii].inrange) {
+							arts[ii].inrange = FALSE;
+							art_mark_will_return (&CURR_GROUP, &arts[ii]);
+						}
+					}
+					range_active = FALSE;
+					show_group_page();
+				} else
+					thd_mark_unread (&CURR_GROUP, base[index_point]);
 				show_group_title (TRUE);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
@@ -1568,13 +1630,13 @@ bld_sline (
 #else
 	char *buffer;
 #endif
-	int respnum;
-	int n, j;
 	char from[HEADER_LEN];
 	char new_resps[8];
 	char art_cnt[9];
-	struct t_art_stat sbuf;
 	char arts_sub[255];
+	int respnum;
+	int n, j;
+	struct t_art_stat sbuf;
 
 	from[0] = '\0';
 	respnum = (int) base[i];

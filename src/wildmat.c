@@ -145,5 +145,7 @@ wildmat(
 		str_lwr(pbuff, p);
 	}
 
+	msg[0] = '\0';
+
 	return DoMatch((icase)?tbuff:text, (icase)?pbuff:p) == TRUE;
 }

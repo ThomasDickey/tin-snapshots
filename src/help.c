@@ -192,10 +192,6 @@ constext *help_thread[] = {
 	txt_help_d,
 	txt_help_I,
 		txt_help_empty_line,
-/*
-	txt_help_g_t_p_i,
-		txt_help_empty_line,
-*/
 	txt_help_v,
 	txt_help_bug_report,
 	0
@@ -500,9 +496,12 @@ show_mini_help (
 			center_line (line+1, FALSE, txt_mini_select_2);
 			center_line (line+2, FALSE, txt_mini_select_3);
 			break;
+/* what the hell is the spooldir-level ???? */
+#if 0
 		case SPOOLDIR_LEVEL:
 			center_line (line, FALSE, txt_mini_spooldir_1);
 			break;
+#endif
 		case GROUP_LEVEL:
 			center_line (line, FALSE, txt_mini_group_1);
 			center_line (line+1, FALSE, txt_mini_group_2);
