@@ -17,7 +17,7 @@ This following configure options and defines are documented in detail:
   NNTP_INEWS                 DONT_HAVE_PIPING           NNTP_SERVER_FILE
   DONT_REREAD_ACTIVE_FILE    HAVE_FASCIST_NEWSADMIN     NO_POSTING
   HAVE_TIN_NNTP_EXTS         INDEX_DAEMON               NO_REGEX
-  NO_SHELL_ESCAPE             SMALL_MEMORY_MACHINE       USE_INVERSE_HACK
+  NO_SHELL_ESCAPE            SMALL_MEMORY_MACHINE       USE_INVERSE_HACK
   HAVE_MMDF_MAILER
   
 

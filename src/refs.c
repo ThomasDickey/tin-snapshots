@@ -369,7 +369,7 @@ get_references(refptr)
 	struct t_msgid *refptr;
 {
 	char *refs;
-	short len;
+	size_t len;
 
 	if (refptr == NULL)
 		return(NULL);

@@ -49,12 +49,13 @@ nntp_open ()
 {
 #ifdef NNTP_ABLE
 	int ret;
-	unsigned short nntp_tcp_port;
+	static unsigned short nntp_tcp_port;
 
 	if (read_news_via_nntp) {
 		debug_nntp ("nntp_open", "BEGIN");
 
 		if (nntp_server == (char *) 0) {
+		/* do this only once at start-up */
 			nntp_server = getserverbyfile (NNTP_SERVER_FILE);
 			nntp_tcp_port = atoi (get_val ("NNTPPORT", NNTP_TCP_PORT));
 		}

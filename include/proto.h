@@ -1,3 +1,6 @@
+#ifndef PROTO_H
+#define PROTO_H 1
+
 /* active.c */
 extern int cmp_group_p P_((t_comptype *group1, t_comptype *group2));
 extern int cmp_notify_p P_((t_comptype *notify1, t_comptype *notify2));
@@ -627,3 +630,5 @@ extern void NSETRNG0 P_((t_bitmap *bitmap, long low, long high));
 	/* post.c */
 	extern void make_path_header P_((char *line, char *from_name));
 #endif /* FORGERY */
+
+#endif /* PROTO_H */

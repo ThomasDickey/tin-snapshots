@@ -12,6 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
+#ifndef EXTERN_H
+#define EXTERN_H 1
+
 /*
  * Library prototypes
  */
@@ -949,6 +952,8 @@ extern int cur_groupnum;
 extern int debug;
 extern int default_auto_save_msg;
 extern int default_filter_days;
+extern int default_filter_kill_header;
+extern int default_filter_select_header;
 extern int default_move_group;
 extern int default_post_proc_type;
 extern int default_save_mode;
@@ -1061,11 +1066,9 @@ extern t_bool default_batch_save;
 extern t_bool default_filter_kill_case;
 extern t_bool default_filter_kill_expire;
 extern t_bool default_filter_kill_global;
-extern t_bool default_filter_kill_header;
 extern t_bool default_filter_select_case;
 extern t_bool default_filter_select_expire;
 extern t_bool default_filter_select_global;
-extern t_bool default_filter_select_header;
 extern t_bool default_show_only_unread;
 extern t_bool draw_arrow_mark;
 extern t_bool force_screen_redraw;
@@ -1225,3 +1228,5 @@ extern constext txt_help_shell[];
 #ifdef SIGTSTP
 extern int do_sigtstp;
 #endif
+
+#endif /* !EXTERN_H */

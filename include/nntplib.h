@@ -11,6 +11,9 @@
  *              right notice, and it must be included in any copy made
  */
 
+#ifndef NNTPLIB_H
+#define NNTPLIB_H 1
+
 #ifndef	NNTP_SERVER_FILE
 #	ifdef M_AMIGA
 #		define	NNTP_SERVER_FILE	"uulib:nntpserver"
@@ -131,3 +134,5 @@
  */
 
 #define	NNTP_STRLEN		512
+
+#endif /* !NNTPLIB_H */

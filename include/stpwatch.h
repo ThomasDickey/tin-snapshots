@@ -12,6 +12,9 @@
  *              right notice, and it must be included in any copy made
  */
 
+#ifndef STPWATCH_H
+#define STPWATCH_H 1
+
 #ifdef PROFILE
 
 #if HAVE_SYS_TIMEB_H && HAVE_FTIME
@@ -43,3 +46,5 @@ struct timeb end_tb;
 #endif	/* HAVE_SYS_TIMEB_H */
 
 #endif	/* PROFILE */
+
+#endif	/* !STPWATCH_H */

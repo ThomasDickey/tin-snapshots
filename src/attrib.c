@@ -152,6 +152,22 @@ set_default_attributes (psAttrib)
  *  attribute.news_quote_format = STRING
  *  attribute.quote_chars = STRING
  */
+#define MATCH_BOOLEAN(pattern, type) \
+	if (match_boolean (line, pattern, &flag)) { \
+		set_attrib_num (type, scope, flag != FALSE); \
+		break; \
+	}
+#define MATCH_INTEGER(pattern, type, maxlen) \
+	if (match_integer (line, pattern, &num, maxlen)) { \
+		set_attrib_num (type, scope, num); \
+		break; \
+	}
+	/* FIXME: the code always modifies 'scope' -- is this right? */
+#define MATCH_STRING(pattern, type) \
+	if (match_string (line, pattern, buf, sizeof (buf))) { \
+		set_attrib_str (type, scope, buf); \
+		break; \
+	}
 
 void
 read_attributes_file (file, global_file)
@@ -164,6 +180,7 @@ read_attributes_file (file, global_file)
 	char line[LEN];
 	char scope[LEN];
 	FILE *fp;
+	t_bool flag;
 	int num;
 	register int i;
 
@@ -191,102 +208,85 @@ read_attributes_file (file, global_file)
 			}
 			switch(tolower(line[0])) {
 			case 'a':
-				if (match_boolean (line, "auto_save=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_AUTO_SAVE, scope, num);
-					break;
-				}
-				if (match_boolean (line, "auto_save_msg=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_AUTO_SAVE_MSG, scope, num);
-					break;
-				}
-				if (match_boolean (line, "auto_select=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_AUTO_SELECT, scope, num);
-					break;
-				}
+				MATCH_BOOLEAN (
+					"auto_save=",
+					ATTRIB_AUTO_SAVE);
+				MATCH_BOOLEAN (
+					"auto_save_msg=",
+					ATTRIB_AUTO_SAVE_MSG);
+				MATCH_BOOLEAN (
+					"auto_select=",
+					ATTRIB_AUTO_SELECT);
 				break;
 			case 'b':
-				if (match_boolean (line, "batch_save=", (t_bool*)&num)) {
-					set_attrib_num (ATTRIB_BATCH_SAVE, scope, num);
-					break;
-				}
+				MATCH_BOOLEAN (
+					"batch_save=",
+					ATTRIB_BATCH_SAVE);
 				break;
 			case 'd':
-				if (match_boolean (line, "delete_tmp_files=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_DELETE_TMP_FILES, scope, num);
-					break;
-				}
+				MATCH_BOOLEAN (
+					"delete_tmp_files=",
+					ATTRIB_DELETE_TMP_FILES);
 				break;
 			case 'f':
-				if (match_string (line, "followup_to=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_FOLLOWUP_TO, scope, buf);
-					break;
-				}
+				MATCH_STRING (
+					"followup_to=",
+					ATTRIB_FOLLOWUP_TO);
 				break;
 			case 'm':
-				if (match_string (line, "maildir=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_MAILDIR, scope, buf);
-					break;
-				}
-				if (match_string (line, "mailing_list=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_MAILING_LIST, scope, buf);
-					break;
-				}
+				MATCH_STRING (
+					"maildir=",
+					ATTRIB_MAILDIR);
+				MATCH_STRING (
+					"mailing_list=",
+					ATTRIB_MAILING_LIST);
 				break;
 			case 'n':
-				if (match_string (line, "news_quote_format=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_NEWS_QUOTE, scope, buf);
-					break;
-				}
+				MATCH_STRING (
+					"news_quote_format=",
+					ATTRIB_NEWS_QUOTE);
 				break;
 			case 'o':
-				if (match_string (line, "organization=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_ORGANIZATION, scope, buf);
-					break;
-				}
+				MATCH_STRING (
+					"organization=",
+					ATTRIB_ORGANIZATION);
 				break;
 			case 'p':
-				if (match_string (line, "printer=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_PRINTER, scope, buf);
-					break;
-				}
-				if (match_integer (line, "post_proc_type=", &num, POST_PROC_UUD_EXT_ZIP)) {
-					set_attrib_num (ATTRIB_POST_PROC_TYPE, scope, num);
-					break;
-				}
+				MATCH_STRING (
+					"printer=",
+					ATTRIB_PRINTER);
+				MATCH_INTEGER (
+					"post_proc_type=",
+					ATTRIB_POST_PROC_TYPE,
+					POST_PROC_UUD_EXT_ZIP);
 				break;
 			case 'q':
-				if (match_integer (line, "quick_kill_header=", &num, FILTER_LINES)) {
-					set_attrib_num (ATTRIB_QUICK_KILL_HEADER, scope, num);
-					break;
-					}
-				if (match_string (line, "quick_kill_scope=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_QUICK_KILL_SCOPE, scope, buf);
-					break;
-				}
-				if (match_boolean (line, "quick_kill_case=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_QUICK_KILL_CASE, scope, num);
-					break;
-				}
-				if (match_boolean (line, "quick_kill_expire=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_QUICK_KILL_EXPIRE, scope, num);
-					break;
-				}
-				if (match_integer (line, "quick_select_header=", &num, FILTER_LINES)) {
-					set_attrib_num (ATTRIB_QUICK_SELECT_HEADER, scope, num);
-					break;
-				}
-				if (match_string (line, "quick_select_scope=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_QUICK_SELECT_SCOPE, scope, buf);
-					break;
-				}
-				if (match_boolean (line, "quick_select_case=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_QUICK_SELECT_CASE, scope, num);
-					break;
-				}
-				if (match_boolean (line, "quick_select_expire=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_QUICK_SELECT_EXPIRE, scope, num);
-					break;
-				}
+				MATCH_INTEGER (
+					"quick_kill_header=",
+					ATTRIB_QUICK_KILL_HEADER,
+					FILTER_LINES);
+				MATCH_STRING (
+					"quick_kill_scope=",
+					ATTRIB_QUICK_KILL_SCOPE);
+				MATCH_BOOLEAN (
+					"quick_kill_case=",
+					ATTRIB_QUICK_KILL_CASE);
+				MATCH_BOOLEAN (
+					"quick_kill_expire=",
+					ATTRIB_QUICK_KILL_EXPIRE);
+				MATCH_INTEGER (
+					"quick_select_header=",
+					ATTRIB_QUICK_SELECT_HEADER,
+					FILTER_LINES);
+				MATCH_STRING (
+					"quick_select_scope=",
+					ATTRIB_QUICK_SELECT_SCOPE);
+				MATCH_BOOLEAN (
+					"quick_select_case=",
+					ATTRIB_QUICK_SELECT_CASE);
+				MATCH_BOOLEAN (
+					"quick_select_expire=",
+					ATTRIB_QUICK_SELECT_EXPIRE);
 				if (match_string (line, "quote_chars=", buf, sizeof (buf))) {
 					quote_dash_to_space (buf);
 					set_attrib_str (ATTRIB_QUOTE_CHARS, scope, buf);
@@ -294,53 +294,46 @@ read_attributes_file (file, global_file)
 				}
 				break;
 			case 's':
-				if (match_string (line, "savedir=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_SAVEDIR, scope, buf);
-					break;
-				}
-				if (match_string (line, "savefile=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_SAVEFILE, scope, buf);
-					break;
-				}
-				if (match_string (line, "sigfile=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_SIGFILE, scope, buf);
-					break;
-				}
+				MATCH_STRING (
+					"savedir=",
+					ATTRIB_SAVEDIR);
+				MATCH_STRING (
+					"savefile=",
+					ATTRIB_SAVEFILE);
+				MATCH_STRING (
+					"sigfile=",
+					ATTRIB_SIGFILE);
 				if (match_string (line, "scope=", scope, sizeof (scope))) {
 					break;
 				}
-				if (match_boolean (line, "show_only_unread=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_SHOW_ONLY_UNREAD, scope, num);
-					break;
-				}
-				if (match_integer (line, "sort_art_type=", &num, SORT_BY_DATE_ASCEND)) {
-					set_attrib_num (ATTRIB_SORT_ART_TYPE, scope, num);
-					break;
-				}
-				if (match_integer (line, "show_author=", &num, SHOW_FROM_BOTH)) {
-					set_attrib_num (ATTRIB_SHOW_AUTHOR, scope, num);
-					break;
-				}
+				MATCH_BOOLEAN (
+					"show_only_unread=",
+					ATTRIB_SHOW_ONLY_UNREAD);
+				MATCH_INTEGER (
+					"sort_art_type=",
+					ATTRIB_SORT_ART_TYPE,
+					SORT_BY_DATE_ASCEND);
+				MATCH_INTEGER (
+					"show_author=",
+					ATTRIB_SHOW_AUTHOR,
+					SHOW_FROM_BOTH);
 				break;
 			case 't':
-				if (match_integer (line, "thread_arts=", &num, THREAD_MAX)) {
-					set_attrib_num (ATTRIB_THREAD_ARTS, scope, num);
-					break;
-				}
+				MATCH_INTEGER (
+					"thread_arts=",
+					ATTRIB_THREAD_ARTS,
+					THREAD_MAX);
 				break;
 			case 'x':
-				if (match_string (line, "x_headers=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_X_HEADERS, scope, buf);
-					break;
-				}
-				if (match_string (line, "x_body=", buf, sizeof (buf))) {
-					set_attrib_str (ATTRIB_X_BODY, scope, buf);
-					break;
-				}
-				if (match_boolean (line, "x_comment_to=", (t_bool *)&num)) {
-					set_attrib_num (ATTRIB_X_COMMENT_TO, scope, num);
-					break;
-				}
+				MATCH_STRING (
+					"x_headers=",
+					ATTRIB_X_HEADERS);
+				MATCH_STRING (
+					"x_body=",
+					ATTRIB_X_BODY);
+				MATCH_BOOLEAN (
+					"x_comment_to=",
+					ATTRIB_X_COMMENT_TO);
 				break;
 			default:
 				break;

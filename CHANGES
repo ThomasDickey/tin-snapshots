@@ -1,3 +1,17 @@
+--unoff BETA release 970114 --
+
+284) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-cleanup
+     FIX. several supplied patches
+
+283) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. tin does not remember tcp_port (introduced in 281)
+     FIX. open.c
+
+282) Thomas E. Dickey <dickey@clark.net>
+     ADD. code-cleanup (mainly lint stuff)
+     FIX. several supplied patches
+
 --unoff BETA release 970112 --
 
 281) Urs Janssen <urs@akk.uni-karlsruhe.de>
