@@ -43,10 +43,11 @@ int
 nntp_open (void)
 {
 #ifdef NNTP_ABLE
+	char *linep;
+	char line[NNTP_STRLEN];
 	int ret;
 	t_bool sec = FALSE;
 	static unsigned short nntp_tcp_port;
-	char line[NNTP_STRLEN];
 
 	if (!read_news_via_nntp)
 		return 0;
@@ -99,7 +100,6 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 
 		case OK_NOPOST:
 			can_post = FALSE;
-			wait_message(0, "%s\n", txt_cannot_post);
 			break;
 
 		default:
@@ -111,7 +111,10 @@ DEBUG_IO((stderr, "server_init returns %d,%s\n", ret, line));
 			error_message (line);
 			return ret;
 	}
-	strncpy(bug_nntpserver1, line, sizeof(bug_nntpserver1)-1);
+	linep = line;
+	while (isspace(*linep))
+		linep++;
+	strncpy(bug_nntpserver1, linep, sizeof(bug_nntpserver1)-1);
 	bug_nntpserver1[sizeof(bug_nntpserver1)-1] = '\0';
 
 	/*
@@ -131,7 +134,6 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 		case OK_NOPOST:
 			can_post = FALSE;
 			sec = TRUE;
-			wait_message(0, "%s\n", txt_cannot_post);
 			break;
 
 		case ERR_ACCESS:
@@ -139,11 +141,17 @@ DEBUG_IO((stderr, "nntp_command(MODE READER)\n"));
 			error_message (line);
 			return ret;
 	}
-	strncpy(bug_nntpserver2, line, sizeof(bug_nntpserver2)-1);
+	if (!can_post)
+		wait_message(0, "%s\n", txt_cannot_post);
+
+	linep = line;
+	while (isspace(*linep))
+		linep++;
+	strncpy(bug_nntpserver2, linep, sizeof(bug_nntpserver2)-1);
 	bug_nntpserver2[sizeof(bug_nntpserver2)-1] = '\0';
 
 	if (sec)
-	    	wait_message(0, "%s\n", bug_nntpserver2);
+		wait_message(0, "%s\n", bug_nntpserver2);
 	else
 		wait_message(0, "%s\n", bug_nntpserver1);
 

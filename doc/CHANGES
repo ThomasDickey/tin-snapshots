@@ -1,3 +1,14 @@
+-- pre-1.4 release 971106 --
+
+484) Ralf Doeblitz <doeblitz@gmx.de>
+     ADD. rules for emacs-tags
+     FIX. Makefile.in
+
+483) Ralf Doeblitz <doeblitz@gmx.de>
+     Jason Faultless <jason@radar.demon.co.uk>
+     BUG. missing check for NULL-pointer references
+     FIX. refs.c
+
 -- pre-1.4 release 971105 --
 
 482) Ralf Doeblitz <doeblitz@gmx.de>

@@ -42,9 +42,9 @@ fi
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
+	--enable-nntp-only \
 	--enable-prototypes \
 	--disable-echo \
-	--enable-nntp-only \
 	--disable-mime-strict-charset \
 	--with-domain-name=/etc/NNTP_INEWS_DOMAIN \
         $OPTS $* 2>&1 |tee -a $OUT
