@@ -389,6 +389,7 @@ Compiled & installed on the following machines
 7)   Vax 11/785 & BSD 4.3
 8)   DG Aviion 300 & DG-UX 4.30
 9)   Apollo DN5500 & DomainOS 10.3
+     Note: You may want to do "CFLAGS=-I/bsd4.3/usr/include configure"
 10)  ICL DRS6000 & SVR4.0 
 11)  Apricot VX/FT & SCO 3.2.2
 12)  DIAB DS90 & D-NIX 5.3

@@ -186,10 +186,10 @@ rfc1522_decode(s)
 	while (*c && t-buffer<2048) {
 		if (*c!='=') {
 			if (adjacentflag && isspace(*c)) {
-				char *d;
-				d=c+1;
-				while (isspace(*d)) d++;
-				if (*d=='=') { /* brute hack, makes mistakes under certain circumstances comp. 6.2 */
+				char *dd;
+				dd=c+1;
+				while (isspace(*dd)) dd++;
+				if (*dd=='=') { /* brute hack, makes mistakes under certain circumstances comp. 6.2 */
 					c++;
 					continue;
 				}

@@ -52,10 +52,13 @@ o  According to 026) in CHANGES, some of the config files can be
 
 o  full_page_scroll=OFF seems not to work
 
-o  fix parsdate.y line 827   (no prototyping) *uhhh?*
-       nntplib.c  line 388++ (no prototyping #if !defined(linux))
-       init.c     line 233++ (no prototyping #if !defined(linux))
-       misc.c     line 666   (no prototyping #if !defined(linux))
+o  fix parsdate.y line 827   (no prototyping #if defined (__GNUC__)) *uhhh?*
+       nntplib.c  line 388++ (no prototyping #if !defined(linux)
+                                                 && defined (__GNUC__))
+       init.c     line 233++ (no prototyping #if !defined(linux)
+                                                 && defined (__GNUC__))
+       misc.c     line 666   (no prototyping #if !defined(linux)
+                                                 && defined (__GNUC__))
 
 o  tin sometimes crashes (thread.c) 710/892
 
@@ -169,8 +172,8 @@ o  marking hot-articles read with 'K' and then post-process the newsgroup
 
 o  killing articles with Lines: 0 does not work
 
-o  canceling via Supersedes:/Also-Control:/Control:-header is possible if it
-   is supplied by hand (buildin_inews)
+o  forged canceling via Supersedes:/Also-Control:/Control:-header is possible
+   if it is supplied by hand (buildin_inews)
 
 o  f'uping with 'F' to a article which has Followup-To: poster set an then
    use 'm' quotes the text, but it should not! (mail_to_someone has no

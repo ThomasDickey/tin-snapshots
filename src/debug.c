@@ -371,25 +371,24 @@ debug_print_bitmap (group, art)
 
 
 void 
-debug_print_newsrc (newsrc, fp)
-	struct t_newsrc *newsrc;
+debug_print_newsrc (NewSrc, fp)
+	struct t_newsrc *NewSrc;
 	FILE *fp;
 {
 #ifdef DEBUG_NEWSRC
 	register int i, j;
 
 	fprintf (fp, "min=[%ld] max=[%ld] bitlen=[%ld] num_unread=[%ld] present=[%d]\n",
-		newsrc->xmin, newsrc->xmax, newsrc->xbitlen, 
-		newsrc->num_unread, newsrc->present);
+		NewSrc->xmin, NewSrc->xmax, NewSrc->xbitlen, 
+		NewSrc->num_unread, NewSrc->present);
 
 	fprintf (fp, "bitmap=[");
-	if (newsrc->xbitlen && newsrc->xbitmap) {
-		for (j=0, i=newsrc->xmin; i <= newsrc->xmax; i++) {
+	if (NewSrc->xbitlen && NewSrc->xbitmap) {
+		for (j=0, i=NewSrc->xmin; i <= NewSrc->xmax; i++) {
 			fprintf (fp, "%d", 
-				(NTEST(newsrc->xbitmap, i - newsrc->xmin) == ART_READ ?
+				(NTEST(NewSrc->xbitmap, i - NewSrc->xmin) == ART_READ ?
 				ART_READ : ART_UNREAD));
-/*			if ((i % 10) == 9 && i < newsrc->xmax) { */
-			if ((j++ % 8) == 7 && i < newsrc->xmax) {
+			if ((j++ % 8) == 7 && i < NewSrc->xmax) {
 				fprintf (fp, " ");
 			}
 		}

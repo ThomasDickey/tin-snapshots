@@ -17,15 +17,6 @@
 #define MARK_OFFSET	8
 #define CURR_GROUP	(active[my_group[cur_groupnum]])
 
-/* what we do here is bizarre */
-/*
-#ifndef ART_ADJUST	
-#define ART_ADJUST(n)	(CURR_GROUP.attribute->show_only_unread \
-				? ((n) > 1 ? (n) : 0) \
-				: ((n) > 0 ? (n) - 1 : 0))
-#endif
-*/
-
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(SNUM2LNUM(INDEX2SNUM(i)))
@@ -108,7 +99,7 @@ group_page (group)
 	int filter_state;
 	int old_top = 0;
 	int old_selected_arts;
-	int posted;
+	int posted_flag;
 	int scroll_lines;
 	long old_artnum = 0L;
 	int xflag = 0;
@@ -171,7 +162,7 @@ debug_print_bitmap (group, NULL);
 		ch = ReadCh ();
 
 		if (ch > '0' && ch <= '9') {	/* 0 goes to basenote */
-			(void) prompt_subject_num (ch/*, group->name*/);
+			(void) prompt_subject_num (ch);
 			continue;
 		} 
 		switch (ch) {
@@ -887,7 +878,6 @@ group_list_thread:
 				break;
 
 			case iKeyGroupQuit:	/* return to group selection page */
-/*			case iKeyGroupQuit2: */
 				if (num_of_tagged_arts && prompt_yn (cLINES, txt_quit_despite_tags, 'y') != 1) {
 					break;
 				}
@@ -964,13 +954,13 @@ group_list_thread:
 					int tagged = TRUE;
 					n = (int) base[index_point];
 					if (CURR_GROUP.attribute->thread_arts) {
-						int i;
+						int ii;
 						/*
 						 * Unlike 'line_is_tagged()', this loop looks for any
 						 * article in the thread that isn't already tagged.
 						 */
-						for (i = n; i != -1 && tagged; i = arts[i].thread) {
-							if (! arts[i].tagged)
+						for (ii = n; ii != -1 && tagged; ii = arts[ii].thread) {
+							if (! arts[ii].tagged)
 								tagged = FALSE;
 						}
 						if (tagged) {
@@ -980,19 +970,19 @@ group_list_thread:
 							 * determination politic in the previous lines. 
 							 */
 							info_message (txt_untagged_thread);
-							for (i = n; i != -1; i = arts[i].thread) {
-								if (arts[i].tagged) {
+							for (ii = n; ii != -1; ii = arts[ii].thread) {
+								if (arts[ii].tagged) {
 									tagged = TRUE;
-									decr_tagged (arts[i].tagged);
-									arts[i].tagged = 0;
+									decr_tagged (arts[ii].tagged);
+									arts[ii].tagged = 0;
 									--num_of_tagged_arts;
 								}
 							}
 						} else {
 							info_message (txt_tagged_thread);
-							for (i = n; i != -1; i = arts[i].thread) {
-								if (! arts[i].tagged)
-									arts[i].tagged = ++num_of_tagged_arts;
+							for (ii = n; ii != -1; ii = arts[ii].thread) {
+								if (! arts[ii].tagged)
+									arts[ii].tagged = ++num_of_tagged_arts;
 							}
 						}
 					} else {
@@ -1050,7 +1040,7 @@ group_list_thread:
 				break;
 
 			case iKeyGroupPost:	/* post an article */
-				if (post_article (group->name, &posted)) {
+				if (post_article (group->name, &posted_flag)) {
 					show_group_page ();
 				}
 				break;
@@ -1116,11 +1106,11 @@ group_list_thread:
 				assert (n > 0);
 				bld_sline(index_point);
 				draw_sline(index_point, FALSE);
-/* #if 0 */
+
 				info_message ( flag
 					      ? txt_thread_marked_as_selected
 					      : txt_thread_marked_as_deselected);
-/* #endif */
+
 				if (index_point + 1 < top_base)
 					goto group_down;
 				draw_subject_arrow ();
@@ -1217,7 +1207,7 @@ do_auto_select_arts:
 				if (auto_select_articles (&CURR_GROUP)) {
 					update_group_page ();
 				}
-/*				break; */
+
 undo_auto_select_arts:
 				for (i=0; i<top; ++i) {
 					if (arts[i].status == ART_READ && arts[i].zombie) {
@@ -1389,9 +1379,8 @@ erase_subject_arrow ()
 
 
 int
-prompt_subject_num (ch/*, group*/)
+prompt_subject_num (ch)
 	int ch;
-/*	char *group;*/
 {
 	int num;
 
@@ -1539,28 +1528,9 @@ set_subj_from_size (num_cols)
 void 
 toggle_subject_from ()
 {
-/*
-	int i;
-
-	i = my_group[cur_groupnum];
-
-	if (active[i].attribute->show_author != SHOW_FROM_NONE) {
-		if (show_author != SHOW_FROM_NONE) {
-			show_author = SHOW_FROM_NONE;
-		} else {
-			show_author = active[i].attribute->show_author;
-		}
-	} else {
- */
-		if (++show_author > SHOW_FROM_BOTH) {
-			show_author = SHOW_FROM_NONE;
-		}
-/*
-		 else {
-			show_author++;
-		}
+	if (++show_author > SHOW_FROM_BOTH) {
+		show_author = SHOW_FROM_NONE;
 	}
- */
 	set_subj_from_size (cCOLS);
 }
 

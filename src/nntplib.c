@@ -300,7 +300,7 @@ get_tcp_socket (machine, service, port)
 {
 #ifdef NNTP_ABLE
 	int	s = -1;
-	struct	sockaddr_in sin;
+	struct	sockaddr_in sock_in;
 	
 /* hp-ux 8.0, 9.05, 10.10 don't need it...
 #ifdef __hpux
@@ -325,17 +325,17 @@ get_tcp_socket (machine, service, port)
 		t_close (s);
 		return (-1);
 	}
-	bzero((char *) &sin, sizeof (sin));	
-	sin.sin_family = AF_INET;
-	sin.sin_port = htons (port);
+	bzero((char *) &sock_in, sizeof (sock_in));	
+	sock_in.sin_family = AF_INET;
+	sock_in.sin_port = htons (port);
 	if (!isdigit(*machine) ||
-	    (long)(sin.sin_addr.s_addr = inet_addr (machine)) == -1) {
+	    (long)(sock_in.sin_addr.s_addr = inet_addr (machine)) == -1) {
 		if((hp = gethostbyname (machine)) == NULL) {
 			fprintf (stderr, "gethostbyname: %s: host unknown\n", machine);
 			t_close (s);
 			return (-1);
 		}
-		bcopy(hp->h_addr, (char *) &sin.sin_addr, hp->h_length);
+		bcopy(hp->h_addr, (char *) &sock_in.sin_addr, hp->h_length);
 	}
 	
 	/*
@@ -348,9 +348,9 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 
-	callptr->addr.maxlen = sizeof (sin);
-	callptr->addr.len = sizeof (sin);
-	callptr->addr.buf = (char *) &sin;
+	callptr->addr.maxlen = sizeof (sock_in);
+	callptr->addr.len = sizeof (sock_in);
+	callptr->addr.buf = (char *) &sock_in;
 	callptr->opt.len = 0;			/* no options */
 	callptr->udata.len = 0;			/* no user data with connect */
 
@@ -430,13 +430,13 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 
-	bzero((char *) &sin, sizeof (sin));
-	sin.sin_family = hp->h_addrtype;
-	sin.sin_port = htons (port);
-/* 	sin.sin_port = sp->s_port; */
+	bzero((char *) &sock_in, sizeof (sock_in));
+	sock_in.sin_family = hp->h_addrtype;
+	sock_in.sin_port = htons (port);
+/* 	sock_in.sin_port = sp->s_port; */
 #else /* EXCELAN */
-	bzero((char *) &sin, sizeof (sin));
-	sin.sin_family = AF_INET;
+	bzero((char *) &sock_in, sizeof (sock_in));
+	sock_in.sin_family = AF_INET;
 #endif /* EXCELAN */
 
 	/*
@@ -460,10 +460,10 @@ get_tcp_socket (machine, service, port)
 			perror ("socket");
 			return (-1);
 		}
-		bcopy(*cp, (char *) &sin.sin_addr, hp->h_length);
+		bcopy(*cp, (char *) &sock_in.sin_addr, hp->h_length);
 		
 		if (x < 0) {
-			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sin.sin_addr));
+			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sock_in.sin_addr));
 		}
 #if defined(__hpux) && defined(SVR4)	/* recommended by raj@cup.hp.com */
 #define	HPSOCKSIZE 0x8000
@@ -480,11 +480,11 @@ get_tcp_socket (machine, service, port)
 			setsockopt(s, SOL_SOCKET, SO_RCVBUF, (caddr_t)&socksize, sizeof(socksize));
 		}
 #endif
-		x = connect (s, (struct sockaddr *) &sin, sizeof (sin));
+		x = connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in));
 		if (x == 0) {
 			break;
 		}
-		fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sin.sin_addr));
+		fprintf (stderr, "\nConnection to %s: ", (char *) inet_ntoa (sock_in.sin_addr));
 		perror ("");
 		(void) s_close (s);
 	}
@@ -494,23 +494,23 @@ get_tcp_socket (machine, service, port)
 	}
 #else	/* no name server */
 #ifdef EXCELAN
-	if ((s = socket (SOCK_STREAM,(struct sockproto *)NULL,&sin,SO_KEEPALIVE)) < 0) {
+	if ((s = socket (SOCK_STREAM,(struct sockproto *)NULL,&sock_in,SO_KEEPALIVE)) < 0) {
 		/* Get the socket */
 		perror ("socket");
 		return (-1);
 	}
-	bzero((char *) &sin, sizeof (sin));
-	sin.sin_family = AF_INET;
-	sin.sin_port = htons (IPPORT_NNTP);
+	bzero((char *) &sock_in, sizeof (sock_in));
+	sock_in.sin_family = AF_INET;
+	sock_in.sin_port = htons (IPPORT_NNTP);
 	/* set up addr for the connect */
 
-	if ((sin.sin_addr.s_addr = rhost (&machine)) == -1) {
+	if ((sock_in.sin_addr.s_addr = rhost (&machine)) == -1) {
 		fprintf (stderr, "\n%s: Unknown host.\n", machine);
 		return (-1);
 	}
 	/* And then connect */
 
-	if (connect (s, (struct sockaddr *)&sin) < 0) {
+	if (connect (s, (struct sockaddr *)&sock_in) < 0) {
 		perror ("connect");
 		(void) s_close (s);
 		return (-1);
@@ -523,8 +523,8 @@ get_tcp_socket (machine, service, port)
 
 	/* And then connect */
 
-	bcopy (hp->h_addr, (char *) &sin.sin_addr, hp->h_length);
-	if (connect (s, (struct sockaddr *) &sin, sizeof (sin)) < 0) {
+	bcopy (hp->h_addr, (char *) &sock_in.sin_addr, hp->h_length);
+	if (connect (s, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0) {
 		perror ("connect");
 		(void) s_close (s);
 		return (-1);

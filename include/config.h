@@ -44,19 +44,6 @@
 #   define  HAVE_IS_XTERM
 #endif
 
-/*
- * HP/Apollo CC 6.8 is reasonably close to ANSI
- */
-
-#undef DECL_GETENV		/* assume 'getenv()' is declared */
-#undef pre_CC_6_8
-#if defined(apollo)
-#	if !defined(__STDCPP__) && !defined(__GNUC__)
-#		define  DECL_GETENV
-#		define pre_CC_6_8
-#	endif
-#endif
-
 #if defined(M_XENIX)
 #	define	HAVE_PROTOTYPES_H
 #endif
@@ -97,7 +84,7 @@
 #	define	HAVE_SYS_PARAM_H
 #endif
 
-#if !defined(apollo) && !defined(gould) && !defined(MACH) && \
+#if !defined(gould) && !defined(MACH) && \
     !defined(mips) && !defined(__NeXT__) && !defined(M_OS2) && \
 	!defined(WIN32)
 #	define	HAVE_UNISTD_H
@@ -108,14 +95,14 @@
 #	define	HAVE_SYS_IOCTL_H
 #endif
 
-#if !defined(apollo) && !defined(BSD) && \
+#if !defined(BSD) && \
     !defined(M_OS2) && !defined(sinix) && !defined(RS6000) && \
 	!defined(WIN32) && !defined(VMS)
 #	define	HAVE_SYS_UTSNAME_H
 #endif
 
-#if !defined(pre_CC_6_8) && !defined(EPIX) && !defined(pyr) && \
-    !defined(sequent) && !defined(sysV68) && !defined(UTS) && \
+#if !defined(EPIX) && !defined(pyr) && \
+    !defined(sequent) && !defined(UTS) && \
     !defined(u3b2)
 #	define	HAVE_STDLIB_H
 #endif
@@ -130,7 +117,7 @@
 #	define	HAVE_STRING_H
 #endif
 
-#if defined(apollo) || defined(BSD) || defined(EPIX) || \
+#if defined(BSD) || defined(EPIX) || \
     defined(M_OS2) || defined(__osf__) || defined(UMAXV) || defined(WIN32)
 #	define	HAVE_FCNTL_H
 #endif
@@ -139,20 +126,20 @@
 #	define	HAVE_SYS_STREAM_H
 #endif
 
-#if !defined(apollo) && !defined(COHERENT) && !defined(__hpux) && \
+#if !defined(COHERENT) && !defined(__hpux) && \
     !defined(M_OS2) && !defined(QNX42) && !defined(sinix) && \
     !defined(UMAXV) && !defined(WIN32)
 #	define	HAVE_SYS_PTEM_H
 #endif
 
-#if !defined(apollo) && !defined(COHERENT) && !defined(M_OS2) && \
+#if !defined(COHERENT) && !defined(M_OS2) && \
     !defined(QNX42) && !defined(SCO_UNIX) && !defined(sinix) && \
     !defined(SVR4) && !defined(WIN32)
 #	define	HAVE_SYS_PTY_H
 #	define	XWIN	/* stops ISC bitching */
 #endif
 
-#if defined(__386BSD__) || defined(apollo) || defined(BSD) || \
+#if defined(__386BSD__) || defined(BSD) || \
     defined(__hpux) || defined(linux) || defined(M_OS2) || \
     defined(__osf__) || defined(RS6000) || defined(sinix) || \
     defined(UMAXV)
@@ -195,8 +182,8 @@
 #	else
 #		if __STDC__ || defined(atthcx) || defined(__hpux) || \
 		   defined(__osf__) || defined(M_OS2) || defined(PTX) || \
-		   defined(RS6000) || defined(sgi) || defined(sinix) || \
-		   defined(sysV68) || defined(sun) || defined(SVR4) || \
+		   defined(RS6000) || defined(sinix) || \
+		   defined(sun) || defined(SVR4) || \
 		   defined(u3b2) || defined(ultrix)	|| defined(WIN32)
 #			define	RETSIGTYPE void
 #		else
@@ -209,7 +196,7 @@
 #	define DECL_SIG_CONST
 #endif
 
-#if defined(M_OS2) || defined(apollo) || defined(linux) || defined(SVR4) || \
+#if defined(M_OS2) || defined(linux) || defined(SVR4) || \
 	defined(WIN32)
 #	if !defined(HAVE_COMPTYPE_CHAR)
 #		define	HAVE_COMPTYPE_VOID
@@ -243,7 +230,7 @@
  */
 
 #if __STDC__ || defined(SVR4)
-#	if !defined(pre_CC_6_8) && !defined(__hpux) && !defined(sun)
+#	if !defined(__hpux) && !defined(sun)
 #		define	HAVE_ANSI_ASSERT
 #	endif
 #endif
@@ -256,8 +243,7 @@
 #	define	HAVE_SET_GID_UID
 #endif
 
-#if defined(M_UNIX) && !defined(__386BSD__) && !defined(apollo) && \
-    !defined(__NeXT__)
+#if defined(M_UNIX) && !defined(__386BSD__) && !defined(__NeXT__)
 #	define	HAVE_UNAME
 #endif
 
@@ -294,7 +280,7 @@
  * Used in parsedate.y
  */
 
-#if defined(apollo) || defined(__arm) || defined(__convex__) || \
+#if defined(__arm) || defined(__convex__) || \
     defined(DGUX) || defined(pyr) || defined(sequent) || !defined(BSD)
 #	define	DONT_HAVE_TM_GMTOFF
 #endif
@@ -315,8 +301,7 @@
 #	undef HAVE_SELECT
 #endif
 
-#if !defined(apollo) && !defined(COHERENT) && \
-    !defined(M_OS2) && !defined(supermax) && !defined(u3b2) && \
+#if !defined(COHERENT) && !defined(M_OS2) && !defined(supermax) && !defined(u3b2) && \
     !defined(HAVE_POLL) && !defined(WIN32)
 #	define	HAVE_SELECT
 #endif

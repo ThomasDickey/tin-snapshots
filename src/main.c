@@ -460,15 +460,15 @@ read_cmd_line_options (argc, argv)
  */
 
 void 
-usage (progname)
-	char *progname;
+usage (theProgname)
+	char *theProgname;
 {
 #ifndef INDEX_DAEMON
 	error_message ("%s A Usenet reader.\n", cvers);
 #else
 	error_message ("%s Tin index file daemon.\n", cvers);
 #endif
-	error_message ("Usage: %s [options] [newsgroups]", progname);
+	error_message ("Usage: %s [options] [newsgroups]", theProgname);
 #ifndef INDEX_DAEMON
 #	ifdef HAVE_COLOR
 		error_message ("  -a       toggle color flag","");
@@ -488,7 +488,7 @@ usage (progname)
 #endif /* NNTP_ABLE */
 	error_message ("  -h       this help message", "");
 #ifndef INDEX_DAEMON
-	error_message ("  -H       help information about %s", progname);
+	error_message ("  -H       help information about %s", theProgname);
 #endif /* INDEX_DAEMON */
 	error_message ("  -I dir   news index file directory [default=%s]", index_newsdir);
 #ifndef INDEX_DAEMON
@@ -529,18 +529,18 @@ usage (progname)
  */
 
 int 
-check_for_any_new_news (check_any_unread, start_any_unread)
-	int check_any_unread;
-	int start_any_unread;
+check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
+	int CheckAnyUnread;
+	int StartAnyUnread;
 {
 	int i = 0;
 	
-	if (check_any_unread) {
+	if (CheckAnyUnread) {
 		i = check_start_save_any_news (CHECK_ANY_NEWS);
 		exit (i);
 	}
 	
-	if (start_any_unread) {
+	if (StartAnyUnread) {
 		i = check_start_save_any_news (START_ANY_NEWS);
 		if (i == -1) {		/* no new/unread news so exit */
 			exit (0);

@@ -112,11 +112,6 @@ static	TTY _raw_tty, _original_tty;
 #				endif
 #			endif
 #		endif
-#	else
-#		if defined(__hpux) || (defined(sun) && defined(SVR4))
-#			include <termio.h>
-#			define USE_TERMIO 1
-#		endif
 #	endif
 #endif
 

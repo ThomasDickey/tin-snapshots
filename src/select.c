@@ -37,7 +37,7 @@ selection_index (start_groupnum, num_cmd_line_groups)
 	char post_group[LEN];
 	int ch, i, n;
 	int INDEX_BOTTOM;
-	int posted;
+	int posted_flag;
 	int scroll_lines;
 	int subscribe_num;
 	
@@ -664,7 +664,7 @@ select_done:
 					} else {
 						strcpy (post_group, active[my_group[cur_groupnum]].name);
 					}
-					if (post_article (post_group, &posted)) {
+					if (post_article (post_group, &posted_flag)) {
 						group_selection_page ();
 					}
 				}

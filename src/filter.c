@@ -478,11 +478,11 @@ should work - but didn't with changing order of filterfile
 */
 
 void 
-vWriteFilterArray (fp, global, ptr, time)
+vWriteFilterArray (fp, global, ptr, theTime)
 	FILE *fp;
 	int global;
 	struct t_filters *ptr;
-	long time;
+	long theTime;
 {
 	register int i;
 	 
@@ -494,8 +494,8 @@ vWriteFilterArray (fp, global, ptr, time)
 
 /* printf ("WRITE i=[%d] subj=[%s] from=[%s]\n", i, (ptr->filter[i].subj ? ptr->filter[i].subj : ""), (ptr->filter[i].from ? ptr->filter[i].from : "")); */
 
-		if (time && ptr->filter[i].time) {
-			if (time > ptr->filter[i].time) {
+		if (theTime && ptr->filter[i].time) {
+			if (theTime > ptr->filter[i].time) {
 				continue;
 			}
 		}
