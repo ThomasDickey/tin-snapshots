@@ -536,7 +536,7 @@ write_config_file (file)
 	strcat (file_tmp, ".tmp");
 
 	if ((fp = fopen (file_tmp, "w")) == (FILE *) 0) {
-		error_message (txt_filesystem_full_backup, "tinrc");
+		error_message (txt_filesystem_full_backup, CONFIG_FILE);
 		/* free memory for tmp-filename */
 		free (file_tmp);
 		return;
@@ -935,7 +935,7 @@ write_config_file (file)
 		}
 	}
 	if (ferror (fp) | fclose (fp)){
-		error_message (txt_filesystem_full, "tinrc");
+		error_message (txt_filesystem_full, CONFIG_FILE);
 		/* free memory for tmp-filename */
 		free (file_tmp);
 		return;

@@ -16,9 +16,10 @@
 #include	"tin.h"
 #include	"version.h"
 
-int authorization P_((char *server, char *authuser));
+#ifdef NNTP_ABLE
+static int authorization P_((char *server, char *authuser));
+#endif
 
-int nntp_codeno = 0;
 long head_next;
 
 /* error message from server */
@@ -1078,7 +1079,7 @@ nntp_to_fp ()
  *   etc.
  */
 
-int
+static int
 authorization (server, authuser)
 	char *server;
 	char *authuser;
