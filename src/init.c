@@ -13,6 +13,8 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
+#include	"patchlev.h"
 
 char active_times_file[PATH_LEN];
 char global_attributes_file[PATH_LEN];

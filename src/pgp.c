@@ -14,6 +14,8 @@
 
 #include	"tin.h"
 
+#ifdef HAVE_PGP
+
 /* 
  * name of environment variable of options to pass to PGP 
  */
@@ -33,8 +35,6 @@
 
 extern FILE *note_fp;
 extern long note_mark[MAX_PAGES];
-
-#ifdef HAVE_PGP
 
 static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
 char *pgpopts = (char *)NULL, pgp_data[PATH_LEN];
@@ -190,14 +190,11 @@ pgp_available ()
 	}
 }
 
-#endif	/* HAVE_PGP */
-
 void 
 invoke_pgp_mail (nam, mail_to)
 	char *nam;
 	char *mail_to;
 {
-#ifdef HAVE_PGP
 	char ch, ch_default = 's';
 	
 	if (!pgp_available()) {
@@ -228,14 +225,12 @@ invoke_pgp_mail (nam, mail_to)
 			do_pgp(SIGN, nam, NULL);
 			break;
 	}
-#endif
 }
 
 void
 invoke_pgp_news(the_article)
 	char *the_article;
 {
-#ifdef HAVE_PGP
 	char ch, ch_default = 's';
 	
 	if (!pgp_available()) {
@@ -263,13 +258,11 @@ invoke_pgp_news(the_article)
 			pgp_append_public_key(the_article);
 			break;
 	}
-#endif
 }
 
 int 
 pgp_check_article()
 {
-#ifdef HAVE_PGP
 	FILE *art;
 	char article[PATH_LEN], buf[LEN], cmd[LEN], ch;
 	int pgp_signed = 0, pgp_key = 0;
@@ -330,24 +323,6 @@ pgp_check_article()
 	continue_prompt();
 	set_alarm_clock_on();
 	return (1);
-#else
 	return 0;
-#endif
 }
-
-/* Overrides for Emacs so that we follow Iain's tabbing style.
- * Emacs will notice this stuff at the end of the file and automatically
- * adjust the settings for this buffer only.  This must remain at the end
- * of the file. 
- * ---------------------------------------------------------------------------
- * Local variables:
- * c-basic-offset: 8
- * c-indent-level: 8
- * c-brace-imaginary-offset: 0
- * c-brace-offset: -8
- * c-argdecl-indent: 8
- * c-label-offset: -8
- * c-continued-statement-offset: 8
- * c-continued-brace-offset: 0
- * End:
- */
+#endif /* HAVE_PGP */

@@ -108,7 +108,7 @@ psGrpPrev ()
 	return (struct t_group *) 0;
 }
 
-
+#ifdef 0
 void
 vGrpTest ()
 {
@@ -166,3 +166,4 @@ printf ("Find grp thats not there\n");
 		printf ("Find grp NOT FOUND=[%s]\n", "NO.group");		
 	}
 }
+#endif /* 0 */

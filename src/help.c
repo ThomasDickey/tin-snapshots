@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 static char txt_help_empty_line[] = "\r\n";
 

@@ -18,10 +18,10 @@
  *  Load the mail active file into active[]
  */
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void 
 read_mail_active_file ()
 {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 	char	buf[LEN];
 	char	spooldir[PATH_LEN];
 	FILE	*fp;
@@ -110,18 +110,17 @@ read_mail_active_continue:;
 	if ((cmd_line && ! update && ! verbose) || (update && update_fork)) {
 		wait_message ("\n");
 	}
-
-#endif	/* INDEX_DAEMON	*/
 }
+#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /*
  *  Write out mailgroups from active[] to ~/.tin/active.mail
  */
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void 
 write_mail_active_file ()
 {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 	char acGrpPath[PATH_LEN];
 	FILE *fp;
 	register int i;
@@ -140,18 +139,18 @@ write_mail_active_file ()
 		}
 		fclose (fp);
 	}
-#endif	/* INDEX_DAEMON	*/
 }
+#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 /*
  *  Load the text description from ~/.tin/mailgroups for each mail group into 
  *  the active[] array.
  */
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void 
 read_mailgroups_file ()
 {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 	FILE *fp;
 	
 	if (show_description == FALSE || save_news || catchup) {
@@ -169,9 +168,8 @@ read_mailgroups_file ()
 			wait_message ("\n");
 		}
 	}
-	
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
 
 /*
  *  Load the text description from LIBDIR/newsgroups for each group into the 
@@ -482,30 +480,28 @@ vMakeGrpName (pcBaseDir, pcGrpName, pcGrpPath)
 }
 
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-vGrpDelMailArt (/*psGrp,*/ psArt)
-/*	struct t_group *psGrp;*/
+vGrpDelMailArt (psArt)
 	struct t_article *psArt;
 {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 
 	if (psArt->delete) {
-		art_mark_undeleted (/*psGrp,*/ psArt);
+		art_mark_undeleted (psArt);
 		info_message ("Article undeleted");
 	} else {
-		art_mark_deleted (/*psGrp, */psArt);
+		art_mark_deleted (psArt);
 		info_message ("Article deleted");
 	}
-
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
 vGrpDelMailArts (psGrp)
 	struct t_group *psGrp;
 {
-#if !defined(INDEX_DAEMON) && defined(HAVE_MAIL_HANDLING)
 	char	acArtFile[PATH_LEN];
 	char	acGrpPath[PATH_LEN];
 	int		iNum;
@@ -534,8 +530,8 @@ vGrpDelMailArts (psGrp)
 			vWriteNovFile (psGrp);
 		}
 	}
-#endif	/* INDEX_DAEMON */
 }
+#endif	/* INDEX_DAEMON */
 
 
 int 

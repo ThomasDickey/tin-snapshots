@@ -13,10 +13,30 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
+#include	"patchlev.h"
 
 #define	PRINT_LF()	{Raw (FALSE); my_fputc ('\n', stdout); fflush (stdout); Raw (TRUE);}
 
 #define	MAX_MSG_HEADERS	20
+
+/* which keys are allowed for posting? */
+#ifdef	HAVE_PGP
+#	ifdef	HAVE_ISPELL
+#		define POST_KEYS	"egiqs\033"
+#	else
+#		define POST_KEYS	"egqs\033"
+#	endif
+#else
+#	ifdef   HAVE_ISPELL
+#		define POST_KEYS	"eiqs\033"
+#	else
+#		define POST_KEYS	"eqs\033"
+#	endif
+#endif
+
+
+
 
 extern char note_h_distrib[PATH_LEN];			/* Distribution: */
 extern char note_h_followup[LEN];			/* Followup-To: */
@@ -507,7 +527,6 @@ check_article_to_be_posted (the_article, art_type, lines)
 			fprintf (stderr, txt_warn_art_line_too_long, MAX_COL, cnt, line);
 			fflush (stderr);
 			got_long_line = TRUE;
-			/*break;*/
 		}
 	}
 	if (! end_of_header) {
@@ -785,13 +804,17 @@ quick_post_article ()
 			clear_message ();
 			return;
 
+#ifdef HAVE_ISPELL
 		case iKeyPostIspell:
 			invoke_ispell (article);
 			break;
+#endif
 
+#ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        invoke_pgp_news (article);
 			break;
+#endif
 
 		case iKeyPostPost:
 			wait_message (txt_posting);
@@ -1001,13 +1024,17 @@ post_article (group, posted_flag)
 			clear_message ();
 			return redraw_screen;
 
+#ifdef HAVE_ISPELL
 		case iKeyPostIspell:
 			invoke_ispell (article);
 			break;
+#endif
 
+#ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        invoke_pgp_news (article);
 			break;
+#endif
 
 		case iKeyPostPost:
 			wait_message (txt_posting);
@@ -1353,14 +1380,18 @@ ignore_followup_to_poster:
 			clear_message ();
 			return ret_code;
 
+#ifdef HAVE_ISPELL
 		case iKeyPostIspell:
 			invoke_ispell (article);
 			ret_code = POSTED_REDRAW;
 			break;
+#endif
 			
+#ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        invoke_pgp_news (article);
 			break;
+#endif
 
 		case iKeyPostPost:
 			wait_message (txt_posting);
@@ -1535,7 +1566,7 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				MoveCursor (cLINES, (int) (strlen (msg)-1));
 				if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 					ch = ch_default;
-			} while (! strchr ("egiqs\033", ch));
+			} while (! strchr (POST_KEYS, ch));
 		}
 		switch (ch) {
 			case iKeyPostEdit:
@@ -1543,9 +1574,11 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				redraw_screen = TRUE;
 				break;
 
+#ifdef HAVE_ISPELL
 			case iKeyPostIspell:
 				invoke_ispell (nam);
 				break;
+#endif
 
 			case iKeyPostQuit:
 			case iKeyPostQuit2:
@@ -1554,9 +1587,11 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				*mailed_ok = FALSE;
 				return redraw_screen;
 
+#ifdef HAVE_PGP
 		        case iKeyPostPGP:
 			        invoke_pgp_mail (nam, mail_to);
 				break;
+#endif
 
 			case iKeyPostSend:
 				/*
@@ -1721,9 +1756,11 @@ mail_bug_report ()
 				invoke_editor (nam, start_line_offset);
 				break;
 
+#ifdef HAVE_ISPELL
 			case iKeyPostIspell:
 				invoke_ispell (nam);
 				break;
+#endif
 
 			case iKeyPostQuit:
 			case iKeyPostQuit2:
@@ -1731,9 +1768,11 @@ mail_bug_report ()
 				clear_message ();
 				return TRUE;
 
+#ifdef HAVE_PGP
 		        case iKeyPostPGP:
 			        invoke_pgp_mail (nam, mail_to);
 				break;
+#endif
 
 			case iKeyPostSend:
 				sprintf (msg, txt_mail_bug_report_confirm, bug_addr, add_addr);
@@ -1764,7 +1803,7 @@ mail_bug_report ()
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("egiqs\033", ch));
+			} while (! strchr (POST_KEYS, ch));
 	}
 
 mail_bug_report_done:
@@ -1867,9 +1906,11 @@ mail_to_author (group, respnum, copy_text)
 			redraw_screen = TRUE;
 			break;
 
+#ifdef HAVE_ISPELL
 		case iKeyPostIspell:
 			invoke_ispell (nam);
 			break;
+#endif
 
 		case iKeyPostQuit:
 		case iKeyPostQuit2:
@@ -1877,12 +1918,14 @@ mail_to_author (group, respnum, copy_text)
 			clear_message ();
 			return redraw_screen;
 
+#ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
 			if (pcCopyArtHeader (HEADER_TO, nam, mail_to)
 			 && pcCopyArtHeader (HEADER_SUBJECT, nam, subject))
 			        invoke_pgp_mail (nam, mail_to);
 			break;
+#endif
 
 		case iKeyPostSend:
 			my_strncpy (mail_to, arts[respnum].from, sizeof (mail_to));
@@ -1911,7 +1954,7 @@ mail_to_author (group, respnum, copy_text)
 			MoveCursor (cLINES, (int) strlen (msg)-1);
 			if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
-		} while (! strchr ("egiqs\033", ch));
+			} while (! strchr (POST_KEYS, ch));
 	}
 
 mail_to_author_done:
@@ -2056,7 +2099,9 @@ delete_article (group, art)
 	 * Check if news / mail / save group
 	 */
 	if (group->type == GROUP_TYPE_MAIL || group->type == GROUP_TYPE_SAVE) {
-		vGrpDelMailArt (/*group,*/ art);
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+		vGrpDelMailArt (art);
+#endif	/* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 		return FALSE;
 	}
 		 
@@ -2376,9 +2421,11 @@ repost_article (group, art, respnum)
 			ret_code = POSTED_REDRAW;
 			break;
 
+#ifdef HAVE_ISPELL
 		case iKeyPostIspell:
 			invoke_ispell (article);
 			break;
+#endif
 
  		case iKeyPostQuit:
  		case iKeyPostQuit2:
@@ -2387,9 +2434,11 @@ repost_article (group, art, respnum)
 			clear_message ();
 			return ret_code;
 
+#ifdef HAVE_PGP
 		case iKeyPostPGP:
 		        invoke_pgp_news (article);
 			break;
+#endif
 
  		case iKeyPostPost:
 			wait_message (txt_repost_an_article);

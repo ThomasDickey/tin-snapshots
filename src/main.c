@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"patchlev.h"
 
 #if defined(M_AMIGA) && defined(__SASC_650)
 extern int	_WBArg;
@@ -147,7 +148,9 @@ main (argc, argv)
 	if (read_saved_news) {
 		create_save_active_file ();
 	}
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mail_active_file ();
+#endif
 	read_news_active_file ();
 	debug_print_active();
 
@@ -181,7 +184,9 @@ main (argc, argv)
 	 *  Read text descriptions for mail & news groups from 
 	 *  ~/.tin/mailgroups & LIBDIR/newsgroups respectively
 	 */
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mailgroups_file ();
+#endif
 	read_newsgroups_file ();
 	
 	if (create_mail_save_dirs ()) {

@@ -13,6 +13,7 @@
  */
 
 #include	"tin.h"
+#include	"menukeys.h"
 
 #define INDEX2TNUM(i)	((i) % NOTESLINES)
 #define TNUM2LNUM(i)	(INDEX_TOP + (i))

@@ -12,7 +12,8 @@
  *              right notice, and it must be included in any copy made
  */
 
-#include "tin.h"
+#include	"tin.h"
+#include	"patchlev.h"
 
 #if defined(M_OS2)
 

@@ -1,5 +1,8 @@
 Bugs
 ----
+o  strip hardcoded values (binaries/sources) from feed.c
+   add default to attributes... 
+
 o  if no INEWSDIR is given INEWSDIR is set to LIBDIR which is not always
    true...
 
@@ -64,6 +67,8 @@ o  tin sometimes crashes (thread.c) 710/892
 
 New features
 ------------
+o  add expandation of $HOME and/or ~ to newsrctable
+
 o  add
        --enable-mime-base64           (default off)
        --disable-piping               (default on)
@@ -76,7 +81,7 @@ o  move architecture dependent files to subdirectories, clean up architecture
    independent files, rename several defines, remove useless doubled defines
    like NO_PIPING and DONT_HAVE_PIPING
 
-o  split tin.h for better dependencies in make
+o  split tin.h/proto.h for better dependencies in make
 
 o  join Makefile and makefile
 
