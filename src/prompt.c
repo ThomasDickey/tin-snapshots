@@ -137,16 +137,15 @@ prompt_yn_loop:
 	switch (ch) {
 #ifndef WIN32
 		case ESC:	/* (ESC) common arrow keys */
-#ifdef HAVE_KEY_PREFIX
+#	ifdef HAVE_KEY_PREFIX
 		case KEY_PREFIX:
-#endif
+#	endif
 			switch (get_arrow_key ()) {
 #endif /* WIN32 */
 				case KEYMAP_UP:
 				case KEYMAP_DOWN:
 					default_answer = 1 - default_answer;
 					goto prompt_yn_loop;
-					break;
 				
 				case KEYMAP_LEFT:
 					ch = ESC;
@@ -155,10 +154,10 @@ prompt_yn_loop:
 				case KEYMAP_RIGHT:
 					ch = prompt_ch;
 					break;
- #ifndef WIN32
+#ifndef WIN32
 			}
 			break;
- #endif
+#endif
 	}
 
 	if (line == cLINES) {

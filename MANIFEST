@@ -1,6 +1,6 @@
-MANIFEST for tin-1.3-unoff-BETA-960717 (Thu Jul 18 02:59:51 MET DST 1996)
+MANIFEST for tin-1.3-unoff-BETA-960718 (Thu Jul 18 17:19:43 MET DST 1996)
 ----------------------------------------------------
-  27348 ./CHANGES
+  27492 ./CHANGES
   10555 ./TODO
    5181 ./Makefile
   17237 ./INSTALL
@@ -33,7 +33,7 @@ MANIFEST for tin-1.3-unoff-BETA-960717 (Thu Jul 18 02:59:51 MET DST 1996)
    8167 ./src/actived.c
   13034 ./src/amiga.c
    4426 ./src/amigatcp.c
-  35854 ./src/art.c
+  35905 ./src/art.c
   22649 ./src/attrib.c
    8270 ./src/charset.c
    1480 ./src/color.c
@@ -86,4 +86,4 @@ MANIFEST for tin-1.3-unoff-BETA-960717 (Thu Jul 18 02:59:51 MET DST 1996)
    5522 ./src/vms.c
    6764 ./include/autoconf.hin
   11054 ./src/Makefile.in
-1431153 total
+1431348 total
