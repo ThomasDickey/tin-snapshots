@@ -27,6 +27,7 @@
 
 #include	"tin.h"
 #include	"tcurses.h"
+#include	"bugrep.h"
 
 char	acHomeDir[PATH_LEN];
 char	acMailActiveFile[PATH_LEN];

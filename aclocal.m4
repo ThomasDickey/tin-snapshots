@@ -452,6 +452,58 @@ AC_DEFUN([CF_MSG_LOG],
 echo "(line __oline__) testing $* ..." 1>&5
 )dnl
 dnl ---------------------------------------------------------------------------
+dnl After checking for functions in the default $LIBS, make a further check
+dnl for the functions that are netlib-related (these aren't always in the
+dnl libc, etc., and have to be handled specially because there are conflicting
+dnl and broken implementations.
+dnl Common library requirements (in order):
+dnl	-lresolv -lsocket -lnsl
+dnl	-lnsl -lsocket
+dnl	-lsocket
+dnl	-lbsd
+AC_DEFUN([CF_NETLIBS],[
+NETLIBS=""
+cf_have_lsocket=no
+#
+AC_CHECK_FUNC(gethostname,[AC_DEFINE(HAVE_GETHOSTNAME)],[
+	AC_CHECK_LIB(nsl,gethostname,
+		[AC_DEFINE(HAVE_GETHOSTNAME)
+		NETLIBS="-lnsl $NETLIBS"],
+		AC_CHECK_LIB(socket,gethostname,
+		[AC_DEFINE(HAVE_GETHOSTNAME)
+		NETLIBS="-lsocket $NETLIBS"
+		cf_have_lsocket=yes]),
+		[$NETLIBS])])
+#
+# FIXME:  sequent needs this library (i.e., -lsocket -linet -lnsl), but
+# I don't know the entrypoints - 97/7/22 TD
+AC_HAVE_LIBRARY(inet,NETLIBS="-linet $NETLIBS")
+#
+if test $cf_have_lsocket = no ; then
+AC_CHECK_FUNC(socket,[AC_DEFINE(HAVE_SOCKET)],[
+	AC_CHECK_LIB(socket,socket,
+		[AC_DEFINE(HAVE_SOCKET)
+		NETLIBS="-lsocket $NETLIBS"],
+		AC_CHECK_LIB(bsd,socket,
+			[AC_DEFINE(HAVE_SOCKET)
+			NETLIBS="-lbsd $NETLIBS"]),
+		[$NETLIBS])])
+fi
+#
+AC_CHECK_FUNC(gethostbyname,[AC_DEFINE(HAVE_GETHOSTBYNAME)],[
+	AC_CHECK_LIB(nsl,gethostbyname,
+		[AC_DEFINE(HAVE_GETHOSTBYNAME)
+		NETLIBS="-lnsl $NETLIBS"],,
+		[$NETLIBS])])
+#
+AC_CHECK_FUNC(strcasecmp,[AC_DEFINE(HAVE_STRCASECMP)],[
+	AC_CHECK_LIB(resolv,strcasecmp,
+		[AC_DEFINE(HAVE_STRCASECMP)
+		NETLIBS="-lresolv $NETLIBS"],,
+		[$NETLIBS])])
+LIBS="$LIBS $NETLIBS"
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl See if sum can take -r
 AC_DEFUN([CF_PROG_SUM_R],
 [
@@ -584,6 +636,31 @@ fi
 ])
 AC_MSG_RESULT($cf_cv_sig_const)
 test "$cf_cv_sig_const" = yes && AC_DEFINE(DECL_SIG_CONST)
+])dnl
+dnl ---------------------------------------------------------------------------
+dnl Check for socks5 configuration
+AC_DEFUN([CF_SOCKS5],[
+AC_MSG_CHECKING(if we can link against socks5 library)
+AC_CACHE_VAL(cf_cv_lib_socks5,[
+LIBS="$LIBS -lsocks5"
+AC_TRY_LINK([
+#define SOCKS
+#include <socks.h>],[
+#ifdef USE_SOCKS4_PREFIX
+	Rinit((char *)0);
+#else
+	SOCKSinit((char *)0);
+#endif
+	getpeername(0, (struct sockaddr *)0, (int *)0);],
+	[cf_cv_lib_socks5=yes],
+	[cf_cv_lib_socks5=no])
+])
+AC_MSG_RESULT($cf_cv_lib_socks5)
+if test $cf_cv_lib_socks5 = yes ; then
+	AC_DEFINE(USE_SOCKS5)
+else
+	AC_ERROR(Sorry.  Cannot link against socks5 library)
+fi
 ])dnl
 dnl ---------------------------------------------------------------------------
 dnl	Check for declaration of sys_errlist in one of stdio.h and errno.h.  

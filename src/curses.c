@@ -235,13 +235,12 @@ setup_screen (void)
 #endif /* INDEX_DAEMON */
 }
 
-
 #ifdef M_UNIX
 
-int
-InitScreen (void)
-{
 #ifndef INDEX_DAEMON
+int
+SetupScreen (void)
+{
 	char the_termname[40], *p;
 
 	if ((p = getenv ("TERM")) == (char *) 0) {
@@ -284,12 +283,12 @@ InitScreen (void)
 	_cursoroff = NULL;
 
 	if (STRCMPEQ(the_termname, "xterm")) {
+		static char x_init[] = "\033[?9h";
+		static char x_end[]  = "\033[?9l";
 		xclicks = TRUE;
-		_xclickinit	= "\033[?9h";
-		_xclickend	= "\033[?9l";
+		_xclickinit	= x_init;
+		_xclickend	= x_end;
 	}
-
-	InitWin ();
 
 	if (!_clearscreen) {
 		my_fprintf (stderr, txt_no_term_clearscreen, progname);
@@ -321,11 +320,17 @@ InitScreen (void)
 			draw_arrow_mark = 1;
 	}
 	return (TRUE);
+}
+#endif
 
+int
+InitScreen (void)
+{
+#ifndef INDEX_DAEMON
+	InitWin ();
+	return (TRUE);
 #else
-
 	return (FALSE);
-
 #endif /* INDEX_DAEMON */
 }
 

@@ -611,40 +611,20 @@ AC_EGREP_HEADER([select\(.*, *int *\*,],time.h,AC_DEFINE(HAVE_SELECT_INTP) AC_MS
 
 AC_FUNC_SETPGRP
 
-dnl After checking for functions in the default $LIBS, make a further check
-dnl for the functions that are netlib-related (these aren't always in the
-dnl libc, etc., and have to be handled specially because there are conflicting
-dnl and broken implementations.
-dnl Common library requirements (in order):
-dnl	-lresolv -lsocket -lnsl
-dnl	-lnsl -lsocket
-dnl	-lsocket
-dnl	-lbsd
-NETLIBS=""
-AC_CHECK_FUNC(gethostname,[AC_DEFINE(HAVE_GETHOSTNAME)],[
-	AC_CHECK_LIB(nsl,gethostname,
-		[AC_DEFINE(HAVE_GETHOSTNAME)
-		NETLIBS="-lnsl $NETLIBS"],,
-		[$NETLIBS])])
-AC_CHECK_FUNC(socket,[AC_DEFINE(HAVE_SOCKET)],[
-	AC_CHECK_LIB(socket,socket,
-		[AC_DEFINE(HAVE_SOCKET)
-		NETLIBS="-lsocket $NETLIBS"],
-		AC_CHECK_LIB(bsd,socket,
-			[AC_DEFINE(HAVE_SOCKET)
-			NETLIBS="-lbsd $NETLIBS"]),
-		[$NETLIBS])])
-AC_CHECK_FUNC(gethostbyname,[AC_DEFINE(HAVE_GETHOSTBYNAME)],[
-	AC_CHECK_LIB(nsl,gethostbyname,
-		[AC_DEFINE(HAVE_GETHOSTBYNAME)
-		NETLIBS="-lnsl $NETLIBS"],,
-		[$NETLIBS])])
-AC_CHECK_FUNC(strcasecmp,[AC_DEFINE(HAVE_STRCASECMP)],[
-	AC_CHECK_LIB(resolv,strcasecmp,
-		[AC_DEFINE(HAVE_STRCASECMP)
-		NETLIBS="-lresolv $NETLIBS"],,
-		[$NETLIBS])])
-LIBS="$LIBS $NETLIBS"
+AC_MSG_CHECKING(if you want socks5 library)
+AC_CACHE_VAL(cf_cv_use_libsocks5,[
+AC_ARG_WITH(socks5,
+	[  --with-socks5           link with socks5 if available],
+	[cf_cv_use_libsocks5=yes],
+	[cf_cv_use_libsocks5=no])
+])
+AC_MSG_RESULT($cf_use_libsocks5)
+
+if test $cf_cv_use_libsocks5 = yes ; then
+	CF_SOCKS5
+else
+	CF_NETLIBS
+fi
 
 ###	Checks for network library functions.
 AC_CHECK_FUNCS(\

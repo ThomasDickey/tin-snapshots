@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : tin.h
  *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 22-08-95
+ *  Created   : 01.04.91
+ *  Updated   : 30.07.97
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
  *		You may  freely  copy or  redistribute	this software,
@@ -19,10 +19,45 @@
 #ifndef TIN_H
 #define TIN_H 1
 
+#if 0
+/* these are the only two defines I found on MacOS */
+#if defined (__POWERPC__) || defined (__CFM68K__)
+
+#	define __MAC_OS__ 1
+
+/* FIXME */
+#	undef HAVE_CONFIG_H	/* just in case */
+#	define HAVE_ATOI 1	/* MacOS comes with atoi() */
+
+#  undef SYSTEM_LOOKS_LIKE_SCO
+ 
+/* MacOS doesn't have these - so ignore them */
+#	define NO_SHELL_ESCAPE	1
+#  define DONT_HAVE_PIPING	1
+#	define access(a,b)	(0)
+#	define chmod(a,b)	(0)
+
+/* someone has to write make_post_cmd() for MacOS someday */
+#	define make_post_cmd(a,b)	(0)
+
+#endif /* (__POWERPC__) || (__CFM68K__) */
+#endif /* 0 */
+
 #ifdef HAVE_CONFIG_H
 #	include	<autoconf.h>	/* FIXME: normally we use 'config.h' */
 #else
 #	include	"config.h"
+#endif
+
+/*
+ * We force this include-ordering since socks.h contains redefinitions of
+ * functions that probably are prototyped via other includes.  The socks.h
+ * definitions have to be included everywhere, since they're making wrappers
+ * for the stdio functions as well as the network functions.
+ */
+#ifdef USE_SOCKS5
+#	define SOCKS
+#	include	<socks.h>
 #endif
 
 /*
@@ -74,7 +109,7 @@ extern char *get_uaf_fullname();
 
 #ifndef VMS
 #	include	<stdio.h>
-#	if HAVE_ERRNO_H
+#	ifdef HAVE_ERRNO_H
 #		include	<errno.h>
 #	else
 #		include	<sys/errno.h>
@@ -297,9 +332,13 @@ extern char *get_uaf_fullname();
 /*
  *  Max time between the first character of a VT terminal escape sequence
  *  for special keys and the following characters to arrive (msec)
- *
  */
 #define SECOND_CHARACTER_DELAY   200
+
+/*
+ * Maximum time (seconds) for a VT terminal escape sequence
+ */
+#define VT_ESCAPE_TIMEOUT        1
 
 /*
  * Index file daemon version of tin. Will create/update index files from cron
@@ -615,7 +654,7 @@ extern char *get_uaf_fullname();
 #define 	POSTPONED_FILE		"postponed.articles"
 #define 	DEFAULT_MAILDIR 	"Mail"
 #define 	DEFAULT_SAVEDIR 	"News"
-#define	INPUT_HISTORY_FILE	".inputhistory"
+#define 	INPUT_HISTORY_FILE	".inputhistory"
 #define 	MAILGROUPS_FILE 	"mailgroups"
 #define 	MSG_HEADERS_FILE	"headers"
 #define 	MOTD_FILE		"motd"
@@ -652,9 +691,14 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #	define	forever	for(;;)
 #endif
 
+/* safe strcpy into fixed-legth buffer */
+#define STRCPY(dst, src) \
+       (dst[sizeof(dst) - 1] = 0, strncpy(dst, src, sizeof(dst) -1))
+
 #define STRCMPEQ(s1, s2)		(*(s1) == *(s2) && strcmp((s1), (s2)) == 0)
 #define STRNCMPEQ(s1, s2, n)		(*(s1) == *(s2) && strncmp((s1), (s2), n) == 0)
 #define STRNCASECMPEQ(s1, s2, n)	(strncasecmp((s1), (s2), n) == 0)
+
 
 #if defined(VMS) || defined(M_AMIGA)
 #	define	LEN			512
@@ -1508,7 +1552,6 @@ typedef struct t_notify *notify_p;
 
 #ifdef M_AMIGA
 #	define	NEWSGROUPS_FILE 	"newsdescrip"
-#	define	BUG_REPORT_ADDRESS	"obw@amarok.ping.de"
 #	define	REDIRECT_OUTPUT 	"> NIL:"
 #	define	REDIRECT_PGP_OUTPUT	"> NIL:"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"
@@ -1524,7 +1567,6 @@ extern void joinpath (char *result, const char *dir, const char *file);
 #endif
 #ifdef VMS
 #	define	NEWSGROUPS_FILE 	"newsgroups"
-#	define	BUG_REPORT_ADDRESS	"mcquill@next.duq.edu"
 #	define	REDIRECT_OUTPUT 	""
 #	define	REDIRECT_PGP_OUTPUT	""
 #	define	ENV_VAR_MAILER		"TIN_MAILER"
@@ -1541,7 +1583,6 @@ extern void joindir (char *result, char *dir, char *file);
 #endif /* VMS */
 #ifdef M_OS2
 #	define	NEWSGROUPS_FILE 	"newsgroups"
-#	define	BUG_REPORT_ADDRESS	"andreas@scilink.org"
 #	define	REDIRECT_OUTPUT 	"> NUL"
 #	define	REDIRECT_PGP_OUTPUT	"> NUL"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"
@@ -1554,7 +1595,6 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef WIN32
 #	define	NEWSGROUPS_FILE 	"newsgroups"
-#	define	BUG_REPORT_ADDRESS	"nigele@microsoft.com"
 #	define	REDIRECT_OUTPUT 	"> NUL"
 #	define	REDIRECT_PGP_OUTPUT "> NUL"
 #	define	ENV_VAR_GROUPS		"TIN_GROUPS"
@@ -1568,7 +1608,6 @@ extern void joinpath (char *result, char *dir, char *file);
 #endif
 #ifdef M_UNIX
 #	define	NEWSGROUPS_FILE		"newsgroups"
-#	define	BUG_REPORT_ADDRESS		"urs@akk.uni-karlsruhe.de"
 #	define	REDIRECT_OUTPUT		"> /dev/null 2>&1"
 #	define	REDIRECT_PGP_OUTPUT		"> /dev/null"
 #	define	ENV_VAR_MAILER		"MAILER"
@@ -1580,6 +1619,36 @@ extern void joinpath (char *result, char *dir, char *file);
 #	ifdef	HAVE_KEY_PREFIX
 #		define	KEY_PREFIX		0xff
 #	endif
+#endif
+
+/* fallback values */
+/* FIXME! */
+#ifndef NEWSGROUPS_FILE
+#	define	NEWSGROUPS_FILE		""
+#endif
+#ifndef REDIRECT_OUTPUT
+#	define	REDIRECT_OUTPUT		""
+#endif
+#ifndef REDIRECT_PGP_OUTPUT
+#	define	REDIRECT_PGP_OUTPUT		""
+#endif
+#ifndef ENV_VAR_MAILER
+#	define	ENV_VAR_MAILER		""
+#endif
+#ifndef ENV_VAR_SHELL
+#	define	ENV_VAR_SHELL		""
+#endif
+#ifndef EDITOR_FORMAT_ON
+#	define	EDITOR_FORMAT_ON		""
+#endif
+#ifndef MAILER_FORMAT
+#	define	MAILER_FORMAT		""
+#endif
+#ifndef METAMAIL_CMD
+#	define	METAMAIL_CMD		""
+#endif
+#ifndef TMPDIR
+#	define	TMPDIR		""
 #endif
 
 #ifdef M_AMIGA
@@ -1729,6 +1798,7 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 
 #include	"extern.h"
 #include	"nntplib.h"
+
 #ifndef __CPROTO__
 #	include	"proto.h"
 #endif

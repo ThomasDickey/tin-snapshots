@@ -1,9 +1,30 @@
+--unoff BETA release 970730 --
+
+416) Thomas E. Dickey <dickey@clark.net>
+     ADD. logic to use 'poll() in get_arrow_key()
+     BUG. corrects timeout values in get_arrow_key()
+     BUG. corrected logic of input_pending() when configured with curses.
+     ADD. moves the termcap lookup out of InitScreen() to a new function
+	  SetupScreen()
+     ADD. moves the network-library checks to aclocal.m4
+     ADD. configure option "--with-socks5"
+     FIX. several supplied patches
+
+415) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. some fallback values
+     FIX. several supplied patches
+
+414) Carsten Theis <iw250@advs2.gm.fh-koeln.de>
+     BUG. strdup() calls replaced by my_strdup()-calls, as strdup()
+          is not mandatory in ansi-c.
+     FIX. attrib.c
+
 --unoff BETA release 970724 --
 
 413) Thomas Quinot <thomas@cuivre.fdn.fr>
      ADD. if using INN nntplib use _CONF_FROMHOST value, if present,
           instead of domain_name.
-      FIX. header.c
+     FIX. header.c
 
 412) Urs Janssen <urs@akk.uni-karlsruhe.de>
      ADD. test for curses before reading any config-files
