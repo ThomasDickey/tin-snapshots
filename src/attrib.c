@@ -608,7 +608,7 @@ write_attributes_file (
 	fprintf (fp, "#  maildir=STRING (ie. ~/Mail)\n");
 	fprintf (fp, "#  savedir=STRING (ie. ~user/News)\n");
 	fprintf (fp, "#  savefile=STRING (ie. =linux)\n");
-	fprintf (fp, "#  organization=STRING\n");
+	fprintf (fp, "#  organization=STRING (if starting with '/' read from file)\n");
 	fprintf (fp, "#  sigfile=STRING (ie. $var/sig)\n");
 	fprintf (fp, "#  followup_to=STRING\n");
 	fprintf (fp, "#  printer=STRING\n");
@@ -669,7 +669,7 @@ write_attributes_file (
 	fprintf (fp, "post_proc_type=1\n\n");
 
 	fprintf (fp, "# in *binaries* set post process type to uudecode, remove tmp files\n");
-	fprintf (fp, "# and Followup-To: poster\n");
+	fprintf (fp, "# and set Followup-To: poster\n");
 	fprintf (fp, "scope=*binaries*\n");
 	fprintf (fp, "post_proc_type=2\n");
 	fprintf (fp, "delete_tmp_files=ON\n");

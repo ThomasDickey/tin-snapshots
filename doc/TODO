@@ -1,5 +1,9 @@
 Bugs
 ----
+o  word_h_display_marks, word_highlighting and wildcard are sometimes
+   reseted to their defualt value.
+   [Urs Janssen <urs@akk.uni-karlsruhe.de>]
+
 o  tin does not assure that you are in nnrpd after a reconnect -> issue a
    mode reader after a reconnect.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
@@ -58,8 +62,9 @@ o  if you compile debug.c with -O3 on IRIX (5.3) & native-compiler tin won't
 o  - fix tinrc-update from old (tin1.2pl2) versions (sometime causes crashes)
    - 'any key' seems to be only 'return'
 
-o  join show_xcommentto/news_headers_to_display, remove auto-display of
-   Keywords/Summary as it could be controlled by news_headers_to_display
+o  - join show_xcommentto/news_headers_to_display, remove auto-display of
+     Keywords/Summary as it could be controlled by news_headers_to_display
+   - crsr/page-up/down does not work in large articles.
 
 o  --enable-curses has several bugs
    (screen redraw is broken, tty-settings get messed up, color might not
@@ -180,6 +185,9 @@ o  When enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
+o  if Subject: contains (was: ...) on a f'up strip it before
+   entering editor.
+
 o  Menu/tinrc/attributes entry for TeX2ISO_Conversion=ON/OFF
    [toggle via '"']
 

@@ -2,7 +2,7 @@ dnl Project   : tin - a Usenet reader
 dnl Module    : configure.in
 dnl Author    : Thomas E. Dickey <dickey@clark.net>
 dnl Created   : 24.08.95
-dnl Updated   : 02.02.97
+dnl Updated   : 16.06.97
 dnl Notes     : 
 dnl
 dnl Copyright 1996,1997 by Thomas Dickey
@@ -13,13 +13,24 @@ dnl             right notice, and it must be included in any copy made
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.0)
+AC_PREREQ(2.12)
 AC_INIT(include/tin.h)
 AC_CONFIG_HEADER(include/autoconf.h:include/autoconf.hin)
 AC_PREFIX_DEFAULT(/usr/local)
 
 CF_SYS_NAME
 echo "Configuring `make version` for $SYS_NAME"
+
+CF_WITH_PATH(install-prefix,
+	[  --install-prefix        prefixes actual install location],
+	INSTALL_PREFIX,/)
+case ".$INSTALL_PREFIX" in # (vi
+./)	INSTALL_PREFIX=
+	;; # (vi
+./*/)	;; # (vi
+./*)	INSTALL_PREFIX="$INSTALL_PREFIX/"
+	;;
+esac
 
 ###	Checks for programs.
 save_CFLAGS="$CFLAGS"
@@ -650,6 +661,7 @@ AC_TRY_COMPILE([#include <sys/types.h>
 fi
 AC_MSG_RESULT($sigact_bad)
 
+CF_REGEX
 CF_SET_GID_UID
 CF_TYPE_SIGACTION
 CF_TERMIOS

@@ -332,6 +332,10 @@ read_news_active_file (void)
 		 * 'x'  junked group
 		 * '='  aliased group
 		 */
+		/* FIXME! - IMHO that's a bug
+		 * just mark 'x' group as 'no post' and
+		 * issue a waring for '=' groups that your posting will be redirected...
+		 */
 		if (moderated[0] == 'x' || moderated[0] == '=')
 			continue;
 

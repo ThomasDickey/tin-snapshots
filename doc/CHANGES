@@ -1,3 +1,25 @@
+--unoff BETA release 970622 --
+
+395) Sven Paulus <sven@oops.sub.de>
+     ADD. 'e'dit article possibillity if posting failed
+     ADD. random Oragnization via attributes file
+     FIX. several supplied patches
+
+394) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. REG_NOERROR definition (needed for hp-ux 8.0)
+     ADD. minor code cleanup
+     FIX. several supplied patches
+
+393) Thomas E. Dickey <dickey@clark.net>
+     ADD. install-prefix and autoconf support for regular expression
+     ADD. code clean-up
+     FIX. several supplied patches
+
+392) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. clear keybord-buffer in prompt_yn() to aviod unexpected
+          results.
+     FIX. prompt.c
+
 --unoff BETA release 970613 --
 
 391) Jason Faultless <jason@radar.demon.co.uk>
@@ -24,7 +46,6 @@
 
 387) Jason Faultless <jason@radar.demon.co.uk>
      ADD. started support for regular expressions
-          [define HAVE_POSIX_REGEX and you might need libregex]
      ADD. make str_lwr() syntax more ANSI-like. Other minor changes.
      FIX. several supplied patches
 

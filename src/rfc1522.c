@@ -447,13 +447,13 @@ rfc1522_do_encode(
    MIME_BREAK_LONG_LINES is defined
  */
 /* #ifdef MIME_BREAK_LONG_LINES */
-	int column = 0;				  /* current column */
+	int column = 0;				/* current column */
 	int word_cnt = 0;
 
 /* #endif */
-	int ewsize = 0;				  /* size of current encoded-word */
-	char buf[2048];				  /* buffer for encoded stuff */
-	char buf2[80];					  /* buffer for this and that */
+	size_t ewsize = 0;			/* size of current encoded-word */
+	char buf[2048];				/* buffer for encoded stuff */
+	char buf2[80];				/* buffer for this and that */
 	char *c;
 	char *t;
 	t_bool isstruct_head = FALSE;		/* are we dealing with structured header? */
@@ -494,9 +494,9 @@ rfc1522_do_encode(
 					if (break_long_line == TRUE) {
 						if (word_cnt == 2) {
 							/* Make sure we fit the first encoded
-							   * word in with the header keyword,
-							   * since we cannot break the line
-							   * directly after the keyword.
+							 * word in with the header keyword,
+							 * since we cannot break the line
+							 * directly after the keyword.
 							 */
 							ewsize = t - buf;
 						}

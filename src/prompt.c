@@ -3,9 +3,9 @@
  *  Module    : prompt.c
  *  Author    : I.Lea
  *  Created   : 01-04-91
- *  Updated   : 24-10-94, 12-08-96
+ *  Updated   : 14.06.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-97 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -134,6 +134,13 @@ prompt_yn (
 	int yn_loop = TRUE;
 
 	set_alarm_clock_off ();
+
+	/*
+	 * clear buffer - this is needed, otherwise a lost
+	 * connection right before a resync_active() call
+	 * would lead to a 'n' answer to the reconect prompt
+	 */
+	fflush(stdin);
 
 	while (yn_loop) {
 		prompt_ch = (default_answer ? iKeyPromptYes : iKeyPromptNo);

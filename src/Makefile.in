@@ -1,4 +1,4 @@
-# Source Makefile for tin - for configuration options read the ../INSTALL file.
+# Source Makefile for tin - for configuration options read the ../doc/INSTALL file.
 #
 SHELL		= /bin/sh
 prefix		= @prefix@
@@ -21,6 +21,7 @@ YACC	= @YACC@
 LIBS	= @LIBS@ @INN_NNTPLIB@
 
 # Where do you want the binary & manual page installed?
+INSTALL_PREFIX = @INSTALL_PREFIX@
 INS_BINARY_DIR	= @bindir@
 INS_DAEMON_DIR	= @NEWSLIBDIR@
 INS_MANUAL_DIR	= @mandir@/man
@@ -249,29 +250,34 @@ help:
 	@$(ECHO) "    make help            [ Show this text ]"
 	@$(ECHO) " "
 
-install_manpage:
-	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
-	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
+$(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT) \
+$(INSTALL_PREFIX)$(INS_BINARY_DIR) \
+$(INSTALL_PREFIX)$(INS_DAEMON_DIR) :
+	$(srcdir)/../mkdirs.sh $@
 
-install:
+install_manpage: $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)
+	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
+	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INSTALL_PREFIX)$(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
+
+install: $(INSTALL_PREFIX)$(INS_BINARY_DIR)
 	@$(MAKE) all
 	@$(ECHO) "Installing $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
-	@$(INSTALL) -s $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
-	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
-	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
+	@$(INSTALL) -s $(BINDIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE)
+	@cd $(INSTALL_PREFIX)$(INS_BINARY_DIR) && $(RM) r$(EXE)
+	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
 install_setuid:
 	@$(MAKE) all
 	@$(ECHO) "Installing SETUID $(EXE) v$(VER) to $(INS_BINARY_DIR)..."
-	@$(INSTALL) -s -o news -g news -m 6755 $(BINDIR)/$(EXE) $(INS_BINARY_DIR)/$(EXE)
-	@-$(RM) $(INS_BINARY_DIR)/r$(EXE)
-	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INS_BINARY_DIR)/r$(EXE)
+	@$(INSTALL) -s -o news -g news -m 6755 $(BINDIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/$(EXE)
+	@cd $(INSTALL_PREFIX)$(INS_BINARY_DIR) && @-$(RM) r$(EXE)
+	@$(LN) $(INS_BINARY_DIR)/$(EXE) $(INSTALL_PREFIX)$(INS_BINARY_DIR)/r$(EXE)
 	@$(MAKE) install_manpage
 
-install_daemon:
+install_daemon: $(INSTALL_PREFIX)$(INS_DAEMON_DIR)
 	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INS_DAEMON_DIR)..."
-	@$(INSTALL) -s -o news -m 0750 $(EXED) $(INS_DAEMON_DIR)/$(EXED)
+	@$(INSTALL) -s -o news -m 0750 $(EXED) $(INSTALL_PREFIX)$(INS_DAEMON_DIR)/$(EXED)
 
 tags:
 	@$(ECHO) "Generating tags (results in ./tags)..."

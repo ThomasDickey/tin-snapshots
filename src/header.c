@@ -306,9 +306,8 @@ get_from_name (
 ** return (*(user@fq.domainna.me))
 */
 #ifndef FORGERY
-const char *
-build_sender (
-	void)
+char *
+build_sender (void)
 {
 	const char *ptr;
 	static char sender[8192];
@@ -324,17 +323,18 @@ build_sender (
 		strcat(sender, ptr);
 		strcat(sender, "@");
 #ifdef HAVE_GETHOSTBYNAME
-		if ((ptr = get_fqdn(get_host_name()))) {
+		if ((ptr = get_fqdn(get_host_name())))
 #else
-		if (ptr = get_host_name()) { 
+		if (ptr = get_host_name())
 #endif /* HAVE_GETHOSTBYNAME */
+		{
 			strcat(sender, ptr);
 			strcat(sender, ">");
 		} else { 
-			return ((char *)NULL);
+			return 0;
 		}
 	} else {
-		return ((char *)NULL);
+		return 0;
 	}
 	return (sender);
 }

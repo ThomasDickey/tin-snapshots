@@ -113,8 +113,8 @@
 #endif
 
 	alternative_handling		OPT_ON_OFF
-	strip_newsrc		OPT_ON_OFF
-	strip_bogus		txt_strip_bogus BOGUS_ASK+1
-#ifdef	HAVE_POSIX_REGEX
-	wildcard		txt_wildcard	TRUE+1
+	strip_newsrc			OPT_ON_OFF
+	strip_bogus			txt_strip_bogus BOGUS_ASK+1
+#ifdef	HAVE_REGEX_FUNCS
+	wildcard			txt_wildcard	2
 #endif

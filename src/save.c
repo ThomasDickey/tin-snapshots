@@ -57,7 +57,7 @@ static void post_process_uud (int pp, t_bool auto_delete);
 static void post_process_sh (t_bool auto_delete);
 
 #ifndef INDEX_DAEMON
-static const char *get_first_savefile (void);
+static char *get_first_savefile (void);
 static const char *get_last_savefile (void);
 static void uudecode_file (int pp, char *file_out_dir, char *file_out);
 static char *get_archive_file (char *dir);
@@ -123,7 +123,7 @@ check_start_save_any_news (
 			fprintf (fp_log, "To: %s\n", userid);
 			sprintf (subject, "Subject: NEWS LOG %s", ctime (&epoch));
 			/** Remove trailing \n introduced by ctime() **/
-			if ((ich=strrchr(subject, '\n'))!=(char *)NULL)
+			if ((ich=strrchr(subject, '\n')) != 0)
 				*ich='\0';
 			fprintf (fp_log, "%s\n\n", subject);
 			break;
@@ -385,7 +385,7 @@ save_art_to_file (
 
 	save[i].saved = TRUE;
 
-	if (filename == (char *) 0) {
+	if (filename == 0) {
 		if (is_mailbox) {
 			sprintf (save_art_info, txt_saved_to_mailbox, get_first_savefile ());
 		} else {
@@ -409,7 +409,7 @@ save_thread_to_file (
 
 	char file[PATH_LEN];
 	char save_thread_info[LEN];
-	const char *first_savefile;
+	char *first_savefile;
 	int count = 0;
 	int i;
 
@@ -681,11 +681,11 @@ add_to_save_list (
 	save[num_save].index = the_index;
 	save[num_save].saved = FALSE;
 	save[num_save].is_mailbox = is_mailbox;
-	save[num_save].dir = (char *) 0;
-	save[num_save].file = (char *) 0;
-	save[num_save].archive = (char *) 0;
-	save[num_save].part = (char *) 0;
-	save[num_save].patch = (char *) 0;
+	save[num_save].dir = 0;
+	save[num_save].file = 0;
+	save[num_save].archive = 0;
+	save[num_save].part = 0;
+	save[num_save].patch = 0;
 
 	save[num_save].subject = my_strdup (the_article->subject);
 	if (archive_save && the_article->archive) {
@@ -834,9 +834,9 @@ save_comp (
 	/*
 	 * Sort on Archive-name: part & patch otherwise Subject:
 	 */
-	if (s1->archive != (char *) 0) {
-		if (s1->part != (char *) 0) {
-			if (s2->part != (char *) 0) {
+	if (s1->archive != 0) {
+		if (s1->part != 0) {
+			if (s2->part != 0) {
 				if (strcmp (s1->part, s2->part) < 0) {
 					return -1;
 				}
@@ -846,8 +846,8 @@ save_comp (
 			} else {
 				return 0;
 			}
-		} else if (s1->patch != (char *) 0) {
-			if (s2->patch != (char *) 0) {
+		} else if (s1->patch != 0) {
+			if (s2->patch != 0) {
 				if (strcmp (s1->patch, s2->patch) < 0) {
 					return -1;
 				}
@@ -883,7 +883,7 @@ save_filename (
 	if (i < 0)
 		return 0;
 #endif
-	filename = (char *) my_malloc (PATH_LEN);
+	filename = my_malloc (PATH_LEN);
 
 	if (save[i].is_mailbox) {
 		joinpath (filename, save[i].dir, save[i].file);
@@ -922,15 +922,16 @@ save_filename (
 
 
 #ifndef INDEX_DAEMON
-static const char *
+static char *
 get_first_savefile (void)
 {
+	static char empty[] = "";
 	char *file;
 	int i;
 
 	for (i=0 ; i < num_save ; i++) {
 		if (save[i].saved) {
-			file = (char *) my_malloc (PATH_LEN);
+			file = my_malloc (PATH_LEN);
 			if (save[i].is_mailbox) {
 #ifdef VMS
 				joinpath (file, save[i].dir, save[i].file);
@@ -980,7 +981,7 @@ get_first_savefile (void)
 			}
 		}
 	}
-	return "";
+	return empty;
 }
 #endif /* INDEX_DAEMON */
 
@@ -994,7 +995,7 @@ get_last_savefile (void)
 
 	for (i=num_save-1 ; i >= 0 ; i--) {
 		if (save[i].saved) {
-			file = (char *) my_malloc (PATH_LEN);
+			file = my_malloc (PATH_LEN);
 			if (save[i].is_mailbox) {
 #ifdef VMS
 				joinpath (file, save[i].dir, save[i].file);
@@ -1142,7 +1143,7 @@ post_process_uud (
 
 		my_strncpy (buf, save_filename (i), sizeof (buf));
 		if ((fp_in = fopen (buf, "r")) != (FILE *) 0) {
-			if (fgets (s, sizeof (s), fp_in) == (char *) 0) {
+			if (fgets (s, sizeof (s), fp_in) == 0) {
 				fclose (fp_in);
 				continue;
 			}
@@ -1205,7 +1206,7 @@ post_process_uud (
 				/*
 				 *  read next line & if error goto next file in save array
 				 */
-				if (fgets (s, sizeof (s), fp_in) == (char *) 0) {
+				if (fgets (s, sizeof (s), fp_in) == 0) {
 					break;
 				}
 			}
@@ -1254,15 +1255,15 @@ uudecode_file (
 		/*
 		 *  Sum file
 		 */
-		if ((file = get_archive_file (file_out_dir)) != (char *) 0) {
+		if ((file = get_archive_file (file_out_dir)) != 0) {
 			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
 			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
 				if (stat (file, &st) != -1) {
 					file_size = (int) st.st_size;
 				}
-				if (fgets (buf, sizeof (buf), fp_in) != (char *) 0) {
+				if (fgets (buf, sizeof (buf), fp_in) != 0) {
 					ptr = strchr (buf, '\n');
-					if (ptr != (char *) 0) {
+					if (ptr != 0) {
 						*ptr = '\0';
 					}
 				}
@@ -1288,7 +1289,7 @@ uudecode_file (
 				/*
 				 *  Test archive integrity
 				 */
-				if (pp > POST_PROC_UUDECODE && archiver[pp].test != (char *) 0) {
+				if (pp > POST_PROC_UUDECODE && archiver[pp].test != 0) {
 					i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
 					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].test, file);
@@ -1456,14 +1457,14 @@ get_archive_file (
 	struct stat sbuf;
 	time_t last = 0;
 
-	file = (char *) my_malloc (LEN);
-	if (file == (char *) 0) {
-		return (char *) 0;
+	file = my_malloc (LEN);
+	if (file == 0) {
+		return 0;
 	}
 
 	if ((dirp = opendir (dir)) == (DIR *) 0) {
 		free (file);
-		return (char *) 0;
+		return 0;
 	}
 
 	dp = (DIR_BUF *) readdir (dirp);
@@ -1484,7 +1485,7 @@ get_archive_file (
 
 	if (last == 0) {
 		free (file);
-		file = (char *) 0;
+		file = 0;
 	}
 
 	return file;

@@ -134,7 +134,7 @@ static int
 prompt_rejected(void)
 {
 	int ch;
-	char ch_default = iKeyPostPostpone;
+	char ch_default = iKeyPostEdit;
 
 /* fix screen pos. */
 	Raw(FALSE);
@@ -143,10 +143,10 @@ prompt_rejected(void)
 	Raw(TRUE);
 
 	do {
-		do_prompt1 (txt_quit_postpone, ch_default);
+		do_prompt1 (txt_quit_edit_postpone, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = ch_default;
-	} while (!strchr ("qo", ch));
+	} while (!strchr ("eqo", ch));
 	return ch;
 }
 
@@ -944,7 +944,7 @@ quick_post_article (
 		msg_add_header ("Reply-To", reply_to);
 	}
 	if (psGrp && psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
+		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
 	}
 	if (*my_distribution) {
 		msg_add_header ("Distribution", my_distribution);
@@ -968,6 +968,7 @@ quick_post_article (
 
 	ch = iKeyPostEdit;
 	forever {
+quick_post_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
@@ -1005,8 +1006,13 @@ quick_post_article (
 					info_message (txt_art_posted);
 					goto post_article_done;
 				} else {
-					if (prompt_rejected()==iKeyPostPostpone) {
+					ch = prompt_rejected();
+					if (ch==iKeyPostPostpone) {
 						postpone_article(backup_article_name(article));
+					} else if (ch==iKeyPostEdit) {
+						rename(backup_article_name(article), article);
+						ch = iKeyPostEdit;
+						goto quick_post_article_loop;
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
@@ -1090,6 +1096,7 @@ post_existing_article (
 	else
 		ch = iKeyPostPost;
 	forever {
+post_existing_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, 0);
@@ -1131,11 +1138,17 @@ post_existing_article (
 				}
 				if (submit_news_file (article, lines)) {
 					unlink(backup_article_name(article));
+					Raw(FALSE);
 					info_message (txt_art_posted);
 					goto post_article_done;
 				} else {
-					if (prompt_rejected() == iKeyPostPostpone) {
+					ch = prompt_rejected();
+					if (ch==iKeyPostPostpone) {
 						postpone_article(backup_article_name(article));
+					} else if (ch==iKeyPostEdit) {
+						rename(backup_article_name(article), article);
+						ch = iKeyPostEdit;
+						goto post_existing_article_loop;
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);
@@ -1500,7 +1513,7 @@ post_article (
 		msg_add_header ("Reply-To", reply_to);
 	}
 	if (psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
+		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
 	}
 	if (*my_distribution && art_type == GROUP_TYPE_NEWS) {
 		msg_add_header ("Distribution", my_distribution);
@@ -1522,6 +1535,7 @@ post_article (
 
 	ch = iKeyPostEdit;
 	forever {
+post_article_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
@@ -1569,20 +1583,25 @@ post_article (
 					sleep (1);
 					goto post_article_done;
 				} else {
-				  if(prompt_rejected()==iKeyPostPostpone) {
-				    postpone_article(backup_article_name(article));
-				  } else {
-				    unlink(backup_article_name(article));
-				    rename_file (article, dead_article);
+					ch = prompt_rejected();
+					if (ch==iKeyPostPostpone) {
+						postpone_article(backup_article_name(article));
+					} else if (ch==iKeyPostEdit) {
+						rename(backup_article_name(article), article);
+						ch = iKeyPostEdit;
+						goto post_article_loop;
+				  	} else {
+					    unlink(backup_article_name(article));
+					    rename_file (article, dead_article);
 #ifdef M_UNIX
-				    if (keep_dead_articles)
-				      append_file (dead_articles, dead_article);
+					    if (keep_dead_articles)
+					      append_file (dead_articles, dead_article);
 #endif
-				    sprintf (buf, txt_art_rejected, dead_article);
- 				    info_message (buf);
-				    ReadCh ();
-				  }
-				  return redraw_screen;
+					    sprintf (buf, txt_art_rejected, dead_article);
+	 				    info_message (buf);
+					    ReadCh ();
+					}
+				 	return redraw_screen;
 				}
 			case iKeyPostPostpone:
 			  postpone_article(article);
@@ -1963,7 +1982,7 @@ ignore_followup_to_poster:
 	}
 
 	if (psGrp && psGrp->attribute->organization != (char *) 0) {
-		msg_add_header ("Organization", psGrp->attribute->organization);
+		msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
 	}
 	if (*reply_to) {
 		msg_add_header ("Reply-To", reply_to);
@@ -2026,6 +2045,7 @@ ignore_followup_to_poster:
 
 	ch = iKeyPostEdit;
 	forever {
+post_response_loop:
 		switch (ch) {
 			case iKeyPostEdit:
 				invoke_editor (article, start_line_offset);
@@ -2073,20 +2093,25 @@ ignore_followup_to_poster:
 					unlink(backup_article_name(article));
 					goto post_response_done;
 				} else {
-				  if(prompt_rejected()==iKeyPostPostpone) {
-				    postpone_article(backup_article_name(article));
-				  } else {
-				    unlink(backup_article_name(article));
-				    rename_file (article, dead_article);
+					ch = prompt_rejected();
+					if (ch==iKeyPostPostpone) {
+						postpone_article(backup_article_name(article));
+					} else if (ch==iKeyPostEdit) {
+						rename(backup_article_name(article), article);
+						ch = iKeyPostEdit;
+						goto post_response_loop;
+					} else {
+					    unlink(backup_article_name(article));
+					    rename_file (article, dead_article);
 #ifdef M_UNIX
-				    if (keep_dead_articles)
-				      append_file (dead_articles, dead_article);
+					    if (keep_dead_articles)
+					      append_file (dead_articles, dead_article);
 #endif
-				    sprintf (buf, txt_art_rejected, dead_article);
-				    info_message (buf);
-				    ReadCh ();
-				  }
-				  return ret_code;
+					    sprintf (buf, txt_art_rejected, dead_article);
+					    info_message (buf);
+					    ReadCh ();
+					}
+					return ret_code;
 				}
 			case iKeyPostPostpone:
 			  postpone_article(article);
@@ -2188,7 +2213,7 @@ mail_to_someone (
 		msg_add_header ("Newsgroups", note_h_newsgroups);
 
 		if (*default_organization) {
-			msg_add_header ("Organization", default_organization);
+			msg_add_header ("Organization", random_organization(default_organization));
 		}
 		if (*reply_to) {
 			msg_add_header ("Reply-To", reply_to);
@@ -2336,7 +2361,7 @@ mail_bug_report (void)
 			msg_add_header ("Bcc", userid);
 		}
 		if (*default_organization) {
-			msg_add_header ("Organization", default_organization);
+			msg_add_header ("Organization", random_organization(default_organization));
 		}
 		if (*reply_to) {
 			msg_add_header ("Reply-To", reply_to);
@@ -2554,7 +2579,7 @@ mail_to_author (
 		}
 
 		if (*default_organization) {
-			msg_add_header ("Organization", default_organization);
+			msg_add_header ("Organization", random_organization(default_organization));
 		}
 		if (*reply_to) {
 			msg_add_header ("Reply-To", reply_to);
@@ -2904,7 +2929,7 @@ cancel_article (
 		msg_add_header ("Approved", from_name);
 	}
 	if (*default_organization) {
-		msg_add_header ("Organization", default_organization);
+		msg_add_header ("Organization", random_organization(default_organization));
 	}
 	if (*note_h_distrib) {
 		msg_add_header ("Distribution", note_h_distrib);
@@ -3137,7 +3162,7 @@ repost_article (
 	}
 	if (NotSuperseding) {
 		if (psGrp->attribute->organization != (char *) 0) {
-			msg_add_header ("Organization", psGrp->attribute->organization);
+			msg_add_header ("Organization", random_organization(psGrp->attribute->organization));
 		}
 		if (*reply_to) {
 			msg_add_header ("Reply-To", reply_to);
@@ -3180,6 +3205,7 @@ repost_article (
 		force_command = TRUE;
 	}
 	forever {
+repost_article_loop:
 		if (!force_command)
 			do {
 				do_prompt2 (txt_quit_edit_xpost, note_h_subj, ch_default);
@@ -3240,8 +3266,13 @@ repost_article (
 					ret_code = POSTED_OK;
 					goto repost_done;
 				} else {
-					if (prompt_rejected()==iKeyPostPostpone) {
+					ch = prompt_rejected();
+					if (ch==iKeyPostPostpone) {
 						postpone_article(backup_article_name(article));
+					} else if (ch==iKeyPostEdit) {
+						rename(backup_article_name(article), article);
+						ch = iKeyPostEdit;
+						goto repost_article_loop;
 					} else {
 						unlink(backup_article_name(article));
 						rename_file (article, dead_article);

@@ -4,7 +4,7 @@ PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.3
-PVER		= 970613
+PVER		= 970622
 VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
@@ -130,6 +130,7 @@ TOP	= \
 	$(TOPDIR)/configure \
 	$(TOPDIR)/configure.in \
 	$(TOPDIR)/install.sh \
+	$(TOPDIR)/mkdirs.sh \
 	$(TOPDIR)/makefile.in \
 	$(TOPDIR)/conf-tin
 

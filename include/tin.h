@@ -744,7 +744,8 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 
 #define	GROUP_MATCH(s1, pat, case)		(wildmat (s1, pat, case))
 
-#ifdef HAVE_POSIX_REGEX
+#if defined(HAVE_REGEX_H_FUNCS) || defined(HAVE_REGEXP_H_FUNCS) || defined(HAVE_REGEXPR_H_FUNCS)
+#	define	HAVE_REGEX_FUNCS
 #	define	REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
 #else
 #	define	REGEX_MATCH(s1, pat, case)	(wildmat (s1, pat, case))
@@ -1650,8 +1651,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #define FreeIfNeeded(p) if (p != (char *)0) free((char *)p)
 #define FreeAndNull(p)  if (p != (char *)0) { free((char *)p); p = (char *)0; }
 
-#define my_group_find(x)	add_my_group(x, 0)
-#define my_group_add(x)		add_my_group(x, 1)
+#define my_group_find(x)	add_my_group(x, FALSE)
+#define my_group_add(x)		add_my_group(x, TRUE)
 
 /*
  * Cast for the (few!) places where we need to examine 8-bit characters w/o

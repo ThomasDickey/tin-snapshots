@@ -2349,3 +2349,35 @@ buffer_to_network (
 }
 
 #endif /* LOCAL_CHARSET */
+
+
+char 
+*random_organization(
+	char *in_org)
+{
+	static char selorg[512];
+	int nool = 0, sol;
+	FILE *orgfp;
+
+	*selorg = '\0';
+
+	if (*in_org != '/')
+		return in_org;
+		
+	if ((orgfp = fopen(in_org, "r")) == NULL)
+		return selorg;
+
+	/* count lines */
+	while (fgets(selorg, sizeof(selorg), orgfp))
+		nool++;
+	
+	fseek(orgfp, 0, SEEK_SET);
+	sol = rand () % nool + 1;
+	nool = 0;
+	while ((nool != sol) && (fgets(selorg, sizeof(selorg), orgfp)))
+		nool++;
+		
+	fclose(orgfp);
+	
+	return selorg;
+}	
