@@ -1622,7 +1622,7 @@ bld_sline (i)
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
 	for (n = 0; buffer[n] != '\0'; n++) {
-		if (!isprint(buffer[n]) && !((unsigned char)buffer[n]>=0xa0)) {
+		if (! isprint(buffer[n]) && !((unsigned char)buffer[n]>=0xa0)) {
 			buffer[n] = '?';
 		}
 	}

@@ -666,7 +666,7 @@ write_config_file (file)
 	fprintf (fp, "# Format of mailer line including parameters\n");
 	fprintf (fp, "# %%M Mailer  %%S Subject  %%T To  %%F Filename  %%U User (AmigaDOS)\n");
 	fprintf (fp, "# ie. to use elm as your mailer:    elm -s \"%%S\" \"%%T\" < %%F\n");
-	fprintf (fp, "# ie. elm interactive          :    elm -s \"%%S\" \"%%T\" -i %%F\n");
+	fprintf (fp, "# ie. elm interactive          :    elm -i %%F -s \"%%S\" \"%%T\"\n");
 	fprintf (fp, "default_mailer_format=%s\n\n", default_mailer_format);
 
 	fprintf (fp, "# interactive mailreader: if ON mailreader will be invoked earlier for\n");
@@ -1420,7 +1420,7 @@ change_config_file (group, filter_at_once)
 						case OPT_MAIL_MIME_ENCODING:
 						case OPT_POST_MIME_ENCODING:
 							for (i=0; i<4; i++) {
-								if (!strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
+								if (! strcasecmp (option_table[option - 1].variable, txt_mime_types[i])) {
 									mime_type = i;
 								}
 							}

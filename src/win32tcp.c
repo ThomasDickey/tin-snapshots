@@ -31,7 +31,7 @@ static int sock_dups;
 int s_init()
 {
 	WSADATA wsaData;
-	if( WSAStartup( MAKEWORD(1,1), &wsaData) != 0)
+	if ( WSAStartup( MAKEWORD(1,1), &wsaData) != 0)
 	{
 		return 0;
 	}
@@ -66,7 +66,7 @@ char *s_gets(LPSTR nntp_line, DWORD length, TCP *tp)
 	DWORD cbRead = 0, cb;
 	char *pEol;
 
-	if( imemBlock == iendBlock )
+	if ( imemBlock == iendBlock )
 	{
 		pEol = 0;
 	}
@@ -77,10 +77,10 @@ char *s_gets(LPSTR nntp_line, DWORD length, TCP *tp)
 			pEol = 0;								/* then we didn't really find one */
 	}
 
-	if( !pEol)
+	if ( !pEol)
 	{
 		iendBlock -= imemBlock;
-		if( iendBlock)
+		if ( iendBlock)
 			memcpy( memBlock, memBlock+imemBlock, iendBlock );
 		imemBlock = 0;
 		do {

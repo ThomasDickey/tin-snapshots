@@ -1380,7 +1380,7 @@ post_process_sh (auto_delete)
 						/*
 						 *  find #!/bin/sh or #! /bin/sh pattern
 						 */
-						if (!found_header) {
+						if (! found_header) {
 							if (str_str (buf, ptr1, patlen1) != 0 ||
 								str_str (buf, ptr2, patlen2) != 0 ||
 								str_str (buf, ptr3, patlen3) != 0) {

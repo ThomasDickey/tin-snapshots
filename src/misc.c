@@ -95,11 +95,11 @@ copy_fp (fp_ip, fp_op, prefix)
 	char buf[8192];
 	int retcode;
 
-	if (!prefix || !prefix[0]) {
+	if (! prefix || !prefix[0]) {
 		size_t n;
 		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
 			if (n != fwrite (buf, 1, n, fp_op)) {
-				if (!got_sig_pipe) {
+				if (! got_sig_pipe) {
 					sprintf (msg, "Failed copy_fp(). errno=%d", errno);
 					perror_message (msg, "");
 				}
@@ -143,7 +143,7 @@ copy_body (fp_ip, fp_op, prefix, initl)
 	int double_quote;
 	int i;
 
-	if (!prefix || !prefix[0]) {
+	if (! prefix || !prefix[0]) {
 		size_t n;
 		while ((n = fread (buf, 1, sizeof (buf), fp_ip)) != 0) {
 			if (n != fwrite (buf, 1, n, fp_op)) {
@@ -405,7 +405,7 @@ tin_done (ret)
 		nntp_close ();			/* disconnect from NNTP server */
 	}
 	free_all_arrays ();
-	if (!cmd_line)
+	if (! cmd_line)
 		ClearScreen ();
 	EndWin ();
 	Raw (FALSE);
@@ -1069,7 +1069,7 @@ parse_from (from_line, eaddr, fname)
 
 			default:
 				newstate = state; /* stay in this state */
-				if (!isspace(*from_line))
+				if (! isspace(*from_line))
 					*addrptr++ = *from_line;
 			}  /* switch(*from_line) */
 			break;
@@ -1144,7 +1144,7 @@ parse_from (from_line, eaddr, fname)
 
 		nameptr = name;
 		while ( *(nameptr) != '\0') {
-			if (!(isspace(*nameptr) || (*nameptr == '"')))
+			if (! (isspace(*nameptr) || (*nameptr == '"')))
 				break;
 			else
 				nameptr++;
@@ -2406,7 +2406,7 @@ peek_char (fp)
 	FILE *fp;
 {
 	int c=fgetc(fp);
-	if(c!=EOF)
+	if (c!=EOF)
 		ungetc(c, fp);
 	return c;
 }

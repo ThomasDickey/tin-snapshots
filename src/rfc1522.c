@@ -89,7 +89,7 @@ build_base64_rank_table ()
 {
 	int i;
 
-	if (!base64_rank_table_built) {
+	if (! base64_rank_table_built) {
 		for (i = 0; i < 256; i++)
 			base64_rank[i] = NOT_RANKED;
 		for (i = 0; i < 64; i++)
@@ -136,7 +136,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 
 		while (*what != delimiter) {
 			if (*what != '=') {
-				if (!delimiter || *what != '_')
+				if (! delimiter || *what != '_')
 					*t++ = *what++;
 				else
 					*t++ = ' ', what++;
@@ -169,7 +169,7 @@ mmdecode (what, encoding, delimiter, where, charset)
 		unsigned char x;
 
 		build_base64_rank_table ();
-		if (!what || !where) {	/* flush */
+		if (! what || !where) {	/* flush */
 			pattern = bits = 0;
 			return 0;
 		}
@@ -199,9 +199,9 @@ get_mm_charset ()
 {
 	char *c;
 
-	if (!mm_charset[0]) {
+	if (! mm_charset[0]) {
 		c = getenv ("MM_CHARSET");
-		if (!c)
+		if (! c)
 			strcpy (mm_charset, MM_CHARSET);
 		else {
 			strncpy (mm_charset, c, 128);
@@ -299,7 +299,7 @@ contains_nonprintables (w)
 	while (*w && !isbetween(*w)) {
 		if (is_EIGHT_BIT(w))
 			nonprint++;
-		if (!nonprint && *w == '=' && *(w + 1) == '?')
+		if (! nonprint && *w == '=' && *(w + 1) == '?')
 			nonprint = TRUE;
 #ifdef MIME_BASE64_ALLOWED
 		if (*w == '=' || *w == '?' || *w == '_')
@@ -397,7 +397,7 @@ rfc1522_do_encode (what, where)
 	while (*what) {
 		word_cnt++;
 		if ((encoding = contains_nonprintables (what))) {
-			if (!quoting) {
+			if (! quoting) {
 				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
 				ewsize = mystrcat (&t, buf2);
 #ifdef MIME_BREAK_LONG_LINES
@@ -439,7 +439,7 @@ rfc1522_do_encode (what, where)
 					break;
 				}
 			}
-			if (!contains_nonprintables (what) || ewsize >= 60) {
+			if (! contains_nonprintables (what) || ewsize >= 60) {
 				/* next word is 'clean', close encoding */
 				*t++ = '?';
 				*t++ = '=';
@@ -572,10 +572,10 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	BodyPtr body_encode;
 
 	g = tmpfile ();
-	if (!g)
+	if (! g)
 		return;
 	f = fopen (filename, "r");
-	if (!f) {
+	if (! f) {
 		fclose (g);
 		return;
 	}
@@ -614,7 +614,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 	fclose (f);
 	rewind (g);
 	f = fopen (filename, "w");
-	if (!f) {
+	if (! f) {
 		fclose (g);
 		return;
 	}
@@ -651,7 +651,7 @@ rfc15211522_encode (filename, mime_encoding,allow_8bit_header)
 
 	if (! strcasecmp (mime_encoding, "base64"))
 		encoding = 'b';
-	else if (!strcasecmp (mime_encoding, "quoted-printable"))
+	else if (! strcasecmp (mime_encoding, "quoted-printable"))
 		encoding = 'q';
 	else
 		encoding = '8';

@@ -45,17 +45,8 @@ o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
-o  if marking read article with 'z' as will return and than reread it, the
-   '-' article_will_return flag is not removed.
-   when leaving that group, the unread_articles counter still contains that
-   article, but when reentering it is recognized as read and disappears (as it
-   should have before)
-
 o  'D' deleted article flag (thread selection level) is not showing up.
    (is it still needed?!)
-
-o  screen.c:center_line() no range check for cCOLS. Excessively long
-   messages cause a scroll and no redraw
 
 o  tin does not warn you if you try to save into a directory and not into
    a file. 
@@ -66,9 +57,6 @@ o  if save marked_hot_article fails with cannot create file the
 o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
    expired...), it is untouched, and remains marked as unread.
-
-o  mark_read with 'K' in 'l'ist_thread is not working, after you leave
-   the group the articles are marked as unread again.
 
 o  Colors are not reset when tin is suspended with ^Z (signal.c)
 
@@ -203,10 +191,6 @@ o  looks like, that while being connected to a server, new newsgroups are
    with the test-news-server)
 
 o  select range and process selected range seems not to work
-
-o  marking a thread as unread using 'Z' and then tabbing through the unread
-   articles will not catch the art_will_return marked articles - bug or
-   feature?
 
 o  what is with DEBUG_NEWSRC_FIXME (not DEBUG_NEWSRC) in newsrc.c?
 

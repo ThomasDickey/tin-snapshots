@@ -70,9 +70,9 @@ char *inet_ntoa(struct in_addr addr)
 
 int s_init(void)
 {
-	if (!SocketBase) {
+	if (! SocketBase) {
 		SocketBase = OpenLibrary(SOCKLIB,0L);
-		if (!SocketBase) return 0;
+		if (! SocketBase) return 0;
 
 #ifdef AS225
 		setup_sockets(MAXSOCK,&errno);
@@ -98,11 +98,11 @@ TCP *s_fdopen(int s, const char *mode)
 	TCP *tp;
 
 	tp = malloc(sizeof(TCP));
-	if (!tp) return (TCP *)0;
+	if (! tp) return (TCP *)0;
 
 	tp->size = 2048;
 	tp->base = malloc(tp->size);
-	if (!tp->base) {
+	if (! tp->base) {
 		free(tp);
 		return (TCP *)0;
 	}
@@ -247,7 +247,7 @@ char *s_gets(char *str, int size, TCP *tp)
 				FD_SET(tp->fd, &rfd);
 				efd = rfd;
 				select(tp->fd+1, &rfd, NULL, &efd, &timeout);
-				if (!FD_ISSET(tp->fd, &rfd)) {
+				if (! FD_ISSET(tp->fd, &rfd)) {
 					*cp = 0;
 					return 0;
 				}

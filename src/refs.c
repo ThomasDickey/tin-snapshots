@@ -98,7 +98,7 @@ add_to_parent(ptr)
 #ifdef HAVE_REF_THREADING
 	struct t_msgid *p;
 
-	if (!ptr->parent)
+	if (! ptr->parent)
 		return;
 
 	/*
@@ -169,7 +169,7 @@ add_msgid(key, msgid, newparent)
 	struct t_msgid *i = NULL;
 	unsigned int h;
 
-	if (!msgid)
+	if (! msgid)
 		return(NULL);
 
 	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
@@ -303,7 +303,7 @@ parse_references(r)
 	char *ptr;
 	struct t_msgid *parent, *current;
 
-	if (!r)
+	if (! r)
 		return(NULL);
 
 #ifdef DEBUG_REFS
@@ -559,24 +559,20 @@ dump_thread(fp, msgid, level)
 	 * Dump the current article
 	 */
 	sprintf(buff, "%3d %*s %-.18s", msgid->article, 2*level, "  ",
-					(msgid->article >= 0) ?
-						((arts[msgid->article].name) ?
-							arts[msgid->article].name :
-							arts[msgid->article].from) :
-						"[- Unavailable -]"
-	);
+	        (msgid->article >= 0) ? ((arts[msgid->article].name) ?
+	        arts[msgid->article].name : arts[msgid->article].from) :
+	        "[- Unavailable -]");
 
-	fprintf(fp, "%-*s  %-.45s\n", 30, buff,
-										(msgid->article >= 0) ?
-											arts[msgid->article].subject :
-											""
-	);
+	fprintf(fp, "%-*s  %-.45s\n", 30, buff, (msgid->article >= 0) ?
+	        arts[msgid->article].subject : "");
 
-	if (msgid->child != NULL)
+	if (msgid->child != NULL) {
 		dump_thread(fp, msgid->child, level + 1);
+	}
 
-	if (msgid->sibling != NULL)
+	if (msgid->sibling != NULL) {
 		dump_thread(fp, msgid->sibling, level);
+	}
 
 	return;
 }
@@ -654,7 +650,7 @@ find_next(ptr)
 		/*
 		 * Children first, unless bottom is set
 		 */
-		if (!bottom && ptr->child != NULL) {
+		if (! bottom && ptr->child != NULL) {
 			ptr = ptr->child;
 
 			/*

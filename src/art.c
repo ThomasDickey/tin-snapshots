@@ -933,7 +933,7 @@ sleep(1);
 		 */
 		q = strchr (p, '\t');
 		if (q == (char *) 0) {
-			if (!*p || (*p < '0' && *p > '9')) {
+			if (! *p || (*p < '0' && *p > '9')) {
 #ifdef DEBUG
 				error_message ("Bad overview record (Lines) [%s]", p);
 				debug_nntp ("iReadNovFile", "Bad overview record (Lines)");

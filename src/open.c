@@ -622,7 +622,7 @@ open_art_fp (group_path, art)
 			note_size = sb.st_size;
 		}
 		fp=rfc1521_decode(old_fp=fopen (buf, "r"));
-		if(fp!=old_fp)
+		if (fp!=old_fp)
 		  note_size=0;
 		return fp;
 	}
@@ -990,10 +990,10 @@ stuff_nntp (fnam)
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
 #endif
-		if (!last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
+		if (! last_line_nolf && STRCMPEQ(line, ".")) {	/* end of text */
 			break;
 		}
-		if(!get_server_nolf) {
+		if (! get_server_nolf) {
 			strcat (line, "\n");
 			if (line[0] == '.') {	/* reduce leading .'s */
 				fputs (&line[1], fp);
@@ -1038,7 +1038,7 @@ nntp_to_fp ()
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}
-	if(old_fp!=fp)
+	if (old_fp!=fp)
 	  note_size=0;
 
 /*
@@ -1088,7 +1088,7 @@ authorization (server, authuser)
 	/*
 	 * don't try again if failed before
 	 */
-	if(already_failed) {
+	if (already_failed) {
 		return;
 	}
 
@@ -1119,7 +1119,7 @@ authorization (server, authuser)
 		 */
 
 		ptr = strchr (line, '\n');
-		if(ptr != (char *) 0)
+		if (ptr != (char *) 0)
 			*ptr = '\0';
 
 		/*
@@ -1128,7 +1128,7 @@ authorization (server, authuser)
 
 		ptr = strchr (line, ' ');
 
-		if(ptr == (char *) 0)		/* no passwd, no auth, skip */
+		if (ptr == (char *) 0)		/* no passwd, no auth, skip */
 			continue;
 
 		*ptr++ = '\0'; 			/* cut of server part */
@@ -1150,9 +1150,9 @@ authorization (server, authuser)
 
 		ptr = authpass;			/* continue searching here */
 
-		if(*authpass == '"') {		/* skip "embedded" password string */
+		if (*authpass == '"') {		/* skip "embedded" password string */
 			ptr = strrchr (authpass,'"');
-			if((ptr != (char *) 0) && (ptr > authpass)) {
+			if ((ptr != (char *) 0) && (ptr > authpass)) {
 				authpass++;
 				*ptr++ = '\0';	/* cut off trailing " */
 			} else			/* no matching ", proceede as normal */
@@ -1161,10 +1161,10 @@ authorization (server, authuser)
 
 		ptr = strchr (ptr,' ');		/* find next separating blank */
 
-		if(ptr != (char *) 0) {		/* a 3rd argument follows */
+		if (ptr != (char *) 0) {		/* a 3rd argument follows */
 			while(*ptr == ' ')	/* skip any blanks */
 				*ptr++ = '\0';
-			if(*ptr != '\0')	/* if its not just empty */
+			if (*ptr != '\0')	/* if its not just empty */
 				authuser = ptr;	/* so will replace default user */
 		}
 
@@ -1349,7 +1349,7 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 			closedir (tDirFile);
 		}
 #else
-		if (!lArtMin) *plArtMin = 1;
+		if (! lArtMin) *plArtMin = 1;
 		*plArtMax = lArtMax;
 		*plArtCount = lArtMax - *plArtMin + 1;
 #endif

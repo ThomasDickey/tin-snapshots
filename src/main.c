@@ -45,7 +45,7 @@ main (argc, argv)
 	/* Call tzset() here! */
 	_TZ = "GMT0";
 	tzset();
-	if(argc == 0) /* we are running from the Workbench */
+	if (argc == 0) /* we are running from the Workbench */
 	{
 		argc = _WBArgc;
 		argv = _WBArgv;
@@ -594,7 +594,7 @@ void
 update_index_files ()
 {
 	if (update || update_fork) {
-		if (!catchup && (read_news_via_nntp && xover_supported)) {
+		if (! catchup && (read_news_via_nntp && xover_supported)) {
 			error_message ("%s: Updating of index files not supported", progname);
 			tin_done (EXIT_ERROR);
 		}

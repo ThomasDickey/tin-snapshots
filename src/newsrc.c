@@ -944,7 +944,7 @@ pos_group_in_newsrc (group, pos)
 	fclose (fp_in);
 	fp_in = NULL;
 
-	if (!found) {
+	if (! found) {
 		goto rewrite_group_done;
 	}
 #endif /* !VMS */
@@ -1193,7 +1193,7 @@ art_mark_read (group, art)
 			debug_print_bitmap (group, art);
 #endif
 		}
-		if (art->status == ART_UNREAD) {
+		if ((art->status  == ART_UNREAD) || (art->status == ART_WILL_RETURN)) {
 			art_mark_xref_read (art);
 			if (group != (struct t_group *) 0 && group->newsrc.num_unread) {
 				group->newsrc.num_unread--;

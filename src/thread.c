@@ -92,7 +92,7 @@ bld_tline (l, art)
 	}
 
 	from[0] = '\0';
-	if (!show_subject || show_author != SHOW_FROM_NONE) {
+	if (! show_subject || show_author != SHOW_FROM_NONE) {
 		get_author (TRUE, art, from);
 	}
 
@@ -374,7 +374,7 @@ thread_tab_pressed:
 					n = choose_response (thread_basenote, thread_index_point);
 				}
 				for (i = n ; i != -1 ; i = arts[i].thread) {
-					if (arts[i].status == ART_UNREAD) {
+					if ((arts[i].status == ART_UNREAD) || (arts[i].status == ART_WILL_RETURN)) {
 						n = show_page (group, group_path, i, &thread_index_point);
 						break;
 					}
@@ -545,9 +545,7 @@ thread_catchup:
 
 			case iKeyThreadMarkArtRead: /* mark article as read */
 				n = choose_response (thread_basenote, thread_index_point);
-				arts[n].selected = 0;
-				arts[n].status = ART_READ;
-				art_mark_xref_read (&arts[n]);
+				art_mark_read (group, &arts[n]);
 				bld_tline (thread_index_point, &arts[n]);
 				draw_tline (thread_index_point, FALSE);
 				goto thread_down;
@@ -709,7 +707,7 @@ case 'a':	/* Very dirty temp. hack - Show threaded tree */
 				break;
 
 			case iKeyThreadDisplaySubject:
-				info_message(arts[(choose_response (thread_basenote, thread_index_point))].subject);
+				info_message (arts[(choose_response (thread_basenote, thread_index_point))].subject);
 				break;
 
 			default:
@@ -1160,8 +1158,8 @@ next_unread (n)
 	int cur_base_art = n;
 
 	while (n >= 0) {
-		if ((arts[n].status == ART_UNREAD
-		     /* || arts[n].status == ART_WILL_RETURN */ )
+		if (((arts[n].status == ART_UNREAD)
+		     || (arts[n].status == ART_WILL_RETURN))
 		     && arts[n].thread != ART_EXPIRED) {
 			return n;
 		}
@@ -1170,8 +1168,8 @@ next_unread (n)
 
 	n = base[0];
 	while (n != cur_base_art) {
-		if ((arts[n].status == ART_UNREAD
-		     /* || arts[n].status == ART_WILL_RETURN */ )
+		if (((arts[n].status == ART_UNREAD)
+		     || (arts[n].status == ART_WILL_RETURN))
 		     && arts[n].thread != ART_EXPIRED) {
 			return n;
 		}

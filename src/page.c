@@ -102,7 +102,6 @@ restart:
 	if ((note_page = art_open (art, group_path)) == ART_UNAVAILABLE) {
 		sprintf (msg, txt_art_unavailable, art);
 		if (debug) {
-
 			error_message (msg, "");
 		} else {
 			wait_message (msg);
@@ -289,7 +288,7 @@ page_down:
 page_goto_next_unread:
 				skip_include = '\0';
 				if (note_page != ART_UNAVAILABLE) {
-					if (!(tab_goto_next_unread || note_end)) {
+					if (! (tab_goto_next_unread || note_end)) {
 						show_note_page (group->name, respnum);
 						break;
 					}
@@ -326,7 +325,7 @@ page_goto_next_unread:
 			case iKeyPageToggleTex2iso:	/* toggle german TeX to ISO latin1 style conversion */
 				if ((tex2iso_supported = !tex2iso_supported)) {
 					tex2iso_article = iIsArtTexEncoded (art, group_path);
-			   }
+				}
 				redraw_page (group->name, respnum);
 				if (tex2iso_supported) {
 					info_message (txt_toggled_tex2iso_on);
@@ -443,10 +442,10 @@ page_up:
 
 			case iKeyPageCatchup:	/* catchup - mark all articles as read */
 			case iKeyPageCatchupGotoNext:	/* and goto next group */
-				if (!confirm_action || prompt_yn (cLINES, txt_mark_all_read, TRUE) == 1) {
+				if (! confirm_action || prompt_yn (cLINES, txt_mark_all_read, TRUE) == 1) {
 					grp_mark_read (group, arts);
 					ret_code = (ch == iKeyPageCatchupGotoNext ? GRP_CONTINUE : GRP_UNINDEXED);
-					if (!(cur_groupnum + 1 < group_top)) {
+					if (! (cur_groupnum + 1 < group_top)) {
 						ret_code = GRP_UNINDEXED;
 					}
 					art_close ();
@@ -562,7 +561,7 @@ return_to_index:
 				}
 				set_subj_from_size (cCOLS);
 				redraw_page (group->name, respnum);
-			    break;
+				break;
 
 			case iKeyPageNextArt:	/* skip to next article */
 				art_close ();
@@ -840,7 +839,7 @@ print_a_line:
 			if (first_char != skip_include) {
 				skip_include = '\0';
 #ifdef HAVE_COLOR
-				if( ! below_sig )
+				if ( ! below_sig )
 					print_color(buf2);
 				else {
 					fcol(col_signature);
@@ -854,7 +853,7 @@ print_a_line:
 			}
 		} else {
 #ifdef HAVE_COLOR
-			if( ! below_sig )
+			if ( ! below_sig )
 				print_color(buf2);
 			else {
 				fcol(col_signature);
@@ -1246,13 +1245,13 @@ art_open (art, group_path)
 	while (fgets(buf, sizeof buf, note_fp) != NULL) {
 		buf[sizeof(buf)-1] = '\0';
 
-		if(*buf == '\n')
+		if (*buf == '\n')
 			break;
 
 		/* check for continued header line */
 		while((c=peek_char(note_fp))!=EOF && isspace(c) && c!='\n'
 		      && strlen(buf)<sizeof(buf)-1) {
-		  if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+		  if (strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
 		    buf[strlen(buf)-1]='\0';
 		  }
 		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), note_fp);
@@ -1510,7 +1509,7 @@ match_header (buf, pat, body, len)
 	/*
 	 * If the header matches, skip the ': ' and any leading whitespace
 	 */
-	if(my_strnicmp(buf, pat, plen) == 0) {
+	if (my_strnicmp(buf, pat, plen) == 0) {
 		plen += 2;
 
 		while (buf[plen] == ' ') {
