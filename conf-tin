@@ -47,10 +47,6 @@ CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \
 	--disable-echo \
-	--disable-debug \
-	--enable-prototypes \
-	--enable-warnings \
-	--with-mail-domain=/etc/NNTP_INEWS_DOMAIN \
-	--enable-nntp \
 	--enable-nntp-only \
+	--with-mail-domain=/etc/NNTP_INEWS_DOMAIN \
         $OPTS $* 2>&1 |tee -a $OUT

@@ -796,7 +796,7 @@ void
 collate_subjects()
 {
 	int i, j, art;
-	char *aptr;
+	int *aptr;
 
 	/*
  	 * Run through the root messages of each thread. We have to traverse
@@ -810,7 +810,7 @@ collate_subjects()
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = arts[i].subject - 2;
+		aptr = (int *)arts[i].subject - 2;
 
 		j = *aptr;
 
