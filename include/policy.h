@@ -3,7 +3,7 @@
  *  Module    : policy.h
  *  Author    : R.Doeblitz
  *  Created   : 1999-01-12
- *  Updated   : 
+ *  Updated   :
  *  Notes     : #defines and static data for policy configuration
  *  Copyright : (c) Copyright 1999 by Ralf Doeblitz
  *              You may  freely  copy or  redistribute  this software,
@@ -69,7 +69,6 @@ static const char *gnksa_domain_list[] = {
 	"arpa",
 	"uucp",
 	"bitnet",
-	"invalid",
 #  if 0
 	/* the new domain names, not yet valid */
 	"nom",
@@ -80,6 +79,11 @@ static const char *gnksa_domain_list[] = {
 	"info",
 	"shop",
 #  endif /* 0 */
+#	ifdef TINC_DNS
+	"bofh",
+#	endif /* TINC_DNS */
+	/* for forged addresses */
+	"invalid",
 	/* sentinel */
 	""
 };

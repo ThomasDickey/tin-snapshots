@@ -366,6 +366,6 @@ authenticate (
 }
 
 #else
-static void no_authenticate (void);
-static void no_authenticate (void) { }
+static void no_authenticate (void);			/* proto-type */
+static void no_authenticate (void) { }		/* ANSI C requires non-empty source file */
 #endif /* !INDEX_DAEMON && NNTP_ABLE */

@@ -52,7 +52,7 @@ prompt_num (
  *  get a string from the user
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
-int
+t_bool
 prompt_string (
 	const char *prompt,
 	char *buf,
@@ -67,7 +67,7 @@ prompt_string (
  * get a string from the user, display default value
  * Return TRUE if a valid string was typed, FALSE otherwise
  */
-int
+t_bool
 prompt_default_string (
 	const char *prompt,
 	char *buf,
@@ -97,7 +97,7 @@ prompt_default_string (
  *  get a string from the user
  *  Return TRUE if a valid string was typed, FALSE otherwise
  */
-int
+t_bool
 prompt_menu_string (
 	int line,
 	int col,
@@ -397,7 +397,7 @@ prompt_option_char (
  */
 char *
 prompt_string_default (
-	char *prompt,
+	const char *prompt,
 	char *def,
 	const char *failtext,
 	int history)
@@ -421,6 +421,59 @@ prompt_string_default (
 	}
 
 	return(def);					/* use the default */
+}
+
+
+/*
+ * Get a message ID for the 'L' command. Add <> if needed
+ * If the msgid exists and is reachable, return its index
+ * in arts[], else ART_UNAVAILABLE
+ */
+int
+prompt_msgid (
+	void)
+{
+	char buf[LEN];
+
+	if (prompt_string(txt_enter_message_id, buf+1, HIST_MESSAGE_ID) && buf[1]) {
+		char *ptr = buf+1;
+		struct t_msgid *msgid;
+
+		/*
+		 * If the user failed to supply Message-ID in <>, add them
+		 */
+		if (buf[1] != '<') {
+			buf[0] = '<';
+			strcat(buf, ">");
+			ptr = buf;
+		}
+
+		if ((msgid = find_msgid(ptr)) == NULL) {
+			info_message(txt_art_unavailable);
+			return ART_UNAVAILABLE;
+		}
+
+		/*
+		 * Is it expired or otherwise not on the spool ?
+		 */
+		if (msgid->article == ART_UNAVAILABLE) {
+			info_message(txt_art_unavailable);
+			return ART_UNAVAILABLE;
+		}
+
+		/*
+		 * If the article is no longer part of a thread, then there is
+		 * no way to display it
+		 */
+		if (which_thread(msgid->article) == -1) {
+			info_message (txt_no_last_message);
+			return ART_UNAVAILABLE;
+		}
+
+		return msgid->article;
+	}
+
+	return ART_UNAVAILABLE;
 }
 
 

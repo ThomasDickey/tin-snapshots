@@ -46,7 +46,7 @@ info_message (
 
 	clear_message ();
 #ifdef HAVE_COLOR
-	fcol(col_message);
+	fcol(tinrc.col_message);
 #endif /* HAVE_COLOR */
 
 	vsprintf (mesg, fmt, ap);
@@ -54,7 +54,7 @@ info_message (
 	center_line (cLINES, FALSE, mesg);	/* center the message at screen bottom */
 
 #ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #endif /* HAVE_COLOR */
 	stow_cursor();
 
@@ -77,14 +77,14 @@ wait_message (
 
 	clear_message ();
 #ifdef HAVE_COLOR
-	fcol(col_message);
+	fcol(tinrc.col_message);
 #endif /* HAVE_COLOR */
 
 	vsprintf (mesg, fmt, ap);
 	my_fputs (mesg, stdout);
 
 #ifdef HAVE_COLOR
-	fcol(col_normal);
+	fcol(tinrc.col_normal);
 #endif /* HAVE_COLOR */
 	cursoron ();
 	my_flush();
@@ -227,7 +227,7 @@ draw_arrow (
 {
 	MoveCursor (line, 0);
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		my_fputs ("->", stdout);
 	else {
 #ifdef USE_CURSES
@@ -250,7 +250,7 @@ erase_arrow (
 {
 	MoveCursor (line, 0);
 
-	if (draw_arrow_mark)
+	if (tinrc.draw_arrow_mark)
 		my_fputs ("  ", stdout);
 	else {
 #ifdef USE_CURSES
@@ -275,13 +275,13 @@ show_title (
 	if (col) {
 		MoveCursor (0, col);
 #ifdef HAVE_COLOR
-		fcol(col_title);
+		fcol(tinrc.col_title);
 #endif /* HAVE_COLOR */
 		/* you have mail message in */
 		my_fputs ((mail_check () ? txt_you_have_mail : txt_type_h_for_help), stdout);
 
 #ifdef HAVE_COLOR
-		fcol(col_normal);
+		fcol(tinrc.col_normal);
 #endif /* HAVE_COLOR */
 	}
 	center_line (0, TRUE, title);

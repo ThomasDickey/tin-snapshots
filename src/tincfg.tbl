@@ -13,13 +13,13 @@
 ; display options
 	beginner_level			OPT_ON_OFF
 	show_description		OPT_ON_OFF
-	default_show_author		txt_show_from	SHOW_FROM_BOTH+1
+	show_author				txt_show_from	SHOW_FROM_BOTH+1
 	draw_arrow_mark			OPT_ON_OFF
 	inverse_okay			OPT_ON_OFF
-	default_thread_arts		txt_thread	THREAD_MAX+1
-	default_sort_art_type		txt_sort_type	SORT_BY_SCORE_ASCEND+1
+	thread_articles			txt_thread	THREAD_MAX+1
+	sort_article_type		txt_sort_type	SORT_BY_SCORE_ASCEND+1
 	pos_first_unread		OPT_ON_OFF
-	default_show_only_unread	OPT_ON_OFF
+	show_only_unread_arts		OPT_ON_OFF
 	show_only_unread_groups		OPT_ON_OFF
 	tab_goto_next_unread		OPT_ON_OFF
 	space_goto_next_unread		OPT_ON_OFF
@@ -63,7 +63,7 @@
 
 ; colour options
 #ifdef	HAVE_COLOR
-	use_color_tinrc			OPT_ON_OFF
+	use_color			OPT_ON_OFF
 	col_normal			txt_colors	MAX_COLOR+1
 	col_back			txt_colors	MAX_COLOR+1
 	col_invers_bg			txt_colors	MAX_COLOR+1
@@ -80,7 +80,7 @@
 	col_from			txt_colors	MAX_COLOR+1
 	col_title			txt_colors	MAX_COLOR+1
 	col_signature			txt_colors	MAX_COLOR+1
-	word_highlight_tinrc		OPT_ON_OFF
+	word_highlight			OPT_ON_OFF
 	word_h_display_marks		txt_marks	MAX_MARK+1
 	col_markstar			txt_colors	MAX_COLOR+1
 	col_markdash			txt_colors	MAX_COLOR+1
@@ -112,13 +112,13 @@
 	add_posted_to_filter		OPT_ON_OFF
 
 ; saving/printing options
-	default_maildir			OPT_STRING
+	maildir				OPT_STRING
 	save_to_mmdf_mailbox		OPT_ON_OFF
-	default_batch_save		OPT_ON_OFF
-	default_savedir			OPT_STRING
-	default_auto_save		OPT_ON_OFF
+	batch_save			OPT_ON_OFF
+	savedir				OPT_STRING
+	auto_save			OPT_ON_OFF
 	mark_saved_read			OPT_ON_OFF
-	default_post_proc_type		txt_post_process POST_PROC_UUD_EXT_ZIP+1
+	post_process_type		txt_post_process POST_PROC_UUD_EXT_ZIP+1
 	process_only_unread		OPT_ON_OFF
 	print_header			OPT_ON_OFF
 	default_printer			OPT_STRING

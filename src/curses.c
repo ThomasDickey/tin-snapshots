@@ -46,7 +46,6 @@ void my_dummy(void) { }	/* ANSI C requires non-empty file */
 
 int cLINES = DEFAULT_LINES_ON_TERMINAL - 1;
 int cCOLS  = DEFAULT_COLUMNS_ON_TERMINAL;
-t_bool inverse_okay = TRUE;
 static int _inraw = FALSE;	/* are we IN rawmode? */
 int _hp_glitch = FALSE;		/* standout not erased by overwriting on HP terms */
 
@@ -305,7 +304,7 @@ SetupScreen (void)
 		_setinverse = _setunderline;
 		_clearinverse = _clearunderline;
 		if (!_setinverse)
-			draw_arrow_mark = 1;
+			tinrc.draw_arrow_mark = 1;
 	}
 #ifdef HAVE_COLOR
 	postinit_colors();
@@ -401,7 +400,7 @@ InitScreen (void)
 		_columns = COLS;
 	}
 #endif /* M_OS2 */
-#ifdef VMS  /* moved from below InitWin () M.St. 22.01.98 */
+#ifdef VMS /* moved from below InitWin () M.St. 22.01.98 */
 	{
 		int input_chan, status;
 		int item_code, eightbit;
@@ -553,7 +552,7 @@ set_keypad_on (void)
 {
 #ifndef INDEX_DAEMON
 #	ifdef HAVE_KEYPAD
-	if (use_keypad && _keypadxmit) {
+	if (tinrc.use_keypad && _keypadxmit) {
 		tputs (_keypadxmit, 1, outchar);
 		my_flush();
 	}
@@ -567,7 +566,7 @@ set_keypad_off (void)
 {
 #ifndef INDEX_DAEMON
 #	ifdef HAVE_KEYPAD
-	if (use_keypad && _keypadlocal) {
+	if (tinrc.use_keypad && _keypadlocal) {
 		tputs (_keypadlocal, 1, outchar);
 		my_flush();
 	}
@@ -585,7 +584,7 @@ ClearScreen (void)
 #ifndef INDEX_DAEMON
 
 	tputs (_clearscreen, 1, outchar);
-	my_flush ();      /* clear the output buffer */
+	my_flush ();		/* clear the output buffer */
 	_line = 1;
 
 #endif /* !INDEX_DAEMON */
@@ -647,7 +646,7 @@ CleartoEOLN (void)
 #ifndef INDEX_DAEMON
 
 	tputs (_cleartoeoln, 1, outchar);
-	my_flush ();  /* clear the output buffer */
+	my_flush ();	/* clear the output buffer */
 
 #endif /* !INDEX_DAEMON */
 }
@@ -670,7 +669,7 @@ CleartoEOS (void)
 			CleartoEOLN ();
 		}
 	}
-	my_flush ();  /* clear the output buffer */
+	my_flush ();	/* clear the output buffer */
 
 #endif /* !INDEX_DAEMON */
 }
@@ -685,11 +684,11 @@ StartInverse (void)
 #ifndef INDEX_DAEMON
 
 	in_inverse = 1;
-	if (_setinverse && inverse_okay) {
+	if (_setinverse && tinrc.inverse_okay) {
 #	ifdef HAVE_COLOR
 		if (use_color) {
-			bcol(col_invers_bg);
-			fcol(col_invers_fg);
+			bcol(tinrc.col_invers_bg);
+			fcol(tinrc.col_invers_fg);
 		} else {
 			tputs (_setinverse, 1, outchar);
 		}
@@ -712,11 +711,11 @@ EndInverse (void)
 #ifndef INDEX_DAEMON
 
 	in_inverse = 0;
-	if (_clearinverse && inverse_okay) {
+	if (_clearinverse && tinrc.inverse_okay) {
 #	ifdef HAVE_COLOR
 		if (use_color) {
-			fcol(col_normal);
-			bcol(col_back);
+			fcol(tinrc.col_normal);
+			bcol(tinrc.col_back);
 		} else {
 			tputs (_clearinverse, 1, outchar);
 		}
@@ -794,7 +793,7 @@ Raw (
 #			else
 #				ifdef __FreeBSD__
 		cfmakeraw(&_raw_tty);
-		_raw_tty.c_lflag |= ISIG;       /* for ^Z */
+		_raw_tty.c_lflag |= ISIG;		/* for ^Z */
 #				else
 		_raw_tty.c_lflag &= ~(ICANON | ECHO);	/* noecho raw mode */
 		_raw_tty.c_cc[VMIN] = '\01';	/* minimum # of chars to queue */
@@ -1039,7 +1038,7 @@ xclick (
 void
 set_xclick_on (void)
 {
-	if (use_mouse) xclick (TRUE);
+	if (tinrc.use_mouse) xclick (TRUE);
 }
 
 
@@ -1049,7 +1048,7 @@ set_xclick_on (void)
 void
 set_xclick_off (void)
 {
-	if (use_mouse) xclick (FALSE);
+	if (tinrc.use_mouse) xclick (FALSE);
 }
 
 
@@ -1076,7 +1075,7 @@ cursoroff (void)
 
 
 /*
- * The UNIX version of ReadCh is used both in termcap and curses configurations.
+ * The UNIX version of ReadCh, termcap version
  */
 #ifdef M_UNIX
 int
@@ -1109,8 +1108,15 @@ ReadCh (void)
 
 #		else
 #			ifdef EINTR
-	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR)
-		;	/* spin on signal interrupts */
+
+	allow_resize (TRUE);
+	while ((result = read (0, &ch, 1)) < 0 && errno == EINTR) {		/* spin on signal interrupts */
+		if (need_resize) {
+			handle_resize ((need_resize == cRedraw) ? TRUE : FALSE);
+			need_resize = cNo;
+		}
+	}
+	allow_resize (FALSE);
 #			else
 	result = read (0, &ch, 1);
 #			endif /* EINTR */

@@ -17,8 +17,8 @@
 
 #	define PRODUCT		"tin"
 #	define VERSION		"pre-1.4"
-#	define RELEASEDATE	"19990216"
-#	define RELEASENAME	"Styrofoam"
+#	define RELEASEDATE	"19990413"
+#	define RELEASENAME	"Endemoniada"
 #	define TINRC_VERSION	"1.1"
 
 #	ifdef M_AMIGA

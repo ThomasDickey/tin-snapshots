@@ -26,6 +26,7 @@ CC="${CC-cc}"
 #	--with-nntp-default-server=news.doma.in
 # to your local needs
 
+echo "Making with $CC $CFLAGS"
 CFLAGS="$CFLAGS" \
 CC="$CC" \
 ./configure --verbose \

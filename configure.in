@@ -451,17 +451,26 @@ CF_ARG_DISABLE(xhdr-xref,
 	[AC_DEFINE(XHDR_XREF)])
 AC_MSG_RESULT($enableval)
 
+### bypass a bug in old versions of leafnode & NNTPcache
+AC_MSG_CHECKING(whether to send a GROUP command before a LISTGROUP)
+CF_ARG_ENABLE(broken-listgorup-fix,
+	[  --enable-broken-listgorup-fix
+                          send extra GROUP command before LISTGROUP
+                         ],
+	[AC_DEFINE(BROKEN_LISTGROUP)])
+AC_MSG_RESULT($enableval)
 
 ### checks for the location of the system-wide default setting file
 AC_MSG_CHECKING(for directory containing tin.defaults file)
 CF_WITH_PATH(defaults-dir,
 	[  --with-defaults-dir=PATH
-                          directory containing tin.defaults file],
+                          directory containing tin.defaults file
+                         ],
 	TIN_DEFAULTS_DIR,/etc/tin)
 AC_MSG_RESULT($TIN_DEFAULTS_DIR)
 AC_DEFINE_UNQUOTED(TIN_DEFAULTS_DIR,"$TIN_DEFAULTS_DIR")
 
-###	checks for operator characteristics (should be the last option)
+### checks for operator characteristics (should be the last option)
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,
 	[  --with-coffee           coffee support],

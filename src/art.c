@@ -21,7 +21,6 @@
 
 #define SortBy(func) qsort (arts, (size_t)top, sizeof (struct t_article), func);
 
-char *glob_art_group;
 static long last_read_article;
 static t_bool overview_index_filename = FALSE;
 
@@ -45,6 +44,22 @@ static int read_group (struct t_group *group, char *group_path, int *pcount);
 	static void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
 
+
+/*
+ * Display a suitable 'entering group' message if screen needs redrawing
+ */
+void
+show_art_msg(char *group)
+{
+	ClearScreen ();
+#if defined(HAVE_POLL) || defined(HAVE_SELECT)
+	/* strlen("Group %s ('q' to quit)... 'low'/'high'") = 45 */
+	wait_message (0, txt_group, cCOLS - 45, group);
+#else
+	/* strlen("Group %s ... 'low'/'high'") = 31 */
+	wait_message (0, txt_group, cCOLS - 31, group);
+#endif /* HAVE_POLL || HAVE_SELECT */
+}
 
 /*
  *  Construct the pointers to the base article in each thread.
@@ -140,9 +155,7 @@ index_group (
 		wait_message (0, txt_group, cCOLS - i, group->name);
 
 	make_group_path (group->name, group_path);
-	glob_art_group = group->name;
-
-	set_signals_art ();
+	signal_context = cArt;			/* Set this once glob_group is valid */
 
 	hash_reclaim ();
 	free_art_array ();
@@ -173,9 +186,9 @@ index_group (
 	min = top_base ? base[0] : group->xmin;
 	max = top_base ? base[top_base-1] : min - 1;
 
-	if (use_getart_limit && (getart_limit > 0)) {
-		if (top_base && (top_base > getart_limit))
-			min = base[top_base-getart_limit];
+	if (tinrc.use_getart_limit && (tinrc.getart_limit > 0)) {
+		if (top_base && (top_base > tinrc.getart_limit))
+			min = base[top_base-tinrc.getart_limit];
 	}
 
 	/*
@@ -231,7 +244,7 @@ index_group (
 		}
 	}
 
-	if (expired || modified || cache_overview_files)
+	if (expired || modified || tinrc.cache_overview_files)
 		vWriteNovFile (group);
 
 	/*
@@ -506,7 +519,7 @@ make_threads (
 #ifdef DEBUG
 	if (debug == 2)
 		error_message ("rethread=[%d]  thread_arts=[%d]  attr_thread_arts=[%d]",
-				rethread, default_thread_arts, group->attribute->thread_arts);
+				rethread, tinrc.thread_articles, group->attribute->thread_arts);
 #endif /* DEBUG */
 
 	/*
@@ -810,7 +823,7 @@ iReadNovFile (
  *  next article past last_read_article; there's no reason to read them
  *  from NNTP if they're cached locally.
  */
-	if (cache_overview_files && read_news_via_nntp && xover_supported && group->type == GROUP_TYPE_NEWS) {
+	if (tinrc.cache_overview_files && read_news_via_nntp && xover_supported && group->type == GROUP_TYPE_NEWS) {
 		read_news_via_nntp = FALSE;
 		iReadNovFile (group, min, max, expired);
 		read_news_via_nntp = TRUE;
@@ -829,6 +842,10 @@ iReadNovFile (
 		group->xmax = max;
 
 	while ((buf = tin_fgets (fp, FALSE)) != (char *) 0) {
+		if (need_resize) {
+			handle_resize ((need_resize == cRedraw) ? TRUE : FALSE);
+			need_resize = cNo;
+		}
 
 #ifdef DEBUG
 		debug_nntp ("iReadNovFile", buf);
@@ -1049,17 +1066,20 @@ void
 vWriteNovFile (
 	struct t_group *psGrp)
 {
-	char	*pcNovFile;
-	FILE	*hFp;
-	int	iNum;
-	struct	t_article *psArt;
-	char	tmp[PATH_LEN];
+	FILE *hFp;
+	char *pcNovFile;
+	char tmp[PATH_LEN];
+	int iNum;
+	struct t_article *psArt;
+
+	if (no_write)
+		return;
 
 	/*
 	 * Don't write local index if we have XOVER, unless the user has
 	 * asked for caching.
 	 */
-	if (xover_supported && ! cache_overview_files)
+	if (xover_supported && ! tinrc.cache_overview_files)
 		return;
 
 	set_tin_uid_gid ();
@@ -1196,7 +1216,7 @@ pcFindNovFile (
 			bHashFileName = TRUE;
 			break;
 		case GROUP_TYPE_NEWS:
-			if (read_news_via_nntp && xover_supported && ! cache_overview_files)
+			if (read_news_via_nntp && xover_supported && ! tinrc.cache_overview_files)
 				sprintf (acNovFile, "%s%d.idx", TMPDIR, (int) process_id);
 			else {
 				vMakeGrpPath (novrootdir, psGrp->name, acBuf);

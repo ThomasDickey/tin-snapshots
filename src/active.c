@@ -25,7 +25,7 @@
 t_bool force_reread_active_file = FALSE;
 
 static char acSaveActiveFile[PATH_LEN];
-static time_t active_timestamp;  /* time active file read (local) */
+static time_t active_timestamp;	/* time active file read (local) */
 
 
 /*
@@ -75,8 +75,8 @@ t_bool
 reread_active_file (
 	void)
 {
-	return (force_reread_active_file || (reread_active_file_secs != 0 &&
-		(int)(time(NULL) - active_timestamp) >= reread_active_file_secs));
+	return (force_reread_active_file || (tinrc.reread_active_file_secs != 0 &&
+		(int)(time(NULL) - active_timestamp) >= tinrc.reread_active_file_secs));
 }
 
 
@@ -91,7 +91,7 @@ resync_active_file (
 	char old_group[HEADER_LEN];
 	t_bool command_line = FALSE;
 
-	if (no_write || !reread_active_file ())	/* don't resync with no_write */
+	if (!reread_active_file ())
 		return FALSE;
 
 	reread_active_for_posted_arts = FALSE;
@@ -110,9 +110,9 @@ resync_active_file (
 	read_newsrc (newsrc, bool_not(command_line));
 
 	if (command_line)		/* Can't show only unread groups with cmd line groups */
-		show_only_unread_groups = FALSE;
+		tinrc.show_only_unread_groups = FALSE;
 	else
-		toggle_my_groups (show_only_unread_groups, old_group);
+		toggle_my_groups (tinrc.show_only_unread_groups, old_group);
 
 	set_groupname_len (FALSE);
 	show_selection_page ();
@@ -135,10 +135,10 @@ active_add (
 	const char *moderated)
 {
 	/* name - pre-initialised when group is made */
+	ptr->aliasedto = ((moderated[0] == '=') ? my_strdup(moderated+1) : (char *) 0);
 	ptr->description = (char *) 0;
 	/* spool - see below */
 	ptr->moderated = moderated[0];
-	ptr->aliasedto = ((moderated[0] == '=') ? my_strdup(moderated+1) : (char *) 0);
 	ptr->count = count;
 	ptr->xmax = max;
 	ptr->xmin = min;
@@ -670,7 +670,7 @@ subscribe_new_group (
 			return;
 	}
 
-	if ((autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
+	if (!no_write && (autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
 		my_printf (txt_autosubscribed, group);
 
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
@@ -846,13 +846,16 @@ create_save_active_file (
 {
 	char acGrpPath[PATH_LEN];
 
-	my_printf (txt_creating_active);
-
 	vInitVariables ();
 
+	if (no_write && file_size (acSaveActiveFile) != -1)
+		return;
+
+	my_printf (txt_creating_active);
+
 	vPrintActiveHead (acSaveActiveFile);
-	strcpy (acGrpPath, default_savedir);
-	vMakeGrpList (acSaveActiveFile, default_savedir, acGrpPath);
+	strcpy (acGrpPath, tinrc.savedir);
+	vMakeGrpList (acSaveActiveFile, tinrc.savedir, acGrpPath);
 }
 
 

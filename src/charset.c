@@ -169,7 +169,7 @@ ConvertIso2Asc (
 						first = 0;
 					}
 					i++;
-				} else {   /* here: *iso == '\t' */
+				} else {	/* here: *iso == '\t' */
 					if (a >= TABSTOP(i)) {
 						/*
 						 * remove TAB or replace it with SPACE if necessary
@@ -194,7 +194,7 @@ ConvertIso2Asc (
 				 * just copy the characters and advance the column counters
 				 */
 				if (*iso == '\t') {
-					a = i = TABSTOP(i);  /* = TABSTOP(a), because here a = i */
+					a = i = TABSTOP(i);	/* = TABSTOP(a), because here a = i */
 				} else if (*iso == '\b') {
 					a--;
 					i--;
@@ -218,7 +218,7 @@ ConvertTeX2Iso (
 	char *from,
 	char *to)
 {
-	size_t len, col, spaces;  /* length of from, col counter, spaces to add */
+	size_t len, col, spaces;	/* length of from, col counter, spaces to add */
 	size_t subst_len;
 	int i, ex;
 
@@ -228,7 +228,6 @@ ConvertTeX2Iso (
 	spaces = 0;
 
 	while (col < len) {
-		subst_len = 0;
 		i = ex = 0;
 		while ((i < TEX_SUBST) && !ex) {
 			subst_len = strlen (tex_from[i]);
@@ -283,12 +282,12 @@ iIsArtTexEncoded (
 		i = 0;
 
 		while (line[i++] == ' ')
-			;  /* search for first non blank */
+			;	/* search for first non blank */
 
 		i--;
 
 		if (!isalnum((unsigned char)line[i]))
-			continue;  /* quoting char */
+			continue;	/* quoting char */
 
 		len = strlen (line) - 1;
 		for (i = 1; i < len; i++) {

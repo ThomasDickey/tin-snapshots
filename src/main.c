@@ -174,8 +174,13 @@ main (
 	/*
 	 *  Load the mail & news active files into active[]
 	 */
+
+	/* create_save_active_file cannot write to active.save
+	   if no_write == TRUE, so restore original value temporarily */
+	no_write = tmp_no_write;
 	if (read_saved_news)
 		create_save_active_file ();
+	no_write = TRUE;
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 	read_mail_active_file ();
@@ -241,8 +246,10 @@ main (
 #endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 	read_newsgroups_file ();
 
+#ifndef INDEX_DAEMON
 	if (create_mail_save_dirs ())
 		write_config_file (local_config_file);
+#endif /* !INDEX_DAEMON */
 
 	/*
 	 * Preloads active[] with command line groups. They will follow any
@@ -267,9 +274,9 @@ main (
 	 * We have to show all groups with command line groups
 	 */
 	if (num_cmd_line_groups)
-		show_only_unread_groups = FALSE;
+		tinrc.show_only_unread_groups = FALSE;
 	else
-		toggle_my_groups (show_only_unread_groups, "");
+		toggle_my_groups (tinrc.show_only_unread_groups, "");
 #endif /* INDEX_DAEMON */
 
 	/*
@@ -417,11 +424,11 @@ read_cmd_line_options (
 				break;
 
 			case 'G':
-				getart_limit = atoi(optarg);
-				if (getart_limit > 0)
-					use_getart_limit = TRUE;
+				tinrc.getart_limit = atoi(optarg);
+				if (tinrc.getart_limit > 0)
+					tinrc.use_getart_limit = TRUE;
 				else
-					use_getart_limit = FALSE;
+					tinrc.use_getart_limit = FALSE;
 				break;
 
 #ifndef INDEX_DAEMON
@@ -464,7 +471,7 @@ read_cmd_line_options (
 				break;
 
 			case 'm':
-				my_strncpy (default_maildir, optarg, sizeof (default_maildir));
+				my_strncpy (tinrc.maildir, optarg, sizeof (tinrc.maildir));
 				break;
 
 			case 'M':	/* mail new news to specified user */
@@ -531,7 +538,7 @@ read_cmd_line_options (
 				break;
 
 			case 's':
-				my_strncpy (default_savedir, optarg, sizeof (default_savedir));
+				my_strncpy (tinrc.savedir, optarg, sizeof (tinrc.savedir));
 				break;
 
 			case 'S':	/* save new news to dir structure */
@@ -712,7 +719,7 @@ usage (
 		error_message ("  -l       use only LISTGROUP instead of GROUP (-n) command");
 #	endif /* NNTP_ABLE */
 
-	error_message ("  -m dir   mailbox directory [default=%s]", default_maildir);
+	error_message ("  -m dir   mailbox directory [default=%s]", tinrc.maildir);
 	error_message ("  -M user  mail new news to specified user (batch mode)");
 
 #	ifdef NNTP_ABLE
@@ -740,7 +747,7 @@ usage (
 #	endif /* NNTP_ABLE */
 
 	error_message ("  -R       read news saved by -S option");
-	error_message ("  -s dir   save news directory [default=%s]", default_savedir);
+	error_message ("  -s dir   save news directory [default=%s]", tinrc.savedir);
 	error_message ("  -S       save new news for later reading (batch mode)");
 
 #	ifndef NNTP_ONLY
@@ -883,7 +890,7 @@ update_index_files (
 					if (nntp_open () != 0)				/* connect server if we are using nntp */
 						tin_done (EXIT_SUCCESS);
 
-					default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
+					tinrc.thread_articles = THREAD_NONE;	/* stop threading to run faster */
 					do_update ();
 					tin_done (EXIT_SUCCESS);
 					break;
@@ -895,7 +902,7 @@ update_index_files (
 #endif /* HAVE_FORK */
 		{
 			create_index_lock_file (lock_file);
-			default_thread_arts = THREAD_NONE;	/* stop threading to run faster */
+			tinrc.thread_articles = THREAD_NONE;	/* stop threading to run faster */
 			do_update ();
 			tin_done (EXIT_SUCCESS);
 		}

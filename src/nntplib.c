@@ -19,8 +19,7 @@
 #include "tcurses.h"
 #include "tnntp.h"
 
-
-#ifdef VMS  /* M.St. 15.01.98 */
+#ifdef VMS /* M.St. 15.01.98 */
 #	undef VMS
 #endif /* VMS */
 
@@ -679,12 +678,12 @@ reconnect (
 	 * Tear down current connection
 	 */
 	NNTP_HARD_CLOSE;
-	if (!auto_reconnect)
+	if (!tinrc.auto_reconnect)
 		ring_bell ();
 
 	DEBUG_IO((stderr, "\nServer timed out, trying reconnect # %d\n", retry));
 
-	if (!auto_reconnect && prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
+	if (!tinrc.auto_reconnect && prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1)
 		tin_done(EXIT_SUCCESS);		/* user said no to reconnect */
 
 	clear_message ();

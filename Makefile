@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 19990216
+PVER	= 19990413
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -35,6 +35,7 @@ HFILES	= \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tcurses.h \
 	$(INCDIR)/tin.h \
+	$(INCDIR)/tinrc.h \
 	$(INCDIR)/tnntp.h \
 	$(INCDIR)/trace.h \
 	$(INCDIR)/version.h \
@@ -140,6 +141,7 @@ DOC	= \
 	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/good-netkeeping-seal \
+	$(DOCDIR)/reading-mail.txt \
 	$(DOCDIR)/umlaute.txt \
 	$(DOCDIR)/umlauts.txt \
 	$(DOCDIR)/tin.defaults \

@@ -80,37 +80,37 @@ set_default_attributes (
 	struct t_attribute *psAttrib)
 {
 	psAttrib->global = FALSE;	/* global/group specific */
-	psAttrib->maildir = default_maildir;
-	psAttrib->savedir = default_savedir;
+	psAttrib->maildir = tinrc.maildir;
+	psAttrib->savedir = tinrc.savedir;
 	psAttrib->savefile = (char *) 0;
-	psAttrib->sigfile = default_sigfile;
+	psAttrib->sigfile = tinrc.default_sigfile;
 	psAttrib->organization = (default_organization ? default_organization : (char *) 0);
 	psAttrib->from = (char *) 0;
 	psAttrib->followup_to = (char *) 0;
-	psAttrib->printer = default_printer;
-	psAttrib->quick_kill_scope = (default_filter_kill_global ? my_strdup("*") : (char *) 0);
-	psAttrib->quick_kill_header = default_filter_kill_header;
-	psAttrib->quick_kill_case = default_filter_kill_case;
-	psAttrib->quick_kill_expire = default_filter_kill_expire;
-	psAttrib->quick_select_scope = (default_filter_select_global ? my_strdup("*") : (char *) 0);
-	psAttrib->quick_select_header = default_filter_select_header;
-	psAttrib->quick_select_case = default_filter_select_case;
-	psAttrib->quick_select_expire = default_filter_select_expire;
+	psAttrib->printer = tinrc.default_printer;
+	psAttrib->quick_kill_scope = (tinrc.default_filter_kill_global ? my_strdup("*") : (char *) 0);
+	psAttrib->quick_kill_header = tinrc.default_filter_kill_header;
+	psAttrib->quick_kill_case = tinrc.default_filter_kill_case;
+	psAttrib->quick_kill_expire = tinrc.default_filter_kill_expire;
+	psAttrib->quick_select_scope = (tinrc.default_filter_select_global ? my_strdup("*") : (char *) 0);
+	psAttrib->quick_select_header = tinrc.default_filter_select_header;
+	psAttrib->quick_select_case = tinrc.default_filter_select_case;
+	psAttrib->quick_select_expire = tinrc.default_filter_select_expire;
 	psAttrib->mailing_list = (char *) 0;
 	psAttrib->x_headers = (char *) 0;
 	psAttrib->x_body = (char *) 0;
-	psAttrib->show_only_unread = default_show_only_unread;
-	psAttrib->thread_arts = default_thread_arts;
-	psAttrib->sort_art_type = default_sort_art_type;
-	psAttrib->show_author = default_show_author;
-	psAttrib->auto_save = default_auto_save;
+	psAttrib->show_only_unread = tinrc.show_only_unread_arts;
+	psAttrib->thread_arts = tinrc.thread_articles;
+	psAttrib->sort_art_type = tinrc.sort_article_type;
+	psAttrib->show_author = tinrc.show_author;
+	psAttrib->auto_save = tinrc.auto_save;
 	psAttrib->auto_select = FALSE;
-	psAttrib->batch_save = default_batch_save;
+	psAttrib->batch_save = tinrc.batch_save;
 	psAttrib->delete_tmp_files = FALSE;
-	psAttrib->post_proc_type = default_post_proc_type;
+	psAttrib->post_proc_type = tinrc.post_process_type;
 	psAttrib->x_comment_to = FALSE;
-	psAttrib->news_quote_format = news_quote_format;
-	psAttrib->quote_chars = quote_chars;
+	psAttrib->news_quote_format = tinrc.news_quote_format;
+	psAttrib->quote_chars = tinrc.quote_chars;
 }
 
 /*
@@ -576,6 +576,9 @@ write_attributes_file (
 	register int i;
 	struct t_group *psGrp;
 #	endif /* 0 */
+
+	if (no_write && file_size (file) != -1)
+		return;
 
 	/* alloc memory for tmp-filename */
 	file_tmp = (char *) my_malloc (strlen (file)+5);

@@ -18,7 +18,7 @@ This following configure options and defines are documented in detail:
   --enable-mmdf-mailer       --with-ispell         NNTP_INEWS
   --enable-nntp		     --with-libdir         NNTP_SERVER_FILE
   --enable-nntp-only	     --with-local-charset  (SMALL_MEMORY_MACHINE)
-
+  --enable-broken-listgorup-fix
 
 Not yet documented configure options and defines:
 -------------------------------------------------
@@ -34,12 +34,12 @@ TIN related:
   --with-dbmalloc                  --with-sum
   --with-dmalloc                   --with-trace
 
-  DEBUG                            JUST_TESTING
-  DEBUG_NEWSRC                     MATCH_TAR_PATTERN
-  DEBUG_NEWSRC_FIXME               NEW_HASH_METHOD
-  DEBUG_REFS (see doc/DEBUG_REFS)  OPTIMIZE_JUST_STAR
-  ENFORCE_RFC1034                  PROFILE
-  HAVE_PGP_2                       REQUIRE_BRACKET_IN_DOMAIN_LITERAL
+  DEBUG                            MATCH_TAR_PATTERN
+  DEBUG_NEWSRC                     NEW_HASH_METHOD
+  DEBUG_NEWSRC_FIXME               OPTIMIZE_JUST_STAR
+  DEBUG_REFS (see doc/DEBUG_REFS)  PROFILE
+  ENFORCE_RFC1034                  REQUIRE_BRACKET_IN_DOMAIN_LITERAL
+  JUST_TESTING                     TINC_DNS
 
   
 System related:
@@ -244,6 +244,10 @@ Enable if you [want to | can] ONLY read news remotely via an NNTP server.
 Defines the name of the default NNTP server that tin should connect to.
 Can be overridden by setting the environment variable NNTPSERVER.
 
+--enable-broken-listgorup-fix (default: off)
+Bypass a bug in some broken NNTPservers which need an extra
+GROUP command before accepting a LISTGROUP command.
+
 NNTP_INEWS
 Define if you want to use my built-in NNTP POST routine so that you no
 longer have to rely on the mini-inews from NNTP to be installed on each
@@ -317,15 +321,15 @@ Define if you have PGP (Pretty Good Privacy encryption system)
 installed and want the option of checking signatures, extract keys,
 sign messages and add public key to messages.  This is bound to the
 key 'g' or '^G'.
-If found in search path, this is used automatically (pgp-5 is prefered
-over pgp-2).
+If found in search path, this is used automatically (pgp-5 (HAVE_PGP_5 set)
+is prefered over pgp-2 (HAVE_PGP_2 set)).
 
 --with-inn-nntplib=PATH
 Define if you want to use the INN library functions GetConfigValue()
 & GetFQDN(). PATH must be the correct path to the INN library.
 
 --with-iso-to-ascii
-Define if you want tin to do ISO-8859-1 Charset to ASCII conversations
+Define if you want tin to do ISO-8859-1 Charset to ASCII conversions
 by default for all groups. You must specify a value of "0-6" to get tin
 to use one of the 7 conversion tables for different languages.
 i.e., Adding -DUSE_ISO2ASC=\"2\" to the CPPOPTS line in the Makefile would
@@ -334,12 +338,12 @@ read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
 --with-local-charset
 LOCAL_CHARSET
-Define LOCAL_CHARSET if you like charset conversertions.
+Define LOCAL_CHARSET if you like charset conversions.
 set LOCAL_CHARSET to one of the following values:
-	437	ibm437<->iso-8859-1 conversation
-	850	ibm850<->iso-8859-1 conversation
-	1	next<->iso-8859-1 conversation
-	unset	no conversation (default)
+	437	ibm437<->iso-8859-1 conversion
+	850	ibm850<->iso-8859-1 conversion
+	1	next<->iso-8859-1 conversion
+	unset	no conversion (default)
 
 --with-ncurses
 Define this if you want to link with ncurses instead of termcap.
@@ -428,11 +432,11 @@ Compiled & installed on the following machines:
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
 	i586 & Linux 2.0.36 with gcc 2.7.2.3
-	i686 & Linux 2.2.0 with egcs-egcs-2.91.60
+	i586 & Linux 2.2.5-ac7 with egcs-egcs-2.91.60
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
-	Cobalt Microserver 27 (MIPS) & Linux 2.0.33 with gcc 2.7.2
+	Cobalt Microserver 27 (MIPS Nevada V10.0) & Linux 2.0.34 with gcc 2.7.2
 
 2)	HP 9000/835 & HP-UX 8.00 with cc
 	HP 9000/825 & HP-UX 8.00 with gcc 2.7.2

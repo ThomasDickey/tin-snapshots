@@ -43,7 +43,7 @@ msg_write_signature (
 	char pathfixed[PATH_LEN];
 
 #ifdef NNTP_INEWS
-	if (read_news_via_nntp && use_builtin_inews)
+	if (read_news_via_nntp && tinrc.use_builtin_inews)
 		flag = TRUE;
 #endif /* NNTP_INEWS */
 
@@ -55,7 +55,7 @@ msg_write_signature (
 			FILE *pipe_fp;
 			char *sigcmd;
 			char cmd[PATH_LEN];
-			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+			fprintf (fp, "\n%s", tinrc.sigdashes ? SIGDASHES : "\n");
 			sigcmd = (char *) my_malloc(strlen(thisgroup->attribute->sigfile+1) + strlen(thisgroup->name) + 4);
 			sprintf (sigcmd, "%s \"%s\"", thisgroup->attribute->sigfile+1, thisgroup->name);
 			if ((pipe_fp = popen (sigcmd, "r")) != (FILE *) 0) {
@@ -70,7 +70,7 @@ msg_write_signature (
 		get_cwd (cwd);
 
 		if (!strfpath (thisgroup->attribute->sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name)) {
-			if (!strfpath (default_sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name))
+			if (!strfpath (tinrc.default_sigfile, path, sizeof (path), homedir, (char *) 0, (char *) 0, thisgroup->name))
 				joinpath (path, homedir, ".Sig");
 		}
 
@@ -86,7 +86,7 @@ msg_write_signature (
 			if (debug == 2)
 				error_message ("USING random sig=[%s]", sigfile);
 #endif /* DEBUG */
-			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+			fprintf (fp, "\n%s", tinrc.sigdashes ? SIGDASHES : "\n");
 			joinpath (pathfixed, path, ".sigfixed");
 #ifdef DEBUG
 			if (debug == 2)
@@ -118,7 +118,7 @@ msg_write_signature (
 	 */
 	if ((sigfp = fopen (default_signature, "r")) != (FILE *) 0) {
 		if (flag) {
-			fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+			fprintf (fp, "\n%s", tinrc.sigdashes ? SIGDASHES : "\n");
 			copy_fp (sigfp, fp);
 		}
 		fclose (sigfp);
@@ -126,7 +126,7 @@ msg_write_signature (
 	}
 
 	if ((sigfp = fopen (path, "r")) != (FILE *) 0) {
-		fprintf (fp, "\n%s", sigdashes ? SIGDASHES : "\n");
+		fprintf (fp, "\n%s", tinrc.sigdashes ? SIGDASHES : "\n");
 		copy_fp (sigfp, fp);
 		fclose (sigfp);
 	}

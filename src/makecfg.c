@@ -241,7 +241,7 @@ generate_tbl (
 			if (!is_int) {
 				fprintf(ofp, "OINX_%s, 0, ", p->name);
 			} else {
-				fprintf (ofp, "0, &%s, ", p->name);
+				fprintf (ofp, "0, &tinrc.%s, ", p->name);
 			}
 
 			if (is_opt)
@@ -300,7 +300,7 @@ generate_ptr(
 			}
 			switch (mode) {
 			case 0:
-				fprintf(ofp, "\t%s%s,%*s/* %2d: %s__ */\n",
+				fprintf(ofp, "\t%stinrc.%s,%*s/* %2d: %s__ */\n",
 					addr,
 					p->name,
 					MAXNAME - (int)(strlen(addr) + strlen(p->name)),

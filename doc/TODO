@@ -9,10 +9,6 @@ o  using libuu for decoding articles breaks
     provide a script which handles all post_process_types) and kick
     non-libuu code afterwards)
 
-o  '-X' doesn't disable changing the killfile and the tinrc from
-   inside tin
-   [Urs Janssen <urs@tin.org>]
-
 o  in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
    batch_save etc. is broken.
      scope=*
@@ -20,11 +16,6 @@ o  in batch mode (i.e. -S) ~/.tin/attributes is not evaluated, thus
      scope=foo.bar
      batch_save=ON
    'tin -S' saves all groups, not only foo.bar
-   [Urs Janssen <urs@tin.org>]
-
-o  '-d' cmd-line switch turns of show_description in the tinrc, thus
-   after once using '-d' (or -Q) you have to explicitly turn it on
-   again.
    [Urs Janssen <urs@tin.org>]
 
 o  '-s' cmd-line switch specifies the spooldir also in the tinrc.
@@ -68,7 +59,7 @@ o  fix check_upgrade() (config.c)
    - check if TINRC_VERSION machtes (already done, but used string is 'wrong'
      as it's still talking about tin-unoff)
    - check if TINRC_VERSION is 'older' (mismatch and not newer) as in the
-     config file, give a warnings and the possibilliy to qiit without saving
+     config file, give a warning and the possibillity to quit without saving
      config file
    - check if TINRC_VERSION is 'newer' (already done) and give a warning
 
@@ -116,6 +107,7 @@ o  sort Followup-To:/Newsgroups: after stripping doubled newsgroups and
 
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
+   [ the post-process query is done b4 the file save -> rewrite feed.c ]
 
 o  When tagging/auto-selecting files to be saved and decoded, if a tagged
    article is expired from the server (WHY do they show up? they are
@@ -157,6 +149,8 @@ o  word highlighting shouldn't be enabled in signatures, as '*'
 
 New features
 ------------
+o  add unicode/UTF-8 support
+
 o  add Message-ID param to quick_filter_select_posted_art() and
    update_posted_info_file() so we could log the Message-ID in the
    filter and posting history file if we know it (see inews.c.
@@ -209,11 +203,9 @@ o  Rather than cc/bcc, I'd like to see tin simply append the
    have to be locked using a convention that will hold off
    the various Unix mailer programs.
 
-o  have the default answer to "do you really want to send this
-   bug report?" be: (y)es. check for a null body, and just ignore it ...
-   [I hate all those empty bugreports ,-)]
-
 o  add support for ispell language change
+
+o  add check for gpg
 
 o  MIME-pgp support according to RFC2015
 
@@ -242,9 +234,7 @@ o  add feature goto using the 'G' key
 o  Additions to the pager:
     check for urlview during configure and if found add
      'U' feed page to urlview <ftp://ftp.tin.org/pub/misc/>
-
-o  Additions to the group menu :
-     'L' (lookup message-id)
+     '?' backward search
 
 o  Additions to the thread menu :
      'B' (body search)
@@ -254,7 +244,6 @@ o  Additions to the thread menu :
      'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
      ''  r ought to be toggle show all/show only unread
      'f' (post a followup)
-     'L' (lookup message-id)
      keys to goto previous/next thread
 
 o  Add to the 'M'enu:
@@ -330,6 +319,8 @@ Internal Changes
 ----------------
 o  kick Hungarian notation
 
+o  kick ~/.tin/headers, ~/.tin/attributs exists
+
 o  use XGTITLE (if available) if -n cmd-line flag is present
    (see open.c)
 
@@ -403,8 +394,6 @@ o  strip Xref:-header if saving news in batch mode (-S)?
 
 o  tin in batchmode dumps core if getting a SIGINT, useful?
 
-o  'tin -N|-M address' doesn't work out of cron
-
 o  'u'nsubscribe/'s'ubscribe are inconsistent - bug or feature?
    's' subscribes you to the current group and does _not_ skip to the next
        group (annoying when subscribing to multiple groups, but useful
@@ -457,12 +446,11 @@ o  mail_bugreport() with other mailers than sendmail and use_mailreader_i=ON
 
 Filtering enhancements
 ----------------------
-o  add command: mark all articles older than <date> as read
+o  add command: mark all articles older/newer than <date> as read
    (useful when subscribing to a new group with high-traffic...)
 
 o  fix kill/hot mechanism so that it is possible to match articles on
    arbitrary headers
-   i.e.: killing on References only would be nice
 
 o  don't strip "Re: " out of the subject before applying the filter on it
 

@@ -109,7 +109,7 @@ iWriteNewsrcLine (
 		return 0;
 
 	if (seq == NULL) {		/* line has no ':' or '!' in it */
-		if (strip_bogus == BOGUS_REMOVE)
+		if (tinrc.strip_bogus == BOGUS_REMOVE)
 			wait_message(2, txt_remove_bogus, line);
 		return 0;
 	}
@@ -121,18 +121,18 @@ iWriteNewsrcLine (
 	 */
 	psGrp = psGrpFind (line);
 
-	if (strip_bogus == BOGUS_REMOVE) {
+	if (tinrc.strip_bogus == BOGUS_REMOVE) {
 		if (psGrp == NULL || psGrp->bogus) { /* group dosen't exist */
 			wait_message(2, txt_remove_bogus, line);
 			return 0;
 		}
 	}
 
-	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !strip_newsrc)) {
+	if ((psGrp && psGrp->newsrc.present) && (psGrp->subscribed || !tinrc.strip_newsrc)) {
 		fprintf (fp, "%s%c ", psGrp->name, SUB_CHAR(psGrp->subscribed));
 		print_bitmap_seq (fp, psGrp);
 	} else {
-		if (sub == SUBSCRIBED || !strip_newsrc)
+		if (sub == SUBSCRIBED || !tinrc.strip_newsrc)
 			fprintf (fp, "%s%c %s\n", line, sub, seq);
 	}
 
@@ -157,6 +157,9 @@ vWriteNewsrc (
 	int tot = 0;
 	struct stat note_stat_newsrc;
 	t_bool write_ok = FALSE;
+
+	if (no_write)
+		return TRUE;
 
 	if ((fp_ip = fopen (newsrc, "r")) == (FILE *) 0)
 		return FALSE; /* can't open newsrc */
@@ -323,6 +326,9 @@ subscribe (
 	int sub;
 	t_bool found = FALSE;
 
+	if (no_write)
+		return;
+
 	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) == (FILE *) 0)
 		return;
 
@@ -389,7 +395,7 @@ reset_newsrc (
 	int sub;
 	long i;
 
-	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
+	if (!no_write && (newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
 
 		if (newsrc_mode)
 			chmod (newnewsrc, newsrc_mode);
@@ -425,6 +431,9 @@ delete_group (
 	char *line;
 	char *seq;
 	int sub;
+
+	if (no_write)
+		return;
 
 	if ((newfp = fopen (newnewsrc, "w" FOPEN_OPTS)) != (FILE *) 0) {
 
@@ -942,6 +951,9 @@ pos_group_in_newsrc (
 	t_bool ret_code = FALSE;
 	t_bool sub_created = FALSE;
 	t_bool unsub_created = FALSE;
+
+	if (no_write)
+		goto rewrite_group_done;
 
 	if ((fp_in = fopen (newsrc, "r")) == (FILE *) 0)
 		goto rewrite_group_done;

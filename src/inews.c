@@ -232,7 +232,7 @@ submit_inews (
 		  * Message-ID in the response string...
 		  * if it does so, compare it with message_id (if set)
 		  * and pass it to update_posted_info_file() and
-		  * quick_filter_select_posted_art() if add_posted_to_filter
+		  * quick_filter_select_posted_art() if tinrc.add_posted_to_filter
 		  * is set
 		  * make sure, that quick_filter_select_posted_art() and
 		  * update_posted_info_file() arn't called twice!
@@ -284,13 +284,13 @@ submit_news_file (
 	checknadd_headers (name);
 
 	/* 7bit ISO-2022-KR is NEVER to be used in Korean news posting. */
-	if (!(strcasecmp(mm_charset, "euc-kr") || strcasecmp(txt_mime_encodings[post_mime_encoding], txt_7bit)))
-		post_mime_encoding = 0;	/* FIXME: txt_8bit */
+	if (!(strcasecmp(tinrc.mm_charset, "euc-kr") || strcasecmp(txt_mime_encodings[tinrc.post_mime_encoding], txt_7bit)))
+		tinrc.post_mime_encoding = 0;	/* FIXME: txt_8bit */
 
-	rfc15211522_encode(name, txt_mime_encodings[post_mime_encoding], post_8bit_header, ismail);
+	rfc15211522_encode(name, txt_mime_encodings[tinrc.post_mime_encoding], tinrc.post_8bit_header, ismail);
 
 #ifdef NNTP_INEWS
-	if (read_news_via_nntp && !read_saved_news && use_builtin_inews) {
+	if (read_news_via_nntp && !read_saved_news && tinrc.use_builtin_inews) {
 #	ifdef DEBUG
 		if (debug == 2)
 			error_message ("Using BUILTIN inews");

@@ -296,7 +296,7 @@ constext txt_help_use_getart_limit[] = "<SPACE> toggles, <CR> sets, <ESC> cancel
 	constext txt_help_col_title[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 	constext txt_help_col_markstar[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 	constext txt_help_col_markdash[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-	constext txt_help_word_highlight_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+	constext txt_help_word_highlight[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 	constext txt_help_word_h_display_marks[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif /* HAVE_COLOR */
 
@@ -413,7 +413,7 @@ constext txt_help_plus[] = "+\t  select group (make \"hot\")" cCRLF;
 constext txt_help_pos_first_unread[] = "Put cursor at first/last unread art in groups. <SPACE> toggles & <CR> sets.";
 constext txt_help_post_8bit_header[] = "Don't change unless you know what you are doing. <ESC> cancels.";
 constext txt_help_post_mime_encoding[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_help_post_proc_type[] = "Post process (ie. unshar) saved article/thread. <SPACE> toggles & <CR> sets.";
+constext txt_help_post_process_type[] = "Post process (ie. unshar) saved article/thread. <SPACE> toggles & <CR> sets.";
 constext txt_help_print_header[] = "Print all or just part of header. <SPACE> toggles & <CR> sets.";
 constext txt_help_printer[] = "The printer program with options that is to be used to print articles/threads.";
 constext txt_help_process_only_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -433,14 +433,14 @@ constext txt_help_show_description[] = "Show short description for each newsgrou
 constext txt_help_show_last_line_prev_page[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_show_lines[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_show_score[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
-constext txt_help_show_only_unread[] = "Show all articles or only unread articles. <SPACE> toggles & <CR> sets.";
+constext txt_help_show_only_unread_arts[] = "Show all articles or only unread articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_show_only_unread_groups[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_show_signatures[] = "Display signatures. <SPACE> toggles & <CR> sets.";
 constext txt_help_show_xcommentto[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_sigdashes[] = "Prepend signature with \"-- \" on own line. <SPACE> toggles & <CR> sets.";
 constext txt_help_signature_repost[] = "Add signature when reposting articles. <SPACE> toggles & <CR> sets.";
 constext txt_help_sigfile[] = "Enter path/! command/--none to create your default signature. <CR> sets.";
-constext txt_help_sort_art_type[] = "Sort articles by Subject, From, Date or Score. <SPACE> toggles & <CR> sets.";
+constext txt_help_sort_article_type[] = "Sort articles by Subject, From, Date or Score. <SPACE> toggles & <CR> sets.";
 constext txt_help_space_goto_next_unread[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_spamtrap_warning_addresses[] = "Enter address elements about which you want to be warned. <CR> sets.";
 constext txt_help_pgdn_goto_next[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -456,7 +456,7 @@ constext txt_help_t_caret_dollar[] = "^ $\t  choose first ($ = last) article in 
 constext txt_help_t_cr[] = "<CR>\t  read chosen article" cCRLF;
 constext txt_help_t_num[] = "0 - 9\t  choose article by number" cCRLF;
 constext txt_help_thread[] = "< >\t  display first (> = last) article in current thread" cCRLF;
-constext txt_help_thread_arts[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+constext txt_help_thread_articles[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_thread_catchup_on_exit[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 constext txt_help_u[] = "u\t  cycle through threading options available" cCRLF;
 constext txt_help_unlink_article[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
@@ -466,7 +466,7 @@ constext txt_help_unlink_article[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.
 #endif /* NNTP_ABLE || NNTP_ONLY */
 
 #ifdef HAVE_COLOR
-	constext txt_help_use_color_tinrc[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
+	constext txt_help_use_color[] = "<SPACE> toggles, <CR> sets, <ESC> cancels.";
 #endif /* HAVE_COLOR */
 
 #ifdef HAVE_KEYPAD
@@ -501,6 +501,7 @@ constext txt_info_do_postpone[] = "Storing article for later posting";
 constext txt_info_postponed[] = "%d postponed article%s, reuse with ^O...\n";
 constext txt_info_nopostponed[] = "*** No postponed articles ***";
 constext txt_info_not_subscribed[] = "You are not subscribed to this group";
+constext txt_info_no_write[] = "Operation disabled in no-overwrite mode";
 constext txt_is_tex_ecoded[]= "TeX2Iso encoded article";
 
 #ifndef INDEX_DAEMON
@@ -532,7 +533,6 @@ constext txt_mail[] = "Mail";
 constext txt_mail_art_to[] = "Mail article(s) to [%.*s]> ";
 constext txt_mail_bug_report[] = "Mail bug report...";
 constext txt_mail_bug_report_confirm[] = "Mail BUG REPORT to %s? (y/n): ";
-constext txt_mail_quote[] = "In article %M you wrote:";
 constext txt_mailed[] = "-- %d Article%s mailed --";
 constext txt_mailing_to[] = "Mailing to %s...";
 constext txt_marked_as_unread[] = "%s marked as unread";
@@ -554,7 +554,6 @@ constext txt_mini_thread_2[] = "h)elp, j=line down, k=line up, q)uit, t)ag, z=ma
 constext txt_more[] = "--More--";
 constext txt_moving[] = "Moving %s...";
 constext txt_msg_headers_file[] = "# Add extra header lines to mail/news messages.\n# ie.  Organization: Bits & Bobs Inc.\n\n";
-constext txt_news_quote[] = "%F wrote:";
 constext txt_newsgroup[] = "Goto newsgroup [%s]> ";
 constext txt_newsgroup_position[] = "Position %s in group list (1,2,..,$) [%d]> ";
 constext txt_newsrc_again[] = "Try and save newsrc file again? (y/n): ";
@@ -650,7 +649,7 @@ constext txt_opt_getart_limit[] = "Number of articles to get          : ";
 	constext txt_opt_col_subject[] = "Color of article subject lines     : ";
 	constext txt_opt_col_text[] = "Color of text lines                : ";
 	constext txt_opt_col_title[] = "Color of help/mail sign            : ";
-	constext txt_opt_word_highlight_tinrc[] = "Word highlighting in message body  : ";
+	constext txt_opt_word_highlight[] = "Word highlighting in message body  : ";
 	constext txt_opt_word_h_display_marks[] = "What to display instead of mark    : ";
 	constext txt_opt_col_markstar[] = "Color of highlighting with *stars* : ";
 	constext txt_opt_col_markdash[] = "Color of highlighting with _dash_  : ";
@@ -685,7 +684,7 @@ constext txt_opt_advertising[] = "Insert 'User-Agent:'-header        : ";
 constext txt_opt_pos_first_unread[] = "Goto first unread article in group : ";
 constext txt_opt_post_8bit_header[] = "Use 8bit characters in news headers: ";
 constext txt_opt_post_mime_encoding[] = "MIME encoding in news messages     : ";
-constext txt_opt_post_proc_type[] = "Post process saved art/thread with : ";
+constext txt_opt_post_process_type[] = "Post process saved art/thread with : ";
 constext txt_opt_print_header[] = "Print all headers when printing    : ";
 constext txt_opt_printer[] = "Printer program with options       : ";
 constext txt_opt_process_only_unread[] = "Process only unread articles       : ";
@@ -701,14 +700,14 @@ constext txt_opt_show_description[] = "Show description of each newsgroup : ";
 constext txt_opt_show_last_line_prev_page[] = "Show last line of previous page    : ";
 constext txt_opt_show_lines[] = "Show no. of lines in thread listing: ";
 constext txt_opt_show_score[] = "Show score of article in listing   : ";
-constext txt_opt_show_only_unread[] = "Show only unread articles          : ";
+constext txt_opt_show_only_unread_arts[] = "Show only unread articles          : ";
 constext txt_opt_show_only_unread_groups[] = "Show only groups with unread arts  : ";
 constext txt_opt_show_signatures[] = "Display signatures                 : ";
 constext txt_opt_show_xcommentto[] = "Display X-Comment-To: header       : ";
 constext txt_opt_sigdashes[] = "Prepend signature with \"-- \"       : ";
 constext txt_opt_signature_repost[] = "Add signature when reposting       : ";
 constext txt_opt_sigfile[] = "Create signature from path/command : ";
-constext txt_opt_sort_art_type[] = "Sort article by                    : ";
+constext txt_opt_sort_article_type[] = "Sort article by                    : ";
 constext txt_opt_space_goto_next_unread[] = "Space goes to next unread article  : ";
 constext txt_opt_spamtrap_warning_addresses[] = "Spamtrap warning address parts     : ";
 constext txt_opt_pgdn_goto_next[] = "PgDn goes to next article at EOF   : ";
@@ -718,7 +717,7 @@ constext txt_opt_strip_bogus[] = "Remove bogus groups from newsrc    : ";
 constext txt_opt_strip_newsrc[] = "No unsubscribed groups in newsrc   : ";
 constext txt_opt_tab_after_X_selection[] = "Do tab after X automatically       : ";
 constext txt_opt_tab_goto_next_unread[] = "Tab goes to next unread article    : ";
-constext txt_opt_thread_arts[] = "Thread articles by                 : ";
+constext txt_opt_thread_articles[] = "Thread articles by                 : ";
 constext txt_opt_thread_catchup_on_exit[] = "Catchup thread by using left key   : ";
 constext txt_opt_unlink_article[] = "Remove ~/.article after posting    : ";
 
@@ -727,7 +726,7 @@ constext txt_opt_unlink_article[] = "Remove ~/.article after posting    : ";
 #endif /* NNTP_ABLE || NNTP_ONLY */
 
 #ifdef HAVE_COLOR
-	constext txt_opt_use_color_tinrc[] = "Use ANSI color                     : ";
+	constext txt_opt_use_color[] = "Use ANSI color                     : ";
 #endif /* HAVE_COLOR */
 
 #ifdef HAVE_KEYPAD
@@ -835,13 +834,13 @@ constext txt_tinrc_confirm_to_quit[] = "# If ON confirm with y/n before quitting
 constext txt_tinrc_default_editor_format[] = "# Format of editor line including parameters\n\
 # %%E Editor  %%F Filename  %%N Linenumber\n";
 constext txt_tinrc_default_filter_days[] = "# Num of days a short term filter will be active\n";
-constext txt_tinrc_default_maildir[] = "# (-m) directory where articles/threads are saved in mailbox format\n";
+constext txt_tinrc_maildir[] = "# (-m) directory where articles/threads are saved in mailbox format\n";
 constext txt_tinrc_default_mailer_format[] = "# Format of mailer line including parameters\n\
 # %%M Mailer  %%S Subject  %%T To  %%F Filename  %%U User (AmigaDOS)\n\
 # ie. to use elm as your mailer:    elm -s \"%%S\" \"%%T\" < %%F\n\
 # ie. elm interactive          :    elm -i %%F -s \"%%S\" \"%%T\"\n";
 constext txt_tinrc_default_printer[] = "# Print program with parameters used to print articles/threads\n";
-constext txt_tinrc_default_savedir[] = "# Directory where articles/threads are saved\n";
+constext txt_tinrc_savedir[] = "# Directory where articles/threads are saved\n";
 constext txt_tinrc_default_sigfile[] = "# Signature path (random sigs)/file to be used when posting/replying\n\
 # default_sigfile=file       appends file as signature\n\
 # default_sigfile=!command   executes external command to generate a signature\n\
@@ -964,7 +963,7 @@ constext txt_tinrc_show_description[] = "# If ON show group description text aft
 constext txt_tinrc_show_last_line_prev_page[] = "# If ON show the last line of the previous page as first line of next page\n";
 constext txt_tinrc_show_lines[] = "# Show number of lines of first unread article in thread listing (ON/OFF)\n";
 constext txt_tinrc_show_score[] = "# Show score of article/thread in listing (ON/OFF)\n";
-constext txt_tinrc_show_only_unread[] = "# If ON show only new/unread articles otherwise show all.\n";
+constext txt_tinrc_show_only_unread_arts[] = "# If ON show only new/unread articles otherwise show all.\n";
 constext txt_tinrc_show_only_unread_groups[] = "# If ON show only subscribed to groups that contain unread articles.\n";
 constext txt_tinrc_show_signatures[] = "# If OFF don't show signatures when displaying articles\n";
 constext txt_tinrc_show_xcommentto[] = "# If ON, the realname in the X-Comment-To header is displayed in the\n\
@@ -1279,7 +1278,6 @@ constext txt_warn_multiple_sigs[] ="\nWarning: Found %d '-- \\n' lines, this may
 constext txt_warn_wrong_sig_format[] = "\nWarning: Signatures should start with '-- \\n' not with '--\\n'.\n";
 constext txt_writing_attributes_file[] = "Writing attributes file...";
 constext txt_x_resp[] = "%d Responses" cCRLF;
-constext txt_xpost_quote[] = "In %G %F wrote:";
 constext txt_yanking_all_groups[] = "Yanking in all groups...";
 constext txt_yanking_sub_groups[] = "Yanking in subscribed to groups...";
 constext txt_yes[] = "Yes";
@@ -1334,6 +1332,7 @@ constext txt_filter_file[] = "# Global & local filter file for the TIN newsreade
 #   msgid=STRING      Message-ID: line (e.g. <123@ether.net>) with full references\n\
 #   msgid_last=STRING Message-ID: line (e.g. <123@ether.net>) with last reference only\n\
 #   msgid_only=STRING Message-ID: line (e.g. <123@ether.net>) without references\n\
+#   refs_only=STRING  References: line (e.g. <123@ether.net>) without Message-Id:\n\
 #   lines=[<>]?NUM    Lines: line\n\
 #   gnksa=[<>]?NUM    GNKSA parse_from() return code\n\
 # either:\n\

@@ -223,13 +223,13 @@ tin_read (
 		 * to a single ' '
 		 */
 #ifdef NNTP_ABLE
-		if (check_dot_only_line && i == 1 && buffer[0] == '.') {
+		if (check_dot_only_line && i == 1 && buffer[0] == '.') { /* EMPTY */
 			/* Find a terminator, don't check next line. */
 		} else
 #endif /* NNTP_ABLE */
 		{
 			if (header) {
-				if (!i) {
+				if (!i) { /* EMPTY */
 					/* Find a header separator, don't check next line. */
 				} else {
 					while ((c = fgetc (get_nntp_fp(fp))) == ' ' || c == '\t')
