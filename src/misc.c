@@ -28,27 +28,28 @@ tin_itoa (value, digits)
 	int digits;
 {
 	static char buffer[256];
-	char test[256];
-	char power[5];
+	static char power[]=" KMGT";
 	int len;
 	int i=0;
-	
-	strcpy (power, " KMGT");
-	sprintf (test, "%d", value);
-	len = strlen (test);
+
+	sprintf (buffer, "%d", value);
+	len = strlen (buffer);
+
 	while (len > digits) {
-		value/=1000;
 		len-=3;
 		i++;
 	}
-	sprintf(buffer, "%*d", digits, value);
+
 	if (i) {
 		while (len < (digits-1)) {
 			buffer[len++]=' ';
 		}
 		buffer[digits-1] = power[i];
 		buffer[digits] = '\0';
+	} else {
+		sprintf(buffer, "%*d", digits, value);
 	}
+
 	return (buffer);
 }
 
