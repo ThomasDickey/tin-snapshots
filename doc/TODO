@@ -1,7 +1,19 @@
 Bugs
 ----
+o  The subject lines for the 1st newsgroup in .newsrc is truncated when
+   the author field is toggled off using the 'd' command.
+   [Jason C Lin <jlin@hawaii.edu>]
+
+o  If show_author=0 is set in tinrc, the 'd' command doesn't work for the
+   1st newsgroup.
+   [Jason C Lin <jlin@hawaii.edu>]
+
+o  When an article is piped and the message "Press <RETURN> to continue..." 
+   appears, if an arrow key is pressed, arbitrary commands are executed.
+   [Jason C Lin <jlin@hawaii.edu>]
+
 o  word_h_display_marks, word_highlighting and wildcard are sometimes
-   reseted to their defualt value.
+   reseted to their default value.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
 o  tin does not assure that you are in nnrpd after a reconnect -> issue a
@@ -24,14 +36,14 @@ o  When trying to renumber my newsgroups (using the 'M' command), I find
 o  tin does not care about resizing the xterm it's running in.
    [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
 
-o  tin (sometimes?) overwrites the newsgroupnumber and number of unread
+o  tin (sometimes?) overwrites the newsgroup-number and number of unread
    articles with spaces when turning on newsgroup descriptions with
-   strip_blanks=OFF - the bugs seems to be realted to the screen-width and
+   strip_blanks=OFF - the bugs seems to be related to the screen-width and
    does not show up on small screens, but in large xterms...
    (sounds like a calculation error with float -> int values [urs])
    [Karsten Weiss <knweiss@trick.informatik.uni-stuttgart.de> ]
 
-o  sometimes tin truncates newsgroupnames after turning off newsgroup
+o  sometimes tin truncates newsgroup-names after turning off newsgroup
    descriptions.
    [Urs Janssen <urs@akk.uni-karlsruhe.de>]
 
@@ -52,7 +64,7 @@ o  supersedes does not work if one of the Newsgroups is not present in the
 o  commas in real-name might cause problems in mail-replys
    -> rewrite To: before mailing to old-style notation user@dom.in (real-name)
 
-o  tin ignores some file-permissions (.newsrc will be set to 644)
+o  tin ignores some file-permissions (.newsrc will be set to 644) ?????
 
 o  src/Makefile ignores cf_cv_makeflags
 
@@ -70,11 +82,11 @@ o  --enable-curses has several bugs
    (screen redraw is broken, tty-settings get messed up, color might not
     work, ...)
 
-o  mark group as read warps into the next line if the groupname is very long
+o  mark group as read warps into the next line if the group-name is very long
 
-o  on some systems (my Linux 2.0.26/gcc 2.7.2.1) - tin claims that the
-   connection has timed out if the server refuses the connection.
-   on HP-UX 8.0/cc it works the way it should... 
+o  if the server refuses reader-connections after MODE READER
+   tin claims that the connection has timed out instead of displaying the
+   '400'-message
 
 o  fix nntp_open/get_server (as reconnect often fails on the first try
    nntp_open should return different values for 'different' errors
@@ -94,7 +106,7 @@ o  'K' is still a bit inconsistent
    - in the article pager (page.c) it marks the whole thread as unread
      and jumps to the next thread containing unread articles
 
-o  tin crashes if started with too small a screen size
+o  tin crashes if started with too small a screen size ???
 
 o  In cases where a tinrc variable is stored in group->attributes
    (ie on a per-group basis) then changes in the config menu won't always
@@ -106,6 +118,7 @@ o  In cases where a tinrc variable is stored in group->attributes
 o  ispell checks all headers
 
 o  tin crashes if compiled without default-newsserver and unset $NNTPSERVER
+   ???
 
 o  reposting of a thread does not work
 
@@ -133,7 +146,7 @@ o  Followup-To: line is not examined weather the mentioned group(s) are valid
    on this server.
 
 o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
-   is examined weather it contains several groups...
+   is examined wether it contains several groups...
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
@@ -185,8 +198,14 @@ o  When enabling the 'cc/bcc on every message that is sent', and
 
 New features
 ------------
-o  if Subject: contains (was: ...) on a f'up strip it before
-   entering editor.
+o  allow changing From: in mail-replys
+
+o  '/', '?' searching in 'M'enu and 'h'elp-screen
+
+o  iftem_by_item_etiquette_warnings [compiletime?]
+   (i.e. enable x-posts without f'up waring, disable long-sig waring)
+
+o  auto_reconnect=ON/OFF ['M'enu]
 
 o  Menu/tinrc/attributes entry for TeX2ISO_Conversion=ON/OFF
    [toggle via '"']

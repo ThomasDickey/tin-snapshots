@@ -34,7 +34,7 @@ constext txt_art_posted[] = "Article posted";
 constext txt_art_rejected[] = "Article rejected (saved to %s)";
 constext txt_art_saved_to[] = "Article saved to %s";
 constext txt_art_thread_regex_tag[] = " a)rticle, t)hread, h)ot, p)attern, T)agged articles, q)uit: ";
-constext txt_art_unavailable[] = "Article %ld unavailable";
+constext txt_art_unavailable[] = "Article unavailable";
 constext txt_art_parent_none[] = "Article has no parent";
 constext txt_art_parent_unavail[] = "Parent article is unavailable";
 constext txt_article_cancelled[] = "Article cancelled from within tin [v%s release %s]\n";
@@ -103,6 +103,7 @@ constext txt_deleting[] = "Deleting...";
 constext txt_end_of_arts[] = "*** End of Articles ***";
 constext txt_end_of_groups[] = "*** End of Groups ***";
 constext txt_end_of_thread[] = "*** End of Thread ***";
+constext txt_enter_message_id[] = "Enter Message-ID to goto> ";
 constext txt_enter_option_num[] = "Enter option number> ";
 constext txt_enter_range[] = "Enter range [%s]> ";
 constext txt_env_var_not_found[] = "Environment variable %s not found. Set and retry...";
@@ -156,6 +157,7 @@ constext txt_help_BIGB[] = "B\t  display article by body string case-insensitive
 constext txt_help_BIGD[] = "D\t  cancel (delete) current article; must have been posted by you" cCRLF;
 constext txt_help_BIGI[] = "I\t  toggle inverse video" cCRLF;
 constext txt_help_BIGK[] = "K\t  mark thread as read and display next unread" cCRLF;
+constext txt_help_BIGL[] = "L\t  goto article chosen by Message-ID" cCRLF;
 constext txt_help_BIGM[] = "M\t  menu of configurable options" cCRLF;
 constext txt_help_BIGS[] = "S U\t  subscribe (U = unsubscribe) to groups that match pattern" cCRLF;
 constext txt_help_BIGT[] = "T\t  return to group selection level" cCRLF;
@@ -167,6 +169,7 @@ constext txt_help_B[] = "B\t  display article by body string case-insensitive se
 constext txt_help_D[] = "D\t  cancel (delete) current article; must have been posted by you" cCRLF;
 constext txt_help_I[] = "I\t  toggle inverse video" cCRLF;
 constext txt_help_K[] = "K\t  mark thread as read and display next unread" cCRLF;
+constext txt_help_L[] = "L\t  goto article chosen by Message-ID" cCRLF;
 constext txt_help_M[] = "M\t  menu of configurable options" cCRLF;
 constext txt_help_S[] = "S U\t  subscribe (U = unsubscribe) to groups that match pattern" cCRLF;
 constext txt_help_T[] = "T\t  return to group selection level" cCRLF;
@@ -1051,8 +1054,8 @@ constext txt_warn_posting_etiquette[] = "\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
 constext txt_warn_sig_too_long[] ="\n\
-  Warning: Your signature is longer then %d lines.  Since signatures usually do\n\
-  not transport any useful information  they should be as  short as possible.\n\n";
+  Warning: Your signature is longer than %d lines.  Since signatures usually do\n\
+  not transport any useful information, they should be as  short as possible.\n\n";
 constext txt_warn_multiple_sigs[] ="\n\
   Warning: Found %d '-- \\n' lines, this may confuse some people.\n\n";
 constext txt_warn_wrong_sig_format[] = "\n\

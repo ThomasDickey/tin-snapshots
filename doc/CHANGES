@@ -1,8 +1,41 @@
+--unoff BETA release 970625 --
+
+401) Oliver B. Warzecha <obw@amarok.ping.de>
+     Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. strip "(was:" from Subject:
+     ADD. amiga code clean-up
+     FIX. misc.c
+
+400) Sven Paulus <sven@oops.sub.de>
+     ADD. remove mail-address from X-Comment-To:
+     FIX. page.c, post.c
+
+399) Jason Faultless <jason@radar.demon.co.uk>
+     BUG. author and article body searching fixed
+     ADD. 'L'ookup Message-ID in article pager
+     ADD. '/' subject search to thread menu
+     ADD. Improvements to search by subject - now enters thread
+          if needed
+     ADD. still more code clean-up
+     FIX. several supplied patches
+
+398) Oliver B. Warzecha <obw@amarok.ping.de>
+     ADD. amiga code clean-up
+     FIX. amiga.c, amiga.h
+
+397) Mike Muise <c-muise@mail.dec.com>
+     BUG. typo
+     FIX. lang.c
+
+396) Henrik Wist <goose@MuFFiN.Org>
+     BUG. tin didn't remove temp.-articles after pgp-signing them.
+     FIX. pgp.c
+
 --unoff BETA release 970622 --
 
 395) Sven Paulus <sven@oops.sub.de>
-     ADD. 'e'dit article possibillity if posting failed
-     ADD. random Oragnization via attributes file
+     ADD. 'e'dit article possibility if posting failed
+     ADD. random Organization via attributes file
      FIX. several supplied patches
 
 394) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -16,7 +49,7 @@
      FIX. several supplied patches
 
 392) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     ADD. clear keybord-buffer in prompt_yn() to aviod unexpected
+     ADD. clear keyboard-buffer in prompt_yn() to avoid unexpected
           results.
      FIX. prompt.c
 
@@ -52,7 +85,7 @@
 --unoff BETA release 970527 --
 
 386) Thomas E. Dickey <dickey@clark.net>
-     ADD. rewrote signalhandler
+     ADD. rewrote signal-handler
      FIX. several supplied patches
 
 385) Andrey A. Chernov <ache@null.net>

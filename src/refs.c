@@ -260,6 +260,31 @@ add_msgid(
 }
 
 /*
+ * Find a Message-ID in the cache. Return ptr to this node, or NULL if
+ * not found.
+ */
+struct t_msgid *
+find_msgid(
+	char *msgid)
+{
+	unsigned int h;
+	struct t_msgid *i;
+
+	h = hash_msgid(msgid+1);				/* Don't hash the initial '<' */
+
+	/*
+	 * Look for this message id in the cache.
+	 * Broken software will sometimes damage the case of a message-id.
+	 */
+	for (i = msgids[h]; i != NULL; i = i->next) {
+		if (strcasecmp(i->txt, msgid) == 0)				/* Found it */	
+			return(i);
+	}
+
+	return(NULL);
+}
+
+/*
  * Take a raw line of references data and return a ptr to a linked list of
  * msgids, starting with the most recent entry. (Thus the list is reversed)
  * Following the parent ptrs leads us back to the start of the thread.
@@ -572,9 +597,13 @@ dump_msgid_threads(void)
  *  It doesn't point to an article OR
  *     (it's already threaded/expired OR it has been autokilled)
  */
+#if 0
 #define SKIP_ART(ptr)	\
 	(ptr && (ptr->article == ART_NORMAL || \
 		(arts[ptr->article].thread != ART_NORMAL || arts[ptr->article].killed)))
+#endif
+#define SKIP_ART(ptr)	\
+	(ptr && (ptr->article == ART_NORMAL || arts[ptr->article].thread != ART_NORMAL))
 
 static struct t_msgid *
 find_next(

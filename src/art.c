@@ -634,7 +634,7 @@ parse_headers (
 			case 'S':	/* Subject:  mandatory */
 				if (!got_subject) {
 					if (match_header (ptrline+1, "ubject", buf2, (char*)0, HEADER_LEN) && *buf2 != '\0') {
-						s = eat_re (buf2);
+						s = eat_re (buf2, FALSE);
 						h->subject = hash_str (s);
 						got_subject = TRUE;
 					}
@@ -841,7 +841,7 @@ sleep(1);
 		} else {
 			*q = '\0';
 		}
-		arts[top].subject = hash_str (eat_re(rfc1522_decode(p)));
+		arts[top].subject = hash_str (eat_re(rfc1522_decode(p),FALSE));
 		p = q + 1;
 
 		/*

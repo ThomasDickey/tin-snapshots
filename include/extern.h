@@ -444,6 +444,7 @@ extern constext txt_deleting[];
 extern constext txt_end_of_arts[];
 extern constext txt_end_of_groups[];
 extern constext txt_end_of_thread[];
+extern constext txt_enter_message_id[];
 extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
 extern constext txt_env_var_not_found[];
@@ -485,6 +486,7 @@ extern constext txt_help_B[];
 extern constext txt_help_D[];
 extern constext txt_help_I[];
 extern constext txt_help_K[];
+extern constext txt_help_L[];
 extern constext txt_help_M[];
 extern constext txt_help_S[];
 extern constext txt_help_T[];
@@ -1319,6 +1321,7 @@ extern struct utsname system_info;
 #define txt_help_D   txt_help_BIGD
 #define txt_help_I   txt_help_BIGI
 #define txt_help_K   txt_help_BIGK
+#define txt_help_L   txt_help_BIGL
 #define txt_help_M   txt_help_BIGM
 #define txt_help_S   txt_help_BIGS
 #define txt_help_T   txt_help_BIGT

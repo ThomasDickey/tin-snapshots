@@ -219,7 +219,7 @@ extern void *my_malloc1 (const char *file, int line, size_t size);
 extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 
 /* misc.c */
-extern char *eat_re (char *s);
+extern char *eat_re (char *s, t_bool eat_was);
 extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (void);
 extern int get_initials (int respnum, char *s, int maxsize);
@@ -369,6 +369,7 @@ extern void prompt_on_off (int row, int col, t_bool *var, constext *help_text, c
 
 /* refs.c */
 extern char *get_references (struct t_msgid *refptr);
+extern struct t_msgid *find_msgid (char *msgid);
 extern void build_references (struct t_group *group);
 extern void clear_art_ptrs (void);
 extern void collate_subjects (void);
@@ -426,8 +427,9 @@ extern void wait_message (const char *str);
 extern int search_article (int forward);
 extern int search_author (int the_index, int current_art, int forward);
 extern int search_body (struct t_group *group, int current_art);
+extern int search_subject_group (int forward);
 extern void search_group (int forward);
-extern void search_subject (int forward);
+extern void search_subject_thread (int forward, int baseart, int offset);
 
 /* select.c */
 extern int add_my_group (char *group, t_bool add);
@@ -507,10 +509,11 @@ extern int next_unread (int n);
 extern int num_of_responses (int n);
 extern int prev_response (int n);
 extern int prev_unread (int n);
-extern int show_thread (struct t_group *group, char *group_path, int respnum);
+extern int show_thread (struct t_group *group, char *group_path, int respnum, int thread_depth);
 extern int stat_thread (int n, struct t_art_stat *sbuf);
 extern int which_response (int n);
 extern int which_thread (int n);
+extern void move_to_response (int n);
 extern void show_thread_page (void);
 
 /* wildmat.c */
