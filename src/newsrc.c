@@ -21,18 +21,14 @@ static int newsrc_mode = 0;
 /*
 ** Local prototypes
 */
-static void vWriteNewsrcLine P_((FILE *fp, char *line));
-static char *getaline P_((FILE *fp));
-static char *pcParseNewsrcLine P_((char *line, char *grp, int *sub));
-static void print_bitmap_seq P_((FILE *fp, struct t_group *group));
-static char *pcParseSubSeq P_((struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum));
-static char *pcParseGetSeq P_((char *pcSeq, long *plLow, long *plHigh));
-static void parse_bitmap_seq P_((struct t_group *group, char *seq));
-static void create_newsrc P_((char *newsrc_file));
-static void auto_subscribe_groups P_((char *newsrc_file));
-#if 0
-static void delete_group P_((char *group));
-#endif
+static char *getaline (FILE *fp);
+static char *pcParseNewsrcLine (char *line, char *grp, int *sub);
+static void print_bitmap_seq (FILE *fp, struct t_group *group);
+static char *pcParseSubSeq (struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum);
+static char *pcParseGetSeq (char *pcSeq, long *plLow, long *plHigh);
+static void parse_bitmap_seq (struct t_group *group, char *seq);
+static void create_newsrc (char *newsrc_file);
+static void auto_subscribe_groups (char *newsrc_file);
 
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
@@ -1369,8 +1365,8 @@ getaline(
 #ifdef DEBUG_NEWSRC
 
 #ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
-static void set_bitmap_range_read P_((struct t_newsrc *newsrc, long beg, long end));
-static void set_bitmap_range_unread P_((struct t_newsrc *newsrc, long beg, long end));
+static void set_bitmap_range_read (struct t_newsrc *newsrc, long beg, long end);
+static void set_bitmap_range_unread (struct t_newsrc *newsrc, long beg, long end);
 #endif
 
 void

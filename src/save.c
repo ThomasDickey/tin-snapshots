@@ -51,14 +51,13 @@ struct archiver_t {
 /*
 ** Local prototypes
 */
-static int any_saved_files P_((void));
-static int create_sub_dir P_((int i));
-static char *get_first_savefile P_((void));
-static char *get_last_savefile P_((void));
-static void post_process_uud P_((int pp, t_bool auto_delete));
-static void uudecode_file P_((int pp, char *file_out_dir, char *file_out));
-static void post_process_sh P_((t_bool auto_delete));
-static char *get_archive_file P_((char *dir));
+static int any_saved_files (void);
+static char *get_first_savefile (void);
+static char *get_last_savefile (void);
+static void post_process_uud (int pp, t_bool auto_delete);
+static void uudecode_file (int pp, char *file_out_dir, char *file_out);
+static void post_process_sh (t_bool auto_delete);
+static char *get_archive_file (char *dir);
 
 
 /*

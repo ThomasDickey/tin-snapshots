@@ -31,14 +31,11 @@ static char *spaces = "XXXX";
 /*
 ** Locla prototypes
 */
-static int line_is_tagged P_((int n));
-static void show_tagged_lines P_((void));
-static int bld_sline P_((int i));
-static int draw_sline P_((int i, int full));
-static int prompt_subject_num P_((int ch));
-static void decr_tagged P_((int tag));
-static void update_group_page P_((void));
-static void show_group_title P_((int clear_title));
+static int bld_sline (int i);
+static int draw_sline (int i, int full);
+static int prompt_subject_num (int ch);
+static void update_group_page (void);
+static void show_group_title (int clear_title);
 
 
 static int

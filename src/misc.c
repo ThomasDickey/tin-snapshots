@@ -18,9 +18,7 @@
 /*
 ** Local prototypes
 */
-
-static char * escape_shell_meta P_((char *source, int quote_area));
-static int strfeditor P_((char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format));
+static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 
 #ifdef M_UNIX
 /*

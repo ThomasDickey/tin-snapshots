@@ -58,43 +58,17 @@ struct msg_header {
 /*
 ** Local prototypes
 */
-static int msg_add_x_body P_((FILE *fp_out, char *body));
-static int msg_write_headers P_((FILE *fp));
-static int pcCopyArtHeader P_((int iHeader, char *pcArt, char *result));
-static int prompt_to_edit P_((void));
-static int prompt_to_send P_((char *subject));
-static int submit_mail_file P_((char *file));
-static t_bool check_article_to_be_posted P_((char *the_article, int art_type, int *lines));
-static t_bool damaged_id P_((char *id));
-static t_bool insert_from_header P_((char *infile));
-static t_bool is_crosspost P_((char *xref));
-static t_bool must_include P_((char *id));
-static t_bool repair_article P_((char *result));
-static void appendid P_((char **where, char **what));
-static void do_prompt1 P_(( char *format, int ch_default));
-static void do_prompt2 P_(( char *format, char *subject, int ch_default));
-static void postpone_article P_(( char *the_article));
-static void find_reply_to_addr P_((int respnum, char *from_addr));
-static void join_references P_((char *buffer, char *oldrefs, char *newref));
-static void modify_headers P_((char *line));
-static void msg_add_header P_((char *name, char *text));
-static void msg_add_x_headers P_((char *headers));
-static void msg_free_headers P_((void));
-static void msg_init_headers P_((void));
-static void setup_check_article_screen P_((int *init));
-static void skip_id P_((char **id));
-static void update_active_after_posting P_((char *newsgroups));
-static void update_posted_info_file P_((char *group, int action, char *subj));
-static void update_posted_msgs_file P_((char *file, char *addr));
-static void append_postponed_file P_((char *file, char *addr));
-static int fetch_postponed_article P_((char tmp_file[], char subject[], char newsgroups[]));
-static void post_existing_article P_((void));
-static int prompt_rejected P_((void));
-static char *backup_article_name P_((char *the_article));
-static void backup_article P_((char *the_article));
+static int msg_add_x_body (FILE *fp_out, char *body);
+static int pcCopyArtHeader (int iHeader, char *pcArt, char *result);
+static int submit_mail_file (char *file);
+static void postpone_article ( char *the_article);
+static void find_reply_to_addr (int respnum, char *from_addr);
+static void msg_add_x_headers (char *headers);
+static void setup_check_article_screen (int *init);
+static void update_active_after_posting (char *newsgroups);
 
 #ifdef FORGERY
-static void make_path_header P_((char *line, char *from_name));
+static void make_path_header (char *line, char *from_name);
 #endif /* FORGERY */
 
 
@@ -156,7 +130,7 @@ prompt_to_send(
 }
 
 static int
-prompt_rejected()
+prompt_rejected(void)
 {
 	int ch;
 	char ch_default = iKeyPostPostpone;
@@ -1044,7 +1018,7 @@ post_article_postponed:
  */
 
 static void
-post_existing_article ()
+post_existing_article (void)
 {
 	char ch;
 	char group[HEADER_LEN];

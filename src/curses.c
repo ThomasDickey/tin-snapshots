@@ -207,7 +207,7 @@ static int in_inverse;			/* 1 when in inverse, 0 otherwise */
 /*
 ** Local prototypes
 */
-static void ScreenSize P_((int *num_lines, int *num_columns));
+static void ScreenSize (int *num_lines, int *num_columns);
 
 
 void

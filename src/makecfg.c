@@ -28,19 +28,6 @@ MYDATA {
 	char *size;
 };
 
-static FILE *open_it P_ ((char *filename, char *mode));
-static char *string_dup P_ ((char *string));
-static char *typename_of P_((MYDATA *p));
-static int index_of P_ ((MYDATA *p));
-static int type_is_int P_ ((MYDATA *p));
-static void failed P_ ((char *name));
-static void generate_ptr P_ ((FILE * ofp, char *opt_type, char *ptr_type, int mode));
-static void generate_tbl P_ ((FILE * ofp));
-static void makecfg P_ ((FILE * input, FILE * output));
-static void parse_tbl P_ ((char *buffer));
-static void store_data P_ ((char *name, char *type, char *size));
-static void write_it P_ ((FILE * ofp, char **table));
-
 static MYDATA *all_data;
 static int line_no;
 

@@ -53,11 +53,9 @@
 /*
 ** Local prototypes
 */
-static void set_attrib P_((struct t_group *psGrp, int type, char *str, int num));
-static void set_attrib_num P_((int type, char *scope, int num));
-static void set_attrib_str P_((int type, char *scope, char *str));
-static void set_default_attributes P_((struct t_attribute *psAttrib));
-
+static void set_attrib (struct t_group *psGrp, int type, char *str, int num);
+static void set_attrib_num (int type, char *scope, int num);
+static void set_attrib_str (int type, char *scope, char *str);
 
 /*
  * global attributes

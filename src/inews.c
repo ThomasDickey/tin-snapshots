@@ -44,11 +44,6 @@ static const char *inews_mail_domain = INEWS_MAIL_DOMAIN;
 #define INEWS_MAIL_DOMAIN inews_mail_domain
 #endif
 
-/*
-** Local prototypes
-*/
-static int submit_inews P_((char *name));
-
 static int
 submit_inews (
 	char *name)

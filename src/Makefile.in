@@ -14,14 +14,6 @@ DEBUG	= @ENABLE_DEBUG@ -DDEBUG #-DDEBUG_NEWSRC -DPROFILE -DDEBUG_REFS
 CPPOPTS	= @DEFS@ -I. -I../include -I$(INCDIR) $(DEBUG) @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 
-CPROTO_OPTS = -d -e -m $(CPPOPTS) \
-	-DDEBUG_NEWSRC \
-	-DFORGERY \
-	-DHAVE_COLOR \
-	-DHAVE_MH_MAIL_HANDLING \
-	-DHAVE_REF_THREADING \
-	-DLOCAL_CHARSET
-
 LD	= $(CC)
 LDFLAGS	= @LDFLAGS@
 YACC	= @YACC@
@@ -52,7 +44,6 @@ SRCDIR	= $(srcdir)
 CFLOW	= cflow
 CP	= cp
 CHMOD	= chmod
-CPROTO	= cproto
 CSCOPE	= cscope
 ECHO	= echo
 LINT	= lint
@@ -248,7 +239,6 @@ help:
 	@$(ECHO) " "
 	@$(ECHO) "    make [all]           [ Build the binary for your OS ]"
 	@$(ECHO) "    make clean           [ Delete all object files ]"
-	@$(ECHO) "    make proto           [ Regenerate ../include/proto.h ]"
 	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
 	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
 	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
@@ -310,15 +300,6 @@ cflow:
 cscope:
 	@$(ECHO) "Creating cscope database $(PROJECT)..."
 	@$(CSCOPE) $(ALL_FILES)
-
-proto:
-	@$(ECHO) "Generating function prototypes to $(INCDIR)/proto.h..."
-	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
-	@-$(CP) $(INCDIR)/proto.h $(INCDIR)/protoold.h
-	@$(CPROTO) $(CPROTO_OPTS) $(CFILES) | sed -f proto.sed > $(INCDIR)/protonew.h
-	@-$(CHMOD) 0644 $(INCDIR)/proto.h
-	@-$(MV) $(INCDIR)/protonew.h $(INCDIR)/proto.h
-	@$(LS) $(INCDIR)/proto.h
 
 TIN_DEP	= \
 	Makefile \

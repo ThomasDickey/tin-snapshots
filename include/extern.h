@@ -25,169 +25,169 @@
  * are enabled.  (Not all of the functions are ANSI or POSIX).
  */
 #ifdef DECL_BCOPY
-extern int bcopy P_((char *, char *, int));
+extern int bcopy (char *, char *, int);
 #endif
 #ifdef DECL_BZERO
-extern void bzero P_((char *, int));
+extern void bzero (char *, int);
 #endif
 #ifdef DECL_FCLOSE
-extern int fclose P_((FILE *));
+extern int fclose (FILE *);
 #endif
 #ifdef DECL_FDOPEN
-extern FILE *fdopen P_((int, const char *));
+extern FILE *fdopen (int, const char *);
 #endif
 #ifdef DECL_FFLUSH
-extern int fflush P_((FILE *));
+extern int fflush (FILE *);
 #endif
 #ifdef DECL_FPRINTF
-extern int fprintf P_((FILE *, const char *, ...));
+extern int fprintf (FILE *, const char *, ...);
 #endif
 #ifdef DECL_FPUTC
-extern int fputc P_((int, FILE *));
+extern int fputc (int, FILE *);
 #endif
 #ifdef DECL_FPUTS
-extern int fputs P_((const char *, FILE *));
+extern int fputs (const char *, FILE *);
 #endif
 #ifdef DECL_FREAD
-extern size_t fread P_((void *, size_t, size_t, FILE *));
+extern size_t fread (void *, size_t, size_t, FILE *);
 #endif
 #ifdef DECL_FSEEK
-extern int fseek P_((FILE *, long, int));
+extern int fseek (FILE *, long, int);
 #endif
 #ifdef DECL_FWRITE
-extern size_t fwrite P_((void *, size_t, size_t, FILE *));
+extern size_t fwrite (void *, size_t, size_t, FILE *);
 #endif
 #ifdef DECL_GETCWD
-extern char *getcwd P_((char *, size_t));
+extern char *getcwd (char *, size_t);
 #endif
 #ifdef DECL_GETHOSTNAME
-extern int gethostname P_((char *, int));
+extern int gethostname (char *, int);
 #endif
 #ifdef DECL_GETLOGIN
-extern char *getlogin P_((void));
+extern char *getlogin (void);
 #endif
 #ifdef DECL_GETOPT
-extern int getopt P_((int, char **, char *));
+extern int getopt (int, char **, char *);
 #endif
 #ifdef DECL_GETHOSTBYNAME
-extern struct hostent *gethostbyname P_((const char *));
+extern struct hostent *gethostbyname (const char *);
 #endif
 #ifdef DECL_GETPWNAM
-extern struct passwd *getpwnam P_((const char *));
+extern struct passwd *getpwnam (const char *);
 #endif
 #ifdef DECL_GETSERVBYNAME
-extern struct servent *getservbyname P_((const char *, const char *));
+extern struct servent *getservbyname (const char *, const char *);
 #endif
 #ifdef DECL_INET_ADDR
-extern unsigned long inet_addr P_((const char *));
+extern unsigned long inet_addr (const char *);
 #endif
 #ifdef DECL_INET_NTOA
-extern char *inet_ntoa P_((struct in_addr));
+extern char *inet_ntoa (struct in_addr);
 #endif
 #ifdef DECL_IOCTL
-extern int ioctl P_((int, unsigned long, void *));
+extern int ioctl (int, unsigned long, void *);
 #endif
 #ifdef DECL_MEMSET
-extern void * memset P_((void *, int, size_t));
+extern void * memset (void *, int, size_t);
 #endif
 #ifdef DECL_MKTEMP
-extern char * mktemp P_((char *));
+extern char * mktemp (char *);
 #endif
 #ifdef DECL_PCLOSE
-extern int pclose P_((FILE *));
+extern int pclose (FILE *);
 #endif
 #ifdef DECL_PERROR
-extern void perror P_((const char *));
+extern void perror (const char *);
 #endif
 #ifdef DECL_POPEN
-extern FILE * popen P_((const char *, const char *));
+extern FILE * popen (const char *, const char *);
 #endif
 #ifdef DECL_PRINTF
-extern int printf P_((const char *, ...));
+extern int printf (const char *, ...);
 #endif
 #ifdef DECL_REWIND
-extern void rewind P_((FILE *));
+extern void rewind (FILE *);
 #endif
 #ifdef DECL_SELECT
-extern int select P_((int, fd_set *, fd_set *, fd_set *, struct timeval *));
+extern int select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
 #endif
 #ifdef DECL_SETEGID
-extern int setegid P_((gid_t));
+extern int setegid (gid_t);
 #endif
 #ifdef DECL_SETEUID
-extern int seteuid P_((uid_t));
+extern int seteuid (uid_t);
 #endif
 #ifdef DECL_SETPGRP
 #if SETPGRP_VOID
-extern pid_t setpgrp P_((void));
+extern pid_t setpgrp (void);
 #else
-extern int setpgrp P_((int, int));
+extern int setpgrp (int, int);
 #endif
 #endif /* DECL_SETPGRP */
 #ifdef DECL_SETREGID
-extern int setregid P_((gid_t, gid_t));
+extern int setregid (gid_t, gid_t);
 #endif
 #ifdef DECL_SETREUID
-extern int setreuid P_((uid_t, uid_t));
+extern int setreuid (uid_t, uid_t);
 #endif
 #ifdef DECL_SOCKET
-extern int socket P_((int, int, int));
+extern int socket (int, int, int);
 #endif
 #ifdef DECL_SSCANF
-extern int sscanf P_((const char *, const char *, ...));
+extern int sscanf (const char *, const char *, ...);
 #endif
 #ifdef DECL_STRCASECMP
-extern int strcasecmp P_((const char *, const char *));
+extern int strcasecmp (const char *, const char *);
 #endif
 #ifdef DECL_STRCHR
-extern char *strchr P_((const char *, int));
-extern char *strrchr P_((const char *, int));
+extern char *strchr (const char *, int);
+extern char *strrchr (const char *, int);
 #endif
 #ifdef DECL_STRFTIME
-extern int strftime P_((char *, int, char *, struct tm *));
+extern int strftime (char *, int, char *, struct tm *);
 #endif
 #ifdef DECL_STRNCASECMP
-extern int strncasecmp P_((const char *, const char *, size_t));
+extern int strncasecmp (const char *, const char *, size_t);
 #endif
 #ifdef DECL_STRTOL
-extern long strtol P_((const char *, char **, int));
+extern long strtol (const char *, char **, int);
 #endif
 #ifdef DECL_SYSTEM
-extern int system P_((char *));
+extern int system (char *);
 #endif
 #ifdef DECL_TGETENT
-extern int tgetent P_((char *, char *));
+extern int tgetent (char *, char *);
 #endif
 #ifdef DECL_TGETFLAG
-extern int tgetflag P_((char *));
+extern int tgetflag (char *);
 #endif
 #ifdef DECL_TGETNUM
-extern int tgetnum P_((char *));
+extern int tgetnum (char *);
 #endif
 #ifdef DECL_TGETSTR
-extern char *tgetstr P_((char *, char **));
+extern char *tgetstr (char *, char **);
 #endif
 #ifdef DECL_TGOTO
-extern char *tgoto P_((char *, int, int));
+extern char *tgoto (char *, int, int);
 #endif
 #ifdef DECL_TIME
-extern time_t time P_((time_t *));
+extern time_t time (time_t *);
 #endif
-#ifdef DECL_TOLOWER
-extern int tolower P_((int));
+#if defined(DECL_TOLOWER) && !defined(tolower)
+extern int tolower (int);
 #endif
-#ifdef DECL_TOUPPER
-extern int toupper P_((int));
+#if defined(DECL_TOUPPER) && !defined(toupper)
+extern int toupper (int);
 #endif
 #ifdef DECL_TPUTS
-extern int tputs P_((char *, int, OutcPtr));
+extern int tputs (char *, int, OutcPtr);
 #endif
 #ifdef DECL__FLSBUF
-extern int _flsbuf P_((int, FILE *));
+extern int _flsbuf (int, FILE *);
 #endif
 
 #if !__STDC__ || defined(DECL_GETENV)
-extern char *getenv P_((char *));
+extern char *getenv (char *);
 #endif
 
 #ifdef DECL_ERRNO

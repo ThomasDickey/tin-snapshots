@@ -50,21 +50,21 @@ static int gl_pos, gl_cnt = 0;	/* position and size of input */
 /*
  * local prototypes
  */
-static void gl_addchar P_((int c));
-static void gl_del P_((int loc));
-static void gl_fixup P_((int change, int cursor));
-static int gl_tab P_((char *buf, int offset, int *loc));
-static void gl_redraw P_((void));
-static void gl_newline P_((void));
-static void gl_kill P_((void));
-static void hist_add P_((void));
-static void hist_init P_((void));
-static void hist_next P_((void));
-static void hist_prev P_((void));
+static void gl_addchar (int c);
+static void gl_del (int loc);
+static void gl_fixup (int change, int cursor);
+static int gl_tab (char *buf, int offset, int *loc);
+static void gl_redraw (void);
+static void gl_newline (void);
+static void gl_kill (void);
+static void hist_add (void);
+static void hist_init (void);
+static void hist_next (void);
+static void hist_prev (void);
 
-int (*gl_in_hook) P_((char *)) = 0;
-int (*gl_out_hook) P_((char *)) = 0;
-int (*gl_tab_hook) P_((char *, int, int *)) = gl_tab;
+int (*gl_in_hook) (char *) = 0;
+int (*gl_out_hook) (char *) = 0;
+int (*gl_tab_hook) (char *, int, int *) = gl_tab;
 
 char *
 getline (

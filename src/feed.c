@@ -26,8 +26,8 @@ char proc_ch_default;			/* set in change_config_file () */
 /*
 ** Local prototypes
 */
-static int does_article_exist P_((int function, long artnum, char *path));
-static int print_file P_((char *command, int respnum, int count));
+static int does_article_exist (int function, long artnum, char *path);
+static int print_file (char *command, int respnum, int count);
 
 
 void

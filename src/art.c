@@ -27,18 +27,17 @@ static int overview_index_filename = FALSE;
 /*
  * Local prototypes
  */
-static char *pcPrintDate P_((long lSecs));
-static char *pcPrintFrom P_((struct t_article *psArt));
-static int artnum_comp P_((t_comptype *p1, t_comptype *p2));
-static int date_comp P_((t_comptype *p1, t_comptype *p2));
-static int from_comp P_((t_comptype *p1, t_comptype *p2));
-static int iReadNovFile P_((struct t_group *group, long min, long max, int *expired));
-static int parse_headers P_((char *buf, struct t_article *h));
-static int read_group P_((struct t_group *group, char *group_path, int *pcount));
-static int subj_comp P_((t_comptype *p1, t_comptype *p2));
-static int valid_artnum P_((long art));
-static void print_expired_arts P_((int num_expired));
-static void thread_by_subject P_((void));
+static char *pcPrintDate (long lSecs);
+static char *pcPrintFrom (struct t_article *psArt);
+static int artnum_comp (t_comptype *p1, t_comptype *p2);
+static int date_comp (t_comptype *p1, t_comptype *p2);
+static int from_comp (t_comptype *p1, t_comptype *p2);
+static int iReadNovFile (struct t_group *group, long min, long max, int *expired);
+static int parse_headers (char *buf, struct t_article *h);
+static int read_group (struct t_group *group, char *group_path, int *pcount);
+static int subj_comp (t_comptype *p1, t_comptype *p2);
+static int valid_artnum (long art);
+static void print_expired_arts (int num_expired);
 
 /*
  *  Construct the pointers to the basenotes of each thread

@@ -19,13 +19,10 @@
 
 #define LAST_OPTION_PAGE ((LAST_OPT - 1) / option_lines_per_page)
 
-static int match_list P_(( char *line, char *pat, char **table, size_t tablelen, int *dst));
-static void expand_rel_abs_pathname P_((int line, int col, char *str));
-static void highlight_option P_((int option));
-static void print_any_option P_((int the_option));
-static void print_option P_((enum option_enum the_option));
-static void show_config_page P_((int page_no));
-static void unhighlight_option P_((int option));
+static int match_list ( char *line, char *pat, char **table, size_t tablelen, int *dst);
+static void expand_rel_abs_pathname (int line, int col, char *str);
+static void print_any_option (int the_option);
+static void show_config_page (int page_no);
 
 /*
  *  read local & global configuration defaults

@@ -26,7 +26,7 @@ char default_art_search[LEN];
 /*
 ** Local prototypes
 */
-static int search_art_body P_((char *group_path, struct t_article *art, char *pat));
+static int search_art_body (char *group_path, struct t_article *art, char *pat);
 
 
 /*

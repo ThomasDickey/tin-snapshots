@@ -45,11 +45,8 @@ struct t_spooldir *spooldirs;		/* spooldirs on NNTP server (cdrom) */
 /*
 ** Local prototypes
 */
-static void free_newnews_array P_((void));
-static void free_spooldirs_array P_((void));
-#if 0
-static void expand_spooldirs P_((void));
-#endif
+static void free_newnews_array (void);
+static void free_spooldirs_array (void);
 
 /*
  *  Dynamic table management

@@ -106,11 +106,11 @@ char	last_put[NNTP_STRLEN];
 #	endif /* !TLI */
 
 #	ifdef EXCELAN
-		int connect P_((int, struct sockaddr *));
-		unsigned short htons P_((unsigned short));
-		unsigned long rhost P_((char **));
-		int rresvport P_((int));
-		int socket P_((int, struct sockproto *, struct sockaddr_in *, int));
+		extern int connect (int, struct sockaddr *);
+		extern unsigned short htons (unsigned short);
+		extern unsigned long rhost (char **);
+		extern int rresvport (int);
+		extern int socket (int, struct sockproto *, struct sockaddr_in *, int);
 #	endif
 
 #	ifdef DECNET

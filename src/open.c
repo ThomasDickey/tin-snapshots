@@ -17,9 +17,7 @@
 #include	"version.h"
 
 #ifdef NNTP_ABLE
-static FILE * extract_groups_from_newsrc P_((void));
-static int authenticate P_((void));
-static int authorization P_((char *server, char *authuser));
+static int authorization (char *server, char *authuser);
 #endif
 
 long head_next;
@@ -43,17 +41,6 @@ char *nntp_server = (char *)0;
 
 #ifdef NNTP_ABLE
 int get_server_nolf=0; /* this will only be set by our own nntplib.c */
-#endif
-
-/*
-** Local prototypes
-*/
-static int base_comp P_((t_comptype *p1, t_comptype *p2));
-
-#if 0
-#ifdef NNTP_ABLE
-static FILE *open_xhdr_fp P_((char *header, long min, long max));
-#endif
 #endif
 
 /* fixme - return different values for different errors
@@ -913,10 +900,11 @@ static int
 authenticate (void)
 {
 #ifdef NNTP_ABLE /* former: HAVE_GENERIC_AUTHINFO */
-	char tmpbuf[NNTP_STRLEN], *authval;
+	char tmpbuf[NNTP_STRLEN];
+	char authval[NNTP_STRLEN];
 	char *authcmd;
 	FILE *fp;
-	int builtinauth = 0;
+	t_bool builtinauth = FALSE;
 	static int cookiefd = -1;
 #ifdef HAVE_PUTENV
 	char *new_env;
@@ -932,7 +920,7 @@ authenticate (void)
 	}
 
 	if (cookiefd == -1) {
-		char *tempfile;
+		char tempfile[BUFSIZ];
 		
 		sprintf (tempfile, "%stin_AXXXXXX", TMPDIR);		
 		if (!mktemp(tempfile)) {
@@ -949,13 +937,14 @@ authenticate (void)
 		cookiefd = fileno (fp);
 	}
 
-	strcpy (tmpbuf, "authinfo generic ");
-	if ((authval = getenv ("NNTPAUTH"))) {
+	sprintf (tmpbuf, "authinfo generic ");
+	sprintf (authval, getenv ("NNTPAUTH"));
+	if (strlen(authval)) {
 		strcat (tmpbuf, authval);
 	} else {
 		strcat (tmpbuf, "any ");
 		strcat (tmpbuf, userid);
-		builtinauth = 1;
+		builtinauth = TRUE;
 	}
 	put_server (tmpbuf);
 
@@ -1176,6 +1165,9 @@ authorization (
 		strcpy (authusername, ptr);
 		authuser = &authusername[0];
 		clear_message ();
+/*
+** we should use getpass here
+*/
 		if ((ptr = getline (txt_auth_pass_needed, FALSE, (char *) 0, 0, TRUE)) == (char *) 0)
 			return FALSE;
 		strcpy (authpassword, ptr);
