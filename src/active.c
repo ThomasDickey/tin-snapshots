@@ -210,8 +210,8 @@ parse_active_line (line, max, min, moderated)
 		}
 	}
 
-	*max = (long) atol (p);
-	*min = (long) atol (q);
+	*max = atol (p);
+	*min = atol (q);
 
 	return TRUE;
 }

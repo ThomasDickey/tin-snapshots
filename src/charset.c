@@ -23,7 +23,6 @@
 #define SUB         "?"
 #define ISO_TABLES  7
 #define ISO_EXTRA   0xa0 /* beginning of second range of printable chars */
-#define EIGHT_BIT(ptr) (unsigned char *)ptr
 
 /*
  * TABSTOP(x) is the column of the character after the TAB

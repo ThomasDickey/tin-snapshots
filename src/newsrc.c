@@ -1269,7 +1269,7 @@ art_mark_will_return (group, art)
 	}
 }
 
-
+#ifdef HAVE_MH_MAIL_HANDLING
 void
 art_mark_deleted (art)
 	struct t_article *art;
@@ -1290,7 +1290,7 @@ art_mark_undeleted (art)
 wait_message("FIXME  article marked for undeletion");
 	}
 }
-
+#endif /* HAVE_MH_MAIL_HANDLING */
 
 void
 vSetDefaultBitmap (group)
@@ -1315,14 +1315,14 @@ getaline (fp)
 	FILE	*fp;
 {
 	char *buf;		/* buffer for line */
-	size_t size;	/* size of buffer */
+	size_t size;		/* size of buffer */
 	size_t inc;		/* how much to enlarge buffer */
 	size_t len;		/* # of chars stored into buf before '\0' */
 	char *p;
-	size_t thres = 512; /* initial buffer size (most lines should
+	size_t thres = 512;	/* initial buffer size (most lines should
 				     fit into this size, so think of this as
 				     the "long line threshold").  */
-	size_t mucho = 128; /* if there is at least this much wasted
+	size_t mucho = 128;	/* if there is at least this much wasted
 				     space when the whole buffer has been
 				     read, try to reclaim it.  Don't make
 				     this too small, else there is too much

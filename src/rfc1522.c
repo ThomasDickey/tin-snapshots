@@ -13,10 +13,10 @@
  */
 
 #undef MIME_BASE64_ALLOWED	/*
-				 * allow base64 encoding in headers if the
-				 * result is shorter than quoted printable
-				 * encoding. THIS IS NOT YET IMPLEMENTED,
-				 * so leave this off
+				   * allow base64 encoding in headers if the
+				   * result is shorter than quoted printable
+				   * encoding. THIS IS NOT YET IMPLEMENTED,
+				   * so leave this off
 				 */
 
 #ifndef DEBUG_MIME
@@ -31,59 +31,83 @@
 #include <malloc.h>
 #endif
 #undef MIME_BREAK_LONG_LINES	/*
-				 * define this to make TIN strictly observe
-				 * RFC1522 and break lots of other software
+				   * define this to make TIN strictly observe
+				   * RFC1522 and break lots of other software
 				 */
 #define MIME_STRICT_CHARSET	/*
-				 * define this to force MM_CHARSET obeyance
-				 * when decoding.  If you don't, everything
-				 * is thought to match your machine's charset
+				   * define this to force MM_CHARSET obeyance
+				   * when decoding.  If you don't, everything
+				   * is thought to match your machine's charset
 				 */
 #endif /* DEBUG_MIME */
 
-/* NOTE: these routines expect that MM_CHARSET is set to the charset
-   your system is using.  If it is not defined, US-ASCII is used.
-   Can be overridden by setting MM_CHARSET as environment variable. */
+#define isreturn(c) ((c) == '\r' || ((c) == '\n'))
+#define isbetween(c) (isspace(c) || (c) == '(' || (c) == ')')
+
+/*
+ * NOTE: these routines expect that MM_CHARSET is set to the charset
+ * your system is using.  If it is not defined, US-ASCII is used.
+ * Can be overridden by setting MM_CHARSET as environment variable.
+ */
 
 #ifndef MM_CHARSET
 #define MM_CHARSET "US-ASCII"
 #endif
 
+#define NOT_RANKED 255
+
 char mm_charset[128] = "";
-const char base64_alphabet[64] = {
-  'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
-  'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
-  'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
-  'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/' };
+const char base64_alphabet[64] =
+{
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+	'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+
 static unsigned char base64_rank[256];
 static int base64_rank_table_built;
 static int quoteflag;
 
-void
-build_base64_rank_table()
+static int contains_nonprintables P_ ((char *w));
+static int mystrcat P_ ((char **t, char *s));
+static int rfc1522_do_encode P_ ((char *what, char **where));
+static unsigned hex2bin P_ ((int x));
+static void build_base64_rank_table P_ ((void));
+
+#ifdef MIME_BREAK_LONG_LINES
+static int sizeofnextword P_ ((char *w));
+
+#endif
+
+static void
+build_base64_rank_table ()
 {
 	int i;
 
-	if (base64_rank_table_built) return;
-	for (i=0; i<256; i++) base64_rank[i]=255;
-	for (i=0; i<64; i++) base64_rank[(int)base64_alphabet[i]]=i;
-	base64_rank_table_built=1;
+	if (!base64_rank_table_built) {
+		for (i = 0; i < 256; i++)
+			base64_rank[i] = NOT_RANKED;
+		for (i = 0; i < 64; i++)
+			base64_rank[(int) base64_alphabet[i]] = i;
+		base64_rank_table_built = TRUE;
+	}
 }
 
-
-unsigned char 
-hex2bin(x)
+static unsigned
+hex2bin (x)
 	char x;
 {
-	if (x>='0'&&x<='9') return x-'0';
-	if (x>='A'&&x<='F') return x-'A'+10;
-	if (x>='a'&&x<='f') return x-'a'+10;
+	if (x >= '0' && x <= '9')
+		return (x - '0');
+	if (x >= 'A' && x <= 'F')
+		return (x - 'A') + 10;
+	if (x >= 'a' && x <= 'f')
+		return (x - 'a') + 10;
 	return 255;
 }
 
-
 int
-mmdecode(what, encoding, delimiter, where, charset)
+mmdecode (what, encoding, delimiter, where, charset)
 	char *what;
 	char encoding;
 	char delimiter;
@@ -94,300 +118,327 @@ mmdecode(what, encoding, delimiter, where, charset)
 	int decode_gt128 = 0;
 
 #ifdef MIME_STRICT_CHARSET
-	if (charset && !strcasecmp(charset,mm_charset)) decode_gt128=1;
+	if (charset && !strcasecmp (charset, mm_charset))
+		decode_gt128 = TRUE;
 #else
-	decode_gt128=1;
+	decode_gt128 = TRUE;
 #endif
-	t=where;
-	encoding=tolower(encoding);
-	if (encoding=='q') {  /* quoted-printable */
-		unsigned char x;
-		unsigned char hi,lo;
-		
-		while (*what!=delimiter) {
-			if (*what!='=') {
-				if (!delimiter || *what!='_')
+	t = where;
+	encoding = tolower (encoding);
+	if (encoding == 'q') {	/* quoted-printable */
+		int x;
+		unsigned hi, lo;
+
+		while (*what != delimiter) {
+			if (*what != '=') {
+				if (!delimiter || *what != '_')
 					*t++ = *what++;
 				else
 					*t++ = ' ', what++;
 				continue;
 			}
 			what++;
-			if (*what==delimiter) return -1; /* failed */
-			x=(unsigned char)(*what++);
-			if (x=='\n') continue;
-			if (*what==delimiter) return -1;
-			hi=hex2bin(x);
-			lo=hex2bin(*what);
+			if (*what == delimiter)		/* failed */
+				return -1;
+
+			x = *what++;
+			if (x == '\n')
+				continue;
+			if (*what == delimiter)
+				return -1;
+
+			hi = hex2bin (x);
+			lo = hex2bin (*what);
 			what++;
-			if (hi==255||lo==255) return -1;
-			x=(hi<<4)+lo;
-			if (x>=128 && !decode_gt128) x='?';
-			*t++=x;
+			if (hi == 255 || lo == 255)
+				return -1;
+			x = (hi << 4) + lo;
+			if (x >= 128 && !decode_gt128)
+				x = '?';
+			*EIGHT_BIT (t)++ = x;
 		}
-		return t-where;
-	}
-	else if (encoding=='b') { /* base64 */
-		static unsigned short pattern=0;
-		static int bits=0;
+		return t - where;
+	} else if (encoding == 'b') {	/* base64 */
+		static unsigned short pattern = 0;
+		static int bits = 0;
 		unsigned char x;
 
-		build_base64_rank_table();
-		if (!what || !where) { /* flush */
-			pattern=bits=0;
+		build_base64_rank_table ();
+		if (!what || !where) {	/* flush */
+			pattern = bits = 0;
 			return 0;
 		}
-		while (*what!=delimiter) {
-			x=base64_rank[(int)(*what++)];
-			if (x==255) continue; /* ignore everything not in the alphabet, including '=' */
-			pattern<<=6;
-			pattern|=x;
-			bits+=6;
-			if (bits>=8) {
-				x=(pattern>>(bits-8))&0xff;
-				if (x>=128 && !decode_gt128) x='?';
-				*t++=x;
-				bits-=8;
+		while (*what != delimiter) {
+			x = base64_rank[(int) (*what++)];
+			/* ignore everything not in the alphabet, including '=' */
+			if (x == NOT_RANKED)
+				continue;
+			pattern <<= 6;
+			pattern |= x;
+			bits += 6;
+			if (bits >= 8) {
+				x = (pattern >> (bits - 8)) & 0xff;
+				if (x >= 128 && !decode_gt128)
+					x = '?';
+				*t++ = x;
+				bits -= 8;
 			}
 		}
-		return t-where;
+		return t - where;
 	}
 	return -1;
 }
 
-
 void
-get_mm_charset()
+get_mm_charset ()
 {
 	char *c;
 
 	if (!mm_charset[0]) {
-		c=getenv("MM_CHARSET");
-		if (!c) strcpy(mm_charset,MM_CHARSET);
+		c = getenv ("MM_CHARSET");
+		if (!c)
+			strcpy (mm_charset, MM_CHARSET);
 		else {
-			strncpy(mm_charset,c,128);
-			mm_charset[127]='\0';
+			strncpy (mm_charset, c, 128);
+			mm_charset[127] = '\0';
 		}
 	}
 }
 
-
 char *
-rfc1522_decode(s)
+rfc1522_decode (s)
 	char *s;
 {
 	char *c, *d, *t;
 	static char buffer[2048];
 	char charset[256];
 	char encoding;
-	char adjacentflag=0;
+	char adjacentflag = 0;
 
-	get_mm_charset();
-	c=s;
-	t=buffer;
-	while (*c && t-buffer<2048) {
-		if (*c!='=') {
-			if (adjacentflag && isspace(*c)) {
+	get_mm_charset ();
+	c = s;
+	t = buffer;
+	while (*c && t - buffer < 2048) {
+		if (*c != '=') {
+			if (adjacentflag && isspace (*c)) {
 				char *dd;
-				dd=c+1;
-				while (isspace(*dd)) dd++;
-				if (*dd=='=') { /* brute hack, makes mistakes under certain circumstances comp. 6.2 */
+
+				dd = c + 1;
+				while (isspace (*dd))
+					dd++;
+				if (*dd == '=') {	/* brute hack, makes mistakes under certain circumstances comp. 6.2 */
 					c++;
 					continue;
 				}
 			}
-			adjacentflag=0;
+			adjacentflag = 0;
 			*t++ = *c++;
 			continue;
 		}
-		d=c++;
-		if (*c=='?') {
+		d = c++;
+		if (*c == '?') {
 			char *e;
+
 			e = charset;
 			c++;
-			while (*c && *c != '?') *e++ = *c++;
+			while (*c && *c != '?')
+				*e++ = *c++;
 			*e = 0;
 			if (*c == '?') {
 				c++;
-				encoding=tolower(*c);
-				if (encoding=='b')
-					mmdecode((char*)0,'b',0,(char*)0,(char*)0); /* flush */
+				encoding = tolower (*c);
+				if (encoding == 'b')
+					mmdecode ((char *) 0, 'b', 0, (char *) 0, (char *) 0);	/* flush */
 				c++;
-				if (*c=='?') {
+				if (*c == '?') {
 					c++;
-					if ((e=strchr(c,'?'))) {
+					if ((e = strchr (c, '?'))) {
 						int i;
-						i=mmdecode(c,encoding,'?',t,charset);
-						if (i>0) {
-							t+=i;
+
+						i = mmdecode (c, encoding, '?', t, charset);
+						if (i > 0) {
+							t += i;
 							e++;
-							if (*e=='=') e++;
-							d=c=e;
-							adjacentflag=1;
+							if (*e == '=')
+								e++;
+							d = c = e;
+							adjacentflag = TRUE;
 						}
 					}
 				}
 			}
 		}
-		while (d!=c) *t++ = *d++;
+		while (d != c)
+			*t++ = *d++;
 	}
-	*t=0;
+	*t = '\0';
 	return buffer;
 }
 
-
-int
-contains_nonprintables(w)
-	unsigned char *w;
+static int
+contains_nonprintables (w)
+	char *w;
 {
-#ifdef MIME_BASE64_ALLOWED	
-	int chars=0;
-	int schars=0;
+#ifdef MIME_BASE64_ALLOWED
+	int chars = 0;
+	int schars = 0;
+
 #endif
-	int nonprint=0;
+	int nonprint = 0;
 
 	/* first skip all leading whitespaces */
-  	while (*w&&isspace(*w)) w++;
-  	
-	/* then check the next word */
-	while (*w&&!isspace(*w)&&*w!='('&&*w!=')') {
-		if (*w<32||*w>127) nonprint++;
-		if (!nonprint && *w=='=' && *(w+1)=='?') nonprint=1;
-#ifdef MIME_BASE64_ALLOWED
-		if (*w=='=' || *w=='?' || *w=='_') schars++;
-		chars++;
-#endif		
+	while (*w && isspace (*w))
 		w++;
-  	}
+
+	/* then check the next word */
+	while (*w && !isbetween (*w)) {
+		if (is_EIGHT_BIT (w))
+			nonprint++;
+		if (!nonprint && *w == '=' && *(w + 1) == '?')
+			nonprint = TRUE;
+#ifdef MIME_BASE64_ALLOWED
+		if (*w == '=' || *w == '?' || *w == '_')
+			schars++;
+		chars++;
+#endif
+		w++;
+	}
 	if (nonprint) {
 #ifdef MIME_BASE64_ALLOWED
-		if (chars+2*(nonprint+schars) /* QP size */ >
-		   (chars*4+3)/3 /* B64 size */) return 'B';
+		if (chars + 2 * (nonprint + schars) /* QP size */ >
+		    (chars * 4 + 3) / 3 /* B64 size */ )
+			return 'B';
 #endif
 		return 'Q';
 	}
-  	return 0;
+	return 0;
 }
 
-int
-sizeofnextword(w)
-	unsigned char *w;
+#ifdef MIME_BREAK_LONG_LINES
+static int
+sizeofnextword (w)
+	char *w;
 {
-	unsigned char *x;
+	char *x;
 
-	x=w;
-	while (*x&&isspace(*x)) x++;
-	while (*x&&!isspace(*x)) x++;
-	return x-w;
+	x = w;
+	while (*x && isspace (*x))
+		x++;
+	while (*x && !isspace (*x))
+		x++;
+	return x - w;
 }
+#endif
 
-
-int
-mystrcat(t,s)
+static int
+mystrcat (t, s)
 	char **t;
 	char *s;
 {
-	int len=0;
+	int len = 0;
 
 	while (*s) {
 		*((*t)++) = *s++;
 		len++;
 	}
-	**t=0;
+	**t = 0;
 	return len;
 }
 
-
-int
-rfc1522_do_encode(what, where)
-	unsigned char *what;
-	unsigned char **where;
+static int
+rfc1522_do_encode (what, where)
+	char *what;
+	char **where;
 {
-  /* We need to meet several partly contradictional requirements here.
-     First of all, a line containing MIME encodings must not be longer
-     than 76 chars (including delimiters, charset, encoding).  Second,
-     we should not encode more than necessary.  Third, we should not
-     produce more overhead than absolutely necessary; this means we
-     should extend chunks over several words if there are more
-     characters-to-quote to come.  This means we have to rely on some
-     heuristics.  We process whole words, checking if it contains
-     characters to be quoted.  If not, the word is output 'as is',
-     previous quoting being terminated before.  If two adjoining words
-     contain non-printable characters, they are encoded together (up
-     to 60 characters).  If a resulting encoded word would break the
-     76 characters boundary, we 'break' the line, output a SPACE, then
-     output the encoded word.  Note that many wide-spread news applications,
-     notably INN's xover support, does not understand multiple-lines,
-     so it's a compile-time feature with default off.
+	/* We need to meet several partly contradictional requirements here.
+	   First of all, a line containing MIME encodings must not be longer
+	   than 76 chars (including delimiters, charset, encoding).  Second,
+	   we should not encode more than necessary.  Third, we should not
+	   produce more overhead than absolutely necessary; this means we
+	   should extend chunks over several words if there are more
+	   characters-to-quote to come.  This means we have to rely on some
+	   heuristics.  We process whole words, checking if it contains
+	   characters to be quoted.  If not, the word is output 'as is',
+	   previous quoting being terminated before.  If two adjoining words
+	   contain non-printable characters, they are encoded together (up
+	   to 60 characters).  If a resulting encoded word would break the
+	   76 characters boundary, we 'break' the line, output a SPACE, then
+	   output the encoded word.  Note that many wide-spread news applications,
+	   notably INN's xover support, does not understand multiple-lines,
+	   so it's a compile-time feature with default off.
 
-     To make things a bit easier, we do all processing in two stages;
-     first we build all encoded words without any bells and whistles
-     (just checking that they don get longer than 76 characters),
-     then, in a second pass, we replace all SPACEs inside encoded
-     words by '_', break long lines, etc. */
+	   To make things a bit easier, we do all processing in two stages;
+	   first we build all encoded words without any bells and whistles
+	   (just checking that they don get longer than 76 characters),
+	   then, in a second pass, we replace all SPACEs inside encoded
+	   words by '_', break long lines, etc. */
 
-	int quoting=0;		/* currently inside quote block? */
+	int quoting = 0;	/* currently inside quote block? */
 	int encoding;		/* which encoding to use ('B' or 'Q') */
-	int any_quoting_done=0;
-#ifdef MIME_BREAK_LONG_LINES
-	int column=0;		/* current column */
-#endif
-	int ewsize=0;		/* size of current encoded-word */
-	unsigned char buf[2048];/* buffer for encoded stuff */
-	unsigned char buf2[64];	/* buffer for this and that */
-	unsigned char *c;
-	unsigned char *t;
-	int word_cnt=0;
+	int any_quoting_done = 0;
 
-	t=buf;
+#ifdef MIME_BREAK_LONG_LINES
+	int column = 0;		/* current column */
+
+#endif
+	int ewsize = 0;		/* size of current encoded-word */
+	char buf[2048];		/* buffer for encoded stuff */
+	char buf2[64];		/* buffer for this and that */
+	char *c;
+	char *t;
+	int word_cnt = 0;
+
+	t = buf;
 	while (*what) {
 		word_cnt++;
-		if ((encoding=contains_nonprintables(what))) {
+		if ((encoding = contains_nonprintables (what))) {
 			if (!quoting) {
-				sprintf((char *)buf2,"=?%s?%c?",mm_charset,encoding);
-				ewsize=mystrcat((char **)&t,(char *)buf2);
+				sprintf (buf2, "=?%s?%c?", mm_charset, encoding);
+				ewsize = mystrcat (&t, buf2);
 #ifdef MIME_BREAK_LONG_LINES
-				if(word_cnt==2) {
-				  /* make sure we fit the first
-                                     encoded word in with the header
-                                     keyword, since we cannot break
-                                     the line directly after the
-                                     keyword.*/
-				  ewsize=t-buf;
+				if (word_cnt == 2) {
+					/* Make sure we fit the first encoded
+					 * word in with the header keyword,
+					 * since we cannot break the line
+					 * directly after the keyword.
+					 */
+					ewsize = t - buf;
 				}
 #endif
-				quoting=1;
-				any_quoting_done=1;
+				quoting = TRUE;
+				any_quoting_done = TRUE;
 			}
-			while (*what && !isspace(*what)&&*what!='('&&*what!=')') {
-				if (*what<32||*what>127||*what=='='||*what=='?'||*what=='_') {
-					sprintf((char *)buf2,"=%2.2X",*what);
-					*t++=buf2[0];
-					*t++=buf2[1];
-					*t++=buf2[2];
-					ewsize+=3;
+			while (*what && !isbetween (*what)) {
+				if (is_EIGHT_BIT (what)
+				    || *what == '='
+				    || *what == '?'
+				    || *what == '_') {
+					sprintf (buf2, "=%2.2X", *EIGHT_BIT (what));
+					*t++ = buf2[0];
+					*t++ = buf2[1];
+					*t++ = buf2[2];
+					ewsize += 3;
 				} else {
 					*t++ = *what;
 					ewsize++;
 				}
 				what++;
-				/* be sure to encode at least one
-                                   char, even if that overflows the
-                                   line limit, otherwise, we will be
-                                   stuck in a loop (if this were in
-                                   the while condition above). (Can
-                                   only happen in the first line, if
-                                   we have a very long header keyword,
-                                   I think) */
-				if(ewsize>=71) {
-				  break;
+				/* Be sure to encode at least one char, even if
+				 * that overflows the line limit, otherwise, we
+				 * will be stuck in a loop (if this were in the
+				 * while condition above).  (Can only happen in
+				 * the first line, if we have a very long
+				 * header keyword, I think).
+				 */
+				if (ewsize >= 71) {
+					break;
 				}
 			}
-			if (!contains_nonprintables(what) || ewsize>=60) {
+			if (!contains_nonprintables (what) || ewsize >= 60) {
 				/* next word is 'clean', close encoding */
-				*t++='?';
-				*t++='=';
-				ewsize+=2;
+				*t++ = '?';
+				*t++ = '=';
+				ewsize += 2;
 #ifdef MIME_BREAK_LONG_LINES
 /* if our line is too long, but the next word will not be quoted, we
    just use the space that separates the words as header continuation
@@ -406,202 +457,213 @@ rfc1522_do_encode(what, where)
    non-whitespace strings of up to 75 chars, delimited by whitespace
    or the line start/end, so we break and insert a space here also. */
 #endif
-				if(ewsize>=60 && contains_nonprintables(what)) {
-				  *t++=' ';
-				  ewsize++;
+				if (ewsize >= 60 && contains_nonprintables (what)) {
+					*t++ = ' ';
+					ewsize++;
 				}
-				quoting=0;
+				quoting = 0;
 			} else {
 				/* process whitespace in-between by quoting it properly */
-				while (*what&&isspace(*what)) {
-					if (*what==32 /* not ' ', compare chapter 4! */) {
-						*t++='_';
+				while (*what && isspace (*what)) {
+					if (*what == 32 /* not ' ', compare chapter 4! */ ) {
+						*t++ = '_';
 						ewsize++;
 					} else {
-						sprintf((char *)buf2,"=%2.2X",*what);
-						*t++=buf2[0];
-						*t++=buf2[1];
-						*t++=buf2[2];
-						ewsize+=3;
+						sprintf (buf2, "=%2.2X", *EIGHT_BIT (what));
+						*t++ = buf2[0];
+						*t++ = buf2[1];
+						*t++ = buf2[2];
+						ewsize += 3;
 					}
 					what++;
 				}
 			}
 		} else {
-			while (*what&&!isspace(*what)&&*what!='('&&*what!=')')
-				*t++ = *what++; /* output word unencoded */
-			while ((*what&&isspace(*what))||*what=='('||*what==')')
-				*t++ = *what++; /* output trailing whitespace unencoded */
+			while (*what && !isbetween (*what))
+				*t++ = *what++;		/* output word unencoded */
+			while (*what && isbetween (*what))
+				*t++ = *what++;		/* output trailing whitespace unencoded */
 		}
 	}
-	*t=0;
+	*t = 0;
 	/* Pass 2: break long lines if there are MIME-sequences in the result */
-	c=buf;
+	c = buf;
 #ifdef MIME_BREAK_LONG_LINES
-	column=0;
+	column = 0;
 	if (any_quoting_done) {
-		word_cnt=1; /* note, if the user has typed a
-			       continuation line, we will consider the
-			       initial whitespace to be delimiting
-			       word one (well, just assume an empty
-			       word). */
+		word_cnt = 1;	/* note, if the user has typed a
+				   continuation line, we will consider the
+				   initial whitespace to be delimiting
+				   word one (well, just assume an empty
+				   word). */
 		while (*c) {
-			if (isspace(*c)) {
-			  /* according to rfc1522, header lines
-                             containg encoded words are limited to 76
-                             chars, but if the first line is too long
-                             (due to a long header keyword), we cannot
-                             stick to that, since we would break the
-                             line directly after the keyword's colon,
-                             which is not allowed. The same is
-                             necessary for a continuation line with an
-                             unencoded word that is too long. */
-				if (sizeofnextword(c)+column>76 && word_cnt!=1) {
-					*((*where)++)='\n';
-					column=0;
+			if (isspace (*c)) {
+				/* According to rfc1522, header lines
+				 * containing encoded words are limited to 76
+				 * chars, but if the first line is too long
+				 * (due to a long header keyword), we cannot
+				 * stick to that, since we would break the line
+				 * directly after the keyword's colon, which is
+				 * not allowed.  The same is necessary for a
+				 * continuation line with an unencoded word
+				 * that is too long.
+				 */
+				if (sizeofnextword (c) + column > 76 && word_cnt != 1) {
+					*((*where)++) = '\n';
+					column = 0;
 				}
-				if(c>buf && !isspace(*(c-1))) {
-				  word_cnt++;
+				if (c > buf && !isspace (*(c - 1))) {
+					word_cnt++;
 				}
-				*((*where)++)=*c++;
+				*((*where)++) = *c++;
 				column++;
-			}
-			else while (*c&&!isspace(*c)) {
-				*((*where)++)=*c++;
-				column++;
-			}
+			} else
+				while (*c && !isspace (*c)) {
+					*((*where)++) = *c++;
+					column++;
+				}
 		}
 	}
 #else
 	if (0);
 #endif
 	else {
-		while (*c) *((*where)++) = *c++;
+		while (*c)
+			*((*where)++) = *c++;
 	}
-	**where=0;
+	**where = 0;
 	return any_quoting_done;
 }
 
-
 char *
-rfc1522_encode(s)
+rfc1522_encode (s)
 	char *s;
 {
 	static char buf[2048];
-	unsigned char *b;
+	char *b;
 	int x;
 
-	get_mm_charset();
-	b=(unsigned char *)buf;
-	x=rfc1522_do_encode((unsigned char *)s,&b);
-	quoteflag=quoteflag || x;
+	get_mm_charset ();
+	b = buf;
+	x = rfc1522_do_encode (s, &b);
+	quoteflag = quoteflag || x;
 	return buf;
 }
 
 void
-rfc15211522_encode(filename, mime_encoding)
+rfc15211522_encode (filename, mime_encoding)
 	char *filename;
 	char *mime_encoding;
 {
 	FILE *f;
 	FILE *g;
-	unsigned char header[4096];
-	unsigned char buffer[2048];
-	unsigned char *c, *d;
+	char header[4096];
+	char buffer[2048];
+	char *c, *d;
 	int umlauts = 0;
 	int body_encoding_needed = 0;
 	char encoding;
 
-	g=tmpfile();
-	if (!g) return;
-	f=fopen(filename,"r");
+	g = tmpfile ();
+	if (!g)
+		return;
+	f = fopen (filename, "r");
 	if (!f) {
-		fclose(g);
+		fclose (g);
 		return;
 	}
-	header[0]=0;
-	d=header;
-	quoteflag=0;
-	while (fgets((char *)buffer,2048,f)) {
-		if (header[0]&&(!isspace(buffer[0])||buffer[0]=='\r'||buffer[0]=='\n')) {
-			fputs(rfc1522_encode((char *)header),g);
- 			fputc('\n',g);
-			header[0]=0;
-			d=header;
+	header[0] = 0;
+	d = header;
+	quoteflag = 0;
+	while (fgets (buffer, 2048, f)) {
+		if (header[0]
+		    && (!isspace (buffer[0]) || isreturn (buffer[0]))) {
+			fputs (rfc1522_encode (header), g);
+			fputc ('\n', g);
+			header[0] = '\0';
+			d = header;
 		}
-		if (buffer[0]=='\n'||buffer[0]=='\r') break;
-		c=buffer;
-		while (*c&&*c!='\r'&&*c!='\n') *d++ = *c++;
-		*d=0;
-	}
-	fputc('\n',g);
-	while (fgets((char *)buffer,2048,f)) {
-		fputs((char *)buffer,g);
-		/* see if there are any umlauts in the body... */
-		for (c=buffer; *c&&!*c!='\r'&&*c!='\n'; c++) 
-		if (*c<32||*c>127) {
-			umlauts=1;
-			body_encoding_needed=1;
+		if (isreturn (buffer[0]))
 			break;
-      		}
+		c = buffer;
+		while (*c && !isreturn (*c))
+			*d++ = *c++;
+		*d = 0;
 	}
-	fclose(f);
-	rewind(g);
-	f=fopen(filename,"w");
+	fputc ('\n', g);
+	while (fgets (buffer, 2048, f)) {
+		fputs (buffer, g);
+		/* see if there are any umlauts in the body... */
+		for (c = buffer; *c && !isreturn (*c); c++)
+			if (is_EIGHT_BIT (c)) {
+				umlauts = TRUE;
+				body_encoding_needed = TRUE;
+				break;
+			}
+	}
+	fclose (f);
+	rewind (g);
+	f = fopen (filename, "w");
 	if (!f) {
-		fclose(g);
+		fclose (g);
 		return;
 	}
-	while (fgets((char *)buffer,2048,g)) {
-		if (buffer[0]=='\r'||buffer[0]=='\n') break;
-		fputs((char *)buffer,f);
-	}
+	while (fgets (buffer, 2048, g)
+	       && !isreturn (buffer[0]))
+		fputs (buffer, f);
 
 	/* now add MIME headers as necessary */
-#if 0  /* RFC1522 does not require MIME headers just because there are
-	   encoded header lines */
-  	if (quoteflag||umlauts) {
+#if 0				/* RFC1522 does not require MIME headers just because there are
+				   encoded header lines */
+	if (quoteflag || umlauts) {
 #else
 	if (umlauts) {
 #endif
-		fputs("MIME-Version: 1.0\n",f);
+		fputs ("MIME-Version: 1.0\n", f);
 		if (body_encoding_needed) {
-			fprintf(f,"Content-Type: text/plain; charset=%s\n",mm_charset);
-			fprintf(f,"Content-Transfer-Encoding: %s\n",mime_encoding);
+			fprintf (f, "Content-Type: text/plain; charset=%s\n", mm_charset);
+			fprintf (f, "Content-Transfer-Encoding: %s\n", mime_encoding);
 		} else {
-			fputs("Content-Type: text/plain; charset=US-ASCII\n",f);
-			fputs("Content-Transfer-Encoding: 7bit\n",f);
+			fputs ("Content-Type: text/plain; charset=US-ASCII\n", f);
+			fputs ("Content-Transfer-Encoding: 7bit\n", f);
 		}
 	}
-	fputc('\n',f);
+	fputc ('\n', f);
 
-	if (!strcasecmp(mime_encoding,"base64")) encoding='b';
-	else if (!strcasecmp(mime_encoding,"quoted-printable")) encoding='q';
-	else encoding='8';
+	if (!strcasecmp (mime_encoding, "base64"))
+		encoding = 'b';
+	else if (!strcasecmp (mime_encoding, "quoted-printable"))
+		encoding = 'q';
+	else
+		encoding = '8';
 
-	if (!body_encoding_needed) encoding='8';
+	if (!body_encoding_needed)
+		encoding = '8';
 
-	while (fgets((char *)buffer,2048,g)) {
-		rfc1521_encode(buffer,f,encoding);
+	while (fgets (buffer, 2048, g)) {
+		rfc1521_encode (buffer, f, encoding);
 	}
-	if (encoding=='b' || encoding=='q')
-	  rfc1521_encode(NULL,f,encoding); /* flush */
+	if (encoding == 'b' || encoding == 'q')
+		rfc1521_encode (NULL, f, encoding);	/* flush */
 
-	fclose(g);
-	fclose(f);
+	fclose (g);
+	fclose (f);
 }
-
 
 #ifdef DEBUG_MIME
 #define xTESTHEADER "vorher =?ISO-8859-1?Q?Kristian_K=F6hntopp?= nachher"
 #define yTESTHEADER "vorher =?ISO-8859-1?B?S3Jpc3RpYW4gS/ZobnRvcHA=?= nachher"
 #define TESTHEADER "Kristian Köhntopp 	Müller 123 (hähäsdkäfas)."
 
-main()
+void
+main (argc, argv)
+	int argc;
+	char *argv[];
 {
-  char *c;
+	char *c;
 
-  printf("%s\n",c=rfc1522_encode(TESTHEADER));
-  printf("%s\n",rfc1522_decode(c));
+	printf ("%s\n", c = rfc1522_encode (TESTHEADER));
+	printf ("%s\n", rfc1522_decode (c));
 }
+
 #endif /* DEBUG_MIME */
