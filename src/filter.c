@@ -588,7 +588,7 @@ get_choice (x, help, prompt, opt1, opt2, opt3, opt4, opt5)
 			continue;
 		if (++i == n)
 			i = 0;
-	} while (ch != CR && ch != ESC);
+	} while (ch != '\n' && ch != '\r' && ch != ESC);
 
 	if (ch == ESC)
 		return (-1);
@@ -868,7 +868,7 @@ filter_menu (type, group, art)
 			sprintf (msg, "%s%c", ptr_filter_quit_edit_save, ch_default);
 			wait_message (msg);
 			MoveCursor (cLINES, (int) strlen (ptr_filter_quit_edit_save));
-			if ((ch = ReadCh ()) == CR)
+			if ((ch = ReadCh ()) == '\r' || ch == '\n')
 				ch = ch_default;
 		} while (! strchr ("eqs\033", ch));
 		switch (ch) {

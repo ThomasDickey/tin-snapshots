@@ -496,11 +496,18 @@ select_done:
 				group_selection_page ();
 				break;
 
-			case iKeySelectQuit2:   /* quit, no ask */
+			case iKeySelectQuit2:	/* quit, no ask */
 				write_config_file (local_config_file);
 				tin_done (EXIT_OK);
                                 break;
-
+                                
+			case iKeySelectQuitNoWrite:	/* quit, but don't save configuration */
+				if (prompt_yn (cLINES, txt_quit_no_write, TRUE)==1) {
+					tin_done (EXIT_OK);
+				}
+				group_selection_page ();
+				break;
+				
 			case iKeySelectToggleReadDisplay:
 	 			/* 
 	 			 * If in show_only_unread_groups mode toggle

@@ -24,6 +24,9 @@ AC_PROG_YACC
 CF_WITH_PROGRAM(uname,
 [  --with-uname            (default: from system path)])
 
+CF_WITH_PROGRAM(hostname,
+[  --with-hostname         (default: from system path)])
+
 CF_WITH_PROGRAM(ispell,
 [  --with-ispell           (default: from system path)])
 
@@ -33,44 +36,64 @@ CF_WITH_PROGRAM(metamail,
 CF_WITH_PROGRAM(pgp,
 [  --with-pgp              (default: from system path)])
 
-###	use option --enable-debug to compile-in test/development code
-AC_ARG_ENABLE(debug,
-	[  --enable-debug          turn on debug/profiling/traces],
-	[with_debug=$enableval],
-	[with_debug=no])
-if test $with_debug = no; then
-	if test -z "$save_CFLAGS"; then
-		CFLAGS=`echo $CFLAGS|sed -e 's/-g //'`
-	fi
+### check for this early, since it'll override several options
+AC_MSG_CHECKING(if NNTP-support will be used)
+CF_ARG_DISABLE(nntp,
+	[  --enable-nntp           reading via NNTP],
+	[USE_NNTP=no],
+	[USE_NNTP=yes])
+AC_MSG_RESULT($enableval)
+
+USE_SPOOLDIR=yes
+if test "$USE_NNTP" = "yes" ; then
+AC_MSG_CHECKING(whether to be NNTP_ONLY)
+CF_ARG_ENABLE(nntp-only,
+	[  --enable-nntp-only      reading via NNTP only],
+	[AC_DEFINE(NNTP_ONLY)
+	 USE_SPOOLDIR=no],
+	[AC_DEFINE(NNTP_ABLE)])
+AC_MSG_RESULT($enableval)
 fi
 
+###	use option --enable-debug to compile-in test/development code
+AC_MSG_CHECKING(if you want to compile-in debug support)
+CF_ARG_ENABLE(debug,
+	[  --enable-debug          turn on debug/profiling/traces],
+	[ENABLE_DEBUG=''
+    CFLAGS="-g $CFLAGS"],
+	[ENABLE_DEBUG='#'
+    test -z "$save_CFLAGS" && CFLAGS=`echo $CFLAGS|sed -e 's/-g //'`])
+AC_MSG_RESULT($enableval)
+AC_SUBST(ENABLE_DEBUG)
+
 ###	use option --disable-echo to suppress full display compiling commands
-AC_ARG_ENABLE(echo,
-	[  --enable-echo           display \"compiling\" commands (default)],
-	[with_echo=$enableval],
-	[with_echo=yes])
-if test $with_echo = yes; then
-	SHOW_CC='# compiling'
-	ECHO_CC=''
-else
-	SHOW_CC='	@echo compiling $@'
-	ECHO_CC='@'
-fi
+AC_MSG_CHECKING(if you want to see long compiling messages)
+CF_ARG_DISABLE(echo,
+	[  --enable-echo           display \"compiling\" commands],
+	[SHOW_CC='	@echo compiling $@'
+    ECHO_CC='@'],
+	[SHOW_CC='# compiling'
+    ECHO_CC=''])
+AC_MSG_RESULT($enableval)
 AC_SUBST(SHOW_CC)
 AC_SUBST(ECHO_CC)
 
 ### use option --enable-prototypes to turn on optional prototypes
-AC_ARG_ENABLE(prototypes,
+AC_MSG_CHECKING(if you want to compile with fallback prototypes)
+CF_ARG_ENABLE(prototypes,
 	[  --enable-prototypes     check for optional prototypes],
-	[with_decl_check=$enableval],
+	[with_decl_check=yes],
 	[with_decl_check=no])
+AC_MSG_RESULT($enableval)
 
 ###	use option --enable-warnings to turn on all gcc warnings
-AC_ARG_ENABLE(warnings,
-	[  --enable-warnings       turn on GCC compiler warnings],
-	[with_warnings=$enableval])
 if test -n "$GCC"
 then
+AC_MSG_CHECKING(if you want to turn on gcc warnings)
+CF_ARG_ENABLE(warnings,
+	[  --enable-warnings       turn on GCC compiler warnings],
+	[with_warnings=yes],
+	[with_warnings=no])
 	# gcc 2.5.8 doesn't recognize some other useful options that could
 	# be configured if you have gcc 2.6.3:
 	# -Wbad-function-cast
@@ -82,6 +105,7 @@ then
 	then
 		CFLAGS="$CFLAGS -Wall -Winline -Wstrict-prototypes -Wmissing-prototypes"
 	fi
+AC_MSG_RESULT($enableval)
 fi
 
 ## options for directories
@@ -102,6 +126,13 @@ CF_WITH_PATH(overviewdir,
 	[  --with-nov-dir=PATH     news overview-directory],
 	NOVROOTDIR,$SPOOLDIR)
 AC_MSG_RESULT($NOVROOTDIR)
+
+AC_MSG_CHECKING(for news overview-directory path)
+CF_WITH_PATH(inewsdir,
+	[  --with-inews-dir=PATH   directory containing \"inews\"],
+	INEWSDIR,$LIBDIR)
+AC_MSG_RESULT($INEWSDIR)
+test ".$INEWSDIR" != ".$LIBDIR" && AC_DEFINE(INEWSDIR,$INEWSDIR)
 
 ## options for libraries
 AC_MSG_CHECKING(for optional INN-NNTP library)
@@ -124,37 +155,40 @@ CF_WITH_VALUE(mail-domain,
 	INEWS_MAIL_DOMAIN,unspecified)
 AC_MSG_RESULT($INEWS_MAIL_DOMAIN)
 
+AC_MSG_CHECKING(for INEWS domain)
+if test -z "$INEWS_DOMAIN" ; then
 if test "$INEWS_MAIL_DOMAIN" = unspecified ; then
-	echo "configure: error: You must specify the mail-domain" 1>&2
-	exit 1
+	INEWS_DOMAIN=.`(hostname || uname -n) 2>/dev/null | sed 1q`
+	if test "$INEWS_DOMAIN" = "." ; then
+		INEWS_DOMAIN=".localhost"
+	fi
+else
+	INEWS_DOMAIN="$INEWS_MAIL_DOMAIN"
 fi
+fi
+AC_MSG_RESULT($INEWS_DOMAIN)
 
+if test "$USE_NNTP" = "yes" ; then
 AC_MSG_CHECKING(for NNTP default-server)
 AC_ARG_WITH(nntp-default-server,
 	[  --with-nntp-default-server
-                          (default: news\$INEWS_MAIL_DOMAIN)
+                          (default: news\$INEWS_DOMAIN)
                           (sets \$NNTP_DEFAULT_SERVER)],
 	[NNTP_DEFAULT_SERVER=$withval],
-	[test -z "$NNTP_DEFAULT_SERVER" && case "$INEWS_MAIL_DOMAIN" in #(((
-	 /*)	NNTP_DEFAULT_SERVER="news`cat $INEWS_MAIL_DOMAIN`" ;;
-	 .*)	NNTP_DEFAULT_SERVER="news$INEWS_MAIL_DOMAIN"       ;;
-	 *)	NNTP_DEFAULT_SERVER="news.$INEWS_MAIL_DOMAIN"      ;;
+	[test -z "$NNTP_DEFAULT_SERVER" && case "$INEWS_DOMAIN" in #(((
+	 /*)	NNTP_DEFAULT_SERVER="news`cat $INEWS_DOMAIN`" ;;
+	 .*)	NNTP_DEFAULT_SERVER="news$INEWS_DOMAIN"       ;;
+	 *)	NNTP_DEFAULT_SERVER="news.$INEWS_DOMAIN"      ;;
 	 esac])
-AC_SUBST(NNTP_DEFAULT_SERVER)
 AC_MSG_RESULT($NNTP_DEFAULT_SERVER)
+fi
+AC_SUBST(NNTP_DEFAULT_SERVER)
 
 ## optional features
 AC_MSG_CHECKING(whether to use MH style mail handling)
 CF_ARG_ENABLE(mail-handling,
 	[  --enable-mail-handling  use MH style mail handling],
 	[AC_DEFINE(HAVE_MH_MAIL_HANDLING)])
-AC_MSG_RESULT($enableval)
-
-AC_MSG_CHECKING(whether to be NNTP_ONLY)
-CF_ARG_ENABLE(nntp-only,
-	[  --enable-nntp-only      reading via NNTP only],
-	[AC_DEFINE(NNTP_ONLY)],
-	[AC_DEFINE(NNTP_ABLE)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable ANSI-color)
@@ -202,6 +236,20 @@ CF_ARG_ENABLE(forgery,
 	[AC_DEFINE(FORGERY)])
 AC_MSG_RESULT($enableval)
 
+###	checks for operator characteristics
+AC_MSG_CHECKING(whether to make a coffee while compiling)
+AC_ARG_WITH(coffee,
+	[  --with-coffee           coffee support],
+	[ case "$withval" in
+	yes)
+	AC_MSG_RESULT(yes - with milk - please!)
+	AC_DEFINE(HAVE_COFFEE)
+	;;
+	*)
+	AC_MSG_RESULT(no)
+	;;
+	esac],
+	AC_MSG_RESULT(no))
 ###	checks for compiler characteristics
 CF_MAKEFLAGS
 AC_LANG_C

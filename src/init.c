@@ -460,8 +460,8 @@ void init_selfinfo ()
 	strncpy (news_quote_format, txt_news_quote, sizeof (news_quote_format));
 	strncpy (xpost_quote_format, txt_xpost_quote, sizeof (xpost_quote_format));
 
-	sprintf (page_header, "%s %s PL%s [%s%s%s]", 
-		progname, VERSION, PATCHLEVEL, OS,
+	sprintf (page_header, "%s %s release %s [%s%s%s]", 
+		progname, VERSION, RELEASEDATE, OS,
 		(tex2iso_supported ? " TeX2ISO" : ""),
 		(iso2asc_supported >= 0 ? " ISO2ASC" : ""));
 	sprintf (cvers, txt_copyright_notice, page_header);

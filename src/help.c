@@ -447,7 +447,6 @@ help_page_up:
 
 			case iKeyHelpHome:			/* Home */
 			case iKeyHelpHome2:
-			case iKeyHelpHome3:
 help_home:
 				if (cur_page != 1) {
 					cur_page = 1;

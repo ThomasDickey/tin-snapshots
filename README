@@ -47,3 +47,9 @@ Compiled & installed on the following machines:
 8)	Sun SPARCsystem 10/30 & SunOS 5.4 with gcc 2.6.3
 
 9)	Intergraph Clipper & CLIX 7.5 with gcc 2.7.1
+
+10)	i486 & BSDI 2.0 with gcc 1.42
+	i486 & BSDI 2.0 with gcc 2.6.3
+
+11)	i486 & NetBSD 1.1 with gcc 2.7.2
+ 

@@ -3,11 +3,9 @@
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
-BASE_VER	= 950824
-LVER		= 1.3_$(BASE_VER)
-PPREFIX		= MC
-PVER		= 960611
-VER		= $(LVER)BETA_PL$(PPREFIX).$(PVER)
+LVER		= 1.3
+PVER		= 960613
+VER		= $(LVER)-unoff-BETA-$(PVER)
 MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
 
 # directory structure

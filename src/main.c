@@ -416,11 +416,11 @@ read_cmd_line_options (argc, argv)
 
 			case 'V':
 #if defined(__DATE__) && defined(__TIME__)			
-				sprintf (msg, "Version: %s PL%s  %s %s",
-					VERSION, PATCHLEVEL, __DATE__, __TIME__);
+				sprintf (msg, "Version: %s release %s  %s %s",
+					VERSION, RELEASEDATE, __DATE__, __TIME__);
 #else
-				sprintf (msg, "Version: %s PL%s",
-					VERSION, PATCHLEVEL);
+				sprintf (msg, "Version: %s release %s",
+					VERSION, RELEASEDATE);
 #endif					
 				error_message (msg, "");
 				exit (1);

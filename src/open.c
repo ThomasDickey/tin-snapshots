@@ -4,7 +4,7 @@
  *  Author    : I.Lea & R.Skrenta
  *  Created   : 01-04-91
  *  Updated   : 21-12-94
- *  Notes     : Routines to make reading news locally (ie. /usr/spool/news) 
+ *  Notes     : Routines to make reading news locally (ie. /usr/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -36,13 +36,13 @@ int	can_post = TRUE;
 char *nntp_server;
 
 
-int 
+int
 nntp_open ()
 {
-#ifdef NNTP_ABLE	
+#ifdef NNTP_ABLE
 	int ret;
 	unsigned short nntp_tcp_port;
-	
+
 	if (read_news_via_nntp) {
 		debug_nntp ("nntp_open", "BEGIN");
 
@@ -63,7 +63,7 @@ nntp_open ()
 			}
 			wait_message (msg);
 		}
-		
+
 		debug_nntp ("nntp_open", nntp_server);
 
 		ret = server_init (nntp_server, NNTP_TCP_NAME, nntp_tcp_port);
@@ -75,16 +75,16 @@ nntp_open ()
 
 		switch (ret) {
 		case OK_CANPOST:
-#ifndef NO_POSTING		
+#ifndef NO_POSTING
 			can_post = TRUE;
-#endif			
+#endif
 			break;
 
 		case OK_NOPOST:
 			can_post = FALSE;
 			wait_message(txt_cannot_post);
 			fputc ('\n', stdout);
-			break;	
+			break;
 
 		case -1:
 			error_message (txt_failed_to_connect_to_server, nntp_server);
@@ -107,7 +107,7 @@ nntp_open ()
 				break;
 			case ERR_ACCESS:
 				nntp_message (ret);
-				return -1;			
+				return -1;
 			default:
 				break;
 		}
@@ -116,7 +116,7 @@ nntp_open ()
 		 * Check if NNTP/INN supports XOVER command
 		 */
 		debug_nntp ("nntp_open", "xover");
-		put_server ("xover");	
+		put_server ("xover");
 		if (get_respcode () != ERR_COMMAND) {
 			xover_supported = TRUE;
 		}
@@ -124,14 +124,14 @@ nntp_open ()
 		/*
 		 * Check if NNTP supports my XINDEX & XUSER commands
 		 */
-#ifdef HAVE_TIN_NNTP_EXTS	 
+#ifdef HAVE_TIN_NNTP_EXTS
 		debug_nntp ("nntp_open", "xuser");
-		put_server ("xuser");	
+		put_server ("xuser");
 		if (get_respcode () != ERR_COMMAND) {
 			xuser_supported = TRUE;
 		}
-#endif	/* HAVE_TIN_NNTP_EXTS */		
-		
+#endif	/* HAVE_TIN_NNTP_EXTS */
+
 		/*
 		 * Check if NNTP server expects user authorization
 		 */
@@ -143,7 +143,7 @@ nntp_open ()
 }
 
 
-void 
+void
 nntp_close ()
 {
 #ifdef NNTP_ABLE
@@ -151,7 +151,7 @@ nntp_close ()
 		debug_nntp ("nntp_close", "END");
 		close_server ();
 	}
-#endif	
+#endif
 }
 
 /*
@@ -175,7 +175,7 @@ open_news_active_fp ()
 #ifdef NNTP_ABLE
 	int respcode;
 #endif
-	
+
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		put_server ("list");
@@ -188,7 +188,7 @@ open_news_active_fp ()
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return fopen (news_active_file, "r");
 	}
@@ -203,7 +203,7 @@ FILE *
 open_overview_fmt_fp ()
 {
 	char line[NNTP_STRLEN];
-	
+
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		if (xover_supported) {
@@ -221,7 +221,7 @@ open_overview_fmt_fp ()
 		}
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		joinpath (line, libdir, OVERVIEW_FMT);
 		return fopen (line, "r");
@@ -242,13 +242,13 @@ open_newgroups_fp (index)
 	char line[NNTP_STRLEN];
 	struct tm *tm;
 #endif
-	
+
 	if (read_news_via_nntp) {
 #ifdef NNTP_ABLE
 		if (index == -1) {
 			return (FILE *) 0;
 		}
-	
+
 		tm = localtime (&newnews[index].time);
 		sprintf (line, "newgroups %02d%02d%02d %02d%02d%02d",
 			tm->tm_year, tm->tm_mon+1, tm->tm_mday,
@@ -265,7 +265,7 @@ open_newgroups_fp (index)
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return fopen (active_times_file, "r");
 	}
@@ -276,15 +276,15 @@ open_newgroups_fp (index)
  *
  * XMOTD 311299 235959 [GMT]
  */
- 
+
 FILE *
 open_motd_fp (motd_file_date)
-	char *motd_file_date; 
+	char *motd_file_date;
 {
 #if defined(NNTP_ABLE) && defined(HAVE_TIN_NNTP_EXTS)
 	char line[NNTP_STRLEN];
 #endif
-	
+
 	if (read_news_via_nntp) {
 #if defined(NNTP_ABLE) && defined(HAVE_TIN_NNTP_EXTS)
 		sprintf (line, "xmotd %s", motd_file_date);
@@ -298,7 +298,7 @@ open_motd_fp (motd_file_date)
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return fopen (motd_file, "r");
 	}
@@ -319,7 +319,7 @@ open_subscription_fp ()
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return fopen (subscriptions_file, "r");
 	}
@@ -328,7 +328,7 @@ open_subscription_fp ()
 /*
  *  Open mail groups description file.
  */
- 
+
 FILE *
 open_mailgroups_fp ()
 {
@@ -341,7 +341,7 @@ open_mailgroups_fp ()
  * so that any subsequent rereads on the active file will not have to waste
  * net bandwidth and the local copy of the newsgroups file can be accessed.
  */
- 
+
 FILE *
 open_newsgroups_fp ()
 {
@@ -361,7 +361,7 @@ open_newsgroups_fp ()
 		}
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return fopen (newsgroups_file, "r");
 	}
@@ -383,7 +383,7 @@ open_xover_fp (psGrp, pcMode, lMin, lMax)
 	char acLine[NNTP_STRLEN];
 #endif
 
-	if (read_news_via_nntp && xover_supported && 
+	if (read_news_via_nntp && xover_supported &&
 	    *pcMode == 'r' && psGrp->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (acLine, "xover %ld-%ld", lMin, lMax);
@@ -401,7 +401,7 @@ open_xover_fp (psGrp, pcMode, lMin, lMax)
 	} else {
 		pcNovFile = pcFindNovFile (psGrp, (*pcMode == 'r' ? R_OK : W_OK));
 
-		if (debug) { 
+		if (debug) {
 			error_message ("READ file=[%s]", pcNovFile);
 		}
 		if (pcNovFile != (char *) 0) {
@@ -414,8 +414,8 @@ open_xover_fp (psGrp, pcMode, lMin, lMax)
 /*
  * Stat a mail/news article to see if it still exists
  */
- 
-int 
+
+int
 stat_article (art, group_path)
 	long art;
 	char *group_path;
@@ -429,7 +429,7 @@ stat_article (art, group_path)
 	struct stat sb;
 
 	i = my_group[cur_groupnum];
-	
+
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "stat %ld", art);
@@ -468,14 +468,14 @@ open_art_header (art)
 #ifdef NNTP_ABLE
 		/*
 		 *  Don't bother requesting if we have not got there yet.
-		 *  This is a big win if the group has got holes in it (ie. if 000's 
+		 *  This is a big win if the group has got holes in it (ie. if 000's
 		 *  of articles have expired between active files min & max values).
 		 */
 		if (art < head_next) {
 			return (char *) 0;
 		}
 		sprintf (buf, "head %ld", art);
-		
+
 		debug_nntp ("open_art_header", buf);
 
 		put_server (buf);
@@ -544,7 +544,7 @@ open_art_header (art)
 		}
 #else
 		return (char *) 0;
-#endif		
+#endif
 	} else {
 		sprintf (buf, "%ld", art);
 		fp = fopen (buf, "r");
@@ -553,33 +553,36 @@ open_art_header (art)
 			fclose (fp);
 		}
 /*
-printf ("Artnum=[%ld] Items=[%d]\n", art, items);		
+printf ("Artnum=[%ld] Items=[%d]\n", art, items);
 fflush (stdout);
 sleep (1);
 */
 		if (items == 0) {
 			return (char *) 0;
 		}
-	}	
+	}
 	return mem;
 }
 
 /*
  * Open a mail/news article
  */
- 
+
 FILE *
 open_art_fp (group_path, art)
 	char *group_path;
 	long art;
 {
 	char buf[NNTP_STRLEN];
-	int i, respcode;
+	int i;
 	struct stat sb;
 	extern long note_size;
+#ifdef NNTP_ABLE
+	int respcode;
+#endif
 
 	i = my_group[cur_groupnum];
-	
+
 	if (read_news_via_nntp && active[i].type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "article %ld", art);
@@ -623,12 +626,11 @@ open_xhdr_fp (header, min, max)
 	long min;
 	long max;
 {
-	char buf[NNTP_STRLEN];
-
 	if (read_news_via_nntp) {
-#ifdef NNTP_ABLE	
+#ifdef NNTP_ABLE
+		char buf[NNTP_STRLEN];
 		sprintf(buf, "xhdr %s %ld-%ld", header, min, max);
-		
+
 		debug_nntp ("open_xhdr_fp", buf);
 
 		put_server (buf);
@@ -642,7 +644,7 @@ open_xhdr_fp (header, min, max)
 		return nntp_to_fp ();
 #else
 		return (FILE *) 0;
-#endif		
+#endif
 	} else {
 		return (FILE *) 0;
 	}
@@ -652,7 +654,7 @@ open_xhdr_fp (header, min, max)
  *  Longword comparison routine for the qsort()
  */
 
-int 
+int
 base_comp (p1, p2)
 	t_comptype *p1;
 	t_comptype *p2;
@@ -673,7 +675,7 @@ base_comp (p1, p2)
  */
 
 #if 0
-int 
+int
 setup_soft_base (group)
 	struct t_group *group;
 {
@@ -685,8 +687,8 @@ setup_soft_base (group)
 		group->xmax = base[top_base-1];
 		expand_bitmap (group, base[0]);
 	}
-	
-	return top_base-1; 
+
+	return top_base-1;
 }
 #endif
 
@@ -696,7 +698,7 @@ setup_soft_base (group)
  *  Returns total number of articles in group.
  */
 
-int 
+int
 setup_hard_base (group, group_path)
 	struct t_group *group;
 	char *group_path;
@@ -704,20 +706,21 @@ setup_hard_base (group, group_path)
 	char buf[NNTP_STRLEN];
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
+	long start, last, dummy, count;
 #endif
 	DIR *d;
 	DIR_BUF *e;
-	long art, start, last, dummy, count;
+	long art;
 	long total = 0;
-	
+
 	top_base = 0;
-			
+
 	if (read_news_via_nntp && group->type == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
 		sprintf (buf, "group %s", group->name);
 
 		debug_nntp ("setup_base", buf);
-		
+
 		put_server (buf);
 
 			switch (get_server (line, NNTP_STRLEN)) {
@@ -738,7 +741,7 @@ setup_hard_base (group, group_path)
 		sscanf (line,"%ld %ld %ld %ld", &dummy, &count, &start, &last);
 
 		total = count;
-		
+
 		sprintf (buf, "listgroup %s", group->name);
 		debug_nntp ("setup_base", buf);
 		put_server (buf);
@@ -809,8 +812,8 @@ setup_hard_base (group, group_path)
 			group->xmax = base[top_base-1];
 		expand_bitmap (group, base[0]);
 	}
-	
-	return total; 
+
+	return total;
 }
 
 #ifdef HAVE_GENERIC_AUTHINFO
@@ -822,7 +825,7 @@ setup_hard_base (group, group_path)
  */
 
 int
-authenticate () 
+authenticate ()
 {
 	extern FILE *nntp_rd_fp, *nntp_wr_fp;
 	char tmpbuf[NNTP_STRLEN], *authval, *p;
@@ -835,9 +838,9 @@ authenticate ()
 	static char *old_env = 0;
 #endif
 
-	/* 
+	/*
 	 * If we have authenticated before, NNTP_AUTH_FDS already
-	 * exists, pull out the cookiefd. Just in case we've nested. 
+	 * exists, pull out the cookiefd. Just in case we've nested.
 	 */
 	if (cookiefd == -1 && (authcmd = getenv ("NNTP_AUTH_FDS"))) {
 	    sscanf (authcmd, "%*d.%*d.%d", &cookiefd);
@@ -865,7 +868,7 @@ authenticate ()
 	put_server (tmpbuf);
 
 #ifdef HAVE_PUTENV
-	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d", 
+	sprintf (tmpbuf, "NNTP_AUTH_FDS=%d.%d.%d",
 		fileno(nntp_rd_fp), fileno(nntp_wr_fp), cookiefd);
 	new_env = my_malloc (strlen (tmpbuf)+1);
 	strcpy (new_env, tmpbuf);
@@ -875,7 +878,7 @@ authenticate ()
 	}
 	old_env = new_env;
 #else
-	sprintf (tmpbuf, "%d.%d.%d", 
+	sprintf (tmpbuf, "%d.%d.%d",
 		fileno(nntp_rd_fp), fileno(nntp_wr_fp), cookiefd);
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
 #endif
@@ -895,13 +898,13 @@ authenticate ()
  *  Also does AUTHINFO user/pass or GENERIC authorization
  */
 
-int 
+int
 get_respcode ()
 {
 #ifdef NNTP_ABLE
 	char line[NNTP_STRLEN];
 	int respcode;
-	
+
 	switch (get_server (line, NNTP_STRLEN)) {
 	case -1:
 		error_message (txt_connection_to_server_broken, "");
@@ -914,7 +917,7 @@ get_respcode ()
 
 	/* error message vom server retten*/
 	strcpy(error_response, line);
-	
+
 	respcode = atoi (line);
 
 #ifdef USE_GENAUTH
@@ -941,7 +944,7 @@ get_respcode ()
 }
 
 
-int 
+int
 stuff_nntp (fnam)
 	char *fnam;
 {
@@ -972,7 +975,7 @@ stuff_nntp (fnam)
 
 #ifdef DEBUG
 		debug_nntp ("stuff_nntp", line);
-#endif		
+#endif
 		if (STRCMPEQ(line, ".")) {	/* end of text */
 			break;
 		}
@@ -1006,7 +1009,7 @@ nntp_to_fp ()
 #ifdef NNTP_ABLE
 	char fnam[PATH_LEN];
 	FILE *fp;
-	
+
 	if (! stuff_nntp (fnam)) {
 		debug_nntp ("nntp_to_fp", "! stuff_nntp()");
 		return (FILE *) 0;
@@ -1016,7 +1019,7 @@ nntp_to_fp ()
 		perror_message (txt_nntp_to_fp_cannot_reopen, fnam);
 		return (FILE *) 0;
 	}
-	
+
 /*
  * It is impossible to delete an open file on the Amiga or Win32. So we keep a
  * copy of the file name and delete it when finished instead.
@@ -1037,7 +1040,7 @@ nntp_to_fp ()
  * Log user info to local file or NNTP logfile
  */
 
-void 
+void
 log_user ()
 {
 	char dummy[PATH_LEN];
@@ -1066,11 +1069,11 @@ log_user ()
 	{
 #ifndef DONT_LOG_USER
 		joinpath (log_file, TMPDIR, LOG_USER_FILE);
-		
+
 		if ((fp = fopen (log_file, "a+")) != (FILE *) 0) {
 			time (&epoch);
 			fprintf (fp, "%s%s: %-32s (%-8s) %s", 
-				VERSION, PATCHLEVEL,
+				VERSION, RELEASEDATE,
 #ifdef M_AMIGA
 				get_val ("REALNAME", "Unknown"),
 				get_val ("USERNAME", "Unknown"),
@@ -1088,13 +1091,13 @@ log_user ()
 
 /*
  * NNTP user authorization. Password read from ~/.newsauth
- * The ~/.newsauth authorization file has the format:  
+ * The ~/.newsauth authorization file has the format:
  *   nntpserver1 password
  *   nntpserver2 password
  *   etc.
  */
- 
-void 
+
+void
 authorization (server, authuser)
 	char *server;
 	char *authuser;
@@ -1133,7 +1136,7 @@ authorization (server, authuser)
 			/*
 			 * Get server from 1st part of the line
 			 */
-			strcpy (line, buf); 
+			strcpy (line, buf);
 			ptr = (char *) strchr (line, ' ');
 			if (ptr != (char *) 0) {
 				*ptr = '\0';
@@ -1145,7 +1148,7 @@ authorization (server, authuser)
 				 */
 				ptr = (char *) strrchr (buf, ' ');
 				if (ptr != (char *) 0 && ++ptr != (char *) 0) {
-					strcpy (authpass, ptr); 
+					strcpy (authpass, ptr);
 					ptr = (char *) strchr (authpass, '\n');
 					if (ptr != (char *) 0) {
 						*ptr = '\0';
@@ -1155,7 +1158,7 @@ authorization (server, authuser)
 				break;
 			}
 		}
-		fclose (fp); 
+		fclose (fp);
 
 		if (! found) {
 			error_message (txt_nntp_authorization_failed, authuser);
@@ -1183,7 +1186,7 @@ vGrpGetSubArtInfo ()
 	if ((update && update_fork) || ! update) {
 		wait_message (txt_rereading_active_file);
 	}
-	
+
 	for (iNum = 0 ; iNum < num_active ; iNum++) {
 		psGrp = &active[iNum];
 		if (psGrp->subscribed == SUBSCRIBED) {
@@ -1193,23 +1196,23 @@ vGrpGetSubArtInfo ()
 				psGrp->spooldir,
 				psGrp->name,
 				psGrp->type,
-				&psGrp->count, 
+				&psGrp->count,
 				&psGrp->xmax,
 				&psGrp->xmin);
 			if (psGrp->newsrc.num_unread > psGrp->count) {
 #ifdef DEBUG
-	printf ("\r\nUnread WRONG [%d]=%s unread=[%ld] count=[%ld]", 
+	printf ("\r\nUnread WRONG [%d]=%s unread=[%ld] count=[%ld]",
 		iNum, psGrp->name, psGrp->newsrc.num_unread, psGrp->count);
-	fflush(stdout);	
+	fflush(stdout);
 #endif
 				psGrp->newsrc.num_unread = psGrp->count;
 			}
 			if (psGrp->xmin != lMinOld || psGrp->xmax != lMaxOld) {
 				expand_bitmap(psGrp,psGrp->xmin);
 #ifdef DEBUG
-	printf ("\r\nMin/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]", 
+	printf ("\r\nMin/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]",
 		iNum, psGrp->name, lMinOld, lMaxOld, psGrp->xmin, psGrp->xmax);
-	fflush(stdout);	
+	fflush(stdout);
 #endif
 			}
 			if (iNum % 5 == 0) {
@@ -1240,13 +1243,13 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 	char	acBuf[NNTP_STRLEN];
 #ifdef NNTP_ABLE
 	char	acLine[NNTP_STRLEN];
+	long	lDummy;
 #endif
 	DIR		*tDirFile;
 	DIR_BUF	*tFile;
 	long	lArtMin;
 	long	lArtMax;
 	long	lArtNum;
-	long	lDummy;
 
 	lArtMin = *plArtMin;
 	lArtMax = *plArtMax;
@@ -1257,11 +1260,11 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 
 	if (read_news_via_nntp && iGrpType == GROUP_TYPE_NEWS) {
 #ifdef NNTP_ABLE
-		
+
 		sprintf (acBuf, "group %s", pcGrpName);
 
 		debug_nntp ("vGrpGetArtInfo", acBuf);
-		
+
 		put_server (acBuf);
 
 		switch (get_server (acLine, NNTP_STRLEN)) {
@@ -1289,7 +1292,7 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 #else
 		*plArtMin = lArtMin;
 		*plArtMax = lArtMax;
-		return; 
+		return;
 #endif
 	} else {
 #ifndef M_AMIGA
@@ -1311,7 +1314,7 @@ vGrpGetArtInfo (pcSpoolDir, pcGrpName, iGrpType, plArtCount, plArtMax, plArtMin)
 						if (*plArtMin == 0) {
 							*plArtMin = lArtNum;
 						}
-					} else if (lArtNum < *plArtMin) {	
+					} else if (lArtNum < *plArtMin) {
 						*plArtMin = lArtNum;
 					}
 					(*plArtCount)++;

@@ -525,8 +525,6 @@ group_page_down:
 				break;
 
 			case iKeyGroupRedrawScr:	/* redraw screen */
-			case iKeyGroupRedrawScr2:
-			case iKeyGroupRedrawScr3:
 				ClearScreen ();
 				set_xclick_off ();
 				show_group_page ();

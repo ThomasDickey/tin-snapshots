@@ -154,7 +154,7 @@ extern void show_group_page P_((void));
 extern void update_group_page P_((void));
 extern void draw_subject_arrow P_((void));
 extern void erase_subject_arrow P_((void));
-extern int prompt_subject_num P_((int ch/*, char *group*/));
+extern int prompt_subject_num P_((int ch));
 extern void clear_note_area P_((void));
 extern int find_new_pos P_((int old_top, long old_artnum, int cur_pos));
 extern void mark_screen P_((int level, int screen_row, int screen_col, char *value));
@@ -203,7 +203,7 @@ extern void vPrintGrpLine P_((FILE *hFp, char *pcGrpName, long lArtMax, long lAr
 extern long lAtol P_((char *pcStr, int iNum));
 extern void vMakeGrpPath P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
 extern void vMakeGrpName P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath));
-extern void vGrpDelMailArt P_((/*struct t_group *psGrp,*/ struct t_article *psArt));
+extern void vGrpDelMailArt P_((struct t_article *psArt));
 extern void vGrpDelMailArts P_((struct t_group *psGrp));
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 /* ./main.c */
@@ -309,8 +309,8 @@ extern void expand_bitmap P_((struct t_group *group, long min));
 extern void art_mark_read P_((struct t_group *group, struct t_article *art));
 extern void art_mark_unread P_((struct t_group *group, struct t_article *art));
 extern void art_mark_will_return P_((struct t_group *group, struct t_article *art));
-extern void art_mark_deleted P_((/*struct t_group *group,*/ struct t_article *art));
-extern void art_mark_undeleted P_((/*struct t_group *group,*/ struct t_article *art));
+extern void art_mark_deleted P_((struct t_article *art));
+extern void art_mark_undeleted P_((struct t_article *art));
 extern void vSetDefaultBitmap P_((struct t_group *group));
 extern char *getaline P_((FILE *fp));
 /* ./nntplib.c */
@@ -325,9 +325,9 @@ extern void close_server P_((void));
 extern char *nntp_respcode P_((int respcode));
 extern int nntp_message P_((int respcode));
 /* ./nrctbl.c */
+extern void write_newsrctable_file P_((void));
 extern void get_nntpserver P_((char *nntpserver_name, char *nick_name));
 extern int get_newsrcname P_((char *newsrc_name, char *nntpserver_name));
-extern void write_newsrctable_file P_((void));
 /* ./open.c */
 extern int nntp_open P_((void));
 extern void nntp_close P_((void));
@@ -434,7 +434,6 @@ extern int sizeofnextword P_((unsigned char *w));
 extern int mystrcat P_((char **t, char *s));
 extern int rfc1522_do_encode P_((unsigned char *what, unsigned char **where));
 extern char *rfc1522_encode P_((char *s));
-extern void rfc1522_decode_all_headers P_((void));
 extern void rfc15211522_encode P_((char *filename));
 /* ./save.c */
 extern int check_start_save_any_news P_((int check_start_save));

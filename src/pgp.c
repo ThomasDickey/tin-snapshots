@@ -208,7 +208,7 @@ invoke_pgp_mail (nam, mail_to)
 		sprintf(msg, "%s%c", txt_pgp_mail, ch_default);
 		wait_message(msg);
 		MoveCursor(cLINES, (int) strlen(txt_pgp_mail));
-		if ((ch = (char) ReadCh()) == CR)
+		if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 			ch = ch_default;
 	} while (! strchr("beqs\033", ch));
 	switch (ch) {
@@ -246,7 +246,7 @@ invoke_pgp_news(article)
 		sprintf(msg, "%s%c", txt_pgp_news, ch_default);
 		wait_message(msg);
 		MoveCursor(cLINES, (int) strlen(txt_pgp_news));
-		if ((ch = (char) ReadCh()) == CR)
+		if ((ch = (char) ReadCh()) == '\n' || ch == '\r')
 			ch = ch_default;
 	} while (! strchr("iqs\033", ch));
 	switch (ch) {
@@ -313,7 +313,7 @@ pgp_check_article()
 		do {
 			wait_message(buf);
 			MoveCursor(cLINES, (int) strlen(buf) - 1);
-			if ((ch = (char) ReadCh()) == CR)
+			if ((ch = (char) ReadCh()) == '\r' || ch == '\n')
 			ch = 'n';
 		} while (! strchr("YyNn", ch));
 		if (tolower(ch) == 'y') {

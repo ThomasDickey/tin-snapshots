@@ -1389,10 +1389,9 @@ vNewsrcTestHarness ()
 {
 	char seq[20000];
 	FILE *fp;
-	int i, length;
+	int i;
 	long rng_min, rng_max;
 	struct t_group group;
-	struct t_newsrc newsrc;
 
 	rng_min = atoi (get_val ("TIN_RNG_MIN", "1"));
 	rng_max = atoi (get_val ("TIN_RNG_MAX", "1"));
@@ -1439,7 +1438,7 @@ debug_print_newsrc (&group.newsrc, stdout);
 		seq[strlen(seq)-1] = '\0';
 		fclose (fp);
 	}
-/*
+#ifdef DEBUG_NEWSRC_FIXME	/* something's broken here */
 	set_bitmap_range_read (&group.newsrc, rng_min, rng_max);
 	debug_print_newsrc (&group.newsrc, stdout);
 
@@ -1452,7 +1451,7 @@ debug_print_newsrc (&group.newsrc, stdout);
 
 	NSETBLK1(group.newsrc.xbitmap, group.newsrc.xbitlen);
 	debug_print_newsrc (&group.newsrc, stdout);
-*/
+#endif
 	printf ("\n");
 }
 

@@ -272,3 +272,5 @@
 #	endif
 #endif
 #endif /* FIXME */
+
+#undef HAVE_COFFEE
