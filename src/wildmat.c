@@ -49,6 +49,10 @@
 /* Do tar(1) matching rules, which ignore a trailing slash? */
 #undef MATCH_TAR_PATTERN
 
+/*
+ * local prototypes
+ */
+static int DoMatch(register const char *text, register char *p);
 
 /*
  *  Match text and p, return TRUE, FALSE, or ABORT.

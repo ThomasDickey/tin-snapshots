@@ -220,9 +220,9 @@ main (
 	if (post_article_and_exit || post_postponed_and_exit) {
 		global_filtered_articles = read_filter_file (global_filter_file, TRUE);
 		local_filtered_articles = read_filter_file (local_filter_file, FALSE);
-	#ifdef DEBUG
+#ifdef DEBUG
 		debug_print_filters ();
-	#endif
+#endif
 		quick_post_article (post_postponed_and_exit);
 		tin_done (EXIT_OK);
 	}

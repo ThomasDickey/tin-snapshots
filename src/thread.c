@@ -32,6 +32,8 @@ static int top_thread = 0;
 static int thread_respnum = 0;
 static int first_thread_on_screen = 0;
 static int last_thread_on_screen = 0;
+static void bld_tline (int l, struct t_article *art);
+static void draw_tline (int i, int full);
 #endif
 
 /*
@@ -56,7 +58,7 @@ bld_tline (
 	struct t_article *art)
 {
 	int i;
-	int len_from;
+	size_t len_from;
 	char mark;
 	struct t_msgid *ptr;
 #if USE_CURSES

@@ -15,6 +15,8 @@
 #include	"tin.h"
 #include	"tnntp.h"
 
+static int submit_inews (char *name);
+
 #if 0
 #ifdef VMS
 #   ifdef MULTINET

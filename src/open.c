@@ -17,9 +17,15 @@
 #include	"tcurses.h"
 
 #ifdef NNTP_ABLE
-static FILE *nntp_to_fp (void);
-static FILE *stuff_nntp (char *fnam);
+	static FILE * extract_groups_from_newsrc(void);
+	static FILE * nntp_to_fp (void);
+	static FILE * stuff_nntp (char *fnam);
 #endif
+#if 0
+	static FILE * open_xhdr_fp (char *header, long min, long max);
+#endif /* 0 */
+
+static int base_comp (t_comptype *p1, t_comptype *p2);
 
 long head_next;
 
@@ -27,15 +33,15 @@ long head_next;
 char error_response[NNTP_STRLEN];
 
 #ifdef NO_POSTING
-int can_post = FALSE;
+	int can_post = FALSE;
 #else
-int can_post = TRUE;
+	int can_post = TRUE;
 #endif
 
 char *nntp_server = (char *)0;
 
 #ifdef NNTP_ABLE
-int get_server_nolf=0; /* this will only be set by our own nntplib.c */
+	int get_server_nolf=0; /* this will only be set by our own nntplib.c */
 #endif
 
 /* fixme - return different values for different errors
@@ -1215,7 +1221,10 @@ vGet1GrpArtInfo(struct t_group *grp)
 
 	if (grp->newsrc.num_unread > grp->count) {
 #ifdef DEBUG
+#if 0
 		my_printf (cCRLF "Unread WRONG [%d]=%s unread=[%ld] count=[%ld]", iNum, grp->name, grp->newsrc.num_unread, grp->count);
+#endif
+		my_printf (cCRLF "Unread WRONG %s unread=[%ld] count=[%ld]", grp->name, grp->newsrc.num_unread, grp->count);
 		my_flush ();
 #endif
 		grp->newsrc.num_unread = grp->count;
@@ -1224,7 +1233,10 @@ vGet1GrpArtInfo(struct t_group *grp)
 	if (grp->xmin != lMinOld || grp->xmax != lMaxOld) {
 		expand_bitmap(grp, grp->xmin);
 #ifdef DEBUG
+#if 0
 		my_printf (cCRLF "Min/Max DIFF [%d]=%s old=[%ld-%ld] new=[%ld-%ld]", iNum, grp->name, lMinOld, lMaxOld, grp->xmin, grp->xmax);
+#endif
+		my_printf (cCRLF "Min/Max DIFF %s old=[%ld-%ld] new=[%ld-%ld]", grp->name, lMinOld, lMaxOld, grp->xmin, grp->xmax);
 		my_flush ();
 #endif
 	}

@@ -14,7 +14,13 @@
 
 #include "tin.h"
 
-unsigned char
+/*
+ * local prototypes
+ */
+static int boundary_cmp (char *line, char *boundary);
+static unsigned char bin2hex (unsigned int x);
+
+static unsigned char
 bin2hex(
 	unsigned int x)
 {

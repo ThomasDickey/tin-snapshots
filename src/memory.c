@@ -45,6 +45,9 @@ struct t_spooldir *spooldirs;		/* spooldirs on NNTP server (cdrom) */
 */
 static void free_newnews_array (void);
 static void free_spooldirs_array (void);
+#if 0 /* unused */
+	static void expand_spooldirs (void);
+#endif /* 0 */
 
 /*
  *  Dynamic table management
@@ -130,16 +133,6 @@ expand_save (void)
 		sizeof (struct t_save) * max_save);
 }
 
-#if 0 /*never used */
-static void
-expand_spooldirs (void)
-{
-	max_spooldir += max_spooldir / 2;	/* increase by 50% */
-
-	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs,
-		sizeof (struct t_spooldir) * max_spooldir);
-}
-#endif /* 0 */
 
 void
 expand_newnews (void)
@@ -449,3 +442,14 @@ my_realloc1 (
 	}
 	return (void *) p;
 }
+
+#if 0 /* unused */
+static void
+expand_spooldirs (void)
+{
+	max_spooldir += max_spooldir / 2;	/* increase by 50% */
+
+	spooldirs = (struct t_spooldir *) my_realloc((char *) spooldirs,
+		sizeof (struct t_spooldir) * max_spooldir);
+}
+#endif /* 0 */

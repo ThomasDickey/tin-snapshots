@@ -612,7 +612,7 @@ write_attributes_file (
 	fprintf (fp, "#  maildir=STRING (ie. ~/Mail)\n");
 	fprintf (fp, "#  savedir=STRING (ie. ~user/News)\n");
 	fprintf (fp, "#  savefile=STRING (ie. =linux)\n");
-	fprintf (fp, "#  organization=STRING (if starting with '/' read from file)\n");
+	fprintf (fp, "#  organization=STRING (if beginning with '/' read from file)\n");
 	fprintf (fp, "#  sigfile=STRING (ie. $var/sig)\n");
 	fprintf (fp, "#  followup_to=STRING\n");
 	fprintf (fp, "#  printer=STRING\n");

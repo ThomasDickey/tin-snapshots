@@ -21,10 +21,12 @@
 /*
 ** Local prototypes
 */
+static char * escape_shell_meta (char *source, int quote_area);      
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
 #ifdef LOCAL_CHARSET
-	static unt to_local (int c);
+	static int to_local (int c);
+	static int to_network (int c);	   
 #endif /* LOCAL_CHARSET */
 
 #if 0
@@ -2536,11 +2538,15 @@ random_organization(
 	static char selorg[512];
 	int nool = 0, sol;
 	FILE *orgfp;
+	time_t epoch;
 
 	*selorg = '\0';
 
 	if (*in_org != '/')
 		return in_org;
+
+	time (&epoch);
+	srand ((unsigned int) epoch);
 
 	if ((orgfp = fopen(in_org, "r")) == NULL)
 		return selorg;
@@ -2561,8 +2567,8 @@ random_organization(
 }	
 
 #if 0
-void
-dump_input_history(void) {
+static void
+dump_input_history (void) {
 	int his_w, his_e;
 	
 	for (his_w = 0; his_w <= HIST_MAXNUM; his_w++) {
@@ -2592,9 +2598,9 @@ read_input_history_file (void) {
 		wait_message (txt_reading_input_history_file);
 
 	/* to be safe ;-) */
-	memset((void *) &input_history, 0, sizeof(input_history));
-	memset((void *) &hist_last, 0, sizeof(hist_last));
-	memset((void *) &hist_pos, 0, sizeof(hist_pos));
+	memset((void *) input_history, 0, sizeof(input_history));
+	memset((void *) hist_last, 0, sizeof(hist_last));
+	memset((void *) hist_pos, 0, sizeof(hist_pos));
 
 
 	while (fgets(buf, sizeof(buf), fp)) {

@@ -36,10 +36,12 @@ static int draw_sline (int i, int full);
 
 #ifndef INDEX_DAEMON
 static int bld_sline (int i);
+static int line_is_tagged (int n);
 static int prompt_subject_num (int ch);
 static void update_group_page (void);
 static void show_group_title (int clear_title);
-#endif /* INDEX_DAEMON */
+static void show_tagged_lines (void);
+#endif /* !INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON

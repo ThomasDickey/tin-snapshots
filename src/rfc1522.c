@@ -44,6 +44,19 @@ static unsigned char base64_rank[256];
 static int base64_rank_table_built;
 static int quoteflag;
 
+/*
+ * local prototypes
+ */
+static int contains_nonprintables (char *w,t_bool isstruct_head);
+static int do_b_encode (char *w, char *b, int max_ewsize, t_bool isstruct_head);
+static int rfc1522_do_encode (char *what, char **where, t_bool break_long_line);
+static int sizeofnextword (char *w);                             
+static int which_encoding (char *w);                             
+static unsigned hex2bin (int x);
+static void build_base64_rank_table (void);
+static void str2b64 (char *from, char *to);
+
+
 static void
 build_base64_rank_table(
 	void)

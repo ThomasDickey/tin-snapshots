@@ -345,11 +345,11 @@ AC_DEFUN([CF_ERRNO],
 [
 AC_MSG_CHECKING([for errno external decl])
 AC_CACHE_VAL(cf_cv_extern_errno,[
-	AC_TRY_COMPILE([
+    AC_TRY_COMPILE([
 #include <errno.h>],
-		[int x = errno],
-		[cf_cv_extern_errno=yes],
-		[cf_cv_extern_errno=no])])
+        [int x = errno],
+        [cf_cv_extern_errno=yes],
+        [cf_cv_extern_errno=no])])
 AC_MSG_RESULT($cf_cv_extern_errno)
 test $cf_cv_extern_errno = no && AC_DEFINE(DECL_ERRNO)
 ])dnl
@@ -365,7 +365,6 @@ AC_DEFUN([CF_FIND_LIBRARY],
 [
 	cf_cv_have_lib_$1=no
 	AC_CHECK_FUNC($4,cf_cv_have_lib_$1=yes,[
-		ac_cv_func_$4=
 		cf_save_LIBS="$LIBS"
 		AC_MSG_CHECKING(for $4 in -l$1)
 		LIBS="-l$1 $LIBS"
@@ -667,7 +666,7 @@ if test -n "$cf_ncurses_LIBS" ; then
 		fi
 	done
 	AC_TRY_LINK([#include <$cf_cv_ncurses_header>],
-		[initscr()],
+		[initscr(); tgoto((char *)0, 0, 0);],
 		[AC_MSG_RESULT(yes)],
 		[AC_MSG_RESULT(no)
 		 LIBS="$cf_ncurses_SAVE"])
@@ -774,12 +773,12 @@ dnl set to 'no').
 AC_DEFUN([CF_RECHECK_FUNC],[
 AC_CHECK_LIB($2,$1,[
 	CF_UPPER(cf_tr_func,$1)
-	AC_DEFINE(HAVE_$cf_tr_func)
+	AC_DEFINE_UNQUOTED(HAVE_$cf_tr_func)
 	ac_cv_func_$1=yes
-	$3="-l$2 [$]$3"],
+	$3="-l$2 [$]$3"],[
 	ac_cv_func_$1=unknown
 	unset ac_cv_func_$1 2>/dev/null
-	$4,
+	$4],
 	[[$]$3])
 ])dnl
 dnl ---------------------------------------------------------------------------
@@ -918,20 +917,20 @@ else
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl	Check for declaration of sys_errlist in one of stdio.h and errno.h.  
-dnl	Declaration of sys_errlist on BSD4.4 interferes with our declaration.
-dnl	Reported by Keith Bostic.
+dnl Check for declaration of sys_errlist in one of stdio.h and errno.h.
+dnl Declaration of sys_errlist on BSD4.4 interferes with our declaration.
+dnl Reported by Keith Bostic.
 AC_DEFUN([CF_SYS_ERRLIST],
 [
 AC_MSG_CHECKING([declaration of sys_errlist])
 AC_CACHE_VAL(cf_cv_dcl_sys_errlist,[
-	AC_TRY_COMPILE([
+    AC_TRY_COMPILE([
 #include <stdio.h>
 #include <sys/types.h>
 #include <errno.h> ],
-	[char *c = (char *) *sys_errlist],
-	[cf_cv_dcl_sys_errlist=yes],
-	[cf_cv_dcl_sys_errlist=no])])
+    [char *c = (char *) *sys_errlist],
+    [cf_cv_dcl_sys_errlist=yes],
+    [cf_cv_dcl_sys_errlist=no])])
 AC_MSG_RESULT($cf_cv_dcl_sys_errlist)
 test $cf_cv_dcl_sys_errlist = no && AC_DEFINE(DECL_SYS_ERRLIST)
 ])dnl
@@ -1140,6 +1139,7 @@ AC_MSG_RESULT($cf_cv_type_unionwait)
 test $cf_cv_type_unionwait = yes && AC_DEFINE(HAVE_TYPE_UNIONWAIT)
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl Make an uppercase version of a variable
 dnl $1=uppercase($2)
 AC_DEFUN([CF_UPPER],
 [

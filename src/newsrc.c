@@ -24,13 +24,14 @@ static mode_t newsrc_mode = 0;
 */
 static char *getaline (FILE *fp);
 static char *pcParseNewsrcLine (char *line, char *grp, int *sub);
-static void print_bitmap_seq (FILE *fp, struct t_group *group);
 static char *pcParseSubSeq (struct t_group *psGrp, char *pcSeq, long *plLow, long *plHigh, int *piSum);
 static char *pcParseGetSeq (char *pcSeq, long *plLow, long *plHigh);
-static void parse_bitmap_seq (struct t_group *group, char *seq);
-static void create_newsrc (char *newsrc_file);
 static void auto_subscribe_groups (char *newsrc_file);
-
+static void create_newsrc (char *newsrc_file);
+static void parse_bitmap_seq (struct t_group *group, char *seq);
+static void print_bitmap_seq (FILE *fp, struct t_group *group);
+static void vWriteNewsrcLine (FILE *fp, char *line);
+      
 /*
  *  Read $HOME/.newsrc into my_group[]. my_group[] ints point to
  *  active[] entries.
@@ -342,7 +343,8 @@ subscribe (
 			wait_message (txt_subscribing);
 
 			if (sub_state == SUBSCRIBED) {
-				char null_seq[2] = "";
+				char null_seq[2];
+				null_seq[0] = '\0';
 
 				vGet1GrpArtInfo(group);
 				parse_bitmap_seq(group, null_seq);

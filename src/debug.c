@@ -21,9 +21,13 @@ int debug;
 /*
 ** Local prototypes
 */
+static void debug_print_group_hash (void);
 static void debug_print_attributes (struct t_attribute *attr, FILE *fp);
+static void debug_print_base (void);
 static void debug_print_filter (FILE *fp, int num, struct t_filter *the_filter);
-
+#if 0
+	static void debug_print_active_hash (void);
+#endif /* 0 */
 /*
  *  nntp specific debug routines
  */
@@ -393,7 +397,7 @@ debug_print_filters (void)
 /*
  * Prints out hash distribution of active[]
  */
-
+#if 0
 static void
 debug_print_active_hash (void)
 {
@@ -439,6 +443,7 @@ debug_print_active_hash (void)
 	}
 	my_printf ("\n");
 }
+#endif /* 0 */
 
 static void
 debug_print_group_hash (void)

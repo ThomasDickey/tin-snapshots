@@ -46,7 +46,7 @@ authinfo_generic (void)
 #ifdef HAVE_PUTENV
 	char *new_env;
 	static char *old_env = 0;
-#endif
+#endif /* HAVE_PUTENV */
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "authinfo generic");
@@ -104,7 +104,7 @@ authinfo_generic (void)
 	sprintf (tmpbuf, "%d.%d.%d",
 		fileno (nntp_rd_fp), fileno (nntp_wr_fp), cookiefd);
 	setenv ("NNTP_AUTH_FDS", tmpbuf, 1);
-#endif
+#endif /* HAVE_PUTENV */
 
 	if (!builtinauth) {
 		return (invoke_cmd (authval));
@@ -271,14 +271,14 @@ authinfo_original (
 	static t_bool already_failed = FALSE;
 	char *authpass, *ptr;
 	int ret = ERR_AUTHBAD, changed;
-	char authusername[PATH_LEN] = "";
-	char authpassword[PATH_LEN] = "";
+	char authusername[PATH_LEN];
+	char authpassword[PATH_LEN];
 
 #ifdef DEBUG
 	debug_nntp ("authorization", "original authinfo");
 #endif
 
-  	authpassword[0]='\0';
+	authpassword[0]='\0';
 	authuser = strncpy (authusername, authuser, PATH_LEN);
 	authpass = authpassword;
 
@@ -360,4 +360,5 @@ authenticate (
 }
 #else
 void no_authenticate (void) { }
-#endif
+
+#endif /* !INDEX_DAEMON || NNTP_ABLE */

@@ -19,17 +19,25 @@
 
 #ifdef HAVE_REGEX_H_FUNCS
 #	include <regex.h>
+	static void regex_error (int error, regex_t preg);
 #else
 #	undef RETURN
 	static int reg_errno;
 
-	static char *RegEx_Init(char *instring)
+	static char * RegEx_Init (char *instring);
+	static char * RegEx_Error (int code);
+      
+	static char *
+	RegEx_Init (
+		char *instring)
 	{
 		reg_errno = 0;
 		return instring;
 	}
 
-	static char *RegEx_Error(int code)
+	static char *
+	RegEx_Error (
+		int code)
 	{
 		reg_errno = code;
 		return 0;
