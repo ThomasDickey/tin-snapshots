@@ -1,0 +1,25 @@
+Antwort aus d.c.o.linux - FAQ:
+
+! Im Tin-unoff (das ist die heute gebraeuchliche Version, da der
+  urspruengliche Tin AFAIK nicht mehr weiterentwickelt wird), ist eine
+  Funktion enthalten, die ueberprueft, ob die in einem Artikel enthaltenen
+  Zeichen auf dem System ueberhaupt dargestellt werden koennen. Dazu
+  greift der Tin auf die "Locales" zurueck. Locales sind
+  Konfigurationsdateien, die Informationen ueber nationale oder regionale
+  Besonderheiten enthalten, u.a. die Sprache, das Zahlenformat (z.B. ob
+  der Dezimaltrenner ein Punkt oder ein Komma ist), das Datums- und
+  Zeitformat und den verwendeten bzw. darstellbaren Zeichensatz. Sind die
+  Locales unvollstaendig oder nicht richtig konfiguriert, werden alle
+  Nicht-7-Bit-ASCII-Zeichen (dazu gehoeren auch die Umlaute) vom Tin als
+  nicht darstellbar gewertet und es wird ersatzweise ein Fragezeichen
+  ausgegeben. Die Konfiguration, welche Locale-Einstellungen verwendet
+  werden sollen, erfolgt ueber Environmentvariablen. Um die Darstellung
+  der Umlaute zu erzielen, muss man mittels "export LC_CTYPE=de_DE" in
+  der bash bzw. "setenv LC_CTYPE de_DE" in der (t)csh die Locales
+  entsprechend konfigurieren.
+  Fuehrt auch das nicht zum Erfolg, sind wahrscheinlich die Locale-Dateien
+  unvollstaendig oder gar nicht installiert. In diesem Fall besteht (neben
+  der Installation aktueller Locales) noch die Moeglichkeit, zur
+  "brute force"-Methode zu greifen und den Tin aus den Sourcen mit der
+  Option "--disable-locale" selbst zu compilieren. In diesem Fall werden
+  die Locales voellig ignoriert und jedes Zeichen als darstellbar bewertet.

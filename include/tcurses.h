@@ -1,16 +1,15 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : tcurses.h
- *  Author    : Thomas Dickey
- *  Created   : 02.03.97
- *  Updated   : 02.03.97
+ *  Author    : Thomas Dickey <dickey@clark.net>
+ *  Created   : 02.03.1997
+ *  Updated   : 02.03.1997
  *  Notes     : #include files, #defines & struct's
- *
- *  Copyright 1997 by Thomas Dickey
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *  Copyright : (c) Copyright 1997 by Thomas Dickey
+ *	             You may  freely  copy or  redistribute  this software,
+ *	             so  long as there is no profit made from its use, sale
+ *	             trade or  reproduction.  You may not change this copy-
+ *	             right notice, and it must be included in any copy made
  */
 
 #ifndef TCURSES_H
@@ -52,6 +51,7 @@
 #define ClearScreen()			my_erase()
 #define CleartoEOLN()			clrtoeol()
 #define CleartoEOS()			clrtobot()
+#define WriteLine(row,buffer)		write_line(row,buffer)
 
 #define HpGlitch(func)			/*nothing*/
 
@@ -75,6 +75,7 @@ extern void my_printf(const char *fmt, ...)
 	;
 extern void my_retouch(void);
 extern void refresh_color(void);
+extern void write_line(int row, char *buffer);
 
 #else	/* !USE_CURSES */
 
@@ -92,6 +93,7 @@ extern void refresh_color(void);
 #define my_flush()			fflush(stdout)
 #define my_fflush(stream)		fflush(stream)
 #define my_retouch()			ClearScreen()
+#define WriteLine(row,buffer)		/*nothing*/
 
 #define HpGlitch(func)			if (_hp_glitch) func
 

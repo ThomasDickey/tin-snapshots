@@ -1,5 +1,5 @@
 #ifndef PROTO_H
-#define PROTO_H 1
+#	define PROTO_H 1
 
 /* active.c */
 extern int get_active_num (void);
@@ -8,18 +8,13 @@ extern int match_group_list (char *group, char *group_list);
 extern int parse_active_line (char *line, long *max, long *min, char *moderated);
 extern int process_bogus(char *name);
 extern int resync_active_file (void);
+extern void create_save_active_file (void);
 extern void load_newnews_info (char *info);
 extern void read_news_active_file (void);
 #ifdef INDEX_DAEMON
 	extern void read_group_times_file (void);
 	extern void vMakeActiveMyGroup (void);
 	extern void write_group_times_file (void);
-#endif /* INDEX_DAEMON */
-
-/* actived.c */
-extern void create_save_active_file (void);
-#ifdef INDEX_DAEMON
-	extern void vCreatePath (char *pcPath);
 #endif /* INDEX_DAEMON */
 
 /* art.c */
@@ -236,6 +231,7 @@ extern void *my_realloc1 (const char *file, int line, char *p, size_t size);
 /* misc.c */
 extern char *eat_re (char *s, t_bool eat_was);
 extern char *quote_wild(char *str);
+extern char *quote_wild_whitespace(char *str);
 extern const char *get_val (const char *env, const char *def);
 extern int get_arrow_key (int prech);
 extern int get_initials (int respnum, char *s, int maxsize);
@@ -477,6 +473,7 @@ extern int search_article (int forward);
 extern int search_author (int the_index, int current_art, int forward);
 extern int search_body (struct t_group *group, int current_art);
 extern int search_config (int forward, int current, int last);
+extern int search_help (int forward, int current, int last);
 extern int search_subject_group (int forward);
 extern void search_group (int forward);
 extern void search_subject_thread (int forward, int baseart, int offset);
@@ -523,6 +520,7 @@ extern char *my_strdup (const char *str);
 extern char *str_trim (char *string);
 extern char *strcasestr (char *haystack, const char *needle);
 extern char *tin_itoa (int value, int digits);
+extern int sh_format(char *dst, size_t len, const char *fmt, ...);
 extern size_t mystrcat (char **t, const char *s);
 extern void modifiedstrncpy (char *target, const char *source, size_t size, int decode);
 extern void my_strncpy (char *p, const char *q, size_t n);

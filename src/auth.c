@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : auth.c
  *  Author    : Dirk Nimmich <nimmich@uni-muenster.de>
- *  Created   : 05.04.97
- *  Updated   : 19.12.97
+ *  Created   : 05.04.1997
+ *  Updated   : 19.12.1997
  *  Notes     : Routines to authenticate to a news server via NNTP
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,

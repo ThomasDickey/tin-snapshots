@@ -1,15 +1,15 @@
 /*
-** Project   : tin - a Usenet reader
-** Module    : header.c
-** Author    : Urs Janssen <urs@akk.uni-karlsruhe.de>
-** Created   : 10.03.97
-** Updated   : 19.03.97
-** Copyright : (c) Copyright 1997 by Urs Janssen
-**             You may  freely  copy or  redistribute  this software,
-**             so  long as there is no profit made from its use, sale
-**             trade or  reproduction.  You may not change this copy-
-**             right notice, and it must be included in any copy made.
-*/
+ * Project   : tin - a Usenet reader
+ * Module    : header.c
+ * Author    : Urs Janssen <urs@tin.org>
+ * Created   : 10.03.1997
+ * Updated   : 19.03.1997
+ * Copyright : (c) Copyright 1997-98 by Urs Janssen
+ *             You may  freely  copy or  redistribute  this software,
+ *             so  long as there is no profit made from its use, sale
+ *             trade or  reproduction.  You may not change this copy-
+ *             right notice, and it must be included in any copy made.
+ */
 
 #include "tin.h"
 #include "tnntp.h"

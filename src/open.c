@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : open.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.91
- *  Updated   : 24.12.97
+ *  Created   : 01.04.1991
+ *  Updated   : 24.12.1997
  *  Notes     : Routines to make reading news locally (ie. /var/spool/news)
  *              or via NNTP transparent
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta

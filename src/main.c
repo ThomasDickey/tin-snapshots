@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : main.c
  *  Author    : I. Lea & R. Skrenta
- *  Created   : 01.04.91
- *  Updated   : 22.12.94
+ *  Created   : 01.04.1991
+ *  Updated   : 28.12.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
@@ -18,10 +18,10 @@
 #include	"bugrep.h"
 
 #if defined(M_AMIGA) && defined(__SASC_650)
-extern int	_WBArg;
-extern char	**_WBArgv;
-char		__stdiowin[] = "con:0/12/640/200/TIN " VERSION;
-char		__stdiov37[] = "/AUTO/NOCLOSE";
+	extern int _WBArg;
+	extern char	**_WBArgv;
+	char __stdiowin[] = "con:0/12/640/200/TIN " VERSION;
+	char __stdiov37[] = "/AUTO/NOCLOSE";
 #endif
 
 static char **cmdargs;
@@ -29,23 +29,20 @@ static int num_cmdargs;
 static int max_cmdargs;
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static int check_for_any_new_news (t_bool CheckAnyUnread, t_bool StartAnyUnread);
 static void save_or_mail_new_news (void);
-#ifndef ACTIVE_DAEMON
-	static void read_cmd_line_options (int argc, char *argv[]);
-	static void update_index_files (void);
-	static void usage (char *theProgname);
-#	ifndef INDEX_DAEMON
+static void read_cmd_line_options (int argc, char *argv[]);
+static void update_index_files (void);
+static void usage (char *theProgname);
+#ifndef INDEX_DAEMON
 	static void show_intro_page (void);
-#	endif /* !INDEX_DAEMON */
-#endif /* !ACTIVE_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 /*
-**  OK lets start the ball rolling...
-*/
-#ifndef ACTIVE_DAEMON
+ *  OK lets start the ball rolling...
+ */
 int
 main (
 	int argc,
@@ -105,15 +102,15 @@ main (
 	}
 
 	/*
+	 *  Process envargs & command line options
+	 */
+	read_cmd_line_options (argc, argv);
+
+	/*
 	 *  Read user local & global config files
 	 */
 	read_config_file (global_config_file, TRUE);
 	read_config_file (local_config_file, FALSE);
-
-	/*
-	 *  Process envargs & command line options
-	 */
-	read_cmd_line_options (argc, argv);
 
 #ifndef INDEX_DAEMON
 	set_up_private_index_cache ();
@@ -324,7 +321,6 @@ main (
 	selection_index (start_groupnum, num_cmd_line_groups);
 	return(0); /* not reached */
 }
-#endif /* !ACTIVE_DAEMON */
 
 /*
  * process command line options
@@ -340,7 +336,6 @@ main (
 #	define OPTIONS "dD:f:hI:PvV"
 #endif
 
-#ifndef ACTIVE_DAEMON
 static void
 read_cmd_line_options (
 	int argc,
@@ -467,7 +462,9 @@ read_cmd_line_options (
 				break;
 
 			case 'N':	/* mail new news to your posts */
-				mail_news_to_posted = TRUE;
+				my_strncpy (mail_news_user, userid ,sizeof(userid));
+				mail_news = TRUE;
+				batch_mode = TRUE;
 				break;
 
 			case 'o':	/* post postponed articles & exit */
@@ -611,7 +608,7 @@ read_cmd_line_options (
 	}
 
 	if (verbose && !batch_mode) {
-		wait_message(0, "-v only useful for batch mode operations\n");
+		wait_message(1, "-v only useful for batch mode operations\n");
 		verbose = FALSE;
 	}
 
@@ -620,7 +617,7 @@ read_cmd_line_options (
 	 */
 #ifdef NNTP_ABLE
 	if (newsrc_active && !read_news_via_nntp) {
-		wait_message(0, "Assuming -r in order to use -n\n");
+		wait_message(1, "Assuming -r in order to use -n\n");
 		read_news_via_nntp = TRUE;	/* We won't get here without NNTP support */
 	}
 #endif
@@ -634,8 +631,7 @@ usage (
 	char *theProgname)
 {
 #ifndef INDEX_DAEMON
-	error_message ("%s A Usenet reader.\n", cvers);
-	error_message ("Usage: %s [options] [newsgroups]", theProgname);
+	error_message ("A Usenet reader.\n\nUsage: %s [options] [newsgroup[,...]]", theProgname);
 
 #	ifndef M_AMIGA
 #		ifdef HAVE_COLOR
@@ -647,9 +643,7 @@ usage (
 #	endif /* !M_AMIGA */
 
 	error_message ("  -c       mark all news as read in subscribed newsgroups (batch mode)");
-
 	error_message ("  -C       count unread articles");
-
 	error_message ("  -d       don't show newsgroup descriptions");
 
 #	ifdef DEBUG
@@ -660,7 +654,8 @@ usage (
 
 #	ifndef M_AMIGA
 #		ifdef NNTP_ABLE
-			error_message ("  -g serv  read news from NNTP server serv");
+			/* FIXME, default should be $NNTPSERVER if set ... */
+			error_message ("  -g serv  read news from NNTP server serv [default=%s]", NNTP_DEFAULT_SERVER);
 #		endif /* NNTP_ABLE */
 #	endif /* !M_AMIGA */
 
@@ -680,9 +675,11 @@ usage (
 
 	error_message ("  -N       mail new news to your posts");
 	error_message ("  -o       post all postponed articles and exit");
+
 #	ifdef NNTP_ABLE
-		error_message ("  -p port  use port (instead of %d) as NNTP port", nntp_tcp_port);
+		error_message ("  -p port  use port as NNTP port [default=%d]", nntp_tcp_port);
 #	endif /* NNTP_ABLE */
+
 	error_message ("  -q       don't check for new newsgroups");
 	error_message ("  -Q       quick start. Same as -nqd");
 
@@ -708,8 +705,9 @@ usage (
 	error_message ("  -Z       return status indicating if any unread news (batch mode)");
 
 #else /* INDEX_DAEMON */
-	error_message ("%s Tin index file daemon.\n", cvers);
-	error_message ("Usage: %s [options] [newsgroups]", theProgname);
+
+	error_message ("Index file daemon.\n\nUsage: %s [options] [newsgroups]", theProgname);
+
 	error_message ("  -d       delete index file before indexing articles");
 
 #	ifdef DEBUG
@@ -726,7 +724,6 @@ usage (
 
 	error_message ("\nMail bug reports/comments to %s", BUG_REPORT_ADDRESS);
 }
-#endif /* !ACTIVE_DAEMON */
 
 /*
  *  check/start if any new/unread articles
@@ -781,7 +778,6 @@ save_or_mail_new_news (void)
 /*
  *  update index files
  */
-#ifndef ACTIVE_DAEMON
 static void
 update_index_files (void)
 {
@@ -853,7 +849,6 @@ update_index_files (void)
 		}
 	}
 }
-#endif /* !ACTIVE_DAEMON */
 
 /*
  *  display page of general info. for first time user.
@@ -862,12 +857,11 @@ update_index_files (void)
 static void
 show_intro_page (void)
 {
-	if (cmd_line) {
-		wait_message (1, cvers);
-	} else {
+	if (!cmd_line) {
 		ClearScreen ();
 		center_line (0, TRUE, cvers);
 		Raw (FALSE);
+		my_printf("\n");
 	}
 
 	my_fputs (txt_intro_page, stdout);

@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : search.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 05-06-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 27.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -73,8 +73,10 @@ get_search_pattern(
 	wait_message (0, txt_searching);
 	stow_cursor();
 
-	if (wildcard)			/* ie, not wildmat() */
+	if (wildcard) {			/* ie, not wildmat() */
+		strcpy(def, quote_wild_whitespace (def));
 		return(def);
+	}
 
 	/*
 	 * A gross hack to simulate substrings with wildmat()
@@ -84,7 +86,7 @@ get_search_pattern(
 }
 
 /*
- *  Called by group.c & page.c
+ * Called by group.c & page.c
  */
 
 int
@@ -112,9 +114,8 @@ search_author (
 			if (i < 0)
 				i = base[0];
 		} else {
-			i = prev_response (i);
-			if (i < 0)
-				i = base[top_base - 1] + num_of_responses (top_base - 1);
+			if ((i = prev_response (i)) < 0)
+				i = find_response(top_base - 1, num_of_responses (top_base - 1));
 		}
 
 		if (active[the_index].attribute->show_only_unread && arts[i].status != ART_UNREAD)
@@ -136,7 +137,7 @@ search_author (
 		}
 	} while (i != current_art);
 
-	info_message ((msg[0] == '\0') ? txt_no_match : msg);
+	info_message (txt_no_match);
 	return -1;
 }
 
@@ -176,10 +177,10 @@ search_config(int forward, int current, int last)
 	return result;
 }
 
+#ifndef INDEX_DAEMON
 /*
  * Called by select.c
  */
-
 void
 search_group (
 	int forward)
@@ -224,7 +225,44 @@ search_group (
 		}
 	} while (i != cur_groupnum);
 
-	info_message ((msg[0] == '\0') ? txt_no_match : msg);
+	info_message (txt_no_match);
+}
+#endif /* !INDEX_DAEMON */
+
+/*
+ * Called by help.c
+ */
+int
+search_help(int forward, int current, int last)
+{
+	int n;
+	int incr = forward ? 1 : -1;
+	int result = current;
+	char *buf;
+
+	if (!(buf = get_search_pattern(
+				forward,
+				txt_search_forwards,
+				txt_search_backwards,
+				default_group_search,
+				HIST_HELP_SEARCH
+	))) return result;
+
+	current += incr;
+	n = current;
+	do {
+		if (n < 0)
+			n = last;
+		else if (n > last)
+			n = 0;
+		if (REGEX_MATCH (info_help[n], buf, TRUE)) {
+			result = n;
+			break;
+		}
+		n += incr;
+	} while (n != current);
+	clear_message ();
+	return result;
 }
 
 /*
@@ -282,7 +320,7 @@ search_subject_thread(
 		baseart = arts[baseart].thread;
 
 	if ((depth = search_thread(baseart, buf)) == -1) {
-		info_message ((msg[0] == '\0') ? txt_no_match : msg);
+		info_message (txt_no_match);
 		return;
 	}
 
@@ -297,6 +335,7 @@ search_subject_thread(
  * If the match happened inside a thread (ie after a subject change within a thread)
  * return the depth in the thread of the matching article. Otherwise -1.
  */
+#ifndef INDEX_DAEMON
 int
 search_subject_group (
 	int forward)
@@ -350,7 +389,7 @@ search_subject_group (
 	} while (i != index_point && !found);
 
 	if (!found) {
-		info_message ((msg[0] == '\0') ? txt_no_match : msg);
+		info_message (txt_no_match);
 		return(-1);
 	}
 
@@ -364,12 +403,12 @@ search_subject_group (
 	clear_message();
 	return(-1);				/* No furthur action needed in group.c */
 }
+#endif /* INDEX_DAEMON */
 
 /*
- *  page.c (search current article body)
+ * page.c (search current article body)
  *	TODO - highlight located text ?
  */
-
 int
 search_article (
 	int forward)
@@ -451,7 +490,7 @@ search_article (
 	}
 
 	fseek (note_fp, note_mark[note_page], SEEK_SET);
-	info_message ((msg[0] == '\0') ? txt_no_match : msg);
+	info_message (txt_no_match);
 	return FALSE;
 }
 
@@ -459,9 +498,9 @@ search_article (
 /*
  * Scan the body of an article for a string.
  * used only by search_body()
- * Returns:		TRUE	String found
- *				FALSE	Not found
- *				-1		User aborted the search
+ * Returns:	TRUE  String found
+ *          FALSE Not found
+ *          -1	   User aborted the search
  */
 static int
 search_art_body (
@@ -527,13 +566,8 @@ search_body (
 	char *pat;
 	int art_cnt = 0, i, j = 0;
 
-	if (!(pat = get_search_pattern(
-				1,
-				txt_search_body,
-				txt_search_body,
-				default_art_search,
-				HIST_ART_SEARCH
-	))) return -1;
+	if (!(pat = get_search_pattern(1, txt_search_body, txt_search_body, default_art_search, HIST_ART_SEARCH)))
+		return -1;
 
 	make_group_path (group->name, group_path);
 
@@ -541,9 +575,8 @@ search_body (
 	 * Count up the articles to be processed for the progress meter
 	 */
 	if (group->attribute->show_only_unread) {
-		for (i = 0 ; i < top_base ; i++) {
+		for (i = 0 ; i < top_base ; i++)
 			art_cnt += new_responses (i);
-		}
 	} else {
 		for (i = 0 ; i < top ; i++) {
 			if (!IGNORE_ART(i))
@@ -573,7 +606,7 @@ search_body (
 
 	} while (i != current_art);
 
-	info_message ((msg[0] == '\0') ? txt_no_match : msg);
+	info_message (txt_no_match);
 
 	return -1;
 }

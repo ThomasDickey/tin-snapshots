@@ -1,17 +1,16 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : tcurses.c
- *  Author    : Thomas Dickey
- *  Created   : 02.03.97
- *  Updated   : 24.11.97
+ *  Author    : Thomas Dickey <dickey@clark.net>
+ *  Created   : 02.03.1997
+ *  Updated   : 31.12.1997
  *  Notes     : This is a set of wrapper functions adapting the termcap
- *		interface of tin to use SVr4 curses (e.g., ncurses).
- *
- *  Copyright 1997 by Thomas Dickey
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *	             interface of tin to use SVr4 curses (e.g., ncurses).
+ * Copyright :  (c) Copyright 1997-98 by Thomas Dickey
+ *	             You may  freely  copy or  redistribute  this software,
+ *	             so  long as there is no profit made from its use, sale
+ *	             trade or  reproduction.  You may not change this copy-
+ *	             right notice, and it must be included in any copy made
  */
 
 #include "tin.h"
@@ -22,8 +21,6 @@
 #ifndef KEY_MIN
 #define KEY_MIN KEY_BREAK	/* SVr3 curses */
 #endif
-
-#include <stdarg.h>
 
 #include "trace.h"
 
@@ -364,6 +361,18 @@ screen_contents(int row, int col, char *buffer)
 	buffer[len] = '\0';
 	TRACE(("...screen_contents(%d,%d) %s", y, x, _nc_visbuf(buffer)))
 	return buffer;
+}
+
+void
+write_line(int row, char *buffer)
+{
+	int len = strlen(buffer);
+
+	if (len > cCOLS)
+		buffer[len = cCOLS] = '\0';
+	mvaddstr(row, 0, buffer);
+	if (len < cCOLS)
+		clrtoeol();
 }
 
 #else

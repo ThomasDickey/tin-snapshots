@@ -1,10 +1,14 @@
-# Top level Makefile for tin - for configuration options read the ./INSTALL file.
+# Top level Makefile for tin
+# - for configuration options read the doc/INSTALL file.
 #
+# Updated   : 31.12.1997
+#
+
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971224
+PVER		= 980105
 VER		= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -37,7 +41,6 @@ HFILES	= \
 
 CFILES	= \
 	$(SRCDIR)/active.c \
-	$(SRCDIR)/actived.c \
 	$(SRCDIR)/art.c \
 	$(SRCDIR)/attrib.c \
 	$(SRCDIR)/auth.c \
@@ -120,6 +123,7 @@ DOC	= \
 	$(DOCDIR)/internals.txt \
 	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/minimal-netkeeping \
+	$(DOCDIR)/umlaute.txt \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
 TOL	= \
@@ -186,6 +190,7 @@ NROFF		= groff -Tascii
 RM		= rm
 SHELL		= /bin/sh
 TAR		= gtar
+BZIP2		= bzip2
 WC		= wc
 SED		= sed
 TR		= tr
@@ -259,6 +264,18 @@ tar:
  	| $(TR) "[\012]" " "`
 	@$(CHMOD) 644 $(PROJECT)$(VER).tgz
 	@$(LS) $(PROJECT)$(VER).tgz
+
+bzip2:
+	@$(ECHO) "Generating bzipped tar file..."
+	@-$(RM) $(PROJECT)$(VER).tgz > /dev/null 2>&1
+	@$(TAR) cvf $(PROJECT)$(VER).tar -C ../ \
+	`$(ECHO) $(ALL_FILES) \
+	| $(TR) -s '[[:space:]]' "[\012*]" \
+	| $(SED) 's,^\./,$(PROJECT)-$(PVER)/,' \
+ 	| $(TR) "[\012]" " "`
+	@$(BZIP2) $(PROJECT)$(VER).tar
+	@$(CHMOD) 644 $(PROJECT)$(VER).tar.bz2
+	@$(LS) $(PROJECT)$(VER).tar.bz2
 
 #
 # I know it's ugly, but it works

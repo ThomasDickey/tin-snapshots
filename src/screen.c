@@ -1,18 +1,16 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : screen.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 25-07-94
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 31.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
  *              right notice, and it must be included in any copy made
  */
-
-#include	<stdarg.h>
 
 #include	"tin.h"
 #include	"tcurses.h"

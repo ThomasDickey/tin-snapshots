@@ -1,11 +1,11 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : active.c
- *  Author    : I.Lea
- *  Created   : 16-02-92
- *  Updated   : 20-08-95
+ *  Author    : I. Lea
+ *  Created   : 16.02.1992
+ *  Updated   : 05.01.1998
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -16,9 +16,31 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
+
+/*
+ * List of allowed seperator chars in active file
+ * unsed in parse_active_line()
+ */
+#define ACTIVE_SEP		" \n"
+
 char new_newnews_host[PATH_LEN];
 int reread_active_file = FALSE;
 time_t new_newnews_time;			/* FIXME: never set */
+
+/* FIXME: make local */
+char	acHomeDir[PATH_LEN];
+char	acMailActiveFile[PATH_LEN];
+char	acSaveActiveFile[PATH_LEN];
+char	acTempActiveFile[PATH_LEN];
+char	acMailDir[PATH_LEN];
+char	acSaveDir[PATH_LEN];
+int	iAllGrps;
+int	iRecursive;
+int	iVerbose;
+#ifndef M_AMIGA
+	struct	passwd *psPwd;
+	struct	passwd sPwd;
+#endif
 
 /*
  * Local prototypes
@@ -28,6 +50,10 @@ static int parse_newsrc_active_line (char *buf, long *count, long *max, long *mi
 static void check_for_any_new_groups (void);
 static void subscribe_new_group (char *group, char *autosubscribe, char *autounsubscribe);
 static void active_add (struct t_group *ptr, long count, long max, long min, const char *moderated);
+static void vAppendGrpLine (char *pcActiveFile, char *pcGrpPath, long lArtMax, long lArtMin, char *pcBaseDir);
+static void vInitVariables (void);
+static void vMakeGrpList (char *pcActiveFile, char *pcBaseDir, char *pcGrpPath);
+
 
 /*
  *  Get default array size for active[] from environment (AmigaDOS)
@@ -87,8 +113,6 @@ resync_active_file (void)
 	return TRUE;
 }
 
-/* List of allowed seperator chars in active file */
-#define ACTIVE_SEP				" \n"
 
 /*
  * Populate a slot in the active[] array
@@ -315,7 +339,7 @@ read_news_active_file (void)
 		/*
 		 * Load the new group in active[]
 		 */
-		active_add(grpptr, count, max, min, moderated);
+		active_add (grpptr, count, max, min, moderated);
 	}
 
 	if (newsrc_active)
@@ -413,7 +437,7 @@ check_for_any_new_groups (void)
 				*ptr = '\0';
 			}
 
-			subscribe_new_group(buf, autosubscribe, autounsubscribe);
+			subscribe_new_group (buf, autosubscribe, autounsubscribe);
 		}
 
 		TIN_FCLOSE (fp);
@@ -473,7 +497,7 @@ subscribe_new_group (
 	}
 
 	if ((autosubscribe != (char *) 0) && match_group_list (group, autosubscribe)) {
-		my_printf("\nAutosubscribed to %s", group);
+		my_printf (txt_autosubscribed, group);
 
 		subscribe (&active[my_group[idx]], SUBSCRIBED);
 		/*
@@ -688,7 +712,8 @@ find_newnews_index (
  * and in header of group screen
  */
 int
-group_flag(int ch)
+group_flag (
+	int ch)
 {
 	switch (ch) {
 		case 'm':
@@ -700,6 +725,162 @@ group_flag(int ch)
 			return '=';
 		default:
 			return ' ';
+	}
+}
+
+
+/* ex actived.c functions */
+void
+create_save_active_file (void)
+{
+	char	acGrpPath[PATH_LEN];
+
+	my_printf (txt_creating_active);
+
+	vInitVariables ();
+
+	iRecursive = TRUE;
+
+	vPrintActiveHead (acSaveActiveFile);
+	strcpy (acGrpPath, acSaveDir);
+	vMakeGrpList (acSaveActiveFile, acSaveDir, acGrpPath);
+}
+
+
+static void
+vInitVariables (void)
+{
+	char	*pcPtr;
+
+#ifndef M_AMIGA
+	psPwd = (struct passwd *) 0;
+	if (((pcPtr = getlogin ()) != (char *) 0) && strlen (pcPtr))
+		psPwd = getpwnam (pcPtr);
+
+	if (psPwd == (struct passwd *) 0)
+		psPwd = getpwuid (getuid ());
+
+	if (psPwd != (struct passwd *) 0) {
+		memcpy (&sPwd, psPwd, sizeof (struct passwd));
+		psPwd = &sPwd;
+	}
+#endif
+
+	if ((pcPtr = getenv ("TIN_HOMEDIR")) != (char *) 0) {
+		strcpy (acHomeDir, pcPtr);
+	} else if ((pcPtr = getenv ("HOME")) != (char *) 0) {
+		strcpy (acHomeDir, pcPtr);
+#ifndef M_AMIGA
+	} else if (psPwd != (struct passwd *) 0) {
+		strcpy (acHomeDir, psPwd->pw_dir);
+	} else
+		strcpy (acHomeDir, "/tmp");
+#else
+	} else
+		strcpy (acHomeDir, "T:");
+#endif
+
+#ifdef WIN32
+#	define DOTTINDIR "tin"
+#else
+#	define DOTTINDIR ".tin"
+#endif /* WIN32 */
+	sprintf (acTempActiveFile, "%s/%s/%ld.tmp", acHomeDir, DOTTINDIR, (long) getpid ());
+	sprintf (acMailActiveFile, "%s/%s/%s", acHomeDir, DOTTINDIR, ACTIVE_MAIL_FILE);
+	sprintf (acSaveActiveFile, "%s/%s/%s", acHomeDir, DOTTINDIR, ACTIVE_SAVE_FILE);
+	sprintf (acMailDir, "%s/Mail", acHomeDir);
+	sprintf (acSaveDir, "%s/News", acHomeDir);
+	iAllGrps = FALSE;
+	iRecursive = FALSE;
+	iVerbose = FALSE;
+}
+
+
+static void
+vMakeGrpList (
+	char	*pcActiveFile,
+	char	*pcBaseDir,
+	char	*pcGrpPath)
+{
+	char	*pcPtr;
+	char	acFile[PATH_LEN];
+	char	acPath[PATH_LEN];
+	DIR		*tDirFile;
+	DIR_BUF	*tFile;
+	int		iIsDir;
+	long	lArtMax;
+	long	lArtMin;
+	struct	stat sStatInfo;
+
+	if (iVerbose)
+		my_printf ("BEG Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
+
+	if (access (pcGrpPath, R_OK) != 0)
+		return;
+
+	tDirFile = opendir (pcGrpPath);
+
+#if 0
+	my_printf ("opendir(%s)\n", pcGrpPath);
+#endif
+
+	if (tDirFile != (DIR *) 0) {
+		iIsDir = FALSE;
+		while ((tFile = readdir (tDirFile)) != (DIR_BUF *) 0) {
+			strncpy (acFile, tFile->d_name, (size_t) D_NAMLEN(tFile));
+			acFile[D_NAMLEN(tFile)] = '\0';
+			sprintf (acPath, "%s/%s", pcGrpPath, acFile);
+
+#if 0
+	my_printf ("STAT=[%s]\n", acPath);
+#endif
+
+			if (!(acFile[0] == '.' && acFile[1] == '\0') &&
+				!(acFile[0] == '.' && acFile[1] == '.' && acFile[2] == '\0')) {
+				if (stat (acPath, &sStatInfo) != -1) {
+					if (S_ISDIR(sStatInfo.st_mode))
+						iIsDir = TRUE;
+				}
+			}
+			if (iIsDir) {
+				iIsDir = FALSE;
+				strcpy (pcGrpPath, acPath);
+				if (iVerbose)
+					my_printf ("Base=[%s] path=[%s]\n", pcBaseDir, pcGrpPath);
+
+				vMakeGrpList (pcActiveFile, pcBaseDir, pcGrpPath);
+				vFindArtMaxMin (pcGrpPath, &lArtMax, &lArtMin);
+				vAppendGrpLine (pcActiveFile, pcGrpPath, lArtMax, lArtMin, pcBaseDir);
+
+				pcPtr = strrchr (pcGrpPath, '/');
+				if (pcPtr != (char *) 0)
+					*pcPtr = '\0';
+			}
+		}
+		closedir (tDirFile);
+	}
+}
+
+
+static void
+vAppendGrpLine (
+	char	*pcActiveFile,
+	char	*pcGrpPath,
+	long	lArtMax,
+	long	lArtMin,
+	char	*pcBaseDir)
+{
+	char	acGrpName[PATH_LEN];
+	FILE	*hFp;
+
+	if (!iAllGrps && (lArtMax == 0 && lArtMin == 1))
+		return;
+
+	if ((hFp = fopen (pcActiveFile, "a+")) != (FILE *) 0) {
+		vMakeGrpName (pcBaseDir, acGrpName, pcGrpPath);
+		my_printf ("Appending=[%s %ld %ld %s]\n", acGrpName, lArtMax, lArtMin, pcBaseDir);
+		vPrintGrpLine (hFp, acGrpName, lArtMax, lArtMin, pcBaseDir);
+		fclose (hFp);
 	}
 }
 

@@ -2,12 +2,12 @@
  *  Project   : tin - a Usenet reader
  *  Module    : refs.c
  *  Author    : Jason Faultless <jason@radar.demon.co.uk>
- *  Created   : 09-05-96
- *  Updated   : 04-12-96
+ *  Created   : 09.05.96
+ *  Updated   : 04.01.98
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
  *              hash_msgid, free_msgid
- *  Copyright : (c) 1996 by Jason Faultless
+ *  Copyright : (c) 1996-98 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -39,8 +39,8 @@ static struct t_msgid * parse_references (char *r);
 static unsigned int hash_msgid (char *key);
 static void add_to_parent (struct t_msgid *ptr);
 static void build_thread (struct t_msgid *ptr);
-static void dump_thread (FILE *fp, struct t_msgid *msgid, int level);
 #ifdef DEBUG_REFS
+	static void dump_thread (FILE *fp, struct t_msgid *msgid, int level);
 	static void dump_msgid_thread(struct t_msgid *ptr, int level);
 	static void dump_msgid_threads(void);
 #endif /* DEBUG_REFS */
@@ -526,6 +526,7 @@ clear_art_ptrs(void)
  * Function to dump an ASCII tree map of a thread rooted at msgid.
  * Output goes to fp, level is the current depth of the tree.
  */
+#ifdef DEBUG_REFS
 static void
 dump_thread(
 	FILE *fp,
@@ -560,7 +561,6 @@ dump_thread(
 	return;
 }
 
-#ifdef DEBUG_REFS
 /*
  * Dump out all the threads from the msgid point of view, show the
  * related article index in arts[] where possible
@@ -605,7 +605,7 @@ dump_msgid_threads(void)
 
 	fprintf(dbgfd, "Dump complete.\n\n");
 }
-#endif
+#endif /* DEBUG_REFS */
 
 /*
  * Find the next message in the thread.

@@ -2,10 +2,10 @@
  *  Project   : tin - a Usenet reader
  *  Module    : makecfg.c
  *  Author    : Thomas E. Dickey <dickey@clark.net>
- *  Created   : 23.08.97
+ *  Created   : 23.08.1997
  *  Updated   :
  *  Notes     : #defines and structs for config.c
- *  Copyright 1996 by Thomas E. Dickey
+ *  Copyright : (c) Copyright 1997-98 by Thomas E. Dickey
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

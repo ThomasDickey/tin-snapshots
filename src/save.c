@@ -1,15 +1,15 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : save.c
- *  Author    : I.Lea & R.Skrenta
- *  Created   : 01-04-91
- *  Updated   : 22-08-95
+ *  Author    : I. Lea & R. Skrenta
+ *  Created   : 01.04.1991
+ *  Updated   : 31.12.1997
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Iain Lea & Rich Skrenta
- *		You may  freely  copy or  redistribute	this software,
- *		so  long as there is no profit made from its use, sale
- *		trade or  reproduction.  You may not change this copy-
- *		right notice, and it must be included in any copy made
+ *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *	             You may  freely  copy or  redistribute this  software,
+ *	             so  long as there is no profit made from its use, sale
+ *	             trade or  reproduction.  You may not change this copy-
+ *	             right notice, and it must be included in any copy made
  */
 
 #include	"tin.h"
@@ -142,11 +142,6 @@ check_start_save_any_news (
 			if (arts[j].status != ART_UNREAD)
 				continue;
 
-			if (mail_news_to_posted && !arts[j].selected) {
-				if (catchup)
-					art_mark_read (group, &arts[j]);
-				continue;
-			}
 			switch (check_start_save) {
 				case CHECK_ANY_NEWS:
 					if (print_first && verbose) {
@@ -297,7 +292,6 @@ save_art_to_file (
 	int is_mailbox = FALSE;
 	int i = 0, ret_code = FALSE;
 	struct stat st;
-	time_t epoch;
 
 	if (strlen (filename)) {
 		is_mailbox = the_mailbox;
@@ -342,13 +336,38 @@ save_art_to_file (
 		return ret_code;
 	}
 
-	time (&epoch);
-	fprintf (fp, "From %s %s", note_h.path, ctime (&epoch));
+	{
+		/*
+		 * place "^From from  date" line as mailbox-seperator
+		 * on top of each article
+		 */
+		char from[HEADER_LEN];
+		char * from_login_pos;
+		char * from_end_pos;
+		time_t epoch;
+	
+		strcpy (from, note_h.from); /* make a working copy */
+	
+		/* skip realname in from */
+		if ((from_login_pos = strchr (from, '<')) == (char *) 0) {
+			/* address in user@domain (realname) syntax or realname is missing */
+			from_login_pos = from;
+			if ((from_end_pos = strchr (from_login_pos, ' ')) == (char *) 0)
+				from_end_pos = from_login_pos+strlen(from_login_pos);
+		} else {
+			from_login_pos++; /* skip '<' */
+			from_end_pos = from_login_pos+strlen(from_login_pos)-1; /* skip '>' */
+		}
+		*(from_end_pos) = '\0';
+		time (&epoch);
+		fprintf (fp, "From %s %s", from_login_pos, ctime (&epoch));
+	}
 
 	if (fseek (note_fp, 0L, SEEK_SET) == -1)
 		perror_message ("fseek() error on [%s]", arts[respnum].subject);
 	copy_fp (note_fp, fp);
 
+	/* write tailing newline or MDF-mailbix seperator */
 	print_art_seperator_line (fp, the_mailbox);
 
 	fclose (fp);
@@ -429,10 +448,9 @@ save_thread_to_file (
 		}
 		wait_message (2, save_thread_info);
 	}
-
+#endif /* !INDEX_DAEMON */
 	return TRUE;
 }
-#endif /* INDEX_DAEMON */
 
 
 #ifndef INDEX_DAEMON
@@ -479,7 +497,7 @@ save_regex_arts (
 
 	return ret_code;
 }
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 int
 create_path (
@@ -575,7 +593,7 @@ create_path (
 	if (mbox_format)
 		strcpy (path, tmp);
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 	return mbox_format;
 }
@@ -600,7 +618,7 @@ create_sub_dir (
 		return ((S_ISDIR(st.st_mode)) ? TRUE : FALSE);
 	}
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 
 	return FALSE;
 }
@@ -749,7 +767,7 @@ add_to_save_list (
 	}
 	num_save++;
 
-#endif /* INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 /*
@@ -1020,8 +1038,7 @@ post_process_files (
 				break;
 		}
 
-		info_message (txt_post_processing_finished);
-		sleep (1);
+		wait_message (1, txt_post_processing_finished);
 		return TRUE;
 	}
 	return FALSE;
@@ -1182,13 +1199,13 @@ uudecode_file (
 	make_post_process_cmd (DEFAULT_UUDECODE, file_out_dir, file_out);
 #else
 
-	sprintf (buf, "cd %s; uudecode %s", file_out_dir, file_out);
+	sh_format (buf, sizeof(buf), "cd %s; uudecode %s", file_out_dir, file_out);
 	if (invoke_cmd (buf)) {
 		/*
 		 *  Sum file
 		 */
 		if ((file = get_archive_file (file_out_dir)) != 0) {
-			sprintf (buf, "%s '%s'", DEFAULT_SUM, file);
+			sh_format (buf, sizeof(buf), "%s %s", DEFAULT_SUM, file);
 			if ((fp_in = popen (buf, "r")) != (FILE *) 0) {
 				if (stat (file, &st) != -1)
 					file_size = (int) st.st_size;
@@ -1209,7 +1226,7 @@ uudecode_file (
 
 			/* If defined, invoke post processor command */
 			if (*post_proc_command) {
-				sprintf (buf, "cd %s; %s '%s'", file_out_dir, post_proc_command, file);
+				sh_format (buf, sizeof(buf), "cd %s; %s '%s'", file_out_dir, post_proc_command, file);
 
 				if (!invoke_cmd (buf))
 					error_message (txt_command_failed_s, buf);
@@ -1221,7 +1238,7 @@ uudecode_file (
 				 */
 				if (pp > POST_PROC_UUDECODE && archiver[pp].test != 0) {
 					i = (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
-					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
+					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].test, file);
 					my_printf (txt_testing_archive, file);
 					my_flush ();
@@ -1233,7 +1250,7 @@ uudecode_file (
 				 */
 				if (pp == POST_PROC_UUD_LST_ZOO || pp == POST_PROC_UUD_LST_ZIP) {
 					i = (pp == POST_PROC_UUD_LST_ZOO ? 3 : 4);
-					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
+					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].list, file);
 					my_printf (txt_listing_archive, file);
 					my_flush ();
@@ -1246,7 +1263,7 @@ uudecode_file (
 				 */
 				if (pp == POST_PROC_UUD_EXT_ZOO || pp == POST_PROC_UUD_EXT_ZIP) {
 					i = (pp == POST_PROC_UUD_EXT_ZOO ? 3 : 4);
-					sprintf (buf, "cd %s; %s %s %s", file_out_dir,
+					sh_format (buf, sizeof(buf), "cd %s; %s %s %s", file_out_dir,
 						archiver[i].name, archiver[i].extract, file);
 					my_printf (txt_extracting_archive, file);
 					my_flush ();
@@ -1348,7 +1365,7 @@ post_process_sh (
 #if !defined(M_UNIX)
 			make_post_process_cmd (DEFAULT_UNSHAR, file_out_dir, file_out);
 #else
-			sprintf (buf, "cd %s; sh %s", file_out_dir, file_out);
+			sh_format (buf, sizeof(buf), "cd %s; sh %s", file_out_dir, file_out);
 			my_fputs (cCRLF, stdout);
 			my_flush ();
 			Raw (FALSE);
@@ -1456,6 +1473,9 @@ any_saved_files (void)
 	return saved;
 }
 
+/*
+ * write tailing (MDF)-mailbox seperator
+ */
 void
 print_art_seperator_line (
 	FILE *fp,

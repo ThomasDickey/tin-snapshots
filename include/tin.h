@@ -3,7 +3,7 @@
  *  Module    : tin.h
  *  Author    : I. Lea & R. Skrenta
  *  Created   : 01.04.1991
- *  Updated   : 22.12.1997
+ *  Updated   : 31.12.1997
  *  Notes     : #include files, #defines & struct's
  *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
  *		You may  freely  copy or  redistribute	this software,
@@ -778,6 +778,7 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	GROUP_MATCH(s1, pat, case)		(wildmat (s1, pat, case))
 
 #define	REGEX_MATCH(s1, pat, case)	(wildcard_func (s1, pat, case))
+#define	REGEX_FMT (wildcard ? "%s" : "*%s*")
 
 #define	IGNORE_ART(i)	((arts[i].killed) || (arts[i].thread == ART_EXPIRED))
 

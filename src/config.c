@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : config.c
  *  Author    : I. Lea
- *  Created   : 01.04.91
- *  Updated   : 15.12.97
+ *  Created   : 01.04.1991
+ *  Updated   : 15.12.1997
  *  Notes     : Configuration file routines
  *  Copyright : (c) Copyright 1991-98 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,

@@ -1,29 +1,33 @@
-# Top level Makefile for tin - for configuration options read the ./INSTALL file.
+# Top level Makefile for tin
+# for configuration options read the doc/INSTALL file.
+#
+# Updated   : 31.12.1997
 #
 PROJECT		= tin
 EXE		= tin
 MANEXT		= 1
 LVER		= 1.4
-PVER		= 971224
+PVER		= 980105
 VER		= pre-$(LVER)-$(PVER)
-MAIL_ADDR 	= "urs@akk.uni-karlsruhe.de"
+MAIL_ADDR 	= "urs@tin.org"
 
 @SET_MAKE@
 
 # directory structure
-TOPDIR	= .
-AMGDIR	= ./amiga
-DOCDIR	= ./doc
-DOCDEDIR = ./doc/german
-INCDIR	= ./include
-MISCDIR = ./misc
-NNTPDIR = ./nntp
-OBJDIR	= ./src
-OS2DIR	= ./os2
-SRCDIR	= ./src
-VMSDIR  = ./vms
-VMSSIODIR  = ./sio
-WIN32DIR= ./win32
+TOPDIR = .
+AMGDIR = ./amiga
+DOCDIR = ./doc
+INCDIR = ./include
+OBJDIR = ./src
+SRCDIR = ./src
+
+# OS2DIR    = ./os2
+# MISCDIR   = ./misc
+# NNTPDIR   = ./nntp
+# DOCDEDIR  = ./doc/german
+# VMSDIR    = ./vms
+# VMSSIODIR = ./sio
+# WIN32DIR  = ./win32
 
 HFILES	= \
 	$(INCDIR)/amiga.h \
@@ -264,22 +268,22 @@ all:
 	@$(ECHO) "    make ztar            [ Create compressed tar archive of the distribution ]"
 
 build:
-	@$(CD) $(SRCDIR) && $(MAKE)
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@
 
 install:
-	@$(CD) $(SRCDIR) && $(MAKE) install
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@ install
 
 install_setuid:
-	@$(CD) $(SRCDIR) && $(MAKE) install_setuid
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@ install_setuid
 
 install_daemon:
-	@$(CD) $(SRCDIR) && $(MAKE) install_daemon
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@ install_daemon
 
 version:
 	@$(ECHO) "TIN v$(VER)"
 
 clean:
-	@$(CD) $(SRCDIR) && $(MAKE) clean
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@ clean
 	@$(RM) -f *~
 	@$(RM) -f $(AMGDIR)/*~
 	@$(RM) -f $(DOCDIR)/*~
@@ -291,7 +295,7 @@ clean:
 	@$(RM) -f $(SRCDIR)/*~
 
 clobber:
-	@$(CD) $(SRCDIR) && $(MAKE) clobber
+	@$(CD) $(SRCDIR) && $(MAKE) @cf_cv_makeflags@ clobber
 	@$(RM) -f *~
 	@$(RM) -f $(AMGDIR)/*~
 	@$(RM) -f $(DOCDIR)/*~
@@ -436,8 +440,8 @@ print:
 	done
 
 distclean:
-	$(CD) pcre && $(MAKE) $@
-	$(CD) src && $(MAKE) $@
+	$(CD) pcre && $(MAKE) @cf_cv_makeflags@ $@
+	$(CD) src && $(MAKE) @cf_cv_makeflags@ $@
 	$(RM) -f config.cache config.log config.status makefile */Makefile include/autoconf.h
 
 configure: configure.in aclocal.m4
