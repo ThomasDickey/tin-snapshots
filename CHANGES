@@ -1,3 +1,13 @@
+--unoff BETA release 960807 --
+
+147) Tomasz Kloczko <kloczek@rudy.mif.pg.gda.pl>
+     BUG. get nntpserver name from file did not work
+     FIX. nntplib.c
+
+146) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code cleanup
+     FIX. several patches
+
 --unoff BETA release 960805 --
 
 145) Enrik Berkhan <enrik@akk.uni-karlsruhe.de>

@@ -147,12 +147,10 @@ get_newsrcname (newsrc_name, nntpserver_name)
 			if (! error) {
 			/* FIXME - write a global permssion check routine */
 				if (access (dir, X_OK)) {
-					/* FIXME - put me in lang.c */
-					fprintf (stderr, "No permissions to go into %s\n", dir);
+					fprintf (stderr, txt_error_no_enter_permission, dir);
 					error=1;
 				} else if (access (newsrc_name, F_OK)) {
-					/* FIXME - put me in lang.c */
-					fprintf (stderr, "File %s does not exists\n", newsrc_name);
+					fprintf (stderr, txt_error_no_such_file, newsrc_name);
 					error=2;
 				} else if (access (dir, R_OK)) {
 					fprintf (stderr, txt_error_no_read_permission, dir);
@@ -175,11 +173,9 @@ get_newsrcname (newsrc_name, nntpserver_name)
 				do {
 					if (error >= 2) {
 						default_ch = iKeyNrctblCreate;
-						/* FIXME - put me in lang.c */
-						sprintf (msg, "%s%c", "c)reate it i)gnore q)uit tin: ",default_ch);
+						sprintf (msg, "%s%c", txt_nrctbl_create, default_ch);
 					} else {
-						/* FIXME - put me in lang.c */
-						sprintf (msg, "%s%c", "use d)efault .newsrc i)gnore q)uit tin: ",default_ch);
+						sprintf (msg, "%s%c", txt_nrctbl_default, default_ch);
 					}
 					wait_message (msg);
 					
@@ -200,8 +196,7 @@ get_newsrcname (newsrc_name, nntpserver_name)
 						joinpath(newsrc_name, homedir, ".newsrc");
 						return TRUE;
 					case iKeyNrctblIgnore:
-						/* FIXME - put me in lang.c */
-						sprintf(msg, "%s", "Okay, but you may run into difficulties later\n");
+						sprintf(msg, "%s", txt_warn_difficulties);
 						wait_message (msg);
 						return TRUE;
 					case iKeyNrctblQuit:

@@ -189,7 +189,7 @@ parse_active_line (line, max, min, moderated)
 	}
 	if (*q != ' ') {
 		error_message (txt_bad_active_file, line);
-		return FALSE;;
+		return FALSE;
 	}
 	*q++ = '\0';
 

@@ -74,8 +74,10 @@ extern char *get_uaf_fullname();
 #	else
 #		include	<sys/errno.h>
 #	endif
-#	if !defined(errno) && DECL_ERRNO
-	extern int errno;
+#	if !defined(errno)
+#		if DECL_ERRNO
+			extern int errno;
+#		endif
 #	endif
 #endif
 
@@ -121,7 +123,7 @@ extern char *get_uaf_fullname();
 #	endif
 #endif
 
-	/* prefer string.h because it's Posix */
+/* prefer string.h because it's Posix */
 #ifdef HAVE_STRING_H
 #	include <string.h>
 #else
@@ -386,6 +388,10 @@ extern char *get_uaf_fullname();
  * Determine machine configuration for external programs & directories
  */
 
+/*
+ * changed all bcopy/bzero calls to memcpy/memset so this is no longer needed
+ * so we could remove the next 8 lines and the autoconf check for bcopy/bzero 
+ */
 #ifndef BSD
 #	ifndef HAVE_BCOPY
 #		define	bcopy(a,b,c)	memcpy(b,a,c)
@@ -411,9 +417,6 @@ extern char *get_uaf_fullname();
 #	endif
 #	define		DEFAULT_SHELL		"/bin/csh"
 #	if defined(__386BSD__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__FreeBSD__)
-#		ifndef DEFAULT_EDITOR
-#			define	DEFAULT_EDITOR	"/usr/bin/vi"
-#		endif
 #		define	DEFAULT_PRINTER "/usr/bin/lpr"
 #		define	DEFAULT_MAILER	"/usr/sbin/sendmail"
 #		define	DEFAULT_MAILBOX "/var/mail"
@@ -431,18 +434,9 @@ extern char *get_uaf_fullname();
 #	ifdef pyr
 #		define	DEFAULT_MAILER	"/usr/.ucbucb/mail"
 #	endif
-#	ifndef DEFAULT_MAILER
-#		define	DEFAULT_MAILER	"/usr/lib/sendmail"
-#	endif
-#	ifndef DEFAULT_MAILBOX
-#		define	DEFAULT_MAILBOX "/usr/spool/mail"
-#	endif
 #else
 #	if defined(NCR) || defined(atthcx) || defined(PTX) || defined(sinix)
 #		define	DEFAULT_MAILER	"/usr/bin/mailx"
-#	endif
-#	if defined(__hpux) || defined(u3b2)
-#		define	DEFAULT_MAILER	"/usr/lib/sendmail"
 #	endif
 #	ifdef linux
 #		define	DEFAULT_MAILBOX "/var/spool/mail"
@@ -466,7 +460,7 @@ extern char *get_uaf_fullname();
 #	define	DEFAULT_EDITOR		"EDIT/TPU"
 #	define	DEFAULT_MAILBOX 	"SYS$LOGIN:"
 #	define	DEFAULT_MAILER		"MAIL"
-#	define	MAILER_FORMAT	    "MAIL /SUBJECT=\"%S\" %F \"IN%%\"\"%T\"\""
+#	define	MAILER_FORMAT		"MAIL /SUBJECT=\"%S\" %F \"IN%%\"\"%T\"\""
 #	define	DEFAULT_POSTER		"inews %s"
 #	define	DEFAULT_PRINTER 	"PRINT/DELETE"
 #	define	DEFAULT_UUDECODE	"uudecode %s"
@@ -501,17 +495,14 @@ extern char *get_uaf_fullname();
 #			define	DEFAULT_EDITOR	"/bin/vi"
 #		endif
 #		define	DEFAULT_MAILER	"/usr/bin/mail"
-#		define	DEFAULT_MAILBOX "/usr/spool/mail"
 #	endif
 #	ifdef QNX42
 #		ifndef DEFAULT_EDITOR
 #			define	DEFAULT_EDITOR		"/bin/vedit"
 #		endif
 #		define	DEFAULT_MAILER		"/usr/bin/sendmail"
-#		define	DEFAULT_MAILBOX 	"/usr/spool/mail"
 #	endif
 #	ifdef RS6000
-#		define	DEFAULT_MAILER	"/usr/lib/sendmail"
 #		define	DEFAULT_PRINTER "/bin/lp"
 #	endif
 #	ifdef SCO_UNIX
@@ -529,9 +520,6 @@ extern char *get_uaf_fullname();
 #	ifndef DEFAULT_SHELL
 #		define	DEFAULT_SHELL	"/bin/sh"
 #	endif
-#	ifndef DEFAULT_EDITOR
-#		define	DEFAULT_EDITOR	"/usr/bin/vi"
-#	endif
 #	ifndef DEFAULT_MAILBOX
 #		define	DEFAULT_MAILBOX "/usr/mail"
 #	endif
@@ -543,6 +531,20 @@ extern char *get_uaf_fullname();
 #	endif
 #	define		DEFAULT_SUM		"sum -r"
 #endif
+
+/*
+ * fallback values
+ */
+#ifndef DEFAULT_EDITOR
+#	define	DEFAULT_EDITOR		"/usr/bin/vi"
+#endif
+#ifndef DEFAULT_MAILER
+#	define  DEFAULT_MAILER		"/usr/bin/sendmail"
+#endif
+#ifndef DEFAULT_MAILBOX
+#	define  DEFAULT_MAILBOX		"/usr/spool/mail"
+#endif
+
 
 /*
  * Miscellaneous program-paths

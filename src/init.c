@@ -504,9 +504,12 @@ void init_selfinfo ()
 	 * on all UNIX systems.
 	 */
 
+#ifndef NNTP_ONLY
 	strcpy (libdir, get_val ("TIN_LIBDIR", LIBDIR));
 	strcpy (novrootdir, get_val ("TIN_NOVROOTDIR", NOVROOTDIR));
 	strcpy (spooldir, get_val ("TIN_SPOOLDIR", SPOOLDIR));
+#endif
+
 #ifdef VMS
 	joindir (rcdir, homedir, RCDIR); /* we're naming a directory here */
 	joinpath (rcdir_asfile, homedir, RCDIR);	/* for stat() */

@@ -13,7 +13,7 @@
  */
 
 #define VERSION		"1.3 unoff BETA"
-#define RELEASEDATE	"960805"
+#define RELEASEDATE	"960807"
 
 /* This is NO official release, but a patched version.
  * Including patches from:
@@ -30,6 +30,7 @@
  *	Ulli Horlacher		<framstag@moep.bb.bawue.de>
  * 	Urs Janssen		<urs@akk.uni-karlsruhe.de>
  *	Olaf Kaluza		<olaf@criseis.ruhr.de>
+ *	Tomasz Kloczko		<kloczek@rudy.mif.pg.gda.pl>
  *	Alexander Lehmann	<alex@hal.rhein-main.de>
  *	Daniel Naber		<dnaber@pluto.teuto.de>
  *	Torsten Neumann		<torsten@imke.infodrom.north.de>

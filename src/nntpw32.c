@@ -491,7 +491,7 @@ get_tcp_socket (machine, service, port)
 		return (-1);
 	}
 
-	bzero((char *) &sin, sizeof (sin));
+	memset((char *) &sin, '\0', sizeof (sin));
 	sin.sin_family = hp->h_addrtype;
 	sin.sin_port = sp->s_port;
 
@@ -516,7 +516,7 @@ get_tcp_socket (machine, service, port)
 			perror ("socket");
 			return (-1);
 		}
-		bcopy(*cp, (char *) &sin.sin_addr, hp->h_length);
+		memcpy((char *) &sin.sin_addr, *cp, hp->h_length);
 		
 		if (x < 0) {
 			fprintf (stderr, "Trying %s", (char *) inet_ntoa (sin.sin_addr));
@@ -541,7 +541,7 @@ get_tcp_socket (machine, service, port)
 
 	/* And then connect */
 
-	bcopy (hp->h_addr, (char *) &sin.sin_addr, hp->h_length);
+	memcpy((char *) &sin.sin_addr, hp->h_addr, hp->h_length);
 	if (connect (s, (struct sockaddr *) &sin, sizeof (sin)) < 0) {
 		perror ("connect");
 		(void) closesocket (s);

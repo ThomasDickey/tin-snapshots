@@ -1,5 +1,7 @@
 Bugs
 ----
+o  keep_posted_articles 'suddenly' stopped working :(
+
 o  tin may crash when using a broken overview-file
    make read_nov_overview more stable (ignore ctrl-m's etc.)
 
@@ -79,6 +81,12 @@ o  full_page_scroll=OFF seems not to work
 
 o  tin sometimes crashes (thread.c) 710/892/987
 
+o  rereading the active file is buggy, it causes crashes on some machines and
+   sometimes it takes 50 times longer than the first read at startup...
+
+o  looks like DEFAULT_EDITOR (fall-back if neither $EDITOR nor $VISUAL is set)
+   is missing for SCO
+
 New features
 ------------
 o  add a weed-out list like in elm so the user could specify which headers
@@ -133,6 +141,8 @@ o  sender-patch
    ad a Sender:-line
    (for canceling articles never look at the Sender:-line, always look at
    the From:-line)
+
+o  add counter to postprocessing commands (processing file x of y)
 
 o  add feature show_new_newsgroups_since
 

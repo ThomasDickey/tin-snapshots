@@ -74,12 +74,8 @@ OBJDIR	= .
 SRCDIR	= $(srcdir)
 
 # standard commands
-CHGRP	= chgrp
-CHMOD	= chmod
-CHOWN	= chown
 CFLOW	= cflow
 CP	= cp
-CPROTO	= cproto
 CSCOPE	= cscope
 ECHO	= echo
 LINT	= lint
@@ -250,6 +246,18 @@ $(BINDIR)/$(EXE): $(OFILES)
 	$(LD) $(LDFLAGS) -o $(BINDIR)/$(EXE) $(OFILES) $(NNTPLIB) $(NETLIBS) $(LIBS) $(DEBUG)
 	@$(LS) $(BINDIR)/$(EXE)
 
+help:
+	@$(ECHO) "This Makefile offers the following options:"
+	@$(ECHO) " "
+	@$(ECHO) "    make                 [ Build the binary for yor OS ]"
+	@$(ECHO) "    make clean           [ Delete all object files ]"
+	@$(ECHO) "    make install         [ Install the binary & the manual page ]"
+	@$(ECHO) "    make install_setuid  [ Install the binary setuid & the manual page ]"
+	@$(ECHO) "    make install_daemon  [ Install the index daemon binary ]"
+	@$(ECHO) "    make install_manpage [ Install the manual page ]"
+	@$(ECHO) "    make help            [ Show this text ]"
+	@$(ECHO) " "
+
 install_manpage:
 	@$(ECHO) "Installing $(EXE) manual page to $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)..."
 	@$(INSTALL) -m 444 $(DOCDIR)/$(EXE).$(MANEXT) $(INS_MANUAL_DIR)$(INS_MANUAL_EXT)/$(EXE).$(INS_MANUAL_EXT)
@@ -271,15 +279,6 @@ install_setuid:
 install_daemon:
 	@$(ECHO) "Installing index daemon $(EXED) v$(VER) to $(INS_DAEMON_DIR)..."
 	@$(INSTALL) -s -o news -m 0750 $(EXED) $(INS_DAEMON_DIR)/$(EXED)
-
-proto:
-	@$(ECHO) "Generating function prototypes to $(INCDIR)/proto.h..."
-	@-$(RM) -f $(INCDIR)/protoold.h $(INCDIR)/protonew.h
-	@-$(CP) $(INCDIR)/proto.h $(INCDIR)/protoold.h
-	@$(CPROTO) $(CPROTO_OPTS) $(CFILES) | sed -f proto.sed > $(INCDIR)/protonew.h
-	@-$(CHMOD) 0644 $(INCDIR)/proto.h
-	@-$(MV) $(INCDIR)/protonew.h $(INCDIR)/proto.h
-	@$(LS) $(INCDIR)/proto.h
 
 tags:
 	@$(ECHO) "Generating tags (results in ./tags)..."
@@ -305,7 +304,7 @@ clobber: clean
 
 cflow:
 	@$(ECHO) "Creating cflow for $(PROJECT)..."
-	@$(CFLOW) $(CFILES) > cflow.$(PROJECT) &
+	@$(CFLOW) -I$(INCDIR) $(CFILES) > cflow.$(PROJECT) &
 
 cscope:
 	@$(ECHO) "Creating cscope database $(PROJECT)..."

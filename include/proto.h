@@ -217,7 +217,7 @@ extern void vMakeGrpName P_((char *pcBaseDir, char *pcGrpName, char *pcGrpPath))
 extern int iArtEdit P_((struct t_group *psGrp, struct t_article *psArt));
 
 /* main.c */
-extern void main P_((int argc, char *argv[]));
+extern int main P_((int argc, char *argv[]));
 extern void read_cmd_line_options P_((int argc, char *argv[]));
 extern void usage P_((char *theProgname));
 extern int check_for_any_new_news P_((int CheckAnyUnread, int StartAnyUnread));
@@ -255,7 +255,7 @@ extern int invoke_ispell P_((char *nam));
 extern void shell_escape P_((void));
 extern void tin_done P_((int ret));
 extern void strip_double_ngs P_((char *ngs_list));
-extern long my_strtol P_((char *str, char **ptr, int use_base));
+extern long my_strtol P_((/* const */ char *str, char **ptr, int use_base));
 extern int my_mkdir P_((char *path, int mode));
 extern int my_chdir P_((char *path));
 extern unsigned long hash_groupname P_((char *group));
@@ -269,10 +269,10 @@ extern void base_name P_((char *dirname, char *program));
 extern int mail_check P_((void));
 extern void parse_from P_((char *from_line, char *eaddr, char *fname));
 extern long my_atol P_((char *s, int n));
-extern int my_stricmp P_((char *p, char *q));
-extern int my_strnicmp P_((char *p, char *q, size_t n));
+extern int my_stricmp P_((/* const */ char *p, /* const */ char *q));
+extern int my_strnicmp P_((/* const */ char *p, /* const */ char *q, size_t n));
 extern char *eat_re P_((char *s));
-extern void my_strncpy P_((char *p, char *q, int n));
+extern void my_strncpy P_((char *p, /* const */ char *q, int n));
 extern int untag_all_articles P_((void));
 extern char *str_str P_((char *text, char *pattern, size_t patlen));
 extern void get_author P_((int thread, struct t_article *art, char *str));

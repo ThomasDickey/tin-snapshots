@@ -647,7 +647,7 @@ write_config_file (file)
 	fprintf (fp, "# if ON keep all failed postings in ~/dead.articles\n");
 	fprintf (fp, "keep_dead_articles=%s\n\n", print_boolean (keep_dead_articles));
 #endif
-	fprintf (fp, "# if ON keep all failed postings in ~/Mail/posted\n");
+	fprintf (fp, "# if ON keep all postings in ~/Mail/posted\n");
 	fprintf (fp, "keep_posted_articles=%s\n\n", print_boolean (keep_posted_articles));
 	fprintf (fp, "# if ON show only subscribed to groups that contain unread articles.\n");
 	fprintf (fp, "show_only_unread_groups=%s\n\n", print_boolean (show_only_unread_groups));
@@ -1235,7 +1235,7 @@ char *
 print_boolean (value)
 	int value;
 {
-	return (value ? txt_onoff[TRUE] : txt_onoff[FALSE]);
+	return (value ? txt_onoff[(int) TRUE] : txt_onoff[(int) FALSE]);
 }
 
 /*

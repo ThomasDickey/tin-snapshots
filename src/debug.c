@@ -210,10 +210,8 @@ debug_print_comment (comment)
 	char file[PATH_LEN];
 	FILE *fp;
 
-#ifndef DEBUG_NEWSRC
 	if (debug < 2)
 		return;
-#endif
 
 	sprintf (file, "%sBITMAP", TMPDIR);
 
@@ -335,11 +333,9 @@ debug_print_bitmap (group, art)
 	char file[PATH_LEN];
 	FILE *fp;
 
-#ifndef DEBUG_NEWSRC
 	if (debug != 3) {
 		return;
 	}	
-#endif
 	
 	sprintf (file, "%sBITMAP", TMPDIR);
 
