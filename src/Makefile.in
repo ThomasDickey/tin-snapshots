@@ -126,7 +126,9 @@ CFILES	= \
 #	$(SRCDIR)/os_2.c
 #	$(SRCDIR)/vms.c
 
-OFILES	= @ALLOCA@ \
+EXTRAOBJS = @EXTRAOBJS@
+
+OFILES	= @ALLOCA@ $(EXTRAOBJS) \
 	$(OBJDIR)/active.o \
 	$(OBJDIR)/actived.o \
 	$(OBJDIR)/art.o \

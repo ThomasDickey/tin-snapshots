@@ -350,8 +350,8 @@ extern char txt_help_bug_report[LEN];
 extern char userid[PATH_LEN];
 extern char xpost_quote_format[PATH_LEN];
 
-extern char domain_name[MAXHOSTNAMELEN];
-extern char host_name[MAXHOSTNAMELEN];
+extern char domain_name[];
+extern char host_name[];
 
 extern const char base64_alphabet[64];
 extern constext *help_group[];
@@ -445,7 +445,7 @@ extern constext txt_enter_option_num[];
 extern constext txt_enter_range[];
 extern constext txt_env_var_not_found[];
 extern constext txt_error_followup_to_several_groups[];
-extern constext txt_error_from_in_header_not_allowed[];
+extern constext txt_error_sender_in_header_not_allowed[];
 extern constext txt_error_header_and_body_not_separate[];
 extern constext txt_error_header_line_blank[];
 extern constext txt_error_header_line_colon[];
@@ -1019,9 +1019,7 @@ extern constext txt_tinrc_keep_posted_articles[];
 extern constext txt_tinrc_local_charset[];
 #endif /* LOCAL_CHARSET */
 extern constext txt_tinrc_mail_8bit_header[];
-#ifdef FORGERY
 extern constext txt_tinrc_mail_address[];
-#endif /* FORGERY */
 extern constext txt_tinrc_mail_mime_encoding[];
 extern constext txt_tinrc_mail_quote_format[];
 extern constext txt_tinrc_mark_saved_read[];
@@ -1321,11 +1319,9 @@ extern struct utsname system_info;
 #define txt_help_t_K txt_help_t_BIGK
 #endif
 
-#ifdef FORGERY
 extern char mail_address[LEN];
 extern constext txt_help_mail_address[];
 extern constext txt_opt_mail_address[];
-#endif
 
 #ifdef HAVE_COLOR
 extern constext txt_help_col_back[];

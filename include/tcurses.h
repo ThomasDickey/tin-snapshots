@@ -46,6 +46,7 @@ extern void my_printf(const char *fmt, ...)
 	__attribute__((format(printf,1,2)))
 #endif
 	;
+extern void my_retouch(void);
 extern void refresh_color(void);
 
 #else	/* !USE_CURSES */
@@ -59,6 +60,7 @@ extern void refresh_color(void);
 #define my_fprintf			fprintf
 #define my_flush()			fflush(stdout)
 #define my_fflush(stream)		fflush(stream)
+#define my_retouch()			ClearScreen()
 
 #define HpGlitch(func)			if (_hp_glitch) func
 

@@ -225,7 +225,7 @@ select_read_group:
 				 * NB: With -n, no need as group command was already used to
 				 * get the min/max/count info in parse_newsrc_active_line()
 				 */
-				if (read_news_via_nntp && !newsrc_active) {
+				if (read_news_via_nntp && !newsrc_active && CURR_GROUP.type==GROUP_TYPE_NEWS) {
 					char	acBuf[NNTP_STRLEN];
 					char	acLine[NNTP_STRLEN];
 

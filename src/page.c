@@ -430,6 +430,7 @@ page_goto_next_unread:
 				break;
 
 			case iKeyPageRedrawScr:		/* redraw current page of article */
+				my_retouch();
 				redraw_page (group->name, respnum);
 				break;
 
@@ -994,9 +995,10 @@ print_a_line:
 			if ( buf2[0] != ' ' && buf2[0] != '\t' ) {
 				char header_name[80];
 				size_t header_name_len;
-				/* maybe not necessary, but just in case,
-				   checking the range would not be bad */
-				if ( (header_name_len = strstr(buf2,": ")-buf2) > 0) {
+				/* necessary, if there were only blanks in the header line, which
+					are stripped by strip_line (buf2) above */
+				if ( strstr(buf2, ": ") ) {
+					header_name_len = strstr(buf2,": ")-buf2;
 					strncpy(header_name,buf2,header_name_len);
 					header_name[header_name_len]='\0';
 					match_header(buf2,header_name,buf3,(char *) 0,HEADER_LEN);
@@ -1004,7 +1006,7 @@ print_a_line:
 				}
 			} else {
 				strcpy(buf2,rfc1522_decode(buf2));
-				}
+			}
 		}
 		if (tex2iso_supported && tex2iso_article) {
 			strcpy (buf3, buf2);

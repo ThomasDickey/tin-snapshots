@@ -257,6 +257,7 @@
  * interface
  */
 #undef	USE_CURSES
+#undef	USE_TRACE
 
 /*
  * Define symbols to prototype the function 'outchar()'

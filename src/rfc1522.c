@@ -474,19 +474,18 @@ rfc1522_do_encode (
 
 /* the list of structured header fields where '(' and ')' are
    treated specially in rfc 1522 encoding */
-        static char *struct_header[] = {"Approved: ","From: ","Originator: ",
+        static const char *struct_header[] = {
+           "Approved: ","From: ","Originator: ",
            "Reply-To: ","Sender: ","X-Cancelled-By: ","X-Comment-To: ",
-           "X-Submissions-To: ","To: ","Cc: ","Bcc: ","X-Originator: ",NULL};
-        char **strptr=struct_header;
-        
-
+           "X-Submissions-To: ","To: ","Cc: ","Bcc: ","X-Originator: ",0};
+        const char **strptr=struct_header;  
 
         do {
               if ( !strncasecmp(what,*strptr,strlen(*strptr)) ) {
                    isstruct_head=TRUE;
                    break;
               }
-        } while ( *(++strptr) != NULL );
+        } while ( *(++strptr) != 0 );
 
 	t = buf;
         encoding = which_encoding(what);

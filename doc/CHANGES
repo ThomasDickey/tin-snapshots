@@ -1,3 +1,33 @@
+--unoff BETA release 970324 --
+
+362) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     BUG. removing tailing whitespaces from headerlines caused crashes
+          if the line contains only whitespaces after the header-name.
+     FIX. page.c
+
+361) T.E.Dickey <dickey@clark.net>
+     ADD. even more curses stuff
+          + added some traces
+          + fixed an out-of-order call on set_win_size
+          + added the touchwin calls to make ^L work
+     FIX. several supplied patches
+
+360) Ulli Horlacher <framstag@moep.bb.bawue.de>
+     ADD. parsing to of /etc/resolv.conf to get_fqdn()
+     FIX. tin.h, string.c, header.c
+
+359) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. missplaced definition of MAXHOSTNAMELEN
+     ADD. ifndef FORGERY: insertion of Sender: if it differs from From:
+     FIX. several supplied patches
+
+358) Kevin Lentin <kevinl@cs.monash.edu.au>
+     BUG. When reading mail groups tin trys to connect the server
+     ADD. prompt_yn2() now allows only 'y','n','ESC' as a answer
+     BUG. if you answer the reconnect to server question with no or the
+          connection is broken the newsrc is written out before tin exits.
+     FIX. several supplied patches
+
 --unoff BETA release 970321 --
 
 357) Jungshik Shin <jshin@pantheon.yale.edu>

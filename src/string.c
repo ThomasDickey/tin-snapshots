@@ -3,7 +3,7 @@
  *  Module    : string.c
  *  Author    : 
  *  Created   : 20.01.1997
- *  Updated   : 
+ *  Updated   : 22.03.1997
  *  Notes     :
  *  Copyright : (c) Copyright 1997 by Urs Janssen
  *              You may  freely  copy or  redistribute	this software,
@@ -404,3 +404,47 @@ strncasecmp(
 	return n ? r : 0;
 }
 #endif
+
+/*
+ * str_trim - substitute multiple white spaces with one space
+ *            and delete heading and trailing whitespace
+ *
+ * INPUT:  string  - string to trim
+ *
+ * OUTPUT: string  - trimmed string
+ *
+ * RETURN: trimmed string
+ */
+char *
+str_trim(
+	char *string)
+	{
+	char	*rp,	/* reading string pointer */
+			*wp;	/* writing string pointer */
+	int	ws = 1;	/* white space flag */
+
+	/* loop over string */
+	for (wp=rp=string; *rp; rp++) {
+
+	/* is it a white space? */
+		if (*rp==' ' || *rp=='\t' || *rp=='\n' || *rp=='\r') {
+
+			/* was the last character not a white space? */
+			if (ws==0) {
+
+				/* store a blank */
+				*wp++ = ' ';
+				ws = 1;
+			}
+		} else /* no white space */ {
+			/* store the character */
+			*wp++ = *rp;
+			ws = 0;
+		}
+	}
+	/* delete trailing blank */
+	if (ws) wp--;
+	*wp = 0;
+
+	return(string);
+}

@@ -551,8 +551,8 @@ check_article_to_be_posted (
 			found_subject_line = TRUE;
 		}
 #ifndef FORGERY
-		if (cp - line == 4 && !strncasecmp (line, "From", 4)) {
-			my_fprintf (stderr, txt_error_from_in_header_not_allowed, cnt);
+		if (cp - line == 6 && !strncasecmp (line, "Sender", 6)) {
+			my_fprintf (stderr, txt_error_sender_in_header_not_allowed, cnt);
 			my_fflush (stderr);
 			errors++;
 		}
@@ -759,13 +759,13 @@ quick_post_article (
 	char group[HEADER_LEN];
 	char subj[HEADER_LEN];
 	char buf[HEADER_LEN], tmp[HEADER_LEN];
+	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	t_bool done = FALSE;
 	struct t_group *psGrp;
 
 #ifdef FORGERY
-	char from_name[HEADER_LEN];
 	char line[HEADER_LEN];
 #endif
 
@@ -894,8 +894,9 @@ quick_post_article (
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
-	msg_add_header ("From", from_name);
 #endif
+	get_from_name(from_name);
+	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
 	msg_add_header ("Newsgroups", group);
 	if (psGrp && psGrp->attribute->followup_to != (char *) 0) {
@@ -1309,7 +1310,7 @@ pickup_postponed_articles(
   char newsgroups[HEADER_LEN];
   char subject[HEADER_LEN];
   char question[HEADER_LEN];
-  char ch;
+  char ch = 0;
   char def = iKeyPostponeYes;
   int count=count_postponed_articles();
   int i;
@@ -1384,13 +1385,13 @@ post_article (
 	char ch;
 	char subj[HEADER_LEN];
 	char buf[HEADER_LEN];
+	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	int redraw_screen = FALSE;
 	struct t_group *psGrp;
 
 #ifdef FORGERY
-	char from_name[HEADER_LEN];
 	char line[HEADER_LEN];
 #endif
 
@@ -1446,8 +1447,9 @@ post_article (
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
-	msg_add_header ("From", from_name);
 #endif
+   get_from_name(from_name);
+	msg_add_header ("From", from_name);
 	msg_add_header ("Subject", subj);
 	if (art_type == GROUP_TYPE_MAIL) {
 		msg_add_header ("To", psGrp->attribute->mailing_list);
@@ -1791,6 +1793,7 @@ post_response (
 	char ch, *ptr;
 	char bigbuf[HEADER_LEN];
 	char buf[HEADER_LEN];
+	char from_name[HEADER_LEN];
 	int art_type = GROUP_TYPE_NEWS;
 	int lines;
 	int ret_code = POSTED_NONE;
@@ -1798,9 +1801,7 @@ post_response (
 	char initials[64];
 
 #ifdef FORGERY
-	char from_name[HEADER_LEN];
 	char line[HEADER_LEN];
-
 #endif
 
 	msg_init_headers ();
@@ -1878,8 +1879,9 @@ ignore_followup_to_poster:
 #ifdef FORGERY
 	make_path_header (line, from_name);
 	msg_add_header ("Path", line);
-	msg_add_header ("From", from_name);
 #endif
+	get_from_name(from_name);
+	msg_add_header ("From", from_name);
 
 	psGrp = psGrpFind (group);
 
@@ -2269,16 +2271,15 @@ mail_bug_report (void)
 	char mail_to[HEADER_LEN];
 	char subject[HEADER_LEN];
 	FILE *fp;
-
-#ifdef HAVE_UNAME
-	FILE *fp_uname;
-
-#endif
 	int is_debug;
 	int is_longfiles;
 	int is_nntp;
 	int is_nntp_only;
 	int uname_ok = FALSE;
+#ifdef HAVE_UNAME
+	FILE *fp_uname;
+#endif
+
 
 	msg_init_headers ();
 
@@ -2802,7 +2803,7 @@ cancel_article (
 	make_path_header (line, from_name);
 #else
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, full_name, from_name);
+	get_from_name (from_name);
 #endif
 
 	if (debug == 2) {
@@ -2814,6 +2815,7 @@ cancel_article (
 		author = FALSE;
 #else
 		info_message (txt_art_cannot_cancel);
+		sleep(3); /* FIXME */
 		return redraw_screen;
 #endif
 	} else {
@@ -2859,14 +2861,14 @@ cancel_article (
 		sprintf (line, "<%s>", art->from);
 	}
 	msg_add_header ("From", line);
-
 	if (!author) {
 		sprintf (line, "<cancel.%s", note_h_messageid + 1);
 		msg_add_header ("Message-ID", line);
 		msg_add_header ("X-Cancelled-By", from_name);
 	}
+#else
+	msg_add_header ("From", from_name);
 #endif
-
 	sprintf (buf, "cmsg cancel %s", note_h_messageid);
 	msg_add_header ("Subject", buf);
 
@@ -3064,25 +3066,26 @@ repost_article (
 	if (supersede) {
 #ifndef FORGERY
 		get_user_info (user_name, full_name);
-		get_from_name (user_name, full_name, from_name);
+		get_from_name (from_name);
 
-		if (FromSameUser)
+		if (FromSameUser) {
+			msg_add_header ("From", from_name);
 #else
-		make_path_header (line, from_name);
-		msg_add_header ("Path", line);
-		if (art->name) {
-			sprintf (line, "%s <%s>", art->name, arts[respnum].from);
-		} else {
-			sprintf (line, "<%s>", arts[respnum].from);
-		}
-		msg_add_header ("From", line);
-		msg_add_header ("X-Superseded-By", from_name);
-		if (note_h_org[0])
-			msg_add_header ("Organization", note_h_org);
-		sprintf (line, "<supersede.%s", note_h_messageid + 1);
-		msg_add_header ("Message-ID", line);
-#endif
 		{
+			make_path_header (line, from_name);
+			msg_add_header ("Path", line);
+			if (art->name) {
+				sprintf (line, "%s <%s>", art->name, arts[respnum].from);
+			} else {
+				sprintf (line, "<%s>", arts[respnum].from);
+			}
+			msg_add_header ("From", line);
+			msg_add_header ("X-Superseded-By", from_name);
+			if (note_h_org[0])
+				msg_add_header ("Organization", note_h_org);
+			sprintf (line, "<supersede.%s", note_h_messageid + 1);
+			msg_add_header ("Message-ID", line);
+#endif
 			msg_add_header ("Supersedes", note_h_messageid);
 			if (note_h_followup[0])
 				msg_add_header ("Followup-To", note_h_followup);
@@ -3095,14 +3098,11 @@ repost_article (
 			if (*note_h_distrib)
 				msg_add_header ("Distribution", note_h_distrib);
 		}
-	} else {		/* !supersede */
-#ifdef FORGERY
+	} else { /* !supersede */
 		get_user_info (user_name, full_name);
-		get_from_name (user_name, full_name, from_name);
+		get_from_name (from_name);
 		msg_add_header ("From", from_name);
-#endif
 	}
-
 	msg_add_header ("Subject", note_h_subj);
 	msg_add_header ("Newsgroups", group);
 
@@ -3399,7 +3399,7 @@ checknadd_headers (
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			while (fgets (line, sizeof (line), fp_in) != (char *) 0) {
 				if (!gotit && line[0] == '\n') {
-/* isn't it the newsservers job to insert a Lines:-header? */
+					/* isn't it the newsservers job to insert a Lines:-header? */
 					if (lines) {
 						fprintf (fp_out, "Lines: %d\n", lines);
 					}
@@ -3474,7 +3474,7 @@ insert_from_header (
 #endif
 		if ((fp_out = fopen (outfile, "w")) != (FILE *) 0) {
 			get_user_info (user_name, full_name);
-			get_from_name (user_name, full_name, from_name);
+			get_from_name (from_name);
 
 			/*
 			 * Check that at least one '.' comes after the '@' in the From: line
@@ -3745,7 +3745,7 @@ make_path_header (
 	char user_name[128];
 
 	get_user_info (user_name, full_name);
-	get_from_name (user_name, full_name, from_name);
+	get_from_name (from_name);
 
 	sprintf (line, "%s!%s", domain_name, user_name);
 	return;

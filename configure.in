@@ -230,21 +230,30 @@ AC_MSG_RESULT($enableval)
 use_curses=$enableval
 
 ## debugging libraries (do this after other libraries)
+AC_MSG_CHECKING(if you want dbmalloc library)
 debug_malloc=none
 AC_ARG_WITH(dbmalloc,
 	[  --with-dbmalloc         use Conor Cahill's dbmalloc library],
 	[AC_CHECK_LIB(dbmalloc,debug_malloc,
 	 AC_CHECK_HEADER(dbmalloc.h,debug_malloc=DBMALLOC))])
 
+AC_MSG_CHECKING(if you want dmalloc library)
 AC_ARG_WITH(dmalloc,
 	[  --with-dmalloc          use Gray Watson's dmalloc library],
 	[AC_CHECK_LIB(dmalloc,dmalloc_debug,
 	 AC_CHECK_HEADER(dmalloc.h,debug_malloc=DMALLOC))])
 
+AC_MSG_CHECKING(if you want debugging-trace)
+AC_ARG_WITH(trace,
+	[  --with-trace            use debugging/traces],
+	[AC_DEFINE(USE_TRACE)
+	 test $found_ncurses = no && EXTRAOBJS="$EXTRAOBJS trace.o"])
+AC_SUBST(EXTRAOBJS)
+
 ## options for miscellaneous definitions
 AC_MSG_CHECKING(for domain-name)
 AC_ARG_WITH(domain-name,
-	[  --with-domain-name     sets \$DOMAIN_NAME],
+	[  --with-domain-name      sets \$DOMAIN_NAME],
 	DOMAIN_NAME=$withval
 	if test "$DOMAIN_NAME" != ""; then
 		AC_DEFINE_UNQUOTED(DOMAIN_NAME, "${withval}")

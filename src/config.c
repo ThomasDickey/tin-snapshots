@@ -387,11 +387,9 @@ read_config_file (
 			if (match_boolean (buf, "mark_saved_read=", &mark_saved_read)) {
 				break;
 			}
-#ifdef FORGERY
 			if (match_string (buf, "mail_address=", mail_address, sizeof (mail_address))) {
 				break;
 			}
-#endif
 			if (match_string (buf, "mail_quote_format=", mail_quote_format, sizeof (mail_quote_format))) {
 				break;
 			}
@@ -911,12 +909,10 @@ write_config_file (
 
 #endif
 
-#ifdef FORGERY
 	if (*mail_address) {
 		fprintf (fp, txt_tinrc_mail_address);
 		fprintf (fp, "mail_address=%s\n\n",mail_address);
 	}
-#endif
 
 	fprintf (fp, txt_tinrc_mm_charset);
 	fprintf (fp, "mm_charset=%s\n\n", mm_charset);
@@ -1503,9 +1499,7 @@ change_config_file (
 						case OPT_NEWS_QUOTE_FORMAT:
 						case OPT_QUOTE_CHARS:
 						case OPT_XPOST_QUOTE_FORMAT:
-#ifdef FORGERY
 						case OPT_MAIL_ADDRESS:
-#endif
 							prompt_option_string (option);
 							break;
 
