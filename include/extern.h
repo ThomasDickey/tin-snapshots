@@ -1085,7 +1085,6 @@ extern int MORE_POS;
 extern int NOTESLINES;
 extern int RIGHT_POS;
 extern int _hp_glitch;
-extern int actual_option_page;
 extern int cCOLS;
 extern int cLINES;
 extern int can_post;

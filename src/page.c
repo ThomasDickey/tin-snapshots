@@ -1042,11 +1042,11 @@ print_a_line:
 			ConvertIso2Asc (buf3, buf2, iso2asc_supported);
 		}
 
-		ConvertBody2Printable ((unsigned char*) buf2);
+		ConvertBody2Printable (buf2);
 
 		first_char = buf2[0] ? buf2[0] : first_char;
 
-		if ((below_sig == FALSE) || (show_signatures == TRUE)) {
+		if (!below_sig || show_signatures) {
 			if (skip_include) {
 				if (first_char != skip_include) {
 					skip_include = '\0';
@@ -1218,7 +1218,7 @@ show_first_header (
 	/* Oh, this question is easy: It's for displaying the value
 	   of a X-Comment-To header in the upper right corner! */
 	if (note_h_ftnto[0] && show_xcommentto && highlight_xcommentto) {
-		char ftbuf[HEADER_LEN];	/* FTN-To aka X-Comment-To */
+		char ftbuf[HEADER_LEN]; /* FTN-To aka X-Comment-To */
 
 		my_fputs (buf, stdout);
 		parse_from(note_h_ftnto, buf, ftbuf);

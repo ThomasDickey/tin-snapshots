@@ -1,39 +1,40 @@
-MANIFEST for tin-1.3-unoff-BETA-970923 (Tue Sep 23 21:35:23 CEST 1997)
+MANIFEST for tin-1.3-unoff-BETA-970930 (Tue Sep 30 18:42:37 CEST 1997)
 ----------------------------------------------------
-   6664 ./Makefile
-   2807 ./MANIFEST
-   1425 ./README
-  37124 ./aclocal.m4
+   6626 ./Makefile
+   2809 ./MANIFEST
+   1408 ./README
+  39415 ./aclocal.m4
   20446 ./config.guess
   19236 ./config.sub
- 177784 ./configure
-  16212 ./configure.in
+ 180561 ./configure
+  16237 ./configure.in
    4772 ./install.sh
     651 ./mkdirs.sh
-  11707 ./makefile.in
+  11628 ./makefile.in
     964 ./conf-tin
-  95101 ./doc/CHANGES
+  96699 ./doc/CHANGES
    1469 ./doc/DEBUG_REFS
-  34970 ./doc/minimal-netkeeping
-  16445 ./doc/INSTALL
-  18229 ./doc/TODO
+  16486 ./doc/INSTALL
+  18096 ./doc/TODO
    1627 ./doc/WHATSNEW
   12686 ./doc/auth.txt
+  34970 ./doc/minimal-netkeeping
    2322 ./doc/internals.txt
+  23648 ./doc/iso2asc.txt
   74038 ./doc/tin.1
     896 ./tools/tinpp
    1661 ./tools/expand_aliases.tgz
-   1060 ./include/bugrep.h
+   1044 ./include/bugrep.h
    8473 ./include/config.h
-  52752 ./include/extern.h
+  52721 ./include/extern.h
   13284 ./include/menukeys.h
     718 ./include/msmail.h
    4828 ./include/nntplib.h
    2233 ./include/os_2.h
-  23777 ./include/proto.h
+  23744 ./include/proto.h
    2389 ./include/stpwatch.h
    1933 ./include/tcurses.h
-  47604 ./include/tin.h
+  47687 ./include/tin.h
    2734 ./include/tnntp.h
     873 ./include/trace.h
     903 ./include/version.h
@@ -41,32 +42,32 @@ MANIFEST for tin-1.3-unoff-BETA-970923 (Tue Sep 23 21:35:23 CEST 1997)
     789 ./include/win32tcp.h
   19025 ./src/active.c
    9883 ./src/actived.c
-  38252 ./src/art.c
+  38247 ./src/art.c
   23409 ./src/attrib.c
-   9861 ./src/auth.c
-   8771 ./src/charset.c
-   7594 ./src/color.c
-  56341 ./src/config.c
-  21300 ./src/curses.c
+   9868 ./src/auth.c
+   8789 ./src/charset.c
+   7790 ./src/color.c
+  55100 ./src/config.c
+  21312 ./src/curses.c
   12471 ./src/debug.c
    2300 ./src/envarg.c
-  20189 ./src/feed.c
-  40057 ./src/filter.c
+  20162 ./src/feed.c
+  40039 ./src/filter.c
   11257 ./src/getline.c
-  43830 ./src/group.c
+  43750 ./src/group.c
    3007 ./src/hashstr.c
    7327 ./src/header.c
   10433 ./src/help.c
    4757 ./src/inews.c
-  35538 ./src/init.c
+  35627 ./src/init.c
     962 ./src/joinpath.c
-  80917 ./src/lang.c
+  80880 ./src/lang.c
    3805 ./src/list.c
    9791 ./src/mail.c
-  21510 ./src/main.c
-   8683 ./src/makecfg.c
+  21508 ./src/main.c
+   8656 ./src/makecfg.c
    9660 ./src/memory.c
-  51629 ./src/misc.c
+  51627 ./src/misc.c
    7228 ./src/msmail.c
   34093 ./src/newsrc.c
   23917 ./src/nntplib.c
@@ -74,26 +75,25 @@ MANIFEST for tin-1.3-unoff-BETA-970923 (Tue Sep 23 21:35:23 CEST 1997)
    6370 ./src/nrctbl.c
   28133 ./src/open.c
    6272 ./src/os_2.c
-  42063 ./src/page.c
+  42026 ./src/page.c
   24119 ./src/parsdate.y
    6717 ./src/pgp.c
-  93395 ./src/post.c
-  10280 ./src/prompt.c
-    160 ./src/proto.sed
+  93391 ./src/post.c
+   9996 ./src/prompt.c
   22671 ./src/refs.c
    3038 ./src/regex.c
   11243 ./src/rfc1521.c
-  22393 ./src/rfc1522.c
+  22341 ./src/rfc1522.c
   34061 ./src/save.c
-   5160 ./src/screen.c
+   5076 ./src/screen.c
   11414 ./src/search.c
   37031 ./src/select.c
    5704 ./src/sigfile.c
-   9722 ./src/signal.c
+   9716 ./src/signal.c
    5681 ./src/strftime.c
    7453 ./src/string.c
-   5210 ./src/tcurses.c
-  29592 ./src/thread.c
+   5724 ./src/tcurses.c
+  29461 ./src/thread.c
     971 ./src/trace.c
    4336 ./src/wildmat.c
   12575 ./src/win32.c
@@ -102,7 +102,7 @@ MANIFEST for tin-1.3-unoff-BETA-970923 (Tue Sep 23 21:35:23 CEST 1997)
    5597 ./src/vms.c
    4987 ./amiga/README
    4931 ./amiga/tin-unoff.readme
-   9698 ./amiga/smakefile
+   9885 ./amiga/smakefile
    4987 ./amiga/actived.c
   17223 ./amiga/amiga.c
    6373 ./amiga/amigatcp.c
@@ -113,4 +113,4 @@ MANIFEST for tin-1.3-unoff-BETA-970923 (Tue Sep 23 21:35:23 CEST 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    4071 ./src/tincfg.tbl
-1941079 total
+1970023 total

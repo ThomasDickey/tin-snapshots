@@ -146,9 +146,6 @@ o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
 
-o  tin does not warn you if you try to save into a directory and not into
-   a file.
-
 o  if save marked_hot_article fails with cannot create file the
    post-process query comes up - stupid!
 
@@ -331,8 +328,6 @@ Internal Changes
 ----------------
 o  clean-up INDEX_DAEMON and ACTIVE_DAEMON code
    add configure option for those
-
-o  check where "~" is used instead of homedir
 
 o  change all system()/popen() calls to fork() and exec() calls
    [close security holes]

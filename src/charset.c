@@ -303,10 +303,10 @@ iIsArtTexEncoded (
  */
 void
 Convert2Printable (
-	unsigned char *buf)
+	char *buf)
 {
 	unsigned char *c;
-	for (c=buf; *c; c++) {
+	for (c= (unsigned char *)buf; *c; c++) {
 		if (!my_isprint(*c)) {
 			*c = '?';
 		}
@@ -319,10 +319,10 @@ Convert2Printable (
  */
 void
 ConvertBody2Printable (
-	unsigned char *buf)
+	char *buf)
 {
 	unsigned char *c;
-	for (c=buf; *c; c++) {
+	for (c= (unsigned char *)buf; *c; c++) {
 		if ( !(my_isprint(*c) || *c==8 || *c==9 || *c==12)) {
 			*c = '?';
 		}

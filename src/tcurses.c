@@ -3,7 +3,7 @@
  *  Module    : tcurses.c
  *  Author    : Thomas Dickey
  *  Created   : 02.03.97
- *  Updated   : 02.09.97
+ *  Updated   : 24.09.97
  *  Notes     : This is a set of wrapper functions adapting the termcap
  *		interface of tin to use SVr4 curses (e.g., ncurses).
  *
@@ -36,10 +36,10 @@ int cCOLS;
 t_bool inverse_okay = TRUE;
 
 /*
+ * Most of the logic corresponding to the termcap version is done in InitScreen.
  */
 void setup_screen (void)
 {
-	/* FIXME */
 	cmd_line = FALSE;
 	bcol(col_back);
 }
@@ -61,7 +61,7 @@ int InitScreen (void)
 	raw(); noecho(); cbreak();
 	cmd_line = FALSE;	/* ...so fcol/bcol will succeed */
 
-	keypad(stdscr, TRUE);
+	set_keypad_on();
 	if (has_colors()) {
 		start_color();
 #ifdef HAVE_USE_DEFAULT_COLORS
@@ -86,8 +86,9 @@ int InitScreen (void)
 void InitWin(void)
 {
 	TRACE(("InitWin"))
-	Raw(TRUE);		/* FIXME */
+	Raw(TRUE);
 	cmd_line = FALSE;
+	set_keypad_on();
 }
 
 /*
@@ -96,7 +97,7 @@ void EndWin(void)
 {
 	TRACE(("EndWin (%d)", cmd_line))
 	if (!cmd_line) {
-		Raw(FALSE);		/* FIXME */
+		Raw(FALSE);
 		endwin();
 		cmd_line = TRUE;
 	}
@@ -186,20 +187,23 @@ void cursoroff (void) { if (!cmd_line) curs_set(0); }
 
 /*
  */
-void set_keypad_on (void) { /* FIXME */ }
+void set_keypad_on (void) { if (!cmd_line) keypad(stdscr,TRUE); }
 
 /*
  */
-void set_keypad_off (void) { /* FIXME */ }
+void set_keypad_off (void) { if (!cmd_line) keypad(stdscr,FALSE); }
 
 
 /*
+ * Ncurses mouse support is turned on/off when the keypad code is on/off.
+ * Tin doesn't really need separate functions for this, though the termcap
+ * version implements them separately.
  */
-void set_xclick_on (void) { /* FIXME */ }
+void set_xclick_on (void) { }
 
 /*
  */
-void set_xclick_off (void) { /* FIXME */ }
+void set_xclick_off (void) { }
 
 void
 MoveCursor(int row, int col)
@@ -235,10 +239,16 @@ my_printf(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	if (cmd_line)
+	if (cmd_line) {
+		int flag = _inraw;
+		if (flag)
+			Raw(FALSE);
 		vprintf(fmt, ap);
-	else
+		if (flag)
+			Raw(TRUE);
+	} else {
 		vwprintw(stdscr, fmt, ap);
+	}
 	va_end(ap);
 }
 
@@ -248,10 +258,16 @@ my_fprintf(FILE *stream, const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	TRACE(("my_fprintf(%s)", fmt))
-	if (cmd_line)
+	if (cmd_line) {
+		int flag = _inraw && isatty(fileno(stream));
+		if (flag)
+			Raw(FALSE);
 		vfprintf(stream, fmt, ap);
-	else
+		if (flag)
+			Raw(TRUE);
+	} else {
 		vwprintw(stdscr, fmt, ap);
+	}
 	va_end(ap);
 }
 
@@ -259,36 +275,41 @@ void
 my_fputc(int ch, FILE *fp)
 {
 	TRACE(("my_fputc(%s)", _tracechar(ch)))
-	if (cmd_line)
+	if (cmd_line) {
+		if (_inraw && ch == '\n')
+			fputc ('\r', fp);
 		fputc (ch, fp);
-	else
+	} else {
 		addch ((unsigned char) ch);
+	}
 }
 
 void
 my_fputs(const char *str, FILE *fp)
 {
 	TRACE(("my_fputs(%s)", _nc_visbuf(str)))
-	if (cmd_line)
-		fputs (str, fp);
-	else
+	if (cmd_line) {
+		if (_inraw) {
+			while (*str)
+				my_fputc(*str++, fp);
+		} else
+			fputs (str, fp);
+	} else {
 		addstr(str);
+	}
 }
 
-void my_erase()
+void my_erase(void)
 {
 	TRACE(("my_erase"))
 
 	if (!cmd_line) {
 		erase();
 
-		/* FIXME:  curses doesn't actually do an erase() until
-		 * refresh() is called.  Ncurses 4.0 (and lower) reset the
-		 * background color when doing an erase().  So the only way to
-		 * ensure we'll get the same background colors is to reset them
-		 * here.
-		 *
-		 * (Need to verify if SVr4 does the same thing).
+		/* Curses doesn't actually do an erase() until refresh() is
+		 * called.  Ncurses 4.0 (and lower) reset the background color
+		 * when doing an erase().  So the only way to ensure we'll get
+		 * the same background colors is to reset them here.
 		 */
 		refresh();
 		refresh_color();
@@ -326,13 +347,12 @@ screen_contents(int row, int col, char *buffer)
 	if (innstr(buffer, len) == ERR)
 		len = 0;
 	buffer[len] = '\0';
-	/* FIXME move(y, x); */
 	TRACE(("...screen_contents(%d,%d) %s", y, x, _nc_visbuf(buffer)))
 	return buffer;
 }
 
 #else
 
-void my_dummy(void) { }	/* ANSI C requires non-empty file */
+static void my_tcurses(void) { }	/* ANSI C requires non-empty file */
 
 #endif

@@ -1733,10 +1733,8 @@ bld_sline (
 		 arts_sub, spaces, len_from, len_from, from);
 
 	/* protect display from non-displayable characters (e.g., form-feed) */
-	for (n = 0; buffer[n] != '\0'; n++) {
-		if (!(my_isprint((unsigned char) buffer[n])))
-			buffer[n] = '?';
-	}
+	Convert2Printable (buffer);
+
 #if USE_CURSES
 	/* FIXME: draw_sline usually does this too */
 	mvaddstr(INDEX2LNUM(i), 0, buffer);

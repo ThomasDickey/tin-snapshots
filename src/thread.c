@@ -155,8 +155,6 @@ bld_tline (
 			strncat(buff, art->subject, i);
 			*(buff + strlen(buff)) = '\0';		/* Just in case */
 		}
-/* TODO */
-		Convert2Printable((unsigned char *)buff);
 
 		/*
 		 * If we need to show the author, pad out to the start of the author field,
@@ -178,11 +176,8 @@ bld_tline (
 		get_author (TRUE, art, buff+strlen(buff), cCOLS-strlen(buff));
 	}
 
-/* protect display from non-displayable characters (e.g., form-feed) */
-	for (i = 0; buff[i] != '\0'; i++) {
-		if (!(my_isprint((unsigned char) buff[i])))
-			buff[i] = '?';
-	}
+	/* protect display from non-displayable characters (e.g., form-feed) */
+	Convert2Printable (buff);
 
 	if (!strip_blanks) {
 		/*

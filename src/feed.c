@@ -130,8 +130,8 @@ feed_articles (
 	/*
 	 * If not automatic, ask what the user wants to save
 	 */
-	if (((default_auto_save == FALSE || arts[respnum].archive == (char *) 0) ||
-		(default_auto_save == TRUE && function != FEED_SAVE) ||
+	if (((!default_auto_save || arts[respnum].archive == (char *) 0) ||
+		(default_auto_save && function != FEED_SAVE) ||
 		ch_default == iKeyFeedTag) && function != FEED_SAVE_TAGGED) {
 		do {
 			sprintf (msg, "%s%s%c", prompt, txt_art_thread_regex_tag, ch_default);
@@ -669,9 +669,7 @@ got_sig_pipe_while_piping:
 		case FEED_SAVE:
 		case FEED_SAVE_TAGGED:
 			if (proc_ch != 'n' && is_mailbox == FALSE) {
-				ret2 = post_process_files (
-					proc_ch,
-					(t_bool)(function == FEED_SAVE ? FALSE : TRUE));
+				ret2 = post_process_files (proc_ch, (t_bool)(function == FEED_SAVE ? FALSE : TRUE));
 			}
 			free_save_array ();
 			break;

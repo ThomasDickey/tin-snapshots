@@ -18,11 +18,6 @@
 #include	"menukeys.h"
 
 /*
- * FIXME put in tin.h (or find a better solution). See also: config.c
- */
-#define option_lines_per_page (cLINES - INDEX_TOP - 3)
-
-/*
  *  prompt_num
  *  get a number from the user
  *  Return -1 if missing or bad number typed
@@ -310,13 +305,13 @@ prompt_option_string (
 {
 	char prompt[LEN];
 	char *p;
-	char *variable = OPT_STRING_list[option_table[option - 1].var_index];
+	char *variable = OPT_STRING_list[option_table[option].var_index];
 
 	set_alarm_clock_off ();
 
-	show_menu_help (option_table[option - 1].help_text);
-	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
+	show_menu_help (option_table[option].help_text);
+	MoveCursor (option_row(option), 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
 
 	if ((p = getline (prompt, FALSE, variable, 0, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();
@@ -351,17 +346,17 @@ prompt_option_num (
 
 	set_alarm_clock_off ();
 
-	show_menu_help (option_table[option - 1].help_text);
-	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
-	sprintf (&number[0], "%d", *(option_table[option - 1].variable));
+	show_menu_help (option_table[option].help_text);
+	MoveCursor (option_row(option), 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
+	sprintf (&number[0], "%d", *(option_table[option].variable));
 
 	if ((p = getline (prompt, TRUE, number, 0, HIST_OTHER)) == (char *) 0) {
 		return FALSE;
 	}
 	strcpy (number, p);
 	num = atoi (number);
-	*(option_table[option - 1].variable) = num;
+	*(option_table[option].variable) = num;
 
 	clear_message ();
 	set_alarm_clock_on ();
@@ -386,16 +381,16 @@ prompt_option_char (
 	char prompt[LEN];
 	char input[2];
 	char *p = &input[0];
-	char *variable = OPT_CHAR_list[option_table[option - 1].var_index];
+	char *variable = OPT_CHAR_list[option_table[option].var_index];
 
 	input[0] = *variable;
 	input[1] = '\0';
 
 	set_alarm_clock_off ();
 
-	show_menu_help (option_table[option - 1].help_text);
-	MoveCursor (INDEX_TOP + (option - 1) % option_lines_per_page, 0);
-	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option - 1].option_text);
+	show_menu_help (option_table[option].help_text);
+	MoveCursor (option_row(option), 0);
+	sprintf (&prompt[0], "-> %3d. %s ", option, option_table[option].option_text);
 
 	if ((p = getline (prompt, FALSE, p, 1, HIST_OTHER)) == (char *) 0) {
 		set_alarm_clock_on ();
@@ -472,7 +467,6 @@ continue_prompt (void)
 	}
 #endif /* WIN32 */
                                                                                 
-	get_arrow_key(' ');
 #if USE_CURSES
 	cmd_line = FALSE;
 	my_retouch();

@@ -672,6 +672,14 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #	define	forever	for(;;)
 #endif
 
+#ifndef nop
+#	define	nop	((void)0)
+#endif
+
+#ifndef nobreak
+#	define	nobreak
+#endif
+
 /* safe strcpy into fixed-legth buffer */
 #define STRCPY(dst, src) \
        (dst[sizeof(dst) - 1] = 0, strncpy(dst, src, sizeof(dst) -1))
@@ -1856,10 +1864,10 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 
 /* FIXME - check also for mktemp/mkstemp/tmpfile */
 #ifdef HAVE_TEMPNAM
-#	define my_tempnam(a,b) tempnam(a,b)      
+#	define my_tempnam(a,b) tempnam(a,b)
 #else
 #	ifdef HAVE_TMPNAM
-#		define my_tempnam(a,b) tmpnam('\0')
+#		define my_tempnam(a,b) tmpnam((char *)0)
 #	endif /* HAVE_TMPNAM */
 #endif /* HAVE_TEMPNAM */
 

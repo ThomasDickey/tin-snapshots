@@ -76,8 +76,8 @@ constext txt_return_key[] = "Press <RETURN> to continue...";
 constext txt_color_off[] = "ANSI color disabled";
 constext txt_color_on[] = "ANSI color enabled";
 constext txt_command_failed_s[] = "Command failed: %s\n";
-constext txt_connecting[] = "Connecting to %s... ";
-constext txt_connecting_port[] = "Connecting to %s:%d... ";
+constext txt_connecting[] = "Connecting to %s...";
+constext txt_connecting_port[] = "Connecting to %s:%d...";
 constext txt_connection_to_server_broken[] = "Connection to server broken";
 constext txt_continue[] = "Continue? (y/n): ";
 #ifdef M_AMIGA
@@ -138,7 +138,7 @@ constext txt_filter_global_rules[] = "Filtering global rules (%d/%d)...";
 constext txt_filter_local_rules[] = "Filtering local rules (%d)...";
 constext txt_warn_difficulties[] = "Okay, but you may run into difficulties later\n";
 constext txt_warn_update[] = "\n\nYou are upgrading to tin %s from an earlier version.\n\
-Some values in your configuration file have changed\nRead WHATSNEW, etc.....\n";
+Some values in your configuration file have changed\nRead WHATSNEW, etc...\n";
 constext txt_feed_pattern[] = "Enter wildcard pattern [%s]> ";
 constext txt_subscribe_pattern[] = "Enter wildcard subscribe pattern> ";
 constext txt_unsubscribe_pattern[] = "Enter wildcard unsubscribe pattern> ";
@@ -406,7 +406,7 @@ constext txt_index_page_com[] = "Group Level Commands (page %d of %d)";
 constext txt_info_add_kill[] = "Kill filter added";
 constext txt_info_add_select[] = "Auto-selection filter added";
 constext txt_info_do_postpone[] = "Storing article for later posting";
-constext txt_info_postponed[] = "%d postponed article%s, reuse with ^O";
+constext txt_info_postponed[] = "%d postponed article%s, reuse with ^O...\n";
 constext txt_info_nopostponed[] = "*** No postponed articles ***";
 constext txt_is_tex_ecoded[]= "TeX2Iso encoded article";
 
@@ -874,9 +874,7 @@ constext *txt_show_from[] = { "None", "Address", "Full Name", "Address and Name"
  * Which colors can be used.
  */
 constext *txt_colors[] = {
-#ifdef HAVE_USE_DEFAULT_COLORS
 	txt_default,
-#endif
 	"Black",      "Red",        "Green",       "Brown",
 	"Blue",       "Pink",       "Cyan",        "White",
 	"Gray",       "Light Red",  "Light Green", "Yellow",

@@ -19,8 +19,8 @@
 #include	"trace.h"
 
 /*
-** Local prototypes
-*/
+ * Local prototypes
+ */
 static char * escape_shell_meta (char *source, int quote_area);
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
@@ -413,7 +413,7 @@ tin_done (
 		EndWin ();
 		Raw (FALSE);
 #ifdef SIGUSR1
-		ret = SIGUSR1 ;
+		ret = SIGUSR1;
 	}
 #endif
 	cleanup_tmp_files ();
@@ -875,8 +875,8 @@ mail_check (void)
 	while ((whatp) >= (whatbuf) && \
 	(*(whatp)==' ')) \
 	*((whatp)--) = '\0'; } while (0)
-# define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf) ; \
-	(whatp) && (*(whatp) == ' ') ; \
+# define LTRIM(whatbuf, whatp) for ((whatp) = (whatbuf); \
+	(whatp) && (*(whatp) == ' '); \
 	(whatp)++)
 # define TRIM(whatbuf, whatp) do { RTRIM ((whatbuf), (whatp)); \
 	LTRIM ((whatbuf), (whatp)); \

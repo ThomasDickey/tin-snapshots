@@ -116,7 +116,7 @@ main (
 	read_cmd_line_options (argc, argv);
 
 #ifndef INDEX_DAEMON
-	set_up_private_index_cache () ;
+	set_up_private_index_cache ();
 #endif
 
 #if defined(M_UNIX) && !defined(INDEX_DAEMON)
@@ -615,7 +615,7 @@ read_cmd_line_options (
  */
 #ifdef NNTP_ABLE			
 	if (read_news_via_nntp)
-		read_local_newsgroups_file = ! check_for_new_newsgroups ;
+		read_local_newsgroups_file = ! check_for_new_newsgroups;
 #endif
 }
 
