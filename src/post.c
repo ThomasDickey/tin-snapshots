@@ -2137,6 +2137,7 @@ pcCopyArtHeader (iHeader, pcArt, result)
 	int found = FALSE;
 	int was_to = FALSE;
 	static char header[HEADER_LEN];
+	int c;
 
 	*header = '\0';
 
@@ -2154,6 +2155,15 @@ pcCopyArtHeader (iHeader, pcArt, result)
 		if (*buf == '\0')
 			break;
 
+		/* check for continued header */
+		while((c=peek_char(fp))!=EOF && isspace(c) && c!='\n'
+		      && strlen(buf)<sizeof(buf)-1) {
+		  if(strlen(buf)>0 && buf[strlen(buf)-1]=='\n') {
+		    buf[strlen(buf)-1]='\0';
+		  }
+		  fgets(buf+strlen(buf), sizeof buf-strlen(buf), fp);
+		}
+		
 		switch (iHeader) {
 			case HEADER_TO:
 				if (STRNCMPEQ(buf, "To: ", 4) || STRNCMPEQ(buf, "Cc: ", 4)) {

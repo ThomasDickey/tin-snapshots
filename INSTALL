@@ -391,6 +391,7 @@ Compiled & installed on the following machines:
 	HP 9000/715 & HP-UX 9.05 with gcc 2.7.2
 	HP 9000/720 & HP-UX 9.05 with cc
 	HP 9000/720 & HP-UX 9.05 with gcc 2.7.2
+	HP 9000/715 & HP-UX 9.07 with cc
 	HP 9000/819 & HP-UX 10.10 with gcc 2.7.2
 
 3)	VAX 8350 & Ultrix 4.0 with gcc 1.4.0

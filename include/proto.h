@@ -286,6 +286,7 @@ extern void make_post_process_cmd P_((char *cmd, char *dir, char *file));
 extern int stat_file P_((char *file));
 extern void vPrintBugAddress P_((void));
 extern int iCopyFile P_((char *pcSrcFile, char *pcDstFile));
+extern int peek_char P_((FILE *));
 /* ./newsrc.c */
 extern void read_newsrc P_((char *newsrc_file, int allgroups));
 extern void vWriteNewsrc P_((void));

@@ -337,13 +337,25 @@ rfc1522_do_encode(what, where)
 	unsigned char buf2[64];	/* buffer for this and that */
 	unsigned char *c;
 	unsigned char *t;
+	int word_cnt=0;
 
 	t=buf;
 	while (*what) {
+		word_cnt++;
 		if ((encoding=contains_nonprintables(what))) {
 			if (!quoting) {
 				sprintf((char *)buf2,"=?%s?%c?",mm_charset,encoding);
 				ewsize=mystrcat((char **)&t,(char *)buf2);
+#ifdef MIME_BREAK_LONG_LINES
+				if(word_cnt==2) {
+				  /* make sure we fit the first
+                                     encoded word in with the header
+                                     keyword, since we cannot break
+                                     the line directly after the
+                                     keyword.*/
+				  ewsize=t-buf;
+				}
+#endif
 				quoting=1;
 				any_quoting_done=1;
 			}
@@ -359,12 +371,45 @@ rfc1522_do_encode(what, where)
 					ewsize++;
 				}
 				what++;
+				/* be sure to encode at least one
+                                   char, even if that overflows the
+                                   line limit, otherwise, we will be
+                                   stuck in a loop (if this were in
+                                   the while condition above). (Can
+                                   only happen in the first line, if
+                                   we have a very long header keyword,
+                                   I think) */
+				if(ewsize>=71) {
+				  break;
+				}
 			}
 			if (!contains_nonprintables(what) || ewsize>=60) {
 				/* next word is 'clean', close encoding */
 				*t++='?';
 				*t++='=';
 				ewsize+=2;
+#ifdef MIME_BREAK_LONG_LINES
+/* if our line is too long, but the next word will not be quoted, we
+   just use the space that separates the words as header continuation
+   space. Note that apparently the xover files in INN convert the nl
+   also to space, which inserts a 2nd space into our string. This is
+   not a problem when we continue with a quoted word, since whitespace
+   between quoted words is ignored. (We could insert a quoted space
+   like =?us-ascii?Q?_?= after the line break, but that's kind of
+   ugly. As long as we are threading by Refs, it will work, but
+   threading by Subject will break with this. Since we parse the
+   header lines ourself before generating followups, at least the
+   error will not be in the next article. */
+#else
+/* if we do not break long lines, we could just continue with the
+   encoded text, but rfc1522 says that encoded words are only
+   non-whitespace strings of up to 75 chars, delimited by whitespace
+   or the line start/end, so we break and insert a space here also. */
+#endif
+				if(ewsize>=60 && contains_nonprintables(what)) {
+				  *t++=' ';
+				  ewsize++;
+				}
 				quoting=0;
 			} else {
 				/* process whitespace in-between by quoting it properly */
@@ -395,11 +440,28 @@ rfc1522_do_encode(what, where)
 #ifdef MIME_BREAK_LONG_LINES
 	column=0;
 	if (any_quoting_done) {
+		word_cnt=1; /* note, if the user has typed a
+			       continuation line, we will consider the
+			       initial whitespace to be delimiting
+			       word one (well, just assume an empty
+			       word). */
 		while (*c) {
 			if (isspace(*c)) {
-				if (sizeofnextword(c)+column>76) {
+			  /* according to rfc1522, header lines
+                             containg encoded words are limited to 76
+                             chars, but if the first line is too long
+                             (due to a long header keyword), we cannot
+                             stick to that, since we would break the
+                             line directly after the keyword's colon,
+                             which is not allowed. The same is
+                             necessary for a continuation line with an
+                             unencoded word that is too long. */
+				if (sizeofnextword(c)+column>76 && word_cnt!=1) {
 					*((*where)++)='\n';
 					column=0;
+				}
+				if(c>buf && !isspace(*(c-1))) {
+				  word_cnt++;
 				}
 				*((*where)++)=*c++;
 				column++;

@@ -1,7 +1,21 @@
+--unoff BETA release 960731 --
+
+133) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. smarter MIME-code
+     FIX. several supplied patches     
+
+132) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. don't check for LIB/SPOOL/NOVROOTDIR when NNTP_ONLY
+     FIX. configure.in
+
+131) Torsten Neumann <torsten@imke.infodrom.north.de>
+     ADD. --none/! command to default_sigfile
+     FIX. config.c, sigfile.c
+
 --unoff BETA release 960730 --
 
 130) Alexander Lehmann <alex@hal.rhein-main.de>
-     BUG. tin did not thread more than 128 articles (introduced in 960725)
+     BUG. tin did not thread more than 128 articles (introduced in 124)
      ADD. added 'Re :' to eat_re
      FIX. art.c, misc.c, refs.c
 
