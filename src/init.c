@@ -133,7 +133,7 @@ int num_of_killed_arts;
 int num_of_selected_arts;
 int num_of_tagged_arts;
 int post_mime_encoding;
-int process_id;
+int process_id;		/* FIXME: use pid_t instead of int */
 int real_gid;
 int real_uid;
 int real_umask;
@@ -593,6 +593,9 @@ void init_selfinfo (void)
 #else
 	joinpath (article, homedir, ".article");
 #endif
+#ifdef APPEND_PID
+	sprintf (article+strlen(article), ".%d", process_id);
+#endif
 	joinpath (dead_article, homedir, "dead.article");
 	joinpath (dead_articles, homedir, "dead.articles");
 
@@ -652,13 +655,9 @@ void init_selfinfo (void)
 	joinpath (newnewsrc, rcdir, NEWNEWSRC_FILE);
 #else
 	joinpath (newsrc, homedir, NEWSRC_FILE);
-#ifdef SINGLETASK
-	/* we don't expect to run two tins at once or we don't have
-           getpid */
 	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
-#else
-	joinpath (newnewsrc, homedir, NEWNEWSRC_FILE);
-	sprintf(newnewsrc+strlen(newnewsrc), "%lu", (unsigned long)getpid());
+#ifdef APPEND_PID
+	sprintf(newnewsrc+strlen(newnewsrc), "%d", process_id);
 #endif
 #endif
 	joinpath (posted_info_file, rcdir, POSTED_FILE);
@@ -869,6 +868,7 @@ int create_mail_save_dirs (void)
 
 #ifndef USE_INN_NNTPLIB
 
+/*
 char *
 GetFQDN (void)
 {
@@ -876,6 +876,7 @@ GetFQDN (void)
 
 	return fqdn;
 }
+*/
 
 
 char *

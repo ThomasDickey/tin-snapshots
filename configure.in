@@ -366,6 +366,12 @@ CF_ARG_DISABLE(piping,
 	[AC_DEFINE(DONT_HAVE_PIPING)])
 AC_MSG_RESULT($enableval)
 
+AC_MSG_CHECKING(whether to unique tmp-files by appending .pid)
+CF_ARG_DISABLE(color,
+        [  --disable-append-pid    disable appending .pid to tmp-files],,
+        [AC_DEFINE(APPEND_PID)])
+AC_MSG_RESULT($enableval)
+
 ###	checks for operator characteristics (should be the last option)
 AC_MSG_CHECKING(whether to make a coffee while compiling)
 AC_ARG_WITH(coffee,
@@ -416,6 +422,7 @@ AC_CHECK_HEADERS(\
 	locale.h \
 	malloc.h \
 	netdb.h \
+	netinet/in.h \
 	netlib.h \
 	poll.h \
 	prototypes.h \
@@ -433,6 +440,7 @@ AC_CHECK_HEADERS(\
 	sys/pty.h \
 	sys/select.h \
 	sys/stream.h \
+	sys/socket.h \
 	sys/time.h \
 	sys/timeb.h \
 	sys/times.h \

@@ -157,7 +157,7 @@ extern int submit_news_file (char *name, int lines);
 /* init.c */
 extern void init_selfinfo (void);
 extern int create_mail_save_dirs (void);
-extern char *GetFQDN (void);
+/*extern char *GetFQDN (void);*/
 extern char *GetConfigValue (const char *name);
 
 /* joinpath.c */
