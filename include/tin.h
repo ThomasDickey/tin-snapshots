@@ -731,6 +731,11 @@ typedef unsigned t_bool;	/* don't make this a char or short! */
 #define	NUM_MIME_TYPES	4
 
 /*
+ * Number of charset-traslation tables (iso2asci)
+ */
+#define NUM_ISO_TABLES  7
+
+/*
  * Maximum permissible colour number
  */
 #define		MAX_COLOR	15

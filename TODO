@@ -1,7 +1,5 @@
 Bugs
 ----
-o  rangecheck for ISO2ASC is missing (ISO2ASC > 7 may lead to SIGSEGVs)
-
 o  mark group as read warps into the next line if the groupname is very long
 
 o  on some systems (my Linux 2.0.26/gcc 2.7.2.1) - tin claims that the

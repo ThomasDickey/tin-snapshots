@@ -751,7 +751,7 @@ collate_subjects(void)
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
-		aptr = (int *)arts[i].subject - 2; /* arghh */
+		aptr = (int *)arts[i].subject - 2; /* arghh - see also art.c line 405*/
 
 		j = *aptr;
 

@@ -290,7 +290,7 @@ strstr (
 */
 long int
 atol (
-	/* const */ char *s)
+	const char *s)
 {
 	long ret = 0;
 	while (*s) {
@@ -310,7 +310,7 @@ atol (
 #define MBASE 36
 long
 strtol (
-	/* const */ char *str,
+	const char *str,
 	char **ptr,
 	int use_base)
 {

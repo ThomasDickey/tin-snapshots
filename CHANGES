@@ -1,3 +1,11 @@
+--unoff BETA release 970225 --
+
+325) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     BUG. changing OPT_DEFAULT_SHOW_AUTHOR in 'M'enu at top-level SIGSEVs
+     BUG. no ragecheck for ISO2ASCI
+     BUG. wrong prototype for handrolled atol
+     FIX. config.c, init.c, string.c
+
 --unoff BETA release 970222 --
 
 324) Thomas Leitner <tom@finwds01.tu-graz.ac.at>

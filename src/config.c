@@ -1420,7 +1420,9 @@ change_config_file (
 							break;
 
 						case OPT_DEFAULT_SHOW_AUTHOR:
-							group->attribute->show_author = default_show_author;
+							if (group != (struct t_group *) 0) {
+								group->attribute->show_author = default_show_author;
+							}
 							break;
 
 						/*

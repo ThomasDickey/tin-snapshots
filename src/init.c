@@ -418,6 +418,9 @@ void init_selfinfo (void)
 	global_filtered_articles = FALSE;
 	local_filtered_articles = FALSE;
 	iso2asc_supported = atoi (get_val ("ISO2ASC", DEFAULT_ISO2ASC));
+	if (iso2asc_supported > NUM_ISO_TABLES) {
+		iso2asc_supported = 0;
+	}
 	mark_saved_read = TRUE;
 	newsrc_active = FALSE;
 	num_of_selected_arts = 0;
