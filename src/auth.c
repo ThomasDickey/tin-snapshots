@@ -6,7 +6,7 @@
  *  Updated   : 1998-04-18
  *  Notes     : Routines to authenticate to a news server via NNTP.
  *              DON'T USE get_respcode() THROUGHOUT THIS CODE.
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Dirk Nimmich
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Dirk Nimmich
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -39,7 +39,8 @@ static t_bool authinfo_original (char *server, char *authuser, t_bool startup);
  * FALSE means failed
  */
 static t_bool
-authinfo_generic (void)
+authinfo_generic (
+	void)
 {
 	FILE *fp;
 	char *authcmd;

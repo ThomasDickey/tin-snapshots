@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1994-12-21
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -19,8 +19,8 @@
 char default_goto_group[LEN];
 int default_move_group;
 int cur_groupnum = 0;        /* always >= 0 */
-int first_group_on_screen;
-int last_group_on_screen;
+static int first_group_on_screen;
+static int last_group_on_screen;
 /*
  * Oddly named variable - seems to dictate whether to position on first
  * unread item or not. Used internally unlike 'pos_first_unread', which
@@ -624,7 +624,8 @@ select_done:
 
 
 void
-show_selection_page (void)
+show_selection_page (
+	void)
 {
 #ifndef INDEX_DAEMON
 
@@ -766,14 +767,16 @@ prompt_group_num (
 
 
 static void
-erase_group_arrow (void)
+erase_group_arrow (
+	void)
 {
 	erase_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
 }
 
 
 void
-draw_group_arrow (void)
+draw_group_arrow (
+	void)
 {
 	draw_arrow (INDEX_TOP + (cur_groupnum-first_group_on_screen));
 	if (!group_top)
@@ -785,7 +788,8 @@ draw_group_arrow (void)
 
 #ifndef INDEX_DAEMON
 static void
-yank_active_file (void)
+yank_active_file (
+	void)
 {
 	force_reread_active_file = TRUE;
 	resync_active_file ();
@@ -794,7 +798,8 @@ yank_active_file (void)
 
 
 int
-choose_new_group (void)
+choose_new_group (
+	void)
 {
 	char buf[LEN];
 	char *p;
@@ -837,7 +842,8 @@ choose_new_group (void)
  * found
  */
 int
-skip_newgroups(void)
+skip_newgroups (
+	void)
 {
 	int i=0;
 
@@ -1011,7 +1017,8 @@ pos_next_unread_group (
  * (return TRUE) or quit (return FALSE)
  */
 static t_bool
-read_groups (void)
+read_groups (
+	void)
 {
 	t_bool done = FALSE;
 
@@ -1171,7 +1178,7 @@ toggle_my_groups (
 	if ((cur_groupnum = my_group_find(old_curr_group)) == -1)
 		cur_groupnum = 0;
 
-#endif	/* !INDEX_DAEMON */
+#endif /* !INDEX_DAEMON */
 }
 
 
@@ -1453,7 +1460,7 @@ vDelRange (
  * Move the on-screen pointer & internal variable to the given group
  */
 static void
-move_to_group(
+move_to_group (
 	int n)
 {
 	if (cur_groupnum == n)

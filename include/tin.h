@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     : #include files, #defines & struct's
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -253,50 +253,50 @@
 #	else
 #		ifdef HAVE_SYS_DIR_H
 #			include <sys/dir.h>
-#		endif
+#		endif /* HAVE_SYS_DIR_H */
 #		ifdef HAVE_SYS_NDIR_H
 #			include <sys/ndir.h>
-#		endif
+#		endif /* HAVE_SYS_NDIR_H */
 #		define DIR_BUF	struct direct
-#	endif
+#	endif /* HAVE_DIRENT_H */
 #else
 #	ifdef M_AMIGA
 #		include "amiga.h"
 #		define DIR_BUF	struct dirent
-#	endif
+#	endif /* M_AMIGA */
 #	ifdef M_OS2
 #		include "os_2.h"
 #		define DIR_BUF	struct dirent
-#	endif
+#	endif /* M_OS2 */
 #	ifdef WIN32
 #		include "win32.h"
 #		define DIR_BUF	struct direct
-#	endif
+#	endif /* WIN32 */
 #	ifdef M_XENIX
 #		include <sys/ndir.h>
 #		define DIR_BUF	struct direct
-#	endif
+#	endif /* M_XENIX */
 #	ifdef VMS
 #		include "ndir.h"
 #		define DIR_BUF	struct direct
-#	endif
-#endif	/* !HAVE_CONFIG_H */
+#	endif /* VMS */
+#endif /* !HAVE_CONFIG_H */
 
 #ifndef DIR_BUF
 #	include <dirent.h>
 #	define DIR_BUF	struct dirent
-#endif
+#endif /* !DIR_BUF */
 
 #ifndef HAVE_UNLINK
 #	define unlink(file)	remove(file)
-#endif
+#endif /* !HAVE_UNLINK */
 
 /*
  * If native OS has'nt defined STDIN_FILENO be a smartass and do it
  */
 #if !defined(STDIN_FILENO)
 #	define STDIN_FILENO	0
-#endif
+#endif /* !STDIN_FILENO */
 
 /*
  * If OS misses the isascii() function
@@ -311,18 +311,17 @@
 #if defined(NNTP_ABLE) || defined(NNTP_ONLY)
 #	ifndef NNTP_ABLE
 #		define NNTP_ABLE	1
-#	endif
+#	endif /* !NNTP_ABLE */
 #	ifndef NNTP_INEWS
 #		define NNTP_INEWS	1
-#	endif
-#endif
+#	endif /* !NNTP_INEWS */
+#endif /* NNTP_ABLE || NNTP_ONLY */
+
+#if defined(INDEX_DAEMON) && defined(FORGERY)
+#	undef FORGERY
+#endif /* INDEX_DAEMON && FORGERY */
 
 #define FAKE_NNTP_FP		(FILE *) 9999
-
-/*
- *  Time idle after which to check (via STAT) if nntp connection is still ok
- */
-#define NNTP_IDLE_RETRY_SECS	300
 
 /*
  *  Max time between the first character of a VT terminal escape sequence
@@ -349,7 +348,7 @@
 #	undef	NNTP_ABLE
 #	undef	NNTP_ONLY
 #	undef	NNTP_INEWS
-#endif
+#endif /* INDEX_DAEMON */
 
 /*
  * Specify News spool & control directories if not running NNTP_ONLY
@@ -407,17 +406,17 @@
  */
 #	ifndef HAVE_MEMCMP
 #		define memcmp(s1, s2, n)	bcmp(s2, s1, n)
-#	endif
+#	endif /* !HAVE_MEMCMP */
 #	ifndef HAVE_MEMCPY
 #		define memcpy(s1, s2, n)	bcopy(s2, s1, n)
-#	endif
+#	endif /* !HAVE_MEMCPY */
 #	ifndef HAVE_MEMSET
 #		define memset(s1, s2, n)	bfill(s1, n, s2)
-#	endif
+#	endif /* !HAVE_MEMSET */
 #	ifndef HAVE_STRCHR
 #		define strchr(str, ch)	index(str, ch)
 #		define strrchr(str, ch)	rindex(str, ch)
-#	endif
+#	endif /* !HAVE_STRCHR */
 #	define DEFAULT_SHELL	"/bin/csh"
 #	if defined(__386BSD__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #		define DEFAULT_PRINTER	"/usr/bin/lpr"
@@ -425,21 +424,21 @@
 #	else
 #		define DEFAULT_PRINTER	"/usr/ucb/lpr"
 #		define DEFAULT_SUM	"sum"
-#	endif
+#	endif /* __386BSD__ || __bsdi__ || __NetBSD__ ||__FreeBSD__ || __OpenBSD__ */
 #	ifdef DGUX
 #		define USE_INVERSE_HACK
-#	endif
+#	endif /* DGUX */
 #	ifdef pyr
 #		define DEFAULT_MAILER	"/usr/.ucbucb/mail"
-#	endif
+#	endif /* pyr */
 #else /* !BSD */
 #	ifdef linux
 #		define DEFAULT_PRINTER	"/usr/bin/lpr"
-#	endif
+#	endif /* linux */
 #	ifdef M_AMIGA
 #		ifndef DEFAULT_EDITOR
 #			define DEFAULT_EDITOR	"c:ed"
-#		endif
+#		endif /* !DEFAULT_EDITOR */
 #		define DEFAULT_MAILBOX	"uumail:"
 #		define DEFAULT_MAILER	"uucp:c/sendmail"
 #		define DEFAULT_POSTER	"uucp:c/postnews %s"
@@ -448,7 +447,7 @@
 #		define DEFAULT_SHELL	"c:newshell"	/* Not Yet Implemented */
 #		define DEFAULT_UUDECODE	"uudecode %s"
 #		define DEFAULT_UNSHAR	"unshar %s"
-#	endif
+#	endif /* M_AMIGA */
 #	ifdef VMS
 #		define DEFAULT_EDITOR	"EDIT/TPU"
 #		define DEFAULT_MAILBOX	"SYS$LOGIN:"
@@ -458,11 +457,11 @@
 #		define DEFAULT_PRINTER	"PRINT/DELETE"
 #		define DEFAULT_UUDECODE	"uudecode %s."
 #		define DEFAULT_UNSHAR	"unshar %s."
-#	endif
+#	endif /* VMS */
 #	ifdef M_OS2
 #		ifndef DEFAULT_EDITOR
 #			define DEFAULT_EDITOR	"epm /m"
-#		endif
+#		endif /* !DEFAULT_EDITOR */
 #		define DEFAULT_MAILBOX	"/mail"
 #		define DEFAULT_MAILER	"sendmail -af %s -f %s %s"
 #		define DEFAULT_POSTER	"postnews %s"
@@ -470,11 +469,11 @@
 #		define DEFAULT_SHELL	"cmd.exe"
 #		define DEFAULT_UUDECODE	"uudecode %s"
 #		define DEFAULT_UNSHAR	"unshar %s"
-#	endif
+#	endif /* M_OS2 */
 #	ifdef WIN32
 #		ifndef DEFAULT_EDITOR
 #			define DEFAULT_EDITOR	"vi"
-#		endif
+#		endif /* !DEFAULT_EDITOR */
 #		define DEFAULT_MAILBOX	"/mail"
 #		define DEFAULT_MAILER	"sendmail"
 #		define DEFAULT_POSTER	"postnews %s"
@@ -482,45 +481,45 @@
 #		define DEFAULT_SHELL	"cmd.exe"
 #		define DEFAULT_UUDECODE	"uudecode %s"
 #		define DEFAULT_UNSHAR	"unshar %s"
-#	endif
+#	endif /* WIN32 */
 #	ifdef QNX42
 #		ifndef DEFAULT_EDITOR
 #			define DEFAULT_EDITOR	"/bin/vedit"
-#		endif
-#	endif
+#		endif /* !DEFAULT_EDITOR */
+#	endif /* QNX42 */
 #	ifdef _AIX
 #		define DEFAULT_PRINTER	"/bin/lp"
 #		define READ_CHAR_HACK
-#	endif
+#	endif /* _AIX */
 #	ifdef SCO_UNIX
 #		define HAVE_MMDF_MAILER
-#	endif
+#	endif /* SCO_UNIX */
 #	ifdef sinix
 #		define DEFAULT_PRINTER	"/bin/lpr"
-#	endif
+#	endif /* sinix */
 #	ifdef sysV68
 #		define DEFAULT_MAILER	"/bin/rmail"
-#	endif
+#	endif /* sysV68 */
 #	ifdef UNIXPC
 #		define DEFAULT_MAILER	"/bin/rmail"
-#	endif
+#	endif /* UNIXPC */
 
 /* HP-UX >= 10 defines __STDC_EXT__ (ANSI) || __CLASSIC_C__ (K&R) */
 #	if defined (__hpux)
 #		if defined (__STDC_EXT__) || defined (__CLASSIC_C__)
 #			define DEFAULT_SHELL "/usr/bin/sh"
-#		endif
-#	endif
+#		endif /* __STDC_EXT__ || __CLASSIC_C__ */
+#	endif /* __hpux */
 
 #	ifndef DEFAULT_SHELL
 #		define DEFAULT_SHELL	"/bin/sh"
-#	endif
+#	endif /* !DEFAULT_SHELL */
 #	ifndef DEFAULT_PRINTER
 #		define DEFAULT_PRINTER	"/usr/bin/lp"
-#	endif
+#	endif /* !DEFAULT_PRINTER */
 #	ifndef PATH_SUM
 #		define DEFAULT_SUM	"sum -r"
-#	endif
+#	endif /* !PATH_SUM */
 #endif /* BSD */
 
 /*
@@ -528,13 +527,13 @@
  */
 #ifndef DEFAULT_EDITOR
 #	define DEFAULT_EDITOR	"/usr/bin/vi"
-#endif
+#endif /* !DEFAULT_EDITOR */
 #ifndef DEFAULT_MAILER
 #	define DEFAULT_MAILER	"/usr/lib/sendmail"
-#endif
+#endif /* !DEFAULT_MAILER */
 #ifndef DEFAULT_MAILBOX
 #	define DEFAULT_MAILBOX	"/usr/spool/mail"
-#endif
+#endif /* !DEFAULT_MAILBOX */
 
 
 /* FIXME: remove absolut-paths! */
@@ -543,11 +542,11 @@
  */
 #ifndef PATH_ISPELL
 #	define PATH_ISPELL	"ispell"
-#endif
+#endif /* !PATH_ISPELL */
 
 #ifndef PATH_METAMAIL
 #	define PATH_METAMAIL	"metamail"
-#endif
+#endif /* !PATH_METAMAIL */
 
 /*
  * Fix up the 'sum' path and parameter for './configure'd systems
@@ -569,14 +568,14 @@
 #else
 #	define LONG_PATH_PART	""
 #	define LONG_PATH_PATCH	"p"
-#endif
+#endif /* HAVE_LONG_FILE_NAMES */
 
 /*
  * How often should the active file be reread for new news
  */
 #ifndef REREAD_ACTIVE_FILE_SECS
 #	define REREAD_ACTIVE_FILE_SECS 1200	/* seconds (20 mins) */
-#endif
+#endif /* !REREAD_ACTIVE_FILE_SECS */
 
 /*
  * Initial sizes of internal arrays for small (<4MB) & large memory machines
@@ -587,7 +586,7 @@
 #else
 #	define DEFAULT_ARTICLE_NUM	1200
 #	define DEFAULT_SAVE_NUM	30
-#endif
+#endif /* SMALL_MEMORY_MACHINE */
 #define DEFAULT_ACTIVE_NUM	1800
 #define DEFAULT_NEWNEWS_NUM	5
 
@@ -601,7 +600,7 @@
 #	define INDEX_MAILDIR	".mail"
 #	define INDEX_NEWSDIR	".news"
 #	define INDEX_SAVEDIR	".save"
-#endif
+#endif /* VMS */
 
 #define ACTIVE_FILE	"active"
 #define ACTIVE_MAIL_FILE	"active.mail"
@@ -623,7 +622,7 @@
 #define OLDNEWSRC_FILE	".oldnewsrc"
 #ifndef	OVERVIEW_FILE
 #	define OVERVIEW_FILE	".overview"
-#endif
+#endif /* !OVERVIEW_FILE */
 #define OVERVIEW_FMT	"overview.fmt"
 #define POSTED_FILE	"posted"
 #define POSTPONED_FILE	"postponed.articles"
@@ -637,20 +636,20 @@
 
 #ifndef MAX
 #	define MAX(a,b)	((a > b) ? a : b)
-#endif
+#endif /* !MAX */
 
 #ifndef forever
 /*@notfunction@*/
 #	define forever	for(;;)
-#endif
+#endif /* !forever */
 
 #ifndef nop
 #	define nop	((void)0)
-#endif
+#endif /* !nop */
 
 #ifndef nobreak
 #	define nobreak
-#endif
+#endif /* !nobreak */
 
 /* safe strcpy into fixed-legth buffer */
 #define STRCPY(dst, src)	(dst[sizeof(dst) - 1] = '\0', strncpy(dst, src, sizeof(dst) -1))
@@ -663,18 +662,18 @@
 #if defined(VMS) || defined(M_AMIGA)
 #	define LEN	512
 #	define PATH_LEN	256
-#endif
+#endif /* VMS || M_AMIGA */
 #if defined(M_OS2) || defined(M_UNIX)
 #	ifndef MAXPATHLEN
 #		define MAXPATHLEN	256
-#	endif
+#	endif /* !MAXPATHLEN */
 #	define LEN	1024
 #	define PATH_LEN	MAXPATHLEN
-#endif
+#endif /* M_OS2 || M_UNIX */
 #if defined(WIN32)
 #	define LEN	1024
 #	define PATH_LEN	MAX_PATH
-#endif
+#endif /* WIN32 */
 
 #define NEWSRC_LINE	8192
 #define MAXLINELEN	1024
@@ -683,7 +682,7 @@
 #	define HEADER_LEN	2048
 #else
 #	define HEADER_LEN	1024
-#endif
+#endif /* HAVE_MAIL_HANDLER */
 
 #define MODULO_COUNT_NUM	50
 #define TABLE_SIZE	1409
@@ -695,29 +694,29 @@
 
 #ifndef DEFAULT_ISO2ASC
 #	define DEFAULT_ISO2ASC	"-1 "	/* ISO -> Ascii charset conversion */
-#endif
+#endif /* !DEFAULT_ISO2ASC */
 
 #ifndef DEFAULT_COMMENT
 #	define DEFAULT_COMMENT	"> "	/* used when by follow-ups & replys */
-#endif
+#endif /* !DEFAULT_COMMENT */
 #ifndef ART_MARK_UNREAD
 #	define ART_MARK_UNREAD	'+'	/* used to show that an art is unread */
-#endif
+#endif /* !ART_MARK_UNREAD */
 #ifndef ART_MARK_RETURN
 #	define ART_MARK_RETURN	'-'	/* used to show that an art will return */
-#endif
+#endif /* !ART_MARK_RETURN */
 #ifndef ART_MARK_SELECTED
 #	define ART_MARK_SELECTED	'*'	/* used to show that an art was auto selected */
-#endif
+#endif /* !ART_MARK_SELECTED */
 #ifndef ART_MARK_READ
 #	define ART_MARK_READ	' '	/* used to show that an art was not read or seen */
-#endif
+#endif /* !ART_MARK_READ */
 #ifndef ART_MARK_DELETED
 #	define ART_MARK_DELETED	'D'	/* art has been marked for deletion (mailgroup) */
-#endif
+#endif /* !ART_MARK_DELETED */
 #ifndef MARK_INRANGE
 #	define MARK_INRANGE	'#'	/* group/art within a range (# command) */
-#endif
+#endif /* !MARK_INRANGE */
 
 /*
  * position of the unread/will_return/hot-mark
@@ -732,7 +731,7 @@
 #else
 #	define BLANK_GROUP_COLS	0
 #	define BLANK_PAGE_COLS	0
-#endif
+#endif /* USE_INVERSE_HACK */
 
 /*
  * Return values for tin_errno
@@ -872,7 +871,7 @@
 #	define DEBUG_IO(x)	fprintf x
 #else
 #	define DEBUG_IO(x)	/* nothing */
-#endif
+#endif /* 0 */
 
 
 /*
@@ -1324,7 +1323,7 @@ struct t_group
 	struct t_filters *glob_filter;	/* points to filter array */
 #ifdef INDEX_DAEMON
 	time_t last_updated_time;		/* last time group dir was changed */
-#endif
+#endif /* INDEX_DAEMON */
 };
 
 /*
@@ -1494,7 +1493,7 @@ struct t_newnews
 	typedef const char /*__far*/ constext;
 #else
 	typedef const char constext;
-#endif
+#endif /* M_AMIGA */
 
 /*
  * Used for building option menu
@@ -1540,7 +1539,7 @@ typedef struct t_notify *notify_p;
  */
 #ifndef RETSIGTYPE
 #	define RETSIGTYPE void
-#endif
+#endif /* !RETSIGTYPE */
 
 /*
  * Determine qsort compare type
@@ -1550,12 +1549,12 @@ typedef struct t_notify *notify_p;
 		typedef const void t_comptype;
 #	else
 		typedef void t_comptype;
-#	endif
-#endif
+#	endif /* __STDC__ */
+#endif /* HAVE_COMPTYPE_VOID */
 
 #ifdef HAVE_COMPTYPE_CHAR
 	typedef char t_comptype;
-#endif
+#endif /* HAVE_COMPTYPE_CHAR */
 
 #ifdef M_OS2
 #	define _CDECL	_cdecl
@@ -1590,7 +1589,7 @@ typedef struct t_notify *notify_p;
 #	define TMPDIR			"T:"
 #	define KEY_PREFIX		0x9b
 extern void joinpath (char *result, const char *dir, const char *file);
-#endif
+#endif /* M_AMIGA */
 #ifdef VMS
 #	define NEWSGROUPS_FILE	"newsgroups"
 #	define REDIRECT_OUTPUT	""
@@ -1619,7 +1618,7 @@ extern void joindir (char *result, const char *dir, const char *file);
 #	define TIN_EDITOR_FMT_ON	"%E %F"
 #	define METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
-#endif
+#endif /* M_OS2 */
 
 #ifdef WIN32
 #	define NEWSGROUPS_FILE	"newsgroups"
@@ -1633,7 +1632,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define MAILER_FORMAT		"%M -t %T -f %U -s \"%S\" -F %F"
 #	define METAMAIL_CMD		"%s -e -p -m \"tin\""
 extern void joinpath (char *result, char *dir, char *file);
-#endif
+#endif /* WIN32 */
 
 #ifdef M_UNIX
 #	define NEWSGROUPS_FILE		"newsgroups"
@@ -1647,38 +1646,38 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define TMPDIR		"/tmp/"
 #	ifdef	HAVE_KEY_PREFIX
 #		define KEY_PREFIX		0x8f: case 0x9b
-#	endif
-#endif
+#	endif /* HAVE_KEY_PREFIX */
+#endif /* M_UNIX */
 
 /* fallback values */
 /* FIXME! */
 #ifndef NEWSGROUPS_FILE
 #	define NEWSGROUPS_FILE		""
-#endif
+#endif /* !NEWSGROUPS_FILE */
 #ifndef REDIRECT_OUTPUT
 #	define REDIRECT_OUTPUT		""
-#endif
+#endif /* !REDIRECT_OUTPUT */
 #ifndef REDIRECT_PGP_OUTPUT
 #	define REDIRECT_PGP_OUTPUT		""
-#endif
+#endif /* !REDIRECT_PGP_OUTPUT */
 #ifndef ENV_VAR_MAILER
 #	define ENV_VAR_MAILER		""
-#endif
+#endif /* !ENV_VAR_MAILER */
 #ifndef ENV_VAR_SHELL
 #	define ENV_VAR_SHELL		""
-#endif
+#endif /* !ENV_VAR_SHELL */
 #ifndef TIN_EDITOR_FMT_ON
 #	define TIN_EDITOR_FMT_ON		""
-#endif
+#endif /* !TIN_EDITOR_FMT_ON */
 #ifndef MAILER_FORMAT
 #	define MAILER_FORMAT		""
-#endif
+#endif /* !MAILER_FORMAT */
 #ifndef METAMAIL_CMD
 #	define METAMAIL_CMD		""
-#endif
+#endif /* !METAMAIL_CMD */
 #ifndef TMPDIR
 #	define TMPDIR		""
-#endif
+#endif /* !TMPDIR */
 
 #if !defined(S_ISDIR)
 #	if defined(WIN32)
@@ -1686,16 +1685,16 @@ extern void joinpath (char *result, char *dir, char *file);
 #	else
 #		if defined(M_OS2)
 #			define S_ISDIR(m)	((m) & S_IF_DIR)
-#		endif
-#	endif
+#		endif /* M_OS2 */
+#	endif /* WIN32 */
 #	if defined(M_UNIX) || defined(VMS) || defined(M_AMIGA)
 #		define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
-#	endif
-#endif
+#	endif /* M_UNIX || VMS || M_AMIGA */
+#endif /* !S_ISDIR */
 
 #if !defined(S_ISREG)
 #	define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
-#endif
+#endif /* !S_ISREG */
 
 #ifndef S_IRWXU /* should be defined in <sys/stat.h> */
 #	define S_IRWXU	0000700	/* read, write, execute permission (owner) */
@@ -1712,38 +1711,38 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define S_IROTH	0000004	/* read permission (other) */
 #	define S_IWOTH	0000002	/* write permission (other) */
 #	define S_IXOTH	0000001	/* execute permission (other) */
-#endif /* S_IRWXU */
+#endif /* !S_IRWXU */
 
 #ifndef S_IRWXUGO
 #	define S_IRWXUGO	(S_IRWXU|S_IRWXG|S_IRWXO)	/* read, write, execute permission (all) */
 #	define S_IRUGO	(S_IRUSR|S_IRGRP|S_IROTH)	/* read permission (all) */
 #	define S_IWUGO	(S_IWUSR|S_IWGRP|S_IWOTH)	/* write permission (all) */
 #	define S_IXUGO	(S_IXUSR|S_IXGRP|S_IXOTH)	/* execute permission (all) */
-#endif /* S_IRWXUGO */
+#endif /* !S_IRWXUGO */
 
 #ifdef DONT_HAVE_PIPING
 #	ifdef VMS
 #		define TIN_PRINTFILE "Sys$Scratch:TIN_PRINT%d.TMP"
 #	else
 #		define TIN_PRINTFILE "tinprint%d.tmp"
-#	endif
-#endif
+#	endif /* VMS */
+#endif /* DONT_HAVE_PIPING */
 
 /*
  * Defines for access()
  */
 #ifndef R_OK
 #	define R_OK	4	/* Test for Read permission */
-#endif
+#endif /* !R_OK */
 #ifndef W_OK
 #	define W_OK	2	/* Test for Write permission */
-#endif
+#endif /* !W_OK */
 #ifndef X_OK
 #	define X_OK	1	/* Test for eXecute permission */
-#endif
+#endif /* !X_OK */
 #ifndef F_OK
 #	define F_OK	0	/* Test for existence of File */
-#endif
+#endif /* !F_OK */
 
 #ifdef USE_DBMALLOC
 #	define my_malloc(size)	malloc(size)
@@ -1751,7 +1750,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #else
 #	define my_malloc(size)	my_malloc1(__FILE__, __LINE__, (size))
 #	define my_realloc(ptr, size)	my_realloc1(__FILE__, __LINE__, (ptr), (size))
-#endif
+#endif /* USE_DBMALLOC */
 
 #define SIZEOF(array)	((int)(sizeof array / sizeof array[0]))
 
@@ -1776,8 +1775,8 @@ extern void joinpath (char *result, char *dir, char *file);
 #ifndef SIG_ARGS
 #	if defined(__STDC__)
 #		define SIG_ARGS	int sig
-#	endif
-#endif
+#	endif /* __STDC__ */
+#endif /* !SIG_ARGS */
 
 /* stifle complaints about not-a-prototype from gcc */
 #ifdef DECL_SIG_CONST
@@ -1787,7 +1786,7 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define SIG_IGN	(void (*)(SIG_ARGS))1
 #	undef	SIG_ERR
 #	define SIG_ERR	(void (*)(SIG_ARGS))-1
-#endif	/* DECL_SIG_CONST */
+#endif /* DECL_SIG_CONST */
 
 /*
  * tputs() function-param
@@ -1796,17 +1795,17 @@ extern void joinpath (char *result, char *dir, char *file);
 #	define OUTC_RETTYPE	int
 #else
 #	define OUTC_RETTYPE	void
-#endif
+#endif /* OUTC_RETURN */
 
 #ifndef OUTC_ARGS
 #	define OUTC_ARGS	int c
-#endif
+#endif /* !OUTC_ARGS */
 
 #if __STDC__ || defined(__cplusplus)
 #	define OUTC_FUNCTION(func)	OUTC_RETTYPE func (OUTC_ARGS)
 #else
 #	define OUTC_FUNCTION(func)	OUTC_RETTYPE func (c) int c;
-#endif
+#endif /* __STDC__ || __cplusplus */
 
 typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 
@@ -1822,11 +1821,11 @@ typedef	OUTC_RETTYPE (*OutcPtr) (OUTC_ARGS);
 
 #ifndef __CPROTO__
 #	include	"proto.h"
-#endif
+#endif /* !__CPROTO__ */
 
 #if defined(WIN32)
 #	include	"msmail.h"
-#endif
+#endif /* WIN32 */
 
 /* Philip Hazel's Perl regular expressions library */
 #include	<pcre.h>
@@ -1841,15 +1840,15 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #	undef strrchr
 #	undef NSET1
 #	undef NSET0
-#	define NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] |	NTEST(n,b), 1)
+#	define NSET1(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] | NTEST(n,b), 1)
 #	define NSET0(n,b) memset(n+NOFFSET(b), n[NOFFSET(b)] & ~NTEST(n,b), 1)
 #	include <dbmalloc.h> /* dbmalloc 1.4 */
-#endif
+#endif /* USE_DBMALLOC */
 
 #ifdef USE_DMALLOC
 #	include <dmalloc.h>
 #	define DMALLOC_FUNC_CHECK
-#endif
+#endif /* USE_DMALLOC */
 
 #if defined(WIN32) && defined(DEBUG) && defined(CHECKHEAP)
 #	undef malloc
@@ -1860,7 +1859,7 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #	define realloc(pv,cb)		myrealloc(pv, cb, __LINE__, __FILE__)
 #	define calloc(cbs,cbe)		mycalloc(cbs, cbe, __LINE__, __FILE__)
 #	define free(pv)		myfree(pv, __LINE__, __FILE__)
-#endif
+#endif /* WIN32 && DEBUG && CHECKHEAP */
 
 #ifdef DOALLOC
 	extern char *doalloc (char *, size_t);
@@ -1880,14 +1879,14 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 	extern void	WalkBack ( void );
 	extern void	show_alloc ( void );
 	extern void	no_leaks ( void );
-#endif	/* DOALLOC */
+#endif /* DOALLOC */
 
 #ifdef __DECC		/* VMS */
 #	ifndef ferror
 #		define ferror(x)		(0)
 #		define EndWin		EndWind
-#	endif
-#endif
+#	endif /* !ferror */
+#endif /* __DECC */
 
 #define IS_PLURAL(x)	(x != 1 ? txt_plural : "")
 
@@ -1897,16 +1896,16 @@ typedef void (*BodyPtr) (char *, FILE *, int);
 #else
 #	ifdef HAVE_TMPNAM
 #		define my_tempnam(a,b)	tmpnam((char *)0)
-#	endif
-#endif
+#	endif /* HAVE_TMPNAM */
+#endif /* HAVE_TEMPNAM */
 
 /* define some standard places to look for a tin.defaults file */
 #define TIN_DEFAULTS_BUILTIN "/etc/opt/tin","/etc/tin","/etc","/usr/local/lib/tin","/usr/local/lib","/usr/local/etc/tin","/usr/local/etc","/usr/lib/tin","/usr/lib",NULL
-#ifdef	TIN_DEFAULTS_DIR
+#ifdef TIN_DEFAULTS_DIR
 #	define TIN_DEFAULTS TIN_DEFAULTS_DIR,TIN_DEFAULTS_BUILTIN
 #else
 #	define TIN_DEFAULTS TIN_DEFAULTS_BUILTIN
-#endif
+#endif /* TIN_DEFAULTS_DIR */
 
 /*
  * We force this include-ordering since socks.h contains redefinitions of
@@ -1925,5 +1924,17 @@ extern int fprintf(FILE *, const char *, ...);
 extern int fclose(FILE *);
 extern struct tm *localtime(time_t *);
 #endif /* USE_SOCKS5 */
+
+#ifdef SETVBUF_REVERSED
+#	define SETVBUF(stream, buf, mode, size)	setvbuf(stream, mode, buf, size)
+#else
+#	define SETVBUF(stream, buf, mode, size)	setvbuf(stream, buf, mode, size)
+#endif /* SETVBUF_REVERSED */
+
+#ifdef CLOSEDIR_VOID
+#	define CLOSEDIR(DIR)	closedir(DIR)
+#else
+#	define CLOSEDIR(DIR)	if (closedir(DIR)) error_message("closedir() failed: %s %s", __FILE__, __LINE__)
+#endif /* CLOSEDIR_VOID */
 
 #endif /* !TIN_H */

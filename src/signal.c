@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1994-12-21
  *  Notes     : signal handlers for different modes and window resizing
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -63,11 +63,11 @@
 /*
  * local prototypes
  */
-static const char * signal_name(int code);
+static const char *signal_name(int code);
 #ifdef SIGTSTP
 	static void handle_suspend (void);
 #endif /* SIGTSTP */
-
+static void _CDECL signal_handler (SIG_ARGS);
 
 #ifndef WEXITSTATUS
 #	define WEXITSTATUS(stat_val) ((unsigned)(stat_val) >> 8)
@@ -120,7 +120,7 @@ static const struct {
 	{ SIGTSTP,	"SIGTSTP" },	/* terminal-stop */
 #endif /* SIGTSTP */
 #ifdef SIGHUP
-	{ SIGHUP,	"SIGHUP" },	/* hang up signal */
+	{ SIGHUP,	"SIGHUP" },	/* hang up */
 #endif /* SIGHUP */
 #ifdef SIGUSR1
 	{ SIGUSR1,	"SIGUSR1" },	/* User-defined signal 1 */
@@ -142,6 +142,7 @@ RETSIGTYPE (*sigdisp(signum, func))(SIG_ARGS)
 #	endif /* HAVE_NESTED_PARAMS */
 {
 #ifdef HAVE_POSIX_JC
+#	define RESTORE_HANDLER(x, y)
 	struct sigaction sa, osa;
 
 	sa.sa_handler = func;
@@ -155,12 +156,13 @@ RETSIGTYPE (*sigdisp(signum, func))(SIG_ARGS)
 
 	return (osa.sa_handler);
 #else
+#	define RESTORE_HANDLER(x, y)  signal (x, y)
 	return (signal (signum, func));
 #endif /* HAVE_POSIX_JC */
 }
 
 static const char *
-signal_name(
+signal_name (
 	int code)
 {
 	size_t n;
@@ -179,9 +181,15 @@ void
 handle_resize (
 	int repaint)
 {
+	static t_bool reentrant = FALSE;
+
+	assert (!reentrant);
+
+	reentrant = TRUE;
+
 #	ifdef SIGWINCH
 	repaint |= set_win_size (&cLINES, &cCOLS);
-	signal (SIGWINCH, signal_handler);
+	RESTORE_HANDLER (SIGWINCH, signal_handler);
 #	endif /* SIGWINCH */
 
 	if (cLINES < MIN_LINES_ON_TERMINAL || cCOLS < MIN_COLUMNS_ON_TERMINAL) {
@@ -242,12 +250,14 @@ handle_resize (
 		}
 		my_fflush(stdout);
 	}
+	reentrant = FALSE;
 }
 #endif /* SIGWINCH || SIGTSTP */
 
 #ifdef SIGTSTP
 static void
-handle_suspend (void)
+handle_suspend (
+	void)
 {
 	TRACE(("handle_suspend(%d)", my_context))
 
@@ -269,7 +279,7 @@ handle_suspend (void)
 }
 #endif /* SIGTSTP */
 
-void _CDECL
+static void _CDECL
 signal_handler (
 	int sig)
 {
@@ -287,7 +297,7 @@ signal_handler (
 		case SIGINT:
 #	if !defined(M_AMIGA) && !defined(__SASC)
 			if (!batch_mode) {
-				signal (sig, signal_handler);
+				RESTORE_HANDLER (sig, signal_handler);
 				return;
 			}
 #	endif /* !M_AMIGA && !__SASC */
@@ -297,7 +307,7 @@ signal_handler (
 #ifdef SIGCHLD
 		case SIGCHLD:
 			wait (&wait_status);
-			signal (sig, signal_handler);	/* death of a child */
+			RESTORE_HANDLER (sig, signal_handler);	/* death of a child */
 			system_status = WEXITSTATUS(wait_status);
 			return;
 #endif /* SIGCHLD */
@@ -305,7 +315,7 @@ signal_handler (
 #ifdef SIGPIPE
 		case SIGPIPE:
 			got_sig_pipe = TRUE;
-			signal(sig, signal_handler);
+			RESTORE_HANDLER(sig, signal_handler);
 			return;
 #endif /* SIGPIPE */
 #ifdef SIGTSTP
@@ -370,20 +380,27 @@ signal_handler (
 #endif /* 1 */ /* apollo || HAVE_COREFILE */
 }
 
+/*
+ * Turn on (flag==TRUE) our signal handler for TSTP and WINCH
+ * Otherwise revert to the default handler
+ */
 void
 set_signal_catcher (
 	int flag)
 {
 #ifdef SIGTSTP
 	if (do_sigtstp)
-		signal(SIGTSTP, flag ? signal_handler : SIG_DFL);
+		sigdisp (SIGTSTP, flag ? signal_handler : SIG_DFL);
 #endif /* SIGTSTP */
+
 #ifdef SIGWINCH
-	signal(SIGWINCH, flag ? signal_handler : SIG_DFL);
+	sigdisp (SIGWINCH, flag ? signal_handler : SIG_DFL);
 #endif /* SIGWINCH */
 }
 
-void set_signal_handlers (void)
+void
+set_signal_handlers (
+	void)
 {
 	size_t n;
 	int code;
@@ -395,8 +412,8 @@ void set_signal_handlers (void)
 		switch ((code = signal_list[n].code)) {
 #ifdef SIGTSTP
 		case SIGTSTP:
-			ptr = signal (code, SIG_DFL);
-			signal (code, ptr);
+			ptr = sigdisp (code, SIG_DFL);
+			sigdisp (code, ptr);
 			if (ptr == SIG_IGN)
 				break;
 			/*
@@ -407,7 +424,7 @@ void set_signal_handlers (void)
 			/* FALLTHROUGH */
 #endif /* SIGTSTP */
 		default:
-			signal (code, signal_handler);
+			sigdisp (code, signal_handler);
 		}
 	}
 }

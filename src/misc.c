@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute	this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -17,6 +17,7 @@
 #include	"version.h"
 #include	"bugrep.h"
 #include	"trace.h"
+#include	"policy.h"
 
 /*
  * defines to control GNKSA-checks behaviour:
@@ -32,6 +33,11 @@
  * Local prototypes
  */
 static char *escape_shell_meta (char *source, int quote_area);
+static int gnksa_check_domain (char *domain);
+static int gnksa_check_domain_literal (char *domain);
+static int gnksa_check_localpart (char *localpart);
+static int gnksa_dequote_plainphrase (char *realname, char *decoded, int addrtype);
+static int gnksa_split_from (char *from, char *address, char *realname, int *addrtype);
 static int input_pending (int delay);
 static int strfeditor (char *editor, int linenum, char *filename, char *s, size_t maxsize, char *format);
 static void write_input_history_file (void);
@@ -91,10 +97,10 @@ asfail (
 #			ifdef SIGIOT
 				sigdisp(SIGIOT, SIG_DFL);
 				kill (process_id, SIGIOT);
-#			endif	/* SIGIOT */
-#		endif	/* SIGILL */
-#	endif	/* SIGABRT */
-#endif	/* HAVE_COREFILE */
+#			endif /* SIGIOT */
+#		endif /* SIGILL */
+#	endif /* SIGABRT */
+#endif /* HAVE_COREFILE */
 
 	exit(EXIT_FAILURE);
 }
@@ -341,7 +347,8 @@ invoke_ispell (
 
 #ifndef NO_SHELL_ESCAPE
 void
-shell_escape (void)
+shell_escape (
+	void)
 {
 	char *p;
 	char shell[LEN];
@@ -577,7 +584,7 @@ my_mkdir (
 #	else
 		return mkdir (path, mode);
 #	endif /* M_OS2 || WIN32 */
-#endif /* HAVE_MKDIR */
+#endif /* !HAVE_MKDIR */
 }
 
 int
@@ -692,7 +699,7 @@ invoke_cmd (
 {
 	int ret;
 
-	int save_cmd_line = cmd_line;
+	t_bool save_cmd_line = cmd_line;
 	if (!save_cmd_line) {
 		EndWin ();
 		Raw (FALSE);
@@ -755,7 +762,8 @@ draw_percent_mark (
  * setuid/setgid - SYSV, POSIX (Std003.1-1988)
  */
 void
-set_real_uid_gid (void)
+set_real_uid_gid (
+	void)
 {
 #ifdef HAVE_SET_GID_UID
 	if (local_index)
@@ -787,11 +795,12 @@ set_real_uid_gid (void)
 
 #		endif /* HAVE_SETREUID && HAVE_SETREGID */
 #	endif /* HAVE_SETEUID && HAVE_SETEGID */
-#endif	/* HAVE_SET_GID_UID */
+#endif /* HAVE_SET_GID_UID */
 }
 
 void
-set_tin_uid_gid (void)
+set_tin_uid_gid (
+	void)
 {
 #ifdef HAVE_SET_GID_UID
 	if (local_index)
@@ -823,7 +832,7 @@ set_tin_uid_gid (void)
 
 #		endif /* HAVE_SETREUID && HAVE_SETREGID */
 #	endif /* HAVE_SETEUID && HAVE_SETEGID */
-#endif	/* HAVE_SET_GID_UID */
+#endif /* HAVE_SET_GID_UID */
 }
 
 
@@ -844,7 +853,7 @@ base_name (
 		if (dirname[i] == SEPDIR) {
 #else
 		if (dirname[i] == ']') {
-#endif /* VMS */
+#endif /* !VMS */
 			strcpy (program, dirname+(i+1));
 			break;
 		}
@@ -863,7 +872,8 @@ base_name (
  *  Return TRUE if new mail has arrived
  */
 t_bool
-mail_check (void)
+mail_check (
+	void)
 {
 #ifndef WIN32 /* No unified mail transport on WIN32 */
 	const char *mailbox_name;
@@ -1153,7 +1163,8 @@ eat_re (
  * Clear tag status of all articles. If articles were untagged, return TRUE
  */
 t_bool
-untag_all_articles (void)
+untag_all_articles (
+	void)
 {
 	t_bool untagged = FALSE;
 	register int i;
@@ -1237,7 +1248,8 @@ get_author (
 
 
 void
-toggle_inverse_video (void)
+toggle_inverse_video (
+	void)
 {
 	inverse_okay = !inverse_okay;
 	if (inverse_okay) {
@@ -1251,7 +1263,8 @@ toggle_inverse_video (void)
 
 
 void
-show_inverse_video_status (void)
+show_inverse_video_status (
+	void)
 {
 		info_message ((inverse_okay ? txt_inverse_on : txt_inverse_off));
 }
@@ -1259,7 +1272,8 @@ show_inverse_video_status (void)
 
 #ifdef HAVE_COLOR
 t_bool
-toggle_color (void)
+toggle_color (
+	void)
 {
 #	ifdef USE_CURSES
 	if (!has_colors()) {
@@ -1275,7 +1289,8 @@ toggle_color (void)
 
 
 void
-show_color_status (void)
+show_color_status (
+	void)
 {
 	info_message ((use_color ? txt_color_on : txt_color_off));
 }
@@ -1312,7 +1327,7 @@ input_pending (
 	return kbhit() ? TRUE : FALSE;
 #	endif /* WIN32 */
 #	ifdef M_AMIGA
-	return (WaitForChar(Input(), 1000*delay) == DOSTRUE) ? TRUE : FALSE;
+	return (WaitForChar(Input(), 1000 * delay) == DOSTRUE) ? TRUE : FALSE;
 #	endif /* M_AMIGA */
 
 #ifdef HAVE_SELECT
@@ -1473,14 +1488,14 @@ get_arrow_key (
 		}
 #					else /* !HAVE_POLL */
 		(void) sleep(1);
-#					endif	/* HAVE_POLL */
-#				endif	/* HAVE_SELECT */
-#			endif	/* HAVE_USLEEP */
+#					endif /* HAVE_POLL */
+#				endif /* HAVE_SELECT */
+#			endif /* HAVE_USLEEP */
 		if (!input_pending(0))
 			return prech;
 	}
-#		endif	/* M_AMIGA */
-#	endif	/* !VMS */
+#		endif /* M_AMIGA */
+#	endif /* !VMS */
 	ch = ReadCh ();
 	if (ch == '[' || ch == 'O')
 		ch = ReadCh ();
@@ -2070,7 +2085,7 @@ strfpath (
 #	endif /* WIN32 */
 #else
 			joindir (tbuf, buf, tmp);
-#endif /* VMS */
+#endif /* !VMS */
 						i = strlen (tbuf);
 						if (i) {
 							if (str + i < endp - 1) {
@@ -2354,7 +2369,8 @@ make_group_path (
  * Delete tmp index & local newsgroups file
  */
 void
-cleanup_tmp_files (void)
+cleanup_tmp_files (
+	void)
 {
 	char acNovFile[PATH_LEN];
 
@@ -2407,7 +2423,8 @@ file_size (
 
 
 void
-vPrintBugAddress (void)
+vPrintBugAddress (
+	void)
 {
 	my_fprintf (stderr, "%s %s %s (\"%s\") [%s]: send a DETAILED bug report to %s\n",
 		progname, VERSION, RELEASEDATE, RELEASENAME, OS, BUG_REPORT_ADDRESS);
@@ -2468,7 +2485,7 @@ peek_char (
 
 
 char *
-random_organization(
+random_organization (
 	char *in_org)
 {
 	FILE *orgfp;
@@ -2502,7 +2519,9 @@ random_organization(
 
 
 void
-read_input_history_file (void) {
+read_input_history_file (
+	void)
+{
 	FILE *fp;
 	char *chr;
 	char buf[HEADER_LEN];
@@ -2556,7 +2575,9 @@ read_input_history_file (void) {
 
 
 static void
-write_input_history_file(void) {
+write_input_history_file (
+	void)
+{
 	FILE *fp;
 	char *chr;
 	int his_w, his_e;
@@ -2585,7 +2606,7 @@ write_input_history_file(void) {
  * quotes wildcards * ? \ [ ] with \
  */
 char *
-quote_wild(
+quote_wild (
 	char *str)
 {
 	char *target;
@@ -2620,7 +2641,7 @@ quote_wild(
  * quotes whitespace in regexps for pcre
  */
 char *
-quote_wild_whitespace(
+quote_wild_whitespace (
 	char *str)
 {
 	char *target;
@@ -2678,7 +2699,7 @@ strip_address (
  * Take half page scrolling into account
  */
 int
-page_up(
+page_up (
 	int curslot,
 	int maxslot)
 {
@@ -2702,7 +2723,7 @@ page_up(
  * Take half page scrolling into account
  */
 int
-page_down(
+page_down (
 	int curslot,
 	int maxslot)
 {
@@ -2868,8 +2889,6 @@ buffer_to_network (
  *   address       = local-part "@" domain
  *   local-part    = unquoted-word *( "." unquoted-word )
  *   domain        = unquoted-word *( "." unquoted-word )
- *
- * legal TLDs: .uucp, .bitnet and all valid internet top level domains
 */
 
 
@@ -2924,59 +2943,26 @@ static char gnksa_legal_localpart_chars[256] = {
 
 
 /*
- * known two letter country codes
+ * legal realname characters according to son-of-rfc1036
  */
-static char gnksa_country_codes[26*26] = {
-/*      A B C D E  F G H I J  K L M N O  P Q R S T  U V W X Y Z */
-/* A */ 0,0,1,1,1, 1,1,0,1,0, 0,1,1,1,1, 0,1,1,1,1, 1,0,1,0,0,1,
-/* B */ 1,1,0,1,1, 1,1,1,1,1, 0,0,1,1,1, 0,0,1,1,1, 0,1,1,0,1,1,
-/* C */ 1,0,1,1,0, 1,1,1,1,0, 1,1,1,1,1, 0,0,1,0,0, 1,1,0,1,1,1,
-/* D */ 0,0,0,0,1, 0,0,0,0,1, 1,0,1,0,1, 0,0,0,0,0, 0,0,0,0,0,1,
-/* E */ 0,0,1,0,1, 0,1,1,0,0, 0,0,0,0,0, 0,0,1,1,1, 0,0,0,0,0,0,
-/* F */ 0,0,0,0,0, 0,0,0,1,1, 1,0,1,0,1, 0,0,1,0,0, 0,0,0,1,0,0,
-/* G */ 1,1,0,1,1, 1,1,1,1,0, 0,1,1,1,0, 1,1,1,1,1, 1,0,1,0,1,0,
-/* H */ 0,0,0,0,0, 0,0,0,0,0, 1,0,1,1,0, 0,0,1,0,1, 1,0,0,0,0,0,
-/* I */ 0,0,0,1,1, 0,0,0,0,0, 0,1,1,1,1, 0,1,1,1,1, 0,0,0,0,0,0,
-/* J */ 0,0,0,0,1, 0,0,0,0,0, 0,0,1,0,1, 1,0,0,0,0, 0,0,0,0,0,0,
-/* K */ 0,0,0,0,1, 0,1,0,1,0, 0,0,1,1,0, 1,0,1,0,0, 0,0,1,0,1,1,
-/* L */ 1,1,1,0,0, 0,0,0,1,0, 1,0,0,0,0, 0,0,1,1,1, 1,1,0,0,1,0,
-/* M */ 1,0,1,1,0, 0,1,1,0,0, 1,1,1,1,1, 1,1,1,1,1, 1,1,1,1,1,1,
-/* N */ 1,0,1,0,1, 1,1,0,1,0, 0,1,0,0,1, 1,0,1,0,0, 1,0,0,0,0,1,
-/* O */ 0,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
-/* P */ 1,0,0,0,1, 1,1,1,0,0, 1,1,1,1,0, 0,0,1,0,1, 0,0,1,0,1,0,
-/* Q */ 1,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
-/* R */ 0,0,0,0,1, 0,0,0,0,0, 0,0,0,0,1, 0,0,0,0,0, 1,0,1,0,0,0,
-/* S */ 1,1,1,1,1, 0,1,1,1,1, 1,1,1,1,1, 0,0,1,0,1, 1,1,0,0,1,1,
-/* T */ 0,0,1,1,0, 1,1,1,0,1, 1,0,1,1,1, 1,0,1,0,1, 0,1,1,0,0,1,
-/* U */ 1,0,0,0,0, 0,1,0,0,0, 1,0,1,0,0, 0,0,0,1,0, 0,0,0,0,1,1,
-/* V */ 1,0,1,0,1, 0,1,0,1,0, 0,0,0,1,0, 0,0,0,0,0, 1,0,0,0,0,0,
-/* W */ 0,0,0,0,0, 1,0,0,0,0, 0,0,0,0,0, 0,0,0,1,0, 0,0,0,0,0,0,
-/* X */ 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,0,0,
-/* Y */ 0,0,0,0,1, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,1, 1,0,0,0,0,0,
-/* Z */ 1,0,0,0,0, 0,0,0,0,0, 0,0,1,0,0, 0,0,0,0,0, 0,0,0,0,0,1
-/*      A B C D E  F G H I J  K L M N O  P Q R S T  U V W X Y Z */
-};
-
-
-/*
- * valid domains with 3 or more characters
- *
- * later add: nom, rec, web, arts, firm, info, shop
- */
-static const char *gnksa_domain_list[] = {
-	"com",
-	"edu",
-	"gov",
-	"int",
-	"mil",
-	"net",
-	"org",
-	"arpa",
-	"uucp",
-	"bitnet",
-	"invalid",
-	/* sentinel */
-	""
+static char gnksa_legal_realname_chars[256] = {
+/*         0 1 2 3  4 5 6 7  8 9 a b  c d e f */
+/* 0x00 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x10 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x20 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x30 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x40 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x50 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x60 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,
+/* 0x70 */ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,0,
+/* 0x80 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0x90 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xa0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xb0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xc0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xd0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xe0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
+/* 0xf0 */ 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0
 };
 
 
@@ -2984,7 +2970,7 @@ static const char *gnksa_domain_list[] = {
  * return error message string for given code
  */
 const char *
-gnksa_strerror(
+gnksa_strerror (
 	int errcode)
 {
 	const char *message;
@@ -3086,6 +3072,14 @@ gnksa_strerror(
 			message = txt_error_gnksa_rn_encsyn;
 			break;
 
+		case GNKSA_ILLEGAL_PAREN_CHAR:
+			message = txt_error_gnksa_rn_paren;
+			break;
+
+		case GNKSA_INVALID_REALNAME:
+			message = txt_error_gnksa_rn_invalid;
+			break;
+
 		case GNKSA_OK:
 		default:
 			/* shouldn't happen */
@@ -3102,22 +3096,44 @@ gnksa_strerror(
  * this only does RFC822 decoding, decoding RFC2047 encoded parts must
  * be done by another call to the appropriate function
  */
-int
-gnksa_dequote_plainphrase(
+static int
+gnksa_dequote_plainphrase (
 	char *realname,
-	char *decoded)
+	char *decoded,
+	int addrtype)
 {
 	char *rpos;	/* read position */
 	char *wpos;	/* write position */
-	int state;
+	int initialstate;	/* initial state */
+	int state;	/* current state */
 
-	state = 0;
+
+	/* initialize state machine */
+	switch (addrtype) {
+		case GNKSA_ADDRTYPE_ROUTE:
+			initialstate = 0;
+			break;
+		case GNKSA_ADDRTYPE_OLDSTYLE:
+			initialstate = 5;
+			break;
+		default:
+			/* shouldn't happen */
+			return GNKSA_INTERNAL_ERROR;
+			/* NOTREACHED */
+			break;
+	}
+	state = initialstate;
 	rpos = realname;
 	wpos = decoded;
+
+	/* decode realname */
 	while (*rpos) {
+		if (!gnksa_legal_realname_chars[(int) *rpos])
+			return GNKSA_INVALID_REALNAME;
+
 		switch (state) {
 			case 0:
-				/* in unquoted word */
+				/* in unquoted word, route address style */
 				switch (*rpos) {
 					case '"':
 						state = 1;
@@ -3255,7 +3271,7 @@ gnksa_dequote_plainphrase(
 					case '?':
 						*(wpos++) = *(rpos++);
 						if ('=' == *rpos) {
-							state = 0;
+							state = initialstate;
 							*(wpos++) = *(rpos++);
 						} else
 							return GNKSA_BAD_ENCODE_SYNTAX;
@@ -3268,11 +3284,40 @@ gnksa_dequote_plainphrase(
 					}
 				break;
 
+			case 5:
+				/* in word, old style address */
+				switch (*rpos) {
+					case '(':
+					case ')':
+					case '<':
+					case '>':
+					case '\\':
+						return GNKSA_ILLEGAL_PAREN_CHAR;
+						/* NOTREACHED */
+						break;
+
+					case '=':
+						*(wpos++) = *(rpos++);
+						if ('?' == *rpos) {
+							state = 2;
+							*(wpos++) = *(rpos++);
+						} else
+							state = 5;
+						break;
+
+					default:
+						state = 5;
+						*(wpos++) = *(rpos++);
+						break;
+				}
+				break;
+
 			default:
 				/* shouldn't happen */
 				return GNKSA_INTERNAL_ERROR;
 		}
 	}
+
 	/* successful */
 	*wpos = '\0';
 	return GNKSA_OK;
@@ -3282,8 +3327,8 @@ gnksa_dequote_plainphrase(
 /*
  * check domain literal
  */
-int
-gnksa_check_domain_literal(
+static int
+gnksa_check_domain_literal (
 	char *domain)
 {
 	char term;
@@ -3318,11 +3363,12 @@ gnksa_check_domain_literal(
 		return GNKSA_BAD_DOMAIN_LITERAL;
 
 	/* check for private ip or localhost */
-	if ((0 == x1)											/* local network */
-		|| (10 == x1)										/* private class A */
+	if ((!disable_gnksa_domain_check)
+	    && ((0 == x1)				/* local network */
+		|| (10 == x1)				/* private class A */
 		|| ((172 == x1) && (16 == (x2 & 0xf0)))	/* private class B */
-		|| ((192 == x1) && (168 == x2))				/* private class C */
-		|| (127 == x1))									/* localhost */
+		|| ((192 == x1) && (168 == x2))		/* private class C */
+		|| (127 == x1)))			/* localhost */
 		return GNKSA_LOCAL_DOMAIN_LITERAL;
 
 
@@ -3330,7 +3376,7 @@ gnksa_check_domain_literal(
 }
 
 
-int
+static int
 gnksa_check_domain (
 	char *domain)
 {
@@ -3395,6 +3441,8 @@ gnksa_check_domain (
 				if (!strcmp(aux, gnksa_domain_list[i]))
 					result = GNKSA_OK;
 			}
+			if (disable_gnksa_domain_check)
+				result = GNKSA_OK;
 			if (GNKSA_OK != result)
 				return result;
 			break;
@@ -3434,8 +3482,8 @@ gnksa_check_domain (
 /*
  * check localpart of address
  */
-int
-gnksa_check_localpart(
+static int
+gnksa_check_localpart (
 	char *localpart)
 {
 	char *aux;
@@ -3466,11 +3514,12 @@ gnksa_check_localpart(
 /*
  * split mail address into realname and address parts
  */
-int
-gnksa_split_from(
+static int
+gnksa_split_from (
 	char *from,
 	char *address,
-	char *realname)
+	char *realname,
+	int *addrtype)
 {
 	char *addr_begin;
 	char *addr_end;
@@ -3494,6 +3543,7 @@ gnksa_split_from(
 
 	if ('>' == *addr_end) {
 		/* route-address used */
+		*addrtype = GNKSA_ADDRTYPE_ROUTE;
 
 		/* get address part */
 		addr_begin = addr_end;
@@ -3523,6 +3573,7 @@ gnksa_split_from(
 		strcpy(realname, addr_begin);
 	} else {
 		/* old-style address used */
+		*addrtype = GNKSA_ADDRTYPE_OLDSTYLE;
 
 		/* get address part */
 		/* skip leading whitespace */
@@ -3561,8 +3612,7 @@ gnksa_split_from(
 			/* copy realname */
 			*addr_end = '\0';
 			strcpy(realname, addr_begin + 1);
-		} else /* no realname */
-			realname[0] = '\0';
+		}
 	}
 
 	/* split successful */
@@ -3575,7 +3625,7 @@ gnksa_split_from(
  * and draft-usefor-article-xx.txt
  */
 int
-gnksa_do_check_from(
+gnksa_do_check_from (
 	char *from,
 	char *address,
 	char *realname)
@@ -3583,43 +3633,79 @@ gnksa_do_check_from(
 	char *addr_begin;
 	char *aux;
 	char decoded[HEADER_LEN];
-	int result;
+	int result = 0;
+	int code;
+	int addrtype;
 
 	decoded[0] = '\0';
 
+#ifdef DEBUG
+	if (debug == 2)
+		wait_message (0, "From:=[%s]", from);
+#endif /* DEBUG */
+
 	/* split from */
-	if (GNKSA_OK != (result = gnksa_split_from(from, address, realname))) /* error detected */
-		return result;
+	code = gnksa_split_from(from, address, realname, &addrtype);
+	if ('\0' == *address) /* address missing or not extractable */
+		return code;
+
+#ifdef DEBUG
+	if (debug == 2)
+		wait_message (0, "address=[%s]", address);
+#endif /* DEBUG */
 
 	/* parse address */
 	addr_begin = strrchr(address, '@');
-	if (NULL == addr_begin)
-		return GNKSA_ATSIGN_MISSING;
+	if (NULL == addr_begin) {
+		if (GNKSA_OK == code)
+			code = result;
+	} else {
+		/* temporarily terminate string at separator position */
+		*addr_begin++ = '\0';
 
-	/* temporarily terminate string at separator position */
-	*addr_begin++ = '\0';
+#ifdef DEBUG
+		if (debug == 2)
+			wait_message (0, "FQDN=[%s]", addr_begin);
+#endif /* DEBUG */
 
-	/* convert FQDN part to lowercase */
-	for (aux = addr_begin; *aux; aux++)
-		*aux = tolower(*aux);
+		/* convert FQDN part to lowercase */
+		for (aux = addr_begin; *aux; aux++)
+			*aux = tolower(*aux);
 
-	if (GNKSA_OK != (result = gnksa_check_domain(addr_begin)))	/* error detected */
-		return result;
+		if (GNKSA_OK != (result = gnksa_check_domain(addr_begin))
+		    && (GNKSA_OK == code)) /* error detected */
+			code = result;
 
-	if (GNKSA_OK != (result = gnksa_check_localpart(address)))	/* error detected */
-		return result;
+		if (GNKSA_OK != (result = gnksa_check_localpart(address))
+		    && (GNKSA_OK == code)) /* error detected */
+			code = result;
 
-	/* restore separator character */
-	*--addr_begin= '@';
+		/* restore separator character */
+		*--addr_begin= '@';
+	}
+
+#ifdef DEBUG
+	if (debug == 2)
+		wait_message (0, "realname=[%s]", realname);
+#endif /* DEBUG */
 
 	/* check realname */
-	if (GNKSA_OK != (result = gnksa_dequote_plainphrase(realname, decoded)))	/* error detected */
-		return result;
+	if (GNKSA_OK != (result = gnksa_dequote_plainphrase(realname, decoded, addrtype))
+	    && (GNKSA_OK == code)) /* error detected */
+		code = result;
 	else	/* copy dequoted realname to result variable */
 		strcpy(realname, decoded);
 
-	/* successful */
-	return GNKSA_OK;
+#ifdef DEBUG
+	if (debug == 2) {
+		if (GNKSA_OK != code)
+			wait_message (3, "From:=[%s], GNKSA=[%d]", from, code);
+		else
+			wait_message (0, "GNKSA=[%d]", code);
+	}
+#endif /* DEBUG */
+
+	return code;
 }
 
 
@@ -3627,7 +3713,7 @@ gnksa_do_check_from(
  * check given address
  */
 int
-gnksa_check_from(
+gnksa_check_from (
 	char *from)
 {
 	char address[HEADER_LEN];	/* will be initialised in gnksa_split_from () */
@@ -3643,7 +3729,7 @@ gnksa_check_from(
  * return error code on GNKSA check failure
  */
 int
-parse_from(
+parse_from (
 	char *from,
 	char *address,
 	char *realname)

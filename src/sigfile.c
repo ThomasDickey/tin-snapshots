@@ -5,7 +5,7 @@
  *  Created   : 1992-10-17
  *  Updated   : 1998-07-20
  *  Notes     : Generate random signature for posting/mailing etc.
- *  Copyright : (c) Copyright 1989-98 by Mike Gleason & Iain Lea
+ *  Copyright : (c) Copyright 1989-99 by Mike Gleason & Iain Lea
  *	             You may  freely  copy or  redistribute  this software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-
@@ -194,7 +194,7 @@ thrashdir (
 #else
 	if (numentries == 0 || cwd == (char *) 0) {
 #endif /* !M_AMIGA */
-		closedir (dirp);
+		CLOSEDIR(dirp);
 		return (-1);
 	}
 
@@ -214,7 +214,7 @@ thrashdir (
 #ifdef HAVE_REWINDDIR
 		rewinddir (dirp);
 #else
-		closedir (dirp);
+		CLOSEDIR(dirp);
 		if ((dirp = opendir (CURRENTDIR)) == NULL)
 			return (1);
 #endif /* HAVE_REWINDDIR */
@@ -228,7 +228,7 @@ thrashdir (
 				dp = NULL;
 			else {	/* if we have a non-dot entry */
 				if (stat (dp->d_name, &st) == -1) {
-					closedir (dirp);
+					CLOSEDIR(dirp);
 					return (1);
 				}
 				if (S_ISDIR(st.st_mode)) {
@@ -237,7 +237,7 @@ thrashdir (
 						 * do subdirectories
 						 */
 						if ((my_chdir (dp->d_name) < 0) || ((c = thrashdir (sigdir)) == 1)) {
-							closedir (dirp);
+							CLOSEDIR(dirp);
 							return (1);
 						}
 						if (c == -1) {
@@ -271,7 +271,7 @@ thrashdir (
 	if (debug == 2)
 		error_message ("return 0: sigfile=[%s]", sigfile);
 #endif /* DEBUG */
-	closedir (dirp);
+	CLOSEDIR(dirp);
 
 	return 0;
 }

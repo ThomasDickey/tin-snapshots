@@ -11,7 +11,7 @@
  *  Example   : time (&secs);
  *              tm = localtime (&secs);
  *              num = strftime (buf, sizeof (buf), "%a %d-%m-%y %H:%M:%S", tm);
- *  Copyright : (c) Copyright 1991-98 by Arnold Robbins & Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Arnold Robbins & Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -244,5 +244,5 @@ out:
 	} else
 		return 0;
 
-#endif	/* HAVE_STRFTIME */
+#endif /* HAVE_STRFTIME */
 }

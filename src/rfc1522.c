@@ -5,7 +5,7 @@
  *  Created   : September '95
  *  Updated   : 1998-04-05
  *  Notes     : MIME header encoding/decoding stuff
- *  Copyright : (c) Copyright 1995-98 by Chris Blum
+ *  Copyright : (c) Copyright 1995-99 by Chris Blum
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -37,8 +37,8 @@
 #define NOT_RANKED 255
 
 #if 0
-/* inside a quoted word these 7bit chars need to be encoded too */
-#define RFC2047_ESPECIALS "[]<>.;@,=?_\"\\"
+	/* inside a quoted word these 7bit chars need to be encoded too */
+#	define RFC2047_ESPECIALS "[]<>.;@,=?_\"\\"
 #endif /* 0 */
 
 const char base64_alphabet[64] =
@@ -66,7 +66,7 @@ static void str2b64 (char *from, char *to);
 
 
 static void
-build_base64_rank_table(
+build_base64_rank_table (
 	void)
 {
 	int i;
@@ -82,7 +82,7 @@ build_base64_rank_table(
 
 
 static unsigned
-hex2bin(
+hex2bin (
 	int x)
 {
 	if (x >= '0' && x <= '9')
@@ -96,7 +96,7 @@ hex2bin(
 
 
 int
-mmdecode(
+mmdecode (
 	const char *what,
 	int encoding,
 	int delimiter,
@@ -104,12 +104,13 @@ mmdecode(
 	const char *charset)
 {
 	char *t;
-	int decode_gt128 = 0;
+	t_bool decode_gt128 = FALSE;
 
 #ifdef MIME_STRICT_CHARSET
 	if (charset && !strcasecmp(charset, mm_charset))
 #endif /* MIME_STRICT_CHARSET */
 		decode_gt128 = TRUE;
+
 	t = where;
 	encoding = tolower((unsigned char)encoding);
 	if (encoding == 'q') {		  /* quoted-printable */
@@ -178,23 +179,17 @@ mmdecode(
 
 
 void
-get_mm_charset(
+get_mm_charset (
 	void)
 {
-	char *c;
-
 	if (!*mm_charset) {
-		c = getenv("MM_CHARSET");
-		if (!c)
-			strcpy(mm_charset, MM_CHARSET);
-		else
-			STRCPY(mm_charset, c);
+		STRCPY(mm_charset, get_val("MM_CHARSET", MM_CHARSET));
 	}
 }
 
 
 char *
-rfc1522_decode(
+rfc1522_decode (
 	const char *s)
 {
 	const char *c, *d;
@@ -275,12 +270,12 @@ rfc1522_decode(
  * Woohyung Choi's(whchoi@cosmos.kaist.ac.kr) sdn2ks and ks2sdn
  */
 static void
-str2b64(
+str2b64 (
 	char *from,
 	char *to)
 {
-	unsigned long tmp;
 	short int i, count;
+	unsigned long tmp;
 
 	while (*from) {
 		for (i = count = 0, tmp = 0; i < 3; i++)
@@ -302,7 +297,7 @@ str2b64(
 
 
 static int
-do_b_encode(
+do_b_encode (
 	char *w,
 	char *b,
 	int max_ewsize,
@@ -310,12 +305,12 @@ do_b_encode(
 {
 
 	char tmp[60];				/* strings to be B encoded */
+	char *t = tmp;
 	int len8 = 0;				/* the number of trailing 8bit chars, which
 									   should be even(i.e. the first and second byte
 									   of wide_char should NOT be split into two
 									   encoded words) in order to be compatible with
 									   some CJK mail client */
-	char *t = tmp;
 
 	int count = max_ewsize / 4 * 3;
 	t_bool isleading_between = TRUE;		/* are we still processing leading space */
@@ -349,7 +344,7 @@ do_b_encode(
  * some news/mail clients.
  */
 static int
-which_encoding(
+which_encoding (
 	char *w)
 {
 	int chars = 0;
@@ -383,7 +378,7 @@ which_encoding(
 
 /* now only checks if there's any 8bit chars in a given "fragment" */
 static t_bool
-contains_nonprintables(
+contains_nonprintables (
 	char *w,
 	t_bool isstruct_head)
 {
@@ -412,7 +407,7 @@ contains_nonprintables(
  */
 /* #ifdef MIME_BREAK_LONG_LINES */
 static int
-sizeofnextword(
+sizeofnextword (
 	char *w)
 {
 	char *x;
@@ -428,7 +423,7 @@ sizeofnextword(
 
 
 static int
-rfc1522_do_encode(
+rfc1522_do_encode (
 	char *what,
 	char **where,
 	t_bool break_long_line)
@@ -694,13 +689,13 @@ rfc1522_do_encode(
 
 
 char *
-rfc1522_encode(
+rfc1522_encode (
 	char *s,
 	t_bool ismail)
 {
-	static char buf[2048];
 	char *b;
 	int x;
+	static char buf[2048];
 
 /*
  * break_long_line is  FALSE for news posting unless MIME_BREAK_LONG_LINES
@@ -732,7 +727,7 @@ rfc1522_encode(
 
 
 void
-rfc15211522_encode(
+rfc15211522_encode (
 	char *filename,
 	constext * mime_encoding,
 	t_bool allow_8bit_header,

@@ -8,7 +8,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
 Written by: Philip Hazel <ph10@cam.ac.uk>
 
-           Copyright (c) 1998 University of Cambridge
+           Copyright (c) 1997-1999 University of Cambridge
 
 -----------------------------------------------------------------------------
 Permission is granted to anyone to use this software for any purpose on any
@@ -24,6 +24,10 @@ restrictions:
 
 3. Altered versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
+
+4. If PCRE is embedded in any software that is released under the GNU
+   General Purpose Licence (GPL), then the terms of that licence shall
+   supersede any condition above with which it is incompatible.
 -----------------------------------------------------------------------------
 
 See the file Tech.Notes for some information on the internals.
@@ -42,7 +46,7 @@ order to be consistent. */
 
 #include "internal.h"
 
-#define DEFTABLES
+#define DFTABLES          /* maketables.c notices this */
 #include "maketables.c"
 
 
@@ -139,4 +143,4 @@ printf(" */\n\n/* End of chartables.c */\n");
 return 0;
 }
 
-/* End of deftables.c */
+/* End of dftables.c */

@@ -9,7 +9,7 @@ the file Tech.Notes for some information on the internals.
 
 Written by: Philip Hazel <ph10@cam.ac.uk>
 
-           Copyright (c) 1998 University of Cambridge
+           Copyright (c) 1997-1999 University of Cambridge
 
 -----------------------------------------------------------------------------
 Permission is granted to anyone to use this software for any purpose on any
@@ -25,6 +25,10 @@ restrictions:
 
 3. Altered versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
+
+4. If PCRE is embedded in any software that is released under the GNU
+   General Purpose Licence (GPL), then the terms of that licence shall
+   supersede any condition above with which it is incompatible.
 -----------------------------------------------------------------------------
 */
 
@@ -85,6 +89,14 @@ set_start_bits(const uschar *code, uschar *start_bits, BOOL caseless,
 {
 register int c;
 
+/* This next statement and the later reference to dummy are here in order to
+trick the optimizer of the IBM C compiler for OS/2 into generating correct
+code. Apparently IBM isn't going to fix the problem, and we would rather not
+disable optimization (in this module it actually makes a big difference, and
+the pcre module can use all the optimization it can get). */
+
+volatile int dummy;
+
 do
   {
   const uschar *tcode = code + 3;
@@ -132,6 +144,7 @@ do
       case OP_BRAMINZERO:
       if (!set_start_bits(++tcode, start_bits, caseless, cd))
         return FALSE;
+      dummy = 1;
       do tcode += (tcode[1] << 8) + tcode[2]; while (*tcode == OP_ALT);
       tcode += 3;
       try_next = TRUE;

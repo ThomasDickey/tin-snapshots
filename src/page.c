@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1995-07-26
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -778,6 +778,7 @@ return_to_index:
 				info_message(txt_bad_command);
 		}
 	}
+	/* NOTREACHED */
 	return GRP_ARTFAIL; /* default-value - I don't think we should get here */
 }
 #endif /* !INDEX_DAEMON */
@@ -803,7 +804,7 @@ redraw_page (
 
 #ifndef INDEX_DAEMON
 static t_bool
-expand_ctrl_chars(
+expand_ctrl_chars (
 	char *tobuf,
 	char *frombuf,
 	int length,
@@ -1513,7 +1514,8 @@ art_open (
 
 
 void
-art_close (void)
+art_close (
+	void)
 {
 	show_all_headers = FALSE; /* start without displaying ALL headers */
 	if (note_fp && note_page >= 0) {
@@ -1543,7 +1545,8 @@ prompt_response (
 
 
 static int
-show_last_page (void)
+show_last_page (
+	void)
 {
 	char buf[LEN];
 	char buf3[LEN+50];

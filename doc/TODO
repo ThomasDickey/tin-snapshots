@@ -328,6 +328,8 @@ o  Bounce duplicate Message-ID's when the headers are read. This will
 
 Internal Changes
 ----------------
+o  kick Hungarian notation
+
 o  use XGTITLE (if available) if -n cmd-line flag is present
    (see open.c)
 
@@ -390,6 +392,9 @@ o  tin.defaults is not mentioned in manpage/INSTALL
 
 Not yet classified
 ------------------
+o  confirm_to_quit=ON & hitting 'Q' in thread or page-level and answering
+   the following question with 'n' will put you back in the selection level.
+
 o  'B'ody search doesn't jump to the match in the article
    (IMHO this is confusing inside the pager (at least if the hit
     is in the current article), but ok at any other level).
@@ -473,7 +478,7 @@ Fixed already?:
 o  The subject lines for the 1st newsgroup in .newsrc is truncated when
    the author field is toggled off using the 'd' command.
    [Jason C Lin <jlin@hawaii.edu>]
-   [I can't reproduce this - jason@radar.demon.co.uk]
+   [I can't reproduce this - <jason@radar.tele2.co.uk>]
 
 o  tin (sometimes?) overwrites the newsgroup-number and number of unread
    articles with spaces when turning on newsgroup descriptions with

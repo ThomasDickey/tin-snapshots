@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -27,13 +27,13 @@ char *glob_group;
  * Equates to the cursor location (thread number) on group page
  */
 int index_point;
-int first_subj_on_screen;
-int last_subj_on_screen;
-int thread_depth;					/* Stating depth in threads we enter */
 
+static const char *spaces = "XXXX";
+static int first_subj_on_screen;
+static int last_subj_on_screen;
 static int len_from;
 static int len_subj;
-static const char *spaces = "XXXX";
+static int thread_depth;			/* Stating depth in threads we enter */
 
 /*
  * Local prototypes
@@ -77,7 +77,8 @@ line_is_tagged (
 
 #ifndef INDEX_DAEMON
 static void
-show_tagged_lines (void)
+show_tagged_lines (
+	void)
 {
 	register int i;
 
@@ -124,7 +125,7 @@ group_page (
 {
 	char buf[128];
 	char pat[128];
-	int ch;
+	int ch = 0;
 	int i, n;
 	int filter_state;
 	int old_selected_arts;
@@ -260,14 +261,14 @@ group_page (
 					break;
 				}
 				break;
-#	endif /* WIN32 */
+#	endif /* !WIN32 */
 
 #	ifndef NO_SHELL_ESCAPE
 			case iKeyShellEscape:
 				shell_escape ();
 				show_group_page ();
 				break;
-#	endif /* NO_SHELL_ESCAPE */
+#	endif /* !NO_SHELL_ESCAPE */
 
 			case iKeyFirstPage: /* show first page of threads */
 top_of_list:
@@ -315,6 +316,10 @@ end_of_list:
 				n = SEARCH_SUBJ;
 
 do_search:		/* Search for type 'n' in direction 'i' */
+
+				if (index_point < 0)
+					break;
+
 				{
 					/* Not intuitive to search current thread in fwd search */
 					int start = (i && index_point < top_base-1) ? prev_response((int)base[index_point+1]) : (int)base[index_point];
@@ -736,7 +741,12 @@ enter_pager:
 					case GRP_NEXTUNREAD:		/* Thread was 'C'aught up - enter next unread thread */
 						goto group_tab_pressed;
 
-					default:					/* GRP_QUIT / GRP_RETURN */
+					case GRP_QUIT:				/* 'Q' */
+					 	index_point = GRP_QUIT;
+					 	goto group_done;
+
+					case GRP_RETURN:
+					default:
 						goto group_done;		/* All other cases -> group_done -> select:read_groups() */
 				}
 
@@ -1143,7 +1153,8 @@ group_done:
 
 
 void
-show_group_page (void)
+show_group_page (
+	void)
 {
 #ifndef INDEX_DAEMON
 	int i;
@@ -1189,7 +1200,8 @@ show_group_page (void)
 
 #ifndef INDEX_DAEMON
 static void
-update_group_page (void)
+update_group_page (
+	void)
 {
 	register int i;
 
@@ -1207,7 +1219,8 @@ update_group_page (void)
 
 
 static void
-draw_subject_arrow (void)
+draw_subject_arrow (
+	void)
 {
 #ifndef INDEX_DAEMON
 	MoveCursor (INDEX2LNUM(index_point), 0);
@@ -1236,7 +1249,8 @@ draw_subject_arrow (void)
 
 #ifndef INDEX_DAEMON
 static void
-erase_subject_arrow (void)
+erase_subject_arrow (
+	void)
 {
 	MoveCursor (INDEX2LNUM(index_point), 0);
 
@@ -1279,7 +1293,8 @@ prompt_subject_num (
 
 
 void
-clear_note_area (void)
+clear_note_area (
+	void)
 {
 	MoveCursor (INDEX_TOP, 0);
 	CleartoEOS ();
@@ -1358,7 +1373,8 @@ find_new_pos (
  * the internal variable 'space_mode'
  */
 void
-pos_first_unread_thread (void)
+pos_first_unread_thread (
+	void)
 {
 	int i;
 
@@ -1445,7 +1461,8 @@ set_subj_from_size (
 
 
 void
-toggle_subject_from (void)
+toggle_subject_from (
+	void)
 {
 	if (++CURR_GROUP.attribute->show_author > SHOW_FROM_BOTH)
 		CURR_GROUP.attribute->show_author = SHOW_FROM_NONE;
@@ -1663,7 +1680,7 @@ else
  * Move the on-screen pointer & internal variable to the given thread number
  */
 static void
-move_to_thread(
+move_to_thread (
 	int n)
 {
 	if (index_point == n)

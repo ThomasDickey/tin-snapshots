@@ -1,3 +1,56 @@
+-- pre-1.4 release 19990216 "Styrofoam" --
+
+634) Urs Janssen <urs@tin.org>
+     BUG. case for GRP_QUIT was missing
+     BUG. thread_catchup_on_exit && !confirm_action did not catchup
+          the thread
+     ADD. skip "mark thread read?" if confirm_action &&
+          thread_catchup_on_exit and the whole thread is read already
+     ADD. minor code cleanup (removed unused vars, made some
+          functions static, ...)
+     ADD. updated pcre (2.01 -> 2.03)
+     FIX. configure[.in], autoconf.h[in], Makefile, tin.defaults, proto.h,
+          tin.h, feed.c, group.c, misc.c, post.c, rfc1522.c, thread.c,
+          pcre/*
+
+633) Ralf Doeblitz <doeblitz@gmx.de>
+     FIX. the GNKSA-cheks now try to decode the given address as far as
+          possible
+     ADD. option to disable Sender: via tin.defaults
+     ADD. option to disable GNKSA check of top level domain and domain
+          literals via tin.defaults
+     FIX. Makefile.in, tin.defaults, extern.h, policy.h, proto.h, inews.c
+          init.c, lang.c, misc.c, post.c
+
+632) Wolfgang Becker <uafr@rz.uni-karlsruhe.de>
+     ADD. README.WIN
+     FIX. README.WIN
+
+631) Bernhard Oemer <oemer@tph.tuwien.ac.at>
+     BUG. posting ('w') to a 'D'eleted group dumped core
+     FIX. post.c
+
+630) Roland Rosenfeld <roland@spinnaker.rhein.de>
+     ADD. updated metamutt (1.13 -> 1.15)
+     FIX. metamutt
+
+629) Dirk Nimmich <nimmich@uni-muenster.de>
+     ADD. docu cleanup
+     ADD. missing configure flags
+     FIX. autoconf.h[in], configure[.in], INSTALL, umlauts.txt
+
+628) Thomas E. Dickey <dickey@clark.net>
+     BUG. several array index checks were missing
+     ADD. updated config.guess/config.sub
+     FIX. config.guess, config.sub, thread.c
+
+627) Jason Faultless <jason@radar.tele2.co.uk>
+     BUG. searching in a group with all articles read and
+          show_only_unread=TRUE caused a crash
+     ADD. improved signal handling with HAVE_POSIX_JC
+     ADD. debug assertion check around handle_resize()
+     FIX. group.c, select.c
+
 -- pre-1.4 release 981225 "Volcane" --
 
 626) Urs Janssen <urs@tin.org>
@@ -16,7 +69,7 @@
      FIX. aclocal.m4, config.guess, config.sub, configure[.in],
           autoconf.h[in], tin.h, tnntp.h, help.c, select.c, signal.c
 
-624) Jason Faultless <jason@radar.demon.co.uk>
+624) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. '-' at group level dumped core if previous article no longer
           threaded
      BUG. various selection menu options would coredump with no active
@@ -68,7 +121,7 @@
      FIX. active.c, config.c, filter.c, group.c, inews.c, main.c, misc.c,
           page.c, regexp.c, autoconf.h[in], configure[.in], pcre/*
 
-615) Jason Faultless <jason@radar.demon.co.uk>
+615) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. fix inconsistencies in [Cc]atchup and other menus
      ADD. cleaned up navigation between menus and commented existing code
      ADD. 'l'ist thread to pager
@@ -95,7 +148,7 @@
 
 614) Ralf Doeblitz <doeblitz@gmx.de>
      ADD. show_score in thread/group-level
-     ADD. GNKSA-checks for vaild From/Sender/Approved
+     ADD. GNKSA-checks for valid From/Sender/Approved
      FIX. extern.h, proto.h, tin.h, version.h, config.c, group.c, init.c
           lang.c, misc.c, post.c, thread.c, tincfg.tbl
 
@@ -116,7 +169,7 @@
      ADD. -A cmd-line switch to force auth on connect
      FIX. extern.h, init.c, main.c, open.c
 
-610) Jason Faultless <jason@radar.demon.co.uk>
+610) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. if the shell tin is running in is SIGHUP tin could fall into
           a endless loop
      FIX. read.c, signal.c
@@ -189,7 +242,7 @@
      BUG. typo in vWriteFilterArray()
      FIX. filter.c, sigfile.c
 
-598) Jason Faultless <jason@radar.demon.co.uk>
+598) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. speedup 'y'ank in
      FIX. select.c
 
@@ -200,7 +253,7 @@
 596) Kazushi Marukawa <jam@pobox.com>
      BUG. tin now handles "LIST ACTIVE"/"GROUP" differences correct
      BUG. tins mailgroup feature was broken
-     BUG. parse_headers() used mime-decoded data which might be troublesome
+     BUG. parse_headers() used MIME-decoded data which might be troublesome
      ADD. '-l' cmd-line switch to turn on "LIST ACTIVE" only-mode
      ADD. changed '-R' to read saved news (-S) off-line
      ADD. -s option to -R to point -R to the saved spool
@@ -208,7 +261,7 @@
           main.c, misc.c, memory.c, newsrc.c, open.c, page.c, post.c,
           read.c, refs.c
 
-595) Jason Faultless <jason@radar.demon.co.uk>
+595) Jason Faultless <jason@radar.tele2.co.uk>
      Kazushi Marukawa <jam@pobox.com>
      BUG: possible buffer overflow in rfc1521_decode()
      ADD. Made I/O code fully dynamic. Fixed header joining in all cases.
@@ -298,7 +351,7 @@
 583) Urs Janssen <urs@tin.org>
      BUG. compile with -DDONT_HAVE_PIPING didn't work
      BUG. broken newsrc-lines could cause a core-dump
-     BUG. if starting with on comandline group, tin doesn't display
+     BUG. if starting with on commandline group, tin doesn't display
           any groupnames after leaving group-level
      BUG. no check for empty but present Followup-To line if posting
           to multiple newsgroups
@@ -327,7 +380,7 @@
      BUG. writing out of final ".\r\n" could fail on some systems.
      BUG. mail_address was extracted after MIME-decoding From:-line
           but parse_from() can't handle multiple '@'/'('
-     BUG. @LIBS@ was mssing in makecfg make-rule
+     BUG. @LIBS@ was missing in makecfg make-rule
      BUG. From:-line was not MIME-encoded in NOV-file entries
           created by tin
      FIX. Makefile[.in], art.c, nntplib.c, post.c
@@ -374,7 +427,7 @@
           it didn't fallback to a useful value.
      FIX. aclocal.m4,configure[.in]
 
-571) Jason Faultless <jason@radar.demon.co.uk>
+571) Jason Faultless <jason@radar.tele2.co.uk>
      FIX. Crash on 'L' when message already read
      ADD. Better fix for message bar crash from 468/9
      ADD. minor cleanup
@@ -390,7 +443,7 @@
      ADD. check for 7bit encoding when posting 8bit article
      FIX. extern.h, lang.c, post.c
 
-568) Jason Faultless <jason@radar.demon.co.uk>
+568) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. removed D_NAMLEN() macro
      FIX. tin.h, active.c, mail.c, open.c
 
@@ -456,7 +509,7 @@
      FIX. pcre/*
 
 556) Thomas E. Dickey <dickey@clark.net>
-     BUG. sh_format() escaped allready escaped chars
+     BUG. sh_format() escaped already escaped chars
      FIX. save.c, string.c
 
 555) Ralf Doeblitz <doeblitz@gmx.de>
@@ -467,11 +520,11 @@
      Michael Stenns <stenns@hal.tci.uni-hannover.de>
      Thomas E. Dickey <dickey@clark.net>
      Urs Janssen <urs@tin.org>
-     BUG. preprocesser symbol for OpenBSD was missing
+     BUG. preprocessor symbol for OpenBSD was missing
      ADD. check for HP-UX >=10
      BUG. #ifdef NO_SHELL_ESCAPE was missing
      BUG. TIN_DEFAULTS_DIR didn't get defined due misspelling
-     BUG. removed missplaced barce
+     BUG. removed missplaced brace
      BUG. no automatic aggregate initialization
      FIX. init.c, misc.c, select.c, tin.h, autoconf.h[in]
 
@@ -529,11 +582,11 @@
      FIX. feed.c, page.c
 
 543) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     ADD. metamutt - a shell script to call mutt as mimeparser
+     ADD. metamutt - a shell script to call mutt as MIME-parser
      FIX. metamutt
 
 542) Ulli Horlacher <framstag@moep.bb.bawue.de>
-     ADD. $METAMAIL to set external mime-parser (i.e. metamutt vs. metamail)
+     ADD. $METAMAIL to set external MIME-parser (i.e. metamutt vs. metamail)
      FIX. page.c
 
 541) Sven Paulus <sven@tin.org>
@@ -542,7 +595,7 @@
 
 -- pre-1.4 release 980117 --
 
-540) Jason Faultless <jason@radar.demon.co.uk>
+540) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. 'Try again (y/n)' loop if writing newsrc fails due to full disk
      ADD. Abort save of newsrc file if 0 groups written
      BUG. Couple of very obscure problems related to new newsgroup
@@ -560,7 +613,7 @@
 
 538) Darrell Tangman <darrelltman@mindspring.com>
      BUG. local caching of newsgroups file didn't try to read newsgroups
-          via nntp if no local copy exists and -q falg was used
+          via nntp if no local copy exists and -q flag was used
      FIX. main.c, open.c
 
 537) Sven Paulus <sven@tin.org>
@@ -582,7 +635,7 @@
      FIX. extern.h, menukeys.h, config.c, group.c, init.c, select.c
           thread.c, tin.1
 
-534) Jason Faultless <jason@radar.demon.co.uk>
+534) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. missing set_signals_page() call added
      ADD. check against active-file if using AUTOSUBSCRIBE and reading from
           local spool.
@@ -599,7 +652,7 @@
 
 -- pre-1.4 release 980105 --
 
-532) Jason Faultless <jason@radar.demon.co.uk>
+532) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. A NULL read following a partial read would hang tin with
           a malloc() failure
      FIX. read.c
@@ -624,14 +677,14 @@
      ADD. use make-flags substitution in makefiles
      FIX. several supplied patches
 
-528) Jason Faultless <jason@radar.demon.co.uk>
+528) Jason Faultless <jason@radar.tele2.co.uk>
      Ralf Doeblitz <doeblitz@gmx.de>
      Thomas E. Dickey <dickey@clark.net>
      BUG. regex search pattern in '=' (select thread) were
           embedded in *%s*
      FIX. tin.h, filter.c, group.c
 
-527) Jason Faultless <jason@radar.demon.co.uk>
+527) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. 'A'uthor search backwards might produce a
            invalid offset into arts[]
      FIX. search.c
@@ -667,7 +720,7 @@
           (see also 518)
      FIX. pcre/*
 
-521) Jason Faultless <jason@radar.demon.co.uk>
+521) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. -z was broken
      FIX. main.c
 
@@ -720,7 +773,7 @@
           filter.c, nntplib.c, regex.c, pcre.c, pcre.h, pcreposix.c
           pcretest.c, pgrep.c, study.c
 
-513) Jason Faultless <jason@radar.demon.co.uk>
+513) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. ESC didn't abort backward search
      FIX. search.c
 
@@ -747,7 +800,7 @@
 
 -- pre-1.4 release 971204 --
 
-508) Jason Faultless <jason@radar.demon.co.uk>
+508) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. 's'ave article in thread-level always saved base article
      FIX. thread.c
 
@@ -800,7 +853,7 @@
           pcre/pcre.c, pcre/Makefile.in, color.c, misc.c, post.c, tcurses.c
           Makefile[.in]
 
-499) Jason Faultless <jason@radar.demon.co.uk>
+499) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. Autosubscribed groups are not postable
      BUG. Killed articles incorrectly threaded
      BUG. 'u' crashed on killed parents
@@ -845,7 +898,7 @@
      ADD. detection of multi-line Content-Type:-header
      FIX. proto.h, rfc1521.c, read.c
 
-492) Jason Faultless <jason@radar.demon.co.uk>
+492) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. can't leave group via left arrow when answering catch-up-question
           with no
      BUG. crash when 'n' points to bogus group
@@ -873,7 +926,7 @@
      FIX. autoconf.h[in], extern.h, open.c, misc.c, filter.c, post.c
           active.c, configure[.in]
 
-487) Jason Faultless <jason@radar.demon.co.uk>
+487) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. read/post problems with ANU NEWS-servers
      BUG. wrong message counter while searching
      FIX. open.c, search.c
@@ -895,7 +948,7 @@
      FIX. Makefile.in
 
 483) Ralf Doeblitz <doeblitz@gmx.de>
-     Jason Faultless <jason@radar.demon.co.uk>
+     Jason Faultless <jason@radar.tele2.co.uk>
      BUG. missing check for NULL-pointer references
      FIX. refs.c
 
@@ -964,7 +1017,7 @@
           which displays X-Comment-To in the upper right corner.
      FIX. page.c and some other files
 
-472) Jason Faultless <jason@radar.demon.co.uk>
+472) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. Sort by score
      ADD. minor cleanup
      FIX. several supplied patches
@@ -981,7 +1034,7 @@
      ADD. minor code cleanup
      FIX. several patches
 
-469) Jason Faultless <jason@radar.demon.co.uk>
+469) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. Support for 'x' and '=' active file flags.
           More informative flags on the selection page and
           group page
@@ -991,7 +1044,7 @@
      ADD. Sub/Unsub pattern now accept full group lists
      ADD. code cleanup
 
-468) Jason Faultless <jason@radar.demon.co.uk>
+468) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. cleanup newsrc parsing
      ADD. 'K' in thread menu now skips to next unread
      BUG. no check for full disk when getting article
@@ -1009,14 +1062,14 @@
      ADD. minor code cleanup; cosmetic patch
      FIX. several supplied patches
 
-466) Jason Faultless <jason@radar.demon.co.uk>
+466) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. cleanup *_message()
      ADD. joined single letter key prompts
      ADD. renamed stuff_nntp() to get_article()
      BUG. show_progress sometimes trashed screen-layout
      FIX. several supplied patches
 
-465) Jason Faultless <jason@radar.demon.co.uk>
+465) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. varargs *_message() functions
      BUG. 'm'ove group was broken
      ADD. minor code cleanup; cosmetic patch
@@ -1030,7 +1083,7 @@
      BUG. no line-warp after "Xref: not supported" warning
      FIX. xref.c, lang.c, extern.h
 
-462) Jason Faultless <jason@radar.demon.co.uk>
+462) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. rewrite all I/O and NNTP data handling
      ADD. extensive internal changes
      ADD. new -d and -Q options
@@ -1059,7 +1112,7 @@
 
 --unoff BETA release 971018 --
 
-457) Jason Faultless <jason@radar.demon.co.uk>
+457) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. changed reread_active routine to old 1.2
      FIX. active.c
 
@@ -1077,7 +1130,7 @@
 
 --unoff BETA release 970930 --
 
-453) Jason Faultless <jason@radar.demon.co.uk>
+453) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. cosmetic patch
      FIX. art.c, init.c, main.c, misc.c, signal.c
 
@@ -1253,7 +1306,7 @@
 
 --unoff BETA release 970826 --
 
-427) Jason Faultless <jason@radar.demon.co.uk>
+427) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. 'i' in group menu always shows subject of the base article
      BUG. newsrc entry was ignored when resubscribing to an unsubscribed group
      BUG. 'N'ewgroups are now skipped correctly when 'm'oving newsgroups
@@ -1449,7 +1502,7 @@
      ADD. remove mail-address from X-Comment-To:
      FIX. page.c, post.c
 
-399) Jason Faultless <jason@radar.demon.co.uk>
+399) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. author and article body searching fixed
      ADD. 'L'ookup Message-ID in article pager
      ADD. '/' subject search to thread menu
@@ -1494,7 +1547,7 @@
 
 --unoff BETA release 970613 --
 
-391) Jason Faultless <jason@radar.demon.co.uk>
+391) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. wildmat searching broken in 387)
      BUG. ranges were broken on group menu
      ADD. 'K', 'z' & 'Z' on group menu now understand ranges
@@ -1516,7 +1569,7 @@
      ADD. minor code cleanup, mainly amiga stuff
      FIX. several supplied patches
 
-387) Jason Faultless <jason@radar.demon.co.uk>
+387) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. started support for regular expressions
      ADD. make str_lwr() syntax more ANSI-like. Other minor changes.
      FIX. several supplied patches
@@ -1594,7 +1647,7 @@
 
 --unoff BETA release 970409 --
 
-373) Jason Faultless <jason@radar.demon.co.uk>
+373) Jason Faultless <jason@radar.tele2.co.uk>
      FIX. screenredraw, cursor position after removing bogus newsgroups
      FIX. tin.1, newsrc.c, select.c
 
@@ -1623,7 +1676,7 @@
      ADD. tool/expand_aliases.tgz (might need some work)
      FIX. several supplied patches
 
-368) Jason Faultless <jason@radar.demon.co.uk>
+368) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. strip_bogus=ASK now shows groups even with show_only_unread=TRUE
      ADD. folded Message-ID text into t_msgid
      BUG. threading problem (from 309)
@@ -1722,7 +1775,7 @@
      BUG. correct a length used in tcurses.c in the innstr() call
      FIX. aclocal.m4, configure[.in], tcurses.c
 
-351) Jason Faultless <jason@radar.demon.co.uk>
+351) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. handling for bogus groups in .newsrc
      ADD. better string hashing, memory savings
      ADD. better default for -n
@@ -1764,7 +1817,7 @@
           with INEWS_MAIL_DOMAIN - inews.c should be rewritten!!
      FIX. autoconf.h[in], configure[.in], misc.c, inews.c
 
-345) Jason Faultless <jason@radar.demon.co.uk>
+345) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. fix wrong byte-count in article-pager (introduced in 340)
      FIX. open.c
 
@@ -1787,7 +1840,7 @@
      ADD. test/define for OSF1
      FIX. configure[.in], autoconf.h[in]
 
-340) Jason Faultless <jason@radar.demon.co.uk>
+340) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. restrict MIME decoding to just article data
      BUG. fix and document command line groups
      ADD. minor tidy up
@@ -1894,7 +1947,7 @@
      BUG. typo in HAVE_MH_MAIL_HANDLING
      FIX. open.c
 
-321) Jason Faultless <jason@radar.demon.co.uk>
+321) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. crash on some systems with no subscribed groups
      BUG. $ not always working on group selection page
      BUG. workaround for annoying problem with 'u' key
@@ -1931,7 +1984,7 @@
      BUG. tabs before preprocessor symbols (introduced in 312)
      FIX. several supplied patches
 
-315) Jason Faultless <jason@radar.demon.co.uk>
+315) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. Tagged article counter sometimes badly broken
      BUG. 'q' quit didn't work properly while entering a group
      ADD. 'u' goto parent article in pager
@@ -1947,7 +2000,7 @@
 
 --unoff BETA release 970212 --
 
-313) Jason Faultless <jason@radar.demon.co.uk>
+313) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. New newsgroups were broken with -n
      BUG. unYank didn't honour show_only_unread_groups
      BUG. $ didn't always skip to last article correctly
@@ -1973,7 +2026,7 @@
 
 --unoff BETA release 970202 --
 
-309) Jason Faultless <jason@radar.demon.co.uk>
+309) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. rewrite new newsgroup handling
      ADD. make newsrc->subscribed a bitfield
      ADD. better reference parsing
@@ -2096,7 +2149,7 @@
      FIX. several patches
 
 285) Alexander Lehmann <alex@hal.rhein-main.de>
-     ADD. ability to strip non txt/plain parts from multi-part mime-postings
+     ADD. ability to strip non txt/plain parts from multi-part MIME-postings
      FIX. several supplied patches
 
 --unoff BETA release 970114 --
@@ -2120,7 +2173,7 @@
      ADD. some small fixes (mainly for 279/280)
      FIX. attrib.c, config.c, newsrc.c, open.c, thread.c
 
-280) Jason Faultless <jason@radar.demon.co.uk>
+280) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. default threading method is now to use the best available
      ADD. warning if attempt to use -n on local spool
      BUG. incorrect article count with -n on empty groups
@@ -2264,7 +2317,7 @@
 --unoff BETA release 961224 --
 
 257) Alexander Lehmann <alex@hal.rhein-main.de>
-     BUG. in some circumstances reply-to could be mime_encoded twice
+     BUG. in some circumstances reply-to could be MIME-encoded twice
      FIX. post.c
 
 256) Urs Janssen <urs@akk.uni-karlsruhe.de>
@@ -2342,7 +2395,7 @@
      ADD. -N option
      FIX. several supplied patched
 
-243) Jason Faultless <jason@radar.demon.co.uk>
+243) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. self referencing threads could still be generated in certain cases
      BUG. incorrect thread creation with some broken headers
      ADD. various other cleanups and tweaks
@@ -2440,7 +2493,7 @@
      BUG. quoted 8-bit from-addresses aren't MIME-encoded correctly
      FIX. art.c, rfc1522.c
 
-225) Jason Faultless <jason@radar.demon.co.uk>
+225) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. The 'a' reference tree hack debug key now produces readable
           output similar to the thread menu.
      ADD. A few commentary changes.
@@ -2474,7 +2527,7 @@
           option).
      FIX. tin.1, Makefile[.in], init.c, open.c
 
-219) Jason Faultless <jason@radar.demon.co.uk>
+219) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. still some assertion faults...
      FIX. refs.c
 
@@ -2508,7 +2561,7 @@
           in POSIX/ANSI-C
      FIX. several supplied patches
 
-212) Jason Faultless <jason@radar.demon.co.uk>
+212) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. Expired articles sometimes incorrectly threaded when
           threading both
      FIX. refs.c
@@ -2653,7 +2706,7 @@
           files are available
      FIX. art.c
 
-190) Jason Faultless <jason@radar.demon.co.uk>
+190) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. on group menu, '/' (search for subject) now handles changes of
           subject within threads, when using reference threading.
      ADD. 's' (save) now works on thread menu
@@ -2672,7 +2725,7 @@
      ADD. online help updated
      FIX. several supplied patches
 
-186) Jason Faultless <jason@radar.demon.co.uk>
+186) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. better debug ability for threading bugs
      FIX. several supplied patches
 
@@ -3086,7 +3139,7 @@
 
 --unoff BETA release 960718 --
 
-119) Jason Faultless <jason@radar.demon.co.uk>
+119) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. tin crashed on filtering on a msg-id
      FIX. art.c
 
@@ -3107,7 +3160,7 @@
      ADD. minor code cleanup
      FIX. extern.h, lang.c
 
-115) Jason Faultless <jason@radar.demon.co.uk>
+115) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. Various improvements to reference thread creation
           Siblings now sorted correctly
           Threading on both references and subject
@@ -3199,7 +3252,7 @@
           words, which have to be encoded in order to prevent decoding
      FIX. rfc1522.c
 
-101) Jason Faultless <jason@radar.demon.co.uk>
+101) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. reference-threading code cleanup
      FIX. several supplied patches
 
@@ -3222,7 +3275,7 @@
 
 --unoff BETA release 960626 --
 
-097) Jason Faultless <jason@radar.demon.co.uk>
+097) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. Circular reference chains not handled correctly
      FIX. several supplied patches
 
@@ -3254,7 +3307,7 @@
 
 --unoff BETA release 960622 --
 
-091) Jason Faultless <jason@radar.demon.co.uk>
+091) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. Hashing of Message-ID and References headers in msgid cache
           o Saves memory
           o Much faster reference threading
@@ -3269,7 +3322,7 @@
 --unoff BETA release 960619 --
 
 090) Chris Blum <chris@phil.uni-sb.de>
-     BUG. '"' in mime-encoded-headers caused some trouble
+     BUG. '"' in MIME-encoded-headers caused some trouble
      FIX. rfc1521.c
 
 089) Thomas E. Dickey <dickey@clark.net>
@@ -3402,7 +3455,7 @@
      FIX. several supplied patches
 
 064) Chris Blum <chris@phil.uni-sb.de>
-     ADD. better algorithm for mime-encoding =sequences or not
+     ADD. better algorithm for MIME-encoding =sequences or not
      ADD. forged-cancel warning
      FIX. several supplied patches
 
@@ -3423,7 +3476,7 @@
      FIX. page.c
 
 060) Chris Blum <chris@phil.uni-sb.de>
-     BUG. useless mime-headers without mime-encoding in the body
+     BUG. useless MIME-headers without MIME-encoding in the body
      FIX. rfc1522.c
 
 059) Thomas E. Dickey <dickey@clark.net>
@@ -3519,7 +3572,7 @@
 
 --950824BETA  PLMC.960521 --
 
-042) Jason Faultless <jason@radar.demon.co.uk>
+042) Jason Faultless <jason@radar.tele2.co.uk>
      ADD. Initial implementation of references based threading.
           o Can be set on Options Menu
           o 'u' in group mode cycles through none, subj, refs
@@ -3601,7 +3654,7 @@
 
 --950824BETA  PLMC.960511 --
 
-032) Jason Faultless <jason@radar.demon.co.uk>
+032) Jason Faultless <jason@radar.tele2.co.uk>
      BUG. When changing Process type in Options Menu, <ESC> resets
           the single character prompt to bogus values.
           Rewrote option toggle interface to use a generic, more
@@ -3613,13 +3666,13 @@
 --950824BETA  PLMC.960510 --
 
 031) Chris Blum <chris@phil.uni-sb.de>
-     BUG. threading problem with mime-decoded subjects
+     BUG. threading problem with MIME-decoded subjects
      FIX. art.c
 
 --950824BETA  PLMC.960507 --
 
 030) Chris Blum <chris@phil.uni-sb.de>
-     BUG. threading problem with mime-decoded subjects
+     BUG. threading problem with MIME-decoded subjects
      FIX. art.c
 
 --950824BETA  PLMC.960506 --
@@ -3641,7 +3694,7 @@
 --950824BETA  PLMC.960427 --
 
 027) Roland Rosenfeld <roland@spinnaker.rhein.de>
-     BUG. Did not recognize multi-part mime articles
+     BUG. Did not recognize multi-part MIME articles
      FIX. page.c
 
 --950824BETA  PLMC.960421 --
@@ -3716,7 +3769,7 @@ L10) Greg Berigan <gberigan@cse.unl.edu>
 --950824BETA  PLM.960320 cb/eb/gb/uj/sp/sts --
 
 021) Urs Janssen <urs@akk.uni-karlsruhe.de>
-     BUG. when show_xcommentto=ON, it was not mime-decoded;
+     BUG. when show_xcommentto=ON, it was not MIME-decoded;
           when show_xcommentto and highlight_xcommentto were both off
           X-Comment-To: was displayed
      FIX. page.c
@@ -3789,7 +3842,7 @@ L07) Chris Blum <chris@phil.uni-sb.de>
      FIX. lang.c - reformat help-text
 
 L06) Chris Blum <chris@phil.uni-sb.de>
-     BUG. minor bug in misc.c, USER-ID was not mime decoded
+     BUG. minor bug in misc.c, USER-ID was not MIME decoded
      FIX. misc.c
 
 --950824BETA  PLM.960215 eb/uj/sts/gb/cb --

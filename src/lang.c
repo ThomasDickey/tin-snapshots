@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1998-10-17
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -86,23 +86,23 @@ constext txt_connecting_port[] = "Connecting to %s:%d...";
 constext txt_continue[] = "Continue? (y/n): ";
 
 #ifdef M_AMIGA
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Mark Tomlinson.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-99 Iain Lea & Mark Tomlinson.";
 #endif /* M_AMIGA */
 
 #ifdef M_OS2
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Andreas Wrede.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-99 Iain Lea & Andreas Wrede.";
 #endif /* M_OS2 */
 
 #ifdef M_UNIX
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-99 Iain Lea.";
 #endif /* M_UNIX */
 
 #ifdef VMS
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Tod McQuillin & other.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-99 Iain Lea & Tod McQuillin & other.";
 #endif /* VMS */
 
 #ifdef WIN32
-	constext txt_copyright_notice[] = "%s (c) Copyright 1991-98 Iain Lea & Nigel Ellis.";
+	constext txt_copyright_notice[] = "%s (c) Copyright 1991-99 Iain Lea & Nigel Ellis.";
 #endif /* WIN32 */
 
 constext txt_cancel_article[] = "Cancel (delete) or supersede (overwrite) article [%.*s]? (d/s/q): ";
@@ -144,10 +144,12 @@ constext txt_error_gnksa_rbracket[] = "Right bracket missing in domain literal.\
 constext txt_error_gnksa_lp_missing[] = "Missing localpart of mail address.\n";
 constext txt_error_gnksa_lp_invalid[] = "Illegal character in localpart of mail address.\n";
 constext txt_error_gnksa_lp_zero[] = "Zero length localpart component not allowed.\n";
-constext txt_error_gnksa_rn_unq[] = "Illegal character in realname.\nUnquoted words may not contain '!()<>@,;:\\.[]'.\n";
+constext txt_error_gnksa_rn_unq[] = "Illegal character in realname.\nUnquoted words may not contain '!()<>@,;:\\.[]' in route addresses.\n";
 constext txt_error_gnksa_rn_qtd[] = "Illegal character in realname.\nQuoted words may not contain '()<>\\'.\n";
 constext txt_error_gnksa_rn_enc[] = "Illegal character in realname.\nEncoded words may not contain '!()<>@,;:\"\\.[]/=' in parameter.\n";
 constext txt_error_gnksa_rn_encsyn[] = "Bad syntax in encoded word used in realname.\n";
+constext txt_error_gnksa_rn_paren[] = "Illegal character in realname.\nUnquoted words may not contain '()<>\\' in oldstyle addresses.\n";
+constext txt_error_gnksa_rn_invalid[] = "Illegal character in realname.\nControl characters and unencoded 8bit characters > 127 are not allowed.\n";
 constext txt_error_header_and_body_not_separate[] = "\nError: No blank line found after header.\n";
 constext txt_error_header_line_bad_charset[] = "\n\
 Error: Posting contains non-ASCII characters but MM_CHARSET is set to\n\
@@ -268,7 +270,6 @@ constext txt_help_c[] = "c\t  mark all articles as read and return to group sele
 constext txt_help_cache_overview_files[] = "Create local copies of NNTP overview files. <SPACE> toggles & <CR> sets.";
 constext txt_help_catchup_read_groups[] = "Ask to mark groups read when quitting. <SPACE> toggles & <CR> sets.";
 constext txt_help_getart_limit[] = "Enter maximum number of article to get. <CR> sets.";
-constext txt_help_pg_k[] = "K\t  mark rest of thread as read and enter next unread" cCRLF;
 constext txt_help_sel_c[] = "c C\t  mark all articles in chosen group read (C = and enter next unread group)" cCRLF;
 constext txt_help_thd_c[] = "c\t  mark thread as read and return to group index page" cCRLF;
 constext txt_help_thd_C[] = "C\t  mark thread as read and enter next unread thread or group" cCRLF;
@@ -1177,7 +1178,6 @@ constext txt_rename_error[] = "Error: rename %s to %s";
 constext txt_reply_to_author[] = "Reply to author...";
 constext txt_repost_an_article[] = "Reposting article...";
 constext txt_repost_group[] = "Repost article(s) to group(s) [%s]> ";
-constext txt_rereading_active_file[] = "Rereading active file... ";
 constext txt_reset_newsrc[] = "Reset newsrc? (y/n): ";
 constext txt_resp_redirect[] = "Responses have been directed to the following newsgroups";
 constext txt_resp_to_poster[] = "Responses have been directed to poster. Mail/Post/Quit (m/p/q): ";
@@ -1270,7 +1270,7 @@ constext txt_warn_suspicious_mail[] = "Warning: this mail address may contain a 
   they'll wrap  around  ugly and  people won't  read what you  write.  If you\n\
   aren't  careful  and considerate  in  formatting  your posting, people  are\n\
   likely to ignore it completely.  It's a crowded net out there.\n";
-#endif /* NO_ETIQUETTE */
+#endif /* !NO_ETIQUETTE */
 constext txt_warn_sig_too_long[] ="\n\
 Warning: Your signature  is longer than %d lines.  Since signatures usually do\n\
          not  transport any  useful information,  they should be as  short as\n\

@@ -59,7 +59,7 @@ static int DoMatch(register const char *text, register char *p);
  */
 
 static int
-DoMatch(
+DoMatch (
 	register const char *text,
 	register char *p)
 {
@@ -126,7 +126,7 @@ DoMatch(
  */
 
 t_bool
-wildmat(
+wildmat (
 	const char *text,
 	char *p,
 	t_bool icase)

@@ -74,6 +74,7 @@ HFILES	= \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
+	$(INCDIR)/policy.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tin.h \
@@ -307,7 +308,7 @@ dirty:
 distclean \
 clobber: clean
 	@$(ECHO) "Clobbering..."
-	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) actived tags
+	@-$(RM) -f $(OFILES) $(BINDIR)/$(EXE) $(BINDIR)/$(EXED) tags TAGS LINT cflow.$(PROJECT
 
 cflow:
 	@$(ECHO) "Creating cflow for $(PROJECT)..."
@@ -336,8 +337,7 @@ tincfg.h:			$(SRCDIR)/tincfg.tbl \
 makecfg$x:			$(OBJDIR)/makecfg.o
 	$(LD) $(LDFLAGS) $(OBJDIR)/makecfg.o -o $@ @LIBS@
 
-$(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP) \
-				$(INCDIR)/menukeys.h
+$(OBJDIR)/active.o:		$(SRCDIR)/active.c $(TIN_DEP)
 $(OBJDIR)/art.o:		$(SRCDIR)/art.c $(TIN_DEP) \
 				$(INCDIR)/stpwatch.h
 $(OBJDIR)/attrib.o:		$(SRCDIR)/attrib.c $(TIN_DEP)
@@ -378,7 +378,8 @@ $(OBJDIR)/makecfg.o:		$(SRCDIR)/makecfg.c $(TIN_DEP)
 $(OBJDIR)/memory.o:		$(SRCDIR)/memory.c $(TIN_DEP)
 $(OBJDIR)/misc.o:		$(SRCDIR)/misc.c $(TIN_DEP) \
 				$(INCDIR)/version.h \
-				$(INCDIR)/bugrep.h
+				$(INCDIR)/bugrep.h \
+				$(INCDIR)/policy.h
 $(OBJDIR)/newsrc.o:		$(SRCDIR)/newsrc.c $(TIN_DEP)
 $(OBJDIR)/nntplib.o:		$(SRCDIR)/nntplib.c $(TIN_DEP)
 $(OBJDIR)/nrctbl.o:		$(SRCDIR)/nrctbl.c $(TIN_DEP) \

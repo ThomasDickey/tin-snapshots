@@ -8,7 +8,7 @@ PROJECT	= tin
 EXE	= tin
 MANEXT	= 1
 LVER	= 1.4
-PVER	= 981225
+PVER	= 19990216
 VER	= pre-$(LVER)-$(PVER)
 
 # directory structure
@@ -30,6 +30,7 @@ HFILES	= \
 	$(INCDIR)/extern.h \
 	$(INCDIR)/menukeys.h \
 	$(INCDIR)/nntplib.h \
+	$(INCDIR)/policy.h \
 	$(INCDIR)/proto.h \
 	$(INCDIR)/stpwatch.h \
 	$(INCDIR)/tcurses.h \
@@ -140,6 +141,7 @@ DOC	= \
 	$(DOCDIR)/iso2asc.txt \
 	$(DOCDIR)/good-netkeeping-seal \
 	$(DOCDIR)/umlaute.txt \
+	$(DOCDIR)/umlauts.txt \
 	$(DOCDIR)/tin.defaults \
 	$(DOCDIR)/$(EXE).$(MANEXT)
 
@@ -153,6 +155,7 @@ TOP	= \
 	$(TOPDIR)/MANIFEST \
 	$(TOPDIR)/README \
 	$(TOPDIR)/README.VMS \
+	$(TOPDIR)/README.WIN \
 	$(TOPDIR)/aclocal.m4 \
 	$(TOPDIR)/conf-tin \
 	$(TOPDIR)/config.guess \
@@ -173,7 +176,8 @@ PCRE	= \
 	$(PCREDIR)/pgrep.1 \
 	$(PCREDIR)/pcre.3 \
 	$(PCREDIR)/pcreposix.3 \
-	$(PCREDIR)/deftables.c \
+	$(PCREDIR)/dftables.c \
+	$(PCREDIR)/get.c \
 	$(PCREDIR)/maketables.c \
 	$(PCREDIR)/pcre.c \
 	$(PCREDIR)/pcreposix.c \
@@ -186,8 +190,12 @@ PCRE	= \
 	$(PCREDIR)/perltest \
 	$(PCREDIR)/testinput \
 	$(PCREDIR)/testinput2 \
+	$(PCREDIR)/testinput3 \
+	$(PCREDIR)/testinput4 \
 	$(PCREDIR)/testoutput \
-	$(PCREDIR)/testoutput2
+	$(PCREDIR)/testoutput2 \
+	$(PCREDIR)/testoutput3 \
+	$(PCREDIR)/testoutput4
 
 OLD	= \
 	$(OLDDIR)/msmail.c \
@@ -276,6 +284,7 @@ clean:
 	@-$(RM) -f $(SRCDIR)/*~
 	@-$(RM) -f $(PCREDIR)/*~
 	@-test -e $(SRCDIR)/Makefile && $(CD) $(SRCDIR) && $(MAKE) clean
+	@-test -e $(PCREDIR)/Makefile && $(CD) $(PCREDIR) && $(MAKE) clean
 
 man:
 	@$(MAKE) manpage
@@ -330,7 +339,7 @@ bzip2:
 # I know it's ugly, but it works
 #
 name:
-	@DATE=`date +%y%m%d`; if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
+	@DATE=`date +%Y%m%d`; if test `pwd | cut -d '-' -f 2` != $$DATE ; then \
 	$(MV) ../`basename \`pwd\`` ../tin-$$DATE ; \
 	$(SED) "s,^PVER[[:space:]]*=[[:print:]]*,PVER	= $$DATE," ./Makefile > ./Makefile.tmp \
 	&& $(MV) ./Makefile.tmp ./Makefile ; \
@@ -354,7 +363,7 @@ distclean:
 	@-$(MAKE) clean
 	@-$(RM) -f config.cache config.log config.status
 	@-$(RM) -f $(INCDIR)/autoconf.h
-	@-$(RM) -f $(PCREDIR)/maketables $(PCREDIR)/chartables.c
+	@-$(RM) -f $(PCREDIR)/chartables.c $(PCREDIR)/dftables
 	@-$(RM) -f $(PCREDIR)/Makefile
 	@-$(RM) -f $(SRCDIR)/Makefile
 	@-$(RM) -f td-conf.out

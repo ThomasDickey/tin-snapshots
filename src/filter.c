@@ -5,7 +5,7 @@
  *  Created   : 1992-12-28
  *  Updated   : 1998-02-04
  *  Notes     : Filter articles. Kill & auto selection are supported.
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -60,6 +60,7 @@ struct t_filters glob_filter = { 0, 0, (struct t_filter *) 0 };
 static int get_choice (int x, const char *help, const char *prompt, const char *opt1, const char *opt2, const char *opt3, const char *opt4, const char *opt5);
 static int unfilter_articles (void);
 static int set_filter_scope (struct t_group *group);
+static struct t_filter * psExpandFilterArray (struct t_filter *ptr, int *num);
 static t_bool bAddFilterRule (struct t_group *psGrp, struct t_article *psArt, struct t_filter_rule *psRule);
 static void free_filter_array (struct t_filters *ptr);
 static void free_filter_item (struct t_filter *ptr);
@@ -78,7 +79,7 @@ struct regex_cache {
 	pcre_extra *extra;
 };
 
-struct t_filter *
+static struct t_filter *
 psExpandFilterArray (
 	struct t_filter *ptr,
 	int *num)

@@ -5,7 +5,7 @@
  *  Created   : 1995-05-12
  *  Updated   : 1997-12-31
  *  Notes     : PGP support for article posting and mailing
- *  Copyright : (c) 1995-98 by Steven J. Madsen
+ *  Copyright : (c) 1995-99 by Steven J. Madsen
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -58,16 +58,16 @@ static void join_files (char *file);
 static void pgp_append_public_key (char *file);
 static void split_file (char *file);
 
-static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
-const char *pgpopts = "";
 char pgp_data[PATH_LEN];
+const char *pgpopts = "";
+static char hdr[PATH_LEN], pt[PATH_LEN], ct[PATH_LEN];
 
 static void
 join_files (
 	char *file)
 {
-	char buf[LEN];
 	FILE *art, *header, *text;
+	char buf[LEN];
 
 	if ((header = fopen(hdr, "r")) == (FILE *) 0)
 		return;
@@ -96,14 +96,15 @@ join_files (
 	fclose(art);
 }
 
+
 static void
 split_file (
 	char *file)
 {
+	FILE *art, *header, *text;
+	char buf[LEN];
 	int pid;
 	mode_t mask;
-	char buf[LEN];
-	FILE *art, *header, *text;
 
 	pid = getpid();
 	sprintf(hdr, HEADERS, TMPDIR, pid);
@@ -138,6 +139,7 @@ split_file (
 	fclose(text);
 	umask(mask);
 }
+
 
 static void
 do_pgp (
@@ -182,6 +184,7 @@ do_pgp (
 	unlink(ct);
 }
 
+
 static void
 pgp_append_public_key (
 	char *file)
@@ -223,8 +226,10 @@ pgp_append_public_key (
 	}
 }
 
+
 static t_bool
-pgp_available (void)
+pgp_available (
+	void)
 {
 	FILE *f;
 	char keyring[PATH_LEN];
@@ -237,6 +242,7 @@ pgp_available (void)
 		return TRUE;
 	}
 }
+
 
 void
 invoke_pgp_mail (
@@ -280,8 +286,9 @@ invoke_pgp_mail (
 	}
 }
 
+
 void
-invoke_pgp_news(
+invoke_pgp_news (
 	char *the_article)
 {
 	char ch, ch_default = 's';
@@ -320,8 +327,10 @@ invoke_pgp_news(
 	}
 }
 
+
 int
-pgp_check_article(void)
+pgp_check_article (
+	void)
 {
 	FILE *art;
 	char the_article[PATH_LEN], buf[LEN], cmd[LEN];

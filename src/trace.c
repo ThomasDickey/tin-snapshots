@@ -5,7 +5,7 @@
  *  Created   : 1997-03-22
  *  Updated   : 1997-12-31
  *  Notes     : debugging support via TRACE macro.
- *  Copyright : (c) Copyright 1997-98 by Thomas Dickey
+ *  Copyright : (c) Copyright 1997-99 by Thomas Dickey
  *	             You may  freely  copy or  redistribute  this software,
  *	             so  long as there is no profit made from its use, sale
  *	             trade or  reproduction.  You may not change this copy-

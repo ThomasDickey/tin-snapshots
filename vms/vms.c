@@ -2,8 +2,8 @@
  *  Project   : tin - a Usenet reader
  *  Module    : vms.c
  *  Author    : Andrew Greer
- *  Created   : 19-06-95
- *  Updated   : 24-01-98  by Michael Stenns
+ *  Created   : 1995-06-19
+ *  Updated   : 1998-01-24 by Michael Stenns
  *  Notes     :
  *  Copyright : (c) Copyright 1991-95 by Iain Lea & Andrew Greer
  *              You may  freely  copy or  redistribute  this software,

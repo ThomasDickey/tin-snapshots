@@ -1,0 +1,45 @@
+     - what is it?
+       - A Usenet newsreader
+
+     - system
+       - Windows 95, should work on NT, too
+
+     - Cygwin
+       - for B20
+
+     - preliminaries
+       - install ncurses first
+           - get tin source (e.g from ftp://ftp.tin.org/tin)
+
+     - configure
+       - export CC=gcc
+       - export CFLAGS="-DLOCAL_CHARSET=850"  (or 477 depends on "mode con")
+       - ./configure --with-ncurses --libdir=/usr/local/lib --disable-locale
+
+     - make
+       - cd src
+       - make
+
+     - make install
+       - does not work. Just copy tin.exe from the src dir to a directory in
+         your path.
+       - add to your profile:
+          export NNTPSERVER=your.nntp.server
+          export TERM=pcansi
+
+     - notes
+       - You also need an editor. vim works fine.
+       - tin needs an /etc/passwd
+                username:x:500:100:Real Name:/home:/bin/sh.exe
+       - in autoexec or in cygnus.bat
+              set HOME=c:\home
+              set USER=username
+
+     - package availability
+       - on <site name>
+       - in <path>
+       - as <package name>
+
+     - contributed by
+       - uafr@rz.uni-karlsruhe.de (Wolfgang Becker)
+         19.1.1999

@@ -5,7 +5,7 @@
  *  Created   : 1993-12-01
  *  Updated   : 1997-12-20
  *  Notes     : Group attribute routines
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,10 @@
  */
 
 #include	"tin.h"
-#include	"tcurses.h"
+
+#ifdef DEBUG
+#	include	"tcurses.h"
+#endif /* DEBUG */
 
 #ifndef INDEX_DAEMON
 
@@ -66,7 +69,7 @@ static void set_default_attributes (struct t_attribute *psAttrib);
  * global attributes
  */
 
-struct t_attribute glob_attributes;
+static struct t_attribute glob_attributes;
 
 /*
  * Per group attributes
@@ -727,7 +730,8 @@ write_attributes_file (
 
 #	if 0
 void
-debug_print_filter_attributes (void)
+debug_print_filter_attributes (
+	void)
 {
 	register int i;
 	struct t_group *psGrp;

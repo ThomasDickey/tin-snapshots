@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1994-06-05
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea & Rich Skrenta
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea & Rich Skrenta
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -50,7 +50,8 @@ static void free_active_arrays (void);
  */
 
 void
-init_alloc (void)
+init_alloc (
+	void)
 {
 	/*
 	 * active file arrays
@@ -84,7 +85,8 @@ init_alloc (void)
 
 
 void
-expand_art (void)
+expand_art (
+	void)
 {
 	max_art += max_art / 2;		/* increase by 50% */
 
@@ -94,7 +96,8 @@ expand_art (void)
 
 
 void
-expand_active (void)
+expand_active (
+	void)
 {
 	max_active += max_active / 2;		/* increase by 50% */
 
@@ -109,7 +112,8 @@ expand_active (void)
 
 
 void
-expand_save (void)
+expand_save (
+	void)
 {
 	max_save += max_save / 2;		/* increase by 50% */
 
@@ -119,7 +123,8 @@ expand_save (void)
 
 
 void
-expand_newnews (void)
+expand_newnews (
+	void)
 {
 	max_newnews += max_newnews / 2;			/* increase by 50% */
 
@@ -156,13 +161,14 @@ init_screen_array (
 
 
 void
-free_all_arrays (void)
+free_all_arrays (
+	void)
 {
 	hash_reclaim ();
 
 #ifndef USE_CURSES
 	init_screen_array (FALSE);
-#endif /* USE_CURSES */
+#endif /* !USE_CURSES */
 
 	free_art_array ();
 
@@ -200,7 +206,8 @@ free_all_arrays (void)
 
 
 void
-free_art_array (void)
+free_art_array (
+	void)
 {
 	register int i;
 
@@ -226,7 +233,8 @@ free_art_array (void)
 
 
 void
-free_attributes_array (void)
+free_attributes_array (
+	void)
 {
 	register int i;
 	struct t_group *psGrp;
@@ -272,7 +280,8 @@ free_attributes_array (void)
 
 
 static void
-free_active_arrays (void)
+free_active_arrays (
+	void)
 {
 	register int i;
 
@@ -310,7 +319,8 @@ free_active_arrays (void)
 
 
 void
-free_save_array (void)
+free_save_array (
+	void)
 {
 	int i;
 
@@ -332,7 +342,8 @@ free_save_array (void)
 }
 
 static void
-free_newnews_array (void)
+free_newnews_array (
+	void)
 {
 	int i;
 

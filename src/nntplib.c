@@ -5,7 +5,7 @@
  *  Created   : 1991-01-12
  *  Updated   : 1997-12-22
  *  Notes     : NNTP client routines taken from clientlib.c 1.5.11 (1991-02-10)
- *  Copyright : (c) Copyright 1991-98 by Stan Barber & Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Stan Barber & Iain Lea
  *              Permission is hereby granted to copy, reproduce, redistribute
  *              or otherwise use this software  as long as: there is no
  *              monetary  profit  gained  specifically  from the use or
@@ -670,7 +670,7 @@ put_server (
  */
 #	ifdef NNTP_ABLE
 static int
-reconnect(
+reconnect (
 	int retry)
 {
 	char buf[NNTP_STRLEN];
@@ -770,7 +770,8 @@ get_server (
  */
 #	ifdef NNTP_ABLE
 void
-close_server (void)
+close_server (
+	void)
 {
 	if (nntp_wr_fp == NULL || nntp_rd_fp == NULL)
 		return;

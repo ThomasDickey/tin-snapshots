@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $Id: metamutt,v 1.14 1998/12/25 11:54:11 tom Exp $
+# $Id: metamutt,v 1.15 1999/02/16 20:43:28 roland Exp $
 #
 # This should become a replacement of metamail, using the mail reader
 # mutt. The options of metamail are not yet implemented, but it should
@@ -20,11 +20,17 @@
 #  -D allows splits a digest into seperate mails by using formail
 #     (Feature added by Martin Ramsch <m.ramsch@computer.org>)
 #
+# This script tries to find a working muttrc (which is sourced first)
+# at the following places (descending priority):
+# 1) ~/.mutt/metamuttrc
+# 2) ~/.mutt/muttrc
+# 3) ~/.muttrc
+#
 # Most recent version can be found at http://www.rhein.de/~roland/mutt/metamutt
 #
 ##########################################################################
 #
-#   Copyright (C) 1997-1998  Roland Rosenfeld <roland@spinnaker.rhein.de>
+#   Copyright (C) 1997-1999  Roland Rosenfeld <roland@spinnaker.rhein.de>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License as
@@ -54,15 +60,15 @@ fmopt=''
 digest='no'
 
 # handle options (ignore most of them at the moment):
-for parameter 
+for parameter
 do
-    case $1 in 
+    case $1 in
         -- ) shift; break;;
         -e|-p ) shift;;
         -m ) shift 2;;
-	-D ) fmopt='-ds cat'
-	     digest='yes'
-	     shift;;
+        -D ) fmopt='-ds cat'
+             digest='yes'
+             shift;;
         * )  break;;
     esac
 done
@@ -75,18 +81,20 @@ cat "$@" | formail $fmopt > $tmpdir/mbox
 #cat $* - | sed 's/^From />From /' >> $tmpdir/mbox
 
 # create special muttrc for metamutt:
-if [ -f ~/.mutt/muttrc ]
+if [ -f ~/.mutt/metamuttrc ]
+then
+    echo 'source ~/.mutt/metamuttrc' > $tmpdir/muttrc
+elif [ -f ~/.mutt/muttrc ]
 then
     echo 'source ~/.mutt/muttrc' > $tmpdir/muttrc
-else
-    if [ -f ~/.muttrc ]
-    then
-        echo 'source ~/.muttrc' > $tmpdir/muttrc
-    fi
+elif [ -f ~/.muttrc ]
+then
+    echo 'source ~/.muttrc' > $tmpdir/muttrc
 fi
 
 cat >> $tmpdir/muttrc <<EOF
-macro pager g ":set sendmail=$tmpdir/inews dsn_notify='' dsn_return=''<return>:my_hdr `formail -X Newsgroups < $tmpdir/mbox`<return>r"
+macro pager g ":set sendmail=$tmpdir/inews dsn_notify='' dsn_return=''<return>:
+my_hdr `formail -X Newsgroups < $tmpdir/mbox`<return>r"
 EOF
 
 # some additions, if we read exactly one article.
@@ -116,3 +124,4 @@ chmod 700 $tmpdir/inews
 
 # run mutt on mbox message with special muttrc:
 mutt -F $tmpdir/muttrc -R -f $tmpdir/mbox </dev/tty >/dev/tty
+

@@ -5,7 +5,7 @@
  *  Created   : 1993-12-10
  *  Updated   : 1994-02-28
  *  Notes     : ISO to ascii charset conversion routines
- *  Copyright : (c) Copyright 1991-98 by Markus Kuhn & Tilman Burmester
+ *  Copyright : (c) Copyright 1991-99 by Markus Kuhn & Tilman Burmester
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-

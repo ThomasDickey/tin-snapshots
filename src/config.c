@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-15
  *  Notes     : Configuration file routines
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -1268,7 +1268,7 @@ int
 change_config_file (
 	struct t_group *group)
 {
-	int ch;
+	int ch = 0;
 	int original_list_value;
 	int option, old_option;
 	int ret_code = NO_FILTERING;
@@ -2020,7 +2020,8 @@ quote_space_to_dash (
  * display current configuration page
  */
 static void
-show_config_page (void)
+show_config_page (
+	void)
 {
 	int i, lines_to_print = option_lines_per_page;
 
@@ -2053,7 +2054,7 @@ show_config_page (void)
  *   ELSE!! Do _NOT_ free the individual args of argv.
  */
 char **
-ulBuildArgv(
+ulBuildArgv (
 	char *cmd,
 	int *new_argc)
 {

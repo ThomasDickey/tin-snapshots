@@ -2,6 +2,43 @@ ChangeLog for PCRE
 ------------------
 
 
+Version 2.03 02-Feb-99
+----------------------
+
+1. Fixed typo and small mistake in man page.
+
+2. Added 4th condition (GPL supersedes) and created separate LICENCE file.
+
+3. Updated pcretest so that patterns such as /abc\/def/ work like they do in
+Perl, that is the internal \ allows the delimiter to be included in the
+pattern. Locked out the use of \ as a delimiter. If \ immediately follows
+the final delimiter, add \ to the end of the pattern (to test the error).
+
+4. Added the convenience functions for extracting substrings after a successful
+match. Updated pcretest to make it able to test these functions.
+
+
+Version 2.02 14-Jan-99
+----------------------
+
+1. Initialized the working variables associated with each extraction so that
+their saving and restoring doesn't refer to uninitialized store.
+
+2. Put dummy code into study.c in order to trick the optimizer of the IBM C
+compiler for OS/2 into generating correct code. Apparently IBM isn't going to
+fix the problem.
+
+3. Pcretest: the timing code wasn't using LOOPREPEAT for timing execution
+calls, and wasn't printing the correct value for compiling calls. Increased the
+default value of LOOPREPEAT, and the number of significant figures in the
+times.
+
+4. Changed "/bin/rm" in the Makefile to "-rm" so it works on Windows NT.
+
+5. Renamed "deftables" as "dftables" to get it down to 8 characters, to avoid
+a building problem on Windows NT with a FAT file system.
+
+
 Version 2.01 21-Oct-98
 ----------------------
 

@@ -7,7 +7,7 @@
  *  Notes     : This is a screen management library borrowed with permission
  *              from the Elm mail system. This library was hacked to provide
  *              what tin needs.
- *  Copyright : Copyright (c) 1986-98 Dave Taylor & Iain Lea
+ *  Copyright : Copyright (c) 1986-99 Dave Taylor & Iain Lea
  *              The Elm Mail System  -  @Revision: 2.1 $   $State: Exp @
  */
 
@@ -804,7 +804,7 @@ Raw (
 		SET_TTY (&_raw_tty);
 		_inraw = 1;
 	}
-#		endif	/* M_AMIGA && __SASC */
+#		endif /* M_AMIGA && __SASC */
 
 #	endif /* !INDEX_DAEMON && !M_OS2 */
 #endif /* !VMS */
@@ -968,14 +968,17 @@ PROFILE_ON();
 #		endif /* !INDEX_DAEMON */
 }
 
+
 int
-ReadCh(void)
+ReadCh (
+	void)
 {
 	return AmiReadCh(0);
 }
 
+
 void
-AmiGetWinSize(
+AmiGetWinSize (
 	int *lines,
 	int *columns)
 {
@@ -996,7 +999,7 @@ AmiGetWinSize(
 /*
  *  output a character. From tputs... (Note: this CANNOT be a macro!)
  */
-OUTC_FUNCTION(
+OUTC_FUNCTION (
 	outchar)
 {
 #ifdef OUTC_RETURN
@@ -1006,10 +1009,10 @@ OUTC_FUNCTION(
 #endif /* OUTC_RETURN */
 }
 
+
 /*
  *  setup to monitor mouse buttons if running in a xterm
  */
-
 static void
 xclick (
 	int state)
@@ -1029,25 +1032,26 @@ xclick (
 #endif /* !INDEX_DAEMON */
 }
 
+
 /*
  *  switch on monitoring of mouse buttons
  */
-
 void
 set_xclick_on (void)
 {
 	if (use_mouse) xclick (TRUE);
 }
 
+
 /*
  *  switch off monitoring of mouse buttons
  */
-
 void
 set_xclick_off (void)
 {
 	if (use_mouse) xclick (FALSE);
 }
+
 
 void
 cursoron (void)
@@ -1057,6 +1061,7 @@ cursoron (void)
 		tputs (_cursoron, 1, outchar);
 #endif /* !INDEX_DAEMON */
 }
+
 
 void
 cursoroff (void)
@@ -1068,6 +1073,7 @@ cursoroff (void)
 }
 
 #endif /* !USE_CURSES */
+
 
 /*
  * The UNIX version of ReadCh is used both in termcap and curses configurations.
@@ -1107,13 +1113,13 @@ ReadCh (void)
 		;	/* spin on signal interrupts */
 #			else
 	result = read (0, &ch, 1);
-#			endif	/* EINTR */
+#			endif /* EINTR */
 
 	return ((result <= 0) ? EOF : ch & 0xFF);
 
-#		endif	/* READ_CHAR_HACK */
+#		endif /* READ_CHAR_HACK */
 #	else
 	return 0;
-#	endif	/* !INDEX_DAEMON */
+#	endif /* !INDEX_DAEMON */
 }
 #endif /* M_UNIX */

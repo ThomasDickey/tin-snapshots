@@ -10,7 +10,7 @@
  *  Updated   : 1996-12-15
  *  Notes     : This are the basic function for ansi-color
  *              and word highlighting
- *  Copyright : (c) 1995-98 by Olaf Kalzuga and Roland Rosenfeld
+ *  Copyright : (c) 1995-99 by Olaf Kalzuga and Roland Rosenfeld
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -109,7 +109,8 @@ set_colors (
 	}
 }
 
-void refresh_color(void)
+void refresh_color (
+	void)
 {
 	set_colors(current_fcol, current_bcol);
 }

@@ -5,7 +5,7 @@
  *  Created   : 1992-10-02
  *  Updated   : 1994-08-11
  *  Notes     : Mail handling routines for creating pseudo newsgroups
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,10 @@
  */
 
 #include	"tin.h"
-#include	"tcurses.h"
+
+#if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
+#	include	"tcurses.h"
+#endif /* !INDEX_DAEMON && HAVE_MH_MAIL_HANDLING */
 
 #ifndef INDEX_DAEMON
 	static void read_groups_descriptions (FILE *fp, FILE *fp_save);
@@ -25,7 +28,8 @@
 
 #if !defined(INDEX_DAEMON) && defined(HAVE_MH_MAIL_HANDLING)
 void
-read_mail_active_file (void)
+read_mail_active_file (
+	void)
 {
 	char	buf[LEN];
 	char	my_spooldir[PATH_LEN];
@@ -99,7 +103,8 @@ my_flush();
  */
 
 void
-write_mail_active_file (void)
+write_mail_active_file (
+	void)
 {
 	char acGrpPath[PATH_LEN];
 	FILE *fp;
@@ -126,9 +131,9 @@ write_mail_active_file (void)
  *  Load the text description from ~/.tin/mailgroups for each mail group into
  *  the active[] array.
  */
-
 void
-read_mailgroups_file (void)
+read_mailgroups_file (
+	void)
 {
 	FILE *fp;
 
@@ -148,13 +153,14 @@ read_mailgroups_file (void)
 }
 #endif /* !INDEX_DAEMON && HAVE_MAIL_HANDLING */
 
+
 /*
  *  Load the text description from NEWSLIBDIR/newsgroups for each group into the
  *  active[] array. Save a copy locally if reading via NNTP to save bandwidth.
  */
-
 void
-read_newsgroups_file (void)
+read_newsgroups_file (
+	void)
 {
 #ifndef INDEX_DAEMON
 	FILE *fp;
@@ -298,7 +304,7 @@ vFindArtMaxMin (
 					*plArtMin = lArtNum;
 			}
 		}
-		closedir (tDirFile);
+		CLOSEDIR(tDirFile);
 	}
 	if (*plArtMin == 0)
 		*plArtMin = 1;

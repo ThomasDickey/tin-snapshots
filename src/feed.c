@@ -5,7 +5,7 @@
  *  Created   : 1991-08-31
  *  Updated   : 1994-12-22
  *  Notes     : provides same interface to mail,pipe,print and save commands
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -13,7 +13,11 @@
  */
 
 #include	"tin.h"
-#include	"tcurses.h"
+
+#ifdef DEBUG
+#	include	"tcurses.h"
+#endif /* DEBUG */
+
 #include	"menukeys.h"
 
 char default_mail_address[LEN];
@@ -257,14 +261,8 @@ feed_articles (
 					if (is_mailbox) {
 						if ((int) strlen (filename) > 1)
 							my_strncpy (my_mailbox, filename+1, sizeof (my_mailbox));
-						else {
+						else
 							my_strncpy (my_mailbox, group->name, sizeof (my_mailbox));
-#if 0 /* this is looks ugly */
-							/* convert 1st letter to uppercase */
-							if (islower(my_mailbox[0]))
-								my_mailbox[0] = (char) toupper (my_mailbox[0]);
-#endif /* 0 */
-						}
 						my_strncpy (filename, my_mailbox, sizeof (filename));
 					} else {		/* ask for post processing type */
 						proc_ch = (char) prompt_slk_response(proc_ch_default, "eElLnqsu\033", txt_post_process_type);
@@ -287,12 +285,11 @@ feed_articles (
 			if (!can_post)
 				info_message(txt_cannot_post);
 			else {
-#	ifndef FORGERY
+#	if !defined(FORGERY) && !defined (INDEX_DAEMON)
 				get_user_info (user_name, full_name);
 				get_from_name (from_name, (struct t_group *) 0);
-
 				if (strstr (from_name, arts[respnum].from)) {
-#	endif /* !FORGERY */
+#	endif /* !FORGERY && !INDEX_DAEMON */
 					/* repost or supersede ? */
 					option = (char) prompt_slk_response (option_default, "\033qrs", sized_message(txt_supersede_article, arts[respnum].subject));
 
@@ -773,17 +770,15 @@ does_article_exist (
 	struct t_article *art,
 	char *path)
 {
-	t_bool retcode = FALSE;
-
 	if (function == FEED_SAVE || function == FEED_PIPE) {
 		if (stat_article (art->artnum, path))
-			retcode = TRUE;
+			return TRUE;
 	} else {
 		if (art_open (art, path, TRUE) != ART_UNAVAILABLE)
-			retcode = TRUE;		/* Even if the user aborted, the art still exists */
+			return TRUE;		/* Even if the user aborted, the art still exists */
 	}
 
-	return retcode;
+	return FALSE;
 }
 #endif /* !INDEX_DAEMON */
 

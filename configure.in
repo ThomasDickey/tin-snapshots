@@ -389,10 +389,48 @@ CF_WITH_DFTENV(iso-to-ascii,
 	DEFAULT_ISO2ASC,-1)
 AC_MSG_RESULT($DEFAULT_ISO2ASC)
 
+AC_MSG_CHECKING(whether to use character set conversation)
+CF_ARG_WITH(local-charset,
+	[  --with-local-charset=CHARSET
+                          set local charset to convert from/to],
+	LOCAL_CHARSET)
+AC_MSG_RESULT($LOCAL_CHARSET)
+
 AC_MSG_CHECKING(whether to enable locale support)
 CF_ARG_DISABLE(locale,
 	[  --disable-locale        disable locale support],
 	[AC_DEFINE(NO_LOCALE)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to enable posting)
+CF_ARG_DISABLE(posting,
+	[  --disable-posting       disable posting],
+	[AC_DEFINE(NO_POSTING)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to enable shell escape)
+CF_ARG_DISABLE(shell-escape,
+	[  --disable-shell-escape  disable shell escape],
+	[AC_DEFINE(NO_SHELL_ESCAPE)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to have fascist newsadmin)
+CF_ARG_ENABLE(fascist-newsadmin,
+	[  --enable-fascist-newsadmin
+                          have fascist newsadmin],
+	[AC_DEFINE(HAVE_FASCIST_NEWSADMIN)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to enable inverse video and highlighting)
+CF_ARG_DISABLE(inverse-video,
+	[  --disable-inverse-video disable inverse video and highlighting],
+	[AC_DEFINE(USE_INVERSE_HACK)])
+AC_MSG_RESULT($enableval)
+
+AC_MSG_CHECKING(whether to have MMDF type mailer as default)
+CF_ARG_ENABLE(mmdf-mailer,
+	[  --enable-mmdf-mailer    have MMDF type mailer as default],
+	[AC_DEFINE(HAVE_MMDF_MAILER)])
 AC_MSG_RESULT($enableval)
 
 AC_MSG_CHECKING(whether to enable piping support)
@@ -635,7 +673,9 @@ CF_FUNC_MEMMOVE
 AC_MSG_CHECKING(if select expects int * arguments)
 AC_EGREP_HEADER([select\(.*, *int *\*,],time.h,AC_DEFINE(HAVE_SELECT_INTP) AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
+AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_SETPGRP
+AC_FUNC_SETVBUF_REVERSED
 
 ###	Checks for network library functions.
 AC_CHECK_FUNCS(\

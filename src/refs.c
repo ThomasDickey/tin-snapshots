@@ -1,13 +1,13 @@
 /*
  *  Project   : tin - a Usenet reader
  *  Module    : refs.c
- *  Author    : Jason Faultless <jason@radar.demon.co.uk>
+ *  Author    : Jason Faultless <jason@radar.tele2.co.uk>
  *  Created   : 1996-05-09
  *  Updated   : 1998-01-04
  *  Notes     : Cacheing of message ids / References based threading
  *  Credits   : Richard Hodson <richard@radar.demon.co.uk>
  *              hash_msgid, free_msgid
- *  Copyright : (c) 1996-98 by Jason Faultless
+ *  Copyright : (c) 1996-99 by Jason Faultless
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -89,7 +89,7 @@ static struct t_msgid *msgids[MSGID_HASH_SIZE] = {0};
  * MSGID_HASH_SIZE is a prime of order 2^11
  */
 static unsigned int
-hash_msgid(
+hash_msgid (
 	char *key)
 {
 	unsigned int hash = 0;
@@ -108,7 +108,7 @@ hash_msgid(
  * Thread us into our parents' list of children.
  */
 static void
-add_to_parent(
+add_to_parent (
 	struct t_msgid *ptr)
 {
 	struct t_msgid *p;
@@ -174,7 +174,7 @@ add_to_parent(
  *        overview database.
  */
 static struct t_msgid *
-add_msgid(
+add_msgid (
 	int key,
 	char *msgid,
 	struct t_msgid *newparent)
@@ -288,7 +288,7 @@ add_msgid(
  * not found.
  */
 struct t_msgid *
-find_msgid(
+find_msgid (
 	char *msgid)
 {
 	unsigned int h;
@@ -318,7 +318,7 @@ find_msgid(
  * The space saving vs. storing the refs as a single string is significant.
  */
 static struct t_msgid *
-parse_references(
+parse_references (
 	char *r)
 {
 	char *ptr;
@@ -357,7 +357,7 @@ parse_references(
  *	    lists, which we strive to work around.
  */
 static char *
-_get_references(
+_get_references (
 	struct t_msgid *refptr,
 	int depth)
 {
@@ -391,7 +391,7 @@ _get_references(
  * to correct size
  */
 char *
-get_references(
+get_references (
 	struct t_msgid *refptr)
 {
 	char *refs;
@@ -416,7 +416,8 @@ get_references(
  * normally only needed when entering a new group
  */
 void
-free_msgids(void)
+free_msgids (
+	void)
 {
 	int i;
 	struct t_msgid *ptr, *next, **msgptr;
@@ -439,7 +440,8 @@ free_msgids(void)
 
 #if 0	/* But please don't remove it */
 static void
-dump_msgids(void)
+dump_msgids (
+	void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -506,7 +508,8 @@ dump_msgids(void)
  * rethread.
  */
 void
-clear_art_ptrs(void)
+clear_art_ptrs (
+	void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -523,7 +526,7 @@ clear_art_ptrs(void)
  */
 #ifdef DEBUG_REFS
 static void
-dump_thread(
+dump_thread (
 	FILE *fp,
 	struct t_msgid *msgid,
 	int level)
@@ -562,7 +565,7 @@ dump_thread(
  * A thread is defined as a starting article with no parent
  */
 static void
-dump_msgid_thread(
+dump_msgid_thread (
 	struct t_msgid *ptr,
 	int level)
 {
@@ -578,7 +581,8 @@ dump_msgid_thread(
 }
 
 static void
-dump_msgid_threads(void)
+dump_msgid_threads (
+	void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -619,7 +623,7 @@ dump_msgid_threads(void)
 		(arts[ptr->article].thread != ART_NORMAL /*|| arts[ptr->article].killed*/)))
 
 static struct t_msgid *
-find_next(
+find_next (
 	struct t_msgid *ptr)
 {
 	static t_bool bottom = FALSE;
@@ -687,7 +691,7 @@ find_next(
  * thread.
  */
 static void
-build_thread(
+build_thread (
 	struct t_msgid *ptr)
 {
 	struct t_msgid *newptr;
@@ -716,7 +720,8 @@ build_thread(
  * parent / child / sibling  / article pointers in the msgid hash.
  */
 void
-thread_by_reference(void)
+thread_by_reference (
+	void)
 {
 	int i;
 	struct t_msgid *ptr;
@@ -768,7 +773,8 @@ thread_by_reference(void)
  * correct.
  */
 void
-collate_subjects(void)
+collate_subjects (
+	void)
 {
 	int i, j, art;
 	struct t_hashnode *h;
@@ -837,7 +843,7 @@ collate_subjects(void)
  * 4) free() up the msgid and refs headers once cached
  */
 void
-build_references(
+build_references (
 	struct t_group *group)
 {
 	int i;
@@ -860,7 +866,7 @@ build_references(
 
 #ifdef DEBUG_REFS
 	dbgfd = fopen("Refs.dump", "w");
-	setvbuf (dbgfd, NULL, 0, _IONBF);
+	SETVBUF(dbgfd, 0, NULL, _IONBF);
 	fprintf (dbgfd, "MSGID phase\n");
 #endif /* DEBUG_REFS */
 

@@ -1,23 +1,55 @@
-Compilation and installation notes for tin - 98-08-02 (still incomplete!)
------------------------------------------------------
+Compilation and installation notes for tin - 1998-12-27 (still incomplete!)
+-------------------------------------------------------
 
 Note: The section 'News machine names' is now at the beginning as it
       seemed to be the most sought after section.
 
 This following configure options and defines are documented in detail:
 ----------------------------------------------------------------------
-  --enable-8bit-keys	     --with-inn-nntplib		HAVE_FASCIST_NEWSADMIN
-  --enable-color	     --with-iso-to-ascii	HAVE_MMDF_MAILER
-  --enable-curses	     --with-ispell              HAVE_LIBUU
-  --enable-debug	     --with-libdir		INDEX_DAEMON
-  --enable-etiquette	     --with-metamail		NNTP_INEWS
-  --with-ncurses	     FORGERY			NNTP_SERVER_FILE
-  --enable-locale	     --with-nntp-default-server NO_POSTING
-  --enable-mh-mail-handling  --with-nov-dir		NO_SHELL_ESCAPE
-  --enable-nntp		     --with-pgp			LOCAL-CHARSET
-  --enable-nntp-only	     --with-spooldir		SMALL_MEMORY_MACHINE
-  --with-domain-name	     DONT_HAVE_PIPING		USE_INVERSE_HACK
-  --with-inews-dir	     --with-defaults-dir	--disable-xhdr-xref
+  --enable-8bit-keys	     --enable-posting      --with-metamail
+  --enable-color	     --enable-piping       --with-ncurses
+  --enable-curses	     --enable-shell-escape --with-nntp-default-server
+  --enable-debug	     --enable-xhdr-xref    --with-nov-dir
+  --enable-etiquette	     --with-defaults-dir   --with-pgp
+  --enable-fascist-newsadmin --with-domain-name    --with-spooldir
+  --enable-inverse-video     --with-inews-dir      FORGERY
+  --enable-locale	     --with-inn-nntplib    HAVE_LIBUU
+  --enable-mh-mail-handling  --with-iso-to-ascii   INDEX_DAEMON
+  --enable-mmdf-mailer       --with-ispell         NNTP_INEWS
+  --enable-nntp		     --with-libdir         NNTP_SERVER_FILE
+  --enable-nntp-only	     --with-local-charset  (SMALL_MEMORY_MACHINE)
+
+
+Not yet documented configure options and defines:
+-------------------------------------------------
+
+TIN related:
+  --enable-append-pid              --with-editor
+  --enable-break-long-lines        --with-mailbox
+  --enable-echo                    --with-mailer
+  --enable-mime-strict-charset     --with-mime-default-charset
+  --enable-pgp                     --with-nov-fname
+  --enable-prototypes              --with-socks
+  --enable-warnings                --with-socks5
+  --with-dbmalloc                  --with-sum
+  --with-dmalloc                   --with-trace
+
+  DEBUG                            JUST_TESTING
+  DEBUG_NEWSRC                     MATCH_TAR_PATTERN
+  DEBUG_NEWSRC_FIXME               NEW_HASH_METHOD
+  DEBUG_REFS (see doc/DEBUG_REFS)  OPTIMIZE_JUST_STAR
+  ENFORCE_RFC1034                  PROFILE
+  HAVE_PGP_2                       REQUIRE_BRACKET_IN_DOMAIN_LITERAL
+
+  
+System related:
+  --bindir              --libexecdir          --program-transform-name
+  --datadir             --localstatedir       --sbindir
+  --exec-prefix         --mandir              --sharedstatedir
+  --includedir          --oldincludedir       --srcdir
+  --infodir             --prefix              --sysconfdir
+  --install-prefix      --program-prefix
+  --libdir              --program-suffix
 
 
 News machine names
@@ -34,7 +66,7 @@ Example 1: If you are on machine 'tragic' at network domain 'confusion.com',
 Tin will assume your From: line should read "user@tragic.confusion.com".  If
 your inews script instead rewrites your address as "user@confusion.com", you
 will be unable to cancel your own postings.  To make your posts and cancels
-work properly, define -DDOMAIN_NAME=\"confusion.com\"
+work properly, configure using --with-domain-name="confusion.com".
 
 General Notes on Building Tin
 -----------------------------
@@ -61,26 +93,33 @@ Otherwise tin will create its own NOV style index files on the local machine
 for each user in $HOME/.tin/.index
 
 Many machines require the name of the news gateway machine or the news
-domain to be set via the --with-mail-gateway or the --with-mail-domain
-configure options.  This is true of both NNTP and local news systems.
+domain to be set via the --with-domain-name configure options. This is
+true of both NNTP and local news systems.
 
 
 Building the Normal version:
 ----------------------------
 
 1)  Type './configure --help' to see which options are needed for your
-    local setup.
+    local setup. These options are described below, too.
+
 2)  Change conf-tin for your needs or run ./configure with all needed
     options.
+
 3)  type 'make build' to build tin in the src/ directory.
     Alternatively goto the src subdirectory and type 'make'
+
 4)  Type 'make install' to install.
 
 Building the Index daemon version:
 ----------------------------------
 
-(This feature is deprecated. Use it only if your server doesn't support
-NOV overview files)
+!!! This feature is deprecated and unsupported. So is this part of the
+!!! the file. The patches and some of the files mentioned below are not
+!!! part of the standard distribution of TIN. Future releases may
+!!! (will!) obsolete this feature.
+
+Use it only if your server doesn't support NOV overview files.
 
 Note1: If you want to retrieve tin index files from your NNTP server,
        or if you don't run NNTP but want to install tin setuid and have
@@ -91,29 +130,44 @@ Note1: If you want to retrieve tin index files from your NNTP server,
 
    1)  Build and install the 'Normal version' of tin as specified by the
        above 4 points.
+
    2)  Run "make clean" to delete the *.o files from the normal version.
+
    3)  The tind index daemon needs to be installed on your NNTP server,
        or on your stand-alone news server if you're not using NNTP.
        More info. concerning my NNTP patches & the tin daemon can be
        found in the INSTALL.NNTP file.  If you don't use NNTP, just
        install tind on the machine that has the news spool directory.
+       [These mentioned files are not included in the distribution of
+        TIN.]
+
    4)  Apply my NNTP patches to your nntpd server or this will not work
-       with NNTP!!!. (If you want tind locally read Note3).
-   5)  Edit the Makefile and add -DINDEX_DAEMON to your CPPOPTS entry and
-       remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap, and
-       any other screen-handling libraries used, as tind does not need to
-       be linked with curses and it will save a good 30-50K on the size of
-       tind.
+       with NNTP!!!. (If you want tind locally read Note3). [Again:
+       These patches are not included any longer.]
+
+   5)  Edit the Makefile in the src/ tree and add remove the # before
+       the -DINDEX_DAEMON in the declaration of the DAEMON variable and
+       remove any -DNNTP_* defines. Also remove -lcurses, -ltermcap,
+       and any other screen-handling libraries used in the LIBS
+       variable, as tind does not need to be linked with curses and it
+       will save a good 30-50K on the size of tind.
+
    6)  Type 'make <system type>' to compile tind daemon for your NNTP server
        or stand-alone news server.  This creates tind as the file "tin".
+       [Actually, this won't work. Just try to run 'make' in the src/
+        tree instead.]
+
    7)  Rename the file "tin" to "tind" (i.e. mv tin tind).
+
    8)  Type 'make install_daemon' to install tind daemon on your NNTP server
        or stand-alone news server.
+
    9)  Add the following line to your system cron to run tind every 30 mins:
               00,30 * * * * su news -c '/usr/lib/news/tind'
 
 Note2: tind must be run as user 'news' and the normal tin must have
        the correct permissions to read the central index files!
+
 Note3: tind can also be used to update a copy of all index files
 
 Testing Tin
@@ -147,7 +201,7 @@ Things to test:
 3) Check that you can cancel one of your test postings.  If not, it is
    almost certain that your News machine defines need to be set correctly,
    because Tin thinks your From: line is different from what has actually
-   been posted.  See the section on News machine names below.
+   been posted.  See the section on News machine names above and below.
 
 Further testing is desirable, but left to your individual conscience and
 ingenuity.
@@ -173,16 +227,18 @@ Define if news overview (NOV) files are not stored in SPOOLDIR.
 (only needed if not running --enable-nntp-only)
 
 --with-inews-dir=PATH
-Define if bnews/cnews program 'inews' is not in NEWSLIBDIR.
+Define if 'inews' program is not in NEWSLIBDIR.
 
 NNTP - Reading & posting news
 -----------------------------
 
 --enable-nntp (default: on)
-Define if you wish to read news locally and remotely via an NNTP server.
+Enable if you wish to read news locally and remotely via an NNTP
+server. Disable if you only want to read from local spool. Note: If you
+disable this feature, you won't be able to connect to any NNTP server.
 
 --enable-nntp-only (default: off)
-Define if you [want to | can] ONLY read news remotely via an NNTP server.
+Enable if you [want to | can] ONLY read news remotely via an NNTP server.
 
 --with-nntp-default-server (default: news.$DOMAIN_NAME)
 Defines the name of the default NNTP server that tin should connect to.
@@ -207,6 +263,7 @@ Daemon options
 --------------
 
 INDEX_DAEMON
+!!! Using this define is deprecated and unsupported.
 Define to make an index file updating daemon version of tin. Note that
 no -lcurses or screen libraries need to be linked with tin when this
 #define is specified. If defined this will automatically undefine all
@@ -249,10 +306,11 @@ Define if you want metamail display your MIME messages.
 If found in search path, this is used automatically.
 
 --enable-mh-mail-handling
-Define if you want to use the MH style mail handling & reading code in mail.c
-It should be noted that mail handling is not well tested and not yet fully
-implemented. You can expect errors if you use this define so let me know the
-problems by sending me a bug report ('R' bug command from within tin).
+Enable if you want to use the MH style mail handling & reading code in
+mail.c. It should be noted that mail handling is not well tested and not
+yet fully implemented. You can expect errors if you use this option so
+let me know the problems by sending me a bug report ('R' bug command
+from within tin).
 
 --with-pgp=PATH
 Define if you have PGP (Pretty Good Privacy encryption system)
@@ -264,8 +322,7 @@ over pgp-2).
 
 --with-inn-nntplib=PATH
 Define if you want to use the INN library functions GetConfigValue()
-& GetFQDN().  The INN_NNTPLIB variable in the Makefile must contain
-the correct path to INN library.
+& GetFQDN(). PATH must be the correct path to the INN library.
 
 --with-iso-to-ascii
 Define if you want tin to do ISO-8859-1 Charset to ASCII conversations
@@ -275,9 +332,10 @@ i.e., Adding -DUSE_ISO2ASC=\"2\" to the CPPOPTS line in the Makefile would
 be useful in the german language newsgroups. For more detailed info
 read the file ./doc/iso2asc.txt. Default value for USE_ISO2ASC is "-1".
 
+--with-local-charset
 LOCAL_CHARSET
 Define LOCAL_CHARSET if you like charset conversertions.
-set LOCAL-CHARSET to one of the following values:
+set LOCAL_CHARSET to one of the following values:
 	437	ibm437<->iso-8859-1 conversation
 	850	ibm850<->iso-8859-1 conversation
 	1	next<->iso-8859-1 conversation
@@ -302,15 +360,54 @@ If enabled, tin uses multi language support, as described in
 locale(7).  If you don't have locale support installed on your system,
 try --disable-locale, otherwise you won't see any 8-bit-characters.
 
-DONT_HAVE_PIPING
-Define if your system does not support piping of articles to shell commands.
+--enable-piping (default: on)
+Disable if your system does not support piping of articles to shell commands
+or if you don't want your users to have such support. Note: There may still
+be possibilities for users to "pipe" an article to a command, even if you
+disable this feature. They are just not able to use the '|' key to do so.
 
-HAVE_FASCIST_NEWSADMIN
-Define if you want users articles to be posted to groups that your site
+--enable-fascist-newsadmin (default: off)
+Enable if you want users articles to be posted to groups that your site
 receives.  This will change the warning that a group that the user is
 posting to was not found in the sites active file to an error in the
 article checking routine therefore causing the user to remove the group
 from his/her posting or to abort the posting of the article.
+
+[FIXME: Find another name for this option.		-dn, 1998-12-27]
+
+--enable-mmdf-mailer (default: off, except on SCO Unix)
+If enabled, MMDF type mail handling is used as the default (instead of
+sendmail). On SCO Unix this is always the case, no matter what you use
+here. It can be dynamically changed by setting the tinrc variable
+save_to_mmdf_mailbox to ON or OFF, respectively.
+
+[NOTE: To change the default behaviour on SCO Unix, have a look to
+ include/tin.h and search for HAVE_MMDF_MAILER.]
+
+[FIXME: If I interpret the code and the description correctly, then
+ "instead of sendmail" should be "instead of mbox format handling".
+							-dn, 1998-12-27]
+
+--enable-posting (default: on)
+If disabled, TIN does not allow posting/followup of articles.
+
+--enable-shell-escape (default: on)
+If disabled, do not allow shell escapes. Note: There may still be
+possibilities for users to start a shell (e.g. from within an editor or
+using a shell as the "editor"), even if you disable this feature here.
+They are just not able to use the '!' key to do so.
+
+--enable-inverse-video (default: on)
+Disable if you want inverse video and highlighted bar disabled. Can be
+toggled in tin by the 'I' command and highlight bar by 'M' command.
+
+[FIXME: Is this still true? 'M' command is for entering the config menu
+ ... Is the support for disabling of this feature complete?
+							-dn, 1998-12-27]
+
+--enable-xhdr-xref (default: on)
+If disabled, don't allow using XHDR XREF if XOVER doesn't work to mark
+crossposted articles as read in all groups.
 
 FORGERY
 Define if you want to be able to cancel postings you did not write
@@ -319,29 +416,10 @@ careful with this feature, it should not be used in an free accessible
 tin.  This feature does not work with INN using the INN-inews (when
 using without NNTP), because INN-inews rejects these cancels.
 
-HAVE_MMDF_MAILER
-Define if your machine uses a MMDF type mailer instead of sendmail.
-It is defined as default on SCO Unix machines. It can be dynamically
-changed by setting the tinrc variable save_to_mmdf_mailbox to ON.
-
-NO_POSTING
-Do not allow posting/followup of articles.
-
-NO_SHELL_ESCAPE
-Do not allow shell escapes.
-
-USE_INVERSE_HACK
-Define if you want inverse video and highlighted bar disabled. Can be
-toggled in tin by the 'I' command and highlight bar by 'M' command.
-
-SMALL_MEMORY_MACHINE
+SMALL_MEMORY_MACHINE (not supported anymore)
 Define if you are running a machine with little memory (<4MB). Tin will
 run slightly slower but be more efficient in how memory is allocated and
 reclaimed.
-
---disable-xhdr-xref
-don't allow using XHDR XREF if XOVER dosn't work to mark crossposted
-articles as read in all groups.
 
 
 Compiled & installed on the following machines:
@@ -349,8 +427,8 @@ Compiled & installed on the following machines:
 
 1)	i486 & Linux 0.99.14w with gcc 2.5.7
 	i486 & Linux 1.2.13 with gcc 2.7.0
-	i686 & Linux 2.0.35 with gcc 2.7.2.1
-	i586 & Linux 2.0.36 with gcc 2.7.2.3 (glibc 2.0.7)
+	i586 & Linux 2.0.36 with gcc 2.7.2.3
+	i686 & Linux 2.2.0 with egcs-egcs-2.91.60
 	DEC Alpha AXP & Linux 2.0.0 with gcc 2.7.1
 	Amiga 4000/040 & Linux 2.0.29 with gcc 2.7.2
 	Power Macintosh 7200/75 & Linux 2.0.30 with gcc 2.7.2.1
@@ -375,6 +453,7 @@ Compiled & installed on the following machines:
 
 4)	AlphaStation 3000 & Digital UNIX 3.2c with gcc 2.7.2
 	AlphaStation 600 5/266 & Digital UNIX 3.2 with cc
+	AlphaStation 3000/M800 & Digital UNIX V4.0B OSF/1 with cc
 
 5)	AlphaStation ??? & OSF/1 v3.2 with cc
 	AlphaStation ??? & OSF/1 v3.2 with gcc 2.7.2
@@ -412,8 +491,7 @@ Compiled & installed on the following machines:
 
 12)	i586 & SCO OpenServer Enterprise System (ver 5.0.0b)
 	with SCO OpenServer Development System (ver 5.0.0a)
-	i386 & SCO System V Rel 3.2v4.2 with SCO Development System and
-	International Supplement (in other words, regular system cc)
+	i486 & SCO System V Rel 3.2v4.2 with cc
 
 13)	i386 & XENIX 2.3.3 with gcc 1.37.1
 
@@ -433,4 +511,5 @@ Compiled & installed on the following machines:
 18)	OpenVMS/Alpha 6.2, DEC C V5.0-003,                  SOCKETSHR_TCP
 	OpenVMS/Vax   5.3, GCC 2.7.2 (Pat Ranking edition), SOCKETSHR_TCP
 
-19)	i586 & Windows95 with Cygwin32 gcc 2.7-B19
+19)	i586 & Windows95 with CYGWIN_95-4.0/20.1
+	i686 & WindowsNT with CYGWIN_NT-4.0/20.1

@@ -5,7 +5,7 @@
  *  Created   : 1991-04-01
  *  Updated   : 1997-12-31
  *  Notes     :
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -26,9 +26,9 @@
 #include	"tcurses.h"
 #include	"menukeys.h"
 
-const char *info_title;
 const char **info_help;
 
+static const char *info_title;
 static constext txt_help_empty_line[] = cCRLF;
 
 static int cur_page;
@@ -312,7 +312,8 @@ constext *help_page[] = {
 
 
 static int
-ReadHelpCh (void)
+ReadHelpCh (
+	void)
 {
 	int ch = ReadCh ();
 

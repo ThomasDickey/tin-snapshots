@@ -5,7 +5,7 @@
  *  Created   : 1991-11-09
  *  Updated   : 1994-07-27
  *  Notes     : emacs style line editing input package.
- *  Copyright : (c) Copyright 1991-98 by Chris Thewalt & Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Chris Thewalt & Iain Lea
  *              Permission to use, copy, modify, and distribute this
  *              software for any purpose and without fee is hereby
  *              granted, provided that the above copyright notices
@@ -297,7 +297,8 @@ gl_del (
  */
 
 static void
-gl_kill (void)
+gl_kill (
+	void)
 {
 	if (gl_pos < gl_cnt) {
 		gl_buf[gl_pos] = '\0';
@@ -312,7 +313,8 @@ gl_kill (void)
  */
 
 static void
-gl_kill_back_word (void)
+gl_kill_back_word (
+	void)
 {
 	int i, cur;
 
@@ -341,7 +343,8 @@ gl_kill_back_word (void)
  */
 
 static void
-gl_redraw (void)
+gl_redraw (
+	void)
 {
 	if (gl_init_done == -1) {
 		my_fputc ('\n', stdout);

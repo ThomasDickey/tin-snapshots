@@ -6,7 +6,7 @@
  *  Updated   : 1997-04-05
  *  Notes     : Simple stopwatch routines for timing code using timeb
  *	             or gettimeofday structs
- *  Copyright : (c) Copyright 1991-98 by Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
@@ -62,8 +62,8 @@ float d_time;
 #			define PrintStopWatch()	{sprintf (tmp_tb, "StopWatch(%s): %6.3f ms", msg_tb, d_time); \
 				 error_message (tmp_tb, "");}
 
-#		endif	/* HAVE_SYS_TIME_H */
-#	endif	/* HAVE_SYS_TIMEB_H && HAVE_FTIME */
+#		endif /* HAVE_SYS_TIME_H */
+#	endif /* HAVE_SYS_TIMEB_H && HAVE_FTIME */
 
 #	else	/* PROFILE */
 
@@ -71,5 +71,5 @@ float d_time;
 #		define EndStopWatch()
 #		define PrintStopWatch()
 
-#	endif	/* PROFILE */
-#endif	/* !STPWATCH_H */
+#	endif /* PROFILE */
+#endif /* !STPWATCH_H */

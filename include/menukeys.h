@@ -5,7 +5,7 @@
  *  Created   : 1994-08-15
  *  Updated   : 1995-12-21
  *  Notes     :
- *  Copyright : (c) Copyright 1991-94 by Steve Robbins & Iain Lea
+ *  Copyright : (c) Copyright 1991-99 by Steve Robbins & Iain Lea
  *              You may  freely  copy or  redistribute  this software,
  *              so  long as there is no profit made from its use, sale
  *              trade or  reproduction.  You may not change this copy-
