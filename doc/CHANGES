@@ -1,3 +1,19 @@
+--unoff BETA release 970705 --
+
+403) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. check for control-characters in Subject:
+     ADD. minor code clean-up
+     FIX. several patches
+
+402) Sven Paulus <sven@oops.sub.de>
+     BUG. keyboard didn't return to raw mode after posting
+          postponed articles
+     ADD. changed message "Repost" to "Post postponed articles"
+     BUG. tin got slower as .tin/posted grew, increasing speed by
+          reverting order
+     BUG. tin garbled .tin/posted when posting postponed articles
+     FIX. lang.c, post.c
+
 --unoff BETA release 970625 --
 
 401) Oliver B. Warzecha <obw@amarok.ping.de>

@@ -1,4 +1,4 @@
-MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
+MANIFEST for tin-1.3-unoff-BETA-970705 (Sat Jul  5 23:34:32 CEST 1997)
 ----------------------------------------------------
    6550 ./Makefile
    2749 ./MANIFEST
@@ -12,11 +12,11 @@ MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
     651 ./mkdirs.sh
   11743 ./makefile.in
     934 ./conf-tin
-  82359 ./doc/CHANGES
+  82915 ./doc/CHANGES
    1470 ./doc/DEBUG_REFS
   19310 ./doc/Good-Netkeeping-Seal
   15584 ./doc/INSTALL
-  17767 ./doc/TODO
+  17640 ./doc/TODO
    1627 ./doc/WHATSNEW
   12686 ./doc/auth.txt
    2323 ./doc/internals.txt
@@ -61,7 +61,7 @@ MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
    4965 ./src/inews.c
   32725 ./src/init.c
     962 ./src/joinpath.c
-  76323 ./src/lang.c
+  76340 ./src/lang.c
    3805 ./src/list.c
   10513 ./src/mail.c
   21069 ./src/main.c
@@ -75,10 +75,10 @@ MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
    6179 ./src/nrctbl.c
   25301 ./src/open.c
    6272 ./src/os_2.c
-  42214 ./src/page.c
+  42248 ./src/page.c
   24119 ./src/parsdate.y
    6472 ./src/pgp.c
-  90166 ./src/post.c
+  89676 ./src/post.c
    9139 ./src/prompt.c
     160 ./src/proto.sed
   21891 ./src/refs.c
@@ -86,15 +86,15 @@ MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
   11108 ./src/rfc1521.c
   21935 ./src/rfc1522.c
   33917 ./src/save.c
-   4943 ./src/screen.c
-  10941 ./src/search.c
+   5184 ./src/screen.c
+  10933 ./src/search.c
   36507 ./src/select.c
    5673 ./src/sigfile.c
    9173 ./src/signal.c
    5750 ./src/strftime.c
    7416 ./src/string.c
    4497 ./src/tcurses.c
-  28899 ./src/thread.c
+  29100 ./src/thread.c
     971 ./src/trace.c
    4244 ./src/wildmat.c
   12575 ./src/win32.c
@@ -113,4 +113,4 @@ MANIFEST for tin-1.3-unoff-BETA-970625 (Wed Jun 25 22:26:22 CEST 1997)
    4278 ./src/l1_next.tab
    4278 ./src/next_l1.tab
    3915 ./src/tincfg.tbl
-1825420 total
+1825844 total

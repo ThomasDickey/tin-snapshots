@@ -55,9 +55,6 @@ o  new subscribed groups won't show up in the same session if:
    as tin does not check if the group contains any articles [we should send
    a GROUP or LISTGROUP to the server after 's'ubscribe]
 
-o  postings with control characters in the Subject: may corrupt the screen
-   when pressing 'i' or viewing a thread with 'l'.
-
 o  supersedes does not work if one of the Newsgroups is not present in the
    active file.
 

@@ -137,16 +137,16 @@ prompt_rejected(void)
 	char ch_default = iKeyPostEdit;
 
 /* fix screen pos. */
-	Raw(FALSE);
+	Raw (FALSE);
 	my_fprintf(stderr, "\n\n%s\n\n", txt_post_error_ask_postpone);
 	my_fflush(stderr);
-	Raw(TRUE);
+	Raw (TRUE);
 
 	do {
 		do_prompt1 (txt_quit_edit_postpone, ch_default);
 		if ((ch = (char) ReadCh ()) == '\r' || ch == '\n')
 			ch = ch_default;
-	} while (!strchr ("eqo", ch));
+	} while (!strchr (EDIT_KEYS, ch));
 	return ch;
 }
 
@@ -396,36 +396,17 @@ update_posted_info_file (
 	int action,
 	char *subj)
 {
-	char buf[LEN];
-	char tmp_post[LEN];
-	FILE *fp, *tmp_fp;
+	FILE *fp;
 	time_t epoch;
 	struct tm *tm;
 
-	sprintf (tmp_post, "%s.%d", posted_info_file, process_id);
-
-	if ((tmp_fp = fopen (tmp_post, "w")) != NULL) {
+	if ((fp = fopen (posted_info_file, "a+")) != NULL) {
 		time (&epoch);
 		tm = localtime (&epoch);
-		fprintf (tmp_fp, "%02d-%02d-%02d|%c|%s|%s\n",
+		fprintf (fp, "%02d-%02d-%02d|%c|%s|%s\n",
 			 tm->tm_mday, tm->tm_mon + 1, tm->tm_year,
 			 action, group, subj);
-		fclose (tmp_fp);
-	}
-	if ((tmp_fp = fopen (tmp_post, "a+")) != NULL) {
-		int fMove = 0;
-
-		if ((fp = fopen (posted_info_file, "r")) != NULL) {
-			fMove = 1;
-			while (fgets (buf, sizeof buf, fp) != NULL) {
-				fprintf (tmp_fp, "%s", buf);
-			}
-			fclose (fp);
-		}
-		fclose (tmp_fp);
-		/* Win32 -- can't move a file which is open */
-		if (fMove)
-			rename_file (tmp_post, posted_info_file);
+		fclose (fp);
 	}
 }
 
@@ -1065,7 +1046,6 @@ post_article_postponed:
 	if (unlink_article) {
 		unlink (article);
 	}
-
 	return;
 }
 
@@ -1177,11 +1157,10 @@ post_article_done:
 		update_active_after_posting (group);
 
 		if (pcCopyArtHeader (HEADER_SUBJECT, article, subj)) {
-			/* we currently do not add autoselect for
+		   /* we currently do not add autoselect for
 		    * crossposted postponed articles, since we don't
 		    * know in which group the article was actually in
 		    */
-		    
 			if(!strchr(group, ',') && (psGrp=psGrpFind(group))) {
 				quick_filter_select_posted_art (psGrp, subj);
 			}
@@ -1397,6 +1376,7 @@ pickup_postponed_articles(
 			case iKeyPostponeYes:
 			case iKeyPostponeYesOverride:
 				post_existing_article(ch == iKeyPostponeYes, subject);
+				Raw(TRUE);
 				break;
 			case iKeyPostponeNo:
 			case iKeyQuit:
@@ -1938,7 +1918,7 @@ ignore_followup_to_poster:
 
 	psGrp = psGrpFind (group);
 
-	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj,TRUE));
+	sprintf (bigbuf, "Re: %s", eat_re (note_h_subj, TRUE));
 	msg_add_header ("Subject", bigbuf);
 
 	if (psGrp && psGrp->attribute->x_comment_to && *note_h_from) {
@@ -2196,7 +2176,7 @@ mail_to_someone (
 		msg_add_header ("To", mail_to);
 
 		if (mail_to_poster) {
-			sprintf (subject, "Re: %s\n", eat_re (note_h_subj,TRUE));
+			sprintf (subject, "Re: %s\n", eat_re (note_h_subj, TRUE));
 			msg_add_header ("Subject", subject);
 		} else {
 			msg_add_header ("Subject", subject);
@@ -2262,7 +2242,7 @@ mail_to_someone (
 	if (use_mailreader_i) {	/* user wants to use his own mailreader */
 		ch = iKeyAbort;
 		redraw_screen = TRUE;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj,TRUE));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj, TRUE));
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
 			error_message (txt_command_failed_s, buf);
@@ -2549,7 +2529,7 @@ mail_to_author (
 	}
 	chmod (nam, (S_IRUSR|S_IWUSR));
 
-	sprintf (subject, "Re: %s\n", eat_re (note_h_subj,TRUE));
+	sprintf (subject, "Re: %s\n", eat_re (note_h_subj, TRUE));
 
 	if (!use_mailreader_i) {	/* tin should start editor */
 		find_reply_to_addr (respnum, from_addr, FALSE);
@@ -2625,7 +2605,7 @@ mail_to_author (
 
 	if (use_mailreader_i) {	/* user wants to use his own mailreader for reply */
 		ch = iKeyAbort;
-		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj,TRUE));
+		sprintf (mailreader_subject, "Re: %s", eat_re (note_h_subj, TRUE));
 		find_reply_to_addr (respnum, mail_to, TRUE);
 		strfmailer (mailer, mailreader_subject, mail_to, nam, buf, sizeof (buf), default_mailer_format);
 		if (!invoke_cmd (buf))
@@ -3753,7 +3733,6 @@ update_active_after_posting (
 	 */
 	strip_double_ngs (note_h_newsgroups);
 
-	strcat (newsgroups, "\n");
 	src = newsgroups;
 	dst = group;
 
@@ -3762,7 +3741,7 @@ update_active_after_posting (
 			*dst = *src;
 		}
 		src++;
-		if (*dst == ',' || *dst == '\n') {
+		if (*dst == ',' || *dst == '\0') {
 			*dst = '\0';
 			psGrp = psGrpFind (group);
 			if (psGrp != (struct t_group *) 0 && psGrp->subscribed) {
