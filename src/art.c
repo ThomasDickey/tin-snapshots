@@ -732,7 +732,7 @@ parse_headers (
  *  Format:
  *    1.  article number (ie. 183)                [mandatory]
  *    2.  Subject: line  (ie. Which newsreader?)  [mandatory]
- *    3.  From: line     (ie. iain@scn.de)        [mandatory]
+ *    3.  From: line     (ie. iain@ecrc.de)       [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
  *    5.  MessageID:     (ie. <123@ether.net>)    [mandatory]
  *    6.  References:    (ie. <message-id> ....)  [mandatory]
@@ -1037,7 +1037,7 @@ sleep(1);
  *  Format:
  *    1.  article number (ie. 183)                [mandatory]
  *    2.  Subject: line  (ie. Which newsreader?)  [mandatory]
- *    3.  From: line     (ie. iain@scn.de)        [mandatory]
+ *    3.  From: line     (ie. iain@ecrc.de)       [mandatory]
  *    4.  Date: line     (rfc822 format)          [mandatory]
  *    5.  MessageID:     (ie. <123@ether.net>)    [optional]
  *    6.  References:    (ie. <message-id> ....)  [mandatory]

@@ -56,7 +56,7 @@ read_newsrc (
 #endif
 
 	if (allgroups)
-		group_top = 0;
+		group_top = skip_newgroups();
 
 	/*
 	 * make a .newsrc if one doesn't exist & auto subscribe to set groups

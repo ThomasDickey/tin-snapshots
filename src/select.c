@@ -609,6 +609,7 @@ select_done:
 					subscribe (&CURR_GROUP, UNSUBSCRIBED);
 					sprintf(buf, txt_unsubscribed_to, CURR_GROUP.name);
 					info_message(buf);
+					goto_next_group_on_screen ();
 				} else if (CURR_GROUP.bogus && strip_bogus == BOGUS_ASK) {
 					/* Bogus groups aren't subscribed to avoid confusion */
 					sprintf (buf, txt_remove_bogus, CURR_GROUP.name);
@@ -618,7 +619,6 @@ select_done:
 					info_message (buf);
 				}
 
-				goto_next_group_on_screen ();
 				break;
 
 			case iKeySelectUnsubscribePat:	/* unsubscribe to groups matching pattern */

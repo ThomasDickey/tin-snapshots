@@ -491,6 +491,8 @@ check_article_to_be_posted (
 	int ngcnt = 0;
 	int oldraw;		/* save previous raw state */
 	int c;
+	int saw_sig_dashes = 0;
+	int sig_lines = 0;
 	size_t nglens[NGLIMIT];
 	t_bool end_of_header = FALSE;
 	t_bool found_newsgroups_line = FALSE;
@@ -498,11 +500,8 @@ check_article_to_be_posted (
 	t_bool found_followup_to = FALSE;
 	t_bool found_followup_to_several_groups = FALSE;
 	t_bool got_long_line = FALSE;
-	struct t_group *psGrp;
-	int    saw_sig_dashes = 0;
-	int    sig_lines = 0;
-	t_bool wrong_sig_dashes = FALSE;
 	t_bool saw_wrong_sig_dashes = FALSE;
+	struct t_group *psGrp;
 
 	if ((fp = fopen (the_article, "r")) == (FILE *) 0) {
 		perror_message (txt_cannot_open, the_article);
@@ -663,14 +662,17 @@ check_article_to_be_posted (
 		if (cp != (char *) 0) {
 			*cp = '\0';
 		}
-		if ( saw_sig_dashes ) {
+		if (saw_sig_dashes || saw_wrong_sig_dashes) {
 			sig_lines++;
 		}
-		wrong_sig_dashes = !strcmp(line, "--");
-		if ( !strcmp(line, "-- ") || wrong_sig_dashes ) {
+		if (!strcmp(line, "-- ")) {
+			saw_wrong_sig_dashes=FALSE;
 			saw_sig_dashes++;
-			saw_wrong_sig_dashes = saw_wrong_sig_dashes || wrong_sig_dashes;
-			sig_lines=0;
+			sig_lines = 0;
+		}
+		if (!strcmp(line, "--") && !saw_sig_dashes) {
+			saw_wrong_sig_dashes=TRUE;
+			sig_lines = 0;
 		}
 		col = 0;
 		for (cp = line; *cp; cp++) {
@@ -687,17 +689,17 @@ check_article_to_be_posted (
 			got_long_line = TRUE;
 		}
 	}
-	if ( saw_sig_dashes >= 2 ) {
+	if (saw_sig_dashes >= 2) {
 		setup_check_article_screen (&init);
-		my_fprintf (stderr, txt_warn_multiple_sigs, saw_sig_dashes );
+		my_fprintf (stderr, txt_warn_multiple_sigs, saw_sig_dashes);
 		my_fflush (stderr);
 	}
-	if ( saw_wrong_sig_dashes ) {
+	if (saw_wrong_sig_dashes) {
 		setup_check_article_screen (&init);
 		my_fprintf (stderr, txt_warn_wrong_sig_format );
 		my_fflush (stderr);
 	}
-	if ( sig_lines > MAX_SIG_LINES ) {
+	if (sig_lines > MAX_SIG_LINES) {
 		setup_check_article_screen (&init);
 		my_fprintf (stderr, txt_warn_sig_too_long, MAX_SIG_LINES );
 		my_fflush (stderr);

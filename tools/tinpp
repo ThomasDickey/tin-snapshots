@@ -1,0 +1,51 @@
+# Tin Newsreader post-processor
+# $1 is the filename that has been uudecoded
+# This is just a sample script - It is very Linux oriented.
+# TODO:
+#	Eliminate case issues
+#	Check for gz composites (eg: .tar.gz) accordingly
+#	Option to decide to list and/or extract archives
+#	If there anyway we can grep mailcap to do all this ?
+#
+
+[ ! -f "$1" ] && exit 1
+
+case ${1##*.} in
+	gz)
+		echo "Can't differentiate gzip/tar gzip yet"
+		;;
+
+	tgz)
+		tar -ztvf $1
+		;;
+
+	gif|jpg|GIF|JPG)
+		[ -z "$DISPLAY" ] && zgv $1 || xv $1
+		;;
+
+	txt|TXT)
+		${EDITOR:=vi} $1
+		;;
+
+	zip)
+		unzip -l $1
+		;;
+
+
+	avi)
+		[ -z "$DISPLAY" ] && echo "No text mode viewer. Sorry." || xanim $1
+		;;
+
+	*)
+		echo "Unsupported or missing suffix: ${1##*.}"
+		file $1
+		;;
+esac
+
+echo ""
+
+echo "Press <RETURN> to keep $(basename $1) or anything else to remove it."
+read ans
+[ -n "$ans" ] && echo "Removing $1" && rm -f $1
+
+# end of tinpp
