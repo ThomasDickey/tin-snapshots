@@ -1,3 +1,24 @@
+--unoff BETA release 961216 --
+
+249) Alexander Lehmann <alex@hal.rhein-main.de>
+     BUG. (introduced in 240)
+          - when writing out the .newsrc, apparently no longer existing
+            groups and unsubscribed groups get an empty line afterwards 
+          - when subscribing some groups from the yanked-in list and then
+            yanking out the unsubscribed groups again, leaves only the 1st
+            subscribed group in the .newsrc or doesn't add the group at all.
+     FIX. newsrc.c
+
+248) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     Julien Oster <fuzzy@cu8.cum.de>
+     ADD. minor code cleanup
+     BUG. strange display if num_taged_articles_in_thread > 99
+     FIX. serveral supplied patches
+
+247) Thomas E. Dickey <dickey@clark.net>
+     ADD. extra rules for broken IRIX make
+     FIX. Makefile[.in]
+
 --unoff BETA release 961215 --
 
 246) Urs Janssen <urs@akk.uni-karlsruhe.de>

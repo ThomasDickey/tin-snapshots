@@ -126,8 +126,11 @@ selection_index (start_groupnum, num_cmd_line_groups)
 									goto select_page_up;
 								}
 								goto select_done;
-								/* break; */
+							default:
+								break;
 						}
+						break;
+					default:
 						break;
 				}
 				break;

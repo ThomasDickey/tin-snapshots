@@ -1086,6 +1086,8 @@ struct t_article
 {
 	long artnum;			/* Article number in spool directory for group */
 	char *subject;			/* Subject: line from mail header */
+/* t_article.subject is casted to (int *) in art.c :-( */
+
 	char *from;			/* From: line from mail header (address) */
 	char *name;			/* From: line from mail header (full name) */
 	time_t date;			/* Date: line from header in seconds */

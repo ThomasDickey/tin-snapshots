@@ -781,6 +781,8 @@ quick_post_article ()
 					ReadCh ();
 					return;
 				}
+			default:
+				break;
 		}
 
 		do {
@@ -1003,6 +1005,8 @@ post_article (group, posted_flag)
 					ReadCh ();
 					return redraw_screen;
 				}
+			default:
+				break;
 		}
 
 		do {
@@ -1271,6 +1275,8 @@ post_response (group, respnum, copy_text)
 			case iKeyQuit:
 			case iKeyAbort:
 				return ret_code;
+			default:
+				break;
 		}
 		{
 			char save_followup[HEADER_LEN];
@@ -1487,6 +1493,8 @@ post_response (group, respnum, copy_text)
 					ReadCh ();
 					return ret_code;
 				}
+			default:
+				break;
 		}
 
 		do {
@@ -1687,6 +1695,8 @@ mail_to_someone (respnum, address, mail_to_poster, confirm_to_mail, mailed_ok)
 				} else {
 					break;
 				}
+			default:
+				break;
 		}
 		if (mail_to_poster) {
 			do {
@@ -1902,6 +1912,8 @@ mail_bug_report ()
 				} else {
 					goto mail_bug_report_done;
 				}
+			default:
+				break;
 		}
 		do {
 			sprintf (msg, txt_quit_edit_send,
@@ -2083,6 +2095,8 @@ mail_to_author (group, respnum, copy_text)
 					}
 				}
 				break;	/* an error occurred */
+			default:
+				break;
 		}
 
 		do {
@@ -2178,6 +2192,8 @@ pcCopyArtHeader (iHeader, pcArt, result)
 					my_strncpy (header, &buf[9], sizeof (header));
 					found = TRUE;
 				}
+				break;
+			default:
 				break;
 		}
 	}
@@ -2411,6 +2427,8 @@ cancel_article (group, art, respnum)
 				unlink (cancel);
 				clear_message ();
 				return redraw_screen;
+			default:
+				break;
 		}
 	}
 }
@@ -2680,6 +2698,8 @@ repost_article (group, art, respnum, supersede)
 					sleep (3);
 					return ret_code;
 				}
+			default:
+				break;
 		}
 	}
 
@@ -2928,14 +2948,15 @@ insert_from_header (infile)
 
 void
 find_reply_to_addr (respnum, from_addr)
-	int respnum;
+	int respnum;	/* we don't need that in the #else part */
 	char *from_addr;
 {
 #if 0
-	/* 
-    * This works fine, but since parse_from() has bugs, it seems to be better
-    * to use the other routine...
-    */
+	/*
+	 * This works fine, but since parse_from() has bugs, it seems to be better
+	 * to use the other routine...
+	 */
+	 
 	char *ptr, buf[HEADER_LEN];
 	char from_both[HEADER_LEN];
 	char from_name[HEADER_LEN];

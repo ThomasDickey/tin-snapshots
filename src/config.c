@@ -1023,7 +1023,9 @@ print_option (act_option)
 		case OPT_CHAR:
 			/* grrr... who the heck defined art_marked_* as int? */
 			printf("%c", *((int *) option_table[act_option - 1].variable));
-		break;
+			break;
+		default:
+			break;
 	}
 }
 
@@ -1093,7 +1095,7 @@ refresh_config_page (act_option, force_redraw)
 int
 change_config_file (group, filter_at_once)
 	struct t_group *group;
-	int filter_at_once;
+	int filter_at_once;	/* not used */
 {
 	int ch, i;
 /*	int filter_changed = FALSE; */
@@ -1153,9 +1155,13 @@ change_config_file (group, filter_at_once)
 						ch = iKeyConfigPageDown;
 						break;
 #ifndef WIN32
+					default:
+						break;
 				} /* switch (get_arrow_key ()) */
 				break;
 #endif
+			default:
+				break;
 		}	/* switch (ch) */
 
 		switch (ch) {
@@ -1252,6 +1258,8 @@ change_config_file (group, filter_at_once)
 			case iKeyConfigSelect:
 			case iKeyConfigSelect2:
 				change_option = TRUE;
+				break;
+			default:
 				break;
 		} /* switch (ch) */
 
@@ -1385,6 +1393,8 @@ change_config_file (group, filter_at_once)
 #endif
 						 * 	break;
 						 */
+						default:
+							break;
 					} /* switch (option) */
 					break;
 
@@ -1438,7 +1448,9 @@ change_config_file (group, filter_at_once)
 						 * case OPT_DEFAULT_SHOW_AUTHOR:	case OPT_DEFAULT_SORT_ART_TYPE:
 						 *	break;
 						 */
-
+						 
+						default:
+							break;
 					} /* switch (option) */
 					break;
 
@@ -1504,6 +1516,8 @@ change_config_file (group, filter_at_once)
 							}
 							break;
 
+						default:
+							break;
 					} /* switch (option) */
 					break;
 
@@ -1513,6 +1527,9 @@ change_config_file (group, filter_at_once)
 						case OPT_GROUPNAME_MAX_LENGTH:
 						case OPT_DEFAULT_FILTER_DAYS:
 							prompt_option_num (option);
+							break;
+
+						default:
 							break;
 					} /* switch (option) */
 					break;
@@ -1526,9 +1543,14 @@ change_config_file (group, filter_at_once)
 						case OPT_ART_MARKED_UNREAD:
 							prompt_option_char (option);
 							break;
+
+						default:
+							break;
 					} /* switch (option) */
 					break;
 
+				default:
+					break;
 			} /* switch (option_table[option - 1].var_type) */
 			change_option = FALSE;
 			show_menu_help (txt_select_config_file_option);

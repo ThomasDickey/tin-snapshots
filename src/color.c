@@ -22,9 +22,9 @@
 /*
  * Local prototypes
  */
-int isalp P_((char c));
-int check_valid_mark P_((const char *s, char c));
-int color_fputs P_((const char *s, FILE *stream, int color));
+static int isalp P_((int c));
+static int check_valid_mark P_((const char *s, int c));
+static int color_fputs P_((const char *s, FILE *stream, int color));
 
 
 /* setting foregroundcolor */
@@ -49,8 +49,9 @@ bcol (color)
 	printf("\033[%dm", (color + 40));
 }
 
-int
-isalp (char c)
+static int
+isalp (c)
+	int c;
 {
 	if (isalnum(c)) {
 		return (1);
@@ -93,14 +94,16 @@ isalp (char c)
 		case '@':
 		case '\\':
 			return (1);
-			break;
+
 		default:
 			return (0);
 	}
 }
 
-int
-check_valid_mark (const char *s, char c)
+static int
+check_valid_mark (s, c)
+	const char *s;
+	int c;
 {
 	const char *p;
 
@@ -116,8 +119,11 @@ check_valid_mark (const char *s, char c)
 	return (0);
 }
 
-int
-color_fputs (const char *s, FILE *stream, int color)
+static int
+color_fputs (s, stream, color)
+	const char *s;
+	FILE *stream;
+	int color;
 {
 	const char *p;
 	int col1=0, col2=0;
@@ -170,6 +176,7 @@ color_fputs (const char *s, FILE *stream, int color)
 
 			default:
 				my_fputc(*p, stream);
+				break;
 		}
 	}
 	return (1);

@@ -847,6 +847,7 @@ ReadCh ()
 					break;
 				default:
 					secondkey = '?';
+					break;
 			}
 		} else if (result == 0x0d) {
 			result = 0x0a;
@@ -889,6 +890,7 @@ PROFILE_ON();
 			switch (buf[buflen-1])
 			{	char *ptr;
 				long class;
+
 				case 'r':		/* Window bounds report */
 					ptr = (char *)&buf[bufp+1];
 					my_strtol(ptr,&ptr,10);
@@ -902,6 +904,7 @@ PROFILE_ON();
 					if (getscrsize)
 						return 0;
 					break;
+
 				case '|':		/* Raw Input Events */
 					ptr = (char *)&buf[bufp+1];
 					class = my_strtol(ptr,&ptr,10);
@@ -931,6 +934,9 @@ PROFILE_ON();
 							buflen = bufp;
 							break;
 					}
+					break;
+
+				default:
 					break;
 			}
 		}

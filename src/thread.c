@@ -103,11 +103,11 @@ bld_tline (l, art)
 	}
 
 	if (show_lines) {
-		sprintf (screen[j].col, "  %s%s  [%s]  %-*.*s%s%-*.*s",
+		sprintf (screen[j].col, "  %s %s  [%s]  %-*.*s%s%-*.*s",
 			 tin_itoa(l, 4), new_resps, lines, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	} else {
-		sprintf (screen[j].col, "  %s%s  %-*.*s%s%-*.*s",
+		sprintf (screen[j].col, "  %s %s  %-*.*s%s%-*.*s",
 			 tin_itoa(l, 4), new_resps, len_subj, len_subj, art->subject,
 			 spaces, len_from, len_from, from);
 	}
@@ -297,8 +297,11 @@ show_thread (group, group_path, respnum)
 								} else {
 									goto thread_done;
 								}
-								/* break; */
+							default:
+								break;
 						}
+						break;
+					default:
 						break;
 				}
 				break;

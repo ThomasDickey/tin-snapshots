@@ -392,6 +392,11 @@ thread_by_subject()
 		/*
 		 * Get the contents of the magic marker in the hashnode
 		 */
+
+		/* 
+		 * Yehova: casting char * to int *
+		 * FIXME!! 
+		 */
 		aptr = (int *)arts[i].subject;
 		aptr -=2;
 
@@ -526,6 +531,9 @@ make_threads (group, rethread)
 			collate_subjects();
 			return;
 #endif
+
+		default: /* not reached */
+			return;
 	}
 }
 
@@ -700,6 +708,8 @@ parse_headers (buf, h)
 						}
 					}
 				}
+				break;
+			default:
 				break;
 		} /* switch */
 
@@ -1227,6 +1237,8 @@ pcFindNovFile (psGrp, iMode)
 				}
 			}
 			break;
+		default: /* not reached */
+			break;
 	}
 
 	if (iHashFileName) {
@@ -1569,7 +1581,6 @@ input_pending ()
 	switch (fds[0].revents) {
 		case POLLIN:
 			return TRUE;
-			/* break; */
 		/*
 		 * Other conditions on the stream
 		 */
@@ -1577,7 +1588,6 @@ input_pending ()
 		case POLLERR:
 		default:
 			return FALSE;
-			/* break; */
 	}
 #endif	/* HAVE_POLL */
 
