@@ -30,10 +30,10 @@
 #	define SMALL_MEMORY_MACHINE
 #	define DONT_REREAD_ACTIVE_FILE
 #	ifndef __GNUC__
-#		undef  M_UNIX
+#		undef M_UNIX
 #		define M_AMIGA
-#		define  SIG_ARGS /*nothing, since compiler doesn't handle it*/
-#		undef   DECL_SIG_CONST
+#		define SIG_ARGS /*nothing, since compiler doesn't handle it*/
+#		undef DECL_SIG_CONST
 #	endif
 #endif
 
@@ -490,9 +490,13 @@ extern char *get_uaf_fullname();
 #		define	DEFAULT_SHELL	"/bin/sh"
 #	endif
 #	ifndef DEFAULT_MAILBOX
-#		define	DEFAULT_MAILBOX "/usr/mail"
+#		define	DEFAULT_MAILBOX "/usr/mail" 
 #	endif
 #	ifndef DEFAULT_MAILER
+/*
+** sure that we want to fall-back to /bin/mail instead of
+** /usr/lib/sendmail on SysV-style systems?
+*/
 #		define	DEFAULT_MAILER	"/bin/mail"
 #	endif
 #	ifndef DEFAULT_PRINTER
@@ -693,6 +697,12 @@ extern char *get_uaf_fullname();
 #	define	MARK_INRANGE	'#'	/* group/art within a range (# command) */
 #endif
 
+/*
+ * position of the unread/will_return/hot-mark
+ * (used in group.c/thread.c)
+ */
+#define	MARK_OFFSET	9
+
 #define			SELECT_MISC_COLS	21
 #ifdef USE_INVERSE_HACK
 #	define		BLANK_GROUP_COLS	2
@@ -713,7 +723,6 @@ extern char *get_uaf_fullname();
 #define		MAX_COLOR	15
 #define		MAX_BACKCOLOR	7
 
-#define 	SCREEN_READ_UNREAD	6		/* position for "  +" / "   " */
 #define 	INDEX_TOP	2
 
 #ifdef NO_REGEX
@@ -1357,8 +1366,9 @@ struct t_newnews
  */
 
 struct t_option {
-	void *variable;		/* ptr to variable to change */
-	int var_type;		/* type of variable (see conf.h) */
+	int var_type;		/* type of variable (see tincfg.h) */
+	int var_index;		/* index in corresponding table */
+	int *variable;		/* ptr to variable to change */
 	char **opt_list;	/* ptr to list entries if OPT_LIST */
 	int opt_count;		/* no. of list entries if OPT_LIST */
 	char *option_text;	/* text to print as information on option */

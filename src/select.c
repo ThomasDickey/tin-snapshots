@@ -696,6 +696,8 @@ select_done:
 					if (post_article (post_group, &posted_flag)) {
 						group_selection_page ();
 					}
+				} else {
+					info_message(txt_cannot_post);
 				}
 				break;
 

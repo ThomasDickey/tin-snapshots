@@ -27,19 +27,15 @@
 
 #include	"tin.h"
 
-#ifndef S_ISDIR
-#define S_ISDIR(m)  ((m & S_IFMT) == S_IFDIR)
-#endif
-
 char	acHomeDir[PATH_LEN];
 char	acMailActiveFile[PATH_LEN];
 char	acSaveActiveFile[PATH_LEN];
 char	acTempActiveFile[PATH_LEN];
 char	acMailDir[PATH_LEN];
 char	acSaveDir[PATH_LEN];
-int		iAllGrps;
-int		iRecursive;
-int		iVerbose;
+int	iAllGrps;
+int	iRecursive;
+int	iVerbose;
 
 #ifndef M_AMIGA
 struct	passwd *psPwd;

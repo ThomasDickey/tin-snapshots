@@ -15,8 +15,6 @@
 #include	"tin.h"
 #include	"menukeys.h"
 
-#define MARK_OFFSET	9
-
 #define INDEX2SNUM(i)	((i) % NOTESLINES)
 #define SNUM2LNUM(i)	(INDEX_TOP + (i))
 #define INDEX2LNUM(i)	(SNUM2LNUM(INDEX2SNUM(i)))
@@ -1550,7 +1548,7 @@ toggle_subject_from ()
  * that draw_sline() expects bld_sline() to place the article mark
  * (read_art_makr, selected_art_mark, etc) at MARK_OFFSET in the screen[].col.
  * So, if you change the format used in this routine, be sure to check
- * that the value of MARK_OFFSET is still correct.
+ * that the value of MARK_OFFSET (tin.h) is still correct.
  * Yes, this is somewhat kludgy.
  */
 

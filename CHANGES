@@ -1,3 +1,21 @@
+--unoff BETA release 961226 --
+
+260) Thomas E. Dickey <dickey@clark.net>
+     ADD. extends 'makecfg' to generate type-specific tables for string and
+          char pointers, getting rid of the void* casts in tincfg.h
+          modifies config.c and prompt.c accordingly.
+     ADD. fixes color.c to work in xterm (i.e., the XFree86 3.2 version, or
+          rxvt -- there's no point in fixing for color_xterm unless we
+          converted to using ncurses).
+     ADD. eliminates some of the clutter in post.c by using new utility
+          functions (I did that when seeing that the newline in a subject
+          wasn't stripped properly).
+     FIX. several supplied patches
+
+259) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code clean-up
+     FIX. several supplied patches
+
 --unoff BETA release 961225 --
 
 258) Roland Rosenfeld <roland@spinnaker.rhein.de>

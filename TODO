@@ -7,7 +7,8 @@ o  if ((n > 9999) && (x > 9999)) n is truncated to the left most 4 digits
    (thread_x_of_n, group.c) (use tin_itoa would help)
 
 o  'From: "Lastname, Firstname" <netscape@luser.dau>' is not displayed
-   correct at all levels - it appears as '"Lastname' -> rewrite parse_from()
+   correct at all levels - it appears as '"Lastname'
+   -> rewrite parse_from()
 
 o  on x*n+1 articles (n=articles on one screen) - <end> does not work
    correctly (it jumps to the (x*n)th artilce - f.e. 22 articles, 21 per
@@ -44,17 +45,12 @@ o  if postings fails tin rereads the article numbers for the group you
    useless!
 
 o  Followup-To: line is not examined weather the mentioned group(s) are valid
-   on this server (btw. with nntp_only & tin -n this feature is useless
-   cause it may lead to wrong results (on the other hand, posting in a
-   newsgroup which one isn't subscribed to is not very useful))
+   on this server.
 
 o  Newsgroup: and Followup-To: stripping should be done before Followup-To:
    is examined weather it contains several groups...
 
 o  if a colored signature wraps over a page-break, the coloring gets lost
-
-o  'D' deleted article flag (thread selection level) is not showing up.
-   (is it still needed?!)
 
 o  tin does not warn you if you try to save into a directory and not into
    a file. 
@@ -109,8 +105,6 @@ o  unique newsgroups after editing article
 
 o  add feature save selected/tagged files sequentially to the same file
 
-o  rewrite NGLIMIT handling (post.c)
-
 o  add feature Cc:
 
 o  sender-patch
@@ -143,6 +137,9 @@ o  Additions to the thread menu :
 	'S' (autosave tagged)
 	'U' (untag all)
 	'M' (option menu)
+	'w' (post an article)
+	'r' (reply to) /* not 'R' cause it conflicts with mail_bugreport */
+	'f' (post a followup)
 	keys to goto previous/next thread
 
 o  Add 'l' (goto thread menu) to the article pager
@@ -163,9 +160,11 @@ o  if Newsgroups:-line has groups in it which are not present in the users
 o  fix built-in inews to truncate signature > 4 lines
    (compile-time option?)
 
-o  bring up a warning on a long newsgroup/followup line (>=5 groups) and
-   force the user to confirm every single group he wants to post in.
-   (N/y)
+o  bring up a warning on a long newsgroup (>=5) line and
+   force the user to confirm every single group he wants to post (or
+   redirect followups to) in. (N/y)
+   rewrite NGLIMIT handling (post.c)
+   (not just truncate Newsgroups:-line after the NGLIMITth newsgroup)
 
 o  bring up a warning when trying to f'up into a binaries group
    (Warning, sending a followup to a binaries group is undesired, post it
@@ -356,3 +355,5 @@ o  marking latest article with 'K' does not jump to top of newsgroup if
 
 o  when resizing an xterm (on SunOS, at least), tin will repaint the screen
    when the user is actually in an editor spawned by tin.
+
+o  check where tin_done() should be called instead of using exit()

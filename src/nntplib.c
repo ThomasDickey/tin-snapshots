@@ -609,6 +609,7 @@ get_dnet_socket (machine, service)
 }
 #endif
 
+#if 0 /* this function is NEVER called */
 /*
  * handle_server_response
  *
@@ -659,6 +660,7 @@ handle_server_response (response, nntpserver)
 	return (-1);
 #endif /* NNTP_ABLE */
 }
+#endif /* 0 */
 
 /*
  * u_put_server -- send data to the server. Do not flush output.
@@ -796,7 +798,6 @@ static int reconnecting = 0;
 			if (reconnecting) return -1;
 			if (prompt_yn (cLINES, txt_reconnect_to_news_server, TRUE) != 1) {
 				return -2;
-	/* there was no check for -2 in open.c !!!*/
 			}
 			reconnecting = 1;
 			clear_message ();
@@ -940,8 +941,19 @@ nntp_respcode (respcode)
 	static char *text;
 
 	if (strlen (error_response) > 4) {
+	/*
+	** the newsserver returns more than just an error number
+	** -> show it to the user
+	*/
 		return (error_response);
 	} else {
+	/*
+	** the newsserver returns just an error number
+	** -> translate it to something usefull
+	**
+	** (does this ever happen?)
+	*/
+	
 	switch (respcode) {
 		case 0:
 			text = "";

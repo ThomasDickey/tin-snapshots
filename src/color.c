@@ -19,6 +19,9 @@
 #include "tin.h"
 #ifdef HAVE_COLOR
 
+static int current_fcol = 7;
+static int current_bcol = 0;
+
 /*
  * Local prototypes
  */
@@ -32,10 +35,15 @@ void
 fcol (color)
 	int color;
 {
-	if (!use_color) {
-		return;
+	if (use_color) {
+		if (color >= 0 && color <= 15) {
+			int bold = (color >> 3);
+			printf("\033[%d;%dm", bold, ((color & 7) + 30));
+			if (!bold)
+				bcol(current_bcol);
+			current_fcol = color;
+		}
 	}
-	printf("\033[%d;%dm", (color >> 3), ((color & 7) + 30));
 }
 
 /* setting backgroundcolor */
@@ -43,10 +51,12 @@ void
 bcol (color)
 	int color;
 {
-	if (!use_color) {
-		return;
+	if (use_color) {
+		if (color >= 0 && color <= 7) {
+			printf("\033[%dm", (color + 40));
+			current_bcol = color;
+		}
 	}
-	printf("\033[%dm", (color + 40));
 }
 
 static int

@@ -787,7 +787,8 @@ constext txt_value_out_of_range[] = "\n%s%d out of range (0 - %d). Reset to 0";
 constext txt_warn_art_line_too_long[] = "Warning: posting exceeds %d columns.  Line %d is the first long one:\n%-100s\n\n";
 constext txt_warn_followup_to_several_groups[] = "Warning: Followup-To set to more than one newsgroup!\n\n";
 constext txt_warn_missing_followup_to[] = "Warning: cross-posting to %d newsgroups and no Followup-To line!\n\n";
-constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n\n";
+constext txt_warn_not_in_newsrc[] = "Warning: \"%s\" is not in your newsrc, it may be invalid at this site!\n";
+constext txt_warn_not_valid_newsgroup[] = "Warning: \"%s\" is not a valid newsgroup at this site!\n";
 constext txt_warn_posting_etiquette[] = "\n\
   If your article contains quoted text  please take some time to pare it down\n\
   to just the  key points to which you are  responding, or  people will think\n\

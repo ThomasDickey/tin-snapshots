@@ -339,7 +339,7 @@ extern void vNewsrcTestHarness P_((void));
 extern char *getserverbyfile P_((char *file));
 extern int server_init P_((char *machine, char *service, int port));
 extern int get_tcp_socket P_((char *machine, char *service, unsigned port));
-extern int handle_server_response P_((int response, char *nntpserver));
+/*extern int handle_server_response P_((int response, char *nntpserver));*/ /* not used */
 extern void u_put_server P_((char *string));
 extern void put_server P_((char *string));
 extern int get_server P_((char *string, int size));
