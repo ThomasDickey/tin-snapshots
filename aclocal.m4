@@ -645,7 +645,7 @@ int*)
 esac
 case $cf_cv_type_outchar in
 *char*)
-	AC_DEFINE(OUTC_ARGS,char c)
+	AC_DEFINE(OUTC_ARGS,char)
 	;;
 esac
 ])dnl

@@ -1,3 +1,13 @@
+--unoff BETA release 970115 --
+
+286) Urs Janssen <urs@akk.uni-karlsruhe.de>
+     ADD. minor code-cleanup
+     FIX. several supplied patches
+
+285) Alexander Lehmann <alex@hal.rhein-main.de>
+     ADD. abillity to strip non txt/plain parts from multipart mime-postings
+     FIX. several supplied patches
+
 --unoff BETA release 970114 --
 
 284) Urs Janssen <urs@akk.uni-karlsruhe.de>

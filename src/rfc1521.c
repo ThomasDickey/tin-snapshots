@@ -14,6 +14,11 @@
 
 #include "tin.h"
 
+/*
+** Local prototypes
+*/
+static int boundary_cmp P_((char *line, char *boundary));
+
 /* this strcpy variant removes \n and "" */
 void
 strcpynl (to, from)
@@ -61,6 +66,48 @@ strcasestr (haystack, needle)
 	return NULL;
 }
 
+/* check if a line is a MIME boundary, returns 0 if false, 1 if normal
+   boundary and 2 if closing boundary */
+
+int boundary_cmp(line, boundary)
+	char *line;
+	char *boundary;
+{
+  int nl;
+
+  if(strlen(line)==0)
+    return 0;
+
+  nl=line[strlen(line)-1]=='\n';
+
+  if(strlen(line)!=strlen(boundary)+2+nl &&
+     strlen(line)!=strlen(boundary)+4+nl )
+    return 0;
+
+  if(line[0]!='-' || line[1]!='-')
+    return 0;
+
+  if(strncmp(line+2, boundary, strlen(boundary))!=0)
+    return 0;
+
+  if(line[strlen(boundary)+2]!='-') {
+    if( nl ? line[strlen(boundary)+2]=='\n'
+	   : line[strlen(boundary)+2]=='\0')
+      return 1;
+    else
+      return 0;
+  }
+
+  if(line[strlen(boundary)+3]!='-')
+    return 0;
+  if(nl ? line[strlen(boundary)+4]=='\n'
+	: line[strlen(boundary)+4]=='\0')
+    return 2;
+  else
+    return 0;
+}
+
+
 /* KNOWN BUG: this function is also called before piping and saving
    articles, so these get saved with incorrect MIME headers */
 
@@ -73,8 +120,10 @@ rfc1521_decode (file)
 	char buf2[2048];
 	char content_type[128];
 	char content_transfer_encoding[128];
+	char boundary[128];
 	char *charset;
 	char encoding = '\0';
+	off_t hdr_pos;
 
 	if (!file)
 		return file;
@@ -103,6 +152,82 @@ rfc1521_decode (file)
 		if (*buf == '\r' || *buf == '\n')
 			break;
 	}
+
+	if(alternative_handling) {
+	  /* if we have an article of type multipart/alternative, we
+	   * scan if for a part that is text/plain and use only that.
+	   * This should take care of the text/html articles that seem
+	   * to pop up more and more. When NS4 gets released this will
+	   * be even more of a problem.
+	   */
+
+	  if(strcasestr(content_type, "multipart/alternative") &&
+	     strcasestr(content_type, "boundary=") &&
+	     (!*content_transfer_encoding ||
+	      strcasecmp(content_transfer_encoding, "7bit")==0)) {
+	    /* first copy the header without the two lines */
+	    rewind(file);
+	    rewind(f);
+
+	    while (fgets (buf, sizeof (buf), file)) {
+	      if (strncasecmp (buf, "Content-Type: ", 14)!=0 &&
+		  strncasecmp (buf, "Content-Transfer-Encoding: ", 27)!=0) {
+		if (*buf == '\r' || *buf == '\n')
+		  break;
+		/* don't copy the empty line, since we add header
+		   lines later */
+		fputs (buf, f);
+	      }
+	    }
+
+	    /*
+	     * now search for the start of each part 
+	     */
+
+	    strcpynl(boundary, strcasestr(content_type, "boundary=")+9);
+
+	    fputs("X-Conversion-Note: multipart/alternative contents have been removed.\n", f);
+	    fputs("\tTo get the whole article, turn alternative_handling OFF\n", f);
+
+	    hdr_pos=ftell(f);
+
+	    while(!feof(file)) {
+	      while(fgets(buf, sizeof(buf), file)) {
+		if(boundary_cmp(buf, boundary)) {
+		  if(boundary_cmp(buf, boundary)==2) {
+		    break;
+		  }
+		  fseek(f, hdr_pos, SEEK_SET);
+		  while(fgets(buf, sizeof(buf), file)) {
+		    if(strncasecmp(buf, "Content-Type: ", 14)==0 && 
+		       strncasecmp(buf, "Content-Type: text/plain", 24)!=0) {
+		      /* different type, ignore it */
+		      goto break2;
+		    }
+		    fputs(buf, f);
+		    if(*buf=='\n')
+		      break;
+		  }
+		  
+		  /* now copy the part body */
+
+		  while(fgets(buf, sizeof(buf), file)) {
+		    if(boundary_cmp(buf, boundary))
+		      break;
+		    fputs(buf, f);
+		  }
+		  /* we just call ourselves, better than a goto, I think */
+		  fclose(file);
+		  rewind(f);
+		  return rfc1521_decode (f);
+		}
+	      }
+	    break2:
+	    ;
+	    }
+	  }
+	}
+
 #ifndef LOCAL_CHARSET
 	/*
 	 * if we have a different local charset, we also convert articles

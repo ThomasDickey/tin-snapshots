@@ -635,7 +635,7 @@ check_for_any_new_news (CheckAnyUnread, StartAnyUnread)
 void
 save_or_mail_new_news ()
 {
-	int i;
+	t_bool i;
 
 	if (mail_news || save_news) {
 		i = catchup;			/* set catchup to FALSE */

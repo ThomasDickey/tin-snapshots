@@ -17,9 +17,12 @@
 #include	"version.h"
 
 char active_times_file[PATH_LEN];
-char global_attributes_file[PATH_LEN];
-char local_attributes_file[PATH_LEN];
 char add_addr[LEN];			/* address to add to rR reply to author with mail */
+char art_marked_deleted;
+char art_marked_inrange;
+char art_marked_return;
+char art_marked_selected;
+char art_marked_unread;
 char article[PATH_LEN];			/* ~/.article file */
 char bug_addr[LEN];			/* address to add send bug reports to */
 char cmd_line_printer[PATH_LEN];	/* printer program specified on cmd line */
@@ -28,8 +31,8 @@ char cvers[LEN];
 char dead_article[PATH_LEN];		/* ~/dead.article file */
 char dead_articles[PATH_LEN];		/* ~/dead.articles file */
 char default_editor_format[PATH_LEN];	/* editor + parameters  %E +%N %F */
-char default_mailer_format[PATH_LEN];	/* mailer + parameters  %M %S %T %F */
 char default_maildir[PATH_LEN];		/* mailbox dir where = saves are stored */
+char default_mailer_format[PATH_LEN];	/* mailer + parameters  %M %S %T %F */
 char default_organization[PATH_LEN];	/* Organization: */
 char default_post_newsgroups[PATH_LEN];
 char default_post_subject[PATH_LEN];
@@ -37,11 +40,12 @@ char default_printer[LEN];		/* printer program specified from tinrc */
 char default_range_group[PATH_LEN];
 char default_range_select[PATH_LEN];
 char default_range_thread[PATH_LEN];
+char default_savedir[PATH_LEN];		/* directory to save articles to */
 char default_select_pattern[LEN];
+char default_shell_command[LEN];	/* offers user default choice */
 char default_sigfile[PATH_LEN];
 char default_signature[PATH_LEN];
-char default_shell_command[LEN];	/* offers user default choice */
-char default_savedir[PATH_LEN];		/* directory to save articles to */
+char global_attributes_file[PATH_LEN];
 char global_config_file[PATH_LEN];
 char global_filter_file[PATH_LEN];
 char group_times_file[PATH_LEN];
@@ -50,197 +54,202 @@ char index_maildir[PATH_LEN];
 char index_newsdir[PATH_LEN];
 char index_savedir[PATH_LEN];
 char libdir[PATH_LEN];			/* directory where news config files are (ie. active) */
-char lock_file[PATH_LEN];		/* contains name of index lock file */
+char local_attributes_file[PATH_LEN];
 char local_config_file[PATH_LEN];
 char local_filter_file[PATH_LEN];
 char local_newsgroups_file[PATH_LEN];	/* local copy of NNTP newsgroups file */
 char local_newsrctable_file[PATH_LEN];
+char lock_file[PATH_LEN];		/* contains name of index lock file */
 char mail_active_file[PATH_LEN];
-#ifdef FORGERY
-char mail_address[LEN];			/* user's mail address */
-#endif
-int mail_mime_encoding;
-t_bool mail_8bit_header=FALSE;		/* allow 8bit chars. in header of mail message */
-char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char mail_news_user[LEN];		/* mail new news to this user address */
 char mail_quote_format[PATH_LEN];
 char mailbox[PATH_LEN];			/* system mailbox for each user */
 char mailer[PATH_LEN];			/* mail program */
+char mailgroups_file[PATH_LEN];
+char mm_charset[LEN]="";                /* MIME charset: moved from rfc1522.c */
 char motd_file[PATH_LEN];		/* news motd file for newsadmin purposes */
 char motd_file_info[PATH_LEN];		/* date of last time news motd file read */
+char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char my_distribution[LEN];		/* Distribution: */
+char newnewsrc[PATH_LEN];
 char news_active_file[PATH_LEN];
 char news_quote_format[PATH_LEN];
-char mailgroups_file[PATH_LEN];
 char newsgroups_file[PATH_LEN];
 char newsrc[PATH_LEN];
-char newnewsrc[PATH_LEN];
 char novrootdir[PATH_LEN];		/* root directory of nov index files */
 char page_header[LEN];			/* page header of pgm name and version */
 char post_proc_command[PATH_LEN];	/* Post processing command */
-int post_mime_encoding;
 char posted_info_file[PATH_LEN];
 char posted_msgs_file[PATH_LEN];
 char progname[PATH_LEN];		/* program name */
 char quote_chars[PATH_LEN];		/* quote chars for posting/mails ": " */
 char rcdir[PATH_LEN];
-#ifdef VMS
-char rcdir_asfile[PATH_LEN];		/* rcdir expressed as dev:[dir]tin.dir, for stat() */
-#endif
 char reply_to[LEN];			/* Reply-To: address */
 char save_active_file[PATH_LEN];
 char spooldir[PATH_LEN];		/* directory where news is */
 char subscriptions_file[PATH_LEN];
-char msg_headers_file[PATH_LEN];	/* $HOME/.tin/headers */
 char txt_help_bug_report[LEN];		/* address to add send bug reports to */
 char userid[PATH_LEN];
 char xpost_quote_format[PATH_LEN];
+
+#ifdef FORGERY
+char mail_address[LEN];				/* user's mail address */
+#endif
+
+#ifdef VMS
+char rcdir_asfile[PATH_LEN];		/* rcdir expressed as dev:[dir]tin.dir, for stat() */
+#endif
+
 #ifdef M_OS2
 char TMPDIR[PATH_LEN];
 #endif
 
-char art_marked_deleted;
-char art_marked_inrange;
-char art_marked_return;
-char art_marked_selected;
-char art_marked_unread;
-t_bool auto_list_thread;		/* list thread when entering it using right arrow */
-int NOTESLINES;				/* set in set_win_size () */
-int RIGHT_POS;				/* set in set_win_size () */
-int MORE_POS;				/* set in set_win_size () */
-t_bool confirm_action;
-t_bool confirm_to_quit;
-int max_subj = 0;
-int max_from = 0;
-int got_sig_pipe = FALSE;
-int group_top;				/* one past top of my_group */
-int groupname_len = 0;			/* one past top of my_group */
-int catchup = FALSE;			/* mark all arts read in all subscribed groups */
-int update_fork = FALSE;		/* update index files by forked tin -u */
-int verbose = FALSE;			/* update index files only mode */
-int start_line_offset = 1;		/* used by invoke_editor for line no. */
-int read_news_via_nntp = FALSE;		/* read news locally or via NNTP */
-int local_index;			/* do private indexing? */
-int read_saved_news = FALSE;		/* tin -R read saved news from tin -S */
-int real_gid;
-int real_uid;
-int real_umask;
-t_bool show_description;
-t_bool strip_blanks;
-t_bool sigdashes;			/* set TRUE to prepend every signature with dashes */
-t_bool start_editor_offset;
-int tin_uid;
-int tin_gid;
-int top = 0;
-int top_base;
-int check_any_unread = FALSE;
-int start_any_unread = FALSE;
+t_bool catchup = FALSE;				/* mark all arts read in all subscribed groups */
+t_bool check_for_new_newsgroups;	/* don't check for new newsgroups */
+t_bool created_rcdir;				/* checks if first time tin is started */
+t_bool count_articles;				/* count articles on spooldir or via GROUP cmd */
+t_bool got_sig_pipe = FALSE;
+t_bool mail_news;						/* mail all arts to specified user */
+t_bool mail_news_to_posted;		/* mail all arts to specified user */
 
-t_bool beginner_level;			/* beginner level (shows mini help a la elm) */
-t_bool catchup_read_groups;		/* ask if read groups are to be marked read */
-int cmd_line;				/* batch / interactive mode */
-int check_for_new_newsgroups;		/* don't check for new newsgroups */
-int count_articles;			/* count articles on spooldir or via GROUP cmd */
-int created_rcdir;			/* checks if first time tin is started */
-t_bool default_auto_save;		/* save thread with name from Archive-name: field */
+/*  check for the bools -> change to t_bool */
+int MORE_POS;						/* set in set_win_size () */
+int NOTESLINES;					/* set in set_win_size () */
+int RIGHT_POS;						/* set in set_win_size () */
+int check_any_unread = FALSE;
+int cmd_line;						/* batch / interactive mode */
 int default_auto_save_msg;		/* save posted message to ~/Mail/posted */
-t_bool default_batch_save;		/* save arts if -M/-S command line switch specified */
 int default_filter_days;		/* num of days an article  filter can be active */
+int default_filter_kill_header;
+int default_filter_select_header;
+int default_post_proc_type;	/* type of post processing to be performed */
 int default_save_mode;			/* Append/Overwrite existing file when saving */
 int default_show_author;		/* show_author value from 'M' menu in tinrc */
-t_bool default_show_only_unread;	/* show only new/unread arts or all arts */
 int default_sort_art_type;		/* sort arts[] array by subject,from or date field */
 int default_thread_arts;		/* threading system for viewing articles */
 int delete_index_file;			/* delete index file before indexing (tind only) */
-t_bool draw_arrow_mark;			/* draw -> or highlighted bar */
-t_bool force_screen_redraw;		/* force screen redraw after external (shell) commands */
-t_bool full_page_scroll;		/* page half/full screen of articles/groups */
-t_bool group_catchup_on_exit;		/* catchup group with left arrow key or not */
-t_bool thread_catchup_on_exit;		/* catchup thread with left arrow key or not */
+int global_filtered_articles;	/* globally killed / auto-selected articles */
+int group_top;						/* one past top of my_group */
+int groupname_len = 0;			/* one past top of my_group */
 int groupname_max_length;		/* max len of group names to display on screen */
-int use_keypad;				/* enables/disables scroll keys on supported terminals */
-#ifdef HAVE_METAMAIL
-t_bool use_metamail;			/* enables/disables metamail on MIME messages */
-t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
-#endif
-#ifdef HAVE_COLOR
-int use_color;				/* enables/disables ansi-color support under linux-console and color-xterm */
-t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
-int col_back;				/* standard bacground color */
-int col_invers_fg;			/* color of inverse text (foreground) */
-int col_invers_bg;			/* color of inverse text (background) */
-int col_text;				/* color of textlines*/
-int col_minihelp;			/* color of mini help menu*/
-int col_help;				/* color of help pages */
-int col_message;			/* color of message lines at bottom */
-int col_quote;				/* color of quotelines */
-int col_head;				/* color of headerlines */
-int col_subject;			/* color of article subject */
-int col_response;			/* color of respone counter */
-int col_from;				/* color of sender (From:) */
-int col_normal;				/* standard foreground color */
-int col_title;				/* color of Help/Mail-Sign */
-int col_signature;			/* color of signature */
-int word_highlight;			/* word highlighting on/off */
-t_bool word_highlight_tinrc;		/* like word_highlight but stored in tinrc */
-int word_h_display_marks;		/* display * or _ when highlighting or space or nothing*/
-int col_markstar;			/* text highlighting with *stars* */
-int col_markdash;			/* text highlighting with _underdashes_ */
-#endif
-t_bool use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
-t_bool use_mouse;			/* enables/disables mouse support under xterm */
-t_bool auto_cc;				/* add your name to cc automatically */
-t_bool auto_bcc;			/* add your name to bcc automatically */
-int global_filtered_articles;		/* globally killed / auto-selected articles */
-int local_filtered_articles;		/* locally killed / auto-selected articles */
 int iso2asc_supported;			/* Convert ISO-Latin1 to Ascii */
-t_bool mark_saved_read;			/* mark saved article/thread as read */
+int local_filtered_articles;	/* locally killed / auto-selected articles */
+int local_index;					/* do private indexing? */
+int mail_mime_encoding;
+int max_from = 0;
+int max_subj = 0;
 int newsrc_active;
-int num_of_selected_arts;
 int num_of_killed_arts;
+int num_of_selected_arts;
 int num_of_tagged_arts;
-int process_id;
-t_bool pos_first_unread;		/* position cursor at first/last unread article */
-int default_post_proc_type;		/* type of post processing to be performed */
 int post_article_and_exit;		/* quick post of an article then exit (elm like) */
-t_bool post_8bit_header=FALSE;		/* allow 8bit chars. in header when posting to newsgroup */
-t_bool print_header;			/* print all of mail header or just Subject: & From lines */
+int post_mime_encoding;
+int process_id;
 int purge_index_files;			/* stat all articles to see if they still exist */
-int default_filter_kill_header;
-t_bool default_filter_kill_global;
-t_bool default_filter_kill_case;
-t_bool default_filter_kill_expire;
-int default_filter_select_header;
-t_bool default_filter_select_global;
-t_bool default_filter_select_case;
-t_bool default_filter_select_expire;
-t_bool process_only_unread;		/* save/print//mail/pipe unread/all articles */
-int read_local_newsgroups_file;		/* read newsgroups file locally or via NNTP */
-int mail_news_to_posted;		/* mail all arts to specified user */
-int mail_news;				/* mail all arts to specified user */
-int save_news;				/* save all arts to savedir structure */
-t_bool save_to_mmdf_mailbox;		/* save mail to MMDF/mbox format mailbox */
+int read_local_newsgroups_file;	/* read newsgroups file locally or via NNTP */
+int read_news_via_nntp = FALSE;	/* read news locally or via NNTP */
+int read_saved_news = FALSE;	/* tin -R read saved news from tin -S */
+int real_gid;
+int real_uid;
+int real_umask;
+int reread_active_file_secs;	/* reread active file interval in seconds */
+int save_news;						/* save all arts to savedir structure */
 int show_author;
-t_bool show_lines;
-t_bool show_last_line_prev_page;	/* set TRUE to see last line of prev page (ala nn) */
-t_bool show_only_unread_groups;		/* set TRUE to see only subscribed groups with new news */
-t_bool show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
-t_bool highlight_xcommentto;		/* set TRUE to show X-Comment-To inverse in the upper right corner */
+int start_any_unread = FALSE;
+int start_line_offset = 1;		/* used by invoke_editor for line no. */
 int system_status;
-t_bool tab_after_X_selection;		/* set TRUE if you want auto TAB after X */
-t_bool tab_goto_next_unread;
-t_bool space_goto_next_unread;
 int tex2iso_supported;			/* Convert german style TeX to ISO-Latin1 */
-int update;				/* update index files only mode */
-t_bool use_builtin_inews;
-int xref_supported = TRUE;
-int xover_supported = FALSE;
-int xuser_supported = FALSE;
-t_bool no_advertising = FALSE;
+int tin_gid;
+int tin_uid;
+int top = 0;
+int top_base;
+int update;							/* update index files only mode */
+int update_fork = FALSE;		/* update index files by forked tin -u */
+int use_keypad;					/* enables/disables scroll keys on supported terminals */
+int verbose = FALSE;				/* update index files only mode */
 int xmouse, xrow, xcol;			/* xterm button pressing information */
-int reread_active_file_secs;		/* reread active file interval in seconds */
+int xover_supported = FALSE;
+int xref_supported = TRUE;
+int xuser_supported = FALSE;
+
 #ifdef LOCAL_CHARSET
 int use_local_charset=TRUE;
+#endif
+
+#ifdef HAVE_COLOR
+int use_color;						/* enables/disables ansi-color support under linux-console and color-xterm */
+t_bool use_color_tinrc;			/* like use_color but stored in tinrc */
+int col_back;						/* standard bacground color */
+int col_invers_fg;				/* color of inverse text (foreground) */
+int col_invers_bg;				/* color of inverse text (background) */
+int col_text;						/* color of textlines*/
+int col_minihelp;					/* color of mini help menu*/
+int col_help;						/* color of help pages */
+int col_message;					/* color of message lines at bottom */
+int col_quote;						/* color of quotelines */
+int col_head;						/* color of headerlines */
+int col_subject;					/* color of article subject */
+int col_response;					/* color of respone counter */
+int col_from;						/* color of sender (From:) */
+int col_normal;					/* standard foreground color */
+int col_title;						/* color of Help/Mail-Sign */
+int col_signature;				/* color of signature */
+int word_highlight;				/* word highlighting on/off */
+t_bool word_highlight_tinrc;	/* like word_highlight but stored in tinrc */
+int word_h_display_marks;		/* display * or _ when highlighting or space or nothing*/
+int col_markstar;					/* text highlighting with *stars* */
+int col_markdash;					/* text highlighting with _underdashes_ */
+#endif
+
+t_bool alternative_handling=TRUE;
+t_bool auto_bcc;					/* add your name to bcc automatically */
+t_bool auto_cc;					/* add your name to cc automatically */
+t_bool auto_list_thread;		/* list thread when entering it using right arrow */
+t_bool beginner_level;			/* beginner level (shows mini help a la elm) */
+t_bool catchup_read_groups;	/* ask if read groups are to be marked read */
+t_bool confirm_action;
+t_bool confirm_to_quit;
+t_bool default_auto_save;		/* save thread with name from Archive-name: field */
+t_bool default_batch_save;		/* save arts if -M/-S command line switch specified */
+t_bool default_filter_kill_case;
+t_bool default_filter_kill_expire;
+t_bool default_filter_kill_global;
+t_bool default_filter_select_case;
+t_bool default_filter_select_expire;
+t_bool default_filter_select_global;
+t_bool default_show_only_unread;	/* show only new/unread arts or all arts */
+t_bool draw_arrow_mark;			/* draw -> or highlighted bar */
+t_bool force_screen_redraw;	/* force screen redraw after external (shell) commands */
+t_bool full_page_scroll;		/* page half/full screen of articles/groups */
+t_bool group_catchup_on_exit;	/* catchup group with left arrow key or not */
+t_bool highlight_xcommentto;	/* set TRUE to show X-Comment-To inverse in the upper right corner */
+t_bool mail_8bit_header=FALSE;	/* allow 8bit chars. in header of mail message */
+t_bool mark_saved_read;			/* mark saved article/thread as read */
+t_bool no_advertising = FALSE;
+t_bool pos_first_unread;		/* position cursor at first/last unread article */
+t_bool post_8bit_header=FALSE;	/* allow 8bit chars. in header when posting to newsgroup */
+t_bool print_header;				/* print all of mail header or just Subject: & From lines */
+t_bool process_only_unread;	/* save/print//mail/pipe unread/all articles */
+t_bool save_to_mmdf_mailbox;	/* save mail to MMDF/mbox format mailbox */
+t_bool show_description;
+t_bool show_last_line_prev_page;	/* set TRUE to see last line of prev page (ala nn) */
+t_bool show_lines;
+t_bool show_only_unread_groups;	/* set TRUE to see only subscribed groups with new news */
+t_bool show_xcommentto;			/* set TRUE to show X-Comment-To-Header */
+t_bool sigdashes;					/* set TRUE to prepend every signature with dashes */
+t_bool space_goto_next_unread;
+t_bool start_editor_offset;
+t_bool strip_blanks;
+t_bool tab_after_X_selection;	/* set TRUE if you want auto TAB after X */
+t_bool tab_goto_next_unread;
+t_bool thread_catchup_on_exit;	/* catchup thread with left arrow key or not */
+t_bool use_builtin_inews;
+t_bool use_mailreader_i;		/* invoke user's mailreader earlier to use more of its features (i = interactive) */
+t_bool use_mouse;					/* enables/disables mouse support under xterm */
+
+#ifdef HAVE_METAMAIL
+t_bool use_metamail;				/* enables/disables metamail on MIME messages */
+t_bool ask_for_metamail;		/* enables/disables the metamail query if a MIME message is going to be displayed */
 #endif
 
 #ifndef M_AMIGA
